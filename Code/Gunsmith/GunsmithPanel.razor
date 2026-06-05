@@ -704,7 +704,7 @@
 @code
 {
     private static GunsmithPanel Instance { get; set; }
-    public static bool IsAnyOpen { get; private set; }
+    public static bool IsAnyOpen => Game.ActiveScene.IsValid() && Game.ActiveScene.GetAllComponents<GunsmithPanel>().Any( x => x.IsValid() && x.Enabled );
 
     public enum GunsmithViewMode
     {
@@ -738,21 +738,17 @@
     {
         base.OnStart();
         Instance = this;
-        IsAnyOpen = true;
     }
 
     protected override void OnEnabled()
     {
         base.OnEnabled();
         Instance = this;
-        IsAnyOpen = true;
     }
 
     protected override void OnDisabled()
     {
         base.OnDisabled();
-        if ( Instance == this )
-            IsAnyOpen = false;
     }
 
     protected override void OnDestroy()
@@ -761,13 +757,11 @@
         if ( Instance == this )
         {
             Instance = null;
-            IsAnyOpen = false;
         }
     }
 
     public static void MarkClosed()
     {
-        IsAnyOpen = false;
     }
 
     private static readonly EquipmentSlot[] WeaponSlots =
