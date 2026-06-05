@@ -1,0 +1,1232 @@
+@import "/UI/Styles/Theme.scss";
+
+$gs-accent: rgba( 255, 180, 0, 0.92 );
+$gs-accent-dim: rgba( 255, 180, 0, 0.55 );
+$gs-panel-bg: rgba( 0, 0, 0, 0.52 );
+$gs-panel-bg-light: rgba( 255, 255, 255, 0.06 );
+$gs-text-dim: rgba( 255, 255, 255, 0.55 );
+$gs-text-mid: rgba( 255, 255, 255, 0.72 );
+
+GunsmithPanel
+{
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	justify-content: center;
+	align-items: center;
+	font-weight: bold;
+	flex-direction: column;
+	pointer-events: none;
+
+	// ===================== TOP BAR =====================
+	.gs-topbar
+	{
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 64px;
+		background-color: rgba( 0, 0, 0, 0.72 );
+		backdrop-filter: blur( 16px );
+		flex-direction: row;
+		align-items: center;
+		padding: 0 24px;
+		gap: 24px;
+		z-index: 200;
+		border-bottom: 1px solid rgba( 255, 180, 0, 0.25 );
+		pointer-events: all;
+	}
+
+	.gs-brand
+	{
+		flex-direction: row;
+		align-items: center;
+		gap: 10px;
+		flex-shrink: 0;
+	}
+
+	.gs-brand-logo
+	{
+		width: 42px;
+		height: 24px;
+	}
+
+	.gs-brand-text
+	{
+		flex-direction: column;
+		gap: 1px;
+	}
+
+	.gs-brand-name
+	{
+		font-size: 14px;
+		font-weight: bold;
+		color: white;
+		letter-spacing: 2px;
+	}
+
+	.gs-brand-sub
+	{
+		font-size: 9px;
+		color: $gs-accent;
+		letter-spacing: 3px;
+	}
+
+	.gs-weapon-title
+	{
+		flex-direction: column;
+		flex-grow: 1;
+		align-items: center;
+		gap: 2px;
+	}
+
+	.gs-weapon-name
+	{
+		font-size: 20px;
+		font-weight: bold;
+		color: white;
+		letter-spacing: 1px;
+	}
+
+	.gs-weapon-class
+	{
+		font-size: 10px;
+		color: $gs-text-dim;
+		letter-spacing: 1.5px;
+	}
+
+	.gs-topbar-actions
+	{
+		flex-direction: row;
+		gap: 8px;
+		flex-shrink: 0;
+	}
+
+	.gs-icon-btn
+	{
+		flex-direction: row;
+		align-items: center;
+		gap: 5px;
+		padding: 6px 14px;
+		background-color: $gs-panel-bg-light;
+		border-radius: 3px;
+		cursor: pointer;
+		pointer-events: all;
+		color: $gs-text-mid;
+		font-size: 12px;
+		transition: background-color 0.1s ease, color 0.1s ease;
+
+		i
+		{
+			font-size: 16px;
+		}
+
+		&:hover
+		{
+			background-color: rgba( 255, 255, 255, 0.16 );
+			color: white;
+		}
+
+		&.danger
+		{
+			color: rgba( 220, 80, 80, 0.9 );
+
+			&:hover
+			{
+				background-color: rgba( 220, 80, 80, 0.2 );
+				color: rgba( 255, 100, 100, 1 );
+			}
+		}
+	}
+
+	.gs-share-backdrop
+	{
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: rgba( 0, 0, 0, 0.42 );
+		backdrop-filter: blur( 4px );
+		align-items: center;
+		justify-content: center;
+		z-index: 500;
+		pointer-events: all;
+	}
+
+	.gs-share-modal
+	{
+		width: 560px;
+		max-height: 760px;
+		background-color: rgba( 7, 7, 8, 0.94 );
+		border: 1px solid rgba( 255, 255, 255, 0.16 );
+		border-radius: 4px;
+		box-shadow: 0 16px 40px rgba( 0, 0, 0, 0.55 );
+		padding: 20px;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.gs-share-header
+	{
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 2px;
+	}
+
+	.gs-share-title
+	{
+		flex-direction: column;
+		gap: 2px;
+
+		label
+		{
+			font-size: 18px;
+			color: white;
+			letter-spacing: 1.5px;
+		}
+
+		span
+		{
+			font-size: 10px;
+			color: $gs-accent;
+			letter-spacing: 2px;
+		}
+	}
+
+	.gs-share-close
+	{
+		width: 34px;
+		height: 34px;
+		align-items: center;
+		justify-content: center;
+		background-color: rgba( 255, 255, 255, 0.08 );
+		border-radius: 3px;
+		color: $gs-text-mid;
+		cursor: pointer;
+
+		i
+		{
+			font-size: 18px;
+		}
+
+		&:hover
+		{
+			background-color: rgba( 220, 80, 80, 0.2 );
+			color: rgba( 255, 100, 100, 1 );
+		}
+	}
+
+	.gs-share-label
+	{
+		font-size: 10px;
+		color: $gs-accent;
+		letter-spacing: 2px;
+		margin-top: 6px;
+	}
+
+	.gs-share-code
+	{
+		height: 86px;
+		background-color: rgba( 255, 255, 255, 0.06 );
+		border: 1px solid rgba( 255, 255, 255, 0.14 );
+		border-radius: 3px;
+		color: white;
+		font-size: 12px;
+		font-family: monospace;
+		padding: 10px;
+		pointer-events: all;
+
+		&.import
+		{
+			height: 72px;
+		}
+	}
+
+	.gs-share-actions
+	{
+		flex-direction: row;
+		gap: 8px;
+	}
+
+	.gs-share-button
+	{
+		height: 38px;
+		padding: 0 14px;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		gap: 7px;
+		background-color: rgba( 255, 255, 255, 0.10 );
+		border: 1px solid rgba( 255, 255, 255, 0.12 );
+		border-radius: 3px;
+		color: white;
+		font-size: 13px;
+		cursor: pointer;
+		pointer-events: all;
+
+		i
+		{
+			font-size: 17px;
+		}
+
+		&:hover
+		{
+			background-color: rgba( 255, 255, 255, 0.18 );
+		}
+
+		&.primary
+		{
+			background-color: $gs-accent;
+			border-color: rgba( 255, 210, 90, 0.85 );
+			color: black;
+		}
+
+		&.import
+		{
+			margin-top: 2px;
+			align-self: flex-start;
+		}
+	}
+
+	.gs-share-message
+	{
+		font-size: 12px;
+		color: rgba( 170, 235, 170, 0.95 );
+
+		&.error
+		{
+			color: rgba( 255, 115, 105, 0.95 );
+		}
+	}
+
+	// ===================== TABS =====================
+	.gs-mode-tabs
+	{
+		position: absolute;
+		top: 64px;
+		left: 0;
+		right: 0;
+		height: 48px;
+		background-color: rgba( 0, 0, 0, 0.4 );
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		gap: 12px;
+		z-index: 100;
+		pointer-events: all;
+	}
+
+	.gs-mode-tab
+	{
+		min-width: 150px;
+		height: 34px;
+		font-size: 14px;
+		letter-spacing: 2px;
+		color: $gs-text-dim;
+		cursor: pointer;
+		padding: 0 18px;
+		align-items: center;
+		justify-content: center;
+		background-color: rgba( 255, 255, 255, 0.05 );
+		border: 1px solid rgba( 255, 255, 255, 0.08 );
+		border-radius: 3px;
+		transition: background-color 0.1s ease, border-color 0.1s ease, color 0.1s ease;
+
+		&:hover
+		{
+			color: $gs-accent;
+			background-color: rgba( 255, 255, 255, 0.1 );
+			border-color: rgba( 255, 255, 255, 0.16 );
+		}
+
+		&.active
+		{
+			color: black;
+			background-color: $gs-accent;
+			border-color: rgba( 255, 210, 90, 0.9 );
+		}
+	}
+
+	// ===================== TOP LEFT: CLASS SELECTOR =====================
+	.gs-class-panel
+	{
+		position: absolute;
+		left: 24px;
+		top: 154px;
+		width: 560px;
+		background-color: $gs-panel-bg;
+		backdrop-filter: blur( 12px );
+		border-radius: $rounding;
+		border: 1px solid rgba( 255, 255, 255, 0.06 );
+		padding: 14px 16px;
+		gap: 10px;
+		flex-direction: column;
+		pointer-events: all;
+
+		&.has-many-classes
+		{
+			.gs-class-strip
+			{
+				flex-wrap: wrap;
+				overflow: visible;
+			}
+
+			.gs-class-slot
+			{
+				flex: 0 0 96px;
+				height: 62px;
+			}
+
+			.gs-add-class
+			{
+				height: 62px;
+			}
+		}
+	}
+
+	// ===================== LEFT: ARMORY =====================
+	.weapon-browser
+	{
+		position: absolute;
+		left: 24px;
+		top: 320px;
+		bottom: 24px;
+		width: 408px;
+		background-color: $gs-panel-bg;
+		backdrop-filter: blur( 12px );
+		border-radius: $rounding;
+		border: 1px solid rgba( 255, 255, 255, 0.06 );
+		padding: 16px;
+		gap: 10px;
+		flex-direction: column;
+		pointer-events: all;
+		overflow: hidden;
+
+		&.is-hidden { display: none; }
+
+		&.has-many-classes
+		{
+			top: 376px;
+		}
+	}
+
+	.gs-panel-label
+	{
+		font-size: 13px;
+		letter-spacing: 2px;
+		color: $gs-accent-dim;
+		text-transform: uppercase;
+		margin-bottom: 6px;
+	}
+
+	.browser-tabs
+	{
+		flex-direction: row;
+		gap: 6px;
+	}
+
+	.browser-tab,
+	.weapon-option
+	{
+		background-color: $gs-panel-bg-light;
+		color: $gs-text-mid;
+		border-radius: 3px;
+		border: 0;
+		cursor: pointer;
+		font-weight: bold;
+		pointer-events: all;
+		transition: background-color 0.08s ease, color 0.08s ease;
+
+		&:hover
+		{
+			background-color: rgba( white, 0.16 );
+			color: white;
+		}
+
+		&.active
+		{
+			background-color: $gs-accent;
+			color: black;
+		}
+	}
+
+	.browser-tab
+	{
+		flex-grow: 1;
+		height: 28px;
+		align-items: center;
+		justify-content: center;
+		font-size: 11px;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+	}
+
+	.weapon-list
+	{
+		flex-direction: column;
+		flex-grow: 1;
+		flex-shrink: 1;
+		min-height: 0;
+		gap: 6px;
+		overflow-y: scroll;
+	}
+
+	.weapon-option
+	{
+		height: 38px;
+		flex-shrink: 0;
+		padding: 0 34px 0 12px;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+		font-size: 13px;
+		position: relative;
+		background-color: $gs-panel-bg-light;
+		color: $gs-text-mid;
+		border-radius: 3px;
+		cursor: pointer;
+		pointer-events: all;
+		transition: background-color 0.08s ease, color 0.08s ease;
+
+		&:hover
+		{
+			background-color: rgba( 255, 255, 255, 0.16 );
+			color: white;
+		}
+
+		&.active
+		{
+			background-color: $gs-accent;
+			color: black;
+		}
+
+		&.loadout
+		{
+			border-left: 3px solid $gs-accent;
+		}
+	}
+
+	.weapon-name
+	{
+		white-space: nowrap;
+		flex-grow: 1;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.weapon-lv
+	{
+		font-size: 10px;
+		color: $gs-text-dim;
+		letter-spacing: 0.5px;
+		margin-left: 8px;
+		flex-shrink: 0;
+	}
+
+	.weapon-state
+	{
+		font-size: 9px;
+		letter-spacing: 0.8px;
+		color: $gs-accent;
+		margin-left: 8px;
+		flex-shrink: 0;
+	}
+
+	.weapon-option.active .weapon-state
+	{
+		color: rgba( 0, 0, 0, 0.7 );
+	}
+
+	.weapon-option.active .weapon-lv
+	{
+		color: rgba( 0, 0, 0, 0.5 );
+	}
+
+	// ── Class selector strip ────────────────────────────────────────────
+	.gs-class-strip
+	{
+		flex-direction: row;
+		flex-wrap: nowrap;
+		gap: 8px;
+		flex-shrink: 0;
+		overflow: hidden;
+	}
+
+	.gs-class-slot
+	{
+		flex: 1 1 88px;
+		height: 70px;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 10px 8px;
+		background-color: rgba( 255, 255, 255, 0.05 );
+		border: 1px solid rgba( 255, 255, 255, 0.08 );
+		border-radius: 4px;
+		cursor: pointer;
+		gap: 5px;
+		transition: background-color 0.1s ease, border-color 0.1s ease;
+
+		.gs-class-num
+		{
+			font-size: 14px;
+			font-weight: 900;
+			color: rgba( 255, 255, 255, 0.35 );
+			letter-spacing: 1px;
+		}
+
+		.gs-class-name
+		{
+			font-size: 10px;
+			font-weight: 800;
+			color: rgba( 255, 255, 255, 0.6 );
+			letter-spacing: 0;
+			text-align: center;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			width: 100%;
+		}
+
+		&:hover
+		{
+			background-color: rgba( 255, 255, 255, 0.12 );
+			border-color: rgba( 255, 255, 255, 0.18 );
+			.gs-class-name { color: rgba( 255, 255, 255, 0.9 ); }
+			.gs-class-num  { color: rgba( 255, 255, 255, 0.5 ); }
+		}
+
+		&.active
+		{
+			background-color: rgba( 255, 180, 0, 0.18 );
+			border-color: rgba( 255, 180, 0, 0.6 );
+			border-bottom-width: 2px;
+
+			.gs-class-num  { color: $gs-accent; }
+			.gs-class-name { color: white; font-weight: 900; letter-spacing: 0; }
+		}
+	}
+
+	.gs-add-class
+	{
+		flex: 0 0 42px;
+		height: 70px;
+		background-color: transparent;
+		border: 1px solid rgba( 255, 255, 255, 0.2 );
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		border-radius: 2px;
+		color: rgba( 255, 255, 255, 0.3 );
+
+		i { font-size: 16px; }
+
+		&:hover
+		{
+			border-color: rgba( 255, 255, 255, 0.5 );
+			color: white;
+			background-color: rgba( 255, 255, 255, 0.05 );
+		}
+	}
+
+	.gs-class-actions
+	{
+		flex-direction: row;
+		gap: 6px;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.gs-rename-input
+	{
+		flex-grow: 1;
+		background-color: rgba( 0, 0, 0, 0.5 );
+		border: 1px solid rgba( 255, 255, 255, 0.1 );
+		color: white;
+		font-size: 14px;
+		font-weight: bold;
+		padding: 7px 10px;
+		border-radius: 2px;
+
+		&:focus
+		{
+			border-color: $gs-accent;
+		}
+	}
+
+	.gs-action-btn
+	{
+		width: 34px;
+		height: 34px;
+		background-color: rgba( 255, 255, 255, 0.05 );
+		border: 1px solid rgba( 255, 255, 255, 0.1 );
+		border-radius: 2px;
+		cursor: pointer;
+		color: $gs-text-mid;
+		font-size: 14px;
+		align-items: center;
+		justify-content: center;
+
+		&:hover
+		{
+			background-color: rgba( 255, 255, 255, 0.15 );
+			color: white;
+		}
+
+		&.danger:hover
+		{
+			background-color: rgba( 220, 80, 80, 0.2 );
+			color: rgba( 255, 100, 100, 1 );
+			border-color: rgba( 220, 80, 80, 0.5 );
+		}
+	}
+
+	// ── Section header ───────────────────────────────────────────────────
+	.gs-armory-section
+	{
+		height: 16px;
+		flex-shrink: 0;
+		align-items: center;
+		font-size: 10px;
+		font-weight: 800;
+		letter-spacing: 3px;
+		color: rgba( 255, 255, 255, 0.46 );
+	}
+
+	// ── Weapon / equipment slot rows ─────────────────────────────────────
+	.gs-slot-list
+	{
+		flex-direction: column;
+		flex-shrink: 0;
+		gap: 6px;
+	}
+
+	.gs-slot-row
+	{
+		flex-direction: row;
+		align-items: center;
+		gap: 10px;
+		height: 56px;
+		padding: 0 12px;
+		background-color: rgba( 255, 255, 255, 0.04 );
+		border: 1px solid rgba( 255, 255, 255, 0.06 );
+		border-left: 3px solid transparent;
+		cursor: pointer;
+
+		&:hover
+		{
+			background-color: rgba( 255, 255, 255, 0.09 );
+		}
+
+		&.active
+		{
+			border-left-color: $gs-accent;
+			background-color: rgba( 255, 180, 0, 0.07 );
+		}
+
+		&.empty .gs-slot-weapon-name
+		{
+			color: rgba( 255, 255, 255, 0.62 );
+		}
+	}
+
+	.gs-slot-row-sm
+	{
+		height: 50px;
+		padding: 0 12px;
+	}
+
+	.gs-slot-copy
+	{
+		flex-direction: column;
+		flex-grow: 1;
+		min-width: 0;
+		gap: 4px;
+	}
+
+	.gs-slot-type-badge
+	{
+		font-size: 9px;
+		font-weight: 900;
+		letter-spacing: 1.6px;
+		color: $gs-accent-dim;
+		white-space: nowrap;
+	}
+
+	.gs-slot-weapon-name
+	{
+		font-size: 15px;
+		font-weight: 800;
+		color: white;
+		letter-spacing: 0.5px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.gs-slot-lv
+	{
+		font-size: 9px;
+		font-weight: 700;
+		color: $gs-accent-dim;
+		letter-spacing: 0.5px;
+		flex-shrink: 0;
+	}
+
+	.gs-slot-arrow
+	{
+		font-size: 16px;
+		color: rgba( 255, 255, 255, 0.28 );
+		flex-shrink: 0;
+	}
+
+	// ── Perk row ─────────────────────────────────────────────────────────
+	.gs-perk-row
+	{
+		flex-direction: row;
+		flex-shrink: 0;
+		gap: 8px;
+	}
+
+	.gs-perk-slot
+	{
+		flex: 1;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		height: 68px;
+		padding: 0 6px;
+		background-color: rgba( 255, 255, 255, 0.04 );
+		border: 1px solid rgba( 255, 255, 255, 0.07 );
+		cursor: pointer;
+		gap: 4px;
+
+		.gs-perk-icon
+		{
+			font-size: 18px;
+			color: rgba( 255, 255, 255, 0.5 );
+		}
+
+		.gs-perk-label
+		{
+			font-size: 9px;
+			font-weight: 800;
+			color: white;
+			letter-spacing: 0.2px;
+			text-align: center;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			width: 100%;
+		}
+
+		.gs-perk-sub
+		{
+			font-size: 7px;
+			font-weight: 700;
+			color: rgba( 255, 255, 255, 0.3 );
+			letter-spacing: 1px;
+		}
+
+		&:hover
+		{
+			background-color: rgba( 255, 255, 255, 0.09 );
+			.gs-perk-icon { color: white; }
+		}
+
+		&.active
+		{
+			border-color: rgba( 255, 180, 0, 0.5 );
+			background-color: rgba( 255, 180, 0, 0.1 );
+			.gs-perk-icon  { color: $gs-accent; }
+			.gs-perk-sub   { color: $gs-accent-dim; }
+		}
+
+		&.empty .gs-perk-icon { color: rgba( 255, 255, 255, 0.18 ); }
+		&.empty .gs-perk-label { color: rgba( 255, 255, 255, 0.3 ); }
+	}
+
+	// ── Category tabs inside weapon list ─────────────────────────────────
+	.gs-cat-tabs
+	{
+		flex-direction: row;
+		flex-wrap: wrap;
+		height: 82px;
+		flex-shrink: 0;
+		gap: 6px;
+		align-content: flex-start;
+		margin: 4px 0 10px 0;
+	}
+
+	.gs-cat-tab
+	{
+		height: 38px;
+		min-width: 0;
+		padding: 0 8px;
+		font-size: 10px;
+		font-weight: 800;
+		letter-spacing: 0.2px;
+		color: rgba( 255, 255, 255, 0.5 );
+		background-color: rgba( 255, 255, 255, 0.05 );
+		border: 0;
+		cursor: pointer;
+		flex: 1 1 116px;
+		text-align: center;
+		white-space: normal;
+		line-height: 12px;
+		justify-content: center;
+		align-items: center;
+
+		&:hover { background-color: rgba( 255, 255, 255, 0.12 ); color: white; }
+		&.active { background-color: $gs-accent; color: black; }
+	}
+
+	// ===================== BACKGROUND VIGNETTE =====================
+	.gs-bg-vignette
+	{
+		position: absolute;
+		left: 0;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		pointer-events: none;
+		z-index: -1;
+		background-image: radial-gradient( rgba( 30, 30, 40, 0.0 ), rgba( 10, 10, 15, 0.6 ) 55%, rgba( 0, 0, 0, 0.92 ) );
+	}
+
+	// ===================== BOTTOM BAR =====================
+	.gs-bottom
+	{
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		max-height: 480px;
+		overflow: hidden;
+		background-color: rgba( 0, 0, 0, 0.72 );
+		backdrop-filter: blur( 12px );
+		border-top: 1px solid rgba( 255, 180, 0, 0.2 );
+		flex-direction: column;
+		align-items: center;
+		padding: 8px 24px 10px 24px;
+		pointer-events: all;
+
+		// In Build mode the weapon-browser fills the full left column, so the
+		// tuning bar starts to the right of it to avoid overlapping. In Customise
+		// the weapon-browser is hidden, so the camo drawer stays full-width.
+		&.build-mode { left: 456px; }
+	}
+
+	.gs-camo-panel
+	{
+		flex-direction: column;
+		gap: 12px;
+		width: 100%;
+		padding: 10px 0;
+
+		.camo-grid
+		{
+			flex-direction: row;
+			flex-wrap: wrap;
+			gap: 12px;
+			max-height: 200px;
+			overflow-y: scroll;
+
+			.camo-swatch
+			{
+				width: 64px;
+				height: 64px;
+				border-radius: 4px;
+				border: 2px solid rgba( 255, 255, 255, 0.1 );
+				cursor: pointer;
+				transition: all 0.1s ease;
+				align-items: center;
+				justify-content: center;
+
+				i
+				{
+					font-size: 32px;
+					color: white;
+					text-shadow: 0 2px 4px rgba( 0, 0, 0, 0.5 );
+				}
+
+				&:hover
+				{
+					border-color: rgba( 255, 255, 255, 0.5 );
+					transform: scale( 1.05 );
+				}
+
+				&.active
+				{
+					border-color: $gs-accent;
+					box-shadow: 0 0 12px $gs-accent-dim;
+				}
+			}
+		}
+	}
+
+	// ===================== CUSTOMIZE: camos / charms / stickers =====================
+	.gs-customize-row
+	{
+		flex-direction: column;
+		gap: 20px;
+		width: 100%;
+		padding: 10px 0;
+		justify-content: center;
+		align-items: center;
+		min-height: 0;
+	}
+
+	.gs-tab-nav
+	{
+		flex-direction: row;
+		gap: 15px;
+		justify-content: center;
+		align-items: center;
+		background-color: rgba( 0, 0, 0, 0.4 );
+		backdrop-filter: blur( 10px );
+		padding: 8px 12px;
+		border-radius: 8px;
+		border: 1px solid rgba( 255, 255, 255, 0.05 );
+		pointer-events: all;
+	}
+
+	.gs-tab-btn
+	{
+		padding: 8px 16px;
+		border-radius: 4px;
+		cursor: pointer;
+		transition: all 0.2s ease-out;
+		background-color: transparent;
+		color: rgba( 255, 255, 255, 0.5 );
+		font-size: 13px;
+		font-weight: bold;
+		letter-spacing: 1px;
+		text-transform: uppercase;
+
+		&:hover
+		{
+			background-color: rgba( 255, 255, 255, 0.1 );
+			color: white;
+			transform: scale( 1.05 );
+		}
+
+		&.active
+		{
+			background-color: rgba( 255, 255, 255, 0.15 );
+			color: white;
+			border-bottom: 2px solid $gs-accent;
+			box-shadow: 0 4px 12px rgba( 255, 180, 0, 0.2 );
+		}
+	}
+
+	.gs-tab-content
+	{
+		min-height: 0;
+	}
+
+	.gs-cust-section
+	{
+		flex-shrink: 1;
+		flex-direction: column;
+		gap: 10px;
+		min-height: 0;
+	}
+
+	.cust-grid
+	{
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: 10px;
+		max-width: 600px;
+		max-height: 340px;
+		overflow-y: scroll;
+	}
+
+	.cust-empty
+	{
+		font-size: 11px;
+		color: rgba( 255, 255, 255, 0.55 );
+		letter-spacing: 0.5px;
+		padding: 22px 4px;
+	}
+
+	.cust-item
+	{
+		position: relative;
+		width: 96px;
+		height: 96px;
+		border-radius: 4px;
+		border: 2px solid rgba( 255, 255, 255, 0.1 );
+		cursor: pointer;
+		transition: all 0.1s ease;
+		align-items: center;
+		justify-content: center;
+		background-color: rgba( 255, 255, 255, 0.06 );
+		background-size: 100% 100%;
+		background-position: center;
+		background-repeat: no-repeat;
+		overflow: hidden;
+
+		i
+		{
+			font-size: 28px;
+			color: white;
+			text-shadow: 0 2px 4px rgba( 0, 0, 0, 0.7 );
+		}
+
+		.cust-name
+		{
+			font-size: 9px;
+			font-weight: bold;
+			color: white;
+			text-align: center;
+			letter-spacing: 0.3px;
+			text-shadow: 0 1px 3px rgba( 0, 0, 0, 0.9 );
+			padding: 2px;
+		}
+
+		.cust-check
+		{
+			position: absolute;
+			top: 3px;
+			right: 3px;
+			font-size: 16px;
+			color: rgba( 255, 180, 0, 0.92 );
+		}
+
+		&:hover
+		{
+			border-color: rgba( 255, 255, 255, 0.5 );
+			transform: scale( 1.05 );
+		}
+
+		&.active
+		{
+			border-color: rgba( 255, 180, 0, 0.92 );
+			box-shadow: 0 0 12px rgba( 255, 180, 0, 0.55 );
+		}
+	}
+
+	.gs-bottom-row
+	{
+		flex-direction: row;
+		align-items: center;
+		gap: 20px;
+		width: 100%;
+		justify-content: center;
+	}
+
+	.gs-detail-head
+	{
+		flex-direction: row;
+		align-items: center;
+		gap: 12px;
+		flex-shrink: 0;
+		width: 240px;
+	}
+
+	.gs-lv-badge
+	{
+		width: 36px;
+		height: 36px;
+		background-color: $gs-accent;
+		color: black;
+		font-size: 16px;
+		font-weight: bold;
+		border-radius: 3px;
+		justify-content: center;
+		align-items: center;
+		flex-shrink: 0;
+	}
+
+	.gs-detail-meta
+	{
+		flex-direction: column;
+		gap: 4px;
+		flex-grow: 1;
+	}
+
+	.gs-detail-name
+	{
+		font-size: 16px;
+		font-weight: bold;
+		color: white;
+		letter-spacing: 0.5px;
+	}
+
+	.gs-xp-wrap
+	{
+		width: 160px;
+		height: 6px;
+		background-color: rgba( 255, 255, 255, 0.12 );
+		border-radius: 3px;
+		overflow: hidden;
+	}
+
+	.gs-xp-fill
+	{
+		height: 100%;
+		background-color: $gs-accent;
+		border-radius: 3px;
+		transition: width 0.3s ease;
+	}
+
+	.gs-xp-label
+	{
+		font-size: 11px;
+		color: $gs-text-dim;
+		letter-spacing: 0.5px;
+	}
+
+	.gs-loadout-section
+	{
+		flex-direction: column;
+		align-items: center;
+		flex-shrink: 0;
+	}
+
+	.gs-loadout-btn
+	{
+		flex-direction: row;
+		align-items: center;
+		gap: 8px;
+		padding: 8px 20px;
+		background-color: $gs-panel-bg-light;
+		border-radius: 4px;
+		cursor: pointer;
+		pointer-events: all;
+		color: $gs-text-mid;
+		font-size: 15px;
+		font-weight: bold;
+		letter-spacing: 0.5px;
+		transition: background-color 0.12s ease, color 0.12s ease;
+
+		i
+		{
+			font-size: 18px;
+		}
+
+		&:hover
+		{
+			background-color: rgba( 255, 255, 255, 0.16 );
+			color: white;
+		}
+
+		&.set
+		{
+			background-color: rgba( 255, 180, 0, 0.18 );
+			color: $gs-accent;
+			border: 1px solid rgba( 255, 180, 0, 0.35 );
+
+			&:hover
+			{
+				background-color: rgba( 255, 180, 0, 0.28 );
+			}
+		}
+	}
+}

@@ -1,0 +1,59 @@
+@inherits BaseMarkerPanel
+@namespace Facepunch.UI
+
+@if ( !Bot.IsValid() ) return;
+
+<style>
+    LightweightBotMarkerPanel
+    {
+        justify-content: flex-end;
+        align-items: center;
+        flex-direction: column-reverse;
+        text-shadow: 1px 1px 1px rgba( black, 1 );
+        transform: translateY(-100%);
+
+        .dot
+        {
+            width: 6px;
+            height: 6px;
+            border-radius: 100px;
+            background-color: @Bot.Team.GetColor().Hex;
+            box-shadow: 2px 2px 2px rgba( black, 0.5 );
+        }
+
+        .name
+        {
+            text-shadow: 1px 1px 1px rgba( black, 1 );
+            font-weight: 900;
+            color: @Bot.Team.GetColor().Hex;
+            text-align: center;
+        }
+    }
+</style>
+
+<root>
+    @if ( !Marker.IsValid() ) return;
+    @if ( Marker.IsBehind || Marker.IsOffScreen ) return;
+    @if ( !Bot.IsAlive ) return;
+
+    <div class="dot" />
+    <label class="name">@(Bot.HealthComponent.Health.ToString( "0" ))%</label>
+    <label class="name">BOT @Bot.BotName</label>
+</root>
+
+@code
+{
+    private LightweightCombatBot Bot => Object as LightweightCombatBot;
+
+    protected override int BuildHash()
+    {
+        return HashCode.Combine(
+            Bot?.BotName,
+            Bot?.Team,
+            Bot?.HealthComponent?.Health.CeilToInt(),
+            Bot?.HealthComponent?.State,
+            Marker?.IsBehind,
+            Marker?.IsOffScreen
+        );
+    }
+}

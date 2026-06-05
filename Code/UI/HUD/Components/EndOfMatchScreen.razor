@@ -1,0 +1,264 @@
+@namespace Facepunch.UI
+@inherits Panel
+@attribute [StyleSheet]
+
+@if ( !IsVisible ) return;
+
+@{
+    var entries = SortedEntries;
+    var ts = TeamScoring;
+    var localTeam = LocalTeam;
+}
+
+<root class="eom-screen @ResultClass">
+
+    @* ── HEADER ─────────────────────────────────────────────────── *@
+    <div class="eom-header">
+        <label class="eom-result-label">@ResultText</label>
+        @if ( ts is not null )
+        {
+            <div class="eom-team-scores">
+                <span class="eom-ct-score" style="color: @Team.CounterTerrorist.GetColor().Hex">
+                    @ts.Scores.GetValueOrDefault( Team.CounterTerrorist )
+                </span>
+                <span class="eom-dash"> — </span>
+                <span class="eom-t-score" style="color: @Team.Terrorist.GetColor().Hex">
+                    @ts.Scores.GetValueOrDefault( Team.Terrorist )
+                </span>
+            </div>
+        }
+        <label class="eom-mode-label">@(GameMode.Instance?.DisplayTitle?.ToUpper() ?? "")</label>
+    </div>
+
+    @* ── SCOREBOARD ───���──────────────────────────────────────────── *@
+    <div class="eom-table-wrap">
+        <div class="eom-table-header eom-row">
+            <span class="col-mvp"></span>
+            <span class="col-name">PLAYER</span>
+            <span class="col-stat">KILLS</span>
+            <span class="col-stat">DEATHS</span>
+            <span class="col-stat">K/D</span>
+            <span class="col-stat">SCORE</span>
+        </div>
+        @foreach ( var e in entries )
+        {
+            var rowClass = $"eom-row{(e.IsLocal ? " is-local" : "")}{(e.IsMvp ? " is-mvp" : "")}";
+            <div class="@rowClass">
+                <span class="col-mvp">@(e.IsMvp ? "★" : "")</span>
+                <span class="col-name">@e.Name</span>
+                <span class="col-stat">@e.Kills</span>
+                <span class="col-stat">@e.Deaths</span>
+                <span class="col-stat">@e.KdStr</span>
+                <span class="col-stat">@e.Score</span>
+            </div>
+        }
+    </div>
+
+    @* ── XP SECTION ──────────────────────────────────────────────── *@
+    <div class="eom-xp-section">
+        <div class="eom-xp-info-row">
+            <label class="eom-xp-earned">+@XpEarned XP</label>
+            @if ( WonMatch )
+            {
+                <label class="eom-win-bonus">WIN BONUS INCLUDED</label>
+            }
+            @if ( LeveledUp )
+            {
+                <label class="eom-level-up-badge">LEVEL UP!</label>
+            }
+        </div>
+        <div class="eom-bar-row">
+            <label class="eom-lv-label">LV @LevelBefore</label>
+            <div class="eom-level-bar">
+                @* Already-earned portion *@
+                <div class="eom-bar-old" style="width: @(ProgressBefore * 100f)%;"></div>
+                @* Newly-earned portion (capped at end of bar on level-up) *@
+                @if ( LeveledUp )
+                {
+                    <div class="eom-bar-new" style="width: @((1f - ProgressBefore) * 100f)%;"></div>
+                }
+                else
+                {
+                    <div class="eom-bar-new" style="width: @(MathF.Max( 0f, ProgressAfter - ProgressBefore ) * 100f)%;"></div>
+                }
+            </div>
+            <label class="eom-lv-label">LV @(LeveledUp ? Progression.GetLevel() : LevelBefore)</label>
+        </div>
+    </div>
+
+    @* ── FOOTER ───────────────────────────────────────────────────── *@
+    <div class="eom-footer">
+        <div class="eom-continue-btn" @onclick=@Dismiss>
+            <label>CONTINUE</label>
+        </div>
+        <label class="eom-timer-label">@SecondsLeft<span class="eom-timer-s">s</span></label>
+    </div>
+
+</root>
+
+@code
+{
+    // ── Static entry-point ──────────────────────────────────────────
+
+    private static EndOfMatchScreen Instance { get; set; }
+    public static bool IsAnyVisible => Instance is not null && Instance.IsVisible;
+
+    /// <summary>
+    /// Broadcast from the host to show the end-of-match screen on all clients.
+    /// <paramref name="winningTeam"/> is <see cref="Team.Unassigned"/> for a draw
+    /// or a free-for-all mode where team scoring isn't used.
+    /// </summary>
+    [Rpc.Broadcast]
+    public static void Show( Team winningTeam )
+    {
+        if ( !Instance.IsValid() ) return;
+        Instance.DoShow( winningTeam );
+    }
+
+    // ── State ───────────────────────────────────────────────────────
+
+    private bool IsVisible { get; set; }
+    private Team WinningTeam { get; set; }
+
+    private RealTimeSince TimeSinceShown;
+    private const float AutoDismissTime = 15f;
+
+    private bool XpAwarded;
+    private int XpEarned;
+    private int LevelBefore;
+    private float ProgressBefore;
+    private float ProgressAfter;
+    private bool LeveledUp;
+
+    private int _lastSecondsLeft = -1;
+
+    private const int WinBonusXp    = 200;
+    private const int MatchBonusXp  =  50;
+    private const int MaxMatchXp    = 2000;
+
+    // ── Derived helpers ────���────────────────────────────────────────
+
+    private TeamScoring TeamScoring => GameMode.Instance?.Get<TeamScoring>();
+    private Team LocalTeam => Client.Local?.Team ?? Team.Unassigned;
+    private bool WonMatch  => WinningTeam != Team.Unassigned && WinningTeam == LocalTeam;
+    private bool IsDraw    => WinningTeam == Team.Unassigned;
+
+    private string ResultClass => WonMatch ? "victory" : IsDraw ? "draw" : "defeat";
+    private string ResultText  => WonMatch ? "VICTORY" : IsDraw ? "MATCH OVER" : "DEFEAT";
+    private int    SecondsLeft => Math.Max( 0, (int)MathF.Ceiling( AutoDismissTime - TimeSinceShown ) );
+
+    // ── Player-entry list ───────────────────────────────────────────
+
+    private class EomEntry
+    {
+        public string Name    { get; init; }
+        public int    Kills   { get; init; }
+        public int    Deaths  { get; init; }
+        public int    Score   { get; init; }
+        public bool   IsLocal { get; init; }
+        public bool   IsMvp   { get; set; }
+        public string KdStr   => $"{(float)Kills / MathF.Max( 1f, Deaths ):0.00}";
+    }
+
+    private List<EomEntry> SortedEntries
+    {
+        get
+        {
+            var list = new List<EomEntry>();
+
+            foreach ( var client in GameUtils.AllPlayers )
+            {
+                var ps = client.GetComponent<PlayerScore>();
+                list.Add( new EomEntry
+                {
+                    Name    = client.DisplayName,
+                    Kills   = ps?.Kills  ?? 0,
+                    Deaths  = ps?.Deaths ?? 0,
+                    Score   = ps?.Score  ?? 0,
+                    IsLocal = client == Client.Local,
+                } );
+            }
+
+            foreach ( var bot in GameUtils.LightweightBots.Where( b => b.IsValid() && b.Team != Team.Unassigned ) )
+            {
+                list.Add( new EomEntry
+                {
+                    Name   = $"BOT {bot.BotName}",
+                    Kills  = bot.Kills,
+                    Deaths = bot.Deaths,
+                    Score  = bot.Score,
+                } );
+            }
+
+            var sorted = list.OrderByDescending( e => e.Score ).ToList();
+            if ( sorted.Count > 0 )
+                sorted[0].IsMvp = true;
+
+            return sorted;
+        }
+    }
+
+    // ── Lifecycle ───────────────────────────────────────────────────
+
+    public EndOfMatchScreen()
+    {
+        Instance = this;
+    }
+
+    private void DoShow( Team winningTeam )
+    {
+        WinningTeam  = winningTeam;
+        IsVisible    = true;
+        TimeSinceShown = 0;
+        XpAwarded    = false;
+
+        AwardXp();
+        StateHasChanged();
+    }
+
+    private void AwardXp()
+    {
+        if ( XpAwarded ) return;
+        XpAwarded = true;
+
+        var localClient = Client.Local;
+        if ( !localClient.IsValid() ) return;
+
+        var ps    = localClient.GetComponent<PlayerScore>();
+        var score = ps?.Score ?? 0;
+
+        LevelBefore   = Progression.GetLevel();
+        ProgressBefore = Progression.GetLevelProgress();
+
+        XpEarned = Math.Min( score * 2 + MatchBonusXp + (WonMatch ? WinBonusXp : 0), MaxMatchXp );
+        Progression.AddXP( XpEarned );
+
+        LeveledUp    = Progression.GetLevel() > LevelBefore;
+        ProgressAfter = Progression.GetLevelProgress();
+    }
+
+    private void Dismiss()
+    {
+        IsVisible = false;
+        StateHasChanged();
+    }
+
+    public override void Tick()
+    {
+        if ( !IsVisible ) return;
+
+        if ( TimeSinceShown >= AutoDismissTime )
+        {
+            Dismiss();
+            return;
+        }
+
+        // Only re-render once per second (for the countdown label).
+        var secs = SecondsLeft;
+        if ( secs != _lastSecondsLeft )
+        {
+            _lastSecondsLeft = secs;
+            StateHasChanged();
+        }
+    }
+}

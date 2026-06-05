@@ -1,0 +1,110 @@
+@using Sandbox;
+@using Sandbox.Network
+@using Sandbox.UI;
+@using Sandbox.UI.Navigation;
+
+@inherits Panel
+@implements INavigatorPage
+@namespace Facepunch.UI
+
+<root class="hc1 blur" style="display: flex; flex-direction: column; width: 100%; height: 100%; position: absolute;">
+    <MenuTopbar Title="PLAY GAME" />
+    
+    <div style="flex-grow: 1; overflow: hidden; display: flex; flex-direction: column;">
+        <div style="height: 23%;"/>
+            
+            <div class="layout column gap align-center">
+                <label class="emphasis" style="font-size: 24px; color: white;">HOST PRIVATE MATCH</label>
+                <label class="slight" style="font-size: 16px; margin-bottom: 20px;">Create a Pre-Game Lobby where you can configure settings and players can choose teams before starting.</label>
+
+                <div class="button standard action large" onclick=@Join>
+                    <label>Create Lobby</label>
+                </div>
+            </div>
+
+            <div class="grow" />
+    </div>
+</root>
+
+@code
+{
+    public SceneFile SelectedMap { get; set; }
+    public List<string> SelectedGameModes { get; set; } = new();
+    public bool SelectedHardcore { get; set; } = false;
+
+    public GameModeList GameModeList { get; set; }
+
+    private void SetMap( SceneFile map )
+    {
+        SelectedMap = map;
+        StateHasChanged();
+    }
+
+    private void ToggleMode( string ident )
+    {
+        if ( SelectedGameModes.Contains( ident ) )
+        {
+            if ( SelectedGameModes.Count > 1 )
+            {
+                SelectedGameModes.Remove( ident );
+            }
+        }
+        else
+        {
+            SelectedGameModes.Add( ident );
+        }
+
+        // Auto-select a map that matches the new selection if current map is not compatible
+        if ( SelectedMap is null || !GameMode.GetAll( SelectedMap ).Any( x => SelectedGameModes.Contains( x.Ident ) ) )
+        {
+            SelectedMap = GameUtils.GetAvailableMaps()
+                .FirstOrDefault( map => GameMode.GetAll( map ).Any( x => SelectedGameModes.Contains( x.Ident ) ) );
+        }
+
+        StateHasChanged();
+    }
+
+    private void SetHardcoreMode( bool hardcore )
+    {
+        SelectedHardcore = hardcore;
+        StateHasChanged();
+    }
+
+    protected override void OnAfterTreeRender( bool firstTime )
+    {
+        if ( !firstTime )
+            return;
+
+        SelectedMap = GameUtils.GetAvailableMaps().FirstOrDefault();
+        var firstMode = GameMode.GetAll( SelectedMap ).FirstOrDefault();
+        if ( firstMode is not null )
+        {
+            SelectedGameModes.Add( firstMode.Ident );
+        }
+    }
+
+    private void Join()
+    {
+        var sc = ResourceLibrary.Get<SceneFile>( "scenes/pregame_lobby.scene" );
+        if ( sc != null )
+        {
+            Game.ActiveScene.Load( sc );
+        }
+    }
+
+    public void OnNavigationOpen()
+    {
+        if ( MainMenuRoot.Instance.IsValid() )
+        {
+            MainMenuRoot.Instance.SetBlur( true );
+        }
+    }
+    
+    public void OnNavigationClose() 
+    {
+        if ( MainMenuRoot.Instance.IsValid() )
+        {
+            MainMenuRoot.Instance.SetBlur( false );
+        }
+    }
+}

@@ -1,0 +1,24 @@
+﻿@namespace Facepunch.UI
+@inherits Panel
+
+@if ( !Player.IsValid() ) return;
+
+<root class="hud with-deadzone with-padding column bottom-right">
+    @if (HasKit)
+    {
+        <Icon File="/ui/defusekit.png" size="32" />
+    }
+</root>
+
+@code
+{
+    public PlayerPawn Player => Client.Viewer.PlayerPawn;
+    public PlayerInventory Inventory => Player.Inventory;
+
+    public bool HasKit => Inventory.HasDefuseKit;
+
+    protected override int BuildHash()
+    {
+        return !Player.IsValid() ? 0 : HashCode.Combine(HasKit);
+    }
+}

@@ -1,0 +1,179 @@
+@import "/UI/Styles/Theme.scss";
+
+$accent: #FF7A1A;
+$panel-bg: rgba( 10, 12, 16, 0.78 );
+$panel-border: rgba( 255, 255, 255, 0.08 );
+$muted: rgba( 255, 255, 255, 0.45 );
+
+.ranked-page
+{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: $main-font;
+
+    .ranked-shell
+    {
+        flex-direction: column;
+        align-items: center;
+        width: 560px;
+        gap: 8px;
+    }
+
+    .ranked-back
+    {
+        position: absolute;
+        left: 48px;
+        top: 36px;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 16px;
+        background-color: $panel-bg;
+        border: 1px solid $panel-border;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.12s ease-out;
+
+        i { font-size: 18px; color: rgba( 255, 255, 255, 0.65 ); }
+        label { font-size: 14px; font-weight: bold; color: rgba( 255, 255, 255, 0.7 ); letter-spacing: 1px; cursor: pointer; }
+
+        &:hover { border-color: rgba( 255, 122, 26, 0.6 ); i, label { color: $accent; } }
+    }
+
+    .ranked-kicker
+    {
+        font-size: 13px;
+        font-weight: bold;
+        color: $accent;
+        letter-spacing: 5px;
+    }
+
+    .ranked-title
+    {
+        font-size: 48px;
+        font-weight: bold;
+        color: white;
+        letter-spacing: 3px;
+        line-height: 58px;
+        margin-bottom: 18px;
+    }
+
+    .rank-card
+    {
+        flex-direction: row;
+        align-items: center;
+        gap: 22px;
+        width: 100%;
+        padding: 26px;
+        background-color: $panel-bg;
+        border: 1px solid $panel-border;
+        border-radius: 8px;
+    }
+
+    .rank-badge
+    {
+        width: 84px;
+        height: 84px;
+        border-radius: 8px;
+        justify-content: center;
+        align-items: center;
+        flex-shrink: 0;
+
+        i { font-size: 48px; color: rgba( 0, 0, 0, 0.85 ); }
+    }
+
+    .rank-info
+    {
+        flex-direction: column;
+        flex-grow: 1;
+        gap: 5px;
+    }
+
+    .rank-tier
+    {
+        font-size: 30px;
+        font-weight: bold;
+        letter-spacing: 2px;
+    }
+
+    .rank-sr
+    {
+        font-size: 15px;
+        font-weight: bold;
+        color: rgba( 255, 255, 255, 0.85 );
+        letter-spacing: 1px;
+    }
+
+    .rank-bar
+    {
+        height: 9px;
+        background-color: rgba( 255, 255, 255, 0.10 );
+        border-radius: 5px;
+        overflow: hidden;
+        margin-top: 6px;
+    }
+
+    .rank-bar-fill
+    {
+        height: 100%;
+        border-radius: 5px;
+    }
+
+    .rank-bar-label
+    {
+        font-size: 11px;
+        font-weight: bold;
+        color: $muted;
+        letter-spacing: 1px;
+    }
+
+    .ranked-actions
+    {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        gap: 12px;
+        margin-top: 22px;
+    }
+
+    .find-match
+    {
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        width: 100%;
+        padding: 18px;
+        background-color: $accent;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.12s ease-out;
+
+        i { font-size: 24px; color: black; }
+        label { font-size: 21px; font-weight: bold; color: black; letter-spacing: 3px; cursor: pointer; }
+
+        &:hover { background-color: #ff8c33; }
+
+        &.searching
+        {
+            background-color: rgba( 255, 255, 255, 0.10 );
+            i { color: $accent; }
+            label { color: $accent; }
+        }
+    }
+
+    .ranked-note
+    {
+        font-size: 12px;
+        font-weight: bold;
+        color: $muted;
+        letter-spacing: 0.5px;
+        text-align: center;
+    }
+}

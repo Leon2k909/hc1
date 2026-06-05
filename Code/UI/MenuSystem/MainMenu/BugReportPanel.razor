@@ -1,0 +1,158 @@
+@using Sandbox;
+@using Sandbox.UI;
+
+@namespace Facepunch.UI
+@inherits Panel
+@attribute [StyleSheet]
+
+<root class="hc1 bug-report-root @(IsOpen ? "open" : "")">
+    @if ( IsOpen )
+    {
+        <div class="bug-report-backdrop" onclick=@((e) => { e.StopPropagation(); Close(); }) />
+    }
+    @if ( IsOpen )
+    {
+    <div class="bug-report-modal">
+
+        @if ( IsAdmin )
+        {
+            <div class="tab-row">
+                <div class="tab @(CurrentTab == "report" ? "active" : "")" onclick=@(() => { CurrentTab = "report"; StateHasChanged(); })>Report Bug</div>
+                <div class="tab @(CurrentTab == "view" ? "active" : "")" onclick=@(() => { CurrentTab = "view"; StateHasChanged(); })>Submitted Reports <span class="admin-badge">ADMIN</span></div>
+            </div>
+        }
+        else
+        {
+            <label class="bug-report-title">Report a Bug</label>
+        }
+
+        @if ( CurrentTab == "view" && IsAdmin )
+        {
+            <div class="bug-report-list">
+                @{
+                    var reports = GetReports().ToList();
+                }
+                @if ( reports.Count == 0 )
+                {
+                    <label class="no-reports">No bug reports yet.</label>
+                }
+                else
+                {
+                    @foreach ( var r in reports )
+                    {
+                        <div class="bug-entry">
+                            <div class="entry-header">
+                                <label class="entry-title">@r.Title</label>
+                                <label class="entry-category">@r.Category</label>
+                                <label class="entry-time">@r.Time</label>
+                            </div>
+                            <label class="entry-body">@r.Body</label>
+                        </div>
+                    }
+                }
+            </div>
+            <div class="form-actions">
+                <div class="button standard" onclick=@Close>Close</div>
+            </div>
+        }
+        else
+        {
+            <div class="bug-form">
+                <label class="form-label">Title</label>
+                <TextEntry @ref=TitleEntry Placeholder="Short description..." />
+
+                <label class="form-label">Category</label>
+                <div class="category-row">
+                    @foreach ( var cat in Categories )
+                    {
+                        var capturedCat = cat;
+                        <div class="button standard smaller no-anim @(SelectedCategory == capturedCat ? "selected" : "")"
+                             onclick=@(() => { SelectedCategory = capturedCat; StateHasChanged(); })>@capturedCat</div>
+                    }
+                </div>
+
+                <label class="form-label">Description</label>
+                <TextEntry @ref=BodyEntry Multiline=@true Placeholder="Detailed description..." class="multiline" />
+            </div>
+            <div class="form-actions">
+                <div class="button standard" onclick=@Submit>Submit</div>
+                <div class="button standard" onclick=@Close>Cancel</div>
+            </div>
+        }
+
+    </div>
+    }
+</root>
+
+@code
+{
+    private const ulong AdminSteamId = 76561198271608270UL;
+    private static readonly string[] Categories = { "Crash", "UI", "Gameplay", "Network", "Other" };
+
+    public bool IsOpen { get; private set; }
+
+    private ulong LocalSteamId => Client.Local?.SteamId ?? Connection.Local?.SteamId ?? 0UL;
+    private bool IsAdmin => LocalSteamId == AdminSteamId;
+
+    private string CurrentTab { get; set; } = "report";
+
+    private TextEntry TitleEntry { get; set; }
+    private TextEntry BodyEntry { get; set; }
+    private string SelectedCategory { get; set; } = "Other";
+
+    public void Open()
+    {
+        IsOpen = true;
+        CurrentTab = "report";
+        StateHasChanged();
+    }
+
+    private void Close()
+    {
+        IsOpen = false;
+        SelectedCategory = "Other";
+        if ( TitleEntry.IsValid() ) TitleEntry.Value = "";
+        if ( BodyEntry.IsValid() ) BodyEntry.Value = "";
+        StateHasChanged();
+    }
+
+    private void Submit()
+    {
+        var title = (TitleEntry.IsValid() ? TitleEntry.Value : "").Trim();
+        var body  = (BodyEntry.IsValid()  ? BodyEntry.Value  : "").Trim();
+
+        if ( string.IsNullOrEmpty( title ) ) return;
+
+        var countRaw = Game.Cookies.Get( "hc1.bug.count", "0" );
+        var count = int.TryParse( countRaw, out var n ) ? n : 0;
+
+        Game.Cookies.Set( $"hc1.bug.{count}.title",    title );
+        Game.Cookies.Set( $"hc1.bug.{count}.category", SelectedCategory );
+        Game.Cookies.Set( $"hc1.bug.{count}.body",     body );
+        Game.Cookies.Set( $"hc1.bug.{count}.time",     DateTime.UtcNow.ToString( "yyyy-MM-dd HH:mm" ) );
+        Game.Cookies.Set( "hc1.bug.count",              (count + 1).ToString() );
+
+        Close();
+    }
+
+    private record BugReport( string Title, string Category, string Body, string Time );
+
+    private IEnumerable<BugReport> GetReports()
+    {
+        var countRaw = Game.Cookies.Get( "hc1.bug.count", "0" );
+        if ( !int.TryParse( countRaw, out var total ) || total <= 0 )
+            yield break;
+
+        for ( int i = total - 1; i >= 0; i-- )
+        {
+            yield return new BugReport(
+                Game.Cookies.Get( $"hc1.bug.{i}.title",    "" ),
+                Game.Cookies.Get( $"hc1.bug.{i}.category", "" ),
+                Game.Cookies.Get( $"hc1.bug.{i}.body",     "" ),
+                Game.Cookies.Get( $"hc1.bug.{i}.time",     "" )
+            );
+        }
+    }
+
+    protected override int BuildHash() => HashCode.Combine( IsOpen, SelectedCategory, CurrentTab, IsAdmin );
+}

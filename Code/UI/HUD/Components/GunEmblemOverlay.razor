@@ -1,0 +1,74 @@
+@namespace Facepunch.UI
+@using Facepunch.Gunsmith
+@inherits Panel
+@attribute [StyleSheet]
+
+@if ( IsVisible )
+{
+    <root class="gun-emblem-overlay">
+        <EmblemViewer Data=@EmblemData />
+    </root>
+}
+
+@code
+{
+    /// <summary>The Gunsmith system that owns the weapon being displayed.</summary>
+    public GunsmithSystem System { get; set; }
+
+    private bool IsVisible { get; set; }
+    private EmblemData EmblemData { get; set; } = new();
+
+    protected override void OnAfterTreeRender( bool firstTime )
+    {
+        if ( firstTime ) RefreshEmblem();
+    }
+
+    public void RefreshEmblem()
+    {
+        var json = Game.Cookies.Get<string>( "hc1.emblem.data", "" );
+        EmblemData = global::Facepunch.UI.EmblemData.FromJson( json );
+        StateHasChanged();
+    }
+
+    public override void Tick()
+    {
+        if ( !System.IsValid() || !System.Renderer.IsValid() )
+        {
+            IsVisible = false;
+            return;
+        }
+
+        var equip = System.Equipment;
+        if ( !equip.IsValid() || !GunsmithLoadoutManager.GetEmblemOnGun( equip ) )
+        {
+            IsVisible = false;
+            return;
+        }
+
+        // Pick a world position on the weapon — slightly behind and above the root
+        // so it lands on the receiver/stock area.
+        var weaponTransform = System.Renderer.WorldTransform;
+        var emblemWorldPos = weaponTransform.Position
+            + weaponTransform.Rotation.Forward  * -6f   // back toward the stock
+            + weaponTransform.Rotation.Up       *  1f;  // slightly above centreline
+
+        var camera = Scene.Camera;
+        if ( !camera.IsValid() )
+        {
+            IsVisible = false;
+            return;
+        }
+
+        var screenPos = camera.PointToScreenNormal( emblemWorldPos, out var behind );
+        if ( behind )
+        {
+            IsVisible = false;
+            return;
+        }
+
+        IsVisible = true;
+        Style.Left   = Length.Fraction( screenPos.x );
+        Style.Top    = Length.Fraction( screenPos.y );
+        StateHasChanged();
+    }
+}

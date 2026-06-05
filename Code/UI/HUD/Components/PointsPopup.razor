@@ -1,0 +1,42 @@
+@using Sandbox
+@using Sandbox.Events
+@using Sandbox.UI
+@using System.Collections.Generic
+@namespace Facepunch.UI
+@inherits Panel
+@implements IGameEventHandler<PointsAwardedEvent>
+
+<root>
+    @foreach ( var point in _points )
+    {
+        <div class="point-popup @(point.Fading ? "fade-out" : "")">
+            +@point.Amount
+        </div>
+    }
+</root>
+
+@code {
+    private class PointInstance
+    {
+        public int Amount;
+        public TimeSince TimeCreated;
+        public bool Fading => TimeCreated > 1.5f;
+        public bool Dead => TimeCreated > 2.0f;
+    }
+
+    private List<PointInstance> _points = new();
+
+    public override void Tick()
+    {
+        if ( _points.RemoveAll( x => x.Dead ) > 0 )
+        {
+            StateHasChanged();
+        }
+    }
+
+    void IGameEventHandler<PointsAwardedEvent>.OnGameEvent( PointsAwardedEvent eventArgs )
+    {
+        _points.Add( new PointInstance { Amount = eventArgs.Amount, TimeCreated = 0 } );
+        StateHasChanged();
+    }
+}

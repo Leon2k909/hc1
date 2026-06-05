@@ -1,0 +1,124 @@
+@import "/UI/Styles/Theme.scss";
+
+TheaterPage
+{
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    font-family: Inter, sans-serif;
+}
+
+.theater-content {
+    padding: 30px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    flex-grow: 1;
+}
+
+.movie-list
+{
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    gap: 12px;
+    overflow-y: scroll;
+    height: 100%;
+    padding-right: 20px;
+}
+
+.movie-card
+{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background-color: rgba( 255, 255, 255, 0.05 );
+    border-radius: 8px;
+    padding: 20px 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid rgba( 255, 255, 255, 0.05 );
+
+    &:hover
+    {
+        background-color: rgba( 255, 255, 255, 0.1 );
+        transform: scale( 1.01 );
+        border-color: rgba( 255, 255, 255, 0.2 );
+        box-shadow: 0 4px 20px rgba( 0, 0, 0, 0.5 );
+    }
+
+    .movie-info
+    {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+        .movie-name
+        {
+            font-size: 24px;
+            font-weight: 800;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .movie-date
+        {
+            font-size: 16px;
+            color: rgba( 255, 255, 255, 0.6 );
+        }
+    }
+
+    .movie-play, .movie-delete
+    {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 60px;
+        height: 60px;
+        background-color: rgba( 255, 255, 255, 0.1 );
+        border-radius: 50%;
+        margin-left: 10px;
+        transition: all 0.2s;
+        
+        > i
+        {
+            font-family: Material Icons;
+            font-size: 32px;
+            color: white;
+        }
+    }
+
+    .movie-play:hover
+    {
+        background-color: white;
+        > i { color: black; }
+    }
+
+    .movie-delete:hover
+    {
+        background-color: rgba( 220, 80, 80, 0.8 );
+        > i { color: white; }
+    }
+}
+
+.empty-state
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    
+    > label
+    {
+        font-size: 24px;
+        color: rgba(255,255,255,0.4);
+        font-weight: bold;
+    }
+}

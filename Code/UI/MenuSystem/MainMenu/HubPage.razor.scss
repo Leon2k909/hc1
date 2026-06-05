@@ -1,0 +1,234 @@
+@import "/UI/Styles/Theme.scss";
+
+$hub-accent: #FF7A1A;
+$hub-accent-dim: rgba(255, 122, 26, 0.4);
+
+.hub-page
+{
+    position: absolute;
+    left: 0; right: 0; top: 0; bottom: 0;
+    background-image: radial-gradient( rgba( 20, 20, 25, 0.8 ), rgba( 0, 0, 0, 0.95 ) );
+    justify-content: center;
+    align-items: center;
+    padding: 32px 48px;
+}
+
+.hub-container
+{
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    max-width: 1400px;
+}
+
+.brand
+{
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+
+    .brand-logo
+    {
+        width: 50px;
+        height: 28px;
+    }
+
+    .brand-text
+    {
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .brand-name
+    {
+        font-family: $main-font;
+        font-size: 18px;
+        font-weight: 900;
+        color: white;
+        letter-spacing: 0.2em;
+    }
+
+    .brand-sub
+    {
+        font-family: $main-font;
+        font-size: 11px;
+        color: $hub-accent;
+        letter-spacing: 0.3em;
+    }
+}
+
+.hub-cards
+{
+    flex-direction: row;
+    flex-grow: 1;
+    gap: 20px;
+    justify-content: center;
+    align-items: stretch;
+}
+
+.hub-card
+{
+    position: relative;
+    flex: 1;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.05);
+
+    &:hover
+    {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        border-color: rgba(255,255,255,0.2);
+        z-index: 10;
+    }
+
+    &.main-card
+    {
+        flex: 1.5;
+        border-color: rgba($hub-accent, 0.3);
+
+        &:hover
+        {
+            border-color: $hub-accent;
+            box-shadow: 0 20px 50px $hub-accent-dim;
+        }
+
+        .hub-title
+        {
+            color: white;
+        }
+    }
+
+    &.locked
+    {
+        cursor: not-allowed;
+        opacity: 0.6;
+        filter: grayscale(80%);
+
+        &:hover
+        {
+            transform: translateY(-5px);
+            opacity: 0.8;
+            filter: grayscale(40%);
+            border-color: rgba(255,255,255,0.1);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+        }
+    }
+}
+
+.hub-bg
+{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.5s ease;
+    z-index: -1;
+
+    // We don't have distinct images right now, so we use distinct gradients.
+    &.campaign-bg { background-image: linear-gradient( to bottom, rgba(30,40,60,0.5), rgba(10,15,20,0.9) ); }
+    &.multiplayer-bg { background-image: linear-gradient( to bottom, rgba(120,60,20,0.5), rgba(30,15,5,0.9) ); }
+    &.ranked-bg { background-image: linear-gradient( to bottom, rgba(60,20,60,0.5), rgba(15,5,15,0.9) ); }
+    &.br-bg { background-image: linear-gradient( to bottom, rgba(20,60,30,0.5), rgba(5,15,10,0.9) ); }
+    &.zombies-bg { background-image: linear-gradient( to bottom, rgba(60,10,10,0.5), rgba(20,0,0,0.9) ); }
+}
+
+.hub-card:hover .hub-bg
+{
+    transform: scale(1.05);
+}
+
+.hub-content
+{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 30px;
+    flex-direction: column;
+    justify-content: flex-end;
+    background-image: linear-gradient( to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100% );
+}
+
+.hub-mode
+{
+    font-family: $main-font;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    color: $hub-accent;
+    margin-bottom: 4px;
+}
+
+.hub-title
+{
+    font-family: $main-font;
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    color: rgba(255,255,255,0.8);
+    text-shadow: 0 4px 10px rgba(0,0,0,0.8);
+}
+
+.hub-desc
+{
+    font-family: $main-font;
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 8px;
+}
+
+.hub-card.main-card .hub-desc
+{
+    color: white;
+    font-weight: bold;
+}
+
+.hub-card.zombies-card
+{
+    border-color: rgba( 200, 40, 40, 0.35 );
+
+    &:hover
+    {
+        border-color: rgba( 225, 55, 55, 0.95 );
+        box-shadow: 0 20px 50px rgba( 150, 20, 20, 0.45 );
+    }
+
+    .hub-title
+    {
+        color: white;
+    }
+
+    .hub-desc
+    {
+        color: white;
+        font-weight: bold;
+    }
+}
+
+.hub-card.ranked-card
+{
+    border-color: rgba( 150, 90, 200, 0.35 );
+
+    &:hover
+    {
+        border-color: rgba( 170, 110, 230, 0.95 );
+        box-shadow: 0 20px 50px rgba( 90, 40, 150, 0.45 );
+    }
+
+    .hub-title
+    {
+        color: white;
+    }
+
+    .hub-desc
+    {
+        color: white;
+        font-weight: bold;
+    }
+}

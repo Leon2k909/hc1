@@ -1,0 +1,263 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using Sandbox.UI.Navigation;
+
+@inherits Panel
+@implements INavigatorPage
+@attribute [StyleSheet]
+@namespace Facepunch.UI
+
+<root class="hc1 landing">
+
+    @* ===================== MAIN CONTENT ===================== *@
+    <div class="content">
+
+        @* ----- Dashboard Grid ----- *@
+        <div class="main-dashboard">
+            @* Primary Hero Action *@
+            <div class="card hero-card @(IsHardcore ? "hardcore" : "")">
+                <div class="hero-bg" />
+                <div class="hero-shade" />
+                <div class="hero-body">
+                    <label class="kicker">@(IsHardcore ? "HARDCORE" : "MULTIPLAYER")</label>
+                    <label class="hero-title">QUICK PLAY</label>
+                    <label class="hero-sub">@(IsHardcore ? "Reduced HUD · Friendly fire · No kill-cam." : "Jump straight into a match.")</label>
+                    <div class="hero-actions">
+                        <div class="play-btn @(IsHardcore ? "play-btn-hc" : "")" onclick=@(() => QuickPlay())>
+                            <i>play_arrow</i>
+                            <label>PLAY NOW</label>
+                        </div>
+                        <a class="play-btn ranked-btn" href="/ranked">
+                            <i>military_tech</i>
+                            <label>RANKED</label>
+                        </a>
+                        <a class="play-btn private-btn" href="/new">
+                            <i>vpn_key</i>
+                            <label>PRIVATE MATCH</label>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            @* Secondary Actions Stack: Game Modes *@
+            <div class="secondary-cards">
+
+                @* CORE / HARDCORE toggle *@
+                <div class="mode-rule-toggle">
+                    <div class="mode-rule-btn @(!IsHardcore ? "active" : "")" @onclick=@(() => { IsHardcore = false; StateHasChanged(); })>
+                        <i>sports_esports</i>
+                        <label>CORE</label>
+                    </div>
+                    <div class="mode-rule-btn @(IsHardcore ? "active hc" : "")" @onclick=@(() => { IsHardcore = true; StateHasChanged(); })>
+                        <i>warning</i>
+                        <label>HARDCORE</label>
+                    </div>
+                </div>
+
+                @foreach ( var mode in GameMode.AllUnique
+                    .Where( m => !string.Equals( m.Ident, "zombies", StringComparison.OrdinalIgnoreCase ) ) )
+                {
+                    <div class="card mini-card @(IsHardcore ? "hc-card" : "")" onclick=@(() => PlayMode(mode))>
+                        <div class="mini-bg custom-bg"></div>
+                        <div class="mini-shade"></div>
+                        <div class="mini-content">
+                            <i>@(IsHardcore ? "warning" : "sports_esports")</i>
+                            <div class="mini-text">
+                                <label class="kicker">@(IsHardcore ? "HARDCORE" : "MULTIPLAYER")</label>
+                                <label class="title">@mode.Title.ToUpper()</label>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        @* ----- Last Played ----- *@
+        @if ( LastPlayedMode != null )
+        {
+            <div class="card last-played-card" onclick=@PlayLastMode>
+                <div class="last-played-bg"></div>
+                <div class="last-played-body">
+                    <label class="kicker">LAST PLAYED</label>
+                    <label class="last-played-title">@(_lastPlayedHardcore ? "HC " + LastPlayedMode.Title.ToUpper() : LastPlayedMode.Title.ToUpper())</label>
+                    <div class="last-played-action">
+                        <i>replay</i>
+                        <label>PLAY AGAIN</label>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @* ----- Friends / Party ----- *@
+        <div class="card friends-card">
+            <div class="friends-header">
+                <i>group</i>
+                <label>FRIENDS LIST</label>
+            </div>
+            <div class="friends-list">
+                @if ( PartyRoom.Current?.Members is var members && members != null && members.Any() )
+                {
+                    @foreach ( var member in members )
+                    {
+                        <div class="friend-row online">
+                            <img class="friend-avatar" src="avatar:@member.Id" />
+                            <div class="friend-info">
+                                <label class="friend-name">@member.Name</label>
+                                <label class="friend-status">In Party</label>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="friends-empty">
+                        <label>No one is in your party.</label>
+                    </div>
+                }
+
+                <div class="open-friends-btn" onclick=@(() => OpenFriendsList())>
+                    <i>group_add</i>
+                    <label>OPEN FRIENDS LIST</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* ===================== BOTTOM STATUS BAR ===================== *@
+    <div class="statusbar">
+        <div class="status-left">
+            <div class="online-dot" />
+            <label class="status-name">@LocalName</label>
+            <label class="status-state">ONLINE</label>
+        </div>
+
+        <div class="status-right">
+            <div class="status-btn" onclick=@(() => ReportBug())>
+                <i>bug_report</i>
+                <label>Report a Bug</label>
+            </div>
+            <div class="status-btn danger" onclick=@(() => Quit())>
+                <i>power_settings_new</i>
+                <label>Quit</label>
+            </div>
+        </div>
+    </div>
+
+</root>
+
+@code
+{
+    public void OnNavigationOpen()  => MainMenuRoot.Instance?.SetActiveRoute( "/multiplayer" );
+    public void OnNavigationClose() { }
+
+    private bool IsHardcore { get; set; } = false;
+
+    private static GameMode _lastPlayedMode;
+    private static string _lastPlayedMapPath;
+    private static bool _lastPlayedHardcore;
+
+    private GameMode LastPlayedMode
+    {
+        get
+        {
+            if ( _lastPlayedMode != null ) return _lastPlayedMode;
+            var ident = Cookie.Get( "last_mode_ident", "" );
+            if ( string.IsNullOrEmpty( ident ) ) return null;
+            return GameMode.AllUnique.FirstOrDefault( m => m.Ident == ident );
+        }
+    }
+
+    private ulong LocalSteamId => Client.Local.IsValid() ? Client.Local.SteamId : (Connection.Local?.SteamId ?? 0UL);
+
+    private string LocalName
+    {
+        get
+        {
+            var name = Client.Local.IsValid() ? Client.Local.DisplayName : Connection.Local?.DisplayName;
+            return string.IsNullOrWhiteSpace( name ) ? "Player" : name;
+        }
+    }
+
+    private int PlayerLevel => Progression.GetLevel();
+
+    void QuickPlay()
+    {
+        var map = GameUtils.GetAvailableMaps().FirstOrDefault();
+        if ( map is null ) return;
+
+        var mode = GameMode.GetAll( map ).FirstOrDefault();
+        if ( mode is null ) return;
+
+        SaveLastPlayed( mode, map.ResourcePath, IsHardcore );
+        GameMode.SetCurrent( mode );
+        GameMode.SetHardcore( IsHardcore );
+        Game.ActiveScene.Load( map );
+    }
+
+    void PlayMode( GameMode targetMode )
+    {
+        var maps = GameUtils.GetAvailableMaps();
+        var map = maps.FirstOrDefault( m => GameMode.GetAll( m ).Any( x => x.Ident == targetMode.Ident ) );
+        if ( map is null ) map = maps.FirstOrDefault();
+        if ( map is null ) return;
+
+        SaveLastPlayed( targetMode, map.ResourcePath, IsHardcore );
+        GameMode.SetCurrent( targetMode );
+        GameMode.SetHardcore( IsHardcore );
+        Game.ActiveScene.Load( map );
+    }
+
+    void PlayLastMode()
+    {
+        var mode = LastPlayedMode;
+        if ( mode is null ) return;
+
+        var mapPath = Cookie.Get( "last_map_path", "" );
+        var hardcore = Cookie.Get( "last_hardcore", false );
+        var maps = GameUtils.GetAvailableMaps();
+
+        SceneFile map = null;
+        if ( !string.IsNullOrEmpty( mapPath ) )
+            map = maps.FirstOrDefault( m => m.ResourcePath == mapPath );
+        map ??= maps.FirstOrDefault( m => GameMode.GetAll( m ).Any( x => x.Ident == mode.Ident ) );
+        map ??= maps.FirstOrDefault();
+        if ( map is null ) return;
+
+        GameMode.SetCurrent( mode );
+        GameMode.SetHardcore( hardcore );
+        Game.ActiveScene.Load( map );
+    }
+
+    static void SaveLastPlayed( GameMode mode, string mapPath, bool hardcore )
+    {
+        _lastPlayedMode = mode;
+        _lastPlayedMapPath = mapPath;
+        _lastPlayedHardcore = hardcore;
+        Cookie.Set( "last_mode_ident", mode.Ident );
+        Cookie.Set( "last_map_path", mapPath );
+        Cookie.Set( "last_hardcore", hardcore );
+    }
+
+    void OpenFriendsList()
+    {
+        if ( !Game.IsEditor )
+        {
+            Game.Overlay.ShowFriendsList( new Sandbox.Modals.FriendsListModalOptions()
+            {
+                ShowOfflineMembers = true,
+            } );
+        }
+    }
+
+    void ReportBug()  => MainMenuRoot.Instance?.OpenBugReport();
+
+    void Quit()
+    {
+        DialogModal.Show( "Are you sure you want to quit?", "Quit", "Cancel", () => Game.Close() );
+    }
+
+    protected override int BuildHash()
+    {
+        return HashCode.Combine( LocalSteamId, LocalName, PlayerLevel, _lastPlayedMode?.Ident );
+    }
+}

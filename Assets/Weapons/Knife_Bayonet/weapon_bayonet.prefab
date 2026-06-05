@@ -1,0 +1,104 @@
+{
+  "RootObject": {
+    "__guid": "a9609d9e-aa5a-4e77-8a5e-1410999a3a7f",
+    "Flags": 0,
+    "Name": "w_bayonet",
+    "Tags": "player",
+    "Enabled": true,
+    "Components": [
+      {
+        "__type": "Facepunch.Equipment",
+        "__guid": "f46bf723-97c8-4415-a45d-069538684bd6",
+        "CrosshairType": "Shotgun",
+        "DeploySound": "sounds/guns/knife/knife.deploy.sound",
+        "Handedness": "Right",
+        "HoldType": "Swing",
+        "MountedPrefab": {
+          "_type": "gameobject",
+          "prefab": "weapons/knife_bayonet/mount_knife_bayonet.prefab"
+        },
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Resource": "weapons/knife_bayonet/knife_bayonet.equip",
+        "SpeedPenalty": 0,
+        "UseCrosshair": true
+      },
+      {
+        "__type": "Facepunch.TagBinder",
+        "__guid": "b2de65d3-2a49-4d42-a7af-0b4faf9f7a41",
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "e0b6f84a-933e-4d12-9c33-4e41df80b06a",
+        "Flags": 0,
+        "Name": "Functions",
+        "Enabled": true,
+        "Components": [
+          {
+            "__type": "Facepunch.Melee",
+            "__guid": "78a7e471-152c-4266-b4e9-53992ee7c202",
+            "BaseDamage": 50,
+            "FireRate": 1,
+            "InputActions": [
+              "Attack1",
+              "Attack2"
+            ],
+            "MaxRange": 80,
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "OnInputAction": null,
+            "RequiresAllInputActions": false,
+            "Size": 16,
+            "SwingSound": "sounds/guns/knife/knife.swing.sound"
+          }
+        ]
+      }
+    ],
+    "__variables": [],
+    "__properties": {
+      "FixedUpdateFrequency": 50,
+      "MaxFixedUpdates": 5,
+      "NetworkFrequency": 30,
+      "NetworkInterpolation": true,
+      "PhysicsSubSteps": 1,
+      "ThreadedAnimation": true,
+      "TimeScale": 1,
+      "UseFixedUpdate": true,
+      "Metadata": {},
+      "NavMesh": {
+        "Enabled": false,
+        "IncludeStaticBodies": true,
+        "IncludeKeyframedBodies": true,
+        "EditorAutoUpdate": true,
+        "AgentHeight": 64,
+        "AgentRadius": 16,
+        "AgentStepSize": 18,
+        "AgentMaxSlope": 40,
+        "ExcludedBodies": "",
+        "IncludedBodies": ""
+      }
+    }
+  },
+  "ShowInMenu": false,
+  "MenuPath": null,
+  "MenuIcon": null,
+  "DontBreakAsTemplate": false,
+  "ResourceVersion": 1,
+  "__references": [],
+  "__version": 1
+}

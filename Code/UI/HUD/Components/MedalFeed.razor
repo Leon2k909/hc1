@@ -1,0 +1,168 @@
+@using Sandbox
+@using System.Collections.Generic
+@namespace Facepunch.UI
+@inherits Panel
+
+<root>
+    @foreach ( var medal in Medals )
+    {
+        <div class="medal-card @(medal.Fading ? "fade-out" : "")">
+            <div class="medal-icon">
+                <i>@medal.Icon</i>
+            </div>
+            <label class="medal-title">@medal.Title</label>
+            <label class="medal-subtitle">@medal.Subtitle</label>
+        </div>
+    }
+</root>
+
+@code
+{
+    private sealed class MedalInstance
+    {
+        public string Title { get; init; }
+        public string Subtitle { get; init; }
+        public string Icon { get; init; }
+        public TimeSince TimeCreated { get; init; } = 0;
+        public bool Fading => TimeCreated > 2.25f;
+        public bool Dead => TimeCreated > 2.85f;
+    }
+
+    private readonly List<MedalInstance> Medals = new();
+    private TimeSince TimeSinceLastKill = 999f;
+    private int RapidKillCount;
+    private int LifeKillStreak;
+
+    public override void Tick()
+    {
+        if ( TimeSinceLastKill > 3.0f )
+            RapidKillCount = 0;
+
+        if ( Medals.RemoveAll( x => x.Dead ) > 0 )
+            StateHasChanged();
+    }
+
+    public void OnKill( KillEvent eventArgs )
+    {
+        if ( !MainHUD.IsHudEnabled )
+            return;
+
+        var damageInfo = eventArgs.DamageInfo;
+        if ( IsLocalPlayerDeath( damageInfo ) )
+        {
+            RapidKillCount = 0;
+            LifeKillStreak = 0;
+            TimeSinceLastKill = 999f;
+            return;
+        }
+
+        if ( !IsLocalPlayerKill( damageInfo ) )
+            return;
+
+        RapidKillCount = TimeSinceLastKill <= 3.0f ? RapidKillCount + 1 : 1;
+        TimeSinceLastKill = 0;
+        LifeKillStreak++;
+
+        var hitbox = damageInfo.Hitbox;
+        if ( hitbox.HasFlag( HitboxTags.Head ) )
+            AddMedal( "HEADSHOT", "Precision kill", "gps_fixed" );
+
+        if ( IsOneShotOneKill( damageInfo ) )
+            AddMedal( "ONE SHOT, ONE KILL", "Killed with one lethal shot", "radio_button_checked" );
+
+        switch ( RapidKillCount )
+        {
+            case 2:
+                AddMedal( "DOUBLE KILL", "Two rapid kills", "filter_2" );
+                break;
+            case 3:
+                AddMedal( "TRIPLE KILL", "Three rapid kills", "filter_3" );
+                break;
+            case 4:
+                AddMedal( "FURY KILL", "Four rapid kills", "filter_4" );
+                break;
+            default:
+                if ( RapidKillCount >= 5 )
+                    AddMedal( "FRENZY KILL", $"{RapidKillCount} rapid kills", "local_fire_department" );
+                break;
+        }
+
+        switch ( LifeKillStreak )
+        {
+            case 5:
+                AddMedal( "BLOODTHIRSTY", "5 kill streak", "whatshot" );
+                break;
+            case 10:
+                AddMedal( "MERCILESS", "10 kill streak", "military_tech" );
+                break;
+            case 15:
+                AddMedal( "RUTHLESS", "15 kill streak", "workspace_premium" );
+                break;
+        }
+    }
+
+    private bool IsLocalPlayerKill( Facepunch.DamageInfo damageInfo )
+    {
+        var localPawn = Client.Viewer?.Pawn as PlayerPawn;
+        if ( !localPawn.IsValid() )
+            return false;
+
+        var killerPlayer = GameUtils.GetPlayerFromComponent( damageInfo.Attacker );
+        if ( killerPlayer != localPawn )
+            return false;
+
+        var victimPlayer = GameUtils.GetPlayerFromComponent( damageInfo.Victim );
+        var victimBot = GameUtils.GetLightweightBotFromComponent( damageInfo.Victim );
+        if ( !victimPlayer.IsValid() && !victimBot.IsValid() )
+            return false;
+
+        var killerTeam = GameUtils.GetTeamFromComponent( damageInfo.Attacker );
+        var victimTeam = GameUtils.GetTeamFromComponent( damageInfo.Victim );
+        var isFriendly = killerTeam != Team.Unassigned && killerTeam == victimTeam;
+        var isSuicide = victimPlayer == localPawn;
+
+        return !isFriendly && !isSuicide;
+    }
+
+    private bool IsLocalPlayerDeath( Facepunch.DamageInfo damageInfo )
+    {
+        var localPawn = Client.Viewer?.Pawn as PlayerPawn;
+        if ( !localPawn.IsValid() )
+            return false;
+
+        var victimPlayer = GameUtils.GetPlayerFromComponent( damageInfo.Victim );
+        return victimPlayer == localPawn;
+    }
+
+    private static bool IsOneShotOneKill( Facepunch.DamageInfo damageInfo )
+    {
+        if ( damageInfo.WasExplosion || damageInfo.WasMelee || damageInfo.WasFallDamage )
+            return false;
+
+        var victimHealth = GameUtils.GetPlayerFromComponent( damageInfo.Victim )?.HealthComponent
+            ?? GameUtils.GetLightweightBotFromComponent( damageInfo.Victim )?.HealthComponent;
+
+        var maxHealth = victimHealth.IsValid() ? victimHealth.MaxHealth : 100f;
+        return damageInfo.Damage >= maxHealth - 0.01f;
+    }
+
+    private void AddMedal( string title, string subtitle, string icon )
+    {
+        Medals.Add( new MedalInstance
+        {
+            Title = title,
+            Subtitle = subtitle,
+            Icon = icon
+        } );
+
+        while ( Medals.Count > 4 )
+            Medals.RemoveAt( 0 );
+
+        StateHasChanged();
+    }
+
+    protected override int BuildHash()
+    {
+        return HashCode.Combine( Medals.Count, RapidKillCount, LifeKillStreak );
+    }
+}

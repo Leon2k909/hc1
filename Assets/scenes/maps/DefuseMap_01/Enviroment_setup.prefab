@@ -1,0 +1,111 @@
+{
+  "RootObject": {
+    "__guid": "bebe743a-8c55-43e0-96dd-7f301310c49e",
+    "Flags": 0,
+    "Name": "enviroment_setup",
+    "Enabled": true,
+    "NetworkMode": 2,
+    "NetworkInterpolation": true,
+    "Children": [
+      {
+        "__guid": "dc0d0d39-413f-41ac-beb6-569d4ff6aac8",
+        "Flags": 0,
+        "Name": "Sun",
+        "Rotation": "0.155742,0.5147958,-0.2441217,0.8069292",
+        "Tags": "light_directional,light",
+        "Enabled": true,
+        "NetworkMode": 2,
+        "NetworkInterpolation": true,
+        "Components": [
+          {
+            "__type": "Sandbox.DirectionalLight",
+            "__guid": "60fa806e-4ded-4c7e-b0e8-4e68214186a7",
+            "FogMode": "Enabled",
+            "FogStrength": 1,
+            "LightColor": "0.91267,0.9677,0.98605,1",
+            "Shadows": true,
+            "SkyColor": "0.21685,0.23793,0.26047,1"
+          }
+        ]
+      },
+      {
+        "__guid": "e5862c6d-321b-43c9-8e0e-ef149efc6f19",
+        "Flags": 0,
+        "Name": "2D Skybox",
+        "Position": "0,0,8",
+        "Tags": "skybox",
+        "Enabled": true,
+        "NetworkMode": 2,
+        "NetworkInterpolation": true,
+        "Components": [
+          {
+            "__type": "Sandbox.SkyBox2D",
+            "__guid": "a12be1e3-c714-4e9e-9adf-f8ceade393ab",
+            "SkyMaterial": "materials/sky/atmosphere_sky.vmat",
+            "Tint": "1,1,1,1"
+          }
+        ]
+      },
+      {
+        "__guid": "50f5d58c-ae59-4166-afae-4a8e48f98970",
+        "Flags": 0,
+        "Name": "Gradient Fog",
+        "Position": "0,0,4",
+        "Enabled": true,
+        "NetworkMode": 2,
+        "NetworkInterpolation": true,
+        "Components": [
+          {
+            "__type": "Sandbox.GradientFog",
+            "__guid": "916ec176-8208-4e62-a07a-742c7a74278e",
+            "Color": "0.73025,0.90233,0.87078,0.15",
+            "EndDistance": 2048,
+            "FalloffExponent": 1,
+            "Height": 1024,
+            "StartDistance": 1024,
+            "VerticalFalloffExponent": 2
+          },
+          {
+            "__type": "Sandbox.CubemapFog",
+            "__guid": "26524c19-84fd-4f10-ae1b-fd9bd3449d08",
+            "Blur": 0.53,
+            "EndDistance": 8192,
+            "FalloffExponent": 1,
+            "HeightExponent": 2,
+            "HeightStart": 2000,
+            "HeightWidth": 0,
+            "Sky": "materials/skybox/skybox_day_01.vmat",
+            "StartDistance": 2048
+          }
+        ]
+      },
+      {
+        "__guid": "c39c3d5a-10e2-4667-88f1-63abf31a4ea8",
+        "Flags": 0,
+        "Name": "Soundscape",
+        "Enabled": true,
+        "NetworkMode": 2,
+        "NetworkInterpolation": true,
+        "Components": [
+          {
+            "__type": "Sandbox.SoundscapeTrigger",
+            "__guid": "76bda0f1-6fc9-423f-9ca4-492cfd1fe186",
+            "BoxSize": "50,50,50",
+            "Radius": 10000,
+            "Soundscape": "birdchirpsndscape.sndscape",
+            "StayActiveOnExit": true,
+            "Type": "Sphere"
+          }
+        ]
+      }
+    ]
+  },
+  "ShowInMenu": false,
+  "MenuPath": null,
+  "MenuIcon": null,
+  "ResourceVersion": 1,
+  "__references": [
+    "deff.birdchirp#26087"
+  ],
+  "__version": 1
+}

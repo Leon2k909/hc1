@@ -1,0 +1,34 @@
+{
+    "Name":  "SCAR-H",
+    "Description":  "Reliable and powerful assault rifle with good accuracy.",
+    "Slot":  "Primary",
+    "Team":  "Unassigned",
+    "CanOtherTeamPickUp":  true,
+    "DropOnDisconnect":  false,
+    "Icon":  "weapons/swb/scarh/scarh.png",
+    "IsPurchasable":  true,
+    "Price":  2800,
+    "KillReward":  300,
+    "MainPrefab":  {
+                       "_type":  "gameobject",
+                       "prefab":  "weapons/scarh/weapon_scarh.prefab"
+                   },
+    "WorldModelPrefab":  {
+                             "_type":  "gameobject",
+                             "prefab":  "weapons/scarh/wm_scarh.prefab"
+                         },
+    "ViewModelPrefab":  {
+                            "_type":  "gameobject",
+                            "prefab":  "weapons/scarh/vm_scarh.prefab"
+                        },
+    "WorldModel":  "weapons/swb/scarh/w_scarh.vmdl",
+    "ArmorReduction":  null,
+    "HelmetReduction":  null,
+    "WorldModelBodyGroups":  0,
+    "__references":  [
+
+                     ],
+    "__version":  0,
+    "GunsmithOffset":  "0,-1,6",
+    "Category":  "AssaultRifle"
+}

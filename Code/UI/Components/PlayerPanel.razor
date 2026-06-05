@@ -1,0 +1,17 @@
+@namespace Facepunch.UI
+@inherits Panel
+
+@if (!Client.IsValid()) return;
+
+<root>
+    <label class="name" style="color:@TeamColor">
+        @Client.DisplayName
+    </label>
+</root>
+
+@code
+{
+    public Client Client { get; set; }
+
+    private string TeamColor => (Client?.Team.GetColor() ?? Color.White).Hex;
+}

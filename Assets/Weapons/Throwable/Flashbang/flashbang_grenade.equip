@@ -1,0 +1,31 @@
+{
+  "Name": "Flashbang",
+  "Description": "",
+  "Slot": "Tactical",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": true,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/grenades/decoy_grenade_01.png",
+  "IsPurchasable": true,
+  "Price": 300,
+  "KillReward": 150,
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/throwable/flashbang/weapon_flashbang_grenade.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/throwable/flashbang/wm_flashbang_grenade.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/throwable/flashbang/vm_flashbang_grenade.prefab"
+  },
+  "WorldModel": "models/weapons/sbox_grenade_flash/w_flash_grenade.vmdl",
+  "ArmorReduction": null,
+  "HelmetReduction": null,
+  "__references": [
+    "facepunch.w_flash_grenade#75376"
+  ],
+  "__version": 0
+}

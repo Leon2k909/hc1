@@ -1,0 +1,179 @@
+@import "/UI/Styles/Theme.scss";
+
+Scoreboard {
+    z-index: 100;
+    border-radius: $rounding;
+    backdrop-filter: blur( 5px );
+    background-color: rgba( black, 0.5 );
+
+    &.visible {
+        pointer-events: all;
+    }
+
+    PlayerAvatar {
+        width: 24px;
+        height: 24px;
+    }
+
+    separator {
+        flex-grow: 1;
+        height: 1px;
+        background-color: red;
+        margin: 0 4px;
+    }
+
+    table {
+        width: 1100px;
+        flex-direction: column;
+        gap: 2px;
+        color: white;
+
+        .title {
+            flex-direction: row;
+            text-shadow: 0 0 4px rgba( black, 0.5 );
+            justify-content: space-between;
+
+            label {
+                white-space: nowrap;
+                width: 33%;
+            }
+
+            .left {
+                text-align: left;
+            }
+
+            .center {
+                text-align: center;
+            }
+
+            .right {
+                text-align: right;
+            }
+        }
+
+        .row {
+            background-color: rgba( black, 0.75 );
+            width: 100%;
+            align-items: center;
+
+            &.dead {
+                .avatar {
+                    filter: saturate( 0.2 ) brightness(50%);
+                }
+            }
+
+            &.local {
+                background-color: rgba( white, 0.75 );
+
+                text, label {
+                    color: black;
+                }
+
+                Icon {
+                    background-image-tint: black;
+                }
+            }
+
+            &.bot-row {
+                background-color: rgba( 255, 176, 84, 0.14 );
+                border: 1px solid rgba( 255, 176, 84, 0.22 );
+            }
+
+            .col {
+                align-items: center;
+            }
+
+            .playername {
+                flex-basis: 350px;
+                flex-grow: 1;
+                gap: 8px;
+            }
+
+            .bot-avatar {
+                width: 24px;
+                height: 24px;
+                border-radius: 4px;
+                background-color: rgba( 138, 214, 255, 0.18 );
+                border: 1px solid rgba( 138, 214, 255, 0.35 );
+                flex-shrink: 0;
+            }
+
+            .bot-prefix {
+                color: #8ad6ff;
+                font-size: 11px;
+                font-weight: 800;
+                letter-spacing: 0.08em;
+                flex-shrink: 0;
+            }
+
+            .bot-ping {
+                color: #8ad6ff;
+                font-weight: 800;
+            }
+
+            .stat {
+                flex-basis: 90px;
+                flex-shrink: 0;
+                flex-grow: 0;
+                text-align: center;
+                justify-content: center;
+                padding: 0 4px;
+            }
+
+            .stat-large {
+                flex-basis: 110px;
+                flex-shrink: 0;
+                align-items: center;
+                text-align: center;
+                justify-content: center;
+            }
+
+            .stat-small {
+                flex-basis: 50px;
+                flex-shrink: 0;
+                align-items: center;
+            }
+
+            .mute-header {
+                justify-content: center;
+
+                i {
+                    font-size: 17px;
+                    opacity: 0.6;
+                }
+            }
+
+            .mute-toggle {
+                width: 30px;
+                height: 26px;
+                margin: 0 10px;
+                justify-content: center;
+                align-items: center;
+                background-color: rgba( white, 0.08 );
+                border: 1px solid rgba( white, 0.14 );
+                border-radius: 4px;
+                color: rgba( white, 0.75 );
+                cursor: pointer;
+
+                i {
+                    font-size: 18px;
+                }
+
+                &:hover {
+                    background-color: rgba( white, 0.18 );
+                    color: white;
+                }
+
+                &.muted {
+                    background-color: rgba( #d45a5a, 0.22 );
+                    border-color: rgba( #ff8a8a, 0.45 );
+                    color: #ff9b9b;
+                }
+            }
+
+            .mute-placeholder {
+                margin: 0 10px;
+            }
+        }
+    }
+}

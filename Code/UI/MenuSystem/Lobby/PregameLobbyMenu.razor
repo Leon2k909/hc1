@@ -1,0 +1,177 @@
+@using Sandbox;
+@using Sandbox.Network
+@using Sandbox.UI;
+@using System.Linq;
+
+@namespace Facepunch.UI
+@inherits Panel
+@attribute [StyleSheet]
+
+<root class="hc1 blur">
+    <div class="lobby-container">
+        
+        @* ----- HOST SETTINGS PANEL ----- *@
+        <div class="settings-panel">
+            <label class="panel-title">Match Settings</label>
+            
+            @if ( Networking.IsHost )
+            {
+                <div class="setting-group">
+                    <label>Map</label>
+                    <div class="button-list">
+                        @foreach ( var map in GameUtils.GetAvailableMaps() )
+                        {
+                            var isSelected = PregameLobbyManager.Instance?.SelectedMapPath == map.ResourcePath;
+                            <div class="button standard smaller no-anim @(isSelected ? "selected" : "")" onclick=@(() => PregameLobbyManager.Instance?.SetMap( map.ResourcePath ))>
+                                @map.GetMetadata("Title", map.ResourceName)
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                @if ( PregameLobbyManager.Instance != null && !string.IsNullOrEmpty(PregameLobbyManager.Instance.SelectedMapPath) )
+                {
+                    var currentMap = ResourceLibrary.Get<SceneFile>(PregameLobbyManager.Instance.SelectedMapPath);
+                    if ( currentMap != null )
+                    {
+                        <div class="setting-group">
+                            <label>Game Mode</label>
+                            <div class="button-list">
+                                @foreach ( var mode in GameMode.GetAll( currentMap ) )
+                                {
+                                    var isSelected = PregameLobbyManager.Instance?.SelectedGameMode == mode.Ident;
+                                    <div class="button standard smaller no-anim @(isSelected ? "selected" : "")" onclick=@(() => PregameLobbyManager.Instance?.SetGameMode( mode.Ident ))>
+                                        @mode.Title
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                }
+
+                <div class="setting-group">
+                    <label>Rules</label>
+                    <div class="button-list row">
+                        <div class="button standard smaller no-anim @(!(PregameLobbyManager.Instance?.IsHardcore ?? false) ? "selected" : "")" onclick=@(() => PregameLobbyManager.Instance?.SetHardcore( false ))>CORE</div>
+                        <div class="button standard smaller no-anim hc-toggle @((PregameLobbyManager.Instance?.IsHardcore ?? false) ? "selected" : "")" onclick=@(() => PregameLobbyManager.Instance?.SetHardcore( true ))>HARDCORE</div>
+                    </div>
+                </div>
+
+
+                <div class="grow" />
+
+                <div class="button standard action large" onclick=@(() => PregameLobbyManager.Instance?.StartMatch())>
+                    START MATCH
+                </div>
+            }
+            else
+            {
+                @if ( PregameLobbyManager.Instance != null && !string.IsNullOrEmpty(PregameLobbyManager.Instance.SelectedMapPath) )
+                {
+                    var map = ResourceLibrary.Get<SceneFile>(PregameLobbyManager.Instance.SelectedMapPath);
+                    var mode = GameMode.GetAll( map ).FirstOrDefault(x => x.Ident == PregameLobbyManager.Instance.SelectedGameMode);
+                    
+                    <div class="setting-info">
+                        <label class="info-label">Map:</label>
+                        <label class="info-value">@(map?.GetMetadata("Title", map?.ResourceName))</label>
+                    </div>
+                    <div class="setting-info">
+                        <label class="info-label">Mode:</label>
+                        <label class="info-value">@(mode?.Title) @(PregameLobbyManager.Instance.IsHardcore ? "(Hardcore)" : "")</label>
+                    </div>
+                }
+                
+                <div class="grow" />
+                <label class="waiting-label">Waiting for host to start...</label>
+            }
+        </div>
+
+        @* ----- ROSTER PANEL ----- *@
+        <div class="roster-panel">
+            <label class="panel-title">Lobby Roster</label>
+
+            <div class="teams-container">
+                
+                @* COUNTER TERRORIST *@
+                <div class="team-column">
+                    <div class="team-header ct">
+                        <label>Counter-Terrorist</label>
+                        <div class="button standard smaller" onclick=@(() => Client.Local?.RequestTeam(Team.CounterTerrorist))>JOIN</div>
+                    </div>
+                    <div class="player-list">
+                        @foreach ( var player in GameUtils.AllPlayers.Where( x => x.Team == Team.CounterTerrorist ) )
+                        {
+                            <div class="player-card">
+                                <label>@player.DisplayName</label>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                @* TERRORIST *@
+                <div class="team-column">
+                    <div class="team-header t">
+                        <label>Terrorist</label>
+                        <div class="button standard smaller" onclick=@(() => Client.Local?.RequestTeam(Team.Terrorist))>JOIN</div>
+                    </div>
+                    <div class="player-list">
+                        @foreach ( var player in GameUtils.AllPlayers.Where( x => x.Team == Team.Terrorist ) )
+                        {
+                            <div class="player-card">
+                                <label>@player.DisplayName</label>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                @* UNASSIGNED *@
+                <div class="team-column">
+                    <div class="team-header un">
+                        <label>Spectators</label>
+                        <div class="button standard smaller" onclick=@(() => Client.Local?.RequestTeam(Team.Unassigned))>JOIN</div>
+                    </div>
+                    <div class="player-list">
+                        @foreach ( var player in GameUtils.AllPlayers.Where( x => x.Team == Team.Unassigned ) )
+                        {
+                            <div class="player-card">
+                                <label>@player.DisplayName</label>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="grow" />
+            
+            <div class="button standard smaller" style="align-self: flex-end;" onclick=@(() => GameUtils.ReturnToMainMenu())>
+                Leave Lobby
+            </div>
+        </div>
+
+    </div>
+</root>
+
+@code
+{
+    protected override int BuildHash()
+    {
+        var hash = new HashCode();
+        hash.Add( Networking.IsHost );
+        
+        if ( PregameLobbyManager.Instance != null )
+        {
+            hash.Add( PregameLobbyManager.Instance.SelectedMapPath );
+            hash.Add( PregameLobbyManager.Instance.SelectedGameMode );
+            hash.Add( PregameLobbyManager.Instance.IsHardcore );
+        }
+
+        foreach ( var player in GameUtils.AllPlayers )
+        {
+            hash.Add( player.SteamId );
+            hash.Add( player.Team );
+        }
+
+        return hash.ToHashCode();
+    }
+}

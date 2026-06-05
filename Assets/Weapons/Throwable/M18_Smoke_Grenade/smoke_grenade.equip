@@ -1,0 +1,31 @@
+{
+  "Name": "Smoke Grenade",
+  "Description": "",
+  "Slot": "Tactical",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": true,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/grenades/fire_grenade_01.png",
+  "IsPurchasable": true,
+  "Price": 300,
+  "KillReward": 150,
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/throwable/m18_smoke_grenade/weapon_smoke_grenade.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/throwable/m18_smoke_grenade/wm_smoke_grenade.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/throwable/m18_smoke_grenade/vm_smoke_grenade.prefab"
+  },
+  "WorldModel": "models/weapons/sbox_grenade_smoke/w_smoke_grenade.vmdl",
+  "ArmorReduction": null,
+  "HelmetReduction": null,
+  "__references": [
+    "facepunch.w_smoke_grenade#71890"
+  ],
+  "__version": 0
+}

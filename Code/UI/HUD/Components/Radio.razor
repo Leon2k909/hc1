@@ -1,0 +1,128 @@
+@namespace Facepunch.UI
+@attribute [StyleSheet]
+@inherits Panel
+
+@{
+    var sounds = MySounds;
+    if ( sounds == null ) return;
+}
+
+<root class="@(IsOpen ? "open" : "") layout with-background color-borders">
+    @if ( string.IsNullOrEmpty( SelectedCategory ) )
+    {
+        @for ( int i = 0; i < sounds.TeamSounds.Count; i++ )
+        {
+            @if (sounds.TeamSounds[i].IsHidden) continue;
+
+            <div class="row">
+                <InputHint Action="@($"Slot{i + 1}")" Size=@InputGlyphSize.Small />
+                <label>@sounds.TeamSounds[i].Category</label>
+            </div>
+        }
+
+        <div class="row">
+            <InputHint Action="Radio" Size=@InputGlyphSize.Small />
+            <label>Close</label>
+        </div>
+    }
+    else
+    {
+
+        @for ( int i = 0; i < CurrentCategory.Entries.Count; i++ )
+        {
+            <div class="row">
+                <InputHint Action="@($"Slot{i + 1}")" Size=@InputGlyphSize.Small />
+                <label>@CurrentCategory.Entries[i].Name</label>
+            </div>
+        }
+
+        <div class="row">
+            <InputHint Action="Radio" Size=@InputGlyphSize.Small />
+            <label>Back</label>
+        </div>
+    }
+</root>
+
+@code
+{
+    public RadioSounds MySounds => RadioSounds.All.FirstOrDefault( x => x.Team == Client.Local.Team );
+    public TeamRadioCategory CurrentCategory => MySounds.TeamSounds.FirstOrDefault( x => x.Category == SelectedCategory );
+
+    protected string SelectedCategory { get; set; }
+
+    private bool IsOpen;
+
+    private void CheckForEntryInput()
+    {
+        if ( CurrentCategory is null ) return;
+
+        int i = 0;
+        foreach ( var snd in CurrentCategory.Entries )
+        {
+            var inputAction = $"Slot{++i}";
+            if ( Input.Pressed( inputAction ) )
+            {
+                Input.ReleaseAction( inputAction );
+
+                RadioSounds.CmdPlay( SelectedCategory, snd.Name );
+
+                IsOpen = false;
+                SelectedCategory = null; 
+                StateHasChanged();
+            }
+        }
+    }
+
+    private void CheckForCategoryInput()
+    {
+        if ( MySounds is null )
+            return;
+
+        int i = 0;
+        foreach ( var category in MySounds.TeamSounds )
+        {
+            var inputAction = $"Slot{++i}";
+            if ( Input.Pressed( inputAction ) )
+            {
+                Input.Clear( inputAction );
+                SelectedCategory = category.Category;
+                StateHasChanged();
+            }
+        }
+    }
+
+    public override void Tick()
+    {
+        if ( Client.Local.PlayerPawn.IsValid() && Client.Local.PlayerPawn.HealthComponent?.State != LifeState.Alive && IsOpen )
+        {
+            IsOpen = false;
+            StateHasChanged();
+            return;
+        }
+
+        if ( Input.Pressed( "Radio" ) )
+        {
+            if ( !string.IsNullOrEmpty( SelectedCategory ) )
+            {
+                SelectedCategory = null;
+            }
+            else
+            {
+                IsOpen = !IsOpen;
+            }
+
+            StateHasChanged();
+        }
+
+        if ( !IsOpen ) return;
+
+        if ( !string.IsNullOrEmpty( SelectedCategory ) ) 
+        {
+            CheckForEntryInput();
+        }
+        else
+        {
+            CheckForCategoryInput();
+        }
+    }
+}

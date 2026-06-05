@@ -1,0 +1,23 @@
+{
+  "Name": "C4",
+  "Description": "",
+  "Slot": "Special",
+  "Team": "Terrorist",
+  "CanOtherTeamPickUp": false,
+  "DropOnDisconnect": true,
+  "Icon": "ui/items/c4.png",
+  "IsPurchasable": false,
+  "Price": 0,
+  "KillReward": 300,
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/c4/weapon_c4.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/c4/vm_c4.prefab"
+  },
+  "WorldModel": "weapons/throwable/c4_bomb/c4_bomb.vmdl",
+  "__references": [],
+  "__version": 0
+}

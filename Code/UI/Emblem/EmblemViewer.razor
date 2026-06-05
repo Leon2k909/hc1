@@ -1,0 +1,48 @@
+@using System;
+@using Sandbox.UI;
+@using Sandbox;
+
+@namespace Facepunch.UI
+@inherits Panel
+
+<root class="emblem-viewer">
+    @if ( Data != null )
+    {
+        @foreach ( var layer in Data.Layers )
+        {
+            @if ( layer.IconType == EmblemIconType.Emoji )
+            {
+                @* Emoji: wrap in a fixed-size flex box so centering uses the box dimensions,
+                   not unreliable emoji text-line metrics.
+                   Base size is 28px × scale (emojis render visually larger than their font-size). *@
+                var eSizePx = layer.Scale * 28f;
+                var eStyle  = $"left:{layer.X}%; top:{layer.Y}%; width:{eSizePx}px; height:{eSizePx}px; transform:translate(-50%,-50%) rotate({layer.Rotation}deg);";
+                <div class="emblem-emoji-wrap" style="@eStyle">
+                    <label class="emblem-emoji" style="font-size:{eSizePx}px; color:{layer.Color.Hex};">@layer.Icon</label>
+                </div>
+            }
+            else
+            {
+                @* Material Icon: render via the icon font directly — no wrapper needed. *@
+                var iStyle = $"left:{layer.X}%; top:{layer.Y}%; font-size:{layer.Scale * 32f}px; color:{layer.Color.Hex}; transform:translate(-50%,-50%) rotate({layer.Rotation}deg);";
+                <i class="emblem-layer" style="@iStyle">@layer.Icon</i>
+            }
+        }
+    }
+</root>
+
+@code {
+    public EmblemData Data { get; set; }
+    
+    [Property]
+    public string JsonData
+    {
+        get => Data?.ToJson() ?? "";
+        set => Data = EmblemData.FromJson( value );
+    }
+
+    protected override int BuildHash()
+    {
+        return HashCode.Combine( JsonData );
+    }
+}

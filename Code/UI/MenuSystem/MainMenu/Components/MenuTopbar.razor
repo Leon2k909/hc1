@@ -1,0 +1,33 @@
+@using Sandbox.UI
+@using System
+
+@inherits Panel
+@namespace Facepunch.UI
+@attribute [StyleSheet]
+
+<root class="menu-topbar">
+    @if ( BackAction != null )
+    {
+        <div class="menu-back" @onclick=@BackAction>
+            <i>arrow_back</i>
+            <label>@BackLabel</label>
+        </div>
+    }
+    else
+    {
+        <a class="menu-back" href="@BackHref">
+            <i>arrow_back</i>
+            <label>@BackLabel</label>
+        </a>
+    }
+    
+    <label class="menu-title">@Title</label>
+    <div class="menu-topbar-spacer" />
+</root>
+
+@code {
+    public string Title { get; set; } = "MENU";
+    public string BackLabel { get; set; } = "BACK";
+    public string BackHref { get; set; } = "/multiplayer";
+    public Action BackAction { get; set; }
+}

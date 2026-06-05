@@ -1,0 +1,32 @@
+{
+  "Name": "Trenchknife",
+  "Description": "",
+  "Slot": "Melee",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": true,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/melee/trench_knife_01.png",
+  "IsPurchasable": false,
+  "Price": 0,
+  "KillReward": 1500,
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/knife/weapon_knife.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/knife/wm_knife.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/knife/vm_knife.prefab"
+  },
+  "WorldModel": "models/weapons/sbox_melee_trenchknife/w_trenchknife.vmdl",
+  "ArmorReduction": null,
+  "HelmetReduction": null,
+  "__references": [
+    "facepunch.w_trenchknife#38336"
+  ],
+  "__version": 0,
+  "Category": "Melee"
+}

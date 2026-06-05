@@ -1,0 +1,699 @@
+@import "/UI/Styles/Theme.scss";
+
+$accent: #FF7A1A;
+$accent-strong: #FF6B00;
+$panel-bg: rgba( 10, 12, 16, 0.72 );
+$panel-bg-hover: rgba( 18, 20, 26, 0.85 );
+$panel-border: rgba( 255, 255, 255, 0.07 );
+$muted: rgba( 255, 255, 255, 0.45 );
+
+.landing
+{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    font-family: $main-font;
+    padding: 24px 48px;
+
+    label, i
+    {
+        text-shadow: none;
+    }
+
+    // ============================================================
+    //  MAIN CONTENT
+    // ============================================================
+    .content
+    {
+        flex-direction: row;
+        flex-grow: 1;
+        gap: 20px;
+        padding: 20px 4px;
+        align-items: stretch;
+    }
+
+    .main-dashboard
+    {
+        flex-direction: row;
+        flex-grow: 1;
+        gap: 20px;
+        min-width: 0;
+    }
+
+    .card
+    {
+        background-color: $panel-bg;
+        border: 1px solid $panel-border;
+        border-radius: 6px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.15s ease-out;
+    }
+
+    .kicker
+    {
+        font-size: 13px;
+        font-weight: bold;
+        color: $accent;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+    }
+
+    // ----- Hero / Play (dominant) -----
+    .hero-card
+    {
+        flex-grow: 2;
+        flex-basis: 60%;
+        flex-direction: column;
+        justify-content: flex-end;
+
+        .hero-bg
+        {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url( "/ui/maps/shipment.jpg" );
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.4s ease;
+        }
+
+        .hero-shade
+        {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient( to top, rgba( 6, 7, 10, 0.97 ) 5%, rgba( 6, 7, 10, 0.55 ) 45%, rgba( 6, 7, 10, 0.15 ) 100% );
+        }
+
+        .hero-body
+        {
+            position: relative;
+            flex-direction: column;
+            gap: 10px;
+            padding: 44px;
+            align-items: flex-start;
+        }
+
+        .hero-title
+        {
+            font-size: 64px;
+            font-weight: bold;
+            color: white;
+            letter-spacing: 2px;
+            line-height: 84px;
+        }
+
+        .hero-sub
+        {
+            font-size: 18px;
+            color: rgba( 255, 255, 255, 0.7 );
+            margin-bottom: 18px;
+        }
+
+        .hero-actions
+        {
+            flex-direction: row;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .play-btn
+        {
+            flex-direction: row;
+            align-items: center;
+            gap: 10px;
+            padding: 17px 52px;
+            background-color: $accent-strong;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.12s ease-out;
+
+            i
+            {
+                font-size: 30px;
+                color: black;
+            }
+
+            label
+            {
+                font-size: 24px;
+                font-weight: bold;
+                color: black;
+                letter-spacing: 3px;
+                cursor: pointer;
+            }
+
+            &:hover
+            {
+                background-color: $accent;
+                padding: 17px 58px;
+            }
+        }
+
+        // Hardcore hero variant — red tint
+        &.hardcore
+        {
+            .hero-shade { background-image: linear-gradient( to top, rgba( 30, 0, 0, 0.98 ) 5%, rgba( 20, 0, 0, 0.6 ) 45%, rgba( 10, 0, 0, 0.2 ) 100% ); }
+            .kicker { color: #cc2222; }
+            border-color: rgba( 180, 30, 30, 0.35 );
+        }
+
+        // Hardcore play btn
+        .play-btn-hc
+        {
+            background-color: #8b1212;
+            i, label { color: white; }
+            &:hover { background-color: #aa1818; padding: 17px 58px; }
+        }
+
+        // Ranked variant — purple/gold tint
+        .ranked-btn
+        {
+            background-color: rgba( 130, 80, 220, 0.85 );
+
+            i, label { color: white; }
+
+            &:hover
+            {
+                background-color: rgba( 150, 100, 255, 0.95 );
+                padding: 17px 58px;
+            }
+        }
+
+        // Private match variant — subtle
+        .private-btn
+        {
+            background-color: rgba( 255, 255, 255, 0.1 );
+
+            i, label { color: white; }
+
+            &:hover
+            {
+                background-color: rgba( 255, 255, 255, 0.18 );
+                padding: 17px 58px;
+            }
+        }
+
+        &:hover .hero-bg
+        {
+            transform: scale( 1.05 );
+        }
+    }
+
+    // ----- CORE / HARDCORE toggle -----
+    .mode-rule-toggle
+    {
+        flex-direction: row;
+        gap: 0;
+        flex-shrink: 0;
+        border: 1px solid rgba( 255, 255, 255, 0.1 );
+        border-radius: 3px;
+        overflow: hidden;
+    }
+
+    .mode-rule-btn
+    {
+        flex: 1;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 8px 10px;
+        cursor: pointer;
+        color: rgba( 255, 255, 255, 0.45 );
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        background-color: rgba( 255, 255, 255, 0.04 );
+        transition: all 0.1s ease;
+
+        i { font-size: 14px; }
+
+        &:hover { color: white; background-color: rgba( 255, 255, 255, 0.1 ); }
+
+        &.active
+        {
+            background-color: rgba( 255, 255, 255, 0.12 );
+            color: white;
+            border-bottom: 2px solid $accent;
+        }
+
+        &.active.hc
+        {
+            background-color: rgba( 220, 40, 40, 0.15 );
+            border-bottom-color: #cc2222;
+            color: #ff6666;
+
+            i { color: #ff6666; }
+        }
+    }
+
+    // ----- Secondary Actions Stack -----
+    .secondary-cards
+    {
+        flex-grow: 1;
+        flex-basis: 35%;
+        flex-direction: column;
+        gap: 8px;
+        overflow-y: scroll;
+    }
+
+    .mini-card
+    {
+        flex-grow: 1;
+        flex-direction: column;
+        justify-content: flex-end;
+        cursor: pointer;
+
+        .mini-bg
+        {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.3s ease;
+        }
+
+        .custom-bg { background-image: url( "/ui/maps/shipment.jpg" ); filter: grayscale(1); opacity: 0.3; }
+        .gunsmith-bg { background-image: url( "/ui/teams/operators_logo_banner.png" ); background-size: contain; opacity: 0.1; }
+        .progression-bg { background-color: rgba(255,255,255,0.05); }
+
+        .mini-shade
+        {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient( to right, rgba(0,0,0,0.8), rgba(0,0,0,0.2) );
+        }
+
+        .mini-content
+        {
+            position: relative;
+            flex-direction: row;
+            align-items: center;
+            padding: 24px;
+            gap: 20px;
+            pointer-events: none;
+            transition: transform 0.2s ease;
+
+            i
+            {
+                font-size: 38px;
+                color: rgba( 255, 255, 255, 0.4 );
+                transition: color 0.2s ease;
+            }
+        }
+
+        .mini-text
+        {
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .kicker
+        {
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: $accent-strong;
+        }
+
+        .title
+        {
+            font-size: 26px;
+            font-weight: bold;
+            color: white;
+            letter-spacing: 1px;
+        }
+
+        // Hardcore variant
+        &.hc-card
+        {
+            border-left: 2px solid rgba( 180, 30, 30, 0.5 );
+
+            .kicker { color: #cc4444; }
+            .custom-bg { filter: grayscale(1) sepia(0.4); }
+        }
+
+        &:hover
+        {
+            border-color: rgba(255, 255, 255, 0.3);
+
+            .mini-bg
+            {
+                transform: scale( 1.05 );
+                opacity: 0.6;
+                filter: grayscale(0.5);
+            }
+
+            .mini-content
+            {
+                transform: translateX( 10px );
+                
+                i { color: white; }
+            }
+        }
+    }
+
+    // ----- Friends List -----
+    .friends-card
+    {
+        width: 320px;
+        flex-shrink: 0;
+        flex-direction: column;
+
+        .friends-header
+        {
+            flex-direction: row;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 20px;
+            background-color: rgba( 255, 255, 255, 0.03 );
+            border-bottom: 1px solid rgba( 255, 255, 255, 0.06 );
+            flex-shrink: 0;
+
+            i
+            {
+                font-size: 20px;
+                color: $accent;
+            }
+
+            label
+            {
+                font-size: 14px;
+                font-weight: bold;
+                color: white;
+                letter-spacing: 2px;
+            }
+        }
+
+        .friends-list
+        {
+            flex-direction: column;
+            flex-grow: 1;
+            padding: 10px;
+            gap: 6px;
+            overflow-y: scroll;
+        }
+
+        .friend-row
+        {
+            flex-direction: row;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 10px;
+            border-radius: 4px;
+            background-color: rgba( 255, 255, 255, 0.02 );
+            border: 1px solid rgba( 255, 255, 255, 0.02 );
+            transition: all 0.12s ease;
+
+            .friend-avatar
+            {
+                width: 36px;
+                height: 36px;
+                border-radius: 3px;
+                object-fit: cover;
+                opacity: 0.5;
+                filter: grayscale(1);
+                transition: all 0.2s ease;
+            }
+
+            .friend-info
+            {
+                flex-direction: column;
+                justify-content: center;
+                gap: 2px;
+                flex-grow: 1;
+            }
+
+            .friend-name
+            {
+                font-size: 14px;
+                font-weight: bold;
+                color: rgba( 255, 255, 255, 0.6 );
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 220px;
+                transition: color 0.2s ease;
+            }
+
+            .friend-status
+            {
+                font-size: 10px;
+                font-weight: bold;
+                color: rgba( 255, 255, 255, 0.3 );
+                letter-spacing: 1px;
+                text-transform: uppercase;
+                transition: color 0.2s ease;
+            }
+
+            &.online
+            {
+                background-color: rgba( 255, 255, 255, 0.05 );
+                border-color: rgba( 255, 255, 255, 0.05 );
+
+                .friend-avatar
+                {
+                    opacity: 1;
+                    border: 1px solid #43D17A;
+                }
+
+                .friend-name
+                {
+                    color: white;
+                }
+
+                .friend-status
+                {
+                    color: #43D17A;
+                }
+            }
+
+            &:hover
+            {
+                background-color: rgba( 255, 255, 255, 0.08 );
+                border-color: rgba( 255, 255, 255, 0.15 );
+            }
+        }
+
+        .friends-empty
+        {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 0;
+            color: rgba( 255, 255, 255, 0.4 );
+            font-size: 13px;
+        }
+
+        .open-friends-btn
+        {
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: auto;
+            padding: 12px;
+            background-color: rgba( 255, 255, 255, 0.05 );
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+
+            i
+            {
+                font-size: 20px;
+                color: rgba( 255, 255, 255, 0.72 );
+            }
+
+            label
+            {
+                font-size: 12px;
+                font-weight: bold;
+                letter-spacing: 1px;
+                color: rgba( 255, 255, 255, 0.72 );
+                cursor: pointer;
+            }
+
+            &:hover
+            {
+                background-color: rgba( 255, 255, 255, 0.12 );
+                
+                i, label { color: white; }
+            }
+        }
+    }
+
+    // ----- Last Played Card -----
+    .last-played-card
+    {
+        width: 220px;
+        flex-shrink: 0;
+        flex-direction: column;
+        justify-content: flex-end;
+        cursor: pointer;
+        overflow: hidden;
+        border-color: rgba( $accent, 0.25 );
+
+        .last-played-bg
+        {
+            position: absolute;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background-image: linear-gradient( 135deg, rgba( 60, 30, 10, 0.8 ), rgba( 10, 10, 15, 0.95 ) );
+            transition: transform 0.4s ease;
+        }
+
+        .last-played-body
+        {
+            position: relative;
+            flex-direction: column;
+            padding: 20px;
+            gap: 6px;
+            background-image: linear-gradient( to top, rgba( 0, 0, 0, 0.85 ), transparent );
+        }
+
+        .last-played-title
+        {
+            font-size: 22px;
+            font-weight: bold;
+            color: white;
+            letter-spacing: 1px;
+        }
+
+        .last-played-action
+        {
+            flex-direction: row;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            padding: 8px 14px;
+            background-color: $accent;
+            border-radius: 4px;
+            align-self: flex-start;
+
+            i { font-size: 16px; color: white; }
+            label { font-size: 13px; font-weight: bold; color: white; letter-spacing: 1px; cursor: pointer; }
+        }
+
+        &:hover
+        {
+            border-color: $accent;
+            box-shadow: 0 0 20px rgba( $accent, 0.3 );
+
+            .last-played-bg { transform: scale( 1.05 ); }
+        }
+    }
+
+    // ============================================================
+    //  BOTTOM STATUS BAR
+    // ============================================================
+    .statusbar
+    {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        height: 48px;
+        flex-shrink: 0;
+        padding: 10px 4px 0 4px;
+        border-top: 2px solid rgba( 255, 255, 255, 0.06 );
+    }
+
+    .status-left
+    {
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+
+        .online-dot
+        {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #43D17A;
+        }
+
+        .status-name
+        {
+            font-size: 15px;
+            font-weight: bold;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+
+        .status-state
+        {
+            font-size: 12px;
+            font-weight: bold;
+            color: #43D17A;
+            letter-spacing: 2px;
+        }
+    }
+
+    .status-right
+    {
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+
+        .status-btn
+        {
+            flex-direction: row;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            background-color: $panel-bg;
+            border: 1px solid $panel-border;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.12s ease-out;
+
+            i
+            {
+                font-size: 18px;
+                color: rgba( 255, 255, 255, 0.6 );
+                transition: all 0.12s ease-out;
+            }
+
+            label
+            {
+                font-size: 14px;
+                font-weight: bold;
+                color: rgba( 255, 255, 255, 0.7 );
+                letter-spacing: 1px;
+                text-transform: uppercase;
+                cursor: pointer;
+                transition: all 0.12s ease-out;
+            }
+
+            &:hover
+            {
+                border-color: rgba( 255, 255, 255, 0.25 );
+                background-color: $panel-bg-hover;
+
+                i { color: white; }
+                label { color: white; }
+            }
+
+            &.danger:hover
+            {
+                border-color: rgba( 250, 58, 55, 0.6 );
+
+                i { color: #FA3A37; }
+                label { color: #FA3A37; }
+            }
+        }
+    }
+}

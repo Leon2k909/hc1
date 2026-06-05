@@ -1,0 +1,547 @@
+@using Sandbox;
+@using Sandbox.UI;
+@inherits Panel
+@namespace Facepunch.UI
+
+@attribute [StyleSheet]
+
+<root>
+
+    @* ── Invite popup (floats above party bar) ── *@
+    @if ( _inviteOpen )
+    {
+        <div class="party-invite-popup">
+            <div class="party-popup-header">
+                <span class="party-popup-title">INVITE PLAYERS</span>
+                <button class="party-popup-close" @onclick=@(() => _inviteOpen = false)>✕</button>
+            </div>
+            <div class="party-popup-list">
+                @{
+                    var invitable = GetInvitablePlayers().ToList();
+                }
+                @if ( invitable.Count == 0 )
+                {
+                    <span class="party-popup-empty">No other players online</span>
+                }
+                @foreach ( var player in invitable )
+                {
+                    var targetId = player.Id;
+                    <div class="party-popup-row">
+                        <img src="avatar:@player.SteamId" class="party-popup-avatar" />
+                        <span class="party-popup-name">@player.DisplayName</span>
+                        <button class="party-popup-invite-btn" @onclick=@(() => SendInvite( targetId ))>Invite</button>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    @* ── Invite toast ── *@
+    @if ( _inviteFromName != null )
+    {
+        <div class="party-toast">
+            <div class="party-toast-icon">👥</div>
+            <div class="party-toast-body">
+                <span class="party-toast-title">Party Invite</span>
+                <span class="party-toast-sub">@_inviteFromName wants to party up</span>
+            </div>
+            <div class="party-toast-actions">
+                <button class="party-toast-accept" @onclick=@AcceptInvite>Accept</button>
+                <button class="party-toast-decline" @onclick=@DeclineInvite>Decline</button>
+            </div>
+        </div>
+    }
+
+    @* ── Party bar ── *@
+    <div class="party-bar">
+
+        <button class="party-avatar-slot party-self" @onclick=@ToggleInvitePopup>
+            <img src="avatar:@LocalSteamId" class="party-avatar" />
+            @if ( LocalIsPartyLeader || LocalIsMenuPartyOwner )
+            {
+                <span class="party-slot-crown">♛</span>
+            }
+        </button>
+
+        @{
+            var others = GetOtherMembers().ToList();
+            var limit = 4;
+            var showOverflow = others.Count > limit;
+            var visibleCount = showOverflow ? limit - 1 : others.Count;
+            var visibleOthers = others.Take( visibleCount );
+            var overflowOthers = others.Skip( visibleCount ).ToList();
+        }
+
+        @foreach ( var p in visibleOthers )
+        {
+            <div class="party-avatar-slot party-member-slot">
+                <img src="avatar:@p.SteamId" class="party-avatar" />
+                @if ( p.IsLeader )
+                {
+                    <span class="party-slot-crown">♛</span>
+                }
+                @if ( LocalIsPartyLeader && p.NetworkId != Guid.Empty )
+                {
+                    <button class="party-member-kick" @onclick=@(() => KickMember( p.NetworkId ))>✕</button>
+                }
+            </div>
+        }
+
+        @if ( showOverflow )
+        {
+            <div class="party-avatar-slot party-overflow-slot" onmouseenter=@(() => _dropdownOpen = true) onmouseleave=@(() => _dropdownOpen = false)>
+                <span class="party-invite-plus">+@(overflowOthers.Count)</span>
+                
+                @if ( _dropdownOpen )
+                {
+                    <div class="party-dropdown">
+                        @foreach ( var p in overflowOthers )
+                        {
+                            <div class="party-dropdown-item">
+                                <img src="avatar:@p.SteamId" class="party-dropdown-avatar" />
+                                @if ( p.IsLeader )
+                                {
+                                    <span class="party-dropdown-crown">♛</span>
+                                }
+                                @if ( LocalIsPartyLeader && p.NetworkId != Guid.Empty )
+                                {
+                                    <button class="party-member-kick" @onclick=@(() => KickMember( p.NetworkId ))>✕</button>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            @for ( var i = 0; i < (limit - others.Count); i++ )
+            {
+                <button class="party-invite-slot" @onclick=@ToggleInvitePopup>
+                    <span class="party-invite-plus">+</span>
+                </button>
+            }
+        }
+
+        @if ( LocalIsInParty || MenuParty != null )
+        {
+            <button class="party-leave-btn" @onclick=@LeaveParty>✕</button>
+        }
+
+    </div>
+
+</root>
+
+@code
+{
+    static string _inviteFromName;
+    static Guid   _inviteFromId;
+
+    bool _inviteOpen = false;
+
+    public static void ShowInvite( string fromName, Guid fromId )
+    {
+        _inviteFromName = fromName;
+        _inviteFromId   = fromId;
+    }
+
+    private readonly record struct PartyPlayer( Guid Id, ulong SteamId, string DisplayName, bool IsLocalPlayer );
+    private readonly record struct PartyDisplayMember( ulong SteamId, Guid NetworkId, bool IsLeader );
+
+    bool _dropdownOpen = false;
+
+    IEnumerable<PartyDisplayMember> GetOtherMembers()
+    {
+        if ( LocalIsInParty )
+        {
+            foreach ( var p in PartyMembers.Where( m => !m.IsLocalPlayer ) )
+            {
+                yield return new PartyDisplayMember( p.SteamId, p.Id, IsPartyLeader( p.Id ) );
+            }
+        }
+        else if ( MenuParty != null )
+        {
+            foreach ( var p in MenuPartyMembers.Where( m => !SafeFriendIsMe( m ) ) )
+            {
+                yield return new PartyDisplayMember( SafeFriendId( p ), Guid.Empty, IsMenuPartyOwner( p ) );
+            }
+        }
+    }
+
+    const int MaxPartySlots = 8;
+
+    PartySystem Party
+    {
+        get
+        {
+            var party = PartySystem.Current;
+            return party.IsValid() ? party : null;
+        }
+    }
+
+    PartyRoom MenuParty => GetMenuParty();
+
+    ulong  LocalSteamId => GetLocalSteamId();
+    string LocalName    => GetLocalName();
+
+    string PartyStatus      => LocalIsInParty ? (LocalIsPartyLeader ? "Party Leader" : "In Party")
+                             : MenuParty != null ? (LocalIsMenuPartyOwner ? "Party Leader" : "In Party")
+                             : "Not in party";
+    string PartyStatusClass => LocalIsInParty || MenuParty != null ? "in-party" : "";
+
+    int FilledPartySlots
+    {
+        get
+        {
+            if ( LocalIsInParty )
+                return 1 + PartyMembers.Count( m => !m.IsLocalPlayer );
+
+            if ( MenuParty != null )
+                return 1 + MenuPartyMembers.Count( m => !SafeFriendIsMe( m ) );
+
+            return 1;
+        }
+    }
+
+    int InviteSlotCount => Math.Max( 0, MaxPartySlots - FilledPartySlots );
+
+    bool LocalIsInParty
+    {
+        get
+        {
+            try
+            {
+                return Party?.LocalIsInParty ?? false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+    }
+
+    bool LocalIsPartyLeader
+    {
+        get
+        {
+            try
+            {
+                return Party?.LocalIsLeader ?? false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+    }
+
+    IEnumerable<Friend> MenuPartyMembers
+    {
+        get
+        {
+            try
+            {
+                return (MenuParty?.Members ?? Enumerable.Empty<Friend>()).ToArray();
+            }
+            catch
+            {
+                return Enumerable.Empty<Friend>();
+            }
+        }
+    }
+
+    bool LocalIsMenuPartyOwner
+    {
+        get
+        {
+            try
+            {
+                return MenuParty?.Owner.IsMe ?? false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+    }
+
+    int MenuPartyMemberCount
+    {
+        get
+        {
+            try
+            {
+                return MenuParty?.MemberCount ?? 0;
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+    }
+
+    ulong MenuPartyOwnerId
+    {
+        get
+        {
+            try
+            {
+                return MenuParty?.Owner.Id ?? 0;
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+    }
+
+    bool IsMenuPartyOwner( Friend friend )
+    {
+        try
+        {
+            return SafeFriendId( friend ) != 0 && MenuPartyOwnerId == SafeFriendId( friend );
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    bool IsPartyLeader( Guid id )
+    {
+        try
+        {
+            return Party?.IsLeader( id ) ?? false;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    IEnumerable<PartyPlayer> PartyMembers
+    {
+        get
+        {
+            if ( Party == null ) yield break;
+
+            var onlinePlayers = GetOnlinePlayers().ToDictionary( p => p.Id );
+            var memberIds = Party?.MemberIds?.ToArray() ?? Array.Empty<Guid>();
+            foreach ( var memberId in memberIds )
+            {
+                if ( onlinePlayers.TryGetValue( memberId, out var player ) )
+                {
+                    yield return player;
+                    continue;
+                }
+
+                yield return new PartyPlayer( memberId, 0, "Unknown Player", memberId == (Connection.Local?.Id ?? Guid.Empty) );
+            }
+        }
+    }
+
+    IEnumerable<PartyPlayer> GetInvitablePlayers() =>
+        GetOnlinePlayers()
+            .Where( p => !p.IsLocalPlayer )
+            .Where( p => !IsInNetworkParty( p.Id ) )
+            .OrderBy( p => p.DisplayName );
+
+    IEnumerable<PartyPlayer> GetOnlinePlayers()
+    {
+        var seen = new HashSet<Guid>();
+
+        foreach ( var connection in Connection.All ?? Enumerable.Empty<Connection>() )
+        {
+            if ( connection is null || connection.Id == Guid.Empty ) continue;
+            if ( !seen.Add( connection.Id ) ) continue;
+
+            var name = string.IsNullOrWhiteSpace( connection.DisplayName ) ? connection.Name : connection.DisplayName;
+            yield return new PartyPlayer( connection.Id, connection.SteamId, name, connection == Connection.Local );
+        }
+
+        foreach ( var client in GameUtils.AllPlayers )
+        {
+            var connection = client.Connection;
+            if ( connection is null || connection.Id == Guid.Empty ) continue;
+            if ( !seen.Add( connection.Id ) ) continue;
+
+            yield return new PartyPlayer( connection.Id, client.SteamId, client.DisplayName, client.IsLocalPlayer );
+        }
+    }
+
+    void ToggleInvitePopup()
+    {
+        if ( Networking.IsActive && Party != null )
+        {
+            _inviteOpen = !_inviteOpen;
+            return;
+        }
+
+        OpenFriendsOverlay();
+    }
+
+    async void OpenFriendsOverlay()
+    {
+        if ( MenuParty is null )
+        {
+            await PartyRoom.Create( 8, "My Party", true );
+        }
+
+        // Only show overlay if not in editor (overlay APIs don't work in editor)
+        if ( !Game.IsEditor )
+        {
+            Game.Overlay.ShowFriendsList( new Sandbox.Modals.FriendsListModalOptions()
+            {
+                ShowOfflineMembers = false,
+            } );
+        }
+        else
+        {
+            Toast.Instance?.Show( "Party created - overlay not available in editor" );
+        }
+    }
+
+    void SendInvite( Guid targetId )
+    {
+        Party?.Invite( targetId );
+        _inviteOpen = false;
+    }
+
+    void AcceptInvite()
+    {
+        Party?.AcceptInvite( _inviteFromId );
+        _inviteFromName = null;
+        _inviteFromId   = Guid.Empty;
+    }
+
+    void DeclineInvite()
+    {
+        Party?.DeclineInvite( _inviteFromId );
+        _inviteFromName = null;
+        _inviteFromId   = Guid.Empty;
+    }
+
+    void LeaveParty()
+    {
+        if ( LocalIsInParty )
+        {
+            Party.LeaveParty();
+            return;
+        }
+
+        MenuParty?.Leave();
+    }
+
+    void KickMember( Guid id )     => Party?.KickMember( id );
+
+    protected override int BuildHash()
+    {
+        var h = new HashCode();
+        h.Add( _inviteFromName );
+        h.Add( _inviteOpen );
+        h.Add( Party?.MemberIds.Count ?? 0 );
+        h.Add( Party?.LeaderId );
+        h.Add( MenuPartyMemberCount );
+        h.Add( MenuPartyOwnerId );
+        foreach ( var member in MenuPartyMembers )
+        {
+            h.Add( SafeFriendId( member ) );
+            h.Add( SafeFriendName( member ) );
+        }
+        foreach ( var player in GetOnlinePlayers() )
+        {
+            h.Add( player.Id );
+            h.Add( player.DisplayName );
+        }
+        return h.ToHashCode();
+    }
+
+    PartyRoom GetMenuParty()
+    {
+        // Allow party system in editor for testing if Steam overlay is available
+        // Disable Game.Overlay.ShowFriendsList() call in OpenFriendsOverlay() when in editor
+        // if ( Game.IsEditor )
+        //     return null;
+
+        try
+        {
+            return PartyRoom.Current;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    ulong GetLocalSteamId()
+    {
+        try
+        {
+            return Client.Local?.SteamId ?? Connection.Local?.SteamId ?? 0;
+        }
+        catch
+        {
+            return 0;
+        }
+    }
+
+    string GetLocalName()
+    {
+        try
+        {
+            return Client.Local?.DisplayName ?? Connection.Local?.DisplayName ?? "You";
+        }
+        catch
+        {
+            return "You";
+        }
+    }
+
+    bool IsInNetworkParty( Guid id )
+    {
+        try
+        {
+            return Party?.IsInParty( id ) ?? false;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    ulong SafeFriendId( Friend friend )
+    {
+        try
+        {
+            return friend.Id;
+        }
+        catch
+        {
+            return 0;
+        }
+    }
+
+    string SafeFriendName( Friend friend )
+    {
+        try
+        {
+            return friend.Name ?? "Unknown Player";
+        }
+        catch
+        {
+            return "Unknown Player";
+        }
+    }
+
+    bool SafeFriendIsMe( Friend friend )
+    {
+        try
+        {
+            return friend.IsMe;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+}

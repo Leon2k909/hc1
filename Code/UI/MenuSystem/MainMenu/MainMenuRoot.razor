@@ -1,0 +1,226 @@
+@using Sandbox.Menu
+@using Sandbox.UI;
+@using Sandbox.UI.Navigation;
+
+@inherits NavigationHost
+@namespace Facepunch.UI
+
+<root class="main-menu-root">
+    <div @ref="BackgroundPanel" class="background @( HasBlur ? "blur" : "")" />
+
+    @* ── Persistent global nav — always on every page ─────────── *@
+    <div class="global-nav">
+
+        <a class="gnav-logo" href="/">
+            <img src="/ui/teams/operators_logo_banner.png" />
+            <div class="gnav-logo-text">
+                <label class="gnav-game-name">RAZED</label>
+                <label class="gnav-game-sub">HQ</label>
+            </div>
+        </a>
+
+        @* ── Nav tabs + bumpers (bumpers only show with controller) ── *@
+        <div class="gnav-tabs-group">
+            @if ( Input.UsingController )
+            {
+                <div class="gnav-ctrl-btn" @onclick=@NavPrev>LB</div>
+            }
+
+            <div class="gnav-items">
+                <a class="gnav-item @(IsActive("/", "/multiplayer") ? "active" : "")" href="/">
+                    <i>home</i>
+                    <label>PLAY</label>
+                </a>
+                <div class="gnav-item" @onclick=@OpenGunsmith>
+                    <i>build</i>
+                    <label>WEAPONS</label>
+                </div>
+                <a class="gnav-item @(IsActive("/career") ? "active" : "")" href="/career">
+                    <i>military_tech</i>
+                    <label>PROGRESSION</label>
+                </a>
+                <a class="gnav-item @(IsActive("/barracks") ? "active" : "")" href="/barracks">
+                    <i>star</i>
+                    <label>BARRACKS</label>
+                </a>
+                <a class="gnav-item @(IsActive("/lobbies") ? "active" : "")" href="/lobbies">
+                    <i>dns</i>
+                    <label>SESSIONS</label>
+                </a>
+                <a class="gnav-item @(IsActive("/store") ? "active" : "")" href="/store">
+                    <i>storefront</i>
+                    <label>STORE</label>
+                </a>
+            </div>
+
+            @if ( Input.UsingController )
+            {
+                <div class="gnav-ctrl-btn" @onclick=@NavNext>RB</div>
+            }
+        </div>
+
+        <div class="gnav-right">
+            <a class="gnav-profile" href="/career">
+                @if ( Progression.GetPrestige() > 0 )
+                {
+                    <img src="/ui/prestige/prestige_@(Progression.GetPrestige()).png" style="height: 32px; width: 32px; margin-right: 12px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)); object-fit: contain;" />
+                }
+                <div class="gnav-profile-info">
+                    <label class="gnav-profile-name">@LocalName</label>
+                    <label class="gnav-profile-level">LV @PlayerLevel</label>
+                </div>
+                @if ( LocalSteamId != 0 )
+                {
+                    <img class="gnav-avatar" src="avatar:@LocalSteamId" />
+                }
+                else
+                {
+                    <div class="gnav-avatar gnav-avatar-placeholder"><i>person</i></div>
+                }
+            </a>
+            <button class="gnav-icon-btn" @onclick=@OpenFriendsList title="Friends">
+                <i>group</i>
+            </button>
+            <a class="gnav-icon-btn" href="/settings" title="Settings">
+                <i>settings</i>
+            </a>
+        </div>
+    </div>
+
+    @* ── Pages render here ─────────────────────────────────────── *@
+    <div class="navigator-canvas" slot="navigator-canvas" />
+
+    <BugReportPanel @ref=BugReportPanelRef />
+</root>
+
+@code
+{
+    public static MainMenuRoot Instance { get; set; }
+    private BugReportPanel BugReportPanelRef { get; set; }
+
+    // Track the current page route so nav items can highlight correctly.
+    public string ActiveRoute { get; private set; } = "/";
+
+    public MainMenuRoot()
+    {
+        Instance = this;
+        DefaultUrl = "/";
+        AddDestination( "/",            typeof( HubPage ) );
+        AddDestination( "/multiplayer", typeof( LandingPage ) );
+        AddDestination( "/ranked",      typeof( RankedPage ) );
+        AddDestination( "/lobbies",     typeof( LobbyList ) );
+        AddDestination( "/store",       typeof( StorePage ) );
+        AddDestination( "/new",         typeof( CreateLobbyPage ) );
+        AddDestination( "/career",      typeof( CareerLanding ) );
+        AddDestination( "/barracks",    typeof( BarracksPage ) );
+        AddDestination( "/theater",     typeof( TheaterPage ) );
+        AddDestination( "/settings",    typeof( SettingsPage ) );
+    }
+
+    /// <summary>Called by each page in OnNavigationOpen to highlight the correct nav tab.</summary>
+    public void SetActiveRoute( string route )
+    {
+        ActiveRoute = route;
+        StateHasChanged();
+    }
+
+    private bool IsActive( params string[] routes )
+        => routes.Any( r => ActiveRoute.Equals( r, System.StringComparison.OrdinalIgnoreCase ) );
+
+    // ── Controller tab navigation ──────────────────────────────
+    // Ordered list of navigable top-level routes (Gunsmith skipped — it loads a separate scene).
+    private static readonly string[] ControllerNavRoutes =
+    {
+        "/",
+        "/career",
+        "/barracks",
+        "/lobbies",
+        "/store",
+    };
+
+    private int GetCurrentNavIndex()
+    {
+        for ( int i = 0; i < ControllerNavRoutes.Length; i++ )
+            if ( IsActive( ControllerNavRoutes[i] ) ) return i;
+        return 0;
+    }
+
+    private void NavPrev()
+    {
+        var idx = (GetCurrentNavIndex() - 1 + ControllerNavRoutes.Length) % ControllerNavRoutes.Length;
+        this.Navigate( ControllerNavRoutes[idx] );
+    }
+
+    private void NavNext()
+    {
+        var idx = (GetCurrentNavIndex() + 1) % ControllerNavRoutes.Length;
+        this.Navigate( ControllerNavRoutes[idx] );
+    }
+
+    private bool _lbWasDown, _rbWasDown;
+
+    public override void Tick()
+    {
+        if ( !Input.UsingController ) return;
+
+        // Use raw shoulder button tracking so no action bindings are needed
+        var lbDown = Input.Down( "PrevSlot" );
+        var rbDown = Input.Down( "NextSlot" );
+
+        if ( lbDown && !_lbWasDown ) NavPrev();
+        if ( rbDown && !_rbWasDown ) NavNext();
+
+        _lbWasDown = lbDown;
+        _rbWasDown = rbDown;
+    }
+
+    // ── Profile info ───────────────────────────────────────────
+    private ulong LocalSteamId => Client.Local.IsValid() ? Client.Local.SteamId : (Connection.Local?.SteamId ?? 0UL);
+    private string LocalName
+    {
+        get
+        {
+            var n = Client.Local.IsValid() ? Client.Local.DisplayName : Connection.Local?.DisplayName;
+            return string.IsNullOrWhiteSpace( n ) ? "PLAYER" : n.ToUpper();
+        }
+    }
+    private int PlayerLevel => Progression.GetLevel();
+
+    // ── Gunsmith ───────────────────────────────────────────────
+    public void OpenGunsmith()
+    {
+        var scene = ResourceLibrary.Get<SceneFile>( "scenes/gunsmith.scene" );
+        if ( !scene.IsValid() ) return;
+        GameMode.SetCurrent( null );
+        Game.ActiveScene.Load( scene );
+    }
+
+    // ── Utility ────────────────────────────────────────────────
+    public bool HasBlur { get; set; }
+    public Panel BackgroundPanel { get; set; }
+
+    public void OpenBugReport() => BugReportPanelRef?.Open();
+
+    private void OpenFriendsList()
+    {
+        if ( !Game.IsEditor )
+        {
+            Game.Overlay.ShowFriendsList( new Sandbox.Modals.FriendsListModalOptions()
+            {
+                ShowOfflineMembers = true,
+            } );
+            return;
+        }
+
+        Toast.Instance?.Show( "Friends list overlay is not available in editor" );
+    }
+
+    public void SetBlur( bool doBlur )
+    {
+        HasBlur = doBlur;
+        BackgroundPanel?.StateHasChanged();
+    }
+
+    protected override int BuildHash()
+        => HashCode.Combine( ActiveRoute, LocalName, PlayerLevel, Progression.GetPrestige(), LocalSteamId, Input.UsingController );
+}

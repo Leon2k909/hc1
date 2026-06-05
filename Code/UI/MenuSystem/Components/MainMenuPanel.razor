@@ -1,0 +1,18 @@
+@namespace Facepunch.UI
+@inherits PanelComponent
+
+<root>
+    <MarkerSystem />
+    <MainMenuRoot />
+    <Toast />
+    <PartyPanel />
+</root>
+
+@code
+{
+    protected override void OnStart()
+    {
+        // Re-apply saved volume settings (music mute, etc.) every time the menu loads.
+        GameSettingsSystem.ApplyVolumes();
+    }
+}

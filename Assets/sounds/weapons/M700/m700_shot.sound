@@ -1,0 +1,34 @@
+{
+  "UI": false,
+  "Volume": "1",
+  "Pitch": "1",
+  "Decibels": 10000,
+  "SelectionMode": "Random",
+  "Sounds": [
+    "sounds/weapons/m700/m700_shot.vsnd"
+  ],
+  "Occlusion": false,
+  "AirAbsorption": true,
+  "Transmission": true,
+  "OcclusionRadius": 64,
+  "DistanceAttenuation": true,
+  "Distance": 13000,
+  "Falloff": [
+    {
+      "y": 1
+    },
+    {
+      "x": 0.18898809,
+      "y": 0.381086,
+      "in": 2.0164757,
+      "out": -2.0164757
+    },
+    {
+      "x": 1,
+      "in": 0.19230774,
+      "out": -0.19230774
+    }
+  ],
+  "__references": [],
+  "__version": 1
+}

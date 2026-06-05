@@ -1,0 +1,140 @@
+@namespace Facepunch.UI
+@inherits Panel
+@attribute [StyleSheet]
+
+@if ( Scene is null || !Client.Local.IsValid() || !GameMode.Instance.IsValid() )
+{
+    return;
+}
+
+<root class="flex gap-sm justify-center row">
+    @if ( MyTeamPlayers is not null )
+    {
+        <RoundStateTeam Score="@MyTeamScore" Team="@MyTeam" Players="@MyTeamPlayers" iconPosition="Right" />
+    }
+    else
+    {
+        <div class="grow"></div>        
+    }
+
+    <div class="layout flex column with-background align-center justify-center blur" style="border: 1px solid rgba( black, 0.25 )">
+        @if ( IconPath is { } path )
+        {
+            <Icon File="@path" size="64" />
+        }
+        else
+        {
+            @* <label class="small slight">@Status</label> *@
+            @if (Time.HasValue)
+            {
+                <label class="uppercase">@(Time?.ToString(@"m\:ss"))</label>
+            }
+        }
+
+        @if ( GameMode.Instance.IsValid() && GameMode.Instance.Hardcore )
+        {
+            <label class="hc-badge uppercase">HC</label>
+        }
+    </div>
+
+    @if ( EnemyTeamPlayers is not null )
+    {
+        <RoundStateTeam Score="@EnemyTeamScore" Team="@EnemyTeam" Players="@EnemyTeamPlayers" iconPosition="Left" />
+    }
+    else
+    {
+        <div class="grow"></div>
+    }
+</root>
+
+@code
+{
+    private Team MyTeam => Client.Local.IsValid() ? Client.Local.Team : Team.Unassigned;
+    private Team EnemyTeam => MyTeam.GetOpponents();
+
+    private string MyTeamScore { get; set; } = "0";
+    private string EnemyTeamScore { get; set; } = "0";
+
+    private List<Client> MyTeamPlayers { get; } = new();
+    private List<Client> EnemyTeamPlayers { get; } = new();
+
+    public string Status => GameMode.Instance.IsValid() ? GameMode.Instance.DisplayedStatus : "";
+    public string IconPath => GameMode.Instance.IsValid() ? GameMode.Instance.Get<ShowStatusIcon>()?.IconPath : "";
+    public TimeSpan? Time => GameMode.Instance.IsValid() ? GameMode.Instance.DisplayedTime : null;
+
+    private void OnSecondElapsed()
+    {
+        // TODO: hook this up to a place where we can conditionally activate the beeping
+        // if ( storedTime <= 5 )
+        // {
+        //     var snd = Sound.Play( storedTime == 0 ? "countdown_activate" : "countdown_beep" );
+        //     snd.TargetMixer = Sandbox.Audio.Mixer.FindMixerByName( "UI" );
+        // }
+    }
+
+    private int storedTime;
+    public override void Tick()
+    {
+        if ( Scene is null || !Client.Local.IsValid() || !GameMode.Instance.IsValid() )
+            return;
+
+        if ( Time.HasValue )
+        {
+            var timeInSeconds = (int)Time.Value.TotalSeconds;
+            if ( storedTime != timeInSeconds )
+            {
+                storedTime = timeInSeconds;
+                OnSecondElapsed();
+            }
+        }
+
+        MyTeamPlayers.Clear();
+        EnemyTeamPlayers.Clear();
+
+        if ( MyTeam == Team.Unassigned || EnemyTeam == Team.Unassigned )
+            return;
+
+        if ( GameMode.Instance.IsValid() && GameMode.Instance.Get<TeamScoring>() is { IsValid: true } teamScoring )
+        {
+            MyTeamScore = teamScoring.MyTeamScoreFormatted;
+            EnemyTeamScore = teamScoring.OpposingTeamScoreFormatted;
+        }
+        else
+        {
+            MyTeamScore = null;
+            EnemyTeamScore = null;
+        }
+
+        MyTeamPlayers.AddRange( GameUtils.GetPlayers( MyTeam ) );
+        EnemyTeamPlayers.AddRange( GameUtils.GetPlayers( EnemyTeam ) );
+    }
+
+    protected override int BuildHash()
+    {
+        if ( Scene is null || !Client.Local.IsValid() || !GameMode.Instance.IsValid() )
+            return 0;
+
+        var hash = new HashCode();
+
+        hash.Add( MyTeam );
+        hash.Add( EnemyTeam );
+
+        hash.Add( Status );
+        hash.Add( IconPath );
+        hash.Add( Time?.TotalSeconds );
+
+        foreach ( var player in MyTeamPlayers )
+        {
+            hash.Add( player.Id );
+            hash.Add( player.Team );
+        }
+
+        foreach ( var player in EnemyTeamPlayers )
+        {
+            hash.Add( player.Id );
+            hash.Add( player.Team );
+        }
+
+        return hash.ToHashCode();
+    }
+}

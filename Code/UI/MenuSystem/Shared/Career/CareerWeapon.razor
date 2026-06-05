@@ -1,0 +1,109 @@
+@using Sandbox;
+@using Sandbox.UI;
+
+@namespace Facepunch.UI
+@inherits Panel
+
+<style>
+    .icon {
+        position: absolute;
+        align-self: flex-end;
+        width: 186px;
+        height: 96px;
+        margin-right: 64px;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        z-index: -1;
+    }
+
+    .weapon-level-row {
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+        margin-top: 4px;
+        max-width: 140px;
+    }
+
+    .weapon-level-badge {
+        background-color: rgba( 255, 180, 0, 0.85 );
+        color: #000;
+        font-size: 10px;
+        font-weight: bold;
+        padding: 1px 5px;
+        border-radius: 2px;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .weapon-xp-bar-wrap {
+        flex-grow: 1;
+        height: 5px;
+        background-color: rgba( 255, 255, 255, 0.12 );
+        border-radius: 3px;
+        overflow: hidden;
+    }
+
+    .weapon-xp-bar-fill {
+        height: 100%;
+        background-color: rgba( 255, 180, 0, 0.85 );
+        border-radius: 3px;
+    }
+
+    .weapon-stat-row {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        max-width: 140px;
+        margin-top: 2px;
+    }
+</style>
+
+<root class="flex layout column with-background with-padding">
+    <div class="flex layout column">
+        <div class="icon" style="background-image: url(@Equipment.Icon);" />
+        <label class="text uppercase emphasis">
+            @Equipment.Name
+        </label>
+    </div>
+
+    <div class="weapon-level-row">
+        <div class="weapon-level-badge">LV @WeaponProgression.GetLevel( Equipment )</div>
+        <div class="weapon-xp-bar-wrap">
+            <div class="weapon-xp-bar-fill" style="width: @((WeaponProgression.GetLevelProgress( Equipment ) * 100f).ToString("0.#"))%;" />
+        </div>
+    </div>
+
+    <div class="weapon-stat-row">
+        <label class="text slight emphasis">
+            Kills
+        </label>
+
+        <label class="text emphasis">
+            @WeaponStats.Get( "kills", Equipment )
+        </label>
+    </div>
+
+    <div class="weapon-stat-row">
+        <label class="text slight emphasis">
+            Headshot Kills
+        </label>
+
+        <label class="text emphasis">
+            @WeaponStats.Get( "kills-headshots", Equipment )
+        </label>
+    </div>
+</root>
+
+@code
+{
+    public EquipmentResource Equipment { get; set; }
+    public string Value { get; set; }
+
+        protected override int BuildHash()
+    {
+        return HashCode.Combine( Equipment, WeaponStats.Get( "kills-headshots", Equipment ), WeaponStats.Get( "kills", Equipment ),
+            WeaponProgression.GetXP( Equipment ) );
+    }
+}

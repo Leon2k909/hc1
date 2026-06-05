@@ -1,0 +1,33 @@
+{
+  "Name": "M700",
+  "Description": "Spin 700 degrees and do a trick shot",
+  "Slot": "Primary",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": true,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/guns/m700_01.png",
+  "IsPurchasable": true,
+  "Price": 4750,
+  "KillReward": 300,
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/m700/weapon_m700.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/m700/wm_m700.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/m700/vm_m700.prefab"
+  },
+  "WorldModel": "models/weapons/sbox_sniper_m700/v_m700.vmdl",
+  "ArmorReduction": null,
+  "HelmetReduction": null,
+  "WorldModelBodyGroups": 274,
+  "__references": [
+    "facepunch.v_m700#125833"
+  ],
+  "__version": 0,
+  "Category": "Sniper"
+}

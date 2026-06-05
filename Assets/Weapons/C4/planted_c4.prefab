@@ -1,0 +1,144 @@
+{
+  "RootObject": {
+    "__guid": "b9e2e05a-749c-4290-8fbc-91335ea1e07f",
+    "Flags": 0,
+    "Name": "planted_c4",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "NetworkInterpolation": true,
+    "Components": [
+      {
+        "__type": "TimedExplosive",
+        "__guid": "2950def8-09c1-4ea8-9d18-50d0d0daadfd",
+        "BaseDefuseTime": 10,
+        "BeepEffectPrefab": {
+          "_type": "gameobject",
+          "prefab": "weapons/c4/c4_beep_light.prefab"
+        },
+        "BeepFrequency": [
+          {
+            "y": 1
+          },
+          {
+            "x": 1,
+            "y": 0.09999999,
+            "in": 1.7500001,
+            "out": -1.7500001
+          }
+        ],
+        "BeepSound": "sounds/guns/c4/c4_beep.sound",
+        "DefuseStartSound": "sounds/interactions/loot_box.sound",
+        "Duration": 45,
+        "ExplosionPrefab": {
+          "_type": "gameobject",
+          "prefab": "weapons/c4/c4_explosion.prefab"
+        },
+        "FastDefuseTime": 5,
+        "Wires": {
+          "_type": "component",
+          "component_id": "37f01bdb-0e3f-427c-aafd-d0a7f6ef04eb",
+          "go": "46e7c0c8-a5a8-4cdf-9731-20da22afbbd6",
+          "component_type": "LineRenderer"
+        }
+      },
+      {
+        "__type": "Sandbox.BoxCollider",
+        "__guid": "f8ab2189-f5bc-4459-9287-4c26a5cc03bf",
+        "Center": "0,0,2",
+        "IsTrigger": true,
+        "Scale": "15,10,5",
+        "Static": false
+      },
+      {
+        "__type": "DestroyBetweenRounds",
+        "__guid": "a8812e75-79ec-4c73-8b9c-2f3c207835cf"
+      },
+      {
+        "__type": "Facepunch.Spottable",
+        "__guid": "aa4e16ae-2c8c-43a6-b728-cc67278cea36",
+        "Height": 16,
+        "Static": true,
+        "Team": "Terrorist"
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "53894e30-002d-4a73-9d43-f8f3ef27b871",
+        "Flags": 0,
+        "Name": "Model",
+        "Enabled": true,
+        "NetworkMode": 2,
+        "NetworkInterpolation": true,
+        "Components": [
+          {
+            "__type": "Sandbox.ModelRenderer",
+            "__guid": "dc2cdaff-c747-4bc0-bf36-c9731afd0597",
+            "BodyGroups": 18446744073709551615,
+            "MaterialGroup": null,
+            "MaterialOverride": "Weapons/c4/c4_material.vmat",
+            "Materials": null,
+            "Model": "weapons/throwable/c4_bomb/c4_bomb.vmdl",
+            "RenderType": "On",
+            "Tint": "1,1,1,1"
+          }
+        ]
+      },
+      {
+        "__guid": "46e7c0c8-a5a8-4cdf-9731-20da22afbbd6",
+        "Flags": 0,
+        "Name": "Wires",
+        "Enabled": true,
+        "NetworkMode": 2,
+        "NetworkInterpolation": true,
+        "Components": [
+          {
+            "__type": "Sandbox.LineRenderer",
+            "__guid": "37f01bdb-0e3f-427c-aafd-d0a7f6ef04eb",
+            "Color": {
+              "color": [
+                {
+                  "c": "0,0.03744,0.32093,1"
+                },
+                {
+                  "t": 0.99786323,
+                  "c": "0,0.03529,0.32157,1"
+                }
+              ],
+              "alpha": []
+            },
+            "EndCap": "None",
+            "Opaque": true,
+            "Points": [
+              {
+                "_type": "gameobject",
+                "go": "53894e30-002d-4a73-9d43-f8f3ef27b871"
+              },
+              null
+            ],
+            "SplineBias": 1,
+            "SplineContinuity": 1,
+            "SplineInterpolation": 32,
+            "SplineTension": 1,
+            "StartCap": "None",
+            "Width": {
+              "rangey": "0,0.4",
+              "frames": [
+                {
+                  "x": 0.5,
+                  "y": 1
+                }
+              ]
+            },
+            "Wireframe": false
+          }
+        ]
+      }
+    ]
+  },
+  "ShowInMenu": false,
+  "MenuPath": null,
+  "MenuIcon": null,
+  "ResourceVersion": 1,
+  "__references": [],
+  "__version": 1
+}

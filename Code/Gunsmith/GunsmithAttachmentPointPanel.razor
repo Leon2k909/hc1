@@ -1,0 +1,119 @@
+@using Facepunch.UI
+@using Sandbox
+@using Sandbox.UI
+
+@namespace Facepunch.Gunsmith
+@inherits Panel
+
+<root class="hc1">
+    @if ( IsViewingOptions )
+    {
+        @foreach ( var part in GetPartsForCategory() )
+        {
+            var isCurrent = AttachmentPoint.IsValid() && part == AttachmentPoint.CurrentPart;
+
+            <div class="entry layout grow center @(isCurrent ? "current" : "")" style="justify-content: center; align-items: center;" onclick=@(() => SetPart( part ) )>
+                <label class="white micro">@part.Name</label>
+            </div>
+        }
+
+        <div class="entry layout grow center" style="justify-content: center; align-items: center;" onclick=@(() => ClearThis() )>
+            <label class="white micro">None</label>
+        </div>
+    }
+    else
+    {
+        <div class="entry layout grow center" style="justify-content: center; align-items: center;" onclick=@(() => Toggle() )>
+            @if ( AttachmentPoint.IsValid() && AttachmentPoint.CurrentPart is not null )
+            {
+                <label class="white micro">@AttachmentPoint.CurrentPart.Name</label>
+            }
+            else
+            {
+                <label class="white micro">@Category</label>
+            }
+        </div>
+    }
+</root>
+
+@code
+{
+    public GunsmithAttachmentPoint AttachmentPoint { get; set; }
+    public GunsmithWeapon Weapon { get; set; }
+    public GunsmithPartType Category { get; set; }
+
+    public bool IsViewingOptions { get; set; }
+
+    public GunsmithAttachmentPointPanel()
+    {
+        BindClass( "open", () => IsViewingOptions );
+    }
+
+    public override void Tick()
+    {
+        if ( !AttachmentPoint.IsValid() || AttachmentPoint.Scene?.Camera is null )
+            return;
+
+        var screenPos = AttachmentPoint.Scene.Camera.PointToScreenNormal( AttachmentPoint.WorldPosition );
+
+        // Hacky hack hack, but temporary.
+        if ( Category == GunsmithPartType.Optic )
+            screenPos = screenPos.WithX( screenPos.x - 0.05f ).WithY( screenPos.y - 0.25f );
+        if ( Category == GunsmithPartType.Charm )
+            screenPos = screenPos.WithX( screenPos.x ).WithY( screenPos.y + 0.05f );
+
+        Style.Left = Length.Fraction( screenPos.x );
+        Style.Top = Length.Fraction( screenPos.y );
+    }
+
+    private void ClearThis()
+    {
+        if ( !AttachmentPoint.IsValid() )
+            return;
+
+        AttachmentPoint.SetPart( null );
+        SavePart( null );
+        IsViewingOptions = false;
+    }
+
+    private void Toggle()
+    {
+        IsViewingOptions ^= true;
+    }
+
+    private void SetPart( GunsmithPart part )
+    {
+        if ( !AttachmentPoint.IsValid() )
+            return;
+
+        AttachmentPoint.SetPart( part );
+        SavePart( part );
+        IsViewingOptions = false;
+    }
+
+    private void SavePart( GunsmithPart part )
+    {
+        if ( !Weapon.IsValid() || !Weapon.Resource.IsValid() )
+            return;
+
+        GunsmithLoadoutManager.SetAttachment( Weapon.Resource, AttachmentPoint.Category, part );
+    }
+
+    private IEnumerable<GunsmithPart> GetPartsForCategory()
+    {
+        if ( !GunsmithPart.Categories.TryGetValue( Category, out var parts ) || parts is null )
+        {
+            return Enumerable.Empty<GunsmithPart>();
+        }
+
+        if ( !Weapon.IsValid() || !Weapon.Resource.IsValid() )
+            return parts.Where( x => x is not null ).ToList();
+
+        return parts.Where( x => x is not null && x.Supports( Weapon.Resource ) ).ToList();
+    }
+
+    protected override int BuildHash()
+    {
+        return HashCode.Combine( IsViewingOptions, AttachmentPoint?.CurrentPart );
+    }
+}

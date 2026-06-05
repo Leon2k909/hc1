@@ -1,0 +1,301 @@
+/* ================================================================
+   Emblem Editor  —  s&box-compatible layout
+   ================================================================ */
+
+EmblemEditor {
+    /* Let the containing page size this */
+    flex-grow: 1;
+}
+
+.emblem-editor {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    background-color: rgba( 12, 12, 12, 0.98 );
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+
+.ee-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    height: 48px;
+    background-color: rgba( 0, 0, 0, 0.5 );
+    border-bottom: 1px solid rgba( 255, 255, 255, 0.08 );
+    flex-shrink: 0;
+}
+
+.ee-title {
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    color: white;
+}
+
+.ee-header-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+}
+
+.ee-btn {
+    padding: 7px 22px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    cursor: pointer;
+}
+
+.ee-btn-save {
+    background-color: #ffd700;
+    color: black;
+
+    &:hover { background-color: rgba( 255, 215, 0, 0.85 ); }
+}
+
+/* ── Body ────────────────────────────────────────────────────── */
+
+.ee-body {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+}
+
+/* ── Left panel ──────────────────────────────────────────────── */
+
+.ee-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-grow: 1;
+    padding: 32px;
+    gap: 24px;
+}
+
+.ee-canvas-wrap {
+    width: 280px;
+    height: 280px;
+    background-color: rgba( 30, 30, 30, 1 );
+    border: 1px solid rgba( 255, 255, 255, 0.1 );
+    position: relative;
+    flex-shrink: 0;
+    overflow: hidden;
+
+    EmblemViewer {
+        position: absolute;
+        left: 0; right: 0; top: 0; bottom: 0;
+    }
+}
+
+.ee-transforms {
+    display: flex;
+    flex-direction: column;
+    width: 320px;
+    gap: 4px;
+    background-color: rgba( 0, 0, 0, 0.3 );
+    padding: 16px 18px;
+    border: 1px solid rgba( 255, 255, 255, 0.07 );
+}
+
+.ee-section-label {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    color: rgba( 255, 255, 255, 0.4 );
+    margin-bottom: 6px;
+}
+
+.ee-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: 3px 0;
+}
+
+.ee-prop-label {
+    font-size: 11px;
+    color: rgba( 255, 255, 255, 0.6 );
+    width: 80px;
+    flex-shrink: 0;
+}
+
+
+/* ── Right panel ─────────────────────────────────────────────── */
+
+.ee-right {
+    width: 340px;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid rgba( 255, 255, 255, 0.07 );
+    flex-shrink: 0;
+}
+
+.ee-panel-title {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    color: rgba( 255, 255, 255, 0.4 );
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid rgba( 255, 255, 255, 0.05 );
+}
+
+/* Layers -------------------------------------------------------- */
+
+.ee-layers {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.ee-layer-list {
+    display: flex;
+    flex-direction: column;
+    max-height: 240px;
+    overflow-y: scroll;
+}
+
+.ee-layer-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 8px 14px;
+    gap: 10px;
+    border-bottom: 1px solid rgba( 255, 255, 255, 0.04 );
+    cursor: pointer;
+
+    &.active {
+        background-color: rgba( 255, 215, 0, 0.08 );
+        border-left: 3px solid #ffd700;
+    }
+
+    &:hover { background-color: rgba( 255, 255, 255, 0.05 ); }
+}
+
+.ee-layer-icon {
+    width: 28px;
+    height: 28px;
+    background-color: rgba( 0, 0, 0, 0.4 );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ee-layer-name {
+    flex-grow: 1;
+    font-size: 12px;
+    color: white;
+}
+
+.ee-layer-btns {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+}
+
+.ee-icon-btn {
+    width: 24px;
+    height: 24px;
+    background-color: rgba( 255, 255, 255, 0.08 );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    i { font-size: 14px; color: white; }
+
+    &:hover { background-color: rgba( 255, 255, 255, 0.18 ); }
+
+    &.danger {
+        background-color: rgba( 255, 50, 50, 0.15 );
+        i { color: #ff6b6b; }
+    }
+}
+
+.ee-add-layer {
+    margin: 12px 14px;
+    padding: 9px;
+    background-color: rgba( 255, 255, 255, 0.07 );
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-align: center;
+    cursor: pointer;
+
+    &:hover { background-color: rgba( 255, 255, 255, 0.14 ); }
+}
+
+/* Shape / Emoji picker ------------------------------------------ */
+
+.ee-shapes {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.ee-picker-tabs {
+    display: flex;
+    flex-direction: row;
+    border-bottom: 1px solid rgba( 255, 255, 255, 0.07 );
+    flex-shrink: 0;
+}
+
+.ee-picker-tab {
+    flex: 1;
+    padding: 9px;
+    text-align: center;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: rgba( 255, 255, 255, 0.45 );
+    cursor: pointer;
+
+    &.active {
+        color: white;
+        border-bottom: 2px solid #ffd700;
+    }
+
+    &:hover { color: rgba( 255, 255, 255, 0.8 ); }
+}
+
+.ee-emoji-cat-label {
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: rgba( 255, 255, 255, 0.35 );
+    padding: 8px 12px 4px;
+}
+
+.ee-shape-grid {
+    flex-grow: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px;
+    overflow-y: scroll;
+}
+
+.ee-shape-cell {
+    width: 44px;
+    height: 44px;
+    background-color: rgba( 0, 0, 0, 0.4 );
+    border: 1px solid rgba( 255, 255, 255, 0.08 );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    i { font-size: 22px; color: white; }
+
+    &.active {
+        border-color: #ffd700;
+        background-color: rgba( 255, 215, 0, 0.15 );
+    }
+
+    &:hover { background-color: rgba( 255, 255, 255, 0.1 ); }
+}

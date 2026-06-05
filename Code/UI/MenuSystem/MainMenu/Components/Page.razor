@@ -1,0 +1,84 @@
+@using Sandbox.UI
+@using Sandbox.Razor
+@using Sandbox.Utility
+@inherits Panel
+@namespace Facepunch.UI
+@attribute [StyleSheet]
+
+<root>
+    <div class="header inset-top">
+        <div class="row">
+            <div class="row inset inset-top grow">
+                <div class="logo">
+                    <img src="/ui/teams/operators_logo_banner.png" />
+                </div>
+
+                <div class="align-center" style="margin-left: 16px;">
+                    @if (Header != null)
+                    {
+                        @Header
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (SubHeader != null)
+    {
+        <div class="subheader inset">
+            <div class="row with-padding">
+                @SubHeader
+            </div>
+        </div>
+    }
+
+    <div class="body grow">
+        @if ( Body != null )
+        {
+            @Body
+        }
+    </div>
+
+
+    <div class="footer" style="background-color: rgba( black, 0.25 ); padding-bottom: 16px;">
+         <div class="row grow inset">
+            <VerticalDivider Gradient=@true />
+         </div>
+
+        <div class="column inset grow with-padding with-gap">
+            <div class="row">
+                <div class="row grow with-gap">
+
+                    @if ( !NoHomeButton )
+                    {
+                        <a class="button standard">
+                            <i>home</i>
+                            <label>Home</label>
+                        </a>
+                    }
+
+
+                    @if (Footer != null)
+                    {
+                        @Footer
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</root>
+
+@code
+{
+    public RenderFragment Header { get; set; }
+    public RenderFragment SubHeader { get; set; }
+    public RenderFragment Body { get; set; }
+    public RenderFragment Footer { get; set; }
+
+    public bool NoHomeButton { get; set; }
+
+    public void Quit()
+    {
+        Game.Close();
+    }
+}

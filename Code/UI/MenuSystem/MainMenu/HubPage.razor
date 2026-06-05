@@ -1,0 +1,81 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using Sandbox.UI.Navigation;
+
+@inherits Panel
+@implements INavigatorPage
+@attribute [StyleSheet]
+@namespace Facepunch.UI
+
+<root class="hc1 hub-page">
+    <div class="hub-container">
+        <div class="hub-cards">
+
+            <div class="hub-card locked" onmouseover=@PlayHoverSound>
+                <div class="hub-bg campaign-bg"></div>
+                <div class="hub-content">
+                    <label class="hub-mode">SINGLEPLAYER</label>
+                    <label class="hub-title">CAMPAIGN</label>
+                    <label class="hub-desc">COMING SOON</label>
+                </div>
+            </div>
+
+            <a class="hub-card main-card" href="/multiplayer" onmouseover=@PlayHoverSound>
+                <div class="hub-bg multiplayer-bg"></div>
+                <div class="hub-content">
+                    <label class="hub-mode">COMPETITIVE</label>
+                    <label class="hub-title">MULTIPLAYER</label>
+                    <label class="hub-desc">PLAY NOW</label>
+                </div>
+            </a>
+
+            <div class="hub-card locked" onmouseover=@PlayHoverSound>
+                <div class="hub-bg br-bg"></div>
+                <div class="hub-content">
+                    <label class="hub-mode">WARZONE</label>
+                    <label class="hub-title">BATTLE ROYALE</label>
+                    <label class="hub-desc">COMING SOON</label>
+                </div>
+            </div>
+
+            <div class="hub-card zombies-card" onclick=@PlayZombies onmouseover=@PlayHoverSound>
+                <div class="hub-bg zombies-bg"></div>
+                <div class="hub-content">
+                    <label class="hub-mode">CO-OP</label>
+                    <label class="hub-title">ZOMBIES</label>
+                    <label class="hub-desc">PLAY NOW</label>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</root>
+
+@code
+{
+    public void OnNavigationOpen()  => MainMenuRoot.Instance?.SetActiveRoute( "/" );
+    public void OnNavigationClose() { }
+
+    void PlayHoverSound() => Sound.Play( "ui.button.over" );
+
+    void PlayZombies()
+    {
+        var prefab = GameObject.GetPrefab( "prefabs/game_modes/zombies.prefab" );
+        if ( !prefab.IsValid() ) return;
+
+        var mode = prefab.GetComponent<GameMode>();
+        if ( !mode.IsValid() ) return;
+
+        GameMode.SetCurrent( mode );
+        GameMode.SetHardcore( false );
+
+        var scene = ResourceLibrary.GetAll<SceneFile>()
+            .FirstOrDefault( s =>
+                (s.ResourcePath?.Contains( "flatgrass", StringComparison.OrdinalIgnoreCase ) ?? false)
+                || string.Equals( s.GetMetadata( "Title", "" ), "Flatgrass", StringComparison.OrdinalIgnoreCase ) )
+            ?? GameUtils.GetAvailableMaps().FirstOrDefault();
+
+        if ( scene is null ) return;
+        Game.ActiveScene.Load( scene );
+    }
+}

@@ -1,0 +1,31 @@
+{
+  "Name": "HE Grenade",
+  "Description": "",
+  "Slot": "Lethal",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": true,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/grenades/he_grenade_01.png",
+  "IsPurchasable": true,
+  "Price": 300,
+  "KillReward": 150,
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/throwable/he_grenade/weapon_he_grenade.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/throwable/he_grenade/wm_he_grenade.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/throwable/he_grenade/vm_he_grenade.prefab"
+  },
+  "WorldModel": "models/weapons/sbox_grenade_explosive/w_he_grenade.vmdl",
+  "ArmorReduction": null,
+  "HelmetReduction": null,
+  "__references": [
+    "facepunch.w_he_grenade#58001"
+  ],
+  "__version": 0
+}

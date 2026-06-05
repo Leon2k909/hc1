@@ -1,0 +1,21 @@
+﻿@using System.Text;
+@namespace Facepunch.UI
+@inherits Panel
+
+@attribute [StyleSheet]
+
+<root class="flex justify-center align-center row">
+    <img class="hud with-padding" src="@TeamBanner" />
+</root>
+
+@code
+{
+    public Team Team => ( Client.Viewer.PlayerPawn )?.Team ?? Team.Unassigned;
+
+    protected override int BuildHash()
+    {
+        return HashCode.Combine( Team );
+    }
+
+    private string TeamBanner => Team.GetBannerPath();
+}

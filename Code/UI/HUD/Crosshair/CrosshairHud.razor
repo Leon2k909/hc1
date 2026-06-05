@@ -1,0 +1,137 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using Facepunch;
+@inherits Panel
+@namespace Facepunch.UI
+@attribute [StyleSheet]
+
+@{
+    var cfg = CrosshairManager.Config;
+    var show = MainHUD.IsHudEnabled && cfg.Enabled && cfg.Style != "none" && cfg.Style != "hc1" && !IsAimingDownSights();
+    var rgb = HexToRgb( cfg.Color );
+    var col = $"rgba({rgb.r},{rgb.g},{rgb.b},{cfg.Alpha.ToString( "F2", System.Globalization.CultureInfo.InvariantCulture )})";
+    var outS = cfg.Outline ? $"0 0 0 {cfg.OutlineThickness}px rgba(0,0,0,{cfg.OutlineAlpha.ToString( "F2", System.Globalization.CultureInfo.InvariantCulture )})" : "none";
+    var half = cfg.Gap;
+    var len = cfg.Size;
+    var th = cfg.Thickness;
+}
+
+@if ( show )
+{
+    @if ( cfg.Style == "classic" )
+    {
+        <div class="ch ch-classic">
+            <i class="seg t"></i>
+            <i class="seg r"></i>
+            <i class="seg b"></i>
+            <i class="seg l"></i>
+        </div>
+    }
+    else if ( cfg.Style == "modern" )
+    {
+        <div class="ch ch-modern">
+            <div class="ring"></div>
+            <div class="dot"></div>
+        </div>
+    }
+    else if ( cfg.Style == "custom" )
+    {
+        <div class="ch ch-custom @(cfg.TStyle ? "tstyle" : "") @(cfg.Dot ? "" : "nodot")">
+            <div class="seg t" style="width:@(th)px;height:@(len)px;left:50%;top:50%;margin-top:-@(half + len)px;margin-left:-@(th / 2f)px;background-color:@col;box-shadow:@outS;"></div>
+            <div class="seg b" style="width:@(th)px;height:@(len)px;left:50%;top:50%;margin-top:@(half)px;margin-left:-@(th / 2f)px;background-color:@col;box-shadow:@outS;"></div>
+            <div class="seg l" style="height:@(th)px;width:@(len)px;top:50%;left:50%;margin-left:-@(half + len)px;margin-top:-@(th / 2f)px;background-color:@col;box-shadow:@outS;"></div>
+            <div class="seg r" style="height:@(th)px;width:@(len)px;top:50%;left:50%;margin-left:@(half)px;margin-top:-@(th / 2f)px;background-color:@col;box-shadow:@outS;"></div>
+            <div class="cdot" style="background-color:@col;box-shadow:@outS;"></div>
+        </div>
+    }
+}
+
+@if ( CrosshairManager.HitFlash > 0 && cfg.HitStyle != "none" )
+{
+    var hrgb = HexToRgb( cfg.HitColor );
+    var hcol = $"rgba({hrgb.r},{hrgb.g},{hrgb.b},{cfg.HitAlpha.ToString( "F2", System.Globalization.CultureInfo.InvariantCulture )})";
+    var hout = cfg.HitOutline ? $"0 0 0 {cfg.HitOutlineThickness}px rgba(0,0,0,{cfg.HitOutlineAlpha.ToString( "F2", System.Globalization.CultureInfo.InvariantCulture )})" : "none";
+    var hsz = cfg.HitSize;
+    var hth = cfg.HitThickness;
+
+    @if ( cfg.HitStyle == "x" )
+    {
+        <div class="hit-marker x" style="width:@(hsz)px;height:@(hsz)px;animation-duration:@(cfg.HitDuration)ms;">
+            <div style="position:absolute;left:50%;top:50%;width:@(hth)px;height:@(hsz)px;background-color:@hcol;box-shadow:@hout;transform-origin:center;transform:translate(-50%,-50%) rotate(45deg);"></div>
+            <div style="position:absolute;left:50%;top:50%;width:@(hth)px;height:@(hsz)px;background-color:@hcol;box-shadow:@hout;transform-origin:center;transform:translate(-50%,-50%) rotate(-45deg);"></div>
+        </div>
+    }
+    else if ( cfg.HitStyle == "ring" )
+    {
+        <div class="hit-marker ring" style="width:@(hsz)px;height:@(hsz)px;border:@(hth)px solid @hcol;box-shadow:@hout;animation-duration:@(cfg.HitDuration)ms;"></div>
+    }
+    else if ( cfg.HitStyle == "dot" )
+    {
+        var dsz = hsz / 3;
+        <div class="hit-marker dot" style="width:@(dsz)px;height:@(dsz)px;background-color:@hcol;box-shadow:@hout;animation-duration:@(cfg.HitDuration)ms;"></div>
+    }
+    else if ( cfg.HitStyle == "diamond" )
+    {
+        var dsz = hsz / 2;
+        <div class="hit-marker" style="width:@(dsz)px;height:@(dsz)px;background-color:@hcol;box-shadow:@hout;transform:translate(-50%,-50%) rotate(45deg);animation-duration:@(cfg.HitDuration)ms;"></div>
+    }
+}
+
+@code
+{
+    static bool IsAimingDownSights()
+    {
+        if ( !CrosshairManager.Config.HideOnAds )
+            return false;
+
+        var player = Client.Viewer.PlayerPawn;
+        if ( player.IsValid() && player.CurrentEquipment.IsValid() && player.CurrentEquipment.HasTag( "aiming" ) )
+            return true;
+
+        return false;
+    }
+
+    static (int r, int g, int b) HexToRgb( string hex )
+    {
+        hex = (hex ?? "#ffffff").TrimStart( '#' );
+        if ( hex.Length == 3 ) hex = $"{hex[0]}{hex[0]}{hex[1]}{hex[1]}{hex[2]}{hex[2]}";
+        if ( hex.Length != 6 ) return (255, 255, 255);
+
+        return (
+            Convert.ToInt32( hex[..2], 16 ),
+            Convert.ToInt32( hex[2..4], 16 ),
+            Convert.ToInt32( hex[4..6], 16 )
+        );
+    }
+
+    protected override int BuildHash()
+    {
+        var c = CrosshairManager.Config;
+        var h = new HashCode();
+        h.Add( c.Style );
+        h.Add( c.Enabled );
+        h.Add( c.HideOnAds );
+        h.Add( c.Color );
+        h.Add( c.Alpha );
+        h.Add( c.Thickness );
+        h.Add( c.Size );
+        h.Add( c.Gap );
+        h.Add( c.Dot );
+        h.Add( c.TStyle );
+        h.Add( c.Outline );
+        h.Add( c.OutlineThickness );
+        h.Add( c.OutlineAlpha );
+        h.Add( c.HitStyle );
+        h.Add( c.HitColor );
+        h.Add( c.HitAlpha );
+        h.Add( c.HitThickness );
+        h.Add( c.HitSize );
+        h.Add( c.HitDuration );
+        h.Add( c.HitOutline );
+        h.Add( c.HitOutlineThickness );
+        h.Add( c.HitOutlineAlpha );
+        h.Add( CrosshairManager.HitFlash > 0 );
+        h.Add( IsAimingDownSights() );
+        return h.ToHashCode();
+    }
+}

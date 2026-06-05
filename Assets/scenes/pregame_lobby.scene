@@ -1,0 +1,100 @@
+{
+  "__guid": "12345678-1234-1234-1234-1234567890ab",
+  "GameObjects": [
+    {
+      "__guid": "22345678-1234-1234-1234-1234567890ab",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Scene Information",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.SceneInformation",
+          "__guid": "32345678-1234-1234-1234-1234567890ab",
+          "__enabled": true,
+          "Flags": 0,
+          "Title": "Pre-Game Lobby",
+          "Version": null
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "42345678-1234-1234-1234-1234567890ab",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Network & Lobby Managers",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Facepunch.GameNetworkManager",
+          "__guid": "52345678-1234-1234-1234-1234567890ab",
+          "__enabled": true,
+          "IsMultiplayer": true,
+          "ClientPrefab": {
+            "_type": "gameobject",
+            "prefab": "prefabs/player/client.prefab"
+          }
+        },
+        {
+          "__type": "Facepunch.PregameLobbyManager",
+          "__guid": "62345678-1234-1234-1234-1234567890ab",
+          "__enabled": true
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "72345678-1234-1234-1234-1234567890ab",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "UI",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ScreenPanel",
+          "__guid": "82345678-1234-1234-1234-1234567890ab",
+          "__enabled": true,
+          "AutoScreenScale": true,
+          "Opacity": 1,
+          "Scale": 1,
+          "ScaleStrategy": "FollowDesktopScaling",
+          "ZIndex": 100
+        },
+        {
+          "__type": "Facepunch.UI.PregameLobbyMenu",
+          "__guid": "92345678-1234-1234-1234-1234567890ab",
+          "__enabled": true
+        }
+      ],
+      "Children": []
+    }
+  ]
+}

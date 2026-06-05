@@ -1,0 +1,264 @@
+/* ================================================================
+   Barracks Page
+   ================================================================ */
+
+.barracks-page {
+    position: absolute;
+    left: 0; right: 0; top: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba( 8, 8, 8, 0.97 );
+}
+
+/* ── Category hub ───────────────────────────────────────────────────────── */
+
+.barracks-hub {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.barracks-cat-grid {
+    display: flex;
+    flex-direction: row;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 40px;
+}
+
+.barracks-cat {
+    width: 260px;
+    height: 200px;
+    background-color: rgba( 255, 255, 255, 0.04 );
+    border: 1px solid rgba( 255, 255, 255, 0.09 );
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+
+    .cat-icon {
+        font-size: 48px;
+        color: rgba( 255, 255, 255, 0.7 );
+    }
+
+    .cat-name {
+        font-size: 13px;
+        font-weight: 900;
+        letter-spacing: 3px;
+        color: white;
+    }
+
+    .cat-desc {
+        font-size: 11px;
+        color: rgba( 255, 255, 255, 0.4 );
+        letter-spacing: 1px;
+    }
+
+    &:hover {
+        background-color: rgba( 255, 255, 255, 0.09 );
+        border-color: rgba( 255, 215, 0, 0.4 );
+
+        .cat-icon { color: #ffd700; }
+        .cat-name { color: #ffd700; }
+    }
+
+    &.locked {
+        opacity: 0.4;
+        cursor: default;
+
+        &:hover {
+            background-color: rgba( 255, 255, 255, 0.04 );
+            border-color: rgba( 255, 255, 255, 0.09 );
+
+            .cat-icon { color: rgba( 255, 255, 255, 0.7 ); }
+            .cat-name { color: white; }
+        }
+    }
+}
+
+/* ── Section body (e.g. emblem editor) ───────────────────────── */
+
+.barracks-section-body {
+    flex-grow: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+/* ── Calling Cards ───────────────────────────────────────────── */
+
+.barracks-cc-body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: row;
+    padding: 40px 48px;
+    gap: 48px;
+}
+
+/* Left: preview */
+
+.cc-left {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    flex-shrink: 0;
+    width: 280px;
+}
+
+.cc-preview-label {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    color: rgba( 255, 255, 255, 0.4 );
+}
+
+.cc-preview-card {
+    width: 280px;
+    height: 160px;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border: 1px solid rgba( 255, 255, 255, 0.1 );
+}
+
+.cc-preview-accent {
+    width: 6px;
+    height: 100%;
+    flex-shrink: 0;
+}
+
+.cc-preview-content {
+    display: flex;
+    flex-direction: column;
+    padding: 0 18px;
+    gap: 6px;
+}
+
+.cc-preview-name {
+    font-size: 18px;
+    font-weight: 800;
+    color: white;
+    letter-spacing: 1px;
+}
+
+.cc-preview-tag {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: rgba( 255, 255, 255, 0.5 );
+}
+
+/* Right: grid */
+
+.cc-right {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.cc-grid-label {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    color: rgba( 255, 255, 255, 0.4 );
+}
+
+.cc-grid {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.cc-card {
+    width: 160px;
+    height: 90px;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border: 1px solid rgba( 255, 255, 255, 0.08 );
+    cursor: pointer;
+
+    &:hover {
+        border-color: rgba( 255, 255, 255, 0.3 );
+    }
+
+    &.active {
+        border-color: #ffd700;
+        border-width: 2px;
+    }
+}
+
+.cc-card-accent {
+    width: 4px;
+    height: 100%;
+    flex-shrink: 0;
+}
+
+.cc-card-name {
+    flex-grow: 1;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: rgba( 255, 255, 255, 0.7 );
+    padding: 0 10px;
+}
+
+.cc-card-check {
+    position: absolute;
+    right: 6px;
+    top: 6px;
+    font-size: 16px;
+    color: #ffd700;
+}
+
+/* ── Titles UI ──────────────────────────────────────────────────────── */
+
+.title-preview-card {
+    width: 260px;
+    height: 60px;
+    background-color: rgba( 0, 0, 0, 0.4 );
+    border: 1px solid rgba( 255, 255, 255, 0.15 );
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.title-card {
+    width: 160px;
+    height: 48px;
+    background-color: rgba( 0, 0, 0, 0.3 );
+    border: 1px solid rgba( 255, 255, 255, 0.05 );
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.1s;
+
+    &:hover {
+        background-color: rgba( 255, 255, 255, 0.05 );
+        border-color: rgba( 255, 255, 255, 0.3 );
+    }
+
+    &.active {
+        border-color: white;
+        background-color: rgba( 255, 255, 255, 0.15 );
+        box-shadow: 0 0 10px rgba( 255, 255, 255, 0.1 );
+    }
+}
+
+.title-text {
+    font-size: 14px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba( 0, 0, 0, 0.8 );
+}

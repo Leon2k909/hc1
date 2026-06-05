@@ -1,0 +1,59 @@
+ZombiesRoundUI {
+    position: absolute;
+    bottom: 150px;
+    left: 40px;
+    z-index: 100;
+
+    .round-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-end;
+        text-shadow: 2px 2px 4px rgba( 0, 0, 0, 1.0 );
+    }
+
+    .round-number {
+        font-size: 64px;
+        font-family: 'Georgia', serif; // Generic serif as placeholder for classic zombies font
+        font-weight: 900;
+        color: #c71616; // Bloody red
+        text-shadow: 3px 3px 6px rgba(0, 0, 0, 1), 0px 0px 10px rgba(200, 0, 0, 0.5);
+        line-height: 1;
+        transition: all 0.3s ease;
+    }
+
+    .intermission-text {
+        font-size: 24px;
+        font-family: 'Arial', sans-serif;
+        font-weight: bold;
+        color: #ffffff;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: -10px;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 1);
+        animation: pulse 2s infinite ease-in-out;
+    }
+
+    .zombies-remaining {
+        font-size: 16px;
+        font-family: 'Arial', sans-serif;
+        font-weight: bold;
+        color: rgba(255, 255, 255, 0.7);
+        margin-top: 5px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    &.intermission {
+        .round-number {
+            color: rgba(200, 200, 200, 0.5); // Dull during intermission
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+    }
+
+    @keyframes pulse {
+        0% { opacity: 0.5; }
+        50% { opacity: 1.0; }
+        100% { opacity: 0.5; }
+    }
+}

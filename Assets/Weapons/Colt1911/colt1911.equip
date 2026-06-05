@@ -1,0 +1,33 @@
+{
+    "Name":  "Colt 1911",
+    "Description":  "A classic semi-automatic pistol.",
+    "Slot":  "Secondary",
+    "Team":  "Unassigned",
+    "CanOtherTeamPickUp":  true,
+    "DropOnDisconnect":  false,
+    "Icon":  "ui/weapons/guns/usp_01.png",
+    "IsPurchasable":  true,
+    "Price":  300,
+    "KillReward":  300,
+    "MainPrefab":  {
+                       "_type":  "gameobject",
+                       "prefab":  "weapons/colt1911/weapon_colt1911.prefab"
+                   },
+    "WorldModelPrefab":  {
+                             "_type":  "gameobject",
+                             "prefab":  "weapons/colt1911/wm_colt1911.prefab"
+                         },
+    "ViewModelPrefab":  {
+                            "_type":  "gameobject",
+                            "prefab":  "weapons/colt1911/vm_colt1911.prefab"
+                        },
+    "WorldModel":  "models/weapons/sbox_pistol_1911/w_1911.vmdl",
+    "ArmorReduction":  0.775,
+    "HelmetReduction":  0.4,
+    "WorldModelBodyGroups":  9493,
+    "__references":  [
+
+                     ],
+    "__version":  0,
+    "Category":  "Pistol"
+}

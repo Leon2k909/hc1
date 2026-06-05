@@ -1,0 +1,188 @@
+@namespace Facepunch.UI
+@using Sandbox.Events
+@inherits PanelComponent
+@implements IGameEventHandler<OnScoreAddedEvent>
+@implements IGameEventHandler<KillEvent>
+
+@if ( !IsHudEnabled || Scene is null )
+    return;
+
+@{
+    var isValidPlayer = Client.Viewer.IsValid() && Client.Viewer.Pawn.IsValid();
+}
+
+<root>
+    @if ( isValidPlayer )
+    {
+        <ScreenProtectionOverlay />
+        <div class="center-layer">
+            <MedalFeed @ref="MedalFeed" />
+            <PointsPopup />
+        </div>
+
+        <!-- UI Overlay (Esc) -->
+        <DamageOverlay />
+        <CrosshairHud />
+    }
+
+    <canvas>
+        <Toast />
+
+        @{
+            var isZombies = Scene.GetAllComponents<ZombiesGameMode>().Any();
+        }
+
+        <div class="hud with-deadzone bottom-left gap-sm flex column skew-left">
+            @if ( isValidPlayer )
+            {
+                <Vitals />
+            }
+
+            @if ( !isZombies )
+            {
+                <RoundStateDisplay />
+                @if ( !(GameMode.Instance?.Hardcore ?? false) )
+                {
+                    <Minimap />
+                }
+            }
+        </div>
+
+        @if ( isZombies )
+        {
+            <ZombiesRoundUI />
+        }
+
+        @if ( isValidPlayer )
+        {   
+            <EquipmentOverlay />
+            <Spectating />
+            <Deathcam />
+            <DefuseKitDisplay />
+            <DamageIndicator />
+            <KillFeed @ref="KillFeed" />
+        }
+
+
+        <div class="right">
+            <div class="flex-grow" />
+            <Voices />
+
+            @if ( isValidPlayer )
+            {
+                <WeaponInfoComponent />
+                
+                var score = Client.Viewer.GetComponent<Facepunch.UI.PlayerScore>();
+                if ( score.IsValid() && score.BankedUAVs > 0 )
+                {
+                    <div style="display: flex; align-items: center; justify-content: flex-end; margin-top: 10px; margin-bottom: 10px; gap: 8px;">
+                        <div style="font-size: 14px; font-weight: bold; color: #FFF; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
+                            UAV READY (@score.BankedUAVs)
+                        </div>
+                        <InputHint Action="Scorestreak" class="small" Size="@InputGlyphSize.Small" />
+                    </div>
+                }
+            }
+
+            @if ( GameMode.Instance.IsValid() )
+            {
+                <div class="mode-name-label @(GameMode.Instance.Hardcore ? "hc" : "")" style="text-align: right; padding: 4px 8px; font-size: 9px; font-weight: bold; letter-spacing: 1px; color: rgba(255,255,255,0.6);">@GameMode.Instance.DisplayTitle</div>
+                
+                var hpManager = GameMode.Instance.GetComponentInChildren<HardpointManager>();
+                if ( hpManager.IsValid() )
+                {
+                    <div style="text-align: right; padding: 0px 8px; font-size: 11px; font-weight: bold; color: #FFF; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
+                        NEXT ZONE: @(Math.Max(0, Math.Ceiling(hpManager.RelocateTimer)))s
+                    </div>
+                }
+            }
+        </div>
+
+        @if ( isValidPlayer )
+        {
+            @* <Radio /> *@
+            <ScoringSystem @ref="ScoringSystem" />
+        }
+
+        @if ( !isValidPlayer )
+        {
+            <RespawnScreen />
+        }
+    </canvas>
+    
+    @if ( isValidPlayer )
+    {
+        <!-- Full-screen overlays -->
+        <BuyMenu />
+        <MarkerSystem />
+
+        <PlayAreaOverlay />
+        <DeployedPawnOverlay />
+        <CombatMouseLock />
+    }
+
+    <Scoreboard />
+    <EndOfMatchScreen />
+</root>
+
+@code 
+{
+    [ConVar( "cl_drawhud" )]
+    public static bool IsHudEnabled { get; set; } = true;
+
+    [DeveloperCommand( "Toggle HUD", "Visuals" )]
+    private static void Command_ToggleHUD()
+    {
+        IsHudEnabled = !IsHudEnabled;
+    }
+
+    public ScoringSystem ScoringSystem { get; set; }
+
+    public KillFeed KillFeed { get; set; }
+
+    public MedalFeed MedalFeed { get; set; }
+
+    protected override void OnStart()
+    {
+        // Re-apply saved volume settings (music mute, etc.) when entering a game,
+        // so they persist across play sessions in the editor.
+        GameSettingsSystem.ApplyVolumes();
+    }
+
+    void IGameEventHandler<OnScoreAddedEvent>.OnGameEvent( OnScoreAddedEvent eventArgs )
+    {
+        if ( !ScoringSystem.IsValid() )
+        {
+            return;
+        }
+
+        ScoringSystem.OnScore( eventArgs.Score, eventArgs.Reason );
+    }
+
+    void IGameEventHandler<KillEvent>.OnGameEvent( KillEvent eventArgs )
+    {
+        MedalFeed?.OnKill( eventArgs );
+    }
+
+    protected override void OnUpdate()
+    {
+        base.OnUpdate();
+        GameUtils.UpdateCombatMouseVisibility();
+    }
+
+    protected override void OnPreRender()
+    {
+        base.OnPreRender();
+        GameUtils.UpdateCombatMouseVisibility();
+    }
+
+    protected override int BuildHash()
+    {
+        var hpManager = GameMode.Instance.IsValid() ? GameMode.Instance.GetComponentInChildren<HardpointManager>() : null;
+        float relocateTimer = hpManager.IsValid() ? hpManager.RelocateTimer : 0f;
+        bool isHardcore = GameMode.Instance.IsValid() && GameMode.Instance.Hardcore;
+        var score = Client.Viewer.IsValid() ? Client.Viewer.GetComponent<Facepunch.UI.PlayerScore>() : null;
+        int bankedUAVs = score.IsValid() ? score.BankedUAVs : 0;
+        return HashCode.Combine(IsHudEnabled, Client.Viewer.IsValid(), Client.Viewer.IsValid() && Client.Viewer.Pawn.IsValid(), Math.Ceiling( relocateTimer ), isHardcore, bankedUAVs );
+    }
+}

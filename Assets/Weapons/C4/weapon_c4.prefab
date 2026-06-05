@@ -1,0 +1,153 @@
+{
+  "RootObject": {
+    "__guid": "87eef294-d20b-4a2a-861f-806ccd0383bd",
+    "Flags": 0,
+    "Name": "w_c4",
+    "Tags": "player",
+    "Enabled": true,
+    "Components": [
+      {
+        "__type": "Facepunch.Equipment",
+        "__guid": "6dfca0dd-b80c-4072-98b9-cc7f170870fd",
+        "CrosshairType": "Default",
+        "DeploySound": "sounds/guns/switch/weapon_switch.sound",
+        "Handedness": "Right",
+        "HoldType": "HoldItem",
+        "ModelRenderer": {
+          "_type": "component",
+          "component_id": "ceb74dca-a92d-419d-b08f-71bd818191f8",
+          "go": "9226fe53-48f5-4f14-a3d4-a8a83d972ea7",
+          "component_type": "SkinnedModelRenderer"
+        },
+        "MountedPrefab": {
+          "_type": "gameobject",
+          "prefab": "weapons/c4/mount_c4.prefab"
+        },
+        "Resource": "weapons/c4/c4.equip",
+        "SpeedPenalty": 20,
+        "UseCrosshair": true
+      },
+      {
+        "__type": "Facepunch.TagBinder",
+        "__guid": "298c67ac-391b-4a81-8b19-4bd65a4af5d8"
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "9226fe53-48f5-4f14-a3d4-a8a83d972ea7",
+        "Flags": 0,
+        "Name": "Model",
+        "Position": "3.535849,0,-5.571055",
+        "Enabled": true,
+        "Components": [
+          {
+            "__type": "Sandbox.SkinnedModelRenderer",
+            "__guid": "ceb74dca-a92d-419d-b08f-71bd818191f8",
+            "BodyGroups": 18446744073709551615,
+            "CreateAttachments": false,
+            "CreateBoneObjects": false,
+            "MaterialOverride": "Weapons/c4/c4_material.vmat",
+            "Model": "weapons/throwable/c4_bomb/c4_bomb.vmdl",
+            "Morphs": {},
+            "Parameters": {
+              "bools": {},
+              "ints": {},
+              "floats": {},
+              "vectors": {},
+              "rotations": {}
+            },
+            "RenderOptions": {
+              "GameLayer": true,
+              "OverlayLayer": false,
+              "BloomLayer": false,
+              "AfterUILayer": false
+            },
+            "RenderType": "On",
+            "Tint": "1,1,1,1",
+            "UseAnimGraph": true
+          }
+        ]
+      },
+      {
+        "__guid": "2cfe3fb5-9511-4ab6-9eec-ad135f6a9d42",
+        "Flags": 0,
+        "Name": "Functions",
+        "Enabled": true,
+        "Components": [
+          {
+            "__type": "DefuseC4",
+            "__guid": "b9befb96-6c52-4138-ad67-6dcf961b35cd",
+            "InputActions": [
+              "Attack1",
+              "Use"
+            ],
+            "PlantedObjectPrefab": {
+              "_type": "gameobject",
+              "prefab": "weapons/c4/planted_c4.prefab"
+            },
+            "PlantingBeepFrequency": [
+              {
+                "y": 0.34574467,
+                "in": 2.0425532,
+                "out": -2.0425532
+              },
+              {
+                "x": 0.3690476,
+                "y": 0.43707633
+              },
+              {
+                "x": 0.7202381,
+                "y": 0.13017386
+              },
+              {
+                "x": 1,
+                "y": 0.25,
+                "in": 1.6842108,
+                "out": -1.6842108
+              }
+            ],
+            "PlantingBeepSound": "sounds/guns/c4/c4_planting_beep.sound",
+            "PlantTime": 3.2,
+            "RequiresAllInputActions": false
+          }
+        ]
+      }
+    ],
+    "__variables": [],
+    "__properties": {
+      "FixedUpdateFrequency": 50,
+      "MaxFixedUpdates": 5,
+      "NetworkFrequency": 30,
+      "NetworkInterpolation": true,
+      "PhysicsSubSteps": 1,
+      "ThreadedAnimation": true,
+      "TimeScale": 1,
+      "UseFixedUpdate": true,
+      "Metadata": {
+        "WorldModel": "weapons/throwable/c4_bomb/c4_bomb.vmdl",
+        "BodyGroups": "18446744073709551615",
+        "Maxs": "6.378,4.5079,3.5696",
+        "Mins": "-7.4661,-4.5079,-0"
+      },
+      "NavMesh": {
+        "Enabled": false,
+        "IncludeStaticBodies": true,
+        "IncludeKeyframedBodies": true,
+        "EditorAutoUpdate": true,
+        "AgentHeight": 64,
+        "AgentRadius": 16,
+        "AgentStepSize": 18,
+        "AgentMaxSlope": 40,
+        "ExcludedBodies": "",
+        "IncludedBodies": ""
+      }
+    }
+  },
+  "ShowInMenu": false,
+  "MenuPath": null,
+  "MenuIcon": null,
+  "DontBreakAsTemplate": false,
+  "ResourceVersion": 1,
+  "__references": [],
+  "__version": 1
+}

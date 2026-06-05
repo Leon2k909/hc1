@@ -1,0 +1,108 @@
+@namespace Facepunch.UI
+@inherits Panel
+
+<root class="combat-mouse-lock" />
+
+@code
+{
+	public static bool LastShouldCapture { get; private set; }
+	public static bool LastHasMouseCapture { get; private set; }
+	public static bool LastHasFocus { get; private set; }
+	private int RecaptureRequestId { get; set; }
+
+	public override void Tick()
+	{
+		var shouldLock = GameUtils.ShouldHideCombatMouse();
+		LastShouldCapture = shouldLock;
+
+		SetClass( "active", shouldLock );
+		AcceptsFocus = shouldLock;
+		ButtonInput = Sandbox.UI.PanelInputType.Game;
+
+		if ( shouldLock )
+		{
+			if ( !HasFocus )
+				Focus();
+
+			if ( !HasMouseCapture )
+				SetMouseCapture( true );
+		}
+		else
+		{
+			if ( HasMouseCapture )
+				SetMouseCapture( false );
+
+			if ( HasFocus )
+				Blur();
+		}
+
+		LastHasMouseCapture = HasMouseCapture;
+		LastHasFocus = HasFocus;
+		GameUtils.UpdateCombatMouseVisibility();
+	}
+
+	protected override void OnMouseDown( MousePanelEvent e )
+	{
+		base.OnMouseDown( e );
+	}
+
+	protected override void OnMouseUp( MousePanelEvent e )
+	{
+		base.OnMouseUp( e );
+	}
+
+	public override void OnButtonEvent( ButtonEvent e )
+	{
+		base.OnButtonEvent( e );
+	}
+
+	private static bool CombatMouseInputChanged()
+	{
+		return Input.Pressed( "Attack1" )
+			|| Input.Released( "Attack1" )
+			|| Input.Pressed( "Attack2" )
+			|| Input.Released( "Attack2" );
+	}
+
+	private void RecaptureForCombat()
+	{
+		RecaptureRequestId++;
+		RecaptureNow();
+		RecaptureDelayed( RecaptureRequestId );
+	}
+
+	private void RecaptureNow()
+	{
+		if ( !GameUtils.ShouldHideCombatMouse() )
+			return;
+
+		if ( !HasFocus )
+			Focus();
+
+		SetMouseCapture( true );
+		GameUtils.UpdateCombatMouseVisibility();
+	}
+
+	private async void RecaptureDelayed( int requestId )
+	{
+		await GameTask.DelayRealtime( 1 );
+		if ( requestId != RecaptureRequestId || !this.IsValid() ) return;
+		RecaptureNow();
+
+		await GameTask.DelayRealtime( 1 );
+		if ( requestId != RecaptureRequestId || !this.IsValid() ) return;
+		RecaptureNow();
+	}
+
+	public override void OnDeleted()
+	{
+		if ( HasMouseCapture )
+			SetMouseCapture( false );
+
+		LastShouldCapture = false;
+		LastHasMouseCapture = false;
+		LastHasFocus = false;
+		RecaptureRequestId++;
+		base.OnDeleted();
+	}
+}

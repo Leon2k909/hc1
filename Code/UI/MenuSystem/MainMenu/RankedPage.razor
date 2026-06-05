@@ -1,0 +1,153 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using Sandbox.UI.Navigation;
+@using Sandbox.Network;
+
+@inherits Panel
+@implements INavigatorPage
+@attribute [StyleSheet]
+@namespace Facepunch.UI
+
+<root class="hc1 ranked-page">
+    <div class="ranked-shell">
+
+        <a class="ranked-back" href="/">
+            <i>arrow_back</i>
+            <label>HQ</label>
+        </a>
+
+        <label class="ranked-kicker">LEAGUES</label>
+        <label class="ranked-title">RANKED</label>
+
+        <div class="rank-card" style="border-color: @(Rank.GetTierColor());">
+            <div class="rank-badge" style="background-color: @(Rank.GetTierColor());">
+                <i>military_tech</i>
+            </div>
+
+            <div class="rank-info">
+                <label class="rank-tier" style="color: @(Rank.GetTierColor());">@(Rank.GetTierName().ToUpper())</label>
+                <label class="rank-sr">@Rank.GetSR() SR</label>
+
+                <div class="rank-bar">
+                    <div class="rank-bar-fill" style="width: @((Rank.GetTierProgress() * 100f).ToString( "0.#" ))%; background-color: @(Rank.GetTierColor());" />
+                </div>
+                <label class="rank-bar-label">@RankProgressLabel</label>
+            </div>
+        </div>
+
+        <div class="ranked-actions">
+            <div class="find-match @(IsSearching ? "searching" : "")" onclick=@(() => FindMatch())>
+                <i>@(IsSearching ? "hourglass_top" : "search")</i>
+                <label>@(IsSearching ? "SEARCHING…" : "FIND MATCH")</label>
+            </div>
+            <label class="ranked-note">Matchmaking only pairs you with players of the same rank — no hidden MMR.</label>
+        </div>
+
+    </div>
+</root>
+
+@code
+{
+    private bool IsSearching { get; set; }
+
+    private string RankProgressLabel
+    {
+        get
+        {
+            if ( Rank.GetTierIndex() >= Rank.MaxTierIndex )
+                return "TOP TIER";
+
+            return $"{Rank.GetSRIntoTier()} / {Rank.SrPerTier} SR TO {Rank.TierNames[Rank.GetTierIndex() + 1].ToUpper()}";
+        }
+    }
+
+    async void FindMatch()
+    {
+        if ( IsSearching )
+            return;
+
+        IsSearching = true;
+        StateHasChanged();
+
+        var myTag = Rank.MatchTag();
+
+        try
+        {
+            // 1) Join an open ranked lobby of my exact tier, if one exists.
+            var lobbies = await Networking.QueryLobbies( Game.Ident );
+            foreach ( var info in lobbies )
+            {
+                var lobby = new Lobby( info );
+                if ( lobby.IsFull )
+                    continue;
+                if ( string.IsNullOrEmpty( lobby.Name ) || !lobby.Name.Contains( myTag ) )
+                    continue;
+
+                if ( await Networking.TryConnectSteamId( lobby.LobbyId ) )
+                    return; // joined — the host's scene follows.
+            }
+
+            // 2) None found — host one tagged with my tier so only same-rank players find it.
+            HostRankedMatch( myTag );
+        }
+        catch ( System.Exception e )
+        {
+            Log.Warning( $"[Ranked] matchmaking failed: {e.Message}" );
+            IsSearching = false;
+            StateHasChanged();
+        }
+    }
+
+    private void HostRankedMatch( string tag )
+    {
+        Networking.CreateLobby( new LobbyConfig
+        {
+            Name = $"{tag} Razed Ranked",
+            Privacy = LobbyPrivacy.Public,
+            MaxPlayers = 10,
+            DestroyWhenHostLeaves = true,
+        } );
+
+        var map = GameUtils.GetAvailableMaps().FirstOrDefault();
+        if ( map is null )
+        {
+            IsSearching = false;
+            StateHasChanged();
+            return;
+        }
+
+        var modes = GameMode.GetAll( map ).ToList();
+        var mode = modes.FirstOrDefault( m => m.Ident == "defuse" )
+            ?? modes.FirstOrDefault( m => m.Ident == "tdm" )
+            ?? modes.FirstOrDefault();
+
+        if ( mode is null )
+        {
+            IsSearching = false;
+            StateHasChanged();
+            return;
+        }
+
+        GameMode.SetCurrent( mode );
+        GameMode.SetHardcore( false );
+        Game.ActiveScene.Load( map );
+    }
+
+    public void OnNavigationOpen()
+    {
+        MainMenuRoot.Instance?.SetActiveRoute( "/ranked" );
+        if ( MainMenuRoot.Instance.IsValid() )
+            MainMenuRoot.Instance.SetBlur( true );
+    }
+
+    public void OnNavigationClose()
+    {
+        if ( MainMenuRoot.Instance.IsValid() )
+            MainMenuRoot.Instance.SetBlur( false );
+    }
+
+    protected override int BuildHash()
+    {
+        return HashCode.Combine( Rank.GetSR(), IsSearching );
+    }
+}

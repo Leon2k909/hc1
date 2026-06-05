@@ -1,0 +1,330 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using Sandbox.Events;
+@using Facepunch.UI;
+@using Facepunch;
+
+@namespace Facepunch.UI
+@inherits PanelComponent
+@implements Component.INetworkListener
+@implements IGameEventHandler<TeamAssignedEvent>
+
+@attribute [StyleSheet]
+
+@if ( !MainHUD.IsHudEnabled )
+    return;
+
+<root class="absolute inset-0">
+    <canvas>
+        <div class="chat-container hud flex column-reverse with-deadzone top-left with-px">
+            <div class="layout gap">
+                <div class="when-open flex align-center gap-sm shrink-0">
+                    <InputHint Action="Score" class="small" Size="@InputGlyphSize.Small" />
+                    <label>
+                        @ChatMode
+                    </label>
+                </div>
+
+                <div class="when-not-open flex align-center gap-sm shrink-0">
+                    <InputHint Action="Chat" class="small" Size="@InputGlyphSize.Small" />
+                </div>
+
+                <ChatBox class="input" @ref="InputBox" OnTabPressed="@ChangeChatMode" onsubmit="@ChatFinished"></ChatBox>
+            </div>
+
+            <div class="hud flex column justify-start">
+                @foreach (var entry in Entries)
+                {
+                    <div class="hud with-padding flex row gap-sm align-center">
+                        @if (entry.steamid > 0)
+                        {
+                            <div class="square rounded shrink-0" style="background-image: url( avatar:@entry.steamid )"></div>
+                        }
+
+                        @if (entry.type == MessageType.Chat)
+                        {
+                            <span class="flex row w-full align-center shrink-0 gap-sm">
+                                <span class="flex row gap-sm align-center shrink-0">
+
+                                    @if ( entry.chatMode != ChatModes.All )
+                                    {
+                                        <label class="small no-shadow green">TEAM</label>
+                                    }
+
+                                    <label class="playername bold no-shadow" style="color: @entry.color.Hex">@entry.author</label>
+
+                                    @if (entry.chatMode != ChatModes.All)
+                                    {
+                                        @if ( entry.location is { } zoneName )
+                                        {
+                                            <label class="small no-shadow grey">(@zoneName)</label>
+                                        }
+                                    }
+
+                                    @if ( entry.tags?.Contains( "radio" ) ?? false )
+                                    {
+                                        <Icon class="square rounded shrink-0" File="/ui/chat/radio.png" size="24" />
+                                    }
+
+                                </span>
+
+                                <label class="message no-shadow">@entry.message</label>
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="flex row gap-sm w-full align-center">
+                                <label class="message no-shadow">@entry.message</label>
+                            </span>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </canvas>
+</root>
+
+@code
+{
+    public enum MessageType
+    {
+        Chat,
+        System,
+    }
+
+    public enum ChatModes
+    {
+        Team,
+        All,
+    }
+
+    private ChatModes ChatMode = ChatModes.Team;
+    private ChatBox InputBox { get; set; }
+
+    public record Entry(ulong steamid, string author, string message, RealTimeSince timeSinceAdded, ChatModes chatMode, MessageType type, Color color, string tags = null, string location = null);
+    private List<Entry> Entries = new();
+    private bool IsOpen;
+    private bool IgnoreEmptySubmitUntilChatReleased;
+    private RealTimeSince TimeSinceOpened;
+
+    private bool Open => IsOpen;
+
+    public static Chat Instance { get; set; }
+    public static bool IsAnyOpen => Instance is not null && Instance.Open;
+
+    public Chat()
+    {
+        Instance = this;
+    }
+
+    protected override int BuildHash()
+    {
+        return HashCode.Combine( ChatMode, Open, MainHUD.IsHudEnabled );
+    }
+
+    protected override void OnUpdate()
+    {
+        if ( InputBox is null )
+            return;
+
+        Panel.AcceptsFocus = false;
+
+        if ( Open && Input.EscapePressed )
+        {
+            Input.EscapePressed = false;
+            CloseChat();
+        }
+
+        if ( !Open && Input.Pressed( "chat" ) )
+        {
+            OpenChat();
+        }
+
+        if ( Open && IgnoreEmptySubmitUntilChatReleased && !Input.Down( "chat" ) )
+        {
+            IgnoreEmptySubmitUntilChatReleased = false;
+        }
+
+        if ( Open && !InputBox.HasFocus && TimeSinceOpened > 0.1f && !Input.Down( "chat" ) )
+        {
+            InputBox.Focus();
+            StateHasChanged();
+        }
+
+        if ( Entries.RemoveAll( x => x.timeSinceAdded > 20.0f ) > 0 )
+        {
+            StateHasChanged();
+        }
+
+        // Limit to 5 messages
+        Entries = Entries.TakeLast(5).ToList();
+
+        SetClass("open", Open);
+    }
+
+    void ChangeChatMode()
+    {
+        ChatMode = ChatMode == ChatModes.All ? ChatModes.Team : ChatModes.All;
+        Log.Info( $"Chat mode changed to {ChatMode}" );
+    }
+
+    void ChatFinished()
+    {
+        var text = InputBox.Text;
+        InputBox.Text = "";
+
+        if ( string.IsNullOrWhiteSpace( text ) )
+        {
+            if ( IgnoreEmptySubmitUntilChatReleased )
+            {
+                InputBox.Focus();
+                StateHasChanged();
+                return;
+            }
+
+            CloseChat();
+            return;
+        }
+
+        CloseChat();
+
+        if ( ChatMode == ChatModes.Team )
+        {
+            var players = GameUtils.AllPlayers;
+            var friendlyGameObjects = players.Where((Client x) => !x.IsBot && Client.Local.IsFriendly(x));
+            var friendlyConnections = friendlyGameObjects.Select( x => x.Connection ).Where( x => x is not null );
+
+            using ( Rpc.FilterInclude( friendlyConnections ) )
+            {
+                AddText( text, ChatMode );
+            }
+        }
+        else
+        {
+            AddText( text, ChatMode );
+        }
+    }
+
+    [Rpc.Broadcast]
+    public void AddText( string message, ChatModes chatMode, string tags = null )
+    {
+        message = message.Truncate( 300 );
+
+        if ( string.IsNullOrWhiteSpace( message ) )
+            return;
+
+        if ( GameSettingsSystem.Current.ProfanityFilter )
+        {
+            message = FilterProfanity( message );
+        }
+
+        var author = Rpc.Caller.DisplayName;
+        var steamid = Rpc.Caller.SteamId;
+
+        var client = GameUtils.AllPlayers.FirstOrDefault(x => x.Connection == Rpc.Caller);
+
+        if ( !client.IsValid() || CommunicationMuteState.IsTextMuted( client ) )
+            return;
+
+        var color = client.Team.GetColor();
+
+        var playerPawn = client.PlayerPawn;
+        string location = null;
+        if ( playerPawn.IsValid() )
+        {
+            var mapLocation = playerPawn.GetZone<MapLocation>();
+            if ( mapLocation.IsValid() && mapLocation.Zone.IsValid() )
+            {
+                location = mapLocation.Zone.DisplayName;
+            }
+        }
+
+        Entries.Add( new( steamid, author, message, 0.0f, chatMode, MessageType.Chat, color, tags, location ) );
+
+        StateHasChanged();
+    }
+
+    private void OpenChat()
+    {
+        IsOpen = true;
+        IgnoreEmptySubmitUntilChatReleased = true;
+        TimeSinceOpened = 0;
+        SetClass( "open", true );
+        StateHasChanged();
+    }
+
+    private void CloseChat()
+    {
+        IsOpen = false;
+        IgnoreEmptySubmitUntilChatReleased = false;
+        InputBox?.Blur();
+        SetClass( "open", false );
+        StateHasChanged();
+    }
+
+    protected override void OnDisabled()
+    {
+        base.OnDisabled();
+        IsOpen = false;
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        IsOpen = false;
+
+        if ( Instance == this )
+            Instance = null;
+    }
+
+    [Rpc.Broadcast( NetFlags.HostOnly )]
+    public void AddSystemText( string message )
+    {
+        message = message.Truncate( 300 );
+
+        if ( string.IsNullOrWhiteSpace( message ) )
+            return;
+
+        Entries.Add( new( 0, "", message, 0.0f, ChatModes.All, MessageType.System, Color.White ) );
+        StateHasChanged();
+    }
+
+    void IGameEventHandler<TeamAssignedEvent>.OnGameEvent( TeamAssignedEvent eventArgs )
+    {
+        if ( IsProxy ) return;
+
+        if ( eventArgs.Team == Team.Unassigned )
+            AddSystemText( $"{eventArgs.Player.DisplayName} is spectating" );
+        else
+            AddSystemText( $"{eventArgs.Player.DisplayName} is joining the {eventArgs.Team.GetName()}" );
+    }
+
+    void Component.INetworkListener.OnDisconnected( Connection channel )
+    {
+        if ( IsProxy ) return;
+
+        // TODO: why would these events get fired with an empty guid in the first place?
+        if ( channel.Id == Guid.Empty )
+            return;
+
+        AddSystemText( $"{channel.DisplayName} has left the game" );
+    }
+
+    private static readonly string[] BadWords = new[] { "fuck", "shit", "bitch", "cunt", "nigger", "faggot", "asshole", "bastard" };
+
+    public static string FilterProfanity( string input )
+    {
+        if ( string.IsNullOrEmpty( input ) ) return input;
+        var output = input;
+        foreach ( var word in BadWords )
+        {
+            output = System.Text.RegularExpressions.Regex.Replace( 
+                output, 
+                @"\b" + System.Text.RegularExpressions.Regex.Escape( word ) + @"\b", 
+                new string( '*', word.Length ), 
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase 
+            );
+        }
+        return output;
+    }
+}

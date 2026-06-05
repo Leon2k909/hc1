@@ -1,0 +1,265 @@
+@using System;
+@using System.Linq;
+@using Sandbox.UI;
+@using Sandbox;
+
+@namespace Facepunch.UI
+@attribute [StyleSheet]
+@inherits Panel
+
+<root class="emblem-editor">
+
+    @* ── Header ──────────────────────────────────────────────── *@
+    <div class="ee-header">
+        <label class="ee-title">EMBLEM EDITOR</label>
+        <div class="ee-header-actions">
+            <div class="ee-btn ee-btn-save" @onclick=@Save>SAVE</div>
+        </div>
+    </div>
+
+    @* ── Body ─────────────────────────────────────────────────── *@
+    <div class="ee-body">
+
+        @* LEFT: Canvas + transform controls *@
+        <div class="ee-left">
+            <div class="ee-canvas-wrap">
+                <EmblemViewer Data=@Data />
+            </div>
+
+            @if ( SelectedLayer != null )
+            {
+                <div class="ee-transforms">
+                    <label class="ee-section-label">TRANSFORM</label>
+
+                    <div class="ee-row">
+                        <label class="ee-prop-label">Position X</label>
+                        <SliderControl style="width: 180px;" Min=@(-50f) Max=@(150f) Step=@(1f) Value:bind=@SelectedLayer.X />
+                    </div>
+                    <div class="ee-row">
+                        <label class="ee-prop-label">Position Y</label>
+                        <SliderControl style="width: 180px;" Min=@(-50f) Max=@(150f) Step=@(1f) Value:bind=@SelectedLayer.Y />
+                    </div>
+                    <div class="ee-row">
+                        <label class="ee-prop-label">Scale</label>
+                        <SliderControl style="width: 180px;" Min=@(0.1f) Max=@(10f) Step=@(0.1f) Value:bind=@SelectedLayer.Scale />
+                    </div>
+                    <div class="ee-row">
+                        <label class="ee-prop-label">Rotation</label>
+                        <SliderControl style="width: 180px;" Min=@(0f) Max=@(360f) Step=@(1f) Value:bind=@SelectedLayer.Rotation />
+                    </div>
+
+                    <label class="ee-section-label" style="margin-top: 14px;">COLOR</label>
+                    <ColorPicker Value:bind=@SelectedLayer.Color />
+                </div>
+            }
+        </div>
+
+        @* RIGHT: Layers + shape picker *@
+        <div class="ee-right">
+            <div class="ee-layers">
+                <div class="ee-panel-title">LAYERS (@Data.Layers.Count / 32)</div>
+                <div class="ee-layer-list">
+                    @for ( int i = Data.Layers.Count - 1; i >= 0; i-- )
+                    {
+                        var index = i;
+                        var layer = Data.Layers[i];
+                        <div class="ee-layer-row @(SelectedLayerIndex == index ? "active" : "")" @onclick=@(() => SelectedLayerIndex = index)>
+                            <div class="ee-layer-icon">
+                                <i style="color: @layer.Color.Hex; font-size: 18px;">@layer.Icon</i>
+                            </div>
+                            <label class="ee-layer-name">Layer @(index + 1)</label>
+                            <div class="ee-layer-btns">
+                                <div class="ee-icon-btn" @onclick:stopPropagation="true" @onclick=@(() => MoveLayerUp(index))><i>keyboard_arrow_up</i></div>
+                                <div class="ee-icon-btn" @onclick:stopPropagation="true" @onclick=@(() => MoveLayerDown(index))><i>keyboard_arrow_down</i></div>
+                                <div class="ee-icon-btn danger" @onclick:stopPropagation="true" @onclick=@(() => RemoveLayer(index))><i>delete</i></div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="ee-add-layer" @onclick=@AddLayer>+ ADD LAYER</div>
+            </div>
+
+            @if ( SelectedLayer != null )
+            {
+                <div class="ee-shapes">
+                    @* Tab bar: SHAPES | EMOJI *@
+                    <div class="ee-picker-tabs">
+                        <div class="ee-picker-tab @(PickerTab == 0 ? "active" : "")" @onclick=@(() => PickerTab = 0)>SHAPES</div>
+                        <div class="ee-picker-tab @(PickerTab == 1 ? "active" : "")" @onclick=@(() => PickerTab = 1)>EMOJI</div>
+                    </div>
+
+                    @if ( PickerTab == 0 )
+                    {
+                        <div class="ee-shape-grid">
+                            @foreach ( var icon in IconLibrary )
+                            {
+                                var ic = icon;
+                                var active = SelectedLayer.Icon == ic && SelectedLayer.IconType == EmblemIconType.MaterialIcon;
+                                <div class="ee-shape-cell @(active ? "active" : "")" @onclick=@(() => SetIcon( ic, EmblemIconType.MaterialIcon ))>
+                                    <i>@ic</i>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        @* Emoji organised by category *@
+                        @foreach ( var (catName, emojis) in EmojiCategories )
+                        {
+                            <div class="ee-emoji-cat-label">@catName</div>
+                            <div class="ee-shape-grid">
+                                @foreach ( var emoji in emojis )
+                                {
+                                    var em = emoji;
+                                    var active = SelectedLayer.Icon == em && SelectedLayer.IconType == EmblemIconType.Emoji;
+                                    <div class="ee-shape-cell @(active ? "active" : "")" @onclick=@(() => SetIcon( em, EmblemIconType.Emoji ))>
+                                        <label style="font-size: 20px;">@em</label>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            }
+        </div>
+
+    </div>
+</root>
+
+@code {
+    /// <summary>
+    /// Called when the user clicks Close. Set by the parent page to handle
+    /// navigation back. If null, the Close button is not shown.
+    /// </summary>
+    public Action OnClosed { get; set; }
+
+    public EmblemData Data { get; set; } = new();
+    public int SelectedLayerIndex { get; set; } = -1;
+    public EmblemLayer SelectedLayer => (SelectedLayerIndex >= 0 && SelectedLayerIndex < Data.Layers.Count)
+        ? Data.Layers[SelectedLayerIndex] : null;
+
+    private int PickerTab { get; set; } = 0;
+
+    private void SetIcon( string icon, EmblemIconType type )
+    {
+        if ( SelectedLayer == null ) return;
+        SelectedLayer.Icon = icon;
+        SelectedLayer.IconType = type;
+        StateHasChanged();
+    }
+
+    private static readonly (string Name, string[] Emojis)[] EmojiCategories =
+    {
+        ( "FACES", new[] {
+            "😀","😎","😈","💀","👻","🤖","👾","😤","🥵","🤬","🤡","😴",
+            "🥶","😱","😡","🤑","🤠","🥸","🤫","🫡"
+        }),
+        ( "ANIMALS", new[] {
+            "🐺","🦅","🦁","🐉","🦈","🐍","🦊","🐻","🦝","🦂",
+            "🦇","🦎","🐗","🦌","🦬","🦁","🐯","🐻‍❄️","🦧","🦣"
+        }),
+        ( "NATURE & FIRE", new[] {
+            "🔥","🌊","❄️","⚡","💥","🌪️","☢️","☣️","🌋","🌑",
+            "🌟","⭐","🌙","☀️","🌈","💧","🌿","🍄","🌵","💣"
+        }),
+        ( "MILITARY & GEAR", new[] {
+            "🔫","🗡️","⚔️","🛡️","🪖","🎯","💎","👑","🏆","🎖️",
+            "🪃","🏹","🗺️","🧭","⛓️","🔒","🚀","✈️","🛸","🤿"
+        }),
+        ( "SYMBOLS", new[] {
+            "❤️","🖤","💛","💜","🤍","♠️","♥️","♦️","♣️","🎱",
+            "⚡","✅","❌","⚠️","☠️","⚙️","🔴","🟡","🟢","🔵"
+        }),
+    };
+
+    private static readonly string[] IconLibrary =
+    {
+        "circle", "square", "change_history", "star", "favorite", "pets",
+        "whatshot", "local_fire_department", "eco", "ac_unit", "bolt", "shield",
+        "sports_esports", "flight", "directions_car", "remove", "brightness_1",
+        "favorite_border", "star_border", "play_arrow", "stop", "pause",
+        "fast_forward", "fast_rewind", "brightness_5", "brightness_7",
+        "cloud", "flash_on", "flare", "wb_sunny", "brightness_3", "brightness_2",
+        "anchor", "api", "bug_report", "build", "code", "dashboard", "delete",
+        "extension", "face", "fingerprint", "gavel", "home", "info", "key",
+        "language", "lock", "military_tech", "pan_tool", "public", "rocket_launch",
+        "sports_martial_arts", "sports_motorsports", "visibility"
+    };
+
+    protected override void OnAfterTreeRender( bool firstTime )
+    {
+        if ( firstTime ) Load();
+    }
+
+    public void Load()
+    {
+        var json = Game.Cookies.Get<string>( "hc1.emblem.data", "" );
+        Data = EmblemData.FromJson( json );
+        if ( Data.Layers == null ) Data.Layers = new();
+        SelectedLayerIndex = Data.Layers.Count > 0 ? Data.Layers.Count - 1 : -1;
+        StateHasChanged();
+    }
+
+    public void Save()
+    {
+        var json = Data.ToJson();
+        Game.Cookies.Set( "hc1.emblem.data", json );
+
+        if ( Client.Local.IsValid() )
+            Client.Local.RpcUpdateEmblem( json );
+    }
+
+    private void Close()
+    {
+        Save();
+        OnClosed?.Invoke();
+    }
+
+    private void AddLayer()
+    {
+        if ( Data.Layers.Count >= 32 ) return;
+        Data.Layers.Add( new EmblemLayer { Icon = "circle" } );
+        SelectedLayerIndex = Data.Layers.Count - 1;
+        StateHasChanged();
+    }
+
+    private void RemoveLayer( int index )
+    {
+        if ( index >= 0 && index < Data.Layers.Count )
+        {
+            Data.Layers.RemoveAt( index );
+            SelectedLayerIndex = -1;
+            StateHasChanged();
+        }
+    }
+
+    private void MoveLayerUp( int index )
+    {
+        if ( index >= 0 && index < Data.Layers.Count - 1 )
+        {
+            var layer = Data.Layers[index];
+            Data.Layers.RemoveAt( index );
+            Data.Layers.Insert( index + 1, layer );
+            if ( SelectedLayerIndex == index ) SelectedLayerIndex = index + 1;
+            else if ( SelectedLayerIndex == index + 1 ) SelectedLayerIndex = index;
+            StateHasChanged();
+        }
+    }
+
+    private void MoveLayerDown( int index )
+    {
+        if ( index > 0 && index < Data.Layers.Count )
+        {
+            var layer = Data.Layers[index];
+            Data.Layers.RemoveAt( index );
+            Data.Layers.Insert( index - 1, layer );
+            if ( SelectedLayerIndex == index ) SelectedLayerIndex = index - 1;
+            else if ( SelectedLayerIndex == index - 1 ) SelectedLayerIndex = index;
+            StateHasChanged();
+        }
+    }
+
+    protected override int BuildHash()
+        => HashCode.Combine( Data?.Layers?.Count ?? 0, SelectedLayerIndex,
+            SelectedLayer?.Icon, SelectedLayer?.Color, SelectedLayer?.Scale );
+}

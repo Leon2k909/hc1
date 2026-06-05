@@ -1,0 +1,39 @@
+@using Sandbox.UI
+
+@inherits Panel
+@namespace Facepunch.UI
+
+<root class="input-settings">
+    <div class="with-padding border-bottom grow">
+        <label class="name">AIM INPUT</label>
+        <div class="grow" />
+        <button class="button standard smaller no-anim extra-x-padding @(GameSettingsSystem.Current.ToggleAim ? "selected" : "")" onclick=@ToggleAimSetting>
+            @(GameSettingsSystem.Current.ToggleAim ? "TOGGLE" : "HOLD")
+        </button>
+    </div>
+
+    <div class="with-padding border-bottom grow">
+        <label class="name">SPRINT INPUT</label>
+        <div class="grow" />
+        <button class="button standard smaller no-anim extra-x-padding @(GameSettingsSystem.Current.ToggleSprint ? "selected" : "")" onclick=@ToggleSprintSetting>
+            @(GameSettingsSystem.Current.ToggleSprint ? "TOGGLE" : "HOLD")
+        </button>
+    </div>
+</root>
+
+@code
+{
+    private void ToggleAimSetting()
+    {
+        GameSettingsSystem.Current.ToggleAim = !GameSettingsSystem.Current.ToggleAim;
+        GameSettingsSystem.Save();
+        StateHasChanged();
+    }
+
+    private void ToggleSprintSetting()
+    {
+        GameSettingsSystem.Current.ToggleSprint = !GameSettingsSystem.Current.ToggleSprint;
+        GameSettingsSystem.Save();
+        StateHasChanged();
+    }
+}

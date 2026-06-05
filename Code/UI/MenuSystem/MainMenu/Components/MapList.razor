@@ -1,0 +1,27 @@
+@namespace Facepunch.UI
+@inherits Panel
+
+<root class="layout with-gap column">
+    @foreach ( var map in GameUtils.GetAvailableMaps() )
+    {
+        <MapCard Map=@map Selected=@( SelectedMap == map ) OnSelected=@DoSelect />
+    }
+</root>
+
+@code
+{
+    public SceneFile SelectedMap { get; set; }
+    public GameMode GameMode { get; set; }
+    public Action<SceneFile> OnSelected { get; set; }
+
+    public void DoSelect( SceneFile map )
+    {
+        SelectedMap = map;
+        OnSelected?.Invoke( map );
+    }
+
+    protected override int BuildHash()
+    {
+        return HashCode.Combine( GameMode, SelectedMap );
+    }
+}

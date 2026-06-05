@@ -1,0 +1,58 @@
+@namespace Facepunch.UI
+@using Sandbox
+@using Sandbox.UI
+@inherits Panel
+
+@if ( RoundSystem == null ) return;
+
+<root class="@(RoundSystem.IsIntermission ? "intermission" : "active-round")">
+    
+    <div class="round-container">
+        @if ( RoundSystem.IsIntermission )
+        {
+            <div class="intermission-text">NEXT ROUND STARTING...</div>
+            <div class="round-number">@(RoundSystem.CurrentRound + 1)</div>
+        }
+        else
+        {
+            <div class="round-number">@RoundSystem.CurrentRound</div>
+            <div class="tally-marks">
+                @* Optional: Can do classic tally marks here if desired, but numbers are easier to read high-rounds *@
+            </div>
+            
+            <div class="zombies-remaining">Zombies: @RoundSystem.ZombiesRemainingInRound</div>
+            <div class="zombies-points" style="font-size: 24px; font-family: 'Arial', sans-serif; font-weight: bold; color: #FFD700; text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; text-shadow: 1px 1px 3px rgba(0, 0, 0, 1);">Points: @GetPoints()</div>
+        }
+    </div>
+
+</root>
+
+@code
+{
+    private ZombiesRoundSystem RoundSystem;
+
+    private string GetPoints()
+    {
+        var player = Game.ActiveScene.GetAllComponents<PlayerPawn>().FirstOrDefault( x => x.Network.IsOwner );
+        if ( player != null && player.Components.TryGet<ZombiesPlayerEconomy>( out var eco ) )
+        {
+            return eco.Points.ToString();
+        }
+        return "0";
+    }
+
+    public override void Tick()
+    {
+        if ( RoundSystem == null )
+        {
+            RoundSystem = Game.ActiveScene.GetAllComponents<ZombiesRoundSystem>().FirstOrDefault();
+        }
+    }
+
+    protected override int BuildHash()
+    {
+        if ( RoundSystem == null ) return HashCode.Combine( 0 );
+        
+        return HashCode.Combine( RoundSystem.CurrentRound, RoundSystem.IsIntermission, RoundSystem.ZombiesRemainingInRound, GetPoints() );
+    }
+}

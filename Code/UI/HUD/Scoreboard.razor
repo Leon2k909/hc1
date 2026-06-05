@@ -1,0 +1,202 @@
+@using System;
+@using Sandbox.UI;
+
+@namespace Facepunch.UI
+@inherits Panel
+
+@attribute [StyleSheet]
+
+@if ( Scene is null || !IsActive || !GameMode.Instance.IsValid() || !Client.Local.IsValid() )
+{
+    return;
+}
+
+<root class="hidden flex absolute inset-0 align-center justify-center background">
+    <table class="with-background with-padding-lg layout">
+        <div class="title">
+            <label class="important uppercase left">@(Status is null ? Name : $"{Name} - {Status}")</label>
+            <label class="important uppercase center">@(RoundNumber is { } roundNumber && RoundLimit is { } roundLimit ? $"Round {roundNumber} of {roundLimit}" : "")</label>
+            <label class="important uppercase right">@(Time?.ToString( @"m\:ss" ) ?? " ")</label>
+        </div>
+
+        <div class="row align-center with-padding-sm gap hc1" style="margin-bottom: 8px;">
+            <label class="small emphasis" style="margin-right: 8px;">Voice Channel:</label>
+            <div class="button standard smaller no-anim @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.Auto ? "selected" : "")" onclick=@(() => SetVoiceMode(VoiceChatMode.Auto))>Auto</div>
+            <div class="button standard smaller no-anim @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.Global ? "selected" : "")" onclick=@(() => SetVoiceMode(VoiceChatMode.Global))>Lobby</div>
+            <div class="button standard smaller no-anim @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.TeamOnly ? "selected" : "")" onclick=@(() => SetVoiceMode(VoiceChatMode.TeamOnly))>Team</div>
+            <div class="button standard smaller no-anim @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.PartyOnly ? "selected" : "")" onclick=@(() => SetVoiceMode(VoiceChatMode.PartyOnly))>Party</div>
+
+            <div class="grow"></div>
+
+            <div class="button standard smaller no-anim @(GameSettingsSystem.Current.VoiceProximity ? "selected" : "")" onclick=@ToggleProximity>
+                <i>@(GameSettingsSystem.Current.VoiceProximity ? "spatial_audio_off" : "spatial_audio")</i>
+                Prox Chat
+            </div>
+        </div>
+
+        @for ( int i = 0; i < GroupedPlayers.Count(); i++ )
+        {
+             var group = GroupedPlayers[i];
+
+            @if ( group.Key == Team.Unassigned )
+            {
+                <div class="flex gap-sm align-center">
+                    <Icon file="/ui/teams/spectator.png" size="16" />
+                    <label class="small grey">@(string.Join( ", ", group.Select( x => x.DisplayName ) ))</label>
+                </div>
+            }
+            else
+            {
+                <span class="flex align-center space-between gap-sm" style="color: @group.Key.GetColor().Hex">
+                    <span class="flex align-center gap-sm">
+                        <Icon file="@group.Key.GetIconPath()" size="24" />
+                        <label class="emphasis with-py">@group.Key.GetName()</label>
+                    </span>
+
+                    <separator style="background-color: @group.Key.GetColor().Hex" />
+
+                    @if ( GameMode.Instance.IsValid() && GameMode.Instance.Get<TeamScoring>() is { } scoring )
+                    {
+                        <label class="emphasis">@scoring.GetFormattedScore(group.Key)</label>
+		            }
+                </span>
+
+                <div class="row header with-px-lg with-py-sm">
+                    <label class="col stat-small small"></label>
+                    <label class="col stat-small small"></label>
+                    <label class="col playername small"></label>
+                    <label class="col stat-small small mute-header"><i>chat</i></label>
+                    <label class="col stat-small small mute-header"><i>mic</i></label>
+                   
+                    @foreach ( var x in IScore.Find( Client.Local ) )
+                    {
+                        <label class="col stat">@(x.Attribute.Name)</label>
+                    }
+                </div>
+
+                @foreach ( var player in group )
+                {
+                    <ScoreboardRow Client="@player.Client" Bot="@player.Bot" />
+                }
+
+                @if ( i == 0 )
+                {
+                    <GameOverview />
+                }
+            }
+        }
+    </table>
+</root>
+
+@code
+{
+    public string Status => GameMode.Instance?.DisplayedStatus;
+    public string Name => GameMode.Instance?.DisplayTitle;
+    public TimeSpan? Time => GameMode.Instance?.DisplayedTime;
+
+    public int? RoundNumber => GameMode.Instance.IsValid() ? GameMode.Instance.Get<RoundCounter>()?.Round : null;
+    public int? RoundLimit => GameMode.Instance.IsValid() ? GameMode.Instance.Get<RoundLimit>()?.MaxRounds : null;
+
+    private IEnumerable<ScoreboardEntry> Entries => GameUtils.AllPlayers
+        .Select( x => new ScoreboardEntry { Client = x } )
+        .Concat( GameUtils.LightweightBots
+            .Where( x => x.IsValid() && x.Team != Team.Unassigned )
+            .Select( x => new ScoreboardEntry { Bot = x } ) );
+
+    private List<IGrouping<Team, ScoreboardEntry>> GroupedPlayers
+    {
+        get
+        {
+            var localTeam = Client.Local.IsValid() ? Client.Local.Team : Team.Unassigned;
+            var sortedPlayers = Entries
+                .OrderBy( x => GetTeamSort( x.Team, localTeam ) )
+                .ThenByDescending( x => x.Score )
+                .ThenBy( x => x.DisplayName );
+            var groupedPlayers = sortedPlayers.GroupBy( x => x.Team );
+            return groupedPlayers.ToList();
+        }
+    }
+
+    private int GetTeamSort( Team team, Team localTeam )
+    {
+        if ( team == localTeam ) return 0;
+        if ( team == Team.Unassigned ) return 2;
+        return 1;
+    }
+
+    public bool IsActive { get; set; }
+
+    protected override int BuildHash()
+    {
+        if ( !IsActive ) return 0;
+
+        var hash = new HashCode();
+
+        hash.Add( IsActive );
+        hash.Add( Status );
+        hash.Add( Time?.TotalSeconds );
+        hash.Add( RoundNumber );
+        hash.Add( RoundLimit );
+        hash.Add( CommunicationMuteState.Version );
+        hash.Add( GameSettingsSystem.Current.VoiceChatMode );
+        hash.Add( GameSettingsSystem.Current.VoiceProximity );
+
+        foreach ( var team in GroupedPlayers )
+        {
+            hash.Add( team.Key );
+
+            foreach ( var player in team )
+            {
+                hash.Add( player.Id );
+                hash.Add( player.Score );
+                hash.Add( player.Kills );
+                hash.Add( player.Deaths );
+            }
+        }
+
+        return hash.ToHashCode();
+    }
+
+    public override void Tick()
+    {
+        if ( Input.Pressed( "Score" ) )
+        {
+            IsActive = Input.Pressed( "Score" );
+            SetClass( "visible", true );
+        }
+
+        if ( Input.Released( "Score" ) )
+        {
+            SetClass( "visible", false );
+            IsActive = false;
+        }
+    }
+
+    private void SetVoiceMode( VoiceChatMode mode )
+    {
+        GameSettingsSystem.Current.VoiceChatMode = mode;
+        GameSettingsSystem.Save();
+        StateHasChanged();
+    }
+
+    private void ToggleProximity()
+    {
+        GameSettingsSystem.Current.VoiceProximity = !GameSettingsSystem.Current.VoiceProximity;
+        GameSettingsSystem.Save();
+        StateHasChanged();
+    }
+
+    private sealed class ScoreboardEntry
+    {
+        public Client Client { get; init; }
+        public LightweightCombatBot Bot { get; init; }
+
+        public bool IsBot => Bot.IsValid();
+        public Team Team => IsBot ? Bot.Team : Client.Team;
+        public string DisplayName => IsBot ? $"BOT {Bot.BotName}" : Client.DisplayName;
+        public int Score => IsBot ? Bot.Score : Client.GetComponent<PlayerScore>()?.Score ?? 0;
+        public int Kills => IsBot ? Bot.Kills : Client.GetComponent<PlayerScore>()?.Kills ?? 0;
+        public int Deaths => IsBot ? Bot.Deaths : Client.GetComponent<PlayerScore>()?.Deaths ?? 0;
+        public int Id => IsBot ? Bot.Id.GetHashCode() : Client.Id.GetHashCode();
+    }
+}

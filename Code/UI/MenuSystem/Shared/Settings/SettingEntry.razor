@@ -1,0 +1,80 @@
+@using Sandbox.UI
+@using Sandbox
+
+@inherits Panel
+@namespace Facepunch.UI
+
+<style>
+    .box {
+        width: 24px;
+        height: 24px;
+    }
+</style>
+
+<root class="border-bottom">
+    @if ( Description is not null )
+    {
+        @if ( Description.PropertyType == typeof( float ) || Description.PropertyType == typeof( int ) )
+        {
+            <div class="with-padding">
+                <label class="name">@Description.Title</label>
+                <div class="grow" />
+            </div>
+
+            <div class="control">
+                @if ( Range is not null )
+                {
+                    <CustomSlider style="width: 250px;" class="devslider" Value:bind=@Value Min=@Range.Min Max=@Range.Max Step=@Range.Step ShowTextEntry="@false" />
+                }
+                else
+                {
+                    <CustomSlider class="devslider" Value:bind=@Value />
+                }
+            </div>
+        }
+        else if ( Description.PropertyType == typeof( bool ) )
+        {
+            <div class="with-padding border-bottom grow">
+                <label class="name">@Description.Title</label>
+                <div class="grow" />
+                <Checkbox Value:bind=@Value />
+            </div>
+        }
+        else if ( Description.PropertyType == typeof( Color ) ) 
+        {
+            <div class="with-padding border-bottom">
+                <label class="name" style="min-width: 64px;">@Description.Title</label>
+            </div>
+
+            <div class="control layout column">
+                <ColorPicker Value:bind="@Value" />
+            </div>
+        }
+    }
+    else
+    {
+        <div class="with-padding border-bottom">
+            <label class="name">@Description.Title</label>
+            <div class="grow" />
+            <div class="value-area">@Value</div>
+        </div>
+
+        <label class="name">Unsupported</label>
+    }
+</root>
+
+@code
+{
+    public object Target { get; set; }
+    public object Value
+    {
+        get => Description.GetValue( Target );
+        set
+        {
+            Description.SetValue( Target, value );   
+        }
+    }
+    public PropertyDescription Description { get; set; }
+
+    public RangeAttribute Range => Description.GetCustomAttribute<RangeAttribute>();
+}

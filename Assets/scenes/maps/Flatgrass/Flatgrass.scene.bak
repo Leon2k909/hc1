@@ -1,0 +1,561 @@
+{
+  "__guid": "fc5a4000-7e85-4b09-9a0a-0c8714a31301",
+  "GameObjects": [
+    {
+      "__guid": "b08a57ff-1cb3-4a8d-9f5c-503920a01001",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Scene Information",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.SceneInformation",
+          "__guid": "b08a57ff-1cb3-4a8d-9f5c-503920a01002",
+          "__enabled": true,
+          "Flags": 0,
+          "Author": null,
+          "Changes": "",
+          "Description": "",
+          "Group": null,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "SceneTags": "",
+          "Title": "Flatgrass",
+          "Version": null
+        },
+        {
+          "__type": "Facepunch.MapInformation",
+          "__guid": "b08a57ff-1cb3-4a8d-9f5c-503920a01003",
+          "__enabled": true,
+          "Flags": 0,
+          "Image": "",
+          "IsVisibleInMenu": true,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null
+        },
+        {
+          "__type": "Facepunch.MinimapRenderer",
+          "__guid": "a2b3c4d5-e6f7-8901-2345-abcdefabcdef",
+          "__enabled": true,
+          "Flags": 0,
+          "CurrentMinimapPath": "",
+          "ExportResolution": "2048,2048",
+          "Size": 8000
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "b08a57ff-1cb3-4a8d-9f5c-503920a02001",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Map",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.MapInstance",
+          "__guid": "b08a57ff-1cb3-4a8d-9f5c-503920a02002",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "EnableCollision": true,
+          "MapName": "facepunch.flatgrass",
+          "NoOrigin": true,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "OnMapLoaded": null,
+          "OnMapUnloaded": null,
+          "UseMapFromLaunch": false
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "b08a57ff-1cb3-4a8d-9f5c-503920a03001",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Flatgrass Spawn Points",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [],
+      "Children": [
+        {
+          "__guid": "b08a57ff-1cb3-4a8d-9f5c-503920a03101",
+          "Flags": 0,
+          "Name": "CT Spawn 1",
+          "Position": "-3600,-2800,0",
+          "Rotation": "0,0,0,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "b08a57ff-1cb3-4a8d-9f5c-503920a03102",
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "b08a57ff-1cb3-4a8d-9f5c-503920a03201",
+          "Flags": 0,
+          "Name": "CT Spawn 2",
+          "Position": "-4000,-2200,0",
+          "Rotation": "0,0,0,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "b08a57ff-1cb3-4a8d-9f5c-503920a03202",
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "b08a57ff-1cb3-4a8d-9f5c-503920a03301",
+          "Flags": 0,
+          "Name": "CT Spawn 3",
+          "Position": "-4400,-1600,0",
+          "Rotation": "0,0,0,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "b08a57ff-1cb3-4a8d-9f5c-503920a03302",
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "b08a57ff-1cb3-4a8d-9f5c-503920a03401",
+          "Flags": 0,
+          "Name": "CT Spawn 4",
+          "Position": "-3200,-1600,0",
+          "Rotation": "0,0,0,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "b08a57ff-1cb3-4a8d-9f5c-503920a03402",
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "b08a57ff-1cb3-4a8d-9f5c-503920a03501",
+          "Flags": 0,
+          "Name": "CT Spawn 5",
+          "Position": "-2800,-2200,0",
+          "Rotation": "0,0,0,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "b08a57ff-1cb3-4a8d-9f5c-503920a03502",
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "b08a57ff-1cb3-4a8d-9f5c-503920a03601",
+          "Flags": 0,
+          "Name": "T Spawn 1",
+          "Position": "3600,2800,0",
+          "Rotation": "0,0,1,0",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "b08a57ff-1cb3-4a8d-9f5c-503920a03602",
+              "Team": "Terrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "b08a57ff-1cb3-4a8d-9f5c-503920a03701",
+          "Flags": 0,
+          "Name": "T Spawn 2",
+          "Position": "4000,2200,0",
+          "Rotation": "0,0,1,0",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "b08a57ff-1cb3-4a8d-9f5c-503920a03702",
+              "Team": "Terrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "b08a57ff-1cb3-4a8d-9f5c-503920a03801",
+          "Flags": 0,
+          "Name": "T Spawn 3",
+          "Position": "4400,1600,0",
+          "Rotation": "0,0,1,0",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "b08a57ff-1cb3-4a8d-9f5c-503920a03802",
+              "Team": "Terrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "b08a57ff-1cb3-4a8d-9f5c-503920a03901",
+          "Flags": 0,
+          "Name": "T Spawn 4",
+          "Position": "3200,1600,0",
+          "Rotation": "0,0,1,0",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "b08a57ff-1cb3-4a8d-9f5c-503920a03902",
+              "Team": "Terrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "b08a57ff-1cb3-4a8d-9f5c-503920a04001",
+          "Flags": 0,
+          "Name": "T Spawn 5",
+          "Position": "2800,2200,0",
+          "Rotation": "0,0,1,0",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "b08a57ff-1cb3-4a8d-9f5c-503920a04002",
+              "Team": "Terrorist"
+            }
+          ],
+          "Children": []
+        }
+      ]
+    },
+    {
+      "__guid": "055876fe-440f-4fec-ac9f-e5fd08ded91b",
+      "__version": 2,
+      "__Prefab": "scenes/maps/defusemap_01/game_setup.prefab",
+      "__PrefabInstancePatch": {
+        "AddedObjects": [],
+        "RemovedObjects": [],
+        "PropertyOverrides": [
+          {
+            "Target": {
+              "Type": "GameObject",
+              "IdValue": "d0c8d522-0524-4dbb-92a9-04b45bf7d1c7"
+            },
+            "Property": "Position",
+            "Value": "0,0,0"
+          }
+        ],
+        "MovedObjects": []
+      },
+      "__PrefabIdToInstanceId": {
+        "d0c8d522-0524-4dbb-92a9-04b45bf7d1c7": "055876fe-440f-4fec-ac9f-e5fd08ded91b",
+        "69d5003a-44d7-41fe-a620-32f6bf0c4cd0": "a452b840-d597-471e-9725-b38ff1711161",
+        "49ccfd38-c5e1-45fd-aa44-5efbadaa0577": "83fdf8f8-a743-42bc-b556-e4b18f5936ba",
+        "6c56e4e4-647e-41e5-a3b6-c7fbbeedca05": "2460dff2-1978-43d0-be20-2a0ea9800604",
+        "20c78d91-5ca6-442a-a6b5-ab8b1602e80f": "1d343892-5a9c-41c5-beb5-fcffc937ea4c",
+        "d5595acd-b863-410f-8172-dd5551b1e049": "da3d9644-d9f2-43f5-8b24-97ac2cb6c857",
+        "6a983fb1-0d55-435e-8fcb-732b1ea27724": "a6227893-5603-49d7-8953-9a1a435a4c07",
+        "1812ebb9-9d7f-42c7-9a1b-cc7e3cc08b66": "9799806b-3c4b-444e-baa2-52f28b9ae87f",
+        "58807d92-54d1-46b8-8cb5-b611520f2ede": "ba483119-4342-4fd6-af98-170be870c229",
+        "a90ee9f3-b357-4eb5-9dd4-415402592b57": "3bb25f5c-1455-48f1-849a-5f29b882b14c",
+        "1fbe1885-c54f-4870-916f-05a56271e8fd": "b36d729f-ed8a-4d13-991c-fc810498cec0",
+        "843ab22f-5541-4fb8-bc8c-759f41e35140": "ffebe928-a709-49d6-9c7d-52f4d0f30120",
+        "89e9bfbf-5479-448a-be07-24914e1c82c3": "d5202328-cb52-4b17-a6ce-ee37e4508247",
+        "05ddf668-2a23-425d-80a9-2fbd99aebd3c": "0d3feda0-5df4-4572-b5b6-4630160b4933",
+        "71b39898-e489-4c21-85a1-7d37b7aeec54": "8a17b906-627b-4917-9aae-d117b5b22b85",
+        "95a4c168-2c12-41b9-8496-7737babe56ef": "4b40fff3-a875-4654-8681-7140bb2754e7",
+        "12c896c3-9c7f-432c-b611-5235bc0b256d": "518fc87a-e667-415a-abfb-a0da8e59cef9",
+        "705ab2e0-5402-4947-8a33-bcf05f4e4048": "15f0a7a8-75b7-4f43-ba38-2905167876f8",
+        "5a78ef35-8400-4326-bd0e-e5073d2bcba3": "109f4e27-2bfd-4517-8eaf-cb368741ee8b",
+        "9a4ca0dc-a7e9-466c-8bd6-ad5fab460ce9": "f24bae07-fa19-42c1-bedd-d605f64b76c2",
+        "7a4dcb57-1bdf-41df-8ae3-2089c598fdef": "b8f2c998-83c1-4f86-ab09-ade472535b93",
+        "197c4584-e218-4ca6-bf89-c681d85dde64": "210d8427-d0b0-436b-8d74-5a821538720f",
+        "181fcfdf-894c-4f8d-909c-198a6ce025ab": "43a89a4f-16f2-4f35-bb38-86227ffbfc36",
+        "ab3d0a25-9952-4038-af53-1686d287eb5d": "87f75b0c-d225-4017-892c-4acf16f695dd",
+        "0c0279e4-5ed6-474c-bd2a-7884a4d68b4b": "65df0bd9-c205-4282-8169-4e749a17159c",
+        "277c324d-4d24-4dcf-9d9c-5f7dc9051932": "fae06f11-9dac-44df-8763-b09ffb7379c7",
+        "a0ca5a0f-4af9-416f-8308-bb7fa5dfb8f7": "9e7b6732-e580-4db0-a2c8-bc25b780ba12",
+        "62e7124f-7d96-4d4a-b3ba-4c0ef58f6b4a": "096cf322-d03b-4058-bc17-78f416e6c8a8",
+        "3951a691-bb25-49f8-9a58-e276f08222cf": "cd27d261-917d-47b6-ba9c-72e1eb85438c",
+        "91d5d71c-7576-48cb-8996-eb3c468aaf59": "1c26cba7-071f-4280-aed6-54951f98721d",
+        "b4ca6d36-f647-49b3-9151-8ef4c63aeddd": "be24a04e-cc2b-4ac3-98ed-90f97fbf5844",
+        "50de49ef-0287-435d-b570-e48047718014": "629ad348-2c06-4cdc-bb04-7b42e1e5e392",
+        "4dc414cd-ed6d-4fcd-bd26-0c4c340b5301": "0fa9bf9f-bc7b-40e2-9804-fbb2ab2c4e1c"
+      }
+    },
+    {
+      "__guid": "b08a57ff-1cb3-4a8d-9f5c-503920a05001",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "GameMode",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 1,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "__Prefab": "prefabs/game_modes/team_deathmatch.prefab",
+      "__PrefabInstancePatch": {
+        "AddedObjects": [],
+        "RemovedObjects": [],
+        "PropertyOverrides": [
+          {
+            "Target": {
+              "Type": "GameObject",
+              "IdValue": "f7c25223-1ca5-4076-9d06-aa3c3c46f4a1"
+            },
+            "Property": "Name",
+            "Value": "Team Deathmatch"
+          },
+          {
+            "Target": {
+              "Type": "GameObject",
+              "IdValue": "f7c25223-1ca5-4076-9d06-aa3c3c46f4a1"
+            },
+            "Property": "Position",
+            "Value": "0,0,0"
+          }
+        ],
+        "MovedObjects": []
+      },
+      "__PrefabIdToInstanceId": {
+        "f7c25223-1ca5-4076-9d06-aa3c3c46f4a1": "b08a57ff-1cb3-4a8d-9f5c-503920a05001"
+      },
+      "Components": [],
+      "Children": []
+    },
+    {
+      "__guid": "c2a71e30-4d1e-4f8a-b2c6-8e1234567890",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "GameMode",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 1,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "__Prefab": "prefabs/game_modes/bomb_defusal.prefab",
+      "__PrefabInstancePatch": {
+        "AddedObjects": [],
+        "RemovedObjects": [],
+        "PropertyOverrides": [],
+        "MovedObjects": []
+      },
+      "__PrefabIdToInstanceId": {
+        "f4fe73a9-6aa7-4002-8b52-a120444c3473": "d1b82c41-5f3a-4e7b-9c0d-1234567890ab"
+      },
+      "Components": [],
+      "Children": []
+    },
+    {
+      "__guid": "c7d3c652-3333-4000-8000-ccdd11111111",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "GameMode",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 1,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "__Prefab": "prefabs/game_modes/deathmatch.prefab",
+      "__PrefabInstancePatch": {
+        "AddedObjects": [],
+        "RemovedObjects": [],
+        "PropertyOverrides": [],
+        "MovedObjects": []
+      },
+      "__PrefabIdToInstanceId": {
+        "f7c25223-1ca5-4076-9d06-aa3c3c46f4a1": "c7d3c652-3333-4000-8000-ccdd22222222"
+      },
+      "Components": [],
+      "Children": []
+    },
+    {
+      "__guid": "d4e5f6a7-b8c9-4000-8000-112233445566",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "GameMode",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 1,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "__Prefab": "prefabs/game_modes/gun_game.prefab",
+      "__PrefabInstancePatch": {
+        "AddedObjects": [],
+        "RemovedObjects": [],
+        "PropertyOverrides": [],
+        "MovedObjects": []
+      },
+      "__PrefabIdToInstanceId": {
+        "a1b2c3d4-e5f6-7890-abcd-ef1234567891": "d4e5f6a7-b8c9-4000-8000-112233445567"
+      },
+      "Components": [],
+      "Children": []
+    }
+  ],
+  "SceneProperties": {
+    "NetworkInterpolation": true,
+    "TimeScale": 1,
+    "WantsSystemScene": true,
+    "Metadata": {
+      "Title": "Flatgrass",
+      "Image": "",
+      "IsVisibleInMenu": "True",
+      "GameModes": "prefabs/game_modes/team_deathmatch.prefab, prefabs/game_modes/bomb_defusal.prefab, prefabs/game_modes/deathmatch.prefab, prefabs/game_modes/gun_game.prefab"
+    },
+    "NavMesh": {
+      "Enabled": true,
+      "IncludeStaticBodies": true,
+      "IncludeKeyframedBodies": true,
+      "EditorAutoUpdate": true,
+      "AgentHeight": 64,
+      "AgentRadius": 16,
+      "AgentStepSize": 18,
+      "AgentMaxSlope": 40,
+      "ExcludedBodies": "",
+      "IncludedBodies": "",
+      "DeferGeneration": false,
+      "CustomBounds": false
+    },
+    "GameObjectSystems": {
+      "Sandbox.SelectionSetsSystem": {
+        "Data": {
+          "SelectionSets": []
+        }
+      }
+    }
+  },
+  "ResourceVersion": 3,
+  "Title": "Flatgrass",
+  "Description": null,
+  "__references": [],
+  "__version": 3
+}

@@ -1,0 +1,51 @@
+@namespace Facepunch.UI
+@attribute [StyleSheet]
+@inherits Panel
+
+<root>
+    @foreach (var voice in VoiceList.Where( x => CanDisplay( x ) ) )
+    {
+        <div class="row">
+            <div class="item-row with-background">
+                @{
+                    var player = GetPlayer( voice );
+                }
+
+                <Icon class="square rounded shrink-0" File="/ui/chat/radio.png" size="24" Transform="@($"scale({GetAmplitudeScale( voice )})")" />
+                <img class="avatar" src="avatar:@player.SteamId" />
+                <PlayerPanel Client=@player />
+            </div>
+        </div>
+    }
+
+</root>
+
+@code
+{
+    public IEnumerable<PlayerVoiceComponent> VoiceList => Scene.GetAllComponents<PlayerVoiceComponent>().Where( x => x.Client.IsValid() && x.Client.IsConnected );
+
+    private Client GetPlayer( PlayerVoiceComponent voice )
+    {
+        return voice.Client.IsValid() ? voice.Client : voice.GetComponent<Client>();
+    }
+
+    private bool CanDisplay( PlayerVoiceComponent voice )
+    {
+        var player = GetPlayer( voice );
+        if ( !player.IsValid() || CommunicationMuteState.IsVoiceMuted( player ) )
+            return false;
+
+        return voice.LastPlayed < 0.25f;
+    }
+
+    private string GetAmplitudeScale( Voice voice )
+    {
+        var scale = 0.5f + ( voice.Amplitude * 2.365f );
+        return ( 1f + scale ).ToString( "0.#" );
+    }
+
+    protected override int BuildHash()
+    {
+        return HashCode.Combine( Time.Now );
+    }
+}

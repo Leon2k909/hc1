@@ -1,0 +1,203 @@
+@using Sandbox.UI;
+@using Sandbox.UI.Navigation;
+
+@namespace Facepunch.UI
+@inherits Panel
+@implements INavigatorPage
+@attribute [StyleSheet]
+
+<root class="hc1 barracks-page">
+
+    @* ── Top-bar ───────────────────────────────────────────────────────── *@
+    @if ( ActiveSection != BarracksSection.None )
+    {
+        <MenuTopbar Title="BARRACKS" BackLabel=@SectionLabel BackAction=@ExitSection />
+    }
+    else
+    {
+        <MenuTopbar Title="BARRACKS" />
+    }
+
+    @* ── Category Hub ─────────────────────────────────────────── *@
+    @if ( ActiveSection == BarracksSection.None )
+    {
+        <div class="barracks-hub">
+            <div class="barracks-cat-grid">
+
+                <div class="barracks-cat" @onclick=@OpenEmblems>
+                    <i class="cat-icon">star</i>
+                    <label class="cat-name">EMBLEMS</label>
+                    <label class="cat-desc">Design your personal emblem</label>
+                </div>
+
+                <div class="barracks-cat" @onclick=@OpenCallingCards>
+                    <i class="cat-icon">badge</i>
+                    <label class="cat-name">CALLING CARDS</label>
+                    <label class="cat-desc">Choose your player card style</label>
+                </div>
+
+                <a class="barracks-cat" href="/theater">
+                    <i class="cat-icon">videocam</i>
+                    <label class="cat-name">THEATER</label>
+                    <label class="cat-desc">Watch match replays</label>
+                </a>
+
+                <div class="barracks-cat locked">
+                    <i class="cat-icon">person</i>
+                    <label class="cat-name">OPERATORS</label>
+                    <label class="cat-desc">Coming Soon</label>
+                </div>
+
+                <div class="barracks-cat" @onclick=@OpenTitles>
+                    <i class="cat-icon">military_tech</i>
+                    <label class="cat-name">TITLES</label>
+                    <label class="cat-desc">Select your player title</label>
+                </div>
+
+            </div>
+        </div>
+    }
+
+    @* ── Emblems ──────────────────────────────────────────────── *@
+    @if ( ActiveSection == BarracksSection.Emblems )
+    {
+        <div class="barracks-section-body">
+            <EmblemEditor @ref=EmblemEditorRef />
+        </div>
+    }
+
+    @* ── Calling Cards ────────────────────────────────────────── *@
+    @if ( ActiveSection == BarracksSection.CallingCards )
+    {
+        <div class="barracks-cc-body">
+            <div class="cc-left">
+                @* Preview of selected card *@
+                <label class="cc-preview-label">PREVIEW</label>
+                @{
+                    var selected = CallingCards.GetSelectedDef();
+                }
+                <div class="cc-preview-card" style="@selected.BgStyle">
+                    <div class="cc-preview-accent" style="@selected.AccentStyle" />
+                    <div class="cc-preview-content">
+                        <label class="cc-preview-name">@(Sandbox.Utility.Steam.PersonaName)</label>
+                        <label class="cc-preview-tag">@selected.Name</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cc-right">
+                <label class="cc-grid-label">SELECT CALLING CARD</label>
+                <div class="cc-grid">
+                    @foreach ( var card in CallingCards.All )
+                    {
+                        var isSelected = CallingCards.GetSelected() == card.Id;
+                        <div class="cc-card @(isSelected ? "active" : "")" style="@card.BgStyle" @onclick=@(() => SelectCard( card.Id ))>
+                            <div class="cc-card-accent" style="@card.AccentStyle" />
+                            <label class="cc-card-name">@card.Name</label>
+                            @if ( isSelected )
+                            {
+                                <i class="cc-card-check">check_circle</i>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    @* ── Titles ────────────────────────────────────────────────────────── *@
+    @if ( ActiveSection == BarracksSection.Titles )
+    {
+        <div class="barracks-cc-body">
+            <div class="cc-left">
+                <div class="cc-preview-panel">
+                    <label class="cc-preview-title">CURRENT TITLE</label>
+                    @{
+                        var selected = Titles.GetSelectedDef();
+                    }
+                    <div class="title-preview-card">
+                        <label class="title-text" style="color: @selected.Color;">@selected.Text</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="cc-right">
+                <div class="cc-grid">
+                    @foreach ( var titleDef in Titles.All )
+                    {
+                        var isSelected = Titles.GetSelected() == titleDef.Id;
+                        <div class="title-card @(isSelected ? "active" : "")" @onclick=@(() => SelectTitle( titleDef.Id ))>
+                            <label class="title-text" style="color: @titleDef.Color;">@titleDef.Text</label>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+</root>
+
+@code
+{
+    private enum BarracksSection { None, Emblems, CallingCards, Titles }
+
+    private BarracksSection ActiveSection { get; set; } = BarracksSection.None;
+    private EmblemEditor EmblemEditorRef { get; set; }
+
+    private string SectionLabel => ActiveSection switch
+    {
+        BarracksSection.Emblems      => "EMBLEM EDITOR",
+        BarracksSection.CallingCards => "CALLING CARDS",
+        BarracksSection.Titles       => "TITLES",
+        _                            => "BACK"
+    };
+
+    public void OnNavigationOpen()
+    {
+        MainMenuRoot.Instance?.SetActiveRoute( "/barracks" );
+        ActiveSection = BarracksSection.None;
+        StateHasChanged();
+    }
+
+    public void OnNavigationClose() { }
+
+    private void OpenEmblems()
+    {
+        ActiveSection = BarracksSection.Emblems;
+        StateHasChanged();
+        EmblemEditorRef?.Load();
+    }
+
+    private void OpenCallingCards()
+    {
+        ActiveSection = BarracksSection.CallingCards;
+        StateHasChanged();
+    }
+
+    private void OpenTitles()
+    {
+        ActiveSection = BarracksSection.Titles;
+        StateHasChanged();
+    }
+
+    private void ExitSection()
+    {
+        if ( ActiveSection == BarracksSection.Emblems )
+            EmblemEditorRef?.Save();
+
+        ActiveSection = BarracksSection.None;
+        StateHasChanged();
+    }
+
+    private void SelectCard( string id )
+    {
+        CallingCards.SetSelected( id );
+        StateHasChanged();
+    }
+
+    private void SelectTitle( string id )
+    {
+        Titles.SetSelected( id );
+        StateHasChanged();
+    }
+}

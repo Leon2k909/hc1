@@ -1,0 +1,91 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using Facepunch;
+
+@namespace Facepunch.Gunsmith
+@inherits Panel
+
+<root class="tuning-panel">
+    @if ( WeaponId is not null )
+    {
+        <label class="tuning-title">WEAPON TUNING</label>
+
+        @foreach ( var stat in Stats )
+        {
+            var capturedKey   = stat.Key;
+            var capturedLabel = stat.Label;
+            var value = GetStatValue( capturedKey );
+            <div class="tuning-row">
+                <label class="stat-name">@capturedLabel</label>
+                <div class="bar-wrap">
+                    <div class="bar-fill @(value < 0 ? "negative" : "positive")"
+                         style="width: @(Math.Abs(value) * 10)%; @(value < 0 ? "margin-left: auto;" : "")" />
+                </div>
+                <div class="controls">
+                    <div class="btn" onclick=@(() => Adjust( capturedKey, -1 ))>–</div>
+                    <label class="val @(value > 0 ? "pos" : value < 0 ? "neg" : "zero")">@(value > 0 ? $"+{value}" : value.ToString())</label>
+                    <div class="btn" onclick=@(() => Adjust( capturedKey, +1 ))>+</div>
+                </div>
+            </div>
+        }
+
+        <div class="reset-row">
+            <div class="button standard smaller no-anim" onclick=@ResetAll>Reset All</div>
+        </div>
+    }
+</root>
+
+@code
+{
+    [Property] public string WeaponId { get; set; }
+
+    private record StatDef( string Key, string Label );
+    private static readonly StatDef[] Stats =
+    {
+        new( "damage",    "Damage" ),
+        new( "firerate",  "Fire Rate" ),
+        new( "reload",    "Reload Spd" ),
+        new( "adsmove",   "ADS Move" ),
+        new( "recoil",    "Recoil" ),
+        new( "magsize",   "Mag Size" ),
+    };
+
+    private int GetStatValue( string key )
+    {
+        if ( WeaponId is null ) return 0;
+        return WeaponTuningManager.GetTuning( WeaponId ) switch
+        {
+            var t when key == "damage"   => t.Damage,
+            var t when key == "firerate" => t.FireRate,
+            var t when key == "reload"   => t.Reload,
+            var t when key == "adsmove"  => t.AdsMoveSpeed,
+            var t when key == "recoil"   => t.Recoil,
+            var t when key == "magsize"  => t.MagSize,
+            _                            => 0,
+        };
+    }
+
+    private void Adjust( string stat, int delta )
+    {
+        if ( WeaponId is null ) return;
+        WeaponTuningManager.AdjustTuning( WeaponId, stat, delta );
+        StateHasChanged();
+    }
+
+    private void ResetAll()
+    {
+        if ( WeaponId is null ) return;
+        foreach ( var stat in Stats )
+            WeaponTuningManager.AdjustTuning( WeaponId, stat.Key, -GetStatValue( stat.Key ) );
+        StateHasChanged();
+    }
+
+    protected override int BuildHash()
+    {
+        if ( WeaponId is null ) return 0;
+        var t = WeaponTuningManager.GetTuning( WeaponId );
+        return HashCode.Combine(
+            HashCode.Combine( WeaponId, t.Damage, t.FireRate, t.Reload ),
+            HashCode.Combine( t.AdsMoveSpeed, t.Recoil, t.MagSize ) );
+    }
+}

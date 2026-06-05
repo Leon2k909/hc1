@@ -1,0 +1,105 @@
+@import "/UI/Styles/Theme.scss";
+
+CrosshairHud
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 1500;
+
+    .ch
+    {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .ch-classic
+    {
+        .seg
+        {
+            position: absolute;
+            background: linear-gradient(to bottom, #ff6b35, #ff8c42);
+            box-shadow: 0 0 9px rgba(255, 107, 53, 0.35);
+            filter: drop-shadow(0 0 4px rgba(255, 107, 53, 0.45));
+        }
+
+        .seg.t { width: 2px; height: 8px; left: 50%; top: 50%; margin-top: -13px; margin-left: -1px; }
+        .seg.b { width: 2px; height: 8px; left: 50%; top: 50%; margin-top: 5px; margin-left: -1px; }
+        .seg.l { height: 2px; width: 8px; top: 50%; left: 50%; margin-left: -13px; margin-top: -1px; background: linear-gradient(to right, #ff6b35, #ff8c42); }
+        .seg.r { height: 2px; width: 8px; top: 50%; left: 50%; margin-left: 5px; margin-top: -1px; background: linear-gradient(to right, #ff6b35, #ff8c42); }
+    }
+
+    .ch-modern
+    {
+        .ring
+        {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid #ff6b35;
+            box-shadow: 0 0 10px rgba(255, 107, 53, 0.4);
+            filter: drop-shadow(0 0 4px rgba(255, 107, 53, 0.2));
+        }
+
+        .dot
+        {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background-color: #ff6b35;
+            transform: translate(-50%, -50%);
+        }
+    }
+
+    .ch-custom
+    {
+        .seg
+        {
+            position: absolute;
+        }
+
+        &.tstyle .seg.t { display: none; }
+        &.nodot .cdot { display: none; }
+
+        .cdot
+        {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 4px;
+            border-radius: 1px;
+            transform: translate(-50%, -50%);
+        }
+    }
+
+    .hit-marker
+    {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        animation: hm-fade 0.42s ease-out forwards;
+
+        &.ring,
+        &.dot
+        {
+            border-radius: 50%;
+        }
+    }
+
+    @keyframes hm-fade
+    {
+        0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+        30% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        100% { opacity: 0; transform: translate(-50%, -50%) scale(1.2); }
+    }
+}

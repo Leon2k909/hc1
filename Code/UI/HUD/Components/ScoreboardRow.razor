@@ -1,0 +1,155 @@
+@using System;
+@using Sandbox.UI;
+
+@namespace Facepunch.UI
+@inherits Panel
+
+<root class="row @(IsLocal ? "local" : "") @(IsDead ? "dead" : "") @(IsBotEntry ? "bot-row" : "") with-px-lg with-py">
+    <span class="col stat-small">
+        @if ( !IsBotEntry && Player.IsValid() ) 
+        {
+            @if (Player.Inventory.HasBomb && IsFriendly && Team == Team.Terrorist)
+            {
+                <Icon File="/ui/bomb.png" size="24"></Icon>
+            }
+            else if (Player.Inventory.HasDefuseKit && IsFriendly && Team == Team.CounterTerrorist)
+            {
+                <Icon File="/ui/defusekit.png" size="24"></Icon>
+            }
+        }
+    </span>
+
+    <span class="col stat-small">
+        @if ( IsBotEntry )
+        {
+            <label class="small bot-ping">AI</label>
+        }
+        else if ( Connection is not null )
+        {
+            <label class="small">@(Connection?.Ping.CeilToInt())</label>
+        }
+        else
+        {
+            <Icon style="background-tint: red;" File="/ui/no-connection.png" size="24" />
+        }
+    </span>
+
+    <span class="col playername gap-sm">
+        @if ( IsBotEntry )
+        {
+            <img class="bot-avatar" src="/ui/bot_avatar.png" />
+            <span class="bot-prefix">BOT</span>
+            <label>@Bot.BotName</label>
+        }
+        else
+        {
+            <PlayerAvatar ShowHealth=@false ShowBomb=@false class="avatar" Player=@Client />
+            @if( Client.PrestigeLevel > 0 )
+            {
+                <img src="/ui/prestige/prestige_@(Client.PrestigeLevel).png" style="height: 16px; margin-right: 4px;" />
+            }
+            <EmblemViewer JsonData=@(Client.EmblemDataJson) style="width: 32px; height: 32px; transform: scale(0.5); transform-origin: left center; margin-right: -12px;" />
+            <label>
+                @Client.DisplayName
+            </label>
+        }
+
+        @if ( IsPartyMember )
+        {
+            <Icon File="/ui/party-member.png" size="24"></Icon>
+        }
+    </span>
+
+    @if ( CanMute )
+    {
+        <button class="col stat-small mute-toggle @(IsTextMuted ? "muted" : "")" onclick=@ToggleTextMute>
+            <i>@(IsTextMuted ? "speaker_notes_off" : "speaker_notes")</i>
+        </button>
+
+        <button class="col stat-small mute-toggle @(IsVoiceMuted ? "muted" : "")" onclick=@ToggleVoiceMute>
+            <i>@(IsVoiceMuted ? "mic_off" : "mic")</i>
+        </button>
+    }
+    else
+    {
+        <span class="col stat-small mute-placeholder"></span>
+        <span class="col stat-small mute-placeholder"></span>
+    }
+
+    @foreach ( var x in ScoreValues )
+    {
+        <label class="col stat">@(x.Value)</label>
+    }
+</root>
+
+@code {
+    public Client Client { get; set; }
+    public LightweightCombatBot Bot { get; set; }
+    private bool IsBotEntry => Bot.IsValid();
+    public PlayerPawn Player => IsBotEntry || !Client.IsValid() ? null : Client.PlayerPawn;
+    private Connection Connection => IsBotEntry || !Client.IsValid() ? null : Client.Connection;
+    private PlayerScore Score => IsBotEntry || !Client.IsValid() ? null : Client.GetComponent<PlayerScore>();
+
+    private bool IsFriendly => IsBotEntry ? Client.Local.IsValid() && Bot.Team == Client.Local.Team : Client.IsFriendly( Client.Local );
+    private bool IsLocal => !IsBotEntry && Client.IsLocalPlayer;
+    private bool IsDead => IsBotEntry ? !Bot.IsAlive : !Player.IsValid() || Player.HealthComponent.State != LifeState.Alive;
+    private float KillDeathRatio => Score.IsValid() ? (float)Score.Kills / (float)Score.Deaths.Clamp(1, int.MaxValue) : 0f;
+    private Team Team => IsBotEntry ? Bot.Team : Client.Team;
+    private bool IsPartyMember => !IsBotEntry && Connection is not null && (PartyRoom.Current?.Members.Any( x => x.Id == Connection.SteamId ) ?? false);
+    private bool CanMute => !IsBotEntry && CommunicationMuteState.CanMute( Client );
+    private bool IsTextMuted => !IsBotEntry && CommunicationMuteState.IsTextMuted( Client );
+    private bool IsVoiceMuted => !IsBotEntry && CommunicationMuteState.IsVoiceMuted( Client );
+    private IEnumerable<(object Value, ScoreAttribute Attribute)> ScoreValues => IsBotEntry ? GetBotScoreValues() : IScore.Find( Client );
+
+    public bool Disconnected => Connection is null;
+
+    private IEnumerable<(object Value, ScoreAttribute Attribute)> GetBotScoreValues()
+    {
+        foreach ( var score in IScore.Find( Client.Local ) )
+        {
+            object value = score.Attribute.Name switch
+            {
+                "Balance" => string.Empty,
+                "Points" => (object)Bot.Score,
+                "Kills" => (object)Bot.Kills,
+                "Deaths" => (object)Bot.Deaths,
+                "Ratio" => (object)Bot.Ratio.ToString( "0.00" ),
+                _ => string.Empty
+            };
+
+            yield return (value, score.Attribute);
+        }
+    }
+
+    private void ToggleTextMute()
+    {
+        CommunicationMuteState.ToggleText( Client );
+    }
+
+    private void ToggleVoiceMute()
+    {
+        CommunicationMuteState.ToggleVoice( Client );
+    }
+
+    protected override int BuildHash()
+    {
+        var hash = HashCode.Combine( IsBotEntry, Connection, IsLocal, IsDead, Connection?.Ping, CommunicationMuteState.Version );
+
+        if ( IsBotEntry )
+        {
+            return HashCode.Combine( hash, Bot.Id, Bot.Team, Bot.BotName, Bot.Kills, Bot.Deaths, Bot.Score, Bot.IsAlive );
+        }
+
+        if ( Player.IsValid() )
+        {
+            hash = HashCode.Combine( hash, Player.Inventory.HasDefuseKit, Player.Inventory.HasBomb, IsPartyMember, Player.Client.PlayerColor, Client.EmblemDataJson, Client.PrestigeLevel );
+        }
+
+        foreach ( var x in IScore.Find( Client ) )
+        {
+            hash = HashCode.Combine( hash, x.Value );
+        }
+
+        return hash;
+    }
+}

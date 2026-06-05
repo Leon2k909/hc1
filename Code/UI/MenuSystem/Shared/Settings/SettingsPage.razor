@@ -1,0 +1,110 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using Sandbox.UI.Navigation;
+
+@inherits Panel
+@implements INavigatorPage
+@namespace Facepunch.UI
+
+<root class="hc1 blur" style="display: flex; flex-direction: column; width: 100%; height: 100%; position: absolute;">
+    <MenuTopbar Title="SETTINGS" />
+    
+    <div style="flex-grow: 1; overflow: hidden; display: flex; flex-direction: column;">
+        <div style="height: 18%;"/>
+
+            <div class="layout column gap">
+                <div class="layout row inset">
+                    @foreach (var grouping in TypeLibrary.GetPropertyDescriptions(GameSettingsSystem.Current).GroupBy(x => x.Group))
+                    {
+                        <div class="button standard smaller no-anim extra-x-padding @(SelectedGroup == grouping.Key ? "selected" : "")" onclick=@(() => SetGroup( grouping.Key ) )>@grouping.Key</div>
+                    }
+                </div>
+
+                <div class="layout padding-insane-x with-scroll column">
+                    <VerticalDivider />
+
+                    <div class="column with-bg layout padding-extra with-gap">
+                        @if ( !string.IsNullOrEmpty( SelectedGroup ) )
+                        {
+                            @if ( SelectedGroup == "Crosshair" )
+                            {
+                                <CrosshairSettings />
+                            }
+                            else if ( SelectedGroup == "Controls" )
+                            {
+                                <InputSettings />
+                            }
+                            else
+                            {
+                                @foreach ( var property in TypeLibrary.GetPropertyDescriptions( GameSettingsSystem.Current ).Where( x => x.Group == SelectedGroup ) )
+                                {
+                                    <SettingEntry Target=@GameSettingsSystem.Current Description=@property />
+                                }
+                            }
+                        }
+                    </div>
+
+                    <VerticalDivider />
+                </div>
+            </div>
+
+            <div class="grow" />
+
+        <div class="row inset grow with-padding with-gap" style="justify-content: flex-end; align-items: center; padding: 16px;">
+            <div class="button standard" onclick=@(() => Game.Overlay.ShowBinds())>
+                EDIT INPUT BINDINGS
+            </div>
+            <div class="button standard" onclick=@(() => ReportBug())>
+                <i>bug_report</i>
+                Report a Bug
+            </div>
+            <button class="button standard" onclick=@(()=>Save())>Save</button>
+        </div>
+    </div>
+</root>
+
+@code
+{
+    private string SelectedGroup { get; set; } = null;
+
+    protected override void OnAfterTreeRender( bool firstTime )
+    {
+        if ( firstTime )
+        {
+            // Get the first group
+            var first = TypeLibrary.GetPropertyDescriptions( GameSettingsSystem.Current ).FirstOrDefault();
+            SetGroup( first.Group );
+        }
+    }
+
+    private void SetGroup( string group )
+    {
+        SelectedGroup = group;
+        StateHasChanged();
+    }
+
+    void Save()
+    {
+        GameSettingsSystem.Save();
+    }
+
+    void ReportBug()
+    {
+        MainMenuRoot.Instance?.OpenBugReport();
+    }
+
+    public void OnNavigationOpen()
+    {
+        MainMenuRoot.Instance?.SetActiveRoute( "/settings" );
+        if ( MainMenuRoot.Instance.IsValid() )
+            MainMenuRoot.Instance.SetBlur( true );
+    }
+    
+    public void OnNavigationClose() 
+    {
+        if ( MainMenuRoot.Instance.IsValid() )
+        {
+            MainMenuRoot.Instance.SetBlur( false );
+        }
+    }
+}

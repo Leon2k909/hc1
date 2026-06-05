@@ -1,0 +1,289 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using Facepunch;
+@inherits Panel
+@namespace Facepunch.UI
+@attribute [StyleSheet]
+
+<root class="crosshair-settings">
+    <div class="ch-tabs">
+        <button class="ch-tab @(_tab == "crosshair" ? "active" : "")" @onmousedown=@(() => SetTab( "crosshair" ))>Crosshair</button>
+        <button class="ch-tab @(_tab == "hit" ? "active" : "")" @onmousedown=@(() => SetTab( "hit" ))>Hit Marker</button>
+    </div>
+
+    <div class="ch-scroll">
+    @if ( _tab == "crosshair" )
+    {
+        <div class="ch-label">Style</div>
+        <div class="ch-chips">
+            <button class="ch-chip @(Cfg.Style == "none" ? "active" : "")" @onmousedown=@(() => SetStyle( "none" ))>None</button>
+            <button class="ch-chip @(Cfg.Style == "hc1" ? "active" : "")" @onmousedown=@(() => SetStyle( "hc1" ))>HC1</button>
+            <button class="ch-chip @(Cfg.Style == "classic" ? "active" : "")" @onmousedown=@(() => SetStyle( "classic" ))>Classic</button>
+            <button class="ch-chip @(Cfg.Style == "modern" ? "active" : "")" @onmousedown=@(() => SetStyle( "modern" ))>Modern</button>
+            <button class="ch-chip @(Cfg.Style == "custom" ? "active" : "")" @onmousedown=@(() => SetStyle( "custom" ))>Custom</button>
+        </div>
+
+        <div class="ch-label mt">Enabled</div>
+        <div class="ch-chips">
+            <button class="ch-chip @(Cfg.Enabled ? "active" : "")" @onmousedown=@(() => { Cfg.Enabled = true; Save(); })>On</button>
+            <button class="ch-chip @(!Cfg.Enabled ? "active" : "")" @onmousedown=@(() => { Cfg.Enabled = false; Save(); })>Off</button>
+        </div>
+
+        <div class="ch-label mt">Hide On ADS</div>
+        <div class="ch-chips">
+            <button class="ch-chip @(Cfg.HideOnAds ? "active" : "")" @onmousedown=@(() => { Cfg.HideOnAds = true; Save(); })>On</button>
+            <button class="ch-chip @(!Cfg.HideOnAds ? "active" : "")" @onmousedown=@(() => { Cfg.HideOnAds = false; Save(); })>Off</button>
+        </div>
+
+        @if ( Cfg.Style == "custom" )
+        {
+            <div class="ch-label mt">Color</div>
+            <div class="ch-chips">
+                @foreach ( var hex in ColorPresets )
+                {
+                    var h = hex;
+                    <button class="ch-swatch @(Cfg.Color == h ? "active" : "")" style="background-color:@h" @onmousedown=@(() => { Cfg.Color = h; Save(); })></button>
+                }
+            </div>
+
+            <div class="ch-label mt">Alpha - @(Math.Round( Cfg.Alpha * 100 ))%</div>
+            <div class="ch-chips">
+                @foreach ( var v in AlphaSteps )
+                {
+                    var val = v;
+                    <button class="ch-chip @(Math.Abs( Cfg.Alpha - val ) < 0.01f ? "active" : "")" @onmousedown=@(() => { Cfg.Alpha = val; Save(); })>@(Math.Round( val * 100 ))%</button>
+                }
+            </div>
+
+            <div class="ch-label mt">Thickness - @(Cfg.Thickness)px</div>
+            <div class="ch-chips">
+                @foreach ( var v in ThicknessSteps )
+                {
+                    var val = v;
+                    <button class="ch-chip @(Cfg.Thickness == val ? "active" : "")" @onmousedown=@(() => { Cfg.Thickness = val; Save(); })>@val</button>
+                }
+            </div>
+
+            <div class="ch-label mt">Length - @(Cfg.Size)px</div>
+            <div class="ch-chips">
+                @foreach ( var v in CrosshairSizeSteps )
+                {
+                    var val = v;
+                    <button class="ch-chip @(Cfg.Size == val ? "active" : "")" @onmousedown=@(() => { Cfg.Size = val; Save(); })>@val</button>
+                }
+            </div>
+
+            <div class="ch-label mt">Gap - @(Cfg.Gap)px</div>
+            <div class="ch-chips">
+                @foreach ( var v in GapSteps )
+                {
+                    var val = v;
+                    <button class="ch-chip @(Cfg.Gap == val ? "active" : "")" @onmousedown=@(() => { Cfg.Gap = val; Save(); })>@val</button>
+                }
+            </div>
+
+            <div class="ch-label mt">Options</div>
+            <div class="ch-chips">
+                <button class="ch-chip @(Cfg.Dot ? "active" : "")" @onmousedown=@(() => { Cfg.Dot = !Cfg.Dot; Save(); })>Center Dot</button>
+                <button class="ch-chip @(Cfg.TStyle ? "active" : "")" @onmousedown=@(() => { Cfg.TStyle = !Cfg.TStyle; Save(); })>T-Style</button>
+                <button class="ch-chip @(Cfg.Outline ? "active" : "")" @onmousedown=@(() => { Cfg.Outline = !Cfg.Outline; Save(); })>Outline</button>
+            </div>
+
+            @if ( Cfg.Outline )
+            {
+                <div class="ch-label mt">Outline Thickness - @(Cfg.OutlineThickness)px</div>
+                <div class="ch-chips">
+                    @foreach ( var v in OutlineSteps )
+                    {
+                        var val = v;
+                        <button class="ch-chip @(Cfg.OutlineThickness == val ? "active" : "")" @onmousedown=@(() => { Cfg.OutlineThickness = val; Save(); })>@val</button>
+                    }
+                </div>
+
+                <div class="ch-label mt">Outline Alpha - @(Math.Round( Cfg.OutlineAlpha * 100 ))%</div>
+                <div class="ch-chips">
+                    @foreach ( var v in AlphaSteps )
+                    {
+                        var val = v;
+                        <button class="ch-chip @(Math.Abs( Cfg.OutlineAlpha - val ) < 0.01f ? "active" : "")" @onmousedown=@(() => { Cfg.OutlineAlpha = val; Save(); })>@(Math.Round( val * 100 ))%</button>
+                    }
+                </div>
+            }
+        }
+    }
+
+    @if ( _tab == "hit" )
+    {
+        <div class="ch-label">Style</div>
+        <div class="ch-chips">
+            <button class="ch-chip @(Cfg.HitStyle == "none" ? "active" : "")" @onmousedown=@(() => SetHitStyle( "none" ))>None</button>
+            <button class="ch-chip @(Cfg.HitStyle == "x" ? "active" : "")" @onmousedown=@(() => SetHitStyle( "x" ))>X</button>
+            <button class="ch-chip @(Cfg.HitStyle == "ring" ? "active" : "")" @onmousedown=@(() => SetHitStyle( "ring" ))>Ring</button>
+            <button class="ch-chip @(Cfg.HitStyle == "dot" ? "active" : "")" @onmousedown=@(() => SetHitStyle( "dot" ))>Dot</button>
+            <button class="ch-chip @(Cfg.HitStyle == "diamond" ? "active" : "")" @onmousedown=@(() => SetHitStyle( "diamond" ))>Diamond</button>
+        </div>
+
+        <div class="ch-label mt">Color</div>
+        <div class="ch-chips">
+            @foreach ( var hex in ColorPresets )
+            {
+                var h = hex;
+                <button class="ch-swatch @(Cfg.HitColor == h ? "active" : "")" style="background-color:@h" @onmousedown=@(() => { Cfg.HitColor = h; Save(); })></button>
+            }
+        </div>
+
+        <div class="ch-label mt">Alpha - @(Math.Round( Cfg.HitAlpha * 100 ))%</div>
+        <div class="ch-chips">
+            @foreach ( var v in AlphaSteps )
+            {
+                var val = v;
+                <button class="ch-chip @(Math.Abs( Cfg.HitAlpha - val ) < 0.01f ? "active" : "")" @onmousedown=@(() => { Cfg.HitAlpha = val; Save(); })>@(Math.Round( val * 100 ))%</button>
+            }
+        </div>
+
+        <div class="ch-label mt">Thickness - @(Cfg.HitThickness)px</div>
+        <div class="ch-chips">
+            @foreach ( var v in ThicknessSteps )
+            {
+                var val = v;
+                <button class="ch-chip @(Cfg.HitThickness == val ? "active" : "")" @onmousedown=@(() => { Cfg.HitThickness = val; Save(); })>@val</button>
+            }
+        </div>
+
+        <div class="ch-label mt">Size - @(Cfg.HitSize)px</div>
+        <div class="ch-chips">
+            @foreach ( var v in HitSizeSteps )
+            {
+                var val = v;
+                <button class="ch-chip @(Cfg.HitSize == val ? "active" : "")" @onmousedown=@(() => { Cfg.HitSize = val; Save(); })>@val</button>
+            }
+        </div>
+
+        <div class="ch-label mt">Duration - @(Cfg.HitDuration)ms</div>
+        <div class="ch-chips">
+            @foreach ( var v in DurationSteps )
+            {
+                var val = v;
+                <button class="ch-chip @(Cfg.HitDuration == val ? "active" : "")" @onmousedown=@(() => { Cfg.HitDuration = val; Save(); })>@val</button>
+            }
+        </div>
+
+        <div class="ch-label mt">Options</div>
+        <div class="ch-chips">
+            <button class="ch-chip @(Cfg.HitOutline ? "active" : "")" @onmousedown=@(() => { Cfg.HitOutline = !Cfg.HitOutline; Save(); })>Outline</button>
+        </div>
+
+        @if ( Cfg.HitOutline )
+        {
+            <div class="ch-label mt">Outline Thickness - @(Cfg.HitOutlineThickness)px</div>
+            <div class="ch-chips">
+                @foreach ( var v in OutlineSteps )
+                {
+                    var val = v;
+                    <button class="ch-chip @(Cfg.HitOutlineThickness == val ? "active" : "")" @onmousedown=@(() => { Cfg.HitOutlineThickness = val; Save(); })>@val</button>
+                }
+            </div>
+
+            <div class="ch-label mt">Outline Alpha - @(Math.Round( Cfg.HitOutlineAlpha * 100 ))%</div>
+            <div class="ch-chips">
+                @foreach ( var v in AlphaSteps )
+                {
+                    var val = v;
+                    <button class="ch-chip @(Math.Abs( Cfg.HitOutlineAlpha - val ) < 0.01f ? "active" : "")" @onmousedown=@(() => { Cfg.HitOutlineAlpha = val; Save(); })>@(Math.Round( val * 100 ))%</button>
+                }
+            </div>
+        }
+
+        <button class="ch-btn" @onmousedown=TestHit>Preview Hit</button>
+    }
+
+    <div class="ch-footer">
+        <button class="ch-btn subtle" @onmousedown=ResetDefaults>Reset Defaults</button>
+    </div>
+    </div>
+</root>
+
+@code
+{
+    string _tab = "crosshair";
+
+    static readonly string[] ColorPresets = new[]
+    {
+        "#ffffff", "#ff4444", "#ff8800", "#ffee00",
+        "#44ff44", "#3cff7a", "#00ccff", "#8844ff"
+    };
+
+    static readonly float[] AlphaSteps = new[] { 0.2f, 0.4f, 0.6f, 0.8f, 1.0f };
+    static readonly int[] ThicknessSteps = new[] { 1, 2, 3, 4, 6 };
+    static readonly int[] CrosshairSizeSteps = new[] { 4, 6, 8, 10, 14, 20 };
+    static readonly int[] GapSteps = new[] { 0, 2, 4, 6, 8, 12 };
+    static readonly int[] OutlineSteps = new[] { 0, 1, 2, 3, 4 };
+    static readonly int[] HitSizeSteps = new[] { 8, 12, 16, 24, 32, 48 };
+    static readonly int[] DurationSteps = new[] { 150, 250, 420, 600, 900 };
+
+    CrosshairConfig Cfg => CrosshairManager.Config;
+
+    void SetTab( string tab )
+    {
+        _tab = tab;
+        StateHasChanged();
+    }
+
+    void SetStyle( string style )
+    {
+        Cfg.Style = style;
+        Save();
+    }
+
+    void SetHitStyle( string style )
+    {
+        Cfg.HitStyle = style;
+        Save();
+    }
+
+    void Save()
+    {
+        CrosshairManager.SaveConfig();
+        StateHasChanged();
+    }
+
+    void TestHit()
+    {
+        CrosshairManager.TriggerHit();
+    }
+
+    void ResetDefaults()
+    {
+        CrosshairManager.ResetConfig();
+        StateHasChanged();
+    }
+
+    protected override int BuildHash()
+    {
+        var hash = new HashCode();
+        hash.Add( _tab );
+        hash.Add( Cfg.Style );
+        hash.Add( Cfg.Enabled );
+        hash.Add( Cfg.HideOnAds );
+        hash.Add( Cfg.Color );
+        hash.Add( Cfg.Alpha );
+        hash.Add( Cfg.Thickness );
+        hash.Add( Cfg.Size );
+        hash.Add( Cfg.Gap );
+        hash.Add( Cfg.Dot );
+        hash.Add( Cfg.TStyle );
+        hash.Add( Cfg.Outline );
+        hash.Add( Cfg.OutlineThickness );
+        hash.Add( Cfg.OutlineAlpha );
+        hash.Add( Cfg.HitStyle );
+        hash.Add( Cfg.HitColor );
+        hash.Add( Cfg.HitAlpha );
+        hash.Add( Cfg.HitThickness );
+        hash.Add( Cfg.HitSize );
+        hash.Add( Cfg.HitDuration );
+        hash.Add( Cfg.HitOutline );
+        hash.Add( Cfg.HitOutlineThickness );
+        hash.Add( Cfg.HitOutlineAlpha );
+        return hash.ToHashCode();
+    }
+}

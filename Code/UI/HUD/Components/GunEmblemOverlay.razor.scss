@@ -1,0 +1,16 @@
+.gun-emblem-overlay {
+    position: absolute;
+    transform: translate( -50%, -50% );
+    pointer-events: none;
+
+    EmblemViewer {
+        width: 64px;
+        height: 64px;
+        background-color: transparent;
+    }
+
+    /* Subtle dark backing so the emblem reads against any weapon colour */
+    .emblem-viewer {
+        background-color: rgba( 0, 0, 0, 0.35 );
+    }
+}

@@ -1,0 +1,285 @@
+@import "../../styles/colors.scss";
+$accent: #FF7A1A;
+
+.store-page {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	font-family: 'Poppins', sans-serif;
+	color: white;
+
+	.topbar {
+		position: absolute;
+		top: 48px;
+		left: 0;
+		right: 0;
+		height: 64px;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		padding: 0 48px;
+		gap: 32px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+		.brand {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			gap: 12px;
+			margin-right: 24px;
+
+			.brand-logo {
+				width: 32px;
+				height: 32px;
+				border-radius: 4px;
+			}
+
+			.brand-text {
+				display: flex;
+				flex-direction: column;
+				gap: -2px;
+
+				.brand-name {
+					font-weight: 800;
+					font-size: 18px;
+					letter-spacing: 2px;
+				}
+
+				.brand-sub {
+					font-weight: 600;
+					font-size: 10px;
+					color: rgba(255, 255, 255, 0.5);
+					letter-spacing: 1px;
+				}
+			}
+		}
+
+		.nav-tabs {
+			display: flex;
+			flex-direction: row;
+			flex-grow: 1;
+			gap: 16px;
+
+			.nav-tab {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				gap: 8px;
+				padding: 8px 16px;
+				border-radius: 6px;
+				color: rgba(255, 255, 255, 0.6);
+				font-weight: 600;
+				font-size: 14px;
+				cursor: pointer;
+				transition: all 0.2s ease;
+				pointer-events: all;
+
+				i {
+					font-size: 20px;
+				}
+
+				&:hover {
+					color: white;
+					background-color: rgba(255, 255, 255, 0.05);
+				}
+
+				&.active {
+					color: white;
+					background-color: rgba(255, 255, 255, 0.1);
+				}
+			}
+		}
+
+		.profile {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			gap: 16px;
+			pointer-events: all;
+
+			.currency-chip {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				gap: 6px;
+				padding: 6px 16px;
+				background-color: rgba(0, 0, 0, 0.4);
+				border: 1px solid rgba(255, 152, 0, 0.3);
+				border-radius: 6px;
+				margin-right: 16px;
+			}
+
+			.profile-chip {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				gap: 12px;
+				padding: 6px;
+				padding-left: 16px;
+				background-color: rgba(0, 0, 0, 0.4);
+				border: 1px solid rgba(255, 255, 255, 0.05);
+				border-radius: 32px;
+				cursor: pointer;
+
+				&:hover {
+					background-color: rgba(0, 0, 0, 0.6);
+					border-color: rgba(255, 255, 255, 0.1);
+				}
+
+				.profile-info {
+					display: flex;
+					flex-direction: column;
+					align-items: flex-end;
+
+					.profile-name {
+						font-weight: bold;
+						font-size: 14px;
+					}
+
+					.profile-level {
+						font-size: 10px;
+						color: $accent;
+						font-weight: 800;
+					}
+				}
+
+				.profile-avatar {
+					width: 32px;
+					height: 32px;
+					border-radius: 50%;
+					overflow: hidden;
+					background-color: rgba(255, 255, 255, 0.1);
+					display: flex;
+					align-items: center;
+					justify-content: center;
+
+					img {
+						width: 100%;
+						height: 100%;
+					}
+				}
+			}
+		}
+	}
+
+	.store-content {
+		position: absolute;
+		top: 140px;
+		left: 48px;
+		right: 48px;
+		bottom: 48px;
+		display: flex;
+		flex-direction: column;
+		gap: 32px;
+		pointer-events: all;
+
+		.store-header {
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+
+			.store-title {
+				font-size: 48px;
+				font-weight: 800;
+				letter-spacing: 2px;
+				text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+			}
+
+			.store-sub {
+				font-size: 16px;
+				color: rgba(255, 255, 255, 0.6);
+			}
+            
+            .debug-btn {
+                margin-top: 12px;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 8px;
+                padding: 8px 16px;
+                background-color: rgba(76, 175, 80, 0.2);
+                border: 1px solid rgba(76, 175, 80, 0.5);
+                border-radius: 6px;
+                width: 200px;
+                cursor: pointer;
+                color: #81c784;
+                font-weight: bold;
+                transition: all 0.2s ease;
+                
+                &:hover {
+                    background-color: rgba(76, 175, 80, 0.4);
+                }
+            }
+		}
+
+		.store-grid {
+			display: flex;
+			flex-direction: row;
+			gap: 24px;
+			flex-wrap: wrap;
+
+			.store-item {
+				width: 260px;
+				display: flex;
+				flex-direction: column;
+				background-color: rgba(0, 0, 0, 0.4);
+				border: 1px solid rgba(255, 255, 255, 0.1);
+				border-radius: 8px;
+				padding: 16px;
+				gap: 12px;
+				transition: transform 0.2s ease, border-color 0.2s ease;
+
+				&:hover {
+					transform: scale(1.02);
+					border-color: rgba(255, 255, 255, 0.3);
+				}
+
+				.item-img {
+					width: 100%;
+					height: 140px;
+					border-radius: 6px;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+				}
+
+				.item-name {
+					font-size: 18px;
+					font-weight: bold;
+				}
+
+				.item-desc {
+					font-size: 13px;
+					color: rgba(255, 255, 255, 0.6);
+					flex-grow: 1;
+				}
+
+				.buy-btn {
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+					justify-content: center;
+					gap: 8px;
+					padding: 10px;
+					background-color: rgba(255, 152, 0, 0.8);
+					border-radius: 6px;
+					cursor: pointer;
+					font-weight: bold;
+					margin-top: 8px;
+					transition: background-color 0.2s ease;
+
+					&:hover {
+						background-color: #ff9800;
+					}
+                    
+                    &.disabled {
+                        background-color: rgba(255, 255, 255, 0.1);
+                        color: rgba(255, 255, 255, 0.3);
+                        pointer-events: none;
+                    }
+				}
+			}
+		}
+	}
+}

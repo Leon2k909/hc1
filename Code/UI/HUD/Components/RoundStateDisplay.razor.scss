@@ -1,0 +1,39 @@
+@import "/UI/Styles/Theme.scss";
+
+RoundStateDisplay
+{
+    font-weight: bold;
+    color: white;
+    font-family: $main-font;
+    flex-direction: column;
+    flex-grow: 1;
+
+    div
+    {
+        flex-grow: 1;
+    }
+
+    .status
+    {
+        color: rgba( 255, 255, 255, 0.75 );
+        text-align: center;
+    }
+
+    .timer
+    {
+        font-size: 10px;
+    }
+
+    .grow
+    {
+        width: 100%;
+    }
+
+    .hc-badge
+    {
+        font-size: 8px;
+        font-weight: bold;
+        color: rgb( 220, 80, 60 );
+        letter-spacing: 1px;
+    }
+}

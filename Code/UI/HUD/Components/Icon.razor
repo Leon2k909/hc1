@@ -1,0 +1,32 @@
+﻿@namespace Facepunch.UI
+@inherits Panel
+@attribute [StyleSheet]
+
+<root style="@BuildStyle()">
+</root>
+
+@code
+{
+    public string File { get; set; }
+    public int Size { get; set; }
+    public string Tint { get; set; }
+    public string Transform { get; set; }
+
+    protected override int BuildHash()
+    {
+        return HashCode.Combine(File, Size, Tint, Transform);
+    }
+
+    private string BuildStyle()
+    {
+        var style = $"width: {Size}px; height: {Size}px; background-image: url( {File} );";
+
+        if ( !string.IsNullOrWhiteSpace( Tint ) )
+            style += $" background-tint: {Tint};";
+
+        if ( !string.IsNullOrWhiteSpace( Transform ) )
+            style += $" transform: {Transform};";
+
+        return style;
+    }
+}

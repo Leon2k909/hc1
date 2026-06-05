@@ -1,0 +1,25 @@
+@namespace Facepunch.UI
+@inherits Panel
+@attribute [StyleSheet]
+
+<root class="@(Selected ? "selected" : "")">
+    <div class="background" style="background-image: url( @Map.GetMetadata( "Image", null ) )">
+        <div class="grow" />
+    </div>
+
+    <div class="header">
+        <label class="vital uppercase emphasis">@Map.GetMetadata( "Title" )</label>
+    </div>
+</root>
+
+@code
+{
+    public SceneFile Map { get; set; }
+    public Action<SceneFile> OnSelected { get; set; }
+    public bool Selected { get; set; }
+
+    protected override void OnClick( MousePanelEvent e )
+    {
+        OnSelected?.Invoke( Map );
+    }
+}

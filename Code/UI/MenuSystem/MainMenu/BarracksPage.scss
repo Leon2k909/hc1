@@ -1,0 +1,81 @@
+/* ================================================================
+   Barracks Page  —  wrapper for EmblemEditor and future sections
+   ================================================================ */
+
+BarracksPage {
+    /* panel itself takes no space — root child fills */
+}
+
+.barracks-page {
+    position: absolute;
+    left: 0; right: 0; top: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba( 10, 10, 10, 0.97 );
+}
+
+/* ── Top-bar ─────────────────────────────────────────────────── */
+
+.barracks-topbar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 32px;
+    height: 56px;
+    background-color: rgba( 0, 0, 0, 0.6 );
+    border-bottom: 1px solid rgba( 255, 255, 255, 0.08 );
+    flex-shrink: 0;
+}
+
+.barracks-back {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    color: rgba( 255, 255, 255, 0.65 );
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    cursor: pointer;
+    width: 120px;
+
+    i {
+        font-size: 18px;
+    }
+
+    &:hover {
+        color: white;
+    }
+}
+
+.barracks-title {
+    flex-grow: 1;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 6px;
+    color: white;
+}
+
+.barracks-topbar-spacer {
+    width: 120px;
+}
+
+/* ── Body ────────────────────────────────────────────────────── */
+
+.barracks-body {
+    flex-grow: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Let EmblemEditor fill the body completely */
+.barracks-body EmblemEditor {
+    position: absolute;
+    left: 0; right: 0; top: 0; bottom: 0;
+}
+
+/* Hide EmblemEditor's own header since BarracksPage provides one */
+.barracks-body .emblem-editor .header {
+    display: none;
+}

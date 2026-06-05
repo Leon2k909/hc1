@@ -1,0 +1,235 @@
+/* ================================================================
+   End-of-Match Screen  —  CoD-style post-game overlay
+   ================================================================ */
+
+EndOfMatchScreen {
+    /* Panel takes up no space; the inner .eom-screen is the overlay */
+}
+
+.eom-screen {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba( 0, 0, 0, 0.88 );
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 32px 48px;
+    z-index: 100;
+}
+
+/* ── Result colour themes ──────────────────────────────────────── */
+
+.eom-screen.victory .eom-result-label  { color: #00e87a; text-shadow: 0 0 40px rgba(0, 232, 122, 0.55); }
+.eom-screen.defeat  .eom-result-label  { color: #ff3b3b; text-shadow: 0 0 40px rgba(255, 59, 59, 0.55); }
+.eom-screen.draw    .eom-result-label  { color: #c0c0c0; text-shadow: 0 0 24px rgba(192, 192, 192, 0.4); }
+
+.eom-screen.victory { border-top: 3px solid #00e87a; }
+.eom-screen.defeat  { border-top: 3px solid #ff3b3b; }
+.eom-screen.draw    { border-top: 3px solid #888; }
+
+/* ── Header ────────────────────────────────────────────────────── */
+
+.eom-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.eom-result-label {
+    font-size: 72px;
+    font-weight: 900;
+    letter-spacing: 12px;
+    color: white;
+}
+
+.eom-team-scores {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    font-size: 40px;
+    font-weight: 800;
+}
+
+.eom-dash {
+    color: rgba( 255, 255, 255, 0.35 );
+    font-size: 28px;
+}
+
+.eom-mode-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: rgba( 255, 255, 255, 0.45 );
+    margin-top: 2px;
+}
+
+/* ── Scoreboard ─────────────────────────────────────────────────── */
+
+.eom-table-wrap {
+    display: flex;
+    flex-direction: column;
+    width: 820px;
+    background-color: rgba( 255, 255, 255, 0.04 );
+    border: 1px solid rgba( 255, 255, 255, 0.08 );
+}
+
+.eom-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 7px 14px;
+    border-bottom: 1px solid rgba( 255, 255, 255, 0.05 );
+}
+
+.eom-table-header {
+    background-color: rgba( 0, 0, 0, 0.35 );
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: rgba( 255, 255, 255, 0.45 );
+}
+
+.eom-row.is-local {
+    background-color: rgba( 255, 255, 255, 0.07 );
+}
+
+.eom-row.is-local .col-name {
+    color: #ffe066;
+    font-weight: 800;
+}
+
+.eom-row.is-mvp .col-mvp {
+    color: #ffd700;
+}
+
+/* Column widths */
+.col-mvp  { width: 22px; font-size: 14px; color: transparent; flex-shrink: 0; }
+.col-name { flex-grow: 1; font-size: 14px; font-weight: 600; color: white; }
+.col-stat { width: 72px; text-align: center; font-size: 13px; color: rgba( 255, 255, 255, 0.75 ); font-variant-numeric: tabular-nums; }
+
+/* ── XP Section ─────────────────────────────────────────────────── */
+
+.eom-xp-section {
+    display: flex;
+    flex-direction: column;
+    width: 820px;
+    gap: 8px;
+    background-color: rgba( 255, 255, 255, 0.04 );
+    border: 1px solid rgba( 255, 255, 255, 0.08 );
+    padding: 16px 20px;
+}
+
+.eom-xp-info-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+}
+
+.eom-xp-earned {
+    font-size: 22px;
+    font-weight: 900;
+    color: #ffe066;
+    letter-spacing: 1px;
+}
+
+.eom-win-bonus {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: rgba( 0, 232, 122, 0.85 );
+    background-color: rgba( 0, 232, 122, 0.12 );
+    padding: 2px 8px;
+}
+
+.eom-level-up-badge {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #fff;
+    background-color: rgba( 255, 160, 0, 0.85 );
+    padding: 2px 10px;
+}
+
+.eom-bar-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
+
+.eom-lv-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba( 255, 255, 255, 0.55 );
+    width: 36px;
+}
+
+.eom-level-bar {
+    flex-grow: 1;
+    height: 10px;
+    background-color: rgba( 255, 255, 255, 0.1 );
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+}
+
+.eom-bar-old {
+    height: 100%;
+    background-color: rgba( 255, 255, 255, 0.25 );
+    flex-shrink: 0;
+}
+
+.eom-bar-new {
+    height: 100%;
+    background-color: #ffe066;
+    flex-shrink: 0;
+}
+
+/* ── Footer ─────────────────────────────────────────────────────── */
+
+.eom-footer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 24px;
+    width: 820px;
+    justify-content: flex-end;
+}
+
+.eom-continue-btn {
+    background-color: white;
+    color: black;
+    padding: 10px 36px;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: background-color 0.1s;
+}
+
+.eom-continue-btn:hover {
+    background-color: rgba( 255, 255, 255, 0.8 );
+}
+
+.eom-timer-label {
+    font-size: 18px;
+    font-weight: 800;
+    color: rgba( 255, 255, 255, 0.5 );
+    width: 40px;
+    text-align: right;
+}
+
+.eom-timer-s {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba( 255, 255, 255, 0.35 );
+    margin-left: 1px;
+}

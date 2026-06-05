@@ -1,0 +1,266 @@
+{
+  "RootObject": {
+    "__guid": "0f6d3d36-b5f5-4c37-9161-8fa3e3b51d10",
+    "__version": 2,
+    "Flags": 0,
+    "Name": "hc1_combat_bot",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Tags": "hc1_lightweight_bot,npc,player",
+    "Enabled": true,
+    "NetworkMode": 2,
+    "NetworkFlags": 0,
+    "NetworkOrphaned": 0,
+    "NetworkTransmit": true,
+    "OwnerTransfer": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.NavMeshAgent",
+        "__guid": "db635ad4-628e-44d4-a774-49c187878721",
+        "__enabled": true,
+        "Flags": 0,
+        "Acceleration": 250,
+        "AllowDefaultArea": true,
+        "AllowedAreas": [],
+        "AutoTraverseLinks": true,
+        "ForbiddenAreas": [],
+        "Height": 64,
+        "MaxSpeed": 180,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Radius": 24,
+        "Separation": 1.25,
+        "UpdatePosition": true,
+        "UpdateRotation": false
+      },
+      {
+        "__type": "Facepunch.HealthComponent",
+        "__guid": "bdcf0a10-20a4-4f9b-9f06-96f6e1ab8c10",
+        "__enabled": true,
+        "Flags": 0,
+        "IsGodMode": false,
+        "MaxHealth": 100,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "OnHealthChanged": null
+      },
+      {
+        "__type": "Facepunch.LightweightCombatBot",
+        "__guid": "23e3dfeb-318e-4975-a905-3ad887a6012c",
+        "__enabled": true,
+        "Flags": 0,
+        "Agent": {
+          "_type": "component",
+          "component_id": "db635ad4-628e-44d4-a774-49c187878721",
+          "go": "0f6d3d36-b5f5-4c37-9161-8fa3e3b51d10",
+          "component_type": "NavMeshAgent"
+        },
+        "AimError": 140,
+        "AttackRange": 1200,
+        "BotName": "Raven",
+        "Damage": 10,
+        "FireInterval": 0.55,
+        "HealthComponent": {
+          "_type": "component",
+          "component_id": "bdcf0a10-20a4-4f9b-9f06-96f6e1ab8c10",
+          "go": "0f6d3d36-b5f5-4c37-9161-8fa3e3b51d10",
+          "component_type": "HealthComponent"
+        },
+        "MoveSpeed": 180,
+        "MuzzleFlashPrefab": "prefabs/weapon_effects/rifle_muzzleflash.prefab",
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "PatrolRadius": 900,
+        "PreferredRange": 900,
+        "RealPlayerDamageScale": 0.25,
+        "Renderer": {
+          "_type": "component",
+          "component_id": "ce1ba59d-ce66-4bc7-ae07-cbc8eb04e737",
+          "go": "90c80eef-fbde-41f0-b22f-1b326e25cfb1",
+          "component_type": "SkinnedModelRenderer"
+        },
+        "ShootSound": "sounds/weapons/m4a1/m4_shot.sound",
+        "SightRange": 2600,
+        "Team": "Unassigned",
+        "TracerEffectPrefab": "weapons/common/effects/tracer_9mm.prefab",
+        "WeaponWorldModelPrefab": "weapons/m4a1/wm_m4a1.prefab"
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "90c80eef-fbde-41f0-b22f-1b326e25cfb1",
+        "__version": 2,
+        "Flags": 0,
+        "Name": "citizen",
+        "Position": "0,0,0",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Tags": "",
+        "Enabled": true,
+        "NetworkMode": 2,
+        "NetworkFlags": 0,
+        "NetworkOrphaned": 0,
+        "NetworkTransmit": true,
+        "OwnerTransfer": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.SkinnedModelRenderer",
+            "__guid": "ce1ba59d-ce66-4bc7-ae07-cbc8eb04e737",
+            "__enabled": true,
+            "Flags": 0,
+            "AnimationGraph": null,
+            "BodyGroups": 65,
+            "BoneMergeTarget": null,
+            "CreateAttachments": false,
+            "CreateBoneObjects": true,
+            "LodOverride": null,
+            "MaterialGroup": "default",
+            "MaterialOverride": null,
+            "Materials": null,
+            "Model": "models/citizen/citizen.vmdl",
+            "Morphs": {},
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "Parameters": {
+              "bools": {},
+              "ints": {},
+              "floats": {},
+              "vectors": {},
+              "rotations": {}
+            },
+            "PlaybackRate": 1,
+            "RenderOptions": {
+              "GameLayer": true,
+              "OverlayLayer": false,
+              "BloomLayer": false,
+              "AfterUILayer": false
+            },
+            "RenderType": "On",
+            "Sequence": {
+              "Name": null,
+              "Looping": true,
+              "Blending": false
+            },
+            "Tint": "1,1,1,1",
+            "UseAnimGraph": true
+          },
+          {
+            "__type": "Sandbox.ModelHitboxes",
+            "__guid": "dd9a52c0-f8c8-4bec-884b-7a8988025501",
+            "__enabled": true,
+            "Flags": 0,
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "Renderer": {
+              "_type": "component",
+              "component_id": "ce1ba59d-ce66-4bc7-ae07-cbc8eb04e737",
+              "go": "90c80eef-fbde-41f0-b22f-1b326e25cfb1",
+              "component_type": "SkinnedModelRenderer"
+            },
+            "Target": {
+              "_type": "gameobject",
+              "go": "0f6d3d36-b5f5-4c37-9161-8fa3e3b51d10"
+            }
+          },
+          {
+            "__type": "Sandbox.Dresser",
+            "__guid": "5f31d428-3218-451a-a579-b9e17333ab6d",
+            "__enabled": true,
+            "Flags": 0,
+            "ApplyHeightScale": true,
+            "BodyTarget": {
+              "_type": "component",
+              "component_id": "ce1ba59d-ce66-4bc7-ae07-cbc8eb04e737",
+              "go": "90c80eef-fbde-41f0-b22f-1b326e25cfb1",
+              "component_type": "SkinnedModelRenderer"
+            },
+            "Clothing": [
+              {
+                "Clothing": "models/citizen_clothes/shoes/boots/black_boots.clothing"
+              },
+              {
+                "Clothing": "models/citizen_clothes/shirt/army_shirt/army_shirt.clothing"
+              },
+              {
+                "Clothing": "models/citizen_clothes/trousers/cargopants/cargo_pants_army.clothing"
+              },
+              {
+                "Clothing": "models/citizen_clothes/hat/balaclava/balaclava.clothing"
+              },
+              {
+                "Clothing": "models/citizen_clothes/vest/tactical_vest/models/tactical_vest.clothing"
+              }
+            ],
+            "ManualAge": 0.65923566,
+            "ManualHeight": 0.5,
+            "ManualTint": 0.06687898,
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "RemoveUnownedItems": true,
+            "Source": "Manual",
+            "WorkshopItems": []
+          }
+        ],
+        "Children": []
+      }
+    ],
+    "__variables": [],
+    "__properties": {
+      "FixedUpdateFrequency": 50,
+      "MaxFixedUpdates": 5,
+      "NetworkFrequency": 30,
+      "NetworkInterpolation": true,
+      "PhysicsSubSteps": 1,
+      "ThreadedAnimation": true,
+      "TimeScale": 1,
+      "UseFixedUpdate": true,
+      "Metadata": {},
+      "NavMesh": {
+        "Enabled": false,
+        "IncludeStaticBodies": true,
+        "IncludeKeyframedBodies": true,
+        "EditorAutoUpdate": true,
+        "AgentHeight": 64,
+        "AgentRadius": 16,
+        "AgentStepSize": 18,
+        "AgentMaxSlope": 40,
+        "ExcludedBodies": "",
+        "IncludedBodies": ""
+      }
+    }
+  },
+  "ShowInMenu": false,
+  "MenuPath": null,
+  "MenuIcon": null,
+  "DontBreakAsTemplate": false,
+  "ResourceVersion": 1,
+  "__references": [
+    "facepunch.w_m4a1#60166"
+  ],
+  "__version": 1
+}

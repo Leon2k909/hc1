@@ -1,0 +1,101 @@
+@import "/UI/Styles/Theme.scss";
+
+WeaponTuningPanel
+{
+	flex-direction: column;
+	gap: 6px;
+	width: 600px;
+	max-width: 600px;
+	background-color: rgba( black, 0.45 );
+	border-radius: $rounding;
+	padding: 10px 14px;
+
+	.tuning-title
+	{
+		font-size: 14px;
+		letter-spacing: 1.5px;
+		color: rgba( white, 0.55 );
+		margin-bottom: 4px;
+		text-align: center;
+	}
+
+	.tuning-row
+	{
+		flex-direction: row;
+		align-items: center;
+		gap: 6px;
+
+		.stat-name
+		{
+			font-size: 13px;
+			width: 95px;
+			color: rgba( white, 0.75 );
+			white-space: nowrap;
+		}
+
+		.bar-wrap
+		{
+			flex-grow: 1;
+			flex-shrink: 0;
+			width: 320px;
+			height: 5px;
+			background-color: rgba( white, 0.12 );
+			border-radius: 2px;
+			overflow: visible;
+			flex-direction: row;
+
+			.bar-fill
+			{
+				height: 100%;
+				border-radius: 2px;
+				transition: width 0.1s ease;
+
+				&.positive { background-color: rgba( 100, 220, 100, 0.9 ); }
+				&.negative { background-color: rgba( 220, 100, 100, 0.9 ); }
+			}
+		}
+
+		.controls
+		{
+			flex-direction: row;
+			align-items: center;
+			width: 95px;
+			flex-shrink: 0;
+			gap: 4px;
+
+			.btn
+			{
+				width: 22px;
+				height: 22px;
+				background-color: rgba( white, 0.12 );
+				border-radius: 3px;
+				align-items: center;
+				justify-content: center;
+				font-size: 16px;
+				cursor: pointer;
+				pointer-events: all;
+				color: white;
+
+				&:hover { background-color: rgba( white, 0.25 ); }
+			}
+
+			.val
+			{
+				font-size: 14px;
+				width: 36px;
+				text-align: center;
+				font-weight: bold;
+
+				&.pos  { color: rgba( 100, 220, 100, 1 ); }
+				&.neg  { color: rgba( 220, 100, 100, 1 ); }
+				&.zero { color: rgba( white, 0.4 ); }
+			}
+		}
+	}
+
+	.reset-row
+	{
+		margin-top: 4px;
+		align-items: center;
+	}
+}

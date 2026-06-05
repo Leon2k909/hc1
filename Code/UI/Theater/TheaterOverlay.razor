@@ -1,0 +1,99 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using Facepunch;
+
+@inherits Panel
+@attribute [StyleSheet]
+@namespace Facepunch.UI
+
+<root class="hc1 theater-overlay">
+    @if ( Controller == null || Controller.Player == null )
+    {
+        return;
+    }
+
+    <div class="theater-top">
+        <div class="btn exit" onclick=@ExitTheater>
+            <i>exit_to_app</i>
+            <label>EXIT</label>
+        </div>
+        <div class="cam-info">
+            <label>CAMERA:</label>
+            <label class="val">@(Controller.IsFreecam ? "FREECAM" : "PLAYER")</label>
+        </div>
+    </div>
+
+    <div class="theater-bottom">
+        <div class="controls">
+            <div class="btn-group">
+                <div class="btn icon" onclick=@(() => Speed = 0.5f)><i>fast_rewind</i></div>
+                <div class="btn icon" onclick=@TogglePlay>
+                    <i>@(IsPlaying ? "pause" : "play_arrow")</i>
+                </div>
+                <div class="btn icon" onclick=@(() => Speed = 2.0f)><i>fast_forward</i></div>
+                <div class="btn icon" onclick=@(() => Speed = 1.0f)><i>restore</i></div>
+            </div>
+
+            <div class="timeline">
+                <label>@(FormattedTime(CurrentTime))</label>
+                <div class="timeline-track">
+                    <div class="timeline-fill" style="width: @(Progress * 100)%"></div>
+                </div>
+                <label>@(FormattedTime(Duration))</label>
+            </div>
+        </div>
+    </div>
+</root>
+
+@code
+{
+    public TheaterController Controller { get; set; }
+
+    private float Speed { get; set; } = 1.0f;
+    private bool IsPlaying => Speed > 0f;
+    
+    private float CurrentTime => Controller?.CurrentTime ?? 0f;
+    private float Duration => Controller?.Duration ?? 0f;
+    private float Progress => Duration > 0 ? CurrentTime / Duration : 0f;
+
+    protected override void OnAfterTreeRender( bool firstTime )
+    {
+        if ( firstTime )
+        {
+            Controller = Game.ActiveScene.GetAllComponents<TheaterController>().FirstOrDefault();
+        }
+    }
+
+    public override void Tick()
+    {
+        if ( Controller?.Player != null )
+        {
+            // Update time scale based on speed
+            Game.ActiveScene.TimeScale = Speed;
+        }
+    }
+
+    void TogglePlay()
+    {
+        if ( Speed > 0f )
+            Speed = 0f;
+        else
+            Speed = 1.0f;
+    }
+
+    void ExitTheater()
+    {
+        Game.ActiveScene.TimeScale = 1.0f;
+        var scene = ResourceLibrary.Get<SceneFile>( "scenes/menu.scene" );
+        if ( scene != null )
+        {
+            Game.ActiveScene.Load( scene );
+        }
+    }
+
+    string FormattedTime( float seconds )
+    {
+        var ts = System.TimeSpan.FromSeconds( seconds );
+        return ts.ToString( @"mm\:ss" );
+    }
+}

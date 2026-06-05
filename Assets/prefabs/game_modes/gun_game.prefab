@@ -1,0 +1,301 @@
+{
+  "RootObject": {
+    "__guid": "a1b2c3d4-e5f6-7890-abcd-ef1234567891",
+    "Flags": 0,
+    "Name": "gun_game",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Facepunch.GameMode",
+        "__guid": "a1b2c3d4-e5f6-7890-abcd-ef1234567892",
+        "Description": "Progress through weapon tiers by getting kills. First to complete all tiers wins!",
+        "Ident": "gun_game",
+        "MaxBalance": 0,
+        "Title": "Gun Game",
+        "UnlimitedMoney": false
+      },
+      {
+        "__type": "Facepunch.GunGameManager",
+        "__guid": "a1b2c3d4-e5f6-7890-abcd-ef1234567893",
+        "KnifeKillsDemote": true,
+        "KnifeResource": "weapons/knife/knife.equip",
+        "WeaponProgression": [
+          "weapons/usp/usp.equip",
+          "weapons/colt1911/colt1911.equip",
+          "weapons/usp_sd/usp_sd.equip",
+          "weapons/mp5/mp5.equip",
+          "weapons/m700/M700.equip",
+          "weapons/m4a1/m4a1.equip",
+          "weapons/knife/knife.equip"
+        ]
+      },
+      {
+        "__type": "Facepunch.GunGameRespawner",
+        "__guid": "a1b2c3d4-e5f6-7890-abcd-ef1234567894"
+      },
+      {
+        "__type": "Facepunch.BotManager",
+        "__guid": "a1b2c3d4-e5f6-7890-abcd-ef1234567895"
+      },
+      {
+        "__type": "Facepunch.PlayerRagdollBehavior",
+        "__guid": "a1b2c3d4-e5f6-7890-abcd-ef1234567896",
+        "DestroyTime": 10
+      },
+      {
+        "__type": "Facepunch.DamageTracker",
+        "__guid": "a1b2c3d4-e5f6-7890-abcd-ef1234567897",
+        "ClearBetweenRounds": true,
+        "ClearOnRespawn": true
+      },
+      {
+        "__type": "Facepunch.WeaponStatsRule",
+        "__guid": "a1b2c3d4-e5f6-7890-abcd-ef1234567898"
+      },
+      {
+        "__type": "Facepunch.PlayerStatsRule",
+        "__guid": "a1b2c3d4-e5f6-7890-abcd-ef1234567899"
+      },
+      {
+        "__type": "Facepunch.BotFillRule",
+        "__guid": "a1b2c3d4-e5f6-7890-abcd-ef123456789a",
+        "MinPlayerCount": 10
+      },
+      {
+        "__type": "Facepunch.RandomSpawnAssigner",
+        "__guid": "a1b2c3d4-e5f6-7890-abcd-ef123456789b",
+        "MinEnemyDistance": 512,
+        "SkipLineOfSightTestDistance": 2048,
+        "SpawnTags": ""
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "a1b2c3d4-e5f6-7890-abcd-ef123456789c",
+        "Flags": 0,
+        "Name": "States",
+        "Enabled": true,
+        "NetworkMode": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.Events.StateMachineComponent",
+            "__guid": "a1b2c3d4-e5f6-7890-abcd-ef123456789d",
+            "CurrentState": {
+              "_type": "component",
+              "component_id": "a1b2c3d4-e5f6-7890-abcd-ef12345678a0",
+              "go": "a1b2c3d4-e5f6-7890-abcd-ef12345678a1",
+              "component_type": "StateComponent"
+            }
+          }
+        ],
+        "Children": [
+          {
+            "__guid": "a1b2c3d4-e5f6-7890-abcd-ef12345678a1",
+            "Flags": 0,
+            "Name": "Waiting",
+            "Enabled": true,
+            "NetworkMode": 1,
+            "Components": [
+              {
+                "__type": "Sandbox.Events.StateComponent",
+                "__guid": "a1b2c3d4-e5f6-7890-abcd-ef12345678a0",
+                "DefaultDuration": 60,
+                "DefaultNextState": {
+                  "_type": "component",
+                  "component_id": "a1b2c3d4-e5f6-7890-abcd-ef12345678b0",
+                  "go": "a1b2c3d4-e5f6-7890-abcd-ef12345678b1",
+                  "component_type": "StateComponent"
+                }
+              },
+              {
+                "__type": "Facepunch.WaitForPlayers",
+                "__guid": "a1b2c3d4-e5f6-7890-abcd-ef12345678a2",
+                "MinPlayerCount": 1,
+                "SkipPlayerCount": 10
+              },
+              {
+                "__type": "Facepunch.ShowStatusText",
+                "__guid": "a1b2c3d4-e5f6-7890-abcd-ef12345678a3",
+                "BothTeams": true,
+                "StatusText": "Waiting",
+                "Team": "Unassigned"
+              },
+              {
+                "__type": "Facepunch.ShowCountDown",
+                "__guid": "a1b2c3d4-e5f6-7890-abcd-ef12345678a4"
+              },
+              {
+                "__type": "Facepunch.PlayerAutoRespawner",
+                "__guid": "a1b2c3d4-e5f6-7890-abcd-ef12345678a5",
+                "AllowSpectatorsToSpawn": true,
+                "RespawnDelaySeconds": 3
+              }
+            ]
+          },
+          {
+            "__guid": "a1b2c3d4-e5f6-7890-abcd-ef12345678b1",
+            "Flags": 0,
+            "Name": "Preparing",
+            "Enabled": true,
+            "NetworkMode": 1,
+            "Components": [
+              {
+                "__type": "Sandbox.Events.StateComponent",
+                "__guid": "a1b2c3d4-e5f6-7890-abcd-ef12345678b0",
+                "DefaultDuration": 5,
+                "DefaultNextState": {
+                  "_type": "component",
+                  "component_id": "a1b2c3d4-e5f6-7890-abcd-ef12345678c0",
+                  "go": "a1b2c3d4-e5f6-7890-abcd-ef12345678c1",
+                  "component_type": "StateComponent"
+                }
+              },
+              {
+                "__type": "Facepunch.ShowCountDown",
+                "__guid": "a1b2c3d4-e5f6-7890-abcd-ef12345678b2"
+              },
+              {
+                "__type": "Facepunch.ShowStatusText",
+                "__guid": "a1b2c3d4-e5f6-7890-abcd-ef12345678b3",
+                "BothTeams": true,
+                "StatusText": "Starting",
+                "Team": "Unassigned"
+              },
+              {
+                "__type": "Facepunch.ShowToast",
+                "__guid": "a1b2c3d4-e5f6-7890-abcd-ef12345678b4",
+                "Message": "Gun Game starting...",
+                "Type": "Generic"
+              },
+              {
+                "__type": "Facepunch.FreezePlayers",
+                "__guid": "a1b2c3d4-e5f6-7890-abcd-ef12345678b5"
+              }
+            ]
+          },
+          {
+            "__guid": "a1b2c3d4-e5f6-7890-abcd-ef12345678c1",
+            "Flags": 0,
+            "Name": "Play Game",
+            "Enabled": true,
+            "NetworkMode": 1,
+            "Components": [
+              {
+                "__type": "Sandbox.Events.StateComponent",
+                "__guid": "a1b2c3d4-e5f6-7890-abcd-ef12345678c0",
+                "DefaultDuration": 900,
+                "DefaultNextState": {
+                  "_type": "component",
+                  "component_id": "a1b2c3d4-e5f6-7890-abcd-ef12345678e0",
+                  "go": "a1b2c3d4-e5f6-7890-abcd-ef12345678e1",
+                  "component_type": "StateComponent"
+                }
+              },
+              {
+                "__type": "Facepunch.ShowStatusText",
+                "__guid": "a1b2c3d4-e5f6-7890-abcd-ef12345678c2",
+                "BothTeams": true,
+                "StatusText": "Gun Game",
+                "Team": "Unassigned"
+              },
+              {
+                "__type": "Facepunch.PlayRadio",
+                "__guid": "a1b2c3d4-e5f6-7890-abcd-ef12345678c3",
+                "BothTeams": true,
+                "Sound": "RoundStarted",
+                "Team": "Terrorist"
+              },
+              {
+                "__type": "Facepunch.PlaySound",
+                "__guid": "a1b2c3d4-e5f6-7890-abcd-ef12345678c4",
+                "SoundEvent": "sounds/music/round_intro/round_start.sound"
+              },
+              {
+                "__type": "Facepunch.ShowCountDown",
+                "__guid": "a1b2c3d4-e5f6-7890-abcd-ef12345678c5"
+              },
+              {
+                "__type": "ResetScores",
+                "__guid": "a1b2c3d4-e5f6-7890-abcd-ef12345678c6"
+              },
+              {
+                "__type": "Facepunch.RespawnPlayers",
+                "__guid": "a1b2c3d4-e5f6-7890-abcd-ef12345678c7",
+                "ForceNew": false
+              },
+              {
+                "__type": "Facepunch.PlayerAutoRespawner",
+                "__guid": "a1b2c3d4-e5f6-7890-abcd-ef12345678c8",
+                "AllowSpectatorsToSpawn": true,
+                "RespawnDelaySeconds": 3
+              },
+              {
+                "__type": "Facepunch.SpawnProtection",
+                "__guid": "a1b2c3d4-e5f6-7890-abcd-ef12345678c9",
+                "MaxDurationSeconds": 5
+              }
+            ]
+          },
+          {
+            "__guid": "a1b2c3d4-e5f6-7890-abcd-ef12345678e1",
+            "Flags": 0,
+            "Name": "Game Over",
+            "Enabled": true,
+            "NetworkMode": 1,
+            "Components": [
+              {
+                "__type": "Sandbox.Events.StateComponent",
+                "__guid": "a1b2c3d4-e5f6-7890-abcd-ef12345678e0",
+                "DefaultDuration": 10
+              },
+              {
+                "__type": "Facepunch.ShowStatusText",
+                "__guid": "a1b2c3d4-e5f6-7890-abcd-ef12345678e2",
+                "BothTeams": true,
+                "StatusText": "Game Over",
+                "Team": "Unassigned"
+              },
+              {
+                "__type": "Facepunch.FreezePlayers",
+                "__guid": "a1b2c3d4-e5f6-7890-abcd-ef12345678e3"
+              },
+              {
+                "__type": "Facepunch.StartMapVotingOnEnd",
+                "__guid": "a1b2c3d4-e5f6-7890-abcd-ef12345678e4"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "__variables": [
+      {
+        "Id": "Description",
+        "Title": "Description",
+        "Targets": [
+          {
+            "Id": "a1b2c3d4-e5f6-7890-abcd-ef1234567892",
+            "Property": "Description"
+          }
+        ]
+      },
+      {
+        "Id": "Title",
+        "Title": "Title",
+        "Targets": [
+          {
+            "Id": "a1b2c3d4-e5f6-7890-abcd-ef1234567892",
+            "Property": "Title"
+          }
+        ]
+      }
+    ]
+  },
+  "ShowInMenu": false,
+  "MenuPath": null,
+  "MenuIcon": null,
+  "ResourceVersion": 1,
+  "__references": [],
+  "__version": 1
+}

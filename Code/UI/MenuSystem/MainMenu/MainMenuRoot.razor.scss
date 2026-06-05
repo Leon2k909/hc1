@@ -1,0 +1,240 @@
+@import "/UI/Styles/Theme.scss";
+
+/* ================================================================
+   Global shell — root + persistent nav bar
+   ================================================================ */
+
+.main-menu-root {
+    position: absolute;
+    left: 0; right: 0; top: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── Global nav bar ─────────────────────────────────────────── */
+
+.global-nav {
+    height: 56px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 20px 0 16px;
+    background-color: rgba( 0, 0, 0, 0.75 );
+    border-bottom: 1px solid rgba( 255, 255, 255, 0.07 );
+    z-index: 200;
+}
+
+/* Logo */
+.gnav-logo {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    width: 160px;
+    flex-shrink: 0;
+    cursor: pointer;
+    opacity: 0.9;
+
+    img { width: 40px; height: 22px; }
+
+    &:hover { opacity: 1; }
+}
+
+.gnav-logo-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.gnav-game-name {
+    font-size: 15px;
+    font-weight: 900;
+    color: white;
+    letter-spacing: 4px;
+    font-family: $main-font;
+}
+
+.gnav-game-sub {
+    font-size: 8px;
+    font-weight: 700;
+    color: #FF7A1A;
+    letter-spacing: 4px;
+}
+
+/* Centre tabs */
+.gnav-items {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    justify-content: center;
+    gap: 4px;
+}
+
+.gnav-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 14px;
+    color: rgba( 255, 255, 255, 0.5 );
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    cursor: pointer;
+    font-family: $main-font;
+    border-bottom: 2px solid transparent;
+
+    i { font-size: 16px; }
+
+    &:hover {
+        color: rgba( 255, 255, 255, 0.9 );
+    }
+
+    &.active {
+        color: white;
+        border-bottom-color: #FF7A1A;
+    }
+}
+
+/* Nav tabs + bumper wrapper — keeps LB/RB snug against the tabs */
+.gnav-tabs-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-grow: 1;
+    justify-content: center;
+    gap: 6px;
+}
+
+/* gnav-items does NOT flex-grow when inside the group
+   so the bumpers stay adjacent to the tabs */
+.gnav-tabs-group .gnav-items {
+    flex-grow: 0;
+}
+
+/* Xbox-style LB / RB pill buttons */
+.gnav-ctrl-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 26px;
+    height: 20px;
+    padding: 2px 6px 0 6px; /* Added 2px top padding to visually center the text */
+    background-color: rgba( 255, 255, 255, 0.1 );
+    border: 1.5px solid rgba( 255, 255, 255, 0.35 );
+    border-radius: 4px;
+    flex-shrink: 0;
+    cursor: pointer;
+    font-size: 9px;
+    font-weight: 900;
+    color: rgba( 255, 255, 255, 0.75 );
+    letter-spacing: 0.5px;
+    font-family: $main-font;
+    transition: all 0.1s ease;
+
+    &:hover {
+        background-color: rgba( 255, 255, 255, 0.2 );
+        color: white;
+        border-color: rgba( 255, 255, 255, 0.6 );
+    }
+
+    &:active {
+        transform: scale( 0.88 );
+        background-color: rgba( 255, 122, 26, 0.3 );
+        border-color: #FF7A1A;
+        color: #FF7A1A;
+    }
+}
+
+/* Right cluster */
+.gnav-right {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    width: 264px;
+    flex-shrink: 0;
+    justify-content: flex-end;
+}
+
+.gnav-icon-btn {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba( 255, 255, 255, 0.5 );
+    background-color: transparent;
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    flex-shrink: 0;
+
+    i { font-size: 20px; }
+
+    &:hover {
+        color: white;
+        background-color: rgba( 255, 255, 255, 0.08 );
+    }
+}
+
+.gnav-profile {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    cursor: pointer;
+    border: 1px solid transparent;
+
+    &:hover { border-color: rgba( 255, 255, 255, 0.12 ); }
+}
+
+.gnav-profile-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1px;
+}
+
+.gnav-profile-name {
+    font-size: 11px;
+    font-weight: 800;
+    color: white;
+    letter-spacing: 1px;
+    font-family: $main-font;
+}
+
+.gnav-profile-level {
+    font-size: 9px;
+    font-weight: 700;
+    color: #FF7A1A;
+    letter-spacing: 2px;
+}
+
+.gnav-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 2px;
+    object-fit: cover;
+}
+
+.gnav-avatar-placeholder {
+    width: 32px;
+    height: 32px;
+    background-color: rgba( 255, 255, 255, 0.1 );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    i { font-size: 20px; color: rgba(255,255,255,0.5); }
+}
+
+/* ── Navigator canvas (page area below nav) ──────────────────── */
+
+.navigator-canvas {
+    flex-grow: 1;
+    position: relative;
+    overflow: hidden;
+}

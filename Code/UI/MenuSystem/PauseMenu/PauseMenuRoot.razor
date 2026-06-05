@@ -1,0 +1,22 @@
+@using Sandbox.Menu
+@using Sandbox.UI;
+@using Sandbox.UI.Navigation;
+
+@inherits NavigationHost
+@namespace Facepunch.UI
+
+<root>
+    <div class="background" />
+
+    <div class="navigator-canvas" slot="navigator-canvas" />
+</root>
+
+@code
+{
+	public PauseMenuRoot()
+    {
+        DefaultUrl = "/";
+	    AddDestination( "/", typeof( PausePage ) );
+	    AddDestination( "/settings", typeof( SettingsPage ) );
+    }
+}

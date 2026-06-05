@@ -1,0 +1,204 @@
+BugReportPanel
+{
+    &.bug-report-root
+    {
+        display: none;
+        pointer-events: none;
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+        z-index: 999;
+
+        &.open
+        {
+            display: flex;
+            pointer-events: auto;
+        }
+    }
+
+    .bug-report-backdrop
+    {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: rgba( 0, 0, 0, 0.55 );
+        pointer-events: all;
+    }
+
+    .bug-report-modal
+    {
+        position: relative;
+        background-color: rgba( 15, 20, 26, 0.97 );
+        border: 1px solid rgba( 255, 255, 255, 0.1 );
+        border-radius: 6px;
+        padding: 20px;
+        min-width: 420px;
+        max-width: 560px;
+        flex-direction: column;
+        gap: 12px;
+        pointer-events: all;
+    }
+
+    .bug-report-title
+    {
+        font-size: 18px;
+        font-weight: bold;
+        color: #fff;
+        letter-spacing: 0.5px;
+        flex-direction: row;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .tab-row
+    {
+        flex-direction: row;
+        border-bottom: 1px solid rgba( 255, 255, 255, 0.1 );
+        padding-bottom: 8px;
+        gap: 16px;
+        margin-bottom: 4px;
+    }
+
+    .tab
+    {
+        font-size: 15px;
+        font-weight: bold;
+        color: rgba( 255, 255, 255, 0.45 );
+        cursor: pointer;
+        padding: 4px 0;
+        flex-direction: row;
+        gap: 8px;
+        align-items: center;
+
+        &:hover
+        {
+            color: rgba( 255, 255, 255, 0.75 );
+        }
+
+        &.active
+        {
+            color: #ffb400;
+            border-bottom: 2px solid #ffb400;
+        }
+    }
+
+    .admin-badge
+    {
+        font-size: 10px;
+        background-color: rgba( 255, 60, 60, 0.85 );
+        color: #fff;
+        padding: 2px 6px;
+        border-radius: 3px;
+        letter-spacing: 0.5px;
+    }
+
+    .bug-form
+    {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .form-label
+    {
+        font-size: 12px;
+        color: rgba( 255, 255, 255, 0.55 );
+        letter-spacing: 0.3px;
+        margin-top: 4px;
+    }
+
+    textentry
+    {
+        background-color: rgba( 255, 255, 255, 0.07 );
+        border: 1px solid rgba( 255, 255, 255, 0.15 );
+        border-radius: 4px;
+        padding: 6px 10px;
+        color: #fff;
+        font-size: 13px;
+        min-height: 32px;
+
+        &.multiline
+        {
+            min-height: 72px;
+        }
+    }
+
+    .category-row
+    {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .form-actions
+    {
+        flex-direction: row;
+        gap: 8px;
+        justify-content: flex-end;
+        margin-top: 4px;
+    }
+
+    /* Admin list */
+    .bug-report-list
+    {
+        flex-direction: column;
+        gap: 8px;
+        max-height: 360px;
+        overflow-y: scroll;
+    }
+
+    .no-reports
+    {
+        color: rgba( 255, 255, 255, 0.45 );
+        font-size: 13px;
+        text-align: center;
+        padding: 12px 0;
+    }
+
+    .bug-entry
+    {
+        background-color: rgba( 255, 255, 255, 0.05 );
+        border: 1px solid rgba( 255, 255, 255, 0.08 );
+        border-radius: 4px;
+        padding: 8px 12px;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .entry-header
+    {
+        flex-direction: row;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .entry-title
+    {
+        font-weight: bold;
+        font-size: 13px;
+        color: #fff;
+        flex-grow: 1;
+    }
+
+    .entry-category
+    {
+        font-size: 11px;
+        color: rgba( 255, 180, 0, 0.85 );
+        background-color: rgba( 255, 180, 0, 0.1 );
+        padding: 1px 5px;
+        border-radius: 3px;
+    }
+
+    .entry-time
+    {
+        font-size: 11px;
+        color: rgba( 255, 255, 255, 0.35 );
+    }
+
+    .entry-body
+    {
+        font-size: 12px;
+        color: rgba( 255, 255, 255, 0.65 );
+    }
+}

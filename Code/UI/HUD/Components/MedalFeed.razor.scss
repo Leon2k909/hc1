@@ -1,0 +1,83 @@
+MedalFeed
+{
+    position: absolute;
+    top: 92px;
+    left: 50%;
+    transform: translateX( -50% );
+    width: 420px;
+    z-index: 1700;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+
+    .medal-card
+    {
+        min-width: 260px;
+        max-width: 420px;
+        min-height: 58px;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 8px 18px 8px 10px;
+        background-color: rgba( 0, 0, 0, 0.58 );
+        border: 1px solid rgba( 255, 184, 32, 0.55 );
+        border-radius: 4px;
+        box-shadow: 0 8px 28px rgba( 0, 0, 0, 0.45 );
+        backdrop-filter: blur( 8px );
+        opacity: 1;
+        transform: scale( 1 ) translateY( 0 );
+        transition: opacity 0.22s ease-out, transform 0.22s ease-out;
+
+        &:intro
+        {
+            opacity: 0;
+            transform: scale( 0.86 ) translateY( -14px );
+        }
+
+        &.fade-out
+        {
+            opacity: 0;
+            transform: scale( 0.96 ) translateY( -18px );
+        }
+    }
+
+    .medal-icon
+    {
+        width: 42px;
+        height: 42px;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background-color: rgba( 255, 184, 32, 0.95 );
+        color: black;
+        box-shadow: 0 0 18px rgba( 255, 184, 32, 0.45 );
+
+        i
+        {
+            font-size: 25px;
+        }
+    }
+
+    .medal-title
+    {
+        font-size: 17px;
+        font-weight: 900;
+        color: white;
+        letter-spacing: 1.4px;
+        text-shadow: 1px 1px 4px rgba( 0, 0, 0, 0.9 );
+        white-space: nowrap;
+    }
+
+    .medal-subtitle
+    {
+        font-size: 10px;
+        font-weight: 700;
+        color: rgba( 255, 184, 32, 0.9 );
+        letter-spacing: 1.2px;
+        white-space: nowrap;
+    }
+}

@@ -1,0 +1,52 @@
+{
+  "__guid": "a8fa136b-6147-4e07-aa7f-57dcd6474567",
+  "GameObjects": [
+    {
+      "__guid": "b8fa136b-6147-4e07-aa7f-57dcd6474567",
+      "Flags": 0,
+      "Name": "Map",
+      "Position": "0,0,0",
+      "Enabled": true,
+      "Components": [
+        {
+          "__type": "Sandbox.MapInstance",
+          "__guid": "c8fa136b-6147-4e07-aa7f-57dcd6474567",
+          "__enabled": true,
+          "MapName": "thieves.aesthetic",
+          "UseMapFromLaunch": false
+        }
+      ]
+    }
+  ],
+  "SceneProperties": {
+    "FixedUpdateFrequency": 50,
+    "MaxFixedUpdates": 5,
+    "NetworkFrequency": 30,
+    "NetworkInterpolation": true,
+    "ThreadedAnimation": true,
+    "TimeScale": 1,
+    "UseFixedUpdate": true,
+    "NavMesh": {
+      "Enabled": false,
+      "IncludeStaticBodies": true,
+      "IncludeKeyframedBodies": true,
+      "EditorAutoUpdate": true,
+      "AgentHeight": 64,
+      "AgentRadius": 16,
+      "AgentMaxClimb": 18,
+      "AgentMaxSlope": 40,
+      "RegionMinSize": 8,
+      "RegionMergeSize": 20,
+      "EdgeMaxLen": 12,
+      "EdgeMaxError": 1.3,
+      "DetailSampleDist": 6,
+      "DetailSampleMaxError": 1,
+      "CellSize": 3,
+      "CellHeight": 2
+    }
+  },
+  "Title": "aesthetic_mall",
+  "Description": "",
+  "ResourceVersion": 1,
+  "__references": []
+}
