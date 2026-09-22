@@ -1,4 +1,4 @@
-﻿using Sandbox.UI;
+using Sandbox.UI;
 using Sandbox.UI.Construct;
 using SWB.Shared;
 using System;
@@ -22,6 +22,7 @@ public class SniperScope : Panel
 	public SniperScope( Weapon weapon, string lensTexture, string scopeTexture )
 	{
 		this.weapon = weapon;
+		Style.Set( "pointer-events: none;" );
 		StyleSheet.Load( "/swb_base/ui/SniperScope.cs.scss" );
 		AddClass( "hide" );
 

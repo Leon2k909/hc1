@@ -28,21 +28,11 @@ public partial class PlayerPawn :
 
 	private void UpdateRecoilAndSpread()
 	{
-		bool isAiming = CurrentEquipment.IsValid() && HasEquipmentTag( "aiming" );
-
-		// When ADS, start from 0 spread (perfect accuracy when still, like CoD)
-		// When hipfiring, use the base spread amount
-		var spread = isAiming ? 0f : Global.BaseSpreadAmount;
-		var scale = Global.VelocitySpreadScale;
-		if ( isAiming ) scale *= Global.AimVelocitySpreadScale;
-
-		var velLen = CharacterController.Velocity.Length;
-		spread += velLen.Remap( 0, Global.SpreadVelocityLimit, 0, 1, true ) * scale;
-
-		if ( IsCrouching && IsGrounded ) spread *= Global.CrouchSpreadScale;
-		if ( !IsGrounded ) spread *= Global.AirSpreadScale;
-
-		Spread = spread;
+		// No bloom. Bullets go exactly where the crosshair points whether hipfiring or aimed, moving
+		// or still, grounded or in the air. Spread also drives the crosshair gap, so zeroing it here
+		// keeps the crosshair honest instead of animating a spread the bullets no longer have.
+		// Recoil is untouched — that still kicks your aim, it just doesn't randomise the shot.
+		Spread = 0f;
 	}
 
 	void IGameEventHandler<EquipmentDeployedEvent>.OnGameEvent( EquipmentDeployedEvent eventArgs )

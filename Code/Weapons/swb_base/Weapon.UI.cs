@@ -1,4 +1,4 @@
-﻿using Sandbox.UI;
+using Sandbox.UI;
 using SWB.Base.UI;
 
 namespace SWB.Base;
@@ -10,31 +10,13 @@ public partial class Weapon
 
 	private CustomizationMenu customizationMenu;
 
-	/// <summary>Override this if you want custom UI elements</summary>
 	public virtual void CreateUI()
 	{
-		ScreenPanel = Components.Create<ScreenPanel>();
-		ScreenPanel.Opacity = 1;
-		ScreenPanel.ZIndex = 1;
-
-		var rootPanel = Components.Create<RootWeaponDisplay>();
-		rootPanel.Weapon = this;
-		RootPanel = rootPanel;
-
-		// Attachments (HUD)
-		RootPanel.OnComponentStart += () =>
-		{
-			Attachments.ForEach( ( att ) =>
-			{
-				if ( att.Equipped && !att.CreatedUI )
-					att.CreateHudElements();
-			} );
-		};
+		// Nuclear option: Weapon HUD completely disabled
 	}
 
 	public virtual void DestroyUI()
 	{
-		ScreenPanel?.Destroy();
 		RootPanel?.Destroy();
 	}
 

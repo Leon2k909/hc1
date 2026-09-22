@@ -6,7 +6,7 @@
 @inherits PanelComponent
 @namespace Facepunch
 
-<root class="hc1 gunsmith">
+<root class="hc1 gunsmith @(Mode == GunsmithViewMode.Customize ? "customize-mode" : "") @(ShowArmory ? "" : "armory-collapsed")">
     @* ===================== TOP BAR ===================== *@
     <div class="gs-topbar">
         <div class="gs-brand">
@@ -21,7 +21,7 @@
             <label class="gs-weapon-name">@GetEquipmentName()</label>
             @if ( GetEquipment() is {} titleEquip )
             {
-                <label class="gs-weapon-class">@GetSlotName( titleEquip.Slot ).ToUpper() · LEVEL @WeaponProgression.GetLevel( titleEquip )</label>
+                <label class="gs-weapon-class">@($"{GetSlotName( titleEquip.Slot ).ToUpper()} · LEVEL {WeaponProgression.GetLevel( titleEquip )}")</label>
             }
         </div>
 
@@ -57,7 +57,7 @@
     }
 
     @* ===================== TOP LEFT: CLASS SELECTOR ===================== *@
-    <div class="gs-class-panel @(hasManyClasses ? "has-many-classes" : "")">
+    <div class="gs-class-panel @(hasManyClasses ? "has-many-classes" : "") @(ShowArmory ? "" : "collapsed")">
         <div class="gs-class-strip">
             @for ( int i = 0; i < activeClassIndices.Count; i++ )
             {
@@ -85,11 +85,19 @@
         </div>
     </div>
 
+    @* ===================== PANEL TOGGLES ===================== *@
+    @if ( Mode != GunsmithViewMode.Customize )
+    {
+        <div class="gs-panel-toggle gs-toggle-armory @(ShowArmory ? "" : "is-collapsed")" @onclick=@ToggleArmory title="@(ShowArmory ? "Hide loadout panels" : "Show loadout panels")">
+            <i>@(ShowArmory ? "chevron_left" : "chevron_right")</i>
+        </div>
+    }
+
     @* ===================== LEFT: ARMORY ===================== *@
-    <div class="weapon-browser @(Mode == GunsmithViewMode.Customize ? "is-hidden" : "") @(hasManyClasses ? "has-many-classes" : "")">
+    <div class="weapon-browser @(Mode == GunsmithViewMode.Customize ? "is-hidden" : "") @(hasManyClasses ? "has-many-classes" : "") @(ShowArmory ? "" : "collapsed")">
         @* ── Equipped weapons / gear ── *@
-        <label class="gs-armory-section">WEAPONS</label>
-        <div class="gs-slot-list">
+        <label class="gs-armory-section gs-sec-weapons">WEAPONS</label>
+        <div class="gs-slot-list gs-sec-weapons">
             @foreach ( var slot in new[] { EquipmentSlot.Primary, EquipmentSlot.Secondary } )
             {
                 var s = slot;
@@ -111,8 +119,8 @@
             }
         </div>
 
-        <label class="gs-armory-section">EQUIPMENT</label>
-        <div class="gs-slot-list">
+        <label class="gs-armory-section gs-sec-equipment">EQUIPMENT</label>
+        <div class="gs-slot-list gs-sec-equipment">
             @foreach ( var slot in new[] { EquipmentSlot.Tactical, EquipmentSlot.Lethal } )
             {
                 var s = slot;
@@ -130,8 +138,8 @@
         </div>
 
         @* ── Perks ── *@
-        <label class="gs-armory-section">PERKS</label>
-        <div class="gs-perk-row">
+        <label class="gs-armory-section gs-sec-perks">PERKS</label>
+        <div class="gs-perk-row gs-sec-perks">
             @for ( int i = 1; i <= 3; i++ )
             {
                 var pc = i;
@@ -147,16 +155,16 @@
         </div>
 
         @* ── Weapon / perk list ── *@
-        <div class="weapon-list">
+        <div class="weapon-list @BrowserOrderClass">
             @if ( SelectedPerkCategory > 0 )
             {
                 @foreach ( var perk in PerkResource.All.Where( x => (int)x.Category == SelectedPerkCategory ).OrderBy( x => x.Name ) )
                 {
                     var isEquipped = GunsmithLoadoutManager.GetPerk( SelectedPerkCategory ) == perk.ResourceName
                                   || GunsmithLoadoutManager.GetPerk( SelectedPerkCategory ) == perk.ResourcePath;
-                    <button class="weapon-option @(isEquipped ? "active loadout" : "")" @onclick=@(() => GunsmithLoadoutManager.SetPerk( SelectedPerkCategory, perk.ResourceName ))>
+                    <button class="weapon-option is-perk @(isEquipped ? "active loadout" : "")" @onclick=@(() => GunsmithLoadoutManager.SetPerk( SelectedPerkCategory, perk.ResourceName ))>
                         <span class="weapon-name">@perk.Name</span>
-                        <span class="weapon-lv" style="font-size: 10px; color: rgba(255,255,255,0.5);">@perk.Description</span>
+                        <span class="perk-desc">@perk.Description</span>
                         @if ( isEquipped ) { <span class="weapon-state">EQUIPPED</span> }
                     </button>
                 }
@@ -282,7 +290,7 @@
                     }
                 </div>
 
-                <div class="gs-tab-content" style="display: flex; flex-direction: row; gap: 20px;">
+                <div class="gs-tab-content">
                 @if ( ActiveCustomizeTab == CustomizeTab.Standard )
                 {
                 @* ----- Camouflages ----- *@
@@ -688,7 +696,15 @@
                     </div>
                 }
 
-                <WeaponTuningPanel WeaponId=@(GetEquipment()?.ResourceName) />
+                <div class="gs-tuning-btn @(ShowTuning ? "active" : "")" @onclick=@ToggleTuning>
+                    <i>tune</i>
+                    <label>TUNING</label>
+                </div>
+
+                @if ( ShowTuning )
+                {
+                    <WeaponTuningPanel WeaponId=@(GetEquipment()?.ResourceName) />
+                }
 
                 <div class="gs-loadout-section">
                     <div class="gs-loadout-btn @(IsLoadoutSet() ? "set" : "")" @onclick=@SetLoadout>
@@ -703,7 +719,7 @@
 
 @code
 {
-    private static GunsmithPanel Instance { get; set; }
+    internal static GunsmithPanel Instance { get; set; }
     public static bool IsAnyOpen => Game.ActiveScene.IsValid() && Game.ActiveScene.GetAllComponents<GunsmithPanel>().Any( x => x.IsValid() && x.Enabled );
 
     public enum GunsmithViewMode
@@ -733,6 +749,14 @@
     private WeaponCategory SelectedWeaponCategory { get; set; } = WeaponCategory.AssaultRifle;
     private GunsmithViewMode Mode { get; set; } = GunsmithViewMode.Build;
     private int CamoPage { get; set; } = 0;
+
+    public bool IsCustomizing => Mode == GunsmithViewMode.Customize;
+
+    protected override void OnUpdate()
+    {
+        base.OnUpdate();
+        ResponsiveLayout.Update( Panel );
+    }
 
     protected override void OnStart()
     {
@@ -895,11 +919,14 @@
 
     private string GetCamoTileStyle( GunsmithPart camo )
     {
+        // No trailing semicolon: every call site already appends "; position: relative;", and the
+        // resulting ";;" makes the style parser throw mid render tree, which kills the whole tile
+        // along with its click handler — so camos look present but can never be equipped.
         if ( camo is null || string.IsNullOrEmpty( camo.CamoTexture ) )
-            return $"background-color: {camo?.CamoTint.Hex ?? Color.White.Hex};";
+            return $"background-color: {camo?.CamoTint.Hex ?? Color.White.Hex}";
 
         var path = camo.CamoTexture.Replace( "camos/", "camos/ui/" ).Replace( ".png", ".vtex" );
-        return $"background-image: url({path});";
+        return $"background-image: url( '{path}' )";
     }
 
     private EquipmentResource GetEquipment()
@@ -1343,6 +1370,64 @@
         }
     }
 
+    /// <summary>Every category that paints the gun. ApplyAttachments resolves these in order, so all
+    /// of them have to be cleared when a new camo is equipped — missing one makes camos look stuck.</summary>
+    private static readonly GunsmithPartType[] CamoCategories =
+    {
+        GunsmithPartType.Camoflague,
+        GunsmithPartType.MasteryCamo,
+        GunsmithPartType.AnimatedCamo,
+        GunsmithPartType.GlowingCamo,
+        GunsmithPartType.Camoflague3D,
+    };
+
+    private static bool IsCamoCategory( GunsmithPartType category ) => category is GunsmithPartType.Camoflague
+        or GunsmithPartType.MasteryCamo
+        or GunsmithPartType.AnimatedCamo
+        or GunsmithPartType.GlowingCamo
+        or GunsmithPartType.Camoflague3D;
+
+    /// Which group the browser list should sit under. Clicking PRIMARY used to open the list at the
+    /// very bottom of the panel, past equipment and perks — it should appear against the thing you
+    /// actually clicked. Flex `order` moves it without duplicating the list markup three times.
+    private string BrowserOrderClass
+    {
+        get
+        {
+            if ( SelectedPerkCategory > 0 ) return "after-perks";
+
+            var slot = GetSelectedSlot();
+            if ( slot == EquipmentSlot.Tactical || slot == EquipmentSlot.Lethal ) return "after-equipment";
+
+            return "after-weapons";
+        }
+    }
+
+    /// Panel visibility is a per-user preference, so it sticks between visits to the gunsmith.
+    private bool ShowArmory
+    {
+        get => Game.Cookies.Get<bool>( "hc1.gunsmith.showarmory", true );
+        set => Game.Cookies.Set( "hc1.gunsmith.showarmory", value );
+    }
+
+    private bool ShowTuning
+    {
+        get => Game.Cookies.Get<bool>( "hc1.gunsmith.showtuning", true );
+        set => Game.Cookies.Set( "hc1.gunsmith.showtuning", value );
+    }
+
+    private void ToggleArmory()
+    {
+        ShowArmory = !ShowArmory;
+        StateHasChanged();
+    }
+
+    private void ToggleTuning()
+    {
+        ShowTuning = !ShowTuning;
+        StateHasChanged();
+    }
+
     private bool IsUnlocked( GunsmithPart part )
     {
         if ( Game.SteamId == 76561198271608270ul ) return true;
@@ -1350,8 +1435,7 @@
         var equip = GetEquipment();
         if ( equip is null ) return false;
         
-        bool isCamo = part.Category == GunsmithPartType.Camoflague || part.Category == GunsmithPartType.MasteryCamo || part.Category == GunsmithPartType.AnimatedCamo || part.Category == GunsmithPartType.GlowingCamo;
-        if ( isCamo )
+        if ( IsCamoCategory( part.Category ) )
             return WeaponProgression.GetLifetimeLevel( equip ) >= part.RequiredLevel;
             
         return WeaponProgression.GetLevel( equip ) >= part.RequiredLevel;
@@ -1365,7 +1449,7 @@
         if ( !IsUnlocked( part ) )
         {
             // Just preview it
-            if ( part.Category == GunsmithPartType.Camoflague || part.Category == GunsmithPartType.MasteryCamo || part.Category == GunsmithPartType.AnimatedCamo || part.Category == GunsmithPartType.GlowingCamo )
+            if ( IsCamoCategory( part.Category ) )
             {
                 PreviewCamoPart = part;
                 ApplyPreviewAttachments( equip, PreviewCamoPart );
@@ -1373,7 +1457,7 @@
             return;
         }
 
-        if ( part.Category == GunsmithPartType.Camoflague || part.Category == GunsmithPartType.MasteryCamo || part.Category == GunsmithPartType.AnimatedCamo || part.Category == GunsmithPartType.GlowingCamo )
+        if ( IsCamoCategory( part.Category ) )
         {
             PreviewCamoPart = null;
         }
@@ -1385,33 +1469,17 @@
         }
         else
         {
-            // If equipping a camo, unequip the other camo category and disable custom color
-            if ( part.Category == GunsmithPartType.Camoflague )
+            // Only one camo is worn at a time, and ApplyAttachments resolves the categories in a fixed
+            // order (Camoflague3D first, plain Camoflague last) — so a camo left in any other category
+            // silently wins and the one you just clicked never shows. Clear every other category.
+            if ( IsCamoCategory( part.Category ) )
             {
-                GunsmithLoadoutManager.SetAttachment( equip, GunsmithPartType.MasteryCamo, null );
-                GunsmithLoadoutManager.SetAttachment( equip, GunsmithPartType.AnimatedCamo, null );
-                GunsmithLoadoutManager.SetAttachment( equip, GunsmithPartType.GlowingCamo, null );
-                GunsmithLoadoutManager.SetUseCustomCamoColor( equip, false );
-            }
-            else if ( part.Category == GunsmithPartType.MasteryCamo )
-            {
-                GunsmithLoadoutManager.SetAttachment( equip, GunsmithPartType.Camoflague, null );
-                GunsmithLoadoutManager.SetAttachment( equip, GunsmithPartType.AnimatedCamo, null );
-                GunsmithLoadoutManager.SetAttachment( equip, GunsmithPartType.GlowingCamo, null );
-                GunsmithLoadoutManager.SetUseCustomCamoColor( equip, false );
-            }
-            else if ( part.Category == GunsmithPartType.AnimatedCamo )
-            {
-                GunsmithLoadoutManager.SetAttachment( equip, GunsmithPartType.Camoflague, null );
-                GunsmithLoadoutManager.SetAttachment( equip, GunsmithPartType.MasteryCamo, null );
-                GunsmithLoadoutManager.SetAttachment( equip, GunsmithPartType.GlowingCamo, null );
-                GunsmithLoadoutManager.SetUseCustomCamoColor( equip, false );
-            }
-            else if ( part.Category == GunsmithPartType.GlowingCamo )
-            {
-                GunsmithLoadoutManager.SetAttachment( equip, GunsmithPartType.Camoflague, null );
-                GunsmithLoadoutManager.SetAttachment( equip, GunsmithPartType.MasteryCamo, null );
-                GunsmithLoadoutManager.SetAttachment( equip, GunsmithPartType.AnimatedCamo, null );
+                foreach ( var category in CamoCategories )
+                {
+                    if ( category == part.Category ) continue;
+                    GunsmithLoadoutManager.SetAttachment( equip, category, null );
+                }
+
                 GunsmithLoadoutManager.SetUseCustomCamoColor( equip, false );
             }
 

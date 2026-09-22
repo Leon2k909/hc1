@@ -98,6 +98,8 @@ public partial class Weapon
 
 	public virtual void Shoot( ShootInfo shootInfo, bool isPrimary )
 	{
+		Facepunch.GameUtils.TraceCombatMouse( isPrimary ? "Weapon.Shoot.primary.begin" : "Weapon.Shoot.secondary.begin", null, true );
+
 		// CoD-style minimap reveal: an unsuppressed shot briefly puts us on the enemy minimap.
 		if ( !IsProxy )
 		{
@@ -128,13 +130,15 @@ public partial class Weapon
 			PlaySound( shootInfo.ShootSound );
 
 		// Particles
-		HandleShootEffects( isPrimary );
+		var suppressed = GetActiveAttachmentForCategory( AttachmentCategory.Muzzle ) is SilencerAttachment;
+		var effects = dischargeEffects.Shoot(
+			suppressed ? shootInfo.SuppressedMuzzleFlashChance : shootInfo.MuzzleFlashChance,
+			suppressed ? shootInfo.SuppressedMuzzleFlashScale : shootInfo.MuzzleFlashScale,
+			shootInfo.BarrelSmokeParticle is not null ? shootInfo.BarrelSmokeScale : 0f, suppressed );
+		HandleShootEffects( isPrimary, effects.Flash, effects.FlashScale, effects.SmokeScale );
 
 		if ( !Owner.IsBot )
 		{
-			// Barrel smoke
-			barrelHeat += 1;
-
 			// Recoil
 			Owner.ApplyEyeAnglesOffset( GetRecoilAngles( shootInfo ) );
 
@@ -153,6 +157,8 @@ public partial class Weapon
 			var spreadOffset = shootInfo.BulletType.GetRandomSpread( realSpread );
 			shootInfo?.BulletType?.Shoot( this, isPrimary, spreadOffset );
 		}
+
+		Facepunch.GameUtils.TraceCombatMouse( isPrimary ? "Weapon.Shoot.primary.end" : "Weapon.Shoot.secondary.end", null, true );
 	}
 
 	/// <summary> A single bullet trace from start to end with a certain radius.</summary>
@@ -194,7 +200,7 @@ public partial class Weapon
 	}
 
 	[Rpc.Broadcast( NetFlags.Unreliable )]
-	public virtual void HandleShootEffects( bool isPrimary )
+	public virtual void HandleShootEffects( bool isPrimary, bool showFlash, float flashScale, float smokeScale )
 	{
 		if ( !IsValid || Owner is null || Application.IsDedicatedServer ) return;
 
@@ -237,12 +243,12 @@ public partial class Weapon
 		var muzzleScale = CanSeeViewModel ? shootInfo.VMParticleScale : shootInfo.WMMuzzleParticleScale;
 
 		// Muzzle flash
-		if ( shootInfo.MuzzleFlashParticle is not null )
-			CreateParticle( shootInfo.MuzzleFlashParticle, muzzleObj, muzzleScale );
+		if ( showFlash && shootInfo.MuzzleFlashParticle is not null )
+			CreateParticle( shootInfo.MuzzleFlashParticle, muzzleObj, muzzleScale * flashScale );
 
-		// Barrel smoke
-		if ( !IsProxy && !Owner.IsBot && shootInfo.BarrelSmokeParticle is not null && barrelHeat >= shootInfo.ClipSize * 0.75 )
-			CreateParticle( shootInfo.BarrelSmokeParticle, muzzleObj, muzzleScale );
+		// Smoke is independent of flash and visible on remote players and bots too.
+		if ( smokeScale > 0f && shootInfo.BarrelSmokeParticle is not null )
+			CreateParticle( shootInfo.BarrelSmokeParticle, muzzleObj, muzzleScale * smokeScale );
 	}
 
 	/// <summary>Create a bullet impact effect</summary>

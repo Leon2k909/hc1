@@ -11,6 +11,7 @@ MainHUD
     transition: all 0.5s 0.5s ease-in-out;
     background-color: rgba( black, 0 );
     pointer-events: none;
+    cursor: none;
 
     Canvas
     {
@@ -38,20 +39,24 @@ MainHUD
     }
 }
 
+
 .combat-mouse-lock
 {
     position: absolute;
     inset: 0;
     opacity: 0;
     pointer-events: none;
+    cursor: none;
     z-index: 100000;
 
-    &.active
+    &.active,
+    &:focus
     {
         pointer-events: none;
         cursor: none;
     }
 }
+
 
 .crosshair
 {

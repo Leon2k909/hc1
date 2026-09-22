@@ -244,6 +244,8 @@ public partial class Weapon : Component, IInventoryItem
 
 		if ( !IsProxy && !Owner.IsBot && !IsDeploying )
 		{
+			Facepunch.GameUtils.TraceCombatMouse( "Weapon.OnUpdate.begin" );
+
 			// Customization
 			if ( (WeaponSettings.Instance?.Customization ?? true) && !IsScoping && !IsAiming && Input.Pressed( InputButtonHelper.Menu ) && Attachments.Count > 0 )
 			{
@@ -306,7 +308,6 @@ public partial class Weapon : Component, IInventoryItem
 
 			ResetBurstFireCount( Primary, InputButtonHelper.PrimaryAttack );
 			ResetBurstFireCount( Secondary, InputButtonHelper.SecondaryAttack );
-			BarrelHeatCheck();
 
 			if ( CanPrimaryShoot() && !ShouldTuckVar )
 			{
@@ -336,6 +337,8 @@ public partial class Weapon : Component, IInventoryItem
 				else
 					OnReloadFinish();
 			}
+
+			Facepunch.GameUtils.TraceCombatMouse( "Weapon.OnUpdate.end" );
 		}
 	}
 

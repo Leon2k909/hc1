@@ -1,7 +1,14 @@
-﻿using Sandbox;
+using System;
+using System.Reflection;
+using Sandbox;
 
 public class TestGraphics {
     public static void Run() {
-        Log.Info(typeof(Sandbox.Game).Assembly.GetTypes().FirstOrDefault(t => t.Name.Contains("VideoSettings"))?.FullName ?? "None");
+        foreach (var prop in typeof(Sandbox.ScreenPanel).GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
+            Log.Info($"Prop: {prop.PropertyType.Name} {prop.Name}");
+        }
+        foreach (var field in typeof(Sandbox.ScreenPanel).GetFields(BindingFlags.Public | BindingFlags.Instance)) {
+            Log.Info($"Field: {field.FieldType.Name} {field.Name}");
+        }
     }
 }

@@ -247,6 +247,14 @@
     {
         if ( !IsVisible ) return;
 
+        // The map vote runs for the same 15s this screen does, so without this the two sit on top of
+        // each other for the whole window and the vote can be neither read nor clicked.
+        if ( Facepunch.MapVoteSystem.Instance.IsValid() )
+        {
+            Dismiss();
+            return;
+        }
+
         if ( TimeSinceShown >= AutoDismissTime )
         {
             Dismiss();

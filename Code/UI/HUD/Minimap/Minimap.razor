@@ -4,26 +4,40 @@
 
 @if ( Scene is null || !Client.Viewer.IsValid() || !Client.Viewer.Pawn.IsValid() ) return;
 
-<root class="radar" style="border: 1px solid rgba( black, 0.5 )">
+<root class="radar @(HasBakedMap ? "has-baked-map" : "generic-map")" style="border: 1px solid rgba( black, 0.5 )">
     @if (Renderer.IsValid())
     {
         <div class="mask" style="@MapRot()">
-            <div class="map-parent">
-                <div style="@MapTransform()">
-                    <div class="minimap" style="background-image: url( @Renderer.CurrentMinimapPath )" />
-                    <div class="overlay" style="background-image: url( @Renderer.CurrentMinimapPath )" />
+            @if ( HasBakedMap )
+            {
+                <div class="map-parent">
+                    <div style="@MapTransform()">
+                        <div class="minimap" style="background-image: url( @Renderer.CurrentMinimapPath )" />
+                        <div class="overlay" style="background-image: url( @Renderer.CurrentMinimapPath )" />
 
-                    @foreach ( var volume in Scene.GetAllComponents<IMinimapVolume>() )
-                    {
-                        if (!volume.IsValid() || (Client.Viewer.Pawn is PlayerPawn player && !volume.IsVisible( player )))
-                            continue;
-                            
-                        <div class="volume" style="@GetBox( volume ) @GetBoxStyles( volume )" >
-                            <div class="bg" style="@GetLineStyles( volume )" />
-                        </div>
-                    }
+                        @foreach ( var volume in Scene.GetAllComponents<IMinimapVolume>() )
+                        {
+                            if (!volume.IsValid() || (Client.Viewer.Pawn is PlayerPawn player && !volume.IsVisible( player )))
+                                continue;
+
+                            <div class="volume" style="@GetBox( volume ) @GetBoxStyles( volume )" >
+                                <div class="bg" style="@GetLineStyles( volume )" />
+                            </div>
+                        }
+                    </div>
                 </div>
-            </div>
+            }
+            else
+            {
+                <div class="generic-radar-bg">
+                    <div class="generic-grid" />
+                    <div class="generic-ring ring-outer" />
+                    <div class="generic-ring ring-inner" />
+                    <div class="generic-cross horizontal" />
+                    <div class="generic-cross vertical" />
+                    <label class="generic-north">N</label>
+                </div>
+            }
         </div>
 
         <div class="markers">
@@ -46,7 +60,7 @@
 
                     <div class="marker" style="background-image: url( @icon.IconPath ); @style z-index: @icon.IconOrder;" />
                 }
-                
+
                 if ( element is IMinimapLabel label )
                 {
                     <div class="label" style="@WorldToMap( label.WorldPosition ) @LabelStyles( label )">
@@ -73,6 +87,7 @@
     private PlayerPawn Player => Client.Viewer.IsValid() ? Client.Viewer.PlayerPawn : null;
 
     public Color ViewerColor => Client.Viewer.IsValid() ? Client.Viewer.PlayerColor : Color.White;
+    public bool HasBakedMap => Renderer.IsValid() && !string.IsNullOrWhiteSpace( Renderer.CurrentMinimapPath );
 
     public Vector3 ViewPos => Client.Viewer.Pawn?.WorldPosition ?? Vector3.Zero;
     public float ViewYaw => Client.Viewer.Pawn?.EyeAngles.yaw ?? 0;
@@ -86,7 +101,7 @@
     string WorldToMap( Vector3 worldPosition )
     {
         var position = Renderer.FromWorldRadar( worldPosition, ViewPos, FixedMode ? 0 : ViewYaw, Zoom );
-        return $"left: {Length.Fraction( position.x )}; top: {Length.Fraction( position.y )};";
+        return $"left: {CssPercent( position.x )}; top: {CssPercent( position.y )};";
     }
 
     string LabelStyles( IMinimapLabel label )
@@ -107,7 +122,7 @@
             yaw = -volume.Angles.yaw;
         }
 
-        return $"left: {Length.Fraction(min.x)}; top: {Length.Fraction(min.y)}; width:{Length.Fraction(remappedSize.x)}; height:{Length.Fraction(remappedSize.y)};transform: rotateZ({yaw}deg);";
+        return $"left: {CssPercent( min.x )}; top: {CssPercent( min.y )}; width:{CssPercent( remappedSize.x )}; height:{CssPercent( remappedSize.y )};transform: rotateZ({yaw}deg);";
     }
 
     string GetBoxStyles(IMinimapVolume volume)
@@ -118,6 +133,17 @@
     string GetLineStyles(IMinimapVolume volume)
     {
         return $"background-color: {volume.LineColor.Rgba};";
+    }
+
+    private static string CssPercent( float value )
+    {
+        if ( float.IsNaN( value ) || float.IsInfinity( value ) )
+            value = 0f;
+
+        if ( MathF.Abs( value ) < 0.0001f )
+            value = 0f;
+
+        return $"{(value * 100f).ToString( "0.###", System.Globalization.CultureInfo.InvariantCulture )}%";
     }
 
     string RotationToMap( Angles rot )
@@ -133,7 +159,7 @@
     string MapTransform()
     {
         var position = -Renderer.FromWorld(ViewPos) * Zoom;
-        return $"position: absolute; left: {Length.Fraction( position.x )}; top: {Length.Fraction( position.y )}; width: {Zoom * 100}%; height: {Zoom * 100}%";
+        return $"position: absolute; left: {CssPercent( position.x )}; top: {CssPercent( position.y )}; width: {CssPercent( Zoom )}; height: {CssPercent( Zoom )}";
     }
 
     string MapRot()

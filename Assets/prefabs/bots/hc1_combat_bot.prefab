@@ -95,6 +95,19 @@
         "ShootSound": "sounds/weapons/m4a1/m4_shot.sound",
         "SightRange": 2600,
         "Team": "Unassigned",
+        "TeamBaseModels": {
+          "Terrorist": {
+            "Models": [
+              "models/player/t_side/t_side_player_01/t_side_player_01_v2.vmdl"
+            ]
+          },
+          "CounterTerrorist": {
+            "Models": [
+              "models/player/ct_side/ct_side_player_01/ct_side_player_01_v2.vmdl",
+              "models/player/ct_side/ct_side_riot_player/ct_side_riot_player.vmdl"
+            ]
+          }
+        },
         "TracerEffectPrefab": "weapons/common/effects/tracer_9mm.prefab",
         "WeaponWorldModelPrefab": "weapons/m4a1/wm_m4a1.prefab"
       }
@@ -104,7 +117,7 @@
         "__guid": "90c80eef-fbde-41f0-b22f-1b326e25cfb1",
         "__version": 2,
         "Flags": 0,
-        "Name": "citizen",
+        "Name": "human",
         "Position": "0,0,0",
         "Rotation": "0,0,0,1",
         "Scale": "1,1,1",
@@ -122,15 +135,15 @@
             "__enabled": true,
             "Flags": 0,
             "AnimationGraph": null,
-            "BodyGroups": 65,
+            "BodyGroups": 18446744073709551615,
             "BoneMergeTarget": null,
             "CreateAttachments": false,
             "CreateBoneObjects": true,
             "LodOverride": null,
-            "MaterialGroup": "default",
+            "MaterialGroup": null,
             "MaterialOverride": null,
             "Materials": null,
-            "Model": "models/citizen/citizen.vmdl",
+            "Model": "models/player/t_side/t_side_player_01/t_side_player_01_v2.vmdl",
             "Morphs": {},
             "OnComponentDestroy": null,
             "OnComponentDisabled": null,
@@ -182,48 +195,6 @@
               "_type": "gameobject",
               "go": "0f6d3d36-b5f5-4c37-9161-8fa3e3b51d10"
             }
-          },
-          {
-            "__type": "Sandbox.Dresser",
-            "__guid": "5f31d428-3218-451a-a579-b9e17333ab6d",
-            "__enabled": true,
-            "Flags": 0,
-            "ApplyHeightScale": true,
-            "BodyTarget": {
-              "_type": "component",
-              "component_id": "ce1ba59d-ce66-4bc7-ae07-cbc8eb04e737",
-              "go": "90c80eef-fbde-41f0-b22f-1b326e25cfb1",
-              "component_type": "SkinnedModelRenderer"
-            },
-            "Clothing": [
-              {
-                "Clothing": "models/citizen_clothes/shoes/boots/black_boots.clothing"
-              },
-              {
-                "Clothing": "models/citizen_clothes/shirt/army_shirt/army_shirt.clothing"
-              },
-              {
-                "Clothing": "models/citizen_clothes/trousers/cargopants/cargo_pants_army.clothing"
-              },
-              {
-                "Clothing": "models/citizen_clothes/hat/balaclava/balaclava.clothing"
-              },
-              {
-                "Clothing": "models/citizen_clothes/vest/tactical_vest/models/tactical_vest.clothing"
-              }
-            ],
-            "ManualAge": 0.65923566,
-            "ManualHeight": 0.5,
-            "ManualTint": 0.06687898,
-            "OnComponentDestroy": null,
-            "OnComponentDisabled": null,
-            "OnComponentEnabled": null,
-            "OnComponentFixedUpdate": null,
-            "OnComponentStart": null,
-            "OnComponentUpdate": null,
-            "RemoveUnownedItems": true,
-            "Source": "Manual",
-            "WorkshopItems": []
           }
         ],
         "Children": []

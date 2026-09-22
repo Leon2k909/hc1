@@ -30,7 +30,29 @@ public partial class WeaponAmmo : Component, IDroppedWeaponState<WeaponAmmo>
 	}
 
 	/// <summary>
-	/// Is this container full (accounting for tuned mag size)?
+	/// Does this weapon hold a round in the chamber? If so a tactical reload leaves a full magazine
+	/// plus that chambered round — the classic 30+1. Reloading from empty has nothing to keep, so it
+	/// only gives you a full magazine.
 	/// </summary>
-	public bool IsFull => Ammo == GetEffectiveMaxAmmo();
+	[Property] public bool HasChamber { get; set; } = true;
+
+	/// <summary>
+	/// Total rounds the weapon can hold, chambered round included.
+	/// </summary>
+	public int GetMaxAmmoWithChamber() => GetEffectiveMaxAmmo() + ( HasChamber ? 1 : 0 );
+
+	/// <summary>
+	/// 1 while a round is sat in the chamber, otherwise 0.
+	/// </summary>
+	public int ChamberedRounds => HasChamber && Ammo > 0 ? 1 : 0;
+
+	/// <summary>
+	/// Rounds in the magazine — everything except the chambered one.
+	/// </summary>
+	public int AmmoInMagazine => Ammo - ChamberedRounds;
+
+	/// <summary>
+	/// Is this container full (accounting for tuned mag size and the chambered round)?
+	/// </summary>
+	public bool IsFull => Ammo >= GetEffectiveMaxAmmo() + ChamberedRounds;
 }

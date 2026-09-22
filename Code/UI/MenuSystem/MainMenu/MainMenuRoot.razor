@@ -35,6 +35,14 @@
                     <i>build</i>
                     <label>WEAPONS</label>
                 </div>
+                <a class="gnav-item @(IsActive("/ranked") ? "active" : "")" href="/ranked">
+                    <i>military_tech</i>
+                    <label>RANKED</label>
+                </a>
+                <a class="gnav-item @(IsActive("/new") ? "active" : "")" href="/new">
+                    <i>vpn_key</i>
+                    <label>PRIVATE</label>
+                </a>
                 <a class="gnav-item @(IsActive("/career") ? "active" : "")" href="/career">
                     <i>military_tech</i>
                     <label>PROGRESSION</label>
@@ -58,6 +66,8 @@
                 <div class="gnav-ctrl-btn" @onclick=@NavNext>RB</div>
             }
         </div>
+
+        <PartyPanel />
 
         <div class="gnav-right">
             <a class="gnav-profile" href="/career">
@@ -161,6 +171,8 @@
 
     public override void Tick()
     {
+        base.Tick();
+        ResponsiveLayout.Update( this );
         if ( !Input.UsingController ) return;
 
         // Use raw shoulder button tracking so no action bindings are needed

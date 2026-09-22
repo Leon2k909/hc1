@@ -186,5 +186,6 @@ public partial class Weapon
 
 	// Internal state
 	protected int burstCount = 0;
-	int barrelHeat = 0;
+	private readonly Facepunch.DischargeEffectState dischargeEffects = new();
+	private bool hasPlayedShellReloadSmoke;
 }

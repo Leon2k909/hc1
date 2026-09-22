@@ -472,6 +472,18 @@ public static class GunsmithLoadoutManager
 		public string ReticleColor { get; set; }
 	}
 
+	/// <summary>
+	/// Surface maps carried from a weapon's own material onto a camo material that replaces it, so the
+	/// gun keeps its shading instead of rendering as a flat, evenly lit shape.
+	/// </summary>
+	private static readonly string[] SurfaceMapNames =
+	{
+		"TextureNormal",
+		"TextureRoughness",
+		"TextureAmbientOcclusion",
+		"TextureMetalness",
+	};
+
 	public static void ApplyAttachments( EquipmentResource resource, GameObject root, GunsmithPart previewCamo = null )
 	{
 		if ( !resource.IsValid() || !root.IsValid() )
@@ -591,6 +603,7 @@ public static class GunsmithLoadoutManager
 		}
 
 		// The shared first-person arms model, used to skip the hands so they don't get camo'd.
+
 		var armsModel = Model.Load( "models/first_person/v_first_person_arms_human.vmdl" );
 
 		// Pre-compute once — same value for every renderer in the loop below.
@@ -669,7 +682,25 @@ public static class GunsmithLoadoutManager
 						continue;
 					}
 
-					renderer.Materials.SetOverride( i, camoMat );
+					// The animated shader replaces the material outright, which would drop this material's
+					// normal / roughness / AO maps and leave the gun completely unshaded — bright camos
+					// then blow out and dark ones read flat. Carry the source maps across so it still
+					// lights like metal, and put AO's contribution to direct light back to full.
+					var animCopy = camoMat.CreateCopy();
+
+					foreach ( var mapName in SurfaceMapNames )
+					{
+						var srcMap = mats[i].GetTexture( mapName );
+						if ( srcMap is not null )
+							animCopy.Set( mapName, srcMap );
+					}
+
+					animCopy.Set( "g_flAmbientOcclusionDirectDiffuse", 1f );
+					animCopy.Set( "g_flAmbientOcclusionDirectSpecular", 1f );
+					if ( camoPart.Category == GunsmithPartType.Camoflague )
+						ApplyPaintFinish( animCopy );
+
+					renderer.Materials.SetOverride( i, animCopy );
 				}
 
 				renderer.Tint = Color.White;
@@ -713,8 +744,15 @@ public static class GunsmithLoadoutManager
 					}
 
 					var copy = mats[i].CreateCopy();
+					// TextureColor is the albedo slot these shaders actually expose (see any .vmat).
+					// "Color" / "g_tColor" are no-ops and leave the copy on its default white albedo.
+					copy.Set( "TextureColor", camoTex );
 					copy.Set( "Color", camoTex );
 					copy.Set( "g_tColor", camoTex );
+					// Printed paint is a satin coating, rather than the gun's original
+					// polished metal. Keep the source normal and AO detail underneath.
+					if ( camoPart.Category == GunsmithPartType.Camoflague )
+						ApplyPaintFinish( copy );
 					if ( camoPart.IsValid() && camoPart.Category == GunsmithPartType.GlowingCamo )
 					{
 						copy.Set( "g_bUseSelfIllum", true );
@@ -768,6 +806,8 @@ public static class GunsmithLoadoutManager
 						var copy = mats[i].CreateCopy();
 						copy.Set( "g_vColorTint", camoTint );
 						copy.Set( "Color", camoTint );
+						if ( !useCustomCamo && camoPart.IsValid() && camoPart.Category == GunsmithPartType.Camoflague )
+							ApplyPaintFinish( copy );
 
 						if ( camoPart.IsValid() && camoPart.Category == GunsmithPartType.GlowingCamo )
 						{
@@ -799,6 +839,22 @@ public static class GunsmithLoadoutManager
 				renderer.Tint = Color.White;
 			}
 		}
+	}
+
+	private static void ApplyPaintFinish( Material material )
+	{
+		// Source weapons use both scalar and texture-based shader variants.
+		material.Set( "TextureMetalness", Texture.Black );
+		material.Set( "g_tMetalness", Texture.Black );
+		material.Set( "g_flMetalness", 0f );
+		material.Set( "TextureRoughness", Texture.White );
+		material.Set( "g_tRoughness", Texture.White );
+		material.Set( "g_flRoughnessScaleFactor", 0.65f );
+		material.Set( "g_flRoughness", 0.65f );
+		material.Set( "g_flSelfIllumScale", 0f );
+		material.Set( "g_flSelfIllumBrightness", 0f );
+		material.Set( "g_flAmbientOcclusionDirectDiffuse", 1f );
+		material.Set( "g_flAmbientOcclusionDirectSpecular", 1f );
 	}
 
 	private static Color GetCustomCamoPaintTint( Color color )

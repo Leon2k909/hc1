@@ -44,6 +44,13 @@ public sealed class TeamSpawnAssigner : Component,
 			.Select( x => (x.WorldPosition, Tags: x.SpawnPointTags) )
 			.ToArray();
 
+		var occupiedPositions = playerPositions
+			.Select( x => x.WorldPosition )
+			.Concat( GameUtils.LightweightBots
+				.Where( x => x.IsValid() && x.IsAlive )
+				.Select( x => x.WorldPosition ) )
+			.ToArray();
+
 		foreach ( var rule in SpawnRules )
 		{
 			if ( rule.Team != player.Team )
@@ -69,7 +76,7 @@ public sealed class TeamSpawnAssigner : Component,
 
 		foreach ( var spawn in spawns )
 		{
-			if ( playerPositions.All( x => (x.WorldPosition - spawn.Position).LengthSquared > 32f * 32f ) )
+			if ( occupiedPositions.All( x => (x - spawn.Position).LengthSquared > 96f * 96f ) )
 			{
 				return spawn;
 			}

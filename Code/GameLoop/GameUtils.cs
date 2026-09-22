@@ -55,12 +55,30 @@ public static partial class GameUtils
 
 	public static bool IsGunsmithStudioOpen() => GunsmithPanel.IsAnyOpen;
 
+	// Temporary cursor diagnostic toggle. Off by default now that the bug also
+	// affects pause-menu mouse movement; real interactive menus must be allowed
+	// to show/release the cursor.
+	[ConVar( "hc1_force_combat_cursor_hidden" )]
+	public static bool ForceCombatCursorHidden { get; set; } = false;
+
+	[ConVar( "hc1_mouse_trace" )]
+	public static bool CombatMouseTrace { get; set; } = false;
+
+	private static bool IsMouseTraceInputActive() =>
+		Input.Down( "attack1" )
+		|| Input.Down( "attack2" )
+		|| Input.Pressed( "attack1" )
+		|| Input.Pressed( "attack2" )
+		|| Input.Released( "attack1" )
+		|| Input.Released( "attack2" );
+
 	public static bool IsInteractiveMouseUiOpen() =>
 		Facepunch.UI.PauseMenuPanel.IsAnyOpen
 		|| Facepunch.UI.BuyMenu.IsAnyOpen
 		|| Facepunch.UI.Chat.IsAnyOpen
 		|| Input.Down( "Score" )
-		|| Facepunch.UI.EndOfMatchScreen.IsAnyVisible;
+		|| Facepunch.UI.EndOfMatchScreen.IsAnyVisible
+		|| MapVoteSystem.Instance.IsValid();
 
 	public static PlayerPawn GetActiveCombatPawn()
 	{
@@ -130,6 +148,14 @@ public static partial class GameUtils
 		if ( Facepunch.UI.EndOfMatchScreen.IsAnyVisible )
 			return "end of match screen visible";
 
+		// The map vote overlay is a clickable panel — its singleton only exists while the vote is up,
+		// so this keeps the cursor alive for exactly that window and no longer.
+		if ( MapVoteSystem.Instance.IsValid() )
+			return "map vote open";
+
+		if ( ForceCombatCursorHidden )
+			return null;
+
 		return null;
 	}
 
@@ -137,6 +163,7 @@ public static partial class GameUtils
 	{
 		if ( ShouldHideCombatMouse( player ) )
 		{
+			Input.EnableVirtualCursor = false;
 			Mouse.Visible = false;
 			Mouse.CursorType = "none";
 			Mouse.Visibility = MouseVisibility.Hidden;
@@ -157,11 +184,29 @@ public static partial class GameUtils
 	private static void Command_MouseDebug()
 	{
 		var player = GetActiveCombatPawn();
-		var blockReason = GetCombatMouseBlockReason( player );
 		UpdateCombatMouseVisibility( player );
+		TraceCombatMouse( "debug-command", player, true );
+	}
+
+	[ConCmd( "hc1_mouse_trace_once" )]
+	private static void Command_MouseTraceOnce()
+	{
+		var player = GetActiveCombatPawn();
+		TraceCombatMouse( "trace-once", player, true );
+	}
+
+	public static void TraceCombatMouse( string stage, PlayerPawn player = null, bool force = false )
+	{
+		if ( !force && (!CombatMouseTrace || !IsMouseTraceInputActive()) )
+			return;
+
+		player ??= GetActiveCombatPawn();
+		var blockReason = GetCombatMouseBlockReason( player );
 
 		Log.Info(
-			$"MouseDebug: visibility={Mouse.Visibility}, visible={GetMouseVisibleDebug()}, cursor={GetMouseCursorDebug()}, active={GetMouseActiveDebug()}, position={GetMousePositionDebug()}, hide={blockReason is null}, reason={blockReason ?? "none"}, " +
+			$"MouseTrace[{stage}]: visibility={Mouse.Visibility}, visible={GetMouseVisibleDebug()}, cursor={GetMouseCursorDebug()}, active={GetMouseActiveDebug()}, position={GetMousePositionDebug()}, inputCursorVisible={GetInputMouseCursorVisibleDebug()}, virtualCursor={GetInputVirtualCursorDebug()}, hide={blockReason is null}, reason={blockReason ?? "none"}, " +
+			$"attack1 down={Input.Down( "attack1" )}/pressed={Input.Pressed( "attack1" )}/released={Input.Released( "attack1" )}, " +
+			$"attack2 down={Input.Down( "attack2" )}/pressed={Input.Pressed( "attack2" )}/released={Input.Released( "attack2" )}, analogLook={Input.AnalogLook}, " +
 			$"lockShouldCapture={Facepunch.UI.CombatMouseLock.LastShouldCapture}, lockHasCapture={Facepunch.UI.CombatMouseLock.LastHasMouseCapture}, " +
 			$"lockHasFocus={Facepunch.UI.CombatMouseLock.LastHasFocus}, " +
 			$"player={GetPlayerDisplayNameDebug( player )}, isViewer={GetPlayerViewerDebug( player )}, " +
@@ -293,6 +338,30 @@ public static partial class GameUtils
 		try
 		{
 			return Mouse.Position.ToString();
+		}
+		catch ( Exception exception )
+		{
+			return $"error:{exception.GetType().Name}";
+		}
+	}
+
+	private static string GetInputMouseCursorVisibleDebug()
+	{
+		try
+		{
+			return Input.MouseCursorVisible.ToString();
+		}
+		catch ( Exception exception )
+		{
+			return $"error:{exception.GetType().Name}";
+		}
+	}
+
+	private static string GetInputVirtualCursorDebug()
+	{
+		try
+		{
+			return Input.EnableVirtualCursor.ToString();
 		}
 		catch ( Exception exception )
 		{

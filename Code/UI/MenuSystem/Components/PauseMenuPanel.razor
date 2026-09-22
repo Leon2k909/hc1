@@ -8,7 +8,10 @@
 
 @code
 {
-    public static bool IsAnyOpen => Game.ActiveScene.IsValid() && Game.ActiveScene.GetAllComponents<PauseMenuPanel>().Any( x => x.IsValid() && x.Enabled && x.IsOpen );
+    public static bool IsAnyOpen =>
+        (Instance is not null && Instance.IsValid() && Instance.Enabled && Instance.IsOpen)
+        || (Game.ActiveScene.IsValid() && Game.ActiveScene.GetAllComponents<PauseMenuPanel>().Any( x => x.IsValid() && x.Enabled && x.IsOpen ));
+
     private static PauseMenuPanel Instance { get; set; }
 
     private bool IsOpen = false;

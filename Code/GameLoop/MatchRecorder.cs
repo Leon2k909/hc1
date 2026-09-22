@@ -9,10 +9,19 @@ public class MatchRecorder : Component
     private MovieRecorder _recorder;
     private bool _isRecording;
 
+    [ConVar( "hc1_match_recorder_enabled" )]
+    public static bool MatchRecorderEnabled { get; set; } = false;
+
     [Property] public bool AutoRecord { get; set; } = true;
 
     protected override void OnStart()
     {
+        if ( !MatchRecorderEnabled )
+        {
+            Log.Info( "MatchRecorder disabled by hc1_match_recorder_enabled=0." );
+            return;
+        }
+
         if ( AutoRecord && Networking.IsHost )
         {
             StartRecording();
@@ -21,6 +30,7 @@ public class MatchRecorder : Component
 
     public void StartRecording()
     {
+        if ( !MatchRecorderEnabled ) return;
         if ( _isRecording ) return;
 
         _recorder = new MovieRecorder( Scene );

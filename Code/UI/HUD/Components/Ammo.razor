@@ -20,7 +20,7 @@
         </div>
     }
 
-    <label class="vital">@(HasAmmo?.Ammo.ToString() ?? "∞")</label>
+    <label class="vital">@AmmoDisplay</label>
     <separator />
     <label class="important">@(HasAmmo?.MaxAmmo.ToString() ?? "∞")</label>
 </root>
@@ -36,6 +36,18 @@
     public PlayerPawn Player => Client.Viewer.PlayerPawn;
 
     private WeaponAmmo HasAmmo => Player?.CurrentEquipment?.Components?.Get<WeaponAmmo>(FindMode.EverythingInSelfAndDescendants);
+
+    /// Magazine and chamber shown separately, so "29+1" reads as 29 in the mag with one chambered.
+    private string AmmoDisplay
+    {
+        get
+        {
+            var ammo = HasAmmo;
+            if ( ammo is null ) return "∞";
+            if ( ammo.ChamberedRounds < 1 ) return ammo.Ammo.ToString();
+            return $"{ammo.AmmoInMagazine}+{ammo.ChamberedRounds}";
+        }
+    }
 
     public Shootable Shoot => Player.CurrentEquipment.IsValid() ? Player.CurrentEquipment.Components.Get<Shootable>( FindMode.EnabledInSelfAndDescendants ) : null;
 

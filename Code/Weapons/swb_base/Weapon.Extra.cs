@@ -13,15 +13,6 @@ public partial class Weapon
 		}
 	}
 
-	// Barrel heat
-	public void BarrelHeatCheck()
-	{
-		if ( TimeSincePrimaryShoot > 3 && TimeSinceSecondaryShoot > 0 )
-		{
-			barrelHeat = 0;
-		}
-	}
-
 	// Tucking
 	public virtual float GetTuckDist()
 	{

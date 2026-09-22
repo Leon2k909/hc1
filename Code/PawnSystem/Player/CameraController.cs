@@ -252,7 +252,9 @@ public sealed class CameraController : PawnCameraController, IGameEventHandler<D
 		if ( !IsActive && !GameUtils.IsActiveCombatPlayer( Player ) )
 			return;
 
+		GameUtils.TraceCombatMouse( "CameraController.UpdateMouseVisibility.before", Player );
 		GameUtils.UpdateCombatMouseVisibility( Player );
+		GameUtils.TraceCombatMouse( "CameraController.UpdateMouseVisibility.after", Player );
 	}
 
 	protected override void OnDisabled()

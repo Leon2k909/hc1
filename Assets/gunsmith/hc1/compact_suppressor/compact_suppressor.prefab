@@ -1,0 +1,29 @@
+{
+  "RootObject": {
+    "__guid": "0a1dea5e-8223-5fa3-921a-3372ad65ebbf",
+    "Flags": 0,
+    "Name": "HC1 Compact Suppressor",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "63be273e-b239-5456-bfdb-49a933cc3992",
+        "Model": "attachments/hc1/compact_suppressor/compact_suppressor.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithSocketAttachment",
+        "__guid": "60f9870a-c7e5-51fc-9174-6d85b2af9ecf",
+        "SocketName": "muzzle",
+        "SocketOffset": "-0.35,0,0",
+        "SocketAngles": "0,0,0"
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

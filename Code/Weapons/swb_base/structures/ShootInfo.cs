@@ -116,10 +116,15 @@ public class ShootInfo : Component
 	[Property, Group( "Particles" )] public PrefabScene BulletEjectParticle { get; set; } = LoadParticle( "particles/shell/shelleject_9mm.prefab" );
 
 	/// <summary>Particle used for the muzzle flash</summary>
-	[Property, Group( "Particles" )] public PrefabScene MuzzleFlashParticle { get; set; } = LoadParticle( "particles/muzzle/muzzleflash.prefab" );
+	[Property, Group( "Particles" )] public PrefabScene MuzzleFlashParticle { get; set; } = LoadParticle( "prefabs/weapon_effects/rifle_muzzleflash.prefab" );
+	[Property, Group( "Particles" ), Range( 0f, 1f )] public float MuzzleFlashChance { get; set; } = 0.25f;
+	[Property, Group( "Particles" )] public float MuzzleFlashScale { get; set; } = 0.65f;
+	[Property, Group( "Particles" ), Range( 0f, 1f )] public float SuppressedMuzzleFlashChance { get; set; } = 0.02f;
+	[Property, Group( "Particles" )] public float SuppressedMuzzleFlashScale { get; set; } = 0.5f;
 
 	/// <summary>Particle used for the barrel smoke</summary>
-	[Property, Group( "Particles" )] public PrefabScene BarrelSmokeParticle { get; set; } = LoadParticle( "particles/muzzle/barrelsmoke.prefab" );
+	[Property, Group( "Particles" )] public PrefabScene BarrelSmokeParticle { get; set; } = LoadParticle( "prefabs/weapon_effects/gun_smoke.prefab" );
+	[Property, Group( "Particles" )] public float BarrelSmokeScale { get; set; } = 1f;
 
 	/// <summary>Particle used for the barrel smoke</summary>
 	[Property, Group( "Particles" )] public PrefabScene BulletTracerParticle { get; set; } = LoadParticle( "particles/tracer/tracer.prefab" );

@@ -37,8 +37,7 @@ public abstract class SilencerAttachment : Attachment
 		oldMuzzleFlashParticle = Weapon.Primary.MuzzleFlashParticle;
 		oldShootSound = Weapon.Primary.ShootSound;
 
-		if ( MuzzleFlashParticle is not null )
-			Weapon.Primary.MuzzleFlashParticle = MuzzleFlashParticle;
+		Weapon.Primary.MuzzleFlashParticle = MuzzleFlashParticle;
 
 		if ( ShootSound is not null )
 			Weapon.Primary.ShootSound = ShootSound;

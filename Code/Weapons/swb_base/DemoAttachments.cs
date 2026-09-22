@@ -60,7 +60,7 @@ public class SniperSilencerBG : SilencerAttachment
 	public override int BodyGroupDefault { get; set; } = 0;
 
 	// Silencer
-	public override PrefabScene MuzzleFlashParticle { get; set; } = ShootInfo.LoadParticle( "particles/muzzle/muzzleflash.prefab" );
+	public override PrefabScene MuzzleFlashParticle { get; set; } = ShootInfo.LoadParticle( "prefabs/weapon_effects/suppressed_muzzleflash.prefab" );
 	[Property, Group( "Silencer" )] public override SoundEvent ShootSound { get; set; } = ResourceLibrary.Get<SoundEvent>( "sounds/swb/attachments/silencer/swb_sniper.silenced.fire.sound" );
 }
 

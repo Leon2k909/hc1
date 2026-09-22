@@ -55,6 +55,12 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	[Sync] public bool IsCrouching { get; set; }
 
 	/// <summary>
+	/// Are we lying down? Toggled with the Prone action rather than held, since you shouldn't have to
+	/// keep a key down to stay on the floor.
+	/// </summary>
+	[Sync] public bool IsProne { get; set; }
+
+	/// <summary>
 	/// Is the player slow walking?
 	/// </summary>
 	[Sync] public bool IsSlowWalking { get; set; }
@@ -217,7 +223,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 				helper.IsGrounded = isGroundedForAnimation;
 				helper.WithLook( EyeAngles.Forward );
 				helper.MoveStyle = AnimationHelper.MoveStyles.Run;
-				helper.DuckLevel = (MathF.Abs( _smoothEyeHeight ) / 32.0f);
+				helper.DuckLevel = (MathF.Abs( _smoothEyeHeight ) / 32.0f).Clamp( 0f, 1f );
 				helper.HoldType = CurrentHoldType;
 				helper.Handedness = CurrentEquipment.IsValid() ? CurrentEquipment.GetHandedness() : AnimationHelper.Hand.Both;
 			}
@@ -290,10 +296,18 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	private bool WantsToggleSprint { get; set; }
 
 	private bool HasSprintMovement => WishMove.x > 0.2f || (MathF.Abs( WishMove.y ) > 0.2f && WishMove.x >= 0f);
-	private bool CanSprint => !IsSlowWalking && !HasEquipmentTag( "no_sprint" );
+	private bool CanSprint => !IsSlowWalking && !IsProne && !HasEquipmentTag( "no_sprint" );
 
 	private bool GetWantsToSprint()
 	{
+		// Shooting breaks the sprint. Without this, holding fire while running is simply swallowed by
+		// the no_shooting tag and you stay stuck in the run animation until you let go of Run.
+		if ( Input.Down( "Attack1" ) )
+		{
+			WantsToggleSprint = false;
+			return false;
+		}
+
 		if ( GameSettingsSystem.Current.ToggleSprint )
 		{
 			if ( Input.Pressed( "Run" ) )
@@ -334,6 +348,13 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 		{
 			OnSprintChanged( wasSprinting, IsSprinting );
 		}
+
+		// Prone toggles rather than being held, and jumping gets you back on your feet.
+		if ( Input.Pressed( "Prone" ) && !IsNoclipping )
+			IsProne = !IsProne;
+
+		if ( IsProne && Input.Pressed( "Jump" ) )
+			IsProne = false;
 
 		IsCrouching = Input.Down( "Duck" ) && !IsNoclipping;
 		IsUsing = Input.Down( "Use" );
@@ -577,6 +598,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 
 	float GetEyeHeightOffset()
 	{
+		if ( IsProne ) return -40f;
 		if ( IsCrouching ) return -16f;
 		if ( HealthComponent.State == LifeState.Dead ) return -48f;
 		return 0f;
@@ -592,7 +614,11 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	public float GetWishSpeed()
 	{
 		float speed = 0f;
-		if ( IsSlowWalking )
+		if ( IsProne )
+		{
+			speed = Global.ProneSpeed;
+		}
+		else if ( IsSlowWalking )
 		{
 			speed = Global.SlowWalkSpeed;
 			// Apply per-weapon ADS walk speed tuning only when actually aiming

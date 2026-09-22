@@ -24,7 +24,7 @@
         "OnComponentFixedUpdate": null,
         "OnComponentStart": null,
         "OnComponentUpdate": null,
-        "Time": 2,
+        "Time": 0.15,
         "TimeUntilDestroy": {
           "Absolute": 0,
           "Relative": -314.98434,
@@ -65,7 +65,7 @@
             "ApplyRotation": true,
             "ApplyShape": true,
             "Bounce": 1,
-            "Brightness": 20,
+            "Brightness": 6,
             "Bumpiness": 0,
             "Collision": false,
             "CollisionIgnore": null,
@@ -124,7 +124,7 @@
               "Y": 0,
               "Z": 0
             },
-            "Lifetime": 0.1,
+            "Lifetime": 0.035,
             "LocalSpace": 1,
             "MaxParticles": 1,
             "OnComponentDestroy": null,
@@ -141,7 +141,7 @@
               "Z": 0
             },
             "OrbitalPull": 0,
-            "PerParticleTimeScale": 3,
+            "PerParticleTimeScale": 1,
             "Pitch": 0,
             "PreWarm": 0,
             "PushStrength": 0,
@@ -188,7 +188,7 @@
             "OnComponentStart": null,
             "OnComponentUpdate": null,
             "OnEdge": false,
-            "Rate": 796.51,
+            "Rate": 0,
             "RateOverDistance": 0,
             "Size": "0,0,0"
           },
@@ -254,14 +254,14 @@
             "Alpha": {
               "Type": "Range",
               "Evaluation": "Life",
-              "Constants": "1,4,0,0"
+              "Constants": "0.6,0,0,0"
             },
             "ApplyAlpha": true,
             "ApplyColor": true,
             "ApplyRotation": true,
             "ApplyShape": true,
             "Bounce": 1,
-            "Brightness": 20,
+            "Brightness": 6,
             "Bumpiness": 0,
             "Collision": false,
             "CollisionIgnore": null,
@@ -320,7 +320,7 @@
               "Y": 0,
               "Z": 0
             },
-            "Lifetime": 0.1,
+            "Lifetime": 0.035,
             "LocalSpace": 1,
             "MaxParticles": 1,
             "OnComponentDestroy": null,
@@ -337,7 +337,7 @@
               "Z": 0
             },
             "OrbitalPull": 0,
-            "PerParticleTimeScale": 3,
+            "PerParticleTimeScale": 1,
             "Pitch": 0,
             "PreWarm": 0,
             "PushStrength": 0,
@@ -380,7 +380,7 @@
             "OnComponentStart": null,
             "OnComponentUpdate": null,
             "OnEdge": false,
-            "Rate": 796.51,
+            "Rate": 0,
             "RateOverDistance": 0,
             "Size": "0,0,0"
           },
@@ -446,14 +446,14 @@
             "Alpha": {
               "Type": "Range",
               "Evaluation": "Life",
-              "Constants": "1,4,0,0"
+              "Constants": "0.6,0,0,0"
             },
             "ApplyAlpha": true,
             "ApplyColor": true,
             "ApplyRotation": true,
             "ApplyShape": true,
             "Bounce": 1,
-            "Brightness": 20,
+            "Brightness": 6,
             "Bumpiness": 0,
             "Collision": false,
             "CollisionIgnore": null,
@@ -512,7 +512,7 @@
               "Y": 0,
               "Z": 0
             },
-            "Lifetime": 0.1,
+            "Lifetime": 0.035,
             "LocalSpace": 1,
             "MaxParticles": 1,
             "OnComponentDestroy": null,
@@ -529,7 +529,7 @@
               "Z": 0
             },
             "OrbitalPull": 0,
-            "PerParticleTimeScale": 3,
+            "PerParticleTimeScale": 1,
             "Pitch": 0,
             "PreWarm": 0,
             "PushStrength": 0,
@@ -576,7 +576,7 @@
             "OnComponentStart": null,
             "OnComponentUpdate": null,
             "OnEdge": false,
-            "Rate": 796.51,
+            "Rate": 0,
             "RateOverDistance": 0,
             "Size": "0,0,0"
           },
@@ -708,7 +708,7 @@
               "Y": 0,
               "Z": 0
             },
-            "Lifetime": 0.1,
+            "Lifetime": 0.035,
             "LocalSpace": 1,
             "MaxParticles": 1,
             "OnComponentDestroy": null,
@@ -725,7 +725,7 @@
               "Z": 0
             },
             "OrbitalPull": 0,
-            "PerParticleTimeScale": 3,
+            "PerParticleTimeScale": 1,
             "Pitch": 0,
             "PreWarm": 0,
             "PushStrength": 0,
@@ -772,7 +772,7 @@
             "OnComponentStart": null,
             "OnComponentUpdate": null,
             "OnEdge": false,
-            "Rate": 796.51,
+            "Rate": 0,
             "RateOverDistance": 0,
             "Size": "0,0,0"
           },
@@ -824,7 +824,7 @@
         "Rotation": "0,-0.7071068,0,0.7071068",
         "Scale": "1,1,1",
         "Tags": "particles",
-        "Enabled": true,
+        "Enabled": false,
         "NetworkMode": 2,
         "NetworkInterpolation": true,
         "NetworkOrphaned": 0,
@@ -1096,7 +1096,7 @@
         "Rotation": "0,0,0,1",
         "Scale": "1,1,1",
         "Tags": "particles",
-        "Enabled": true,
+        "Enabled": false,
         "NetworkMode": 2,
         "NetworkInterpolation": true,
         "NetworkOrphaned": 0,

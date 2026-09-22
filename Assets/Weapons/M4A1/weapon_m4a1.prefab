@@ -146,6 +146,13 @@
             "MaxEffectsPlayDistance": 4194304,
             "MaxRange": 10000,
             "MaxRicochetAngle": 45,
+            "MuzzleFlashChance": 0.12,
+            "MuzzleFlashScale": 0.5,
+            "MuzzleSmokePrefab": {
+              "_type": "gameobject",
+              "prefab": "prefabs/weapon_effects/gun_smoke.prefab"
+            },
+            "MuzzleSmokeScale": 1.0,
             "MuzzleFlashPrefab": {
               "_type": "gameobject",
               "prefab": "prefabs/weapon_effects/rifle_muzzleflash.prefab"
@@ -258,7 +265,7 @@
             "__guid": "8e60004f-7ba0-4fa4-88bc-d1abbef63869",
             "__enabled": true,
             "AimAngleOffset": "0,0,0",
-            "AimOffset": "0,0,0",
+            "AimOffset": "-4,0,-0.5",
             "InputActions": [
               "Attack2"
             ],

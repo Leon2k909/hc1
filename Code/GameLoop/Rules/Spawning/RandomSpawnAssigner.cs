@@ -74,6 +74,9 @@ public sealed class RandomSpawnAssigner : Component, ISpawnAssigner
 			.Where( x => x.Client != player )
 			.Where( x => x.HealthComponent.State == LifeState.Alive )
 			.Select( x => x.Transform.World )
+			.Concat( GameUtils.LightweightBots
+				.Where( x => x.IsValid() && x.IsAlive )
+				.Select( x => x.Transform.World ) )
 			.ToArray();
 
 		var enemyPlayers = GameUtils.PlayerPawns
@@ -81,6 +84,10 @@ public sealed class RandomSpawnAssigner : Component, ISpawnAssigner
 			.Where( x => !x.Client.IsFriendly( player ) )
 			.Where( x => x.HealthComponent.State == LifeState.Alive )
 			.Select( x => x.Transform.World )
+			.Concat( GameUtils.LightweightBots
+				.Where( x => x.IsValid() && x.IsAlive )
+				.Where( x => player.Team == Team.Unassigned || x.Team != player.Team )
+				.Select( x => x.Transform.World ) )
 			.ToArray();
 
 		var spawns = GameUtils.GetSpawnPoints( SpawnTags.ToArray() )

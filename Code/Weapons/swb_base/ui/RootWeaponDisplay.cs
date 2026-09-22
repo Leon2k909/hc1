@@ -8,6 +8,10 @@ public class RootWeaponDisplay : PanelComponent
 
 	protected override void OnStart()
 	{
+		base.OnStart();
+		Panel.Style.Set( "pointer-events: none;" );
+		Panel.Style.PointerEvents = PointerEvents.None;
+
 		if ( IsProxy )
 		{
 			Enabled = false;

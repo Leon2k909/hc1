@@ -161,23 +161,24 @@ public partial class Shootable : WeaponInputAction,
 
 	private bool UseSuppressedEffects()
 	{
-		return SuppressedAttachment.IsValid()
+		return HasBuiltInSuppressor || (SuppressedAttachment.IsValid()
 		       && Equipment.IsValid()
 		       && Equipment.Resource.IsValid()
-		       && GunsmithLoadoutManager.HasAttachment( Equipment.Resource, SuppressedAttachment );
+		       && GunsmithLoadoutManager.HasAttachment( Equipment.Resource, SuppressedAttachment ));
 	}
 
-	private GameObject GetMuzzleFlashPrefab()
+	private GameObject GetMuzzleFlashPrefab( bool suppressed )
 	{
-		if ( UseSuppressedEffects() && SuppressedMuzzleFlashPrefab.IsValid() )
-			return SuppressedMuzzleFlashPrefab;
+		// Never fall back to an unsuppressed flash when a suppressor has no flash asset.
+		if ( suppressed )
+			return HasBuiltInSuppressor ? MuzzleFlashPrefab : SuppressedMuzzleFlashPrefab;
 
 		return MuzzleFlashPrefab;
 	}
 
-	private SoundEvent GetShootSound()
+	private SoundEvent GetShootSound( bool suppressed )
 	{
-		if ( UseSuppressedEffects() && SuppressedShootSound is not null )
+		if ( suppressed && SuppressedShootSound is not null )
 			return SuppressedShootSound;
 
 		return ShootSound;
@@ -187,26 +188,20 @@ public partial class Shootable : WeaponInputAction,
 	/// Play any particle effects such as muzzle flashes.
 	/// </summary>
 	[Rpc.Broadcast]
-	protected void DoShootEffects()
+	protected void DoShootEffects( bool suppressed, bool showFlash, float flashScale, float smokeScale )
 	{
-		if ( !Effector.ModelRenderer.IsValid() )
+		if ( Application.IsDedicatedServer || !Equipment.IsValid() )
 			return;
 
-		// Create a muzzle flash from a GameObject / prefab
-		var muzzleFlashPrefab = GetMuzzleFlashPrefab();
-		if ( muzzleFlashPrefab.IsValid() )
-		{
-			if ( Effector.Muzzle.IsValid() )
-			{
-				muzzleFlashPrefab.Clone( new CloneConfig()
-				{
-					Parent = Effector.Muzzle,
-					Transform = new(),
-					StartEnabled = true,
-					Name = $"Muzzle flash: {Equipment.GameObject}"
-				} );
-			}
-		}
+		var effector = Effector;
+		if ( !effector.IsValid() || !effector.ModelRenderer.IsValid() )
+			return;
+
+		if ( showFlash )
+			CreateDischargeParticle( GetMuzzleFlashPrefab( suppressed ), effector.Muzzle, flashScale, "Muzzle flash" );
+
+		if ( smokeScale > 0f )
+			CreateDischargeParticle( MuzzleSmokePrefab, effector.Muzzle, smokeScale, "Muzzle smoke" );
 
 		// Eject casing using GameObject / prefab
 		if ( EjectionPrefab.IsValid() )
@@ -223,7 +218,7 @@ public partial class Shootable : WeaponInputAction,
 			}
 		}
 
-		var shootSound = GetShootSound();
+		var shootSound = GetShootSound( suppressed );
 		if ( shootSound is not null )
 		{
 			if ( Sound.Play( shootSound, Equipment.WorldPosition ) is { } snd )
@@ -266,9 +261,10 @@ public partial class Shootable : WeaponInputAction,
 	public void Shoot()
 	{
 		TimeSinceShoot = 0;
+		var suppressed = UseSuppressedEffects();
 
 		// CoD-style minimap reveal: an unsuppressed shot briefly puts us on the enemy minimap.
-		if ( !UseSuppressedEffects() && Player.IsValid() )
+		if ( !suppressed && Player.IsValid() )
 			Player.TimeSinceUnsuppressedShot = 0;
 
 		if ( AmmoComponent.IsValid() )
@@ -277,7 +273,7 @@ public partial class Shootable : WeaponInputAction,
 		if ( CurrentFireMode == FireMode.Burst )
 			IsBurstFiring = true;
 
-		DoShootEffects();
+		PlayDischargeEffects( suppressed );
 
 		Player.GameObject.Dispatch( new WeaponShotEvent( Equipment ) );
 		

@@ -1,3 +1,6 @@
+using System.IO;
+using System.Linq;
+
 namespace Facepunch;
 
 public partial class MinimapRenderer : Component, Component.ExecuteInEditor
@@ -66,6 +69,87 @@ public partial class MinimapRenderer : Component, Component.ExecuteInEditor
 			Gizmo.Draw.SolidBox( BBox.FromPositionAndSize( Vector3.Zero, Size ) );
 		}
     }
+
+
+	[Button( "Generate Minimap" )]
+	public void GenerateMinimap()
+	{
+		if ( Game.IsPlaying )
+		{
+			Log.Warning( "Minimap generation is editor-only." );
+			return;
+		}
+
+		GetOrCreateCamera();
+
+		var width = Math.Max( 64, (int)ExportResolution.x );
+		var height = Math.Max( 64, (int)ExportResolution.y );
+		var renderTarget = Texture.CreateRenderTarget( $"minimap_{GameObject.Id}", ImageFormat.RGBA8888, new Vector2( width, height ) );
+		Camera.RenderToTexture( renderTarget );
+
+		var pixels = renderTarget.GetPixels();
+		if ( pixels == null || pixels.Length != width * height )
+		{
+			Log.Error( $"Minimap generation failed: expected {width * height} pixels, got {pixels?.Length ?? 0}." );
+			return;
+		}
+
+		var sceneName = SanitizeFileName( Game.ActiveScene?.Name ?? GameObject.Name ?? "scene" ).ToLowerInvariant();
+		if ( string.IsNullOrWhiteSpace( sceneName ) )
+			sceneName = "scene";
+
+		var relativePath = $"ui/minimaps/minimap_{sceneName}.tga";
+		FileSystem.Data.CreateDirectory( "ui/minimaps" );
+		WriteTga( relativePath, pixels, width, height );
+		CurrentMinimapPath = relativePath;
+
+		Log.Info( $"Generated minimap: {CurrentMinimapPath}" );
+	}
+
+	private static string SanitizeFileName( string value )
+	{
+		return new string( value
+			.Select( c => char.IsLetterOrDigit( c ) ? c : '_' )
+			.ToArray() );
+	}
+
+	private static void WriteTga( string path, Color32[] pixels, int width, int height )
+	{
+		using var stream = FileSystem.Data.OpenWrite( path );
+
+		// Uncompressed true-color TGA, top-left origin, 32bpp.
+		stream.WriteByte( 0 );
+		stream.WriteByte( 0 );
+		stream.WriteByte( 2 );
+		WriteUInt16LittleEndian( stream, 0 );
+		WriteUInt16LittleEndian( stream, 0 );
+		stream.WriteByte( 0 );
+		WriteUInt16LittleEndian( stream, 0 );
+		WriteUInt16LittleEndian( stream, 0 );
+		WriteUInt16LittleEndian( stream, (ushort)width );
+		WriteUInt16LittleEndian( stream, (ushort)height );
+		stream.WriteByte( 32 );
+		stream.WriteByte( 0x28 );
+
+		for ( var y = 0; y < height; y++ )
+		{
+			var srcY = height - 1 - y;
+			for ( var x = 0; x < width; x++ )
+			{
+				var c = pixels[srcY * width + x];
+				stream.WriteByte( c.b );
+				stream.WriteByte( c.g );
+				stream.WriteByte( c.r );
+				stream.WriteByte( c.a );
+			}
+		}
+	}
+
+	private static void WriteUInt16LittleEndian( Stream stream, ushort value )
+	{
+		stream.WriteByte( (byte)(value & 0xFF) );
+		stream.WriteByte( (byte)(value >> 8) );
+	}
 
 	void GetOrCreateCamera()
 	{

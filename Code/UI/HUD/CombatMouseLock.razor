@@ -6,11 +6,32 @@
 @code
 {
 	public static bool LastShouldCapture { get; private set; }
-	public static bool LastHasMouseCapture => false;
+	public static bool LastHasMouseCapture { get; private set; }
 	public static bool LastHasFocus { get; private set; }
+
+	[ConVar( "hc1_disable_combat_mouse_lock" )]
+	public static bool DisableCombatMouseLock { get; set; } = false;
 
 	public override void Tick()
 	{
+		GameUtils.TraceCombatMouse( "CombatMouseLock.Tick.begin" );
+
+		if ( DisableCombatMouseLock )
+		{
+			SetClass( "active", false );
+			AcceptsFocus = false;
+			SetMouseCapture( false );
+
+			if ( HasFocus )
+				Blur();
+
+			LastShouldCapture = false;
+			LastHasMouseCapture = HasMouseCapture;
+			LastHasFocus = HasFocus;
+			GameUtils.UpdateCombatMouseVisibility();
+			return;
+		}
+
 		var shouldLock = GameUtils.ShouldHideCombatMouse();
 		LastShouldCapture = shouldLock;
 
@@ -22,20 +43,30 @@
 		{
 			if ( !HasFocus )
 				Focus();
+
+			if ( !HasMouseCapture )
+				SetMouseCapture( true );
 		}
 		else
 		{
+			if ( HasMouseCapture )
+				SetMouseCapture( false );
+
 			if ( HasFocus )
 				Blur();
 		}
 
+		LastHasMouseCapture = HasMouseCapture;
 		LastHasFocus = HasFocus;
 		GameUtils.UpdateCombatMouseVisibility();
+		GameUtils.TraceCombatMouse( "CombatMouseLock.Tick.end" );
 	}
 
 	public override void OnDeleted()
 	{
+		SetMouseCapture( false );
 		LastShouldCapture = false;
+		LastHasMouseCapture = false;
 		LastHasFocus = false;
 		base.OnDeleted();
 	}

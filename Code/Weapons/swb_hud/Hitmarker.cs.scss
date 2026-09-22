@@ -4,6 +4,7 @@ hitmarker {
     position: absolute;
     left: 50%;
     top: 50%;
+    pointer-events: none;
 
     .fadeOut {
         opacity: 0;
@@ -12,6 +13,7 @@ hitmarker {
     marker {
         opacity: 1;
         transition: opacity 0.2s ease-in 0s;
+        pointer-events: none;
 
         .leftTopBar {
             top: -10px;

@@ -81,7 +81,16 @@ public partial class Reloadable : WeaponInputAction,
 	{
 		if ( Input.Down( "Use" ) ) return false; // Don't reload if we're using something.
 
-		return !IsReloading && AmmoComponent.IsValid() && !AmmoComponent.IsFull;
+		if ( IsReloading || !AmmoComponent.IsValid() ) return false;
+
+		// Shell-by-shell reloads top the magazine up one at a time and stop at its size — they never
+		// end on a chambered extra round, so targeting max + 1 here would let you start a pointless
+		// extra reload while already full.
+		var target = SingleReload
+			? AmmoComponent.GetEffectiveMaxAmmo()
+			: AmmoComponent.GetMaxAmmoWithChamber();
+
+		return AmmoComponent.Ammo < target;
 	}
 
 	float GetReloadTime()
@@ -108,6 +117,10 @@ public partial class Reloadable : WeaponInputAction,
 		_queueCancel = false;
 
 		bool isContinuedReload = IsReloading;
+
+		// Shell-by-shell reloads should release at most one residual wisp per sequence.
+		if ( !IsProxy && !isContinuedReload )
+			Equipment.GetComponentInChildren<Shootable>()?.PlayReloadSmoke();
 
 		if ( !IsProxy )
 		{
@@ -173,8 +186,13 @@ public partial class Reloadable : WeaponInputAction,
 			else
 			{
 				IsReloading = false;
-				// Refill the ammo container.
-				AmmoComponent.Ammo = AmmoComponent.GetEffectiveMaxAmmo();
+
+				// Ammo still holds the pre-reload count here, so it tells us whether there was a round
+				// left to keep in the chamber. Swapping a partially spent mag gives max + 1; reloading
+				// from empty has nothing chambered, so just max.
+				AmmoComponent.Ammo = AmmoComponent.HasAmmo
+					? AmmoComponent.GetMaxAmmoWithChamber()
+					: AmmoComponent.GetEffectiveMaxAmmo();
 			}
 		}
 

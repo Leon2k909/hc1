@@ -25,6 +25,7 @@ public sealed class LightweightCombatBot : Component, ITeam, IDescription, IResp
 	[Property, Group( "Combat" )] public float AimError { get; set; } = 140f;
 	[Property, Group( "Movement" )] public float MoveSpeed { get; set; } = 180f;
 	[Property, Group( "Movement" )] public float PatrolRadius { get; set; } = 900f;
+	[Property, Group( "Visuals" ), InlineEditor] public Dictionary<Team, HumanOutfitter.TeamModelEntry> TeamBaseModels { get; set; } = new();
 	[Property, Group( "Visuals" )] public string WeaponWorldModelPrefab { get; set; } = "weapons/m4a1/wm_m4a1.prefab";
 	[Property, Group( "Effects" )] public string MuzzleFlashPrefab { get; set; } = "prefabs/weapon_effects/rifle_muzzleflash.prefab";
 	[Property, Group( "Effects" )] public string TracerEffectPrefab { get; set; } = "weapons/common/effects/tracer_9mm.prefab";
@@ -105,6 +106,21 @@ public sealed class LightweightCombatBot : Component, ITeam, IDescription, IResp
 		HealthComponent ??= Components.Get<HealthComponent>();
 		Agent ??= Components.Get<NavMeshAgent>();
 		Renderer ??= Components.GetInChildren<SkinnedModelRenderer>( true );
+	}
+
+	internal void ApplyTeamModel()
+	{
+		EnsureReferences();
+		if ( !Renderer.IsValid() )
+			return;
+
+		// Match the player outfitter, including its T-side fallback for free-for-all.
+		if ( !TeamBaseModels.TryGetValue( Team, out var entry )
+			&& !TeamBaseModels.TryGetValue( Team.Terrorist, out entry ) )
+			return;
+
+		if ( entry.Models is { Count: > 0 } )
+			Renderer.Model = Game.Random.FromList( entry.Models );
 	}
 
 	private void ConfigureComponents()
@@ -797,6 +813,8 @@ public sealed class LightweightBotManager : SingletonComponent<LightweightBotMan
 		{
 			bot.Team = team;
 			bot.BotName = BotNames[index % BotNames.Length];
+			// Select the body before networking and creating its weapon attachment bones.
+			bot.ApplyTeamModel();
 		}
 
 		if ( Networking.IsActive )

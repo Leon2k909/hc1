@@ -1,0 +1,29 @@
+{
+  "RootObject": {
+    "__guid": "f25b8cf3-9178-5857-9b2f-1c9c50672c46",
+    "Flags": 0,
+    "Name": "HC1 Rifle Suppressor",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "d8351197-159d-565b-86eb-b3df29a9e85d",
+        "Model": "attachments/hc1/rifle_suppressor/rifle_suppressor.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithSocketAttachment",
+        "__guid": "e08f0e60-fc33-54a6-9d22-81d4129061da",
+        "SocketName": "muzzle",
+        "SocketOffset": "-0.35,0,0",
+        "SocketAngles": "0,0,0"
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

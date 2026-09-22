@@ -4,14 +4,16 @@
 @implements IGameEventHandler<OnScoreAddedEvent>
 @implements IGameEventHandler<KillEvent>
 
-@if ( !IsHudEnabled || Scene is null )
+@if ( Scene is null )
     return;
 
 @{
     var isValidPlayer = Client.Viewer.IsValid() && Client.Viewer.Pawn.IsValid();
+    var hideCombatMouse = isValidPlayer && GameUtils.ShouldHideCombatMouse();
+    var rootClass = IsHudEnabled ? (hideCombatMouse ? "combat-cursor-hidden" : "") : "hidden";
 }
 
-<root>
+<root class="@rootClass">
     @if ( isValidPlayer )
     {
         <ScreenProtectionOverlay />
@@ -167,13 +169,17 @@
     protected override void OnUpdate()
     {
         base.OnUpdate();
+        GameUtils.TraceCombatMouse( "MainHUD.OnUpdate.before" );
         GameUtils.UpdateCombatMouseVisibility();
+        GameUtils.TraceCombatMouse( "MainHUD.OnUpdate.after" );
     }
 
     protected override void OnPreRender()
     {
         base.OnPreRender();
+        GameUtils.TraceCombatMouse( "MainHUD.OnPreRender.before" );
         GameUtils.UpdateCombatMouseVisibility();
+        GameUtils.TraceCombatMouse( "MainHUD.OnPreRender.after" );
     }
 
     protected override int BuildHash()

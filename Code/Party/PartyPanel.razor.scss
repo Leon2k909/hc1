@@ -5,9 +5,10 @@ $color-accent: #FF7A1A;
 
 PartyPanel
 {
-    position: absolute;
-    width: 100%;
-    height: 100%;
+    position: relative;
+    height: 34px;
+    flex-shrink: 0;
+    margin: 0 10px;
     pointer-events: none;
     z-index: 5900;
 
@@ -15,8 +16,8 @@ PartyPanel
     .party-invite-popup
     {
         position: absolute;
-        top: 62px;
-        right: 270px;
+        top: 44px;
+        right: 0;
         width: 300px;
         background-color: rgba( black, 0.72 );
         border: 0;
@@ -128,8 +129,8 @@ PartyPanel
     .party-toast
     {
         position: absolute;
-        top: 62px;
-        right: 270px;
+        top: 44px;
+        right: 0;
         margin-bottom: 0;
         width: 340px;
         background-color: rgba( black, 0.85 );
@@ -193,9 +194,7 @@ PartyPanel
     // ── Party bar — sits inside the global nav row (56 px tall) ──────────
     .party-bar
     {
-        position: absolute;
-        top: 11px;
-        right: 274px;
+        position: relative;
         flex-direction: row;
         align-items: center;
         gap: 5px;
@@ -246,6 +245,8 @@ PartyPanel
         border-radius: 50%;
         background-color: rgba(255,255,255,0.1);
         flex-shrink: 0;
+        object-fit: cover;
+        overflow: hidden;
     }
 
     .party-slot-crown

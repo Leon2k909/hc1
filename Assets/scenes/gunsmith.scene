@@ -60,6 +60,8 @@
           "__guid": "738dd2b7-3e88-44e5-91c4-f908c94af6eb",
           "__enabled": true,
           "Flags": 0,
+          "ContactShadows": true,
+          "Contribution": "Diffuse, Specular, Transmissive",
           "FogMode": "Enabled",
           "FogStrength": 1,
           "LightColor": "1,1,1,1",
@@ -121,6 +123,7 @@
           "OnComponentUpdate": null,
           "Priority": 0,
           "Projection": "Box",
+          "RenderExcludeTags": "",
           "Resolution": "Small",
           "Texture": "textures/cubemaps/default2.vtex",
           "TintColor": "1,1,1,1",
@@ -206,6 +209,7 @@
               "Attenuation": 1,
               "ConeInner": 15,
               "ConeOuter": 38,
+              "Contribution": "Diffuse, Specular, Transmissive",
               "Cookie": null,
               "FogMode": "Enabled",
               "FogStrength": 1,
@@ -248,6 +252,7 @@
               "Attenuation": 1,
               "ConeInner": 15,
               "ConeOuter": 38,
+              "Contribution": "Diffuse, Specular, Transmissive",
               "Cookie": null,
               "FogMode": "Enabled",
               "FogStrength": 1,
@@ -319,10 +324,10 @@
           "__enabled": true,
           "Flags": 0,
           "__version": 3,
-          "AutoExposureEnabled": true,
+          "AutoExposureEnabled": false,
           "ExposureCompensation": 0,
           "ExposureMethod": "RGB",
-          "MaximumExposure": 2,
+          "MaximumExposure": 1,
           "MinimumExposure": 1,
           "Mode": "ACES",
           "OnComponentDestroy": null,
@@ -370,8 +375,6 @@
           "__enabled": true,
           "Flags": 0,
           "__version": 1,
-          "Filter": "Bilinear",
-          "Gamma": 2.2,
           "Mode": "Additive",
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
@@ -379,8 +382,8 @@
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null,
-          "Strength": 1,
-          "Threshold": 1.6,
+          "Strength": 0.12,
+          "Threshold": 3.5,
           "Tint": "1,1,1,1"
         },
         {
@@ -389,7 +392,8 @@
           "__enabled": true,
           "Flags": 0,
           "BackBlur": true,
-          "BlurSize": 100,
+          "BlurSize": 12,
+          "DebugView": false,
           "FocalDistance": 120,
           "FocusRange": 500,
           "FrontBlur": false,
@@ -568,14 +572,15 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
+      "Sandbox.Clutter.ClutterGridSystem": {
+        "Storage": {
+          "$blob": "64db792e-5935-8fbc-8cfa-050cd49fa7fd",
+          "$refs": []
+        }
+      },
       "Sandbox.SelectionSetsSystem": {
         "Data": {
           "SelectionSets": []
-        }
-      },
-      "Sandbox.Clutter.ClutterGridSystem": {
-        "Storage": {
-          "$blob": "565b23cb-9cb8-494e-b2c4-3ba04267b1be"
         }
       }
     }

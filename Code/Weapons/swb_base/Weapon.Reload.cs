@@ -42,7 +42,13 @@ public partial class Weapon
 		ViewModelRenderer?.Set( reloadAnim, true );
 
 		// Player anim
-		HandleReloadEffects();
+		var smokeScale = 0f;
+		if ( !ShellReloading || !hasPlayedShellReloadSmoke )
+		{
+			smokeScale = dischargeEffects.ReloadSmoke( Primary.BarrelSmokeParticle is not null ? Primary.BarrelSmokeScale : 0f );
+			hasPlayedShellReloadSmoke = ShellReloading;
+		}
+		HandleReloadEffects( smokeScale );
 
 		//Boltback
 		if ( !isEmptyReload && Primary.Ammo == 0 && BoltBack )
@@ -74,6 +80,7 @@ public partial class Weapon
 
 	public virtual void CancelShellReload()
 	{
+		hasPlayedShellReloadSmoke = false;
 		IsReloading = false;
 		ViewModelRenderer?.PlaybackRate = 1;
 		ViewModelRenderer?.Set( ReloadAnim, false );
@@ -81,6 +88,8 @@ public partial class Weapon
 
 	public virtual void OnShellReload()
 	{
+		if ( !IsReloading )
+			hasPlayedShellReloadSmoke = false;
 		StartReload( ShellReloadStartTime + ShellReloadInsertTime );
 	}
 
@@ -125,9 +134,17 @@ public partial class Weapon
 	}
 
 	[Rpc.Broadcast]
-	public virtual void HandleReloadEffects()
+	public virtual void HandleReloadEffects( float smokeScale )
 	{
 		// Player
 		Owner?.TriggerAnimation( Shared.Animations.Reload );
+
+		if ( Application.IsDedicatedServer || smokeScale <= 0f || Primary?.BarrelSmokeParticle is null )
+			return;
+
+		var muzzle = GetMuzzleObject();
+		if ( !muzzle.IsValid() ) return;
+		var scale = CanSeeViewModel ? Primary.VMParticleScale : Primary.WMMuzzleParticleScale;
+		CreateParticle( Primary.BarrelSmokeParticle, muzzle, scale * smokeScale );
 	}
 }

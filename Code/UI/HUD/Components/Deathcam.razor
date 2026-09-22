@@ -4,18 +4,26 @@
 
 @attribute [StyleSheet]
 
-@if ( !Player.IsValid() || Player.HealthComponent.State == LifeState.Alive || LastDamageInfo is null )
+@if ( !Player.IsValid() || !Player.HealthComponent.IsValid() || Player.HealthComponent.State == LifeState.Alive || LastDamageInfo is null )
     return;
 
-@if ( GameUtils.GetPlayerFromComponent( LastDamageInfo.Attacker ) is not { } killerPlayer )
-    return;
+@{
+    var killerPlayer = GameUtils.GetPlayerFromComponent( LastDamageInfo.Attacker );
+    var killerDescription = GameUtils.GetDescription( LastDamageInfo.Attacker );
+    var killerName = killerPlayer.IsValid()
+        ? killerPlayer.DisplayName
+        : killerDescription?.DisplayName ?? "Unknown";
+}
 
 <root class="hud with-deadzone flex column gap-xs">
     <div class="flex row">
-        <img class="image" src="avatar:@killerPlayer.SteamId" />
+        @if ( killerPlayer.IsValid() )
+        {
+            <img class="image" src="avatar:@killerPlayer.SteamId" />
+        }
         <div class="flex column with-background with-padding h-full align-left justify-center" style="min-width: 275px;">
             <label class="text small upper">KILLED BY</label>
-            <label>@killerPlayer.DisplayName</label>
+            <label>@killerName</label>
         </div>
     </div>
 
@@ -35,7 +43,7 @@
             {
                 <div class="flex row gap-xs">
                     <label>@(entry.Damage.CeilToInt()) damage in @(entry.Count) hits - </label>
-                    <label>@entry.Attacker.DisplayName</label>
+                    <label>@(entry.Attacker?.DisplayName ?? "Unknown")</label>
                 </div>
             }
         </div>
@@ -57,23 +65,23 @@
 
 @code
 {
-    public PlayerPawn Player => Client.Viewer.PlayerPawn;
+    public PlayerPawn Player => Client.Viewer?.PlayerPawn;
 
-    public List<DamageTracker.GroupedDamage> DamageEntries => GameMode.Instance?.Get<DamageTracker>()?.GetGroupedDamage( Client.Local );
-    public List<DamageTracker.GroupedDamage> InflictedDamageEntries => GameMode.Instance?.Get<DamageTracker>()?.GetGroupedInflictedDamage( Client.Local );
+    public List<DamageTracker.GroupedDamage> DamageEntries => Client.Local.IsValid() ? GameMode.Instance?.Get<DamageTracker>()?.GetGroupedDamage( Client.Local ) : null;
+    public List<DamageTracker.GroupedDamage> InflictedDamageEntries => Client.Local.IsValid() ? GameMode.Instance?.Get<DamageTracker>()?.GetGroupedInflictedDamage( Client.Local ) : null;
 
-    public DamageInfo LastDamageInfo => Client.Local.LastDamageInfo;
+    public DamageInfo LastDamageInfo => Client.Local.IsValid() ? Client.Local.LastDamageInfo : null;
     public SpectateSystem SpectateSystem => SpectateSystem.Instance;
 
     public string GetName( Component attacker )
     {
         var ply = GameUtils.GetDescription( attacker );
 
-        return ply.DisplayName;
+        return ply?.DisplayName ?? "Unknown";
     }
 
     protected override int BuildHash()
     {
-        return !Player.IsValid() ? 0 : HashCode.Combine( Player.HealthComponent.State, Player, Time.Now );
+        return !Player.IsValid() || !Player.HealthComponent.IsValid() ? 0 : HashCode.Combine( Player.HealthComponent.State, Player, Time.Now );
     }
 }

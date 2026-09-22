@@ -113,4 +113,102 @@ Minimap
         transform: translateX(-50%) translateY(-50%);
         text-shadow: 2px 2px 0px rgba( black, 0.5 );
     }
+
+
+    .mask
+    {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    &.generic-map
+    {
+        background-color: rgba( 25, 29, 31, 0.92 );
+        box-shadow: inset 0 0 0 1px rgba( white, 0.06 ), 0 2px 12px rgba( black, 0.35 );
+
+        .markers
+        {
+            width: 50%;
+            height: 50%;
+            top: 50%;
+            left: 50%;
+        }
+    }
+
+    .generic-radar-bg
+    {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: rgba( 30, 35, 37, 0.95 );
+    }
+
+    .generic-grid
+    {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-image:
+            linear-gradient( rgba( white, 0.045 ) 4.5%, transparent 4.5% ),
+            linear-gradient( 90deg, rgba( white, 0.045 ) 4.5%, transparent 4.5% );
+        background-size: 22px 22px;
+        opacity: 0.9;
+    }
+
+    .generic-ring
+    {
+        position: absolute;
+        border-radius: 50%;
+        border: 1px solid rgba( white, 0.11 );
+        left: 50%;
+        top: 50%;
+        transform: translateX( -50% ) translateY( -50% );
+    }
+
+    .ring-outer
+    {
+        width: 78%;
+        height: 78%;
+    }
+
+    .ring-inner
+    {
+        width: 42%;
+        height: 42%;
+    }
+
+    .generic-cross
+    {
+        position: absolute;
+        background-color: rgba( white, 0.08 );
+        left: 50%;
+        top: 50%;
+        transform: translateX( -50% ) translateY( -50% );
+    }
+
+    .generic-cross.horizontal
+    {
+        width: 100%;
+        height: 1px;
+    }
+
+    .generic-cross.vertical
+    {
+        width: 1px;
+        height: 100%;
+    }
+
+    .generic-north
+    {
+        position: absolute;
+        top: 6px;
+        left: 50%;
+        transform: translateX( -50% );
+        font-size: 12px;
+        font-weight: 700;
+        color: rgba( white, 0.35 );
+        text-shadow: 1px 1px 0 rgba( black, 0.8 );
+    }
 }

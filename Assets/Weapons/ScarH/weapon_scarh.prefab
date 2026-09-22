@@ -146,6 +146,18 @@
             "MaxEffectsPlayDistance": 4194304,
             "MaxRange": 10000,
             "MaxRicochetAngle": 45,
+            "MuzzleFlashChance": 0.18,
+            "MuzzleFlashScale": 0.6,
+            "MuzzleSmokePrefab": {
+              "_type": "gameobject",
+              "prefab": "prefabs/weapon_effects/gun_smoke.prefab"
+            },
+            "MuzzleSmokeScale": 1.0,
+            "SuppressedAttachment": "gunsmith/scarh/barrel/scarh_suppressor.gnsmth",
+            "SuppressedMuzzleFlashPrefab": {
+              "_type": "gameobject",
+              "prefab": "prefabs/weapon_effects/suppressed_muzzleflash.prefab"
+            },
             "MuzzleFlashPrefab": {
               "_type": "gameobject",
               "prefab": "prefabs/weapon_effects/rifle_muzzleflash.prefab"

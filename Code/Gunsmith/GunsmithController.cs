@@ -127,7 +127,14 @@ public sealed class GunsmithController : Component
 			var clampedAng = new Angles( 0, ang.yaw.Clamp( YawRange.Min, YawRange.Max ), ang.roll.Clamp( RollRange.Min, RollRange.Max ) );
 
 			Weapon.WorldRotation = Rotation.From( clampedAng );
-			CameraComponent.FieldOfView = InitialFOV + (ZoomFactor * 10f);
+			var panel = GunsmithPanel.Instance;
+			var customizing = panel.IsValid() && panel.IsCustomizing;
+			var size = panel.IsValid() ? panel.Panel.Box.Rect.Size : Screen.Size;
+			var aspect = size.x / MathF.Max( size.y, 1f );
+			// Keep the full weapon above the camo drawer, including on ultrawide displays.
+			var horizontalFov = InitialFOV * (customizing ? 1.4f : 1f);
+			var halfWidth = MathF.Tan( horizontalFov * MathF.PI / 360f ) * MathF.Max( 1f, aspect / (16f / 9f) );
+			CameraComponent.FieldOfView = 2f * MathF.Atan( halfWidth ) * 180f / MathF.PI + (ZoomFactor * 10f);
 
 			panOffsetTarget.x = panOffsetTarget.x.Clamp( -25f, 25f );
 			panOffsetTarget.y = panOffsetTarget.y.Clamp( -25f, 25f );
@@ -135,7 +142,14 @@ public sealed class GunsmithController : Component
 			if ( !isPanning )
 				panOffsetTarget = panOffsetTarget.LerpTo( 0, Time.Delta * SlowSpeed );
 
-			CameraComponent.LocalPosition = initialCameraPos + CameraComponent.WorldRotation.Right * panOffsetTarget.x + CameraComponent.WorldRotation.Up * panOffsetTarget.y;
+			var framingOffset = 0f;
+			if ( customizing )
+			{
+				var distance = Vector3.DistanceBetween( CameraComponent.WorldPosition, Weapon.WorldPosition );
+				framingOffset = -0.36f * distance * halfWidth / MathF.Max( aspect, 0.5f );
+			}
+			CameraComponent.LocalPosition = initialCameraPos + CameraComponent.WorldRotation.Right * panOffsetTarget.x
+				+ CameraComponent.WorldRotation.Up * (panOffsetTarget.y + framingOffset);
 		}
 	}
 }

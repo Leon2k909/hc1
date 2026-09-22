@@ -113,7 +113,7 @@
         "AmmoType": "revolver",
         "BarrelSmokeParticle": {
           "_type": "gameobject",
-          "prefab": "prefabs/particles/muzzle/barrelsmoke.prefab"
+          "prefab": "prefabs/weapon_effects/gun_smoke.prefab"
         },
         "BulletEjectParticle": null,
         "Bullets": 1,
@@ -136,9 +136,13 @@
         "Force": 3,
         "HitFlinch": 3,
         "InfiniteAmmo": "reserve",
+        "MuzzleFlashChance": 0.35,
+        "MuzzleFlashScale": 0.5385,
+        "BarrelSmokeScale": 0.6538,
+        "SuppressedMuzzleFlashScale": 0.3846,
         "MuzzleFlashParticle": {
           "_type": "gameobject",
-          "prefab": "prefabs/particles/muzzle/muzzleflash.prefab"
+          "prefab": "prefabs/weapon_effects/pistol_muzzleflash.prefab"
         },
         "OnComponentDestroy": null,
         "OnComponentDisabled": null,

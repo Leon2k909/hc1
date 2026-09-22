@@ -27,14 +27,13 @@
                             <i>play_arrow</i>
                             <label>PLAY NOW</label>
                         </div>
-                        <a class="play-btn ranked-btn" href="/ranked">
-                            <i>military_tech</i>
-                            <label>RANKED</label>
-                        </a>
-                        <a class="play-btn private-btn" href="/new">
-                            <i>vpn_key</i>
-                            <label>PRIVATE MATCH</label>
-                        </a>
+                        @if ( LastPlayedMode != null )
+                        {
+                            <div class="play-btn replay-btn" onclick=@PlayLastMode>
+                                <i>replay</i>
+                                <label>PLAY AGAIN · @(_lastPlayedHardcore ? "HC " + LastPlayedMode.Title.ToUpper() : LastPlayedMode.Title.ToUpper())</label>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
@@ -73,54 +72,6 @@
         </div>
 
         @* ----- Last Played ----- *@
-        @if ( LastPlayedMode != null )
-        {
-            <div class="card last-played-card" onclick=@PlayLastMode>
-                <div class="last-played-bg"></div>
-                <div class="last-played-body">
-                    <label class="kicker">LAST PLAYED</label>
-                    <label class="last-played-title">@(_lastPlayedHardcore ? "HC " + LastPlayedMode.Title.ToUpper() : LastPlayedMode.Title.ToUpper())</label>
-                    <div class="last-played-action">
-                        <i>replay</i>
-                        <label>PLAY AGAIN</label>
-                    </div>
-                </div>
-            </div>
-        }
-
-        @* ----- Friends / Party ----- *@
-        <div class="card friends-card">
-            <div class="friends-header">
-                <i>group</i>
-                <label>FRIENDS LIST</label>
-            </div>
-            <div class="friends-list">
-                @if ( PartyRoom.Current?.Members is var members && members != null && members.Any() )
-                {
-                    @foreach ( var member in members )
-                    {
-                        <div class="friend-row online">
-                            <img class="friend-avatar" src="avatar:@member.Id" />
-                            <div class="friend-info">
-                                <label class="friend-name">@member.Name</label>
-                                <label class="friend-status">In Party</label>
-                            </div>
-                        </div>
-                    }
-                }
-                else
-                {
-                    <div class="friends-empty">
-                        <label>No one is in your party.</label>
-                    </div>
-                }
-
-                <div class="open-friends-btn" onclick=@(() => OpenFriendsList())>
-                    <i>group_add</i>
-                    <label>OPEN FRIENDS LIST</label>
-                </div>
-            </div>
-        </div>
     </div>
 
     @* ===================== BOTTOM STATUS BAR ===================== *@

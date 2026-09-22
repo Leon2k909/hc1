@@ -1,4 +1,4 @@
-﻿using Sandbox.UI;
+using Sandbox.UI;
 using SWB.Shared;
 using System;
 
@@ -27,14 +27,25 @@ public class Crosshair : Panel
 	{
 		this.weapon = weapon;
 		timeUntilRestore = 9999;
+		Style.Set( "pointer-events: none;" );
+		Style.PointerEvents = PointerEvents.None;
 
 		StyleSheet.Load( "/swb_base/ui/Crosshair.cs.scss" );
 
 		centerDot = Add.Panel( "centerDot" );
+		centerDot.Style.PointerEvents = PointerEvents.None;
+
 		leftBar = Add.Panel( "leftBar" );
+		leftBar.Style.PointerEvents = PointerEvents.None;
+
 		rightBar = Add.Panel( "rightBar" );
+		rightBar.Style.PointerEvents = PointerEvents.None;
+
 		topBar = Add.Panel( "topBar" );
+		topBar.Style.PointerEvents = PointerEvents.None;
+
 		bottomBar = Add.Panel( "bottomBar" );
+		bottomBar.Style.PointerEvents = PointerEvents.None;
 
 		leftBar.AddClass( "sharedBarStyling" );
 		rightBar.AddClass( "sharedBarStyling" );
