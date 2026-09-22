@@ -32,7 +32,8 @@ public static class Hc1AttachmentAudit
 			renderer.SetBodyGroup( "foregrip", 0 );
 			foreach ( var other in root.Components.GetAll<SkinnedModelRenderer>( FindMode.EverythingInSelfAndDescendants ) )
 				if ( other != renderer ) other.Enabled = false;
-			renderer.Sequence.Name = weapon == "m4a1" && !world ? "IdlePose" : renderer.Model.GetAnimationName( 0 );
+			if ( renderer.Model.AnimationCount > 0 )
+				renderer.Sequence.Name = weapon == "m4a1" && !world ? "IdlePose" : renderer.Model.GetAnimationName( 0 );
 			renderer.PlaybackRate = 0;
 			root.Enabled = true;
 			var gunsmith = root.Components.Create<GunsmithWeapon>();
@@ -65,7 +66,7 @@ public static class Hc1AttachmentAudit
 			{
 				var point = attachment.GetComponentInParent<GunsmithAttachmentPoint>();
 				attachment.Initialize( point );
-				Log.Info( $"HC1_ATTACHMENT_ALIGNED {attachment.GameObject.Name} {attachment.WorldTransform}" );
+				Log.Info( $"HC1_ATTACHMENT_ALIGNED {attachment.GameObject.Name} {attachment.WorldTransform} model={renderer.Model.Name} corrections={string.Join( ";", attachment.ModelSocketAngles )}" );
 			}
 			Log.Info( $"HC1_ATTACHMENT_SOCKET {path} muzzle={renderer.GetAttachment( "muzzle" )}" );
 			camera.RenderToBitmap( bitmap );

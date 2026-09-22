@@ -76,4 +76,10 @@ for weapon in ['M4A1','ScarH']:
             root.setdefault('Children',[]).append({
                 '__guid':guid(key),'Flags':0,'Name':f'{category} Attachment Point',
                 'Position':position,'Rotation':'0,0,0,1','Scale':'1,1,1','Enabled':True,
-                'Components':[{'__type':'Facepunch.Gunsmi
+                'Components':[{'__type':'Facepunch.Gunsmith.GunsmithAttachmentPoint',
+                               '__guid':guid(key+'/component'),'Category':category}],
+            })
+            changed=True
+        if changed:
+            write(path,data)
+            print('Added sockets:',path.relative_to(ROOT))

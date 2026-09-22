@@ -9,6 +9,8 @@ public sealed class GunsmithSocketAttachment : GunsmithAttachment
 	[Property] public string SocketName { get; set; } = "muzzle";
 	[Property] public Vector3 SocketOffset { get; set; }
 	[Property] public Angles SocketAngles { get; set; }
+	/// <summary>Calibrates socket roll for models authored with a different up axis.</summary>
+	[Property] public System.Collections.Generic.Dictionary<string, Angles> ModelSocketAngles { get; set; } = new();
 
 	private SkinnedModelRenderer weaponRenderer;
 	private WeaponModel weaponModel;
@@ -39,8 +41,14 @@ public sealed class GunsmithSocketAttachment : GunsmithAttachment
 		if ( !socket.HasValue )
 			return;
 
-		WorldPosition = socket.Value.PointToWorld( SocketOffset );
-		WorldRotation = socket.Value.Rotation * Rotation.From( SocketAngles );
+		var correction = new Angles();
+		if ( weaponRenderer.Model is not null && ModelSocketAngles is not null )
+			ModelSocketAngles.TryGetValue( weaponRenderer.Model.Name, out correction );
+
+		var rotation = socket.Value.Rotation * Rotation.From( correction ) * Rotation.From( SocketAngles );
+		var mount = new Transform( socket.Value.Position, rotation, socket.Value.Scale );
+		WorldPosition = mount.PointToWorld( SocketOffset );
+		WorldRotation = rotation;
 		WorldScale = weaponRenderer.WorldScale;
 	}
 }
