@@ -1,0 +1,42 @@
+{
+  "RootObject": {
+    "__guid": "727c4541-1c8c-5512-946e-3c9d88252647",
+    "Flags": 0,
+    "Name": "M4A1 Rifle Suppressor",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "ccf8a4e4-5706-5110-9648-f8ed751b7865",
+        "__enabled": true,
+        "Model": "attachments/m4a1/rifle_suppressor/rifle_suppressor.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithSocketAttachment",
+        "__guid": "f4f84340-5886-50c0-b5ca-7e145ba3320a",
+        "__enabled": true,
+        "SocketName": "muzzle",
+        "SocketOffset": "-0.35,0,0",
+        "SocketAngles": "0,0,0",
+        "ModelSocketAngles": {
+          "weapons/swb/scarh/v_scarh.vmdl": "0,0,180",
+          "weapons/swb/scarh/v_scarh_gunsmith.vmdl": "0,0,180",
+          "weapons/swb/scarh/w_scarh.vmdl": "0,0,180"
+        },
+        "ModelSocketOffsets": {
+          "models/weapons/sbox_assault_m4a1/w_m4a1.vmdl": "-2.73281,0,0.20177"
+        },
+        "ModelScales": {
+          "weapons/swb/scarh/w_scarh.vmdl": 1.4
+        }
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

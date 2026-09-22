@@ -1,0 +1,28 @@
+{
+  "RootObject": {
+    "__guid": "fd221978-1aa7-51ca-87cb-3e70ad66c3eb",
+    "Name": "Reflex Sight",
+    "Enabled": true,
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "e8fade79-5648-5189-af9e-c64fe1867dab",
+        "Model": "attachments/m4a1/optics/reflex.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithSocketAttachment",
+        "__guid": "20e813ae-fd67-5009-8742-49d96fd62739",
+        "SocketName": "muzzle",
+        "SocketOffset": "-16.9,0,1.18",
+        "SocketAngles": "0,0,0",
+        "ModelSocketOffsets": {
+          "models/weapons/sbox_assault_m4a1/w_m4a1.vmdl": "-19.28281,0,1.38177"
+        }
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

@@ -1,0 +1,2416 @@
+{
+  "packs": [
+    {
+      "id": "2962304029",
+      "title": "Modern Warfare 2022 SWEPs - M4",
+      "url": "https://steamcommunity.com/sharedfiles/filedetails/?id=2962304029",
+      "archive": "D:\\tmp\\hc1-mw22-tools\\steamcmd\\steamapps\\workshop\\content\\4000\\2962304029\\gmpublisher.gma",
+      "bytes": 297606000,
+      "sha256": "ead00a413128d3d4403b8d4ab18c4bd183b09fe01cfc053fb5bb081c12666ba8",
+      "extracted": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029",
+      "file_counts": {
+        ".lua": 69,
+        ".mdl": 41,
+        ".ogg": 2,
+        ".phy": 3,
+        ".png": 4,
+        ".vmt": 93,
+        ".vtf": 192,
+        ".vtx": 82,
+        ".vvd": 41,
+        ".wav": 446
+      }
+    },
+    {
+      "id": "3529121373",
+      "title": "Modern Warfare 2022 SWEPs - Shared Content",
+      "url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3529121373",
+      "archive": "D:\\tmp\\hc1-mw22-tools\\steamcmd\\steamapps\\workshop\\content\\4000\\3529121373\\gmpublisher.gma",
+      "bytes": 893815007,
+      "sha256": "50f704eea2bcfd298a90a178e1dea05cee08f03f2ae199c3e9092eda9bed3728",
+      "extracted": "D:\\tmp\\hc1-mw22-tools\\extracted\\3529121373",
+      "file_counts": {
+        ".lua": 259,
+        ".mdl": 271,
+        ".ogg": 518,
+        ".png": 5,
+        ".vmt": 1169,
+        ".vtf": 1661,
+        ".vtx": 274,
+        ".vvd": 271
+      }
+    },
+    {
+      "id": "2459720887",
+      "title": "Modern Wokefare Base",
+      "url": "https://steamcommunity.com/sharedfiles/filedetails/?id=2459720887",
+      "archive": "D:\\tmp\\hc1-mw22-tools\\steamcmd\\steamapps\\workshop\\content\\4000\\2459720887\\gmpublisher.gma",
+      "bytes": 1078337325,
+      "sha256": "8c3f05bf4bc5c09d31f4b5133e2000bbcb9c9a886da19a4ef95fe084f2d6ab72",
+      "extracted": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887",
+      "file_counts": {
+        ".lua": 343,
+        ".mdl": 130,
+        ".ogg": 476,
+        ".pcf": 14,
+        ".phy": 1,
+        ".png": 3,
+        ".ttf": 6,
+        ".vmt": 464,
+        ".vtf": 818,
+        ".vtx": 134,
+        ".vvd": 130,
+        ".wav": 495
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "key": "att_perk",
+      "category": "Perk",
+      "default": true,
+      "name": "Default",
+      "model": "",
+      "model_file": null,
+      "source": {
+        "Base": "att_base",
+        "Name": "Default",
+        "Category": "Perks",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\base\\att_perk.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Default",
+        "Category": "Perks",
+        "Icon": "mg/genericattachment",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\base\\att_perk.lua",
+        "pack": "2459720887",
+        "Base": "att_base"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_perk_soh",
+      "category": "Perk",
+      "default": false,
+      "name": "Fast Hands",
+      "model": "",
+      "model_file": null,
+      "source": {
+        "Base": "att_perk_soh",
+        "Icon": "easy/mw/attachments/icons/shared/icon_perk_warhead_patch.vmt",
+        "Name": "Fast Hands",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\perks\\att_vm_p01_ar_mike4_perk_soh.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Fast Hands",
+        "Category": "Perks",
+        "Icon": "easy/mw/attachments/icons/shared/icon_perk_warhead_patch.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\perks\\att_vm_p01_ar_mike4_perk_soh.lua",
+        "pack": "2962304029",
+        "Base": "att_perk_soh"
+      }
+    },
+    {
+      "key": "iw9_perk_fmj",
+      "category": "Perk",
+      "default": false,
+      "name": "FMJ",
+      "model": "",
+      "model_file": null,
+      "source": {
+        "Base": "att_perk_fmj",
+        "Name": "FMJ",
+        "Icon": "easy/mw/attachments/icons/shared/jup_hud_icon_perks_fmj_legacy.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\3529121373\\lua\\weapons\\mg_base\\modules\\attachmentss\\perks\\iw9_perk_fmj.lua",
+        "pack": "3529121373"
+      },
+      "inherited": {
+        "Name": "FMJ",
+        "Category": "Perks",
+        "Icon": "easy/mw/attachments/icons/shared/jup_hud_icon_perks_fmj_legacy.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\3529121373\\lua\\weapons\\mg_base\\modules\\attachmentss\\perks\\iw9_perk_fmj.lua",
+        "pack": "3529121373",
+        "Base": "att_perk_fmj"
+      }
+    },
+    {
+      "key": "iw9_perk_ricochet",
+      "category": "Perk",
+      "default": false,
+      "name": "Shrapnel",
+      "model": "",
+      "model_file": null,
+      "source": {
+        "Base": "att_perk",
+        "Name": "Shrapnel",
+        "Icon": "easy/mw/attachments/icons/shared/iw9_icon_perk_shrapnel.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\3529121373\\lua\\weapons\\mg_base\\modules\\attachmentss\\perks\\iw9_perk_ricochet.lua",
+        "pack": "3529121373"
+      },
+      "inherited": {
+        "Name": "Shrapnel",
+        "Category": "Perks",
+        "Icon": "easy/mw/attachments/icons/shared/iw9_icon_perk_shrapnel.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\3529121373\\lua\\weapons\\mg_base\\modules\\attachmentss\\perks\\iw9_perk_ricochet.lua",
+        "pack": "3529121373",
+        "Base": "att_perk"
+      }
+    },
+    {
+      "key": "iw9_perk_headshot",
+      "category": "Perk",
+      "default": false,
+      "name": "Hollow-point Rounds",
+      "model": "",
+      "model_file": null,
+      "source": {
+        "Base": "att_perk_headshot",
+        "Name": "Hollow-point Rounds",
+        "Icon": "pwci/mw/attachments/icons/shared/icon_attachment_cat_ammo.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\3529121373\\lua\\weapons\\mg_base\\modules\\attachmentss\\perks\\iw9_perk_headshot.lua",
+        "pack": "3529121373"
+      },
+      "inherited": {
+        "Name": "Hollow-point Rounds",
+        "Category": "Perks",
+        "Icon": "pwci/mw/attachments/icons/shared/icon_attachment_cat_ammo.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\3529121373\\lua\\weapons\\mg_base\\modules\\attachmentss\\perks\\iw9_perk_headshot.lua",
+        "pack": "3529121373",
+        "Base": "att_perk_headshot"
+      }
+    },
+    {
+      "key": "iw9_perk_melee",
+      "category": "Perk",
+      "default": false,
+      "name": "Strong Arm",
+      "model": "",
+      "model_file": null,
+      "source": {
+        "Base": "att_perk",
+        "Icon": "easy/mw/attachments/icons/shared/icon_perk_strong_arm_patch.vmt",
+        "Name": "Strong Arm",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\3529121373\\lua\\weapons\\mg_base\\modules\\attachmentss\\perks\\iw9_perk_melee.lua",
+        "pack": "3529121373"
+      },
+      "inherited": {
+        "Name": "Strong Arm",
+        "Category": "Perks",
+        "Icon": "easy/mw/attachments/icons/shared/icon_perk_strong_arm_patch.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\3529121373\\lua\\weapons\\mg_base\\modules\\attachmentss\\perks\\iw9_perk_melee.lua",
+        "pack": "3529121373",
+        "Base": "att_perk"
+      }
+    },
+    {
+      "key": "iw9_perk_fastswap",
+      "category": "Perk",
+      "default": false,
+      "name": "Quick Grip",
+      "model": "",
+      "model_file": null,
+      "source": {
+        "Base": "att_perk",
+        "Name": "Quick Grip",
+        "Icon": "easy/mw/attachments/icons/shared/jup_hud_icon_perks_custom_gloves_legacy.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\3529121373\\lua\\weapons\\mg_base\\modules\\attachmentss\\perks\\iw9_perk_fastswap.lua",
+        "pack": "3529121373"
+      },
+      "inherited": {
+        "Name": "Quick Grip",
+        "Category": "Perks",
+        "Icon": "easy/mw/attachments/icons/shared/jup_hud_icon_perks_custom_gloves_legacy.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\3529121373\\lua\\weapons\\mg_base\\modules\\attachmentss\\perks\\iw9_perk_fastswap.lua",
+        "pack": "3529121373",
+        "Base": "att_perk"
+      }
+    },
+    {
+      "key": "att_grip",
+      "category": "Underbarrel",
+      "default": true,
+      "name": "Default",
+      "model": "",
+      "model_file": null,
+      "source": {
+        "Base": "att_base",
+        "Name": "Default",
+        "Category": "Grips",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\base\\att_grip.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Default",
+        "Category": "Grips",
+        "Icon": "mg/genericattachment",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\base\\att_grip.lua",
+        "pack": "2459720887",
+        "Base": "att_base"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_bipodgrip",
+      "category": "Underbarrel",
+      "default": false,
+      "name": "Bipod Grip",
+      "model": "models/viper/mw/attachments/attachment_vm_bipod_grip.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_bipod_grip.mdl",
+      "source": {
+        "Base": "att_vm_bipodgrip",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\grips\\att_vm_p01_ar_mike4_bipodgrip.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Bipod Grip",
+        "Category": "Grips",
+        "Icon": "viper/mw/attachments/icons/grips/icon_attachment_bipod_grip.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\grips\\att_vm_p01_ar_mike4_bipodgrip.lua",
+        "pack": "2962304029",
+        "Base": "att_vm_bipodgrip",
+        "Model": "models/viper/mw/attachments/attachment_vm_bipod_grip.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_angledgrip01",
+      "category": "Underbarrel",
+      "default": false,
+      "name": "Commando Foregrip",
+      "model": "models/viper/mw/attachments/attachment_vm_angledgrip_lod0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_angledgrip_lod0.mdl",
+      "source": {
+        "Base": "att_vm_angledgrip01",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\grips\\att_vm_p01_ar_mike4_angledgrip01.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Commando Foregrip",
+        "Category": "Grips",
+        "Icon": "viper/mw/attachments/icons/grips/icon_attachment_angledgrip.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\grips\\att_vm_p01_ar_mike4_angledgrip01.lua",
+        "pack": "2962304029",
+        "Base": "att_vm_angledgrip01",
+        "Model": "models/viper/mw/attachments/attachment_vm_angledgrip_lod0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_angledgrip02",
+      "category": "Underbarrel",
+      "default": false,
+      "name": "Tactical Foregrip",
+      "model": "models/viper/mw/attachments/attachment_vm_angledgrip02.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_angledgrip02.mdl",
+      "source": {
+        "Base": "att_vm_angledgrip02",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\grips\\att_vm_p01_ar_mike4_angledgrip02.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Tactical Foregrip",
+        "Category": "Grips",
+        "Icon": "viper/mw/attachments/icons/grips/icon_attachment_angledgrip02.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\grips\\att_vm_p01_ar_mike4_angledgrip02.lua",
+        "pack": "2962304029",
+        "Base": "att_vm_angledgrip02",
+        "Model": "models/viper/mw/attachments/attachment_vm_angledgrip02.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_stubbygrip01",
+      "category": "Underbarrel",
+      "default": false,
+      "name": "Ergo Foregrip",
+      "model": "models/viper/mw/attachments/attachment_vm_vertgrip_stubby01.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_vertgrip_stubby01.mdl",
+      "source": {
+        "Base": "att_vm_stubbygrip01",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\grips\\att_vm_p01_ar_mike4_stubbygrip01.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Ergo Foregrip",
+        "Category": "Grips",
+        "Icon": "viper/mw/attachments/icons/grips/icon_attachment_vertgrip_stubby01.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\grips\\att_vm_p01_ar_mike4_stubbygrip01.lua",
+        "pack": "2962304029",
+        "Base": "att_vm_stubbygrip01",
+        "Model": "models/viper/mw/attachments/attachment_vm_vertgrip_stubby01.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_stubbygrip02",
+      "category": "Underbarrel",
+      "default": false,
+      "name": "Operator Foregrip",
+      "model": "models/viper/mw/attachments/attachment_vm_vertgrip_stubby04.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_vertgrip_stubby04.mdl",
+      "source": {
+        "Base": "att_vm_stubbygrip02",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\grips\\att_vm_p01_ar_mike4_stubbygrip02.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Operator Foregrip",
+        "Category": "Grips",
+        "Icon": "viper/mw/attachments/icons/grips/icon_attachment_vertgrip_stubby04.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\grips\\att_vm_p01_ar_mike4_stubbygrip02.lua",
+        "pack": "2962304029",
+        "Base": "att_vm_stubbygrip02",
+        "Model": "models/viper/mw/attachments/attachment_vm_vertgrip_stubby04.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_vertgrip01",
+      "category": "Underbarrel",
+      "default": false,
+      "name": "Ranger Foregrip",
+      "model": "models/viper/mw/attachments/attachment_vm_vertgrip02_lod0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_vertgrip02_lod0.mdl",
+      "source": {
+        "Base": "att_vm_vertgrip01",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\grips\\att_vm_p01_ar_mike4_vertgrip01.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Ranger Foregrip",
+        "Category": "Grips",
+        "Icon": "viper/mw/attachments/icons/grips/icon_attachment_vertgrip02.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\grips\\att_vm_p01_ar_mike4_vertgrip01.lua",
+        "pack": "2962304029",
+        "Base": "att_vm_vertgrip01",
+        "Model": "models/viper/mw/attachments/attachment_vm_vertgrip02_lod0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_vertgrip02",
+      "category": "Underbarrel",
+      "default": false,
+      "name": "Scout Foregrip",
+      "model": "models/viper/mw/attachments/attachment_vm_vertgrip03.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_vertgrip03.mdl",
+      "source": {
+        "Base": "att_vm_vertgrip02",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\grips\\att_vm_p01_ar_mike4_vertgrip02.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Scout Foregrip",
+        "Category": "Grips",
+        "Icon": "viper/mw/attachments/icons/grips/icon_attachment_vertgrip03.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\grips\\att_vm_p01_ar_mike4_vertgrip02.lua",
+        "pack": "2962304029",
+        "Base": "att_vm_vertgrip02",
+        "Model": "models/viper/mw/attachments/attachment_vm_vertgrip03.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_vertgrip03",
+      "category": "Underbarrel",
+      "default": false,
+      "name": "Merc Foregrip",
+      "model": "models/viper/mw/attachments/attachment_vm_vertgrip_stubby02.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_vertgrip_stubby02.mdl",
+      "source": {
+        "Base": "att_vm_vertgrip03",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\grips\\att_vm_p01_ar_mike4_vertgrip03.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Merc Foregrip",
+        "Category": "Grips",
+        "Icon": "viper/mw/attachments/icons/grips/icon_attachment_vertgrip_stubby02.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\grips\\att_vm_p01_ar_mike4_vertgrip03.lua",
+        "pack": "2962304029",
+        "Base": "att_vm_vertgrip03",
+        "Model": "models/viper/mw/attachments/attachment_vm_vertgrip_stubby02.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_barrel_base",
+      "category": "Barrel",
+      "default": true,
+      "name": "Demo 501 Factory",
+      "model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barrel_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\iw9_mike4\\att_vm_p01_ar_mike4_barrel_v0.mdl",
+      "source": {
+        "Base": "att_barrel",
+        "Name": "Demo 501 Factory",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barrel_v0.mdl",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_barrel_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\barrels\\att_vm_p01_ar_mike4_barrel_base.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Demo 501 Factory",
+        "Category": "Barrels",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_barrel_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\barrels\\att_vm_p01_ar_mike4_barrel_base.lua",
+        "pack": "2962304029",
+        "Base": "att_barrel",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barrel_v0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_barhvy_v0",
+      "category": "Barrel",
+      "default": false,
+      "name": "14'' Carbine Shroud",
+      "model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barhvy_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\iw9_mike4\\att_vm_p01_ar_mike4_barhvy_v0.mdl",
+      "source": {
+        "Base": "att_barrel",
+        "Name": "14'' Carbine Shroud",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barhvy_v0.mdl",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_barhvy_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\barrels\\att_vm_p01_ar_mike4_barhvy_v0.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "14'' Carbine Shroud",
+        "Category": "Barrels",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_barhvy_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\barrels\\att_vm_p01_ar_mike4_barhvy_v0.lua",
+        "pack": "2962304029",
+        "Base": "att_barrel",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barhvy_v0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_barhvyshort_v0",
+      "category": "Barrel",
+      "default": false,
+      "name": "11.5'' Carbine Shroud",
+      "model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barhvyshort_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\iw9_mike4\\att_vm_p01_ar_mike4_barhvyshort_v0.mdl",
+      "source": {
+        "Base": "att_barrel",
+        "Name": "11.5'' Carbine Shroud",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barhvyshort_v0.mdl",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_barhvyshort_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\barrels\\att_vm_p01_ar_mike4_barhvyshort_v0.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "11.5'' Carbine Shroud",
+        "Category": "Barrels",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_barhvyshort_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\barrels\\att_vm_p01_ar_mike4_barhvyshort_v0.lua",
+        "pack": "2962304029",
+        "Base": "att_barrel",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barhvyshort_v0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_barlight_v0",
+      "category": "Barrel",
+      "default": false,
+      "name": "Tempus Trench Pro",
+      "model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barlight_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\iw9_mike4\\att_vm_p01_ar_mike4_barlight_v0.mdl",
+      "source": {
+        "Base": "att_barrel",
+        "Name": "Tempus Trench Pro",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barlight_v0.mdl",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_barlight_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\barrels\\att_vm_p01_ar_mike4_barlight_v0.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Tempus Trench Pro",
+        "Category": "Barrels",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_barlight_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\barrels\\att_vm_p01_ar_mike4_barlight_v0.lua",
+        "pack": "2962304029",
+        "Base": "att_barrel",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barlight_v0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_barlong_v0",
+      "category": "Barrel",
+      "default": false,
+      "name": "419mm EXF Barrel",
+      "model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barlong_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\iw9_mike4\\att_vm_p01_ar_mike4_barlong_v0.mdl",
+      "source": {
+        "Base": "att_barrel",
+        "Name": "419mm EXF Barrel",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barlong_v0.mdl",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_barlong_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\barrels\\att_vm_p01_ar_mike4_barlong_v0.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "419mm EXF Barrel",
+        "Category": "Barrels",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_barlong_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\barrels\\att_vm_p01_ar_mike4_barlong_v0.lua",
+        "pack": "2962304029",
+        "Base": "att_barrel",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barlong_v0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_barmidhvy_v0",
+      "category": "Barrel",
+      "default": false,
+      "name": "11.5'' T-H4 Barrel",
+      "model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barmidhvy_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\iw9_mike4\\att_vm_p01_ar_mike4_barmidhvy_v0.mdl",
+      "source": {
+        "Base": "att_barrel",
+        "Name": "11.5'' T-H4 Barrel",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barmidhvy_v0.mdl",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_barmidhvy_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\barrels\\att_vm_p01_ar_mike4_barmidhvy_v0.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "11.5'' T-H4 Barrel",
+        "Category": "Barrels",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_barmidhvy_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\barrels\\att_vm_p01_ar_mike4_barmidhvy_v0.lua",
+        "pack": "2962304029",
+        "Base": "att_barrel",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barmidhvy_v0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_barshort_v0",
+      "category": "Barrel",
+      "default": false,
+      "name": "7.5'' Tempus Firebrand",
+      "model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barshort_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\iw9_mike4\\att_vm_p01_ar_mike4_barshort_v0.mdl",
+      "source": {
+        "Base": "att_barrel",
+        "Name": "7.5'' Tempus Firebrand",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barshort_v0.mdl",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_barshort_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\barrels\\att_vm_p01_ar_mike4_barshort_v0.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "7.5'' Tempus Firebrand",
+        "Category": "Barrels",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_barshort_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\barrels\\att_vm_p01_ar_mike4_barshort_v0.lua",
+        "pack": "2962304029",
+        "Base": "att_barrel",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barshort_v0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike16_barrel_v0",
+      "category": "Barrel",
+      "default": false,
+      "name": "Hightower 20'' Barrel",
+      "model": "models/easy/mw/attachments/iw9_mike16/att_vm_p01_ar_mike16_barrel_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\iw9_mike16\\att_vm_p01_ar_mike16_barrel_v0.mdl",
+      "source": {
+        "Base": "att_barrel",
+        "Name": "Hightower 20'' Barrel",
+        "Model": "models/easy/mw/attachments/iw9_mike16/att_vm_p01_ar_mike16_barrel_v0.mdl",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike16_barrel_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike16\\barrels\\att_vm_p01_ar_mike16_barrel_v0.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Hightower 20'' Barrel",
+        "Category": "Barrels",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike16_barrel_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike16\\barrels\\att_vm_p01_ar_mike16_barrel_v0.lua",
+        "pack": "2962304029",
+        "Base": "att_barrel",
+        "Model": "models/easy/mw/attachments/iw9_mike16/att_vm_p01_ar_mike16_barrel_v0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_stock_base",
+      "category": "Stock",
+      "default": true,
+      "name": "Assault-60 Stock Factory",
+      "model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_stock_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\iw9_mike4\\att_vm_p01_ar_mike4_stock_v0.mdl",
+      "source": {
+        "Base": "att_stock",
+        "Name": "Assault-60 Stock Factory",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_stock_v0.mdl",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_stock_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\stock\\att_vm_p01_ar_mike4_stock_base.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Assault-60 Stock Factory",
+        "Category": "Stocks",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_stock_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\stock\\att_vm_p01_ar_mike4_stock_base.lua",
+        "pack": "2962304029",
+        "Base": "att_stock",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_stock_v0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_stockl_v0",
+      "category": "Stock",
+      "default": false,
+      "name": "Demo Fade Pro Stock",
+      "model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_stockl_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\iw9_mike4\\att_vm_p01_ar_mike4_stockl_v0.mdl",
+      "source": {
+        "Base": "att_stock",
+        "Name": "Demo Fade Pro Stock",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_stockl_v0.mdl",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_stockl_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\stock\\att_vm_p01_ar_mike4_stockl_v0.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Demo Fade Pro Stock",
+        "Category": "Stocks",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_stockl_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\stock\\att_vm_p01_ar_mike4_stockl_v0.lua",
+        "pack": "2962304029",
+        "Base": "att_stock",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_stockl_v0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_stockno_v0",
+      "category": "Stock",
+      "default": false,
+      "name": "Demo D50 Buffer Tube",
+      "model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_stockno_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\iw9_mike4\\att_vm_p01_ar_mike4_stockno_v0.mdl",
+      "source": {
+        "Base": "att_stock",
+        "Name": "Demo D50 Buffer Tube",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_stockno_v0.mdl",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_stockno_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\stock\\att_vm_p01_ar_mike4_stockno_v0.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Demo D50 Buffer Tube",
+        "Category": "Stocks",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_stockno_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\stock\\att_vm_p01_ar_mike4_stockno_v0.lua",
+        "pack": "2962304029",
+        "Base": "att_stock",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_stockno_v0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_stocktac_v0",
+      "category": "Stock",
+      "default": false,
+      "name": "Ravage-8",
+      "model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_stocktac_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\iw9_mike4\\att_vm_p01_ar_mike4_stocktac_v0.mdl",
+      "source": {
+        "Base": "att_stock",
+        "Name": "Ravage-8",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_stocktac_v0.mdl",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_stocktac_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\stock\\att_vm_p01_ar_mike4_stocktac_v0.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Ravage-8",
+        "Category": "Stocks",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_stocktac_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\stock\\att_vm_p01_ar_mike4_stocktac_v0.lua",
+        "pack": "2962304029",
+        "Base": "att_stock",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_stocktac_v0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_dm_msecho_stock_v0",
+      "category": "Stock",
+      "default": false,
+      "name": "Corio Precio Factory",
+      "model": "models/easy/mw/attachments/iw9_msecho/att_vm_p01_dm_msecho_stock_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\iw9_msecho\\att_vm_p01_dm_msecho_stock_v0.mdl",
+      "source": {
+        "Base": "att_stock",
+        "Name": "Corio Precio Factory",
+        "Model": "models/easy/mw/attachments/iw9_msecho/att_vm_p01_dm_msecho_stock_v0.mdl",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_dm_msecho_stock_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\shared\\att_vm_p01_dm_msecho_stock_v0.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Corio Precio Factory",
+        "Category": "Stocks",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_dm_msecho_stock_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\shared\\att_vm_p01_dm_msecho_stock_v0.lua",
+        "pack": "2962304029",
+        "Base": "att_stock",
+        "Model": "models/easy/mw/attachments/iw9_msecho/att_vm_p01_dm_msecho_stock_v0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_dm_stango25_stock_v0",
+      "category": "Stock",
+      "default": false,
+      "name": "Torrent Span-9",
+      "model": "models/easy/mw/attachments/iw9_stango25/att_vm_p01_dm_stango25_stock_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\iw9_stango25\\att_vm_p01_dm_stango25_stock_v0.mdl",
+      "source": {
+        "Base": "att_stock",
+        "Name": "Torrent Span-9",
+        "Model": "models/easy/mw/attachments/iw9_stango25/att_vm_p01_dm_stango25_stock_v0.mdl",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_dm_stango25_stock_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\shared\\att_vm_p01_dm_stango25_stock_v0.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Torrent Span-9",
+        "Category": "Stocks",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_dm_stango25_stock_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\shared\\att_vm_p01_dm_stango25_stock_v0.lua",
+        "pack": "2962304029",
+        "Base": "att_stock",
+        "Model": "models/easy/mw/attachments/iw9_stango25/att_vm_p01_dm_stango25_stock_v0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_sm_alpha57_stock_v0",
+      "category": "Stock",
+      "default": false,
+      "name": "Tempus P80 Strike Stock",
+      "model": "models/easy/mw/attachments/iw9_alpha57/att_vm_p01_sm_alpha57_stock_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\iw9_alpha57\\att_vm_p01_sm_alpha57_stock_v0.mdl",
+      "source": {
+        "Base": "att_stock",
+        "Name": "Tempus P80 Strike Stock",
+        "Model": "models/easy/mw/attachments/iw9_alpha57/att_vm_p01_sm_alpha57_stock_v0.mdl",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_sm_alpha57_stock_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\shared\\att_vm_p01_sm_alpha57_stock_v0.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Tempus P80 Strike Stock",
+        "Category": "Stocks",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_sm_alpha57_stock_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\shared\\att_vm_p01_sm_alpha57_stock_v0.lua",
+        "pack": "2962304029",
+        "Base": "att_stock",
+        "Model": "models/easy/mw/attachments/iw9_alpha57/att_vm_p01_sm_alpha57_stock_v0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_sm_alpha57_stockwire_v0",
+      "category": "Stock",
+      "default": false,
+      "name": "Demo Quicksilver Stock",
+      "model": "models/easy/mw/attachments/iw9_alpha57/att_vm_p01_sm_alpha57_stockwire_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\iw9_alpha57\\att_vm_p01_sm_alpha57_stockwire_v0.mdl",
+      "source": {
+        "Base": "att_stock",
+        "Name": "Demo Quicksilver Stock",
+        "Model": "models/easy/mw/attachments/iw9_alpha57/att_vm_p01_sm_alpha57_stockwire_v0.mdl",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_sm_alpha57_stockwire_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\shared\\att_vm_p01_sm_alpha57_stockwire_v0.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Demo Quicksilver Stock",
+        "Category": "Stocks",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_sm_alpha57_stockwire_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\shared\\att_vm_p01_sm_alpha57_stockwire_v0.lua",
+        "pack": "2962304029",
+        "Base": "att_stock",
+        "Model": "models/easy/mw/attachments/iw9_alpha57/att_vm_p01_sm_alpha57_stockwire_v0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike16_stock_v0",
+      "category": "Stock",
+      "default": false,
+      "name": "Demo Precision Elite Factory",
+      "model": "models/easy/mw/attachments/iw9_mike16/att_vm_p01_ar_mike16_stock_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\iw9_mike16\\att_vm_p01_ar_mike16_stock_v0.mdl",
+      "source": {
+        "Base": "att_stock",
+        "Name": "Demo Precision Elite Factory",
+        "Model": "models/easy/mw/attachments/iw9_mike16/att_vm_p01_ar_mike16_stock_v0.mdl",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike16_stock_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike16\\stock\\att_vm_p01_ar_mike16_stock_v0.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Demo Precision Elite Factory",
+        "Category": "Stocks",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike16_stock_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike16\\stock\\att_vm_p01_ar_mike16_stock_v0.lua",
+        "pack": "2962304029",
+        "Base": "att_stock",
+        "Model": "models/easy/mw/attachments/iw9_mike16/att_vm_p01_ar_mike16_stock_v0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_mag_v0",
+      "category": "Magazine",
+      "default": true,
+      "name": "Default Magazine",
+      "model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_mag_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\iw9_mike4\\att_vm_p01_ar_mike4_mag_v0.mdl",
+      "source": {
+        "Base": "att_magazine",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_mag_v0.mdl",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\mags\\att_vm_p01_ar_mike4_mag_v0.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Default Magazine",
+        "Category": "Magazines",
+        "Icon": "mg/genericattachment",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\mags\\att_vm_p01_ar_mike4_mag_v0.lua",
+        "pack": "2962304029",
+        "Base": "att_magazine",
+        "PoseParameter": "bullets_offset",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_mag_v0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_xmag_v0",
+      "category": "Magazine",
+      "default": false,
+      "name": "45 Round Mag",
+      "model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_xmag_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\iw9_mike4\\att_vm_p01_ar_mike4_xmag_v0.mdl",
+      "source": {
+        "Base": "att_magazine",
+        "Name": "45 Round Mag",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_xmag_v0.mdl",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_xmag_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\mags\\att_vm_p01_ar_mike4_xmag_v0.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "45 Round Mag",
+        "Category": "Magazines",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_xmag_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\mags\\att_vm_p01_ar_mike4_xmag_v0.lua",
+        "pack": "2962304029",
+        "Base": "att_magazine",
+        "PoseParameter": "bullets_offset",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_xmag_v0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_xmaglrg_v0",
+      "category": "Magazine",
+      "default": false,
+      "name": "60 Round Mag",
+      "model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_xmaglrg_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\iw9_mike4\\att_vm_p01_ar_mike4_xmaglrg_v0.mdl",
+      "source": {
+        "Base": "att_magazine",
+        "Name": "60 Round Mag",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_xmaglrg_v0.mdl",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_xmaglrg_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\mags\\att_vm_p01_ar_mike4_xmaglrg_v0.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "60 Round Mag",
+        "Category": "Magazines",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_xmaglrg_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\mags\\att_vm_p01_ar_mike4_xmaglrg_v0.lua",
+        "pack": "2962304029",
+        "Base": "att_magazine",
+        "PoseParameter": "bullets_offset",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_xmaglrg_v0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike16_smag_v0",
+      "category": "Magazine",
+      "default": false,
+      "name": "15 Round Mag",
+      "model": "models/easy/mw/attachments/iw9_mike16/att_vm_p01_ar_mike16_smag_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\iw9_mike16\\att_vm_p01_ar_mike16_smag_v0.mdl",
+      "source": {
+        "Base": "att_magazine",
+        "Name": "15 Round Mag",
+        "Model": "models/easy/mw/attachments/iw9_mike16/att_vm_p01_ar_mike16_smag_v0.mdl",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike16_smag_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike16\\mags\\att_vm_p01_ar_mike16_smag_v0.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "15 Round Mag",
+        "Category": "Magazines",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike16_smag_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike16\\mags\\att_vm_p01_ar_mike16_smag_v0.lua",
+        "pack": "2962304029",
+        "Base": "att_magazine",
+        "PoseParameter": "bullets_offset",
+        "Model": "models/easy/mw/attachments/iw9_mike16/att_vm_p01_ar_mike16_smag_v0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_pistolgrip_v0",
+      "category": "RearGrip",
+      "default": true,
+      "name": "Default Pistol Grip",
+      "model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_pistolgrip_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\iw9_mike4\\att_vm_p01_ar_mike4_pistolgrip_v0.mdl",
+      "source": {
+        "Base": "att_pistolgrip",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_pistolgrip_v0.mdl",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_pistolgrip_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\pistolgrip\\att_vm_p01_ar_mike4_pistolgrip_v0.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Default Pistol Grip",
+        "Category": "Pistol Grips",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_pistolgrip_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\pistolgrip\\att_vm_p01_ar_mike4_pistolgrip_v0.lua",
+        "pack": "2962304029",
+        "Base": "att_pistolgrip",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_pistolgrip_v0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_grpass_v0",
+      "category": "RearGrip",
+      "default": false,
+      "name": "Sakin XZ Grip",
+      "model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_grpass_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\iw9_mike4\\att_vm_p01_ar_mike4_grpass_v0.mdl",
+      "source": {
+        "Base": "att_pistolgrip",
+        "Name": "Sakin XZ Grip",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_grpass_v0.mdl",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_grpass_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\pistolgrip\\att_vm_p01_ar_mike4_grpass_v0.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Sakin XZ Grip",
+        "Category": "Pistol Grips",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_grpass_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\pistolgrip\\att_vm_p01_ar_mike4_grpass_v0.lua",
+        "pack": "2962304029",
+        "Base": "att_pistolgrip",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_grpass_v0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_grpskel_v0",
+      "category": "RearGrip",
+      "default": false,
+      "name": "Phantom Grip",
+      "model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_grpskel_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\iw9_mike4\\att_vm_p01_ar_mike4_grpskel_v0.mdl",
+      "source": {
+        "Base": "att_pistolgrip",
+        "Name": "Phantom Grip",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_grpskel_v0.mdl",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_grpskel_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\pistolgrip\\att_vm_p01_ar_mike4_grpskel_v0.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Phantom Grip",
+        "Category": "Pistol Grips",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_grpskel_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\pistolgrip\\att_vm_p01_ar_mike4_grpskel_v0.lua",
+        "pack": "2962304029",
+        "Base": "att_pistolgrip",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_grpskel_v0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_grpsn_v0",
+      "category": "RearGrip",
+      "default": false,
+      "name": "Support CP90 Grip",
+      "model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_grpsn_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\iw9_mike4\\att_vm_p01_ar_mike4_grpsn_v0.mdl",
+      "source": {
+        "Base": "att_pistolgrip",
+        "Name": "Support CP90 Grip",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_grpsn_v0.mdl",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_grpsn_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\pistolgrip\\att_vm_p01_ar_mike4_grpsn_v0.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Support CP90 Grip",
+        "Category": "Pistol Grips",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_grpsn_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\pistolgrip\\att_vm_p01_ar_mike4_grpsn_v0.lua",
+        "pack": "2962304029",
+        "Base": "att_pistolgrip",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_grpsn_v0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_grpstdy_v0",
+      "category": "RearGrip",
+      "default": false,
+      "name": "D15 Grip",
+      "model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_grpstdy_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\iw9_mike4\\att_vm_p01_ar_mike4_grpstdy_v0.mdl",
+      "source": {
+        "Base": "att_pistolgrip",
+        "Name": "D15 Grip",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_grpstdy_v0.mdl",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_grpstdy_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\pistolgrip\\att_vm_p01_ar_mike4_grpstdy_v0.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "D15 Grip",
+        "Category": "Pistol Grips",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_grpstdy_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\pistolgrip\\att_vm_p01_ar_mike4_grpstdy_v0.lua",
+        "pack": "2962304029",
+        "Base": "att_pistolgrip",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_grpstdy_v0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_grptac_v0",
+      "category": "RearGrip",
+      "default": false,
+      "name": "XTEN Grip",
+      "model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_grptac_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\iw9_mike4\\att_vm_p01_ar_mike4_grptac_v0.mdl",
+      "source": {
+        "Base": "att_pistolgrip",
+        "Name": "XTEN Grip",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_grptac_v0.mdl",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_grptac_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\pistolgrip\\att_vm_p01_ar_mike4_grptac_v0.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "XTEN Grip",
+        "Category": "Pistol Grips",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_p01_ar_mike4_grptac_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\pistolgrip\\att_vm_p01_ar_mike4_grptac_v0.lua",
+        "pack": "2962304029",
+        "Base": "att_pistolgrip",
+        "Model": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_grptac_v0.mdl"
+      }
+    },
+    {
+      "key": "att_muzzle",
+      "category": "Muzzle",
+      "default": true,
+      "name": "Default",
+      "model": "",
+      "model_file": null,
+      "source": {
+        "Base": "att_base",
+        "Name": "Default",
+        "Category": "Muzzle Devices",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\base\\att_muzzle.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Default",
+        "Category": "Muzzle Devices",
+        "Icon": "mg/genericattachment",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\base\\att_muzzle.lua",
+        "pack": "2459720887",
+        "Base": "att_base"
+      }
+    },
+    {
+      "key": "att_vm_breacher01",
+      "category": "Muzzle",
+      "default": false,
+      "name": "Breacher Device",
+      "model": "models/viper/mw/attachments/attachment_vm_muzzlemelee01.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_muzzlemelee01.mdl",
+      "source": {
+        "Base": "att_muzzle",
+        "Name": "Breacher Device",
+        "Model": "models/viper/mw/attachments/attachment_vm_muzzlemelee01.mdl",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_muzzlemelee01.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\breacher\\att_vm_breacher01.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Breacher Device",
+        "Category": "Muzzle Devices",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_muzzlemelee01.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\breacher\\att_vm_breacher01.lua",
+        "pack": "2459720887",
+        "Base": "att_muzzle",
+        "Model": "models/viper/mw/attachments/attachment_vm_muzzlemelee01.mdl"
+      }
+    },
+    {
+      "key": "att_vm_breacher02",
+      "category": "Muzzle",
+      "default": false,
+      "name": "Breacher Device",
+      "model": "models/viper/mw/attachments/attachment_vm_muzzlemelee02.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_muzzlemelee02.mdl",
+      "source": {
+        "Base": "att_muzzle",
+        "Name": "Breacher Device",
+        "Model": "models/viper/mw/attachments/attachment_vm_muzzlemelee02.mdl",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_muzzlemelee02.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\breacher\\att_vm_breacher02.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Breacher Device",
+        "Category": "Muzzle Devices",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_muzzlemelee02.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\breacher\\att_vm_breacher02.lua",
+        "pack": "2459720887",
+        "Base": "att_muzzle",
+        "Model": "models/viper/mw/attachments/attachment_vm_muzzlemelee02.mdl"
+      }
+    },
+    {
+      "key": "att_vm_compensator01",
+      "category": "Muzzle",
+      "default": false,
+      "name": "Light Compensator",
+      "model": "models/viper/mw/attachments/attachment_vm_compensator01.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_compensator01.mdl",
+      "source": {
+        "Base": "att_muzzle",
+        "Name": "Light Compensator",
+        "Model": "models/viper/mw/attachments/attachment_vm_compensator01.mdl",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_compensator01.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\compensator\\att_vm_compensator01.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Light Compensator",
+        "Category": "Muzzle Devices",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_compensator01.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\compensator\\att_vm_compensator01.lua",
+        "pack": "2459720887",
+        "Base": "att_muzzle",
+        "Model": "models/viper/mw/attachments/attachment_vm_compensator01.mdl"
+      }
+    },
+    {
+      "key": "att_vm_compensator02",
+      "category": "Muzzle",
+      "default": false,
+      "name": "Compensator",
+      "model": "models/viper/mw/attachments/attachment_vm_compensator02.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_compensator02.mdl",
+      "source": {
+        "Base": "att_muzzle",
+        "Name": "Compensator",
+        "Model": "models/viper/mw/attachments/attachment_vm_compensator02.mdl",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_compensator02.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\compensator\\att_vm_compensator02.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Compensator",
+        "Category": "Muzzle Devices",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_compensator02.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\compensator\\att_vm_compensator02.lua",
+        "pack": "2459720887",
+        "Base": "att_muzzle",
+        "Model": "models/viper/mw/attachments/attachment_vm_compensator02.mdl"
+      }
+    },
+    {
+      "key": "att_vm_flashhider01",
+      "category": "Muzzle",
+      "default": false,
+      "name": "Flash Guard",
+      "model": "models/viper/mw/attachments/attachment_vm_flashhider01.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_flashhider01.mdl",
+      "source": {
+        "Base": "att_muzzle",
+        "Name": "Flash Guard",
+        "Model": "models/viper/mw/attachments/attachment_vm_flashhider01.mdl",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_flashhider01.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\flashhider\\att_vm_flashhider01.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Flash Guard",
+        "Category": "Muzzle Devices",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_flashhider01.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\flashhider\\att_vm_flashhider01.lua",
+        "pack": "2459720887",
+        "Base": "att_muzzle",
+        "Model": "models/viper/mw/attachments/attachment_vm_flashhider01.mdl"
+      }
+    },
+    {
+      "key": "att_vm_flashhider02",
+      "category": "Muzzle",
+      "default": false,
+      "name": "Flash Guard",
+      "model": "models/viper/mw/attachments/attachment_vm_flashhider02.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_flashhider02.mdl",
+      "source": {
+        "Base": "att_muzzle",
+        "Name": "Flash Guard",
+        "Model": "models/viper/mw/attachments/attachment_vm_flashhider02.mdl",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_flashhider02.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\flashhider\\att_vm_flashhider02.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Flash Guard",
+        "Category": "Muzzle Devices",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_flashhider02.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\flashhider\\att_vm_flashhider02.lua",
+        "pack": "2459720887",
+        "Base": "att_muzzle",
+        "Model": "models/viper/mw/attachments/attachment_vm_flashhider02.mdl"
+      }
+    },
+    {
+      "key": "att_vm_flashhider03",
+      "category": "Muzzle",
+      "default": false,
+      "name": "Flash Guard",
+      "model": "models/viper/mw/attachments/attachment_vm_flashhider03.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_flashhider03.mdl",
+      "source": {
+        "Base": "att_muzzle",
+        "Name": "Flash Guard",
+        "Model": "models/viper/mw/attachments/attachment_vm_flashhider03.mdl",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_flashhider03.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\flashhider\\att_vm_flashhider03.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Flash Guard",
+        "Category": "Muzzle Devices",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_flashhider03.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\flashhider\\att_vm_flashhider03.lua",
+        "pack": "2459720887",
+        "Base": "att_muzzle",
+        "Model": "models/viper/mw/attachments/attachment_vm_flashhider03.mdl"
+      }
+    },
+    {
+      "key": "att_vm_flashhider04",
+      "category": "Muzzle",
+      "default": false,
+      "name": "Flash Guard",
+      "model": "models/viper/mw/attachments/attachment_vm_flashhider05.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_flashhider05.mdl",
+      "source": {
+        "Base": "att_muzzle",
+        "Name": "Flash Guard",
+        "Model": "models/viper/mw/attachments/attachment_vm_flashhider05.mdl",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_flashhider05.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\flashhider\\att_vm_flashhider04.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Flash Guard",
+        "Category": "Muzzle Devices",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_flashhider05.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\flashhider\\att_vm_flashhider04.lua",
+        "pack": "2459720887",
+        "Base": "att_muzzle",
+        "Model": "models/viper/mw/attachments/attachment_vm_flashhider05.mdl"
+      }
+    },
+    {
+      "key": "att_vm_muzzlebrake01",
+      "category": "Muzzle",
+      "default": false,
+      "name": "Light Muzzle Brake",
+      "model": "models/viper/mw/attachments/attachment_vm_muzzlebrake01.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_muzzlebrake01.mdl",
+      "source": {
+        "Base": "att_muzzle",
+        "Name": "Light Muzzle Brake",
+        "Model": "models/viper/mw/attachments/attachment_vm_muzzlebrake01.mdl",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_muzzlebrake01.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\muzzlebrake\\att_vm_muzzlebrake01.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Light Muzzle Brake",
+        "Category": "Muzzle Devices",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_muzzlebrake01.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\muzzlebrake\\att_vm_muzzlebrake01.lua",
+        "pack": "2459720887",
+        "Base": "att_muzzle",
+        "Model": "models/viper/mw/attachments/attachment_vm_muzzlebrake01.mdl"
+      }
+    },
+    {
+      "key": "att_vm_muzzlebrake02",
+      "category": "Muzzle",
+      "default": false,
+      "name": "Muzzle Brake",
+      "model": "models/viper/mw/attachments/attachment_vm_muzzlebrake02.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_muzzlebrake02.mdl",
+      "source": {
+        "Base": "att_muzzle",
+        "Name": "Muzzle Brake",
+        "Model": "models/viper/mw/attachments/attachment_vm_muzzlebrake02.mdl",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_muzzlebrake02.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\muzzlebrake\\att_vm_muzzlebrake02.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Muzzle Brake",
+        "Category": "Muzzle Devices",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_muzzlebrake02.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\muzzlebrake\\att_vm_muzzlebrake02.lua",
+        "pack": "2459720887",
+        "Base": "att_muzzle",
+        "Model": "models/viper/mw/attachments/attachment_vm_muzzlebrake02.mdl"
+      }
+    },
+    {
+      "key": "att_vm_muzzlebrake03",
+      "category": "Muzzle",
+      "default": false,
+      "name": "Comp Muzzle Brake",
+      "model": "models/viper/mw/attachments/attachment_vm_muzzlebrake03.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_muzzlebrake03.mdl",
+      "source": {
+        "Base": "att_muzzle",
+        "Name": "Comp Muzzle Brake",
+        "Model": "models/viper/mw/attachments/attachment_vm_muzzlebrake03.mdl",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_muzzlebrake03.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\muzzlebrake\\att_vm_muzzlebrake03.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Comp Muzzle Brake",
+        "Category": "Muzzle Devices",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_muzzlebrake03.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\muzzlebrake\\att_vm_muzzlebrake03.lua",
+        "pack": "2459720887",
+        "Base": "att_muzzle",
+        "Model": "models/viper/mw/attachments/attachment_vm_muzzlebrake03.mdl"
+      }
+    },
+    {
+      "key": "att_vm_silencer01",
+      "category": "Muzzle",
+      "default": false,
+      "name": "Stealth Suppressor",
+      "model": "models/viper/mw/attachments/attachment_vm_silencer_east01.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_silencer_east01.mdl",
+      "source": {
+        "Base": "att_suppressor",
+        "Name": "Stealth Suppressor",
+        "Model": "models/viper/mw/attachments/attachment_vm_silencer_east01.mdl",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_silencer_east01.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\suppressors\\att_vm_silencer01.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Stealth Suppressor",
+        "Category": "Muzzle Devices",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_silencer_east01.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\suppressors\\att_vm_silencer01.lua",
+        "pack": "2459720887",
+        "Base": "att_suppressor",
+        "Model": "models/viper/mw/attachments/attachment_vm_silencer_east01.mdl"
+      }
+    },
+    {
+      "key": "att_vm_silencer02",
+      "category": "Muzzle",
+      "default": false,
+      "name": "Monolithic Suppressor",
+      "model": "models/viper/mw/attachments/attachment_vm_silencer02.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_silencer02.mdl",
+      "source": {
+        "Base": "att_suppressor",
+        "Name": "Monolithic Suppressor",
+        "Model": "models/viper/mw/attachments/attachment_vm_silencer02.mdl",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_silencer02.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\suppressors\\att_vm_silencer02.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Monolithic Suppressor",
+        "Category": "Muzzle Devices",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_silencer02.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\suppressors\\att_vm_silencer02.lua",
+        "pack": "2459720887",
+        "Base": "att_suppressor",
+        "Model": "models/viper/mw/attachments/attachment_vm_silencer02.mdl"
+      }
+    },
+    {
+      "key": "att_vm_silencer03",
+      "category": "Muzzle",
+      "default": false,
+      "name": "Lightweight Suppressor",
+      "model": "models/viper/mw/attachments/attachment_vm_silencer03.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_silencer03.mdl",
+      "source": {
+        "Base": "att_suppressor",
+        "Name": "Lightweight Suppressor",
+        "Model": "models/viper/mw/attachments/attachment_vm_silencer03.mdl",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_silencer03.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\suppressors\\att_vm_silencer03.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Lightweight Suppressor",
+        "Category": "Muzzle Devices",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_silencer03.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\suppressors\\att_vm_silencer03.lua",
+        "pack": "2459720887",
+        "Base": "att_suppressor",
+        "Model": "models/viper/mw/attachments/attachment_vm_silencer03.mdl"
+      }
+    },
+    {
+      "key": "att_vm_silencer04",
+      "category": "Muzzle",
+      "default": false,
+      "name": "Tactical Suppressor",
+      "model": "models/viper/mw/attachments/attachment_vm_silencer04.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_silencer04.mdl",
+      "source": {
+        "Base": "att_suppressor",
+        "Name": "Tactical Suppressor",
+        "Model": "models/viper/mw/attachments/attachment_vm_silencer04.mdl",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_silencer04.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\suppressors\\att_vm_silencer04.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Tactical Suppressor",
+        "Category": "Muzzle Devices",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_silencer04.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\suppressors\\att_vm_silencer04.lua",
+        "pack": "2459720887",
+        "Base": "att_suppressor",
+        "Model": "models/viper/mw/attachments/attachment_vm_silencer04.mdl"
+      }
+    },
+    {
+      "key": "att_vm_silencer05",
+      "category": "Muzzle",
+      "default": false,
+      "name": "Monolithic Suppressor",
+      "model": "models/viper/mw/attachments/attachment_vm_silencer_east02.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_silencer_east02.mdl",
+      "source": {
+        "Base": "att_vm_silencer02",
+        "Model": "models/viper/mw/attachments/attachment_vm_silencer_east02.mdl",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_silencer_east02.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\suppressors\\att_vm_silencer05.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Monolithic Suppressor",
+        "Category": "Muzzle Devices",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_silencer_east02.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\suppressors\\att_vm_silencer05.lua",
+        "pack": "2459720887",
+        "Base": "att_vm_silencer02",
+        "Model": "models/viper/mw/attachments/attachment_vm_silencer_east02.mdl"
+      }
+    },
+    {
+      "key": "att_vm_silencer06",
+      "category": "Muzzle",
+      "default": false,
+      "name": "Lightweight Suppressor",
+      "model": "models/viper/mw/attachments/attachment_vm_silencer_east03.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_silencer_east03.mdl",
+      "source": {
+        "Base": "att_vm_silencer03",
+        "Model": "models/viper/mw/attachments/attachment_vm_silencer_east03.mdl",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_silencer_east03.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\suppressors\\att_vm_silencer06.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Lightweight Suppressor",
+        "Category": "Muzzle Devices",
+        "Icon": "viper/mw/attachments/icons/muzzle/icon_attachment_silencer_east03.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\muzzles\\suppressors\\att_vm_silencer06.lua",
+        "pack": "2459720887",
+        "Base": "att_vm_silencer03",
+        "Model": "models/viper/mw/attachments/attachment_vm_silencer_east03.mdl"
+      }
+    },
+    {
+      "key": "att_sight",
+      "category": "Optic",
+      "default": true,
+      "name": "Default Sight",
+      "model": "",
+      "model_file": null,
+      "source": {
+        "Base": "att_base",
+        "Name": "Default Sight",
+        "Category": "Sights",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\base\\att_sight.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Default Sight",
+        "Category": "Sights",
+        "Icon": "mg/genericattachment",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\base\\att_sight.lua",
+        "pack": "2459720887",
+        "Base": "att_base"
+      }
+    },
+    {
+      "key": "att_vm_2x_west02_holo",
+      "category": "Optic",
+      "default": false,
+      "name": "Solozero K498",
+      "model": "models/viper/mw/attachments/attachment_vm_lm_slima_acog_optic.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_lm_slima_acog_optic.mdl",
+      "source": {
+        "Base": "att_sight_1x",
+        "Name": "Solozero K498",
+        "Model": "models/viper/mw/attachments/attachment_vm_lm_slima_acog_optic.mdl",
+        "Icon": "viper/mw/attachments/icons/optics/icon_attachment_lm_slima_acog_holo.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\optics\\att_vm_2x_west02_holo.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Solozero K498",
+        "Category": "Sights",
+        "Icon": "viper/mw/attachments/icons/optics/icon_attachment_lm_slima_acog_holo.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\optics\\att_vm_2x_west02_holo.lua",
+        "pack": "2459720887",
+        "Base": "att_sight_1x",
+        "Model": "models/viper/mw/attachments/attachment_vm_lm_slima_acog_optic.mdl"
+      }
+    },
+    {
+      "key": "att_vm_2x_west02",
+      "category": "Optic",
+      "default": false,
+      "name": "Solozero K498 2.0x Integral",
+      "model": "models/viper/mw/attachments/attachment_vm_lm_slima_acog.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_lm_slima_acog.mdl",
+      "source": {
+        "Base": "att_optic_2x",
+        "Name": "Solozero K498 2.0x Integral",
+        "Model": "models/viper/mw/attachments/attachment_vm_lm_slima_acog.mdl",
+        "Icon": "viper/mw/attachments/icons/optics/icon_attachment_lm_slima_acog.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\optics\\att_vm_2x_west02.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Solozero K498 2.0x Integral",
+        "Category": "Sights",
+        "Icon": "viper/mw/attachments/icons/optics/icon_attachment_lm_slima_acog.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\optics\\att_vm_2x_west02.lua",
+        "pack": "2459720887",
+        "Base": "att_optic_2x",
+        "Model": "models/viper/mw/attachments/attachment_vm_lm_slima_acog.mdl"
+      }
+    },
+    {
+      "key": "att_vm_reflex_02",
+      "category": "Optic",
+      "default": false,
+      "name": "LP Collimator",
+      "model": "models/viper/mw/attachments/attachment_vm_reflex_02.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_reflex_02.mdl",
+      "source": {
+        "Base": "att_sight_1x",
+        "Name": "LP Collimator",
+        "Model": "models/viper/mw/attachments/attachment_vm_reflex_02.mdl",
+        "Icon": "viper/mw/attachments/icons/reticles/dyn_icon_attachment_vm_reflex_02.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\reticles\\att_vm_reflex_02.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "LP Collimator",
+        "Category": "Sights",
+        "Icon": "viper/mw/attachments/icons/reticles/dyn_icon_attachment_vm_reflex_02.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\reticles\\att_vm_reflex_02.lua",
+        "pack": "2459720887",
+        "Base": "att_sight_1x",
+        "Model": "models/viper/mw/attachments/attachment_vm_reflex_02.mdl"
+      }
+    },
+    {
+      "key": "att_vm_minireddot01_tall",
+      "category": "Optic",
+      "default": false,
+      "name": "G.I. Mini Reflex",
+      "model": "models/viper/mw/attachments/attachment_vm_minireddot_tall.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_minireddot_tall.mdl",
+      "source": {
+        "Base": "att_vm_minireddot01",
+        "Model": "models/viper/mw/attachments/attachment_vm_minireddot_tall.mdl",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\reticles\\att_vm_minireddot01_tall.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "G.I. Mini Reflex",
+        "Category": "Sights",
+        "Icon": "viper/mw/attachments/icons/reticles/icon_attachment_minireddot.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\reticles\\att_vm_minireddot01_tall.lua",
+        "pack": "2459720887",
+        "Base": "att_vm_minireddot01",
+        "Model": "models/viper/mw/attachments/attachment_vm_minireddot_tall.mdl"
+      }
+    },
+    {
+      "key": "att_vm_minireddot02_tall",
+      "category": "Optic",
+      "default": false,
+      "name": "Solozero Optics Mini Reflex",
+      "model": "models/viper/mw/attachments/attachment_vm_minireddot02_tall.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_minireddot02_tall.mdl",
+      "source": {
+        "Base": "att_vm_minireddot02",
+        "Model": "models/viper/mw/attachments/attachment_vm_minireddot02_tall.mdl",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\reticles\\att_vm_minireddot02_tall.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Solozero Optics Mini Reflex",
+        "Category": "Sights",
+        "Icon": "viper/mw/attachments/icons/reticles/icon_attachment_minireddot02.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\reticles\\att_vm_minireddot02_tall.lua",
+        "pack": "2459720887",
+        "Base": "att_vm_minireddot02",
+        "Model": "models/viper/mw/attachments/attachment_vm_minireddot02_tall.mdl"
+      }
+    },
+    {
+      "key": "att_vm_minireddot03_tall",
+      "category": "Optic",
+      "default": false,
+      "name": "Cronen LP945 Mini Reflex",
+      "model": "models/viper/mw/attachments/attachment_vm_minireddot03_tall.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_minireddot03_tall.mdl",
+      "source": {
+        "Base": "att_vm_minireddot03",
+        "Model": "models/viper/mw/attachments/attachment_vm_minireddot03_tall.mdl",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\reticles\\att_vm_minireddot03_tall.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Cronen LP945 Mini Reflex",
+        "Category": "Sights",
+        "Icon": "viper/mw/attachments/icons/reticles/icon_attachment_minireddot03.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\reticles\\att_vm_minireddot03_tall.lua",
+        "pack": "2459720887",
+        "Base": "att_vm_minireddot03",
+        "Model": "models/viper/mw/attachments/attachment_vm_minireddot03_tall.mdl"
+      }
+    },
+    {
+      "key": "att_vm_holo_west01",
+      "category": "Optic",
+      "default": false,
+      "name": "Corp Combat Holo Sight",
+      "model": "models/viper/mw/attachments/attachment_vm_holo_west_lod0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_holo_west_lod0.mdl",
+      "source": {
+        "Base": "att_sight_1x",
+        "Name": "Corp Combat Holo Sight",
+        "Model": "models/viper/mw/attachments/attachment_vm_holo_west_lod0.mdl",
+        "Icon": "viper/mw/attachments/icons/reticles/icon_attachment_holo_west.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\reticles\\att_vm_holo_west01.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Corp Combat Holo Sight",
+        "Category": "Sights",
+        "Icon": "viper/mw/attachments/icons/reticles/icon_attachment_holo_west.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\reticles\\att_vm_holo_west01.lua",
+        "pack": "2459720887",
+        "Base": "att_sight_1x",
+        "Model": "models/viper/mw/attachments/attachment_vm_holo_west_lod0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_holo_west02",
+      "category": "Optic",
+      "default": false,
+      "name": "PBX Holo 7 Sight",
+      "model": "models/viper/mw/attachments/attachment_vm_holo_west02.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_holo_west02.mdl",
+      "source": {
+        "Base": "att_sight_1x",
+        "Name": "PBX Holo 7 Sight",
+        "Model": "models/viper/mw/attachments/attachment_vm_holo_west02.mdl",
+        "Icon": "viper/mw/attachments/icons/reticles/icon_attachment_holo_west02.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\reticles\\att_vm_holo_west02.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "PBX Holo 7 Sight",
+        "Category": "Sights",
+        "Icon": "viper/mw/attachments/icons/reticles/icon_attachment_holo_west02.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\reticles\\att_vm_holo_west02.lua",
+        "pack": "2459720887",
+        "Base": "att_sight_1x",
+        "Model": "models/viper/mw/attachments/attachment_vm_holo_west02.mdl"
+      }
+    },
+    {
+      "key": "att_vm_holo_east01",
+      "category": "Optic",
+      "default": false,
+      "name": "APX5 Holographic Sight",
+      "model": "models/viper/mw/attachments/attachment_vm_holo_east.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_holo_east.mdl",
+      "source": {
+        "Base": "att_optic_1point5x",
+        "Name": "APX5 Holographic Sight",
+        "Model": "models/viper/mw/attachments/attachment_vm_holo_east.mdl",
+        "Icon": "viper/mw/attachments/icons/optics/icon_attachment_holo_east.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\optics\\att_vm_holo_east01.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "APX5 Holographic Sight",
+        "Category": "Sights",
+        "Icon": "viper/mw/attachments/icons/optics/icon_attachment_holo_east.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\optics\\att_vm_holo_east01.lua",
+        "pack": "2459720887",
+        "Base": "att_optic_1point5x",
+        "Model": "models/viper/mw/attachments/attachment_vm_holo_east.mdl"
+      }
+    },
+    {
+      "key": "att_vm_reflex_east01",
+      "category": "Optic",
+      "default": false,
+      "name": "Viper Reflex Sight",
+      "model": "models/viper/mw/attachments/attachment_vm_reflex_east_lod0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_reflex_east_lod0.mdl",
+      "source": {
+        "Base": "att_sight_1x",
+        "Name": "Viper Reflex Sight",
+        "Model": "models/viper/mw/attachments/attachment_vm_reflex_east_lod0.mdl",
+        "Icon": "viper/mw/attachments/icons/reticles/icon_attachment_reflex_east.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\reticles\\att_vm_reflex_east01.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Viper Reflex Sight",
+        "Category": "Sights",
+        "Icon": "viper/mw/attachments/icons/reticles/icon_attachment_reflex_east.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\reticles\\att_vm_reflex_east01.lua",
+        "pack": "2459720887",
+        "Base": "att_sight_1x",
+        "Model": "models/viper/mw/attachments/attachment_vm_reflex_east_lod0.mdl"
+      }
+    },
+    {
+      "key": "att_vm_reflex_east02_tall",
+      "category": "Optic",
+      "default": false,
+      "name": "Monocle Reflex Sight",
+      "model": "models/viper/mw/attachments/attachment_vm_reflex_east02_tall.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_reflex_east02_tall.mdl",
+      "source": {
+        "Base": "att_vm_reflex_east02",
+        "Model": "models/viper/mw/attachments/attachment_vm_reflex_east02_tall.mdl",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\reticles\\att_vm_reflex_east02_tall.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Monocle Reflex Sight",
+        "Category": "Sights",
+        "Icon": "viper/mw/attachments/icons/reticles/icon_attachment_reflex_east02.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\reticles\\att_vm_reflex_east02_tall.lua",
+        "pack": "2459720887",
+        "Base": "att_vm_reflex_east02",
+        "Model": "models/viper/mw/attachments/attachment_vm_reflex_east02_tall.mdl"
+      }
+    },
+    {
+      "key": "att_vm_reflex_west02_tall",
+      "category": "Optic",
+      "default": false,
+      "name": "Aim-Op Reflex Sight",
+      "model": "models/viper/mw/attachments/attachment_vm_reflex_west04.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_reflex_west04.mdl",
+      "source": {
+        "Base": "att_vm_reflex_west02",
+        "Model": "models/viper/mw/attachments/attachment_vm_reflex_west04.mdl",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\reticles\\att_vm_reflex_west02_tall.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Aim-Op Reflex Sight",
+        "Category": "Sights",
+        "Icon": "viper/mw/attachments/icons/reticles/icon_attachment_reflex_west02.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\reticles\\att_vm_reflex_west02_tall.lua",
+        "pack": "2459720887",
+        "Base": "att_vm_reflex_west02",
+        "Model": "models/viper/mw/attachments/attachment_vm_reflex_west04.mdl"
+      }
+    },
+    {
+      "key": "att_vm_reflex_west03",
+      "category": "Optic",
+      "default": false,
+      "name": "Operator Reflex Sight",
+      "model": "models/viper/mw/attachments/attachment_vm_reflex_west03.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_reflex_west03.mdl",
+      "source": {
+        "Base": "att_sight_1x",
+        "Name": "Operator Reflex Sight",
+        "Model": "models/viper/mw/attachments/attachment_vm_reflex_west03.mdl",
+        "Icon": "viper/mw/attachments/icons/reticles/icon_attachment_reflex_west03.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\reticles\\att_vm_reflex_west03.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Operator Reflex Sight",
+        "Category": "Sights",
+        "Icon": "viper/mw/attachments/icons/reticles/icon_attachment_reflex_west03.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\reticles\\att_vm_reflex_west03.lua",
+        "pack": "2459720887",
+        "Base": "att_sight_1x",
+        "Model": "models/viper/mw/attachments/attachment_vm_reflex_west03.mdl"
+      }
+    },
+    {
+      "key": "att_vm_thermal_east01",
+      "category": "Optic",
+      "default": false,
+      "name": "Merc Thermal Optic",
+      "model": "models/viper/mw/attachments/attachment_vm_thermal_east.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_thermal_east.mdl",
+      "source": {
+        "Base": "att_optic_4x",
+        "Name": "Merc Thermal Optic",
+        "Model": "models/viper/mw/attachments/attachment_vm_thermal_east.mdl",
+        "Icon": "viper/mw/attachments/icons/optics/icon_attachment_thermal_east.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\optics\\att_vm_thermal_east01.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Merc Thermal Optic",
+        "Category": "Sights",
+        "Icon": "viper/mw/attachments/icons/optics/icon_attachment_thermal_east.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\optics\\att_vm_thermal_east01.lua",
+        "pack": "2459720887",
+        "Base": "att_optic_4x",
+        "Model": "models/viper/mw/attachments/attachment_vm_thermal_east.mdl"
+      }
+    },
+    {
+      "key": "att_vm_thermal_west01",
+      "category": "Optic",
+      "default": false,
+      "name": "Solozero NVG Enhanced",
+      "model": "models/viper/mw/attachments/attachment_vm_thermal_west_01.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_thermal_west_01.mdl",
+      "source": {
+        "Base": "att_optic_10x",
+        "Name": "Solozero NVG Enhanced",
+        "Model": "models/viper/mw/attachments/attachment_vm_thermal_west_01.mdl",
+        "Icon": "viper/mw/attachments/icons/optics/icon_attachment_thermal_west01.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\optics\\att_vm_thermal_west01.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Solozero NVG Enhanced",
+        "Category": "Sights",
+        "Icon": "viper/mw/attachments/icons/optics/icon_attachment_thermal_west01.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\optics\\att_vm_thermal_west01.lua",
+        "pack": "2459720887",
+        "Base": "att_optic_10x",
+        "Model": "models/viper/mw/attachments/attachment_vm_thermal_west_01.mdl"
+      }
+    },
+    {
+      "key": "att_vm_thermal_east01_hybrid",
+      "category": "Optic",
+      "default": false,
+      "name": "Merc Thermal Hybrid",
+      "model": "models/viper/mw/attachments/attachment_vm_thermal_hybrid.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_thermal_hybrid.mdl",
+      "source": {
+        "Base": "att_hybrid_4x",
+        "Name": "Merc Thermal Hybrid",
+        "Model": "models/viper/mw/attachments/attachment_vm_thermal_hybrid.mdl",
+        "Icon": "viper/mw/attachments/icons/optics/icon_attachment_thermal_east.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\hybrids\\att_vm_thermal_east01_hybrid.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Merc Thermal Hybrid",
+        "Category": "Sights",
+        "Icon": "viper/mw/attachments/icons/optics/icon_attachment_thermal_east.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\hybrids\\att_vm_thermal_east01_hybrid.lua",
+        "pack": "2459720887",
+        "Base": "att_hybrid_4x",
+        "Model": "models/viper/mw/attachments/attachment_vm_thermal_hybrid.mdl"
+      }
+    },
+    {
+      "key": "att_vm_hybrid_west01",
+      "category": "Optic",
+      "default": false,
+      "name": "Integral Hybrid",
+      "model": "models/viper/mw/attachments/attachment_vm_hybrid_west.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_hybrid_west.mdl",
+      "source": {
+        "Base": "att_hybrid_4x",
+        "Name": "Integral Hybrid",
+        "Model": "models/viper/mw/attachments/attachment_vm_hybrid_west.mdl",
+        "Icon": "viper/mw/attachments/icons/hybrid/icon_attachment_hybrid_west_lw.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\hybrids\\att_vm_hybrid_west01.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Integral Hybrid",
+        "Category": "Sights",
+        "Icon": "viper/mw/attachments/icons/hybrid/icon_attachment_hybrid_west_lw.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\hybrids\\att_vm_hybrid_west01.lua",
+        "pack": "2459720887",
+        "Base": "att_hybrid_4x",
+        "Model": "models/viper/mw/attachments/attachment_vm_hybrid_west.mdl"
+      }
+    },
+    {
+      "key": "att_vm_hybrid_west02",
+      "category": "Optic",
+      "default": false,
+      "name": "3.0x Flip Hybrid",
+      "model": "models/viper/mw/attachments/attachment_vm_hybrid_west02.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_hybrid_west02.mdl",
+      "source": {
+        "Base": "att_hybrid_3x",
+        "Name": "3.0x Flip Hybrid",
+        "Model": "models/viper/mw/attachments/attachment_vm_hybrid_west02.mdl",
+        "Icon": "viper/mw/attachments/icons/hybrid/icon_attachment_hybrid_west02_lw.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\hybrids\\att_vm_hybrid_west02.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "3.0x Flip Hybrid",
+        "Category": "Sights",
+        "Icon": "viper/mw/attachments/icons/hybrid/icon_attachment_hybrid_west02_lw.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\hybrids\\att_vm_hybrid_west02.lua",
+        "pack": "2459720887",
+        "Base": "att_hybrid_3x",
+        "Model": "models/viper/mw/attachments/attachment_vm_hybrid_west02.mdl"
+      }
+    },
+    {
+      "key": "att_vm_hybrid_west02_thermal",
+      "category": "Optic",
+      "default": false,
+      "name": "3.0x Flip Thermal",
+      "model": "models/viper/mw/attachments/attachment_vm_hybrid_west02.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_hybrid_west02.mdl",
+      "source": {
+        "Base": "att_vm_hybrid_west02",
+        "Name": "3.0x Flip Thermal",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\hybrids\\att_vm_hybrid_west02_thermal.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "3.0x Flip Thermal",
+        "Category": "Sights",
+        "Icon": "viper/mw/attachments/icons/hybrid/icon_attachment_hybrid_west02_lw.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\hybrids\\att_vm_hybrid_west02_thermal.lua",
+        "pack": "2459720887",
+        "Base": "att_vm_hybrid_west02",
+        "Model": "models/viper/mw/attachments/attachment_vm_hybrid_west02.mdl"
+      }
+    },
+    {
+      "key": "att_vm_reflex_west04",
+      "category": "Optic",
+      "default": false,
+      "name": "Cronen Elite",
+      "model": "models/viper/mw/attachments/attachment_vm_reflex_west05.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_reflex_west05.mdl",
+      "source": {
+        "Base": "att_sight_1x",
+        "Name": "Cronen Elite",
+        "Model": "models/viper/mw/attachments/attachment_vm_reflex_west05.mdl",
+        "Icon": "viper/mw/attachments/icons/reticles/icon_attachment_ar_tango21_reflex.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\reticles\\att_vm_reflex_west04.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Cronen Elite",
+        "Category": "Sights",
+        "Icon": "viper/mw/attachments/icons/reticles/icon_attachment_ar_tango21_reflex.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\reticles\\att_vm_reflex_west04.lua",
+        "pack": "2459720887",
+        "Base": "att_sight_1x",
+        "Model": "models/viper/mw/attachments/attachment_vm_reflex_west05.mdl"
+      }
+    },
+    {
+      "key": "att_vm_2x_west01",
+      "category": "Optic",
+      "default": false,
+      "name": "Cronen 2x2 Elite",
+      "model": "models/viper/mw/attachments/attachment_vm_ar_tango21_hybrid.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_ar_tango21_hybrid.mdl",
+      "source": {
+        "Base": "att_optic_2x",
+        "Name": "Cronen 2x2 Elite",
+        "Model": "models/viper/mw/attachments/attachment_vm_ar_tango21_hybrid.mdl",
+        "Icon": "viper/mw/attachments/icons/optics/icon_attachment_ar_tango21_hybrid.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\optics\\att_vm_2x_west01.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Cronen 2x2 Elite",
+        "Category": "Sights",
+        "Icon": "viper/mw/attachments/icons/optics/icon_attachment_ar_tango21_hybrid.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\optics\\att_vm_2x_west01.lua",
+        "pack": "2459720887",
+        "Base": "att_optic_2x",
+        "Model": "models/viper/mw/attachments/attachment_vm_ar_tango21_hybrid.mdl"
+      }
+    },
+    {
+      "key": "att_vm_hybrid_west03",
+      "category": "Optic",
+      "default": false,
+      "name": "Cronen C480 Pro Hybrid",
+      "model": "models/viper/mw/attachments/attachment_vm_hybrid_west03.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_hybrid_west03.mdl",
+      "source": {
+        "Base": "att_hybrid_4x",
+        "Name": "Cronen C480 Pro Hybrid",
+        "Model": "models/viper/mw/attachments/attachment_vm_hybrid_west03.mdl",
+        "Icon": "viper/mw/attachments/icons/optics/icon_attachment_4x_west02.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\hybrids\\att_vm_hybrid_west03.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Cronen C480 Pro Hybrid",
+        "Category": "Sights",
+        "Icon": "viper/mw/attachments/icons/optics/icon_attachment_4x_west02.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\hybrids\\att_vm_hybrid_west03.lua",
+        "pack": "2459720887",
+        "Base": "att_hybrid_4x",
+        "Model": "models/viper/mw/attachments/attachment_vm_hybrid_west03.mdl"
+      }
+    },
+    {
+      "key": "att_vm_4x_east01_tall",
+      "category": "Optic",
+      "default": false,
+      "name": "VLK 3.0x Optic",
+      "model": "models/viper/mw/attachments/attachment_vm_4x_east_tall.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_4x_east_tall.mdl",
+      "source": {
+        "Base": "att_vm_4x_east01",
+        "Model": "models/viper/mw/attachments/attachment_vm_4x_east_tall.mdl",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\optics\\att_vm_4x_east01_tall.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "VLK 3.0x Optic",
+        "Category": "Sights",
+        "Icon": "viper/mw/attachments/icons/optics/icon_attachment_4x_east.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\optics\\att_vm_4x_east01_tall.lua",
+        "pack": "2459720887",
+        "Base": "att_vm_4x_east01",
+        "Model": "models/viper/mw/attachments/attachment_vm_4x_east_tall.mdl"
+      }
+    },
+    {
+      "key": "att_vm_4x_west01_tall",
+      "category": "Optic",
+      "default": false,
+      "name": "Scout Combat Optic",
+      "model": "models/viper/mw/attachments/attachment_vm_4x_west_tall.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_4x_west_tall.mdl",
+      "source": {
+        "Base": "att_vm_4x_west01",
+        "Model": "models/viper/mw/attachments/attachment_vm_4x_west_tall.mdl",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\optics\\att_vm_4x_west01_tall.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Scout Combat Optic",
+        "Category": "Sights",
+        "Icon": "viper/mw/attachments/icons/optics/icon_attachment_4x_west.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\optics\\att_vm_4x_west01_tall.lua",
+        "pack": "2459720887",
+        "Base": "att_vm_4x_west01",
+        "Model": "models/viper/mw/attachments/attachment_vm_4x_west_tall.mdl"
+      }
+    },
+    {
+      "key": "att_vm_4x_west02_tall",
+      "category": "Optic",
+      "default": false,
+      "name": "Cronen C480 Pro Optic",
+      "model": "models/viper/mw/attachments/attachment_vm_4x_west02_tall.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_4x_west02_tall.mdl",
+      "source": {
+        "Base": "att_vm_4x_west02",
+        "Model": "models/viper/mw/attachments/attachment_vm_4x_west02_tall.mdl",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\optics\\att_vm_4x_west02_tall.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Cronen C480 Pro Optic",
+        "Category": "Sights",
+        "Icon": "viper/mw/attachments/icons/optics/icon_attachment_4x_west02.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\optics\\att_vm_4x_west02_tall.lua",
+        "pack": "2459720887",
+        "Base": "att_vm_4x_west02",
+        "Model": "models/viper/mw/attachments/attachment_vm_4x_west02_tall.mdl"
+      }
+    },
+    {
+      "key": "att_vm_scope_mike14",
+      "category": "Optic",
+      "default": false,
+      "name": "Sniper Scope",
+      "model": "models/viper/mw/attachments/weapon_vm_scope_mike14_alt.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\weapon_vm_scope_mike14_alt.mdl",
+      "source": {
+        "Base": "att_optic_10x",
+        "Name": "Sniper Scope",
+        "Model": "models/viper/mw/attachments/weapon_vm_scope_mike14_alt.mdl",
+        "Icon": "viper/mw/attachments/icons/optics/icon_attachment_snprscope_mike14.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\optics\\att_vm_scope_mike14.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Sniper Scope",
+        "Category": "Sights",
+        "Icon": "viper/mw/attachments/icons/optics/icon_attachment_snprscope_mike14.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\optics\\att_vm_scope_mike14.lua",
+        "pack": "2459720887",
+        "Base": "att_optic_10x",
+        "Model": "models/viper/mw/attachments/weapon_vm_scope_mike14_alt.mdl"
+      }
+    },
+    {
+      "key": "att_vm_scope_vz",
+      "category": "Optic",
+      "default": false,
+      "name": "Variable\u2122 Zoom Scope",
+      "model": "models/viper/mw/attachments/attachment_vm_scope_vz.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_scope_vz.mdl",
+      "source": {
+        "Base": "att_optic_10x",
+        "Name": "Variable\u2122 Zoom Scope",
+        "Model": "models/viper/mw/attachments/attachment_vm_scope_vz.mdl",
+        "Icon": "viper/mw/attachments/icons/optics/icon_attachment_scope_vz.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\optics\\att_vm_scope_vz.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Variable\u2122 Zoom Scope",
+        "Category": "Sights",
+        "Icon": "viper/mw/attachments/icons/optics/icon_attachment_scope_vz.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\sights\\optics\\att_vm_scope_vz.lua",
+        "pack": "2459720887",
+        "Base": "att_optic_10x",
+        "Model": "models/viper/mw/attachments/attachment_vm_scope_vz.mdl"
+      }
+    },
+    {
+      "key": "att_camo",
+      "category": "Camo",
+      "default": true,
+      "name": "Default Skin",
+      "model": "",
+      "model_file": null,
+      "source": {
+        "Base": "att_base",
+        "Name": "Default Skin",
+        "Category": "Camos",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\camos\\att_camo.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Default Skin",
+        "Category": "Camos",
+        "Icon": "mg/genericattachment",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\camos\\att_camo.lua",
+        "pack": "2962304029",
+        "Base": "att_base"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_camo_black",
+      "category": "Camo",
+      "default": false,
+      "name": "Black",
+      "model": "",
+      "model_file": null,
+      "source": {
+        "Base": "att_camo",
+        "Name": "Black",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/ui_camo_k_04.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\camos\\att_vm_p01_ar_mike4_camo_black.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Black",
+        "Category": "Camos",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/ui_camo_k_04.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\camos\\att_vm_p01_ar_mike4_camo_black.lua",
+        "pack": "2962304029",
+        "Base": "att_camo"
+      }
+    },
+    {
+      "key": "att_laser",
+      "category": "Laser",
+      "default": true,
+      "name": "Default",
+      "model": "",
+      "model_file": null,
+      "source": {
+        "Base": "att_base",
+        "Name": "Default",
+        "Category": "Lasers",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\base\\att_laser.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Default",
+        "Category": "Lasers",
+        "Icon": "mg/genericattachment",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\base\\att_laser.lua",
+        "pack": "2459720887",
+        "Base": "att_base"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_laser01",
+      "category": "Laser",
+      "default": false,
+      "name": "Tac Laser",
+      "model": "models/viper/mw/attachments/attachment_vm_laser01.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_laser01.mdl",
+      "source": {
+        "Base": "att_vm_laser01",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\lasers\\att_vm_p01_ar_mike4_laser01.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "Tac Laser",
+        "Category": "Lasers",
+        "Icon": "viper/mw/attachments/icons/laser/icon_attachment_laser01.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\lasers\\att_vm_p01_ar_mike4_laser01.lua",
+        "pack": "2962304029",
+        "Base": "att_vm_laser01",
+        "Model": "models/viper/mw/attachments/attachment_vm_laser01.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_laser02",
+      "category": "Laser",
+      "default": false,
+      "name": "5mW Laser",
+      "model": "models/viper/mw/attachments/attachment_vm_laser02.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_laser02.mdl",
+      "source": {
+        "Base": "att_vm_laser02",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\lasers\\att_vm_p01_ar_mike4_laser02.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "5mW Laser",
+        "Category": "Lasers",
+        "Icon": "viper/mw/attachments/icons/laser/icon_attachment_laser02.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\lasers\\att_vm_p01_ar_mike4_laser02.lua",
+        "pack": "2962304029",
+        "Base": "att_vm_laser02",
+        "Model": "models/viper/mw/attachments/attachment_vm_laser02.mdl"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_laser03",
+      "category": "Laser",
+      "default": false,
+      "name": "1mW Laser",
+      "model": "models/viper/mw/attachments/attachment_vm_laser03.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\models\\viper\\mw\\attachments\\attachment_vm_laser03.mdl",
+      "source": {
+        "Base": "att_vm_laser03",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\lasers\\att_vm_p01_ar_mike4_laser03.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "1mW Laser",
+        "Category": "Lasers",
+        "Icon": "viper/mw/attachments/icons/laser/icon_attachment_laser03.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\lasers\\att_vm_p01_ar_mike4_laser03.lua",
+        "pack": "2962304029",
+        "Base": "att_vm_laser03",
+        "Model": "models/viper/mw/attachments/attachment_vm_laser03.mdl"
+      }
+    },
+    {
+      "key": "att_underbarrel",
+      "category": "Launcher",
+      "default": true,
+      "name": "Default Underbarrel",
+      "model": "",
+      "model_file": null,
+      "source": {
+        "Base": "att_grip",
+        "Name": "Default Underbarrel",
+        "Category": "Underbarrels",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\base\\att_underbarrel.lua",
+        "pack": "2459720887"
+      },
+      "inherited": {
+        "Name": "Default Underbarrel",
+        "Category": "Underbarrels",
+        "Icon": "mg/genericattachment",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2459720887\\lua\\weapons\\mg_base\\modules\\attachmentss\\base\\att_underbarrel.lua",
+        "pack": "2459720887",
+        "Base": "att_grip"
+      }
+    },
+    {
+      "key": "att_vm_p01_ar_mike4_ubgl",
+      "category": "Launcher",
+      "default": false,
+      "name": "SPW 40mm",
+      "model": "models/easy/mw/attachments/ubgl/att_vm_ub_gl01_v0.mdl",
+      "model_file": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\models\\easy\\mw\\attachments\\ubgl\\att_vm_ub_gl01_v0.mdl",
+      "source": {
+        "Base": "att_underbarrel_gl",
+        "Name": "SPW 40mm",
+        "Model": "models/easy/mw/attachments/ubgl/att_vm_ub_gl01_v0.mdl",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_ub_gl01_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\ub\\att_vm_p01_ar_mike4_ubgl.lua",
+        "pack": "2962304029"
+      },
+      "inherited": {
+        "Name": "SPW 40mm",
+        "Category": "Underbarrels",
+        "Icon": "easy/mw/attachments/icons/iw9_mike4/icon_attachment_ub_gl01_v0.vmt",
+        "lua": "D:\\tmp\\hc1-mw22-tools\\extracted\\2962304029\\lua\\weapons\\mg_base\\modules\\attachmentss\\iw9_mike4\\ub\\att_vm_p01_ar_mike4_ubgl.lua",
+        "pack": "2962304029",
+        "Base": "att_underbarrel_gl",
+        "Model": "models/easy/mw/attachments/ubgl/att_vm_ub_gl01_v0.mdl"
+      }
+    }
+  ],
+  "missing_definitions": [],
+  "missing_models": []
+}

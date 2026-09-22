@@ -1,0 +1,32 @@
+{
+  "RootObject": {
+    "__guid": "ff107b8f-c64a-5b97-ab0e-81223535c992",
+    "Name": "Solozero NVG Enhanced",
+    "Enabled": true,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "79463a99-50f1-595a-a5e3-904eb471aa3a",
+        "Model": "attachments/mw2022/models/att_vm_thermal_west01/att_vm_thermal_west01.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithMw22Attachment",
+        "__guid": "28f79cd0-5c3e-54c2-9a1a-dd7876b0e1df",
+        "BindPosition": "0.250000,0.000000,8.730000",
+        "PartScale": "1.000000,1.000000,1.000000",
+        "PartAngles": "0,0,0",
+        "BoneName": "weapon_root",
+        "BodygroupChoices": {
+          "lens": 1
+        },
+        "IsLauncher": false
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

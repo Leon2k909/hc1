@@ -161,6 +161,11 @@ public partial class Shootable : WeaponInputAction,
 
 	private bool UseSuppressedEffects()
 	{
+		if ( Equipment.IsValid() && Equipment.Resource.IsValid()
+			&& GunsmithLoadoutManager.TryGetAttachment( Equipment.Resource, GunsmithPartType.Muzzle, out var muzzle )
+			&& muzzle.IsValid() && muzzle.IsSuppressor )
+			return true;
+
 		return HasBuiltInSuppressor || (SuppressedAttachment.IsValid()
 		       && Equipment.IsValid()
 		       && Equipment.Resource.IsValid()
@@ -198,25 +203,13 @@ public partial class Shootable : WeaponInputAction,
 			return;
 
 		if ( showFlash )
-			CreateDischargeParticle( GetMuzzleFlashPrefab( suppressed ), effector.Muzzle, flashScale, "Muzzle flash" );
+			CreateDischargeParticle( GetMuzzleFlashPrefab( suppressed ), effector.DischargeMuzzle, flashScale, "Muzzle flash" );
 
 		if ( smokeScale > 0f )
-			CreateDischargeParticle( MuzzleSmokePrefab, effector.Muzzle, smokeScale, "Muzzle smoke" );
+			CreateDischargeParticle( MuzzleSmokePrefab, effector.DischargeMuzzle, smokeScale, "Muzzle smoke" );
 
-		// Eject casing using GameObject / prefab
-		if ( EjectionPrefab.IsValid() )
-		{
-			if ( Effector.EjectionPort.IsValid() )
-			{
-				EjectionPrefab.Clone( new CloneConfig()
-				{
-					Parent = Effector.EjectionPort,
-					Transform = new(),
-					StartEnabled = true,
-					Name = $"Bullet ejection: {Equipment.GameObject}"
-				} );
-			}
-		}
+		// One spent case per discharge, independent of flash/smoke chance and pellet count.
+		effector.EjectCasing( EjectionPrefab, Equipment.Owner );
 
 		var shootSound = GetShootSound( suppressed );
 		if ( shootSound is not null )
@@ -261,6 +254,7 @@ public partial class Shootable : WeaponInputAction,
 	public void Shoot()
 	{
 		TimeSinceShoot = 0;
+		Equipment.RefreshAmmunitionLoadout();
 		var suppressed = UseSuppressedEffects();
 
 		// CoD-style minimap reveal: an unsuppressed shot briefly puts us on the enemy minimap.
@@ -403,7 +397,10 @@ public partial class Shootable : WeaponInputAction,
 		forward += (Vector3.Random + Vector3.Random + Vector3.Random + Vector3.Random) * (BulletSpread + Equipment.Owner.Spread) * 0.25f;
 		forward = forward.Normal;
 
-		var original = DoTraceBullet( start, WeaponRay.Position + forward * MaxRange, BulletSize );
+		var end = WeaponRay.Position + forward * MaxRange;
+		var original = DoTraceBullet( start, end, BulletSize ).ToArray();
+		var firstHit = original.FirstOrDefault( trace => trace.Hit );
+		PlayTracer( firstHit.Hit ? firstHit.EndPosition : end, start );
 
 		if ( original.Count() < 1 ) return original;
 

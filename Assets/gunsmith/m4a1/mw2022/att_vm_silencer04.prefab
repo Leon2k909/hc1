@@ -1,0 +1,30 @@
+{
+  "RootObject": {
+    "__guid": "535c09d6-89d4-5f25-a4c9-b58147dbed76",
+    "Name": "Tactical Suppressor",
+    "Enabled": true,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "53dc9125-e9c7-5c7e-b20a-40855c7c5c30",
+        "Model": "attachments/mw2022/models/att_vm_silencer04/att_vm_silencer04.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithMw22Attachment",
+        "__guid": "08318adc-722f-5c13-b822-1f78d1556135",
+        "BindPosition": "17.620000,0.000000,7.414700",
+        "PartScale": "1.000000,1.000000,1.000000",
+        "PartAngles": "0,0,0",
+        "BoneName": "weapon_root",
+        "BodygroupChoices": {},
+        "IsLauncher": false
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

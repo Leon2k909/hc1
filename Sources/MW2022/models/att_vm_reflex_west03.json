@@ -1,0 +1,179 @@
+{
+  "vertices": 6498,
+  "triangles": 7251,
+  "removed_degenerate": 2,
+  "materials": {
+    "m_22e0e649123c": "viper/mw/attachments/attachment_vm_reflex_west01_lens",
+    "m_72462e813a1c": "viper/mw/attachments/attachment_vm_reflex_west01_lens_ads",
+    "m_d88464ba9984": "viper/mw/attachments/stencil_outline",
+    "m_277aa3571f6f": "viper/mw/attachments/attachment_vm_reflex_west01_glass",
+    "m_3e30f2a3cd6e": "viper/mw/attachments/attachment_vm_reflex_west01_body",
+    "m_eb60d30e5413": "viper/mw/attachments/attachment_vm_riser01"
+  },
+  "bounds": [
+    [
+      -0.39100000262260437,
+      -0.8090010285377502,
+      -0.21300099790096283
+    ],
+    [
+      2.1019999980926514,
+      0.7269999980926514,
+      1.9129999876022339
+    ]
+  ],
+  "key": "att_vm_reflex_west03",
+  "name": "Operator Reflex Sight",
+  "category": "Optic",
+  "source": "models/viper/mw/attachments/attachment_vm_reflex_west03.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_reflex_west03/att_vm_reflex_west03.vmdl",
+  "bodygroups": [
+    {
+      "name": "optic",
+      "choices": [
+        {
+          "source": "attachment_vm_reflex_west03.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_reflex",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_glass_ads2",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_glass_hip2",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_reticle_attach",
+      "head": [
+        1.6390000581741333,
+        0.0,
+        1.340999960899353
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          1.6390000581741333
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.340999960899353
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "vertices": 940,
+  "triangles": 940,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_e4280c4d1154": "viper/mw/attachments/attachment_vm_muzzlebrake01_body"
+  },
+  "bounds": [
+    [
+      0.004999999888241291,
+      -0.45600101351737976,
+      -0.45600101351737976
+    ],
+    [
+      2.7300000190734863,
+      0.4559989869594574,
+      0.4559989869594574
+    ]
+  ],
+  "key": "att_vm_muzzlebrake01",
+  "name": "Light Muzzle Brake",
+  "category": "Muzzle",
+  "source": "models/viper/mw/attachments/attachment_vm_muzzlebrake01.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_muzzlebrake01/att_vm_muzzlebrake01.vmdl",
+  "bodygroups": [
+    {
+      "name": "grip",
+      "choices": [
+        {
+          "source": "attachment_vm_muzzlebrake01.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_silencer",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

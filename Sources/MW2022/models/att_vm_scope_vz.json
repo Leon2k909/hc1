@@ -1,0 +1,226 @@
+{
+  "vertices": 10448,
+  "triangles": 12163,
+  "removed_degenerate": 1,
+  "materials": {
+    "m_0af99aadfc8a": "viper/mw/attachments/attachment_vm_scope_vz_lens",
+    "m_fdc7790bbb77": "viper/mw/attachments/attachment_vm_scope_vz_body",
+    "m_853afc05898f": "viper/mw/attachments/ads_scope_lens_1",
+    "m_83cf44e58438": "viper/mw/attachments/vm_depth_mask_start",
+    "m_b8e6869a1803": "viper/mw/attachments/vm_depth_mask_end",
+    "m_500dff8192f9": "viper/mw/attachments/reticle_ui_stencil"
+  },
+  "bounds": [
+    [
+      -3.533998966217041,
+      -1.3930000066757202,
+      -0.2720020115375519
+    ],
+    [
+      6.265999794006348,
+      1.356997013092041,
+      2.555000066757202
+    ]
+  ],
+  "key": "att_vm_scope_vz",
+  "name": "Variable\u2122 Zoom Scope",
+  "category": "Optic",
+  "source": "models/viper/mw/attachments/attachment_vm_scope_vz.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_scope_vz/att_vm_scope_vz.vmdl",
+  "bodygroups": [
+    {
+      "name": "optic",
+      "choices": [
+        {
+          "source": "attachment_vm_scope_vz.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    },
+    {
+      "name": "lens",
+      "choices": [
+        {
+          "source": "attachment_vm_scope_vz_lens_hide.smd",
+          "mesh": "mesh_01"
+        },
+        {
+          "source": "attachment_vm_scope_vz_lens.smd",
+          "mesh": "mesh_02"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_scope",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "j_scope_lens_cover",
+      "head": [
+        -3.421999931335449,
+        -0.7710000276565552,
+        1.7009999752044678
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -3.421999931335449
+        ],
+        [
+          0.0,
+          0.4988187551498413,
+          -0.866706371307373,
+          -0.7710000276565552
+        ],
+        [
+          0.0,
+          0.866706371307373,
+          0.49881869554519653,
+          1.7009999752044678
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_reticle_attach",
+      "head": [
+        -3.190999984741211,
+        0.0010000000474974513,
+        1.2480000257492065
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -3.190999984741211
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0009999871253967285
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.2480000257492065
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_lense_hide",
+      "head": [
+        -3.190999984741211,
+        0.0010000000474974513,
+        1.2480000257492065
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -3.190999984741211
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0009999871253967285
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.2480000257492065
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_lense",
+      "head": [
+        -3.190999984741211,
+        0.0010000000474974513,
+        1.2480000257492065
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -3.190999984741211
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0009999871253967285
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.2480000257492065
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

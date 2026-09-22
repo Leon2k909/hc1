@@ -1,6 +1,6 @@
 namespace Facepunch;
 
-public abstract class WeaponModel : Component
+public abstract partial class WeaponModel : Component
 {
 	[Property] public SkinnedModelRenderer ModelRenderer { get; set; }
 

@@ -17,4 +17,9 @@ public partial class GunsmithAttachment : Component
 	protected virtual void OnInitialize()
 	{
 	}
+
+	/// <summary>Restore any original weapon geometry before this attachment is replaced.</summary>
+	public virtual void Unequip()
+	{
+	}
 }

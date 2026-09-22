@@ -1,0 +1,72 @@
+{
+  "vertices": 964,
+  "triangles": 1442,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_356e1f8668ad": "easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike4_pstlgrip_v0"
+  },
+  "bounds": [
+    [
+      -3.5250205993652344,
+      -0.5950044989585876,
+      -4.0140228271484375
+    ],
+    [
+      -1.5748120176795055e-06,
+      0.6070026159286499,
+      0.0
+    ]
+  ],
+  "key": "att_vm_p01_ar_mike4_pistolgrip_v0",
+  "name": "Default Pistol Grip",
+  "category": "RearGrip",
+  "source": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_pistolgrip_v0.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_p01_ar_mike4_pistolgrip_v0/att_vm_p01_ar_mike4_pistolgrip_v0.vmdl",
+  "bodygroups": [
+    {
+      "name": "stock",
+      "choices": [
+        {
+          "source": "att_vm_p01_ar_mike4_pistolgrip_v0_LOD0.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_pistolgrip_attach",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

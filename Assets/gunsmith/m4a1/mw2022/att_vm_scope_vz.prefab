@@ -1,0 +1,32 @@
+{
+  "RootObject": {
+    "__guid": "82a128a7-3014-5215-91ff-6d7fef5c0ae8",
+    "Name": "Variable™ Zoom Scope",
+    "Enabled": true,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "2dcbc03c-3f38-5609-8b59-8ef39f1eb3f1",
+        "Model": "attachments/mw2022/models/att_vm_scope_vz/att_vm_scope_vz.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithMw22Attachment",
+        "__guid": "4b4b1afd-4269-5dce-a843-e639e770143c",
+        "BindPosition": "0.250000,0.000000,8.730000",
+        "PartScale": "1.000000,1.000000,1.000000",
+        "PartAngles": "0,0,0",
+        "BoneName": "weapon_root",
+        "BodygroupChoices": {
+          "lens": 1
+        },
+        "IsLauncher": false
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

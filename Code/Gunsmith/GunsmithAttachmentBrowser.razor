@@ -1,0 +1,178 @@
+@using Sandbox
+@using Sandbox.UI
+@using Facepunch.UI
+@namespace Facepunch.Gunsmith
+@inherits Panel
+
+<root class="hc1 @(SelectedPoint.IsValid() ? "browsing" : "")">
+    <div class="attachment-header">
+        <label>ATTACHMENTS</label>
+        <span>@EquippedCount EQUIPPED</span>
+    </div>
+    <div class="attachment-slots">
+        @foreach ( var point in GetPoints() )
+        {
+            var current = point.CurrentPart;
+            <button class="attachment-slot @(SelectedPoint == point ? "selected" : "") @(current.IsValid() ? "equipped" : "")" onclick=@(() => SelectPoint( point ))>
+                <div class="slot-heading"><label>@CategoryName( point.Category )</label><i>@(current.IsValid() ? "check" : "add")</i></div>
+                <label class="slot-part">@(current.IsValid() ? current.Name : StandardName( point.Category ))</label>
+                <div class="slot-footer"><span>@OptionCountLabel( point.Category )</span><i>chevron_right</i></div>
+            </button>
+        }
+    </div>
+
+    @if ( SelectedPoint.IsValid() )
+    {
+        var parts = GetParts( SelectedPoint.Category ).ToList();
+        var options = new List<GunsmithPart> { null };
+        options.AddRange( parts );
+        var pages = Math.Max( 1, (int)Math.Ceiling( options.Count / (float)PageSize ) );
+        var page = Math.Clamp( Page, 0, pages - 1 );
+        <div class="attachment-drawer">
+            <div class="drawer-heading">
+                <div class="drawer-title"><label>@CategoryName( SelectedPoint.Category )</label><span>Choose an attachment · changes save automatically</span></div>
+                @if ( pages > 1 )
+                {
+                    <div class="drawer-paging">
+                        <button class="page-button @(page == 0 ? "disabled" : "")" onclick=@(() => ChangePage( -1, pages ))><i>chevron_left</i></button>
+                        <label>@(page + 1) / @pages</label>
+                        <button class="page-button @(page == pages - 1 ? "disabled" : "")" onclick=@(() => ChangePage( 1, pages ))><i>chevron_right</i></button>
+                    </div>
+                }
+                <button class="drawer-close" onclick=@Close><i>close</i><label>Done</label></button>
+            </div>
+            <div class="attachment-options">
+                @foreach ( var part in options.Skip( page * PageSize ).Take( PageSize ) )
+                {
+                    var equipped = SelectedPoint.CurrentPart == part;
+                    var unlocked = IsUnlocked( part );
+                    <button class="attachment-option @(equipped ? "equipped" : "") @(!unlocked ? "locked" : "")" onclick=@(() => Equip( part ))>
+                        <div class="option-top"><i>@(part is null ? "block" : CategoryIcon( SelectedPoint.Category ))</i><label>@(equipped ? "EQUIPPED" : unlocked ? "AVAILABLE" : $"LEVEL {part.RequiredLevel}")</label></div>
+                        <label class="option-name">@(part?.Name ?? StandardName( SelectedPoint.Category ))</label>
+                        <div class="option-action"><span>@OptionDescription( part )</span><i>@(equipped ? "check_circle" : unlocked ? "add_circle_outline" : "lock")</i></div>
+                    </button>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="attachment-help">
+            <i>touch_app</i><label>@(GetPoints().Any() ? "Select a slot above to change attachments" : "This weapon has no attachment slots")</label>
+            <span>DRAG TO ROTATE · SCROLL TO ZOOM</span>
+        </div>
+    }
+</root>
+
+@code
+{
+    public GunsmithWeapon Weapon { get; set; }
+    public GunsmithAttachmentPoint SelectedPoint { get; private set; }
+    private GunsmithWeapon PreviousWeapon;
+    private int Page;
+    private int PageSize = 4;
+    private int EquippedCount => GetPoints().Count( p => p.CurrentPart.IsValid() );
+
+    private string OptionCountLabel( GunsmithPartType category )
+    {
+        var count = GetParts( category ).Count();
+        return count == 1 ? "1 OPTION" : $"{count} OPTIONS";
+    }
+
+    public bool IsPointerOverControls() => Children.Any( p =>
+        (p.HasClass( "attachment-slots" ) || p.HasClass( "attachment-drawer" )) && p.Box.Rect.IsInside( Mouse.Position ) );
+
+    // Keep selection and pagination local to this browser. One slot owns the tray at a time.
+    public override void Tick()
+    {
+        base.Tick();
+        if ( PreviousWeapon != Weapon )
+        {
+            PreviousWeapon = Weapon;
+            Close();
+        }
+
+        var width = Box.Rect.Width * ScaleFromScreen;
+        PageSize = Math.Clamp( (int)((width - 32f) / 228f), 2, 6 );
+    }
+
+    private IEnumerable<GunsmithAttachmentPoint> GetPoints()
+    {
+        if ( !Weapon.IsValid() ) return Enumerable.Empty<GunsmithAttachmentPoint>();
+        return Weapon.GetComponentsInChildren<GunsmithAttachmentPoint>( true )
+            .Where( p => p.Category is GunsmithPartType.Muzzle or GunsmithPartType.Barrel or GunsmithPartType.Optic or GunsmithPartType.Underbarrel or GunsmithPartType.Stock or GunsmithPartType.RearGrip or GunsmithPartType.Magazine or GunsmithPartType.Ammunition or GunsmithPartType.Laser )
+            .GroupBy( p => p.Category ).Select( g => g.First() ).OrderBy( p => CategoryOrder( p.Category ) );
+    }
+
+    private IEnumerable<GunsmithPart> GetParts( GunsmithPartType category ) => ResourceLibrary.GetAll<GunsmithPart>()
+        .Where( p => p.IsValid() && p.Category == category && (p.MainPrefab.IsValid() || p.ModifyBodygroups || p.Category == GunsmithPartType.Ammunition) )
+        .Where( p => Weapon.IsValid() && p.Supports( Weapon.Resource ) )
+        .OrderBy( p => p.RequiredLevel ).ThenBy( p => p.Name );
+
+    private bool IsUnlocked( GunsmithPart part ) => part is null || Game.SteamId == 76561198271608270ul
+        || (Weapon.IsValid() && Weapon.Resource.IsValid() && WeaponProgression.GetLifetimeLevel( Weapon.Resource ) >= part.RequiredLevel);
+
+    public void SelectPoint( GunsmithAttachmentPoint point )
+    {
+        SelectedPoint = point;
+        Page = 0;
+        StateHasChanged();
+    }
+
+    public void Close()
+    {
+        SelectedPoint = null;
+        Page = 0;
+        StateHasChanged();
+    }
+
+    private void ChangePage( int delta, int pages )
+    {
+        Page = Math.Clamp( Page + delta, 0, pages - 1 );
+        StateHasChanged();
+    }
+
+    private void Equip( GunsmithPart part )
+    {
+        if ( !Weapon.IsValid() || !Weapon.Resource.IsValid() || !SelectedPoint.IsValid() || !IsUnlocked( part ) ) return;
+        if ( part is not null && (part.Category != SelectedPoint.Category || !part.Supports( Weapon.Resource )) ) return;
+        GunsmithLoadoutManager.SetAttachment( Weapon.Resource, SelectedPoint.Category, part );
+        GunsmithLoadoutManager.ApplyAttachments( Weapon.Resource, Weapon.GameObject );
+        StateHasChanged();
+    }
+
+    private static int CategoryOrder( GunsmithPartType category ) => category switch
+    {
+        GunsmithPartType.Muzzle => 0, GunsmithPartType.Barrel => 1, GunsmithPartType.Optic => 2,
+        GunsmithPartType.Underbarrel => 3, GunsmithPartType.Stock => 4, GunsmithPartType.RearGrip => 5,
+        GunsmithPartType.Magazine => 6, GunsmithPartType.Ammunition => 7, GunsmithPartType.Laser => 8, _ => 9
+    };
+
+    private static string StandardName( GunsmithPartType category ) => category == GunsmithPartType.Ammunition ? "Standard Rounds" : "Standard";
+
+    private string OptionDescription( GunsmithPart part ) => !string.IsNullOrWhiteSpace( part?.Description ) ? part.Description : SelectedPoint.Category == GunsmithPartType.Ammunition
+        ? part?.UsesTracerRounds == true ? "Visible bullet trails" : "No visible bullet trails"
+        : part is null ? "Original weapon part" : part.IsSuppressor ? "Suppressor" : CategoryName( part.Category );
+
+    private static string CategoryName( GunsmithPartType category ) => category == GunsmithPartType.RearGrip ? "REAR GRIP" : category.ToString().ToUpperInvariant();
+    private static string CategoryIcon( GunsmithPartType category ) => category switch
+    {
+        GunsmithPartType.Optic => "filter_center_focus", GunsmithPartType.Muzzle => "volume_off",
+        GunsmithPartType.Barrel => "straighten", GunsmithPartType.Stock => "view_week",
+        GunsmithPartType.Underbarrel => "pan_tool", GunsmithPartType.RearGrip => "back_hand",
+        GunsmithPartType.Magazine => "view_stream", GunsmithPartType.Ammunition => "linear_scale", GunsmithPartType.Laser => "flare", _ => "build"
+    };
+
+    protected override int BuildHash()
+    {
+        var hash = new HashCode();
+        hash.Add( Weapon ); hash.Add( SelectedPoint ); hash.Add( Page ); hash.Add( PageSize );
+        if ( Weapon.IsValid() && Weapon.Resource.IsValid() ) hash.Add( WeaponProgression.GetLifetimeLevel( Weapon.Resource ) );
+        foreach ( var point in GetPoints() )
+        {
+            hash.Add( point ); hash.Add( point.CurrentPart );
+            foreach ( var part in GetParts( point.Category ) ) hash.Add( part );
+        }
+        return hash.ToHashCode();
+    }
+}

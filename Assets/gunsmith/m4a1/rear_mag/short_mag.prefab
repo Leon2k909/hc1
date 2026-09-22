@@ -1,0 +1,29 @@
+{
+  "RootObject": {
+    "__guid": "5c82084a-cabe-51da-bdc1-65cf0db27585",
+    "Name": "20 Round Compact",
+    "Flags": 0,
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "56bd1416-4a7c-58de-b763-53b1367807ac",
+        "Model": "attachments/rear_mag/m4a1_short_mag/m4a1_short_mag.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithBoneAttachment",
+        "__guid": "e3f25c72-fd1b-5511-b15e-b881eb86b2c8",
+        "BoneName": "magazine",
+        "HiddenBodygroup": "magazine",
+        "ModelVariants": {}
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

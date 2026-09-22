@@ -1,0 +1,30 @@
+{
+  "RootObject": {
+    "__guid": "2f6a8048-b07c-5c2b-b356-4940680d0d30",
+    "Name": "Operator Foregrip",
+    "Enabled": true,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "588e1d42-f1f1-5aaf-8e6b-3c170caf46a2",
+        "Model": "attachments/mw2022/models/att_vm_p01_ar_mike4_stubbygrip02/att_vm_p01_ar_mike4_stubbygrip02.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithMw22Attachment",
+        "__guid": "43aace49-b255-55e5-8ae5-9f98f176ff39",
+        "BindPosition": "8.300000,0.000000,6.200000",
+        "PartScale": "1.000000,1.000000,1.000000",
+        "PartAngles": "0,0,0",
+        "BoneName": "weapon_root",
+        "BodygroupChoices": {},
+        "IsLauncher": false
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

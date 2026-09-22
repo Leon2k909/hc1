@@ -1,0 +1,142 @@
+{
+  "vertices": 4286,
+  "triangles": 5224,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_2e740c15f567": "viper/mw/attachments/weapon_vm_ar_tango21_reddot_lens",
+    "m_916c79cb4d3d": "viper/mw/attachments/weapon_vm_ar_tango21_reddot_lens_ads",
+    "m_75147d65bdca": "viper/mw/attachments/weapon_vm_ar_tango21_reddot"
+  },
+  "bounds": [
+    [
+      0.6191350221633911,
+      -1.123000979423523,
+      -0.33399999141693115
+    ],
+    [
+      3.255134105682373,
+      0.8559989929199219,
+      1.9879989624023438
+    ]
+  ],
+  "key": "att_vm_reflex_west04",
+  "name": "Cronen Elite",
+  "category": "Optic",
+  "source": "models/viper/mw/attachments/attachment_vm_reflex_west05.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_reflex_west04/att_vm_reflex_west04.vmdl",
+  "bodygroups": [
+    {
+      "name": "optic",
+      "choices": [
+        {
+          "source": "attachment_vm_reflex_west05.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_hybrid",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_glass_hip2",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_reticle_attach",
+      "head": [
+        2.508133888244629,
+        0.0,
+        1.2920000553131104
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          2.508133888244629
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.2920000553131104
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

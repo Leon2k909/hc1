@@ -6,12 +6,23 @@
 <root>
     @foreach ( var medal in Medals )
     {
-        <div class="medal-card @(medal.Fading ? "fade-out" : "")">
-            <div class="medal-icon">
-                <i>@medal.Icon</i>
+        <div @key="medal.Id" class="medal-slot @medal.Family @(medal.Fading ? "leaving" : "")">
+            <div class="medal-award" style="animation-delay: @(medal.DelayMilliseconds)ms;">
+                <div class="medal-emblem">
+                    <div class="medal-impact" style="animation-delay: @(medal.DelayMilliseconds)ms;"></div>
+                    <img class="medal-art" src="@($"ui/medals/{medal.Family}.png")" />
+                    <div class="medal-rank"><label>@medal.Rank</label></div>
+                </div>
+                <div class="medal-ribbon">
+                    <div class="medal-sweep" style="animation-delay: @(medal.DelayMilliseconds + 120)ms;"></div>
+                    <label class="medal-title @(medal.Title.Length > 16 ? "long-title" : "")">@medal.Title</label>
+                    <div class="medal-detail">
+                        <div class="medal-rule"></div>
+                        <label class="medal-subtitle">@medal.Subtitle</label>
+                        <div class="medal-rule"></div>
+                    </div>
+                </div>
             </div>
-            <label class="medal-title">@medal.Title</label>
-            <label class="medal-subtitle">@medal.Subtitle</label>
         </div>
     }
 </root>
@@ -20,26 +31,49 @@
 {
     private sealed class MedalInstance
     {
+        public int Id { get; init; }
         public string Title { get; init; }
         public string Subtitle { get; init; }
-        public string Icon { get; init; }
+        public string Family { get; init; }
+        public string Rank { get; init; }
+        public int DelayMilliseconds { get; init; }
         public TimeSince TimeCreated { get; init; } = 0;
-        public bool Fading => TimeCreated > 2.25f;
-        public bool Dead => TimeCreated > 2.85f;
+        public bool Fading { get; set; }
+        public bool ShouldFade => TimeCreated > 2.4f + DelayMilliseconds / 1000f;
+        public bool Dead => TimeCreated > 2.7f + DelayMilliseconds / 1000f;
     }
 
     private readonly List<MedalInstance> Medals = new();
     private TimeSince TimeSinceLastKill = 999f;
     private int RapidKillCount;
     private int LifeKillStreak;
+    private int NextMedalId;
+    private int Revision;
 
     public override void Tick()
     {
+        base.Tick();
+
         if ( TimeSinceLastKill > 3.0f )
             RapidKillCount = 0;
 
-        if ( Medals.RemoveAll( x => x.Dead ) > 0 )
-            StateHasChanged();
+        var changed = Medals.RemoveAll( x => x.Dead ) > 0;
+        foreach ( var medal in Medals )
+        {
+            if ( medal.Fading == medal.ShouldFade )
+                continue;
+
+            medal.Fading = medal.ShouldFade;
+            changed = true;
+        }
+
+        if ( changed )
+            RefreshFeed();
+
+        // Use parent bounds so narrow editor views work as well as fullscreen.
+        var width = Parent?.Box.Rect.Width * ScaleFromScreen ?? 1920f;
+        SetClass( "compact-medals", width > 0 && width < 1100f );
+        SetClass( "stacked-medals", width > 0 && width < 700f );
     }
 
     public void OnKill( KillEvent eventArgs )
@@ -65,38 +99,38 @@
 
         var hitbox = damageInfo.Hitbox;
         if ( hitbox.HasFlag( HitboxTags.Head ) )
-            AddMedal( "HEADSHOT", "Precision kill", "gps_fixed" );
+            AddMedal( "HEADSHOT", "PRECISION KILL", "precision", "HS" );
 
         if ( IsOneShotOneKill( damageInfo ) )
-            AddMedal( "ONE SHOT, ONE KILL", "Killed with one lethal shot", "radio_button_checked" );
+            AddMedal( "ONE SHOT, ONE KILL", "SINGLE SHOT ELIMINATION", "precision", "1" );
 
         switch ( RapidKillCount )
         {
             case 2:
-                AddMedal( "DOUBLE KILL", "Two rapid kills", "filter_2" );
+                AddMedal( "DOUBLE KILL", "RAPID ELIMINATIONS", "multikill", "2" );
                 break;
             case 3:
-                AddMedal( "TRIPLE KILL", "Three rapid kills", "filter_3" );
+                AddMedal( "TRIPLE KILL", "RAPID ELIMINATIONS", "multikill", "3" );
                 break;
             case 4:
-                AddMedal( "FURY KILL", "Four rapid kills", "filter_4" );
+                AddMedal( "FURY KILL", "RAPID ELIMINATIONS", "multikill", "4" );
                 break;
             default:
                 if ( RapidKillCount >= 5 )
-                    AddMedal( "FRENZY KILL", $"{RapidKillCount} rapid kills", "local_fire_department" );
+                    AddMedal( "FRENZY KILL", "RAPID ELIMINATIONS", "multikill", RapidKillCount.ToString() );
                 break;
         }
 
         switch ( LifeKillStreak )
         {
             case 5:
-                AddMedal( "BLOODTHIRSTY", "5 kill streak", "whatshot" );
+                AddMedal( "BLOODTHIRSTY", "KILL STREAK", "streak", "5" );
                 break;
             case 10:
-                AddMedal( "MERCILESS", "10 kill streak", "military_tech" );
+                AddMedal( "MERCILESS", "KILL STREAK", "streak", "10" );
                 break;
             case 15:
-                AddMedal( "RUTHLESS", "15 kill streak", "workspace_premium" );
+                AddMedal( "RUTHLESS", "KILL STREAK", "streak", "15" );
                 break;
         }
     }
@@ -146,23 +180,41 @@
         return damageInfo.Damage >= maxHealth - 0.01f;
     }
 
-    private void AddMedal( string title, string subtitle, string icon )
+    private void AddMedal( string title, string subtitle, string family, string rank )
     {
-        Medals.Add( new MedalInstance
+        // Upgrade rapid kills and retrigger repeat awards instead of filling the HUD
+        // with duplicates. New keys restart the entrance even when the count is unchanged.
+        var replacement = Medals.FindIndex( x => x.Title == title || (family == "multikill" && x.Family == family) );
+        var delay = Medals.Count( x => x.TimeCreated < 0.05f ) * 90;
+        var medal = new MedalInstance
         {
+            Id = ++NextMedalId,
             Title = title,
             Subtitle = subtitle,
-            Icon = icon
-        } );
+            Family = family,
+            Rank = rank,
+            DelayMilliseconds = delay
+        };
+
+        if ( replacement >= 0 )
+            Medals[replacement] = medal;
+        else
+            Medals.Add( medal );
 
         while ( Medals.Count > 4 )
             Medals.RemoveAt( 0 );
 
+        RefreshFeed();
+    }
+
+    private void RefreshFeed()
+    {
+        Revision++;
         StateHasChanged();
     }
 
     protected override int BuildHash()
     {
-        return HashCode.Combine( Medals.Count, RapidKillCount, LifeKillStreak );
+        return Revision;
     }
 }

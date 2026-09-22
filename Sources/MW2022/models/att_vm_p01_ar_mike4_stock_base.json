@@ -1,0 +1,72 @@
+{
+  "vertices": 5136,
+  "triangles": 6543,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_f5f44c79b027": "easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike4_stock_v0"
+  },
+  "bounds": [
+    [
+      -7.920044898986816,
+      -0.8640052676200867,
+      -4.543028354644775
+    ],
+    [
+      0.126000314950943,
+      0.8640013337135315,
+      0.7540030479431152
+    ]
+  ],
+  "key": "att_vm_p01_ar_mike4_stock_base",
+  "name": "Assault-60 Stock Factory",
+  "category": "Stock",
+  "source": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_stock_v0.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_p01_ar_mike4_stock_base/att_vm_p01_ar_mike4_stock_base.vmdl",
+  "bodygroups": [
+    {
+      "name": "stock",
+      "choices": [
+        {
+          "source": "att_vm_p01_ar_mike4_stock_v0_LOD0.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_stock_attach",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

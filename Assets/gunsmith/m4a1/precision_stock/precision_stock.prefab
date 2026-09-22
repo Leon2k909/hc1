@@ -1,0 +1,28 @@
+{
+  "RootObject": {
+    "__guid": "f71c7afa-40f2-5463-9597-f2d8482871e7",
+    "Flags": 0,
+    "Name": "Recon Stock",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "dedfc994-f2ed-58c7-90c4-598068c2dd6c",
+        "Model": "attachments/m4a1/precision_stock/precision_stock.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithStockAttachment",
+        "__guid": "d3480fa3-a534-5df8-9014-2775386c5a3c",
+        "StaticMount": "-6.21926,0,7.4147",
+        "WorldBodyReplacement": "attachments/m4a1/world_base/world_base.vmdl"
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

@@ -77,6 +77,7 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 
 		ApplyVelocity();
 		ApplyAnimationTransform();
+		ApplyInspectPose();
 
 		var baseFov = GameSettingsSystem.Current.FieldOfView;
 
@@ -95,6 +96,8 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 
 	protected override void OnUpdate()
 	{
+		UpdateInspect();
+
 		if ( ModelRenderer.IsValid() )
 		{
 			bool hasOptic = false;
@@ -104,7 +107,7 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 				if ( point.CurrentPart.IsValid() && point.CurrentPart.ModifyBodygroups )
 				{
 					if ( point.Category == GunsmithPartType.Optic ) hasOptic = true;
-					if ( point.Category == GunsmithPartType.Barrel ) hasMuzzle = true;
+					if ( point.Category is GunsmithPartType.Barrel or GunsmithPartType.Muzzle ) hasMuzzle = true;
 				}
 			}
 
@@ -338,7 +341,8 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 
 		ModelRenderer.Set( "speed_ironsights", 1 );
 
-		ModelRenderer.Set( "reload_speed", ReloadSpeed );
+		var reloadDuration = Equipment.GetComponentInChildren<Reloadable>()?.DurationMultiplier ?? 1f;
+		ModelRenderer.Set( "reload_speed", ReloadSpeed / reloadDuration );
 
 		ModelRenderer.Set( "b_grab", Owner.Hovered.IsValid() );
 

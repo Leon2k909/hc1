@@ -1,0 +1,48 @@
+@namespace Facepunch.UI
+@inherits Panel
+
+@*
+    MW2022-style picture-in-picture lens. The gun and optic housing stay visible; this draws the magnified
+    view (OpticZoom.LensTexture) over the optic's glass, with the reticle, edge darkening and a thin rim.
+*@
+
+<root style="opacity: @Alpha">
+    <div class="mount" style="left: @(OffsetX)%; top: @(OffsetY)%;">
+        <div class="lens" @ref="Lens" style="width: @(LensWidthPercent)%; height: @(LensHeightPercent)%;">
+            <div class="vignette"></div>
+            <div class="dot"></div>
+        </div>
+    </div>
+</root>
+
+@code
+{
+    /// <summary>Lens diameter as a fraction of screen height, matched to the optic's glass at the aim position.</summary>
+    const float Diameter = 0.3f;
+
+    Panel Lens { get; set; }
+    Texture _bound;
+
+    float Alpha => MathF.Round( ((OpticZoom.ScopeBlend - 0.75f) / 0.2f).Clamp( 0f, 1f ) * OpticZoom.LensVisibility, 3 );
+
+    float LensHeightPercent => MathF.Round( Diameter * OpticZoom.LensScale * 100f, 2 );
+    float LensWidthPercent => MathF.Round( Diameter * OpticZoom.LensScale * 100f * Screen.Height / Screen.Width, 2 );
+
+    float OffsetX => MathF.Round( OpticZoom.ScopeOffset.x * 100f * Screen.Height / Screen.Width, 2 );
+    float OffsetY => MathF.Round( OpticZoom.ScopeOffset.y * 100f, 2 );
+
+    public override void Tick()
+    {
+        OpticZoom.LensDiameter = Diameter;
+        var texture = OpticZoom.LensTexture;
+        SetClass( "hidden", Alpha <= 0f || texture is null );
+
+        if ( Lens is not null && texture != _bound )
+        {
+            _bound = texture;
+            Lens.Style.SetBackgroundImage( texture );
+        }
+    }
+
+    protected override int BuildHash() => HashCode.Combine( Alpha, LensWidthPercent, LensHeightPercent, OffsetX, OffsetY );
+}

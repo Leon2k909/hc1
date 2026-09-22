@@ -1,0 +1,72 @@
+{
+  "vertices": 2021,
+  "triangles": 3114,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_4084a5bc669d": "viper/mw/attachments/attachment_vm_vertgrip02"
+  },
+  "bounds": [
+    [
+      -0.01500099990516901,
+      -0.7700009942054749,
+      -4.276000022888184
+    ],
+    [
+      1.9619979858398438,
+      0.7699990272521973,
+      0.453000009059906
+    ]
+  ],
+  "key": "att_vm_p01_ar_mike4_vertgrip01",
+  "name": "Ranger Foregrip",
+  "category": "Underbarrel",
+  "source": "models/viper/mw/attachments/attachment_vm_vertgrip02_lod0.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_p01_ar_mike4_vertgrip01/att_vm_p01_ar_mike4_vertgrip01.vmdl",
+  "bodygroups": [
+    {
+      "name": "grip",
+      "choices": [
+        {
+          "source": "attachment_vm_vertgrip02_LOD0.dmx",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_folding_grip",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

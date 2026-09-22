@@ -1,0 +1,109 @@
+{
+  "vertices": 5613,
+  "triangles": 6564,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_d3a6495b1693": "viper/mw/attachments/attachment_vm_reflex_east_lens",
+    "m_20289ed8d917": "viper/mw/attachments/attachment_vm_reflex_east_decals",
+    "m_5f101e9e7185": "viper/mw/attachments/attachment_vm_reflex_east_lens_ads",
+    "m_b9fa9114d333": "viper/mw/attachments/attachment_vm_reflex_east_body"
+  },
+  "bounds": [
+    [
+      -0.10999999940395355,
+      -0.7710000276565552,
+      -0.2630009949207306
+    ],
+    [
+      3.869999885559082,
+      0.8819980025291443,
+      1.7949999570846558
+    ]
+  ],
+  "key": "att_vm_reflex_east01",
+  "name": "Viper Reflex Sight",
+  "category": "Optic",
+  "source": "models/viper/mw/attachments/attachment_vm_reflex_east_lod0.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_reflex_east01/att_vm_reflex_east01.vmdl",
+  "bodygroups": [
+    {
+      "name": "optic",
+      "choices": [
+        {
+          "source": "attachment_vm_reflex_east.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_reflex",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_reticle_attach",
+      "head": [
+        3.687000036239624,
+        0.0,
+        1.2619999647140503
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          3.687000036239624
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.2619999647140503
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "vertices": 2988,
+  "triangles": 3960,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_a90a56ef170d": "viper/mw/attachments/attachment_vm_angledgrip"
+  },
+  "bounds": [
+    [
+      -4.598999977111816,
+      -0.6720020174980164,
+      -1.8020009994506836
+    ],
+    [
+      -0.0010000000474974513,
+      0.671999990940094,
+      0.38499900698661804
+    ]
+  ],
+  "key": "att_vm_p01_ar_mike4_angledgrip01",
+  "name": "Commando Foregrip",
+  "category": "Underbarrel",
+  "source": "models/viper/mw/attachments/attachment_vm_angledgrip_lod0.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_p01_ar_mike4_angledgrip01/att_vm_p01_ar_mike4_angledgrip01.vmdl",
+  "bodygroups": [
+    {
+      "name": "grip",
+      "choices": [
+        {
+          "source": "attachment_vm_angledgrip_LOD0.dmx",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_grip_attach",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

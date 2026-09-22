@@ -47,8 +47,9 @@
 
     @* ===================== TABS ===================== *@
     <div class="gs-mode-tabs">
-        <button class="gs-mode-tab @(Mode == GunsmithViewMode.Build ? "active" : "")" @onclick=@(() => SetMode( GunsmithViewMode.Build ))>BUILD</button>
-        <button class="gs-mode-tab @(Mode == GunsmithViewMode.Customize ? "active" : "")" @onclick=@(() => SetMode( GunsmithViewMode.Customize ))>@(GameSettingsSystem.Current.Language == GameLanguage.EnglishUK ? "CUSTOMISE" : "CUSTOMIZE")</button>
+        <button class="gs-mode-tab gs-armory-tab @(IsArmoryVisible ? "is-selected" : "")" @onclick=@ToggleArmory><i>view_list</i> LOADOUT</button>
+        <button class="gs-mode-tab @(Mode == GunsmithViewMode.Build ? "is-selected" : "")" @onclick=@(() => SetMode( GunsmithViewMode.Build ))>BUILD</button>
+        <button class="gs-mode-tab @(Mode == GunsmithViewMode.Customize ? "is-selected" : "")" @onclick=@(() => SetMode( GunsmithViewMode.Customize ))>@(GameSettingsSystem.Current.Language == GameLanguage.EnglishUK ? "CUSTOMISE" : "CUSTOMIZE")</button>
     </div>
 
     @{
@@ -84,14 +85,6 @@
             </div>
         </div>
     </div>
-
-    @* ===================== PANEL TOGGLES ===================== *@
-    @if ( Mode != GunsmithViewMode.Customize )
-    {
-        <div class="gs-panel-toggle gs-toggle-armory @(ShowArmory ? "" : "is-collapsed")" @onclick=@ToggleArmory title="@(ShowArmory ? "Hide loadout panels" : "Show loadout panels")">
-            <i>@(ShowArmory ? "chevron_left" : "chevron_right")</i>
-        </div>
-    }
 
     @* ===================== LEFT: ARMORY ===================== *@
     <div class="weapon-browser @(Mode == GunsmithViewMode.Customize ? "is-hidden" : "") @(hasManyClasses ? "has-many-classes" : "") @(ShowArmory ? "" : "collapsed")">
@@ -181,7 +174,7 @@
                         @foreach ( var cat in categories )
                         {
                             var c = cat;
-                            <button class="gs-cat-tab @(SelectedWeaponCategory == c ? "active" : "")" @onclick=@(() => SelectedWeaponCategory = c)>@(c == WeaponCategory.AssaultRifle ? "ASSAULT RIFLE" : c.ToString().ToUpper())</button>
+                            <button class="gs-cat-tab @(SelectedWeaponCategory == c ? "is-selected" : "")" @onclick=@(() => SelectedWeaponCategory = c)>@(c == WeaponCategory.AssaultRifle ? "ASSAULT RIFLE" : c.ToString().ToUpper())</button>
                         }
                     </div>
                 }
@@ -190,7 +183,7 @@
                 {
                     var selected = GetEquipment() == weapon;
                     var loadout  = IsLoadoutSet( weapon );
-                    <button class="weapon-option @(selected ? "active" : "") @(loadout ? "loadout" : "")" @onclick=@(() => SelectWeapon( weapon ))>
+                    <button class="weapon-option @(selected ? "is-selected" : "") @(loadout ? "loadout" : "")" @onclick=@(() => SelectWeapon( weapon ))>
                         <span class="weapon-name">@weapon.Name</span>
                         <span class="weapon-lv">LV @WeaponProgression.GetLevel( weapon )</span>
                         @if ( loadout ) { <span class="weapon-state">EQUIPPED</span> }
@@ -202,13 +195,10 @@
         </div>
     </div>
 
-    @* Attachment point floating buttons — each panel positions itself via Tick() *@
+    @* Stable, full-size hit targets stay clear of the weapon preview. *@
     @if ( Mode == GunsmithViewMode.Build )
     {
-        @foreach ( var point in GetAttachmentPoints() )
-        {
-            <GunsmithAttachmentPointPanel AttachmentPoint=@point Weapon=@(System?.Weapon) Category=@(point.Category) />
-        }
+        <GunsmithAttachmentBrowser Weapon=@(System?.Weapon) />
     }
 
     <div class="layout grow">
@@ -701,11 +691,6 @@
                     <label>TUNING</label>
                 </div>
 
-                @if ( ShowTuning )
-                {
-                    <WeaponTuningPanel WeaponId=@(GetEquipment()?.ResourceName) />
-                }
-
                 <div class="gs-loadout-section">
                     <div class="gs-loadout-btn @(IsLoadoutSet() ? "set" : "")" @onclick=@SetLoadout>
                         <i>@(IsLoadoutSet() ? "check_circle" : "add_circle")</i>
@@ -715,6 +700,15 @@
             </div>
         }
     </div>
+    @if ( ShowTuning )
+    {
+        <div class="gs-tuning-backdrop" @onclick=@ToggleTuning>
+            <div class="gs-tuning-dialog" @onclick:stopPropagation="true">
+                <div class="gs-tuning-heading"><label>WEAPON TUNING</label><button class="gs-icon-btn" @onclick=@ToggleTuning><i>close</i> Done</button></div>
+                <WeaponTuningPanel WeaponId=@(GetEquipment()?.ResourceName) />
+            </div>
+        </div>
+    }
 </root>
 
 @code
@@ -751,6 +745,27 @@
     private int CamoPage { get; set; } = 0;
 
     public bool IsCustomizing => Mode == GunsmithViewMode.Customize;
+    public bool IsArmoryVisible => ShowArmory && !IsCustomizing;
+    public bool IsAttachmentBrowserOpen => Panel?.Children.OfType<GunsmithAttachmentBrowser>().Any( p => p.SelectedPoint.IsValid() ) ?? false;
+
+    public bool IsPointerOverControls()
+    {
+        if ( Panel is null ) return false;
+        foreach ( var child in Panel.Children )
+        {
+            if ( child is GunsmithAttachmentBrowser browser )
+            {
+                if ( browser.IsPointerOverControls() ) return true;
+                continue;
+            }
+            if ( child.HasClass( "collapsed" ) || child.HasClass( "is-hidden" ) ) continue;
+            if ( IsCustomizing && child.HasClass( "gs-class-panel" ) ) continue;
+            if ( !(child.HasClass( "gs-topbar" ) || child.HasClass( "gs-mode-tabs" ) || child.HasClass( "gs-class-panel" )
+                || child.HasClass( "weapon-browser" ) || child.HasClass( "gs-bottom" ) || child.HasClass( "gs-share-backdrop" ) || child.HasClass( "gs-tuning-backdrop" )) ) continue;
+            if ( child.Box.Rect.IsInside( Mouse.Position ) ) return true;
+        }
+        return false;
+    }
 
     protected override void OnUpdate()
     {
@@ -1410,15 +1425,16 @@
         set => Game.Cookies.Set( "hc1.gunsmith.showarmory", value );
     }
 
-    private bool ShowTuning
-    {
-        get => Game.Cookies.Get<bool>( "hc1.gunsmith.showtuning", true );
-        set => Game.Cookies.Set( "hc1.gunsmith.showtuning", value );
-    }
+    private bool ShowTuning { get; set; }
 
     private void ToggleArmory()
     {
-        ShowArmory = !ShowArmory;
+        if ( IsCustomizing )
+        {
+            Mode = GunsmithViewMode.Build;
+            ShowArmory = true;
+        }
+        else ShowArmory = !ShowArmory;
         StateHasChanged();
     }
 
@@ -1502,6 +1518,7 @@
             equip is null ? 0 : WeaponProgression.GetXP( equip ),
             GunsmithLoadoutManager.GetPrimary(), GunsmithLoadoutManager.GetSecondary() );
         var hash2 = HashCode.Combine( hash1, PreviewCamoPart, CamoOnOptics, CustomCamoColor, IsCustomCamoColorEquipped );
-        return HashCode.Combine( hash2, GunsmithLoadoutManager.GetActiveClassIndex(), GunsmithLoadoutManager.GetActiveClassIndices().Count, GunsmithLoadoutManager.GetClassName( GunsmithLoadoutManager.GetActiveClassIndex() ), IsShareBuildOpen, ShareBuildCode, ShareBuildMessage );
+        var hash3 = HashCode.Combine( hash2, SelectedWeaponCategory, SelectedPerkCategory, ShowArmory, ShowTuning );
+        return HashCode.Combine( hash3, GunsmithLoadoutManager.GetActiveClassIndex(), GunsmithLoadoutManager.GetActiveClassIndices().Count, GunsmithLoadoutManager.GetClassName( GunsmithLoadoutManager.GetActiveClassIndex() ), IsShareBuildOpen, ShareBuildCode, ShareBuildMessage );
     }
 }

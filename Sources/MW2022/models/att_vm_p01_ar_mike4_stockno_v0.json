@@ -1,0 +1,72 @@
+{
+  "vertices": 1725,
+  "triangles": 2586,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_0be020d456c8": "easy/mw/weapons/iw9_mike4/material_550a4e38fde938dc"
+  },
+  "bounds": [
+    [
+      -6.657037258148193,
+      -0.8440079689025879,
+      -0.8460079431533813
+    ],
+    [
+      0.9990051984786987,
+      0.8440043926239014,
+      0.8420043587684631
+    ]
+  ],
+  "key": "att_vm_p01_ar_mike4_stockno_v0",
+  "name": "Demo D50 Buffer Tube",
+  "category": "Stock",
+  "source": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_stockno_v0.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_p01_ar_mike4_stockno_v0/att_vm_p01_ar_mike4_stockno_v0.vmdl",
+  "bodygroups": [
+    {
+      "name": "stock",
+      "choices": [
+        {
+          "source": "att_vm_p01_ar_mike4_stockno_v0_LOD0.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_stock_attach",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

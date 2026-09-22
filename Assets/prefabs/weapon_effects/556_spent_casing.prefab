@@ -1,0 +1,36 @@
+{
+  "RootObject": {
+    "__guid": "fbc7a9f8-1c22-425f-9c66-36f3db5497f4",
+    "__version": 2,
+    "Name": "556_spent_casing",
+    "Enabled": true,
+    "NetworkMode": 0,
+    "Tags": "particles",
+    "Components": [
+      {
+        "__type": "Facepunch.SpentCasing",
+        "__guid": "b346e920-4f14-45e8-b604-40f86fa5382b",
+        "Lifetime": 8,
+        "BounceSound": "weapons/common/effects/shell_case_bounce.wav.sound"
+      },
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "936606d9-cc34-4f5b-b6c2-febf78b24bb5",
+        "Model": "models/weapons/sbox_ammo/556x45_bullet/556x45_bullet.vmdl",
+        "BodyGroups": 2,
+        "RenderType": "On",
+        "RenderOptions": {
+          "GameLayer": true,
+          "OverlayLayer": false
+        },
+        "Tint": "1,1,1,1"
+      }
+    ],
+    "Children": []
+  },
+  "ResourceVersion": 2,
+  "__version": 2,
+  "__references": [
+    "facepunch.556_ejectbrass#58789"
+  ]
+}

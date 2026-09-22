@@ -1,0 +1,72 @@
+{
+  "vertices": 2218,
+  "triangles": 2666,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_d51fa875401a": "viper/mw/attachments/attachment_vm_vertgrip_stubby04"
+  },
+  "bounds": [
+    [
+      -0.01600099913775921,
+      -1.0090010166168213,
+      -2.931999921798706
+    ],
+    [
+      2.1319990158081055,
+      0.6249989867210388,
+      0.44699999690055847
+    ]
+  ],
+  "key": "att_vm_p01_ar_mike4_stubbygrip02",
+  "name": "Operator Foregrip",
+  "category": "Underbarrel",
+  "source": "models/viper/mw/attachments/attachment_vm_vertgrip_stubby04.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_p01_ar_mike4_stubbygrip02/att_vm_p01_ar_mike4_stubbygrip02.vmdl",
+  "bodygroups": [
+    {
+      "name": "grip",
+      "choices": [
+        {
+          "source": "attachment_vm_vertgrip_stubby04.dmx",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_folding_grip",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

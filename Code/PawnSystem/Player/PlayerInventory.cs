@@ -63,7 +63,8 @@ public partial class PlayerInventory : Component
 		{
 			if ( wpn.GetComponentInChildren<WeaponAmmo>() is { } ammo )
 			{
-				ammo.Ammo = ammo.MaxAmmo;
+				wpn.RefreshAmmunitionLoadout();
+				ammo.Ammo = ammo.GetEffectiveMaxAmmo();
 			}
 		}
 	}
@@ -324,6 +325,8 @@ public partial class PlayerInventory : Component
 		if ( component is null )
 		{
 			// SWB weapon — no Equipment component, spawn and enable directly
+			var swbWeapon = gameObject.Components.Get<SWB.Base.Weapon>( FindMode.EverythingInSelfAndDescendants );
+			if ( swbWeapon.IsValid() ) swbWeapon.GunsmithResource = resource;
 			if ( Current.IsValid() )
 				HolsterCurrent();
 			gameObject.NetworkSpawn( Player.Network.Owner );

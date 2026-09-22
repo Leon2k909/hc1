@@ -32,6 +32,9 @@ public class ShootInfo : Component
 	/// <summary>Type of ammo</summary>
 	[Property, Group( "Ammo" )] public string AmmoType { get; set; } = "pistol";
 
+	/// <summary>Opt in only when this firing mode has tracer rounds equipped.</summary>
+	[Property, Group( "Ammo" ), Sync] public bool UsesTracerRounds { get; set; } = false;
+
 	/// <summary>Amount of ammo in the clip</summary>
 	[Property, Group( "Ammo" ), Sync] public int Ammo { get; set; } = 10;
 
@@ -49,7 +52,7 @@ public class ShootInfo : Component
 	/// <summary>Bullet size</summary>
 	[Property, Group( "Bullets" )] public float BulletSize { get; set; } = 0.1f;
 
-	/// <summary>Chance the BulletTracerParticle is created (0-1)</summary>
+	/// <summary>Chance of a visible trail when tracer rounds are equipped (0-1).</summary>
 	[Property, Group( "Bullets" )] public float BulletTracerChance { get; set; } = 0.33f;
 
 	/// <summary>Damage per bullet</summary>  
@@ -126,6 +129,6 @@ public class ShootInfo : Component
 	[Property, Group( "Particles" )] public PrefabScene BarrelSmokeParticle { get; set; } = LoadParticle( "prefabs/weapon_effects/gun_smoke.prefab" );
 	[Property, Group( "Particles" )] public float BarrelSmokeScale { get; set; } = 1f;
 
-	/// <summary>Particle used for the barrel smoke</summary>
+	/// <summary>Particle used for equipped tracer rounds.</summary>
 	[Property, Group( "Particles" )] public PrefabScene BulletTracerParticle { get; set; } = LoadParticle( "particles/tracer/tracer.prefab" );
 }

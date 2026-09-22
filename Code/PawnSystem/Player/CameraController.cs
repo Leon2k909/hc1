@@ -193,6 +193,7 @@ public sealed class CameraController : PawnCameraController, IGameEventHandler<D
 		}
 	}
 
+	OpticZoom opticZoom;
 	bool fetchedInitial = false;
 	float defaultSaturation = 1f;
 
@@ -204,11 +205,18 @@ public sealed class CameraController : PawnCameraController, IGameEventHandler<D
 		if ( !Player.IsValid() )
 			return;
 
+		if ( Player.IsLocallyControlled && !opticZoom.IsValid() )
+		{
+			opticZoom = Components.GetOrCreate<OpticZoom>( FindMode.EverythingInSelf );
+			opticZoom.Flags |= ComponentFlags.NotSaved | ComponentFlags.NotNetworked;
+			opticZoom.CameraController = this;
+		}
+
 		if ( Player.CurrentEquipment.IsValid() )
 		{
 			if ( Player.CurrentEquipment.HasTag( "aiming" ) )
 			{
-				FieldOfViewOffset += Player.CurrentEquipment.AimFovOffset;
+				FieldOfViewOffset += Player.CurrentEquipment.GetAimFovOffset( baseFov );
 			}
 		}
 
@@ -242,6 +250,7 @@ public sealed class CameraController : PawnCameraController, IGameEventHandler<D
 
 		TargetFieldOfView = TargetFieldOfView.LerpTo( baseFov + FieldOfViewOffset, Time.Delta * 5f );
 		Camera.FieldOfView = TargetFieldOfView;
+		opticZoom?.UpdateCamera( baseFov );
 	}
 
 	private void UpdateMouseVisibility()

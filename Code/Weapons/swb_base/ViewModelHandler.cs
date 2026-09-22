@@ -277,16 +277,9 @@ public class ViewModelHandler : Component
 
 	protected virtual void HandleInspectAnimation()
 	{
-		if ( Weapon.IsInspecting )
-		{
-			// Pull gun slightly down and right, rotate it to show the left side
-			targetVectorPos += new Vector3( 2.5f, -3.0f, -1.5f );
-			targetVectorRot += new Vector3( 5.0f, 50.0f, 15.0f );
-			
-			// Subtle wobble
-			var time = RealTime.Now * 1.5f;
-			targetVectorRot += new Vector3( MathF.Sin(time) * 1.5f, MathF.Cos(time * 0.8f) * 1.5f, 0 );
-		}
+		var pose = Weapon.InspectPose;
+		WorldPosition += WorldRotation * pose.Position;
+		WorldRotation *= pose.Rotation;
 	}
 
 	protected virtual void HandleJumpAnimation()

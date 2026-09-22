@@ -1,0 +1,106 @@
+{
+  "vertices": 4359,
+  "triangles": 6980,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_7aafd8de6b74": "viper/mw/attachments/attachment_vm_silencer04"
+  },
+  "bounds": [
+    [
+      -0.16099999845027924,
+      -0.8960019946098328,
+      -0.8059999942779541
+    ],
+    [
+      6.629001140594482,
+      0.8059989809989929,
+      0.8999999761581421
+    ]
+  ],
+  "key": "att_vm_silencer04",
+  "name": "Tactical Suppressor",
+  "category": "Muzzle",
+  "source": "models/viper/mw/attachments/attachment_vm_silencer04.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_silencer04/att_vm_silencer04.vmdl",
+  "bodygroups": [
+    {
+      "name": "grip",
+      "choices": [
+        {
+          "source": "attachment_vm_silencer04.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_silencer",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_flash_attachment_silenced",
+      "head": [
+        6.447000026702881,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          6.447000026702881
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

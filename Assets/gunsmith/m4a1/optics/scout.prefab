@@ -1,0 +1,28 @@
+{
+  "RootObject": {
+    "__guid": "e7174baa-4c64-5d01-b391-6b372623948a",
+    "Name": "Scout 3x",
+    "Enabled": true,
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "7898b2b8-5e5e-5eb7-806b-9167e0683630",
+        "Model": "attachments/m4a1/optics/scout.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithSocketAttachment",
+        "__guid": "24861a6a-00f3-5482-a307-803c74b0481e",
+        "SocketName": "muzzle",
+        "SocketOffset": "-17.7,0,1.18",
+        "SocketAngles": "0,0,0",
+        "ModelSocketOffsets": {
+          "models/weapons/sbox_assault_m4a1/w_m4a1.vmdl": "-20.08281,0,1.38177"
+        }
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

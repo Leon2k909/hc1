@@ -1,0 +1,177 @@
+{
+  "vertices": 7892,
+  "triangles": 8573,
+  "removed_degenerate": 1,
+  "materials": {
+    "m_83be7e45aefd": "viper/mw/attachments/attachment_vm_holo_west_lens",
+    "m_d88464ba9984": "viper/mw/attachments/stencil_outline",
+    "m_4bf8037154a0": "viper/mw/attachments/attachment_vm_holo_west_lens_ads",
+    "m_b9afdf1ca558": "viper/mw/attachments/attachment_vm_holo_west"
+  },
+  "bounds": [
+    [
+      -0.21799999475479126,
+      -1.0779999494552612,
+      -0.37400099635124207
+    ],
+    [
+      3.285999059677124,
+      1.1829990148544312,
+      2.0160000324249268
+    ]
+  ],
+  "key": "att_vm_holo_west01",
+  "name": "Corp Combat Holo Sight",
+  "category": "Optic",
+  "source": "models/viper/mw/attachments/attachment_vm_holo_west_lod0.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_holo_west01/att_vm_holo_west01.vmdl",
+  "bodygroups": [
+    {
+      "name": "optic",
+      "choices": [
+        {
+          "source": "attachment_vm_holo_west_LOD0.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_holo",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_glass_ads2",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_glass_hip2",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_reticle_attach",
+      "head": [
+        0.5149999856948853,
+        0.0,
+        1.3170000314712524
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.5149999856948853
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.3170000314712524
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

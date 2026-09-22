@@ -103,6 +103,6 @@ public partial class Aimable : WeaponInputAction
 			return;
 		}
 
-		IsAiming = GameSettingsSystem.Current.ToggleAim ? WantsToggleAim : IsDown();
+		IsAiming = DevCommands.ForceAim || (GameSettingsSystem.Current.ToggleAim ? WantsToggleAim : IsDown());
 	}
 }

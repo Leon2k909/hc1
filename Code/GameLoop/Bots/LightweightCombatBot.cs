@@ -23,6 +23,8 @@ public sealed class LightweightCombatBot : Component, ITeam, IDescription, IResp
 	[Property, Group( "Combat" )] public float Damage { get; set; } = 10f;
 	[Property, Group( "Combat" )] public float RealPlayerDamageScale { get; set; } = 0.25f;
 	[Property, Group( "Combat" )] public float AimError { get; set; } = 140f;
+	/// <summary>Whether this bot's weapon is loaded with tracer rounds. Ordinary ammo has no visible trail.</summary>
+	[Property, Group( "Combat" )] public bool UsesTracerRounds { get; set; } = false;
 	[Property, Group( "Movement" )] public float MoveSpeed { get; set; } = 180f;
 	[Property, Group( "Movement" )] public float PatrolRadius { get; set; } = 900f;
 	[Property, Group( "Visuals" ), InlineEditor] public Dictionary<Team, HumanOutfitter.TeamModelEntry> TeamBaseModels { get; set; } = new();
@@ -422,7 +424,8 @@ public sealed class LightweightCombatBot : Component, ITeam, IDescription, IResp
 		}
 
 		Renderer?.Set( "b_attack", true );
-		DoShootEffects( GetMuzzlePosition(), trace.EndPosition );
+		// Send the firing weapon's ammo choice with the shot so every observer sees the same effect.
+		DoShootEffects( GetMuzzlePosition(), trace.EndPosition, UsesTracerRounds );
 
 		if ( !trace.Hit || !HitTarget( trace.GameObject, _target ) )
 			return;
@@ -449,7 +452,7 @@ public sealed class LightweightCombatBot : Component, ITeam, IDescription, IResp
 	}
 
 	[Rpc.Broadcast]
-	private void DoShootEffects( Vector3 startPosition, Vector3 endPosition )
+	private void DoShootEffects( Vector3 startPosition, Vector3 endPosition, bool usesTracerRounds )
 	{
 		EnsureReferences();
 		AttachWeaponModel();
@@ -467,7 +470,7 @@ public sealed class LightweightCombatBot : Component, ITeam, IDescription, IResp
 				flash.Flags |= GameObjectFlags.NotSaved | GameObjectFlags.NotNetworked;
 		}
 
-		if ( !string.IsNullOrWhiteSpace( TracerEffectPrefab ) && GameObject.GetPrefab( TracerEffectPrefab ).IsValid() )
+		if ( usesTracerRounds && !string.IsNullOrWhiteSpace( TracerEffectPrefab ) && GameObject.GetPrefab( TracerEffectPrefab ).IsValid() )
 		{
 			var tracerObject = GameObject.Clone( TracerEffectPrefab, new CloneConfig
 			{

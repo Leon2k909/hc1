@@ -1,0 +1,72 @@
+{
+  "vertices": 1272,
+  "triangles": 1596,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_2ad3560469d5": "viper/mw/attachments/attachment_vm_flashhider05"
+  },
+  "bounds": [
+    [
+      -0.004000000189989805,
+      -0.5460010170936584,
+      -0.5850009918212891
+    ],
+    [
+      3.4800000190734863,
+      0.5459989905357361,
+      0.5820000171661377
+    ]
+  ],
+  "key": "att_vm_flashhider04",
+  "name": "Flash Guard",
+  "category": "Muzzle",
+  "source": "models/viper/mw/attachments/attachment_vm_flashhider05.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_flashhider04/att_vm_flashhider04.vmdl",
+  "bodygroups": [
+    {
+      "name": "grip",
+      "choices": [
+        {
+          "source": "attachment_vm_flashhider05.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_silencer",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

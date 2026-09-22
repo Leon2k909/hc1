@@ -1,0 +1,30 @@
+{
+  "RootObject": {
+    "__guid": "24b9f69c-c382-52fc-9b3c-8360e27b916e",
+    "Name": "Default Pistol Grip",
+    "Enabled": true,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "6812387d-7b0e-5dd6-b8c5-03b07e320124",
+        "Model": "attachments/mw2022/models/att_vm_p01_ar_mike4_pistolgrip_v0/att_vm_p01_ar_mike4_pistolgrip_v0.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithMw22Attachment",
+        "__guid": "d33ba6f9-b140-5703-8741-adf4263733d2",
+        "BindPosition": "-1.610000,0.000000,5.580000",
+        "PartScale": "0.985000,1.000000,0.987000",
+        "PartAngles": "0,0,0",
+        "BoneName": "weapon_root",
+        "BodygroupChoices": {},
+        "IsLauncher": false
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

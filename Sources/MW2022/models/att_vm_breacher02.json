@@ -1,0 +1,72 @@
+{
+  "vertices": 1721,
+  "triangles": 1776,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_687dcf5a7ff9": "viper/mw/attachments/attachment_vm_muzzlemelee02"
+  },
+  "bounds": [
+    [
+      0.0,
+      -0.460999995470047,
+      -0.46799999475479126
+    ],
+    [
+      2.9519999027252197,
+      0.4569990038871765,
+      0.46799901127815247
+    ]
+  ],
+  "key": "att_vm_breacher02",
+  "name": "Breacher Device",
+  "category": "Muzzle",
+  "source": "models/viper/mw/attachments/attachment_vm_muzzlemelee02.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_breacher02/att_vm_breacher02.vmdl",
+  "bodygroups": [
+    {
+      "name": "grip",
+      "choices": [
+        {
+          "source": "attachment_vm_muzzlemelee02.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_silencer",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

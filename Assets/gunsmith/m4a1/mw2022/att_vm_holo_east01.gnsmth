@@ -1,0 +1,29 @@
+{
+  "Name": "APX5 Holographic Sight",
+  "Category": "Optic",
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "gunsmith/m4a1/mw2022/att_vm_holo_east01.prefab"
+  },
+  "EligibleEquipment": [
+    "weapons/m4a1/m4a1.equip"
+  ],
+  "RequiredLevel": 0,
+  "Description": "",
+  "ModifyBodygroups": true,
+  "Bodygroups": {
+    "top_rail": 3,
+    "gasblock": 1
+  },
+  "__references": [],
+  "__version": 0,
+  "ModelBodygroups": {
+    "models/weapons/sbox_assault_m4a1/w_m4a1.vmdl": {
+      "top_rail": 1,
+      "gasblock": 1
+    }
+  },
+  "OverrideAimOffset": true,
+  "OpticAimOffset": "-4.000000,0.018014,0.288163",
+  "OpticMagnification": 1
+}

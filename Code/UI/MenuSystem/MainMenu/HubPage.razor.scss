@@ -62,8 +62,9 @@ $hub-accent-dim: rgba(255, 122, 26, 0.4);
 .hub-cards
 {
     flex-direction: row;
-    flex-wrap: wrap;
-    overflow-y: scroll;
+    // A single desktop row stretches the cards to the full page height.
+    // Wrapping is reserved for narrow screens below.
+    flex-wrap: nowrap;
     flex-grow: 1;
     gap: 20px;
     justify-content: center;
@@ -75,8 +76,9 @@ $hub-accent-dim: rgba(255, 122, 26, 0.4);
 .hub-card
 {
     position: relative;
-    flex: 1 1 240px;
-    min-height: 300px;
+    flex: 1 1 0px;
+    height: 100%;
+    min-height: 0;
     min-width: 0;
     border-radius: 12px;
     overflow: hidden;
@@ -95,7 +97,7 @@ $hub-accent-dim: rgba(255, 122, 26, 0.4);
 
     &.main-card
     {
-        flex: 1.5 1 360px;
+        flex: 1.5 1 0px;
         border-color: rgba($hub-accent, 0.3);
 
         &:hover
@@ -173,7 +175,7 @@ $hub-accent-dim: rgba(255, 122, 26, 0.4);
 .main-menu-root.narrow {
     .hub-page { padding: 16px; }
     .hub-cards { flex-wrap: wrap; overflow-y: scroll; }
-    .hub-card, .hub-card.main-card { flex: 1 0 45%; min-height: 300px; }
+    .hub-card, .hub-card.main-card { flex: 1 0 45%; height: auto; min-height: 300px; }
     .hub-bg { background-position: center 35%; }
     .hub-card:hover { transform: scale(1.01); }
 }

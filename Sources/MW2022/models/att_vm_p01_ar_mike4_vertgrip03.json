@@ -1,0 +1,72 @@
+{
+  "vertices": 2699,
+  "triangles": 4152,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_78ea0c351966": "viper/mw/attachments/attachment_vm_vertgrip_stubby02_body"
+  },
+  "bounds": [
+    [
+      0.000999000039882958,
+      -0.6890010237693787,
+      -4.968999862670898
+    ],
+    [
+      1.970999002456665,
+      0.6889979839324951,
+      0.3100000023841858
+    ]
+  ],
+  "key": "att_vm_p01_ar_mike4_vertgrip03",
+  "name": "Merc Foregrip",
+  "category": "Underbarrel",
+  "source": "models/viper/mw/attachments/attachment_vm_vertgrip_stubby02.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_p01_ar_mike4_vertgrip03/att_vm_p01_ar_mike4_vertgrip03.vmdl",
+  "bodygroups": [
+    {
+      "name": "grip",
+      "choices": [
+        {
+          "source": "attachment_vm_vertgrip_stubby02.dmx",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_folding_grip",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

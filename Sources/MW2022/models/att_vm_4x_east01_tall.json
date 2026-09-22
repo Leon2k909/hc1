@@ -1,0 +1,156 @@
+{
+  "vertices": 10346,
+  "triangles": 12869,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_4a9b5bc82e59": "viper/mw/attachments/attachment_vm_4x_east_lens",
+    "m_ad5bdfa0d50c": "viper/mw/attachments/attachment_vm_riser03",
+    "m_37038ee3af83": "viper/mw/attachments/attachment_vm_4x_east_body",
+    "m_853afc05898f": "viper/mw/attachments/ads_scope_lens_1"
+  },
+  "bounds": [
+    [
+      -1.6929999589920044,
+      -0.801002025604248,
+      -0.22300100326538086
+    ],
+    [
+      2.940000057220459,
+      1.0329999923706055,
+      2.3899989128112793
+    ]
+  ],
+  "key": "att_vm_4x_east01_tall",
+  "name": "VLK 3.0x Optic",
+  "category": "Optic",
+  "source": "models/viper/mw/attachments/attachment_vm_4x_east_tall.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_4x_east01_tall/att_vm_4x_east01_tall.vmdl",
+  "bodygroups": [
+    {
+      "name": "optic",
+      "choices": [
+        {
+          "source": "attachment_vm_4x_east_tall.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    },
+    {
+      "name": "lens",
+      "choices": [
+        {
+          "source": "blank",
+          "mesh": ""
+        },
+        {
+          "source": "attachment_vm_4x_east_tall_lens.smd",
+          "mesh": "mesh_01"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_acog_2",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_reticle_attach",
+      "head": [
+        -1.4700000286102295,
+        0.11400000005960464,
+        1.437999963760376
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -1.4700000286102295
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.11400002241134644
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.437999963760376
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_lense",
+      "head": [
+        -1.4700000286102295,
+        0.11400000005960464,
+        1.437999963760376
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -1.4700000286102295
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.11400002241134644
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.437999963760376
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

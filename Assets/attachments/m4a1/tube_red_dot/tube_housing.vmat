@@ -1,0 +1,13 @@
+"Layer0"
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR "1"
+ F_METALNESS_TEXTURE "1"
+ g_flRoughnessScaleFactor "1"
+ g_vColorTint "[1 1 1 1]"
+ TextureColor "attachments/m4a1/tube_red_dot/tube_red_dot_color.png"
+ TextureNormal "attachments/m4a1/tube_red_dot/tube_red_dot_normal.png"
+ TextureRoughness "attachments/m4a1/tube_red_dot/tube_red_dot_roughness.png"
+ TextureMetalness "attachments/m4a1/tube_red_dot/tube_red_dot_metalness.png"
+ TextureAmbientOcclusion "attachments/m4a1/tube_red_dot/tube_red_dot_ao.png"
+}

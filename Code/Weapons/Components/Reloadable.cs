@@ -95,12 +95,18 @@ public partial class Reloadable : WeaponInputAction,
 
 	float GetReloadTime()
 	{
-		var baseTime = !AmmoComponent.HasAmmo ? EmptyReloadTime : ReloadTime;
-		var weaponId = Equipment?.Resource?.ResourceName ?? string.Empty;
-		if ( string.IsNullOrEmpty( weaponId ) ) return baseTime;
-		var tune = WeaponTuningManager.GetTuning( weaponId );
-		// +10 = 15% shorter reload, -10 = 15% longer
-		return baseTime * (1f - tune.Reload * 0.015f);
+		return (!AmmoComponent.HasAmmo ? EmptyReloadTime : ReloadTime) * DurationMultiplier;
+	}
+
+	public float DurationMultiplier
+	{
+		get
+		{
+			var multiplier = Equipment?.AttachmentReloadMultiplier ?? 1f;
+			var weaponId = Equipment?.Resource?.ResourceName ?? string.Empty;
+			if ( string.IsNullOrEmpty( weaponId ) ) return multiplier;
+			return multiplier * (1f - WeaponTuningManager.GetTuning( weaponId ).Reload * 0.015f);
+		}
 	}
 
 	Dictionary<float, SoundEvent> GetReloadSounds()
@@ -146,7 +152,7 @@ public partial class Reloadable : WeaponInputAction,
 		foreach ( var kv in GetReloadSounds() )
 		{
 			// Play this sound after a certain time but only if we're reloading.
-			PlayAsyncSound( kv.Key, kv.Value, () => IsReloading );
+			PlayAsyncSound( kv.Key * DurationMultiplier, kv.Value, () => IsReloading );
 		}
 
 		Equipment.Owner?.BodyRenderer?.Set( "b_reload", true );

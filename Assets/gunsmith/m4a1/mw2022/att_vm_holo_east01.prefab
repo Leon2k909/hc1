@@ -1,0 +1,32 @@
+{
+  "RootObject": {
+    "__guid": "691439e8-f060-5811-bec1-0a9bc469e2bb",
+    "Name": "APX5 Holographic Sight",
+    "Enabled": true,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "8ae33bb0-3fa0-5c1d-962a-5af71a0de208",
+        "Model": "attachments/mw2022/models/att_vm_holo_east01/att_vm_holo_east01.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithMw22Attachment",
+        "__guid": "e3ba4bed-984f-571e-a2c1-f72142754dcf",
+        "BindPosition": "0.250000,0.000000,8.730000",
+        "PartScale": "1.000000,1.000000,1.000000",
+        "PartAngles": "0,0,0",
+        "BoneName": "weapon_root",
+        "BodygroupChoices": {
+          "lens": 1
+        },
+        "IsLauncher": false
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

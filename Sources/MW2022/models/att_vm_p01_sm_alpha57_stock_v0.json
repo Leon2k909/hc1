@@ -1,0 +1,72 @@
+{
+  "vertices": 7129,
+  "triangles": 8500,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_1e795244e037": "easy/mw/weapons/iw9_mike4/material_441002902b629294"
+  },
+  "bounds": [
+    [
+      -7.927044868469238,
+      -1.0620063543319702,
+      -3.0250210762023926
+    ],
+    [
+      1.2240068912506104,
+      1.0620020627975464,
+      0.7310037612915039
+    ]
+  ],
+  "key": "att_vm_p01_sm_alpha57_stock_v0",
+  "name": "Tempus P80 Strike Stock",
+  "category": "Stock",
+  "source": "models/easy/mw/attachments/iw9_alpha57/att_vm_p01_sm_alpha57_stock_v0.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_p01_sm_alpha57_stock_v0/att_vm_p01_sm_alpha57_stock_v0.vmdl",
+  "bodygroups": [
+    {
+      "name": "stock",
+      "choices": [
+        {
+          "source": "att_vm_p01_sm_alpha57_stock_v0_LOD0.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_stock_attach",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

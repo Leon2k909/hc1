@@ -1,0 +1,109 @@
+{
+  "vertices": 6128,
+  "triangles": 7528,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_2951aed5ec77": "viper/mw/attachments/attachment_vm_holo_west02_lens",
+    "m_d88464ba9984": "viper/mw/attachments/stencil_outline",
+    "m_1bf62f85b0af": "viper/mw/attachments/attachment_vm_holo_west02_lens_ads",
+    "m_4c1645633264": "viper/mw/attachments/attachment_vm_holo_west02"
+  },
+  "bounds": [
+    [
+      -0.18799999356269836,
+      -1.034999966621399,
+      -0.2770000100135803
+    ],
+    [
+      2.999000072479248,
+      1.1629999876022339,
+      1.871000051498413
+    ]
+  ],
+  "key": "att_vm_holo_west02",
+  "name": "PBX Holo 7 Sight",
+  "category": "Optic",
+  "source": "models/viper/mw/attachments/attachment_vm_holo_west02.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_holo_west02/att_vm_holo_west02.vmdl",
+  "bodygroups": [
+    {
+      "name": "optic",
+      "choices": [
+        {
+          "source": "attachment_vm_holo_west02.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_holo",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_reticle_attach",
+      "head": [
+        0.7059999704360962,
+        0.003000000026077032,
+        1.2200000286102295
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.7059999704360962
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.003000020980834961
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.2200000286102295
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

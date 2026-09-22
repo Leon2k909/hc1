@@ -71,8 +71,7 @@
         if ( !AttachmentPoint.IsValid() )
             return;
 
-        AttachmentPoint.SetPart( null );
-        SavePart( null );
+        SaveAndApplyPart( null );
         IsViewingOptions = false;
     }
 
@@ -86,34 +85,45 @@
         if ( !AttachmentPoint.IsValid() )
             return;
 
-        AttachmentPoint.SetPart( part );
-        SavePart( part );
+        SaveAndApplyPart( part );
         IsViewingOptions = false;
     }
 
-    private void SavePart( GunsmithPart part )
+    private void SaveAndApplyPart( GunsmithPart part )
     {
         if ( !Weapon.IsValid() || !Weapon.Resource.IsValid() )
             return;
 
         GunsmithLoadoutManager.SetAttachment( Weapon.Resource, AttachmentPoint.Category, part );
+        // New prefab meshes need the saved camo as soon as they are equipped.
+        GunsmithLoadoutManager.ApplyAttachments( Weapon.Resource, Weapon.GameObject );
     }
 
     private IEnumerable<GunsmithPart> GetPartsForCategory()
     {
-        if ( !GunsmithPart.Categories.TryGetValue( Category, out var parts ) || parts is null )
-        {
-            return Enumerable.Empty<GunsmithPart>();
-        }
+        // The PostLoad category cache can be empty after an editor restart even
+        // while ResourceLibrary contains the parts. Use the live catalogue,
+        // matching the Customize tab and saved-loadout resolver.
+        var parts = ResourceLibrary.GetAll<GunsmithPart>()
+            .Where( x => x.IsValid() && x.Category == Category )
+            // Failed/incomplete prefab loads must not appear as usable options.
+            .Where( x => x.MainPrefab.IsValid() || x.ModifyBodygroups )
+            .OrderBy( x => x.RequiredLevel )
+            .ThenBy( x => x.Name );
 
         if ( !Weapon.IsValid() || !Weapon.Resource.IsValid() )
-            return parts.Where( x => x is not null ).ToList();
+            return parts.ToList();
 
-        return parts.Where( x => x is not null && x.Supports( Weapon.Resource ) ).ToList();
+        return parts.Where( x => x.Supports( Weapon.Resource ) ).ToList();
     }
 
     protected override int BuildHash()
     {
-        return HashCode.Combine( IsViewingOptions, AttachmentPoint?.CurrentPart );
+        var hash = new HashCode();
+        hash.Add( IsViewingOptions );
+        hash.Add( AttachmentPoint?.CurrentPart );
+        hash.Add( Weapon?.Resource );
+        foreach ( var part in GetPartsForCategory() ) hash.Add( part );
+        return hash.ToHashCode();
     }
 }

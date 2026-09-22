@@ -1,0 +1,29 @@
+{
+  "RootObject": {
+    "__guid": "a70dfc04-51e2-5299-ae98-a5c18b03f1bc",
+    "Name": "40 Round Extended",
+    "Flags": 0,
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "f1e08e76-ceb8-5b95-a0bc-96f15ea01774",
+        "Model": "attachments/rear_mag/m4a1_extended_mag/m4a1_extended_mag.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithBoneAttachment",
+        "__guid": "4ebf91c7-90e4-5b57-bd6e-c18ffcf0e1f0",
+        "BoneName": "magazine",
+        "HiddenBodygroup": "magazine",
+        "ModelVariants": {}
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

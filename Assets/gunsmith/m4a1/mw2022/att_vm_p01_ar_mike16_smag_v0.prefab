@@ -1,0 +1,32 @@
+{
+  "RootObject": {
+    "__guid": "0488b130-4bb2-5dd3-977f-2878c65f0ee8",
+    "Name": "15 Round Mag",
+    "Enabled": true,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "79f836cc-839f-54ef-b8f9-67bd19392e99",
+        "Model": "attachments/mw2022/models/att_vm_p01_ar_mike16_smag_v0/att_vm_p01_ar_mike16_smag_v0.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithMw22Attachment",
+        "__guid": "c635fdb2-e74a-5b20-b3a2-09269972aab0",
+        "BindPosition": "3.120000,0.000000,4.550000",
+        "PartScale": "1.000000,1.000000,1.000000",
+        "PartAngles": "0,0,0",
+        "BoneName": "magazine",
+        "BodygroupChoices": {
+          "boolet": 1
+        },
+        "IsLauncher": false
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

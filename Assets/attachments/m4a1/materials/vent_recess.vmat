@@ -1,0 +1,13 @@
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flMetalness "0"
+    g_flRoughnessScaleFactor "0.95"
+    TextureColor "attachments/m4a1/textures/recon_anodized_color.png"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureRoughness "materials/default/default_rough.tga"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.035 0.035 0.035 1]"
+    g_flModelTintAmount "1"
+}

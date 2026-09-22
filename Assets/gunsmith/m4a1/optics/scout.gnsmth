@@ -1,0 +1,28 @@
+{
+  "Name": "Scout 3x",
+  "Category": "Optic",
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "gunsmith/m4a1/optics/scout.prefab"
+  },
+  "EligibleEquipment": [
+    "weapons/m4a1/m4a1.equip"
+  ],
+  "RequiredLevel": 0,
+  "ModifyBodygroups": true,
+  "Bodygroups": {
+    "top_rail": 3,
+    "gasblock": 1
+  },
+  "ModelBodygroups": {
+    "models/weapons/sbox_assault_m4a1/w_m4a1.vmdl": {
+      "top_rail": 1,
+      "gasblock": 1
+    }
+  },
+  "OverrideAimOffset": true,
+  "OpticAimOffset": "0,0.0402,0.4999",
+  "OpticMagnification": 3.0,
+  "__references": [],
+  "__version": 0
+}

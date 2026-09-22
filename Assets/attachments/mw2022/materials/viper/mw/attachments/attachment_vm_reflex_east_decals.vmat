@@ -1,0 +1,12 @@
+Layer0
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR "1"
+ g_vColorTint "[1 1 1 1]"
+ g_flMetalness "0"
+ TextureColor "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_reflex_east_decals_rgb_color.png"
+ TextureNormal "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_reflex_east_decals_n_normal.png"
+ TextureRoughness "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_reflex_east_decals_e_roughness.png"
+ F_TRANSLUCENT "1"
+ TextureTranslucency "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_reflex_east_decals_rgb_opacity.png"
+}

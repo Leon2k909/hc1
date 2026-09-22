@@ -1,0 +1,24 @@
+{
+  "Name": "11.5\" Carbine Shroud",
+  "Category": "Barrel",
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "gunsmith/m4a1/mw2022/att_vm_p01_ar_mike4_barhvyshort_v0.prefab"
+  },
+  "EligibleEquipment": [
+    "weapons/m4a1/m4a1.equip"
+  ],
+  "RequiredLevel": 0,
+  "Description": "",
+  "ModifyBodygroups": true,
+  "Bodygroups": {
+    "handguard_covers": 1
+  },
+  "__references": [],
+  "__version": 0,
+  "ModelBodygroups": {
+    "models/weapons/sbox_assault_m4a1/w_m4a1.vmdl": {
+      "handguard_covers": 0
+    }
+  }
+}

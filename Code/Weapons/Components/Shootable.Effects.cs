@@ -48,7 +48,7 @@ public partial class Shootable
 			return;
 
 		// A wisp at the barrel; a smaller puff at the open action when reloading empty.
-		CreateDischargeParticle( MuzzleSmokePrefab, effector.Muzzle, scale, "Residual barrel smoke" );
+		CreateDischargeParticle( MuzzleSmokePrefab, effector.DischargeMuzzle, scale, "Residual barrel smoke" );
 		if ( chamberOpen )
 			CreateDischargeParticle( MuzzleSmokePrefab, effector.EjectionPort, scale * 0.55f, "Chamber smoke" );
 	}

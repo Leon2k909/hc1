@@ -1,0 +1,30 @@
+{
+  "RootObject": {
+    "__guid": "e89c008b-7c27-501b-a740-f28f9303c053",
+    "Name": "Light Compensator",
+    "Enabled": true,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "fd67a26c-1ab4-5481-b173-51316d2d3ad2",
+        "Model": "attachments/mw2022/models/att_vm_compensator01/att_vm_compensator01.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithMw22Attachment",
+        "__guid": "3925cda0-a7e4-5ddf-9028-598eec011e7c",
+        "BindPosition": "17.620000,0.000000,7.414700",
+        "PartScale": "1.000000,1.000000,1.000000",
+        "PartAngles": "0,0,0",
+        "BoneName": "weapon_root",
+        "BodygroupChoices": {},
+        "IsLauncher": false
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

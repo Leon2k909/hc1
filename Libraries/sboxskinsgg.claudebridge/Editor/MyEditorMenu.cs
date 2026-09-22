@@ -182,6 +182,7 @@ public static class ClaudeBridge
 		Register( "stop_play",           () => new StopPlayHandler() );
 		// pause_play / resume_play — no API found, omitted
 		Register( "is_playing",          () => new IsPlayingHandler() );
+		Register( "simulate_input",      () => new SimulateInputHandler() );
 		Register( "get_runtime_property",() => new GetRuntimePropertyHandler() );
 		Register( "set_runtime_property",() => new SetRuntimePropertyHandler() );
 
@@ -250,6 +251,7 @@ public static class ClaudeBridge
 		// ── Batch 14: Console / diagnostics ─────────────────────────────
 		// get_console_output / get_compile_errors / clear_console — LogCapture not available, omitted
 		Register( "take_screenshot",     () => new TakeScreenshotHandler() );
+		Register( "screenshot_game",     () => new WindowCaptureHandler() );
 		Register( "trigger_hotload",     () => new TriggerHotloadHandler() );
 
 		// ── Batch 15: Terrain / Map building ────────────────────────────
@@ -660,6 +662,11 @@ public static class ClaudeBridge
 				return MakeError( id, $"set_prefab_ref error: {ex.Message}" );
 			}
 		}
+
+		// Registration runs once per editor session and hotloads keep the old table; re-scan so
+		// handlers added since startup work without restarting the editor.
+		if ( !_handlers.ContainsKey( command ) )
+			RegisterHandlers();
 
 		if ( _handlers.TryGetValue( command, out var handler ) )
 		{
@@ -1936,6 +1943,8 @@ public class StopPlayHandler : IBridgeHandler
 {
 	public Task<object> Execute( JsonElement p )
 	{
+		// Don't carry held input into the next play session.
+		BridgeInput.ReleaseAll();
 		// StartPlayHandler enters play via the editor's own EditorScene.Play(session) path.
 		// The symmetric teardown is the STATIC EditorScene.Stop() — it tears down the play
 		// GameSession and restores the editor scene the same way the editor's Stop button
@@ -1999,6 +2008,38 @@ public class StopPlayHandler : IBridgeHandler
 	static bool SafeGameIsPlaying()
 	{
 		try { return Game.IsPlaying; } catch { return false; }
+	}
+}
+
+public class SimulateInputHandler : IBridgeHandler
+{
+	public Task<object> Execute( JsonElement p )
+	{
+		if ( !Game.IsPlaying && !PlayState.IsPlaying )
+			throw new System.Exception( "simulate_input requires play mode (call start_play first)." );
+
+		var action = p.TryGetProperty( "action", out var a ) ? a.GetString() : null;
+		if ( string.IsNullOrWhiteSpace( action ) )
+			throw new System.Exception( "Missing 'action' (e.g. 'attack2', 'jump')." );
+
+		var state = p.TryGetProperty( "state", out var s ) ? s.GetString() : "press";
+		var durationMs = p.TryGetProperty( "durationMs", out var d ) && d.ValueKind == JsonValueKind.Number ? d.GetSingle() : 0f;
+
+		switch ( state )
+		{
+			case "hold": BridgeInput.Hold( action, durationMs / 1000f ); break;
+			case "release": BridgeInput.Release( action ); break;
+			default: BridgeInput.Press( action ); break;
+		}
+
+		return Task.FromResult<object>( new
+		{
+			action,
+			state = state == "release" ? "up" : "down",
+			note = state == "hold"
+				? (durationMs > 0 ? $"Held for {durationMs}ms, re-applied every frame." : "Held until state 'release'.")
+				: state == "release" ? "Released." : "Pressed for one frame."
+		} );
 	}
 }
 

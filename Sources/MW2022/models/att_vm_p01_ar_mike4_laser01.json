@@ -1,0 +1,107 @@
+{
+  "vertices": 6657,
+  "triangles": 7988,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_d2d8ae985aab": "viper/mw/attachments/attachment_vm_laser01_glass",
+    "m_ab8f7b32553d": "viper/mw/attachments/attachment_vm_laser01"
+  },
+  "bounds": [
+    [
+      -0.20499999821186066,
+      -1.0420010089874268,
+      -0.23500099778175354
+    ],
+    [
+      3.0380001068115234,
+      0.9519990086555481,
+      0.5199990272521973
+    ]
+  ],
+  "key": "att_vm_p01_ar_mike4_laser01",
+  "name": "Tac Laser",
+  "category": "Laser",
+  "source": "models/viper/mw/attachments/attachment_vm_laser01.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_p01_ar_mike4_laser01/att_vm_p01_ar_mike4_laser01.vmdl",
+  "bodygroups": [
+    {
+      "name": "grip",
+      "choices": [
+        {
+          "source": "attachment_vm_laser01.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_laser_attach",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_laser",
+      "head": [
+        2.999000072479248,
+        0.6690000295639038,
+        0.11100000143051147
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          2.999000072479248
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.6690000295639038
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.11100000143051147
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

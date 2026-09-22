@@ -1,0 +1,157 @@
+{
+  "vertices": 8973,
+  "triangles": 10429,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_5eddbf80141d": "viper/mw/attachments/weapon_vm_lm_slima_sightoptic_lens",
+    "m_6b390e05fce2": "viper/mw/attachments/weapon_vm_lm_slima_sightmagnifier_lens",
+    "m_609686a929ab": "viper/mw/attachments/weapon_vm_lm_slima_sightoptic",
+    "m_54768067cdff": "viper/mw/attachments/weapon_vm_lm_slima_sightmagnifier",
+    "m_853afc05898f": "viper/mw/attachments/ads_scope_lens_1"
+  },
+  "bounds": [
+    [
+      -2.734999895095825,
+      -1.281000018119812,
+      -0.307000994682312
+    ],
+    [
+      4.47599983215332,
+      0.9719989895820618,
+      2.190000057220459
+    ]
+  ],
+  "key": "att_vm_2x_west02",
+  "name": "Solozero K498 2.0x Integral",
+  "category": "Optic",
+  "source": "models/viper/mw/attachments/attachment_vm_lm_slima_acog.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_2x_west02/att_vm_2x_west02.vmdl",
+  "bodygroups": [
+    {
+      "name": "optic",
+      "choices": [
+        {
+          "source": "attachment_vm_lm_slima_acog.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    },
+    {
+      "name": "lens",
+      "choices": [
+        {
+          "source": "blank",
+          "mesh": ""
+        },
+        {
+          "source": "attachment_vm_lm_slima_acog_lens.smd",
+          "mesh": "mesh_01"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_acog_2",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_reticle_attach",
+      "head": [
+        -2.5679988861083984,
+        0.0,
+        1.3650000095367432
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -2.5679988861083984
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.3650000095367432
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_lense",
+      "head": [
+        -2.5679988861083984,
+        0.0,
+        1.3650000095367432
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -2.5679988861083984
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.3650000095367432
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

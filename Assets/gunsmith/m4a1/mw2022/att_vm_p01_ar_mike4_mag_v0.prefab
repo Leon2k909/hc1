@@ -1,0 +1,32 @@
+{
+  "RootObject": {
+    "__guid": "cf97aa46-48e0-5ec8-ac26-770c8214e81f",
+    "Name": "Default Magazine",
+    "Enabled": true,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "ad6cc657-5c1a-51d1-bf06-2036b29cf1f3",
+        "Model": "attachments/mw2022/models/att_vm_p01_ar_mike4_mag_v0/att_vm_p01_ar_mike4_mag_v0.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithMw22Attachment",
+        "__guid": "2607b17c-dd06-542a-b3c4-fb003c774d87",
+        "BindPosition": "3.120000,0.000000,4.550000",
+        "PartScale": "1.000000,1.000000,1.000000",
+        "PartAngles": "0,0,0",
+        "BoneName": "magazine",
+        "BodygroupChoices": {
+          "boolet": 1
+        },
+        "IsLauncher": false
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

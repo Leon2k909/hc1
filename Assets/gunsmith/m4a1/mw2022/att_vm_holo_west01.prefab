@@ -1,0 +1,30 @@
+{
+  "RootObject": {
+    "__guid": "aea1dd2d-ffb9-582f-ab8b-a83670bb2b1f",
+    "Name": "Corp Combat Holo Sight",
+    "Enabled": true,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "1b4de70d-d6e1-53fc-940a-d273c83068a8",
+        "Model": "attachments/mw2022/models/att_vm_holo_west01/att_vm_holo_west01.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithMw22Attachment",
+        "__guid": "6ad27086-50ea-5429-86ec-a15266f5e68f",
+        "BindPosition": "0.250000,0.000000,8.730000",
+        "PartScale": "1.000000,1.000000,1.000000",
+        "PartAngles": "0,0,0",
+        "BoneName": "weapon_root",
+        "BodygroupChoices": {},
+        "IsLauncher": false
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

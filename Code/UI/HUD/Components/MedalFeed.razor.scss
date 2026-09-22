@@ -1,83 +1,218 @@
+@import "/UI/Styles/Theme.scss";
+
 MedalFeed
 {
     position: absolute;
-    top: 92px;
+    top: 7%;
     left: 50%;
-    transform: translateX( -50% );
-    width: 420px;
+    transform: translateX(-50%);
+    width: 920px;
+    max-width: 94%;
     z-index: 1700;
-    align-items: center;
-    justify-content: flex-start;
-    flex-direction: column;
-    gap: 8px;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 12px;
     pointer-events: none;
+    font-family: $main-font;
 
-    .medal-card
+    .medal-slot
     {
-        min-width: 260px;
-        max-width: 420px;
-        min-height: 58px;
-        flex-direction: row;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        padding: 8px 18px 8px 10px;
-        background-color: rgba( 0, 0, 0, 0.58 );
-        border: 1px solid rgba( 255, 184, 32, 0.55 );
-        border-radius: 4px;
-        box-shadow: 0 8px 28px rgba( 0, 0, 0, 0.45 );
-        backdrop-filter: blur( 8px );
+        width: 216px;
+        max-width: 25%;
+        min-width: 0;
+        flex-shrink: 1;
+        color: #ffc96a;
         opacity: 1;
-        transform: scale( 1 ) translateY( 0 );
-        transition: opacity 0.22s ease-out, transform 0.22s ease-out;
+        transform: translateY(0) scale(1);
+        transition: opacity 0.28s ease-in, transform 0.28s ease-in;
 
-        &:intro
+        &.leaving
         {
             opacity: 0;
-            transform: scale( 0.86 ) translateY( -14px );
-        }
-
-        &.fade-out
-        {
-            opacity: 0;
-            transform: scale( 0.96 ) translateY( -18px );
+            transform: translateY(-18px) scale(0.94);
         }
     }
 
-    .medal-icon
+    .medal-award
     {
-        width: 42px;
-        height: 42px;
-        flex-shrink: 0;
+        width: 100%;
+        align-items: center;
+        flex-direction: column;
+        animation: medal-arrive 0.46s ease-out both;
+    }
+
+    .medal-emblem
+    {
+        position: relative;
+        width: 132px;
+        height: 132px;
+        max-width: 90%;
         align-items: center;
         justify-content: center;
-        border-radius: 50%;
-        background-color: rgba( 255, 184, 32, 0.95 );
-        color: black;
-        box-shadow: 0 0 18px rgba( 255, 184, 32, 0.45 );
+    }
 
-        i
+    .medal-art
+    {
+        z-index: 1;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.75));
+    }
+
+    .medal-impact
+    {
+        position: absolute;
+        width: 92px;
+        height: 92px;
+        border: 2px solid #ffe4a9;
+        border-radius: 50%;
+        animation: medal-impact 0.5s ease-out both;
+    }
+
+    .medal-rank
+    {
+        position: absolute;
+        z-index: 2;
+        bottom: -2px;
+        min-width: 32px;
+        height: 26px;
+        padding: 0 7px;
+        align-items: center;
+        justify-content: center;
+        background-color: #161a20;
+        border: 1px solid #ba934c;
+        transform: skewX(-10deg);
+
+        label
         {
-            font-size: 25px;
+            font-size: 18px;
+            font-weight: 800;
+            transform: skewX(10deg);
+            text-shadow: 0 1px 2px black;
         }
+    }
+
+    .medal-ribbon
+    {
+        position: relative;
+        width: 100%;
+        margin-top: 9px;
+        padding: 5px 6px 9px;
+        align-items: center;
+        flex-direction: column;
+        background-image: linear-gradient(to right, rgba(10, 14, 20, 0), rgba(10, 14, 20, 0.88) 25%, rgba(10, 14, 20, 0.88) 75%, rgba(10, 14, 20, 0));
+        overflow: hidden;
     }
 
     .medal-title
     {
-        font-size: 17px;
-        font-weight: 900;
-        color: white;
-        letter-spacing: 1.4px;
-        text-shadow: 1px 1px 4px rgba( 0, 0, 0, 0.9 );
-        white-space: nowrap;
+        flex-shrink: 0;
+        max-width: 100%;
+        font-size: 22px;
+        font-weight: 800;
+        font-style: italic;
+        color: #ffffff;
+        letter-spacing: 0.7px;
+        text-align: center;
+        text-shadow: 0 2px 3px black;
+
+        &.long-title { font-size: 17px; }
+    }
+
+    .medal-detail
+    {
+        width: 100%;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        margin-top: 3px;
+    }
+
+    .medal-rule
+    {
+        width: 18px;
+        height: 1px;
+        background-color: #c39753;
+        flex-shrink: 1;
     }
 
     .medal-subtitle
     {
-        font-size: 10px;
+        flex-shrink: 0;
+        font-size: 9px;
         font-weight: 700;
-        color: rgba( 255, 184, 32, 0.9 );
-        letter-spacing: 1.2px;
-        white-space: nowrap;
+        letter-spacing: 1.6px;
+        text-shadow: 0 1px 2px black;
     }
+
+    .medal-sweep
+    {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 32px;
+        background-image: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0));
+        animation: medal-sweep 0.55s ease-out both;
+    }
+
+    .multikill
+    {
+        color: #91dcf5;
+        .medal-rank { border-color: #5c9eb9; }
+        .medal-rule { background-color: #659eb2; }
+        .medal-impact { border-color: #a5e6ff; }
+    }
+
+    .streak
+    {
+        color: #ffc785;
+        .medal-rank { background-color: #381518; border-color: #cd7855; }
+        .medal-rule { background-color: #cd7855; }
+        .medal-impact { border-color: #ff9675; }
+    }
+
+    &.compact-medals
+    {
+        gap: 6px;
+        .medal-emblem { width: 106px; height: 106px; }
+        .medal-title { font-size: 17px; letter-spacing: 0; }
+        .medal-title.long-title { font-size: 14px; }
+        .medal-subtitle { font-size: 8px; letter-spacing: 0.4px; }
+        .medal-rule { width: 8px; }
+        .medal-detail { gap: 3px; }
+    }
+
+    &.stacked-medals
+    {
+        flex-wrap: wrap;
+        row-gap: 10px;
+        .medal-slot { width: 46%; max-width: 46%; }
+        .medal-emblem { width: 86px; height: 86px; }
+    }
+
+}
+
+// s&box resolves animation names from top-level keyframes.
+@keyframes medal-arrive
+{
+    0% { opacity: 0; transform: translateY(-20px) scale(1.55) rotate(-7deg); }
+    45% { opacity: 1; transform: translateY(3px) scale(0.94) rotate(2deg); }
+    72% { opacity: 1; transform: translateY(0) scale(1.04) rotate(-1deg); }
+    100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+}
+
+@keyframes medal-impact
+{
+    0% { opacity: 0; transform: scale(0.45); }
+    24% { opacity: 0.7; }
+    100% { opacity: 0; transform: scale(1.8); }
+}
+
+@keyframes medal-sweep
+{
+    0% { opacity: 0; transform: translateX(-40px) skewX(-20deg); }
+    25% { opacity: 1; }
+    100% { opacity: 0; transform: translateX(240px) skewX(-20deg); }
 }

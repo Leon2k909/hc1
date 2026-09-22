@@ -1,0 +1,32 @@
+{
+  "RootObject": {
+    "__guid": "32cee003-53fe-58cc-967f-4984625656ba",
+    "Name": "Integral Hybrid",
+    "Enabled": true,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "69db2c42-c263-5422-a736-21f27544f67f",
+        "Model": "attachments/mw2022/models/att_vm_hybrid_west01/att_vm_hybrid_west01.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithMw22Attachment",
+        "__guid": "f51ed112-0652-5bc9-b070-9c8b7a1d7cc1",
+        "BindPosition": "0.250000,0.000000,8.730000",
+        "PartScale": "1.000000,1.000000,1.000000",
+        "PartAngles": "0,0,0",
+        "BoneName": "weapon_root",
+        "BodygroupChoices": {
+          "lens": 1
+        },
+        "IsLauncher": false
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

@@ -1,0 +1,112 @@
+{
+  "vertices": 9637,
+  "triangles": 11202,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_9dd282e3fc6b": "viper/mw/attachments/attachment_vm_reflex_east02_lens",
+    "m_db6195f23929": "viper/mw/attachments/attachment_vm_reflex_east02_lens_ads",
+    "m_7c5043d76359": "viper/mw/attachments/attachment_vm_reflex_east02_lens_edge",
+    "m_ff4230552173": "viper/mw/attachments/attachment_vm_reflex_east02_lens_edge_in",
+    "m_5e6b4fd468a2": "viper/mw/attachments/attachment_vm_reflex_east02_lens_ads_edge",
+    "m_ad5bdfa0d50c": "viper/mw/attachments/attachment_vm_riser03",
+    "m_218448b18be6": "viper/mw/attachments/attachment_vm_reflex_east02_body"
+  },
+  "bounds": [
+    [
+      -0.7609999775886536,
+      -0.7900009751319885,
+      -0.2200009971857071
+    ],
+    [
+      3.430000066757202,
+      1.215999960899353,
+      2.190999984741211
+    ]
+  ],
+  "key": "att_vm_reflex_east02_tall",
+  "name": "Monocle Reflex Sight",
+  "category": "Optic",
+  "source": "models/viper/mw/attachments/attachment_vm_reflex_east02_tall.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_reflex_east02_tall/att_vm_reflex_east02_tall.vmdl",
+  "bodygroups": [
+    {
+      "name": "optic",
+      "choices": [
+        {
+          "source": "attachment_vm_reflex_east02_tall.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_reflex",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_reticle_attach",
+      "head": [
+        2.871000051498413,
+        0.0,
+        1.4010000228881836
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          2.871000051498413
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.4010000228881836
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

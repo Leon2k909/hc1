@@ -1,0 +1,31 @@
+{
+  "RootObject": {
+    "__guid": "09e25fac-ef31-5146-b5dd-48d677909a43",
+    "Name": "20 Round Compact",
+    "Flags": 0,
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "93cff913-9508-5441-922f-781b659577ab",
+        "Model": "attachments/rear_mag/scarh_short_mag/scarh_short_mag.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithBoneAttachment",
+        "__guid": "c5e8ee72-8ece-58d5-869f-61b53afd647a",
+        "BoneName": "Mag",
+        "HiddenBodygroup": "magazine",
+        "ModelVariants": {
+          "weapons/swb/scarh/w_scarh.vmdl": "attachments/rear_mag/scarh_short_mag_world/scarh_short_mag_world.vmdl"
+        }
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

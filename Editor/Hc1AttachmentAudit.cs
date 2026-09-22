@@ -8,6 +8,26 @@ using Facepunch.Gunsmith;
 
 public static class Hc1AttachmentAudit
 {
+	[ConCmd( "hc1_attachment_fit_matrix" )]
+	public static void FitMatrix()
+	{
+		Preview( "m4a1", false, false );
+		Preview( "m4a1", true, true );
+		Preview( "scarh", false, false );
+		Preview( "scarh", true, true );
+	}
+
+	[ConCmd( "hc1_attachment_refresh" )]
+	public static void Refresh()
+	{
+		foreach ( var name in new[] { "rifle_suppressor", "compact_suppressor", "vertical_grip", "angled_grip" } )
+		{
+			AssetSystem.FindByPath( $"gunsmith/hc1/{name}/{name}.prefab" )?.Compile( true );
+			AssetSystem.FindByPath( $"gunsmith/hc1/{name}/{name}.gnsmth" )?.Compile( true );
+		}
+		Log.Info( "HC1_ATTACHMENT_REFRESH complete" );
+	}
+
 	[ConCmd( "hc1_attachment_preview" )]
 	public static void Preview( string weapon = "m4a1", bool world = false, bool compact = false )
 	{
@@ -27,7 +47,7 @@ public static class Hc1AttachmentAudit
 				: $"models/weapons/sbox_assault_m4a1/{(world ? "w" : "v")}_m4a1.vmdl";
 			renderer.Model = Model.Load( path );
 			renderer.UseAnimGraph = false;
-			renderer.BodyGroups = weapon == "scarh" ? 42259UL : world ? 395UL : 9251UL;
+			renderer.BodyGroups = weapon == "scarh" ? 81UL : world ? 395UL : 9251UL;
 			renderer.SetBodyGroup( "muzzle", 0 );
 			renderer.SetBodyGroup( "foregrip", 0 );
 			foreach ( var other in root.Components.GetAll<SkinnedModelRenderer>( FindMode.EverythingInSelfAndDescendants ) )
@@ -35,7 +55,7 @@ public static class Hc1AttachmentAudit
 			if ( renderer.Model.AnimationCount > 0 )
 				renderer.Sequence.Name = weapon == "m4a1" && !world ? "IdlePose" : renderer.Model.GetAnimationName( 0 );
 			renderer.PlaybackRate = 0;
-			root.Enabled = true;
+			root.Enabled = !world;
 			var gunsmith = root.Components.Create<GunsmithWeapon>();
 			gunsmith.Resource = ResourceLibrary.Get<EquipmentResource>( $"weapons/{weapon}/{weapon}.equip" );
 			foreach ( var point in root.Components.GetAll<GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants ).ToArray() )
@@ -46,10 +66,19 @@ public static class Hc1AttachmentAudit
 				var part = ResourceLibrary.Get<GunsmithPart>( $"gunsmith/hc1/{partName}/{partName}.gnsmth" );
 				if ( part is null ) throw new Exception( $"Part failed to load: {partName}" );
 				point.SetPart( part );
+				if ( !point.CurrentGameObject.IsValid() ) throw new Exception( $"Prefab failed to instantiate: {partName}" );
+				var previous = point.CurrentGameObject;
+				point.SetPart( null );
+				if ( !previous.IsDestroyed || point.CurrentGameObject is not null || point.CurrentPart is not null ) throw new Exception( $"Unequip did not clear {partName}" );
+				// Runtime destruction is deferred until the next frame. This isolated
+				// scene renders synchronously, so flush the already-marked old object.
+				previous.DestroyImmediate();
+				point.SetPart( part );
+				if ( !point.CurrentGameObject.Components.Get<GunsmithSocketAttachment>( FindMode.EverythingInSelf ).IsValid() )
+					throw new Exception( $"Socket component missing from {partName}; recompile the prefabs after C# hotload." );
 				Log.Info( $"HC1_ATTACHMENT_FIT {weapon} {world} {partName} position={point.CurrentGameObject?.WorldPosition}" );
-				foreach ( var component in point.CurrentGameObject.Components.GetAll<Component>( FindMode.EverythingInSelf ) )
-					Log.Info( $"HC1_ATTACHMENT_COMPONENT {component.GetType().Name} enabled={component.Enabled}" );
 			}
+			root.Enabled = true;
 			var camera = new GameObject( true, "QA camera" ).Components.Create<CameraComponent>();
 			camera.BackgroundColor = new Color( 0.08f, 0.10f, 0.13f );
 			camera.FieldOfView = 40;
@@ -65,12 +94,13 @@ public static class Hc1AttachmentAudit
 			foreach ( var attachment in root.Components.GetAll<GunsmithSocketAttachment>( FindMode.EverythingInSelfAndDescendants ) )
 			{
 				var point = attachment.GetComponentInParent<GunsmithAttachmentPoint>();
+				if ( !point.IsValid() || point.CurrentGameObject != attachment.GameObject ) continue;
 				attachment.Initialize( point );
-				Log.Info( $"HC1_ATTACHMENT_ALIGNED {attachment.GameObject.Name} {attachment.WorldTransform} model={renderer.Model.Name} corrections={string.Join( ";", attachment.ModelSocketAngles )}" );
+				Log.Info( $"HC1_ATTACHMENT_ALIGNED {attachment.GameObject.Name} {attachment.WorldTransform} model={renderer.Model.Name}" );
 			}
 			Log.Info( $"HC1_ATTACHMENT_SOCKET {path} muzzle={renderer.GetAttachment( "muzzle" )}" );
 			camera.RenderToBitmap( bitmap );
-			File.WriteAllBytes( Path.Combine( folder, $"{weapon}-{(world ? "world" : "view")}-{(compact ? "compact" : "rifle")}-fit.png" ), bitmap.ToPng() );
+			File.WriteAllBytes( Path.Combine( folder, $"{weapon}-{(world ? "world" : "view")}-{(compact ? "compact" : "rifle")}-verified.png" ), bitmap.ToPng() );
 		}
 		finally { scene.Destroy(); }
 		Log.Info( "HC1_ATTACHMENT_PREVIEW saved" );
@@ -80,13 +110,6 @@ public static class Hc1AttachmentAudit
 	public static void Run()
 	{
 		foreach ( var path in new[] {
-			"models/weapons/sbox_assault_m4a1/v_m4a1.vmdl",
-			"models/weapons/sbox_assault_m4a1/w_m4a1.vmdl",
-			"weapons/swb/scarh/v_scarh.vmdl",
-			"weapons/swb/scarh/v_scarh_gunsmith.vmdl",
-			"weapons/swb/scarh/w_scarh.vmdl",
-			"models/weapons/sbox_pistol_usp/v_usp.vmdl",
-			"models/weapons/sbox_pistol_usp/w_usp.vmdl",
 			"attachments/hc1/rifle_suppressor/rifle_suppressor.vmdl",
 			"attachments/hc1/compact_suppressor/compact_suppressor.vmdl",
 			"attachments/hc1/vertical_grip/vertical_grip.vmdl",
@@ -97,11 +120,8 @@ public static class Hc1AttachmentAudit
 			{
 				var model = Model.Load( path );
 				Log.Info( $"HC1_ATTACHMENT_AUDIT {path} valid={model?.IsError == false} bounds={model?.Bounds}" );
-				if ( model is null ) continue;
-				foreach ( var name in new[] { "muzzle", "muzzle_silenced", "weapon_root", "Base" } )
-				{
-					Log.Info( $"HC1_ATTACHMENT_AUDIT {name} attachment={model.GetAttachment( name )} bone={model.GetBoneTransform( name )}" );
-				}
+				if ( model is null || model.IsError ) throw new Exception( $"Model failed: {path}" );
+				Log.Info( $"HC1_ATTACHMENT_MATERIALS {string.Join( ",", model.Materials.Select( x => x.Name ) )}" );
 			}
 			catch ( Exception ex ) { Log.Warning( $"HC1_ATTACHMENT_AUDIT {path}: {ex.Message}" ); }
 		}

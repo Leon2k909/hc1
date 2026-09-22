@@ -1,0 +1,32 @@
+{
+  "RootObject": {
+    "__guid": "db927845-a69f-5395-ae53-f312632864d1",
+    "Name": "VLK 3.0x Optic",
+    "Enabled": true,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "6f2b7acd-acc3-5d27-be84-679a764655f1",
+        "Model": "attachments/mw2022/models/att_vm_4x_east01_tall/att_vm_4x_east01_tall.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithMw22Attachment",
+        "__guid": "7f98b299-7bb4-5613-809c-b4db0144d140",
+        "BindPosition": "0.250000,0.000000,8.730000",
+        "PartScale": "1.000000,1.000000,1.000000",
+        "PartAngles": "0,0,0",
+        "BoneName": "weapon_root",
+        "BodygroupChoices": {
+          "lens": 1
+        },
+        "IsLauncher": false
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

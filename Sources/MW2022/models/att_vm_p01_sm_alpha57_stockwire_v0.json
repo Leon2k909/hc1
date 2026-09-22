@@ -1,0 +1,72 @@
+{
+  "vertices": 3237,
+  "triangles": 4737,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_9e38555f57b1": "easy/mw/weapons/iw9_mike4/wpn_p01_sm_alpha57_stockwire_v0"
+  },
+  "bounds": [
+    [
+      -5.769033432006836,
+      -0.9870079159736633,
+      -4.452025890350342
+    ],
+    [
+      0.6550033092498779,
+      0.9870051741600037,
+      0.6810010671615601
+    ]
+  ],
+  "key": "att_vm_p01_sm_alpha57_stockwire_v0",
+  "name": "Demo Quicksilver Stock",
+  "category": "Stock",
+  "source": "models/easy/mw/attachments/iw9_alpha57/att_vm_p01_sm_alpha57_stockwire_v0.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_p01_sm_alpha57_stockwire_v0/att_vm_p01_sm_alpha57_stockwire_v0.vmdl",
+  "bodygroups": [
+    {
+      "name": "stock",
+      "choices": [
+        {
+          "source": "att_vm_p01_sm_alpha57_stockwire_v0_LOD0.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_stock_attach",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,155 @@
+{
+  "vertices": 10405,
+  "triangles": 14069,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_019450dd3fee": "viper/mw/attachments/attachment_vm_thermal_west01_lens",
+    "m_95bdca163d65": "viper/mw/attachments/attachment_vm_thermal_west01_body",
+    "m_853afc05898f": "viper/mw/attachments/ads_scope_lens_1"
+  },
+  "bounds": [
+    [
+      -1.2879999876022339,
+      -0.8930000066757202,
+      -0.24600200355052948
+    ],
+    [
+      3.4019999504089355,
+      0.8929979801177979,
+      2.2079989910125732
+    ]
+  ],
+  "key": "att_vm_thermal_west01",
+  "name": "Solozero NVG Enhanced",
+  "category": "Optic",
+  "source": "models/viper/mw/attachments/attachment_vm_thermal_west_01.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_thermal_west01/att_vm_thermal_west01.vmdl",
+  "bodygroups": [
+    {
+      "name": "optic",
+      "choices": [
+        {
+          "source": "attachment_vm_thermal_west_01.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    },
+    {
+      "name": "lens",
+      "choices": [
+        {
+          "source": "blank",
+          "mesh": ""
+        },
+        {
+          "source": "attachment_vm_thermal_west_01_lens.smd",
+          "mesh": "mesh_01"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_thermal",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_reticle_attach",
+      "head": [
+        -1.0820000171661377,
+        0.0,
+        0.9259999990463257
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -1.0820000171661377
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.9259999990463257
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_lense",
+      "head": [
+        -1.0820000171661377,
+        0.0,
+        0.9259999990463257
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -1.0820000171661377
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.9259999990463257
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

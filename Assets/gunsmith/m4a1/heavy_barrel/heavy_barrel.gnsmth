@@ -1,0 +1,22 @@
+{
+  "Name": "Recon Barrel Kit",
+  "Category": "Barrel",
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "gunsmith/m4a1/heavy_barrel/heavy_barrel.prefab"
+  },
+  "EligibleEquipment": [
+    "weapons/m4a1/m4a1.equip"
+  ],
+  "RequiredLevel": 0,
+  "ModifyBodygroups": true,
+  "Bodygroups": {
+    "gasblock": 1,
+    "handguard_covers": 0
+  },
+  "HiddenWeaponMaterials": [
+    "models/weapons/sbox_assault_m4a1/v_m4a1_handguard.vmat"
+  ],
+  "__references": [],
+  "__version": 0
+}

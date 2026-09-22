@@ -98,6 +98,7 @@ public partial class Weapon
 
 	public virtual void Shoot( ShootInfo shootInfo, bool isPrimary )
 	{
+		RefreshAmmunitionLoadout( shootInfo );
 		Facepunch.GameUtils.TraceCombatMouse( isPrimary ? "Weapon.Shoot.primary.begin" : "Weapon.Shoot.secondary.begin", null, true );
 
 		// CoD-style minimap reveal: an unsuppressed shot briefly puts us on the enemy minimap.

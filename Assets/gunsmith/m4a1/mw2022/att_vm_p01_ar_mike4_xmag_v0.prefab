@@ -1,0 +1,32 @@
+{
+  "RootObject": {
+    "__guid": "e52f4067-b569-5c8b-ae87-3ddd3c015bc1",
+    "Name": "45 Round Mag",
+    "Enabled": true,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "24cb03fd-cfb5-5a74-94dd-e8d07fb99dfc",
+        "Model": "attachments/mw2022/models/att_vm_p01_ar_mike4_xmag_v0/att_vm_p01_ar_mike4_xmag_v0.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithMw22Attachment",
+        "__guid": "f4aa6cd0-9b3c-5245-abd2-46fe5c1f144e",
+        "BindPosition": "3.120000,0.000000,4.550000",
+        "PartScale": "1.000000,1.000000,1.000000",
+        "PartAngles": "0,0,0",
+        "BoneName": "magazine",
+        "BodygroupChoices": {
+          "boolet": 1
+        },
+        "IsLauncher": false
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

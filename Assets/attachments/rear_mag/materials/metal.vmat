@@ -1,0 +1,16 @@
+"Layer0"
+{
+shader "shaders/complex.shader"
+F_SPECULAR "1"
+F_METALNESS_TEXTURE "0"
+g_flMetalness "0.85"
+g_flRoughnessScaleFactor "0.44"
+
+TextureColor "attachments/rear_mag/textures/rear_mag_atlas_color.png"
+TextureNormal "materials/default/default_normal.tga"
+TextureRoughness "materials/default/default_rough.tga"
+TextureAmbientOcclusion "materials/default/default_ao.tga"
+g_vColorTint "[0.55 0.55 0.55 1]"
+
+g_flModelTintAmount "1"
+}

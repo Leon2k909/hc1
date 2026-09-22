@@ -325,7 +325,7 @@ GunsmithPanel
 	.gs-mode-tab
 	{
 		min-width: 150px;
-		height: 34px;
+		height: 44px;
 		font-size: 14px;
 		letter-spacing: 2px;
 		color: $gs-text-dim;
@@ -333,6 +333,7 @@ GunsmithPanel
 		padding: 0 18px;
 		align-items: center;
 		justify-content: center;
+		gap: 8px;
 		background-color: rgba( 255, 255, 255, 0.05 );
 		border: 1px solid rgba( 255, 255, 255, 0.08 );
 		border-radius: 3px;
@@ -1460,3 +1461,98 @@ GunsmithPanel.short
 }
 
 GunsmithPanel.compact.armory-collapsed .gs-bottom.build-mode { left: 0; }
+
+// Readable controls with full-tile hit targets, shared by Build and Customise.
+GunsmithPanel
+{
+	.gs-mode-tabs { height: 64px; gap: 10px; background-color: rgba( 12, 16, 19, 0.96 ); }
+	.gs-mode-tab { min-width: 170px; font-size: 16px; color: #d7dce0; }
+	.gs-mode-tab.is-selected { background-color: #ffbd24; color: #111519; }
+	.gs-armory-tab.is-selected { background-color: #303a43; border-color: #ffbd24; color: white; }
+	.gs-armory-tab { position: absolute; left: 24px; }
+	.gs-icon-btn { min-height: 44px; font-size: 15px; gap: 8px; }
+	.gs-class-panel { top: 144px; padding: 14px; background-color: rgba( 19, 24, 28, 0.96 ); border-color: #46515a; }
+	.gs-class-strip { overflow-x: scroll; flex-wrap: nowrap; }
+	.gs-class-slot { flex: 0 0 100px; height: 70px; background-color: #262e34; border-color: #4c5862; }
+	.gs-class-slot .gs-class-name { font-size: 13px; color: #d7dce0; }
+	.gs-class-slot .gs-class-num { color: #aebbc5; }
+	.gs-add-class { min-width: 44px; color: white; background-color: #262e34; }
+	.gs-rename-input { min-height: 42px; background-color: #10161b; border-color: #46515a; }
+	.gs-action-btn { width: 44px; height: 44px; font-size: 20px; }
+	.weapon-browser { top: 326px; background-color: rgba( 19, 24, 28, 0.96 ); border-color: #46515a; overflow-y: scroll; }
+	.weapon-browser.has-many-classes { top: 326px; }
+	.gs-armory-section { color: #adb9c3; letter-spacing: 1.5px; }
+	.gs-slot-row { height: 68px; background-color: #252e35; border-color: #46515a; }
+	.gs-slot-row-sm { height: 58px; }
+	.gs-slot-row.active { background-color: #393321; border-left-color: #ffbd24; }
+	.gs-slot-type-badge, .gs-slot-lv { color: #ffca54; }
+	.gs-slot-weapon-name { font-size: 18px; }
+	.gs-slot-arrow { color: #cad2d8; font-size: 22px; }
+	.gs-cat-tabs { height: auto; min-height: 98px; }
+	.gs-cat-tab { min-height: 44px; color: #d4dce2; background-color: #303a43; line-height: 16px; }
+	.gs-cat-tab.is-selected { background-color: #ffbd24; color: #111519; }
+	.weapon-list { flex-shrink: 0; min-height: 180px; max-height: 360px; }
+	.weapon-option { min-height: 58px; font-size: 17px; background-color: #242e36; color: #f3f4f5; }
+	.weapon-option.is-selected { color: white; background-color: #3c3523; border: 1px solid #ffbd24; }
+	.weapon-lv { color: #b8c4ce; }
+	.gs-perk-slot { min-height: 88px; background-color: #252e35; border-color: #46515a; }
+	.gs-perk-slot .gs-perk-icon { color: #d4dce2; font-size: 24px; }
+	.gs-perk-slot .gs-perk-sub { color: #aebbc5; font-size: 12px; }
+	.gs-bottom.build-mode { min-height: 96px; background-color: rgba( 13, 17, 20, 0.98 ); justify-content: center; }
+	.gs-tuning-btn, .gs-loadout-btn { min-height: 50px; min-width: 150px; justify-content: center; }
+	.gs-tuning-btn { background-color: #303a43; color: white; }
+	.gs-loadout-btn { background-color: #ffbd24; color: #111519; }
+	.gs-loadout-btn.set { border-color: #ffbd24; color: #ffca54; }
+	.gs-tab-btn { min-height: 44px; align-items: center; }
+	.cust-item { width: 96px; height: 96px; border-color: #59656e; }
+	.gs-bg-vignette { background-image: none; }
+	.gs-tuning-backdrop
+	{
+		position: absolute;
+		inset: 0;
+		z-index: 300;
+		align-items: center;
+		justify-content: center;
+		background-color: rgba( 0, 0, 0, 0.65 );
+		pointer-events: all;
+	}
+	.gs-tuning-dialog
+	{
+		width: 760px;
+		max-width: 92%;
+		max-height: 85%;
+		overflow-y: scroll;
+		padding: 24px;
+		flex-direction: column;
+		gap: 20px;
+		background-color: #131a20;
+		border: 1px solid #65717b;
+		border-top: 3px solid #ffbd24;
+	}
+	.gs-tuning-heading { justify-content: space-between; align-items: center; color: white; font-size: 22px; letter-spacing: 1px; }
+	.gs-tuning-dialog WeaponTuningPanel
+	{
+		width: 100%;
+		max-width: 100%;
+		padding: 0;
+		background-color: transparent;
+		gap: 14px;
+		.tuning-title { display: none; }
+		.tuning-row { gap: 16px; }
+		.stat-name { width: 130px; font-size: 16px; color: #d4dce2; }
+		.bar-wrap { width: auto; min-width: 60px; flex-shrink: 1; height: 8px; }
+		.controls { width: 140px; justify-content: space-between; }
+		.controls .btn { width: 44px; height: 44px; background-color: #34404a; font-size: 24px; }
+		.controls .val { font-size: 17px; }
+		.reset-row { min-height: 44px; }
+	}
+}
+
+GunsmithPanel.compact .gs-armory-tab { left: 16px; }
+GunsmithPanel.narrow
+{
+	.gs-mode-tab { min-width: 140px; }
+	.gs-mode-tabs { justify-content: flex-end; padding-right: 16px; }
+	.gs-class-panel { top: 144px; }
+	.weapon-browser, .weapon-browser.has-many-classes { top: 326px; }
+}

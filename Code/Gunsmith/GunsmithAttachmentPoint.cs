@@ -25,6 +25,7 @@ public partial class GunsmithAttachmentPoint : Component
 	{
 		if ( CurrentGameObject.IsValid() )
 		{
+			CurrentGameObject.Components.Get<GunsmithAttachment>( FindMode.EverythingInSelf )?.Unequip();
 			CurrentGameObject.Destroy();
 		}
 
@@ -47,7 +48,21 @@ public partial class GunsmithAttachmentPoint : Component
 				StartEnabled = true,
 			} );
 
-			var attachment = CurrentGameObject.GetComponent<GunsmithAttachment>();
+			// Viewmodels render in the overlay pass. Their attachments must share it
+			// or the gun draws over the new meshes regardless of their actual depth.
+			var weaponRenderer = GetComponentInParent<SkinnedModelRenderer>( true );
+			if ( weaponRenderer.IsValid() )
+			{
+				foreach ( var renderer in CurrentGameObject.Components.GetAll<ModelRenderer>( FindMode.EverythingInSelfAndDescendants ) )
+				{
+					renderer.RenderOptions.Game = weaponRenderer.RenderOptions.Game;
+					renderer.RenderOptions.Overlay = weaponRenderer.RenderOptions.Overlay;
+					renderer.RenderType = weaponRenderer.RenderType;
+				}
+			}
+
+			// Equipment applies world-model loadouts before enabling their root.
+			var attachment = CurrentGameObject.Components.Get<GunsmithAttachment>( FindMode.EverythingInSelf );
 			if ( attachment.IsValid() )
 			{
 				attachment.Initialize( this );
@@ -60,12 +75,12 @@ public partial class GunsmithAttachmentPoint : Component
 		}
 	}
 
-	private void ApplyBodygroups()
+	internal void ApplyBodygroups()
 	{
-		if ( !CurrentPart.IsValid() || CurrentPart.Bodygroups is null )
+		if ( !CurrentPart.IsValid() || !CurrentPart.ModifyBodygroups || CurrentPart.Bodygroups is null )
 			return;
 
-		var renderer = GetComponentInParent<SkinnedModelRenderer>();
+		var renderer = GetComponentInParent<SkinnedModelRenderer>( true );
 		if ( !renderer.IsValid() )
 		{
 			Log.Warning( $"ApplyBodygroups FAILED: SkinnedModelRenderer not found on parent of {GameObject.Name}" );
@@ -73,7 +88,7 @@ public partial class GunsmithAttachmentPoint : Component
 		}
 
 		Log.Warning( $"ApplyBodygroups on {renderer.GameObject.Name}: before BodyGroups={renderer.BodyGroups}" );
-		foreach ( var kv in CurrentPart.Bodygroups )
+		foreach ( var kv in CurrentPart.GetBodygroups( renderer.Model ) )
 		{
 			if ( int.TryParse( kv.Key, out var index ) )
 			{
@@ -92,7 +107,7 @@ public partial class GunsmithAttachmentPoint : Component
 		if ( !part.IsValid() || part.Bodygroups is null )
 			return;
 
-		var renderer = GetComponentInParent<SkinnedModelRenderer>();
+		var renderer = GetComponentInParent<SkinnedModelRenderer>( true );
 		if ( !renderer.IsValid() )
 		{
 			Log.Warning( $"ResetBodygroups FAILED: SkinnedModelRenderer not found on parent of {GameObject.Name}" );
@@ -101,7 +116,7 @@ public partial class GunsmithAttachmentPoint : Component
 
 		Log.Warning( $"ResetBodygroups on {renderer.GameObject.Name}: before BodyGroups={renderer.BodyGroups}" );
 		// Reset effected bodygroups
-		foreach ( var kv in part.Bodygroups )
+		foreach ( var kv in part.GetBodygroups( renderer.Model ) )
 		{
 			if ( int.TryParse( kv.Key, out var index ) )
 			{
@@ -117,11 +132,11 @@ public partial class GunsmithAttachmentPoint : Component
 
 	private void ResetCategoryBodygroups()
 	{
-		if ( !GunsmithPart.Categories.TryGetValue( Category, out var parts ) || parts is null )
-			return;
+		var parts = ResourceLibrary.GetAll<GunsmithPart>()
+			.Where( part => part.IsValid() && part.Category == Category );
 
-		var resource = GetComponentInParent<GunsmithWeapon>()?.Resource ??
-		               GetComponentInParent<Equipment>()?.Resource;
+		var resource = GetComponentInParent<GunsmithWeapon>( true )?.Resource ??
+		               GetComponentInParent<Equipment>( true )?.Resource;
 
 		foreach ( var part in parts )
 		{

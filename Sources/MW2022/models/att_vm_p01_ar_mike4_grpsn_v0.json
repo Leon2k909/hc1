@@ -1,0 +1,72 @@
+{
+  "vertices": 3104,
+  "triangles": 4310,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_94d23494079b": "easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike4_gripsn_v0"
+  },
+  "bounds": [
+    [
+      -4.676029205322266,
+      -1.108008623123169,
+      -4.4530253410339355
+    ],
+    [
+      -0.002001192420721054,
+      1.1080063581466675,
+      0.7480041980743408
+    ]
+  ],
+  "key": "att_vm_p01_ar_mike4_grpsn_v0",
+  "name": "Support CP90 Grip",
+  "category": "RearGrip",
+  "source": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_grpsn_v0.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_p01_ar_mike4_grpsn_v0/att_vm_p01_ar_mike4_grpsn_v0.vmdl",
+  "bodygroups": [
+    {
+      "name": "stock",
+      "choices": [
+        {
+          "source": "att_vm_p01_ar_mike4_grpsn_v0_LOD0.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_pistolgrip_attach",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

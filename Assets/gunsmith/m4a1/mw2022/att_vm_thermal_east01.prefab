@@ -1,0 +1,32 @@
+{
+  "RootObject": {
+    "__guid": "7575f2cb-c32b-5f8e-bc52-8e4213f1f189",
+    "Name": "Merc Thermal Optic",
+    "Enabled": true,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "0b2e422f-702f-5f97-9789-99bfb0940e4d",
+        "Model": "attachments/mw2022/models/att_vm_thermal_east01/att_vm_thermal_east01.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithMw22Attachment",
+        "__guid": "5fda213d-45e0-5d59-9305-012af09c422d",
+        "BindPosition": "0.250000,0.000000,8.730000",
+        "PartScale": "1.000000,1.000000,1.000000",
+        "PartAngles": "0,0,0",
+        "BoneName": "weapon_root",
+        "BodygroupChoices": {
+          "lens": 1
+        },
+        "IsLauncher": false
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

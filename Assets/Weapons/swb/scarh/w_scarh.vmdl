@@ -69,7 +69,12 @@
 						]
 						hidden_in_tools = false
 					},
-				]
+
+            { _class = "BodyGroup" name = "magazine" children = [
+                { _class = "BodyGroupChoice" name = "standard_magazine" meshes = [ "magazine", ] },
+                { _class = "BodyGroupChoice" name = "" meshes = [ "", ] },
+            ] hidden_in_tools = false },
+]
 			},
 			{
 				_class = "MaterialGroupList"
@@ -190,8 +195,22 @@
 								"sleeve",
 								"hardknuckle",
 								"Circle_001_low_100",
-							]
+							 "mag", ]
 						}
+					},
+{
+						_class = "RenderMeshFile"
+						name = "magazine"
+						filename = "weapons/swb/scarh/models/scar.fbx"
+						import_translation = [ -8.5, 3.0, -29.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.4
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter =
+						{ exclude_by_default = true exception_list = [ "mag", ] }
 					},
 					{
 						_class = "RenderMeshFile"
@@ -220,7 +239,7 @@
 					{
 						_class = "RenderMeshFile"
 						name = "reflex"
-						filename = "attachments/swb/sight/reflex/w_reflex_sight.smd"
+						filename = "attachments/rear_mag/legacy/reflex.obj"
 						import_translation = [ -0.16, 0.32, -0.5 ]
 						import_rotation = [ 98.0, 139.600006, -40.0 ]
 						import_scale = 5.6
@@ -237,7 +256,7 @@
 					{
 						_class = "RenderMeshFile"
 						name = "silencer"
-						filename = "attachments/swb/muzzle/silencer_rifle/silencer_rifle.smd"
+						filename = "attachments/rear_mag/legacy/silencer.obj"
 						import_translation = [ 0.1125, -0.022, -0.89 ]
 						import_rotation = [ 98.0, 139.600006, -40.0 ]
 						import_scale = 35.0

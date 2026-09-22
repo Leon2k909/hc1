@@ -1,0 +1,158 @@
+{
+  "vertices": 9743,
+  "triangles": 11211,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_c085e2c177bd": "viper/mw/attachments/attachment_vm_hybrid_west_lens_scope",
+    "m_d88464ba9984": "viper/mw/attachments/stencil_outline",
+    "m_b47b8cb06bb4": "viper/mw/attachments/attachment_vm_hybrid_west_lens_reflex_ads",
+    "m_989bce12cdd0": "viper/mw/attachments/attachment_vm_hybrid_west_lens_reflex",
+    "m_b9183c7d8f53": "viper/mw/attachments/attachment_vm_hybrid_west_scope",
+    "m_853afc05898f": "viper/mw/attachments/ads_scope_lens_1"
+  },
+  "bounds": [
+    [
+      -1.593000054359436,
+      -0.8270009756088257,
+      -0.23600099980831146
+    ],
+    [
+      3.3389999866485596,
+      1.1119999885559082,
+      2.8289999961853027
+    ]
+  ],
+  "key": "att_vm_hybrid_west01",
+  "name": "Integral Hybrid",
+  "category": "Optic",
+  "source": "models/viper/mw/attachments/attachment_vm_hybrid_west.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_hybrid_west01/att_vm_hybrid_west01.vmdl",
+  "bodygroups": [
+    {
+      "name": "optic",
+      "choices": [
+        {
+          "source": "attachment_vm_hybrid_west.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    },
+    {
+      "name": "lens",
+      "choices": [
+        {
+          "source": "blank",
+          "mesh": ""
+        },
+        {
+          "source": "attachment_vm_hybrid_west_lens.smd",
+          "mesh": "mesh_01"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_hybrid",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_reticle_attach",
+      "head": [
+        -1.149999976158142,
+        0.0,
+        1.0750000476837158
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -1.149999976158142
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.0750000476837158
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_reticle_attach2",
+      "head": [
+        2.2890000343322754,
+        0.0,
+        2.309000015258789
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          2.2890000343322754
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          2.309000015258789
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+{
+  "vertices": 15254,
+  "triangles": 19722,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_530fca30a4de": "viper/mw/attachments/attachment_vm_thermal_east_lens",
+    "m_a9c7cddeca2e": "viper/mw/attachments/attachment_vm_kalpha_sight_canted",
+    "m_ebf9d90d4147": "viper/mw/attachments/attachment_vm_minireddot02_body",
+    "m_0c89cabc84da": "viper/mw/attachments/attachment_vm_thermal_east_body",
+    "m_853afc05898f": "viper/mw/attachments/ads_scope_lens_1",
+    "m_07524281557d": "viper/mw/attachments/attachment_vm_minireddot02_lens_ads"
+  },
+  "bounds": [
+    [
+      -1.6970000267028809,
+      -2.3550009727478027,
+      -0.3959999978542328
+    ],
+    [
+      3.858999013900757,
+      1.0719980001449585,
+      1.9549989700317383
+    ]
+  ],
+  "key": "att_vm_thermal_east01_hybrid",
+  "name": "Merc Thermal Hybrid",
+  "category": "Optic",
+  "source": "models/viper/mw/attachments/attachment_vm_thermal_hybrid.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_thermal_east01_hybrid/att_vm_thermal_east01_hybrid.vmdl",
+  "bodygroups": [
+    {
+      "name": "optic",
+      "choices": [
+        {
+          "source": "attachment_vm_thermal_hybrid.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    },
+    {
+      "name": "lens",
+      "choices": [
+        {
+          "source": "blank",
+          "mesh": ""
+        },
+        {
+          "source": "attachment_vm_thermal_hybrid_lens.smd",
+          "mesh": "mesh_01"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_hybrid",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_reticle_attach",
+      "head": [
+        -1.2330000400543213,
+        0.0,
+        0.9430000185966492
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -1.2330000400543213
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.9430000185966492
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_reticle_attach2",
+      "head": [
+        1.3389999866485596,
+        -1.7480000257492065,
+        0.45100000500679016
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          1.3389999866485596
+        ],
+        [
+          0.0,
+          0.7071289420127869,
+          -0.7070847153663635,
+          -1.748000144958496
+        ],
+        [
+          0.0,
+          0.7070847153663635,
+          0.7071288824081421,
+          0.45100000500679016
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

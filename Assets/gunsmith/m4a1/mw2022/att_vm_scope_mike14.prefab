@@ -1,0 +1,32 @@
+{
+  "RootObject": {
+    "__guid": "d6ad8587-c8a6-5748-99dc-1af0ecb3f455",
+    "Name": "Sniper Scope",
+    "Enabled": true,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "625af7d3-f677-5bbf-8b6e-18556a9d7c35",
+        "Model": "attachments/mw2022/models/att_vm_scope_mike14/att_vm_scope_mike14.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithMw22Attachment",
+        "__guid": "d8dfb765-9b6e-58fb-9143-214cb9df0f53",
+        "BindPosition": "0.250000,0.000000,8.730000",
+        "PartScale": "1.000000,1.000000,1.000000",
+        "PartAngles": "0,0,0",
+        "BoneName": "weapon_root",
+        "BodygroupChoices": {
+          "lens": 1
+        },
+        "IsLauncher": false
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

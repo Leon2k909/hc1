@@ -1,0 +1,30 @@
+{
+  "RootObject": {
+    "__guid": "f9ddc79e-6c4d-5a52-9e13-512bccbc3598",
+    "Name": "LP Collimator",
+    "Enabled": true,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "62849205-03a0-5273-92cd-7412ced3aa69",
+        "Model": "attachments/mw2022/models/att_vm_reflex_02/att_vm_reflex_02.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithMw22Attachment",
+        "__guid": "36cbcc3d-5893-59f3-8a7c-e8aa63d7a442",
+        "BindPosition": "0.250000,0.000000,8.730000",
+        "PartScale": "1.000000,1.000000,1.000000",
+        "PartAngles": "0,0,0",
+        "BoneName": "weapon_root",
+        "BodygroupChoices": {},
+        "IsLauncher": false
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

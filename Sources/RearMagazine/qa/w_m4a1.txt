@@ -1,0 +1,32 @@
+MODEL models/weapons/sbox_assault_m4a1/w_m4a1.vmdl
+BOUNDS mins -11.6434,-1.5964,0.0061, maxs 19.456,1.3881,10.3036
+MATERIALS models/weapons/sbox_assault_m4a1/w_m4a1.vmat|models/weapons/sbox_assault_m4a1/w_m4a1_bakelod.vmat
+PART M4A1: 1 choices=m4a1_lod0=1
+PART magazine: 2 choices=m4a1_magazine_lod0=2|=0
+PART gasblock: 24 choices=m4a1_gasblock_high_lod0=8|m4a1_gasblock_low_lod0=16
+PART top_rail: 32 choices=m4a1_carryhandle_lod0=32|=0
+PART handguard_covers: 256 choices==0|m4a1_handguard_covers_lod0=256
+MESH m4a1_lod0: -11.6373,-1.5964,1.6218 / 19.456,1.2186,8.726
+MESH m4a1_lod1: -11.611,-1.5847,1.6387 / 19.456,1.2186,8.726
+MESH m4a1_lod2: -11.611,-1.3508,1.6387 / 19.4388,1.2186,8.726
+MESH m4a1_lod3: -11.6434,-1.3508,1.6187 / 19.456,1.2186,8.726
+MESH m4a1_magazine_lod0: 0.7044,-0.4846,0.0061 / 4.1453,0.583,7.1611
+MESH m4a1_magazine_lod1: 0.7044,-0.4831,0.0061 / 4.1453,0.4831,7.1611
+MESH m4a1_magazine_lod2: 0.7418,-0.4509,0.0828 / 4.099,0.4509,7.1611
+MESH m4a1_magazine_lod3: 0.8823,-0.4509,0.0828 / 4.099,0.4509,6.8886
+MESH m4a1_handguard_covers_lod0: 4.5445,-1.3881,6.6907 / 10.8156,1.3881,8.1387
+MESH m4a1_handguard_covers_lod1: 4.5445,-1.3881,6.6907 / 10.8156,1.3881,8.1387
+MESH m4a1_handguard_covers_lod2: 4.5445,-1.3881,6.6907 / 10.8156,1.3881,8.1433
+MESH m4a1_handguard_covers_lod3: 4.5474,-1.3074,6.6907 / 10.8156,1.3074,8.1387
+MESH m4a1_gasblock_high_lod0: 10.8478,-0.9263,5.9984 / 13.1958,0.9263,10.0824
+MESH m4a1_gasblock_high_lod1: 10.8504,-0.9187,6.0053 / 13.1958,0.9187,10.0794
+MESH m4a1_gasblock_high_lod2: 10.863,-0.8934,6.0173 / 13.1958,0.8934,10.0794
+MESH m4a1_gasblock_high_lod3: 11.049,-0.4362,6.5494 / 13.2004,0.4259,10.0972
+MESH m4a1_gasblock_low_lod0: 11.1506,-0.458,6.8756 / 12.1623,0.458,8.1388
+MESH m4a1_gasblock_low_lod1: 11.1506,-0.4406,6.8756 / 12.1623,0.4406,8.1259
+MESH m4a1_gasblock_low_lod2: 11.1506,-0.4406,6.8756 / 12.1623,0.4406,8.1259
+MESH m4a1_gasblock_low_lod3: 11.1506,-0.4516,6.8756 / 12.1623,0.4516,8.1259
+MESH m4a1_carryhandle_lod0: -3.2439,-0.6932,8.3382 / 3.4604,0.9476,10.289
+MESH m4a1_carryhandle_lod1: -3.2439,-0.6932,8.3527 / 3.4604,0.9383,10.285
+MESH m4a1_carryhandle_lod2: -3.2439,-0.627,8.4773 / 3.4558,0.4625,10.2619
+MESH m4a1_carryhandle_lod3: -3.2439,-0.6175,8.4773 / 3.4565,0.4621,10.3036

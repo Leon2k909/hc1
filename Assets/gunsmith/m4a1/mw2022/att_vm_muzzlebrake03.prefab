@@ -1,0 +1,30 @@
+{
+  "RootObject": {
+    "__guid": "cbd26881-cb6b-5361-87aa-bb57b43986c0",
+    "Name": "Comp Muzzle Brake",
+    "Enabled": true,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "aa469c65-0c93-54f1-a809-fbb0e7dcb1fd",
+        "Model": "attachments/mw2022/models/att_vm_muzzlebrake03/att_vm_muzzlebrake03.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithMw22Attachment",
+        "__guid": "feab6189-5a7b-5b70-824e-e96d2584ff04",
+        "BindPosition": "17.620000,0.000000,7.414700",
+        "PartScale": "1.000000,1.000000,1.000000",
+        "PartAngles": "0,0,0",
+        "BoneName": "weapon_root",
+        "BodygroupChoices": {},
+        "IsLauncher": false
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

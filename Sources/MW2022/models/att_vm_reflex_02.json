@@ -1,0 +1,178 @@
+{
+  "vertices": 6040,
+  "triangles": 6897,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_ff4bb00c606f": "viper/mw/attachments/attachment_reflex_02_glass",
+    "m_4bf8037154a0": "viper/mw/attachments/attachment_vm_holo_west_lens_ads",
+    "m_a9ff5f7c630c": "viper/mw/attachments/attachment_reflex_02_principal_decal",
+    "m_500dff8192f9": "viper/mw/attachments/reticle_ui_stencil",
+    "m_6bb6ccc8b1cb": "viper/mw/attachments/attachment_reflex_02_principal"
+  },
+  "bounds": [
+    [
+      -0.460999995470047,
+      -0.8489999771118164,
+      -0.3670009970664978
+    ],
+    [
+      3.24399995803833,
+      1.2139990329742432,
+      1.8419990539550781
+    ]
+  ],
+  "key": "att_vm_reflex_02",
+  "name": "LP Collimator",
+  "category": "Optic",
+  "source": "models/viper/mw/attachments/attachment_vm_reflex_02.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_reflex_02/att_vm_reflex_02.vmdl",
+  "bodygroups": [
+    {
+      "name": "optic",
+      "choices": [
+        {
+          "source": "attachment_vm_reflex_02.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_holo",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_glass_ads2",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_glass_hip2",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_reticle_attach",
+      "head": [
+        2.2669999599456787,
+        0.0,
+        1.3170000314712524
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          2.2669999599456787
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.3170000314712524
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

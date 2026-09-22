@@ -1,0 +1,38 @@
+{
+  "RootObject": {
+    "__guid": "ec2ca230-d57f-55c7-a862-5a17da08c8ce",
+    "Flags": 0,
+    "Name": "Recon Barrel Kit",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "221178de-50c8-52bf-97b0-83b10b747f53",
+        "Model": "attachments/m4a1/heavy_barrel/heavy_barrel.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithSocketAttachment",
+        "__guid": "54132062-849a-5a01-9e0a-c0bde4ffc981",
+        "SocketName": "muzzle",
+        "SocketOffset": "0,0,0",
+        "SocketAngles": "0,0,0",
+        "ModelSocketOffsets": {
+          "models/weapons/sbox_assault_m4a1/w_m4a1.vmdl": "-2.38281,0,0.20177"
+        },
+        "ModelVariants": {
+          "models/weapons/sbox_assault_m4a1/w_m4a1.vmdl": "attachments/m4a1/heavy_barrel/heavy_barrel_world.vmdl"
+        },
+        "ModelScaleMultipliers": {
+          "models/weapons/sbox_assault_m4a1/w_m4a1.vmdl": "1,1.32,1"
+        }
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

@@ -1,0 +1,72 @@
+{
+  "vertices": 2829,
+  "triangles": 3836,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_321944fa6e13": "viper/mw/attachments/attachment_vm_angledgrip02"
+  },
+  "bounds": [
+    [
+      -4.232999801635742,
+      -0.5590000152587891,
+      -1.2290019989013672
+    ],
+    [
+      0.07100000232458115,
+      0.5589979887008667,
+      0.28600001335144043
+    ]
+  ],
+  "key": "att_vm_p01_ar_mike4_angledgrip02",
+  "name": "Tactical Foregrip",
+  "category": "Underbarrel",
+  "source": "models/viper/mw/attachments/attachment_vm_angledgrip02.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_p01_ar_mike4_angledgrip02/att_vm_p01_ar_mike4_angledgrip02.vmdl",
+  "bodygroups": [
+    {
+      "name": "grip",
+      "choices": [
+        {
+          "source": "attachment_vm_angledgrip02.dmx",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_grip_attach",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

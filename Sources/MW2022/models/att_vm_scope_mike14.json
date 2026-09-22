@@ -1,0 +1,156 @@
+{
+  "vertices": 10403,
+  "triangles": 11914,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_bf7057c6f9f5": "viper/mw/attachments/weapon_vm_sn_mike14_scope_lens",
+    "m_3e7888de9b6b": "viper/mw/attachments/weapon_vm_sn_mike14_scope_alt",
+    "m_853afc05898f": "viper/mw/attachments/ads_scope_lens_1",
+    "m_500dff8192f9": "viper/mw/attachments/reticle_ui_stencil"
+  },
+  "bounds": [
+    [
+      -3.865999937057495,
+      -1.352004051208496,
+      -0.27500298619270325
+    ],
+    [
+      5.895999908447266,
+      1.5189989805221558,
+      2.68599796295166
+    ]
+  ],
+  "key": "att_vm_scope_mike14",
+  "name": "Sniper Scope",
+  "category": "Optic",
+  "source": "models/viper/mw/attachments/weapon_vm_scope_mike14_alt.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_scope_mike14/att_vm_scope_mike14.vmdl",
+  "bodygroups": [
+    {
+      "name": "optic",
+      "choices": [
+        {
+          "source": "weapon_vm_scope_mike14_alt.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    },
+    {
+      "name": "lens",
+      "choices": [
+        {
+          "source": "blank",
+          "mesh": ""
+        },
+        {
+          "source": "weapon_vm_scope_mike14_alt_lens.smd",
+          "mesh": "mesh_01"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_scope",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_reticle_attach",
+      "head": [
+        -0.46299999952316284,
+        0.0,
+        1.3140000104904175
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -0.46299999952316284
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.3140000104904175
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_lense",
+      "head": [
+        -3.618000030517578,
+        -0.0020000000949949026,
+        1.315999984741211
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -3.618000030517578
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -0.001999974250793457
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.315999984741211
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

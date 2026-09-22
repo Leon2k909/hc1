@@ -1,0 +1,931 @@
+TBBmalloc: skip allocation functions replacement in ucrtbase.dll: unknown prologue for function _aligned_free
+[DEBUG]--[LOGGING:__init__]: Using BPY logger
+[INFO]--[Source2 Entities:__init__]: Loading keys
+[INFO]--[Source2 Entities:__init__]: Found precomputed keys
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for sky shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for refract shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for sdk_infected shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for bms_lightmapped_4wayblend shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for teeth shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for heroes_pbs shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for sdk_vertexlitgeneric shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for vertexlitgeneric shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for sdk_unlitgeneric shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for eyerefract shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for lightmapped_4wayblend shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for sdk_lightmappedgeneric shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for eyes shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for worldvertextransition shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for modulate shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for unlittwotexture shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for unlitgeneric shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for water shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for lightmappedreflective shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for lightmappedgeneric shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for infected shader
+[DEBUG]--[MaterialLoader:_collect_handlers]: Skipping DetailSupportMixin: no SHADER name declared
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for heroes_faceskin shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for heroes_hair shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for decalmodulate shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for cable shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for splinerope shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for heroes_armor shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source1ShaderBase material handler for pbr shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered GoldSrcShaderBase material handler for goldsrc_shader shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for environment_layer.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for csgo_glass.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for csgo_lightmappedgeneric.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for csgo_foliage.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for csgo_effects.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for csgo_black_unlit.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for hero.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for vr_standard.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for csgo_static_overlay.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for eyeball.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for csgo_complex.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for vr_glass.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for vr_complex.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for steampal_2way_blend_mask.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for vr_bloody_simple.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for blend.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for static_overlay.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for sky.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for complex.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for vr_simple_2way_blend.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for csgo_vertexlitgeneric.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for vr_skin.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for simple.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for vr_simple.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for citadel_overlay.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for csgo_environment.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for generic.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for csgo_environment_blend.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for environment_blend.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for vr_eyeball.vfx shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for DUMMY shader
+[INFO]--[MaterialLoader:_collect_handlers]: Registered Source2ShaderBase material handler for pbr.vfx shader
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_bipod_grip.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_bipod_grip.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_bipod_grip.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_p01_ar_mike4_bipodgrip.blend"
+CONVERTED att_vm_p01_ar_mike4_bipodgrip: 6562 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_angledgrip_lod0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_angledgrip.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_angledgrip.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_p01_ar_mike4_angledgrip01.blend"
+CONVERTED att_vm_p01_ar_mike4_angledgrip01: 3960 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_angledgrip02.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_angledgrip02.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_angledgrip02.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_p01_ar_mike4_angledgrip02.blend"
+CONVERTED att_vm_p01_ar_mike4_angledgrip02: 3836 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_vertgrip_stubby01.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_vertgrip_stubby01_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_vertgrip_stubby01_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_p01_ar_mike4_stubbygrip01.blend"
+CONVERTED att_vm_p01_ar_mike4_stubbygrip01: 3982 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_vertgrip_stubby04.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_vertgrip_stubby04.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_vertgrip_stubby04.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_p01_ar_mike4_stubbygrip02.blend"
+CONVERTED att_vm_p01_ar_mike4_stubbygrip02: 2666 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_vertgrip02_lod0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_vertgrip02.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_vertgrip02.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_p01_ar_mike4_vertgrip01.blend"
+CONVERTED att_vm_p01_ar_mike4_vertgrip01: 3114 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_vertgrip03.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_vertgrip03.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_vertgrip03.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_p01_ar_mike4_vertgrip02.blend"
+CONVERTED att_vm_p01_ar_mike4_vertgrip02: 3138 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_vertgrip_stubby02.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_vertgrip_stubby02_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_vertgrip_stubby02_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_p01_ar_mike4_vertgrip03.blend"
+CONVERTED att_vm_p01_ar_mike4_vertgrip03: 4152 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barrel_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_barrel_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_brake_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_sights_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike4_barrel_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike4_brake_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike4_sights_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+Info: Saved as "att_vm_p01_ar_mike4_barrel_base.blend"
+CONVERTED att_vm_p01_ar_mike4_barrel_base: 21195 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barhvy_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_barhvyshort_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_brake_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike4_barhvyshort_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+Info: Saved as "att_vm_p01_ar_mike4_barhvy_v0.blend"
+CONVERTED att_vm_p01_ar_mike4_barhvy_v0: 14226 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barhvyshort_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_barhvyshort_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_brake_v0.vmt file
+Info: Saved as "att_vm_p01_ar_mike4_barhvyshort_v0.blend"
+CONVERTED att_vm_p01_ar_mike4_barhvyshort_v0: 13794 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barlight_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_barlgt_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_brake_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_sights_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike4_barlgt_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+Info: Saved as "att_vm_p01_ar_mike4_barlight_v0.blend"
+CONVERTED att_vm_p01_ar_mike4_barlight_v0: 24180 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barlong_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_barlong_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_brake_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_sights_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike4_barlong_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+Info: Saved as "att_vm_p01_ar_mike4_barlong_v0.blend"
+CONVERTED att_vm_p01_ar_mike4_barlong_v0: 26452 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barmidhvy_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/material_473e18ec61581226.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/material_61a3b965b58ea910.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/material_20d12eec166b8b3.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/material_3edf2c101f636978.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_brake_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_barrel_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_sights_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/material_473e18ec61581226.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/material_61a3b965b58ea910.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/material_20d12eec166b8b3.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/material_3edf2c101f636978.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+Info: Saved as "att_vm_p01_ar_mike4_barmidhvy_v0.blend"
+CONVERTED att_vm_p01_ar_mike4_barmidhvy_v0: 26484 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_barshort_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_barshort_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_brake_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_sights_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike4_barshort_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+Info: Saved as "att_vm_p01_ar_mike4_barshort_v0.blend"
+CONVERTED att_vm_p01_ar_mike4_barshort_v0: 19813 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/iw9_mike16/att_vm_p01_ar_mike16_barrel_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/material_bd497eb66e09b3c.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/material_5762d4f7f3cdfeeb.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/material_60a5ce7dadf25032.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_brake_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike16_rail_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/material_bd497eb66e09b3c.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/material_5762d4f7f3cdfeeb.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/material_60a5ce7dadf25032.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike16_rail_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike16/material_bd497eb66e09b3c.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike16/material_5762d4f7f3cdfeeb.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike16/material_60a5ce7dadf25032.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike16/wpn_p01_ar_mike16_rail_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+Info: Saved as "att_vm_p01_ar_mike16_barrel_v0.blend"
+CONVERTED att_vm_p01_ar_mike16_barrel_v0: 43785 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_stock_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_stock_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike4_stock_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+Info: Saved as "att_vm_p01_ar_mike4_stock_base.blend"
+CONVERTED att_vm_p01_ar_mike4_stock_base: 6543 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_stockl_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/material_406ce30fc417100b.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/material_406ce30fc417100b.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+Info: Saved as "att_vm_p01_ar_mike4_stockl_v0.blend"
+CONVERTED att_vm_p01_ar_mike4_stockl_v0: 4174 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_stockno_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/material_550a4e38fde938dc.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/material_550a4e38fde938dc.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+Info: Saved as "att_vm_p01_ar_mike4_stockno_v0.blend"
+CONVERTED att_vm_p01_ar_mike4_stockno_v0: 2586 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_stocktac_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_stocktac_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike4_stocktac_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+Info: Saved as "att_vm_p01_ar_mike4_stocktac_v0.blend"
+CONVERTED att_vm_p01_ar_mike4_stocktac_v0: 8827 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/iw9_msecho/att_vm_p01_dm_msecho_stock_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/material_1df221610b879d49.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/material_1df221610b879d49.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+Info: Saved as "att_vm_p01_dm_msecho_stock_v0.blend"
+CONVERTED att_vm_p01_dm_msecho_stock_v0: 7261 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/iw9_stango25/att_vm_p01_dm_stango25_stock_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/material_31afe0ee62f03334.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/material_31afe0ee62f03334.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+Info: Saved as "att_vm_p01_dm_stango25_stock_v0.blend"
+CONVERTED att_vm_p01_dm_stango25_stock_v0: 8984 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/iw9_alpha57/att_vm_p01_sm_alpha57_stock_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/material_441002902b629294.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/material_441002902b629294.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+Info: Saved as "att_vm_p01_sm_alpha57_stock_v0.blend"
+CONVERTED att_vm_p01_sm_alpha57_stock_v0: 8500 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/iw9_alpha57/att_vm_p01_sm_alpha57_stockwire_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_sm_alpha57_stockwire_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/wpn_p01_sm_alpha57_stockwire_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+Info: Saved as "att_vm_p01_sm_alpha57_stockwire_v0.blend"
+CONVERTED att_vm_p01_sm_alpha57_stockwire_v0: 4737 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/iw9_mike16/att_vm_p01_ar_mike16_stock_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/material_1ae0691f40c31b94.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike16/material_1ae0691f40c31b94.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+Info: Saved as "att_vm_p01_ar_mike16_stock_v0.blend"
+CONVERTED att_vm_p01_ar_mike16_stock_v0: 3165 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_mag_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_mag_556n_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_mag_556n_trans_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/att_ammo_556n.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike4_mag_556n_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike4_mag_556n_trans_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/att_ammo_556n.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+Info: Saved as "att_vm_p01_ar_mike4_mag_v0.blend"
+CONVERTED att_vm_p01_ar_mike4_mag_v0: 31622 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_xmag_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_xmag_556n_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/att_ammo_556n.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike4_xmag_556n_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+Info: Saved as "att_vm_p01_ar_mike4_xmag_v0.blend"
+CONVERTED att_vm_p01_ar_mike4_xmag_v0: 14344 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_xmaglrg_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_xmaglrg_556n_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/att_ammo_556n.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike4_xmaglrg_556n_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+Info: Saved as "att_vm_p01_ar_mike4_xmaglrg_v0.blend"
+CONVERTED att_vm_p01_ar_mike4_xmaglrg_v0: 11848 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/iw9_mike16/att_vm_p01_ar_mike16_smag_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike16_smag_556n_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/att_ammo_556n.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike16_smag_556n_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+Info: Saved as "att_vm_p01_ar_mike16_smag_v0.blend"
+CONVERTED att_vm_p01_ar_mike16_smag_v0: 6852 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_pistolgrip_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_pstlgrip_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike4_pstlgrip_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+Info: Saved as "att_vm_p01_ar_mike4_pistolgrip_v0.blend"
+CONVERTED att_vm_p01_ar_mike4_pistolgrip_v0: 1442 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_grpass_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_gripass_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike4_gripass_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+Info: Saved as "att_vm_p01_ar_mike4_grpass_v0.blend"
+CONVERTED att_vm_p01_ar_mike4_grpass_v0: 1710 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_grpskel_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_gripskel_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike4_gripskel_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+Info: Saved as "att_vm_p01_ar_mike4_grpskel_v0.blend"
+CONVERTED att_vm_p01_ar_mike4_grpskel_v0: 4884 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_grpsn_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_gripsn_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike4_gripsn_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+Info: Saved as "att_vm_p01_ar_mike4_grpsn_v0.blend"
+CONVERTED att_vm_p01_ar_mike4_grpsn_v0: 4310 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_grpstdy_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_gripstdy_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike4_gripstdy_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+Info: Saved as "att_vm_p01_ar_mike4_grpstdy_v0.blend"
+CONVERTED att_vm_p01_ar_mike4_grpstdy_v0: 3106 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_grptac_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/wpn_p01_ar_mike4_griptac_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike4_griptac_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+Info: Saved as "att_vm_p01_ar_mike4_grptac_v0.blend"
+CONVERTED att_vm_p01_ar_mike4_grptac_v0: 1085 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_muzzlemelee01.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_muzzlemelee01.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_muzzlemelee01.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_breacher01.blend"
+CONVERTED att_vm_breacher01: 1766 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_muzzlemelee02.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_muzzlemelee02.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_muzzlemelee02.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_breacher02.blend"
+CONVERTED att_vm_breacher02: 1776 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_compensator01.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_compensator01_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_compensator01_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_compensator01.blend"
+CONVERTED att_vm_compensator01: 3330 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_compensator02.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_compensator02_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_compensator02_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_compensator02.blend"
+CONVERTED att_vm_compensator02: 2690 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_flashhider01.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_flashhider01.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_flashhider01.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_flashhider01.blend"
+CONVERTED att_vm_flashhider01: 680 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_flashhider02.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_flashhider02.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_flashhider02.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_flashhider02.blend"
+CONVERTED att_vm_flashhider02: 4756 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_flashhider03.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_flashhider03.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_flashhider03.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_flashhider03.blend"
+CONVERTED att_vm_flashhider03: 1026 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_flashhider05.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_flashhider05.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_flashhider05.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_flashhider04.blend"
+CONVERTED att_vm_flashhider04: 1596 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_muzzlebrake01.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_muzzlebrake01_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_muzzlebrake01_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_muzzlebrake01.blend"
+CONVERTED att_vm_muzzlebrake01: 940 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_muzzlebrake02.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_muzzlebrake02_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_muzzlebrake02_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_muzzlebrake02.blend"
+CONVERTED att_vm_muzzlebrake02: 2440 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_muzzlebrake03.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_muzzlebrake03_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_muzzlebrake03_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_muzzlebrake03.blend"
+CONVERTED att_vm_muzzlebrake03: 2944 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_silencer_east01.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_silencer_east01.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_silencer_east01.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_silencer01.blend"
+CONVERTED att_vm_silencer01: 4298 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_silencer02.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_silencer02_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_silencer02_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_silencer02.blend"
+CONVERTED att_vm_silencer02: 4432 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_silencer03.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_silencer03_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_silencer03_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_silencer03.blend"
+CONVERTED att_vm_silencer03: 4639 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_silencer04.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_silencer04.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_silencer04.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_silencer04.blend"
+CONVERTED att_vm_silencer04: 6980 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_silencer_east02.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_silencer_east02.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_silencer_east02.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_silencer05.blend"
+CONVERTED att_vm_silencer05: 3596 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_silencer_east03.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_silencer_east03.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_silencer_east03.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_silencer06.blend"
+CONVERTED att_vm_silencer06: 2994 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_lm_slima_acog_optic.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/weapon_vm_lm_slima_sightoptic.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/weapon_vm_lm_slima_sightoptic_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/weapon_vm_lm_slima_sightoptic.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/weapon_vm_lm_slima_sightoptic_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_2x_west02_holo.blend"
+CONVERTED att_vm_2x_west02_holo: 5634 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_lm_slima_acog.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/weapon_vm_lm_slima_sightmagnifier.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/weapon_vm_lm_slima_sightoptic.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/weapon_vm_lm_slima_sightmagnifier_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/weapon_vm_lm_slima_sightoptic_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/ads_scope_lens_1.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/weapon_vm_lm_slima_sightmagnifier.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/weapon_vm_lm_slima_sightmagnifier_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/ads_scope_lens_1.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_2x_west02.blend"
+CONVERTED att_vm_2x_west02: 10429 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_reflex_02.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_reflex_02_principal.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/reticle_ui_stencil.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_reflex_02_principal_decal.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_holo_west_lens_ads.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_reflex_02_glass.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_reflex_02_principal.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/reticle_ui_stencil.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_reflex_02_principal_decal.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_holo_west_lens_ads.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_reflex_02_glass.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_reflex_02.blend"
+CONVERTED att_vm_reflex_02: 6897 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_minireddot_tall.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_minireddot_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_riser03.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_minireddot_railmount.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_minireddot_decals.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_minireddot_lens_ads.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_minireddot_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_minireddot_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_riser03.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_minireddot_railmount.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_minireddot_decals.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_minireddot_lens_ads.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_minireddot_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_minireddot01_tall.blend"
+CONVERTED att_vm_minireddot01_tall: 8162 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_minireddot02_tall.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_minireddot02_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_riser03.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_minireddot_railmount.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/stencil_outline.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_minireddot02_lens_ads.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_minireddot02_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_minireddot02_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/stencil_outline.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_minireddot02_lens_ads.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_minireddot02_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_minireddot02_tall.blend"
+CONVERTED att_vm_minireddot02_tall: 9076 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_minireddot03_tall.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_minireddot_railmount.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_riser03.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_minireddot03_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_reflex_west01_lens_ads.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_minireddot03_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_minireddot03_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_reflex_west01_lens_ads.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_minireddot03_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_minireddot03_tall.blend"
+CONVERTED att_vm_minireddot03_tall: 8107 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_holo_west_lod0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_holo_west.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_holo_west_lens_ads.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/stencil_outline.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_holo_west_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_holo_west.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_holo_west_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_holo_west01.blend"
+CONVERTED att_vm_holo_west01: 8573 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_holo_west02.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_holo_west02.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_holo_west02_lens_ads.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/stencil_outline.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_holo_west02_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_holo_west02.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_holo_west02_lens_ads.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_holo_west02_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_holo_west02.blend"
+CONVERTED att_vm_holo_west02: 7528 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_holo_east.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_holo_east_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_holo_east_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/reticle_ui_stencil.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/vm_depth_mask_start.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/vm_depth_mask_end.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/ads_scope_lens_1.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_holo_east_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_holo_east_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/reticle_ui_stencil.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/vm_depth_mask_start.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/vm_depth_mask_end.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/ads_scope_lens_1.vmt file
+Info: Saved as "att_vm_holo_east01.blend"
+CONVERTED att_vm_holo_east01: 7890 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_reflex_east_lod0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_reflex_east_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_reflex_east_lens_ads.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_reflex_east_decals.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_reflex_east_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_reflex_east_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_reflex_east_lens_ads.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_reflex_east_decals.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_reflex_east_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_reflex_east01.blend"
+CONVERTED att_vm_reflex_east01: 6564 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_reflex_east02_tall.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_reflex_east02_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_riser03.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_reflex_east02_lens_ads_edge.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_reflex_east02_lens_edge_in.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_reflex_east02_lens_edge.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_reflex_east02_lens_ads.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_reflex_east02_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_reflex_east02_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_riser03.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_reflex_east02_lens_ads_edge.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_reflex_east02_lens_edge_in.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_reflex_east02_lens_edge.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_reflex_east02_lens_ads.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_reflex_east02_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_reflex_east02_tall.blend"
+CONVERTED att_vm_reflex_east02_tall: 11202 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_reflex_west04.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_reflex_west02_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_riser02.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/reticle_ui_stencil_no_weap_cull.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/ads_scope_lens_low_eye_relief.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_reflex_west02_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_reflex_west02_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_riser02.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/reticle_ui_stencil_no_weap_cull.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/ads_scope_lens_low_eye_relief.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_reflex_west02_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_reflex_west02_tall.blend"
+CONVERTED att_vm_reflex_west02_tall: 7036 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_reflex_west03.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_riser01.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_reflex_west01_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_reflex_west01_glass.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/stencil_outline.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_reflex_west01_lens_ads.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_reflex_west01_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_riser01.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_reflex_west01_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_reflex_west01_glass.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/stencil_outline.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_reflex_west01_lens_ads.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_reflex_west01_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_reflex_west03.blend"
+CONVERTED att_vm_reflex_west03: 7251 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_thermal_east.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_thermal_east_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_thermal_east_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/ads_scope_lens_1.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_thermal_east_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_thermal_east_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/ads_scope_lens_1.vmt file
+Info: Saved as "att_vm_thermal_east01.blend"
+CONVERTED att_vm_thermal_east01: 14832 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_thermal_west_01.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_thermal_west01_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_thermal_west01_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/ads_scope_lens_1.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_thermal_west01_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_thermal_west01_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_thermal_west01.blend"
+CONVERTED att_vm_thermal_west01: 14069 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_thermal_hybrid.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_thermal_east_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_minireddot02_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_kalpha_sight_canted.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_thermal_east_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_minireddot02_lens_ads.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/ads_scope_lens_1.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_minireddot02_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_kalpha_sight_canted.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_minireddot02_lens_ads.vmt file
+Info: Saved as "att_vm_thermal_east01_hybrid.blend"
+CONVERTED att_vm_thermal_east01_hybrid: 19722 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_hybrid_west.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_hybrid_west_scope.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_hybrid_west_lens_reflex.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_hybrid_west_lens_reflex_ads.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/stencil_outline.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_hybrid_west_lens_scope.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/ads_scope_lens_1.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_hybrid_west_scope.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_hybrid_west_lens_reflex.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_hybrid_west_lens_reflex_ads.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_hybrid_west_lens_scope.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_hybrid_west01.blend"
+CONVERTED att_vm_hybrid_west01: 11211 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_hybrid_west02.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_hybrid_west02_magnifier.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_holo_west.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_hybrid_west02_magnifier_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_holo_west_lens_ads_hybrid.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_holo_west_lens_hybrid.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/ads_scope_lens_1.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_hybrid_west02_magnifier.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_holo_west.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_hybrid_west02_magnifier_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_holo_west_lens_ads_hybrid.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_holo_west_lens_hybrid.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_hybrid_west02.blend"
+CONVERTED att_vm_hybrid_west02: 16685 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_reflex_west05.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/weapon_vm_ar_tango21_reddot.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/weapon_vm_ar_tango21_reddot_lens_ads.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/weapon_vm_ar_tango21_reddot_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/weapon_vm_ar_tango21_reddot.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/weapon_vm_ar_tango21_reddot_lens_ads.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/weapon_vm_ar_tango21_reddot_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_reflex_west04.blend"
+CONVERTED att_vm_reflex_west04: 5224 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_ar_tango21_hybrid.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/weapon_vm_ar_tango21_magnifier.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/weapon_vm_ar_tango21_reddot.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/weapon_vm_ar_tango21_reddot_lens_ads.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/weapon_vm_ar_tango21_reddot_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/reticle_ui_stencil.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/ads_scope_lens_1.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/weapon_vm_ar_tango21_magnifier.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/reticle_ui_stencil.vmt file
+Info: Saved as "att_vm_2x_west01.blend"
+CONVERTED att_vm_2x_west01: 10106 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_hybrid_west03.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_4x_west02_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_minireddot02_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_kalpha_sight_canted.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_minireddot02_lens_ads.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/stencil_outline.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_4x_west02_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_minireddot02_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/ads_scope_lens_1.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_4x_west02_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_minireddot02_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_kalpha_sight_canted.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_minireddot02_lens_ads.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/stencil_outline.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_4x_west02_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_minireddot02_lens.vmt file
+Info: Saved as "att_vm_hybrid_west03.blend"
+CONVERTED att_vm_hybrid_west03: 16529 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_4x_east_tall.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_4x_east_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_riser03.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_4x_east_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/ads_scope_lens_1.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_4x_east_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_riser03.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_4x_east_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_4x_east01_tall.blend"
+CONVERTED att_vm_4x_east01_tall: 12869 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_4x_west_tall.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_4x_west_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_riser03.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_4x_west_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_4x_west_decals.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/reticle_ui_stencil.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/ads_scope_lens_1.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_4x_west_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_4x_west_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_4x_west_decals.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_4x_west01_tall.blend"
+CONVERTED att_vm_4x_west01_tall: 13266 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_4x_west02_tall.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_4x_west02_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_riser03.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_4x_west02_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/reticle_ui_stencil.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/ads_scope_lens_1.vmt file
+Info: Saved as "att_vm_4x_west02_tall.blend"
+CONVERTED att_vm_4x_west02_tall: 13514 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/weapon_vm_scope_mike14_alt.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/weapon_vm_sn_mike14_scope_alt.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/weapon_vm_sn_mike14_scope_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/reticle_ui_stencil.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/ads_scope_lens_1.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/weapon_vm_sn_mike14_scope_alt.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/weapon_vm_sn_mike14_scope_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_scope_mike14.blend"
+CONVERTED att_vm_scope_mike14: 11914 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_scope_vz.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_scope_vz_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_scope_vz_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/reticle_ui_stencil.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/vm_depth_mask_end.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/vm_depth_mask_start.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/ads_scope_lens_1.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_scope_vz_body.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_scope_vz_lens.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/vm_depth_mask_end.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/vm_depth_mask_start.vmt file
+Info: Saved as "att_vm_scope_vz.blend"
+CONVERTED att_vm_scope_vz: 12163 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_laser01.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_laser01.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_laser01_glass.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_laser01.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_laser01_glass.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_p01_ar_mike4_laser01.blend"
+CONVERTED att_vm_p01_ar_mike4_laser01: 7988 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_laser02.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_laser02.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_laser02_glass.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_laser02.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_laser02_glass.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_p01_ar_mike4_laser02.blend"
+CONVERTED att_vm_p01_ar_mike4_laser02: 9006 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2459720887/models/viper/mw/attachments/attachment_vm_laser03.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:49
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_laser03.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/attachment_vm_laser03_glass.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_laser03.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/viper/MW/attachments/attachment_vm_laser03_glass.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2459720887")!
+Info: Saved as "att_vm_p01_ar_mike4_laser03.blend"
+CONVERTED att_vm_p01_ar_mike4_laser03: 9060 triangles
+[INFO]--[MDL loader:import_model]: Trying to load model: D:/tmp/hc1-mw22-tools/extracted/2962304029/models/easy/mw/attachments/ubgl/att_vm_ub_gl01_v0.mdl
+[INFO]--[MDL loader:import_model]: Detected magic: b'IDST', version:48
+[DEBUG]--[ContentManager:find_file]: Requesting materials/att_ub_gl01_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/att_ammo_grenade_40m.vmt file
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/att_ub_gl01_v0.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+[DEBUG]--[ContentManager:find_file]: Requesting materials/easy/mw/weapons/iw9_mike4/att_ammo_grenade_40m.vmt file
+[DEBUG]--[ContentManager:find_file]: Found in LooseFilesContentProvider("D:/tmp/hc1-mw22-tools/extracted/2962304029")!
+Info: Saved as "att_vm_p01_ar_mike4_ubgl.blend"
+CONVERTED att_vm_p01_ar_mike4_ubgl: 13248 triangles
+CONVERSION_SUMMARY 82 models; 0 failures
+Blender 5.1.1 (hash b70da489d7f4 built 2026-04-14 01:37:22)
+
+Blender quit

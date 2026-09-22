@@ -1,0 +1,31 @@
+{
+  "RootObject": {
+    "__guid": "be3f3ec0-a3ce-57e1-90c1-a71f3e528e1f",
+    "Name": "40 Round Extended",
+    "Flags": 0,
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "6d4dd0df-dd78-55d3-bcde-936427d3dbfe",
+        "Model": "attachments/rear_mag/scarh_extended_mag/scarh_extended_mag.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithBoneAttachment",
+        "__guid": "8f37180f-83c8-5d95-9b9b-81f08aadcccb",
+        "BoneName": "Mag",
+        "HiddenBodygroup": "magazine",
+        "ModelVariants": {
+          "weapons/swb/scarh/w_scarh.vmdl": "attachments/rear_mag/scarh_extended_mag_world/scarh_extended_mag_world.vmdl"
+        }
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

@@ -1,0 +1,32 @@
+{
+  "RootObject": {
+    "__guid": "6b3dc1d3-61fb-5650-81b0-ec42e67be46b",
+    "Name": "3.0x Flip Hybrid",
+    "Enabled": true,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "f02db21a-0b64-5c5f-94f5-2942177f20a1",
+        "Model": "attachments/mw2022/models/att_vm_hybrid_west02/att_vm_hybrid_west02.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithMw22Attachment",
+        "__guid": "6b6dee68-1e55-5f1a-8947-abb750e29b96",
+        "BindPosition": "0.250000,0.000000,8.730000",
+        "PartScale": "1.000000,1.000000,1.000000",
+        "PartAngles": "0,0,0",
+        "BoneName": "weapon_root",
+        "BodygroupChoices": {
+          "lens": 1
+        },
+        "IsLauncher": false
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

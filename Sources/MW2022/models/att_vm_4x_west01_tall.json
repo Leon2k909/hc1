@@ -1,0 +1,158 @@
+{
+  "vertices": 12266,
+  "triangles": 13266,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_a189a891671b": "viper/mw/attachments/attachment_vm_4x_west_decals",
+    "m_8d84f77ded3a": "viper/mw/attachments/attachment_vm_4x_west_lens",
+    "m_ad5bdfa0d50c": "viper/mw/attachments/attachment_vm_riser03",
+    "m_0ca900c1fbd5": "viper/mw/attachments/attachment_vm_4x_west_body",
+    "m_853afc05898f": "viper/mw/attachments/ads_scope_lens_1",
+    "m_500dff8192f9": "viper/mw/attachments/reticle_ui_stencil"
+  },
+  "bounds": [
+    [
+      -1.0880000591278076,
+      -0.9180009961128235,
+      -0.22400100529193878
+    ],
+    [
+      3.6549980640411377,
+      1.1719989776611328,
+      2.341999053955078
+    ]
+  ],
+  "key": "att_vm_4x_west01_tall",
+  "name": "Scout Combat Optic",
+  "category": "Optic",
+  "source": "models/viper/mw/attachments/attachment_vm_4x_west_tall.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_4x_west01_tall/att_vm_4x_west01_tall.vmdl",
+  "bodygroups": [
+    {
+      "name": "optic",
+      "choices": [
+        {
+          "source": "attachment_vm_4x_west_tall.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    },
+    {
+      "name": "lens",
+      "choices": [
+        {
+          "source": "blank",
+          "mesh": ""
+        },
+        {
+          "source": "attachment_vm_4x_west_tall_lens.smd",
+          "mesh": "mesh_01"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_acog_2",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_reticle_attach",
+      "head": [
+        -1.0880000591278076,
+        0.0,
+        1.5429999828338623
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -1.0880000591278076
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.5429999828338623
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_lense",
+      "head": [
+        -0.9089999794960022,
+        -0.00800000037997961,
+        1.5410000085830688
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -0.9089999794960022
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -0.008000016212463379
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.5410000085830688
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

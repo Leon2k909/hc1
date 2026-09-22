@@ -1,0 +1,106 @@
+{
+  "vertices": 2302,
+  "triangles": 2994,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_74772da9c15f": "viper/mw/attachments/attachment_vm_silencer_east03"
+  },
+  "bounds": [
+    [
+      -0.0020000000949949026,
+      -1.1090010404586792,
+      -1.1040010452270508
+    ],
+    [
+      6.99399995803833,
+      1.103996992111206,
+      1.1089979410171509
+    ]
+  ],
+  "key": "att_vm_silencer06",
+  "name": "Lightweight Suppressor",
+  "category": "Muzzle",
+  "source": "models/viper/mw/attachments/attachment_vm_silencer_east03.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_silencer06/att_vm_silencer06.vmdl",
+  "bodygroups": [
+    {
+      "name": "grip",
+      "choices": [
+        {
+          "source": "attachment_vm_silencer_east03.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_silencer",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_flash_attachment_silenced",
+      "head": [
+        6.954999923706055,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          6.954999923706055
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

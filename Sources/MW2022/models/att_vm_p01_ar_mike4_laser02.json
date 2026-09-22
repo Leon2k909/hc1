@@ -1,0 +1,107 @@
+{
+  "vertices": 7940,
+  "triangles": 9006,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_78f163dd0828": "viper/mw/attachments/attachment_vm_laser02_glass",
+    "m_e13eff97b2d5": "viper/mw/attachments/attachment_vm_laser02"
+  },
+  "bounds": [
+    [
+      -0.2460000067949295,
+      -1.0219999551773071,
+      -0.3269999921321869
+    ],
+    [
+      3.115000009536743,
+      1.2149989604949951,
+      0.5379999876022339
+    ]
+  ],
+  "key": "att_vm_p01_ar_mike4_laser02",
+  "name": "5mW Laser",
+  "category": "Laser",
+  "source": "models/viper/mw/attachments/attachment_vm_laser02.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_p01_ar_mike4_laser02/att_vm_p01_ar_mike4_laser02.vmdl",
+  "bodygroups": [
+    {
+      "name": "grip",
+      "choices": [
+        {
+          "source": "attachment_vm_laser02.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_laser_attach",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_laser",
+      "head": [
+        2.9619998931884766,
+        -0.6539999842643738,
+        -0.09300000220537186
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          2.9619998931884766
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -0.6540000438690186
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          -0.09300000220537186
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

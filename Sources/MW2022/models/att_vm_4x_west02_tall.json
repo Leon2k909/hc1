@@ -1,0 +1,157 @@
+{
+  "vertices": 11381,
+  "triangles": 13514,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_471c28980621": "viper/mw/attachments/attachment_vm_4x_west02_lens",
+    "m_ad5bdfa0d50c": "viper/mw/attachments/attachment_vm_riser03",
+    "m_0d596d17b198": "viper/mw/attachments/attachment_vm_4x_west02_body",
+    "m_853afc05898f": "viper/mw/attachments/ads_scope_lens_1",
+    "m_500dff8192f9": "viper/mw/attachments/reticle_ui_stencil"
+  },
+  "bounds": [
+    [
+      -1.4249999523162842,
+      -1.053001046180725,
+      -0.22200000286102295
+    ],
+    [
+      3.178999900817871,
+      1.0209989547729492,
+      2.400999069213867
+    ]
+  ],
+  "key": "att_vm_4x_west02_tall",
+  "name": "Cronen C480 Pro Optic",
+  "category": "Optic",
+  "source": "models/viper/mw/attachments/attachment_vm_4x_west02_tall.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_4x_west02_tall/att_vm_4x_west02_tall.vmdl",
+  "bodygroups": [
+    {
+      "name": "optic",
+      "choices": [
+        {
+          "source": "attachment_vm_4x_west02_tall.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    },
+    {
+      "name": "lens",
+      "choices": [
+        {
+          "source": "blank",
+          "mesh": ""
+        },
+        {
+          "source": "attachment_vm_4x_west02_tall_lens.smd",
+          "mesh": "mesh_01"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_acog_2",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_reticle_attach",
+      "head": [
+        -1.309999942779541,
+        -0.004000000189989805,
+        1.4450000524520874
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -1.309999942779541
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -0.003999948501586914
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.4450000524520874
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_lense",
+      "head": [
+        -1.309999942779541,
+        -0.004000000189989805,
+        1.4450000524520874
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -1.309999942779541
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -0.003999948501586914
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.4450000524520874
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

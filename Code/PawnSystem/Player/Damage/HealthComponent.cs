@@ -89,7 +89,7 @@ public partial class HealthComponent : Component, IRespawnable//, Component.IDam
 
 		BroadcastDamage( damageInfo );
 
-		if ( IsGodMode ) return;
+		if ( IsGodMode || DevCommands.NoDamage ) return;
 
 		if ( isHcBot && State == LifeState.Alive )
 		{

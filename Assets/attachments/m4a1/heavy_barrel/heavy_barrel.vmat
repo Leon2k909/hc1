@@ -1,0 +1,13 @@
+"Layer0"
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR "1"
+ F_METALNESS_TEXTURE "1"
+ g_flRoughnessScaleFactor "1"
+ g_vColorTint "[1 1 1 1]"
+ TextureColor "attachments/m4a1/heavy_barrel/heavy_barrel_color_authored.png"
+ TextureNormal "attachments/m4a1/heavy_barrel/heavy_barrel_normal.png"
+ TextureRoughness "attachments/m4a1/heavy_barrel/heavy_barrel_roughness.png"
+ TextureMetalness "attachments/m4a1/heavy_barrel/heavy_barrel_metalness.png"
+ TextureAmbientOcclusion "attachments/m4a1/heavy_barrel/heavy_barrel_ao.png"
+}

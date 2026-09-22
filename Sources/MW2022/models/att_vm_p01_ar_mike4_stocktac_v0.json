@@ -1,0 +1,72 @@
+{
+  "vertices": 7575,
+  "triangles": 8827,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_cbeaccce9773": "easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike4_stocktac_v0"
+  },
+  "bounds": [
+    [
+      -8.305047035217285,
+      -0.8510064482688904,
+      -3.7380223274230957
+    ],
+    [
+      0.9990051984786987,
+      0.8510024547576904,
+      0.6980007886886597
+    ]
+  ],
+  "key": "att_vm_p01_ar_mike4_stocktac_v0",
+  "name": "Ravage-8",
+  "category": "Stock",
+  "source": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_stocktac_v0.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_p01_ar_mike4_stocktac_v0/att_vm_p01_ar_mike4_stocktac_v0.vmdl",
+  "bodygroups": [
+    {
+      "name": "stock",
+      "choices": [
+        {
+          "source": "att_vm_p01_ar_mike4_stocktac_v0_LOD0.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_stock_attach",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

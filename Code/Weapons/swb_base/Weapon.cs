@@ -103,6 +103,7 @@ public partial class Weapon : Component, IInventoryItem
 		IsAiming = false;
 		IsCustomizing = false;
 		IsInspecting = false;
+		inspectAnimation.Reset();
 		SetScopeLensCenter( DefaultScopeLensCenter );
 	}
 
@@ -241,6 +242,7 @@ public partial class Weapon : Component, IInventoryItem
 
 		UpdateModels();
 		Owner.HoldType = HoldType;
+		UpdateInspectAnimation();
 
 		if ( !IsProxy && !Owner.IsBot && !IsDeploying )
 		{
@@ -255,18 +257,6 @@ public partial class Weapon : Component, IInventoryItem
 					CloseCustomizationMenu();
 
 				IsCustomizing = !IsCustomizing;
-			}
-
-			// Inspecting
-			if ( Input.Pressed( "SpectatorMode" ) && !IsScoping && !IsAiming && !IsReloading && !IsRunning && !IsCustomizing )
-			{
-				IsInspecting = !IsInspecting;
-			}
-
-			// Cancel inspecting
-			if ( IsInspecting && (IsAiming || IsReloading || IsRunning || IsCustomizing || Input.Down( InputButtonHelper.PrimaryAttack ) || Input.Down( InputButtonHelper.SecondaryAttack )) )
-			{
-				IsInspecting = false;
 			}
 
 			// Don't cancel reload when customizing

@@ -1,0 +1,33 @@
+{
+  "RootObject": {
+    "__guid": "df1ec63d-7b8b-5f26-afc7-3f4f696f5b37",
+    "Name": "1mW Laser",
+    "Enabled": true,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "a11ea8f3-0d58-5155-ae40-02698ec3c521",
+        "Model": "attachments/mw2022/models/att_vm_p01_ar_mike4_laser03/att_vm_p01_ar_mike4_laser03.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithMw22Attachment",
+        "__guid": "4e9501c5-e7eb-56fa-8341-d0ea3b45d768",
+        "BindPosition": "8.600000,-1.220000,7.414700",
+        "PartScale": "1.000000,1.000000,1.000000",
+        "PartAngles": "0,0,90",
+        "BoneName": "weapon_root",
+        "BodygroupChoices": {},
+        "IsLauncher": false,
+        "LaserEmitter": "2.628000,0.474000,0.125000",
+        "LaserColor": "1,0.025,0.015,1",
+        "LaserWidth": 0.025
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

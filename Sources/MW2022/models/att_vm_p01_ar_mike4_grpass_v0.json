@@ -1,0 +1,72 @@
+{
+  "vertices": 1392,
+  "triangles": 1710,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_bcc723bf7475": "easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike4_gripass_v0"
+  },
+  "bounds": [
+    [
+      -3.38702130317688,
+      -0.6130053997039795,
+      -4.296023845672607
+    ],
+    [
+      -0.0020015861373394728,
+      0.6130030751228333,
+      0.8010045289993286
+    ]
+  ],
+  "key": "att_vm_p01_ar_mike4_grpass_v0",
+  "name": "Sakin XZ Grip",
+  "category": "RearGrip",
+  "source": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_grpass_v0.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_p01_ar_mike4_grpass_v0/att_vm_p01_ar_mike4_grpass_v0.vmdl",
+  "bodygroups": [
+    {
+      "name": "stock",
+      "choices": [
+        {
+          "source": "att_vm_p01_ar_mike4_grpass_v0_LOD0.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_pistolgrip_attach",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

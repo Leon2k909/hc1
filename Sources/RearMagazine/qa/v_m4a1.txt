@@ -1,0 +1,101 @@
+MODEL models/weapons/sbox_assault_m4a1/v_m4a1.vmdl
+BOUNDS mins -11.6373,-1.5864,0.0061, maxs 25.8495,1.3934,11.3638
+MATERIALS models/weapons/sbox_assault_m4a1/v_m4a1_handguard.vmat|models/weapons/sbox_assault_m4a1/v_m4a1_b.vmat|models/weapons/sbox_assault_m4a1/v_m4a1_stock.vmat|models/weapons/sbox_assault_m4a1/v_m4a1_a.vmat|models/weapons/sbox_assault_m4a1/v_m4a1_magazine.vmat|models/weapons/sbox_ammo/556x45_bullet/556_bullet.vmat|models/weapons/sbox_assault_m4a1/v_m4a1_carryhandle.vmat|models/weapons/sbox_attachments/foregrip_straight/v_foregrip_straight.vmat|models/weapons/sbox_attachments/foregrip_angled/v_foregrip_angled.vmat|models/weapons/sbox_attachments/reddot_rmr/v_rmr_glass.vmat|models/weapons/sbox_attachments/reddot_rmr/v_rmr.vmat|models/weapons/sbox_attachments/reddot_rmr/v_rmr_red_dot.vmat|models/weapons/sbox_attachments/sight_holographic/v_holosight.vmat|models/weapons/sbox_attachments/sight_holographic/v_holosight_glass.vmat|models/weapons/sbox_attachments/sight_holographic/v_holosight_red_dot.vmat|models/weapons/sbox_melee_m9bayonet/v_m9bayonet.vmat
+BONE weapon_root: pos -0.5906,-0,6.6929, rot -0,0,0,1, scale 1,1,1
+BONE weapon_root_children: pos -0.5906,-0,6.6929, rot -0,0,-0,1, scale 1,1,1
+BONE muzzle: pos 17.6929,-0,7.4147, rot 0,0,0,1, scale 1,1,1
+BONE root: pos -0,-0,-7.874, rot 0,0,0,1, scale 1,1,1
+BONE clavicle_R: pos -1.4296,-0.8201,-5.2835, rot -0.06705,0.06739,-0.70375,0.70406, scale 1,1,1
+BONE arm_upper_R: pos -1.4296,-6.2464,-5.2835, rot 0.31045,0.27602,-0.66765,0.6178, scale 1,1,1
+BONE arm_lower_R: pos -1.91,-13.3997,-13.5536, rot 0.32929,0.21119,-0.5484,0.73907, scale 1,1,1
+BONE hand_R: pos 1.2944,-20.359,-20.5336, rot 0.35196,0.19248,-0.54314,0.73761, scale 1,1,1
+BONE finger_index_meta_R: pos 2.3421,-21.0311,-20.849, rot 0.34751,0.20975,-0.47627,0.78001, scale 1,1,1
+BONE finger_index_0_R: pos 3.5984,-22.6681,-22.6531, rot 0.38776,0.3648,-0.50432,0.67987, scale 1,1,1
+BONE finger_index_1_R: pos 3.9832,-23.3565,-24.1688, rot 0.49848,0.50741,-0.39569,0.58093, scale 1,1,1
+BONE finger_index_2_R: pos 4.1806,-23.3036,-25.2985, rot 0.53322,0.55949,-0.34734,0.53104, scale 1,1,1
+BONE finger_middle_meta_R: pos 1.8575,-21.2308,-20.9219, rot 0.37481,0.2066,-0.55605,0.71249, scale 1,1,1
+BONE finger_middle_0_R: pos 2.6596,-22.957,-22.8476, rot 0.45549,0.38892,-0.54313,0.58845, scale 1,1,1
+BONE finger_middle_1_R: pos 2.8892,-23.5655,-24.8819, rot 0.57074,0.51674,-0.42038,0.48012, scale 1,1,1
+BONE finger_middle_2_R: pos 3.0358,-23.3232,-26.1533, rot 0.59225,0.54149,-0.3895,0.45202, scale 1,1,1
+BONE finger_ring_meta_R: pos 1.3491,-21.0807,-20.9991, rot 0.38684,0.23133,-0.62279,0.63951, scale 1,1,1
+BONE finger_ring_0_R: pos 1.6668,-22.7551,-23.1075, rot 0.4756,0.34688,-0.58251,0.5605, scale 1,1,1
+BONE finger_ring_1_R: pos 1.8162,-23.3529,-24.8523, rot 0.5956,0.46525,-0.45909,0.46694, scale 1,1,1
+BONE finger_ring_2_R: pos 1.9932,-23.2004,-26.0458, rot 0.61548,0.48561,-0.43208,0.44574, scale 1,1,1
+BONE finger_pinky_meta_R: pos 0.9066,-20.8084,-21.0692, rot 0.41345,0.23936,-0.67693,0.55994, scale 1,1,1
+BONE finger_pinky_0_R: pos 0.8241,-22.2943,-23.2649, rot 0.54239,0.36256,-0.59259,0.47244, scale 1,1,1
+BONE finger_pinky_1_R: pos 0.8762,-22.5439,-24.7399, rot 0.58226,0.39452,-0.55346,0.4461, scale 1,1,1
+BONE finger_pinky_2_R: pos 0.9432,-22.5742,-25.6166, rot 0.61286,0.4193,-0.51938,0.4229, scale 1,1,1
+BONE hand_L_to_R_ikrule: pos 1.2945,20.3588,-20.5338, rot 0.7376,0.54323,-0.19229,0.35196, scale 1,1,1
+BONE finger_thumb_0_R: pos 2.6085,-20.1525,-21.2518, rot -0.06969,0.34488,-0.11338,0.92916, scale 1,1,1
+BONE finger_thumb_1_R: pos 3.987,-20.6369,-22.422, rot -0.06747,0.51298,-0.17438,0.83779, scale 1,1,1
+BONE finger_thumb_2_R: pos 4.5774,-21.1536,-23.6173, rot -0.06043,0.54636,-0.17702,0.8164, scale 1,1,1
+BONE arm_lower_R_twistctrl0: pos -1.91,-13.3997,-13.5536, rot 0.32929,0.21119,-0.5484,0.73907, scale 1,1,1
+BONE arm_lower_R_twist0: pos -1.91,-13.3997,-13.5536, rot 0.32929,0.21119,-0.5484,0.73907, scale 1,1,1
+BONE arm_lower_R_twistctrl1: pos -0.8414,-15.7198,-15.8798, rot 0.33436,0.20742,-0.54984,0.73679, scale 1,1,1
+BONE arm_lower_R_twistctrl2: pos 0.2272,-18.0398,-18.2059, rot 0.3438,0.20062,-0.55252,0.73231, scale 1,1,1
+BONE arm_lower_R_twist2: pos 0.2272,-18.0399,-18.2059, rot 0.3438,0.20062,-0.55252,0.73231, scale 1,1,1
+BONE arm_lower_R_twist1: pos -0.8414,-15.7198,-15.8797, rot 0.33436,0.20742,-0.54984,0.73679, scale 1,1,1
+BONE clavicle_L: pos -1.4296,0.8201,-5.2835, rot -0.70375,-0.70405,0.06705,0.06739, scale 1,1,1
+BONE arm_upper_L: pos -1.4296,6.2464,-5.2834, rot 0.61266,0.67206,-0.26511,0.32048, scale 1,1,1
+BONE arm_lower_L: pos -1.91,13.3997,-13.5536, rot 0.73906,0.54841,-0.21119,0.32929, scale 1,1,1
+BONE hand_L: pos 1.2945,20.3589,-20.5337, rot 0.7376,0.54323,-0.19229,0.35196, scale 1,1,1
+BONE finger_index_meta_L: pos 2.3421,21.0314,-20.8487, rot 0.77996,0.47631,-0.20956,0.34767, scale 1,1,1
+BONE finger_index_0_L: pos 3.5986,22.6686,-22.6524, rot 0.67985,0.50435,-0.36463,0.38793, scale 1,1,1
+BONE finger_index_1_L: pos 3.9836,23.3569,-24.168, rot 0.5809,0.39562,-0.50745,0.49853, scale 1,1,1
+BONE finger_index_2_L: pos 4.181,23.3037,-25.2975, rot 0.53105,0.34741,-0.55941,0.53325, scale 1,1,1
+BONE finger_middle_meta_L: pos 1.8574,21.2309,-20.9217, rot 0.71248,0.55613,-0.20641,0.37481, scale 1,1,1
+BONE finger_middle_0_L: pos 2.6594,22.9577,-22.8468, rot 0.58847,0.54321,-0.38873,0.45553, scale 1,1,1
+BONE finger_middle_1_L: pos 2.8892,23.5668,-24.8809, rot 0.48018,0.42045,-0.51656,0.5708, scale 1,1,1
+BONE finger_middle_2_L: pos 3.0361,23.3246,-26.1522, rot 0.4521,0.38957,-0.54131,0.5923, scale 1,1,1
+BONE finger_ring_meta_L: pos 1.349,21.0808,-20.999, rot 0.63949,0.62287,-0.23114,0.38687, scale 1,1,1
+BONE finger_ring_0_L: pos 1.6667,22.7556,-23.1069, rot 0.56051,0.58258,-0.34669,0.47564, scale 1,1,1
+BONE finger_ring_1_L: pos 1.8163,23.3538,-24.8515, rot 0.467,0.45915,-0.46507,0.59566, scale 1,1,1
+BONE finger_ring_2_L: pos 1.9936,23.2015,-26.045, rot 0.4458,0.43215,-0.48542,0.61553, scale 1,1,1
+BONE finger_pinky_meta_L: pos 0.9067,20.8083,-21.0693, rot 0.55991,0.67699,-0.23917,0.41349, scale 1,1,1
+BONE finger_pinky_0_L: pos 0.8242,22.2947,-23.2646, rot 0.47247,0.59264,-0.36236,0.54244, scale 1,1,1
+BONE finger_pinky_1_L: pos 0.8765,22.5444,-24.7395, rot 0.44614,0.55351,-0.39432,0.58232, scale 1,1,1
+BONE finger_pinky_2_L: pos 0.9436,22.5749,-25.6162, rot 0.42294,0.51943,-0.41911,0.61292, scale 1,1,1
+BONE hand_R_to_L_ikrule: pos 1.2944,-20.3589,-20.5335, rot 0.35196,0.19248,-0.54314,0.73761, scale 1,1,1
+BONE finger_thumb_0_L: pos 2.6088,20.153,-21.2517, rot -0.92918,-0.11356,0.34478,0.06973, scale 1,1,1
+BONE finger_thumb_1_L: pos 3.9872,20.638,-22.4213, rot -0.83781,-0.17457,0.51288,0.06749, scale 1,1,1
+BONE finger_thumb_2_L: pos 4.5777,21.1552,-23.6163, rot -0.81642,-0.1772,0.54627,0.06043, scale 1,1,1
+BONE arm_lower_L_twistctrl0: pos -1.91,13.3997,-13.5536, rot 0.73906,0.54841,-0.21119,0.32929, scale 1,1,1
+BONE arm_lower_L_twistctrl1: pos -0.8414,15.7197,-15.8798, rot 0.73679,0.54984,-0.20741,0.33436, scale 1,1,1
+BONE arm_lower_L_twistctrl2: pos 0.2272,18.0398,-18.206, rot 0.7323,0.55252,-0.20062,0.3438, scale 1,1,1
+BONE arm_lower_L_twist2: pos 0.2272,18.0397,-18.206, rot 0.7323,0.55252,-0.20062,0.3438, scale 1,1,1
+BONE arm_lower_L_twist1: pos -0.8414,15.7197,-15.8798, rot 0.73679,0.54984,-0.20741,0.33436, scale 1,1,1
+BONE arm_lower_L_twist0: pos -1.91,13.3997,-13.5536, rot 0.73906,0.54841,-0.21119,0.32929, scale 1,1,1
+BONE camera: pos 0.0032,0,-0, rot -0,-0,0,1, scale 1,1,1
+BONE weapon_IK_hand_R: pos -3.1496,0,3.937, rot -0,0,-0,1, scale 1,1,1
+BONE hand_R_to_weapon_ikrule: pos 1.2944,-20.359,-20.5336, rot 0.35196,0.19248,-0.54314,0.73761, scale 1,1,1
+BONE weapon_IK_hand_L: pos 6.7096,-0,7.4146, rot -0,0,-0,1, scale 1,1,1
+BONE hand_L_to_weapon_ikrule: pos 1.2945,20.3589,-20.5337, rot 0.7376,0.54323,-0.19229,0.35196, scale 1,1,1
+BONE stock: pos -6.2193,-0,7.4147, rot 0,0,1,0, scale 1,1,1
+BONE stock_lever: pos -6.8766,0,5.5907, rot 0,-0,1,0, scale 1,1,1
+BONE stock_pin: pos -6.8766,0,5.2973, rot 0.70711,0,-0.70711,0, scale 1,1,1
+BONE trigger: pos -0.819,0,5.9445, rot 0,0.70711,-0,0.70711, scale 1,1,1
+BONE magazine: pos 2.0866,-0,4.3307, rot 0,0.70711,-0,0.70711, scale 1,1,1
+BONE magazine_release: pos 0.5548,-0.6565,6.033, rot -0,-0,-0.70711,0.70711, scale 1,1,1
+BONE bolt_catch: pos 0.5699,0.6554,6.2913, rot 0.5,-0.5,0.5,0.5, scale 1,1,1
+BONE mode_selector: pos -1.8922,0.563,6.1404, rot 0,0,1,0, scale 1,1,1
+BONE bolt_flap: pos 1.7607,-0.7858,7.3257, rot -0.54562,0.54562,0.44978,0.44977, scale 1,1,1
+BONE bolt: pos 0.9241,-0,7.4147, rot 0,0,0,1, scale 1,1,1
+PART M4A1: 1 choices=m4a1=1
+PART magazine: 6 choices=magazine_full=2|magazine_empty=4|=0
+PART top_rail: 112 choices=carryhandle=16|v_sight_holographic=32|v_rmr_raised=64|=0
+PART handguard_covers: 512 choices==0|handguard_covers=512
+PART foregrip: 6144 choices==0|foregrip_straight=2048|foregrip_angled=4096
+PART gasblock: 24576 choices=gasblock_high=8192|gasblock_low=16384
+PART bayonet: 65536 choices==0|bayonet=65536
+MESH m4a1: -11.6373,-1.5864,1.6218 / 19.456,1.2186,8.726
+MESH magazine_full: 0.7044,-0.4846,0.0061 / 4.1453,0.583,7.1611
+MESH magazine_empty: 0.7044,-0.4846,0.0061 / 4.1453,0.583,7.1611
+MESH gasblock_high: 10.8451,-0.9263,5.9962 / 13.1958,0.9263,10.0929
+MESH gasblock_low: 11.1506,-0.458,6.8704 / 12.1623,0.458,8.1388
+MESH carryhandle: -3.2439,-0.6932,8.3382 / 3.4604,0.9476,10.289
+MESH handguard_covers: 4.5445,-1.3926,6.6907 / 10.8156,1.3934,8.1387
+MESH foregrip_straight: 6.9492,-0.6131,3.0859 / 8.7205,0.6151,6.4744
+MESH foregrip_angled: 5.3598,-0.6406,4.2669 / 9.9816,0.6297,6.4017
+MESH v_rmr_raised: 1.5539,-0.5703,8.392 / 3.5055,0.5845,10.3538
+MESH v_sight_holographic: 0.4933,-1.1871,8.3833 / 4.3766,1.172,11.3638
+MESH bayonet: 14.08,-0.6043,5.8333 / 25.8495,0.6043,8.9906

@@ -1,0 +1,30 @@
+{
+  "RootObject": {
+    "__guid": "e7f17eb6-c803-5f88-bb97-75a50e4aaf48",
+    "Name": "Muzzle Brake",
+    "Enabled": true,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "9faebc95-4ad6-58b5-8b94-0dae8e73db81",
+        "Model": "attachments/mw2022/models/att_vm_muzzlebrake02/att_vm_muzzlebrake02.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithMw22Attachment",
+        "__guid": "058c7575-cdbf-50c8-ad77-826b40ccc0e6",
+        "BindPosition": "17.620000,0.000000,7.414700",
+        "PartScale": "1.000000,1.000000,1.000000",
+        "PartAngles": "0,0,0",
+        "BoneName": "weapon_root",
+        "BodygroupChoices": {},
+        "IsLauncher": false
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

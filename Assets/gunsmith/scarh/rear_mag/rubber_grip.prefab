@@ -1,0 +1,31 @@
+{
+  "RootObject": {
+    "__guid": "e27a48bc-ecff-5d70-b1ce-f8f24f0b3ebc",
+    "Name": "Rubberized Grip",
+    "Flags": 0,
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "d8c2bb3d-3996-50e5-ab3e-3fb98fb2269e",
+        "Model": "attachments/rear_mag/scarh_rubber_grip/scarh_rubber_grip.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithBoneAttachment",
+        "__guid": "4e376700-2301-5b58-871e-1d7bcc07fcd5",
+        "BoneName": "Base",
+        "HiddenBodygroup": "",
+        "ModelVariants": {
+          "weapons/swb/scarh/w_scarh.vmdl": "attachments/rear_mag/scarh_rubber_grip_world/scarh_rubber_grip_world.vmdl"
+        }
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

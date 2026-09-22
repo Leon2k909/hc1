@@ -1,0 +1,13 @@
+"Layer0"
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR "1"
+ F_METALNESS_TEXTURE "1"
+ g_flRoughnessScaleFactor ".85"
+ g_vColorTint "[0.65 0.65 0.65 1]"
+ TextureColor "attachments/m4a1/precision_stock/precision_stock_color_authored.png"
+ TextureNormal "attachments/m4a1/precision_stock/precision_stock_normal.png"
+ TextureRoughness "attachments/m4a1/precision_stock/precision_stock_roughness.png"
+ TextureMetalness "attachments/m4a1/precision_stock/precision_stock_metalness.png"
+ TextureAmbientOcclusion "attachments/m4a1/precision_stock/precision_stock_ao.png"
+}

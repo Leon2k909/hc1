@@ -46,7 +46,7 @@
         "__type": "Sandbox.SkinnedModelRenderer",
         "__guid": "2d65235d-6a43-421f-9bae-49d28004f322",
         "AnimationGraph": null,
-        "BodyGroups": 42259,
+        "BodyGroups": 81,
         "BoneMergeTarget": null,
         "CreateAttachments": false,
         "CreateBoneObjects": true,
@@ -1145,6 +1145,38 @@
             "Rate": 0,
             "RateOverDistance": 0,
             "Velocity": 100
+          }
+        ]
+      },
+      {
+        "__guid": "104129be-0512-59fb-b4a3-1d9ca4e99799",
+        "Flags": 0,
+        "Name": "RearGrip Attachment Point",
+        "Position": "5,-3,-7",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Enabled": true,
+        "Components": [
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithAttachmentPoint",
+            "__guid": "6f20318b-4e04-52ab-9574-70e914e04f2a",
+            "Category": 14
+          }
+        ]
+      },
+      {
+        "__guid": "3eee54d9-f09f-5312-8e71-d93b5a6791e4",
+        "Flags": 0,
+        "Name": "Magazine Attachment Point",
+        "Position": "10,-3,-7",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Enabled": true,
+        "Components": [
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithAttachmentPoint",
+            "__guid": "626409df-e915-523c-b8a6-ec1a003f6677",
+            "Category": 15
           }
         ]
       }

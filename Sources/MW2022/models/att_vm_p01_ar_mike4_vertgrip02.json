@@ -1,0 +1,72 @@
+{
+  "vertices": 2470,
+  "triangles": 3138,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_b0ffc63f368f": "viper/mw/attachments/attachment_vm_vertgrip03"
+  },
+  "bounds": [
+    [
+      -0.01600099913775921,
+      -1.0099999904632568,
+      -4.11299991607666
+    ],
+    [
+      2.131998062133789,
+      0.6479979753494263,
+      0.44699999690055847
+    ]
+  ],
+  "key": "att_vm_p01_ar_mike4_vertgrip02",
+  "name": "Scout Foregrip",
+  "category": "Underbarrel",
+  "source": "models/viper/mw/attachments/attachment_vm_vertgrip03.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_p01_ar_mike4_vertgrip02/att_vm_p01_ar_mike4_vertgrip02.vmdl",
+  "bodygroups": [
+    {
+      "name": "grip",
+      "choices": [
+        {
+          "source": "attachment_vm_vertgrip03.dmx",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_folding_grip",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

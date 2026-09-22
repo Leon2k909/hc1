@@ -23,8 +23,8 @@ def write(path, data):
 specs = [
     ('rifle_suppressor', 'HC1 Rifle Suppressor', 'Barrel', '-0.35,0,0'),
     ('compact_suppressor', 'HC1 Compact Suppressor', 'Barrel', '-0.35,0,0'),
-    ('vertical_grip', 'HC1 Vertical Grip', 'Underbarrel', '-9.0,0,-1.3'),
-    ('angled_grip', 'HC1 Angled Grip', 'Underbarrel', '-9.0,0,-1.3'),
+    ('vertical_grip', 'HC1 Vertical Grip', 'Underbarrel', '-9.0,0,-1.1'),
+    ('angled_grip', 'HC1 Angled Grip', 'Underbarrel', '-9.0,0,-1.1'),
 ]
 for name, title, category, offset in specs:
     folder=ASSETS/'gunsmith/hc1'/name
@@ -43,7 +43,16 @@ for name, title, category, offset in specs:
                      'weapons/swb/scarh/v_scarh.vmdl':'0,0,180',
                      'weapons/swb/scarh/v_scarh_gunsmith.vmdl':'0,0,180',
                      'weapons/swb/scarh/w_scarh.vmdl':'0,0,180',
-                 }},
+                 },
+                 'ModelSocketOffsets': {
+                     'models/weapons/sbox_assault_m4a1/w_m4a1.vmdl': '-11.38281,0,-0.89823' if category=='Underbarrel' else '-2.73281,0,0.20177',
+                     **({
+                         'weapons/swb/scarh/v_scarh.vmdl':'-9,0,-0.6',
+                         'weapons/swb/scarh/v_scarh_gunsmith.vmdl':'-9,0,-0.6',
+                         'weapons/swb/scarh/w_scarh.vmdl':'-13,0,-1.6',
+                     } if category=='Underbarrel' else {}),
+                 },
+                 'ModelScales': {'weapons/swb/scarh/w_scarh.vmdl':1.4}},
             ],
         }, 'ResourceVersion':2,'__version':2,
     })

@@ -135,7 +135,7 @@
             "DryShootDelay": 0.15,
             "EjectionPrefab": {
               "_type": "gameobject",
-              "prefab": "prefabs/weapon_effects/556_casing.prefab"
+              "prefab": "prefabs/weapon_effects/556_spent_casing.prefab"
             },
             "FireModeSwitchDelay": 0.3,
             "FireRate": 680,
@@ -175,7 +175,9 @@
               "Semi"
             ],
             "TracerEffect": null,
-            "VelocitySpreadScale": 0.25
+            "VelocitySpreadScale": 0.25,
+            "SuppressedShootSound": "sounds/swb/attachments/silencer/swb_rifle.silenced.fire.sound",
+            "SuppressedMuzzleFlashChance": 0
           },
           {
             "__type": "Facepunch.Reloadable",

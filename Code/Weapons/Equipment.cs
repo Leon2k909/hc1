@@ -346,6 +346,7 @@ public partial class Equipment : Component, Component.INetworkListener, IDescrip
 
 	protected virtual void OnDeployed()
 	{
+		RefreshAmmunitionLoadout();
 		if ( Owner.IsValid() && Owner.IsViewer && Owner.CameraController.Mode == CameraMode.FirstPerson )
 			CreateViewModel( !HasCreatedViewModel );
 
@@ -446,7 +447,7 @@ public partial class Equipment : Component, Component.INetworkListener, IDescrip
 					if ( point.CurrentPart.IsValid() && point.CurrentPart.ModifyBodygroups )
 					{
 						if ( point.Category == GunsmithPartType.Optic ) hasOptic = true;
-						if ( point.Category == GunsmithPartType.Barrel ) hasMuzzle = true;
+						if ( point.Category is GunsmithPartType.Barrel or GunsmithPartType.Muzzle ) hasMuzzle = true;
 					}
 				}
 

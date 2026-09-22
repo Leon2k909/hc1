@@ -1,0 +1,29 @@
+{
+  "RootObject": {
+    "__guid": "0b0a16c2-e54d-5259-ac89-b3d1665c0bda",
+    "Name": "Rubberized Grip",
+    "Flags": 0,
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "15aa2396-8977-50ff-b78b-e830294ad958",
+        "Model": "attachments/rear_mag/m4a1_rubber_grip/m4a1_rubber_grip.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithBoneAttachment",
+        "__guid": "d31b159e-a0f9-5fcd-81b5-e0b9138541f8",
+        "BoneName": "weapon_root",
+        "HiddenBodygroup": "",
+        "ModelVariants": {}
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

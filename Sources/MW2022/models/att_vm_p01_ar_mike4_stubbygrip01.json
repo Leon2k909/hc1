@@ -1,0 +1,72 @@
+{
+  "vertices": 2784,
+  "triangles": 3982,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_ac00dafec8c1": "viper/mw/attachments/attachment_vm_vertgrip_stubby01_body"
+  },
+  "bounds": [
+    [
+      -0.013001999817788601,
+      -0.7560009956359863,
+      -3.48799991607666
+    ],
+    [
+      1.9910000562667847,
+      0.753000020980835,
+      0.2840000092983246
+    ]
+  ],
+  "key": "att_vm_p01_ar_mike4_stubbygrip01",
+  "name": "Ergo Foregrip",
+  "category": "Underbarrel",
+  "source": "models/viper/mw/attachments/attachment_vm_vertgrip_stubby01.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_p01_ar_mike4_stubbygrip01/att_vm_p01_ar_mike4_stubbygrip01.vmdl",
+  "bodygroups": [
+    {
+      "name": "grip",
+      "choices": [
+        {
+          "source": "attachment_vm_vertgrip_stubby01.dmx",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_folding_grip",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

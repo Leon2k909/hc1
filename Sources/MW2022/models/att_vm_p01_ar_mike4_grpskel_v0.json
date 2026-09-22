@@ -1,0 +1,72 @@
+{
+  "vertices": 4570,
+  "triangles": 4884,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_5bacf456b1c8": "easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike4_gripskel_v0"
+  },
+  "bounds": [
+    [
+      -3.482020616531372,
+      -0.5590035319328308,
+      -4.164023399353027
+    ],
+    [
+      -0.00200237357057631,
+      0.5590015649795532,
+      -0.002000011270865798
+    ]
+  ],
+  "key": "att_vm_p01_ar_mike4_grpskel_v0",
+  "name": "Phantom Grip",
+  "category": "RearGrip",
+  "source": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_grpskel_v0.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_p01_ar_mike4_grpskel_v0/att_vm_p01_ar_mike4_grpskel_v0.vmdl",
+  "bodygroups": [
+    {
+      "name": "stock",
+      "choices": [
+        {
+          "source": "att_vm_p01_ar_mike4_grpskel_v0_LOD0.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_pistolgrip_attach",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

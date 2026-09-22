@@ -13,7 +13,7 @@ public abstract class BulletInfo : Component
 
 	public virtual bool ShouldSpawnTracer( ShootInfo shootInfo )
 	{
-		if ( shootInfo.BulletTracerParticle is null )
+		if ( !shootInfo.IsValid() || !shootInfo.UsesTracerRounds || shootInfo.BulletTracerParticle is null )
 			return false;
 
 		var randVal = Random.Shared.NextDouble();

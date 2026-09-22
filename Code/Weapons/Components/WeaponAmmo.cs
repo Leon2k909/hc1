@@ -26,7 +26,8 @@ public partial class WeaponAmmo : Component, IDroppedWeaponState<WeaponAmmo>
 		var equip = Components.Get<Equipment>( FindMode.InParent );
 		if ( equip?.Resource is null ) return MaxAmmo;
 		var tune = WeaponTuningManager.GetTuning( equip.Resource.ResourceName );
-		return (int)(MaxAmmo * (1f + tune.MagSize * 0.04f));
+		var capacity = equip.AttachmentMagazineCapacity > 0 ? equip.AttachmentMagazineCapacity : MaxAmmo;
+		return Math.Max( 1, (int)(capacity * (1f + tune.MagSize * 0.04f)) );
 	}
 
 	/// <summary>

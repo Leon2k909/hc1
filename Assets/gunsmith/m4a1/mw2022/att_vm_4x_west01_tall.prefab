@@ -1,0 +1,32 @@
+{
+  "RootObject": {
+    "__guid": "8e7deab9-0bd1-5441-ada1-e98056f5b185",
+    "Name": "Scout Combat Optic",
+    "Enabled": true,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "db37601b-88a0-5a71-96db-b23b2c4e628e",
+        "Model": "attachments/mw2022/models/att_vm_4x_west01_tall/att_vm_4x_west01_tall.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithMw22Attachment",
+        "__guid": "d5139072-2a50-52bb-801f-622973f0e9c6",
+        "BindPosition": "0.250000,0.000000,8.730000",
+        "PartScale": "1.000000,1.000000,1.000000",
+        "PartAngles": "0,0,0",
+        "BoneName": "weapon_root",
+        "BodygroupChoices": {
+          "lens": 1
+        },
+        "IsLauncher": false
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

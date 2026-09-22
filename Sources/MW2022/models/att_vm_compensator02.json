@@ -1,0 +1,72 @@
+{
+  "vertices": 2644,
+  "triangles": 2690,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_df914a942d98": "viper/mw/attachments/attachment_vm_compensator02_body"
+  },
+  "bounds": [
+    [
+      0.003000000026077032,
+      -0.5190010070800781,
+      -0.5190010070800781
+    ],
+    [
+      2.1659998893737793,
+      0.5189999938011169,
+      0.5189999938011169
+    ]
+  ],
+  "key": "att_vm_compensator02",
+  "name": "Compensator",
+  "category": "Muzzle",
+  "source": "models/viper/mw/attachments/attachment_vm_compensator02.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_compensator02/att_vm_compensator02.vmdl",
+  "bodygroups": [
+    {
+      "name": "grip",
+      "choices": [
+        {
+          "source": "attachment_vm_compensator02.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_silencer",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

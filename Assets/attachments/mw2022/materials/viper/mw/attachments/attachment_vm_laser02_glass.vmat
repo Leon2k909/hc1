@@ -1,0 +1,11 @@
+Layer0
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR "1"
+ g_vColorTint "[1 1 1 1]"
+ g_flMetalness "0"
+ TextureColor "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_laser01_glass_rgb_color.png"
+ g_flRoughnessScaleFactor "0.5266"
+ F_TRANSLUCENT "1"
+ TextureTranslucency "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_laser01_glass_rgb_opacity.png"
+}

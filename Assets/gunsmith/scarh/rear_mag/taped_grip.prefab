@@ -1,0 +1,31 @@
+{
+  "RootObject": {
+    "__guid": "65937e3c-ea75-5979-979c-15ace4ea34bb",
+    "Name": "Taped Grip",
+    "Flags": 0,
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "b1857341-59f4-5725-abfa-6aba8db0eae5",
+        "Model": "attachments/rear_mag/scarh_taped_grip/scarh_taped_grip.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithBoneAttachment",
+        "__guid": "f979ff04-3d1c-588f-89eb-6e18b2330ec1",
+        "BoneName": "Base",
+        "HiddenBodygroup": "",
+        "ModelVariants": {
+          "weapons/swb/scarh/w_scarh.vmdl": "attachments/rear_mag/scarh_taped_grip_world/scarh_taped_grip_world.vmdl"
+        }
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

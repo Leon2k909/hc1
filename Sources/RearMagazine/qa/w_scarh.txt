@@ -1,0 +1,16 @@
+MODEL weapons/swb/scarh/w_scarh.vmdl
+BOUNDS mins -13.0107,-0.645,-6.7933, maxs 35.8813,2.2041,6.9687
+MATERIALS weapons/swb/scarh/textures/scar.vmat|attachments/swb/sight/reflex/textures/reflex.vmat|attachments/swb/muzzle/silencer_rifle/textures/ats4.vmat
+BONE Base: pos -0.8859,2.8024,3.2178, rot -0.74357,0.03557,0.6672,0.02593, scale 1,1,1
+BONE hold_R: pos 9.9218,-10.439,21.2739, rot 0,0,0,1, scale 1,1,1
+BONE Trigger: pos 10.4468,3.1809,3.8508, rot -0.74357,0.03557,0.6672,0.02593, scale 1,1,1
+BONE Mag: pos 5.6259,3.0358,-3.5392, rot -0.74357,0.03557,0.6672,0.02593, scale 1,1,1
+PART Body: 64 choices=scar=64
+PART sight: 3 choices=ironsights=1|reflex=2
+PART muzzle: 8 choices==0|silencer=8
+PART magazine: 16 choices=magazine=16|=0
+MESH scar: -13.0107,-0.645,-5.1286 / 27.9098,2.2041,4.7201
+MESH magazine: 3.6318,0.1969,-6.7933 / 7.6135,1.4321,0.804
+MESH ironsights: -2.7253,-0.2261,4.3087 / 17.605,1.855,6.9687
+MESH reflex: -1.1426,-0.0959,4.2627 / 3.1381,1.6787,6.526
+MESH silencer: 24.8703,-0.2419,1.6206 / 35.8813,1.8768,3.7221

@@ -1,0 +1,72 @@
+{
+  "vertices": 1990,
+  "triangles": 2440,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_413dfa1c4066": "viper/mw/attachments/attachment_vm_muzzlebrake02_body"
+  },
+  "bounds": [
+    [
+      0.0020000000949949026,
+      -0.44600099325180054,
+      -0.5640010237693787
+    ],
+    [
+      2.9519999027252197,
+      0.44600000977516174,
+      0.5640000104904175
+    ]
+  ],
+  "key": "att_vm_muzzlebrake02",
+  "name": "Muzzle Brake",
+  "category": "Muzzle",
+  "source": "models/viper/mw/attachments/attachment_vm_muzzlebrake02.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_muzzlebrake02/att_vm_muzzlebrake02.vmdl",
+  "bodygroups": [
+    {
+      "name": "grip",
+      "choices": [
+        {
+          "source": "attachment_vm_muzzlebrake02.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_silencer",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "RootObject": {
+    "__guid": "cb09fcec-1148-502e-a9fd-417bbc6d330c",
+    "Name": "60 Round Mag",
+    "Enabled": true,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "97e3ff5a-2bc3-5abe-b361-521efb586c2c",
+        "Model": "attachments/mw2022/models/att_vm_p01_ar_mike4_xmaglrg_v0/att_vm_p01_ar_mike4_xmaglrg_v0.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithMw22Attachment",
+        "__guid": "6fb86107-9528-54c2-a34c-eaff1c04d92b",
+        "BindPosition": "3.120000,0.000000,4.550000",
+        "PartScale": "1.000000,1.000000,1.000000",
+        "PartAngles": "0,0,0",
+        "BoneName": "magazine",
+        "BodygroupChoices": {
+          "boolet": 1
+        },
+        "IsLauncher": false
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

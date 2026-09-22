@@ -1,0 +1,32 @@
+{
+  "RootObject": {
+    "__guid": "8820a994-8f73-5dcc-b9f5-14cdc4df5208",
+    "Name": "Merc Thermal Hybrid",
+    "Enabled": true,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "a188904e-5293-5dfd-bd3a-fecaea31753b",
+        "Model": "attachments/mw2022/models/att_vm_thermal_east01_hybrid/att_vm_thermal_east01_hybrid.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithMw22Attachment",
+        "__guid": "584b8a32-5958-5894-8e11-1b307ed3f93b",
+        "BindPosition": "0.250000,0.000000,8.730000",
+        "PartScale": "1.000000,1.000000,1.000000",
+        "PartAngles": "0,0,0",
+        "BoneName": "weapon_root",
+        "BodygroupChoices": {
+          "lens": 1
+        },
+        "IsLauncher": false
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

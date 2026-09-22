@@ -1,0 +1,72 @@
+{
+  "vertices": 1003,
+  "triangles": 1085,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_68a5fd6d9b06": "easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike4_griptac_v0"
+  },
+  "bounds": [
+    [
+      -3.2680201530456543,
+      -0.5280041694641113,
+      -4.063022613525391
+    ],
+    [
+      0.1599993258714676,
+      0.5280026197433472,
+      -0.002000011270865798
+    ]
+  ],
+  "key": "att_vm_p01_ar_mike4_grptac_v0",
+  "name": "XTEN Grip",
+  "category": "RearGrip",
+  "source": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_grptac_v0.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_p01_ar_mike4_grptac_v0/att_vm_p01_ar_mike4_grptac_v0.vmdl",
+  "bodygroups": [
+    {
+      "name": "stock",
+      "choices": [
+        {
+          "source": "att_vm_p01_ar_mike4_grptac_v0_LOD0.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_pistolgrip_attach",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

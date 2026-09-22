@@ -1,0 +1,13 @@
+"Layer0"
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR "1"
+ F_METALNESS_TEXTURE "1"
+ g_flRoughnessScaleFactor "1"
+ g_vColorTint "[1 1 1 1]"
+ TextureColor "attachments/m4a1/compact_suppressor/compact_suppressor_color.png"
+ TextureNormal "attachments/m4a1/compact_suppressor/compact_suppressor_normal.png"
+ TextureRoughness "attachments/m4a1/compact_suppressor/compact_suppressor_roughness.png"
+ TextureMetalness "attachments/m4a1/compact_suppressor/compact_suppressor_metalness.png"
+ TextureAmbientOcclusion "attachments/m4a1/compact_suppressor/compact_suppressor_ao.png"
+}

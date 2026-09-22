@@ -1,0 +1,521 @@
+SceneLineObject Sandbox.Texture get_LineTexture()
+SceneLineObject Void set_LineTexture(Sandbox.Texture)
+SceneLineObject CapStyle get_StartCap()
+SceneLineObject Void set_StartCap(CapStyle)
+SceneLineObject CapStyle get_EndCap()
+SceneLineObject Void set_EndCap(CapStyle)
+SceneLineObject FaceMode get_Face()
+SceneLineObject Void set_Face(FaceMode)
+SceneLineObject Boolean get_Wireframe()
+SceneLineObject Void set_Wireframe(Boolean)
+SceneLineObject Boolean get_Lighting()
+SceneLineObject Void set_Lighting(Boolean)
+SceneLineObject Boolean get_Clamped()
+SceneLineObject Void set_Clamped(Boolean)
+SceneLineObject Sandbox.Rendering.SamplerState get_SamplerState()
+SceneLineObject Void set_SamplerState(Sandbox.Rendering.SamplerState)
+SceneLineObject Int32 get_Smoothness()
+SceneLineObject Void set_Smoothness(Int32)
+SceneLineObject Void set_Opaque(Boolean)
+SceneLineObject Int32 get_TessellationLevel()
+SceneLineObject Void set_TessellationLevel(Int32)
+SceneLineObject Void StartLine()
+SceneLineObject Void AddLinePoint(Vector3 ByRef, Color, Single)
+SceneLineObject Void AddLinePoint(Vector3 ByRef, Color, Single, Single)
+SceneLineObject Void AddLinePoint(Vector3 ByRef, Vector3 ByRef, Color, Single, Single)
+SceneLineObject Void EndLine()
+SceneLineObject Void Clear()
+SceneLineObject Void RenderSceneObject()
+SceneLineObject Sandbox.RenderAttributes get_Attributes()
+SceneLineObject Sandbox.SceneWorld get_World()
+SceneLineObject Void Delete()
+SceneLineObject Transform get_Transform()
+SceneLineObject Void set_Transform(Transform)
+SceneLineObject Rotation get_Rotation()
+SceneLineObject Void set_Rotation(Rotation)
+SceneLineObject Vector3 get_Position()
+SceneLineObject Void set_Position(Vector3)
+SceneLineObject BBox get_Bounds()
+SceneLineObject Void set_Bounds(BBox)
+SceneLineObject BBox get_LocalBounds()
+SceneLineObject Void set_LocalBounds(BBox)
+SceneLineObject Boolean get_RenderingEnabled()
+SceneLineObject Void set_RenderingEnabled(Boolean)
+SceneLineObject Color get_ColorTint()
+SceneLineObject Void set_ColorTint(Color)
+SceneLineObject Sandbox.SceneObject get_Parent()
+SceneLineObject Void AddChild(System.String, Sandbox.SceneObject)
+SceneLineObject Void RemoveChild(Sandbox.SceneObject)
+SceneLineObject Sandbox.Model get_Model()
+SceneLineObject Void set_Model(Sandbox.Model)
+SceneLineObject UInt64 get_MeshGroupMask()
+SceneLineObject Void set_MeshGroupMask(UInt64)
+SceneLineObject Void SetMaterialOverride(Sandbox.Material)
+SceneLineObject Void ClearMaterialOverride()
+SceneLineObject Void SetMaterialOverride(Sandbox.Material, System.String, Int32)
+SceneLineObject Void SetMaterialGroup(System.String)
+SceneLineObject Boolean get_Batchable()
+SceneLineObject Void set_Batchable(Boolean)
+SceneLineObject Void SetComponentSource(Sandbox.Component)
+SceneLineObject Sandbox.GameObject GetGameObject()
+SceneLineObject SceneObjectFlagAccessor get_Flags()
+SceneLineObject Int32 GetHashCode()
+SceneLineObject Boolean Equals(System.Object)
+SceneLineObject Sandbox.SceneRenderLayer get_RenderLayer()
+SceneLineObject Void set_RenderLayer(Sandbox.SceneRenderLayer)
+SceneLineObject Sandbox.ITagSet get_Tags()
+SceneLineObject System.Type GetType()
+SceneLineObject System.String ToString()
+SceneLineObject Void .ctor(Sandbox.SceneWorld)
+SceneLineObject Sandbox.Texture LineTexture
+SceneLineObject CapStyle StartCap
+SceneLineObject CapStyle EndCap
+SceneLineObject FaceMode Face
+SceneLineObject Boolean Wireframe
+SceneLineObject Boolean Lighting
+SceneLineObject Boolean Clamped
+SceneLineObject Sandbox.Rendering.SamplerState SamplerState
+SceneLineObject Int32 Smoothness
+SceneLineObject Boolean Opaque
+SceneLineObject Int32 TessellationLevel
+SceneLineObject Sandbox.RenderAttributes Attributes
+SceneLineObject Sandbox.SceneWorld World
+SceneLineObject Transform Transform
+SceneLineObject Rotation Rotation
+SceneLineObject Vector3 Position
+SceneLineObject BBox Bounds
+SceneLineObject BBox LocalBounds
+SceneLineObject Boolean RenderingEnabled
+SceneLineObject Color ColorTint
+SceneLineObject Sandbox.SceneObject Parent
+SceneLineObject Sandbox.Model Model
+SceneLineObject UInt64 MeshGroupMask
+SceneLineObject Boolean Batchable
+SceneLineObject SceneObjectFlagAccessor Flags
+SceneLineObject Sandbox.SceneRenderLayer RenderLayer
+SceneLineObject Sandbox.ITagSet Tags
+SceneLineObject Sandbox.Material Material
+SceneLineObject System.Action`1[Sandbox.SceneObject] RenderOverride
+SceneLineObject Sandbox.Plane ClipPlane
+SceneLineObject Boolean ClipPlaneEnabled
+SceneLineObject Sandbox.SceneLineObject+CapStyle
+SceneLineObject Sandbox.SceneLineObject+FaceMode
+SceneObject Sandbox.RenderAttributes get_Attributes()
+SceneObject Sandbox.SceneWorld get_World()
+SceneObject Void Delete()
+SceneObject Transform get_Transform()
+SceneObject Void set_Transform(Transform)
+SceneObject Rotation get_Rotation()
+SceneObject Void set_Rotation(Rotation)
+SceneObject Vector3 get_Position()
+SceneObject Void set_Position(Vector3)
+SceneObject BBox get_Bounds()
+SceneObject Void set_Bounds(BBox)
+SceneObject BBox get_LocalBounds()
+SceneObject Void set_LocalBounds(BBox)
+SceneObject Boolean get_RenderingEnabled()
+SceneObject Void set_RenderingEnabled(Boolean)
+SceneObject Color get_ColorTint()
+SceneObject Void set_ColorTint(Color)
+SceneObject Sandbox.SceneObject get_Parent()
+SceneObject Void AddChild(System.String, Sandbox.SceneObject)
+SceneObject Void RemoveChild(Sandbox.SceneObject)
+SceneObject Sandbox.Model get_Model()
+SceneObject Void set_Model(Sandbox.Model)
+SceneObject UInt64 get_MeshGroupMask()
+SceneObject Void set_MeshGroupMask(UInt64)
+SceneObject Void SetMaterialOverride(Sandbox.Material)
+SceneObject Void ClearMaterialOverride()
+SceneObject Void SetMaterialOverride(Sandbox.Material, System.String, Int32)
+SceneObject Void SetMaterialGroup(System.String)
+SceneObject Boolean get_Batchable()
+SceneObject Void set_Batchable(Boolean)
+SceneObject Void SetComponentSource(Sandbox.Component)
+SceneObject Sandbox.GameObject GetGameObject()
+SceneObject SceneObjectFlagAccessor get_Flags()
+SceneObject Int32 GetHashCode()
+SceneObject Boolean Equals(System.Object)
+SceneObject Sandbox.SceneRenderLayer get_RenderLayer()
+SceneObject Void set_RenderLayer(Sandbox.SceneRenderLayer)
+SceneObject Sandbox.ITagSet get_Tags()
+SceneObject System.Type GetType()
+SceneObject System.String ToString()
+SceneObject Void .ctor(Sandbox.SceneWorld, Sandbox.Model)
+SceneObject Void .ctor(Sandbox.SceneWorld, Sandbox.Model, Transform)
+SceneObject Void .ctor(Sandbox.SceneWorld, System.String, Transform)
+SceneObject Void .ctor(Sandbox.SceneWorld, System.String)
+SceneObject Sandbox.RenderAttributes Attributes
+SceneObject Sandbox.SceneWorld World
+SceneObject Transform Transform
+SceneObject Rotation Rotation
+SceneObject Vector3 Position
+SceneObject BBox Bounds
+SceneObject BBox LocalBounds
+SceneObject Boolean RenderingEnabled
+SceneObject Color ColorTint
+SceneObject Sandbox.SceneObject Parent
+SceneObject Sandbox.Model Model
+SceneObject UInt64 MeshGroupMask
+SceneObject Boolean Batchable
+SceneObject SceneObjectFlagAccessor Flags
+SceneObject Sandbox.SceneRenderLayer RenderLayer
+SceneObject Sandbox.ITagSet Tags
+SceneObject Sandbox.Plane ClipPlane
+SceneObject Boolean ClipPlaneEnabled
+SceneObject Sandbox.SceneObject+SceneObjectFlagAccessor
+Model Int32 get_AnimationCount()
+Model System.String GetAnimationName(Int32)
+Model System.Collections.Generic.IReadOnlyList`1[System.String] get_AnimationNames()
+Model Sandbox.AnimationGraph get_AnimGraph()
+Model Sandbox.ModelAttachments get_Attachments()
+Model Int32 get_AttachmentCount()
+Model System.Nullable`1[Transform] GetAttachment(System.String)
+Model System.Nullable`1[Transform] GetAttachment(Int32)
+Model System.String GetAttachmentName(Int32)
+Model Sandbox.ModelParts get_Parts()
+Model Int32 get_BodyGroupCount()
+Model UInt64 get_DefaultBodyGroupMask()
+Model System.Collections.Generic.IEnumerable`1[Sandbox.Model+BodyPart] get_BodyParts()
+Model BBox get_Bounds()
+Model BBox get_PhysicsBounds()
+Model BBox get_RenderBounds()
+Model Boolean get_IsValid()
+Model Boolean get_IsError()
+Model System.String get_Name()
+Model Boolean get_IsProcedural()
+Model Int32 get_MeshCount()
+Model Sandbox.Engine.Utility.RayTrace.MeshTraceRequest get_Trace()
+Model CommonData get_Data()
+Model Boolean TryGetData[T](T ByRef)
+Model Boolean TryGetData(System.Type, System.Object ByRef)
+Model Boolean HasData[T]()
+Model T GetData[T]()
+Model System.Collections.Generic.Dictionary`2[System.String,System.String[]] GetBreakCommands()
+Model Sandbox.HitboxSet get_HitboxSet()
+Model ModelMeshInfo get_MeshInfo()
+Model Sandbox.Model Load(System.String)
+Model System.Threading.Tasks.Task`1[Sandbox.Model] LoadAsync(System.String)
+Model Int32 get_MaterialGroupCount()
+Model System.String GetMaterialGroupName(Int32)
+Model Int32 GetMaterialGroupIndex(System.String)
+Model System.Collections.Immutable.ImmutableArray`1[Sandbox.Material] get_Materials()
+Model System.Collections.Generic.IEnumerable`1[Sandbox.Material] GetMaterials(Int32)
+Model System.Collections.Generic.IEnumerable`1[Sandbox.Material] GetMaterials(System.String)
+Model Sandbox.ModelMorphs get_Morphs()
+Model Int32 get_MorphCount()
+Model System.String GetMorphName(Int32)
+Model Single GetVisemeMorph(System.String, Int32)
+Model Sandbox.PhysicsGroupDescription get_Physics()
+Model Byte[] SaveToVmdl()
+Model System.Threading.Tasks.Task`1[System.Byte[]] SaveToVmdlAsync()
+Model Sandbox.BoneCollection get_Bones()
+Model Int32 get_BoneCount()
+Model System.String GetBoneName(Int32)
+Model Int32 GetBoneParent(Int32)
+Model Transform GetBoneTransform(Int32)
+Model Transform GetBoneTransform(System.String)
+Model System.Collections.Generic.Dictionary`2[Sandbox.BoneCollection+Bone,Sandbox.GameObject] CreateBoneObjects(Sandbox.GameObject)
+Model Sandbox.ModelBuilder get_Builder()
+Model Sandbox.Model get_Cube()
+Model Sandbox.Model get_Sphere()
+Model Sandbox.Model get_Plane()
+Model Sandbox.Model get_Error()
+Model Sandbox.Vertex[] GetVertices()
+Model UInt32[] GetIndices()
+Model Int32 GetIndexCount(Int32)
+Model Int32 GetIndexStart(Int32)
+Model Int32 GetBaseVertex(Int32)
+Model Int32 GetIndexCountForLod(Int32)
+Model Sandbox.Bitmap GetAssetTypeIcon(Int32, Int32)
+Model Int32 get_ResourceId()
+Model System.String get_ResourcePath()
+Model System.String get_ResourceName()
+Model Boolean get_HasUnsavedChanges()
+Model System.String ToString()
+Model Void StateHasChanged()
+Model System.Nullable`1[Sandbox.Resources.EmbeddedResource] get_EmbeddedResource()
+Model Void set_EmbeddedResource(System.Nullable`1[Sandbox.Resources.EmbeddedResource])
+Model Void ConfigurePublishing(Sandbox.ResourcePublishContext)
+Model Sandbox.Bitmap RenderThumbnail(ThumbnailOptions)
+Model System.Type GetType()
+Model Boolean Equals(System.Object)
+Model Int32 GetHashCode()
+Model Int32 AnimationCount
+Model System.Collections.Generic.IReadOnlyList`1[System.String] AnimationNames
+Model Sandbox.AnimationGraph AnimGraph
+Model Sandbox.ModelAttachments Attachments
+Model Int32 AttachmentCount
+Model Sandbox.ModelParts Parts
+Model Int32 BodyGroupCount
+Model UInt64 DefaultBodyGroupMask
+Model System.Collections.Generic.IEnumerable`1[Sandbox.Model+BodyPart] BodyParts
+Model BBox Bounds
+Model BBox PhysicsBounds
+Model BBox RenderBounds
+Model Boolean IsValid
+Model Boolean IsError
+Model System.String Name
+Model Boolean IsProcedural
+Model Int32 MeshCount
+Model Sandbox.Engine.Utility.RayTrace.MeshTraceRequest Trace
+Model CommonData Data
+Model Sandbox.HitboxSet HitboxSet
+Model ModelMeshInfo MeshInfo
+Model Int32 MaterialGroupCount
+Model System.Collections.Immutable.ImmutableArray`1[Sandbox.Material] Materials
+Model Sandbox.ModelMorphs Morphs
+Model Int32 MorphCount
+Model Sandbox.PhysicsGroupDescription Physics
+Model Sandbox.BoneCollection Bones
+Model Int32 BoneCount
+Model Sandbox.ModelBuilder Builder
+Model Sandbox.Model Cube
+Model Sandbox.Model Sphere
+Model Sandbox.Model Plane
+Model Sandbox.Model Error
+Model Int32 ResourceId
+Model System.String ResourcePath
+Model System.String ResourceName
+Model Boolean HasUnsavedChanges
+Model System.Nullable`1[Sandbox.Resources.EmbeddedResource] EmbeddedResource
+Model Sandbox.Model+BodyPart
+Model Sandbox.Model+BodyGroupMaskAttribute
+Model Sandbox.Model+CommonData
+Model Sandbox.Model+ModelMeshInfo
+Model Sandbox.Model+MaterialGroupAttribute
+Model Sandbox.Model+MaterialOverrideAttribute
+CameraComponent AutoExposureSetup get_AutoExposure()
+CameraComponent Void AddCommandList(Sandbox.Rendering.CommandList, Sandbox.Rendering.Stage, Int32)
+CameraComponent Void RemoveCommandList(Sandbox.Rendering.CommandList, Sandbox.Rendering.Stage)
+CameraComponent Void RemoveCommandList(Sandbox.Rendering.CommandList)
+CameraComponent Void ClearCommandLists(Sandbox.Rendering.Stage)
+CameraComponent Void ClearCommandLists()
+CameraComponent Sandbox.ClearFlags get_ClearFlags()
+CameraComponent Void set_ClearFlags(Sandbox.ClearFlags)
+CameraComponent Color get_BackgroundColor()
+CameraComponent Void set_BackgroundColor(Color)
+CameraComponent Boolean get_IsMainCamera()
+CameraComponent Void set_IsMainCamera(Boolean)
+CameraComponent Axis get_FovAxis()
+CameraComponent Void set_FovAxis(Axis)
+CameraComponent Single get_FieldOfView()
+CameraComponent Void set_FieldOfView(Single)
+CameraComponent Single get_ZNear()
+CameraComponent Void set_ZNear(Single)
+CameraComponent Single get_ZFar()
+CameraComponent Void set_ZFar(Single)
+CameraComponent Int32 get_Priority()
+CameraComponent Void set_Priority(Int32)
+CameraComponent Boolean get_Orthographic()
+CameraComponent Void set_Orthographic(Boolean)
+CameraComponent Single get_OrthographicHeight()
+CameraComponent Void set_OrthographicHeight(Single)
+CameraComponent Sandbox.StereoTargetEye get_TargetEye()
+CameraComponent Void set_TargetEye(Sandbox.StereoTargetEye)
+CameraComponent Sandbox.TagSet get_RenderTags()
+CameraComponent Void set_RenderTags(Sandbox.TagSet)
+CameraComponent Sandbox.TagSet get_RenderExcludeTags()
+CameraComponent Void set_RenderExcludeTags(Sandbox.TagSet)
+CameraComponent Vector4 get_Viewport()
+CameraComponent Void set_Viewport(Vector4)
+CameraComponent Sandbox.Texture get_RenderTarget()
+CameraComponent Void set_RenderTarget(Sandbox.Texture)
+CameraComponent Sandbox.SceneCameraDebugMode get_DebugMode()
+CameraComponent Void set_DebugMode(Sandbox.SceneCameraDebugMode)
+CameraComponent Boolean get_WireframeMode()
+CameraComponent Void set_WireframeMode(Boolean)
+CameraComponent Void Reset()
+CameraComponent Sandbox.CameraView get_View()
+CameraComponent Void ComposeView()
+CameraComponent Void UpdateSceneCamera(Sandbox.SceneCamera, Boolean)
+CameraComponent System.IDisposable AddHookAfterOpaque(System.String, Int32, System.Action`1[Sandbox.SceneCamera])
+CameraComponent System.IDisposable AddHookAfterTransparent(System.String, Int32, System.Action`1[Sandbox.SceneCamera])
+CameraComponent System.IDisposable AddHookBeforeOverlay(System.String, Int32, System.Action`1[Sandbox.SceneCamera])
+CameraComponent System.IDisposable AddHookAfterUI(System.String, Int32, System.Action`1[Sandbox.SceneCamera])
+CameraComponent Vector2 PointToScreenNormal(Vector3 ByRef)
+CameraComponent Vector2 PointToScreenPixels(Vector3 ByRef)
+CameraComponent Sandbox.Rect get_ScreenRect()
+CameraComponent Sandbox.Rect BBoxToScreenPixels(BBox, Boolean ByRef)
+CameraComponent Vector2 PointToScreenPixels(Vector3, Boolean ByRef)
+CameraComponent Vector2 PointToScreenNormal(Vector3, Boolean ByRef)
+CameraComponent Ray ScreenPixelToRay(Vector2)
+CameraComponent Ray ScreenNormalToRay(Vector3)
+CameraComponent Vector3 ScreenToWorld(Vector2)
+CameraComponent Sandbox.Frustum GetFrustum()
+CameraComponent Sandbox.Frustum GetFrustum(Sandbox.Rect)
+CameraComponent Sandbox.Frustum GetFrustum(Sandbox.Rect, Vector3)
+CameraComponent Boolean RenderToTexture(Sandbox.Texture, Sandbox.Rendering.ViewSetup ByRef)
+CameraComponent System.Nullable`1[Matrix] get_CustomProjectionMatrix()
+CameraComponent Void set_CustomProjectionMatrix(System.Nullable`1[Matrix])
+CameraComponent System.Nullable`1[Vector2] get_CustomSize()
+CameraComponent Void set_CustomSize(System.Nullable`1[Vector2])
+CameraComponent Matrix get_ProjectionMatrix()
+CameraComponent Matrix CalculateObliqueMatrix(Sandbox.Plane)
+CameraComponent Void RenderToBitmap(Sandbox.Bitmap)
+CameraComponent Void RenderToBitmap(Sandbox.Bitmap, Boolean)
+CameraComponent T AddEffect[T](T)
+CameraComponent BaseEffect AddShake(Single, Single, Single)
+CameraComponent BaseEffect AddPunch(Vector3, Single, Single, Single, Single)
+CameraComponent BaseEffect AddPunch(Angles, Single, Single, Single)
+CameraComponent BaseEffect AddTilt(Angles, Single, Single)
+CameraComponent Sandbox.Rendering.HudPainter get_Hud()
+CameraComponent Sandbox.Painter BeginHud()
+CameraComponent Sandbox.Rendering.HudPainter get_Overlay()
+CameraComponent Sandbox.Painter BeginOverlay()
+CameraComponent Sandbox.Rendering.CommandList get_HudCommandList()
+CameraComponent Sandbox.Rendering.CommandList get_OverlayCommandList()
+CameraComponent Boolean get_EnablePostProcessing()
+CameraComponent Void set_EnablePostProcessing(Boolean)
+CameraComponent Sandbox.GameObject get_PostProcessAnchor()
+CameraComponent Void set_PostProcessAnchor(Sandbox.GameObject)
+CameraComponent Sandbox.Scene get_Scene()
+CameraComponent Sandbox.GameTransform get_Transform()
+CameraComponent Sandbox.GameObject get_GameObject()
+CameraComponent Sandbox.ComponentList get_Components()
+CameraComponent Boolean get_Enabled()
+CameraComponent Void set_Enabled(Boolean)
+CameraComponent Boolean get_Active()
+CameraComponent Boolean get_IsValid()
+CameraComponent System.Action get_OnComponentEnabled()
+CameraComponent Void set_OnComponentEnabled(System.Action)
+CameraComponent System.Action get_OnComponentStart()
+CameraComponent Void set_OnComponentStart(System.Action)
+CameraComponent System.Action get_OnComponentUpdate()
+CameraComponent Void set_OnComponentUpdate(System.Action)
+CameraComponent System.Action get_OnComponentFixedUpdate()
+CameraComponent Void set_OnComponentFixedUpdate(System.Action)
+CameraComponent System.Action get_OnComponentDisabled()
+CameraComponent Void set_OnComponentDisabled(System.Action)
+CameraComponent System.Action get_OnComponentDestroy()
+CameraComponent Void set_OnComponentDestroy(System.Action)
+CameraComponent Void Destroy()
+CameraComponent Void DestroyGameObject()
+CameraComponent Void EditLog(System.String, System.Object)
+CameraComponent Sandbox.ITagSet get_Tags()
+CameraComponent Void Invoke(Single, System.Action, System.Threading.CancellationToken)
+CameraComponent Sandbox.DebugOverlaySystem get_DebugOverlay()
+CameraComponent Void OnParentDestroy()
+CameraComponent Void RunDoo(Sandbox.Doo, System.Action`1[Sandbox.Doo+Configure])
+CameraComponent Void StopDoo(Sandbox.Doo)
+CameraComponent Void StopAllDoo()
+CameraComponent Boolean IsRunningDoo(Sandbox.Doo)
+CameraComponent Sandbox.ComponentFlags get_Flags()
+CameraComponent Void set_Flags(Sandbox.ComponentFlags)
+CameraComponent T AddComponent[T](Boolean)
+CameraComponent T GetOrAddComponent[T](Boolean)
+CameraComponent T GetComponent[T](Boolean)
+CameraComponent System.Collections.Generic.IEnumerable`1[T] GetComponents[T](Boolean)
+CameraComponent System.Collections.Generic.IEnumerable`1[T] GetComponentsInChildren[T](Boolean, Boolean)
+CameraComponent T GetComponentInChildren[T](Boolean, Boolean)
+CameraComponent System.Collections.Generic.IEnumerable`1[T] GetComponentsInParent[T](Boolean, Boolean)
+CameraComponent T GetComponentInParent[T](Boolean, Boolean)
+CameraComponent System.Guid get_Id()
+CameraComponent Transform get_LocalTransform()
+CameraComponent Void set_LocalTransform(Transform)
+CameraComponent Vector3 get_LocalPosition()
+CameraComponent Void set_LocalPosition(Vector3)
+CameraComponent Rotation get_LocalRotation()
+CameraComponent Void set_LocalRotation(Rotation)
+CameraComponent Vector3 get_LocalScale()
+CameraComponent Void set_LocalScale(Vector3)
+CameraComponent NetworkAccessor get_Network()
+CameraComponent Boolean get_IsProxy()
+CameraComponent System.Text.Json.Nodes.JsonNode Serialize(SerializeOptions)
+CameraComponent Void Deserialize(System.Text.Json.Nodes.JsonObject)
+CameraComponent Void DeserializeImmediately(System.Text.Json.Nodes.JsonObject)
+CameraComponent Int32 get_ComponentVersion()
+CameraComponent Transform get_WorldTransform()
+CameraComponent Void set_WorldTransform(Transform)
+CameraComponent Vector3 get_WorldPosition()
+CameraComponent Void set_WorldPosition(Vector3)
+CameraComponent Rotation get_WorldRotation()
+CameraComponent Void set_WorldRotation(Rotation)
+CameraComponent Vector3 get_WorldScale()
+CameraComponent Void set_WorldScale(Vector3)
+CameraComponent System.Type GetType()
+CameraComponent System.String ToString()
+CameraComponent Boolean Equals(System.Object)
+CameraComponent Int32 GetHashCode()
+CameraComponent Void .ctor()
+CameraComponent AutoExposureSetup AutoExposure
+CameraComponent Sandbox.ClearFlags ClearFlags
+CameraComponent Color BackgroundColor
+CameraComponent Boolean IsMainCamera
+CameraComponent Axis FovAxis
+CameraComponent Single FieldOfView
+CameraComponent Single ZNear
+CameraComponent Single ZFar
+CameraComponent Int32 Priority
+CameraComponent Boolean Orthographic
+CameraComponent Single OrthographicHeight
+CameraComponent Sandbox.StereoTargetEye TargetEye
+CameraComponent Sandbox.TagSet RenderTags
+CameraComponent Sandbox.TagSet RenderExcludeTags
+CameraComponent Vector4 Viewport
+CameraComponent Sandbox.Texture RenderTarget
+CameraComponent Sandbox.SceneCameraDebugMode DebugMode
+CameraComponent Boolean WireframeMode
+CameraComponent Sandbox.CameraView View
+CameraComponent Sandbox.Rect ScreenRect
+CameraComponent System.Nullable`1[Matrix] CustomProjectionMatrix
+CameraComponent System.Nullable`1[Vector2] CustomSize
+CameraComponent Matrix ProjectionMatrix
+CameraComponent Sandbox.Rendering.HudPainter Hud
+CameraComponent Sandbox.Rendering.HudPainter Overlay
+CameraComponent Sandbox.Rendering.CommandList HudCommandList
+CameraComponent Sandbox.Rendering.CommandList OverlayCommandList
+CameraComponent Boolean EnablePostProcessing
+CameraComponent Sandbox.GameObject PostProcessAnchor
+CameraComponent Sandbox.Scene Scene
+CameraComponent Sandbox.GameTransform Transform
+CameraComponent Sandbox.GameObject GameObject
+CameraComponent Sandbox.ComponentList Components
+CameraComponent Boolean Enabled
+CameraComponent Boolean Active
+CameraComponent Boolean IsValid
+CameraComponent System.Action OnComponentEnabled
+CameraComponent System.Action OnComponentStart
+CameraComponent System.Action OnComponentUpdate
+CameraComponent System.Action OnComponentFixedUpdate
+CameraComponent System.Action OnComponentDisabled
+CameraComponent System.Action OnComponentDestroy
+CameraComponent Sandbox.ITagSet Tags
+CameraComponent Sandbox.DebugOverlaySystem DebugOverlay
+CameraComponent Sandbox.ComponentFlags Flags
+CameraComponent System.Guid Id
+CameraComponent Transform LocalTransform
+CameraComponent Vector3 LocalPosition
+CameraComponent Rotation LocalRotation
+CameraComponent Vector3 LocalScale
+CameraComponent NetworkAccessor Network
+CameraComponent Boolean IsProxy
+CameraComponent Int32 ComponentVersion
+CameraComponent Transform WorldTransform
+CameraComponent Vector3 WorldPosition
+CameraComponent Rotation WorldRotation
+CameraComponent Vector3 WorldScale
+CameraComponent Sandbox.RenderTextureAsset RenderTexture
+CameraComponent Sandbox.CameraComponent+AutoExposureSetup
+CameraComponent Sandbox.CameraComponent+Axis
+LIVE Laser:  root=Combat Bot 9
+LIVE Optic:  root=Combat Bot 9
+LIVE Laser:  root=Combat Bot 19
+LIVE Laser:  root=Combat Bot 1
+LIVE Optic:  root=Combat Bot 1
+LIVE Optic: gunsmith/m4a1/mw2022/att_vm_reflex_west02_tall.gnsmth root=Player (Leon)
+LIVE Laser: gunsmith/m4a1/mw2022/att_vm_p01_ar_mike4_laser02.gnsmth root=Player (Leon)
+LIVE Laser: gunsmith/m4a1/mw2022/att_vm_p01_ar_mike4_laser02.gnsmth root=Player (Leon)
+LIVE Optic: gunsmith/m4a1/mw2022/att_vm_reflex_west02_tall.gnsmth root=Player (Leon)
+LIVE Optic:  root=Combat Bot 19
+LIVE Laser:  root=Combat Bot 16
+LIVE Optic:  root=Combat Bot 16
+LIVE Optic:  root=Combat Bot 15
+LIVE Optic:  root=Combat Bot 13
+LIVE Laser:  root=Combat Bot 15
+LIVE Laser:  root=Combat Bot 13
+LIVE Optic:  root=Combat Bot 11
+LIVE Laser:  root=Combat Bot 11
+LIVE Optic:  root=Combat Bot 17
+LIVE Laser:  root=Combat Bot 17
+LIVE Laser:  root=Combat Bot 18
+LIVE Optic:  root=Combat Bot 18

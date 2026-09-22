@@ -299,6 +299,11 @@ public static class GunsmithLoadoutManager
 		           || equippedPart.ResourceName.Equals( part.ResourceName, StringComparison.OrdinalIgnoreCase ));
 	}
 
+	/// <summary>Read only for the local shooter's loadout; observers receive the shot effect over RPC.</summary>
+	public static bool UsesTracerRounds( EquipmentResource resource ) =>
+		TryGetAttachment( resource, GunsmithPartType.Ammunition, out var ammo )
+		&& ammo.IsValid() && ammo.UsesTracerRounds;
+
 	public static string ExportWeaponBuildCode( EquipmentResource resource )
 	{
 		if ( !resource.IsValid() )
@@ -501,6 +506,17 @@ public static class GunsmithLoadoutManager
 		}
 
 		var attachmentPoints = root.Components.GetAll<GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants ).ToList();
+		// Ammunition is a loadout option, so its preview slot needs no external mesh or mounting socket.
+		if ( root.Components.Get<GunsmithWeapon>( FindMode.EverythingInSelf ).IsValid()
+			&& !attachmentPoints.Any( x => x.Category == GunsmithPartType.Ammunition )
+			&& ResourceLibrary.GetAll<GunsmithPart>().Any( x => x.Category == GunsmithPartType.Ammunition && x.Supports( resource ) ) )
+		{
+			var slot = new GameObject( root, true, "Ammunition" );
+			slot.Flags |= GameObjectFlags.NotSaved | GameObjectFlags.NotNetworked;
+			var point = slot.Components.Create<GunsmithAttachmentPoint>();
+			point.Category = GunsmithPartType.Ammunition;
+			attachmentPoints.Add( point );
+		}
 		
 		if ( TryGetAttachment( resource, GunsmithPartType.Barrel, out var barrelPart ) )
 		{
@@ -527,10 +543,29 @@ public static class GunsmithLoadoutManager
 			}
 		}
 
+		if ( TryGetAttachment( resource, GunsmithPartType.Muzzle, out var muzzlePart )
+			&& muzzlePart.IsValid() && muzzlePart.MainPrefab.IsValid()
+			&& !attachmentPoints.Any( x => x.Category == GunsmithPartType.Muzzle ) )
+		{
+			var muzzle = FindMuzzle( root );
+			if ( muzzle.IsValid() )
+			{
+				var point = muzzle.Components.Create<GunsmithAttachmentPoint>();
+				point.Category = GunsmithPartType.Muzzle;
+				attachmentPoints.Add( point );
+			}
+		}
+
 		foreach ( var point in attachmentPoints )
 		{
 			point.SetPart( TryGetAttachment( resource, point.Category, out var part ) ? part : null );
 		}
+
+		// A barrel kit and optic can affect the same gas-block bodygroup. Restore
+		// active choices after every category has reset its previous bodygroups.
+		foreach ( var point in attachmentPoints ) point.ApplyBodygroups();
+		foreach ( var mount in root.Components.GetAll<GunsmithBoneAttachment>( FindMode.EverythingInSelfAndDescendants ) )
+			mount.RefreshMount();
 
 		var useCustomCamo = GetUseCustomCamoColor( resource );
 
@@ -617,12 +652,12 @@ public static class GunsmithLoadoutManager
 			if ( renderer.Model is not null && renderer.Model == armsModel )
 				continue;
 
-			// Don't apply camo to optic sights
+			// Separate optic meshes obey the same camo toggle as built-in optic bodygroups.
 			var isOptic = false;
 			var currentObj = renderer.GameObject;
 			while ( currentObj.IsValid() )
 			{
-				var point = currentObj.Components.Get<GunsmithAttachmentPoint>();
+				var point = currentObj.Components.Get<GunsmithAttachmentPoint>( FindMode.EverythingInSelf );
 				if ( point.IsValid() && point.Category == GunsmithPartType.Optic )
 				{
 					isOptic = true;
@@ -630,9 +665,6 @@ public static class GunsmithLoadoutManager
 				}
 				currentObj = currentObj.Parent;
 			}
-
-			if ( isOptic )
-				continue;
 
 			renderer.MaterialOverride = null;
 
@@ -647,15 +679,15 @@ public static class GunsmithLoadoutManager
 
 			if ( camoMat is not null )
 			{
-				// Material camo: swap out the entire material. We still skip arms and sights.
+				// Material camo: preserve lenses and reticles while painting the housing.
 				for ( int i = 0; i < mats.Length; i++ )
 				{
-					var matName = mats[i].Name.ToLower();
+					var matName = GetMaterialFileName( mats[i] );
 					
 					// Reticle Customization (and skipping glass/lens)
-					if ( matName.Contains( "lens" ) || matName.Contains( "glass" ) || matName.Contains( "dot" ) || matName.Contains( "reticle" ) || matName.Contains( "hologram" ) )
+					if ( matName.Contains( "lens" ) || matName.Contains( "glass" ) || IsReticleMaterial( matName ) )
 					{
-						if ( matName.Contains( "dot" ) || matName.Contains( "reticle" ) || matName.Contains( "hologram" ) )
+						if ( IsReticleMaterial( matName ) )
 						{
 							var reticleCopy = mats[i].CreateCopy();
 							reticleCopy.Set( "g_vSightLightColor", customReticleColor );
@@ -664,7 +696,11 @@ public static class GunsmithLoadoutManager
 								var texPath = customReticleShape.CamoTexture.Replace(".png", ".vtex");
 								var tex = Texture.Load( FileSystem.Mounted, texPath );
 								if ( tex != null )
+								{
 									reticleCopy.Set( "RedDot", tex );
+									reticleCopy.Set( "g_tRedDot", tex );
+									reticleCopy.Set( "g_flUseReticleTexture", 1f );
+								}
 							}
 							renderer.Materials.SetOverride( i, reticleCopy );
 						}
@@ -676,7 +712,7 @@ public static class GunsmithLoadoutManager
 					}
 
 					// Conditionally skip sight/optic body
-					if ( !camoOnOptics && (matName.Contains( "sight" ) || matName.Contains( "scope" ) || matName.Contains( "holo" ) || matName.Contains( "optic" )) )
+					if ( !camoOnOptics && (isOptic || IsOpticMaterial( mats[i] )) )
 					{
 						renderer.Materials.SetOverride( i, mats[i] );
 						continue;
@@ -711,12 +747,12 @@ public static class GunsmithLoadoutManager
 				// keep everything else (normal, roughness, AO) so lighting stays correct.
 				for ( int i = 0; i < mats.Length; i++ )
 				{
-					var matName = mats[i].Name.ToLower();
+					var matName = GetMaterialFileName( mats[i] );
 					
 					// Reticle Customization (and skipping glass/lens)
-					if ( matName.Contains( "lens" ) || matName.Contains( "glass" ) || matName.Contains( "dot" ) || matName.Contains( "reticle" ) || matName.Contains( "hologram" ) )
+					if ( matName.Contains( "lens" ) || matName.Contains( "glass" ) || IsReticleMaterial( matName ) )
 					{
-						if ( matName.Contains( "dot" ) || matName.Contains( "reticle" ) || matName.Contains( "hologram" ) )
+						if ( IsReticleMaterial( matName ) )
 						{
 							var reticleCopy = mats[i].CreateCopy();
 							reticleCopy.Set( "g_vSightLightColor", customReticleColor );
@@ -725,7 +761,11 @@ public static class GunsmithLoadoutManager
 								var texPath = customReticleShape.CamoTexture.Replace(".png", ".vtex");
 								var tex = Texture.Load( FileSystem.Mounted, texPath );
 								if ( tex != null )
+								{
 									reticleCopy.Set( "RedDot", tex );
+									reticleCopy.Set( "g_tRedDot", tex );
+									reticleCopy.Set( "g_flUseReticleTexture", 1f );
+								}
 							}
 							renderer.Materials.SetOverride( i, reticleCopy );
 						}
@@ -737,7 +777,7 @@ public static class GunsmithLoadoutManager
 					}
 
 					// Conditionally skip sight/optic body
-					if ( !camoOnOptics && (matName.Contains( "sight" ) || matName.Contains( "scope" ) || matName.Contains( "holo" ) || matName.Contains( "optic" )) )
+					if ( !camoOnOptics && (isOptic || IsOpticMaterial( mats[i] )) )
 					{
 						renderer.Materials.SetOverride( i, mats[i] );
 						continue;
@@ -746,6 +786,7 @@ public static class GunsmithLoadoutManager
 					var copy = mats[i].CreateCopy();
 					// TextureColor is the albedo slot these shaders actually expose (see any .vmat).
 					// "Color" / "g_tColor" are no-ops and leave the copy on its default white albedo.
+					copy.Set( "g_flUseFactoryFinish", 0f );
 					copy.Set( "TextureColor", camoTex );
 					copy.Set( "Color", camoTex );
 					copy.Set( "g_tColor", camoTex );
@@ -769,12 +810,12 @@ public static class GunsmithLoadoutManager
 			{
 				for ( int i = 0; i < mats.Length; i++ )
 				{
-					var matName = mats[i].Name.ToLower();
+					var matName = GetMaterialFileName( mats[i] );
 
 					// Reticle Customization (and skipping glass/lens)
-					if ( matName.Contains( "lens" ) || matName.Contains( "glass" ) || matName.Contains( "dot" ) || matName.Contains( "reticle" ) || matName.Contains( "hologram" ) )
+					if ( matName.Contains( "lens" ) || matName.Contains( "glass" ) || IsReticleMaterial( matName ) )
 					{
-						if ( matName.Contains( "dot" ) || matName.Contains( "reticle" ) || matName.Contains( "hologram" ) )
+						if ( IsReticleMaterial( matName ) )
 						{
 							var reticleCopy = mats[i].CreateCopy();
 							reticleCopy.Set( "g_vSightLightColor", customReticleColor );
@@ -783,7 +824,11 @@ public static class GunsmithLoadoutManager
 								var texPath = customReticleShape.CamoTexture.Replace(".png", ".vtex");
 								var tex = Texture.Load( FileSystem.Mounted, texPath );
 								if ( tex != null )
+								{
 									reticleCopy.Set( "RedDot", tex );
+									reticleCopy.Set( "g_tRedDot", tex );
+									reticleCopy.Set( "g_flUseReticleTexture", 1f );
+								}
 							}
 							renderer.Materials.SetOverride( i, reticleCopy );
 						}
@@ -795,7 +840,7 @@ public static class GunsmithLoadoutManager
 					}
 
 					// Conditionally skip sight/optic body
-					if ( !camoOnOptics && (matName.Contains( "sight" ) || matName.Contains( "scope" ) || matName.Contains( "holo" ) || matName.Contains( "optic" )) )
+					if ( !camoOnOptics && (isOptic || IsOpticMaterial( mats[i] )) )
 					{
 						renderer.Materials.SetOverride( i, mats[i] );
 						continue;
@@ -839,6 +884,49 @@ public static class GunsmithLoadoutManager
 				renderer.Tint = Color.White;
 			}
 		}
+
+		// Hide replaced geometry after painting, so every camo branch preserves
+		// the barrel kit's silhouette. Removing the kit restores original slots
+		// through the normal material pass above.
+		var hiddenMaterials = attachmentPoints.Where( p => p.CurrentPart.IsValid() )
+			.SelectMany( p => p.CurrentPart.HiddenWeaponMaterials ?? new List<string>() )
+			.ToHashSet( StringComparer.OrdinalIgnoreCase );
+		if ( hiddenMaterials.Count > 0 )
+		{
+			var nodraw = Material.Load( "attachments/m4a1/materials/hidden.vmat" );
+			foreach ( var renderer in root.Components.GetAll<ModelRenderer>( FindMode.EverythingInSelfAndDescendants ) )
+			{
+				if ( renderer.Model is null ) continue;
+				for ( int i = 0; i < renderer.Model.Materials.Length; i++ )
+					if ( hiddenMaterials.Contains( renderer.Model.Materials[i].Name ) )
+						renderer.Materials.SetOverride( i, nodraw );
+			}
+		}
+		foreach ( var mount in root.Components.GetAll<GunsmithMw22Attachment>( FindMode.EverythingInSelfAndDescendants ) ) mount.RefreshMount();
+		foreach ( var factory in root.Components.GetAll<GunsmithMw22Factory>( FindMode.EverythingInSelfAndDescendants ) ) factory.Refresh();
+	}
+
+	private static string GetMaterialFileName( Material material )
+	{
+		var path = (material.Name ?? "").Replace( '\\', '/' );
+		return path[(path.LastIndexOf( '/' ) + 1)..].ToLowerInvariant();
+	}
+
+	private static bool IsReticleMaterial( string fileName )
+	{
+		// "reddot_rmr" is the housing's folder, not a reticle. Match the material
+		// filename so v_rmr.vmat gets painted while v_rmr_red_dot.vmat stays clear.
+		return fileName.Contains( "reticle" ) || fileName.Contains( "hologram" )
+			|| fileName.Contains( "_dot." ) || fileName.Contains( "_reddot." )
+			|| fileName.StartsWith( "dot." ) || fileName.StartsWith( "red_dot." );
+	}
+
+	private static bool IsOpticMaterial( Material material )
+	{
+		var name = (material.Name ?? "").ToLowerInvariant();
+		return name.Contains( "sight" ) || name.Contains( "scope" )
+			|| name.Contains( "holo" ) || name.Contains( "optic" )
+			|| name.Contains( "reddot" ) || name.Contains( "rmr" );
 	}
 
 	private static void ApplyPaintFinish( Material material )

@@ -1,0 +1,33 @@
+{
+  "RootObject": {
+    "__guid": "7d028001-aa41-55f9-b3ff-1aa80a78271b",
+    "Name": "Tac Laser",
+    "Enabled": true,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "760e0557-d60f-5fa4-a011-2daf91196f86",
+        "Model": "attachments/mw2022/models/att_vm_p01_ar_mike4_laser01/att_vm_p01_ar_mike4_laser01.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithMw22Attachment",
+        "__guid": "09ce4667-c6da-5e1d-9d83-893201376370",
+        "BindPosition": "8.600000,-1.220000,7.414700",
+        "PartScale": "1.000000,1.000000,1.000000",
+        "PartAngles": "0,0,90",
+        "BoneName": "weapon_root",
+        "BodygroupChoices": {},
+        "IsLauncher": false,
+        "LaserEmitter": "2.999000,0.669000,0.111000",
+        "LaserColor": "0.08,1,0.12,1",
+        "LaserWidth": 0.035
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

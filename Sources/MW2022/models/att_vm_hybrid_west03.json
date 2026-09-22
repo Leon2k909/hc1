@@ -1,0 +1,160 @@
+{
+  "vertices": 13001,
+  "triangles": 16529,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_ae6d7bd27d67": "viper/mw/attachments/attachment_vm_minireddot02_lens",
+    "m_471c28980621": "viper/mw/attachments/attachment_vm_4x_west02_lens",
+    "m_d88464ba9984": "viper/mw/attachments/stencil_outline",
+    "m_07524281557d": "viper/mw/attachments/attachment_vm_minireddot02_lens_ads",
+    "m_a9c7cddeca2e": "viper/mw/attachments/attachment_vm_kalpha_sight_canted",
+    "m_ebf9d90d4147": "viper/mw/attachments/attachment_vm_minireddot02_body",
+    "m_0d596d17b198": "viper/mw/attachments/attachment_vm_4x_west02_body",
+    "m_853afc05898f": "viper/mw/attachments/ads_scope_lens_1"
+  },
+  "bounds": [
+    [
+      -1.3279999494552612,
+      -2.1579999923706055,
+      -0.6650000214576721
+    ],
+    [
+      3.2860000133514404,
+      1.0210000276565552,
+      1.968999981880188
+    ]
+  ],
+  "key": "att_vm_hybrid_west03",
+  "name": "Cronen C480 Pro Hybrid",
+  "category": "Optic",
+  "source": "models/viper/mw/attachments/attachment_vm_hybrid_west03.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_hybrid_west03/att_vm_hybrid_west03.vmdl",
+  "bodygroups": [
+    {
+      "name": "optic",
+      "choices": [
+        {
+          "source": "attachment_vm_hybrid_west03.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    },
+    {
+      "name": "lens",
+      "choices": [
+        {
+          "source": "blank",
+          "mesh": ""
+        },
+        {
+          "source": "attachment_vm_hybrid_west03_lens.smd",
+          "mesh": "mesh_01"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_hybrid",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_reticle_attach",
+      "head": [
+        -1.2029999494552612,
+        -0.004999999888241291,
+        1.0140000581741333
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -1.2029999494552612
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -0.004999995231628418
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.0140000581741333
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_reticle_attach2",
+      "head": [
+        1.3109999895095825,
+        -1.5750000476837158,
+        0.20499999821186066
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          1.3109999895095825
+        ],
+        [
+          0.0,
+          0.7071260213851929,
+          -0.7070875763893127,
+          -1.5750000476837158
+        ],
+        [
+          0.0,
+          0.7070875763893127,
+          0.7071260213851929,
+          0.20499999821186066
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

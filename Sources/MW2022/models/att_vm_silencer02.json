@@ -1,0 +1,106 @@
+{
+  "vertices": 3803,
+  "triangles": 4432,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_66cedc410d39": "viper/mw/attachments/attachment_vm_silencer02_body"
+  },
+  "bounds": [
+    [
+      -0.17599999904632568,
+      -0.8009999990463257,
+      -0.8009999990463257
+    ],
+    [
+      6.956999778747559,
+      0.8009999990463257,
+      0.8009999990463257
+    ]
+  ],
+  "key": "att_vm_silencer02",
+  "name": "Monolithic Suppressor",
+  "category": "Muzzle",
+  "source": "models/viper/mw/attachments/attachment_vm_silencer02.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_silencer02/att_vm_silencer02.vmdl",
+  "bodygroups": [
+    {
+      "name": "grip",
+      "choices": [
+        {
+          "source": "attachment_vm_silencer02.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_silencer",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_flash_attachment_silenced",
+      "head": [
+        6.923999786376953,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          6.923999786376953
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

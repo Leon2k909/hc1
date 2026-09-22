@@ -1,0 +1,72 @@
+{
+  "vertices": 2382,
+  "triangles": 3165,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_09100922db34": "easy/mw/weapons/iw9_mike16/material_1ae0691f40c31b94"
+  },
+  "bounds": [
+    [
+      -10.21005916595459,
+      -0.8500063419342041,
+      -4.655027866363525
+    ],
+    [
+      0.3760017454624176,
+      0.8500016927719116,
+      0.7210009098052979
+    ]
+  ],
+  "key": "att_vm_p01_ar_mike16_stock_v0",
+  "name": "Demo Precision Elite Factory",
+  "category": "Stock",
+  "source": "models/easy/mw/attachments/iw9_mike16/att_vm_p01_ar_mike16_stock_v0.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_p01_ar_mike16_stock_v0/att_vm_p01_ar_mike16_stock_v0.vmdl",
+  "bodygroups": [
+    {
+      "name": "stock",
+      "choices": [
+        {
+          "source": "att_vm_p01_ar_mike16_stock_v0_LOD0.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_stock_attach",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

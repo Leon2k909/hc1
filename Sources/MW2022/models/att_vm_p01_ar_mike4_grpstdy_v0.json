@@ -1,0 +1,72 @@
+{
+  "vertices": 2345,
+  "triangles": 3106,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_65d83eafc4ac": "easy/mw/weapons/iw9_mike4/wpn_p01_ar_mike4_gripstdy_v0"
+  },
+  "bounds": [
+    [
+      -3.5460214614868164,
+      -0.6860046982765198,
+      -4.013022422790527
+    ],
+    [
+      -0.0020015861373394728,
+      0.6860026717185974,
+      -0.002000011270865798
+    ]
+  ],
+  "key": "att_vm_p01_ar_mike4_grpstdy_v0",
+  "name": "D15 Grip",
+  "category": "RearGrip",
+  "source": "models/easy/mw/attachments/iw9_mike4/att_vm_p01_ar_mike4_grpstdy_v0.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_p01_ar_mike4_grpstdy_v0/att_vm_p01_ar_mike4_grpstdy_v0.vmdl",
+  "bodygroups": [
+    {
+      "name": "stock",
+      "choices": [
+        {
+          "source": "att_vm_p01_ar_mike4_grpstdy_v0_LOD0.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_pistolgrip_attach",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

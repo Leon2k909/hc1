@@ -1,0 +1,107 @@
+{
+  "vertices": 5382,
+  "triangles": 5634,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_5eddbf80141d": "viper/mw/attachments/weapon_vm_lm_slima_sightoptic_lens",
+    "m_609686a929ab": "viper/mw/attachments/weapon_vm_lm_slima_sightoptic"
+  },
+  "bounds": [
+    [
+      -0.22004899382591248,
+      -1.281000018119812,
+      -0.307000994682312
+    ],
+    [
+      3.2239511013031006,
+      0.9719989895820618,
+      2.190000057220459
+    ]
+  ],
+  "key": "att_vm_2x_west02_holo",
+  "name": "Solozero K498",
+  "category": "Optic",
+  "source": "models/viper/mw/attachments/attachment_vm_lm_slima_acog_optic.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_2x_west02_holo/att_vm_2x_west02_holo.vmdl",
+  "bodygroups": [
+    {
+      "name": "optic",
+      "choices": [
+        {
+          "source": "attachment_vm_lm_slima_acog_optic.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_holo",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_reticle_attach",
+      "head": [
+        0.5149999856948853,
+        0.0,
+        1.3170000314712524
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.5149999856948853
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.3170000314712524
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

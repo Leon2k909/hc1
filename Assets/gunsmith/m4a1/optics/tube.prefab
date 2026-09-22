@@ -1,0 +1,28 @@
+{
+  "RootObject": {
+    "__guid": "d5703db3-c5f1-56a5-a446-19c5312187c0",
+    "Name": "Patrol Red Dot",
+    "Enabled": true,
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "52cf496e-24b0-5a1c-b9ff-a0c6d04682e4",
+        "Model": "attachments/m4a1/tube_red_dot/tube_red_dot.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithSocketAttachment",
+        "__guid": "1ed72421-b27e-5ab0-9fc0-ca59864e6148",
+        "SocketName": "muzzle",
+        "SocketOffset": "-16.9,0,1.18",
+        "SocketAngles": "0,0,0",
+        "ModelSocketOffsets": {
+          "models/weapons/sbox_assault_m4a1/w_m4a1.vmdl": "-19.28281,0,1.38177"
+        }
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

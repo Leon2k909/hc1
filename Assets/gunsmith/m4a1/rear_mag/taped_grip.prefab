@@ -1,0 +1,29 @@
+{
+  "RootObject": {
+    "__guid": "9c211da1-1d91-571c-bf42-6943a73c43f0",
+    "Name": "Taped Grip",
+    "Flags": 0,
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "20a5f9f4-f29d-5174-8d27-8dc490aea02d",
+        "Model": "attachments/rear_mag/m4a1_taped_grip/m4a1_taped_grip.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithBoneAttachment",
+        "__guid": "17a10c3b-9d29-54db-b935-90cb440bc5bc",
+        "BoneName": "weapon_root",
+        "HiddenBodygroup": "",
+        "ModelVariants": {}
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

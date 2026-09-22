@@ -1,0 +1,72 @@
+{
+  "vertices": 5090,
+  "triangles": 6562,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_aa6381d529b0": "viper/mw/attachments/attachment_vm_bipod_grip"
+  },
+  "bounds": [
+    [
+      -0.13199999928474426,
+      -3.3760030269622803,
+      -8.21500015258789
+    ],
+    [
+      2.1410000324249268,
+      3.375998020172119,
+      0.34999901056289673
+    ]
+  ],
+  "key": "att_vm_p01_ar_mike4_bipodgrip",
+  "name": "Bipod Grip",
+  "category": "Underbarrel",
+  "source": "models/viper/mw/attachments/attachment_vm_bipod_grip.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_p01_ar_mike4_bipodgrip/att_vm_p01_ar_mike4_bipodgrip.vmdl",
+  "bodygroups": [
+    {
+      "name": "grip",
+      "choices": [
+        {
+          "source": "attachment_vm_bipod_grip.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_folding_grip",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

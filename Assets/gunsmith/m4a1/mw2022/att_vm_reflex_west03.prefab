@@ -1,0 +1,30 @@
+{
+  "RootObject": {
+    "__guid": "a252479c-a683-57a9-9c12-e0c56d976346",
+    "Name": "Operator Reflex Sight",
+    "Enabled": true,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "498bae42-fe29-5500-9030-275fa8cb223f",
+        "Model": "attachments/mw2022/models/att_vm_reflex_west03/att_vm_reflex_west03.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithMw22Attachment",
+        "__guid": "32bf1a13-687d-5a2e-b8c5-9f07c4770992",
+        "BindPosition": "0.250000,0.000000,8.730000",
+        "PartScale": "1.000000,1.000000,1.000000",
+        "PartAngles": "0,0,0",
+        "BoneName": "weapon_root",
+        "BodygroupChoices": {},
+        "IsLauncher": false
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}
