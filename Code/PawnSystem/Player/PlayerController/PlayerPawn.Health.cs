@@ -16,10 +16,18 @@ public partial class PlayerPawn : IGameEventHandler<DamageGivenEvent>, IGameEven
 		if ( !mode.IsValid() || mode.Hardcore ) return;
 		if ( HealthComponent.State != LifeState.Alive ) return;
 		if ( HealthComponent.Health >= HealthComponent.MaxHealth ) return;
-		if ( _timeSinceLastDamage < 5f ) return;
+
+		// Zombies: CoD-style fast regen, but never while downed.
+		var zombies = ZombiesPlayerState.For( this );
+		if ( zombies is { IsDowned: true } ) return;
+
+		var delay = zombies is not null ? 3f : 4f;
+		// Core modes: full health back in ~4s once you stop taking damage.
+		var rate = zombies is not null ? 40f : 25f;
+		if ( _timeSinceLastDamage < delay ) return;
 
 		HealthComponent.Health = Math.Min( HealthComponent.MaxHealth,
-			HealthComponent.Health + 2f * Time.Delta );
+			HealthComponent.Health + rate * Time.Delta );
 	}
 
 	/// <summary>

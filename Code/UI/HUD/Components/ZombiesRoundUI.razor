@@ -5,54 +5,253 @@
 
 @if ( RoundSystem == null ) return;
 
-<root class="@(RoundSystem.IsIntermission ? "intermission" : "active-round")">
-    
-    <div class="round-container">
-        @if ( RoundSystem.IsIntermission )
+<root>
+    @* ── Round counter (bottom left, above vitals) ── *@
+    <div class="round-box @(RoundSystem.IsIntermission ? "intermission" : "")">
+        @if ( RoundSystem.IsIntermission && !RoundSystem.IsGameOver )
         {
-            <div class="intermission-text">NEXT ROUND STARTING...</div>
-            <div class="round-number">@(RoundSystem.CurrentRound + 1)</div>
+            <label class="round-caption">ROUND @(RoundSystem.CurrentRound + 1) IN @(Math.Max( 0, (int)MathF.Ceiling( RoundSystem.TimeUntilNextRound ) ))</label>
         }
-        else
+        <label class="round-number">@(Math.Max( 1, RoundSystem.IsIntermission ? RoundSystem.CurrentRound + 1 : RoundSystem.CurrentRound ))</label>
+        @if ( !RoundSystem.IsIntermission )
         {
-            <div class="round-number">@RoundSystem.CurrentRound</div>
-            <div class="tally-marks">
-                @* Optional: Can do classic tally marks here if desired, but numbers are easier to read high-rounds *@
-            </div>
-            
-            <div class="zombies-remaining">Zombies: @RoundSystem.ZombiesRemainingInRound</div>
-            <div class="zombies-points" style="font-size: 24px; font-family: 'Arial', sans-serif; font-weight: bold; color: #FFD700; text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; text-shadow: 1px 1px 3px rgba(0, 0, 0, 1);">Points: @GetPoints()</div>
+            <label class="round-caption">@(RoundSystem.ZombiesRemainingInRound + RoundSystem.ZombiesAlive) ZOMBIES LEFT</label>
         }
     </div>
 
+    @* ── Points + perks (bottom right) ── *@
+    <div class="points-box">
+        <div class="popups">
+            @foreach ( var p in Popups )
+            {
+                <label class="popup @(p.Amount < 0 ? "spent" : "")" style="bottom: @((int)(p.Age * 60f))px; opacity: @(Math.Clamp( 1.2f - p.Age, 0f, 1f ));">@(p.Amount > 0 ? "+" : "")@p.Amount</label>
+            }
+        </div>
+        <label class="points">@(Economy?.Points ?? 0)</label>
+        <div class="perks">
+            @foreach ( var perk in AllPerks )
+            {
+                if ( State?.HasPerk( perk ) != true ) continue;
+                <div class="perk" style="background-color: @ZombiesBuyStation.PerkColor( perk ).Hex;"><label>@PerkLetter( perk )</label></div>
+            }
+        </div>
+    </div>
+
+    @* ── Active power-ups (bottom centre) ── *@
+    <div class="powerups">
+        @if ( RoundSystem.IsPowerUpActive( ZombiesPowerUpType.InstaKill ) )
+        {
+            <div class="powerup" style="border-color: @ZombiesPowerUp.GetColor( ZombiesPowerUpType.InstaKill ).Hex;"><label class="pu-name">INSTA-KILL</label><label class="pu-time">@((int)RoundSystem.InstaKillTime)</label></div>
+        }
+        @if ( RoundSystem.IsPowerUpActive( ZombiesPowerUpType.DoublePoints ) )
+        {
+            <div class="powerup" style="border-color: @ZombiesPowerUp.GetColor( ZombiesPowerUpType.DoublePoints ).Hex;"><label class="pu-name">DOUBLE POINTS</label><label class="pu-time">@((int)RoundSystem.DoublePointsTime)</label></div>
+        }
+    </div>
+
+    @* ── Interaction prompt (centre, below crosshair) ── *@
+    @if ( !string.IsNullOrEmpty( PromptText ) )
+    {
+        <div class="prompt @(PromptBlocked ? "blocked" : "")">
+            <div class="key"><label>E</label></div>
+            <label>@PromptText</label>
+        </div>
+    }
+
+    @* ── Downed overlay ── *@
+    @if ( State?.IsDowned == true && !RoundSystem.IsGameOver )
+    {
+        <div class="downed">
+            <label class="downed-title">YOU ARE DOWN</label>
+            @if ( State.IsSelfReviving )
+            {
+                <label class="downed-sub">Quick Revive is getting you back up…</label>
+            }
+            else if ( State.Reviver.IsValid() )
+            {
+                <label class="downed-sub">@State.Reviver.DisplayName is reviving you</label>
+            }
+            else
+            {
+                <label class="downed-sub">Bleeding out in @((int)MathF.Ceiling( State.BleedOutRemaining ))s — wait for a teammate</label>
+            }
+            <div class="bar"><div class="fill" style="width: @((State.ReviveProgress > 0 ? State.ReviveProgress : State.BleedOutRemaining / ZombiesPlayerState.BleedOutTime) * 100f)%;"></div></div>
+        </div>
+    }
+
+    @* ── Reviving someone ── *@
+    @if ( !RoundSystem.IsGameOver && RevivingTarget is { } target )
+    {
+        <div class="reviving">
+            <label>REVIVING @target.Player?.DisplayName</label>
+            <div class="bar"><div class="fill revive" style="width: @(target.ReviveProgress * 100f)%;"></div></div>
+        </div>
+    }
+
+    @* ── Dead, waiting for next round ── *@
+    @if ( IsDeadWaiting && !RoundSystem.IsGameOver )
+    {
+        <div class="downed">
+            <label class="downed-title">YOU DIED</label>
+            <label class="downed-sub">You'll respawn when the round ends</label>
+        </div>
+    }
+
+    @* ── Round start banner ── *@
+    @if ( !RoundSystem.IsIntermission && !RoundSystem.IsGameOver && RoundSystem.TimeSinceRoundStart < 3.5f )
+    {
+        <div class="round-banner" style="opacity: @BannerOpacity;">
+            <label class="rb-caption">ROUND</label>
+            <label class="rb-number">@RoundSystem.CurrentRound</label>
+        </div>
+    }
+
+    @* ── Opening cinematic ── *@
+    @if ( RoundSystem.IntroPlaying && RoundSystem.TimeSinceIntro < ZombiesRoundSystem.IntroDuration )
+    {
+        var t = (float)RoundSystem.TimeSinceIntro;
+        <div class="intro" style="background-color: rgba( 0, 0, 0, @Fade( t, -1f, 0f, 3.2f, 5.2f ) );">
+            <div class="intro-text" style="opacity: @Fade( t, 0.4f, 1f, 6.2f, 7.6f );">
+                <label class="intro-line">@Typed( IntroLocation, t, 0.8f )</label>
+                <label class="intro-line dim">@Typed( IntroTime, t, 2.0f )</label>
+                <label class="intro-title" style="opacity: @Fade( t, 3.0f, 4.2f, 99f, 100f );">ZOMBIES</label>
+                <label class="intro-sub" style="opacity: @Fade( t, 4.4f, 5.2f, 99f, 100f );">SURVIVE AS LONG AS YOU CAN</label>
+            </div>
+        </div>
+    }
+
+    @* ── Game over ── *@
+    @if ( RoundSystem.IsGameOver )
+    {
+        <div class="game-over">
+            <label class="go-title">GAME OVER</label>
+            <label class="go-sub">You survived @RoundSystem.GameOverRound @(RoundSystem.GameOverRound == 1 ? "round" : "rounds")</label>
+            <label class="go-restart">Restarting in @((int)MathF.Ceiling( RoundSystem.TimeUntilRestart ))…</label>
+        </div>
+    }
 </root>
 
 @code
 {
-    private ZombiesRoundSystem RoundSystem;
+    private ZombiesRoundSystem RoundSystem => ZombiesRoundSystem.Current;
 
-    private string GetPoints()
+    // ── Intro helpers ──
+    private string IntroLocation => (Scene?.Source?.ResourceName ?? "Unknown").Replace( "_", " " ).ToUpperInvariant() + " — OUTSKIRTS";
+    private string IntroTime => $"DAY 1  ·  {DateTime.Now:HH:mm}";
+
+    /// <summary>0 → 1 between inStart..inEnd, back to 0 between outStart..outEnd.</summary>
+    private static float Fade( float t, float inStart, float inEnd, float outStart, float outEnd )
     {
-        var player = Game.ActiveScene.GetAllComponents<PlayerPawn>().FirstOrDefault( x => x.Network.IsOwner );
-        if ( player != null && player.Components.TryGet<ZombiesPlayerEconomy>( out var eco ) )
-        {
-            return eco.Points.ToString();
-        }
-        return "0";
+        var fadeIn = inEnd <= inStart ? 1f : Math.Clamp( (t - inStart) / (inEnd - inStart), 0f, 1f );
+        var fadeOut = 1f - Math.Clamp( (t - outStart) / (outEnd - outStart), 0f, 1f );
+        return MathF.Round( Math.Min( fadeIn, fadeOut ), 2 );
     }
+
+    /// <summary>Typewriter reveal, ~22 characters a second from start time.</summary>
+    private static string Typed( string text, float t, float start )
+    {
+        var n = Math.Clamp( (int)((t - start) * 22f), 0, text.Length );
+        return text.Substring( 0, n );
+    }
+
+    private float BannerOpacity
+    {
+        get
+        {
+            var t = (float)RoundSystem.TimeSinceRoundStart;
+            return MathF.Round( Math.Min( Math.Clamp( t / 0.3f, 0f, 1f ), Math.Clamp( (3.5f - t) / 0.8f, 0f, 1f ) ), 2 );
+        }
+    }
+
+    private static readonly ZombiesPerk[] AllPerks = { ZombiesPerk.Juggernog, ZombiesPerk.SpeedCola, ZombiesPerk.DoubleTap, ZombiesPerk.QuickRevive, ZombiesPerk.StaminUp };
+
+    private static string PerkLetter( ZombiesPerk perk ) => perk switch
+    {
+        ZombiesPerk.Juggernog => "J",
+        ZombiesPerk.SpeedCola => "S",
+        ZombiesPerk.DoubleTap => "D",
+        ZombiesPerk.QuickRevive => "Q",
+        ZombiesPerk.StaminUp => "M",
+        _ => "?"
+    };
+
+    private record Popup( int Amount, RealTimeSince Age );
+    private readonly List<Popup> Popups = new();
+
+    private PlayerPawn LocalPawn => Client.Local?.PlayerPawn;
+    private ZombiesPlayerEconomy Economy => LocalPawn?.GetComponent<ZombiesPlayerEconomy>();
+    private ZombiesPlayerState State => LocalPawn?.GetComponent<ZombiesPlayerState>();
+
+    private bool IsDeadWaiting => LocalPawn is null || LocalPawn.HealthComponent.State == LifeState.Dead;
+
+    private ZombiesPlayerState RevivingTarget => LocalPawn is { } me
+        ? Scene.GetAllComponents<ZombiesPlayerState>().FirstOrDefault( x => x.IsDowned && x.Reviver == me )
+        : null;
+
+    private string PromptText;
+    private bool PromptBlocked;
+
+    // Points popups come from watching the synced total, so they work for every client.
+    private int? _lastPoints;
+    private ZombiesPlayerEconomy _lastEconomy;
 
     public override void Tick()
     {
-        if ( RoundSystem == null )
+        var eco = Economy;
+        if ( eco != _lastEconomy ) { _lastEconomy = eco; _lastPoints = eco?.Points; }
+        else if ( eco is not null && _lastPoints is { } last && eco.Points != last )
         {
-            RoundSystem = Game.ActiveScene.GetAllComponents<ZombiesRoundSystem>().FirstOrDefault();
+            Popups.Add( new Popup( eco.Points - last, 0 ) );
+            _lastPoints = eco.Points;
+        }
+
+        Popups.RemoveAll( x => x.Age > 1.2f );
+        UpdatePrompt();
+    }
+
+    private void UpdatePrompt()
+    {
+        PromptText = null;
+        PromptBlocked = false;
+
+        var me = LocalPawn;
+        if ( me is null || State?.IsDowned == true || me.HealthComponent.State != LifeState.Alive ) return;
+
+        switch ( me.Hovered )
+        {
+            case ZombiesBuyStation station:
+				if ( me.WorldPosition.Distance( station.WorldPosition ) > ZombiesBuyStation.UseRange ) return;
+                var (cost, action) = station.GetOffer( me );
+                if ( station.Kind == ZombiesBuyKind.Perk && State?.HasPerk( station.Perk ) == true )
+                {
+                    PromptText = $"You already have {station.Title}";
+                    PromptBlocked = true;
+                    return;
+                }
+                PromptText = $"{action} [{cost}]";
+                PromptBlocked = (Economy?.Points ?? 0) < cost;
+                return;
+
+            case ZombiesPlayerState downed when downed.IsDowned:
+                PromptText = $"Hold to revive {downed.Player?.DisplayName}";
+                return;
         }
     }
 
     protected override int BuildHash()
     {
-        if ( RoundSystem == null ) return HashCode.Combine( 0 );
-        
-        return HashCode.Combine( RoundSystem.CurrentRound, RoundSystem.IsIntermission, RoundSystem.ZombiesRemainingInRound, GetPoints() );
+        var rs = RoundSystem;
+        if ( rs == null ) return 0;
+
+        var state = State;
+        var h1 = HashCode.Combine( rs.CurrentRound, rs.IsIntermission, rs.ZombiesRemainingInRound, rs.ZombiesAlive, rs.IsGameOver,
+            (int)rs.TimeUntilNextRound, (int)rs.TimeUntilRestart, Economy?.Points );
+        var h2 = HashCode.Combine( state?.Perks, state?.IsDowned, (int)((state?.ReviveProgress ?? 0) * 50), (int)(state?.BleedOutRemaining ?? 0),
+            PromptText, PromptBlocked, (int)rs.InstaKillTime, (int)rs.DoublePointsTime );
+        var animating = (rs.IntroPlaying && rs.TimeSinceIntro < ZombiesRoundSystem.IntroDuration) || (!rs.IsIntermission && rs.TimeSinceRoundStart < 3.6f);
+        var h4 = animating ? (int)(Time.Now * 30f) : 0;
+        var h3 = HashCode.Combine( h4, Popups.Count, Popups.Count > 0 ? (int)(Popups[^1].Age * 30) : 0, IsDeadWaiting,
+            (int)((RevivingTarget?.ReviveProgress ?? 0) * 50) );
+        return HashCode.Combine( h1, h2, h3 );
     }
 }

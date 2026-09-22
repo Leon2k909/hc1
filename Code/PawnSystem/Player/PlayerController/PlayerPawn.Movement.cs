@@ -126,6 +126,9 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	public Ray AimRay => CameraController.AimRay;
 
 	private float _smoothEyeHeight;
+
+	// Keep the first-person body hidden until the camera clears it when standing up.
+	public bool HideFirstPersonBodyForStance => IsProne || _smoothEyeHeight < -18f;
 	private Vector3 _previousVelocity;
 	private bool _isTouchingLadder;
 	private Vector3 _ladderNormal;
@@ -158,8 +161,9 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 		if ( PlayerBoxCollider.IsValid() )
 		{
 			// Bit shit, but it works
-			PlayerBoxCollider.Center = new( 0, 0, 32 + _smoothEyeHeight );
-			PlayerBoxCollider.Scale = new( 32, 32, 64 + _smoothEyeHeight );
+			var stanceHeight = Height + _smoothEyeHeight;
+			PlayerBoxCollider.Center = new( 0, 0, stanceHeight * 0.5f );
+			PlayerBoxCollider.Scale = new( 32, 32, stanceHeight );
 		}
 	}
 
@@ -289,7 +293,9 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 			cc.Velocity += Vector3.Up * vertical * NoclipSpeed;
 		}
 
-		cc.ApplyFriction( GetFriction() );
+		// The standing stop-speed floor can erase an entire slow crawl each tick.
+		if ( IsProne ) cc.ApplyFriction( GetFriction(), MathF.Max( GetWishSpeed(), 1f ) );
+		else cc.ApplyFriction( GetFriction() );
 		cc.Move();
 	}
 
@@ -302,7 +308,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	{
 		// Shooting breaks the sprint. Without this, holding fire while running is simply swallowed by
 		// the no_shooting tag and you stay stuck in the run animation until you let go of Run.
-		if ( Input.Down( "Attack1" ) )
+		if ( Input.Down( "Attack1" ) && !HasEquipmentTag( "aiming" ) )
 		{
 			WantsToggleSprint = false;
 			return false;
@@ -341,7 +347,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	{
 		bool wasSprinting = IsSprinting;
 
-		IsSlowWalking = Input.Down( "Walk" ) || HasEquipmentTag( "aiming" );
+		IsSlowWalking = Input.Down( "Walk" );
 		IsSprinting = GetWantsToSprint();
 
 		if ( wasSprinting != IsSprinting )
@@ -355,6 +361,13 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 
 		if ( IsProne && Input.Pressed( "Jump" ) )
 			IsProne = false;
+
+		// Zombies: downed players are stuck on the floor until revived.
+		if ( ZombiesPlayerState.For( this ) is { IsDowned: true } )
+		{
+			IsProne = true;
+			IsSprinting = false;
+		}
 
 		IsCrouching = Input.Down( "Duck" ) && !IsNoclipping;
 		IsUsing = Input.Down( "Use" );
@@ -580,6 +593,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	private float GetFriction()
 	{
 		if ( !CharacterController.IsOnGround ) return 0.1f;
+		if ( IsProne ) return Global.CrouchingFriction;
 		if ( IsSlowWalking ) return Global.SlowWalkFriction;
 		if ( IsCrouching ) return Global.CrouchingFriction;
 		if ( IsSprinting ) return Global.SprintingFriction;
@@ -589,6 +603,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	private float GetAcceleration()
 	{
 		if ( !CharacterController.IsOnGround ) return Global.AirAcceleration;
+		else if ( IsProne ) return Global.CrouchingAcceleration;
 		else if ( IsSlowWalking ) return Global.SlowWalkAcceleration;
 		else if ( IsCrouching ) return Global.CrouchingAcceleration;
 		else if ( IsSprinting ) return Global.SprintingAcceleration;
@@ -621,13 +636,6 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 		else if ( IsSlowWalking )
 		{
 			speed = Global.SlowWalkSpeed;
-			// Apply per-weapon ADS walk speed tuning only when actually aiming
-			if ( HasEquipmentTag( "aiming" ) )
-			{
-				var aimable = CurrentEquipment?.GetComponentInChildren<Aimable>();
-				if ( aimable is not null )
-					speed *= aimable.GetAdsMoveScale();
-			}
 		}
 		else if ( IsCrouching )
 		{
@@ -646,6 +654,9 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 		{
 			speed *= 1.07f; // 7% increase
 		}
+
+		// Zombies: Stamin-Up, and crawling while downed.
+		speed *= ZombiesPlayerState.MoveSpeedScale( this );
 
 		return speed;
 	}

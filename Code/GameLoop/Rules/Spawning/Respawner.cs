@@ -27,6 +27,10 @@ public abstract class Respawner : Component,
 			if ( !player.IsConnected )
 				continue;
 
+			// Zombies: players who died wait for the next round.
+			if ( ZombiesRoundSystem.Current?.ShouldHoldRespawn( player ) == true )
+				continue;
+
 			// Don't auto-respawn bots - they respawn via round events in round-based modes
 			if ( player.IsBot )
 				continue;

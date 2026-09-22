@@ -12,6 +12,12 @@ public partial class ManualOffset : Aimable, IViewModelOffset
 	[Property] public Vector3 AimOffset { get; set; }
 	[Property] public Angles AimAngleOffset { get; set; }
 
+	protected override void OnStart()
+	{
+		base.OnStart();
+		IronSightCalibration.Verify( Equipment, this );
+	}
+
 	protected override void OnUpdate()
 	{
 		base.OnUpdate();

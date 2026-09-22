@@ -7,22 +7,50 @@
 @implements INavigatorPage
 @namespace Facepunch.UI
 
-<root class="hc1 blur" style="display: flex; flex-direction: column; width: 100%; height: 100%; position: absolute;">
-    <MenuTopbar Title="PLAY GAME" />
-    
-    <div style="flex-grow: 1; overflow: hidden; display: flex; flex-direction: column;">
-        <div style="height: 23%;"/>
-            
-            <div class="layout column gap align-center">
-                <label class="emphasis" style="font-size: 24px; color: white;">HOST PRIVATE MATCH</label>
-                <label class="slight" style="font-size: 16px; margin-bottom: 20px;">Create a Pre-Game Lobby where you can configure settings and players can choose teams before starting.</label>
+<root class="hc1 blur">
+    <MenuTopbar Title="PRIVATE MATCH" />
 
-                <div class="button standard action large" onclick=@Join>
-                    <label>Create Lobby</label>
+    <div class="cl-body">
+        <div class="cl-card">
+            <div class="cl-header">
+                <div class="cl-icon"><i>vpn_key</i></div>
+                <div class="cl-titles">
+                    <label class="cl-caption">PRIVATE</label>
+                    <label class="cl-title">HOST PRIVATE MATCH</label>
                 </div>
             </div>
 
-            <div class="grow" />
+            <label class="cl-desc">Create a pre-game lobby where you set up the match and players pick their teams before it starts.</label>
+
+            <div class="cl-features">
+                <div class="cl-feature">
+                    <i>tune</i>
+                    <div class="cl-feature-copy">
+                        <label class="cl-feature-name">CONFIGURE</label>
+                        <label class="cl-feature-sub">Map, mode and match rules</label>
+                    </div>
+                </div>
+                <div class="cl-feature">
+                    <i>groups</i>
+                    <div class="cl-feature-copy">
+                        <label class="cl-feature-name">PICK TEAMS</label>
+                        <label class="cl-feature-sub">Players choose sides in the lobby</label>
+                    </div>
+                </div>
+                <div class="cl-feature">
+                    <i>play_arrow</i>
+                    <div class="cl-feature-copy">
+                        <label class="cl-feature-name">START</label>
+                        <label class="cl-feature-sub">Launch when everyone is ready</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cl-create" onclick=@Join>
+                <i>add</i>
+                <label>CREATE LOBBY</label>
+            </div>
+        </div>
     </div>
 </root>
 

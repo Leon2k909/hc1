@@ -90,12 +90,32 @@ public partial class Reloadable : WeaponInputAction,
 			? AmmoComponent.GetEffectiveMaxAmmo()
 			: AmmoComponent.GetMaxAmmoWithChamber();
 
-		return AmmoComponent.Ammo < target;
+		return AmmoComponent.Ammo < target && HasSpareAmmo;
+	}
+
+	/// <summary>
+	/// Bots never run dry — they don't know how to scavenge.
+	/// </summary>
+	bool HasInfiniteReserve => Equipment?.Owner?.Client?.IsBot ?? false;
+
+	bool HasSpareAmmo => HasInfiniteReserve || AmmoComponent.ReserveAmmo > 0;
+
+	/// <summary>
+	/// Take up to <paramref name="wanted"/> rounds out of the spare ammo.
+	/// </summary>
+	int TakeFromReserve( int wanted )
+	{
+		if ( wanted <= 0 ) return 0;
+		if ( HasInfiniteReserve ) return wanted;
+		var take = Math.Min( wanted, AmmoComponent.ReserveAmmo );
+		AmmoComponent.ReserveAmmo -= take;
+		return take;
 	}
 
 	float GetReloadTime()
 	{
-		return (!AmmoComponent.HasAmmo ? EmptyReloadTime : ReloadTime) * DurationMultiplier;
+		return (!AmmoComponent.HasAmmo ? EmptyReloadTime : ReloadTime) * DurationMultiplier
+			* ZombiesPlayerState.ReloadScale( Equipment?.Owner );
 	}
 
 	public float DurationMultiplier
@@ -177,11 +197,11 @@ public partial class Reloadable : WeaponInputAction,
 		{
 			if ( SingleReload )
 			{
-				AmmoComponent.Ammo++;
-				AmmoComponent.Ammo = AmmoComponent.Ammo.Clamp( 0, AmmoComponent.GetEffectiveMaxAmmo() );
+				if ( AmmoComponent.Ammo < AmmoComponent.GetEffectiveMaxAmmo() )
+					AmmoComponent.Ammo += TakeFromReserve( 1 );
 
 				// Reload more!
-				if ( !_queueCancel && AmmoComponent.Ammo < AmmoComponent.GetEffectiveMaxAmmo() )
+				if ( !_queueCancel && AmmoComponent.Ammo < AmmoComponent.GetEffectiveMaxAmmo() && HasSpareAmmo )
 					StartReload();
 				else
 				{
@@ -196,9 +216,11 @@ public partial class Reloadable : WeaponInputAction,
 				// Ammo still holds the pre-reload count here, so it tells us whether there was a round
 				// left to keep in the chamber. Swapping a partially spent mag gives max + 1; reloading
 				// from empty has nothing chambered, so just max.
-				AmmoComponent.Ammo = AmmoComponent.HasAmmo
+				// Rounds only come out of the spare ammo, so a nearly-dry reserve gives a partial mag.
+				var target = AmmoComponent.HasAmmo
 					? AmmoComponent.GetMaxAmmoWithChamber()
 					: AmmoComponent.GetEffectiveMaxAmmo();
+				AmmoComponent.Ammo += TakeFromReserve( target - AmmoComponent.Ammo );
 			}
 		}
 

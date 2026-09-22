@@ -33,6 +33,8 @@
       {
         "__type": "Facepunch.ZombiesGameMode",
         "__guid": "f1e2d3c4-b5a6-4978-8c9d-0e1f2a3b4c5d",
+        "ZombieBodyModel": "zombie_project/models/zombie_male.vmdl",
+        "MysteryBoxModel": "models/treasure_chest.vmdl",
         "__enabled": true
       },
       {
@@ -110,7 +112,7 @@
       {
         "__type": "Facepunch.BotManager",
         "__guid": "83a62c25-6c75-4ee0-abb7-7d7f1d033fe6",
-        "__enabled": true,
+        "__enabled": false,
         "OnComponentDestroy": null,
         "OnComponentDisabled": null,
         "OnComponentEnabled": null,
@@ -180,7 +182,7 @@
       {
         "__type": "Facepunch.BotWeaponAllocator",
         "__guid": "49fc0437-6e51-4ea0-9057-09e41e1b1c77",
-        "__enabled": true,
+        "__enabled": false,
         "OnComponentDestroy": null,
         "OnComponentDisabled": null,
         "OnComponentEnabled": null,
@@ -319,7 +321,7 @@
               {
                 "__type": "Facepunch.EnableBuyMenu",
                 "__guid": "ea635d1f-635b-48d4-9e6b-92c52aa96a0b",
-                "__enabled": true,
+                "__enabled": false,
                 "InBuyZoneOnly": false,
                 "OnComponentDestroy": null,
                 "OnComponentDisabled": null,
@@ -464,7 +466,7 @@
                 "__type": "Sandbox.Events.StateComponent",
                 "__guid": "188025de-1b23-4cc9-a89f-dcbc112f8a8a",
                 "__enabled": true,
-                "DefaultDuration": 900,
+                "DefaultDuration": 999999,
                 "DefaultNextState": {
                   "_type": "component",
                   "component_id": "1fd1898f-a9bb-42d0-9e1c-3bf36e9a98ef",
@@ -558,7 +560,7 @@
               {
                 "__type": "Facepunch.EnableBuyMenuDuringSpawnProtection",
                 "__guid": "196af5b3-533e-47f7-b9ce-3fbfcd6860cb",
-                "__enabled": true,
+                "__enabled": false,
                 "AlivePlayersCanBuy": true,
                 "OnComponentDestroy": null,
                 "OnComponentDisabled": null,
@@ -570,7 +572,7 @@
               {
                 "__type": "Facepunch.TeamEarlyWinCondition",
                 "__guid": "eb15b2f6-b2a6-48a1-8439-b3383fefc746",
-                "__enabled": true,
+                "__enabled": false,
                 "CounterTerroristVictoryState": {
                   "_type": "component",
                   "component_id": "fa9131b6-22be-4312-ae77-e3e7da7a7cf9",
@@ -620,7 +622,7 @@
               {
                 "__type": "Facepunch.TeamDeathmatchScoring",
                 "__guid": "51495847-64a3-463e-8145-a8992dae1ec2",
-                "__enabled": true,
+                "__enabled": false,
                 "OnComponentDestroy": null,
                 "OnComponentDisabled": null,
                 "OnComponentEnabled": null,
@@ -1192,7 +1194,9 @@
   "MenuPath": null,
   "MenuIcon": null,
   "DontBreakAsTemplate": false,
-  "__references": [],
+  "__references": [
+    "facepunch.zombiemale",
+    "polyhaven.treasure_chest"
+  ],
   "__version": 2
 }
-

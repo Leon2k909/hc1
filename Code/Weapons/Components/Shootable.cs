@@ -490,9 +490,12 @@ public partial class Shootable : WeaponInputAction,
 	/// </summary>
 	private float GetEffectiveFireRate()
 	{
-		if ( string.IsNullOrEmpty( TuningId ) ) return FireRate;
+		// Zombies Double Tap: a shorter delay between shots means a higher RPM.
+		var perkScale = 1f / ZombiesPlayerState.FireDelayScale( Equipment?.Owner );
+
+		if ( string.IsNullOrEmpty( TuningId ) ) return FireRate * perkScale;
 		var tune = WeaponTuningManager.GetTuning( TuningId );
-		return FireRate * (1f + tune.FireRate * 0.012f);
+		return FireRate * (1f + tune.FireRate * 0.012f) * perkScale;
 	}
 
 	protected float RPMToSeconds()

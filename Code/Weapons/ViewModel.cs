@@ -192,7 +192,8 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 		// Apply SCAR-H specific procedural sprint and walk bobbing
 		if ( Equipment.IsValid() && Equipment.Resource.IsValid() && Equipment.Resource.ResourceName.Contains( "scarh", StringComparison.OrdinalIgnoreCase ) )
 		{
-			var isSprinting = Owner.IsValid() && Owner.IsSprinting;
+			var isAiming = Equipment.HasTag( "aiming" );
+			var isSprinting = Owner.IsValid() && Owner.IsSprinting && !isAiming;
 			var targetSprintPos = isSprinting ? new Vector3( 4.29f, -0.86f, -1.1f ) : Vector3.Zero;
 			var targetSprintAngle = isSprinting ? new Angles( 8.41f, 59.66f, 0f ) : Angles.Zero;
 
@@ -274,26 +275,29 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 		var moveVel = Owner.CharacterController.Velocity;
 		var moveLen = moveVel.Length;
 		var isMoving = moveLen > 10f; // Small threshold to determine if actually moving
+		var isAiming = Equipment.HasTag( "aiming" );
 
 		var wishMove = Owner.WishMove.Normal * 1f;
-		if ( Equipment.HasTag( "aiming" ) ) wishMove = 0;
+		if ( isAiming ) wishMove = 0;
 
 		if ( Owner.IsSlowWalking || Owner.IsCrouching ) moveLen *= 0.5f;
 
 		lerpedWishMove = lerpedWishMove.LerpTo( wishMove, Time.Delta * 7.0f );
 
+		// Missing for a frame or two while a pawn is being replaced (e.g. a forced respawn).
 		var footsteps = Owner.GetComponent<PlayerFootsteps>();
+		if ( footsteps is null ) return;
 		var timeSince = footsteps.TimeSinceStep;
 		var freq = footsteps.GetStepFrequency();
 
 		// Set move_bob based on movement
-		lenMult = lenMult.LerpTo( isMoving ? moveLen.Remap( 0, 300, 0, 1, true ) : 0, Time.Delta * 10f );
+		lenMult = lenMult.LerpTo( isMoving && !isAiming ? moveLen.Remap( 0, 300, 0, 1, true ) : 0, Time.Delta * 10f );
 		ModelRenderer?.Set( "move_bob", lenMult );
 
 		// Handle cycle when moving vs stopped
 		float cycleProgress;
 
-		if ( isMoving )
+		if ( isMoving && !isAiming )
 		{
 			// Track step alternation when moving
 			if ( timeSince < Time.Delta )
@@ -331,10 +335,10 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 
 	void ApplyAnimationParameters()
 	{
-		ModelRenderer.Set( "b_sprint", Owner.IsSprinting );
+		var aiming = Equipment.HasTag( "aiming" );
+		ModelRenderer.Set( "b_sprint", Owner.IsSprinting && !aiming );
 		ModelRenderer.Set( "b_grounded", Owner.IsGrounded );
 
-		var aiming = Equipment.HasTag( "aiming" );
 		// Ironsights
 		ModelRenderer.Set( "ironsights", aiming ? 1 : 0 );
 		ModelRenderer.Set( "ironsights_fire_scale", aiming ? IronsightsFireScale : 0f );

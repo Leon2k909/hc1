@@ -27,10 +27,31 @@
         Instance?.Close();
     }
 
+    public static void ToggleAny()
+    {
+        if ( Instance is null || !Instance.IsValid() || !Instance.Enabled )
+        {
+            var pauseObject = Game.ActiveScene.CreateObject();
+            pauseObject.Name = "PauseMenu";
+            Instance = pauseObject.Components.Create<PauseMenuPanel>();
+            pauseObject.Components.Create<ScreenPanel>();
+        }
+
+        Instance.SetOpen( !Instance.IsOpen );
+    }
+
+    private void SetOpen( bool open )
+    {
+        if ( IsOpen == open ) return;
+
+        IsOpen = open;
+        ZombiesRoundSystem.Current?.SetPausedFromMenu( open );
+        StateHasChanged();
+    }
+
     private void Close()
     {
-        IsOpen = false;
-        StateHasChanged();
+        SetOpen( false );
     }
 
     protected override void OnUpdate()
@@ -38,8 +59,7 @@
         if ( Input.EscapePressed )
         {
             Input.EscapePressed = false;
-            IsOpen = !IsOpen;
-            StateHasChanged();
+            SetOpen( !IsOpen );
         }
     }
 
@@ -50,6 +70,9 @@
 
     protected override void OnDestroy()
     {
+        if ( IsOpen )
+            ZombiesRoundSystem.Current?.SetPausedFromMenu( false );
+
         base.OnDestroy();
         if ( Instance == this )
             Instance = null;

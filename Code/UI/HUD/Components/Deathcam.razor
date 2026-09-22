@@ -12,7 +12,7 @@
     var killerDescription = GameUtils.GetDescription( LastDamageInfo.Attacker );
     var killerName = killerPlayer.IsValid()
         ? killerPlayer.DisplayName
-        : killerDescription?.DisplayName ?? "Unknown";
+        : killerDescription?.DisplayName ?? (IsZombiesMode ? "Zombie" : "Unknown");
 }
 
 <root class="hud with-deadzone flex column gap-xs">
@@ -43,7 +43,7 @@
             {
                 <div class="flex row gap-xs">
                     <label>@(entry.Damage.CeilToInt()) damage in @(entry.Count) hits - </label>
-                    <label>@(entry.Attacker?.DisplayName ?? "Unknown")</label>
+                    <label>@(entry.Attacker?.DisplayName ?? (IsZombiesMode ? "Zombie" : "Unknown"))</label>
                 </div>
             }
         </div>
@@ -72,12 +72,13 @@
 
     public DamageInfo LastDamageInfo => Client.Local.IsValid() ? Client.Local.LastDamageInfo : null;
     public SpectateSystem SpectateSystem => SpectateSystem.Instance;
+    private bool IsZombiesMode => GameMode.Instance?.Ident == "zombies";
 
     public string GetName( Component attacker )
     {
         var ply = GameUtils.GetDescription( attacker );
 
-        return ply?.DisplayName ?? "Unknown";
+        return ply?.DisplayName ?? (IsZombiesMode ? "Zombie" : "Unknown");
     }
 
     protected override int BuildHash()

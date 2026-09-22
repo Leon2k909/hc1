@@ -25,6 +25,9 @@ public sealed class SpawnProtection : Component,
 
 	void IGameEventHandler<PlayerSpawnedEvent>.OnGameEvent( PlayerSpawnedEvent eventArgs )
 	{
+		// Zombies spawns players out of harm's way between rounds; no deathmatch-style protection.
+		if ( ZombiesRoundSystem.Current.IsValid() ) return;
+
 		Enable( eventArgs.Player );
 	}
 

@@ -219,6 +219,14 @@ public partial class Crosshair : Component
 
 	public void Trigger( DamageInfo damageInfo )
 	{
+		// No hitmarker for self-inflicted damage (fall damage, own grenade, etc.)
+		if ( damageInfo.WasFallDamage )
+			return;
+
+		var attackerRoot = damageInfo.Attacker?.GameObject?.Root;
+		if ( attackerRoot is not null && attackerRoot == damageInfo.Victim?.GameObject?.Root )
+			return;
+
 		var healthComponent = GameUtils.GetPlayerFromComponent( damageInfo.Victim )?.HealthComponent ??
 		                      GameUtils.GetLightweightBotFromComponent( damageInfo.Victim )?.HealthComponent;
 

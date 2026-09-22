@@ -1,0 +1,133 @@
+$pause-accent: #ffbd24;
+
+PausePage
+{
+	width: 100%;
+	height: 100%;
+	font-family: Poppins;
+	color: white;
+	pointer-events: all;
+	// Dark on the left where the menu is, fading so the match stays visible on the right.
+	background: linear-gradient( to right, rgba( 8, 11, 14, 0.94 ) 0%, rgba( 8, 11, 14, 0.8 ) 32%, rgba( 8, 11, 14, 0.15 ) 70% );
+
+	.pause-side
+	{
+		flex-direction: column;
+		justify-content: center;
+		padding-left: 96px;
+		width: 560px;
+		height: 100%;
+		gap: 36px;
+	}
+
+	.pause-head
+	{
+		flex-direction: row;
+		align-items: center;
+		gap: 16px;
+	}
+
+	.pause-accent
+	{
+		width: 6px;
+		height: 56px;
+		background-color: $pause-accent;
+	}
+
+	.pause-title
+	{
+		font-size: 56px;
+		font-weight: 900;
+		letter-spacing: 6px;
+	}
+
+	.pause-items
+	{
+		flex-direction: column;
+		gap: 4px;
+		width: 400px;
+	}
+
+	.pause-sep
+	{
+		height: 1px;
+		margin: 14px 0;
+		background-color: rgba( white, 0.12 );
+	}
+
+	.pause-item
+	{
+		flex-direction: row;
+		align-items: center;
+		gap: 16px;
+		height: 56px;
+		padding: 0 20px;
+		border-left: 4px solid transparent;
+		color: rgba( white, 0.75 );
+		font-size: 22px;
+		font-weight: 700;
+		letter-spacing: 1px;
+		text-transform: uppercase;
+		cursor: pointer;
+		transition: all 0.1s ease;
+
+		i { font-size: 26px; opacity: 0.7; }
+
+		&:hover
+		{
+			color: white;
+			padding-left: 28px;
+			border-left-color: $pause-accent;
+			background: linear-gradient( to right, rgba( 255, 189, 36, 0.22 ), rgba( 255, 189, 36, 0 ) );
+
+			i { opacity: 1; color: $pause-accent; }
+		}
+
+		&.primary { color: white; }
+
+		&.warn:hover
+		{
+			border-left-color: #ff6a5a;
+			background: linear-gradient( to right, rgba( 255, 106, 90, 0.22 ), rgba( 255, 106, 90, 0 ) );
+
+			i { color: #ff6a5a; }
+		}
+	}
+
+	.pause-modal-overlay
+	{
+		position: absolute;
+		left: 0;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		align-items: center;
+		justify-content: center;
+		background-color: rgba( 0, 0, 0, 0.8 );
+		z-index: 100;
+	}
+
+	.pause-modal
+	{
+		flex-direction: column;
+		gap: 6px;
+		width: 440px;
+		padding: 28px;
+		background-color: #131a20;
+		border-top: 3px solid $pause-accent;
+	}
+
+	.pause-modal-title
+	{
+		font-size: 26px;
+		font-weight: 900;
+		letter-spacing: 3px;
+	}
+
+	.pause-modal-text
+	{
+		font-size: 16px;
+		color: rgba( white, 0.7 );
+		margin-bottom: 16px;
+	}
+}

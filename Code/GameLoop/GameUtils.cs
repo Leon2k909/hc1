@@ -171,13 +171,12 @@ public static partial class GameUtils
 		}
 
 		Mouse.Visible = true;
-		Mouse.CursorType = null;
+		Mouse.CursorType = Input.Down( "Score" ) ? "default" : null;
 
-		// Force Visible for the gunsmith only: there the cursor must stay put while
-		// right-click-dragging to pan. Everywhere else (in-game menus, dead/spectate)
-		// stay on Auto so the engine can manage the cursor normally — forcing Visible
-		// in-game made it "stick" on screen after a right-click.
-		Mouse.Visibility = IsGunsmithStudioOpen() ? MouseVisibility.Visible : MouseVisibility.Auto;
+		// Explicit visibility overrides the HUD's hidden cursor during the scoreboard
+		// and keeps gunsmith panning usable. Releasing Score restores normal handling.
+		Mouse.Visibility = IsGunsmithStudioOpen() || Input.Down( "Score" )
+			? MouseVisibility.Visible : MouseVisibility.Auto;
 	}
 
 	[ConCmd( "hc1_mouse_debug" )]

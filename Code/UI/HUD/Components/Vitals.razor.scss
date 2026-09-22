@@ -4,6 +4,30 @@ Vitals
 {
     position: relative;
 
+    .armor-readout
+    {
+        min-width: 84px;
+        padding-right: 10px;
+        margin-right: 2px;
+        border-right: 1px solid rgba( white, 0.2 );
+    }
+
+    .armor-label
+    {
+        font-size: 10px;
+        font-weight: bold;
+        letter-spacing: 1px;
+        color: #c3d6e4;
+    }
+
+    .helmet-status
+    {
+        gap: 4px;
+        font-size: 9px;
+        letter-spacing: 0.5px;
+        color: #c3d6e4;
+    }
+
     &.low-health > .inner
     {
         animation: LowHealth 1s linear infinite;

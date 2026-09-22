@@ -6,8 +6,10 @@ public static class Utils
 {
 	public static Sandbox.DamageInfo CreateDamageInfo( Facepunch.DamageInfo damageInfo )
 	{
-		// Log.Info($"----------------- CreateDamageInfo {damageInfo.Damage} {damageInfo.Attacker.GameObject} {damageInfo.Inflictor.GameObject}");
-		return new Sandbox.DamageInfo(damageInfo.Damage, damageInfo.Attacker.GameObject, damageInfo.Inflictor.GameObject);
+		return new Sandbox.DamageInfo( damageInfo.Damage, damageInfo.Attacker?.GameObject, damageInfo.Inflictor?.GameObject )
+		{
+			Position = damageInfo.Position
+		};
 	}
 	
 	public static Facepunch.DamageInfo CreateDamageInfo( Sandbox.DamageInfo damageInfo)

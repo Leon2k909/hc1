@@ -13,6 +13,20 @@ public partial class DroppedEquipment : Component, IUse, Component.ICollisionLis
 	public Rigidbody Rigidbody { get; private set; }
 
 	/// <summary>
+	/// Dropped guns clean themselves up after this long so respawn modes don't fill with weapons.
+	/// Special items (the bomb) never expire.
+	/// </summary>
+	public const float Lifetime = 60f;
+
+	private TimeSince _timeSinceDropped = 0;
+
+	protected override void OnUpdate()
+	{
+		if ( !Networking.IsHost || Resource is null || Resource.Slot == EquipmentSlot.Special ) return;
+		if ( _timeSinceDropped > Lifetime ) GameObject.Destroy();
+	}
+
+	/// <summary>
 	/// Creates a world instance of a dropped piece of equipment. Takes in a <see cref="EquipmentResource"/>, position, rotation, and optionally a held weapon to inherit data from.
 	/// </summary>
 	/// <param name="resource"></param>
@@ -82,7 +96,62 @@ public partial class DroppedEquipment : Component, IUse, Component.ICollisionLis
 
 	public UseResult CanUse( PlayerPawn player )
 	{
+		if ( player.Inventory.Has( Resource ) )
+			return FindScavengeTarget( player ).IsValid() ? true : "Ammo full";
 		if ( player.Inventory.CanTake( Resource ) == PlayerInventory.PickupResult.None ) return "Can't pick this up";
+		return true;
+	}
+
+	/// <summary>
+	/// Rounds left in this dropped weapon (magazine + spare).
+	/// </summary>
+	public int RoundsLeft => GetComponent<WeaponAmmo>() is { } a ? a.Ammo + a.ReserveAmmo : 0;
+
+	/// <summary>
+	/// The player's weapon that could use this gun's ammo: the same weapon, or one of the same category
+	/// (rifles share rifle rounds, pistols share pistol rounds…). Null if none, or it's already full.
+	/// </summary>
+	public WeaponAmmo FindScavengeTarget( PlayerPawn player )
+	{
+		if ( !player.IsValid() || RoundsLeft <= 0 ) return null;
+
+		var candidates = player.Inventory.Equipment
+			.Where( x => x.IsValid() && x.Resource is not null )
+			.Where( x => x.Resource == Resource
+				|| ( x.Resource.Category == Resource.Category && x.Resource.Slot is EquipmentSlot.Primary or EquipmentSlot.Secondary ) )
+			.OrderByDescending( x => x.Resource == Resource );
+
+		foreach ( var equipment in candidates )
+		{
+			var ammo = equipment.GetComponentInChildren<WeaponAmmo>( true );
+			if ( ammo.IsValid() && ammo.ReserveAmmo < ammo.GetMaxReserve() ) return ammo;
+		}
+		return null;
+	}
+
+	/// <summary>
+	/// Strip ammo off this dropped gun into the player's matching weapon. The gun disappears once it's empty.
+	/// </summary>
+	private bool TryScavenge( PlayerPawn player )
+	{
+		var target = FindScavengeTarget( player );
+		if ( !target.IsValid() ) return false;
+
+		var source = GetComponent<WeaponAmmo>();
+		var room = target.GetMaxReserve() - target.ReserveAmmo;
+		var taken = Math.Min( room, source.Ammo + source.ReserveAmmo );
+		if ( taken <= 0 ) return false;
+
+		// Empty the spare ammo first, then the magazine.
+		var fromReserve = Math.Min( taken, source.ReserveAmmo );
+		source.ReserveAmmo -= fromReserve;
+		source.Ammo -= taken - fromReserve;
+
+		target.ReceiveReserve( taken );
+
+		if ( source.Ammo + source.ReserveAmmo <= 0 )
+			GameObject.Destroy();
+
 		return true;
 	}
 
@@ -95,6 +164,14 @@ public partial class DroppedEquipment : Component, IUse, Component.ICollisionLis
 
 		if ( !player.IsValid() )
 			return;
+
+		// Already carrying this gun: take its ammo instead.
+		if ( player.Inventory.Has( Resource ) )
+		{
+			TryScavenge( player );
+			_isUsed = false;
+			return;
+		}
 
 		var currentActiveSlot = player.CurrentEquipment?.Resource.Slot ?? EquipmentSlot.Melee;
 		var weapon = player.Inventory.Give( Resource, Resource.Slot < currentActiveSlot );
@@ -127,6 +204,10 @@ public partial class DroppedEquipment : Component, IUse, Component.ICollisionLis
 			// we need to give a chance for the owner to update its position. I want to add a way
 			// to specify that Transform can be changed on non-owner too (prediction.)
 			if ( player.TimeSinceLastRespawn < 2f )
+				return;
+
+			// Walking over a gun that takes the same ammo as ours strips its rounds, CoD-style.
+			if ( TryScavenge( player ) )
 				return;
 
 			if ( player.Inventory.CanTake( Resource ) != PlayerInventory.PickupResult.Pickup )

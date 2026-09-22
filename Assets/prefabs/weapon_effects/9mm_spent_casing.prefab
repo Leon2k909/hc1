@@ -1,0 +1,36 @@
+{
+  "RootObject": {
+    "__guid": "f7c2be31-0ad4-4b61-9f28-9638245e7812",
+    "__version": 2,
+    "Name": "9mm_spent_casing",
+    "Enabled": true,
+    "NetworkMode": 0,
+    "Tags": "particles",
+    "Components": [
+      {
+        "__type": "Facepunch.SpentCasing",
+        "__guid": "d1a2904e-bc65-458f-a173-9c2de6b40f83",
+        "Lifetime": 8,
+        "BounceSound": "weapons/common/effects/shell_case_bounce.wav.sound"
+      },
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "a91fb072-2af9-4d49-a410-8773c42e46fb",
+        "Model": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "BodyGroups": 2,
+        "RenderType": "On",
+        "RenderOptions": {
+          "GameLayer": true,
+          "OverlayLayer": false
+        },
+        "Tint": "1,1,1,1"
+      }
+    ],
+    "Children": []
+  },
+  "ResourceVersion": 2,
+  "__version": 2,
+  "__references": [
+    "facepunch.9mm_ejectbrass#58914"
+  ]
+}

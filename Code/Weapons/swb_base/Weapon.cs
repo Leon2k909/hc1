@@ -266,7 +266,7 @@ public partial class Weapon : Component, IInventoryItem
 				TimeSinceRunning = 0;
 
 			var wasAiming = IsAiming;
-			IsAiming = !Owner.IsRunning && AimAnimData != AngPos.Zero && Input.Down( InputButtonHelper.SecondaryAttack );
+			IsAiming = AimAnimData != AngPos.Zero && Input.Down( InputButtonHelper.SecondaryAttack );
 
 			if ( wasAiming != IsAiming )
 			{

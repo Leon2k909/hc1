@@ -1,0 +1,142 @@
+CreateLobbyPage
+{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	flex-direction: column;
+	// Fully opaque backdrop: the 3D menu scene (operators) must never show through here.
+	background-color: #0b0e11;
+	background-image: radial-gradient( circle at 50% 40%, #1d252c 0%, #0f1418 55%, #07090b 100% );
+	backdrop-filter: none;
+
+	.cl-body
+	{
+		flex-grow: 1;
+		justify-content: center;
+		align-items: center;
+		padding: 24px;
+	}
+
+	.cl-card
+	{
+		flex-direction: column;
+		width: 720px;
+		max-width: 100%;
+		padding: 32px;
+		gap: 22px;
+		background-color: rgba( 19, 24, 28, 0.96 );
+		border: 1px solid #46515a;
+		border-top: 4px solid #ffbd24;
+		border-radius: 6px;
+		box-shadow: 0px 20px 60px rgba( black, 0.55 );
+	}
+
+	.cl-header
+	{
+		flex-direction: row;
+		align-items: center;
+		gap: 16px;
+	}
+
+	.cl-icon
+	{
+		width: 56px;
+		height: 56px;
+		background-color: #ffbd24;
+		border-radius: 4px;
+		justify-content: center;
+		align-items: center;
+		flex-shrink: 0;
+
+		i
+		{
+			font-size: 32px;
+			color: #111519;
+			text-align: center;
+		}
+	}
+
+	.cl-titles { flex-direction: column; }
+
+	.cl-caption
+	{
+		font-size: 12px;
+		font-weight: 700;
+		letter-spacing: 2px;
+		color: #ffbd24;
+	}
+
+	.cl-title
+	{
+		font-size: 32px;
+		font-weight: 900;
+		color: white;
+	}
+
+	.cl-desc
+	{
+		font-size: 17px;
+		color: #c3ccd3;
+	}
+
+	.cl-features
+	{
+		flex-direction: row;
+		gap: 10px;
+	}
+
+	.cl-feature
+	{
+		flex: 1 1 0;
+		flex-direction: row;
+		align-items: center;
+		gap: 12px;
+		padding: 14px;
+		background-color: #252e35;
+		border: 1px solid #46515a;
+		border-radius: 4px;
+
+		i
+		{
+			font-size: 26px;
+			color: #ffbd24;
+			flex-shrink: 0;
+		}
+	}
+
+	.cl-feature-copy { flex-direction: column; min-width: 0; }
+
+	.cl-feature-name
+	{
+		font-size: 14px;
+		font-weight: 900;
+		letter-spacing: 1px;
+		color: white;
+	}
+
+	.cl-feature-sub
+	{
+		font-size: 13px;
+		color: #aebbc5;
+	}
+
+	.cl-create
+	{
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		gap: 10px;
+		height: 60px;
+		margin-top: 4px;
+		background-color: #ffbd24;
+		border-radius: 4px;
+		cursor: pointer;
+		transition: background-color 0.12s ease, transform 0.12s ease;
+
+		i { font-size: 26px; color: #111519; }
+		label { font-size: 20px; font-weight: 900; letter-spacing: 2px; color: #111519; }
+
+		&:hover { background-color: #ffcb4f; transform: scale( 1.01 ); }
+		&:active { transform: scale( 0.99 ); }
+	}
+}

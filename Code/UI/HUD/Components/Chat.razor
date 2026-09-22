@@ -293,6 +293,9 @@
     {
         if ( IsProxy ) return;
 
+        // Zombies is co-op: teams are an implementation detail there.
+        if ( ZombiesRoundSystem.Current.IsValid() ) return;
+
         if ( eventArgs.Team == Team.Unassigned )
             AddSystemText( $"{eventArgs.Player.DisplayName} is spectating" );
         else

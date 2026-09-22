@@ -1472,11 +1472,25 @@ GunsmithPanel
 	.gs-armory-tab { position: absolute; left: 24px; }
 	.gs-icon-btn { min-height: 44px; font-size: 15px; gap: 8px; }
 	.gs-class-panel { top: 144px; padding: 14px; background-color: rgba( 19, 24, 28, 0.96 ); border-color: #46515a; }
-	.gs-class-strip { overflow-x: scroll; flex-wrap: nowrap; }
-	.gs-class-slot { flex: 0 0 100px; height: 70px; background-color: #262e34; border-color: #4c5862; }
-	.gs-class-slot .gs-class-name { font-size: 13px; color: #d7dce0; }
-	.gs-class-slot .gs-class-num { color: #aebbc5; }
-	.gs-add-class { min-width: 44px; color: white; background-color: #262e34; }
+	// All classes visible at once (5 per row, max 10) — no sideways scrolling.
+	.gs-class-strip, .gs-class-panel.has-many-classes .gs-class-strip { overflow: hidden; flex-wrap: wrap; gap: 6px; }
+	.gs-class-slot, .gs-class-panel.has-many-classes .gs-class-slot
+	{
+		flex: 0 0 18.8%;
+		height: 46px;
+		flex-direction: row;
+		gap: 6px;
+		padding: 0 8px;
+		justify-content: flex-start;
+		background-color: #262e34;
+		border-color: #4c5862;
+	}
+	.gs-class-slot .gs-class-num { font-size: 16px; color: #aebbc5; flex-shrink: 0; }
+	.gs-class-slot .gs-class-name { font-size: 14px; color: #d7dce0; text-align: left; }
+	.gs-class-slot.active .gs-class-num { color: #ffbd24; }
+	.gs-class-slot.active .gs-class-name { color: white; }
+	.gs-add-class, .gs-class-panel.has-many-classes .gs-add-class { flex: 0 0 18.8%; height: 46px; color: white; background-color: #262e34; }
+	.gs-add-class i { font-size: 22px; }
 	.gs-rename-input { min-height: 42px; background-color: #10161b; border-color: #46515a; }
 	.gs-action-btn { width: 44px; height: 44px; font-size: 20px; }
 	.weapon-browser { top: 326px; background-color: rgba( 19, 24, 28, 0.96 ); border-color: #46515a; overflow-y: scroll; }
@@ -1555,4 +1569,256 @@ GunsmithPanel.narrow
 	.gs-mode-tabs { justify-content: flex-end; padding-right: 16px; }
 	.gs-class-panel { top: 144px; }
 	.weapon-browser, .weapon-browser.has-many-classes { top: 326px; }
+}
+
+// ===================== CLASS PICKER (dropdown) =====================
+GunsmithPanel
+{
+	.gs-class-panel.dd-open { z-index: 50; }
+	// The rename row sits under the open list; hide it so it can't draw through.
+	.gs-class-panel.dd-open .gs-class-actions { opacity: 0; pointer-events: none; }
+
+	.gs-class-dd-header
+	{
+		flex-direction: row;
+		align-items: center;
+		gap: 12px;
+		height: 64px;
+		padding: 0 14px;
+		background-color: #262e34;
+		border: 1px solid #4c5862;
+		border-left: 4px solid #ffbd24;
+		border-radius: 4px;
+		cursor: pointer;
+		transition: background-color 0.12s ease, border-color 0.12s ease;
+
+		&:hover { background-color: #2f3941; border-color: #6b7883; border-left-color: #ffbd24; }
+		&.open { background-color: #313c45; border-color: #ffbd24; }
+	}
+
+	.gs-class-dd-num
+	{
+		font-size: 30px;
+		font-weight: 900;
+		color: #ffbd24;
+		width: 28px;
+		text-align: center;
+		flex-shrink: 0;
+	}
+
+	.gs-class-dd-copy
+	{
+		flex-direction: column;
+		flex-grow: 1;
+		min-width: 0;
+	}
+
+	.gs-class-dd-caption
+	{
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 1.5px;
+		color: #aebbc5;
+	}
+
+	.gs-class-dd-name
+	{
+		font-size: 22px;
+		font-weight: 900;
+		color: white;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		overflow: hidden;
+	}
+
+	.gs-class-dd-count
+	{
+		font-size: 13px;
+		font-weight: 700;
+		color: #aebbc5;
+		flex-shrink: 0;
+	}
+
+	.gs-class-dd-chevron
+	{
+		font-size: 28px;
+		color: white;
+		flex-shrink: 0;
+	}
+
+	// Opens over the armory below it.
+	.gs-class-dd-list
+	{
+		position: absolute;
+		left: 14px;
+		right: 14px;
+		top: 84px;
+		flex-direction: column;
+		max-height: 560px;
+		overflow-y: scroll;
+		background-color: rgba( 16, 20, 24, 0.99 );
+		border: 1px solid #ffbd24;
+		border-radius: 4px;
+		box-shadow: 0px 12px 32px rgba( black, 0.6 );
+		z-index: 20;
+		padding: 6px;
+		gap: 4px;
+	}
+
+	.gs-class-dd-item
+	{
+		flex-direction: row;
+		align-items: center;
+		gap: 12px;
+		min-height: 54px;
+		padding: 6px 12px;
+		background-color: #222a30;
+		border: 1px solid transparent;
+		border-radius: 3px;
+		cursor: pointer;
+		flex-shrink: 0;
+
+		&:hover { background-color: #2f3941; border-color: #6b7883; }
+
+		&.active
+		{
+			background-color: rgba( 255, 189, 36, 0.14 );
+			border-color: #ffbd24;
+
+			.gs-class-dd-item-num { color: #ffbd24; }
+		}
+
+		&.create
+		{
+			background-color: transparent;
+			border: 1px dashed #4c5862;
+
+			.gs-class-dd-item-num { font-size: 22px; color: #ffbd24; }
+			.gs-class-dd-item-name { font-size: 15px; color: #d7dce0; }
+			&:hover { border-color: #ffbd24; }
+		}
+	}
+
+	.gs-class-dd-item-num
+	{
+		width: 28px;
+		font-size: 20px;
+		font-weight: 900;
+		color: #aebbc5;
+		text-align: center;
+		flex-shrink: 0;
+	}
+
+	.gs-class-dd-item-copy
+	{
+		flex-direction: column;
+		flex-grow: 1;
+		min-width: 0;
+	}
+
+	.gs-class-dd-item-name
+	{
+		font-size: 17px;
+		font-weight: 900;
+		color: white;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		overflow: hidden;
+	}
+
+	.gs-class-dd-item-sub
+	{
+		font-size: 12px;
+		font-weight: 700;
+		letter-spacing: 1px;
+		color: #8f9ba5;
+	}
+
+	.gs-class-dd-check
+	{
+		font-size: 22px;
+		color: #ffbd24;
+		flex-shrink: 0;
+	}
+}
+
+// ===================== ARMORY PICKER PAGE =====================
+GunsmithPanel
+{
+	.gs-picker-header
+	{
+		flex-direction: row;
+		align-items: center;
+		gap: 12px;
+		flex-shrink: 0;
+		padding-bottom: 12px;
+		margin-bottom: 10px;
+		border-bottom: 1px solid #46515a;
+	}
+
+	.gs-picker-back
+	{
+		flex-direction: row;
+		align-items: center;
+		gap: 6px;
+		height: 44px;
+		padding: 0 14px 0 10px;
+		background-color: #303a43;
+		border: 1px solid #4c5862;
+		border-radius: 3px;
+		cursor: pointer;
+		flex-shrink: 0;
+
+		i { font-size: 20px; color: white; }
+		label { font-size: 14px; font-weight: 800; letter-spacing: 1px; color: white; }
+
+		&:hover { border-color: #ffbd24; background-color: #3a4650; }
+	}
+
+	.gs-picker-title
+	{
+		flex-direction: column;
+		min-width: 0;
+	}
+
+	.gs-picker-caption
+	{
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 1.5px;
+		color: #ffbd24;
+	}
+
+	.gs-picker-name
+	{
+		font-size: 20px;
+		font-weight: 900;
+		color: white;
+		white-space: nowrap;
+	}
+
+	// The list gets the whole panel instead of a cramped strip between the slots.
+	.weapon-list.gs-picker-list
+	{
+		flex-grow: 1;
+		flex-shrink: 1;
+		min-height: 0;
+		max-height: none;
+		overflow-y: scroll;
+	}
+
+	.gs-picker-list .gs-cat-tabs
+	{
+		height: auto;
+		min-height: 0;
+		margin: 0 0 8px 0;
+	}
+
+	.gs-picker-list .gs-cat-tab
+	{
+		flex: 1 1 30%;
+		min-height: 44px;
+		font-size: 13px;
+		white-space: nowrap;
+	}
 }

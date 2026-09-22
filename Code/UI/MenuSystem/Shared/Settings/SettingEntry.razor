@@ -71,7 +71,9 @@
         get => Description.GetValue( Target );
         set
         {
-            Description.SetValue( Target, value );   
+            Description.SetValue( Target, value );
+            if ( Target is GameSettings )
+                GameSettingsSystem.Apply();
         }
     }
     public PropertyDescription Description { get; set; }

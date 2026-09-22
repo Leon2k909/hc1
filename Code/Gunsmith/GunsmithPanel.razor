@@ -58,25 +58,48 @@
     }
 
     @* ===================== TOP LEFT: CLASS SELECTOR ===================== *@
-    <div class="gs-class-panel @(hasManyClasses ? "has-many-classes" : "") @(ShowArmory ? "" : "collapsed")">
-        <div class="gs-class-strip">
-            @for ( int i = 0; i < activeClassIndices.Count; i++ )
-            {
-                var idx = activeClassIndices[i];
-                var displayNum = i + 1;
-                var classActive = GunsmithLoadoutManager.GetActiveClassIndex() == idx;
-                <div class="gs-class-slot @(classActive ? "active" : "")" @onclick=@(() => SelectClass( idx ))>
-                    <label class="gs-class-num">@displayNum</label>
-                    <label class="gs-class-name">@GunsmithLoadoutManager.GetClassName( idx )</label>
-                </div>
-            }
-            @if ( activeClassIndices.Count < 10 )
-            {
-                <div class="gs-add-class" @onclick=@CreateClass>
-                    <i>add</i>
-                </div>
-            }
+    <div class="gs-class-panel @(hasManyClasses ? "has-many-classes" : "") @(IsClassListOpen ? "dd-open" : "") @(ShowArmory ? "" : "collapsed")">
+        @{
+            var activeClass = GunsmithLoadoutManager.GetActiveClassIndex();
+            var activeClassNum = activeClassIndices.IndexOf( activeClass ) + 1;
+        }
+        @* CoD-style class picker: one big header for the current class, opening a full list of classes. *@
+        <div class="gs-class-dd-header @(IsClassListOpen ? "open" : "")" @onclick=@ToggleClassList>
+            <label class="gs-class-dd-num">@activeClassNum</label>
+            <div class="gs-class-dd-copy">
+                <label class="gs-class-dd-caption">CREATE-A-CLASS</label>
+                <label class="gs-class-dd-name">@GunsmithLoadoutManager.GetClassName( activeClass )</label>
+            </div>
+            <label class="gs-class-dd-count">@activeClassNum / @activeClassIndices.Count</label>
+            <i class="gs-class-dd-chevron">@(IsClassListOpen ? "expand_less" : "expand_more")</i>
         </div>
+
+        @if ( IsClassListOpen )
+        {
+            <div class="gs-class-dd-list">
+                @for ( int i = 0; i < activeClassIndices.Count; i++ )
+                {
+                    var idx = activeClassIndices[i];
+                    var displayNum = i + 1;
+                    var classActive = activeClass == idx;
+                    <div class="gs-class-dd-item @(classActive ? "active" : "")" @onclick=@(() => PickClass( idx ))>
+                        <label class="gs-class-dd-item-num">@displayNum</label>
+                        <div class="gs-class-dd-item-copy">
+                            <label class="gs-class-dd-item-name">@GunsmithLoadoutManager.GetClassName( idx )</label>
+                            <label class="gs-class-dd-item-sub">@GetClassPrimaryName( idx )</label>
+                        </div>
+                        @if ( classActive ) { <i class="gs-class-dd-check">check</i> }
+                    </div>
+                }
+                @if ( activeClassIndices.Count < 10 )
+                {
+                    <div class="gs-class-dd-item create" @onclick=@CreateClassFromList>
+                        <i class="gs-class-dd-item-num">add</i>
+                        <label class="gs-class-dd-item-name">CREATE CLASS</label>
+                    </div>
+                }
+            </div>
+        }
 
         <div class="gs-class-actions">
             <TextEntry class="gs-rename-input" Value:bind=@ActiveClassName />
@@ -88,6 +111,8 @@
 
     @* ===================== LEFT: ARMORY ===================== *@
     <div class="weapon-browser @(Mode == GunsmithViewMode.Customize ? "is-hidden" : "") @(hasManyClasses ? "has-many-classes" : "") @(ShowArmory ? "" : "collapsed")">
+        @if ( !IsPickerOpen )
+        {
         @* ── Equipped weapons / gear ── *@
         <label class="gs-armory-section gs-sec-weapons">WEAPONS</label>
         <div class="gs-slot-list gs-sec-weapons">
@@ -147,8 +172,22 @@
             }
         </div>
 
-        @* ── Weapon / perk list ── *@
-        <div class="weapon-list @BrowserOrderClass">
+        }
+        else
+        {
+        @* ── Picker page: one slot's options, full height, with a way back to the class overview ── *@
+        <div class="gs-picker-header">
+            <div class="gs-picker-back" @onclick=@ClosePicker>
+                <i>arrow_back</i>
+                <label>BACK</label>
+            </div>
+            <div class="gs-picker-title">
+                <label class="gs-picker-caption">@GunsmithLoadoutManager.GetClassName( GunsmithLoadoutManager.GetActiveClassIndex() )</label>
+                <label class="gs-picker-name">@PickerTitle</label>
+            </div>
+        </div>
+
+        <div class="weapon-list gs-picker-list">
             @if ( SelectedPerkCategory > 0 )
             {
                 @foreach ( var perk in PerkResource.All.Where( x => (int)x.Category == SelectedPerkCategory ).OrderBy( x => x.Name ) )
@@ -174,7 +213,7 @@
                         @foreach ( var cat in categories )
                         {
                             var c = cat;
-                            <button class="gs-cat-tab @(SelectedWeaponCategory == c ? "is-selected" : "")" @onclick=@(() => SelectedWeaponCategory = c)>@(c == WeaponCategory.AssaultRifle ? "ASSAULT RIFLE" : c.ToString().ToUpper())</button>
+                            <button class="gs-cat-tab @(SelectedWeaponCategory == c ? "is-selected" : "")" @onclick=@(() => SelectedWeaponCategory = c)>@(c == WeaponCategory.AssaultRifle ? "ASSAULT" : c.ToString().ToUpper())</button>
                         }
                     </div>
                 }
@@ -193,6 +232,7 @@
                 }
             }
         </div>
+        }
     </div>
 
     @* Stable, full-size hit targets stay clear of the weapon preview. *@
@@ -770,6 +810,7 @@
     protected override void OnUpdate()
     {
         base.OnUpdate();
+        ApplyDevPickerRequest();
         ResponsiveLayout.Update( Panel );
     }
 
@@ -983,8 +1024,27 @@
         _ => slot.ToString()
     };
 
+    /// <summary>True while the armory shows one slot's options instead of the class overview.</summary>
+    private bool IsPickerOpen { get; set; }
+
+    private void ClosePicker()
+    {
+        IsPickerOpen = false;
+        StateHasChanged();
+    }
+
+    private string PickerTitle => SelectedPerkCategory > 0
+        ? $"PERK {SelectedPerkCategory}"
+        : GetSelectedSlot() switch
+        {
+            EquipmentSlot.Primary => "PRIMARY WEAPON",
+            EquipmentSlot.Secondary => "SECONDARY WEAPON",
+            var other => GetSlotName( other ).ToUpper(),
+        };
+
     private void SelectSlot( EquipmentSlot slot )
     {
+        IsPickerOpen = true;
         SelectedSlot = slot;
         SelectedPerkCategory = 0;
         if ( slot == EquipmentSlot.Primary )
@@ -1041,6 +1101,55 @@
         }
     }
 
+    private bool _classListOpen;
+    private static bool _devClassListOpen;
+    private bool IsClassListOpen { get => _classListOpen || _devClassListOpen; set { _classListOpen = value; _devClassListOpen = false; } }
+
+    private void ToggleClassList() => IsClassListOpen = !IsClassListOpen;
+
+    private static int _devPickerRequest = -1;
+
+    /// <summary>Test helper: show the armory and open the picker for a slot (1 primary, 2 secondary, 0 overview).</summary>
+    [ConCmd( "dev_armory_picker" )]
+    private static void DevArmoryPicker( int slot )
+    {
+        Game.Cookies.Set( "hc1.gunsmith.showarmory", true );
+        _devPickerRequest = slot;
+    }
+
+    private void ApplyDevPickerRequest()
+    {
+        if ( _devPickerRequest < 0 ) return;
+        if ( _devPickerRequest == 0 ) ClosePicker();
+        else SelectSlot( (EquipmentSlot)_devPickerRequest );
+        _devPickerRequest = -1;
+    }
+
+    [ConCmd( "dev_class_list" )]
+    private static void DevToggleClassList() => _devClassListOpen = !_devClassListOpen;
+
+    private void PickClass( int index )
+    {
+        IsClassListOpen = false;
+        SelectClass( index );
+    }
+
+    private void CreateClassFromList()
+    {
+        IsClassListOpen = false;
+        CreateClass();
+    }
+
+    /// <summary>Primary weapon name for a class's row in the class list (read straight from that class's saved loadout).</summary>
+    private static string GetClassPrimaryName( int classIndex )
+    {
+        var id = Game.Cookies.Get<string>( $"hc1.loadout.class{classIndex}.primary", "" );
+        if ( string.IsNullOrEmpty( id ) ) return "NO PRIMARY";
+        var resource = ResourceLibrary.GetAll<EquipmentResource>()
+            .FirstOrDefault( r => r.ResourceName.Equals( id, StringComparison.OrdinalIgnoreCase ) || r.ResourcePath.Equals( id, StringComparison.OrdinalIgnoreCase ) );
+        return resource?.Name.ToUpper() ?? "NO PRIMARY";
+    }
+
     private void SelectClass( int index )
     {
         GunsmithLoadoutManager.SetActiveClassIndex( index );
@@ -1095,6 +1204,7 @@
 
     private void SelectPerkCategory( int pc )
     {
+        IsPickerOpen = true;
         SelectedPerkCategory = pc;
         StateHasChanged();
     }
@@ -1518,7 +1628,7 @@
             equip is null ? 0 : WeaponProgression.GetXP( equip ),
             GunsmithLoadoutManager.GetPrimary(), GunsmithLoadoutManager.GetSecondary() );
         var hash2 = HashCode.Combine( hash1, PreviewCamoPart, CamoOnOptics, CustomCamoColor, IsCustomCamoColorEquipped );
-        var hash3 = HashCode.Combine( hash2, SelectedWeaponCategory, SelectedPerkCategory, ShowArmory, ShowTuning );
-        return HashCode.Combine( hash3, GunsmithLoadoutManager.GetActiveClassIndex(), GunsmithLoadoutManager.GetActiveClassIndices().Count, GunsmithLoadoutManager.GetClassName( GunsmithLoadoutManager.GetActiveClassIndex() ), IsShareBuildOpen, ShareBuildCode, ShareBuildMessage );
+        var hash3 = HashCode.Combine( hash2, SelectedWeaponCategory, SelectedPerkCategory, ShowArmory, ShowTuning, IsPickerOpen );
+        return HashCode.Combine( hash3, GunsmithLoadoutManager.GetActiveClassIndex(), GunsmithLoadoutManager.GetActiveClassIndices().Count, GunsmithLoadoutManager.GetClassName( GunsmithLoadoutManager.GetActiveClassIndex() ), IsClassListOpen, IsShareBuildOpen, ShareBuildCode, ShareBuildMessage );
     }
 }

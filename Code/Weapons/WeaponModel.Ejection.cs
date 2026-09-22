@@ -18,7 +18,7 @@ public abstract partial class WeaponModel
 			{
 				Transform = new Transform( position, WorldRotation ),
 				StartEnabled = false,
-				Name = "Spent 5.56 casing"
+				Name = "Spent casing"
 			} );
 			casing.GetComponent<SpentCasing>( true ).Launch( WorldRotation, owner.IsValid() ? owner.SyncedVelocity : Vector3.Zero,
 				owner.IsValid() ? owner.GameObject : GameObject );

@@ -20,9 +20,6 @@ public sealed class GunsmithController : Component
 	float SlowSpeed { get; set; } = 5f;
 
 	[Property]
-	RangedFloat YawRange { get; set; } = new( -20, 20 );
-
-	[Property]
 	RangedFloat RollRange { get; set; } = new( -10, 10 );
 
 	[Property]
@@ -34,6 +31,13 @@ public sealed class GunsmithController : Component
 	private Vector2 lastFrameMousePos = 0;
 	private Vector2 dragStartMousePos = 0;
 	private bool isDragging = false;
+	private float viewYaw;
+	private float viewRoll;
+	private static Vector2 _devSpin;
+
+	/// <summary>Test helper: rotate the gunsmith preview as if dragged (degrees of yaw, tilt).</summary>
+	[ConCmd( "dev_gunsmith_spin" )]
+	private static void DevSpin( float yaw, float tilt ) => _devSpin += new Vector2( yaw, tilt );
 	private bool dragStartedOnPreview;
 	private bool panStartedOnPreview;
 	private const float DragThreshold = 4f;
@@ -63,6 +67,8 @@ public sealed class GunsmithController : Component
 		{
 			CameraComponent.FieldOfView = 80;
 			Weapon.LocalRotation = Rotation.Identity;
+			viewYaw = 0f;
+			viewRoll = 0f;
 
 			CameraComponent.WorldRotation = Rotation.From( 0, -45, 0 );
 		}
@@ -126,12 +132,13 @@ public sealed class GunsmithController : Component
 			ZoomFactor = ZoomFactor.Clamp( ZoomRange.Min, ZoomRange.Max );
 
 			angleOffset = angleOffset.LerpTo( 0, Time.Delta * SlowSpeed );
-			Weapon.WorldRotation *= Rotation.From( 0, angleOffset.x, -angleOffset.y );
-
-			var ang = Weapon.WorldRotation.Angles();
-			var clampedAng = new Angles( 0, ang.yaw.Clamp( YawRange.Min, YawRange.Max ), ang.roll.Clamp( RollRange.Min, RollRange.Max ) );
-
-			Weapon.WorldRotation = Rotation.From( clampedAng );
+			// Spin freely all the way round (yaw), tilt within RollRange to look over the top / underneath.
+			// Tracked as plain angles: reading them back from the rotation wraps and fights the clamp.
+			viewYaw = (viewYaw + angleOffset.x + _devSpin.x) % 360f;
+			viewRoll -= _devSpin.y;
+			_devSpin = default;
+			viewRoll = (viewRoll - angleOffset.y).Clamp( RollRange.Min, RollRange.Max );
+			Weapon.WorldRotation = Rotation.From( 0, viewYaw, viewRoll );
 			var panel = GunsmithPanel.Instance;
 			var customizing = panel.IsValid() && panel.IsCustomizing;
 			var browsingAttachments = panel.IsValid() && panel.IsAttachmentBrowserOpen;

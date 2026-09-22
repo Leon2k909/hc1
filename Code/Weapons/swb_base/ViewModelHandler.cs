@@ -258,7 +258,7 @@ public class ViewModelHandler : Component
 
 	protected virtual void HandleSprintAnimation()
 	{
-		if ( Weapon.IsRunning && Weapon.RunAnimData != AngPos.Zero && !Weapon.IsCustomizing )
+		if ( !isAiming && Weapon.IsRunning && Weapon.RunAnimData != AngPos.Zero && !Weapon.IsCustomizing )
 		{
 			targetVectorPos += Weapon.RunAnimData.Pos;
 			targetVectorRot += MathUtil.ToVector3( Weapon.RunAnimData.Angle );

@@ -18,11 +18,6 @@ public static partial class GameObjectExtensions
 			return false;
 		}
 		
-		// foreach ( var damageable in go.Root.GetComponents<Component.IDamageable>() )
-		// {
-		// 	damageable.OnDamage( Tec.Utils.CreateDamageInfo(damageInfo));
-		// }
-
 		var damaged = false;
 		var healthComponent = go.Root.GetComponentInChildren<HealthComponent>();
 		var prop = go.Root.GetComponentInChildren<Prop>();
@@ -37,6 +32,19 @@ public static partial class GameObjectExtensions
 		{
 			prop.OnDamage( Tec.Utils.CreateDamageInfo(damageInfo) );
 			damaged = true;
+		}
+
+		// Zombies and other engine damage receivers don't have a HealthComponent.
+		// Resolve upward from the hit object so child meshes reach their owner,
+		// and only use this fallback when the existing handlers haven't dealt damage.
+		if ( !damaged )
+		{
+			var engineDamage = Tec.Utils.CreateDamageInfo( damageInfo );
+			foreach ( var receiver in go.GetComponentsInParent<Component.IDamageable>().Distinct() )
+			{
+				receiver.OnDamage( engineDamage );
+				damaged = true;
+			}
 		}
 
 		return damaged;

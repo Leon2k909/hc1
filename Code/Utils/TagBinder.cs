@@ -15,9 +15,20 @@ public partial class TagBinder : Component
 	{
 		if ( IsProxy ) return;
 
-		foreach ( var kv in binds )
+		foreach ( var kv in binds.ToArray() )
 		{
-			GameObject.Tags.Set( kv.Key, kv.Value() );
+			try
+			{
+				GameObject.Tags.Set( kv.Key, kv.Value() );
+			}
+			catch ( NotImplementedException )
+			{
+				// Hot reload may leave an old captured callback that the runtime can no
+				// longer invoke. Drop it once instead of raising an error every frame.
+				binds.Remove( kv.Key );
+				GameObject.Tags.Remove( kv.Key );
+				Log.Warning( $"[TagBinder] Cleared stale '{kv.Key}' binding on {GameObject.Name}; it will be restored when this object respawns." );
+			}
 		}
 	}
 

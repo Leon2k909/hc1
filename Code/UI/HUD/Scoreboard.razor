@@ -19,8 +19,8 @@
             <label class="important uppercase right">@(Time?.ToString( @"m\:ss" ) ?? " ")</label>
         </div>
 
-        <div class="row align-center with-padding-sm gap hc1" style="margin-bottom: 8px;">
-            <label class="small emphasis" style="margin-right: 8px;">Voice Channel:</label>
+        <div class="row voice-bar hc1">
+            <label class="small emphasis voice-label">Voice Channel:</label>
             <div class="button standard smaller no-anim @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.Auto ? "selected" : "")" onclick=@(() => SetVoiceMode(VoiceChatMode.Auto))>Auto</div>
             <div class="button standard smaller no-anim @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.Global ? "selected" : "")" onclick=@(() => SetVoiceMode(VoiceChatMode.Global))>Lobby</div>
             <div class="button standard smaller no-anim @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.TeamOnly ? "selected" : "")" onclick=@(() => SetVoiceMode(VoiceChatMode.TeamOnly))>Team</div>
@@ -159,17 +159,8 @@
 
     public override void Tick()
     {
-        if ( Input.Pressed( "Score" ) )
-        {
-            IsActive = Input.Pressed( "Score" );
-            SetClass( "visible", true );
-        }
-
-        if ( Input.Released( "Score" ) )
-        {
-            SetClass( "visible", false );
-            IsActive = false;
-        }
+        IsActive = Input.Down( "Score" );
+        SetClass( "visible", IsActive );
     }
 
     private void SetVoiceMode( VoiceChatMode mode )

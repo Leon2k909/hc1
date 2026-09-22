@@ -97,8 +97,8 @@ public sealed partial class PlayerPawn : Pawn, IDescription, IAreaDamageReceiver
 	protected override void OnStart()
 	{
 		// TODO: expose these parameters please
-		TagBinder.BindTag( "no_shooting", () => IsSprinting || TimeSinceSprintChanged < 0.25f || TimeSinceWeaponDeployed < 0.66f );
-		TagBinder.BindTag( "no_aiming", () => IsSprinting || TimeSinceSprintChanged < 0.25f || TimeSinceGroundedChanged < 0.25f );
+		TagBinder.BindTag( "no_shooting", () => TimeSinceWeaponDeployed < 0.66f || ((IsSprinting || TimeSinceSprintChanged < 0.25f) && !HasEquipmentTag( "aiming" )) );
+		TagBinder.BindTag( "no_aiming", () => TimeSinceGroundedChanged < 0.25f );
 
 		GameObject.Name = $"Player ({DisplayName})";
 
@@ -117,7 +117,7 @@ public sealed partial class PlayerPawn : Pawn, IDescription, IAreaDamageReceiver
 		UpdateHealthRegen();
 		OnUpdateMovement();
 
-		_smoothEyeHeight = _smoothEyeHeight.LerpTo( _eyeHeightOffset * (IsCrouching ? 1 : 0), Time.Delta * 10f );
+		_smoothEyeHeight = _smoothEyeHeight.LerpTo( _eyeHeightOffset, Time.Delta * 10f );
 		CharacterController.Height = Height + _smoothEyeHeight;
 
 		if ( IsLocallyControlled )

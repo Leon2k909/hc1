@@ -9,6 +9,7 @@ Scoreboard {
 
     &.visible {
         pointer-events: all;
+        cursor: default;
     }
 
     PlayerAvatar {
@@ -49,6 +50,27 @@ Scoreboard {
 
             .right {
                 text-align: right;
+            }
+        }
+
+        // Voice controls sit apart from the title above and the team lists below.
+        .row.voice-bar {
+            flex-direction: row;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            margin: 14px 0 18px 0;
+            border-radius: 4px;
+            background-color: rgba( black, 0.55 );
+
+            .voice-label {
+                margin-right: 10px;
+                opacity: 0.8;
+            }
+
+            .button {
+                padding: 6px 14px;
+                gap: 6px;
             }
         }
 

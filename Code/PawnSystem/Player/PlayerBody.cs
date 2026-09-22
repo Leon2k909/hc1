@@ -60,7 +60,13 @@ public partial class PlayerBody : Component
 			Player.CurrentEquipment.UpdateRenderMode();
 		}
 
-		FirstPersonBody.Enabled = IsFirstPerson;
+		UpdateFirstPersonBodyVisibility();
+	}
+
+	private void UpdateFirstPersonBodyVisibility()
+	{
+		if ( !FirstPersonBody.IsValid() ) return;
+		FirstPersonBody.Enabled = IsFirstPerson && Player.IsValid() && !Player.HideFirstPersonBodyForStance;
 	}
 
 	protected override void OnUpdate()
@@ -73,6 +79,7 @@ public partial class PlayerBody : Component
 
 		var isWatchingThisPlayer = Client.Viewer.IsValid() && Client.Viewer.Pawn == Player;
 		Tags.Set( "viewer", isWatchingThisPlayer && Player.CameraController.Mode == CameraMode.FirstPerson );
+		UpdateFirstPersonBodyVisibility();
 	}
 
 	internal void UpdateRotation( Rotation rotation )

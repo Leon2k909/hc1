@@ -5,41 +5,56 @@ namespace Facepunch;
 
 public sealed class ZombiesGameMode : Component, IGameEventHandler<PlayerSpawnedEvent>
 {
-    protected override void OnAwake()
-    {
-        base.OnAwake();
-        if ( Networking.IsHost )
-        {
-            Components.GetOrCreate<ZombiesRoundSystem>();
-        }
-    }
+	// Serialized model references keep cloud assets in the game's dependency graph.
+	[Property] public Model ZombieBodyModel { get; set; }
+	[Property] public Model MysteryBoxModel { get; set; }
 
-    protected override void OnStart()
-    {
-        base.OnStart();
-        
-        if ( Networking.IsHost )
-        {
-            // Give all players the economy component
-            foreach ( var p in Scene.GetAllComponents<PlayerPawn>() )
-            {
-                if ( !p.Components.TryGet<ZombiesPlayerEconomy>( out _ ) )
-                {
-                    p.Components.Create<ZombiesPlayerEconomy>();
-                }
-            }
-        }
-    }
+	protected override void OnAwake()
+	{
+		base.OnAwake();
+		if ( Networking.IsHost )
+		{
+			var rounds = Components.GetOrCreate<ZombiesRoundSystem>();
+			rounds.ZombieBodyModel = ZombieBodyModel;
+			rounds.MysteryBoxModel = MysteryBoxModel;
+		}
+	}
 
-    void IGameEventHandler<PlayerSpawnedEvent>.OnGameEvent( PlayerSpawnedEvent eventArgs )
-    {
-        if ( Networking.IsHost )
-        {
-            var player = eventArgs.Player;
-            if ( player.IsValid() && !player.Components.TryGet<ZombiesPlayerEconomy>( out _ ) )
-            {
-                player.Components.Create<ZombiesPlayerEconomy>();
-            }
-        }
-    }
+	protected override void OnStart()
+	{
+		base.OnStart();
+
+		if ( Networking.IsHost )
+		{
+			CarriedPoints.Clear();
+			foreach ( var p in Scene.GetAllComponents<PlayerPawn>() )
+				SetupPlayer( p );
+		}
+	}
+
+	void IGameEventHandler<PlayerSpawnedEvent>.OnGameEvent( PlayerSpawnedEvent eventArgs )
+	{
+		if ( Networking.IsHost && eventArgs.Player.IsValid() )
+			SetupPlayer( eventArgs.Player );
+	}
+
+	private static void SetupPlayer( PlayerPawn player )
+	{
+		// Points carry over between lives; a restart resets them.
+		if ( !player.Components.TryGet<ZombiesPlayerEconomy>( out _ ) )
+		{
+			var eco = player.Components.Create<ZombiesPlayerEconomy>();
+			if ( player.Client.IsValid() && CarriedPoints.TryGetValue( player.Client, out var pts ) )
+				eco.SetPoints( pts );
+		}
+
+		if ( !player.Components.TryGet<ZombiesPlayerState>( out var state ) )
+			state = player.Components.Create<ZombiesPlayerState>();
+
+		state.ResetState();
+		ZombiesRoundSystem.Current?.OnPlayerSpawned( player );
+	}
+
+	/// <summary>Points saved when a pawn is destroyed on death, restored when the player respawns.</summary>
+	public static readonly Dictionary<Client, int> CarriedPoints = new();
 }

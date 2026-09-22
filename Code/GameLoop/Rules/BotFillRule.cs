@@ -104,6 +104,10 @@ public sealed class BotFillRule : Component,
 		if ( !HasHostAuthority )
 			return;
 
+		// Game events still reach disabled components; a disabled rule (e.g. zombies) must not add bots.
+		if ( !Active )
+			return;
+
 		if ( UseLightweightNpcBots )
 		{
 			GetLightweightBotManager()?.Maintain( MinPlayerCount, MaxTeamSize );

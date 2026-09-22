@@ -172,6 +172,7 @@
     public override void Tick()
     {
         base.Tick();
+        Instance = this; // the live, ticking root (constructor may run for other instances)
         ResponsiveLayout.Update( this );
         if ( !Input.UsingController ) return;
 

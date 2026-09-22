@@ -64,7 +64,7 @@ public partial class PlayerInventory : Component
 			if ( wpn.GetComponentInChildren<WeaponAmmo>() is { } ammo )
 			{
 				wpn.RefreshAmmunitionLoadout();
-				ammo.Ammo = ammo.GetEffectiveMaxAmmo();
+				ammo.RefillAll();
 			}
 		}
 	}
@@ -335,6 +335,10 @@ public partial class PlayerInventory : Component
 		}
 		component.Owner = Player;
 		Facepunch.Gunsmith.GunsmithLoadoutManager.ApplyAttachments( resource, gameObject );
+
+		// A fresh weapon comes with a full basic load. Picked-up weapons overwrite this with what the dropper had.
+		if ( gameObject.GetComponentInChildren<WeaponAmmo>( true ) is { } freshAmmo )
+			freshAmmo.ReserveAmmo = freshAmmo.GetMaxReserve();
 		gameObject.NetworkSpawn( Player.Network.Owner );
 
 		if ( makeActive )

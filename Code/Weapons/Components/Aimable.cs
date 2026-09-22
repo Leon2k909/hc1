@@ -34,7 +34,7 @@ public partial class Aimable : WeaponInputAction
 
 	protected override void OnEnabled()
 	{
-		BindTag( "no_sprint", () => IsAiming || IsDown() );
+		// Sprinting is allowed while aimed in.
 	}
 
 	protected override void OnDisabled()
@@ -81,8 +81,6 @@ public partial class Aimable : WeaponInputAction
 			return false;
 
 		// Player controller
-		if ( !Player.IsGrounded ) return false;
-		if ( Player.IsSprinting ) return false;
 		if ( Player.Tags.Has( "no_aiming" ) ) return false;
 
 		return true;

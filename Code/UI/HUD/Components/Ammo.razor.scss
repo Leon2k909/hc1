@@ -9,9 +9,28 @@ Ammo
         background-color: rgba( white, 0.5 );
     }
 
-    .vital, .important
+    .ammo-count
+    {
+        display: flex;
+        align-items: baseline;
+        gap: 5px;
+    }
+
+    .vital
     {
         min-width: 32px;
+        font-size: 30px;
+        font-weight: bold;
+        color: white;
+        text-shadow: 1px 1px 3px rgba( black, 0.9 );
+    }
+
+    .reserve
+    {
+        min-width: 28px;
+        color: rgba( white, 0.72 );
+        font-size: 16px;
+        text-shadow: 1px 1px 3px rgba( black, 0.9 );
     }
 
     .firemode

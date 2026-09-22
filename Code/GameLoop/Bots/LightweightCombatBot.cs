@@ -22,7 +22,8 @@ public sealed class LightweightCombatBot : Component, ITeam, IDescription, IResp
 	[Property, Group( "Combat" )] public float FireInterval { get; set; } = 0.55f;
 	[Property, Group( "Combat" )] public float Damage { get; set; } = 10f;
 	[Property, Group( "Combat" )] public float RealPlayerDamageScale { get; set; } = 0.25f;
-	[Property, Group( "Combat" )] public float AimError { get; set; } = 140f;
+	/// <summary> Aim cone half-angle in degrees. Miss radius grows with distance instead of being a fixed world offset. </summary>
+	[Property, Group( "Combat" )] public float AimSpreadDegrees { get; set; } = 2.5f;
 	/// <summary>Whether this bot's weapon is loaded with tracer rounds. Ordinary ammo has no visible trail.</summary>
 	[Property, Group( "Combat" )] public bool UsesTracerRounds { get; set; } = false;
 	[Property, Group( "Movement" )] public float MoveSpeed { get; set; } = 180f;
@@ -395,7 +396,10 @@ public sealed class LightweightCombatBot : Component, ITeam, IDescription, IResp
 		if ( EyePosition.DistanceSquared( aimPosition ) > AttackRange * AttackRange )
 			return;
 
-		var noisyAim = aimPosition + Vector3.Random * (AimError * 0.35f);
+		// Aim at centre mass (eye position made head-level noise sail over shoulders) with an angular cone.
+		var chestAim = aimPosition - Vector3.Up * 16f;
+		var spreadRadius = EyePosition.Distance( chestAim ) * MathF.Tan( AimSpreadDegrees.DegreeToRadian() );
+		var noisyAim = chestAim + Vector3.Random * spreadRadius;
 		var trace = Scene.Trace.Ray( EyePosition, noisyAim )
 			.IgnoreGameObjectHierarchy( GameObject )
 			.WithoutTags( "trigger", "playerclip", "movement" )
@@ -717,6 +721,17 @@ public sealed class LightweightBotManager : SingletonComponent<LightweightBotMan
 
 	[Property] public string BotPrefabPath { get; set; } = "prefabs/bots/hc1_combat_bot.prefab";
 	[Property] public float MinSpawnDistanceFromPlayers { get; set; } = 900f;
+
+	/// <summary>
+	/// Chance a bot spawns at one of the map's own player starts instead of the team spawns.
+	/// On Flatgrass those are all in the central building, so this keeps it occupied.
+	/// </summary>
+	[Property, Range( 0, 1 )] public float MapSpawnChance { get; set; } = 0.35f;
+
+	/// <summary>
+	/// Map spawns closer than this to a living player are skipped, so bots don't appear in someone's face.
+	/// </summary>
+	[Property] public float MapSpawnMinPlayerDistance { get; set; } = 500f;
 	[Property] public float MinSpawnDistanceFromBots { get; set; } = 800f;
 
 	private int _nextBotIndex;
@@ -850,6 +865,9 @@ public sealed class LightweightBotManager : SingletonComponent<LightweightBotMan
 
 	private Transform GetSpawnTransform( Team team )
 	{
+		if ( Random.Shared.Float() < MapSpawnChance && TryGetMapSpawn( out var mapSpawn ) )
+			return mapSpawn;
+
 		var spawnPoints = (team == Team.Unassigned ? GameUtils.GetSpawnPoints() : GameUtils.GetSpawnPoints( team )).ToArray();
 		if ( spawnPoints.Length == 0 )
 			return global::Transform.Zero;
@@ -861,6 +879,34 @@ public sealed class LightweightBotManager : SingletonComponent<LightweightBotMan
 
 		var spawn = Random.Shared.FromArray( candidates, spawnPoints[0] );
 		return spawn.Transform.WithScale( 1f );
+	}
+
+	/// <summary>
+	/// Pick a free map-authored spawn (info_player_start) that no living player is standing near.
+	/// </summary>
+	private bool TryGetMapSpawn( out Transform transform )
+	{
+		transform = global::Transform.Zero;
+
+		var players = GameUtils.PlayerPawns
+			.Where( x => x.IsValid() && x.HealthComponent.State == LifeState.Alive )
+			.Select( x => x.WorldPosition )
+			.ToArray();
+		var bots = Bots
+			.Where( x => x.IsValid() && x.IsAlive )
+			.Select( x => x.WorldPosition )
+			.ToArray();
+
+		var candidates = Scene.GetAllComponents<SpawnPoint>()
+			.Select( x => x.Transform.World )
+			.Where( t => players.All( p => p.Distance( t.Position ) > MapSpawnMinPlayerDistance ) )
+			.Where( t => bots.All( b => b.Distance( t.Position ) > 64f ) )
+			.ToArray();
+
+		if ( candidates.Length == 0 ) return false;
+
+		transform = Random.Shared.FromArray( candidates ).WithScale( 1f );
+		return true;
 	}
 
 	private float GetSpawnScore( Vector3 position )

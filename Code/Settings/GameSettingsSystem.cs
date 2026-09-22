@@ -164,16 +164,25 @@ public partial class GameSettingsSystem
 		}
 	}
 
-	public static void Save()
+	/// <summary>
+	/// Applies the current (possibly unsaved) settings live, so changes preview immediately
+	/// in the settings menu — e.g. dragging a volume slider is heard right away.
+	/// </summary>
+	public static void Apply()
 	{
 		ApplyVolumes();
-		FileSystem.Data.WriteJson( FilePath, Current );
 
 		// Push the streak preference to the live PlayerScore so it takes effect immediately
 		// if the player is currently in a match and changes it mid-game.
 		var localScore = Client.Local?.GetComponent<Facepunch.UI.PlayerScore>();
 		if ( localScore.IsValid() )
 			localScore.UseScorestreaks = Current.UseScorestreaks;
+	}
+
+	public static void Save()
+	{
+		Apply();
+		FileSystem.Data.WriteJson( FilePath, Current );
 	}
 
 	public static void Load()

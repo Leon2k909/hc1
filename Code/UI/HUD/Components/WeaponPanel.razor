@@ -15,7 +15,7 @@
         {
             <div class="ammo">
                 <label class="main">@Ammo.Ammo</label>
-                <label class="backup">/@(Ammo.MaxAmmo)</label>
+                <label class="backup">/@(Ammo.ReserveAmmo)</label>
             </div>
         }
     }
@@ -31,6 +31,6 @@
     {
         if ( !Weapon.IsValid() ) return 0;
 
-        return HashCode.Combine( Ammo.IsValid() ? Ammo.Ammo : 0, Ammo.IsValid() ? Ammo.MaxAmmo : 0);
+        return HashCode.Combine( Ammo.IsValid() ? Ammo.Ammo : 0, Ammo.IsValid() ? Ammo.ReserveAmmo : 0);
     }
 }

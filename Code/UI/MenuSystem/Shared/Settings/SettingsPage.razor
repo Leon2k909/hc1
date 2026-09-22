@@ -5,61 +5,57 @@
 @inherits Panel
 @implements INavigatorPage
 @namespace Facepunch.UI
+@attribute [StyleSheet]
 
-<root class="hc1 blur" style="display: flex; flex-direction: column; width: 100%; height: 100%; position: absolute;">
+<root class="hc1 blur settings-page">
     <MenuTopbar Title="SETTINGS" />
-    
-    <div style="flex-grow: 1; overflow: hidden; display: flex; flex-direction: column;">
-        <div style="height: 18%;"/>
 
-            <div class="layout column gap">
-                <div class="layout row inset">
-                    @foreach (var grouping in TypeLibrary.GetPropertyDescriptions(GameSettingsSystem.Current).GroupBy(x => x.Group))
-                    {
-                        <div class="button standard smaller no-anim extra-x-padding @(SelectedGroup == grouping.Key ? "selected" : "")" onclick=@(() => SetGroup( grouping.Key ) )>@grouping.Key</div>
-                    }
+    <div class="set-body">
+        <div class="set-nav">
+            <div class="set-head">
+                <div class="set-accent"></div>
+                <label class="set-title">SETTINGS</label>
+            </div>
+
+            @foreach ( var grouping in TypeLibrary.GetPropertyDescriptions( GameSettingsSystem.Current ).GroupBy( x => x.Group ) )
+            {
+                <div class="set-cat @(SelectedGroup == grouping.Key ? "active" : "")" onclick=@(() => SetGroup( grouping.Key ) )>
+                    <label>@grouping.Key</label>
+                    <i>chevron_right</i>
                 </div>
-
-                <div class="layout padding-insane-x with-scroll column">
-                    <VerticalDivider />
-
-                    <div class="column with-bg layout padding-extra with-gap">
-                        @if ( !string.IsNullOrEmpty( SelectedGroup ) )
-                        {
-                            @if ( SelectedGroup == "Crosshair" )
-                            {
-                                <CrosshairSettings />
-                            }
-                            else if ( SelectedGroup == "Controls" )
-                            {
-                                <InputSettings />
-                            }
-                            else
-                            {
-                                @foreach ( var property in TypeLibrary.GetPropertyDescriptions( GameSettingsSystem.Current ).Where( x => x.Group == SelectedGroup ) )
-                                {
-                                    <SettingEntry Target=@GameSettingsSystem.Current Description=@property />
-                                }
-                            }
-                        }
-                    </div>
-
-                    <VerticalDivider />
-                </div>
-            </div>
-
-            <div class="grow" />
-
-        <div class="row inset grow with-padding with-gap" style="justify-content: flex-end; align-items: center; padding: 16px;">
-            <div class="button standard" onclick=@(() => Game.Overlay.ShowBinds())>
-                EDIT INPUT BINDINGS
-            </div>
-            <div class="button standard" onclick=@(() => ReportBug())>
-                <i>bug_report</i>
-                Report a Bug
-            </div>
-            <button class="button standard" onclick=@(()=>Save())>Save</button>
+            }
         </div>
+
+        <div class="set-content">
+            <label class="set-group-title">@SelectedGroup</label>
+
+            <div class="set-list">
+                @if ( !string.IsNullOrEmpty( SelectedGroup ) )
+                {
+                    @if ( SelectedGroup == "Crosshair" )
+                    {
+                        <CrosshairSettings />
+                    }
+                    else if ( SelectedGroup == "Controls" )
+                    {
+                        <InputSettings />
+                    }
+                    else
+                    {
+                        @foreach ( var property in TypeLibrary.GetPropertyDescriptions( GameSettingsSystem.Current ).Where( x => x.Group == SelectedGroup ) )
+                        {
+                            <SettingEntry Target=@GameSettingsSystem.Current Description=@property />
+                        }
+                    }
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="set-footer">
+        <div class="set-btn" onclick=@(() => Game.Overlay.ShowBinds())><i>keyboard</i><label>Edit Input Bindings</label></div>
+        <div class="set-btn" onclick=@(() => ReportBug())><i>bug_report</i><label>Report a Bug</label></div>
+        <div class="set-btn primary" onclick=@(() => Save())><i>save</i><label>Save</label></div>
     </div>
 </root>
 
