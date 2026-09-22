@@ -35,10 +35,15 @@ for name, title, category, offset in specs:
             'Position':'0,0,0','Rotation':'0,0,0,1','Scale':'1,1,1',
             'Enabled':True,'NetworkMode':1,
             'Components':[
-                {'__type':'Sandbox.ModelRenderer','__guid':guid(name+'/renderer'),
+                {'__type':'Sandbox.ModelRenderer','__guid':guid(name+'/renderer'),'__enabled':True,
                  'Model':f'attachments/hc1/{name}/{name}.vmdl','Tint':'1,1,1,1'},
-                {'__type':'Facepunch.Gunsmith.GunsmithSocketAttachment','__guid':guid(name+'/socket'),
-                 'SocketName':'muzzle','SocketOffset':offset,'SocketAngles':'0,0,0'},
+                {'__type':'Facepunch.Gunsmith.GunsmithSocketAttachment','__guid':guid(name+'/socket'),'__enabled':True,
+                 'SocketName':'muzzle','SocketOffset':offset,'SocketAngles':'0,0,0',
+                 'ModelSocketAngles':{
+                     'weapons/swb/scarh/v_scarh.vmdl':'0,0,180',
+                     'weapons/swb/scarh/v_scarh_gunsmith.vmdl':'0,0,180',
+                     'weapons/swb/scarh/w_scarh.vmdl':'0,0,180',
+                 }},
             ],
         }, 'ResourceVersion':2,'__version':2,
     })
@@ -71,10 +76,4 @@ for weapon in ['M4A1','ScarH']:
             root.setdefault('Children',[]).append({
                 '__guid':guid(key),'Flags':0,'Name':f'{category} Attachment Point',
                 'Position':position,'Rotation':'0,0,0,1','Scale':'1,1,1','Enabled':True,
-                'Components':[{'__type':'Facepunch.Gunsmith.GunsmithAttachmentPoint',
-                               '__guid':guid(key+'/component'),'Category':category}],
-            })
-            changed=True
-        if changed:
-            write(path,data)
-            print('Added sockets:',path.relative_to(ROOT))
+                'Components':[{'__type':'Facepunch.Gunsmi
