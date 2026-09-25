@@ -1,0 +1,38 @@
+{
+  "RootObject": {
+    "__guid": "12ec9aa3-d6e2-40a2-8fae-adac0b675205",
+    "Flags": 0,
+    "Name": "MP5 45-Round Magazine",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "d5519078-77d8-4359-b60c-3b8a0b19f6f7",
+        "__enabled": true,
+        "Model": "attachments/mpapa5/magazines/magazine_45_round/magazine_45_round.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithBoneAttachment",
+        "__guid": "1d83fb89-3894-45a6-8e8e-bc4b056dae30",
+        "__enabled": true,
+        "BoneName": "magazine",
+        "HiddenBodygroup": "magazine",
+        "UseWeaponOrigin": true,
+        "WeaponSpaceOffset": "3.1,0,4.25",
+        "WeaponSpaceScale": 0.95,
+        "MountAtBone": false,
+        "BoneOffset": "0,0,0",
+        "BoneAngles": "0,0,0",
+        "ModelScaleMultiplier": "1,1,1"
+      }
+    ],
+    "Children": []
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

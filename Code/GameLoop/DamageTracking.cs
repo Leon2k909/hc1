@@ -48,7 +48,7 @@ public partial class DamageTracker : Component, IGameEventHandler<DamageTakenGlo
 
 	public struct GroupedDamage
 	{
-		public Client Attacker { get; set; }
+		public Component Attacker { get; set; }
 		public int Count { get; set; }
 		public float Damage { get; set; }
 	}
@@ -64,7 +64,7 @@ public partial class DamageTracker : Component, IGameEventHandler<DamageTakenGlo
 			{
 				groups.Add( new()
 				{
-					Attacker = group.First().Attacker is Pawn pawn ? pawn.Client : null,
+					Attacker = group.First().Attacker,
 					Count = group.Count(),
 					Damage = group.Sum( x => x.Damage )
 				} );
@@ -85,7 +85,7 @@ public partial class DamageTracker : Component, IGameEventHandler<DamageTakenGlo
 			{
 				groups.Add( new()
 				{
-					Attacker = group.First().Attacker is Pawn pawn ? pawn.Client : null,
+					Attacker = group.First().Attacker,
 					Count = group.Count(),
 					Damage = group.Sum( x => x.Damage )
 				} );

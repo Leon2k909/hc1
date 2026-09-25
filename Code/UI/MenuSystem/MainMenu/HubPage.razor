@@ -49,33 +49,98 @@
 
         </div>
     </div>
+
+    @if ( _pickingZombiesMap )
+    {
+        <div class="map-picker">
+            <div class="map-picker-backdrop" onclick=@CloseMapPicker />
+            <div class="map-picker-panel">
+                <div class="map-picker-header">
+                    <div class="map-picker-heading">
+                        <label class="kicker">CO-OP · ZOMBIES</label>
+                        <label class="map-picker-title">SELECT MAP</label>
+                    </div>
+                    <div class="map-picker-close" onclick=@CloseMapPicker>
+                        <i>close</i>
+                    </div>
+                </div>
+
+                <div class="map-grid">
+                    @foreach ( var map in ZombiesMaps() )
+                    {
+                        var image = map.GetMetadata( "Image", "" );
+                        <div class="map-card" onclick=@(() => LaunchZombies( map ))>
+                            @if ( string.IsNullOrWhiteSpace( image ) )
+                            {
+                                <div class="map-img placeholder"><i>landscape</i></div>
+                            }
+                            else
+                            {
+                                <img class="map-img" src="@image" />
+                            }
+                            <div class="map-shade" />
+                            <label class="map-name">@map.GetMetadata( "Title", map.ResourceName ).ToUpper()</label>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
 </root>
 
 @code
 {
+    bool _pickingZombiesMap;
+
     public void OnNavigationOpen()  => MainMenuRoot.Instance?.SetActiveRoute( "/" );
     public void OnNavigationClose() { }
 
     void PlayHoverSound() => Sound.Play( "ui.button.over" );
 
+    static GameMode ZombiesMode() => GameObject.GetPrefab( "prefabs/game_modes/zombies.prefab" )?.GetComponent<GameMode>();
+
+    /// <summary>Match maps that can host Zombies, Flatgrass first since it was the original.</summary>
+    static List<SceneFile> ZombiesMaps()
+    {
+        var mode = ZombiesMode();
+        if ( !mode.IsValid() ) return new();
+
+        return GameUtils.GetMatchMaps()
+            .Where( m => GameMode.GetAll( m ).Any( x => x.Ident == mode.Ident ) )
+            .OrderByDescending( m => m.ResourcePath?.Contains( "flatgrass", StringComparison.OrdinalIgnoreCase ) ?? false )
+            .ToList();
+    }
+
     void PlayZombies()
     {
-        var prefab = GameObject.GetPrefab( "prefabs/game_modes/zombies.prefab" );
-        if ( !prefab.IsValid() ) return;
+        var maps = ZombiesMaps();
+        if ( maps.Count == 0 ) return;
 
-        var mode = prefab.GetComponent<GameMode>();
-        if ( !mode.IsValid() ) return;
+        // Only ask when there's a choice to make.
+        if ( maps.Count == 1 )
+        {
+            LaunchZombies( maps[0] );
+            return;
+        }
 
+        _pickingZombiesMap = true;
+        StateHasChanged();
+    }
+
+    void CloseMapPicker()
+    {
+        _pickingZombiesMap = false;
+        StateHasChanged();
+    }
+
+    void LaunchZombies( SceneFile map )
+    {
+        var mode = ZombiesMode();
+        if ( !mode.IsValid() || map is null ) return;
+
+        _pickingZombiesMap = false;
         GameMode.SetCurrent( mode );
         GameMode.SetHardcore( false );
-
-        var scene = ResourceLibrary.GetAll<SceneFile>()
-            .FirstOrDefault( s =>
-                (s.ResourcePath?.Contains( "flatgrass", StringComparison.OrdinalIgnoreCase ) ?? false)
-                || string.Equals( s.GetMetadata( "Title", "" ), "Flatgrass", StringComparison.OrdinalIgnoreCase ) )
-            ?? GameUtils.GetAvailableMaps().FirstOrDefault();
-
-        if ( scene is null ) return;
-        Game.ActiveScene.Load( scene );
+        Game.ActiveScene.Load( map );
     }
 }

@@ -157,6 +157,7 @@ public sealed class BotFillRule : Component,
 			return manager;
 
 		var obj = new GameObject( true, "Lightweight Bot Manager" );
+		obj.Flags |= GameObjectFlags.NotSaved;
 		manager = obj.AddComponent<LightweightBotManager>();
 
 		if ( Networking.IsActive )

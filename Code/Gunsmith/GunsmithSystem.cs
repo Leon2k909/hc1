@@ -7,6 +7,9 @@ public partial class GunsmithSystem : Component
 {
 	private const string ScarHResourcePath = "weapons/scarh/scarh.equip";
 	private const string ScarHGunsmithModelPath = "weapons/swb/scarh/v_scarh_gunsmith.vmdl";
+	private const string Mp5ResourcePath = "weapons/mp5/mp5.equip";
+	private string appliedMp5Stock;
+	private bool loadingEquipment;
 
 	[Property]
 	public EquipmentResource Equipment { get; set; }
@@ -124,9 +127,55 @@ public partial class GunsmithSystem : Component
 		if ( !equipment.IsValid() || !Weapon.IsValid() )
 			return;
 
+		var isMp5 = equipment.ResourcePath.Equals( Mp5ResourcePath, System.StringComparison.OrdinalIgnoreCase );
+		var stock = isMp5 ? SelectedPartPath( equipment, GunsmithPartType.Stock ) : null;
+		if ( isMp5 && !loadingEquipment
+			&& !string.Equals( stock, appliedMp5Stock, System.StringComparison.OrdinalIgnoreCase ) )
+		{
+			// Stock bone overrides survive renderer reparenting. A fresh MP5
+			// renderer restores the factory stock when its selection changes.
+			LoadEquipment( equipment, previewCamo );
+			return;
+		}
+
 		GunsmithLoadoutManager.ApplyAttachments( equipment, Weapon.GameObject, previewCamo );
 		HidePreviewArms( Weapon.GameObject, Renderer );
+		PinPreviewReticles( Weapon.GameObject, equipment );
+		appliedMp5Stock = stock;
 	}
+
+	/// <summary> How much bigger the reticle is drawn on the preview's lens, so a 1-2% dot is readable. </summary>
+	private const float PreviewReticleScale = 3f;
+
+	/// <summary>
+	/// The lens shader collimates the reticle: it only lines up when you look straight down the sight, so from the
+	/// preview camera it slides off the glass and nothing shows. Pin it to the lens and enlarge it so the chosen shape
+	/// and colour can be seen. These are the per-renderer copies ApplyAttachments made, so in-game optics are unchanged.
+	/// </summary>
+	private static void PinPreviewReticles( GameObject root, EquipmentResource equipment )
+	{
+		var scale = PreviewReticleScale * GunsmithLoadoutManager.GetCustomReticleScale( equipment );
+		foreach ( var renderer in root.Components.GetAll<ModelRenderer>( FindMode.EverythingInSelfAndDescendants ) )
+		{
+			for ( var i = 0; i < renderer.Materials.Count; i++ )
+			{
+				if ( !renderer.Materials.HasOverride( i ) )
+					continue;
+
+				var material = renderer.Materials.GetOverride( i );
+				if ( material is null || material == renderer.Materials.GetOriginal( i )
+					|| material.ShaderName?.Contains( "m4_optic_lens" ) != true )
+					continue;
+
+				material.Set( "g_flSightDistanceScale", 0f );
+				material.Set( "g_flReticleScale", scale );
+			}
+		}
+	}
+
+	private static string SelectedPartPath( EquipmentResource equipment, GunsmithPartType category ) =>
+		GunsmithLoadoutManager.TryGetAttachment( equipment, category, out var part ) && part.IsValid()
+			? part.ResourcePath : "";
 
 	private static void HidePreviewArms( GameObject root, SkinnedModelRenderer mainRenderer )
 	{
@@ -235,7 +284,7 @@ public partial class GunsmithSystem : Component
 		       || equipment.ResourceName.Contains( "scarh", System.StringComparison.OrdinalIgnoreCase );
 	}
 
-	private void LoadEquipment( EquipmentResource equipment )
+	private void LoadEquipment( EquipmentResource equipment, GunsmithPart previewCamo = null )
 	{
 		if ( !equipment.IsValid() || !equipment.ViewModelPrefab.IsValid() )
 		{
@@ -302,7 +351,9 @@ public partial class GunsmithSystem : Component
 		ApplyGunsmithPreviewModel( equipment, Renderer );
 		Renderer.UseAnimGraph = false;
 		Controller.Weapon = weapon;
-		ApplyPreviewAttachments( equipment );
+		loadingEquipment = true;
+		try { ApplyPreviewAttachments( equipment, previewCamo ); }
+		finally { loadingEquipment = false; }
 
 		SetFirstPerson( wasFps );
 	}

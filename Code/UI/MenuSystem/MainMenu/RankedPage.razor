@@ -129,7 +129,9 @@
         }
 
         GameMode.SetCurrent( mode );
-        GameMode.SetHardcore( false );
+        // Core modes are off for now, every match is hardcore. Put back with Core:
+        // GameMode.SetHardcore( false );
+        GameMode.SetHardcore( true );
         Game.ActiveScene.Load( map );
     }
 

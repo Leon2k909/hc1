@@ -31,10 +31,12 @@
             }
         }
 
+        @* Every match is hardcore while Core modes are off, so there's nothing to mark. Put back with Core.
         @if ( GameMode.Instance.IsValid() && GameMode.Instance.Hardcore )
         {
             <label class="hc-badge uppercase">HC</label>
         }
+        *@
     </div>
 
     @if ( EnemyTeamPlayers is not null )

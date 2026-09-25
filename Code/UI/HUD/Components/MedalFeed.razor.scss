@@ -6,21 +6,19 @@ MedalFeed
     top: 7%;
     left: 50%;
     transform: translateX(-50%);
-    width: 920px;
+    width: 280px;
     max-width: 94%;
     z-index: 1700;
     align-items: flex-start;
     justify-content: center;
-    gap: 12px;
     pointer-events: none;
     font-family: $main-font;
 
     .medal-slot
     {
-        width: 216px;
-        max-width: 25%;
+        width: 100%;
+        max-width: 100%;
         min-width: 0;
-        flex-shrink: 1;
         color: #ffc96a;
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -91,6 +89,7 @@ MedalFeed
             transform: skewX(10deg);
             text-shadow: 0 1px 2px black;
         }
+
     }
 
     .medal-ribbon
@@ -182,14 +181,6 @@ MedalFeed
         .medal-subtitle { font-size: 8px; letter-spacing: 0.4px; }
         .medal-rule { width: 8px; }
         .medal-detail { gap: 3px; }
-    }
-
-    &.stacked-medals
-    {
-        flex-wrap: wrap;
-        row-gap: 10px;
-        .medal-slot { width: 46%; max-width: 46%; }
-        .medal-emblem { width: 86px; height: 86px; }
     }
 
 }

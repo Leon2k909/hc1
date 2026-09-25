@@ -1,0 +1,38 @@
+{
+  "RootObject": {
+    "__guid": "861dc722-9f0c-4814-9b62-71c46729dd2b",
+    "Flags": 0,
+    "Name": "MP5 Classic Full Stock",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "0293a918-6e11-427c-b42c-d7aa1e8ebf6d",
+        "__enabled": true,
+        "Model": "attachments/mpapa5/stocks/stock_classic_full/stock_classic_full.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithBoneAttachment",
+        "__guid": "d9f4ffab-5c1b-4730-a4bb-932ab3e94334",
+        "__enabled": true,
+        "BoneName": "stock",
+        "HiddenBone": "stock",
+        "UseWeaponOrigin": true,
+        "WeaponSpaceOffset": "-5.964,0,8.211",
+        "WeaponSpaceScale": 0.955,
+        "MountAtBone": false,
+        "BoneOffset": "0,0,0",
+        "BoneAngles": "0,0,0",
+        "ModelScaleMultiplier": "1,1,1"
+      }
+    ],
+    "Children": []
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

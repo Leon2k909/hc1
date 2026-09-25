@@ -6,65 +6,89 @@
 @attribute [StyleSheet]
 
 <root>
-    <div class="list">
-        <div class="header">
-            <label class="small slight">Name</label>
-            <div class="grow" />
-            <label class="small slight">Players</label>
+    <div class="sb-head">
+        <div class="sb-accent"></div>
+        <label class="sb-title">SERVER BROWSER</label>
+        <div class="sb-head-fill"></div>
+        <label class="sb-count @(IsSearching && !ShowFakeLobbies ? "searching" : "")">@CountLabel</label>
+    </div>
+
+    <div class="sb-panels">
+        <div class="sb-list">
+            <div class="sb-panel-head">
+                <label class="sb-col-name">Name</label>
+                <label class="sb-col-players">Players</label>
+            </div>
+
+            <div class="sb-rows">
+                @if ( ShowFakeLobbies )
+                {
+                    @for ( int i = 0; i < 32; i++ )
+                    {
+                        var fakeLobby = new Lobby()
+                        {
+                            FakeId = (ulong)i
+                        };
+                        <ServerEntry Lobby=@fakeLobby IsSelected=@( CurrentLobby?.Equals( fakeLobby ) ?? false )  OnSelected=@OnSelected />
+                    }
+                }
+                else if ( IsSearching )
+                {
+                    <div class="sb-state searching">
+                        <i>search</i>
+                        <label class="sb-state-title">Searching for sessions</label>
+                    </div>
+                }
+                else if ( FetchedLobbies.Count < 1 )
+                {
+                    <div class="sb-state">
+                        <i>dns</i>
+                        <label class="sb-state-title">No sessions found</label>
+                        <label class="sb-state-text">Refresh the list or create your own game.</label>
+                    </div>
+                }
+                else
+                {
+                    @foreach ( var info in FetchedLobbies )
+                    {
+                        <ServerEntry Lobby=@(new Lobby( info )) IsSelected=@( CurrentLobby?.Equals( new Lobby( info ) ) ?? false )  OnSelected=@OnSelected />
+                    }
+                }
+            </div>
         </div>
 
-        <div class="servers">
-            @if ( ShowFakeLobbies )
+        <div class="sb-detail @(CurrentLobby.HasValue ? "" : "empty")">
+            <div class="sb-panel-head">
+                <label>Session Details</label>
+            </div>
+
+            @if ( CurrentLobby.HasValue )
             {
-                @for ( int i = 0; i < 32; i++ )
-                {
-                    var fakeLobby = new Lobby()
-                    {
-                        FakeId = (ulong)i
-                    };
-                    <ServerEntry Lobby=@fakeLobby IsSelected=@( CurrentLobby?.Equals( fakeLobby ) ?? false )  OnSelected=@OnSelected />
-                }
+                var selected = CurrentLobby.Value;
+
+                <div class="sb-detail-body">
+                    <label class="sb-detail-name">@selected.Name</label>
+
+                    <div class="sb-stat">
+                        <label class="sb-stat-key">Players</label>
+                        <label class="sb-stat-value">@selected.Members / @selected.MaxMembers</label>
+
+                        <div class="sb-bar">
+                            <div class="sb-bar-fill @(selected.IsFull ? "full" : "")" style="width: @(FillPercent( selected ))%;" />
+                        </div>
+                    </div>
+
+                    <div class="sb-stat">
+                        <label class="sb-stat-key">Status</label>
+                        <label class="sb-stat-value @(selected.IsFull ? "full" : "open")">@(selected.IsFull ? "Full" : "Open")</label>
+                    </div>
+                </div>
             }
             else
             {
-                @if ( IsSearching )
-                {
-                    <div class="flex align-center justify-center">
-                        <label class="small slight" style="margin-top: 32px;">Looking for servers...</label>
-                    </div>
-                }
-                else if ( FetchedLobbies.Count() < 1 )
-                {
-                    <div class="flex align-center justify-center">
-                        <label class="small slight" style="margin-top: 32px;">No servers found...</label>
-                    </div>
-                }
-                @foreach ( var lobby in FetchedLobbies )
-                {
-                    <ServerEntry Lobby=@(new Lobby(lobby)) IsSelected=@( CurrentLobby?.Equals( new Lobby( lobby ) ) ?? false )  OnSelected=@OnSelected />
-                }
-            }
-        </div>
-    </div>
-
-
-    <div class="current">
-        <div class="header">
-            <label class="small slight">Server</label>
-        </div>
-
-        <div class="layout column padding-extra gap">
-            @if (CurrentLobby.HasValue)
-            {
-                <label class="important">
-                    @CurrentLobby?.Name
-                </label>
-
-                <div class="layout row gap-insane">
-                    <label>Players</label>
-                    <div class="grow" />
-
-                    <label>@(CurrentLobby?.Members) / @(CurrentLobby?.MaxMembers)</label>
+                <div class="sb-state">
+                    <i>touch_app</i>
+                    <label class="sb-state-text">Select a session to see its details.</label>
                 </div>
             }
         </div>
@@ -82,6 +106,22 @@
 
     private bool IsSearching = true;
 
+    private string CountLabel
+    {
+        get
+        {
+            if ( ShowFakeLobbies ) return "32 FOUND";
+            if ( IsSearching ) return "SEARCHING";
+            return $"{FetchedLobbies.Count} FOUND";
+        }
+    }
+
+    private static int FillPercent( Lobby lobby )
+    {
+        if ( lobby.MaxMembers <= 0 ) return 0;
+        return Math.Clamp( lobby.Members * 100 / lobby.MaxMembers, 0, 100 );
+    }
+
     protected override void OnAfterTreeRender( bool firstTime )
     {
         if ( firstTime )
@@ -92,13 +132,8 @@
 
     private void OnSelected( Lobby lobby )
     {
-        if ( CurrentLobby.Equals( lobby ) )
-        {
-            CurrentLobby = null;
-            return;
-        }
-
-        CurrentLobby = lobby;
+        CurrentLobby = CurrentLobby.Equals( lobby ) ? null : lobby;
+        StateHasChanged();
     }
 
     private bool IsEditorLobby( LobbyInformation lobby )

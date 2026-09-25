@@ -83,6 +83,9 @@ public partial class HealthComponent : Component, IRespawnable//, Component.IDam
 			             (GameMode.Instance.IsValid() && GameMode.Instance.Hardcore);
 		var isHcBot = isHardcore &&
 			          GameUtils.GetLightweightBotFromComponent( this ) is not null;
+		var isHcBotAttackOnPlayer = isHardcore &&
+			                       GameUtils.GetPlayerFromComponent( this ) is not null &&
+			                       GameUtils.GetLightweightBotFromComponent( damageInfo.Attacker ) is not null;
 
 		damageInfo = WithThisAsVictim( damageInfo );
 		damageInfo = ModifyDamage( damageInfo );
@@ -91,7 +94,8 @@ public partial class HealthComponent : Component, IRespawnable//, Component.IDam
 
 		if ( IsGodMode || DevCommands.NoDamage ) return;
 
-		if ( isHcBot && State == LifeState.Alive )
+		// Hardcore bot hits kill players in one shot; bot victims keep the same rule.
+		if ( (isHcBot || isHcBotAttackOnPlayer) && State == LifeState.Alive )
 		{
 			Health = 0f;
 			State = LifeState.Dead;

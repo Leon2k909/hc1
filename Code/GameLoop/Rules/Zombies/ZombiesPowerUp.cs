@@ -109,7 +109,7 @@ public sealed class ZombiesPowerUp : Component, IMarkerObject
 		}
 	}
 
-	private static void CreateAmmoCase( GameObject parent )
+	internal static void CreateAmmoCase( GameObject parent )
 	{
 		var olive = new Color( 0.24f, 0.3f, 0.12f );
 		var metal = new Color( 0.12f, 0.14f, 0.11f );

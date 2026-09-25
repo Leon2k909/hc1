@@ -24,6 +24,8 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	[Property, Group( "Fall Damage" )] public float MinimumFallVelocity { get; set; } = 500f;
 	[Property, Group( "Fall Damage" )] public float MinimumFallSoundVelocity { get; set; } = 300f;
 	[Property, Group( "Fall Damage" )] public float FallDamageScale { get; set; } = 0.2f;
+	[Property, Group( "Fall Damage" )] public float FallKnockdownVelocity { get; set; } = 650f;
+	[Property, Group( "Fall Damage" )] public float FallKnockdownDuration { get; set; } = 1.25f;
 
 	[Property, Group( "Sprint" )] public float SprintMovementDampening { get; set; } = 0.35f;
 
@@ -59,6 +61,8 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	/// keep a key down to stay on the floor.
 	/// </summary>
 	[Sync] public bool IsProne { get; set; }
+	[Sync] private bool IsFallKnockedDown { get; set; }
+	[Sync] private TimeSince TimeSinceFallKnockdown { get; set; }
 
 	/// <summary>
 	/// Is the player slow walking?
@@ -182,6 +186,8 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 
 	private void OnUpdateMovement()
 	{
+		UpdateFallKnockdown();
+
 		var cc = CharacterController;
 		CurrentHoldType = CurrentEquipment.IsValid() ? CurrentEquipment.GetHoldType() : AnimationHelper.HoldTypes.None;
 
@@ -302,7 +308,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	private bool WantsToggleSprint { get; set; }
 
 	private bool HasSprintMovement => WishMove.x > 0.2f || (MathF.Abs( WishMove.y ) > 0.2f && WishMove.x >= 0f);
-	private bool CanSprint => !IsSlowWalking && !IsProne && !HasEquipmentTag( "no_sprint" );
+	private bool CanSprint => !IsFallKnockedDown && !IsSlowWalking && !IsProne && !HasEquipmentTag( "no_sprint" );
 
 	private bool GetWantsToSprint()
 	{
@@ -347,12 +353,20 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	{
 		bool wasSprinting = IsSprinting;
 
-		IsSlowWalking = Input.Down( "Walk" );
+		IsSlowWalking = !IsFallKnockedDown && Input.Down( "Walk" );
 		IsSprinting = GetWantsToSprint();
 
 		if ( wasSprinting != IsSprinting )
 		{
 			OnSprintChanged( wasSprinting, IsSprinting );
+		}
+
+		if ( IsFallKnockedDown )
+		{
+			IsProne = true;
+			IsCrouching = false;
+			IsUsing = false;
+			return;
 		}
 
 		// Prone toggles rather than being held, and jumping gets you back on your feet.
@@ -464,6 +478,9 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 			var minimumVelocity = MinimumFallVelocity;
 			var vel = MathF.Abs( _previousVelocity.z );
 
+			if ( vel >= FallKnockdownVelocity )
+				StartFallKnockdown();
+
 			if ( vel > MinimumFallSoundVelocity )
 			{
 				PlayFallSound();
@@ -481,6 +498,41 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 				}
 			}
 		}
+	}
+
+	private void StartFallKnockdown()
+	{
+		if ( IsFallKnockedDown || IsProne || HealthComponent.State != LifeState.Alive )
+			return;
+
+		if ( ZombiesPlayerState.For( this ) is { IsDowned: true } )
+			return;
+
+		IsFallKnockedDown = true;
+		TimeSinceFallKnockdown = 0f;
+		IsProne = true;
+		IsSprinting = false;
+
+		if ( CurrentEquipment.IsValid() )
+		{
+			foreach ( var aimable in CurrentEquipment.Components.GetAll<Aimable>( FindMode.EverythingInSelfAndDescendants ) )
+				if ( aimable.IsValid() ) aimable.CancelAim();
+		}
+	}
+
+	private void UpdateFallKnockdown()
+	{
+		if ( !IsFallKnockedDown || !IsLocallyControlled )
+			return;
+
+		if ( HealthComponent.State != LifeState.Alive || TimeSinceFallKnockdown >= FallKnockdownDuration )
+		{
+			IsFallKnockedDown = false;
+			IsProne = false;
+			return;
+		}
+
+		IsProne = true;
 	}
 
 	[Property, Group( "Effects" )] public SoundEvent LandSound { get; set; }
@@ -559,16 +611,32 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 			return;
 
 		TimeSinceLastInput = 0;
+		if ( Networking.IsHost )
+			Scene.Dispatch( new PlayerFiredWhileSpawnedEvent( this ) );
+		else if ( TimeSinceLastRespawn < 10f )
+			ReportSpawnProtectionShot();
+	}
+
+	[Rpc.Host]
+	private void ReportSpawnProtectionShot()
+	{
+		if ( !Client.IsValid() || Rpc.Caller != Client.Connection || TimeSinceLastRespawn >= 10f )
+			return;
+
+		Scene.Dispatch( new PlayerFiredWhileSpawnedEvent( this ) );
 	}
 
 	private void BuildWishInput()
 	{
 		WishMove = 0f;
 
-		if ( IsFrozen )
+		if ( IsFrozen || IsFallKnockedDown )
 			return;
 
 		WishMove += Input.AnalogMove;
+
+		if ( DevCommands.ForceMove != 0f && IsLocallyControlled )
+			WishMove += Vector3.Forward * DevCommands.ForceMove;
 	}
 
 	private void BuildWishVelocity()

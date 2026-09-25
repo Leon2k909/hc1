@@ -228,6 +228,12 @@
                     PromptBlocked = true;
                     return;
                 }
+				if ( station.Kind == ZombiesBuyKind.AmmoBox && !station.HasAmmoToRefill( me ) )
+				{
+					PromptText = "Ammo already full";
+					PromptBlocked = true;
+					return;
+				}
                 PromptText = $"{action} [{cost}]";
                 PromptBlocked = (Economy?.Points ?? 0) < cost;
                 return;

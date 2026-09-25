@@ -1,0 +1,32 @@
+{
+  "Name": "Kastov 762",
+  "Description": "Hard-hitting 7.62 assault rifle. Fires slower and kicks harder than the M4.",
+  "Slot": "Primary",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": true,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/guns/kastov762_01.png",
+  "IsPurchasable": true,
+  "Price": 2700,
+  "KillReward": 300,
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/kastov/weapon_kastov762.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/kastov/wm_kastov762.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/kastov/vm_kastov762.prefab"
+  },
+  "WorldModel": "weapons/kastov/w_kastov.vmdl",
+  "ArmorReduction": null,
+  "HelmetReduction": null,
+  "WorldModelBodyGroups": 0,
+  "__references": [],
+  "__version": 0,
+  "Category": "AssaultRifle",
+  "GunsmithOffset": "0,0,4"
+}

@@ -9,6 +9,7 @@ public record EquipmentPickedUpEvent( PlayerPawn Player, DroppedEquipment Droppe
 public partial class DroppedEquipment : Component, IUse, Component.ICollisionListener, IMarkerObject
 {
 	[Property] public EquipmentResource Resource { get; set; }
+	[Sync( SyncFlags.FromHost )] public bool ApplySavedAttachments { get; set; } = true;
 
 	public Rigidbody Rigidbody { get; private set; }
 
@@ -16,7 +17,7 @@ public partial class DroppedEquipment : Component, IUse, Component.ICollisionLis
 	/// Dropped guns clean themselves up after this long so respawn modes don't fill with weapons.
 	/// Special items (the bomb) never expire.
 	/// </summary>
-	public const float Lifetime = 60f;
+	public const float Lifetime = 180f;
 
 	private TimeSince _timeSinceDropped = 0;
 
@@ -40,6 +41,7 @@ public partial class DroppedEquipment : Component, IUse, Component.ICollisionLis
 		Assert.True( Networking.IsHost );
 
 		var go = new GameObject();
+		go.Flags |= GameObjectFlags.NotSaved;
 		go.WorldPosition = positon;
 		go.WorldRotation = rotation ?? Rotation.Identity;
 		go.Name = resource.Name;
@@ -51,6 +53,7 @@ public partial class DroppedEquipment : Component, IUse, Component.ICollisionLis
 
 		var droppedWeapon = go.Components.Create<DroppedEquipment>();
 		droppedWeapon.Resource = resource;
+		droppedWeapon.ApplySavedAttachments = heldWeapon?.ApplySavedAttachments ?? true;
 
 		var renderer = go.Components.Create<SkinnedModelRenderer>();
 		renderer.Model = worldModel;
@@ -80,7 +83,7 @@ public partial class DroppedEquipment : Component, IUse, Component.ICollisionLis
 
 		if ( heldWeapon is not null )
 		{
-			foreach ( var state in heldWeapon.GetComponents<IDroppedWeaponState>() )
+			foreach ( var state in heldWeapon.GetComponentsInChildren<IDroppedWeaponState>( true ) )
 			{
 				state.CopyToDroppedWeapon( droppedWeapon );
 			}
@@ -97,7 +100,7 @@ public partial class DroppedEquipment : Component, IUse, Component.ICollisionLis
 	public UseResult CanUse( PlayerPawn player )
 	{
 		if ( player.Inventory.Has( Resource ) )
-			return FindScavengeTarget( player ).IsValid() ? true : "Ammo full";
+			return true;
 		if ( player.Inventory.CanTake( Resource ) == PlayerInventory.PickupResult.None ) return "Can't pick this up";
 		return true;
 	}
@@ -130,7 +133,7 @@ public partial class DroppedEquipment : Component, IUse, Component.ICollisionLis
 	}
 
 	/// <summary>
-	/// Strip ammo off this dropped gun into the player's matching weapon. The gun disappears once it's empty.
+	/// Take spare rounds on contact while leaving the dropped gun available for an explicit pickup.
 	/// </summary>
 	private bool TryScavenge( PlayerPawn player )
 	{
@@ -139,7 +142,8 @@ public partial class DroppedEquipment : Component, IUse, Component.ICollisionLis
 
 		var source = GetComponent<WeaponAmmo>();
 		var room = target.GetMaxReserve() - target.ReserveAmmo;
-		var taken = Math.Min( room, source.Ammo + source.ReserveAmmo );
+		// Leave at least one magazine round in the gun so Use can still pick up a usable weapon.
+		var taken = Math.Min( room, source.ReserveAmmo + Math.Max( 0, source.Ammo - 1 ) );
 		if ( taken <= 0 ) return false;
 
 		// Empty the spare ammo first, then the magazine.
@@ -148,9 +152,6 @@ public partial class DroppedEquipment : Component, IUse, Component.ICollisionLis
 		source.Ammo -= taken - fromReserve;
 
 		target.ReceiveReserve( taken );
-
-		if ( source.Ammo + source.ReserveAmmo <= 0 )
-			GameObject.Destroy();
 
 		return true;
 	}
@@ -163,25 +164,29 @@ public partial class DroppedEquipment : Component, IUse, Component.ICollisionLis
 		_isUsed = true;
 
 		if ( !player.IsValid() )
-			return;
-
-		// Already carrying this gun: take its ammo instead.
-		if ( player.Inventory.Has( Resource ) )
 		{
-			TryScavenge( player );
 			_isUsed = false;
 			return;
 		}
 
+		// Contact scavenges ammo; Use explicitly swaps for the physical gun.
+		if ( player.Inventory.Has( Resource ) )
+		{
+			var carried = player.Inventory.Equipment.FirstOrDefault( x => x.IsValid() && x.Resource == Resource );
+			if ( carried.IsValid() )
+			{
+				DroppedEquipment.Create( carried.Resource, player.WorldPosition + Vector3.Up * 32f, Rotation.Identity, carried );
+				player.Inventory.RemoveWeapon( carried );
+			}
+		}
+
 		var currentActiveSlot = player.CurrentEquipment?.Resource.Slot ?? EquipmentSlot.Melee;
-		var weapon = player.Inventory.Give( Resource, Resource.Slot < currentActiveSlot );
+		var weapon = player.Inventory.Give( Resource, Resource.Slot < currentActiveSlot, ApplySavedAttachments, this );
 
 		if ( !weapon.IsValid() )
-			return;
-
-		foreach ( var state in weapon.GetComponents<IDroppedWeaponState>() )
 		{
-			state.CopyFromDroppedWeapon( this );
+			_isUsed = false;
+			return;
 		}
 
 		Game.ActiveScene.Dispatch( new EquipmentPickedUpEvent( player, this, weapon ) );

@@ -185,34 +185,6 @@ public partial class Crosshair : Component
 			hud.DrawCircle( center, w, color );
 		}
 
-		if ( TimeSinceAttacked < HitmarkerTime && !CrosshairManager.UsesCustomHitMarker )
-		{
-			var isKillHitmarker = Hitmarker.HasFlag( HitmarkerType.Kill );
-			var isHeadshotHitmarker = Hitmarker.HasFlag( HitmarkerType.Headshot );
-
-			var initialHitmarkerLength = 20f * scale;
-			var initialDiagonalOffset = CrosshairGap * scale;
-			var translationFactor = isKillHitmarker ? 1.0f : 1.0f - (TimeSinceAttacked / HitmarkerTime);
-			translationFactor = translationFactor.Clamp( 0.0f, 1.0f );
-
-			var scaleFactor = isKillHitmarker ? 1.0f : (1.0f - (TimeSinceAttacked / HitmarkerTime)).Clamp( 0.0f, 1.0f );
-
-			var hitmarkerLength = initialHitmarkerLength * scaleFactor;
-			var diagonalOffset = initialDiagonalOffset * translationFactor;
-
-			var topLeft = center + new Vector2( -diagonalOffset, -diagonalOffset );
-			var topRight = center + new Vector2( diagonalOffset, -diagonalOffset );
-			var bottomLeft = center + new Vector2( -diagonalOffset, diagonalOffset );
-			var bottomRight = center + new Vector2( diagonalOffset, diagonalOffset );
-
-			var hitColor = isHeadshotHitmarker || isKillHitmarker ? Color.Red : Color.White.WithAlpha( 0.5f );
-
-			hud.DrawLine( topLeft, topLeft + new Vector2( -hitmarkerLength, -hitmarkerLength ), w, hitColor );
-			hud.DrawLine( topRight, topRight + new Vector2( hitmarkerLength, -hitmarkerLength ), w, hitColor );
-			hud.DrawLine( bottomLeft, bottomLeft + new Vector2( -hitmarkerLength, hitmarkerLength ), w, hitColor );
-			hud.DrawLine( bottomRight, bottomRight + new Vector2( hitmarkerLength, hitmarkerLength ), w, hitColor );
-		}
-
 		mainAlpha = mainAlpha.LerpTo( alphaTarget, Time.Delta * 30f );
 		linesAlpha = linesAlpha.LerpTo( linesTarget, Time.Delta * 30f );
 	}

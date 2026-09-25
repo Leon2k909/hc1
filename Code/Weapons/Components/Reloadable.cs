@@ -114,8 +114,12 @@ public partial class Reloadable : WeaponInputAction,
 
 	float GetReloadTime()
 	{
-		return (!AmmoComponent.HasAmmo ? EmptyReloadTime : ReloadTime) * DurationMultiplier
-			* ZombiesPlayerState.ReloadScale( Equipment?.Owner );
+		// A magazine with its own reload animations brings its own times.
+		var magazine = Equipment?.ReloadMagazine;
+		var time = !AmmoComponent.HasAmmo
+			? magazine?.EmptyReloadTime > 0 ? magazine.EmptyReloadTime : EmptyReloadTime
+			: magazine?.ReloadTime > 0 ? magazine.ReloadTime : ReloadTime;
+		return time * DurationMultiplier * ZombiesPlayerState.ReloadScale( Equipment?.Owner );
 	}
 
 	public float DurationMultiplier
@@ -131,8 +135,9 @@ public partial class Reloadable : WeaponInputAction,
 
 	Dictionary<float, SoundEvent> GetReloadSounds()
 	{
-		if ( !AmmoComponent.HasAmmo ) return EmptyReloadSounds;
-		return TimedReloadSounds;
+		var magazine = Equipment?.ReloadMagazine;
+		if ( !AmmoComponent.HasAmmo ) return magazine?.EmptyReloadSounds is { Count: > 0 } empty ? empty : EmptyReloadSounds;
+		return magazine?.ReloadSounds is { Count: > 0 } sounds ? sounds : TimedReloadSounds;
 	}
 
 	bool _queueCancel = false;

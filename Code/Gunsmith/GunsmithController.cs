@@ -49,6 +49,10 @@ public sealed class GunsmithController : Component
 	private bool isPanning;
 	private Vector3 initialCameraPos;
 
+	/// <summary> The Reticle tab turns the gun to this yaw: from behind and a little to the side, so the lens faces the camera. </summary>
+	private const float ReticleViewYaw = -75f;
+	private float? yawBeforeReticle;
+
 	protected override void OnStart()
 	{
 		if ( !CameraComponent.IsValid() )
@@ -138,21 +142,42 @@ public sealed class GunsmithController : Component
 			viewRoll -= _devSpin.y;
 			_devSpin = default;
 			viewRoll = (viewRoll - angleOffset.y).Clamp( RollRange.Min, RollRange.Max );
+
+			// Reticle tab: turn the fitted optic's lens towards the camera. Dragging still spins the gun meanwhile.
+			var reticleTab = GunsmithPanel.Instance.IsValid() && GunsmithPanel.Instance.IsReticleTabOpen && OpticRenderers().Any();
+			if ( reticleTab )
+			{
+				yawBeforeReticle ??= viewYaw;
+				if ( !isDragging )
+				{
+					var turn = ((ReticleViewYaw - viewYaw) % 360f + 540f) % 360f - 180f;
+					viewYaw += turn * MathF.Min( 1f, Time.Delta * 8f );
+					viewRoll = viewRoll.LerpTo( 0f, Time.Delta * 8f );
+				}
+			}
+			else if ( yawBeforeReticle is { } yaw )
+			{
+				viewYaw = yaw;
+				yawBeforeReticle = null;
+			}
 			Weapon.WorldRotation = Rotation.From( 0, viewYaw, viewRoll );
 			var panel = GunsmithPanel.Instance;
 			var customizing = panel.IsValid() && panel.IsCustomizing;
-			var browsingAttachments = panel.IsValid() && panel.IsAttachmentBrowserOpen;
 			var size = panel.IsValid() ? panel.Panel.Box.Rect.Size : Screen.Size;
 			var aspect = size.x / MathF.Max( size.y, 1f );
 			// Keep the full weapon above the camo drawer, including on ultrawide displays.
-			var horizontalFov = InitialFOV * (customizing ? 1.4f : browsingAttachments ? 1.15f : 1f);
+			var horizontalFov = InitialFOV * (customizing ? 1.4f : 1f);
 			var halfWidth = MathF.Tan( horizontalFov * MathF.PI / 360f ) * MathF.Max( 1f, aspect / (16f / 9f) );
 			var horizontalOffset = 0f;
 			// Include custom stocks and muzzle extensions when fitting the preview.
-			// Reserve the actual browser width so a suppressor cannot disappear behind it.
+			// Reserve the actual armory (left) and attachment column (right) widths so a suppressor
+			// or stock cannot disappear behind either of them.
 			var browser = panel.IsValid() ? panel.Panel.Children.FirstOrDefault( p => p.HasClass( "weapon-browser" ) ) : null;
 			var leftFraction = panel.IsValid() && panel.IsArmoryVisible && browser is not null
 				? ((browser.Box.Rect.Right - panel.Panel.Box.Rect.Left + 24f) / MathF.Max( size.x, 1f )).Clamp( 0f, 0.6f ) : 0f;
+			var attachments = panel.IsValid() && !customizing ? panel.Panel.Children.OfType<GunsmithAttachmentBrowser>().FirstOrDefault() : null;
+			var rightFraction = attachments is not null && attachments.HasClass( "has-slots" )
+				? ((panel.Panel.Box.Rect.Right - attachments.Box.Rect.Left + 24f) / MathF.Max( size.x, 1f )).Clamp( 0f, 0.6f ) : 0f;
 			var cameraOrigin = CameraComponent.GameObject.Parent.IsValid()
 				? CameraComponent.GameObject.Parent.WorldTransform.PointToWorld( initialCameraPos ) : initialCameraPos;
 			var minRight = float.MaxValue;
@@ -172,8 +197,9 @@ public sealed class GunsmithController : Component
 			}
 			if ( minRight < maxRight && nearestDepth > 1f )
 			{
-				halfWidth = MathF.Max( halfWidth, (maxRight - minRight) * 0.5f / (nearestDepth * MathF.Max( 0.3f, 0.92f - leftFraction )) );
-				horizontalOffset = (minRight + maxRight) * 0.5f - leftFraction * nearestDepth * halfWidth;
+				// Fit the gun into the gap between the two columns and centre it there.
+				halfWidth = MathF.Max( halfWidth, (maxRight - minRight) * 0.5f / (nearestDepth * MathF.Max( 0.3f, 0.95f - leftFraction - rightFraction )) );
+				horizontalOffset = (minRight + maxRight) * 0.5f - (leftFraction - rightFraction) * nearestDepth * halfWidth;
 			}
 			CameraComponent.FieldOfView = 2f * MathF.Atan( halfWidth ) * 180f / MathF.PI + (ZoomFactor * 10f);
 
@@ -184,13 +210,42 @@ public sealed class GunsmithController : Component
 				panOffsetTarget = panOffsetTarget.LerpTo( 0, Time.Delta * SlowSpeed );
 
 			var framingOffset = 0f;
-			if ( customizing || browsingAttachments )
+			if ( customizing )
 			{
 				var distance = Vector3.DistanceBetween( CameraComponent.WorldPosition, Weapon.WorldPosition );
-				framingOffset = (customizing ? -0.36f : -0.18f) * distance * halfWidth / MathF.Max( aspect, 0.5f );
+				framingOffset = -0.36f * distance * halfWidth / MathF.Max( aspect, 0.5f );
 			}
+			// Fill the view with the optic so the reticle on its lens is readable, clear of the drawer below.
+			if ( reticleTab && TryGetOpticBounds( out var opticBounds ) )
+			{
+				var toOptic = opticBounds.Center - cameraOrigin;
+				var depth = Vector3.Dot( toOptic, CameraComponent.WorldRotation.Forward );
+				if ( depth > 1f )
+				{
+					halfWidth = opticBounds.Size.Length * 0.5f / (depth * 0.6f) * aspect;
+					CameraComponent.FieldOfView = 2f * MathF.Atan( halfWidth ) * 180f / MathF.PI * (1f + ZoomFactor);
+					horizontalOffset = Vector3.Dot( toOptic, CameraComponent.WorldRotation.Right );
+					framingOffset = Vector3.Dot( toOptic, CameraComponent.WorldRotation.Up ) - 0.36f * depth * halfWidth / MathF.Max( aspect, 0.5f );
+				}
+			}
+
 			CameraComponent.LocalPosition = initialCameraPos + CameraComponent.WorldRotation.Right * (panOffsetTarget.x + horizontalOffset)
 				+ CameraComponent.WorldRotation.Up * (panOffsetTarget.y + framingOffset);
 		}
+	}
+
+	private IEnumerable<ModelRenderer> OpticRenderers() => Weapon.GameObject.Components
+		.GetAll<GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants )
+		.Where( x => x.Category == GunsmithPartType.Optic && x.CurrentGameObject.IsValid() )
+		.SelectMany( x => x.CurrentGameObject.Components.GetAll<ModelRenderer>( FindMode.EverythingInSelfAndDescendants ) )
+		.Where( x => x.Enabled && x.Model is not null );
+
+	private bool TryGetOpticBounds( out BBox bounds )
+	{
+		var corners = OpticRenderers()
+			.SelectMany( r => r.Model.Bounds.Corners.Select( c => r.WorldTransform.PointToWorld( c ) ) )
+			.ToArray();
+		bounds = corners.Length > 0 ? BBox.FromPoints( corners ) : default;
+		return corners.Length > 0;
 	}
 }

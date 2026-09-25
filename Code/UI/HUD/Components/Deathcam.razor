@@ -43,7 +43,7 @@
             {
                 <div class="flex row gap-xs">
                     <label>@(entry.Damage.CeilToInt()) damage in @(entry.Count) hits - </label>
-                    <label>@(entry.Attacker?.DisplayName ?? (IsZombiesMode ? "Zombie" : "Unknown"))</label>
+                    <label>@GetName( entry.Attacker )</label>
                 </div>
             }
         </div>

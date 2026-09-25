@@ -1,0 +1,38 @@
+{
+  "RootObject": {
+    "__guid": "1d4f9ad1-e6fe-4bac-90a4-793c2c09a690",
+    "Flags": 0,
+    "Name": "MP5 Standard Magazine",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "7afc1938-9a1c-4c2e-9f8b-24181596a8bc",
+        "__enabled": true,
+        "Model": "attachments/mpapa5/magazines/magazine_standard/magazine_standard.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithBoneAttachment",
+        "__guid": "8ca9864b-0203-4ef4-975c-0157d08b062a",
+        "__enabled": true,
+        "BoneName": "magazine",
+        "HiddenBodygroup": "magazine",
+        "UseWeaponOrigin": true,
+        "WeaponSpaceOffset": "1.3,0,7.5",
+        "WeaponSpaceScale": 1.3,
+        "MountAtBone": false,
+        "BoneOffset": "0,0,0",
+        "BoneAngles": "0,0,0",
+        "ModelScaleMultiplier": "1,1,1"
+      }
+    ],
+    "Children": []
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

@@ -185,7 +185,7 @@
               "Type": "Curve",
               "Evaluation": "Life",
               "CurveA": {
-                "rangey": "0,50",
+                "rangey": "0,25",
                 "frames": [
                   {
                     "x": 0,
@@ -640,7 +640,7 @@
             "FollowerPrefabChance": 1,
             "FollowerPrefabKill": true,
             "Force": true,
-            "ForceDirection": "0,0,-800",
+            "ForceDirection": "0,0,0",
             "ForceScale": 1,
             "ForceSpace": "World",
             "Friction": 0.2,
@@ -718,7 +718,7 @@
             "StartVelocity": {
               "Type": "Range",
               "Evaluation": "Seed",
-              "Constants": "200,500,0,0"
+              "Constants": "8,25,0,0"
             },
             "Stretch": 0,
             "TimeScale": 1,
@@ -792,7 +792,7 @@
             "CenterBias": 0,
             "CenterBiasVelocity": 0,
             "ConeAngle": 45,
-            "ConeFar": 50,
+            "ConeFar": 8,
             "ConeNear": 1,
             "Delay": 0,
             "DestroyOnEnd": true,

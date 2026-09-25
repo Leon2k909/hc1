@@ -1,0 +1,18 @@
+{
+  "Name": "45-Round Magazine",
+  "Category": "Magazine",
+  "HiddenWeaponMaterials": ["models/weapons/sbox_smg_mp5/v_mp5_magazine.vmat"],
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "attachments/mpapa5/prefabs/magazine_45_round.prefab"
+  },
+  "EligibleEquipment": [
+    "weapons/mp5/mp5.equip"
+  ],
+  "RequiredLevel": 0,
+  "Description": "Extended 45-round magazine.",
+  "MagazineCapacity": 45,
+  "ReloadTimeMultiplier": 1,
+  "__references": [],
+  "__version": 0
+}

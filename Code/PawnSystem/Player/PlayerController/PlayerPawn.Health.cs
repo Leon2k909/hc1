@@ -110,7 +110,8 @@ public partial class PlayerPawn : IGameEventHandler<DamageGivenEvent>, IGameEven
 		}
 		else
 		{
-			if ( BloodEffect.IsValid() )
+			// Non-local viewer: our own body isn't drawn, so the blood would float around the camera.
+			if ( !IsViewer && BloodEffect.IsValid() )
 			{
 				var blood = BloodEffect?.Clone( new CloneConfig()
 				{

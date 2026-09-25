@@ -1,0 +1,37 @@
+{
+  "RootObject": {
+    "__guid": "5c6dea4d-ed75-56d1-990b-e1e132fb53cb",
+    "Flags": 0,
+    "Name": "MP5 Tactical Foregrip",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "c3260950-1a39-5b50-8eec-ab6030d34a47",
+        "__enabled": true,
+        "Model": "attachments/mpapa5/shared/attachment_vm_sm_mpapa5_angledgrip02/attachment_vm_sm_mpapa5_angledgrip02.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithBoneAttachment",
+        "__guid": "87ae52a1-64d9-5464-8bfb-bf8c87d58565",
+        "__enabled": true,
+        "BoneName": "weapon_root",
+        "UseWeaponOrigin": true,
+        "WeaponSpaceOffset": "7.5,0,6.8",
+        "WeaponSpaceScale": 1.0,
+        "MountAtBone": false,
+        "BoneOffset": "0,0,0",
+        "BoneAngles": "0,0,0",
+        "ModelScaleMultiplier": "1,1,1"
+      }
+    ],
+    "Children": []
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

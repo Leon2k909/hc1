@@ -1,0 +1,38 @@
+{
+  "RootObject": {
+    "__guid": "d942af8c-ea45-58e6-a38b-1a3d92939591",
+    "Flags": 0,
+    "Name": "MP5 Breacher Device 02",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "5520fb14-d10a-532b-8c1d-b0bc842af44b",
+        "__enabled": true,
+        "Model": "attachments/mw2022/models/att_vm_breacher02/att_vm_breacher02.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithBoneAttachment",
+        "__guid": "22ad7569-9987-5c6f-a167-44a78d4505d9",
+        "__enabled": true,
+        "BoneName": "weapon_root",
+        "UseWeaponOrigin": true,
+        "WeaponSpaceOffset": "12,0,8.13",
+        "WeaponSpaceScale": 1,
+        "MountAtBone": false,
+        "BoneOffset": "0,0,0",
+        "BoneAngles": "0,0,0",
+        "ModelScaleMultiplier": "1,1,1",
+        "FitMp5MuzzleToBarrel": true
+      }
+    ],
+    "Children": []
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

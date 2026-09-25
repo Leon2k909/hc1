@@ -15,7 +15,6 @@ public static class CrosshairManager
 
 	public static float HitFlash { get; private set; }
 	public static bool SuppressNativeCrosshair => !Config.Enabled || Config.Style != "hc1";
-	public static bool UsesCustomHitMarker => Config.HitStyle != "none";
 
 	public static void Tick()
 	{

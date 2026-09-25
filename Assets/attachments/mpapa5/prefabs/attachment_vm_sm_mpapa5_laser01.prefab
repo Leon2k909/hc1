@@ -1,0 +1,37 @@
+{
+  "RootObject": {
+    "__guid": "80b8ec46-e8fc-59a5-9ff0-3f67104cce5e",
+    "Flags": 0,
+    "Name": "MP5 Tac Laser",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "d4f579d8-7127-54fb-9e70-4e7b1b6a1aa1",
+        "__enabled": true,
+        "Model": "attachments/mpapa5/shared/attachment_vm_sm_mpapa5_laser01/attachment_vm_sm_mpapa5_laser01.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithBoneAttachment",
+        "__guid": "e6b92eef-fe4f-53d5-83c6-2b8ecc41a94a",
+        "__enabled": true,
+        "BoneName": "weapon_root",
+        "UseWeaponOrigin": true,
+        "WeaponSpaceOffset": "6,2.35,8.6",
+        "WeaponSpaceScale": 1.0,
+        "MountAtBone": false,
+        "BoneOffset": "0,0,0",
+        "BoneAngles": "0,0,0",
+        "ModelScaleMultiplier": "1,1,1"
+      }
+    ],
+    "Children": []
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

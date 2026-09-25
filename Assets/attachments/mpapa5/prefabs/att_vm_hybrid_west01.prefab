@@ -1,0 +1,63 @@
+{
+  "RootObject": {
+    "__guid": "2ae6ca94-ce99-5b5d-84b7-f43ed0d530c0",
+    "Flags": 0,
+    "Name": "MP5 Integral Hybrid",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "caaf5bd9-1f2f-530f-a3a3-1d618ac39338",
+        "__enabled": true,
+        "Model": "attachments/mw2022/models/att_vm_hybrid_west01/att_vm_hybrid_west01.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithBoneAttachment",
+        "__guid": "8ac205aa-5c86-5f02-899d-be209dbd5d9a",
+        "__enabled": true,
+        "BoneName": "weapon_root",
+        "UseWeaponOrigin": true,
+        "WeaponSpaceOffset": "0.7,0,10.55",
+        "WeaponSpaceScale": 1,
+        "MountAtBone": false,
+        "BoneOffset": "0,0,0",
+        "BoneAngles": "0,0,0",
+        "ModelScaleMultiplier": "1,1,1"
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "693dd5ef-aefa-5fd0-b1c8-c77ea840ff59",
+        "Flags": 0,
+        "Name": "MP5 raised optic rail",
+        "Position": "0,0,0",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Enabled": true,
+        "NetworkMode": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.ModelRenderer",
+            "__guid": "f27dd1c9-c2ca-5bd9-9c9b-896e4ea751c6",
+            "__enabled": true,
+            "Model": "attachments/mpapa5/optic_riser/optic_riser.vmdl",
+            "Tint": "1,1,1,1"
+          },
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithMp5OpticRiser",
+            "__guid": "74b68da7-3a10-5804-852e-20abdf6d9df8",
+            "__enabled": true
+          }
+        ],
+        "Children": []
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

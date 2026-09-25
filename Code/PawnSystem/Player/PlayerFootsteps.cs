@@ -24,9 +24,11 @@ public sealed class PlayerFootsteps : Component
 
 	private void Footstep()
 	{
+		// Corpses (ZombieAI) are silent underfoot: step on the floor beneath them.
 		var tr = Scene.Trace
 			.Ray( Player.WorldPosition + Vector3.Up * 20, Player.WorldPosition + Vector3.Up * -20 )
 			.IgnoreGameObjectHierarchy( Player.GameObject )
+			.WithoutTags( "corpse" )
 			.Run();
 
 		if ( !tr.Hit )

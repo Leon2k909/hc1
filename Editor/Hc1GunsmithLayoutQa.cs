@@ -97,11 +97,17 @@ public static class Hc1GunsmithLayoutQa
             {
                 GunsmithLoadoutManager.TryGetAttachment( browser.Weapon.Resource, point.Category, out var saved );
                 if ( point.CurrentPart is not null || saved is not null ) throw new Exception( "Standard did not remove the attachment" );
+                // Picking a slot swaps the column over to its options, so go back to the slot list to measure it.
+                browser.Close();
+            }
+            await Task.Delay( 250 );
+            using ( scene.Push() )
+            {
                 var slots = Descendants( browser ).Where( p => p.HasClass( "attachment-slot" ) ).ToList();
-                if ( slots.Any( p => p.Box.Rect.Height * p.ScaleFromScreen < 90f || p.Box.Rect.Width * p.ScaleFromScreen < 150f ) )
+                if ( slots.Count == 0 || slots.Any( p => p.Box.Rect.Height * p.ScaleFromScreen < 80f || p.Box.Rect.Width * p.ScaleFromScreen < 300f ) )
                     throw new Exception( "Attachment hit targets too small" );
             }
-            File.WriteAllText( Path.Combine( folder, "checks.txt" ), "PASS: visible card clicks equip and save; Standard removes and saves; original attachment restored; attachment targets at least 150 x 90 panel units." );
+            File.WriteAllText( Path.Combine( folder, "checks.txt" ), "PASS: visible card clicks equip and save; Standard removes and saves; original attachment restored; attachment targets at least 300 x 80 panel units." );
         }
         catch ( Exception ex )
         {

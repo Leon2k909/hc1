@@ -1,3 +1,5 @@
+using Facepunch.Gunsmith;
+
 namespace Facepunch;
 
 [Title( "Recoil" ), Group( "Weapon Components" )]
@@ -37,18 +39,21 @@ public partial class ShootRecoil : EquipmentComponent
 
 		var timeDelta = Time.Delta;
 		var recoilScale = GetRecoilScale();
+		var attachments = GunsmithAttachmentEffects.For( Equipment );
 
 		if ( UseRecoilPattern )
 		{
 			var point = RecoilPattern.GetPoint( ref currentFrame );
 
-			var newAngles = new Angles( -point.y * Scale.y * recoilScale, -point.x * Scale.x * recoilScale, 0 ) * timeDelta;
+			var newAngles = new Angles( -point.y * Scale.y * recoilScale * attachments.VerticalRecoil,
+				-point.x * Scale.x * recoilScale * attachments.HorizontalRecoil, 0 ) * timeDelta;
 			Current = Current + newAngles;
 			currentFrame++;
 		}
 		else
 		{
-			var newAngles = new Angles( -VerticalSpread.GetValue() * recoilScale * timeDelta, HorizontalSpread.GetValue() * recoilScale * timeDelta, 0 );
+			var newAngles = new Angles( -VerticalSpread.GetValue() * recoilScale * attachments.VerticalRecoil * timeDelta,
+				HorizontalSpread.GetValue() * recoilScale * attachments.HorizontalRecoil * timeDelta, 0 );
 			Current = Current + newAngles;
 		}
 

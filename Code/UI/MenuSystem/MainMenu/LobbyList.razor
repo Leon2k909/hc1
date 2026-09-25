@@ -6,33 +6,20 @@
 @inherits Panel
 @implements INavigatorPage
 @namespace Facepunch.UI
+@attribute [StyleSheet]
 
-<root class="hc1">
-    <Page>
-        <Header>
-            Server Browser
-        </Header>
+<root class="hc1 lobby-list">
+    <MenuTopbar Title="SESSIONS" />
 
-        <Body>
-            <div class="layout grow padding-insane">
-                <ServerBrowser CurrentLobby:bind=@Lobby  @ref="Browser" />
-            </div>
-        </Body>
+    <div class="sb-body">
+        <ServerBrowser CurrentLobby:bind=@Lobby  @ref="Browser" />
+    </div>
 
-        <Footer>
-            <div class="button standard" onclick=@(() => Refresh())>refresh</div>
-            <a class="button standard" href="/new">Create Game</a>
-            <div class="button standard @(Lobby.HasValue ? "" : "no-anim disabled")" onclick=@(() => TryJoin())>
-                <label>
-                    Join
-                </label>
-                @if ( Lobby.HasValue )
-                {
-                    <label class="slight">Session</label>
-                }
-            </div>
-        </Footer>
-    </Page>
+    <div class="sb-footer">
+        <div class="sb-btn" onclick=@(() => Refresh())><i>refresh</i><label>Refresh</label></div>
+        <a class="sb-btn" href="/new"><i>add</i><label>Create Game</label></a>
+        <div class="sb-btn primary @(CanJoin ? "" : "disabled")" onclick=@(() => TryJoin())><i>play_arrow</i><label>@JoinLabel</label></div>
+    </div>
 </root>
 
 @code
@@ -40,6 +27,10 @@
     public ServerBrowser Browser { get; set; }
 
     public Lobby? Lobby { get; set; }
+
+    private bool CanJoin => Lobby.HasValue && !Lobby.Value.IsFull;
+
+    private string JoinLabel => Lobby.HasValue && Lobby.Value.IsFull ? "Session Full" : "Join Session";
 
     private void Refresh()
     {
@@ -85,12 +76,15 @@
         if ( MainMenuRoot.Instance.IsValid() )
             MainMenuRoot.Instance.SetBlur( true );
     }
-    
-    public void OnNavigationClose() 
+
+    public void OnNavigationClose()
     {
         if ( MainMenuRoot.Instance.IsValid() )
         {
             MainMenuRoot.Instance.SetBlur( false );
         }
     }
+
+    // The selection arrives through the ServerBrowser binding, so rebuild the footer when it changes.
+    protected override int BuildHash() => HashCode.Combine( Lobby?.LobbyId, Lobby?.IsFull );
 }

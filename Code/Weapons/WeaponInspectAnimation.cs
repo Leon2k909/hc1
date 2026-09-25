@@ -16,7 +16,7 @@ public sealed class WeaponInspectAnimation
 	private float _returnElapsed;
 	private Transform _returnPose;
 
-	public void Update( bool pressed, bool blocked, float delta )
+	public void Update( bool pressed, bool blocked, float delta, float poseScale = 1f, float rotationScale = 1f )
 	{
 		if ( blocked )
 			Cancel();
@@ -29,7 +29,7 @@ public sealed class WeaponInspectAnimation
 		if ( IsPlaying )
 		{
 			_elapsed += delta;
-			Pose = Evaluate( _elapsed );
+			Pose = Evaluate( _elapsed, poseScale, rotationScale );
 			if ( _elapsed >= Duration ) Reset();
 		}
 		else if ( _returning )
@@ -71,19 +71,21 @@ public sealed class WeaponInspectAnimation
 		(Duration, Vector3.Zero, Angles.Zero),
 	};
 
-	public static Transform Evaluate( float time )
+	public static Transform Evaluate( float time, float poseScale = 1f, float rotationScale = 1f )
 	{
 		var i = 1;
 		while ( i < Keys.Length - 1 && time > Keys[i].Time ) i++;
 		var (t0, p0, a0) = Keys[i - 1];
 		var (t1, p1, a1) = Keys[i];
 		var blend = Ease( (time - t0) / (t1 - t0) );
+		poseScale = poseScale.Clamp( 0f, 1f );
 
-		var angles = new Angles( a0.pitch.LerpTo( a1.pitch, blend ), a0.yaw.LerpTo( a1.yaw, blend ), a0.roll.LerpTo( a1.roll, blend ) );
+		var angleScale = poseScale * rotationScale.Clamp( 0f, 1f );
+		var angles = new Angles( a0.pitch.LerpTo( a1.pitch, blend ) * angleScale, a0.yaw.LerpTo( a1.yaw, blend ) * angleScale, a0.roll.LerpTo( a1.roll, blend ) * angleScale );
 		var rotation = angles.ToRotation();
 		// Rotate around the receiver rather than the viewmodel origin, so the stock stays off the near plane.
 		var pivot = new Vector3( 16f, -4f, -4f );
-		var position = p0.LerpTo( p1, blend ) + pivot - rotation * pivot;
+		var position = p0.LerpTo( p1, blend ) * poseScale + pivot - rotation * pivot;
 		return new Transform( position, rotation );
 	}
 

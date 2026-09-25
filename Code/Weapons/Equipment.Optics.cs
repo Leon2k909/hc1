@@ -8,7 +8,7 @@ public partial class Equipment
 	public bool TryGetOpticAim( out GunsmithPart optic )
 	{
 		optic = null;
-		return Resource.IsValid()
+		return ApplySavedAttachments && Resource.IsValid()
 			&& GunsmithLoadoutManager.TryGetAttachment( Resource, GunsmithPartType.Optic, out optic )
 			&& optic.IsValid() && optic.OverrideAimOffset;
 	}

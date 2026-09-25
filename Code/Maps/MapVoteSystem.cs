@@ -127,14 +127,15 @@ public partial class MapVoteSystem : SingletonComponent<MapVoteSystem>
 			.FirstOrDefault();
 
 		if ( highestKeyValuePair.Value < 1 )
-			return null;
+			return Options.Count > 0 ? GetOption( 0 ) : null;
 
 		return highestKeyValuePair.Key;
 	}
 
 	public static IEnumerable<Option> GenerateOptions( GameMode currentMode = null, SceneFile currentMap = null, int count = 5 )
 	{
-		var maps = GameUtils.GetAvailableMaps().ToList();
+		// Only maps the current match flow is set up for.
+		var maps = GameUtils.GetMatchMaps().ToList();
 		var options = new List<Option>();
 
 		var inList = ( GameMode gameMode ) =>
@@ -230,6 +231,8 @@ public partial class MapVoteSystem : SingletonComponent<MapVoteSystem>
 	private void RpcVote( int index )
 	{
 		var callerSteamId = Rpc.Caller.SteamId;
+		if ( index < 0 || index >= Options.Count )
+			return;
 
 		// did we already get a winning option?
 		if ( WinningOption is { } option )

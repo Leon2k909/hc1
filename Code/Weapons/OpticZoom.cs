@@ -20,6 +20,7 @@ public sealed class OpticZoom : Component
 
 	/// <summary>Lens diameter as a fraction of screen height. Set by the overlay; drives the lens camera FOV.</summary>
 	public static float LensDiameter { get; set; } = 0.3f;
+	public static bool OverlayDotVisible { get; private set; } = true;
 
 	/// <summary>Eyepiece offset from screen centre as a fraction of screen height (x right, y down), from sway/recoil.</summary>
 	public static Vector2 ScopeOffset { get; private set; }
@@ -71,6 +72,8 @@ public sealed class OpticZoom : Component
 			Deactivate();
 			return;
 		}
+		LensDiameter = optic.OpticLensDiameter.Clamp( 0.05f, 0.5f );
+		OverlayDotVisible = optic.OpticOverlayDot;
 
 		var aimFov = Equipment.ZoomFov( baseFov + equipment.AimFovOffset, ViewMagnification );
 		ScopeBlend = equipment.HasTag( "aiming" )
@@ -168,6 +171,7 @@ public sealed class OpticZoom : Component
 		LensScale = 1f;
 		LensVisibility = 0f;
 		LensTexture = null;
+		OverlayDotVisible = true;
 		_optic = null;
 		if ( _lensCamera.IsValid() ) _lensCamera.Enabled = false;
 	}

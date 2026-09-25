@@ -195,9 +195,9 @@
                     var isEquipped = GunsmithLoadoutManager.GetPerk( SelectedPerkCategory ) == perk.ResourceName
                                   || GunsmithLoadoutManager.GetPerk( SelectedPerkCategory ) == perk.ResourcePath;
                     <button class="weapon-option is-perk @(isEquipped ? "active loadout" : "")" @onclick=@(() => GunsmithLoadoutManager.SetPerk( SelectedPerkCategory, perk.ResourceName ))>
-                        <span class="weapon-name">@perk.Name</span>
-                        <span class="perk-desc">@perk.Description</span>
-                        @if ( isEquipped ) { <span class="weapon-state">EQUIPPED</span> }
+                        <label class="weapon-name">@perk.Name</label>
+                        <label class="perk-desc">@perk.Description</label>
+                        @if ( isEquipped ) { <label class="weapon-state">EQUIPPED</label> }
                     </button>
                 }
             }
@@ -223,11 +223,11 @@
                     var selected = GetEquipment() == weapon;
                     var loadout  = IsLoadoutSet( weapon );
                     <button class="weapon-option @(selected ? "is-selected" : "") @(loadout ? "loadout" : "")" @onclick=@(() => SelectWeapon( weapon ))>
-                        <span class="weapon-name">@weapon.Name</span>
-                        <span class="weapon-lv">LV @WeaponProgression.GetLevel( weapon )</span>
-                        @if ( loadout ) { <span class="weapon-state">EQUIPPED</span> }
+                        <label class="weapon-name">@weapon.Name</label>
+                        <label class="weapon-lv">LV @WeaponProgression.GetLevel( weapon )</label>
+                        @if ( loadout ) { <label class="weapon-state">EQUIPPED</label> }
                         @{ var wpnFav = GunsmithLoadoutManager.IsFavorite( weapon.ResourcePath ); }
-                        <i class="favorite-icon" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 16px; color: @(wpnFav ? "#ffd700" : "rgba(255,255,255,0.2)");" @onclick:stopPropagation="true" @onclick=@(() => { GunsmithLoadoutManager.SetFavorite( weapon.ResourcePath, !wpnFav ); StateHasChanged(); })>@(wpnFav ? "star" : "star_border")</i>
+                        <i class="favorite-icon" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: @(wpnFav ? "#ffd700" : "rgba(255,255,255,0.3)");" @onclick:stopPropagation="true" @onclick=@(() => { GunsmithLoadoutManager.SetFavorite( weapon.ResourcePath, !wpnFav ); StateHasChanged(); })>@(wpnFav ? "star" : "star_border")</i>
                     </button>
                 }
             }
@@ -258,7 +258,7 @@
                 <div class="gs-share-header">
                     <div class="gs-share-title">
                         <label>SHARE BUILD</label>
-                        <span>@GetEquipmentName()</span>
+                        <label class="gs-share-weapon">@GetEquipmentName()</label>
                     </div>
                     <button class="gs-share-close" @onclick=@CloseShareBuild>
                         <i>close</i>
@@ -270,11 +270,11 @@
                 <div class="gs-share-actions">
                     <button class="gs-share-button primary" @onclick=@CopyShareBuildCode>
                         <i>content_copy</i>
-                        <span>Copy Code</span>
+                        <label>Copy Code</label>
                     </button>
                     <button class="gs-share-button" @onclick=@RefreshShareBuildCode>
                         <i>refresh</i>
-                        <span>Refresh</span>
+                        <label>Refresh</label>
                     </button>
                 </div>
 
@@ -286,7 +286,7 @@
                 }
                 <button class="gs-share-button import" @onclick=@ImportShareBuildCode>
                     <i>download</i>
-                    <span>Apply To Current Class</span>
+                    <label>Apply To Current Class</label>
                 </button>
             </div>
         </div>
@@ -340,12 +340,12 @@
                                 @if ( !unlocked )
                                 {
                                     <div class="locked-overlay" style="position: absolute; inset: 0; background: rgba(0,0,0,0.7); display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;">
-                                        <i style="font-size: 24px; opacity: 0.8;">lock</i>
-                                        <label style="font-size: 12px; font-weight: bold; opacity: 0.8;">LV @camo.RequiredLevel</label>
+                                        <i style="font-size: 32px; opacity: 0.85;">lock</i>
+                                        <label style="font-size: 16px; font-weight: bold; opacity: 0.9;">LV @camo.RequiredLevel</label>
                                     </div>
                                 }
                                 @{ var isFav = GunsmithLoadoutManager.IsFavorite( camo.ResourcePath ); }
-                                <i class="favorite-icon" style="position: absolute; right: 4px; top: 4px; font-size: 14px; text-shadow: 0px 0px 4px black; color: @(isFav ? "#ffd700" : "rgba(255,255,255,0.4)"); pointer-events: all; cursor: pointer; z-index: 10;" @onclick:stopPropagation="true" @onclick=@(() => { GunsmithLoadoutManager.SetFavorite( camo.ResourcePath, !isFav ); StateHasChanged(); })>@(isFav ? "star" : "star_border")</i>
+                                <i class="favorite-icon" style="position: absolute; right: 6px; top: 6px; font-size: 22px; text-shadow: 0px 0px 4px black; color: @(isFav ? "#ffd700" : "rgba(255,255,255,0.4)"); pointer-events: all; cursor: pointer; z-index: 10;" @onclick:stopPropagation="true" @onclick=@(() => { GunsmithLoadoutManager.SetFavorite( camo.ResourcePath, !isFav ); StateHasChanged(); })>@(isFav ? "star" : "star_border")</i>
                             </div>
                         }
                     </div>
@@ -354,19 +354,19 @@
                         <button class="gs-icon-btn" style="padding: 4px 10px; @(CamoPage == 0 ? "opacity: 0.5; pointer-events: none;" : "")" @onclick=@(() => CamoPage--)>
                             <i>chevron_left</i> Prev
                         </button>
-                        <label style="color: rgba(255,255,255,0.7); font-size: 11px; font-weight: bold; width: 60px; text-align: center;">@(CamoPage + 1) / @totalCamoPages</label>
+                        <label style="color: rgba(255,255,255,0.7); font-size: 16px; font-weight: bold; width: 80px; text-align: center;">@(CamoPage + 1) / @totalCamoPages</label>
                         <button class="gs-icon-btn" style="padding: 4px 10px; @(CamoPage >= totalCamoPages - 1 ? "opacity: 0.5; pointer-events: none;" : "")" @onclick=@(() => CamoPage++)>
                             Next <i>chevron_right</i>
                         </button>
                     </div>
 
                     <div class="gs-setting-btn @(CamoOnOptics ? "active" : "")" @onclick=@ToggleCamoOnOptics style="color: white; margin-top: 10px; display: flex; align-items: center; gap: 8px; cursor: pointer; opacity: 0.8; font-size: 14px;">
-                        <i style="font-size: 20px;">@(CamoOnOptics ? "check_box" : "check_box_outline_blank")</i>
+                        <i style="font-size: 26px;">@(CamoOnOptics ? "check_box" : "check_box_outline_blank")</i>
                         <label style="cursor: pointer;">Apply Camo to Optics</label>
                     </div>
 
                     <div class="gs-setting-btn @(EmblemOnGun ? "active" : "")" @onclick=@ToggleEmblemOnGun style="color: white; margin-top: 6px; display: flex; align-items: center; gap: 8px; cursor: pointer; opacity: 0.8; font-size: 14px;">
-                        <i style="font-size: 20px;">@(EmblemOnGun ? "check_box" : "check_box_outline_blank")</i>
+                        <i style="font-size: 26px;">@(EmblemOnGun ? "check_box" : "check_box_outline_blank")</i>
                         <label style="cursor: pointer;">Show Emblem on Gun</label>
                     </div>
                 </div>
@@ -390,20 +390,20 @@
                                 @if ( !unlocked )
                                 {
                                     <div class="locked-overlay" style="position: absolute; inset: 0; background: rgba(0,0,0,0.7); display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;">
-                                        <i style="font-size: 24px; opacity: 0.8;">lock</i>
-                                        <label style="font-size: 12px; font-weight: bold; opacity: 0.8;">LV @camo.RequiredLevel</label>
+                                        <i style="font-size: 32px; opacity: 0.85;">lock</i>
+                                        <label style="font-size: 16px; font-weight: bold; opacity: 0.9;">LV @camo.RequiredLevel</label>
                                     </div>
                                 }
                                 @{ var isFav = GunsmithLoadoutManager.IsFavorite( camo.ResourcePath ); }
-                                <i class="favorite-icon" style="position: absolute; right: 4px; top: 4px; font-size: 14px; text-shadow: 0px 0px 4px black; color: @(isFav ? "#ffd700" : "rgba(255,255,255,0.4)"); pointer-events: all; cursor: pointer; z-index: 10;" @onclick:stopPropagation="true" @onclick=@(() => { GunsmithLoadoutManager.SetFavorite( camo.ResourcePath, !isFav ); StateHasChanged(); })>@(isFav ? "star" : "star_border")</i>
+                                <i class="favorite-icon" style="position: absolute; right: 6px; top: 6px; font-size: 22px; text-shadow: 0px 0px 4px black; color: @(isFav ? "#ffd700" : "rgba(255,255,255,0.4)"); pointer-events: all; cursor: pointer; z-index: 10;" @onclick:stopPropagation="true" @onclick=@(() => { GunsmithLoadoutManager.SetFavorite( camo.ResourcePath, !isFav ); StateHasChanged(); })>@(isFav ? "star" : "star_border")</i>
                             </div>
                         }
                     </div>
 
                     <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
-                        <label class="gs-panel-label" style="font-size: 13px; color: rgba(255,255,255,0.8);">Custom Paint</label>
+                        <label class="gs-panel-label" style="font-size: 17px; color: rgba(255,255,255,0.8);">Custom Paint</label>
                         <div class="gs-setting-btn @(IsCustomCamoColorEquipped ? "active" : "")" @onclick=@ToggleCustomCamoColor style="color: white; display: flex; align-items: center; gap: 8px; cursor: pointer; opacity: 0.8; font-size: 14px; margin-bottom: 10px;">
-                            <i style="font-size: 20px;">@(IsCustomCamoColorEquipped ? "check_box" : "check_box_outline_blank")</i>
+                            <i style="font-size: 26px;">@(IsCustomCamoColorEquipped ? "check_box" : "check_box_outline_blank")</i>
                             <label style="cursor: pointer;">Enable Custom Color</label>
                         </div>
                         @if ( IsCustomCamoColorEquipped )
@@ -413,8 +413,8 @@
                                 
                                 <div style="margin-top: 10px;">
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                        <label style="font-size: 12px; color: rgba(255,255,255,0.7);">Opacity</label>
-                                        <label style="font-size: 12px; color: white;">@CustomCamoOpacity.ToString("0.00")</label>
+                                        <label style="font-size: 15px; color: rgba(255,255,255,0.7);">Opacity</label>
+                                        <label style="font-size: 15px; color: white;">@CustomCamoOpacity.ToString("0.00")</label>
                                     </div>
                                     <CustomSlider style="width: 250px;" Value:bind="@CustomCamoOpacity" Min=@(0f) Max=@(1f) Step=@(0.01f) NumberFormat="0.00" ShowTextEntry="@false" ShowValueTooltip="@false" />
                                 </div>
@@ -425,8 +425,8 @@
                                 @for ( int fi = 0; fi < GunsmithLoadoutManager.FinishNames.Length; fi++ )
                                 {
                                     var idx = fi;
-                                    <div class="cust-item @(CustomCamoFinish == idx ? "active" : "")" style="width: auto; height: auto; padding: 8px 14px; font-size: 12px;" @onclick=@(() => SetFinish( idx ))>
-                                        <label class="cust-name" style="font-size: 12px;">@GunsmithLoadoutManager.FinishNames[idx]</label>
+                                    <div class="cust-item @(CustomCamoFinish == idx ? "active" : "")" style="width: auto; height: auto; padding: 10px 18px; font-size: 15px;" @onclick=@(() => SetFinish( idx ))>
+                                        <label class="cust-name" style="font-size: 15px;">@GunsmithLoadoutManager.FinishNames[idx]</label>
                                     </div>
                                 }
                             </div>
@@ -457,12 +457,12 @@
                                 @if ( !unlocked )
                                 {
                                     <div class="locked-overlay" style="position: absolute; inset: 0; background: rgba(0,0,0,0.7); display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;">
-                                        <i style="font-size: 24px; opacity: 0.8;">lock</i>
-                                        <label style="font-size: 12px; font-weight: bold; opacity: 0.8;">LV @camo.RequiredLevel</label>
+                                        <i style="font-size: 32px; opacity: 0.85;">lock</i>
+                                        <label style="font-size: 16px; font-weight: bold; opacity: 0.9;">LV @camo.RequiredLevel</label>
                                     </div>
                                 }
                                 @{ var isFav = GunsmithLoadoutManager.IsFavorite( camo.ResourcePath ); }
-                                <i class="favorite-icon" style="position: absolute; right: 4px; top: 4px; font-size: 14px; text-shadow: 0px 0px 4px black; color: @(isFav ? "#ffd700" : "rgba(255,255,255,0.4)"); pointer-events: all; cursor: pointer; z-index: 10;" @onclick:stopPropagation="true" @onclick=@(() => { GunsmithLoadoutManager.SetFavorite( camo.ResourcePath, !isFav ); StateHasChanged(); })>@(isFav ? "star" : "star_border")</i>
+                                <i class="favorite-icon" style="position: absolute; right: 6px; top: 6px; font-size: 22px; text-shadow: 0px 0px 4px black; color: @(isFav ? "#ffd700" : "rgba(255,255,255,0.4)"); pointer-events: all; cursor: pointer; z-index: 10;" @onclick:stopPropagation="true" @onclick=@(() => { GunsmithLoadoutManager.SetFavorite( camo.ResourcePath, !isFav ); StateHasChanged(); })>@(isFav ? "star" : "star_border")</i>
                             </div>
                         }
                         @if ( !GetParts( GunsmithPartType.MasteryCamo ).Any() )
@@ -495,12 +495,12 @@
                                 @if ( !unlocked )
                                 {
                                     <div class="locked-overlay" style="position: absolute; inset: 0; background: rgba(0,0,0,0.7); display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;">
-                                        <i style="font-size: 24px; opacity: 0.8;">lock</i>
-                                        <label style="font-size: 12px; font-weight: bold; opacity: 0.8;">LV @camo.RequiredLevel</label>
+                                        <i style="font-size: 32px; opacity: 0.85;">lock</i>
+                                        <label style="font-size: 16px; font-weight: bold; opacity: 0.9;">LV @camo.RequiredLevel</label>
                                     </div>
                                 }
                                 @{ var isFav = GunsmithLoadoutManager.IsFavorite( camo.ResourcePath ); }
-                                <i class="favorite-icon" style="position: absolute; right: 4px; top: 4px; font-size: 14px; text-shadow: 0px 0px 4px black; color: @(isFav ? "#ffd700" : "rgba(255,255,255,0.4)"); pointer-events: all; cursor: pointer; z-index: 10;" @onclick:stopPropagation="true" @onclick=@(() => { GunsmithLoadoutManager.SetFavorite( camo.ResourcePath, !isFav ); StateHasChanged(); })>@(isFav ? "star" : "star_border")</i>
+                                <i class="favorite-icon" style="position: absolute; right: 6px; top: 6px; font-size: 22px; text-shadow: 0px 0px 4px black; color: @(isFav ? "#ffd700" : "rgba(255,255,255,0.4)"); pointer-events: all; cursor: pointer; z-index: 10;" @onclick:stopPropagation="true" @onclick=@(() => { GunsmithLoadoutManager.SetFavorite( camo.ResourcePath, !isFav ); StateHasChanged(); })>@(isFav ? "star" : "star_border")</i>
                             </div>
                         }
                         @if ( !GetParts( GunsmithPartType.AnimatedCamo ).Any() )
@@ -510,9 +510,9 @@
                     </div>
 
                     <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
-                        <label class="gs-panel-label" style="font-size: 13px; color: rgba(255,255,255,0.8);">Custom Animation</label>
+                        <label class="gs-panel-label" style="font-size: 17px; color: rgba(255,255,255,0.8);">Custom Animation</label>
                         <div class="gs-setting-btn @(IsCustomAnimatedCamoSpeedEquipped ? "active" : "")" @onclick=@ToggleCustomAnimatedCamoSpeed style="color: white; display: flex; align-items: center; gap: 8px; cursor: pointer; opacity: 0.8; font-size: 14px; margin-bottom: 10px;">
-                            <i style="font-size: 20px;">@(IsCustomAnimatedCamoSpeedEquipped ? "check_box" : "check_box_outline_blank")</i>
+                            <i style="font-size: 26px;">@(IsCustomAnimatedCamoSpeedEquipped ? "check_box" : "check_box_outline_blank")</i>
                             <label style="cursor: pointer;">Enable Custom Speed/Direction</label>
                         </div>
                         @if ( IsCustomAnimatedCamoSpeedEquipped )
@@ -520,15 +520,15 @@
                             <div style="background-color: rgba(0,0,0,0.5); padding: 15px; border-radius: 4px; pointer-events: all; display: flex; flex-direction: column; gap: 15px;">
                                 <div style="width: 250px; flex-shrink: 0;">
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                        <label style="font-size: 12px; color: rgba(255,255,255,0.7); white-space: nowrap;">Horizontal Speed</label>
-                                        <label style="font-size: 12px; color: white; white-space: nowrap;">@CustomAnimatedCamoSpeedX.ToString("0.00")</label>
+                                        <label style="font-size: 15px; color: rgba(255,255,255,0.7); white-space: nowrap;">Horizontal Speed</label>
+                                        <label style="font-size: 15px; color: white; white-space: nowrap;">@CustomAnimatedCamoSpeedX.ToString("0.00")</label>
                                     </div>
                                     <CustomSlider style="width: 250px;" Value:bind="@CustomAnimatedCamoSpeedX" Min=@(-2f) Max=@(2f) Step=@(0.05f) NumberFormat="0.00" ShowTextEntry="@false" ShowValueTooltip="@false" />
                                 </div>
                                 <div style="width: 250px; flex-shrink: 0;">
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                        <label style="font-size: 12px; color: rgba(255,255,255,0.7); white-space: nowrap;">Vertical Speed</label>
-                                        <label style="font-size: 12px; color: white; white-space: nowrap;">@CustomAnimatedCamoSpeedY.ToString("0.00")</label>
+                                        <label style="font-size: 15px; color: rgba(255,255,255,0.7); white-space: nowrap;">Vertical Speed</label>
+                                        <label style="font-size: 15px; color: white; white-space: nowrap;">@CustomAnimatedCamoSpeedY.ToString("0.00")</label>
                                     </div>
                                     <CustomSlider style="width: 250px;" Value:bind="@CustomAnimatedCamoSpeedY" Min=@(-2f) Max=@(2f) Step=@(0.05f) NumberFormat="0.00" ShowTextEntry="@false" ShowValueTooltip="@false" />
                                 </div>
@@ -560,12 +560,12 @@
                                 @if ( !unlocked )
                                 {
                                     <div class="locked-overlay" style="position: absolute; inset: 0; background: rgba(0,0,0,0.7); display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;">
-                                        <i style="font-size: 24px; opacity: 0.8;">lock</i>
-                                        <label style="font-size: 12px; font-weight: bold; opacity: 0.8;">LV @camo.RequiredLevel</label>
+                                        <i style="font-size: 32px; opacity: 0.85;">lock</i>
+                                        <label style="font-size: 16px; font-weight: bold; opacity: 0.9;">LV @camo.RequiredLevel</label>
                                     </div>
                                 }
                                 @{ var isFav = GunsmithLoadoutManager.IsFavorite( camo.ResourcePath ); }
-                                <i class="favorite-icon" style="position: absolute; right: 4px; top: 4px; font-size: 14px; text-shadow: 0px 0px 4px black; color: @(isFav ? "#ffd700" : "rgba(255,255,255,0.4)"); pointer-events: all; cursor: pointer; z-index: 10;" @onclick:stopPropagation="true" @onclick=@(() => { GunsmithLoadoutManager.SetFavorite( camo.ResourcePath, !isFav ); StateHasChanged(); })>@(isFav ? "star" : "star_border")</i>
+                                <i class="favorite-icon" style="position: absolute; right: 6px; top: 6px; font-size: 22px; text-shadow: 0px 0px 4px black; color: @(isFav ? "#ffd700" : "rgba(255,255,255,0.4)"); pointer-events: all; cursor: pointer; z-index: 10;" @onclick:stopPropagation="true" @onclick=@(() => { GunsmithLoadoutManager.SetFavorite( camo.ResourcePath, !isFav ); StateHasChanged(); })>@(isFav ? "star" : "star_border")</i>
                             </div>
                         }
                         @if ( !GetParts( GunsmithPartType.GlowingCamo ).Any() )
@@ -598,12 +598,12 @@
                                 @if ( !unlocked )
                                 {
                                     <div class="locked-overlay" style="position: absolute; inset: 0; background: rgba(0,0,0,0.7); display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;">
-                                        <i style="font-size: 24px; opacity: 0.8;">lock</i>
-                                        <label style="font-size: 12px; font-weight: bold; opacity: 0.8;">LV @camo.RequiredLevel</label>
+                                        <i style="font-size: 32px; opacity: 0.85;">lock</i>
+                                        <label style="font-size: 16px; font-weight: bold; opacity: 0.9;">LV @camo.RequiredLevel</label>
                                     </div>
                                 }
                                 @{ var isFav = GunsmithLoadoutManager.IsFavorite( camo.ResourcePath ); }
-                                <i class="favorite-icon" style="position: absolute; right: 4px; top: 4px; font-size: 14px; text-shadow: 0px 0px 4px black; color: @(isFav ? "#ffd700" : "rgba(255,255,255,0.4)"); pointer-events: all; cursor: pointer; z-index: 10;" @onclick:stopPropagation="true" @onclick=@(() => { GunsmithLoadoutManager.SetFavorite( camo.ResourcePath, !isFav ); StateHasChanged(); })>@(isFav ? "star" : "star_border")</i>
+                                <i class="favorite-icon" style="position: absolute; right: 6px; top: 6px; font-size: 22px; text-shadow: 0px 0px 4px black; color: @(isFav ? "#ffd700" : "rgba(255,255,255,0.4)"); pointer-events: all; cursor: pointer; z-index: 10;" @onclick:stopPropagation="true" @onclick=@(() => { GunsmithLoadoutManager.SetFavorite( camo.ResourcePath, !isFav ); StateHasChanged(); })>@(isFav ? "star" : "star_border")</i>
                             </div>
                         }
                         @if ( !GetParts( GunsmithPartType.Camoflague3D ).Any() )
@@ -646,8 +646,8 @@
                 {
                 @* ----- Stickers ----- *@
                 <div class="gs-cust-section">
-                    <label class="gs-panel-label">Stickers</label>
-                    <label style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: -5px; margin-bottom: 10px; display: block;">Stickers will be placed on valid sticker points on the weapon.</label>
+                    <label class="gs-panel-label gs-sticker-title">Stickers</label>
+                    <label class="gs-sticker-description">Stickers will be placed on valid sticker points on the weapon.</label>
                     
                     @{
                         GunsmithLoadoutManager.TryGetAttachment( equip, GunsmithPartType.Sticker, out var equippedSticker );
@@ -665,7 +665,7 @@
                         }
                         @if ( !GetParts( GunsmithPartType.Sticker ).Any() )
                         {
-                            <label class="cust-empty">No stickers</label>
+                            <label class="cust-empty gs-sticker-empty">No stickers</label>
                         }
                     </div>
                 </div>
@@ -684,8 +684,11 @@
                         @foreach ( var reticle in GetParts( GunsmithPartType.Reticle ) )
                         {
                             var isEquipped = equippedReticle == reticle;
-                            var reticleStyle = $"background-image: url( '{reticle.CamoTexture.Replace(".png", ".vtex")}' ); background-size: contain; background-repeat: no-repeat; background-position: center;";
-                            <div class="cust-item @(isEquipped ? "active" : "")" style="@reticleStyle position: relative;" @onclick=@(() => EquipPart( reticle ))>
+                            var reticlePreview = string.IsNullOrEmpty( reticle.ReticlePreview ) ? reticle.CamoTexture : reticle.ReticlePreview;
+                            var reticleStyle = $"background-image: url( '{reticlePreview}' ); background-image-tint: {CustomReticleColor.WithAlpha( 1f ).Hex}; background-size: contain; background-repeat: no-repeat; background-position: center;";
+                            <div class="cust-item reticle-item @(isEquipped ? "active" : "")" @onclick=@(() => EquipPart( reticle ))>
+                                <div class="reticle-icon" style="@reticleStyle"></div>
+                                <label class="reticle-name">@reticle.Name</label>
                                 @if ( isEquipped )
                                 {
                                     <i>check</i>
@@ -699,9 +702,34 @@
                     </div>
 
                     <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
-                        <label class="gs-panel-label" style="font-size: 13px; color: rgba(255,255,255,0.8);">Reticle Color</label>
+                        <label class="gs-panel-label" style="font-size: 17px; color: rgba(255,255,255,0.8);">Reticle Color</label>
                         <div style="background-color: rgba(0,0,0,0.5); padding: 10px; border-radius: 4px; pointer-events: all; margin-top: 10px;">
                             <Facepunch.UI.ColorPicker Value:bind="@CustomReticleColor" />
+                        </div>
+                    </div>
+
+                    <div class="gs-reticle-adjustments">
+                        <div class="gs-reticle-adjustments-heading">
+                            <label class="gs-panel-label">Adjust Reticle</label>
+                            <button class="gs-reticle-reset" @onclick=@ResetReticleTransform>Reset</button>
+                        </div>
+                        <div class="gs-reticle-sliders">
+                            <div class="gs-reticle-slider">
+                                <div class="gs-reticle-slider-heading"><label>Size</label><label>@CustomReticleScale.ToString("0.00")x</label></div>
+                                <CustomSlider style="width: 250px;" Value:bind="@CustomReticleScale" Min=@(0.25f) Max=@(3f) Step=@(0.05f) NumberFormat="0.00" ShowTextEntry="@false" ShowValueTooltip="@false" />
+                            </div>
+                            <div class="gs-reticle-slider">
+                                <div class="gs-reticle-slider-heading"><label>Rotation</label><label>@CustomReticleRotation.ToString("0")°</label></div>
+                                <CustomSlider style="width: 250px;" Value:bind="@CustomReticleRotation" Min=@(-180f) Max=@(180f) Step=@(5f) NumberFormat="0" ShowTextEntry="@false" ShowValueTooltip="@false" />
+                            </div>
+                            <div class="gs-reticle-slider">
+                                <div class="gs-reticle-slider-heading"><label>Horizontal</label><label>@CustomReticleOffsetX.ToString("+0.0;-0.0;0.0")%</label></div>
+                                <CustomSlider style="width: 250px;" Value:bind="@CustomReticleOffsetX" Min=@(-8f) Max=@(8f) Step=@(0.2f) NumberFormat="0.0" ShowTextEntry="@false" ShowValueTooltip="@false" />
+                            </div>
+                            <div class="gs-reticle-slider">
+                                <div class="gs-reticle-slider-heading"><label>Vertical</label><label>@CustomReticleOffsetY.ToString("+0.0;-0.0;0.0")%</label></div>
+                                <CustomSlider style="width: 250px;" Value:bind="@CustomReticleOffsetY" Min=@(-8f) Max=@(8f) Step=@(0.2f) NumberFormat="0.0" ShowTextEntry="@false" ShowValueTooltip="@false" />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -711,11 +739,12 @@
         }
         else
         {
+            <label class="gs-view-hint">DRAG TO ROTATE · SCROLL TO ZOOM</label>
             <div class="gs-bottom-row">
                 @if ( GetEquipment() is {} selectedEquip )
                 {
                     <div class="gs-detail-head">
-                        <div class="gs-lv-badge">@WeaponProgression.GetLevel( selectedEquip )</div>
+                        <div class="gs-lv-badge"><label>@WeaponProgression.GetLevel( selectedEquip )</label></div>
                         <div class="gs-detail-meta">
                             <label class="gs-detail-name">@selectedEquip.Name</label>
                             <div class="gs-xp-wrap">
@@ -729,13 +758,6 @@
                 <div class="gs-tuning-btn @(ShowTuning ? "active" : "")" @onclick=@ToggleTuning>
                     <i>tune</i>
                     <label>TUNING</label>
-                </div>
-
-                <div class="gs-loadout-section">
-                    <div class="gs-loadout-btn @(IsLoadoutSet() ? "set" : "")" @onclick=@SetLoadout>
-                        <i>@(IsLoadoutSet() ? "check_circle" : "add_circle")</i>
-                        <label>@(IsLoadoutSet() ? "Equipped" : "Equip")</label>
-                    </div>
                 </div>
             </div>
         }
@@ -785,6 +807,7 @@
     private int CamoPage { get; set; } = 0;
 
     public bool IsCustomizing => Mode == GunsmithViewMode.Customize;
+    public bool IsReticleTabOpen => IsCustomizing && ActiveCustomizeTab == CustomizeTab.Reticle;
     public bool IsArmoryVisible => ShowArmory && !IsCustomizing;
     public bool IsAttachmentBrowserOpen => Panel?.Children.OfType<GunsmithAttachmentBrowser>().Any( p => p.SelectedPoint.IsValid() ) ?? false;
 
@@ -1062,6 +1085,8 @@
         PreviewCamoPart = null;
         CamoPage = 0;
         SelectedSlot = resource.Slot;
+        // Picking a weapon puts it in the class, as in CoD (and like perks); there's no separate Equip step.
+        GunsmithLoadoutManager.SetSlot( resource.Slot, resource.ResourcePath );
         System.SetEquipment( resource );
         StateHasChanged();
     }
@@ -1080,13 +1105,6 @@
         // Charms are handled in the Customize tab now, not as a floating attachment point in Build.
         return System.Weapon.GetComponentsInChildren<GunsmithAttachmentPoint>( true )
             .Where( p => p.Category != GunsmithPartType.Charm );
-    }
-
-    private bool IsLoadoutSet()
-    {
-        var equip = GetEquipment();
-        if ( equip is null ) return false;
-        return IsLoadoutSet( equip );
     }
 
     private int SelectedPerkCategory { get; set; } = 0;
@@ -1141,14 +1159,8 @@
     }
 
     /// <summary>Primary weapon name for a class's row in the class list (read straight from that class's saved loadout).</summary>
-    private static string GetClassPrimaryName( int classIndex )
-    {
-        var id = Game.Cookies.Get<string>( $"hc1.loadout.class{classIndex}.primary", "" );
-        if ( string.IsNullOrEmpty( id ) ) return "NO PRIMARY";
-        var resource = ResourceLibrary.GetAll<EquipmentResource>()
-            .FirstOrDefault( r => r.ResourceName.Equals( id, StringComparison.OrdinalIgnoreCase ) || r.ResourcePath.Equals( id, StringComparison.OrdinalIgnoreCase ) );
-        return resource?.Name.ToUpper() ?? "NO PRIMARY";
-    }
+    private static string GetClassPrimaryName( int classIndex ) =>
+        GunsmithLoadoutManager.GetSlotResource( classIndex, EquipmentSlot.Primary )?.Name.ToUpper() ?? "NO PRIMARY";
 
     private void SelectClass( int index )
     {
@@ -1214,14 +1226,6 @@
         if ( resource.Slot == EquipmentSlot.Tactical ) return GunsmithLoadoutManager.GetTactical() == resource.ResourceName || GunsmithLoadoutManager.GetTactical() == resource.ResourcePath;
         if ( resource.Slot == EquipmentSlot.Lethal ) return GunsmithLoadoutManager.GetLethal() == resource.ResourceName || GunsmithLoadoutManager.GetLethal() == resource.ResourcePath;
         return GunsmithLoadoutManager.GetSlot( resource.Slot ) == resource.ResourceName || GunsmithLoadoutManager.GetSlot( resource.Slot ) == resource.ResourcePath;
-    }
-
-    private void SetLoadout()
-    {
-        var equip = GetEquipment();
-        if ( equip is null ) return;
-        GunsmithLoadoutManager.SetSlot( equip.Slot, equip.ResourcePath );
-        StateHasChanged();
     }
 
     private IEnumerable<GunsmithPart> GetParts( GunsmithPartType category )
@@ -1384,6 +1388,68 @@
                 ApplyPreviewAttachments( equip );
             }
         }
+    }
+
+    private float CustomReticleScale
+    {
+        get => GetEquipment() is {} equip ? GunsmithLoadoutManager.GetCustomReticleScale( equip ) : 1f;
+        set
+        {
+            if ( GetEquipment() is not {} equip ) return;
+            GunsmithLoadoutManager.SetCustomReticleScale( equip, value );
+            ApplyPreviewAttachments( equip );
+            StateHasChanged();
+        }
+    }
+
+    private float CustomReticleRotation
+    {
+        get => GetEquipment() is {} equip ? GunsmithLoadoutManager.GetCustomReticleRotation( equip ) : 0f;
+        set
+        {
+            if ( GetEquipment() is not {} equip ) return;
+            GunsmithLoadoutManager.SetCustomReticleRotation( equip, value );
+            ApplyPreviewAttachments( equip );
+            StateHasChanged();
+        }
+    }
+
+    private float CustomReticleOffsetX
+    {
+        get => GetEquipment() is {} equip ? GunsmithLoadoutManager.GetCustomReticleOffset( equip ).x * 100f : 0f;
+        set
+        {
+            if ( GetEquipment() is not {} equip ) return;
+            var offset = GunsmithLoadoutManager.GetCustomReticleOffset( equip );
+            offset.x = value / 100f;
+            GunsmithLoadoutManager.SetCustomReticleOffset( equip, offset );
+            ApplyPreviewAttachments( equip );
+            StateHasChanged();
+        }
+    }
+
+    private float CustomReticleOffsetY
+    {
+        get => GetEquipment() is {} equip ? GunsmithLoadoutManager.GetCustomReticleOffset( equip ).y * 100f : 0f;
+        set
+        {
+            if ( GetEquipment() is not {} equip ) return;
+            var offset = GunsmithLoadoutManager.GetCustomReticleOffset( equip );
+            offset.y = value / 100f;
+            GunsmithLoadoutManager.SetCustomReticleOffset( equip, offset );
+            ApplyPreviewAttachments( equip );
+            StateHasChanged();
+        }
+    }
+
+    private void ResetReticleTransform()
+    {
+        if ( GetEquipment() is not {} equip ) return;
+        GunsmithLoadoutManager.SetCustomReticleScale( equip, 1f );
+        GunsmithLoadoutManager.SetCustomReticleRotation( equip, 0f );
+        GunsmithLoadoutManager.SetCustomReticleOffset( equip, Vector2.Zero );
+        ApplyPreviewAttachments( equip );
+        StateHasChanged();
     }
 
     private bool IsCustomCamoColorEquipped

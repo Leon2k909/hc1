@@ -7,14 +7,17 @@
     @foreach ( var medal in Medals )
     {
         <div @key="medal.Id" class="medal-slot @medal.Family @(medal.Fading ? "leaving" : "")">
-            <div class="medal-award" style="animation-delay: @(medal.DelayMilliseconds)ms;">
+            <div class="medal-award">
                 <div class="medal-emblem">
-                    <div class="medal-impact" style="animation-delay: @(medal.DelayMilliseconds)ms;"></div>
-                    <img class="medal-art" src="@($"ui/medals/{medal.Family}.png")" />
-                    <div class="medal-rank"><label>@medal.Rank</label></div>
+                    <div class="medal-impact"></div>
+                    <img class="medal-art" src="@($"ui/medals/{medal.Art}.png")" />
+                    @if ( medal.Family != "multikill" )
+                    {
+                        <div class="medal-rank"><label>@medal.Rank</label></div>
+                    }
                 </div>
                 <div class="medal-ribbon">
-                    <div class="medal-sweep" style="animation-delay: @(medal.DelayMilliseconds + 120)ms;"></div>
+                    <div class="medal-sweep"></div>
                     <label class="medal-title @(medal.Title.Length > 16 ? "long-title" : "")">@medal.Title</label>
                     <div class="medal-detail">
                         <div class="medal-rule"></div>
@@ -35,15 +38,16 @@
         public string Title { get; init; }
         public string Subtitle { get; init; }
         public string Family { get; init; }
+        public string Art { get; init; }
         public string Rank { get; init; }
-        public int DelayMilliseconds { get; init; }
-        public TimeSince TimeCreated { get; init; } = 0;
+        public TimeSince TimeCreated { get; set; } = 0;
         public bool Fading { get; set; }
-        public bool ShouldFade => TimeCreated > 2.4f + DelayMilliseconds / 1000f;
-        public bool Dead => TimeCreated > 2.7f + DelayMilliseconds / 1000f;
+        public bool ShouldFade => TimeCreated > 1.6f;
+        public bool Dead => TimeCreated > 1.9f;
     }
 
     private readonly List<MedalInstance> Medals = new();
+    private readonly Queue<MedalInstance> PendingMedals = new();
     private TimeSince TimeSinceLastKill = 999f;
     private int RapidKillCount;
     private int LifeKillStreak;
@@ -57,13 +61,26 @@
         if ( TimeSinceLastKill > 3.0f )
             RapidKillCount = 0;
 
-        var changed = Medals.RemoveAll( x => x.Dead ) > 0;
-        foreach ( var medal in Medals )
+        var changed = false;
+        if ( Medals.Count > 0 )
         {
-            if ( medal.Fading == medal.ShouldFade )
-                continue;
+            var medal = Medals[0];
+            if ( medal.Dead )
+            {
+                Medals.Clear();
+                changed = true;
+            }
+            else if ( medal.Fading != medal.ShouldFade )
+            {
+                medal.Fading = medal.ShouldFade;
+                changed = true;
+            }
+        }
 
-            medal.Fading = medal.ShouldFade;
+        if ( Medals.Count == 0 && PendingMedals.TryDequeue( out var next ) )
+        {
+            next.TimeCreated = 0f;
+            Medals.Add( next );
             changed = true;
         }
 
@@ -73,7 +90,6 @@
         // Use parent bounds so narrow editor views work as well as fullscreen.
         var width = Parent?.Box.Rect.Width * ScaleFromScreen ?? 1920f;
         SetClass( "compact-medals", width > 0 && width < 1100f );
-        SetClass( "stacked-medals", width > 0 && width < 700f );
     }
 
     public void OnKill( KillEvent eventArgs )
@@ -87,6 +103,9 @@
             RapidKillCount = 0;
             LifeKillStreak = 0;
             TimeSinceLastKill = 999f;
+            Medals.Clear();
+            PendingMedals.Clear();
+            RefreshFeed();
             return;
         }
 
@@ -97,27 +116,19 @@
         TimeSinceLastKill = 0;
         LifeKillStreak++;
 
-        var hitbox = damageInfo.Hitbox;
-        if ( hitbox.HasFlag( HitboxTags.Head ) )
-            AddMedal( "HEADSHOT", "PRECISION KILL", "precision", "HS" );
-
-        if ( IsOneShotOneKill( damageInfo ) )
-            AddMedal( "ONE SHOT, ONE KILL", "SINGLE SHOT ELIMINATION", "precision", "1" );
-
         switch ( RapidKillCount )
         {
             case 2:
-                AddMedal( "DOUBLE KILL", "RAPID ELIMINATIONS", "multikill", "2" );
+                AddMedal( "DOUBLE KILL", "RAPID ELIMINATIONS", "multikill", "2", "double-kill" );
                 break;
             case 3:
-                AddMedal( "TRIPLE KILL", "RAPID ELIMINATIONS", "multikill", "3" );
+                AddMedal( "TRIPLE KILL", "RAPID ELIMINATIONS", "multikill", "3", "triple-kill" );
                 break;
             case 4:
-                AddMedal( "FURY KILL", "RAPID ELIMINATIONS", "multikill", "4" );
+                AddMedal( "FURY KILL", "RAPID ELIMINATIONS", "multikill", "4", "fury-kill" );
                 break;
-            default:
-                if ( RapidKillCount >= 5 )
-                    AddMedal( "FRENZY KILL", "RAPID ELIMINATIONS", "multikill", RapidKillCount.ToString() );
+            case 5:
+                AddMedal( "FRENZY KILL", "RAPID ELIMINATIONS", "multikill", "5", "frenzy-kill" );
                 break;
         }
 
@@ -133,6 +144,13 @@
                 AddMedal( "RUTHLESS", "KILL STREAK", "streak", "15" );
                 break;
         }
+
+        var hitbox = damageInfo.Hitbox;
+        if ( hitbox.HasFlag( HitboxTags.Head ) )
+            AddMedal( "HEADSHOT", "PRECISION KILL", "precision", "HS" );
+
+        if ( IsOneShotOneKill( damageInfo ) )
+            AddMedal( "ONE SHOT, ONE KILL", "SINGLE SHOT ELIMINATION", "precision", "1" );
     }
 
     private bool IsLocalPlayerKill( Facepunch.DamageInfo damageInfo )
@@ -180,29 +198,28 @@
         return damageInfo.Damage >= maxHealth - 0.01f;
     }
 
-    private void AddMedal( string title, string subtitle, string family, string rank )
+    private void AddMedal( string title, string subtitle, string family, string rank, string art = null )
     {
-        // Upgrade rapid kills and retrigger repeat awards instead of filling the HUD
-        // with duplicates. New keys restart the entrance even when the count is unchanged.
-        var replacement = Medals.FindIndex( x => x.Title == title || (family == "multikill" && x.Family == family) );
-        var delay = Medals.Count( x => x.TimeCreated < 0.05f ) * 90;
         var medal = new MedalInstance
         {
             Id = ++NextMedalId,
             Title = title,
             Subtitle = subtitle,
             Family = family,
-            Rank = rank,
-            DelayMilliseconds = delay
+            Art = art ?? family,
+            Rank = rank
         };
 
-        if ( replacement >= 0 )
-            Medals[replacement] = medal;
-        else
-            Medals.Add( medal );
+        PendingMedals.Enqueue( medal );
+        while ( PendingMedals.Count > 24 )
+            PendingMedals.Dequeue();
 
-        while ( Medals.Count > 4 )
-            Medals.RemoveAt( 0 );
+        if ( Medals.Count == 0 )
+        {
+            var first = PendingMedals.Dequeue();
+            first.TimeCreated = 0f;
+            Medals.Add( first );
+        }
 
         RefreshFeed();
     }

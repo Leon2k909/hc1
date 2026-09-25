@@ -1,3 +1,5 @@
+using Facepunch.Gunsmith;
+
 namespace Facepunch;
 
 public partial class Shootable
@@ -15,13 +17,15 @@ public partial class Shootable
 
 	private void PlayDischargeEffects( bool suppressed )
 	{
-		var flashChance = suppressed ? SuppressedMuzzleFlashChance : MuzzleFlashChance;
+		var attachments = GunsmithAttachmentEffects.For( Equipment );
+		var flashChance = suppressed ? SuppressedMuzzleFlashChance
+			: (MuzzleFlashChance * attachments.FlashChance).Clamp( 0f, 1f );
 		var flashScale = suppressed ? SuppressedMuzzleFlashScale : MuzzleFlashScale;
 		var effects = _dischargeEffects.Shoot( flashChance, flashScale,
 			MuzzleSmokePrefab.IsValid() ? MuzzleSmokeScale : 0f, suppressed );
 
 		// Roll once on the firing owner and broadcast the result to every viewer.
-		DoShootEffects( suppressed, effects.Flash, effects.FlashScale, effects.SmokeScale );
+		DoShootEffects( suppressed, effects.Flash, effects.FlashScale, effects.SmokeScale, attachments.SoundVolume );
 	}
 
 	/// <summary>Residual smoke on a fresh reload, only after recent live firing.</summary>

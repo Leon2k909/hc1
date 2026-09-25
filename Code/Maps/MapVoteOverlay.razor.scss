@@ -20,6 +20,29 @@ MapVoteOverlay
         flex-grow: 1;
     }
 
+    .vote-heading
+    {
+        height: 104px;
+        flex-shrink: 0;
+    }
+
+    .vote-timer
+    {
+        width: 320px;
+        height: 40px;
+        line-height: 40px;
+        flex-shrink: 0;
+        text-align: center;
+    }
+
+    .vote-caption
+    {
+        height: 20px;
+        line-height: 20px;
+        flex-shrink: 0;
+        text-align: center;
+    }
+
     .bg
     {
         width: 100%;

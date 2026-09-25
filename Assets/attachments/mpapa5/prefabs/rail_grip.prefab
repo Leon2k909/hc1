@@ -1,0 +1,88 @@
+{
+  "RootObject": {
+    "__guid": "b1baa4bf-f903-453a-a938-a6c626016fc1",
+    "Flags": 0,
+    "Name": "MP5 Rail Grip",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "97e9167a-cfeb-4255-9585-d02188797680",
+        "__enabled": true,
+        "Model": "attachments/mpapa5/underbarrel/rail_grip/rail_grip.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithSocketAttachment",
+        "__guid": "a684cf3c-71d1-4a12-9bef-6af4b739580d",
+        "__enabled": true,
+        "SocketName": "muzzle",
+        "UseWeaponOrigin": true,
+        "WeaponSpaceOffset": "2.652,-0.248,8.128",
+        "WeaponSpaceScale": 1.122,
+        "SocketOffset": "-9.642,-0.221,0.009",
+        "SocketAngles": "0,0,0"
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "729dfa0d-a5fc-56e5-a231-188f9bc8a846",
+        "Flags": 0,
+        "Name": "Existing MP5 barrel and sights",
+        "Position": "0,0,0",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Enabled": true,
+        "NetworkMode": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.ModelRenderer",
+            "__guid": "4d9944a4-4abe-5b87-b5cf-8249f817d3d3",
+            "__enabled": true,
+            "Model": "attachments/mpapa5/native_receiver/native_front.vmdl",
+            "Tint": "1,1,1,1"
+          },
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithMp5NativeReceiver",
+            "__guid": "c55ca671-c1dc-52b9-9214-1a2b955970c4",
+            "__enabled": true,
+            "BoneName": "weapon_root"
+          }
+        ],
+        "Children": []
+      },
+      {
+        "__guid": "0eb67ec6-92d3-5981-a448-7e37fb4d4603",
+        "Flags": 0,
+        "Name": "Existing MP5 bolt",
+        "Position": "0,0,0",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Enabled": true,
+        "NetworkMode": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.ModelRenderer",
+            "__guid": "4a203b4a-9bde-5990-994f-38703a95d7e2",
+            "__enabled": true,
+            "Model": "attachments/mpapa5/native_receiver/native_bolt.vmdl",
+            "Tint": "1,1,1,1"
+          },
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithMp5NativeReceiver",
+            "__guid": "57203f5b-ce57-513c-95d6-eb45158293b1",
+            "__enabled": true,
+            "BoneName": "bolt"
+          }
+        ],
+        "Children": []
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

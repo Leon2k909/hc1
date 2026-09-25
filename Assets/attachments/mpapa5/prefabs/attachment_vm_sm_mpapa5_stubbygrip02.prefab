@@ -1,0 +1,37 @@
+{
+  "RootObject": {
+    "__guid": "bc43e839-9a3b-5d77-86c6-b0273fc993e0",
+    "Flags": 0,
+    "Name": "MP5 Operator Foregrip",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "7f33a7bc-3423-51f4-97c9-36f175166572",
+        "__enabled": true,
+        "Model": "attachments/mpapa5/shared/attachment_vm_sm_mpapa5_stubbygrip02/attachment_vm_sm_mpapa5_stubbygrip02.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithBoneAttachment",
+        "__guid": "0c2c5caa-98e2-5fbb-8937-4aa73af6bf2a",
+        "__enabled": true,
+        "BoneName": "weapon_root",
+        "UseWeaponOrigin": true,
+        "WeaponSpaceOffset": "7.5,0,6.8",
+        "WeaponSpaceScale": 1.0,
+        "MountAtBone": false,
+        "BoneOffset": "0,0,0",
+        "BoneAngles": "0,0,0",
+        "ModelScaleMultiplier": "1,1,1"
+      }
+    ],
+    "Children": []
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

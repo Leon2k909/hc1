@@ -27,7 +27,7 @@ GunsmithPanel
 		top: 0;
 		left: 0;
 		right: 0;
-		height: 64px;
+		height: 76px;
 		background-color: rgba( 0, 0, 0, 0.72 );
 		backdrop-filter: blur( 16px );
 		flex-direction: row;
@@ -43,14 +43,14 @@ GunsmithPanel
 	{
 		flex-direction: row;
 		align-items: center;
-		gap: 10px;
+		gap: 12px;
 		flex-shrink: 0;
 	}
 
 	.gs-brand-logo
 	{
-		width: 42px;
-		height: 24px;
+		width: 52px;
+		height: 30px;
 	}
 
 	.gs-brand-text
@@ -61,15 +61,15 @@ GunsmithPanel
 
 	.gs-brand-name
 	{
-		font-size: 14px;
+		font-size: 19px;
 		font-weight: bold;
 		color: white;
-		letter-spacing: 2px;
+		letter-spacing: 2.5px;
 	}
 
 	.gs-brand-sub
 	{
-		font-size: 11px;
+		font-size: 14px;
 		color: $gs-accent;
 		letter-spacing: 3px;
 	}
@@ -84,7 +84,7 @@ GunsmithPanel
 
 	.gs-weapon-name
 	{
-		font-size: 20px;
+		font-size: 30px;
 		font-weight: bold;
 		color: white;
 		letter-spacing: 1px;
@@ -92,8 +92,8 @@ GunsmithPanel
 
 	.gs-weapon-class
 	{
-		font-size: 12px;
-		color: $gs-text-dim;
+		font-size: 15px;
+		color: $gs-text-mid;
 		letter-spacing: 1.5px;
 	}
 
@@ -109,18 +109,23 @@ GunsmithPanel
 		flex-direction: row;
 		align-items: center;
 		gap: 5px;
-		padding: 6px 14px;
+		padding: 6px 18px;
 		background-color: $gs-panel-bg-light;
 		border-radius: 3px;
 		cursor: pointer;
 		pointer-events: all;
 		color: $gs-text-mid;
-		font-size: 12px;
+		font-size: 17px;
 		transition: background-color 0.1s ease, color 0.1s ease;
+
+		label
+		{
+			font-size: 17px;
+		}
 
 		i
 		{
-			font-size: 16px;
+			font-size: 22px;
 		}
 
 		&:hover
@@ -158,7 +163,7 @@ GunsmithPanel
 
 	.gs-share-modal
 	{
-		width: 560px;
+		width: 660px;
 		max-width: 94%;
 		max-height: 90%;
 		overflow-y: scroll;
@@ -166,9 +171,9 @@ GunsmithPanel
 		border: 1px solid rgba( 255, 255, 255, 0.16 );
 		border-radius: 4px;
 		box-shadow: 0 16px 40px rgba( 0, 0, 0, 0.55 );
-		padding: 20px;
+		padding: 24px;
 		flex-direction: column;
-		gap: 12px;
+		gap: 14px;
 	}
 
 	.gs-share-header
@@ -186,14 +191,14 @@ GunsmithPanel
 
 		label
 		{
-			font-size: 18px;
+			font-size: 24px;
 			color: white;
 			letter-spacing: 1.5px;
 		}
 
-		span
+		.gs-share-weapon
 		{
-			font-size: 10px;
+			font-size: 15px;
 			color: $gs-accent;
 			letter-spacing: 2px;
 		}
@@ -201,8 +206,8 @@ GunsmithPanel
 
 	.gs-share-close
 	{
-		width: 34px;
-		height: 34px;
+		width: 46px;
+		height: 46px;
 		align-items: center;
 		justify-content: center;
 		background-color: rgba( 255, 255, 255, 0.08 );
@@ -212,7 +217,7 @@ GunsmithPanel
 
 		i
 		{
-			font-size: 18px;
+			font-size: 26px;
 		}
 
 		&:hover
@@ -224,7 +229,7 @@ GunsmithPanel
 
 	.gs-share-label
 	{
-		font-size: 10px;
+		font-size: 15px;
 		color: $gs-accent;
 		letter-spacing: 2px;
 		margin-top: 6px;
@@ -232,19 +237,24 @@ GunsmithPanel
 
 	.gs-share-code
 	{
-		height: 86px;
+		height: 96px;
 		background-color: rgba( 255, 255, 255, 0.06 );
 		border: 1px solid rgba( 255, 255, 255, 0.14 );
 		border-radius: 3px;
 		color: white;
-		font-size: 12px;
+		font-size: 16px;
 		font-family: monospace;
-		padding: 10px;
+		padding: 12px;
 		pointer-events: all;
+
+		label
+		{
+			font-size: 16px;
+		}
 
 		&.import
 		{
-			height: 72px;
+			height: 80px;
 		}
 	}
 
@@ -256,23 +266,28 @@ GunsmithPanel
 
 	.gs-share-button
 	{
-		height: 38px;
-		padding: 0 14px;
+		height: 50px;
+		padding: 0 18px;
 		flex-direction: row;
 		align-items: center;
 		justify-content: center;
-		gap: 7px;
+		gap: 8px;
 		background-color: rgba( 255, 255, 255, 0.10 );
 		border: 1px solid rgba( 255, 255, 255, 0.12 );
 		border-radius: 3px;
 		color: white;
-		font-size: 13px;
+		font-size: 17px;
 		cursor: pointer;
 		pointer-events: all;
 
-		i
+		label
 		{
 			font-size: 17px;
+		}
+
+		i
+		{
+			font-size: 22px;
 		}
 
 		&:hover
@@ -296,7 +311,7 @@ GunsmithPanel
 
 	.gs-share-message
 	{
-		font-size: 12px;
+		font-size: 16px;
 		color: rgba( 170, 235, 170, 0.95 );
 
 		&.error
@@ -309,10 +324,10 @@ GunsmithPanel
 	.gs-mode-tabs
 	{
 		position: absolute;
-		top: 64px;
+		top: 76px;
 		left: 0;
 		right: 0;
-		height: 48px;
+		height: 68px;
 		background-color: rgba( 0, 0, 0, 0.4 );
 		flex-direction: row;
 		justify-content: center;
@@ -325,15 +340,18 @@ GunsmithPanel
 	.gs-mode-tab
 	{
 		min-width: 150px;
-		height: 44px;
-		font-size: 14px;
-		letter-spacing: 2px;
+		height: 52px;
+		font-size: 19px;
+		letter-spacing: 2.5px;
 		color: $gs-text-dim;
 		cursor: pointer;
-		padding: 0 18px;
+		padding: 0 26px;
 		align-items: center;
 		justify-content: center;
-		gap: 8px;
+		gap: 10px;
+
+		label { font-size: 19px; letter-spacing: 2.5px; }
+		i { font-size: 24px; }
 		background-color: rgba( 255, 255, 255, 0.05 );
 		border: 1px solid rgba( 255, 255, 255, 0.08 );
 		border-radius: 3px;
@@ -359,15 +377,15 @@ GunsmithPanel
 	{
 		position: absolute;
 		left: 24px;
-		top: 132px;
-		width: 408px;
+		top: 156px;
+		width: 420px;
 		max-width: 90%;
 		background-color: $gs-panel-bg;
 		backdrop-filter: blur( 12px );
 		border-radius: $rounding;
 		border: 1px solid rgba( 255, 255, 255, 0.06 );
-		padding: 14px 16px;
-		gap: 10px;
+		padding: 16px;
+		gap: 12px;
 		flex-direction: column;
 		pointer-events: all;
 
@@ -397,29 +415,27 @@ GunsmithPanel
 	{
 		position: absolute;
 		left: 24px;
-		top: 320px;
+		top: 340px;
 		bottom: 24px;
-		width: 408px;
+		width: 420px;
 		background-color: $gs-panel-bg;
 		backdrop-filter: blur( 12px );
 		border-radius: $rounding;
 		border: 1px solid rgba( 255, 255, 255, 0.06 );
-		padding: 16px;
-		gap: 10px;
+		padding: 18px;
+		gap: 12px;
 		flex-direction: column;
 		pointer-events: all;
 		overflow: hidden;
 
 		&.is-hidden { display: none; }
-
-		&.has-many-classes { top: 320px; }
 	}
 
 	.gs-panel-label
 	{
-		font-size: 13px;
+		font-size: 18px;
 		letter-spacing: 2px;
-		color: $gs-accent-dim;
+		color: $gs-accent;
 		text-transform: uppercase;
 		margin-bottom: 6px;
 	}
@@ -472,7 +488,7 @@ GunsmithPanel
 		flex-grow: 1;
 		flex-shrink: 1;
 		min-height: 0;
-		gap: 6px;
+		gap: 8px;
 		overflow-y: scroll;
 	}
 
@@ -480,11 +496,11 @@ GunsmithPanel
 	{
 		height: 42px;
 		flex-shrink: 0;
-		padding: 0 34px 0 12px;
+		padding: 0 50px 0 16px;
 		align-items: center;
 		justify-content: space-between;
-		gap: 8px;
-		font-size: 15px;
+		gap: 10px;
+		font-size: 20px;
 		position: relative;
 		background-color: $gs-panel-bg-light;
 		color: $gs-text-mid;
@@ -513,6 +529,7 @@ GunsmithPanel
 
 	.weapon-name
 	{
+		font-size: 20px;
 		white-space: nowrap;
 		flex-grow: 1;
 		overflow: hidden;
@@ -521,7 +538,7 @@ GunsmithPanel
 
 	.weapon-lv
 	{
-		font-size: 12px;
+		font-size: 15px;
 		color: $gs-text-dim;
 		letter-spacing: 0.5px;
 		margin-left: 8px;
@@ -530,11 +547,16 @@ GunsmithPanel
 
 	.weapon-state
 	{
-		font-size: 11px;
+		font-size: 14px;
 		letter-spacing: 0.8px;
 		color: $gs-accent;
 		margin-left: 8px;
 		flex-shrink: 0;
+	}
+
+	.favorite-icon
+	{
+		font-size: 24px;
 	}
 
 	.weapon-option.active .weapon-state
@@ -637,7 +659,7 @@ GunsmithPanel
 	.gs-class-actions
 	{
 		flex-direction: row;
-		gap: 6px;
+		gap: 8px;
 		align-items: center;
 		justify-content: space-between;
 	}
@@ -648,10 +670,15 @@ GunsmithPanel
 		background-color: rgba( 0, 0, 0, 0.5 );
 		border: 1px solid rgba( 255, 255, 255, 0.1 );
 		color: white;
-		font-size: 14px;
+		font-size: 20px;
 		font-weight: bold;
-		padding: 7px 10px;
+		padding: 8px 14px;
 		border-radius: 2px;
+
+		label
+		{
+			font-size: 20px;
+		}
 
 		&:focus
 		{
@@ -689,10 +716,10 @@ GunsmithPanel
 	// ── Section header ───────────────────────────────────────────────────
 	.gs-armory-section
 	{
-		height: 16px;
+		height: 22px;
 		flex-shrink: 0;
 		align-items: center;
-		font-size: 12px;
+		font-size: 15px;
 		font-weight: 800;
 		letter-spacing: 3px;
 		color: rgba( 255, 255, 255, 0.46 );
@@ -703,19 +730,19 @@ GunsmithPanel
 	{
 		flex-direction: column;
 		flex-shrink: 0;
-		gap: 6px;
+		gap: 8px;
 	}
 
 	.gs-slot-row
 	{
 		flex-direction: row;
 		align-items: center;
-		gap: 10px;
+		gap: 14px;
 		height: 56px;
-		padding: 0 12px;
+		padding: 0 16px;
 		background-color: rgba( 255, 255, 255, 0.04 );
 		border: 1px solid rgba( 255, 255, 255, 0.06 );
-		border-left: 3px solid transparent;
+		border-left: 4px solid transparent;
 		cursor: pointer;
 
 		&:hover
@@ -738,7 +765,7 @@ GunsmithPanel
 	.gs-slot-row-sm
 	{
 		height: 50px;
-		padding: 0 12px;
+		padding: 0 16px;
 	}
 
 	.gs-slot-copy
@@ -751,9 +778,9 @@ GunsmithPanel
 
 	.gs-slot-type-badge
 	{
-		font-size: 11px;
+		font-size: 14px;
 		font-weight: 900;
-		letter-spacing: 1.6px;
+		letter-spacing: 2px;
 		color: $gs-accent-dim;
 		white-space: nowrap;
 	}
@@ -771,7 +798,7 @@ GunsmithPanel
 
 	.gs-slot-lv
 	{
-		font-size: 11px;
+		font-size: 15px;
 		font-weight: 700;
 		color: $gs-accent-dim;
 		letter-spacing: 0.5px;
@@ -790,7 +817,7 @@ GunsmithPanel
 	{
 		flex-direction: row;
 		flex-shrink: 0;
-		gap: 8px;
+		gap: 10px;
 	}
 
 	.gs-perk-slot
@@ -799,12 +826,12 @@ GunsmithPanel
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		height: 78px;
-		padding: 0 6px;
+		height: 116px;
+		padding: 8px;
 		background-color: rgba( 255, 255, 255, 0.04 );
 		border: 1px solid rgba( 255, 255, 255, 0.07 );
 		cursor: pointer;
-		gap: 4px;
+		gap: 6px;
 
 		.gs-perk-icon
 		{
@@ -814,12 +841,12 @@ GunsmithPanel
 
 		.gs-perk-label
 		{
-			font-size: 12px;
+			font-size: 17px;
 			font-weight: 800;
 			color: white;
 			letter-spacing: 0.2px;
 			text-align: center;
-			// These tiles are only ~105px wide, so a name like "Flak Jacket" can never fit on one
+			// These tiles are only ~120px wide, so a name like "Sleight of Hand" can never fit on one
 			// line — wrapping keeps it readable where an ellipsis just hid it.
 			white-space: normal;
 			line-height: 1.15;
@@ -918,10 +945,36 @@ GunsmithPanel
 		padding: 8px 24px 10px 24px;
 		pointer-events: all;
 
-		// In Build mode the weapon-browser fills the full left column, so the
-		// tuning bar starts to the right of it to avoid overlapping. In Customise
-		// the weapon-browser is hidden, so the camo drawer stays full-width.
-		&.build-mode { left: 456px; height: auto; max-height: 40%; overflow-y: scroll; }
+		// In Build mode the armory fills the left column and the attachments fill the right, so the
+		// weapon card floats between them under the gun. In Customise both columns are hidden, so the
+		// camo drawer stays full-width.
+		&.build-mode
+		{
+			left: 468px;
+			right: 488px;
+			bottom: 24px;
+			height: auto;
+			max-height: 100%;
+			overflow: visible;
+			padding: 16px 24px;
+			border: 1px solid #46515a;
+			border-radius: 2px;
+		}
+	}
+
+	// Sits just above the weapon card, so it reads as a caption for the preview.
+	.gs-view-hint
+	{
+		position: absolute;
+		top: -42px;
+		left: 0;
+		right: 0;
+		justify-content: center;
+		text-align: center;
+		font-size: 15px;
+		letter-spacing: 1.5px;
+		color: #aebbc5;
+		pointer-events: none;
 	}
 
 	.gs-camo-panel
@@ -1006,16 +1059,22 @@ GunsmithPanel
 	.gs-tab-btn
 	{
 		flex-shrink: 0;
-		padding: 8px 16px;
+		padding: 8px 20px;
 		border-radius: 4px;
 		cursor: pointer;
 		transition: all 0.2s ease-out;
 		background-color: transparent;
-		color: rgba( 255, 255, 255, 0.5 );
-		font-size: 13px;
+		color: rgba( 255, 255, 255, 0.62 );
+		font-size: 19px;
 		font-weight: bold;
 		letter-spacing: 1px;
 		text-transform: uppercase;
+
+		label
+		{
+			font-size: 19px;
+			letter-spacing: 1.5px;
+		}
 
 		&:hover
 		{
@@ -1054,21 +1113,41 @@ GunsmithPanel
 		align-items: center;
 	}
 
+	.gs-sticker-title
+	{
+		font-size: 18px;
+		letter-spacing: 2.5px;
+	}
+
+	.gs-sticker-description
+	{
+		font-size: 16px;
+		color: rgba( 255, 255, 255, 0.72 );
+		margin-top: -5px;
+		margin-bottom: 10px;
+	}
+
+	.gs-sticker-empty
+	{
+		font-size: 17px;
+		color: rgba( 255, 255, 255, 0.72 );
+	}
+
 	.cust-grid
 	{
 		flex-direction: row;
 		flex-wrap: wrap;
-		gap: 8px;
+		gap: 10px;
 		width: 100%;
-		max-width: 900px;
+		max-width: 1060px;
 		flex-shrink: 0;
 		justify-content: center;
 	}
 
 	.cust-empty
 	{
-		font-size: 11px;
-		color: rgba( 255, 255, 255, 0.55 );
+		font-size: 17px;
+		color: rgba( 255, 255, 255, 0.62 );
 		letter-spacing: 0.5px;
 		padding: 22px 4px;
 	}
@@ -1093,28 +1172,28 @@ GunsmithPanel
 
 		i
 		{
-			font-size: 28px;
+			font-size: 34px;
 			color: white;
 			text-shadow: 0 2px 4px rgba( 0, 0, 0, 0.7 );
 		}
 
 		.cust-name
 		{
-			font-size: 11px;
+			font-size: 15px;
 			font-weight: bold;
 			color: white;
 			text-align: center;
 			letter-spacing: 0.3px;
 			text-shadow: 0 1px 3px rgba( 0, 0, 0, 0.9 );
-			padding: 2px;
+			padding: 4px;
 		}
 
 		.cust-check
 		{
 			position: absolute;
-			top: 3px;
-			right: 3px;
-			font-size: 16px;
+			top: 4px;
+			right: 4px;
+			font-size: 22px;
 			color: rgba( 255, 180, 0, 0.92 );
 		}
 
@@ -1131,11 +1210,105 @@ GunsmithPanel
 		}
 	}
 
+	.reticle-item
+	{
+		.reticle-icon
+		{
+			position: absolute;
+			top: 5px;
+			left: 18%;
+			width: 64%;
+			height: 64%;
+		}
+
+		.reticle-name
+		{
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			padding: 4px 2px;
+			font-size: 12px;
+			text-align: center;
+			color: white;
+			background-color: rgba( 7, 10, 13, 0.82 );
+		}
+
+		i
+		{
+			position: absolute;
+			top: 1px;
+			right: 2px;
+			font-size: 19px;
+		}
+	}
+
+	.gs-reticle-adjustments
+	{
+		width: 100%;
+		margin-top: 15px;
+		padding-top: 15px;
+		border-top: 1px solid rgba( 255, 255, 255, 0.1 );
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	.gs-reticle-adjustments-heading
+	{
+		width: 100%;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.gs-reticle-reset
+	{
+		padding: 6px 14px;
+		background-color: rgba( 255, 255, 255, 0.1 );
+		color: white;
+		font-size: 13px;
+		cursor: pointer;
+		pointer-events: all;
+
+		&:hover { background-color: rgba( 255, 255, 255, 0.2 ); }
+	}
+
+	.gs-reticle-sliders
+	{
+		width: 100%;
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: 14px 24px;
+		padding: 14px;
+		background-color: rgba( 0, 0, 0, 0.5 );
+		border-radius: 4px;
+		pointer-events: all;
+	}
+
+	.gs-reticle-slider
+	{
+		width: 250px;
+		flex-shrink: 0;
+		flex-direction: column;
+		gap: 5px;
+	}
+
+	.gs-reticle-slider-heading
+	{
+		width: 100%;
+		flex-direction: row;
+		justify-content: space-between;
+		font-size: 14px;
+		color: rgba( 255, 255, 255, 0.75 );
+
+		label:last-child { color: white; }
+	}
+
 	.gs-bottom-row
 	{
 		flex-direction: row;
 		align-items: center;
-		gap: 20px;
+		gap: 24px;
 		width: 100%;
 		justify-content: center;
 		flex-wrap: wrap;
@@ -1145,35 +1318,41 @@ GunsmithPanel
 	{
 		flex-direction: row;
 		align-items: center;
-		gap: 16px;
+		gap: 18px;
 		flex-shrink: 0;
-		width: 340px;
+		width: 380px;
 	}
 
 	.gs-lv-badge
 	{
-		width: 56px;
-		height: 56px;
+		width: 68px;
+		height: 68px;
 		background-color: $gs-accent;
 		color: black;
-		font-size: 26px;
+		font-size: 32px;
 		font-weight: bold;
 		border-radius: 3px;
 		justify-content: center;
 		align-items: center;
 		flex-shrink: 0;
+
+		label
+		{
+			font-size: 32px;
+			text-shadow: none;
+		}
 	}
 
 	.gs-detail-meta
 	{
 		flex-direction: column;
-		gap: 4px;
+		gap: 6px;
 		flex-grow: 1;
 	}
 
 	.gs-detail-name
 	{
-		font-size: 22px;
+		font-size: 27px;
 		font-weight: bold;
 		color: white;
 		letter-spacing: 0.5px;
@@ -1181,8 +1360,8 @@ GunsmithPanel
 
 	.gs-xp-wrap
 	{
-		width: 260px;
-		height: 10px;
+		width: 290px;
+		height: 12px;
 		background-color: rgba( 255, 255, 255, 0.12 );
 		border-radius: 3px;
 		overflow: hidden;
@@ -1198,8 +1377,8 @@ GunsmithPanel
 
 	.gs-xp-label
 	{
-		font-size: 14px;
-		color: $gs-text-dim;
+		font-size: 16px;
+		color: $gs-text-mid;
 		letter-spacing: 0.5px;
 	}
 
@@ -1276,7 +1455,7 @@ GunsmithPanel
 
 	.perk-desc
 	{
-		font-size: 12px;
+		font-size: 15px;
 		color: $gs-text-dim;
 		letter-spacing: 0.3px;
 		margin-left: 12px;
@@ -1319,22 +1498,28 @@ GunsmithPanel
 	{
 		flex-direction: row;
 		align-items: center;
-		gap: 8px;
-		padding: 8px 20px;
+		gap: 10px;
+		padding: 8px 24px;
 		background-color: $gs-panel-bg-light;
 		border-radius: 4px;
 		cursor: pointer;
 		pointer-events: all;
 		color: $gs-text-mid;
-		font-size: 15px;
+		font-size: 20px;
 		font-weight: bold;
 		letter-spacing: 0.5px;
 		flex-shrink: 0;
 		transition: background-color 0.12s ease, color 0.12s ease;
 
+		label
+		{
+			font-size: 20px;
+			letter-spacing: 1px;
+		}
+
 		i
 		{
-			font-size: 18px;
+			font-size: 26px;
 		}
 
 		&:hover
@@ -1367,21 +1552,27 @@ GunsmithPanel
 	{
 		flex-direction: row;
 		align-items: center;
-		gap: 8px;
-		padding: 8px 20px;
+		gap: 10px;
+		padding: 8px 24px;
 		background-color: $gs-panel-bg-light;
 		border-radius: 4px;
 		cursor: pointer;
 		pointer-events: all;
 		color: $gs-text-mid;
-		font-size: 15px;
+		font-size: 20px;
 		font-weight: bold;
 		letter-spacing: 0.5px;
 		transition: background-color 0.12s ease, color 0.12s ease;
 
+		label
+		{
+			font-size: 20px;
+			letter-spacing: 1px;
+		}
+
 		i
 		{
-			font-size: 18px;
+			font-size: 26px;
 		}
 
 		&:hover
@@ -1404,20 +1595,22 @@ GunsmithPanel
 	}
 }
 
-GunsmithPanel.armory-collapsed .gs-bottom.build-mode { left: 0; }
+GunsmithPanel.armory-collapsed .gs-bottom.build-mode { left: 24px; }
 GunsmithPanel.customize-mode .gs-class-panel { display: none; }
 
 GunsmithPanel.compact
 {
 	.gs-topbar { padding: 0 16px; gap: 12px; }
-	.gs-icon-btn { padding: 6px 10px; }
-	.gs-class-panel, .weapon-browser { left: 16px; width: 320px; }
-	.gs-toggle-armory { left: 344px; }
-	.gs-toggle-armory.is-collapsed { left: 16px; }
-	.gs-bottom.build-mode { left: 354px; }
-	.gs-tab-btn { padding: 8px 10px; }
-	.gs-detail-head { width: 290px; }
-	.gs-xp-wrap { width: 210px; }
+	.gs-icon-btn { padding: 6px 12px; }
+	.gs-class-panel, .weapon-browser { left: 16px; width: 340px; }
+	// Armory ends at 356 and the 360-wide attachment column starts 376 from the right.
+	.gs-bottom.build-mode { left: 372px; right: 392px; padding: 14px 16px; }
+	.gs-slot-weapon-name { font-size: 21px; }
+	.gs-tab-btn { padding: 8px 12px; }
+	.gs-detail-head { width: 300px; }
+	.gs-xp-wrap { width: 200px; }
+	.gs-detail-name { font-size: 23px; }
+	.gs-tuning-btn, .gs-loadout-btn { min-width: 140px; padding: 8px 16px; }
 }
 
 GunsmithPanel.narrow
@@ -1428,50 +1621,49 @@ GunsmithPanel.narrow
 	.gs-topbar-actions .gs-icon-btn label { display: none; }
 	.gs-weapon-title { min-width: 0; }
 	.gs-weapon-name { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-	.gs-class-panel, .weapon-browser { width: 280px; }
-	.gs-class-panel { top: 120px; padding: 10px; }
-	.weapon-browser, .weapon-browser.has-many-classes { top: 292px; }
-	.gs-toggle-armory { left: 304px; top: 292px; }
-	.gs-bottom.build-mode { left: 314px; padding: 10px; }
+	.gs-class-panel, .weapon-browser { width: 290px; }
+	.gs-class-panel { padding: 12px; }
+	.gs-bottom.build-mode { left: 322px; right: 332px; padding: 10px; }
 	.gs-bottom { padding: 8px 12px; }
-	.gs-tab-btn { padding: 7px 9px; font-size: 12px; }
+	.gs-tab-btn { padding: 7px 10px; }
+	.gs-tab-btn label { font-size: 16px; }
 	.gs-tab-content { padding: 4px 4px 12px; }
 	.gs-detail-head { width: 100%; min-width: 0; }
 	.gs-detail-meta { min-width: 0; }
 	.gs-xp-wrap { width: 100%; }
-	.gs-detail-name { font-size: 16px; }
+	.gs-detail-name { font-size: 19px; }
 }
 
 GunsmithPanel.portrait
 {
 	.gs-brand { display: none; }
-	.gs-bottom.build-mode { left: 0; max-height: 24%; }
+	.gs-bottom.build-mode { left: 16px; right: 16px; }
 	.weapon-browser { bottom: 26%; }
-	.cust-item { width: 64px; height: 64px; }
+	.cust-item { width: 72px; height: 72px; }
 	.gs-tab-nav { padding: 4px; }
-	.gs-tab-btn { padding: 6px; font-size: 11px; }
+	.gs-tab-btn { padding: 6px; }
+	.gs-tab-btn label { font-size: 14px; }
 }
 
 GunsmithPanel.short
 {
-	.gs-class-panel { top: 120px; }
-	.weapon-browser, .weapon-browser.has-many-classes { top: 292px; overflow-y: scroll; }
+	.weapon-browser { overflow-y: scroll; }
 	.gs-bottom { height: 44%; }
-	.cust-item { width: 64px; height: 64px; }
+	.cust-item { width: 72px; height: 72px; }
 }
 
-GunsmithPanel.compact.armory-collapsed .gs-bottom.build-mode { left: 0; }
+GunsmithPanel.compact.armory-collapsed .gs-bottom.build-mode { left: 16px; }
 
 // Readable controls with full-tile hit targets, shared by Build and Customise.
 GunsmithPanel
 {
-	.gs-mode-tabs { height: 64px; gap: 10px; background-color: rgba( 12, 16, 19, 0.96 ); }
-	.gs-mode-tab { min-width: 170px; font-size: 16px; color: #d7dce0; }
+	.gs-mode-tabs { height: 68px; gap: 12px; background-color: rgba( 12, 16, 19, 0.96 ); }
+	.gs-mode-tab { min-width: 200px; font-size: 19px; color: #d7dce0; }
 	.gs-mode-tab.is-selected { background-color: #ffbd24; color: #111519; }
 	.gs-armory-tab.is-selected { background-color: #303a43; border-color: #ffbd24; color: white; }
 	.gs-armory-tab { position: absolute; left: 24px; }
-	.gs-icon-btn { min-height: 44px; font-size: 15px; gap: 8px; }
-	.gs-class-panel { top: 144px; padding: 14px; background-color: rgba( 19, 24, 28, 0.96 ); border-color: #46515a; }
+	.gs-icon-btn { min-height: 50px; font-size: 17px; gap: 8px; }
+	.gs-class-panel { top: 156px; padding: 16px; background-color: rgba( 19, 24, 28, 0.96 ); border-color: #46515a; }
 	// All classes visible at once (5 per row, max 10) — no sideways scrolling.
 	.gs-class-strip, .gs-class-panel.has-many-classes .gs-class-strip { overflow: hidden; flex-wrap: wrap; gap: 6px; }
 	.gs-class-slot, .gs-class-panel.has-many-classes .gs-class-slot
@@ -1491,34 +1683,35 @@ GunsmithPanel
 	.gs-class-slot.active .gs-class-name { color: white; }
 	.gs-add-class, .gs-class-panel.has-many-classes .gs-add-class { flex: 0 0 18.8%; height: 46px; color: white; background-color: #262e34; }
 	.gs-add-class i { font-size: 22px; }
-	.gs-rename-input { min-height: 42px; background-color: #10161b; border-color: #46515a; }
-	.gs-action-btn { width: 44px; height: 44px; font-size: 20px; }
-	.weapon-browser { top: 326px; background-color: rgba( 19, 24, 28, 0.96 ); border-color: #46515a; overflow-y: scroll; }
-	.weapon-browser.has-many-classes { top: 326px; }
-	.gs-armory-section { color: #adb9c3; letter-spacing: 1.5px; }
-	.gs-slot-row { height: 68px; background-color: #252e35; border-color: #46515a; }
-	.gs-slot-row-sm { height: 58px; }
+	.gs-rename-input { min-height: 52px; background-color: #10161b; border-color: #46515a; }
+	.gs-action-btn { width: 52px; height: 52px; font-size: 26px; }
+	.gs-action-btn i { font-size: 26px; }
+	.weapon-browser { top: 340px; background-color: rgba( 19, 24, 28, 0.96 ); border-color: #46515a; overflow-y: scroll; }
+	.gs-armory-section { color: #adb9c3; letter-spacing: 2px; }
+	.gs-slot-row { height: 84px; background-color: #252e35; border-color: #46515a; }
+	.gs-slot-row-sm { height: 72px; }
 	.gs-slot-row.active { background-color: #393321; border-left-color: #ffbd24; }
 	.gs-slot-type-badge, .gs-slot-lv { color: #ffca54; }
-	.gs-slot-weapon-name { font-size: 18px; }
-	.gs-slot-arrow { color: #cad2d8; font-size: 22px; }
+	.gs-slot-weapon-name { font-size: 24px; }
+	.gs-slot-arrow { color: #cad2d8; font-size: 28px; }
 	.gs-cat-tabs { height: auto; min-height: 98px; }
-	.gs-cat-tab { min-height: 44px; color: #d4dce2; background-color: #303a43; line-height: 16px; }
+	.gs-cat-tab { min-height: 54px; color: #d4dce2; background-color: #303a43; line-height: 20px; }
+	.gs-cat-tab label { font-size: 17px; letter-spacing: 0.5px; }
 	.gs-cat-tab.is-selected { background-color: #ffbd24; color: #111519; }
 	.weapon-list { flex-shrink: 0; min-height: 180px; max-height: 360px; }
-	.weapon-option { min-height: 58px; font-size: 17px; background-color: #242e36; color: #f3f4f5; }
+	.weapon-option { min-height: 68px; font-size: 20px; background-color: #242e36; color: #f3f4f5; }
 	.weapon-option.is-selected { color: white; background-color: #3c3523; border: 1px solid #ffbd24; }
 	.weapon-lv { color: #b8c4ce; }
-	.gs-perk-slot { min-height: 88px; background-color: #252e35; border-color: #46515a; }
-	.gs-perk-slot .gs-perk-icon { color: #d4dce2; font-size: 24px; }
-	.gs-perk-slot .gs-perk-sub { color: #aebbc5; font-size: 12px; }
-	.gs-bottom.build-mode { min-height: 96px; background-color: rgba( 13, 17, 20, 0.98 ); justify-content: center; }
-	.gs-tuning-btn, .gs-loadout-btn { min-height: 50px; min-width: 150px; justify-content: center; }
+	.gs-perk-slot { min-height: 116px; background-color: #252e35; border-color: #46515a; }
+	.gs-perk-slot .gs-perk-icon { color: #d4dce2; font-size: 32px; }
+	.gs-perk-slot .gs-perk-sub { color: #aebbc5; font-size: 14px; }
+	.gs-bottom.build-mode { min-height: 100px; background-color: rgba( 13, 17, 20, 0.98 ); justify-content: center; }
+	.gs-tuning-btn, .gs-loadout-btn { min-height: 60px; min-width: 180px; justify-content: center; }
 	.gs-tuning-btn { background-color: #303a43; color: white; }
 	.gs-loadout-btn { background-color: #ffbd24; color: #111519; }
 	.gs-loadout-btn.set { border-color: #ffbd24; color: #ffca54; }
-	.gs-tab-btn { min-height: 44px; align-items: center; }
-	.cust-item { width: 96px; height: 96px; border-color: #59656e; }
+	.gs-tab-btn { min-height: 52px; align-items: center; }
+	.cust-item { width: 116px; height: 116px; border-color: #59656e; }
 	.gs-bg-vignette { background-image: none; }
 	.gs-tuning-backdrop
 	{
@@ -1532,43 +1725,43 @@ GunsmithPanel
 	}
 	.gs-tuning-dialog
 	{
-		width: 760px;
+		width: 860px;
 		max-width: 92%;
 		max-height: 85%;
 		overflow-y: scroll;
-		padding: 24px;
+		padding: 28px;
 		flex-direction: column;
-		gap: 20px;
+		gap: 22px;
 		background-color: #131a20;
 		border: 1px solid #65717b;
 		border-top: 3px solid #ffbd24;
 	}
-	.gs-tuning-heading { justify-content: space-between; align-items: center; color: white; font-size: 22px; letter-spacing: 1px; }
+	.gs-tuning-heading { justify-content: space-between; align-items: center; color: white; font-size: 28px; letter-spacing: 1px; }
+	.gs-tuning-heading > label { font-size: 28px; letter-spacing: 1.5px; }
 	.gs-tuning-dialog WeaponTuningPanel
 	{
 		width: 100%;
 		max-width: 100%;
 		padding: 0;
 		background-color: transparent;
-		gap: 14px;
+		gap: 16px;
 		.tuning-title { display: none; }
-		.tuning-row { gap: 16px; }
-		.stat-name { width: 130px; font-size: 16px; color: #d4dce2; }
-		.bar-wrap { width: auto; min-width: 60px; flex-shrink: 1; height: 8px; }
-		.controls { width: 140px; justify-content: space-between; }
-		.controls .btn { width: 44px; height: 44px; background-color: #34404a; font-size: 24px; }
-		.controls .val { font-size: 17px; }
-		.reset-row { min-height: 44px; }
+		.tuning-row { gap: 18px; }
+		.stat-name { width: 170px; font-size: 20px; color: #d4dce2; }
+		.bar-wrap { width: auto; min-width: 60px; flex-shrink: 1; height: 10px; }
+		.controls { width: 180px; justify-content: space-between; }
+		.controls .btn { width: 52px; height: 52px; background-color: #34404a; font-size: 28px; }
+		.controls .btn label { font-size: 28px; }
+		.controls .val { width: 52px; font-size: 22px; }
+		.reset-row { min-height: 52px; }
 	}
 }
 
 GunsmithPanel.compact .gs-armory-tab { left: 16px; }
 GunsmithPanel.narrow
 {
-	.gs-mode-tab { min-width: 140px; }
+	.gs-mode-tab { min-width: 150px; }
 	.gs-mode-tabs { justify-content: flex-end; padding-right: 16px; }
-	.gs-class-panel { top: 144px; }
-	.weapon-browser, .weapon-browser.has-many-classes { top: 326px; }
 }
 
 // ===================== CLASS PICKER (dropdown) =====================
@@ -1582,9 +1775,9 @@ GunsmithPanel
 	{
 		flex-direction: row;
 		align-items: center;
-		gap: 12px;
-		height: 64px;
-		padding: 0 14px;
+		gap: 14px;
+		height: 72px;
+		padding: 0 16px;
 		background-color: #262e34;
 		border: 1px solid #4c5862;
 		border-left: 4px solid #ffbd24;
@@ -1598,10 +1791,10 @@ GunsmithPanel
 
 	.gs-class-dd-num
 	{
-		font-size: 30px;
+		font-size: 36px;
 		font-weight: 900;
 		color: #ffbd24;
-		width: 28px;
+		width: 34px;
 		text-align: center;
 		flex-shrink: 0;
 	}
@@ -1615,7 +1808,7 @@ GunsmithPanel
 
 	.gs-class-dd-caption
 	{
-		font-size: 11px;
+		font-size: 14px;
 		font-weight: 700;
 		letter-spacing: 1.5px;
 		color: #aebbc5;
@@ -1623,7 +1816,7 @@ GunsmithPanel
 
 	.gs-class-dd-name
 	{
-		font-size: 22px;
+		font-size: 27px;
 		font-weight: 900;
 		color: white;
 		white-space: nowrap;
@@ -1633,7 +1826,7 @@ GunsmithPanel
 
 	.gs-class-dd-count
 	{
-		font-size: 13px;
+		font-size: 17px;
 		font-weight: 700;
 		color: #aebbc5;
 		flex-shrink: 0;
@@ -1641,7 +1834,7 @@ GunsmithPanel
 
 	.gs-class-dd-chevron
 	{
-		font-size: 28px;
+		font-size: 34px;
 		color: white;
 		flex-shrink: 0;
 	}
@@ -1650,9 +1843,9 @@ GunsmithPanel
 	.gs-class-dd-list
 	{
 		position: absolute;
-		left: 14px;
-		right: 14px;
-		top: 84px;
+		left: 16px;
+		right: 16px;
+		top: 96px;
 		flex-direction: column;
 		max-height: 560px;
 		overflow-y: scroll;
@@ -1669,9 +1862,9 @@ GunsmithPanel
 	{
 		flex-direction: row;
 		align-items: center;
-		gap: 12px;
-		min-height: 54px;
-		padding: 6px 12px;
+		gap: 14px;
+		min-height: 66px;
+		padding: 8px 14px;
 		background-color: #222a30;
 		border: 1px solid transparent;
 		border-radius: 3px;
@@ -1693,16 +1886,16 @@ GunsmithPanel
 			background-color: transparent;
 			border: 1px dashed #4c5862;
 
-			.gs-class-dd-item-num { font-size: 22px; color: #ffbd24; }
-			.gs-class-dd-item-name { font-size: 15px; color: #d7dce0; }
+			.gs-class-dd-item-num { font-size: 28px; color: #ffbd24; }
+			.gs-class-dd-item-name { font-size: 19px; color: #d7dce0; }
 			&:hover { border-color: #ffbd24; }
 		}
 	}
 
 	.gs-class-dd-item-num
 	{
-		width: 28px;
-		font-size: 20px;
+		width: 34px;
+		font-size: 24px;
 		font-weight: 900;
 		color: #aebbc5;
 		text-align: center;
@@ -1718,7 +1911,7 @@ GunsmithPanel
 
 	.gs-class-dd-item-name
 	{
-		font-size: 17px;
+		font-size: 21px;
 		font-weight: 900;
 		color: white;
 		white-space: nowrap;
@@ -1728,15 +1921,15 @@ GunsmithPanel
 
 	.gs-class-dd-item-sub
 	{
-		font-size: 12px;
+		font-size: 14px;
 		font-weight: 700;
 		letter-spacing: 1px;
-		color: #8f9ba5;
+		color: #9aa6b0;
 	}
 
 	.gs-class-dd-check
 	{
-		font-size: 22px;
+		font-size: 28px;
 		color: #ffbd24;
 		flex-shrink: 0;
 	}
@@ -1749,9 +1942,9 @@ GunsmithPanel
 	{
 		flex-direction: row;
 		align-items: center;
-		gap: 12px;
+		gap: 14px;
 		flex-shrink: 0;
-		padding-bottom: 12px;
+		padding-bottom: 14px;
 		margin-bottom: 10px;
 		border-bottom: 1px solid #46515a;
 	}
@@ -1761,16 +1954,16 @@ GunsmithPanel
 		flex-direction: row;
 		align-items: center;
 		gap: 6px;
-		height: 44px;
-		padding: 0 14px 0 10px;
+		height: 52px;
+		padding: 0 16px 0 12px;
 		background-color: #303a43;
 		border: 1px solid #4c5862;
 		border-radius: 3px;
 		cursor: pointer;
 		flex-shrink: 0;
 
-		i { font-size: 20px; color: white; }
-		label { font-size: 14px; font-weight: 800; letter-spacing: 1px; color: white; }
+		i { font-size: 24px; color: white; }
+		label { font-size: 17px; font-weight: 800; letter-spacing: 1px; color: white; }
 
 		&:hover { border-color: #ffbd24; background-color: #3a4650; }
 	}
@@ -1783,7 +1976,7 @@ GunsmithPanel
 
 	.gs-picker-caption
 	{
-		font-size: 11px;
+		font-size: 14px;
 		font-weight: 700;
 		letter-spacing: 1.5px;
 		color: #ffbd24;
@@ -1791,7 +1984,7 @@ GunsmithPanel
 
 	.gs-picker-name
 	{
-		font-size: 20px;
+		font-size: 26px;
 		font-weight: 900;
 		color: white;
 		white-space: nowrap;
@@ -1803,7 +1996,7 @@ GunsmithPanel
 		flex-grow: 1;
 		flex-shrink: 1;
 		min-height: 0;
-		max-height: none;
+		max-height: 100%;
 		overflow-y: scroll;
 	}
 
@@ -1811,14 +2004,15 @@ GunsmithPanel
 	{
 		height: auto;
 		min-height: 0;
-		margin: 0 0 8px 0;
+		gap: 8px;
+		margin: 0 0 10px 0;
 	}
 
 	.gs-picker-list .gs-cat-tab
 	{
 		flex: 1 1 30%;
-		min-height: 44px;
-		font-size: 13px;
+		min-height: 54px;
+		font-size: 17px;
 		white-space: nowrap;
 	}
 }

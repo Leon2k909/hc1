@@ -1,0 +1,37 @@
+{
+  "RootObject": {
+    "__guid": "8ff52831-e03d-5721-95a3-47245c87473e",
+    "Flags": 0,
+    "Name": "MP5 Merc Foregrip",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "4203e737-b7e1-563c-8da4-37ce08b9ed7a",
+        "__enabled": true,
+        "Model": "attachments/mpapa5/shared/attachment_vm_sm_mpapa5_vertgrip03/attachment_vm_sm_mpapa5_vertgrip03.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithBoneAttachment",
+        "__guid": "dde92588-2392-5a2d-b2a9-b5c91da20073",
+        "__enabled": true,
+        "BoneName": "weapon_root",
+        "UseWeaponOrigin": true,
+        "WeaponSpaceOffset": "7.5,0,6.8",
+        "WeaponSpaceScale": 1.0,
+        "MountAtBone": false,
+        "BoneOffset": "0,0,0",
+        "BoneAngles": "0,0,0",
+        "ModelScaleMultiplier": "1,1,1"
+      }
+    ],
+    "Children": []
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

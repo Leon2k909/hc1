@@ -1,0 +1,38 @@
+{
+  "RootObject": {
+    "__guid": "eef86011-47ed-5a64-86dc-b32ec2a50fa5",
+    "Flags": 0,
+    "Name": "MP5 FSS Close Quarters Stock",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "dbaf3766-5523-53cf-991f-a5857753513b",
+        "__enabled": true,
+        "Model": "attachments/mpapa5/shared/att_vm_stock_medium01/att_vm_stock_medium01.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithBoneAttachment",
+        "__guid": "4f32af01-d8be-5ed9-8e52-6386deebbefd",
+        "__enabled": true,
+        "BoneName": "weapon_root",
+        "UseWeaponOrigin": true,
+        "WeaponSpaceOffset": "-5.964,0,8.211",
+        "WeaponSpaceScale": 0.955,
+        "MountAtBone": false,
+        "BoneOffset": "0,0,0",
+        "BoneAngles": "0,0,0",
+        "ModelScaleMultiplier": "1,1,1",
+        "HiddenBone": "stock"
+      }
+    ],
+    "Children": []
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

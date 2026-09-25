@@ -1,38 +1,75 @@
-@import "/UI/Styles/Theme.scss";
+// Rows behave like the pause menu items: yellow left edge + fading yellow wash on hover / selection.
+$sb-accent: #ffbd24;
+$sb-warn: #ff6a5a;
 
 ServerEntry
 {
-    gap: 64px;
-    padding: 16px 16px;
-    border: 0.8px solid rgba( black, 0.35 );
-    transition: all 0.1s ease;
-    cursor: pointer;
-    flex-shrink: 0;
+	flex-direction: row;
+	align-items: center;
+	flex-shrink: 0;
+	gap: 16px;
+	height: 56px;
+	padding: 0 20px;
+	border-left: 4px solid transparent;
+	border-bottom: 1px solid rgba( white, 0.05 );
+	cursor: pointer;
+	transition: all 0.1s ease;
 
-    &:nth-child( odd )
-    {
-        background-color: rgba( black, 0.25 );
-    }
+	.se-name
+	{
+		flex-grow: 1;
+		min-width: 0;
+		font-size: 20px;
+		font-weight: 700;
+		color: rgba( white, 0.8 );
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
 
-    &:nth-child( even )
-    {
-        background-color: rgba( black, 0.5 );
-    }
+	.se-tag
+	{
+		flex-shrink: 0;
+		padding: 2px 8px;
+		font-size: 12px;
+		font-weight: 900;
+		letter-spacing: 2px;
+		text-transform: uppercase;
+		color: $sb-warn;
+		background-color: rgba( 255, 106, 90, 0.14 );
+	}
 
-    .grow
-    {
-        flex-grow: 1;
-    }
+	.se-players
+	{
+		flex-direction: row;
+		align-items: center;
+		justify-content: flex-end;
+		flex-shrink: 0;
+		gap: 8px;
+		width: 120px;
 
-    &:hover, &.selected
-    {
-        background-color: rgba( white, 1 );
-        sound-in: ui.button.over;
+		i { font-size: 18px; color: rgba( white, 0.35 ); }
+		label { font-size: 18px; font-weight: 700; color: rgba( white, 0.7 ); }
+	}
 
-        label
-        {
-            color: black;
-            text-shadow: 1px 1px 2px rgba( black, 0 );
-        }
-    }
+	&:hover
+	{
+		border-left-color: rgba( 255, 189, 36, 0.5 );
+		background: linear-gradient( to right, rgba( 255, 189, 36, 0.12 ), rgba( 255, 189, 36, 0 ) );
+		sound-in: ui.button.over;
+
+		.se-name { color: white; }
+	}
+
+	&.selected
+	{
+		border-left-color: $sb-accent;
+		background: linear-gradient( to right, rgba( 255, 189, 36, 0.24 ), rgba( 255, 189, 36, 0 ) );
+
+		.se-name { color: white; }
+		.se-players i { color: $sb-accent; }
+		.se-players label { color: white; }
+	}
+
+	&.full .se-players label { color: $sb-warn; }
 }

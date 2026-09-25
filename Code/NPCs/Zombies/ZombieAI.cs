@@ -137,6 +137,9 @@ public sealed class ZombieAI : Component, Component.IDamageable
 			return;
 		}
 
+		if ( Agent.IsValid() && Agent.Enabled && WaitForDoor() )
+			return;
+
 		var toTarget = (_target.WorldPosition - WorldPosition).WithZ( 0 );
 		if ( toTarget.LengthSquared > 0.1f )
 			WorldRotation = Rotation.Lerp( WorldRotation, Rotation.LookAt( toTarget.Normal, Vector3.Up ), Time.Delta * 10f );
@@ -152,11 +155,12 @@ public sealed class ZombieAI : Component, Component.IDamageable
 				Agent.MoveTo( _target.WorldPosition + GetSeparationOffset() );
 		}
 
-		if ( dist <= AttackRange && _lastAttack > AttackCooldown && !_swingPending )
-			StartSwing();
-
 		if ( !attacking )
 			SetAnim( Agent.IsValid() && Agent.Velocity.Length > 10f ? AnimState.Move : AnimState.Idle );
+
+		// Start the attack after selecting idle/move so this update can't overwrite its attack pose.
+		if ( dist <= AttackRange && _lastAttack > AttackCooldown && !_swingPending )
+			StartSwing();
 
 		UpdateStuck( dist );
 	}
@@ -197,6 +201,40 @@ public sealed class ZombieAI : Component, Component.IDamageable
 			ZombiesRoundSystem.Current?.OnZombieRecycled();
 			GameObject.Destroy();
 		}
+	}
+
+	private TerrorTown.MapMover _door;
+	private TimeUntil _doorGiveUp;
+	private TimeSince _timeSinceDoorCheck;
+
+	/// <summary>A shut door in the way: shove it open and wait until it's open enough to get through.</summary>
+	private bool WaitForDoor()
+	{
+		if ( _door.IsValid() )
+		{
+			if ( _door.OpenAmount < TerrorTown.MapMover.OpenEnough && _doorGiveUp.Relative > 0f && _door.OpenForNpc( WorldPosition ) )
+				return true;
+
+			_door = null;
+			// Waiting at a door isn't being wedged.
+			_stuckAnchor = WorldPosition;
+			_timeSinceStuck = 0;
+			return false;
+		}
+
+		if ( _timeSinceDoorCheck < 0.1f )
+			return false;
+
+		_timeSinceDoorCheck = 0;
+		var door = TerrorTown.MapMover.FindDoorAhead( Scene, WorldPosition, Agent.Velocity );
+		if ( !door.IsValid() || !door.OpenForNpc( WorldPosition ) )
+			return false;
+
+		_door = door;
+		_doorGiveUp = 2f;
+		Agent.Stop();
+		SetAnim( AnimState.Attack );
+		return true;
 	}
 
 	private static bool IsValidTarget( PlayerPawn p ) =>
@@ -389,6 +427,7 @@ public sealed class ZombieAI : Component, Component.IDamageable
 		// Models without physics: topple the whole body instead.
 		if ( !_ragdolled && _rb.IsValid() )
 		{
+			_rb.RigidbodyFlags |= RigidbodyFlags.DisableCollisionSounds;
 			_rb.MotionEnabled = true;
 			_rb.Enabled = true;
 
@@ -419,16 +458,24 @@ public sealed class ZombieAI : Component, Component.IDamageable
 		if ( !Renderer.IsValid() || Renderer.Model?.Physics is null ) return;
 		_ragdolled = true;
 		Renderer.UseAnimGraph = false;
+		// Footsteps look through corpses to the floor (PlayerFootsteps).
+		GameObject.Tags.Add( "corpse" );
 
 		if ( _rb.IsValid() ) _rb.Enabled = false;
 		foreach ( var c in Components.GetAll<Collider>() ) c.Enabled = false;
 
+		// Bumping into a corpse is silent: no flesh impact sounds from its bodies.
 		var physics = Components.Create<ModelPhysics>();
+		physics.RigidbodyFlags |= RigidbodyFlags.DisableCollisionSounds;
 		physics.Model = Renderer.Model;
 		physics.Renderer = Renderer;
 
 		foreach ( var part in physics.Bodies )
-			if ( part.Component is Rigidbody rb ) rb.Velocity = push * 200f + Vector3.Up * 60f;
+		{
+			if ( part.Component is not Rigidbody rb ) continue;
+			rb.RigidbodyFlags |= RigidbodyFlags.DisableCollisionSounds;
+			rb.Velocity = push * 200f + Vector3.Up * 60f;
+		}
 	}
 
 	[Rpc.Broadcast]

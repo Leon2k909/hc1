@@ -1,0 +1,1119 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc30:version{8c2d7a91-9c42-4bf0-883a-5a3b1762d4f1} -->
+{
+	rootNode = 
+	{
+		_class = "RootNode"
+		children = 
+		[
+			{
+				_class = "MaterialGroupList"
+				children = 
+				[
+					{
+						_class = "DefaultMaterialGroup"
+						remaps = 
+						[
+							{
+								from = "ximage_70eb638a9a70670f.vmat"
+								to = "weapons/vityaz/materials/vityaz_receiver.vmat"
+							},
+							{
+								from = "ximage_1242d1cf91d4bf3.vmat"
+								to = "weapons/vityaz/materials/vityaz_toprail.vmat"
+							},
+							{
+								from = "ximage_677c5f5598bf5318.vmat"
+								to = "weapons/vityaz/materials/vityaz_barrel.vmat"
+							},
+							{
+								from = "ximage_6575aebf2991ff6f.vmat"
+								to = "weapons/vityaz/materials/vityaz_brake.vmat"
+							},
+							{
+								from = "wpn_p04_sm_aviktor_mag_9p_v0.vmat"
+								to = "weapons/vityaz/materials/vityaz_mag.vmat"
+							},
+							{
+								from = "wpn_p04_sm_aviktor_xmag_9p_v0.vmat"
+								to = "weapons/vityaz/materials/vityaz_xmag.vmat"
+							},
+							{
+								from = "att_ammo_9p.vmat"
+								to = "weapons/vityaz/materials/vityaz_rounds.vmat"
+							},
+							{
+								from = "wpn_p04_sm_aviktor_barrel_v0.vmat"
+								to = "weapons/vityaz/materials/vityaz_barrel.vmat"
+							},
+							{
+								from = "wpn_p04_sm_aviktor_brake_v0.vmat"
+								to = "weapons/vityaz/materials/vityaz_brake.vmat"
+							},
+							{
+								from = "xmaterial_1c0fbe815cee2ced.vmat"
+								to = "weapons/kastov74u/materials/ks74u_stock.vmat"
+							},
+							{
+								from = "wpn_p04_ar_akilo_pstlgrip_v0.vmat"
+								to = "weapons/kastov74u/materials/ks74u_pistolgrip.vmat"
+							},
+							{
+								from = "xmaterial_7fbb0a572b2df63.vmat"
+								to = "weapons/kastov74u/materials/ks74u_stock_skeleton.vmat"
+							},
+							{
+								from = "xmaterial_72129c296198ca6f.vmat"
+								to = "weapons/kastov74u/materials/ks74u_stock_spetsnaz.vmat"
+							},
+							{
+								from = "xmaterial_565b28beb19da10.vmat"
+								to = "weapons/kastov74u/materials/ks74u_stock_wood.vmat"
+							},
+							{
+								from = "xmaterial_7c8b5a0f01933b53.vmat"
+								to = "weapons/kastov74u/materials/ks74u_stock_tac.vmat"
+							},
+							{
+								from = "xmaterial_6c091df09c21d2a5.vmat"
+								to = "weapons/kastov74u/materials/ks74u_stock_tac02.vmat"
+							},
+							{
+								from = "xmaterial_7e736406c37951b4.vmat"
+								to = "weapons/kastov74u/materials/ks74u_stock_wire.vmat"
+							},
+							{
+								from = "xmaterial_7751c7fa2ecc7b00.vmat"
+								to = "weapons/kastov74u/materials/ks74u_stock_broadside.vmat"
+							},
+							{
+								from = "xmaterial_2a0266bcd0128fde.vmat"
+								to = "weapons/kastov74u/materials/ks74u_stock_exo.vmat"
+							},
+							{
+								from = "xmaterial_535b60d017059ff0.vmat"
+								to = "weapons/kastov74u/materials/ks74u_stock_rpk.vmat"
+							},
+							{
+								from = "xmaterial_7cdb053d4abc6fc7.vmat"
+								to = "weapons/kastov74u/materials/ks74u_stock_rpk_heavy.vmat"
+							},
+							{
+								from = "xmaterial_78c49d1377297bd1.vmat"
+								to = "weapons/kastov74u/materials/ks74u_grip_tac.vmat"
+							},
+							{
+								from = "xmaterial_4bdf66a36afc9521.vmat"
+								to = "weapons/kastov74u/materials/ks74u_grip_steady.vmat"
+							},
+							{
+								from = "xmaterial_34f83c1410c9afaa.vmat"
+								to = "weapons/kastov74u/materials/ks74u_grip_demo.vmat"
+							},
+							{
+								from = "xmaterial_69c574f075d5df8e.vmat"
+								to = "weapons/kastov74u/materials/ks74u_grip_shotgun.vmat"
+							},
+							{
+								from = "xmaterial_2c6a8fc7ddc7cb85.vmat"
+								to = "weapons/kastov74u/materials/ks74u_grip_brace.vmat"
+							},
+						]
+						use_global_default = false
+						global_default_material = ""
+					},
+				]
+			},
+			{
+				_class = "BoneMarkupList"
+				bone_cull_type = "None"
+			},
+			{
+				_class = "RenderMeshList"
+				children = 
+				[
+					{
+						_class = "RenderMeshFile"
+						name = "v_vityaz"
+						filename = "weapons/vityaz/models/v_vityaz.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_vityaz_muzzle_tip"
+						filename = "weapons/vityaz/models/v_vityaz_muzzle_tip.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_vityaz_muzzle_tip_long"
+						filename = "weapons/vityaz/models/v_vityaz_muzzle_tip_long.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_vityaz_stock_ar_akilo_stock_v0"
+						filename = "weapons/vityaz/models/v_vityaz_stock_ar_akilo_stock_v0.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_vityaz_stock_ar_akilo74_stock_v0"
+						filename = "weapons/vityaz/models/v_vityaz_stock_ar_akilo74_stock_v0.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_vityaz_stock_sh_vecho_stocktac_v0"
+						filename = "weapons/vityaz/models/v_vityaz_stock_sh_vecho_stocktac_v0.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_vityaz_stock_ar_akilo_stockh_v0"
+						filename = "weapons/vityaz/models/v_vityaz_stock_ar_akilo_stockh_v0.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_vityaz_stock_ar_akilo_stocktac_v0"
+						filename = "weapons/vityaz/models/v_vityaz_stock_ar_akilo_stocktac_v0.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_vityaz_stock_ar_akilo_stocktac02_v0"
+						filename = "weapons/vityaz/models/v_vityaz_stock_ar_akilo_stocktac02_v0.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_vityaz_stock_ar_akilo_stockwire_v0"
+						filename = "weapons/vityaz/models/v_vityaz_stock_ar_akilo_stockwire_v0.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_vityaz_stock_ar_akilo74_stockno_v0"
+						filename = "weapons/vityaz/models/v_vityaz_stock_ar_akilo74_stockno_v0.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_vityaz_stock_ar_akilo74_stockskel_v0"
+						filename = "weapons/vityaz/models/v_vityaz_stock_ar_akilo74_stockskel_v0.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_vityaz_stock_lm_rkilo_stock_v0"
+						filename = "weapons/vityaz/models/v_vityaz_stock_lm_rkilo_stock_v0.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_vityaz_stock_lm_rkilo_stockh_v0"
+						filename = "weapons/vityaz/models/v_vityaz_stock_lm_rkilo_stockh_v0.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_vityaz_pistol_grip_ar_akilo_pstlgrp_v0"
+						filename = "weapons/vityaz/models/v_vityaz_pistol_grip_ar_akilo_pstlgrp_v0.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_vityaz_pistol_grip_sh_vecho_pgrip_v0"
+						filename = "weapons/vityaz/models/v_vityaz_pistol_grip_sh_vecho_pgrip_v0.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_vityaz_pistol_grip_ar_akilo_griptac_v0"
+						filename = "weapons/vityaz/models/v_vityaz_pistol_grip_ar_akilo_griptac_v0.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_vityaz_pistol_grip_ar_akilo_gripstdy_v0"
+						filename = "weapons/vityaz/models/v_vityaz_pistol_grip_ar_akilo_gripstdy_v0.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_vityaz_pistol_grip_ar_akilo_gripass_v0"
+						filename = "weapons/vityaz/models/v_vityaz_pistol_grip_ar_akilo_gripass_v0.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_vityaz_pistol_grip_sh_vecho_gripsnp_v0"
+						filename = "weapons/vityaz/models/v_vityaz_pistol_grip_sh_vecho_gripsnp_v0.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_vityaz_magazine_sm_aviktor_mag_v0"
+						filename = "weapons/vityaz/models/v_vityaz_magazine_sm_aviktor_mag_v0.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_vityaz_magazine_sm_aviktor_xmag_v0"
+						filename = "weapons/vityaz/models/v_vityaz_magazine_sm_aviktor_xmag_v0.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_vityaz_barrel_sm_aviktor_barrel_v0"
+						filename = "weapons/vityaz/models/v_vityaz_barrel_sm_aviktor_barrel_v0.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_vityaz_barrel_sm_aviktor_barlightlong_v0"
+						filename = "weapons/vityaz/models/v_vityaz_barrel_sm_aviktor_barlightlong_v0.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+				]
+			},
+			{
+				_class = "BodyGroupList"
+				children = 
+				[
+					{
+						_class = "BodyGroup"
+						name = "muzzle_tip"
+						children = 
+						[
+							{
+								_class = "BodyGroupChoice"
+								name = "on"
+								meshes = 
+								[
+									"v_vityaz_muzzle_tip",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "long"
+								meshes = 
+								[
+									"v_vityaz_muzzle_tip_long",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "off"
+								meshes = 
+								[
+									"",
+								]
+							},
+						]
+						hidden_in_tools = false
+					},
+					{
+						_class = "BodyGroup"
+						name = "stock"
+						children = 
+						[
+							{
+								_class = "BodyGroupChoice"
+								name = "ar_akilo_stock_v0"
+								meshes = 
+								[
+									"v_vityaz_stock_ar_akilo_stock_v0",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ar_akilo74_stock_v0"
+								meshes = 
+								[
+									"v_vityaz_stock_ar_akilo74_stock_v0",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "sh_vecho_stocktac_v0"
+								meshes = 
+								[
+									"v_vityaz_stock_sh_vecho_stocktac_v0",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ar_akilo_stockh_v0"
+								meshes = 
+								[
+									"v_vityaz_stock_ar_akilo_stockh_v0",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ar_akilo_stocktac_v0"
+								meshes = 
+								[
+									"v_vityaz_stock_ar_akilo_stocktac_v0",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ar_akilo_stocktac02_v0"
+								meshes = 
+								[
+									"v_vityaz_stock_ar_akilo_stocktac02_v0",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ar_akilo_stockwire_v0"
+								meshes = 
+								[
+									"v_vityaz_stock_ar_akilo_stockwire_v0",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ar_akilo74_stockno_v0"
+								meshes = 
+								[
+									"v_vityaz_stock_ar_akilo74_stockno_v0",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ar_akilo74_stockskel_v0"
+								meshes = 
+								[
+									"v_vityaz_stock_ar_akilo74_stockskel_v0",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "lm_rkilo_stock_v0"
+								meshes = 
+								[
+									"v_vityaz_stock_lm_rkilo_stock_v0",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "lm_rkilo_stockh_v0"
+								meshes = 
+								[
+									"v_vityaz_stock_lm_rkilo_stockh_v0",
+								]
+							},
+						]
+						hidden_in_tools = false
+					},
+					{
+						_class = "BodyGroup"
+						name = "pistol_grip"
+						children = 
+						[
+							{
+								_class = "BodyGroupChoice"
+								name = "ar_akilo_pstlgrp_v0"
+								meshes = 
+								[
+									"v_vityaz_pistol_grip_ar_akilo_pstlgrp_v0",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "sh_vecho_pgrip_v0"
+								meshes = 
+								[
+									"v_vityaz_pistol_grip_sh_vecho_pgrip_v0",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ar_akilo_griptac_v0"
+								meshes = 
+								[
+									"v_vityaz_pistol_grip_ar_akilo_griptac_v0",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ar_akilo_gripstdy_v0"
+								meshes = 
+								[
+									"v_vityaz_pistol_grip_ar_akilo_gripstdy_v0",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ar_akilo_gripass_v0"
+								meshes = 
+								[
+									"v_vityaz_pistol_grip_ar_akilo_gripass_v0",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "sh_vecho_gripsnp_v0"
+								meshes = 
+								[
+									"v_vityaz_pistol_grip_sh_vecho_gripsnp_v0",
+								]
+							},
+						]
+						hidden_in_tools = false
+					},
+					{
+						_class = "BodyGroup"
+						name = "magazine"
+						children = 
+						[
+							{
+								_class = "BodyGroupChoice"
+								name = "sm_aviktor_mag_v0"
+								meshes = 
+								[
+									"v_vityaz_magazine_sm_aviktor_mag_v0",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "sm_aviktor_xmag_v0"
+								meshes = 
+								[
+									"v_vityaz_magazine_sm_aviktor_xmag_v0",
+								]
+							},
+						]
+						hidden_in_tools = false
+					},
+					{
+						_class = "BodyGroup"
+						name = "barrel"
+						children = 
+						[
+							{
+								_class = "BodyGroupChoice"
+								name = "sm_aviktor_barrel_v0"
+								meshes = 
+								[
+									"v_vityaz_barrel_sm_aviktor_barrel_v0",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "sm_aviktor_barlightlong_v0"
+								meshes = 
+								[
+									"v_vityaz_barrel_sm_aviktor_barlightlong_v0",
+								]
+							},
+						]
+						hidden_in_tools = false
+					},
+				]
+			},
+			{
+				_class = "AnimationList"
+				children = 
+				[
+					{
+						_class = "AnimFile"
+						name = "idle"
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = true
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/vityaz/models/anims/idle.dmx"
+						start_frame = -1
+						end_frame = -1
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "draw"
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = false
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/vityaz/models/anims/draw.dmx"
+						start_frame = -1
+						end_frame = -1
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "fire"
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = false
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/vityaz/models/anims/fire.dmx"
+						start_frame = -1
+						end_frame = -1
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "reload"
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = false
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/vityaz/models/anims/reload.dmx"
+						start_frame = -1
+						end_frame = -1
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "reload_empty"
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = false
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/vityaz/models/anims/reload_empty.dmx"
+						start_frame = -1
+						end_frame = -1
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "sprint"
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = true
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/vityaz/models/anims/sprint.dmx"
+						start_frame = -1
+						end_frame = -1
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "lowered"
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = true
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/vityaz/models/anims/lowered.dmx"
+						start_frame = -1
+						end_frame = -1
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "ads"
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = true
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/vityaz/models/anims/ads.dmx"
+						start_frame = -1
+						end_frame = -1
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "walk"
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = true
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/vityaz/models/anims/walk.dmx"
+						start_frame = -1
+						end_frame = -1
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "zero_delta"
+						children = 
+						[
+							{
+								_class = "AnimSubtract"
+								anim_name = "idle"
+								frame = 0
+							},
+						]
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = true
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/vityaz/models/anims/idle.dmx"
+						start_frame = -1
+						end_frame = -1
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "ads_delta"
+						children = 
+						[
+							{
+								_class = "AnimSubtract"
+								anim_name = "idle"
+								frame = 0
+							},
+						]
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = true
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/vityaz/models/anims/ads.dmx"
+						start_frame = -1
+						end_frame = -1
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "walk_delta"
+						children = 
+						[
+							{
+								_class = "AnimSubtract"
+								anim_name = "idle"
+								frame = 0
+							},
+						]
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = true
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/vityaz/models/anims/walk.dmx"
+						start_frame = -1
+						end_frame = -1
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+				]
+				default_root_bone_name = ""
+			},
+			{
+				_class = "AttachmentList"
+				children = 
+				[
+					{
+						_class = "Attachment"
+						name = "muzzle"
+						parent_bone = "muzzle"
+						relative_origin = [ 0.0, 0.0, 0.0 ]
+						relative_angles = [ 0.0, 0.0, 0.0 ]
+						weight = 1.0
+						ignore_rotation = false
+					},
+					{
+						_class = "Attachment"
+						name = "eject"
+						parent_bone = "tag_brass"
+						relative_origin = [ 0.0, 0.0, 0.0 ]
+						relative_angles = [ 0.0, 0.0, 0.0 ]
+						weight = 1.0
+						ignore_rotation = false
+					},
+				]
+			},
+		]
+		model_archetype = ""
+		primary_associated_entity = ""
+		anim_graph_name = "weapons/vityaz/v_vityaz.vanmgrph"
+		base_model_name = ""
+	}
+}

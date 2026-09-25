@@ -1,0 +1,88 @@
+{
+  "RootObject": {
+    "__guid": "d5f90417-56e6-48cc-a2be-9c5cafed698d",
+    "Flags": 0,
+    "Name": "MP5 Integral Suppressor Barrel",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "a427a4b5-c64d-42ed-862b-8a75633b655c",
+        "__enabled": true,
+        "Model": "attachments/mpapa5/barrels/barrel_integral_suppressor/barrel_integral_suppressor.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithSocketAttachment",
+        "__guid": "27819db8-a407-4ccd-ba39-02e3cf1ba6e0",
+        "__enabled": true,
+        "SocketName": "muzzle",
+        "UseWeaponOrigin": true,
+        "WeaponSpaceOffset": "2.652,-0.248,8.128",
+        "WeaponSpaceScale": 1.122,
+        "SocketOffset": "-9.642,-0.221,0.009",
+        "SocketAngles": "0,0,0"
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "c5cae920-622e-512d-818e-4271d48e426b",
+        "Flags": 0,
+        "Name": "Existing MP5 barrel and sights",
+        "Position": "0,0,0",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Enabled": true,
+        "NetworkMode": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.ModelRenderer",
+            "__guid": "d021930e-9cbb-5b90-9b9c-88821981bdb4",
+            "__enabled": true,
+            "Model": "attachments/mpapa5/native_receiver/native_front.vmdl",
+            "Tint": "1,1,1,1"
+          },
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithMp5NativeReceiver",
+            "__guid": "e1b91fee-6597-59f3-9891-d70cde48f92f",
+            "__enabled": true,
+            "BoneName": "weapon_root"
+          }
+        ],
+        "Children": []
+      },
+      {
+        "__guid": "22549e2c-cfd7-5a72-a7fd-162cbe18b84b",
+        "Flags": 0,
+        "Name": "Existing MP5 bolt",
+        "Position": "0,0,0",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Enabled": true,
+        "NetworkMode": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.ModelRenderer",
+            "__guid": "4d9bd25b-23b1-5652-add7-b1fd253984bd",
+            "__enabled": true,
+            "Model": "attachments/mpapa5/native_receiver/native_bolt.vmdl",
+            "Tint": "1,1,1,1"
+          },
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithMp5NativeReceiver",
+            "__guid": "9ccfeae5-05ff-53a4-9366-6f7a8a4af4b2",
+            "__enabled": true,
+            "BoneName": "bolt"
+          }
+        ],
+        "Children": []
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

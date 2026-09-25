@@ -30,7 +30,8 @@ public class MountPoint
 
 			if ( inst.IsValid() )
 			{
-				Facepunch.Gunsmith.GunsmithLoadoutManager.ApplyAttachments( equipment.Resource, inst );
+				if ( equipment.ApplySavedAttachments )
+					Facepunch.Gunsmith.GunsmithLoadoutManager.ApplyAttachments( equipment.Resource, inst );
 				inst.BreakFromPrefab();
 				Mounted.Add( equipment, inst );
 			}

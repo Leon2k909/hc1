@@ -1,0 +1,32 @@
+{
+  "Name": "PP-19-01 Vityaz",
+  "Description": "Russian 9x19mm submachine gun built on the AK-74. Straight blowback, 30-round magazine.",
+  "Slot": "Primary",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": true,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/guns/vityaz_01.png",
+  "IsPurchasable": true,
+  "Price": 1500,
+  "KillReward": 600,
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/vityaz/weapon_vityaz.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/vityaz/wm_vityaz.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/vityaz/vm_vityaz.prefab"
+  },
+  "WorldModel": "weapons/vityaz/w_vityaz.vmdl",
+  "ArmorReduction": null,
+  "HelmetReduction": null,
+  "WorldModelBodyGroups": 0,
+  "__references": [],
+  "__version": 0,
+  "Category": "SMG",
+  "GunsmithOffset": "0,0,4"
+}

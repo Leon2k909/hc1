@@ -18,9 +18,12 @@ public sealed partial class GameMode : SingletonComponent<GameMode>, Component.I
 	public static string ActivePath { get; private set; }
 
 	/// <summary>
-	/// Whether the next game session should use hardcore rules.
+	/// Whether the next game session should use hardcore rules. Core modes are switched off for now, so every
+	/// multiplayer match is hardcore; only Zombies turns it off.
 	/// </summary>
-	public static bool ActiveHardcore { get; private set; }
+	public static bool ActiveHardcore { get; private set; } = true;
+	// Put back when Core modes return:
+	// public static bool ActiveHardcore { get; private set; }
 
 	public static string ActiveIdent { get; private set; }
 
@@ -60,9 +63,11 @@ public sealed partial class GameMode : SingletonComponent<GameMode>, Component.I
 	public string Ident { get; set; } = "gamemode";
 
 	/// <summary>
-	/// Title prefixed with "HC " when Hardcore is enabled.
+	/// The title to show. Hardcore is the only ruleset while Core modes are off, so it isn't marked "HC ".
 	/// </summary>
-	public string DisplayTitle => Hardcore ? $"HC {Title}" : Title;
+	public string DisplayTitle => Title;
+	// Put back when Core modes return:
+	// public string DisplayTitle => Hardcore ? $"HC {Title}" : Title;
 
 	private StateMachineComponent _stateMachine;
 

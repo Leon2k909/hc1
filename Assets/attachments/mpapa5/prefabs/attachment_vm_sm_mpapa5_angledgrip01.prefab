@@ -1,0 +1,37 @@
+{
+  "RootObject": {
+    "__guid": "7aa3e40e-94dc-5c04-83dc-2dd002fe834a",
+    "Flags": 0,
+    "Name": "MP5 Commando Foregrip",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "52b292b6-a33f-5698-aaf3-b5d6b6393c2a",
+        "__enabled": true,
+        "Model": "attachments/mpapa5/shared/attachment_vm_sm_mpapa5_angledgrip01/attachment_vm_sm_mpapa5_angledgrip01.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithBoneAttachment",
+        "__guid": "02eba089-f21f-59ba-817b-53a08f27588c",
+        "__enabled": true,
+        "BoneName": "weapon_root",
+        "UseWeaponOrigin": true,
+        "WeaponSpaceOffset": "7.5,0,6.8",
+        "WeaponSpaceScale": 1.0,
+        "MountAtBone": false,
+        "BoneOffset": "0,0,0",
+        "BoneAngles": "0,0,0",
+        "ModelScaleMultiplier": "1,1,1"
+      }
+    ],
+    "Children": []
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

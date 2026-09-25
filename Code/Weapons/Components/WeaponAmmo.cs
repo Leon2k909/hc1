@@ -88,15 +88,17 @@ public partial class WeaponAmmo : Component, IDroppedWeaponState<WeaponAmmo>
 	[Property] public bool HasAmmo => Ammo > 0;
 
 	/// <summary>
-	/// Maximum ammo after applying the player's mag-size tuning (+10 = +40%).
+	/// Fitted magazine capacity, or the weapon's default capacity with optional tuning.
 	/// </summary>
 	public int GetEffectiveMaxAmmo()
 	{
 		var equip = Components.Get<Equipment>( FindMode.InParent );
 		if ( equip?.Resource is null ) return MaxAmmo;
+		// A fitted magazine has a physical round count. Weapon tuning cannot
+		// turn a marked 15/30/45/60-round magazine into another capacity.
+		if ( equip.AttachmentMagazineCapacity > 0 ) return equip.AttachmentMagazineCapacity;
 		var tune = WeaponTuningManager.GetTuning( equip.Resource.ResourceName );
-		var capacity = equip.AttachmentMagazineCapacity > 0 ? equip.AttachmentMagazineCapacity : MaxAmmo;
-		return Math.Max( 1, (int)(capacity * (1f + tune.MagSize * 0.04f)) );
+		return Math.Max( 1, (int)(MaxAmmo * (1f + tune.MagSize * 0.04f)) );
 	}
 
 	/// <summary>

@@ -1,0 +1,38 @@
+{
+  "RootObject": {
+    "__guid": "9ae0bf7e-f4e0-5f78-86a8-3560f47a285d",
+    "Flags": 0,
+    "Name": "MP5 FORGE TAC Stalker",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "68a7e90d-208a-5de4-890c-27a0ac00063d",
+        "__enabled": true,
+        "Model": "attachments/mpapa5/shared/att_vm_stock_heavy01/att_vm_stock_heavy01.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithBoneAttachment",
+        "__guid": "61c92a25-9104-56ea-a7fa-c617160b5862",
+        "__enabled": true,
+        "BoneName": "weapon_root",
+        "UseWeaponOrigin": true,
+        "WeaponSpaceOffset": "-5.964,0,8.211",
+        "WeaponSpaceScale": 0.955,
+        "MountAtBone": false,
+        "BoneOffset": "0,0,0",
+        "BoneAngles": "0,0,0",
+        "ModelScaleMultiplier": "1,1,1",
+        "HiddenBone": "stock"
+      }
+    ],
+    "Children": []
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

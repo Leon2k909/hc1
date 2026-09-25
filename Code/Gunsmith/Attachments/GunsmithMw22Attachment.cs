@@ -36,6 +36,10 @@ public sealed class GunsmithMw22Attachment : GunsmithAttachment, ICameraSetup
 		factory.Refresh();
 	}
 
+	/// <summary>The weapon takes M4 parts on its own mounts (<see cref="GunsmithAttachmentPoint.MountBone"/>).</summary>
+	internal static bool IsRemounted( IEnumerable<GunsmithAttachmentPoint> points ) =>
+		points.Any( p => !string.IsNullOrEmpty( p.MountBone ) );
+
 	protected override void OnUpdate() => RefreshMount();
 
 	protected override void OnPreRender() => UpdateLaser();
@@ -82,7 +86,9 @@ public sealed class GunsmithMw22Attachment : GunsmithAttachment, ICameraSetup
 			if ( AttachmentPoint.Category == GunsmithPartType.Underbarrel && !IsLauncher ) position = barrel.BarrelGrip;
 			if ( AttachmentPoint.Category == GunsmithPartType.Laser ) { position = barrel.BarrelLaser; angles = new Angles( 0, 0, 90 ); }
 		}
-		var pose = BoneDelta( weapon, BoneName );
+		if ( AttachmentPoint.Category == GunsmithPartType.Muzzle ) position += GunsmithAttachmentPoint.MuzzleShift( weapon.GameObject );
+		position += AttachmentPoint.MountOffset;
+		var pose = BoneDelta( weapon, string.IsNullOrEmpty( AttachmentPoint.MountBone ) ? BoneName : AttachmentPoint.MountBone );
 		WorldPosition = pose.PointToWorld( position );
 		WorldRotation = pose.Rotation * Rotation.From( angles );
 		WorldScale = pose.Scale * PartScale;
@@ -169,9 +175,10 @@ public sealed class GunsmithMw22Factory : Component, ICameraSetup
 		var grip = GunsmithMw22Attachment.Find( weapon, GunsmithPartType.RearGrip ).IsValid();
 		var muzzle = GunsmithMw22Attachment.Find( weapon, GunsmithPartType.Muzzle ).IsValid();
 		var magazine = GunsmithMw22Attachment.Find( weapon, GunsmithPartType.Magazine ).IsValid();
-		var active = barrel || stock || grip || muzzle;
 		var world = weapon.Model.BoneCount == 0;
 		var points = weapon.Components.GetAll<GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants );
+		// Other weapons fitting the M4's parts have none of its factory pieces to swap in.
+		var active = (barrel || stock || grip || muzzle) && !GunsmithMw22Attachment.IsRemounted( points );
 		// Any fitted muzzle device (including socket-mounted HC1 parts) replaces the factory flash hider.
 		muzzle |= points.Any( p => p.Category == GunsmithPartType.Muzzle && p.CurrentPart.IsValid() );
 		if ( world && active ) stock |= points.Any( p => p.Category == GunsmithPartType.Stock && p.CurrentPart.IsValid() );

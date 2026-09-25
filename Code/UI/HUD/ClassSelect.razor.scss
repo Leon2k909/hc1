@@ -1,0 +1,371 @@
+@import "/UI/Styles/Theme.scss";
+
+ClassSelect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    pointer-events: none;
+    font-family: $main-font;
+    color: white;
+
+    &.visible {
+        pointer-events: all;
+        cursor: default;
+        background-color: rgba( black, 0.45 );
+        backdrop-filter: blur( 6px );
+    }
+
+    .window {
+        flex-direction: row;
+        gap: 12px;
+    }
+
+    .class-list {
+        flex-direction: column;
+        gap: 4px;
+        width: 340px;
+    }
+
+    .heading {
+        font-size: 34px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        margin-bottom: 12px;
+        text-shadow: 0 2px 6px rgba( black, 0.6 );
+    }
+
+    .class-button {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        height: 52px;
+        padding: 0 16px;
+        background-color: rgba( black, 0.6 );
+        border-left: 4px solid transparent;
+        border-radius: $rounding;
+        transition: all 0.08s ease;
+
+        .class-name {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .class-tag {
+            font-size: 12px;
+            letter-spacing: 1px;
+            color: $main-color;
+        }
+
+        &.equipped {
+            border-left-color: rgba( $main-color, 0.6 );
+        }
+
+        &.shown {
+            background-color: rgba( white, 0.92 );
+            border-left-color: $main-color;
+            color: black;
+
+            .class-tag {
+                color: #9a7500;
+            }
+        }
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+    .class-details {
+        flex-direction: column;
+        gap: 6px;
+        width: 620px;
+        padding: 20px;
+        background-color: rgba( black, 0.6 );
+        border-radius: $rounding;
+    }
+
+    .details-header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 8px;
+    }
+
+    .class-title {
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: $main-color;
+    }
+
+    .name-entry {
+        flex-grow: 1;
+        height: 44px;
+        padding: 0 10px;
+        align-items: center;
+        background-color: rgba( white, 0.08 );
+        border-bottom: 2px solid $main-color;
+        border-radius: $rounding;
+        cursor: text;
+    }
+
+    .edit-button {
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+        padding: 8px 14px;
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        background-color: rgba( white, 0.1 );
+        border-radius: $rounding;
+        transition: all 0.08s ease;
+
+        i {
+            font-size: 20px;
+        }
+
+        &:hover {
+            cursor: pointer;
+            background-color: $main-color;
+            color: black;
+        }
+    }
+
+    .slot {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        height: 76px;
+        padding: 0 14px;
+        background-color: rgba( white, 0.06 );
+        border-left: 4px solid transparent;
+        border-radius: $rounding;
+        transition: all 0.08s ease;
+
+        &.primary {
+            height: 120px;
+        }
+    }
+
+    // Slots and perks open their choices when clicked.
+    .slot, .perk {
+        &:hover {
+            cursor: pointer;
+            background-color: rgba( white, 0.14 );
+        }
+
+        &.selected {
+            background-color: rgba( white, 0.18 );
+            border-left-color: $main-color;
+        }
+    }
+
+    .slot-text {
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .slot-name {
+        font-size: 13px;
+        letter-spacing: 2px;
+        opacity: 0.6;
+    }
+
+    .item-name {
+        font-size: 22px;
+        font-weight: 600;
+
+        &.empty {
+            opacity: 0.4;
+        }
+    }
+
+    .item-icon {
+        width: 220px;
+        height: 100%;
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    .slot.primary .item-icon {
+        width: 300px;
+    }
+
+    .perks {
+        flex-direction: row;
+        gap: 6px;
+        margin-top: 4px;
+    }
+
+    .perk {
+        flex-grow: 1;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        height: 56px;
+        padding: 0 10px;
+        background-color: rgba( white, 0.06 );
+        border-left: 4px solid transparent;
+        border-radius: $rounding;
+        transition: all 0.08s ease;
+    }
+
+    .perk-icon {
+        width: 36px;
+        height: 36px;
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    .perk-name {
+        font-size: 15px;
+
+        &.empty {
+            opacity: 0.4;
+        }
+    }
+
+    .footer {
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+        opacity: 0.85;
+    }
+
+    &.editing .footer {
+        gap: 12px;
+        opacity: 1;
+    }
+
+    .footer-button {
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 20px;
+        font-size: 17px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        background-color: rgba( black, 0.6 );
+        border-radius: $rounding;
+        transition: all 0.08s ease;
+
+        i {
+            font-size: 20px;
+        }
+
+        &:hover {
+            cursor: pointer;
+            background-color: rgba( white, 0.2 );
+        }
+
+        &.accent {
+            background-color: $main-color;
+            color: black;
+
+            &:hover {
+                background-color: #ffd24d;
+            }
+        }
+    }
+
+    // ── Edit Class: a slot's choices, in place of the class list ──
+
+    .picker {
+        width: 400px;
+    }
+
+    .picker-title {
+        font-size: 14px;
+        letter-spacing: 2px;
+        opacity: 0.7;
+        margin-bottom: 4px;
+    }
+
+    .picker-hint {
+        font-size: 18px;
+        opacity: 0.8;
+        padding: 16px;
+        background-color: rgba( black, 0.6 );
+        border-radius: $rounding;
+
+        &.small {
+            font-size: 15px;
+            opacity: 0.6;
+            padding-top: 0;
+            background-color: transparent;
+        }
+    }
+
+    .choices {
+        flex-direction: column;
+        gap: 4px;
+        max-height: 520px;
+        overflow-y: scroll;
+    }
+
+    .choice {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0;
+        min-height: 64px;
+        padding: 8px 14px;
+        gap: 10px;
+        background-color: rgba( black, 0.6 );
+        border-left: 4px solid transparent;
+        border-radius: $rounding;
+        transition: all 0.08s ease;
+
+        &:hover {
+            cursor: pointer;
+            background-color: rgba( white, 0.16 );
+        }
+
+        &.current {
+            border-left-color: $main-color;
+
+            .choice-name {
+                color: $main-color;
+            }
+        }
+    }
+
+    .choice-text {
+        flex-direction: column;
+        flex-shrink: 1;
+        gap: 2px;
+    }
+
+    .choice-name {
+        font-size: 20px;
+        font-weight: 600;
+    }
+
+    .choice-sub {
+        font-size: 14px;
+        opacity: 0.65;
+    }
+
+    .choice-icon {
+        width: 130px;
+        height: 48px;
+        flex-shrink: 0;
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+}

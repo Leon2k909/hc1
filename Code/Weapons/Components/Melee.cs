@@ -65,6 +65,9 @@ public partial class Melee : WeaponInputAction
 			impact.WorldPosition = pos + normal;
 			impact.WorldRotation = Rotation.LookAt( normal );
 			impact.SetParent( hitObject, true );
+
+			// See Shootable.CreateImpactEffects: skip the fixed-update interpolation of the re-parent.
+			impact.Transform.ClearInterpolation();
 		}
 
 		if ( surface.SoundCollection.Bullet.IsValid() )

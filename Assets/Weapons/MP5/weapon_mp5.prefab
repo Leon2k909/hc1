@@ -134,16 +134,17 @@
             "DryShootDelay": 0.15,
             "EjectionPrefab": {
               "_type": "gameobject",
-              "prefab": "prefabs/weapon_effects/9mm_casing.prefab"
+              "prefab": "prefabs/weapon_effects/9mm_spent_casing.prefab"
             },
             "FireModeSwitchDelay": 0.3,
-            "FireRate": 740,
+            "FireRate": 800,
+            "SuppressorFireRateScale": 1.05,
             "InAirSpreadMultiplier": 2,
             "InputActions": [
               "Attack1"
             ],
             "MaxEffectsPlayDistance": 4194304,
-            "MaxRange": 1024000,
+            "MaxRange": 8000,
             "MaxRicochetAngle": 45,
             "MuzzleFlashChance": 0.12,
             "MuzzleFlashScale": 0.45,
@@ -169,6 +170,7 @@
             "RequiresHasAmmo": true,
             "RicochetMaxHits": 2,
             "ShootSound": "sounds/guns/mp5/smg1_shoot.sound",
+            "SuppressedShootSound": "sounds/swb/attachments/silencer/swb_smg.silenced.fire.sound",
             "SupportedFireModes": [
               "Automatic",
               "Burst",
@@ -260,14 +262,16 @@
               "IsLooping": false
             },
             "ResetTime": 0.3,
-            "Scale": "2,5",
+            "Scale": "0.45,2.75",
             "UseRecoilPattern": true,
             "VerticalSpread": "3.5"
           },
           {
-            "__type": "Facepunch.Aimable",
+            "__type": "Facepunch.ManualOffset",
             "__guid": "dfdced3b-f729-47a4-a151-4caf974cafc7",
             "__enabled": true,
+            "AimOffset": "0,0,0",
+            "AimAngleOffset": "0,0,0",
             "InputActions": [
               "Attack2"
             ],
@@ -284,7 +288,7 @@
             "__type": "Facepunch.ViewPunch",
             "__guid": "7b56d2e0-b645-4546-8417-6d4ce46e798f",
             "__enabled": true,
-            "AnglesOffset": "-0.5,0.1,0.5",
+            "AnglesOffset": "-0.25,0,0",
             "Curve": [
               {
                 "x": 0,
@@ -309,15 +313,15 @@
               }
             ],
             "Lifetime": 0.15,
-            "MaxAnglesOffset": "-0.5,0.1,0.5",
-            "MaxPositionOffset": "0.5,0.2,1",
+            "MaxAnglesOffset": "-0.25,0,0",
+            "MaxPositionOffset": "0.3,0,0.5",
             "OnComponentDestroy": null,
             "OnComponentDisabled": null,
             "OnComponentEnabled": null,
             "OnComponentFixedUpdate": null,
             "OnComponentStart": null,
             "OnComponentUpdate": null,
-            "PositionOffset": "0.5,0.2,1"
+            "PositionOffset": "0.3,0,0.5"
           }
         ],
         "Children": []

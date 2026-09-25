@@ -61,17 +61,23 @@ public static class GunsmithLoadoutManager
 	private static string LethalCookieKey => $"hc1.loadout.class{GetActiveClassIndex()}.lethal";
 
 	private static string NoneAttachmentValue = "__none";
+
+	/// <summary>
+	/// The primary of a class that hasn't picked one, so every class spawns with a gun. The gunsmith scene previews it
+	/// for such classes too.
+	/// </summary>
+	public const string DefaultPrimaryResourceName = "weapons/m4a1/m4a1.equip";
 	public const string UspResourceName = "weapons/usp/usp.equip";
 	public const string LegacyUspSResourceName = "weapons/usp_sd/usp_sd.equip";
 	public const string UspSuppressorResourceName = "gunsmith/usp/barrel/usp_suppressor.gnsmth";
 
 	/// <summary>
-	/// Returns the ResourceName of the player's chosen primary, or null if unset.
+	/// Returns the ResourceName of the player's chosen primary, or <see cref="DefaultPrimaryResourceName"/> if unset.
 	/// </summary>
 	public static string GetPrimary()
 	{
 		var v = Game.Cookies.Get<string>( PrimaryCookieKey, "" );
-		return string.IsNullOrEmpty( v ) ? null : v;
+		return string.IsNullOrEmpty( v ) ? DefaultPrimaryResourceName : v;
 	}
 
 	public static bool GetCamoOnOptics() => Game.Cookies.Get<bool>( $"hc1.gunsmith.class{GetActiveClassIndex()}.camoonoptics", false );
@@ -165,6 +171,32 @@ public static class GunsmithLoadoutManager
 	public static void SetCustomReticleColor( EquipmentResource resource, Color color ) =>
 		Game.Cookies.Set( $"hc1.gunsmith.class{GetActiveClassIndex()}.{resource.ResourcePath}.reticlecolor", color.Hex );
 
+	private static string ReticleSettingKey( EquipmentResource resource, string setting ) =>
+		$"hc1.gunsmith.class{GetActiveClassIndex()}.{resource.ResourcePath}.reticle{setting}";
+
+	public static float GetCustomReticleScale( EquipmentResource resource ) =>
+		Game.Cookies.Get<float>( ReticleSettingKey( resource, "scale" ), 1f ).Clamp( 0.25f, 3f );
+
+	public static void SetCustomReticleScale( EquipmentResource resource, float scale ) =>
+		Game.Cookies.Set( ReticleSettingKey( resource, "scale" ), scale.Clamp( 0.25f, 3f ) );
+
+	public static float GetCustomReticleRotation( EquipmentResource resource ) =>
+		Game.Cookies.Get<float>( ReticleSettingKey( resource, "rotation" ), 0f ).Clamp( -180f, 180f );
+
+	public static void SetCustomReticleRotation( EquipmentResource resource, float degrees ) =>
+		Game.Cookies.Set( ReticleSettingKey( resource, "rotation" ), degrees.Clamp( -180f, 180f ) );
+
+	/// <summary>Reticle position in lens UV units, limited to eight percent from centre on each axis.</summary>
+	public static Vector2 GetCustomReticleOffset( EquipmentResource resource ) => new(
+		Game.Cookies.Get<float>( ReticleSettingKey( resource, "offsetx" ), 0f ).Clamp( -0.08f, 0.08f ),
+		Game.Cookies.Get<float>( ReticleSettingKey( resource, "offsety" ), 0f ).Clamp( -0.08f, 0.08f ) );
+
+	public static void SetCustomReticleOffset( EquipmentResource resource, Vector2 offset )
+	{
+		Game.Cookies.Set( ReticleSettingKey( resource, "offsetx" ), offset.x.Clamp( -0.08f, 0.08f ) );
+		Game.Cookies.Set( ReticleSettingKey( resource, "offsety" ), offset.y.Clamp( -0.08f, 0.08f ) );
+	}
+
 	/// <summary>
 	/// Saves <paramref name="resourceName"/> as the preferred primary.
 	/// </summary>
@@ -221,6 +253,19 @@ public static class GunsmithLoadoutManager
 	public static void SetPerk( int category, string resourceName ) =>
 		Game.Cookies.Set( $"hc1.loadout.class{GetActiveClassIndex()}.perk{category}", resourceName ?? "" );
 
+	/// <summary>
+	/// The perk a class has in <paramref name="category"/>, or null. Reads any class, not just the active one.
+	/// </summary>
+	public static PerkResource GetPerkResource( int classIndex, int category )
+	{
+		var value = Game.Cookies.Get<string>( $"hc1.loadout.class{classIndex}.perk{category}", "" );
+		if ( string.IsNullOrEmpty( value ) ) return null;
+
+		return PerkResource.All.FirstOrDefault( x => x.ResourcePath.Equals( value, StringComparison.OrdinalIgnoreCase )
+		                                             || x.ResourceName.Equals( value, StringComparison.OrdinalIgnoreCase )
+		                                             || x.Name.Equals( value, StringComparison.OrdinalIgnoreCase ) );
+	}
+
 	public static bool IsMergedWeaponResource( EquipmentResource resource ) =>
 		resource.IsValid() && IsLegacyMergedResourceName( resource.ResourcePath );
 
@@ -228,8 +273,59 @@ public static class GunsmithLoadoutManager
 	{
 		EquipmentSlot.Primary => GetPrimary(),
 		EquipmentSlot.Secondary => GetSecondary(),
+		EquipmentSlot.Tactical => GetTactical(),
+		EquipmentSlot.Lethal => GetLethal(),
 		_ => null
 	};
+
+	/// <summary>
+	/// What a class has in <paramref name="slot"/> (a resource path or name), or null. Reads any class, not just the
+	/// active one, e.g. for the in-match class picker.
+	/// </summary>
+	public static string GetSlot( int classIndex, EquipmentSlot slot )
+	{
+		var key = ClassSlotCookieKey( classIndex, slot );
+		if ( key is null ) return null;
+
+		var value = Game.Cookies.Get<string>( key, "" );
+		if ( IsLegacyMergedResourceName( value ) ) return UspResourceName;
+		if ( string.IsNullOrEmpty( value ) ) return slot == EquipmentSlot.Primary ? DefaultPrimaryResourceName : null;
+		return value;
+	}
+
+	/// <summary>
+	/// Puts <paramref name="resourceName"/> (null for nothing) in a class's slot. Writes any class, not just the active
+	/// one, e.g. for editing classes from the in-match class picker.
+	/// </summary>
+	public static void SetSlot( int classIndex, EquipmentSlot slot, string resourceName )
+	{
+		var key = ClassSlotCookieKey( classIndex, slot );
+		if ( key is not null )
+			Game.Cookies.Set( key, resourceName ?? "" );
+	}
+
+	/// <summary>
+	/// Puts a perk (null for none) in a class's perk <paramref name="category"/>. Writes any class, not just the active one.
+	/// </summary>
+	public static void SetPerk( int classIndex, int category, string resourceName ) =>
+		Game.Cookies.Set( $"hc1.loadout.class{classIndex}.perk{category}", resourceName ?? "" );
+
+	private static string ClassSlotCookieKey( int classIndex, EquipmentSlot slot ) => slot switch
+	{
+		EquipmentSlot.Primary => $"hc1.loadout.class{classIndex}.primary",
+		EquipmentSlot.Secondary => $"hc1.loadout.class{classIndex}.secondary",
+		EquipmentSlot.Tactical => $"hc1.loadout.class{classIndex}.tactical",
+		EquipmentSlot.Lethal => $"hc1.loadout.class{classIndex}.lethal",
+		_ => null
+	};
+
+	/// <summary>
+	/// What a class can put in <paramref name="slot"/>: every weapon or piece of equipment made for it, by category then name.
+	/// </summary>
+	public static IEnumerable<EquipmentResource> GetSlotChoices( EquipmentSlot slot ) => ResourceLibrary.GetAll<EquipmentResource>()
+		.Where( x => x.Slot == slot && x.MainPrefab.IsValid() && x.ViewModelPrefab.IsValid() && !IsMergedWeaponResource( x ) )
+		.OrderBy( x => x.Category )
+		.ThenBy( x => x.Name );
 
 	public static void SetSlot( EquipmentSlot slot, string resourceName )
 	{
@@ -259,9 +355,12 @@ public static class GunsmithLoadoutManager
 	public static EquipmentResource GetSecondaryResource() =>
 		GetSlotResource( EquipmentSlot.Secondary );
 
-	public static EquipmentResource GetSlotResource( EquipmentSlot slot )
+	public static EquipmentResource GetSlotResource( EquipmentSlot slot ) => FindEquipment( GetSlot( slot ) );
+
+	public static EquipmentResource GetSlotResource( int classIndex, EquipmentSlot slot ) => FindEquipment( GetSlot( classIndex, slot ) );
+
+	private static EquipmentResource FindEquipment( string value )
 	{
-		var value = GetSlot( slot );
 		if ( string.IsNullOrEmpty( value ) )
 			return null;
 
@@ -270,11 +369,26 @@ public static class GunsmithLoadoutManager
 			                     || r.ResourceName.Equals( value, StringComparison.OrdinalIgnoreCase ) );
 	}
 
+	/// <summary>
+	/// The slots a class fills, in the order they're given out.
+	/// </summary>
+	public static EquipmentSlot[] ClassSlots => new[] { EquipmentSlot.Primary, EquipmentSlot.Secondary, EquipmentSlot.Lethal, EquipmentSlot.Tactical };
+
 	public static IEnumerable<EquipmentResource> GetLoadoutResources()
 	{
-		foreach ( var slot in new[] { EquipmentSlot.Primary, EquipmentSlot.Secondary, EquipmentSlot.Tactical, EquipmentSlot.Lethal } )
+		foreach ( var slot in ClassSlots )
 		{
 			var resource = GetSlotResource( slot );
+			if ( resource.IsValid() )
+				yield return resource;
+		}
+	}
+
+	public static IEnumerable<EquipmentResource> GetLoadoutResources( int classIndex )
+	{
+		foreach ( var slot in ClassSlots )
+		{
+			var resource = GetSlotResource( classIndex, slot );
 			if ( resource.IsValid() )
 				yield return resource;
 		}
@@ -324,6 +438,10 @@ public static class GunsmithLoadoutManager
 			CustomAnimatedSpeedX = GetCustomAnimatedCamoSpeed( resource ).x,
 			CustomAnimatedSpeedY = GetCustomAnimatedCamoSpeed( resource ).y,
 			ReticleColor = GetCustomReticleColor( resource ).Hex,
+			ReticleScale = GetCustomReticleScale( resource ),
+			ReticleRotation = GetCustomReticleRotation( resource ),
+			ReticleOffsetX = GetCustomReticleOffset( resource ).x,
+			ReticleOffsetY = GetCustomReticleOffset( resource ).y,
 		};
 
 		foreach ( var category in Enum.GetValues<GunsmithPartType>() )
@@ -415,6 +533,9 @@ public static class GunsmithLoadoutManager
 
 		if ( Color.TryParse( payload.ReticleColor, out var reticleColor ) )
 			SetCustomReticleColor( resource, reticleColor );
+		SetCustomReticleScale( resource, payload.ReticleScale );
+		SetCustomReticleRotation( resource, payload.ReticleRotation );
+		SetCustomReticleOffset( resource, new Vector2( payload.ReticleOffsetX, payload.ReticleOffsetY ) );
 
 		return true;
 	}
@@ -475,6 +596,10 @@ public static class GunsmithLoadoutManager
 		public float CustomAnimatedSpeedX { get; set; }
 		public float CustomAnimatedSpeedY { get; set; }
 		public string ReticleColor { get; set; }
+		public float ReticleScale { get; set; } = 1f;
+		public float ReticleRotation { get; set; }
+		public float ReticleOffsetX { get; set; }
+		public float ReticleOffsetY { get; set; }
 	}
 
 	/// <summary>
@@ -534,7 +659,8 @@ public static class GunsmithLoadoutManager
 					}
 				}
 			}
-			else
+			// A bodygroup barrel (ModifyBodygroups) has no prefab: it switches the weapon's own barrel in its Barrel slot.
+			else if ( !barrelPart.IsValid() || !barrelPart.ModifyBodygroups )
 			{
 				// Broken/missing barrel part — nuke the cookie entirely (empty string, NOT __none)
 				// so TryGetAttachment returns false and the barrel logic stops firing.
@@ -644,7 +770,16 @@ public static class GunsmithLoadoutManager
 		// Pre-compute once — same value for every renderer in the loop below.
 		var camoOnOptics = GetCamoOnOptics();
 		var customReticleColor = GetCustomReticleColor( resource );
+		var customReticleScale = GetCustomReticleScale( resource );
+		var customReticleRotation = GetCustomReticleRotation( resource );
+		var customReticleOffset = GetCustomReticleOffset( resource );
 		TryGetAttachment( resource, GunsmithPartType.Reticle, out var customReticleShape );
+		Texture reticleShape = null;
+		if ( customReticleShape.IsValid() && !string.IsNullOrEmpty( customReticleShape.CamoTexture ) )
+		{
+			try { reticleShape = Texture.Load( customReticleShape.CamoTexture ); }
+			catch ( System.Exception e ) { Log.Warning( $"Gunsmith: couldn't load reticle '{customReticleShape.CamoTexture}': {e.Message}" ); }
+		}
 
 		foreach ( var renderer in root.Components.GetAll<ModelRenderer>( FindMode.EverythingInSelfAndDescendants ) )
 		{
@@ -691,17 +826,7 @@ public static class GunsmithLoadoutManager
 						{
 							var reticleCopy = mats[i].CreateCopy();
 							reticleCopy.Set( "g_vSightLightColor", customReticleColor );
-							if ( customReticleShape != null && !string.IsNullOrEmpty( customReticleShape.CamoTexture ) )
-							{
-								var texPath = customReticleShape.CamoTexture.Replace(".png", ".vtex");
-								var tex = Texture.Load( FileSystem.Mounted, texPath );
-								if ( tex != null )
-								{
-									reticleCopy.Set( "RedDot", tex );
-									reticleCopy.Set( "g_tRedDot", tex );
-									reticleCopy.Set( "g_flUseReticleTexture", 1f );
-								}
-							}
+							ApplyReticleShape( reticleCopy, matName, reticleShape, customReticleScale, customReticleRotation, customReticleOffset );
 							renderer.Materials.SetOverride( i, reticleCopy );
 						}
 						else
@@ -756,17 +881,7 @@ public static class GunsmithLoadoutManager
 						{
 							var reticleCopy = mats[i].CreateCopy();
 							reticleCopy.Set( "g_vSightLightColor", customReticleColor );
-							if ( customReticleShape != null && !string.IsNullOrEmpty( customReticleShape.CamoTexture ) )
-							{
-								var texPath = customReticleShape.CamoTexture.Replace(".png", ".vtex");
-								var tex = Texture.Load( FileSystem.Mounted, texPath );
-								if ( tex != null )
-								{
-									reticleCopy.Set( "RedDot", tex );
-									reticleCopy.Set( "g_tRedDot", tex );
-									reticleCopy.Set( "g_flUseReticleTexture", 1f );
-								}
-							}
+							ApplyReticleShape( reticleCopy, matName, reticleShape, customReticleScale, customReticleRotation, customReticleOffset );
 							renderer.Materials.SetOverride( i, reticleCopy );
 						}
 						else
@@ -819,17 +934,7 @@ public static class GunsmithLoadoutManager
 						{
 							var reticleCopy = mats[i].CreateCopy();
 							reticleCopy.Set( "g_vSightLightColor", customReticleColor );
-							if ( customReticleShape != null && !string.IsNullOrEmpty( customReticleShape.CamoTexture ) )
-							{
-								var texPath = customReticleShape.CamoTexture.Replace(".png", ".vtex");
-								var tex = Texture.Load( FileSystem.Mounted, texPath );
-								if ( tex != null )
-								{
-									reticleCopy.Set( "RedDot", tex );
-									reticleCopy.Set( "g_tRedDot", tex );
-									reticleCopy.Set( "g_flUseReticleTexture", 1f );
-								}
-							}
+							ApplyReticleShape( reticleCopy, matName, reticleShape, customReticleScale, customReticleRotation, customReticleOffset );
 							renderer.Materials.SetOverride( i, reticleCopy );
 						}
 						else
@@ -891,12 +996,33 @@ public static class GunsmithLoadoutManager
 		var hiddenMaterials = attachmentPoints.Where( p => p.CurrentPart.IsValid() )
 			.SelectMany( p => p.CurrentPart.HiddenWeaponMaterials ?? new List<string>() )
 			.ToHashSet( StringComparer.OrdinalIgnoreCase );
+		var hideableMaterials = ResourceLibrary.GetAll<GunsmithPart>()
+			.Where( p => p.IsValid() && p.Supports( resource ) )
+			.SelectMany( p => p.HiddenWeaponMaterials ?? new List<string>() )
+			.ToHashSet( StringComparer.OrdinalIgnoreCase );
+		if ( hideableMaterials.Count > 0 )
+		{
+			var nodraw = Material.Load( "attachments/m4a1/materials/hidden.vmat" );
+			foreach ( var renderer in root.Components.GetAll<SkinnedModelRenderer>( FindMode.EverythingInSelfAndDescendants ) )
+			{
+				if ( renderer.Model is null ) continue;
+				for ( int i = 0; i < renderer.Model.Materials.Length; i++ )
+				{
+					var original = renderer.Model.Materials[i];
+					if ( hideableMaterials.Contains( original.Name ) )
+						renderer.Materials.SetOverride( i, hiddenMaterials.Contains( original.Name ) ? nodraw : original );
+				}
+			}
+		}
 		if ( hiddenMaterials.Count > 0 )
 		{
 			var nodraw = Material.Load( "attachments/m4a1/materials/hidden.vmat" );
 			foreach ( var renderer in root.Components.GetAll<ModelRenderer>( FindMode.EverythingInSelfAndDescendants ) )
 			{
 				if ( renderer.Model is null ) continue;
+				// Barrel prefabs retain the original MP5 receiver as a separate
+				// clipped mesh. Hide only the native skinned copy of this material.
+				if ( renderer.Components.Get<GunsmithMp5NativeReceiver>() is not null ) continue;
 				for ( int i = 0; i < renderer.Model.Materials.Length; i++ )
 					if ( hiddenMaterials.Contains( renderer.Model.Materials[i].Name ) )
 						renderer.Materials.SetOverride( i, nodraw );
@@ -910,6 +1036,25 @@ public static class GunsmithLoadoutManager
 	{
 		var path = (material.Name ?? "").Replace( '\\', '/' );
 		return path[(path.LastIndexOf( '/' ) + 1)..].ToLowerInvariant();
+	}
+
+	/// <summary>
+	/// Draws the chosen reticle shape on an optic's lens. Only m4_optic_lens centres its mask on the lens; the SWB
+	/// reflex masks are placed per model, and the scout scope keeps its drawn crosshair.
+	/// </summary>
+	private static void ApplyReticleShape( Material reticle, string fileName, Texture shape, float scale, float rotation, Vector2 offset )
+	{
+		if ( fileName.StartsWith( "scout_" ) || reticle.ShaderName?.Contains( "m4_optic_lens" ) != true )
+			return;
+
+		reticle.Set( "g_flReticleScale", scale );
+		reticle.Set( "g_flReticleRotation", rotation );
+		reticle.Set( "g_vReticleOffset", offset );
+		if ( shape is not null )
+		{
+			reticle.Set( "g_tRedDot", shape );
+			reticle.Set( "g_flUseReticleTexture", 1f );
+		}
 	}
 
 	private static bool IsReticleMaterial( string fileName )

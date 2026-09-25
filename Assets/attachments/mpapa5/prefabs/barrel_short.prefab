@@ -1,0 +1,140 @@
+{
+  "RootObject": {
+    "__guid": "1621e9ca-1cca-4201-8f3a-2457dddfa793",
+    "Flags": 0,
+    "Name": "MP5 Short Barrel",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "1622e634-5f8c-46d1-8320-f70278363805",
+        "__enabled": true,
+        "Model": "attachments/mpapa5/barrels/barrel_short/barrel_short.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithSocketAttachment",
+        "__guid": "84fe68a9-1036-4107-8351-e36b8d7fa2f5",
+        "__enabled": true,
+        "SocketName": "muzzle",
+        "UseWeaponOrigin": true,
+        "WeaponSpaceOffset": "2.652,-0.248,8.128",
+        "WeaponSpaceScale": 1.122,
+        "SocketOffset": "-9.642,-0.221,0.009",
+        "SocketAngles": "0,0,0"
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "d442a9c5-2d12-5065-a104-dfdd7d6df206",
+        "Flags": 0,
+        "Name": "Existing MP5 receiver and sights",
+        "Position": "0,0,0",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Enabled": true,
+        "NetworkMode": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.ModelRenderer",
+            "__guid": "e4a77408-a9f8-5668-9499-4a2a77ba7105",
+            "__enabled": true,
+            "Model": "attachments/mpapa5/native_receiver/native_receiver.vmdl",
+            "Tint": "1,1,1,1"
+          },
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithMp5NativeReceiver",
+            "__guid": "2b0bb26b-a254-566f-ad5b-8a670e23636f",
+            "__enabled": true,
+            "BoneName": "weapon_root"
+          }
+        ],
+        "Children": []
+      },
+      {
+        "__guid": "0f5e7366-18ca-5b3f-970c-6dd2c8ebacb2",
+        "Flags": 0,
+        "Name": "Existing MP5 bolt",
+        "Position": "0,0,0",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Enabled": true,
+        "NetworkMode": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.ModelRenderer",
+            "__guid": "2e79e9d8-b2ff-5d37-b12b-43964c99b5fc",
+            "__enabled": true,
+            "Model": "attachments/mpapa5/native_receiver/native_bolt.vmdl",
+            "Tint": "1,1,1,1"
+          },
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithMp5NativeReceiver",
+            "__guid": "ec1555b3-495d-5cd3-86c4-6c46bbb3a083",
+            "__enabled": true,
+            "BoneName": "bolt"
+          }
+        ],
+        "Children": []
+      },
+      {
+        "__guid": "6a025d50-3b98-5e10-bab3-c95b094636da",
+        "Flags": 0,
+        "Name": "Existing MP5 cocking lever",
+        "Position": "0,0,0",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Enabled": true,
+        "NetworkMode": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.ModelRenderer",
+            "__guid": "49e39594-a802-5ee7-bde3-e0e71986df77",
+            "__enabled": true,
+            "Model": "attachments/mpapa5/native_receiver/native_lever.vmdl",
+            "Tint": "1,1,1,1"
+          },
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithMp5NativeReceiver",
+            "__guid": "fd87ff85-f01e-5e66-bc4d-974c46b1c6ac",
+            "__enabled": true,
+            "BoneName": "cocking_lever"
+          }
+        ],
+        "Children": []
+      },
+      {
+        "__guid": "4980d60b-457c-574f-b691-864a4418febb",
+        "Flags": 0,
+        "Name": "Existing MP5 magazine latch",
+        "Position": "0,0,0",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Enabled": true,
+        "NetworkMode": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.ModelRenderer",
+            "__guid": "d933697f-a7da-5f7f-9889-d45eaa46d399",
+            "__enabled": true,
+            "Model": "attachments/mpapa5/native_receiver/native_latch.vmdl",
+            "Tint": "1,1,1,1"
+          },
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithMp5NativeReceiver",
+            "__guid": "cce0288e-da70-567a-85a1-de057686dda3",
+            "__enabled": true,
+            "BoneName": "reload_latch"
+          }
+        ],
+        "Children": []
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

@@ -1,0 +1,18 @@
+{
+  "Name": "10mm 30-Round Magazine",
+  "Category": "Magazine",
+  "HiddenWeaponMaterials": ["models/weapons/sbox_smg_mp5/v_mp5_magazine.vmat"],
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "attachments/mpapa5/prefabs/magazine_10mm_30_round.prefab"
+  },
+  "EligibleEquipment": [
+    "weapons/mp5/mp5.equip"
+  ],
+  "RequiredLevel": 0,
+  "Description": "30-round magazine configured for 10mm ammunition.",
+  "MagazineCapacity": 30,
+  "ReloadTimeMultiplier": 1,
+  "__references": [],
+  "__version": 0
+}

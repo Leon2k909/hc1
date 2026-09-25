@@ -138,7 +138,7 @@
               "prefab": "prefabs/weapon_effects/556_casing.prefab"
             },
             "FireModeSwitchDelay": 0.3,
-            "FireRate": 680,
+            "FireRate": 600,
             "InAirSpreadMultiplier": 2,
             "InputActions": [
               "Attack1"
@@ -175,6 +175,7 @@
             "RequiresHasAmmo": true,
             "RicochetMaxHits": 2,
             "ShootSound": "weapons/swb/scarh/sounds/scar.fire.sound",
+            "SuppressedShootSound": "sounds/swb/attachments/silencer/swb_rifle.silenced.fire.sound",
             "SupportedFireModes": [
               "Automatic",
               "Semi"
@@ -269,7 +270,7 @@
             "__type": "Facepunch.ManualOffset",
             "__guid": "8e60004f-7ba0-4fa4-88bc-d1abbef63869",
             "__enabled": true,
-            "AimAngleOffset": "-0.1,0.34,3.9",
+            "AimAngleOffset": "-0.1,0.34,0",
             "AimOffset": "0.36,2.163,0.233",
             "InputActions": [
               "Attack2"

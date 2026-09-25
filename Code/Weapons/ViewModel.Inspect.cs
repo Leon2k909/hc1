@@ -4,6 +4,8 @@ public partial class ViewModel
 {
 	private readonly WeaponInspectAnimation _inspectAnimation = new();
 	private TimeSince _timeSinceInspectDeploy = 0f;
+	[Property, Range( 0, 1 ), Group( "Configuration" )] public float InspectPoseScale { get; set; } = 1f;
+	[Property, Range( 0, 1 ), Group( "Configuration" )] public float InspectRotationScale { get; set; } = 1f;
 
 	public bool IsInspecting => _inspectAnimation.IsActive;
 
@@ -38,7 +40,7 @@ public partial class ViewModel
 			|| Input.Down( "reload" ) || Input.Down( "use" )
 			|| (Input.Down( "Run" ) && Owner.WishMove.Length > 0f);
 
-		_inspectAnimation.Update( Input.Pressed( WeaponInspectAnimation.InputAction ), blocked, Time.Delta );
+		_inspectAnimation.Update( Input.Pressed( WeaponInspectAnimation.InputAction ), blocked, Time.Delta, InspectPoseScale, InspectRotationScale );
 	}
 
 	private void ApplyInspectPose()

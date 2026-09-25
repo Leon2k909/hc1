@@ -5,6 +5,9 @@ public static class DevCommands
 	/// <summary>Hold ADS without input, for testing optics through the editor bridge.</summary>
 	[ConVar( "dev_force_aim", Saved = false )] public static bool ForceAim { get; set; }
 
+	/// <summary>Walk without input (1 forward, -1 back), for testing movement through the editor bridge.</summary>
+	[ConVar( "dev_force_move", Saved = false )] public static float ForceMove { get; set; }
+
 	/// <summary>Nobody takes damage, so bots can't interrupt testing.</summary>
 	[ConVar( "dev_no_damage", Saved = false )] public static bool NoDamage { get; set; }
 
@@ -23,13 +26,13 @@ public static class DevCommands
 
 	/// <summary>Start the zombies mode the same way the hub's Zombies button does.</summary>
 	[ConCmd( "dev_zombies" )]
-	public static void Zombies()
+	public static void Zombies( string mapContains = "flatgrass" )
 	{
 		var mode = GameObject.GetPrefab( "prefabs/game_modes/zombies.prefab" )?.GetComponent<GameMode>();
 		if ( !mode.IsValid() ) { Log.Warning( "dev_zombies: no zombies mode prefab" ); return; }
 
 		var scene = ResourceLibrary.GetAll<SceneFile>()
-			.FirstOrDefault( s => s.ResourcePath?.Contains( "flatgrass", StringComparison.OrdinalIgnoreCase ) ?? false )
+			.FirstOrDefault( s => s.ResourcePath?.Contains( mapContains, StringComparison.OrdinalIgnoreCase ) ?? false )
 			?? GameUtils.GetAvailableMaps().FirstOrDefault();
 		if ( scene is null ) { Log.Warning( "dev_zombies: no map" ); return; }
 
@@ -153,6 +156,29 @@ public static class DevCommands
 	{
 		var manual = Client.Local?.PlayerPawn?.CurrentEquipment?.GetComponentInChildren<ManualOffset>( true );
 		if ( manual.IsValid() ) manual.AimOffset = new Vector3( x, y, z );
+	}
+
+	/// <summary>Live-tune the current weapon's optic aim correction (not saved), e.g. dev_optic_correction 0 0 -1.5.</summary>
+	[ConCmd( "dev_optic_correction" )]
+	public static void OpticCorrection( float x, float y, float z )
+	{
+		var manual = Client.Local?.PlayerPawn?.CurrentEquipment?.GetComponentInChildren<ManualOffset>( true );
+		if ( manual.IsValid() ) manual.OpticAimCorrection = new Vector3( x, y, z );
+	}
+
+	/// <summary>Select an optic for live ADS calibration.</summary>
+	[ConCmd( "dev_optic" )]
+	public static void Optic( string name )
+	{
+		var equipment = Client.Local?.PlayerPawn?.CurrentEquipment;
+		if ( !equipment.IsValid() || !equipment.ViewModel.IsValid() ) return;
+		var part = ResourceLibrary.GetAll<Facepunch.Gunsmith.GunsmithPart>()
+			.FirstOrDefault( p => p.IsValid() && p.Category == Facepunch.Gunsmith.GunsmithPartType.Optic
+				&& p.Supports( equipment.Resource ) && p.ResourcePath.Contains( name, StringComparison.OrdinalIgnoreCase ) );
+		if ( !part.IsValid() ) { Log.Warning( $"dev_optic: no optic matching {name}" ); return; }
+		Facepunch.Gunsmith.GunsmithLoadoutManager.SetAttachment( equipment.Resource, Facepunch.Gunsmith.GunsmithPartType.Optic, part );
+		Facepunch.Gunsmith.GunsmithLoadoutManager.ApplyAttachments( equipment.Resource, equipment.ViewModel.GameObject );
+		Log.Info( $"dev_optic: {part.ResourcePath}" );
 	}
 
 	/// <summary>Log the model attachments of the current viewmodel (looking for sight reference points).</summary>

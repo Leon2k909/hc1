@@ -59,6 +59,7 @@ public sealed class BotManager : SingletonComponent<BotManager>
 
 		var player = networkManager.ClientPrefab.Clone();
 		player.BreakFromPrefab();
+		player.Flags |= GameObjectFlags.NotSaved;
 		player.Network.SetOrphanedMode( NetworkOrphaned.ClearOwner );
 		player.Name = $"Client (BOT)";
 

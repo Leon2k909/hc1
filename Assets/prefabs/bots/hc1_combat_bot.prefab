@@ -64,18 +64,19 @@
           "go": "0f6d3d36-b5f5-4c37-9161-8fa3e3b51d10",
           "component_type": "NavMeshAgent"
         },
-        "AimSpreadDegrees": 2.5,
-        "AttackRange": 1200,
         "BotName": "Raven",
-        "Damage": 10,
-        "FireInterval": 0.55,
+        "BloodEffect": {
+          "_type": "gameobject",
+          "prefab": "prefabs/impact_fx/impact_blood_mist.prefab"
+        },
+        "Damage": 20,
         "HealthComponent": {
           "_type": "component",
           "component_id": "bdcf0a10-20a4-4f9b-9f06-96f6e1ab8c10",
           "go": "0f6d3d36-b5f5-4c37-9161-8fa3e3b51d10",
           "component_type": "HealthComponent"
         },
-        "MoveSpeed": 180,
+        "MoveSpeed": 230,
         "MuzzleFlashPrefab": "prefabs/weapon_effects/rifle_muzzleflash.prefab",
         "OnComponentDestroy": null,
         "OnComponentDisabled": null,
@@ -84,8 +85,8 @@
         "OnComponentStart": null,
         "OnComponentUpdate": null,
         "PatrolRadius": 900,
-        "PreferredRange": 900,
-        "RealPlayerDamageScale": 0.6,
+        "PreferredRange": 550,
+        "RealPlayerDamageScale": 0.75,
         "Renderer": {
           "_type": "component",
           "component_id": "ce1ba59d-ce66-4bc7-ae07-cbc8eb04e737",
@@ -93,7 +94,7 @@
           "component_type": "SkinnedModelRenderer"
         },
         "ShootSound": "sounds/weapons/m4a1/m4_shot.sound",
-        "SightRange": 2600,
+        "SightRange": 6000,
         "Team": "Unassigned",
         "TeamBaseModels": {
           "Terrorist": {
@@ -109,6 +110,7 @@
           }
         },
         "TracerEffectPrefab": "weapons/common/effects/tracer_9mm.prefab",
+        "WeaponResource": "weapons/m4a1/m4a1.equip",
         "WeaponWorldModelPrefab": "weapons/m4a1/wm_m4a1.prefab"
       }
     ],

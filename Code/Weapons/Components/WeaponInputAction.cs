@@ -93,9 +93,12 @@ public abstract class WeaponInputAction : EquipmentComponent,
 
 		bool matched = false;
 
+		// Clicking a class in the class menu isn't weapon input.
+		var menuOpen = UI.ClassSelect.IsAnyOpen;
+
 		foreach ( var action in InputActions )
 		{
-			var down = Input.Down( action );
+			var down = !menuOpen && Input.Down( action );
 
 			if ( RequiresAllInputActions && !down )
 			{

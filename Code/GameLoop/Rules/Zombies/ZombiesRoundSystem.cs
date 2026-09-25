@@ -342,34 +342,83 @@ public sealed class ZombiesRoundSystem : Component
 		if ( targets.Count == 0 ) return false;
 
 		float NearestPlayer( Vector3 pos ) => targets.Min( p => p.WorldPosition.Distance( pos ) );
+		bool CanReachAnyone( Vector3 pos ) => targets.Any( p => CanWalk( pos, p.WorldPosition, 3000f ) );
 
 		// Prefer map spawn points that are out of the players' faces but not miles away.
-		var points = Scene.GetAllComponents<SpawnPoint>()
-			.Select( x => x.WorldPosition )
-			.Where( p => { var d = NearestPlayer( p ); return d > 700f && d < 2600f; } )
-			.ToList();
-
-		if ( points.Count > 0 )
+		if ( MapSpawnSettings.MapSpawnPointsAllowed )
 		{
-			position = points[Game.Random.Int( 0, points.Count - 1 )];
-			return true;
+			var points = Scene.GetAllComponents<SpawnPoint>()
+				.Select( x => x.WorldPosition )
+				.Where( p => { var d = NearestPlayer( p ); return d > 700f && d < 2600f; } )
+				.OrderBy( _ => Game.Random.Float() )
+				.Take( 4 );
+
+			foreach ( var p in points )
+			{
+				if ( !CanReachAnyone( p ) ) continue;
+				position = p;
+				return true;
+			}
 		}
 
-		// Otherwise pick a navmesh point in a ring around a random player.
-		for ( int i = 0; i < 12; i++ )
+		// Otherwise pick a navmesh point around a random player. Maps like Innocent Hotel have navmesh islands
+		// nobody can walk to (its basement and roof), so the zombie has to be able to reach someone. Indoors,
+		// prefer spots round a corner: popping up in plain sight looks wrong, so those are only a fallback.
+		Vector3? seen = null;
+		for ( int i = 0; i < 16; i++ )
 		{
 			var target = targets[Game.Random.Int( 0, targets.Count - 1 )];
-			var dir = Vector3.Random.WithZ( 0 ).Normal;
-			var guess = target.WorldPosition + dir * Game.Random.Float( 900f, 1500f );
-			var nav = Scene.NavMesh.GetClosestPoint( guess, 400f );
+			var nav = i % 2 == 0
+				? Scene.NavMesh.GetClosestPoint( target.WorldPosition + Vector3.Random.WithZ( 0 ).Normal * Game.Random.Float( 900f, 1500f ), 400f )
+				: Scene.NavMesh.GetRandomPoint( target.WorldPosition, 1500f );
 			if ( nav is not { } p ) continue;
-			if ( NearestPlayer( p ) < 600f ) continue;
+
+			var visible = targets.Any( x => CanSee( x, p ) );
+			if ( NearestPlayer( p ) < (visible ? 700f : 450f) ) continue;
+			if ( visible && seen.HasValue ) continue;
+			if ( !CanReachAnyone( p ) ) continue;
+
+			if ( visible )
+			{
+				seen = p;
+				continue;
+			}
 
 			position = p;
 			return true;
 		}
 
-		return false;
+		position = seen.GetValueOrDefault();
+		return seen.HasValue;
+	}
+
+	/// <summary>Can <paramref name="player"/> see a zombie standing at <paramref name="position"/>?</summary>
+	private bool CanSee( PlayerPawn player, Vector3 position )
+	{
+		var eye = player.WorldPosition + Vector3.Up * 64f;
+		return !Scene.Trace.Ray( eye, position + Vector3.Up * 48f )
+			.WithoutTags( "player", "enemy", "trigger" )
+			.Run().Hit;
+	}
+
+	/// <summary>
+	/// Is there a navmesh path from <paramref name="from"/> to <paramref name="to"/> no longer than <paramref name="maxLength"/>?
+	/// </summary>
+	private bool CanWalk( Vector3 from, Vector3 to, float maxLength )
+	{
+		var end = Scene.NavMesh.GetClosestPoint( to, 200f ) ?? to;
+		var path = Scene.NavMesh.CalculatePath( new Sandbox.Navigation.CalculatePathRequest { Start = from, Target = end } );
+		if ( path.Status != Sandbox.Navigation.NavMeshPathStatus.Complete || path.Points is null ) return false;
+
+		var length = 0f;
+		var previous = from;
+		foreach ( var point in path.Points )
+		{
+			length += previous.Distance( point.Position );
+			previous = point.Position;
+		}
+
+		return length <= maxLength;
 	}
 
 	/// <summary>Zombies is co-op against zombies only: clear out any deathmatch combat bots.</summary>
@@ -500,49 +549,198 @@ public sealed class ZombiesRoundSystem : Component
 
 	// ── Buy stations ────────────────────────────────────────────────────────────
 	/// <summary>
-	/// The zombies maps have no authored machines, so lay out perk machines, wall-buys and the
-	/// mystery box in a ring around where players spawn.
+	/// The zombies maps have no authored machines. Spread perks across reachable rooms,
+	/// then place ammo boxes, wall-buys and the mystery box in reachable areas.
 	/// </summary>
 	private void PlaceBuyStations()
 	{
 		if ( Scene.GetAllComponents<ZombiesBuyStation>().Any() ) return;
 
-		var spawns = Scene.GetAllComponents<SpawnPoint>().Select( x => x.WorldPosition ).ToList();
+		var spawns = GameUtils.GetSpawnPoints().Select( x => x.Transform.Position ).ToList();
 		var center = spawns.Count > 0
 			? spawns.Aggregate( Vector3.Zero, ( a, b ) => a + b ) / spawns.Count
 			: HumanPawns( Scene ).First().WorldPosition;
 
-		var entries = new List<Action<ZombiesBuyStation>>();
+		var entries = new List<(ZombiesBuyKind Kind, Action<ZombiesBuyStation> Setup)>();
 
 		foreach ( var perk in new[] { ZombiesPerk.QuickRevive, ZombiesPerk.Juggernog, ZombiesPerk.SpeedCola, ZombiesPerk.DoubleTap, ZombiesPerk.StaminUp } )
 		{
 			var p = perk;
-			entries.Add( s => { s.Kind = ZombiesBuyKind.Perk; s.Perk = p; s.Cost = ZombiesBuyStation.PerkCost( p ); } );
+			entries.Add( (ZombiesBuyKind.Perk, s => { s.Kind = ZombiesBuyKind.Perk; s.Perk = p; s.Cost = ZombiesBuyStation.PerkCost( p ); }) );
 		}
 
 		var weapons = GetMysteryBoxPool().OrderBy( x => x.ResourceName ).ToList();
 		var secondary = weapons.FirstOrDefault( x => x.Slot == EquipmentSlot.Secondary );
 		var primaries = weapons.Where( x => x.Slot == EquipmentSlot.Primary ).Take( 2 ).ToList();
-		if ( secondary is not null ) entries.Add( s => { s.Kind = ZombiesBuyKind.WallWeapon; s.WeaponName = secondary.ResourceName; s.Cost = 500; } );
+		if ( secondary is not null )
+			entries.Add( (ZombiesBuyKind.WallWeapon, s => { s.Kind = ZombiesBuyKind.WallWeapon; s.WeaponName = secondary.ResourceName; s.Cost = 500; }) );
 		for ( int i = 0; i < primaries.Count; i++ )
 		{
 			var w = primaries[i];
 			var cost = 1000 + i * 400;
-			entries.Add( s => { s.Kind = ZombiesBuyKind.WallWeapon; s.WeaponName = w.ResourceName; s.Cost = cost; } );
+			entries.Add( (ZombiesBuyKind.WallWeapon, s => { s.Kind = ZombiesBuyKind.WallWeapon; s.WeaponName = w.ResourceName; s.Cost = cost; }) );
 		}
+		for ( int i = 0; i < 2; i++ )
+			entries.Add( (ZombiesBuyKind.AmmoBox, s => { s.Kind = ZombiesBuyKind.AmmoBox; s.Cost = ZombiesBuyStation.AmmoBoxCost; }) );
 
-		entries.Add( s => { s.Kind = ZombiesBuyKind.MysteryBox; s.Cost = ZombiesBuyStation.MysteryBoxCost; } );
+		entries.Add( (ZombiesBuyKind.MysteryBox, s => { s.Kind = ZombiesBuyKind.MysteryBox; s.Cost = ZombiesBuyStation.MysteryBoxCost; }) );
+
+		var centerNav = Scene.NavMesh.GetClosestPoint( center, 400f )
+			?? (spawns.Count > 0 ? Scene.NavMesh.GetClosestPoint( spawns[0], 200f ) : null)
+			?? center;
+		var placed = new List<Vector3>();
 
 		for ( int i = 0; i < entries.Count; i++ )
 		{
-			var angle = 360f / entries.Count * i;
-			var pos = center + Rotation.FromYaw( angle ).Forward * 420f;
+			var (kind, setup) = entries[i];
+			var size = StationSize( kind );
+			var ring = center + Rotation.FromYaw( 360f / entries.Count * i ).Forward * 420f;
+			Vector3 pos;
+			Rotation rot;
+			var found = (kind == ZombiesBuyKind.Perk || kind == ZombiesBuyKind.AmmoBox) && placed.Count > 0
+				? TryPlaceSpreadStation( centerNav, ring, size, spawns, placed, out pos, out rot )
+				: TryPlaceStation( centerNav, ring, size, placed, false, out pos, out rot );
 
-			var tr = Scene.Trace.Ray( pos + Vector3.Up * 400f, pos + Vector3.Down * 800f ).WithoutTags( "player", "enemy" ).Run();
-			if ( tr.Hit ) pos = tr.EndPosition;
+			if ( !found )
+			{
+				// Search outwards from the spawn area. Indoor nav points can be cramped or disconnected;
+				// if the strict search fails, allow spots closer to doors and other stations.
+				for ( int attempt = 0; attempt < 800 && !found; attempt++ )
+				{
+					var radius = 300f + 1300f * (attempt % 400) / 399f;
+					if ( Scene.NavMesh.GetRandomPoint( centerNav, radius ) is { } guess )
+						found = TryPlaceStation( centerNav, guess, size, placed, attempt >= 400, out pos, out rot );
+				}
 
-			CreateStation( pos, Rotation.LookAt( (center - pos).WithZ( 0 ).Normal ), entries[i] );
+				if ( !found )
+				{
+					// Nowhere sensible: fall back to the plain ring spot rather than leave the station out.
+					Log.Warning( $"[Zombies] No clear spot for a {kind} station, placing it on the ring." );
+					pos = Scene.NavMesh.GetClosestPoint( ring, 400f ) ?? ring;
+					var tr = Scene.Trace.Ray( pos + Vector3.Up * 40f, pos + Vector3.Down * 400f ).WithoutTags( "player", "enemy" ).Run();
+					if ( tr.Hit ) pos = tr.EndPosition;
+					rot = Rotation.LookAt( (center - pos).WithZ( 0 ).Normal );
+				}
+			}
+
+			placed.Add( pos );
+			CreateStation( pos, rot, setup );
 		}
+	}
+
+	/// <summary>Sample playable spawn areas and pick a reachable station location away from the others.</summary>
+	private bool TryPlaceSpreadStation( Vector3 center, Vector3 ring, Vector3 size, List<Vector3> spawns, List<Vector3> placed, out Vector3 position, out Rotation rotation )
+	{
+		position = default;
+		rotation = default;
+		var bestSeparation = -1f;
+
+		for ( int pass = 0; pass < 2 && bestSeparation < 450f; pass++ )
+		{
+			for ( int attempt = 0; attempt < 160; attempt++ )
+			{
+				Vector3? guess = attempt == 0 ? ring
+					: spawns.Count > 0 && attempt % 5 != 0
+						? Scene.NavMesh.GetRandomPoint( spawns[(attempt - 1) % spawns.Count], 450f )
+						: Scene.NavMesh.GetRandomPoint();
+				if ( guess is not { } candidate || !TryPlaceStation( center, candidate, size, placed, pass > 0, out var pos, out var rot ) )
+					continue;
+
+				var separation = placed.Min( p => p.Distance( pos ) );
+				if ( separation <= bestSeparation )
+					continue;
+
+				bestSeparation = separation;
+				position = pos;
+				rotation = rot;
+			}
+		}
+
+		return bestSeparation >= 0f;
+	}
+
+	/// <summary>Collision size of each kind of station, matching <see cref="CreateStation"/>. X is its depth, front to back.</summary>
+	private static Vector3 StationSize( ZombiesBuyKind kind ) => kind switch
+	{
+		ZombiesBuyKind.Perk => new Vector3( 64f, 64f, 92f ),
+		ZombiesBuyKind.MysteryBox => new Vector3( 36f, 70f, 34f ),
+		ZombiesBuyKind.AmmoBox => new Vector3( 40f, 68f, 48f ),
+		_ => new Vector3( 10f, 60f, 60f ),
+	};
+
+	/// <summary>
+	/// Find a spot for a station near <paramref name="guess"/>: on the navmesh and
+	/// walkable from them, clear of walls, doors and other stations. It backs onto a wall if there's one close by,
+	/// otherwise it faces the players. <paramref name="relaxed"/> lets it go nearer doors and other stations.
+	/// </summary>
+	private bool TryPlaceStation( Vector3 center, Vector3 guess, Vector3 size, List<Vector3> placed, bool relaxed, out Vector3 position, out Rotation rotation )
+	{
+		position = default;
+		rotation = default;
+
+		if ( Scene.NavMesh.GetClosestPoint( guess, 96f ) is not { } nav ) return false;
+
+		// Back onto the closest wall, if there's one within reach.
+		var pos = nav;
+		var forward = (center - nav).WithZ( 0 );
+		forward = forward.LengthSquared > 1f ? forward.Normal : Vector3.Forward;
+		var closestWall = 100f;
+		for ( int i = 0; i < 8; i++ )
+		{
+			var dir = Rotation.FromYaw( 45f * i ).Forward;
+			var start = nav + Vector3.Up * 48f;
+			var wall = Scene.Trace.Ray( start, start + dir * 100f )
+				.WithoutTags( "player", "enemy", "trigger", TerrorTown.MapMover.DoorTag )
+				.Run();
+			if ( !wall.Hit || MathF.Abs( wall.Normal.z ) > 0.3f ) continue;
+
+			// Straight-on distance to the wall, the ray may have hit it at an angle.
+			var normal = wall.Normal.WithZ( 0 ).Normal;
+			var distance = wall.Distance * Vector3.Dot( dir, -normal );
+			if ( distance >= closestWall ) continue;
+
+			closestWall = distance;
+			forward = normal;
+			pos = nav - forward * (distance - size.x * 0.5f - 1f);
+		}
+
+		var ground = Scene.Trace.Ray( pos + Vector3.Up * 40f, pos + Vector3.Down * 80f ).WithoutTags( "player", "enemy", "trigger" ).Run();
+		if ( !ground.Hit || MathF.Abs( ground.EndPosition.z - nav.z ) > 24f ) return false;
+		pos = ground.EndPosition;
+
+		if ( placed.Any( p => p.Distance( pos ) < (relaxed ? 100f : 150f) ) ) return false;
+
+		// Not on top of anyone, or where they'll respawn.
+		bool Near( Vector3 p ) => p.WithZ( 0 ).Distance( pos.WithZ( 0 ) ) < 90f && MathF.Abs( p.z - pos.z ) < 72f;
+		if ( HumanPawns( Scene ).Any( p => Near( p.WorldPosition ) ) ) return false;
+		if ( GameUtils.GetSpawnPoints().Any( s => Near( s.Transform.Position ) ) ) return false;
+
+		// Out of the way of doors swinging open.
+		var doorClearance = relaxed ? 70f : 110f;
+		foreach ( var door in Scene.GetAllComponents<TerrorTown.MapMover>() )
+		{
+			var doorCenter = door.GetComponent<ModelRenderer>()?.Bounds.Center ?? door.WorldPosition;
+			if ( doorCenter.WithZ( 0 ).Distance( pos.WithZ( 0 ) ) < doorClearance && MathF.Abs( doorCenter.z - pos.z ) < 120f ) return false;
+		}
+
+		// Nothing in the way of the station itself (lifted off the floor, and a touch smaller so the wall it backs onto doesn't count).
+		var rot = Rotation.LookAt( forward );
+		var half = (size - 4f) * 0.5f;
+		var box = new BBox( new Vector3( -half.x, -half.y, -half.z ), new Vector3( half.x, half.y, half.z ) );
+		var middle = pos + Vector3.Up * (size.z * 0.5f + 4f);
+		var blocked = Scene.Trace.Box( box, middle, middle )
+			.Rotated( rot )
+			.WithoutTags( "player", "enemy", "trigger" )
+			.Run();
+		if ( blocked.Hit || blocked.StartedSolid ) return false;
+
+		// Standing room in front, and players can walk to it.
+		var front = Scene.NavMesh.GetClosestPoint( pos + forward * (size.x * 0.5f + 40f), 48f );
+		if ( front is not { } frontNav || !CanWalk( center, frontNav, 5000f ) ) return false;
+
+		position = pos;
+		rotation = rot;
+		return true;
 	}
 
 	private void CreateStation( Vector3 pos, Rotation rot, Action<ZombiesBuyStation> setup )
@@ -558,6 +756,7 @@ public sealed class ZombiesRoundSystem : Component
 		{
 			ZombiesBuyKind.Perk => ZombiesBuyStation.PerkColor( station.Perk ),
 			ZombiesBuyKind.MysteryBox => new Color( 0.3f, 0.6f, 1f ),
+			ZombiesBuyKind.AmmoBox => new Color( 0.3f, 1f, 0.35f ),
 			_ => new Color( 1f, 0.85f, 0.6f ),
 		};
 
@@ -573,6 +772,14 @@ public sealed class ZombiesRoundSystem : Component
 			case ZombiesBuyKind.MysteryBox:
 				AddFittedModel( go, MysteryBoxModel, 32f, Color.White, lengthAlongY: true );
 				size = new Vector3( 36f, 70f, 34f );
+				break;
+
+			case ZombiesBuyKind.AmmoBox:
+				var crate = new GameObject( go, true, "Ammo box" );
+				crate.LocalPosition = Vector3.Up * 26f;
+				crate.LocalScale = 2.5f;
+				ZombiesPowerUp.CreateAmmoCase( crate );
+				size = new Vector3( 40f, 68f, 48f );
 				break;
 
 			default:

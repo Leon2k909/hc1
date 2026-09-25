@@ -50,14 +50,7 @@ public sealed class DefaultEquipment : Component,
 
 		if ( LoadoutsEnabled )
 		{
-			foreach ( var resource in Facepunch.Gunsmith.GunsmithLoadoutManager.GetLoadoutResources() )
-			{
-				if ( !player.Inventory.HasInSlot( resource.Slot ) )
-				{
-					player.Inventory.Give( resource, false );
-				}
-			}
-
+			// The class the player picked, sent from their own saved classes (PlayerLoadout.SendActiveClass).
 			foreach ( var resource in player.Client.Loadout.Equipment )
 			{
 				if ( !player.Inventory.HasInSlot( resource.Slot ) )

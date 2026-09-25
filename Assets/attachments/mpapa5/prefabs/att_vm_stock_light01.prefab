@@ -1,0 +1,38 @@
+{
+  "RootObject": {
+    "__guid": "035e7e1d-7a37-5bf2-a0a9-118958290a73",
+    "Flags": 0,
+    "Name": "MP5 FORGE TAC Ultralight",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "44ba1762-5ee1-5ecf-9332-28cc6c79679c",
+        "__enabled": true,
+        "Model": "attachments/mpapa5/shared/att_vm_stock_light01/att_vm_stock_light01.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithBoneAttachment",
+        "__guid": "48aa9551-2170-5cdb-a3cb-23467621806e",
+        "__enabled": true,
+        "BoneName": "weapon_root",
+        "UseWeaponOrigin": true,
+        "WeaponSpaceOffset": "-5.964,0,8.211",
+        "WeaponSpaceScale": 0.955,
+        "MountAtBone": false,
+        "BoneOffset": "0,0,0",
+        "BoneAngles": "0,0,0",
+        "ModelScaleMultiplier": "1,1,1",
+        "HiddenBone": "stock"
+      }
+    ],
+    "Children": []
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

@@ -1,0 +1,38 @@
+{
+  "RootObject": {
+    "__guid": "a68a61d6-1806-5990-807b-482bdecc1216",
+    "Flags": 0,
+    "Name": "MP5 Light Muzzle Brake",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "792e65e1-fd42-52f6-9c67-60c63b0b0164",
+        "__enabled": true,
+        "Model": "attachments/mw2022/models/att_vm_muzzlebrake01/att_vm_muzzlebrake01.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithBoneAttachment",
+        "__guid": "9b73f925-d07d-5984-8d6c-4303ae6e7fef",
+        "__enabled": true,
+        "BoneName": "weapon_root",
+        "UseWeaponOrigin": true,
+        "WeaponSpaceOffset": "12,0,8.13",
+        "WeaponSpaceScale": 1,
+        "MountAtBone": false,
+        "BoneOffset": "0,0,0",
+        "BoneAngles": "0,0,0",
+        "ModelScaleMultiplier": "1,1,1",
+        "FitMp5MuzzleToBarrel": true
+      }
+    ],
+    "Children": []
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

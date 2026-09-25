@@ -3,15 +3,15 @@
 
 <root class="hc1 hud layout grow flex column">
     <div class="layout main with-background padding-extra column">
-        <div class="layout flex column padding-extra center">
-            @if ( MapVoteSystem.WinningOption is { } option )
+        <div class="layout flex column padding-extra center vote-heading">
+            @if ( MapVoteSystem.WinningOption is not null )
             {
-                <label class="vital white uppercase">Changing Map</label>
+                <label class="vital white uppercase vote-timer">Changing Map</label>
             }
             else
             {
-                <label class="vital white uppercase">@TimeSpan.FromSeconds(MapVoteSystem.TimeUntilDecidedWinner).ToString(@"mm\:ss")</label>
-                <label class="small slight">Vote for the next map.</label>
+                <label class="vital white uppercase vote-timer">@TimeSpan.FromSeconds(Math.Max(0, Math.Ceiling((double)MapVoteSystem.TimeUntilDecidedWinner))).ToString(@"mm\:ss")</label>
+                <label class="small slight vote-caption">Vote for the next map.</label>
             }
         </div>
 

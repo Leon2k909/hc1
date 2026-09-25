@@ -27,20 +27,21 @@ public partial class PlayerPawn
 
 	public override void OnKill( DamageInfo damageInfo )
 	{
+		IsFallKnockedDown = false;
+		IsProne = false;
+		var client = Client;
+
 		if ( Networking.IsHost )
 		{
 			ArmorComponent.HasHelmet = false;
 			ArmorComponent.Armor = 0f;
 
-			var defaultRespawnState = Scene.GetAllComponents<DefaultRespawnState>().FirstOrDefault();
-			if ( defaultRespawnState.IsValid() )
+			if ( client.IsValid() )
 			{
-				Client.RespawnState = defaultRespawnState.RespawnState;
-			}
-			else
-			{
-				// on join, spawn right now if we can
-				Client.RespawnState = RespawnState.Requested;
+				var defaultRespawnState = Scene.GetAllComponents<DefaultRespawnState>().FirstOrDefault();
+				client.RespawnState = defaultRespawnState.IsValid()
+					? defaultRespawnState.RespawnState
+					: RespawnState.Requested;
 			}
 
 			Inventory.Clear();
@@ -49,10 +50,10 @@ public partial class PlayerPawn
 
 		PlayerBoxCollider.Enabled = false;
 
-		if ( IsProxy )
+		if ( IsProxy || !client.IsValid() )
 			return;
 
-		Client.OnKill( damageInfo );
+		client.OnKill( damageInfo );
 
 		Holster();
 
@@ -156,7 +157,7 @@ public partial class PlayerPawn
 			Body.GameObject.Name = $"Ragdoll (BOT {DisplayName})";
 
 			var comp = Body.Components.Create<DestroyAfter>();
-			comp.Time = 5f;
+			comp.Time = 15f;
 
 			Body = null;
 			return;

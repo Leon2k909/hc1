@@ -53,6 +53,34 @@ public partial class GunsmithPart : GameResource
 	public int MagazineCapacity { get; set; }
 	[Property, ShowIf( nameof( Category ), GunsmithPartType.Magazine )]
 	public float ReloadTimeMultiplier { get; set; } = 1f;
+	/// <summary>
+	/// A magazine of another kind than the weapon's own (a box magazine on a drum-fed gun) reloads with its own viewmodel
+	/// animations: the animgraph's reload_variant, 0 keeping the weapon's reload. Its reload times and foley then replace
+	/// the weapon's (<see cref="Reloadable"/>); <see cref="ReloadTimeMultiplier"/> still applies on top.
+	/// </summary>
+	[Property, ShowIf( nameof( Category ), GunsmithPartType.Magazine ), Group( "Reload" )]
+	public int ReloadAnimation { get; set; }
+	[Property, ShowIf( nameof( Category ), GunsmithPartType.Magazine ), Group( "Reload" )]
+	public float ReloadTime { get; set; }
+	[Property, ShowIf( nameof( Category ), GunsmithPartType.Magazine ), Group( "Reload" )]
+	public float EmptyReloadTime { get; set; }
+	[Property, ShowIf( nameof( Category ), GunsmithPartType.Magazine ), Group( "Reload" )]
+	public Dictionary<float, SoundEvent> ReloadSounds { get; set; } = new();
+	[Property, ShowIf( nameof( Category ), GunsmithPartType.Magazine ), Group( "Reload" )]
+	public Dictionary<float, SoundEvent> EmptyReloadSounds { get; set; } = new();
+	/// <summary>
+	/// A bodygroup barrel of another length: how far it moves the muzzle from the factory barrel's, in the weapon's
+	/// bind space. Muzzle devices and discharge effects follow it (<see cref="GunsmithAttachmentPoint.MuzzleShift"/>).
+	/// </summary>
+	[Property, ShowIf( nameof( Category ), GunsmithPartType.Barrel )]
+	public Vector3 MuzzleShift { get; set; }
+
+	/// <summary>
+	/// Recoil multipliers for parts whose effect isn't implied by their name (see <see cref="GunsmithAttachmentEffects"/>),
+	/// e.g. a heavier fixed stock. 1 leaves recoil unchanged.
+	/// </summary>
+	[Property, Group( "Effects" )] public float VerticalRecoilScale { get; set; } = 1f;
+	[Property, Group( "Effects" )] public float HorizontalRecoilScale { get; set; } = 1f;
 
 	/// <summary>
 	/// Which weapons does this part support? By default, if it's empty, it's universal
@@ -78,6 +106,10 @@ public partial class GunsmithPart : GameResource
 	[Property, ShowIf( nameof( OverrideAimOffset ), true )] public Vector3 OpticAimOffset { get; set; }
 	[Property, ShowIf( nameof( OverrideAimOffset ), true )] public Angles OpticAimAngles { get; set; }
 	[Property, ShowIf( nameof( Category ), GunsmithPartType.Optic ), Range( 1, 8 )] public float OpticMagnification { get; set; } = 1f;
+	[Property, ShowIf( nameof( Category ), GunsmithPartType.Optic ), Range( 0.05f, 0.5f )]
+	public float OpticLensDiameter { get; set; } = 0.3f;
+	[Property, ShowIf( nameof( Category ), GunsmithPartType.Optic )]
+	public bool OpticOverlayDot { get; set; } = true;
 
 	public Dictionary<string, int> GetBodygroups( Model model ) =>
 		model is not null && ModelBodygroups is not null && ModelBodygroups.TryGetValue( model.Name, out var groups )
@@ -105,6 +137,13 @@ public partial class GunsmithPart : GameResource
 	/// </summary>
 	[Property, ImageAssetPath, ShowIf( nameof(Category), GunsmithPartType.Sticker )]
 	public string StickerImage { get; set; }
+
+	/// <summary>
+	/// The reticle drawn large on a transparent square (white, tinted with the chosen reticle colour) for the
+	/// Customize tab. <see cref="CamoTexture"/> is the lens mask, where the shape is only a few pixels wide.
+	/// </summary>
+	[Property, ImageAssetPath, ShowIf( nameof(Category), GunsmithPartType.Reticle )]
+	public string ReticlePreview { get; set; }
 
 	/// <summary>
 	/// Is this a universal attachment?

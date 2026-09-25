@@ -12,8 +12,8 @@
         "__guid": "2dd95a44-30f3-41fd-ac16-dd967ea5d163",
         "Arms": {
           "_type": "component",
-          "component_id": "2d65235d-6a43-421f-9bae-49d28004f322",
-          "go": "42a3c29d-4bb2-4aa8-ba33-8b8323783b56",
+          "component_id": "9834aee0-3ca7-4432-a08c-816bc3d3cce0",
+          "go": "9427690e-92ee-4b0a-ba3c-634d04530e54",
           "component_type": "SkinnedModelRenderer"
         },
         "EjectionPort": {
@@ -91,9 +91,80 @@
           "component_type": "SkinnedModelRenderer"
         },
         "Resource": "weapons/scarh/scarh.equip"
+      },
+      {
+        "__type": "Facepunch.SwbArmsRetarget",
+        "__guid": "a01022e4-6f4e-499e-81e1-7482331e8c05",
+        "Arms": {
+          "_type": "component",
+          "component_id": "9834aee0-3ca7-4432-a08c-816bc3d3cce0",
+          "go": "9427690e-92ee-4b0a-ba3c-634d04530e54",
+          "component_type": "SkinnedModelRenderer"
+        },
+        "KnuckleAnchor": 0.5,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "PalmClearance": 0.25,
+        "Source": {
+          "_type": "component",
+          "component_id": "2d65235d-6a43-421f-9bae-49d28004f322",
+          "go": "42a3c29d-4bb2-4aa8-ba33-8b8323783b56",
+          "component_type": "SkinnedModelRenderer"
+        }
       }
     ],
     "Children": [
+      {
+        "__guid": "9427690e-92ee-4b0a-ba3c-634d04530e54",
+        "Flags": 0,
+        "Name": "Arms",
+        "Enabled": true,
+        "NetworkMode": 0,
+        "Components": [
+          {
+            "__type": "Sandbox.SkinnedModelRenderer",
+            "__guid": "9834aee0-3ca7-4432-a08c-816bc3d3cce0",
+            "AnimationGraph": null,
+            "BodyGroups": 21,
+            "BoneMergeTarget": null,
+            "CreateAttachments": false,
+            "CreateBoneObjects": false,
+            "MaterialOverride": null,
+            "Model": "models/first_person/v_first_person_arms_human.vmdl",
+            "Morphs": {},
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "Parameters": {
+              "bools": {},
+              "ints": {},
+              "floats": {},
+              "vectors": {},
+              "rotations": {}
+            },
+            "PlaybackRate": 1,
+            "RenderOptions": {
+              "GameLayer": false,
+              "OverlayLayer": true,
+              "BloomLayer": false,
+              "AfterUILayer": false
+            },
+            "RenderType": "Off",
+            "Sequence": {
+              "Name": null
+            },
+            "Tint": "1,1,1,1",
+            "UseAnimGraph": false
+          }
+        ]
+      },
       {
         "__guid": "a72d3a58-9f96-4134-8a69-25fe00ccd39f",
         "Flags": 4,

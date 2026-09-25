@@ -1,59 +1,233 @@
-@import "/UI/Styles/Theme.scss";
+// Matches the pause menu / settings: yellow accent title, slate panels with a yellow top edge.
+$sb-accent: #ffbd24;
+$sb-warn: #ff6a5a;
 
 ServerBrowser
 {
-    width: 100%;
-    height: 100%;
-    flex-grow: 1;
-    flex-direction: row;
-    gap: 64px;
+	flex-grow: 1;
+	flex-direction: column;
+	width: 100%;
+	min-height: 0;
+	gap: 28px;
 
-    .list
-    {
-        flex-basis: 70%;
-        flex-direction: column;
-        background-color: rgba( black, 0.35 );
-        backdrop-filter: $blur;
+	.sb-head
+	{
+		flex-direction: row;
+		align-items: center;
+		flex-shrink: 0;
+		gap: 14px;
+	}
 
-        > .header
-        {
-            background-color: rgba( black, 0.35 );
-            padding: 10px 16px;
-            gap: 64px;
-            width: 100%;
-            flex-direction: row;
-            border-radius: 2px;
-            flex-shrink: 0;
-        }
-    }
+	.sb-accent
+	{
+		width: 6px;
+		height: 44px;
+		background-color: $sb-accent;
+	}
 
-    .current
-    {
-        background-color: rgba( black, 0.35 );
-        flex-grow: 1;
-        flex-direction: column;
-        backdrop-filter: $blur;
+	.sb-title
+	{
+		font-size: 40px;
+		font-weight: 900;
+		letter-spacing: 5px;
+	}
 
-        > .header
-        {
-            background-color: rgba( black, 0.35 );
-            padding: 10px 16px;
-            gap: 64px;
-            width: 100%;
-            flex-direction: row;
-            border-radius: 2px;
-            flex-shrink: 0;
-            justify-content: flex-start;
-        }
-    }
+	.sb-head-fill
+	{
+		flex-grow: 1;
+	}
 
-    .servers
-    {
-        border-radius: 2px;
-        flex-direction: column;
-        overflow-y: scroll;
-        overflow-x: hidden;
-        max-height: 100%;
-        mask-mode: alpha;
-    }
+	.sb-count
+	{
+		font-size: 16px;
+		font-weight: 700;
+		letter-spacing: 2px;
+		color: rgba( white, 0.55 );
+
+		&.searching
+		{
+			color: $sb-accent;
+			animation: sb-pulse 1.6s ease-in-out infinite;
+		}
+	}
+
+	.sb-panels
+	{
+		flex-grow: 1;
+		flex-direction: row;
+		min-height: 0;
+		gap: 24px;
+	}
+
+	.sb-list, .sb-detail
+	{
+		flex-direction: column;
+		background-color: rgba( 19, 26, 32, 0.9 );
+		border-top: 3px solid $sb-accent;
+	}
+
+	.sb-list
+	{
+		flex-grow: 1;
+		min-width: 0;
+	}
+
+	.sb-detail
+	{
+		width: 420px;
+		flex-shrink: 0;
+	}
+
+	.sb-panel-head
+	{
+		flex-direction: row;
+		align-items: center;
+		flex-shrink: 0;
+		height: 52px;
+		// Rows are 20px padding + a 4px accent border, so the column labels line up with the row text.
+		padding: 0 20px 0 24px;
+		border-bottom: 1px solid rgba( white, 0.1 );
+
+		label
+		{
+			font-size: 14px;
+			font-weight: 700;
+			letter-spacing: 2px;
+			text-transform: uppercase;
+			color: rgba( white, 0.5 );
+		}
+
+		.sb-col-name { flex-grow: 1; }
+		.sb-col-players { width: 120px; text-align: right; }
+	}
+
+	.sb-rows
+	{
+		flex-grow: 1;
+		flex-direction: column;
+		min-height: 0;
+		overflow-y: scroll;
+	}
+
+	.sb-state
+	{
+		flex-grow: 1;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		gap: 10px;
+		padding: 32px;
+
+		i { font-size: 56px; color: rgba( white, 0.18 ); }
+
+		.sb-state-title
+		{
+			font-size: 22px;
+			font-weight: 900;
+			letter-spacing: 3px;
+			text-transform: uppercase;
+			color: rgba( white, 0.8 );
+		}
+
+		.sb-state-text
+		{
+			font-size: 16px;
+			color: rgba( white, 0.5 );
+			text-align: center;
+		}
+
+		&.searching
+		{
+			animation: sb-pulse 1.6s ease-in-out infinite;
+
+			i { color: $sb-accent; }
+		}
+	}
+
+	.sb-detail-body
+	{
+		flex-direction: column;
+		gap: 12px;
+		padding: 24px;
+	}
+
+	.sb-detail-name
+	{
+		font-size: 28px;
+		font-weight: 900;
+		color: white;
+		margin-bottom: 8px;
+	}
+
+	.sb-stat
+	{
+		position: relative;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		height: 48px;
+		padding: 0 16px;
+		background-color: rgba( 48, 58, 67, 0.45 );
+	}
+
+	.sb-stat-key
+	{
+		font-size: 14px;
+		font-weight: 700;
+		letter-spacing: 2px;
+		text-transform: uppercase;
+		color: rgba( white, 0.55 );
+	}
+
+	.sb-stat-value
+	{
+		font-size: 18px;
+		font-weight: 700;
+		color: white;
+		text-transform: uppercase;
+
+		&.open { color: $sb-accent; }
+		&.full { color: $sb-warn; }
+	}
+
+	// Capacity bar along the bottom edge of the Players stat.
+	.sb-bar
+	{
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		height: 4px;
+		background-color: rgba( white, 0.08 );
+	}
+
+	.sb-bar-fill
+	{
+		height: 100%;
+		background-color: $sb-accent;
+
+		&.full { background-color: $sb-warn; }
+	}
+}
+
+.main-menu-root.compact ServerBrowser
+{
+	.sb-title { font-size: 32px; letter-spacing: 4px; }
+	.sb-accent { height: 36px; }
+	.sb-detail { width: 340px; }
+}
+
+.main-menu-root.narrow ServerBrowser
+{
+	.sb-panels { flex-direction: column; }
+	.sb-detail { width: 100%; }
+	.sb-detail.empty { display: none; }
+}
+
+// s&box resolves animation names from top-level keyframes.
+@keyframes sb-pulse
+{
+	0% { opacity: 0.45; }
+	50% { opacity: 1; }
+	100% { opacity: 0.45; }
 }

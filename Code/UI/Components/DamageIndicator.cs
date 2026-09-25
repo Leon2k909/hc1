@@ -23,6 +23,9 @@ public partial class DamageIndicator : Panel
 		{
 			Position = pos;
 
+			// Just the red end: drawing it as this panel's bottom border also drew hairline sides along its length.
+			Add.Panel( "bar" );
+
 			_ = Lifetime();
 		}
 

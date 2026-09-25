@@ -283,7 +283,7 @@ public partial class PlayerInventory : Component
 		RemoveWeapon( equipment );
 	}
 
-	public Equipment Give( EquipmentResource resource, bool makeActive = true )
+	public Equipment Give( EquipmentResource resource, bool makeActive = true, bool applySavedAttachments = true, DroppedEquipment droppedState = null )
 	{
 		Assert.True( Networking.IsHost );
 
@@ -334,11 +334,18 @@ public partial class PlayerInventory : Component
 			return null;
 		}
 		component.Owner = Player;
-		Facepunch.Gunsmith.GunsmithLoadoutManager.ApplyAttachments( resource, gameObject );
+		component.ApplySavedAttachments = applySavedAttachments;
+		if ( applySavedAttachments )
+			Facepunch.Gunsmith.GunsmithLoadoutManager.ApplyAttachments( resource, gameObject );
 
 		// A fresh weapon comes with a full basic load. Picked-up weapons overwrite this with what the dropper had.
 		if ( gameObject.GetComponentInChildren<WeaponAmmo>( true ) is { } freshAmmo )
 			freshAmmo.ReserveAmmo = freshAmmo.GetMaxReserve();
+		if ( droppedState.IsValid() )
+		{
+			foreach ( var state in component.GetComponentsInChildren<IDroppedWeaponState>( true ) )
+				state.CopyFromDroppedWeapon( droppedState );
+		}
 		gameObject.NetworkSpawn( Player.Network.Owner );
 
 		if ( makeActive )
@@ -387,66 +394,5 @@ public partial class PlayerInventory : Component
 			default:
 				return !HasInSlot( resource.Slot ) ? PickupResult.Pickup : PickupResult.Swap;
 		}
-	}
-
-	public void TryPurchaseBuyMenuItem( string equipmentId )
-	{
-		using var _ = Rpc.FilterInclude( Connection.Host );
-		PurchaseBuyMenuItem( equipmentId );
-	}
-
-	[Rpc.Broadcast]
-	private void PurchaseBuyMenuItem( string equipmentId )
-	{
-		if ( !Networking.IsHost )
-		{
-			Log.Warning( $"Tried to purchase an buy menu item ({equipmentId}) but is not the host." );
-			return;
-		}
-
-		var equipmentData = BuyMenuItem.GetById( equipmentId );
-
-		if ( equipmentData == null )
-		{
-			Log.Warning( $"Attempted purchase but EquipmentData (Id: {equipmentId}) not known!" );
-			return;
-		}
-
-		equipmentData.Purchase( Player );
-	}
-
-	public void Purchase( int resourceId )
-	{
-		using var _ = Rpc.FilterInclude( Connection.Host );
-		PurchaseAsHost( resourceId );
-	}
-
-	[Rpc.Broadcast]
-	private void PurchaseAsHost( int resourceId )
-	{
-		if ( !Networking.IsHost )
-		{
-			Log.Warning( $"Tried to purchase an inventory resource ({resourceId}) but is not the host." );
-			return;
-		}
-
-		var resource = ResourceLibrary.Get<EquipmentResource>( resourceId );
-
-		if ( resource == null )
-		{
-			Log.Warning( $"Attempted purchase but EquipmentResource (Id: {resource}) not known!" );
-			return;
-		}
-
-		if ( Player.Client.Balance < resource.Price )
-			return;
-
-		if ( Give( resource ) is null )
-			return;
-
-		// Update the player's loadout
-		Player.Client.Loadout.SetFrom( Player );
-
-		Player.Client.Balance -= resource.Price;
 	}
 }

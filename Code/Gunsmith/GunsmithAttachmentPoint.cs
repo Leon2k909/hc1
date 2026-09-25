@@ -18,6 +18,34 @@ public partial class GunsmithAttachmentPoint : Component
 	public GunsmithPart CurrentPart { get; set; }
 
 	/// <summary>
+	/// For weapons other than the M4 that take its MW22 parts: the bone the parts follow instead of the M4's
+	/// weapon_root. A weapon with this set has none of the M4's factory pieces to swap. A missing bone (e.g. on a
+	/// single-bone world model) mounts on the model itself.
+	/// </summary>
+	[Property, Group( "MW22 Mount" )]
+	public string MountBone { get; set; }
+
+	/// <summary>
+	/// Where this weapon's mount sits relative to the M4's, in the model's bind space.
+	/// </summary>
+	[Property, Group( "MW22 Mount" )]
+	public Vector3 MountOffset { get; set; }
+
+	/// <summary>
+	/// Weapon bodygroups switched to these choices while this slot holds a part, and back to 0 while it's empty,
+	/// e.g. a rail that's only there under an optic. Where several fitted slots set the same bodygroup, the highest
+	/// choice wins, so such choices run from most to least shown (a muzzle tip: factory, a longer barrel's, none).
+	/// </summary>
+	[Property]
+	public Dictionary<string, int> FittedBodygroups { get; set; } = new();
+
+	/// <summary>The fitted barrel's <see cref="GunsmithPart.MuzzleShift"/> on this weapon, zero for the factory barrel.</summary>
+	public static Vector3 MuzzleShift( GameObject weapon ) =>
+		weapon.Components.GetAll<GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants )
+			.FirstOrDefault( p => p.Category == GunsmithPartType.Barrel && p.CurrentPart.IsValid() )?.CurrentPart.MuzzleShift
+		?? Vector3.Zero;
+
+	/// <summary>
 	/// Set the gunsmith part to this part
 	/// </summary>
 	/// <param name="part"></param>
@@ -32,6 +60,7 @@ public partial class GunsmithAttachmentPoint : Component
 		CurrentPart = part;
 
 		ResetCategoryBodygroups();
+		ApplyFittedBodygroups();
 
 		if ( CurrentPart is null )
 		{
@@ -75,8 +104,25 @@ public partial class GunsmithAttachmentPoint : Component
 		}
 	}
 
+	private void ApplyFittedBodygroups()
+	{
+		if ( FittedBodygroups is null || FittedBodygroups.Count == 0 )
+			return;
+
+		var renderer = GetComponentInParent<SkinnedModelRenderer>( true );
+		if ( !renderer.IsValid() )
+			return;
+
+		var fitted = renderer.Components.GetAll<GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants )
+			.Where( p => p.CurrentPart.IsValid() && p.FittedBodygroups is not null ).ToList();
+		foreach ( var name in FittedBodygroups.Keys )
+			renderer.SetBodyGroup( name, fitted.Select( p => p.FittedBodygroups.TryGetValue( name, out var choice ) ? choice : 0 )
+				.DefaultIfEmpty( 0 ).Max() );
+	}
+
 	internal void ApplyBodygroups()
 	{
+		ApplyFittedBodygroups();
 		if ( !CurrentPart.IsValid() || !CurrentPart.ModifyBodygroups || CurrentPart.Bodygroups is null )
 			return;
 

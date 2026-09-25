@@ -1,0 +1,38 @@
+{
+  "RootObject": {
+    "__guid": "228366e3-0c0a-4312-a50a-effe11605974",
+    "Flags": 0,
+    "Name": "MP5 10mm 30-Round Magazine",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "07e4b85d-3999-4f87-941b-96ea04d1d3d5",
+        "__enabled": true,
+        "Model": "attachments/mpapa5/magazines/magazine_10mm_30_round/magazine_10mm_30_round.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithBoneAttachment",
+        "__guid": "a9eb2333-52df-45f5-9403-f7d6c6f88fe8",
+        "__enabled": true,
+        "BoneName": "magazine",
+        "HiddenBodygroup": "magazine",
+        "UseWeaponOrigin": true,
+        "WeaponSpaceOffset": "3.1,0,4.5",
+        "WeaponSpaceScale": 0.8,
+        "MountAtBone": false,
+        "BoneOffset": "0,0,0",
+        "BoneAngles": "0,0,0",
+        "ModelScaleMultiplier": "1,1,1"
+      }
+    ],
+    "Children": []
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

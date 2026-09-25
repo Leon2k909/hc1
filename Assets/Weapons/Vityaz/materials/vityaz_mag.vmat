@@ -1,0 +1,13 @@
+"Layer0"
+{
+	shader "shaders/complex.shader"
+	F_SPECULAR "1"
+	F_METALNESS_TEXTURE "1"
+	g_flRoughnessScaleFactor "1"
+	g_vColorTint "[1 1 1 1]"
+	TextureColor "weapons/vityaz/materials/vityaz_mag_color.png"
+	TextureNormal "weapons/vityaz/materials/vityaz_mag_normal.png"
+	TextureRoughness "weapons/vityaz/materials/vityaz_mag_roughness.png"
+	TextureMetalness "weapons/vityaz/materials/vityaz_mag_metalness.png"
+	TextureAmbientOcclusion "materials/default/default_ao.tga"
+}

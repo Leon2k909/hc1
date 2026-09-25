@@ -30,6 +30,7 @@ public partial class Client
 	private void Spawn( SpawnPointInfo spawnPoint )
 	{
 		var prefab = PlayerPawnPrefab.Clone( spawnPoint.Transform );
+		prefab.Flags |= GameObjectFlags.NotSaved;
 		var pawn = prefab.GetComponent<PlayerPawn>();
 
 		pawn.Client = this;

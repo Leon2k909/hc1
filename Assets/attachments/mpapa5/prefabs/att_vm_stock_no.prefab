@@ -1,0 +1,38 @@
+{
+  "RootObject": {
+    "__guid": "471dabcb-cda5-5c14-9ef8-88d41771e0be",
+    "Flags": 0,
+    "Name": "MP5 No Stock",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "aee065e8-d39c-5884-89d1-ddacb6b84eca",
+        "__enabled": true,
+        "Model": "attachments/mpapa5/shared/att_vm_stock_no/att_vm_stock_no.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithBoneAttachment",
+        "__guid": "8d0c2eca-209c-50e0-8a39-e86580a85b0d",
+        "__enabled": true,
+        "BoneName": "weapon_root",
+        "UseWeaponOrigin": true,
+        "WeaponSpaceOffset": "-5.964,0,8.211",
+        "WeaponSpaceScale": 0.955,
+        "MountAtBone": false,
+        "BoneOffset": "0,0,0",
+        "BoneAngles": "0,0,0",
+        "ModelScaleMultiplier": "1,1,1",
+        "HiddenBone": "stock"
+      }
+    ],
+    "Children": []
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

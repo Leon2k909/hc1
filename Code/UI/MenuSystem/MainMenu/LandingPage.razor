@@ -31,7 +31,8 @@
                         {
                             <div class="play-btn replay-btn" onclick=@PlayLastMode>
                                 <i>replay</i>
-                                <label>PLAY AGAIN · @(_lastPlayedHardcore ? "HC " + LastPlayedMode.Title.ToUpper() : LastPlayedMode.Title.ToUpper())</label>
+                                @* Put back with Core modes: PLAY AGAIN · @(_lastPlayedHardcore ? "HC " + LastPlayedMode.Title.ToUpper() : LastPlayedMode.Title.ToUpper()) *@
+                                <label>PLAY AGAIN · @LastPlayedMode.Title.ToUpper()</label>
                             </div>
                         }
                     </div>
@@ -41,7 +42,7 @@
             @* Secondary Actions Stack: Game Modes *@
             <div class="secondary-cards">
 
-                @* CORE / HARDCORE toggle *@
+                @* Core / Hardcore toggle: Core modes are off for now, every mode is hardcore. Put back with Core.
                 <div class="mode-rule-toggle">
                     <div class="mode-rule-btn @(!IsHardcore ? "active" : "")" @onclick=@(() => { IsHardcore = false; StateHasChanged(); })>
                         <i>sports_esports</i>
@@ -52,6 +53,7 @@
                         <label>HARDCORE</label>
                     </div>
                 </div>
+                *@
 
                 @foreach ( var mode in GameMode.AllUnique
                     .Where( m => !string.Equals( m.Ident, "zombies", StringComparison.OrdinalIgnoreCase ) ) )
@@ -73,6 +75,50 @@
 
         @* ----- Last Played ----- *@
     </div>
+
+    @* ===================== MAP SELECT ===================== *@
+    @if ( _mapPickMode is not null )
+    {
+        <div class="map-picker">
+            <div class="map-picker-backdrop" onclick=@CloseMapPicker />
+            <div class="map-picker-panel @(IsHardcore ? "hc" : "")">
+                <div class="map-picker-header">
+                    <div class="map-picker-heading">
+                        <label class="kicker">@(IsHardcore ? "HARDCORE" : "MULTIPLAYER") · @_mapPickMode.Title.ToUpper()</label>
+                        <label class="map-picker-title">SELECT MAP</label>
+                    </div>
+                    <div class="map-picker-close" onclick=@CloseMapPicker>
+                        <i>close</i>
+                    </div>
+                </div>
+
+                <div class="map-grid">
+                    @foreach ( var map in MapsFor( _mapPickMode ) )
+                    {
+                        var image = map.GetMetadata( "Image", "" );
+                        <div class="map-card" onclick=@(() => Launch( _mapPickMode, map ))>
+                            @if ( string.IsNullOrWhiteSpace( image ) )
+                            {
+                                <div class="map-img placeholder"><i>landscape</i></div>
+                            }
+                            else
+                            {
+                                <img class="map-img" src="@image" />
+                            }
+                            <div class="map-shade" />
+                            <label class="map-name">@map.GetMetadata( "Title", map.ResourceName ).ToUpper()</label>
+                        </div>
+                    }
+
+                    <div class="map-card random" onclick=@(() => Launch( _mapPickMode, RandomMap( _mapPickMode ) ))>
+                        <div class="map-img placeholder"><i>shuffle</i></div>
+                        <div class="map-shade" />
+                        <label class="map-name">RANDOM</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 
     @* ===================== BOTTOM STATUS BAR ===================== *@
     <div class="statusbar">
@@ -101,6 +147,10 @@
     public void OnNavigationOpen()  => MainMenuRoot.Instance?.SetActiveRoute( "/multiplayer" );
     public void OnNavigationClose() { }
 
+    /// <summary>
+    /// The Core / Hardcore toggle, which also picks the menu's look. Core modes are off for now: the toggle is
+    /// commented out and this stays false, so the menu shows plain mode names, and every match launches hardcore.
+    /// </summary>
     private bool IsHardcore { get; set; } = false;
 
     private static GameMode _lastPlayedMode;
@@ -131,30 +181,59 @@
 
     private int PlayerLevel => Progression.GetLevel();
 
+    /// <summary> The mode whose map choice is open, or null. </summary>
+    private GameMode _mapPickMode;
+
     void QuickPlay()
     {
-        var map = GameUtils.GetAvailableMaps().FirstOrDefault();
+        var map = Game.Random.FromList( GameUtils.GetMatchMaps().ToList() );
         if ( map is null ) return;
 
         var mode = GameMode.GetAll( map ).FirstOrDefault();
         if ( mode is null ) return;
 
-        SaveLastPlayed( mode, map.ResourcePath, IsHardcore );
-        GameMode.SetCurrent( mode );
-        GameMode.SetHardcore( IsHardcore );
-        Game.ActiveScene.Load( map );
+        Launch( mode, map );
     }
 
     void PlayMode( GameMode targetMode )
     {
-        var maps = GameUtils.GetAvailableMaps();
-        var map = maps.FirstOrDefault( m => GameMode.GetAll( m ).Any( x => x.Ident == targetMode.Ident ) );
-        if ( map is null ) map = maps.FirstOrDefault();
-        if ( map is null ) return;
+        var maps = MapsFor( targetMode );
+        if ( maps.Count == 0 ) return;
 
-        SaveLastPlayed( targetMode, map.ResourcePath, IsHardcore );
-        GameMode.SetCurrent( targetMode );
-        GameMode.SetHardcore( IsHardcore );
+        // Only ask when there's a choice to make.
+        if ( maps.Count == 1 )
+        {
+            Launch( targetMode, maps[0] );
+            return;
+        }
+
+        _mapPickMode = targetMode;
+        StateHasChanged();
+    }
+
+    void CloseMapPicker()
+    {
+        _mapPickMode = null;
+        StateHasChanged();
+    }
+
+    static List<SceneFile> MapsFor( GameMode mode ) => GameUtils.GetMatchMaps()
+        .Where( m => GameMode.GetAll( m ).Any( x => x.Ident == mode.Ident ) )
+        .ToList();
+
+    static SceneFile RandomMap( GameMode mode ) => Game.Random.FromList( MapsFor( mode ) );
+
+    void Launch( GameMode mode, SceneFile map )
+    {
+        if ( mode is null || map is null ) return;
+
+        _mapPickMode = null;
+        // Core modes are off for now, every match is hardcore. Put back with Core:
+        // SaveLastPlayed( mode, map.ResourcePath, IsHardcore );
+        // GameMode.SetHardcore( IsHardcore );
+        SaveLastPlayed( mode, map.ResourcePath, true );
+        GameMode.SetCurrent( mode );
+        GameMode.SetHardcore( true );
         Game.ActiveScene.Load( map );
     }
 
@@ -164,8 +243,10 @@
         if ( mode is null ) return;
 
         var mapPath = Cookie.Get( "last_map_path", "" );
-        var hardcore = Cookie.Get( "last_hardcore", false );
-        var maps = GameUtils.GetAvailableMaps();
+        // Core modes are off for now, so replays are hardcore too. Put back with Core:
+        // var hardcore = Cookie.Get( "last_hardcore", false );
+        var hardcore = true;
+        var maps = GameUtils.GetMatchMaps();
 
         SceneFile map = null;
         if ( !string.IsNullOrEmpty( mapPath ) )
@@ -209,6 +290,6 @@
 
     protected override int BuildHash()
     {
-        return HashCode.Combine( LocalSteamId, LocalName, PlayerLevel, _lastPlayedMode?.Ident );
+        return HashCode.Combine( LocalSteamId, LocalName, PlayerLevel, _lastPlayedMode?.Ident, _mapPickMode?.Ident, IsHardcore );
     }
 }

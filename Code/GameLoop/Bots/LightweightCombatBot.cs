@@ -5,7 +5,7 @@ namespace Facepunch;
 /// <summary>
 /// A cheap FPS-style combat bot that participates in HC1 teams without becoming a full Client/PlayerPawn.
 /// </summary>
-public sealed class LightweightCombatBot : Component, ITeam, IDescription, IRespawnable, IAreaDamageReceiver, IMarkerObject,
+public sealed partial class LightweightCombatBot : Component, ITeam, IDescription, IRespawnable, IAreaDamageReceiver, IMarkerObject,
 	IGameEventHandler<KillEvent>,
 	IGameEventHandler<ResetScoresEvent>,
 	IGameEventHandler<DamageTakenEvent>
@@ -16,26 +16,28 @@ public sealed class LightweightCombatBot : Component, ITeam, IDescription, IResp
 	[Property] public NavMeshAgent Agent { get; set; }
 	[Property] public SkinnedModelRenderer Renderer { get; set; }
 
-	[Property, Group( "Combat" )] public float SightRange { get; set; } = 2600f;
-	[Property, Group( "Combat" )] public float AttackRange { get; set; } = 1200f;
-	[Property, Group( "Combat" )] public float PreferredRange { get; set; } = 900f;
-	[Property, Group( "Combat" )] public float FireInterval { get; set; } = 0.55f;
-	[Property, Group( "Combat" )] public float Damage { get; set; } = 10f;
-	[Property, Group( "Combat" )] public float RealPlayerDamageScale { get; set; } = 0.25f;
-	/// <summary> Aim cone half-angle in degrees. Miss radius grows with distance instead of being a fixed world offset. </summary>
-	[Property, Group( "Combat" )] public float AimSpreadDegrees { get; set; } = 2.5f;
+	[Property, Group( "Combat" )] public float SightRange { get; set; } = 6000f;
+	/// <summary> Beyond this the bot holds fire: at that distance a soldier is spotting, not shooting. </summary>
+	[Property, Group( "Combat" )] public float EngageRange { get; set; } = 4000f;
+	/// <summary> The distance bots like to fight at; aggressive ones get closer, cautious ones hang back. </summary>
+	[Property, Group( "Combat" )] public float PreferredRange { get; set; } = 550f;
+	/// <summary> Damage per round, before hitbox multipliers. Hardcore kills in one hit regardless. </summary>
+	[Property, Group( "Combat" )] public float Damage { get; set; } = 20f;
+	[Property, Group( "Combat" )] public float RealPlayerDamageScale { get; set; } = 0.75f;
 	/// <summary>Whether this bot's weapon is loaded with tracer rounds. Ordinary ammo has no visible trail.</summary>
 	[Property, Group( "Combat" )] public bool UsesTracerRounds { get; set; } = false;
-	[Property, Group( "Movement" )] public float MoveSpeed { get; set; } = 180f;
+	[Property, Group( "Movement" )] public float MoveSpeed { get; set; } = 230f;
 	[Property, Group( "Movement" )] public float PatrolRadius { get; set; } = 900f;
 	[Property, Group( "Visuals" ), InlineEditor] public Dictionary<Team, HumanOutfitter.TeamModelEntry> TeamBaseModels { get; set; } = new();
 	[Property, Group( "Visuals" )] public string WeaponWorldModelPrefab { get; set; } = "weapons/m4a1/wm_m4a1.prefab";
+	[Property, Group( "Combat" )] public EquipmentResource WeaponResource { get; set; } = ResourceLibrary.Get<EquipmentResource>( "weapons/m4a1/m4a1.equip" );
 	[Property, Group( "Effects" )] public string MuzzleFlashPrefab { get; set; } = "prefabs/weapon_effects/rifle_muzzleflash.prefab";
+	[Property, Group( "Effects" )] public GameObject BloodEffect { get; set; }
 	[Property, Group( "Effects" )] public string TracerEffectPrefab { get; set; } = "weapons/common/effects/tracer_9mm.prefab";
 	[Property, Group( "Effects" )] public string ShootSound { get; set; } = "sounds/weapons/m4a1/m4_shot.sound";
 
 	public bool IsAlive => HealthComponent.IsValid() && HealthComponent.State == LifeState.Alive;
-	public Vector3 EyePosition => WorldPosition + Vector3.Up * 64f;
+	public Vector3 EyePosition => WorldPosition + Vector3.Up * (IsCrouching ? 44f : 64f);
 
 	[Sync( SyncFlags.FromHost ), Property, ReadOnly] public int Kills { get; private set; }
 	[Sync( SyncFlags.FromHost ), Property, ReadOnly] public int Deaths { get; private set; }
@@ -54,27 +56,24 @@ public sealed class LightweightCombatBot : Component, ITeam, IDescription, IResp
 		return IsAlive && Team != Team.Unassigned && viewer.IsValid() && viewer.Team == Team;
 	}
 
-	private Component _target;
 	private GameObject _weaponModel;
 	private GameObject _weaponHold;
-	private Vector3? _patrolTarget;
-	private TimeSince _timeSinceTargetScan;
-	private TimeSince _timeSinceLastShot;
-	private TimeSince _timeSincePatrolPick;
 	private bool _dying;
-	private float _nextFireDelay = 0.55f;
-	private int _burstShotsRemaining;
-	private TimeSince _timeSinceLastSeen;
 
 	private const int KillScore = 25;
 	private const int TeamKillScore = -25;
 	private const int SuicideScore = -10;
+	private const float TargetMemorySeconds = 8f;
+	private const float CorpseLifetime = 15f;
 
 	protected override void OnStart()
 	{
 		EnsureReferences();
 		ConfigureComponents();
 		AttachWeaponModel();
+
+		if ( RandomizePersonality && !IsProxy )
+			RollPersonality();
 	}
 
 	protected override void OnUpdate()
@@ -94,14 +93,11 @@ public sealed class LightweightCombatBot : Component, ITeam, IDescription, IResp
 
 		if ( GameUtils.IsCombatFrozen )
 		{
-			_target = null;
-			Agent?.Stop();
+			ResetCombatState();
 			return;
 		}
 
-		UpdateTarget();
-		UpdateMovement();
-		UpdateShooting();
+		Think();
 	}
 
 	private void EnsureReferences()
@@ -149,7 +145,7 @@ public sealed class LightweightCombatBot : Component, ITeam, IDescription, IResp
 
 	private void AttachWeaponModel()
 	{
-		if ( _weaponModel.IsValid() || string.IsNullOrWhiteSpace( WeaponWorldModelPrefab ) )
+		if ( _dying || _weaponModel.IsValid() || string.IsNullOrWhiteSpace( WeaponWorldModelPrefab ) )
 			return;
 
 		if ( !GameObject.GetPrefab( WeaponWorldModelPrefab ).IsValid() )
@@ -170,6 +166,33 @@ public sealed class LightweightCombatBot : Component, ITeam, IDescription, IResp
 			return;
 
 		_weaponModel.Flags |= GameObjectFlags.NotSaved | GameObjectFlags.NotNetworked;
+	}
+
+	private void DropWeaponModel()
+	{
+		if ( !_weaponModel.IsValid() )
+			return;
+
+		var weapon = _weaponModel;
+		_weaponModel = null;
+		var position = weapon.WorldPosition;
+		var rotation = weapon.WorldRotation;
+		weapon.Destroy();
+
+		if ( !Networking.IsHost || WeaponResource is null )
+			return;
+
+		var dropped = DroppedEquipment.Create( WeaponResource, position, rotation, networkSpawn: false );
+		dropped.ApplySavedAttachments = false;
+		var templateAmmo = WeaponResource.MainPrefab.IsValid()
+			? WeaponResource.MainPrefab.GetComponentInChildren<WeaponAmmo>( true )
+			: null;
+		var magazineSize = Math.Max( 1, templateAmmo?.MaxAmmo ?? 30 );
+		var ammo = dropped.GameObject.Components.Create<WeaponAmmo>();
+		ammo.MaxAmmo = magazineSize;
+		ammo.Ammo = magazineSize;
+		ammo.ReserveAmmo = magazineSize * 2;
+		dropped.GameObject.NetworkSpawn();
 	}
 
 	private GameObject GetWeaponHold()
@@ -198,261 +221,6 @@ public sealed class LightweightCombatBot : Component, ITeam, IDescription, IResp
 		_weaponHold.LocalRotation = new Rotation( 0.006424597f, -0.9902432f, 0.04879934f, 0.130368f );
 
 		return _weaponHold;
-	}
-
-	private void UpdateTarget()
-	{
-		if ( _target.IsValid() && IsEnemyAlive( _target ) )
-		{
-			if ( HasLineOfSight( _target ) )
-			{
-				_timeSinceLastSeen = 0f;
-			}
-
-			if ( _timeSinceLastSeen < 3f && WorldPosition.DistanceSquared( GetAimPosition( _target ) ) < SightRange * SightRange )
-			{
-				return;
-			}
-		}
-
-		if ( _timeSinceTargetScan < 0.25f )
-			return;
-
-		_timeSinceTargetScan = 0f;
-		_target = FindNearestEnemy();
-		if ( _target.IsValid() )
-		{
-			_timeSinceLastSeen = 0f;
-		}
-	}
-
-	private Component FindNearestEnemy()
-	{
-		var bestDistance = SightRange * SightRange;
-		Component best = null;
-		var freeForAll = GameUtils.IsFreeForAllMode;
-
-		foreach ( var bot in GameUtils.LightweightBots )
-		{
-			if ( bot == this || !bot.IsValid() || !bot.IsAlive || (!freeForAll && bot.Team == Team) )
-				continue;
-
-			if ( !HasLineOfSight( bot ) )
-				continue;
-
-			var distance = WorldPosition.DistanceSquared( bot.WorldPosition );
-			if ( distance < bestDistance )
-			{
-				bestDistance = distance;
-				best = bot;
-			}
-		}
-
-		foreach ( var player in GameUtils.PlayerPawns )
-		{
-			if ( !player.IsValid() || player.HealthComponent.State != LifeState.Alive || (!freeForAll && player.Team == Team) )
-				continue;
-
-			if ( !HasLineOfSight( player ) )
-				continue;
-
-			var distance = WorldPosition.DistanceSquared( player.WorldPosition );
-			if ( distance < bestDistance )
-			{
-				bestDistance = distance;
-				best = player;
-			}
-		}
-
-		return best;
-	}
-
-	private void UpdateMovement()
-	{
-		if ( !Agent.IsValid() )
-			return;
-
-		Agent.MaxSpeed = MoveSpeed;
-
-		if ( _target.IsValid() && IsEnemyAlive( _target ) )
-		{
-			var targetPosition = GetAimPosition( _target ).WithZ( WorldPosition.z );
-			var toTarget = targetPosition - WorldPosition;
-
-			if ( toTarget.LengthSquared > 4f )
-			{
-				Rotation desiredRotation;
-				if ( HasLineOfSight( _target ) )
-				{
-					desiredRotation = Rotation.LookAt( toTarget.Normal, Vector3.Up );
-				}
-				else if ( Agent.Velocity.LengthSquared > 10f )
-				{
-					desiredRotation = Rotation.LookAt( Agent.Velocity.WithZ( 0 ).Normal, Vector3.Up );
-				}
-				else
-				{
-					desiredRotation = WorldRotation;
-				}
-				WorldRotation = Rotation.Lerp( WorldRotation, desiredRotation, Time.Delta * 8f );
-			}
-
-			if ( WorldPosition.DistanceSquared( targetPosition ) > PreferredRange * PreferredRange || !HasLineOfSight( _target ) )
-			{
-				Agent.MoveTo( targetPosition );
-			}
-			else
-			{
-				Agent.Stop();
-			}
-
-			return;
-		}
-
-		UpdatePatrol();
-
-		if ( Agent.Velocity.LengthSquared > 10f )
-		{
-			var patrolRotation = Rotation.LookAt( Agent.Velocity.WithZ( 0 ).Normal, Vector3.Up );
-			WorldRotation = Rotation.Lerp( WorldRotation, patrolRotation, Time.Delta * 8f );
-		}
-	}
-
-	private void UpdatePatrol()
-	{
-		if ( !Agent.IsValid() )
-			return;
-
-		if ( !_patrolTarget.HasValue || _timeSincePatrolPick > 4f || WorldPosition.DistanceSquared( _patrolTarget.Value ) < 96f * 96f )
-		{
-			_timeSincePatrolPick = 0f;
-			_patrolTarget = FindPatrolTarget();
-		}
-
-		if ( _patrolTarget.HasValue )
-		{
-			Agent.MoveTo( _patrolTarget.Value );
-		}
-	}
-
-	private Vector3 FindPatrolTarget()
-	{
-		// Hardpoint game mode integration: capture active hardpoint
-		var activeHardpoints = Scene.GetAllComponents<HardpointZone>().ToList();
-		if ( activeHardpoints.Count > 0 )
-		{
-			var targetZone = Game.Random.FromList( activeHardpoints );
-			var offset = Vector3.Random.WithZ( 0 ).Normal * Game.Random.Float( 30f, 90f );
-			var targetPos = targetZone.WorldPosition + offset;
-			return Scene.NavMesh.GetClosestPoint( targetPos ) ?? targetPos;
-		}
-
-		// Domination game mode integration: capture active flags
-		var activeFlags = Scene.GetAllComponents<DominationFlag>().ToList();
-		if ( activeFlags.Count > 0 )
-		{
-			var enemyFlags = activeFlags.Where( x => x.ControllingTeam != Team ).ToList();
-			if ( enemyFlags.Count > 0 )
-			{
-				// Go to a random uncapped/enemy flag to capture it
-				var targetFlag = Game.Random.FromList( enemyFlags );
-				var offset = Vector3.Random.WithZ( 0 ).Normal * Game.Random.Float( 30f, 90f );
-				var targetPos = targetFlag.WorldPosition + offset;
-				return Scene.NavMesh.GetClosestPoint( targetPos ) ?? targetPos;
-			}
-			else
-			{
-				// All flags controlled! Choose a random one to defend
-				var targetFlag = Game.Random.FromList( activeFlags );
-				var offset = Vector3.Random.WithZ( 0 ).Normal * Game.Random.Float( 30f, 90f );
-				var targetPos = targetFlag.WorldPosition + offset;
-				return Scene.NavMesh.GetClosestPoint( targetPos ) ?? targetPos;
-			}
-		}
-
-		// Fallback to random patrol
-		var direction = Vector3.Random.WithZ( 0f );
-		if ( direction.LengthSquared < 0.01f )
-		{
-			direction = WorldRotation.Forward;
-		}
-
-		var candidate = WorldPosition + direction.Normal * Game.Random.Float( PatrolRadius * 0.35f, PatrolRadius );
-		return Scene.NavMesh.GetClosestPoint( candidate ) ?? candidate;
-	}
-
-	private void UpdateShooting()
-	{
-		if ( !_target.IsValid() || !IsEnemyAlive( _target ) )
-			return;
-
-		if ( _timeSinceLastShot < _nextFireDelay )
-			return;
-
-		if ( !HasLineOfSight( _target ) )
-			return;
-
-		var aimPosition = GetAimPosition( _target );
-		if ( EyePosition.DistanceSquared( aimPosition ) > AttackRange * AttackRange )
-			return;
-
-		// Aim at centre mass (eye position made head-level noise sail over shoulders) with an angular cone.
-		var chestAim = aimPosition - Vector3.Up * 16f;
-		var spreadRadius = EyePosition.Distance( chestAim ) * MathF.Tan( AimSpreadDegrees.DegreeToRadian() );
-		var noisyAim = chestAim + Vector3.Random * spreadRadius;
-		var trace = Scene.Trace.Ray( EyePosition, noisyAim )
-			.IgnoreGameObjectHierarchy( GameObject )
-			.WithoutTags( "trigger", "playerclip", "movement" )
-			.UseHitboxes()
-			.Run();
-
-		_timeSinceLastShot = 0f;
-		
-		if ( _burstShotsRemaining > 0 )
-		{
-			_burstShotsRemaining--;
-			_nextFireDelay = FireInterval * Game.Random.Float( 0.2f, 0.4f );
-		}
-		else
-		{
-			if ( Game.Random.Float() < 0.4f )
-			{
-				_burstShotsRemaining = Game.Random.Int( 2, 5 );
-				_nextFireDelay = FireInterval * Game.Random.Float( 0.2f, 0.4f );
-			}
-			else
-			{
-				_burstShotsRemaining = 0;
-				_nextFireDelay = FireInterval * Game.Random.Float( 0.75f, 1.4f );
-			}
-		}
-
-		Renderer?.Set( "b_attack", true );
-		// Send the firing weapon's ammo choice with the shot so every observer sees the same effect.
-		DoShootEffects( GetMuzzlePosition(), trace.EndPosition, UsesTracerRounds );
-
-		if ( !trace.Hit || !HitTarget( trace.GameObject, _target ) )
-			return;
-
-		var hitbox = trace.GetHitboxTags();
-		if ( hitbox == HitboxTags.None )
-		{
-			hitbox = HitboxTags.Chest;
-		}
-
-		var direction = (trace.EndPosition - EyePosition).Normal;
-		var damage = _target is PlayerPawn ? Damage * RealPlayerDamageScale : Damage;
-		var damageInfo = new DamageInfo( this, damage, this, trace.EndPosition, direction * damage, hitbox );
-
-		switch ( _target )
-		{
-			case PlayerPawn player when player.HealthComponent.IsValid():
-				player.HealthComponent.TakeDamage( damageInfo );
-				break;
-			case LightweightCombatBot bot when bot.HealthComponent.IsValid():
-				bot.HealthComponent.TakeDamage( damageInfo );
-				break;
-		}
 	}
 
 	[Rpc.Broadcast]
@@ -534,20 +302,13 @@ public sealed class LightweightCombatBot : Component, ITeam, IDescription, IResp
 		Renderer.Set( "move_z", velocity.z );
 		Renderer.Set( "speed_move", 1f );
 
-		if ( _target.IsValid() && IsEnemyAlive( _target ) && HasLineOfSight( _target ) )
-		{
-			var direction = (GetAimPosition( _target ) - EyePosition).Normal;
-			Renderer.SetLookDirection( "aim_eyes", direction, 1f );
-			Renderer.SetLookDirection( "aim_head", direction, 1f );
-			Renderer.SetLookDirection( "aim_body", direction, 0.75f );
-		}
-		else
-		{
-			var dir = velocity.LengthSquared > 1f ? velocity.Normal : WorldRotation.Forward;
-			Renderer.SetLookDirection( "aim_eyes", dir, 1f );
-			Renderer.SetLookDirection( "aim_head", dir, 1f );
-			Renderer.SetLookDirection( "aim_body", dir, 0.75f );
-		}
+		Renderer.Set( "duck", IsCrouching ? 1f : 0f );
+
+		// The host decides where the bot aims and syncs it, so every client sees it look at what it's shooting.
+		var aim = AimDirection.IsNearZeroLength ? WorldRotation.Forward : AimDirection;
+		Renderer.SetLookDirection( "aim_eyes", aim, 1f );
+		Renderer.SetLookDirection( "aim_head", aim, 1f );
+		Renderer.SetLookDirection( "aim_body", aim, 0.75f );
 	}
 
 	private bool IsEnemyAlive( Component target )
@@ -560,19 +321,10 @@ public sealed class LightweightCombatBot : Component, ITeam, IDescription, IResp
 
 		return target switch
 		{
-			PlayerPawn player => player.HealthComponent.IsValid() && player.HealthComponent.State == LifeState.Alive,
+			PlayerPawn player => player.HealthComponent.IsValid() && player.HealthComponent.State == LifeState.Alive
+				&& !player.HealthComponent.IsGodMode,
 			LightweightCombatBot bot => bot.IsAlive,
 			_ => false
-		};
-	}
-
-	private static Vector3 GetAimPosition( Component target )
-	{
-		return target switch
-		{
-			PlayerPawn player => player.EyePosition,
-			LightweightCombatBot bot => bot.EyePosition,
-			_ => target.WorldPosition + Vector3.Up * 48f
 		};
 	}
 
@@ -599,6 +351,8 @@ public sealed class LightweightCombatBot : Component, ITeam, IDescription, IResp
 			Agent.Enabled = false;
 		}
 
+		DropWeaponModel();
+
 		if ( Renderer.IsValid() )
 		{
 			Renderer.UseAnimGraph = false;
@@ -614,7 +368,7 @@ public sealed class LightweightCombatBot : Component, ITeam, IDescription, IResp
 			}
 		}
 
-		GameObject.DestroyAsync( 4.0f );
+		GameObject.DestroyAsync( CorpseLifetime );
 	}
 
 	void IGameEventHandler<KillEvent>.OnGameEvent( KillEvent eventArgs )
@@ -673,30 +427,34 @@ public sealed class LightweightCombatBot : Component, ITeam, IDescription, IResp
 
 	void IGameEventHandler<DamageTakenEvent>.OnGameEvent( DamageTakenEvent eventArgs )
 	{
+		var damageInfo = eventArgs.DamageInfo;
+		if ( damageInfo.Damage > 0f && BloodEffect.IsValid() )
+		{
+			// Splash damage can report the blast origin, well outside the victim.
+			var chest = WorldPosition + Vector3.Up * 44f;
+			var impact = damageInfo.Position;
+			if ( impact.DistanceSquared( chest ) > 32f * 32f )
+				impact = chest;
+			var effectRotation = damageInfo.Force.IsNearZeroLength
+				? WorldRotation
+				: Rotation.LookAt( damageInfo.Force.Normal, Vector3.Up );
+			var blood = BloodEffect.Clone( new CloneConfig()
+			{
+				StartEnabled = true,
+				Transform = new( impact, effectRotation ),
+				Name = $"Blood effect from ({GameObject})"
+			} );
+
+			if ( blood.IsValid() && !blood.Components.Get<DestroyAfter>().IsValid() )
+				blood.DestroyAsync( 2f );
+		}
+
 		if ( !Networking.IsHost )
 			return;
 
-		var attacker = eventArgs.DamageInfo.Attacker;
+		var attacker = damageInfo.Attacker;
 		if ( attacker.IsValid() && IsEnemyAlive( attacker ) )
-		{
-			// Prioritize targeting whoever just shot us!
-			_target = attacker;
-		}
-	}
-
-	private bool HasLineOfSight( Component target )
-	{
-		if ( !target.IsValid() )
-			return false;
-
-		var targetPos = GetAimPosition( target );
-		var trace = Scene.Trace.Ray( EyePosition, targetPos )
-			.IgnoreGameObjectHierarchy( GameObject )
-			.WithoutTags( "trigger", "playerclip", "movement" )
-			.UseHitboxes()
-			.Run();
-
-		return trace.Hit && HitTarget( trace.GameObject, target );
+			OnShotBy( attacker );
 	}
 
 	void IAreaDamageReceiver.ApplyAreaDamage( AreaDamage component )
@@ -736,6 +494,9 @@ public sealed class LightweightBotManager : SingletonComponent<LightweightBotMan
 
 	private int _nextBotIndex;
 
+	/// <summary> Each bot name's skill and aggression, so a name is the same soldier all match. </summary>
+	private readonly Dictionary<string, (float Skill, float Aggression)> _personalities = new();
+
 	public IEnumerable<LightweightCombatBot> Bots => Scene.GetAllComponents<LightweightCombatBot>()
 		.Where( x => x.IsValid() && x.GameObject.Tags.Has( BotTag ) );
 
@@ -763,7 +524,7 @@ public sealed class LightweightBotManager : SingletonComponent<LightweightBotMan
 	private void MaintainFreeForAll( int targetPlayerCount )
 	{
 		var realPlayers = GameUtils.AllPlayers.Count( x => x.IsConnected && !x.IsBot );
-		var bots = Bots.ToList();
+		var bots = Bots.Where( x => x.IsAlive ).ToList();
 
 		while ( realPlayers + bots.Count > targetPlayerCount && bots.Count > 0 )
 		{
@@ -785,7 +546,7 @@ public sealed class LightweightBotManager : SingletonComponent<LightweightBotMan
 	private void MaintainTeam( Team team, int targetTeamSize )
 	{
 		var realPlayers = GameUtils.GetPlayers( team ).Count( x => x.IsConnected && !x.IsBot );
-		var bots = Bots.Where( x => x.Team == team ).ToList();
+		var bots = Bots.Where( x => x.IsAlive && x.Team == team ).ToList();
 
 		while ( realPlayers + bots.Count > targetTeamSize && bots.Count > 0 )
 		{
@@ -823,6 +584,7 @@ public sealed class LightweightBotManager : SingletonComponent<LightweightBotMan
 		if ( !botObject.IsValid() )
 			return null;
 
+		botObject.Flags |= GameObjectFlags.NotSaved;
 		botObject.Tags.Add( BotTag );
 		botObject.Tags.Add( "removable" );
 
@@ -831,6 +593,11 @@ public sealed class LightweightBotManager : SingletonComponent<LightweightBotMan
 		{
 			bot.Team = team;
 			bot.BotName = BotNames[index % BotNames.Length];
+			if ( !_personalities.TryGetValue( bot.BotName, out var personality ) )
+				_personalities[bot.BotName] = personality = (LightweightCombatBot.RollSkill(), Random.Shared.Float( 0.15f, 0.95f ));
+			bot.Skill = personality.Skill;
+			bot.Aggression = personality.Aggression;
+			bot.RandomizePersonality = false;
 			// Select the body before networking and creating its weapon attachment bones.
 			bot.ApplyTeamModel();
 		}
@@ -865,8 +632,10 @@ public sealed class LightweightBotManager : SingletonComponent<LightweightBotMan
 
 	private Transform GetSpawnTransform( Team team )
 	{
-		if ( Random.Shared.Float() < MapSpawnChance && TryGetMapSpawn( out var mapSpawn ) )
+		if ( MapSpawnSettings.MapSpawnPointsAllowed && Random.Shared.Float() < MapSpawnChance && TryGetMapSpawn( out var mapSpawn ) )
 			return mapSpawn;
+		if ( MapSpawnSettings.NavMeshSpawnsAllowed && TryGetNavSpawn( out var navSpawn ) )
+			return navSpawn;
 
 		var spawnPoints = (team == Team.Unassigned ? GameUtils.GetSpawnPoints() : GameUtils.GetSpawnPoints( team )).ToArray();
 		if ( spawnPoints.Length == 0 )
@@ -879,6 +648,45 @@ public sealed class LightweightBotManager : SingletonComponent<LightweightBotMan
 
 		var spawn = Random.Shared.FromArray( candidates, spawnPoints[0] );
 		return spawn.Transform.WithScale( 1f );
+	}
+
+	/// <summary>Spread new bots over navigable ground when authored spawn points are occupied.</summary>
+	private bool TryGetNavSpawn( out Transform transform )
+	{
+		transform = global::Transform.Zero;
+		var players = GameUtils.PlayerPawns
+			.Where( x => x.IsValid() && x.HealthComponent.State == LifeState.Alive )
+			.Select( x => x.WorldPosition )
+			.ToArray();
+		var bots = Bots
+			.Where( x => x.IsValid() && x.IsAlive )
+			.Select( x => x.WorldPosition )
+			.ToArray();
+		var candidates = new List<(Vector3 Position, float Score)>();
+		for ( var i = 0; i < 32; i++ )
+		{
+			var point = Scene.NavMesh.GetRandomPoint();
+			if ( !point.HasValue )
+				break;
+
+			var playerDistance = players.Select( x => x.Distance( point.Value ) )
+				.DefaultIfEmpty( MinSpawnDistanceFromPlayers ).Min();
+			var botDistance = bots.Select( x => x.Distance( point.Value ) )
+				.DefaultIfEmpty( MinSpawnDistanceFromBots ).Min();
+			if ( playerDistance < MinSpawnDistanceFromPlayers || botDistance < MinSpawnDistanceFromBots )
+				continue;
+
+			var score = MathF.Min( playerDistance, 3000f ) * 0.5f + MathF.Min( botDistance, 3000f );
+			candidates.Add( (point.Value, score) );
+		}
+
+		if ( candidates.Count == 0 )
+			return false;
+
+		var safePoints = candidates.OrderByDescending( x => x.Score ).Take( 5 ).ToArray();
+		var chosen = Random.Shared.FromArray( safePoints );
+		transform = new Transform( chosen.Position, Rotation.Identity );
+		return true;
 	}
 
 	/// <summary>
@@ -900,7 +708,7 @@ public sealed class LightweightBotManager : SingletonComponent<LightweightBotMan
 		var candidates = Scene.GetAllComponents<SpawnPoint>()
 			.Select( x => x.Transform.World )
 			.Where( t => players.All( p => p.Distance( t.Position ) > MapSpawnMinPlayerDistance ) )
-			.Where( t => bots.All( b => b.Distance( t.Position ) > 64f ) )
+			.Where( t => bots.All( b => b.Distance( t.Position ) > MinSpawnDistanceFromBots ) )
 			.ToArray();
 
 		if ( candidates.Length == 0 ) return false;

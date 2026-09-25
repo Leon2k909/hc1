@@ -1,0 +1,35 @@
+{
+  "RootObject": {
+    "__guid": "6870e786-3918-4cb3-b782-4635649c0a15",
+    "Flags": 0,
+    "Name": "MP5 Standard Barrel",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "50058f26-3715-45ba-957c-baf660b16bdc",
+        "__enabled": true,
+        "Model": "attachments/mpapa5/barrels/barrel_standard/barrel_standard.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithSocketAttachment",
+        "__guid": "f852bd98-7f7f-4771-a53e-d29197698b9f",
+        "__enabled": true,
+        "SocketName": "muzzle",
+        "UseWeaponOrigin": true,
+        "WeaponSpaceOffset": "1,0,7.5",
+        "WeaponSpaceScale": 1.3,
+        "SocketOffset": "-9.642,-0.221,0.009",
+        "SocketAngles": "0,0,0"
+      }
+    ],
+    "Children": []
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

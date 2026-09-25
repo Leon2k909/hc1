@@ -97,8 +97,8 @@ public sealed partial class PlayerPawn : Pawn, IDescription, IAreaDamageReceiver
 	protected override void OnStart()
 	{
 		// TODO: expose these parameters please
-		TagBinder.BindTag( "no_shooting", () => TimeSinceWeaponDeployed < 0.66f || ((IsSprinting || TimeSinceSprintChanged < 0.25f) && !HasEquipmentTag( "aiming" )) );
-		TagBinder.BindTag( "no_aiming", () => TimeSinceGroundedChanged < 0.25f );
+		TagBinder.BindTag( "no_shooting", () => IsFallKnockedDown || TimeSinceWeaponDeployed < 0.66f || ((IsSprinting || TimeSinceSprintChanged < 0.25f) && !HasEquipmentTag( "aiming" )) );
+		TagBinder.BindTag( "no_aiming", () => IsFallKnockedDown || TimeSinceGroundedChanged < 0.25f );
 
 		GameObject.Name = $"Player ({DisplayName})";
 

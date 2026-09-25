@@ -1,0 +1,38 @@
+{
+  "RootObject": {
+    "__guid": "e4e7d118-db16-53e9-bf78-de44f9d43730",
+    "Flags": 0,
+    "Name": "MP5 FTAC Hunter",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "ceed1086-29ce-5fae-b405-bba2babbfd3e",
+        "__enabled": true,
+        "Model": "attachments/mpapa5/shared/att_vm_stock_heavy02/att_vm_stock_heavy02.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithBoneAttachment",
+        "__guid": "39f743ed-e06e-570c-ae43-e147e0137b93",
+        "__enabled": true,
+        "BoneName": "weapon_root",
+        "UseWeaponOrigin": true,
+        "WeaponSpaceOffset": "-5.964,0,8.211",
+        "WeaponSpaceScale": 0.955,
+        "MountAtBone": false,
+        "BoneOffset": "0,0,0",
+        "BoneAngles": "0,0,0",
+        "ModelScaleMultiplier": "1,1,1",
+        "HiddenBone": "stock"
+      }
+    ],
+    "Children": []
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

@@ -72,8 +72,10 @@ public partial class Aimable : WeaponInputAction
 			return false;
 		}
 
-		// Self checks first
-		if ( Tags.Has( "no_aiming" ) ) return false;
+		// A short no_aiming lockout (for example, just after leaving the ground) should
+		// prevent starting ADS, but must not cancel an aim that's already held.
+		// Otherwise jumping briefly drops the weapon out of the sights.
+		if ( !IsAiming && Tags.Has( "no_aiming" ) ) return false;
 		if ( GameUtils.IsGunsmithStudioOpen() ) return false;
 		// if ( Tags.Has( "reloading" ) ) return false;
 
@@ -81,7 +83,7 @@ public partial class Aimable : WeaponInputAction
 			return false;
 
 		// Player controller
-		if ( Player.Tags.Has( "no_aiming" ) ) return false;
+		if ( !IsAiming && Player.Tags.Has( "no_aiming" ) ) return false;
 
 		return true;
 	}

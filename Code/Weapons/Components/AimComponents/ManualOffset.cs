@@ -12,6 +12,12 @@ public partial class ManualOffset : Aimable, IViewModelOffset
 	[Property] public Vector3 AimOffset { get; set; }
 	[Property] public Angles AimAngleOffset { get; set; }
 
+	/// <summary>
+	/// Added to a fitted optic's <see cref="Gunsmith.GunsmithPart.OpticAimOffset"/>, which is calibrated on the M4:
+	/// how far this weapon's ADS pose and optic mount put the sight line from where the M4's do.
+	/// </summary>
+	[Property] public Vector3 OpticAimCorrection { get; set; }
+
 	protected override void OnStart()
 	{
 		base.OnStart();
@@ -29,7 +35,7 @@ public partial class ManualOffset : Aimable, IViewModelOffset
 	}
 
 	Vector3 IViewModelOffset.PositionOffset => IsAiming
-		? Equipment.IsValid() && Equipment.TryGetOpticAim( out var optic ) ? optic.OpticAimOffset : AimOffset
+		? Equipment.IsValid() && Equipment.TryGetOpticAim( out var optic ) ? optic.OpticAimOffset + OpticAimCorrection : AimOffset
 		: Vector3.Zero;
 	Angles IViewModelOffset.AngleOffset => IsAiming
 		? Equipment.IsValid() && Equipment.TryGetOpticAim( out var optic ) ? optic.OpticAimAngles : AimAngleOffset

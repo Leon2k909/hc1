@@ -1,7 +1,7 @@
 HEADER
 {
     Description = "M4 clear optic lens and collimated reticle";
-    Version = 5;
+    Version = 6;
 }
 FEATURES
 {
@@ -54,6 +54,10 @@ PS
     float g_flScopeReticle < Default(0.0); Range(0.0,1.0); UiGroup("Reticle,10/20"); >;
     float g_flUseReticleTexture < Default(0.0); Range(0.0,1.0); UiGroup("Reticle,10/30"); >;
     float g_flSightDistanceScale < Default(0.35); Range(0.0,20.0); UiGroup("Reticle,10/40"); >;
+    // Scale, rotation and position are set per weapon by the gunsmith.
+    float g_flReticleScale < Default(1.0); Range(0.1,10.0); UiGroup("Reticle,10/45"); >;
+    float g_flReticleRotation < Default(0.0); Range(-180.0,180.0); UiGroup("Reticle,10/46"); >;
+    float2 g_vReticleOffset < Default2(0.0,0.0); Range2(-0.08,-0.08,0.08,0.08); UiGroup("Reticle,10/47"); >;
     CreateInputTexture2D( RedDot, Linear, 8, "", "_color", "Reticle,10/50", Default3(0.0,0.0,0.0) );
     Texture2D g_tRedDot < Channel(R,Box(RedDot),Linear); OutputFormat(BC7); SrgbRead(false); >;
 
@@ -65,6 +69,12 @@ PS
         denominator = abs(denominator)<0.01 ? 0.01 : denominator;
         float project = -g_flSightDistanceScale / denominator;
         float2 uv = i.vTextureCoords.xy + project * 0.5 * float2(dot(viewRay,i.vTangentUWs),dot(viewRay,i.vTangentVWs));
+        float2 centred = uv - 0.5 - g_vReticleOffset;
+        float angle = g_flReticleRotation * 0.01745329252;
+        float sine, cosine;
+        sincos(angle, sine, cosine);
+        uv = float2(cosine * centred.x + sine * centred.y, -sine * centred.x + cosine * centred.y)
+            / max(g_flReticleScale, 0.01) + 0.5;
         float2 p = uv - 0.5;
         float aa = max(max(fwidth(p.x),fwidth(p.y)),0.0008);
         float mark = 1.0-smoothstep(0.010,0.010+aa,length(p));

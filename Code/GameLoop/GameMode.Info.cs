@@ -29,8 +29,12 @@ partial class GameMode
 		{
 			AddGameMode( list, "prefabs/game_modes/deathmatch.prefab" );
 			AddGameMode( list, "prefabs/game_modes/team_deathmatch.prefab" );
-			AddGameMode( list, "prefabs/game_modes/bomb_defusal.prefab" );
-			AddGameMode( list, "prefabs/game_modes/retakes.prefab" );
+			// Defuse and Retakes need bomb sites placed in the scene, so only maps that list Defuse get them.
+			if ( meta.Contains( "bomb_defusal", StringComparison.OrdinalIgnoreCase ) )
+			{
+				AddGameMode( list, "prefabs/game_modes/bomb_defusal.prefab" );
+				AddGameMode( list, "prefabs/game_modes/retakes.prefab" );
+			}
 			AddGameMode( list, "prefabs/game_modes/gun_game.prefab" );
 			AddGameMode( list, "prefabs/game_modes/cash_grab.prefab" );
 			AddGameMode( list, "prefabs/game_modes/domination.prefab" );

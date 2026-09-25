@@ -7,15 +7,17 @@ public enum ZombiesBuyKind
 	Perk,
 	WallWeapon,
 	MysteryBox,
+	AmmoBox,
 }
 
 /// <summary>
 /// Something a player can spend points on by pressing Use: a perk machine, a wall-buy weapon
-/// (buying it again refills ammo at half price), or the mystery box.
+/// (buying it again refills ammo at half price), the mystery box, or an ammo box.
 /// </summary>
 public sealed class ZombiesBuyStation : Component, IUse, IMarkerObject
 {
 	public const int MysteryBoxCost = 950;
+	public const int AmmoBoxCost = 1000;
 	public const float UseRange = 100f;
 
 	[Property, Sync( SyncFlags.FromHost )] public ZombiesBuyKind Kind { get; set; }
@@ -72,6 +74,7 @@ public sealed class ZombiesBuyStation : Component, IUse, IMarkerObject
 		ZombiesBuyKind.Perk => PerkName( Perk ),
 		ZombiesBuyKind.WallWeapon => Weapon?.Name ?? WeaponName,
 		ZombiesBuyKind.MysteryBox => "Mystery Box",
+		ZombiesBuyKind.AmmoBox => "Ammo Box",
 		_ => ""
 	};
 
@@ -85,10 +88,16 @@ public sealed class ZombiesBuyStation : Component, IUse, IMarkerObject
 				return (Cost, $"Buy {Title}");
 			case ZombiesBuyKind.Perk:
 				return (Cost, $"Buy {Title} — {PerkDescription( Perk )}");
+			case ZombiesBuyKind.AmmoBox:
+				return (Cost, "Refill all ammo");
 			default:
 				return (Cost, "Open the Mystery Box");
 		}
 	}
+
+	public bool HasAmmoToRefill( PlayerPawn player ) => player is not null && player.Inventory.Equipment.Any( equipment =>
+		equipment.IsValid() && equipment.GetComponentInChildren<WeaponAmmo>() is { } ammo &&
+		(ammo.Ammo < ammo.GetEffectiveMaxAmmo() || ammo.ReserveAmmo < ammo.GetMaxReserve()) );
 
 	private bool OwnsWeapon( PlayerPawn player )
 	{
@@ -105,6 +114,8 @@ public sealed class ZombiesBuyStation : Component, IUse, IMarkerObject
 
 		if ( Kind == ZombiesBuyKind.Perk && state is not null && state.HasPerk( Perk ) )
 			return "You already have this perk";
+		if ( Kind == ZombiesBuyKind.AmmoBox && !HasAmmoToRefill( player ) )
+			return "Ammo already full";
 
 		var (cost, _) = GetOffer( player );
 		var eco = player.GetComponent<ZombiesPlayerEconomy>();
@@ -121,7 +132,7 @@ public sealed class ZombiesBuyStation : Component, IUse, IMarkerObject
 
 		var eco = player.GetComponent<ZombiesPlayerEconomy>();
 		var state = ZombiesPlayerState.For( player );
-		if ( eco is null ) return;
+		if ( eco is null || state?.IsDowned == true || player.HealthComponent.State != LifeState.Alive ) return;
 
 		var (cost, _) = GetOffer( player );
 
@@ -153,6 +164,11 @@ public sealed class ZombiesBuyStation : Component, IUse, IMarkerObject
 				{
 					GameMode.Instance?.ShowToast( $"Mystery Box: {pick.Name}", Facepunch.UI.ToastType.Generic, 3 );
 				}
+				break;
+
+			case ZombiesBuyKind.AmmoBox:
+				if ( !HasAmmoToRefill( player ) || !eco.TrySpendPoints( cost ) ) return;
+				player.Inventory.RefillAmmo();
 				break;
 		}
 

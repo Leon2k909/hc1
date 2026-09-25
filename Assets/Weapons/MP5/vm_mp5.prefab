@@ -39,7 +39,7 @@
         },
         "Muzzle": {
           "_type": "gameobject",
-          "go": "4c701c26-dcbb-4c92-9114-28a6edfec043"
+          "go": "44cf3fd6-5dfc-4d73-9d18-8deca5a1a7ac"
         },
         "OnComponentDestroy": null,
         "OnComponentDisabled": null,
@@ -49,7 +49,9 @@
         "OnComponentUpdate": null,
         "ReloadSpeed": 1,
         "ThrowableType": "HEGrenade",
-        "UseMovementInertia": true
+        "UseMovementInertia": false,
+        "MoveBobScale": 0.6,
+        "YawInertiaScale": 0.8
       },
       {
         "__type": "Sandbox.SkinnedModelRenderer",
@@ -452,6 +454,17 @@
                     "Children": []
                   }
                 ]
+              },
+              {
+                "__guid": "44cf3fd6-5dfc-4d73-9d18-8deca5a1a7ac",
+                "Flags": 0,
+                "Name": "Muzzle Origin",
+                "Position": "13.29764,0,8.152003",
+                "Rotation": "0,0,0,1",
+                "Scale": "1,1,1",
+                "Enabled": true,
+                "Components": [],
+                "Children": []
               }
             ]
           }
@@ -1651,6 +1664,118 @@
         "OwnerTransfer": 1,
         "Components": [],
         "Children": []
+      },
+      {
+        "__guid": "4f5fadf4-061b-49bc-8539-4788ec3c0120",
+        "Flags": 0,
+        "Name": "Barrel Attachment Point",
+        "Position": "0,0,0",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Enabled": true,
+        "Components": [
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithAttachmentPoint",
+            "__guid": "9078c4c3-2c60-4a24-9b2a-ab248b57ddec",
+            "Category": "Barrel"
+          }
+        ]
+      },
+      {
+        "__guid": "983f066f-2d81-460a-8688-efeb98877ca6",
+        "Flags": 0,
+        "Name": "Underbarrel Attachment Point",
+        "Position": "0,0,0",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Enabled": true,
+        "Components": [
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithAttachmentPoint",
+            "__guid": "472d4f0e-f831-456a-afd0-c6b44d0680dc",
+            "Category": "Underbarrel"
+          }
+        ]
+      },
+      {
+        "__guid": "67e5095c-1bc6-49fb-9d53-21216bde8aed",
+        "Flags": 0,
+        "Name": "Stock Attachment Point",
+        "Position": "0,0,0",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Enabled": true,
+        "Components": [
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithAttachmentPoint",
+            "__guid": "a6e1adde-9012-4027-bc2f-629c5c45130b",
+            "Category": "Stock"
+          }
+        ]
+      },
+      {
+        "__guid": "10100128-eb88-4269-a10c-cd7df71b297b",
+        "Flags": 0,
+        "Name": "Magazine Attachment Point",
+        "Position": "0,0,0",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Enabled": true,
+        "Components": [
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithAttachmentPoint",
+            "__guid": "87b9721a-941c-4da2-98c0-502b5ee845a6",
+            "Category": "Magazine"
+          }
+        ]
+      },
+      {
+        "__guid": "493f27db-d0a4-4128-9626-03a05519553b",
+        "Flags": 0,
+        "Name": "Optic Attachment Point",
+        "Position": "0,0,0",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Enabled": true,
+        "Components": [
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithAttachmentPoint",
+            "__guid": "b593f3fa-4d85-4a61-ab31-64bcb6b44a61",
+            "Category": "Optic"
+          }
+        ]
+      },
+      {
+        "__guid": "49c9d1b4-f413-49f2-8798-3c84c2abf96a",
+        "Flags": 0,
+        "Name": "Muzzle Attachment Point",
+        "Position": "0,0,0",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Enabled": true,
+        "Components": [
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithAttachmentPoint",
+            "__guid": "18d95410-6495-46e1-bd0c-b0eeb31a9a91",
+            "Category": "Muzzle"
+          }
+        ]
+      },
+      {
+        "__guid": "df65b606-ab30-4721-9a13-838b26933acf",
+        "Flags": 0,
+        "Name": "Laser Attachment Point",
+        "Position": "0,0,0",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Enabled": true,
+        "Components": [
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithAttachmentPoint",
+            "__guid": "ca8c6717-c16d-46ca-b53c-6a33925e1c88",
+            "Category": "Laser"
+          }
+        ]
       }
     ],
     "__properties": {

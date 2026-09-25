@@ -19,7 +19,14 @@ public partial class Shootable : WeaponInputAction,
 	IGameEventHandler<EquipmentHolsteredEvent>
 {
 	[Property, Group( "Bullet" ), EquipmentResourceProperty] public float BaseDamage { get; set; } = 25.0f;
+	/// <summary> Cyclic rate in rounds per minute. Set to the real firearm's rate. </summary>
 	[Property, Group( "Bullet" ), EquipmentResourceProperty] public float FireRate { get; set; } = 0.2f;
+	/// <summary>
+	/// Rate multiplier with a suppressor fitted. Back-pressure speeds up gas-operated actions: a lot on a direct-impingement
+	/// AR, less on roller-delayed or long-stroke guns, and not at all on guns with a suppressed gas setting (SCAR) or
+	/// trigger-limited semi-autos.
+	/// </summary>
+	[Property, Group( "Bullet" )] public float SuppressorFireRateScale { get; set; } = 1f;
 	[Property, Group( "Bullet" )] public float DryShootDelay { get; set; } = 0.15f;
 	[Property, Group( "Bullet" )] public float BulletSize { get; set; } = 4.0f;
 	[Property, Group( "Bullet" ), EquipmentResourceProperty] public int BulletCount { get; set; } = 1;
@@ -141,6 +148,13 @@ public partial class Shootable : WeaponInputAction,
 	public TimeSince TimeSinceShoot { get; private set; }
 
 	/// <summary>
+	/// When the next shot is due. Each shot is scheduled from when the previous one was due, not from the fixed-update
+	/// tick that fired it, so the gun fires at exactly <see cref="FireRate"/> instead of being rounded up to a whole
+	/// number of ticks (on the 50 Hz tick, 680 and 740 rpm both used to fire at 600).
+	/// </summary>
+	private float _nextShotTime;
+
+	/// <summary>
 	/// Fetches the desired model renderer that we'll focus effects on like trail effects, muzzle flashes, etc.
 	/// </summary>
 	protected WeaponModel Effector
@@ -161,13 +175,16 @@ public partial class Shootable : WeaponInputAction,
 
 	private bool UseSuppressedEffects()
 	{
-		if ( Equipment.IsValid() && Equipment.Resource.IsValid()
+		if ( Equipment.IsValid() && Equipment.ApplySavedAttachments && Equipment.Resource.IsValid()
 			&& GunsmithLoadoutManager.TryGetAttachment( Equipment.Resource, GunsmithPartType.Muzzle, out var muzzle )
 			&& muzzle.IsValid() && muzzle.IsSuppressor )
 			return true;
+		if ( Equipment.IsValid() && Equipment.ApplySavedAttachments && Equipment.Resource.IsValid()
+			&& GunsmithLoadoutManager.TryGetAttachment( Equipment.Resource, GunsmithPartType.Barrel, out var barrel )
+			&& barrel.IsValid() && (barrel.IsSuppressor || (barrel.Name?.Contains( "suppressor", StringComparison.OrdinalIgnoreCase ) ?? false)) )
+			return true;
 
-		return HasBuiltInSuppressor || (SuppressedAttachment.IsValid()
-		       && Equipment.IsValid()
+		return HasBuiltInSuppressor || (Equipment.IsValid() && Equipment.ApplySavedAttachments && SuppressedAttachment.IsValid()
 		       && Equipment.Resource.IsValid()
 		       && GunsmithLoadoutManager.HasAttachment( Equipment.Resource, SuppressedAttachment ));
 	}
@@ -193,7 +210,7 @@ public partial class Shootable : WeaponInputAction,
 	/// Play any particle effects such as muzzle flashes.
 	/// </summary>
 	[Rpc.Broadcast]
-	protected void DoShootEffects( bool suppressed, bool showFlash, float flashScale, float smokeScale )
+	protected void DoShootEffects( bool suppressed, bool showFlash, float flashScale, float smokeScale, float soundVolume )
 	{
 		if ( Application.IsDedicatedServer || !Equipment.IsValid() )
 			return;
@@ -217,6 +234,7 @@ public partial class Shootable : WeaponInputAction,
 			if ( Sound.Play( shootSound, Equipment.WorldPosition ) is { } snd )
 			{
 				snd.SpacialBlend = (Equipment.Owner?.IsViewer ?? false) ? 0 : snd.SpacialBlend;
+				snd.Volume *= soundVolume;
 				Log.Trace( $"Shootable: ShootSound {shootSound.ResourceName}" );
 			}
 		}
@@ -240,6 +258,10 @@ public partial class Shootable : WeaponInputAction,
 			impact.WorldPosition = pos + normal;
 			impact.WorldRotation = Rotation.LookAt( normal );
 			impact.SetParent( hitObject, true );
+
+			// Shots run in fixed update, which interpolates the re-parent: for a frame the effect sits at
+			// hitObject.PointToWorld( pos ) (thousands of units away) and its particles burst there.
+			impact.Transform.ClearInterpolation();
 		}
 
 		if ( surface.SoundCollection.Bullet.IsValid() )
@@ -253,6 +275,11 @@ public partial class Shootable : WeaponInputAction,
 	/// </summary>
 	public void Shoot()
 	{
+		// Held fire goes off on the first tick after the shot is due, so carry that lateness into the next shot and the
+		// average rate is exact. A later shot (trigger released, or semi-auto) starts a fresh schedule, so clicking can
+		// never beat the cyclic rate.
+		var continuing = Time.Now - _nextShotTime < Time.Delta;
+		_nextShotTime = (continuing ? _nextShotTime : Time.Now) + RPMToSeconds();
 		TimeSinceShoot = 0;
 		Equipment.RefreshAmmunitionLoadout();
 		var suppressed = UseSuppressedEffects();
@@ -271,7 +298,9 @@ public partial class Shootable : WeaponInputAction,
 
 		Player.GameObject.Dispatch( new WeaponShotEvent( Equipment ) );
 		
-		new Tec.AI.AudioStim( Player.Team.ToFaction(), Player.WorldPosition, 300000f, AudioStim.AudioStimType.Shoot, AudioStim.AudioStimDurationType.Finite, 1f );
+		var hearingScale = GunsmithAttachmentEffects.For( Equipment ).HearingDistance;
+		new Tec.AI.AudioStim( Player.Team.ToFaction(), Player.WorldPosition, 30000f * hearingScale,
+			AudioStim.AudioStimType.Shoot, AudioStim.AudioStimDurationType.Finite, 1f );
 
 		for ( int i = 0; i < BulletCount; i++ )
 		{
@@ -322,7 +351,7 @@ public partial class Shootable : WeaponInputAction,
 
 	private float CalculateDamageFalloff( float damage, float distance )
 	{
-		var distDelta = distance / MaxRange;
+		var distDelta = distance / (MaxRange * GunsmithAttachmentEffects.For( Equipment ).DamageFalloffDistance);
 		var damageMultiplier = BaseDamageFalloff.Evaluate( distDelta );
 
 		return damage * damageMultiplier;
@@ -479,23 +508,30 @@ public partial class Shootable : WeaponInputAction,
 	/// </summary>
 	private float GetEffectiveDamage()
 	{
-		var baseDamage = UseSuppressedEffects() && SuppressedBaseDamage > 0f ? SuppressedBaseDamage : BaseDamage;
+		// A suppressor changes the report, not the cartridge's damage.
+		var baseDamage = BaseDamage;
 		if ( string.IsNullOrEmpty( TuningId ) ) return baseDamage;
 		var tune = WeaponTuningManager.GetTuning( TuningId );
 		return baseDamage * (1f + tune.Damage * 0.025f);
 	}
 
 	/// <summary>
-	/// Effective RPM after applying fire-rate tuning. +10 = +12% RPM.
+	/// Effective RPM after fitted parts (gas system length, suppressor back-pressure) and fire-rate tuning. +10 tuning = +12% RPM.
 	/// </summary>
 	private float GetEffectiveFireRate()
 	{
 		// Zombies Double Tap: a shorter delay between shots means a higher RPM.
 		var perkScale = 1f / ZombiesPlayerState.FireDelayScale( Equipment?.Owner );
 
-		if ( string.IsNullOrEmpty( TuningId ) ) return FireRate * perkScale;
+		var partScale = GunsmithAttachmentEffects.For( Equipment ).FireRate;
+		// An integral suppressor is already part of the prefab's rate.
+		if ( !HasBuiltInSuppressor && UseSuppressedEffects() )
+			partScale *= SuppressorFireRateScale;
+
+		var rate = FireRate * partScale * perkScale;
+		if ( string.IsNullOrEmpty( TuningId ) ) return rate;
 		var tune = WeaponTuningManager.GetTuning( TuningId );
-		return FireRate * (1f + tune.FireRate * 0.012f) * perkScale;
+		return rate * (1f + tune.FireRate * 0.012f);
 	}
 
 	protected float RPMToSeconds()
@@ -522,7 +558,7 @@ public partial class Shootable : WeaponInputAction,
 			return false;
 
 		// Delay checks
-		if ( TimeSinceShoot < RPMToSeconds() )
+		if ( Time.Now < _nextShotTime )
 			return false;
 
 		// Ammo checks

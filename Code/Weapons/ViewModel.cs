@@ -36,11 +36,12 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 
 	[Property, Range( 0, 1 ), Group( "Configuration" )] public float IronsightsFireScale { get; set; } = 0.2f;
 	[Property, Group( "Configuration" )] public bool UseMovementInertia { get; set; } = true;
+	[Property, Range( 0, 1 ), Group( "Configuration" )] public float MoveBobScale { get; set; } = 1f;
+	[Property, Range( 0, 2 ), Group( "Configuration" )] public float YawInertiaScale { get; set; } = 2f;
 
 	[Property]
 	public float ReloadSpeed { get; set; } = 1f;
 
-	private float YawInertiaScale => 2f;
 	private float PitchInertiaScale => -2f;
 	private bool activateInertia = false;
 	private float lastPitch;
@@ -122,12 +123,12 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 					if ( hasOptic )
 					{
 						manualOffset.AimOffset = new Vector3( 0.36f, 2.181f, 0.596f );
-						manualOffset.AimAngleOffset = new Angles( -1.47f, 0.44f, 3.9f );
+						manualOffset.AimAngleOffset = new Angles( -1.47f, 0.44f, 0f );
 					}
 					else
 					{
 						manualOffset.AimOffset = new Vector3( 0.36f, 2.163f, 0.233f );
-						manualOffset.AimAngleOffset = new Angles( -0.1f, 0.34f, 3.9f );
+						manualOffset.AimAngleOffset = new Angles( -0.1f, 0.34f, 0f );
 					}
 				}
 			}
@@ -152,6 +153,10 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 
 	void OnPlayerJumped()
 	{
+		// Keep the sights steady while ADS; the jump pose can rotate the weapon out of alignment.
+		if ( Equipment.IsValid() && Equipment.HasTag( "aiming" ) )
+			return;
+
 		ModelRenderer?.Set( "b_jump", true );
 	}
 
@@ -292,7 +297,7 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 
 		// Set move_bob based on movement
 		lenMult = lenMult.LerpTo( isMoving && !isAiming ? moveLen.Remap( 0, 300, 0, 1, true ) : 0, Time.Delta * 10f );
-		ModelRenderer?.Set( "move_bob", lenMult );
+		ModelRenderer?.Set( "move_bob", lenMult * MoveBobScale );
 
 		// Handle cycle when moving vs stopped
 		float cycleProgress;
@@ -337,7 +342,9 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 	{
 		var aiming = Equipment.HasTag( "aiming" );
 		ModelRenderer.Set( "b_sprint", Owner.IsSprinting && !aiming );
-		ModelRenderer.Set( "b_grounded", Owner.IsGrounded );
+		// Airborne viewmodel blends can roll the weapon slightly out of the sights.
+		// Keep the aimed pose stable until the player leaves ADS.
+		ModelRenderer.Set( "b_grounded", Owner.IsGrounded || aiming );
 
 		// Ironsights
 		ModelRenderer.Set( "ironsights", aiming ? 1 : 0 );
@@ -360,6 +367,8 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 
 		// Weapon state
 		ModelRenderer.Set( "b_empty", !Equipment.GetComponentInChildren<WeaponAmmo>()?.HasAmmo ?? false );
+		// A magazine with its own reload animations (the RPK's box magazines) picks them; 0 is the weapon's own reload.
+		ModelRenderer.Set( "reload_variant", Equipment.ReloadMagazine?.ReloadAnimation ?? 0 );
 
 		// Map reload and shooting animations for SCAR-H
 		if ( Equipment.IsValid() && Equipment.Resource.IsValid() && Equipment.Resource.ResourceName.Contains( "scarh", StringComparison.OrdinalIgnoreCase ) )

@@ -1,0 +1,427 @@
+@namespace Facepunch.UI
+@using Facepunch.Gunsmith
+@inherits Panel
+@attribute [StyleSheet]
+
+@*
+    CoD-style class picker: opens when the player first loads into a match and on the ChooseClass input (B).
+    The classes are the ones built in the gunsmith; picking one gives it now if the player has only just spawned
+    (or it's their first pick this match), otherwise on their next spawn (PlayerLoadout.SendActiveClass).
+    Edit Class changes a class's weapons, equipment, perks and name without leaving the match. Attachments and
+    camos still need the gunsmith, which is its own scene.
+*@
+
+<root class="@(IsOpen ? "visible" : "") @(IsEditing ? "editing" : "")">
+    @if ( IsOpen )
+    {
+        <div class="window">
+            @if ( IsEditing )
+            {
+                <div class="class-list picker">
+                    <label class="heading">EDIT CLASS</label>
+
+                    @if ( EditSlot is { } pickSlot )
+                    {
+                        <label class="picker-title">@SlotLabel( pickSlot )</label>
+                        <div class="choices">
+                            @if ( pickSlot != EquipmentSlot.Primary )
+                            {
+                                var noneCurrent = GunsmithLoadoutManager.GetSlotResource( EditingClass, pickSlot ) is null;
+                                <div class="choice @(noneCurrent ? "current" : "")" onclick=@(() => PickSlot( pickSlot, null ))>
+                                    <div class="choice-text">
+                                        <label class="choice-name">None</label>
+                                        <label class="choice-sub">@(pickSlot == EquipmentSlot.Secondary ? "No secondary weapon" : "Use the mode's default")</label>
+                                    </div>
+                                </div>
+                            }
+
+                            @foreach ( var choice in GunsmithLoadoutManager.GetSlotChoices( pickSlot ) )
+                            {
+                                var resource = choice;
+                                var current = GunsmithLoadoutManager.GetSlotResource( EditingClass, pickSlot ) == resource;
+                                <div class="choice @(current ? "current" : "")" onclick=@(() => PickSlot( pickSlot, resource ))>
+                                    <div class="choice-text">
+                                        <label class="choice-name">@resource.Name</label>
+                                        <label class="choice-sub">@ChoiceDetail( resource )</label>
+                                    </div>
+                                    @if ( !string.IsNullOrEmpty( resource.Icon ) )
+                                    {
+                                        <div class="choice-icon" style="background-image: url( @resource.Icon );"></div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                    else if ( EditPerk > 0 )
+                    {
+                        <label class="picker-title">PERK @EditPerk</label>
+                        <div class="choices">
+                            <div class="choice @(GunsmithLoadoutManager.GetPerkResource( EditingClass, EditPerk ) is null ? "current" : "")" onclick=@(() => PickPerk( null ))>
+                                <div class="choice-text">
+                                    <label class="choice-name">None</label>
+                                </div>
+                            </div>
+
+                            @foreach ( var choice in PerkResource.All.Where( x => (int)x.Category == EditPerk ).OrderBy( x => x.Name ) )
+                            {
+                                var perk = choice;
+                                var current = GunsmithLoadoutManager.GetPerkResource( EditingClass, EditPerk ) == perk;
+                                <div class="choice @(current ? "current" : "")" onclick=@(() => PickPerk( perk ))>
+                                    <div class="choice-text">
+                                        <label class="choice-name">@perk.Name</label>
+                                        <label class="choice-sub">@perk.Description</label>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <label class="picker-hint">Pick a weapon, piece of equipment or perk on the right to change it.</label>
+                        <label class="picker-hint small">Attachments and camos are changed in the gunsmith.</label>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="class-list">
+                    <label class="heading">CHOOSE CLASS</label>
+
+                    @foreach ( var idx in GunsmithLoadoutManager.GetActiveClassIndices() )
+                    {
+                        var index = idx;
+                        <div class="class-button @(index == ShownClass ? "shown" : "") @(index == ActiveClass ? "equipped" : "")"
+                             onmouseover=@(() => HoveredClass = index) onclick=@(() => Choose( index ))>
+                            <label class="class-name">@GunsmithLoadoutManager.GetClassName( index )</label>
+                            @if ( index == ActiveClass )
+                            {
+                                <label class="class-tag">EQUIPPED</label>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+
+            <div class="class-details">
+                <div class="details-header">
+                    @if ( IsEditing )
+                    {
+                        <TextEntry @ref=NameEntry class="class-title name-entry" Value:bind=@NameDraft />
+                    }
+                    else
+                    {
+                        <label class="class-title">@GunsmithLoadoutManager.GetClassName( ShownClass )</label>
+                        <div class="edit-button" onclick=@(() => StartEditing( ShownClass ))>
+                            <i>edit</i>
+                            <label>EDIT CLASS</label>
+                        </div>
+                    }
+                </div>
+
+                @foreach ( var classSlot in GunsmithLoadoutManager.ClassSlots )
+                {
+                    var slot = classSlot;
+                    var resource = GunsmithLoadoutManager.GetSlotResource( ShownClass, slot );
+                    <div class="slot @slot.ToString().ToLowerInvariant() @(EditSlot == slot ? "selected" : "")" onclick=@(() => SelectSlot( slot ))>
+                        <div class="slot-text">
+                            <label class="slot-name">@slot.ToString().ToUpperInvariant()</label>
+                            <label class="item-name @(resource is null ? "empty" : "")">@(resource?.Name ?? "None")</label>
+                        </div>
+                        @if ( !string.IsNullOrEmpty( resource?.Icon ) )
+                        {
+                            <div class="item-icon" style="background-image: url( @resource.Icon );"></div>
+                        }
+                    </div>
+                }
+
+                <div class="perks">
+                    @for ( var i = 1; i <= 3; i++ )
+                    {
+                        var category = i;
+                        var perk = GunsmithLoadoutManager.GetPerkResource( ShownClass, category );
+                        <div class="perk @(EditPerk == category ? "selected" : "")" onclick=@(() => SelectPerk( category ))>
+                            @if ( !string.IsNullOrEmpty( perk?.Icon ) )
+                            {
+                                <div class="perk-icon" style="background-image: url( @perk.Icon );"></div>
+                            }
+                            <label class="perk-name @(perk is null ? "empty" : "")">@(perk?.Name ?? $"Perk {category}")</label>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            @if ( IsEditing )
+            {
+                <div class="footer-button" onclick=@(() => StopEditing())>
+                    <i>arrow_back</i>
+                    <label>Back</label>
+                </div>
+                <div class="footer-button accent" onclick=@FinishEditing>
+                    <i>check</i>
+                    <label>@(EditingClass == ActiveClass ? "Done" : "Equip class")</label>
+                </div>
+            }
+            else
+            {
+                <InputHint Action="ChooseClass" class="small" Size="@InputGlyphSize.Small" />
+                <label>Close</label>
+            }
+        </div>
+    }
+</root>
+
+@code
+{
+    private static ClassSelect Instance { get; set; }
+
+    public static bool IsAnyOpen => Instance is not null && !Instance.IsDeleting && Instance.IsOpen;
+
+    /// <summary>
+    /// Step back out of the class menu if it's open: from a slot's choices to the class, from editing to the class
+    /// list, then closed. Returns whether it was open.
+    /// </summary>
+    public static bool CloseAny()
+    {
+        if ( !IsAnyOpen ) return false;
+        Instance.Back();
+        return true;
+    }
+
+    private bool IsOpen { get; set; }
+
+    // The match we last opened for on joining; the HUD can rebuild this panel mid-match.
+    private static GameMode _openedOnJoin;
+
+    private int HoveredClass { get; set; } = -1;
+    private int ActiveClass => GunsmithLoadoutManager.GetActiveClassIndex();
+    private int ShownClass => IsEditing ? EditingClass : HoveredClass >= 0 ? HoveredClass : ActiveClass;
+
+    // The class being edited (-1 when just picking), and which of its slots or perks is showing its choices.
+    private int EditingClass { get; set; } = -1;
+    private bool IsEditing => EditingClass >= 0;
+    private EquipmentSlot? EditSlot { get; set; }
+    private int EditPerk { get; set; }
+
+    // Whether the class being edited changed, so leaving the editor re-sends it if it's the equipped one.
+    private bool _edited;
+    private int _revision;
+
+    private const int MaxClassNameLength = 24;
+
+    private TextEntry NameEntry { get; set; }
+    private string _nameDraft;
+
+    // Only a non-empty name is saved, so clearing the box to type a new one doesn't leave a blank class.
+    private string NameDraft
+    {
+        get => _nameDraft;
+        set
+        {
+            _nameDraft = value ?? "";
+            if ( _nameDraft.Length > MaxClassNameLength )
+                _nameDraft = _nameDraft[..MaxClassNameLength];
+
+            if ( !string.IsNullOrWhiteSpace( _nameDraft ) )
+                GunsmithLoadoutManager.SetClassName( EditingClass, _nameDraft.Trim() );
+        }
+    }
+
+    public ClassSelect()
+    {
+        Instance = this;
+    }
+
+    private void Choose( int index )
+    {
+        EndEditing( false );
+        IsOpen = false;
+        Equip( index );
+    }
+
+    /// <summary>
+    /// Makes a class the active one and sends it to the host: given now if the player has only just spawned,
+    /// otherwise on their next spawn.
+    /// </summary>
+    private void Equip( int index )
+    {
+        GunsmithLoadoutManager.SetActiveClassIndex( index );
+
+        var client = Client.Local;
+        if ( !client.IsValid() ) return;
+
+        if ( client.Loadout.SendActiveClass( true ) )
+        {
+            // Perks run on the owner, from the active class.
+            client.PlayerPawn?.GetComponent<PlayerPerks>()?.LoadFromCookies();
+        }
+        else if ( client.PlayerPawn.IsValid() )
+        {
+            Toast.Instance?.Show( $"{GunsmithLoadoutManager.GetClassName( index )} will be equipped on your next spawn" );
+        }
+    }
+
+    private void StartEditing( int index )
+    {
+        EditingClass = index;
+        EditSlot = null;
+        EditPerk = 0;
+        _edited = false;
+        _nameDraft = GunsmithLoadoutManager.GetClassName( index );
+    }
+
+    private void StopEditing() => EndEditing( true );
+
+    // The equipped class is only re-sent if it changed; another class gets equipped, as picking it would.
+    private void FinishEditing()
+    {
+        if ( EditingClass == ActiveClass ) Close();
+        else Choose( EditingClass );
+    }
+
+    /// <summary>
+    /// Leaves the editor. Changes are already saved; <paramref name="resend"/> re-sends the equipped class if it was
+    /// edited, so it's swapped straight away during the spawn window, as picking it would.
+    /// </summary>
+    private void EndEditing( bool resend )
+    {
+        if ( !IsEditing ) return;
+
+        var index = EditingClass;
+        var edited = _edited;
+
+        EditingClass = -1;
+        EditSlot = null;
+        EditPerk = 0;
+        _edited = false;
+        HoveredClass = index;
+
+        if ( resend && edited && index == ActiveClass )
+            Equip( index );
+    }
+
+    private void Close()
+    {
+        EndEditing( true );
+        IsOpen = false;
+    }
+
+    private void Back()
+    {
+        if ( EditSlot is not null || EditPerk > 0 )
+        {
+            EditSlot = null;
+            EditPerk = 0;
+        }
+        else if ( IsEditing )
+        {
+            StopEditing();
+        }
+        else
+        {
+            Close();
+        }
+    }
+
+    // Clicking a slot or perk of the class on show edits that class.
+    private void SelectSlot( EquipmentSlot slot )
+    {
+        if ( !IsEditing ) StartEditing( ShownClass );
+
+        EditSlot = EditSlot == slot ? null : slot;
+        EditPerk = 0;
+    }
+
+    private void SelectPerk( int category )
+    {
+        if ( !IsEditing ) StartEditing( ShownClass );
+
+        EditPerk = EditPerk == category ? 0 : category;
+        EditSlot = null;
+    }
+
+    private void PickSlot( EquipmentSlot slot, EquipmentResource resource )
+    {
+        GunsmithLoadoutManager.SetSlot( EditingClass, slot, resource?.ResourcePath );
+        EditSlot = null;
+        MarkEdited();
+    }
+
+    private void PickPerk( PerkResource perk )
+    {
+        GunsmithLoadoutManager.SetPerk( EditingClass, EditPerk, perk?.ResourceName );
+        EditPerk = 0;
+        MarkEdited();
+    }
+
+    private void MarkEdited()
+    {
+        _edited = true;
+        _revision++;
+    }
+
+    private static string SlotLabel( EquipmentSlot slot ) => slot switch
+    {
+        EquipmentSlot.Primary => "PRIMARY WEAPON",
+        EquipmentSlot.Secondary => "SECONDARY WEAPON",
+        _ => slot.ToString().ToUpperInvariant()
+    };
+
+    private static string ChoiceDetail( EquipmentResource resource )
+    {
+        if ( resource.Slot is not (EquipmentSlot.Primary or EquipmentSlot.Secondary) )
+            return resource.Description;
+
+        var category = resource.Category switch
+        {
+            WeaponCategory.AssaultRifle => "Assault Rifle",
+            WeaponCategory.Sniper => "Sniper Rifle",
+            WeaponCategory.Marksman => "Marksman Rifle",
+            var other => other.ToString()
+        };
+
+        return $"{category} · LV {WeaponProgression.GetLevel( resource )}";
+    }
+
+    public override void Tick()
+    {
+        var client = Client.Local;
+        if ( !client.IsValid() || !PlayerLoadout.ClassesEnabled )
+        {
+            if ( IsOpen ) Close();
+            return;
+        }
+
+        // Pick a class when first loading into the match.
+        if ( _openedOnJoin != GameMode.Instance && client.PlayerPawn.IsValid() )
+        {
+            _openedOnJoin = GameMode.Instance;
+            IsOpen = true;
+        }
+
+        // Typing a class name mustn't close the menu.
+        if ( Input.Pressed( "ChooseClass" ) && !(NameEntry.IsValid() && NameEntry.HasFocus) )
+        {
+            if ( IsOpen ) Close();
+            else IsOpen = true;
+        }
+
+        if ( !IsOpen )
+            HoveredClass = -1;
+    }
+
+    public override void OnDeleted()
+    {
+        if ( Instance == this )
+            Instance = null;
+
+        base.OnDeleted();
+    }
+
+    protected override int BuildHash()
+    {
+        return HashCode.Combine( IsOpen, HoveredClass, ActiveClass, GunsmithLoadoutManager.GetActiveClassIndices().Count,
+            EditingClass, EditSlot, EditPerk, _revision );
+    }
+}

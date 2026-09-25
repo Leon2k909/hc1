@@ -1,0 +1,38 @@
+{
+  "RootObject": {
+    "__guid": "d51da836-850c-564a-b801-bf050433a9fd",
+    "Flags": 0,
+    "Name": "MP5 Flash Guard 04",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Enabled": true,
+    "NetworkMode": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "8683fbbd-a325-5de4-b476-2e8638606fe2",
+        "__enabled": true,
+        "Model": "attachments/mw2022/models/att_vm_flashhider04/att_vm_flashhider04.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithBoneAttachment",
+        "__guid": "4e51bb69-0f4d-5cd2-8285-275b55ceaa68",
+        "__enabled": true,
+        "BoneName": "weapon_root",
+        "UseWeaponOrigin": true,
+        "WeaponSpaceOffset": "12,0,8.13",
+        "WeaponSpaceScale": 1,
+        "MountAtBone": false,
+        "BoneOffset": "0,0,0",
+        "BoneAngles": "0,0,0",
+        "ModelScaleMultiplier": "1,1,1",
+        "FitMp5MuzzleToBarrel": true
+      }
+    ],
+    "Children": []
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

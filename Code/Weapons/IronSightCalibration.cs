@@ -11,6 +11,8 @@ public static class IronSightCalibration
 	public static readonly IReadOnlyDictionary<string, Vector3> Expected = new Dictionary<string, Vector3>( StringComparer.OrdinalIgnoreCase )
 	{
 		["m4a1"] = new Vector3( 0f, 0f, 0f ),
+		// The sight picture comes from the CoD ADS pose baked into the animgraph (front post centred in the notch).
+		["kastov762"] = new Vector3( 0f, 0f, 0f ),
 	};
 
 	private static readonly HashSet<string> _reported = new( StringComparer.OrdinalIgnoreCase );

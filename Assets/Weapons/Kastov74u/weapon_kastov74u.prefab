@@ -1,0 +1,410 @@
+{
+  "RootObject": {
+    "__guid": "7a707154-47db-4779-a122-6fb719e21312",
+    "__version": 1,
+    "Flags": 0,
+    "Name": "weapon_kastov74u",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Tags": "player",
+    "Enabled": true,
+    "NetworkMode": 2,
+    "NetworkInterpolation": true,
+    "NetworkOrphaned": 0,
+    "OwnerTransfer": 1,
+    "Components": [
+      {
+        "__type": "Facepunch.Equipment",
+        "__guid": "89de4056-7f91-41ec-9011-8a49d12daf71",
+        "__enabled": true,
+        "AimFovOffset": -5,
+        "CrosshairType": "Default",
+        "DeploySound": "weapons/kastov74u/sounds/ks74u.raise.sound",
+        "Handedness": "Right",
+        "HoldType": "Rifle",
+        "MountedPrefab": {
+          "_type": "gameobject",
+          "prefab": "weapons/kastov74u/mount_kastov74u.prefab"
+        },
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Resource": "weapons/kastov74u/kastov74u.equip",
+        "SpeedPenalty": 30,
+        "UseCrosshair": true
+      },
+      {
+        "__type": "Facepunch.TagBinder",
+        "__guid": "b1c8e058-c6cd-4647-a1d2-4b1b72d61aef",
+        "__enabled": true,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "78a3f9ed-11ab-4b37-9410-1a522580e011",
+        "__version": 1,
+        "Flags": 0,
+        "Name": "Functions",
+        "Position": "0,0,0",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Tags": "",
+        "Enabled": true,
+        "NetworkMode": 2,
+        "NetworkInterpolation": true,
+        "NetworkOrphaned": 0,
+        "OwnerTransfer": 1,
+        "Components": [
+          {
+            "__type": "Facepunch.Lowerable",
+            "__guid": "893a6528-ade7-4d73-a119-441da5956bce",
+            "__enabled": true,
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null
+          },
+          {
+            "__type": "Facepunch.WeaponAmmo",
+            "__guid": "bce1f093-95c7-4ecf-be97-0cbf7ae1d2aa",
+            "__enabled": true,
+            "Ammo": 30,
+            "HasAmmo": true,
+            "MaxAmmo": 30,
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null
+          },
+          {
+            "__type": "Facepunch.Shootable",
+            "__guid": "3af8d096-c6b0-41f6-af08-f12f7d17821c",
+            "__enabled": true,
+            "AmmoComponent": {
+              "_type": "component",
+              "component_id": "bce1f093-95c7-4ecf-be97-0cbf7ae1d2aa",
+              "go": "78a3f9ed-11ab-4b37-9410-1a522580e011",
+              "component_type": "WeaponAmmo"
+            },
+            "BaseDamage": 20,
+            "BaseDamageFalloff": [
+              {
+                "x": 0,
+                "y": 1,
+                "in": 0,
+                "out": 0,
+                "mode": "Mirrored"
+              },
+              {
+                "x": 0.15,
+                "y": 0.9,
+                "in": 1.0,
+                "out": -1.0,
+                "mode": "Mirrored"
+              },
+              {
+                "x": 0.3,
+                "y": 0.7,
+                "in": 0.9,
+                "out": -0.9,
+                "mode": "Mirrored"
+              },
+              {
+                "x": 0.6,
+                "y": 0.45,
+                "in": 0.5,
+                "out": -0.5,
+                "mode": "Mirrored"
+              },
+              {
+                "x": 1,
+                "y": 0.3,
+                "in": 0,
+                "out": 0,
+                "mode": "Mirrored"
+              }
+            ],
+            "BloodEjectDistance": 512,
+            "BulletCount": 1,
+            "BulletSize": 8.0,
+            "BulletSpread": 0,
+            "BurstAmount": 3,
+            "BurstEndDelay": 0.2,
+            "CurrentFireMode": "Automatic",
+            "DryFireSound": "sounds/guns/gun_dryfire.sound",
+            "DryShootDelay": 0.15,
+            "EjectionPrefab": {
+              "_type": "gameobject",
+              "prefab": "prefabs/weapon_effects/556_spent_casing.prefab"
+            },
+            "FireModeSwitchDelay": 0.3,
+            "FireRate": 700,
+            "InAirSpreadMultiplier": 2,
+            "InputActions": [
+              "Attack1"
+            ],
+            "MaxEffectsPlayDistance": 4194304,
+            "MaxRange": 10000,
+            "MaxRicochetAngle": 45,
+            "MuzzleFlashChance": 0.12,
+            "MuzzleFlashScale": 0.5,
+            "MuzzleSmokePrefab": {
+              "_type": "gameobject",
+              "prefab": "prefabs/weapon_effects/gun_smoke.prefab"
+            },
+            "MuzzleSmokeScale": 1.0,
+            "MuzzleFlashPrefab": {
+              "_type": "gameobject",
+              "prefab": "prefabs/weapon_effects/rifle_muzzleflash.prefab"
+            },
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "OnInputAction": null,
+            "PenetrationThickness": 32,
+            "PlayerVelocityLimit": 300,
+            "RequiresAllInputActions": false,
+            "RequiresHasAmmo": true,
+            "RicochetMaxHits": 2,
+            "ShootSound": "weapons/kastov74u/sounds/ks74u.fire.sound",
+            "SupportedFireModes": [
+              "Automatic",
+              "Semi"
+            ],
+            "TracerEffect": null,
+            "VelocitySpreadScale": 0.25,
+            "SuppressedShootSound": "sounds/swb/attachments/silencer/swb_rifle.silenced.fire.sound",
+            "SuppressedMuzzleFlashChance": 0
+          },
+          {
+            "__type": "Facepunch.Reloadable",
+            "__guid": "c61f9430-2f54-4407-ac85-5ebd6c644665",
+            "__enabled": true,
+            "AmmoComponent": {
+              "_type": "component",
+              "component_id": "bce1f093-95c7-4ecf-be97-0cbf7ae1d2aa",
+              "go": "78a3f9ed-11ab-4b37-9410-1a522580e011",
+              "component_type": "WeaponAmmo"
+            },
+            "EmptyReloadSounds": {
+              "0.0": "weapons/kastov74u/sounds/ks74u.reload_empty.mvt.sound",
+              "0.28": "weapons/kastov74u/sounds/ks74u.reload_empty.charge.sound",
+              "1.12": "weapons/kastov74u/sounds/ks74u.reload_empty.magout.sound",
+              "1.82": "weapons/kastov74u/sounds/ks74u.reload_empty.magbump.sound",
+              "1.95": "weapons/kastov74u/sounds/ks74u.reload_empty.magin.sound",
+              "2.18": "weapons/kastov74u/sounds/ks74u.reload_empty.shoulder.sound"
+            },
+            "EmptyReloadTime": 2.73,
+            "InputActions": [
+              "Reload"
+            ],
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "OnInputAction": null,
+            "ReloadTime": 2.5,
+            "RequiresAllInputActions": false,
+            "SingleReload": false,
+            "TimedReloadSounds": {
+              "0.0": "weapons/kastov74u/sounds/ks74u.reload.mvt.sound",
+              "0.3": "weapons/kastov74u/sounds/ks74u.reload.maggrab.sound",
+              "0.7": "weapons/kastov74u/sounds/ks74u.reload.magout.sound",
+              "1.13": "weapons/kastov74u/sounds/ks74u.reload.magbump.sound",
+              "1.35": "weapons/kastov74u/sounds/ks74u.reload.magclick.sound",
+              "1.76": "weapons/kastov74u/sounds/ks74u.reload.mvt2.sound",
+              "2.02": "weapons/kastov74u/sounds/ks74u.reload.shoulder.sound"
+            }
+          },
+          {
+            "__type": "Facepunch.ShootRecoil",
+            "__guid": "6614abb2-8d49-4095-b928-feb57be0495f",
+            "__enabled": true,
+            "HorizontalSpread": "-5 5",
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "RecoilPattern": {
+              "Points": [
+                "0,4.93644",
+                "-0.0190115,4.661017",
+                "-0.09505701,4.322034",
+                "-0.2471485,4.067797",
+                "-0.3992395,3.855932",
+                "-0.513308,3.665254",
+                "-0.6273766,3.495763",
+                "-0.7794676,3.347458",
+                "-0.9505706,3.072034",
+                "-1.045627,2.838983",
+                "-1.140685,2.605932",
+                "-1.254753,2.330508",
+                "-1.292776,2.076271",
+                "-1.292776,1.779661",
+                "-1.311787,1.525424",
+                "-1.311787,1.313559",
+                "-1.273764,1.080508",
+                "-1.235741,0.8898305",
+                "-1.21673,0.7203389",
+                "-1.08365,0.5296611",
+                "-0.8745246,0.2966102",
+                "-0.7604561,0.2118644",
+                "-0.456274,0.06355932",
+                "-0.1711025,0.02118644"
+              ],
+              "LoopStart": 1,
+              "LoopEnd": 23,
+              "IsLooping": false
+            },
+            "ResetTime": 0.3,
+            "Scale": "2.3,5.6",
+            "UseRecoilPattern": true,
+            "VerticalSpread": "1 3"
+          },
+          {
+            "__type": "Facepunch.ManualOffset",
+            "__guid": "c5007690-153b-4a9b-aa6d-5cdf46fa8bcd",
+            "__enabled": true,
+            "AimAngleOffset": "0,0,0",
+            "AimOffset": "0,0,0",
+            "InputActions": [
+              "Attack2"
+            ],
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "OnInputAction": null,
+            "RequiresAllInputActions": false,
+            "OpticAimCorrection": "3.162,0,-1.226"
+          },
+          {
+            "__type": "Facepunch.ViewPunch",
+            "__guid": "15e84f72-ea4f-48f9-940a-6abe39d38118",
+            "__enabled": true,
+            "AnglesOffset": "-0.4,-0.1,-0.5",
+            "Curve": [
+              {
+                "x": 0,
+                "y": 0,
+                "in": 0,
+                "out": 0,
+                "mode": "Mirrored"
+              },
+              {
+                "x": 0.21428572,
+                "y": 1,
+                "in": 0,
+                "out": 0,
+                "mode": "Mirrored"
+              },
+              {
+                "x": 1,
+                "y": 0,
+                "in": 0,
+                "out": 0,
+                "mode": "Mirrored"
+              }
+            ],
+            "Lifetime": 0.45,
+            "MaxAnglesOffset": "-0.7,0.1,0.5",
+            "MaxPositionOffset": "-0.5,-0.2,-0.75",
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "PositionOffset": "0.5,0.2,0.75"
+          },
+          {
+            "__type": "Facepunch.FovOffset",
+            "__guid": "c39f4c6b-f1cb-4196-93fe-fdf5af70806e",
+            "__enabled": true,
+            "Curve": [
+              {
+                "x": 0,
+                "y": 0,
+                "in": 0,
+                "out": 0,
+                "mode": "Mirrored"
+              },
+              {
+                "x": 0.15,
+                "y": 1,
+                "in": 0,
+                "out": 0,
+                "mode": "Mirrored"
+              },
+              {
+                "x": 1,
+                "y": 0,
+                "in": 0,
+                "out": 0,
+                "mode": "Mirrored"
+              }
+            ],
+            "Length": 0.1,
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "Size": 2
+          }
+        ],
+        "Children": []
+      }
+    ],
+    "__properties": {
+      "NetworkInterpolation": true,
+      "TimeScale": 1,
+      "WantsSystemScene": true,
+      "Metadata": {},
+      "NavMesh": {
+        "Enabled": false,
+        "IncludeStaticBodies": true,
+        "IncludeKeyframedBodies": true,
+        "EditorAutoUpdate": true,
+        "AgentHeight": 64,
+        "AgentRadius": 16,
+        "AgentStepSize": 18,
+        "AgentMaxSlope": 40,
+        "ExcludedBodies": "",
+        "IncludedBodies": ""
+      }
+    },
+    "__variables": []
+  },
+  "ResourceVersion": 2,
+  "ShowInMenu": false,
+  "MenuPath": null,
+  "MenuIcon": null,
+  "DontBreakAsTemplate": false,
+  "__references": [],
+  "__version": 2
+}

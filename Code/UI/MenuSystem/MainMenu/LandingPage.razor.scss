@@ -625,6 +625,170 @@ $muted: rgba( 255, 255, 255, 0.45 );
     }
 
     // ============================================================
+    //  MAP SELECT (opens from a mode card)
+    // ============================================================
+    .map-picker
+    {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+
+        .map-picker-backdrop
+        {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba( 4, 5, 8, 0.78 );
+            backdrop-filter: blur( 6px );
+        }
+    }
+
+    .map-picker-panel
+    {
+        position: relative;
+        flex-direction: column;
+        gap: 20px;
+        padding: 32px;
+        max-width: 90%;
+        max-height: 85%;
+        background-color: rgba( 10, 12, 16, 0.95 );
+        border: 1px solid $panel-border;
+        border-top: 2px solid $accent;
+        border-radius: 6px;
+
+        &.hc
+        {
+            border-top-color: #cc2222;
+
+            .kicker { color: #cc4444; }
+        }
+    }
+
+    .map-picker-header
+    {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 40px;
+    }
+
+    .map-picker-heading
+    {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .map-picker-title
+    {
+        font-size: 40px;
+        font-weight: bold;
+        color: white;
+        letter-spacing: 2px;
+    }
+
+    .map-picker-close
+    {
+        padding: 6px;
+        border-radius: 4px;
+        cursor: pointer;
+
+        i
+        {
+            font-size: 28px;
+            color: rgba( 255, 255, 255, 0.5 );
+        }
+
+        &:hover
+        {
+            background-color: rgba( 255, 255, 255, 0.1 );
+
+            i { color: white; }
+        }
+    }
+
+    .map-grid
+    {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 16px;
+        overflow-y: scroll;
+    }
+
+    .map-card
+    {
+        position: relative;
+        width: 300px;
+        height: 190px;
+        flex-shrink: 0;
+        flex-direction: column;
+        justify-content: flex-end;
+        border: 1px solid $panel-border;
+        border-radius: 6px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.15s ease-out;
+
+        .map-img
+        {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+
+            &.placeholder
+            {
+                align-items: center;
+                justify-content: center;
+                background-image: linear-gradient( 135deg, rgba( 40, 44, 52, 1 ), rgba( 14, 16, 20, 1 ) );
+
+                i
+                {
+                    font-size: 64px;
+                    color: rgba( 255, 255, 255, 0.18 );
+                }
+            }
+        }
+
+        .map-shade
+        {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient( to top, rgba( 6, 7, 10, 0.95 ) 8%, rgba( 6, 7, 10, 0.1 ) 60% );
+        }
+
+        .map-name
+        {
+            position: relative;
+            padding: 14px 18px;
+            font-size: 22px;
+            font-weight: bold;
+            color: white;
+            letter-spacing: 1px;
+        }
+
+        &:hover
+        {
+            border-color: $accent;
+            box-shadow: 0 0 20px rgba( $accent, 0.25 );
+
+            .map-img { transform: scale( 1.06 ); }
+        }
+    }
+
+    // ============================================================
     //  BOTTOM STATUS BAR
     // ============================================================
     .statusbar

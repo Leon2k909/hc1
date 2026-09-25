@@ -10,7 +10,10 @@
     <div class="mount" style="left: @(OffsetX)%; top: @(OffsetY)%;">
         <div class="lens" @ref="Lens" style="width: @(LensWidthPercent)%; height: @(LensHeightPercent)%;">
             <div class="vignette"></div>
-            <div class="dot"></div>
+            @if (OpticZoom.OverlayDotVisible)
+            {
+                <div class="dot"></div>
+            }
         </div>
     </div>
 </root>
@@ -18,7 +21,7 @@
 @code
 {
     /// <summary>Lens diameter as a fraction of screen height, matched to the optic's glass at the aim position.</summary>
-    const float Diameter = 0.3f;
+    float Diameter => OpticZoom.LensDiameter;
 
     Panel Lens { get; set; }
     Texture _bound;
@@ -33,7 +36,6 @@
 
     public override void Tick()
     {
-        OpticZoom.LensDiameter = Diameter;
         var texture = OpticZoom.LensTexture;
         SetClass( "hidden", Alpha <= 0f || texture is null );
 
@@ -44,5 +46,5 @@
         }
     }
 
-    protected override int BuildHash() => HashCode.Combine( Alpha, LensWidthPercent, LensHeightPercent, OffsetX, OffsetY );
+    protected override int BuildHash() => HashCode.Combine( Alpha, LensWidthPercent, LensHeightPercent, OffsetX, OffsetY, OpticZoom.OverlayDotVisible );
 }

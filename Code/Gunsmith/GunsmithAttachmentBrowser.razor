@@ -4,52 +4,40 @@
 @namespace Facepunch.Gunsmith
 @inherits Panel
 
-<root class="hc1 @(SelectedPoint.IsValid() ? "browsing" : "")">
-    <div class="attachment-header">
-        <label>ATTACHMENTS</label>
-        <span>@EquippedCount EQUIPPED</span>
-    </div>
-    <div class="attachment-slots">
-        @foreach ( var point in GetPoints() )
-        {
-            var current = point.CurrentPart;
-            <button class="attachment-slot @(SelectedPoint == point ? "selected" : "") @(current.IsValid() ? "equipped" : "")" onclick=@(() => SelectPoint( point ))>
-                <div class="slot-heading"><label>@CategoryName( point.Category )</label><i>@(current.IsValid() ? "check" : "add")</i></div>
-                <label class="slot-part">@(current.IsValid() ? current.Name : StandardName( point.Category ))</label>
-                <div class="slot-footer"><span>@OptionCountLabel( point.Category )</span><i>chevron_right</i></div>
-            </button>
-        }
-    </div>
-
+@{ var points = GetPoints().ToList(); }
+<root class="hc1 @(SelectedPoint.IsValid() ? "browsing" : "") @(points.Any() ? "has-slots" : "no-slots")">
+    @* CoD-style gunsmith column: one big card per slot, and picking a slot swaps the column to that slot's options. *@
     @if ( SelectedPoint.IsValid() )
     {
-        var parts = GetParts( SelectedPoint.Category ).ToList();
         var options = new List<GunsmithPart> { null };
-        options.AddRange( parts );
-        var pages = Math.Max( 1, (int)Math.Ceiling( options.Count / (float)PageSize ) );
-        var page = Math.Clamp( Page, 0, pages - 1 );
+        options.AddRange( GetParts( SelectedPoint.Category ) );
         <div class="attachment-drawer">
             <div class="drawer-heading">
-                <div class="drawer-title"><label>@CategoryName( SelectedPoint.Category )</label><span>Choose an attachment · changes save automatically</span></div>
-                @if ( pages > 1 )
-                {
-                    <div class="drawer-paging">
-                        <button class="page-button @(page == 0 ? "disabled" : "")" onclick=@(() => ChangePage( -1, pages ))><i>chevron_left</i></button>
-                        <label>@(page + 1) / @pages</label>
-                        <button class="page-button @(page == pages - 1 ? "disabled" : "")" onclick=@(() => ChangePage( 1, pages ))><i>chevron_right</i></button>
-                    </div>
-                }
-                <button class="drawer-close" onclick=@Close><i>close</i><label>Done</label></button>
+                <button class="drawer-close" onclick=@Close><i>arrow_back</i><label>BACK</label></button>
+                <div class="drawer-title">
+                    <label class="drawer-caption">ATTACHMENTS</label>
+                    <label class="drawer-name">@CategoryName( SelectedPoint.Category )</label>
+                </div>
             </div>
+            <label class="drawer-hint">@OptionCountLabel( SelectedPoint.Category ) · CHANGES SAVE AUTOMATICALLY</label>
             <div class="attachment-options">
-                @foreach ( var part in options.Skip( page * PageSize ).Take( PageSize ) )
+                @foreach ( var part in options )
                 {
                     var equipped = SelectedPoint.CurrentPart == part;
                     var unlocked = IsUnlocked( part );
                     <button class="attachment-option @(equipped ? "equipped" : "") @(!unlocked ? "locked" : "")" onclick=@(() => Equip( part ))>
-                        <div class="option-top"><i>@(part is null ? "block" : CategoryIcon( SelectedPoint.Category ))</i><label>@(equipped ? "EQUIPPED" : unlocked ? "AVAILABLE" : $"LEVEL {part.RequiredLevel}")</label></div>
-                        <label class="option-name">@(part?.Name ?? StandardName( SelectedPoint.Category ))</label>
-                        <div class="option-action"><span>@OptionDescription( part )</span><i>@(equipped ? "check_circle" : unlocked ? "add_circle_outline" : "lock")</i></div>
+                        <div class="option-copy">
+                            <label class="option-name">@(part?.Name ?? StandardName( SelectedPoint.Category ))</label>
+                            <div class="option-meta">
+                                <i class="option-icon">@(part is null ? "block" : CategoryIcon( SelectedPoint.Category ))</i>
+                                @if ( equipped || !unlocked )
+                                {
+                                    <label class="option-state">@(equipped ? "EQUIPPED" : $"LEVEL {part.RequiredLevel}")</label>
+                                }
+                                <label class="option-desc">@OptionDescription( part )</label>
+                            </div>
+                        </div>
+                        <i class="option-action">@(equipped ? "check_circle" : unlocked ? "add_circle_outline" : "lock")</i>
                     </button>
                 }
             </div>
@@ -57,9 +45,33 @@
     }
     else
     {
-        <div class="attachment-help">
-            <i>touch_app</i><label>@(GetPoints().Any() ? "Select a slot above to change attachments" : "This weapon has no attachment slots")</label>
-            <span>DRAG TO ROTATE · SCROLL TO ZOOM</span>
+        <div class="attachment-header">
+            <label class="attachment-title">ATTACHMENTS</label>
+            @if ( points.Any() )
+            {
+                <label class="attachment-count">@EquippedCount / @points.Count EQUIPPED</label>
+            }
+        </div>
+        <div class="attachment-slots">
+            @foreach ( var point in points )
+            {
+                var current = point.CurrentPart;
+                <button class="attachment-slot @(current.IsValid() ? "equipped" : "empty")" onclick=@(() => SelectPoint( point ))>
+                    <div class="slot-copy">
+                        <div class="slot-heading">
+                            <i class="slot-icon">@CategoryIcon( point.Category )</i>
+                            <label class="slot-category">@CategoryName( point.Category )</label>
+                            <label class="slot-count">@OptionCountLabel( point.Category )</label>
+                        </div>
+                        <label class="slot-part">@(current.IsValid() ? current.Name : StandardName( point.Category ))</label>
+                    </div>
+                    <i class="slot-state">@(current.IsValid() ? "check_circle" : "add_circle_outline")</i>
+                </button>
+            }
+            @if ( !points.Any() )
+            {
+                <label class="attachment-empty">This weapon has no attachment slots</label>
+            }
         </div>
     }
 </root>
@@ -69,8 +81,8 @@
     public GunsmithWeapon Weapon { get; set; }
     public GunsmithAttachmentPoint SelectedPoint { get; private set; }
     private GunsmithWeapon PreviousWeapon;
-    private int Page;
-    private int PageSize = 4;
+    private GunsmithPartType? selectedCategory;
+    private string selectedWeaponPath;
     private int EquippedCount => GetPoints().Count( p => p.CurrentPart.IsValid() );
 
     private string OptionCountLabel( GunsmithPartType category )
@@ -79,21 +91,25 @@
         return count == 1 ? "1 OPTION" : $"{count} OPTIONS";
     }
 
-    public bool IsPointerOverControls() => Children.Any( p =>
-        (p.HasClass( "attachment-slots" ) || p.HasClass( "attachment-drawer" )) && p.Box.Rect.IsInside( Mouse.Position ) );
+    // The browser is a solid column now, so anywhere on it is UI rather than the weapon preview.
+    public bool IsPointerOverControls() => Box.Rect.IsInside( Mouse.Position );
 
-    // Keep selection and pagination local to this browser. One slot owns the tray at a time.
+    // Keep selection local to this browser. One slot owns the column at a time.
     public override void Tick()
     {
         base.Tick();
         if ( PreviousWeapon != Weapon )
         {
             PreviousWeapon = Weapon;
-            Close();
+            if ( selectedCategory.HasValue && Weapon.IsValid() && Weapon.Resource.IsValid()
+                && string.Equals( Weapon.Resource.ResourcePath, selectedWeaponPath, System.StringComparison.OrdinalIgnoreCase ) )
+            {
+                SelectedPoint = GetPoints().FirstOrDefault( p => p.Category == selectedCategory.Value );
+                if ( !SelectedPoint.IsValid() ) Close();
+                else StateHasChanged();
+            }
+            else Close();
         }
-
-        var width = Box.Rect.Width * ScaleFromScreen;
-        PageSize = Math.Clamp( (int)((width - 32f) / 228f), 2, 6 );
     }
 
     private IEnumerable<GunsmithAttachmentPoint> GetPoints()
@@ -115,20 +131,16 @@
     public void SelectPoint( GunsmithAttachmentPoint point )
     {
         SelectedPoint = point;
-        Page = 0;
+        selectedCategory = point.Category;
+        selectedWeaponPath = Weapon.Resource.ResourcePath;
         StateHasChanged();
     }
 
     public void Close()
     {
         SelectedPoint = null;
-        Page = 0;
-        StateHasChanged();
-    }
-
-    private void ChangePage( int delta, int pages )
-    {
-        Page = Math.Clamp( Page + delta, 0, pages - 1 );
+        selectedCategory = null;
+        selectedWeaponPath = null;
         StateHasChanged();
     }
 
@@ -137,7 +149,9 @@
         if ( !Weapon.IsValid() || !Weapon.Resource.IsValid() || !SelectedPoint.IsValid() || !IsUnlocked( part ) ) return;
         if ( part is not null && (part.Category != SelectedPoint.Category || !part.Supports( Weapon.Resource )) ) return;
         GunsmithLoadoutManager.SetAttachment( Weapon.Resource, SelectedPoint.Category, part );
-        GunsmithLoadoutManager.ApplyAttachments( Weapon.Resource, Weapon.GameObject );
+        var gunsmith = Weapon.GetComponentInParent<GunsmithSystem>();
+        if ( gunsmith.IsValid() ) gunsmith.ApplyPreviewAttachments( Weapon.Resource );
+        else GunsmithLoadoutManager.ApplyAttachments( Weapon.Resource, Weapon.GameObject );
         StateHasChanged();
     }
 
@@ -150,9 +164,9 @@
 
     private static string StandardName( GunsmithPartType category ) => category == GunsmithPartType.Ammunition ? "Standard Rounds" : "Standard";
 
-    private string OptionDescription( GunsmithPart part ) => !string.IsNullOrWhiteSpace( part?.Description ) ? part.Description : SelectedPoint.Category == GunsmithPartType.Ammunition
+    private string OptionDescription( GunsmithPart part ) => GunsmithAttachmentEffects.Describe( part ) ?? (!string.IsNullOrWhiteSpace( part?.Description ) ? part.Description : SelectedPoint.Category == GunsmithPartType.Ammunition
         ? part?.UsesTracerRounds == true ? "Visible bullet trails" : "No visible bullet trails"
-        : part is null ? "Original weapon part" : part.IsSuppressor ? "Suppressor" : CategoryName( part.Category );
+        : part is null ? "Original weapon part" : part.IsSuppressor ? "Suppressor" : CategoryName( part.Category ));
 
     private static string CategoryName( GunsmithPartType category ) => category == GunsmithPartType.RearGrip ? "REAR GRIP" : category.ToString().ToUpperInvariant();
     private static string CategoryIcon( GunsmithPartType category ) => category switch
@@ -166,7 +180,7 @@
     protected override int BuildHash()
     {
         var hash = new HashCode();
-        hash.Add( Weapon ); hash.Add( SelectedPoint ); hash.Add( Page ); hash.Add( PageSize );
+        hash.Add( Weapon ); hash.Add( SelectedPoint );
         if ( Weapon.IsValid() && Weapon.Resource.IsValid() ) hash.Add( WeaponProgression.GetLifetimeLevel( Weapon.Resource ) );
         foreach ( var point in GetPoints() )
         {

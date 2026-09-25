@@ -67,6 +67,7 @@ public sealed class GameNetworkManager : SingletonComponent<GameNetworkManager>,
 
 		var player = ClientPrefab.Clone();
 		player.BreakFromPrefab();
+		player.Flags |= GameObjectFlags.NotSaved;
 		player.Name = $"Client ({channel.DisplayName})";
 		player.Network.SetOrphanedMode( NetworkOrphaned.ClearOwner );
 

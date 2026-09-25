@@ -2,10 +2,18 @@
 @inherits Panel
 @attribute [StyleSheet]
 
-<root class="@(IsSelected ? "selected" : "")">
-    <label class="small">@Lobby.Name</label>
-    <div class="grow" />
-    <label class="small">@(Lobby.Members) / @(Lobby.MaxMembers)</label>
+<root class="@(IsSelected ? "selected" : "") @(Lobby.IsFull ? "full" : "")">
+    <label class="se-name">@Lobby.Name</label>
+
+    @if ( Lobby.IsFull )
+    {
+        <label class="se-tag">Full</label>
+    }
+
+    <div class="se-players">
+        <i>group</i>
+        <label>@(Lobby.Members) / @(Lobby.MaxMembers)</label>
+    </div>
 </root>
 
 @code

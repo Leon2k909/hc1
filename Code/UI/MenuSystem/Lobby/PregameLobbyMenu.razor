@@ -49,6 +49,7 @@
                     }
                 }
 
+                @* Core / Hardcore choice: Core modes are off for now, every match is hardcore. Put back with Core.
                 <div class="setting-group">
                     <label>Rules</label>
                     <div class="button-list row">
@@ -56,6 +57,7 @@
                         <div class="button standard smaller no-anim hc-toggle @((PregameLobbyManager.Instance?.IsHardcore ?? false) ? "selected" : "")" onclick=@(() => PregameLobbyManager.Instance?.SetHardcore( true ))>HARDCORE</div>
                     </div>
                 </div>
+                *@
 
 
                 <div class="grow" />
@@ -77,7 +79,8 @@
                     </div>
                     <div class="setting-info">
                         <label class="info-label">Mode:</label>
-                        <label class="info-value">@(mode?.Title) @(PregameLobbyManager.Instance.IsHardcore ? "(Hardcore)" : "")</label>
+                        @* Put back with Core modes: @(mode?.Title) @(PregameLobbyManager.Instance.IsHardcore ? "(Hardcore)" : "") *@
+                        <label class="info-value">@(mode?.Title)</label>
                     </div>
                 }
                 

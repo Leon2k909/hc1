@@ -1,0 +1,12 @@
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    F_METALNESS_TEXTURE "0"
+    g_flMetalness "0.32"
+    g_flRoughnessScaleFactor "1.0"
+    TextureColor "attachments/mpapa5/materials/shared/attachment_vm_stock_medium01_color.png"
+    TextureNormal "attachments/mpapa5/materials/shared/attachment_vm_stock_medium01_normal.png"
+    TextureRoughness "[0.42 0.42 0.42 1.0]"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+}

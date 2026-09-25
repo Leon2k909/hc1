@@ -7,6 +7,9 @@ namespace Facepunch.Gunsmith;
 public sealed class GunsmithSocketAttachment : GunsmithAttachment, ICameraSetup
 {
 	[Property] public string SocketName { get; set; } = "muzzle";
+	[Property] public bool UseWeaponOrigin { get; set; }
+	[Property] public Vector3 WeaponSpaceOffset { get; set; }
+	[Property] public float WeaponSpaceScale { get; set; } = 1f;
 	[Property] public Vector3 SocketOffset { get; set; }
 	[Property] public Angles SocketAngles { get; set; }
 	/// <summary>Calibrates socket roll for models authored with a different up axis.</summary>
@@ -54,8 +57,20 @@ public sealed class GunsmithSocketAttachment : GunsmithAttachment, ICameraSetup
 	{
 		if ( !weaponRenderer.IsValid() )
 			return;
+		if ( UseWeaponOrigin )
+		{
+			var root = GunsmithMw22Attachment.BoneDelta( weaponRenderer, "weapon_root" );
+			WorldTransform = root;
+			WorldPosition = root.PointToWorld( WeaponSpaceOffset );
+			WorldScale = root.Scale * WeaponSpaceScale;
+			return;
+		}
 
 		var socket = weaponRenderer.GetAttachment( SocketName );
+		// Some imported weapon models expose the mount as a bone rather than a
+		// named model attachment (the MP5 muzzle is authored this way).
+		if ( !socket.HasValue && weaponRenderer.TryGetBoneTransform( SocketName, out var boneSocket ) )
+			socket = boneSocket;
 		// World sockets are stale after camera setup moves the viewmodel; reuse the offset from the update phase.
 		if ( socket.HasValue && !GunsmithMw22Attachment.FollowingCamera ) socketOffset = weaponRenderer.WorldTransform.ToLocal( socket.Value );
 		else if ( socket.HasValue && socketOffset.HasValue ) socket = weaponRenderer.WorldTransform.ToWorld( socketOffset.Value );

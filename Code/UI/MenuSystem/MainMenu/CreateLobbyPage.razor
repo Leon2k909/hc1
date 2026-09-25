@@ -58,7 +58,9 @@
 {
     public SceneFile SelectedMap { get; set; }
     public List<string> SelectedGameModes { get; set; } = new();
-    public bool SelectedHardcore { get; set; } = false;
+    // Core modes are off for now, every match is hardcore. Put back with Core:
+    // public bool SelectedHardcore { get; set; } = false;
+    public bool SelectedHardcore { get; set; } = true;
 
     public GameModeList GameModeList { get; set; }
 

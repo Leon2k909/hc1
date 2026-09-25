@@ -55,6 +55,7 @@ public sealed class GlobalSystem : GameObjectSystem
 		if ( !GlobalsGameObject.IsValid() )
 		{
 			GlobalsGameObject = Scene.CreateObject();
+			GlobalsGameObject.Flags |= GameObjectFlags.NotSaved;
 			GlobalsGameObject.Name = "Fallback Globals";
 		}
 

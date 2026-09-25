@@ -17,6 +17,8 @@
 
 	public void OnScore( int amount, string reason )
 	{
+		if ( amount <= 0 ) return;
+
 		Layout.AddChild( new ScoringEntry()
 		{
 			Score = amount,
@@ -30,6 +32,7 @@
 	{
 		if ( ( Layout?.Children.Count() ?? 0 ) < 1 )
 			Total = 0;
+		SetClass( "hidden", (Layout?.Children.Count() ?? 0) < 1 );
 	}
 
 	protected override int BuildHash()

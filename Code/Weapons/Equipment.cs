@@ -69,6 +69,7 @@ public partial class Equipment : Component, Component.INetworkListener, IDescrip
 	/// The <see cref="PlayerPawn"/> who owns this.
 	/// </summary>
 	[Sync( SyncFlags.FromHost )] public PlayerPawn Owner { get; set; }
+	[Sync( SyncFlags.FromHost )] public bool ApplySavedAttachments { get; set; } = true;
 
 	/// <summary>
 	/// What flags do we have?
@@ -266,7 +267,8 @@ public partial class Equipment : Component, Component.INetworkListener, IDescrip
 			wmRenderer.SetBodyGroup( "sight", 0 );
 			wmRenderer.SetBodyGroup( "muzzle", 0 );
 		}
-		Facepunch.Gunsmith.GunsmithLoadoutManager.ApplyAttachments( Resource, wm );
+		if ( ApplySavedAttachments )
+			Facepunch.Gunsmith.GunsmithLoadoutManager.ApplyAttachments( Resource, wm );
 
 		wm.Flags |= GameObjectFlags.NotSaved | GameObjectFlags.NotNetworked;
 		wm.Enabled = true;
@@ -307,7 +309,8 @@ public partial class Equipment : Component, Component.INetworkListener, IDescrip
 
 			var viewModelComponent = viewModelGameObject.GetComponent<ViewModel>();
 			viewModelComponent.PlayDeployEffects = playDeployEffects;
-			Facepunch.Gunsmith.GunsmithLoadoutManager.ApplyAttachments( resource, viewModelGameObject );
+			if ( ApplySavedAttachments )
+				Facepunch.Gunsmith.GunsmithLoadoutManager.ApplyAttachments( resource, viewModelGameObject );
 
 			// equipment needs to know about the ViewModel
 			ViewModel = viewModelComponent;

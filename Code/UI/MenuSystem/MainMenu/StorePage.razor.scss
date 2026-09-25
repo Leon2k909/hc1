@@ -187,8 +187,8 @@ $accent: #FF7A1A;
 			}
 
 			.store-sub {
-				font-size: 16px;
-				color: rgba(255, 255, 255, 0.6);
+				font-size: 20px;
+				color: rgba(255, 255, 255, 0.75);
 			}
             
             .debug-btn {
@@ -197,15 +197,19 @@ $accent: #FF7A1A;
                 flex-direction: row;
                 align-items: center;
                 gap: 8px;
-                padding: 8px 16px;
+                padding: 10px 18px;
                 background-color: rgba(76, 175, 80, 0.2);
                 border: 1px solid rgba(76, 175, 80, 0.5);
                 border-radius: 6px;
-                width: 200px;
+                align-self: flex-start;
+                white-space: nowrap;
                 cursor: pointer;
                 color: #81c784;
+                font-size: 16px;
                 font-weight: bold;
                 transition: all 0.2s ease;
+
+                i { font-size: 22px; }
                 
                 &:hover {
                     background-color: rgba(76, 175, 80, 0.4);
@@ -220,14 +224,14 @@ $accent: #FF7A1A;
 			flex-wrap: wrap;
 
 			.store-item {
-				width: 260px;
+				width: 340px;
 				display: flex;
 				flex-direction: column;
 				background-color: rgba(0, 0, 0, 0.4);
 				border: 1px solid rgba(255, 255, 255, 0.1);
 				border-radius: 8px;
-				padding: 16px;
-				gap: 12px;
+				padding: 20px;
+				gap: 14px;
 				transition: transform 0.2s ease, border-color 0.2s ease;
 
 				&:hover {
@@ -237,7 +241,7 @@ $accent: #FF7A1A;
 
 				.item-img {
 					width: 100%;
-					height: 140px;
+					height: 190px;
 					border-radius: 6px;
 					display: flex;
 					align-items: center;
@@ -245,13 +249,13 @@ $accent: #FF7A1A;
 				}
 
 				.item-name {
-					font-size: 18px;
+					font-size: 24px;
 					font-weight: bold;
 				}
 
 				.item-desc {
-					font-size: 13px;
-					color: rgba(255, 255, 255, 0.6);
+					font-size: 17px;
+					color: rgba(255, 255, 255, 0.75);
 					flex-grow: 1;
 				}
 
@@ -261,10 +265,11 @@ $accent: #FF7A1A;
 					align-items: center;
 					justify-content: center;
 					gap: 8px;
-					padding: 10px;
+					padding: 12px;
 					background-color: rgba(255, 152, 0, 0.8);
 					border-radius: 6px;
 					cursor: pointer;
+					font-size: 19px;
 					font-weight: bold;
 					margin-top: 8px;
 					transition: background-color 0.2s ease;
@@ -273,9 +278,11 @@ $accent: #FF7A1A;
 						background-color: #ff9800;
 					}
                     
+                    i { font-size: 24px; }
+
                     &.disabled {
                         background-color: rgba(255, 255, 255, 0.1);
-                        color: rgba(255, 255, 255, 0.3);
+                        color: rgba(255, 255, 255, 0.45);
                         pointer-events: none;
                     }
 				}

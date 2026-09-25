@@ -74,7 +74,7 @@ public static partial class GameUtils
 
 	public static bool IsInteractiveMouseUiOpen() =>
 		Facepunch.UI.PauseMenuPanel.IsAnyOpen
-		|| Facepunch.UI.BuyMenu.IsAnyOpen
+		|| Facepunch.UI.ClassSelect.IsAnyOpen
 		|| Facepunch.UI.Chat.IsAnyOpen
 		|| Input.Down( "Score" )
 		|| Facepunch.UI.EndOfMatchScreen.IsAnyVisible
@@ -136,8 +136,8 @@ public static partial class GameUtils
 		if ( Facepunch.UI.PauseMenuPanel.IsAnyOpen )
 			return "pause menu open";
 
-		if ( Facepunch.UI.BuyMenu.IsAnyOpen )
-			return "buy menu open";
+		if ( Facepunch.UI.ClassSelect.IsAnyOpen )
+			return "class select open";
 
 		if ( Facepunch.UI.Chat.IsAnyOpen )
 			return "chat open";
@@ -210,7 +210,7 @@ public static partial class GameUtils
 			$"lockHasFocus={Facepunch.UI.CombatMouseLock.LastHasFocus}, " +
 			$"player={GetPlayerDisplayNameDebug( player )}, isViewer={GetPlayerViewerDebug( player )}, " +
 			$"isLocal={GetPlayerLocalDebug( player )}, gameMode={GetGameModeDebug()}, gunsmith={IsGunsmithStudioOpen()}, " +
-			$"pause={Facepunch.UI.PauseMenuPanel.IsAnyOpen}, buy={Facepunch.UI.BuyMenu.IsAnyOpen}, " +
+			$"pause={Facepunch.UI.PauseMenuPanel.IsAnyOpen}, classSelect={Facepunch.UI.ClassSelect.IsAnyOpen}, " +
 			$"chat={Facepunch.UI.Chat.IsAnyOpen}, score={Input.Down( "Score" )}, end={Facepunch.UI.EndOfMatchScreen.IsAnyVisible}" );
 	}
 
@@ -420,7 +420,7 @@ public static partial class GameUtils
 		return Team.Unassigned;
 	}
 
-	private static readonly string[] MainMenuMapOrder = { "Refinery", "Flatgrass", "Depot", "Aesthetic Mall" };
+	private static readonly string[] MainMenuMapOrder = { "Refinery", "Flatgrass", "Depot", "Innocent Hotel", "Aesthetic Mall" };
 
 	/// <summary>Maps currently excluded from quick play / lobby selection (work in progress).</summary>
 	private static readonly HashSet<string> DisabledMaps = new( StringComparer.OrdinalIgnoreCase )
@@ -447,7 +447,20 @@ public static partial class GameUtils
 		var path = map.ResourcePath ?? "";
 		return path.Contains( "scenes/maps/refinery/refinery.scene", StringComparison.OrdinalIgnoreCase )
 			|| path.Contains( "scenes/maps/flatgrass/flatgrass.scene", StringComparison.OrdinalIgnoreCase )
-			|| path.Contains( "scenes/maps/depot/depot.scene", StringComparison.OrdinalIgnoreCase );
+			|| path.Contains( "scenes/maps/depot/depot.scene", StringComparison.OrdinalIgnoreCase )
+			|| path.Contains( "scenes/maps/innocenthotel/innocent_hotel.scene", StringComparison.OrdinalIgnoreCase );
+	}
+
+	/// <summary>
+	/// Maps the match flow is set up for: team spawns, navmesh for bots, minimap. Depot and the rest are still WIP.
+	/// </summary>
+	public static IEnumerable<SceneFile> GetMatchMaps() => GetAvailableMaps().Where( IsMatchReadyMap );
+
+	public static bool IsMatchReadyMap( SceneFile map )
+	{
+		var path = map?.ResourcePath ?? "";
+		return path.Contains( "scenes/maps/flatgrass/flatgrass.scene", StringComparison.OrdinalIgnoreCase )
+			|| path.Contains( "scenes/maps/innocenthotel/innocent_hotel.scene", StringComparison.OrdinalIgnoreCase );
 	}
 
 	private static int GetMainMenuMapOrder( SceneFile map )
@@ -472,8 +485,7 @@ public static partial class GameUtils
 		.Where( x => x.Team == team )
 		.Where( x => tags.Length == 0 || tags.Any( x.Tags.Contains ) )
 		.Select( x => new SpawnPointInfo( x.Transform.World, x.GameObject.Tags.ToArray() ) )
-		.Concat( Game.ActiveScene.GetAllComponents<SpawnPoint>()
-			.Select( x => new SpawnPointInfo( x.Transform.World, x.GameObject.Tags.ToArray() ) ) );
+		.Concat( GetMapSpawnPoints() );
 
 	/// <summary>
 	/// Get all spawn point transforms
@@ -482,8 +494,15 @@ public static partial class GameUtils
 		.GetAllComponents<TeamSpawnPoint>()
 		.Where( x => tags.Length == 0 || tags.Any( x.Tags.Contains ) )
 		.Select( x => new SpawnPointInfo( x.Transform.World, x.GameObject.Tags.ToArray() ) )
-		.Concat( Game.ActiveScene.GetAllComponents<SpawnPoint>()
-			.Select( x => new SpawnPointInfo( x.Transform.World, x.GameObject.Tags.ToArray() ) ) );
+		.Concat( GetMapSpawnPoints() );
+
+	/// <summary>
+	/// The map's own info_player_starts, unless the scene's <see cref="MapSpawnSettings"/> turns them off.
+	/// </summary>
+	private static IEnumerable<SpawnPointInfo> GetMapSpawnPoints() => MapSpawnSettings.MapSpawnPointsAllowed
+		? Game.ActiveScene.GetAllComponents<SpawnPoint>()
+			.Select( x => new SpawnPointInfo( x.Transform.World, x.GameObject.Tags.ToArray() ) )
+		: Enumerable.Empty<SpawnPointInfo>();
 
 	/// <summary>
 	/// Pick a random spawn point for the given team.

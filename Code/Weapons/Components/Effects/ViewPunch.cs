@@ -1,4 +1,5 @@
 using Sandbox.Events;
+using Facepunch.Gunsmith;
 
 namespace Facepunch;
 
@@ -36,10 +37,14 @@ public class ViewPunch : EquipmentComponent, IGameEventHandler<WeaponShotEvent>
 		if ( !Player.IsValid() || !Player.IsViewer )
 			return;
 
+		var effects = GunsmithAttachmentEffects.For( Equipment );
+		var positionScale = (effects.VerticalRecoil + effects.HorizontalRecoil) * 0.5f;
+		var angles = GetBetween( AnglesOffset, MaxAnglesOffset );
 		var shake = new ScreenShake.Punch(
 			Lifetime,
-			GetBetween( PositionOffset, MaxPositionOffset ),
-			GetBetween( AnglesOffset, MaxAnglesOffset ),
+			GetBetween( PositionOffset, MaxPositionOffset ) * positionScale,
+			new Angles( angles.pitch * effects.VerticalRecoil, angles.yaw * effects.HorizontalRecoil,
+				angles.roll * positionScale ),
 			Curve );
 
 		ScreenShaker.Main?.Add( shake );
