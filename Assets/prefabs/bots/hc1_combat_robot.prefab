@@ -1,0 +1,227 @@
+{
+  "RootObject": {
+    "__guid": "1ad267df-106d-40b1-9b4c-80b301715947",
+    "__version": 2,
+    "Flags": 0,
+    "Name": "hc1_combat_robot",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Tags": "hc1_lightweight_bot,npc,player",
+    "Enabled": true,
+    "NetworkMode": 2,
+    "NetworkFlags": 0,
+    "NetworkOrphaned": 0,
+    "NetworkTransmit": true,
+    "OwnerTransfer": 1,
+    "Components": [
+      {
+        "__type": "Sandbox.NavMeshAgent",
+        "__guid": "f12d1618-22e7-434e-92c8-0126ea5cfdda",
+        "__enabled": true,
+        "Flags": 0,
+        "Acceleration": 250,
+        "AllowDefaultArea": true,
+        "AllowedAreas": [],
+        "AutoTraverseLinks": true,
+        "ForbiddenAreas": [],
+        "Height": 64,
+        "MaxSpeed": 180,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Radius": 24,
+        "Separation": 1.25,
+        "UpdatePosition": true,
+        "UpdateRotation": false
+      },
+      {
+        "__type": "Facepunch.HealthComponent",
+        "__guid": "d5cae2fd-eb79-435b-8758-e3e345a9e3e9",
+        "__enabled": true,
+        "Flags": 0,
+        "IsGodMode": false,
+        "MaxHealth": 100,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "OnHealthChanged": null
+      },
+      {
+        "__type": "Facepunch.LightweightCombatBot",
+        "__guid": "a24f4bd5-7cf9-47aa-a194-6882556be651",
+        "__enabled": true,
+        "Flags": 0,
+        "Agent": {
+          "_type": "component",
+          "component_id": "f12d1618-22e7-434e-92c8-0126ea5cfdda",
+          "go": "1ad267df-106d-40b1-9b4c-80b301715947",
+          "component_type": "NavMeshAgent"
+        },
+        "BotName": "RZ-07",
+        "BloodEffect": {
+          "_type": "gameobject",
+          "prefab": "prefabs/impact_fx/impact_sparks.prefab"
+        },
+        "Damage": 20,
+        "HealthComponent": {
+          "_type": "component",
+          "component_id": "d5cae2fd-eb79-435b-8758-e3e345a9e3e9",
+          "go": "1ad267df-106d-40b1-9b4c-80b301715947",
+          "component_type": "HealthComponent"
+        },
+        "MoveSpeed": 230,
+        "MuzzleFlashPrefab": "prefabs/weapon_effects/rifle_muzzleflash.prefab",
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "PatrolRadius": 900,
+        "PreferredRange": 550,
+        "RealPlayerDamageScale": 0.75,
+        "Renderer": {
+          "_type": "component",
+          "component_id": "5a38c02e-7327-4f02-a9ef-36fc7faa23ee",
+          "go": "77030a61-2522-4fb4-bf79-a5aaa21667f9",
+          "component_type": "SkinnedModelRenderer"
+        },
+        "ShootSound": "sounds/weapons/m4a1/m4_shot.sound",
+        "SightRange": 6000,
+        "Team": "Unassigned",
+        "TeamBaseModels": {},
+        "TracerEffectPrefab": "weapons/common/effects/tracer_9mm.prefab",
+        "WeaponResource": "weapons/m4a1/m4a1.equip",
+        "WeaponWorldModelPrefab": "weapons/m4a1/wm_m4a1.prefab"
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "77030a61-2522-4fb4-bf79-a5aaa21667f9",
+        "__version": 2,
+        "Flags": 0,
+        "Name": "robot",
+        "Position": "0,0,0",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Tags": "",
+        "Enabled": true,
+        "NetworkMode": 2,
+        "NetworkFlags": 0,
+        "NetworkOrphaned": 0,
+        "NetworkTransmit": true,
+        "OwnerTransfer": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.SkinnedModelRenderer",
+            "__guid": "5a38c02e-7327-4f02-a9ef-36fc7faa23ee",
+            "__enabled": true,
+            "Flags": 0,
+            "AnimationGraph": null,
+            "BodyGroups": 18446744073709551615,
+            "BoneMergeTarget": null,
+            "CreateAttachments": false,
+            "CreateBoneObjects": true,
+            "LodOverride": null,
+            "MaterialGroup": null,
+            "MaterialOverride": null,
+            "Materials": null,
+            "Model": "models/campaign/robot/combat_robot.vmdl",
+            "Morphs": {},
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "Parameters": {
+              "bools": {},
+              "ints": {},
+              "floats": {},
+              "vectors": {},
+              "rotations": {}
+            },
+            "PlaybackRate": 1,
+            "RenderOptions": {
+              "GameLayer": true,
+              "OverlayLayer": false,
+              "BloomLayer": false,
+              "AfterUILayer": false
+            },
+            "RenderType": "On",
+            "Sequence": {
+              "Name": null,
+              "Looping": true,
+              "Blending": false
+            },
+            "Tint": "1,1,1,1",
+            "UseAnimGraph": true
+          },
+          {
+            "__type": "Sandbox.ModelHitboxes",
+            "__guid": "b26b8657-363a-4090-bcdd-8324da2ec5b5",
+            "__enabled": true,
+            "Flags": 0,
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "Renderer": {
+              "_type": "component",
+              "component_id": "5a38c02e-7327-4f02-a9ef-36fc7faa23ee",
+              "go": "77030a61-2522-4fb4-bf79-a5aaa21667f9",
+              "component_type": "SkinnedModelRenderer"
+            },
+            "Target": {
+              "_type": "gameobject",
+              "go": "1ad267df-106d-40b1-9b4c-80b301715947"
+            }
+          }
+        ],
+        "Children": []
+      }
+    ],
+    "__variables": [],
+    "__properties": {
+      "FixedUpdateFrequency": 50,
+      "MaxFixedUpdates": 5,
+      "NetworkFrequency": 30,
+      "NetworkInterpolation": true,
+      "PhysicsSubSteps": 1,
+      "ThreadedAnimation": true,
+      "TimeScale": 1,
+      "UseFixedUpdate": true,
+      "Metadata": {},
+      "NavMesh": {
+        "Enabled": false,
+        "IncludeStaticBodies": true,
+        "IncludeKeyframedBodies": true,
+        "EditorAutoUpdate": true,
+        "AgentHeight": 64,
+        "AgentRadius": 16,
+        "AgentStepSize": 18,
+        "AgentMaxSlope": 40,
+        "ExcludedBodies": "",
+        "IncludedBodies": ""
+      }
+    }
+  },
+  "ShowInMenu": false,
+  "MenuPath": null,
+  "MenuIcon": null,
+  "DontBreakAsTemplate": false,
+  "ResourceVersion": 1,
+  "__references": [
+    "facepunch.w_m4a1#60166"
+  ],
+  "__version": 1
+}

@@ -1,0 +1,191 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc29:version{3cec427c-1b0e-4d48-a90a-0436f33a6041} -->
+{
+	rootNode =
+	{
+		_class = "RootNode"
+		children =
+		[
+			{
+				_class = "MaterialGroupList"
+				children =
+				[
+					{
+						_class = "DefaultMaterialGroup"
+						remaps =
+						[
+							{
+								from = "combat_robot.vmat"
+								to = "models/campaign/robot/combat_robot.vmat"
+							},
+							{
+								from = "combat_robot_glow.vmat"
+								to = "models/campaign/robot/combat_robot_glow.vmat"
+							},
+						]
+						use_global_default = false
+						global_default_material = "materials/default.vmat"
+					},
+					{
+						_class = "MaterialGroup"
+						name = "amber"
+						remaps =
+						[
+							{
+								from = "models/campaign/robot/combat_robot_glow.vmat"
+								to = "models/campaign/robot/combat_robot_glow_amber.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "cyan"
+						remaps =
+						[
+							{
+								from = "models/campaign/robot/combat_robot_glow.vmat"
+								to = "models/campaign/robot/combat_robot_glow_cyan.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "light"
+						remaps =
+						[
+							{
+								from = "models/campaign/robot/combat_robot.vmat"
+								to = "models/campaign/robot/combat_robot_light.vmat"
+							},
+							{
+								from = "models/campaign/robot/combat_robot_glow.vmat"
+								to = "models/campaign/robot/combat_robot_glow_cyan.vmat"
+							},
+						]
+					},
+				]
+			},
+			{
+				_class = "RenderMeshList"
+				children =
+				[
+					{
+						_class = "RenderMeshFile"
+						filename = "models/campaign/robot/combat_robot.fbx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter =
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+				]
+			},
+			{
+				_class = "ModelModifierList"
+				children =
+				[
+					{
+						_class = "ModelModifier_ScaleAndMirror"
+						scale = 0.3937
+						mirror_x = false
+						mirror_y = false
+						mirror_z = false
+						flip_bone_forward = false
+						swap_left_and_right_bones = false
+					},
+				]
+			},
+			{
+				_class = "AnimationList"
+				children =
+				[
+					{
+						_class = "Prefab"
+						target_file = "models/player/prefabs_v2/prefab_animation_list.vmdl_prefab"
+					},
+				]
+				default_root_bone_name = ""
+			},
+			{
+				_class = "WeightListList"
+				children =
+				[
+					{
+						_class = "Prefab"
+						target_file = "models/player/prefabs_v2/prefab_weight_list_list.vmdl_prefab"
+					},
+				]
+			},
+			{
+				_class = "PhysicsJointList"
+				children =
+				[
+					{
+						_class = "Prefab"
+						target_file = "models/player/prefabs_v2/prefab_physics_joints.vmdl_prefab"
+					},
+				]
+			},
+			{
+				_class = "PhysicsShapeList"
+				children =
+				[
+					{
+						_class = "Prefab"
+						target_file = "models/campaign/robot/combat_robot_physics_shapes.vmdl_prefab"
+					},
+				]
+			},
+			{
+				_class = "HitboxSetList"
+				children =
+				[
+					{
+						_class = "Prefab"
+						target_file = "models/campaign/robot/combat_robot_hitboxes.vmdl_prefab"
+					},
+				]
+			},
+			{
+				_class = "GameDataList"
+				children =
+				[
+					{
+						_class = "Prefab"
+						target_file = "models/player/prefabs_v2/prefab_gamedatalist.vmdl_prefab"
+					},
+				]
+			},
+			{
+				_class = "IKData"
+				children =
+				[
+					{
+						_class = "Prefab"
+						target_file = "models/player/prefabs_v2/prefab_ikdata.vmdl_prefab"
+					},
+				]
+			},
+			{
+				_class = "AttachmentList"
+				children =
+				[
+					{
+						_class = "Prefab"
+						target_file = "models/player/prefabs_v2/prefab_attachments.vmdl_prefab"
+					},
+				]
+			},
+		]
+		model_archetype = ""
+		primary_associated_entity = ""
+		anim_graph_name = "animgraphs/rigged_human.vanmgrph"
+		base_model_name = ""
+	}
+}

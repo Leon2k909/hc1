@@ -8,7 +8,7 @@
 <root>
     <div class="sb-head">
         <div class="sb-accent"></div>
-        <label class="sb-title">SERVER BROWSER</label>
+        <label class="sb-title">@Tr( "SERVER BROWSER" )</label>
         <div class="sb-head-fill"></div>
         <label class="sb-count @(IsSearching && !ShowFakeLobbies ? "searching" : "")">@CountLabel</label>
     </div>
@@ -16,8 +16,8 @@
     <div class="sb-panels">
         <div class="sb-list">
             <div class="sb-panel-head">
-                <label class="sb-col-name">Name</label>
-                <label class="sb-col-players">Players</label>
+                <label class="sb-col-name">@Tr( "Name" )</label>
+                <label class="sb-col-players">@Tr( "Players" )</label>
             </div>
 
             <div class="sb-rows">
@@ -36,15 +36,15 @@
                 {
                     <div class="sb-state searching">
                         <i>search</i>
-                        <label class="sb-state-title">Searching for sessions</label>
+                        <label class="sb-state-title">@Tr( "Searching for sessions" )</label>
                     </div>
                 }
                 else if ( FetchedLobbies.Count < 1 )
                 {
                     <div class="sb-state">
                         <i>dns</i>
-                        <label class="sb-state-title">No sessions found</label>
-                        <label class="sb-state-text">Refresh the list or create your own game.</label>
+                        <label class="sb-state-title">@Tr( "No sessions found" )</label>
+                        <label class="sb-state-text">@Tr( "Refresh the list or create your own game." )</label>
                     </div>
                 }
                 else
@@ -59,7 +59,7 @@
 
         <div class="sb-detail @(CurrentLobby.HasValue ? "" : "empty")">
             <div class="sb-panel-head">
-                <label>Session Details</label>
+                <label>@Tr( "Session Details" )</label>
             </div>
 
             @if ( CurrentLobby.HasValue )
@@ -70,7 +70,7 @@
                     <label class="sb-detail-name">@selected.Name</label>
 
                     <div class="sb-stat">
-                        <label class="sb-stat-key">Players</label>
+                        <label class="sb-stat-key">@Tr( "Players" )</label>
                         <label class="sb-stat-value">@selected.Members / @selected.MaxMembers</label>
 
                         <div class="sb-bar">
@@ -79,8 +79,8 @@
                     </div>
 
                     <div class="sb-stat">
-                        <label class="sb-stat-key">Status</label>
-                        <label class="sb-stat-value @(selected.IsFull ? "full" : "open")">@(selected.IsFull ? "Full" : "Open")</label>
+                        <label class="sb-stat-key">@Tr( "Status" )</label>
+                        <label class="sb-stat-value @(selected.IsFull ? "full" : "open")">@Tr( selected.IsFull ? "Full" : "Open" )</label>
                     </div>
                 </div>
             }
@@ -88,7 +88,7 @@
             {
                 <div class="sb-state">
                     <i>touch_app</i>
-                    <label class="sb-state-text">Select a session to see its details.</label>
+                    <label class="sb-state-text">@Tr( "Select a session to see its details." )</label>
                 </div>
             }
         </div>
@@ -110,9 +110,9 @@
     {
         get
         {
-            if ( ShowFakeLobbies ) return "32 FOUND";
-            if ( IsSearching ) return "SEARCHING";
-            return $"{FetchedLobbies.Count} FOUND";
+            if ( ShowFakeLobbies ) return Tr( "{0} FOUND", 32 );
+            if ( IsSearching ) return Tr( "SEARCHING" );
+            return Tr( "{0} FOUND", FetchedLobbies.Count );
         }
     }
 

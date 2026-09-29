@@ -1,60 +1,102 @@
 @namespace Facepunch.UI
 @inherits Panel
 
-<root class="layout flex column card with-background @(IsWinning ? "winning" : "")">
-    <div class="bg flex column">
-        <img src="@Option.Map.GetMetadata( "Image", null )" />
-
-        @if (IsWinning)
+<root class="card @StateClass">
+    <div class="art @(HasArt ? "" : "placeholder")" style="@ArtStyle">
+        @if ( !HasArt )
         {
-            <div class="win-fade row with-background layout padding flex gap align-center">
-                <i class="white">label_important</i>
-                <label class="white">Currently Winning...</label>
-            </div>
+            <i class="placeholder-icon">landscape</i>
         }
+
+        <div class="shade"></div>
+
+        <div class="tags">
+            @if ( IsWinner )
+            {
+                <label class="tag accent">@Tr( "Next map" )</label>
+            }
+            else if ( IsLeading )
+            {
+                <label class="tag">@Tr( "Leading" )</label>
+            }
+
+            @if ( IsLocalVote )
+            {
+                <label class="tag accent">@Tr( "Your vote" )</label>
+            }
+        </div>
+
+        <div class="caption">
+            <label class="name">@Title</label>
+            <label class="mode">@Tr( Option.Mode?.Title ?? "" )</label>
+        </div>
     </div>
 
+    <div class="share">
+        <div class="share-fill" style="width: @(Share * 100f)%;"></div>
+    </div>
 
-    <div class="row footer flex column justify-center">
-        <div class="flex row">
-
-            <div class="layout padding-extra flex column grow">
-                <label class="name important white uppercase">@Option.Map.GetMetadata( "Title" )</label>
-                <label class="mode small slight">@Option.Mode.Title</label>
-            </div>
-
-            <div class="layout votes padding-extra flex column align-end">
-                <div class="flex column">
-                    <div class="flex gap-xs">
-                        <label class="white">
-                            @Votes.Count()
-                        </label>
-                        <div>
-                            <label class="white">vote(s)</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex row" style="gap: 4px">
-                    @foreach (var vote in Votes)
-                    {
-                        <img class="avatar" src="avatar:@vote.VoterId" />
-                    }
-                </div>
-            </div>
+    <div class="footer">
+        <div class="voters">
+            @foreach ( var vote in Votes )
+            {
+                <img class="avatar" src="avatar:@vote.VoterId" />
+            }
         </div>
+        <label class="count">@VoteText</label>
     </div>
 </root>
 
 @code
 {
     public MapVoteSystem.Option Option { get; set; }
-    public List<MapVoteSystem.NetworkedVote> Votes { get; set; } = new();
-
     public int Index { get; set; }
-    public bool IsWinning { get; set; }
+
+    private MapVoteSystem VoteSystem => MapVoteSystem.Instance;
+    private List<MapVoteSystem.NetworkedVote> Votes => VoteSystem.IsValid() ? VoteSystem.Votes.Where( x => x is not null && x.Option == Index ).ToList() : new();
+    private int TotalVotes => VoteSystem.IsValid() ? VoteSystem.Votes.Count( x => x is not null ) : 0;
+    private float Share => TotalVotes > 0 ? Votes.Count / (float)TotalVotes : 0f;
+
+    private bool IsDecided => VoteSystem.IsValid() && VoteSystem.WinnerIndex >= 0;
+    private bool IsWinner => IsDecided && VoteSystem.WinnerIndex == Index;
+    private bool IsLocalVote => Votes.Any( x => x.VoterId == Connection.Local.SteamId );
+
+    /// <summary> Strictly ahead of every other map, with at least one vote. </summary>
+    private bool IsLeading => VoteSystem.IsValid() && Votes.Count > 0
+        && Enumerable.Range( 0, VoteSystem.OptionCount ).All( i => i == Index || VoteSystem.GetVoteCount( i ) < Votes.Count );
+
+    private string StateClass => string.Join( " ",
+        IsDecided ? (IsWinner ? "winner" : "loser") : "open",
+        IsLocalVote ? "voted" : "",
+        IsLeading ? "leading" : "" );
+
+    private string Title => Option.Map?.GetMetadata( "Title", Option.Map.ResourceName ) ?? "";
+    private string VoteText => Votes.Count switch { 0 => Tr( "No votes" ), 1 => Tr( "1 vote" ), var n => Tr( "{0} votes", n ) };
+
+    private string Art => MapArt.Get( Option.Map );
+    private bool HasArt => !string.IsNullOrEmpty( Art );
+    private string ArtStyle => HasArt ? $"background-image: url( '{Art}' );" : "";
 
     protected override void OnClick( MousePanelEvent e )
     {
-        MapVoteSystem.Instance.Vote( Index );
+        if ( VoteSystem.IsValid() && !IsDecided )
+            VoteSystem.Vote( Index );
+    }
+
+    protected override int BuildHash()
+    {
+        var hash = new HashCode();
+        hash.Add( Index );
+        hash.Add( Option.Map?.ResourcePath );
+        hash.Add( Art );
+        hash.Add( VoteSystem.IsValid() ? VoteSystem.WinnerIndex : -1 );
+
+        if ( VoteSystem.IsValid() )
+        {
+            foreach ( var vote in VoteSystem.Votes )
+                hash.Add( HashCode.Combine( vote?.VoterId, vote?.Option ) );
+        }
+
+        return hash.ToHashCode();
     }
 }

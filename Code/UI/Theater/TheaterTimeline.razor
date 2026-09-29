@@ -1,0 +1,71 @@
+@namespace Facepunch.UI
+@inherits Panel
+
+@* The Theater's seek bar: click or drag anywhere on it. Its children take no pointer events, so the root is always the
+   pressed panel and HasActive holds for the whole drag. *@
+<root>
+    <div class="tl-track">
+        <div class="tl-fill" @ref="Fill"></div>
+
+        @foreach ( var time in Deaths )
+        {
+            <div class="tl-death" style="left: @(Percent( time ))%"></div>
+        }
+
+        <div class="tl-thumb" @ref="Thumb"></div>
+    </div>
+</root>
+
+@code
+{
+    /// <summary> Whom the camera follows: their deaths are marked on the bar. </summary>
+    public TheaterController.Person Following { get; set; }
+
+    Panel Fill { get; set; }
+    Panel Thumb { get; set; }
+
+    TheaterController Controller => TheaterController.Current;
+
+    IEnumerable<float> Deaths => Controller?.Info?.Soldiers is { } soldiers && Following is { } person
+        ? soldiers.Where( x => x.Died >= 0f && x.Name == person.Name && x.Bot == person.Bot ).Select( x => x.Died )
+        : Enumerable.Empty<float>();
+
+    float Percent( float seconds ) => Controller is { Duration: > 0f } c ? Math.Clamp( seconds / c.Duration, 0f, 1f ) * 100f : 0f;
+
+    protected override void OnMouseDown( MousePanelEvent e )
+    {
+        base.OnMouseDown( e );
+
+        if ( e.MouseButton != MouseButtons.Left )
+            return;
+
+        SeekToMouse();
+        e.StopPropagation();
+    }
+
+    public override void Tick()
+    {
+        base.Tick();
+
+        if ( Controller is not { } controller )
+            return;
+
+        if ( HasActive )
+            SeekToMouse();
+
+        var percent = Length.Percent( Percent( controller.Position ) );
+        if ( Fill is not null ) Fill.Style.Width = percent;
+        if ( Thumb is not null ) Thumb.Style.Left = percent;
+    }
+
+    void SeekToMouse()
+    {
+        if ( Controller is not { Duration: > 0f } controller || Box.Rect.Width < 1f )
+            return;
+
+        var fraction = MathX.LerpInverse( Mouse.Position.x, Box.Left, Box.Right, true );
+        controller.Seek( fraction * controller.Duration );
+    }
+
+    protected override int BuildHash() => HashCode.Combine( Following, Controller?.Duration );
+}

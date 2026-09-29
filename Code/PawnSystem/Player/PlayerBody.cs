@@ -67,7 +67,16 @@ public partial class PlayerBody : Component
 	{
 		if ( !FirstPersonBody.IsValid() ) return;
 		FirstPersonBody.Enabled = IsFirstPerson && Player.IsValid() && !Player.HideFirstPersonBodyForStance;
+
+		// Only its legs are for seeing: the human model's face came into view when it leaned into a walk.
+		if ( !_firstPersonUniform.IsValid() )
+		{
+			_firstPersonUniform = FirstPersonBody.GetComponent<MilitaryUniform>( true );
+			_firstPersonUniform?.ShowLegsOnly();
+		}
 	}
+
+	private MilitaryUniform _firstPersonUniform;
 
 	protected override void OnUpdate()
 	{

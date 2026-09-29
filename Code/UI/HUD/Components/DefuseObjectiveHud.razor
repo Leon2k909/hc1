@@ -1,0 +1,72 @@
+@namespace Facepunch.UI
+@inherits Panel
+@attribute [StyleSheet]
+
+@if ( Visible )
+{
+    <div class="objective-heading">@Heading</div>
+    @if ( Armed ) { <label class="timer">@Countdown</label> }
+    <div class="objective-instruction">
+        @if ( Action is not null ) { <InputHint @key="Action" Action="@Action" Size="@InputGlyphSize.Small" /> }
+        <label>@Instruction</label>
+    </div>
+}
+
+@code
+{
+    bool Visible, Armed;
+    string Heading, Instruction, Action, Countdown;
+
+    public override void Tick()
+    {
+        Refresh();
+
+        // The panel is in the HUD in every mode, so only draw the box while it has something to say. A class set on
+        // <root> is added but never taken off again, so the classes are set here.
+        SetClass( "shown", Visible );
+        SetClass( "armed", Visible && Armed );
+    }
+
+    void Refresh()
+    {
+        Visible = false;
+        var mode = GameMode.Instance;
+        var player = Client.Viewer?.PlayerPawn;
+        if ( Scene is null || mode?.Ident != "defuse" || !player.IsValid() || player.HealthComponent.State != LifeState.Alive
+            || ClassSelect.IsAnyOpen || PauseMenuPanel.IsAnyOpen || Toast.IsWinShowing ) return;
+        var bomb = Scene.GetAllComponents<TimedExplosive>().FirstOrDefault( x => x.Active && !x.IsDefused && !x.HasDetonated );
+        Action = null;
+        Armed = bomb.IsValid();
+        if ( Armed )
+        {
+            Visible = true;
+            Heading = "DEVICE ARMED";
+            Countdown = TimeSpan.FromSeconds( Math.Ceiling(bomb.SecondsRemaining) ).ToString(@"m\:ss");
+            var defending = player.Team == Team.CounterTerrorist;
+            Instruction = defending ? "Reach the device and hold to disarm" : "Protect the device until detonation";
+            if ( defending ) Action = "Use";
+            return;
+        }
+        if ( mode.Get<BombPlantedEventComponent>() is not { Active: true } ) return;
+        Visible = true;
+        var site = player.GetZone<BombSite>();
+        if ( player.Inventory.HasBomb )
+        {
+            Heading = "YOU HAVE THE DEVICE";
+            var equipped = player.CurrentEquipment?.GetComponentInChildren<DefuseC4>();
+            if ( equipped.IsValid() && site.IsValid() )
+            {
+                Action = "Attack1";
+                Instruction = $"Hold to plant at site {(char)('A'+site.Index)} · 4 seconds";
+            }
+            else Instruction = equipped.IsValid() ? "Carry the device into site A or B" : "Equip the device in slot 5 at site A or B";
+        }
+        else
+        {
+            Heading = player.Team == Team.Terrorist ? "ATTACK" : "DEFEND";
+            Instruction = player.Team == Team.Terrorist ? "Escort the carrier to site A or B" : "Protect sites A and B · one life this round";
+        }
+    }
+
+    protected override int BuildHash() => HashCode.Combine(Visible,Armed,Heading,Instruction,Action,Countdown);
+}

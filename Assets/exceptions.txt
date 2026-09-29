@@ -1,0 +1,72 @@
+---------------
+File: D:\Documents\s&box projects\hc1\forked-shooter-main\.sbox\cloud\models\weapons\sbox_pistol_1911\w_1911.vmdl
+Exception: System.NullReferenceException: Object reference not set to an instance of an object.
+   at ValveResourceFormat.IO.GltfModelExporter.LoadPhysicsMeshes(ModelRoot exportedModel, Scene scene, PhysAggregateData phys, Matrix4x4 transform, String classname) in /_/ValveResourceFormat/IO/GltfModelExporter.Physics.cs:line 104
+   at ValveResourceFormat.IO.GltfModelExporter.ExportToFile(String resourceName, String fileName, PhysAggregateData physAggregateData) in /_/ValveResourceFormat/IO/GltfModelExporter.cs:line 628
+   at ValveResourceFormat.IO.GltfModelExporter.ExportToFile(String resourceName, String fileName, Model model) in /_/ValveResourceFormat/IO/GltfModelExporter.cs:line 614
+   at ValveResourceFormat.IO.GltfModelExporter.<>c__DisplayClass71_0.<Export>b__0() in /_/ValveResourceFormat/IO/GltfModelExporter.cs:line 242
+   at ValveResourceFormat.IO.GltfModelExporter.RunExport(Action exportAction, String targetPath, CancellationToken cancellationToken) in /_/ValveResourceFormat/IO/GltfModelExporter.cs:line 164
+   at CLI.Decompiler.ProcessFile(String path, Stream stream, String originalPath, IFileLoader fileLoader) in /_/CLI/Decompiler.cs:line 687
+
+---------------
+File: D:\Documents\s&box projects\hc1\forked-shooter-main\.sbox\cloud\models\weapons\sbox_pistol_usp\v_usp.vmdl
+Exception: System.NullReferenceException: Object reference not set to an instance of an object.
+   at ValveResourceFormat.IO.GltfModelExporter.LoadPhysicsMeshes(ModelRoot exportedModel, Scene scene, PhysAggregateData phys, Matrix4x4 transform, String classname) in /_/ValveResourceFormat/IO/GltfModelExporter.Physics.cs:line 104
+   at ValveResourceFormat.IO.GltfModelExporter.ExportToFile(String resourceName, String fileName, PhysAggregateData physAggregateData) in /_/ValveResourceFormat/IO/GltfModelExporter.cs:line 628
+   at ValveResourceFormat.IO.GltfModelExporter.ExportToFile(String resourceName, String fileName, Model model) in /_/ValveResourceFormat/IO/GltfModelExporter.cs:line 614
+   at ValveResourceFormat.IO.GltfModelExporter.<>c__DisplayClass71_0.<Export>b__0() in /_/ValveResourceFormat/IO/GltfModelExporter.cs:line 242
+   at ValveResourceFormat.IO.GltfModelExporter.RunExport(Action exportAction, String targetPath, CancellationToken cancellationToken) in /_/ValveResourceFormat/IO/GltfModelExporter.cs:line 164
+   at CLI.Decompiler.ProcessFile(String path, Stream stream, String originalPath, IFileLoader fileLoader) in /_/CLI/Decompiler.cs:line 687
+
+---------------
+File: D:\Documents\s&box projects\hc1\forked-shooter-main\.sbox\cloud\models\weapons\sbox_pistol_usp\w_usp.vmdl
+Exception: System.NullReferenceException: Object reference not set to an instance of an object.
+   at ValveResourceFormat.IO.GltfModelExporter.LoadPhysicsMeshes(ModelRoot exportedModel, Scene scene, PhysAggregateData phys, Matrix4x4 transform, String classname) in /_/ValveResourceFormat/IO/GltfModelExporter.Physics.cs:line 104
+   at ValveResourceFormat.IO.GltfModelExporter.ExportToFile(String resourceName, String fileName, PhysAggregateData physAggregateData) in /_/ValveResourceFormat/IO/GltfModelExporter.cs:line 628
+   at ValveResourceFormat.IO.GltfModelExporter.ExportToFile(String resourceName, String fileName, Model model) in /_/ValveResourceFormat/IO/GltfModelExporter.cs:line 614
+   at ValveResourceFormat.IO.GltfModelExporter.<>c__DisplayClass71_0.<Export>b__0() in /_/ValveResourceFormat/IO/GltfModelExporter.cs:line 242
+   at ValveResourceFormat.IO.GltfModelExporter.RunExport(Action exportAction, String targetPath, CancellationToken cancellationToken) in /_/ValveResourceFormat/IO/GltfModelExporter.cs:line 164
+   at CLI.Decompiler.ProcessFile(String path, Stream stream, String originalPath, IFileLoader fileLoader) in /_/CLI/Decompiler.cs:line 687
+
+---------------
+File: D:\Documents\s&box projects\hc1\forked-shooter-main\.sbox\cloud\models\weapons\sbox_smg_mp5\w_mp5.vmdl
+Exception: System.NullReferenceException: Object reference not set to an instance of an object.
+   at ValveResourceFormat.IO.GltfModelExporter.LoadPhysicsMeshes(ModelRoot exportedModel, Scene scene, PhysAggregateData phys, Matrix4x4 transform, String classname) in /_/ValveResourceFormat/IO/GltfModelExporter.Physics.cs:line 104
+   at ValveResourceFormat.IO.GltfModelExporter.ExportToFile(String resourceName, String fileName, PhysAggregateData physAggregateData) in /_/ValveResourceFormat/IO/GltfModelExporter.cs:line 628
+   at ValveResourceFormat.IO.GltfModelExporter.ExportToFile(String resourceName, String fileName, Model model) in /_/ValveResourceFormat/IO/GltfModelExporter.cs:line 614
+   at ValveResourceFormat.IO.GltfModelExporter.<>c__DisplayClass71_0.<Export>b__0() in /_/ValveResourceFormat/IO/GltfModelExporter.cs:line 242
+   at ValveResourceFormat.IO.GltfModelExporter.RunExport(Action exportAction, String targetPath, CancellationToken cancellationToken) in /_/ValveResourceFormat/IO/GltfModelExporter.cs:line 164
+   at CLI.Decompiler.ProcessFile(String path, Stream stream, String originalPath, IFileLoader fileLoader) in /_/CLI/Decompiler.cs:line 687
+
+---------------
+File: D:\Documents\s&box projects\hc1\forked-shooter-main\Assets\weapons\swb\scarh\v_scarh.vmdl_c
+Exception: System.ArgumentException: Unrecognized block type 'GUID'
+   at ValveResourceFormat.Resource.ConstructFromType(BlockType blockType) in /_/ValveResourceFormat/Resource/Resource.cs:line 541
+   at ValveResourceFormat.Resource.Read(Stream input, Boolean verifyFileSize, Boolean leaveOpen) in /_/ValveResourceFormat/Resource/Resource.cs:line 251
+   at CLI.Decompiler.ProcessFile(String path, Stream stream, String originalPath, IFileLoader fileLoader) in /_/CLI/Decompiler.cs:line 656
+
+---------------
+File: D:\Documents\s&box projects\hc1\forked-shooter-main\Assets\weapons\swb\scarh\w_scarh.vmdl
+Exception: System.NotImplementedException: Unsupported "NORMAL" DXGI_FORMAT.R10G10B10A2_UNORM
+   at ValveResourceFormat.Blocks.VBIB.GetFormatInfo(DXGI_FORMAT format, String attributeName) in /_/ValveResourceFormat/Resource/Blocks/VBIB.cs:line 983
+   at ValveResourceFormat.IO.GltfModelExporter.<>c__DisplayClass120_0.<CreateVertexBufferAccessors>b__0(OnDiskBufferData vertexBuffer, Int32 vertexBufferIndex) in /_/ValveResourceFormat/IO/GltfModelExporter.Mesh.cs:line 114
+   at System.Linq.Enumerable.SelectIterator[TSource,TResult](IEnumerable`1 source, Func`3 selector)+MoveNext()
+   at System.Linq.Enumerable.<ToArray>g__EnumerableToArray|324_0[TSource](IEnumerable`1 source)
+   at ValveResourceFormat.IO.GltfModelExporter.CreateGltfMesh(String meshName, Mesh vmesh, VBIB vbib, ModelRoot exportedModel, Int32[] boneRemapTable, String skinMaterialPath, Vector4 tintColor) in /_/ValveResourceFormat/IO/GltfModelExporter.Mesh.cs:line 48
+   at ValveResourceFormat.IO.GltfModelExporter.AddMeshNode(ModelRoot exportedModel, Scene scene, String name, Vector4 tintColor, Mesh mesh, VBIB vbib, Node[] joints, Node& meshNode, Int32[] boneRemapTable, String skinMaterialPath, Entity entity) in /_/ValveResourceFormat/IO/GltfModelExporter.cs:line 846
+   at ValveResourceFormat.IO.GltfModelExporter.LoadModel(ModelRoot exportedModel, Scene scene, Model model, String name, Matrix4x4 transform, Vector4 tintColor, String skinName, Entity entity) in /_/ValveResourceFormat/IO/GltfModelExporter.cs:line 751
+   at ValveResourceFormat.IO.GltfModelExporter.ExportToFile(String resourceName, String fileName, Model model) in /_/ValveResourceFormat/IO/GltfModelExporter.cs:line 598
+   at ValveResourceFormat.IO.GltfModelExporter.<>c__DisplayClass71_0.<Export>b__0() in /_/ValveResourceFormat/IO/GltfModelExporter.cs:line 242
+   at ValveResourceFormat.IO.GltfModelExporter.RunExport(Action exportAction, String targetPath, CancellationToken cancellationToken) in /_/ValveResourceFormat/IO/GltfModelExporter.cs:line 164
+   at CLI.Decompiler.ProcessFile(String path, Stream stream, String originalPath, IFileLoader fileLoader) in /_/CLI/Decompiler.cs:line 687
+
+---------------
+File: D:\Documents\s&box projects\hc1\forked-shooter-main\.sbox\cloud\models\weapons\sbox_pistol_usp\v_usp.vmdl
+Exception: System.NullReferenceException: Object reference not set to an instance of an object.
+   at ValveResourceFormat.IO.GltfModelExporter.LoadPhysicsMeshes(ModelRoot exportedModel, Scene scene, PhysAggregateData phys, Matrix4x4 transform, String classname) in /_/ValveResourceFormat/IO/GltfModelExporter.Physics.cs:line 104
+   at ValveResourceFormat.IO.GltfModelExporter.ExportToFile(String resourceName, String fileName, PhysAggregateData physAggregateData) in /_/ValveResourceFormat/IO/GltfModelExporter.cs:line 628
+   at ValveResourceFormat.IO.GltfModelExporter.ExportToFile(String resourceName, String fileName, Model model) in /_/ValveResourceFormat/IO/GltfModelExporter.cs:line 614
+   at ValveResourceFormat.IO.GltfModelExporter.<>c__DisplayClass71_0.<Export>b__0() in /_/ValveResourceFormat/IO/GltfModelExporter.cs:line 242
+   at ValveResourceFormat.IO.GltfModelExporter.RunExport(Action exportAction, String targetPath, CancellationToken cancellationToken) in /_/ValveResourceFormat/IO/GltfModelExporter.cs:line 164
+   at CLI.Decompiler.ProcessFile(String path, Stream stream, String originalPath, IFileLoader fileLoader) in /_/CLI/Decompiler.cs:line 687
+

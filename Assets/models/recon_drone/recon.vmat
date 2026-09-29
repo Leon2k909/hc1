@@ -1,0 +1,10 @@
+Layer0
+{
+ shader "shaders/complex.shader"
+ TextureColor "models/recon_drone/recon_color.png"
+ TextureNormal "models/recon_drone/recon_normal.png"
+ TextureRoughness "models/recon_drone/recon_roughness.png"
+ TextureAmbientOcclusion "materials/default/default_ao.tga"
+ g_flRoughnessScale "1"
+ g_flMetalness "0.08"
+}

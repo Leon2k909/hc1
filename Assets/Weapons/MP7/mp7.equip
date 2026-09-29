@@ -1,0 +1,32 @@
+{
+  "Name": "MP7A1",
+  "Description": "German 4.6x30mm personal defence weapon: compact and fast-firing, fed from a 40-round magazine in its pistol grip.",
+  "Slot": "Primary",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": true,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/guns/mp7_01.png",
+  "IsPurchasable": true,
+  "Price": 1600,
+  "KillReward": 600,
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/mp7/weapon_mp7.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/mp7/wm_mp7.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/mp7/vm_mp7.prefab"
+  },
+  "WorldModel": "weapons/mp7/w_mp7.vmdl",
+  "ArmorReduction": null,
+  "HelmetReduction": null,
+  "WorldModelBodyGroups": 0,
+  "__references": [],
+  "__version": 0,
+  "Category": "SMG",
+  "GunsmithOffset": "0,0,4"
+}

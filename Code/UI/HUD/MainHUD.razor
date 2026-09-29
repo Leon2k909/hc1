@@ -8,7 +8,10 @@
     return;
 
 @{
-    var isValidPlayer = Client.Viewer.IsValid() && Client.Viewer.Pawn.IsValid();
+    // While a team-win banner is up it's the only thing on screen: no spectate panel, crosshair or scores over it.
+    var winBanner = Toast.IsWinShowing;
+    var hasPawn = Client.Viewer.IsValid() && Client.Viewer.Pawn.IsValid();
+    var isValidPlayer = hasPawn && !winBanner;
     var hideCombatMouse = isValidPlayer && GameUtils.ShouldHideCombatMouse();
     var rootClass = IsHudEnabled ? (hideCombatMouse ? "combat-cursor-hidden" : "") : "hidden";
 }
@@ -32,6 +35,7 @@
 
         @{
             var isZombies = Scene.GetAllComponents<ZombiesGameMode>().Any();
+            var isBattleRoyale = GameUtils.IsBattleRoyale;
         }
 
         <div class="hud with-deadzone bottom-left gap-sm flex column skew-left">
@@ -40,7 +44,11 @@
                 <Vitals />
             }
 
-            @if ( !isZombies )
+            @if ( isBattleRoyale && !winBanner )
+            {
+                <BattleRoyaleRadar />
+            }
+            else if ( !isZombies && !winBanner )
             {
                 <RoundStateDisplay />
                 @if ( !(GameMode.Instance?.Hardcore ?? false) )
@@ -55,9 +63,15 @@
             <ZombiesRoundUI />
         }
 
+        @if ( isBattleRoyale && !winBanner )
+        {
+            <BattleRoyaleHud />
+        }
+
         @if ( isValidPlayer )
         {   
             <EquipmentOverlay />
+            <DefuseObjectiveHud />
             <Spectating />
             <Deathcam />
             <DefuseKitDisplay />
@@ -80,22 +94,22 @@
                 {
                     <div style="display: flex; align-items: center; justify-content: flex-end; margin-top: 10px; margin-bottom: 10px; gap: 8px;">
                         <div style="font-size: 14px; font-weight: bold; color: #FFF; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
-                            UAV READY (@score.BankedUAVs)
+                            @Tr( "UAV READY ({0})", score.BankedUAVs )
                         </div>
                         <InputHint Action="Scorestreak" class="small" Size="@InputGlyphSize.Small" />
                     </div>
                 }
             }
 
-            @if ( GameMode.Instance.IsValid() )
+            @if ( GameMode.Instance.IsValid() && !winBanner )
             {
-                <div class="mode-name-label @(GameMode.Instance.Hardcore ? "hc" : "")" style="text-align: right; padding: 4px 8px; font-size: 9px; font-weight: bold; letter-spacing: 1px; color: rgba(255,255,255,0.6);">@GameMode.Instance.DisplayTitle</div>
+                <div class="mode-name-label @(GameMode.Instance.Hardcore ? "hc" : "")" style="text-align: right; padding: 4px 8px; font-size: 9px; font-weight: bold; letter-spacing: 1px; color: rgba(255,255,255,0.6);">@Tr( GameMode.Instance.DisplayTitle )</div>
                 
                 var hpManager = GameMode.Instance.GetComponentInChildren<HardpointManager>();
                 if ( hpManager.IsValid() )
                 {
                     <div style="text-align: right; padding: 0px 8px; font-size: 11px; font-weight: bold; color: #FFF; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
-                        NEXT ZONE: @(Math.Max(0, Math.Ceiling(hpManager.RelocateTimer)))s
+                        @Tr( "NEXT ZONE: {0}s", Math.Max(0, Math.Ceiling(hpManager.RelocateTimer)) )
                     </div>
                 }
             }
@@ -107,7 +121,7 @@
             <ScoringSystem @ref="ScoringSystem" />
         }
 
-        @if ( !isValidPlayer )
+        @if ( !hasPawn && !winBanner )
         {
             <RespawnScreen />
         }
@@ -124,6 +138,7 @@
     }
 
     <ClassSelect />
+    <ZombiesWorkbenchPanel />
     <Scoreboard />
     <EndOfMatchScreen />
 </root>
@@ -165,6 +180,7 @@
     void IGameEventHandler<KillEvent>.OnGameEvent( KillEvent eventArgs )
     {
         MedalFeed?.OnKill( eventArgs );
+        KillSounds.OnKill( eventArgs );
     }
 
     protected override void OnUpdate()
@@ -173,7 +189,8 @@
         if ( Input.EscapePressed )
         {
             Input.EscapePressed = false;
-            if ( !ClassSelect.CloseAny() )
+            // An open list (the settings' language picker), then the gunsmith (opened over the match) step back first.
+            if ( !LanguageMenu.CloseAny() && !GunsmithPanel.HandleEscapeAny() && !ClassSelect.CloseAny() && !ZombiesWorkbenchPanel.CloseAny() )
                 PauseMenuPanel.ToggleAny();
         }
         GameUtils.TraceCombatMouse( "MainHUD.OnUpdate.before" );
@@ -196,6 +213,6 @@
         bool isHardcore = GameMode.Instance.IsValid() && GameMode.Instance.Hardcore;
         var score = Client.Viewer.IsValid() ? Client.Viewer.GetComponent<Facepunch.UI.PlayerScore>() : null;
         int bankedUAVs = score.IsValid() ? score.BankedUAVs : 0;
-        return HashCode.Combine(IsHudEnabled, Client.Viewer.IsValid(), Client.Viewer.IsValid() && Client.Viewer.Pawn.IsValid(), Math.Ceiling( relocateTimer ), isHardcore, bankedUAVs );
+        return HashCode.Combine(IsHudEnabled, Client.Viewer.IsValid(), Client.Viewer.IsValid() && Client.Viewer.Pawn.IsValid(), Math.Ceiling( relocateTimer ), isHardcore, bankedUAVs, Toast.IsWinShowing );
     }
 }

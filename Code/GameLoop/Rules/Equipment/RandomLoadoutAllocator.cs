@@ -102,8 +102,12 @@ public sealed class RandomLoadoutAllocator : Component,
 	[Property]
 	public List<LoadoutType> LoadoutTypes { get; set; } = new();
 
+	// The body is a named method: hotload can't re-link static lambdas inside explicit generic interface methods
+	// ("Unable to find matching substitution for a static method"), so they'd throw after every hotload.
 	[After<RespawnPlayers>, Before<SpecialWeaponAllocator>]
-	void IGameEventHandler<EnterStateEvent>.OnGameEvent( EnterStateEvent eventArgs )
+	void IGameEventHandler<EnterStateEvent>.OnGameEvent( EnterStateEvent eventArgs ) => AllocateLoadouts( eventArgs );
+
+	void AllocateLoadouts( EnterStateEvent eventArgs )
 	{
 		var roundCounter = GameMode.Instance.Get<RoundCounter>();
 		var roundNumber = roundCounter?.Round ?? 1;

@@ -18,24 +18,37 @@
             @if ( IsEditing )
             {
                 <div class="class-list picker">
-                    <label class="heading">EDIT CLASS</label>
+                    <label class="heading">@Tr( "EDIT CLASS" )</label>
 
                     @if ( EditSlot is { } pickSlot )
                     {
+                        var categories = SlotCategories( pickSlot );
                         <label class="picker-title">@SlotLabel( pickSlot )</label>
+                        @if ( categories.Count > 1 )
+                        {
+                            <div class="categories">
+                                @foreach ( var tab in categories )
+                                {
+                                    var category = tab;
+                                    <div class="category @(category == PickCategory ? "active" : "")" onclick=@(() => PickCategory = category)>
+                                        <label>@Tr( CategoryTab( category ) )</label>
+                                    </div>
+                                }
+                            </div>
+                        }
                         <div class="choices">
                             @if ( pickSlot != EquipmentSlot.Primary )
                             {
                                 var noneCurrent = GunsmithLoadoutManager.GetSlotResource( EditingClass, pickSlot ) is null;
                                 <div class="choice @(noneCurrent ? "current" : "")" onclick=@(() => PickSlot( pickSlot, null ))>
                                     <div class="choice-text">
-                                        <label class="choice-name">None</label>
-                                        <label class="choice-sub">@(pickSlot == EquipmentSlot.Secondary ? "No secondary weapon" : "Use the mode's default")</label>
+                                        <label class="choice-name">@Tr( "None" )</label>
+                                        <label class="choice-sub">@Tr( pickSlot == EquipmentSlot.Secondary ? "No secondary weapon" : "Use the mode's default" )</label>
                                     </div>
                                 </div>
                             }
 
-                            @foreach ( var choice in GunsmithLoadoutManager.GetSlotChoices( pickSlot ) )
+                            @foreach ( var choice in GunsmithLoadoutManager.GetSlotChoices( pickSlot ).Where( x => categories.Count < 2 || x.Category == PickCategory ) )
                             {
                                 var resource = choice;
                                 var current = GunsmithLoadoutManager.GetSlotResource( EditingClass, pickSlot ) == resource;
@@ -54,11 +67,11 @@
                     }
                     else if ( EditPerk > 0 )
                     {
-                        <label class="picker-title">PERK @EditPerk</label>
+                        <label class="picker-title">@Tr( "PERK {0}", EditPerk )</label>
                         <div class="choices">
                             <div class="choice @(GunsmithLoadoutManager.GetPerkResource( EditingClass, EditPerk ) is null ? "current" : "")" onclick=@(() => PickPerk( null ))>
                                 <div class="choice-text">
-                                    <label class="choice-name">None</label>
+                                    <label class="choice-name">@Tr( "None" )</label>
                                 </div>
                             </div>
 
@@ -68,8 +81,8 @@
                                 var current = GunsmithLoadoutManager.GetPerkResource( EditingClass, EditPerk ) == perk;
                                 <div class="choice @(current ? "current" : "")" onclick=@(() => PickPerk( perk ))>
                                     <div class="choice-text">
-                                        <label class="choice-name">@perk.Name</label>
-                                        <label class="choice-sub">@perk.Description</label>
+                                        <label class="choice-name">@Tr( perk.Name )</label>
+                                        <label class="choice-sub">@Tr( perk.Description )</label>
                                     </div>
                                 </div>
                             }
@@ -77,15 +90,15 @@
                     }
                     else
                     {
-                        <label class="picker-hint">Pick a weapon, piece of equipment or perk on the right to change it.</label>
-                        <label class="picker-hint small">Attachments and camos are changed in the gunsmith.</label>
+                        <label class="picker-hint">@Tr( "Pick a weapon, piece of equipment or perk on the right to change it." )</label>
+                        <label class="picker-hint small">@Tr( "Attachments and camos are changed in the gunsmith." )</label>
                     }
                 </div>
             }
             else
             {
                 <div class="class-list">
-                    <label class="heading">CHOOSE CLASS</label>
+                    <label class="heading">@Tr( "CHOOSE CLASS" )</label>
 
                     @foreach ( var idx in GunsmithLoadoutManager.GetActiveClassIndices() )
                     {
@@ -95,7 +108,7 @@
                             <label class="class-name">@GunsmithLoadoutManager.GetClassName( index )</label>
                             @if ( index == ActiveClass )
                             {
-                                <label class="class-tag">EQUIPPED</label>
+                                <label class="class-tag">@Tr( "EQUIPPED" )</label>
                             }
                         </div>
                     }
@@ -113,7 +126,7 @@
                         <label class="class-title">@GunsmithLoadoutManager.GetClassName( ShownClass )</label>
                         <div class="edit-button" onclick=@(() => StartEditing( ShownClass ))>
                             <i>edit</i>
-                            <label>EDIT CLASS</label>
+                            <label>@Tr( "EDIT CLASS" )</label>
                         </div>
                     }
                 </div>
@@ -124,8 +137,8 @@
                     var resource = GunsmithLoadoutManager.GetSlotResource( ShownClass, slot );
                     <div class="slot @slot.ToString().ToLowerInvariant() @(EditSlot == slot ? "selected" : "")" onclick=@(() => SelectSlot( slot ))>
                         <div class="slot-text">
-                            <label class="slot-name">@slot.ToString().ToUpperInvariant()</label>
-                            <label class="item-name @(resource is null ? "empty" : "")">@(resource?.Name ?? "None")</label>
+                            <label class="slot-name">@Tr( slot.ToString().ToUpperInvariant() )</label>
+                            <label class="item-name @(resource is null ? "empty" : "")">@(resource?.Name ?? Tr( "None" ))</label>
                         </div>
                         @if ( !string.IsNullOrEmpty( resource?.Icon ) )
                         {
@@ -144,7 +157,7 @@
                             {
                                 <div class="perk-icon" style="background-image: url( @perk.Icon );"></div>
                             }
-                            <label class="perk-name @(perk is null ? "empty" : "")">@(perk?.Name ?? $"Perk {category}")</label>
+                            <label class="perk-name @(perk is null ? "empty" : "")">@(perk is null ? Tr( "Perk {0}", category ) : Tr( perk.Name ))</label>
                         </div>
                     }
                 </div>
@@ -156,17 +169,17 @@
             {
                 <div class="footer-button" onclick=@(() => StopEditing())>
                     <i>arrow_back</i>
-                    <label>Back</label>
+                    <label>@Tr( "Back" )</label>
                 </div>
                 <div class="footer-button accent" onclick=@FinishEditing>
                     <i>check</i>
-                    <label>@(EditingClass == ActiveClass ? "Done" : "Equip class")</label>
+                    <label>@Tr( EditingClass == ActiveClass ? "Done" : "Equip class" )</label>
                 </div>
             }
             else
             {
                 <InputHint Action="ChooseClass" class="small" Size="@InputGlyphSize.Small" />
-                <label>Close</label>
+                <label>@Tr( "Close" )</label>
             }
         </div>
     }
@@ -189,6 +202,13 @@
         return true;
     }
 
+    /// <summary> Open the class menu, as the ChooseClass key does (the pause menu's Change Class). </summary>
+    public static void OpenAny()
+    {
+        if ( Instance is null || Instance.IsDeleting ) return;
+        Instance.IsOpen = true;
+    }
+
     private bool IsOpen { get; set; }
 
     // The match we last opened for on joining; the HUD can rebuild this panel mid-match.
@@ -203,6 +223,9 @@
     private bool IsEditing => EditingClass >= 0;
     private EquipmentSlot? EditSlot { get; set; }
     private int EditPerk { get; set; }
+
+    // The category tab showing, when a slot's choices span more than one (the primaries).
+    private WeaponCategory PickCategory { get; set; }
 
     // Whether the class being edited changed, so leaving the editor re-sends it if it's the equipped one.
     private bool _edited;
@@ -258,7 +281,7 @@
         }
         else if ( client.PlayerPawn.IsValid() )
         {
-            Toast.Instance?.Show( $"{GunsmithLoadoutManager.GetClassName( index )} will be equipped on your next spawn" );
+            Toast.Instance?.Show( "{0} will be equipped on your next spawn", ToastType.Generic, 5f, GunsmithLoadoutManager.GetClassName( index ) );
         }
     }
 
@@ -331,6 +354,14 @@
 
         EditSlot = EditSlot == slot ? null : slot;
         EditPerk = 0;
+
+        // Open on the tab of the weapon the class has there, as the gunsmith does.
+        if ( EditSlot is { } open )
+        {
+            var categories = SlotCategories( open );
+            var current = GunsmithLoadoutManager.GetSlotResource( EditingClass, open );
+            PickCategory = current is not null && categories.Contains( current.Category ) ? current.Category : categories.FirstOrDefault();
+        }
     }
 
     private void SelectPerk( int category )
@@ -361,17 +392,29 @@
         _revision++;
     }
 
-    private static string SlotLabel( EquipmentSlot slot ) => slot switch
+    // Both are shown straight away, so they come back in the player's language.
+    private static string SlotLabel( EquipmentSlot slot ) => Tr( slot switch
     {
         EquipmentSlot.Primary => "PRIMARY WEAPON",
         EquipmentSlot.Secondary => "SECONDARY WEAPON",
         _ => slot.ToString().ToUpperInvariant()
+    } );
+
+    /// <summary> The categories of a slot's choices, in the gunsmith's tab order (GetSlotChoices sorts by category). </summary>
+    private static List<WeaponCategory> SlotCategories( EquipmentSlot slot ) =>
+        GunsmithLoadoutManager.GetSlotChoices( slot ).Select( x => x.Category ).Distinct().ToList();
+
+    // The gunsmith's tab names (GunsmithPanel.CategoryChip).
+    private static string CategoryTab( WeaponCategory category ) => category switch
+    {
+        WeaponCategory.AssaultRifle => "ASSAULT",
+        _ => category.ToString().ToUpperInvariant()
     };
 
     private static string ChoiceDetail( EquipmentResource resource )
     {
         if ( resource.Slot is not (EquipmentSlot.Primary or EquipmentSlot.Secondary) )
-            return resource.Description;
+            return Tr( resource.Description );
 
         var category = resource.Category switch
         {
@@ -381,7 +424,7 @@
             var other => other.ToString()
         };
 
-        return $"{category} · LV {WeaponProgression.GetLevel( resource )}";
+        return $"{Tr( category )} · {Tr( "LV {0}", WeaponProgression.GetLevel( resource ) )}";
     }
 
     public override void Tick()
@@ -422,6 +465,6 @@
     protected override int BuildHash()
     {
         return HashCode.Combine( IsOpen, HoveredClass, ActiveClass, GunsmithLoadoutManager.GetActiveClassIndices().Count,
-            EditingClass, EditSlot, EditPerk, _revision );
+            EditingClass, EditSlot, EditPerk, HashCode.Combine( _revision, PickCategory ) );
     }
 }

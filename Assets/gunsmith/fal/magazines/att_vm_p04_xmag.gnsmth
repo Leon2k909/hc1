@@ -1,0 +1,42 @@
+{
+  "Name": "30 Round Mag",
+  "Category": "Magazine",
+  "EligibleEquipment": [
+    "weapons/fal/fal.equip"
+  ],
+  "RequiredLevel": 0,
+  "Description": "The 30-round magazine of the FAL's heavy-barrel squad rifle. Longer and heavier. Reloads in 2.67s (3.57s when empty).",
+  "ModifyBodygroups": true,
+  "Bodygroups": {
+    "magazine": 1
+  },
+  "VerticalRecoilScale": 1.0,
+  "HorizontalRecoilScale": 1.0,
+  "MagazineCapacity": 30,
+  "ReloadTimeMultiplier": 1.0,
+  "ReloadAnimation": 1,
+  "ReloadTime": 2.67,
+  "EmptyReloadTime": 3.57,
+  "ReloadSounds": {
+    "0.133": "weapons/fal/sounds/fal.reload_xmag_start.sound",
+    "0.533": "weapons/fal/sounds/fal.reload_xmag_magout_01.sound",
+    "0.733": "weapons/fal/sounds/fal.reload_xmag_rattle.sound",
+    "1.367": "weapons/fal/sounds/fal.reload_xmag_magin_v2_01.sound",
+    "1.767": "weapons/fal/sounds/fal.reload_xmag_magin_v2_02.sound",
+    "2.233": "weapons/fal/sounds/fal.reload_xmag_end.sound"
+  },
+  "EmptyReloadSounds": {
+    "0": "weapons/fal/sounds/fal.reload_empty_xmag_start.sound",
+    "0.433": "weapons/fal/sounds/fal.reload_empty_xmag_rotate.sound",
+    "0.8": "weapons/fal/sounds/fal.reload_empty_xmag_magout_01.sound",
+    "1": "weapons/fal/sounds/fal.reload_empty_xmag_dropmag.sound",
+    "1.667": "weapons/fal/sounds/fal.reload_empty_xmag_arm.sound",
+    "1.833": "weapons/fal/sounds/fal.reload_empty_xmag_magin_v2_01.sound",
+    "2.2": "weapons/fal/sounds/fal.reload_empty_xmag_magin_v2_02.sound",
+    "2.433": "weapons/fal/sounds/fal.reload_empty_xmag_rattle.sound",
+    "2.7": "weapons/fal/sounds/fal.reload_empty_xmag_charge_01.sound",
+    "3.067": "weapons/fal/sounds/fal.reload_empty_xmag_end.sound"
+  },
+  "__references": [],
+  "__version": 0
+}

@@ -14,6 +14,70 @@
 						remaps = 
 						[
 							{
+								from = "ak47_s_ass.vmat"
+								to = "weapons/kastov/materials/ak47_s_ass.vmat"
+							},
+							{
+								from = "ak47_s_h.vmat"
+								to = "weapons/kastov/materials/ak47_s_h.vmat"
+							},
+							{
+								from = "ak47_s_ha.vmat"
+								to = "weapons/kastov/materials/ak47_s_ha.vmat"
+							},
+							{
+								from = "ak47_s_l.vmat"
+								to = "weapons/kastov/materials/ak47_s_l.vmat"
+							},
+							{
+								from = "ak47_s_no.vmat"
+								to = "weapons/kastov/materials/ak47_s_no.vmat"
+							},
+							{
+								from = "ak47_s_t.vmat"
+								to = "weapons/kastov/materials/ak47_s_t.vmat"
+							},
+							{
+								from = "ak47_p_a.vmat"
+								to = "weapons/kastov/materials/ak47_p_a.vmat"
+							},
+							{
+								from = "ak47_p_ass.vmat"
+								to = "weapons/kastov/materials/ak47_p_ass.vmat"
+							},
+							{
+								from = "ak47_p_s.vmat"
+								to = "weapons/kastov/materials/ak47_p_s.vmat"
+							},
+							{
+								from = "47_apex_m_d.vmat"
+								to = "weapons/kastov/materials/47_apex_m_d.vmat"
+							},
+							{
+								from = "ak47_m_e1.vmat"
+								to = "weapons/kastov/materials/ak47_m_e1.vmat"
+							},
+							{
+								from = "ak47_m_e2.vmat"
+								to = "weapons/kastov/materials/ak47_m_e2.vmat"
+							},
+							{
+								from = "ak47_b_s.vmat"
+								to = "weapons/kastov/materials/ak47_b_s.vmat"
+							},
+							{
+								from = "ak47_b_s_hg.vmat"
+								to = "weapons/kastov/materials/ak47_b_s_hg.vmat"
+							},
+							{
+								from = "ak47_b_s_muz.vmat"
+								to = "weapons/kastov/materials/ak47_b_s_muz.vmat"
+							},
+							{
+								from = "ak47_rec_sto_ada.vmat"
+								to = "weapons/kastov/materials/ak47_rec_sto_ada.vmat"
+							},
+							{
 								from = "76239.vmat"
 								to = "weapons/kastov/materials/76239.vmat"
 							},
@@ -160,6 +224,329 @@
 							exception_list = [  ]
 						}
 					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_kastov_stock_adapter"
+						filename = "weapons/kastov/models/v_kastov_stock_adapter.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_kastov_muzzle_tip_short"
+						filename = "weapons/kastov/models/v_kastov_muzzle_tip_short.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_kastov_stock_ak47_stock_default"
+						filename = "weapons/kastov/models/v_kastov_stock_ak47_stock_default.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_kastov_stock_ak47_stock_adjustable"
+						filename = "weapons/kastov/models/v_kastov_stock_ak47_stock_adjustable.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_kastov_stock_ak47_stock_heavy"
+						filename = "weapons/kastov/models/v_kastov_stock_ak47_stock_heavy.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_kastov_stock_ak47_stock_padded"
+						filename = "weapons/kastov/models/v_kastov_stock_ak47_stock_padded.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_kastov_stock_ak47_stock_light"
+						filename = "weapons/kastov/models/v_kastov_stock_ak47_stock_light.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_kastov_stock_ak47_stock_delete"
+						filename = "weapons/kastov/models/v_kastov_stock_ak47_stock_delete.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_kastov_stock_ak47_stock_tactical"
+						filename = "weapons/kastov/models/v_kastov_stock_ak47_stock_tactical.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_kastov_pistol_grip_ak47_grip_default"
+						filename = "weapons/kastov/models/v_kastov_pistol_grip_ak47_grip_default.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_kastov_pistol_grip_ak47_grip_contoured"
+						filename = "weapons/kastov/models/v_kastov_pistol_grip_ak47_grip_contoured.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_kastov_pistol_grip_ak47_grip_textured"
+						filename = "weapons/kastov/models/v_kastov_pistol_grip_ak47_grip_textured.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_kastov_pistol_grip_ak47_grip_skeleton"
+						filename = "weapons/kastov/models/v_kastov_pistol_grip_ak47_grip_skeleton.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_kastov_magazine_ak47_mag_default"
+						filename = "weapons/kastov/models/v_kastov_magazine_ak47_mag_default.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_kastov_magazine_ak47_mag_polymer"
+						filename = "weapons/kastov/models/v_kastov_magazine_ak47_mag_polymer.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_kastov_magazine_ak47_mag_extended"
+						filename = "weapons/kastov/models/v_kastov_magazine_ak47_mag_extended.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_kastov_magazine_ak47_mag_drum"
+						filename = "weapons/kastov/models/v_kastov_magazine_ak47_mag_drum.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_kastov_barrel_ak47_barrel_default"
+						filename = "weapons/kastov/models/v_kastov_barrel_ak47_barrel_default.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "v_kastov_barrel_ak47_barrel_compact"
+						filename = "weapons/kastov/models/v_kastov_barrel_ak47_barrel_compact.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
 				]
 			},
 			{
@@ -177,6 +564,14 @@
 								meshes = 
 								[
 									"v_kastov_muzzle_tip",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "short"
+								meshes = 
+								[
+									"v_kastov_muzzle_tip_short",
 								]
 							},
 							{
@@ -257,6 +652,198 @@
 								meshes = 
 								[
 									"v_kastov_laser_rail",
+								]
+							},
+						]
+						hidden_in_tools = false
+					},
+					{
+						_class = "BodyGroup"
+						name = "stock_adapter"
+						children = 
+						[
+							{
+								_class = "BodyGroupChoice"
+								name = "off"
+								meshes = 
+								[
+									"",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "on"
+								meshes = 
+								[
+									"v_kastov_stock_adapter",
+								]
+							},
+						]
+						hidden_in_tools = false
+					},
+					{
+						_class = "BodyGroup"
+						name = "stock"
+						children = 
+						[
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_stock_default"
+								meshes = 
+								[
+									"v_kastov_stock_ak47_stock_default",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_stock_adjustable"
+								meshes = 
+								[
+									"v_kastov_stock_ak47_stock_adjustable",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_stock_heavy"
+								meshes = 
+								[
+									"v_kastov_stock_ak47_stock_heavy",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_stock_padded"
+								meshes = 
+								[
+									"v_kastov_stock_ak47_stock_padded",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_stock_light"
+								meshes = 
+								[
+									"v_kastov_stock_ak47_stock_light",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_stock_delete"
+								meshes = 
+								[
+									"v_kastov_stock_ak47_stock_delete",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_stock_tactical"
+								meshes = 
+								[
+									"v_kastov_stock_ak47_stock_tactical",
+								]
+							},
+						]
+						hidden_in_tools = false
+					},
+					{
+						_class = "BodyGroup"
+						name = "pistol_grip"
+						children = 
+						[
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_grip_default"
+								meshes = 
+								[
+									"v_kastov_pistol_grip_ak47_grip_default",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_grip_contoured"
+								meshes = 
+								[
+									"v_kastov_pistol_grip_ak47_grip_contoured",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_grip_textured"
+								meshes = 
+								[
+									"v_kastov_pistol_grip_ak47_grip_textured",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_grip_skeleton"
+								meshes = 
+								[
+									"v_kastov_pistol_grip_ak47_grip_skeleton",
+								]
+							},
+						]
+						hidden_in_tools = false
+					},
+					{
+						_class = "BodyGroup"
+						name = "magazine"
+						children = 
+						[
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_mag_default"
+								meshes = 
+								[
+									"v_kastov_magazine_ak47_mag_default",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_mag_polymer"
+								meshes = 
+								[
+									"v_kastov_magazine_ak47_mag_polymer",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_mag_extended"
+								meshes = 
+								[
+									"v_kastov_magazine_ak47_mag_extended",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_mag_drum"
+								meshes = 
+								[
+									"v_kastov_magazine_ak47_mag_drum",
+								]
+							},
+						]
+						hidden_in_tools = false
+					},
+					{
+						_class = "BodyGroup"
+						name = "barrel"
+						children = 
+						[
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_barrel_default"
+								meshes = 
+								[
+									"v_kastov_barrel_ak47_barrel_default",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_barrel_compact"
+								meshes = 
+								[
+									"v_kastov_barrel_ak47_barrel_compact",
 								]
 							},
 						]
@@ -377,6 +964,98 @@
 						disable_interpolation = false
 						enable_scale = false
 						source_filename = "weapons/kastov/models/anims/reload_empty.dmx"
+						start_frame = -1
+						end_frame = -1
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "reload_xmag"
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = false
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/kastov/models/anims/reload_xmag.dmx"
+						start_frame = -1
+						end_frame = -1
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "reload_empty_xmag"
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = false
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/kastov/models/anims/reload_empty_xmag.dmx"
+						start_frame = -1
+						end_frame = -1
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "reload_dmag"
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = false
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/kastov/models/anims/reload_dmag.dmx"
+						start_frame = -1
+						end_frame = -1
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "reload_empty_dmag"
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = false
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/kastov/models/anims/reload_empty_dmag.dmx"
 						start_frame = -1
 						end_frame = -1
 						framerate = -1.0
@@ -568,6 +1247,471 @@
 						take = 0
 						reverse = false
 					},
+					{
+						_class = "AnimFile"
+						name = "sway_rest"
+						children = 
+						[
+							{
+								_class = "AnimSubtract"
+								anim_name = "idle"
+								frame = 0
+							},
+						]
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = true
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/kastov/models/anims/sway.dmx"
+						start_frame = 0
+						end_frame = 0
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "sway_orientation_left"
+						children = 
+						[
+							{
+								_class = "AnimSubtract"
+								anim_name = "idle"
+								frame = 0
+							},
+						]
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = true
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/kastov/models/anims/sway.dmx"
+						start_frame = 1
+						end_frame = 1
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "sway_orientation_right"
+						children = 
+						[
+							{
+								_class = "AnimSubtract"
+								anim_name = "idle"
+								frame = 0
+							},
+						]
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = true
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/kastov/models/anims/sway.dmx"
+						start_frame = 2
+						end_frame = 2
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "sway_orientation_up"
+						children = 
+						[
+							{
+								_class = "AnimSubtract"
+								anim_name = "idle"
+								frame = 0
+							},
+						]
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = true
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/kastov/models/anims/sway.dmx"
+						start_frame = 3
+						end_frame = 3
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "sway_orientation_down"
+						children = 
+						[
+							{
+								_class = "AnimSubtract"
+								anim_name = "idle"
+								frame = 0
+							},
+						]
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = true
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/kastov/models/anims/sway.dmx"
+						start_frame = 4
+						end_frame = 4
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "sway_orientation_upleft"
+						children = 
+						[
+							{
+								_class = "AnimSubtract"
+								anim_name = "idle"
+								frame = 0
+							},
+						]
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = true
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/kastov/models/anims/sway.dmx"
+						start_frame = 5
+						end_frame = 5
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "sway_orientation_upright"
+						children = 
+						[
+							{
+								_class = "AnimSubtract"
+								anim_name = "idle"
+								frame = 0
+							},
+						]
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = true
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/kastov/models/anims/sway.dmx"
+						start_frame = 6
+						end_frame = 6
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "sway_orientation_downleft"
+						children = 
+						[
+							{
+								_class = "AnimSubtract"
+								anim_name = "idle"
+								frame = 0
+							},
+						]
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = true
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/kastov/models/anims/sway.dmx"
+						start_frame = 7
+						end_frame = 7
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "sway_orientation_downright"
+						children = 
+						[
+							{
+								_class = "AnimSubtract"
+								anim_name = "idle"
+								frame = 0
+							},
+						]
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = true
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/kastov/models/anims/sway.dmx"
+						start_frame = 8
+						end_frame = 8
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "sway_orientation_roll_left"
+						children = 
+						[
+							{
+								_class = "AnimSubtract"
+								anim_name = "idle"
+								frame = 0
+							},
+						]
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = true
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/kastov/models/anims/sway.dmx"
+						start_frame = 9
+						end_frame = 9
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "sway_orientation_roll_right"
+						children = 
+						[
+							{
+								_class = "AnimSubtract"
+								anim_name = "idle"
+								frame = 0
+							},
+						]
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = true
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/kastov/models/anims/sway.dmx"
+						start_frame = 10
+						end_frame = 10
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "sway_position_up"
+						children = 
+						[
+							{
+								_class = "AnimSubtract"
+								anim_name = "idle"
+								frame = 0
+							},
+						]
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = true
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/kastov/models/anims/sway.dmx"
+						start_frame = 11
+						end_frame = 11
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "sway_position_down"
+						children = 
+						[
+							{
+								_class = "AnimSubtract"
+								anim_name = "idle"
+								frame = 0
+							},
+						]
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = true
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/kastov/models/anims/sway.dmx"
+						start_frame = 12
+						end_frame = 12
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "sway_position_left"
+						children = 
+						[
+							{
+								_class = "AnimSubtract"
+								anim_name = "idle"
+								frame = 0
+							},
+						]
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = true
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/kastov/models/anims/sway.dmx"
+						start_frame = 13
+						end_frame = 13
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "sway_position_right"
+						children = 
+						[
+							{
+								_class = "AnimSubtract"
+								anim_name = "idle"
+								frame = 0
+							},
+						]
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = true
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						disable_interpolation = false
+						enable_scale = false
+						source_filename = "weapons/kastov/models/anims/sway.dmx"
+						start_frame = 14
+						end_frame = 14
+						framerate = -1.0
+						take = 0
+						reverse = false
+					},
 				]
 				default_root_bone_name = ""
 			},
@@ -592,6 +1736,102 @@
 						relative_angles = [ 0.0, 0.0, 0.0 ]
 						weight = 1.0
 						ignore_rotation = false
+					},
+				]
+			},
+			{
+				_class = "IKData"
+				children = 
+				[
+					{
+						_class = "IKChain"
+						name = "left_arm_IK"
+						children = 
+						[
+							{
+								_class = "IKChainJoint"
+								name = "arm_upper_L"
+								children = 
+								[
+									{
+										_class = "IKChainJoint"
+										name = "arm_lower_L1"
+										children = 
+										[
+											{
+												_class = "IKChainJoint"
+												name = "hand_L1"
+												bone = "hand_L"
+											},
+										]
+										bone = "arm_lower_L"
+									},
+								]
+								bone = "arm_upper_L"
+							},
+						]
+						m_bDoBonesOrientAlongPositiveX = true
+						"m_DefaultSolverSettings.m_nNumIterations" = 6
+						"m_DefaultSolverSettings.m_SolverType" = "IKSOLVER_TwoBone"
+						"m_DefaultTargetSettings.m_Bone" = 
+						{
+							m_Name = "ik_hand_L"
+						}
+						"m_DefaultTargetSettings.m_TargetSource" = "Bone"
+						"m_Data.m_DefaultTargetSettings.m_AnimgraphParameterNamePosition" = 
+						{
+							m_id = 4294967295
+						}
+						"m_Data.m_EndEffectorFixedOffsetAttachment" = 
+						{
+							m_Name = ""
+						}
+						"m_Data.m_bParentJointRequiresAlignment" = true
+					},
+					{
+						_class = "IKChain"
+						name = "right_arm_IK"
+						children = 
+						[
+							{
+								_class = "IKChainJoint"
+								name = "arm_upper_R"
+								children = 
+								[
+									{
+										_class = "IKChainJoint"
+										name = "arm_lower_R1"
+										children = 
+										[
+											{
+												_class = "IKChainJoint"
+												name = "hand_R1"
+												bone = "hand_R"
+											},
+										]
+										bone = "arm_lower_R"
+									},
+								]
+								bone = "arm_upper_R"
+							},
+						]
+						m_bDoBonesOrientAlongPositiveX = true
+						"m_DefaultSolverSettings.m_nNumIterations" = 6
+						"m_DefaultSolverSettings.m_SolverType" = "IKSOLVER_TwoBone"
+						"m_DefaultTargetSettings.m_Bone" = 
+						{
+							m_Name = "ik_hand_R"
+						}
+						"m_DefaultTargetSettings.m_TargetSource" = "Bone"
+						"m_Data.m_DefaultTargetSettings.m_AnimgraphParameterNamePosition" = 
+						{
+							m_id = 4294967295
+						}
+						"m_Data.m_EndEffectorFixedOffsetAttachment" = 
+						{
+							m_Name = ""
+						}
+						"m_Data.m_bParentJointRequiresAlignment" = true
 					},
 				]
 			},

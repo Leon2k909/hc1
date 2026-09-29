@@ -32,10 +32,13 @@
         {
             if ( Player.Components.Get<DeployedPawnHandler>() is { } handler )
             {
+                // Whole lines ("Exit Drone"), since the pawn's name takes an article in other languages.
+                // The drone is the only deployable pawn; anything else would stay English.
+                var drone = handler.Pawn is Drone;
                 if ( Player.Pawn == handler.Pawn )
-                    return $"Exit {handler.Pawn.NameType}";
+                    return drone ? Tr( "Exit Drone" ) : $"Exit {handler.Pawn.NameType}";
                 else
-                    return $"Return to {handler.Pawn.NameType}";
+                    return drone ? Tr( "Return to Drone" ) : $"Return to {handler.Pawn.NameType}";
             }
 
             return "";

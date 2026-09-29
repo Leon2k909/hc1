@@ -1,3 +1,4 @@
+@using System.Globalization;
 @using Sandbox;
 @using Sandbox.UI;
 @using Sandbox.UI.Navigation;
@@ -8,41 +9,176 @@
 @attribute [StyleSheet]
 @namespace Facepunch.UI
 
+@* The ranked overview: your rank, Play Ranked, the season and the rules on the left; the tier ladder and the map pool
+   in the middle; the hub's daily challenges and squad (HubSidebar) on the right. What it states comes from Rank.cs. *@
 <root class="hc1 ranked-page">
-    <div class="ranked-shell">
+    <div class="ranked-atmosphere" style="@AtmosphereStyle" />
 
-        <a class="ranked-back" href="/">
-            <i>arrow_back</i>
-            <label>HQ</label>
-        </a>
+    <div class="ranked-container">
 
-        <label class="ranked-kicker">LEAGUES</label>
-        <label class="ranked-title">RANKED</label>
-
-        <div class="rank-card" style="border-color: @(Rank.GetTierColor());">
-            <div class="rank-badge" style="background-color: @(Rank.GetTierColor());">
-                <i>military_tech</i>
-            </div>
-
-            <div class="rank-info">
-                <label class="rank-tier" style="color: @(Rank.GetTierColor());">@(Rank.GetTierName().ToUpper())</label>
-                <label class="rank-sr">@Rank.GetSR() SR</label>
-
-                <div class="rank-bar">
-                    <div class="rank-bar-fill" style="width: @((Rank.GetTierProgress() * 100f).ToString( "0.#" ))%; background-color: @(Rank.GetTierColor());" />
+        @* ── Your rank ── *@
+        <div class="ranked-left">
+            <div class="ranked-head">
+                <div class="ranked-bar" />
+                <div class="ranked-heading">
+                    <label class="ranked-kicker">@Tr( "SEASON {0}", Season )</label>
+                    <label class="ranked-title">@Tr( "RANKED" )</label>
                 </div>
-                <label class="rank-bar-label">@RankProgressLabel</label>
+            </div>
+
+            <div class="ranked-panel rank-card" style="border-left-color: @TierColor;">
+                <img class="rank-emblem" src=@(Rank.GetEmblem( Tier )) />
+                <div class="rank-info">
+                    <label class="rank-label">@Tr( "CURRENT RANK" )</label>
+                    <label class="rank-name" style="color: @TierColor;">@RankName</label>
+                    <label class="rank-progress">@ProgressLabel</label>
+                    <div class="rank-bar">
+                        <div class="rank-bar-fill" style="width: @(Percent( DisplayProgress )); background-color: @TierColor;" />
+                    </div>
+                    <label class="rank-next">@NextLabel</label>
+                </div>
+            </div>
+
+            <div class="play-ranked @(IsSearching ? "searching" : "")" onclick=@FindMatch onmouseover=@PlayHoverSound>
+                <div class="play-text">
+                    <label class="play-label">@Tr( IsSearching ? "SEARCHING" : IsPlaced ? "PLAY RANKED" : "PLAY PLACEMENTS" )</label>
+                    <label class="play-sub">@(IsSearching ? Tr( "FINDING {0}", QueueName ) : Tr( "5V5 HARDCORE · {0}", QueueName ))</label>
+                </div>
+                <i>@(IsSearching ? "hourglass_top" : "chevron_right")</i>
+            </div>
+
+            <div class="season-row">
+                <div class="ranked-panel season-stat">
+                    <i>schedule</i>
+                    <div class="season-text">
+                        <label class="season-label">@Tr( "SEASON {0} ENDS IN", Season )</label>
+                        <label class="season-value">@SeasonLeft</label>
+                    </div>
+                </div>
+                <div class="ranked-panel season-stat">
+                    <img class="season-emblem" src=@(Rank.GetEmblem( Rank.GetSeasonHighTier() )) />
+                    <div class="season-text">
+                        <label class="season-label">@Tr( "SEASON HIGH" )</label>
+                        <label class="season-value" style="color: @SeasonHighColor;">@Rank.Translate( Rank.GetSeasonHighName().ToUpper() )</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ranked-panel rules">
+                <div class="panel-head">
+                    <label class="panel-title">@Tr( "RANKED RULES" )</label>
+                </div>
+                @foreach ( var rule in Rules )
+                {
+                    <div class="rule">
+                        <div class="rule-icon"><i>@rule.Icon</i></div>
+                        <div class="rule-text">
+                            <label class="rule-title">@Tr( rule.Title, rule.Count )</label>
+                            <label class="rule-desc">@Tr( rule.Description )</label>
+                        </div>
+                    </div>
+                }
             </div>
         </div>
 
-        <div class="ranked-actions">
-            <div class="find-match @(IsSearching ? "searching" : "")" onclick=@(() => FindMatch())>
-                <i>@(IsSearching ? "hourglass_top" : "search")</i>
-                <label>@(IsSearching ? "SEARCHING…" : "FIND MATCH")</label>
+        @* ── The tiers and the maps ── *@
+        <div class="ranked-center">
+            <div class="ranked-panel ladder">
+                <div class="panel-head">
+                    <label class="panel-title">@Tr( "RANK LADDER" )</label>
+                    <label class="panel-meta">@Tr( "III → II → I · REACH 100% TO ADVANCE" )</label>
+                </div>
+
+                <div class="ladder-tiers">
+                  @if ( !IsPlaced )
+                  {
+                    <div class="placement-status">
+                        <img class="placement-emblem" src=@Rank.GetEmblem( -1 ) />
+                        <div class="placement-copy">
+                            <label class="placement-title">@Tr( "EARN YOUR FIRST RANK" )</label>
+                            <label class="placement-description">@Tr( "Complete {0} ranked matches. Results and contribution determine your starting rank.", Rank.PlacementMatches )</label>
+                        </div>
+                        <div class="placement-count">
+                            <label>@Rank.PlacementsCompleted / @Rank.PlacementMatches</label>
+                            <label class="placement-count-label">@Tr( "MATCHES" )</label>
+                        </div>
+                    </div>
+                  }
+                  <div class="ladder-row">
+                    @for ( var i = 0; i <= Rank.MaxTierIndex; i++ )
+                    {
+                        <div class="ladder-tier @TierState( i )" style="@TierStyle( i )">
+                            <label class="ladder-you" style="background-color: @(Rank.TierColors[i]);">@Tr( "YOU" )</label>
+                            <img class="ladder-emblem" src=@(Rank.GetEmblem( i )) />
+                            <label class="ladder-name">@Tr( Rank.TierNames[i].ToUpper() )</label>
+                            <label class="ladder-range">@TierLabel( i )</label>
+                            <div class="ladder-track">
+                                <div class="ladder-fill" style="width: @(Percent( TierFill( i ) )); background-color: @(Rank.TierColors[i]);" />
+                                @if ( i < Rank.MaxTierIndex )
+                                {
+                                    <div class="ladder-tick first" />
+                                    <div class="ladder-tick second" />
+                                }
+                            </div>
+                        </div>
+                    }
+                  </div>
+                </div>
+
+                <div class="ladder-stats">
+                    <div class="ladder-stat">
+                        <label class="stat-label">@Tr( IsPlaced ? "NEXT RANK" : "STATUS" )</label>
+                        <label class="stat-value" style="color: @NextColor;">@NextRankLabel</label>
+                    </div>
+                    <div class="ladder-stat">
+                        <label class="stat-label">@Tr( IsPlaced ? "RANK PROGRESS" : "PLACEMENTS" )</label>
+                        <label class="stat-value">@(IsPlaced ? Percent( Rank.GetDivisionProgress() ) : $"{Rank.PlacementsCompleted} / {Rank.PlacementMatches}")</label>
+                    </div>
+                    <div class="ladder-stat">
+                        <label class="stat-label">@Tr( IsPlaced ? "TO ADVANCE" : "MATCHES LEFT" )</label>
+                        <label class="stat-value">@(IsPlaced ? AtTop ? Tr( "TOP TIER" ) : Percent( 1f - Rank.GetDivisionProgress() ) : Rank.PlacementsRemaining.ToString())</label>
+                    </div>
+                    <div class="ladder-stat">
+                        <label class="stat-label">@Tr( "YOU PLAY" )</label>
+                        <label class="stat-value">@(IsPlaced ? Tr( "{0} TIER", TierName ) : Tr( "PLACEMENTS" ))</label>
+                    </div>
+                </div>
             </div>
-            <label class="ranked-note">Matchmaking only pairs you with players of the same rank — no hidden MMR.</label>
+
+            <div class="ranked-panel pool">
+                <div class="panel-head">
+                    <label class="panel-title">@Tr( "MAP POOL" )</label>
+                    <label class="panel-meta">@Tr( "A RANDOM MAP EACH MATCH" )</label>
+                </div>
+
+                <div class="pool-row">
+                    @foreach ( var entry in Pool )
+                    {
+                        var art = MapArt.Get( entry.Map );
+                        <div class="pool-map">
+                            <div class="pool-art @(string.IsNullOrEmpty( art ) ? "placeholder" : "")" style="@ArtStyle( art )">
+                                @if ( string.IsNullOrEmpty( art ) )
+                                {
+                                    <i>landscape</i>
+                                }
+                            </div>
+                            <div class="pool-shade" />
+                            <div class="pool-caption">
+                                <label class="pool-mode">@Tr( entry.ModeTitle )</label>
+                                <label class="pool-name">@entry.Title</label>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="pool-count">
+                        <label class="pool-count-number">@Pool.Count</label>
+                        <label class="pool-count-label">@Tr( Pool.Count == 1 ? "MAP IN ROTATION" : "MAPS IN ROTATION" )</label>
+                    </div>
+                </div>
+            </div>
         </div>
 
+        <HubSidebar />
     </div>
 </root>
 
@@ -50,22 +186,117 @@
 {
     private bool IsSearching { get; set; }
 
-    private string RankProgressLabel
+    private static bool IsPlaced => Rank.IsPlaced;
+    private static int Tier => Rank.GetTierIndex();
+    private static int Season => Rank.GetSeason();
+    private static bool AtTop => Tier >= Rank.MaxTierIndex;
+    private static string TierColor => Rank.GetTierColor();
+    // Shown only, so in the player's language. The English names are what Rank saves and tags lobbies with.
+    private static string TierName => Tr( Rank.GetTierName().ToUpper() );
+    private static string RankName => Rank.Translate( Rank.GetRankName().ToUpper() );
+
+    private static string ProgressLabel => IsPlaced ? Tr( "{0} THROUGH RANK", Percent( Rank.GetDivisionProgress() ) ) : Tr( "{0} / {1} PLACEMENTS", Rank.PlacementsCompleted, Rank.PlacementMatches );
+    private static float DisplayProgress => IsPlaced ? Rank.GetDivisionProgress() : Rank.PlacementsCompleted / (float)Rank.PlacementMatches;
+    private static string NextLabel => !IsPlaced ? Tr( "{0} MATCHES TO REVEAL YOUR RANK", Rank.PlacementsRemaining ) : AtTop ? Tr( "TOP TIER REACHED" ) : Tr( "NEXT: {0}", Rank.Translate( Rank.GetNextRankName().ToUpper() ) );
+    private static string NextRankLabel => !IsPlaced ? Tr( "UNRANKED" ) : Rank.Translate( Rank.GetNextRankName()?.ToUpper() ) ?? Tr( "TOP TIER" );
+    private static string NextColor => !IsPlaced || AtTop ? TierColor : Rank.TierColors[Rank.GetNextTierIndex()];
+    private static string SeasonHighColor => IsPlaced ? Rank.TierColors[Rank.GetSeasonHighTier()] : Rank.UnrankedColor;
+    private static string QueueName => IsPlaced ? Tr( "{0} LOBBIES", TierName ) : Tr( "PLACEMENT MATCHES" );
+
+    private static string SeasonLeft
     {
         get
         {
-            if ( Rank.GetTierIndex() >= Rank.MaxTierIndex )
-                return "TOP TIER";
-
-            return $"{Rank.GetSRIntoTier()} / {Rank.SrPerTier} SR TO {Rank.TierNames[Rank.GetTierIndex() + 1].ToUpper()}";
+            var left = Rank.GetSeasonTimeLeft();
+            return left.TotalDays >= 1
+                ? Tr( "{0}D {1:00}H {2:00}M", (int)left.TotalDays, left.Hours, left.Minutes )
+                : Tr( "{0}H {1:00}M", left.Hours, left.Minutes );
         }
     }
+
+    // ── Rules: what Rank.cs and the ranked lobbies below actually do ─────────────
+
+    /// <summary>English, translated where it's shown. Title is a format string filled with Count ("{0} PLACEMENT MATCHES").</summary>
+    private readonly record struct Rule( string Icon, string Title, string Description, int Count = 0 );
+
+    // A property, not a static readonly array, so a hotload picks up edited rules.
+    private static Rule[] Rules => new Rule[]
+    {
+        new( "groups", "5V5 HARDCORE", "Ten-player lobbies on hardcore rules. Bots fill any empty slots." ),
+        new( "explore", "{0} PLACEMENT MATCHES", "Start Unranked. Results and score contribution determine your first rank.", Rank.PlacementMatches ),
+        new( "balance", "MATCH YOUR TIER", "Placements have their own pool. Once placed, play others in your earned tier." ),
+        new( "trending_up", "+12.5% WIN · −10% LOSS", "After placement. Draws keep your progress. Reach 100% to advance." ),
+        new( "layers", "{0} DIVISIONS PER TIER", "Climb from III to II to I. Master is the top rank.", Rank.DivisionsPerTier ),
+        new( "event_repeat", "A FRESH SEASON", "Complete five new placements each season to earn your rank." ),
+    };
+
+    // ── Ladder ───────────────────────────────────────────────────────────────────
+
+    private static string TierState( int tier ) => !IsPlaced ? "unplaced" : tier < Tier ? "reached" : tier == Tier ? "current" : "ahead";
+
+    /// <summary>Your tier's column is outlined and lit in its colour.</summary>
+    private static string TierStyle( int tier )
+    {
+        if ( tier != Tier ) return "";
+        var colour = Rank.TierColors[tier];
+        return $"border-color: {Rgba( colour, 0.55f )}; background-color: {Rgba( colour, 0.07f )}; box-shadow: 0 0 24px {Rgba( colour, 0.18f )};";
+    }
+
+    private static string TierLabel( int tier ) => IsPlaced && tier == Tier ? Tr( "{0} OF TIER", Percent( Rank.GetTierProgress() ) ) : tier == Rank.MaxTierIndex ? Tr( "TOP RANK" ) : "III → II → I";
+
+    /// <summary>The tiers below yours are full, yours is as full as you are through it.</summary>
+    private static float TierFill( int tier ) => tier < Tier ? 1f : tier > Tier ? 0f : Rank.GetTierProgress();
+
+    private string AtmosphereStyle => $"background-image: radial-gradient( {Rgba( TierColor, 0.13f )}, {Rgba( TierColor, 0f )} 70% );";
+
+    // ── Map pool ─────────────────────────────────────────────────────────────────
+
+    private readonly record struct PoolEntry( SceneFile Map, GameMode Mode, string Title, string ModeTitle );
+
+    private List<PoolEntry> _pool;
+
+    /// <summary>The maps a ranked match can be on (the match-ready maps), each with the mode ranked plays there.</summary>
+    private List<PoolEntry> Pool => _pool ??= RankedPool();
+
+    private static List<PoolEntry> RankedPool() => GameUtils.GetMatchMaps()
+        .Select( map => (Map: map, Mode: RankedMode( map )) )
+        .Where( x => x.Mode is not null )
+        .Select( x => new PoolEntry( x.Map, x.Mode, x.Map.GetMetadata( "Title", x.Map.ResourceName ).ToUpper(), x.Mode.Title.ToUpper() ) )
+        .ToList();
+
+    /// <summary>Defuse where the map has bomb sites, otherwise Team Deathmatch.</summary>
+    private static GameMode RankedMode( SceneFile map )
+    {
+        var modes = GameMode.GetAll( map ).ToList();
+        return modes.FirstOrDefault( m => m.Ident == "defuse" )
+            ?? modes.FirstOrDefault( m => m.Ident == "tdm" );
+    }
+
+    private static string ArtStyle( string art ) => string.IsNullOrEmpty( art ) ? "" : $"background-image: url( '{art}' );";
+
+    // ── Formatting ───────────────────────────────────────────────────────────────
+
+    private static string Percent( float fraction )
+        => (Math.Clamp( fraction, 0f, 1f ) * 100f).ToString( "0.#", CultureInfo.InvariantCulture ) + "%";
+
+    private static string Rgba( string hex, float alpha )
+    {
+        var c = Color.Parse( hex ) ?? Color.White;
+        return string.Format( CultureInfo.InvariantCulture, "rgba( {0}, {1}, {2}, {3:0.###} )",
+            (int)(c.r * 255f), (int)(c.g * 255f), (int)(c.b * 255f), alpha );
+    }
+
+    void PlayHoverSound() => Sound.Play( "ui_button_hover" );
+
+    // ── Matchmaking ──────────────────────────────────────────────────────────────
 
     async void FindMatch()
     {
         if ( IsSearching )
             return;
 
+        Sound.Play( "ui_button_press" );
+        Rank.CheckSeason();
         IsSearching = true;
         StateHasChanged();
 
@@ -79,6 +310,8 @@
             {
                 var lobby = new Lobby( info );
                 if ( lobby.IsFull )
+                    continue;
+                if ( info.Data?.GetValueOrDefault( "ranked_closed" ) == "1" )
                     continue;
                 if ( string.IsNullOrEmpty( lobby.Name ) || !lobby.Name.Contains( myTag ) )
                     continue;
@@ -98,8 +331,20 @@
         }
     }
 
+    /// <summary>Hosts a lobby tagged with the tier, on a random map from the pool in its ranked mode.</summary>
     private void HostRankedMatch( string tag )
     {
+        var pool = RankedPool();
+        if ( pool.Count == 0 )
+        {
+            Log.Warning( "[Ranked] no map in the ranked pool" );
+            IsSearching = false;
+            StateHasChanged();
+            return;
+        }
+
+        var pick = pool[Game.Random.Int( 0, pool.Count - 1 )];
+
         Networking.CreateLobby( new LobbyConfig
         {
             Name = $"{tag} Razed Ranked",
@@ -108,35 +353,17 @@
             DestroyWhenHostLeaves = true,
         } );
 
-        var map = GameUtils.GetAvailableMaps().FirstOrDefault();
-        if ( map is null )
-        {
-            IsSearching = false;
-            StateHasChanged();
-            return;
-        }
-
-        var modes = GameMode.GetAll( map ).ToList();
-        var mode = modes.FirstOrDefault( m => m.Ident == "defuse" )
-            ?? modes.FirstOrDefault( m => m.Ident == "tdm" )
-            ?? modes.FirstOrDefault();
-
-        if ( mode is null )
-        {
-            IsSearching = false;
-            StateHasChanged();
-            return;
-        }
-
-        GameMode.SetCurrent( mode );
+        GameMode.SetCurrent( pick.Mode );
+        GameMode.PrepareRankedMatch();
         // Core modes are off for now, every match is hardcore. Put back with Core:
         // GameMode.SetHardcore( false );
         GameMode.SetHardcore( true );
-        Game.ActiveScene.Load( map );
+        Game.ActiveScene.Load( pick.Map );
     }
 
     public void OnNavigationOpen()
     {
+        Rank.CheckSeason();
         MainMenuRoot.Instance?.SetActiveRoute( "/ranked" );
         if ( MainMenuRoot.Instance.IsValid() )
             MainMenuRoot.Instance.SetBlur( true );
@@ -150,6 +377,13 @@
 
     protected override int BuildHash()
     {
-        return HashCode.Combine( Rank.GetSR(), IsSearching );
+        var h = new HashCode();
+        h.Add( Rank.State );
+        h.Add( IsPlaced );
+        h.Add( IsSearching );
+        h.Add( SeasonLeft );
+        foreach ( var entry in Pool )
+            h.Add( MapArt.Get( entry.Map ) );
+        return h.ToHashCode();
     }
 }

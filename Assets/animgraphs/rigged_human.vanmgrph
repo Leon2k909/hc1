@@ -89,12 +89,6 @@
 						{
 							_class = "CBlend2DItem"
 							m_tagSpans = [  ]
-							m_sequenceName = "crouch_S"
-							m_blendValue = [ 0.0, -50.0 ]
-						},
-						{
-							_class = "CBlend2DItem"
-							m_tagSpans = [  ]
 							m_sequenceName = "3p_crouch_idle"
 							m_blendValue = [ 0.0, 0.0 ]
 						},
@@ -102,91 +96,49 @@
 							_class = "CBlend2DItem"
 							m_tagSpans = [  ]
 							m_sequenceName = "crouch_N"
-							m_blendValue = [ 0.0, 50.0 ]
-						},
-						{
-							_class = "CBlend2DItem"
-							m_tagSpans = [  ]
-							m_sequenceName = "crouch_N"
-							m_blendValue = [ 0.0, 75.0 ]
+							m_blendValue = [ 0.0, 38.0 ]
 						},
 						{
 							_class = "CBlend2DItem"
 							m_tagSpans = [  ]
 							m_sequenceName = "crouch_S"
-							m_blendValue = [ 0.0, -75.0 ]
-						},
-						{
-							_class = "CBlend2DItem"
-							m_tagSpans = [  ]
-							m_sequenceName = "crouch_W"
-							m_blendValue = [ -50.0, 0.0 ]
+							m_blendValue = [ 0.0, -39.0 ]
 						},
 						{
 							_class = "CBlend2DItem"
 							m_tagSpans = [  ]
 							m_sequenceName = "crouch_E"
-							m_blendValue = [ 50.0, 0.0 ]
-						},
-						{
-							_class = "CBlend2DItem"
-							m_tagSpans = [  ]
-							m_sequenceName = "crouch_NW"
-							m_blendValue = [ -50.0, 50.0 ]
+							m_blendValue = [ 32.0, 0.0 ]
 						},
 						{
 							_class = "CBlend2DItem"
 							m_tagSpans = [  ]
 							m_sequenceName = "crouch_W"
-							m_blendValue = [ -75.0, 0.0 ]
+							m_blendValue = [ -32.0, 0.0 ]
+						},
+						{
+							_class = "CBlend2DItem"
+							m_tagSpans = [  ]
+							m_sequenceName = "crouch_NE"
+							m_blendValue = [ 26.0, 27.0 ]
 						},
 						{
 							_class = "CBlend2DItem"
 							m_tagSpans = [  ]
 							m_sequenceName = "crouch_NW"
-							m_blendValue = [ -75.0, 75.0 ]
-						},
-						{
-							_class = "CBlend2DItem"
-							m_tagSpans = [  ]
-							m_sequenceName = "crouch_SW"
-							m_blendValue = [ -50.0, -50.0 ]
-						},
-						{
-							_class = "CBlend2DItem"
-							m_tagSpans = [  ]
-							m_sequenceName = "crouch_SW"
-							m_blendValue = [ -75.0, -75.0 ]
-						},
-						{
-							_class = "CBlend2DItem"
-							m_tagSpans = [  ]
-							m_sequenceName = "crouch_NE"
-							m_blendValue = [ 50.0, 50.0 ]
-						},
-						{
-							_class = "CBlend2DItem"
-							m_tagSpans = [  ]
-							m_sequenceName = "crouch_NE"
-							m_blendValue = [ 75.0, 75.0 ]
-						},
-						{
-							_class = "CBlend2DItem"
-							m_tagSpans = [  ]
-							m_sequenceName = "crouch_E"
-							m_blendValue = [ 75.0, 0.0 ]
+							m_blendValue = [ -26.0, 29.0 ]
 						},
 						{
 							_class = "CBlend2DItem"
 							m_tagSpans = [  ]
 							m_sequenceName = "crouch_SE"
-							m_blendValue = [ 50.0, -50.0 ]
+							m_blendValue = [ 26.0, -29.0 ]
 						},
 						{
 							_class = "CBlend2DItem"
 							m_tagSpans = [  ]
-							m_sequenceName = "crouch_SE"
-							m_blendValue = [ 75.0, -75.0 ]
+							m_sequenceName = "crouch_SW"
+							m_blendValue = [ -26.0, -29.0 ]
 						},
 					]
 					m_blendSourceX = "Parameter"
@@ -354,7 +306,7 @@
 							{
 								m_nodeID = 
 								{
-									m_id = 1277043748
+									m_id = 1739205861
 								}
 								m_outputID = 
 								{
@@ -737,128 +689,86 @@
 						{
 							_class = "CBlend2DItem"
 							m_tagSpans = [  ]
-							m_sequenceName = "jog_S"
-							m_blendValue = [ 0.0, -100.0 ]
-						},
-						{
-							_class = "CBlend2DItem"
-							m_tagSpans = [  ]
 							m_sequenceName = "3p_idle_breathe"
 							m_blendValue = [ 0.0, 0.0 ]
 						},
 						{
 							_class = "CBlend2DItem"
 							m_tagSpans = [  ]
-							m_sequenceName = "jog_N"
-							m_blendValue = [ 0.0, 150.0 ]
-						},
-						{
-							_class = "CBlend2DItem"
-							m_tagSpans = [  ]
-							m_sequenceName = "sprint"
-							m_blendValue = [ 0.0, 200.0 ]
-						},
-						{
-							_class = "CBlend2DItem"
-							m_tagSpans = [  ]
-							m_sequenceName = "jog_S"
-							m_blendValue = [ 0.0, -150.0 ]
-						},
-						{
-							_class = "CBlend2DItem"
-							m_tagSpans = [  ]
-							m_sequenceName = "jog_W"
-							m_blendValue = [ -150.0, 0.0 ]
-						},
-						{
-							_class = "CBlend2DItem"
-							m_tagSpans = [  ]
-							m_sequenceName = "jog_E"
-							m_blendValue = [ 150.0, 0.0 ]
-						},
-						{
-							_class = "CBlend2DItem"
-							m_tagSpans = [  ]
-							m_sequenceName = "jog_NW"
-							m_blendValue = [ -100.0, 100.0 ]
-						},
-						{
-							_class = "CBlend2DItem"
-							m_tagSpans = [  ]
-							m_sequenceName = "jog_W"
-							m_blendValue = [ -200.0, 0.0 ]
-						},
-						{
-							_class = "CBlend2DItem"
-							m_tagSpans = [  ]
-							m_sequenceName = "jog_NW"
-							m_blendValue = [ -150.0, 150.0 ]
-						},
-						{
-							_class = "CBlend2DItem"
-							m_tagSpans = [  ]
-							m_sequenceName = "jog_SW"
-							m_blendValue = [ -100.0, -100.0 ]
-						},
-						{
-							_class = "CBlend2DItem"
-							m_tagSpans = [  ]
-							m_sequenceName = "jog_SW"
-							m_blendValue = [ -150.0, -150.0 ]
-						},
-						{
-							_class = "CBlend2DItem"
-							m_tagSpans = [  ]
-							m_sequenceName = "jog_NE"
-							m_blendValue = [ 100.0, 100.0 ]
-						},
-						{
-							_class = "CBlend2DItem"
-							m_tagSpans = [  ]
-							m_sequenceName = "jog_NE"
-							m_blendValue = [ 150.0, 150.0 ]
-						},
-						{
-							_class = "CBlend2DItem"
-							m_tagSpans = [  ]
-							m_sequenceName = "jog_E"
-							m_blendValue = [ 200.0, 0.0 ]
-						},
-						{
-							_class = "CBlend2DItem"
-							m_tagSpans = [  ]
-							m_sequenceName = "jog_SE"
-							m_blendValue = [ 100.0, -100.0 ]
-						},
-						{
-							_class = "CBlend2DItem"
-							m_tagSpans = [  ]
-							m_sequenceName = "jog_SE"
-							m_blendValue = [ 150.0, -150.0 ]
-						},
-						{
-							_class = "CBlend2DItem"
-							m_tagSpans = [  ]
 							m_sequenceName = "walk_N"
-							m_blendValue = [ 0.0, 60.0 ]
+							m_blendValue = [ 0.0, 33.0 ]
 						},
 						{
 							_class = "CBlend2DItem"
 							m_tagSpans = [  ]
 							m_sequenceName = "walk_S"
-							m_blendValue = [ 0.0, -60.0 ]
-						},
-						{
-							_class = "CBlend2DItem"
-							m_tagSpans = [  ]
-							m_sequenceName = "walk_W"
-							m_blendValue = [ -60.0, 0.0 ]
+							m_blendValue = [ 0.0, -33.0 ]
 						},
 						{
 							_class = "CBlend2DItem"
 							m_tagSpans = [  ]
 							m_sequenceName = "walk_E"
-							m_blendValue = [ 60.0, 0.0 ]
+							m_blendValue = [ 33.0, 0.0 ]
+						},
+						{
+							_class = "CBlend2DItem"
+							m_tagSpans = [  ]
+							m_sequenceName = "walk_W"
+							m_blendValue = [ -36.0, 0.0 ]
+						},
+						{
+							_class = "CBlend2DItem"
+							m_tagSpans = [  ]
+							m_sequenceName = "jog_N"
+							m_blendValue = [ 0.0, 103.0 ]
+						},
+						{
+							_class = "CBlend2DItem"
+							m_tagSpans = [  ]
+							m_sequenceName = "jog_S"
+							m_blendValue = [ 0.0, -91.0 ]
+						},
+						{
+							_class = "CBlend2DItem"
+							m_tagSpans = [  ]
+							m_sequenceName = "jog_E"
+							m_blendValue = [ 93.0, 0.0 ]
+						},
+						{
+							_class = "CBlend2DItem"
+							m_tagSpans = [  ]
+							m_sequenceName = "jog_W"
+							m_blendValue = [ -93.0, 0.0 ]
+						},
+						{
+							_class = "CBlend2DItem"
+							m_tagSpans = [  ]
+							m_sequenceName = "jog_NE"
+							m_blendValue = [ 81.0, 90.0 ]
+						},
+						{
+							_class = "CBlend2DItem"
+							m_tagSpans = [  ]
+							m_sequenceName = "jog_NW"
+							m_blendValue = [ -65.0, 86.0 ]
+						},
+						{
+							_class = "CBlend2DItem"
+							m_tagSpans = [  ]
+							m_sequenceName = "jog_SE"
+							m_blendValue = [ 62.0, -71.0 ]
+						},
+						{
+							_class = "CBlend2DItem"
+							m_tagSpans = [  ]
+							m_sequenceName = "jog_SW"
+							m_blendValue = [ -67.0, -62.0 ]
+						},
+						{
+							_class = "CBlend2DItem"
+							m_tagSpans = [  ]
+							m_sequenceName = "sprint"
+							m_blendValue = [ 0.0, 178.0 ]
 						},
 					]
 					m_blendSourceX = "Parameter"
@@ -1336,6 +1246,49 @@
 			{
 				key = 
 				{
+					m_id = 672557973
+				}
+				value = 
+				{
+					_class = "CTwoBoneIKAnimNode"
+					m_sName = "Left hand on the gun"
+					m_vecPosition = [ 576.0, -160.0 ]
+					m_nNodeID = 
+					{
+						m_id = 672557973
+					}
+					m_sNote = "Puts the left hand on the held gun's IkLeftHand (AnimationHelper, LightweightCombatBot): the wrist at its position, the hand turned to its rotation."
+					m_inputConnection = 
+					{
+						m_nodeID = 
+						{
+							m_id = 870625193
+						}
+						m_outputID = 
+						{
+							m_id = 4294967295
+						}
+					}
+					m_ikChainName = "left_arm_IK"
+					m_endEffectorType = "IkEndEffector_Bone"
+					m_endEffectorAttachmentName = ""
+					m_targetType = "IkTarget_Parameter_ModelSpace"
+					m_attachmentName = ""
+					m_targetBoneName = ""
+					m_targetParam = 
+					{
+						m_id = 513015117
+					}
+					m_bMatchTargetOrientation = true
+					m_rotationParam = 
+					{
+						m_id = 1044777460
+					}
+				}
+			},
+			{
+				key = 
+				{
 					m_id = 870625193
 				}
 				value = 
@@ -1795,6 +1748,38 @@
 					m_sequenceName = "Pistol_Idle"
 					m_playbackSpeed = 1.0
 					m_bLoop = false
+				}
+			},
+			{
+				key = 
+				{
+					m_id = 1739205861
+				}
+				value = 
+				{
+					_class = "CSpeedScaleAnimNode"
+					m_sName = "Move Rate"
+					m_vecPosition = [ -608.0, 496.0 ]
+					m_nNodeID = 
+					{
+						m_id = 1739205861
+					}
+					m_sNote = ""
+					m_inputConnection = 
+					{
+						m_nodeID = 
+						{
+							m_id = 1277043748
+						}
+						m_outputID = 
+						{
+							m_id = 4294967295
+						}
+					}
+					m_param = 
+					{
+						m_id = 902718453
+					}
 				}
 			},
 			{
@@ -2648,6 +2633,80 @@
 			{
 				key = 
 				{
+					m_id = 2130833767
+				}
+				value = 
+				{
+					_class = "CSelectorAnimNode"
+					m_sName = "Left hand IK"
+					m_vecPosition = [ 576.0, -304.0 ]
+					m_nNodeID = 
+					{
+						m_id = 2130833767
+					}
+					m_sNote = ""
+					m_children = 
+					[
+						{
+							m_nodeID = 
+							{
+								m_id = 870625193
+							}
+							m_outputID = 
+							{
+								m_id = 4294967295
+							}
+						},
+						{
+							m_nodeID = 
+							{
+								m_id = 672557973
+							}
+							m_outputID = 
+							{
+								m_id = 4294967295
+							}
+						},
+					]
+					m_tags = 
+					[
+						{
+							m_id = 4294967295
+						},
+						{
+							m_id = 4294967295
+						},
+					]
+					m_selectionSource = "SelectionSource_Bool"
+					m_boolParamID = 
+					{
+						m_id = 1945851716
+					}
+					m_enumParamID = 
+					{
+						m_id = 4294967295
+					}
+					m_intParamID = 
+					{
+						m_id = 4294967295
+					}
+					m_intParamMinValue = 0
+					m_intParamMaxValue = 2
+					m_blendDuration = 0.3
+					m_tagBehavior = "SelectorTagBehavior_OffWhenFinished"
+					m_bResetOnChange = false
+					m_bSyncCyclesOnChange = false
+					m_blendCurve = 
+					{
+						m_vControlPoint1 = [ 0.5, 0.0 ]
+						m_vControlPoint2 = [ 0.5, 1.0 ]
+					}
+					m_intParamNames = [  ]
+				}
+			},
+			{
+				key = 
+				{
 					m_id = 2145564399
 				}
 				value = 
@@ -2664,7 +2723,7 @@
 					{
 						m_nodeID = 
 						{
-							m_id = 870625193
+							m_id = 2130833767
 						}
 						m_outputID = 
 						{
@@ -2707,6 +2766,20 @@
 				m_fDefaultValue = 0.0
 				m_fMinValue = -250.0
 				m_fMaxValue = 250.0
+			},
+			{
+				_class = "CFloatAnimParameter"
+				m_name = "move_rate"
+				m_id = 
+				{
+					m_id = 902718453
+				}
+				m_previewButton = "ANIMPARAM_BUTTON_NONE"
+				m_bUseMostRecentValue = false
+				m_bAutoReset = false
+				m_fDefaultValue = 1.0
+				m_fMinValue = 0.0
+				m_fMaxValue = 4.0
 			},
 			{
 				_class = "CEnumAnimParameter"
@@ -2842,6 +2915,42 @@
 				m_bUseMostRecentValue = false
 				m_bAutoReset = true
 				m_bDefaultValue = false
+			},
+			{
+				_class = "CBoolAnimParameter"
+				m_name = "ik.hand_left.enabled"
+				m_id = 
+				{
+					m_id = 1945851716
+				}
+				m_previewButton = "ANIMPARAM_BUTTON_NONE"
+				m_bUseMostRecentValue = false
+				m_bAutoReset = false
+				m_bDefaultValue = false
+			},
+			{
+				_class = "CVectorAnimParameter"
+				m_name = "ik.hand_left.position"
+				m_id = 
+				{
+					m_id = 513015117
+				}
+				m_previewButton = "ANIMPARAM_BUTTON_NONE"
+				m_bUseMostRecentValue = false
+				m_bAutoReset = false
+				m_defaultValue = [ 0.0, 0.0, 0.0 ]
+			},
+			{
+				_class = "CQuaternionAnimParameter"
+				m_name = "ik.hand_left.rotation"
+				m_id = 
+				{
+					m_id = 1044777460
+				}
+				m_previewButton = "ANIMPARAM_BUTTON_NONE"
+				m_bUseMostRecentValue = false
+				m_bAutoReset = false
+				m_defaultValue = [ 0.0, 0.0, 0.0, 1.0 ]
 			},
 		]
 	}

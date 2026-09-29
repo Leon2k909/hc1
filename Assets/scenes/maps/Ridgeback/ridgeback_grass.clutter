@@ -1,0 +1,66 @@
+{
+  "Entries": [
+    {
+      "Prefab": null,
+      "Model": "models/grass/grass_meadow_a.vmdl",
+      "Weight": 3.0,
+      "LocalScale": 1,
+      "CastShadows": false,
+      "EnablePhysics": false
+    },
+    {
+      "Prefab": null,
+      "Model": "models/grass/grass_meadow_b.vmdl",
+      "Weight": 4.0,
+      "LocalScale": 1,
+      "CastShadows": false,
+      "EnablePhysics": false
+    },
+    {
+      "Prefab": null,
+      "Model": "models/grass/grass_dry_a.vmdl",
+      "Weight": 4.0,
+      "LocalScale": 1,
+      "CastShadows": false,
+      "EnablePhysics": false
+    },
+    {
+      "Prefab": null,
+      "Model": "models/grass/grass_tuft.vmdl",
+      "Weight": 2.0,
+      "LocalScale": 1,
+      "CastShadows": false,
+      "EnablePhysics": false
+    }
+  ],
+  "TileSizeEnum": "Size512",
+  "TileRadius": 3,
+  "Scatterer": {
+    "Type": "TerrainMaterialScatterer",
+    "Scale": "0.7 1.25",
+    "Density": 26.0,
+    "HeightOffset": -2,
+    "AlignToNormal": false,
+    "RandomYaw": true,
+    "Mappings": [
+      {
+        "Material": "materials/terrain/meadow.tmat",
+        "EntryIndices": [
+          0,
+          1,
+          3
+        ]
+      },
+      {
+        "Material": "materials/terrain/meadow_dry.tmat",
+        "EntryIndices": [
+          2,
+          3
+        ]
+      }
+    ],
+    "UseFallback": false
+  },
+  "__references": [],
+  "__version": 0
+}

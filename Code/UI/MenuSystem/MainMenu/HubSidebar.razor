@@ -1,0 +1,444 @@
+@using Sandbox;
+@using Sandbox.UI;
+
+@inherits Panel
+@attribute [StyleSheet]
+@namespace Facepunch.UI
+
+<root>
+
+    @* ── Your squad: the Steam party ── *@
+    <div class="side-panel squad-panel">
+        <div class="side-head">
+            <label class="side-title">@Tr( "YOUR SQUAD" )</label>
+            <div class="side-head-right">
+                @if ( InParty )
+                {
+                    <label class="squad-leave" @onclick=@LeaveSquad>@Tr( "LEAVE" )</label>
+                }
+                <label class="side-meta">@SquadSize / @SquadLimit</label>
+                <div class="squad-cog @(_privacyOpen ? "open" : "")" @onclick=@TogglePrivacy>
+                    <i>settings</i>
+                </div>
+            </div>
+        </div>
+
+        <div class="squad-member">
+            @if ( Progression.GetPrestige() > 0 )
+            {
+                <img class="squad-emblem" src="/ui/prestige/prestige_@(Progression.GetPrestige())_readable.png" />
+            }
+            else
+            {
+                <img class="squad-avatar" src="avatar:@LocalSteamId" />
+            }
+            <div class="squad-info">
+                <div class="squad-name-row">
+                    <label class="squad-name">@LocalName</label>
+                    @if ( InParty && _leaderIsMe )
+                    {
+                        <div class="squad-leader" />
+                    }
+                </div>
+                <div class="squad-level-row">
+                    <label class="squad-level">@Tr( "LV {0}", Progression.GetLevel() )</label>
+                    <div class="side-bar">
+                        <div class="side-bar-fill" style="width: @((int)(Progression.GetLevelProgress() * 100))%" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @foreach ( var member in _others )
+        {
+            <div class="squad-member">
+                <img class="squad-avatar" src="avatar:@member.SteamId" />
+                <div class="squad-info">
+                    <div class="squad-name-row">
+                        <label class="squad-name">@(member.Name ?? Tr( "PLAYER" ))</label>
+                        @if ( member.IsLeader )
+                        {
+                            <div class="squad-leader" />
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if ( MyPrivateSquad )
+        {
+            <div class="squad-invite locked" @onclick=@TogglePrivacy>
+                <div class="squad-invite-plus"><i>lock</i></div>
+                <label>@Tr( "PRIVATE SQUAD" )</label>
+            </div>
+        }
+        else if ( CanInvite )
+        {
+            <div class="squad-invite" @onclick=@Invite>
+                <div class="squad-invite-plus"><i>add</i></div>
+                <label>@Tr( "INVITE FRIENDS" )</label>
+                @if ( SquadPrivacy.CanChange )
+                {
+                    <i class="squad-privacy-tag">@PrivacyIcon( SquadPrivacy.Mode )</i>
+                }
+            </div>
+        }
+
+        @* The cog's menu: who can join. It drops down over the rows and cards below, so it comes last (siblings draw in order). *@
+        @if ( _privacyOpen )
+        {
+            <div class="squad-privacy">
+                <label class="squad-privacy-title">@Tr( "SQUAD PRIVACY" )</label>
+                @foreach ( var mode in Enum.GetValues<SquadPrivacyMode>() )
+                {
+                    var selected = SquadPrivacy.CanChange && SquadPrivacy.Mode == mode;
+                    <div class="privacy-option @(selected ? "selected" : "") @(SquadPrivacy.CanChange ? "" : "locked")" @onclick=@(() => PickPrivacy( mode ))>
+                        <i class="privacy-icon">@PrivacyIcon( mode )</i>
+                        <div class="privacy-text">
+                            <label class="privacy-name">@PrivacyTitle( mode )</label>
+                            <label class="privacy-desc">@Tr( PrivacyDescription( mode ) )</label>
+                        </div>
+                        @if ( selected )
+                        {
+                            <i class="privacy-check">check</i>
+                        }
+                    </div>
+                }
+                @if ( !SquadPrivacy.CanChange )
+                {
+                    <label class="squad-privacy-note">@Tr( "Only the squad leader can change this." )</label>
+                }
+                else if ( SquadPrivacy.AppliesToNextSquad )
+                {
+                    <label class="squad-privacy-note">@Tr( "Applies to your next squad" )</label>
+                }
+            </div>
+        }
+    </div>
+
+    @* ── Friends: the Steam friends you've played with (a game can't read the whole list; see RecentFriends) ── *@
+    <div class="side-panel friends-panel">
+        <div class="side-head">
+            <label class="side-title">@Tr( "FRIENDS" )</label>
+            <label class="side-meta">@Tr( "RECENT" )</label>
+        </div>
+
+        <div class="friends-list">
+            @if ( _friends.Count == 0 )
+            {
+                <label class="friends-empty">@Tr( "Steam friends you play with show up here." )</label>
+            }
+            @foreach ( var friend in _friends )
+            {
+                <div class="friend-row">
+                    <img class="friend-avatar" src="avatar:@friend.SteamId" />
+                    <div class="friend-info">
+                        <label class="friend-name">@(friend.Name ?? Tr( "PLAYER" ))</label>
+                        <div class="friend-status @StateClass( friend.State )">
+                            <div class="status-dot" />
+                            <label>@Tr( StateTitle( friend.State ) )</label>
+                        </div>
+                    </div>
+                    @if ( friend.State != FriendState.Offline && CanInvite )
+                    {
+                        <div class="friend-invite" @onclick=@Invite><label>@Tr( "INVITE" )</label></div>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="side-link friends-all" @ref="_allFriendsRow" @onclick=@ShowAllFriends>
+            <label>@Tr( "ALL FRIENDS" )</label>
+            <i>arrow_forward</i>
+        </div>
+    </div>
+
+    @* ── Daily challenges ── *@
+    <div class="side-panel">
+        <div class="side-head">
+            <label class="side-title">@Tr( "DAILY CHALLENGES" )</label>
+            <label class="side-meta">@ResetIn</label>
+        </div>
+
+        @foreach ( var challenge in DailyChallenges.Current )
+        {
+            var def = challenge.Definition;
+            <div class="challenge @(challenge.IsComplete ? "complete" : "")">
+                <div class="challenge-icon">
+                    <i>@(challenge.IsComplete ? "check" : def.Icon)</i>
+                </div>
+                <div class="challenge-body">
+                    <label class="challenge-title">@def.Title</label>
+                    <div class="challenge-progress">
+                        <div class="side-bar">
+                            <div class="side-bar-fill" style="width: @((int)(challenge.Fraction * 100))%" />
+                        </div>
+                        <label class="challenge-count">@challenge.Progress / @def.Goal</label>
+                    </div>
+                </div>
+                <div class="challenge-reward">
+                    <div class="xp-badge">
+                        <div class="xp-layer"><i class="xp-hex">hexagon</i></div>
+                        <div class="xp-layer"><i class="xp-hex-inner">hexagon</i></div>
+                        <div class="xp-layer"><label class="xp-text">XP</label></div>
+                    </div>
+                    <label class="challenge-xp">@def.Xp</label>
+                </div>
+            </div>
+        }
+
+        <a class="side-link" href="/barracks/career">
+            <label>@Tr( "CAREER RECORD" )</label>
+            <i>arrow_forward</i>
+        </a>
+    </div>
+
+</root>
+
+@code
+{
+    // ── Challenges ─────────────────────────────────────────────
+    private static string ResetIn
+    {
+        get
+        {
+            var left = DailyChallenges.TimeUntilReset;
+            return left.TotalHours >= 1 ? Tr( "{0}H {1:00}M", (int)left.TotalHours, left.Minutes ) : Tr( "{0}M", Math.Max( 1, left.Minutes ) );
+        }
+    }
+
+    // ── Squad ──────────────────────────────────────────────────
+    /// <summary>A party member. Name is null for a nameless one, which the markup shows as "PLAYER" in the player's language.</summary>
+    private readonly record struct SquadMember( ulong SteamId, string Name, bool IsLeader );
+
+    /// <summary>A copy of the party taken each tick, so the markup never touches Steam objects directly.</summary>
+    private readonly List<SquadMember> _others = new();
+    private bool _leaderIsMe;
+
+    private static PartyRoom Party => SquadPrivacy.Party;
+
+    private bool InParty => Party is not null;
+    private int SquadSize => 1 + _others.Count;
+    private int SquadLimit => SquadPrivacy.Limit( Party );
+
+    /// <summary>The player's own squad is Private: its invite row is a lock that opens the privacy menu.</summary>
+    private static bool MyPrivateSquad => SquadPrivacy.Mode == SquadPrivacyMode.Private && SquadPrivacy.CanChange;
+
+    // One invite row while there's room, not one per free slot.
+    private bool CanInvite => SquadSize < SquadLimit && !MyPrivateSquad;
+
+    private ulong LocalSteamId => Client.Local.IsValid() ? Client.Local.SteamId : (Connection.Local?.SteamId ?? 0UL);
+
+    private string LocalName
+    {
+        get
+        {
+            var n = Client.Local.IsValid() ? Client.Local.DisplayName : Connection.Local?.DisplayName;
+            return string.IsNullOrWhiteSpace( n ) ? Tr( "PLAYER" ) : n.ToUpper();
+        }
+    }
+
+    private void Invite()
+    {
+        Sound.Play( "ui_button_press" );
+        PartyPanel.InviteFriends();
+    }
+
+    private void LeaveSquad()
+    {
+        Sound.Play( "ui_button_press" );
+        try { Party?.Leave(); }
+        catch { }
+    }
+
+    public override void Tick()
+    {
+        base.Tick();
+
+        // SquadSocialSystem does these in every scene too; here they take effect without a scene load.
+        SquadPrivacy.Enforce();
+        RecentFriends.Scan();
+
+        RefreshSquad();
+        RefreshFriends();
+    }
+
+    private void RefreshSquad()
+    {
+        _others.Clear();
+        _leaderIsMe = false;
+
+        var party = Party;
+        if ( party is null ) return;
+
+        try
+        {
+            _leaderIsMe = party.Owner.IsMe;
+            ulong leaderId = party.Owner.Id;
+
+            foreach ( var friend in party.Members )
+            {
+                if ( friend.IsMe ) continue;
+
+                ulong id = friend.Id;
+                var name = string.IsNullOrWhiteSpace( friend.Name ) ? null : friend.Name.ToUpper();
+                _others.Add( new SquadMember( id, name, id == leaderId ) );
+            }
+        }
+        catch
+        {
+            // Steam can drop the party mid-read; show what we have.
+        }
+    }
+
+    // ── Squad privacy (the cog) ────────────────────────────────
+    /// <summary> The menus' click (Tools/ui_sounds.py), which the header's tabs play too, for the cog and its options. </summary>
+    private const string ClickSound = "sounds/ui/menu/ui_nav_tab.sound";
+
+    private bool _privacyOpen;
+
+    private void TogglePrivacy()
+    {
+        Sound.Play( ClickSound );
+        _privacyOpen = !_privacyOpen;
+        StateHasChanged();
+    }
+
+    /// <summary> Escape (MainMenuRoot): closes the privacy menu, if it's open. </summary>
+    public bool ClosePrivacyMenu()
+    {
+        if ( !_privacyOpen ) return false;
+
+        _privacyOpen = false;
+        StateHasChanged();
+        return true;
+    }
+
+    private void PickPrivacy( SquadPrivacyMode mode )
+    {
+        if ( !SquadPrivacy.CanChange ) return;
+
+        Sound.Play( ClickSound );
+        SquadPrivacy.Set( mode );
+        StateHasChanged();
+    }
+
+    // Other languages name the squad, so Open and Private agree with it (the shared "Open" is a lobby's).
+    private static string PrivacyTitle( SquadPrivacyMode mode ) => mode switch
+    {
+        SquadPrivacyMode.Open => GameText.IsEnglish ? "OPEN" : Tr( "OPEN SQUAD" ),
+        SquadPrivacyMode.InviteOnly => Tr( "INVITE ONLY" ),
+        _ => GameText.IsEnglish ? "PRIVATE" : Tr( "PRIVATE SQUAD" ),
+    };
+
+    private static string PrivacyDescription( SquadPrivacyMode mode ) => mode switch
+    {
+        SquadPrivacyMode.Open => "Anyone can find and join your squad",
+        SquadPrivacyMode.InviteOnly => "Only players you invite can join",
+        _ => "Nobody can join your squad",
+    };
+
+    private static string PrivacyIcon( SquadPrivacyMode mode ) => mode switch
+    {
+        SquadPrivacyMode.Open => "public",
+        SquadPrivacyMode.InviteOnly => "mail",
+        _ => "lock",
+    };
+
+    // ── Friends ────────────────────────────────────────────────
+    private enum FriendState { InGame, Online, Away, Offline }
+
+    /// <summary>A remembered friend as shown. Name is null when Steam doesn't have it, shown as "PLAYER".</summary>
+    private readonly record struct FriendRow( ulong SteamId, string Name, FriendState State );
+
+    private readonly List<FriendRow> _friends = new();
+    private RealTimeSince _sinceFriends = 10f;
+    private Panel _allFriendsRow;
+
+    /// <summary>Recent friends, in game first, then online, then away, then offline. Squadmates are in the squad card.</summary>
+    private void RefreshFriends()
+    {
+        if ( _sinceFriends < 1f ) return;
+        _sinceFriends = 0;
+
+        _friends.Clear();
+        foreach ( var entry in RecentFriends.All )
+        {
+            if ( _others.Any( x => x.SteamId == entry.SteamId ) ) continue;
+
+            try
+            {
+                var friend = new Friend( entry.SteamId );
+                var state = friend.IsPlayingThisGame ? FriendState.InGame
+                    : !friend.IsOnline ? FriendState.Offline
+                    : friend.IsAway || friend.IsSnoozing ? FriendState.Away
+                    : FriendState.Online;
+                var name = string.IsNullOrWhiteSpace( friend.Name ) ? null : friend.Name.ToUpper();
+                _friends.Add( new FriendRow( entry.SteamId, name, state ) );
+            }
+            catch
+            {
+                // Steam can be unavailable, or not know the id; skip just this one.
+            }
+        }
+
+        // A stable sort, so friends in the same state stay newest first.
+        var sorted = _friends.OrderBy( x => x.State ).Take( 6 ).ToList();
+        _friends.Clear();
+        _friends.AddRange( sorted );
+    }
+
+    private static string StateTitle( FriendState state ) => state switch
+    {
+        FriendState.InGame => "IN GAME",
+        FriendState.Online => "ONLINE",
+        FriendState.Away => "AWAY",
+        _ => "OFFLINE",
+    };
+
+    private static string StateClass( FriendState state ) => state switch
+    {
+        FriendState.InGame => "in-game",
+        FriendState.Online => "online",
+        FriendState.Away => "away",
+        _ => "offline",
+    };
+
+    /// <summary>
+    /// s&box's own friends list (the whole Steam list, with party invites), popped out above this card's last row. It opens
+    /// in the editor too: s&box's menu pushes it like the settings modal.
+    /// </summary>
+    private void ShowAllFriends()
+    {
+        Sound.Play( "ui_button_press" );
+
+        Game.Overlay.ShowFriendsList( new Sandbox.Modals.FriendsListModalOptions()
+        {
+            ShowOnlineMembers = true,
+            ShowOfflineMembers = true,
+            Anchor = new() { Panel = _allFriendsRow, Position = Sandbox.Modals.ModalAnchorPosition.AboveRight, Offset = 8 },
+        } );
+    }
+
+    protected override int BuildHash()
+    {
+        var h = new HashCode();
+        h.Add( DailyChallenges.Version );
+        h.Add( DailyChallenges.Today );
+        h.Add( ResetIn );
+        h.Add( Progression.GetXP() );
+        h.Add( Progression.GetPrestige() );
+        h.Add( LocalName );
+        h.Add( InParty );
+        h.Add( _leaderIsMe );
+        h.Add( SquadLimit );
+        h.Add( _privacyOpen );
+        h.Add( SquadPrivacy.Mode );
+        h.Add( SquadPrivacy.CanChange );
+        h.Add( SquadPrivacy.AppliesToNextSquad );
+        h.Add( RecentFriends.Version );
+        foreach ( var member in _others ) h.Add( member );
+        foreach ( var friend in _friends ) h.Add( friend );
+        return h.ToHashCode();
+    }
+}

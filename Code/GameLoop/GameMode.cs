@@ -33,6 +33,7 @@ public sealed partial class GameMode : SingletonComponent<GameMode>, Component.I
 	/// <param name="gameMode"></param>
 	public static void SetCurrent( GameMode gameMode )
 	{
+		ActiveRanked = false;
 		if ( gameMode is null )
 		{
 			ActivePath = null;
@@ -143,6 +144,7 @@ public sealed partial class GameMode : SingletonComponent<GameMode>, Component.I
 		if ( Networking.IsHost )
 		{
 			Hardcore = ActiveHardcore;
+			InitializeRankedMatch();
 			GameObject.Components.GetOrCreate<ScorestreakManager>();
 		}
 

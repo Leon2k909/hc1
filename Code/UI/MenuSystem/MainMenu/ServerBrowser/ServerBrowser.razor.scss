@@ -1,5 +1,6 @@
-// Matches the pause menu / settings: yellow accent title, slate panels with a yellow top edge.
-$sb-accent: #ffbd24;
+@import "/UI/Styles/MenuPage.scss";
+
+$sb-accent: $menu-accent;
 $sb-warn: #ff6a5a;
 
 ServerBrowser
@@ -8,7 +9,7 @@ ServerBrowser
 	flex-direction: column;
 	width: 100%;
 	min-height: 0;
-	gap: 28px;
+	gap: 24px;
 
 	.sb-head
 	{
@@ -20,16 +21,16 @@ ServerBrowser
 
 	.sb-accent
 	{
-		width: 6px;
-		height: 44px;
+		width: 3px;
+		height: 28px;
 		background-color: $sb-accent;
 	}
 
 	.sb-title
 	{
-		font-size: 40px;
-		font-weight: 900;
-		letter-spacing: 5px;
+		font-size: 32px;
+		font-weight: 700;
+		letter-spacing: 3px;
 	}
 
 	.sb-head-fill
@@ -62,8 +63,7 @@ ServerBrowser
 	.sb-list, .sb-detail
 	{
 		flex-direction: column;
-		background-color: rgba( 19, 26, 32, 0.9 );
-		border-top: 3px solid $sb-accent;
+		@include menu-panel;
 	}
 
 	.sb-list
@@ -74,7 +74,7 @@ ServerBrowser
 
 	.sb-detail
 	{
-		width: 420px;
+		width: 360px;
 		flex-shrink: 0;
 	}
 
@@ -123,7 +123,7 @@ ServerBrowser
 		.sb-state-title
 		{
 			font-size: 22px;
-			font-weight: 900;
+			font-weight: 700;
 			letter-spacing: 3px;
 			text-transform: uppercase;
 			color: rgba( white, 0.8 );
@@ -154,7 +154,7 @@ ServerBrowser
 	.sb-detail-name
 	{
 		font-size: 28px;
-		font-weight: 900;
+		font-weight: 700;
 		color: white;
 		margin-bottom: 8px;
 	}
@@ -167,7 +167,7 @@ ServerBrowser
 		align-items: center;
 		height: 48px;
 		padding: 0 16px;
-		background-color: rgba( 48, 58, 67, 0.45 );
+		background-color: #08090b;
 	}
 
 	.sb-stat-key
@@ -222,6 +222,10 @@ ServerBrowser
 	.sb-panels { flex-direction: column; }
 	.sb-detail { width: 100%; }
 	.sb-detail.empty { display: none; }
+	.sb-list { min-height: 200px; }
+	.sb-detail { flex-shrink: 0; }
+	.sb-panels { overflow-y: scroll; }
+	.sb-detail-body { padding: 16px; }
 }
 
 // s&box resolves animation names from top-level keyframes.

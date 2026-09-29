@@ -234,3 +234,25 @@ EndOfMatchScreen {
     color: rgba( 255, 255, 255, 0.35 );
     margin-left: 1px;
 }
+
+.eom-ranked-result {
+    width: 820px;
+    align-items: center;
+    gap: 18px;
+    padding: 12px 20px;
+    border: 1px solid rgba( 255, 122, 26, 0.3 );
+    background-color: rgba( 255, 122, 26, 0.06 );
+    flex-shrink: 0;
+}
+.eom-rank-emblem {
+    width: 72px;
+    height: 72px;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.eom-rank-copy { flex-direction: column; flex-grow: 1; gap: 3px; }
+.eom-rank-heading { font-size: 11px; letter-spacing: 2px; color: #aebbc8; }
+.eom-rank-name { font-size: 22px; font-weight: 800; }
+.eom-rank-progress { font-size: 14px; color: white; }
+.eom-rank-return { font-size: 11px; letter-spacing: 1px; color: #aebbc8; }

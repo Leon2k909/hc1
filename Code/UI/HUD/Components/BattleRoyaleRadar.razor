@@ -1,0 +1,170 @@
+@namespace Facepunch.UI
+@inherits Panel
+@attribute [StyleSheet]
+
+@* Battle royale's radar, where the other modes' minimap goes: the zone (orange, the gas red outside it) and the next
+   circle (white), turning with the view and zoomed to take in the next circle. Hardcore puts nobody on it. Above it,
+   who's left, your kills and the zone's clock. *@
+
+<root>
+    <div class="readouts">
+        <div class="readout">
+            <label class="value">@(Match?.AliveCount ?? 0)</label>
+            <label class="caption">@Tr( "ALIVE" )</label>
+        </div>
+        <div class="readout">
+            <label class="value">@Kills</label>
+            <label class="caption">@Tr( "KILLS" )</label>
+        </div>
+        <div class="readout clock @ClockClass">
+            <label class="value">@ClockTime</label>
+            <label class="caption">@ClockCaption</label>
+        </div>
+    </div>
+
+    <div class="radar">
+        <div class="ring zone" @ref="ZoneRing" />
+        <div class="ring next" @ref="NextRing" />
+        <label class="north" @ref="North">N</label>
+        <div class="me" />
+    </div>
+</root>
+
+@code
+{
+    /// <summary> The radar's width and height, as in the stylesheet. </summary>
+    private const float RadarSize = 220f;
+    /// <summary> Closest it zooms in: about 60 m either side. </summary>
+    private const float MinViewRadius = 2500f;
+
+    private Panel ZoneRing { get; set; }
+    private Panel NextRing { get; set; }
+    private Panel North { get; set; }
+
+    private float _viewRadius;
+
+    private static SafeZoneManager Zone => SafeZoneManager.Current;
+    private static BattleRoyaleMatch Match => BattleRoyaleMatch.Current;
+
+    private int Kills => Client.Local.IsValid() ? Client.Local.GetComponent<PlayerScore>()?.Kills ?? 0 : 0;
+
+    private string ClockClass => Zone switch
+    {
+        { IsFinal: true } => "final",
+        { IsRunning: true, IsShrinking: true } => "closing",
+        _ => ""
+    };
+
+    private string ClockTime
+    {
+        get
+        {
+            if ( Match is { IsOver: true } || Zone is null )
+                return "-";
+            if ( Zone.IsFinal )
+                return "-";
+            if ( Zone.IsRunning )
+                return FormatTime( Zone.StageTimeLeft );
+
+            // Before the fight: the drop-in countdown.
+            return GameMode.Instance.IsValid() && GameMode.Instance.DisplayedTime is { } time ? FormatTime( (float)time.TotalSeconds ) : "-";
+        }
+    }
+
+    private string ClockCaption
+    {
+        get
+        {
+            if ( Match is { IsOver: true } )
+                return Tr( "MATCH OVER" );
+            if ( Zone is null || !Zone.IsRunning )
+                return Tr( "DROPPING IN" );
+            if ( Zone.IsFinal )
+                return Tr( "FINAL ZONE" );
+
+            return Zone.IsShrinking ? Tr( "ZONE CLOSING" ) : Tr( "ZONE {0} CLOSES IN", Zone.PhaseNumber );
+        }
+    }
+
+    private static string FormatTime( float seconds )
+    {
+        var whole = Math.Max( 0, (int)MathF.Ceiling( seconds ) );
+        return $"{whole / 60}:{whole % 60:00}";
+    }
+
+    public override void Tick()
+    {
+        base.Tick();
+
+        var zone = Zone;
+        var camera = Scene?.Camera;
+        if ( zone is null || !zone.HasCircle || !camera.IsValid() )
+        {
+            SetVisible( ZoneRing, false );
+            SetVisible( NextRing, false );
+            return;
+        }
+
+        var eye = camera.WorldPosition;
+        var yaw = MathX.DegreeToRadian( camera.WorldRotation.Yaw() );
+        var cos = MathF.Cos( yaw );
+        var sin = MathF.Sin( yaw );
+
+        // Zoomed out far enough to take in the next circle, easing so it doesn't jump about.
+        var wanted = Math.Clamp( (eye.WithZ( 0f ).Distance( zone.NextCenter.WithZ( 0f ) ) + zone.NextRadius) * 1.1f, MinViewRadius, 40000f );
+        _viewRadius = _viewRadius <= 0f ? wanted : MathX.Lerp( _viewRadius, wanted, 1f - MathF.Exp( -3f * Time.Delta ) );
+        var scale = RadarSize * 0.5f / _viewRadius;
+
+        Place( ZoneRing, zone.ZoneCenter, zone.CurrentRadius );
+        // Before it starts closing, and once it's done, the next circle is the zone itself.
+        var showNext = zone.IsRunning && !zone.IsFinal;
+        if ( showNext )
+            Place( NextRing, zone.NextCenter, zone.NextRadius );
+        SetVisible( NextRing, showNext );
+
+        // North is +X, round the edge.
+        if ( North.IsValid() )
+        {
+            var edge = RadarSize * 0.5f - 13f;
+            North.Style.Left = Length.Pixels( RadarSize * 0.5f + sin * edge - 6f );
+            North.Style.Top = Length.Pixels( RadarSize * 0.5f - cos * edge - 8f );
+        }
+
+        void Place( Panel ring, Vector3 center, float radius )
+        {
+            if ( !ring.IsValid() )
+                return;
+
+            // Forward is up the radar, left is left.
+            var offset = center - eye;
+            var forward = offset.x * cos + offset.y * sin;
+            var left = offset.y * cos - offset.x * sin;
+            var x = RadarSize * 0.5f - left * scale;
+            var y = RadarSize * 0.5f - forward * scale;
+            var r = MathF.Max( radius * scale, 1f );
+
+            ring.Style.Left = Length.Pixels( x - r );
+            ring.Style.Top = Length.Pixels( y - r );
+            ring.Style.Width = Length.Pixels( r * 2f );
+            ring.Style.Height = Length.Pixels( r * 2f );
+            ring.Style.BorderTopLeftRadius = Length.Pixels( r );
+            ring.Style.BorderTopRightRadius = Length.Pixels( r );
+            ring.Style.BorderBottomLeftRadius = Length.Pixels( r );
+            ring.Style.BorderBottomRightRadius = Length.Pixels( r );
+            SetVisible( ring, true );
+        }
+    }
+
+    private static void SetVisible( Panel panel, bool visible )
+    {
+        if ( panel.IsValid() )
+            panel.Style.Opacity = visible ? 1f : 0f;
+    }
+
+    protected override int BuildHash()
+    {
+        var zone = Zone;
+        var match = Match;
+        return HashCode.Combine( match?.AliveCount, Kills, ClockTime, ClockCaption, zone?.IsShrinking, zone?.IsFinal, match?.IsOver );
+    }
+}

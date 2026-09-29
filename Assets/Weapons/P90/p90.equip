@@ -1,0 +1,32 @@
+{
+  "Name": "FN P90",
+  "Description": "Belgian 5.7x28mm personal defence weapon: a bullpup fed from a 50-round magazine lying along its top.",
+  "Slot": "Primary",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": true,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/guns/p90_01.png",
+  "IsPurchasable": true,
+  "Price": 1700,
+  "KillReward": 600,
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/p90/weapon_p90.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/p90/wm_p90.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/p90/vm_p90.prefab"
+  },
+  "WorldModel": "weapons/p90/w_p90.vmdl",
+  "ArmorReduction": null,
+  "HelmetReduction": null,
+  "WorldModelBodyGroups": 0,
+  "__references": [],
+  "__version": 0,
+  "Category": "SMG",
+  "GunsmithOffset": "0,0,4"
+}

@@ -4,7 +4,7 @@
 @namespace Facepunch.UI
 @inherits Panel
 
-<root class="row @(IsLocal ? "local" : "") @(IsDead ? "dead" : "") @(IsBotEntry ? "bot-row" : "") with-px-lg with-py">
+<root class="row @(IsLocal ? "local" : "") @(IsDead ? "dead" : "") @(IsBotEntry ? "bot-row" : "") with-px-lg with-py" style="@BotRowStyle">
     <span class="col stat-small">
         @if ( !IsBotEntry && Player.IsValid() ) 
         {
@@ -22,7 +22,7 @@
     <span class="col stat-small">
         @if ( IsBotEntry )
         {
-            <label class="small bot-ping">AI</label>
+            <label class="small bot-ping" style="color: @BotAccent">@Tr( "AI" )</label>
         }
         else if ( Connection is not null )
         {
@@ -37,8 +37,8 @@
     <span class="col playername gap-sm">
         @if ( IsBotEntry )
         {
-            <img class="bot-avatar" src="/ui/bot_avatar.png" />
-            <span class="bot-prefix">BOT</span>
+            <img class="bot-avatar" src="/ui/bot_avatar.png" style="@BotAvatarStyle" />
+            <span class="bot-prefix" style="color: @BotAccent">BOT</span>
             <label>@Bot.BotName</label>
         }
         else
@@ -46,7 +46,7 @@
             <PlayerAvatar ShowHealth=@false ShowBomb=@false class="avatar" Player=@Client />
             @if( Client.PrestigeLevel > 0 )
             {
-                <img src="/ui/prestige/prestige_@(Client.PrestigeLevel).png" style="height: 16px; margin-right: 4px;" />
+                <img class="prestige" src="/ui/prestige/prestige_@(Client.PrestigeLevel)_readable.png" />
             }
             <EmblemViewer JsonData=@(Client.EmblemDataJson) style="width: 32px; height: 32px; transform: scale(0.5); transform-origin: left center; margin-right: -12px;" />
             <label>
@@ -70,15 +70,22 @@
             <i>@(IsVoiceMuted ? "mic_off" : "mic")</i>
         </button>
     }
+    else if ( IsBotEntry && LightweightBotManager.CanManageBots )
+    {
+        <button class="col stat-small mute-toggle kick-bot" tooltip=@(Tr( "Kick bot" )) onclick=@KickBot>
+            <i>person_remove</i>
+        </button>
+        <span class="col stat-small mute-placeholder"></span>
+    }
     else
     {
         <span class="col stat-small mute-placeholder"></span>
         <span class="col stat-small mute-placeholder"></span>
     }
 
-    @foreach ( var x in ScoreValues )
+    @foreach ( var value in StatValues )
     {
-        <label class="col stat">@(x.Value)</label>
+        <label class="col stat">@value</label>
     }
 </root>
 
@@ -100,8 +107,23 @@
     private bool IsTextMuted => !IsBotEntry && CommunicationMuteState.IsTextMuted( Client );
     private bool IsVoiceMuted => !IsBotEntry && CommunicationMuteState.IsVoiceMuted( Client );
     private IEnumerable<(object Value, ScoreAttribute Attribute)> ScoreValues => IsBotEntry ? GetBotScoreValues() : IScore.Find( Client );
+    private IEnumerable<object> StatValues => Scoreboard.IsZombies && !IsBotEntry ? GetZombiesValues() : ScoreValues.Select( x => x.Value );
+
+    /// <summary> <see cref="Scoreboard.ZombiesColumns"/>: points and zombie kills, a dash while the player is dead. </summary>
+    private IEnumerable<object> GetZombiesValues()
+    {
+        var economy = Scoreboard.GetZombiesEconomy( Client );
+        yield return economy.IsValid() ? economy.Points : "-";
+        yield return economy.IsValid() ? economy.Kills : "-";
+    }
 
     public bool Disconnected => Connection is null;
+
+    // A bot's row, tags and avatar are tinted its team's colour, like everything else that shows a team.
+    private Color TeamColor => Team.GetColor();
+    private string BotRowStyle => IsBotEntry ? $"background-color: {TeamColor.WithAlpha( 0.2f ).Hex}; border-color: {TeamColor.WithAlpha( 0.35f ).Hex};" : "";
+    private string BotAvatarStyle => $"background-color: {TeamColor.WithAlpha( 0.18f ).Hex}; border-color: {TeamColor.WithAlpha( 0.4f ).Hex};";
+    private string BotAccent => Color.Lerp( TeamColor, Color.White, 0.25f ).Hex;
 
     private IEnumerable<(object Value, ScoreAttribute Attribute)> GetBotScoreValues()
     {
@@ -131,13 +153,18 @@
         CommunicationMuteState.ToggleVoice( Client );
     }
 
+    private void KickBot()
+    {
+        LightweightBotManager.Instance?.KickBot( Bot.BotName );
+    }
+
     protected override int BuildHash()
     {
         var hash = HashCode.Combine( IsBotEntry, Connection, IsLocal, IsDead, Connection?.Ping, CommunicationMuteState.Version );
 
         if ( IsBotEntry )
         {
-            return HashCode.Combine( hash, Bot.Id, Bot.Team, Bot.BotName, Bot.Kills, Bot.Deaths, Bot.Score, Bot.IsAlive );
+            return HashCode.Combine( hash, Bot.Id, Bot.Team, Bot.BotName, Bot.Kills, Bot.Deaths, Bot.Score, HashCode.Combine( Bot.IsAlive, LightweightBotManager.CanManageBots ) );
         }
 
         if ( Player.IsValid() )
@@ -145,9 +172,9 @@
             hash = HashCode.Combine( hash, Player.Inventory.HasDefuseKit, Player.Inventory.HasBomb, IsPartyMember, Player.Client.PlayerColor, Client.EmblemDataJson, Client.PrestigeLevel );
         }
 
-        foreach ( var x in IScore.Find( Client ) )
+        foreach ( var value in StatValues )
         {
-            hash = HashCode.Combine( hash, x.Value );
+            hash = HashCode.Combine( hash, value );
         }
 
         return hash;

@@ -38,14 +38,8 @@ public sealed class AllowInstantDefuse : Component,
 	{
 		if ( Scene.GetAllComponents<BaseGrenade>().Any( x => x.CanDealDamage ) ) return true;
 
-		var maxDistSq = 128f * 128f;
-
-		if ( MolotovFireNode.All.Any( x => (x.WorldPosition - player.WorldPosition).LengthSquared < maxDistSq ) )
-		{
-			return true;
-		}
-
-		return false;
+		// Fire on the ground, or burning thermite, near the defuser.
+		return SurfaceFire.IsBurningNear( Scene, player.WorldPosition, 128f );
 	}
 }
 

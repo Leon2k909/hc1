@@ -31,7 +31,7 @@ public sealed class HumanOutfitter : Component,
 			model = TeamBaseModels[Team.Terrorist];
 		}
 
-		Renderer.Model = Game.Random.FromList( model.Models );
+		MilitaryUniform.SetModel( Renderer, Game.Random.FromList( model.Models ), MilitaryUniform.StyleForTeam( team ) );
 		PlayerPawn.Body.Refresh();
 	}
 }

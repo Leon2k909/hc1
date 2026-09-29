@@ -51,6 +51,12 @@ public partial class Equipment : Component, Component.INetworkListener, IDescrip
 	[Property, Group( "Movement" )] public float SpeedPenalty { get; set; } = 0f;
 
 	/// <summary>
+	/// For a gun heavier than the rifles: the fraction by which its extra weight slows every gait in real life, after
+	/// <see cref="SpeedPenalty"/> (0.03 = 3% slower).
+	/// </summary>
+	[Property, Group( "Movement" )] public float WeightSlowdown { get; set; }
+
+	/// <summary>
 	/// What prefab should we spawn as the mounted version of this piece of equipment?
 	/// </summary>
 	[Property, Group( "Mount Points" )] public GameObject MountedPrefab { get; set; }
@@ -260,7 +266,9 @@ public partial class Equipment : Component, Component.INetworkListener, IDescrip
 			return;
 		}
 
-		var parentBone = Owner.BodyRenderer?.GetBoneObject( "hold_R" ) ?? Owner.HoldGameObject;
+		var parentBone = MilitaryUniform.UsesHumanSkeleton( Owner.BodyRenderer?.Model )
+			? Owner.HoldGameObject
+			: Owner.BodyRenderer?.GetBoneObject( "hold_R" ) ?? Owner.HoldGameObject;
 		var wm = Resource.WorldModelPrefab.Clone( new CloneConfig { Parent = parentBone, StartEnabled = false } );
 		if ( wm.Components.TryGet<SkinnedModelRenderer>( out var wmRenderer, FindMode.EverythingInSelfAndDescendants ) )
 		{
@@ -406,11 +414,16 @@ public partial class Equipment : Component, Component.INetworkListener, IDescrip
 			Owner.CameraController?.ScreenShaker?.Clear();
 	}
 
+	/// <summary>
+	/// The body's left hand goes on the world model's <see cref="WorldModel.IkLeftHand"/> (rigged_human.vanmgrph's
+	/// two-bone IK), except while reloading, when the reload clip takes it to the magazine.
+	/// </summary>
 	private void UpdateIkHands()
 	{
 		if ( !Owner.IsValid() || !Owner.Body.IsValid() ) return;
 
-		var ikTarget = WorldModel.IsValid() ? WorldModel.IkLeftHand : null;
+		var reloading = Components.Get<Reloadable>( FindMode.EnabledInSelfAndDescendants )?.IsReloading ?? false;
+		var ikTarget = WorldModel.IsValid() && !reloading ? WorldModel.IkLeftHand : null;
 		foreach ( var helper in Owner.Body.AnimationHelpers )
 		{
 			if ( helper.IsValid() )
@@ -438,6 +451,9 @@ public partial class Equipment : Component, Component.INetworkListener, IDescrip
 
 	protected override void OnUpdate()
 	{
+		if ( IsDeployed )
+			UpdateIkHands();
+
 		if ( WorldModel.IsValid() )
 		{
 			var wmRenderer = WorldModel.Components.Get<SkinnedModelRenderer>( FindMode.EverythingInSelfAndDescendants );

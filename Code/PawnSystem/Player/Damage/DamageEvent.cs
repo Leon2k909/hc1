@@ -65,6 +65,12 @@ public enum DamageFlags
 	/// Was the attacker in the air when doing this damage?
 	/// </summary>
 	AirShot = 128,
+
+	/// <summary>
+	/// The battle royale's closing zone (<see cref="SafeZoneManager"/>): steady damage with no hit location, never a
+	/// hardcore one-shot.
+	/// </summary>
+	Zone = 256,
 }
 
 /// <summary>
@@ -223,13 +229,67 @@ public record KillEvent( DamageInfo DamageInfo ) : IGameEvent;
 
 public static class SceneTraceExtensions
 {
-	public static HitboxTags GetHitboxTags( this SceneTraceResult tr )
+	public static HitboxTags GetHitboxTags( this SceneTraceResult tr ) => tr.Hitbox.GetHitboxTags();
+
+	private static Surface _wood;
+
+	/// <summary>
+	/// The surface a hit looks and sounds like. Map clutter's collision (Ridgeback's trees) comes with the default
+	/// surface, which chips like concrete, so it counts as wood.
+	/// </summary>
+	public static Surface GetImpactSurface( this SceneTraceResult tr )
 	{
-		if ( tr.Hitbox is null ) return HitboxTags.None;
+		if ( tr.Shape is { } shape && shape.Tags.Has( "clutter" ) && tr.Surface?.ResourceName is null or "default" )
+			return _wood ??= ResourceLibrary.Get<Surface>( "surfaces/wood.surface" ) ?? tr.Surface;
+
+		return tr.Surface;
+	}
+
+	private const HitboxTags Limbs = HitboxTags.Arm | HitboxTags.Hand | HitboxTags.Leg | HitboxTags.Ankle;
+	private const HitboxTags Vitals = HitboxTags.Head | HitboxTags.Neck | HitboxTags.Chest | HitboxTags.Stomach
+		| HitboxTags.Clavicle | HitboxTags.Spine;
+
+	/// <summary>
+	/// Where a bullet that reached this body really hit it. A box trace touches hitboxes the bullet's line only passed
+	/// near (the other leg), and a round goes through an arm held across the body and on into the chest. So this follows
+	/// the line through the body and takes the first vital hitbox on it, else the first limb. A near miss that only the
+	/// box touched keeps its hitbox.
+	/// </summary>
+	public static SceneTraceResult ThroughBody( this SceneTraceResult tr, Scene scene )
+	{
+		var root = tr.GameObject?.Root;
+		if ( tr.Hitbox is null || root is null )
+			return tr;
+
+		var line = scene.Trace.Ray( tr.EndPosition - tr.Direction * 32f, tr.EndPosition + tr.Direction * 96f )
+			.UseHitboxes()
+			.WithoutTags( "trigger", "playerclip", "movement" )
+			.RunAll();
+
+		SceneTraceResult limb = default;
+		foreach ( var hit in line )
+		{
+			if ( !hit.Hit || hit.Hitbox is null || hit.GameObject?.Root != root )
+				continue;
+
+			var tags = hit.GetHitboxTags();
+			if ( (tags & Vitals) != 0 || (tags & Limbs) == 0 )
+				return hit;
+
+			if ( !limb.Hit )
+				limb = hit;
+		}
+
+		return limb.Hit ? limb : tr;
+	}
+
+	public static HitboxTags GetHitboxTags( this Hitbox hitbox )
+	{
+		if ( hitbox is null ) return HitboxTags.None;
 
 		var tags = HitboxTags.None;
 
-		foreach ( var tag in tr.Hitbox.Tags )
+		foreach ( var tag in hitbox.Tags )
 		{
 			if ( Enum.TryParse<HitboxTags>( tag, true, out var hitboxTag ) )
 			{
@@ -237,6 +297,29 @@ public static class SceneTraceExtensions
 			}
 		}
 
-		return tags;
+		return tags != HitboxTags.None ? tags : FromBoneName( hitbox.Bone?.Name );
+	}
+
+	/// <summary>
+	/// The player models' leg, pelvis and clavicle hitboxes have no tags (or only "pelvis", which isn't one of ours), so
+	/// the bone says where the hit was.
+	/// </summary>
+	private static HitboxTags FromBoneName( string bone )
+	{
+		if ( string.IsNullOrEmpty( bone ) ) return HitboxTags.None;
+
+		bone = bone.ToLowerInvariant();
+		bool Has( params string[] parts ) => parts.Any( bone.Contains );
+
+		if ( Has( "head" ) ) return HitboxTags.Head;
+		if ( Has( "neck" ) ) return HitboxTags.Neck;
+		if ( Has( "clavicle" ) ) return HitboxTags.Clavicle;
+		if ( Has( "spine", "chest" ) ) return HitboxTags.Chest;
+		if ( Has( "pelvis" ) ) return HitboxTags.Stomach;
+		if ( Has( "foot", "ankle", "toe" ) ) return HitboxTags.Ankle;
+		if ( Has( "hip", "thigh", "knee", "calf", "leg" ) ) return HitboxTags.Leg;
+		if ( Has( "hand", "finger", "thumb", "wrist" ) ) return HitboxTags.Hand;
+		if ( Has( "arm", "elbow", "shoulder" ) ) return HitboxTags.Arm;
+		return HitboxTags.None;
 	}
 }

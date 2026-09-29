@@ -1,0 +1,551 @@
+@namespace Facepunch.UI
+@using Facepunch.Gunsmith
+@inherits Panel
+@attribute [StyleSheet]
+
+@*
+    The Zombies workbench's menu (ZombiesBuyStation, ZombiesWorkbench.cs), opened by pressing Use on the bench and shut
+    by Use, Escape or walking away. Left: the attachments of the guns in hand, free, from the parts their weapon levels
+    have unlocked, saved to the active class like the gunsmith and fitted at once. Right: armour plates, spare ammo and
+    an HE grenade, bought with points on the host.
+*@
+
+<root class="@(IsOpen ? "visible" : "")">
+    @if ( IsOpen && Pawn is { } pawn )
+    {
+        var weapons = Weapons;
+        var weapon = SelectedWeapon;
+        var points = Points;
+        <div class="window">
+            <div class="head">
+                <div class="head-icon"><i>construction</i></div>
+                <div class="head-titles">
+                    <label class="head-title">@Tr( "WORKBENCH" )</label>
+                    <label class="head-sub">@Tr( "Attachments are free. Armour, ammo and grenades cost points." )</label>
+                </div>
+                <div class="head-points">
+                    <label class="points-value">@points.ToString( "N0" )</label>
+                    <label class="points-label">@Tr( "POINTS" )</label>
+                </div>
+                <div class="head-close" onclick=@Close><i>close</i></div>
+            </div>
+
+            <div class="body">
+                @* ── Attachments ── *@
+                <div class="bench-panel gunsmith">
+                    <div class="weapon-tabs">
+                        @foreach ( var held in weapons )
+                        {
+                            var gun = held;
+                            <div class="weapon-tab @(gun == weapon ? "selected" : "")" onclick=@(() => SelectWeapon( gun ))>
+                                <div class="tab-copy">
+                                    <label class="tab-slot">@SlotAndLevel( gun.Resource )</label>
+                                    <label class="tab-name">@gun.Resource.Name</label>
+                                </div>
+                                @if ( !string.IsNullOrEmpty( gun.Resource.Icon ) )
+                                {
+                                    <div class="tab-icon" style="background-image: url( @gun.Resource.Icon );"></div>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    @if ( !weapon.IsValid() )
+                    {
+                        <label class="empty">@Tr( "You're not carrying a gun that takes attachments." )</label>
+                    }
+                    else if ( !weapon.ApplySavedAttachments || !SlotsFor( weapon.Resource ).Any() )
+                    {
+                        <label class="empty">@Tr( "No attachments fit the {0}.", weapon.Resource.Name )</label>
+                    }
+                    else if ( SelectedSlot is { } slot )
+                    {
+                        var current = CurrentPart( weapon.Resource, slot );
+                        <div class="list-head">
+                            <div class="back" onclick=@Back><i>arrow_back</i></div>
+                            <label class="list-title">@CategoryName( slot )</label>
+                            <label class="list-count">@UnlockedLabel( weapon.Resource, slot )</label>
+                        </div>
+                        <div class="list">
+                            @foreach ( var option in Options( weapon.Resource, slot ) )
+                            {
+                                var part = option;
+                                var equipped = SamePart( part, current );
+                                var unlocked = part is null || AttachmentUnlocks.IsUnlocked( weapon.Resource, part );
+                                var picture = Picture( weapon, part );
+                                <div class="row part @(equipped ? "equipped" : "") @(!unlocked ? "locked" : "")" onclick=@(() => Fit( slot, part ))>
+                                    <div class="pic @(picture is not null ? "pictured" : "")">
+                                        @if ( picture is not null )
+                                        {
+                                            <Image class="picture" Texture=@picture />
+                                        }
+                                        else
+                                        {
+                                            <i>@(part is null ? "block" : CategoryIcon( slot ))</i>
+                                        }
+                                    </div>
+                                    <div class="copy">
+                                        <label class="row-name">@(part?.Name ?? StandardName( slot ))</label>
+                                        <label class="row-desc">@Describe( slot, part )</label>
+                                        @if ( !unlocked )
+                                        {
+                                            <label class="row-state">@Tr( "UNLOCKS AT WEAPON LV {0}", AttachmentUnlocks.GetRequiredLevel( weapon.Resource, part ) )</label>
+                                        }
+                                    </div>
+                                    <i class="row-mark">@(equipped ? "check" : unlocked ? "add" : "lock")</i>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="list">
+                            @foreach ( var category in SlotsFor( weapon.Resource ) )
+                            {
+                                var pick = category;
+                                var current = CurrentPart( weapon.Resource, pick );
+                                var picture = Picture( weapon, current );
+                                <div class="row slot @(current is not null ? "fitted" : "")" onclick=@(() => SelectSlot( pick ))>
+                                    <div class="pic @(picture is not null ? "pictured" : "")">
+                                        @if ( picture is not null )
+                                        {
+                                            <Image class="picture" Texture=@picture />
+                                        }
+                                        else
+                                        {
+                                            <i>@CategoryIcon( pick )</i>
+                                        }
+                                    </div>
+                                    <div class="copy">
+                                        <label class="row-caption">@CategoryName( pick )</label>
+                                        <label class="row-name">@(current?.Name ?? StandardName( pick ))</label>
+                                    </div>
+                                    <label class="row-count">@UnlockedLabel( weapon.Resource, pick )</label>
+                                    <i class="row-mark">chevron_right</i>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    <label class="gunsmith-note">@Tr( "FREE · SAVED TO YOUR ACTIVE CLASS · MORE PARTS UNLOCK AS YOUR WEAPONS LEVEL UP" )</label>
+                </div>
+
+                @* ── Supplies ── *@
+                <div class="shop">
+                    @{
+                        var armor = Armor;
+                        var plateCost = ZombiesBuyStation.ArmorCost( pawn, false );
+                        var fillCost = ZombiesBuyStation.ArmorCost( pawn, true );
+                    }
+                    <div class="card">
+                        <div class="card-head">
+                            <i>shield</i>
+                            <label class="card-title">@Tr( "ARMOUR" )</label>
+                            <label class="card-value">@armor / @ZombiesBuyStation.MaxArmor</label>
+                        </div>
+                        <div class="plates">
+                            @for ( var i = 0; i < ZombiesBuyStation.MaxPlates; i++ )
+                            {
+                                var share = Math.Clamp( (armor - i * ZombiesBuyStation.PlateArmor) / (float)ZombiesBuyStation.PlateArmor, 0f, 1f );
+                                <div class="plate">
+                                    <div class="plate-fill" style="width: @((int)MathF.Round( share * 100f ))%;"></div>
+                                </div>
+                            }
+                        </div>
+                        <label class="card-note">@Tr( "Plates take the hits before your health does." )</label>
+                        <div class="buy-row">
+                            <div class="buy @(CanAfford( plateCost ) ? "" : "disabled")" onclick=@(() => Purchase( ZombiesWorkbenchItem.ArmorPlate, null, plateCost ))>
+                                <label class="buy-label">@Tr( "+1 PLATE" )</label>
+                                <label class="buy-cost">@PriceText( plateCost )</label>
+                            </div>
+                            <div class="buy @(CanAfford( fillCost ) ? "" : "disabled")" onclick=@(() => Purchase( ZombiesWorkbenchItem.ArmorFill, null, fillCost ))>
+                                <label class="buy-label">@Tr( "FILL VEST" )</label>
+                                <label class="buy-cost">@PriceText( fillCost )</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-head">
+                            <i>inventory_2</i>
+                            <label class="card-title">@Tr( "AMMO" )</label>
+                        </div>
+                        @foreach ( var held in weapons )
+                        {
+                            var gun = held;
+                            var ammo = gun.GetComponentInChildren<WeaponAmmo>();
+                            var cost = ZombiesBuyStation.AmmoCost( gun );
+                            <div class="item-row">
+                                <div class="item-copy">
+                                    <label class="item-name">@gun.Resource.Name</label>
+                                    <label class="item-sub">@Tr( "{0} in the gun · {1} / {2} spare", ammo.Ammo, ammo.ReserveAmmo, ammo.GetMaxReserve() )</label>
+                                </div>
+                                <div class="buy small @(CanAfford( cost ) ? "" : "disabled")" onclick=@(() => Purchase( ZombiesWorkbenchItem.Ammo, gun, cost ))>
+                                    <label class="buy-label">@Tr( "REFILL" )</label>
+                                    <label class="buy-cost">@PriceText( cost )</label>
+                                </div>
+                            </div>
+                        }
+                        @if ( weapons.Count > 1 )
+                        {
+                            var allCost = ZombiesBuyStation.AmmoAllCost( pawn );
+                            <div class="buy wide @(CanAfford( allCost ) ? "" : "disabled")" onclick=@(() => Purchase( ZombiesWorkbenchItem.AmmoAll, null, allCost ))>
+                                <label class="buy-label">@Tr( "REFILL ALL" )</label>
+                                <label class="buy-cost">@PriceText( allCost )</label>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="card">
+                        <div class="card-head">
+                            <i>local_fire_department</i>
+                            <label class="card-title">@Tr( "LETHAL" )</label>
+                        </div>
+                        @{
+                            var grenade = ZombiesBuyStation.GrenadeResource;
+                            var blocked = ZombiesBuyStation.GrenadeBlocked( pawn );
+                            var grenadeCost = blocked is null ? ZombiesBuyStation.GrenadeCost : 0;
+                        }
+                        <div class="item-row">
+                            @if ( !string.IsNullOrEmpty( grenade?.Icon ) )
+                            {
+                                <div class="item-icon" style="background-image: url( @grenade.Icon );"></div>
+                            }
+                            <div class="item-copy">
+                                <label class="item-name">@(grenade?.Name ?? "HE Grenade")</label>
+                                <label class="item-sub">@Tr( blocked ?? "Throw it into a crowd" )</label>
+                            </div>
+                            <div class="buy small @(CanAfford( grenadeCost ) ? "" : "disabled")" onclick=@(() => Purchase( ZombiesWorkbenchItem.Grenade, null, grenadeCost ))>
+                                <label class="buy-label">@Tr( "BUY" )</label>
+                                <label class="buy-cost">@(blocked is null ? PriceText( ZombiesBuyStation.GrenadeCost ) : "—")</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flash @(FlashVisible ? "show" : "") @(_flashError ? "error" : "")">
+                <div class="flash-pill">
+                    <i>@(_flashError ? "error_outline" : "check_circle")</i>
+                    <label>@FlashText</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="key"><label>E</label></div>
+            <label class="footer-label">@Tr( "Close" )</label>
+            <div class="key wide"><label>ESC</label></div>
+            <label class="footer-label">@Tr( SelectedSlot is not null ? "Back" : "Close" )</label>
+        </div>
+    }
+</root>
+
+@code
+{
+    private static ZombiesWorkbenchPanel Instance { get; set; }
+
+    public static bool IsAnyOpen => Instance is not null && !Instance.IsDeleting && Instance.IsOpen;
+
+    /// <summary> Step back out of the menu if it's open: from a slot's parts to the slots, then shut. Returns whether it was open. </summary>
+    public static bool CloseAny()
+    {
+        if ( !IsAnyOpen ) return false;
+        Instance.Back();
+        return true;
+    }
+
+    /// <summary> ZombiesBuyStation.Bought: the host took the points, so say so. </summary>
+    public static void NotifyBought( ZombiesWorkbenchItem item )
+    {
+        if ( Instance is null || Instance.IsDeleting ) return;
+        Instance.Flash( item switch
+        {
+            ZombiesWorkbenchItem.ArmorPlate => "ARMOUR PLATE FITTED",
+            ZombiesWorkbenchItem.ArmorFill => "VEST FILLED",
+            ZombiesWorkbenchItem.Ammo => "AMMO REFILLED",
+            ZombiesWorkbenchItem.AmmoAll => "ALL AMMO REFILLED",
+            ZombiesWorkbenchItem.Grenade => "HE GRENADE ADDED",
+            _ => "BOUGHT"
+        } );
+    }
+
+    /// <summary> The bench the menu is open at, or null while it's shut. </summary>
+    private ZombiesBuyStation Bench { get; set; }
+    private bool IsOpen => Bench.IsValid();
+
+    private Equipment SelectedWeapon { get; set; }
+    private GunsmithPartType? SelectedSlot { get; set; }
+
+    // In English, filled in with _flashArgs and translated as it's drawn (FlashText).
+    private string _flash;
+    private object[] _flashArgs = Array.Empty<object>();
+    private bool _flashError;
+    private RealTimeSince _flashSince = 100f;
+    private const float FlashTime = 1.8f;
+    private bool FlashVisible => !string.IsNullOrEmpty( _flash ) && _flashSince < FlashTime;
+
+    // Bumped by every fitted part, so the lists redraw with it.
+    private int _revision;
+
+    // Each weapon's slots and parts, worked out once per opening (the prefab's attachment points don't change).
+    private readonly Dictionary<EquipmentResource, Dictionary<GunsmithPartType, List<GunsmithPart>>> _parts = new();
+
+    public ZombiesWorkbenchPanel()
+    {
+        Instance = this;
+    }
+
+    private static PlayerPawn Pawn => Client.Local.IsValid() ? Client.Local.PlayerPawn : null;
+    private int Points => Pawn?.GetComponent<ZombiesPlayerEconomy>()?.Points ?? 0;
+    private int Armor => Pawn?.ArmorComponent?.Armor.CeilToInt() ?? 0;
+
+    /// <summary> The guns in hand that the bench works on: the primary, then the secondary. </summary>
+    private static List<Equipment> Weapons => ZombiesBuyStation.AmmoWeapons( Pawn ).ToList();
+
+    private void Open( ZombiesBuyStation bench )
+    {
+        Bench = bench;
+        SelectedSlot = null;
+        _parts.Clear();
+        _flash = null;
+
+        var weapons = Weapons;
+        var current = Pawn?.CurrentEquipment;
+        SelectedWeapon = weapons.Contains( current ) ? current : weapons.FirstOrDefault();
+    }
+
+    private void Close()
+    {
+        Bench = null;
+        SelectedSlot = null;
+    }
+
+    private void Back()
+    {
+        if ( SelectedSlot is not null ) SelectedSlot = null;
+        else Close();
+    }
+
+    private void SelectWeapon( Equipment weapon )
+    {
+        if ( SelectedWeapon == weapon ) return;
+        SelectedWeapon = weapon;
+        SelectedSlot = null;
+    }
+
+    private void SelectSlot( GunsmithPartType slot ) => SelectedSlot = slot;
+
+    /// <summary> Flashes <paramref name="text"/>, in English ("{0} FITTED"), filled in with <paramref name="args"/>. </summary>
+    private void Flash( string text, bool error = false, params object[] args )
+    {
+        _flash = text;
+        _flashArgs = args ?? Array.Empty<object>();
+        _flashError = error;
+        _flashSince = 0f;
+    }
+
+    /// <summary> The flash in the player's language. A slot fills in as its name. </summary>
+    private string FlashText => Tr( _flash, _flashArgs.Select( arg => arg is GunsmithPartType slot ? CategoryName( slot ) : arg ).ToArray() );
+
+    public override void Tick()
+    {
+        var pawn = Pawn;
+
+        if ( IsOpen )
+        {
+            AttachmentThumbnails.Pump();
+
+            // Walking off, going down, dying or another menu shuts it.
+            if ( !Bench.CanWorkAt( pawn ) || PauseMenuPanel.IsAnyOpen || ClassSelect.IsAnyOpen )
+            {
+                Close();
+                return;
+            }
+
+            // Use shuts it again, as it opened it.
+            if ( Input.Pressed( "Use" ) )
+            {
+                Close();
+                return;
+            }
+
+            // A gun given or dropped while it's open (the weapon crate, a wall-buy).
+            var weapons = Weapons;
+            if ( !weapons.Contains( SelectedWeapon ) )
+            {
+                SelectedWeapon = weapons.FirstOrDefault();
+                SelectedSlot = null;
+            }
+            return;
+        }
+
+        if ( !pawn.IsValid() || !Input.Pressed( "Use" ) || PauseMenuPanel.IsAnyOpen || ClassSelect.IsAnyOpen ) return;
+
+        // The host's Use does nothing at the bench: its menu is this player's own.
+        if ( pawn.Hovered is ZombiesBuyStation { Kind: ZombiesBuyKind.Workbench } bench
+            && pawn.WorldPosition.Distance( bench.WorldPosition ) <= ZombiesBuyStation.UseRange && bench.CanWorkAt( pawn ) )
+        {
+            Open( bench );
+        }
+    }
+
+    // ── Attachments ─────────────────────────────────────────────────────────
+
+    private Dictionary<GunsmithPartType, List<GunsmithPart>> PartsFor( EquipmentResource weapon )
+    {
+        if ( weapon is null ) return new();
+        if ( _parts.TryGetValue( weapon, out var parts ) ) return parts;
+
+        // In unlock order, as the gunsmith lists them: what's open first, then what the next levels bring.
+        parts = AttachmentUnlocks.GetWeaponParts( weapon )
+            .GroupBy( p => p.Category )
+            .ToDictionary( g => g.Key, g => g.OrderBy( p => AttachmentUnlocks.GetRequiredLevel( weapon, p ) ).ThenBy( p => p.Name ).ToList() );
+        _parts[weapon] = parts;
+        return parts;
+    }
+
+    private IEnumerable<GunsmithPartType> SlotsFor( EquipmentResource weapon ) => PartsFor( weapon ).Keys.OrderBy( CategoryOrder );
+
+    /// <summary> The factory part (null), then every part that fits. </summary>
+    private IEnumerable<GunsmithPart> Options( EquipmentResource weapon, GunsmithPartType slot ) =>
+        new GunsmithPart[] { null }.Concat( PartsFor( weapon ).TryGetValue( slot, out var parts ) ? parts : Enumerable.Empty<GunsmithPart>() );
+
+    private string UnlockedLabel( EquipmentResource weapon, GunsmithPartType slot )
+    {
+        if ( !PartsFor( weapon ).TryGetValue( slot, out var parts ) ) return "";
+        var open = parts.Count( p => AttachmentUnlocks.IsUnlocked( weapon, p ) );
+        return open == parts.Count ? Tr( parts.Count == 1 ? "{0} OPTION" : "{0} OPTIONS", parts.Count ) : Tr( "{0} / {1} UNLOCKED", open, parts.Count );
+    }
+
+    /// <summary> The part fitted in <paramref name="slot"/>, or null for the factory part (or one still locked). </summary>
+    private static GunsmithPart CurrentPart( EquipmentResource weapon, GunsmithPartType slot ) =>
+        GunsmithLoadoutManager.TryGetAttachment( weapon, slot, out var part ) && part.IsValid() ? part : null;
+
+    private static bool SamePart( GunsmithPart a, GunsmithPart b ) => a is null || b is null
+        ? a is null && b is null
+        : string.Equals( a.ResourcePath, b.ResourcePath, StringComparison.OrdinalIgnoreCase );
+
+    private void Fit( GunsmithPartType slot, GunsmithPart part )
+    {
+        var weapon = SelectedWeapon;
+        if ( !IsOpen || !weapon.IsValid() || !weapon.Resource.IsValid() || !weapon.ApplySavedAttachments ) return;
+
+        var resource = weapon.Resource;
+        if ( part is not null && !AttachmentUnlocks.IsUnlocked( resource, part ) )
+        {
+            Flash( "UNLOCKS AT {0} LEVEL {1}", true, resource.Name.ToUpperInvariant(), AttachmentUnlocks.GetRequiredLevel( resource, part ) );
+            return;
+        }
+        if ( part is not null && (part.Category != slot || !part.Supports( resource )) ) return;
+        if ( SamePart( part, CurrentPart( resource, slot ) ) ) return;
+
+        GunsmithLoadoutManager.SetAttachment( resource, slot, part );
+        ZombiesBuyStation.RefitAttachments( weapon );
+        _revision++;
+
+        Sound.Play( "ui_button_press" );
+        if ( part is null ) Flash( "{0}: STANDARD", false, slot );
+        else Flash( "{0} FITTED", false, part.Name.ToUpperInvariant() );
+    }
+
+    /// <summary> The part's picture as fitted to this gun (AttachmentThumbnails), or null while it's drawn or for none. </summary>
+    private static Texture Picture( Equipment weapon, GunsmithPart part ) =>
+        part is null || GunModel( weapon ) is not { } model ? null : AttachmentThumbnails.Get( part, model );
+
+    /// <summary> The gun's viewmodel model, which the gunsmith draws its pictures with: the live one, else its prefab's. </summary>
+    private static Model GunModel( Equipment weapon )
+    {
+        if ( !weapon.IsValid() ) return null;
+        if ( weapon.ViewModel.IsValid() && weapon.ViewModel.ModelRenderer.IsValid() && weapon.ViewModel.ModelRenderer.Model is { } live )
+            return live;
+
+        var prefab = weapon.Resource?.ViewModelPrefab;
+        if ( !prefab.IsValid() ) return null;
+
+        var gun = prefab.Components.Get<GunsmithWeapon>( FindMode.EverythingInSelfAndDescendants );
+        if ( gun.IsValid() && gun.Renderer.IsValid() && gun.Renderer.Model is { } model )
+            return model;
+
+        return prefab.Components.Get<ViewModel>( FindMode.EverythingInSelfAndDescendants )?.ModelRenderer?.Model;
+    }
+
+    // The gunsmith's own names, icons and order (GunsmithAttachmentBrowser).
+    private static int CategoryOrder( GunsmithPartType category ) => category switch
+    {
+        GunsmithPartType.Muzzle => 0, GunsmithPartType.Barrel => 1, GunsmithPartType.Optic => 2,
+        GunsmithPartType.Underbarrel => 3, GunsmithPartType.Magazine => 4, GunsmithPartType.RearGrip => 5,
+        GunsmithPartType.Stock => 6, GunsmithPartType.Laser => 7, GunsmithPartType.Ammunition => 8, _ => 9
+    };
+
+    // "PRIMARY · LV 5", built here: a "·" in the markup between two values was dropped.
+    private static string SlotAndLevel( EquipmentResource weapon ) =>
+        $"{Tr( weapon.Slot == EquipmentSlot.Primary ? "PRIMARY" : "SECONDARY" )} · {Tr( "LV {0}", WeaponProgression.GetLevel( weapon ) )}";
+
+    private static string StandardName( GunsmithPartType category ) => Tr( category == GunsmithPartType.Ammunition ? "Standard Rounds" : "Standard" );
+
+    private static string CategoryName( GunsmithPartType category ) => Tr( category == GunsmithPartType.RearGrip ? "REAR GRIP" : category.ToString().ToUpperInvariant() );
+
+    private static string CategoryIcon( GunsmithPartType category ) => category switch
+    {
+        GunsmithPartType.Optic => "filter_center_focus", GunsmithPartType.Muzzle => "volume_off",
+        GunsmithPartType.Barrel => "straighten", GunsmithPartType.Stock => "view_week",
+        GunsmithPartType.Underbarrel => "pan_tool", GunsmithPartType.RearGrip => "back_hand",
+        GunsmithPartType.Magazine => "view_stream", GunsmithPartType.Ammunition => "linear_scale", GunsmithPartType.Laser => "flare", _ => "build"
+    };
+
+    private static string Describe( GunsmithPartType category, GunsmithPart part ) => GunsmithAttachmentEffects.Describe( part ) is { } effects ? Tr( effects )
+        : !string.IsNullOrWhiteSpace( part?.Description ) ? Tr( part.Description )
+        : category == GunsmithPartType.Ammunition ? Tr( part?.UsesTracerRounds == true ? "Visible bullet trails" : "No visible bullet trails" )
+        : part is null ? Tr( "Original weapon part" ) : part.IsSuppressor ? Tr( "Suppressor" ) : CategoryName( category );
+
+    // ── Supplies ────────────────────────────────────────────────────────────
+
+    private bool CanAfford( int cost ) => cost > 0 && Points >= cost;
+
+    private static string PriceText( int cost ) => cost > 0 ? cost.ToString( "N0" ) : Tr( "FULL" );
+
+    private void Purchase( ZombiesWorkbenchItem item, Equipment weapon, int cost )
+    {
+        if ( !IsOpen ) return;
+        if ( cost <= 0 ) return;
+        if ( Points < cost )
+        {
+            Flash( "NOT ENOUGH POINTS · {0} NEEDED", true, cost.ToString( "N0" ) );
+            return;
+        }
+
+        Bench.Buy( item, weapon );
+    }
+
+    public override void OnDeleted()
+    {
+        if ( Instance == this )
+            Instance = null;
+
+        base.OnDeleted();
+    }
+
+    protected override int BuildHash()
+    {
+        var hash = new HashCode();
+        hash.Add( IsOpen );
+        if ( !IsOpen ) return hash.ToHashCode();
+
+        hash.Add( SelectedWeapon ); hash.Add( SelectedSlot ); hash.Add( _revision );
+        hash.Add( Points ); hash.Add( Armor ); hash.Add( AttachmentThumbnails.Version );
+        hash.Add( FlashVisible ); hash.Add( FlashText ); hash.Add( _flashError );
+
+        var pawn = Pawn;
+        hash.Add( pawn?.Inventory?.HasInSlot( EquipmentSlot.Lethal ) );
+        foreach ( var weapon in Weapons )
+        {
+            hash.Add( weapon );
+            if ( weapon.GetComponentInChildren<WeaponAmmo>() is { } ammo )
+            {
+                hash.Add( ammo.Ammo ); hash.Add( ammo.ReserveAmmo ); hash.Add( ammo.GetMaxReserve() );
+            }
+        }
+        return hash.ToHashCode();
+    }
+}

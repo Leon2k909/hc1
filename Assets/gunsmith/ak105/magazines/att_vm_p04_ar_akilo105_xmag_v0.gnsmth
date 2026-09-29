@@ -1,0 +1,40 @@
+{
+  "Name": "45 Round Mag",
+  "Category": "Magazine",
+  "EligibleEquipment": [
+    "weapons/ak105/ak105.equip"
+  ],
+  "RequiredLevel": 0,
+  "Description": "RPK-74 45-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty).",
+  "ModifyBodygroups": true,
+  "Bodygroups": {
+    "magazine": 2
+  },
+  "VerticalRecoilScale": 1.0,
+  "HorizontalRecoilScale": 1.0,
+  "MagazineCapacity": 45,
+  "ReloadTimeMultiplier": 1.0,
+  "ReloadAnimation": 2,
+  "ReloadTime": 2.4,
+  "EmptyReloadTime": 2.75,
+  "ReloadSounds": {
+    "0.1": "weapons/ak105/sounds/ak105.reload_xmag_raise.sound",
+    "0.4": "weapons/ak105/sounds/ak105.reload_xmag_magout.sound",
+    "1.033": "weapons/ak105/sounds/ak105.reload_xmag_rattle.sound",
+    "1.3": "weapons/ak105/sounds/ak105.reload_xmag_arm.sound",
+    "1.433": "weapons/ak105/sounds/ak105.reload_xmag_maghit.sound",
+    "1.733": "weapons/ak105/sounds/ak105.reload_xmag_end.sound",
+    "1.867": "weapons/ak105/sounds/ak105.reload_xmag_magin.sound"
+  },
+  "EmptyReloadSounds": {
+    "0": "weapons/ak105/sounds/ak105.reload_xmag_empty_raise.sound",
+    "0.267": "weapons/ak105/sounds/ak105.reload_xmag_empty_boltpull.sound",
+    "0.967": "weapons/ak105/sounds/ak105.reload_xmag_empty_magout.sound",
+    "1.533": "weapons/ak105/sounds/ak105.reload_xmag_empty_maghit.sound",
+    "1.967": "weapons/ak105/sounds/ak105.reload_xmag_empty_magin.sound",
+    "2.1": "weapons/ak105/sounds/ak105.reload_xmag_empty_boltrelease.sound",
+    "2.367": "weapons/ak105/sounds/ak105.reload_xmaglarg_fast_end.sound"
+  },
+  "__references": [],
+  "__version": 0
+}

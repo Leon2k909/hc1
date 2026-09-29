@@ -11,47 +11,54 @@
     @* ── Top-bar ───────────────────────────────────────────────────────── *@
     @if ( ActiveSection != BarracksSection.None )
     {
-        <MenuTopbar Title="BARRACKS" BackLabel=@SectionLabel BackAction=@ExitSection />
+        <MenuTopbar Title=@SectionLabel ParentTitle="PROFILE" ParentAction=@ExitSection BackAction=@ExitSection />
     }
     else
     {
-        <MenuTopbar Title="BARRACKS" />
+        <MenuTopbar Title="PROFILE" />
     }
 
     @* ── Category Hub ─────────────────────────────────────────── *@
     @if ( ActiveSection == BarracksSection.None )
     {
         <div class="barracks-hub">
+            <label class="barracks-heading">@Tr( "YOUR RECORD & IDENTITY" )</label>
             <div class="barracks-cat-grid">
+
+                <a class="barracks-cat career-record-link" href="/barracks/career">
+                    <i class="cat-icon">assessment</i>
+                    <label class="cat-name">@Tr( "CAREER RECORD" )</label>
+                    <label class="cat-desc">@Tr( "Your level, milestones and weapon statistics" )</label>
+                </a>
 
                 <div class="barracks-cat" @onclick=@OpenEmblems>
                     <i class="cat-icon">star</i>
-                    <label class="cat-name">EMBLEMS</label>
-                    <label class="cat-desc">Design your personal emblem</label>
+                    <label class="cat-name">@Tr( "EMBLEMS" )</label>
+                    <label class="cat-desc">@Tr( "Design your personal emblem" )</label>
                 </div>
 
                 <div class="barracks-cat" @onclick=@OpenCallingCards>
                     <i class="cat-icon">badge</i>
-                    <label class="cat-name">CALLING CARDS</label>
-                    <label class="cat-desc">Choose your player card style</label>
+                    <label class="cat-name">@Tr( "CALLING CARDS" )</label>
+                    <label class="cat-desc">@Tr( "Choose your player card style" )</label>
                 </div>
 
                 <a class="barracks-cat" href="/theater">
                     <i class="cat-icon">videocam</i>
-                    <label class="cat-name">THEATER</label>
-                    <label class="cat-desc">Watch match replays</label>
+                    <label class="cat-name">@Tr( "THEATER" )</label>
+                    <label class="cat-desc">@Tr( "Watch match replays" )</label>
                 </a>
 
                 <div class="barracks-cat locked">
                     <i class="cat-icon">person</i>
-                    <label class="cat-name">OPERATORS</label>
-                    <label class="cat-desc">Coming Soon</label>
+                    <label class="cat-name">@Tr( "OPERATORS" )</label>
+                    <label class="cat-desc">@Tr( "Coming Soon" )</label>
                 </div>
 
                 <div class="barracks-cat" @onclick=@OpenTitles>
                     <i class="cat-icon">military_tech</i>
-                    <label class="cat-name">TITLES</label>
-                    <label class="cat-desc">Select your player title</label>
+                    <label class="cat-name">@Tr( "TITLES" )</label>
+                    <label class="cat-desc">@Tr( "Select your player title" )</label>
                 </div>
 
             </div>
@@ -72,7 +79,7 @@
         <div class="barracks-cc-body">
             <div class="cc-left">
                 @* Preview of selected card *@
-                <label class="cc-preview-label">PREVIEW</label>
+                <label class="cc-preview-label">@Tr( "PREVIEW" )</label>
                 @{
                     var selected = CallingCards.GetSelectedDef();
                 }
@@ -80,20 +87,20 @@
                     <div class="cc-preview-accent" style="@selected.AccentStyle" />
                     <div class="cc-preview-content">
                         <label class="cc-preview-name">@(Sandbox.Utility.Steam.PersonaName)</label>
-                        <label class="cc-preview-tag">@selected.Name</label>
+                        <label class="cc-preview-tag">@Tr( selected.Name )</label>
                     </div>
                 </div>
             </div>
 
             <div class="cc-right">
-                <label class="cc-grid-label">SELECT CALLING CARD</label>
+                <label class="cc-grid-label">@Tr( "SELECT CALLING CARD" )</label>
                 <div class="cc-grid">
                     @foreach ( var card in CallingCards.All )
                     {
                         var isSelected = CallingCards.GetSelected() == card.Id;
                         <div class="cc-card @(isSelected ? "active" : "")" style="@card.BgStyle" @onclick=@(() => SelectCard( card.Id ))>
                             <div class="cc-card-accent" style="@card.AccentStyle" />
-                            <label class="cc-card-name">@card.Name</label>
+                            <label class="cc-card-name">@Tr( card.Name )</label>
                             @if ( isSelected )
                             {
                                 <i class="cc-card-check">check_circle</i>
@@ -111,23 +118,24 @@
         <div class="barracks-cc-body">
             <div class="cc-left">
                 <div class="cc-preview-panel">
-                    <label class="cc-preview-title">CURRENT TITLE</label>
+                    <label class="cc-preview-title">@Tr( "CURRENT TITLE" )</label>
                     @{
                         var selected = Titles.GetSelectedDef();
                     }
                     <div class="title-preview-card">
-                        <label class="title-text" style="color: @selected.Color;">@selected.Text</label>
+                        <label class="title-text" style="color: @selected.Color;">@Tr( selected.Text )</label>
                     </div>
                 </div>
             </div>
-            
+
             <div class="cc-right">
+                <label class="cc-grid-label">@Tr( "SELECT TITLE" )</label>
                 <div class="cc-grid">
                     @foreach ( var titleDef in Titles.All )
                     {
                         var isSelected = Titles.GetSelected() == titleDef.Id;
                         <div class="title-card @(isSelected ? "active" : "")" @onclick=@(() => SelectTitle( titleDef.Id ))>
-                            <label class="title-text" style="color: @titleDef.Color;">@titleDef.Text</label>
+                            <label class="title-text" style="color: @titleDef.Color;">@Tr( titleDef.Text )</label>
                         </div>
                     }
                 </div>

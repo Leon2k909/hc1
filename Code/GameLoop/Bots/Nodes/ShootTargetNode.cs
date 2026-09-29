@@ -39,7 +39,8 @@ public class ShootTargetNode : BaseBehaviorNode
 			.IgnoreGameObjectHierarchy( pawn.GameObject.Root )
 			.Run();
 
-		if ( !trace.Hit || trace.GameObject.Root != target.GameObject )
+		// Map clutter (trees) has collision but no GameObject
+		if ( !trace.Hit || !trace.GameObject.IsValid() || trace.GameObject.Root != target.GameObject )
 			return NodeResult.Failure;
 
 		// Start new burst if needed

@@ -14,8 +14,9 @@ public abstract partial class WeaponModel
 			var factory = ModelRenderer.IsValid() ? ModelRenderer.Components.Get<GunsmithMw22Factory>( FindMode.EverythingInSelf ) : null;
 			if ( factory.IsValid() && factory.MuzzleEffectPoint.IsValid() ) return factory.MuzzleEffectPoint;
 
-			// A bodygroup barrel of another length moves the muzzle along the bore (the muzzle's own axes).
-			var shift = ModelRenderer.IsValid() ? GunsmithAttachmentPoint.MuzzleShift( ModelRenderer.GameObject ) : Vector3.Zero;
+			// A bodygroup barrel of another length moves the muzzle along the bore (the muzzle's own axes), and a shorter
+			// flash hider of its own moves the bare muzzle further.
+			var shift = ModelRenderer.IsValid() ? GunsmithAttachmentPoint.DischargeShift( ModelRenderer.GameObject ) : Vector3.Zero;
 			if ( shift == Vector3.Zero || !Muzzle.IsValid() ) return Muzzle;
 			if ( !shiftedMuzzle.IsValid() || shiftedMuzzle.Parent != Muzzle )
 			{

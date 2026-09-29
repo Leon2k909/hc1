@@ -1,175 +1,376 @@
-// CoD-style gunsmith column: one big card per slot on the right, mirroring the armory on the left.
-// GunsmithController reserves this column's width when framing the gun, so the preview never sits behind it.
-// Text sizes go on the labels themselves: the theme's `label { font-size: 18px }` beats anything inherited.
+// The gunsmith's ATTACHMENTS panel (right column, under BUILD / CUSTOMIZE): one row per slot, and a slot's parts in
+// place of the list once it's picked. Text sizes go on the labels themselves: the theme's `label { font-size: 18px }`
+// beats anything inherited.
+
+$accent: #FF7A1A;
+$accent-ink: #16100A;
+$line: rgba( 255, 255, 255, 0.08 );
+$text-dim: rgba( 255, 255, 255, 0.5 );
+$text-mid: rgba( 255, 255, 255, 0.72 );
+
 GunsmithAttachmentBrowser
 {
-    position: absolute;
-    top: 156px;
-    right: 24px;
-    bottom: 24px;
-    width: 440px;
+    flex-grow: 1;
+    min-height: 0;
     flex-direction: column;
-    gap: 12px;
-    padding: 18px;
-    background-color: rgba( 19, 24, 28, 0.96 );
-    border: 1px solid #46515a;
+    background-color: rgba( 12, 14, 17, 0.72 );
+    border: 1px solid rgba( 255, 255, 255, 0.09 );
     border-radius: 2px;
+    backdrop-filter: blur( 8px );
     pointer-events: all;
-    color: #f3f4f5;
+    color: white;
 
-    &.no-slots { bottom: auto; }
+    &.no-slots { flex-grow: 0; }
 
-    // ── Slot list ────────────────────────────────────────────────────────
-    .attachment-header
+    label, i { text-shadow: none; }
+
+    .ab-head
     {
         flex-shrink: 0;
-        justify-content: space-between;
-        align-items: center;
-        height: 30px;
-    }
-
-    .attachment-title { font-size: 20px; letter-spacing: 2px; color: white; }
-    .attachment-count { font-size: 16px; letter-spacing: 1px; color: #ffca54; }
-
-    .attachment-slots
-    {
-        flex-direction: column;
-        flex-grow: 1;
-        min-height: 0;
-        gap: 6px;
-        overflow-y: scroll;
-    }
-
-    .attachment-slot
-    {
-        flex-shrink: 0;
-        align-items: center;
-        gap: 12px;
-        height: 84px;
-        padding: 0 16px;
-        background-color: #252e35;
-        border: 1px solid #46515a;
-        border-left: 4px solid #46515a;
-        color: white;
-        cursor: pointer;
-        transition: background-color 0.1s ease, border-color 0.1s ease;
-
-        &:hover { background-color: #313c45; border-color: #9aa6b0; }
-        &.equipped { border-left-color: #ffbd24; }
-    }
-
-    .slot-copy { flex-direction: column; flex-grow: 1; min-width: 0; gap: 4px; }
-    .slot-heading { align-items: center; gap: 8px; }
-    .slot-icon { font-size: 20px; color: #aebbc5; flex-shrink: 0; }
-    .slot-category { flex-grow: 1; font-size: 15px; letter-spacing: 1.5px; color: #ffca54; white-space: nowrap; }
-    .slot-count { flex-shrink: 0; font-size: 14px; letter-spacing: 0.5px; color: #aebbc5; }
-    .slot-part { font-size: 22px; font-weight: 800; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .slot-state { flex-shrink: 0; font-size: 28px; color: #6b7883; }
-
-    .equipped .slot-icon, .equipped .slot-state { color: #ffbd24; }
-    .empty .slot-part { color: #aebbc5; }
-    .attachment-slot:hover .slot-state { color: white; }
-
-    .attachment-empty { font-size: 18px; color: #d4d9de; padding: 6px 0; }
-
-    // ── Options for the picked slot ──────────────────────────────────────
-    .attachment-drawer
-    {
-        flex-direction: column;
-        flex-grow: 1;
-        min-height: 0;
-        gap: 12px;
-    }
-
-    .drawer-heading
-    {
-        flex-shrink: 0;
-        align-items: center;
-        gap: 14px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid #46515a;
-    }
-
-    .drawer-close
-    {
-        flex-shrink: 0;
-        align-items: center;
-        gap: 6px;
         height: 52px;
-        padding: 0 16px 0 12px;
-        background-color: #303a43;
-        border: 1px solid #4c5862;
-        border-radius: 3px;
-        cursor: pointer;
-
-        i { font-size: 24px; color: white; }
-        label { font-size: 17px; letter-spacing: 1px; color: white; }
-
-        &:hover { background-color: #3a4650; border-color: #ffbd24; }
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        padding: 0 16px;
+        border-bottom: 1px solid $line;
     }
 
-    .drawer-title { flex-direction: column; min-width: 0; }
-    .drawer-caption { font-size: 13px; letter-spacing: 1.5px; color: #ffbd24; }
-    .drawer-name { font-size: 26px; font-weight: 900; color: white; white-space: nowrap; }
-    .drawer-hint { flex-shrink: 0; font-size: 14px; letter-spacing: 1px; color: #aebbc5; }
-
-    .attachment-options
+    .ab-bar
     {
+        width: 3px;
+        height: 20px;
+        margin-right: 4px;
+        background-color: $accent;
+        box-shadow: 0 0 10px rgba( 255, 122, 26, 0.6 );
+    }
+
+    .ab-heading
+    {
+        flex-grow: 1;
+        min-width: 0;
         flex-direction: column;
+    }
+
+    .ab-caption
+    {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 2.5px;
+        color: rgba( 255, 255, 255, 0.45 );
+    }
+
+    .ab-title
+    {
+        flex-grow: 1;
+        font-size: 17px;
+        font-weight: 700;
+        letter-spacing: 3px;
+        color: white;
+    }
+
+    .ab-heading .ab-title { flex-grow: 0; }
+
+    .ab-count
+    {
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        color: $accent;
+        white-space: nowrap;
+    }
+
+    .ab-back
+    {
+        width: 32px;
+        height: 32px;
+        flex-shrink: 0;
+        margin-right: 4px;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba( 255, 255, 255, 0.16 );
+        border-radius: 2px;
+        cursor: pointer;
+
+        i { font-size: 18px; color: rgba( 255, 255, 255, 0.8 ); }
+
+        &:hover
+        {
+            border-color: $accent;
+            background-color: rgba( 255, 122, 26, 0.12 );
+
+            i { color: white; }
+        }
+    }
+
+    .ab-list
+    {
         flex-grow: 1;
         min-height: 0;
+        flex-direction: column;
         gap: 6px;
         overflow-y: scroll;
+        padding: 10px 12px 12px 12px;
     }
 
-    .attachment-option
+    // ── A slot, or one of its parts ──
+
+    .ab-slot,
+    .ab-option
     {
         flex-shrink: 0;
+        flex-direction: row;
         align-items: center;
-        gap: 12px;
-        min-height: 84px;
-        padding: 10px 16px;
-        background-color: #242c32;
-        border: 1px solid #46515a;
-        border-left: 4px solid #46515a;
-        color: white;
+        min-height: 68px;
+        background-color: rgba( 255, 255, 255, 0.035 );
+        border: 1px solid $line;
+        border-left: 3px solid transparent;
         cursor: pointer;
-        transition: background-color 0.1s ease, border-color 0.1s ease;
+        transition: border-color 0.15s ease, background-color 0.15s ease;
 
-        &:hover { background-color: #313c45; border-color: #9aa6b0; }
-        &.equipped { background-color: #39321f; border-color: #ffbd24; }
-        &.locked { background-color: #1b2025; }
+        &:hover
+        {
+            background-color: rgba( 255, 255, 255, 0.07 );
+            border-color: rgba( 255, 255, 255, 0.18 );
+
+            .ab-plus { background-color: rgba( 255, 122, 26, 0.16 ); }
+            .ab-icon i { color: white; }
+        }
+
+        &.equipped
+        {
+            border-left-color: $accent;
+
+            .ab-part { color: white; font-weight: 700; }
+        }
     }
 
-    .option-copy { flex-direction: column; flex-grow: 1; min-width: 0; gap: 5px; }
-    .option-name { font-size: 21px; font-weight: 800; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .option-meta { align-items: center; gap: 8px; min-width: 0; }
-    .option-icon { flex-shrink: 0; font-size: 18px; color: #aebbc5; }
-    .option-state { flex-shrink: 0; font-size: 14px; letter-spacing: 1px; color: #ffca54; }
-    .option-desc { flex-shrink: 1; min-width: 0; font-size: 15px; color: #b7c1c9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .option-action { flex-shrink: 0; font-size: 28px; color: #8b97a1; }
+    // The part's picture (AttachmentThumbnails, drawn at 1.6:1), or its slot's icon until it's drawn.
+    .ab-icon
+    {
+        width: 104px;
+        align-self: stretch;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba( 0, 0, 0, 0.28 );
+        border-right: 1px solid $line;
 
-    .attachment-option:hover .option-action { color: white; }
-    .equipped .option-icon, .equipped .option-action { color: #ffbd24; }
-    .locked .option-name { color: #9aa4ac; }
-    .locked .option-state { color: #ff8f7a; }
-    .locked .option-action { color: #6b7883; }
+        i { font-size: 26px; color: $text-mid; }
+    }
+
+    .ab-picture
+    {
+        width: 96px;
+        height: 60px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    .ab-option.locked .ab-picture { opacity: 0.45; }
+
+    // ── Unlock points ──
+
+    .ab-points
+    {
+        flex-shrink: 0;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-bottom: 1px solid $line;
+        background-color: rgba( 255, 255, 255, 0.02 );
+
+        i { font-size: 18px; color: rgba( 255, 255, 255, 0.4 ); }
+
+        &.has-points
+        {
+            background-color: rgba( 255, 122, 26, 0.08 );
+
+            i, .ab-points-count { color: $accent; }
+        }
+    }
+
+    .ab-points-count
+    {
+        font-size: 17px;
+        font-weight: 700;
+        color: rgba( 255, 255, 255, 0.6 );
+    }
+
+    .ab-points-label
+    {
+        flex-grow: 1;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: $text-mid;
+    }
+
+    .ab-points-next
+    {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        color: $text-dim;
+        white-space: nowrap;
+    }
+
+    .ab-copy
+    {
+        flex-grow: 1;
+        min-width: 0;
+        flex-direction: column;
+        justify-content: center;
+        gap: 3px;
+        padding: 8px 12px 8px 14px;
+    }
+
+    .ab-slot-head
+    {
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .ab-slot-name
+    {
+        flex-shrink: 1;
+        min-width: 0;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: $accent;
+    }
+
+    // How many parts fit the slot on this gun, or unlocked/all while some are locked.
+    .ab-slot-count
+    {
+        flex-shrink: 0;
+        padding: 0 5px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        color: $accent;
+        border: 1px solid rgba( 255, 122, 26, 0.4 );
+        border-radius: 2px;
+    }
+
+    // Nothing fits the slot on this gun: the count reads 0 and there's nothing to add. It still opens, showing Standard.
+    .ab-slot.empty
+    {
+        .ab-slot-name, .ab-slot-count, .ab-part, .ab-icon i { color: rgba( 255, 255, 255, 0.4 ); }
+        .ab-slot-count { border-color: rgba( 255, 255, 255, 0.16 ); }
+
+        .ab-plus
+        {
+            border-color: rgba( 255, 255, 255, 0.2 );
+
+            i { color: rgba( 255, 255, 255, 0.4 ); }
+        }
+
+        &:hover .ab-plus { background-color: transparent; }
+    }
+
+    .ab-part
+    {
+        font-size: 17px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        color: $text-mid;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .ab-desc
+    {
+        font-size: 12px;
+        font-weight: 500;
+        color: $text-dim;
+    }
+
+    .ab-state
+    {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        color: $accent;
+    }
+
+    .ab-plus
+    {
+        width: 44px;
+        height: 44px;
+        flex-shrink: 0;
+        margin-right: 12px;
+        align-items: center;
+        justify-content: center;
+        border: 1.5px solid $accent;
+        transition: background-color 0.15s ease;
+
+        i { font-size: 24px; color: $accent; }
+    }
+
+    .ab-option.equipped .ab-plus
+    {
+        background-color: $accent;
+
+        i { color: $accent-ink; }
+    }
+
+    .ab-option.locked
+    {
+        cursor: default;
+
+        .ab-part { color: rgba( 255, 255, 255, 0.45 ); }
+        .ab-state { color: rgba( 255, 255, 255, 0.55 ); }
+
+        .ab-plus
+        {
+            border-color: rgba( 255, 255, 255, 0.2 );
+
+            i { color: rgba( 255, 255, 255, 0.4 ); }
+        }
+
+        &:hover .ab-plus { background-color: transparent; }
+
+        // With a point to spend it can be bought: a click asks, a second spends.
+        &.buyable
+        {
+            cursor: pointer;
+
+            .ab-plus { border-color: rgba( 255, 122, 26, 0.55 ); i { color: $accent; } }
+            &:hover .ab-plus { background-color: rgba( 255, 122, 26, 0.16 ); }
+        }
+
+        &.armed
+        {
+            border-left-color: $accent;
+            background-color: rgba( 255, 122, 26, 0.1 );
+
+            .ab-state { color: $accent; }
+            .ab-plus { background-color: $accent; border-color: $accent; i { color: $accent-ink; } }
+            &:hover .ab-plus { background-color: $accent; }
+        }
+    }
+
+    .ab-empty
+    {
+        padding: 16px 4px;
+        font-size: 14px;
+        color: $text-dim;
+    }
+
+    .ab-hint
+    {
+        flex-shrink: 0;
+        padding: 10px 16px 12px 16px;
+        border-top: 1px solid $line;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 2.5px;
+        color: rgba( 255, 255, 255, 0.38 );
+        text-align: center;
+    }
 }
-
-GunsmithPanel.compact GunsmithAttachmentBrowser
-{
-    right: 16px;
-    width: 360px;
-    padding: 14px;
-    .slot-part, .option-name { font-size: 19px; }
-}
-
-GunsmithPanel.narrow GunsmithAttachmentBrowser
-{
-    width: 300px;
-    .attachment-slot, .attachment-option { padding: 0 12px; }
-    .slot-count, .drawer-hint { display: none; }
-    .slot-part, .option-name { font-size: 18px; }
-}
-
-GunsmithPanel.portrait GunsmithAttachmentBrowser { width: 260px; }

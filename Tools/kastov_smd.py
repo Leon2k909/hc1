@@ -48,6 +48,11 @@ def orthonormalize(rot: np.ndarray) -> np.ndarray:
     return fixed
 
 
+# Bone names read under another name (Weapon.bone_renames, set by port_kastov.Kastov): a pistol rig's gun root is
+# tag_pistol_offset, which the pipeline knows as the rifles' tag_sling.
+BONE_RENAMES: dict[str, str] = {}
+
+
 class Smd:
     """A parsed SMD: nodes, skeleton frames (sparse per frame) and triangles."""
 
@@ -76,7 +81,8 @@ class Smd:
                     node = int(text[:start])
                     while len(self.nodes) <= node:
                         self.nodes.append(("", -1))
-                    self.nodes[node] = (text[start + 1:end], int(text[end + 1:]))
+                    name = text[start + 1:end]
+                    self.nodes[node] = (BONE_RENAMES.get(name, name), int(text[end + 1:]))
                 index += 1
             elif line == "skeleton":
                 current = None

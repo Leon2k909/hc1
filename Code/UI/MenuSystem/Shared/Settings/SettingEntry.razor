@@ -14,10 +14,33 @@
 <root class="border-bottom">
     @if ( Description is not null )
     {
-        @if ( Description.PropertyType == typeof( float ) || Description.PropertyType == typeof( int ) )
+        @if ( Description.PropertyType == typeof( GameLanguage ) )
+        {
+            <div class="with-padding grow language-setting">
+                <div class="setting-text">
+                    <label class="name">@LanguageTitle</label>
+                    <label class="setting-hint">@Tr( "Language changes apply immediately and are saved automatically." )</label>
+                </div>
+                <div class="grow" />
+                <LanguagePicker />
+            </div>
+        }
+        else if ( Description.PropertyType == typeof( VoiceChatMode ) )
+        {
+            <div class="with-padding choice-setting">
+                <label class="name">@SettingTitle</label>
+                <div class="choice-options">
+                    @foreach ( var mode in Enum.GetValues<VoiceChatMode>() )
+                    {
+                        <button class="choice-option @(Equals( Value, mode ) ? "selected" : "")" onclick=@(() => Value = mode)><label>@Tr( VoiceModeTitle( mode ) )</label></button>
+                    }
+                </div>
+            </div>
+        }
+        else if ( Description.PropertyType == typeof( float ) || Description.PropertyType == typeof( int ) )
         {
             <div class="with-padding">
-                <label class="name">@Description.Title</label>
+                <label class="name">@SettingTitle</label>
                 <div class="grow" />
             </div>
 
@@ -32,34 +55,35 @@
                 }
             </div>
         }
+        else if ( Description.PropertyType == typeof( bool ) && Choices is not null )
+        {
+            <div class="with-padding grow switch-setting">
+                <label class="name">@SettingTitle</label>
+                <div class="grow" />
+                <div class="switch">
+                    <div class="switch-option @(Equals( Value, false ) ? "selected" : "")" onclick=@(() => Value = false)><label>@Tr( Choices.WhenFalse )</label></div>
+                    <div class="switch-option @(Equals( Value, true ) ? "selected" : "")" onclick=@(() => Value = true)><label>@Tr( Choices.WhenTrue )</label></div>
+                </div>
+            </div>
+        }
         else if ( Description.PropertyType == typeof( bool ) )
         {
             <div class="with-padding border-bottom grow">
-                <label class="name">@Description.Title</label>
+                <label class="name">@SettingTitle</label>
                 <div class="grow" />
                 <Checkbox Value:bind=@Value />
             </div>
         }
-        else if ( Description.PropertyType == typeof( Color ) ) 
+        else if ( Description.PropertyType == typeof( Color ) )
         {
             <div class="with-padding border-bottom">
-                <label class="name" style="min-width: 64px;">@Description.Title</label>
+                <label class="name" style="min-width: 64px;">@SettingTitle</label>
             </div>
 
             <div class="control layout column">
                 <ColorPicker Value:bind="@Value" />
             </div>
         }
-    }
-    else
-    {
-        <div class="with-padding border-bottom">
-            <label class="name">@Description.Title</label>
-            <div class="grow" />
-            <div class="value-area">@Value</div>
-        </div>
-
-        <label class="name">Unsupported</label>
     }
 </root>
 
@@ -79,4 +103,30 @@
     public PropertyDescription Description { get; set; }
 
     public RangeAttribute Range => Description.GetCustomAttribute<RangeAttribute>();
+    public ChoicesAttribute Choices => Description.GetCustomAttribute<ChoicesAttribute>();
+
+    // Other languages look these up by a fuller name: "Master" alone is also the top rank, which they name differently,
+    // and the abbreviations aren't theirs.
+    private static readonly Dictionary<string, string> FullTitles = new()
+    {
+        ["Master"] = "Master volume",
+        ["SFX"] = "Sound effects",
+        ["UI"] = "Interface sounds",
+    };
+
+    private string SettingTitle => !GameText.IsEnglish && FullTitles.TryGetValue( Description.Title, out var full )
+        ? Tr( full ) : Tr( Description.Title );
+
+    // The English name stays beside the translation, so the setting can be found in a language you can't read.
+    private static string LanguageTitle => GameText.IsEnglish ? Tr( "Language" ) : $"{Tr( "Language" )} / Language";
+
+    private static string VoiceModeTitle( VoiceChatMode mode ) => mode switch
+    {
+        VoiceChatMode.Global => "Global (Whole Lobby)",
+        VoiceChatMode.TeamOnly => "Team Only",
+        VoiceChatMode.PartyOnly => "Party Only",
+        _ => "Auto (GameMode Default)"
+    };
+
+    protected override int BuildHash() => HashCode.Combine( Description, Description?.GetValue( Target ), GameText.Current );
 }

@@ -16,13 +16,13 @@
 
             <div class="row">
                 <InputHint Action="@($"Slot{i + 1}")" Size=@InputGlyphSize.Small />
-                <label>@sounds.TeamSounds[i].Category</label>
+                <label>@Tr( sounds.TeamSounds[i].Category )</label>
             </div>
         }
 
         <div class="row">
             <InputHint Action="Radio" Size=@InputGlyphSize.Small />
-            <label>Close</label>
+            <label>@Tr( "Close" )</label>
         </div>
     }
     else
@@ -32,13 +32,13 @@
         {
             <div class="row">
                 <InputHint Action="@($"Slot{i + 1}")" Size=@InputGlyphSize.Small />
-                <label>@CurrentCategory.Entries[i].Name</label>
+                <label>@Tr( CurrentCategory.Entries[i].Name )</label>
             </div>
         }
 
         <div class="row">
             <InputHint Action="Radio" Size=@InputGlyphSize.Small />
-            <label>Back</label>
+            <label>@Tr( "Back" )</label>
         </div>
     }
 </root>

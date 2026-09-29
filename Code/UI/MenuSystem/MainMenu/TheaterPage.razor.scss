@@ -1,124 +1,263 @@
-@import "/UI/Styles/Theme.scss";
+@import "/UI/Styles/MenuPage.scss";
+
+// Laid out like SESSIONS (LobbyList + ServerBrowser): a heading, the list beside a details panel, then the footer.
+$th-accent: $menu-accent;
+$th-warn: #ff6a5a;
 
 TheaterPage
 {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    display: flex;
-    flex-direction: column;
-    font-family: Inter, sans-serif;
-}
+    @include menu-page;
 
-.theater-content {
-    padding: 30px 80px;
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-    flex-grow: 1;
-}
-
-.movie-list
-{
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-height: 0;
-    gap: 12px;
-    overflow-y: scroll;
-    height: 100%;
-    padding-right: 20px;
-}
-
-.movie-card
-{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    background-color: rgba( 255, 255, 255, 0.05 );
-    border-radius: 8px;
-    padding: 20px 24px;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: 1px solid rgba( 255, 255, 255, 0.05 );
-
-    &:hover
+    .th-body
     {
-        background-color: rgba( 255, 255, 255, 0.1 );
-        transform: scale( 1.01 );
-        border-color: rgba( 255, 255, 255, 0.2 );
-        box-shadow: 0 4px 20px rgba( 0, 0, 0, 0.5 );
+        flex-grow: 1;
+        flex-direction: column;
+        min-height: 0;
+        gap: 24px;
+        padding: 32px 48px;
     }
 
-    .movie-info
+    .th-footer { @include menu-footer; }
+    .th-action { @include menu-action; }
+
+    .th-head
     {
-        flex: 1;
-        display: flex;
+        flex-direction: row;
+        align-items: center;
+        flex-shrink: 0;
+        gap: 14px;
+    }
+
+    .th-accent
+    {
+        width: 3px;
+        height: 28px;
+        background-color: $th-accent;
+    }
+
+    .th-heading
+    {
+        font-size: 32px;
+        font-weight: 700;
+        letter-spacing: 3px;
+    }
+
+    .th-head-fill { flex-grow: 1; }
+
+    .th-off
+    {
+        padding: 4px 10px;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: $th-warn;
+        background-color: rgba( 255, 106, 90, 0.14 );
+    }
+
+    .th-count
+    {
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: rgba( white, 0.55 );
+    }
+
+    .th-panels
+    {
+        flex-grow: 1;
+        flex-direction: row;
+        min-height: 0;
+        gap: 24px;
+    }
+
+    .th-list, .th-detail
+    {
         flex-direction: column;
-        gap: 6px;
+        @include menu-panel;
+    }
 
-        .movie-name
+    .th-list
+    {
+        flex-grow: 1;
+        min-width: 0;
+    }
+
+    .th-detail
+    {
+        width: 360px;
+        flex-shrink: 0;
+    }
+
+    .th-panel-head
+    {
+        flex-direction: row;
+        align-items: center;
+        flex-shrink: 0;
+        gap: 16px;
+        height: 52px;
+        // Rows are 20px padding + a 4px accent border, so the column labels line up with the row text.
+        padding: 0 20px 0 24px;
+        border-bottom: 1px solid rgba( white, 0.1 );
+
+        label
         {
-            font-size: 24px;
-            font-weight: 800;
-            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            color: rgba( white, 0.5 );
         }
+    }
 
-        .movie-date
+    .th-col-map { flex-grow: 1; min-width: 0; }
+    .th-col-mode { width: 220px; flex-shrink: 0; }
+    .th-col-date { width: 170px; flex-shrink: 0; }
+    .th-col-length { width: 80px; flex-shrink: 0; text-align: right; }
+
+    .th-rows
+    {
+        flex-grow: 1;
+        flex-direction: column;
+        min-height: 0;
+        overflow-y: scroll;
+    }
+
+    .th-row
+    {
+        flex-direction: row;
+        align-items: center;
+        flex-shrink: 0;
+        gap: 16px;
+        height: 54px;
+        padding: 0 20px;
+        border-left: 4px solid transparent;
+        border-bottom: 1px solid rgba( white, 0.05 );
+        cursor: pointer;
+        transition: all 0.1s ease;
+
+        label
         {
             font-size: 16px;
-            color: rgba( 255, 255, 255, 0.6 );
+            font-weight: 700;
+            color: rgba( white, 0.65 );
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .th-col-map
+        {
+            font-size: 17px;
+            color: rgba( white, 0.85 );
+            text-transform: uppercase;
+        }
+
+        &:hover
+        {
+            border-left-color: rgba( 255, 122, 26, 0.5 );
+            background: linear-gradient( to right, rgba( 255, 122, 26, 0.12 ), rgba( 255, 122, 26, 0 ) );
+            sound-in: ui_button_hover;
+
+            label { color: white; }
+        }
+
+        &.selected
+        {
+            border-left-color: $th-accent;
+            background: linear-gradient( to right, rgba( 255, 122, 26, 0.24 ), rgba( 255, 122, 26, 0 ) );
+
+            label { color: white; }
         }
     }
 
-    .movie-play, .movie-delete
+    .th-state
     {
-        display: flex;
+        flex-grow: 1;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
-        width: 60px;
-        height: 60px;
-        background-color: rgba( 255, 255, 255, 0.1 );
-        border-radius: 50%;
-        margin-left: 10px;
-        transition: all 0.2s;
-        
-        > i
+        gap: 10px;
+        padding: 32px;
+
+        i { font-size: 56px; color: rgba( white, 0.18 ); }
+
+        .th-state-text
         {
-            font-family: Material Icons;
-            font-size: 32px;
-            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            color: rgba( white, 0.55 );
+            text-align: center;
         }
     }
 
-    .movie-play:hover
+    .th-detail-body
     {
-        background-color: white;
-        > i { color: black; }
+        flex-direction: column;
+        gap: 12px;
+        padding: 24px;
     }
 
-    .movie-delete:hover
+    .th-detail-name
     {
-        background-color: rgba( 220, 80, 80, 0.8 );
-        > i { color: white; }
+        font-size: 28px;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    .th-stat
+    {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        height: 48px;
+        padding: 0 16px;
+        background-color: #08090b;
+    }
+
+    .th-stat-key
+    {
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: rgba( white, 0.55 );
+    }
+
+    .th-stat-value
+    {
+        font-size: 18px;
+        font-weight: 700;
+        text-align: right;
+    }
+
+    .th-note
+    {
+        margin-top: 8px;
+        font-size: 14px;
+        color: rgba( white, 0.45 );
     }
 }
 
-.empty-state
+.main-menu-root.compact TheaterPage
 {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    
-    > label
-    {
-        font-size: 24px;
-        color: rgba(255,255,255,0.4);
-        font-weight: bold;
-    }
+    .th-body { padding: 24px 32px; }
+    .th-footer { padding: 16px 32px 24px; }
+    .th-detail { width: 320px; }
+    .th-col-mode { width: 180px; }
 }
+
+.main-menu-root.narrow TheaterPage
+{
+    .th-body { padding: 20px 24px; }
+    .th-footer { padding: 14px 24px; flex-wrap: wrap; }
+    .th-panels { flex-direction: column; overflow-y: scroll; }
+    .th-list { min-height: 240px; }
+    .th-detail { width: 100%; flex-shrink: 0; }
+    .th-detail.empty { display: none; }
+    .th-col-date { display: none; }
+}
+
+.main-menu-root.portrait TheaterPage MenuTopbar { padding: 0 24px; }

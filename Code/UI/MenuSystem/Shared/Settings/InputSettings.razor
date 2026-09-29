@@ -2,27 +2,144 @@
 
 @inherits Panel
 @namespace Facepunch.UI
+@attribute [StyleSheet]
 
 <root class="input-settings">
     <div class="with-padding border-bottom grow">
-        <label class="name">AIM INPUT</label>
+        <label class="name">@Tr( "AIM INPUT" )</label>
         <div class="grow" />
         <button class="button standard smaller no-anim extra-x-padding @(GameSettingsSystem.Current.ToggleAim ? "selected" : "")" onclick=@ToggleAimSetting>
-            @(GameSettingsSystem.Current.ToggleAim ? "TOGGLE" : "HOLD")
+            @Tr( GameSettingsSystem.Current.ToggleAim ? "TOGGLE" : "HOLD" )
         </button>
     </div>
 
     <div class="with-padding border-bottom grow">
-        <label class="name">SPRINT INPUT</label>
+        <label class="name">@Tr( "SPRINT INPUT" )</label>
         <div class="grow" />
         <button class="button standard smaller no-anim extra-x-padding @(GameSettingsSystem.Current.ToggleSprint ? "selected" : "")" onclick=@ToggleSprintSetting>
-            @(GameSettingsSystem.Current.ToggleSprint ? "TOGGLE" : "HOLD")
+            @Tr( GameSettingsSystem.Current.ToggleSprint ? "TOGGLE" : "HOLD" )
         </button>
     </div>
+
+    <div class="kb-head">
+        <div class="kb-head-text">
+            <label class="kb-title">@Tr( "KEYBINDS" )</label>
+            <label class="kb-hint">@Tr( "Click any key to change it" )</label>
+        </div>
+        <div class="grow" />
+        <div class="kb-edit" onclick=@EditBinds><i>keyboard</i><label>@Tr( "Change Keybinds" )</label></div>
+    </div>
+
+    @foreach ( var group in Groups() )
+    {
+        <label class="kb-group">@Tr( group.Key )</label>
+        @foreach ( var action in group )
+        {
+            <div class="kb-row" onclick=@EditBinds>
+                <label class="kb-name">@Tr( ActionTitle( action ) )</label>
+                <div class="grow" />
+                <div class="kb-keys">
+                    @{ var keys = Keys( action ).ToList(); }
+                    @if ( keys.Count == 0 )
+                    {
+                        <label class="kb-unbound">@Tr( "Not bound" )</label>
+                    }
+                    @for ( var i = 0; i < keys.Count; i++ )
+                    {
+                        var glyph = Input.Keyboard.GetGlyph( keys[i], InputGlyphSize.Small, false );
+                        @if ( glyph is not null )
+                        {
+                            <Image class="kb-glyph" Texture=@glyph />
+                        }
+                        else
+                        {
+                            <label class="kb-key">@keys[i].ToUpperInvariant()</label>
+                        }
+                        @if ( i < keys.Count - 1 )
+                        {
+                            <label class="kb-plus">+</label>
+                        }
+                    }
+                </div>
+            </div>
+        }
+    }
 </root>
 
 @code
 {
+    // s&box doesn't let game code change binds (only its own bind editor can), so the list shows every action's current
+    // key and any row opens that editor.
+    private static readonly string[] GroupOrder = { "Movement", "Weapon Handling", "Inventory", "Team", "Other", "Spectator" };
+
+    // Players never use these.
+    private static readonly HashSet<string> HiddenGroups = new( StringComparer.OrdinalIgnoreCase ) { "Development" };
+
+    private static readonly Dictionary<string, string> Titles = new( StringComparer.OrdinalIgnoreCase )
+    {
+        ["Forward"] = "Move Forward",
+        ["Backward"] = "Move Back",
+        ["Left"] = "Move Left",
+        ["Right"] = "Move Right",
+        ["Run"] = "Sprint",
+        ["Walk"] = "Walk Slowly",
+        ["Duck"] = "Crouch",
+        ["attack1"] = "Fire",
+        ["attack2"] = "Aim Down Sights",
+        ["reload"] = "Reload",
+        ["FireMode"] = "Fire Mode",
+        ["Slot1"] = "Primary Weapon",
+        ["Slot2"] = "Pistol",
+        ["Slot3"] = "Melee",
+        ["Slot4"] = "Grenades",
+        ["Slot5"] = "Special",
+        ["Slot6"] = "Tactical",
+        ["Slot7"] = "Lethal",
+        ["PrevSlot"] = "Previous Weapon",
+        ["NextSlot"] = "Next Weapon",
+        ["ChooseClass"] = "Choose Class",
+        ["Use"] = "Interact",
+        ["Drop"] = "Drop Weapon",
+        ["Score"] = "Scoreboard",
+        ["Voice"] = "Push to Talk",
+        ["Radio"] = "Radio Callouts",
+        ["Ping"] = "Ping",
+        ["Scorestreak"] = "Streak Reward",
+        ["SpectatorNext"] = "Next Player",
+        ["SpectatorPrev"] = "Previous Player",
+        ["SpectatorFreeCam"] = "Free Camera",
+        ["SpectatorMode"] = "Change View",
+    };
+
+    private static IEnumerable<IGrouping<string, InputAction>> Groups() => Input.GetActions()
+        .Where( x => !string.IsNullOrEmpty( x.Name ) && !HiddenGroups.Contains( x.GroupName ?? "" ) )
+        .DistinctBy( x => x.Name, StringComparer.OrdinalIgnoreCase )
+        .GroupBy( x => string.IsNullOrEmpty( x.GroupName ) ? "Other" : x.GroupName )
+        .OrderBy( g => GroupRank( g.Key ) );
+
+    private static int GroupRank( string group )
+    {
+        var index = Array.IndexOf( GroupOrder, group );
+        return index >= 0 ? index : GroupOrder.Length;
+    }
+
+    private static string ActionTitle( InputAction action )
+    {
+        if ( Titles.TryGetValue( action.Name, out var title ) ) return title;
+        return string.IsNullOrEmpty( action.Title ) ? action.Name : action.Title;
+    }
+
+    /// <summary>The keys bound to the action; a chord like "shift + w" comes back as several.</summary>
+    private static IEnumerable<string> Keys( InputAction action )
+    {
+        var bind = Input.GetButtonOrigin( action.Name, true );
+        if ( string.IsNullOrWhiteSpace( bind ) ) yield break;
+        foreach ( var key in bind.Split( '+', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries ) )
+            yield return key;
+    }
+
+    private void EditBinds() => Game.Overlay.ShowBinds();
+
     private void ToggleAimSetting()
     {
         GameSettingsSystem.Current.ToggleAim = !GameSettingsSystem.Current.ToggleAim;
@@ -35,5 +152,16 @@
         GameSettingsSystem.Current.ToggleSprint = !GameSettingsSystem.Current.ToggleSprint;
         GameSettingsSystem.Save();
         StateHasChanged();
+    }
+
+    // Rebuild when a bind changes in the bind editor.
+    protected override int BuildHash()
+    {
+        var hash = new HashCode();
+        hash.Add( GameSettingsSystem.Current.ToggleAim );
+        hash.Add( GameSettingsSystem.Current.ToggleSprint );
+        foreach ( var action in Input.GetActions() )
+            hash.Add( Input.GetButtonOrigin( action.Name, true ) );
+        return hash.ToHashCode();
     }
 }

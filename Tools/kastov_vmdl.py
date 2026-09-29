@@ -2,13 +2,16 @@
 """Write a Kastov's ModelDoc files (v_<model>.vmdl, w_<model>.vmdl) for the DMX files port_kastov.py exports.
 
 The viewmodel's additive layers (ads_delta, walk_delta, zero_delta) are the full-pose clips minus idle's first
-frame, which the animgraph adds on top of its state machine.
+frame, which the animgraph adds on top of its state machine. So are the look sway's poses (kastov_sway.py), each a
+single frame of sway.dmx. The viewmodel also gets the M4's arm IK chains, which the animgraph solves onto the hands'
+IK targets.
 
-Run: python Tools/kastov_vmdl.py [--weapon kastov762|kastov74u|vityaz|rpk]
+Run: python Tools/kastov_vmdl.py [--weapon kastov762|kastov74u|vityaz|rpk|bizon|ak105|vepr12|m16|p90|mp7|aug|uzi|fal|m18]
 """
 
 from __future__ import annotations
 
+import kastov_sway
 import kastov_weapons
 from kastov_weapons import Weapon
 
@@ -32,8 +35,15 @@ ANIMATIONS = [
 ]
 # The pieces port_kastov.py writes separately (Weapon.optional_meshes), each its own bodygroup: name -> shown by
 # default. The gunsmith switches them per slot (GunsmithAttachmentPoint.FittedBodygroups in kastov_prefabs.py). A gun
-# gets bodygroups only for the pieces it has.
-BODY_GROUPS = {"muzzle_tip": True, "optic_rail": False, "grip_rail": False, "laser_rail": False}
+# gets bodygroups only for the pieces it has. The AK-105's folding stock hinge gives way to the fixed wooden stocks.
+# The M16's carry handle (with its rear sight) comes off under an optic, like the real flat-top's, and its bottom
+# rail's cover under a grip. The P90's iron sights come off the top rail for an optic. The FAL's rear sight folds
+# down under an optic (iron_sights off, sight_folded on).
+BODY_GROUPS = {"muzzle_tip": True, "optic_rail": False, "grip_rail": False, "laser_rail": False, "stock_hinge": True,
+               "carry_handle": True, "grip_cover": True, "iron_sights": True, "sight_folded": False,
+               "stock_adapter": False,
+               "factory_barrel": True, "factory_handguard": True, "factory_front_sight": True,
+               "factory_stock": True, "factory_grip": True}
 # name, bone
 ATTACHMENTS = [("muzzle", "muzzle"), ("eject", "tag_brass")]
 
@@ -124,7 +134,9 @@ def body_groups(weapon: Weapon, prefix: str) -> str:
             tips = [(tip, f"{mesh}_{tip}") for tip in weapon.tip_choices]
             groups.append(body_group(name, [("on", mesh), *tips, ("off", "")]))
         else:
-            groups.append(body_group(name, [("on", mesh), ("off", "")] if shown else [("off", ""), ("on", mesh)]))
+            variants = [(choice, f"{mesh}_{choice}" if path else "") for choice, path, _ in weapon.optional_variants.get(name, [])]
+            groups.append(body_group(name, [("on", mesh), *variants, ("off", "")] if shown
+                                     else [("off", ""), ("on", mesh), *variants]))
     for group, choices in weapon.part_choices.items():
         groups.append(body_group(group, [(choice, f"{prefix}_{group}_{choice}") for choice, _ in choices]))
     return list_node("BodyGroupList", groups)
@@ -133,12 +145,15 @@ def body_groups(weapon: Weapon, prefix: str) -> str:
 def mesh_files(weapon: Weapon, prefix: str) -> list[tuple[str, str]]:
     pieces = [name for name in BODY_GROUPS if name in weapon.optional_meshes]
     pieces += [f"muzzle_tip_{tip}" for tip in weapon.tip_choices]
+    pieces += [f"{group}_{choice}" for group, choices in weapon.optional_variants.items() for choice, path, _ in choices if path]
     pieces += [f"{group}_{choice}" for group, choices in weapon.part_choices.items() for choice, _ in choices]
     return [(prefix, f"{weapon.asset}/models/{prefix}.dmx")] + [
         (f"{prefix}_{name}", f"{weapon.asset}/models/{prefix}_{name}.dmx") for name in pieces]
 
 
-def anim_file(weapon: Weapon, name: str, clip: str, looping: bool, subtract: str | None) -> str:
+def anim_file(weapon: Weapon, name: str, clip: str, looping: bool, subtract: str | None,
+              frame: int | None = None) -> str:
+    """One AnimFile: the whole clip, or only its given frame."""
     children = ""
     if subtract is not None:
         children = (
@@ -169,8 +184,8 @@ def anim_file(weapon: Weapon, name: str, clip: str, looping: bool, subtract: str
         "\tdisable_interpolation = false\n"
         "\tenable_scale = false\n"
         f'\tsource_filename = "{weapon.asset}/models/anims/{clip}.dmx"\n'
-        "\tstart_frame = -1\n"
-        "\tend_frame = -1\n"
+        f"\tstart_frame = {-1 if frame is None else frame}\n"
+        f"\tend_frame = {-1 if frame is None else frame}\n"
         "\tframerate = -1.0\n"
         "\ttake = 0\n"
         "\treverse = false\n"
@@ -188,6 +203,59 @@ def attachment(name: str, bone: str) -> str:
         "\tweight = 1.0\n"
         "\tignore_rotation = false\n"
         "},")
+
+
+def ik_data() -> str:
+    """kastov_sway.IK_CHAINS as ModelDoc IK chains, written as Facepunch's citizen_ikdata.vmdl_prefab writes them."""
+    chains = []
+    for name, (upper, lower, hand), target in kastov_sway.IK_CHAINS:
+        chains.append(
+            "{\n"
+            '\t_class = "IKChain"\n'
+            f'\tname = "{name}"\n'
+            "\tchildren = \n"
+            "\t[\n"
+            "\t\t{\n"
+            '\t\t\t_class = "IKChainJoint"\n'
+            f'\t\t\tname = "{upper}"\n'
+            "\t\t\tchildren = \n"
+            "\t\t\t[\n"
+            "\t\t\t\t{\n"
+            '\t\t\t\t\t_class = "IKChainJoint"\n'
+            f'\t\t\t\t\tname = "{lower}1"\n'
+            "\t\t\t\t\tchildren = \n"
+            "\t\t\t\t\t[\n"
+            "\t\t\t\t\t\t{\n"
+            '\t\t\t\t\t\t\t_class = "IKChainJoint"\n'
+            f'\t\t\t\t\t\t\tname = "{hand}1"\n'
+            f'\t\t\t\t\t\t\tbone = "{hand}"\n'
+            "\t\t\t\t\t\t},\n"
+            "\t\t\t\t\t]\n"
+            f'\t\t\t\t\tbone = "{lower}"\n'
+            "\t\t\t\t},\n"
+            "\t\t\t]\n"
+            f'\t\t\tbone = "{upper}"\n'
+            "\t\t},\n"
+            "\t]\n"
+            "\tm_bDoBonesOrientAlongPositiveX = true\n"
+            '\t"m_DefaultSolverSettings.m_nNumIterations" = 6\n'
+            '\t"m_DefaultSolverSettings.m_SolverType" = "IKSOLVER_TwoBone"\n'
+            '\t"m_DefaultTargetSettings.m_Bone" = \n'
+            "\t{\n"
+            f'\t\tm_Name = "{target}"\n'
+            "\t}\n"
+            '\t"m_DefaultTargetSettings.m_TargetSource" = "Bone"\n'
+            '\t"m_Data.m_DefaultTargetSettings.m_AnimgraphParameterNamePosition" = \n'
+            "\t{\n"
+            "\t\tm_id = 4294967295\n"
+            "\t}\n"
+            '\t"m_Data.m_EndEffectorFixedOffsetAttachment" = \n'
+            "\t{\n"
+            '\t\tm_Name = ""\n'
+            "\t}\n"
+            '\t"m_Data.m_bParentJointRequiresAlignment" = true\n'
+            "},")
+    return list_node("IKData", chains)
 
 
 def list_node(kind: str, items: list[str], extra: str = "") -> str:
@@ -223,12 +291,25 @@ def model(nodes: list[str], graph: str = "") -> str:
         "}\n")
 
 
-def animations(weapon: Weapon) -> list[tuple[str, str, bool, str | None]]:
-    """ANIMATIONS plus the reloads of Weapon.reload_variants (the RPK's box magazines), after the factory reloads."""
+def animations(weapon: Weapon) -> list[tuple]:
+    """ANIMATIONS plus Weapon.ads_fire's fire_ads after fire (and Weapon.slide_lock's clips), the reloads of Weapon.reload_variants (the RPK's box
+    magazines) after the factory reloads, and last the look sway's: sway.dmx's frame 0 as kastov_sway.REST, then a
+    pose per frame, each minus idle's first frame (anim_file's frame)."""
+    names = [name for name, *_ in ANIMATIONS]
+    fire = [("fire_ads", "fire_ads", False, None)] if weapon.ads_fire else []
+    if weapon.slide_lock:
+        # The last round's fire clips, with the slide held back, and the slide lock on its own (empty minus idle's
+        # first frame), which the animgraph adds on while b_empty is set.
+        fire += [("fire_empty", "fire_empty", False, None)]
+        fire += [("fire_ads_empty", "fire_ads_empty", False, None)] if weapon.ads_fire else []
+        fire += [("empty_delta", "empty", True, "idle"), ("slide_home", "idle", True, "idle", 0)]
     variants = [(f"{clip}{suffix}", f"{clip}{suffix}", False, None)
                 for suffix in weapon.reload_variants for clip in ("reload", "reload_empty")]
-    at = [name for name, *_ in ANIMATIONS].index("reload_empty") + 1
-    return ANIMATIONS[:at] + variants + ANIMATIONS[at:]
+    after_fire, after_reloads = names.index("fire") + 1, names.index("reload_empty") + 1
+    sway = [(kastov_sway.REST, "sway", True, "idle", 0)] + [
+        (name, "sway", True, "idle", frame) for frame, (name, _, _) in enumerate(kastov_sway.poses(), 1)]
+    return (ANIMATIONS[:after_fire] + fire + ANIMATIONS[after_fire:after_reloads] + variants
+            + ANIMATIONS[after_reloads:] + sway)
 
 
 def main() -> None:
@@ -244,6 +325,7 @@ def main() -> None:
         list_node("AnimationList", [anim_file(weapon, *animation) for animation in animations(weapon)],
                   '\tdefault_root_bone_name = ""\n'),
         list_node("AttachmentList", [attachment(*item) for item in ATTACHMENTS]),
+        ik_data(),
     ], f"{weapon.asset}/{v_name}.vanmgrph")
     (weapon.folder / f"{v_name}.vmdl").write_text(viewmodel, encoding="utf-8", newline="\n")
 

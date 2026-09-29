@@ -1,292 +1,58 @@
-@import "../../styles/colors.scss";
-$accent: #FF7A1A;
+@import "/UI/Styles/MenuPage.scss";
 
-.store-page {
-	width: 100%;
-	height: 100%;
-	display: flex;
-	flex-direction: column;
-	font-family: 'Poppins', sans-serif;
-	color: white;
+StorePage
+{
+    @include menu-page;
 
-	.topbar {
-		position: absolute;
-		top: 48px;
-		left: 0;
-		right: 0;
-		height: 64px;
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		padding: 0 48px;
-		gap: 32px;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-
-		.brand {
-			display: flex;
-			flex-direction: row;
-			align-items: center;
-			gap: 12px;
-			margin-right: 24px;
-
-			.brand-logo {
-				width: 32px;
-				height: 32px;
-				border-radius: 4px;
-			}
-
-			.brand-text {
-				display: flex;
-				flex-direction: column;
-				gap: -2px;
-
-				.brand-name {
-					font-weight: 800;
-					font-size: 18px;
-					letter-spacing: 2px;
-				}
-
-				.brand-sub {
-					font-weight: 600;
-					font-size: 10px;
-					color: rgba(255, 255, 255, 0.5);
-					letter-spacing: 1px;
-				}
-			}
-		}
-
-		.nav-tabs {
-			display: flex;
-			flex-direction: row;
-			flex-grow: 1;
-			gap: 16px;
-
-			.nav-tab {
-				display: flex;
-				flex-direction: row;
-				align-items: center;
-				gap: 8px;
-				padding: 8px 16px;
-				border-radius: 6px;
-				color: rgba(255, 255, 255, 0.6);
-				font-weight: 600;
-				font-size: 14px;
-				cursor: pointer;
-				transition: all 0.2s ease;
-				pointer-events: all;
-
-				i {
-					font-size: 20px;
-				}
-
-				&:hover {
-					color: white;
-					background-color: rgba(255, 255, 255, 0.05);
-				}
-
-				&.active {
-					color: white;
-					background-color: rgba(255, 255, 255, 0.1);
-				}
-			}
-		}
-
-		.profile {
-			display: flex;
-			flex-direction: row;
-			align-items: center;
-			gap: 16px;
-			pointer-events: all;
-
-			.currency-chip {
-				display: flex;
-				flex-direction: row;
-				align-items: center;
-				gap: 6px;
-				padding: 6px 16px;
-				background-color: rgba(0, 0, 0, 0.4);
-				border: 1px solid rgba(255, 152, 0, 0.3);
-				border-radius: 6px;
-				margin-right: 16px;
-			}
-
-			.profile-chip {
-				display: flex;
-				flex-direction: row;
-				align-items: center;
-				gap: 12px;
-				padding: 6px;
-				padding-left: 16px;
-				background-color: rgba(0, 0, 0, 0.4);
-				border: 1px solid rgba(255, 255, 255, 0.05);
-				border-radius: 32px;
-				cursor: pointer;
-
-				&:hover {
-					background-color: rgba(0, 0, 0, 0.6);
-					border-color: rgba(255, 255, 255, 0.1);
-				}
-
-				.profile-info {
-					display: flex;
-					flex-direction: column;
-					align-items: flex-end;
-
-					.profile-name {
-						font-weight: bold;
-						font-size: 14px;
-					}
-
-					.profile-level {
-						font-size: 10px;
-						color: $accent;
-						font-weight: 800;
-					}
-				}
-
-				.profile-avatar {
-					width: 32px;
-					height: 32px;
-					border-radius: 50%;
-					overflow: hidden;
-					background-color: rgba(255, 255, 255, 0.1);
-					display: flex;
-					align-items: center;
-					justify-content: center;
-
-					img {
-						width: 100%;
-						height: 100%;
-					}
-				}
-			}
-		}
-	}
-
-	.store-content {
-		position: absolute;
-		top: 140px;
-		left: 48px;
-		right: 48px;
-		bottom: 48px;
-		display: flex;
-		flex-direction: column;
-		gap: 32px;
-		pointer-events: all;
-
-		.store-header {
-			display: flex;
-			flex-direction: column;
-			gap: 8px;
-
-			.store-title {
-				font-size: 48px;
-				font-weight: 800;
-				letter-spacing: 2px;
-				text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-			}
-
-			.store-sub {
-				font-size: 20px;
-				color: rgba(255, 255, 255, 0.75);
-			}
-            
-            .debug-btn {
-                margin-top: 12px;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                gap: 8px;
-                padding: 10px 18px;
-                background-color: rgba(76, 175, 80, 0.2);
-                border: 1px solid rgba(76, 175, 80, 0.5);
-                border-radius: 6px;
-                align-self: flex-start;
-                white-space: nowrap;
-                cursor: pointer;
-                color: #81c784;
-                font-size: 16px;
-                font-weight: bold;
-                transition: all 0.2s ease;
-
-                i { font-size: 22px; }
-                
-                &:hover {
-                    background-color: rgba(76, 175, 80, 0.4);
-                }
-            }
-		}
-
-		.store-grid {
-			display: flex;
-			flex-direction: row;
-			gap: 24px;
-			flex-wrap: wrap;
-
-			.store-item {
-				width: 340px;
-				display: flex;
-				flex-direction: column;
-				background-color: rgba(0, 0, 0, 0.4);
-				border: 1px solid rgba(255, 255, 255, 0.1);
-				border-radius: 8px;
-				padding: 20px;
-				gap: 14px;
-				transition: transform 0.2s ease, border-color 0.2s ease;
-
-				&:hover {
-					transform: scale(1.02);
-					border-color: rgba(255, 255, 255, 0.3);
-				}
-
-				.item-img {
-					width: 100%;
-					height: 190px;
-					border-radius: 6px;
-					display: flex;
-					align-items: center;
-					justify-content: center;
-				}
-
-				.item-name {
-					font-size: 24px;
-					font-weight: bold;
-				}
-
-				.item-desc {
-					font-size: 17px;
-					color: rgba(255, 255, 255, 0.75);
-					flex-grow: 1;
-				}
-
-				.buy-btn {
-					display: flex;
-					flex-direction: row;
-					align-items: center;
-					justify-content: center;
-					gap: 8px;
-					padding: 12px;
-					background-color: rgba(255, 152, 0, 0.8);
-					border-radius: 6px;
-					cursor: pointer;
-					font-size: 19px;
-					font-weight: bold;
-					margin-top: 8px;
-					transition: background-color 0.2s ease;
-
-					&:hover {
-						background-color: #ff9800;
-					}
-                    
-                    i { font-size: 24px; }
-
-                    &.disabled {
-                        background-color: rgba(255, 255, 255, 0.1);
-                        color: rgba(255, 255, 255, 0.45);
-                        pointer-events: none;
-                    }
-				}
-			}
-		}
-	}
+    .store-content { flex-grow: 1; min-height: 0; flex-direction: column; padding: 32px 48px; gap: 28px; overflow-y: scroll; }
+    .store-header { flex-direction: row; align-items: center; justify-content: space-between; gap: 24px; flex-shrink: 0; }
+    .store-heading { flex-direction: column; gap: 8px; }
+    .store-title { font-size: 32px; font-weight: 700; letter-spacing: 3px; }
+    .store-sub { color: $menu-muted; font-size: 16px; }
+    .store-balance { @include menu-panel; padding: 14px 24px; flex-shrink: 0; flex-direction: column; align-items: flex-end; gap: 4px; border-left: 3px solid $menu-accent; }
+    .balance-label { @include menu-section-title; font-size: 11px; }
+    .balance-value { color: $menu-accent; font-size: 24px; font-weight: 700; letter-spacing: 1px; }
+    .store-grid { flex-direction: row; gap: 24px; flex-wrap: wrap; flex-shrink: 0; }
+    .store-item
+    {
+        @include menu-panel;
+        width: 380px;
+        max-width: 100%;
+        flex-shrink: 0;
+        flex-direction: column;
+        transition: border-color 0.15s ease;
+        &:hover { border-color: rgba( 255, 122, 26, 0.45 ); }
+    }
+    .item-img { width: 100%; height: 230px; flex-shrink: 0; background-size: cover; background-position: center; border-bottom: 1px solid $menu-border; }
+    .xp-art
+    {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
+        background-image: linear-gradient( to bottom, #29211b, #141314 );
+        color: $menu-accent;
+        i { font-size: 64px; }
+        label { font-size: 42px; font-weight: 700; letter-spacing: 5px; }
+    }
+    .camo-art { background-image: url('/camos/mastery.png'); background-color: #202023; }
+    .item-info { flex-grow: 1; flex-direction: column; padding: 24px; gap: 12px; }
+    .item-name { font-size: 22px; font-weight: 700; letter-spacing: 1px; }
+    .item-desc { font-size: 16px; color: $menu-muted; min-height: 48px; }
+    .buy-btn { @include menu-action; margin-top: 10px; width: 100%; }
+    .store-tools { flex-shrink: 0; }
+    .debug-btn { @include menu-action; font-size: 11px; min-height: 36px; padding: 0 14px; color: $menu-muted; }
+}
+.main-menu-root.compact StorePage { .store-content { padding: 24px 32px; } }
+.main-menu-root.narrow StorePage
+{
+    .store-content { padding: 20px 24px; }
+    .store-item { width: 48%; }
+}
+.main-menu-root.portrait StorePage
+{
+    .store-header { flex-wrap: wrap; }
+    .store-balance { align-items: flex-start; }
+    .store-item { width: 100%; }
+    MenuTopbar { padding: 0 24px; }
 }

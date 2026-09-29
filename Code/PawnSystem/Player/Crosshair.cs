@@ -195,6 +195,10 @@ public partial class Crosshair : Component
 		if ( damageInfo.WasFallDamage )
 			return;
 
+		// Nor for fire: you can't feel it burn someone.
+		if ( damageInfo.Flags.HasFlag( DamageFlags.Burn ) )
+			return;
+
 		var attackerRoot = damageInfo.Attacker?.GameObject?.Root;
 		if ( attackerRoot is not null && attackerRoot == damageInfo.Victim?.GameObject?.Root )
 			return;
@@ -204,19 +208,26 @@ public partial class Crosshair : Component
 
 		if ( healthComponent.IsValid() )
 		{
-			Hitmarker = HitmarkerType.Default;
-
 			var isKill = healthComponent.Health - damageInfo.Damage <= 0f;
-
-			TimeSinceAttacked = 0;
-
-			if ( isKill )
-				Hitmarker |= HitmarkerType.Kill;
-
-			if ( damageInfo.Hitbox.HasFlag( HitboxTags.Head ) )
-				Hitmarker |= HitmarkerType.Headshot;
-
-			CrosshairManager.TriggerHit();
+			ShowHit( isKill, damageInfo.Hitbox.HasFlag( HitboxTags.Head ) );
 		}
+	}
+
+	/// <summary>
+	/// Shows the hitmarker. Players and bots get here through <see cref="Trigger"/>; zombies, which have no
+	/// HealthComponent, call it from <see cref="ZombieAI"/>.
+	/// </summary>
+	public void ShowHit( bool kill, bool headshot )
+	{
+		Hitmarker = HitmarkerType.Default;
+		TimeSinceAttacked = 0;
+
+		if ( kill )
+			Hitmarker |= HitmarkerType.Kill;
+
+		if ( headshot )
+			Hitmarker |= HitmarkerType.Headshot;
+
+		CrosshairManager.TriggerHit();
 	}
 }

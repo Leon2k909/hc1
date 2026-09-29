@@ -23,7 +23,7 @@ public sealed class GunsmithController : Component
 	RangedFloat RollRange { get; set; } = new( -10, 10 );
 
 	[Property]
-	private RangedFloat ZoomRange { get; set; } = new( -0.6f, 0.3f );
+	private RangedFloat ZoomRange { get; set; } = new( -1.5f, 1f );
 
 	public bool FPS => System.IsValid() && System.FPS;
 
@@ -132,7 +132,7 @@ public sealed class GunsmithController : Component
 
 			var scroll = overControls ? 0f : -Input.MouseWheel.y;
 
-			ZoomFactor += scroll * Time.Delta * 5f;
+			ZoomFactor += scroll * 0.12f;
 			ZoomFactor = ZoomFactor.Clamp( ZoomRange.Min, ZoomRange.Max );
 
 			angleOffset = angleOffset.LerpTo( 0, Time.Delta * SlowSpeed );
@@ -161,47 +161,6 @@ public sealed class GunsmithController : Component
 				yawBeforeReticle = null;
 			}
 			Weapon.WorldRotation = Rotation.From( 0, viewYaw, viewRoll );
-			var panel = GunsmithPanel.Instance;
-			var customizing = panel.IsValid() && panel.IsCustomizing;
-			var size = panel.IsValid() ? panel.Panel.Box.Rect.Size : Screen.Size;
-			var aspect = size.x / MathF.Max( size.y, 1f );
-			// Keep the full weapon above the camo drawer, including on ultrawide displays.
-			var horizontalFov = InitialFOV * (customizing ? 1.4f : 1f);
-			var halfWidth = MathF.Tan( horizontalFov * MathF.PI / 360f ) * MathF.Max( 1f, aspect / (16f / 9f) );
-			var horizontalOffset = 0f;
-			// Include custom stocks and muzzle extensions when fitting the preview.
-			// Reserve the actual armory (left) and attachment column (right) widths so a suppressor
-			// or stock cannot disappear behind either of them.
-			var browser = panel.IsValid() ? panel.Panel.Children.FirstOrDefault( p => p.HasClass( "weapon-browser" ) ) : null;
-			var leftFraction = panel.IsValid() && panel.IsArmoryVisible && browser is not null
-				? ((browser.Box.Rect.Right - panel.Panel.Box.Rect.Left + 24f) / MathF.Max( size.x, 1f )).Clamp( 0f, 0.6f ) : 0f;
-			var attachments = panel.IsValid() && !customizing ? panel.Panel.Children.OfType<GunsmithAttachmentBrowser>().FirstOrDefault() : null;
-			var rightFraction = attachments is not null && attachments.HasClass( "has-slots" )
-				? ((panel.Panel.Box.Rect.Right - attachments.Box.Rect.Left + 24f) / MathF.Max( size.x, 1f )).Clamp( 0f, 0.6f ) : 0f;
-			var cameraOrigin = CameraComponent.GameObject.Parent.IsValid()
-				? CameraComponent.GameObject.Parent.WorldTransform.PointToWorld( initialCameraPos ) : initialCameraPos;
-			var minRight = float.MaxValue;
-			var maxRight = float.MinValue;
-			var nearestDepth = float.MaxValue;
-			foreach ( var renderer in Weapon.GameObject.Components.GetAll<ModelRenderer>( FindMode.EverythingInSelfAndDescendants ) )
-			{
-				if ( !renderer.Enabled || renderer.Model is null ) continue;
-				foreach ( var corner in renderer.Model.Bounds.Corners )
-				{
-					var relative = renderer.WorldTransform.PointToWorld( corner ) - cameraOrigin;
-					var right = Vector3.Dot( relative, CameraComponent.WorldRotation.Right );
-					minRight = MathF.Min( minRight, right );
-					maxRight = MathF.Max( maxRight, right );
-					nearestDepth = MathF.Min( nearestDepth, Vector3.Dot( relative, CameraComponent.WorldRotation.Forward ) );
-				}
-			}
-			if ( minRight < maxRight && nearestDepth > 1f )
-			{
-				// Fit the gun into the gap between the two columns and centre it there.
-				halfWidth = MathF.Max( halfWidth, (maxRight - minRight) * 0.5f / (nearestDepth * MathF.Max( 0.3f, 0.95f - leftFraction - rightFraction )) );
-				horizontalOffset = (minRight + maxRight) * 0.5f - (leftFraction - rightFraction) * nearestDepth * halfWidth;
-			}
-			CameraComponent.FieldOfView = 2f * MathF.Atan( halfWidth ) * 180f / MathF.PI + (ZoomFactor * 10f);
 
 			panOffsetTarget.x = panOffsetTarget.x.Clamp( -25f, 25f );
 			panOffsetTarget.y = panOffsetTarget.y.Clamp( -25f, 25f );
@@ -209,29 +168,98 @@ public sealed class GunsmithController : Component
 			if ( !isPanning )
 				panOffsetTarget = panOffsetTarget.LerpTo( 0, Time.Delta * SlowSpeed );
 
-			var framingOffset = 0f;
-			if ( customizing )
-			{
-				var distance = Vector3.DistanceBetween( CameraComponent.WorldPosition, Weapon.WorldPosition );
-				framingOffset = -0.36f * distance * halfWidth / MathF.Max( aspect, 0.5f );
-			}
-			// Fill the view with the optic so the reticle on its lens is readable, clear of the drawer below.
-			if ( reticleTab && TryGetOpticBounds( out var opticBounds ) )
-			{
-				var toOptic = opticBounds.Center - cameraOrigin;
-				var depth = Vector3.Dot( toOptic, CameraComponent.WorldRotation.Forward );
-				if ( depth > 1f )
-				{
-					halfWidth = opticBounds.Size.Length * 0.5f / (depth * 0.6f) * aspect;
-					CameraComponent.FieldOfView = 2f * MathF.Atan( halfWidth ) * 180f / MathF.PI * (1f + ZoomFactor);
-					horizontalOffset = Vector3.Dot( toOptic, CameraComponent.WorldRotation.Right );
-					framingOffset = Vector3.Dot( toOptic, CameraComponent.WorldRotation.Up ) - 0.36f * depth * halfWidth / MathF.Max( aspect, 0.5f );
-				}
-			}
-
-			CameraComponent.LocalPosition = initialCameraPos + CameraComponent.WorldRotation.Right * (panOffsetTarget.x + horizontalOffset)
-				+ CameraComponent.WorldRotation.Up * (panOffsetTarget.y + framingOffset);
+			FrameWeapon( reticleTab );
 		}
+	}
+
+	private bool framed;
+	private float framedFov;
+	private Vector2 framedOffset;
+
+	/// <summary>
+	/// Fits the gun (in the Reticle tab, its optic) into the gunsmith's stage: the empty middle of the screen between its
+	/// columns (<see cref="GunsmithPanel.StageRect"/>). The field of view widens until every part (a suppressor, a long
+	/// stock) fits the stage with a little room, and the camera slides so the gun sits in the stage's middle.
+	/// </summary>
+	private void FrameWeapon( bool reticleTab )
+	{
+		var panel = GunsmithPanel.Instance;
+		var screen = panel.IsValid() && panel.Panel is not null && panel.Panel.Box.Rect.Width > 1f
+			? panel.Panel.Box.Rect : new Rect( 0, 0, Screen.Width, Screen.Height );
+		var stage = panel.IsValid() && panel.StageRect is { } stageRect ? stageRect : screen;
+		var aspect = screen.Width / MathF.Max( screen.Height, 1f );
+
+		// The stage as fractions of the screen, from its top left.
+		var fx0 = ((stage.Left - screen.Left) / screen.Width).Clamp( 0f, 0.9f );
+		var fx1 = ((stage.Right - screen.Left) / screen.Width).Clamp( fx0 + 0.1f, 1f );
+		var fy0 = ((stage.Top - screen.Top) / screen.Height).Clamp( 0f, 0.9f );
+		var fy1 = ((stage.Bottom - screen.Top) / screen.Height).Clamp( fy0 + 0.1f, 1f );
+
+		var cameraOrigin = CameraComponent.GameObject.Parent.IsValid()
+			? CameraComponent.GameObject.Parent.WorldTransform.PointToWorld( initialCameraPos ) : initialCameraPos;
+		var rotation = CameraComponent.WorldRotation;
+
+		// The gun's extent across and up the view, all at its nearest depth, which errs on the roomy side.
+		var renderers = reticleTab ? OpticRenderers() : Weapon.GameObject.Components.GetAll<ModelRenderer>( FindMode.EverythingInSelfAndDescendants )
+			.Where( x => x.Enabled && x.Model is not null );
+		var minRight = float.MaxValue;
+		var maxRight = float.MinValue;
+		var minUp = float.MaxValue;
+		var maxUp = float.MinValue;
+		var depth = float.MaxValue;
+		foreach ( var renderer in renderers )
+		{
+			foreach ( var corner in renderer.Model.Bounds.Corners )
+			{
+				var relative = renderer.WorldTransform.PointToWorld( corner ) - cameraOrigin;
+				var right = Vector3.Dot( relative, rotation.Right );
+				var up = Vector3.Dot( relative, rotation.Up );
+				minRight = MathF.Min( minRight, right );
+				maxRight = MathF.Max( maxRight, right );
+				minUp = MathF.Min( minUp, up );
+				maxUp = MathF.Max( maxUp, up );
+				depth = MathF.Min( depth, Vector3.Dot( relative, rotation.Forward ) );
+			}
+		}
+
+		// Tangent of half the horizontal field of view. By default the scene's own, widened to keep its height on ultrawides.
+		var halfWidth = MathF.Tan( InitialFOV * MathF.PI / 360f ) * MathF.Max( 1f, aspect / (16f / 9f) );
+		var offset = Vector2.Zero;
+		if ( minRight < maxRight && depth > 1f )
+		{
+			// The share of the stage the gun may fill; the optic fills more of it, so its reticle is readable.
+			var fill = reticleTab ? 0.62f : 0.9f;
+			var fitWidth = (maxRight - minRight) / (2f * depth * (fx1 - fx0) * fill);
+			var fitHeight = (maxUp - minUp) * aspect / (2f * depth * (fy1 - fy0) * fill);
+			halfWidth = reticleTab ? MathF.Max( fitWidth, fitHeight ) : MathF.Max( halfWidth, MathF.Max( fitWidth, fitHeight ) );
+
+			// Slide the camera so the gun's middle lands on the stage's middle.
+			var halfHeight = halfWidth / aspect;
+			offset.x = (minRight + maxRight) * 0.5f - (fx0 + fx1 - 1f) * depth * halfWidth;
+			offset.y = (minUp + maxUp) * 0.5f + (fy0 + fy1 - 1f) * depth * halfHeight;
+		}
+
+		var fov = 2f * MathF.Atan( halfWidth ) * 180f / MathF.PI;
+		fov *= MathF.Pow( 2f, ZoomFactor );
+		fov = fov.Clamp( 5f, 110f );
+
+		// Ease towards the new framing, so a new part or a panel resizing doesn't jolt the view.
+		if ( !framed )
+		{
+			framed = true;
+			framedFov = fov;
+			framedOffset = offset;
+		}
+		else
+		{
+			var t = MathF.Min( 1f, Time.Delta * 12f );
+			framedFov = framedFov.LerpTo( fov, t );
+			framedOffset = framedOffset.LerpTo( offset, t );
+		}
+
+		CameraComponent.FieldOfView = framedFov;
+		CameraComponent.LocalPosition = initialCameraPos + rotation.Right * (panOffsetTarget.x + framedOffset.x)
+			+ rotation.Up * (panOffsetTarget.y + framedOffset.y);
 	}
 
 	private IEnumerable<ModelRenderer> OpticRenderers() => Weapon.GameObject.Components

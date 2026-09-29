@@ -1,0 +1,61 @@
+{
+  "RootObject": {
+    "__guid": "f6543942-f5aa-4a9e-8f81-bec8647ac704",
+    "Name": "wm_c4",
+    "Enabled": true,
+    "Position": "3,5,-1",
+    "Components": [
+      {
+        "__type": "Sandbox.SkinnedModelRenderer",
+        "__guid": "df5afce8-010b-4c76-a2ec-7c04ca063510",
+        "BodyGroups": 18446744073709551615,
+        "CreateAttachments": false,
+        "CreateBoneObjects": false,
+        "MaterialOverride": null,
+        "Model": "weapons/c4/field_device/field_device.vmdl",
+        "Morphs": {},
+        "Parameters": {
+          "bools": {},
+          "ints": {},
+          "floats": {},
+          "vectors": {},
+          "rotations": {}
+        },
+        "RenderOptions": {
+          "GameLayer": true,
+          "OverlayLayer": false,
+          "BloomLayer": false,
+          "AfterUILayer": false
+        },
+        "RenderType": "On",
+        "Tint": "1,1,1,1",
+        "UseAnimGraph": false
+      },
+      {
+        "__type": "Facepunch.WorldModel",
+        "__guid": "4d056eae-0efc-48c7-a28c-be72d2760080",
+        "ModelRenderer": {
+          "_type": "component",
+          "component_id": "df5afce8-010b-4c76-a2ec-7c04ca063510",
+          "go": "f6543942-f5aa-4a9e-8f81-bec8647ac704",
+          "component_type": "SkinnedModelRenderer"
+        },
+        "IkLeftHand": {
+          "_type": "gameobject",
+          "go": "287b5d1d-bf2b-4eaf-a990-647f83d97401"
+        }
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "287b5d1d-bf2b-4eaf-a990-647f83d97401",
+        "Name": "Left hand grip",
+        "Enabled": true,
+        "Position": "-3,5,1"
+      }
+    ]
+  },
+  "ResourceVersion": 1,
+  "__references": [],
+  "__version": 1
+}

@@ -93,34 +93,42 @@ public static class TeamExtensions
 		return IsFriendly( self.Team, other.Team );
 	}
 
+	/// <summary>
+	/// The teams are Red Team and Blue Team. The enum keeps its old Terrorist/CounterTerrorist names because scenes and
+	/// prefabs store them.
+	/// </summary>
 	public static string GetName( this Team team )
 	{
 		return team switch
 		{
-			Team.Terrorist => "Anarchists",
-			Team.CounterTerrorist => "Security",
+			Team.Terrorist => "Red Team",
+			Team.CounterTerrorist => "Blue Team",
 			_ => "Unassigned",
 		};
 	}
 
-	private static Dictionary<Team, Color> teamColors = new()
-	{
-		{ Team.CounterTerrorist, new Color32( 5, 146, 235 ) },
-		{ Team.Terrorist, new Color32( 233, 190, 92 ) },
-		{ Team.Unassigned, new Color32( 255, 255, 255 ) },
-	};
-
+	/// <summary>
+	/// A team's colour means that team everywhere, to every viewer: enemy markers are the enemy's team colour rather than
+	/// a generic enemy red, which would look like Red Team's teammates. Red is the logo's pure red (green and blue level):
+	/// with more green than blue it read as orange.
+	/// </summary>
 	public static Color GetColor( this Team team )
 	{
-		return teamColors[team];
+		return team switch
+		{
+			Team.CounterTerrorist => new Color32( 5, 146, 235 ),
+			Team.Terrorist => new Color32( 228, 32, 40 ),
+			_ => new Color32( 255, 255, 255 ),
+		};
 	}
 
+	/// <summary> The team logo (Tools/team_logos.py builds it and the banner from the source art). </summary>
 	public static string GetIconPath( this Team team )
 	{
 		return team switch
 		{
-			Team.CounterTerrorist => "/ui/teams/operators_logo.png",
-			Team.Terrorist => "/ui/teams/anarchists_logo.png",
+			Team.CounterTerrorist => "/ui/teams/blue_team_logo.png",
+			Team.Terrorist => "/ui/teams/red_team_logo.png",
 			_ => ""
 		};
 	}
@@ -129,8 +137,8 @@ public static class TeamExtensions
 	{
 		return team switch
 		{
-			Team.CounterTerrorist => "/ui/teams/operators_logo_banner.png",
-			Team.Terrorist => "/ui/teams/anarchists_logo_banner.png",
+			Team.CounterTerrorist => "/ui/teams/blue_team_logo_banner.png",
+			Team.Terrorist => "/ui/teams/red_team_logo_banner.png",
 			_ => ""
 		};
 	}

@@ -1,0 +1,43 @@
+@using Sandbox
+@using Sandbox.UI
+
+@inherits Panel
+@namespace Facepunch.UI
+@attribute [StyleSheet]
+
+@*
+    The Video page's links to s&box's own settings. Window mode, resolution, VSync, frame rate limits and graphics
+    quality belong to s&box and are shared by every game: only its menu can read or change them
+    (MenuUtility.RenderSettings is in Sandbox.Menu, which games don't reference), so each row opens s&box's settings
+    over the game at that tab.
+*@
+<root>
+    <label class="sbox-title">@Tr( "s&box Settings" )</label>
+    <label class="sbox-hint">@Tr( "Resolution, window mode and graphics quality are set in s&box itself and apply to every game." )</label>
+
+    @foreach ( var page in Pages )
+    {
+        <div class="sbox-row" onclick=@(() => Open( page.Id ))>
+            <div class="sbox-text">
+                <label class="sbox-name">@Tr( page.Title )</label>
+                <label class="sbox-detail">@Tr( page.Detail )</label>
+            </div>
+            @* Not plain "Open": that key is the lobby's "open" (PageText), which reads as an adjective. *@
+            <div class="sbox-open"><i>open_in_new</i><label>@Tr( "Open in s&box" )</label></div>
+        </div>
+    }
+</root>
+
+@code
+{
+    // Tab ids of s&box's settings (Game.Overlay.ShowSettingsModal).
+    private static (string Id, string Title, string Detail)[] Pages => new[]
+    {
+        ("display", "Display", "Window mode, resolution, VSync and frame rate limit"),
+        ("graphics", "Graphics", "Quality presets, textures, shadows, anti-aliasing and upscaling"),
+    };
+
+    // Only the row has a handler: clicks bubble to every parent's handler, so a second one on the button would run too,
+    // and a second ShowSettingsModal closes the settings the first one opened.
+    private static void Open( string page ) => Game.Overlay.ShowSettingsModal( page );
+}

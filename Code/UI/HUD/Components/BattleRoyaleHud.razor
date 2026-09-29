@@ -1,0 +1,115 @@
+@namespace Facepunch.UI
+@inherits Panel
+@attribute [StyleSheet]
+
+@* Battle royale's screen-wide bits: the gas warning while you're outside the zone, the zone's news as it happens
+   (marked, closing, final), and your placing once you're out. The radar is BattleRoyaleRadar. *@
+
+<root>
+    @if ( OutsideMetres > 0 )
+    {
+        <div class="gas" />
+        <div class="warning">
+            <label class="title">@Tr( "RETURN TO THE SAFE ZONE" )</label>
+            @* Built in C#: a "·" in the markup between two values was dropped ("48510 HP/s"). *@
+            <label class="detail">@($"{OutsideMetres} m · {DamagePerSecond} HP/s")</label>
+        </div>
+    }
+
+    @if ( _announcement is { } news && _announcementAge < AnnouncementTime )
+    {
+        <div class="announcement @_announcementClass">
+            <label>@Tr( news )</label>
+        </div>
+    }
+
+    @if ( Match is { IsOver: false } match && match.LocalPlacement > 1 )
+    {
+        <div class="eliminated">
+            <label class="title">@Tr( "ELIMINATED" )</label>
+            <label class="detail">@Placing( match.LocalPlacement, match.StartCount )</label>
+        </div>
+    }
+</root>
+
+@code
+{
+    private const float AnnouncementTime = 4f;
+
+    private static SafeZoneManager Zone => SafeZoneManager.Current;
+    private static BattleRoyaleMatch Match => BattleRoyaleMatch.Current;
+
+    private string _announcement;
+    private string _announcementClass;
+    private TimeSince _announcementAge;
+    private bool _wasRunning;
+    private bool _wasShrinking;
+    private bool _wasFinal;
+
+    /// <summary> How far the local player is out in the gas, in metres, or 0. </summary>
+    private int OutsideMetres
+    {
+        get
+        {
+            if ( Zone is not { IsRunning: true } zone || Client.Local?.PlayerPawn is not { } pawn || !pawn.IsValid() )
+                return 0;
+            if ( !pawn.HealthComponent.IsValid() || pawn.HealthComponent.State != LifeState.Alive )
+                return 0;
+
+            var outside = zone.DistanceOutside( pawn.WorldPosition );
+            return outside > 0f ? Math.Max( 1, (int)MathF.Ceiling( outside * 0.0254f ) ) : 0;
+        }
+    }
+
+    private int DamagePerSecond => (int)MathF.Round( Zone?.DamagePerSecond ?? 0f );
+
+    public static string Ordinal( int place )
+    {
+        var suffix = (place % 100) is 11 or 12 or 13 ? "TH" : (place % 10) switch { 1 => "ST", 2 => "ND", 3 => "RD", _ => "TH" };
+        return $"{place}{suffix}";
+    }
+
+    /// <summary> "2ND OF 50" in the player's language. Each English suffix is its own line, since the other languages don't use them. </summary>
+    private static string Placing( int place, int count )
+    {
+        var ordinal = Ordinal( place );
+        if ( ordinal.EndsWith( "ST" ) ) return Tr( "{0}ST OF {1}", place, count );
+        if ( ordinal.EndsWith( "ND" ) ) return Tr( "{0}ND OF {1}", place, count );
+        if ( ordinal.EndsWith( "RD" ) ) return Tr( "{0}RD OF {1}", place, count );
+        return Tr( "{0}TH OF {1}", place, count );
+    }
+
+    public override void Tick()
+    {
+        base.Tick();
+
+        if ( Zone is not { } zone )
+            return;
+
+        // The zone's news, once each as it happens.
+        if ( zone.IsRunning && !_wasRunning )
+            Announce( "SAFE ZONE MARKED", "" );
+        else if ( zone.IsShrinking && !_wasShrinking )
+            Announce( "THE ZONE IS CLOSING", "closing" );
+        else if ( zone.IsFinal && !_wasFinal )
+            Announce( "FINAL ZONE", "final" );
+
+        _wasRunning = zone.IsRunning;
+        _wasShrinking = zone.IsShrinking;
+        _wasFinal = zone.IsFinal;
+    }
+
+    private void Announce( string text, string style )
+    {
+        _announcement = text;
+        _announcementClass = style;
+        _announcementAge = 0f;
+    }
+
+    protected override int BuildHash()
+    {
+        var match = Match;
+        return HashCode.Combine( OutsideMetres, DamagePerSecond, _announcement, _announcementAge < AnnouncementTime,
+            match?.LocalPlacement, match?.IsOver, match?.StartCount );
+    }
+}

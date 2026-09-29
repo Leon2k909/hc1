@@ -1,0 +1,51 @@
+{
+  "Maps": {
+    "$blob": "44ee0b10-70df-80c7-987b-6e7bbcdec87b"
+  },
+  "Resolution": 2048,
+  "TerrainSize": 61440,
+  "TerrainHeight": 13000,
+  "Materials": [
+    {
+      "Id": "e8eb0ac5-0874-4ef0-bb98-089f8c40a1da",
+      "Path": "materials/terrain/meadow.tmat"
+    },
+    {
+      "Id": "1f78baa0-f20b-48c6-ad3f-751792640613",
+      "Path": "materials/terrain/meadow_dry.tmat"
+    },
+    {
+      "Id": "dfb9ba50-b4e7-40c5-a8d8-6ec95eba9c02",
+      "Path": "materials/terrain/dirt.tmat"
+    },
+    {
+      "Id": "be799f06-5f32-4c91-894d-8bf69a859aac",
+      "Path": "materials/terrain/gravel.tmat"
+    },
+    {
+      "Id": "f4854e85-df02-40bc-a3d6-2f552b56ea8a",
+      "Path": "materials/terrain/rock.tmat"
+    },
+    {
+      "Id": "a3a7cf99-2b77-4cb5-a018-76c7e7e1973b",
+      "Path": "materials/terrain/scree.tmat"
+    }
+  ],
+  "MaterialSettings": {
+    "HeightBlendEnabled": true,
+    "HeightBlendSharpness": 0.87,
+    "Sampler": {
+      "Filter": "Anisotropic",
+      "AddressModeU": "Wrap",
+      "AddressModeV": "Wrap",
+      "AddressModeW": "Wrap",
+      "MipLodBias": 0,
+      "MaxAnisotropy": 8,
+      "BorderColor": "0,0,0,0",
+      "Index": 1
+    }
+  },
+  "ResourceVersion": 3,
+  "__references": [],
+  "__version": 3
+}

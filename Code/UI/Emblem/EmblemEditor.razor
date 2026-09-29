@@ -11,9 +11,9 @@
 
     @* ── Header ──────────────────────────────────────────────── *@
     <div class="ee-header">
-        <label class="ee-title">EMBLEM EDITOR</label>
+        <label class="ee-title">@Tr( "EMBLEM EDITOR" )</label>
         <div class="ee-header-actions">
-            <div class="ee-btn ee-btn-save" @onclick=@Save>SAVE</div>
+            <div class="ee-btn ee-btn-save" @onclick=@Save>@Tr( "SAVE" )</div>
         </div>
     </div>
 
@@ -29,26 +29,26 @@
             @if ( SelectedLayer != null )
             {
                 <div class="ee-transforms">
-                    <label class="ee-section-label">TRANSFORM</label>
+                    <label class="ee-section-label">@Tr( "TRANSFORM" )</label>
 
                     <div class="ee-row">
-                        <label class="ee-prop-label">Position X</label>
+                        <label class="ee-prop-label">@Tr( "Position X" )</label>
                         <SliderControl style="width: 180px;" Min=@(-50f) Max=@(150f) Step=@(1f) Value:bind=@SelectedLayer.X />
                     </div>
                     <div class="ee-row">
-                        <label class="ee-prop-label">Position Y</label>
+                        <label class="ee-prop-label">@Tr( "Position Y" )</label>
                         <SliderControl style="width: 180px;" Min=@(-50f) Max=@(150f) Step=@(1f) Value:bind=@SelectedLayer.Y />
                     </div>
                     <div class="ee-row">
-                        <label class="ee-prop-label">Scale</label>
+                        <label class="ee-prop-label">@Tr( "Scale" )</label>
                         <SliderControl style="width: 180px;" Min=@(0.1f) Max=@(10f) Step=@(0.1f) Value:bind=@SelectedLayer.Scale />
                     </div>
                     <div class="ee-row">
-                        <label class="ee-prop-label">Rotation</label>
+                        <label class="ee-prop-label">@Tr( "Rotation" )</label>
                         <SliderControl style="width: 180px;" Min=@(0f) Max=@(360f) Step=@(1f) Value:bind=@SelectedLayer.Rotation />
                     </div>
 
-                    <label class="ee-section-label" style="margin-top: 14px;">COLOR</label>
+                    <label class="ee-section-label" style="margin-top: 14px;">@Tr( "COLOR" )</label>
                     <ColorPicker Value:bind=@SelectedLayer.Color />
                 </div>
             }
@@ -57,7 +57,7 @@
         @* RIGHT: Layers + shape picker *@
         <div class="ee-right">
             <div class="ee-layers">
-                <div class="ee-panel-title">LAYERS (@Data.Layers.Count / 32)</div>
+                <div class="ee-panel-title">@Tr( "LAYERS ({0} / {1})", Data.Layers.Count, 32 )</div>
                 <div class="ee-layer-list">
                     @for ( int i = Data.Layers.Count - 1; i >= 0; i-- )
                     {
@@ -67,7 +67,7 @@
                             <div class="ee-layer-icon">
                                 <i style="color: @layer.Color.Hex; font-size: 18px;">@layer.Icon</i>
                             </div>
-                            <label class="ee-layer-name">Layer @(index + 1)</label>
+                            <label class="ee-layer-name">@Tr( "Layer {0}", index + 1 )</label>
                             <div class="ee-layer-btns">
                                 <div class="ee-icon-btn" @onclick:stopPropagation="true" @onclick=@(() => MoveLayerUp(index))><i>keyboard_arrow_up</i></div>
                                 <div class="ee-icon-btn" @onclick:stopPropagation="true" @onclick=@(() => MoveLayerDown(index))><i>keyboard_arrow_down</i></div>
@@ -76,7 +76,7 @@
                         </div>
                     }
                 </div>
-                <div class="ee-add-layer" @onclick=@AddLayer>+ ADD LAYER</div>
+                <div class="ee-add-layer" @onclick=@AddLayer>@Tr( "+ ADD LAYER" )</div>
             </div>
 
             @if ( SelectedLayer != null )
@@ -84,8 +84,8 @@
                 <div class="ee-shapes">
                     @* Tab bar: SHAPES | EMOJI *@
                     <div class="ee-picker-tabs">
-                        <div class="ee-picker-tab @(PickerTab == 0 ? "active" : "")" @onclick=@(() => PickerTab = 0)>SHAPES</div>
-                        <div class="ee-picker-tab @(PickerTab == 1 ? "active" : "")" @onclick=@(() => PickerTab = 1)>EMOJI</div>
+                        <div class="ee-picker-tab @(PickerTab == 0 ? "active" : "")" @onclick=@(() => PickerTab = 0)>@Tr( "SHAPES" )</div>
+                        <div class="ee-picker-tab @(PickerTab == 1 ? "active" : "")" @onclick=@(() => PickerTab = 1)>@Tr( "EMOJI" )</div>
                     </div>
 
                     @if ( PickerTab == 0 )
@@ -106,7 +106,7 @@
                         @* Emoji organised by category *@
                         @foreach ( var (catName, emojis) in EmojiCategories )
                         {
-                            <div class="ee-emoji-cat-label">@catName</div>
+                            <div class="ee-emoji-cat-label">@Tr( catName )</div>
                             <div class="ee-shape-grid">
                                 @foreach ( var emoji in emojis )
                                 {

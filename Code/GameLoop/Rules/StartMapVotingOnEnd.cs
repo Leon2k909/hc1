@@ -14,10 +14,12 @@ public sealed class StartMapVotingOnEnd : Component,
 		if ( Networking.IsHost )
 		{
 			var winningTeam = GameMode.Instance?.Get<TeamScoring>()?.GetHighest() ?? Team.Unassigned;
+			var ranked = GameMode.Instance?.FinishRankedMatch( winningTeam ) ?? false;
 			Facepunch.UI.EndOfMatchScreen.Show( winningTeam );
+			if ( ranked ) return;
 		}
 
 		// Start the vote system
-		MapVoteSystem.Create();
+		if ( Networking.IsHost ) MapVoteSystem.Create();
 	}
 }

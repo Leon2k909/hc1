@@ -4,20 +4,20 @@
 @namespace Facepunch.UI
 @inherits Panel
 
-<root class="layout flex row with-background with-padding" style="justify-content: space-between; align-items: center; gap: 8px;">
-    <div class="name">
-        @Name
-    </div>
+<root class="career-stat">
+    <label class="name">
+        @Tr( Name )
+    </label>
 
-    <div class="divider" />
 
-    <div class="value">
+    <label class="value">
         @StatValue
-    </div>
+    </label>
 </root>
 
 @code
 {
+    /// <summary> The stat's English name ("Kills"), translated where it's shown. </summary>
     public string Name { get; set; }
     public string Stat { get; set; }
 

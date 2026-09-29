@@ -166,7 +166,8 @@ public partial class PlayerInventory : Component
 			break;
 		}
 
-		var slotDelta = wheel.y > 0f ? 1 : -1;
+		// Match the HUD's ascending top-to-bottom order: wheel up is previous, down is next.
+		var slotDelta = wheel.y > 0f ? -1 : 1;
 		currentSlot += slotDelta;
 
 		if ( currentSlot < 0 )
@@ -333,6 +334,9 @@ public partial class PlayerInventory : Component
 			gameObject.Enabled = true;
 			return null;
 		}
+		// The prefab names its own resource too, but the editor can cache a prefab from before that resource finished
+		// importing, which leaves a blank one (no slot, no viewmodel) that never deploys.
+		component.Resource = resource;
 		component.Owner = Player;
 		component.ApplySavedAttachments = applySavedAttachments;
 		if ( applySavedAttachments )

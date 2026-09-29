@@ -133,7 +133,9 @@
 		"element" "d121f26f-ba60-51d2-88ec-1380c522f9e8",
 		"element" "0f4ec47a-502d-5df9-9881-4ef03a6b9e75",
 		"element" "734ce66f-4d34-5535-824b-f8be729acffd",
-		"element" "9d8eebd8-a94a-51d2-82ef-c8f8e05196c7"
+		"element" "9d8eebd8-a94a-51d2-82ef-c8f8e05196c7",
+		"element" "c71807a6-4cb2-5dd2-88b4-3056360bf7bb",
+		"element" "15cbd170-408b-59a0-90a6-236b718cad30"
 	]
 	"baseStates" "element_array"
 	[
@@ -236,16 +238,16 @@
 {
 	"id" "elementid" "3971b1e4-4d63-50a9-ae53-f8533adcf47d"
 	"name" "string" "clavicle_R"
-	"position" "vector3" "-10.668596 2.188593 -1.154669"
-	"orientation" "quaternion" "0.139620 -0.029387 0.865796 -0.479625"
+	"position" "vector3" "-10.524813 1.950946 -1.436928"
+	"orientation" "quaternion" "0.151023 -0.023376 0.867260 -0.473821"
 }
 
 "DmeTransform"
 {
 	"id" "elementid" "2140ef72-c9b3-5ca4-9db8-89e8fa0f6ff6"
 	"name" "string" "clavicle_R"
-	"position" "vector3" "-10.668596 2.188593 -1.154669"
-	"orientation" "quaternion" "0.139620 -0.029387 0.865796 -0.479625"
+	"position" "vector3" "-10.524813 1.950946 -1.436928"
+	"orientation" "quaternion" "0.151023 -0.023376 0.867260 -0.473821"
 }
 
 "DmeJoint"
@@ -266,16 +268,16 @@
 {
 	"id" "elementid" "d8baf0d6-91a5-58ca-ab5d-b8591e952cc4"
 	"name" "string" "arm_upper_R"
-	"position" "vector3" "5.459921 -0.000002 0.000206"
-	"orientation" "quaternion" "0.170049 0.389459 0.664696 0.614479"
+	"position" "vector3" "5.459921 -0.000009 0.000206"
+	"orientation" "quaternion" "0.180844 0.377693 0.671451 0.611389"
 }
 
 "DmeTransform"
 {
 	"id" "elementid" "1e0628b3-6489-5d89-bf30-8a6db7b736d5"
 	"name" "string" "arm_upper_R"
-	"position" "vector3" "5.459921 -0.000002 0.000206"
-	"orientation" "quaternion" "0.170049 0.389459 0.664696 0.614479"
+	"position" "vector3" "5.459921 -0.000009 0.000206"
+	"orientation" "quaternion" "0.180844 0.377693 0.671451 0.611389"
 }
 
 "DmeJoint"
@@ -927,16 +929,16 @@
 {
 	"id" "elementid" "d4805c8b-b61f-564d-a8bd-72d774f11856"
 	"name" "string" "arm_lower_R_twistctrl0"
-	"position" "vector3" "0.000000 0.000000 -0.000000"
-	"orientation" "quaternion" "0.000000 -0.000000 0.000000 1.000000"
+	"position" "vector3" "-0.000000 -0.000000 0.000000"
+	"orientation" "quaternion" "-0.000000 0.000000 0.000000 1.000000"
 }
 
 "DmeTransform"
 {
 	"id" "elementid" "6525ddba-7baf-5c99-a3db-e940dab029a2"
 	"name" "string" "arm_lower_R_twistctrl0"
-	"position" "vector3" "0.000000 0.000000 -0.000000"
-	"orientation" "quaternion" "0.000000 -0.000000 0.000000 1.000000"
+	"position" "vector3" "-0.000000 -0.000000 0.000000"
+	"orientation" "quaternion" "-0.000000 0.000000 0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -956,16 +958,16 @@
 {
 	"id" "elementid" "83f77357-88c4-5484-aea4-49831765276b"
 	"name" "string" "arm_lower_R_twist0"
-	"position" "vector3" "0.000000 0.000000 -0.000000"
-	"orientation" "quaternion" "0.000000 -0.000000 0.000000 1.000000"
+	"position" "vector3" "-0.000000 -0.000000 0.000000"
+	"orientation" "quaternion" "-0.000000 0.000000 0.000000 1.000000"
 }
 
 "DmeTransform"
 {
 	"id" "elementid" "f232e0e7-1973-50b3-ab31-15c28aab2224"
 	"name" "string" "arm_lower_R_twist0"
-	"position" "vector3" "0.000000 0.000000 -0.000000"
-	"orientation" "quaternion" "0.000000 -0.000000 0.000000 1.000000"
+	"position" "vector3" "-0.000000 -0.000000 0.000000"
+	"orientation" "quaternion" "-0.000000 0.000000 0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -988,7 +990,7 @@
 	"id" "elementid" "dd293414-5edc-58c1-90f5-81d938b629c3"
 	"name" "string" "arm_lower_R_twistctrl1"
 	"position" "vector3" "3.475166 0.000353 -0.000132"
-	"orientation" "quaternion" "0.061183 -0.000000 0.000000 0.998127"
+	"orientation" "quaternion" "0.061183 0.000000 -0.000000 0.998127"
 }
 
 "DmeTransform"
@@ -996,7 +998,7 @@
 	"id" "elementid" "86cccf3e-e08d-50aa-8740-5bda84fccf9e"
 	"name" "string" "arm_lower_R_twistctrl1"
 	"position" "vector3" "3.475166 0.000353 -0.000132"
-	"orientation" "quaternion" "0.061183 -0.000000 0.000000 0.998127"
+	"orientation" "quaternion" "0.061183 0.000000 -0.000000 0.998127"
 }
 
 "DmeJoint"
@@ -1046,16 +1048,16 @@
 {
 	"id" "elementid" "7291ac22-f354-5528-b2ca-136ea6ee21e5"
 	"name" "string" "arm_lower_R_twist2"
-	"position" "vector3" "0.000000 -0.000000 0.000000"
-	"orientation" "quaternion" "-0.000000 0.000000 -0.000000 1.000000"
+	"position" "vector3" "0.000000 0.000000 -0.000000"
+	"orientation" "quaternion" "0.000000 -0.000000 0.000000 1.000000"
 }
 
 "DmeTransform"
 {
 	"id" "elementid" "dff5ad0b-d5df-57e6-b143-848ef4dd03f9"
 	"name" "string" "arm_lower_R_twist2"
-	"position" "vector3" "0.000000 -0.000000 0.000000"
-	"orientation" "quaternion" "-0.000000 0.000000 -0.000000 1.000000"
+	"position" "vector3" "0.000000 0.000000 -0.000000"
+	"orientation" "quaternion" "0.000000 -0.000000 0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -1075,16 +1077,16 @@
 {
 	"id" "elementid" "81e826c4-c79f-5630-aae5-c5482a0ef96b"
 	"name" "string" "arm_lower_R_twist1"
-	"position" "vector3" "-0.000000 0.000000 -0.000000"
-	"orientation" "quaternion" "0.000000 0.000000 0.000000 1.000000"
+	"position" "vector3" "0.000000 -0.000000 -0.000000"
+	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
 {
 	"id" "elementid" "fb2438db-b75d-582f-92af-6612c0086e29"
 	"name" "string" "arm_lower_R_twist1"
-	"position" "vector3" "-0.000000 0.000000 -0.000000"
-	"orientation" "quaternion" "0.000000 0.000000 0.000000 1.000000"
+	"position" "vector3" "0.000000 -0.000000 -0.000000"
+	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -1105,16 +1107,16 @@
 {
 	"id" "elementid" "758f2fa9-c751-5307-a064-6a01fb1f0529"
 	"name" "string" "clavicle_L"
-	"position" "vector3" "-6.032639 7.788857 -1.578984"
-	"orientation" "quaternion" "0.885489 0.434333 0.082225 -0.143188"
+	"position" "vector3" "-5.874839 7.905529 -2.117309"
+	"orientation" "quaternion" "0.885262 0.438001 0.071747 -0.138990"
 }
 
 "DmeTransform"
 {
 	"id" "elementid" "1f6d966a-b62d-5503-9999-cb758083e914"
 	"name" "string" "clavicle_L"
-	"position" "vector3" "-6.032639 7.788857 -1.578984"
-	"orientation" "quaternion" "0.885489 0.434333 0.082225 -0.143188"
+	"position" "vector3" "-5.874839 7.905529 -2.117309"
+	"orientation" "quaternion" "0.885262 0.438001 0.071747 -0.138990"
 }
 
 "DmeJoint"
@@ -1135,16 +1137,16 @@
 {
 	"id" "elementid" "00af4ae4-730e-58a1-827c-41be1566d48a"
 	"name" "string" "arm_upper_L"
-	"position" "vector3" "5.460393 0.000010 -0.000226"
-	"orientation" "quaternion" "-0.456462 -0.351237 0.477899 0.663241"
+	"position" "vector3" "5.460393 0.000002 -0.000226"
+	"orientation" "quaternion" "-0.469310 -0.341850 0.484658 0.654212"
 }
 
 "DmeTransform"
 {
 	"id" "elementid" "ff34a06d-abff-5d09-9a6b-d02c42947f33"
 	"name" "string" "arm_upper_L"
-	"position" "vector3" "5.460393 0.000010 -0.000226"
-	"orientation" "quaternion" "-0.456462 -0.351237 0.477899 0.663241"
+	"position" "vector3" "5.460393 0.000002 -0.000226"
+	"orientation" "quaternion" "-0.469310 -0.341850 0.484658 0.654212"
 }
 
 "DmeJoint"
@@ -1261,7 +1263,7 @@
 	"id" "elementid" "b3a48e2c-b421-5c67-ad4e-97628d497859"
 	"name" "string" "finger_index_0_L"
 	"position" "vector3" "2.740234 -0.000041 -0.000136"
-	"orientation" "quaternion" "-0.063580 -0.178261 -0.370761 0.909240"
+	"orientation" "quaternion" "-0.048336 -0.135523 -0.281871 0.948602"
 }
 
 "DmeTransform"
@@ -1269,7 +1271,7 @@
 	"id" "elementid" "3a81c5bd-8543-5251-923f-bed70b1f346a"
 	"name" "string" "finger_index_0_L"
 	"position" "vector3" "2.740234 -0.000041 -0.000136"
-	"orientation" "quaternion" "-0.063580 -0.178261 -0.370761 0.909240"
+	"orientation" "quaternion" "-0.048336 -0.135523 -0.281871 0.948602"
 }
 
 "DmeJoint"
@@ -1291,7 +1293,7 @@
 	"id" "elementid" "e6baa798-1f07-5c6f-a532-adca5496935c"
 	"name" "string" "finger_index_1_L"
 	"position" "vector3" "1.708008 0.000008 0.000012"
-	"orientation" "quaternion" "0.200861 -0.571836 0.171613 0.776664"
+	"orientation" "quaternion" "0.155966 -0.444024 0.133256 0.872216"
 }
 
 "DmeTransform"
@@ -1299,7 +1301,7 @@
 	"id" "elementid" "55f3da78-7622-50b4-b102-7425644999af"
 	"name" "string" "finger_index_1_L"
 	"position" "vector3" "1.708008 0.000008 0.000012"
-	"orientation" "quaternion" "0.200861 -0.571836 0.171613 0.776664"
+	"orientation" "quaternion" "0.155966 -0.444024 0.133256 0.872216"
 }
 
 "DmeJoint"
@@ -1320,7 +1322,7 @@
 	"id" "elementid" "5cf91bd4-67dc-563c-af84-a4d6648e794e"
 	"name" "string" "finger_index_2_L"
 	"position" "vector3" "1.147461 0.000014 0.000006"
-	"orientation" "quaternion" "-0.049572 -0.296467 0.158914 0.940424"
+	"orientation" "quaternion" "-0.037509 -0.224322 0.120243 0.966341"
 }
 
 "DmeTransform"
@@ -1328,7 +1330,7 @@
 	"id" "elementid" "63ab0911-4f0c-5260-9076-ba091ee9631b"
 	"name" "string" "finger_index_2_L"
 	"position" "vector3" "1.147461 0.000014 0.000006"
-	"orientation" "quaternion" "-0.049572 -0.296467 0.158914 0.940424"
+	"orientation" "quaternion" "-0.037509 -0.224322 0.120243 0.966341"
 }
 
 "DmeJoint"
@@ -1380,7 +1382,7 @@
 	"id" "elementid" "85b4068d-dc15-58cd-b8ef-4ec4521656fd"
 	"name" "string" "finger_middle_0_L"
 	"position" "vector3" "2.707031 -0.000032 -0.000116"
-	"orientation" "quaternion" "-0.020247 -0.499439 -0.246013 0.830438"
+	"orientation" "quaternion" "-0.015584 -0.384422 -0.189358 0.903394"
 }
 
 "DmeTransform"
@@ -1388,7 +1390,7 @@
 	"id" "elementid" "b12c6aa9-eaa8-57df-9914-4d15a9b0ca50"
 	"name" "string" "finger_middle_0_L"
 	"position" "vector3" "2.707031 -0.000032 -0.000116"
-	"orientation" "quaternion" "-0.020247 -0.499439 -0.246013 0.830438"
+	"orientation" "quaternion" "-0.015584 -0.384422 -0.189358 0.903394"
 }
 
 "DmeJoint"
@@ -1410,7 +1412,7 @@
 	"id" "elementid" "db2f981b-a3e4-5987-ab66-2aaa3cb47373"
 	"name" "string" "finger_middle_1_L"
 	"position" "vector3" "2.134766 0.000002 0.000006"
-	"orientation" "quaternion" "-0.043504 -0.630003 0.281699 0.722391"
+	"orientation" "quaternion" "-0.034091 -0.493688 0.220747 0.840464"
 }
 
 "DmeTransform"
@@ -1418,7 +1420,7 @@
 	"id" "elementid" "5b46747e-4946-512f-a887-fb24539523c4"
 	"name" "string" "finger_middle_1_L"
 	"position" "vector3" "2.134766 0.000002 0.000006"
-	"orientation" "quaternion" "-0.043504 -0.630003 0.281699 0.722391"
+	"orientation" "quaternion" "-0.034091 -0.493688 0.220747 0.840464"
 }
 
 "DmeJoint"
@@ -1439,7 +1441,7 @@
 	"id" "elementid" "c649d146-e64f-58e1-ac62-194fe1d5051c"
 	"name" "string" "finger_middle_2_L"
 	"position" "vector3" "1.301758 0.000011 0.000003"
-	"orientation" "quaternion" "-0.067108 -0.028019 0.008454 0.997316"
+	"orientation" "quaternion" "-0.050350 -0.021022 0.006343 0.998490"
 }
 
 "DmeTransform"
@@ -1447,7 +1449,7 @@
 	"id" "elementid" "ca09ae7d-eca1-547c-bc0c-e2b9c8a89382"
 	"name" "string" "finger_middle_2_L"
 	"position" "vector3" "1.301758 0.000011 0.000003"
-	"orientation" "quaternion" "-0.067108 -0.028019 0.008454 0.997316"
+	"orientation" "quaternion" "-0.050350 -0.021022 0.006343 0.998490"
 }
 
 "DmeJoint"
@@ -1499,7 +1501,7 @@
 	"id" "elementid" "8becda85-e513-5621-bd98-89f2337d373e"
 	"name" "string" "finger_ring_0_L"
 	"position" "vector3" "2.710937 -0.000050 -0.000060"
-	"orientation" "quaternion" "-0.062687 -0.591677 -0.074114 0.800310"
+	"orientation" "quaternion" "-0.048486 -0.457646 -0.057325 0.885959"
 }
 
 "DmeTransform"
@@ -1507,7 +1509,7 @@
 	"id" "elementid" "749cd623-96e0-5016-89ac-3eb2b7576d6e"
 	"name" "string" "finger_ring_0_L"
 	"position" "vector3" "2.710937 -0.000050 -0.000060"
-	"orientation" "quaternion" "-0.062687 -0.591677 -0.074114 0.800310"
+	"orientation" "quaternion" "-0.048486 -0.457646 -0.057325 0.885959"
 }
 
 "DmeJoint"
@@ -1529,7 +1531,7 @@
 	"id" "elementid" "e710651e-35eb-5695-b065-f7b53e43deef"
 	"name" "string" "finger_ring_1_L"
 	"position" "vector3" "1.849609 0.000022 -0.000000"
-	"orientation" "quaternion" "-0.125037 -0.497196 0.145826 0.846107"
+	"orientation" "quaternion" "-0.096001 -0.381738 0.111962 0.912428"
 }
 
 "DmeTransform"
@@ -1537,7 +1539,7 @@
 	"id" "elementid" "8f99569c-c126-57ec-b78e-bf897e9bcfbc"
 	"name" "string" "finger_ring_1_L"
 	"position" "vector3" "1.849609 0.000022 -0.000000"
-	"orientation" "quaternion" "-0.125037 -0.497196 0.145826 0.846107"
+	"orientation" "quaternion" "-0.096001 -0.381738 0.111962 0.912428"
 }
 
 "DmeJoint"
@@ -1558,7 +1560,7 @@
 	"id" "elementid" "711ccb5e-294e-5b98-a77c-99030811025e"
 	"name" "string" "finger_ring_2_L"
 	"position" "vector3" "1.215820 0.000008 0.000011"
-	"orientation" "quaternion" "-0.003151 -0.000000 0.000000 0.999995"
+	"orientation" "quaternion" "-0.002363 -0.000000 0.000000 0.999997"
 }
 
 "DmeTransform"
@@ -1566,7 +1568,7 @@
 	"id" "elementid" "10d50778-5519-5404-91f3-b07b28f338dc"
 	"name" "string" "finger_ring_2_L"
 	"position" "vector3" "1.215820 0.000008 0.000011"
-	"orientation" "quaternion" "-0.003151 -0.000000 0.000000 0.999995"
+	"orientation" "quaternion" "-0.002363 -0.000000 0.000000 0.999997"
 }
 
 "DmeJoint"
@@ -1618,7 +1620,7 @@
 	"id" "elementid" "f2e63ce0-2448-5d46-9bcd-dd889d7ea29c"
 	"name" "string" "finger_pinky_0_L"
 	"position" "vector3" "2.652344 -0.000064 -0.000185"
-	"orientation" "quaternion" "-0.120786 -0.635566 -0.036393 0.761671"
+	"orientation" "quaternion" "-0.094023 -0.494744 -0.028329 0.863473"
 }
 
 "DmeTransform"
@@ -1626,7 +1628,7 @@
 	"id" "elementid" "0184269a-138b-5875-8558-72ec1b725c7b"
 	"name" "string" "finger_pinky_0_L"
 	"position" "vector3" "2.652344 -0.000064 -0.000185"
-	"orientation" "quaternion" "-0.120786 -0.635566 -0.036393 0.761671"
+	"orientation" "quaternion" "-0.094023 -0.494744 -0.028329 0.863473"
 }
 
 "DmeJoint"
@@ -1648,7 +1650,7 @@
 	"id" "elementid" "e8d6ee5c-b7c9-5288-b05c-37dbf6e26894"
 	"name" "string" "finger_pinky_1_L"
 	"position" "vector3" "1.496094 0.000008 0.000010"
-	"orientation" "quaternion" "-0.102258 -0.318832 0.089494 0.938019"
+	"orientation" "quaternion" "-0.077402 -0.241333 0.067741 0.964976"
 }
 
 "DmeTransform"
@@ -1656,7 +1658,7 @@
 	"id" "elementid" "096a0134-9f65-500d-855c-c71ae2c09010"
 	"name" "string" "finger_pinky_1_L"
 	"position" "vector3" "1.496094 0.000008 0.000010"
-	"orientation" "quaternion" "-0.102258 -0.318832 0.089494 0.938019"
+	"orientation" "quaternion" "-0.077402 -0.241333 0.067741 0.964976"
 }
 
 "DmeJoint"
@@ -1677,7 +1679,7 @@
 	"id" "elementid" "eb009fd3-314a-570a-b704-24aa75370f22"
 	"name" "string" "finger_pinky_2_L"
 	"position" "vector3" "0.879395 0.000002 0.000005"
-	"orientation" "quaternion" "0.035225 -0.000000 0.000000 0.999379"
+	"orientation" "quaternion" "0.026421 -0.000000 0.000000 0.999651"
 }
 
 "DmeTransform"
@@ -1685,7 +1687,7 @@
 	"id" "elementid" "83f43b73-8b22-5f2f-9dc5-3ba161f55ce3"
 	"name" "string" "finger_pinky_2_L"
 	"position" "vector3" "0.879395 0.000002 0.000005"
-	"orientation" "quaternion" "0.035225 -0.000000 0.000000 0.999379"
+	"orientation" "quaternion" "0.026421 -0.000000 0.000000 0.999651"
 }
 
 "DmeJoint"
@@ -1707,7 +1709,7 @@
 	"id" "elementid" "1fede10f-d0f4-5a44-907f-15859b1d0ba3"
 	"name" "string" "finger_thumb_0_L"
 	"position" "vector3" "0.782227 1.041016 0.766602"
-	"orientation" "quaternion" "0.716423 0.192600 0.363588 0.563425"
+	"orientation" "quaternion" "0.665611 0.178940 0.337801 0.640963"
 }
 
 "DmeTransform"
@@ -1715,7 +1717,7 @@
 	"id" "elementid" "333701b1-c426-5777-922f-5dd5fe64ac31"
 	"name" "string" "finger_thumb_0_L"
 	"position" "vector3" "0.782227 1.041016 0.766602"
-	"orientation" "quaternion" "0.716423 0.192600 0.363588 0.563425"
+	"orientation" "quaternion" "0.665611 0.178940 0.337801 0.640963"
 }
 
 "DmeJoint"
@@ -1737,7 +1739,7 @@
 	"id" "elementid" "470b94c4-d681-502a-aa38-1beb9f2197b9"
 	"name" "string" "finger_thumb_1_L"
 	"position" "vector3" "1.871094 -0.000007 -0.000005"
-	"orientation" "quaternion" "-0.016978 -0.242988 -0.097841 0.964933"
+	"orientation" "quaternion" "-0.015314 -0.219180 -0.088255 0.971564"
 }
 
 "DmeTransform"
@@ -1745,7 +1747,7 @@
 	"id" "elementid" "eb964abb-1236-5619-b13f-9be10ac2df55"
 	"name" "string" "finger_thumb_1_L"
 	"position" "vector3" "1.871094 -0.000007 -0.000005"
-	"orientation" "quaternion" "-0.016978 -0.242988 -0.097841 0.964933"
+	"orientation" "quaternion" "-0.015314 -0.219180 -0.088255 0.971564"
 }
 
 "DmeJoint"
@@ -1766,7 +1768,7 @@
 	"id" "elementid" "7f9b5e21-16df-52a9-8e9e-1a3e1190415f"
 	"name" "string" "finger_thumb_2_L"
 	"position" "vector3" "1.429688 -0.000005 0.000005"
-	"orientation" "quaternion" "0.000504 -0.019096 0.005367 0.999803"
+	"orientation" "quaternion" "0.000453 -0.017187 0.004830 0.999841"
 }
 
 "DmeTransform"
@@ -1774,7 +1776,7 @@
 	"id" "elementid" "bb8ba373-9e74-5153-ab0a-77ab3c22ecfe"
 	"name" "string" "finger_thumb_2_L"
 	"position" "vector3" "1.429688 -0.000005 0.000005"
-	"orientation" "quaternion" "0.000504 -0.019096 0.005367 0.999803"
+	"orientation" "quaternion" "0.000453 -0.017187 0.004830 0.999841"
 }
 
 "DmeJoint"
@@ -1796,16 +1798,16 @@
 {
 	"id" "elementid" "9ca38c4c-7688-5654-b695-9271dc1c3a88"
 	"name" "string" "arm_lower_L_twistctrl0"
-	"position" "vector3" "0.000000 0.000000 0.000000"
-	"orientation" "quaternion" "0.000000 -0.000000 0.000000 1.000000"
+	"position" "vector3" "-0.000000 -0.000000 0.000000"
+	"orientation" "quaternion" "-0.000000 -0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
 {
 	"id" "elementid" "8b85e6e7-99dc-5267-899d-2b060535b2b9"
 	"name" "string" "arm_lower_L_twistctrl0"
-	"position" "vector3" "0.000000 0.000000 0.000000"
-	"orientation" "quaternion" "0.000000 -0.000000 0.000000 1.000000"
+	"position" "vector3" "-0.000000 -0.000000 0.000000"
+	"orientation" "quaternion" "-0.000000 -0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -1828,7 +1830,7 @@
 	"id" "elementid" "3dd79d43-6289-5e0d-8143-cc4545f9da7f"
 	"name" "string" "arm_lower_L_twistctrl1"
 	"position" "vector3" "3.475466 0.000506 0.000143"
-	"orientation" "quaternion" "-0.177464 -0.000000 0.000000 0.984127"
+	"orientation" "quaternion" "-0.177464 -0.000000 -0.000000 0.984127"
 }
 
 "DmeTransform"
@@ -1836,7 +1838,7 @@
 	"id" "elementid" "f6a74ce2-bd15-5b4d-bce4-c20b471f1ac7"
 	"name" "string" "arm_lower_L_twistctrl1"
 	"position" "vector3" "3.475466 0.000506 0.000143"
-	"orientation" "quaternion" "-0.177464 -0.000000 0.000000 0.984127"
+	"orientation" "quaternion" "-0.177464 -0.000000 -0.000000 0.984127"
 }
 
 "DmeJoint"
@@ -1858,7 +1860,7 @@
 	"id" "elementid" "30282f6c-0123-5d90-b835-2c85d8c5ce82"
 	"name" "string" "arm_lower_L_twistctrl2"
 	"position" "vector3" "3.475466 0.000425 0.000310"
-	"orientation" "quaternion" "-0.324948 -0.000000 0.000000 0.945732"
+	"orientation" "quaternion" "-0.324948 0.000000 -0.000000 0.945732"
 }
 
 "DmeTransform"
@@ -1866,7 +1868,7 @@
 	"id" "elementid" "be6b0488-e228-5a10-95d5-91737db62cbe"
 	"name" "string" "arm_lower_L_twistctrl2"
 	"position" "vector3" "3.475466 0.000425 0.000310"
-	"orientation" "quaternion" "-0.324948 -0.000000 0.000000 0.945732"
+	"orientation" "quaternion" "-0.324948 0.000000 -0.000000 0.945732"
 }
 
 "DmeJoint"
@@ -1886,16 +1888,16 @@
 {
 	"id" "elementid" "e45ddcc9-2b35-525d-b7b9-1fbd81d6f906"
 	"name" "string" "arm_lower_L_twist2"
-	"position" "vector3" "0.000000 0.000000 0.000000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"position" "vector3" "-0.000000 0.000000 0.000000"
+	"orientation" "quaternion" "-0.000000 -0.000000 0.000000 1.000000"
 }
 
 "DmeTransform"
 {
 	"id" "elementid" "e5acf8ef-ebe0-5150-9916-8b984982e476"
 	"name" "string" "arm_lower_L_twist2"
-	"position" "vector3" "0.000000 0.000000 0.000000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"position" "vector3" "-0.000000 0.000000 0.000000"
+	"orientation" "quaternion" "-0.000000 -0.000000 0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -1915,16 +1917,16 @@
 {
 	"id" "elementid" "96fb63d1-bee9-5687-804e-344eebb9bb55"
 	"name" "string" "arm_lower_L_twist1"
-	"position" "vector3" "0.000000 -0.000000 0.000000"
-	"orientation" "quaternion" "0.000000 -0.000000 0.000000 1.000000"
+	"position" "vector3" "-0.000000 0.000000 0.000000"
+	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
 {
 	"id" "elementid" "73c4ba01-0f66-5853-b2e5-145b2ca3828f"
 	"name" "string" "arm_lower_L_twist1"
-	"position" "vector3" "0.000000 -0.000000 0.000000"
-	"orientation" "quaternion" "0.000000 -0.000000 0.000000 1.000000"
+	"position" "vector3" "-0.000000 0.000000 0.000000"
+	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -1944,16 +1946,16 @@
 {
 	"id" "elementid" "321a97f7-1267-53a5-bdff-361d8365b237"
 	"name" "string" "arm_lower_L_twist0"
-	"position" "vector3" "0.000000 0.000000 0.000000"
-	"orientation" "quaternion" "0.000000 -0.000000 0.000000 1.000000"
+	"position" "vector3" "-0.000000 -0.000000 0.000000"
+	"orientation" "quaternion" "-0.000000 -0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
 {
 	"id" "elementid" "ccc985a7-6d6a-55aa-a1e6-6a50792877ba"
 	"name" "string" "arm_lower_L_twist0"
-	"position" "vector3" "0.000000 0.000000 0.000000"
-	"orientation" "quaternion" "0.000000 -0.000000 0.000000 1.000000"
+	"position" "vector3" "-0.000000 -0.000000 0.000000"
+	"orientation" "quaternion" "-0.000000 -0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -1992,7 +1994,9 @@
 		"element" "7c4517f6-2058-51f7-8b71-ad07a5a2240c",
 		"element" "ec13794f-53c3-576d-a55d-8fd579cedc7d",
 		"element" "d121f26f-ba60-51d2-88ec-1380c522f9e8",
-		"element" "0f4ec47a-502d-5df9-9881-4ef03a6b9e75"
+		"element" "0f4ec47a-502d-5df9-9881-4ef03a6b9e75",
+		"element" "c71807a6-4cb2-5dd2-88b4-3056360bf7bb",
+		"element" "15cbd170-408b-59a0-90a6-236b718cad30"
 	]
 }
 
@@ -2000,16 +2004,16 @@
 {
 	"id" "elementid" "2077497e-dcac-507d-bb54-961012f96ef1"
 	"name" "string" "tag_sling"
-	"position" "vector3" "0.578280 -0.575955 -2.958196"
-	"orientation" "quaternion" "0.020386 0.007733 0.000559 0.999762"
+	"position" "vector3" "0.623052 -0.572826 -2.959452"
+	"orientation" "quaternion" "-0.000000 0.000002 0.000000 1.000000"
 }
 
 "DmeTransform"
 {
 	"id" "elementid" "23b4f70d-5fa1-5d9a-b04b-85741855395e"
 	"name" "string" "tag_sling"
-	"position" "vector3" "0.578280 -0.575955 -2.958196"
-	"orientation" "quaternion" "0.020386 0.007733 0.000559 0.999762"
+	"position" "vector3" "0.623052 -0.572826 -2.959452"
+	"orientation" "quaternion" "-0.000000 0.000002 0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2030,7 +2034,7 @@
 	"id" "elementid" "b91147a1-b2fa-5e64-8704-d1be7723aca7"
 	"name" "string" "j_bolt"
 	"position" "vector3" "16.871000 -0.000000 5.434000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -2038,7 +2042,7 @@
 	"id" "elementid" "d16ed7ec-eaaf-569c-995d-180b59ac18e7"
 	"name" "string" "j_bolt"
 	"position" "vector3" "16.871000 -0.000000 5.434000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2059,7 +2063,7 @@
 	"id" "elementid" "16dd7db5-d00d-5216-b918-3dcdf06b257b"
 	"name" "string" "j_trigger"
 	"position" "vector3" "4.562500 0.609375 -0.106934"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -2067,7 +2071,7 @@
 	"id" "elementid" "a3f94e3b-9cf5-524e-9bde-3b6b4e70ee51"
 	"name" "string" "j_trigger"
 	"position" "vector3" "4.562500 0.609375 -0.106934"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2088,7 +2092,7 @@
 	"id" "elementid" "576f436c-be08-52be-a551-0721ee465185"
 	"name" "string" "tag_acog_2"
 	"position" "vector3" "2.570000 0.573000 2.960000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -2096,7 +2100,7 @@
 	"id" "elementid" "e3a8e401-d096-554d-bac7-49618694c097"
 	"name" "string" "tag_acog_2"
 	"position" "vector3" "2.570000 0.573000 2.960000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2117,7 +2121,7 @@
 	"id" "elementid" "740745d1-815c-5f50-abc4-75513d1bcd6c"
 	"name" "string" "tag_align_gun"
 	"position" "vector3" "3.228516 0.572266 2.974609"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -2125,7 +2129,7 @@
 	"id" "elementid" "174420d0-923d-5957-b8d5-1a84a91e0b7b"
 	"name" "string" "tag_align_gun"
 	"position" "vector3" "3.228516 0.572266 2.974609"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2156,7 +2160,7 @@
 	"id" "elementid" "c7609eec-3c50-5f7f-bf0a-68130b8929b0"
 	"name" "string" "tag_barrel_attach"
 	"position" "vector3" "13.312500 0.572266 2.527344"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -2164,7 +2168,7 @@
 	"id" "elementid" "58fb7e54-b8b1-52eb-9b6d-6ad5124a11ed"
 	"name" "string" "tag_barrel_attach"
 	"position" "vector3" "13.312500 0.572266 2.527344"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2184,16 +2188,16 @@
 {
 	"id" "elementid" "3f63038c-31f2-5273-b6e2-a409e2e2afd2"
 	"name" "string" "tag_bipod_attach"
-	"position" "vector3" "12.076000 0.000000 -1.158000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"position" "vector3" "12.076000 -0.000000 -1.158000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
 {
 	"id" "elementid" "ba4e0311-ca06-5f41-9ac3-3b912c8dc652"
 	"name" "string" "tag_bipod_attach"
-	"position" "vector3" "12.076000 0.000000 -1.158000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"position" "vector3" "12.076000 -0.000000 -1.158000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2247,7 +2251,7 @@
 	"id" "elementid" "92c990a0-040f-5e64-a547-564dcf55c045"
 	"name" "string" "tag_grenade_launcher"
 	"position" "vector3" "-2.246094 0.000094 -1.553711"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -2255,7 +2259,7 @@
 	"id" "elementid" "cbd4451a-6200-5619-9123-40dada6ac94b"
 	"name" "string" "tag_grenade_launcher"
 	"position" "vector3" "-2.246094 0.000094 -1.553711"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2275,16 +2279,16 @@
 {
 	"id" "elementid" "6ff79b77-8068-519e-b049-425d2f590f29"
 	"name" "string" "j_grenade2"
-	"position" "vector3" "7.631001 -0.000000 -1.010000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"position" "vector3" "7.631001 0.000000 -1.010000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
 {
 	"id" "elementid" "e49e8996-b2a0-57ad-841b-3e71c84b6361"
 	"name" "string" "j_grenade2"
-	"position" "vector3" "7.631001 -0.000000 -1.010000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"position" "vector3" "7.631001 0.000000 -1.010000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2305,7 +2309,7 @@
 	"id" "elementid" "128fe287-7851-578b-8d48-73a6597398ea"
 	"name" "string" "j_ub_safety"
 	"position" "vector3" "4.177000 -0.267000 -0.747000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -2313,7 +2317,7 @@
 	"id" "elementid" "82939604-57c0-56a4-8365-72e32b61b37e"
 	"name" "string" "j_ub_safety"
 	"position" "vector3" "4.177000 -0.267000 -0.747000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2333,16 +2337,16 @@
 {
 	"id" "elementid" "5a7b925c-5104-59d2-bc31-715bb3fd077f"
 	"name" "string" "j_ub_trigger"
-	"position" "vector3" "2.420000 -0.000000 -1.002000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"position" "vector3" "2.420000 0.000000 -1.002000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
 {
 	"id" "elementid" "089a99ac-6223-577b-826c-a351a8c011f3"
 	"name" "string" "j_ub_trigger"
-	"position" "vector3" "2.420000 -0.000000 -1.002000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"position" "vector3" "2.420000 0.000000 -1.002000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2362,16 +2366,16 @@
 {
 	"id" "elementid" "ed4efc09-2ff5-54df-ae41-da18b247c68c"
 	"name" "string" "j_grenade1"
-	"position" "vector3" "7.631001 -0.000000 -1.010000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"position" "vector3" "7.631001 0.000000 -1.010000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
 {
 	"id" "elementid" "d14f294b-e6e9-5505-918c-58f5a65aae45"
 	"name" "string" "j_grenade1"
-	"position" "vector3" "7.631001 -0.000000 -1.010000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"position" "vector3" "7.631001 0.000000 -1.010000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2392,7 +2396,7 @@
 	"id" "elementid" "f9c8303c-2082-5db1-bd46-f88007710e08"
 	"name" "string" "tag_rail_attach"
 	"position" "vector3" "16.843750 0.000212 -1.421875"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -2400,7 +2404,7 @@
 	"id" "elementid" "7a819a6a-3d15-50a9-b8ae-24f42b7daf2c"
 	"name" "string" "tag_rail_attach"
 	"position" "vector3" "16.843750 0.000212 -1.421875"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2421,7 +2425,7 @@
 	"id" "elementid" "64017cb5-480b-5cb1-b2fb-d4f1727caf88"
 	"name" "string" "tag_flash"
 	"position" "vector3" "20.062500 0.012230 -1.493164"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -2429,7 +2433,7 @@
 	"id" "elementid" "96f4b3e3-d95b-58c7-ac9d-f3c31cefd9e0"
 	"name" "string" "tag_flash"
 	"position" "vector3" "20.062500 0.012230 -1.493164"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2450,7 +2454,7 @@
 	"id" "elementid" "40519aea-6f8b-57b6-bcba-be766f5a6694"
 	"name" "string" "j_bipod_left_leg"
 	"position" "vector3" "17.412426 0.579161 -2.788271"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -2458,7 +2462,7 @@
 	"id" "elementid" "3415dcc1-61ef-5dff-a748-63ea6c02d5c0"
 	"name" "string" "j_bipod_left_leg"
 	"position" "vector3" "17.412426 0.579161 -2.788271"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2479,7 +2483,7 @@
 	"id" "elementid" "bbd4514c-9d7a-5f2f-9f4c-e369dadae5cf"
 	"name" "string" "j_bipod_right_leg"
 	"position" "vector3" "17.417431 -0.570542 -2.788329"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -2487,7 +2491,7 @@
 	"id" "elementid" "8afbcd09-3eb8-50c4-a500-19871e33da1e"
 	"name" "string" "j_bipod_right_leg"
 	"position" "vector3" "17.417431 -0.570542 -2.788329"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2537,7 +2541,7 @@
 	"id" "elementid" "9724cf6d-1e52-5d28-8c88-992851930e75"
 	"name" "string" "j_barrel_carryhandle"
 	"position" "vector3" "-1.918831 -0.557815 -0.765826"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -2545,7 +2549,7 @@
 	"id" "elementid" "333142f4-17ac-5435-99dd-2f26b1e51240"
 	"name" "string" "j_barrel_carryhandle"
 	"position" "vector3" "-1.918831 -0.557815 -0.765826"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2595,7 +2599,7 @@
 	"id" "elementid" "b91ced0a-cad2-5eaf-90e2-60f3a0ad402c"
 	"name" "string" "tag_holo"
 	"position" "vector3" "4.274000 0.573000 2.960000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -2603,7 +2607,7 @@
 	"id" "elementid" "e77042bf-2815-5230-8115-c876930c12bb"
 	"name" "string" "tag_holo"
 	"position" "vector3" "4.274000 0.573000 2.960000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2626,7 +2630,7 @@
 	"id" "elementid" "a18e998d-498b-5b12-b4d6-f382bd903991"
 	"name" "string" "tag_hybrid"
 	"position" "vector3" "3.135000 0.573000 2.963000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -2634,7 +2638,7 @@
 	"id" "elementid" "b1e9e008-eed4-5e19-bd06-34475b5422d9"
 	"name" "string" "tag_hybrid"
 	"position" "vector3" "3.135000 0.573000 2.963000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2655,7 +2659,7 @@
 	"id" "elementid" "cab11faa-7210-506a-b36f-4d1adebbbb4b"
 	"name" "string" "j_hybrid_scope"
 	"position" "vector3" "1.084961 -0.660645 -0.148926"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -2663,7 +2667,7 @@
 	"id" "elementid" "c8e8bc14-8a38-5d3a-8e23-9f1b8dd39dbe"
 	"name" "string" "j_hybrid_scope"
 	"position" "vector3" "1.084961 -0.660645 -0.148926"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2684,7 +2688,7 @@
 	"id" "elementid" "31065022-c9a9-5b06-807d-a5ce0fc90293"
 	"name" "string" "j_magnifier_lever"
 	"position" "vector3" "1.066406 0.588379 0.075989"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -2692,7 +2696,7 @@
 	"id" "elementid" "9078ecd6-8e01-5fa5-b3ed-ed6138d34c69"
 	"name" "string" "j_magnifier_lever"
 	"position" "vector3" "1.066406 0.588379 0.075989"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2745,7 +2749,7 @@
 	"id" "elementid" "26786750-feeb-52b7-af83-0af7485934b5"
 	"name" "string" "tag_mag_attach"
 	"position" "vector3" "9.484375 0.572754 -0.093933"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -2753,7 +2757,7 @@
 	"id" "elementid" "91f397fd-b0ac-58d2-91ac-93a80ea622df"
 	"name" "string" "tag_mag_attach"
 	"position" "vector3" "9.484375 0.572754 -0.093933"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2776,7 +2780,7 @@
 	"id" "elementid" "ed1eab4d-6457-5369-b940-85e55922a68f"
 	"name" "string" "j_mag1"
 	"position" "vector3" "-1.187500 -0.000020 0.126953"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -2784,7 +2788,7 @@
 	"id" "elementid" "f6b7b9d3-ab8e-5c9b-881f-8b973deaf126"
 	"name" "string" "j_mag1"
 	"position" "vector3" "-1.187500 -0.000020 0.126953"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2805,7 +2809,7 @@
 	"id" "elementid" "c381993f-ce41-5eae-9de9-eaa860f1ff13"
 	"name" "string" "j_bullet"
 	"position" "vector3" "0.095000 -0.144000 0.332000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -2813,7 +2817,7 @@
 	"id" "elementid" "cbb226fb-8449-51d7-b87f-e66ab9dc96b1"
 	"name" "string" "j_bullet"
 	"position" "vector3" "0.095000 -0.144000 0.332000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2834,7 +2838,7 @@
 	"id" "elementid" "d71e1d23-24f0-58b4-bb18-76b0d794746f"
 	"name" "string" "j_bullet2"
 	"position" "vector3" "0.095000 0.182000 0.167000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -2842,7 +2846,7 @@
 	"id" "elementid" "767ab4d9-8ee3-5a7f-a756-2126f2f0753e"
 	"name" "string" "j_bullet2"
 	"position" "vector3" "0.095000 0.182000 0.167000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2863,7 +2867,7 @@
 	"id" "elementid" "fd9e18b3-0dce-548a-aad9-32c5af0ab4d9"
 	"name" "string" "j_mag2"
 	"position" "vector3" "-31.640625 -0.001037 -1.160156"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -2871,7 +2875,7 @@
 	"id" "elementid" "e3d88449-24c6-59d1-9ed1-246e5a4f8800"
 	"name" "string" "j_mag2"
 	"position" "vector3" "-31.640625 -0.001037 -1.160156"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2892,7 +2896,7 @@
 	"id" "elementid" "9a17bb59-d129-56b7-9fcb-99675199b7d8"
 	"name" "string" "j_ammo_09"
 	"position" "vector3" "-5.960938 -0.175659 0.604492"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -2900,7 +2904,7 @@
 	"id" "elementid" "f1f4ba43-b6d5-5b2a-ac13-665b8e1d391a"
 	"name" "string" "j_ammo_09"
 	"position" "vector3" "-5.960938 -0.175659 0.604492"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2921,7 +2925,7 @@
 	"id" "elementid" "e024e4e8-492b-56f2-a7a9-77c49d4b4fa3"
 	"name" "string" "tag_rail"
 	"position" "vector3" "6.357000 0.573000 2.616000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -2929,7 +2933,7 @@
 	"id" "elementid" "ac504da6-1c86-5f0a-a69c-916131e7fa84"
 	"name" "string" "tag_rail"
 	"position" "vector3" "6.357000 0.573000 2.616000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2950,7 +2954,7 @@
 	"id" "elementid" "869603b4-faab-565c-bfe4-94901567eb19"
 	"name" "string" "tag_reflex"
 	"position" "vector3" "4.144000 0.573000 2.960000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -2958,7 +2962,7 @@
 	"id" "elementid" "345722d8-d2b0-59b5-be8c-cf4216dff12d"
 	"name" "string" "tag_reflex"
 	"position" "vector3" "4.144000 0.573000 2.960000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2979,7 +2983,7 @@
 	"id" "elementid" "7bd5d7be-8579-5e46-b9be-24ee5a70faab"
 	"name" "string" "tag_scope"
 	"position" "vector3" "2.974609 0.572266 2.958984"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -2987,7 +2991,7 @@
 	"id" "elementid" "bca7ef27-d6d0-531e-80ba-3676cbec9897"
 	"name" "string" "tag_scope"
 	"position" "vector3" "2.974609 0.572266 2.958984"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -3008,7 +3012,7 @@
 	"id" "elementid" "92369aa1-5cd2-587c-ab6f-13f86d78bc72"
 	"name" "string" "tag_shtgn_attach"
 	"position" "vector3" "11.062500 0.572754 0.973633"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -3016,7 +3020,7 @@
 	"id" "elementid" "7fb7f0af-bf17-5035-b620-16789b16371c"
 	"name" "string" "tag_shtgn_attach"
 	"position" "vector3" "11.062500 0.572754 0.973633"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -3037,7 +3041,7 @@
 	"id" "elementid" "e0cd89b0-564e-5b4d-9026-b77f7bc18edd"
 	"name" "string" "tag_sight_on"
 	"position" "vector3" "17.521000 -0.000000 4.333000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -3045,7 +3049,7 @@
 	"id" "elementid" "3b9333f5-9cc6-5e13-8c5f-34a6b8fe483e"
 	"name" "string" "tag_sight_on"
 	"position" "vector3" "17.521000 -0.000000 4.333000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -3066,7 +3070,7 @@
 	"id" "elementid" "9f690419-44c9-52a6-ad32-dd17f3509eeb"
 	"name" "string" "tag_stock_attach"
 	"position" "vector3" "1.254883 0.572754 0.297852"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -3074,7 +3078,7 @@
 	"id" "elementid" "de70a45d-2f5a-5af0-963b-49fa9a7d69cb"
 	"name" "string" "tag_stock_attach"
 	"position" "vector3" "1.254883 0.572754 0.297852"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -3095,7 +3099,7 @@
 	"id" "elementid" "e87e9a5f-c479-59d8-a756-7dd7eb2fd68a"
 	"name" "string" "tag_stock_show"
 	"position" "vector3" "8.331999 -0.000000 4.333000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -3103,7 +3107,7 @@
 	"id" "elementid" "626a675f-8863-56bd-8102-512a2d5ef93f"
 	"name" "string" "tag_stock_show"
 	"position" "vector3" "8.331999 -0.000000 4.333000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -3124,7 +3128,7 @@
 	"id" "elementid" "a1f9f20b-8237-50e0-bd96-6628c81869b2"
 	"name" "string" "tag_taclight"
 	"position" "vector3" "21.100000 1.015000 4.613000"
-	"orientation" "quaternion" "-0.707107 -0.000000 0.000000 0.707107"
+	"orientation" "quaternion" "-0.707107 -0.000000 -0.000000 0.707107"
 }
 
 "DmeTransform"
@@ -3132,7 +3136,7 @@
 	"id" "elementid" "02c01e28-27c1-52c1-8791-e2575fcc5806"
 	"name" "string" "tag_taclight"
 	"position" "vector3" "21.100000 1.015000 4.613000"
-	"orientation" "quaternion" "-0.707107 -0.000000 0.000000 0.707107"
+	"orientation" "quaternion" "-0.707107 -0.000000 -0.000000 0.707107"
 }
 
 "DmeJoint"
@@ -3153,7 +3157,7 @@
 	"id" "elementid" "ccf8c3f6-93a3-5a44-a99b-fac499a6c166"
 	"name" "string" "tag_thermal"
 	"position" "vector3" "2.648438 0.572266 2.958984"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -3161,7 +3165,7 @@
 	"id" "elementid" "59df6f03-1c62-5c48-8292-9c1b7a790840"
 	"name" "string" "tag_thermal"
 	"position" "vector3" "2.648438 0.572266 2.958984"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -3211,7 +3215,7 @@
 	"id" "elementid" "e279b7a4-2573-55e6-9189-a30d755a1ba6"
 	"name" "string" "j_fireselect"
 	"position" "vector3" "3.661000 0.450000 0.680000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -3219,7 +3223,7 @@
 	"id" "elementid" "70a3aeaf-10a2-51a6-8b2d-4c986064254a"
 	"name" "string" "j_fireselect"
 	"position" "vector3" "3.661000 0.450000 0.680000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -3240,7 +3244,7 @@
 	"id" "elementid" "3536dec1-5adc-5fb2-b01d-280cd2ef3f1c"
 	"name" "string" "j_magrel"
 	"position" "vector3" "13.056998 -0.000000 2.302000"
-	"orientation" "quaternion" "0.000000 -0.000000 0.707107 0.707107"
+	"orientation" "quaternion" "-0.000000 -0.000000 0.707107 0.707107"
 }
 
 "DmeTransform"
@@ -3248,7 +3252,7 @@
 	"id" "elementid" "c74accdd-518c-59aa-be08-0c8f1d24fe79"
 	"name" "string" "j_magrel"
 	"position" "vector3" "13.056998 -0.000000 2.302000"
-	"orientation" "quaternion" "0.000000 -0.000000 0.707107 0.707107"
+	"orientation" "quaternion" "-0.000000 -0.000000 0.707107 0.707107"
 }
 
 "DmeJoint"
@@ -3269,7 +3273,7 @@
 	"id" "elementid" "18964a96-e655-5db7-8fd3-29a16d83532f"
 	"name" "string" "tag_pistolgrip_attach"
 	"position" "vector3" "3.968750 0.572754 -0.350830"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -3277,7 +3281,7 @@
 	"id" "elementid" "11aa2cbf-4f0f-5cb1-849c-bde77f37eaf2"
 	"name" "string" "tag_pistolgrip_attach"
 	"position" "vector3" "3.968750 0.572754 -0.350830"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -3298,7 +3302,7 @@
 	"id" "elementid" "61d06bf3-33e8-5a04-aad2-bd33c688236c"
 	"name" "string" "j_sear"
 	"position" "vector3" "4.569000 0.573000 -0.108000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -3306,7 +3310,7 @@
 	"id" "elementid" "7e911166-a47e-5d67-9e3b-2d8aece799d7"
 	"name" "string" "j_sear"
 	"position" "vector3" "4.569000 0.573000 -0.108000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -3327,7 +3331,7 @@
 	"id" "elementid" "e1456b21-62ac-5898-a100-bdfb5bc9e902"
 	"name" "string" "j_boltcarrier"
 	"position" "vector3" "9.243000 0.283000 1.812000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -3335,7 +3339,7 @@
 	"id" "elementid" "fba77889-fa4f-51b3-9c9b-2bce87aa4fe6"
 	"name" "string" "j_boltcarrier"
 	"position" "vector3" "9.243000 0.283000 1.812000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -3356,7 +3360,7 @@
 	"id" "elementid" "db73cee5-0265-567d-8e50-8be84ffa4ce2"
 	"name" "string" "j_hammer"
 	"position" "vector3" "6.100000 0.581000 0.169000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -3364,7 +3368,7 @@
 	"id" "elementid" "5b3f9c6d-a08d-5754-b562-43cd1b57c231"
 	"name" "string" "j_hammer"
 	"position" "vector3" "6.100000 0.581000 0.169000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -3385,7 +3389,7 @@
 	"id" "elementid" "bf8c0425-eed4-5a3d-aeff-c95373a03104"
 	"name" "string" "j_magrelease"
 	"position" "vector3" "6.560000 0.579000 -1.053000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -3393,7 +3397,7 @@
 	"id" "elementid" "4b5ef590-3110-511c-a528-0dd7d0423816"
 	"name" "string" "j_magrelease"
 	"position" "vector3" "6.560000 0.579000 -1.053000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -3413,16 +3417,16 @@
 {
 	"id" "elementid" "148073ef-03cd-5f6b-b10d-7fe5c8bc0a1e"
 	"name" "string" "j_gun"
-	"position" "vector3" "11.656743 -0.025161 -2.130046"
-	"orientation" "quaternion" "0.020386 0.007733 0.000559 0.999762"
+	"position" "vector3" "11.688191 0.002382 -1.983037"
+	"orientation" "quaternion" "-0.000000 0.000002 0.000000 1.000000"
 }
 
 "DmeTransform"
 {
 	"id" "elementid" "b8e76ad4-783d-51ad-91cb-5073937b92af"
 	"name" "string" "j_gun"
-	"position" "vector3" "11.656743 -0.025161 -2.130046"
-	"orientation" "quaternion" "0.020386 0.007733 0.000559 0.999762"
+	"position" "vector3" "11.688191 0.002382 -1.983037"
+	"orientation" "quaternion" "-0.000000 0.000002 0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -3442,16 +3446,74 @@
 {
 	"id" "elementid" "3f167756-33b4-5114-83d2-364586ec29ce"
 	"name" "string" "muzzle"
-	"position" "vector3" "20.063000 0.000000 -1.494000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"position" "vector3" "20.063000 -0.000000 -1.494000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
 {
 	"id" "elementid" "fefea9f5-1b76-5ddc-a5cd-5db08cac61eb"
 	"name" "string" "muzzle"
-	"position" "vector3" "20.063000 0.000000 -1.494000"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"position" "vector3" "20.063000 -0.000000 -1.494000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
+}
+
+"DmeJoint"
+{
+	"id" "elementid" "c71807a6-4cb2-5dd2-88b4-3056360bf7bb"
+	"name" "string" "ik_hand_L"
+	"transform" "element" "aaf9f53b-2d6e-5b9e-b8c9-7d56c1273a3e"
+	"shape" "element" ""
+	"visible" "bool" "1"
+	"lockInfluenceWeights" "bool" "0"
+	"children" "element_array"
+	[
+	]
+}
+
+"DmeTransform"
+{
+	"id" "elementid" "aaf9f53b-2d6e-5b9e-b8c9-7d56c1273a3e"
+	"name" "string" "ik_hand_L"
+	"position" "vector3" "12.808904 2.695359 -0.739490"
+	"orientation" "quaternion" "0.423790 -0.073308 -0.179366 0.884792"
+}
+
+"DmeTransform"
+{
+	"id" "elementid" "94e70d4a-8e50-5c3a-b34c-d4fa44b1babd"
+	"name" "string" "ik_hand_L"
+	"position" "vector3" "12.808904 2.695359 -0.739490"
+	"orientation" "quaternion" "0.423790 -0.073308 -0.179366 0.884792"
+}
+
+"DmeJoint"
+{
+	"id" "elementid" "15cbd170-408b-59a0-90a6-236b718cad30"
+	"name" "string" "ik_hand_R"
+	"transform" "element" "4344bd88-0896-5335-9b94-9463319c89ca"
+	"shape" "element" ""
+	"visible" "bool" "1"
+	"lockInfluenceWeights" "bool" "0"
+	"children" "element_array"
+	[
+	]
+}
+
+"DmeTransform"
+{
+	"id" "elementid" "4344bd88-0896-5335-9b94-9463319c89ca"
+	"name" "string" "ik_hand_R"
+	"position" "vector3" "-0.487420 -0.026457 -2.750372"
+	"orientation" "quaternion" "0.631445 -0.181250 -0.046032 0.752534"
+}
+
+"DmeTransform"
+{
+	"id" "elementid" "32b4f0ee-8ca1-5e4f-a487-f225ab374ce5"
+	"name" "string" "ik_hand_R"
+	"position" "vector3" "-0.487420 -0.026457 -2.750372"
+	"orientation" "quaternion" "0.631445 -0.181250 -0.046032 0.752534"
 }
 
 "DmeTransformList"
@@ -3570,7 +3632,9 @@
 		"element" "5b3f9c6d-a08d-5754-b562-43cd1b57c231",
 		"element" "4b5ef590-3110-511c-a528-0dd7d0423816",
 		"element" "b8e76ad4-783d-51ad-91cb-5073937b92af",
-		"element" "fefea9f5-1b76-5ddc-a5cd-5db08cac61eb"
+		"element" "fefea9f5-1b76-5ddc-a5cd-5db08cac61eb",
+		"element" "94e70d4a-8e50-5c3a-b34c-d4fa44b1babd",
+		"element" "32b4f0ee-8ca1-5e4f-a487-f225ab374ce5"
 	]
 }
 
@@ -3781,8 +3845,8 @@
 	]
 	"values" "vector3_array"
 	[
-		"-10.668596 2.188593 -1.154669",
-		"-10.668596 2.188593 -1.154669"
+		"-10.524813 1.950946 -1.436928",
+		"-10.524813 1.950946 -1.436928"
 	]
 }
 
@@ -3827,8 +3891,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.139620 -0.029387 0.865796 -0.479625",
-		"0.139620 -0.029387 0.865796 -0.479625"
+		"0.151023 -0.023376 0.867260 -0.473821",
+		"0.151023 -0.023376 0.867260 -0.473821"
 	]
 }
 
@@ -3873,8 +3937,8 @@
 	]
 	"values" "vector3_array"
 	[
-		"5.459921 -0.000002 0.000206",
-		"5.459921 -0.000002 0.000206"
+		"5.459921 -0.000009 0.000206",
+		"5.459921 -0.000009 0.000206"
 	]
 }
 
@@ -3919,8 +3983,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.170049 0.389459 0.664696 0.614479",
-		"0.170049 0.389459 0.664696 0.614479"
+		"0.180844 0.377693 0.671451 0.611389",
+		"0.180844 0.377693 0.671451 0.611389"
 	]
 }
 
@@ -5897,8 +5961,8 @@
 	]
 	"values" "vector3_array"
 	[
-		"0.000000 0.000000 -0.000000",
-		"0.000000 0.000000 -0.000000"
+		"-0.000000 -0.000000 0.000000",
+		"-0.000000 -0.000000 0.000000"
 	]
 }
 
@@ -5943,8 +6007,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 0.000000 1.000000",
-		"0.000000 -0.000000 0.000000 1.000000"
+		"-0.000000 0.000000 0.000000 1.000000",
+		"-0.000000 0.000000 0.000000 1.000000"
 	]
 }
 
@@ -5989,8 +6053,8 @@
 	]
 	"values" "vector3_array"
 	[
-		"0.000000 0.000000 -0.000000",
-		"0.000000 0.000000 -0.000000"
+		"-0.000000 -0.000000 0.000000",
+		"-0.000000 -0.000000 0.000000"
 	]
 }
 
@@ -6035,8 +6099,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 0.000000 1.000000",
-		"0.000000 -0.000000 0.000000 1.000000"
+		"-0.000000 0.000000 0.000000 1.000000",
+		"-0.000000 0.000000 0.000000 1.000000"
 	]
 }
 
@@ -6127,8 +6191,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.061183 -0.000000 0.000000 0.998127",
-		"0.061183 -0.000000 0.000000 0.998127"
+		"0.061183 0.000000 -0.000000 0.998127",
+		"0.061183 0.000000 -0.000000 0.998127"
 	]
 }
 
@@ -6265,8 +6329,8 @@
 	]
 	"values" "vector3_array"
 	[
-		"0.000000 -0.000000 0.000000",
-		"0.000000 -0.000000 0.000000"
+		"0.000000 0.000000 -0.000000",
+		"0.000000 0.000000 -0.000000"
 	]
 }
 
@@ -6311,8 +6375,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.000000 0.000000 -0.000000 1.000000",
-		"-0.000000 0.000000 -0.000000 1.000000"
+		"0.000000 -0.000000 0.000000 1.000000",
+		"0.000000 -0.000000 0.000000 1.000000"
 	]
 }
 
@@ -6357,8 +6421,8 @@
 	]
 	"values" "vector3_array"
 	[
-		"-0.000000 0.000000 -0.000000",
-		"-0.000000 0.000000 -0.000000"
+		"0.000000 -0.000000 -0.000000",
+		"0.000000 -0.000000 -0.000000"
 	]
 }
 
@@ -6403,8 +6467,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 0.000000 0.000000 1.000000",
-		"0.000000 0.000000 0.000000 1.000000"
+		"0.000000 -0.000000 -0.000000 1.000000",
+		"0.000000 -0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -6449,8 +6513,8 @@
 	]
 	"values" "vector3_array"
 	[
-		"-6.032639 7.788857 -1.578984",
-		"-6.032639 7.788857 -1.578984"
+		"-5.874839 7.905529 -2.117309",
+		"-5.874839 7.905529 -2.117309"
 	]
 }
 
@@ -6495,8 +6559,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.885489 0.434333 0.082225 -0.143188",
-		"0.885489 0.434333 0.082225 -0.143188"
+		"0.885262 0.438001 0.071747 -0.138990",
+		"0.885262 0.438001 0.071747 -0.138990"
 	]
 }
 
@@ -6541,8 +6605,8 @@
 	]
 	"values" "vector3_array"
 	[
-		"5.460393 0.000010 -0.000226",
-		"5.460393 0.000010 -0.000226"
+		"5.460393 0.000002 -0.000226",
+		"5.460393 0.000002 -0.000226"
 	]
 }
 
@@ -6587,8 +6651,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.456462 -0.351237 0.477899 0.663241",
-		"-0.456462 -0.351237 0.477899 0.663241"
+		"-0.469310 -0.341850 0.484658 0.654212",
+		"-0.469310 -0.341850 0.484658 0.654212"
 	]
 }
 
@@ -6955,8 +7019,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.063580 -0.178261 -0.370761 0.909240",
-		"-0.063580 -0.178261 -0.370761 0.909240"
+		"-0.048336 -0.135523 -0.281871 0.948602",
+		"-0.048336 -0.135523 -0.281871 0.948602"
 	]
 }
 
@@ -7047,8 +7111,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.200861 -0.571836 0.171613 0.776664",
-		"0.200861 -0.571836 0.171613 0.776664"
+		"0.155966 -0.444024 0.133256 0.872216",
+		"0.155966 -0.444024 0.133256 0.872216"
 	]
 }
 
@@ -7139,8 +7203,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.049572 -0.296467 0.158914 0.940424",
-		"-0.049572 -0.296467 0.158914 0.940424"
+		"-0.037509 -0.224322 0.120243 0.966341",
+		"-0.037509 -0.224322 0.120243 0.966341"
 	]
 }
 
@@ -7323,8 +7387,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.020247 -0.499439 -0.246013 0.830438",
-		"-0.020247 -0.499439 -0.246013 0.830438"
+		"-0.015584 -0.384422 -0.189358 0.903394",
+		"-0.015584 -0.384422 -0.189358 0.903394"
 	]
 }
 
@@ -7415,8 +7479,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.043504 -0.630003 0.281699 0.722391",
-		"-0.043504 -0.630003 0.281699 0.722391"
+		"-0.034091 -0.493688 0.220747 0.840464",
+		"-0.034091 -0.493688 0.220747 0.840464"
 	]
 }
 
@@ -7507,8 +7571,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.067108 -0.028019 0.008454 0.997316",
-		"-0.067108 -0.028019 0.008454 0.997316"
+		"-0.050350 -0.021022 0.006343 0.998490",
+		"-0.050350 -0.021022 0.006343 0.998490"
 	]
 }
 
@@ -7691,8 +7755,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.062687 -0.591677 -0.074114 0.800310",
-		"-0.062687 -0.591677 -0.074114 0.800310"
+		"-0.048486 -0.457646 -0.057325 0.885959",
+		"-0.048486 -0.457646 -0.057325 0.885959"
 	]
 }
 
@@ -7783,8 +7847,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.125037 -0.497196 0.145826 0.846107",
-		"-0.125037 -0.497196 0.145826 0.846107"
+		"-0.096001 -0.381738 0.111962 0.912428",
+		"-0.096001 -0.381738 0.111962 0.912428"
 	]
 }
 
@@ -7875,8 +7939,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.003151 -0.000000 0.000000 0.999995",
-		"-0.003151 -0.000000 0.000000 0.999995"
+		"-0.002363 -0.000000 0.000000 0.999997",
+		"-0.002363 -0.000000 0.000000 0.999997"
 	]
 }
 
@@ -8059,8 +8123,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.120786 -0.635566 -0.036393 0.761671",
-		"-0.120786 -0.635566 -0.036393 0.761671"
+		"-0.094023 -0.494744 -0.028329 0.863473",
+		"-0.094023 -0.494744 -0.028329 0.863473"
 	]
 }
 
@@ -8151,8 +8215,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.102258 -0.318832 0.089494 0.938019",
-		"-0.102258 -0.318832 0.089494 0.938019"
+		"-0.077402 -0.241333 0.067741 0.964976",
+		"-0.077402 -0.241333 0.067741 0.964976"
 	]
 }
 
@@ -8243,8 +8307,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.035225 -0.000000 0.000000 0.999379",
-		"0.035225 -0.000000 0.000000 0.999379"
+		"0.026421 -0.000000 0.000000 0.999651",
+		"0.026421 -0.000000 0.000000 0.999651"
 	]
 }
 
@@ -8335,8 +8399,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.716423 0.192600 0.363588 0.563425",
-		"0.716423 0.192600 0.363588 0.563425"
+		"0.665611 0.178940 0.337801 0.640963",
+		"0.665611 0.178940 0.337801 0.640963"
 	]
 }
 
@@ -8427,8 +8491,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.016978 -0.242988 -0.097841 0.964933",
-		"-0.016978 -0.242988 -0.097841 0.964933"
+		"-0.015314 -0.219180 -0.088255 0.971564",
+		"-0.015314 -0.219180 -0.088255 0.971564"
 	]
 }
 
@@ -8519,8 +8583,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000504 -0.019096 0.005367 0.999803",
-		"0.000504 -0.019096 0.005367 0.999803"
+		"0.000453 -0.017187 0.004830 0.999841",
+		"0.000453 -0.017187 0.004830 0.999841"
 	]
 }
 
@@ -8565,8 +8629,8 @@
 	]
 	"values" "vector3_array"
 	[
-		"0.000000 0.000000 0.000000",
-		"0.000000 0.000000 0.000000"
+		"-0.000000 -0.000000 0.000000",
+		"-0.000000 -0.000000 0.000000"
 	]
 }
 
@@ -8611,8 +8675,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 0.000000 1.000000",
-		"0.000000 -0.000000 0.000000 1.000000"
+		"-0.000000 -0.000000 -0.000000 1.000000",
+		"-0.000000 -0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -8703,8 +8767,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.177464 -0.000000 0.000000 0.984127",
-		"-0.177464 -0.000000 0.000000 0.984127"
+		"-0.177464 -0.000000 -0.000000 0.984127",
+		"-0.177464 -0.000000 -0.000000 0.984127"
 	]
 }
 
@@ -8795,8 +8859,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.324948 -0.000000 0.000000 0.945732",
-		"-0.324948 -0.000000 0.000000 0.945732"
+		"-0.324948 0.000000 -0.000000 0.945732",
+		"-0.324948 0.000000 -0.000000 0.945732"
 	]
 }
 
@@ -8841,8 +8905,8 @@
 	]
 	"values" "vector3_array"
 	[
-		"0.000000 0.000000 0.000000",
-		"0.000000 0.000000 0.000000"
+		"-0.000000 0.000000 0.000000",
+		"-0.000000 0.000000 0.000000"
 	]
 }
 
@@ -8887,8 +8951,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"-0.000000 -0.000000 0.000000 1.000000",
+		"-0.000000 -0.000000 0.000000 1.000000"
 	]
 }
 
@@ -8933,8 +8997,8 @@
 	]
 	"values" "vector3_array"
 	[
-		"0.000000 -0.000000 0.000000",
-		"0.000000 -0.000000 0.000000"
+		"-0.000000 0.000000 0.000000",
+		"-0.000000 0.000000 0.000000"
 	]
 }
 
@@ -8979,8 +9043,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 0.000000 1.000000",
-		"0.000000 -0.000000 0.000000 1.000000"
+		"0.000000 -0.000000 -0.000000 1.000000",
+		"0.000000 -0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -9025,8 +9089,8 @@
 	]
 	"values" "vector3_array"
 	[
-		"0.000000 0.000000 0.000000",
-		"0.000000 0.000000 0.000000"
+		"-0.000000 -0.000000 0.000000",
+		"-0.000000 -0.000000 0.000000"
 	]
 }
 
@@ -9071,8 +9135,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 0.000000 1.000000",
-		"0.000000 -0.000000 0.000000 1.000000"
+		"-0.000000 -0.000000 -0.000000 1.000000",
+		"-0.000000 -0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -9117,8 +9181,8 @@
 	]
 	"values" "vector3_array"
 	[
-		"0.578280 -0.575955 -2.958196",
-		"0.578280 -0.575955 -2.958196"
+		"0.623052 -0.572826 -2.959452",
+		"0.623052 -0.572826 -2.959452"
 	]
 }
 
@@ -9163,8 +9227,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.020386 0.007733 0.000559 0.999762",
-		"0.020386 0.007733 0.000559 0.999762"
+		"-0.000000 0.000002 0.000000 1.000000",
+		"-0.000000 0.000002 0.000000 1.000000"
 	]
 }
 
@@ -9255,8 +9319,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -9347,8 +9411,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -9439,8 +9503,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -9531,8 +9595,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -9623,8 +9687,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -9669,8 +9733,8 @@
 	]
 	"values" "vector3_array"
 	[
-		"12.076000 0.000000 -1.158000",
-		"12.076000 0.000000 -1.158000"
+		"12.076000 -0.000000 -1.158000",
+		"12.076000 -0.000000 -1.158000"
 	]
 }
 
@@ -9715,8 +9779,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -9899,8 +9963,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -9945,8 +10009,8 @@
 	]
 	"values" "vector3_array"
 	[
-		"7.631001 -0.000000 -1.010000",
-		"7.631001 -0.000000 -1.010000"
+		"7.631001 0.000000 -1.010000",
+		"7.631001 0.000000 -1.010000"
 	]
 }
 
@@ -9991,8 +10055,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -10083,8 +10147,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -10129,8 +10193,8 @@
 	]
 	"values" "vector3_array"
 	[
-		"2.420000 -0.000000 -1.002000",
-		"2.420000 -0.000000 -1.002000"
+		"2.420000 0.000000 -1.002000",
+		"2.420000 0.000000 -1.002000"
 	]
 }
 
@@ -10175,8 +10239,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -10221,8 +10285,8 @@
 	]
 	"values" "vector3_array"
 	[
-		"7.631001 -0.000000 -1.010000",
-		"7.631001 -0.000000 -1.010000"
+		"7.631001 0.000000 -1.010000",
+		"7.631001 0.000000 -1.010000"
 	]
 }
 
@@ -10267,8 +10331,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -10359,8 +10423,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -10451,8 +10515,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -10543,8 +10607,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -10635,8 +10699,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -10819,8 +10883,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -11003,8 +11067,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -11095,8 +11159,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -11187,8 +11251,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -11279,8 +11343,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -11463,8 +11527,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -11555,8 +11619,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -11647,8 +11711,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -11739,8 +11803,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -11831,8 +11895,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -11923,8 +11987,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -12015,8 +12079,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -12107,8 +12171,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -12199,8 +12263,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -12291,8 +12355,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -12383,8 +12447,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -12475,8 +12539,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -12567,8 +12631,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -12659,8 +12723,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.707107 -0.000000 0.000000 0.707107",
-		"-0.707107 -0.000000 0.000000 0.707107"
+		"-0.707107 -0.000000 -0.000000 0.707107",
+		"-0.707107 -0.000000 -0.000000 0.707107"
 	]
 }
 
@@ -12751,8 +12815,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -12935,8 +12999,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -13027,8 +13091,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 0.707107 0.707107",
-		"0.000000 -0.000000 0.707107 0.707107"
+		"-0.000000 -0.000000 0.707107 0.707107",
+		"-0.000000 -0.000000 0.707107 0.707107"
 	]
 }
 
@@ -13119,8 +13183,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -13211,8 +13275,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -13303,8 +13367,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -13395,8 +13459,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -13487,8 +13551,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -13533,8 +13597,8 @@
 	]
 	"values" "vector3_array"
 	[
-		"11.656743 -0.025161 -2.130046",
-		"11.656743 -0.025161 -2.130046"
+		"11.688191 0.002382 -1.983037",
+		"11.688191 0.002382 -1.983037"
 	]
 }
 
@@ -13579,8 +13643,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.020386 0.007733 0.000559 0.999762",
-		"0.020386 0.007733 0.000559 0.999762"
+		"-0.000000 0.000002 0.000000 1.000000",
+		"-0.000000 0.000002 0.000000 1.000000"
 	]
 }
 
@@ -13625,8 +13689,8 @@
 	]
 	"values" "vector3_array"
 	[
-		"20.063000 0.000000 -1.494000",
-		"20.063000 0.000000 -1.494000"
+		"20.063000 -0.000000 -1.494000",
+		"20.063000 -0.000000 -1.494000"
 	]
 }
 
@@ -13671,8 +13735,8 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -13701,6 +13765,190 @@
 	"toIndex" "int" "0"
 	"mode" "int" "1"
 	"log" "element" "64b5bc25-ff59-57cf-8238-749d6161b8d6"
+}
+
+"DmeVector3LogLayer"
+{
+	"id" "elementid" "1808f5f2-2217-5671-85d3-23663351f24c"
+	"name" "string" "ik_hand_L_p"
+	"times" "time_array"
+	[
+		"0.000000",
+		"0.033333"
+	]
+	"curvetypes" "int_array"
+	[
+	]
+	"values" "vector3_array"
+	[
+		"12.808904 2.695359 -0.739490",
+		"12.808904 2.695359 -0.739490"
+	]
+}
+
+"DmeVector3Log"
+{
+	"id" "elementid" "4d494916-3f7a-53b6-8fa8-64fdce49df9f"
+	"name" "string" "ik_hand_L_p"
+	"layers" "element_array"
+	[
+		"element" "1808f5f2-2217-5671-85d3-23663351f24c"
+	]
+	"curveinfo" "element" ""
+	"usedefaultvalue" "bool" "0"
+	"defaultvalue" "vector3" "0.000000 0.000000 0.000000"
+}
+
+"DmeChannel"
+{
+	"id" "elementid" "db38af1f-c91d-5c08-ab99-c7e7c8d2aeda"
+	"name" "string" "ik_hand_L_p"
+	"fromElement" "element" ""
+	"fromAttribute" "string" ""
+	"fromIndex" "int" "0"
+	"toElement" "element" "aaf9f53b-2d6e-5b9e-b8c9-7d56c1273a3e"
+	"toAttribute" "string" "position"
+	"toIndex" "int" "0"
+	"mode" "int" "1"
+	"log" "element" "4d494916-3f7a-53b6-8fa8-64fdce49df9f"
+}
+
+"DmeQuaternionLogLayer"
+{
+	"id" "elementid" "22a19b1f-9fa7-5d0e-9c74-8938fae594ce"
+	"name" "string" "ik_hand_L_o"
+	"times" "time_array"
+	[
+		"0.000000",
+		"0.033333"
+	]
+	"curvetypes" "int_array"
+	[
+	]
+	"values" "quaternion_array"
+	[
+		"0.423790 -0.073308 -0.179366 0.884792",
+		"0.423790 -0.073308 -0.179366 0.884792"
+	]
+}
+
+"DmeQuaternionLog"
+{
+	"id" "elementid" "975e541a-73db-5bf5-8ddd-71516e1d32c2"
+	"name" "string" "ik_hand_L_o"
+	"layers" "element_array"
+	[
+		"element" "22a19b1f-9fa7-5d0e-9c74-8938fae594ce"
+	]
+	"curveinfo" "element" ""
+	"usedefaultvalue" "bool" "0"
+	"defaultvalue" "quaternion" "0.000000 0.000000 0.000000 1.000000"
+}
+
+"DmeChannel"
+{
+	"id" "elementid" "a9d18db8-a2f0-5f60-97d0-2dc21e80379f"
+	"name" "string" "ik_hand_L_o"
+	"fromElement" "element" ""
+	"fromAttribute" "string" ""
+	"fromIndex" "int" "0"
+	"toElement" "element" "aaf9f53b-2d6e-5b9e-b8c9-7d56c1273a3e"
+	"toAttribute" "string" "orientation"
+	"toIndex" "int" "0"
+	"mode" "int" "1"
+	"log" "element" "975e541a-73db-5bf5-8ddd-71516e1d32c2"
+}
+
+"DmeVector3LogLayer"
+{
+	"id" "elementid" "15578210-d73d-5bb4-b8ef-9f71127a0c7c"
+	"name" "string" "ik_hand_R_p"
+	"times" "time_array"
+	[
+		"0.000000",
+		"0.033333"
+	]
+	"curvetypes" "int_array"
+	[
+	]
+	"values" "vector3_array"
+	[
+		"-0.487420 -0.026457 -2.750372",
+		"-0.487420 -0.026457 -2.750372"
+	]
+}
+
+"DmeVector3Log"
+{
+	"id" "elementid" "79b9c25e-5980-5488-8d7e-de06ab874bd1"
+	"name" "string" "ik_hand_R_p"
+	"layers" "element_array"
+	[
+		"element" "15578210-d73d-5bb4-b8ef-9f71127a0c7c"
+	]
+	"curveinfo" "element" ""
+	"usedefaultvalue" "bool" "0"
+	"defaultvalue" "vector3" "0.000000 0.000000 0.000000"
+}
+
+"DmeChannel"
+{
+	"id" "elementid" "bb5a7bfe-1c0f-509f-8ced-04d9b9e45334"
+	"name" "string" "ik_hand_R_p"
+	"fromElement" "element" ""
+	"fromAttribute" "string" ""
+	"fromIndex" "int" "0"
+	"toElement" "element" "4344bd88-0896-5335-9b94-9463319c89ca"
+	"toAttribute" "string" "position"
+	"toIndex" "int" "0"
+	"mode" "int" "1"
+	"log" "element" "79b9c25e-5980-5488-8d7e-de06ab874bd1"
+}
+
+"DmeQuaternionLogLayer"
+{
+	"id" "elementid" "3f08c7cb-7e90-5873-aa82-43aac8489b80"
+	"name" "string" "ik_hand_R_o"
+	"times" "time_array"
+	[
+		"0.000000",
+		"0.033333"
+	]
+	"curvetypes" "int_array"
+	[
+	]
+	"values" "quaternion_array"
+	[
+		"0.631445 -0.181250 -0.046032 0.752534",
+		"0.631445 -0.181250 -0.046032 0.752534"
+	]
+}
+
+"DmeQuaternionLog"
+{
+	"id" "elementid" "91dc0925-0279-527d-b5d3-daaa332ecd23"
+	"name" "string" "ik_hand_R_o"
+	"layers" "element_array"
+	[
+		"element" "3f08c7cb-7e90-5873-aa82-43aac8489b80"
+	]
+	"curveinfo" "element" ""
+	"usedefaultvalue" "bool" "0"
+	"defaultvalue" "quaternion" "0.000000 0.000000 0.000000 1.000000"
+}
+
+"DmeChannel"
+{
+	"id" "elementid" "2479ad9c-8ed6-5b50-b89f-ff59b0d9da29"
+	"name" "string" "ik_hand_R_o"
+	"fromElement" "element" ""
+	"fromAttribute" "string" ""
+	"fromIndex" "int" "0"
+	"toElement" "element" "4344bd88-0896-5335-9b94-9463319c89ca"
+	"toAttribute" "string" "orientation"
+	"toIndex" "int" "0"
+	"mode" "int" "1"
+	"log" "element" "91dc0925-0279-527d-b5d3-daaa332ecd23"
 }
 
 "DmeTimeFrame"
@@ -13946,7 +14194,11 @@
 		"element" "d7668699-bf48-5e8d-a7d0-a0891af33e4e",
 		"element" "ff756c3f-6ec2-5600-b61e-fdea6b21fb9a",
 		"element" "22b9f2d9-2356-57cd-889a-04a66cc299a9",
-		"element" "31ba05fe-375d-59a5-8d72-889b136e82ec"
+		"element" "31ba05fe-375d-59a5-8d72-889b136e82ec",
+		"element" "db38af1f-c91d-5c08-ab99-c7e7c8d2aeda",
+		"element" "a9d18db8-a2f0-5f60-97d0-2dc21e80379f",
+		"element" "bb5a7bfe-1c0f-509f-8ced-04d9b9e45334",
+		"element" "2479ad9c-8ed6-5b50-b89f-ff59b0d9da29"
 	]
 	"frameRate" "int" "30"
 }

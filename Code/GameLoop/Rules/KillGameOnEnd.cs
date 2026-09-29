@@ -25,7 +25,9 @@ public sealed class KillGameOnEnd : Component,
 		if ( Networking.IsHost )
 		{
 			var winningTeam = GameMode.Instance?.Get<TeamScoring>()?.GetHighest() ?? Team.Unassigned;
+			var ranked = GameMode.Instance?.FinishRankedMatch( winningTeam ) ?? false;
 			Facepunch.UI.EndOfMatchScreen.Show( winningTeam );
+			if ( ranked ) return;
 		}
 
 		if ( !string.IsNullOrEmpty( Message ) )
@@ -36,6 +38,7 @@ public sealed class KillGameOnEnd : Component,
 
 	void IGameEventHandler<LeaveStateEvent>.OnGameEvent( LeaveStateEvent eventArgs )
 	{
+		if ( GameMode.Instance?.IsRanked == true ) return;
 		Disconnect();
 	}
 }

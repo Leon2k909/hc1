@@ -12,8 +12,8 @@
     {
         <div class="party-invite-popup">
             <div class="party-popup-header">
-                <span class="party-popup-title">INVITE PLAYERS</span>
-                <button class="party-popup-close" @onclick=@(() => _inviteOpen = false)>✕</button>
+                <span class="party-popup-title">@Tr( "INVITE PLAYERS" )</span>
+                <button class="party-popup-close" @onclick=@(() => _inviteOpen = false)><i>close</i></button>
             </div>
             <div class="party-popup-list">
                 @{
@@ -21,7 +21,7 @@
                 }
                 @if ( invitable.Count == 0 )
                 {
-                    <span class="party-popup-empty">No other players online</span>
+                    <span class="party-popup-empty">@Tr( "No other players online" )</span>
                 }
                 @foreach ( var player in invitable )
                 {
@@ -29,7 +29,7 @@
                     <div class="party-popup-row">
                         <img src="avatar:@player.SteamId" class="party-popup-avatar" />
                         <span class="party-popup-name">@player.DisplayName</span>
-                        <button class="party-popup-invite-btn" @onclick=@(() => SendInvite( targetId ))>Invite</button>
+                        <button class="party-popup-invite-btn" @onclick=@(() => SendInvite( targetId ))>@Tr( "Invite" )</button>
                     </div>
                 }
             </div>
@@ -42,12 +42,12 @@
         <div class="party-toast">
             <div class="party-toast-icon">👥</div>
             <div class="party-toast-body">
-                <span class="party-toast-title">Party Invite</span>
-                <span class="party-toast-sub">@_inviteFromName wants to party up</span>
+                <span class="party-toast-title">@Tr( "Party Invite" )</span>
+                <span class="party-toast-sub">@Tr( "{0} wants to party up", _inviteFromName )</span>
             </div>
             <div class="party-toast-actions">
-                <button class="party-toast-accept" @onclick=@AcceptInvite>Accept</button>
-                <button class="party-toast-decline" @onclick=@DeclineInvite>Decline</button>
+                <button class="party-toast-accept" @onclick=@AcceptInvite>@Tr( "Accept" )</button>
+                <button class="party-toast-decline" @onclick=@DeclineInvite>@Tr( "Decline" )</button>
             </div>
         </div>
     }
@@ -55,13 +55,18 @@
     @* ── Party bar ── *@
     <div class="party-bar">
 
-        <button class="party-avatar-slot party-self" @onclick=@ToggleInvitePopup>
-            <img src="avatar:@LocalSteamId" class="party-avatar" />
-            @if ( LocalIsPartyLeader || LocalIsMenuPartyOwner )
-            {
-                <span class="party-slot-crown">♛</span>
-            }
-        </button>
+        @* Your own avatar is already in the profile next to this, so it only joins the row in a party. *@
+        @if ( LocalIsInParty || MenuParty != null )
+        {
+            <button class="party-avatar-slot party-self" @onclick=@ToggleInvitePopup>
+                <img src="avatar:@LocalSteamId" class="party-avatar" />
+                @if ( LocalIsPartyLeader || LocalIsMenuPartyOwner )
+                {
+                    <span class="party-slot-crown">♛</span>
+                }
+                <label class="gnav-tip">@Tr( PartyStatus.ToUpper() )</label>
+            </button>
+        }
 
         @{
             var others = GetOtherMembers().ToList();
@@ -82,8 +87,9 @@
                 }
                 @if ( LocalIsPartyLeader && p.NetworkId != Guid.Empty )
                 {
-                    <button class="party-member-kick" @onclick=@(() => KickMember( p.NetworkId ))>✕</button>
+                    <button class="party-member-kick" @onclick=@(() => KickMember( p.NetworkId ))><i>close</i></button>
                 }
+                <label class="gnav-tip">@(p.IsLeader ? Tr( "{0} · LEADER", p.Name.ToUpper() ) : p.Name.ToUpper())</label>
             </div>
         }
 
@@ -105,7 +111,7 @@
                                 }
                                 @if ( LocalIsPartyLeader && p.NetworkId != Guid.Empty )
                                 {
-                                    <button class="party-member-kick" @onclick=@(() => KickMember( p.NetworkId ))>✕</button>
+                                    <button class="party-member-kick" @onclick=@(() => KickMember( p.NetworkId ))><i>close</i></button>
                                 }
                             </div>
                         }
@@ -113,19 +119,21 @@
                 }
             </div>
         }
-        else
+        else if ( others.Count < limit )
         {
-            @for ( var i = 0; i < (limit - others.Count); i++ )
-            {
-                <button class="party-invite-slot" @onclick=@ToggleInvitePopup>
-                    <span class="party-invite-plus">+</span>
-                </button>
-            }
+            @* One invite button: every empty slot did the same thing. *@
+            <button class="party-invite-slot" @onclick=@ToggleInvitePopup>
+                <i class="party-invite-icon">person_add</i>
+                <label class="gnav-tip">@Tr( "INVITE TO PARTY" )</label>
+            </button>
         }
 
         @if ( LocalIsInParty || MenuParty != null )
         {
-            <button class="party-leave-btn" @onclick=@LeaveParty>✕</button>
+            <button class="party-leave-btn" @onclick=@LeaveParty>
+                <i>close</i>
+                <label class="gnav-tip">@Tr( "LEAVE PARTY" )</label>
+            </button>
         }
 
     </div>
@@ -146,7 +154,7 @@
     }
 
     private readonly record struct PartyPlayer( Guid Id, ulong SteamId, string DisplayName, bool IsLocalPlayer );
-    private readonly record struct PartyDisplayMember( ulong SteamId, Guid NetworkId, bool IsLeader );
+    private readonly record struct PartyDisplayMember( ulong SteamId, Guid NetworkId, bool IsLeader, string Name );
 
     bool _dropdownOpen = false;
 
@@ -156,14 +164,14 @@
         {
             foreach ( var p in PartyMembers.Where( m => !m.IsLocalPlayer ) )
             {
-                yield return new PartyDisplayMember( p.SteamId, p.Id, IsPartyLeader( p.Id ) );
+                yield return new PartyDisplayMember( p.SteamId, p.Id, IsPartyLeader( p.Id ), p.DisplayName ?? Tr( "Unknown Player" ) );
             }
         }
         else if ( MenuParty != null )
         {
             foreach ( var p in MenuPartyMembers.Where( m => !SafeFriendIsMe( m ) ) )
             {
-                yield return new PartyDisplayMember( SafeFriendId( p ), Guid.Empty, IsMenuPartyOwner( p ) );
+                yield return new PartyDisplayMember( SafeFriendId( p ), Guid.Empty, IsMenuPartyOwner( p ), SafeFriendName( p ) );
             }
         }
     }
@@ -184,6 +192,7 @@
     ulong  LocalSteamId => GetLocalSteamId();
     string LocalName    => GetLocalName();
 
+    // In English: the markup shows it through Tr.
     string PartyStatus      => LocalIsInParty ? (LocalIsPartyLeader ? "Party Leader" : "In Party")
                              : MenuParty != null ? (LocalIsMenuPartyOwner ? "Party Leader" : "In Party")
                              : "Not in party";
@@ -335,7 +344,7 @@
                     continue;
                 }
 
-                yield return new PartyPlayer( memberId, 0, "Unknown Player", memberId == (Connection.Local?.Id ?? Guid.Empty) );
+                yield return new PartyPlayer( memberId, 0, Tr( "Unknown Player" ), memberId == (Connection.Local?.Id ?? Guid.Empty) );
             }
         }
     }
@@ -377,28 +386,28 @@
             return;
         }
 
-        OpenFriendsOverlay();
+        InviteFriends();
     }
 
-    async void OpenFriendsOverlay()
+    /// <summary>Start a party if there isn't one, then open the friends list to invite people. The hub's squad panel uses this too.</summary>
+    public static async void InviteFriends()
     {
-        if ( MenuParty is null )
+        // Nobody can join a private squad, so there's no one to invite (the cog on the hub's squad card changes it).
+        if ( SquadPrivacy.Mode == SquadPrivacyMode.Private && SquadPrivacy.CanChange )
         {
-            await PartyRoom.Create( 8, "My Party", true );
+            Toast.Instance?.Show( "Your squad is private" );
+            return;
         }
 
-        // Only show overlay if not in editor (overlay APIs don't work in editor)
-        if ( !Game.IsEditor )
+        if ( GetMenuParty() is null )
         {
-            Game.Overlay.ShowFriendsList( new Sandbox.Modals.FriendsListModalOptions()
-            {
-                ShowOfflineMembers = false,
-            } );
+            await SquadPrivacy.CreateParty();
         }
-        else
+
+        Game.Overlay.ShowFriendsList( new Sandbox.Modals.FriendsListModalOptions()
         {
-            Toast.Instance?.Show( "Party created - overlay not available in editor" );
-        }
+            ShowOfflineMembers = false,
+        } );
     }
 
     void SendInvite( Guid targetId )
@@ -456,10 +465,9 @@
         return h.ToHashCode();
     }
 
-    PartyRoom GetMenuParty()
+    static PartyRoom GetMenuParty()
     {
         // Allow party system in editor for testing if Steam overlay is available
-        // Disable Game.Overlay.ShowFriendsList() call in OpenFriendsOverlay() when in editor
         // if ( Game.IsEditor )
         //     return null;
 
@@ -525,11 +533,11 @@
     {
         try
         {
-            return friend.Name ?? "Unknown Player";
+            return friend.Name ?? Tr( "Unknown Player" );
         }
         catch
         {
-            return "Unknown Player";
+            return Tr( "Unknown Player" );
         }
     }
 

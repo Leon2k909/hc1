@@ -1,0 +1,24 @@
+{
+  "Name": "Low Profile Rail",
+  "Category": "Rail",
+  "EligibleEquipment": [
+    "weapons/famas/famas.equip"
+  ],
+  "RequiredLevel": 0,
+  "Description": "Lower accessory rail with its own folding sights and charging assembly. No effect on recoil.",
+  "ModifyBodygroups": true,
+  "Bodygroups": {
+    "rail": 2,
+    "iron_sights": 1
+  },
+  "VerticalRecoilScale": 1.0,
+  "HorizontalRecoilScale": 1.0,
+  "OpticBodygroups": {
+    "sight_folded": 2
+  },
+  "OpticMountShift": "-0.605,0,-1.338",
+  "RailOpticAimCorrection": "0.605,0,1.338",
+  "RailIronAimCorrection": "0,0,1.669",
+  "__references": [],
+  "__version": 0
+}

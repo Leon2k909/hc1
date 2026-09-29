@@ -2,7 +2,7 @@
   "RootObject": {
     "__guid": "f7c25223-1ca5-4076-9d06-aa3c3c46f4a1",
     "Flags": 0,
-    "Name": "deathmatch",
+    "Name": "battle_royale",
     "Enabled": true,
     "NetworkMode": 1,
     "Components": [
@@ -56,29 +56,39 @@
         "__guid": "91ab47da-c178-479c-8af6-c7515eba5759"
       },
       {
-        "__type": "Facepunch.BotFillRule",
-        "__guid": "7e1e5a0a-7cef-4388-aa2f-44ac5088662e",
-        "MinPlayerCount": 10
+        "__type": "Facepunch.BattleRoyaleSpawnAssigner",
+        "__guid": "466d4f9d-77ed-4ff0-bafe-88b627e0f129"
       },
       {
-        "__type": "Facepunch.RandomSpawnAssigner",
-        "__guid": "e20a2bcd-6b16-48d6-b902-50943cfac8a8",
-        "MinEnemyDistance": 512,
-        "SkipLineOfSightTestDistance": 2048,
-        "SpawnTags": ""
+        "__type": "Facepunch.EquipmentDropper",
+        "__guid": "69dfdeb2-7edf-4505-9a04-3bb466b6ff58",
+        "Categories": [
+          "Primary",
+          "Secondary"
+        ],
+        "LimitedDropOnDeath": true
       },
       {
-        "__type": "Facepunch.BattleRoyaleWinCondition",
-        "__guid": "f30e6fc8-3603-4927-b67f-4cf60a316b8b",
+        "__type": "Facepunch.BattleRoyaleMatch",
+        "__guid": "749f4a31-a437-447c-8f83-c6458861d10f",
+        "BotCount": 40,
+        "DropSpacing": 1800,
+        "EndAfterPlayersOut": 8,
         "MatchEndedState": {
           "_type": "component",
+          "component_id": "cc2b3a78-7da1-44f0-8e8b-e5581f8096e9",
           "go": "1ef5a15e-79c1-4571-bcf3-4d923760cc0e",
           "component_type": "StateComponent"
         }
       },
       {
         "__type": "Facepunch.SafeZoneManager",
-        "__guid": "66487ff1-74cd-4e89-be4d-e9c8bc8b7e71"
+        "__guid": "66487ff1-74cd-4e89-be4d-e9c8bc8b7e71",
+        "TimeScale": 1
+      },
+      {
+        "__type": "Facepunch.BulletDrop",
+        "__guid": "bf32b62b-e20a-4315-ad85-6894cf253892"
       }
     ],
     "Children": [
@@ -111,7 +121,7 @@
               {
                 "__type": "Sandbox.Events.StateComponent",
                 "__guid": "100d9f09-2c5b-41ea-a4d6-e73e2e7a7474",
-                "DefaultDuration": 60,
+                "DefaultDuration": 10,
                 "DefaultNextState": {
                   "_type": "component",
                   "component_id": "bdd00ce5-fc14-432b-9f34-eb55f85aca40",
@@ -123,7 +133,7 @@
                 "__type": "Facepunch.WaitForPlayers",
                 "__guid": "19d65ae4-28c5-47b5-80fc-8240b0d78368",
                 "MinPlayerCount": 1,
-                "SkipPlayerCount": 10
+                "SkipPlayerCount": 1
               },
               {
                 "__type": "Facepunch.ShowStatusText",
@@ -159,7 +169,7 @@
               {
                 "__type": "Sandbox.Events.StateComponent",
                 "__guid": "bdd00ce5-fc14-432b-9f34-eb55f85aca40",
-                "DefaultDuration": 5,
+                "DefaultDuration": 10,
                 "DefaultNextState": {
                   "_type": "component",
                   "component_id": "188025de-1b23-4cc9-a89f-dcbc112f8a8a",
@@ -175,18 +185,33 @@
                 "__type": "Facepunch.ShowStatusText",
                 "__guid": "ea6ec2aa-0c1b-44ba-bce1-5529320cd815",
                 "BothTeams": true,
-                "StatusText": "Starting",
+                "StatusText": "Dropping In",
                 "Team": "Unassigned"
               },
               {
                 "__type": "Facepunch.ShowToast",
                 "__guid": "503695f8-ae28-4816-b3ed-c37017a9b847",
-                "Message": "Preparing to start...",
+                "Message": "Last One Standing Wins",
                 "Type": "Generic"
               },
               {
                 "__type": "Facepunch.FreezePlayers",
                 "__guid": "97a813f1-1d8c-4c6e-8ab9-3c8221ac7dbd"
+              },
+              {
+                "__type": "Facepunch.RespawnPlayers",
+                "__guid": "1ccb194c-756a-415f-a66d-667b64decaef",
+                "ForceNew": true
+              },
+              {
+                "__type": "Facepunch.PlayerAutoRespawner",
+                "__guid": "29b95f94-7b0b-4ac8-90d6-b36a28728c23",
+                "AllowSpectatorsToSpawn": true,
+                "RespawnDelaySeconds": 0
+              },
+              {
+                "__type": "Facepunch.BattleRoyaleDeploy",
+                "__guid": "b29c4bfb-366c-4994-841d-6fb139ddb56c"
               }
             ]
           },
@@ -200,11 +225,11 @@
               {
                 "__type": "Sandbox.Events.StateComponent",
                 "__guid": "188025de-1b23-4cc9-a89f-dcbc112f8a8a",
-                "DefaultDuration": 900,
+                "DefaultDuration": 1200,
                 "DefaultNextState": {
                   "_type": "component",
-                  "component_id": "1fd1898f-a9bb-42d0-9e1c-3bf36e9a98ef",
-                  "go": "22f62d20-a0d2-4ab3-b282-aac29691fc99",
+                  "component_id": "cc2b3a78-7da1-44f0-8e8b-e5581f8096e9",
+                  "go": "1ef5a15e-79c1-4571-bcf3-4d923760cc0e",
                   "component_type": "StateComponent"
                 }
               },
@@ -212,7 +237,7 @@
                 "__type": "Facepunch.ShowStatusText",
                 "__guid": "46d6ff07-4596-4f6f-9f01-51568736df65",
                 "BothTeams": true,
-                "StatusText": "Deathmatch",
+                "StatusText": "Battle Royale",
                 "Team": "Unassigned"
               },
               {
@@ -223,11 +248,6 @@
                 "Team": "Terrorist"
               },
               {
-                "__type": "Facepunch.PlaySound",
-                "__guid": "c8b726ed-51d8-42ef-a8a5-973fb6eecd55",
-                "SoundEvent": "sounds/music/round_intro/round_start.sound"
-              },
-              {
                 "__type": "Facepunch.ShowCountDown",
                 "__guid": "3b615d8e-5bb8-4652-8f25-6441adb0d684"
               },
@@ -236,45 +256,8 @@
                 "__guid": "73c32974-c759-440d-80bb-eb65411f3508"
               },
               {
-                "__type": "Facepunch.RespawnPlayers",
-                "__guid": "39bfe2ad-98a5-4fc8-aab8-cbc29f1ffd05",
-                "ForceNew": false
-              },
-              {
-                "__type": "Facepunch.EnableBuyMenuDuringSpawnProtection",
-                "__guid": "196af5b3-533e-47f7-b9ce-3fbfcd6860cb"
-              },
-              {
-                "__type": "Facepunch.PlayerAutoRespawner",
-                "__guid": "879c4006-f472-4c34-972d-7778361d9b3e",
-                "AllowSpectatorsToSpawn": true,
-                "RespawnDelaySeconds": 3
-              },
-              {
-                "__type": "Facepunch.SpawnProtection",
-                "__guid": "020a8d1e-fc64-4a6a-b8ab-9797113f26a2",
-                "MaxDurationSeconds": 10
-              }
-            ],
-            "Children": [
-              {
-                "__guid": "22f62d20-a0d2-4ab3-b282-aac29691fc99",
-                "Flags": 0,
-                "Name": "Timeout",
-                "Enabled": true,
-                "NetworkMode": 1,
-                "Components": [
-                  {
-                    "__type": "Sandbox.Events.StateComponent",
-                    "__guid": "1fd1898f-a9bb-42d0-9e1c-3bf36e9a98ef",
-                    "DefaultDuration": 0
-                  },
-                  {
-                    "__type": "Facepunch.CompareTeamScores",
-                    "__guid": "8e4fef47-033e-4a13-a3c8-7d2e4f18365f",
-                    "MinMargin": 1
-                  }
-                ]
+                "__type": "Facepunch.BattleRoyaleFight",
+                "__guid": "396baf4c-7e3b-44f3-bebc-7fbe30a191f5"
               }
             ]
           },
@@ -288,13 +271,19 @@
               {
                 "__type": "Sandbox.Events.StateComponent",
                 "__guid": "cc2b3a78-7da1-44f0-8e8b-e5581f8096e9",
-                "DefaultDuration": 0
+                "DefaultDuration": 6,
+                "DefaultNextState": {
+                  "_type": "component",
+                  "component_id": "45d2f9c1-e34d-4756-807d-b5197dfc0e92",
+                  "go": "e202fa43-68f7-4d19-8046-f39ed2edd444",
+                  "component_type": "StateComponent"
+                }
               },
               {
                 "__type": "Facepunch.ShowStatusText",
                 "__guid": "8ec842f2-cfc7-41de-81a1-9b2dfe5302f4",
                 "BothTeams": true,
-                "StatusText": "Round Over",
+                "StatusText": "Match Over",
                 "Team": "Unassigned"
               },
               {
@@ -313,15 +302,36 @@
               {
                 "__type": "Sandbox.Events.StateComponent",
                 "__guid": "45d2f9c1-e34d-4756-807d-b5197dfc0e92",
-                "DefaultDuration": 10
+                "DefaultDuration": 15,
+                "DefaultNextState": {
+                  "_type": "component",
+                  "component_id": "a6c16b86-3a92-46b7-b93f-66d0a61791cc",
+                  "go": "f7f35110-2f57-4f8a-ad6a-2ee7ac5270d3",
+                  "component_type": "StateComponent"
+                }
               },
               {
                 "__type": "Facepunch.FreezePlayers",
                 "__guid": "35f22135-8476-417b-b33c-fea8b2524a75"
               },
               {
-                "__type": "Facepunch.StartMapVotingOnEnd",
-                "__guid": "ec32f16b-5053-4522-8948-4eaef65a809a"
+                "__type": "Facepunch.KillGameOnEnd",
+                "__guid": "688cd7bb-b8f6-4950-a459-0b4a8e4a6852",
+                "Message": ""
+              }
+            ]
+          },
+          {
+            "__guid": "f7f35110-2f57-4f8a-ad6a-2ee7ac5270d3",
+            "Flags": 0,
+            "Name": "Return",
+            "Enabled": true,
+            "NetworkMode": 1,
+            "Components": [
+              {
+                "__type": "Sandbox.Events.StateComponent",
+                "__guid": "a6c16b86-3a92-46b7-b93f-66d0a61791cc",
+                "DefaultDuration": 0
               }
             ]
           }

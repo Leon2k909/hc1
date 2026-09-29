@@ -1,0 +1,14 @@
+// Tools/building_textures.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.30"
+    TextureColor "materials/buildings/corrugated_color.png"
+    TextureNormal "materials/buildings/corrugated_normal.png"
+    TextureRoughness "materials/buildings/corrugated_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1.0 1.0 1.0 1.0]"
+    g_flModelTintAmount "1.0"
+}

@@ -1,0 +1,32 @@
+{
+  "Name": "PP-19 Bizon",
+  "Description": "Russian 9x18mm submachine gun built on the AKS-74. Straight blowback, fed from a 64-round helical magazine under the barrel.",
+  "Slot": "Primary",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": true,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/guns/bizon_01.png",
+  "IsPurchasable": true,
+  "Price": 1400,
+  "KillReward": 600,
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/bizon/weapon_bizon.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/bizon/wm_bizon.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/bizon/vm_bizon.prefab"
+  },
+  "WorldModel": "weapons/bizon/w_bizon.vmdl",
+  "ArmorReduction": null,
+  "HelmetReduction": null,
+  "WorldModelBodyGroups": 0,
+  "__references": [],
+  "__version": 0,
+  "Category": "SMG",
+  "GunsmithOffset": "0,0,4"
+}

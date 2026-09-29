@@ -39,7 +39,7 @@
 
     protected override int BuildHash()
     {
-        // If we switch input device, rebuild the tree.
-        return HashCode.Combine( Action, Size, Input.UsingController );
+        // Refresh when the player rebinds an action as well as when switching input devices.
+        return HashCode.Combine( Action, Size, Input.UsingController, Input.GetButtonOrigin( Action ) );
     }
 }

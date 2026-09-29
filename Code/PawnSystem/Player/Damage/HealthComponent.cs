@@ -76,7 +76,7 @@ public partial class HealthComponent : Component, IRespawnable//, Component.IDam
 	{
 		Assert.True( Networking.IsHost );
 
-		// In hardcore mode, bots always die in one hit regardless of armor or hitbox.
+		// In hardcore mode, explosions and knives to or from a bot kill outright, regardless of armor.
 		// Use the same component-owner lookup as kill scoring so child health components
 		// are still recognized as part of a lightweight bot.
 		var isHardcore = GameMode.ActiveHardcore ||
@@ -87,15 +87,33 @@ public partial class HealthComponent : Component, IRespawnable//, Component.IDam
 			                       GameUtils.GetPlayerFromComponent( this ) is not null &&
 			                       GameUtils.GetLightweightBotFromComponent( damageInfo.Attacker ) is not null;
 
+		var gunDamage = damageInfo.Damage;
 		damageInfo = WithThisAsVictim( damageInfo );
 		damageInfo = ModifyDamage( damageInfo );
+
+		// Hardcore bullets go by where they hit (HealthComponent.Wounds.cs). Explosions and knives to or from a bot still
+		// kill outright. The battle royale's zone and burns only ever wear health down.
+		var hurt = damageInfo.Damage > 0f;
+		var bullet = isHardcore && hurt && IsBulletHit( damageInfo );
+		var lethal = false;
+		if ( bullet )
+			damageInfo = HardcoreBullet( damageInfo, gunDamage, out lethal );
+		else if ( isHardcore && hurt && (isHcBot || isHcBotAttackOnPlayer)
+			&& !damageInfo.Flags.HasFlag( DamageFlags.Zone ) && !damageInfo.Flags.HasFlag( DamageFlags.Burn ) )
+			lethal = true;
 
 		BroadcastDamage( damageInfo );
 
 		if ( IsGodMode || DevCommands.NoDamage ) return;
 
-		// Hardcore bot hits kill players in one shot; bot victims keep the same rule.
-		if ( (isHcBot || isHcBotAttackOnPlayer) && State == LifeState.Alive )
+		if ( bullet && State == LifeState.Alive && IsLimbHit( damageInfo ) )
+			AddWound( damageInfo.Hitbox );
+
+		// Landing hard enough to hurt lames the legs the same way, in every mode (fall damage always hits the legs).
+		if ( hurt && damageInfo.WasFallDamage && State == LifeState.Alive )
+			AddWound( damageInfo.Hitbox );
+
+		if ( lethal && State == LifeState.Alive )
 		{
 			Health = 0f;
 			State = LifeState.Dead;

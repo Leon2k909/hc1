@@ -31,7 +31,7 @@
         "ModelRenderer": {
           "_type": "component",
           "component_id": "f612f047-25dc-4c04-9c20-fff947acb56f",
-          "go": "2ccae365-bd7e-4405-8ce0-ee2a8b04761f",
+          "go": "9bbb4574-cf3c-49d6-baff-021fcb315195",
           "component_type": "SkinnedModelRenderer"
         },
         "Muzzle": null,
@@ -43,51 +43,25 @@
         "OnComponentUpdate": null,
         "ReloadSpeed": 1,
         "ThrowableType": "HEGrenade",
-        "UseMovementInertia": true
+        "UseMovementInertia": true,
+        "MoveBobScale": 0.35,
+        "YawInertiaScale": 0.6
       },
       {
-        "__type": "Sandbox.SkinnedModelRenderer",
-        "__guid": "f612f047-25dc-4c04-9c20-fff947acb56f",
-        "__enabled": true,
-        "AnimationGraph": null,
-        "BodyGroups": 18446744073709551615,
-        "BoneMergeTarget": null,
-        "CreateAttachments": false,
-        "CreateBoneObjects": false,
-        "LodOverride": null,
-        "MaterialGroup": null,
-        "MaterialOverride": "Weapons/c4/c4_material.vmat",
-        "Materials": null,
-        "Model": "weapons/throwable/c4_bomb/c4_bomb.vmdl",
-        "Morphs": {},
-        "OnComponentDestroy": null,
-        "OnComponentDisabled": null,
-        "OnComponentEnabled": null,
-        "OnComponentFixedUpdate": null,
-        "OnComponentStart": null,
-        "OnComponentUpdate": null,
-        "Parameters": {
-          "bools": {},
-          "ints": {},
-          "floats": {},
-          "vectors": {},
-          "rotations": {}
+        "__type": "Facepunch.DefuseViewModel",
+        "__guid": "aac78d96-d728-4781-b6e9-bcdc18acb94e",
+        "Device": {
+          "_type": "component",
+          "component_id": "f612f047-25dc-4c04-9c20-fff947acb56f",
+          "go": "9bbb4574-cf3c-49d6-baff-021fcb315195",
+          "component_type": "SkinnedModelRenderer"
         },
-        "PlaybackRate": 1,
-        "RenderOptions": {
-          "GameLayer": false,
-          "OverlayLayer": true,
-          "BloomLayer": false,
-          "AfterUILayer": false
-        },
-        "RenderType": "Off",
-        "Sequence": {
-          "Name": null,
-          "Looping": true,
-          "Blending": false
-        },
-        "Tint": "1,1,1,1",
-        "UseAnimGraph": true
+        "Arms": {
+          "_type": "component",
+          "component_id": "0177512d-f04b-456f-b135-01956d4a1ea7",
+          "go": "8acd437f-c851-40cc-9aae-58a2a1edff3e",
+          "component_type": "SkinnedModelRenderer"
+        }
       }
     ],
     "Children": [
@@ -113,12 +87,7 @@
             "__enabled": true,
             "AnimationGraph": null,
             "BodyGroups": 21,
-            "BoneMergeTarget": {
-              "_type": "component",
-              "component_id": "f612f047-25dc-4c04-9c20-fff947acb56f",
-              "go": "2ccae365-bd7e-4405-8ce0-ee2a8b04761f",
-              "component_type": "SkinnedModelRenderer"
-            },
+            "BoneMergeTarget": null,
             "CreateAttachments": false,
             "CreateBoneObjects": false,
             "LodOverride": null,
@@ -142,8 +111,8 @@
             },
             "PlaybackRate": 1,
             "RenderOptions": {
-              "GameLayer": true,
-              "OverlayLayer": false,
+              "GameLayer": false,
+              "OverlayLayer": true,
               "BloomLayer": false,
               "AfterUILayer": false
             },
@@ -154,10 +123,62 @@
               "Blending": false
             },
             "Tint": "1,1,1,1",
-            "UseAnimGraph": true
+            "UseAnimGraph": false
           }
         ],
         "Children": []
+      },
+      {
+        "__guid": "9bbb4574-cf3c-49d6-baff-021fcb315195",
+        "Name": "Field Device",
+        "Enabled": true,
+        "NetworkMode": 0,
+        "Components": [
+          {
+            "__type": "Sandbox.SkinnedModelRenderer",
+            "__guid": "f612f047-25dc-4c04-9c20-fff947acb56f",
+            "__enabled": true,
+            "AnimationGraph": null,
+            "BodyGroups": 18446744073709551615,
+            "BoneMergeTarget": null,
+            "CreateAttachments": false,
+            "CreateBoneObjects": false,
+            "LodOverride": null,
+            "MaterialGroup": null,
+            "MaterialOverride": null,
+            "Materials": null,
+            "Model": "weapons/c4/field_device/field_device.vmdl",
+            "Morphs": {},
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "Parameters": {
+              "bools": {},
+              "ints": {},
+              "floats": {},
+              "vectors": {},
+              "rotations": {}
+            },
+            "PlaybackRate": 1,
+            "RenderOptions": {
+              "GameLayer": false,
+              "OverlayLayer": true,
+              "BloomLayer": false,
+              "AfterUILayer": false
+            },
+            "RenderType": "Off",
+            "Sequence": {
+              "Name": null,
+              "Looping": true,
+              "Blending": false
+            },
+            "Tint": "1,1,1,1",
+            "UseAnimGraph": false
+          }
+        ]
       }
     ],
     "__properties": {

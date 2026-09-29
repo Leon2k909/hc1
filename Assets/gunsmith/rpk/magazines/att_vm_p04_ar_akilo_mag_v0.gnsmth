@@ -1,0 +1,40 @@
+{
+  "Name": "30 Round Mag",
+  "Category": "Magazine",
+  "EligibleEquipment": [
+    "weapons/rpk/rpk.equip"
+  ],
+  "RequiredLevel": 0,
+  "Description": "The AKM's 30-round steel magazine. Much quicker to change than the drum. Reloads in 2.2s (2.6s when empty).",
+  "ModifyBodygroups": true,
+  "Bodygroups": {
+    "magazine": 1
+  },
+  "VerticalRecoilScale": 1.0,
+  "HorizontalRecoilScale": 1.0,
+  "MagazineCapacity": 30,
+  "ReloadTimeMultiplier": 1.0,
+  "ReloadAnimation": 1,
+  "ReloadTime": 2.2,
+  "EmptyReloadTime": 2.6,
+  "ReloadSounds": {
+    "0": "weapons/kastov74u/sounds/ks74u.reload.mvt.sound",
+    "0.4": "weapons/kastov74u/sounds/ks74u.reload.maggrab.sound",
+    "0.6": "weapons/kastov74u/sounds/ks74u.reload.magout.sound",
+    "0.967": "weapons/kastov74u/sounds/ks74u.reload.magbump.sound",
+    "1.167": "weapons/kastov74u/sounds/ks74u.reload.magclick.sound",
+    "1.7": "weapons/kastov74u/sounds/ks74u.reload.mvt2.sound",
+    "2.167": "weapons/kastov74u/sounds/ks74u.reload.shoulder.sound"
+  },
+  "EmptyReloadSounds": {
+    "0": "weapons/kastov74u/sounds/ks74u.reload_empty.mvt.sound",
+    "0.533": "weapons/kastov74u/sounds/ks74u.reload_empty.magout.sound",
+    "0.933": "weapons/kastov74u/sounds/ks74u.reload_empty.magbump.sound",
+    "1.233": "weapons/kastov74u/sounds/ks74u.reload_empty.magin.sound",
+    "1.733": "weapons/kastov74u/sounds/ks74u.reload_empty.mvt2.sound",
+    "1.933": "weapons/kastov74u/sounds/ks74u.reload_empty.charge.sound",
+    "2.5": "weapons/kastov74u/sounds/ks74u.reload_empty.shoulder.sound"
+  },
+  "__references": [],
+  "__version": 0
+}

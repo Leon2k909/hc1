@@ -12,7 +12,7 @@
     var killerDescription = GameUtils.GetDescription( LastDamageInfo.Attacker );
     var killerName = killerPlayer.IsValid()
         ? killerPlayer.DisplayName
-        : killerDescription?.DisplayName ?? (IsZombiesMode ? "Zombie" : "Unknown");
+        : killerDescription?.DisplayName ?? Tr( IsZombiesMode ? "Zombie" : "Unknown" );
 }
 
 <root class="hud with-deadzone flex column gap-xs">
@@ -22,27 +22,38 @@
             <img class="image" src="avatar:@killerPlayer.SteamId" />
         }
         <div class="flex column with-background with-padding h-full align-left justify-center" style="min-width: 275px;">
-            <label class="text small upper">KILLED BY</label>
+            <label class="text small upper">@Tr( "KILLED BY" )</label>
             <label>@killerName</label>
         </div>
     </div>
 
     <div class="flex row layout with-background with-padding align-center">
-        <label>Press</label>
-        <InputHint class="small" Action="Attack1" />
-        <label>or</label>
-        <InputHint class="small" Action="Attack2" />
-        <label>to start spectating</label>
+        @* The words go around the two buttons in the translation's order: {0} and {1} mark where the buttons sit. *@
+        @foreach ( var piece in System.Text.RegularExpressions.Regex.Split( Tr( "Press {0} or {1} to start spectating" ), "(\\{\\d\\})" ) )
+        {
+            @if ( piece == "{0}" )
+            {
+                <InputHint class="small" Action="Attack1" />
+            }
+            else if ( piece == "{1}" )
+            {
+                <InputHint class="small" Action="Attack2" />
+            }
+            else if ( !string.IsNullOrWhiteSpace( piece ) )
+            {
+                <label>@piece.Trim()</label>
+            }
+        }
     </div>
 
     @if ( DamageEntries is not null && DamageEntries.Count > 0 )
     {
         <div class="flex column layout with-background with-padding">
-            <label class="small slight">DAMAGE TAKEN</label>
+            <label class="small slight">@Tr( "DAMAGE TAKEN" )</label>
             @foreach ( var entry in DamageEntries )
             {
                 <div class="flex row gap-xs">
-                    <label>@(entry.Damage.CeilToInt()) damage in @(entry.Count) hits - </label>
+                    <label>@Tr( "{0} damage in {1} hits", entry.Damage.CeilToInt(), entry.Count ) - </label>
                     <label>@GetName( entry.Attacker )</label>
                 </div>
             }
@@ -52,11 +63,11 @@
     @if ( InflictedDamageEntries is not null && InflictedDamageEntries.Count > 0 )
     {
         <div class="flex column layout with-background with-padding">
-            <label class="small slight">INFLICTED DAMAGE</label>
+            <label class="small slight">@Tr( "INFLICTED DAMAGE" )</label>
             @foreach ( var entry in InflictedDamageEntries )
             {
                 <div class="flex row gap-xs">
-                    <label>@(entry.Damage.CeilToInt()) damage in @(entry.Count) hits</label>
+                    <label>@Tr( "{0} damage in {1} hits", entry.Damage.CeilToInt(), entry.Count )</label>
                 </div>
             }
         </div>
@@ -78,7 +89,7 @@
     {
         var ply = GameUtils.GetDescription( attacker );
 
-        return ply?.DisplayName ?? (IsZombiesMode ? "Zombie" : "Unknown");
+        return ply?.DisplayName ?? Tr( IsZombiesMode ? "Zombie" : "Unknown" );
     }
 
     protected override int BuildHash()

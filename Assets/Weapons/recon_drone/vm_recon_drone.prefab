@@ -1,0 +1,210 @@
+{
+  "RootObject": {
+    "__guid": "615a122b-eb02-50bb-8498-123c01bcb684",
+    "__version": 1,
+    "Flags": 0,
+    "Name": "Recon Drone View Model",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Tags": "player,viewmodel",
+    "Enabled": true,
+    "NetworkMode": 0,
+    "NetworkInterpolation": true,
+    "NetworkOrphaned": 0,
+    "NetworkTransmit": true,
+    "OwnerTransfer": 1,
+    "Components": [
+      {
+        "__type": "Facepunch.ViewModel",
+        "__guid": "ec01143f-dac6-55a8-bd8a-85f42a2efa8c",
+        "__enabled": true,
+        "Arms": {
+          "_type": "component",
+          "component_id": "0d202d51-adc7-5d91-9a59-c47662ada108",
+          "go": "615a122b-eb02-50bb-8498-123c01bcb684",
+          "component_type": "SkinnedModelRenderer"
+        },
+        "EjectionPort": null,
+        "IronsightsFireScale": 0.2,
+        "IsThrowable": true,
+        "ModelRenderer": {
+          "_type": "component",
+          "component_id": "0d202d51-adc7-5d91-9a59-c47662ada108",
+          "go": "615a122b-eb02-50bb-8498-123c01bcb684",
+          "component_type": "SkinnedModelRenderer"
+        },
+        "Muzzle": null,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "ReloadSpeed": 1,
+        "ThrowableType": "SmokeGrenade",
+        "UseMovementInertia": true,
+        "MoveBobScale": 0.45,
+        "YawInertiaScale": 0.7
+      },
+      {
+        "__type": "Sandbox.SkinnedModelRenderer",
+        "__guid": "0d202d51-adc7-5d91-9a59-c47662ada108",
+        "__enabled": true,
+        "AnimationGraph": "weapons/throwable/first_person_arms_hc1_throwables.vanmgrph",
+        "BodyGroups": 21,
+        "BoneMergeTarget": null,
+        "CreateAttachments": false,
+        "CreateBoneObjects": true,
+        "LodOverride": null,
+        "MaterialGroup": null,
+        "MaterialOverride": null,
+        "Materials": null,
+        "Model": "models/first_person/v_first_person_arms_human.vmdl",
+        "Morphs": {},
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Parameters": {
+          "bools": {},
+          "ints": {
+            "throwable_type": 1
+          },
+          "floats": {},
+          "vectors": {},
+          "rotations": {}
+        },
+        "PlaybackRate": 1,
+        "RenderOptions": {
+          "GameLayer": false,
+          "OverlayLayer": true,
+          "BloomLayer": false,
+          "AfterUILayer": false
+        },
+        "RenderType": "Off",
+        "Sequence": {
+          "Name": null,
+          "Looping": true,
+          "Blending": false
+        },
+        "Tint": "1,1,1,1",
+        "UseAnimGraph": true
+      },
+      {
+        "__type": "Facepunch.ThrowableViewModelGrip",
+        "__guid": "a688d9df-fa34-5b02-b114-c0b0deec0b56",
+        "__enabled": true,
+        "ItemCenterHeight": -1.0,
+        "Hands": {
+          "_type": "component",
+          "component_id": "0d202d51-adc7-5d91-9a59-c47662ada108",
+          "go": "615a122b-eb02-50bb-8498-123c01bcb684",
+          "component_type": "SkinnedModelRenderer"
+        },
+        "Item": {
+          "_type": "component",
+          "component_id": "b04ad5ad-b105-5a49-beba-b9f1076885f3",
+          "go": "8b193c35-a129-5a17-909e-629e11034ddc",
+          "component_type": "ModelRenderer"
+        },
+        "ItemOffset": "1,0,0"
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "8b193c35-a129-5a17-909e-629e11034ddc",
+        "__version": 1,
+        "Flags": 0,
+        "Name": "Handheld recon drone",
+        "Position": "0,0,0",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Tags": "",
+        "Enabled": true,
+        "NetworkMode": 0,
+        "NetworkInterpolation": true,
+        "NetworkOrphaned": 0,
+        "NetworkTransmit": true,
+        "OwnerTransfer": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.ModelRenderer",
+            "__guid": "b04ad5ad-b105-5a49-beba-b9f1076885f3",
+            "__enabled": true,
+            "BodyGroups": 11,
+            "CreateAttachments": false,
+            "LodOverride": null,
+            "MaterialGroup": null,
+            "MaterialOverride": null,
+            "Materials": null,
+            "Model": "models/recon_drone/recon_drone_handheld.vmdl",
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "RenderOptions": {
+              "GameLayer": false,
+              "OverlayLayer": true,
+              "BloomLayer": false,
+              "AfterUILayer": false
+            },
+            "RenderType": "Off",
+            "Tint": "1,1,1,1"
+          }
+        ],
+        "Children": [
+          {
+            "__guid": "b94dc3d7-dfa5-51dc-a5ec-b8a949603f06",
+            "Name": "held-propeller",
+            "Enabled": true,
+            "NetworkMode": 0,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "50e17dca-c64d-56e0-b914-6aa888bfcdb5",
+                "__enabled": true,
+                "Model": "models/recon_drone/recon_propeller_handheld.vmdl",
+                "Tint": "1,1,1,1",
+                "RenderType": "Off",
+                "RenderOptions": {
+                  "GameLayer": false,
+                  "OverlayLayer": true
+                },
+                "UseAnimGraph": false
+              }
+            ],
+            "Children": [],
+            "Position": "-5.94,0,0.54"
+          }
+        ]
+      }
+    ],
+    "__properties": {
+      "NetworkInterpolation": true,
+      "TimeScale": 1,
+      "WantsSystemScene": true,
+      "Metadata": {},
+      "NavMesh": {
+        "Enabled": false,
+        "IncludeStaticBodies": true,
+        "IncludeKeyframedBodies": true,
+        "EditorAutoUpdate": true,
+        "AgentHeight": 64,
+        "AgentRadius": 16,
+        "AgentStepSize": 18,
+        "AgentMaxSlope": 40,
+        "ExcludedBodies": "",
+        "IncludedBodies": ""
+      }
+    },
+    "__variables": []
+  },
+  "ResourceVersion": 2,
+  "__references": [],
+  "__version": 2
+}

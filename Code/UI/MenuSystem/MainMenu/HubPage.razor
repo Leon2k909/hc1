@@ -1,6 +1,7 @@
 @using Sandbox;
 @using Sandbox.UI;
 @using Sandbox.UI.Navigation;
+@using System.Threading.Tasks;
 
 @inherits Panel
 @implements INavigatorPage
@@ -8,47 +9,310 @@
 @namespace Facepunch.UI
 
 <root class="hc1 hub-page">
+    @* The picked tab's art blurred behind everything, crossfading when the tab changes *@
+    <div class="hub-backdrop multiplayer @(_operation == Operation.Multiplayer ? "shown" : "")" />
+    <div class="hub-backdrop zombies @(_operation == Operation.Zombies ? "shown" : "")" />
+    <div class="hub-backdrop battle-royale @(_operation == Operation.BattleRoyale ? "shown" : "")"><div class="backdrop-art" /></div>
+    <div class="hub-atmosphere" />
+
     <div class="hub-container">
-        <div class="hub-cards">
+        <HubModeRail Selected=@_operation OnSelect=@Select />
 
-            <div class="hub-card locked" onmouseover=@PlayHoverSound>
-                <div class="hub-bg campaign-bg"></div>
-                <div class="hub-content">
-                    <label class="hub-mode">SINGLEPLAYER</label>
-                    <label class="hub-title">CAMPAIGN</label>
-                    <label class="hub-desc">COMING SOON</label>
+        @* The picked tab's featured screen *@
+        @if ( _operation == Operation.BattleRoyale )
+        {
+            var royaleMaps = BattleRoyaleMatch.GetMaps();
+            var royaleMap = BattleRoyaleMatch.GetChosenMap();
+            <div class="hub-main">
+                <div class="hub-feature battle-royale">
+                    <div class="feature-bg br-art" />
+                    <div class="feature-shade" />
+                    <div class="feature-shade-left" />
+
+                    <div class="feature-content">
+                        <label class="feature-kicker">@Tr( "SOLOS · {0}", RoyaleMapTitle( royaleMap ) )</label>
+                        <label class="feature-title">@Tr( "BATTLE ROYALE" )</label>
+                        <label class="feature-sub">@Tr( "DROP IN. OUTRUN THE ZONE. BE THE LAST ONE STANDING." )</label>
+
+                        <div class="feature-actions">
+                            <div class="feature-deploy" onclick=@PlayBattleRoyale onmouseover=@PlayHoverSound>
+                                <label>@Tr( "PLAY" )</label>
+                                <i>arrow_forward</i>
+                            </div>
+                            <label class="feature-note">@Tr( "{0} BOTS", RoyaleBots )</label>
+                        </div>
+                    </div>
+                </div>
+
+                @* Where (br_map) and how many bots drop in (br_bots), side by side *@
+                <div class="royale-options">
+                    <div class="hub-playlists royale-maps">
+                        <div class="playlists-head">
+                            <div class="playlists-bar" />
+                            <label class="playlists-title">@Tr( "MAP" )</label>
+                        </div>
+
+                        <div class="playlists-row">
+                            @foreach ( var map in royaleMaps )
+                            {
+                                var art = MapArt.Get( map );
+                                <div class="playlist-card field-card @(map == royaleMap ? "picked" : "")" onclick=@(() => PickRoyaleMap( map )) onmouseover=@PlayHoverSound>
+                                    @if ( string.IsNullOrWhiteSpace( art ) )
+                                    {
+                                        <div class="playlist-bg royale-map-placeholder"><i>landscape</i></div>
+                                    }
+                                    else
+                                    {
+                                        <img class="playlist-bg royale-map-art" src="@art" />
+                                    }
+                                    <div class="playlist-shade" />
+                                    <div class="playlist-content">
+                                        <label class="playlist-name">@RoyaleMapTitle( map )</label>
+                                        <label class="playlist-sub">@Tr( RoyaleMapNote( map ) )</label>
+                                    </div>
+                                    <i class="playlist-go">check</i>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="hub-playlists royale-field">
+                        <div class="playlists-head">
+                            <div class="playlists-bar" />
+                            <label class="playlists-title">@Tr( "FIELD SIZE" )</label>
+                        </div>
+
+                        <div class="playlists-row">
+                            @foreach ( var count in RoyaleFieldSizes )
+                            {
+                                <div class="playlist-card field-card @(count == RoyaleBots ? "picked" : "")" onclick=@(() => PickRoyaleBots( count )) onmouseover=@PlayHoverSound>
+                                    <div class="playlist-shade" />
+                                    <div class="playlist-content">
+                                        <label class="playlist-name">@Tr( "{0} BOTS", count )</label>
+                                        <label class="playlist-sub">@Tr( RoyaleFieldNote( count ) )</label>
+                                    </div>
+                                    <i class="playlist-go">check</i>
+                                </div>
+                            }
+                        </div>
+                    </div>
                 </div>
             </div>
+        }
+        else if ( _operation == Operation.Zombies )
+        {
+            var maps = ZombiesMaps();
+            <div class="hub-main">
+                <div class="hub-feature zombies">
+                    <div class="feature-bg zombies-art" />
+                    <div class="feature-shade" />
+                    <div class="feature-shade-left" />
 
-            <a class="hub-card main-card" href="/multiplayer" onmouseover=@PlayHoverSound>
-                <div class="hub-bg multiplayer-bg"></div>
-                <div class="hub-content">
-                    <label class="hub-mode">COMPETITIVE</label>
-                    <label class="hub-title">MULTIPLAYER</label>
-                    <label class="hub-desc">PLAY NOW</label>
+                    <div class="feature-content">
+                        <label class="feature-kicker">@Tr( "CO-OP" )</label>
+                        <label class="feature-title">@Tr( "ZOMBIES" )</label>
+                        <label class="feature-sub">@Tr( "FIGHT TOGETHER. STAY HUMAN." )</label>
+
+                        <div class="feature-actions">
+                            <div class="feature-deploy" onclick=@PlayZombies onmouseover=@PlayHoverSound>
+                                <label>@Tr( "PLAY" )</label>
+                                <i>arrow_forward</i>
+                            </div>
+                            <label class="feature-note">@Tr( maps.Count == 1 ? "{0} MAP" : "{0} MAPS", maps.Count )</label>
+                        </div>
+                    </div>
                 </div>
-            </a>
 
-            <div class="hub-card locked" onmouseover=@PlayHoverSound>
-                <div class="hub-bg br-bg"></div>
-                <div class="hub-content">
-                    <label class="hub-mode">WARZONE</label>
-                    <label class="hub-title">BATTLE ROYALE</label>
-                    <label class="hub-desc">COMING SOON</label>
+                <div class="hub-playlists zombies-maps">
+                    <div class="playlists-head">
+                        <div class="playlists-bar" />
+                        <label class="playlists-title">@Tr( "ZOMBIES MAPS" )</label>
+                    </div>
+
+                    <div class="playlists-row">
+                        @foreach ( var map in maps )
+                        {
+                            var art = MapArt.Get( map );
+                            <div class="playlist-card" onclick=@(() => LaunchZombies( map )) onmouseover=@PlayHoverSound>
+                                @if ( string.IsNullOrWhiteSpace( art ) )
+                                {
+                                    <div class="playlist-bg zombies-map-placeholder"><i>landscape</i></div>
+                                }
+                                else
+                                {
+                                    <img class="playlist-bg zombies-map-art" src="@art" />
+                                }
+                                <div class="playlist-shade" />
+                                <div class="playlist-content">
+                                    <label class="playlist-name">@map.GetMetadata( "Title", map.ResourceName ).ToUpper()</label>
+                                    <label class="playlist-sub">@Tr( "CO-OP SURVIVAL" )</label>
+                                </div>
+                                <i class="playlist-go">arrow_forward</i>
+                            </div>
+                        }
+                        @if ( maps.Count == 0 )
+                        {
+                            <label class="zombies-maps-empty">@Tr( "No Zombies maps available." )</label>
+                        }
+                    </div>
                 </div>
             </div>
+        }
+        else
+        {
+            @* The featured screen, with the most played modes under it *@
+            <div class="hub-main">
+                <div class="hub-feature multiplayer">
+                    <div class="feature-bg multiplayer-art" />
+                    <div class="feature-shade" />
+                    <div class="feature-shade-left" />
 
-            <div class="hub-card zombies-card" onclick=@PlayZombies onmouseover=@PlayHoverSound>
-                <div class="hub-bg zombies-bg"></div>
-                <div class="hub-content">
-                    <label class="hub-mode">CO-OP</label>
-                    <label class="hub-title">ZOMBIES</label>
-                    <label class="hub-desc">PLAY NOW</label>
+                    <div class="feature-content">
+                        <label class="feature-kicker">@Tr( "FEATURED" )</label>
+                        <label class="feature-title">@Tr( "MULTIPLAYER" )</label>
+                        <label class="feature-sub">@Tr( "SKILL. STRATEGY. ALL OUT WAR." )</label>
+
+                        @* Hovering the row under the title opens the Quick Play filter above it. Deploy starts Quick Play in
+                           a ticked mode on a ticked map; Playlists opens the Multiplayer page to pick one mode and map. *@
+                        <div class="feature-play">
+                            <div class="quick-filter">
+                                <div class="filter-group modes">
+                                    <div class="filter-head">
+                                        <label class="filter-title">@Tr( "MODES" )</label>
+                                        <div class="filter-all @(AllModesIncluded ? "active" : "")" onclick=@IncludeAllModes>
+                                            <label>@Tr( "ALL" )</label>
+                                        </div>
+                                    </div>
+                                    <div class="filter-grid">
+                                        @foreach ( var mode in QuickPlayFilter.Modes )
+                                        {
+                                            <div class="filter-option @(QuickPlayFilter.IsIncluded( mode ) ? "on" : "")" onclick=@(() => ToggleMode( mode ))>
+                                                <div class="filter-check"><i>check</i></div>
+                                                <label>@Tr( mode.Title.ToUpper() )</label>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="filter-group maps">
+                                    <div class="filter-head">
+                                        <label class="filter-title">@Tr( "MAPS" )</label>
+                                        <div class="filter-all @(AllMapsIncluded ? "active" : "")" onclick=@IncludeAllMaps>
+                                            <label>@Tr( "ALL" )</label>
+                                        </div>
+                                    </div>
+                                    <div class="filter-grid">
+                                        @foreach ( var map in QuickPlayFilter.Maps )
+                                        {
+                                            <div class="filter-option @(QuickPlayFilter.IsIncluded( map ) ? "on" : "")" onclick=@(() => ToggleMap( map ))>
+                                                <div class="filter-check"><i>check</i></div>
+                                                <label>@QuickPlayFilter.MapTitle( map ).ToUpper()</label>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="feature-actions">
+                                <div class="feature-deploy" onclick=@StartQuickPlay onmouseover=@PlayHoverSound>
+                                    <label>@Tr( "PLAY NOW" )</label>
+                                    <i>arrow_forward</i>
+                                </div>
+                                <div class="feature-link">
+                                    <label>@Tr( "MODES" )</label>
+                                    <label class="feature-count">@QuickPlayFilter.Included.Count/@QuickPlayFilter.Modes.Count</label>
+                                </div>
+                                <div class="feature-sep" />
+                                <div class="feature-link">
+                                    <label>@Tr( "MAPS" )</label>
+                                    <label class="feature-count">@QuickPlayFilter.IncludedMaps.Count/@QuickPlayFilter.Maps.Count</label>
+                                </div>
+                                <div class="feature-sep" />
+                                <div class="feature-link button" onclick=@OpenAllPlaylists onmouseover=@PlayHoverSound>
+                                    <label>@Tr( "PLAYLISTS" )</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hub-playlists">
+                    <div class="playlists-head">
+                        <div class="playlists-bar" />
+                        <label class="playlists-title">@Tr( "POPULAR PLAYLISTS" )</label>
+                        <div class="playlists-all" onclick=@OpenAllPlaylists onmouseover=@PlayHoverSound>
+                            <label>@Tr( "VIEW ALL PLAYLISTS" )</label>
+                            <i>arrow_forward</i>
+                        </div>
+                    </div>
+
+                    @* A card starts its mode on a random map for it (PopularPlaylists.Play) *@
+                    <div class="playlists-row">
+                        @foreach ( var mode in PopularPlaylists.Top( 4 ) )
+                        {
+                            <div class="playlist-card" onclick=@(() => PopularPlaylists.Play( mode )) onmouseover=@PlayHoverSound>
+                                <div class="playlist-bg @PopularPlaylists.ArtClass( mode )" />
+                                <div class="playlist-shade" />
+                                <div class="playlist-content">
+                                    <label class="playlist-name">@PopularPlaylists.Name( mode )</label>
+                                    <label class="playlist-sub">@PopularPlaylists.Subtitle( mode )</label>
+                                </div>
+                                <i class="playlist-go">arrow_forward</i>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
+        }
 
+        <HubSidebar />
+    </div>
+
+    <div class="hub-footer">
+        <div class="hub-footer-left">
+            <label class="hub-footer-brand">RAZED</label>
+        </div>
+
+        @* Power: asks whether to quit to s&box (QuitPrompt), like Escape does *@
+        <div class="gnav-round-btn hub-power" onclick=@(() => MainMenuRoot.Instance?.OpenQuitPrompt())>
+            <i>power_settings_new</i>
+            <label class="gnav-tip">@Tr( "QUIT GAME" )</label>
         </div>
     </div>
+
+    @* Every Quick Play mode, most played first, from the hero's Playlists link and the row's View All *@
+    @if ( _showingAllPlaylists )
+    {
+        <div class="map-picker all-playlists">
+            <div class="map-picker-backdrop" onclick=@CloseAllPlaylists />
+            <div class="map-picker-panel">
+                <div class="map-picker-header">
+                    <div class="map-picker-heading">
+                        <label class="kicker">@Tr( "MULTIPLAYER" )</label>
+                        <label class="map-picker-title">@Tr( "ALL PLAYLISTS" )</label>
+                    </div>
+                    <div class="map-picker-close" onclick=@CloseAllPlaylists>
+                        <i>close</i>
+                    </div>
+                </div>
+
+                <div class="map-grid">
+                    @foreach ( var mode in PopularPlaylists.Top( int.MaxValue ) )
+                    {
+                        <div class="playlist-card" onclick=@(() => PopularPlaylists.Play( mode )) onmouseover=@PlayHoverSound>
+                            <div class="playlist-bg @PopularPlaylists.ArtClass( mode )" />
+                            <div class="playlist-shade" />
+                            <div class="playlist-content">
+                                <label class="playlist-name">@PopularPlaylists.Name( mode )</label>
+                                <label class="playlist-sub">@PopularPlaylists.Subtitle( mode )</label>
+                            </div>
+                            <i class="playlist-go">arrow_forward</i>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
 
     @if ( _pickingZombiesMap )
     {
@@ -57,8 +321,8 @@
             <div class="map-picker-panel">
                 <div class="map-picker-header">
                     <div class="map-picker-heading">
-                        <label class="kicker">CO-OP · ZOMBIES</label>
-                        <label class="map-picker-title">SELECT MAP</label>
+                        <label class="kicker">@Tr( "CO-OP · ZOMBIES" )</label>
+                        <label class="map-picker-title">@Tr( "SELECT MAP" )</label>
                     </div>
                     <div class="map-picker-close" onclick=@CloseMapPicker>
                         <i>close</i>
@@ -68,7 +332,7 @@
                 <div class="map-grid">
                     @foreach ( var map in ZombiesMaps() )
                     {
-                        var image = map.GetMetadata( "Image", "" );
+                        var image = MapArt.Get( map );
                         <div class="map-card" onclick=@(() => LaunchZombies( map ))>
                             @if ( string.IsNullOrWhiteSpace( image ) )
                             {
@@ -90,26 +354,131 @@
 
 @code
 {
+    /// <summary>What the featured screen shows, picked on the rail's tabs.</summary>
+    public enum Operation { Multiplayer, Zombies, BattleRoyale }
+
+    // Kept for the session, so coming back to the hub shows the tab you left.
+    static Operation _operation = Operation.Multiplayer;
+
     bool _pickingZombiesMap;
 
     public void OnNavigationOpen()  => MainMenuRoot.Instance?.SetActiveRoute( "/" );
     public void OnNavigationClose() { }
 
-    void PlayHoverSound() => Sound.Play( "ui.button.over" );
+    void PlayHoverSound() => Sound.Play( "ui_button_hover" );
 
-    static GameMode ZombiesMode() => GameObject.GetPrefab( "prefabs/game_modes/zombies.prefab" )?.GetComponent<GameMode>();
-
-    /// <summary>Match maps that can host Zombies, Flatgrass first since it was the original.</summary>
-    static List<SceneFile> ZombiesMaps()
+    void Select( Operation operation )
     {
-        var mode = ZombiesMode();
-        if ( !mode.IsValid() ) return new();
-
-        return GameUtils.GetMatchMaps()
-            .Where( m => GameMode.GetAll( m ).Any( x => x.Ident == mode.Ident ) )
-            .OrderByDescending( m => m.ResourcePath?.Contains( "flatgrass", StringComparison.OrdinalIgnoreCase ) ?? false )
-            .ToList();
+        _operation = operation;
+        StateHasChanged();
     }
+
+    protected override void OnAfterTreeRender( bool firstTime )
+    {
+        base.OnAfterTreeRender( firstTime );
+        if ( firstTime ) _ = RankPlaylists();
+    }
+
+    /// <summary>Re-orders the Popular Playlists once the global stats they're ranked by have arrived.</summary>
+    async Task RankPlaylists()
+    {
+        var stats = PopularPlaylists.RefreshStats();
+        if ( stats.IsCompleted ) return;
+
+        try { await stats; }
+        catch ( Exception e ) { Log.Warning( $"Popular playlists: couldn't fetch global stats ({e.Message})" ); }
+
+        if ( IsValid ) StateHasChanged();
+    }
+
+    bool AllModesIncluded => QuickPlayFilter.Included.Count == QuickPlayFilter.Modes.Count;
+    bool AllMapsIncluded => QuickPlayFilter.IncludedMaps.Count == QuickPlayFilter.Maps.Count;
+
+    void ToggleMode( GameMode mode )
+    {
+        QuickPlayFilter.Toggle( mode );
+        Sound.Play( "ui_button_press" );
+        StateHasChanged();
+    }
+
+    void ToggleMap( SceneFile map )
+    {
+        QuickPlayFilter.Toggle( map );
+        Sound.Play( "ui_button_press" );
+        StateHasChanged();
+    }
+
+    void IncludeAllModes()
+    {
+        QuickPlayFilter.IncludeAll();
+        Sound.Play( "ui_button_press" );
+        StateHasChanged();
+    }
+
+    void IncludeAllMaps()
+    {
+        QuickPlayFilter.IncludeAllMaps();
+        Sound.Play( "ui_button_press" );
+        StateHasChanged();
+    }
+
+    void StartQuickPlay()
+    {
+        if ( QuickPlayFilter.TryPick( out var mode, out var map ) )
+            MatchLauncher.StartMatch( mode, map );
+    }
+
+    /// <summary>The bot counts the Battle Royale screen offers. A getter, since hotload keeps a static readonly's old value.</summary>
+    static int[] RoyaleFieldSizes => new[] { 20, 40, 60, 100 };
+
+    /// <summary>Bots in the next battle royale: br_bots, or the mode's own 40.</summary>
+    static int RoyaleBots => BattleRoyaleMatch.BotCountSetting > 0 ? BattleRoyaleMatch.BotCountSetting : 40;
+
+    /// <summary>A field size's card note, in English: the card shows it through Tr.</summary>
+    static string RoyaleFieldNote( int count ) => count switch
+    {
+        <= 20 => "QUICK MATCH",
+        <= 40 => "STANDARD",
+        <= 60 => "CROWDED",
+        _ => "FULL LOBBY"
+    };
+
+    void PickRoyaleBots( int count )
+    {
+        Sound.Play( "ui_button_press" );
+        BattleRoyaleMatch.BotCountSetting = count;
+        StateHasChanged();
+    }
+
+    static string RoyaleMapTitle( SceneFile map ) => map?.GetMetadata( "Title", map.ResourceName ).ToUpper() ?? "";
+
+    /// <summary>A map's card note, in English: the card shows it through Tr.</summary>
+    static string RoyaleMapNote( SceneFile map ) => map?.ResourceName?.ToLowerInvariant() switch
+    {
+        "flatgrass" => "WIDE OPEN",
+        "ridgeback" => "MOUNTAIN VALLEY",
+        _ => ""
+    };
+
+    void PickRoyaleMap( SceneFile map )
+    {
+        Sound.Play( "ui_button_press" );
+        BattleRoyaleMatch.MapSetting = map.ResourcePath;
+        StateHasChanged();
+    }
+
+    /// <summary>Battle royale on the map picked on its screen (br_map): Flatgrass or Ridgeback.</summary>
+    void PlayBattleRoyale()
+    {
+        var mode = MatchLauncher.BattleRoyaleMode();
+        var map = BattleRoyaleMatch.GetChosenMap();
+        if ( !mode.IsValid() || map is null ) return;
+
+        Sound.Play( "ui_button_press" );
+        MatchLauncher.StartMatch( mode, map );
+    }
+
+    static List<SceneFile> ZombiesMaps() => MatchLauncher.ZombiesMaps();
 
     void PlayZombies()
     {
@@ -127,20 +496,51 @@
         StateHasChanged();
     }
 
+    bool _showingAllPlaylists;
+
+    void OpenAllPlaylists()
+    {
+        Sound.Play( "ui_button_press" );
+        _showingAllPlaylists = true;
+        StateHasChanged();
+    }
+
+    void CloseAllPlaylists()
+    {
+        _showingAllPlaylists = false;
+        StateHasChanged();
+    }
+
     void CloseMapPicker()
     {
         _pickingZombiesMap = false;
         StateHasChanged();
     }
 
+    /// <summary> Escape (MainMenuRoot): closes the all-playlists list or the zombies map picker, if one is open. </summary>
+    public bool CloseOverlay()
+    {
+        if ( _showingAllPlaylists )
+        {
+            CloseAllPlaylists();
+            return true;
+        }
+
+        if ( _pickingZombiesMap )
+        {
+            CloseMapPicker();
+            return true;
+        }
+
+        return false;
+    }
+
     void LaunchZombies( SceneFile map )
     {
-        var mode = ZombiesMode();
+        var mode = MatchLauncher.ZombiesMode();
         if ( !mode.IsValid() || map is null ) return;
 
         _pickingZombiesMap = false;
-        GameMode.SetCurrent( mode );
-        GameMode.SetHardcore( false );
-        Game.ActiveScene.Load( map );
+        MatchLauncher.StartMatch( mode, map );
     }
 }

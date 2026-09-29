@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Port a MWII Kastov-platform viewmodel into HC1: the Kastov 762 (the AK-47 from GMod workshop item 3803722029),
-the Kastov-74u, the PP-19-01 Vityaz (the Vaznev-9K) or the RPK, see kastov_weapons.py.
+the Kastov-74u, the PP-19-01 Vityaz (the Vaznev-9K), the RPK, the PP-19 Bizon, the AK-105, the Vepr-12, the M16A4
+(on MWII's AR rig, which has the same bone and clip names), or MW2019's FN P90, MP7A1 or Steyr AUG A3 (whose rigs have
+them too), see kastov_weapons.py.
 
 The CoD viewmodel's animations drive CoD arm bones, so they are retargeted onto HC1's own arm skeleton (the
 bones of models/first_person/v_first_person_arms_human.vmdl). The exported viewmodel carries those arm bones
@@ -9,17 +11,20 @@ plus the gun's bones; the prefab bone-merges the HC1 arms onto it, like every ot
 Outputs in the gun's folder (DMX, which ModelDoc imports as-is: X forward, Y left, Z up), shown for the 762:
   models/v_kastov.dmx         viewmodel mesh + skeleton (bind pose = level gun for the gunsmith, arms at idle)
   models/anims/<clip>.dmx     viewmodel animations (and Weapon.reload_variants' reloads, the RPK's box magazines)
+  models/anims/sway.dmx       the M4's look sway poses: idle, then one pose per frame (kastov_sway.py)
   models/w_kastov.dmx         static world model, laid out like the M4's (grip mount near the origin)
   models/[vw]_kastov_<piece>.dmx  the optional_meshes bodygroup pieces for each model (and muzzle_tip_<tip_choices>)
   models/[vw]_kastov_<group>_<choice>.dmx  the part_choices bodygroup choices for each model (the 74u's)
 
 Inputs that are not in the repo:
   Weapon.decompiled  Crowbar decompiles of the viewmodel (v_akm.mdl, v_akilo74.mdl, v_aviktor.mdl,
-                     vm_iw9_rkilo.mdl) and its attachment models.
+                     vm_iw9_rkilo.mdl, v_iw9_beta.mdl, vm_iw9_akilo105.mdl, v_vecho.mdl, vm_iw9_mike16.mdl,
+                     v_papa90.mdl, v_mpapa7.mdl, v_augolf.mdl) and its attachment models.
   HC1_GLTF    Source2Viewer glTF exports (with animations) of the cloud models v_m4a1.vmdl (its IdlePose is HC1's
               rifle grip, the retarget reference) and v_first_person_arms_human.vmdl (preview render only).
 
-Run: python Tools/port_kastov.py [--weapon kastov762|kastov74u|vityaz|rpk] [--preview]
+Run: python Tools/port_kastov.py [--weapon kastov762|kastov74u|vityaz|rpk|bizon|ak105|vepr12|m16|p90|mp7|aug|uzi|fal|m18]
+     [--preview]
 """
 
 from __future__ import annotations
@@ -31,8 +36,10 @@ from pathlib import Path
 import numpy as np
 
 import kastov_dmx
+import kastov_sway
 import kastov_weapons
 from kastov_gltf import GltfModel
+import kastov_smd
 from kastov_smd import Smd, euler_to_mat, matrix, orthonormalize
 from kastov_weapons import Weapon
 
@@ -43,6 +50,10 @@ TWIST_FRACTIONS = (0.0, 0.2594, 0.7406)
 
 # Where the world model puts the pistol grip mount, matching w_m4a1's RearGrip attachment point (X forward, Z up).
 WORLD_GRIP = np.array([-3.0, 0.0, 3.0])
+
+# Weapon.left_grip applies in full while the left wrist is within the first distance of its idle grip on the gun,
+# fading out by the second, so the hand keeps CoD's motion when it leaves the handguard (reloads).
+GRIP_FADE = (1.0, 3.0)
 
 # v_m4a1's sprint: a still pose and a looping run bob, both deltas on weapon_root (Weapon.m4_sprint).
 M4_SPRINT_POSE = "Shared_Sprint_Pose_delta"
@@ -156,30 +167,47 @@ def compose(base: Smd, base_frame: int, delta: Smd, corrective: Smd) -> list[dic
     studiomdl's 'subtract' + 'delta' (post) semantics, per bone in parent space: rotation base * c^-1 * d,
     position base + d - c.
 
-    Only bones the delta actually animates are layered. The rest hold export filler (zeros, bind values or
-    values that don't match the corrective), which would otherwise throw e.g. the magazine rounds off the gun.
+    Only the channels (position, rotation) the delta actually animates are layered. The rest hold export filler
+    (zeros, bind values or values that don't match the corrective), which would otherwise throw e.g. the magazine
+    rounds off the gun, or the RPK's carry handle (swung by rotation only, its position left at zero) off the barrel.
     """
     base_local = local_matrices(base, base.dense_frames()[base_frame])
     corrective_local = local_matrices(corrective, corrective.dense_frames()[0])
     delta_frames = delta.dense_frames()
-    animated = set()
+    animated: dict[str, tuple[bool, bool]] = {}  # bone -> (position animated, rotation animated)
     for index, (name, _) in enumerate(delta.nodes):
         values = np.array([np.concatenate(frame[index]) for frame in delta_frames if index in frame])
-        if len(values) and np.abs(values - values[0]).max() > 1e-4:
-            animated.add(name)
+        if len(values):
+            moving = np.abs(values - values[0]).max(axis=0) > 1e-4
+            if moving.any():
+                animated[name] = (bool(moving[:3].any()), bool(moving[3:].any()))
     poses = []
     for frame in delta_frames:
         current = local_matrices(delta, frame)
         composed = {}
         for name, value in base_local.items():
             if name in animated and name in corrective_local:
+                moves, turns = animated[name]
                 c, d = corrective_local[name], current[name]
-                rotation = orthonormalize(value[:3, :3] @ c[:3, :3].T @ d[:3, :3])
-                composed[name] = matrix(value[:3, 3] + d[:3, 3] - c[:3, 3], rotation)
+                position = value[:3, 3] + d[:3, 3] - c[:3, 3] if moves else value[:3, 3]
+                rotation = orthonormalize(value[:3, :3] @ c[:3, :3].T @ d[:3, :3]) if turns else value[:3, :3]
+                composed[name] = matrix(position, rotation)
             else:
                 composed[name] = value
         poses.append(world_from_locals(base, composed))
     return poses
+
+
+def scale_rotation(rotation: np.ndarray, factor: float) -> np.ndarray:
+    """The rotation about the same axis by factor times its angle."""
+    angle = math.acos(float(np.clip((np.trace(rotation) - 1.0) / 2.0, -1.0, 1.0)))
+    if angle < 1e-9:
+        return np.eye(3)
+    axis = np.array([rotation[2, 1] - rotation[1, 2], rotation[0, 2] - rotation[2, 0],
+                     rotation[1, 0] - rotation[0, 1]]) / (2.0 * math.sin(angle))
+    k = np.array([[0.0, -axis[2], axis[1]], [axis[2], 0.0, -axis[0]], [-axis[1], axis[0], 0.0]])
+    turned = angle * factor
+    return np.eye(3) + math.sin(turned) * k + (1.0 - math.cos(turned)) * (k @ k)
 
 
 def rotation_between(source: np.ndarray, target: np.ndarray) -> np.ndarray:
@@ -312,15 +340,26 @@ class ArmRetarget:
         return world
 
 
+def smd_file(path: str) -> str:
+    """The SMD file of a mesh path: the first of several joined by +, without its #bone or @material filter."""
+    return path.partition("+")[0].partition("@")[0].partition("#")[0]
+
+
 class Kastov:
     """Loads the CoD rig and HC1 references and builds the output skeleton."""
 
     def __init__(self, weapon: Weapon):
         self.weapon = weapon
+        # Before any SMD is read: a pistol rig's gun root comes in as tag_sling (Weapon.bone_renames).
+        kastov_smd.BONE_RENAMES.clear()
+        kastov_smd.BONE_RENAMES.update(weapon.bone_renames)
         self.decompiled = weapon.decompiled
         self.cod_anims = weapon.decompiled / weapon.cod_anims
         self.extra_bones = weapon.extra_bones
-        self.ref = Smd(self.decompiled / weapon.vm_meshes[0])
+        # CoD lengths -> HC1's (Weapon.model_scale): the whole pose shrinks about the camera (to_model), and so do the
+        # meshes (_vertex), the extra bones' offsets and the attachment models' bones (part_bone).
+        self.shrink = 1.0 / weapon.model_scale
+        self.ref = Smd(self.decompiled / smd_file(weapon.vm_meshes[0]))
         self.idle = Smd(self.cod_anims / "idle.smd")
         idle_world = named_world(self.idle, self.idle.dense_frames()[0])
         self.camera0_inv = np.linalg.inv(idle_world["tag_camera"])
@@ -329,6 +368,18 @@ class Kastov:
         self.hc1_parent = m4.hierarchy()
         hc1_pose = m4.pose("IdlePose", 0.0)
         self.arms = ArmRetarget(self.to_model(idle_world, weapon.aim), hc1_pose, self.hc1_parent)
+        # The left wrist's idle grip, in tag_sling space, for Weapon.left_grip.
+        idle_model = self.to_model(idle_world, weapon.hip)
+        self.left_grip = (np.linalg.inv(idle_model["tag_sling"]) @ idle_model["j_wrist_le"])[:3, 3]
+        # Weapon.grip_pose: bone -> (corrective, delta) parent-space transforms, for the bones it moves.
+        self.cod_parent = [(name, self.idle.name(parent) if parent >= 0 else None) for name, parent in self.idle.nodes]
+        self.grip_delta = self._grip_delta(weapon.grip_pose) if weapon.grip_pose else {}
+        # Weapon.slide_lock: the bones it moves, in idle's parent space with the delta on (the QC's empty_offset at 1).
+        rest = local_matrices(self.idle, self.idle.dense_frames()[0])
+        self.slide_lock = {
+            name: matrix(rest[name][:3, 3] + d[:3, 3] - c[:3, 3],
+                         orthonormalize(rest[name][:3, :3] @ c[:3, :3].T @ d[:3, :3]))
+            for name, (c, d) in (self._grip_delta(weapon.slide_lock).items() if weapon.slide_lock else ())}
 
         # Output skeleton: camera, HC1 arms under root, then the CoD gun bones and extras.
         arm_bones = set()
@@ -344,6 +395,9 @@ class Kastov:
             self.nodes.append((bone, -2))
         for bone in self.extra_bones:
             self.nodes.append((bone, -2))
+        # The hands' IK targets on the gun, under tag_sling (kastov_sway.py).
+        for bone in kastov_sway.IK_TARGETS:
+            self.nodes.append((bone, -2))
         self.index = {name: i for i, (name, _) in enumerate(self.nodes)}
         # The gun's root bones stay roots (the Vityaz's tag_sling hangs off a GMod hand helper bone, which isn't kept).
         cod_parent = {name: (self.ref.name(parent) if parent >= 0 and self.ref.name(parent) in gun else None)
@@ -355,6 +409,8 @@ class Kastov:
                     parent_name = self.hc1_parent[name]
                 elif name in self.extra_bones:
                     parent_name = self.extra_bones[name][0]
+                elif name in kastov_sway.IK_TARGETS:
+                    parent_name = "tag_sling"
                 else:
                     parent_name = cod_parent[name]
                 parent = self.index[parent_name] if parent_name is not None else -1
@@ -376,22 +432,83 @@ class Kastov:
                 visit(child)
 
         visit(self.ref.index("tag_sling"))
-        visit(self.ref.index("j_gun"))
+        # j_gun is its own root on the Kastovia rigs; on the M16's it hangs off tag_sling, so it's in already.
+        if "j_gun" not in result:
+            visit(self.ref.index("j_gun"))
         return result
 
     def to_model(self, cod_world: dict[str, np.ndarray], offset: np.ndarray) -> dict[str, np.ndarray]:
         """CoD bone transforms -> HC1 viewmodel space (origin and axes at the idle camera), offset applied to all but
-        the camera."""
+        the camera, then shrunk about the camera by Weapon.model_scale: the gun comes out its real size, as far from
+        the eye as that makes it, so the view through the sights doesn't change."""
         result = {}
         for name, world in cod_world.items():
             model = self.camera0_inv @ world
-            result[name] = model if name == "tag_camera" else offset @ model
+            if name != "tag_camera":
+                model = offset @ model
+            if self.shrink != 1.0:
+                model = matrix(model[:3, 3] * self.shrink, model[:3, :3])
+            result[name] = model
+        return result
+
+    def _grip_delta(self, clip: str) -> dict[str, tuple[np.ndarray, np.ndarray]]:
+        """The bones a one-frame delta clip (Weapon.grip_pose, Weapon.slide_lock) moves from its corrective, with both
+        parent-space transforms."""
+        delta, corrective = Smd(self.cod_anims / f"{clip}.smd"), Smd(self.cod_anims / f"{clip}_corrective_animation.smd")
+        d, c = local_matrices(delta, delta.dense_frames()[0]), local_matrices(corrective, corrective.dense_frames()[0])
+        moved = {}
+        for name in d:
+            turn = c[name][:3, :3].T @ d[name][:3, :3]
+            angle = math.acos(float(np.clip((np.trace(turn) - 1.0) / 2.0, -1.0, 1.0)))
+            if np.linalg.norm(d[name][:3, 3] - c[name][:3, 3]) > 1e-4 or angle > 1e-4:
+                moved[name] = (c[name], d[name])
+        return moved
+
+    def with_grip_pose(self, cod_world: dict[str, np.ndarray], weight: float) -> dict[str, np.ndarray]:
+        """CoD world poses with Weapon.grip_pose layered on at weight: studiomdl's subtract + delta per bone in parent
+        space (as compose does), each bone's change scaled by weight; the bones below follow."""
+        result = dict(cod_world)
+        moved = set()
+        for name, parent in self.cod_parent:  # parents first
+            parent_world = result[parent] if parent is not None else np.eye(4)
+            if name in self.grip_delta:
+                c, d = self.grip_delta[name]
+                base = np.linalg.inv(cod_world[parent]) @ cod_world[name] if parent is not None else cod_world[name]
+                position = base[:3, 3] + weight * (d[:3, 3] - c[:3, 3])
+                rotation = orthonormalize(base[:3, :3] @ scale_rotation(c[:3, :3].T @ d[:3, :3], weight))
+                result[name] = parent_world @ matrix(position, rotation)
+            elif parent in moved:
+                result[name] = parent_world @ np.linalg.inv(cod_world[parent]) @ cod_world[name]
+            else:
+                continue
+            moved.add(name)
         return result
 
     def pose(self, cod_world: dict[str, np.ndarray], offset: np.ndarray) -> list[np.ndarray]:
         """Model-space world transform of every output bone for one CoD pose."""
         cod = self.to_model(cod_world, offset)
+        fit, weight = self.weapon.left_grip, self.grip_weight(cod)
+        if self.grip_delta and weight > 0:
+            # CoD's grip pose holds while the left hand is on the handguard (the QC's grip events); the same fade as
+            # left_grip stands in for them.
+            cod = self.to_model(self.with_grip_pose(cod_world, weight), offset)
+        if fit is not None and weight > 0:
+            # The whole left arm moves, so the arm mesh isn't stretched; the fingers open after the solve.
+            shift = cod["tag_sling"][:3, :3] @ (weight * np.array(fit.shift, float))
+            cod = dict(cod)
+            for bone in cod_arm_map("L").values():
+                cod[bone] = matrix(cod[bone][:3, 3] + shift, cod[bone][:3, :3])
         arms = self.arms.solve(cod)
+        if fit is not None and weight > 0:
+            solved = dict(arms)
+            for finger in ("index", "middle", "ring", "pinky", "thumb"):
+                opening = weight * (fit.thumb if finger == "thumb" else fit.fingers)
+                for bone in finger_chain(finger, "L"):
+                    if "meta" in bone:
+                        continue
+                    parent = self.hc1_parent[bone]
+                    local = np.linalg.inv(solved[parent]) @ solved[bone]
+                    arms[bone] = arms[parent] @ matrix(local[:3, 3], scale_rotation(local[:3, :3], 1.0 - opening))
         world: list[np.ndarray] = []
         for name, parent in self.nodes:
             if name == "camera":
@@ -401,10 +518,19 @@ class Kastov:
             elif name in arms:
                 world.append(arms[name])
             elif name in self.extra_bones:
-                world.append(world[parent] @ matrix(self.extra_bones[name][1], np.eye(3)))
+                world.append(world[parent] @ matrix(self.extra_bones[name][1] * self.shrink, np.eye(3)))
+            elif name in kastov_sway.IK_TARGETS:
+                # Where its hand is, so the animgraph's IK changes nothing on the clip's own frames.
+                world.append(arms[kastov_sway.IK_TARGETS[name]])
             else:
                 world.append(cod[name])
         return world
+
+    def grip_weight(self, cod: dict[str, np.ndarray]) -> float:
+        """How much of Weapon.left_grip applies: 1 with the left wrist on its idle grip, 0 away from it (GRIP_FADE)."""
+        wrist = (np.linalg.inv(cod["tag_sling"]) @ cod["j_wrist_le"])[:3, 3]
+        near, far = GRIP_FADE
+        return float(np.clip((far - np.linalg.norm(wrist - self.left_grip)) / (far - near), 0.0, 1.0))
 
     def locals_(self, world: list[np.ndarray]) -> list[np.ndarray]:
         return [world[index] if parent < 0 else np.linalg.inv(world[parent]) @ world[index]
@@ -447,6 +573,8 @@ class Kastov:
             bob = self.m4.pose(M4_SPRINT_BOB, index * length / count)["weapon_root"]
             sprint = matrix(root[:3, 3] + still[:3, 3] + bob[:3, 3], root[:3, :3] @ still[:3, :3] @ bob[:3, :3])
             move = pivot @ sprint @ np.linalg.inv(root) @ np.linalg.inv(pivot)
+            # A move in model space is one with 1/shrink the offset in CoD's (to_model shrinks CoD's lengths).
+            move = matrix(move[:3, 3] / self.shrink, move[:3, :3])
             cod_move = np.linalg.inv(view) @ move @ view
             world = dict(rest)
             for bone in self.gun_bones:
@@ -454,17 +582,82 @@ class Kastov:
             frames.append(self.pose(pin_hands(self.idle, world, rest), offset))
         return frames, fps
 
+    def m4_sway(self, offset: np.ndarray) -> list[list[np.ndarray]]:
+        """HC1's M4 look sway on this gun's idle pose (kastov_sway.py): idle's first frame, then one frame per
+        kastov_sway.poses() entry.
+
+        Each frame adds its share of one of the M4's weapon_root deltas to IdlePose, as the M4's animgraph adds it,
+        and moves the gun and the hands' IK targets that way about the point that sits where weapon_root does
+        relative to the M4's right hand, as m4_sprint does. The arms stay where they are: the animgraph's IK takes
+        the hands along, as the M4's does.
+        """
+        m4_idle = self.m4.pose("IdlePose")
+        root = m4_idle["weapon_root"]
+        pivot = matrix(self.bind[self.index["hand_R"]][:3, 3] - m4_idle["hand_R"][:3, 3], np.eye(3))
+        rest = self.play("idle", offset, slice(0, 1))[0]
+        gun = set(self.gun_bones) | set(self.extra_bones) | set(kastov_sway.IK_TARGETS)
+        moving = [name in gun for name, _ in self.nodes]
+        frames = [rest]
+        for _, m4_pose, share in kastov_sway.poses():
+            delta = self.m4.pose(m4_pose)["weapon_root"]
+            swayed = matrix(root[:3, 3] + share * delta[:3, 3], root[:3, :3] @ scale_rotation(delta[:3, :3], share))
+            # In model space: m4_sprint's move before it goes into CoD's.
+            move = pivot @ swayed @ np.linalg.inv(root) @ np.linalg.inv(pivot)
+            frames.append([move @ world if moves else world for world, moves in zip(rest, moving)])
+        return frames
+
+    def steady_fire(self, offset: np.ndarray, count: int) -> list[list[np.ndarray]]:
+        """The fire clip's first count frames with the gun and arms held still (Weapon.steady_fire): every bone keeps
+        its idle parent-space transform except the gun's moving parts (the bones under tag_sling or j_gun, but not the
+        spare magazine's) and the right hand's fingers, which play the clip."""
+        parent = dict(self.cod_parent)
+
+        def under(bone: str | None, ancestor: str) -> bool:
+            while bone is not None:
+                if bone == ancestor:
+                    return True
+                bone = parent.get(bone)
+            return False
+
+        fingers = {cod for hc1, cod in cod_arm_map("R").items() if hc1.startswith("finger_")}
+        playing = {bone for bone in parent
+                   if bone in fingers or (bone not in ("tag_sling", "j_gun") and not under(bone, self.weapon.spare_mag)
+                                          and (under(bone, "tag_sling") or under(bone, "j_gun")))}
+        rest = local_matrices(self.idle, self.idle.dense_frames()[0])
+        fire = Smd(self.cod_anims / "fire.smd")
+        frames = []
+        for frame in fire.dense_frames()[:count]:
+            local = local_matrices(fire, frame)
+            steady = {bone: local[bone] if bone in playing and bone in local else value for bone, value in rest.items()}
+            frames.append(self.pose(world_from_locals(self.idle, steady), offset))
+        return frames
+
     def clips(self):
         """(name, frames, fps) of every exported animation."""
         hip, aim, sprint = self.weapon.hip, self.weapon.aim, self.weapon.sprint
         yield "idle", self.play("idle", hip), 30
         yield "draw", self.play("draw", hip), 30
-        yield "fire", self.play("fire", hip), 30
-        yield "reload", self.play("reload", hip), 30
-        yield "reload_empty", self.play("reload_empty", hip), 30
+        if self.weapon.steady_fire:
+            yield "fire", self.steady_fire(hip, self.weapon.steady_fire), 30
+        else:
+            yield "fire", self.play("fire", hip), 30
+        if self.weapon.ads_fire:
+            # At the hip pose, like fire: the animgraph's ADS layer adds the aim on top.
+            yield "fire_ads", self.play(self.weapon.ads_fire, hip), 30
+        if self.slide_lock:
+            # The last round: the slide stays back (and the barrel tilted) once it's there. Every other state but
+            # reload_empty adds empty's slide lock on top while the magazine is empty (the animgraph's b_empty).
+            assert not self.weapon.steady_fire, "a slide lock needs the fire clip as it is"
+            yield "fire_empty", self.slide_held("fire", hip), 30
+            if self.weapon.ads_fire:
+                yield "fire_ads_empty", self.slide_held(self.weapon.ads_fire, hip), 30
+            yield "empty", self.slide_locked(hip) * 2, 30
+        factory = self.weapon.factory_reload
+        yield "reload", self.play(f"reload{factory}", hip), 30
+        yield "reload_empty", self.play(self.empty_reload(factory), hip), 30
         for suffix in self.weapon.reload_variants:
-            yield f"reload{suffix}", self.play(f"reload{suffix}", hip), 30
-            yield f"reload_empty{suffix}", self.play(f"reload_empty{suffix}", hip), 30
+            yield f"reload{suffix}", self.play(self.weapon.reload_clip_overrides.get(f"reload{suffix}", f"reload{suffix}"), hip), 30
+            yield f"reload_empty{suffix}", self.play(self.empty_reload(suffix), hip), 30
         yield "ads", self.ads() * 2, 30
         yield "walk", self.layered("idle", "a_walk", hip), 30
         if self.weapon.m4_sprint:
@@ -474,6 +667,37 @@ class Kastov:
         # The weapon held low (HC1's lowered toggle): the still sprint pose.
         lowered = self.weapon.lowered if self.weapon.lowered is not None else sprint
         yield "lowered", self.play("sprint_in", lowered, slice(0, 1)) * 2, 30
+        # The look sway's poses, which the animgraph blends by how fast the view turns.
+        yield "sway", self.m4_sway(hip), 30
+
+    def slide_locked(self, offset: np.ndarray) -> list[list[np.ndarray]]:
+        """Idle's first frame with the slide locked back (Weapon.slide_lock): the one-frame empty pose."""
+        local = local_matrices(self.idle, self.idle.dense_frames()[0])
+        local.update(self.slide_lock)
+        return [self.pose(world_from_locals(self.idle, local), offset)]
+
+    def slide_held(self, clip: str, offset: np.ndarray) -> list[list[np.ndarray]]:
+        """A fire clip whose slide stays back from the frame it's furthest back on: the bones the slide lock moves
+        hold their locked pose from then on, as a real slide stops on the slide stop after the last round."""
+        smd = Smd(self.cod_anims / f"{clip}.smd")
+        frames = [local_matrices(smd, frame) for frame in smd.dense_frames()]
+        # The slide is the bone the lock moves furthest; its locked place is where the clip's recoil takes it.
+        slide = max(self.slide_lock,
+                    key=lambda name: np.linalg.norm(self.slide_lock[name][:3, 3] - frames[0][name][:3, 3]))
+        locked = self.slide_lock[slide][:3, 3]
+        back = int(np.argmin([np.linalg.norm(local[slide][:3, 3] - locked) for local in frames]))
+        poses = []
+        for index, local in enumerate(frames):
+            if index >= back:
+                local = {**local, **self.slide_lock}
+            poses.append(self.pose(world_from_locals(smd, local), offset))
+        return poses
+
+    def empty_reload(self, suffix: str) -> str:
+        """The CoD clip of a magazine's empty reload: reload_empty<suffix>, or reload<suffix>_empty (the AK-105's
+        60-rounder's)."""
+        empty = f"reload_empty{suffix}"
+        return empty if (self.cod_anims / f"{empty}.smd").exists() else f"reload{suffix}_empty"
 
     def ads(self) -> list[list[np.ndarray]]:
         """The one-frame ADS pose (Weapon.ads_pose)."""
@@ -497,6 +721,9 @@ class Kastov:
                   for name, (path, reference_path) in self.weapon.optional_meshes.items()}
         pieces.update({f"muzzle_tip_{name}": self.part_triangles(path, reference_path)
                        for name, (path, reference_path) in self.weapon.tip_choices.items()})
+        pieces.update({f"{group}_{name}": self.part_triangles(path, reference_path)
+                       for group, choices in self.weapon.optional_variants.items()
+                       for name, path, reference_path in choices if path})
         return pieces
 
     def choice_triangles(self) -> dict[str, list[tuple[str, list]]]:
@@ -510,17 +737,41 @@ class Kastov:
                 for triangle in self.part_triangles(choices[0][1], choices[0][1])]
 
     def part_reference(self, reference_path: str) -> dict[str, np.ndarray]:
-        reference = Smd(self.decompiled / reference_path)
+        reference = Smd(self.decompiled / smd_file(reference_path))
         return named_world(reference, reference.dense_frames()[0])
 
     def part_triangles(self, path: str, reference_path: str | None) -> list[tuple[str, list]]:
         """One attachment model's mesh, placed as the viewmodel's bone-merge would place it; with no reference, a mesh
-        on the viewmodel itself."""
+        on the viewmodel itself. A path ending in #bone,bone keeps only the triangles on those bones, and #!bone,bone
+        only the rest: CoD hides some pieces by their bones (the M16's rail cover), and a magazine's rounds are one
+        mesh. After that, @material,material keeps only the triangles in those materials, and @!material,material
+        only the rest: some of MW2019's meshes carry a second copy of a piece in another material (the AUG's).
+        Paths joined by + are one piece from several models on one skeleton (the M18's slide and its sights, which
+        its attachment model has as a bodygroup), each placed by its own reference pose when the reference is the
+        path itself."""
+        if "+" in path:
+            pieces = path.split("+")
+            references = pieces if reference_path == path else [reference_path] * len(pieces)
+            return [triangle for piece, reference in zip(pieces, references)
+                    for triangle in self.part_triangles(piece, reference)]
+        path, _, materials = path.partition("@")
+        path, _, bones = path.partition("#")
         smd = Smd(self.decompiled / path)
+        triangles = smd.triangles
+        if materials:
+            keep = not materials.startswith("!")
+            wanted = set(materials.lstrip("!").split(","))
+            triangles = [(material, vertices) for material, vertices in triangles if (material in wanted) == keep]
+        if bones:
+            keep = not bones.startswith("!")
+            wanted = {smd.index(name) for name in bones.lstrip("!").split(",")}
+            triangles = [(material, vertices) for material, vertices in triangles
+                         if any(bone in wanted and weight > 0.5
+                                for *_, links in vertices for bone, weight in links) == keep]
         bind = smd.world(smd.dense_frames()[0])
         ref_world = self.part_reference(reference_path) if reference_path is not None else None
         return [(material, [self._vertex(vertex, smd, bind, ref_world) for vertex in vertices])
-                for material, vertices in smd.triangles]
+                for material, vertices in triangles]
 
     def _vertex(self, vertex, smd: Smd, bind: list[np.ndarray], part_pose):
         position, normal, uv, links = vertex
@@ -531,14 +782,16 @@ class Kastov:
             name = smd.name(bone)
             target, extra = name, np.eye(4)
             if part_pose is not None:
-                # Bones missing from the viewmodel follow their nearest merged ancestor, as bone-merge does.
+                # Bones missing from the viewmodel follow their nearest merged ancestor, as bone-merge does, and so do
+                # Weapon.unmerged_bones.
                 current = bone
-                while smd.name(current) not in self.index:
+                while smd.name(current) not in self.index or smd.name(current) in self.weapon.unmerged_bones:
                     current = smd.nodes[current][1]
                 target = smd.name(current)
                 extra = np.linalg.inv(part_pose[target]) @ part_pose[name]
             index = self.index[target]
-            skin = self.bind[index] @ extra @ np.linalg.inv(bind[bone])
+            # The vertex's offset from its bone shrinks like the pose (to_model); the normal is normalized below.
+            skin = self.bind[index] @ np.diag([self.shrink] * 3 + [1.0]) @ extra @ np.linalg.inv(bind[bone])
             new_position += weight * (skin[:3, :3] @ position + skin[:3, 3])
             new_normal += weight * (skin[:3, :3] @ normal)
             new_links.append((index, weight))
@@ -561,7 +814,7 @@ class Kastov:
         frame = self.world_frame()
         spare = self.index[self.weapon.spare_mag]
         onto_mag = self.bind[self.index["j_mag1"]] @ np.linalg.inv(self.bind[spare])
-        gun = set(self.gun_bones) | set(self.extra_bones)
+        gun = set(self.gun_bones) | set(self.extra_bones) | set(kastov_sway.IK_TARGETS)
         result = []
         for index, (name, _) in enumerate(self.nodes):
             if self._descends_from(index, spare):
@@ -607,25 +860,34 @@ class Kastov:
     def world_points(self) -> dict[str, np.ndarray]:
         """Attachment positions in world model space."""
         frame = self.world_frame()
+        # A pistol's rig has no left-hand IK tag (tag_ik_loc_le), so that one is left out.
         points = {name: (frame @ self.bind[self.index[bone]])[:3, 3]
                   for name, bone in (("muzzle", "muzzle"), ("eject", "tag_brass"), ("left_hand", "tag_ik_loc_le"),
                                      ("grip", "tag_pistolgrip_attach"), ("mag", "tag_mag_attach"),
                                      ("stock", "tag_stock_attach"), ("barrel", "tag_barrel_attach"),
-                                     ("optic", "tag_reflex"))}
+                                     ("optic", "tag_reflex")) if bone in self.index}
         for bone in self.weapon.report_bones:
             points[bone] = (frame @ self.part_bone(bone))[:3, 3]
         return points
 
     def part_bone(self, bone: str) -> np.ndarray:
-        """Bind transform of a viewmodel bone, or of a bone of an attachment model merged onto it."""
+        """Bind transform of a viewmodel bone, or of a bone of an attachment model merged onto it: it follows its
+        nearest ancestor the viewmodel has, as bone-merge (and _vertex) places it. The model's root isn't always that
+        ancestor: the FAL's handguard hangs its bones off tag_sling under a j_gun root, and the rig's j_gun is elsewhere."""
         if bone in self.index:
             return self.bind[self.index[bone]]
         factory_parts = [(path, path) for choices in self.weapon.part_choices.values() for _, path in choices[:1]]
-        for _, reference_path in self.weapon.part_meshes + factory_parts:
-            reference = self.part_reference(reference_path)
+        optional_parts = [(path, reference) for path, reference in self.weapon.optional_meshes.values() if reference]
+        for _, reference_path in self.weapon.part_meshes + factory_parts + optional_parts:
+            smd = Smd(self.decompiled / smd_file(reference_path))
+            reference = named_world(smd, smd.dense_frames()[0])
             if bone in reference:
-                root = next(name for name in reference if name in self.index)
-                return self.bind[self.index[root]] @ np.linalg.inv(reference[root]) @ reference[bone]
+                current = smd.index(bone)
+                while smd.name(current) not in self.index or smd.name(current) in self.weapon.unmerged_bones:
+                    current = smd.nodes[current][1]
+                ancestor = smd.name(current)
+                relative = np.linalg.inv(reference[ancestor]) @ reference[bone]
+                return self.bind[self.index[ancestor]] @ matrix(relative[:3, 3] * self.shrink, relative[:3, :3])
         raise KeyError(bone)
 
 

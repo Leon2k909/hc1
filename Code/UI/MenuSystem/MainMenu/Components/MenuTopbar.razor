@@ -5,29 +5,50 @@
 @namespace Facepunch.UI
 @attribute [StyleSheet]
 
+@*
+    The breadcrumb bar under the menu's header, the same as the gunsmith's (UI/Styles/Breadcrumbs.scss): a back button,
+    then the page this one is inside (ParentTitle), if any, and this page's title in orange. Pages pass their titles in
+    English, and the bar shows them in the player's language.
+*@
+
 <root class="menu-topbar">
     @if ( BackAction != null )
     {
-        <div class="menu-back" @onclick=@BackAction>
+        <div class="topbar-back" @onclick=@BackAction>
             <i>arrow_back</i>
-            <label>@BackLabel</label>
+            <label>@Tr( BackLabel )</label>
         </div>
     }
     else
     {
-        <a class="menu-back" href="@BackHref">
+        <a class="topbar-back" href="@BackHref">
             <i>arrow_back</i>
-            <label>@BackLabel</label>
+            <label>@Tr( BackLabel )</label>
         </a>
     }
-    
-    <label class="menu-title">@Title</label>
-    <div class="menu-topbar-spacer" />
+
+    @if ( !string.IsNullOrEmpty( ParentTitle ) )
+    {
+        <label class="topbar-crumb @(ParentAction != null ? "link" : "")" @onclick=@OpenParent>@Tr( ParentTitle )</label>
+        <i class="topbar-crumb-sep">chevron_right</i>
+    }
+    <label class="topbar-crumb current">@Tr( Title )</label>
 </root>
 
 @code {
     public string Title { get; set; } = "MENU";
     public string BackLabel { get; set; } = "BACK";
-    public string BackHref { get; set; } = "/multiplayer";
+    public string BackHref { get; set; } = "/";
     public Action BackAction { get; set; }
+
+    /// <summary>
+    /// The page this one is inside, shown before its title ("PROFILE" › "CAREER RECORD"). Not "Parent", which
+    /// would hide the panel's own <see cref="Panel.Parent"/>.
+    /// </summary>
+    public string ParentTitle { get; set; }
+
+    /// <summary> What clicking the ParentTitle crumb does: back to that page. </summary>
+    public Action ParentAction { get; set; }
+
+    private void OpenParent() => ParentAction?.Invoke();
 }

@@ -19,12 +19,21 @@ public partial class Reloadable : WeaponInputAction,
 	[Property] public bool SingleReload { get; set; } = false;
 
 	/// <summary>
-	/// This is really just the magazine for the weapon. 
+	/// Shell-by-shell reloads: how long the gun takes to come back up after the last shell (the reload's closing
+	/// animation). It can't fire until then.
+	/// </summary>
+	[Property] public float ReloadExitTime { get; set; } = 0f;
+
+	/// <summary>
+	/// This is really just the magazine for the weapon.
 	/// </summary>
 	[Property] public WeaponAmmo AmmoComponent { get; set; }
 
 	private TimeUntil TimeUntilReload { get; set; }
 	[Sync] public bool IsReloading { get; set; }
+
+	/// <summary>A shell-by-shell reload's last shell is in and the gun is coming back up (<see cref="ReloadExitTime"/>).</summary>
+	private bool _closing;
 
 	protected override void OnEnabled()
 	{
@@ -146,6 +155,7 @@ public partial class Reloadable : WeaponInputAction,
 	public void StartReload()
 	{
 		_queueCancel = false;
+		_closing = false;
 
 		bool isContinuedReload = IsReloading;
 
@@ -187,7 +197,10 @@ public partial class Reloadable : WeaponInputAction,
 	void CancelReload()
 	{
 		if ( !IsProxy )
+		{
 			IsReloading = false;
+			_closing = false;
+		}
 
 		// Tags will be better so we can just react to stimuli.
 		Equipment.ViewModel?.ModelRenderer?.Set( "b_reload", false );
@@ -200,7 +213,13 @@ public partial class Reloadable : WeaponInputAction,
 	{
 		if ( !IsProxy )
 		{
-			if ( SingleReload )
+			if ( _closing )
+			{
+				// Back up after the last shell.
+				_closing = false;
+				IsReloading = false;
+			}
+			else if ( SingleReload )
 			{
 				if ( AmmoComponent.Ammo < AmmoComponent.GetEffectiveMaxAmmo() )
 					AmmoComponent.Ammo += TakeFromReserve( 1 );
@@ -211,7 +230,17 @@ public partial class Reloadable : WeaponInputAction,
 				else
 				{
 					Equipment.ViewModel?.ModelRenderer?.Set( "b_reloading", false );
-					IsReloading = false;
+
+					// The closing animation plays before the gun can fire.
+					if ( ReloadExitTime > 0f )
+					{
+						_closing = true;
+						TimeUntilReload = ReloadExitTime * DurationMultiplier * ZombiesPlayerState.ReloadScale( Equipment?.Owner );
+					}
+					else
+					{
+						IsReloading = false;
+					}
 				}
 			}
 			else

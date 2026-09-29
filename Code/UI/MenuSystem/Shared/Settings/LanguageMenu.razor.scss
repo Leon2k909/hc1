@@ -1,0 +1,103 @@
+@import "/UI/Styles/MenuPage.scss";
+
+// The language picker's list. It's a Popup in the root panel, outside the menu's stylesheets, so it sets its own
+// fonts. The rules are on .popup-panel.language-menu to win over s&box's own .popup-panel look.
+.popup-panel.language-menu
+{
+    flex-direction: column;
+    padding: 6px;
+    gap: 6px;
+    overflow: hidden;
+    background-color: #111316;
+    border: 1px solid rgba( 255, 122, 26, 0.45 );
+    border-radius: 0;
+    box-shadow: 0 14px 36px rgba( black, 0.65 );
+    color: white;
+    font-family: Chakra Petch;
+    font-size: 16px;
+    font-weight: 600;
+    transition: opacity 0.12s ease-out, transform 0.12s ease-out;
+
+    &:intro, &.below-stretch:intro { opacity: 0; transform: translateY( -6px ); pointer-events: none; }
+    &:outro { opacity: 0; margin-top: 0; transform: none; transition: opacity 0.08s ease-in; pointer-events: none; }
+
+    label, i, .textentry { text-shadow: none; }
+    label { font-family: Chakra Petch; }
+    i { font-family: Material Icons; font-weight: normal; pointer-events: none; }
+
+    .lm-search
+    {
+        flex-direction: row;
+        flex-shrink: 0;
+        align-items: center;
+        height: 40px;
+        padding-left: 10px;
+        gap: 6px;
+        background-color: #0b0c0e;
+        border: 1px solid rgba( white, 0.12 );
+    }
+
+    .lm-search-icon { font-size: 20px; color: $menu-muted; flex-shrink: 0; }
+
+    .lm-search-entry
+    {
+        flex-grow: 1;
+        min-width: 0;
+        height: 100%;
+        padding: 0 10px 0 0;
+        justify-content: flex-start;
+        font-family: Chakra Petch;
+        font-size: 16px;
+        font-weight: 600;
+        color: white;
+
+        .content-label { font-family: Chakra Petch; }
+        .placeholder { opacity: 1; color: rgba( white, 0.4 ); }
+    }
+
+    // Eight rows, then it scrolls.
+    .lm-list
+    {
+        flex-direction: column;
+        max-height: 352px;
+        overflow-y: scroll;
+    }
+
+    .lm-row
+    {
+        flex-direction: row;
+        flex-shrink: 0;
+        align-items: center;
+        height: 44px;
+        padding: 0 12px 0 11px;
+        gap: 10px;
+        border-left: 3px solid transparent;
+        cursor: pointer;
+
+        label, i { pointer-events: none; }
+
+        .lm-native { font-size: 16px; font-weight: 600; color: rgba( white, 0.9 ); flex-shrink: 0; }
+        .lm-english
+        {
+            min-width: 0; flex-shrink: 1;
+            font-size: 14px; font-weight: 500; color: rgba( white, 0.5 );
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .lm-spacer { flex-grow: 1; }
+        .lm-check { font-size: 18px; color: $menu-accent; flex-shrink: 0; opacity: 0; }
+
+        &.highlight { background-color: rgba( white, 0.06 ); .lm-native { color: white; } }
+
+        &.selected
+        {
+            background-color: rgba( 255, 122, 26, 0.12 );
+            border-left-color: $menu-accent;
+            .lm-native { color: $menu-accent; }
+            .lm-check { opacity: 1; }
+        }
+
+        &.selected.highlight { background-color: rgba( 255, 122, 26, 0.18 ); }
+    }
+
+    .lm-empty { padding: 12px; font-size: 15px; font-weight: 500; color: $menu-muted; }
+}

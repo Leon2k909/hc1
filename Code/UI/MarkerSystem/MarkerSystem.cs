@@ -5,6 +5,8 @@ public partial class MarkerSystem : Panel
 	private const float RefreshInterval = 0.1f;
 	private readonly List<IMarkerObject> _deleteList = new();
 	private TimeSince _timeSinceRefresh;
+	private ViewModelMask _gunMask;
+	private Texture _maskImage;
 
 	public Dictionary<IMarkerObject, Marker> ActiveMarkers { get; set; } = new();
 
@@ -69,8 +71,44 @@ public partial class MarkerSystem : Panel
 		return true;
 	}
 
+	/// <summary>
+	/// The first-person gun draws over the markers: they're masked out wherever it covers the view.
+	/// </summary>
+	void UpdateGunMask()
+	{
+		// Made here, not in an initialiser: a hotload leaves a new field on an existing panel null.
+		_gunMask ??= new ViewModelMask();
+
+		// Only while there are markers to hide, since the mask draws the viewmodel a second time.
+		_gunMask.Update( ActiveMarkers.Count > 0 ? Scene : null );
+
+		var texture = _gunMask.Texture;
+		if ( texture == _maskImage )
+			return;
+
+		_maskImage = texture;
+		Style.MaskImage = texture;
+
+		if ( texture is null )
+			return;
+
+		Style.MaskMode = MaskMode.Luminance;
+		Style.MaskSizeX = Length.Percent( 100 );
+		Style.MaskSizeY = Length.Percent( 100 );
+		Style.MaskRepeat = BackgroundRepeat.Clamp;
+	}
+
+	public override void OnDeleted()
+	{
+		base.OnDeleted();
+
+		_gunMask?.Dispose();
+	}
+
 	public override void Tick()
 	{
+		UpdateGunMask();
+
 		foreach ( var pair in ActiveMarkers )
 		{
 			if ( pair.Value.IsValid() )

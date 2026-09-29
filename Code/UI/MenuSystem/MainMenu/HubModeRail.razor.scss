@@ -1,0 +1,442 @@
+@import "/UI/Styles/Theme.scss";
+
+// The hub page's accent ($hub-accent in HubPage.razor.scss) and easings.
+$rail-accent: #FF7A1A;
+$ease-out: cubic-bezier( 0.23, 1, 0.32, 1 );
+$ease-in-out: cubic-bezier( 0.77, 0, 0.175, 1 );
+
+// Sits left of the featured screen in .hub-container, which takes whatever width it leaves. The whole list slides in,
+// so the cards themselves are free to move on hover. Folding it (.collapsed, at the end) animates the width. Drawn
+// over the featured screen, so the folded strip's hover labels (.rail-tip) can overlap it.
+.hub-rail
+{
+    flex-direction: column;
+    flex-shrink: 0;
+    width: 240px;
+    gap: 12px;
+    z-index: 10;
+    animation: rail-in 0.5s $ease-out both;
+    transition: width 0.3s $ease-in-out;
+}
+
+@keyframes rail-in
+{
+    0% { opacity: 0; transform: translateX( -24px ); }
+    100% { opacity: 1; transform: translateX( 0px ); }
+}
+
+// As tall as the toggle at its end needs, with the bar the height of the one word
+.rail-head
+{
+    position: relative;
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    min-height: 36px;
+    gap: 12px;
+    margin-bottom: 4px;
+}
+
+.rail-bar
+{
+    width: 3px;
+    height: 24px;
+    background-color: $rail-accent;
+    box-shadow: 0 0 8px rgba( 255, 122, 26, 0.6 );
+    transition: opacity 0.18s ease 0.18s;
+}
+
+// One line each, clipped rather than wrapped while the rail narrows
+.rail-heading
+{
+    flex-direction: column;
+    overflow: hidden;
+    transition: opacity 0.18s ease 0.18s;
+}
+
+.rail-title
+{
+    font-family: $main-font;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: white;
+    white-space: nowrap;
+    text-shadow: none;
+}
+
+// Folds the rail down to its icons and back: a square at the end of the heading, the strip's full width when folded.
+.rail-toggle
+{
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 38px;
+    align-items: center;
+    justify-content: center;
+    // See-through like the sidebar's panels (.side-panel in HubSidebar.razor.scss)
+    background-color: rgba( 12, 13, 16, 0.6 );
+    border: 1px solid rgba( 255, 255, 255, 0.14 );
+    border-radius: 4px;
+    cursor: pointer;
+    transition: width 0.3s $ease-in-out, border-color 0.2s ease;
+
+    i
+    {
+        font-size: 22px;
+        color: rgba( 255, 255, 255, 0.7 );
+        text-shadow: none;
+        transition: transform 0.3s $ease-in-out, color 0.2s ease;
+    }
+
+    &:hover
+    {
+        border-color: rgba( 255, 255, 255, 0.32 );
+
+        i { color: white; }
+    }
+}
+
+// A card and its hover label
+.rail-slot
+{
+    position: relative;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+// The mode's name beside its icon on the folded strip (shown by .hub-rail.collapsed, at the end), in the header's
+// hover-label style (.gnav-tip in MainMenuRoot.razor.scss) with the accent on the side facing the icon.
+.rail-tip
+{
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    margin-left: 12px;
+    flex-direction: column;
+    padding: 7px 12px 6px 12px;
+    background-color: rgba( 12, 12, 15, 0.97 );
+    border: 1px solid rgba( 255, 255, 255, 0.1 );
+    border-left: 2px solid $rail-accent;
+    border-radius: 2px;
+    box-shadow: 0 8px 20px rgba( 0, 0, 0, 0.6 );
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY( -50% ) translateX( -6px );
+    transition: opacity 0.1s ease, transform 0.1s ease;
+
+    &.zombies { border-left-color: rgba( 225, 55, 55, 0.9 ); }
+    &.battle-royale { border-left-color: #35D0BD; }
+}
+
+.rail-tip-row
+{
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+
+    i
+    {
+        font-size: 13px;
+        color: rgba( 255, 255, 255, 0.5 );
+        text-shadow: none;
+    }
+}
+
+.rail-tip-name
+{
+    font-family: $main-font;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: white;
+    white-space: nowrap;
+    text-shadow: none;
+}
+
+.rail-tip-desc
+{
+    font-family: $main-font;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: rgba( 255, 255, 255, 0.55 );
+    white-space: nowrap;
+    text-shadow: none;
+    margin-top: 2px;
+}
+
+.rail-card
+{
+    position: relative;
+    flex-shrink: 0;
+    height: 108px;
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+    background-color: #0b0c0f;
+    border: 1px solid rgba( 255, 255, 255, 0.14 );
+    box-shadow: 0 8px 20px rgba( 0, 0, 0, 0.5 );
+    transition: transform 0.2s $ease-out, border-color 0.2s ease, box-shadow 0.25s ease, height 0.3s $ease-in-out;
+
+    &:hover
+    {
+        transform: translateX( 4px );
+        border-color: rgba( 255, 255, 255, 0.32 );
+
+        .rail-bg { transform: scale( 1.06 ); }
+    }
+
+    // The picked tab, lit like the featured screen.
+    &.featured
+    {
+        border: 1.5px solid rgba( 255, 122, 26, 0.85 );
+        box-shadow: 0 0 18px rgba( 255, 122, 26, 0.32 );
+
+        .rail-icon { color: $rail-accent; }
+
+        &:hover
+        {
+            border-color: #FF9A4D;
+            box-shadow: 0 0 26px rgba( 255, 122, 26, 0.5 );
+        }
+    }
+
+    &.locked
+    {
+        cursor: not-allowed;
+
+        .rail-bg { filter: grayscale( 55% ); }
+        .rail-name { color: rgba( 255, 255, 255, 0.82 ); }
+
+        &:hover
+        {
+            transform: none;
+            border-color: rgba( 255, 255, 255, 0.2 );
+
+            .rail-bg { transform: none; }
+        }
+    }
+
+    &.battle-royale:hover, &.battle-royale.featured
+    {
+        border-color: #35D0BD;
+        box-shadow: 0 0 18px rgba( 53, 208, 189, 0.3 );
+        .rail-icon { color: #35D0BD; }
+        &:hover { border-color: #83EBDD; box-shadow: 0 0 26px rgba( 53, 208, 189, 0.5 ); }
+    }
+
+    &.zombies:hover
+    {
+        border-color: rgba( 225, 55, 55, 0.9 );
+        box-shadow: 0 0 22px rgba( 170, 25, 25, 0.45 );
+    }
+
+    // Zombies is lit in its own red.
+    &.zombies.featured
+    {
+        border-color: rgba( 225, 55, 55, 0.9 );
+        box-shadow: 0 0 18px rgba( 170, 25, 25, 0.45 );
+
+        &:hover { box-shadow: 0 0 26px rgba( 170, 25, 25, 0.6 ); }
+    }
+}
+
+// The big cards' portrait (2:3) art, cut to a band across its subject: the layer is the whole picture, 3.75x the
+// card's height, and its top pulls the band into the card. s&box's background-position percentages can't do this:
+// "center 28%" pushes the picture down 28% of the card, leaving a gap above it.
+.rail-bg
+{
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 375%;
+    background-size: cover;
+    background-position: center;
+    pointer-events: none;
+    transform-origin: 50% 27%;
+    transition: transform 0.6s $ease-out, opacity 0.3s ease;
+
+    &.campaign-art { top: -56%; background-image: url( "/ui/modes/campaign.png" ); }
+    &.multiplayer-art { top: -41%; background-image: url( "/ui/modes/multiplayer.png" ); }
+    &.br-art { top: -75%; background-image: url( "/ui/modes/battle-royale.png" ); }
+    &.zombies-art { top: -22%; background-image: url( "/ui/modes/zombies.png" ); }
+}
+
+// Dark under the text on the left, the art showing through on the right.
+.rail-shade
+{
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-image: linear-gradient( to right, rgba( 7, 7, 9, 0.92 ) 0%, rgba( 7, 7, 9, 0.66 ) 50%, rgba( 7, 7, 9, 0.22 ) 100% );
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.rail-content
+{
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    padding: 12px 18px;
+    flex-direction: column;
+    justify-content: center;
+    pointer-events: none;
+    transition: opacity 0.18s ease 0.18s;
+}
+
+// The icon alone, centred in the tile, shown when the rail is folded
+.rail-mini
+{
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.1s ease;
+
+    .rail-icon
+    {
+        font-size: 28px;
+        margin-bottom: 0;
+
+        &.skull
+        {
+            width: 28px;
+            height: 28px;
+        }
+    }
+}
+
+.rail-icon
+{
+    font-size: 26px;
+    color: white;
+    margin-bottom: 4px;
+    text-shadow: 0 2px 8px rgba( 0, 0, 0, 0.6 );
+
+    &.skull
+    {
+        width: 26px;
+        height: 26px;
+        background-image: url( "/ui/modes/zombies_icon.png" );
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+}
+
+.rail-name
+{
+    font-family: $main-font;
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: white;
+    white-space: nowrap;
+    text-shadow: 0 3px 10px rgba( 0, 0, 0, 0.8 );
+
+    // A translated name too long for the card at full size (HubModeRail.Fit)
+    &.long
+    {
+        font-size: 16px;
+        letter-spacing: 0.5px;
+    }
+}
+
+.rail-desc
+{
+    font-family: $main-font;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: rgba( 255, 255, 255, 0.6 );
+    white-space: nowrap;
+    text-shadow: none;
+    margin-top: 2px;
+}
+
+.rail-lock
+{
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 16px;
+    color: rgba( 255, 255, 255, 0.35 );
+    pointer-events: none;
+    transition: top 0.3s $ease-in-out, right 0.3s $ease-in-out, font-size 0.3s $ease-in-out;
+}
+
+.main-menu-root.short .rail-card
+{
+    height: 88px;
+}
+
+// Folded to its icons by the toggle in the heading: square tiles under a full-width toggle. The words fade out before the
+// strip narrows, and back in once it has widened again.
+.hub-rail.collapsed
+{
+    width: 72px;
+
+    .rail-bar, .rail-heading
+    {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.1s ease;
+    }
+
+    .rail-toggle
+    {
+        width: 72px;
+
+        i { transform: rotate( 180deg ); }
+    }
+
+    .rail-card { height: 72px; }
+    .rail-bg { opacity: 0.4; }
+    .rail-shade { opacity: 0; }
+
+    .rail-content
+    {
+        opacity: 0;
+        transition: opacity 0.1s ease;
+    }
+
+    .rail-mini
+    {
+        opacity: 1;
+        transition: opacity 0.18s ease 0.12s;
+    }
+
+    .rail-lock
+    {
+        top: 6px;
+        right: 6px;
+        font-size: 12px;
+    }
+
+    // Quick enough to read the strip by sweeping down it, late enough not to flash while the pointer crosses it
+    .rail-slot:hover .rail-tip
+    {
+        opacity: 1;
+        transform: translateY( -50% );
+        transition: opacity 0.12s ease 0.15s, transform 0.2s $ease-out 0.15s;
+    }
+}
+
+// Below 1900 wide (tight-nav) there's only room for the folded strip, so HubModeRail keeps it folded there (.tight)
+// and drops the heading and its toggle.
+.hub-rail.tight .rail-head
+{
+    display: none;
+}

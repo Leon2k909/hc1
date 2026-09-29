@@ -28,6 +28,9 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
+sys.path.insert(0, str(Path(__file__).resolve().parent / "texture_markings"))
+import markings  # noqa: E402
+
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "Assets"
 DEST = ASSETS / "Weapons" / "Kastov74u"
@@ -118,46 +121,56 @@ def asset_path(path: Path) -> str:
     return path.relative_to(ASSETS).as_posix().lower()
 
 
-def load_vtf(base: str) -> np.ndarray:
+def load_vtf(base: str, extracted: Path = EXTRACTED) -> np.ndarray:
     sys.path.insert(0, str(TOOLS))
     from SourceIO.library.utils.pylib.vtf import load_vtf_texture
 
-    source = EXTRACTED / "materials" / f"{base}.vtf"
+    source = extracted / "materials" / f"{base}.vtf"
     pixels, width, height, floating = load_vtf_texture(source.read_bytes())
     if floating:
         raise RuntimeError(f"Unexpected HDR texture: {source}")
     return np.frombuffer(pixels, dtype=np.uint8).reshape(height, width, 4)
 
 
-def build_material(name: str, base: str, out: Path = DEST / "materials") -> Path:
+def build_material(name: str, base: str, out: Path = DEST / "materials", extracted: Path = EXTRACTED,
+                   translucent: bool = False) -> Path:
+    """A complex.shader material from a pack's _rgb/_n/_e textures (extracted: the gmad-extracted pack; another pack
+    that packs its textures the same way, like the M16's). A translucent material ($translucent in its vmt, like a
+    see-through magazine's strip) has opacity in the _rgb alpha instead of the metal mask."""
     out.mkdir(parents=True, exist_ok=True)
-    rgb = load_vtf(base + "_rgb")
-    normal = load_vtf(base + "_n")
-    exponent = load_vtf(base + "_e")
+    rgb = load_vtf(base + "_rgb", extracted)
+    normal = load_vtf(base + "_n", extracted)
+    exponent = load_vtf(base + "_e", extracted)
 
     Image.fromarray(rgb[:, :, :3].copy()).save(out / f"{name}_color.png")
     flipped = normal[:, :, :3].copy()
     flipped[:, :, 1] = 255 - flipped[:, :, 1]
     Image.fromarray(flipped).save(out / f"{name}_normal.png")
     Image.fromarray(255 - exponent[:, :, 3]).save(out / f"{name}_roughness.png")
-    Image.fromarray(rgb[:, :, 3].copy()).save(out / f"{name}_metalness.png")
+    Image.fromarray(rgb[:, :, 3].copy()).save(out / f"{name}_{'opacity' if translucent else 'metalness'}.png")
 
     vmat = out / f"{name}.vmat"
     rel = lambda suffix: asset_path(out / f"{name}_{suffix}.png")
+    if translucent:
+        alpha = ['\tF_TRANSLUCENT "1"', '\tg_flMetalness "0"', f'\tTextureTranslucency "{rel("opacity")}"']
+    else:
+        alpha = ['\tF_METALNESS_TEXTURE "1"', f'\tTextureMetalness "{rel("metalness")}"']
     vmat.write_text("\n".join([
         '"Layer0"', "{",
         '\tshader "shaders/complex.shader"',
         '\tF_SPECULAR "1"',
-        '\tF_METALNESS_TEXTURE "1"',
+        alpha[0],
         '\tg_flRoughnessScaleFactor "1"',
         '\tg_vColorTint "[1 1 1 1]"',
         f'\tTextureColor "{rel("color")}"',
         f'\tTextureNormal "{rel("normal")}"',
         f'\tTextureRoughness "{rel("roughness")}"',
-        f'\tTextureMetalness "{rel("metalness")}"',
+        *alpha[1:],
         '\tTextureAmbientOcclusion "materials/default/default_ao.tga"',
         "}",
     ]) + "\n", encoding="utf-8", newline="\n")
+    # The rip's serials, stamps and logos come off again (Tools/texture_markings/specs).
+    markings.after_rip(asset_path(vmat))
     return vmat
 
 

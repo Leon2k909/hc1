@@ -169,7 +169,12 @@
             "SupportedFireModes": [
               "Automatic"
             ],
-            "VelocitySpreadScale": 0.25
+            "VelocitySpreadScale": 0.25,
+            "MuzzleVelocity": 404,
+            "DragFunction": "Sphere",
+            "BallisticCoefficient": 0.071,
+            "SightHeight": 0.98,
+            "ZeroRange": 25
           },
           {
             "__type": "Facepunch.Reloadable",
@@ -182,7 +187,7 @@
               "component_type": "WeaponAmmo"
             },
             "EmptyReloadSounds": {},
-            "EmptyReloadTime": 1,
+            "EmptyReloadTime": 2.15,
             "InputActions": [
               "Reload"
             ],
@@ -193,11 +198,12 @@
             "OnComponentStart": null,
             "OnComponentUpdate": null,
             "OnInputAction": null,
-            "ReloadTime": 0.5,
+            "ReloadExitTime": 0.5,
+            "ReloadTime": 1.3,
             "RequiresAllInputActions": false,
             "SingleReload": true,
             "TimedReloadSounds": {
-              "0.2": "sounds/guns/r870/shotgun_load.sound"
+              "0.65": "sounds/guns/r870/shotgun_load.sound"
             }
           },
           {

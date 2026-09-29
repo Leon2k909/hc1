@@ -27,6 +27,8 @@ from SourceIO.library.source1.vmt import VMT
 from SourceIO.library.utils import FileBuffer
 from SourceIO.library.utils.tiny_path import TinyPath
 from SourceIO.library.utils.pylib.vtf import load_vtf_texture
+sys.path.insert(0, str(ROOT/'Tools'/'texture_markings'))
+import markings
 
 inventory = json.loads((HERE/'inventory.json').read_text())
 cm = ContentManager()
@@ -82,6 +84,13 @@ def convert(full):
         destination.write_text((ASSETS/'attachments/m4a1/materials/hidden.vmat').read_text())
         notes.append(dict(material=full,note='Source runtime stencil geometry is transparent; s&box lens supplies its own reticle.'))
         return dict(source=full,shader='runtime stencil',hidden=True,vmat=destination.relative_to(ASSETS).as_posix())
+    if full.endswith('_decals'):
+        # A decal sheet is all writing, part numbers and logos, on overlays just above the body: hidden, not converted.
+        destination=ASSETS/'attachments/mw2022/materials'/(full+'.vmat')
+        destination.parent.mkdir(parents=True,exist_ok=True)
+        destination.write_text((ASSETS/'attachments/m4a1/materials/hidden.vmat').read_text())
+        notes.append(dict(material=full,note='Decal sheet (writing, numbers, logos) hidden; the body is under it.'))
+        return dict(source=full,shader='decal sheet',hidden=True,vmat=destination.relative_to(ASSETS).as_posix())
     buffer = cm.find_file(TinyPath('materials')/(full+'.vmt'))
     if buffer is None:
         raise FileNotFoundError(full+'.vmt')
@@ -134,6 +143,8 @@ for index,full in enumerate(sorted(paths)):
         traceback.print_exc()
         failures.append(dict(material=full,error=str(exc)))
     print(f'MATERIAL {index+1}/{len(paths)} {full}',flush=True)
+# The rip's writing, numbers and logos come off again (Tools/texture_markings/specs).
+print('MARKINGS',markings.after_rip_under('attachments/mw2022/'),'materials cleaned')
 (HERE/'materials.json').write_text(json.dumps(dict(materials=materials,textures=list(texture_report.values()),notes=notes,failures=failures),indent=2)+'\n')
 print('MATERIAL_SUMMARY',len(materials),'materials;',len(texture_report),'textures;',len(failures),'failures')
 if failures:

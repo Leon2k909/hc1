@@ -14,6 +14,70 @@
 						remaps = 
 						[
 							{
+								from = "ak47_s_ass.vmat"
+								to = "weapons/kastov/materials/ak47_s_ass.vmat"
+							},
+							{
+								from = "ak47_s_h.vmat"
+								to = "weapons/kastov/materials/ak47_s_h.vmat"
+							},
+							{
+								from = "ak47_s_ha.vmat"
+								to = "weapons/kastov/materials/ak47_s_ha.vmat"
+							},
+							{
+								from = "ak47_s_l.vmat"
+								to = "weapons/kastov/materials/ak47_s_l.vmat"
+							},
+							{
+								from = "ak47_s_no.vmat"
+								to = "weapons/kastov/materials/ak47_s_no.vmat"
+							},
+							{
+								from = "ak47_s_t.vmat"
+								to = "weapons/kastov/materials/ak47_s_t.vmat"
+							},
+							{
+								from = "ak47_p_a.vmat"
+								to = "weapons/kastov/materials/ak47_p_a.vmat"
+							},
+							{
+								from = "ak47_p_ass.vmat"
+								to = "weapons/kastov/materials/ak47_p_ass.vmat"
+							},
+							{
+								from = "ak47_p_s.vmat"
+								to = "weapons/kastov/materials/ak47_p_s.vmat"
+							},
+							{
+								from = "47_apex_m_d.vmat"
+								to = "weapons/kastov/materials/47_apex_m_d.vmat"
+							},
+							{
+								from = "ak47_m_e1.vmat"
+								to = "weapons/kastov/materials/ak47_m_e1.vmat"
+							},
+							{
+								from = "ak47_m_e2.vmat"
+								to = "weapons/kastov/materials/ak47_m_e2.vmat"
+							},
+							{
+								from = "ak47_b_s.vmat"
+								to = "weapons/kastov/materials/ak47_b_s.vmat"
+							},
+							{
+								from = "ak47_b_s_hg.vmat"
+								to = "weapons/kastov/materials/ak47_b_s_hg.vmat"
+							},
+							{
+								from = "ak47_b_s_muz.vmat"
+								to = "weapons/kastov/materials/ak47_b_s_muz.vmat"
+							},
+							{
+								from = "ak47_rec_sto_ada.vmat"
+								to = "weapons/kastov/materials/ak47_rec_sto_ada.vmat"
+							},
+							{
 								from = "76239.vmat"
 								to = "weapons/kastov/materials/76239.vmat"
 							},
@@ -156,6 +220,329 @@
 							exception_list = [  ]
 						}
 					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_kastov_stock_adapter"
+						filename = "weapons/kastov/models/w_kastov_stock_adapter.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_kastov_muzzle_tip_short"
+						filename = "weapons/kastov/models/w_kastov_muzzle_tip_short.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_kastov_stock_ak47_stock_default"
+						filename = "weapons/kastov/models/w_kastov_stock_ak47_stock_default.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_kastov_stock_ak47_stock_adjustable"
+						filename = "weapons/kastov/models/w_kastov_stock_ak47_stock_adjustable.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_kastov_stock_ak47_stock_heavy"
+						filename = "weapons/kastov/models/w_kastov_stock_ak47_stock_heavy.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_kastov_stock_ak47_stock_padded"
+						filename = "weapons/kastov/models/w_kastov_stock_ak47_stock_padded.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_kastov_stock_ak47_stock_light"
+						filename = "weapons/kastov/models/w_kastov_stock_ak47_stock_light.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_kastov_stock_ak47_stock_delete"
+						filename = "weapons/kastov/models/w_kastov_stock_ak47_stock_delete.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_kastov_stock_ak47_stock_tactical"
+						filename = "weapons/kastov/models/w_kastov_stock_ak47_stock_tactical.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_kastov_pistol_grip_ak47_grip_default"
+						filename = "weapons/kastov/models/w_kastov_pistol_grip_ak47_grip_default.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_kastov_pistol_grip_ak47_grip_contoured"
+						filename = "weapons/kastov/models/w_kastov_pistol_grip_ak47_grip_contoured.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_kastov_pistol_grip_ak47_grip_textured"
+						filename = "weapons/kastov/models/w_kastov_pistol_grip_ak47_grip_textured.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_kastov_pistol_grip_ak47_grip_skeleton"
+						filename = "weapons/kastov/models/w_kastov_pistol_grip_ak47_grip_skeleton.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_kastov_magazine_ak47_mag_default"
+						filename = "weapons/kastov/models/w_kastov_magazine_ak47_mag_default.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_kastov_magazine_ak47_mag_polymer"
+						filename = "weapons/kastov/models/w_kastov_magazine_ak47_mag_polymer.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_kastov_magazine_ak47_mag_extended"
+						filename = "weapons/kastov/models/w_kastov_magazine_ak47_mag_extended.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_kastov_magazine_ak47_mag_drum"
+						filename = "weapons/kastov/models/w_kastov_magazine_ak47_mag_drum.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_kastov_barrel_ak47_barrel_default"
+						filename = "weapons/kastov/models/w_kastov_barrel_ak47_barrel_default.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_kastov_barrel_ak47_barrel_compact"
+						filename = "weapons/kastov/models/w_kastov_barrel_ak47_barrel_compact.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
 				]
 			},
 			{
@@ -173,6 +560,14 @@
 								meshes = 
 								[
 									"w_kastov_muzzle_tip",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "short"
+								meshes = 
+								[
+									"w_kastov_muzzle_tip_short",
 								]
 							},
 							{
@@ -253,6 +648,198 @@
 								meshes = 
 								[
 									"w_kastov_laser_rail",
+								]
+							},
+						]
+						hidden_in_tools = false
+					},
+					{
+						_class = "BodyGroup"
+						name = "stock_adapter"
+						children = 
+						[
+							{
+								_class = "BodyGroupChoice"
+								name = "off"
+								meshes = 
+								[
+									"",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "on"
+								meshes = 
+								[
+									"w_kastov_stock_adapter",
+								]
+							},
+						]
+						hidden_in_tools = false
+					},
+					{
+						_class = "BodyGroup"
+						name = "stock"
+						children = 
+						[
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_stock_default"
+								meshes = 
+								[
+									"w_kastov_stock_ak47_stock_default",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_stock_adjustable"
+								meshes = 
+								[
+									"w_kastov_stock_ak47_stock_adjustable",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_stock_heavy"
+								meshes = 
+								[
+									"w_kastov_stock_ak47_stock_heavy",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_stock_padded"
+								meshes = 
+								[
+									"w_kastov_stock_ak47_stock_padded",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_stock_light"
+								meshes = 
+								[
+									"w_kastov_stock_ak47_stock_light",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_stock_delete"
+								meshes = 
+								[
+									"w_kastov_stock_ak47_stock_delete",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_stock_tactical"
+								meshes = 
+								[
+									"w_kastov_stock_ak47_stock_tactical",
+								]
+							},
+						]
+						hidden_in_tools = false
+					},
+					{
+						_class = "BodyGroup"
+						name = "pistol_grip"
+						children = 
+						[
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_grip_default"
+								meshes = 
+								[
+									"w_kastov_pistol_grip_ak47_grip_default",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_grip_contoured"
+								meshes = 
+								[
+									"w_kastov_pistol_grip_ak47_grip_contoured",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_grip_textured"
+								meshes = 
+								[
+									"w_kastov_pistol_grip_ak47_grip_textured",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_grip_skeleton"
+								meshes = 
+								[
+									"w_kastov_pistol_grip_ak47_grip_skeleton",
+								]
+							},
+						]
+						hidden_in_tools = false
+					},
+					{
+						_class = "BodyGroup"
+						name = "magazine"
+						children = 
+						[
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_mag_default"
+								meshes = 
+								[
+									"w_kastov_magazine_ak47_mag_default",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_mag_polymer"
+								meshes = 
+								[
+									"w_kastov_magazine_ak47_mag_polymer",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_mag_extended"
+								meshes = 
+								[
+									"w_kastov_magazine_ak47_mag_extended",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_mag_drum"
+								meshes = 
+								[
+									"w_kastov_magazine_ak47_mag_drum",
+								]
+							},
+						]
+						hidden_in_tools = false
+					},
+					{
+						_class = "BodyGroup"
+						name = "barrel"
+						children = 
+						[
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_barrel_default"
+								meshes = 
+								[
+									"w_kastov_barrel_ak47_barrel_default",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "ak47_barrel_compact"
+								meshes = 
+								[
+									"w_kastov_barrel_ak47_barrel_compact",
 								]
 							},
 						]

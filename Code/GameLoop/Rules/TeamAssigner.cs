@@ -52,6 +52,12 @@ public sealed class TeamAssigner : Component,
 	/// </summary>
 	[Property] public bool AllowLateJoiners { get; set; } = true;
 
+	/// <summary>
+	/// Co-op modes (Zombies) put every player on this one team instead of splitting them, so nobody is anyone's enemy.
+	/// Unassigned splits them into two teams as usual.
+	/// </summary>
+	[Property] public Team OnlyTeam { get; set; } = Team.Unassigned;
+
 	protected override void OnUpdate()
 	{
 		if ( !AllowLateJoiners || !HasHostAuthority || _timeSinceLateJoinerCheck < 0.25f )
@@ -65,7 +71,7 @@ public sealed class TeamAssigner : Component,
 	{
 		foreach ( var player in GameUtils.AllPlayers.Where( x => x.IsValid() && x.IsConnected && !x.IsBot ).ToArray() )
 		{
-			if ( player.Team == Team.Unassigned )
+			if ( player.Team == Team.Unassigned || (OnlyTeam != Team.Unassigned && player.Team != OnlyTeam) )
 			{
 				AssignTeam( player, true );
 				continue;
@@ -100,7 +106,7 @@ public sealed class TeamAssigner : Component,
 
 	private void AutoBalance()
 	{
-		if ( AutoBalanceMode == AutoBalanceMode.None )
+		if ( AutoBalanceMode == AutoBalanceMode.None || OnlyTeam != Team.Unassigned )
 		{
 			return;
 		}
@@ -137,6 +143,7 @@ public sealed class TeamAssigner : Component,
 		var fromTeam = bestDelta < 0 ? Team.CounterTerrorist : Team.Terrorist;
 
 		var toSwap = GameUtils.GetPlayers( fromTeam )
+			.Where( x => !DefuseTesting.IsForced( x ) )
 			.OrderBy( GetScore )
 			.Take( Math.Abs( bestDelta ) )
 			.ToArray();
@@ -164,7 +171,7 @@ public sealed class TeamAssigner : Component,
 
 	private void AssignTeam( Client player, bool dispatch )
 	{
-		var assignTeam = SelectTeam();
+		var assignTeam = DefuseTesting.IsForced( player ) ? Team.Terrorist : SelectTeam();
 		if ( assignTeam == Team.Unassigned && TryMakeRoomForRealPlayer( player ) )
 		{
 			assignTeam = SelectTeam();
@@ -216,6 +223,10 @@ public sealed class TeamAssigner : Component,
 
 	private Team SelectTeam()
 	{
+		// One team has no size limit: the lobby's own size caps the players.
+		if ( OnlyTeam != Team.Unassigned )
+			return OnlyTeam;
+
 		var ts = GameUtils.GetPlayers( Team.Terrorist ).Count( x => x.IsConnected );
 		var cts = GameUtils.GetPlayers( Team.CounterTerrorist ).Count( x => x.IsConnected );
 
@@ -253,7 +264,7 @@ public sealed class TeamAssigner : Component,
 	{
 		if ( AllowLateJoiners )
 		{
-			if ( eventArgs.Player.Team == Team.Unassigned )
+			if ( eventArgs.Player.Team == Team.Unassigned || (OnlyTeam != Team.Unassigned && eventArgs.Player.Team != OnlyTeam) )
 			{
 				AssignTeam( eventArgs.Player, true );
 				return;

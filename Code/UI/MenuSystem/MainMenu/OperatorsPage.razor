@@ -1,0 +1,107 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using Sandbox.UI.Navigation;
+@inherits Panel
+@implements INavigatorPage
+@attribute [StyleSheet]
+@namespace Facepunch.UI
+
+<root class="hc1 operators-page">
+    <MenuTopbar Title="OPERATORS" />
+    <div class="operators-content">
+        <div class="operators-roster">
+            <div class="operators-heading">
+                <label class="operators-eyebrow">@Tr( "OUTFITS" )</label>
+                <label class="operators-title">@Tr( "OPERATORS" )</label>
+                <label class="operators-sub">@Tr( "Inspect the outfits used in game." )</label>
+            </div>
+            <div class="operators-list">
+                @foreach ( var outfit in OperatorOutfits.All )
+                {
+                    <button class="operator-card @(Selected.Id == outfit.Id ? "selected" : "")" @onclick=@(() => Select( outfit.Id ))>
+                        <img class="operator-portrait" src=@outfit.Portrait />
+                        <div class="operator-card-copy">
+                            <label class="operator-team">@Tr( outfit.Team.GetName() )</label>
+                            <label class="operator-name">@Tr( outfit.Name )</label>
+                        </div>
+                        <i class="operator-selected">@(Selected.Id == outfit.Id ? "check" : "chevron_right")</i>
+                    </button>
+                }
+            </div>
+            <div class="operator-details">
+                <label class="operators-eyebrow">@Tr( "FIELD KIT" )</label>
+                <label class="operator-description">@Tr( Selected.Description )</label>
+                <div class="operator-team-note"><i>groups</i><label>@Tr( "Outfits are assigned by team." )</label></div>
+            </div>
+        </div>
+        <div class="operator-viewer">
+            <div class="operator-viewer-heading">
+                <label class="operator-preview-name">@Tr( Selected.Name )</label>
+                <label class="operator-preview-label">@Tr( "3D PREVIEW" )</label>
+            </div>
+            <div class="operator-preview-host" @ref=PreviewHost />
+            @if ( Preview?.HasError == true )
+            {
+                <div class="operator-preview-error"><i>info</i><label>@Tr( "Outfit preview unavailable." )</label></div>
+            }
+            <div class="operator-viewer-footer">
+                <label class="operator-drag-hint">@Tr( "Drag to rotate · Scroll to zoom" )</label>
+                <div class="operator-controls">
+                    <button @onclick=@(() => Preview?.Rotate( -30 )) tooltip=@Tr( "Rotate left" )><i>rotate_left</i></button>
+                    <button @onclick=@(() => Preview?.Rotate( 30 )) tooltip=@Tr( "Rotate right" )><i>rotate_right</i></button>
+                    <button @onclick=@(() => Preview?.Zoom( -.2f )) tooltip=@Tr( "Zoom out" )><i>remove</i></button>
+                    <button @onclick=@(() => Preview?.Zoom( .2f )) tooltip=@Tr( "Zoom in" )><i>add</i></button>
+                    <button class="operator-reset" @onclick=@(() => Preview?.ResetView())><i>restart_alt</i><label>@Tr( "Reset view" )</label></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</root>
+
+@code
+{
+    private string SelectedId { get; set; } = "military";
+    private OperatorOutfit Selected => OperatorOutfits.Find( SelectedId );
+    private OperatorPreview Preview { get; set; }
+    private Panel PreviewHost { get; set; }
+    private bool PageOpen { get; set; } = true;
+
+    public void OnNavigationOpen()
+    {
+        PageOpen = true;
+        MainMenuRoot.Instance?.SetActiveRoute( "/operators" );
+        EnsurePreview();
+    }
+
+    public void OnNavigationClose()
+    {
+        PageOpen = false;
+        // Navigation caches pages, so release the scene when hidden as well as when the panel is deleted.
+        Preview?.Delete( true );
+        Preview = null;
+    }
+
+    protected override void OnAfterTreeRender( bool firstTime )
+    {
+        base.OnAfterTreeRender( firstTime );
+        EnsurePreview();
+    }
+
+    private void EnsurePreview()
+    {
+        if ( !PageOpen || !PreviewHost.IsValid() || Preview.IsValid() ) return;
+        Preview = PreviewHost.AddChild<OperatorPreview>();
+        Preview.ShowOutfit( SelectedId );
+    }
+
+    private void Select( string id )
+    {
+        if ( SelectedId == id ) return;
+        SelectedId = id;
+        Preview?.ShowOutfit( id );
+        Sound.Play( "ui_button_press" );
+        StateHasChanged();
+    }
+
+    protected override int BuildHash() => HashCode.Combine( SelectedId, Preview?.HasError, GameText.Current );
+}

@@ -1,19 +1,58 @@
-﻿@namespace Facepunch.UI
+@namespace Facepunch.UI
 @inherits Panel
 
 @attribute [StyleSheet]
 
-@using System.Text;
+<root>
+    @if ( IsWin( Type ) && IsActive )
+    {
+        @* Built fresh on every win so the entrance replays; removing it plays the :outro fade. *@
+        <div class="win-banner">
+            <div class="win-backdrop"></div>
 
-<root class="hud middle with-padding with-rounding with-px-lg with-background flex justify-center align-center column hidden @BuildClass()" style="top: 35%; @BuildStyle()">
-    @if ( Type == ToastType.TerroristsWin || Type == ToastType.CounterTerroristsWin )
-    {
-        <Icon File="@GetWinningTeam(Type).GetIconPath()" size="256" class="background" />
-        <label class="huge">@Status</label>
+            <div class="win-crest">
+                <div class="win-rays"><div class="win-rays-spin" style="@RaysStyle"></div></div>
+                <div class="win-glow"><div class="win-glow-pulse" style="@GlowStyle"></div></div>
+                <div class="win-flare-soft" style="@FlareSoftStyle"></div>
+                <div class="win-flare" style="@FlareStyle"></div>
+                <div class="win-flash"></div>
+                <div class="win-impact" style="border-color: @(TeamColor.Hex);"></div>
+                <div class="win-bob">
+                    <Icon File="@(WinningTeam.GetIconPath())" Size="@(150)" class="win-logo" />
+                </div>
+                @for ( var i = 0; i < SparkCount; i++ )
+                {
+                    <div class="win-spark @($"s{i}")" style="@SparkStyle"></div>
+                }
+            </div>
+
+            <div class="win-headline">
+                <div class="win-rail left">
+                    <div class="win-rail-line" style="@RailStyle( "left" )"></div>
+                    <div class="win-rail-cap" style="@CapStyle"></div>
+                </div>
+                <div class="win-words">
+                    <label class="win-title" style="@TitleStyle">@Headline</label>
+                    @if ( !string.IsNullOrEmpty( Accent ) )
+                    {
+                        <label class="win-accent" style="@AccentStyle">@Accent</label>
+                    }
+                    <div class="win-sweep-clip">
+                        <div class="win-sweep"></div>
+                    </div>
+                </div>
+                <div class="win-rail right">
+                    <div class="win-rail-line" style="@RailStyle( "right" )"></div>
+                    <div class="win-rail-cap" style="@CapStyle"></div>
+                </div>
+            </div>
+        </div>
     }
-    else
+    else if ( !IsWin( Type ) )
     {
-        <label class="emphasis">@Status</label>
+        <div class="generic hud middle with-padding with-rounding with-px-lg with-background flex justify-center align-center column hidden @(IsActive ? "visible" : "")" style="top: 35%; background-color: rgba( black, 0.25 );">
+            <label class="emphasis">@ShownStatus</label>
+        </div>
     }
 </root>
 
@@ -21,28 +60,87 @@
 {
     public static Toast Instance { get; private set; }
 
+    /// <summary> Is a team-win banner up? The HUD shows nothing else meanwhile (MainHUD). </summary>
+    public static bool IsWinShowing => Instance.IsValid() && IsWin( Instance.Type ) && Instance.IsActive;
+
     public Toast()
     {
         Instance = this;
     }
 
-    public void Show( string status, ToastType type = ToastType.Generic, float duration = 5f )
+    /// <summary>
+    /// Shows <paramref name="status"/>, in English: each player's machine shows it in its own language. With
+    /// <paramref name="args"/> it's a format string ("{0} was demoted to {1}"), and a <see cref="Team"/> argument shows
+    /// as that team's name.
+    /// </summary>
+    public void Show( string status, ToastType type = ToastType.Generic, float duration = 5f, params object[] args )
     {
         Status = status;
+        StatusArgs = args;
         Type = type;
         TimeUntilHide = duration;
     }
 
     private string Status { get; set; } = "";
+    private object[] StatusArgs { get; set; }
     private ToastType Type { get; set; } = ToastType.Generic;
+
+    // Toasts arrive in English, most of them from the host, and are translated here, where they're shown. Text sent with
+    // a name or number already in it has no translation, so it shows as sent.
+    private string ShownStatus => StatusArgs is { Length: > 0 } args
+        ? Tr( Status?.Trim(), args.Select( x => x is Team team ? Tr( team.GetName() ) : x ).ToArray() )
+        : Tr( Status?.Trim() );
 
     private RealTimeUntil TimeUntilHide { get; set; }
     private bool IsActive => TimeUntilHide > 0f && !string.IsNullOrEmpty( Status );
 
     protected override int BuildHash()
     {
-        return HashCode.Combine(Status, Type, IsActive);
+        return HashCode.Combine(Status, StatusArgs is null ? "" : string.Join( "\n", StatusArgs ), Type, IsActive);
     }
+
+    private static bool IsWin( ToastType type )
+    {
+        return type == ToastType.TerroristsWin || type == ToastType.CounterTerroristsWin;
+    }
+
+    private Team WinningTeam => GetWinningTeam( Type );
+    private Color TeamColor => WinningTeam.GetColor();
+
+    // "Blue Team Wins!" becomes the team name plus a team-coloured "Wins!"; a message without a space stays whole.
+    private int SplitIndex => Status.Trim().LastIndexOf( ' ' );
+    // A team win always reads "<team name> Wins!" (TeamExtensions.GetName), whatever the game mode's message says.
+    private string Headline => IsWin( Type ) ? WinWords().Headline : SplitIndex > 0 ? Status.Trim().Substring( 0, SplitIndex ) : Status;
+    private string Accent => IsWin( Type ) ? WinWords().Accent : SplitIndex > 0 ? Status.Trim().Substring( SplitIndex + 1 ) : "";
+
+    // "{0} Wins!" in the player's language, split after the team's name: the headline is up to the end of the name and
+    // the accent is the rest, so the name stays white whatever the word order ("L'{0} gagne !").
+    private (string Headline, string Accent) WinWords()
+    {
+        var format = Tr( "{0} Wins!" );
+        var at = format.IndexOf( "{0}", StringComparison.Ordinal );
+        var end = at < 0 ? format.Length : at + 3;
+        return (format[..end].Replace( "{0}", Tr( WinningTeam.GetName() ) ), format[end..].Trim());
+    }
+
+    private const int SparkCount = 10;
+
+    // The light takes the team colour; the accent, rail caps and sparks use a lighter tint of it so they
+    // stay readable on the dark backdrop.
+    private Color TeamLight => Color.Lerp( TeamColor, Color.White, 0.3f );
+    private string Fade( float alpha ) => TeamColor.WithAlpha( alpha ).Hex;
+
+    private string RaysStyle => $"background-image-tint: {TeamColor.Hex};";
+    private string GlowStyle => $"background-image: radial-gradient( {Fade( 0.6f )}, {Fade( 0f )} 70% );";
+    private string FlareStyle => $"background-image: linear-gradient( to right, {Fade( 0f )}, {Fade( 0.9f )} 36%, #ffffff 50%, {Fade( 0.9f )} 64%, {Fade( 0f )} );";
+    private string FlareSoftStyle => $"background-image: radial-gradient( {Fade( 0.38f )}, {Fade( 0f )} 70% );";
+    private string RailStyle( string side ) => $"background-image: linear-gradient( to {side}, {TeamColor.Hex}, {Fade( 0f )} );";
+    private string CapStyle => $"background-color: {TeamLight.Hex};";
+    // Both words fade a little toward the bottom, like lit metal: the name toward a pale team tint, the accent toward the team colour.
+    private string TitleStyle => $"color: linear-gradient( to bottom, #ffffff 45%, {Tint( 0.22f )} ); text-shadow: 0px 4px 0px rgba( 0, 0, 0, 0.35 ), 0px 0px 30px {Fade( 0.45f )};";
+    private string AccentStyle => $"color: linear-gradient( to bottom, {Tint( 0.5f )}, {Tint( 0.9f )} ); text-shadow: 0px 4px 0px rgba( 0, 0, 0, 0.35 ), 0px 0px 26px {Fade( 0.8f )};";
+    private string Tint( float amount ) => Color.Lerp( Color.White, TeamColor, amount ).Hex;
+    private string SparkStyle => $"background-color: {TeamLight.Hex}; box-shadow: 0px 0px 6px 1px {TeamColor.Hex};";
 
     private Team GetWinningTeam(ToastType toastType)
     {
@@ -52,25 +150,5 @@
             case ToastType.CounterTerroristsWin: return Team.CounterTerrorist;
             default: return Team.Unassigned;
         }
-    }
-
-    private string BuildClass()
-    {
-        var sb = new StringBuilder();
-        sb.Append((IsActive) ? "visible " : "");
-        sb.Append($"{Type} ");
-
-        return sb.ToString();
-    }
-
-    private string BuildStyle()
-    {
-        if (Type == ToastType.TerroristsWin || Type == ToastType.CounterTerroristsWin )
-        {
-            var col = GetWinningTeam(Type).GetColor().Hex;
-            return $"background-color: rgba( {col}, 0.1 );";
-        }
-
-        return "background-color: rgba( black, 0.25 );";
     }
 }

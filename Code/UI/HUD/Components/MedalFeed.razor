@@ -6,11 +6,31 @@
 <root>
     @foreach ( var medal in Medals )
     {
+        var eyes = EyesOf( medal.Art );
         <div @key="medal.Id" class="medal-slot @medal.Family @(medal.Fading ? "leaving" : "")">
             <div class="medal-award">
                 <div class="medal-emblem">
+                    <div class="medal-rays"><div class="medal-rays-spin"></div></div>
+                    <div class="medal-aura"></div>
                     <div class="medal-impact"></div>
                     <img class="medal-art" src="@($"ui/medals/{medal.Art}.png")" />
+                    @for ( var e = 0; e < eyes.Length; e++ )
+                    {
+                        var eye = eyes[e];
+                        var flame = FlameStyle( medal.Family, e );
+                        @* Fire in each socket: a halo, one looping flame and a core, lit as the stamp lands. *@
+                        <div class="medal-eye @(IsSmallEye( eye ) ? "small" : "") @(e % 2 == 1 ? "flip" : "")" style="@EyeStyle( eye )">
+                            <div class="eye-glow"><div class="eye-glow-pulse"></div></div>
+                            <div class="eye-fire">
+                                <div class="eye-flame" style="@flame"></div>
+                            </div>
+                            <div class="eye-core"></div>
+                        </div>
+                    }
+                    @for ( var i = 0; i < EmberCount( eyes ); i++ )
+                    {
+                        <div class="medal-ember @($"e{i}")" style="@EmberStyle( eyes[i % eyes.Length] )"></div>
+                    }
                     @if ( medal.Family != "multikill" )
                     {
                         <div class="medal-rank"><label>@medal.Rank</label></div>
@@ -18,10 +38,10 @@
                 </div>
                 <div class="medal-ribbon">
                     <div class="medal-sweep"></div>
-                    <label class="medal-title @(medal.Title.Length > 16 ? "long-title" : "")">@medal.Title</label>
+                    <label class="medal-title @(Tr( medal.Title ).Length > 16 ? "long-title" : "")">@Tr( medal.Title )</label>
                     <div class="medal-detail">
                         <div class="medal-rule"></div>
-                        <label class="medal-subtitle">@medal.Subtitle</label>
+                        <label class="medal-subtitle">@Tr( medal.Subtitle )</label>
                         <div class="medal-rule"></div>
                     </div>
                 </div>
@@ -40,10 +60,73 @@
         public string Family { get; init; }
         public string Art { get; init; }
         public string Rank { get; init; }
+        public float Lifetime { get; init; } = 1.6f;
         public TimeSince TimeCreated { get; set; } = 0;
         public bool Fading { get; set; }
-        public bool ShouldFade => TimeCreated > 1.6f;
-        public bool Dead => TimeCreated > 1.9f;
+        public bool ShouldFade => TimeCreated > Lifetime;
+        public bool Dead => TimeCreated > Lifetime + 0.3f;
+    }
+
+    // Eye sockets on each medal image: centre x, y and socket width, in percent of the square art.
+    private readonly record struct Eye( float X, float Y, float Size );
+
+    private static readonly Dictionary<string, Eye[]> MedalEyes = new()
+    {
+        ["precision"] = new[] { new Eye( 42.0f, 48.0f, 9.7f ), new Eye( 58.1f, 48.0f, 9.7f ) },
+        ["streak"] = new[] { new Eye( 42.6f, 50.4f, 8.2f ), new Eye( 57.3f, 50.4f, 8.2f ) },
+        ["double-kill"] = new[] { new Eye( 28.7f, 49.2f, 3.8f ), new Eye( 43.5f, 49.2f, 3.8f ), new Eye( 56.5f, 49.2f, 3.8f ), new Eye( 71.1f, 49.1f, 3.8f ) },
+        ["triple-kill"] = new[] { new Eye( 41.2f, 47.4f, 3.5f ), new Eye( 58.9f, 47.3f, 3.5f ), new Eye( 28.1f, 47.8f, 1.7f ), new Eye( 71.9f, 47.8f, 1.7f ) },
+        ["fury-kill"] = new[]
+        {
+            new Eye( 44.7f, 33.1f, 3.3f ), new Eye( 55.2f, 33.1f, 3.3f ), new Eye( 30.7f, 51.2f, 3.3f ), new Eye( 41.2f, 51.0f, 3.3f ),
+            new Eye( 58.7f, 51.0f, 3.3f ), new Eye( 69.3f, 51.0f, 3.3f ), new Eye( 44.8f, 68.1f, 3.3f ), new Eye( 55.2f, 68.4f, 3.3f )
+        },
+        ["frenzy-kill"] = new[] { new Eye( 40.1f, 54.1f, 5.2f ), new Eye( 59.8f, 54.0f, 5.2f ) },
+    };
+
+    private static Eye[] EyesOf( string art )
+    {
+        return art is not null && MedalEyes.TryGetValue( art, out var eyes ) ? eyes : Array.Empty<Eye>();
+    }
+
+    // Multikill skulls have tiny sockets, so their flames stand taller relative to the socket.
+    private static bool IsSmallEye( Eye eye ) => eye.Size < 5f;
+
+    private static int EmberCount( Eye[] eyes ) => eyes.Length > 0 ? 4 : 0;
+
+    private static string Pct( float value )
+    {
+        return value.ToString( "0.###", System.Globalization.CultureInfo.InvariantCulture ) + "%";
+    }
+
+    // A square box one socket wide, centred on the socket; the fire inside is sized from it.
+    private static string EyeStyle( Eye eye )
+    {
+        return $"left: {Pct( eye.X - eye.Size * 0.5f )}; top: {Pct( eye.Y - eye.Size * 0.5f )}; width: {Pct( eye.Size )}; height: {Pct( eye.Size )};";
+    }
+
+    private static string EmberStyle( Eye eye )
+    {
+        return $"left: {Pct( eye.X )}; top: {Pct( eye.Y - eye.Size * 0.3f )};";
+    }
+
+    // The eye fire is a looping flipbook in ui/medals/fx/fire: FireFrames images per palette.
+    private const int FireFrames = 16;
+    private const float FireFps = 20f;
+    private int FireFrame;
+
+    private static string FirePalette( string family ) => family switch
+    {
+        "streak" => "ember",
+        "multikill" => "blue",
+        _ => "gold",
+    };
+
+    // Each socket starts at a different point in the loop so neighbouring flames never flicker in step.
+    private string FlameStyle( string family, int eye )
+    {
+        var frame = (FireFrame + eye * 7) % FireFrames;
+        return $"background-image: url( /ui/medals/fx/fire/{FirePalette( family )}_{frame:00}.png );";
     }
 
     private readonly List<MedalInstance> Medals = new();
@@ -82,6 +165,17 @@
             next.TimeCreated = 0f;
             Medals.Add( next );
             changed = true;
+        }
+
+        // Step the eye-fire flipbook while a medal is up.
+        if ( Medals.Count > 0 )
+        {
+            var frame = (int)(Time.Now * FireFps) % FireFrames;
+            if ( frame != FireFrame )
+            {
+                FireFrame = frame;
+                changed = true;
+            }
         }
 
         if ( changed )
@@ -198,7 +292,22 @@
         return damageInfo.Damage >= maxHealth - 0.01f;
     }
 
-    private void AddMedal( string title, string subtitle, string family, string rank, string art = null )
+    /// <summary>Queue a medal locally for previews: oneshot, headshot, streak, double, triple, fury or frenzy.</summary>
+    public void Preview( string kind, float lifetime = 1.6f )
+    {
+        switch ( kind )
+        {
+            case "headshot": AddMedal( "HEADSHOT", "PRECISION KILL", "precision", "HS", lifetime: lifetime ); break;
+            case "streak": AddMedal( "BLOODTHIRSTY", "KILL STREAK", "streak", "5", lifetime: lifetime ); break;
+            case "double": AddMedal( "DOUBLE KILL", "RAPID ELIMINATIONS", "multikill", "2", "double-kill", lifetime ); break;
+            case "triple": AddMedal( "TRIPLE KILL", "RAPID ELIMINATIONS", "multikill", "3", "triple-kill", lifetime ); break;
+            case "fury": AddMedal( "FURY KILL", "RAPID ELIMINATIONS", "multikill", "4", "fury-kill", lifetime ); break;
+            case "frenzy": AddMedal( "FRENZY KILL", "RAPID ELIMINATIONS", "multikill", "5", "frenzy-kill", lifetime ); break;
+            default: AddMedal( "ONE SHOT, ONE KILL", "SINGLE SHOT ELIMINATION", "precision", "1", lifetime: lifetime ); break;
+        }
+    }
+
+    private void AddMedal( string title, string subtitle, string family, string rank, string art = null, float lifetime = 1.6f )
     {
         var medal = new MedalInstance
         {
@@ -207,7 +316,8 @@
             Subtitle = subtitle,
             Family = family,
             Art = art ?? family,
-            Rank = rank
+            Rank = rank,
+            Lifetime = lifetime
         };
 
         PendingMedals.Enqueue( medal );

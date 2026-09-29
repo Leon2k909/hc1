@@ -1,54 +1,100 @@
 @using Sandbox;
-@using Sandbox.Network
+@using Sandbox.Network;
 @using Sandbox.UI;
 @using Sandbox.UI.Navigation;
 
 @inherits Panel
 @implements INavigatorPage
+@attribute [StyleSheet]
 @namespace Facepunch.UI
 
-<root class="hc1 blur">
-    <MenuTopbar Title="PRIVATE MATCH" />
-
+<root class="hc1 custom-game-page">
+    <MenuTopbar Title="CUSTOM GAME" />
     <div class="cl-body">
-        <div class="cl-card">
-            <div class="cl-header">
-                <div class="cl-icon"><i>vpn_key</i></div>
-                <div class="cl-titles">
-                    <label class="cl-caption">PRIVATE</label>
-                    <label class="cl-title">HOST PRIVATE MATCH</label>
-                </div>
+        <div class="cl-setup">
+            <div class="cl-heading">
+                <label class="cl-caption">@Tr( "MATCH SETUP" )</label>
+                <label class="cl-title">@Tr( "CUSTOM GAME" )</label>
+                <label class="cl-desc">@Tr( "Choose your setup, then start when you're ready." )</label>
             </div>
-
-            <label class="cl-desc">Create a pre-game lobby where you set up the match and players pick their teams before it starts.</label>
-
-            <div class="cl-features">
-                <div class="cl-feature">
-                    <i>tune</i>
-                    <div class="cl-feature-copy">
-                        <label class="cl-feature-name">CONFIGURE</label>
-                        <label class="cl-feature-sub">Map, mode and match rules</label>
+            <div class="cl-columns">
+                <div class="cl-settings">
+                    <div class="cl-group">
+                        <label class="cl-label">@Tr( "MAP" )</label>
+                        <div class="cl-options">
+                            @foreach ( var map in Maps )
+                            {
+                                <div class="cl-option @(map == SelectedMap ? "selected" : "")" onclick=@(() => SelectMap( map ))>
+                                    <label>@map.GetMetadata( "Title", map.ResourceName ).ToUpper()</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="cl-group">
+                        <label class="cl-label">@Tr( "GAME MODE" )</label>
+                        <div class="cl-options modes">
+                            @foreach ( var mode in Modes )
+                            {
+                                <div class="cl-option @(mode.Ident == SelectedMode?.Ident ? "selected" : "")" onclick=@(() => SelectMode( mode ))>
+                                    <label>@Tr( mode.Title.ToUpper() )</label>
+                                </div>
+                            }
+                        </div>
+                        <label class="cl-help">@Tr( SelectedMode?.Description )</label>
+                    </div>
+                    <div class="cl-group">
+                        <label class="cl-label">@Tr( "PLAYER LIMIT" )</label>
+                        <div class="cl-options">
+                            @foreach ( var count in PlayerLimits )
+                            {
+                                <div class="cl-option @(count == PlayerLimit ? "selected" : "")" onclick=@(() => SetPlayerLimit( count ))><label>@count</label></div>
+                            }
+                        </div>
+                    </div>
+                    @if ( SelectedMode?.Ident != "zombies" )
+                    {
+                        <div class="cl-group">
+                            <label class="cl-label">@Tr( "BOT FILL" )</label>
+                            <div class="cl-options">
+                                <div class="cl-option @(!FillWithBots ? "selected" : "")" onclick=@(() => SetBotFill( false ))><label>@Tr( "OFF" )</label></div>
+                                <div class="cl-option @(FillWithBots ? "selected" : "")" onclick=@(() => SetBotFill( true ))><label>@Tr( "FILL EMPTY SLOTS" )</label></div>
+                            </div>
+                            <label class="cl-help">@Tr( FillWithBots ? "Bots fill the player limit and make room as players join." : "Play with whoever joins, or explore alone." )</label>
+                        </div>
+                    }
+                    <div class="cl-group">
+                        <label class="cl-label">@Tr( "WHO CAN JOIN" )</label>
+                        <div class="cl-options">
+                            <div class="cl-option @(Privacy == LobbyPrivacy.Private ? "selected" : "")" onclick=@(() => SetPrivacy( LobbyPrivacy.Private ))><label>@Tr( "INVITE ONLY" )</label></div>
+                            <div class="cl-option @(Privacy == LobbyPrivacy.FriendsOnly ? "selected" : "")" onclick=@(() => SetPrivacy( LobbyPrivacy.FriendsOnly ))><label>@Tr( "FRIENDS" )</label></div>
+                            <div class="cl-option @(Privacy == LobbyPrivacy.Public ? "selected" : "")" onclick=@(() => SetPrivacy( LobbyPrivacy.Public ))><label>@Tr( "PUBLIC" )</label></div>
+                        </div>
+                        <label class="cl-help">@Tr( AccessHelp )</label>
                     </div>
                 </div>
-                <div class="cl-feature">
-                    <i>groups</i>
-                    <div class="cl-feature-copy">
-                        <label class="cl-feature-name">PICK TEAMS</label>
-                        <label class="cl-feature-sub">Players choose sides in the lobby</label>
+                <div class="cl-summary">
+                    <div class="cl-map-preview" style=@MapPreviewStyle>
+                        <div class="cl-map-shade" />
+                        <label class="cl-map-name">@(SelectedMap?.GetMetadata( "Title", SelectedMap.ResourceName ).ToUpper() ?? Tr( "NO MAP AVAILABLE" ))</label>
+                    </div>
+                    <div class="cl-summary-body">
+                        <label class="cl-caption">@Tr( "MATCH SUMMARY" )</label>
+                        <label class="cl-mode-name">@Tr( SelectedMode?.Title.ToUpper() ?? "SELECT A MODE" )</label>
+                        <div class="cl-summary-row"><label>@Tr( "RULESET" )</label><label>@Tr( SelectedMode?.Ident == "zombies" ? "CO-OP SURVIVAL" : "HARDCORE" )</label></div>
+                        <div class="cl-summary-row"><label>@Tr( "PLAYER LIMIT" )</label><label>@PlayerLimit</label></div>
+                        <div class="cl-summary-row"><label>@Tr( "BOT FILL" )</label><label>@Tr( UseBotFill ? "ON" : "OFF" )</label></div>
+                        <div class="cl-summary-row"><label>@Tr( "ACCESS" )</label><label>@Tr( AccessName )</label></div>
+                        @if ( !string.IsNullOrEmpty( _error ) )
+                        {
+                            <label class="cl-error">@Tr( _error )</label>
+                        }
+                        <div class="cl-start primary @(!CanStart || _starting ? "disabled" : "")" onclick=@StartMatch>
+                            <i>@(_starting ? "hourglass_top" : "play_arrow")</i>
+                            <label>@Tr( _starting ? "STARTING…" : "START CUSTOM GAME" )</label>
+                        </div>
+                        <label class="cl-help">@Tr( "Invite friends once the match has loaded." )</label>
                     </div>
                 </div>
-                <div class="cl-feature">
-                    <i>play_arrow</i>
-                    <div class="cl-feature-copy">
-                        <label class="cl-feature-name">START</label>
-                        <label class="cl-feature-sub">Launch when everyone is ready</label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="cl-create" onclick=@Join>
-                <i>add</i>
-                <label>CREATE LOBBY</label>
             </div>
         </div>
     </div>
@@ -56,85 +102,107 @@
 
 @code
 {
-    public SceneFile SelectedMap { get; set; }
-    public List<string> SelectedGameModes { get; set; } = new();
-    // Core modes are off for now, every match is hardcore. Put back with Core:
-    // public bool SelectedHardcore { get; set; } = false;
-    public bool SelectedHardcore { get; set; } = true;
+    private List<SceneFile> Maps = new();
+    private List<GameMode> Modes = new();
+    public SceneFile SelectedMap { get; private set; }
+    public GameMode SelectedMode { get; private set; }
+    public int PlayerLimit { get; private set; } = 10;
+    public bool FillWithBots { get; private set; } = true;
+    public LobbyPrivacy Privacy { get; private set; } = LobbyPrivacy.Private;
+    private bool _starting;
+    private bool _closed;
+    private string _error;
 
-    public GameModeList GameModeList { get; set; }
+    private bool UseBotFill => FillWithBots && SelectedMode?.Ident != "zombies";
+    private bool CanStart => SelectedMap is not null && SelectedMode.IsValid() && Modes.Any( m => m.Ident == SelectedMode.Ident );
+    private int ModePlayerLimit => SelectedMode?.Ident switch { "gunfight_1v1" => 2, "gunfight_2v2" => 4, "zombies" => 4, _ => 10 };
+    private IEnumerable<int> PlayerLimits => new[] { 2, 4, 6, 8, 10 }.Where( count => count <= ModePlayerLimit );
+    private string MapPreviewStyle => SelectedMap is null ? "" : $"background-image: url( '{MapArt.Get( SelectedMap )}' );";
 
-    private void SetMap( SceneFile map )
+    private string AccessName => Privacy switch
     {
+        LobbyPrivacy.Public => "PUBLIC",
+        LobbyPrivacy.FriendsOnly => "FRIENDS",
+        _ => "INVITE ONLY",
+    };
+
+    // Only Public lobbies turn up in the server browser (LobbyList) and s&box's own server list.
+    private string AccessHelp => Privacy switch
+    {
+        LobbyPrivacy.Public => "Listed in the server browser, where anyone can join.",
+        LobbyPrivacy.FriendsOnly => "Your Steam friends can join without an invite.",
+        _ => "Only players you invite can join.",
+    };
+
+    private void SelectMap( SceneFile map )
+    {
+        if ( _starting || map is null || !Maps.Contains( map ) ) return;
         SelectedMap = map;
+        Modes = GameMode.GetAll( map ).ToList();
+        SelectedMode = Modes.FirstOrDefault( mode => mode.Ident == SelectedMode?.Ident )
+            ?? Modes.FirstOrDefault( mode => mode.Ident == "tdm" ) ?? Modes.FirstOrDefault();
+        PlayerLimit = Math.Min( PlayerLimit, ModePlayerLimit );
+        _error = null;
         StateHasChanged();
     }
 
-    private void ToggleMode( string ident )
+    private void SelectMode( GameMode mode )
     {
-        if ( SelectedGameModes.Contains( ident ) )
+        if ( _starting || !Modes.Contains( mode ) ) return;
+        SelectedMode = mode;
+        PlayerLimit = Math.Min( PlayerLimit, ModePlayerLimit );
+        StateHasChanged();
+    }
+
+    private void SetPlayerLimit( int count ) { if ( !_starting && PlayerLimits.Contains( count ) ) { PlayerLimit = count; StateHasChanged(); } }
+    private void SetBotFill( bool fill ) { if ( !_starting ) { FillWithBots = fill; StateHasChanged(); } }
+    private void SetPrivacy( LobbyPrivacy privacy ) { if ( !_starting ) { Privacy = privacy; StateHasChanged(); } }
+
+    private async void StartMatch()
+    {
+        if ( _starting || !CanStart ) return;
+        _starting = true;
+        _error = null;
+        StateHasChanged();
+        try
         {
-            if ( SelectedGameModes.Count > 1 )
+            // A custom game gets its own lobby, not one left over from a previous match.
+            if ( Networking.IsActive )
             {
-                SelectedGameModes.Remove( ident );
+                Networking.Disconnect();
+                for ( var attempt = 0; attempt < 100 && Networking.IsActive; attempt++ )
+                    await GameTask.DelaySeconds( 0.05f );
+                if ( Networking.IsActive ) throw new Exception( "The previous session is still closing. Please try again." );
             }
+            if ( !IsValid || _closed ) return;
+
+            CustomGameSettings.Configure( PlayerLimit, UseBotFill, Privacy );
+            GameMode.SetCurrent( SelectedMode );
+            GameMode.SetHardcore( SelectedMode.Ident != "zombies" );
+            Sound.Play( "ui_button_press" );
+            // Use the map's complete game setup. The legacy pregame scene has no gameplay or spawn setup.
+            Game.ActiveScene.Load( SelectedMap );
         }
-        else
+        catch ( Exception e )
         {
-            SelectedGameModes.Add( ident );
-        }
-
-        // Auto-select a map that matches the new selection if current map is not compatible
-        if ( SelectedMap is null || !GameMode.GetAll( SelectedMap ).Any( x => SelectedGameModes.Contains( x.Ident ) ) )
-        {
-            SelectedMap = GameUtils.GetAvailableMaps()
-                .FirstOrDefault( map => GameMode.GetAll( map ).Any( x => SelectedGameModes.Contains( x.Ident ) ) );
-        }
-
-        StateHasChanged();
-    }
-
-    private void SetHardcoreMode( bool hardcore )
-    {
-        SelectedHardcore = hardcore;
-        StateHasChanged();
-    }
-
-    protected override void OnAfterTreeRender( bool firstTime )
-    {
-        if ( !firstTime )
-            return;
-
-        SelectedMap = GameUtils.GetAvailableMaps().FirstOrDefault();
-        var firstMode = GameMode.GetAll( SelectedMap ).FirstOrDefault();
-        if ( firstMode is not null )
-        {
-            SelectedGameModes.Add( firstMode.Ident );
-        }
-    }
-
-    private void Join()
-    {
-        var sc = ResourceLibrary.Get<SceneFile>( "scenes/pregame_lobby.scene" );
-        if ( sc != null )
-        {
-            Game.ActiveScene.Load( sc );
+            CustomGameSettings.Reset();
+            Log.Warning( $"Custom game could not start: {e}" );
+            if ( IsValid ) { _error = e.Message; _starting = false; StateHasChanged(); }
         }
     }
 
     public void OnNavigationOpen()
     {
-        if ( MainMenuRoot.Instance.IsValid() )
-        {
-            MainMenuRoot.Instance.SetBlur( true );
-        }
+        _closed = false;
+        Maps = GameUtils.GetMatchMaps().ToList();
+        SelectMap( Maps.FirstOrDefault() );
+        MainMenuRoot.Instance?.SetActiveRoute( "/new" );
+        if ( MainMenuRoot.Instance.IsValid() ) MainMenuRoot.Instance.SetBlur( true );
     }
-    
-    public void OnNavigationClose() 
+
+    public void OnNavigationClose()
     {
-        if ( MainMenuRoot.Instance.IsValid() )
-        {
-            MainMenuRoot.Instance.SetBlur( false );
-        }
+        _closed = true;
+        if ( MainMenuRoot.Instance.IsValid() ) MainMenuRoot.Instance.SetBlur( false );
     }
 }

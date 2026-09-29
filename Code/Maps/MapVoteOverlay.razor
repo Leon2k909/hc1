@@ -1,79 +1,181 @@
 @namespace Facepunch.UI
 @inherits PanelComponent
 
-<root class="hc1 hud layout grow flex column">
-    <div class="layout main with-background padding-extra column">
-        <div class="layout flex column padding-extra center vote-heading">
-            @if ( MapVoteSystem.WinningOption is not null )
-            {
-                <label class="vital white uppercase vote-timer">Changing Map</label>
-            }
-            else
-            {
-                <label class="vital white uppercase vote-timer">@TimeSpan.FromSeconds(Math.Max(0, Math.Ceiling((double)MapVoteSystem.TimeUntilDecidedWinner))).ToString(@"mm\:ss")</label>
-                <label class="small slight vote-caption">Vote for the next map.</label>
-            }
-        </div>
-
+@* Not "hud": its pointer-events and cursor are none, which hid the cursor and made the cards unclickable. *@
+<root class="hc1">
+    <div class="vote-heading">
         @if ( !MapVoteSystem.IsValid() )
         {
-            <div class="grow" />
-            <div class="button standard warning">Something went wrong</div>
-            <div class="grow" />
-            return;
+            <label class="vote-kicker">@Tr( "Map vote" )</label>
+            <label class="vote-title">@Tr( "Something went wrong" )</label>
+        }
+        else if ( IsDecided )
+        {
+            <label class="vote-kicker">@Tr( "Next map" )</label>
+            <label class="vote-title">@WinnerTitle</label>
+        }
+        else
+        {
+            <label class="vote-kicker">@Tr( "Vote for the next map" )</label>
+            <label class="vote-title">@($"0:{SecondsLeft:00}")</label>
         }
 
-        <div class="layout flex gap wrap grow padding-extra">
+        <div class="vote-timer">
+            <div class="vote-timer-fill" style="width: @(IsDecided ? 0f : SecondsLeft / MapVoteSystem.VoteDuration * 100f)%;"></div>
+        </div>
+    </div>
 
-            @for ( int i = 0; i < Options.Count(); i++ )
+    @if ( MapVoteSystem.IsValid() )
+    {
+        <div class="vote-cards">
+            @for ( var i = 0; i < Options.Count; i++ )
             {
-                var voteOption = Options.ElementAt( i );
-                var votes = GetOptionVotes( i );
-
-                <MapVoteCard Option=@voteOption Votes=@votes.ToList() Index=@i IsWinning=@IsHighest( i ) />
+                <MapVoteCard Option=@Options[i] Index=@i />
             }
         </div>
+    }
 
-        <div class="layout gap padding-extra flex">
-            <div class="grow" />
-            <div class="button standard" onclick=@(()=>GameUtils.ReturnToMainMenu())><i>logout</i>Leave game</div>
+    @* The other modes: a card leaves this lobby and starts that mode in one of the player's own (LeaveFor) *@
+    @if ( MapVoteSystem.IsValid() && OtherModes is { Count: > 0 } otherModes )
+    {
+        <div class="vote-modes @(_leaving is null ? "" : "leaving")">
+            <div class="modes-head">
+                <div class="modes-bar"></div>
+                <label class="modes-title">@Tr( "PLAY A DIFFERENT MODE" )</label>
+                <label class="modes-note">@Tr( LeaveNote )</label>
+            </div>
+
+            <div class="modes-row">
+                @foreach ( var choice in otherModes )
+                {
+                    <div class="mode-card @(choice.Key == _leaving?.Key ? "picked" : "")" onclick=@(() => LeaveFor( choice ))>
+                        <div class="mode-bg @choice.Key"></div>
+                        <div class="mode-shade"></div>
+                        <div class="mode-content">
+                            <label class="mode-name">@choice.Name()</label>
+                            <label class="mode-sub">@choice.Subtitle()</label>
+                        </div>
+                        <i class="mode-go">arrow_forward</i>
+                    </div>
+                }
+            </div>
         </div>
+    }
+
+    <div class="vote-footer">
+        <label class="vote-hint">@HintText</label>
+        <div class="grow"></div>
+        <div class="button standard" onclick=@(() => GameUtils.ReturnToMainMenu())><i>logout</i>@Tr( "Leave game" )</div>
     </div>
 </root>
 
 @code
 {
     public MapVoteSystem MapVoteSystem => MapVoteSystem.Instance;
-    public IEnumerable<MapVoteSystem.Option> Options => MapVoteSystem.VoteOptions;
+    public List<MapVoteSystem.Option> Options => MapVoteSystem.VoteOptions.ToList();
 
-    public IEnumerable<MapVoteSystem.NetworkedVote> GetOptionVotes( int index ) => MapVoteSystem.Votes.Where( x => x.Option == index );
-    public bool IsHighest( int i )
+    private bool IsDecided => MapVoteSystem.IsValid() && MapVoteSystem.WinnerIndex >= 0;
+    private int SecondsLeft => MapVoteSystem.IsValid() ? Math.Max( 0, (int)Math.Ceiling( MapVoteSystem.TimeUntilDecidedWinner.Relative ) ) : 0;
+
+    private string WinnerTitle => Options.ElementAtOrDefault( MapVoteSystem.WinnerIndex ) is { Map: { } map } ? map.GetMetadata( "Title", map.ResourceName ) : "";
+
+    private bool HasVoted => MapVoteSystem.IsValid() && MapVoteSystem.Votes.Any( x => x is not null && x.VoterId == Connection.Local.SteamId );
+
+    private string Hint => IsDecided ? "Voting has closed" : HasVoted ? "Click another map to change your vote, or yours again to take it back" : "Click a map to vote for it";
+
+    private string HintText => _leaving is not null ? Tr( "Starting {0}…", _leaving.Name() ) : Tr( _leaveError ?? Hint );
+
+    /// <summary>A mode the player can leave for: its art class (the mode's ident), how its card reads, and the map it starts on.</summary>
+    private sealed record ModeChoice( string Key, GameMode Mode, Func<string> Name, Func<string> Subtitle, Func<SceneFile> PickMap );
+
+    /// <summary>
+    /// Every mode the hub offers except this one: the playlists, most played first (PopularPlaylists), each on a random
+    /// map for it; battle royale on the hub's map (br_map); and Zombies on a random map that has it.
+    /// </summary>
+    private List<ModeChoice> OtherModes
     {
-        Dictionary<int, int> dict = new();
-
-        foreach ( var vote in MapVoteSystem.Votes )
+        get
         {
-            if ( !dict.TryGetValue( vote.Option, out var _ ) ) 
+            var choices = PopularPlaylists.Top( int.MaxValue )
+                .Select( mode => new ModeChoice( PopularPlaylists.ArtClass( mode ), mode,
+                    () => PopularPlaylists.Name( mode ), () => PopularPlaylists.Subtitle( mode ), () => PopularPlaylists.PickMap( mode ) ) )
+                .ToList();
+
+            var royale = MatchLauncher.BattleRoyaleMode();
+            if ( royale.IsValid() && BattleRoyaleMatch.GetChosenMap() is { } royaleMap )
             {
-                dict.Add( vote.Option, 0 );
+                choices.Add( new ModeChoice( royale.Ident, royale, () => Tr( "BATTLE ROYALE" ),
+                    () => Tr( "SOLOS · {0}", royaleMap.GetMetadata( "Title", royaleMap.ResourceName ).ToUpper() ), BattleRoyaleMatch.GetChosenMap ) );
             }
 
-            dict[vote.Option]++;
+            var zombies = MatchLauncher.ZombiesMode();
+            if ( zombies.IsValid() && MatchLauncher.ZombiesMaps().Count > 0 )
+            {
+                choices.Add( new ModeChoice( zombies.Ident, zombies, () => Tr( "ZOMBIES" ), () => Tr( "CO-OP SURVIVAL" ),
+                    () => Game.Random.FromList( MatchLauncher.ZombiesMaps() ) ) );
+            }
+
+            var current = GameMode.Instance.IsValid() ? GameMode.Instance.Ident : null;
+            return choices.Where( x => !string.Equals( x.Key, current, StringComparison.OrdinalIgnoreCase ) ).ToList();
         }
-
-        var highestScoring = dict.OrderByDescending( x => x.Value ).ToDictionary( pair => pair.Key, pair => pair.Value ).FirstOrDefault();
-
-        if ( highestScoring.Value < 1 ) return false;
-        return highestScoring.Key == i;
     }
 
-    public void Vote( int index )
+    /// <summary>The host leaving takes the lobby down with them, which the note says when anyone else is in it.</summary>
+    private static bool HostingOthers => Networking.IsHost && Connection.All.Count > 1;
+
+    private string LeaveNote => HostingOthers
+        ? "You're the host, so leaving closes this lobby for everyone"
+        : "Leaves this lobby and starts a new match in that mode";
+
+    /// <summary>The mode being left for, while the lobby closes and its map loads.</summary>
+    private ModeChoice _leaving;
+
+    /// <summary>Why the last try to leave failed, in English (<see cref="HintText"/> translates it).</summary>
+    private string _leaveError;
+
+    /// <summary>
+    /// Leaves this match for <paramref name="choice"/>: the vote stops moving this machine on (MapVoteSystem.IsLeaving),
+    /// then the player leaves the lobby and starts the mode in one of their own (MatchLauncher.LeaveAndStart).
+    /// </summary>
+    private async void LeaveFor( ModeChoice choice )
     {
-        MapVoteSystem.Vote( index );
+        if ( _leaving is not null || !MapVoteSystem.IsValid() ) return;
+
+        var map = choice.PickMap();
+        if ( map is null ) return;
+
+        Sound.Play( "ui_button_press" );
+        _leaving = choice;
+        _leaveError = null;
+        MapVoteSystem.IsLeaving = true;
+        StateHasChanged();
+
+        if ( await MatchLauncher.LeaveAndStart( choice.Mode, map ) || !this.IsValid() ) return;
+
+        // Still in the lobby: the vote carries on here as before.
+        _leaving = null;
+        _leaveError = "Couldn't leave this lobby. Try again.";
+        if ( MapVoteSystem.IsValid() ) MapVoteSystem.IsLeaving = false;
+        StateHasChanged();
     }
 
     protected override int BuildHash()
     {
-        return HashCode.Combine( MapVoteSystem.Votes.Count, MapVoteSystem.TimeUntilDecidedWinner.Fraction );
+        var hash = new HashCode();
+
+        hash.Add( _leaving?.Key );
+        hash.Add( _leaveError );
+        hash.Add( HostingOthers );
+
+        if ( MapVoteSystem.IsValid() )
+        {
+            hash.Add( SecondsLeft );
+            hash.Add( MapVoteSystem.WinnerIndex );
+
+            foreach ( var vote in MapVoteSystem.Votes )
+                hash.Add( HashCode.Combine( vote?.VoterId, vote?.Option ) );
+        }
+
+        return hash.ToHashCode();
     }
 }

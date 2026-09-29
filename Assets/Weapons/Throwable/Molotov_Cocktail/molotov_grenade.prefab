@@ -65,27 +65,17 @@
         "OnComponentUpdate": null
       },
       {
-        "__type": "Facepunch.MolotovGrenade",
+        "__type": "Facepunch.ThermiteGrenade",
         "__guid": "ea642f20-616b-48e9-b93e-493023acb2ba",
         "CanDealDamage": true,
-        "FireNodePrefab": {
-          "_type": "gameobject",
-          "prefab": "weapons/throwable/molotov_cocktail/molotov_firenode.prefab"
-        },
-        "FireNodesToSpawn": 30,
-        "FireRadius": 150,
-        "Lifetime": 3,
+        "Lifetime": 2,
         "OnComponentDestroy": null,
         "OnComponentDisabled": null,
         "OnComponentEnabled": null,
         "OnComponentFixedUpdate": null,
         "OnComponentStart": null,
         "OnComponentUpdate": null,
-        "PrefabOnExplode": {
-          "_type": "gameobject",
-          "prefab": "weapons/throwable/molotov_cocktail/molotov_explosion.prefab"
-        },
-        "SpreadDelay": "0.05 0.1"
+        "PrefabOnExplode": null
       }
     ],
     "Children": [

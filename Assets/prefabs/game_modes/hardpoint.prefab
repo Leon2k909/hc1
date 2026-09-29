@@ -18,7 +18,7 @@
         "__type": "Facepunch.GameMode",
         "__guid": "5b253708-de7c-4c86-8893-b86fb4822642",
         "__enabled": true,
-        "Description": "Capture and hold the rotating Hardpoint zone.",
+        "Description": "Capture and hold the zone as it moves around the map.",
         "Ident": "hardpoint",
         "MaxBalance": 16000,
         "OnComponentDestroy": null,
@@ -27,7 +27,7 @@
         "OnComponentFixedUpdate": null,
         "OnComponentStart": null,
         "OnComponentUpdate": null,
-        "Title": "Hardpoint",
+        "Title": "Hot Zone",
         "UnlimitedMoney": true
       },
       {
@@ -497,7 +497,7 @@
                 "OnComponentFixedUpdate": null,
                 "OnComponentStart": null,
                 "OnComponentUpdate": null,
-                "StatusText": "Hardpoint",
+                "StatusText": "Hot Zone",
                 "Team": "Unassigned"
               },
               {
@@ -513,18 +513,6 @@
                 "OnComponentUpdate": null,
                 "Sound": "RoundStarted",
                 "Team": "Terrorist"
-              },
-              {
-                "__type": "Facepunch.PlaySound",
-                "__guid": "c8b726ed-51d8-42ef-a8a5-973fb6eecd55",
-                "__enabled": true,
-                "OnComponentDestroy": null,
-                "OnComponentDisabled": null,
-                "OnComponentEnabled": null,
-                "OnComponentFixedUpdate": null,
-                "OnComponentStart": null,
-                "OnComponentUpdate": null,
-                "SoundEvent": "sounds/music/round_intro/round_start.sound"
               },
               {
                 "__type": "Facepunch.ShowCountDown",

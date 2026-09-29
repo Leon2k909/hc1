@@ -13,7 +13,7 @@
 
 <root class="button standard layout column @(Lobby.IsEditorLobby ? "dev" : "")">
     <div class="row layout gap">
-        <label>@(Lobby.Name)'s game</label>
+        <label>@Tr( "{0}'s game", Lobby.Name )</label>
         <div class="layout flex-grow" />
         <label>@(Lobby.Members)/@(Lobby.MaxMembers)</label>
     </div>

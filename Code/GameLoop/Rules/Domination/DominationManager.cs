@@ -25,6 +25,15 @@ public sealed class DominationManager : Component
 
 	private void SpawnFlags()
 	{
+		// A map's own flag spots (ObjectiveSpot), named by their labels.
+		var spots = ObjectiveSpot.All( Scene, ObjectiveSpot.SpotKind.Domination );
+		if ( spots.Count >= 3 )
+		{
+			foreach ( var spot in spots )
+				CreateFlag( spot.Label, spot.WorldPosition );
+			return;
+		}
+
 		var spawnPoints = GameUtils.GetSpawnPoints().Select( x => x.Transform.Position ).ToList();
 
 		Vector3 posA, posB, posC;

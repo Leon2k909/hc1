@@ -1,0 +1,64 @@
+{
+  "RootObject": {
+    "__guid": "9e8565f1-43c6-5d4c-a8c6-5c02f24d0dcf",
+    "Name": "Recon Drone Airborne",
+    "Enabled": true,
+    "NetworkMode": 2,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "579758cc-e904-5df2-ba27-6bc4cbd70d2e",
+        "__enabled": true,
+        "Model": "models/recon_drone/recon_drone_handheld.vmdl",
+        "Tint": "1,1,1,1",
+        "RenderType": "On",
+        "RenderOptions": {
+          "GameLayer": true,
+          "OverlayLayer": false
+        },
+        "UseAnimGraph": false
+      },
+      {
+        "__type": "Facepunch.ReconDroneFlight",
+        "__guid": "539c890d-9325-5e23-8f5c-b6501df37dd7",
+        "__enabled": true,
+        "FlightDuration": 30,
+        "ScanRange": 1600,
+        "Propeller": {
+          "_type": "gameobject",
+          "go": "8b994108-c2a2-59db-a104-b968e7bd076b"
+        }
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "8b994108-c2a2-59db-a104-b968e7bd076b",
+        "Name": "flight-propeller",
+        "Enabled": true,
+        "NetworkMode": 0,
+        "Components": [
+          {
+            "__type": "Sandbox.ModelRenderer",
+            "__guid": "dc47412c-f249-5ff9-a6aa-c07159d04855",
+            "__enabled": true,
+            "Model": "models/recon_drone/recon_propeller_handheld.vmdl",
+            "Tint": "1,1,1,1",
+            "RenderType": "On",
+            "RenderOptions": {
+              "GameLayer": true,
+              "OverlayLayer": false
+            },
+            "UseAnimGraph": false
+          }
+        ],
+        "Children": [],
+        "Position": "-5.94,0,0.54"
+      }
+    ],
+    "NetworkInterpolation": true,
+    "Tags": "recon_drone"
+  },
+  "ResourceVersion": 2,
+  "__references": [],
+  "__version": 2
+}

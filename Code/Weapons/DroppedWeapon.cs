@@ -60,12 +60,10 @@ public partial class DroppedEquipment : Component, IUse, Component.ICollisionLis
 
 		renderer.BodyGroups |= resource.WorldModelBodyGroups;
 
-		var min = bounds.Mins;
-		var max = bounds.Maxs;
-
+		// Box the model where it is: a gun model isn't centred above its origin.
 		var collider = go.Components.Create<BoxCollider>();
-		collider.Scale = new Vector3( max.x - min.x, max.y - min.y, max.z - min.z );
-		collider.Center = new Vector3( 0, 0, (max.z - min.z) / 2 );
+		collider.Scale = bounds.Size;
+		collider.Center = bounds.Center;
 
 		droppedWeapon.Rigidbody = go.Components.Create<Rigidbody>();
 
@@ -226,17 +224,21 @@ public partial class DroppedEquipment : Component, IUse, Component.ICollisionLis
 		}
 	}
 
+	/// <summary>The middle of the gun's model in the world, which E aims for (see PlayerPawn.PickupReach).</summary>
+	public Vector3 Center => WorldTransform.PointToWorld( Resource?.WorldModel?.Bounds.Center ?? Vector3.Zero );
+
 	/// <summary>
 	/// Where is the marker?
 	/// </summary>
-	Vector3 IMarkerObject.MarkerPosition => WorldPosition + Vector3.Up * 8f;
+	Vector3 IMarkerObject.MarkerPosition => Center + Vector3.Up * 8f;
 
 	/// <summary>
 	/// What text?
 	/// </summary>
 	string IMarkerObject.DisplayText => $"{Resource.Name}";
 
-	float IMarkerObject.MarkerMaxDistance => 128f;
+	/// <summary>The prompt only shows where E reaches the gun (the marker sits 8 above its middle).</summary>
+	float IMarkerObject.MarkerMaxDistance => PlayerPawn.PickupReach - 8f;
 
 	string IMarkerObject.InputHint => "Use";
 

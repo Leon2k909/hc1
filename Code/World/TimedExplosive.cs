@@ -32,10 +32,12 @@ public sealed class TimedExplosive : Component, IUse, IMinimapIcon, IDescription
 	[Sync( SyncFlags.FromHost )] public TimeSince TimeSinceDefuseStart { get; private set; }
 	[Sync( SyncFlags.FromHost )] public TimeSince TimeSincePlanted { get; private set; }
 	[Sync( SyncFlags.FromHost )] public bool IsDefused { get; private set; }
+	[Sync( SyncFlags.FromHost )] public bool HasDetonated { get; private set; }
+	public float SecondsRemaining => Math.Max( 0f, Duration - TimeSincePlanted );
 
 	// IDescription
 	string IDescription.DisplayName => "C4";
-	string IDescription.Icon => "/ui/items/c4.png";
+	string IDescription.Icon => "/ui/items/field_device.svg";
 
 	public TimeSince TimeSinceLastBeep { get; private set; }
 
@@ -64,10 +66,11 @@ public sealed class TimedExplosive : Component, IUse, IMinimapIcon, IDescription
 	/// Bomb site this bomb was planted at.
 	/// </summary>
 	private BombSite BombSite { get; set; }
+	public void InitializeSite( BombSite site ) => BombSite = site;
 
 	[RequireComponent] public Spottable Spottable { get; private set; }
 
-	public PlayerPawn DefusingPlayer { get; private set; }
+	[Sync( SyncFlags.FromHost )] public PlayerPawn DefusingPlayer { get; private set; }
 
 	string IMinimapIcon.IconPath => "ui/minimaps/icon-map_bomb.png";
 
@@ -75,10 +78,10 @@ public sealed class TimedExplosive : Component, IUse, IMinimapIcon, IDescription
 
 	protected override void OnStart()
 	{
-		TimeSincePlanted = 0f;
+		if ( Networking.IsHost ) TimeSincePlanted = 0f;
 		TimeSinceLastBeep = 0f;
 		
-		BombSite = Zone.GetAt( WorldPosition )
+		BombSite ??= Zone.GetAt( WorldPosition )
 			.Select( x => x.GetComponent<BombSite>() )
 			.FirstOrDefault( x => x is not null );
 
@@ -91,8 +94,10 @@ public sealed class TimedExplosive : Component, IUse, IMinimapIcon, IDescription
 	protected override void OnUpdate()
 	{
 		base.OnUpdate();
+		if ( Wires.IsValid() && Wires.Points.Count > 1 )
+			Wires.Points[1] = !IsDefused && !HasDetonated && DefusingPlayer.IsValid() ? DefusingPlayer.CameraGameObject : null;
 
-		if ( IsDefused )
+		if ( IsDefused || HasDetonated )
 		{
 			return;
 		}
@@ -101,32 +106,36 @@ public sealed class TimedExplosive : Component, IUse, IMinimapIcon, IDescription
 
 		if ( !Networking.IsHost ) return;
 
+		// Completion is only possible while the defender is still alive, holding use and in reach.
 		if ( DefusingPlayer is not null )
 		{
-			if ( TimeSinceDefuseStart >= DefuseTime )
-			{
-				FinishDefusing();
-			}
-			else if ( !DefusingPlayer.IsValid() || !DefusingPlayer.IsUsing || DefusingPlayer.HealthComponent.State != LifeState.Alive )
+			if ( !CanContinueDefusing() )
 			{
 				CancelDefusing();
 			}
+			else if ( TimeSinceDefuseStart >= DefuseTime && TimeSincePlanted - TimeSinceDefuseStart + DefuseTime <= Duration )
+			{
+				FinishDefusing();
+				return;
+			}
 		}
 
-		if ( TimeSincePlanted > Duration )
+		if ( TimeSincePlanted >= Duration )
 		{
-			Enabled = false;
 			Explode();
 		}
 	}
 
 	private void Explode()
 	{
-		if ( ExplosionPrefab is null ) return;
-
-		var explosion = ExplosionPrefab.Clone( WorldPosition, Rotation.FromYaw( Random.Shared.NextSingle() * 360f ) );
-
-		explosion.NetworkSpawn();
+		if ( HasDetonated || IsDefused ) return;
+		HasDetonated = true;
+		CancelDefusing();
+		if ( ExplosionPrefab.IsValid() )
+		{
+			var explosion = ExplosionPrefab.Clone( WorldPosition, Rotation.FromYaw( Random.Shared.NextSingle() * 360f ) );
+			explosion.NetworkSpawn();
+		}
 
 		Scene.Dispatch( new BombDetonatedEvent( GameObject, BombSite ) );
 
@@ -173,77 +182,64 @@ public sealed class TimedExplosive : Component, IUse, IMinimapIcon, IDescription
 		}
 	}
 
-	[Rpc.Broadcast( NetFlags.HostOnly )]
 	public void StartDefusing( PlayerPawn player )
 	{
-		if ( player is null )
-		{
-			Log.Warning( $"Unknown defuser" );
-			return;
-		}
+		if ( !Networking.IsHost || !CanUse( player ).CanUse ) return;
 
 		DefusingPlayer = player;
-
-		if ( DefusingPlayer.CameraGameObject.IsValid() )
-		{
-			Wires.Points[1] = DefusingPlayer.CameraGameObject;
-		}
-
-		if ( DefuseStartSound is not null )
-		{
-			Sound.Play( DefuseStartSound, WorldPosition );
-		}
-
-		if ( Networking.IsHost )
-		{
-			RadioSounds.Play( player.Team, "Hidden", "Defusing the bomb" );
-
-			player.IsFrozen = true;
-
-			Scene.Dispatch( new BombDefuseStartEvent( DefusingPlayer, GameObject, BombSite ) );
-		}
+		TimeSinceDefuseStart = 0f;
+		PlayDefuseSound( false );
+		RadioSounds.Play( player.Team, "Hidden", "Defusing the bomb" );
+		player.IsFrozen = true;
+		Scene.Dispatch( new BombDefuseStartEvent( player, GameObject, BombSite ) );
 	}
 
-	[Rpc.Broadcast( NetFlags.HostOnly )]
 	public void FinishDefusing()
 	{
-		if ( Networking.IsHost )
-		{
-			IsDefused = true;
-			DefusingPlayer.IsFrozen = false;
-
-			Scene.Dispatch( new BombDefusedEvent( DefusingPlayer, GameObject, BombSite ) );
-		}
-
-		Wires.Points[1] = null;
-		DefusingPlayer = null;
-
-		if ( DefuseEndSound is not null )
-		{
-			Sound.Play( DefuseEndSound, WorldPosition );
-		}
+		if ( !Networking.IsHost || IsDefused || HasDetonated || !DefusingPlayer.IsValid() ) return;
+		var player = DefusingPlayer;
+		IsDefused = true;
+		CancelDefusing();
+		PlayDefuseSound( true );
+		Scene.Dispatch( new BombDefusedEvent( player, GameObject, BombSite ) );
 	}
 
 	[Rpc.Broadcast( NetFlags.HostOnly )]
+	private void PlayDefuseSound( bool finished )
+	{
+		var sound = finished ? DefuseEndSound : DefuseStartSound;
+		if ( sound is not null ) Sound.Play( sound, WorldPosition );
+	}
+
 	public void CancelDefusing()
 	{
-		if ( Networking.IsHost )
+		if ( !Networking.IsHost ) return;
+		if ( DefusingPlayer.IsValid() )
 		{
-			DefusingPlayer.IsFrozen = false;
+			DefusingPlayer.IsFrozen = GameMode.Instance?.Get<FreezePlayers>() is { Active: true };
 		}
 
-		Wires.Points[1] = null;
+		if ( Wires.IsValid() && Wires.Points.Count > 1 ) Wires.Points[1] = null;
 		DefusingPlayer = null;
 	}
 
 	public UseResult CanUse( PlayerPawn player )
 	{
-		return !IsDefused && !DefusingPlayer.IsValid() && player.Team == Team.CounterTerrorist;
+		return !IsDefused && !HasDetonated && !DefusingPlayer.IsValid() && IsDefenderInReach( player );
 	}
+
+	private bool IsDefenderInReach( PlayerPawn player ) => player.IsValid()
+		&& player.Team == Team.CounterTerrorist && player.HealthComponent.State == LifeState.Alive
+		&& player.WorldPosition.Distance( WorldPosition ) <= player.UseDistance;
+
+	private bool CanContinueDefusing() => IsDefenderInReach( DefusingPlayer ) && DefusingPlayer.IsUsing;
+
+	protected override void OnDisabled() { if ( Networking.IsHost ) CancelDefusing(); }
+	protected override void OnDestroy() { if ( Networking.IsHost ) CancelDefusing(); }
 
 	public void OnUse( PlayerPawn player )
 	{
-		TimeSinceDefuseStart = 0f;
+		if ( !Networking.IsHost || !CanUse( player ).CanUse ) return;
 		StartDefusing( player );
 	}
 

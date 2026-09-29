@@ -42,7 +42,11 @@ public static partial class GameUtils
 
 	public static IEnumerable<LightweightCombatBot> GetLightweightBots( Team team ) => LightweightBots.Where( x => x.Team == team );
 
-	public static bool IsFreeForAllMode => string.Equals( GameMode.Instance?.Ident, "dm", StringComparison.OrdinalIgnoreCase );
+	/// <summary> Everyone against everyone, bots included: deathmatch and battle royale. </summary>
+	public static bool IsFreeForAllMode => string.Equals( GameMode.Instance?.Ident, "dm", StringComparison.OrdinalIgnoreCase ) || IsBattleRoyale;
+
+	/// <summary> Battle royale (Warzone): no respawns, a closing zone, last one standing wins (<see cref="BattleRoyaleMatch"/>). </summary>
+	public static bool IsBattleRoyale => string.Equals( GameMode.Instance?.Ident, "battle_royale", StringComparison.OrdinalIgnoreCase );
 
 	public static int GetMatchParticipantCount()
 	{
@@ -75,6 +79,7 @@ public static partial class GameUtils
 	public static bool IsInteractiveMouseUiOpen() =>
 		Facepunch.UI.PauseMenuPanel.IsAnyOpen
 		|| Facepunch.UI.ClassSelect.IsAnyOpen
+		|| Facepunch.UI.ZombiesWorkbenchPanel.IsAnyOpen
 		|| Facepunch.UI.Chat.IsAnyOpen
 		|| Input.Down( "Score" )
 		|| Facepunch.UI.EndOfMatchScreen.IsAnyVisible
@@ -138,6 +143,9 @@ public static partial class GameUtils
 
 		if ( Facepunch.UI.ClassSelect.IsAnyOpen )
 			return "class select open";
+
+		if ( Facepunch.UI.ZombiesWorkbenchPanel.IsAnyOpen )
+			return "workbench open";
 
 		if ( Facepunch.UI.Chat.IsAnyOpen )
 			return "chat open";
@@ -420,7 +428,7 @@ public static partial class GameUtils
 		return Team.Unassigned;
 	}
 
-	private static readonly string[] MainMenuMapOrder = { "Refinery", "Flatgrass", "Depot", "Innocent Hotel", "Aesthetic Mall" };
+	private static readonly string[] MainMenuMapOrder = { "Refinery", "Flatgrass", "Depot", "Innocent Hotel", "Belltower", "Aesthetic Mall" };
 
 	/// <summary>Maps currently excluded from quick play / lobby selection (work in progress).</summary>
 	private static readonly HashSet<string> DisabledMaps = new( StringComparer.OrdinalIgnoreCase )
@@ -448,7 +456,8 @@ public static partial class GameUtils
 		return path.Contains( "scenes/maps/refinery/refinery.scene", StringComparison.OrdinalIgnoreCase )
 			|| path.Contains( "scenes/maps/flatgrass/flatgrass.scene", StringComparison.OrdinalIgnoreCase )
 			|| path.Contains( "scenes/maps/depot/depot.scene", StringComparison.OrdinalIgnoreCase )
-			|| path.Contains( "scenes/maps/innocenthotel/innocent_hotel.scene", StringComparison.OrdinalIgnoreCase );
+			|| path.Contains( "scenes/maps/innocenthotel/innocent_hotel.scene", StringComparison.OrdinalIgnoreCase )
+			|| path.Contains( "scenes/maps/belltower/belltower.scene", StringComparison.OrdinalIgnoreCase );
 	}
 
 	/// <summary>
@@ -460,7 +469,8 @@ public static partial class GameUtils
 	{
 		var path = map?.ResourcePath ?? "";
 		return path.Contains( "scenes/maps/flatgrass/flatgrass.scene", StringComparison.OrdinalIgnoreCase )
-			|| path.Contains( "scenes/maps/innocenthotel/innocent_hotel.scene", StringComparison.OrdinalIgnoreCase );
+			|| path.Contains( "scenes/maps/innocenthotel/innocent_hotel.scene", StringComparison.OrdinalIgnoreCase )
+			|| path.Contains( "scenes/maps/belltower/belltower.scene", StringComparison.OrdinalIgnoreCase );
 	}
 
 	private static int GetMainMenuMapOrder( SceneFile map )
@@ -558,8 +568,12 @@ public static partial class GameUtils
 	/// <summary>
 	/// Returns the invoking client to the main menu
 	/// </summary>
-	public static void ReturnToMainMenu()
+	/// <summary>
+	/// Loads the main menu, on the page at <paramref name="route"/> (e.g. "/ranked") if given, otherwise the hub.
+	/// </summary>
+	public static void ReturnToMainMenu( string route = null )
 	{
+		Facepunch.UI.MainMenuRoot.PendingRoute = route;
 		var sc = ResourceLibrary.Get<SceneFile>( "scenes/menu.scene" );
 		Game.ActiveScene.Load( sc );
 	}

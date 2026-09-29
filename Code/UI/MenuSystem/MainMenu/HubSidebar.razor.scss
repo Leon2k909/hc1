@@ -1,0 +1,718 @@
+@import "/UI/Styles/Theme.scss";
+
+$accent: #FF7A1A;
+$line: rgba( 255, 255, 255, 0.08 );
+$ease-out: cubic-bezier( 0.23, 1, 0.32, 1 );
+
+// Arrives just after the last mode card
+HubSidebar
+{
+    flex-direction: column;
+    gap: 14px;
+    animation: side-in 0.5s $ease-out 0.24s both;
+}
+
+@keyframes side-in
+{
+    0% { opacity: 0; transform: translateX( 20px ); }
+    100% { opacity: 1; transform: translateX( 0px ); }
+}
+
+// Smoked glass: the page's backdrop (the hub's .hub-backdrop) shows through, so the shadow is lighter than it was over black.
+.side-panel
+{
+    flex-direction: column;
+    flex-shrink: 0;
+    background-color: rgba( 12, 13, 16, 0.6 );
+    border: 1px solid rgba( 255, 255, 255, 0.09 );
+    border-radius: 3px;
+    box-shadow: 0 10px 28px rgba( 0, 0, 0, 0.3 );
+}
+
+.side-head
+{
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    height: 50px;
+    padding: 0 18px;
+    border-bottom: 1px solid $line;
+}
+
+.side-title
+{
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    color: white;
+    text-shadow: none;
+}
+
+.side-head-right
+{
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+}
+
+.side-meta
+{
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: rgba( 255, 255, 255, 0.5 );
+    text-shadow: none;
+}
+
+.side-bar
+{
+    height: 4px;
+    flex-grow: 1;
+    background-color: rgba( 255, 255, 255, 0.1 );
+}
+
+.side-bar-fill
+{
+    height: 100%;
+    background-color: $accent;
+    box-shadow: 0 0 6px rgba( 255, 122, 26, 0.5 );
+}
+
+// ── Daily challenges ───────────────────────────────────────────
+
+.challenge
+{
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    padding-left: 18px;
+    border-bottom: 1px solid $line;
+}
+
+.challenge-icon
+{
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba( 255, 255, 255, 0.14 );
+    border-radius: 3px;
+    background-color: rgba( 255, 255, 255, 0.03 );
+
+    i
+    {
+        font-size: 24px;
+        color: rgba( 255, 255, 255, 0.8 );
+        text-shadow: none;
+    }
+}
+
+.challenge-body
+{
+    flex-direction: column;
+    flex-grow: 1;
+    min-width: 0;
+    gap: 10px;
+    padding: 16px 0;
+}
+
+.challenge-title
+{
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    color: rgba( 255, 255, 255, 0.92 );
+    text-shadow: none;
+    white-space: nowrap;
+}
+
+.challenge-progress
+{
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
+
+.challenge-count
+{
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba( 255, 255, 255, 0.55 );
+    text-shadow: none;
+    white-space: nowrap;
+}
+
+// The reward column: an XP hexagon over the amount
+.challenge-reward
+{
+    width: 66px;
+    flex-shrink: 0;
+    align-self: stretch;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    border-left: 1px solid $line;
+}
+
+.xp-badge
+{
+    position: relative;
+    width: 32px;
+    height: 32px;
+}
+
+// Each layer fills the badge and centres its glyph
+.xp-layer
+{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.xp-hex
+{
+    font-size: 32px;
+    color: rgba( 255, 255, 255, 0.85 );
+    text-shadow: none;
+}
+
+.xp-hex-inner
+{
+    font-size: 27px;
+    color: #111215;
+    text-shadow: none;
+}
+
+.xp-text
+{
+    font-size: 10px;
+    font-weight: 700;
+    color: white;
+    text-shadow: none;
+}
+
+.challenge-xp
+{
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: white;
+    text-shadow: none;
+}
+
+.challenge.complete
+{
+    .challenge-icon
+    {
+        border-color: rgba( 255, 122, 26, 0.6 );
+        background-color: rgba( 255, 122, 26, 0.12 );
+
+        i { color: $accent; }
+    }
+
+    .challenge-title { color: rgba( 255, 255, 255, 0.55 ); }
+    .xp-hex { color: $accent; }
+    .challenge-xp { color: $accent; }
+}
+
+.side-link
+{
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    height: 50px;
+    padding: 0 18px;
+    cursor: pointer;
+
+    label
+    {
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 2.5px;
+        color: rgba( 255, 255, 255, 0.6 );
+        text-shadow: none;
+    }
+
+    i
+    {
+        font-size: 16px;
+        color: rgba( 255, 255, 255, 0.6 );
+        text-shadow: none;
+        transition: transform 0.2s $ease-out;
+    }
+
+    &:hover
+    {
+        label, i { color: white; }
+        i { transform: translateX( 4px ); }
+    }
+}
+
+// ── Your squad ─────────────────────────────────────────────────
+
+// Drawn over the friends card, so the privacy menu can drop down over it
+.squad-panel
+{
+    position: relative;
+    z-index: 10;
+}
+
+.squad-leave
+{
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: rgba( 255, 255, 255, 0.45 );
+    text-shadow: none;
+    cursor: pointer;
+
+    &:hover { color: #FF6B6B; }
+}
+
+.squad-member
+{
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 18px;
+    border-bottom: 1px solid $line;
+
+    &:last-child { border-bottom: 0; }
+}
+
+.squad-emblem
+{
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+}
+
+.squad-avatar
+{
+    width: 40px;
+    height: 40px;
+    margin: 0 2px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background-color: rgba( 255, 255, 255, 0.08 );
+}
+
+.squad-info
+{
+    flex-direction: column;
+    flex-grow: 1;
+    min-width: 0;
+    gap: 6px;
+}
+
+.squad-name-row
+{
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.squad-name
+{
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: white;
+    text-shadow: none;
+    white-space: nowrap;
+}
+
+// The party leader's crown: the same white crown the match overview uses, tinted gold.
+.squad-leader
+{
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    background-image: url( "/ui/crown.png" );
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image-tint: #F5C542;
+}
+
+.squad-level-row
+{
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+
+    .side-bar { max-width: 150px; }
+}
+
+.squad-level
+{
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: $accent;
+    text-shadow: none;
+}
+
+.squad-invite
+{
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    height: 52px;
+    padding: 0 18px;
+    border-bottom: 1px solid $line;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    &:last-child { border-bottom: 0; }
+
+    label
+    {
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 2.5px;
+        color: rgba( 255, 255, 255, 0.55 );
+        text-shadow: none;
+    }
+
+    &:hover
+    {
+        background-color: rgba( 255, 255, 255, 0.04 );
+
+        label { color: white; }
+        .squad-invite-plus { border-color: rgba( 255, 255, 255, 0.5 ); }
+    }
+}
+
+// Sits in the same column as the emblem above it
+.squad-invite-plus
+{
+    width: 28px;
+    height: 28px;
+    margin: 0 8px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba( 255, 255, 255, 0.18 );
+    border-radius: 2px;
+    background-color: rgba( 255, 255, 255, 0.03 );
+    transition: border-color 0.15s ease;
+
+    i
+    {
+        font-size: 18px;
+        color: rgba( 255, 255, 255, 0.75 );
+        text-shadow: none;
+    }
+}
+
+// ── Squad privacy (the cog and its menu) ───────────────────────
+
+.squad-cog
+{
+    width: 24px;
+    height: 24px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    i
+    {
+        font-size: 18px;
+        color: rgba( 255, 255, 255, 0.5 );
+        text-shadow: none;
+        transition: transform 0.25s $ease-out;
+    }
+
+    &:hover i { color: white; }
+
+    &.open i
+    {
+        color: $accent;
+        transform: rotate( 60deg );
+    }
+}
+
+// Drops down from the header over the rest of the sidebar, so opening it doesn't push the cards down.
+// Opaque: at 0.98 the friends card's heading still showed through.
+.squad-privacy
+{
+    position: absolute;
+    top: 50px;
+    left: -1px;
+    right: -1px;
+    z-index: 20;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 16px 16px;
+    background-color: rgb( 14, 15, 19 );
+    border: 1px solid rgba( 255, 255, 255, 0.14 );
+    border-top: 2px solid $accent;
+    box-shadow: 0 16px 36px rgba( 0, 0, 0, 0.55 );
+    animation: privacy-in 0.18s $ease-out;
+}
+
+@keyframes privacy-in
+{
+    0% { opacity: 0; transform: translateY( -6px ); }
+    100% { opacity: 1; transform: translateY( 0px ); }
+}
+
+.squad-privacy-title
+{
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: rgba( 255, 255, 255, 0.5 );
+    text-shadow: none;
+}
+
+.privacy-option
+{
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1px solid rgba( 255, 255, 255, 0.08 );
+    border-radius: 2px;
+    background-color: rgba( 255, 255, 255, 0.02 );
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+
+    &:hover
+    {
+        background-color: rgba( 255, 255, 255, 0.05 );
+        border-color: rgba( 255, 255, 255, 0.2 );
+    }
+
+    &.selected
+    {
+        border-color: rgba( 255, 122, 26, 0.6 );
+        background-color: rgba( 255, 122, 26, 0.1 );
+
+        .privacy-icon, .privacy-name, .privacy-check { color: $accent; }
+    }
+
+    // Someone else leads the squad
+    &.locked
+    {
+        cursor: default;
+        opacity: 0.45;
+
+        &:hover
+        {
+            background-color: rgba( 255, 255, 255, 0.02 );
+            border-color: rgba( 255, 255, 255, 0.08 );
+        }
+    }
+}
+
+.privacy-icon
+{
+    font-size: 20px;
+    flex-shrink: 0;
+    color: rgba( 255, 255, 255, 0.75 );
+    text-shadow: none;
+}
+
+.privacy-text
+{
+    flex-direction: column;
+    flex-grow: 1;
+    min-width: 0;
+    gap: 3px;
+}
+
+.privacy-name
+{
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: white;
+    text-shadow: none;
+}
+
+// Longer in French and German, so it wraps
+.privacy-desc
+{
+    font-size: 11px;
+    font-weight: 500;
+    color: rgba( 255, 255, 255, 0.55 );
+    text-shadow: none;
+    white-space: normal;
+}
+
+.privacy-check
+{
+    font-size: 18px;
+    flex-shrink: 0;
+    text-shadow: none;
+}
+
+.squad-privacy-note
+{
+    font-size: 11px;
+    font-weight: 500;
+    color: rgba( 255, 255, 255, 0.5 );
+    text-shadow: none;
+    white-space: normal;
+}
+
+// The setting's icon (as in the cog's menu), at the end of the invite row. Not its name: German's "OFFENER TRUPP"
+// pushed the row onto two lines.
+.squad-invite .squad-privacy-tag
+{
+    margin-left: auto;
+    font-size: 16px;
+    color: rgba( 255, 255, 255, 0.35 );
+    text-shadow: none;
+}
+
+.squad-invite:hover .squad-privacy-tag { color: rgba( 255, 255, 255, 0.6 ); }
+
+// A private squad: the invite row is a lock, which opens the privacy menu
+.squad-invite.locked
+{
+    label { color: rgba( 255, 255, 255, 0.4 ); }
+
+    .squad-invite-plus i
+    {
+        font-size: 16px;
+        color: rgba( 255, 255, 255, 0.55 );
+    }
+}
+
+// ── Friends ────────────────────────────────────────────────────
+
+// Takes what's left between the squad and the challenges, and its list scrolls
+.friends-panel
+{
+    flex-shrink: 1;
+    min-height: 150px;
+
+    // Only the list gives way: squeezed, the heading shrank to 34px
+    .side-head { flex-shrink: 0; }
+}
+
+.friends-list
+{
+    flex-direction: column;
+    flex-shrink: 1;
+    min-height: 0;
+    overflow: scroll;
+}
+
+.friends-empty
+{
+    padding: 16px 18px;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba( 255, 255, 255, 0.5 );
+    text-shadow: none;
+    white-space: normal;
+    border-bottom: 1px solid $line;
+}
+
+.friend-row
+{
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 12px;
+    padding: 10px 18px;
+    border-bottom: 1px solid $line;
+}
+
+.friend-avatar
+{
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background-color: rgba( 255, 255, 255, 0.08 );
+}
+
+.friend-info
+{
+    flex-direction: column;
+    flex-grow: 1;
+    min-width: 0;
+    gap: 4px;
+}
+
+.friend-name
+{
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: white;
+    text-shadow: none;
+    white-space: nowrap;
+}
+
+.friend-status
+{
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+
+    label
+    {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        color: rgba( 255, 255, 255, 0.5 );
+        text-shadow: none;
+    }
+}
+
+.status-dot
+{
+    width: 7px;
+    height: 7px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background-color: rgba( 255, 255, 255, 0.3 );
+}
+
+.friend-status.in-game
+{
+    .status-dot { background-color: $accent; }
+    label { color: $accent; }
+}
+
+.friend-status.online .status-dot { background-color: #4CD964; }
+.friend-status.away .status-dot { background-color: #F5C542; }
+
+.friend-invite
+{
+    flex-shrink: 0;
+    padding: 5px 10px;
+    border: 1px solid rgba( 255, 255, 255, 0.18 );
+    border-radius: 2px;
+    cursor: pointer;
+
+    label
+    {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        color: rgba( 255, 255, 255, 0.7 );
+        text-shadow: none;
+    }
+
+    &:hover
+    {
+        border-color: $accent;
+
+        label { color: $accent; }
+    }
+}
+
+.friends-all { flex-shrink: 0; }

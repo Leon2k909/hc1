@@ -99,6 +99,19 @@ public partial class EquipmentResource : GameResource
 	public bool DropOnDisconnect { get; set; } = false;
 
 	/// <summary>
+	/// Work in progress: tagged WIP in the gunsmith, and kept out of the Zombies weapon crate and wall-buys.
+	/// </summary>
+	[Category( "Base" )]
+	public bool IsWip { get; set; } = false;
+
+	/// <summary>
+	/// What still needs checking in-game. The gunsmith tags the gun and shows this under its description, only in the
+	/// editor and on the developer's account (AttachmentUnlocks.IsDeveloper). Clear it once everything's been checked.
+	/// </summary>
+	[Category( "Base" )]
+	public string ReviewNote { get; set; } = "";
+
+	/// <summary>
 	/// The equipment's icon
 	/// </summary>
 	[Group( "Base" ), ImageAssetPath] public string Icon { get; set; }

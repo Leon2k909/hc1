@@ -1,166 +1,318 @@
 @import "/UI/Styles/Theme.scss";
+@import "/UI/Styles/MenuPage.scss";
+
+$th-bg: #08090b;
+$th-warn: #ff6a5a;
 
 TheaterOverlay
 {
     position: absolute;
-    inset: 0;
-    pointer-events: none;
-    font-family: Inter, sans-serif;
-    display: flex;
+    left: 0; right: 0; top: 0; bottom: 0;
     flex-direction: column;
     justify-content: space-between;
-    padding: 40px;
-}
+    pointer-events: none;
+    color: white;
+    font-family: $main-font;
+    font-size: 16px;
 
-.theater-top
-{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    pointer-events: all;
+    label, i { text-shadow: none; }
 
-    .btn
+    .th-grow { flex-grow: 1; }
+
+    // Buttons, as the menus' (MenuPage.scss) but smaller, over the game.
+    .th-btn
     {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
+        @include menu-action;
+        min-height: 40px;
+        padding: 0 16px;
         gap: 8px;
-        background-color: rgba( 0, 0, 0, 0.6 );
-        padding: 10px 20px;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: all 0.2s;
-        border: 1px solid rgba( 255, 255, 255, 0.1 );
+        background-color: rgba( 26, 27, 30, 0.9 );
 
-        > i
-        {
-            font-family: Material Icons;
-            color: white;
-            font-size: 20px;
-        }
-
-        > label
-        {
-            color: white;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
-
-        &:hover
-        {
-            background-color: rgba( 255, 255, 255, 0.1 );
-        }
+        InputHint img { width: 24px; height: 24px; }
     }
 
-    .cam-info
+    .th-icon-btn
     {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 8px;
-        background-color: rgba( 0, 0, 0, 0.6 );
-        padding: 10px 20px;
-        border-radius: 4px;
-        border: 1px solid rgba( 255, 255, 255, 0.1 );
+        @include menu-action;
+        width: 40px;
+        min-height: 40px;
+        height: 40px;
+        padding: 0;
+        background-color: rgba( 26, 27, 30, 0.9 );
 
-        > label
+        i { font-size: 24px; }
+
+        &.play
         {
-            color: rgba( 255, 255, 255, 0.6 );
-            font-size: 14px;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
-
-        .val
-        {
-            color: white;
-        }
-    }
-}
-
-.theater-bottom
-{
-    display: flex;
-    justify-content: center;
-    pointer-events: all;
-
-    .controls
-    {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
-        background-color: rgba( 0, 0, 0, 0.8 );
-        padding: 24px;
-        border-radius: 8px;
-        border: 1px solid rgba( 255, 255, 255, 0.1 );
-        backdrop-filter: blur( 10px );
-        width: 600px;
-    }
-
-    .btn-group
-    {
-        display: flex;
-        flex-direction: row;
-        gap: 16px;
-
-        .btn.icon
-        {
-            display: flex;
-            justify-content: center;
-            align-items: center;
             width: 48px;
             height: 48px;
-            background-color: rgba( 255, 255, 255, 0.05 );
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.2s;
+            background-color: $menu-accent;
+            border-color: $menu-accent;
+            color: $th-bg;
 
-            > i
-            {
-                font-family: Material Icons;
-                color: white;
-                font-size: 24px;
-            }
-
-            &:hover
-            {
-                background-color: white;
-                transform: scale( 1.1 );
-                > i { color: black; }
-            }
+            i { font-size: 30px; }
+            &:hover { background-color: $menu-accent-hover; border-color: $menu-accent-hover; color: $th-bg; }
         }
     }
 
-    .timeline
+    // Loading and error: the whole screen, since the map isn't there yet.
+    .th-screen
     {
-        display: flex;
+        position: absolute;
+        left: 0; right: 0; top: 0; bottom: 0;
+        justify-content: center;
+        align-items: center;
+        pointer-events: all;
+        background-color: $th-bg;
+        background-image: linear-gradient( to bottom, #141416, $th-bg );
+    }
+
+    .th-card
+    {
+        @include menu-panel;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        min-width: 440px;
+        max-width: 640px;
+        padding: 32px 40px;
+        border-top: 2px solid $menu-accent;
+    }
+
+    .th-card-icon { font-size: 48px; color: $th-warn; }
+    .th-card-kicker { @include menu-section-title; }
+
+    .th-card-title
+    {
+        font-size: 30px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        text-align: center;
+    }
+
+    .th-card-text
+    {
+        font-size: 16px;
+        color: $menu-muted;
+        text-align: center;
+        margin-bottom: 12px;
+
+        &.pulse { animation: th-pulse 1.6s ease-in-out infinite; }
+    }
+
+    .th-top
+    {
+        flex-direction: row;
+        align-items: center;
+        flex-shrink: 0;
+        gap: 20px;
+        padding: 20px 32px 36px;
+        pointer-events: all;
+        background: linear-gradient( to bottom, rgba( 8, 9, 11, 0.85 ), rgba( 8, 9, 11, 0 ) );
+    }
+
+    .th-title
+    {
+        flex-direction: column;
+        min-width: 0;
+    }
+
+    .th-map
+    {
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    .th-sub
+    {
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: $menu-muted;
+    }
+
+    .th-follow
+    {
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .th-follow-info
+    {
+        flex-direction: column;
+        align-items: center;
+        min-width: 220px;
+    }
+
+    .th-follow-kicker { @include menu-section-title; font-size: 12px; }
+
+    .th-follow-name
+    {
+        font-size: 22px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .th-follow-state
+    {
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: $menu-muted;
+
+        &.dead { color: $th-warn; }
+    }
+
+    .th-bottom
+    {
+        flex-direction: column;
+        flex-shrink: 0;
+        gap: 10px;
+        padding: 40px 32px 20px;
+        pointer-events: all;
+        background: linear-gradient( to top, rgba( 8, 9, 11, 0.9 ), rgba( 8, 9, 11, 0 ) );
+    }
+
+    .th-controls
+    {
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .th-time
+    {
+        min-width: 150px;
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: 1px;
+    }
+
+    .th-speeds
+    {
+        flex-direction: row;
+        gap: 4px;
+        margin-left: 14px;
+    }
+
+    .th-speed
+    {
+        justify-content: center;
+        align-items: center;
+        min-width: 52px;
+        height: 34px;
+        padding: 0 8px;
+        border: 1px solid rgba( white, 0.12 );
+        border-radius: 2px;
+        background-color: rgba( 26, 27, 30, 0.8 );
+        cursor: pointer;
+
+        label { font-size: 14px; font-weight: 700; color: rgba( white, 0.7 ); }
+
+        &:hover { border-color: $menu-accent; sound-in: ui_button_hover; label { color: white; } }
+
+        &.selected
+        {
+            border-color: $menu-accent;
+            background-color: rgba( 255, 122, 26, 0.18 );
+
+            label { color: white; }
+        }
+    }
+
+    .th-hints
+    {
         flex-direction: row;
         align-items: center;
         gap: 16px;
-        width: 100%;
+        margin-right: 12px;
+    }
 
-        > label
+    .th-hint
+    {
+        flex-direction: row;
+        align-items: center;
+        gap: 2px;
+
+        InputHint img { width: 26px; height: 26px; }
+
+        label
         {
-            color: white;
-            font-family: monospace;
-            font-size: 14px;
-        }
-
-        .timeline-track
-        {
-            flex: 1;
-            height: 6px;
-            background-color: rgba( 255, 255, 255, 0.2 );
-            border-radius: 3px;
-            overflow: hidden;
-
-            .timeline-fill
-            {
-                height: 100%;
-                background-color: #4CAF50;
-                transition: width 0.1s linear;
-            }
+            margin-left: 4px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: $menu-muted;
         }
     }
+
+    // The seek bar. Only its root takes the mouse (see TheaterTimeline.razor).
+    TheaterTimeline
+    {
+        flex-shrink: 0;
+        padding: 8px 0;
+        cursor: pointer;
+
+        .tl-track
+        {
+            position: relative;
+            width: 100%;
+            height: 6px;
+            background-color: rgba( white, 0.16 );
+            pointer-events: none;
+        }
+
+        .tl-fill
+        {
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            background-color: $menu-accent;
+            pointer-events: none;
+        }
+
+        // Where the followed soldier died.
+        .tl-death
+        {
+            position: absolute;
+            top: -4px;
+            width: 3px;
+            height: 14px;
+            margin-left: -1px;
+            background-color: $th-warn;
+            pointer-events: none;
+        }
+
+        .tl-thumb
+        {
+            position: absolute;
+            top: -5px;
+            width: 16px;
+            height: 16px;
+            margin-left: -8px;
+            border-radius: 8px;
+            background-color: white;
+            pointer-events: none;
+        }
+
+        &:hover .tl-track { background-color: rgba( white, 0.24 ); }
+    }
+
+    &.narrow
+    {
+        .th-hints { display: none; }
+        .th-follow-info { min-width: 160px; }
+    }
+}
+
+@keyframes th-pulse
+{
+    0% { opacity: 0.45; }
+    50% { opacity: 1; }
+    100% { opacity: 0.45; }
 }

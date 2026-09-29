@@ -1,0 +1,167 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc30:version{8c2d7a91-9c42-4bf0-883a-5a3b1762d4f1} -->
+{
+	rootNode = 
+	{
+		_class = "RootNode"
+		children = 
+		[
+			{
+				_class = "MaterialGroupList"
+				children = 
+				[
+					{
+						_class = "DefaultMaterialGroup"
+						remaps = 
+						[
+							{
+								from = "weapon_vm_sm_papa90_body.vmat"
+								to = "weapons/p90/materials/p90_body.vmat"
+							},
+							{
+								from = "weapon_vm_sm_papa90_rail.vmat"
+								to = "weapons/p90/materials/p90_rail.vmat"
+							},
+							{
+								from = "weapon_vm_papa90_sights.vmat"
+								to = "weapons/p90/materials/p90_sights.vmat"
+							},
+							{
+								from = "weapon_vm_sm_papa90_mag.vmat"
+								to = "weapons/p90/materials/p90_mag.vmat"
+							},
+							{
+								from = "weapon_vm_sm_papa90_mag_trans.vmat"
+								to = "weapons/p90/materials/p90_mag_shell.vmat"
+							},
+							{
+								from = "weapon_vm_papa90_body.vmat"
+								to = "weapons/p90/materials/p90_body.vmat"
+							},
+							{
+								from = "weapon_vm_sm_papa90_mag_trans_interior.vmat"
+								to = "weapons/p90/materials/p90_mag_shell.vmat"
+							},
+						]
+						use_global_default = false
+						global_default_material = ""
+					},
+				]
+			},
+			{
+				_class = "RenderMeshList"
+				children = 
+				[
+					{
+						_class = "RenderMeshFile"
+						name = "w_p90"
+						filename = "weapons/p90/models/w_p90.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_p90_muzzle_tip"
+						filename = "weapons/p90/models/w_p90_muzzle_tip.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_p90_iron_sights"
+						filename = "weapons/p90/models/w_p90_iron_sights.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+				]
+			},
+			{
+				_class = "BodyGroupList"
+				children = 
+				[
+					{
+						_class = "BodyGroup"
+						name = "muzzle_tip"
+						children = 
+						[
+							{
+								_class = "BodyGroupChoice"
+								name = "on"
+								meshes = 
+								[
+									"w_p90_muzzle_tip",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "off"
+								meshes = 
+								[
+									"",
+								]
+							},
+						]
+						hidden_in_tools = false
+					},
+					{
+						_class = "BodyGroup"
+						name = "iron_sights"
+						children = 
+						[
+							{
+								_class = "BodyGroupChoice"
+								name = "on"
+								meshes = 
+								[
+									"w_p90_iron_sights",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "off"
+								meshes = 
+								[
+									"",
+								]
+							},
+						]
+						hidden_in_tools = false
+					},
+				]
+			},
+		]
+		model_archetype = ""
+		primary_associated_entity = ""
+		anim_graph_name = ""
+		base_model_name = ""
+	}
+}

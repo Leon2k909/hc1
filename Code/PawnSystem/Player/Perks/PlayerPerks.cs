@@ -47,13 +47,13 @@ public partial class PlayerPerks : Component
 	}
 
 	/// <summary>
-	/// Returns true if the player has a perk with this exact name equipped.
+	/// Returns true if the player has this perk equipped, by its resource name (the .perk file's name: "ninja").
 	/// </summary>
 	public bool HasPerk( string perkName )
 	{
-		if ( Perk1 != null && Perk1.Name.Equals( perkName, System.StringComparison.OrdinalIgnoreCase ) ) return true;
-		if ( Perk2 != null && Perk2.Name.Equals( perkName, System.StringComparison.OrdinalIgnoreCase ) ) return true;
-		if ( Perk3 != null && Perk3.Name.Equals( perkName, System.StringComparison.OrdinalIgnoreCase ) ) return true;
+		if ( Perk1 != null && Perk1.ResourceName.Equals( perkName, System.StringComparison.OrdinalIgnoreCase ) ) return true;
+		if ( Perk2 != null && Perk2.ResourceName.Equals( perkName, System.StringComparison.OrdinalIgnoreCase ) ) return true;
+		if ( Perk3 != null && Perk3.ResourceName.Equals( perkName, System.StringComparison.OrdinalIgnoreCase ) ) return true;
 
 		return false;
 	}

@@ -14,6 +14,7 @@ import sys
 import uuid
 from pathlib import Path
 
+import part_names
 from audit_mw19_mp5 import BASE, SMG, active_choices, attachment_source
 from convert_mpapa5_smd import parse_triangles, write_obj_mesh
 
@@ -200,8 +201,8 @@ def modeldoc(key: str, meshes: list[Path], available: dict[str, Path]) -> str:
 
 def convert_choice(original: str, base_key: str, category: str, available: dict[str, Path]) -> None:
     name, source = source_model(base_key)
-    if base_key == "att_vm_angledgrip01_smg":
-        name = attachment_source("att_vm_angledgrip01")[1] or "Commando Foregrip"
+    # Our name (part_names.py), never the workshop's CoD one.
+    name = part_names.name(original, name)
     meshes = decompile(original, source)
     output = DEST_MODELS / original
     output.mkdir(parents=True, exist_ok=True)
@@ -262,7 +263,7 @@ def convert_choice(original: str, base_key: str, category: str, available: dict[
         "MainPrefab": {"_type": "gameobject", "prefab": f"attachments/mpapa5/prefabs/{original}.prefab"},
         "EligibleEquipment": [MP5],
         "RequiredLevel": 0,
-        "Description": f"MW2019 {category.lower()} fitted for the existing MP5.",
+        "Description": "",
         "__references": [],
         "__version": 0,
     })

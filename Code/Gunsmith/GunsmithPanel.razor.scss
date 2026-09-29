@@ -1,2018 +1,2657 @@
 @import "/UI/Styles/Theme.scss";
+@import "/UI/Styles/Breadcrumbs.scss";
 
-$gs-accent: rgba( 255, 180, 0, 0.92 );
-$gs-accent-dim: rgba( 255, 180, 0, 0.55 );
-$gs-panel-bg: rgba( 0, 0, 0, 0.52 );
-$gs-panel-bg-light: rgba( 255, 255, 255, 0.06 );
-$gs-text-dim: rgba( 255, 255, 255, 0.55 );
-$gs-text-mid: rgba( 255, 255, 255, 0.72 );
+// The gunsmith, laid out like the main menu: its header, a breadcrumb bar, then the loadout (left), the weapon on its
+// stand (centre, framed by GunsmithController in .gs-stage) and the build or paint options (right).
+
+$accent: #FF7A1A;
+$accent-light: #FF9A4D;
+$accent-ink: #16100A;
+$nav-height: 76px;
+$ease-out: cubic-bezier( 0.23, 1, 0.32, 1 );
+
+$panel-bg: rgba( 12, 14, 17, 0.72 );
+$panel-border: rgba( 255, 255, 255, 0.09 );
+$card-bg: rgba( 255, 255, 255, 0.035 );
+$card-hover: rgba( 255, 255, 255, 0.07 );
+$line: rgba( 255, 255, 255, 0.08 );
+$text-dim: rgba( 255, 255, 255, 0.5 );
+$text-mid: rgba( 255, 255, 255, 0.72 );
+$good: #7BD66B;
+$bad: #FF5C4D;
+$caution: #FFC83D;
 
 GunsmithPanel
 {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	justify-content: center;
-	align-items: center;
-	font-weight: bold;
-	flex-direction: column;
-	pointer-events: none;
-
-	// ===================== TOP BAR =====================
-	.gs-topbar
-	{
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		height: 76px;
-		background-color: rgba( 0, 0, 0, 0.72 );
-		backdrop-filter: blur( 16px );
-		flex-direction: row;
-		align-items: center;
-		padding: 0 24px;
-		gap: 24px;
-		z-index: 200;
-		border-bottom: 1px solid rgba( 255, 180, 0, 0.25 );
-		pointer-events: all;
-	}
-
-	.gs-brand
-	{
-		flex-direction: row;
-		align-items: center;
-		gap: 12px;
-		flex-shrink: 0;
-	}
-
-	.gs-brand-logo
-	{
-		width: 52px;
-		height: 30px;
-	}
-
-	.gs-brand-text
-	{
-		flex-direction: column;
-		gap: 1px;
-	}
-
-	.gs-brand-name
-	{
-		font-size: 19px;
-		font-weight: bold;
-		color: white;
-		letter-spacing: 2.5px;
-	}
-
-	.gs-brand-sub
-	{
-		font-size: 14px;
-		color: $gs-accent;
-		letter-spacing: 3px;
-	}
-
-	.gs-weapon-title
-	{
-		flex-direction: column;
-		flex-grow: 1;
-		align-items: center;
-		gap: 2px;
-	}
-
-	.gs-weapon-name
-	{
-		font-size: 30px;
-		font-weight: bold;
-		color: white;
-		letter-spacing: 1px;
-	}
-
-	.gs-weapon-class
-	{
-		font-size: 15px;
-		color: $gs-text-mid;
-		letter-spacing: 1.5px;
-	}
-
-	.gs-topbar-actions
-	{
-		flex-direction: row;
-		gap: 8px;
-		flex-shrink: 0;
-	}
-
-	.gs-icon-btn
-	{
-		flex-direction: row;
-		align-items: center;
-		gap: 5px;
-		padding: 6px 18px;
-		background-color: $gs-panel-bg-light;
-		border-radius: 3px;
-		cursor: pointer;
-		pointer-events: all;
-		color: $gs-text-mid;
-		font-size: 17px;
-		transition: background-color 0.1s ease, color 0.1s ease;
-
-		label
-		{
-			font-size: 17px;
-		}
-
-		i
-		{
-			font-size: 22px;
-		}
-
-		&:hover
-		{
-			background-color: rgba( 255, 255, 255, 0.16 );
-			color: white;
-		}
-
-		&.danger
-		{
-			color: rgba( 220, 80, 80, 0.9 );
-
-			&:hover
-			{
-				background-color: rgba( 220, 80, 80, 0.2 );
-				color: rgba( 255, 100, 100, 1 );
-			}
-		}
-	}
-
-	.gs-share-backdrop
-	{
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background-color: rgba( 0, 0, 0, 0.42 );
-		backdrop-filter: blur( 4px );
-		align-items: center;
-		justify-content: center;
-		z-index: 500;
-		pointer-events: all;
-	}
-
-	.gs-share-modal
-	{
-		width: 660px;
-		max-width: 94%;
-		max-height: 90%;
-		overflow-y: scroll;
-		background-color: rgba( 7, 7, 8, 0.94 );
-		border: 1px solid rgba( 255, 255, 255, 0.16 );
-		border-radius: 4px;
-		box-shadow: 0 16px 40px rgba( 0, 0, 0, 0.55 );
-		padding: 24px;
-		flex-direction: column;
-		gap: 14px;
-	}
-
-	.gs-share-header
-	{
-		flex-direction: row;
-		align-items: center;
-		justify-content: space-between;
-		margin-bottom: 2px;
-	}
-
-	.gs-share-title
-	{
-		flex-direction: column;
-		gap: 2px;
-
-		label
-		{
-			font-size: 24px;
-			color: white;
-			letter-spacing: 1.5px;
-		}
-
-		.gs-share-weapon
-		{
-			font-size: 15px;
-			color: $gs-accent;
-			letter-spacing: 2px;
-		}
-	}
-
-	.gs-share-close
-	{
-		width: 46px;
-		height: 46px;
-		align-items: center;
-		justify-content: center;
-		background-color: rgba( 255, 255, 255, 0.08 );
-		border-radius: 3px;
-		color: $gs-text-mid;
-		cursor: pointer;
-
-		i
-		{
-			font-size: 26px;
-		}
-
-		&:hover
-		{
-			background-color: rgba( 220, 80, 80, 0.2 );
-			color: rgba( 255, 100, 100, 1 );
-		}
-	}
-
-	.gs-share-label
-	{
-		font-size: 15px;
-		color: $gs-accent;
-		letter-spacing: 2px;
-		margin-top: 6px;
-	}
-
-	.gs-share-code
-	{
-		height: 96px;
-		background-color: rgba( 255, 255, 255, 0.06 );
-		border: 1px solid rgba( 255, 255, 255, 0.14 );
-		border-radius: 3px;
-		color: white;
-		font-size: 16px;
-		font-family: monospace;
-		padding: 12px;
-		pointer-events: all;
-
-		label
-		{
-			font-size: 16px;
-		}
-
-		&.import
-		{
-			height: 80px;
-		}
-	}
-
-	.gs-share-actions
-	{
-		flex-direction: row;
-		gap: 8px;
-	}
-
-	.gs-share-button
-	{
-		height: 50px;
-		padding: 0 18px;
-		flex-direction: row;
-		align-items: center;
-		justify-content: center;
-		gap: 8px;
-		background-color: rgba( 255, 255, 255, 0.10 );
-		border: 1px solid rgba( 255, 255, 255, 0.12 );
-		border-radius: 3px;
-		color: white;
-		font-size: 17px;
-		cursor: pointer;
-		pointer-events: all;
-
-		label
-		{
-			font-size: 17px;
-		}
-
-		i
-		{
-			font-size: 22px;
-		}
-
-		&:hover
-		{
-			background-color: rgba( 255, 255, 255, 0.18 );
-		}
-
-		&.primary
-		{
-			background-color: $gs-accent;
-			border-color: rgba( 255, 210, 90, 0.85 );
-			color: black;
-		}
-
-		&.import
-		{
-			margin-top: 2px;
-			align-self: flex-start;
-		}
-	}
-
-	.gs-share-message
-	{
-		font-size: 16px;
-		color: rgba( 170, 235, 170, 0.95 );
-
-		&.error
-		{
-			color: rgba( 255, 115, 105, 0.95 );
-		}
-	}
-
-	// ===================== TABS =====================
-	.gs-mode-tabs
-	{
-		position: absolute;
-		top: 76px;
-		left: 0;
-		right: 0;
-		height: 68px;
-		background-color: rgba( 0, 0, 0, 0.4 );
-		flex-direction: row;
-		justify-content: center;
-		align-items: center;
-		gap: 12px;
-		z-index: 100;
-		pointer-events: all;
-	}
-
-	.gs-mode-tab
-	{
-		min-width: 150px;
-		height: 52px;
-		font-size: 19px;
-		letter-spacing: 2.5px;
-		color: $gs-text-dim;
-		cursor: pointer;
-		padding: 0 26px;
-		align-items: center;
-		justify-content: center;
-		gap: 10px;
-
-		label { font-size: 19px; letter-spacing: 2.5px; }
-		i { font-size: 24px; }
-		background-color: rgba( 255, 255, 255, 0.05 );
-		border: 1px solid rgba( 255, 255, 255, 0.08 );
-		border-radius: 3px;
-		transition: background-color 0.1s ease, border-color 0.1s ease, color 0.1s ease;
-
-		&:hover
-		{
-			color: $gs-accent;
-			background-color: rgba( 255, 255, 255, 0.1 );
-			border-color: rgba( 255, 255, 255, 0.16 );
-		}
-
-		&.active
-		{
-			color: black;
-			background-color: $gs-accent;
-			border-color: rgba( 255, 210, 90, 0.9 );
-		}
-	}
-
-	// ===================== TOP LEFT: CLASS SELECTOR =====================
-	.gs-class-panel
-	{
-		position: absolute;
-		left: 24px;
-		top: 156px;
-		width: 420px;
-		max-width: 90%;
-		background-color: $gs-panel-bg;
-		backdrop-filter: blur( 12px );
-		border-radius: $rounding;
-		border: 1px solid rgba( 255, 255, 255, 0.06 );
-		padding: 16px;
-		gap: 12px;
-		flex-direction: column;
-		pointer-events: all;
-
-		&.has-many-classes
-		{
-			.gs-class-strip
-			{
-				flex-wrap: nowrap;
-				overflow-x: scroll;
-			}
-
-			.gs-class-slot
-			{
-				flex: 0 0 96px;
-				height: 62px;
-			}
-
-			.gs-add-class
-			{
-				height: 62px;
-			}
-		}
-	}
-
-	// ===================== LEFT: ARMORY =====================
-	.weapon-browser
-	{
-		position: absolute;
-		left: 24px;
-		top: 340px;
-		bottom: 24px;
-		width: 420px;
-		background-color: $gs-panel-bg;
-		backdrop-filter: blur( 12px );
-		border-radius: $rounding;
-		border: 1px solid rgba( 255, 255, 255, 0.06 );
-		padding: 18px;
-		gap: 12px;
-		flex-direction: column;
-		pointer-events: all;
-		overflow: hidden;
-
-		&.is-hidden { display: none; }
-	}
-
-	.gs-panel-label
-	{
-		font-size: 18px;
-		letter-spacing: 2px;
-		color: $gs-accent;
-		text-transform: uppercase;
-		margin-bottom: 6px;
-	}
-
-	.browser-tabs
-	{
-		flex-direction: row;
-		gap: 6px;
-	}
-
-	.browser-tab,
-	.weapon-option
-	{
-		background-color: $gs-panel-bg-light;
-		color: $gs-text-mid;
-		border-radius: 3px;
-		border: 0;
-		cursor: pointer;
-		font-weight: bold;
-		pointer-events: all;
-		transition: background-color 0.08s ease, color 0.08s ease;
-
-		&:hover
-		{
-			background-color: rgba( white, 0.16 );
-			color: white;
-		}
-
-		&.active
-		{
-			background-color: $gs-accent;
-			color: black;
-		}
-	}
-
-	.browser-tab
-	{
-		flex-grow: 1;
-		height: 28px;
-		align-items: center;
-		justify-content: center;
-		font-size: 13px;
-		text-transform: uppercase;
-		letter-spacing: 0.5px;
-	}
-
-	.weapon-list
-	{
-		flex-direction: column;
-		flex-grow: 1;
-		flex-shrink: 1;
-		min-height: 0;
-		gap: 8px;
-		overflow-y: scroll;
-	}
-
-	.weapon-option
-	{
-		height: 42px;
-		flex-shrink: 0;
-		padding: 0 50px 0 16px;
-		align-items: center;
-		justify-content: space-between;
-		gap: 10px;
-		font-size: 20px;
-		position: relative;
-		background-color: $gs-panel-bg-light;
-		color: $gs-text-mid;
-		border-radius: 3px;
-		cursor: pointer;
-		pointer-events: all;
-		transition: background-color 0.08s ease, color 0.08s ease;
-
-		&:hover
-		{
-			background-color: rgba( 255, 255, 255, 0.16 );
-			color: white;
-		}
-
-		&.active
-		{
-			background-color: $gs-accent;
-			color: black;
-		}
-
-		&.loadout
-		{
-			border-left: 3px solid $gs-accent;
-		}
-	}
-
-	.weapon-name
-	{
-		font-size: 20px;
-		white-space: nowrap;
-		flex-grow: 1;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
-	.weapon-lv
-	{
-		font-size: 15px;
-		color: $gs-text-dim;
-		letter-spacing: 0.5px;
-		margin-left: 8px;
-		flex-shrink: 0;
-	}
-
-	.weapon-state
-	{
-		font-size: 14px;
-		letter-spacing: 0.8px;
-		color: $gs-accent;
-		margin-left: 8px;
-		flex-shrink: 0;
-	}
-
-	.favorite-icon
-	{
-		font-size: 24px;
-	}
-
-	.weapon-option.active .weapon-state
-	{
-		color: rgba( 0, 0, 0, 0.7 );
-	}
-
-	.weapon-option.active .weapon-lv
-	{
-		color: rgba( 0, 0, 0, 0.5 );
-	}
-
-	// ── Class selector strip ────────────────────────────────────────────
-	.gs-class-strip
-	{
-		flex-direction: row;
-		flex-wrap: nowrap;
-		gap: 8px;
-		flex-shrink: 0;
-		overflow-x: scroll;
-	}
-
-	.gs-class-slot
-	{
-		flex: 0 0 88px;
-		height: 70px;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		padding: 10px 8px;
-		background-color: rgba( 255, 255, 255, 0.05 );
-		border: 1px solid rgba( 255, 255, 255, 0.08 );
-		border-radius: 4px;
-		cursor: pointer;
-		gap: 5px;
-		transition: background-color 0.1s ease, border-color 0.1s ease;
-
-		.gs-class-num
-		{
-			font-size: 14px;
-			font-weight: 900;
-			color: rgba( 255, 255, 255, 0.35 );
-			letter-spacing: 1px;
-		}
-
-		.gs-class-name
-		{
-			font-size: 12px;
-			font-weight: 800;
-			color: rgba( 255, 255, 255, 0.6 );
-			letter-spacing: 0;
-			text-align: center;
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			width: 100%;
-		}
-
-		&:hover
-		{
-			background-color: rgba( 255, 255, 255, 0.12 );
-			border-color: rgba( 255, 255, 255, 0.18 );
-			.gs-class-name { color: rgba( 255, 255, 255, 0.9 ); }
-			.gs-class-num  { color: rgba( 255, 255, 255, 0.5 ); }
-		}
-
-		&.active
-		{
-			background-color: rgba( 255, 180, 0, 0.18 );
-			border-color: rgba( 255, 180, 0, 0.6 );
-			border-bottom-width: 2px;
-
-			.gs-class-num  { color: $gs-accent; }
-			.gs-class-name { color: white; font-weight: 900; letter-spacing: 0; }
-		}
-	}
-
-	.gs-add-class
-	{
-		flex: 0 0 42px;
-		height: 70px;
-		background-color: transparent;
-		border: 1px solid rgba( 255, 255, 255, 0.2 );
-		align-items: center;
-		justify-content: center;
-		cursor: pointer;
-		border-radius: 2px;
-		color: rgba( 255, 255, 255, 0.3 );
-
-		i { font-size: 16px; }
-
-		&:hover
-		{
-			border-color: rgba( 255, 255, 255, 0.5 );
-			color: white;
-			background-color: rgba( 255, 255, 255, 0.05 );
-		}
-	}
-
-	.gs-class-actions
-	{
-		flex-direction: row;
-		gap: 8px;
-		align-items: center;
-		justify-content: space-between;
-	}
-
-	.gs-rename-input
-	{
-		flex-grow: 1;
-		background-color: rgba( 0, 0, 0, 0.5 );
-		border: 1px solid rgba( 255, 255, 255, 0.1 );
-		color: white;
-		font-size: 20px;
-		font-weight: bold;
-		padding: 8px 14px;
-		border-radius: 2px;
-
-		label
-		{
-			font-size: 20px;
-		}
-
-		&:focus
-		{
-			border-color: $gs-accent;
-		}
-	}
-
-	.gs-action-btn
-	{
-		width: 34px;
-		height: 34px;
-		background-color: rgba( 255, 255, 255, 0.05 );
-		border: 1px solid rgba( 255, 255, 255, 0.1 );
-		border-radius: 2px;
-		cursor: pointer;
-		color: $gs-text-mid;
-		font-size: 14px;
-		align-items: center;
-		justify-content: center;
-
-		&:hover
-		{
-			background-color: rgba( 255, 255, 255, 0.15 );
-			color: white;
-		}
-
-		&.danger:hover
-		{
-			background-color: rgba( 220, 80, 80, 0.2 );
-			color: rgba( 255, 100, 100, 1 );
-			border-color: rgba( 220, 80, 80, 0.5 );
-		}
-	}
-
-	// ── Section header ───────────────────────────────────────────────────
-	.gs-armory-section
-	{
-		height: 22px;
-		flex-shrink: 0;
-		align-items: center;
-		font-size: 15px;
-		font-weight: 800;
-		letter-spacing: 3px;
-		color: rgba( 255, 255, 255, 0.46 );
-	}
-
-	// ── Weapon / equipment slot rows ─────────────────────────────────────
-	.gs-slot-list
-	{
-		flex-direction: column;
-		flex-shrink: 0;
-		gap: 8px;
-	}
-
-	.gs-slot-row
-	{
-		flex-direction: row;
-		align-items: center;
-		gap: 14px;
-		height: 56px;
-		padding: 0 16px;
-		background-color: rgba( 255, 255, 255, 0.04 );
-		border: 1px solid rgba( 255, 255, 255, 0.06 );
-		border-left: 4px solid transparent;
-		cursor: pointer;
-
-		&:hover
-		{
-			background-color: rgba( 255, 255, 255, 0.09 );
-		}
-
-		&.active
-		{
-			border-left-color: $gs-accent;
-			background-color: rgba( 255, 180, 0, 0.07 );
-		}
-
-		&.empty .gs-slot-weapon-name
-		{
-			color: rgba( 255, 255, 255, 0.62 );
-		}
-	}
-
-	.gs-slot-row-sm
-	{
-		height: 50px;
-		padding: 0 16px;
-	}
-
-	.gs-slot-copy
-	{
-		flex-direction: column;
-		flex-grow: 1;
-		min-width: 0;
-		gap: 4px;
-	}
-
-	.gs-slot-type-badge
-	{
-		font-size: 14px;
-		font-weight: 900;
-		letter-spacing: 2px;
-		color: $gs-accent-dim;
-		white-space: nowrap;
-	}
-
-	.gs-slot-weapon-name
-	{
-		font-size: 15px;
-		font-weight: 800;
-		color: white;
-		letter-spacing: 0.5px;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
-	.gs-slot-lv
-	{
-		font-size: 15px;
-		font-weight: 700;
-		color: $gs-accent-dim;
-		letter-spacing: 0.5px;
-		flex-shrink: 0;
-	}
-
-	.gs-slot-arrow
-	{
-		font-size: 16px;
-		color: rgba( 255, 255, 255, 0.28 );
-		flex-shrink: 0;
-	}
-
-	// ── Perk row ─────────────────────────────────────────────────────────
-	.gs-perk-row
-	{
-		flex-direction: row;
-		flex-shrink: 0;
-		gap: 10px;
-	}
-
-	.gs-perk-slot
-	{
-		flex: 1;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		height: 116px;
-		padding: 8px;
-		background-color: rgba( 255, 255, 255, 0.04 );
-		border: 1px solid rgba( 255, 255, 255, 0.07 );
-		cursor: pointer;
-		gap: 6px;
-
-		.gs-perk-icon
-		{
-			font-size: 18px;
-			color: rgba( 255, 255, 255, 0.5 );
-		}
-
-		.gs-perk-label
-		{
-			font-size: 17px;
-			font-weight: 800;
-			color: white;
-			letter-spacing: 0.2px;
-			text-align: center;
-			// These tiles are only ~120px wide, so a name like "Sleight of Hand" can never fit on one
-			// line — wrapping keeps it readable where an ellipsis just hid it.
-			white-space: normal;
-			line-height: 1.15;
-			width: 100%;
-		}
-
-		.gs-perk-sub
-		{
-			font-size: 10px;
-			font-weight: 700;
-			color: rgba( 255, 255, 255, 0.3 );
-			letter-spacing: 1px;
-		}
-
-		&:hover
-		{
-			background-color: rgba( 255, 255, 255, 0.09 );
-			.gs-perk-icon { color: white; }
-		}
-
-		&.active
-		{
-			border-color: rgba( 255, 180, 0, 0.5 );
-			background-color: rgba( 255, 180, 0, 0.1 );
-			.gs-perk-icon  { color: $gs-accent; }
-			.gs-perk-sub   { color: $gs-accent-dim; }
-		}
-
-		&.empty .gs-perk-icon { color: rgba( 255, 255, 255, 0.18 ); }
-		&.empty .gs-perk-label { color: rgba( 255, 255, 255, 0.3 ); }
-	}
-
-	// ── Category tabs inside weapon list ─────────────────────────────────
-	.gs-cat-tabs
-	{
-		flex-direction: row;
-		flex-wrap: wrap;
-		height: 82px;
-		flex-shrink: 0;
-		gap: 6px;
-		align-content: flex-start;
-		margin: 4px 0 10px 0;
-	}
-
-	.gs-cat-tab
-	{
-		height: 38px;
-		min-width: 0;
-		padding: 0 8px;
-		font-size: 12px;
-		font-weight: 800;
-		letter-spacing: 0.2px;
-		color: rgba( 255, 255, 255, 0.5 );
-		background-color: rgba( 255, 255, 255, 0.05 );
-		border: 0;
-		cursor: pointer;
-		flex: 1 1 116px;
-		text-align: center;
-		white-space: normal;
-		line-height: 12px;
-		justify-content: center;
-		align-items: center;
-
-		&:hover { background-color: rgba( 255, 255, 255, 0.12 ); color: white; }
-		&.active { background-color: $gs-accent; color: black; }
-	}
-
-	// ===================== BACKGROUND VIGNETTE =====================
-	.gs-bg-vignette
-	{
-		position: absolute;
-		left: 0;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		pointer-events: none;
-		z-index: -1;
-		background-image: radial-gradient( rgba( 30, 30, 40, 0.0 ), rgba( 10, 10, 15, 0.6 ) 55%, rgba( 0, 0, 0, 0.92 ) );
-	}
-
-	// ===================== BOTTOM BAR =====================
-	.gs-bottom
-	{
-		position: absolute;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		height: 46%;
-		max-height: 560px;
-		overflow: hidden;
-		background-color: rgba( 0, 0, 0, 0.72 );
-		backdrop-filter: blur( 12px );
-		border-top: 1px solid rgba( 255, 180, 0, 0.2 );
-		flex-direction: column;
-		align-items: center;
-		padding: 8px 24px 10px 24px;
-		pointer-events: all;
-
-		// In Build mode the armory fills the left column and the attachments fill the right, so the
-		// weapon card floats between them under the gun. In Customise both columns are hidden, so the
-		// camo drawer stays full-width.
-		&.build-mode
-		{
-			left: 468px;
-			right: 488px;
-			bottom: 24px;
-			height: auto;
-			max-height: 100%;
-			overflow: visible;
-			padding: 16px 24px;
-			border: 1px solid #46515a;
-			border-radius: 2px;
-		}
-	}
-
-	// Sits just above the weapon card, so it reads as a caption for the preview.
-	.gs-view-hint
-	{
-		position: absolute;
-		top: -42px;
-		left: 0;
-		right: 0;
-		justify-content: center;
-		text-align: center;
-		font-size: 15px;
-		letter-spacing: 1.5px;
-		color: #aebbc5;
-		pointer-events: none;
-	}
-
-	.gs-camo-panel
-	{
-		flex-direction: column;
-		gap: 12px;
-		width: 100%;
-		padding: 10px 0;
-
-		.camo-grid
-		{
-			flex-direction: row;
-			flex-wrap: wrap;
-			gap: 12px;
-			max-height: 200px;
-			overflow-y: scroll;
-
-			.camo-swatch
-			{
-				width: 64px;
-				height: 64px;
-				border-radius: 4px;
-				border: 2px solid rgba( 255, 255, 255, 0.1 );
-				cursor: pointer;
-				transition: all 0.1s ease;
-				align-items: center;
-				justify-content: center;
-
-				i
-				{
-					font-size: 32px;
-					color: white;
-					text-shadow: 0 2px 4px rgba( 0, 0, 0, 0.5 );
-				}
-
-				&:hover
-				{
-					border-color: rgba( 255, 255, 255, 0.5 );
-					transform: scale( 1.05 );
-				}
-
-				&.active
-				{
-					border-color: $gs-accent;
-					box-shadow: 0 0 12px $gs-accent-dim;
-				}
-			}
-		}
-	}
-
-	// ===================== CUSTOMIZE: camos / charms / stickers =====================
-	.gs-customize-row
-	{
-		flex-direction: column;
-		gap: 12px;
-		width: 100%;
-		height: 100%;
-		padding: 4px 0;
-		justify-content: flex-start;
-		align-items: center;
-		min-height: 0;
-	}
-
-	.gs-tab-nav
-	{
-		flex-direction: row;
-		gap: 4px;
-		flex-wrap: wrap;
-		flex-shrink: 0;
-		width: 100%;
-		max-width: 1300px;
-		justify-content: center;
-		align-items: center;
-		background-color: rgba( 0, 0, 0, 0.4 );
-		backdrop-filter: blur( 10px );
-		padding: 8px 12px;
-		border-radius: 8px;
-		border: 1px solid rgba( 255, 255, 255, 0.05 );
-		pointer-events: all;
-	}
-
-	.gs-tab-btn
-	{
-		flex-shrink: 0;
-		padding: 8px 20px;
-		border-radius: 4px;
-		cursor: pointer;
-		transition: all 0.2s ease-out;
-		background-color: transparent;
-		color: rgba( 255, 255, 255, 0.62 );
-		font-size: 19px;
-		font-weight: bold;
-		letter-spacing: 1px;
-		text-transform: uppercase;
-
-		label
-		{
-			font-size: 19px;
-			letter-spacing: 1.5px;
-		}
-
-		&:hover
-		{
-			background-color: rgba( 255, 255, 255, 0.1 );
-			color: white;
-			transform: scale( 1.05 );
-		}
-
-		&.active
-		{
-			background-color: rgba( 255, 255, 255, 0.15 );
-			color: white;
-			border-bottom: 2px solid $gs-accent;
-			box-shadow: 0 4px 12px rgba( 255, 180, 0, 0.2 );
-		}
-	}
-
-	.gs-tab-content
-	{
-		flex-direction: column;
-		flex-grow: 1;
-		width: 100%;
-		max-width: 1120px;
-		min-height: 0;
-		overflow-y: scroll;
-		padding: 4px 12px 12px;
-	}
-
-	.gs-cust-section
-	{
-		flex-shrink: 0;
-		flex-direction: column;
-		gap: 10px;
-		min-height: 0;
-		width: 100%;
-		align-items: center;
-	}
-
-	.gs-sticker-title
-	{
-		font-size: 18px;
-		letter-spacing: 2.5px;
-	}
-
-	.gs-sticker-description
-	{
-		font-size: 16px;
-		color: rgba( 255, 255, 255, 0.72 );
-		margin-top: -5px;
-		margin-bottom: 10px;
-	}
-
-	.gs-sticker-empty
-	{
-		font-size: 17px;
-		color: rgba( 255, 255, 255, 0.72 );
-	}
-
-	.cust-grid
-	{
-		flex-direction: row;
-		flex-wrap: wrap;
-		gap: 10px;
-		width: 100%;
-		max-width: 1060px;
-		flex-shrink: 0;
-		justify-content: center;
-	}
-
-	.cust-empty
-	{
-		font-size: 17px;
-		color: rgba( 255, 255, 255, 0.62 );
-		letter-spacing: 0.5px;
-		padding: 22px 4px;
-	}
-
-	.cust-item
-	{
-		position: relative;
-		width: 80px;
-		height: 80px;
-		flex-shrink: 0;
-		border-radius: 4px;
-		border: 2px solid rgba( 255, 255, 255, 0.1 );
-		cursor: pointer;
-		transition: all 0.1s ease;
-		align-items: center;
-		justify-content: center;
-		background-color: rgba( 255, 255, 255, 0.06 );
-		background-size: 100% 100%;
-		background-position: center;
-		background-repeat: no-repeat;
-		overflow: hidden;
-
-		i
-		{
-			font-size: 34px;
-			color: white;
-			text-shadow: 0 2px 4px rgba( 0, 0, 0, 0.7 );
-		}
-
-		.cust-name
-		{
-			font-size: 15px;
-			font-weight: bold;
-			color: white;
-			text-align: center;
-			letter-spacing: 0.3px;
-			text-shadow: 0 1px 3px rgba( 0, 0, 0, 0.9 );
-			padding: 4px;
-		}
-
-		.cust-check
-		{
-			position: absolute;
-			top: 4px;
-			right: 4px;
-			font-size: 22px;
-			color: rgba( 255, 180, 0, 0.92 );
-		}
-
-		&:hover
-		{
-			border-color: rgba( 255, 255, 255, 0.5 );
-			transform: scale( 1.05 );
-		}
-
-		&.active
-		{
-			border-color: rgba( 255, 180, 0, 0.92 );
-			box-shadow: 0 0 12px rgba( 255, 180, 0, 0.55 );
-		}
-	}
-
-	.reticle-item
-	{
-		.reticle-icon
-		{
-			position: absolute;
-			top: 5px;
-			left: 18%;
-			width: 64%;
-			height: 64%;
-		}
-
-		.reticle-name
-		{
-			position: absolute;
-			bottom: 0;
-			left: 0;
-			right: 0;
-			padding: 4px 2px;
-			font-size: 12px;
-			text-align: center;
-			color: white;
-			background-color: rgba( 7, 10, 13, 0.82 );
-		}
-
-		i
-		{
-			position: absolute;
-			top: 1px;
-			right: 2px;
-			font-size: 19px;
-		}
-	}
-
-	.gs-reticle-adjustments
-	{
-		width: 100%;
-		margin-top: 15px;
-		padding-top: 15px;
-		border-top: 1px solid rgba( 255, 255, 255, 0.1 );
-		flex-direction: column;
-		gap: 10px;
-	}
-
-	.gs-reticle-adjustments-heading
-	{
-		width: 100%;
-		flex-direction: row;
-		align-items: center;
-		justify-content: space-between;
-	}
-
-	.gs-reticle-reset
-	{
-		padding: 6px 14px;
-		background-color: rgba( 255, 255, 255, 0.1 );
-		color: white;
-		font-size: 13px;
-		cursor: pointer;
-		pointer-events: all;
-
-		&:hover { background-color: rgba( 255, 255, 255, 0.2 ); }
-	}
-
-	.gs-reticle-sliders
-	{
-		width: 100%;
-		flex-direction: row;
-		flex-wrap: wrap;
-		gap: 14px 24px;
-		padding: 14px;
-		background-color: rgba( 0, 0, 0, 0.5 );
-		border-radius: 4px;
-		pointer-events: all;
-	}
-
-	.gs-reticle-slider
-	{
-		width: 250px;
-		flex-shrink: 0;
-		flex-direction: column;
-		gap: 5px;
-	}
-
-	.gs-reticle-slider-heading
-	{
-		width: 100%;
-		flex-direction: row;
-		justify-content: space-between;
-		font-size: 14px;
-		color: rgba( 255, 255, 255, 0.75 );
-
-		label:last-child { color: white; }
-	}
-
-	.gs-bottom-row
-	{
-		flex-direction: row;
-		align-items: center;
-		gap: 24px;
-		width: 100%;
-		justify-content: center;
-		flex-wrap: wrap;
-	}
-
-	.gs-detail-head
-	{
-		flex-direction: row;
-		align-items: center;
-		gap: 18px;
-		flex-shrink: 0;
-		width: 380px;
-	}
-
-	.gs-lv-badge
-	{
-		width: 68px;
-		height: 68px;
-		background-color: $gs-accent;
-		color: black;
-		font-size: 32px;
-		font-weight: bold;
-		border-radius: 3px;
-		justify-content: center;
-		align-items: center;
-		flex-shrink: 0;
-
-		label
-		{
-			font-size: 32px;
-			text-shadow: none;
-		}
-	}
-
-	.gs-detail-meta
-	{
-		flex-direction: column;
-		gap: 6px;
-		flex-grow: 1;
-	}
-
-	.gs-detail-name
-	{
-		font-size: 27px;
-		font-weight: bold;
-		color: white;
-		letter-spacing: 0.5px;
-	}
-
-	.gs-xp-wrap
-	{
-		width: 290px;
-		height: 12px;
-		background-color: rgba( 255, 255, 255, 0.12 );
-		border-radius: 3px;
-		overflow: hidden;
-	}
-
-	.gs-xp-fill
-	{
-		height: 100%;
-		background-color: $gs-accent;
-		border-radius: 3px;
-		transition: width 0.3s ease;
-	}
-
-	.gs-xp-label
-	{
-		font-size: 16px;
-		color: $gs-text-mid;
-		letter-spacing: 0.5px;
-	}
-
-	// ── Collapsible panels ─────────────────────────────────────────────
-	// The gunsmith stacks a lot of chrome over the gun render, so each big panel can be tucked
-	// away. Panels slide out rather than vanish, and the toggle stays put so it's always findable.
-	.weapon-browser
-	{
-		transition: transform 0.18s ease, opacity 0.18s ease;
-
-		&.collapsed
-		{
-			transform: translateX( -460px );
-			opacity: 0;
-			pointer-events: none;
-		}
-	}
-
-	.gs-panel-toggle
-	{
-		position: absolute;
-		width: 34px;
-		height: 34px;
-		background-color: $gs-panel-bg;
-		backdrop-filter: blur( 12px );
-		border: 1px solid rgba( 255, 255, 255, 0.10 );
-		border-radius: $rounding;
-		align-items: center;
-		justify-content: center;
-		pointer-events: all;
-		cursor: pointer;
-		z-index: 20;
-		transition: background-color 0.1s ease, border-color 0.1s ease;
-
-		i
-		{
-			font-size: 22px;
-			color: rgba( 255, 255, 255, 0.75 );
-		}
-
-		&:hover
-		{
-			background-color: rgba( 255, 255, 255, 0.14 );
-			border-color: rgba( 255, 255, 255, 0.25 );
-
-			i { color: white; }
-		}
-	}
-
-	// The armory is one flex column, so `order` lets the browser list dock under whichever group is
-	// selected. Equal orders keep source order, so each label stays glued to its own content.
-	.gs-sec-weapons   { order: 1; }
-	.gs-sec-equipment { order: 3; }
-	.gs-sec-perks     { order: 5; }
-
-	.weapon-list
-	{
-		&.after-weapons   { order: 2; }
-		&.after-equipment { order: 4; }
-		&.after-perks     { order: 6; }
-	}
-
-	// Perk rows put name and description on one line, and the description was pinned while the name
-	// was allowed to shrink — so "Flak Jacket" collapsed to "Flak..." and became unidentifiable. The
-	// name is the part you're scanning for, so it holds its width and the description clips instead.
-	.weapon-option.is-perk
-	{
-		.weapon-name
-		{
-			flex-grow: 0;
-			flex-shrink: 0;
-		}
-	}
-
-	.perk-desc
-	{
-		font-size: 15px;
-		color: $gs-text-dim;
-		letter-spacing: 0.3px;
-		margin-left: 12px;
-		flex-grow: 1;
-		flex-shrink: 1;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		text-align: right;
-	}
-
-	// The class strip is 560px of always-on chrome, so it tucks away with the armory on one control.
-	.gs-class-panel
-	{
-		transition: transform 0.18s ease, opacity 0.18s ease;
-
-		&.collapsed
-		{
-			transform: translateX( -620px );
-			opacity: 0;
-			pointer-events: none;
-		}
-	}
-
-	.gs-toggle-armory
-	{
-		// Clear of .gs-class-panel above (left 24, top 154, width 560, so it reaches x=584) — anything
-		// placed inside that box is painted over and stops responding to clicks.
-		left: 440px;
-		top: 320px;
-		transition: left 0.18s ease;
-
-		&.is-collapsed
-		{
-			left: 24px;
-		}
-	}
-
-	.gs-tuning-btn
-	{
-		flex-direction: row;
-		align-items: center;
-		gap: 10px;
-		padding: 8px 24px;
-		background-color: $gs-panel-bg-light;
-		border-radius: 4px;
-		cursor: pointer;
-		pointer-events: all;
-		color: $gs-text-mid;
-		font-size: 20px;
-		font-weight: bold;
-		letter-spacing: 0.5px;
-		flex-shrink: 0;
-		transition: background-color 0.12s ease, color 0.12s ease;
-
-		label
-		{
-			font-size: 20px;
-			letter-spacing: 1px;
-		}
-
-		i
-		{
-			font-size: 26px;
-		}
-
-		&:hover
-		{
-			background-color: rgba( 255, 255, 255, 0.16 );
-			color: white;
-		}
-
-		&.active
-		{
-			background-color: rgba( 255, 180, 0, 0.18 );
-			color: $gs-accent;
-			border: 1px solid rgba( 255, 180, 0, 0.35 );
-
-			&:hover
-			{
-				background-color: rgba( 255, 180, 0, 0.28 );
-			}
-		}
-	}
-
-	.gs-loadout-section
-	{
-		flex-direction: column;
-		align-items: center;
-		flex-shrink: 0;
-	}
-
-	.gs-loadout-btn
-	{
-		flex-direction: row;
-		align-items: center;
-		gap: 10px;
-		padding: 8px 24px;
-		background-color: $gs-panel-bg-light;
-		border-radius: 4px;
-		cursor: pointer;
-		pointer-events: all;
-		color: $gs-text-mid;
-		font-size: 20px;
-		font-weight: bold;
-		letter-spacing: 0.5px;
-		transition: background-color 0.12s ease, color 0.12s ease;
-
-		label
-		{
-			font-size: 20px;
-			letter-spacing: 1px;
-		}
-
-		i
-		{
-			font-size: 26px;
-		}
-
-		&:hover
-		{
-			background-color: rgba( 255, 255, 255, 0.16 );
-			color: white;
-		}
-
-		&.set
-		{
-			background-color: rgba( 255, 180, 0, 0.18 );
-			color: $gs-accent;
-			border: 1px solid rgba( 255, 180, 0, 0.35 );
-
-			&:hover
-			{
-				background-color: rgba( 255, 180, 0, 0.28 );
-			}
-		}
-	}
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    flex-direction: column;
+    pointer-events: none;
+    font-family: $main-font;
+    color: white;
 }
 
-GunsmithPanel.armory-collapsed .gs-bottom.build-mode { left: 24px; }
-GunsmithPanel.customize-mode .gs-class-panel { display: none; }
+// The theme's labels have a text shadow and 18px text: every label here sets its own size, and none has a shadow.
+GunsmithPanel label,
+GunsmithPanel i
+{
+    text-shadow: none;
+}
+
+GunsmithPanel
+{
+    /* =================================================================
+       HEADER: MainMenuRoot's nav bar (keep in step with MainMenuRoot.razor.scss)
+       ================================================================= */
+
+    .global-nav
+    {
+        min-height: $nav-height;
+        flex-shrink: 0;
+        flex-direction: row;
+        align-items: center;
+        padding: 0 22px 0 20px;
+        background-image: linear-gradient( to bottom, rgba( 8, 8, 10, 0.97 ), rgba( 13, 13, 15, 0.9 ) );
+        border-bottom: 1px solid rgba( 255, 255, 255, 0.08 );
+        box-shadow: 0 8px 28px rgba( 0, 0, 0, 0.6 );
+        z-index: 200;
+        pointer-events: all;
+    }
+
+    .gnav-logo
+    {
+        flex-direction: row;
+        align-items: center;
+        flex-shrink: 0;
+        margin-right: 24px;
+        cursor: pointer;
+        opacity: 0.92;
+        transition: opacity 0.15s ease;
+
+        &:hover { opacity: 1; }
+    }
+
+    .gnav-game-name
+    {
+        font-family: $main-font;
+        font-size: 26px;
+        font-weight: 500;
+        letter-spacing: 9px;
+        color: #F0F0F0;
+        text-shadow: 0 2px 12px rgba( 0, 0, 0, 0.7 );
+    }
+
+    .gnav-items
+    {
+        flex-direction: row;
+        flex-grow: 1;
+        justify-content: center;
+        min-width: 0;
+        flex-wrap: wrap;
+    }
+
+    .gnav-item
+    {
+        position: relative;
+        flex-direction: row;
+        align-items: center;
+        flex-shrink: 0;
+        gap: 8px;
+        height: $nav-height;
+        padding: 0 12px;
+        color: rgba( 255, 255, 255, 0.55 );
+        border-left: 1px solid transparent;
+        border-right: 1px solid transparent;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: color 0.15s ease, background-color 0.15s ease;
+
+        i
+        {
+            font-size: 21px;
+            color: rgba( 255, 255, 255, 0.4 );
+            transition: color 0.15s ease;
+        }
+
+        label
+        {
+            font-size: 17px;
+            font-weight: 600;
+            letter-spacing: 1.2px;
+        }
+
+        &:hover
+        {
+            color: rgba( 255, 255, 255, 0.92 );
+            background-color: rgba( 255, 255, 255, 0.03 );
+
+            i { color: rgba( 255, 255, 255, 0.75 ); }
+            .gnav-item-bar { opacity: 0.35; transform: scaleX( 0.6 ); }
+        }
+
+        &.active
+        {
+            color: white;
+            background-image: linear-gradient( to bottom, rgba( 255, 122, 26, 0 ) 0%, rgba( 255, 122, 26, 0.07 ) 55%, rgba( 255, 122, 26, 0.2 ) 100% );
+            border-left-color: rgba( 255, 122, 26, 0.16 );
+            border-right-color: rgba( 255, 122, 26, 0.16 );
+            cursor: default;
+
+            i { color: $accent; }
+            .gnav-item-bar { opacity: 1; transform: scaleX( 1 ); }
+        }
+    }
+
+    .gnav-item-bar
+    {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 3px;
+        background-color: $accent;
+        box-shadow: 0 0 14px rgba( 255, 122, 26, 0.9 );
+        opacity: 0;
+        transform: scaleX( 0.3 );
+        transition: opacity 0.2s $ease-out, transform 0.2s $ease-out;
+        pointer-events: none;
+    }
+
+    .gnav-right
+    {
+        flex-direction: row;
+        align-items: center;
+        gap: 16px;
+        flex-shrink: 0;
+        justify-content: flex-end;
+        margin-left: 10px;
+    }
+
+    .gnav-round-btns
+    {
+        position: relative;
+        flex-direction: row;
+        gap: 9px;
+    }
+
+    .gnav-round-btn
+    {
+        position: relative;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1.5px solid rgba( 255, 255, 255, 0.3 );
+        background-color: rgba( 255, 255, 255, 0.02 );
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        cursor: pointer;
+        transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.1s ease-out;
+
+        i
+        {
+            font-size: 20px;
+            color: rgba( 255, 255, 255, 0.85 );
+        }
+
+        &:hover
+        {
+            border-color: rgba( 255, 255, 255, 0.65 );
+            background-color: rgba( 255, 255, 255, 0.08 );
+
+            i { color: white; }
+        }
+
+        &:active { transform: scale( 0.93 ); }
+
+        &.open
+        {
+            border-color: $accent;
+            background-color: rgba( 255, 122, 26, 0.14 );
+
+            i { color: $accent; }
+        }
+    }
+
+    .gnav-icon-btn
+    {
+        position: relative;
+        width: 40px;
+        height: 40px;
+        align-items: center;
+        justify-content: center;
+        color: rgba( 255, 255, 255, 0.6 );
+        border-radius: 50%;
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: color 0.15s ease, background-color 0.15s ease;
+
+        i { font-size: 26px; }
+
+        &:hover
+        {
+            color: white;
+            background-color: rgba( 255, 255, 255, 0.08 );
+        }
+    }
+
+    .gnav-profile
+    {
+        position: relative;
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+        padding: 4px 6px 4px 8px;
+        cursor: pointer;
+        border: 1px solid transparent;
+        border-radius: 2px;
+        min-width: 0;
+        flex-shrink: 1;
+        transition: border-color 0.15s ease, background-color 0.15s ease;
+
+        &:hover
+        {
+            border-color: rgba( 255, 255, 255, 0.12 );
+            background-color: rgba( 255, 255, 255, 0.03 );
+        }
+    }
+
+    .gnav-prestige
+    {
+        width: 46px;
+        height: 46px;
+        object-fit: contain;
+        filter: drop-shadow( 0 2px 4px rgba( 0, 0, 0, 0.8 ) );
+        flex-shrink: 0;
+    }
+
+    .gnav-profile-info
+    {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1px;
+        min-width: 0;
+    }
+
+    .gnav-profile-name
+    {
+        font-size: 17px;
+        font-weight: 700;
+        color: white;
+        letter-spacing: 1.5px;
+        font-family: $main-font;
+        max-width: 150px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .gnav-profile-level
+    {
+        font-size: 14px;
+        font-weight: 700;
+        color: $accent;
+        letter-spacing: 2px;
+    }
+
+    .gnav-avatar
+    {
+        width: 46px;
+        height: 46px;
+        border-radius: 2px;
+        border: 1px solid rgba( 255, 255, 255, 0.18 );
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    .gnav-avatar-placeholder
+    {
+        background-color: rgba( 255, 255, 255, 0.1 );
+        align-items: center;
+        justify-content: center;
+
+        i { font-size: 26px; color: rgba( 255, 255, 255, 0.5 ); }
+    }
+
+    PartyPanel
+    {
+        height: 40px;
+        margin: 0 0 0 12px;
+
+        .party-bar { height: 40px; gap: 8px; padding: 0; }
+
+        .party-avatar-slot,
+        .party-invite-slot
+        {
+            width: 40px;
+            height: 40px;
+            border: 1.5px solid rgba( 255, 255, 255, 0.3 );
+            background-color: rgba( 255, 255, 255, 0.02 );
+
+            &:hover
+            {
+                border-color: rgba( 255, 255, 255, 0.65 );
+                background-color: rgba( 255, 255, 255, 0.08 );
+            }
+        }
+
+        .party-self { border-color: rgba( 255, 122, 26, 0.7 ); }
+        .party-avatar { width: 36px; height: 36px; }
+
+        .party-invite-popup,
+        .party-toast { top: 58px; }
+
+        .party-leave-btn .gnav-tip { top: 52px; margin-top: 0; }
+    }
+
+    // Hover labels under the header's buttons, after a short hover.
+    .gnav-tip
+    {
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-top: 10px;
+        transform: translateX( -50% );
+        padding: 6px 10px 5px 10px;
+        background-color: rgba( 12, 12, 15, 0.97 );
+        border: 1px solid rgba( 255, 255, 255, 0.1 );
+        border-top: 2px solid $accent;
+        border-radius: 2px;
+        box-shadow: 0 8px 20px rgba( 0, 0, 0, 0.6 );
+        font-family: $main-font;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: white;
+        white-space: nowrap;
+        pointer-events: none;
+        opacity: 0;
+        z-index: 400;
+        transition: opacity 0.1s ease;
+
+        &.right { left: auto; right: 0; transform: none; }
+    }
+
+    .gnav-round-btn:hover .gnav-tip,
+    .gnav-icon-btn:hover .gnav-tip,
+    .gnav-profile:hover .gnav-tip,
+    .party-avatar-slot:hover .gnav-tip,
+    .party-invite-slot:hover .gnav-tip,
+    .party-leave-btn:hover .gnav-tip
+    {
+        opacity: 1;
+        transition: opacity 0.12s ease 0.3s;
+    }
+
+    // Opacity, not display: none, which could leave the label's text drawn alone with no box when it came back.
+    .gnav-round-btns .gnav-round-btn.open .gnav-tip { opacity: 0; transition: none; }
+
+    /* =================================================================
+       BREADCRUMBS: the menu pages' MenuTopbar uses the same mixins (UI/Styles/Breadcrumbs.scss)
+       ================================================================= */
+
+    .gs-crumbs { @include crumbs-bar; }
+    .gs-crumb-back { @include crumbs-back; }
+    .gs-crumb { @include crumb; }
+    .gs-crumb-sep { @include crumb-sep; }
+
+    /* =================================================================
+       BODY: three columns
+       ================================================================= */
+
+    .gs-body
+    {
+        flex-grow: 1;
+        min-height: 0;
+        flex-direction: row;
+        gap: 26px;
+        padding: 16px 30px 14px 30px;
+    }
+
+    .gs-col
+    {
+        flex-direction: column;
+        min-height: 0;
+    }
+
+    .gs-left
+    {
+        width: 392px;
+        flex-shrink: 0;
+        pointer-events: all;
+    }
+
+    .gs-center
+    {
+        flex-grow: 1;
+        min-width: 0;
+    }
+
+    .gs-right
+    {
+        width: 430px;
+        flex-shrink: 0;
+        gap: 14px;
+        pointer-events: all;
+    }
+
+    .gs-panel
+    {
+        background-color: $panel-bg;
+        border: 1px solid $panel-border;
+        border-radius: 2px;
+        backdrop-filter: blur( 8px );
+    }
+
+    .gs-panel-head
+    {
+        flex-shrink: 0;
+        height: 52px;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        padding: 0 12px 0 16px;
+        border-bottom: 1px solid $line;
+    }
+
+    .gs-head-bar
+    {
+        width: 3px;
+        height: 20px;
+        margin-right: 4px;
+        background-color: $accent;
+        box-shadow: 0 0 10px rgba( 255, 122, 26, 0.6 );
+    }
+
+    .gs-panel-title
+    {
+        flex-grow: 1;
+        font-size: 17px;
+        font-weight: 700;
+        letter-spacing: 3px;
+        color: white;
+    }
+
+    .gs-head-count
+    {
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        color: $text-dim;
+        margin-right: 6px;
+    }
+
+    .gs-square-btn
+    {
+        width: 36px;
+        height: 36px;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba( 255, 255, 255, 0.16 );
+        border-radius: 2px;
+        background-color: rgba( 255, 255, 255, 0.03 );
+        cursor: pointer;
+        transition: border-color 0.15s ease, background-color 0.15s ease;
+
+        i { font-size: 20px; color: rgba( 255, 255, 255, 0.8 ); }
+
+        &:hover
+        {
+            border-color: $accent;
+            background-color: rgba( 255, 122, 26, 0.12 );
+
+            i { color: white; }
+        }
+
+        &.small
+        {
+            width: 30px;
+            height: 30px;
+
+            i { font-size: 18px; }
+        }
+
+        &.disabled
+        {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        &.danger:hover
+        {
+            border-color: $bad;
+            background-color: rgba( 255, 92, 77, 0.14 );
+
+            i { color: $bad; }
+        }
+    }
+
+    .gs-section-label
+    {
+        flex-shrink: 0;
+        margin: 14px 0 6px 2px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 2.5px;
+        color: rgba( 255, 255, 255, 0.45 );
+    }
+
+    // Weapon icons are 1024 squares with the gun across the middle (about 90% of the width, the middle 30% of the
+    // height). The square is centred in a clipping box, since background-position % isn't CSS's.
+    .gs-img-square
+    {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    .wip-tag
+    {
+        flex-shrink: 0;
+        padding: 1px 6px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        color: $accent-ink;
+        background-color: $accent-light;
+        border-radius: 2px;
+    }
+
+    // A gun that still needs checking in-game (EquipmentResource.ReviewNote), shown to the developer only.
+    .review-tag
+    {
+        flex-shrink: 0;
+        padding: 0 5px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        color: $caution;
+        border: 1px solid rgba( 255, 200, 61, 0.7 );
+        border-radius: 2px;
+    }
+
+    .gs-lv-key
+    {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        color: $text-dim;
+    }
+
+    .gs-lv-num
+    {
+        font-size: 14px;
+        font-weight: 700;
+        color: $accent;
+    }
+
+    /* =================================================================
+       LEFT: LOADOUT
+       ================================================================= */
+
+    .gs-loadout
+    {
+        flex-grow: 1;
+        min-height: 0;
+        flex-direction: column;
+        overflow-y: scroll;
+        padding: 12px 14px 6px 14px;
+    }
+
+    .gs-class-card
+    {
+        flex-shrink: 0;
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 12px 12px 14px;
+        background-color: $card-bg;
+        border: 1px solid $line;
+        border-left: 3px solid $accent;
+        cursor: pointer;
+        transition: background-color 0.15s ease, border-color 0.15s ease;
+
+        &:hover
+        {
+            background-color: $card-hover;
+            border-color: rgba( 255, 255, 255, 0.18 );
+            border-left-color: $accent;
+
+            .gs-class-more { color: white; }
+        }
+    }
+
+    .gs-class-icon
+    {
+        width: 40px;
+        height: 40px;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba( 255, 122, 26, 0.12 );
+        border: 1px solid rgba( 255, 122, 26, 0.35 );
+
+        i { font-size: 22px; color: $accent; }
+    }
+
+    .gs-class-copy
+    {
+        flex-grow: 1;
+        min-width: 0;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .gs-class-name
+    {
+        font-size: 19px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: white;
+        text-transform: uppercase;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .gs-class-blurb
+    {
+        font-size: 13px;
+        font-weight: 500;
+        color: $text-dim;
+    }
+
+    .gs-class-more
+    {
+        font-size: 22px;
+        color: $text-dim;
+    }
+
+    .gs-weapon-card
+    {
+        flex-shrink: 0;
+        flex-direction: row;
+        background-color: $card-bg;
+        border: 1px solid $line;
+        cursor: pointer;
+        transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+
+        &:hover
+        {
+            border-color: rgba( 255, 255, 255, 0.22 );
+            background-color: rgba( 255, 255, 255, 0.06 );
+        }
+
+        // The weapon on show.
+        &.active
+        {
+            border-color: $accent;
+            background-color: rgba( 255, 122, 26, 0.06 );
+            box-shadow: 0 0 18px rgba( 255, 122, 26, 0.16 );
+        }
+
+        &.empty .gs-card-name { color: rgba( 255, 255, 255, 0.4 ); }
+    }
+
+    .gs-card-main
+    {
+        flex-grow: 1;
+        min-width: 0;
+        flex-direction: column;
+        gap: 6px;
+        padding: 8px 12px 12px 14px;
+    }
+
+    .gs-card-img
+    {
+        position: relative;
+        flex-shrink: 0;
+        overflow: hidden;
+        width: 100%;
+        height: 100px;
+        align-items: center;
+        justify-content: center;
+
+        .gs-img-square
+        {
+            width: 300px;
+            height: 300px;
+            margin-left: -150px;
+            margin-top: -150px;
+        }
+
+        &.side
+        {
+            width: 120px;
+            height: 64px;
+            margin: 10px 0 10px 12px;
+            background-color: rgba( 0, 0, 0, 0.2 );
+
+            .gs-img-square
+            {
+                width: 130px;
+                height: 130px;
+                margin-left: -65px;
+                margin-top: -65px;
+            }
+        }
+    }
+
+    .gs-card-add
+    {
+        font-size: 26px;
+        color: rgba( 255, 255, 255, 0.3 );
+    }
+
+    .gs-card-copy
+    {
+        flex-grow: 1;
+        min-width: 0;
+        flex-direction: column;
+        justify-content: center;
+        gap: 4px;
+        padding: 0 12px;
+
+        .gs-card-name { font-size: 17px; }
+    }
+
+    .gs-card-name
+    {
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        color: white;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .gs-card-level
+    {
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .gs-card-xp
+    {
+        flex-grow: 1;
+        height: 4px;
+        margin-left: 8px;
+        background-color: rgba( 255, 255, 255, 0.1 );
+    }
+
+    .gs-card-xp-fill
+    {
+        height: 100%;
+        background-color: $accent;
+        box-shadow: 0 0 8px rgba( 255, 122, 26, 0.5 );
+    }
+
+    .gs-card-chevron
+    {
+        width: 44px;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        border-left: 1px solid $line;
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+
+        i { font-size: 24px; color: $text-dim; }
+
+        &:hover
+        {
+            background-color: rgba( 255, 122, 26, 0.12 );
+
+            i { color: $accent; }
+        }
+    }
+
+    .gs-gear-row
+    {
+        flex-shrink: 0;
+        flex-direction: row;
+        align-items: center;
+        height: 60px;
+        background-color: $card-bg;
+        border: 1px solid $line;
+        cursor: pointer;
+        transition: border-color 0.15s ease, background-color 0.15s ease;
+
+        &:hover
+        {
+            border-color: rgba( 255, 255, 255, 0.22 );
+            background-color: rgba( 255, 255, 255, 0.06 );
+
+            .gs-card-chevron i { color: $accent; }
+        }
+
+        &.empty .gs-gear-name { color: rgba( 255, 255, 255, 0.4 ); }
+
+        .gs-card-chevron { height: 100%; }
+    }
+
+    .gs-gear-img
+    {
+        position: relative;
+        overflow: hidden;
+        width: 56px;
+        height: 56px;
+        margin-left: 4px;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+
+        .gs-img-square
+        {
+            width: 110px;
+            height: 110px;
+            margin-left: -55px;
+            margin-top: -55px;
+        }
+    }
+
+    .gs-gear-name
+    {
+        flex-grow: 1;
+        min-width: 0;
+        padding: 0 12px;
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+        color: white;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .gs-perks
+    {
+        flex-shrink: 0;
+        flex-direction: row;
+        gap: 8px;
+    }
+
+    .gs-perk
+    {
+        width: 0;
+        flex-grow: 1;
+        min-width: 0;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        padding: 12px 6px 10px 6px;
+        background-color: $card-bg;
+        border: 1px solid $line;
+        cursor: pointer;
+        transition: border-color 0.15s ease, background-color 0.15s ease;
+
+        &:hover
+        {
+            border-color: rgba( 255, 122, 26, 0.6 );
+            background-color: rgba( 255, 122, 26, 0.08 );
+        }
+
+        &.empty
+        {
+            .gs-perk-glyph { color: rgba( 255, 255, 255, 0.3 ); }
+            .gs-perk-name { color: rgba( 255, 255, 255, 0.4 ); }
+        }
+    }
+
+    .gs-perk-glyph
+    {
+        font-size: 30px;
+        color: $accent;
+        margin-bottom: 2px;
+    }
+
+    .gs-perk-num
+    {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: rgba( 255, 255, 255, 0.45 );
+    }
+
+    .gs-perk-name
+    {
+        max-width: 100%;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: white;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .gs-wide-btn
+    {
+        flex-shrink: 0;
+        height: 54px;
+        margin: 10px 14px 14px 14px;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        border: 1px solid rgba( 255, 255, 255, 0.2 );
+        background-color: rgba( 255, 255, 255, 0.04 );
+        cursor: pointer;
+        transition: border-color 0.15s ease, background-color 0.15s ease;
+
+        i { font-size: 20px; color: rgba( 255, 255, 255, 0.8 ); }
+        label { font-size: 15px; font-weight: 700; letter-spacing: 3px; color: white; }
+
+        &:hover
+        {
+            border-color: $accent;
+            background-color: rgba( 255, 122, 26, 0.14 );
+
+            i { color: $accent; }
+        }
+
+        &:active { transform: scale( 0.99 ); }
+
+        &.danger:hover
+        {
+            border-color: $bad;
+            background-color: rgba( 255, 92, 77, 0.12 );
+
+            i { color: $bad; }
+        }
+
+        &.danger.armed
+        {
+            border-color: $bad;
+            background-color: rgba( 255, 92, 77, 0.18 );
+
+            i, label { color: #FF8A7E; }
+        }
+
+        &.disabled
+        {
+            opacity: 0.35;
+            pointer-events: none;
+        }
+    }
+
+    // ── DETAILS: the stats in the loadout column (WeaponComparePanel.Live) ──
+
+    .gs-details-hint
+    {
+        flex-shrink: 0;
+        padding: 10px 14px 2px 14px;
+        font-size: 12px;
+        font-weight: 500;
+        line-height: 17px;
+        letter-spacing: 0.3px;
+        color: $text-dim;
+    }
+
+    .gs-details
+    {
+        flex-grow: 1;
+        min-height: 0;
+        flex-direction: column;
+        overflow-y: scroll;
+        padding: 4px 14px 14px 14px;
+    }
+
+    // ── A slot's choices, and the class list ──
+
+    .gs-page-head
+    {
+        flex-shrink: 0;
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        border-bottom: 1px solid $line;
+    }
+
+    .gs-page-title
+    {
+        flex-grow: 1;
+        min-width: 0;
+        flex-direction: column;
+        gap: 1px;
+    }
+
+    .gs-page-caption
+    {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 2.5px;
+        color: rgba( 255, 255, 255, 0.45 );
+        text-transform: uppercase;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .gs-page-name
+    {
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: 2.5px;
+        color: white;
+    }
+
+    .gs-chips
+    {
+        flex-shrink: 0;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 12px 14px 2px 14px;
+    }
+
+    .gs-chip
+    {
+        height: 30px;
+        padding: 0 12px;
+        align-items: center;
+        border: 1px solid rgba( 255, 255, 255, 0.14 );
+        background-color: rgba( 255, 255, 255, 0.03 );
+        cursor: pointer;
+        transition: border-color 0.15s ease, background-color 0.15s ease;
+
+        label
+        {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: $text-mid;
+        }
+
+        &:hover
+        {
+            border-color: rgba( 255, 255, 255, 0.35 );
+
+            label { color: white; }
+        }
+
+        &.active
+        {
+            background-color: $accent;
+            border-color: $accent;
+
+            label { color: $accent-ink; }
+        }
+    }
+
+    .gs-page-list
+    {
+        flex-grow: 1;
+        min-height: 0;
+        flex-direction: column;
+        gap: 6px;
+        overflow-y: scroll;
+        padding: 10px 14px 14px 14px;
+    }
+
+    .gs-choice
+    {
+        flex-shrink: 0;
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+        min-height: 60px;
+        padding: 8px 12px;
+        background-color: $card-bg;
+        border: 1px solid $line;
+        border-left: 3px solid transparent;
+        cursor: pointer;
+        transition: border-color 0.15s ease, background-color 0.15s ease;
+
+        &:hover
+        {
+            background-color: $card-hover;
+            border-color: rgba( 255, 255, 255, 0.18 );
+        }
+
+        // In the class.
+        &.equipped
+        {
+            border-left-color: $accent;
+            background-color: rgba( 255, 122, 26, 0.07 );
+        }
+
+        // On the stand.
+        &.shown
+        {
+            border-top-color: $accent;
+            border-right-color: $accent;
+            border-bottom-color: $accent;
+        }
+
+        &.create .gs-choice-name { color: $accent; }
+    }
+
+    .gs-choice-glyph
+    {
+        width: 40px;
+        height: 40px;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba( 255, 122, 26, 0.1 );
+
+        i { font-size: 22px; color: $accent; }
+    }
+
+    .gs-choice-img
+    {
+        position: relative;
+        overflow: hidden;
+        width: 96px;
+        height: 44px;
+        flex-shrink: 0;
+
+        .gs-img-square
+        {
+            width: 106px;
+            height: 106px;
+            margin-left: -53px;
+            margin-top: -53px;
+        }
+
+        &.gear
+        {
+            width: 44px;
+
+            .gs-img-square
+            {
+                width: 90px;
+                height: 90px;
+                margin-left: -45px;
+                margin-top: -45px;
+            }
+        }
+    }
+
+    .gs-choice-copy
+    {
+        flex-grow: 1;
+        min-width: 0;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .gs-choice-name-row
+    {
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    .gs-choice-name
+    {
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: white;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .gs-choice-desc
+    {
+        font-size: 12px;
+        font-weight: 500;
+        color: $text-dim;
+    }
+
+    .gs-choice-meta
+    {
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .gs-choice-state
+    {
+        margin-left: 6px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        color: $accent;
+    }
+
+    .gs-choice-check
+    {
+        font-size: 22px;
+        color: $accent;
+    }
+
+    .gs-choice-num
+    {
+        width: 28px;
+        flex-shrink: 0;
+        font-size: 18px;
+        font-weight: 700;
+        text-align: center;
+        color: $text-dim;
+    }
+
+    i.gs-choice-num
+    {
+        font-size: 22px;
+        color: $accent;
+    }
+
+    .gs-fav
+    {
+        font-size: 20px;
+        color: rgba( 255, 255, 255, 0.25 );
+        cursor: pointer;
+
+        &:hover { color: rgba( 255, 215, 0, 0.7 ); }
+        &.on { color: #FFD700; }
+    }
+
+    .gs-rename
+    {
+        flex-shrink: 0;
+        flex-direction: column;
+        padding: 0 14px;
+    }
+
+    .gs-input
+    {
+        min-height: 42px;
+        padding: 8px 12px;
+        background-color: rgba( 0, 0, 0, 0.45 );
+        border: 1px solid rgba( 255, 255, 255, 0.16 );
+        border-radius: 2px;
+        font-size: 16px;
+        font-weight: 600;
+        color: white;
+        cursor: text;
+        pointer-events: all;
+
+        label { font-size: 16px; }
+
+        &:focus { border-color: $accent; }
+
+        &.grow { flex-grow: 1; }
+
+        &.code
+        {
+            height: 92px;
+            font-size: 14px;
+            font-family: monospace;
+
+            label { font-size: 14px; }
+        }
+    }
+
+    /* =================================================================
+       CENTRE: the weapon
+       ================================================================= */
+
+    .gs-hero
+    {
+        flex-shrink: 0;
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 24px;
+    }
+
+    .gs-hero-main
+    {
+        flex-grow: 1;
+        min-width: 0;
+        flex-direction: column;
+    }
+
+    .gs-hero-category
+    {
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 3px;
+        color: $text-mid;
+    }
+
+    .gs-hero-name-row
+    {
+        flex-direction: row;
+        align-items: center;
+        gap: 14px;
+
+        .wip-tag
+        {
+            padding: 3px 10px;
+            font-size: 14px;
+        }
+
+        .review-tag
+        {
+            padding: 2px 9px;
+            font-size: 14px;
+        }
+    }
+
+    .gs-hero-name
+    {
+        font-size: 66px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        color: white;
+        white-space: nowrap;
+        text-shadow: 0 4px 24px rgba( 0, 0, 0, 0.6 );
+    }
+
+    .gs-hero-level
+    {
+        flex-direction: row;
+        align-items: center;
+        gap: 14px;
+        margin-top: 2px;
+    }
+
+    .gs-hero-lv
+    {
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        color: $accent;
+    }
+
+    .gs-xp-bar
+    {
+        width: 256px;
+        height: 8px;
+        background-color: rgba( 255, 255, 255, 0.12 );
+    }
+
+    .gs-xp-fill
+    {
+        height: 100%;
+        background-color: $accent;
+        box-shadow: 0 0 10px rgba( 255, 122, 26, 0.6 );
+        transition: width 0.3s ease;
+    }
+
+    .gs-hero-xp
+    {
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        color: $text-mid;
+    }
+
+    // The next level's attachments, under the XP bar.
+    .gs-hero-next
+    {
+        margin-top: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        color: rgba( 255, 255, 255, 0.5 );
+        text-shadow: none;
+    }
+
+    // Leon's UNLOCK ALL switch (AttachmentUnlocks.IsDeveloper), after the XP.
+    .gs-dev-unlock
+    {
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+        margin-left: 6px;
+        padding: 4px 12px;
+        border: 1px solid rgba( 255, 122, 26, 0.6 );
+        background-color: rgba( 12, 14, 17, 0.6 );
+        cursor: pointer;
+        pointer-events: all;
+
+        i
+        {
+            font-family: "Material Icons";
+            font-size: 15px;
+            color: $accent;
+        }
+
+        label
+        {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: $accent;
+            text-shadow: none;
+        }
+
+        &:hover
+        {
+            background-color: rgba( 255, 122, 26, 0.18 );
+        }
+
+        &.on
+        {
+            background-color: $accent;
+
+            i, label
+            {
+                color: $accent-ink;
+            }
+        }
+    }
+
+    .gs-hero-desc
+    {
+        max-width: 560px;
+        margin-top: 12px;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 2.5px;
+        line-height: 20px;
+        color: rgba( 255, 255, 255, 0.6 );
+    }
+
+    // What still needs checking in-game, under the description (the developer's only, like the review tag).
+    .gs-review-note
+    {
+        max-width: 560px;
+        margin-top: 12px;
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 8px 12px;
+        border-left: 2px solid $caution;
+        background-color: rgba( 255, 200, 61, 0.08 );
+
+        i
+        {
+            flex-shrink: 0;
+            font-family: "Material Icons";
+            font-size: 16px;
+            color: $caution;
+        }
+
+        label
+        {
+            flex-shrink: 1;
+            min-width: 0;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            line-height: 18px;
+            color: rgba( 255, 226, 150, 0.9 );
+        }
+    }
+
+    .gs-tags
+    {
+        flex-shrink: 0;
+        flex-direction: row;
+        gap: 12px;
+        margin-top: 26px;
+    }
+
+    .gs-tag-list
+    {
+        flex-direction: column;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .gs-tag
+    {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 4px;
+        color: rgba( 255, 255, 255, 0.82 );
+    }
+
+    .gs-tag-bar
+    {
+        width: 3px;
+        background-color: $accent;
+        box-shadow: 0 0 10px rgba( 255, 122, 26, 0.6 );
+    }
+
+    // The weapon's frame: GunsmithController fits the gun inside this box, and turns and zooms it only over it.
+    .gs-stage
+    {
+        position: relative;
+        flex-grow: 1;
+        min-height: 120px;
+        pointer-events: none;
+    }
+
+    .gs-stage-hint
+    {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 6px;
+        text-align: center;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 3px;
+        color: rgba( 255, 255, 255, 0.3 );
+    }
+
+    .gs-center-bottom
+    {
+        flex-shrink: 0;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .gs-stats
+    {
+        width: 560px;
+        max-width: 100%;
+        flex-direction: row;
+        padding: 14px 18px;
+        gap: 18px;
+    }
+
+    .gs-stat-rows
+    {
+        flex-grow: 1;
+        min-width: 0;
+        flex-direction: column;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .gs-stat
+    {
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+
+        &.up .gs-stat-change { background-color: $good; }
+        &.up .gs-stat-value { color: $good; }
+        &.down .gs-stat-change { background-color: $bad; }
+        &.down .gs-stat-value { color: $bad; }
+    }
+
+    .gs-stat-name
+    {
+        width: 96px;
+        flex-shrink: 0;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 2px;
+        color: $text-mid;
+        white-space: nowrap;
+    }
+
+    .gs-stat-track
+    {
+        position: relative;
+        flex-grow: 1;
+        height: 6px;
+        background-color: rgba( 255, 255, 255, 0.1 );
+    }
+
+    .gs-stat-fill
+    {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        background-color: rgba( 255, 255, 255, 0.85 );
+        transition: width 0.25s $ease-out;
+    }
+
+    .gs-stat-change
+    {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        transition: left 0.25s $ease-out, width 0.25s $ease-out;
+    }
+
+    .gs-stat-value
+    {
+        width: 96px;
+        flex-shrink: 0;
+        text-align: right;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: white;
+        white-space: nowrap;
+    }
+
+    .gs-stat-side
+    {
+        width: 130px;
+        flex-shrink: 0;
+        flex-direction: column;
+        justify-content: center;
+        padding-left: 18px;
+        border-left: 1px solid $line;
+    }
+
+    .gs-side-label
+    {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 2.5px;
+        color: $text-dim;
+    }
+
+    .gs-side-value
+    {
+        margin-top: 2px;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: white;
+
+        &.big
+        {
+            font-size: 34px;
+            font-weight: 800;
+            letter-spacing: 0;
+        }
+
+        &.up { color: $good; }
+        &.down { color: $bad; }
+    }
+
+    .gs-side-line
+    {
+        height: 1px;
+        margin: 12px 0;
+        background-color: $line;
+    }
+
+    // Opens WEAPON STATS. The stage under the card takes no clicks, so this one has to ask for them.
+    .gs-stats-details
+    {
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        margin-top: 12px;
+        padding: 5px 6px;
+        border: 1px solid rgba( 255, 255, 255, 0.18 );
+        background-color: rgba( 255, 255, 255, 0.04 );
+        pointer-events: all;
+        cursor: pointer;
+        transition: border-color 0.15s ease, background-color 0.15s ease;
+
+        i
+        {
+            font-size: 15px;
+            color: rgba( 255, 255, 255, 0.7 );
+            transition: color 0.15s ease;
+        }
+
+        label
+        {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: $text-mid;
+            white-space: nowrap;
+            transition: color 0.15s ease;
+        }
+
+        &:hover
+        {
+            border-color: rgba( 255, 122, 26, 0.7 );
+            background-color: rgba( 30, 20, 12, 0.8 );
+
+            i { color: $accent; }
+            label { color: white; }
+        }
+
+        &:active { transform: scale( 0.98 ); }
+
+        &.open { border-color: $accent; }
+    }
+
+    .gs-actions
+    {
+        height: 88px;
+        flex-shrink: 0;
+        flex-direction: row;
+        gap: 12px;
+        pointer-events: all;
+    }
+
+    .gs-action
+    {
+        flex-grow: 1;
+        width: 0;
+        flex-direction: row;
+        align-items: center;
+        gap: 14px;
+        padding: 0 20px;
+        background-color: $panel-bg;
+        border: 1px solid $panel-border;
+        cursor: pointer;
+        transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+
+        &:hover
+        {
+            border-color: rgba( 255, 122, 26, 0.7 );
+            background-color: rgba( 30, 20, 12, 0.8 );
+
+            .gs-action-icon { color: $accent; }
+        }
+
+        &:active { transform: scale( 0.99 ); }
+
+        &.range
+        {
+            background-image: linear-gradient( to right, rgba( 12, 14, 17, 0.9 ), rgba( 40, 30, 22, 0.75 ) );
+        }
+
+        &.tuning.open,
+        &.compare.open
+        {
+            border-color: $accent;
+        }
+
+        &.locked
+        {
+            .gs-action-title { color: $text-mid; }
+            .gs-action-icon { color: rgba( 255, 255, 255, 0.35 ); }
+        }
+    }
+
+    .gs-action-icon
+    {
+        font-size: 30px;
+        color: rgba( 255, 255, 255, 0.8 );
+        transition: color 0.15s ease;
+    }
+
+    .gs-action-copy
+    {
+        flex-grow: 1;
+        min-width: 0;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .gs-action-title
+    {
+        font-size: 17px;
+        font-weight: 700;
+        letter-spacing: 2.5px;
+        color: white;
+        white-space: nowrap;
+    }
+
+    .gs-action-sub
+    {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 2px;
+        color: $text-dim;
+        white-space: nowrap;
+
+        &.tuned { color: $accent; }
+    }
+
+    .gs-action-lock
+    {
+        font-size: 18px;
+        color: rgba( 255, 255, 255, 0.4 );
+    }
+
+    /* =================================================================
+       RIGHT: BUILD / CUSTOMIZE
+       ================================================================= */
+
+    .gs-mode-tabs
+    {
+        flex-shrink: 0;
+        height: 50px;
+        flex-direction: row;
+        gap: 6px;
+    }
+
+    .gs-mode-tab
+    {
+        flex-grow: 1;
+        width: 0;
+        align-items: center;
+        justify-content: center;
+        background-color: $panel-bg;
+        border: 1px solid $panel-border;
+        cursor: pointer;
+        transition: background-color 0.15s ease, border-color 0.15s ease;
+
+        label
+        {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: $text-mid;
+        }
+
+        &:hover
+        {
+            border-color: rgba( 255, 255, 255, 0.25 );
+
+            label { color: white; }
+        }
+
+        &.active
+        {
+            background-color: $accent;
+            border-color: $accent;
+            cursor: default;
+
+            label { color: $accent-ink; }
+        }
+    }
+
+    .gs-presets-card
+    {
+        flex-shrink: 0;
+        height: 72px;
+        flex-direction: row;
+        align-items: center;
+        gap: 14px;
+        padding: 0 16px 0 18px;
+        background-color: $panel-bg;
+        border: 1px solid $panel-border;
+        cursor: pointer;
+        transition: border-color 0.15s ease, background-color 0.15s ease;
+
+        &:hover
+        {
+            border-color: rgba( 255, 122, 26, 0.7 );
+            background-color: rgba( 30, 20, 12, 0.8 );
+
+            .gs-presets-chevron { color: $accent; }
+        }
+    }
+
+    .gs-presets-icon
+    {
+        font-size: 28px;
+        color: $accent;
+    }
+
+    .gs-presets-copy
+    {
+        flex-grow: 1;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .gs-presets-title
+    {
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: 3px;
+        color: white;
+    }
+
+    .gs-presets-sub
+    {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 2px;
+        color: $text-dim;
+    }
+
+    .gs-presets-chevron
+    {
+        font-size: 24px;
+        color: $text-dim;
+    }
+
+    // ── Customize ──
+
+    .gs-customize
+    {
+        flex-grow: 1;
+        min-height: 0;
+        flex-direction: column;
+    }
+
+    .gs-cust-tabs
+    {
+        flex-shrink: 0;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 12px 14px 10px 14px;
+        border-bottom: 1px solid $line;
+    }
+
+    .gs-cust-tab
+    {
+        height: 28px;
+        padding: 0 10px;
+        align-items: center;
+        border: 1px solid rgba( 255, 255, 255, 0.14 );
+        background-color: rgba( 255, 255, 255, 0.03 );
+        cursor: pointer;
+        transition: border-color 0.15s ease, background-color 0.15s ease;
+
+        label
+        {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: $text-mid;
+        }
+
+        &:hover
+        {
+            border-color: rgba( 255, 255, 255, 0.35 );
+
+            label { color: white; }
+        }
+
+        &.active
+        {
+            background-color: $accent;
+            border-color: $accent;
+
+            label { color: $accent-ink; }
+        }
+    }
+
+    .gs-cust-body
+    {
+        flex-grow: 1;
+        min-height: 0;
+        flex-direction: column;
+        overflow-y: scroll;
+        padding: 14px 14px 16px 14px;
+    }
+
+    .gs-cust-note
+    {
+        flex-shrink: 0;
+        margin-bottom: 10px;
+        font-size: 13px;
+        font-weight: 500;
+        color: $text-dim;
+    }
+
+    .cust-grid
+    {
+        flex-shrink: 0;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .cust-empty
+    {
+        padding: 18px 2px;
+        font-size: 14px;
+        color: $text-dim;
+    }
+
+    .cust-item
+    {
+        position: relative;
+        width: 118px;
+        height: 118px;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border: 2px solid rgba( 255, 255, 255, 0.1 );
+        background-color: rgba( 255, 255, 255, 0.06 );
+        background-size: 100% 100%;
+        background-position: center;
+        background-repeat: no-repeat;
+        cursor: pointer;
+        transition: border-color 0.1s ease, transform 0.1s ease;
+
+        &:hover
+        {
+            border-color: rgba( 255, 255, 255, 0.55 );
+            transform: scale( 1.03 );
+        }
+
+        &.active
+        {
+            border-color: $accent;
+            box-shadow: 0 0 12px rgba( 255, 122, 26, 0.55 );
+        }
+
+        &.locked { border-color: rgba( 255, 255, 255, 0.06 ); }
+
+        &.sticker
+        {
+            background-size: contain;
+        }
+    }
+
+    .cust-name
+    {
+        padding: 4px;
+        font-size: 14px;
+        font-weight: 700;
+        color: white;
+        text-align: center;
+        text-shadow: 0 1px 3px rgba( 0, 0, 0, 0.9 );
+    }
+
+    .cust-check
+    {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        font-size: 20px;
+        color: $accent;
+        text-shadow: 0 1px 4px rgba( 0, 0, 0, 0.8 );
+    }
+
+    .cust-fav
+    {
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        font-size: 18px;
+        color: rgba( 255, 255, 255, 0.35 );
+        text-shadow: 0 1px 4px rgba( 0, 0, 0, 0.8 );
+        cursor: pointer;
+
+        &:hover { color: rgba( 255, 215, 0, 0.7 ); }
+        &.on { color: #FFD700; }
+    }
+
+    .cust-lock
+    {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        padding: 4px 0;
+        background-color: rgba( 0, 0, 0, 0.72 );
+
+        i { font-size: 14px; color: rgba( 255, 255, 255, 0.75 ); }
+        label { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: rgba( 255, 255, 255, 0.85 ); }
+    }
+
+    .reticle-item
+    {
+        .reticle-icon
+        {
+            position: absolute;
+            top: 8px;
+            left: 18%;
+            width: 64%;
+            height: 64%;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .reticle-name
+        {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 4px 2px;
+            font-size: 11px;
+            font-weight: 600;
+            text-align: center;
+            color: white;
+            background-color: rgba( 7, 10, 13, 0.82 );
+        }
+    }
+
+    .gs-pager
+    {
+        flex-shrink: 0;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        margin-top: 12px;
+    }
+
+    .gs-pager-label
+    {
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: $text-mid;
+    }
+
+    .gs-check-row
+    {
+        flex-shrink: 0;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        margin-top: 12px;
+        cursor: pointer;
+
+        i { font-size: 22px; color: $text-dim; }
+        label { font-size: 14px; font-weight: 600; color: $text-mid; }
+
+        &:hover label { color: white; }
+
+        &.on i { color: $accent; }
+        &.on label { color: white; }
+    }
+
+    .gs-cust-extra
+    {
+        flex-shrink: 0;
+        flex-direction: column;
+        margin-top: 8px;
+    }
+
+    .gs-cust-extra-head
+    {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .gs-text-btn
+    {
+        margin-top: 8px;
+        padding: 4px 10px;
+        border: 1px solid rgba( 255, 255, 255, 0.16 );
+        cursor: pointer;
+
+        label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: $text-mid; }
+
+        &:hover
+        {
+            border-color: $accent;
+
+            label { color: white; }
+        }
+    }
+
+    .gs-subpanel
+    {
+        flex-shrink: 0;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 8px;
+        padding: 12px;
+        background-color: rgba( 0, 0, 0, 0.3 );
+        border: 1px solid $line;
+    }
+
+    // The colour picker's Red, Green and Blue boxes share one row (the picker shrinks them to fit). In the narrow
+    // layout a long name, like Polish "Czerwony", puts its number under it.
+    ColorPicker .channels.layout
+    {
+        padding: 8px 8px 0 8px;
+    }
+
+    ColorPicker .channels .channel.layout
+    {
+        flex-wrap: wrap;
+        padding: 6px 8px;
+
+        label { font-size: 13px; }
+        textentry .content-label { font-size: 14px; }
+    }
+
+    .gs-slider
+    {
+        flex-direction: column;
+        gap: 2px;
+
+        .slidercontrol .track-active { background-color: $accent; }
+        .slidercontrol .thumb { background-color: white; width: 10px; height: 14px; }
+    }
+
+    .gs-slider-head
+    {
+        flex-direction: row;
+        justify-content: space-between;
+
+        label { font-size: 13px; font-weight: 600; color: $text-mid; }
+        .gs-slider-value { color: white; }
+    }
+
+    /* =================================================================
+       FOOTER
+       ================================================================= */
+
+    .gs-footer
+    {
+        flex-shrink: 0;
+        height: 40px;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 30px;
+        background-color: rgba( 4, 4, 6, 0.72 );
+        border-top: 1px solid $line;
+    }
+
+    .gs-footer-brand
+    {
+        font-size: 14px;
+        font-weight: 500;
+        letter-spacing: 6px;
+        color: rgba( 255, 255, 255, 0.55 );
+    }
+
+    .gs-footer-actions
+    {
+        align-items: center;
+        gap: 8px;
+
+        .gnav-round-btn
+        {
+            width: 32px;
+            height: 32px;
+
+            i { font-size: 17px; }
+        }
+
+        .gnav-tip
+        {
+            top: auto;
+            bottom: 100%;
+            margin-top: 0;
+            margin-bottom: 8px;
+            border-top: 1px solid rgba( 255, 255, 255, 0.1 );
+            border-bottom: 2px solid $accent;
+        }
+    }
+
+    /* =================================================================
+       NOTICE (SAVE LOADOUT, locked features)
+       ================================================================= */
+
+    .gs-notice
+    {
+        position: absolute;
+        left: 50%;
+        bottom: 150px;
+        width: 460px;
+        margin-left: -230px;
+        flex-direction: row;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 18px;
+        background-color: rgba( 12, 12, 15, 0.95 );
+        border: 1px solid rgba( 255, 255, 255, 0.1 );
+        border-left: 3px solid $accent;
+        box-shadow: 0 12px 30px rgba( 0, 0, 0, 0.6 );
+        pointer-events: none;
+        z-index: 500;
+        transition: opacity 0.2s $ease-out, transform 0.2s $ease-out;
+
+        &:intro
+        {
+            opacity: 0;
+            transform: translateY( 10px );
+        }
+
+        &:outro
+        {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+    }
+
+    .gs-notice-icon
+    {
+        font-size: 28px;
+        color: $accent;
+    }
+
+    .gs-notice-copy
+    {
+        flex-grow: 1;
+        min-width: 0;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .gs-notice-title
+    {
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: white;
+    }
+
+    .gs-notice-body
+    {
+        font-size: 13px;
+        font-weight: 500;
+        color: $text-mid;
+    }
+
+    /* =================================================================
+       MODALS: share build, presets, tuning
+       ================================================================= */
+
+    .gs-modal-backdrop
+    {
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba( 0, 0, 0, 0.62 );
+        pointer-events: all;
+        z-index: 600;
+        transition: opacity 0.15s ease;
+
+        &:intro { opacity: 0; }
+    }
+
+    .gs-modal
+    {
+        width: 580px;
+        max-width: 92%;
+        max-height: 88%;
+        flex-direction: column;
+        padding: 22px 24px 20px 24px;
+        background-color: rgba( 14, 15, 18, 0.98 );
+        border: 1px solid rgba( 255, 255, 255, 0.1 );
+        border-top: 3px solid $accent;
+        box-shadow: 0 24px 60px rgba( 0, 0, 0, 0.75 );
+        overflow-y: scroll;
+
+        &.tuning { width: 860px; }
+        &.compare { width: 820px; }
+    }
+
+    .gs-modal-head
+    {
+        flex-shrink: 0;
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 6px;
+    }
+
+    .gs-modal-title
+    {
+        flex-grow: 1;
+        min-width: 0;
+        flex-direction: column;
+        gap: 1px;
+    }
+
+    .gs-modal-caption
+    {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 2.5px;
+        color: $accent;
+    }
+
+    .gs-modal-name
+    {
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: white;
+    }
+
+    .gs-modal-text
+    {
+        flex-shrink: 0;
+        margin: 6px 0 12px 0;
+        font-size: 14px;
+        font-weight: 500;
+        color: $text-mid;
+    }
+
+    .gs-modal-row
+    {
+        flex-shrink: 0;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .gs-modal-message
+    {
+        flex-shrink: 0;
+        margin-top: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        color: $good;
+
+        &.error { color: $bad; }
+    }
+
+    .gs-modal-empty
+    {
+        padding: 16px 2px;
+        font-size: 14px;
+        color: $text-dim;
+    }
+
+    .gs-modal-foot
+    {
+        flex-shrink: 0;
+        margin-top: 12px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: $text-dim;
+        text-align: right;
+    }
+
+    .gs-btn
+    {
+        flex-shrink: 0;
+        height: 42px;
+        padding: 0 16px;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border: 1px solid rgba( 255, 255, 255, 0.2 );
+        background-color: rgba( 255, 255, 255, 0.05 );
+        cursor: pointer;
+        transition: border-color 0.15s ease, background-color 0.15s ease;
+
+        i { font-size: 18px; color: rgba( 255, 255, 255, 0.85 ); }
+        label { font-size: 13px; font-weight: 700; letter-spacing: 2px; color: white; }
+
+        &:hover
+        {
+            border-color: $accent;
+            background-color: rgba( 255, 122, 26, 0.14 );
+        }
+
+        &.primary
+        {
+            background-color: $accent;
+            border-color: $accent;
+
+            i, label { color: $accent-ink; }
+
+            &:hover { background-color: #FF8C33; border-color: #FF8C33; }
+        }
+
+        &.wide
+        {
+            margin-top: 12px;
+            width: 100%;
+        }
+
+        &.small
+        {
+            height: 32px;
+            padding: 0 12px;
+
+            label { font-size: 11px; }
+        }
+    }
+
+    .gs-preset-list
+    {
+        flex-shrink: 0;
+        flex-direction: column;
+        gap: 6px;
+        margin-top: 14px;
+    }
+
+    .gs-preset
+    {
+        flex-shrink: 0;
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+        height: 52px;
+        padding: 0 10px 0 14px;
+        background-color: $card-bg;
+        border: 1px solid $line;
+        border-left: 3px solid transparent;
+
+        &.current
+        {
+            border-left-color: $accent;
+            background-color: rgba( 255, 122, 26, 0.07 );
+        }
+    }
+
+    .gs-preset-icon
+    {
+        font-size: 22px;
+        color: $accent;
+    }
+
+    .gs-preset-name
+    {
+        flex-grow: 1;
+        min-width: 0;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        color: white;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .gs-preset-state
+    {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        color: $accent;
+    }
+
+    .gs-modal.tuning WeaponTuningPanel
+    {
+        width: 100%;
+        max-width: 100%;
+        margin-top: 12px;
+        padding: 0;
+        background-color: transparent;
+        gap: 16px;
+
+        .tuning-title { display: none; }
+        .tuning-row { gap: 18px; }
+        .stat-name { width: 170px; font-size: 18px; letter-spacing: 1px; color: $text-mid; }
+        .bar-wrap { width: auto; min-width: 60px; flex-shrink: 1; height: 8px; }
+        .bar-fill.positive { background-color: $good; }
+        .bar-fill.negative { background-color: $bad; }
+        .controls { width: 180px; justify-content: space-between; }
+        .controls .btn { width: 48px; height: 48px; font-size: 26px; background-color: rgba( 255, 255, 255, 0.07 ); border: 1px solid rgba( 255, 255, 255, 0.16 ); border-radius: 2px; }
+        .controls .btn:hover { border-color: $accent; background-color: rgba( 255, 122, 26, 0.14 ); }
+        .controls .btn label { font-size: 26px; }
+        .controls .val { width: 52px; font-size: 20px; }
+        .reset-row { min-height: 52px; }
+    }
+}
+
+/* =================================================================
+   STATES AND SIZES
+   ================================================================= */
+
+// Over a match the header's logo and tabs would leave it, so it only has its buttons.
+GunsmithPanel.in-match .gnav-logo
+{
+    cursor: default;
+
+    &:hover { opacity: 0.92; }
+}
+
+// First-person view: only the header and the breadcrumbs stay up.
+GunsmithPanel.fps
+{
+    .gs-left, .gs-right, .gs-hero, .gs-center-bottom { display: none; }
+}
+
+// Narrower than 16:9: tighter header tabs so it stays on one row (as in the main menu).
+GunsmithPanel.tight-nav
+{
+    .global-nav { padding: 0 14px; }
+    .gnav-logo { margin-right: 12px; }
+    .gnav-item { padding: 0 8px; gap: 6px; }
+    .gnav-item label { font-size: 15px; letter-spacing: 0.8px; }
+    .gnav-right { gap: 10px; }
+}
 
 GunsmithPanel.compact
 {
-	.gs-topbar { padding: 0 16px; gap: 12px; }
-	.gs-icon-btn { padding: 6px 12px; }
-	.gs-class-panel, .weapon-browser { left: 16px; width: 340px; }
-	// Armory ends at 356 and the 360-wide attachment column starts 376 from the right.
-	.gs-bottom.build-mode { left: 372px; right: 392px; padding: 14px 16px; }
-	.gs-slot-weapon-name { font-size: 21px; }
-	.gs-tab-btn { padding: 8px 12px; }
-	.gs-detail-head { width: 300px; }
-	.gs-xp-wrap { width: 200px; }
-	.gs-detail-name { font-size: 23px; }
-	.gs-tuning-btn, .gs-loadout-btn { min-width: 140px; padding: 8px 16px; }
+    .gnav-game-name { font-size: 20px; letter-spacing: 5px; }
+    .gnav-prestige { display: none; }
+    .gnav-profile-info { display: none; }
+    .gnav-item label { font-size: 14px; }
+
+    .gs-body { padding: 14px 20px 12px 20px; gap: 18px; }
+    .gs-crumbs, .gs-footer { padding: 0 20px; }
+    .gs-left { width: 340px; }
+    .gs-right { width: 380px; }
+    .gs-hero-name { font-size: 54px; }
+    .gs-stats { width: 480px; }
+    .gs-card-img { height: 88px; }
+    .cust-item { width: 102px; height: 102px; }
+    .gs-action { padding: 0 14px; gap: 10px; }
 }
 
 GunsmithPanel.narrow
 {
-	.gs-brand-text { display: none; }
-	.gs-topbar-actions { gap: 4px; }
-	.gs-topbar-actions .gs-icon-btn { padding: 8px; }
-	.gs-topbar-actions .gs-icon-btn label { display: none; }
-	.gs-weapon-title { min-width: 0; }
-	.gs-weapon-name { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-	.gs-class-panel, .weapon-browser { width: 290px; }
-	.gs-class-panel { padding: 12px; }
-	.gs-bottom.build-mode { left: 322px; right: 332px; padding: 10px; }
-	.gs-bottom { padding: 8px 12px; }
-	.gs-tab-btn { padding: 7px 10px; }
-	.gs-tab-btn label { font-size: 16px; }
-	.gs-tab-content { padding: 4px 4px 12px; }
-	.gs-detail-head { width: 100%; min-width: 0; }
-	.gs-detail-meta { min-width: 0; }
-	.gs-xp-wrap { width: 100%; }
-	.gs-detail-name { font-size: 19px; }
-}
-
-GunsmithPanel.portrait
-{
-	.gs-brand { display: none; }
-	.gs-bottom.build-mode { left: 16px; right: 16px; }
-	.weapon-browser { bottom: 26%; }
-	.cust-item { width: 72px; height: 72px; }
-	.gs-tab-nav { padding: 4px; }
-	.gs-tab-btn { padding: 6px; }
-	.gs-tab-btn label { font-size: 14px; }
+    .gnav-item label { display: none; }
+    .gs-left { width: 300px; }
+    .gs-right { width: 330px; }
+    .gs-hero-name { font-size: 44px; }
+    .gs-hero-desc, .gs-tags, .gs-action-sub, .gs-stage-hint { display: none; }
+    .gs-stats { width: 100%; }
+    .cust-item { width: 92px; height: 92px; }
 }
 
 GunsmithPanel.short
 {
-	.weapon-browser { overflow-y: scroll; }
-	.gs-bottom { height: 44%; }
-	.cust-item { width: 72px; height: 72px; }
-}
-
-GunsmithPanel.compact.armory-collapsed .gs-bottom.build-mode { left: 16px; }
-
-// Readable controls with full-tile hit targets, shared by Build and Customise.
-GunsmithPanel
-{
-	.gs-mode-tabs { height: 68px; gap: 12px; background-color: rgba( 12, 16, 19, 0.96 ); }
-	.gs-mode-tab { min-width: 200px; font-size: 19px; color: #d7dce0; }
-	.gs-mode-tab.is-selected { background-color: #ffbd24; color: #111519; }
-	.gs-armory-tab.is-selected { background-color: #303a43; border-color: #ffbd24; color: white; }
-	.gs-armory-tab { position: absolute; left: 24px; }
-	.gs-icon-btn { min-height: 50px; font-size: 17px; gap: 8px; }
-	.gs-class-panel { top: 156px; padding: 16px; background-color: rgba( 19, 24, 28, 0.96 ); border-color: #46515a; }
-	// All classes visible at once (5 per row, max 10) — no sideways scrolling.
-	.gs-class-strip, .gs-class-panel.has-many-classes .gs-class-strip { overflow: hidden; flex-wrap: wrap; gap: 6px; }
-	.gs-class-slot, .gs-class-panel.has-many-classes .gs-class-slot
-	{
-		flex: 0 0 18.8%;
-		height: 46px;
-		flex-direction: row;
-		gap: 6px;
-		padding: 0 8px;
-		justify-content: flex-start;
-		background-color: #262e34;
-		border-color: #4c5862;
-	}
-	.gs-class-slot .gs-class-num { font-size: 16px; color: #aebbc5; flex-shrink: 0; }
-	.gs-class-slot .gs-class-name { font-size: 14px; color: #d7dce0; text-align: left; }
-	.gs-class-slot.active .gs-class-num { color: #ffbd24; }
-	.gs-class-slot.active .gs-class-name { color: white; }
-	.gs-add-class, .gs-class-panel.has-many-classes .gs-add-class { flex: 0 0 18.8%; height: 46px; color: white; background-color: #262e34; }
-	.gs-add-class i { font-size: 22px; }
-	.gs-rename-input { min-height: 52px; background-color: #10161b; border-color: #46515a; }
-	.gs-action-btn { width: 52px; height: 52px; font-size: 26px; }
-	.gs-action-btn i { font-size: 26px; }
-	.weapon-browser { top: 340px; background-color: rgba( 19, 24, 28, 0.96 ); border-color: #46515a; overflow-y: scroll; }
-	.gs-armory-section { color: #adb9c3; letter-spacing: 2px; }
-	.gs-slot-row { height: 84px; background-color: #252e35; border-color: #46515a; }
-	.gs-slot-row-sm { height: 72px; }
-	.gs-slot-row.active { background-color: #393321; border-left-color: #ffbd24; }
-	.gs-slot-type-badge, .gs-slot-lv { color: #ffca54; }
-	.gs-slot-weapon-name { font-size: 24px; }
-	.gs-slot-arrow { color: #cad2d8; font-size: 28px; }
-	.gs-cat-tabs { height: auto; min-height: 98px; }
-	.gs-cat-tab { min-height: 54px; color: #d4dce2; background-color: #303a43; line-height: 20px; }
-	.gs-cat-tab label { font-size: 17px; letter-spacing: 0.5px; }
-	.gs-cat-tab.is-selected { background-color: #ffbd24; color: #111519; }
-	.weapon-list { flex-shrink: 0; min-height: 180px; max-height: 360px; }
-	.weapon-option { min-height: 68px; font-size: 20px; background-color: #242e36; color: #f3f4f5; }
-	.weapon-option.is-selected { color: white; background-color: #3c3523; border: 1px solid #ffbd24; }
-	.weapon-lv { color: #b8c4ce; }
-	.gs-perk-slot { min-height: 116px; background-color: #252e35; border-color: #46515a; }
-	.gs-perk-slot .gs-perk-icon { color: #d4dce2; font-size: 32px; }
-	.gs-perk-slot .gs-perk-sub { color: #aebbc5; font-size: 14px; }
-	.gs-bottom.build-mode { min-height: 100px; background-color: rgba( 13, 17, 20, 0.98 ); justify-content: center; }
-	.gs-tuning-btn, .gs-loadout-btn { min-height: 60px; min-width: 180px; justify-content: center; }
-	.gs-tuning-btn { background-color: #303a43; color: white; }
-	.gs-loadout-btn { background-color: #ffbd24; color: #111519; }
-	.gs-loadout-btn.set { border-color: #ffbd24; color: #ffca54; }
-	.gs-tab-btn { min-height: 52px; align-items: center; }
-	.cust-item { width: 116px; height: 116px; border-color: #59656e; }
-	.gs-bg-vignette { background-image: none; }
-	.gs-tuning-backdrop
-	{
-		position: absolute;
-		inset: 0;
-		z-index: 300;
-		align-items: center;
-		justify-content: center;
-		background-color: rgba( 0, 0, 0, 0.65 );
-		pointer-events: all;
-	}
-	.gs-tuning-dialog
-	{
-		width: 860px;
-		max-width: 92%;
-		max-height: 85%;
-		overflow-y: scroll;
-		padding: 28px;
-		flex-direction: column;
-		gap: 22px;
-		background-color: #131a20;
-		border: 1px solid #65717b;
-		border-top: 3px solid #ffbd24;
-	}
-	.gs-tuning-heading { justify-content: space-between; align-items: center; color: white; font-size: 28px; letter-spacing: 1px; }
-	.gs-tuning-heading > label { font-size: 28px; letter-spacing: 1.5px; }
-	.gs-tuning-dialog WeaponTuningPanel
-	{
-		width: 100%;
-		max-width: 100%;
-		padding: 0;
-		background-color: transparent;
-		gap: 16px;
-		.tuning-title { display: none; }
-		.tuning-row { gap: 18px; }
-		.stat-name { width: 170px; font-size: 20px; color: #d4dce2; }
-		.bar-wrap { width: auto; min-width: 60px; flex-shrink: 1; height: 10px; }
-		.controls { width: 180px; justify-content: space-between; }
-		.controls .btn { width: 52px; height: 52px; background-color: #34404a; font-size: 28px; }
-		.controls .btn label { font-size: 28px; }
-		.controls .val { width: 52px; font-size: 22px; }
-		.reset-row { min-height: 52px; }
-	}
-}
-
-GunsmithPanel.compact .gs-armory-tab { left: 16px; }
-GunsmithPanel.narrow
-{
-	.gs-mode-tab { min-width: 150px; }
-	.gs-mode-tabs { justify-content: flex-end; padding-right: 16px; }
-}
-
-// ===================== CLASS PICKER (dropdown) =====================
-GunsmithPanel
-{
-	.gs-class-panel.dd-open { z-index: 50; }
-	// The rename row sits under the open list; hide it so it can't draw through.
-	.gs-class-panel.dd-open .gs-class-actions { opacity: 0; pointer-events: none; }
-
-	.gs-class-dd-header
-	{
-		flex-direction: row;
-		align-items: center;
-		gap: 14px;
-		height: 72px;
-		padding: 0 16px;
-		background-color: #262e34;
-		border: 1px solid #4c5862;
-		border-left: 4px solid #ffbd24;
-		border-radius: 4px;
-		cursor: pointer;
-		transition: background-color 0.12s ease, border-color 0.12s ease;
-
-		&:hover { background-color: #2f3941; border-color: #6b7883; border-left-color: #ffbd24; }
-		&.open { background-color: #313c45; border-color: #ffbd24; }
-	}
-
-	.gs-class-dd-num
-	{
-		font-size: 36px;
-		font-weight: 900;
-		color: #ffbd24;
-		width: 34px;
-		text-align: center;
-		flex-shrink: 0;
-	}
-
-	.gs-class-dd-copy
-	{
-		flex-direction: column;
-		flex-grow: 1;
-		min-width: 0;
-	}
-
-	.gs-class-dd-caption
-	{
-		font-size: 14px;
-		font-weight: 700;
-		letter-spacing: 1.5px;
-		color: #aebbc5;
-	}
-
-	.gs-class-dd-name
-	{
-		font-size: 27px;
-		font-weight: 900;
-		color: white;
-		white-space: nowrap;
-		text-overflow: ellipsis;
-		overflow: hidden;
-	}
-
-	.gs-class-dd-count
-	{
-		font-size: 17px;
-		font-weight: 700;
-		color: #aebbc5;
-		flex-shrink: 0;
-	}
-
-	.gs-class-dd-chevron
-	{
-		font-size: 34px;
-		color: white;
-		flex-shrink: 0;
-	}
-
-	// Opens over the armory below it.
-	.gs-class-dd-list
-	{
-		position: absolute;
-		left: 16px;
-		right: 16px;
-		top: 96px;
-		flex-direction: column;
-		max-height: 560px;
-		overflow-y: scroll;
-		background-color: rgba( 16, 20, 24, 0.99 );
-		border: 1px solid #ffbd24;
-		border-radius: 4px;
-		box-shadow: 0px 12px 32px rgba( black, 0.6 );
-		z-index: 20;
-		padding: 6px;
-		gap: 4px;
-	}
-
-	.gs-class-dd-item
-	{
-		flex-direction: row;
-		align-items: center;
-		gap: 14px;
-		min-height: 66px;
-		padding: 8px 14px;
-		background-color: #222a30;
-		border: 1px solid transparent;
-		border-radius: 3px;
-		cursor: pointer;
-		flex-shrink: 0;
-
-		&:hover { background-color: #2f3941; border-color: #6b7883; }
-
-		&.active
-		{
-			background-color: rgba( 255, 189, 36, 0.14 );
-			border-color: #ffbd24;
-
-			.gs-class-dd-item-num { color: #ffbd24; }
-		}
-
-		&.create
-		{
-			background-color: transparent;
-			border: 1px dashed #4c5862;
-
-			.gs-class-dd-item-num { font-size: 28px; color: #ffbd24; }
-			.gs-class-dd-item-name { font-size: 19px; color: #d7dce0; }
-			&:hover { border-color: #ffbd24; }
-		}
-	}
-
-	.gs-class-dd-item-num
-	{
-		width: 34px;
-		font-size: 24px;
-		font-weight: 900;
-		color: #aebbc5;
-		text-align: center;
-		flex-shrink: 0;
-	}
-
-	.gs-class-dd-item-copy
-	{
-		flex-direction: column;
-		flex-grow: 1;
-		min-width: 0;
-	}
-
-	.gs-class-dd-item-name
-	{
-		font-size: 21px;
-		font-weight: 900;
-		color: white;
-		white-space: nowrap;
-		text-overflow: ellipsis;
-		overflow: hidden;
-	}
-
-	.gs-class-dd-item-sub
-	{
-		font-size: 14px;
-		font-weight: 700;
-		letter-spacing: 1px;
-		color: #9aa6b0;
-	}
-
-	.gs-class-dd-check
-	{
-		font-size: 28px;
-		color: #ffbd24;
-		flex-shrink: 0;
-	}
-}
-
-// ===================== ARMORY PICKER PAGE =====================
-GunsmithPanel
-{
-	.gs-picker-header
-	{
-		flex-direction: row;
-		align-items: center;
-		gap: 14px;
-		flex-shrink: 0;
-		padding-bottom: 14px;
-		margin-bottom: 10px;
-		border-bottom: 1px solid #46515a;
-	}
-
-	.gs-picker-back
-	{
-		flex-direction: row;
-		align-items: center;
-		gap: 6px;
-		height: 52px;
-		padding: 0 16px 0 12px;
-		background-color: #303a43;
-		border: 1px solid #4c5862;
-		border-radius: 3px;
-		cursor: pointer;
-		flex-shrink: 0;
-
-		i { font-size: 24px; color: white; }
-		label { font-size: 17px; font-weight: 800; letter-spacing: 1px; color: white; }
-
-		&:hover { border-color: #ffbd24; background-color: #3a4650; }
-	}
-
-	.gs-picker-title
-	{
-		flex-direction: column;
-		min-width: 0;
-	}
-
-	.gs-picker-caption
-	{
-		font-size: 14px;
-		font-weight: 700;
-		letter-spacing: 1.5px;
-		color: #ffbd24;
-	}
-
-	.gs-picker-name
-	{
-		font-size: 26px;
-		font-weight: 900;
-		color: white;
-		white-space: nowrap;
-	}
-
-	// The list gets the whole panel instead of a cramped strip between the slots.
-	.weapon-list.gs-picker-list
-	{
-		flex-grow: 1;
-		flex-shrink: 1;
-		min-height: 0;
-		max-height: 100%;
-		overflow-y: scroll;
-	}
-
-	.gs-picker-list .gs-cat-tabs
-	{
-		height: auto;
-		min-height: 0;
-		gap: 8px;
-		margin: 0 0 10px 0;
-	}
-
-	.gs-picker-list .gs-cat-tab
-	{
-		flex: 1 1 30%;
-		min-height: 54px;
-		font-size: 17px;
-		white-space: nowrap;
-	}
+    .gs-hero-desc { display: none; }
+    .gs-card-img { height: 76px; }
+    .gs-actions { height: 72px; }
+    .gs-stat-rows { gap: 6px; }
+    .gs-side-line { margin: 8px 0; }
+    .gs-stats-details { margin-top: 8px; padding: 3px 6px; }
 }

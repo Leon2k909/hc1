@@ -11,7 +11,7 @@
         @if ( ArmorComponent.IsValid() )
         {
             <div class="armor-readout flex column">
-                <label class="armor-label">ARMOUR</label>
+                <label class="armor-label">@Tr( "ARMOUR" )</label>
                 <span class="flex row align-center gap-sm">
                     <Icon file="/ui/armor.png" size="24" />
                     <label class="vital">@Armor</label>
@@ -20,7 +20,7 @@
                 {
                     <span class="helmet-status flex row align-center">
                         <Icon file="/ui/helmet.png" size="12" />
-                        <label>HELMET</label>
+                        <label>@Tr( "HELMET" )</label>
                     </span>
                 }
             </div>

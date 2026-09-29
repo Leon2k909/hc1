@@ -7,7 +7,7 @@ public sealed class ZombiesGameMode : Component, IGameEventHandler<PlayerSpawned
 {
 	// Serialized model references keep cloud assets in the game's dependency graph.
 	[Property] public Model ZombieBodyModel { get; set; }
-	[Property] public Model MysteryBoxModel { get; set; }
+	[Property] public Model WeaponCrateModel { get; set; }
 
 	protected override void OnAwake()
 	{
@@ -16,7 +16,7 @@ public sealed class ZombiesGameMode : Component, IGameEventHandler<PlayerSpawned
 		{
 			var rounds = Components.GetOrCreate<ZombiesRoundSystem>();
 			rounds.ZombieBodyModel = ZombieBodyModel;
-			rounds.MysteryBoxModel = MysteryBoxModel;
+			rounds.WeaponCrateModel = WeaponCrateModel;
 		}
 	}
 
@@ -27,6 +27,7 @@ public sealed class ZombiesGameMode : Component, IGameEventHandler<PlayerSpawned
 		if ( Networking.IsHost )
 		{
 			CarriedPoints.Clear();
+			CarriedKills.Clear();
 			foreach ( var p in Scene.GetAllComponents<PlayerPawn>() )
 				SetupPlayer( p );
 		}
@@ -40,12 +41,12 @@ public sealed class ZombiesGameMode : Component, IGameEventHandler<PlayerSpawned
 
 	private static void SetupPlayer( PlayerPawn player )
 	{
-		// Points carry over between lives; a restart resets them.
+		// Points and kills carry over between lives; a restart resets them.
 		if ( !player.Components.TryGet<ZombiesPlayerEconomy>( out _ ) )
 		{
 			var eco = player.Components.Create<ZombiesPlayerEconomy>();
 			if ( player.Client.IsValid() && CarriedPoints.TryGetValue( player.Client, out var pts ) )
-				eco.SetPoints( pts );
+				eco.Restore( pts, CarriedKills.GetValueOrDefault( player.Client ) );
 		}
 
 		if ( !player.Components.TryGet<ZombiesPlayerState>( out var state ) )
@@ -57,4 +58,7 @@ public sealed class ZombiesGameMode : Component, IGameEventHandler<PlayerSpawned
 
 	/// <summary>Points saved when a pawn is destroyed on death, restored when the player respawns.</summary>
 	public static readonly Dictionary<Client, int> CarriedPoints = new();
+
+	/// <summary>Zombie kills, carried over the same way.</summary>
+	public static readonly Dictionary<Client, int> CarriedKills = new();
 }

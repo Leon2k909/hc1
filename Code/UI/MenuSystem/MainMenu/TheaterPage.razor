@@ -9,136 +9,148 @@
 @attribute [StyleSheet]
 @namespace Facepunch.UI
 
+@* The saved replays (TheaterReplays), laid out like SESSIONS' server browser. Watching one loads theater_playback.scene. *@
 <root class="hc1 theater-page">
     <MenuTopbar Title="THEATER" />
 
-    <div class="theater-content">
-        <div class="movie-list">
-        @if ( Replays.Count == 0 )
-        {
-            <div class="empty-state">
-                <label>No replays found. Play a match to record one!</label>
-            </div>
-        }
-        else
-        {
-            @foreach ( var replay in Replays )
+    <div class="th-body">
+        <div class="th-head">
+            <div class="th-accent"></div>
+            <label class="th-heading">@Tr( "REPLAYS" )</label>
+            <div class="th-head-fill"></div>
+            @if ( MatchRecorder.RecordingOff )
             {
-                <div class="movie-card">
-                    <div class="movie-info" onclick=@(() => PlayReplay(replay.Path))>
-                        <label class="movie-name">@replay.Name</label>
-                        <label class="movie-date">@replay.Date</label>
-                    </div>
-                    <div class="movie-play" onclick=@(() => PlayReplay(replay.Path))>
-                        <i>play_arrow</i>
-                    </div>
-                    <div class="movie-delete" onclick=@(() => DeleteReplay(replay.Path))>
-                        <i>delete</i>
-                    </div>
-                </div>
+                <label class="th-off">@Tr( "Theater Recording is off in the settings" )</label>
             }
-        }
+            <label class="th-count">@CountLabel</label>
         </div>
+
+        <div class="th-panels">
+            <div class="th-list">
+                <div class="th-panel-head">
+                    <label class="th-col-map">@Tr( "Map" )</label>
+                    <label class="th-col-mode">@Tr( "Mode" )</label>
+                    <label class="th-col-date">@Tr( "Recorded" )</label>
+                    <label class="th-col-length">@Tr( "Length" )</label>
+                </div>
+
+                <div class="th-rows">
+                    @if ( Replays.Count == 0 )
+                    {
+                        <div class="th-state">
+                            <i>movie</i>
+                            <label class="th-state-text">@Tr( "No replays found. Play a match to record one!" )</label>
+                        </div>
+                    }
+                    else
+                    {
+                        @foreach ( var replay in Replays )
+                        {
+                            <div class="th-row @(replay.Id == SelectedId ? "selected" : "")" onclick=@(() => Select( replay.Id ))>
+                                <label class="th-col-map">@replay.Info.MapTitle</label>
+                                <label class="th-col-mode">@ModeName( replay.Info )</label>
+                                <label class="th-col-date">@DateLabel( replay.Info )</label>
+                                <label class="th-col-length">@TheaterOverlay.FormatTime( replay.Info.Duration )</label>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+
+            <div class="th-detail @(Selected is null ? "empty" : "")">
+                <div class="th-panel-head">
+                    <label>@Tr( "Replay Details" )</label>
+                </div>
+
+                @if ( Selected is { } selected )
+                {
+                    <div class="th-detail-body">
+                        <label class="th-detail-name">@selected.Info.MapTitle</label>
+                        <div class="th-stat"><label class="th-stat-key">@Tr( "Mode" )</label><label class="th-stat-value">@ModeName( selected.Info )</label></div>
+                        <div class="th-stat"><label class="th-stat-key">@Tr( "Recorded" )</label><label class="th-stat-value">@DateLabel( selected.Info )</label></div>
+                        <div class="th-stat"><label class="th-stat-key">@Tr( "Length" )</label><label class="th-stat-value">@TheaterOverlay.FormatTime( selected.Info.Duration )</label></div>
+                        <div class="th-stat"><label class="th-stat-key">@Tr( "Players" )</label><label class="th-stat-value">@CountPeople( selected.Info, false )</label></div>
+                        <div class="th-stat"><label class="th-stat-key">@Tr( "Bots" )</label><label class="th-stat-value">@CountPeople( selected.Info, true )</label></div>
+                        <label class="th-note">@Tr( "The newest {0} replays are kept, for {1} days.", TheaterReplays.MaxReplays, TheaterReplays.MaxAgeDays )</label>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="th-footer">
+        <div class="th-action @(Selected is null ? "disabled" : "")" onclick=@DeleteSelected><i>delete</i><label>@Tr( "Delete" )</label></div>
+        <div class="th-action primary @(Selected is null ? "disabled" : "")" onclick=@WatchSelected><i>play_arrow</i><label>@Tr( "Watch Replay" )</label></div>
     </div>
 </root>
 
 @code
 {
-    public void OnNavigationOpen()  => MainMenuRoot.Instance?.SetActiveRoute( "/theater" );
+    public void OnNavigationOpen() => MainMenuRoot.Instance?.SetActiveRoute( "/theater" );
     public void OnNavigationClose() { }
 
-    struct ReplayInfo
-    {
-        public string Name;
-        public string Path;
-        public string Date;
-    }
+    List<TheaterReplays.Entry> Replays = new();
+    string SelectedId;
 
-    private List<ReplayInfo> Replays = new();
+    TheaterReplays.Entry Selected => Replays.FirstOrDefault( x => x.Id == SelectedId );
+
+    string CountLabel => Tr( "Saved: {0} / {1}", Replays.Count, TheaterReplays.MaxReplays );
 
     protected override void OnAfterTreeRender( bool firstTime )
     {
         if ( firstTime )
-        {
-            RefreshReplays();
-        }
+            Refresh();
     }
 
-    void RefreshReplays()
+    void Refresh()
     {
-        Replays.Clear();
+        TheaterReplays.Prune();
+        Replays = TheaterReplays.List();
 
-        if ( FileSystem.Data.DirectoryExists( "replays" ) )
-        {
-            var files = FileSystem.Data.FindFile( "replays", "*.movie" ).ToList();
-            
-            // Auto-expire clips older than 7 days
-            foreach ( var file in files )
-            {
-                var nameParts = file.Replace( ".movie", "" ).Split('_');
-                if ( nameParts.Length >= 3 )
-                {
-                    string dateStr = $"{nameParts[nameParts.Length-2]}_{nameParts[nameParts.Length-1]}";
-                    if ( System.DateTime.TryParseExact( dateStr, "yyyyMMdd_HHmmss", null, System.Globalization.DateTimeStyles.None, out var date ) )
-                    {
-                        if ( (System.DateTime.Now - date).TotalDays > 7 )
-                        {
-                            FileSystem.Data.DeleteFile( $"replays/{file}" );
-                            continue;
-                        }
-                    }
-                }
-            }
-        }
+        if ( Selected is null )
+            SelectedId = Replays.FirstOrDefault()?.Id;
 
-        LoadReplays();
-    }
-
-    void LoadReplays()
-    {
-        Replays.Clear();
-
-        if ( FileSystem.Data.DirectoryExists( "replays" ) )
-        {
-            var files = FileSystem.Data.FindFile( "replays", "*.movie" ).ToList();
-
-            foreach ( var file in files.OrderByDescending(x => x) )
-            {
-                var nameParts = file.Replace( ".movie", "" ).Split('_');
-                string dateStr = "Unknown Date";
-                if (nameParts.Length >= 3) {
-                    dateStr = $"{nameParts[nameParts.Length-2]} {nameParts[nameParts.Length-1].Substring(0,2)}:{nameParts[nameParts.Length-1].Substring(2,2)}";
-                }
-
-                Replays.Add( new ReplayInfo
-                {
-                    Name = nameParts[0].Replace( "_", " " ),
-                    Path = $"replays/{file}",
-                    Date = dateStr
-                });
-            }
-        }
         StateHasChanged();
     }
 
-    void DeleteReplay( string path )
+    void Select( string id )
     {
-        if ( FileSystem.Data.FileExists( path ) )
-        {
-            FileSystem.Data.DeleteFile( path );
-            LoadReplays();
-        }
+        SelectedId = id;
+        StateHasChanged();
     }
 
-    void PlayReplay( string path )
+    void WatchSelected()
     {
-        // Store path so the theater scene can load it
-        Game.Cookies.Set( "theater_replay_path", path );
-        
+        if ( Selected is not { } replay )
+            return;
+
+        Game.Cookies.Set( TheaterController.ReplayCookie, replay.Id );
+
         var scene = ResourceLibrary.Get<SceneFile>( "scenes/theater_playback.scene" );
-        if ( scene != null )
-        {
+        if ( scene is not null )
             Game.ActiveScene.Load( scene );
-        }
     }
+
+    void DeleteSelected()
+    {
+        if ( Selected is not { } replay )
+            return;
+
+        DialogModal.Show( Tr( "Delete this replay?" ), Tr( "Delete" ), Tr( "Cancel" ), () =>
+        {
+            TheaterReplays.Delete( replay.Id );
+            SelectedId = null;
+            Refresh();
+        } );
+    }
+
+    string ModeName( TheaterReplays.Info info ) => string.IsNullOrWhiteSpace( info.Mode ) ? "" : Tr( info.Mode );
+
+    static string DateLabel( TheaterReplays.Info info ) => info.Recorded.ToString( "yyyy-MM-dd HH:mm" );
+
+    /// <summary> People, not lives: a bot that died five times is one bot. </summary>
+    static int CountPeople( TheaterReplays.Info info, bool bots ) =>
+        info.Soldiers?.Where( x => x.Bot == bots ).Select( x => x.Name ).Distinct().Count() ?? 0;
+
+    protected override int BuildHash() => HashCode.Combine( Replays.Count, SelectedId, MatchRecorder.RecordingOff );
 }

@@ -3,15 +3,24 @@
 
 <root>
     <MarkerSystem />
-    <MainMenuRoot />
+    <MainMenuRoot @ref="Root" />
     <Toast />
 </root>
 
 @code
 {
+    private MainMenuRoot Root { get; set; }
+
     protected override void OnStart()
     {
         // Re-apply saved volume settings (music mute, etc.) every time the menu loads.
         GameSettingsSystem.ApplyVolumes();
+    }
+
+    protected override void OnUpdate()
+    {
+        // Escape has to be taken in the scene's update: what's left of it after that goes to s&box's pause menu (in the
+        // editor, back to the editor) before any panel ticks.
+        if ( Input.EscapePressed ) Root?.HandleEscape();
     }
 }

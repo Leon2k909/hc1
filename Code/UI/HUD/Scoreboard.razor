@@ -14,67 +14,105 @@
 <root class="hidden flex absolute inset-0 align-center justify-center background">
     <table class="with-background with-padding-lg layout">
         <div class="title">
-            <label class="important uppercase left">@(Status is null ? Name : $"{Name} - {Status}")</label>
-            <label class="important uppercase center">@(RoundNumber is { } roundNumber && RoundLimit is { } roundLimit ? $"Round {roundNumber} of {roundLimit}" : "")</label>
+            <label class="important uppercase left">@(Status is null ? Tr( Name ) : $"{Tr( Name )} - {Tr( Status )}")</label>
+            <label class="important uppercase center">@(RoundNumber is { } roundNumber && RoundLimit is { } roundLimit ? Tr( "Round {0} of {1}", roundNumber, roundLimit ) : "")</label>
             <label class="important uppercase right">@(Time?.ToString( @"m\:ss" ) ?? " ")</label>
         </div>
 
         <div class="row voice-bar hc1">
-            <label class="small emphasis voice-label">Voice Channel:</label>
-            <div class="button standard smaller no-anim @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.Auto ? "selected" : "")" onclick=@(() => SetVoiceMode(VoiceChatMode.Auto))>Auto</div>
-            <div class="button standard smaller no-anim @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.Global ? "selected" : "")" onclick=@(() => SetVoiceMode(VoiceChatMode.Global))>Lobby</div>
-            <div class="button standard smaller no-anim @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.TeamOnly ? "selected" : "")" onclick=@(() => SetVoiceMode(VoiceChatMode.TeamOnly))>Team</div>
-            <div class="button standard smaller no-anim @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.PartyOnly ? "selected" : "")" onclick=@(() => SetVoiceMode(VoiceChatMode.PartyOnly))>Party</div>
+            <label class="small emphasis voice-label">@Tr( "Voice Channel:" )</label>
+            <div class="button standard smaller no-anim @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.Auto ? "selected" : "")" onclick=@(() => SetVoiceMode(VoiceChatMode.Auto))>@Tr( "Auto" )</div>
+            <div class="button standard smaller no-anim @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.Global ? "selected" : "")" onclick=@(() => SetVoiceMode(VoiceChatMode.Global))>@Tr( "Lobby" )</div>
+            <div class="button standard smaller no-anim @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.TeamOnly ? "selected" : "")" onclick=@(() => SetVoiceMode(VoiceChatMode.TeamOnly))>@Tr( "Team" )</div>
+            <div class="button standard smaller no-anim @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.PartyOnly ? "selected" : "")" onclick=@(() => SetVoiceMode(VoiceChatMode.PartyOnly))>@Tr( "Party" )</div>
 
             <div class="grow"></div>
 
             <div class="button standard smaller no-anim @(GameSettingsSystem.Current.VoiceProximity ? "selected" : "")" onclick=@ToggleProximity>
                 <i>@(GameSettingsSystem.Current.VoiceProximity ? "spatial_audio_off" : "spatial_audio")</i>
-                Prox Chat
+                @Tr( "Prox Chat" )
             </div>
         </div>
 
-        @for ( int i = 0; i < GroupedPlayers.Count(); i++ )
+        <div class="teams">
+        @if ( IsZombies )
         {
-             var group = GroupedPlayers[i];
+            @* Zombies is co-op: one list, no teams, with the mode's own points and zombie kills. *@
+            <div class="row header with-px-lg with-py-sm">
+                <label class="col stat-small small"></label>
+                <label class="col stat-small small"></label>
+                <label class="col playername small"></label>
+                <label class="col stat-small small mute-header"><i>chat</i></label>
+                <label class="col stat-small small mute-header"><i>mic</i></label>
 
-            @if ( group.Key == Team.Unassigned )
+                @foreach ( var column in ZombiesColumns )
+                {
+                    <label class="col stat">@Tr( column )</label>
+                }
+            </div>
+
+            @foreach ( var player in ZombiesPlayers )
+            {
+                <ScoreboardRow Client="@player" />
+            }
+        }
+        else
+        {
+        var groups = GroupedPlayers;
+        @for ( int i = 0; i < groups.Count; i++ )
+        {
+             var group = groups[i];
+
+            @if ( group.Team == Team.Unassigned )
             {
                 <div class="flex gap-sm align-center">
                     <Icon file="/ui/teams/spectator.png" size="16" />
-                    <label class="small grey">@(string.Join( ", ", group.Select( x => x.DisplayName ) ))</label>
+                    <label class="small grey">@(string.Join( ", ", group.Entries.Select( x => x.DisplayName ) ))</label>
                 </div>
             }
             else
             {
-                <span class="flex align-center space-between gap-sm" style="color: @group.Key.GetColor().Hex">
+                <span class="flex align-center space-between gap-sm" style="color: @group.Team.GetColor().Hex">
                     <span class="flex align-center gap-sm">
-                        <Icon file="@group.Key.GetIconPath()" size="24" />
-                        <label class="emphasis with-py">@group.Key.GetName()</label>
+                        <Icon file="@group.Team.GetIconPath()" size="24" />
+                        <label class="emphasis with-py">@Tr( group.Team.GetName() )</label>
                     </span>
 
-                    <separator style="background-color: @group.Key.GetColor().Hex" />
+                    <separator style="background-color: @group.Team.GetColor().Hex" />
+
+                    @if ( LightweightBotManager.CanManageBots )
+                    {
+                        var team = group.Team;
+                        <div class="button standard smaller no-anim add-bot" onclick=@(() => AddBot( team ))>
+                            <i>person_add</i>
+                            @Tr( "Add Bot" )
+                        </div>
+                    }
 
                     @if ( GameMode.Instance.IsValid() && GameMode.Instance.Get<TeamScoring>() is { } scoring )
                     {
-                        <label class="emphasis">@scoring.GetFormattedScore(group.Key)</label>
+                        <label class="emphasis">@scoring.GetFormattedScore(group.Team)</label>
 		            }
                 </span>
 
+                @* An empty team is only its heading: column names over no rows looked like a broken table. *@
+                @if ( group.Entries.Count > 0 )
+                {
                 <div class="row header with-px-lg with-py-sm">
                     <label class="col stat-small small"></label>
                     <label class="col stat-small small"></label>
                     <label class="col playername small"></label>
                     <label class="col stat-small small mute-header"><i>chat</i></label>
                     <label class="col stat-small small mute-header"><i>mic</i></label>
-                   
+
                     @foreach ( var x in IScore.Find( Client.Local ) )
                     {
-                        <label class="col stat">@(x.Attribute.Name)</label>
+                        <label class="col stat">@Tr( x.Attribute.Name )</label>
                     }
                 </div>
+                }
 
-                @foreach ( var player in group )
+                @foreach ( var player in group.Entries )
                 {
                     <ScoreboardRow Client="@player.Client" Bot="@player.Bot" />
                 }
@@ -85,6 +123,8 @@
                 }
             }
         }
+        }
+        </div>
     </table>
 </root>
 
@@ -99,21 +139,70 @@
 
     private IEnumerable<ScoreboardEntry> Entries => GameUtils.AllPlayers
         .Select( x => new ScoreboardEntry { Client = x } )
-        .Concat( GameUtils.LightweightBots
-            .Where( x => x.IsValid() && x.Team != Team.Unassigned )
-            .Select( x => new ScoreboardEntry { Bot = x } ) );
+        .Concat( ScoreboardBots.Select( x => new ScoreboardEntry { Bot = x } ) );
 
-    private List<IGrouping<Team, ScoreboardEntry>> GroupedPlayers
+    /// <summary>
+    /// One row per bot. Each life is a new bot object and bodies stay around for a while, so a bot that has died has
+    /// several: show the living one, or its latest body while it waits to respawn.
+    /// </summary>
+    private static IEnumerable<LightweightCombatBot> ScoreboardBots => GameUtils.LightweightBots
+        .Where( x => x.IsValid() && x.Team != Team.Unassigned )
+        .GroupBy( x => (x.Team, x.BotName) )
+        .Select( x => x.OrderByDescending( bot => bot.IsAlive ).ThenByDescending( bot => bot.Deaths ).First() );
+
+    /// <summary> Zombies is co-op, so its scoreboard is one list, with no team headings. </summary>
+    public static bool IsZombies => ZombiesRoundSystem.Current.IsValid();
+
+    /// <summary>
+    /// Zombies' columns, in <see cref="ScoreboardRow"/>'s order: its points and zombie kills, since the multiplayer score
+    /// never moves there.
+    /// </summary>
+    public static readonly string[] ZombiesColumns = { "Points", "Kills" };
+
+    /// <summary> A player's zombies economy, on their pawn: none while they're dead, waiting for the next round. </summary>
+    public static ZombiesPlayerEconomy GetZombiesEconomy( Client client ) =>
+        client.IsValid() && client.PlayerPawn.IsValid() ? client.PlayerPawn.GetComponent<ZombiesPlayerEconomy>() : null;
+
+    /// <summary> The players, most points first. </summary>
+    private List<Client> ZombiesPlayers => GameUtils.AllPlayers
+        .Where( x => x.IsValid() && !x.IsBot )
+        .OrderByDescending( x => GetZombiesEconomy( x )?.Points ?? -1 )
+        .ThenBy( x => x.DisplayName )
+        .ToList();
+
+    private void AddBot( Team team )
+    {
+        LightweightBotManager.Instance?.AddBot( team );
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Modes that score by team list both teams, even one with nobody on it: kicking every bot from a team used to
+    /// take its heading off the scoreboard, and its Add Bot button with it.
+    /// </summary>
+    private static bool ListsBothTeams => GameMode.Instance.IsValid() && GameMode.Instance.Get<TeamScoring>() is not null;
+
+    /// <summary> Each team's rows, best score first: the local player's team, then the other, then spectators. </summary>
+    private List<(Team Team, List<ScoreboardEntry> Entries)> GroupedPlayers
     {
         get
         {
             var localTeam = Client.Local.IsValid() ? Client.Local.Team : Team.Unassigned;
-            var sortedPlayers = Entries
-                .OrderBy( x => GetTeamSort( x.Team, localTeam ) )
-                .ThenByDescending( x => x.Score )
-                .ThenBy( x => x.DisplayName );
-            var groupedPlayers = sortedPlayers.GroupBy( x => x.Team );
-            return groupedPlayers.ToList();
+            var groups = Entries
+                .GroupBy( x => x.Team )
+                .ToDictionary( x => x.Key, x => x.OrderByDescending( entry => entry.Score ).ThenBy( entry => entry.DisplayName ).ToList() );
+
+            if ( ListsBothTeams )
+            {
+                groups.TryAdd( Team.Terrorist, new() );
+                groups.TryAdd( Team.CounterTerrorist, new() );
+            }
+
+            return groups
+                .OrderBy( x => GetTeamSort( x.Key, localTeam ) )
+                .ThenBy( x => x.Key )
+                .Select( x => (x.Key, x.Value) )
+                .ToList();
         }
     }
 
@@ -140,12 +229,26 @@
         hash.Add( CommunicationMuteState.Version );
         hash.Add( GameSettingsSystem.Current.VoiceChatMode );
         hash.Add( GameSettingsSystem.Current.VoiceProximity );
+        hash.Add( LightweightBotManager.CanManageBots );
+        hash.Add( IsZombies );
+
+        if ( IsZombies )
+        {
+            // The rows are in points order.
+            foreach ( var player in ZombiesPlayers )
+            {
+                hash.Add( player.Id );
+                hash.Add( GetZombiesEconomy( player )?.Points );
+            }
+
+            return hash.ToHashCode();
+        }
 
         foreach ( var team in GroupedPlayers )
         {
-            hash.Add( team.Key );
+            hash.Add( team.Team );
 
-            foreach ( var player in team )
+            foreach ( var player in team.Entries )
             {
                 hash.Add( player.Id );
                 hash.Add( player.Score );

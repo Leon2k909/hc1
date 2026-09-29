@@ -7,7 +7,36 @@ public enum GameLanguage
 	[Title( "English (UK)" )]
 	EnglishUK,
 	[Title( "English (US)" )]
-	EnglishUS
+	EnglishUS,
+	[Title( "Français" )]
+	French,
+	[Title( "Deutsch" )]
+	German,
+	[Title( "Español" )]
+	Spanish,
+	[Title( "Português (Brasil)" )]
+	PortugueseBrazil,
+
+	// These have a table each (Code/Settings/Text/Languages). A new language goes last, since GameText.Current's range
+	// ends at the last one.
+	[Title( "Italiano" )]
+	Italian,
+	[Title( "Polski" )]
+	Polish,
+	[Title( "Русский" )]
+	Russian,
+	[Title( "Українська" )]
+	Ukrainian,
+	[Title( "Türkçe" )]
+	Turkish,
+	[Title( "日本語" )]
+	Japanese,
+	[Title( "한국어" )]
+	Korean,
+	[Title( "简体中文" )]
+	ChineseSimplified,
+	[Title( "繁體中文" )]
+	ChineseTraditional
 }
 
 public enum VoiceChatMode
@@ -22,6 +51,23 @@ public enum VoiceChatMode
 	PartyOnly
 }
 
+/// <summary>
+/// Shows a bool setting as a switch between two named options instead of a checkbox (<c>SettingEntry</c>): the first
+/// is false, the second true.
+/// </summary>
+[AttributeUsage( AttributeTargets.Property )]
+public sealed class ChoicesAttribute : Attribute
+{
+	public string WhenFalse { get; }
+	public string WhenTrue { get; }
+
+	public ChoicesAttribute( string whenFalse, string whenTrue )
+	{
+		WhenFalse = whenFalse;
+		WhenTrue = whenTrue;
+	}
+}
+
 public class GameSettings
 {
 	public static GameLanguage GetDefaultLanguage()
@@ -29,6 +75,25 @@ public class GameSettings
 		try
 		{
 			var name = System.Globalization.CultureInfo.CurrentCulture.Name;
+			if ( name.StartsWith( "fr", StringComparison.OrdinalIgnoreCase ) ) return GameLanguage.French;
+			if ( name.StartsWith( "de", StringComparison.OrdinalIgnoreCase ) ) return GameLanguage.German;
+			if ( name.StartsWith( "es", StringComparison.OrdinalIgnoreCase ) ) return GameLanguage.Spanish;
+			if ( name.StartsWith( "pt", StringComparison.OrdinalIgnoreCase ) ) return GameLanguage.PortugueseBrazil;
+			if ( name.StartsWith( "it", StringComparison.OrdinalIgnoreCase ) ) return GameLanguage.Italian;
+			if ( name.StartsWith( "pl", StringComparison.OrdinalIgnoreCase ) ) return GameLanguage.Polish;
+			if ( name.StartsWith( "ru", StringComparison.OrdinalIgnoreCase ) ) return GameLanguage.Russian;
+			if ( name.StartsWith( "uk", StringComparison.OrdinalIgnoreCase ) ) return GameLanguage.Ukrainian;
+			if ( name.StartsWith( "tr", StringComparison.OrdinalIgnoreCase ) ) return GameLanguage.Turkish;
+			if ( name.StartsWith( "ja", StringComparison.OrdinalIgnoreCase ) ) return GameLanguage.Japanese;
+			if ( name.StartsWith( "ko", StringComparison.OrdinalIgnoreCase ) ) return GameLanguage.Korean;
+			if ( name.StartsWith( "zh", StringComparison.OrdinalIgnoreCase ) )
+			{
+				// Taiwan, Hong Kong and Macau write traditional characters, the mainland and Singapore simplified.
+				var culture = name.ToUpperInvariant();
+				var traditional = !culture.Contains( "HANS" ) && (culture.Contains( "HANT" )
+					|| culture.EndsWith( "TW" ) || culture.EndsWith( "HK" ) || culture.EndsWith( "MO" ));
+				return traditional ? GameLanguage.ChineseTraditional : GameLanguage.ChineseSimplified;
+			}
 			if ( name.EndsWith( "US", System.StringComparison.OrdinalIgnoreCase ) )
 				return GameLanguage.EnglishUS;
 		}
@@ -87,6 +152,23 @@ public class GameSettings
 	[Title( "View Bob" ), Group( "Game" ), Range( 0, 100, 5f )]
 	public float ViewBob { get; set; } = 100f;
 
+	// Stored inverted so it's on by default even on a settings object from before it existed: a hotload leaves new
+	// fields at false rather than running their initialisers.
+	[Title( "Corner Slicing" ), Description( "Black Ops 6-style: aiming down sights by a corner tilts your gun towards the opening. Only in your own view: your character, hitbox and shots don't change." ), Group( "Game" ), Icon( "rotate_right" )]
+	public bool CornerSlicing { get => !plainCorners; set => plainCorners = !value; }
+	private bool plainCorners;
+
+	// Stored inverted too, so it's on by default.
+	[Title( "Theater Recording" ), Description( "Records each match you play, so you can watch it again in the Theater. Only the soldiers are recorded, a few times a second." ), Group( "Game" ), Icon( "movie" )]
+	public bool TheaterRecording { get => !noTheaterRecording; set => noTheaterRecording = !value; }
+	private bool noTheaterRecording;
+
+	// Stored inverted too, so it's on by default: the markers over teammates' heads are only their circles
+	// (PlayerMarkerPanel, LightweightBotMarkerPanel).
+	[Title( "Hide Teammate Names" ), Description( "Shows only the circle over your teammates' heads, without their names, health or weapons. A teammate carrying the bomb still has the bomb icon." ), Group( "Game" ), Icon( "label_off" )]
+	public bool HideTeammateNames { get => !showTeammateNames; set => showTeammateNames = !value; }
+	private bool showTeammateNames;
+
 	[Title( "Aim Assist" ), Description("Pulls your aim towards targets while using a controller"), Group( "Controls" )]
 	public bool AimAssist { get; set; } = true;
 
@@ -96,7 +178,7 @@ public class GameSettings
 	[Title( "Sprint Input" ), Group( "Controls" )]
 	public bool ToggleSprint { get; set; } = false;
 
-	[Title( "Scorestreaks" ), Description( "When on, your streak meter carries across deaths and charges from score (kills + objectives). When off, streaks count consecutive kills and reset on death." ), Group( "Game" ), Icon( "bolt" )]
+	[Title( "Streak Type" ), Description( "Kills: rewards come from kills in a row and reset on death. Score: rewards charge from score (kills + objectives) and carry across deaths." ), Group( "Game" ), Icon( "bolt" ), Choices( "Kills", "Score" )]
 	public bool UseScorestreaks { get; set; } = false;
 
 	[Title( "Show Dot" ), Group( "Crosshair" )]
@@ -173,8 +255,10 @@ public partial class GameSettingsSystem
 		ApplyVolumes();
 
 		// Push the streak preference to the live PlayerScore so it takes effect immediately
-		// if the player is currently in a match and changes it mid-game.
-		var localScore = Client.Local?.GetComponent<Facepunch.UI.PlayerScore>();
+		// if the player is currently in a match and changes it mid-game. Client.Local outlives its match (a destroyed
+		// client isn't null), so ?. let the menu's language picker throw here and skip saving.
+		var local = Client.Local;
+		var localScore = local.IsValid() ? local.GetComponent<Facepunch.UI.PlayerScore>() : null;
 		if ( localScore.IsValid() )
 			localScore.UseScorestreaks = Current.UseScorestreaks;
 	}

@@ -1,0 +1,101 @@
+// Shared with the orange / charcoal main menu and Gunsmith.
+// Mixins only: importing this file does not restyle unrelated screens.
+$menu-accent: #FF7A1A;
+$menu-accent-hover: #FF963F;
+$menu-panel: #101114;
+$menu-border: rgba( white, 0.1 );
+$menu-muted: rgba( white, 0.6 );
+
+@mixin menu-page
+{
+    position: absolute;
+    left: 0; right: 0; top: 0; bottom: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    color: white;
+    font-family: Chakra Petch;
+    font-size: 16px;
+    text-shadow: none;
+    background-color: #08090b;
+    background-image: linear-gradient( to bottom, #141416, #08090b );
+    backdrop-filter: none;
+
+    label, text, i { text-shadow: none; }
+
+    // The breadcrumb bar keeps the gunsmith's look (MenuTopbar, Breadcrumbs.scss), lined up with the page's content.
+    MenuTopbar { padding: 0 48px; }
+}
+
+@mixin menu-panel
+{
+    background-color: $menu-panel;
+    border: 1px solid $menu-border;
+    border-radius: 2px;
+}
+
+@mixin menu-section-title
+{
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: $menu-muted;
+    flex-shrink: 0;
+}
+
+@mixin menu-action
+{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    min-height: 46px;
+    padding: 0 22px;
+    gap: 10px;
+    background-color: #1a1b1e;
+    border: 1px solid rgba( white, 0.16 );
+    border-radius: 2px;
+    color: rgba( white, 0.85 );
+    font-family: Chakra Petch;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    pointer-events: all;
+    transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+
+    i { font-size: 20px; }
+    &:hover { background-color: #242426; border-color: $menu-accent; color: white; sound-in: ui_button_hover; }
+    &:active { background-color: #303033; }
+    &.primary
+    {
+        background-color: $menu-accent;
+        border-color: $menu-accent;
+        color: #08090b;
+        &:hover { background-color: $menu-accent-hover; border-color: $menu-accent-hover; color: #08090b; }
+    }
+    &.disabled
+    {
+        background-color: #1a1b1e;
+        border-color: rgba( white, 0.08 );
+        color: rgba( white, 0.3 );
+        pointer-events: none;
+        cursor: default;
+    }
+}
+
+@mixin menu-footer
+{
+    flex-direction: row;
+    justify-content: flex-end;
+    flex-shrink: 0;
+    gap: 12px;
+    padding: 16px 48px 24px;
+    border-top: 1px solid rgba( white, 0.06 );
+    background-color: rgba( 5, 5, 7, 0.5 );
+}

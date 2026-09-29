@@ -1,9 +1,13 @@
 {
   "Name": "HC1 Compact Suppressor",
   "Category": "Barrel",
-  "MainPrefab": "gunsmith/hc1/compact_suppressor/compact_suppressor.prefab",
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "gunsmith/hc1/compact_suppressor/compact_suppressor.prefab"
+  },
+  "IsSuppressor": true,
+  "MuzzleShift": "4.36,0,0",
   "EligibleEquipment": [
-    "weapons/m4a1/m4a1.equip",
     "weapons/scarh/scarh.equip"
   ],
   "RequiredLevel": 0,

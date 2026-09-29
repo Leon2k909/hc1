@@ -1,39 +1,15 @@
-MenuTopbar {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    padding: 0 32px;
-    height: 56px;
-    background-color: rgba( 0, 0, 0, 0.55 );
-    border-bottom: 1px solid rgba( 255, 255, 255, 0.07 );
-    flex-shrink: 0;
+@import "/UI/Styles/Breadcrumbs.scss";
+
+// Drawn with the gunsmith's breadcrumb mixins. Pages only change its side padding, to line it up with their content.
+MenuTopbar
+{
+    @include crumbs-bar;
     width: 100%;
+    font-family: Chakra Petch;
+
+    label, i { text-shadow: none; }
+
+    .topbar-back { @include crumbs-back; }
+    .topbar-crumb { @include crumb; }
+    .topbar-crumb-sep { @include crumb-sep; }
 }
-
-.menu-back {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 6px;
-    color: rgba( 255, 255, 255, 0.6 );
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    cursor: pointer;
-    width: 140px;
-
-    i { font-size: 18px; }
-
-    &:hover { color: white; }
-}
-
-.menu-title {
-    flex-grow: 1;
-    text-align: center;
-    font-size: 13px;
-    font-weight: 900;
-    letter-spacing: 6px;
-    color: white;
-}
-
-.menu-topbar-spacer { width: 140px; }

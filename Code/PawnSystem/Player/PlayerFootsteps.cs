@@ -34,7 +34,8 @@ public sealed class PlayerFootsteps : Component
 		if ( !tr.Hit )
 			return;
 
-		if ( tr.Surface is null )
+		var surface = WorldSounds.SurfaceAt( tr );
+		if ( surface is null )
 			return;
 
 		TimeSinceStep = 0;
@@ -45,18 +46,20 @@ public sealed class PlayerFootsteps : Component
 		if ( Player.IsCrouching || Player.IsSlowWalking )
 			return;
 
-		var sound = flipFlop ? tr.Surface.SoundCollection.FootLeft : tr.Surface.SoundCollection.FootRight;
+		// A soldier's boots on this floor, walking or running (Tools/world_sounds.py).
+		var sound = WorldSounds.Footstep( surface, Player.IsSprinting, flipFlop );
 		if ( sound is null ) return;
 
 		var handle = Sound.Play( sound, tr.HitPosition + tr.Normal * 5 );
 		if ( !handle.IsValid() ) return;
 
-		if ( Player.Components.TryGet<PlayerPerks>( out var perks, FindMode.EnabledInSelf ) && perks.HasPerk( "Ninja" ) )
+		if ( Player.Components.TryGet<PlayerPerks>( out var perks, FindMode.EnabledInSelf ) && perks.HasPerk( "ninja" ) )
 		{
 			handle.Volume *= 0.15f; // Reduce footstep sound volume significantly
 		}
 
-		handle.Occlusion = false;
+		// Someone else's steps are muffled through a wall, like any other sound.
+		handle.OcclusionEnabled = !Player.IsViewer && handle.OcclusionEnabled;
 		handle.SpacialBlend = Player.IsViewer ? 0 : handle.SpacialBlend;
 	}
 

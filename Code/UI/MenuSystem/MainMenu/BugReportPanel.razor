@@ -5,93 +5,100 @@
 @inherits Panel
 @attribute [StyleSheet]
 
-<root class="hc1 bug-report-root @(IsOpen ? "open" : "")">
+<root class="hc1 bug-report-root">
     @if ( IsOpen )
     {
-        <div class="bug-report-backdrop" onclick=@((e) => { e.StopPropagation(); Close(); }) />
-    }
-    @if ( IsOpen )
-    {
-    <div class="bug-report-modal">
+        <div class="br-backdrop" onclick=@((e) => { e.StopPropagation(); Close(); }) />
 
-        @if ( IsAdmin )
-        {
-            <div class="tab-row">
-                <div class="tab @(CurrentTab == "report" ? "active" : "")" onclick=@(() => { CurrentTab = "report"; StateHasChanged(); })>Report Bug</div>
-                <div class="tab @(CurrentTab == "view" ? "active" : "")" onclick=@(() => { CurrentTab = "view"; StateHasChanged(); })>Submitted Reports <span class="admin-badge">ADMIN</span></div>
+        <div class="br-modal">
+            <div class="br-topbar" />
+
+            <div class="br-head">
+                <label class="br-title">@Tr( "Report a Bug" )</label>
+                <div class="br-close" onclick=@Close><i>close</i></div>
             </div>
-        }
-        else
-        {
-            <label class="bug-report-title">Report a Bug</label>
-        }
 
-        @if ( CurrentTab == "view" && IsAdmin )
-        {
-            <div class="bug-report-list">
-                @{
-                    var reports = GetReports().ToList();
-                }
-                @if ( reports.Count == 0 )
-                {
-                    <label class="no-reports">No bug reports yet.</label>
-                }
-                else
-                {
+            @if ( IsAdmin )
+            {
+                <div class="br-tabs">
+                    <div class="br-tab @(CurrentTab == "report" ? "active" : "")" onclick=@(() => SetTab( "report" ))>
+                        <label>Report Bug</label>
+                    </div>
+                    <div class="br-tab @(CurrentTab == "view" ? "active" : "")" onclick=@(() => SetTab( "view" ))>
+                        <label>Submitted Reports</label>
+                        <label class="br-badge">ADMIN</label>
+                    </div>
+                </div>
+            }
+
+            @if ( CurrentTab == "view" && IsAdmin )
+            {
+                var reports = GetReports().ToList();
+                <div class="br-list">
+                    @if ( reports.Count == 0 )
+                    {
+                        <label class="br-empty">No bug reports yet.</label>
+                    }
                     @foreach ( var r in reports )
                     {
-                        <div class="bug-entry">
-                            <div class="entry-header">
-                                <label class="entry-title">@r.Title</label>
-                                <label class="entry-category">@r.Category</label>
-                                <label class="entry-time">@r.Time</label>
+                        <div class="br-entry">
+                            <div class="br-entry-head">
+                                <label class="br-entry-title">@r.Title</label>
+                                <label class="br-entry-category">@r.Category</label>
+                                <label class="br-entry-time">@r.Time</label>
                             </div>
-                            <label class="entry-body">@r.Body</label>
+                            @if ( !string.IsNullOrWhiteSpace( r.Body ) )
+                            {
+                                <label class="br-entry-body">@r.Body</label>
+                            }
                         </div>
                     }
-                }
-            </div>
-            <div class="form-actions">
-                <div class="button standard" onclick=@Close>Close</div>
-            </div>
-        }
-        else
-        {
-            <div class="bug-form">
-                <label class="form-label">Title</label>
-                <TextEntry @ref=TitleEntry Placeholder="Short description..." />
+                </div>
+                <div class="br-foot">
+                    <div class="br-btn" onclick=@Close><label>Close</label></div>
+                </div>
+            }
+            else
+            {
+                <label class="br-section">@Tr( "Title" )</label>
+                <TextEntry @ref=TitleEntry class=@(_titleMissing ? "br-input missing" : "br-input") Placeholder=@(Tr( "Short description..." )) />
 
-                <label class="form-label">Category</label>
-                <div class="category-row">
+                <label class="br-section">@Tr( "Category" )</label>
+                <div class="br-categories">
                     @foreach ( var cat in Categories )
                     {
                         var capturedCat = cat;
-                        <div class="button standard smaller no-anim @(SelectedCategory == capturedCat ? "selected" : "")"
-                             onclick=@(() => { SelectedCategory = capturedCat; StateHasChanged(); })>@capturedCat</div>
+                        <div class="br-category @(SelectedCategory == capturedCat ? "selected" : "")" onclick=@(() => PickCategory( capturedCat ))>
+                            <i>@CategoryIcon( capturedCat )</i>
+                            <label>@CategoryTitle( capturedCat )</label>
+                        </div>
                     }
                 </div>
 
-                <label class="form-label">Description</label>
-                <TextEntry @ref=BodyEntry Multiline=@true Placeholder="Detailed description..." class="multiline" />
-            </div>
-            <div class="form-actions">
-                <div class="button standard" onclick=@Submit>Submit</div>
-                <div class="button standard" onclick=@Close>Cancel</div>
-            </div>
-        }
+                <label class="br-section">@Tr( "Description" )</label>
+                <TextEntry @ref=BodyEntry class="br-input multiline" Multiline=@true Placeholder=@(Tr( "Detailed description..." )) />
 
-    </div>
+                <div class="br-foot">
+                    <div class="br-btn" onclick=@Close><label>@Tr( "Cancel" )</label></div>
+                    <div class="br-btn primary" onclick=@Submit><i>send</i><label>@Tr( "Submit" )</label></div>
+                </div>
+            }
+        </div>
     }
 </root>
 
 @code
 {
     private const ulong AdminSteamId = 76561198271608270UL;
+    // In English, since the report saves them; the buttons show them through Tr.
     private static readonly string[] Categories = { "Crash", "UI", "Gameplay", "Network", "Other" };
+
+    // Other languages don't abbreviate "UI", so they look it up by its full name.
+    private static string CategoryTitle( string category ) => category == "UI" && !GameText.IsEnglish ? Tr( "User interface" ) : Tr( category );
 
     public bool IsOpen { get; private set; }
 
-    private ulong LocalSteamId => Client.Local?.SteamId ?? Connection.Local?.SteamId ?? 0UL;
+    private ulong LocalSteamId => Client.Local.IsValid() ? Client.Local.SteamId : (Connection.Local?.SteamId ?? 0UL);
     private bool IsAdmin => LocalSteamId == AdminSteamId;
 
     private string CurrentTab { get; set; } = "report";
@@ -100,20 +107,68 @@
     private TextEntry BodyEntry { get; set; }
     private string SelectedCategory { get; set; } = "Other";
 
+    /// <summary> Submit was pressed with no title: the title box is outlined red until something's typed in it. </summary>
+    private bool _titleMissing;
+
+    private static string CategoryIcon( string category ) => category switch
+    {
+        "Crash" => "error",
+        "UI" => "web",
+        "Gameplay" => "videogame_asset",
+        "Network" => "wifi",
+        _ => "more_horiz"
+    };
+
     public void Open()
     {
         IsOpen = true;
         CurrentTab = "report";
+        _titleMissing = false;
+        // A root's class="@(...)" adds the class but never takes it off again, so it's set here.
+        SetClass( "open", true );
         StateHasChanged();
     }
 
-    private void Close()
+    /// <summary>
+    /// Also Escape's, from MainMenuRoot: a panel's Tick is too late to see Escape. Over a match the pause menu takes
+    /// Escape and closes with the report in it.
+    /// </summary>
+    public void Close()
     {
         IsOpen = false;
         SelectedCategory = "Other";
+        _titleMissing = false;
         if ( TitleEntry.IsValid() ) TitleEntry.Value = "";
         if ( BodyEntry.IsValid() ) BodyEntry.Value = "";
+        SetClass( "open", false );
         StateHasChanged();
+    }
+
+    private void SetTab( string tab )
+    {
+        if ( CurrentTab == tab ) return;
+        Sound.Play( "ui_button_press" );
+        CurrentTab = tab;
+        StateHasChanged();
+    }
+
+    private void PickCategory( string category )
+    {
+        Sound.Play( "ui_button_press" );
+        SelectedCategory = category;
+        StateHasChanged();
+    }
+
+    public override void Tick()
+    {
+        base.Tick();
+        if ( !IsOpen ) return;
+
+        if ( _titleMissing && TitleEntry.IsValid() && !string.IsNullOrWhiteSpace( TitleEntry.Value ) )
+        {
+            _titleMissing = false;
+            StateHasChanged();
+        }
     }
 
     private void Submit()
@@ -121,7 +176,12 @@
         var title = (TitleEntry.IsValid() ? TitleEntry.Value : "").Trim();
         var body  = (BodyEntry.IsValid()  ? BodyEntry.Value  : "").Trim();
 
-        if ( string.IsNullOrEmpty( title ) ) return;
+        if ( string.IsNullOrEmpty( title ) )
+        {
+            _titleMissing = true;
+            StateHasChanged();
+            return;
+        }
 
         var countRaw = Game.Cookies.Get( "hc1.bug.count", "0" );
         var count = int.TryParse( countRaw, out var n ) ? n : 0;
@@ -132,6 +192,7 @@
         Game.Cookies.Set( $"hc1.bug.{count}.time",     DateTime.UtcNow.ToString( "yyyy-MM-dd HH:mm" ) );
         Game.Cookies.Set( "hc1.bug.count",              (count + 1).ToString() );
 
+        Sound.Play( "ui_button_press" );
         Close();
     }
 
@@ -154,5 +215,5 @@
         }
     }
 
-    protected override int BuildHash() => HashCode.Combine( IsOpen, SelectedCategory, CurrentTab, IsAdmin );
+    protected override int BuildHash() => HashCode.Combine( IsOpen, SelectedCategory, CurrentTab, IsAdmin, _titleMissing );
 }

@@ -24,7 +24,7 @@
           "_type": "gameobject",
           "prefab": "prefabs/impact_fx/impact_blood_mist.prefab"
         },
-        "BloodImpactSound": "sounds/impacts/melee/impact-melee-flesh.sound",
+        "BloodImpactSound": "sounds/world/impacts/bullet_flesh.sound",
         "Body": {
           "_type": "component",
           "component_id": "68310fd2-d9db-4f87-a98a-81a7c7dca155",
@@ -479,6 +479,27 @@
             }
           },
           {
+            "__type": "Facepunch.MilitaryUniform",
+            "__guid": "f51e238d-d000-42bb-9251-b73a587eaed8",
+            "__enabled": true,
+            "Flags": 0,
+            "Pieces": [
+              "models/citizen_clothes/hat/tactical_helmet/tactical_helmet_army.clothing",
+              "models/citizen_clothes/shirt/army_shirt/army_shirt.clothing",
+              "models/citizen_clothes/trousers/cargopants/cargo_pants_army.clothing",
+              "models/citizen_clothes/vest/tactical_vest/models/tactical_vest_army.clothing",
+              "models/citizen_clothes/shoes/boots/army_boots.clothing"
+            ],
+            "FieldPieces": [
+              "models/citizen_clothes/hat/tactical_helmet/tactical_helmet_army.clothing",
+              "models/citizen_clothes/shirt/army_shirt/army_shirt.clothing",
+              "models/citizen_clothes/trousers/cargopants/cargo_pants_army.clothing",
+              "models/citizen_clothes/vest/tactical_vest/models/tactical_vest_army.clothing",
+              "models/citizen_clothes/shoes/boots/army_boots.clothing",
+              "models/citizen_clothes/gloves/fingerless_gloves/fingerless_gloves.clothing"
+            ]
+          },
+          {
             "__type": "Sandbox.SkinnedModelRenderer",
             "__guid": "2192125d-a0f3-4033-8a96-7b77485d8539",
             "__enabled": true,
@@ -708,13 +729,12 @@
             "TeamBaseModels": {
               "Terrorist": {
                 "Models": [
-                  "models/player/t_side/t_side_player_01/t_side_player_01_v2.vmdl"
+                  "models/citizen_human/citizen_human_male.vmdl"
                 ]
               },
               "CounterTerrorist": {
                 "Models": [
-                  "models/player/ct_side/ct_side_player_01/ct_side_player_01_v2.vmdl",
-                  "models/player/ct_side/ct_side_riot_player/ct_side_riot_player.vmdl"
+                  "models/citizen_human/citizen_human_male.vmdl"
                 ]
               }
             }
@@ -2427,6 +2447,27 @@
         "OwnerTransfer": 1,
         "Components": [
           {
+            "__type": "Facepunch.MilitaryUniform",
+            "__guid": "6029ad55-0729-4806-a5ec-78405f236082",
+            "__enabled": true,
+            "Flags": 0,
+            "Pieces": [
+              "models/citizen_clothes/hat/tactical_helmet/tactical_helmet_army.clothing",
+              "models/citizen_clothes/shirt/army_shirt/army_shirt.clothing",
+              "models/citizen_clothes/trousers/cargopants/cargo_pants_army.clothing",
+              "models/citizen_clothes/vest/tactical_vest/models/tactical_vest_army.clothing",
+              "models/citizen_clothes/shoes/boots/army_boots.clothing"
+            ],
+            "FieldPieces": [
+              "models/citizen_clothes/hat/tactical_helmet/tactical_helmet_army.clothing",
+              "models/citizen_clothes/shirt/army_shirt/army_shirt.clothing",
+              "models/citizen_clothes/trousers/cargopants/cargo_pants_army.clothing",
+              "models/citizen_clothes/vest/tactical_vest/models/tactical_vest_army.clothing",
+              "models/citizen_clothes/shoes/boots/army_boots.clothing",
+              "models/citizen_clothes/gloves/fingerless_gloves/fingerless_gloves.clothing"
+            ]
+          },
+          {
             "__type": "Sandbox.SkinnedModelRenderer",
             "__guid": "c9151cf0-e367-46c5-bca7-93c87770ef2e",
             "__enabled": true,
@@ -2545,13 +2586,12 @@
             "TeamBaseModels": {
               "Terrorist": {
                 "Models": [
-                  "models/player/t_side/t_side_player_01/t_side_player_01_v2.vmdl"
+                  "models/citizen_human/citizen_human_male.vmdl"
                 ]
               },
               "CounterTerrorist": {
                 "Models": [
-                  "models/player/ct_side/ct_side_player_01/ct_side_player_01_v2.vmdl",
-                  "models/player/ct_side/ct_side_riot_player/ct_side_riot_player.vmdl"
+                  "models/citizen_human/citizen_human_male.vmdl"
                 ]
               }
             }

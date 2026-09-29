@@ -2,7 +2,8 @@
 """The guns the Kastov pipeline ports (port_kastov.py, kastov_vmdl.py, kastov_animgraph.py, kastov_prefabs.py).
 
 Each script takes --weapon (default kastov762). The guns are CoD MWII viewmodels decompiled with Crowbar whose rigs
-share the v_akm skeleton and clip names, so only their meshes, parts and HC1 asset names differ.
+share the v_akm skeleton and clip names (the M16's has the same names on MWII's AR rig, and the P90's and MP7's on
+MW2019's), so only their meshes, parts and HC1 asset names differ.
 """
 
 from __future__ import annotations
@@ -28,6 +29,16 @@ def view_offset(pos=(0.0, 0.0, 0.0), angles=(0.0, 0.0, 0.0)) -> np.ndarray:
     right, forward, up = pos
     pitch, yaw, roll = np.radians(angles)
     return matrix(np.array([forward, -right, up], float), euler_to_mat(roll, pitch, yaw))
+
+
+@dataclass(frozen=True)
+class GripFit:
+    """Fits HC1's left hand to a handguard CoD's thinner hand grips closer: while the hand holds its idle grip, the
+    whole left arm moves by shift (gun axes: forward, left, up, along tag_sling) and each finger joint loses a
+    fraction of its bend (fingers, thumb), so the thicker palm and longer fingers don't sink into the handguard."""
+    shift: tuple[float, float, float]
+    fingers: float = 0.0
+    thumb: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -57,6 +68,18 @@ class Weapon:
     sprint: np.ndarray
     # The frame of the ADS clip (ads_in / ads_out) that puts the sights on the camera together with aim.
     ads_pose: tuple[str, slice]
+    # Seconds to bring the sights up (or down): a rifle's, unless the gun is heavier. kastov_prefabs.py writes it to the
+    # viewmodel prefab's ViewModel.AimTime, which drives the animgraph's ironsights_weight.
+    ads_time: float = 0.25
+    # The clip CoD fires with while aiming: the QC's fire sequence blends fire and this one by aim_offset, the MW base's
+    # ADS fraction. The port exports it as fire_ads, and the animgraph blends the two by ironsights_weight. None fires
+    # with the hip clip while aiming too, which rocks the sights on a gun whose hip clip rolls it (the P90's, 2 degrees
+    # about the bore every shot).
+    ads_fire: str | None = None
+    # Frames of the fire clip to export with the gun and arms held in the idle pose (port_kastov.Kastov.steady_fire):
+    # only the gun's moving parts (bolt, trigger, dust cover) and the right hand's fingers play, as in the Kastovs' own
+    # clips, which leave the kick to HC1's recoil. None plays the clip as it is, kick and all.
+    steady_fire: int | None = None
     # Optional independent lowered pose; sprint changes should not pull this pose along with them.
     lowered: np.ndarray | None = None
     # Run with HC1's M4 sprint (port_kastov.Kastov.m4_sprint) instead of CoD's a_sprint and the sprint offset, so the
@@ -74,10 +97,38 @@ class Weapon:
     # More muzzle_tip choices, between "on" and "off": the tips of part_choices barrels of other lengths, which the
     # barrel's gunsmith slot shows (kastov_prefabs.Prefabs.part_slot_bodygroups). name -> (mesh, reference pose).
     tip_choices: dict[str, tuple[str, str]] = field(default_factory=dict)
+    # Additional choices on an optional group (e.g. a replacement rail's raised/folded iron sights).
+    optional_variants: dict[str, list[tuple[str, str, str | None]]] = field(default_factory=dict)
     # Reloads for magazines of another kind than the factory one (the RPK's box magazines): each is a suffix of the CoD
-    # clips reload<suffix> and reload_empty<suffix>, exported under the same names. The animgraph's reload_variant picks
+    # clips reload<suffix> and reload_empty<suffix> (or reload<suffix>_empty, as the AK-105's 60-rounder's is named),
+    # exported as reload<suffix> and reload_empty<suffix>. The animgraph's reload_variant picks
     # one (0 = the factory reload, then these in order), set from the fitted magazine (GunsmithPart.ReloadAnimation).
     reload_variants: list[str] = field(default_factory=list)
+    reload_clip_overrides: dict[str, str] = field(default_factory=dict)
+    # The factory magazine's reloads, when they aren't CoD's reload and reload_empty: the suffix of its clips (the AUG's
+    # 5.56 magazine reloads with reload_armag and reload_empty_armag; MW2019's AUG is a 9mm gun by default).
+    factory_reload: str = ""
+    # Moves and opens the left hand where HC1's hand would sink into the handguard (GripFit); None keeps CoD's grip.
+    left_grip: GripFit | None = None
+    # The left hand's grip on the gun's barrel, when the MW base gives it one (the barrel attachment's
+    # SetGripPoseParameter): a delta clip, minus its _corrective_animation, that CoD layers on every clip while the hand
+    # holds the handguard. The port adds it with the hand on its idle grip and fades it out like left_grip (GRIP_FADE).
+    grip_pose: str | None = None
+    # Attachment-model bones the viewmodel rig also has, in another place: the part's own reference pose places them
+    # instead, where bone-merge would move them onto the rig's (the M16 barrel's tag_grip_hide, under its rail cover).
+    unmerged_bones: frozenset[str] = frozenset()
+    # How much bigger CoD's gun is than the real one. MW2019's AUG is 1.1 times the size: its top rail's slots are
+    # 0.433 apart and the rail 0.918 wide, where a Picatinny rail's are 0.394 and 0.835 (the P90's and MP7's rails
+    # measure that), while its arms are the P90's size. The port shrinks the whole pose about the camera (gun, arms'
+    # targets and meshes), so the gun is its real size and the sight picture stays CoD's.
+    model_scale: float = 1.0
+    # Rig bones read under another name (kastov_smd.BONE_RENAMES): a pistol rig hangs the gun off tag_pistol_offset,
+    # which becomes tag_sling, the gun root the pipeline and the prefabs' bone objects go by.
+    bone_renames: dict[str, str] = field(default_factory=dict)
+    # A pistol's slide lock: CoD's delta clip that holds the slide back while the magazine is empty (the QC's
+    # empty_offset layer). The port exports it as empty_delta, and fire_empty (the fire clip with the slide staying
+    # back), and the animgraph adds it while b_empty holds.
+    slide_lock: str | None = None
 
 
 def kastov762_materials() -> dict[str, str]:
@@ -100,19 +151,45 @@ KASTOV_762 = Weapon(
     cod_anims="v_akm/v_akm_anims",
     vm_meshes=["v_akm/att_rex_vm_ar_akilo_rec_v0_LOD0.smd", "v_akm/rec_upp.smd", "v_akm/ammo.smd"],
     part_meshes=[
-        ("ak47_b_d/att_rex_vm_ar_akilo_barrel_v0_LOD0.smd", "ak47_b_d/ak47_b_d_anims/reference.smd"),
         ("ak47_b_d/iro.smd", "ak47_b_d/ak47_b_d_anims/reference.smd"),
-        ("ak47_m_d/att_rex_vm_ar_akilo_mag_v0_LOD0.smd", "ak47_m_d/ak47_m_d_anims/reference.smd"),
         ("ak47_m_d/76239.smd", "ak47_m_d/ak47_m_d_anims/reference.smd"),
-        ("ak47_s_d/att_rex_vm_ar_akilo_stock_v0_LOD0.smd", "ak47_s_d/ak47_s_d_anims/reference.smd"),
-        ("ak47_p_d/att_rex_vm_ar_akilo_pgrip_v0_LOD0.smd", "ak47_p_d/ak47_p_d_anims/reference.smd"),
     ],
     optional_meshes={
         "muzzle_tip": ("ak47_b_d/tip.smd", "ak47_b_d/ak47_b_d_anims/reference.smd"),
         "optic_rail": ("ak47_b_d/rail.smd", "ak47_b_d/ak47_b_d_anims/reference.smd"),
         "grip_rail": ("ak47_b_d/grip.smd", "ak47_b_d/ak47_b_d_anims/reference.smd"),
         "laser_rail": ("ak47_b_d/laser.smd", "ak47_b_d/ak47_b_d_anims/reference.smd"),
+        "stock_adapter": ("v_akm/st_ada.smd", None),
     },
+    part_choices={
+        "stock": [
+            ("ak47_stock_default", "ak47_s_d/att_rex_vm_ar_akilo_stock_v0_LOD0.smd"),
+            ("ak47_stock_adjustable", "ak47_s_ass/att_rex_vm_ar_akilo_stock_ass_v0_LOD0.smd"),
+            ("ak47_stock_heavy", "ak47_s_h/att_rex_vm_ar_akilo_stock_hvy_v0_LOD0.smd"),
+            ("ak47_stock_padded", "ak47_s_ha/att_rex_wm_ar_akilo_stock_hvy_ass_v0_LOD0.smd"),
+            ("ak47_stock_light", "ak47_s_l/att_rex_vm_ar_akilo_stock_lgt_v0_LOD0.smd"),
+            ("ak47_stock_delete", "ak47_s_no/att_rex_vm_ar_akilo_stock_no_v0_LOD0.smd"),
+            ("ak47_stock_tactical", "ak47_s_t/att_rex_vm_ar_akilo_stock_tac_v0_LOD0.smd"),
+        ],
+        "pistol_grip": [
+            ("ak47_grip_default", "ak47_p_d/att_rex_vm_ar_akilo_pgrip_v0_LOD0.smd"),
+            ("ak47_grip_contoured", "ak47_p_a/att_rex_vm_ar_akilo_pgrip_aim_v0_LOD0.smd"),
+            ("ak47_grip_textured", "ak47_p_ass/att_rex_vm_ar_akilo_pgrip_ass_v0_LOD0.smd"),
+            ("ak47_grip_skeleton", "ak47_p_s/att_rex_vm_ar_akilo_pgrip_skel_v0_LOD0.smd"),
+        ],
+        "magazine": [
+            ("ak47_mag_default", "ak47_m_d/att_rex_vm_ar_akilo_mag_v0_LOD0.smd"),
+            ("ak47_mag_polymer", "ak47_m_d1/att_rex_vm_ar_akilo_mag_v04_LOD0.smd"),
+            ("ak47_mag_extended", "ak47_m_e1/att_rex_vm_ar_akilo_mag_lrg762s_v0_LOD0.smd"),
+            ("ak47_mag_drum", "ak47_m_e2/att_rex_wm_ar_akilo_drum_762s_v0_LOD0.smd"),
+        ],
+        "barrel": [
+            ("ak47_barrel_default", "ak47_b_d/att_rex_vm_ar_akilo_barrel_v0_LOD0.smd"),
+            ("ak47_barrel_compact", "ak47_b_s1/att_rex_vm_ar_akilo_bar_lgt_short_v5.smd"),
+        ],
+    },
+    tip_choices={"short": ("ak47_b_s1/tip.smd", "ak47_b_s1/ak47_b_s1_anims/reference.smd")},
+    reload_variants=["_xmag", "_dmag"],
     extra_bones={"muzzle": ("tag_barrel_attach", np.array([15.828125, 0.0, 0.0]))},
     materials=kastov762_materials,
     hip=view_offset((0.0, 2.0, 0.0)),
@@ -282,12 +359,18 @@ RPK = Weapon(
     # tag_flash on the barrel.
     extra_bones={"muzzle": ("tag_barrel_attach", np.array([20.063, 0.0, -1.494]))},
     materials=rpk_materials,
-    # From the addon's lua/weapons/mg_iw9_rkilo/shared.lua.
+    # From the addon's lua/weapons/mg_iw9_rkilo/shared.lua, except aim: CoD's ads_in leaves the RPK's camera pitched
+    # 0.9 deg up, rolled 2.3 deg and 0.12 left of the bore, which puts the front post 0.8 deg under the aim point. This
+    # levels the camera on the front post's top (z 6.31 in the world model; the 762's sits the same way on its post).
     hip=view_offset(),
-    aim=view_offset((-0.01, -0.2, 0.003)),
+    aim=view_offset((-0.134, -0.2, -0.037), (-0.887, -0.046, -2.336)),
     sprint=view_offset((-0.4, 0.0, -0.1)),
     m4_sprint=True,
     ads_pose=("ads_in", slice(-1, None)),
+    # 6.8 kg with a loaded drum against the AKM's 3.75 kg, much of it out front. There's no measured figure for how long
+    # a heavier gun takes to shoulder, so this scales the rifles' 0.25 s by the square root of the moving mass (the gun
+    # plus ~4 kg of arms): sqrt(10.8 / 7.75) = 1.18.
+    ads_time=0.3,
     report_bones=["tag_tip", "tag_silencer", "tag_grip_attach", "tag_laser_attach", "tag_rail"],
     # The parts the addon offers the RPK (lua/weapons/mg_iw9_rkilo/customization.lua) that a real RPK takes. The
     # factory ones are the RPK's wooden club-foot stock, the AK pistol grip and the 75-round drum; the box magazines are
@@ -306,9 +389,728 @@ RPK = Weapon(
     },
     # The box magazines' reloads: the 30-rounder's (reload_mag) and the 40-rounder's (reload_xmag).
     reload_variants=["_mag", "_xmag"],
+    # The wooden lower handguard's flared sides: where CoD's hand sits, HC1's palm heel and thumb sank 0.39 into it and
+    # the fingertips into the far side. Measured by skinning the arms against the gun mesh (visible overlap 108
+    # vertices, 0.39 deep -> 22, 0.11; the verified Kastov 762 has 52, 0.10).
+    left_grip=GripFit(shift=(0.0, 0.38, -0.1), fingers=0.25, thumb=0.1),
 )
 
-WEAPONS = {weapon.name: weapon for weapon in (KASTOV_762, KASTOV_74U, VITYAZ, RPK)}
+def bizon_materials() -> dict[str, str]:
+    # Built by bizon_assets.py; the stocks, grips and side rail reuse the 74u's materials.
+    assets = json.loads((ASSETS / "Weapons" / "Bizon" / "bizon_assets.json").read_text(encoding="utf-8"))
+    return assets["materials"]
+
+
+_BIZON_BARREL = "att_vm_p04_sm_beta_barrel_v0_lod0/att_vm_p04_sm_beta_barrel_v0_LOD0.smd"
+_BIZON_MAG = "att_wm_p04_sm_beta_mag_v0_lod0/att_wm_p04_sm_beta_mag_v0_LOD0.smd"
+
+# The PP-19 Bizon 9x18mm SMG: MWII's "Minibak" (mg_iw9_beta) from the same addon as the 74u, by the Vityaz's author and
+# on the same rig. Its 64-round helical magazine runs under the barrel and is the handguard.
+BIZON = Weapon(
+    name="bizon",
+    folder=ASSETS / "Weapons" / "Bizon",
+    asset="weapons/bizon",
+    model="bizon",
+    decompiled=DECOMPILED / "beta",
+    cod_anims="v_iw9_beta/v_iw9_beta_anims",
+    vm_meshes=["v_iw9_beta/att_vm_p04_sm_beta_rec_v0_LOD0.smd"],
+    # The factory barrel and the helical magazine (the fitted one on j_mag1, the reload's fresh one on j_mag2). The
+    # addon's other magazines are CoD inventions (a magazine with a grip, joke cans) and its long barrel is CoD's.
+    part_meshes=[(_BIZON_BARREL, _BIZON_BARREL), (_BIZON_MAG, _BIZON_MAG)],
+    optional_meshes={
+        "muzzle_tip": ("att_vm_p04_sm_beta_barrel_v0_lod0/bartip.smd", _BIZON_BARREL),  # the muzzle nut
+        # The side-mount rail on the left of the receiver, which the Bizon-2 has for optics.
+        "optic_rail": ("v_iw9_beta/att_vm_p04_sm_beta_rec_v0_LOD0_siderail.smd", None),
+    },
+    # tag_flash on the barrel.
+    extra_bones={"muzzle": ("tag_barrel_attach", np.array([7.212, 0.0, -1.397]))},
+    materials=bizon_materials,
+    # From the addon's lua/weapons/mg_iw9_beta/shared.lua.
+    hip=view_offset(),
+    aim=view_offset((-0.484, 0.0, -0.187), (0.12, 0.07, -1.0)),
+    sprint=view_offset((-0.2, 0.5, 1.7)),
+    m4_sprint=True,
+    ads_pose=("ads_in", slice(-1, None)),
+    report_bones=["tag_tip", "tag_laser_attach", "tag_silencer"],
+    # The stocks and pistol grips the addon offers the Bizon (lua/weapons/mg_iw9_beta/customization.lua): Kastovia
+    # platform parts, the factory ones the AKS-74U's side-folding stock (the real Bizon's) and the AK pistol grip.
+    part_choices={
+        "stock": [_kastovia(model) for model in (
+            "ar_akilo74_stock_v0", "ar_akilo_stock_v0", "sh_vecho_stocktac_v0", "ar_akilo_stockh_v0",
+            "ar_akilo_stocktac_v0", "ar_akilo_stocktac02_v0", "ar_akilo_stockwire_v0", "ar_akilo74_stockno_v0",
+            "ar_akilo74_stockskel_v0", "lm_rkilo_stock_v0", "lm_rkilo_stockh_v0")],
+        "pistol_grip": [_kastovia(model) for model in (
+            "ar_akilo_pstlgrp_v0", "sh_vecho_pgrip_v0", "ar_akilo_griptac_v0", "ar_akilo_gripstdy_v0",
+            "ar_akilo_gripass_v0", "sh_vecho_gripsnp_v0")],
+    },
+)
+
+def ak105_materials() -> dict[str, str]:
+    # Built by ak105_assets.py; the muzzle booster, rounds, 20- and 45-round magazines, stocks and grips reuse the 74u's.
+    assets = json.loads((ASSETS / "Weapons" / "AK105" / "ak105_assets.json").read_text(encoding="utf-8"))
+    return assets["materials"]
+
+
+_AK105_BARREL = "att_vm_p04_ar_akilo105_barrel_v0/att_vm_p04_ar_akilo105_barrel_v0"
+_AK105_BARREL_REFERENCE = "att_vm_p04_ar_akilo105_barrel_v0/att_vm_p04_ar_akilo105_barrel_v0_anims/reference.smd"
+
+# The AK-105 (5.45x39mm): MWII's "Kastov 545" (mg_iw9_akilo105) from the same addon as the 74u, on the same rig. The
+# AK-74M's shortened carbine: its receiver, side rail and folding polymer stock, a 314 mm barrel with the AKS-74U's
+# muzzle booster.
+AK105 = Weapon(
+    name="ak105",
+    folder=ASSETS / "Weapons" / "AK105",
+    asset="weapons/ak105",
+    model="ak105",
+    decompiled=DECOMPILED / "akilo105",
+    cod_anims="vm_iw9_akilo105_anims",
+    vm_meshes=["att_vm_p04_ar_akilo105_rec_v0_LOD0_edited.smd"],
+    part_meshes=[(f"{_AK105_BARREL}_LOD0.smd", _AK105_BARREL_REFERENCE)],
+    optional_meshes={
+        "muzzle_tip": (f"{_AK105_BARREL}_tip.smd", _AK105_BARREL_REFERENCE),  # the muzzle booster
+        "optic_rail": ("att_vm_p04_ar_akilo105_rec_v0_mount.smd", None),  # the optic mount on the side rail
+        # The folding stock's hinge, which the fixed wooden stocks replace (their lua sets tag_stock_hinge = 1).
+        "stock_hinge": ("att_vm_p04_ar_akilo105_rec_v0_LOD0_stock_hinge.smd", None),
+    },
+    # 0.2 inside the front of the muzzle booster, like the 74u's (the barrel's tag_flash_attachment is 1.7 inside it).
+    extra_bones={"muzzle": ("tag_barrel_attach", np.array([12.477, 0.0, -1.497]))},
+    materials=ak105_materials,
+    # From the addon's lua/weapons/mg_iw9_akilo105/shared.lua.
+    hip=view_offset(),
+    aim=view_offset((-0.008, 0.0, -0.005)),
+    sprint=view_offset(),
+    m4_sprint=True,
+    ads_pose=("ads_in", slice(-1, None)),
+    report_bones=["tag_rail", "tag_tip", "tag_silencer", "tag_grip_attach", "tag_laser_attach"],
+    # The parts the addon offers the AK-105 (lua/weapons/mg_iw9_akilo105/customization.lua): its own AK-74M-style
+    # folding stock, pistol grip and 30-round magazine, the Kastovia stocks and grips, and the 20-, 45- (RPK-74) and
+    # 60-round (quad-stack casket) magazines. Left out: the akilo74 magazine (the 30-rounder's look, CoD cosmetic) and the
+    # other barrels, which are CoD's own.
+    part_choices={
+        "stock": [_attachment("ar_akilo105_stock_v0")] + [_kastovia(model) for model in (
+            "sh_vecho_stock_v0", "sh_vecho_stocktac_v0", "ar_akilo_stockh_v0", "ar_akilo_stocktac_v0",
+            "ar_akilo_stocktac02_v0", "ar_akilo_stockwire_v0", "ar_akilo74_stockskel_v0", "lm_rkilo_stock_v0",
+            "lm_rkilo_stockh_v0", "ar_akilo_stock_v0")],
+        "pistol_grip": [_attachment("ar_akilo105_pgrip_v0")] + [_kastovia(model) for model in (
+            "sh_vecho_pgrip_v0", "ar_akilo_griptac_v0", "ar_akilo_gripstdy_v0", "ar_akilo_gripass_v0",
+            "sh_vecho_gripsnp_v0", "ar_akilo_pstlgrp_v0")],
+        # Each holds the fitted magazine (j_mag1) and the reload's fresh one (j_mag2).
+        "magazine": [_attachment("ar_akilo105_mag_v0"), _kastovia("ar_akilo105_smag_v0"),
+                     _kastovia("ar_akilo105_xmag_v0"), _attachment("ar_akilo105_xmaglrg_v0")],
+    },
+    # Each other magazine reloads with its own animation (the addon's magazines swap Reload for these).
+    reload_variants=["_smag", "_xmag", "_xmaglrg"],
+    # The factory barrel's (att_vm_p04_ar_akilo105_barrel_v0.lua: grip_pose_l_offset).
+    grip_pose="a_delta_barhvyshort_additive_for_offset",
+)
+
+def vepr12_materials() -> dict[str, str]:
+    # Built by vepr12_assets.py; the stocks and grips reuse the 74u's materials.
+    assets = json.loads((ASSETS / "Weapons" / "Vepr12" / "vepr12_assets.json").read_text(encoding="utf-8"))
+    return assets["materials"]
+
+
+_VEPR12_BARREL = "att_vm_p04_sh_vecho_barrel_v0/att_vm_p04_sh_vecho_barrel_v0"
+_VEPR12_BARREL_REFERENCE = "att_vm_p04_sh_vecho_barrel_v0/att_vm_p04_sh_vecho_barrel_v0_anims/reference.smd"
+_VEPR12_COVER = "att_vm_p04_sh_vecho_bolt_v0/att_vm_p04_sh_vecho_bolt_v0"
+
+
+def _vecho_mag(model: str) -> tuple[str, str]:
+    """A magazine part_choices entry: the Vepr's magazines are world models (att_wm_p04_<model>)."""
+    folder = f"att_wm_p04_{model}"
+    return model, f"{folder}/{folder}_LOD0.smd"
+
+
+# The Vepr-12 (12 gauge): MWII's "KV Broadside" (mg_iw9_vecho) from the same addon as the 74u, on the same rig. Molot's
+# semi-automatic shotgun on the RPK receiver, here the short VPO-205-03 (its barrel measures ~305 mm in the model).
+VEPR12 = Weapon(
+    name="vepr12",
+    folder=ASSETS / "Weapons" / "Vepr12",
+    asset="weapons/vepr12",
+    model="vepr12",
+    decompiled=DECOMPILED / "vecho",
+    cod_anims="v_vecho_anims",
+    vm_meshes=["att_vm_p04_sh_vecho_rec_v0_LOD0.smd"],
+    # The barrel with its handguard, gas block and front sight, and the railed dust cover (the addon's "bolt").
+    part_meshes=[(f"{_VEPR12_BARREL}_LOD0.smd", _VEPR12_BARREL_REFERENCE),
+                 (f"{_VEPR12_COVER}_LOD0.smd", f"att_vm_p04_sh_vecho_bolt_v0/att_vm_p04_sh_vecho_bolt_v0_anims/reference.smd")],
+    optional_meshes={
+        "muzzle_tip": (f"{_VEPR12_BARREL}_tip.smd", _VEPR12_BARREL_REFERENCE),  # the muzzle brake
+        "laser_rail": (f"{_VEPR12_BARREL}_laser.smd", _VEPR12_BARREL_REFERENCE),  # side rail on the handguard
+    },
+    # 0.2 inside the front of the muzzle brake, like the AK-105's (the barrel's tag_flash is 0.8 inside it).
+    extra_bones={"muzzle": ("tag_barrel_attach", np.array([10.877, 0.0, -1.489]))},
+    materials=vepr12_materials,
+    # From the addon's lua/weapons/mg_iw9_vecho/shared.lua.
+    hip=view_offset(),
+    aim=view_offset(angles=(0.0, 0.03, 0.0)),
+    sprint=view_offset((3.0, -0.7, -0.8)),
+    m4_sprint=True,
+    ads_pose=("ads_in", slice(-1, None)),
+    # 4.8 kg loaded (4.2 kg, the 8-round magazine and eight shells) against the AKM's 3.75 kg: the RPK's scaling,
+    # sqrt(8.8 / 7.75) = 1.07.
+    ads_time=0.27,
+    report_bones=["tag_tip", "tag_laser_attach", "tag_grip_attach", "tag_rail_attach"],
+    # The parts the addon offers the Vepr (lua/weapons/mg_iw9_vecho/customization.lua) that a real Vepr-12 takes: the
+    # Kastovia stocks and grips (the factory ones are the addon's, the Vepr's own), and its 8-, 12- and 25-round
+    # magazines. Left out: CoD's barrels, bolts and conversions, and the grips and launcher that move the left hand.
+    part_choices={
+        "stock": [_kastovia(model) for model in (
+            "sh_vecho_stock_v0", "sh_vecho_stocktac_v0", "ar_akilo_stock_v0", "ar_akilo_stockh_v0",
+            "ar_akilo_stocktac_v0", "ar_akilo_stocktac02_v0", "ar_akilo_stockwire_v0", "ar_akilo74_stock_v0",
+            "ar_akilo74_stockno_v0", "ar_akilo74_stockskel_v0", "lm_rkilo_stock_v0", "lm_rkilo_stockh_v0")],
+        "pistol_grip": [_kastovia(model) for model in (
+            "sh_vecho_pgrip_v0", "ar_akilo_pstlgrp_v0", "ar_akilo_griptac_v0", "ar_akilo_gripstdy_v0",
+            "ar_akilo_gripass_v0", "sh_vecho_gripsnp_v0")],
+        # Each holds the fitted magazine (j_mag1) and the reload's fresh one (j_mag2).
+        "magazine": [_vecho_mag(model) for model in ("sh_vecho_mag_v0", "sh_vecho_xmag_v0", "sh_vecho_drummag_v0")],
+    },
+    # The 12-round magazine's and the drum's own reloads.
+    reload_variants=["_xmag", "_drummag"],
+)
+
+def m16_materials() -> dict[str, str]:
+    # Built by m16_assets.py.
+    assets = json.loads((ASSETS / "Weapons" / "M16" / "m16_assets.json").read_text(encoding="utf-8"))
+    return assets["materials"]
+
+
+_M16_BARREL = "att_vm_p01_ar_mike16_barrel_v0"
+_M16_BARREL_REFERENCE = f"{_M16_BARREL}/{_M16_BARREL}_anims/reference.smd"
+_M16_MAG = "att_vm_p01_ar_mike4_mag_v0"
+
+# The M16A4 (5.56x45mm): MWII's M16 (mg_iw9_mike16) from easy4115's addon (Workshop 2962304029). MWII's AR rig has the
+# same bone and clip names as the Kastovia ones, except that j_gun hangs off tag_sling. A flat-top upper under the
+# detachable carry handle (with the A2 rear sight), the 20" barrel with its fixed front sight base, the handguard and
+# the birdcage flash hider, the fixed A2 stock, and MWII's M4 pistol grip and 30-round magazine, which the addon fits.
+M16 = Weapon(
+    name="m16",
+    folder=ASSETS / "Weapons" / "M16",
+    asset="weapons/m16",
+    model="m16",
+    decompiled=DECOMPILED / "mike16",
+    cod_anims="vm_iw9_mike16_anims",
+    vm_meshes=["att_vm_p01_ar_mike16_rec_v0_LOD0.smd"],
+    # The barrel's handguard (a four-rail one, as the real M16A4's) and front sight are its "handguard" and "sight"
+    # bodygroups; the addon's other handguard (a grenade launcher's heat shield) and its second laser rail (the same
+    # mesh) are left out. The magazine has a see-through window, so both magazines (the fitted one and the reload's
+    # fresh one) keep all their rounds; j_ammo_31 is a loose round the clips move, parked inside the receiver.
+    part_meshes=[],
+    optional_meshes={
+        "muzzle_tip": (f"{_M16_BARREL}/tip.smd", _M16_BARREL_REFERENCE),  # the birdcage flash hider
+        "laser_rail": (f"{_M16_BARREL}/laser.smd", _M16_BARREL_REFERENCE),  # rail section on the handguard's side
+        # The ladder cover on the front of the bottom rail (the barrel's tag_grip_hide), which comes off for a grip.
+        "grip_cover": (f"{_M16_BARREL}/guard.smd#tag_grip_hide", _M16_BARREL_REFERENCE),
+        # The carry handle, with the rear sight: it comes off for an optic, as the real flat-top's does.
+        "carry_handle": ("carryhandle.smd", None),
+        "factory_barrel": (f"{_M16_BARREL}/{_M16_BARREL}_LOD0.smd", _M16_BARREL_REFERENCE),
+        "factory_handguard": (f"{_M16_BARREL}/guard.smd#!tag_grip_hide", _M16_BARREL_REFERENCE),
+        "factory_front_sight": (f"{_M16_BARREL}/sighton.smd", _M16_BARREL_REFERENCE),
+        "factory_stock": ("att_vm_p01_ar_mike16_stock_v0/att_vm_p01_ar_mike16_stock_v0_LOD0.smd",
+                          "att_vm_p01_ar_mike16_stock_v0/att_vm_p01_ar_mike16_stock_v0_anims/reference.smd"),
+        "factory_grip": ("att_vm_p01_ar_mike4_pistolgrip_v0/att_vm_p01_ar_mike4_pistolgrip_v0_LOD0.smd",
+                         "att_vm_p01_ar_mike4_pistolgrip_v0/att_vm_p01_ar_mike4_pistolgrip_v0_anims/reference.smd"),
+    },
+    optional_variants={"laser_rail": [("replaced", "", None)]},
+    # m16_gunsmith.py assembles the shells and rounds on both animated magazine bones.
+    part_choices={"magazine": [(name, f"derived/mag_{name}.smd") for name in ("standard", "smag", "xmag", "xmaglrg")]},
+    reload_variants=["_smag", "_xmag", "_xmaglrg"],
+    # 0.2 inside the front of the flash hider, like the AK-105's (the barrel's tag_flash_attachment is 0.57 inside it).
+    extra_bones={"muzzle": ("tag_barrel_attach", np.array([21.35, 0.0, -1.202]))},
+    materials=m16_materials,
+    # From the addon's lua/weapons/mg_iw9_mike16/shared.lua, except aim. The addon's iron-sight aim (0.005, 0.5, 0.135)
+    # leaves the sight line 0.113 above the camera, with the front post 0.32 deg over the aim point, low in the rear
+    # aperture. This drops the gun onto the line through the aperture's centre and the post's top, and turns out the
+    # line's 0.058 deg up and 0.032 deg left, which puts both on the aim point (measured on ads_in's last frame).
+    hip=view_offset(),
+    aim=view_offset((0.004, 0.5, 0.022), (0.058, -0.032, 0.0)),
+    sprint=view_offset(),
+    m4_sprint=True,
+    ads_pose=("ads_in", slice(-1, None)),
+    report_bones=["tag_rail", "tag_tip", "tag_silencer", "tag_grip_attach", "tag_laser_attach", "tag_sight_on",
+                  "tag_sight_on2"],
+    # The mid-length heavy barrel's grip (the QC's grip_barmidhvy_offset), which wraps the thick four-rail handguard: at
+    # idle 121 left-hand vertices are inside it, at most 0.09 deep, and 553 are within 0.25 of it. The factory barrel's
+    # own, with no grip fitted (att_vm_p01_ar_mike16_barrel_v0.lua: grip_vertpro_offset, which plays the vertshort
+    # clip), holds a short vertical grip: the hand closed on air 2.3 under the handguard, and only 117 vertices came
+    # within 0.25 of it. With no grip clip the fingertips rise to the front sight when aiming.
+    grip_pose="a_delta_grip_barmidhvy_additive_for_offset",
+    # The addon's fire clip rocks the whole gun 0.2 sideways each way and 2.5 deg about the bore, settling over 1.4 s,
+    # and every shot starts it again. The bolt, dust cover, trigger and trigger finger are still by frame 12.
+    steady_fire=15,
+    # The rig's tag_grip_hide is 5.7 further back and 1.7 higher than the barrel's, which would lift the rail cover off
+    # the bottom rail into the handguard.
+    unmerged_bones=frozenset({"tag_grip_hide"}),
+)
+
+def p90_materials() -> dict[str, str]:
+    # Built by p90_assets.py.
+    assets = json.loads((ASSETS / "Weapons" / "P90" / "p90_assets.json").read_text(encoding="utf-8"))
+    return assets["materials"]
+
+
+_P90 = "v_papa90"
+_P90_BARREL = "attachment_vm_sm_papa90_barrel/attachment_vm_sm_papa90_barrel"
+_P90_MAG = "attachment_vm_sm_papa90_mag/attachment_vm_sm_papa90_mag.smd"
+
+# The FN P90 (5.7x28mm): MW2019's P90 (mg_papa90) from Viper's MW2019 SMG pack (Workshop 2802430252). MW2019's rig has
+# the same bone and clip names as MWII's, but the P90 has no pistol grip part, so tag_pistolgrip_attach (which places
+# the world model) is an extra bone. The P90 TR: the top rail with its flip-up iron sights, the barrel with its flash
+# hider, and the 50-round magazine along the top, see-through like the real one.
+P90 = Weapon(
+    name="p90",
+    folder=ASSETS / "Weapons" / "P90",
+    asset="weapons/p90",
+    model="p90",
+    decompiled=DECOMPILED / "papa90",
+    cod_anims=f"{_P90}/{_P90}_anims",
+    # The viewmodel's own bodygroup meshes, in its bind pose: the receiver (with the side rails) and the top rail.
+    vm_meshes=[f"{_P90}/attachment_vm_sm_papa90_receiver.smd", f"{_P90}/attachment_vm_sm_papa90_rail_hide.smd"],
+    # The barrel, and the magazine: the fitted one (j_mag1) and the reload's fresh one (j_mag2), then their see-through
+    # shells.
+    part_meshes=[(f"{_P90_BARREL}.smd", f"{_P90_BARREL}.smd"), (_P90_MAG, _P90_MAG),
+                 ("attachment_vm_sm_papa90_mag/body1_model0.smd", _P90_MAG)],
+    optional_meshes={
+        "muzzle_tip": (f"{_P90_BARREL}_tip.smd", f"{_P90_BARREL}.smd"),  # the flash hider
+        # The flip-up sights on the top rail, which an optic takes the place of.
+        "iron_sights": (f"{_P90}/attachment_vm_sm_papa90_tag_sight.smd", None),
+    },
+    extra_bones={
+        # 0.2 inside the front of the flash hider, on the bore (the barrel's tag_flash_attachment is 1.0 inside it and
+        # 0.155 under the bore).
+        "muzzle": ("tag_barrel_attach", np.array([2.0, 0.0, 0.155])),
+        # Where the rifles' pistol grip mounts sit from the right wrist: 4.2 in front of it and 2.3 above, on the
+        # centreline.
+        "tag_pistolgrip_attach": ("tag_sling", np.array([8.59, 0.0, 0.93])),
+    },
+    materials=p90_materials,
+    # From the addon's lua/weapons/mg_papa90/shared.lua. With aim, ads_in's end puts the front post's tip on the aim
+    # point, centred between the rear sight's shoulders.
+    hip=view_offset(),
+    aim=view_offset((0.0, -4.0, 0.0)),
+    sprint=view_offset(),
+    m4_sprint=True,
+    ads_pose=("ads_in", slice(-1, None)),
+    ads_fire="fire_2",
+    report_bones=["tag_tip", "tag_silencer", "tag_laser_attach", "tag_rail_attach", "tag_sight_on"],
+)
+
+def mp7_materials() -> dict[str, str]:
+    # Built by mp7_assets.py.
+    assets = json.loads((ASSETS / "Weapons" / "MP7" / "mp7_assets.json").read_text(encoding="utf-8"))
+    return assets["materials"]
+
+
+_MP7 = "v_mpapa7"
+_MP7_BARREL = "attachment_vm_sm_mpapa7_barrel/attachment_vm_sm_mpapa7_barrel"
+_MP7_MAG = "attachment_vm_sm_mpapa7_mag/attachment_vm_sm_mpapa7_mag.smd"
+_MP7_STOCK = "attachment_vm_sm_mpapa7_stock/attachment_vm_sm_mpapa7_stock.smd"
+
+# The H&K MP7A1 (4.6x30mm): MW2019's MP7 (mg_mpapa7) from Viper's MW2019 SMG pack (Workshop 2802430252). Like the
+# P90, it has no pistol grip part (the grip is the receiver's), so tag_pistolgrip_attach is an extra bone. The receiver
+# with its rails, the barrel with its flash hider, the flip-up iron sights, the 40-round magazine and the retractable
+# stock.
+MP7 = Weapon(
+    name="mp7",
+    folder=ASSETS / "Weapons" / "MP7",
+    asset="weapons/mp7",
+    model="mp7",
+    decompiled=DECOMPILED / "mpapa7",
+    cod_anims=f"{_MP7}/{_MP7}_anims",
+    # The viewmodel's own bodygroup mesh, in its bind pose.
+    vm_meshes=[f"{_MP7}/attachment_vm_sm_mpapa7_receiver.smd"],
+    # The barrel, the magazine (the fitted one on j_mag1 and the reload's fresh one on j_mag2) and the stock.
+    part_meshes=[(f"{_MP7_BARREL}.smd", f"{_MP7_BARREL}.smd"), (_MP7_MAG, _MP7_MAG), (_MP7_STOCK, _MP7_STOCK)],
+    optional_meshes={
+        "muzzle_tip": (f"{_MP7_BARREL}_tip.smd", f"{_MP7_BARREL}.smd"),  # the flash hider
+        # The raised flip-up sights, which come off for an optic (MW2019's magnified optics take them off too).
+        "iron_sights": (f"{_MP7}/attachment_vm_sm_mpapa7_tag_sight_on.smd", None),
+        # The laser's mount on the right-hand rail, shown only under a laser. The rail CoD adds under the front
+        # (attachment_vm_sm_mpapa7_ub_rail) is left out: the real MP7A1 has none, and the left hand holds the receiver
+        # there, so the gun has no Underbarrel slot.
+        "laser_rail": (f"{_MP7}/attachment_vm_sm_mpapa7_tag_laser.smd", None),
+    },
+    extra_bones={
+        # 0.2 inside the front of the flash hider, on the bore (the barrel's tag_flash_attachment is 0.255 inside it).
+        "muzzle": ("tag_barrel_attach", np.array([3.882, 0.0, 0.721])),
+        # Where the rifles' pistol grip mounts sit from the right wrist (as for the P90), on the centreline.
+        "tag_pistolgrip_attach": ("tag_sling", np.array([6.42, 0.0, -1.64])),
+    },
+    materials=mp7_materials,
+    # From the addon's lua/weapons/mg_mpapa7/shared.lua.
+    hip=view_offset(),
+    aim=view_offset((0.0, 3.0, 0.0)),
+    sprint=view_offset(),
+    m4_sprint=True,
+    ads_pose=("ads_in", slice(-1, None)),
+    # The hip clip rolls the gun 2.3 degrees every shot; the aimed one only kicks it 0.7 back along the bore.
+    ads_fire="fire_2",
+    report_bones=["tag_tip", "tag_silencer", "tag_laser_attach", "tag_laser_show", "tag_grip_attach", "tag_rail_attach",
+                  "tag_sight_on"],
+)
+
+def aug_materials() -> dict[str, str]:
+    # Built by aug_assets.py.
+    assets = json.loads((ASSETS / "Weapons" / "AUG" / "aug_assets.json").read_text(encoding="utf-8"))
+    return assets["materials"]
+
+
+_AUG = "v_augolf"
+_AUG_BARREL = "attachment_vm_sm_augolf_arbarrel/attachment_vm_sm_augolf_arbarrel"
+_AUG_MAG = "attachment_vm_sm_augolf_armag/attachment_vm_sm_augolf_armag.smd"
+_AUG_LONG = "attachment_vm_sm_augolf_lmgbarrel/attachment_vm_sm_augolf_lmgbarrel"
+
+
+def _aug_part(name: str) -> str:
+    return f"attachment_vm_sm_augolf_{name}/attachment_vm_sm_augolf_{name}.smd"
+
+# The Steyr AUG A3 (5.56x45mm): MW2019's AUG (mg_augolf) from Viper's MW2019 SMG pack (Workshop 2802430252), which is a
+# 9mm gun by default. Built as the 5.56 rifle: the pack's 407 mm barrel and the AUG's own 30-round magazine, which
+# reloads with its own clips (factory_reload). Like the P90's and MP7's, its pistol grip is the stock's, so
+# tag_pistolgrip_attach is an extra bone.
+AUG = Weapon(
+    name="aug",
+    folder=ASSETS / "Weapons" / "AUG",
+    asset="weapons/aug",
+    model="aug",
+    decompiled=DECOMPILED / "augolf",
+    cod_anims=f"{_AUG}/{_AUG}_anims",
+    # The viewmodel's own bodygroup meshes, in its bind pose: the stock (the receiver housing with the pistol grip and
+    # trigger guard), its butt, the top rail and the folding foregrip. The foregrip's mesh carries a second copy of it
+    # in the rail's material, whose UVs don't fit that texture.
+    vm_meshes=[f"{_AUG}/weapon_vm_sm_augolf_receiver.smd",
+               f"{_AUG}/weapon_vm_sm_augolf_rail_1.smd",
+               f"{_AUG}/weapon_vm_sm_augolf_tag_grip.smd@weapon_vm_sm_augolf_vertgrip"],
+    # The barrel (without the _s copies of its pieces, which have no material of their own) and the magazine: the
+    # fitted one on j_mag1 and the reload's fresh one on j_mag2.
+    part_meshes=[],
+    part_choices={
+        "stock": [("factory", _aug_part("tag_stock_attach")),
+                  ("lightweight", _aug_part("stockl")), ("tactical", _aug_part("stock_tactical"))],
+        "barrel": [("factory", f"{_AUG_BARREL}.smd@!weapon_vm_sm_augolf_ar_barrel_s,weapon_vm_sm_augolf_lmg_barrel_s"),
+                   ("long", f"{_AUG_LONG}.smd")],
+        "magazine": [("factory", _AUG_MAG),
+                     # The decorative decal mesh is omitted; the drum keeps its own PBR surface.
+                     ("drum", _aug_part("drummag") + "@!weapon_vm_sm_augolf_lmg_mag_decal")],
+    },
+    tip_choices={"long": (f"{_AUG_LONG}_tip.smd", f"{_AUG_LONG}.smd")},
+    reload_variants=["_drummag"],
+    optional_meshes={
+        "muzzle_tip": (f"{_AUG_BARREL}_tip.smd", f"{_AUG_BARREL}.smd"),  # the flash hider
+        # The flip-up sights on the top rail, which an optic takes the place of.
+        "iron_sights": (f"{_AUG}/weapon_vm_sm_augolf_tag_sight_1.smd", None),
+        # The laser's mount on the barrel, shown only under a laser.
+        "laser_rail": (f"{_AUG_BARREL}_laser.smd", f"{_AUG_BARREL}.smd"),
+    },
+    extra_bones={
+        # 0.2 inside the front of the flash hider, on the bore (the barrel's tag_flash_attachment is 1.4 inside it).
+        "muzzle": ("tag_barrel_attach", np.array([7.996, 0.0, 0.006])),
+        # Where the rifles' pistol grip mounts sit from the right wrist (as for the P90), on the centreline, which is
+        # 1.174 right of tag_sling: 4.2 in front of the wrist and 2.3 above it, in HC1's lengths (these offsets are
+        # CoD's, which model_scale shrinks).
+        "tag_pistolgrip_attach": ("tag_sling", np.array([16.397, -1.174, 0.525])),
+    },
+    materials=aug_materials,
+    # From the addon's lua/weapons/mg_augolf/shared.lua.
+    hip=view_offset(),
+    aim=view_offset((0.0, 3.0, 0.0)),
+    sprint=view_offset(),
+    m4_sprint=True,
+    ads_pose=("ads_in", slice(-1, None)),
+    # The hip clip rolls the gun 4.6 degrees about the bore on the shot's first frame and rocks it +-2.6 for the next
+    # five; the aimed one rolls it 0.56 at most and kicks it 0.94 straight back.
+    ads_fire="fire_2",
+    factory_reload="_armag",
+    report_bones=["tag_tip", "tag_silencer", "tag_laser_attach", "tag_laser_show", "tag_grip_attach", "tag_rail_attach",
+                  "tag_sight_on"],
+    model_scale=1.1,
+)
+
+def uzi_materials() -> dict[str, str]:
+    # Built by uzi_assets.py.
+    assets = json.loads((ASSETS / "Weapons" / "Uzi" / "uzi_assets.json").read_text(encoding="utf-8"))
+    return assets["materials"]
+
+
+_UZI = "v_uzulu"
+_UZI_BARREL = "attachment_vm_sm_uzulu_barrel/attachment_vm_sm_uzulu_barrel.smd"
+# The receiver model the MW base bone-merges onto the viewmodel, for its bodygroup pieces.
+_UZI_PIECES = "attachment_vm_sm_uzulu_receiver"
+_UZI_PIECES_REFERENCE = f"{_UZI_PIECES}/attachment_vm_sm_uzulu_receiver.smd"
+
+
+def _uzulu(model: str) -> tuple[str, str]:
+    """A part_choices entry: one of the Uzi's attachment models (attachment_vm_sm_uzulu_<model>)."""
+    folder = f"attachment_vm_sm_uzulu_{model}"
+    return f"sm_uzulu_{model}", f"{folder}/{folder}.smd"
+
+
+# The IMI Uzi (9x19mm): MW2019's Uzi (mg_uzulu) from Viper's MW2019 SMG pack (Workshop 2802430252). Like the P90's and
+# MP7's, its pistol grip is the receiver's, so tag_pistolgrip_attach is an extra bone. The receiver with its barrel nut,
+# the short barrel, the sights, the 32-round magazine and the folding metal stock. It's the real gun's size: from the
+# receiver's back to the muzzle it measures 435 mm, the real gun's 445 without a stock.
+UZI = Weapon(
+    name="uzi",
+    folder=ASSETS / "Weapons" / "Uzi",
+    asset="weapons/uzi",
+    model="uzi",
+    decompiled=DECOMPILED / "uzulu",
+    cod_anims=f"{_UZI}/{_UZI}_anims",
+    # The viewmodel's own receiver mesh, in its bind pose, without the _s copies of its pieces (it has every piece
+    # twice, the second copy in an _s material).
+    vm_meshes=[f"{_UZI}/attachment_vm_sm_uzulu_receiver.smd@!weapon_vm_sm_uzulu_body_s,weapon_vm_sm_uzulu_frontgrip_s,"
+               "weapon_vm_sm_uzulu_pstl_grip_s,weapon_vm_sm_uzulu_barrel_s"],
+    # The barrel, and the front and rear sights (the receiver model's one-choice "sight" bodygroup).
+    part_meshes=[(_UZI_BARREL, _UZI_BARREL), (f"{_UZI_PIECES}/attachment_vm_sm_uzulu_tag_sight.smd", _UZI_PIECES_REFERENCE)],
+    optional_meshes={
+        # The mount an optic brings onto the top cover (tag_rail), and the laser's on the receiver's right side.
+        "optic_rail": (f"{_UZI_PIECES}/attachment_vm_sm_uzulu_rail.smd", _UZI_PIECES_REFERENCE),
+        "laser_rail": (f"{_UZI_PIECES}/attachment_vm_sm_uzulu_receiver_laser.smd", _UZI_PIECES_REFERENCE),
+    },
+    extra_bones={
+        # 0.2 inside the barrel's end, on the bore (the barrel's tag_flash_attachment is at its end).
+        "muzzle": ("tag_barrel_attach", np.array([4.121, 0.0, 0.0])),
+        # Where the rifles' pistol grip mounts sit from the right wrist (as for the P90), on the centreline, which is
+        # 0.937 right of tag_sling.
+        "tag_pistolgrip_attach": ("tag_sling", np.array([-1.31, -0.937, -1.51])),
+    },
+    materials=uzi_materials,
+    # From the addon's lua/weapons/mg_uzulu/shared.lua.
+    hip=view_offset(),
+    aim=view_offset((0.0, 3.0, 0.0)),
+    sprint=view_offset(),
+    m4_sprint=True,
+    ads_pose=("ads_in", slice(-1, None)),
+    # The fire clip rolls the gun up to 1.5 degrees about the bore and pitches it 0.9 in its first three frames, and at
+    # 600 rpm every shot starts it again; the aimed clip (fire_2) still rolls it 0.95. The bolt (seen through the
+    # ejection port; the cocking knob on the top cover doesn't reciprocate, as on the real gun) and the trigger finger
+    # are still by frame 5.
+    steady_fire=8,
+    report_bones=["tag_silencer", "tag_laser_attach", "tag_laser_show", "tag_rail", "tag_sight_on", "tag_stock_show"],
+    # The folding metal stock (extended), folded, and the early fixed wooden stock; the 32-round magazine, then the 40
+    # and the 50. Left out: CoD's barrels, its suppressed barrel and calibre conversion, the MW grips and stocks.
+    part_choices={
+        "stock": [_uzulu("stock"), _uzulu("stock_folded"), _uzulu("stockh")],
+        # Each holds the fitted magazine (j_mag1) and the reload's fresh one (j_mag2).
+        "magazine": [_uzulu("mag"), _uzulu("xmags"), _uzulu("xmag2")],
+    },
+    # Both longer magazines reload with the xmag clips, as in the addon.
+    reload_variants=["_xmag"],
+    # The lower receiver's front: where CoD's hand sits, HC1's thumb base sank 0.34 into its left side, the palm into
+    # its bottom and the fingertips into its right side. Measured by skinning the arms against the gun mesh (154
+    # vertices, 0.34 deep -> 60, 0.10; the verified Kastov 762 has 52, 0.10).
+    left_grip=GripFit(shift=(0.0, 0.25, -0.1), fingers=0.1),
+)
+
+def fal_materials() -> dict[str, str]:
+    # Built by fal_assets.py.
+    assets = json.loads((ASSETS / "Weapons" / "FAL" / "fal_assets.json").read_text(encoding="utf-8"))
+    return assets["materials"]
+
+
+_FAL = "v_falima"
+_FAL_BARREL = "attachment_vm_ar_falima_barrel/attachment_vm_ar_falima_barrel"
+_FAL_SHORT = "attachment_vm_ar_falima_barsmg/attachment_vm_ar_falima_barsmg"
+_FAL_FOREND = "attachment_vm_ar_falima_forend/attachment_vm_ar_falima_forend"
+_FAL_MAG = "attachment_vm_ar_falima_mag/attachment_vm_ar_falima_mag.smd"
+_FAL_STOCK = "attachment_vm_ar_falima_stock/attachment_vm_ar_falima_stock.smd"
+# The receiver model the MW base bone-merges onto the viewmodel, for its bodygroup pieces.
+_FAL_PIECES = "attachment_vm_ar_falima_reciever"
+_FAL_PIECES_REFERENCE = f"{_FAL_PIECES}/attachment_vm_ar_falima_reciever.smd"
+
+
+def _falima(model: str) -> str:
+    """One of the FAL's attachment models (attachment_vm_ar_falima_<model>)."""
+    return f"attachment_vm_ar_falima_{model}/attachment_vm_ar_falima_{model}.smd"
+
+
+# The FN FAL (7.62x51mm): MW2019's FAL (mg_falima) from Viper's MW2019 Assault Rifles pack (Workshop 2528829149), the
+# 50.00 rifle: the 533 mm barrel with its flash hider, the handguard with the gas block and front sight, the 20-round
+# magazine and the fixed stock. Like the P90's, its rig has no pistol grip part (the grip is the receiver's), so
+# tag_pistolgrip_attach is an extra bone. It's the real gun's size: 42.9 in from the butt to the muzzle, the real
+# 50.00's 1,090 mm. The gunsmith's parts are the pack's real FAL ones: the Para's tubular folding stock, the 18-inch
+# barrel of the folding-stock 50.62 (with a short flash hider) and the 30-round magazine.
+FAL = Weapon(
+    name="fal",
+    folder=ASSETS / "Weapons" / "FAL",
+    asset="weapons/fal",
+    model="fal",
+    decompiled=DECOMPILED / "falima",
+    cod_anims=f"{_FAL}/{_FAL}_anims",
+    # The viewmodel's own receiver mesh, in its bind pose.
+    vm_meshes=[f"{_FAL}/attachment_vm_ar_falima_reciever.smd"],
+    # The handguard, with the gas block and the front sight.
+    part_meshes=[(f"{_FAL_FOREND}.smd", f"{_FAL_FOREND}.smd")],
+    # The stock, the barrel ahead of the gas block and the magazine (the fitted one on j_mag1 and the reload's fresh one
+    # on j_mag2), each the 50.00's then the gunsmith's. Left out: the pack's long barrel (1.64 longer than the 50.00's,
+    # ~575 mm, which no service FAL had: 533, the SLR's 554, 458 and 436) and its loose muzzle piece, which the addon
+    # never fits, its 24-round magazine (no FAL magazine holds 24), the receiver with no stock, MW's generic stocks, and
+    # the FAL's grips, which move the left hand (a part can't).
+    part_choices={
+        "stock": [("factory", _FAL_STOCK), ("para", _falima("stockl"))],
+        "barrel": [("factory", f"{_FAL_BARREL}.smd"), ("short", f"{_FAL_SHORT}.smd")],
+        "magazine": [("factory", _FAL_MAG), ("xmag", _falima("xmags"))],
+    },
+    # The 18-inch barrel's short flash hider: muzzle_tip 1, between the factory one and none.
+    tip_choices={"short": (f"{_FAL_SHORT}_tip.smd", f"{_FAL_SHORT}.smd")},
+    # The 30-round magazine reloads with its own clips.
+    reload_variants=["_xmag"],
+    optional_meshes={
+        "muzzle_tip": (f"{_FAL_BARREL}_tip.smd", f"{_FAL_BARREL}.smd"),  # the flash hider
+        # The rail an optic brings onto the top cover.
+        "optic_rail": (f"{_FAL_PIECES}/attachment_vm_ar_falima_rail.smd", _FAL_PIECES_REFERENCE),
+        # The laser's mount on the handguard's right side, shown only under a laser.
+        "laser_rail": (f"{_FAL_FOREND}_laser.smd", f"{_FAL_FOREND}.smd"),
+        # The rear sight, raised, and folded down under an optic (the receiver model's tag_sight bodygroup).
+        "iron_sights": (f"{_FAL_PIECES}/attachment_vm_ar_falima_tag_sight_on.smd", _FAL_PIECES_REFERENCE),
+        "sight_folded": (f"{_FAL_PIECES}/attachment_vm_ar_falima_tag_sight_off.smd", _FAL_PIECES_REFERENCE),
+    },
+    extra_bones={
+        # 0.2 inside the front of the flash hider, on the bore (the barrel's tag_flash_attachment is at its front).
+        "muzzle": ("tag_barrel_attach", np.array([9.419, 0.0, -0.007])),
+        # Where the rifles' pistol grip mounts sit from the right wrist (as for the P90), on the centreline.
+        "tag_pistolgrip_attach": ("tag_sling", np.array([2.747, 0.0, -1.872])),
+    },
+    materials=fal_materials,
+    # From the addon's lua/weapons/mg_falima/shared.lua (no offsets).
+    hip=view_offset(),
+    aim=view_offset(),
+    sprint=view_offset(),
+    m4_sprint=True,
+    ads_pose=("ads_in", slice(-1, None)),
+    # About 5.0 kg loaded (4.25 kg empty, a 0.25 kg magazine and 20 rounds of 25.4 g), 1.25 kg over the AKM, by the
+    # RPK's scaling: 0.25 x sqrt((5.0 + 4) / 7.75).
+    ads_time=0.27,
+    # The hip clip rolls the gun up to 3 degrees about the bore and swings it 1 forward every shot; the aimed one
+    # rolls it 0.25 at most and kicks it 0.6 straight back.
+    ads_fire="fire_2",
+    report_bones=["tag_tip", "tag_silencer", "tag_laser_attach", "tag_laser_show2", "tag_rail", "tag_reflex",
+                  "tag_sight_on", "tag_grip_attach"],
+)
+
+def famas_materials() -> dict[str, str]:
+    return json.loads((ASSETS / "Weapons/FAMAS/famas_assets.json").read_text())["materials"]
+
+
+_FAMAS = "v_falpha"
+_FAMAS_BARREL = "attachment_vm_ar_falpha_barrel/attachment_vm_ar_falpha_barrel"
+_FAMAS_MAG = "attachment_vm_ar_falpha_mag/attachment_vm_ar_falpha_mag.smd"
+FAMAS = Weapon(
+    name="famas", folder=ASSETS / "Weapons/FAMAS", asset="weapons/famas", model="famas",
+    decompiled=DECOMPILED / "falpha", cod_anims=f"{_FAMAS}/{_FAMAS}_anims",
+    vm_meshes=[f"{_FAMAS}/attachment_vm_ar_falpha_receiver.smd#!tag_stock_hide",
+               f"{_FAMAS}/attachment_vm_ar_falpha_triggrip.smd"],
+    part_meshes=[],
+    optional_meshes={
+        "muzzle_tip": (f"{_FAMAS_BARREL}_tip.smd", f"{_FAMAS_BARREL}.smd"),
+        "laser_rail": (f"{_FAMAS_BARREL}_laser.smd", f"{_FAMAS_BARREL}.smd"),
+        "iron_sights": (f"{_FAMAS}/attachment_vm_ar_falpha_toprail_sight_on.smd", None),
+        "sight_folded": (f"{_FAMAS}/attachment_vm_ar_falpha_toprail_sight_off.smd", None),
+    },
+    extra_bones={
+        "muzzle": ("tag_barrel_attach", np.array([11.28, 0.0, 0.0])),
+        "tag_pistolgrip_attach": ("tag_sling", np.array([2.747, 0.0, -1.872])),
+    },
+    materials=famas_materials, hip=view_offset(), aim=view_offset(), sprint=view_offset(),
+    m4_sprint=True, ads_pose=("ads_in", slice(-1, None)), ads_time=0.25,
+    ads_fire="fire_2",
+    report_bones=["tag_tip", "tag_laser_attach", "tag_reflex", "tag_grip_attach"],
+    part_choices={
+        "barrel": [("factory", f"{_FAMAS_BARREL}.smd")] + [
+            (name, f"attachment_vm_ar_falpha_{name}/attachment_vm_ar_falpha_{name}.smd")
+            for name in ("barshort", "barlong2", "barrellong_alt")],
+        "stock": [("factory", f"{_FAMAS}/attachment_vm_ar_falpha_receiver.smd#tag_stock_hide")] + [
+            (name, f"attachment_vm_ar_falpha_{name}/attachment_vm_ar_falpha_{name}.smd")
+            for name in ("stock_light", "stock_stable", "stock_tactical_v1")],
+        "magazine": [("factory", _FAMAS_MAG)] + [
+            (name, f"attachment_vm_ar_falpha_{name}/attachment_vm_ar_falpha_{name}.smd")
+            for name in ("xmags", "xmags2")],
+        "rail": [("factory", f"{_FAMAS}/attachment_vm_ar_falpha_toprail_cust2.smd"),
+                 ("classic", "attachment_vm_ar_falpha_toprail/attachment_vm_ar_falpha_toprail_crust.smd"),
+                 ("low", "derived/low_rail.smd")],
+    },
+    tip_choices={name: (f"attachment_vm_ar_falpha_{name}/attachment_vm_ar_falpha_{name}_tip.smd",
+                        f"attachment_vm_ar_falpha_{name}/attachment_vm_ar_falpha_{name}.smd")
+                 for name in ("barshort", "barlong2", "barrellong_alt")},
+    optional_variants={
+        "iron_sights": [("low", "attachment_vm_ar_falpha_railcust/attachment_vm_ar_falpha_railcust_sight_on.smd",
+                         "attachment_vm_ar_falpha_railcust/attachment_vm_ar_falpha_railcust.smd")],
+        "sight_folded": [("low", "attachment_vm_ar_falpha_railcust/attachment_vm_ar_falpha_railcust_sight_on_2.smd",
+                          "attachment_vm_ar_falpha_railcust/attachment_vm_ar_falpha_railcust.smd")],
+    },
+    reload_variants=["_xmag", "_xmag2"],
+    reload_clip_overrides={"reload_xmag": "reload", "reload_xmag2": "reload"},
+)
+
+def m18_materials() -> dict[str, str]:
+    # Built by p320_assets.py.
+    assets = json.loads((ASSETS / "Weapons" / "M18" / "m18_assets.json").read_text(encoding="utf-8"))
+    return assets["materials"]
+
+
+def _papa320(model: str, sights: str | None = None) -> str:
+    """One of the M18's slide models (attachment_vm_pi_papa320_<model>), joined with its sights: the model's "sight"
+    bodygroup, a model of its own (the black slide's is the factory one's file)."""
+    folder = f"attachment_vm_pi_papa320_{model}"
+    return f"{folder}/{folder}.smd+{folder}/attachment_vm_pi_papa320_{sights or model}_sight_on.smd"
+
+
+# The SIG Sauer M18 (9x19mm): MW2019's "M19" (mg_p320) from Viper's MW2019 pistol pack (Workshop 2459723892), the US
+# Army's compact M17 with the coyote grip module and slide. The factory slide is 6.9 long, the real carry-length
+# slide's size. A pistol rig: the gun hangs off tag_pistol_offset (read as tag_sling), and the rig has no left-hand IK
+# tag (the left hand cups the right), no pistol grip mount and no muzzle, so those are extra bones.
+M18 = Weapon(
+    name="m18",
+    folder=ASSETS / "Weapons" / "M18",
+    asset="weapons/m18",
+    model="m18",
+    decompiled=DECOMPILED / "p320",
+    cod_anims="v_p320_anims",
+    # The grip module with the trigger. The slide, barrel, sights and magazine are the part_choices below.
+    vm_meshes=["attachment_vm_pi_papa320_receiver.smd"],
+    part_meshes=[],
+    optional_meshes={},
+    extra_bones={
+        # 0.2 inside the barrel's end, on the bore (the slide model's tag_flash_attachment is 0.07 past its end).
+        "muzzle": ("tag_barrel_attach", np.array([-0.49, 0.0, -0.126])),
+        # Placed so the world model's grip sits where w_usp's does in its model, for the third-person Pistol hold:
+        # the backstrap at x -3.86 and the magazine's floor at z 0.04. Its bore then sits at w_usp's height (4.77).
+        "tag_pistolgrip_attach": ("tag_sling", np.array([-1.04, 0.0, -0.70])),
+    },
+    materials=m18_materials,
+    # From the addon's lua/weapons/mg_p320/shared.lua.
+    hip=view_offset(),
+    aim=view_offset((0.15, 0.0, 0.0)),
+    sprint=view_offset(),
+    m4_sprint=True,
+    ads_pose=("ads_in", slice(-1, None)),
+    # The fire clips flip the muzzle up ~10 degrees as the slide cycles (1.75 back), back by frame 12; the hip one
+    # also swings it 4.3 degrees sideways, the aimed one 1.6.
+    ads_fire="fire_2",
+    # The QC's empty_offset: while the magazine is empty the slide stays back on the slide stop, the barrel tilts down
+    # out of battery and the magazine's top rounds are gone.
+    slide_lock="a_delta_empty_additive_for_offset",
+    bone_renames={"tag_pistol_offset": "tag_sling"},
+    report_bones=["tag_reflex", "tag_sight_on", "tag_laser_attach", "tag_stock_attach", "tag_flash"],
+    part_choices={
+        # The slide with its barrel and sights (the Barrel slot, as a pistol's slide is in CoD): the factory coyote
+        # slide, the black one, one with lightening cuts (0.4 longer), and a long slide over an extended barrel.
+        "barrel": [("pi_papa320_slide", _papa320("slide")),
+                   ("pi_papa320_slide_black", _papa320("slide_black", "slide")),
+                   ("pi_papa320_slide_vented", _papa320("slide_vented")),
+                   ("pi_papa320_barrel_ext", _papa320("barrel_ext"))],
+        # Each holds the fitted magazine (j_mag1) and the reload's fresh one (j_mag2).
+        "magazine": [("pi_papa320_mag", "attachment_vm_pi_papa320_mag/attachment_vm_pi_papa320_mag.smd"),
+                     ("pi_papa320_mag_ext", "attachment_vm_pi_papa320_mag_ext/attachment_vm_pi_papa320_mag_ext.smd"),
+                     ("pi_papa320_mag_ext2",
+                      "attachment_vm_pi_papa320_mag_ext2/attachment_vm_pi_papa320_mag_ext2.smd")],
+    },
+    # The 21-round magazine reloads with the xmag clips (the 32's xmaglrg ones aren't ported: it isn't offered).
+    reload_variants=["_xmag"],
+)
+
+WEAPONS = {weapon.name: weapon for weapon in (KASTOV_762, KASTOV_74U, VITYAZ, RPK, BIZON, AK105, VEPR12, M16, P90,
+                                              MP7, AUG, UZI, FAL, FAMAS, M18)}
 
 
 def add_argument(parser: argparse.ArgumentParser) -> None:

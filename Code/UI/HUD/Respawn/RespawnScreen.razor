@@ -31,7 +31,7 @@
     @if ( Respawner is PlayerAutoRespawner auto )
     {
         <div class="default-respawner">
-            <div class="label">Deploying in @auto.GetRespawnTime()</div>
+            <div class="label">@Tr( "Deploying in {0}", auto.GetRespawnTime() )</div>
         </div>
     }
 
@@ -40,11 +40,24 @@
         <div class="default-respawner">
             @if (input.GetRespawnTime() <= 0f )
             {
-                <div class="label">Press <InputHint class="small" Action=@input.InputAction /> to deploy</div>
+                @* The words go around the button in the translation's order: {0} marks where it sits. *@
+                <div class="label">
+                    @foreach ( var piece in System.Text.RegularExpressions.Regex.Split( Tr( "Press {0} to deploy" ), "(\\{0\\})" ) )
+                    {
+                        @if ( piece == "{0}" )
+                        {
+                            <InputHint class="small" Action=@input.InputAction />
+                        }
+                        else if ( !string.IsNullOrWhiteSpace( piece ) )
+                        {
+                            <label>@piece</label>
+                        }
+                    }
+                </div>
             }
             else
             {
-                <div class="label">Deploying in @input.GetRespawnTime()</div>
+                <div class="label">@Tr( "Deploying in {0}", input.GetRespawnTime() )</div>
             }
         </div>
     }

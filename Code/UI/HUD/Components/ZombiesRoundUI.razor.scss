@@ -86,19 +86,40 @@ ZombiesRoundUI
 	.perks
 	{
 		flex-direction: row;
-		gap: 6px;
+		gap: 8px;
 	}
 
+	// The badge art (ui/zombies/perks) is round with its own cream rim; the border is the perk's colour.
 	.perk
 	{
-		width: 38px;
-		height: 38px;
-		border-radius: 19px;
-		align-items: center;
-		justify-content: center;
-		border: 2px solid rgba( white, 0.8 );
+		width: 50px;
+		height: 50px;
+		border-radius: 25px;
+		border: 2px solid white;
+		background-size: 100% 100%;
+		background-position: center;
+		transition: transform 0.35s ease-out, opacity 0.35s ease-out;
 
-		label { font-size: 18px; font-weight: 900; }
+		&:intro
+		{
+			transform: scale( 1.8 );
+			opacity: 0;
+		}
+	}
+
+	// Hangs under the badges, so the points and badges don't move when it comes and goes.
+	.perk-gained
+	{
+		position: absolute;
+		top: 100%;
+		right: 0;
+		margin-top: 6px;
+		flex-direction: column;
+		align-items: flex-end;
+		white-space: nowrap;
+
+		.pg-name { font-size: 20px; font-weight: 900; letter-spacing: 3px; }
+		.pg-desc { font-size: 14px; font-weight: 600; color: rgba( white, 0.8 ); }
 	}
 
 	// ── Power-ups ──────────────────────────────────────────────────

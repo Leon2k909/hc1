@@ -73,7 +73,8 @@
         "OnComponentUpdate": null,
         "ReloadSpeed": 1,
         "ThrowableType": "HEGrenade",
-        "UseMovementInertia": true
+        "UseMovementInertia": true,
+        "AimTime": 0.25
       },
       {
         "__type": "Sandbox.SkinnedModelRenderer",
@@ -223,6 +224,22 @@
                 "__type": "Facepunch.Gunsmith.GunsmithAttachmentPoint",
                 "__guid": "68e8ccf0-24e3-5805-89bc-253a39b7c411",
                 "Category": "Charm"
+              }
+            ]
+          },
+          {
+            "__guid": "b0205333-0d02-5edb-844c-bc3b26475140",
+            "Flags": 0,
+            "Name": "Sticker Attachment Point",
+            "Position": "9.525,1.2648,0.8269",
+            "Rotation": "-0.000636,0.000637,0.706753,0.707460",
+            "Enabled": true,
+            "Components": [
+              {
+                "__type": "Facepunch.Gunsmith.GunsmithAttachmentPoint",
+                "__guid": "da47fbe8-e191-52fe-a1d4-0d60f59dfd98",
+                "Category": "Sticker",
+                "StickerSize": "1.4,0.7"
               }
             ]
           }

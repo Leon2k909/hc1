@@ -5,90 +5,82 @@
 <root>
     @foreach ( var entry in Entries )
     {
-        <div class="entry">
-            @if ( entry.Attacker is not null )
-            {
-                <div class="attacker @(IsMe( entry.Attacker ) ? "is-me" : "")">
-                    @if ( entry.DamageFlags.HasFlag( DamageFlags.AirShot ) )
+        var mine = entry.Attacker is not null && IsMe( entry.Attacker );
+        var died = entry.Victim is not null && IsMe( entry.Victim );
+
+        <div @key="entry.Id" class="entry">
+            <div class="plate @(died ? "died" : mine ? "mine" : "")">
+                @if ( mine && !died )
+                {
+                    <div class="flash" />
+                }
+
+                @if ( entry.Attacker is not null )
+                {
+                    <div class="name @(mine ? "is-me" : "")">
+                        @if ( entry.DamageFlags.HasFlag( DamageFlags.AirShot ) )
+                        {
+                            <Icon class="glyph" Tint="@(mine ? "white" : entry.AttackerColor.Hex)" File="/ui/wings.png" size="18" />
+                        }
+
+                        @if ( entry.Attacker.Contains( "BOT" ) )
+                        {
+                            <Icon class="bot" Tint="@entry.AttackerColor.Hex" File="/ui/bot.png" size="16" />
+                        }
+
+                        <label style="@(mine ? "" : $"color:{entry.AttackerColor.Hex}")">@entry.Attacker.Replace( "BOT", "" ).Trim()</label>
+                    </div>
+                }
+
+                <div class="method">
+                    @if ( entry.DamageFlags.HasFlag( DamageFlags.Burn ) )
                     {
-                        <Icon Tint="@(IsMe( entry.Attacker ) ? "black" : entry.AttackerColor.Hex)" File="/ui/wings.png" size="24" />
+                        <Icon class="glyph" File="/ui/fire.png" size="20" />
                     }
 
-                    @if ( entry.Attacker.Contains( "BOT" ) )
+                    @if ( entry.DamageFlags.HasFlag( DamageFlags.Explosion ) )
                     {
-                        <Icon Tint="@entry.AttackerColor.Hex" File="/ui/bot.png" size="24" />
+                        <Icon class="glyph" File="/ui/explosion.png" size="20" />
                     }
 
-                    @if ( IsMe( entry.Attacker ) )
+                    @if ( entry.Inflictor is null )
                     {
-                        <label>@entry.Attacker</label>
+                        <label class="method-text">@Tr( "killed" )</label>
+                    }
+                    else if ( entry.Inflictor.StartsWith( "icon:" ) )
+                    {
+                        <div class="weapon" style="background-image: url( @entry.InflictorIcon );" />
                     }
                     else
                     {
-                        <label style="color:@entry.AttackerColor.Hex">@entry.Attacker.Replace("BOT", "").Trim()</label>
-                    }
-                </div>
-            }
-
-            <div class="method">
-                @if ( entry.DamageFlags.HasFlag( DamageFlags.Burn ) ) 
-                {
-                    <Icon File="/ui/fire.png" size="24" />
-                }
-
-                @if ( entry.DamageFlags.HasFlag( DamageFlags.Explosion ) ) 
-                {
-                    <Icon File="/ui/explosion.png" size="24" />
-                }
-
-                @if ( entry.Inflictor is not null )
-                {
-                    @if ( entry.Inflictor.StartsWith( "icon:" ) )
-                    {
-                        <div class="icon">
-                            <Icon class="flip" File="@entry.InflictorIcon" size="64" />
-                        </div>
-                    }
-                    else
-                    {
-                        <label>@entry.Inflictor</label>
+                        <label class="method-text">@entry.Inflictor</label>
                     }
 
-                    if ( entry.DamageFlags.HasFlag( DamageFlags.WallBang ) )
+                    @if ( entry.DamageFlags.HasFlag( DamageFlags.WallBang ) )
                     {
-                        <Icon File="/ui/wallbang.png" size="32" />
+                        <Icon class="glyph" File="/ui/wallbang.png" size="20" />
                     }
 
                     @if ( entry.HitboxTags.HasFlag( HitboxTags.Head ) )
                     {
-                        <Icon class="headshot" File="/ui/headshot.png" size="24" />
-                    }
-                }
-                else
-                {
-                    <label>killed</label>
-                }
-            </div>
-
-            @if ( entry.Victim is not null )
-            {
-                <div class="victim @(IsMe( entry.Victim ) ? "is-me" : "")">
-
-                    @if ( entry.Victim.Contains( "BOT" ) )
-                    {
-                        <Icon Tint="@entry.VictimColor.Hex" File="/ui/bot.png" size="24" />
-                    }
-
-                    @if ( IsMe( entry.Victim ) )
-                    {
-                        <label>@entry.Victim</label>
-                    }
-                    else
-                    {
-                        <label style="color:@entry.VictimColor.Hex">@entry.Victim.Replace("BOT", "").Trim()</label>
+                        <Icon class="glyph headshot" File="/ui/headshot.png" size="22" />
                     }
                 </div>
-            }
+
+                @if ( entry.Victim is not null )
+                {
+                    <div class="name @(died ? "is-me" : "")">
+                        @if ( entry.Victim.Contains( "BOT" ) )
+                        {
+                            <Icon class="bot" Tint="@entry.VictimColor.Hex" File="/ui/bot.png" size="16" />
+                        }
+
+                        <label style="@(died ? "" : $"color:{entry.VictimColor.Hex}")">@entry.Victim.Replace( "BOT", "" ).Trim()</label>
+                    </div>
+                }
+
+                <div class="edge" />
+            </div>
         </div>
     }
 </root>
@@ -96,6 +88,7 @@
 @code
 {
     private static KillFeed Instance { get; set; } = null;
+    private static int _nextId;
 
     public KillFeed()
     {
@@ -107,7 +100,7 @@
         return Sandbox.Utility.Steam.PersonaName.Equals( name );
     }
 
-    public record KillFeedEntry( string Attacker, Color AttackerColor, string Inflictor, string Victim, Color VictimColor, HitboxTags HitboxTags, DamageFlags DamageFlags,
+    public record KillFeedEntry( int Id, string Attacker, Color AttackerColor, string Inflictor, string Victim, Color VictimColor, HitboxTags HitboxTags, DamageFlags DamageFlags,
         RealTimeSince TimeSinceAdded )
     {
         public string AttackerIcon => Attacker.Replace("icon:", "");
@@ -119,13 +112,13 @@
 
     private float Lifetime => 10f;
 
-    [Rpc.Broadcast] 
+    [Rpc.Broadcast]
     public static void BroadcastKillFeedEvent( string attacker, Color attackerColor, string inflictor, string victim, Color victimColor, HitboxTags tags, DamageFlags flags )
     {
         if ( !Instance.IsValid() )
             return;
 
-        Instance.Entries.Add( new KillFeedEntry( attacker, attackerColor, inflictor, victim, victimColor, tags, flags, 0 ) );
+        Instance.Entries.Add( new KillFeedEntry( ++_nextId, attacker, attackerColor, inflictor, victim, victimColor, tags, flags, 0 ) );
         Instance.StateHasChanged();
     }
 
@@ -138,8 +131,11 @@
         var attacker = attackerDesc?.DisplayName;
         if ( !string.IsNullOrEmpty( attackerDesc?.Icon ) ) attacker = $"icon:{attackerDesc.Icon}";
 
-        var inflictor = inflictorDesc?.DisplayName;
-        if ( !string.IsNullOrEmpty( inflictorDesc?.Icon ) ) inflictor = $"icon:{inflictorDesc.Icon}";
+        // The gun's silhouette where there is one. A bot's shots come from the bot itself, so its gun is looked up.
+        var weapon = WeaponOf( damageInfo.Inflictor );
+        var inflictor = weapon?.Name ?? inflictorDesc?.DisplayName;
+        if ( !string.IsNullOrEmpty( weapon?.Icon ) ) inflictor = $"icon:{weapon.Icon}";
+        else if ( !string.IsNullOrEmpty( inflictorDesc?.Icon ) ) inflictor = $"icon:{inflictorDesc.Icon}";
 
         var victim = victimDesc?.DisplayName;
         if ( !string.IsNullOrEmpty( victimDesc?.Icon ) ) victim = $"icon:{victimDesc.Icon}";
@@ -154,6 +150,13 @@
         );
 
     }
+
+    private static EquipmentResource WeaponOf( Component inflictor ) => inflictor switch
+    {
+        Equipment equipment => equipment.Resource,
+        LightweightCombatBot bot => bot.WeaponResource,
+        _ => null
+    };
 
     public override void Tick()
     {

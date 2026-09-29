@@ -47,7 +47,7 @@ def build(name, front):
     faces.clear()
 
     # The rear base grips the MP5's native claw rail. The long variant also
-    # supports the Cronen 2x2's separate forward reflex sight over the handguard.
+    # supports the 2x magnifier's (att_vm_2x_west01) separate forward mini dot over the handguard.
     box(-0.25, 3.50, -0.49, 0.49, 10.00, 10.16)
     if front > 3.50:
         box(3.50, front, -0.49, 0.49, 10.00, 10.16)

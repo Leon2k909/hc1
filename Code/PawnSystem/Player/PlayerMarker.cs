@@ -77,7 +77,8 @@ public partial class PlayerMarker : Component, IMarkerObject, IDirectionalMinima
 	{
 		get
 		{
-			if ( IsEnemy ) return "background-image-tint: rgba(255, 0, 0, 1 );";
+			// The enemy's team colour, not a generic red (TeamExtensions.GetColor).
+			if ( IsEnemy ) return $"background-image-tint: {Player.Team.GetColor().Hex}";
 			return $"background-image-tint: {Player.Client.PlayerColor.Hex}";
 		}
 	}
@@ -109,11 +110,12 @@ public partial class PlayerMarker : Component, IMarkerObject, IDirectionalMinima
 	{
 		get
 		{
-			if ( Client.Viewer == null || ScorestreakManager.Instance == null ) return false;
-			var uavActive = ScorestreakManager.Instance.IsUavActiveForTeam( Client.Viewer.Team );
+			if ( Client.Viewer == null ) return false;
+			var uavActive = ScorestreakManager.Instance?.IsUavActiveForTeam( Client.Viewer.Team ) == true
+				|| ReconDroneFlight.Reveals( Player.GameObject, Client.Viewer.PlayerPawn );
 			if ( !uavActive ) return false;
 
-			var hasGhost = Player.Components.TryGet<PlayerPerks>( out var perks, FindMode.EnabledInSelf ) && perks.HasPerk( "Ghost" );
+			var hasGhost = Player.Components.TryGet<PlayerPerks>( out var perks, FindMode.EnabledInSelf ) && perks.HasPerk( "ghost" );
 			return !hasGhost;
 		}
 	}

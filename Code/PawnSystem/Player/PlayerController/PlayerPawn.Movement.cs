@@ -308,7 +308,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	private bool WantsToggleSprint { get; set; }
 
 	private bool HasSprintMovement => WishMove.x > 0.2f || (MathF.Abs( WishMove.y ) > 0.2f && WishMove.x >= 0f);
-	private bool CanSprint => !IsFallKnockedDown && !IsSlowWalking && !IsProne && !HasEquipmentTag( "no_sprint" );
+	private bool CanSprint => !IsFallKnockedDown && !IsSlowWalking && !IsProne && !IsGettingUp && !HasEquipmentTag( "no_sprint" );
 
 	private bool GetWantsToSprint()
 	{
@@ -369,15 +369,18 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 			return;
 		}
 
-		// Prone toggles rather than being held, and jumping gets you back on your feet.
-		if ( Input.Pressed( "Prone" ) && !IsNoclipping )
-			IsProne = !IsProne;
+		// Prone toggles rather than being held, and jumping gets you back on your feet. Both cost prone stamina.
+		var downed = ZombiesPlayerState.For( this ) is { IsDowned: true };
+		if ( Input.Pressed( "Prone" ) && !IsNoclipping && !downed )
+			ToggleProne();
 
-		if ( IsProne && Input.Pressed( "Jump" ) )
-			IsProne = false;
+		// A jump press that gets you up is spent on that: you can't jump off the floor from lying flat.
+		var gotUpWithJump = IsProne && Input.Pressed( "Jump" ) && !downed;
+		if ( gotUpWithJump )
+			ToggleProne();
 
 		// Zombies: downed players are stuck on the floor until revived.
-		if ( ZombiesPlayerState.For( this ) is { IsDowned: true } )
+		if ( downed )
 		{
 			IsProne = true;
 			IsSprinting = false;
@@ -413,16 +416,95 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 			TimeSinceLastInput = 0f;
 		}
 
-		if ( CharacterController.IsOnGround && !IsFrozen )
+		// Jump fatigue only wears off with your feet on the ground.
+		if ( CharacterController.IsOnGround )
+			JumpFatigue = MathF.Max( 0f, JumpFatigue - JumpFatigueRecovery * Time.Delta );
+
+		if ( ProneFatigue > 0f )
+			ProneFatigue = MathF.Max( 0f, ProneFatigue - ProneFatigueRecovery * Time.Delta );
+
+		if ( CharacterController.IsOnGround && !IsFrozen && !gotUpWithJump )
 		{
 			var bhop = Global.BunnyHopping;
 			if ( bhop ? Input.Down( "Jump" ) : Input.Pressed( "Jump" ) )
-			{
-				CharacterController.Punch( Vector3.Up * Global.JumpPower * 1f );
-				BroadcastPlayerJumped();
-			}
+				Jump();
 		}
 	}
+
+	/// <summary>Jump off the ground, as high as <see cref="JumpFatigue"/> allows.</summary>
+	internal void Jump()
+	{
+		CharacterController.Punch( Vector3.Up * Global.JumpPower * (1f - JumpFatigue) );
+		JumpFatigue = MathF.Min( JumpFatigue + JumpFatigueCost * (1f - JumpFatigue), MaxJumpFatigue );
+		BroadcastPlayerJumped();
+	}
+
+	/// <summary>
+	/// Jump stamina, like CS2's: each jump takes this share of the jump speed you have left, so jumping again as soon as
+	/// you land goes lower every time (100%, 85%, 72%, 61% of the speed), down to <see cref="MaxJumpFatigue"/>.
+	/// </summary>
+	public const float JumpFatigueCost = 0.15f;
+
+	/// <summary>Fatigue worn off per second on the ground: a full jump again ~0.4 s after one jump, ~1.2 s after many.</summary>
+	public const float JumpFatigueRecovery = 0.375f;
+
+	/// <summary>The most a jump loses: 45% of its speed, which leaves about a third of a full jump's height.</summary>
+	public const float MaxJumpFatigue = 0.45f;
+
+	/// <summary>How much of the next jump's speed is gone (see <see cref="JumpFatigueCost"/>). Only the owner moves the pawn.</summary>
+	public float JumpFatigue { get; private set; }
+
+	/// <summary>Lie down or get up, as the Prone key does, paying for it in prone stamina (<see cref="ProneFatigue"/>).</summary>
+	internal void ToggleProne()
+	{
+		IsProne = !IsProne;
+		ProneFatigue = MathF.Min( ProneFatigue + (IsProne ? ProneDropCost : ProneRiseCost), 1f );
+	}
+
+	/// <summary>
+	/// Prone stamina, like CS's crouch speed: getting down flat and getting up each take something out of you, getting up
+	/// more, since you push yourself off the floor. A drop and a get-up now and then cost nothing you'd notice, but going
+	/// up and down again and again slows every stance change (<see cref="StanceChangeRate"/>), getting up most, until it
+	/// wears off. Spammed, it bogs down after two or three drops.
+	/// </summary>
+	public const float ProneDropCost = 0.2f;
+
+	/// <summary>What getting up from prone costs (see <see cref="ProneDropCost"/>).</summary>
+	public const float ProneRiseCost = 0.3f;
+
+	/// <summary>Prone fatigue worn off per second: from exhausted back to full speed in ~3 s, and to none in 5 s.</summary>
+	public const float ProneFatigueRecovery = 0.2f;
+
+	/// <summary>Prone fatigue up to this doesn't slow anything, so an odd drop and get-up don't.</summary>
+	public const float ProneFatigueFree = 0.35f;
+
+	/// <summary>Exhausted, getting down goes at 30% of the speed: flat in ~1 s instead of 0.3 s.</summary>
+	public const float ProneDropSlowdown = 0.7f;
+
+	/// <summary>
+	/// Exhausted, getting up goes at 15% of the speed: past crouch height in ~0.6 s and fully up in ~2 s, instead of 0.1 s
+	/// and 0.3 s.
+	/// </summary>
+	public const float ProneRiseSlowdown = 0.85f;
+
+	/// <summary>
+	/// How tired going prone and getting up have made you, 0 to 1 (see <see cref="ProneDropCost"/>). The owner sets it, and
+	/// every machine slows the stance change by it, so everyone sees the same body height.
+	/// </summary>
+	[Sync] public float ProneFatigue { get; private set; }
+
+	/// <summary>
+	/// How fast the eyes, and with them the body's height, follow a stance change, as a lerp rate per second: 10 fresh,
+	/// less once <see cref="ProneFatigue"/> is past <see cref="ProneFatigueFree"/>.
+	/// </summary>
+	private float StanceChangeRate( bool rising )
+	{
+		var tired = ((ProneFatigue - ProneFatigueFree) / (1f - ProneFatigueFree)).Clamp( 0f, 1f );
+		return 10f * (1f - tired * (rising ? ProneRiseSlowdown : ProneDropSlowdown));
+	}
+
+	/// <summary>Up from prone but not yet at crouch height (-16): you can't run off the floor before you're up.</summary>
+	private bool IsGettingUp => !IsProne && _smoothEyeHeight < -17f;
 
 	public SceneTraceResult TraceBBox( Vector3 start, Vector3 end, float liftFeet = 0.0f, float liftHead = 0.0f )
 	{
@@ -483,7 +565,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 
 			if ( vel > MinimumFallSoundVelocity )
 			{
-				PlayFallSound();
+				PlayFallSound( vel );
 			}
 			if ( vel > minimumVelocity )
 			{
@@ -537,10 +619,28 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 
 	[Property, Group( "Effects" )] public SoundEvent LandSound { get; set; }
 
+	/// <summary>
+	/// The landing's speed (units a second) that its sounds are made for: a jump's, from ~50 units up.
+	/// </summary>
+	private const float LandingSoundSpeed = 300f;
+
+	/// <summary>
+	/// Both boots coming down on the floor underfoot (<see cref="WorldSounds.Landing"/>, else <see cref="LandSound"/>),
+	/// louder the faster they land: the force through the floor goes with the speed.
+	/// </summary>
 	[Rpc.Broadcast]
-	private void PlayFallSound()
+	private void PlayFallSound( float speed )
 	{
-		var snd = Sound.Play( LandSound, WorldPosition );
+		var tr = Scene.Trace.Ray( WorldPosition + Vector3.Up * 20, WorldPosition + Vector3.Down * 20 )
+			.IgnoreGameObjectHierarchy( GameObject )
+			.WithoutTags( "corpse" )
+			.Run();
+
+		var sound = (tr.Hit ? WorldSounds.Landing( WorldSounds.SurfaceAt( tr ) ) : null) ?? LandSound;
+		var snd = Sound.Play( sound, WorldPosition );
+		if ( !snd.IsValid() ) return;
+
+		snd.Volume *= (speed / LandingSoundSpeed).Clamp( 0.6f, 2f );
 		snd.SpacialBlend = IsViewer ? 0 : snd.SpacialBlend;
 	}
 
@@ -705,7 +805,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 		{
 			speed = Global.SlowWalkSpeed;
 		}
-		else if ( IsCrouching )
+		else if ( IsCrouching || IsGettingUp )
 		{
 			speed = Global.CrouchingSpeed;
 		}
@@ -718,13 +818,23 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 			speed = Global.WalkSpeed - GetSpeedPenalty();
 		}
 
-		if ( Components.TryGet<PlayerPerks>( out var perks, FindMode.EnabledInSelf ) && perks.HasPerk( "Lightweight" ) )
+		// A heavy gun slows every gait by the same fraction.
+		if ( CurrentEquipment.IsValid() )
+			speed *= 1f - CurrentEquipment.WeightSlowdown;
+
+		// A shot leg or foot (hardcore), or a landing hard enough to hurt.
+		speed *= HealthComponent.WoundSpeedScale;
+
+		if ( Components.TryGet<PlayerPerks>( out var perks, FindMode.EnabledInSelf ) && perks.HasPerk( "lightweight" ) )
 		{
 			speed *= 1.07f; // 7% increase
 		}
 
-		// Zombies: Stamin-Up, and crawling while downed.
+		// Zombies: Fleet Foot, and crawling while downed.
 		speed *= ZombiesPlayerState.MoveSpeedScale( this );
+
+		// Unsteady on your feet for a few seconds after a flashbang's blast.
+		speed *= FlashbangEffect.MoveSpeedScale( this );
 
 		return speed;
 	}

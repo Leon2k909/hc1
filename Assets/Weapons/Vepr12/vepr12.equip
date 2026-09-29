@@ -1,0 +1,32 @@
+{
+  "Name": "Vepr-12",
+  "Description": "Russian 12-gauge semi-automatic shotgun on the Kalashnikov action, fed from 8-round box magazines.",
+  "Slot": "Primary",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": true,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/guns/vepr12_01.png",
+  "IsPurchasable": true,
+  "Price": 2200,
+  "KillReward": 900,
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/vepr12/weapon_vepr12.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/vepr12/wm_vepr12.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/vepr12/vm_vepr12.prefab"
+  },
+  "WorldModel": "weapons/vepr12/w_vepr12.vmdl",
+  "ArmorReduction": null,
+  "HelmetReduction": null,
+  "WorldModelBodyGroups": 0,
+  "__references": [],
+  "__version": 0,
+  "Category": "Shotgun",
+  "GunsmithOffset": "0,0,4"
+}

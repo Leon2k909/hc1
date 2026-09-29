@@ -1,0 +1,40 @@
+@using Sandbox;
+@using Sandbox.UI;
+
+@namespace Facepunch.UI
+@inherits Popup
+@attribute [StyleSheet]
+
+<root class="language-menu">
+    <div class="lm-search">
+        <i class="lm-search-icon">search</i>
+        <LanguageSearchEntry @ref=Search class="lm-search-entry" Placeholder=@(Tr( "Search languages" )) OnTextEdited=@SetQuery OnArrow=@MoveHighlight onsubmit=@(() => Submit()) />
+    </div>
+
+    <div class="lm-list" @ref=RowList>
+        @if ( Matches.Count == 0 )
+        {
+            <label class="lm-empty">@Tr( "No languages found" )</label>
+        }
+
+        @for ( var i = 0; i < Matches.Count; i++ )
+        {
+            var index = i;
+            var language = Matches[i];
+            <div class="lm-row @(language == GameText.Current ? "selected" : "") @(index == Highlight ? "highlight" : "")" onmouseover=@(() => Hover( index )) onclick=@(() => Pick( language ))>
+                <label class="lm-native">@GameText.NativeName( language )</label>
+                @if ( ShowsEnglishName( language ) )
+                {
+                    <label class="lm-english">@GameText.EnglishName( language )</label>
+                }
+                <div class="lm-spacer"></div>
+                <i class="lm-check">check</i>
+            </div>
+        }
+    </div>
+</root>
+
+@code
+{
+    protected override int BuildHash() => HashCode.Combine( Query, Highlight, Matches.Count, GameText.Current );
+}

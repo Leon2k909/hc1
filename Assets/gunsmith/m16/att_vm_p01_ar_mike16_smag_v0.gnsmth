@@ -1,0 +1,38 @@
+{
+  "Name": "15 Round Mag",
+  "Category": "Magazine",
+  "EligibleEquipment": [
+    "weapons/m16/m16.equip"
+  ],
+  "RequiredLevel": 0,
+  "Description": "15-round 5.56 magazine with its matching reload animations.",
+  "ModifyBodygroups": true,
+  "Bodygroups": {
+    "magazine": 1
+  },
+  "MagazineCapacity": 15,
+  "ReloadTimeMultiplier": 1,
+  "ReloadAnimation": 1,
+  "ReloadTime": 2.3,
+  "EmptyReloadTime": 2.3333,
+  "ReloadSounds": {
+    "0": "weapons/m16/sounds/m16_reload_smag_raise.sound",
+    "0.233": "weapons/m16/sounds/m16_reload_smag_magout.sound",
+    "0.733": "weapons/m16/sounds/m16_reload_smag_rotate.sound",
+    "1.233": "weapons/m16/sounds/m16_reload_smag_maghit.sound",
+    "1.4": "weapons/m16/sounds/m16_reload_smag_magin.sound",
+    "1.467": "weapons/m16/sounds/m16_reload_smag_end.sound"
+  },
+  "EmptyReloadSounds": {
+    "0": "weapons/m16/sounds/m16_reload_empty_smag_raise.sound",
+    "0.2": "weapons/m16/sounds/m16_reload_empty_smag_magout.sound",
+    "0.633": "weapons/m16/sounds/m16_reload_empty_smag_rotate.sound",
+    "1.067": "weapons/m16/sounds/m16_reload_empty_smag_maghit.sound",
+    "1.233": "weapons/m16/sounds/m16_reload_empty_smag_rattle.sound",
+    "1.243": "weapons/m16/sounds/m16_reload_empty_smag_magin.sound",
+    "1.633": "weapons/m16/sounds/m16_reload_empty_smag_charge.sound",
+    "1.8": "weapons/m16/sounds/m16_reload_empty_smag_end.sound"
+  },
+  "__references": [],
+  "__version": 0
+}

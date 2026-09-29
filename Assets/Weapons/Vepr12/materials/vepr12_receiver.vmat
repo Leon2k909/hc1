@@ -1,0 +1,13 @@
+"Layer0"
+{
+	shader "shaders/complex.shader"
+	F_SPECULAR "1"
+	F_METALNESS_TEXTURE "1"
+	g_flRoughnessScaleFactor "1"
+	g_vColorTint "[1 1 1 1]"
+	TextureColor "weapons/vepr12/materials/vepr12_receiver_color.png"
+	TextureNormal "weapons/vepr12/materials/vepr12_receiver_normal.png"
+	TextureRoughness "weapons/vepr12/materials/vepr12_receiver_roughness.png"
+	TextureMetalness "weapons/vepr12/materials/vepr12_receiver_metalness.png"
+	TextureAmbientOcclusion "materials/default/default_ao.tga"
+}

@@ -12,7 +12,7 @@ public sealed class HardpointZone : Component,
 	ICustomMinimapIcon
 {
 	[Property, Sync( SyncFlags.FromHost )]
-	public string ZoneName { get; set; } = "Hardpoint";
+	public string ZoneName { get; set; } = "Hot Zone";
 
 	[Property, Sync( SyncFlags.FromHost ), Change( nameof( OnControllingTeamChanged ) )]
 	public Team ControllingTeam { get; set; } = Team.Unassigned;
@@ -38,16 +38,16 @@ public sealed class HardpointZone : Component,
 		{
 			if ( IsContested )
 			{
-				return "Hardpoint - CONTESTED";
+				return $"{Tr( "Hot Zone" )} - {Tr( "CONTESTED" )}";
 			}
 
 			if ( ControllingTeam != Team.Unassigned )
 			{
-				var teamName = ControllingTeam == Team.Terrorist ? "T" : "CT";
-				return $"Hardpoint - {teamName}";
+				var teamName = Tr( ControllingTeam.GetName() );
+				return $"{Tr( "Hot Zone" )} - {teamName}";
 			}
 
-			return "Hardpoint - Neutral";
+			return $"{Tr( "Hot Zone" )} - {Tr( "Neutral" )}";
 		}
 	}
 
@@ -190,7 +190,7 @@ public sealed class HardpointZone : Component,
 			if ( ControllingTeam != Team.Terrorist )
 			{
 				ControllingTeam = Team.Terrorist;
-				BroadcastNotification( "Hardpoint Secured by Terrorists!", "captured" );
+				BroadcastNotification( "Zone secured by {0}!", "captured", Team.Terrorist );
 				Sound.Play( "sounds/ui/buttons/ui_action.sound" );
 			}
 		}
@@ -200,7 +200,7 @@ public sealed class HardpointZone : Component,
 			if ( ControllingTeam != Team.CounterTerrorist )
 			{
 				ControllingTeam = Team.CounterTerrorist;
-				BroadcastNotification( "Hardpoint Secured by Counter-Terrorists!", "captured" );
+				BroadcastNotification( "Zone secured by {0}!", "captured", Team.CounterTerrorist );
 				Sound.Play( "sounds/ui/buttons/ui_action.sound" );
 			}
 		}
@@ -262,8 +262,10 @@ public sealed class HardpointZone : Component,
 		}
 	}
 
-	private void BroadcastNotification( string message, string type )
+	// The message goes to the toast in English with its values apart, and the toast puts it in the player's language
+	// (a team shows as its translated name).
+	private void BroadcastNotification( string message, string type, params object[] args )
 	{
-		Facepunch.UI.Toast.Instance?.Show( message, Facepunch.UI.ToastType.Generic );
+		Facepunch.UI.Toast.Instance?.Show( message, Facepunch.UI.ToastType.Generic, 5f, args );
 	}
 }

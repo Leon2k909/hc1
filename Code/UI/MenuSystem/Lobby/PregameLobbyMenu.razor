@@ -4,25 +4,25 @@
 @using System.Linq;
 
 @namespace Facepunch.UI
-@inherits Panel
+@inherits PanelComponent
 @attribute [StyleSheet]
 
-<root class="hc1 blur">
+<root class="hc1 private-lobby">
     <div class="lobby-container">
         
         @* ----- HOST SETTINGS PANEL ----- *@
         <div class="settings-panel">
-            <label class="panel-title">Match Settings</label>
-            
+            <label class="panel-title">@Tr( "Match Settings" )</label>
+
             @if ( Networking.IsHost )
             {
                 <div class="setting-group">
-                    <label>Map</label>
+                    <label>@Tr( "Map" )</label>
                     <div class="button-list">
                         @foreach ( var map in GameUtils.GetAvailableMaps() )
                         {
                             var isSelected = PregameLobbyManager.Instance?.SelectedMapPath == map.ResourcePath;
-                            <div class="button standard smaller no-anim @(isSelected ? "selected" : "")" onclick=@(() => PregameLobbyManager.Instance?.SetMap( map.ResourcePath ))>
+                            <div class="lobby-button @(isSelected ? "selected" : "")" onclick=@(() => PregameLobbyManager.Instance?.SetMap( map.ResourcePath ))>
                                 @map.GetMetadata("Title", map.ResourceName)
                             </div>
                         }
@@ -35,13 +35,13 @@
                     if ( currentMap != null )
                     {
                         <div class="setting-group">
-                            <label>Game Mode</label>
+                            <label>@Tr( "Game Mode" )</label>
                             <div class="button-list">
                                 @foreach ( var mode in GameMode.GetAll( currentMap ) )
                                 {
                                     var isSelected = PregameLobbyManager.Instance?.SelectedGameMode == mode.Ident;
-                                    <div class="button standard smaller no-anim @(isSelected ? "selected" : "")" onclick=@(() => PregameLobbyManager.Instance?.SetGameMode( mode.Ident ))>
-                                        @mode.Title
+                                    <div class="lobby-button @(isSelected ? "selected" : "")" onclick=@(() => PregameLobbyManager.Instance?.SetGameMode( mode.Ident ))>
+                                        @Tr( mode.Title )
                                     </div>
                                 }
                             </div>
@@ -53,8 +53,8 @@
                 <div class="setting-group">
                     <label>Rules</label>
                     <div class="button-list row">
-                        <div class="button standard smaller no-anim @(!(PregameLobbyManager.Instance?.IsHardcore ?? false) ? "selected" : "")" onclick=@(() => PregameLobbyManager.Instance?.SetHardcore( false ))>CORE</div>
-                        <div class="button standard smaller no-anim hc-toggle @((PregameLobbyManager.Instance?.IsHardcore ?? false) ? "selected" : "")" onclick=@(() => PregameLobbyManager.Instance?.SetHardcore( true ))>HARDCORE</div>
+                        <div class="lobby-button @(!(PregameLobbyManager.Instance?.IsHardcore ?? false) ? "selected" : "")" onclick=@(() => PregameLobbyManager.Instance?.SetHardcore( false ))>CORE</div>
+                        <div class="lobby-button hc-toggle @((PregameLobbyManager.Instance?.IsHardcore ?? false) ? "selected" : "")" onclick=@(() => PregameLobbyManager.Instance?.SetHardcore( true ))>HARDCORE</div>
                     </div>
                 </div>
                 *@
@@ -62,8 +62,8 @@
 
                 <div class="grow" />
 
-                <div class="button standard action large" onclick=@(() => PregameLobbyManager.Instance?.StartMatch())>
-                    START MATCH
+                <div class="lobby-button primary" onclick=@(() => PregameLobbyManager.Instance?.StartMatch())>
+                    @Tr( "START MATCH" )
                 </div>
             }
             else
@@ -74,32 +74,32 @@
                     var mode = GameMode.GetAll( map ).FirstOrDefault(x => x.Ident == PregameLobbyManager.Instance.SelectedGameMode);
                     
                     <div class="setting-info">
-                        <label class="info-label">Map:</label>
+                        <label class="info-label">@Tr( "Map:" )</label>
                         <label class="info-value">@(map?.GetMetadata("Title", map?.ResourceName))</label>
                     </div>
                     <div class="setting-info">
-                        <label class="info-label">Mode:</label>
+                        <label class="info-label">@Tr( "Mode:" )</label>
                         @* Put back with Core modes: @(mode?.Title) @(PregameLobbyManager.Instance.IsHardcore ? "(Hardcore)" : "") *@
-                        <label class="info-value">@(mode?.Title)</label>
+                        <label class="info-value">@Tr( mode?.Title )</label>
                     </div>
                 }
-                
+
                 <div class="grow" />
-                <label class="waiting-label">Waiting for host to start...</label>
+                <label class="waiting-label">@Tr( "Waiting for host to start..." )</label>
             }
         </div>
 
         @* ----- ROSTER PANEL ----- *@
         <div class="roster-panel">
-            <label class="panel-title">Lobby Roster</label>
+            <label class="panel-title">@Tr( "Lobby Roster" )</label>
 
             <div class="teams-container">
                 
-                @* COUNTER TERRORIST *@
+                @* BLUE TEAM *@
                 <div class="team-column">
                     <div class="team-header ct">
-                        <label>Counter-Terrorist</label>
-                        <div class="button standard smaller" onclick=@(() => Client.Local?.RequestTeam(Team.CounterTerrorist))>JOIN</div>
+                        <label>@Tr( Team.CounterTerrorist.GetName() )</label>
+                        <div class="lobby-button" onclick=@(() => Client.Local?.RequestTeam(Team.CounterTerrorist))>@Tr( "JOIN" )</div>
                     </div>
                     <div class="player-list">
                         @foreach ( var player in GameUtils.AllPlayers.Where( x => x.Team == Team.CounterTerrorist ) )
@@ -111,11 +111,11 @@
                     </div>
                 </div>
 
-                @* TERRORIST *@
+                @* RED TEAM *@
                 <div class="team-column">
                     <div class="team-header t">
-                        <label>Terrorist</label>
-                        <div class="button standard smaller" onclick=@(() => Client.Local?.RequestTeam(Team.Terrorist))>JOIN</div>
+                        <label>@Tr( Team.Terrorist.GetName() )</label>
+                        <div class="lobby-button" onclick=@(() => Client.Local?.RequestTeam(Team.Terrorist))>@Tr( "JOIN" )</div>
                     </div>
                     <div class="player-list">
                         @foreach ( var player in GameUtils.AllPlayers.Where( x => x.Team == Team.Terrorist ) )
@@ -130,8 +130,8 @@
                 @* UNASSIGNED *@
                 <div class="team-column">
                     <div class="team-header un">
-                        <label>Spectators</label>
-                        <div class="button standard smaller" onclick=@(() => Client.Local?.RequestTeam(Team.Unassigned))>JOIN</div>
+                        <label>@Tr( "Spectators" )</label>
+                        <div class="lobby-button" onclick=@(() => Client.Local?.RequestTeam(Team.Unassigned))>@Tr( "JOIN" )</div>
                     </div>
                     <div class="player-list">
                         @foreach ( var player in GameUtils.AllPlayers.Where( x => x.Team == Team.Unassigned ) )
@@ -145,10 +145,8 @@
 
             </div>
             
-            <div class="grow" />
-            
-            <div class="button standard smaller" style="align-self: flex-end;" onclick=@(() => GameUtils.ReturnToMainMenu())>
-                Leave Lobby
+            <div class="lobby-button" style="align-self: flex-end;" onclick=@(() => GameUtils.ReturnToMainMenu())>
+                @Tr( "Leave Lobby" )
             </div>
         </div>
 
@@ -157,6 +155,12 @@
 
 @code
 {
+    protected override void OnUpdate()
+    {
+        base.OnUpdate();
+        ResponsiveLayout.Update( Panel );
+    }
+
     protected override int BuildHash()
     {
         var hash = new HashCode();

@@ -6,10 +6,10 @@ Each piece follows the same v_mp5 bone as the stock gun, so the ejection port,
 reloads and iron sights still work. Every part uses the same Workshop-to-MP5
 transform, fitted so the rail grip spans the stock handguard.
 
-- FSS Light Handguard (rail grip) replaces only the polymer handguard. It
+- The Rail Handguard (rail_grip) replaces only the polymer handguard. It
   hides v_mp5_b and shows `native_front` (v_mp5_b without the handguard) and
   `native_bolt`.
-- Integral and Monolithic Suppressor Barrels use the same native pieces. The
+- The integral and railed suppressor barrels use the same native pieces. The
   stock barrel sits inside the can and the stock front sight on top of it. The
   Workshop front sights sit in the same place but are taller, which would throw
   the iron sights off, so they are left out.
@@ -291,7 +291,7 @@ def native_pieces(a: Primitive, b: Primitive, short_sight_x: float, short_front:
     barrel_id = max(ids, key=lambda c: box[c][:, 0].max())  # barrel, front sight and muzzle
     sight_parts = [c for c in ids if box[c][:, 0].min() > FRONT_SIGHT and c != barrel_id]
 
-    # FSS and the integral cans: everything but the handguard mount, which keeps its tube collar.
+    # The rail handguard and the integral cans: everything but the handguard mount, which keeps its tube collar.
     front = b.triangles(root_b[~np.isin(component, mount)])
     mount_tris = b.triangles(root_b[np.isin(component, mount)])
     collar = mount_tris[mount_tris[:, :, 2].min(axis=1) >= TUBE_COLLAR_MIN_Z]

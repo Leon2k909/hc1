@@ -7,6 +7,7 @@ animations whose channels drive the skeleton's DmeTransforms.
 
 from __future__ import annotations
 
+import time
 import uuid
 from pathlib import Path
 
@@ -103,7 +104,15 @@ class Document:
             out.append("}")
             out.append("")
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text("\n".join(out), encoding="utf-8", newline="\n")
+        # A running editor recompiles the model as its sources change and briefly holds them open: retry until it lets go.
+        for attempt in range(60):
+            try:
+                path.write_text("\n".join(out), encoding="utf-8", newline="\n")
+                break
+            except OSError:
+                if attempt == 59:
+                    raise
+                time.sleep(0.5)
 
 
 def _transform(doc: Document, name: str, local: np.ndarray, key: str) -> Element:

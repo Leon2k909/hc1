@@ -1,28 +1,216 @@
+@import "/UI/Styles/Theme.scss";
+
+// Who's talking: one plate per speaker, like the kill feed's. It fades out towards the middle of the screen and ends
+// in a bar of the speaker's team colour at the screen edge, beside their team's crest. Your own plate is warm, like
+// your kills. Text sizes go on the labels themselves: the theme's `label { font-size: 18px }` beats inherited ones.
+
+$voice-ease: cubic-bezier( 0.23, 1, 0.32, 1 );
+$me-gold: #ffc96a;
+
 Voices
 {
-    padding: 16px;
-    gap: 8px;
     flex-direction: column;
-    border-radius: 2px;
+    align-items: flex-end;
+    gap: 4px;
+    padding: 0px $safe-zone-x 12px 0px;
+    font-family: $main-font;
+    pointer-events: none;
 
-    .row
+    .speaker
     {
-        justify-content: flex-end;
-    }
-
-    .item-row
-    {
-        gap: 8px;
-        justify-content: space-between;
+        position: relative;
+        height: 48px;
+        flex-shrink: 0;
+        flex-direction: row;
         align-items: center;
-        padding: 12px 24px;
+        gap: 10px;
+        padding: 0px 14px 0px 64px;
+        background-image: linear-gradient( to right, rgba( 10, 14, 20, 0 ), rgba( 10, 14, 20, 0.6 ) 30%, rgba( 10, 14, 20, 0.86 ) 65% );
+        transition: opacity 0.2s $voice-ease, transform 0.25s $voice-ease;
+
+        &:intro
+        {
+            opacity: 0;
+            transform: translateX( 24px );
+        }
+
+        &:outro
+        {
+            opacity: 0;
+            transform: translateX( 24px );
+        }
+
+        &.is-me
+        {
+            background-image: linear-gradient( to right, rgba( 44, 32, 12, 0 ), rgba( 44, 32, 12, 0.62 ) 30%, rgba( 58, 42, 14, 0.9 ) 65% );
+        }
     }
 
-    img
+    // The bars grow from the middle; VoiceMeter sets their heights every frame.
+    VoiceMeter
+    {
+        width: 15px;
+        height: 18px;
+        flex-shrink: 0;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+
+        .bar
+        {
+            width: 3px;
+            height: 25%;
+            border-radius: 2px;
+            background-color: white;
+        }
+    }
+
+    // The ring is the team colour (set inline).
+    .avatar
+    {
+        width: 34px;
+        height: 34px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        border: 2px solid white;
+    }
+
+    .who
+    {
+        min-width: 0;
+        flex-direction: column;
+        justify-content: center;
+        gap: 2px;
+    }
+
+    .name
+    {
+        max-width: 240px;
+        font-size: 17px;
+        font-weight: 700;
+        color: white;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-shadow: 0px 1px 2px black;
+    }
+
+    .tags
+    {
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+    }
+
+    // The team's name in its colour (set inline), or the spectators' grey.
+    .team label
+    {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        white-space: nowrap;
+        text-shadow: 0px 1px 2px black;
+    }
+
+    .team.spectator label
+    {
+        color: rgba( white, 0.6 );
+    }
+
+    .chip
+    {
+        height: 15px;
+        padding: 0px 4px;
+        align-items: center;
+        border: 1px solid rgba( white, 0.3 );
+        border-radius: 2px;
+
+        label
+        {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            white-space: nowrap;
+            color: rgba( white, 0.8 );
+        }
+
+        &.me
+        {
+            border-color: $me-gold;
+            background-color: $me-gold;
+
+            label
+            {
+                color: #16100A;
+            }
+        }
+
+        &.squad
+        {
+            border-color: rgba( $terror-color, 0.8 );
+
+            label
+            {
+                color: $terror-color;
+            }
+        }
+
+        &.dead
+        {
+            border-color: rgba( white, 0.15 );
+
+            label
+            {
+                color: rgba( white, 0.5 );
+            }
+        }
+    }
+
+    // Your own row: who can hear you.
+    .scope
+    {
+        align-items: center;
+        gap: 3px;
+
+        i
+        {
+            font-size: 13px;
+            color: rgba( white, 0.7 );
+        }
+
+        label
+        {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            white-space: nowrap;
+            color: rgba( white, 0.8 );
+            text-shadow: 0px 1px 2px black;
+        }
+    }
+
+    .logo
     {
         width: 28px;
         height: 28px;
-        border-radius: 100px;
-        margin-left: 32px;
+        flex-shrink: 0;
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    .edge
+    {
+        position: absolute;
+        top: 0px;
+        bottom: 0px;
+        right: 0px;
+        width: 3px;
+    }
+
+    .speaker.dead .avatar
+    {
+        filter: saturate( 0 );
+        opacity: 0.6;
     }
 }

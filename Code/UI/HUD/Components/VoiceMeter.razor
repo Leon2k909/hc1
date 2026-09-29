@@ -1,0 +1,58 @@
+@namespace Facepunch.UI
+@inherits Panel
+
+@* A speaker's level on Voices: three bars that follow how loud their voice is playing here, each swaying at its own
+   pace so they move like speech. Tick moves them; the tree is never rebuilt for it. *@
+<root>
+    <div class="bar" @ref="Low" />
+    <div class="bar" @ref="Mid" />
+    <div class="bar" @ref="High" />
+</root>
+
+@code
+{
+    /// <summary> The speaker's voice, whose <see cref="Voice.Amplitude"/> sets the level. </summary>
+    public Voice Voice { get; set; }
+
+    /// <summary>
+    /// No level to read: your own voice isn't played back to you (and dev_voices_sample's rows have no voice), so the
+    /// bars sway at a steady middle level.
+    /// </summary>
+    public bool Steady { get; set; }
+
+    /// <summary> Scales <see cref="Voice.Amplitude"/> so ordinary speech fills most of the meter. </summary>
+    private const float AmplitudeGain = 4f;
+
+    private Panel Low { get; set; }
+    private Panel Mid { get; set; }
+    private Panel High { get; set; }
+
+    private float _level;
+
+    public override void Tick()
+    {
+        base.Tick();
+
+        var target = Steady ? 0.6f : Math.Clamp( (Voice.IsValid() ? Voice.Amplitude : 0f) * AmplitudeGain, 0f, 1f );
+
+        // Up at once and down over a few frames, like a level meter.
+        _level = target > _level ? target : _level.LerpTo( target, RealTime.Delta * 12f );
+
+        // No two bars in step.
+        Sway( Low, 11f, 0f );
+        Sway( Mid, 15.5f, 2.1f );
+        Sway( High, 8.5f, 4.2f );
+    }
+
+    private void Sway( Panel bar, float speed, float phase )
+    {
+        if ( !bar.IsValid() )
+            return;
+
+        var sway = 0.5f + 0.5f * MathF.Sin( RealTime.Now * speed + phase );
+        var height = 0.25f + 0.75f * Math.Clamp( _level * (0.4f + 0.6f * sway), 0f, 1f );
+        bar.Style.Height = Length.Percent( height * 100f );
+    }
+
+    protected override int BuildHash() => 0;
+}

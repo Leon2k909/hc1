@@ -1,142 +1,42 @@
+@import "/UI/Styles/MenuPage.scss";
+
 CreateLobbyPage
 {
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	flex-direction: column;
-	// Fully opaque backdrop: the 3D menu scene (operators) must never show through here.
-	background-color: #0b0e11;
-	background-image: radial-gradient( circle at 50% 40%, #1d252c 0%, #0f1418 55%, #07090b 100% );
-	backdrop-filter: none;
-
-	.cl-body
-	{
-		flex-grow: 1;
-		justify-content: center;
-		align-items: center;
-		padding: 24px;
-	}
-
-	.cl-card
-	{
-		flex-direction: column;
-		width: 720px;
-		max-width: 100%;
-		padding: 32px;
-		gap: 22px;
-		background-color: rgba( 19, 24, 28, 0.96 );
-		border: 1px solid #46515a;
-		border-top: 4px solid #ffbd24;
-		border-radius: 6px;
-		box-shadow: 0px 20px 60px rgba( black, 0.55 );
-	}
-
-	.cl-header
-	{
-		flex-direction: row;
-		align-items: center;
-		gap: 16px;
-	}
-
-	.cl-icon
-	{
-		width: 56px;
-		height: 56px;
-		background-color: #ffbd24;
-		border-radius: 4px;
-		justify-content: center;
-		align-items: center;
-		flex-shrink: 0;
-
-		i
-		{
-			font-size: 32px;
-			color: #111519;
-			text-align: center;
-		}
-	}
-
-	.cl-titles { flex-direction: column; }
-
-	.cl-caption
-	{
-		font-size: 12px;
-		font-weight: 700;
-		letter-spacing: 2px;
-		color: #ffbd24;
-	}
-
-	.cl-title
-	{
-		font-size: 32px;
-		font-weight: 900;
-		color: white;
-	}
-
-	.cl-desc
-	{
-		font-size: 17px;
-		color: #c3ccd3;
-	}
-
-	.cl-features
-	{
-		flex-direction: row;
-		gap: 10px;
-	}
-
-	.cl-feature
-	{
-		flex: 1 1 0;
-		flex-direction: row;
-		align-items: center;
-		gap: 12px;
-		padding: 14px;
-		background-color: #252e35;
-		border: 1px solid #46515a;
-		border-radius: 4px;
-
-		i
-		{
-			font-size: 26px;
-			color: #ffbd24;
-			flex-shrink: 0;
-		}
-	}
-
-	.cl-feature-copy { flex-direction: column; min-width: 0; }
-
-	.cl-feature-name
-	{
-		font-size: 14px;
-		font-weight: 900;
-		letter-spacing: 1px;
-		color: white;
-	}
-
-	.cl-feature-sub
-	{
-		font-size: 13px;
-		color: #aebbc5;
-	}
-
-	.cl-create
-	{
-		flex-direction: row;
-		justify-content: center;
-		align-items: center;
-		gap: 10px;
-		height: 60px;
-		margin-top: 4px;
-		background-color: #ffbd24;
-		border-radius: 4px;
-		cursor: pointer;
-		transition: background-color 0.12s ease, transform 0.12s ease;
-
-		i { font-size: 26px; color: #111519; }
-		label { font-size: 20px; font-weight: 900; letter-spacing: 2px; color: #111519; }
-
-		&:hover { background-color: #ffcb4f; transform: scale( 1.01 ); }
-		&:active { transform: scale( 0.99 ); }
-	}
+    @include menu-page;
+    .cl-body { flex-grow: 1; min-height: 0; padding: 32px 48px; overflow-y: scroll; justify-content: center; }
+    .cl-setup { width: 1400px; max-width: 100%; flex-shrink: 0; flex-direction: column; gap: 28px; }
+    .cl-heading { flex-direction: column; gap: 6px; flex-shrink: 0; }
+    .cl-caption { @include menu-section-title; color: $menu-accent; }
+    .cl-title { font-size: 36px; font-weight: 700; letter-spacing: 2px; }
+    .cl-desc { font-size: 17px; color: $menu-muted; }
+    .cl-columns { flex-direction: row; align-items: flex-start; gap: 32px; flex-shrink: 0; }
+    .cl-settings { flex: 1; min-width: 0; flex-direction: column; gap: 24px; }
+    .cl-group { flex-direction: column; gap: 10px; flex-shrink: 0; }
+    .cl-label { @include menu-section-title; }
+    .cl-options { flex-wrap: wrap; gap: 8px; }
+    .cl-option { @include menu-action; padding: 10px 18px; min-height: 44px; font-size: 13px; letter-spacing: 1px; }
+    .cl-option.selected { border-color: $menu-accent; color: $menu-accent; background-color: rgba( 255, 122, 26, 0.12 ); }
+    .cl-help { font-size: 14px; color: $menu-muted; }
+    .cl-summary { @include menu-panel; width: 400px; flex-shrink: 0; flex-direction: column; overflow: hidden; border-top: 2px solid $menu-accent; }
+    .cl-map-preview { position: relative; height: 210px; flex-shrink: 0; background-size: cover; background-position: center; background-color: #20242a; }
+    .cl-map-shade { position: absolute; left: 0; right: 0; bottom: 0; top: 0; background-image: linear-gradient( to top, #101114, rgba( 16, 17, 20, 0.05 ) ); }
+    .cl-map-name { position: absolute; bottom: 20px; left: 24px; right: 24px; font-size: 28px; font-weight: 700; text-transform: uppercase; }
+    .cl-summary-body { padding: 24px; flex-direction: column; gap: 18px; }
+    .cl-mode-name { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+    .cl-summary-row { justify-content: space-between; gap: 16px; font-size: 13px; color: $menu-muted; > label:last-child { color: white; font-weight: 700; } }
+    .cl-start { @include menu-action; min-height: 54px; margin-top: 8px; font-size: 13px; padding: 0 12px; letter-spacing: 1px; }
+    .cl-error { font-size: 14px; color: #ff777c; }
+}
+.main-menu-root.narrow CreateLobbyPage
+{
+    .cl-body { padding: 24px; }
+    .cl-columns { gap: 24px; }
+    .cl-summary { width: 320px; }
+}
+.main-menu-root.portrait CreateLobbyPage
+{
+    .cl-columns { flex-direction: column; }
+    .cl-settings, .cl-summary { width: 100%; flex-shrink: 0; }
+    .cl-map-preview { height: 160px; }
+    MenuTopbar { padding: 0 24px; }
 }

@@ -1,0 +1,32 @@
+{
+  "Name": "Uzi",
+  "Description": "Israeli 9x19mm submachine gun: heavy for its size and slow-firing, with its 32-round magazine in the pistol grip.",
+  "Slot": "Primary",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": true,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/guns/uzi_01.png",
+  "IsPurchasable": true,
+  "Price": 1400,
+  "KillReward": 600,
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/uzi/weapon_uzi.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/uzi/wm_uzi.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/uzi/vm_uzi.prefab"
+  },
+  "WorldModel": "weapons/uzi/w_uzi.vmdl",
+  "ArmorReduction": null,
+  "HelmetReduction": null,
+  "WorldModelBodyGroups": 0,
+  "__references": [],
+  "__version": 0,
+  "Category": "SMG",
+  "GunsmithOffset": "0,0,4"
+}

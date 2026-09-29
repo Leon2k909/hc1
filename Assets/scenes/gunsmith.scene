@@ -1,5 +1,5 @@
 {
-  "__guid": "c0d9d9ce-88a3-4205-903a-b14ad2ee20a6",
+  "__guid": "651972c0-6e39-47f4-b784-d62e114f5a57",
   "GameObjects": [
     {
       "__guid": "c9a5e713-8280-4c27-ba33-60b79bc6cbe0",
@@ -278,7 +278,7 @@
       "__version": 2,
       "Flags": 0,
       "Name": "Camera",
-      "Position": "-4.3176403,110,6",
+      "Position": "-0.239889145,110,3.84423518",
       "Rotation": "0,0,-0.707106769,0.707106769",
       "Scale": "1,1,1",
       "Tags": "maincamera",
@@ -297,7 +297,7 @@
           "BackgroundColor": "0.33333,0.46275,0.52157,1",
           "ClearFlags": "All",
           "EnablePostProcessing": true,
-          "FieldOfView": 32.121124,
+          "FieldOfView": 36.383003,
           "FovAxis": "Horizontal",
           "IsMainCamera": true,
           "OnComponentDestroy": null,
@@ -452,8 +452,8 @@
             "component_type": "GunsmithController"
           },
           "Equipment": {
-            "Id": "a1599a76-462b-4805-af51-40e95ff7a5e2",
-            "Path": "weapons/mp5/mp5.equip"
+            "Id": "163cfcf4-f426-4903-9bc5-536e102a5f9a",
+            "Path": "weapons/ak105/ak105.equip"
           },
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
@@ -463,8 +463,8 @@
           "OnComponentUpdate": null,
           "Renderer": {
             "_type": "component",
-            "component_id": "b59064f6-fd08-4a39-aa44-b3f37d6bf452",
-            "go": "c6040ea6-8f2f-4425-8378-2823219db27d",
+            "component_id": "c6406cbb-ec83-4832-95df-7e753069bcc8",
+            "go": "b13b8883-7125-4637-ad50-d1ea7275fc8d",
             "component_type": "SkinnedModelRenderer"
           }
         },
@@ -496,8 +496,8 @@
           },
           "Weapon": {
             "_type": "component",
-            "component_id": "8d75f2ee-591f-4b56-a650-a5ca6253da7d",
-            "go": "c6040ea6-8f2f-4425-8378-2823219db27d",
+            "component_id": "d55ce88e-231f-4611-974a-77f696acdd0d",
+            "go": "b13b8883-7125-4637-ad50-d1ea7275fc8d",
             "component_type": "GunsmithWeapon"
           },
           "ZoomRange": "-0.600000024 0.300000012"
@@ -566,32 +566,32 @@
           "Children": []
         },
         {
-          "__guid": "c6040ea6-8f2f-4425-8378-2823219db27d",
+          "__guid": "b13b8883-7125-4637-ad50-d1ea7275fc8d",
           "__version": 2,
           "__Prefab": {
-            "Id": "2dab19f7-3301-4b91-a502-f5878444f8fc",
-            "Path": "weapons/mp5/vm_mp5.prefab"
+            "Id": "17db5bd6-4d04-4a8e-98ec-4e01ba94f68b",
+            "Path": "weapons/ak105/vm_ak105.prefab"
           },
           "__PrefabInstancePatch": {
             "AddedObjects": [
               {
                 "Id": {
                   "Type": "Component",
-                  "IdValue": "8d75f2ee-591f-4b56-a650-a5ca6253da7d"
+                  "IdValue": "1f5c70b1-ac78-43d3-b838-0d4f95eb482c"
                 },
                 "Parent": {
                   "Type": "GameObject",
-                  "IdValue": "f085c63b-0ea2-4dae-bd8e-f561b97d196e"
+                  "IdValue": "6c737415-3792-520f-b7df-7e2ee1397d25"
                 },
                 "PreviousElement": {
                   "Type": "Component",
-                  "IdValue": "d990540f-d10b-4091-aceb-2bac219d4237"
+                  "IdValue": "42d7fbbd-e82c-5cd2-8fa8-4e2a806db6e3"
                 },
                 "ContainerProperty": "Components",
                 "IsContainerArray": true,
                 "Data": {
-                  "__type": "Facepunch.GunsmithWeapon",
-                  "__guid": "8d75f2ee-591f-4b56-a650-a5ca6253da7d",
+                  "__type": "Facepunch.Gunsmith.GunsmithMw22Factory",
+                  "__guid": "1f5c70b1-ac78-43d3-b838-0d4f95eb482c",
                   "__enabled": true,
                   "Flags": 0,
                   "OnComponentDestroy": null,
@@ -599,37 +599,27 @@
                   "OnComponentEnabled": null,
                   "OnComponentFixedUpdate": null,
                   "OnComponentStart": null,
-                  "OnComponentUpdate": null,
-                  "Renderer": {
-                    "_type": "component",
-                    "component_id": "d990540f-d10b-4091-aceb-2bac219d4237",
-                    "go": "f085c63b-0ea2-4dae-bd8e-f561b97d196e",
-                    "component_type": "SkinnedModelRenderer"
-                  },
-                  "Resource": {
-                    "Id": "a1599a76-462b-4805-af51-40e95ff7a5e2",
-                    "Path": "weapons/mp5/mp5.equip"
-                  }
+                  "OnComponentUpdate": null
                 }
               },
               {
                 "Id": {
                   "Type": "GameObject",
-                  "IdValue": "68b1fda8-dc74-4959-a2ee-225d0d4ed36d"
+                  "IdValue": "2bc038cc-e2cc-4c77-97fe-d91c6fe7e245"
                 },
                 "Parent": {
                   "Type": "GameObject",
-                  "IdValue": "4f5fadf4-061b-49bc-8539-4788ec3c0120"
+                  "IdValue": "99b471cb-a5c2-5358-89dd-a9ed202b10ab"
                 },
                 "PreviousElement": null,
                 "ContainerProperty": "Children",
                 "IsContainerArray": true,
                 "Data": {
-                  "__guid": "68b1fda8-dc74-4959-a2ee-225d0d4ed36d",
+                  "__guid": "2bc038cc-e2cc-4c77-97fe-d91c6fe7e245",
                   "__version": 2,
                   "__Prefab": {
-                    "Id": "f5dae0bb-faf1-441b-af14-a4b0c51db9c5",
-                    "Path": "attachments/mpapa5/prefabs/rail_grip.prefab"
+                    "Id": "dbb1970c-20cf-49b6-a3c5-75eea930f30b",
+                    "Path": "gunsmith/m4a1/mw2022/att_vm_flashhider01.prefab"
                   },
                   "__PrefabInstancePatch": {
                     "AddedObjects": [],
@@ -638,38 +628,30 @@
                       {
                         "Target": {
                           "Type": "GameObject",
-                          "IdValue": "b1baa4bf-f903-453a-a938-a6c626016fc1"
+                          "IdValue": "dfe3e6c7-6647-5a24-9463-3d5a3ab9340b"
                         },
                         "Property": "Position",
-                        "Value": "2.65199995,-0.24800007,8.12800026"
+                        "Value": "8.35862011E-08,-4.66126949E-07,-5.96046448E-08"
                       },
                       {
                         "Target": {
                           "Type": "GameObject",
-                          "IdValue": "b1baa4bf-f903-453a-a938-a6c626016fc1"
+                          "IdValue": "dfe3e6c7-6647-5a24-9463-3d5a3ab9340b"
                         },
                         "Property": "Rotation",
-                        "Value": "2.98023224E-08,9.92417336E-06,1.00433826E-05,-1"
-                      },
-                      {
-                        "Target": {
-                          "Type": "GameObject",
-                          "IdValue": "b1baa4bf-f903-453a-a938-a6c626016fc1"
-                        },
-                        "Property": "Scale",
-                        "Value": "1.12199998,1.12199998,1.12199998"
+                        "Value": "-3.69618647E-09,4.65661287E-10,-7.4505806E-09,1"
                       },
                       {
                         "Target": {
                           "Type": "Component",
-                          "IdValue": "97e9167a-cfeb-4255-9585-d02188797680"
+                          "IdValue": "f632dbbe-06ca-5b83-a881-2fd709d1ec5b"
                         },
                         "Property": "Materials",
                         "Value": {
                           "indexed": {
                             "0": {
-                              "Id": "61812762-8f52-4c15-b97a-82a906425027",
-                              "Path": "attachments/mpapa5/materials/weapon_vm_sm_mpapa5_railgrip.vmat"
+                              "Id": "625e7f98-dd92-4a66-9e03-edd2a42a082d",
+                              "Path": "attachments/mw2022/materials/viper/mw/attachments/attachment_vm_flashhider01.vmat"
                             }
                           }
                         }
@@ -677,7 +659,7 @@
                       {
                         "Target": {
                           "Type": "Component",
-                          "IdValue": "97e9167a-cfeb-4255-9585-d02188797680"
+                          "IdValue": "f632dbbe-06ca-5b83-a881-2fd709d1ec5b"
                         },
                         "Property": "RenderOptions",
                         "Value": {
@@ -690,7 +672,7 @@
                       {
                         "Target": {
                           "Type": "Component",
-                          "IdValue": "97e9167a-cfeb-4255-9585-d02188797680"
+                          "IdValue": "f632dbbe-06ca-5b83-a881-2fd709d1ec5b"
                         },
                         "Property": "RenderType",
                         "Value": "Off"
@@ -698,174 +680,13 @@
                       {
                         "Target": {
                           "Type": "Component",
-                          "IdValue": "a684cf3c-71d1-4a12-9bef-6af4b739580d"
+                          "IdValue": "e2366a0d-3f53-5b94-aa4c-229ce30a567a"
                         },
                         "Property": "AttachmentPoint",
                         "Value": {
                           "_type": "component",
-                          "component_id": "31dbc345-fc84-4968-9a60-245f9b2c2706",
-                          "go": "7b13a486-0b0d-4c14-93c3-777d7cf20853",
-                          "component_type": "GunsmithAttachmentPoint"
-                        }
-                      },
-                      {
-                        "Target": {
-                          "Type": "GameObject",
-                          "IdValue": "225591ff-36f7-5d7b-9d6c-75d8c42bdcae"
-                        },
-                        "Property": "Position",
-                        "Value": "-2.36378407,0.22098653,-7.24416018"
-                      },
-                      {
-                        "Target": {
-                          "Type": "GameObject",
-                          "IdValue": "225591ff-36f7-5d7b-9d6c-75d8c42bdcae"
-                        },
-                        "Property": "Scale",
-                        "Value": "0.891265631,0.891265631,0.891265631"
-                      },
-                      {
-                        "Target": {
-                          "Type": "Component",
-                          "IdValue": "b4267785-e32a-5a7b-89ff-0983484a38f3"
-                        },
-                        "Property": "Materials",
-                        "Value": {
-                          "indexed": {
-                            "0": {
-                              "Id": "66cffaeb-d7f6-480c-af22-0cbfa5ddcb91",
-                              "Path": "models/weapons/sbox_smg_mp5/v_mp5_b.vmat"
-                            }
-                          }
-                        }
-                      },
-                      {
-                        "Target": {
-                          "Type": "Component",
-                          "IdValue": "b4267785-e32a-5a7b-89ff-0983484a38f3"
-                        },
-                        "Property": "RenderOptions",
-                        "Value": {
-                          "GameLayer": false,
-                          "OverlayLayer": true,
-                          "BloomLayer": false,
-                          "AfterUILayer": false
-                        }
-                      },
-                      {
-                        "Target": {
-                          "Type": "Component",
-                          "IdValue": "b4267785-e32a-5a7b-89ff-0983484a38f3"
-                        },
-                        "Property": "RenderType",
-                        "Value": "Off"
-                      }
-                    ],
-                    "MovedObjects": []
-                  },
-                  "__PrefabIdToInstanceId": {
-                    "b1baa4bf-f903-453a-a938-a6c626016fc1": "68b1fda8-dc74-4959-a2ee-225d0d4ed36d",
-                    "225591ff-36f7-5d7b-9d6c-75d8c42bdcae": "854347f5-cfd5-4a00-a177-7b6fc2b97251",
-                    "b4267785-e32a-5a7b-89ff-0983484a38f3": "c65b146a-964b-411c-b902-446118a5629e",
-                    "c61f7b70-d77a-587c-a081-eed46e8e581c": "fe69d01f-b02e-46ca-acf1-12625b99b44c",
-                    "97e9167a-cfeb-4255-9585-d02188797680": "5a224485-0234-47a7-b661-06412a55ffc8",
-                    "a684cf3c-71d1-4a12-9bef-6af4b739580d": "4c359a52-2808-4b3a-86b6-d6322f276bfc"
-                  }
-                }
-              },
-              {
-                "Id": {
-                  "Type": "GameObject",
-                  "IdValue": "445b52c4-e102-40d6-969c-836a5e083047"
-                },
-                "Parent": {
-                  "Type": "GameObject",
-                  "IdValue": "67e5095c-1bc6-49fb-9d53-21216bde8aed"
-                },
-                "PreviousElement": null,
-                "ContainerProperty": "Children",
-                "IsContainerArray": true,
-                "Data": {
-                  "__guid": "445b52c4-e102-40d6-969c-836a5e083047",
-                  "__version": 2,
-                  "__Prefab": {
-                    "Id": "241a199d-725d-4d5a-9bfa-b5f003a27c7d",
-                    "Path": "attachments/mpapa5/prefabs/stock_classic_full.prefab"
-                  },
-                  "__PrefabInstancePatch": {
-                    "AddedObjects": [],
-                    "RemovedObjects": [],
-                    "PropertyOverrides": [
-                      {
-                        "Target": {
-                          "Type": "GameObject",
-                          "IdValue": "861dc722-9f0c-4814-9b62-71c46729dd2b"
-                        },
-                        "Property": "Position",
-                        "Value": "-2.38418579E-07,4.17232513E-07,7.49999952"
-                      },
-                      {
-                        "Target": {
-                          "Type": "GameObject",
-                          "IdValue": "861dc722-9f0c-4814-9b62-71c46729dd2b"
-                        },
-                        "Property": "Rotation",
-                        "Value": "2.98023224E-08,9.92417336E-06,1.00433826E-05,-1"
-                      },
-                      {
-                        "Target": {
-                          "Type": "GameObject",
-                          "IdValue": "861dc722-9f0c-4814-9b62-71c46729dd2b"
-                        },
-                        "Property": "Scale",
-                        "Value": "1.29999995,1.29999995,1.29999995"
-                      },
-                      {
-                        "Target": {
-                          "Type": "Component",
-                          "IdValue": "0293a918-6e11-427c-b42c-d7aa1e8ebf6d"
-                        },
-                        "Property": "Materials",
-                        "Value": {
-                          "indexed": {
-                            "0": {
-                              "Id": "48d52e32-3703-424c-8b04-2c26765c05b6",
-                              "Path": "attachments/mpapa5/materials/weapon_vm_sm_mpapa5_fullstock.vmat"
-                            }
-                          }
-                        }
-                      },
-                      {
-                        "Target": {
-                          "Type": "Component",
-                          "IdValue": "0293a918-6e11-427c-b42c-d7aa1e8ebf6d"
-                        },
-                        "Property": "RenderOptions",
-                        "Value": {
-                          "GameLayer": false,
-                          "OverlayLayer": true,
-                          "BloomLayer": false,
-                          "AfterUILayer": false
-                        }
-                      },
-                      {
-                        "Target": {
-                          "Type": "Component",
-                          "IdValue": "0293a918-6e11-427c-b42c-d7aa1e8ebf6d"
-                        },
-                        "Property": "RenderType",
-                        "Value": "Off"
-                      },
-                      {
-                        "Target": {
-                          "Type": "Component",
-                          "IdValue": "d9f4ffab-5c1b-4730-a4bb-932ab3e94334"
-                        },
-                        "Property": "AttachmentPoint",
-                        "Value": {
-                          "_type": "component",
-                          "component_id": "70eea97f-e3da-4d98-bb8d-3d7a5867ed99",
-                          "go": "29fbf9be-77e6-4ac4-aba9-97ce68feeec0",
+                          "component_id": "dda7518e-b2c4-4b19-99fb-a350fecc3c19",
+                          "go": "79056380-39e5-4ceb-8b89-458bd0581afc",
                           "component_type": "GunsmithAttachmentPoint"
                         }
                       }
@@ -873,270 +694,9 @@
                     "MovedObjects": []
                   },
                   "__PrefabIdToInstanceId": {
-                    "861dc722-9f0c-4814-9b62-71c46729dd2b": "445b52c4-e102-40d6-969c-836a5e083047",
-                    "0293a918-6e11-427c-b42c-d7aa1e8ebf6d": "cb964d5b-3e77-436d-9f50-94f859aa3b8f",
-                    "d9f4ffab-5c1b-4730-a4bb-932ab3e94334": "90d28eca-cdf9-4b0c-97c3-b730525f9946"
-                  }
-                }
-              },
-              {
-                "Id": {
-                  "Type": "GameObject",
-                  "IdValue": "2962adf6-db1b-4d1d-bc77-5a2c77145d45"
-                },
-                "Parent": {
-                  "Type": "GameObject",
-                  "IdValue": "493f27db-d0a4-4128-9626-03a05519553b"
-                },
-                "PreviousElement": null,
-                "ContainerProperty": "Children",
-                "IsContainerArray": true,
-                "Data": {
-                  "__guid": "2962adf6-db1b-4d1d-bc77-5a2c77145d45",
-                  "__version": 2,
-                  "__Prefab": {
-                    "Id": "08bd80b9-1d32-4015-af1f-d2203d2a1b7b",
-                    "Path": "attachments/mpapa5/prefabs/att_vm_reflex_west02_tall.prefab"
-                  },
-                  "__PrefabInstancePatch": {
-                    "AddedObjects": [],
-                    "RemovedObjects": [],
-                    "PropertyOverrides": [
-                      {
-                        "Target": {
-                          "Type": "GameObject",
-                          "IdValue": "7e0aa80f-d929-5005-a7db-8c1b4874cc8e"
-                        },
-                        "Property": "Position",
-                        "Value": "0.699999332,-1.1920929E-07,10.5500002"
-                      },
-                      {
-                        "Target": {
-                          "Type": "GameObject",
-                          "IdValue": "7e0aa80f-d929-5005-a7db-8c1b4874cc8e"
-                        },
-                        "Property": "Rotation",
-                        "Value": "2.98023224E-08,9.92417336E-06,1.00433826E-05,-1"
-                      },
-                      {
-                        "Target": {
-                          "Type": "Component",
-                          "IdValue": "192db86e-d4c9-5a05-aca9-38b03bf2babf"
-                        },
-                        "Property": "Materials",
-                        "Value": {
-                          "indexed": {
-                            "0": {
-                              "Id": "414ed6b8-e17f-43ea-8e87-5b5f7a1fbcb3",
-                              "Path": "attachments/mw2022/materials/viper/mw/attachments/attachment_vm_reflex_west02_lens.vmat"
-                            },
-                            "1": "attachments/mw2022/models/att_vm_reflex_west02_tall/att_vm_reflex_west02_tall_reticle.vmat",
-                            "2": "attachments/mw2022/materials/reticle_ui_stencil_no_weap_cull.vmat",
-                            "3": {
-                              "Id": "be696333-eb04-4714-9a57-a6dbf656f6bd",
-                              "Path": "attachments/mw2022/materials/viper/mw/attachments/attachment_vm_riser02.vmat"
-                            },
-                            "4": {
-                              "Id": "129b0dc1-3dc6-4755-9904-36a166d1ba10",
-                              "Path": "attachments/mw2022/materials/viper/mw/attachments/attachment_vm_reflex_west02_body.vmat"
-                            }
-                          }
-                        }
-                      },
-                      {
-                        "Target": {
-                          "Type": "Component",
-                          "IdValue": "192db86e-d4c9-5a05-aca9-38b03bf2babf"
-                        },
-                        "Property": "RenderOptions",
-                        "Value": {
-                          "GameLayer": false,
-                          "OverlayLayer": true,
-                          "BloomLayer": false,
-                          "AfterUILayer": false
-                        }
-                      },
-                      {
-                        "Target": {
-                          "Type": "Component",
-                          "IdValue": "192db86e-d4c9-5a05-aca9-38b03bf2babf"
-                        },
-                        "Property": "RenderType",
-                        "Value": "Off"
-                      },
-                      {
-                        "Target": {
-                          "Type": "Component",
-                          "IdValue": "1104be54-a324-59e9-be53-8374b7e1c88c"
-                        },
-                        "Property": "AttachmentPoint",
-                        "Value": {
-                          "_type": "component",
-                          "component_id": "5df25c85-0586-4aae-add2-892b9500832c",
-                          "go": "63d324d1-0b8e-4df9-b2de-3125a84e802f",
-                          "component_type": "GunsmithAttachmentPoint"
-                        }
-                      },
-                      {
-                        "Target": {
-                          "Type": "GameObject",
-                          "IdValue": "b0205d8d-072b-5042-a677-7eec49ba9d58"
-                        },
-                        "Property": "Position",
-                        "Value": "-0.700207829,-1.2755394E-05,-10.5499859"
-                      },
-                      {
-                        "Target": {
-                          "Type": "GameObject",
-                          "IdValue": "b0205d8d-072b-5042-a677-7eec49ba9d58"
-                        },
-                        "Property": "Rotation",
-                        "Value": "0,-1.49011612E-08,-2.98023224E-08,1.00000012"
-                      },
-                      {
-                        "Target": {
-                          "Type": "Component",
-                          "IdValue": "8e60c5a7-51d6-5f10-8d46-74f8e314b41b"
-                        },
-                        "Property": "Materials",
-                        "Value": {
-                          "indexed": {
-                            "0": {
-                              "Id": "bd72bb3d-72ac-466c-8702-93411c793fe6",
-                              "Path": "models/weapons/sbox_smg_mp5/v_mp5_railmount.vmat"
-                            }
-                          }
-                        }
-                      },
-                      {
-                        "Target": {
-                          "Type": "Component",
-                          "IdValue": "8e60c5a7-51d6-5f10-8d46-74f8e314b41b"
-                        },
-                        "Property": "RenderOptions",
-                        "Value": {
-                          "GameLayer": false,
-                          "OverlayLayer": true,
-                          "BloomLayer": false,
-                          "AfterUILayer": false
-                        }
-                      },
-                      {
-                        "Target": {
-                          "Type": "Component",
-                          "IdValue": "8e60c5a7-51d6-5f10-8d46-74f8e314b41b"
-                        },
-                        "Property": "RenderType",
-                        "Value": "Off"
-                      }
-                    ],
-                    "MovedObjects": []
-                  },
-                  "__PrefabIdToInstanceId": {
-                    "7e0aa80f-d929-5005-a7db-8c1b4874cc8e": "2962adf6-db1b-4d1d-bc77-5a2c77145d45",
-                    "b0205d8d-072b-5042-a677-7eec49ba9d58": "8f3329e6-1772-4443-9aaa-8a2ccd52fa81",
-                    "192db86e-d4c9-5a05-aca9-38b03bf2babf": "7afba640-54da-43f1-8559-461ba6e24e3e",
-                    "1104be54-a324-59e9-be53-8374b7e1c88c": "d7c0eec8-cb09-48d7-96d0-70848ed47007",
-                    "8e60c5a7-51d6-5f10-8d46-74f8e314b41b": "4251ed73-4d73-4446-ad7d-609cbe074c73",
-                    "72c68bb7-92f3-5871-9e9c-62c6cb176f12": "e3411181-e504-452f-877f-0f2e2cd26e24"
-                  }
-                }
-              },
-              {
-                "Id": {
-                  "Type": "GameObject",
-                  "IdValue": "3e850289-33e0-4c0f-b983-0885c92170c8"
-                },
-                "Parent": {
-                  "Type": "GameObject",
-                  "IdValue": "49c9d1b4-f413-49f2-8798-3c84c2abf96a"
-                },
-                "PreviousElement": null,
-                "ContainerProperty": "Children",
-                "IsContainerArray": true,
-                "Data": {
-                  "__guid": "3e850289-33e0-4c0f-b983-0885c92170c8",
-                  "__version": 2,
-                  "__Prefab": {
-                    "Id": "0e89c6e3-7465-4f68-a97f-57ee23603685",
-                    "Path": "attachments/mpapa5/prefabs/att_vm_breacher01.prefab"
-                  },
-                  "__PrefabInstancePatch": {
-                    "AddedObjects": [],
-                    "RemovedObjects": [],
-                    "PropertyOverrides": [
-                      {
-                        "Target": {
-                          "Type": "GameObject",
-                          "IdValue": "245eb5d8-8b99-5c59-ae28-69cf7289dd91"
-                        },
-                        "Property": "Position",
-                        "Value": "12,-9.53674316E-07,8.12999916"
-                      },
-                      {
-                        "Target": {
-                          "Type": "GameObject",
-                          "IdValue": "245eb5d8-8b99-5c59-ae28-69cf7289dd91"
-                        },
-                        "Property": "Rotation",
-                        "Value": "2.98023224E-08,9.92417336E-06,1.00433826E-05,-1"
-                      },
-                      {
-                        "Target": {
-                          "Type": "Component",
-                          "IdValue": "876fcdfb-43fa-509e-95b4-253e286b84d6"
-                        },
-                        "Property": "Materials",
-                        "Value": {
-                          "indexed": {
-                            "0": {
-                              "Id": "f2def450-63de-4d49-a24c-b6e6ae10fcbe",
-                              "Path": "attachments/mw2022/materials/viper/mw/attachments/attachment_vm_muzzlemelee01.vmat"
-                            }
-                          }
-                        }
-                      },
-                      {
-                        "Target": {
-                          "Type": "Component",
-                          "IdValue": "876fcdfb-43fa-509e-95b4-253e286b84d6"
-                        },
-                        "Property": "RenderOptions",
-                        "Value": {
-                          "GameLayer": false,
-                          "OverlayLayer": true,
-                          "BloomLayer": false,
-                          "AfterUILayer": false
-                        }
-                      },
-                      {
-                        "Target": {
-                          "Type": "Component",
-                          "IdValue": "876fcdfb-43fa-509e-95b4-253e286b84d6"
-                        },
-                        "Property": "RenderType",
-                        "Value": "Off"
-                      },
-                      {
-                        "Target": {
-                          "Type": "Component",
-                          "IdValue": "a8d4ba56-8316-5297-8c9b-3f353c6e4083"
-                        },
-                        "Property": "AttachmentPoint",
-                        "Value": {
-                          "_type": "component",
-                          "component_id": "72a91ab7-c47c-429c-a9d3-1ad75395beb3",
-                          "go": "d9541eb0-525e-4005-ba52-8e33b8e0c6c2",
-                          "component_type": "GunsmithAttachmentPoint"
-                        }
-                      }
-                    ],
-                    "MovedObjects": []
-                  },
-                  "__PrefabIdToInstanceId": {
-                    "245eb5d8-8b99-5c59-ae28-69cf7289dd91": "3e850289-33e0-4c0f-b983-0885c92170c8",
-                    "876fcdfb-43fa-509e-95b4-253e286b84d6": "cb16e4bd-f909-40e0-ac55-ff5ea0b204de",
-                    "a8d4ba56-8316-5297-8c9b-3f353c6e4083": "aa9f83ba-a491-4a24-b0be-0c0b98ebc89c"
+                    "dfe3e6c7-6647-5a24-9463-3d5a3ab9340b": "2bc038cc-e2cc-4c77-97fe-d91c6fe7e245",
+                    "f632dbbe-06ca-5b83-a881-2fd709d1ec5b": "a494173f-1a01-48c9-af80-c7212df9cfc3",
+                    "e2366a0d-3f53-5b94-aa4c-229ce30a567a": "113f2937-654e-462e-959a-d7bc47910437"
                   }
                 }
               }
@@ -1146,7 +706,7 @@
               {
                 "Target": {
                   "Type": "GameObject",
-                  "IdValue": "f085c63b-0ea2-4dae-bd8e-f561b97d196e"
+                  "IdValue": "6c737415-3792-520f-b7df-7e2ee1397d25"
                 },
                 "Property": "Name",
                 "Value": "Runtime Weapon"
@@ -1154,76 +714,154 @@
               {
                 "Target": {
                   "Type": "GameObject",
-                  "IdValue": "f085c63b-0ea2-4dae-bd8e-f561b97d196e"
+                  "IdValue": "6c737415-3792-520f-b7df-7e2ee1397d25"
+                },
+                "Property": "Position",
+                "Value": "0,0,4"
+              },
+              {
+                "Target": {
+                  "Type": "GameObject",
+                  "IdValue": "6c737415-3792-520f-b7df-7e2ee1397d25"
                 },
                 "Property": "Rotation",
-                "Value": "-0.300463408,0.236998677,0.57216537,-0.725382745"
+                "Value": "-0.0566894598,0.00510725612,-0.0895829424,0.994351625"
               },
               {
                 "Target": {
                   "Type": "Component",
-                  "IdValue": "d990540f-d10b-4091-aceb-2bac219d4237"
+                  "IdValue": "c6c796c5-ce8e-55d4-ac55-a22b1cdb28b1"
                 },
                 "Property": "BodyGroups",
-                "Value": 18446744073709551375
+                "Value": 285344020
               },
               {
                 "Target": {
                   "Type": "Component",
-                  "IdValue": "d990540f-d10b-4091-aceb-2bac219d4237"
+                  "IdValue": "c6c796c5-ce8e-55d4-ac55-a22b1cdb28b1"
                 },
                 "Property": "Materials",
                 "Value": {
                   "indexed": {
                     "0": {
-                      "Id": "69c473c2-a4cc-457b-a7f2-6affac676b2d",
-                      "Path": "models/weapons/sbox_smg_mp5/v_mp5_a.vmat"
+                      "Id": "4c6da330-776e-46cd-80ea-1fb5ca324fb5",
+                      "Path": "weapons/ak105/materials/ak105_receiver.vmat"
                     },
                     "1": {
-                      "Id": "8c13bea9-53d0-4817-a31d-b043ba77fb4d",
-                      "Path": "models/weapons/sbox_smg_mp5/v_mp5_c.vmat"
+                      "Id": "6b717d04-27a6-4da6-a449-de83ab044d50",
+                      "Path": "weapons/ak105/materials/ak105_handguard.vmat"
                     },
                     "2": {
-                      "Id": "a96d81cd-c9cd-4e4c-ae18-344fde92ae55",
-                      "Path": "attachments/m4a1/materials/hidden.vmat"
+                      "Id": "1ab1a502-6be7-4d8a-82de-57dd55a0ca3a",
+                      "Path": "weapons/ak105/materials/ak105_barrel.vmat"
                     },
                     "3": {
-                      "Id": "0d9e42b1-b142-4ff7-ae53-44fdcf808153",
-                      "Path": "models/weapons/sbox_smg_mp5/v_mp5_magazine.vmat"
+                      "Id": "052cbe06-7b77-4876-9e72-de495cdfb3e3",
+                      "Path": "weapons/kastov74u/materials/ks74u_muzzle.vmat"
                     },
                     "4": {
-                      "Id": "d122c3ee-4549-49b0-bcee-a3cbceabc3fe",
-                      "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmat"
+                      "Id": "b56e7993-c856-4f19-9ea4-77c864bbafa1",
+                      "Path": "weapons/ak105/materials/ak105_rail.vmat"
                     },
                     "5": {
-                      "Id": "bd72bb3d-72ac-466c-8702-93411c793fe6",
-                      "Path": "models/weapons/sbox_smg_mp5/v_mp5_railmount.vmat"
+                      "Id": "18b0d54f-36cb-4359-b16b-d03aed5922f4",
+                      "Path": "weapons/ak105/materials/ak105_stock.vmat"
                     },
                     "6": {
-                      "Id": "43d29ffb-82f1-4d11-b193-d656914cde44",
-                      "Path": "models/weapons/sbox_attachments/reddot_rmr/v_rmr_glass.vmat"
+                      "Id": "e377219c-5a9e-4d1f-835c-cfc4ee174047",
+                      "Path": "weapons/kastov74u/materials/ks74u_stock_broadside.vmat"
                     },
                     "7": {
-                      "Id": "25d77af6-6db4-464c-b9ae-1791cbac2ce1",
-                      "Path": "models/weapons/sbox_attachments/reddot_rmr/v_rmr.vmat"
+                      "Id": "b2bc5c57-9abb-4032-9480-394e2c001607",
+                      "Path": "weapons/kastov74u/materials/ks74u_stock_exo.vmat"
                     },
-                    "8": "models/weapons/sbox_attachments/reddot_rmr/v_rmr_red_dot.vmat",
+                    "8": {
+                      "Id": "8237edf6-0d77-42e1-b7d1-aa3c5ae1c931",
+                      "Path": "weapons/kastov74u/materials/ks74u_stock_wood.vmat"
+                    },
                     "9": {
-                      "Id": "f8b9b09a-a89d-4948-8eee-4d718b3ede75",
-                      "Path": "models/weapons/sbox_attachments/sight_holographic/v_holosight.vmat"
+                      "Id": "df2715a5-56c8-4373-bcf3-8f72aa586907",
+                      "Path": "weapons/kastov74u/materials/ks74u_stock_tac.vmat"
                     },
                     "10": {
-                      "Id": "eb85c6e8-4391-4896-ac5b-f3bffa897c8d",
-                      "Path": "models/weapons/sbox_attachments/sight_holographic/v_holosight_glass.vmat"
+                      "Id": "999ccc08-ee68-492b-8c9a-88651e1e8f63",
+                      "Path": "weapons/kastov74u/materials/ks74u_stock_tac02.vmat"
                     },
-                    "11": "models/weapons/sbox_attachments/sight_holographic/v_holosight_red_dot.vmat"
+                    "11": {
+                      "Id": "93304870-aa67-471e-80e1-8fc222dc64b3",
+                      "Path": "weapons/kastov74u/materials/ks74u_stock_wire.vmat"
+                    },
+                    "12": {
+                      "Id": "71d2200d-f863-4b5e-8096-75299e295de8",
+                      "Path": "weapons/kastov74u/materials/ks74u_stock_skeleton.vmat"
+                    },
+                    "13": {
+                      "Id": "9e26ca44-3279-4a28-af84-48b881d65476",
+                      "Path": "weapons/kastov74u/materials/ks74u_stock_rpk.vmat"
+                    },
+                    "14": {
+                      "Id": "86b7069c-92c2-41a8-b8b7-614dfecafabc",
+                      "Path": "weapons/kastov74u/materials/ks74u_stock_rpk_heavy.vmat"
+                    },
+                    "15": {
+                      "Id": "6df16be7-60e0-40db-9bc5-91c68b8a804e",
+                      "Path": "weapons/kastov74u/materials/ks74u_stock_spetsnaz.vmat"
+                    },
+                    "16": {
+                      "Id": "0538854c-6548-4248-b6d2-28b7f8cd0d89",
+                      "Path": "weapons/ak105/materials/ak105_pistolgrip.vmat"
+                    },
+                    "17": {
+                      "Id": "dc385983-4311-413f-b89c-066ff0f5a5e8",
+                      "Path": "weapons/kastov74u/materials/ks74u_grip_shotgun.vmat"
+                    },
+                    "18": {
+                      "Id": "c9e66516-4caa-4a3c-8a9d-4f8d89e9db91",
+                      "Path": "weapons/kastov74u/materials/ks74u_grip_tac.vmat"
+                    },
+                    "19": {
+                      "Id": "3945d0b2-8ab2-4d76-8dc5-b5fca0347dd3",
+                      "Path": "weapons/kastov74u/materials/ks74u_grip_steady.vmat"
+                    },
+                    "20": {
+                      "Id": "f2d0b658-a24e-4166-8ce9-b76d15561b69",
+                      "Path": "weapons/kastov74u/materials/ks74u_grip_demo.vmat"
+                    },
+                    "21": {
+                      "Id": "22ce757f-a4e1-48e2-aea1-a723454aac20",
+                      "Path": "weapons/kastov74u/materials/ks74u_grip_brace.vmat"
+                    },
+                    "22": {
+                      "Id": "2c2d79d3-142d-486d-9785-5c1617899767",
+                      "Path": "weapons/kastov74u/materials/ks74u_pistolgrip.vmat"
+                    },
+                    "23": {
+                      "Id": "f6abce21-602f-4884-b075-d5d1c1ce8cff",
+                      "Path": "weapons/ak105/materials/ak105_mag.vmat"
+                    },
+                    "24": {
+                      "Id": "a040fb0e-094b-47ac-8053-fdad195bd013",
+                      "Path": "weapons/kastov74u/materials/ks74u_rounds.vmat"
+                    },
+                    "25": {
+                      "Id": "8439fa86-491c-4ad9-a952-544779fdbe11",
+                      "Path": "weapons/kastov74u/materials/ks74u_mag_20.vmat"
+                    },
+                    "26": {
+                      "Id": "03318563-8e77-4ae5-b171-86e150e6531e",
+                      "Path": "weapons/kastov74u/materials/ks74u_mag_45.vmat"
+                    },
+                    "27": {
+                      "Id": "208b6f34-914a-4224-9e5e-571c77bb5502",
+                      "Path": "weapons/ak105/materials/ak105_mag_60.vmat"
+                    }
                   }
                 }
               },
               {
                 "Target": {
                   "Type": "Component",
-                  "IdValue": "d990540f-d10b-4091-aceb-2bac219d4237"
+                  "IdValue": "c6c796c5-ce8e-55d4-ac55-a22b1cdb28b1"
                 },
                 "Property": "UseAnimGraph",
                 "Value": false
@@ -1231,7 +869,7 @@
               {
                 "Target": {
                   "Type": "Component",
-                  "IdValue": "b893b170-a219-4a7b-a5c1-0569699b55c3"
+                  "IdValue": "624cf94b-e8c8-5988-8617-3e0fc2487be0"
                 },
                 "Property": "__enabled",
                 "Value": false
@@ -1239,195 +877,316 @@
               {
                 "Target": {
                   "Type": "Component",
-                  "IdValue": "9078c4c3-2c60-4a24-9b2a-ab248b57ddec"
+                  "IdValue": "29b67ae1-f982-580e-af3e-b389d68dfd09"
+                },
+                "Property": "StickerBone",
+                "Value": null
+              },
+              {
+                "Target": {
+                  "Type": "Component",
+                  "IdValue": "29b67ae1-f982-580e-af3e-b389d68dfd09"
+                },
+                "Property": "StickerSize",
+                "Value": "1.5,1.5"
+              },
+              {
+                "Target": {
+                  "Type": "Component",
+                  "IdValue": "d70c2d3b-56da-56cd-a441-5b54209456cf"
+                },
+                "Property": "StickerBone",
+                "Value": null
+              },
+              {
+                "Target": {
+                  "Type": "Component",
+                  "IdValue": "d70c2d3b-56da-56cd-a441-5b54209456cf"
+                },
+                "Property": "StickerSize",
+                "Value": "1.5,1.5"
+              },
+              {
+                "Target": {
+                  "Type": "Component",
+                  "IdValue": "b5e85abc-39f7-571a-947b-fa1c996b566a"
+                },
+                "Property": "StickerBone",
+                "Value": null
+              },
+              {
+                "Target": {
+                  "Type": "Component",
+                  "IdValue": "b5e85abc-39f7-571a-947b-fa1c996b566a"
+                },
+                "Property": "StickerSize",
+                "Value": "1.5,1.5"
+              },
+              {
+                "Target": {
+                  "Type": "Component",
+                  "IdValue": "7dc6be30-b232-5e59-9ff5-5611bbe4c5b8"
                 },
                 "Property": "CurrentGameObject",
                 "Value": {
                   "_type": "gameobject",
-                  "go": "68b1fda8-dc74-4959-a2ee-225d0d4ed36d"
+                  "go": "2bc038cc-e2cc-4c77-97fe-d91c6fe7e245"
                 }
               },
               {
                 "Target": {
                   "Type": "Component",
-                  "IdValue": "9078c4c3-2c60-4a24-9b2a-ab248b57ddec"
+                  "IdValue": "7dc6be30-b232-5e59-9ff5-5611bbe4c5b8"
                 },
                 "Property": "CurrentPart",
                 "Value": {
-                  "Id": "5b1dbb03-0795-48ed-86de-f1856eb06641",
-                  "Path": "gunsmith/mpapa5/underbarrel/rail_grip.gnsmth"
+                  "Id": "bdc6ce04-e436-42e4-bd11-d5f5e9a17632",
+                  "Path": "gunsmith/m4a1/mw2022/att_vm_flashhider01.gnsmth"
                 }
               },
               {
                 "Target": {
                   "Type": "Component",
-                  "IdValue": "a6e1adde-9012-4027-bc2f-629c5c45130b"
+                  "IdValue": "7dc6be30-b232-5e59-9ff5-5611bbe4c5b8"
                 },
-                "Property": "CurrentGameObject",
-                "Value": {
-                  "_type": "gameobject",
-                  "go": "445b52c4-e102-40d6-969c-836a5e083047"
-                }
+                "Property": "StickerBone",
+                "Value": null
               },
               {
                 "Target": {
                   "Type": "Component",
-                  "IdValue": "a6e1adde-9012-4027-bc2f-629c5c45130b"
+                  "IdValue": "7dc6be30-b232-5e59-9ff5-5611bbe4c5b8"
                 },
-                "Property": "CurrentPart",
-                "Value": {
-                  "Id": "8344c5d6-444f-4ab7-bbfc-c7904e460245",
-                  "Path": "gunsmith/mpapa5/stocks/stock_classic_full.gnsmth"
-                }
+                "Property": "StickerSize",
+                "Value": "1.5,1.5"
               },
               {
                 "Target": {
                   "Type": "Component",
-                  "IdValue": "b593f3fa-4d85-4a61-ab31-64bcb6b44a61"
+                  "IdValue": "1b414d74-6576-5183-937c-7f287acab1c9"
                 },
-                "Property": "CurrentGameObject",
-                "Value": {
-                  "_type": "gameobject",
-                  "go": "2962adf6-db1b-4d1d-bc77-5a2c77145d45"
-                }
+                "Property": "StickerBone",
+                "Value": null
               },
               {
                 "Target": {
                   "Type": "Component",
-                  "IdValue": "b593f3fa-4d85-4a61-ab31-64bcb6b44a61"
+                  "IdValue": "1b414d74-6576-5183-937c-7f287acab1c9"
                 },
-                "Property": "CurrentPart",
-                "Value": {
-                  "Id": "b6210275-e745-405f-993a-5c34c4aa034a",
-                  "Path": "gunsmith/mpapa5/optics/att_vm_reflex_west02_tall.gnsmth"
-                }
+                "Property": "StickerSize",
+                "Value": "1.5,1.5"
               },
               {
                 "Target": {
                   "Type": "Component",
-                  "IdValue": "18d95410-6495-46e1-bd0c-b0eeb31a9a91"
+                  "IdValue": "9cf93aaf-e5a2-56f5-83a3-ec2c234f3557"
                 },
-                "Property": "CurrentGameObject",
-                "Value": {
-                  "_type": "gameobject",
-                  "go": "3e850289-33e0-4c0f-b983-0885c92170c8"
-                }
+                "Property": "StickerBone",
+                "Value": null
               },
               {
                 "Target": {
                   "Type": "Component",
-                  "IdValue": "18d95410-6495-46e1-bd0c-b0eeb31a9a91"
+                  "IdValue": "9cf93aaf-e5a2-56f5-83a3-ec2c234f3557"
+                },
+                "Property": "StickerSize",
+                "Value": "1.5,1.5"
+              },
+              {
+                "Target": {
+                  "Type": "Component",
+                  "IdValue": "cae784af-73bf-5430-a4f7-351fe966595e"
                 },
                 "Property": "CurrentPart",
                 "Value": {
-                  "Id": "5e520b58-c225-485a-a9b9-5250ac072d1b",
-                  "Path": "gunsmith/mpapa5/muzzles/att_vm_breacher01.gnsmth"
+                  "Id": "1021cf85-6e2f-42d5-937c-3611dc9ed643",
+                  "Path": "gunsmith/ak105/stocks/att_vm_p04_sh_vecho_stocktac_v0.gnsmth"
                 }
+              },
+              {
+                "Target": {
+                  "Type": "Component",
+                  "IdValue": "cae784af-73bf-5430-a4f7-351fe966595e"
+                },
+                "Property": "StickerBone",
+                "Value": null
+              },
+              {
+                "Target": {
+                  "Type": "Component",
+                  "IdValue": "cae784af-73bf-5430-a4f7-351fe966595e"
+                },
+                "Property": "StickerSize",
+                "Value": "1.5,1.5"
+              },
+              {
+                "Target": {
+                  "Type": "Component",
+                  "IdValue": "9c83baee-ef37-5284-9015-dfaecdb4db1b"
+                },
+                "Property": "StickerBone",
+                "Value": null
+              },
+              {
+                "Target": {
+                  "Type": "Component",
+                  "IdValue": "9c83baee-ef37-5284-9015-dfaecdb4db1b"
+                },
+                "Property": "StickerSize",
+                "Value": "1.5,1.5"
+              },
+              {
+                "Target": {
+                  "Type": "Component",
+                  "IdValue": "e8135f5e-4d67-50da-8aac-a97a4bcc0dc0"
+                },
+                "Property": "StickerBone",
+                "Value": null
+              },
+              {
+                "Target": {
+                  "Type": "Component",
+                  "IdValue": "e8135f5e-4d67-50da-8aac-a97a4bcc0dc0"
+                },
+                "Property": "StickerSize",
+                "Value": "1.5,1.5"
               }
             ],
             "MovedObjects": []
           },
           "__PrefabIdToInstanceId": {
-            "f085c63b-0ea2-4dae-bd8e-f561b97d196e": "c6040ea6-8f2f-4425-8378-2823219db27d",
-            "9ddc9994-b9cd-473d-a63b-05d31643f3ad": "83d1c23d-6533-43cb-ad9d-ece7a13aaa06",
-            "ae03a95e-c8b5-459a-b90f-ca9e4862bfda": "b878390b-2357-4877-a46d-8485076e4e73",
-            "fbdf4731-7eb6-46a0-ade3-189ea03932d9": "24a5c591-9393-40ae-a091-96b52cb59493",
-            "919076cd-6e83-41c5-a0cf-b3a96ea1cd90": "2cd2c28e-9d55-4acd-a3e4-88cc990690e0",
-            "4c701c26-dcbb-4c92-9114-28a6edfec043": "a3a22662-5b72-4622-a3cd-bfdb13288845",
-            "2106f54f-d9d0-4d2e-aab6-cd85cf3b6421": "f990dc1a-a371-46f4-bd67-4b9a38049aa5",
-            "0137a755-01cc-42f6-9690-f04879e24041": "2ad3030a-c67c-4ea8-af02-b981c5cf63a6",
-            "9f502f4f-eb87-432e-93ff-cbffa5b5b7fc": "93ba5423-4895-4a50-8267-7cb5a33d78fc",
-            "f284ff59-dd8b-4031-b366-08cc148f39e0": "00a72ba4-aa26-4c95-b23e-69855dfd85c1",
-            "83455512-98b8-4ad2-8c5a-a3fde4bb80aa": "cc691b7e-99bb-41fb-a3ab-cfac4ee568fb",
-            "75a0a0d6-33d8-4988-91b6-9d603e26f28f": "1ef9de1b-5112-4f81-abec-9e8a685348f4",
-            "db5d308a-ae64-4c30-a1c5-df606e82e5ab": "96502ab9-252c-4adb-b758-60cee674998c",
-            "6288e097-512e-4357-b7df-a4b92720df66": "d52b0add-fcf9-4b32-bcb5-daab3590de27",
-            "332f9545-03f5-4093-95c1-1bee478ed129": "aa7eb12f-0724-414d-ab7f-13b30e15f236",
-            "43704340-7dda-4781-89f5-15a11e24893f": "b91afbd0-08e3-4357-8a07-133b84488b0c",
-            "742108fc-3e65-411d-a59e-8f49c1a8323a": "32e2bf69-49bd-400c-9cda-f283b527e7e4",
-            "b379672b-3a5c-4d49-b4e4-31ab6215f93d": "e1715438-ae74-4195-af1e-bec2a945880b",
-            "44cf3fd6-5dfc-4d73-9d18-8deca5a1a7ac": "2fbe8668-4ee0-4bab-b6b3-a291062a5fdc",
-            "cf746bec-dae5-44ab-bd22-0da0f8708e0d": "d3498d10-2878-4f3d-9ea2-e18f27859798",
-            "9769cad2-ed00-48e2-ae2e-da05d8ea170f": "dff2f00f-9cd4-436a-af26-4cea892a982c",
-            "9363e644-258b-467d-99cb-3667939ce31e": "b5be884b-2ef3-4f7b-b6ac-b6c3cb6f7eb2",
-            "a36d410a-aa7e-4e66-a078-d93b8f17e9ab": "f93d7357-f01c-4319-bcc8-47f577d78b1c",
-            "c141a28b-3cab-4e46-b918-1ceb3b14f5c6": "a31ef45b-1fa5-431f-aa65-2eef5208bf04",
-            "a247c7f7-8b94-4d71-80c3-800df61167cc": "9a4c5d3c-6834-447b-9973-50a8d89c2b19",
-            "d56396ca-d633-4b4c-9ce7-3bfbd29dad8b": "87a9e48b-8a11-4498-ab4d-a1c979e8a595",
-            "1a5fa64a-aaa7-4fc5-b962-ae44feb45ecf": "4a135482-b862-4ccc-8491-0af40fe65f9e",
-            "45281484-31b3-4e17-bf05-d8da347802dd": "ac6a7098-c3d9-4f70-939d-1a73c359439d",
-            "aa6494b7-491e-481d-8bd4-fb91f58257f9": "fe5fc86c-d404-408f-92dd-0234ac512d71",
-            "ecf5dd6a-570c-4d76-a32f-dcf4528ab398": "7dd13a65-c218-4aae-984e-c2824a0505e0",
-            "9a4e7e95-d41a-447f-98af-71c6375f2eb3": "97d9e0b7-b496-4b29-83d5-c696885d5a25",
-            "6ae0278e-4c17-494e-a9c1-d26c023c0439": "903ed6b2-0f8a-44d6-92e2-ad9b3110340d",
-            "966b5acd-cc25-4385-a3f9-b69e1830acf9": "2e959114-36c8-45f7-a2e1-cb3c15a03ad2",
-            "97f8c02d-e6bb-438c-b33e-6d9cc479659b": "22bc1bec-a9ec-43c4-9172-6303d43a842b",
-            "1301830e-0cc6-46e1-8069-2ad2d3bd449c": "15fbdd33-9ab9-4396-b28c-21665313dc2e",
-            "ed98c4b2-4d0e-4cf1-959f-adc02ff3ce0f": "88334fab-cf8c-48ef-80de-3508ceb80aa6",
-            "6ca9339f-a65a-4db9-9ec0-e12fe95031c7": "dc375626-7206-4432-b22b-54e9259de9d2",
-            "597d88eb-f1e4-4f2a-b164-346092fecdb4": "510656b2-71bb-4b40-a18b-37eb5590f08f",
-            "54fd9b7a-112c-4d5d-a25d-046fde516c25": "c989c6a6-b28a-4102-bd44-a2598a776cd8",
-            "e86539db-6ad9-4918-82cc-d9a9cc29b786": "7933eef7-f1f9-466b-bfda-66a329c4ffdc",
-            "e913eea4-96d5-458c-905d-2bfeec89355b": "2056d442-fb99-41ba-a1f7-f06a08536de7",
-            "804e3c47-d215-4088-9cae-648f9122e987": "99f8909d-ee64-45b8-93b4-d66d5d79bfb6",
-            "5ec1bc9d-0759-4249-91fa-1f33a45d4fed": "05bea6d0-be18-4a2f-9b9b-f0bf20eca9e8",
-            "1b8b797e-bc59-4d03-b51a-373a1dcc1e40": "c7a1902c-655d-412b-a991-44f71e7a909e",
-            "d89f39a6-6f8d-4991-8fd4-943534088744": "56108f89-fef4-4f5c-990a-f23c2f08cfd6",
-            "281d74fa-185c-4610-b2b4-fbe82fb541bd": "5d0a6493-0f2b-42ae-a730-e4f0a543b7ff",
-            "1c60e6e9-bd23-4632-b49a-8d73049f45c1": "00e7eda2-6304-4f12-b2ab-b5f0380c5265",
-            "70751953-89c3-4255-8ab0-ce289383ab43": "726ef850-7672-4d10-9324-449eaae0533c",
-            "078317c4-5b30-43e4-8b63-6c7332abf473": "9600d502-41d7-4af8-934e-d9e38a6f3793",
-            "d017c8ed-497b-4584-abdc-d3f4c859ecb2": "ac676c5b-6639-4766-9155-2e6d96f75d5c",
-            "24dddfc5-8eb9-4a08-b139-b4c63837efec": "18905ad7-bbeb-4a5a-95cf-5cb2fc56534f",
-            "10274a18-a19a-4706-be58-4a1d6135521b": "1924fa90-81cc-429b-b752-518a5f34a606",
-            "04449ca3-1c26-4614-804d-d3831d6bd938": "eb4f4c25-26c8-4d5d-a04b-1e78e23bb059",
-            "bd2c8887-b24c-4c4d-8c76-8237d2e6d7c1": "834e69b2-21aa-4036-b95e-93c6e89a649f",
-            "686c7545-b5e7-4922-8fc0-501e6a260ee4": "ce22e054-dee7-4392-8c91-2883a7dcb69a",
-            "3cd9574a-fa14-4b5e-9993-712a5dfe5490": "3c60ec6d-0db4-46e9-a590-4f813566fd98",
-            "3161581a-658f-4619-9155-8174d295af9d": "98e17a29-5a96-4e0e-bd57-4115930712f9",
-            "7cb64b06-09cb-4a60-b832-19fe02716b63": "71614066-c345-45e0-878f-cee228eb77b9",
-            "23918373-8952-4c92-9015-3e258db12399": "a215b194-c378-4737-8b9c-e11569f29c07",
-            "e62ae7ed-2c82-4f1f-8f10-077a3d926cae": "570c2e97-61f2-4fb4-acfe-5f4167a23638",
-            "af24f9bf-80fd-4fca-b06e-01c5a45916e3": "49423c73-117b-455c-b6ca-5ae8fbe29225",
-            "e980f2ee-3435-40f2-b163-6758d718a1d1": "76f97f84-30e4-43e0-93ca-0c2f3089ed4a",
-            "66d345b8-3c7b-4417-ac5d-629826e356e5": "7cc5c2ab-c01a-4c23-b032-dd9f5f92085c",
-            "1dce087f-52d2-4156-a7b6-b59ca3d69a66": "94f513a6-5e11-40cb-aa3c-38bea8a813b1",
-            "5f0a789b-e921-419f-976d-1c34ab39b37d": "ed1152cd-d909-476e-bad4-5114b75e37e8",
-            "1d4d1f4d-438b-4f97-bed2-52c2be48b069": "0b75aa36-5a16-4675-926d-aa4e279bc755",
-            "251a7cfd-62ff-4a9e-9e89-3d63e28f2a47": "b590ff62-c4ce-4c02-937c-62be7a7029db",
-            "a8e093d8-3bd1-4b7e-ad19-6224c6f4deab": "e0a36d00-38f7-4f86-87d6-2a3241997f05",
-            "aa2de62b-a609-4440-bc5e-60d150909492": "1fae2fa9-c0a4-4d45-b707-ff55e9c4e944",
-            "e0f2090e-c849-431f-bbbc-882e83f21bf1": "0361bc63-9ca6-4130-a3ed-6888a9525c4b",
-            "3e075784-a446-4880-8ab0-074a47e91871": "90880596-2042-460f-a442-5097cb1a64d7",
-            "b7f68193-dc56-4bd5-af99-7997f9a94660": "f070f970-01fb-4155-8bf0-f08ea6e9e19c",
-            "d112cd88-6bb3-497d-b472-b137cbf0e76a": "8a02bcde-2fed-43dd-ad7b-21b188341a43",
-            "184a9eae-1159-4500-b9de-d58ec0c80960": "13f44ded-6a12-4014-8d0a-b27188b52fea",
-            "ce04c33d-f7d1-457d-a949-75457bb91807": "71ac97c7-eded-4c64-8ce2-5d336b3b71c4",
-            "356dc1f8-e074-4a37-8699-87c43a2c9ccf": "35e114fb-36e5-4cd4-a814-3042b3e0930d",
-            "f17f465e-8b6e-4c0e-a4ac-c6328e98c3f0": "f31aae12-79af-4917-9e45-11eb824b3c70",
-            "cdfff84b-a681-45e3-8d79-deab58187f52": "09dfaf72-67ed-4b82-ad01-15590139e774",
-            "a0ddb417-90d4-450a-a5b3-bf3e99d1be13": "e5ff13d0-c423-443e-9f3f-5c0d940249c8",
-            "d6ac2e02-f56d-4517-af30-c627d0d602de": "e46ec43d-c8b7-4564-9b98-4aee5b93ba89",
-            "adc55492-2bec-446a-a6c0-89b494297079": "bb3bc400-a57e-4d75-b59b-d103d799eb84",
-            "b7f026ab-26ab-4f5a-9e1f-3a982082f2ee": "9c31d610-c9c1-438b-9a24-3f9560b9822b",
-            "5ebcac2c-3eb2-4309-8c90-e348ff434d06": "346bdaf4-a16e-4787-b2ca-13d3800843dd",
-            "4f5fadf4-061b-49bc-8539-4788ec3c0120": "7b13a486-0b0d-4c14-93c3-777d7cf20853",
-            "983f066f-2d81-460a-8688-efeb98877ca6": "ea7c2879-5052-4cfb-8852-bdb3c25ea9d1",
-            "67e5095c-1bc6-49fb-9d53-21216bde8aed": "29fbf9be-77e6-4ac4-aba9-97ce68feeec0",
-            "10100128-eb88-4269-a10c-cd7df71b297b": "0b751472-0f1d-4eae-8d78-a3dcfa5a8a05",
-            "493f27db-d0a4-4128-9626-03a05519553b": "63d324d1-0b8e-4df9-b2de-3125a84e802f",
-            "49c9d1b4-f413-49f2-8798-3c84c2abf96a": "d9541eb0-525e-4005-ba52-8e33b8e0c6c2",
-            "df65b606-ab30-4721-9a13-838b26933acf": "11adeabb-67b0-4641-993c-eecbb9a77729",
-            "8282256d-d230-4d31-9621-93ad9c41c7a1": "861d99a2-dc97-41f4-8a75-c455a88240f2",
-            "d990540f-d10b-4091-aceb-2bac219d4237": "b59064f6-fd08-4a39-aa44-b3f37d6bf452",
-            "b893b170-a219-4a7b-a5c1-0569699b55c3": "268be220-80bf-495c-a1b2-c9b613aef23a",
-            "9078c4c3-2c60-4a24-9b2a-ab248b57ddec": "31dbc345-fc84-4968-9a60-245f9b2c2706",
-            "472d4f0e-f831-456a-afd0-c6b44d0680dc": "d331e1d8-e0fc-4411-9ec8-cf180b887379",
-            "a6e1adde-9012-4027-bc2f-629c5c45130b": "70eea97f-e3da-4d98-bb8d-3d7a5867ed99",
-            "87b9721a-941c-4da2-98c0-502b5ee845a6": "875feb3d-fc48-4841-aae1-354733352831",
-            "b593f3fa-4d85-4a61-ab31-64bcb6b44a61": "5df25c85-0586-4aae-add2-892b9500832c",
-            "18d95410-6495-46e1-bd0c-b0eeb31a9a91": "72a91ab7-c47c-429c-a9d3-1ad75395beb3",
-            "ca8c6717-c16d-46ca-b53c-6a33925e1c88": "f215cdbb-6fb5-4e81-95bd-6edd3739c7a7"
+            "6c737415-3792-520f-b7df-7e2ee1397d25": "b13b8883-7125-4637-ad50-d1ea7275fc8d",
+            "ac24fe60-aee1-57b8-9df9-2d8daf853133": "5dee92b0-1c1a-4822-a516-0a39994a52a0",
+            "2297390a-8354-5736-b6fc-dcdd1a2aac52": "af3e9eae-a1d1-485c-bad6-fa09ef746805",
+            "ca5adc5e-1d0d-50fe-b508-4cfa6e6e9b9a": "b33fa483-f169-4716-9531-b704ae54eb06",
+            "3c772d38-5e12-5509-b9dc-c77ad99a7fc9": "9b516f35-d6c9-435e-af7a-ce1b4a7ae83d",
+            "d4ac9b91-9745-51df-abc9-985a9b7a592f": "424f91f1-6342-4332-b8a1-c403e1e2d657",
+            "94913e17-fce5-4fc4-b774-70db38f1fe90": "98e287fe-bc01-4efd-8d7e-34b65321f382",
+            "3c9bd9f5-0e59-429d-b271-964b602b61b0": "7657e9a8-7ca4-4cb7-9302-d541a9233688",
+            "23127d49-c2a8-49ef-b250-1964655abbee": "c6c7b776-0b10-4a48-bcfb-314f5c36d542",
+            "08996d2e-80ad-49a9-9848-a10f03d87a93": "8eea7efc-ab34-4d63-8777-37e45fe83951",
+            "cee59d09-52ae-4285-829a-776716ad72a8": "b5888928-433e-49f2-b248-b1a852a4b381",
+            "c5606871-fc76-4894-8649-e3da3af97ace": "4b5f96b3-5a16-4ccb-99ac-9727660e2d9e",
+            "d62e1e24-f043-49cf-b388-fe292169ed72": "7fa83b64-5a60-4de0-9e4d-135c962d2c55",
+            "4e7d4e53-775a-45ab-8c71-267899f9e6cb": "bdf6c25c-e070-4008-b4d3-02ea6a8bbeb8",
+            "c2d33198-4d41-5b5b-afc3-91a86ceecfbb": "22811da0-e751-4d60-8818-921e17ca3d0c",
+            "a5002e38-180a-5a09-8311-56ba4b8fbd80": "b99ecc40-169a-4dd0-aa2a-372dcc30441c",
+            "c0c6afea-abdf-547e-b126-58bd06623424": "60892aa3-f07e-48d8-be2c-b8c4b3e6f442",
+            "8e915c12-5cda-531e-b917-d20eb859620f": "65f4e11f-e4b3-4f4b-8f30-bb133c4a7f63",
+            "99b471cb-a5c2-5358-89dd-a9ed202b10ab": "79056380-39e5-4ceb-8b89-458bd0581afc",
+            "74039bac-cc56-5b57-a7ab-784424649dce": "5d18eea5-ac53-44ea-b1bb-1197b60f6776",
+            "e906e372-8d89-527c-899c-eb9f7b7a9ca3": "55a5147b-64f3-49f2-bbea-d15876d7cfb0",
+            "b4e06f91-7ec8-5560-a527-0efcb4a7e738": "57bc1c35-bde4-4496-9ceb-2224a7b04c58",
+            "44b90d7f-f344-5c03-99e6-ef8d03fc360f": "f04e1af9-ed5d-498b-89b6-700afbd1f4f7",
+            "fffc16dc-f3e9-4d2c-9695-5a958c3a6edc": "ef0bddec-6d61-4547-b1cd-f9982fa557b6",
+            "17b08799-c731-4fbf-bce8-433c435a9703": "5fc31b9b-ec89-4edb-af40-bd9f6c7e3885",
+            "4bb8b13e-6333-46be-a735-04a24c88aa8f": "79df47cf-a47a-476f-aaca-cbba6ab20a61",
+            "434563d5-df4c-4b5e-b4ce-8a53f370552f": "02e575ce-307b-470d-9dbc-f891cda48bbc",
+            "695c33ff-f2d9-4d08-8c41-717e47a9aa30": "861a0023-e0bf-4269-830c-a9ba603ab440",
+            "4b107942-b320-4f00-b28b-c99eb968b140": "11bdc951-5969-4c47-aa1b-8ed69d7f56b1",
+            "7ef1ac45-d721-44e0-b632-adf28509331a": "7a1a5e19-8fbd-4ee2-b5be-ea989b648e5c",
+            "c217af41-920a-425e-859c-4b010ac728ab": "490fc909-28f4-4923-b442-f6a6690fe9c0",
+            "f66b4f2a-fbf2-4087-8c1c-7b33d9b75727": "43a4e246-cfa3-4448-9226-9495c7dd8a0f",
+            "9c08f743-e03c-4fe0-88c3-c697a4a5bf92": "1dcc5a77-3f99-4f2b-ad7e-303e1eb6fe68",
+            "057828f9-54ae-49f3-bccd-ef7e3a57a5fb": "0721ccee-c5a4-4ae0-b723-dc6a84d80348",
+            "02fc7ec5-3a40-478e-acad-6e2f3ef5dacb": "9280a7bf-ce24-4d3c-af97-988b1ad98530",
+            "14518d1c-008e-4030-866d-760428ee88c6": "6d56d707-96f1-452e-b412-b3612c19bcf3",
+            "b5b89e59-d508-4ea2-9c02-3dbe24834819": "e8d6e8e4-13ee-4c3b-bac3-2f4709a97d1b",
+            "53431719-c2ab-4ec5-834c-c732fe1a87af": "15132743-0fcd-455f-91d1-bf113e723f35",
+            "19969f14-152f-499d-880a-2f211ea88676": "4f970ee7-8dbb-4c49-9826-d167a0fc39fd",
+            "1e1507f1-6429-49b1-8616-84ef99b392ef": "16ae7107-7a97-4b44-94c0-e72a746c9108",
+            "18137151-2f2b-4e0b-91cb-50c67e473979": "8b6080ea-937c-4b92-b0da-9297d32a9584",
+            "30431316-af29-4d1e-8261-53ef4f72d837": "f1edaef8-2a93-4134-9f03-4abe44f75667",
+            "ebe34d7d-7ea9-44fa-ba61-053f8c0e2749": "ad9b992b-a893-4a14-8d90-f9f39eac180a",
+            "9b687d2d-3289-450a-9206-c37d81184550": "eb4a0765-695c-4565-a42a-eb9ceab2db0e",
+            "6e4ec123-e213-4ad0-aaf2-b20c6c0a58fd": "d9818050-bdd5-4350-be7c-143e422e6689",
+            "6bae451c-f773-4a05-afea-9754e44f888d": "1d92f3c1-648e-4ca7-b4d9-062b1732453c",
+            "2e93e8ea-728f-4717-aad5-03d3071d0dea": "90e8e7e4-4a2a-4f87-b79b-93355f15c25e",
+            "ef8570d1-58e5-4c6b-ade1-3b8303e92112": "c981ad24-ed46-4eeb-8881-691f190aa6eb",
+            "8f260da8-976e-4ff7-a5a8-aac8e5e39c69": "8e9c5388-5606-49ea-a4f4-e626fab654a5",
+            "7e307842-45f2-4441-89d5-07e982b26dcc": "22dcaf56-3c97-442f-9c39-183537d32fae",
+            "175aa908-cf3d-45fe-84c9-44be524c8a02": "3a928d39-d73b-4bdc-9f19-f2ce8e0f1878",
+            "8e6678f4-d5c0-4d9c-b33b-a61bceefbf40": "afa3f819-6b9d-4c77-bcfb-e310048c2135",
+            "e1b52e02-7976-4b0e-ae87-e8b46ca999d7": "9bfef84b-4bd1-4bb5-9b4c-e090fd51b157",
+            "01b409b5-9df4-42d6-a172-26e6b2961493": "b697731b-f2f8-4728-b5d4-67118bb178dc",
+            "431f8ebf-9279-4fbb-aff3-a9b403e40a22": "25df8ca0-8017-4487-b2e5-20755529254a",
+            "3810190e-60d6-4848-854c-5c7ef98ca8b0": "3f894fed-92d2-4447-ac4c-31b0fe20385a",
+            "f86253d5-b87d-41c2-907f-eea8e1b86e9a": "14283fee-7ada-4576-aaf5-a23347ff4b73",
+            "400e229a-2152-49b1-8dff-1621c46868f5": "7178819c-7785-44cc-97c1-5bab6eb9c802",
+            "0f369387-1cca-42b1-bf61-6f8c3da4795b": "749c3b99-2085-4d28-9c29-921d357aa0f9",
+            "dc68297a-5666-4f57-837a-91d16a72cafb": "95c30618-1910-406b-8d1c-6419045aa77b",
+            "3133100d-991a-4d41-8290-9d9d278b2c03": "0cebc005-d183-4d96-ac8e-eb5ab0725afe",
+            "73d3e65a-5ee4-4b22-8c07-5d83675723be": "fc6485e9-0f85-4123-9ec3-d6a17a99ee9b",
+            "46b64495-0e39-4c25-b979-f3d23b1f0204": "11566071-4c32-4c3b-8670-b43512c4fad1",
+            "9e6c6641-4cc2-476c-a053-b7d7f04f08af": "2e16fa42-52de-406e-bc90-0c4b166aafcc",
+            "94956566-d960-429d-b20e-c8c0b0cbb286": "775d259d-ea5d-4ab1-84a3-8bab637e8306",
+            "1a2971aa-0512-49e4-bcd1-06e655d2aaef": "0f420e4e-d58a-470f-b104-fbab5dcf36c4",
+            "5fc48b11-219f-494a-8a96-0fafbeb1e05b": "22c2b687-3e26-4d0d-b317-dca692346829",
+            "141b5036-0997-4a74-902e-0ca106e6ef19": "e246e01f-0b6e-4a0d-aa4d-85345235f000",
+            "6fb2cc9d-539e-4d25-b422-0e8ae129a17b": "60e52627-97d8-4b47-be38-55465fcd403a",
+            "da7cdf02-6483-49dd-9490-3012c5046ed1": "fd0d8002-5bb4-4fbd-99e6-ca536792cdb0",
+            "273eb14e-c18b-4865-bfd8-49eb6ba52b9b": "bb75227b-6bb8-4e18-9889-6dfcbf1cfb02",
+            "5932bbf8-e6a4-4ca7-b9df-d3c21364abc5": "afb0203a-44f6-411d-8952-d055676b587c",
+            "cd9fb830-6ba2-4749-96f4-e9c5681cede7": "ea26eac0-9505-4a05-a6a5-dda664adeafa",
+            "8e7c6233-25d9-4971-a766-d71bd9f48e3d": "6be0aeaf-b415-4a2b-8668-3c5665ef63c9",
+            "23565bed-5bbd-4de6-9219-cd7e21042f59": "0522cb8d-a749-4f85-84ef-5f686af53194",
+            "9453ef56-e904-4f0d-b66b-ca64a6744fc2": "523a82ac-d122-4fbd-945a-ed577c734226",
+            "18793473-84d7-48ce-b5c2-4af17376de69": "cde14a6d-fd79-4e11-a13a-85ebca3c859e",
+            "2b76106c-5645-4423-8f43-40cc0cce0b69": "82fd1743-f768-479b-b9cd-5955541c6ef3",
+            "38cc7c20-6b08-4a54-a8fa-c3abefe19bb9": "8e222838-9323-4386-a760-3331f722bbb1",
+            "de6e9555-d7e5-454e-8d09-881a14b513b9": "1b9a5530-4a3b-4665-9e64-a694af0ffcf4",
+            "37752b07-7f3e-4c9e-bc42-03a7266e8e05": "c984b286-d89c-46a3-a075-d6c282792ad7",
+            "34c4b371-8f7c-46f8-b632-1e6f1194c9cf": "7927b544-d713-42ba-9fc4-c3972e45e1f2",
+            "721d95bc-f4f9-45a4-a179-1d2948d436fb": "0ff1eb78-7346-4b36-81d3-ddca00cfc4c0",
+            "75fe922c-f44c-4886-8ce7-63294e3f161c": "ae3b1ab2-3df8-4bfa-8e96-807c8cf30df9",
+            "96ec4e16-3fc9-4b81-88f4-21b4a67130d1": "f23f1026-0fb3-42f0-b1fd-8dd6726373d8",
+            "f305cc2d-01e1-4c40-a32f-bb612b38d89e": "57abbefa-3312-42da-9aa7-4b3341181a1d",
+            "e9ad6eb2-2bb6-47de-a11f-6cec15908d88": "4d73ce37-2575-4ff4-b9cf-d42dc11851c2",
+            "456e9be2-433e-418e-b244-8d4c3b4d2d80": "80aacfc8-3465-4f74-b617-3802d233f018",
+            "46b6ed00-39ad-41ab-9c51-101eb1b2761f": "401e5f77-8290-427b-a799-129e351ed2f3",
+            "6d7971cb-48c1-4932-8d1e-2378960fb8fb": "669f471f-7ae8-48cf-9b27-ee9194635cdb",
+            "1b4a989e-837a-4c22-9171-162e552b5499": "43e1a97f-8e4b-43ef-970d-217f1fcf6b9a",
+            "173a1c73-4d5f-48c9-923d-4d39d270b158": "7c3eadf1-1cef-48a2-8121-f372109d8f79",
+            "0ec98bf5-ae99-4cc1-8797-d19a0051f2be": "e7db5c94-6675-4e58-b324-6c06373b031f",
+            "022583a0-264c-420f-bcc9-8d151c82fbea": "71bf08f7-fa1c-4caf-a0da-427cd73ed0ab",
+            "ccadb394-f44d-4f96-8bc4-ebb3d507fecf": "a5ad84e4-35ad-4b16-b329-5ac144444b57",
+            "01b7a8e9-dbeb-4ade-b598-0f73f4a3616d": "e98a3724-92a3-4500-9a56-e8492bb9f40e",
+            "4bc3c827-1dd8-4b7f-8391-e4c8aeff47c9": "6a0157e1-a518-4fa6-80e7-1271e1f91f1d",
+            "445a1238-1844-4f6f-a3c8-41376ac35d94": "e3cecd05-82cf-4c26-9b06-18038e59a7f4",
+            "d611e560-35bb-4f89-97d0-8e872c116c4b": "beca1cb9-4c7f-4473-b638-0b58bf2c5ebd",
+            "751d8b57-37e9-463e-9fda-e0b94657dbe1": "3ad9eee1-662d-42f1-8037-1d2671f6412e",
+            "d42e73ed-6c2e-4a11-b92f-dc71636c3df9": "9806ca63-804f-4f3e-852d-6a92e9521407",
+            "f7f7f249-8f09-4f4d-b02d-3fe10aa2dfb5": "03142869-3178-4f3d-b894-ab6f49cffbd4",
+            "22fba8a6-dc6f-40b1-9f71-f5e18b58aa4f": "6b86be5f-10db-465e-9b74-03edb2fc3f53",
+            "4e6c90ce-d440-422b-8496-dbbeda3bbbf7": "5457254c-1b7a-4f0f-8a07-a8f88495d85e",
+            "268448f5-aef4-4f33-bd9e-0642bfba7bf4": "1db87ad2-de59-4f06-aa11-b92bfc67d110",
+            "a6839ea2-5d5b-441a-9e82-e026dd5b857f": "280c6e64-1568-4c77-8ac8-08e7b759a772",
+            "b32661e1-4178-42ac-a315-89897841f891": "fa473240-7fbc-4151-8cc0-4422a7e08737",
+            "5a2cd992-5d3a-4b25-9611-893e95fe029e": "47fd9e75-75e0-4cc5-8c8e-736aafe42ed0",
+            "5737a48f-b593-49c7-a757-be664682d36b": "58615dcd-511e-4802-a3fa-2ac173888d04",
+            "a3a9a0a4-6144-448b-8276-8acf8aaeb59e": "0f0a0b4b-6f92-4696-aca4-d977efeaa8b3",
+            "18e0bb20-75b5-4442-b675-b92686ec91bb": "32b2e506-2d38-4aae-892d-6c454e782f7f",
+            "baa5c79c-7913-41df-a64b-2051dc737c91": "5f5b9d1d-f7b1-4615-8372-888d6ffe5596",
+            "1b2772a2-3c95-46d3-8ebe-8383997c555e": "7e3b0a44-a858-4f81-b0c7-6ffd72f21416",
+            "d3162515-2ddc-49e4-9a47-a1eb60b63643": "e8e65395-dd1c-4da1-a249-f9fc05d3882c",
+            "165e35a7-adae-4a31-8da2-52260bd3d7fa": "ed3aee49-b9a9-4738-9e52-875d218f243d",
+            "fd29c936-ae98-4ca6-9947-3245ecae023d": "4841c5be-7d4f-44d3-b621-76d4b6d8fc93",
+            "470a197e-6517-4ae1-b85d-6c92c2defeba": "5203acb8-98f4-4529-b1ca-4c6897db87db",
+            "7d537b19-edc0-42bf-a91b-4383b2a2e225": "ad70e1cb-7e8b-4cba-ae0c-996b39a6f27f",
+            "4af42df0-f34a-450c-9a1c-3eba9b3be42a": "3a54b5a9-9c27-454d-a346-0e08b3cef843",
+            "9cf93aaf-e5a2-56f5-83a3-ec2c234f3557": "9361ade9-6c3e-46b9-877d-7f02ba18466f",
+            "cae784af-73bf-5430-a4f7-351fe966595e": "1f32a41a-e886-4385-a9db-355f9bab777a",
+            "9c83baee-ef37-5284-9015-dfaecdb4db1b": "6dcab4a7-6ef6-4edd-8f48-25c5a01e9730",
+            "d23ffe9e-6048-5dec-bd01-ec8f1e37d6a5": "1fef0d47-c31f-4b5c-bf44-7567b8a397f7",
+            "c6c796c5-ce8e-55d4-ac55-a22b1cdb28b1": "c6406cbb-ec83-4832-95df-7e753069bcc8",
+            "42d7fbbd-e82c-5cd2-8fa8-4e2a806db6e3": "d55ce88e-231f-4611-974a-77f696acdd0d",
+            "624cf94b-e8c8-5988-8617-3e0fc2487be0": "e3f28826-65e8-4262-9e1b-7f16a13b7040",
+            "29b67ae1-f982-580e-af3e-b389d68dfd09": "cb7c5225-d940-476a-a2fb-64e1dc04dd49",
+            "d70c2d3b-56da-56cd-a441-5b54209456cf": "dadfe86c-b193-4834-8215-463dfd450fa8",
+            "b5e85abc-39f7-571a-947b-fa1c996b566a": "bf86b3a3-978e-490a-b833-3c191fc94111",
+            "7dc6be30-b232-5e59-9ff5-5611bbe4c5b8": "dda7518e-b2c4-4b19-99fb-a350fecc3c19",
+            "1b414d74-6576-5183-937c-7f287acab1c9": "1896d541-99a7-4d35-b4b6-3498c15593f2",
+            "e8135f5e-4d67-50da-8aac-a97a4bcc0dc0": "519e7f3d-9b75-46a2-9d15-7f4dd246081d"
           }
         }
       ]
@@ -1472,10 +1231,6 @@
   "ResourceVersion": 3,
   "Title": "gunsmith",
   "Description": null,
-  "__references": [
-    "facepunch.9mm_ejectbrass#58914",
-    "facepunch.v_m700#125833",
-    "facepunch.v_mp5#125832"
-  ],
+  "__references": [],
   "__version": 3
 }

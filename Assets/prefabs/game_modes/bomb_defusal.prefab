@@ -18,7 +18,7 @@
         "__type": "Facepunch.GameMode",
         "__guid": "3d316172-22ea-48e3-b3c5-244ef04d8ba8",
         "__enabled": true,
-        "Description": "Security run down the timer without the Anarchists planting the bomb. No respawns.",
+        "Description": "One life per round. Arm the device at A or B, or defend the sites and disarm it. First to six rounds wins.",
         "Ident": "defuse",
         "MaxBalance": 16000,
         "OnComponentDestroy": null,
@@ -84,7 +84,7 @@
         "Armor": 0,
         "DefuseKit": false,
         "Helmet": false,
-        "LoadoutsEnabled": false,
+        "LoadoutsEnabled": true,
         "OnComponentDestroy": null,
         "OnComponentDisabled": null,
         "OnComponentEnabled": null,
@@ -337,7 +337,7 @@
               {
                 "__type": "Facepunch.EnableBuyMenu",
                 "__guid": "84ff0616-05f1-4774-a390-ce9525baab9a",
-                "__enabled": true,
+                "__enabled": false,
                 "InBuyZoneOnly": false,
                 "OnComponentDestroy": null,
                 "OnComponentDisabled": null,
@@ -717,7 +717,7 @@
                       "go": "83b2287d-8fa6-40d2-8fc3-89d593b38ae6",
                       "component_type": "StateComponent"
                     },
-                    "MaxRounds": 24,
+                    "MaxRounds": 12,
                     "NextState": {
                       "_type": "component",
                       "component_id": "f9e6010f-47d4-4ed7-8b24-ecfd9853c9e7",
@@ -748,7 +748,7 @@
                     "OnComponentFixedUpdate": null,
                     "OnComponentStart": null,
                     "OnComponentUpdate": null,
-                    "TargetScore": 13,
+                    "TargetScore": 6,
                     "TerroristVictoryState": {
                       "_type": "component",
                       "component_id": "7fb24345-0d07-464c-9e13-968831fe9f9e",
@@ -848,7 +848,7 @@
                         "__type": "Facepunch.RespawnPlayers",
                         "__guid": "1b1b0c27-e7c8-42c3-b0dd-25a7529129f5",
                         "__enabled": true,
-                        "ForceNew": false,
+                        "ForceNew": true,
                         "OnComponentDestroy": null,
                         "OnComponentDisabled": null,
                         "OnComponentEnabled": null,
@@ -948,7 +948,7 @@
                       {
                         "__type": "Facepunch.EnableBuyMenu",
                         "__guid": "7f496705-e715-4463-8b37-2ea16b08e703",
-                        "__enabled": true,
+                        "__enabled": false,
                         "InBuyZoneOnly": false,
                         "OnComponentDestroy": null,
                         "OnComponentDisabled": null,
@@ -983,8 +983,8 @@
                         "DefaultDuration": 120,
                         "DefaultNextState": {
                           "_type": "component",
-                          "component_id": "81da66d0-027a-43f8-9306-88dfafa3a3f8",
-                          "go": "e876e4bc-4c3c-470e-9786-6a750381c4c6",
+                          "component_id": "20fa6051-a73b-4087-9a12-2f45bb6fcbcc",
+                          "go": "fd005496-e87a-4ba9-b8cf-349050d2c97a",
                           "component_type": "StateComponent"
                         },
                         "OnComponentDestroy": null,
@@ -1112,21 +1112,9 @@
                         "Team": "Terrorist"
                       },
                       {
-                        "__type": "Facepunch.PlaySound",
-                        "__guid": "02986e9a-2563-489f-b028-1d284b6f7ffe",
-                        "__enabled": true,
-                        "OnComponentDestroy": null,
-                        "OnComponentDisabled": null,
-                        "OnComponentEnabled": null,
-                        "OnComponentFixedUpdate": null,
-                        "OnComponentStart": null,
-                        "OnComponentUpdate": null,
-                        "SoundEvent": "sounds/music/round_intro/round_start.sound"
-                      },
-                      {
                         "__type": "Facepunch.EnableBuyMenu",
                         "__guid": "c9c2faf2-0ea5-48d5-9fef-e501a9fcf3d5",
-                        "__enabled": true,
+                        "__enabled": false,
                         "InBuyZoneOnly": true,
                         "OnComponentDestroy": null,
                         "OnComponentDisabled": null,
@@ -1247,7 +1235,7 @@
                         "__type": "Facepunch.ShowStatusIcon",
                         "__guid": "d0a63684-f740-460e-aa80-687424d55ec0",
                         "__enabled": true,
-                        "IconPath": "/ui/items/c4.png",
+                        "IconPath": "/ui/items/field_device.svg",
                         "OnComponentDestroy": null,
                         "OnComponentDisabled": null,
                         "OnComponentEnabled": null,

@@ -9,4 +9,10 @@
 {
     public Marker Marker { get; set; }
     public IMarkerObject Object => Marker.Object;
+
+    /// <summary>
+    /// Settings → Game → Hide Teammate Names, on by default: a teammate's marker is only its circle, with no name,
+    /// health or weapons over it. Put it in BuildHash, so switching it redraws the markers.
+    /// </summary>
+    protected static bool HideTeammateNames => GameSettingsSystem.Current.HideTeammateNames;
 }

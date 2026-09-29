@@ -38,6 +38,19 @@ def cylinder(group, name, loc, radius, depth, axis='Z', vertices=32):
     if axis == 'Y': obj.rotation_euler[0] = 1.57079632679
     return keep(obj, group)
 
+def card(group, name, x, half_width, bottom, top):
+    # A +X facing quad with a 0-1 UV rectangle, for the per-perk artwork materials.
+    verts = [(x,-half_width,bottom),(x,half_width,bottom),(x,half_width,top),(x,-half_width,top)]
+    mesh = bpy.data.meshes.new(name)
+    mesh.from_pydata(verts, [], [(0,1,2,3)])
+    mesh.update()
+    uv = mesh.uv_layers.new(name='UVMap')
+    for loop_id, coord in zip(mesh.polygons[0].loop_indices, [(0,0),(1,0),(1,1),(0,1)]):
+        uv.data[loop_id].uv = coord
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    return keep(obj, group)
+
 def arch(group, name, x_front, x_back, half_width, bottom, shoulder, top):
     # An octagonal shoulder makes a formed sheet-metal cabinet, not a capsule.
     yz = [(-half_width,bottom),(half_width,bottom),(half_width,shoulder),
@@ -73,7 +86,8 @@ for side in (-1,1):
 box('dark','upper panel well',(25.4,0,58),(3.0,36,49),2)
 box('metal','display outer bezel',(27.2,0,58),(2.4,35,48),1.5)
 box('dark','display gasket',(28.55,0,58),(1.1,30.8,43.8),.7)
-# The illustrated card is a thin runtime box with the existing decal material.
+# The poster (name plate, illustration, effect plate) is a 29.6 x 42.6 card; each perk gives it its own material.
+card('card','poster',29.3,14.8,36.7,79.3)
 for y in (-16.5,16.5):
     for z in (36,80):
         cylinder('dark',f'bezel rivet {y} {z}',(28.7,y,z),.65,.5,'X',12)
@@ -94,6 +108,11 @@ box('metal','gauge needle',(29.3,-12.5,30.7),(.3,3.5,.35),.1)
 cylinder('metal','selector surround',(28.5,12.5,30.7),2.8,1.5,'X')
 cylinder('accent','illuminated switch',(29.5,12.5,30.7),1.5,.5,'X')
 box('accent','status lamp',(27.4,0,84.4),(1.3,17,.9),.35)
+
+# Lit name sign on the top cap, far enough forward that the cap's edge doesn't hide it from the player.
+box('metal','sign frame',(18.5,0,96.4),(7,40,12.4),1)
+box('dark','sign gasket',(22.0,0,96.4),(0.3,35.4,9.4),.1)
+card('sign','sign glass',22.2,17,92.1,100.7)
 
 # Merge each color/material group, retaining one renderer per surface type.
 for group, objects in parts.items():
@@ -124,7 +143,9 @@ for group, objects in parts.items():
                           # convert Blender's Z-up geometry on export.
                           forward_axis='NEGATIVE_Z', up_axis='Y', export_materials=False,
                           apply_modifiers=True)
-    default_material = 'Perks/aged_enamel_seafoam.vmat' if group == 'enamel' else 'materials/default.vmat'
+    # The enamel and lamps are tinted per perk at runtime; the poster and sign get per-perk material overrides.
+    default_material = {'enamel': 'Perks/aged_enamel.vmat', 'accent': 'Perks/perk_lamp.vmat',
+                        'card': 'Perks/boltsoda_poster.vmat', 'sign': 'Perks/boltsoda_sign.vmat'}.get(group, 'materials/default.vmat')
     (OUT / f'perk_{group}.vmdl').write_text('''<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc29:version{3cec427c-1b0e-4d48-a90a-0436f33a6041} -->
 {
  rootNode =

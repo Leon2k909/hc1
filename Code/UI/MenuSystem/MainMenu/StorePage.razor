@@ -7,39 +7,49 @@
 @attribute [StyleSheet]
 @namespace Facepunch.UI
 
-<root class="hc1 landing store-page">
-
-    @* ===================== MAIN CONTENT ===================== *@
-    <div class="content store-content">
+<root class="hc1 store-page">
+    <MenuTopbar Title="STORE" />
+    <div class="store-content">
         <div class="store-header">
-            <label class="store-title">ITEM SHOP</label>
-            <label class="store-sub">Use Razed Coins (RC) to purchase exclusive items.</label>
-            <div class="debug-btn" onclick=@(() => AddCoins(1000))>
-                <i>add_circle</i>
-                <label>DEBUG: +1000 COINS</label>
+            <div class="store-heading">
+                <label class="store-title">@Tr( "ITEM SHOP" )</label>
+                <label class="store-sub">@Tr( "Use Razed Coins (RC) to purchase exclusive items." )</label>
+            </div>
+            <div class="store-balance">
+                <label class="balance-label">@Tr( "YOUR BALANCE" )</label>
+                <label class="balance-value">@CurrencyBalance.ToString("N0") RC</label>
             </div>
         </div>
 
         <div class="store-grid">
             <div class="store-item">
-                <div class="item-img" style="background-color: rgba(255,152,0, 0.2);">
-                    <i style="font-size: 88px; color: #ff9800; opacity: 0.8;">star</i>
-                </div>
-                <label class="item-name">DOUBLE XP TOKEN</label>
-                <label class="item-desc">Double your progression XP for 1 hour.</label>
-                <div class="buy-btn @(CurrencyBalance >= 500 ? "" : "disabled")" onclick=@(() => BuyItem("xp_boost", 500))>
-                    <i>shopping_cart</i>
-                    <label>500 RC</label>
+                <div class="item-img xp-art"><i>star</i><label>2XP</label></div>
+                <div class="item-info">
+                    <label class="item-name">@Tr( "DOUBLE XP TOKEN" )</label>
+                    <label class="item-desc">@Tr( "Double your progression XP for 1 hour." )</label>
+                    <div class="buy-btn primary @(CurrencyBalance >= 500 ? "" : "disabled")" onclick=@(() => BuyItem("xp_boost", 500))>
+                        <i>shopping_cart</i>
+                        <label>500 RC</label>
+                    </div>
                 </div>
             </div>
             <div class="store-item">
-                <div class="item-img" style="background-image: url('camos/ui/mastery.vtex'); background-color: #333; background-size: cover; border: 1px solid rgba(255,255,255,0.1);" />
-                <label class="item-name">MASTERY CAMO</label>
-                <label class="item-desc">Unlock the exclusive Mastery camo for all weapons.</label>
-                <div class="buy-btn @(CurrencyBalance >= 2500 ? "" : "disabled")" onclick=@(() => BuyItem("mastery_camo", 2500))>
-                    <i>shopping_cart</i>
-                    <label>2,500 RC</label>
+                <div class="item-img camo-art" />
+                <div class="item-info">
+                    <label class="item-name">@Tr( "MASTERY CAMO" )</label>
+                    <label class="item-desc">@Tr( "Unlock the exclusive Mastery camo for all weapons." )</label>
+                    <div class="buy-btn primary @(CurrencyBalance >= 2500 ? "" : "disabled")" onclick=@(() => BuyItem("mastery_camo", 2500))>
+                        <i>shopping_cart</i>
+                        <label>2,500 RC</label>
+                    </div>
                 </div>
+            </div>
+        </div>
+
+        <div class="store-tools">
+            <div class="debug-btn" onclick=@(() => AddCoins(1000))>
+                <i>add_circle</i>
+                <label>DEBUG: +1000 COINS</label>
             </div>
         </div>
     </div>
@@ -50,16 +60,6 @@
     public void OnNavigationOpen()  => MainMenuRoot.Instance?.SetActiveRoute( "/store" );
     public void OnNavigationClose() { }
 
-    private ulong LocalSteamId => Client.Local?.SteamId ?? Connection.Local?.SteamId ?? 0UL;
-    private string LocalName
-    {
-        get
-        {
-            var name = Client.Local?.DisplayName ?? Connection.Local?.DisplayName;
-            return string.IsNullOrWhiteSpace( name ) ? "Player" : name;
-        }
-    }
-    private int PlayerLevel => Progression.GetLevel();
     private int CurrencyBalance => CurrencyManager.GetBalance();
 
     void AddCoins( int amount )
@@ -82,6 +82,6 @@
 
     protected override int BuildHash()
     {
-        return HashCode.Combine( LocalSteamId, LocalName, PlayerLevel, CurrencyBalance );
+        return HashCode.Combine( CurrencyBalance );
     }
 }

@@ -1,99 +1,197 @@
-@using Sandbox;
-@using Sandbox.UI;
-@using Facepunch;
-
-@inherits Panel
-@attribute [StyleSheet]
 @namespace Facepunch.UI
+@inherits PanelComponent
 
-<root class="hc1 theater-overlay">
-    @if ( Controller == null || Controller.Player == null )
+@* The Theater's HUD (scenes/theater_playback.scene): TheaterController does the playing, this only shows it. *@
+<root class="hc1">
+    @if ( Controller is null )
     {
-        return;
     }
-
-    <div class="theater-top">
-        <div class="btn exit" onclick=@ExitTheater>
-            <i>exit_to_app</i>
-            <label>EXIT</label>
-        </div>
-        <div class="cam-info">
-            <label>CAMERA:</label>
-            <label class="val">@(Controller.IsFreecam ? "FREECAM" : "PLAYER")</label>
-        </div>
-    </div>
-
-    <div class="theater-bottom">
-        <div class="controls">
-            <div class="btn-group">
-                <div class="btn icon" onclick=@(() => Speed = 0.5f)><i>fast_rewind</i></div>
-                <div class="btn icon" onclick=@TogglePlay>
-                    <i>@(IsPlaying ? "pause" : "play_arrow")</i>
-                </div>
-                <div class="btn icon" onclick=@(() => Speed = 2.0f)><i>fast_forward</i></div>
-                <div class="btn icon" onclick=@(() => Speed = 1.0f)><i>restore</i></div>
-            </div>
-
-            <div class="timeline">
-                <label>@(FormattedTime(CurrentTime))</label>
-                <div class="timeline-track">
-                    <div class="timeline-fill" style="width: @(Progress * 100)%"></div>
-                </div>
-                <label>@(FormattedTime(Duration))</label>
+    else if ( Controller.Error is not null )
+    {
+        <div class="th-screen">
+            <div class="th-card">
+                <i class="th-card-icon">error_outline</i>
+                <label class="th-card-title">@Tr( "Can't play this replay" )</label>
+                <label class="th-card-text">@Tr( Controller.Error )</label>
+                <div class="th-btn primary" onclick=@(() => Controller.Exit())><i>arrow_back</i><label>@Tr( "Back to Theater" )</label></div>
             </div>
         </div>
-    </div>
+    }
+    else if ( Controller.IsLoading )
+    {
+        <div class="th-screen">
+            <div class="th-card">
+                <label class="th-card-kicker">@Tr( "Theater" )</label>
+                <label class="th-card-title">@(Controller.Info?.MapTitle ?? "")</label>
+                <label class="th-card-text pulse">@Tr( Controller.LoadingStatus )</label>
+                <div class="th-btn" onclick=@(() => Controller.Exit())><i>close</i><label>@Tr( "Cancel" )</label></div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="th-top" @ref="TopBar">
+            <div class="th-btn" onclick=@(() => Controller.Exit())><i>arrow_back</i><label>@Tr( "Theater" )</label></div>
+
+            <div class="th-title">
+                <label class="th-map">@Controller.Info.MapTitle</label>
+                <label class="th-sub">@Subtitle</label>
+            </div>
+
+            <div class="th-grow"></div>
+
+            <div class="th-follow">
+                <div class="th-icon-btn" onclick=@(() => Controller.NextPerson( -1 ))><i>chevron_left</i></div>
+
+                <div class="th-follow-info">
+                    <label class="th-follow-kicker">@(Controller.IsFreecam ? Tr( "Freecam" ) : Tr( "Following" ))</label>
+                    @if ( Controller.Following is { } person )
+                    {
+                        <label class="th-follow-name" style="color: @person.Team.GetColor().Hex">@person.Name</label>
+                        <label class="th-follow-state @(Controller.FollowingAlive ? "" : "dead")">@PersonState( person )</label>
+                    }
+                </div>
+
+                <div class="th-icon-btn" onclick=@(() => Controller.NextPerson( 1 ))><i>chevron_right</i></div>
+            </div>
+        </div>
+
+        <div class="th-bottom" @ref="BottomBar">
+            <TheaterTimeline Following=@Controller.Following />
+
+            <div class="th-controls">
+                <label class="th-time">@TimeLabel</label>
+
+                <div class="th-icon-btn" onclick=@(() => Controller.Skip( -10f ))><i>replay_10</i></div>
+                <div class="th-icon-btn play" onclick=@(() => Controller.TogglePause())><i>@PlayIcon</i></div>
+                <div class="th-icon-btn" onclick=@(() => Controller.Skip( 10f ))><i>forward_10</i></div>
+
+                <div class="th-speeds">
+                    @foreach ( var speed in TheaterController.Speeds )
+                    {
+                        <div class="th-speed @(Controller.Speed == speed ? "selected" : "")" onclick=@(() => Controller.SetSpeed( speed ))>
+                            <label>@SpeedLabel( speed )</label>
+                        </div>
+                    }
+                </div>
+
+                <div class="th-grow"></div>
+
+                <div class="th-hints">
+                    <div class="th-hint"><InputHint class="small" Action="Jump" Size=@InputGlyphSize.Small /><label>@Tr( "Pause" )</label></div>
+                    @if ( Controller.IsFreecam )
+                    {
+                        <div class="th-hint"><InputHint class="small" Action="Forward" Size=@InputGlyphSize.Small /><InputHint class="small" Action="Backward" Size=@InputGlyphSize.Small /><label>@Tr( "Move" )</label></div>
+                        <div class="th-hint"><InputHint class="small" Action="Use" Size=@InputGlyphSize.Small /><InputHint class="small" Action="PrevSlot" Size=@InputGlyphSize.Small /><label>@Tr( "Up / Down" )</label></div>
+                    }
+                    else
+                    {
+                        <div class="th-hint"><InputHint class="small" Action="Left" Size=@InputGlyphSize.Small /><InputHint class="small" Action="Right" Size=@InputGlyphSize.Small /><label>@Tr( "Soldier" )</label></div>
+                    }
+                    @if ( !Controller.ShowsFirstPerson )
+                    {
+                        <div class="th-hint"><InputHint class="small" Action="attack2" Size=@InputGlyphSize.Small /><label>@Tr( "Look" )</label></div>
+                    }
+                </div>
+
+                <div class="th-btn" onclick=@(() => Controller.ToggleFirstPerson())>
+                    <InputHint class="small" Action="SpectatorMode" Size=@InputGlyphSize.Small />
+                    <label>@(Controller.IsFirstPerson && !Controller.IsFreecam ? Tr( "Third Person" ) : Tr( "First Person" ))</label>
+                </div>
+
+                <div class="th-btn" onclick=@(() => Controller.ToggleCamera())>
+                    <InputHint class="small" Action="FireMode" Size=@InputGlyphSize.Small />
+                    <label>@(Controller.IsFreecam ? Tr( "Follow" ) : Tr( "Freecam" ))</label>
+                </div>
+            </div>
+        </div>
+    }
 </root>
 
 @code
 {
-    public TheaterController Controller { get; set; }
+    public static TheaterOverlay Instance { get; private set; }
 
-    private float Speed { get; set; } = 1.0f;
-    private bool IsPlaying => Speed > 0f;
-    
-    private float CurrentTime => Controller?.CurrentTime ?? 0f;
-    private float Duration => Controller?.Duration ?? 0f;
-    private float Progress => Duration > 0 ? CurrentTime / Duration : 0f;
+    Panel TopBar { get; set; }
+    Panel BottomBar { get; set; }
 
-    protected override void OnAfterTreeRender( bool firstTime )
+    TheaterController Controller => TheaterController.Current;
+
+    string Subtitle
     {
-        if ( firstTime )
+        get
         {
-            Controller = Game.ActiveScene.GetAllComponents<TheaterController>().FirstOrDefault();
+            var info = Controller?.Info;
+            if ( info is null )
+                return "";
+
+            var mode = string.IsNullOrWhiteSpace( info.Mode ) ? "" : Tr( info.Mode );
+            var date = info.Recorded.ToString( "yyyy-MM-dd HH:mm" );
+            return string.IsNullOrEmpty( mode ) ? date : $"{mode}  ·  {date}";
         }
     }
 
-    public override void Tick()
+    string TimeLabel => $"{FormatTime( Controller.Position )} / {FormatTime( Controller.Duration )}";
+
+    string PlayIcon => Controller.IsAtEnd ? "replay" : Controller.IsPaused ? "play_arrow" : "pause";
+
+    string PersonState( TheaterController.Person person )
     {
-        if ( Controller?.Player != null )
-        {
-            // Update time scale based on speed
-            Game.ActiveScene.TimeScale = Speed;
-        }
+        if ( !Controller.FollowingAlive )
+            return Tr( "Dead" );
+
+        return person.Team == Team.Unassigned ? "" : Tr( person.Team.GetName() );
     }
 
-    void TogglePlay()
+    static string SpeedLabel( float speed ) => $"{speed:0.##}x";
+
+    public static string FormatTime( float seconds )
     {
-        if ( Speed > 0f )
-            Speed = 0f;
-        else
-            Speed = 1.0f;
+        var time = TimeSpan.FromSeconds( Math.Max( 0f, seconds ) );
+        return time.TotalHours >= 1 ? time.ToString( @"h\:mm\:ss" ) : time.ToString( @"m\:ss" );
     }
 
-    void ExitTheater()
+    /// <summary> Whether the mouse is on the HUD's bars (or a loading or error card), where it doesn't turn the camera. </summary>
+    public bool IsPointerOverControls()
     {
-        Game.ActiveScene.TimeScale = 1.0f;
-        var scene = ResourceLibrary.Get<SceneFile>( "scenes/menu.scene" );
-        if ( scene != null )
-        {
-            Game.ActiveScene.Load( scene );
-        }
+        if ( Controller is null || Controller.IsLoading || Controller.Error is not null )
+            return true;
+
+        return IsOver( TopBar ) || IsOver( BottomBar );
     }
 
-    string FormattedTime( float seconds )
+    static bool IsOver( Panel panel ) => panel is not null && panel.IsVisible && panel.Box.Rect.IsInside( Mouse.Position );
+
+    protected override void OnEnabled()
     {
-        var ts = System.TimeSpan.FromSeconds( seconds );
-        return ts.ToString( @"mm\:ss" );
+        base.OnEnabled();
+        Instance = this;
+    }
+
+    protected override void OnDisabled()
+    {
+        base.OnDisabled();
+
+        if ( Instance == this )
+            Instance = null;
+    }
+
+    protected override void OnUpdate()
+    {
+        base.OnUpdate();
+
+        // The key hints don't fit beside the controls on a narrow screen.
+        Panel?.SetClass( "narrow", Screen.Width < 1500f );
+    }
+
+    protected override int BuildHash()
+    {
+        if ( Controller is not { } c )
+            return 0;
+
+        return HashCode.Combine(
+            HashCode.Combine( c.IsLoading, c.LoadingStatus, c.Error, c.Info ),
+            HashCode.Combine( c.IsPaused, c.IsAtEnd, c.Speed, c.IsFreecam, c.IsFirstPerson, c.ShowsFirstPerson ),
+            HashCode.Combine( c.Following, c.FollowingAlive, (int)c.Position ) );
     }
 }

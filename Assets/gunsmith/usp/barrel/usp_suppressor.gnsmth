@@ -1,16 +1,21 @@
 {
   "Name": "Suppressor",
   "Category": "Barrel",
-  "MainPrefab": "gunsmith/usp/barrel/usp_suppressor.prefab",
+  "MainPrefab": null,
+  "IsSuppressor": true,
+  "MuzzleShift": "6.696,0,0",
   "EligibleEquipment": [
     "weapons/usp/usp.equip"
   ],
-  "ModifyBodygroups": false,
+  "ModifyBodygroups": true,
   "Bodygroups": {
-    "3": 2
+    "muzzle": 2
   },
-  "IsUniversal": true,
+  "ModelBodygroups": {
+    "models/weapons/sbox_pistol_usp/w_usp.vmdl": {
+      "barrel": 2
+    }
+  },
   "__references": [],
-  "IsValid": true,
   "__version": 0
 }

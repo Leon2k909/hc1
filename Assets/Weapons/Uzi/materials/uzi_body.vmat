@@ -1,0 +1,13 @@
+"Layer0"
+{
+	shader "shaders/complex.shader"
+	F_SPECULAR "1"
+	F_METALNESS_TEXTURE "1"
+	g_flRoughnessScaleFactor "1"
+	g_vColorTint "[1 1 1 1]"
+	TextureColor "weapons/uzi/materials/uzi_body_color.png"
+	TextureNormal "weapons/uzi/materials/uzi_body_normal.png"
+	TextureRoughness "weapons/uzi/materials/uzi_body_roughness.png"
+	TextureMetalness "weapons/uzi/materials/uzi_body_metalness.png"
+	TextureAmbientOcclusion "materials/default/default_ao.tga"
+}

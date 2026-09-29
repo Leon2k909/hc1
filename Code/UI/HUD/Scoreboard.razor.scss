@@ -1,7 +1,9 @@
 @import "/UI/Styles/Theme.scss";
 
 Scoreboard {
-    z-index: 100;
+    // Held open, it's over the rest of the HUD: the medals (MainHUD's .center-layer, 1700) and the crosshair and hit
+    // markers (1500). The Return to the AO countdown and the drone prompt (99999) still show over it.
+    z-index: 2000;
     border-radius: $rounding;
     backdrop-filter: blur( 5px );
     background-color: rgba( black, 0.5 );
@@ -26,9 +28,34 @@ Scoreboard {
 
     table {
         width: 1100px;
+        max-height: 92%;
         flex-direction: column;
         gap: 2px;
         color: white;
+
+        // The title and voice bar stay put; the teams scroll when there are more rows than fit.
+        .teams {
+            flex-direction: column;
+            flex-shrink: 1;
+            gap: 2px;
+            overflow: scroll;
+
+            // Rows keep their height and the list scrolls, rather than squashing every row to fit.
+            > * {
+                flex-shrink: 0;
+            }
+        }
+
+        .add-bot {
+            padding: 4px 12px;
+            gap: 6px;
+            flex-shrink: 0;
+            font-size: 14px;
+
+            i {
+                font-size: 17px;
+            }
+        }
 
         .title {
             flex-direction: row;
@@ -97,9 +124,9 @@ Scoreboard {
                 }
             }
 
+            // Bot rows, and their avatar and tags, take the bot's team colour (ScoreboardRow.BotRowStyle etc.).
             &.bot-row {
-                background-color: rgba( 255, 176, 84, 0.14 );
-                border: 1px solid rgba( 255, 176, 84, 0.22 );
+                border: 1px solid transparent;
             }
 
             .col {
@@ -112,17 +139,24 @@ Scoreboard {
                 gap: 8px;
             }
 
+            // The prestige icons have wide transparent margins, so they're drawn the row's full height, over its
+            // padding rather than making it taller.
+            .prestige {
+                width: 40px;
+                height: 40px;
+                margin: -8px 0px;
+                flex-shrink: 0;
+            }
+
             .bot-avatar {
                 width: 24px;
                 height: 24px;
                 border-radius: 4px;
-                background-color: rgba( 138, 214, 255, 0.18 );
-                border: 1px solid rgba( 138, 214, 255, 0.35 );
+                border: 1px solid transparent;
                 flex-shrink: 0;
             }
 
             .bot-prefix {
-                color: #8ad6ff;
                 font-size: 11px;
                 font-weight: 800;
                 letter-spacing: 0.08em;
@@ -130,7 +164,6 @@ Scoreboard {
             }
 
             .bot-ping {
-                color: #8ad6ff;
                 font-weight: 800;
             }
 
@@ -196,6 +229,12 @@ Scoreboard {
 
             .mute-placeholder {
                 margin: 0 10px;
+            }
+
+            .kick-bot:hover {
+                background-color: rgba( #d45a5a, 0.3 );
+                border-color: rgba( #ff8a8a, 0.55 );
+                color: #ff9b9b;
             }
         }
     }

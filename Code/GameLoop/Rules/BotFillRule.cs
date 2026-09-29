@@ -25,6 +25,8 @@ public sealed class BotFillRule : Component,
 
 	private List<Client> _addedBots = new();
 	private TimeSince _timeSinceLastFillCheck;
+	private bool _defuseRoundFillPending;
+	private TimeSince _timeSinceDefuseReset;
 
 	protected override void OnStart()
 	{
@@ -33,6 +35,11 @@ public sealed class BotFillRule : Component,
 
 	protected override void OnUpdate()
 	{
+		if ( _defuseRoundFillPending && _timeSinceDefuseReset > .1f )
+		{
+			_defuseRoundFillPending = false;
+			UpdatePlayerCount();
+		}
 		UpdatePlayerCountThrottled();
 	}
 
@@ -81,7 +88,7 @@ public sealed class BotFillRule : Component,
 			return;
 
 		// Real player joined, potentially remove a bot if the fill target is exceeded.
-		if ( GameUtils.AllPlayers.Count() > MinPlayerCount )
+		if ( GameUtils.AllPlayers.Count() > (CustomGameSettings.Current?.PlayerLimit ?? MinPlayerCount) )
 		{
 			RemoveBot();
 		}
@@ -108,14 +115,26 @@ public sealed class BotFillRule : Component,
 		if ( !Active )
 			return;
 
+		// A plant or a late join must not replace teammates killed earlier in this round.
+		var mode = GameMode.Instance;
+		if ( mode?.Ident == "defuse" && (mode.Get<BombPlantedEventComponent>() is not null || mode.Get<BombDefusedEventHandler>() is not null) )
+			return;
+
+		var customGame = CustomGameSettings.Current;
+		if ( customGame is { FillWithBots: false } )
+			return;
+
+		var targetPlayers = customGame?.PlayerLimit ?? MinPlayerCount;
+		var teamSize = customGame is null ? MaxTeamSize : Math.Max( 1, targetPlayers / 2 );
+
 		if ( UseLightweightNpcBots )
 		{
-			GetLightweightBotManager()?.Maintain( MinPlayerCount, MaxTeamSize );
+			GetLightweightBotManager()?.Maintain( targetPlayers, teamSize );
 			return;
 		}
 
 		var playerCount = GameUtils.AllPlayers.Count();
-		var botsNeeded = MinPlayerCount - playerCount;
+		var botsNeeded = targetPlayers - playerCount;
 
 		// Add bots if we're below minimum
 		while ( botsNeeded > 0 )
@@ -127,6 +146,15 @@ public sealed class BotFillRule : Component,
 			_addedBots.Add( bot );
 			botsNeeded--;
 		}
+	}
+
+	internal void RestartDefuseRound()
+	{
+		if ( !HasHostAuthority || GameMode.Instance?.Ident != "defuse" ) return;
+		if ( UseLightweightNpcBots ) GetLightweightBotManager()?.ClearBots();
+		// Let the previous pawns and bots finish destroying before counting the new roster.
+		_timeSinceDefuseReset = 0;
+		_defuseRoundFillPending = true;
 	}
 
 	private Client AddBot()

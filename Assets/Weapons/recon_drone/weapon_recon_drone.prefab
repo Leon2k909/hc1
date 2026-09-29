@@ -1,0 +1,53 @@
+{
+  "RootObject": {
+    "__guid": "41549ca5-8e23-5308-8d9b-92f055fbd0bf",
+    "Name": "Recon Drone Equipment",
+    "Enabled": true,
+    "NetworkMode": 0,
+    "Components": [
+      {
+        "__type": "Facepunch.Equipment",
+        "__guid": "e0cba4c6-8d5a-596c-bd51-c23248b5d6e4",
+        "__enabled": true,
+        "Resource": "weapons/recon_drone/recon_drone.equip",
+        "HoldType": "HoldItem",
+        "Handedness": "Right",
+        "UseCrosshair": true,
+        "DeploySound": "sounds/guns/switch/weapon_switch.sound"
+      },
+      {
+        "__type": "Facepunch.TagBinder",
+        "__guid": "dc13a00e-012f-5f85-9ec3-8ec1baea3bcd",
+        "__enabled": true
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "6d07939b-0e08-518b-b85c-d7c33a4eec1a",
+        "Name": "Recon Drone Throw",
+        "Enabled": true,
+        "NetworkMode": 0,
+        "Components": [
+          {
+            "__type": "Facepunch.ReconDroneThrowable",
+            "__guid": "70b892ab-9bdd-5a47-b28f-c54776110763",
+            "__enabled": true,
+            "InputActions": [
+              "Attack1"
+            ],
+            "CookTime": 0.2,
+            "ThrowPower": 650,
+            "Prefab": {
+              "_type": "gameobject",
+              "prefab": "weapons/recon_drone/recon_drone_airborne.prefab"
+            }
+          }
+        ],
+        "Children": []
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__references": [],
+  "__version": 2
+}

@@ -38,7 +38,8 @@ public partial class ShootRecoil : EquipmentComponent
 		TimeSinceLastShot = 0;
 
 		var timeDelta = Time.Delta;
-		var recoilScale = GetRecoilScale();
+		// Hardcore: a shot arm or hand can't hold the gun down as well.
+		var recoilScale = GetRecoilScale() * (Player?.HealthComponent?.WoundRecoilScale ?? 1f);
 		var attachments = GunsmithAttachmentEffects.For( Equipment );
 
 		if ( UseRecoilPattern )

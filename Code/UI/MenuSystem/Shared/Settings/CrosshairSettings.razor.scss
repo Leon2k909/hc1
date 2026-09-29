@@ -34,7 +34,7 @@ CrosshairSettings
     .ch-chip,
     .ch-btn
     {
-        border-radius: 6px;
+        border-radius: 2px;
         border: 1px solid #ffffff1a;
         background-color: #ffffff08;
         color: #ffffffcc;
@@ -65,12 +65,12 @@ CrosshairSettings
         flex-shrink: 0;
     }
 
-    .ch-tab.active,
-    .ch-chip.active
+    .ch-tab.selected,
+    .ch-chip.selected
     {
-        border-color: #ff6b35;
+        border-color: #ff7a1a;
         color: #ffffff;
-        background-color: #ff6b3522;
+        background-color: #ff7a1a22;
     }
 
     .ch-label
@@ -106,12 +106,12 @@ CrosshairSettings
         height: 24px;
         min-width: 24px;
         padding: 0;
-        border-radius: 6px;
+        border-radius: 2px;
         border: 2px solid #ffffff22;
         cursor: pointer;
         pointer-events: all;
 
-        &.active
+        &.selected
         {
             border-color: #ffffff;
         }
@@ -125,9 +125,9 @@ CrosshairSettings
         height: 30px;
         align-items: center;
         justify-content: center;
-        border-color: #ff6b3544;
-        background-color: #ff6b3522;
-        color: #ff8c55;
+        border-color: #ff7a1a44;
+        background-color: #ff7a1a22;
+        color: #ff963f;
         font-size: 12px;
         align-self: flex-start;
 

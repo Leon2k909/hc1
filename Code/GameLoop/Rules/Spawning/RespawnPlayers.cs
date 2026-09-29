@@ -16,9 +16,11 @@ public sealed class RespawnPlayers : Component,
 
 	void IGameEventHandler<EnterStateEvent>.OnGameEvent( EnterStateEvent eventArgs )
 	{
+		DefuseTesting.PrepareRound();
 		foreach ( var player in GameUtils.AllPlayers )
 		{
 			player.Respawn( ForceNew );
 		}
+		GameMode.Instance?.Get<BotFillRule>()?.RestartDefuseRound();
 	}
 }

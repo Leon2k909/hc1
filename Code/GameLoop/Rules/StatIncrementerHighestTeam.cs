@@ -42,7 +42,11 @@ public sealed class StatIncrementerHighestTeam : Component, IGameEventHandler<En
 		}
 	}
 
-	void IGameEventHandler<EnterStateEvent>.OnGameEvent( EnterStateEvent eventArgs )
+	// The body is a named method: hotload can't re-link static lambdas inside explicit generic interface methods
+	// ("Unable to find matching substitution for a static method"), so they'd throw after every hotload.
+	void IGameEventHandler<EnterStateEvent>.OnGameEvent( EnterStateEvent eventArgs ) => IncrementStats( eventArgs );
+
+	void IncrementStats( EnterStateEvent eventArgs )
 	{
 		var winner = TeamScoring.GetHighest();
 		

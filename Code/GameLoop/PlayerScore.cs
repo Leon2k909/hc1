@@ -170,7 +170,7 @@ public sealed class PlayerScore : Component,
 			
 			using ( Rpc.FilterInclude( Network.Owner ) )
 			{
-				SendScoreAdded( 0, "UAV Earned! Press [Scorestreak] to call in." );
+				SendScoreAdded( 0, "UAV Earned! Press [Streak Reward] to call in." );
 			}
 		}
 	}
@@ -258,21 +258,31 @@ public sealed class PlayerScore : Component,
 		var killerTeam = GameUtils.GetTeamFromComponent( damageInfo.Attacker );
 		var victimTeam = GameUtils.GetTeamFromComponent( damageInfo.Victim );
 		var isFriendly = killerTeam != Team.Unassigned && killerTeam == victimTeam;
-		var isSuicide = killerPlayer == victimPlayer;
+		var isSuicide = killerPlayer.IsValid() && killerPlayer == victimPlayer;
 
-		if ( killerPlayer == thisPlayer )
+		if ( isSuicide )
+		{
+			// A fall, their own grenade, the play area or `kill`: a death, and a kill taken away. Checked before the team
+			// kill, since a player is always on their own team (suicides used to score as team kills, with no death).
+			if ( victimPlayer != thisPlayer )
+				return;
+
+			Kills--;
+			Deaths++;
+			AddScore( SuicideScore, "Suicide" );
+
+			if ( !UseScorestreaks )
+			{
+				KillStreak = 0;
+			}
+		}
+		else if ( killerPlayer == thisPlayer )
 		{
 			if ( isFriendly )
 			{
 				// Killed by friendly/teammate
 				Kills--;
 				AddScore( TeamKillScore, "Team kill" );
-			}
-			else if ( isSuicide )
-			{
-				// Killed by suicide
-				Kills--;
-				AddScore( SuicideScore, "Suicide" );
 			}
 			else
 			{
@@ -289,7 +299,7 @@ public sealed class PlayerScore : Component,
 					
 					using ( Rpc.FilterInclude( Network.Owner ) )
 					{
-						SendScoreAdded( 0, "UAV Earned! Press [Scorestreak] to call in." );
+						SendScoreAdded( 0, "UAV Earned! Press [Streak Reward] to call in." );
 					}
 				}
 			}
@@ -348,7 +358,11 @@ public sealed class PlayerScore : Component,
 		}
 	}
 
-	void IGameEventHandler<BombDetonatedEvent>.OnGameEvent( BombDetonatedEvent eventArgs )
+	// The body is a named method: hotload can't re-link static lambdas inside explicit generic interface methods
+	// ("Unable to find matching substitution for a static method"), so they'd throw after every hotload.
+	void IGameEventHandler<BombDetonatedEvent>.OnGameEvent( BombDetonatedEvent eventArgs ) => OnBombDetonated( eventArgs );
+
+	void OnBombDetonated( BombDetonatedEvent eventArgs )
 	{
 		var thisPlayer = Client?.PlayerPawn;
 		var planterPlayer = GameUtils.PlayerPawns

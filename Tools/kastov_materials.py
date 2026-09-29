@@ -31,7 +31,20 @@ ADDON = TOOLS / "extracted" / "3803722029" / "materials"
 sys.path.insert(0, str(TOOLS))
 from SourceIO.library.utils.pylib.vtf import load_vtf_texture  # noqa: E402
 
+sys.path.insert(0, str(PROJECT / "Tools" / "texture_markings"))
+import markings  # noqa: E402
+
+ATTACHMENT_MATERIALS = {
+    **{name: f"mw4/ak47/sto/{name}" for name in
+       ("ak47_s_ass", "ak47_s_h", "ak47_s_ha", "ak47_s_l", "ak47_s_no", "ak47_s_t")},
+    **{name: f"mw4/ak47/psg/{name}" for name in ("ak47_p_a", "ak47_p_ass", "ak47_p_s")},
+    **{name: f"mw4/ak47/mag/{name}" for name in ("47_apex_m_d", "ak47_m_e1", "ak47_m_e2")},
+    **{name: f"mw4/ak47/bar/{name}" for name in ("ak47_b_s", "ak47_b_s_hg", "ak47_b_s_muz")},
+    "ak47_rec_sto_ada": "mw4/ak47/ak47_rec_sto_ada",
+}
+
 MATERIALS = {
+    **ATTACHMENT_MATERIALS,
     "76239": "mw4/ak47/mag/76239",
     "76239_dt": "mw4/ak47/mag/76239_dt",
     "ak47_m_d": "mw4/ak47/mag/ak47_m_d",
@@ -100,6 +113,8 @@ def convert(name: str, vmt_path: str) -> None:
         '    g_vColorTint "[1.0 1.0 1.0 1.0]"\n'
         '    g_flModelTintAmount "1.0"\n'
         "}\n", encoding="utf-8", newline="\n")
+    # The rip's serials, stamps and logos come off again (Tools/texture_markings/specs).
+    markings.after_rip(f"{OUT_ASSET}/{name}.vmat")
     print(f"{name}: {rgb.shape[1]}x{rgb.shape[0]}")
 
 

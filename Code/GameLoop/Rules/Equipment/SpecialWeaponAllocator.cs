@@ -27,14 +27,18 @@ public sealed class SpecialWeaponAllocator : Component,
 	public string SpawnPointTag { get; set; }
 
 	[After<RespawnPlayers>]
-	void IGameEventHandler<EnterStateEvent>.OnGameEvent( EnterStateEvent eventArgs )
+	void IGameEventHandler<EnterStateEvent>.OnGameEvent( EnterStateEvent eventArgs ) => Allocate();
+
+	private void Allocate()
 	{
-		if ( Weapon is null )
+		if ( !Networking.IsHost || Weapon is null )
 		{
 			return;
 		}
 
 		var playersOnTeam = GameUtils.GetPlayerPawns( Team )
+			// Destroyed pawns can remain in the scene until the end of the frame during a forced respawn.
+			.Where( x => x.Client.IsValid() && x.Client.PlayerPawn == x && x.HealthComponent.State == LifeState.Alive )
 			.Where( x => string.IsNullOrEmpty( SpawnPointTag ) || x.SpawnPointTags.Contains( SpawnPointTag, StringComparer.OrdinalIgnoreCase ) )
 			.Shuffle();
 
@@ -45,7 +49,7 @@ public sealed class SpecialWeaponAllocator : Component,
 
 		Log.Info( $"Trying to spawn {Weapon} on {playersOnTeam[0]}" );
 
-		var playerToGiveTo = playersOnTeam[0];
+		var playerToGiveTo = playersOnTeam.FirstOrDefault( x => DefuseTesting.IsForced( x.Client ) ) ?? playersOnTeam[0];
 
 		// Conna: this is a special weapon for a specific team. Remove it for everyone.
 		foreach ( var player in GameUtils.PlayerPawns )

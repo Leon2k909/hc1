@@ -1,8 +1,10 @@
 """Create deterministic s&box resources for every physical M4 menu entry."""
-import json,re,uuid
+import json,re,sys,uuid
 from pathlib import Path
 HERE=Path(__file__).resolve().parent
 ROOT=HERE.parents[1];A=ROOT/'Assets'
+sys.path.insert(0,str(ROOT/'Tools'))
+import part_names
 inventory=json.loads((HERE/'inventory.json').read_text())
 models={m['source']:m for m in json.loads((HERE/'conversion.json').read_text())['models']}
 def guid(s):return str(uuid.uuid5(uuid.NAMESPACE_URL,'hc1/mw2022/'+s))
@@ -18,6 +20,8 @@ for entry in inventory['attachments']:
     m=models[entry['model']];key=entry['key'];cat=entry['category'];category='Underbarrel'if cat=='Launcher'else cat
     name=entry['name'].replace('\ufffd','').replace("''",'"').replace('  ',' ')
     if cat=='Muzzle' and name in ('Breacher Device','Flash Guard','Monolithic Suppressor','Lightweight Suppressor'):name+=' '+re.search(r'(\d+)$',key)[1]
+    rip_name=name
+    name=part_names.name(key,name)  # ours: players never see the rip's CoD names
     bind=mounts[cat]
     choices={}
     for group in m['bodygroups']:
@@ -44,7 +48,7 @@ for entry in inventory['attachments']:
         if cat=='Barrel':part['ModelBodygroups']={'models/weapons/sbox_assault_m4a1/w_m4a1.vmdl':{'handguard_covers':0}}
     if cat=='Muzzle':part['IsSuppressor']='silencer' in key
     if cat=='Magazine':
-        part['MagazineCapacity']=int(re.search(r'(\d+) Round',name)[1])if 'Round' in name else 30
+        part['MagazineCapacity']=int(re.search(r'(\d+) Round',rip_name)[1])if 'Round' in rip_name else 30
         part['ReloadTimeMultiplier']={15:.9,30:1,45:1.12,60:1.22}[part['MagazineCapacity']]
     if cat=='Optic':
         reticle=next((b['head']for b in m['bones']if b['name']=='tag_reticle_attach'),[0,0,1.3])

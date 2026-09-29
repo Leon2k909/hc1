@@ -29,6 +29,18 @@ public abstract class BaseGrenade : Component
 		}
 	}
 
+	/// <summary>
+	/// A grenade thrown at a window goes through it, breaking the glass, rather than bouncing off.
+	/// </summary>
+	protected override void OnFixedUpdate()
+	{
+		if ( IsProxy ) return;
+
+		var body = GetComponentInChildren<Rigidbody>();
+		if ( body.IsValid() )
+			BreakableGlass.BreakAhead( GameObject, body.WorldPosition, body.Velocity );
+	}
+
 	protected virtual bool CanExplode()
 	{
 		return true;

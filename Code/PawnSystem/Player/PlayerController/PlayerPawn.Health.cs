@@ -7,13 +7,14 @@ public partial class PlayerPawn : IGameEventHandler<DamageGivenEvent>, IGameEven
 	private TimeSince _timeSinceLastDamage = float.MaxValue;
 
 	/// <summary>
-	/// Called from OnUpdate. Regenerates health slowly when in Core (non-hardcore) mode.
+	/// Called from OnUpdate. Regenerates health once you stop taking damage, hardcore included (you patch yourself up).
+	/// Hardcore's arm wounds stay; a shot leg heals by itself (HealthComponent.Wounds.cs).
 	/// </summary>
 	internal void UpdateHealthRegen()
 	{
 		if ( !Networking.IsHost ) return;
 		var mode = GameMode.Instance;
-		if ( !mode.IsValid() || mode.Hardcore ) return;
+		if ( !mode.IsValid() ) return;
 		if ( HealthComponent.State != LifeState.Alive ) return;
 		if ( HealthComponent.Health >= HealthComponent.MaxHealth ) return;
 
@@ -22,7 +23,7 @@ public partial class PlayerPawn : IGameEventHandler<DamageGivenEvent>, IGameEven
 		if ( zombies is { IsDowned: true } ) return;
 
 		var delay = zombies is not null ? 3f : 4f;
-		// Core modes: full health back in ~4s once you stop taking damage.
+		// Multiplayer: full health back in ~4s once you stop taking damage.
 		var rate = zombies is not null ? 40f : 25f;
 		if ( _timeSinceLastDamage < delay ) return;
 
@@ -60,6 +61,17 @@ public partial class PlayerPawn : IGameEventHandler<DamageGivenEvent>, IGameEven
 			return;
 
 		var position = eventArgs.DamageInfo.Position;
+
+		// A burn is heat on the skin, not a hit: no flinch, knock or blood. It holds off regen like any damage, and the
+		// indicator shows where the heat comes from.
+		if ( damageInfo.Flags.HasFlag( DamageFlags.Burn ) )
+		{
+			_timeSinceLastDamage = 0f;
+			if ( IsViewer )
+				DamageIndicator.Current?.OnHit( position );
+			return;
+		}
+
 		var force = damageInfo.Force.IsNearZeroLength ? Random.Shared.VectorInSphere() : damageInfo.Force;
 
 		if ( Body.IsValid() && Body.AnimationHelpers is not null )
@@ -69,6 +81,10 @@ public partial class PlayerPawn : IGameEventHandler<DamageGivenEvent>, IGameEven
 				helper.ProceduralHitReaction( damageInfo.Damage / 100f, force );
 			}
 		}
+
+		// The zone has no attacker, but standing in it mustn't let health come back.
+		if ( damageInfo.Flags.HasFlag( DamageFlags.Zone ) )
+			_timeSinceLastDamage = 0f;
 
 		if ( !damageInfo.Attacker.IsValid() )
 			return;
@@ -124,7 +140,8 @@ public partial class PlayerPawn : IGameEventHandler<DamageGivenEvent>, IGameEven
 					blood.DestroyAsync( 2f );
 			}
 
-			if ( BloodImpactSound is not null )
+			// A fall isn't a hit: the landing has its own sound.
+			if ( BloodImpactSound is not null && !damageInfo.Flags.HasFlag( DamageFlags.FallDamage ) )
 			{
 				var snd = Sound.Play( BloodImpactSound, position );
 				if ( !snd.IsValid() ) return;

@@ -1,0 +1,83 @@
+@using Sandbox;
+@using Sandbox.UI;
+
+@namespace Facepunch.UI
+@inherits Panel
+@attribute [StyleSheet]
+
+@*
+    Escape on the main menu (MainMenuRoot), the header's QUIT GAME and the hub's power button ask here before quitting.
+    A game can't close s&box, so the only way out is back to s&box's menu (Game.Close; in the editor it ends play
+    mode): Application.Exit is internal, game code can't run s&box's native console commands (quit included), and the
+    API whitelist has no Environment.Exit or Process. Only a standalone build exits the app on Game.Close, so there the
+    same option says QUIT TO DESKTOP.
+*@
+
+<root class="hc1 quit-prompt-root">
+    @if ( IsOpen )
+    {
+        <div class="qp-backdrop" onclick=@((e) => { e.StopPropagation(); Close(); }) />
+
+        <div class="qp-modal">
+            <div class="qp-topbar" />
+
+            <div class="qp-head">
+                <label class="qp-title">@Tr( "QUIT GAME" )</label>
+                <div class="qp-close" onclick=@Close><i>close</i></div>
+            </div>
+
+            <label class="qp-text">@Tr( "Are you sure you want to quit?" )</label>
+
+            <div class="qp-options">
+                <div class="qp-option" onclick=@Quit>
+                    @if ( Application.IsStandalone )
+                    {
+                        <i>power_settings_new</i>
+                        <label>@Tr( "QUIT TO DESKTOP" )</label>
+                    }
+                    else
+                    {
+                        <i>logout</i>
+                        <label>@Tr( "QUIT TO S&BOX" )</label>
+                    }
+                </div>
+            </div>
+
+            <div class="qp-foot">
+                <div class="qp-btn" onclick=@Close><label>@Tr( "CANCEL" )</label></div>
+            </div>
+        </div>
+    }
+</root>
+
+@code
+{
+    public bool IsOpen { get; private set; }
+
+    public void Open()
+    {
+        if ( IsOpen ) return;
+
+        Sound.Play( "ui_button_press" );
+        IsOpen = true;
+        // A root's class="@(...)" adds the class but never takes it off again, so it's set here.
+        SetClass( "open", true );
+        StateHasChanged();
+    }
+
+    public void Close()
+    {
+        if ( !IsOpen ) return;
+
+        IsOpen = false;
+        SetClass( "open", false );
+        StateHasChanged();
+    }
+
+    /// <summary> Back to s&amp;box's menu (out of play mode in the editor), or to the desktop from a standalone build. </summary>
+    private void Quit()
+    {
+        Close();
+        Game.Close();
+    }
+}

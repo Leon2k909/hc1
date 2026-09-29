@@ -33,6 +33,9 @@ public sealed class IdleAnimator : Component
 
 	protected override void OnStart()
 	{
+		if ( Renderer.IsValid() && MilitaryUniform.IsLegacyModel( Renderer.Model ) )
+			MilitaryUniform.SetModel( Renderer, Renderer.Model );
+
 		var inst = WeaponPrefab?.Clone( new CloneConfig()
 		{
 			StartEnabled = true,
@@ -48,6 +51,11 @@ public sealed class IdleAnimator : Component
 		if ( Renderer.IsValid() )
 		{
 			Renderer.Set( "idle_type", (int)IdleType );
+			if ( MilitaryUniform.UsesHumanSkeleton( Renderer.Model ) )
+			{
+				Renderer.Set( "b_grounded", true );
+				Renderer.Set( "holdtype", IdleType == IdleType.WithRifle ? 2 : IdleType == IdleType.WithPistol ? 1 : 0 );
+			}
 		}
 	}
 }

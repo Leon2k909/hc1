@@ -48,12 +48,71 @@ public static class DevCommands
 		Client.Local?.PlayerPawn?.GetComponent<ZombiesPlayerEconomy>()?.AddPoints( amount );
 	}
 
-	/// <summary>Zombies: hurt the local player (100 = downs you without Juggernog).</summary>
+	/// <summary>Zombies: hurt the local player (100 = downs you without Iron Tonic).</summary>
 	[ConCmd( "dev_hurt" )]
 	public static void Hurt( float amount = 100f )
 	{
 		var pawn = Client.Local?.PlayerPawn;
 		pawn?.HealthComponent?.TakeDamage( new DamageInfo( pawn, amount ) );
+	}
+
+	/// <summary>Hardcore: shoot the local player in the leg, for testing the limp through the editor bridge.</summary>
+	[ConCmd( "dev_legshot" )]
+	public static void LegShot( float damage = 1f )
+	{
+		var pawn = Client.Local?.PlayerPawn;
+		pawn?.HealthComponent?.TakeDamage( new DamageInfo( pawn, damage, Hitbox: HitboxTags.Leg ) );
+	}
+
+	/// <summary>Fall damage on the local player, as if they'd landed hard, for testing the limp it leaves.</summary>
+	[ConCmd( "dev_fall" )]
+	public static void Fall( float damage = 10f )
+	{
+		var pawn = Client.Local?.PlayerPawn;
+		pawn?.HealthComponent?.TakeDamage( new DamageInfo( pawn, damage, Flags: DamageFlags.FallDamage ) );
+	}
+
+	/// <summary>Jump the local player again the moment they land, for testing jump stamina through the editor bridge.</summary>
+	[ConCmd( "dev_jumps" )]
+	public static async void Jumps( int count = 6 )
+	{
+		var pawn = Client.Local?.PlayerPawn;
+		for ( var i = 0; i < count; i++ )
+		{
+			while ( pawn.IsValid() && !pawn.CharacterController.IsOnGround )
+				await GameTask.Delay( 1 );
+
+			if ( !pawn.IsValid() ) return;
+			pawn.Jump();
+			await GameTask.DelaySeconds( 0.1f );
+		}
+	}
+
+	/// <summary>
+	/// Press Prone as the local player <paramref name="count"/> times, <paramref name="interval"/> seconds apart, logging the
+	/// prone stamina and how far the body's height got each time, for testing prone spam through the editor bridge.
+	/// </summary>
+	[ConCmd( "dev_prone" )]
+	public static async void Prone( int count = 6, float interval = 0.2f )
+	{
+		var pawn = Client.Local?.PlayerPawn;
+		for ( var i = 0; i < count && pawn.IsValid(); i++ )
+		{
+			var height = pawn.CharacterController.Height;
+			pawn.ToggleProne();
+			Log.Info( $"dev_prone: height {height:F1}, then {(pawn.IsProne ? "down" : "up")}, fatigue {pawn.ProneFatigue:F2}" );
+			await GameTask.DelaySeconds( interval );
+		}
+
+		if ( pawn.IsValid() )
+			Log.Info( $"dev_prone: height {pawn.CharacterController.Height:F1}, fatigue {pawn.ProneFatigue:F2}" );
+	}
+
+	/// <summary>Press E as the local player, on whatever they're looking at, for testing through the editor bridge.</summary>
+	[ConCmd( "dev_use" )]
+	public static void Use()
+	{
+		Client.Local?.PlayerPawn?.DevUse();
 	}
 
 	/// <summary>Zombies: log round / player state, for checking things through the editor bridge.</summary>
@@ -77,12 +136,36 @@ public static class DevCommands
 		}
 	}
 
-	/// <summary>Zombies: kill every zombie (like the Nuke power-up, no points).</summary>
+	/// <summary>Zombies: kill every zombie (like the Clean Sweep power-up, no points).</summary>
 	[ConCmd( "dev_nuke" )]
 	public static void Nuke()
 	{
 		foreach ( var z in Game.ActiveScene.GetAllComponents<ZombieAI>().ToList() )
 			z.Kill( null );
+	}
+
+	/// <summary>
+	/// Zombies: hit the nearest zombie as the local player, the way a bullet does (head 1 for a headshot), for testing
+	/// the hitmarker, points and score feed through the editor bridge. Host only, like the zombies' damage.
+	/// </summary>
+	[ConCmd( "dev_zombie_hit" )]
+	public static void ZombieHit( float damage = 1000f, int head = 0 )
+	{
+		var pawn = Client.Local?.PlayerPawn;
+		if ( !pawn.IsValid() ) return;
+
+		var zombie = Game.ActiveScene.GetAllComponents<ZombieAI>()
+			.Where( z => z.Health > 0f && z.GameObject.Tags.Has( "enemy" ) )
+			.OrderBy( z => z.WorldPosition.Distance( pawn.WorldPosition ) )
+			.FirstOrDefault();
+		if ( zombie is null ) { Log.Warning( "dev_zombie_hit: no zombie" ); return; }
+
+		// ZombieAI.IsHeadshot goes by the hit's height: from the head bone up is the head.
+		var position = zombie.WorldPosition + Vector3.Up * 40f;
+		if ( head != 0 && zombie.GetComponent<SkinnedModelRenderer>() is { } renderer && renderer.TryGetBoneTransform( "head", out var bone ) )
+			position = bone.Position + Vector3.Up * 2f;
+
+		zombie.OnDamage( new Sandbox.DamageInfo( damage, pawn.GameObject, null ) { Position = position } );
 	}
 
 	/// <summary>Zombies: use the nearest buy station of a kind (perk name, "box", or "wall").</summary>
@@ -93,7 +176,7 @@ public static class DevCommands
 		if ( pawn is null ) return;
 
 		var station = Game.ActiveScene.GetAllComponents<ZombiesBuyStation>()
-			.Where( s => what.Equals( "box", StringComparison.OrdinalIgnoreCase ) ? s.Kind == ZombiesBuyKind.MysteryBox
+			.Where( s => what.Equals( "box", StringComparison.OrdinalIgnoreCase ) ? s.Kind == ZombiesBuyKind.WeaponCrate
 				: what.Equals( "wall", StringComparison.OrdinalIgnoreCase ) ? s.Kind == ZombiesBuyKind.WallWeapon
 				: s.Kind == ZombiesBuyKind.Perk && s.Perk.ToString().Equals( what, StringComparison.OrdinalIgnoreCase ) )
 			.OrderBy( s => s.WorldPosition.Distance( pawn.WorldPosition ) )
@@ -181,6 +264,54 @@ public static class DevCommands
 		Log.Info( $"dev_optic: {part.ResourcePath}" );
 	}
 
+	/// <summary>
+	/// Corner slicing: put the local player where it cants the gun hardest within <paramref name="radius"/> (a wall's edge
+	/// beside the sights), looking past it, for testing through the editor bridge with dev_force_aim 1. Side 1 only takes
+	/// corners that lean the sights right, -1 left. Then logs the cant as it eases in.
+	/// </summary>
+	[ConCmd( "dev_corner" )]
+	public static async void Corner( float radius = 1500f, int side = 0 )
+	{
+		var pawn = Client.Local?.PlayerPawn;
+		if ( !pawn.IsValid() ) return;
+
+		// Look from the camera's own height, so the fan sees what it will once the player is there.
+		var camera = pawn.CameraController?.Camera;
+		var eyeHeight = camera.IsValid() ? camera.WorldPosition.z - pawn.WorldPosition.z : 64f;
+
+		var scene = Game.ActiveScene;
+		var best = 0f;
+		var bestPoint = Vector3.Zero;
+		var bestYaw = 0f;
+		for ( var i = 0; i < 80; i++ )
+		{
+			if ( scene.NavMesh.GetRandomPoint( pawn.WorldPosition, radius ) is not { } point )
+				continue;
+
+			for ( var yaw = 0f; yaw < 360f; yaw += 15f )
+			{
+				var lean = ViewModel.FindCornerLean( scene, point + Vector3.Up * eyeHeight, new Angles( 0f, yaw, 0f ), pawn.GameObject.Root );
+				if ( side != 0 && MathF.Sign( lean ) != side ) continue;
+				if ( MathF.Abs( lean ) <= MathF.Abs( best ) ) continue;
+
+				best = lean;
+				bestPoint = point;
+				bestYaw = yaw;
+			}
+		}
+
+		if ( best == 0f ) { Log.Warning( "dev_corner: no corner found" ); return; }
+
+		pawn.Teleport( bestPoint, Rotation.FromYaw( bestYaw ) );
+		Log.Info( $"dev_corner: lean {best:0.00} at {bestPoint} yaw {bestYaw:0}" );
+
+		for ( var i = 0; i < 4; i++ )
+		{
+			await GameTask.DelaySeconds( 0.5f );
+			Log.Info( $"dev_corner: cant {pawn.CurrentEquipment?.ViewModel?.CornerRoll:0.0} deg" );
+		}
+	}
+
 	/// <summary>Log the model attachments of the current viewmodel (looking for sight reference points).</summary>
 	[ConCmd( "dev_vm_attachments" )]
 	public static void VmAttachments()
@@ -208,10 +339,181 @@ public static class DevCommands
 		Game.ActiveScene.Load( scene );
 	}
 
+	/// <summary>Show a toast locally: dev_toast ct / dev_toast t for the round-win banners, anything else as a plain toast.</summary>
+	[ConCmd( "dev_toast" )]
+	public static void ShowToast( string which = "ct", float duration = 8f )
+	{
+		if ( which.Equals( "ct", StringComparison.OrdinalIgnoreCase ) )
+			UI.Toast.Instance?.Show( "Blue Team Wins!", UI.ToastType.CounterTerroristsWin, duration );
+		else if ( which.Equals( "t", StringComparison.OrdinalIgnoreCase ) )
+			UI.Toast.Instance?.Show( "Red Team Wins!", UI.ToastType.TerroristsWin, duration );
+		else
+			UI.Toast.Instance?.Show( which, UI.ToastType.Generic, duration );
+	}
+
+	/// <summary>Show a kill medal locally: dev_medal oneshot|headshot|streak|double|triple|fury|frenzy [seconds on screen].</summary>
+	[ConCmd( "dev_medal" )]
+	public static void ShowMedal( string which = "oneshot", float seconds = 1.6f )
+	{
+		var hud = Game.ActiveScene?.GetAllComponents<UI.MainHUD>().FirstOrDefault();
+		if ( hud?.MedalFeed is null ) { Log.Warning( "dev_medal: no medal feed (needs a local pawn in play mode)" ); return; }
+		hud.MedalFeed.Preview( which, seconds );
+	}
+
+	/// <summary>Close the in-game pause/settings menu, as Escape would.</summary>
+	[ConCmd( "dev_closemenu" )]
+	public static void CloseMenu()
+	{
+		UI.PauseMenuPanel.CloseAny();
+	}
+
+	/// <summary>
+	/// Press Escape as the key does, so whatever takes Escape (the menus' back steps, the quit prompt, the pause menu)
+	/// gets it. It's pressed as the next update starts (<see cref="DevEscapeSystem"/>): the bridge runs commands at any
+	/// point in the frame, and an Escape left over after the scene's update is taken by the editor.
+	/// </summary>
+	[ConCmd( "dev_escape" )]
+	public static void PressEscape()
+	{
+		DevEscapeSystem.Pending = true;
+	}
+
 	/// <summary>Open a main menu page by route, e.g. dev_menu /new.</summary>
 	[ConCmd( "dev_menu" )]
 	public static void Menu( string route )
 	{
 		if ( UI.MainMenuRoot.Instance.IsValid() ) Sandbox.UI.Navigation.NavigationExtensions.Navigate( UI.MainMenuRoot.Instance, "/" + route.TrimStart( '/' ) );
+	}
+
+	/// <summary>
+	/// Click a visible UI element by its classes, for testing menus without a mouse: dev_click squad-cog, or
+	/// dev_click privacy-option 2 for the third. Dotted classes must all match (side-link.friends-all). It fires the
+	/// element's onclick, which bubbles up to its parents' handlers like a real click. Hover-only UI isn't reached.
+	/// </summary>
+	[ConCmd( "dev_click" )]
+	public static void Click( string classes, int index = 0 )
+	{
+		var wanted = classes.Split( '.', StringSplitOptions.RemoveEmptyEntries );
+		var matches = Game.ActiveScene.GetAllComponents<PanelComponent>()
+			.Where( x => x.Panel is not null )
+			.SelectMany( x => x.Panel.Descendants )
+			.Where( x => x.IsVisible && wanted.All( x.HasClass ) )
+			.ToList();
+
+		if ( index < 0 || index >= matches.Count )
+		{
+			Log.Warning( $"dev_click: {matches.Count} visible element(s) with .{string.Join( ".", wanted )}" );
+			return;
+		}
+
+		matches[index].CreateEvent( "onclick" );
+		Log.Info( $"dev_click: clicked .{string.Join( ".", wanted )} ({index + 1} of {matches.Count})" );
+	}
+
+	/// <summary>
+	/// Switch the game's language and save it, as the settings page does:
+	/// dev_language uk|us|fr|de|es|pt|it|pl|ru|ua|tr|ja|ko|zh|tw. "uk" is English (UK), so Ukrainian is "ua".
+	/// </summary>
+	[ConCmd( "dev_language" )]
+	public static void SetLanguage( string language )
+	{
+		GameLanguage? picked = language.ToLowerInvariant() switch
+		{
+			"uk" or "en" => GameLanguage.EnglishUK,
+			"us" => GameLanguage.EnglishUS,
+			"fr" => GameLanguage.French,
+			"de" => GameLanguage.German,
+			"es" => GameLanguage.Spanish,
+			"pt" or "br" => GameLanguage.PortugueseBrazil,
+			"it" => GameLanguage.Italian,
+			"pl" => GameLanguage.Polish,
+			"ru" => GameLanguage.Russian,
+			"ua" => GameLanguage.Ukrainian,
+			"tr" => GameLanguage.Turkish,
+			"ja" or "jp" => GameLanguage.Japanese,
+			"ko" or "kr" => GameLanguage.Korean,
+			"zh" or "cn" => GameLanguage.ChineseSimplified,
+			"tw" or "hk" => GameLanguage.ChineseTraditional,
+			_ => null
+		};
+		if ( picked is null )
+		{
+			Log.Warning( $"dev_language: {language}? Use uk, us, fr, de, es, pt, it, pl, ru, ua, tr, ja, ko, zh or tw (now {GameText.Current})" );
+			return;
+		}
+		GameText.SetLanguage( picked.Value );
+		Log.Info( $"dev_language: {GameText.Current}" );
+	}
+
+	/// <summary>Log the text shown in English since the language was last set, because its tables don't have it.</summary>
+	[ConCmd( "dev_text_missing" )]
+	public static void TextMissing()
+	{
+		var missing = GameText.Missing.OrderBy( x => x, StringComparer.OrdinalIgnoreCase ).ToList();
+		Log.Info( $"dev_text_missing: {missing.Count} in {GameText.Current}" );
+		foreach ( var text in missing )
+			Log.Info( $"  {text}" );
+	}
+
+	/// <summary>
+	/// Fill the hub's FRIENDS card to check its layout without friends in a match: you, plus made-up offline rows (Steam
+	/// ids 1 and up, which no account has) up to [rows]. Run it again to take them all off.
+	/// </summary>
+	[ConCmd( "dev_friends_sample" )]
+	public static void FriendsSample( int rows = 1 )
+	{
+		var me = (ulong)Game.SteamId;
+		if ( RecentFriends.Contains( me ) )
+		{
+			RecentFriends.Forget( me );
+			for ( ulong id = 1; id < 20; id++ ) RecentFriends.Forget( id );
+			Log.Info( "dev_friends_sample: took the sample rows off the FRIENDS card" );
+			return;
+		}
+
+		rows = Math.Clamp( rows, 1, 20 );
+		for ( ulong id = 1; id < (ulong)rows; id++ ) RecentFriends.Remember( id );
+		RecentFriends.Remember( me );
+		Log.Info( $"dev_friends_sample: added {rows} sample row(s) to the FRIENDS card (run it again to undo)" );
+	}
+
+	/// <summary>Forget every remembered friend (the hub's FRIENDS card), real ones included.</summary>
+	[ConCmd( "dev_friends_clear" )]
+	public static void FriendsClear()
+	{
+		RecentFriends.Clear();
+		Log.Info( "dev_friends_clear: FRIENDS card emptied" );
+	}
+
+	/// <summary>
+	/// Fill the HUD's list of who's talking (Voices) to check its layout with nobody talking: you, a squadmate, a dead
+	/// enemy and a spectator, all with your avatar. Run it again to take them off.
+	/// </summary>
+	[ConCmd( "dev_voices_sample" )]
+	public static void VoicesSample()
+	{
+		Facepunch.UI.Voices.ShowSample = !Facepunch.UI.Voices.ShowSample;
+		Log.Info( Facepunch.UI.Voices.ShowSample
+			? "dev_voices_sample: sample rows in the list of who's talking (run it again to take them off)"
+			: "dev_voices_sample: took the sample rows off the list of who's talking" );
+	}
+}
+
+/// <summary> Presses Escape for <see cref="DevCommands.PressEscape"/> as the scene's update starts, before anything takes it. </summary>
+public sealed class DevEscapeSystem : GameObjectSystem<DevEscapeSystem>
+{
+	public static bool Pending { get; set; }
+
+	public DevEscapeSystem( Scene scene ) : base( scene )
+	{
+		Listen( Stage.StartUpdate, 0, PressPending, "DevEscape" );
+	}
+
+	private void PressPending()
+	{
+		if ( !Pending ) return;
+
+		Pending = false;
+		Input.EscapePressed = true;
 	}
 }

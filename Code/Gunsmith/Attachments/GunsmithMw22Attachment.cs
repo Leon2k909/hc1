@@ -79,15 +79,20 @@ public sealed class GunsmithMw22Attachment : GunsmithAttachment, ICameraSetup
 		if ( unequipped || !weapon.IsValid() || !AttachmentPoint.IsValid() ) return;
 		var position = BindPosition;
 		var angles = PartAngles;
+		var offset = AttachmentPoint.MountOffset;
 		var barrel = Find( weapon, GunsmithPartType.Barrel );
 		if ( barrel.IsValid() && barrel != this )
 		{
-			if ( AttachmentPoint.Category == GunsmithPartType.Muzzle ) position = barrel.BarrelMuzzle;
-			if ( AttachmentPoint.Category == GunsmithPartType.Underbarrel && !IsLauncher ) position = barrel.BarrelGrip;
-			if ( AttachmentPoint.Category == GunsmithPartType.Laser ) { position = barrel.BarrelLaser; angles = new Angles( 0, 0, 90 ); }
+			// These positions are authored in the barrel's bind space, including its weapon-specific offset.
+			if ( AttachmentPoint.Category == GunsmithPartType.Muzzle ) { position = barrel.BarrelMuzzle; offset = barrel.AttachmentPoint.MountOffset; }
+			if ( AttachmentPoint.Category == GunsmithPartType.Underbarrel && !IsLauncher ) { position = barrel.BarrelGrip; offset = barrel.AttachmentPoint.MountOffset; }
+			if ( AttachmentPoint.Category == GunsmithPartType.Laser ) { position = barrel.BarrelLaser; offset = barrel.AttachmentPoint.MountOffset; angles = new Angles( 0, 0, 90 ); }
 		}
 		if ( AttachmentPoint.Category == GunsmithPartType.Muzzle ) position += GunsmithAttachmentPoint.MuzzleShift( weapon.GameObject );
-		position += AttachmentPoint.MountOffset;
+		if ( AttachmentPoint.Category == GunsmithPartType.Optic )
+			position += weapon.GetComponentsInChildren<GunsmithAttachmentPoint>( true )
+				.Where( p => p.CurrentPart.IsValid() ).Aggregate( Vector3.Zero, (shift, p) => shift + p.CurrentPart.OpticMountShift );
+		position += offset;
 		var pose = BoneDelta( weapon, string.IsNullOrEmpty( AttachmentPoint.MountBone ) ? BoneName : AttachmentPoint.MountBone );
 		WorldPosition = pose.PointToWorld( position );
 		WorldRotation = pose.Rotation * Rotation.From( angles );
@@ -249,8 +254,9 @@ public sealed class GunsmithMw22Factory : Component, ICameraSetup
 			else
 			{
 				var mount = GunsmithMw22Attachment.Find( weapon, GunsmithPartType.Barrel );
-				var delta = GunsmithMw22Attachment.BoneDelta( weapon, "weapon_root" );
-				MuzzleEffectPoint.WorldTransform = delta.WithPosition( delta.PointToWorld( mount.BarrelFlash ) );
+				var point = mount.AttachmentPoint;
+				var delta = GunsmithMw22Attachment.BoneDelta( weapon, string.IsNullOrEmpty( point.MountBone ) ? mount.BoneName : point.MountBone );
+				MuzzleEffectPoint.WorldTransform = delta.WithPosition( delta.PointToWorld( mount.BarrelFlash + point.MountOffset ) );
 			}
 		}
 		else if ( MuzzleEffectPoint.IsValid() ) { MuzzleEffectPoint.Destroy(); MuzzleEffectPoint = null; }

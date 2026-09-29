@@ -1,0 +1,32 @@
+{
+  "Name": "M16A4",
+  "Description": "US 5.56x45mm service rifle with a 20-inch barrel and a four-rail handguard. Semi-automatic and three-round burst.",
+  "Slot": "Primary",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": true,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/guns/m16_01.png",
+  "IsPurchasable": true,
+  "Price": 2600,
+  "KillReward": 300,
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/m16/weapon_m16.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/m16/wm_m16.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/m16/vm_m16.prefab"
+  },
+  "WorldModel": "weapons/m16/w_m16.vmdl",
+  "ArmorReduction": null,
+  "HelmetReduction": null,
+  "WorldModelBodyGroups": 0,
+  "__references": [],
+  "__version": 0,
+  "Category": "AssaultRifle",
+  "GunsmithOffset": "0,0,4"
+}

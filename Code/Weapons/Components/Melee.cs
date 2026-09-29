@@ -35,6 +35,8 @@ public partial class Melee : WeaponInputAction
 	[Rpc.Broadcast]
 	protected void DoEffects( GameObject hit )
 	{
+		MatchRecorder.NoteShot( Equipment?.Owner?.GameObject );
+
 		if ( SwingSound is not null )
 		{
 			if ( Sound.Play( SwingSound, Equipment.WorldPosition ) is SoundHandle snd )
@@ -64,7 +66,8 @@ public partial class Melee : WeaponInputAction
 			var impact = impactPrefab.Clone();
 			impact.WorldPosition = pos + normal;
 			impact.WorldRotation = Rotation.LookAt( normal );
-			impact.SetParent( hitObject, true );
+			if ( hitObject.IsValid() )                     // map clutter (trees) has no GameObject
+				impact.SetParent( hitObject, true );
 
 			// See Shootable.CreateImpactEffects: skip the fixed-update interpolation of the re-parent.
 			impact.Transform.ClearInterpolation();
@@ -89,7 +92,7 @@ public partial class Melee : WeaponInputAction
 			}
 
 			DoEffects( tr.GameObject );
-			CreateImpactEffects( tr.GameObject, tr.Surface, tr.EndPosition, tr.Normal );
+			CreateImpactEffects( tr.GameObject, tr.GetImpactSurface(), tr.EndPosition, tr.Normal );
 
 			// Inflict damage on whatever we find.
 

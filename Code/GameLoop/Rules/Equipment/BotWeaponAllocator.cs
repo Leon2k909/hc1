@@ -27,7 +27,11 @@ public sealed class BotWeaponAllocator : Component,
 		return TeamLoadouts.FirstOrDefault()?.Equipment ?? new();
 	}
 
-	void IGameEventHandler<PlayerSpawnedEvent>.OnGameEvent( PlayerSpawnedEvent eventArgs )
+	// The body is a named method: hotload can't re-link static lambdas inside explicit generic interface methods
+	// ("Unable to find matching substitution for a static method"), so they'd throw after every hotload.
+	void IGameEventHandler<PlayerSpawnedEvent>.OnGameEvent( PlayerSpawnedEvent eventArgs ) => ArmBot( eventArgs );
+
+	void ArmBot( PlayerSpawnedEvent eventArgs )
 	{
 		var player = eventArgs.Player;
 

@@ -27,6 +27,9 @@ public partial class PlayerPawn
 
 	public override void OnKill( DamageInfo damageInfo )
 	{
+		// How they go down depends on how they stood, so it's worked out before prone and the knockdown are cleared.
+		var death = Networking.IsHost ? ChooseDeath( damageInfo ) : DeathPlan.Limp;
+
 		IsFallKnockedDown = false;
 		IsProne = false;
 		var client = Client;
@@ -45,7 +48,8 @@ public partial class PlayerPawn
 			}
 
 			Inventory.Clear();
-			CreateRagdoll();
+			CreateRagdoll( (int)death.Style, death.Duration, death.FallDirection, death.HitSide, death.Velocity,
+				death.HitPosition, death.HitVelocity, death.Blast );
 		}
 
 		PlayerBoxCollider.Enabled = false;
@@ -106,6 +110,7 @@ public partial class PlayerPawn
 		}
 
 		HealthComponent.Health = HealthComponent.MaxHealth;
+		HealthComponent.ClearWounds();
 
 		TimeSinceLastRespawn = 0f;
 
@@ -123,6 +128,7 @@ public partial class PlayerPawn
 			return;
 
 		Possess();
+		UsageStats.CountLife();
 	}
 
 	public void Teleport( Transform transform )
@@ -144,15 +150,39 @@ public partial class PlayerPawn
 		}
 	}
 
+	/// <summary> The host's pick of how this player goes down (<see cref="DeathPlan"/>), sent to everyone with the ragdoll. </summary>
+	private DeathPlan ChooseDeath( DamageInfo damageInfo )
+	{
+		var cc = CharacterController;
+		var local = IsLocallyControlled && cc.IsValid();
+		var velocity = local ? cc.Velocity : SyncedVelocity;
+		var grounded = local ? IsGrounded : SyncedIsGrounded;
+		var down = IsProne || IsFallKnockedDown || !grounded;
+
+		return DeathPlan.Choose( damageInfo, GameObject.Id, WorldPosition, Rotation.FromYaw( EyeAngles.yaw ), velocity,
+			IsCrouching, down );
+	}
+
 	[Rpc.Broadcast( NetFlags.HostOnly )]
-	private void CreateRagdoll()
+	private void CreateRagdoll( int style, float duration, Vector3 fallDirection, Vector3 hitSide, Vector3 velocity,
+		Vector3 hitPosition, Vector3 hitVelocity, bool blast )
 	{
 		if ( !Body.IsValid() )
 			return;
 
+		var death = new DeathPlan
+		{
+			Style = (DeathStyle)style, Duration = duration, FallDirection = fallDirection, HitSide = hitSide,
+			Velocity = velocity, HitPosition = hitPosition, HitVelocity = hitVelocity, Blast = blast
+		};
+
+		// The death's own jolt replaces the old shove on every part (5-20 times the damage, at random).
+		Body.DamageTakenForce = Vector3.Zero;
+
 		if ( Client.IsValid() && Client.IsBot )
 		{
 			Body.SetRagdoll( true );
+			DyingBody.Begin( Body.Physics, death );
 			Body.GameObject.SetParent( null, true );
 			Body.GameObject.Name = $"Ragdoll (BOT {DisplayName})";
 
@@ -164,6 +194,7 @@ public partial class PlayerPawn
 		}
 
 		Body.SetRagdoll( true );
+		DyingBody.Begin( Body.Physics, death );
 		Body.GameObject.SetParent( null, true );
 		Body.GameObject.Name = $"Ragdoll ({DisplayName})";
 

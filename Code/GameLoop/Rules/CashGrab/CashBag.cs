@@ -34,5 +34,5 @@ public partial class CashBag : Component, IDroppedWeaponState<CashBag>, ICustomM
 	/// <summary>
 	/// What text?
 	/// </summary>
-	string IMarkerObject.DisplayText => "Cash";
+	string IMarkerObject.DisplayText => Tr( "Cash" );
 }

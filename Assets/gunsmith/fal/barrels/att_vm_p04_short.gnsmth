@@ -1,0 +1,21 @@
+{
+  "Name": "18-inch Barrel",
+  "Category": "Barrel",
+  "EligibleEquipment": [
+    "weapons/fal/fal.equip"
+  ],
+  "RequiredLevel": 0,
+  "Description": "The 18-inch barrel of the folding-stock 50.62, with a short flash hider. Damage falls off 5% earlier at distance.",
+  "ModifyBodygroups": true,
+  "Bodygroups": {
+    "barrel": 1,
+    "muzzle_tip": 1
+  },
+  "VerticalRecoilScale": 1.0,
+  "HorizontalRecoilScale": 1.0,
+  "MuzzleShift": "-2.099,0,0.002",
+  "TipShift": "-3.827,0,-0.002",
+  "DamageFalloffScale": 0.95,
+  "__references": [],
+  "__version": 0
+}

@@ -37,8 +37,13 @@
     @if ( !Bot.IsAlive ) return;
 
     <div class="dot" />
-    <label class="name">@(Bot.HealthComponent.Health.ToString( "0" ))%</label>
-    <label class="name">BOT @Bot.BotName</label>
+
+    @* Bots only have markers for their teammates (IMarkerObject.ShouldShow), so Hide Teammate Names covers them all. *@
+    @if ( !HideTeammateNames )
+    {
+        <label class="name">@(Bot.HealthComponent.Health.ToString( "0" ))%</label>
+        <label class="name">BOT @Bot.BotName</label>
+    }
 </root>
 
 @code
@@ -53,7 +58,8 @@
             Bot?.HealthComponent?.Health.CeilToInt(),
             Bot?.HealthComponent?.State,
             Marker?.IsBehind,
-            Marker?.IsOffScreen
+            Marker?.IsOffScreen,
+            HideTeammateNames
         );
     }
 }

@@ -80,6 +80,7 @@ public sealed class PlayerStatsRule : Component,
 
 		// Player progression XP: 150 for headshot, 100 for regular kill
 		Progression.AddXP( isHeadshot ? 150 : 100 );
+		DailyChallenges.OnKill( isHeadshot );
 	}
 
 	[Rpc.Broadcast( NetFlags.HostOnly )]

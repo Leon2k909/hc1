@@ -82,14 +82,19 @@
         @if ( Friendly )
         {
             <div class="dot" />
-            <label class="name">@(Player.HealthComponent.Health.ToString( "0" ))%</label>
-            <label class="name">@Player.DisplayName</label>
-            <div class="weapons row">
-                @foreach (var wpn in Player.Inventory.Equipment.Where( CanShowWeapon ).OrderBy( x => x.Resource.Slot ) )
-                {
-                    <img class="icon" src="@wpn.Resource.Icon"/>
-                }
-            </div>
+
+            @* Hide Teammate Names leaves only the circle. The column stacks up from it, so it doesn't move. *@
+            @if ( !HideTeammateNames )
+            {
+                <label class="name">@(Player.HealthComponent.Health.ToString( "0" ))%</label>
+                <label class="name">@Player.DisplayName</label>
+                <div class="weapons row">
+                    @foreach (var wpn in Player.Inventory.Equipment.Where( CanShowWeapon ).OrderBy( x => x.Resource.Slot ) )
+                    {
+                        <img class="icon" src="@wpn.Resource.Icon"/>
+                    }
+                </div>
+            }
 
             @if (Player.Inventory.HasBomb && (!Viewer.IsValid() || Player.IsFriendly(Viewer)) )
             {
@@ -115,8 +120,9 @@
 {
     public PlayerPawn Player => Object?.GameObject?.Components?.Get<PlayerPawn>();
     private PlayerPawn Viewer => Client.Viewer.PlayerPawn;
-    public Color MarkerColor => !Friendly ? Color.Red : Player.Team.GetColor();
-    public Color PersonalColor => !Friendly ? Color.Red : Player.Client.PlayerColor;
+    // Enemies show their own team's colour (TeamExtensions.GetColor), so a Red Team player's enemies are blue.
+    public Color MarkerColor => Player.Team.GetColor();
+    public Color PersonalColor => !Friendly ? Player.Team.GetColor() : Player.Client.PlayerColor;
 
     bool LookingAt => MathF.Abs( Marker.CenterDistance.x ) < 0.1f && MathF.Abs( Marker.CenterDistance.y ) < 0.2f;
 
@@ -130,6 +136,7 @@
         var direction = (Player.AimRay.Position - Viewer.AimRay.Position).Normal;
         var tr = Scene.Trace.Ray( Viewer.AimRay.Position, Viewer.AimRay.Position + direction * distance )
             .IgnoreGameObjectHierarchy( Viewer.GameObject )
+            .WithoutTags( "playerclip", BreakableGlass.Tag )
             .Run();
 
         return tr;
@@ -143,7 +150,7 @@
             if ( !tr.Hit ) return false;
             if ( Player is null ) return false;
 
-            return tr.GameObject.Root == Player.GameObject;
+            return tr.GameObject.IsValid() && tr.GameObject.Root == Player.GameObject;
         }
     }
 
@@ -171,7 +178,8 @@
             Marker?.IsBehind,
             Marker?.IsOffScreen,
             Friendly,
-            LookingAt
+            LookingAt,
+            HideTeammateNames
         );
     }
 }

@@ -6,14 +6,16 @@ Each reticle gets two images in Assets/gunsmith/reticles/textures/:
                       sized in the same lens-UV units as the shader's built-in dot (radius 0.01).
   <name>_preview.png  the same shape filling a small transparent square, for the Customize tab
                       (tinted with the chosen reticle colour there).
+The ones in LABELS also get their part, Assets/gunsmith/reticles/reticle_<name>.gnsmth.
 
-Run: python Tools/reticle_textures.py
+Run: python Tools/reticle_textures.py [name ...]      (every reticle when no names are given)
 """
 
 from __future__ import annotations
 
 import json
 import math
+import sys
 import uuid
 from pathlib import Path
 
@@ -135,6 +137,176 @@ def flower(x, y):
     return petals | dot(x, y, 0.008)
 
 
+def rotated(x, y, angle):
+    """(x, y) turned by -angle, so a shape drawn along +x comes out pointing along `angle`."""
+    c, s = math.cos(angle), math.sin(angle)
+    return x * c + y * s, -x * s + y * c
+
+
+def duplex(x, y):
+    """The hunting scope's reticle: heavy posts from the edges, a fine crosshair in the middle."""
+    posts = np.zeros(x.shape, dtype=bool)
+    for sx, sy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+        posts |= bar(x, y, sx * 0.019, sy * 0.019, sx * 0.050, sy * 0.050, 0.0042)
+    return posts | bar(x, y, -0.019, 0, 0.019, 0, 0.0016) | bar(x, y, 0, -0.019, 0, 0.019, 0.0016)
+
+
+def mil_hash(x, y):
+    lines = bar(x, y, -0.046, 0, 0.046, 0, 0.0017) | bar(x, y, 0, -0.046, 0, 0.046, 0.0017)
+    for step in (1, 2, 3):
+        d = 0.012 * step
+        half = 0.0065 if step == 2 else 0.0042
+        for s in (-1, 1):
+            lines |= bar(x, y, s * d, -half, s * d, half, 0.0017) | bar(x, y, -half, s * d, half, s * d, 0.0017)
+    return lines
+
+
+def german_one(x, y):
+    """Heavy posts from the sides and a pointed post from below, its tip on the point of aim."""
+    sides = bar(x, y, -0.050, 0, -0.014, 0, 0.0045) | bar(x, y, 0.014, 0, 0.050, 0, 0.0045)
+    post = polygon(x, y, [(-0.0045, 0.050), (-0.0045, 0.010), (0, 0), (0.0045, 0.010), (0.0045, 0.050)])
+    return sides | post
+
+
+def chevron_scale(x, y):
+    """The SVD's PSO-1: an aiming chevron, three smaller ones below it for longer range, and a lateral scale."""
+    shape = bar(x, y, 0, 0, -0.0085, 0.0085, 0.0021) | bar(x, y, 0, 0, 0.0085, 0.0085, 0.0021)
+    for step in (1, 2, 3):
+        top = 0.0085 + 0.0095 * step
+        shape |= bar(x, y, 0, top, -0.0055, top + 0.0055, 0.0019) | bar(x, y, 0, top, 0.0055, top + 0.0055, 0.0019)
+    shape |= bar(x, y, -0.047, 0, -0.012, 0, 0.0017) | bar(x, y, 0.012, 0, 0.047, 0, 0.0017)
+    for step in (1, 2, 3, 4):
+        d = 0.012 + 0.0088 * step
+        tick = 0.0055 if step % 2 == 0 else 0.0035
+        for s in (-1, 1):
+            shape |= bar(x, y, s * d, -tick, s * d, 0, 0.0017)
+    return shape
+
+
+def holdover_tree(x, y):
+    """A crosshair whose lower line carries rows of windage dots, wider for each longer range."""
+    shape = (bar(x, y, -0.046, 0, -0.005, 0, 0.0017) | bar(x, y, 0.005, 0, 0.046, 0, 0.0017)
+             | bar(x, y, 0, -0.030, 0, -0.005, 0.0017) | bar(x, y, 0, 0.005, 0, 0.048, 0.0017)
+             | dot(x, y, 0.0028))
+    for row in (1, 2, 3, 4):
+        cy = 0.0105 * row
+        for col in range(1, row + 1):
+            for s in (-1, 1):
+                shape |= dot(x - s * 0.0080 * col, y - cy, 0.0024)
+    return shape
+
+
+def dot_stack(x, y):
+    """An aiming dot with holdover dots below it."""
+    shape = dot(x, y, 0.0045)
+    for step, radius in ((1, 0.0032), (2, 0.0030), (3, 0.0028), (4, 0.0026)):
+        shape |= dot(x, y - 0.0105 * step, radius)
+    return shape
+
+
+def corners(x, y):
+    shape = dot(x, y, 0.004)
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            cx, cy = sx * 0.032, sy * 0.032
+            shape |= bar(x, y, cx, cy, cx - sx * 0.013, cy, 0.0025) | bar(x, y, cx, cy, cx, cy - sy * 0.013, 0.0025)
+    return shape
+
+
+def dot_ring(x, y):
+    shape = dot(x, y, 0.0042)
+    for i in range(12):
+        angle = i * math.pi / 6
+        shape |= dot(x - math.cos(angle) * 0.035, y - math.sin(angle) * 0.035, 0.0032 if i % 3 == 0 else 0.0024)
+    return shape
+
+
+def arrow(x, y):
+    """Its tip on the point of aim."""
+    return polygon(x, y, [(0, 0), (-0.015, 0.017), (-0.0045, 0.017), (-0.0045, 0.046),
+                          (0.0045, 0.046), (0.0045, 0.017), (0.015, 0.017)])
+
+
+def moon(x, y):
+    return dot(x, y, 0.036) & ~dot(x - 0.016, y + 0.010, 0.031)
+
+
+def sun(x, y):
+    rays = np.zeros(x.shape, dtype=bool)
+    for i in range(8):
+        angle = i * math.pi / 4
+        c, s = math.cos(angle), math.sin(angle)
+        rays |= bar(x, y, c * 0.022, s * 0.022, c * 0.040, s * 0.040, 0.0030)
+    return rays | dot(x, y, 0.015)
+
+
+def snowflake(x, y):
+    flake = dot(x, y, 0.0045)
+    for i in range(6):
+        angle = i * math.pi / 3 + math.pi / 2
+        c, s = math.cos(angle), math.sin(angle)
+        flake |= bar(x, y, 0, 0, c * 0.041, s * 0.041, 0.0024)
+        for base, length in ((0.017, 0.009), (0.028, 0.008)):
+            bx, by = c * base, s * base
+            for turn in (-1, 1):
+                branch = angle + turn * math.pi / 4
+                flake |= bar(x, y, bx, by, bx + math.cos(branch) * length, by + math.sin(branch) * length, 0.0021)
+    return flake
+
+
+def clover(x, y):
+    """Four heart-shaped leaves, their points at the middle, split by thin gaps, and a stem."""
+    leaves = np.zeros(x.shape, dtype=bool)
+    for i in range(4):
+        lx, ly = rotated(x, y, i * math.pi / 2 - math.pi / 2)
+        lobes = dot(lx - 0.021, ly - 0.0072, 0.0082) | dot(lx - 0.021, ly + 0.0072, 0.0082)
+        point = polygon(lx, ly, [(0.0015, 0), (0.019, -0.0140), (0.024, 0), (0.019, 0.0140)])
+        leaves |= lobes | point
+    gaps = bar(x, y, -0.040, -0.040, 0.040, 0.040, 0.0011) | bar(x, y, -0.040, 0.040, 0.040, -0.040, 0.0011)
+    stem = bar(x, y, 0.003, 0.004, 0.012, 0.022, 0.0024) | bar(x, y, 0.012, 0.022, 0.016, 0.044, 0.0024)
+    return (leaves & ~gaps) | (stem & ~leaves)
+
+
+def spade(x, y):
+    return heart(x / 0.84, -(y - 0.010) / 0.84) | polygon(x, y, [(0, 0.012), (-0.011, 0.043), (0.011, 0.043)])
+
+
+def anchor(x, y):
+    shank = bar(x, y, 0, -0.027, 0, 0.038, 0.0029)
+    eye = ring(x, y + 0.034, 0.0065, 0.0024)
+    stock = bar(x, y, -0.015, -0.019, 0.015, -0.019, 0.0029)
+    arms = ring(x, y - 0.006, 0.032, 0.0029) & (y > 0.012)
+    flukes = (polygon(x, y, [(-0.0335, 0.004), (-0.041, 0.020), (-0.026, 0.018)])
+              | polygon(x, y, [(0.0335, 0.004), (0.041, 0.020), (0.026, 0.018)]))
+    return shank | eye | stock | arms | flukes
+
+
+def cat(x, y):
+    head = ellipse(x, y, 0, 0.006, 0.031, 0.026)
+    ears = (polygon(x, y, [(-0.030, -0.002), (-0.026, -0.040), (-0.007, -0.018)])
+            | polygon(x, y, [(0.030, -0.002), (0.026, -0.040), (0.007, -0.018)]))
+    eyes = ellipse(x, y, -0.011, 0.001, 0.0045, 0.0068) | ellipse(x, y, 0.011, 0.001, 0.0045, 0.0068)
+    nose = polygon(x, y, [(-0.0045, 0.011), (0.0045, 0.011), (0, 0.016)])
+    whiskers = np.zeros(x.shape, dtype=bool)
+    for s in (-1, 1):
+        whiskers |= bar(x, y, s * 0.012, 0.016, s * 0.046, 0.012, 0.0015)
+        whiskers |= bar(x, y, s * 0.012, 0.020, s * 0.045, 0.024, 0.0015)
+    face = head | ears
+    # Whiskers are cut out of the face and drawn past its edge.
+    return (face & ~(eyes | nose | whiskers)) | (whiskers & ~face)
+
+
+def flame(x, y):
+    """A teardrop flame with a smaller tongue on its left, and a hollow core."""
+    body = ellipse(x, y, 0, 0.017, 0.023, 0.025) | polygon(x, y, [
+        (-0.0228, 0.014), (-0.018, -0.004), (-0.008, -0.020), (0.002, -0.047), (0.012, -0.022),
+        (0.020, -0.006), (0.0228, 0.014)])
+    tongue = polygon(x, y, [(-0.0225, 0.010), (-0.0245, -0.006), (-0.022, -0.031), (-0.013, -0.014), (-0.010, 0.000)])
+    core = ellipse(x, y, 0.001, 0.024, 0.0100, 0.0115) | polygon(x, y, [
+        (-0.0093, 0.022), (-0.004, 0.008), (0.003, -0.010), (0.0093, 0.022)])
+    return (body | tongue) & ~core
+
+
 # Coordinates are lens UV relative to the centre; +y is down the texture (towards the bottom of the sight).
 SHAPES = {
     "red_dot": lambda x, y: dot(x, y, 0.010),
@@ -203,6 +375,33 @@ SHAPES = {
     "crown": crown,
     "paw": paw,
     "flower": flower,
+    "duplex": duplex,
+    "fine_crosshair": lambda x, y: bar(x, y, -0.048, 0, 0.048, 0, 0.0016) | bar(x, y, 0, -0.048, 0, 0.048, 0.0016),
+    "mil_hash": mil_hash,
+    # A holographic sight's ring and dot, with a second dot below for close range.
+    "twin_dot_ring": lambda x, y: ring(x, y, 0.040, 0.0028) | dot(x, y, 0.0045) | dot(x, y - 0.015, 0.0036),
+    "ticked_ring": lambda x, y: (ring(x, y, 0.038, 0.0028) | dot(x, y, 0.004)
+        | bar(x, y, -0.038, 0, -0.026, 0, 0.0025) | bar(x, y, 0.026, 0, 0.038, 0, 0.0025)
+        | bar(x, y, 0, -0.038, 0, -0.026, 0.0025) | bar(x, y, 0, 0.026, 0, 0.038, 0.0025)),
+    # A small solid triangle, its tip on the point of aim.
+    "delta": lambda x, y: polygon(x, y, [(0, 0), (-0.0115, 0.020), (0.0115, 0.020)]),
+    "horseshoe_chevron": lambda x, y: ((ring(x, y, 0.036, 0.0028) & (y < 0.022))
+        | bar(x, y, 0, 0, -0.012, 0.0105, 0.0026) | bar(x, y, 0, 0, 0.012, 0.0105, 0.0026)),
+    "german_one": german_one,
+    "chevron_scale": chevron_scale,
+    "holdover_tree": holdover_tree,
+    "dot_stack": dot_stack,
+    "corners": corners,
+    "dot_ring": dot_ring,
+    "arrow": arrow,
+    "moon": moon,
+    "sun": sun,
+    "snowflake": snowflake,
+    "clover": clover,
+    "spade": spade,
+    "anchor": anchor,
+    "cat": cat,
+    "flame": flame,
 }
 
 
@@ -215,6 +414,12 @@ LABELS = {
     "split_cross": "Split Cross", "skull": "Skull", "crossbones": "Crossbones",
     "alien": "Alien", "heart": "Heart", "smile": "Smiley", "star": "Star",
     "lightning": "Lightning", "crown": "Crown", "paw": "Paw Print", "flower": "Flower",
+    "duplex": "Duplex", "fine_crosshair": "Fine Crosshair", "mil_hash": "Mil-Hash",
+    "twin_dot_ring": "Twin Dot Ring", "ticked_ring": "Ticked Ring", "delta": "Delta",
+    "horseshoe_chevron": "Horseshoe Chevron", "german_one": "German #1", "chevron_scale": "Chevron Scale",
+    "holdover_tree": "Holdover Tree", "dot_stack": "Dot Stack", "corners": "Corners", "dot_ring": "Dot Ring",
+    "arrow": "Arrow", "moon": "Moon", "sun": "Sun", "snowflake": "Snowflake", "clover": "Clover",
+    "spade": "Spade", "anchor": "Anchor", "cat": "Cat", "flame": "Flame",
 }
 
 
@@ -242,8 +447,13 @@ def write_meta(path: Path) -> None:
 
 
 def main() -> None:
+    names = sys.argv[1:] or list(SHAPES)
+    unknown = [name for name in names if name not in SHAPES]
+    if unknown:
+        sys.exit(f"unknown reticle(s): {', '.join(unknown)}")
     OUT.mkdir(parents=True, exist_ok=True)
-    for name, shape in SHAPES.items():
+    for name in names:
+        shape = SHAPES[name]
         coverage = rasterise(shape, MASK_SIZE, 1.0)
         grey = (coverage * 255).round().astype(np.uint8)
         mask_path = OUT / f"{name}.png"
@@ -270,7 +480,7 @@ def main() -> None:
             }
             resource_path.write_text(json.dumps(resource, indent=2) + "\n", encoding="utf-8")
             write_meta(resource_path)
-    print(f"wrote {len(SHAPES)} reticles ({len(LABELS)} new) to {OUT}")
+    print(f"wrote {len(names)} reticle(s) ({len([n for n in names if n in LABELS])} with a part file) to {OUT}")
 
 
 if __name__ == "__main__":

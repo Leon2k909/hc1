@@ -12,11 +12,7 @@
     <div class="global-nav">
 
         <a class="gnav-logo" href="/">
-            <img src="/ui/teams/operators_logo_banner.png" />
-            <div class="gnav-logo-text">
-                <label class="gnav-game-name">RAZED</label>
-                <label class="gnav-game-sub">HQ</label>
-            </div>
+            <label class="gnav-game-name">RAZED</label>
         </a>
 
         @* ── Nav tabs + bumpers (bumpers only show with controller) ── *@
@@ -27,37 +23,45 @@
             }
 
             <div class="gnav-items">
-                <a class="gnav-item @(IsActive("/", "/multiplayer") ? "active" : "")" href="/">
+                <a class="gnav-item @(IsActive("/") ? "active" : "")" href="/">
                     <i>home</i>
-                    <label>PLAY</label>
+                    <label>@Tr( "PLAY" )</label>
+                    <div class="gnav-item-bar" />
                 </a>
                 <div class="gnav-item" @onclick=@OpenGunsmith>
                     <i>build</i>
-                    <label>WEAPONS</label>
+                    <label>@Tr( "WEAPONS" )</label>
+                    <div class="gnav-item-bar" />
                 </div>
+                <a class="gnav-item @(IsActive("/operators") ? "active" : "")" href="/operators">
+                    <i>badge</i>
+                    <label>@Tr( "OPERATORS" )</label>
+                    <div class="gnav-item-bar" />
+                </a>
                 <a class="gnav-item @(IsActive("/ranked") ? "active" : "")" href="/ranked">
                     <i>military_tech</i>
-                    <label>RANKED</label>
+                    <label>@Tr( "RANKED" )</label>
+                    <div class="gnav-item-bar" />
                 </a>
                 <a class="gnav-item @(IsActive("/new") ? "active" : "")" href="/new">
-                    <i>vpn_key</i>
-                    <label>PRIVATE</label>
-                </a>
-                <a class="gnav-item @(IsActive("/career") ? "active" : "")" href="/career">
-                    <i>military_tech</i>
-                    <label>PROGRESSION</label>
+                    <i>tune</i>
+                    <label>@Tr( "CUSTOM GAME" )</label>
+                    <div class="gnav-item-bar" />
                 </a>
                 <a class="gnav-item @(IsActive("/barracks") ? "active" : "")" href="/barracks">
                     <i>star</i>
-                    <label>BARRACKS</label>
+                    <label>@Tr( "PROFILE" )</label>
+                    <div class="gnav-item-bar" />
                 </a>
                 <a class="gnav-item @(IsActive("/lobbies") ? "active" : "")" href="/lobbies">
                     <i>dns</i>
-                    <label>SESSIONS</label>
+                    <label>@Tr( "SESSIONS" )</label>
+                    <div class="gnav-item-bar" />
                 </a>
                 <a class="gnav-item @(IsActive("/store") ? "active" : "")" href="/store">
                     <i>storefront</i>
-                    <label>STORE</label>
+                    <label>@Tr( "STORE" )</label>
+                    <div class="gnav-item-bar" />
                 </a>
             </div>
 
@@ -70,14 +74,59 @@
         <PartyPanel />
 
         <div class="gnav-right">
-            <a class="gnav-profile" href="/career">
+            <div class="gnav-round-btns">
+                <div class="gnav-round-btn @(_openMenu == HeaderMenu.More ? "open" : "")" @onclick=@(() => ToggleMenu( HeaderMenu.More ))>
+                    <i>grid_view</i>
+                    <label class="gnav-tip">@Tr( "MORE" )</label>
+                </div>
+                <div class="gnav-round-btn @(_openMenu == HeaderMenu.Notifications ? "open" : "")" @onclick=@(() => ToggleMenu( HeaderMenu.Notifications ))>
+                    <i>notifications</i>
+                    <label class="gnav-tip">@Tr( "NOTIFICATIONS" )</label>
+                </div>
+                <a class="gnav-round-btn @(IsActive("/settings") ? "open" : "")" href="/settings">
+                    <i>settings</i>
+                    <label class="gnav-tip">@Tr( "SETTINGS" )</label>
+                </a>
+
+                @if ( _openMenu == HeaderMenu.More )
+                {
+                    <div class="gnav-dropdown">
+                        <div class="gnav-menu-item" @onclick=@OpenTheater>
+                            <i>theaters</i>
+                            <label>@Tr( "THEATER" )</label>
+                        </div>
+                        <div class="gnav-menu-item" @onclick=@ReportBug>
+                            <i>bug_report</i>
+                            <label>@Tr( "REPORT A BUG" )</label>
+                        </div>
+                        <div class="gnav-menu-divider" />
+                        <div class="gnav-menu-item warn" @onclick=@QuitGame>
+                            <i>power_settings_new</i>
+                            <label>@Tr( "QUIT GAME" )</label>
+                        </div>
+                    </div>
+                }
+                else if ( _openMenu == HeaderMenu.Notifications )
+                {
+                    @* Nothing sends notifications yet. Hand-written "what's new" notes read as fake update notices, so they're out. *@
+                    <div class="gnav-dropdown notifications">
+                        <label class="gnav-dropdown-title">@Tr( "NOTIFICATIONS" )</label>
+                        <div class="gnav-notifications-empty">
+                            <i>notifications_none</i>
+                            <label>@Tr( "No notifications" )</label>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <a class="gnav-profile" href="/barracks">
                 @if ( Progression.GetPrestige() > 0 )
                 {
-                    <img src="/ui/prestige/prestige_@(Progression.GetPrestige()).png" style="height: 44px; width: 44px; margin-right: 12px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)); object-fit: contain;" />
+                    <img class="gnav-prestige" src="/ui/prestige/prestige_@(Progression.GetPrestige())_readable.png" />
                 }
                 <div class="gnav-profile-info">
                     <label class="gnav-profile-name">@LocalName</label>
-                    <label class="gnav-profile-level">LV @PlayerLevel</label>
+                    <label class="gnav-profile-level">@Tr( "LV {0}", PlayerLevel )</label>
                 </div>
                 @if ( LocalSteamId != 0 )
                 {
@@ -87,41 +136,56 @@
                 {
                     <div class="gnav-avatar gnav-avatar-placeholder"><i>person</i></div>
                 }
+                <label class="gnav-tip">@Tr( "PROFILE" )</label>
             </a>
-            <button class="gnav-icon-btn" @onclick=@OpenFriendsList title="Friends">
+            <div class="gnav-icon-btn" @onclick=@OpenFriendsList>
                 <i>group</i>
-            </button>
-            <a class="gnav-icon-btn" href="/settings" title="Settings">
-                <i>settings</i>
-            </a>
+                <label class="gnav-tip right">@Tr( "FRIENDS" )</label>
+            </div>
         </div>
     </div>
+
+    @if ( _openMenu != HeaderMenu.None )
+    {
+        @* Clicking anywhere else closes the open menu. *@
+        <div class="gnav-dismiss" @onclick=@CloseMenu />
+    }
 
     @* ── Pages render here ─────────────────────────────────────── *@
     <div class="navigator-canvas" slot="navigator-canvas" />
 
     <BugReportPanel @ref=BugReportPanelRef />
+    <QuitPrompt @ref=QuitPromptRef />
 </root>
 
 @code
 {
     public static MainMenuRoot Instance { get; set; }
     private BugReportPanel BugReportPanelRef { get; set; }
+    private QuitPrompt QuitPromptRef { get; set; }
+
+    /// <summary>
+    /// A page to open as soon as the menu is up, for a scene that goes back to the menu on a page other than the hub:
+    /// the gunsmith's nav tabs (<see cref="GameUtils.ReturnToMainMenu"/>).
+    /// </summary>
+    public static string PendingRoute { get; set; }
 
     // Track the current page route so nav items can highlight correctly.
     public string ActiveRoute { get; private set; } = "/";
 
     public MainMenuRoot()
     {
+        CustomGameSettings.Reset();
         Instance = this;
         DefaultUrl = "/";
         AddDestination( "/",            typeof( HubPage ) );
-        AddDestination( "/multiplayer", typeof( LandingPage ) );
         AddDestination( "/ranked",      typeof( RankedPage ) );
+        AddDestination( "/operators",   typeof( OperatorsPage ) );
         AddDestination( "/lobbies",     typeof( LobbyList ) );
         AddDestination( "/store",       typeof( StorePage ) );
         AddDestination( "/new",         typeof( CreateLobbyPage ) );
         AddDestination( "/career",      typeof( CareerLanding ) );
+        AddDestination( "/barracks/career", typeof( CareerLanding ) );
         AddDestination( "/barracks",    typeof( BarracksPage ) );
         AddDestination( "/theater",     typeof( TheaterPage ) );
         AddDestination( "/settings",    typeof( SettingsPage ) );
@@ -131,6 +195,7 @@
     public void SetActiveRoute( string route )
     {
         ActiveRoute = route;
+        _openMenu = HeaderMenu.None;
         StateHasChanged();
     }
 
@@ -142,7 +207,7 @@
     private static readonly string[] ControllerNavRoutes =
     {
         "/",
-        "/career",
+        "/operators",
         "/barracks",
         "/lobbies",
         "/store",
@@ -173,7 +238,15 @@
     {
         base.Tick();
         Instance = this; // the live, ticking root (constructor may run for other instances)
+        if ( PendingRoute is { } route && CurrentUrl is not null )
+        {
+            PendingRoute = null;
+            if ( !CurrentUrlMatches( route ) )
+                this.Navigate( route );
+        }
         ResponsiveLayout.Update( this );
+        // The full-size header needs about 1900 units, so anything narrower than a 16:9 screen tightens it up.
+        SetClass( "tight-nav", Box.Rect.Size.x * ScaleFromScreen < 1900 );
         if ( !Input.UsingController ) return;
 
         // Use raw shoulder button tracking so no action bindings are needed
@@ -187,6 +260,74 @@
         _rbWasDown = rbDown;
     }
 
+    // ── Round buttons: the quick menu and notifications ────────
+    private enum HeaderMenu { None, More, Notifications }
+    private HeaderMenu _openMenu;
+
+    private void ToggleMenu( HeaderMenu menu )
+    {
+        _openMenu = _openMenu == menu ? HeaderMenu.None : menu;
+        Sound.Play( "ui_button_press" );
+    }
+
+    private void CloseMenu() => _openMenu = HeaderMenu.None;
+
+    private void OpenTheater()
+    {
+        CloseMenu();
+        this.Navigate( "/theater" );
+    }
+
+    private void ReportBug()
+    {
+        CloseMenu();
+        OpenBugReport();
+    }
+
+    private void QuitGame()
+    {
+        CloseMenu();
+        OpenQuitPrompt();
+    }
+
+    /// <summary> Asks whether to quit (<see cref="QuitPrompt"/>): Escape, the header's QUIT GAME and the hub's power button. </summary>
+    public void OpenQuitPrompt() => QuitPromptRef?.Open();
+
+    // ── Escape ─────────────────────────────────────────────────
+    /// <summary>
+    /// Escape closes one thing at a time: the language list, the bug report, the quit prompt, a header menu, the hub's
+    /// overlays and the squad's privacy menu. With nothing open it asks whether to quit (<see cref="QuitPrompt"/>).
+    /// Called from <see cref="MainMenuPanel"/>'s update: a panel's Tick is too late to see Escape.
+    /// </summary>
+    public void HandleEscape()
+    {
+        Input.EscapePressed = false;
+        if ( LanguageMenu.CloseAny() ) return;
+
+        if ( BugReportPanelRef is { IsOpen: true } )
+        {
+            BugReportPanelRef.Close();
+            return;
+        }
+
+        if ( QuitPromptRef is { IsOpen: true } )
+        {
+            QuitPromptRef.Close();
+            return;
+        }
+
+        if ( _openMenu != HeaderMenu.None )
+        {
+            CloseMenu();
+            return;
+        }
+
+        if ( Descendants.OfType<HubPage>().Any( x => x.CloseOverlay() ) ) return;
+        if ( Descendants.OfType<HubSidebar>().Any( x => x.ClosePrivacyMenu() ) ) return;
+
+        OpenQuitPrompt();
+    }
+
     // ── Profile info ───────────────────────────────────────────
     private ulong LocalSteamId => Client.Local.IsValid() ? Client.Local.SteamId : (Connection.Local?.SteamId ?? 0UL);
     private string LocalName
@@ -194,7 +335,7 @@
         get
         {
             var n = Client.Local.IsValid() ? Client.Local.DisplayName : Connection.Local?.DisplayName;
-            return string.IsNullOrWhiteSpace( n ) ? "PLAYER" : n.ToUpper();
+            return string.IsNullOrWhiteSpace( n ) ? Tr( "PLAYER" ) : n.ToUpper();
         }
     }
     private int PlayerLevel => Progression.GetLevel();
@@ -216,16 +357,10 @@
 
     private void OpenFriendsList()
     {
-        if ( !Game.IsEditor )
+        Game.Overlay.ShowFriendsList( new Sandbox.Modals.FriendsListModalOptions()
         {
-            Game.Overlay.ShowFriendsList( new Sandbox.Modals.FriendsListModalOptions()
-            {
-                ShowOfflineMembers = true,
-            } );
-            return;
-        }
-
-        Toast.Instance?.Show( "Friends list overlay is not available in editor" );
+            ShowOfflineMembers = true,
+        } );
     }
 
     public void SetBlur( bool doBlur )
@@ -235,5 +370,5 @@
     }
 
     protected override int BuildHash()
-        => HashCode.Combine( ActiveRoute, LocalName, PlayerLevel, Progression.GetPrestige(), LocalSteamId, Input.UsingController );
+        => HashCode.Combine( ActiveRoute, LocalName, PlayerLevel, Progression.GetPrestige(), LocalSteamId, Input.UsingController, _openMenu );
 }

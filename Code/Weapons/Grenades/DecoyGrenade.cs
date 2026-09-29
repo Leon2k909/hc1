@@ -15,7 +15,8 @@ public sealed class DecoyGrenade : BaseGrenade, ICustomMinimapIcon
 
 	string IMinimapIcon.IconPath => "ui/minimaps/enemy_icon.png";
 	Vector3 IMinimapElement.WorldPosition => WorldPosition;
-	string ICustomMinimapIcon.CustomStyle => "background-image-tint: rgba(255, 0, 0, 1 );";
+	// Looks like one of the thrower's team on the enemy's minimap (PlayerMarker's enemy tint).
+	string ICustomMinimapIcon.CustomStyle => $"background-image-tint: {(Player.IsValid() ? Player.Team.GetColor() : Color.Red).Hex}";
 	bool IMinimapElement.IsVisible( Pawn viewer ) => TimeSinceShot < 0.5f && IsEnemy;
 
 	protected override void OnUpdate()

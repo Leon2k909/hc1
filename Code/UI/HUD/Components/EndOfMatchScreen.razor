@@ -27,18 +27,18 @@
                 </span>
             </div>
         }
-        <label class="eom-mode-label">@(GameMode.Instance?.DisplayTitle?.ToUpper() ?? "")</label>
+        <label class="eom-mode-label">@Tr( GameMode.Instance?.DisplayTitle?.ToUpper() ?? "" )</label>
     </div>
 
     @* ── SCOREBOARD ───���──────────────────────────────────────────── *@
     <div class="eom-table-wrap">
         <div class="eom-table-header eom-row">
             <span class="col-mvp"></span>
-            <span class="col-name">PLAYER</span>
-            <span class="col-stat">KILLS</span>
-            <span class="col-stat">DEATHS</span>
+            <span class="col-name">@Tr( "PLAYER" )</span>
+            <span class="col-stat">@Tr( "KILLS" )</span>
+            <span class="col-stat">@Tr( "DEATHS" )</span>
             <span class="col-stat">K/D</span>
-            <span class="col-stat">SCORE</span>
+            <span class="col-stat">@Tr( "SCORE" )</span>
         </div>
         @foreach ( var e in entries )
         {
@@ -60,15 +60,15 @@
             <label class="eom-xp-earned">+@XpEarned XP</label>
             @if ( WonMatch )
             {
-                <label class="eom-win-bonus">WIN BONUS INCLUDED</label>
+                <label class="eom-win-bonus">@Tr( "WIN BONUS INCLUDED" )</label>
             }
             @if ( LeveledUp )
             {
-                <label class="eom-level-up-badge">LEVEL UP!</label>
+                <label class="eom-level-up-badge">@Tr( "LEVEL UP!" )</label>
             }
         </div>
         <div class="eom-bar-row">
-            <label class="eom-lv-label">LV @LevelBefore</label>
+            <label class="eom-lv-label">@Tr( "LV {0}", LevelBefore )</label>
             <div class="eom-level-bar">
                 @* Already-earned portion *@
                 <div class="eom-bar-old" style="width: @(ProgressBefore * 100f)%;"></div>
@@ -82,14 +82,27 @@
                     <div class="eom-bar-new" style="width: @(MathF.Max( 0f, ProgressAfter - ProgressBefore ) * 100f)%;"></div>
                 }
             </div>
-            <label class="eom-lv-label">LV @(LeveledUp ? Progression.GetLevel() : LevelBefore)</label>
+            <label class="eom-lv-label">@Tr( "LV {0}", LeveledUp ? Progression.GetLevel() : LevelBefore )</label>
         </div>
     </div>
+
+    @if ( GameMode.Instance?.IsRanked == true )
+    {
+        <div class="eom-ranked-result">
+            <img class="eom-rank-emblem" src=@Rank.GetEmblem( Rank.GetTierIndex() ) />
+            <div class="eom-rank-copy">
+                <label class="eom-rank-heading">@Tr( Rank.IsPlaced ? "RANKED RESULT" : "PLACEMENT COMPLETE" )</label>
+                <label class="eom-rank-name" style="color: @Rank.GetTierColor();">@Rank.Translate( Rank.GetRankName().ToUpper() )</label>
+                <label class="eom-rank-progress">@(Rank.IsPlaced ? Tr( "{0:0.#}% THROUGH RANK", Rank.GetDivisionProgress() * 100f ) : Tr( "{0} / {1} PLACEMENT MATCHES", Rank.PlacementsCompleted, Rank.PlacementMatches ))</label>
+            </div>
+            <label class="eom-rank-return">@Tr( "RETURNING TO RANKED" )</label>
+        </div>
+    }
 
     @* ── FOOTER ───────────────────────────────────────────────────── *@
     <div class="eom-footer">
         <div class="eom-continue-btn" @onclick=@Dismiss>
-            <label>CONTINUE</label>
+            <label>@Tr( "CONTINUE" )</label>
         </div>
         <label class="eom-timer-label">@SecondsLeft<span class="eom-timer-s">s</span></label>
     </div>
@@ -108,7 +121,7 @@
     /// <paramref name="winningTeam"/> is <see cref="Team.Unassigned"/> for a draw
     /// or a free-for-all mode where team scoring isn't used.
     /// </summary>
-    [Rpc.Broadcast]
+    [Rpc.Broadcast( NetFlags.HostOnly )]
     public static void Show( Team winningTeam )
     {
         if ( !Instance.IsValid() ) return;
@@ -140,11 +153,16 @@
 
     private TeamScoring TeamScoring => GameMode.Instance?.Get<TeamScoring>();
     private Team LocalTeam => Client.Local?.Team ?? Team.Unassigned;
-    private bool WonMatch  => WinningTeam != Team.Unassigned && WinningTeam == LocalTeam;
-    private bool IsDraw    => WinningTeam == Team.Unassigned;
+    // Battle royale has no teams: you win by being the last one standing, and otherwise it's your placing.
+    private static BattleRoyaleMatch Royale => GameUtils.IsBattleRoyale ? BattleRoyaleMatch.Current : null;
+    private bool WonMatch  => Royale is { } royale ? royale.LocalPlayerWon : WinningTeam != Team.Unassigned && WinningTeam == LocalTeam;
+    private bool IsDraw    => Royale is not null ? !WonMatch : WinningTeam == Team.Unassigned;
 
     private string ResultClass => WonMatch ? "victory" : IsDraw ? "draw" : "defeat";
-    private string ResultText  => WonMatch ? "VICTORY" : IsDraw ? "MATCH OVER" : "DEFEAT";
+    // In the player's language. "{0} PLACE" is given the English ordinal ("2ND") and the bare number, which the other
+    // languages write their own ordinal with ("{1}. Platz").
+    private string ResultText  => WonMatch ? Tr( "VICTORY" ) : Royale is { LocalPlacement: > 0 } placed
+        ? Tr( "{0} PLACE", BattleRoyaleHud.Ordinal( placed.LocalPlacement ), placed.LocalPlacement ) : Tr( IsDraw ? "MATCH OVER" : "DEFEAT" );
     private int    SecondsLeft => Math.Max( 0, (int)MathF.Ceiling( AutoDismissTime - TimeSinceShown ) );
 
     // ── Player-entry list ───────────────────────────────────────────
@@ -179,7 +197,8 @@
                 } );
             }
 
-            foreach ( var bot in GameUtils.LightweightBots.Where( b => b.IsValid() && b.Team != Team.Unassigned ) )
+            // Battle royale's bots are everyone for themselves, so they have no team.
+            foreach ( var bot in GameUtils.LightweightBots.Where( b => b.IsValid() && (b.Team != Team.Unassigned || Royale is not null) ) )
             {
                 list.Add( new EomEntry
                 {
@@ -193,6 +212,10 @@
             var sorted = list.OrderByDescending( e => e.Score ).ToList();
             if ( sorted.Count > 0 )
                 sorted[0].IsMvp = true;
+
+            // A battle royale's field is dozens: the top ten, and you.
+            if ( Royale is not null && sorted.Count > 10 )
+                sorted = sorted.Take( 10 ).Concat( sorted.Skip( 10 ).Where( e => e.IsLocal ) ).ToList();
 
             return sorted;
         }
@@ -235,6 +258,8 @@
 
         LeveledUp    = Progression.GetLevel() > LevelBefore;
         ProgressAfter = Progression.GetLevelProgress();
+
+        DailyChallenges.OnMatchFinished( WonMatch );
     }
 
     private void Dismiss()

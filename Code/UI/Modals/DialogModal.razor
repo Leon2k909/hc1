@@ -8,11 +8,11 @@
 
     <div class="options">
         <a class="button standard" onclick="@(() => OnSubmitButton())">
-            <label>@SubmitText</label>
+            <label>@ButtonLabel( SubmitText, "OK" )</label>
         </a>
 
         <a class="button standard" onclick="@(() => OnCancelButton())">
-            <label>@CancelText</label>
+            <label>@ButtonLabel( CancelText, "Cancel" )</label>
         </a>
     </div>
 </root>
@@ -25,6 +25,12 @@
 
     public Action OnCancel { get; set; }
     public Action OnSubmit { get; set; }
+
+    /// <summary>
+    /// A button's label. The dialog's own defaults ("OK", "Cancel") show in the player's language; a label the caller
+    /// passed is shown as given, since callers translate their own text.
+    /// </summary>
+    private static string ButtonLabel( string text, string byDefault ) => text == byDefault ? Tr( byDefault ) : text;
 
     private void OnCancelButton()
     {

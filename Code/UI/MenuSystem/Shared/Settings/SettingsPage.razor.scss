@@ -1,163 +1,129 @@
-// Matches the pause menu: left category rail with yellow accent, one content panel, footer actions.
-$set-accent: #ffbd24;
+@import "/UI/Styles/MenuPage.scss";
 
 SettingsPage
 {
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	flex-direction: column;
-	color: white;
-	background: linear-gradient( to right, rgba( 8, 11, 14, 0.96 ) 0%, rgba( 8, 11, 14, 0.86 ) 45%, rgba( 8, 11, 14, 0.7 ) 100% );
+    @include menu-page;
 
-	.set-body
-	{
-		flex-grow: 1;
-		flex-direction: row;
-		min-height: 0;
-		padding: 48px 96px 24px 96px;
-		gap: 48px;
-	}
+    .set-body { flex-grow: 1; min-height: 0; flex-direction: row; padding: 32px 48px; gap: 24px; }
+    .set-nav { width: 280px; flex-shrink: 0; flex-direction: column; gap: 6px; overflow-y: scroll; }
+    .set-head { align-items: center; gap: 10px; margin-bottom: 18px; padding: 0 16px; flex-shrink: 0; }
+    .set-accent { width: 3px; height: 16px; background-color: $menu-accent; }
+    .set-title { @include menu-section-title; }
+    .set-cat
+    {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+        min-height: 52px;
+        padding: 12px 16px;
+        border: 1px solid transparent;
+        border-left: 3px solid transparent;
+        color: $menu-muted;
+        font-size: 17px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: color 0.12s ease, background-color 0.12s ease;
+        i { font-size: 18px; color: rgba( white, 0.25 ); }
+        &:hover { background-color: rgba( white, 0.04 ); color: white; sound-in: ui_button_hover; }
+        &.active
+        {
+            background-image: linear-gradient( to right, rgba( 255, 122, 26, 0.14 ), rgba( 255, 122, 26, 0.02 ) );
+            border-color: rgba( 255, 122, 26, 0.16 );
+            border-left-color: $menu-accent;
+            color: white;
+            i { color: $menu-accent; }
+        }
+    }
+    .set-content { @include menu-panel; flex-grow: 1; min-width: 0; min-height: 0; flex-direction: column; padding: 24px 28px; gap: 20px; }
+    .set-group-title { font-size: 26px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding-bottom: 18px; border-bottom: 1px solid $menu-border; flex-shrink: 0; }
+    .set-list { flex-grow: 1; min-height: 0; flex-direction: column; overflow-y: scroll; padding-right: 8px; }
+    .set-footer { @include menu-footer; }
+    .set-btn { @include menu-action; }
 
-	.set-nav
-	{
-		flex-direction: column;
-		width: 300px;
-		flex-shrink: 0;
-		gap: 4px;
-	}
+    SettingEntry
+    {
+        flex-shrink: 0;
+        align-items: center;
+        border-bottom: 1px solid rgba( white, 0.06 );
+        > .with-padding { min-height: 58px; align-items: center; padding: 16px 12px; border-bottom: 0; min-width: 0; }
+        .name { font-size: 16px; color: rgba( white, 0.85 ); }
+        .control { padding-right: 12px; }
+        // A row of buttons for a setting with a few choices: voice chat mode.
+        > .choice-setting { width: 100%; flex-direction: column; align-items: stretch; gap: 14px; }
+        .choice-options { flex-direction: row; flex-wrap: wrap; gap: 8px; }
+        .choice-option
+        {
+            min-width: 185px; min-height: 42px; padding: 10px 14px; gap: 12px;
+            align-items: center; justify-content: space-between;
+            background-color: #111316; border: 1px solid rgba( white, 0.16 );
+            color: rgba( white, 0.8 ); font-size: 16px; cursor: pointer;
+            label { pointer-events: none; }
+            i { font-size: 16px; flex-shrink: 0; pointer-events: none; }
+            &:hover { border-color: $menu-accent; color: white; }
+            &.selected { background-color: rgba( 255, 122, 26, 0.12 ); border-color: $menu-accent; color: $menu-accent; }
+        }
+        // The language: its name and a note on the left, the searchable dropdown (LanguagePicker) on the right.
+        > .language-setting { flex-wrap: wrap; gap: 12px; padding-top: 12px; padding-bottom: 12px; }
+        .setting-text { flex-direction: column; gap: 4px; min-width: 0; flex-shrink: 1; }
+        .setting-hint { font-size: 14px; color: $menu-muted; }
+        // A bool setting with two named sides (GameSettings' [Choices], e.g. Kills / Score): both are
+        // shown and the one in use is lit. The trimmed padding keeps the row as tall as a checkbox row.
+        > .switch-setting { padding-top: 9px; padding-bottom: 9px; }
+        .switch
+        {
+            flex-direction: row; flex-shrink: 0; padding: 3px; gap: 3px;
+            background-color: #111316; border: 1px solid rgba( white, 0.16 );
+        }
+        .switch-option
+        {
+            min-width: 150px; height: 32px; padding: 0 16px;
+            align-items: center; justify-content: center;
+            border: 1px solid transparent;
+            color: $menu-muted; font-size: 14px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+            cursor: pointer;
+            transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+            label { pointer-events: none; }
+            &:hover { background-color: rgba( white, 0.04 ); color: white; sound-in: ui_button_hover; }
+            &.selected { background-color: rgba( 255, 122, 26, 0.12 ); border-color: $menu-accent; color: $menu-accent; }
+        }
+        &:hover { background-color: rgba( white, 0.025 ); }
+    }
+    .slidercontrol > .inner > .track
+    {
+        height: 4px;
+        background-color: rgba( white, 0.12 );
+        > .track-active { background-color: $menu-accent; }
+        > .thumb { width: 10px; height: 14px; background-color: white; }
+    }
+    .checkbox > .checkmark { border-color: rgba( white, 0.35 ); background-color: #08090b; }
+    .checkbox.checked > .checkmark { border-color: $menu-accent; background-color: $menu-accent; color: #08090b; }
+}
 
-	.set-head
-	{
-		flex-direction: row;
-		align-items: center;
-		gap: 14px;
-		margin-bottom: 28px;
-	}
-
-	.set-accent
-	{
-		width: 6px;
-		height: 44px;
-		background-color: $set-accent;
-	}
-
-	.set-title
-	{
-		font-size: 40px;
-		font-weight: 900;
-		letter-spacing: 5px;
-	}
-
-	.set-cat
-	{
-		flex-direction: row;
-		align-items: center;
-		justify-content: space-between;
-		height: 54px;
-		padding: 0 18px;
-		border-left: 4px solid transparent;
-		color: rgba( white, 0.65 );
-		font-size: 20px;
-		font-weight: 700;
-		letter-spacing: 1px;
-		text-transform: uppercase;
-		cursor: pointer;
-		transition: all 0.1s ease;
-
-		i { font-size: 22px; opacity: 0; }
-
-		&:hover
-		{
-			color: white;
-			padding-left: 24px;
-			border-left-color: rgba( 255, 189, 36, 0.5 );
-			background: linear-gradient( to right, rgba( 255, 189, 36, 0.12 ), rgba( 255, 189, 36, 0 ) );
-		}
-
-		&.active
-		{
-			color: white;
-			padding-left: 24px;
-			border-left-color: $set-accent;
-			background: linear-gradient( to right, rgba( 255, 189, 36, 0.24 ), rgba( 255, 189, 36, 0 ) );
-
-			i { opacity: 1; color: $set-accent; }
-		}
-	}
-
-	.set-content
-	{
-		flex-grow: 1;
-		flex-direction: column;
-		min-width: 0;
-		max-width: 1100px;
-		padding: 24px 32px;
-		background-color: rgba( 19, 26, 32, 0.9 );
-		border-top: 3px solid $set-accent;
-		gap: 16px;
-	}
-
-	.set-group-title
-	{
-		font-size: 26px;
-		font-weight: 900;
-		letter-spacing: 3px;
-		text-transform: uppercase;
-		padding-bottom: 12px;
-		border-bottom: 1px solid rgba( white, 0.1 );
-	}
-
-	.set-list
-	{
-		flex-direction: column;
-		flex-grow: 1;
-		min-height: 0;
-		overflow-y: scroll;
-		gap: 4px;
-	}
-
-	.set-footer
-	{
-		flex-direction: row;
-		justify-content: flex-end;
-		align-items: center;
-		gap: 12px;
-		padding: 16px 96px 28px 96px;
-	}
-
-	.set-btn
-	{
-		flex-direction: row;
-		align-items: center;
-		gap: 10px;
-		height: 50px;
-		padding: 0 22px;
-		background-color: rgba( 48, 58, 67, 0.9 );
-		border-bottom: 3px solid transparent;
-		color: rgba( white, 0.85 );
-		font-size: 16px;
-		font-weight: 700;
-		letter-spacing: 1px;
-		text-transform: uppercase;
-		cursor: pointer;
-		transition: all 0.1s ease;
-
-		i { font-size: 20px; }
-
-		&:hover
-		{
-			color: white;
-			background-color: rgba( 64, 76, 88, 0.95 );
-			border-bottom-color: $set-accent;
-		}
-
-		&.primary
-		{
-			background-color: $set-accent;
-			color: #111519;
-
-			&:hover { background-color: #ffcd55; border-bottom-color: #111519; }
-		}
-	}
+SettingsPage.compact
+{
+    .set-body { padding: 24px 32px; }
+    .set-nav { width: 230px; }
+    .set-footer { padding: 16px 32px 24px; }
+}
+SettingsPage.narrow
+{
+    .set-body { padding: 20px 24px; gap: 16px; }
+    .set-nav { width: 190px; }
+    .set-content { padding: 20px; }
+    .set-cat { font-size: 14px; padding: 10px 12px; }
+    .set-footer { padding: 14px 24px; flex-wrap: wrap; }
+}
+SettingsPage.portrait
+{
+    .set-body { flex-direction: column; }
+    .set-nav { width: 100%; flex-direction: row; flex-wrap: wrap; max-height: 150px; }
+    .set-head { display: none; }
+    .set-cat { min-height: 40px; }
+    .set-cat i { display: none; }
+    SettingEntry { flex-wrap: wrap; }
+    .set-content { padding: 16px; }
+    MenuTopbar { padding: 0 24px; }
 }

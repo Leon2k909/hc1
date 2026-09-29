@@ -102,6 +102,7 @@ partial class GameMode
 			"zombies" => "prefabs/game_modes/zombies.prefab",
 			"gunfight_1v1" => "prefabs/game_modes/gunfight_1v1.prefab",
 			"gunfight_2v2" => "prefabs/game_modes/gunfight_2v2.prefab",
+			"battle_royale" => "prefabs/game_modes/battle_royale.prefab",
 			_ => null
 		};
 	}

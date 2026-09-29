@@ -489,13 +489,8 @@
     },
     "viper/mw/attachments/attachment_vm_4x_west_decals": {
       "source": "viper/mw/attachments/attachment_vm_4x_west_decals",
-      "shader": "vertexlitgeneric",
-      "glass": false,
-      "optic_glass": false,
-      "color": "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_4x_west_decals_rgb_color.png",
-      "normal": "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_4x_west_decals_n_normal.png",
-      "roughness": "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_4x_west_decals_e_roughness.png",
-      "opacity": "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_4x_west_decals_rgb_opacity.png",
+      "shader": "decal sheet",
+      "hidden": true,
       "vmat": "attachments/mw2022/materials/viper/mw/attachments/attachment_vm_4x_west_decals.vmat"
     },
     "viper/mw/attachments/attachment_vm_4x_west_lens": {
@@ -893,12 +888,8 @@
     },
     "viper/mw/attachments/attachment_vm_minireddot_decals": {
       "source": "viper/mw/attachments/attachment_vm_minireddot_decals",
-      "shader": "vertexlitgeneric",
-      "glass": false,
-      "optic_glass": false,
-      "color": "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_minireddot_decals_rgb_color.png",
-      "normal": null,
-      "roughness": "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_minireddot_decals_e_roughness.png",
+      "shader": "decal sheet",
+      "hidden": true,
       "vmat": "attachments/mw2022/materials/viper/mw/attachments/attachment_vm_minireddot_decals.vmat"
     },
     "viper/mw/attachments/attachment_vm_minireddot_lens": {
@@ -1053,13 +1044,8 @@
     },
     "viper/mw/attachments/attachment_vm_reflex_east_decals": {
       "source": "viper/mw/attachments/attachment_vm_reflex_east_decals",
-      "shader": "vertexlitgeneric",
-      "glass": false,
-      "optic_glass": false,
-      "color": "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_reflex_east_decals_rgb_color.png",
-      "normal": "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_reflex_east_decals_n_normal.png",
-      "roughness": "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_reflex_east_decals_e_roughness.png",
-      "opacity": "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_reflex_east_decals_rgb_opacity.png",
+      "shader": "decal sheet",
+      "hidden": true,
       "vmat": "attachments/mw2022/materials/viper/mw/attachments/attachment_vm_reflex_east_decals.vmat"
     },
     "viper/mw/attachments/attachment_vm_reflex_east_lens": {
@@ -2400,34 +2386,6 @@
       "height": 1024
     },
     {
-      "source": "viper\\mw\\attachments\\attachment_vm_4x_west_decals_rgb",
-      "role": "color",
-      "path": "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_4x_west_decals_rgb_color.png",
-      "width": 1024,
-      "height": 1024
-    },
-    {
-      "source": "viper\\mw\\attachments\\attachment_vm_4x_west_decals_n",
-      "role": "normal",
-      "path": "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_4x_west_decals_n_normal.png",
-      "width": 1024,
-      "height": 1024
-    },
-    {
-      "source": "viper\\mw\\attachments\\attachment_vm_4x_west_decals_e",
-      "role": "roughness",
-      "path": "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_4x_west_decals_e_roughness.png",
-      "width": 1024,
-      "height": 1024
-    },
-    {
-      "source": "viper\\mw\\attachments\\attachment_vm_4x_west_decals_rgb",
-      "role": "opacity",
-      "path": "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_4x_west_decals_rgb_opacity.png",
-      "width": 1024,
-      "height": 1024
-    },
-    {
       "source": "viper\\mw\\attachments\\attachment_vm_angledgrip_rgb",
       "role": "color",
       "path": "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_angledgrip_rgb_color.png",
@@ -2911,20 +2869,6 @@
       "height": 1024
     },
     {
-      "source": "viper\\mw\\attachments\\attachment_vm_minireddot_decals_rgb",
-      "role": "color",
-      "path": "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_minireddot_decals_rgb_color.png",
-      "width": 512,
-      "height": 256
-    },
-    {
-      "source": "viper\\mw\\attachments\\attachment_vm_minireddot_decals_e",
-      "role": "roughness",
-      "path": "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_minireddot_decals_e_roughness.png",
-      "width": 512,
-      "height": 256
-    },
-    {
       "source": "viper\\mw\\attachments\\attachment_vm_minireddot_railmount_rgb",
       "role": "color",
       "path": "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_minireddot_railmount_rgb_color.png",
@@ -3089,34 +3033,6 @@
       "source": "viper\\mw\\attachments\\attachment_vm_reflex_east_body_e",
       "role": "roughness",
       "path": "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_reflex_east_body_e_roughness.png",
-      "width": 1024,
-      "height": 1024
-    },
-    {
-      "source": "viper\\mw\\attachments\\attachment_vm_reflex_east_decals_rgb",
-      "role": "color",
-      "path": "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_reflex_east_decals_rgb_color.png",
-      "width": 1024,
-      "height": 1024
-    },
-    {
-      "source": "viper\\mw\\attachments\\attachment_vm_reflex_east_decals_n",
-      "role": "normal",
-      "path": "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_reflex_east_decals_n_normal.png",
-      "width": 1024,
-      "height": 1024
-    },
-    {
-      "source": "viper\\mw\\attachments\\attachment_vm_reflex_east_decals_e",
-      "role": "roughness",
-      "path": "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_reflex_east_decals_e_roughness.png",
-      "width": 1024,
-      "height": 1024
-    },
-    {
-      "source": "viper\\mw\\attachments\\attachment_vm_reflex_east_decals_rgb",
-      "role": "opacity",
-      "path": "attachments/mw2022/textures/viper/mw/attachments/attachment_vm_reflex_east_decals_rgb_opacity.png",
       "width": 1024,
       "height": 1024
     },
@@ -3671,6 +3587,18 @@
     {
       "material": "viper/mw/attachments/vm_depth_mask_start",
       "note": "Source runtime stencil geometry is transparent; s&box lens supplies its own reticle."
+    },
+    {
+      "material": "viper/mw/attachments/attachment_vm_4x_west_decals",
+      "note": "Decal sheet (writing, numbers, logos) hidden; the body is under it."
+    },
+    {
+      "material": "viper/mw/attachments/attachment_vm_minireddot_decals",
+      "note": "Decal sheet (writing, numbers, logos) hidden; the body is under it."
+    },
+    {
+      "material": "viper/mw/attachments/attachment_vm_reflex_east_decals",
+      "note": "Decal sheet (writing, numbers, logos) hidden; the body is under it."
     }
   ],
   "failures": []

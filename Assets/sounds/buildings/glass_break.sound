@@ -1,0 +1,35 @@
+{
+  "UI": false,
+  "Volume": "0.75",
+  "Pitch": "0.95 1.05",
+  "Decibels": 70,
+  "SelectionMode": "Random",
+  "Sounds": [
+    "sounds/buildings/glass_break_1.vsnd",
+    "sounds/buildings/glass_break_2.vsnd",
+    "sounds/buildings/glass_break_3.vsnd",
+    "sounds/buildings/glass_break_4.vsnd"
+  ],
+  "Occlusion": true,
+  "AirAbsorption": true,
+  "Transmission": true,
+  "OcclusionRadius": 64,
+  "DistanceAttenuation": true,
+  "Distance": 3000,
+  "Falloff": [
+    {
+      "y": 1
+    },
+    {
+      "x": 0.25,
+      "y": 0.35,
+      "in": 1.33,
+      "out": -1.33
+    },
+    {
+      "x": 1
+    }
+  ],
+  "__references": [],
+  "__version": 1
+}

@@ -1,0 +1,106 @@
+@import "/UI/Styles/Theme.scss";
+
+BattleRoyaleRadar
+{
+    flex-direction: column;
+    gap: 4px;
+    font-family: $main-font;
+    color: white;
+    pointer-events: none;
+
+    .readouts
+    {
+        flex-direction: row;
+        gap: 4px;
+        width: 220px;
+    }
+
+    .readout
+    {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 4px 8px;
+        background-color: $background;
+        border: 1px solid rgba( black, 0.25 );
+        min-width: 56px;
+
+        .value
+        {
+            font-size: 18px;
+            font-weight: bold;
+            line-height: 1.1;
+        }
+
+        .caption
+        {
+            font-size: 8px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: rgba( white, 0.6 );
+        }
+
+        &.clock
+        {
+            flex-grow: 1;
+        }
+
+        &.clock.closing .value
+        {
+            color: #ff9a3c;
+        }
+
+        &.clock.final .value, &.clock.final .caption
+        {
+            color: #ff4a3a;
+        }
+    }
+
+    .radar
+    {
+        position: relative;
+        width: 220px;
+        height: 220px;
+        overflow: hidden;
+        // Outside the zone is the gas.
+        background-color: rgba( 110, 22, 12, 0.45 );
+        border: 1px solid rgba( black, 0.5 );
+    }
+
+    .ring
+    {
+        position: absolute;
+        opacity: 0;
+    }
+
+    .ring.zone
+    {
+        background-color: rgba( 12, 14, 18, 0.72 );
+        border: 2px solid #ff9a3c;
+    }
+
+    .ring.next
+    {
+        border: 2px solid rgba( white, 0.9 );
+    }
+
+    .north
+    {
+        position: absolute;
+        font-size: 12px;
+        font-weight: bold;
+        color: white;
+        text-shadow: 1px 1px 2px rgba( black, 0.9 );
+    }
+
+    .me
+    {
+        position: absolute;
+        left: 99px;
+        top: 99px;
+        width: 22px;
+        height: 22px;
+        background-image: url( 'ui/minimaps/player_icon.png' );
+        background-size: 100%;
+    }
+}

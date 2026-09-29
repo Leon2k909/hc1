@@ -1,269 +1,953 @@
 @import "/UI/Styles/Theme.scss";
+@import "/UI/Styles/ModeArt.scss";
 
 $hub-accent: #FF7A1A;
 $hub-accent-dim: rgba(255, 122, 26, 0.4);
+$zombies-red: #E5484D;
+$ease-out: cubic-bezier( 0.23, 1, 0.32, 1 );
 
 .hub-page
 {
     position: absolute;
     left: 0; right: 0; top: 0; bottom: 0;
-    background-image: radial-gradient( rgba( 20, 20, 25, 0.8 ), rgba( 0, 0, 0, 0.95 ) );
+    // Under the picked tab's backdrop (.hub-backdrop), darkest under the nav bar. The menu scene behind renders black.
+    background-image: linear-gradient( to bottom, rgba( 5, 5, 7, 0.92 ) 0%, rgba( 5, 5, 7, 0.68 ) 40%, rgba( 5, 5, 7, 0.52 ) 80%, rgba( 5, 5, 7, 0.8 ) 100% );
     justify-content: center;
     align-items: center;
-    padding: 32px 48px;
+    padding: 34px 48px 74px 48px;
 }
 
-.hub-container
-{
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-    max-width: 1400px;
-    min-height: 0;
-}
-
-.brand
-{
-    flex-direction: row;
-    align-items: center;
-    gap: 12px;
-    flex-shrink: 0;
-
-    .brand-logo
-    {
-        width: 50px;
-        height: 28px;
-    }
-
-    .brand-text
-    {
-        flex-direction: column;
-        gap: 2px;
-    }
-
-    .brand-name
-    {
-        font-family: $main-font;
-        font-size: 18px;
-        font-weight: 900;
-        color: white;
-        letter-spacing: 0.2em;
-    }
-
-    .brand-sub
-    {
-        font-family: $main-font;
-        font-size: 11px;
-        color: $hub-accent;
-        letter-spacing: 0.3em;
-    }
-}
-
-.hub-cards
-{
-    flex-direction: row;
-    // A single desktop row stretches the cards to the full page height.
-    // Wrapping is reserved for narrow screens below.
-    flex-wrap: nowrap;
-    flex-grow: 1;
-    gap: 20px;
-    justify-content: center;
-    align-items: stretch;
-    min-height: 0;
-    width: 100%;
-}
-
-.hub-card
-{
-    position: relative;
-    flex: 1 1 0px;
-    height: 100%;
-    min-height: 0;
-    min-width: 0;
-    border-radius: 12px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    border: 1px solid rgba(255,255,255,0.05);
-
-    &:hover
-    {
-        transform: translateY(-10px) scale(1.02);
-        box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-        border-color: rgba(255,255,255,0.2);
-        z-index: 10;
-    }
-
-    &.main-card
-    {
-        flex: 1.5 1 0px;
-        border-color: rgba($hub-accent, 0.3);
-
-        &:hover
-        {
-            border-color: $hub-accent;
-            box-shadow: 0 20px 50px $hub-accent-dim;
-        }
-
-        .hub-title
-        {
-            color: white;
-        }
-    }
-
-    &.locked
-    {
-        cursor: not-allowed;
-        opacity: 0.8;
-        filter: grayscale(45%);
-
-        &:hover
-        {
-            transform: translateY(-5px);
-            opacity: 0.8;
-            filter: grayscale(40%);
-            border-color: rgba(255,255,255,0.1);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
-        }
-    }
-}
-
-.hub-bg
+// The picked tab's key art blurred to soft light behind the whole page, one layer per tab so they crossfade: dim enough
+// to stay behind the featured screen, bright enough to show through the see-through panels (HubSidebar). The images are
+// made by blurring <tab>_wide.png, darker toward the top and bottom.
+.hub-backdrop
 {
     position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-size: cover;
+    background-position: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+
+    &.multiplayer { background-image: url( "/ui/modes/multiplayer_backdrop.png" ); }
+    &.zombies { background-image: url( "/ui/modes/zombies_backdrop.png" ); }
+
+    // Battle royale has no pre-blurred backdrop, so it's the card art blurred here, in a layer the art's own shape
+    // (s&box's background-position doesn't crop a portrait picture the way CSS does).
+    &.battle-royale
+    {
+        overflow: hidden;
+
+        .backdrop-art
+        {
+            position: absolute;
+            left: 0;
+            top: -45%;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 0.6667;
+            background-image: url( "/ui/modes/battle-royale.png" );
+            background-size: 100% 100%;
+            filter: blur( 40px );
+        }
+    }
+
+    &.shown { opacity: 0.34; }
+}
+
+// A warm light low behind the featured screen
+.hub-atmosphere
+{
+    position: absolute;
+    left: 15%;
+    right: 15%;
+    bottom: -25%;
+    height: 75%;
+    background-image: radial-gradient( rgba( 255, 122, 26, 0.12 ), rgba( 255, 122, 26, 0 ) 70% );
+    pointer-events: none;
+}
+
+// The "Select an operation" tabs (HubModeRail), the picked tab's featured screen in the rest of the width, then the
+// sidebar.
+.hub-container
+{
+    flex-direction: row;
+    gap: 24px;
+    width: 100%;
+    height: 100%;
+    max-width: 1900px;
+    min-height: 0;
+}
+
+// Daily challenges and the squad, right of the featured screen (HubSidebar)
+HubSidebar
+{
+    width: 330px;
+    height: 97%;
+    flex-shrink: 0;
+    align-self: center;
+}
+
+@keyframes hub-feature-in
+{
+    0% { opacity: 0; transform: translateY( 26px ); }
+    100% { opacity: 1; transform: translateY( 0px ); }
+}
+
+// ============================================================
+//  FEATURED SCREEN: the picked tab's key art with its title and actions along the bottom left
+// ============================================================
+.hub-feature
+{
+    position: relative;
+    flex-grow: 1;
+    flex-basis: 0px;
+    min-width: 0;
+    height: 100%;
+    border-radius: 4px;
+    overflow: hidden;
+    background-color: #08090b;
+    border: 1px solid rgba( 255, 122, 26, 0.45 );
+    box-shadow: 0 18px 44px rgba( 0, 0, 0, 0.65 ), 0 0 22px rgba( 255, 122, 26, 0.16 );
+    animation: hub-feature-in 0.5s $ease-out 0.06s both;
+
+    &.zombies
+    {
+        border-color: rgba( 225, 55, 55, 0.5 );
+        box-shadow: 0 18px 44px rgba( 0, 0, 0, 0.65 ), 0 0 22px rgba( 170, 25, 25, 0.22 );
+    }
+}
+
+// The mode art cut to a wide frame (ui/modes/*_wide.png, 1024x720 from the 2:3 cards' art)
+.feature-bg
+{
+    position: absolute;
+    left: 0;
+    top: 0;
     width: 100%;
     height: 100%;
     background-size: cover;
     background-position: center;
-    transition: transform 0.5s ease;
-    left: 0;
-    top: 0;
+    transform-origin: 60% 40%;
+    transition: transform 1.2s $ease-out;
     pointer-events: none;
 
-    &.campaign-bg { background-image: url( "/ui/modes/campaign.png" ); }
-    &.multiplayer-bg { background-image: url( "/ui/modes/multiplayer.png" ); }
-    &.br-bg { background-image: url( "/ui/modes/battle-royale.png" ); }
-    &.zombies-bg { background-image: url( "/ui/modes/zombies.png" ); }
+    &.multiplayer-art { background-image: url( "/ui/modes/multiplayer_wide.png" ); }
+    &.zombies-art { background-image: url( "/ui/modes/zombies_wide.png" ); }
+
+    // The 2:3 card art at the screen's width, moved up to show the drop and the soldier over the city.
+    &.br-art
+    {
+        top: -28%;
+        height: auto;
+        aspect-ratio: 0.6667;
+        background-image: url( "/ui/modes/battle-royale.png" );
+        background-size: 100% 100%;
+    }
 }
 
-.hub-card:hover .hub-bg
-{
-    transform: scale(1.05);
-}
+.hub-feature:hover .feature-bg { transform: scale( 1.03 ); }
 
-.hub-content
+// Dark along the bottom for the title and actions...
+.feature-shade
 {
     position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
     bottom: 0;
+    background-image: linear-gradient( to top, rgba( 7, 7, 9, 0.97 ) 0%, rgba( 7, 7, 9, 0.72 ) 24%, rgba( 7, 7, 9, 0.12 ) 52%, rgba( 7, 7, 9, 0 ) 66% );
+    pointer-events: none;
+}
+
+// ...and down the left, where the text is
+.feature-shade-left
+{
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-image: linear-gradient( to right, rgba( 7, 7, 9, 0.78 ) 0%, rgba( 7, 7, 9, 0.32 ) 34%, rgba( 7, 7, 9, 0 ) 58% );
+    pointer-events: none;
+}
+
+.feature-content
+{
+    position: absolute;
     left: 0;
     right: 0;
-    pointer-events: none;
-    padding: 30px;
+    bottom: 0;
+    padding: 0 40px 40px 40px;
     flex-direction: column;
-    justify-content: flex-end;
-    background-image: linear-gradient( to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100% );
+    align-items: flex-start;
 }
 
-.main-menu-root.compact {
-    .hub-page { padding: 24px; }
-    .hub-cards { gap: 14px; }
-    .hub-content { padding: 20px; }
-    .hub-title { font-size: 24px; }
-}
-
-.main-menu-root.narrow {
-    .hub-page { padding: 16px; }
-    .hub-cards { flex-wrap: wrap; overflow-y: scroll; }
-    .hub-card, .hub-card.main-card { flex: 1 0 45%; height: auto; min-height: 300px; }
-    .hub-bg { background-position: center 35%; }
-    .hub-card:hover { transform: scale(1.01); }
-}
-
-.main-menu-root.portrait {
-    .hub-card, .hub-card.main-card { flex-basis: 100%; min-height: 260px; }
-}
-
-.hub-mode
+.feature-kicker
 {
     font-family: $main-font;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.2em;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 5px;
     color: $hub-accent;
-    margin-bottom: 4px;
+    text-shadow: 0 2px 8px rgba( 0, 0, 0, 0.8 );
 }
 
-.hub-title
+.feature-title
 {
     font-family: $main-font;
-    font-size: 28px;
-    font-weight: 900;
-    letter-spacing: 0.05em;
-    color: rgba(255,255,255,0.8);
-    text-shadow: 0 4px 10px rgba(0,0,0,0.8);
+    font-size: 92px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: white;
+    white-space: nowrap;
+    text-shadow: 0 6px 24px rgba( 0, 0, 0, 0.75 );
+    margin-left: -3px;
 }
 
-.hub-desc
+.feature-sub
+{
+    font-family: $main-font;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 5px;
+    color: rgba( 255, 255, 255, 0.82 );
+    text-shadow: 0 2px 8px rgba( 0, 0, 0, 0.8 );
+    margin-bottom: 26px;
+}
+
+.feature-actions
+{
+    flex-direction: row;
+    align-items: center;
+    gap: 22px;
+}
+
+// The outlined orange Play Now the hub's mode cards had, a size up
+// At least 240 wide, and wider for a longer label ("JETZT SPIELEN" wrapped onto two lines at a fixed 240)
+.feature-deploy
+{
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    min-width: 240px;
+    flex-shrink: 0;
+    height: 54px;
+    padding: 0 20px 0 26px;
+    border: 1.5px solid $hub-accent;
+    border-radius: 2px;
+    background-color: rgba( 255, 122, 26, 0.1 );
+    box-shadow: 0 0 14px rgba( 255, 122, 26, 0.25 );
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease-out;
+
+    label
+    {
+        font-family: $main-font;
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: 4px;
+        color: #FF9A4D;
+        text-shadow: none;
+        white-space: nowrap;
+    }
+
+    i
+    {
+        font-size: 26px;
+        color: #FF9A4D;
+        text-shadow: none;
+        transition: transform 0.25s $ease-out;
+    }
+
+    &:hover
+    {
+        background-color: rgba( 255, 122, 26, 0.3 );
+        box-shadow: 0 0 26px rgba( 255, 122, 26, 0.55 );
+
+        i { transform: translateX( 5px ); }
+    }
+
+    &:active { transform: scale( 0.98 ); }
+}
+
+// Modes, maps and playlists beside the button
+.feature-link
+{
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    height: 58px;
+
+    label
+    {
+        font-family: $main-font;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 3px;
+        color: rgba( 255, 255, 255, 0.78 );
+        text-shadow: 0 2px 6px rgba( 0, 0, 0, 0.8 );
+    }
+
+    .feature-count
+    {
+        font-size: 12px;
+        letter-spacing: 1px;
+        color: $hub-accent;
+    }
+
+    &:hover label { color: white; }
+}
+
+.feature-link.button { cursor: pointer; }
+
+.feature-sep
+{
+    width: 1px;
+    height: 18px;
+    background-color: rgba( 255, 255, 255, 0.25 );
+}
+
+.feature-note
 {
     font-family: $main-font;
     font-size: 13px;
-    color: rgba(255,255,255,0.5);
-    margin-top: 8px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: rgba( 255, 255, 255, 0.6 );
+    text-shadow: 0 2px 6px rgba( 0, 0, 0, 0.8 );
 }
 
-.hub-card.main-card .hub-desc
+// Zombies' red
+.hub-feature.zombies
 {
-    color: white;
-    font-weight: bold;
-}
+    .feature-kicker { color: $zombies-red; }
 
-.hub-card.zombies-card
-{
-    border-color: rgba( 200, 40, 40, 0.35 );
-
-    &:hover
+    .feature-deploy
     {
-        border-color: rgba( 225, 55, 55, 0.95 );
-        box-shadow: 0 20px 50px rgba( 150, 20, 20, 0.45 );
-    }
+        border-color: $zombies-red;
+        background-color: rgba( 229, 72, 77, 0.1 );
+        box-shadow: 0 0 14px rgba( 229, 72, 77, 0.25 );
 
-    .hub-title
-    {
-        color: white;
-    }
+        label, i { color: #FF7A7E; }
 
-    .hub-desc
-    {
-        color: white;
-        font-weight: bold;
-    }
-}
-
-.hub-card.ranked-card
-{
-    border-color: rgba( 150, 90, 200, 0.35 );
-
-    &:hover
-    {
-        border-color: rgba( 170, 110, 230, 0.95 );
-        box-shadow: 0 20px 50px rgba( 90, 40, 150, 0.45 );
-    }
-
-    .hub-title
-    {
-        color: white;
-    }
-
-    .hub-desc
-    {
-        color: white;
-        font-weight: bold;
+        &:hover
+        {
+            background-color: rgba( 229, 72, 77, 0.3 );
+            box-shadow: 0 0 26px rgba( 229, 72, 77, 0.55 );
+        }
     }
 }
 
 // ============================================================
-//  MAP SELECT (opens from the Zombies card), matches the multiplayer one on the landing page
+//  QUICK PLAY FILTER: hovering the actions row opens the modes and maps above it, lifting the title
+// ============================================================
+.feature-play
+{
+    flex-direction: column;
+    align-items: flex-start;
+
+    &:hover .quick-filter
+    {
+        max-height: 340px;
+        opacity: 1;
+        margin-bottom: 16px;
+    }
+}
+
+// Only clips; each group is its own panel.
+.quick-filter
+{
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 10px;
+    max-height: 0px;
+    opacity: 0;
+    margin-bottom: 0px;
+    overflow: hidden;
+    transition: max-height 0.3s $ease-out, opacity 0.2s ease, margin-bottom 0.3s $ease-out;
+}
+
+.filter-group
+{
+    flex-direction: column;
+    flex-shrink: 0;
+    padding: 12px 14px 14px 14px;
+    background-color: rgba( 9, 10, 13, 0.92 );
+    border: 1px solid rgba( 255, 255, 255, 0.08 );
+    border-top: 2px solid $hub-accent;
+    border-radius: 2px;
+
+    // Two columns of modes; the longest, "2V2 SKIRMISH", fits a 164 cell.
+    &.modes { width: 364px; }
+
+    &.maps
+    {
+        width: 212px;
+
+        .filter-grid { flex-direction: column; }
+    }
+}
+
+.filter-head
+{
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 10px;
+}
+
+.filter-title
+{
+    font-family: $main-font;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: $hub-accent;
+    white-space: nowrap;
+    text-shadow: none;
+}
+
+.filter-all
+{
+    flex-shrink: 0;
+    padding: 3px 10px;
+    border: 1px solid rgba( 255, 255, 255, 0.22 );
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+
+    label
+    {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: rgba( 255, 255, 255, 0.6 );
+        white-space: nowrap;
+        text-shadow: none;
+    }
+
+    &:hover
+    {
+        border-color: $hub-accent;
+
+        label { color: white; }
+    }
+
+    &.active
+    {
+        border-color: $hub-accent;
+        background-color: rgba( 255, 122, 26, 0.18 );
+
+        label { color: #FF9A4D; }
+    }
+}
+
+.filter-grid
+{
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px 6px;
+}
+
+.filter-option
+{
+    width: 164px;
+    height: 28px;
+    flex-shrink: 0;
+    flex-direction: row;
+    align-items: center;
+    gap: 9px;
+    padding: 0 9px;
+    background-color: rgba( 255, 255, 255, 0.04 );
+    border: 1px solid rgba( 255, 255, 255, 0.08 );
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+
+    label
+    {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: rgba( 255, 255, 255, 0.5 );
+        white-space: nowrap;
+        text-shadow: none;
+    }
+
+    .filter-check
+    {
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        border: 1.5px solid rgba( 255, 255, 255, 0.35 );
+
+        i
+        {
+            font-size: 12px;
+            font-weight: 700;
+            color: #0b0b0d;
+            opacity: 0;
+            text-shadow: none;
+        }
+    }
+
+    &:hover
+    {
+        background-color: rgba( 255, 255, 255, 0.09 );
+        border-color: rgba( 255, 255, 255, 0.2 );
+
+        label { color: rgba( 255, 255, 255, 0.85 ); }
+    }
+
+    &.on
+    {
+        background-color: rgba( 255, 122, 26, 0.12 );
+        border-color: rgba( 255, 122, 26, 0.45 );
+
+        label { color: white; }
+
+        .filter-check
+        {
+            background-color: $hub-accent;
+            border-color: $hub-accent;
+
+            i { opacity: 1; }
+        }
+    }
+}
+
+.filter-group.maps .filter-option { width: auto; }
+
+// ============================================================
+//  The featured screen shares its column with Multiplayer playlists or Zombies maps.
+// ============================================================
+.hub-main
+{
+    flex-direction: column;
+    flex-grow: 1;
+    flex-basis: 0px;
+    min-width: 0;
+    height: 100%;
+    gap: 18px;
+
+    .hub-feature
+    {
+        height: auto;
+        min-height: 0;
+    }
+}
+
+.hub-playlists
+{
+    flex-direction: column;
+    flex-shrink: 0;
+    gap: 12px;
+    animation: hub-feature-in 0.5s $ease-out 0.14s both;
+}
+
+.playlists-head
+{
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
+
+.playlists-bar
+{
+    width: 3px;
+    height: 20px;
+    background-color: $hub-accent;
+    box-shadow: 0 0 8px rgba( 255, 122, 26, 0.6 );
+}
+
+.playlists-title
+{
+    flex-grow: 1;
+    font-family: $main-font;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: white;
+    text-shadow: none;
+}
+
+.playlists-all
+{
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+
+    label
+    {
+        font-family: $main-font;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 3px;
+        color: rgba( 255, 255, 255, 0.62 );
+        text-shadow: none;
+        transition: color 0.15s ease;
+    }
+
+    i
+    {
+        font-size: 16px;
+        color: $hub-accent;
+        text-shadow: none;
+        transition: transform 0.25s $ease-out;
+    }
+
+    &:hover
+    {
+        label { color: white; }
+        i { transform: translateX( 4px ); }
+    }
+}
+
+.playlists-row
+{
+    flex-direction: row;
+    gap: 14px;
+    height: 176px;
+}
+
+.playlist-card
+{
+    position: relative;
+    flex-grow: 1;
+    flex-basis: 0px;
+    min-width: 0;
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+    background-color: #0b0c0f;
+    border: 1px solid rgba( 255, 255, 255, 0.14 );
+    box-shadow: 0 8px 20px rgba( 0, 0, 0, 0.5 );
+    transition: transform 0.2s $ease-out, border-color 0.2s ease, box-shadow 0.25s ease;
+
+    &:hover
+    {
+        transform: translateY( -3px );
+        border-color: rgba( 255, 122, 26, 0.85 );
+        box-shadow: 0 10px 24px rgba( 0, 0, 0, 0.55 ), 0 0 18px rgba( 255, 122, 26, 0.32 );
+
+        .playlist-bg { transform: scale( 1.06 ); }
+
+        .playlist-go
+        {
+            opacity: 1;
+            transform: translateX( 0px );
+        }
+    }
+
+    &:active { transform: translateY( -1px ) scale( 0.99 ); }
+}
+
+// Each mode's card art, by its ident (UI/Styles/ModeArt.scss).
+.playlist-bg
+{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    @include mode-art;
+    pointer-events: none;
+    transition: transform 0.6s $ease-out;
+}
+
+.playlist-shade
+{
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-image: linear-gradient( to top, rgba( 7, 7, 9, 0.95 ) 0%, rgba( 7, 7, 9, 0.6 ) 32%, rgba( 7, 7, 9, 0 ) 62% );
+    pointer-events: none;
+}
+
+.playlist-content
+{
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 0 44px 14px 18px; // clear of the hover arrow
+    flex-direction: column;
+    pointer-events: none;
+}
+
+// Names and subtitles wrap rather than run off the card: some languages' mode names are twice as long as English's
+// ("MATCH À MORT PAR ÉQUIPE").
+.playlist-name
+{
+    font-family: $main-font;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    line-height: 1.05;
+    color: white;
+    white-space: normal;
+    text-shadow: 0 3px 10px rgba( 0, 0, 0, 0.8 );
+}
+
+.playlist-sub
+{
+    font-family: $main-font;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: rgba( 255, 255, 255, 0.66 );
+    white-space: normal;
+    text-shadow: 0 2px 6px rgba( 0, 0, 0, 0.8 );
+    margin-top: 2px;
+}
+
+.playlist-go
+{
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    font-size: 22px;
+    color: #FF9A4D;
+    text-shadow: 0 2px 6px rgba( 0, 0, 0, 0.8 );
+    opacity: 0;
+    transform: translateX( -6px );
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.25s $ease-out;
+}
+
+// Battle royale's options, side by side: the map (br_map) and how many bots drop in (br_bots). The picked card of each
+// is lit. Each group grows by its number of cards, so every card is the same width.
+.royale-options
+{
+    flex-direction: row;
+    flex-shrink: 0;
+    gap: 28px;
+
+    .hub-playlists
+    {
+        flex-basis: 0px;
+        min-width: 0;
+    }
+
+    .royale-maps { flex-grow: 2; }
+    .royale-field { flex-grow: 4; }
+
+    .playlists-bar { background-color: #35D0BD; box-shadow: 0 0 8px rgba( 53, 208, 189, 0.6 ); }
+
+    .royale-map-art
+    {
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+    }
+
+    // A map with no picture yet (Ridgeback)
+    .royale-map-placeholder
+    {
+        background-image: linear-gradient( 135deg, #12292a, #0b0c0f );
+        align-items: center;
+        justify-content: center;
+
+        i { font-size: 56px; color: rgba( 53, 208, 189, 0.3 ); }
+    }
+
+    .field-card
+    {
+        background-image: linear-gradient( 135deg, #1b1f24, #0b0c0f );
+
+        .playlist-go { color: #35D0BD; }
+
+        &:hover { border-color: #35D0BD; box-shadow: 0 8px 20px rgba( 0, 0, 0, 0.5 ), 0 0 18px rgba( 53, 208, 189, 0.3 ); }
+
+        &.picked
+        {
+            border-color: #35D0BD;
+            box-shadow: 0 8px 20px rgba( 0, 0, 0, 0.5 ), 0 0 18px rgba( 53, 208, 189, 0.3 );
+
+            .playlist-name { color: #83EBDD; }
+
+            .playlist-go
+            {
+                opacity: 1;
+                transform: translateX( 0px );
+            }
+        }
+    }
+}
+
+.hub-feature.battle-royale
+{
+    border-color: rgba( 53, 208, 189, 0.5 );
+    box-shadow: 0 18px 44px rgba( 0, 0, 0, 0.65 ), 0 0 22px rgba( 53, 208, 189, 0.2 );
+    .feature-kicker { color: #35D0BD; }
+    .feature-deploy
+    {
+        border-color: #35D0BD;
+        background-color: rgba( 53, 208, 189, 0.1 );
+        box-shadow: 0 0 14px rgba( 53, 208, 189, 0.25 );
+        label, i { color: #83EBDD; }
+        &:hover { background-color: rgba( 53, 208, 189, 0.3 ); box-shadow: 0 0 26px rgba( 53, 208, 189, 0.55 ); }
+    }
+}
+
+.zombies-maps
+{
+    .playlists-bar
+    {
+        background-color: $zombies-red;
+        box-shadow: 0 0 8px rgba( 229, 72, 77, 0.6 );
+    }
+
+    .playlists-row
+    {
+        overflow-x: scroll;
+        overflow-y: hidden;
+        padding-top: 3px;
+    }
+
+    .playlist-card
+    {
+        min-width: 240px;
+        flex-shrink: 0;
+
+        &:hover
+        {
+            border-color: $zombies-red;
+            box-shadow: 0 10px 24px rgba( 0, 0, 0, 0.55 ), 0 0 18px rgba( 229, 72, 77, 0.25 );
+        }
+    }
+
+    .zombies-map-art
+    {
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+    }
+
+    .zombies-map-placeholder
+    {
+        background-image: linear-gradient( 135deg, #281315, #101013 );
+        align-items: center;
+        justify-content: center;
+
+        i { font-size: 56px; color: rgba( 229, 72, 77, 0.3 ); }
+    }
+
+    .playlist-content { padding-right: 44px; }
+    .playlist-name { white-space: normal; }
+    .playlist-sub { font-size: 12px; }
+    .playlist-go { color: #FF777C; }
+
+    .zombies-maps-empty
+    {
+        flex-grow: 1;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        color: rgba( 255, 255, 255, 0.7 );
+        background-color: rgba( 0, 0, 0, 0.35 );
+        border: 1px solid rgba( 255, 255, 255, 0.1 );
+        border-radius: 4px;
+    }
+}
+
+.hub-footer
+{
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 46px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    border-top: 1px solid rgba( 255, 255, 255, 0.06 );
+    background-image: linear-gradient( to top, rgba( 0, 0, 0, 0.75 ), rgba( 0, 0, 0, 0.25 ) );
+}
+
+.hub-footer-left
+{
+    flex-direction: row;
+    align-items: center;
+    gap: 18px;
+}
+
+.hub-footer-brand
+{
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 6px;
+    color: rgba( 255, 255, 255, 0.85 );
+    text-shadow: none;
+}
+
+// The power button (QuitPrompt) is one of the header's round buttons (MainMenuRoot.razor.scss), sized to the footer,
+// with its hover label above it and lined up with its right edge so it stays on screen.
+.hub-footer .hub-power
+{
+    width: 34px;
+    height: 34px;
+
+    i { font-size: 18px; }
+
+    .gnav-tip
+    {
+        top: auto;
+        bottom: 100%;
+        left: auto;
+        right: 0;
+        margin-top: 0;
+        margin-bottom: 10px;
+        transform: none;
+    }
+}
+
+
+.main-menu-root.compact {
+    .hub-page { padding: 24px 24px 66px 24px; }
+    .feature-content { padding: 0 28px 28px 28px; }
+    .feature-title { font-size: 72px; }
+}
+
+.main-menu-root.short {
+    .hub-main { gap: 14px; }
+    .playlists-row { height: 136px; }
+    .feature-title { font-size: 72px; }
+    .feature-sub { margin-bottom: 18px; }
+}
+
+.main-menu-root.narrow {
+    .hub-page { padding: 16px 16px 62px 16px; }
+    .feature-title { font-size: 56px; }
+    .feature-sub { font-size: 13px; letter-spacing: 3px; }
+    .quick-filter { flex-direction: column; }
+    .playlist-name { font-size: 17px; }
+    .playlist-sub { font-size: 10px; letter-spacing: 1px; }
+}
+
+.main-menu-root.portrait {
+    .feature-actions { flex-wrap: wrap; gap: 12px 18px; }
+    .royale-options
+    {
+        flex-direction: column;
+        gap: 18px;
+
+        .hub-playlists { flex-basis: auto; flex-grow: 0; }
+    }
+}
+
+// ============================================================
+//  MAP SELECT (opens from the Zombies tab's Play), matches the multiplayer one on the landing page
 // ============================================================
 .hub-page
 {
@@ -430,3 +1114,23 @@ $hub-accent-dim: rgba(255, 122, 26, 0.4);
         }
     }
 }
+
+// All Playlists: the map picker's frame round the playlist row's cards, five to a row
+.hub-page .all-playlists
+{
+    .map-picker-panel { width: 1640px; }
+
+    .map-grid { gap: 14px; }
+
+    .playlist-card
+    {
+        flex-grow: 0;
+        flex-shrink: 0;
+        flex-basis: auto;
+        width: 300px;
+        height: 176px;
+    }
+}
+
+// Below 1600 units there's no room beside the featured screen
+.main-menu-root.compact HubSidebar { display: none; }

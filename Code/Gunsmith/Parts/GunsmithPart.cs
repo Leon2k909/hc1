@@ -19,7 +19,8 @@ public enum GunsmithPartType
 	Ammunition = 13,
 	RearGrip = 14,
 	Magazine = 15,
-	Laser = 16
+	Laser = 16,
+	Rail = 17
 }
 
 [GameResource( "HC1/Gunsmith Part", "gnsmth", "A gunsmith part" )]
@@ -74,6 +75,20 @@ public partial class GunsmithPart : GameResource
 	/// </summary>
 	[Property, ShowIf( nameof( Category ), GunsmithPartType.Barrel )]
 	public Vector3 MuzzleShift { get; set; }
+	/// <summary>
+	/// A barrel whose own flash hider is shorter than the factory one: how much further back than <see cref="MuzzleShift"/>
+	/// (where a muzzle device mounts) its bare muzzle is. The shots leave from there while no muzzle device is fitted
+	/// (<see cref="GunsmithAttachmentPoint.DischargeShift"/>).
+	/// </summary>
+	[Property, ShowIf( nameof( Category ), GunsmithPartType.Barrel )]
+	public Vector3 TipShift { get; set; }
+	/// <summary>Change in optic mount position in the weapon's bind space when replacing its upper rail.</summary>
+	[Property] public Vector3 OpticMountShift { get; set; }
+	/// <summary>Rail ADS corrections measured in viewmodel camera space.</summary>
+	[Property] public Vector3 RailOpticAimCorrection { get; set; }
+	[Property] public Vector3 RailIronAimCorrection { get; set; }
+	/// <summary>Additional bodygroup choices while this part and an optic are fitted together.</summary>
+	[Property] public Dictionary<string, int> OpticBodygroups { get; set; } = new();
 
 	/// <summary>
 	/// Recoil multipliers for parts whose effect isn't implied by their name (see <see cref="GunsmithAttachmentEffects"/>),
@@ -81,6 +96,12 @@ public partial class GunsmithPart : GameResource
 	/// </summary>
 	[Property, Group( "Effects" )] public float VerticalRecoilScale { get; set; } = 1f;
 	[Property, Group( "Effects" )] public float HorizontalRecoilScale { get; set; } = 1f;
+	/// <summary>
+	/// Damage falloff distance multiplier for parts whose effect isn't implied by their name, e.g. a barrel of another
+	/// length, by the muzzle energy it gives against the factory barrel. 1 (or 0, a part loaded before a hotload added
+	/// this) leaves it unchanged.
+	/// </summary>
+	[Property, Group( "Effects" )] public float DamageFalloffScale { get; set; } = 1f;
 
 	/// <summary>
 	/// Which weapons does this part support? By default, if it's empty, it's universal
@@ -108,6 +129,13 @@ public partial class GunsmithPart : GameResource
 	[Property, ShowIf( nameof( Category ), GunsmithPartType.Optic ), Range( 1, 8 )] public float OpticMagnification { get; set; } = 1f;
 	[Property, ShowIf( nameof( Category ), GunsmithPartType.Optic ), Range( 0.05f, 0.5f )]
 	public float OpticLensDiameter { get; set; } = 0.3f;
+	/// <summary>
+	/// Magnified optics: the centre of the eyepiece's rear glass in the optic model's space, and the glass's diameter
+	/// (inches). With a diameter, <see cref="OpticZoom"/> fills that glass with the magnified picture wherever it is on
+	/// screen, and <see cref="OpticLensDiameter"/> is unused. Written by Tools/optic_eyepieces.py.
+	/// </summary>
+	[Property, ShowIf( nameof( Category ), GunsmithPartType.Optic )] public Vector3 OpticEyepiece { get; set; }
+	[Property, ShowIf( nameof( Category ), GunsmithPartType.Optic )] public float OpticEyepieceDiameter { get; set; }
 	[Property, ShowIf( nameof( Category ), GunsmithPartType.Optic )]
 	public bool OpticOverlayDot { get; set; } = true;
 
@@ -132,11 +160,18 @@ public partial class GunsmithPart : GameResource
 	public string CamoMaterial { get; set; }
 
 	/// <summary>
-	/// The flat sticker artwork (square PNG, transparency supported) shown in the gunsmith
-	/// and projected onto the gun. Used when <see cref="Category"/> is Sticker.
+	/// The sticker's artwork: a PNG cropped to the sticker, transparent outside its cut. The gunsmith shows it, and
+	/// <see cref="GunsmithSticker"/> prints it on the gun at its own shape. Used when <see cref="Category"/> is Sticker.
 	/// </summary>
 	[Property, ImageAssetPath, ShowIf( nameof(Category), GunsmithPartType.Sticker )]
 	public string StickerImage { get; set; }
+
+	/// <summary>
+	/// What the sticker is printed with on the gun: <see cref="StickerImage"/>'s colours, cut out by an alpha test.
+	/// Empty means the .vmat beside the image.
+	/// </summary>
+	[Property, ResourceType( "vmat" ), ShowIf( nameof(Category), GunsmithPartType.Sticker )]
+	public string StickerMaterial { get; set; }
 
 	/// <summary>
 	/// The reticle drawn large on a transparent square (white, tinted with the chosen reticle colour) for the

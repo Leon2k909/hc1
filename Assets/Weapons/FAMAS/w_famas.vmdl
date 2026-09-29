@@ -1,0 +1,792 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc30:version{8c2d7a91-9c42-4bf0-883a-5a3b1762d4f1} -->
+{
+	rootNode = 
+	{
+		_class = "RootNode"
+		children = 
+		[
+			{
+				_class = "MaterialGroupList"
+				children = 
+				[
+					{
+						_class = "DefaultMaterialGroup"
+						remaps = 
+						[
+							{
+								from = "weapon_vm_ar_falpha_body.vmat"
+								to = "weapons/famas/materials/famas_body.vmat"
+							},
+							{
+								from = "weapon_vm_ar_falpha_mag.vmat"
+								to = "weapons/famas/materials/famas_mag.vmat"
+							},
+							{
+								from = "weapon_vm_ar_falpha_grip.vmat"
+								to = "weapons/famas/materials/famas_grip.vmat"
+							},
+							{
+								from = "weapon_vm_ar_falpha_upper.vmat"
+								to = "weapons/famas/materials/famas_upper.vmat"
+							},
+							{
+								from = "weapon_vm_ar_falpha_sights.vmat"
+								to = "weapons/famas/materials/famas_sights.vmat"
+							},
+							{
+								from = "weapon_vm_ar_falpha_barrel.vmat"
+								to = "weapons/famas/materials/famas_barrel.vmat"
+							},
+							{
+								from = "weapon_vm_ar_falpha_barlong.vmat"
+								to = "weapons/famas/materials/famas_barlong.vmat"
+							},
+							{
+								from = "weapon_vm_ar_falpha_barlong_alt.vmat"
+								to = "weapons/famas/materials/famas_barlong_alt.vmat"
+							},
+							{
+								from = "weapon_vm_ar_falpha_v1_stock_light.vmat"
+								to = "weapons/famas/materials/famas_v1_stock_light.vmat"
+							},
+							{
+								from = "weapon_vm_ar_falpha_v1_stock_stable.vmat"
+								to = "weapons/famas/materials/famas_v1_stock_stable.vmat"
+							},
+							{
+								from = "weapon_vm_ar_falpha_v1_stock_tactical.vmat"
+								to = "weapons/famas/materials/famas_v1_stock_tactical.vmat"
+							},
+							{
+								from = "weapon_vm_ar_falpha_xmag2.vmat"
+								to = "weapons/famas/materials/famas_xmag2.vmat"
+							},
+							{
+								from = "weapon_vm_ar_falpha_handlecust.vmat"
+								to = "weapons/famas/materials/famas_handlecust.vmat"
+							},
+							{
+								from = "weapon_vm_ar_mike4_magext.vmat"
+								to = "weapons/famas/materials/famas_xmag.vmat"
+							},
+							{
+								from = "attachment_vm_barrel03.vmat"
+								to = "weapons/famas/materials/famas_barrel_sleeve.vmat"
+							},
+							{
+								from = "attachment_vm_laser_mount01.vmat"
+								to = "weapons/famas/materials/famas_laser_mount.vmat"
+							},
+						]
+						use_global_default = false
+						global_default_material = ""
+					},
+				]
+			},
+			{
+				_class = "RenderMeshList"
+				children = 
+				[
+					{
+						_class = "RenderMeshFile"
+						name = "w_famas"
+						filename = "weapons/famas/models/w_famas.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_famas_muzzle_tip"
+						filename = "weapons/famas/models/w_famas_muzzle_tip.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_famas_laser_rail"
+						filename = "weapons/famas/models/w_famas_laser_rail.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_famas_iron_sights"
+						filename = "weapons/famas/models/w_famas_iron_sights.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_famas_sight_folded"
+						filename = "weapons/famas/models/w_famas_sight_folded.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_famas_muzzle_tip_barshort"
+						filename = "weapons/famas/models/w_famas_muzzle_tip_barshort.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_famas_muzzle_tip_barlong2"
+						filename = "weapons/famas/models/w_famas_muzzle_tip_barlong2.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_famas_muzzle_tip_barrellong_alt"
+						filename = "weapons/famas/models/w_famas_muzzle_tip_barrellong_alt.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_famas_iron_sights_low"
+						filename = "weapons/famas/models/w_famas_iron_sights_low.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_famas_sight_folded_low"
+						filename = "weapons/famas/models/w_famas_sight_folded_low.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_famas_barrel_factory"
+						filename = "weapons/famas/models/w_famas_barrel_factory.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_famas_barrel_barshort"
+						filename = "weapons/famas/models/w_famas_barrel_barshort.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_famas_barrel_barlong2"
+						filename = "weapons/famas/models/w_famas_barrel_barlong2.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_famas_barrel_barrellong_alt"
+						filename = "weapons/famas/models/w_famas_barrel_barrellong_alt.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_famas_stock_factory"
+						filename = "weapons/famas/models/w_famas_stock_factory.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_famas_stock_stock_light"
+						filename = "weapons/famas/models/w_famas_stock_stock_light.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_famas_stock_stock_stable"
+						filename = "weapons/famas/models/w_famas_stock_stock_stable.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_famas_stock_stock_tactical_v1"
+						filename = "weapons/famas/models/w_famas_stock_stock_tactical_v1.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_famas_magazine_factory"
+						filename = "weapons/famas/models/w_famas_magazine_factory.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_famas_magazine_xmags"
+						filename = "weapons/famas/models/w_famas_magazine_xmags.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_famas_magazine_xmags2"
+						filename = "weapons/famas/models/w_famas_magazine_xmags2.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_famas_rail_factory"
+						filename = "weapons/famas/models/w_famas_rail_factory.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_famas_rail_classic"
+						filename = "weapons/famas/models/w_famas_rail_classic.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "w_famas_rail_low"
+						filename = "weapons/famas/models/w_famas_rail_low.dmx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+				]
+			},
+			{
+				_class = "BodyGroupList"
+				children = 
+				[
+					{
+						_class = "BodyGroup"
+						name = "muzzle_tip"
+						children = 
+						[
+							{
+								_class = "BodyGroupChoice"
+								name = "on"
+								meshes = 
+								[
+									"w_famas_muzzle_tip",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "barshort"
+								meshes = 
+								[
+									"w_famas_muzzle_tip_barshort",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "barlong2"
+								meshes = 
+								[
+									"w_famas_muzzle_tip_barlong2",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "barrellong_alt"
+								meshes = 
+								[
+									"w_famas_muzzle_tip_barrellong_alt",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "off"
+								meshes = 
+								[
+									"",
+								]
+							},
+						]
+						hidden_in_tools = false
+					},
+					{
+						_class = "BodyGroup"
+						name = "laser_rail"
+						children = 
+						[
+							{
+								_class = "BodyGroupChoice"
+								name = "off"
+								meshes = 
+								[
+									"",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "on"
+								meshes = 
+								[
+									"w_famas_laser_rail",
+								]
+							},
+						]
+						hidden_in_tools = false
+					},
+					{
+						_class = "BodyGroup"
+						name = "iron_sights"
+						children = 
+						[
+							{
+								_class = "BodyGroupChoice"
+								name = "on"
+								meshes = 
+								[
+									"w_famas_iron_sights",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "low"
+								meshes = 
+								[
+									"w_famas_iron_sights_low",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "off"
+								meshes = 
+								[
+									"",
+								]
+							},
+						]
+						hidden_in_tools = false
+					},
+					{
+						_class = "BodyGroup"
+						name = "sight_folded"
+						children = 
+						[
+							{
+								_class = "BodyGroupChoice"
+								name = "off"
+								meshes = 
+								[
+									"",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "on"
+								meshes = 
+								[
+									"w_famas_sight_folded",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "low"
+								meshes = 
+								[
+									"w_famas_sight_folded_low",
+								]
+							},
+						]
+						hidden_in_tools = false
+					},
+					{
+						_class = "BodyGroup"
+						name = "barrel"
+						children = 
+						[
+							{
+								_class = "BodyGroupChoice"
+								name = "factory"
+								meshes = 
+								[
+									"w_famas_barrel_factory",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "barshort"
+								meshes = 
+								[
+									"w_famas_barrel_barshort",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "barlong2"
+								meshes = 
+								[
+									"w_famas_barrel_barlong2",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "barrellong_alt"
+								meshes = 
+								[
+									"w_famas_barrel_barrellong_alt",
+								]
+							},
+						]
+						hidden_in_tools = false
+					},
+					{
+						_class = "BodyGroup"
+						name = "stock"
+						children = 
+						[
+							{
+								_class = "BodyGroupChoice"
+								name = "factory"
+								meshes = 
+								[
+									"w_famas_stock_factory",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "stock_light"
+								meshes = 
+								[
+									"w_famas_stock_stock_light",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "stock_stable"
+								meshes = 
+								[
+									"w_famas_stock_stock_stable",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "stock_tactical_v1"
+								meshes = 
+								[
+									"w_famas_stock_stock_tactical_v1",
+								]
+							},
+						]
+						hidden_in_tools = false
+					},
+					{
+						_class = "BodyGroup"
+						name = "magazine"
+						children = 
+						[
+							{
+								_class = "BodyGroupChoice"
+								name = "factory"
+								meshes = 
+								[
+									"w_famas_magazine_factory",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "xmags"
+								meshes = 
+								[
+									"w_famas_magazine_xmags",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "xmags2"
+								meshes = 
+								[
+									"w_famas_magazine_xmags2",
+								]
+							},
+						]
+						hidden_in_tools = false
+					},
+					{
+						_class = "BodyGroup"
+						name = "rail"
+						children = 
+						[
+							{
+								_class = "BodyGroupChoice"
+								name = "factory"
+								meshes = 
+								[
+									"w_famas_rail_factory",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "classic"
+								meshes = 
+								[
+									"w_famas_rail_classic",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "low"
+								meshes = 
+								[
+									"w_famas_rail_low",
+								]
+							},
+						]
+						hidden_in_tools = false
+					},
+				]
+			},
+		]
+		model_archetype = ""
+		primary_associated_entity = ""
+		anim_graph_name = ""
+		base_model_name = ""
+	}
+}

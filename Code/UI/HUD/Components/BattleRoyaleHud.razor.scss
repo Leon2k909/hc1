@@ -1,0 +1,110 @@
+@import "/UI/Styles/Theme.scss";
+
+BattleRoyaleHud
+{
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    font-family: $main-font;
+    color: white;
+    text-shadow: 2px 2px 4px rgba( black, 0.9 );
+
+    // Out in the gas: a red haze round the edges of the screen.
+    .gas
+    {
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient( rgba( 200, 40, 20, 0 ), rgba( 200, 40, 20, 0.12 ), rgba( 200, 40, 20, 0.45 ) );
+    }
+
+    // The warning and the zone's news sit under the kill medals (MedalFeed, top 7%, down to about 275 px), which
+    // come up at the same time in a fight.
+    .warning
+    {
+        position: absolute;
+        top: 350px;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        align-items: center;
+
+        .title
+        {
+            font-size: 26px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #ff5a40;
+        }
+
+        .detail
+        {
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: rgba( white, 0.85 );
+        }
+    }
+
+    .announcement
+    {
+        position: absolute;
+        top: 300px;
+        left: 0;
+        right: 0;
+        justify-content: center;
+
+        label
+        {
+            padding: 6px 18px;
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            background-color: $background;
+            border-left: 3px solid white;
+        }
+
+        &.closing label
+        {
+            color: #ff9a3c;
+            border-left: 3px solid #ff9a3c;
+        }
+
+        &.final label
+        {
+            color: #ff4a3a;
+            border-left: 3px solid #ff4a3a;
+        }
+    }
+
+    .eliminated
+    {
+        position: absolute;
+        top: 64px;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        align-items: center;
+
+        .title
+        {
+            font-size: 30px;
+            font-weight: bold;
+            letter-spacing: 4px;
+            color: #ff4a3a;
+        }
+
+        .detail
+        {
+            font-size: 16px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: rgba( white, 0.85 );
+        }
+    }
+}

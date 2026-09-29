@@ -17,7 +17,11 @@ public partial class GameModeObject : Component, IGameEventHandler<GamemodeIniti
 	/// </summary>
 	[Property] public bool Inverse { get; set; } = false;
 
-	void IGameEventHandler<GamemodeInitializedEvent>.OnGameEvent( GamemodeInitializedEvent eventArgs )
+	// The body is a named method: hotload can't re-link static lambdas inside explicit generic interface methods
+	// ("Unable to find matching substitution for a static method"), so they'd throw after every hotload.
+	void IGameEventHandler<GamemodeInitializedEvent>.OnGameEvent( GamemodeInitializedEvent eventArgs ) => OnGamemodeInitialized( eventArgs );
+
+	void OnGamemodeInitialized( GamemodeInitializedEvent eventArgs )
 	{
 		if ( string.IsNullOrEmpty( eventArgs.Title ) )
 		{

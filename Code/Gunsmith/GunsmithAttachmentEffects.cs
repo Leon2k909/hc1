@@ -45,6 +45,35 @@ public struct GunsmithAttachmentEffects
 		return effects;
 	}
 
+	/// <summary>
+	/// The effects of the parts saved for <paramref name="resource"/> in the active class, standing (a bipod only
+	/// helps prone). For the gunsmith's stats, which have no equipment or owner.
+	/// </summary>
+	public static GunsmithAttachmentEffects ForBuild( EquipmentResource resource )
+	{
+		var effects = new GunsmithAttachmentEffects
+		{
+			VerticalRecoil = 1f,
+			HorizontalRecoil = 1f,
+			DamageFalloffDistance = 1f,
+			FlashChance = 1f,
+			HearingDistance = 1f,
+			SoundVolume = 1f,
+			FireRate = 1f
+		};
+
+		if ( !resource.IsValid() )
+			return effects;
+
+		ApplySelected( ref effects, resource, GunsmithPartType.Muzzle, false );
+		ApplySelected( ref effects, resource, GunsmithPartType.Barrel, false );
+		ApplySelected( ref effects, resource, GunsmithPartType.Stock, false );
+		ApplySelected( ref effects, resource, GunsmithPartType.Underbarrel, false );
+		ApplySelected( ref effects, resource, GunsmithPartType.RearGrip, false );
+
+		return effects;
+	}
+
 	private static void ApplySelected( ref GunsmithAttachmentEffects effects, EquipmentResource resource,
 		GunsmithPartType category, bool prone )
 	{
@@ -59,6 +88,7 @@ public struct GunsmithAttachmentEffects
 
 		VerticalRecoil *= part.VerticalRecoilScale;
 		HorizontalRecoil *= part.HorizontalRecoilScale;
+		if ( part.DamageFalloffScale > 0f ) DamageFalloffDistance *= part.DamageFalloffScale;
 
 		if ( (part.Category is GunsmithPartType.Muzzle or GunsmithPartType.Barrel)
 			&& (part.IsSuppressor || Has( "suppressor" ) || Has( "silencer" )) )

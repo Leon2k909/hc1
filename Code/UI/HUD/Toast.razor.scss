@@ -1,17 +1,413 @@
-﻿Toast {
+// Round win banner: the team crest stamps down over spinning rays and a light flare, then the headline
+// lands beneath it between two rails while sparks drift up. The entrance plays once per win (the banner
+// is rebuilt on every Show) and removing it plays the :outro fade. Team colours arrive as inline styles
+// from Toast.razor. Plain toasts keep the old centred box.
+
+$win-ease: cubic-bezier(0.23, 1, 0.32, 1);          // strong ease-out: entrances and the exit
+$win-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);  // on-screen travel: the shine and the idle bob
+$land: 0.14s;                                        // the crest first touches down
+
+Toast
+{
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
     pointer-events: none;
-    .background {
-        position: absolute;
-        opacity: 0.1;
-    }
-
     text-transform: uppercase;
+    z-index: 25;
 
-    &.terroristswin, &.counterterroristswin {
-        width: 50%;
-        padding: 32px;
+    > .generic
+    {
+        overflow: hidden;
     }
 
-    overflow: hidden;
-    z-index: 25;
+    .win-banner
+    {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 23%;
+        height: 272px;
+        flex-direction: column;
+        align-items: center;
+        transition: opacity 0.24s $win-ease, transform 0.24s $win-ease;
+
+        &:outro
+        {
+            opacity: 0;
+            transform: scale( 0.97 );
+        }
+    }
+
+    // A soft dark pool so the lockup reads on bright maps without a hard-edged box. Radial gradients
+    // stretch to the box, so this is a wide ellipse centred on the headline (crest 150 + 4 + half of 100).
+    .win-backdrop
+    {
+        position: absolute;
+        left: 50%;
+        top: 204px;
+        width: 1600px;
+        height: 420px;
+        margin-left: -800px;
+        margin-top: -210px;
+        background-image: radial-gradient( rgba( 2, 5, 9, 0.72 ), rgba( 2, 5, 9, 0.6 ) 35%, rgba( 2, 5, 9, 0 ) 70% );
+        animation: win-fade 0.4s $win-ease both;
+    }
+
+    .win-crest
+    {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        flex-shrink: 0;
+        justify-content: center;
+        align-items: center;
+    }
+
+    // Everything behind the emblem is centred on the 150px crest: offset = ( 150 - size ) / 2.
+    .win-rays
+    {
+        position: absolute;
+        left: -205px;
+        top: -205px;
+        width: 560px;
+        height: 560px;
+        animation: win-rays-in 0.7s $win-ease $land both;
+    }
+
+    .win-rays-spin
+    {
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        background-image: url( "/ui/medals/fx/rays.png" );
+        background-size: 100% 100%;
+        animation: win-spin 5s linear infinite;
+    }
+
+    .win-glow
+    {
+        position: absolute;
+        left: -85px;
+        top: -85px;
+        width: 320px;
+        height: 320px;
+        animation: win-glow-in 0.6s $win-ease $land both;
+    }
+
+    .win-glow-pulse
+    {
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        animation: win-glow-pulse 1.4s $win-ease-in-out 0.8s infinite both;
+        animation-direction: alternate;
+    }
+
+    // Anamorphic streak through the crest: it bursts wide on landing, then settles to a faint line.
+    .win-flare
+    {
+        position: absolute;
+        left: -575px;
+        top: 73px;
+        width: 1300px;
+        height: 4px;
+        animation: win-flare 0.9s linear $land both;
+    }
+
+    .win-flare-soft
+    {
+        position: absolute;
+        left: -425px;
+        top: 51px;
+        width: 1000px;
+        height: 48px;
+        animation: win-flare 0.9s linear $land both;
+    }
+
+    .win-flash
+    {
+        position: absolute;
+        left: -55px;
+        top: -55px;
+        width: 260px;
+        height: 260px;
+        background-image: radial-gradient( rgba( 255, 255, 255, 0.95 ), rgba( 255, 255, 255, 0 ) 65% );
+        animation: win-flash 0.5s linear $land both;
+    }
+
+    .win-impact
+    {
+        position: absolute;
+        left: 5px;
+        top: 5px;
+        width: 140px;
+        height: 140px;
+        border: 3px solid white;
+        border-radius: 50%;
+        animation: win-impact 0.65s linear $land both;
+    }
+
+    .win-bob
+    {
+        animation: win-bob 1.8s $win-ease-in-out 1s infinite both;
+        animation-direction: alternate;
+    }
+
+    .win-logo
+    {
+        filter: drop-shadow( 0px 6px 10px rgba( 0, 0, 0, 0.7 ) );
+        animation: win-stamp 0.55s linear both;
+    }
+
+    .win-spark
+    {
+        position: absolute;
+        width: 5px;
+        height: 5px;
+        margin: -2px;
+        border-radius: 50%;
+        opacity: 0;
+
+        &.s0 { left: -30%; top: 78%; animation: win-spark-a 1.7s linear 0.36s infinite both; }
+        &.s1 { left: 112%; top: 70%; animation: win-spark-b 1.9s linear 0.48s infinite both; }
+        &.s2 { left: 18%; top: 96%; animation: win-spark-c 1.5s linear 0.62s infinite both; }
+        &.s3 { left: 86%; top: 92%; animation: win-spark-a 1.8s linear 0.8s infinite both; }
+        &.s4 { left: -58%; top: 88%; animation: win-spark-b 2.1s linear 0.95s infinite both; }
+        &.s5 { left: 140%; top: 84%; animation: win-spark-c 1.6s linear 1.1s infinite both; }
+        &.s6 { left: 50%; top: 104%; animation: win-spark-a 1.9s linear 1.24s infinite both; }
+        &.s7 { left: -12%; top: 60%; animation: win-spark-c 1.7s linear 1.4s infinite both; }
+        &.s8 { left: 124%; top: 58%; animation: win-spark-a 2s linear 1.55s infinite both; }
+        &.s9 { left: 64%; top: 100%; animation: win-spark-b 1.6s linear 1.7s infinite both; }
+    }
+
+    .win-headline
+    {
+        flex-direction: row;
+        align-items: center;
+        margin-top: 4px;
+    }
+
+    .win-rail
+    {
+        position: relative;
+        width: 340px;
+        height: 12px;
+        flex-shrink: 0;
+
+        &.left { margin-right: 28px; }
+        &.right { margin-left: 28px; }
+    }
+
+    .win-rail-line
+    {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 5px;
+        height: 2px;
+        animation: win-rail-draw 0.55s $win-ease 0.3s both;
+    }
+
+    .win-rail.left .win-rail-line { transform-origin: 100% 50%; }
+    .win-rail.right .win-rail-line { transform-origin: 0% 50%; }
+
+    .win-rail-cap
+    {
+        position: absolute;
+        top: 2px;
+        width: 8px;
+        height: 8px;
+        transform: rotate( 45deg );
+        animation: win-cap-in 0.4s $win-ease 0.3s both;
+    }
+
+    .win-rail.left .win-rail-cap { right: -4px; }
+    .win-rail.right .win-rail-cap { left: -4px; }
+
+    .win-words
+    {
+        position: relative;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .win-title, .win-accent
+    {
+        font-size: 92px;
+        font-weight: 700;
+        font-style: italic;
+        letter-spacing: 2px;
+        white-space: nowrap;
+    }
+
+    .win-title
+    {
+        color: white;
+        animation: win-title-in 0.46s $win-ease 0.2s both;
+    }
+
+    .win-accent
+    {
+        margin-left: 26px;
+        animation: win-accent-in 0.5s linear 0.3s both;
+    }
+
+    // One pass of light across the words once everything has landed.
+    .win-sweep-clip
+    {
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        overflow: hidden;
+    }
+
+    .win-sweep
+    {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 110px;
+        background-image: linear-gradient( to right, rgba( 255, 255, 255, 0 ), rgba( 255, 255, 255, 0.3 ), rgba( 255, 255, 255, 0 ) );
+        animation: win-sweep 0.9s $win-ease-in-out 0.62s both;
+    }
+}
+
+// s&box resolves animation names from top-level keyframes. Multi-step ones run with linear timing and
+// carry their easing in the spacing, so they play the same whether easing applies per step or overall.
+@keyframes win-fade
+{
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+@keyframes win-stamp
+{
+    0% { opacity: 0; transform: scale( 1.7 ) rotate( -10deg ); }
+    14% { opacity: 1; transform: scale( 1.2 ) rotate( -4deg ); }
+    26% { opacity: 1; transform: scale( 0.9 ) rotate( 1.5deg ); }
+    46% { opacity: 1; transform: scale( 1.05 ) rotate( -0.6deg ); }
+    70% { opacity: 1; transform: scale( 0.99 ) rotate( 0.2deg ); }
+    100% { opacity: 1; transform: scale( 1 ) rotate( 0deg ); }
+}
+
+@keyframes win-flash
+{
+    0% { opacity: 0; transform: scale( 0.5 ); }
+    12% { opacity: 1; transform: scale( 0.8 ); }
+    40% { opacity: 0.45; transform: scale( 1.2 ); }
+    100% { opacity: 0; transform: scale( 1.5 ); }
+}
+
+@keyframes win-impact
+{
+    0% { opacity: 0; transform: scale( 0.7 ); }
+    12% { opacity: 0.9; transform: scale( 1.1 ); }
+    40% { opacity: 0.45; transform: scale( 1.7 ); }
+    100% { opacity: 0; transform: scale( 2.2 ); }
+}
+
+@keyframes win-rays-in
+{
+    0% { opacity: 0; transform: scale( 0.55 ); }
+    100% { opacity: 0.6; transform: scale( 1 ); }
+}
+
+// The ray texture repeats every 30 degrees, so this loops without a seam.
+@keyframes win-spin
+{
+    0% { transform: rotate( 0deg ); }
+    100% { transform: rotate( 30deg ); }
+}
+
+@keyframes win-glow-in
+{
+    0% { opacity: 0; transform: scale( 0.6 ); }
+    100% { opacity: 1; transform: scale( 1 ); }
+}
+
+@keyframes win-glow-pulse
+{
+    0% { opacity: 0.7; transform: scale( 0.95 ); }
+    100% { opacity: 1; transform: scale( 1.05 ); }
+}
+
+@keyframes win-flare
+{
+    0% { opacity: 0; transform: scaleX( 0.1 ); }
+    16% { opacity: 1; transform: scaleX( 0.72 ); }
+    40% { opacity: 0.75; transform: scaleX( 0.95 ); }
+    100% { opacity: 0.4; transform: scaleX( 1 ); }
+}
+
+@keyframes win-bob
+{
+    0% { transform: translateY( 0px ); }
+    100% { transform: translateY( -5px ); }
+}
+
+@keyframes win-title-in
+{
+    0% { opacity: 0; transform: translateY( 18px ) scale( 1.08 ); }
+    100% { opacity: 1; transform: translateY( 0px ) scale( 1 ); }
+}
+
+@keyframes win-accent-in
+{
+    0% { opacity: 0; transform: scale( 1.6 ); }
+    20% { opacity: 1; transform: scale( 0.92 ); }
+    44% { opacity: 1; transform: scale( 1.05 ); }
+    70% { opacity: 1; transform: scale( 0.99 ); }
+    100% { opacity: 1; transform: scale( 1 ); }
+}
+
+@keyframes win-rail-draw
+{
+    0% { opacity: 0; transform: scaleX( 0.05 ); }
+    100% { opacity: 1; transform: scaleX( 1 ); }
+}
+
+@keyframes win-cap-in
+{
+    0% { opacity: 0; transform: rotate( 45deg ) scale( 0.4 ); }
+    100% { opacity: 1; transform: rotate( 45deg ) scale( 1 ); }
+}
+
+@keyframes win-sweep
+{
+    0% { transform: translateX( -160px ) skewX( -20deg ); }
+    100% { transform: translateX( 1100px ) skewX( -20deg ); }
+}
+
+@keyframes win-spark-a
+{
+    0% { opacity: 0; transform: translate( 0px, 0px ) scale( 1 ); }
+    14% { opacity: 1; transform: translate( -3px, -20px ) scale( 1 ); }
+    50% { opacity: 0.8; transform: translate( -9px, -70px ) scale( 0.75 ); }
+    100% { opacity: 0; transform: translate( -16px, -130px ) scale( 0.4 ); }
+}
+
+@keyframes win-spark-b
+{
+    0% { opacity: 0; transform: translate( 0px, 0px ) scale( 1 ); }
+    14% { opacity: 1; transform: translate( 4px, -18px ) scale( 1 ); }
+    50% { opacity: 0.8; transform: translate( 11px, -66px ) scale( 0.75 ); }
+    100% { opacity: 0; transform: translate( 18px, -124px ) scale( 0.4 ); }
+}
+
+@keyframes win-spark-c
+{
+    0% { opacity: 0; transform: translate( 0px, 0px ) scale( 1 ); }
+    16% { opacity: 1; transform: translate( 1px, -16px ) scale( 1 ); }
+    55% { opacity: 0.7; transform: translate( -2px, -58px ) scale( 0.7 ); }
+    100% { opacity: 0; transform: translate( 2px, -100px ) scale( 0.4 ); }
 }

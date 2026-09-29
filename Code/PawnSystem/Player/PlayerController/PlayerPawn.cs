@@ -45,6 +45,12 @@ public sealed partial class PlayerPawn : Pawn, IDescription, IAreaDamageReceiver
 	[Sync] public TimeSince TimeSinceUnsuppressedShot { get; set; } = 9999f;
 
 	/// <summary>
+	/// Time since this player last fired a suppressed weapon. A suppressed shot is still a loud crack close by, so bots
+	/// within earshot of it (<see cref="LightweightCombatBot.SuppressedHearingRange"/>) place the shooter roughly.
+	/// </summary>
+	[Sync] public TimeSince TimeSinceSuppressedShot { get; set; } = 9999f;
+
+	/// <summary>
 	/// Where are weapons on the player?
 	/// </summary>
 	[Property]
@@ -117,7 +123,7 @@ public sealed partial class PlayerPawn : Pawn, IDescription, IAreaDamageReceiver
 		UpdateHealthRegen();
 		OnUpdateMovement();
 
-		_smoothEyeHeight = _smoothEyeHeight.LerpTo( _eyeHeightOffset, Time.Delta * 10f );
+		_smoothEyeHeight = _smoothEyeHeight.LerpTo( _eyeHeightOffset, Time.Delta * StanceChangeRate( _eyeHeightOffset > _smoothEyeHeight ) );
 		CharacterController.Height = Height + _smoothEyeHeight;
 
 		if ( IsLocallyControlled )
@@ -231,7 +237,13 @@ public sealed partial class PlayerPawn : Pawn, IDescription, IAreaDamageReceiver
 
 		// Don't have any play areas, dont bother.
 		if ( Scene.GetSystem<PlayAreaSystem>().Count < 1 )
+		{
+			// Takes down a warning left by a play area that's gone.
+			if ( !InPlayArea )
+				InPlayArea = true;
+
 			return;
+		}
 
 		var playArea = GetZone<PlayArea>();
 		if ( !playArea.IsValid() )

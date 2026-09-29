@@ -18,7 +18,7 @@
         }
 
         <div class="entry layout grow center" style="justify-content: center; align-items: center;" onclick=@(() => ClearThis() )>
-            <label class="white micro">None</label>
+            <label class="white micro">@Tr( "None" )</label>
         </div>
     }
     else
@@ -30,7 +30,7 @@
             }
             else
             {
-                <label class="white micro">@Category</label>
+                <label class="white micro">@Tr( Category == GunsmithPartType.RearGrip ? "Rear Grip" : Category.ToString() )</label>
             }
         </div>
     }

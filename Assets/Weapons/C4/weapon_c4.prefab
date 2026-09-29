@@ -13,12 +13,6 @@
         "DeploySound": "sounds/guns/switch/weapon_switch.sound",
         "Handedness": "Right",
         "HoldType": "HoldItem",
-        "ModelRenderer": {
-          "_type": "component",
-          "component_id": "ceb74dca-a92d-419d-b08f-71bd818191f8",
-          "go": "9226fe53-48f5-4f14-a3d4-a8a83d972ea7",
-          "component_type": "SkinnedModelRenderer"
-        },
         "MountedPrefab": {
           "_type": "gameobject",
           "prefab": "weapons/c4/mount_c4.prefab"
@@ -33,41 +27,6 @@
       }
     ],
     "Children": [
-      {
-        "__guid": "9226fe53-48f5-4f14-a3d4-a8a83d972ea7",
-        "Flags": 0,
-        "Name": "Model",
-        "Position": "3.535849,0,-5.571055",
-        "Enabled": true,
-        "Components": [
-          {
-            "__type": "Sandbox.SkinnedModelRenderer",
-            "__guid": "ceb74dca-a92d-419d-b08f-71bd818191f8",
-            "BodyGroups": 18446744073709551615,
-            "CreateAttachments": false,
-            "CreateBoneObjects": false,
-            "MaterialOverride": "Weapons/c4/c4_material.vmat",
-            "Model": "weapons/throwable/c4_bomb/c4_bomb.vmdl",
-            "Morphs": {},
-            "Parameters": {
-              "bools": {},
-              "ints": {},
-              "floats": {},
-              "vectors": {},
-              "rotations": {}
-            },
-            "RenderOptions": {
-              "GameLayer": true,
-              "OverlayLayer": false,
-              "BloomLayer": false,
-              "AfterUILayer": false
-            },
-            "RenderType": "On",
-            "Tint": "1,1,1,1",
-            "UseAnimGraph": true
-          }
-        ]
-      },
       {
         "__guid": "2cfe3fb5-9511-4ab6-9eec-ad135f6a9d42",
         "Flags": 0,
@@ -107,7 +66,7 @@
               }
             ],
             "PlantingBeepSound": "sounds/guns/c4/c4_planting_beep.sound",
-            "PlantTime": 3.2,
+            "PlantTime": 4.0,
             "RequiresAllInputActions": false
           }
         ]
@@ -124,7 +83,7 @@
       "TimeScale": 1,
       "UseFixedUpdate": true,
       "Metadata": {
-        "WorldModel": "weapons/throwable/c4_bomb/c4_bomb.vmdl",
+        "WorldModel": "weapons/c4/field_device/field_device.vmdl",
         "BodyGroups": "18446744073709551615",
         "Maxs": "6.378,4.5079,3.5696",
         "Mins": "-7.4661,-4.5079,-0"

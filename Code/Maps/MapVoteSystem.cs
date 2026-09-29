@@ -17,6 +17,11 @@ public partial class MapVoteSystem : SingletonComponent<MapVoteSystem>
 	[Sync] public NetList<NetworkedVote> Votes { get; set; } = new();
 
 	/// <summary>
+	/// How long the vote stays open, in seconds.
+	/// </summary>
+	public const float VoteDuration = 15f;
+
+	/// <summary>
 	/// How long until we decide who won?
 	/// </summary>
 	public RealTimeUntil TimeUntilDecidedWinner { get; private set; } = 0;
@@ -31,7 +36,21 @@ public partial class MapVoteSystem : SingletonComponent<MapVoteSystem>
 	/// </summary>
 	public Option? WinningOption { get; private set; }
 
+	/// <summary>
+	/// The winning option's index once the vote's decided, -1 before. Synced so every client's cards show it.
+	/// </summary>
+	[Sync] public int WinnerIndex { get; set; } = -1;
+
+	/// <summary>
+	/// Set on this machine while its player leaves for another mode (<see cref="MapVoteOverlay"/>): until it's cleared,
+	/// the vote moves nobody on from here. Once the lobby's gone, a client's copy would otherwise run the host's side and
+	/// load the winning map over the new mode's. Cleared again if the player couldn't leave.
+	/// </summary>
+	public bool IsLeaving { get; set; }
+
 	public IEnumerable<Option> VoteOptions => FromNetworked( Options );
+
+	public int OptionCount => Options.Count;
 
 	/// <summary>
 	/// An instance of the map vote overlay UI
@@ -47,25 +66,27 @@ public partial class MapVoteSystem : SingletonComponent<MapVoteSystem>
 	{
 		base.OnAwake();
 
-		TimeUntilDecidedWinner = 15;
+		TimeUntilDecidedWinner = VoteDuration;
 		ScreenPanel.ZIndex = 999;
 	}
 
 	protected override void OnUpdate()
 	{
-		if ( IsProxy )
+		if ( IsProxy || IsLeaving )
 			return;
 
 		if ( TimeUntilDecidedWinner && WinningOption is null )
 		{
 			TimeUntilTransfer = 5;
-			WinningOption = GetWinningOption();
 
-			if ( !WinningOption.HasValue )
+			if ( Options.Count == 0 )
 			{
-				// TODO: we found no winner, pick random from next best value
 				GameUtils.ReturnToMainMenu();
+				return;
 			}
+
+			WinnerIndex = PickWinner();
+			WinningOption = GetOption( WinnerIndex );
 		}
 
 		if ( WinningOption.HasValue && TimeUntilTransfer )
@@ -102,75 +123,38 @@ public partial class MapVoteSystem : SingletonComponent<MapVoteSystem>
 	}
 
 	/// <summary>
-	/// What's our current winning option?
-	/// TODO: provide sorted options instead so other systems can take winner, or take a draw 
+	/// How many votes an option has.
 	/// </summary>
-	/// <returns></returns>
-	public Option? GetWinningOption()
+	public int GetVoteCount( int index ) => Votes.Count( x => x is not null && x.Option == index );
+
+	/// <summary>
+	/// The option with the most votes. A tie, or no votes at all, is settled at random between the leaders.
+	/// </summary>
+	private int PickWinner()
 	{
-		var dict = new Dictionary<Option, int>();
+		var counts = Enumerable.Range( 0, Options.Count ).Select( GetVoteCount ).ToList();
+		var most = counts.Max();
 
-		foreach ( var vote in Votes )
-		{
-			var option = GetOption( vote.Option );
-
-			if ( !dict.TryGetValue( option, out var _ ) )
-			{
-				dict.Add( option, 0 );
-			}
-
-			dict[option]++;
-		}
-
-		var highestKeyValuePair = dict.OrderByDescending( x => x.Value )
-			.ToDictionary( pair => pair.Key, pair => pair.Value )
-			.FirstOrDefault();
-
-		if ( highestKeyValuePair.Value < 1 )
-			return Options.Count > 0 ? GetOption( 0 ) : null;
-
-		return highestKeyValuePair.Key;
+		return Game.Random.FromList( Enumerable.Range( 0, Options.Count ).Where( i => counts[i] == most ).ToList() );
 	}
 
+	/// <summary>
+	/// One option per match map, in a random order, each in the mode that was just played (or a random mode the map
+	/// has, if it doesn't have that one). Players vote on the map; the mode stays what the lobby picked. This used to
+	/// pick maps at random with repeats and a different mode for each, so two maps filled five cards with duplicates.
+	/// </summary>
 	public static IEnumerable<Option> GenerateOptions( GameMode currentMode = null, SceneFile currentMap = null, int count = 5 )
 	{
-		// Only maps the current match flow is set up for.
-		var maps = GameUtils.GetMatchMaps().ToList();
+		currentMode ??= GameMode.Instance;
 		var options = new List<Option>();
 
-		var inList = ( GameMode gameMode ) =>
+		foreach ( var map in GameUtils.GetMatchMaps().OrderBy( _ => Game.Random.Float() ).Take( count ) )
 		{
-			return options.FirstOrDefault( x => x.Mode == gameMode ).Mode is not null;
-		};
+			var modes = GameMode.GetAll( map ).ToList();
+			var mode = modes.FirstOrDefault( x => currentMode.IsValid() && x.Ident == currentMode.Ident ) ?? Game.Random.FromList( modes );
 
-		int attempts = 0;
-		while ( options.Count < count )
-		{
-			// Grab a random map
-			var map = Game.Random.FromList( maps );
-			if ( map == null ) break;
-
-			// Grab a random mode that is supported by this map, and is not one we picked before
-			var modes = GameMode.GetAll( map );
-			var mode = Game.Random.FromList( modes.Where( x => !inList( x ) ).ToList() );
-
-			// We ran out of options :S
-			if ( mode is null )
-			{
-				maps.Remove( map );
-				attempts++;
-
-				continue;
-			}
-
-			if ( attempts > 5 )
-				break;
-
-			options.Add( new Option()
-			{
-				Map = map,
-				Mode = mode
-			} );
+			if ( mode is not null )
+				options.Add( new Option { Map = map, Mode = mode } );
 		}
 
 		return options;
@@ -305,9 +289,11 @@ public partial class MapVoteSystem : SingletonComponent<MapVoteSystem>
 		/// <returns></returns>
 		public NetworkedOption AsNetworked()
 		{
+			// GetPrefabPath, not PrefabInstanceSource: the modes are the prefabs' own GameModes, which have no instance
+			// source, so every option used to come back as the map's first mode (TDM).
 			return new NetworkedOption
 			{
-				ModeResource = Mode.GameObject.PrefabInstanceSource,
+				ModeResource = GameMode.GetPrefabPath( Mode ),
 				MapResource = Map.ResourcePath
 			};
 		}
@@ -342,7 +328,7 @@ public partial class MapVoteSystem : SingletonComponent<MapVoteSystem>
 			var mapDef = ResourceLibrary.Get<SceneFile>( MapResource );
 			var modePath = ModeResource;
 			var mode = GameMode.GetAll( mapDef )
-				.FirstOrDefault( x => x.GameObject.PrefabInstanceSource == modePath );
+				.FirstOrDefault( x => GameMode.GetPrefabPath( x ) == modePath );
 
 			return new Option
 			{

@@ -21,7 +21,7 @@
                 <div class="when-open flex align-center gap-sm shrink-0">
                     <InputHint Action="Score" class="small" Size="@InputGlyphSize.Small" />
                     <label>
-                        @ChatMode
+                        @Tr( ChatMode == ChatModes.All ? "All" : "Team" )
                     </label>
                 </div>
 
@@ -48,7 +48,7 @@
 
                                     @if ( entry.chatMode != ChatModes.All )
                                     {
-                                        <label class="small no-shadow green">TEAM</label>
+                                        <label class="small no-shadow green">@Tr( "TEAM" )</label>
                                     }
 
                                     <label class="playername bold no-shadow" style="color: @entry.color.Hex">@entry.author</label>
@@ -68,13 +68,13 @@
 
                                 </span>
 
-                                <label class="message no-shadow">@entry.message</label>
+                                <label class="message no-shadow">@MessageText( entry )</label>
                             </span>
                         }
                         else
                         {
                             <span class="flex row gap-sm w-full align-center">
-                                <label class="message no-shadow">@entry.message</label>
+                                <label class="message no-shadow">@SystemText( entry )</label>
                             </span>
                         }
                     </div>
@@ -101,8 +101,17 @@
     private ChatModes ChatMode = ChatModes.Team;
     private ChatBox InputBox { get; set; }
 
-    public record Entry(ulong steamid, string author, string message, RealTimeSince timeSinceAdded, ChatModes chatMode, MessageType type, Color color, string tags = null, string location = null);
+    /// <summary> A chat line. A system line's message is the host's English, filled in with <c>subject</c> (a player's name) and <c>team</c> where it has them. </summary>
+    public record Entry(ulong steamid, string author, string message, RealTimeSince timeSinceAdded, ChatModes chatMode, MessageType type, Color color, string tags = null, string location = null, string subject = null, Team team = Team.Unassigned);
     private List<Entry> Entries = new();
+
+    /// <summary> A chat line's text. Radio callouts are the game's own lines (RadioSounds), so they're shown in the viewer's language. </summary>
+    private static string MessageText( Entry entry ) => entry.tags?.Contains( "radio" ) == true ? Tr( entry.message ) : entry.message;
+
+    /// <summary> A system line in the viewer's language: the host sends the English ("{0} is joining the {1}") with the name and team apart. </summary>
+    private static string SystemText( Entry entry ) => entry.subject is null
+        ? Tr( entry.message )
+        : Tr( entry.message, entry.subject, Tr( entry.team.GetName() ) );
     private bool IsOpen;
     private bool IgnoreEmptySubmitUntilChatReleased;
     private RealTimeSince TimeSinceOpened;
@@ -277,15 +286,19 @@
             Instance = null;
     }
 
+    /// <summary>
+    /// A line from the game, sent in English so each machine shows it in its own language. <paramref name="message"/> can
+    /// be a format ("{0} is spectating"), filled in there with <paramref name="subject"/> and <paramref name="team"/>'s name.
+    /// </summary>
     [Rpc.Broadcast( NetFlags.HostOnly )]
-    public void AddSystemText( string message )
+    public void AddSystemText( string message, string subject = null, Team team = Team.Unassigned )
     {
         message = message.Truncate( 300 );
 
         if ( string.IsNullOrWhiteSpace( message ) )
             return;
 
-        Entries.Add( new( 0, "", message, 0.0f, ChatModes.All, MessageType.System, Color.White ) );
+        Entries.Add( new( 0, "", message, 0.0f, ChatModes.All, MessageType.System, Color.White, subject: subject, team: team ) );
         StateHasChanged();
     }
 
@@ -297,9 +310,9 @@
         if ( ZombiesRoundSystem.Current.IsValid() ) return;
 
         if ( eventArgs.Team == Team.Unassigned )
-            AddSystemText( $"{eventArgs.Player.DisplayName} is spectating" );
+            AddSystemText( "{0} is spectating", eventArgs.Player.DisplayName ?? "" );
         else
-            AddSystemText( $"{eventArgs.Player.DisplayName} is joining the {eventArgs.Team.GetName()}" );
+            AddSystemText( "{0} is joining the {1}", eventArgs.Player.DisplayName ?? "", eventArgs.Team );
     }
 
     void Component.INetworkListener.OnDisconnected( Connection channel )
@@ -310,7 +323,7 @@
         if ( channel.Id == Guid.Empty )
             return;
 
-        AddSystemText( $"{channel.DisplayName} has left the game" );
+        AddSystemText( "{0} has left the game", channel.DisplayName ?? "" );
     }
 
     private static readonly string[] BadWords = new[] { "fuck", "shit", "bitch", "cunt", "nigger", "faggot", "asshole", "bastard" };

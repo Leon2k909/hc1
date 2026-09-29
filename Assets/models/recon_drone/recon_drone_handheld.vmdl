@@ -1,0 +1,14 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc29:version{3cec427c-1b0e-4d48-a90a-0436f33a6041} -->
+{ rootNode = { _class = "RootNode" children = [
+{ _class = "MaterialGroupList" children = [ { _class = "DefaultMaterialGroup" remaps = [
+{ from = "green.vmat" to = "models/recon_drone/green.vmat" },
+{ from = "lens.vmat" to = "models/recon_drone/lens.vmat" },
+{ from = "metal.vmat" to = "models/recon_drone/metal.vmat" },
+{ from = "recon.vmat" to = "models/recon_drone/recon.vmat" },
+{ from = "red.vmat" to = "models/recon_drone/red.vmat" }
+] use_global_default = false } ] },
+{ _class = "RenderMeshList" children = [ { _class = "RenderMeshFile"
+filename = "models/recon_drone/recon_drone.obj"
+import_translation = [0,0,0] import_rotation = [0,0,0] import_scale = 0.09
+align_origin_x_type = "None" align_origin_y_type = "None" align_origin_z_type = "None"
+} ] } ] } }

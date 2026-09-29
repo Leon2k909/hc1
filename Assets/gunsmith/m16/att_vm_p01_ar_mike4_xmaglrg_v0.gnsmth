@@ -1,0 +1,36 @@
+{
+  "Name": "60 Round Mag",
+  "Category": "Magazine",
+  "EligibleEquipment": [
+    "weapons/m16/m16.equip"
+  ],
+  "RequiredLevel": 0,
+  "Description": "60-round 5.56 magazine with its matching reload animations.",
+  "ModifyBodygroups": true,
+  "Bodygroups": {
+    "magazine": 3
+  },
+  "MagazineCapacity": 60,
+  "ReloadTimeMultiplier": 1,
+  "ReloadAnimation": 3,
+  "ReloadTime": 3.0667,
+  "EmptyReloadTime": 3.2667,
+  "ReloadSounds": {
+    "0": "weapons/m16/sounds/m16_reload_xmaglrg_raise.sound",
+    "0.733": "weapons/m16/sounds/m16_reload_xmaglrg_magout.sound",
+    "0.767": "weapons/m16/sounds/m16_reload_xmaglrg_rattle.sound",
+    "1.533": "weapons/m16/sounds/m16_reload_xmaglrg_magin.sound",
+    "1.8": "weapons/m16/sounds/m16_reload_xmaglrg_end.sound"
+  },
+  "EmptyReloadSounds": {
+    "0": "weapons/m16/sounds/m16_reload_empty_xmaglrg_raise.sound",
+    "0.5": "weapons/m16/sounds/m16_reload_empty_xmaglrg_rotate.sound",
+    "0.767": "weapons/m16/sounds/m16_reload_empty_xmaglrg_magout.sound",
+    "1.033": "weapons/m16/sounds/m16_reload_empty_xmaglrg_rattle.sound",
+    "1.767": "weapons/m16/sounds/m16_reload_empty_xmaglrg_magin.sound",
+    "1.933": "weapons/m16/sounds/m16_reload_empty_xmaglrg_end.sound",
+    "2.367": "weapons/m16/sounds/m16_reload_empty_xmaglrg_charge.sound"
+  },
+  "__references": [],
+  "__version": 0
+}

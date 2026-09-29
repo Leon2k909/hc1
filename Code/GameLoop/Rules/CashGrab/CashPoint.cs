@@ -92,7 +92,7 @@ public partial class CashPoint : Component, ICustomMinimapIcon, IMarkerObject
 	/// <summary>
 	/// What text?
 	/// </summary>
-	string IMarkerObject.DisplayText => "Cash Point";
+	string IMarkerObject.DisplayText => Tr( "Cash Point" );
 
 	/// <summary>
 	/// Should we show this marker?

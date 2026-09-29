@@ -1,0 +1,158 @@
+@import "/UI/Styles/Theme.scss";
+
+@import "/UI/Styles/MenuPage.scss";
+
+$kb-accent: $menu-accent;
+
+.input-settings
+{
+    flex-direction: column;
+    flex-shrink: 0;
+    width: 100%;
+
+    .grow
+    {
+        flex-grow: 1;
+    }
+
+    .name
+    {
+        color: white;
+        font-size: 18px;
+    }
+
+    .kb-head
+    {
+        flex-direction: row;
+        align-items: center;
+        margin-top: 24px;
+        padding: 0 8px 12px 8px;
+        border-bottom: 1px solid rgba( white, 0.1 );
+    }
+
+    .kb-head-text
+    {
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .kb-title
+    {
+        font-size: 20px;
+        font-weight: 900;
+        letter-spacing: 3px;
+    }
+
+    .kb-hint
+    {
+        font-size: 14px;
+        color: rgba( white, 0.55 );
+    }
+
+    .kb-edit
+    {
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        height: 44px;
+        padding: 0 20px;
+        background-color: $kb-accent;
+        color: #111519;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        pointer-events: all;
+        flex-shrink: 0;
+        transition: all 0.1s ease;
+
+        i { font-size: 20px; }
+
+        &:hover
+        {
+            background-color: $menu-accent-hover;
+            sound-in: ui_button_hover;
+        }
+    }
+
+    .kb-group
+    {
+        margin-top: 18px;
+        padding: 0 8px 6px 8px;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: $kb-accent;
+    }
+
+    .kb-row
+    {
+        flex-direction: row;
+        align-items: center;
+        min-height: 44px;
+        padding: 4px 8px;
+        border-bottom: 1px solid rgba( white, 0.06 );
+        cursor: pointer;
+        pointer-events: all;
+        transition: all 0.1s ease;
+
+        &:hover
+        {
+            background: linear-gradient( to right, rgba( 255, 122, 26, 0.14 ), rgba( 255, 122, 26, 0 ) );
+
+            .kb-glyph { background-tint: $kb-accent; }
+            .kb-key { border-color: $kb-accent; }
+        }
+    }
+
+    .kb-name
+    {
+        font-size: 16px;
+        color: rgba( white, 0.9 );
+    }
+
+    .kb-keys
+    {
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+    }
+
+    .kb-glyph
+    {
+        width: 32px;
+        height: 32px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-tint: white;
+    }
+
+    .kb-key
+    {
+        min-width: 32px;
+        height: 30px;
+        padding: 0 8px;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba( white, 0.4 );
+        border-radius: 2px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .kb-plus
+    {
+        font-size: 14px;
+        color: rgba( white, 0.5 );
+    }
+
+    .kb-unbound
+    {
+        font-size: 14px;
+        color: rgba( white, 0.4 );
+        font-style: italic;
+    }
+}

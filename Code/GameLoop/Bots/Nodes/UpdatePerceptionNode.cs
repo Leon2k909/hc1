@@ -100,6 +100,7 @@ public class UpdatePerceptionNode : BaseBehaviorNode
 			.IgnoreGameObjectHierarchy( from.GameObject.Root )
 			.Run();
 
-		return trace.Hit && trace.GameObject.Root == obj.GameObject.Root;
+		// Map clutter (trees) has collision but no GameObject
+		return trace.Hit && trace.GameObject.IsValid() && trace.GameObject.Root == obj.GameObject.Root;
 	}
 }

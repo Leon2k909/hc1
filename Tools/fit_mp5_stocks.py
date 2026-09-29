@@ -16,6 +16,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import part_names
+
 
 ASSETS = Path(__file__).resolve().parents[1] / "Assets"
 ATTACHMENTS = ASSETS / "attachments/mpapa5"
@@ -62,7 +64,7 @@ def main() -> None:
     # The MP5-specific bare receiver is a distinct Workshop choice.
     collapsible = ASSETS / "gunsmith/mpapa5/stocks/stock_collapsible.gnsmth"
     part = json.loads(collapsible.read_text(encoding="utf-8"))
-    part["Name"] = "FTAC Collapsible"
+    part["Name"] = part_names.name("stock_collapsible")
     part["Description"] = "MP5 collapsible configuration with the factory stock removed."
     collapsible.write_text(json.dumps(part, indent=2) + "\n", encoding="utf-8")
 

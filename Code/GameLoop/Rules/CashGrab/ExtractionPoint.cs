@@ -95,7 +95,7 @@ public partial class ExtractionPoint : Component,
 	/// <summary>
 	/// What text?
 	/// </summary>
-	string IMarkerObject.DisplayText => "Extraction Point";
+	string IMarkerObject.DisplayText => Tr( "Extraction Point" );
 
 	/// <summary>
 	/// Should we show this marker?

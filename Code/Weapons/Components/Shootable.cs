@@ -215,6 +215,8 @@ public partial class Shootable : WeaponInputAction,
 		if ( Application.IsDedicatedServer || !Equipment.IsValid() )
 			return;
 
+		MatchRecorder.NoteShot( Equipment.Owner?.GameObject, suppressed );
+
 		var effector = Effector;
 		if ( !effector.IsValid() || !effector.ModelRenderer.IsValid() )
 			return;
@@ -228,16 +230,12 @@ public partial class Shootable : WeaponInputAction,
 		// One spent case per discharge, independent of flash/smoke chance and pellet count.
 		effector.EjectCasing( EjectionPrefab, Equipment.Owner );
 
+		// Falls off with distance as a real blast does, muffled through walls (GunshotAudio).
 		var shootSound = GetShootSound( suppressed );
-		if ( shootSound is not null )
-		{
-			if ( Sound.Play( shootSound, Equipment.WorldPosition ) is { } snd )
-			{
-				snd.SpacialBlend = (Equipment.Owner?.IsViewer ?? false) ? 0 : snd.SpacialBlend;
-				snd.Volume *= soundVolume;
-				Log.Trace( $"Shootable: ShootSound {shootSound.ResourceName}" );
-			}
-		}
+		var owner = Equipment.Owner;
+		var forward = owner.IsValid() ? owner.EyeAngles.Forward : Equipment.WorldRotation.Forward;
+		if ( GunshotAudio.Play( shootSound, Equipment.WorldPosition, forward, owner?.IsViewer ?? false, soundVolume ) is not null )
+			Log.Trace( $"Shootable: ShootSound {shootSound.ResourceName}" );
 
 		// Third person
 		if ( Equipment.Owner.IsValid() && Equipment.Owner.BodyRenderer.IsValid() )
@@ -248,8 +246,11 @@ public partial class Shootable : WeaponInputAction,
 			Equipment.ViewModel.ModelRenderer.Set( "b_attack", true );
 	}
 
-	private void CreateImpactEffects( GameObject hitObject, Surface surface, Vector3 pos, Vector3 normal )
+	private void CreateImpactEffects( in SceneTraceResult tr, Surface surface )
 	{
+		var hitObject = tr.GameObject;
+		var pos = tr.EndPosition;
+		var normal = tr.Normal;
 		var impactPrefab = surface.GetBulletImpact();
 
 		if ( impactPrefab.IsValid() )
@@ -257,17 +258,17 @@ public partial class Shootable : WeaponInputAction,
 			var impact = impactPrefab.Clone();
 			impact.WorldPosition = pos + normal;
 			impact.WorldRotation = Rotation.LookAt( normal );
-			impact.SetParent( hitObject, true );
+			if ( hitObject.IsValid() )                     // map clutter (trees) has no GameObject
+				impact.SetParent( hitObject, true );
 
 			// Shots run in fixed update, which interpolates the re-parent: for a frame the effect sits at
 			// hitObject.PointToWorld( pos ) (thousands of units away) and its particles burst there.
 			impact.Transform.ClearInterpolation();
 		}
 
-		if ( surface.SoundCollection.Bullet.IsValid() )
-		{
-			Sound.Play( surface.SoundCollection.Bullet, pos );
-		}
+		// What the round strikes, by its material (Tools/world_sounds.py).
+		if ( WorldSounds.BulletImpact( tr, surface ) is { } sound )
+			Sound.Play( sound, pos );
 	}
 
 	/// <summary>
@@ -284,9 +285,14 @@ public partial class Shootable : WeaponInputAction,
 		Equipment.RefreshAmmunitionLoadout();
 		var suppressed = UseSuppressedEffects();
 
-		// CoD-style minimap reveal: an unsuppressed shot briefly puts us on the enemy minimap.
-		if ( !suppressed && Player.IsValid() )
-			Player.TimeSinceUnsuppressedShot = 0;
+		// An unsuppressed shot briefly puts us on the enemy minimap, and bots hear it far off. A suppressed one, only close by.
+		if ( Player.IsValid() )
+		{
+			if ( suppressed )
+				Player.TimeSinceSuppressedShot = 0;
+			else
+				Player.TimeSinceUnsuppressedShot = 0;
+		}
 
 		if ( AmmoComponent.IsValid() )
 			AmmoComponent.Ammo--;
@@ -305,18 +311,38 @@ public partial class Shootable : WeaponInputAction,
 		for ( int i = 0; i < BulletCount; i++ )
 		{
 			int count = 0;
+			var struck = new HashSet<GameObject>();
 
-			foreach ( var tr in GetShootTrace() )
+			foreach ( var trace in GetShootTrace() )
 			{
-				if ( !tr.Hit )
+				if ( !trace.Hit )
 					continue;
 
-				if ( tr.Distance == 0 )
+				if ( trace.Distance == 0 )
 					continue;
 
-				CreateImpactEffects( tr.GameObject, tr.Surface, tr.EndPosition, tr.Normal );
+				// The trace's box touches several of a body's hitboxes (both legs and the pelvis at once), but the bullet
+				// hits that body once, where its line goes.
+				var tr = trace;
+				if ( tr.Hitbox is not null )
+				{
+					if ( !struck.Add( tr.GameObject.Root ) )
+						continue;
 
-				var damage = CalculateDamageFalloff( GetEffectiveDamage(), tr.Distance );
+					tr = tr.ThroughBody( Scene );
+				}
+
+				CreateImpactEffects( tr, tr.GetImpactSurface() );
+
+				// A window pane breaks as the round goes through (here, not a round trip later on the host), and a shot
+				// through glass isn't a wallbang.
+				if ( tr.GameObject?.GetComponent<BreakableGlass>() is { } glass )
+				{
+					glass.Break( tr.StartPosition );
+					continue;
+				}
+
+				var damage = CalculateDamageFalloff( GetEffectiveDamage(), trace.Distance + _pathTravelled );
 				damage = damage.CeilToInt();
 
 				// Inflict damage on whatever we find.
@@ -338,6 +364,9 @@ public partial class Shootable : WeaponInputAction,
 		var recoil = Equipment.GetComponentInChildren<ShootRecoil>();
 		if ( recoil.IsValid() )
 			recoil.Shoot();
+
+		// This shot's heat reaches the barrel after the bullet has left it.
+		Equipment.GetComponentInChildren<BarrelHeat>()?.Shoot();
 	}
 
 	[Rpc.Broadcast]
@@ -377,26 +406,63 @@ public partial class Shootable : WeaponInputAction,
 		Equipment.ViewModel?.ModelRenderer.Set( "b_attack_dry", true );
 	}
 
+	/// <summary>
+	/// Everything a bullet from <paramref name="start"/> to <paramref name="end"/> meets, nearest first. The bullet is a
+	/// line: walls, floors and props stop it only where that line meets them. The whole trace used to be a box
+	/// (<paramref name="radius"/> x 1.75, at least 14 units), which clipped a wall's edge up to 7 units off the line, so a
+	/// shot aimed just past a corner you stood close to hit the corner. Bodies (players' and bots' hitboxes, zombies) are
+	/// still found with that box, so a near miss hits them, but only where the box touches them in the open
+	/// (<see cref="InTheOpen"/>).
+	/// </summary>
 	protected IEnumerable<SceneTraceResult> DoTraceBullet( Vector3 start, Vector3 end, float radius )
 	{
-		var finalRadius = MathF.Max( radius * 1.75f, 14.0f );
-		return Scene.Trace.Ray( start, end )
+		var world = BulletTrace( start, end )
+			.RunAll()
+			.Where( x => !IsBody( x ) );
+
+		var bodies = BulletTrace( start, end )
 			.UseHitboxes()
-			.IgnoreGameObjectHierarchy( GameObject.Root )
-			.WithoutTags( "trigger", "playerclip", "movement" )
-			.Size( finalRadius )
-			.RunAll();
+			.Size( MathF.Max( radius * 1.75f, 14.0f ) )
+			.RunAll()
+			.Where( x => IsBody( x ) && InTheOpen( x ) );
+
+		return world.Concat( bodies ).OrderBy( x => x.Distance ).ToArray();
 	}
 
 	protected SceneTraceResult DoTraceBulletOne( Vector3 start, Vector3 end, float radius )
 	{
-		var finalRadius = MathF.Max( radius * 1.75f, 14.0f );
-		return Scene.Trace.Ray( start, end )
-			.UseHitboxes()
-			.IgnoreGameObjectHierarchy( GameObject.Root )
-			.WithoutTags( "trigger", "playerclip", "movement" )
-			.Size( finalRadius )
-			.Run();
+		var first = DoTraceBullet( start, end, radius ).FirstOrDefault( x => x.Hit );
+		if ( first.Hit ) return first;
+
+		// A miss ends at the end, like a single trace's: the exit-point search below measures from it.
+		return default( SceneTraceResult ) with
+		{
+			StartPosition = start, EndPosition = end, HitPosition = end, Direction = (end - start).Normal, Fraction = 1f
+		};
+	}
+
+	private SceneTrace BulletTrace( Vector3 start, Vector3 end ) => Scene.Trace.Ray( start, end )
+		.IgnoreGameObjectHierarchy( GameObject.Root )
+		.WithoutTags( "trigger", "playerclip", "movement" );
+
+	/// <summary> Whether a hit is on something a bullet wounds: a player's or bot's hitbox, or a zombie's capsule. </summary>
+	private static bool IsBody( SceneTraceResult tr )
+	{
+		if ( tr.Hitbox is not null ) return true;
+		if ( !tr.GameObject.IsValid() ) return false;
+
+		return tr.GameObject.GetComponentInParent<HealthComponent>().IsValid()
+			|| tr.GameObject.GetComponentInParent<ZombieAI>().IsValid();
+	}
+
+	/// <summary>
+	/// Whether the bullet's line has a clear way to where the box touched a body (a box trace's HitPosition is the point
+	/// of contact; its EndPosition is on the line). A body hidden behind a corner that the line only passes near isn't hit.
+	/// </summary>
+	private bool InTheOpen( SceneTraceResult tr )
+	{
+		var reach = BulletTrace( tr.EndPosition, tr.HitPosition ).Run();
+		return !reach.Hit || reach.GameObject?.Root == tr.GameObject?.Root;
 	}
 
 	protected virtual Vector3 CalculateRicochetDirection( SceneTraceResult tr, ref float hits )
@@ -417,69 +483,22 @@ public partial class Shootable : WeaponInputAction,
 	/// <returns></returns>
 	protected virtual IEnumerable<SceneTraceResult> GetShootTrace()
 	{
-		var hits = new List<SceneTraceResult>();
-
 		var start = WeaponRay.Position;
 		var rot = Rotation.LookAt( WeaponRay.Forward );
 
 		var forward = rot.Forward;
 		forward += (Vector3.Random + Vector3.Random + Vector3.Random + Vector3.Random) * (BulletSpread + Equipment.Owner.Spread) * 0.25f;
+		if ( Equipment.GetComponentInChildren<BarrelHeat>() is { } heat )
+			forward += heat.Deviation( rot );
 		forward = forward.Normal;
+		ApplyBallistics( ref start, ref forward, rot );
 
-		var end = WeaponRay.Position + forward * MaxRange;
+		var end = start + forward * (MaxRange - _pathTravelled);
 		var original = DoTraceBullet( start, end, BulletSize ).ToArray();
 		var firstHit = original.FirstOrDefault( trace => trace.Hit );
 		PlayTracer( firstHit.Hit ? firstHit.EndPosition : end, start );
 
-		if ( original.Count() < 1 ) return original;
-
-		// Run through and fix the start positions for the traces
-		// By using the last end position as the start
-
-		int depth = 0;
-		Vector3 startPos = original.ElementAt( 0 ).StartPosition;
-		List<SceneTraceResult> fixedPath = new();
-		for ( int i = 0; i < original.Count(); i++ )
-		{
-			var el = original.ElementAt( i );
-
-			fixedPath.Add( el with { StartPosition = startPos } );
-			startPos = el.EndPosition;
-		}
-
-		var entries = new List<(SceneTraceResult Trace, float Thickness)>();
-
-		// Then, trace backwards from the end so we can get exit points and thickness
-		for ( int i = fixedPath.Count - 1; i >= 0; i-- )
-		{
-			var el = fixedPath.ElementAt( i );
-
-			// Do a trace back, from the end position to the start, this'll give us the LAST entry's exit point.
-			var backTrace = DoTraceBulletOne( el.EndPosition, el.StartPosition, BulletSize );
-			var impact = backTrace.EndPosition;
-
-			// From that, we can calculate the surface thickness
-			float thickness = (el.StartPosition - impact).Length;
-
-			// Return the element starting at the exit point, it's more useful that way.
-			el = el with { StartPosition = impact };
-			entries.Insert( 0, (el, thickness) );
-		}
-
-		depth = 0;
-		float accThickness = 0;
-		foreach ( var el in entries )
-		{
-			accThickness += el.Thickness;
-			if ( accThickness >= PenetrationThickness )
-				break;
-
-			hits.Add( el.Trace );
-			// DrawLineSegment( el.Trace.StartPosition, el.Trace.EndPosition, depth, fixedPath.Count() );
-			depth++;
-		}
-
-		return hits;
+		return ResolvePenetration( Scene, original, PenetrationThickness );
 	}
 
 	/// <summary>
@@ -520,7 +539,7 @@ public partial class Shootable : WeaponInputAction,
 	/// </summary>
 	private float GetEffectiveFireRate()
 	{
-		// Zombies Double Tap: a shorter delay between shots means a higher RPM.
+		// Zombies Hot Shot: a shorter delay between shots means a higher RPM.
 		var perkScale = 1f / ZombiesPlayerState.FireDelayScale( Equipment?.Owner );
 
 		var partScale = GunsmithAttachmentEffects.For( Equipment ).FireRate;
@@ -585,7 +604,9 @@ public partial class Shootable : WeaponInputAction,
 			return;
 		}
 
-		if ( IsBurstFiring && BurstCount >= BurstAmount - 1 || (Tags.Has( "reloading" ) && IsBurstFiring) )
+		// A burst also ends when the magazine runs dry, or the fire mode switch would stay locked until the reload.
+		if ( IsBurstFiring && (BurstCount >= BurstAmount - 1 || Tags.Has( "reloading" )
+			|| (AmmoComponent.IsValid() && !AmmoComponent.HasAmmo)) )
 		{
 			ClearBurst();
 		}
@@ -599,7 +620,9 @@ public partial class Shootable : WeaponInputAction,
 		bool wantsToShoot = IsDown();
 
 		// HACK
-		if ( CurrentFireMode == FireMode.Semi )
+		// Semi fires a round per trigger pull, and burst a whole burst per pull, as on the M16A4: holding the trigger
+		// doesn't fire another.
+		if ( CurrentFireMode is FireMode.Semi or FireMode.Burst )
 		{
 			wantsToShoot = Input.Pressed( "attack1" );
 		}

@@ -10,7 +10,7 @@
       {
         "__type": "TimedExplosive",
         "__guid": "2950def8-09c1-4ea8-9d18-50d0d0daadfd",
-        "BaseDefuseTime": 10,
+        "BaseDefuseTime": 7.5,
         "BeepEffectPrefab": {
           "_type": "gameobject",
           "prefab": "weapons/c4/c4_beep_light.prefab"
@@ -33,7 +33,7 @@
           "_type": "gameobject",
           "prefab": "weapons/c4/c4_explosion.prefab"
         },
-        "FastDefuseTime": 5,
+        "FastDefuseTime": 7.5,
         "Wires": {
           "_type": "component",
           "component_id": "37f01bdb-0e3f-427c-aafd-d0a7f6ef04eb",
@@ -75,9 +75,9 @@
             "__guid": "dc2cdaff-c747-4bc0-bf36-c9731afd0597",
             "BodyGroups": 18446744073709551615,
             "MaterialGroup": null,
-            "MaterialOverride": "Weapons/c4/c4_material.vmat",
+            "MaterialOverride": null,
             "Materials": null,
-            "Model": "weapons/throwable/c4_bomb/c4_bomb.vmdl",
+            "Model": "weapons/c4/field_device/field_device.vmdl",
             "RenderType": "On",
             "Tint": "1,1,1,1"
           }

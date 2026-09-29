@@ -8,7 +8,7 @@
 <root class="tuning-panel">
     @if ( WeaponId is not null )
     {
-        <label class="tuning-title">WEAPON TUNING</label>
+        <label class="tuning-title">@Tr( "WEAPON TUNING" )</label>
 
         @foreach ( var stat in Stats )
         {
@@ -16,7 +16,7 @@
             var capturedLabel = stat.Label;
             var value = GetStatValue( capturedKey );
             <div class="tuning-row">
-                <label class="stat-name">@capturedLabel</label>
+                <label class="stat-name">@Tr( capturedLabel )</label>
                 <div class="bar-wrap">
                     <div class="bar-fill @(value < 0 ? "negative" : "positive")"
                          style="width: @(Math.Abs(value) * 10)%; @(value < 0 ? "margin-left: auto;" : "")" />
@@ -30,7 +30,7 @@
         }
 
         <div class="reset-row">
-            <div class="button standard smaller no-anim" onclick=@ResetAll>Reset All</div>
+            <div class="button standard smaller no-anim" onclick=@ResetAll>@Tr( "Reset All" )</div>
         </div>
     }
 </root>

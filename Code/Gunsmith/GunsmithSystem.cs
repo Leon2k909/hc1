@@ -52,7 +52,10 @@ public partial class GunsmithSystem : Component
 		}
 		else
 		{
-			Renderer.GameObject.SetParent( GameObject, false );
+			// Most guns' renderer is the prefab's root. The 1911's is a child, which goes back under the root: moved out
+			// here it didn't turn or frame with the gun, and loading the next gun left it on the stage.
+			var parent = Renderer.GameObject == weapon.GameObject ? GameObject : weapon.GameObject;
+			Renderer.GameObject.SetParent( parent, false );
 			Renderer.LocalPosition = Equipment.GunsmithOffset;
 		}
 
@@ -241,7 +244,9 @@ public partial class GunsmithSystem : Component
 			return false;
 
 		var matName = (material.Name?.ToLower() ?? "").Replace( '\\', '/' );
-		if ( matName.Contains( "handguard" ) )
+		// Gun parts, not hands. The M16A4's carry handle (m16_carry_handle.vmat) got the nodraw
+		// material, which draws on a model as its yellow NODRAW texture instead of hiding it.
+		if ( matName.Contains( "handguard" ) || matName.Contains( "handle" ) )
 			return false;
 
 		return matName.Contains( "sleeve" )
@@ -271,6 +276,17 @@ public partial class GunsmithSystem : Component
 		}
 
 		renderer.Model = previewModel;
+	}
+
+	private static bool IsUnder( GameObject child, GameObject ancestor )
+	{
+		for ( var go = child; go.IsValid(); go = go.Parent )
+		{
+			if ( go == ancestor )
+				return true;
+		}
+
+		return false;
 	}
 
 	private static bool IsScarH( EquipmentResource equipment )
@@ -303,8 +319,20 @@ public partial class GunsmithSystem : Component
 
 		if ( Controller.Weapon.IsValid() )
 		{
+			// First person moves the renderer under the camera, out of a gun whose renderer isn't its root (the 1911).
+			if ( Renderer.IsValid() && !IsUnder( Renderer.GameObject, Controller.Weapon.GameObject ) )
+				Renderer.GameObject.Destroy();
+
 			Controller.Weapon.GameObject.Destroy();
 			Controller.Weapon = null;
+		}
+
+		// Only the gun being loaded belongs on the stage. Before SetFirstPerson put the 1911's renderer back in its gun,
+		// every 1911 left its model here, drawn over each gun picked after it.
+		foreach ( var child in GameObject.Children.ToList() )
+		{
+			if ( child.Components.Get<SkinnedModelRenderer>( FindMode.EverythingInSelf ).IsValid() )
+				child.Destroy();
 		}
 
 		Equipment = equipment;

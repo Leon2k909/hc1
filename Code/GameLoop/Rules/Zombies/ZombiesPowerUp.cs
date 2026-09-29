@@ -4,10 +4,10 @@ namespace Facepunch;
 
 public enum ZombiesPowerUpType
 {
-	MaxAmmo,
-	InstaKill,
-	DoublePoints,
-	Nuke,
+	Resupply,
+	OneHitKills,
+	PointBoost,
+	CleanSweep,
 }
 
 /// <summary>
@@ -25,18 +25,18 @@ public sealed class ZombiesPowerUp : Component, IMarkerObject
 
 	public static string GetName( ZombiesPowerUpType t ) => t switch
 	{
-		ZombiesPowerUpType.MaxAmmo => "Max Ammo",
-		ZombiesPowerUpType.InstaKill => "Insta-Kill",
-		ZombiesPowerUpType.DoublePoints => "Double Points",
-		ZombiesPowerUpType.Nuke => "Kaboom!",
+		ZombiesPowerUpType.Resupply => "Resupply",
+		ZombiesPowerUpType.OneHitKills => "One-Hit Kills",
+		ZombiesPowerUpType.PointBoost => "Point Boost",
+		ZombiesPowerUpType.CleanSweep => "Clean Sweep",
 		_ => t.ToString()
 	};
 
 	public static Color GetColor( ZombiesPowerUpType t ) => t switch
 	{
-		ZombiesPowerUpType.MaxAmmo => new Color( 0.3f, 1f, 0.35f ),
-		ZombiesPowerUpType.InstaKill => new Color( 1f, 0.25f, 0.2f ),
-		ZombiesPowerUpType.DoublePoints => new Color( 1f, 0.8f, 0.15f ),
+		ZombiesPowerUpType.Resupply => new Color( 0.3f, 1f, 0.35f ),
+		ZombiesPowerUpType.OneHitKills => new Color( 1f, 0.25f, 0.2f ),
+		ZombiesPowerUpType.PointBoost => new Color( 1f, 0.8f, 0.15f ),
 		_ => new Color( 1f, 0.5f, 0.1f ),
 	};
 
@@ -45,11 +45,11 @@ public sealed class ZombiesPowerUp : Component, IMarkerObject
 		var go = new GameObject( true, $"PowerUp {type}" );
 		go.WorldPosition = position + Vector3.Up * 36f;
 
-		if ( type == ZombiesPowerUpType.MaxAmmo )
+		if ( type == ZombiesPowerUpType.Resupply )
 		{
 			CreateAmmoCase( go );
 		}
-		else if ( type == ZombiesPowerUpType.DoublePoints )
+		else if ( type == ZombiesPowerUpType.PointBoost )
 		{
 			var model = go.Components.Create<ModelRenderer>();
 			model.Model = Model.Load( "models/dev/duffelbag/dufflebag_money.vmdl" );
@@ -147,7 +147,7 @@ public sealed class ZombiesPowerUp : Component, IMarkerObject
 	}
 
 	Vector3 IMarkerObject.MarkerPosition => WorldPosition + Vector3.Up * 20f;
-	string IMarkerObject.DisplayText => GetName( Type );
+	string IMarkerObject.DisplayText => Tr( GetName( Type ) );
 	float IMarkerObject.MarkerMaxDistance => 2000f;
 	bool IMarkerObject.ShowChevron => false;
 }

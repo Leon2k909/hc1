@@ -28,12 +28,15 @@ public sealed class ZombiesRoundSystem : Component
 	[Sync( SyncFlags.FromHost )] public TimeSince TimeSinceRoundStart { get; private set; }
 	public const float IntroDuration = 9f;
 
-	[Sync( SyncFlags.FromHost )] public TimeUntil InstaKillTime { get; private set; }
-	[Sync( SyncFlags.FromHost )] public TimeUntil DoublePointsTime { get; private set; }
+	[Sync( SyncFlags.FromHost )] public TimeUntil OneHitKillsTime { get; private set; }
+	[Sync( SyncFlags.FromHost )] public TimeUntil PointBoostTime { get; private set; }
 
 	[Property] public GameObject ZombiePrefab { get; set; }
 	[Property] public Model ZombieBodyModel { get; set; }
-	[Property] public Model MysteryBoxModel { get; set; }
+	[Property] public Model WeaponCrateModel { get; set; }
+
+	/// <summary>Killed zombies can drop power-ups (Resupply, One-Hit Kills, Point Boost, Clean Sweep). Off for now.</summary>
+	[Property] public bool DropPowerUps { get; set; } = false;
 
 	public const float PowerUpDuration = 30f;
 	public const float GameOverDuration = 12f;
@@ -64,8 +67,8 @@ public sealed class ZombiesRoundSystem : Component
 			_timeScaleBeforePause = Scene.TimeScale;
 		if ( !Networking.IsHost ) return;
 
-		InstaKillTime = 0;
-		DoublePointsTime = 0;
+		OneHitKillsTime = 0;
+		PointBoostTime = 0;
 		// Wait for the first player; the intro then counts down to round 1.
 		BeginIntermission( 9999f );
 	}
@@ -94,8 +97,8 @@ public sealed class ZombiesRoundSystem : Component
 	// ── Queries ─────────────────────────────────────────────────────────────────
 	public bool IsPowerUpActive( ZombiesPowerUpType type ) => type switch
 	{
-		ZombiesPowerUpType.InstaKill => InstaKillTime > 0,
-		ZombiesPowerUpType.DoublePoints => DoublePointsTime > 0,
+		ZombiesPowerUpType.OneHitKills => OneHitKillsTime > 0,
+		ZombiesPowerUpType.PointBoost => PointBoostTime > 0,
 		_ => false
 	};
 
@@ -103,7 +106,7 @@ public sealed class ZombiesRoundSystem : Component
 	private static IEnumerable<PlayerPawn> HumanPawns( Scene scene ) => scene.GetAllComponents<PlayerPawn>()
 		.Where( p => p.IsValid() && p.Client.IsValid() && !p.Client.IsBot );
 
-	/// <summary>Players who are alive and on their feet (or about to be, via solo Quick Revive).</summary>
+	/// <summary>Players who are alive and on their feet (or about to be, via solo Second Wind).</summary>
 	public static int CountActivePlayers()
 	{
 		var scene = Game.ActiveScene;
@@ -115,8 +118,9 @@ public sealed class ZombiesRoundSystem : Component
 	/// <summary>Real players in the game, whatever state they're in.</summary>
 	public static int CountHumanPlayers() => GameUtils.AllPlayers.Count( c => c.IsConnected && !c.IsBot );
 
-	public static IEnumerable<EquipmentResource> GetMysteryBoxPool() => ResourceLibrary.GetAll<EquipmentResource>()
-		.Where( x => (x.Slot == EquipmentSlot.Primary || x.Slot == EquipmentSlot.Secondary)
+	/// <summary>The box's guns, which the wall-buys are also picked from. WIP guns are left out of both.</summary>
+	public static IEnumerable<EquipmentResource> GetWeaponCratePool() => ResourceLibrary.GetAll<EquipmentResource>()
+		.Where( x => (x.Slot == EquipmentSlot.Primary || x.Slot == EquipmentSlot.Secondary) && !x.IsWip
 			&& x.ViewModelPrefab.IsValid() && x.MainPrefab.IsValid()
 			&& !Gunsmith.GunsmithLoadoutManager.IsMergedWeaponResource( x ) );
 
@@ -209,7 +213,6 @@ public sealed class ZombiesRoundSystem : Component
 		var baseCount = 5 + 3 * r + r * r * 0.15f;
 		ZombiesRemainingInRound = (int)(baseCount * (1f + 0.5f * (PlayerCount - 1)));
 
-		BroadcastSound( "sounds/music/round_intro/round_start.sound" );
 		Log.Info( $"[Zombies] Round {CurrentRound}: {ZombiesRemainingInRound} zombies." );
 	}
 
@@ -261,16 +264,17 @@ public sealed class ZombiesRoundSystem : Component
 		CurrentRound = 0;
 		ZombiesAlive = 0;
 		ZombiesRemainingInRound = 0;
-		InstaKillTime = 0;
-		DoublePointsTime = 0;
+		OneHitKillsTime = 0;
+		PointBoostTime = 0;
 		_heldClients.Clear();
 
 		// Fresh pawns give everyone their starting loadout back.
 		foreach ( var client in GameUtils.AllPlayers.Where( c => c.IsConnected && !c.IsBot ).ToList() )
 			client.Respawn( true );
 
-		// Old pawns saved their points as they were destroyed; a new game starts from scratch.
+		// Old pawns saved their points and kills as they were destroyed; a new game starts from scratch.
 		ZombiesGameMode.CarriedPoints.Clear();
+		ZombiesGameMode.CarriedKills.Clear();
 		foreach ( var eco in Scene.GetAllComponents<ZombiesPlayerEconomy>() )
 			eco.ResetEconomy();
 
@@ -447,10 +451,12 @@ public sealed class ZombiesRoundSystem : Component
 			zombie.Tags.Add( "enemy" );
 
 			// The zombie model has no animations of its own, but shares the citizen_human skeleton:
-			// an invisible animated human drives it through bone merge.
+			// an invisible animated human drives it through bone merge. The driver plays zombie clips as
+			// sequences; if it's missing, fall back to the citizen and its (human) animgraph.
 			var renderer = zombie.Components.Create<SkinnedModelRenderer>();
-			renderer.Model = Model.Load( ZombieAI.DriverModel );
-			renderer.UseAnimGraph = true;
+			var driver = Model.Load( ZombieAI.DriverModel );
+			renderer.UseAnimGraph = driver is null || driver.IsError;
+			renderer.Model = renderer.UseAnimGraph ? Model.Load( ZombieAI.CitizenModel ) : driver;
 			if ( ZombieBodyModel is { IsError: false } )
 			{
 				renderer.RenderType = ModelRenderer.ShadowRenderType.Off;
@@ -508,6 +514,7 @@ public sealed class ZombiesRoundSystem : Component
 	// ── Power-ups ───────────────────────────────────────────────────────────────
 	private void TryDropPowerUp( Vector3 position )
 	{
+		if ( !DropPowerUps ) return;
 		if ( _powerUpsThisRound >= MaxPowerUpsPerRound ) return;
 		if ( Game.Random.Float() > 0.03f ) return;
 
@@ -522,20 +529,20 @@ public sealed class ZombiesRoundSystem : Component
 
 		switch ( type )
 		{
-			case ZombiesPowerUpType.MaxAmmo:
+			case ZombiesPowerUpType.Resupply:
 				foreach ( var pawn in HumanPawns( Scene ) )
 					if ( pawn.HealthComponent.State == LifeState.Alive ) pawn.Inventory.RefillAmmo();
 				break;
 
-			case ZombiesPowerUpType.InstaKill:
-				InstaKillTime = PowerUpDuration;
+			case ZombiesPowerUpType.OneHitKills:
+				OneHitKillsTime = PowerUpDuration;
 				break;
 
-			case ZombiesPowerUpType.DoublePoints:
-				DoublePointsTime = PowerUpDuration;
+			case ZombiesPowerUpType.PointBoost:
+				PointBoostTime = PowerUpDuration;
 				break;
 
-			case ZombiesPowerUpType.Nuke:
+			case ZombiesPowerUpType.CleanSweep:
 				foreach ( var z in Scene.GetAllComponents<ZombieAI>().ToList() )
 					z.Kill( null );
 				foreach ( var pawn in HumanPawns( Scene ) )
@@ -549,8 +556,8 @@ public sealed class ZombiesRoundSystem : Component
 
 	// ── Buy stations ────────────────────────────────────────────────────────────
 	/// <summary>
-	/// The zombies maps have no authored machines. Spread perks across reachable rooms,
-	/// then place ammo boxes, wall-buys and the mystery box in reachable areas.
+	/// The zombies maps have no authored machines. Place ammo boxes, wall-buys and the weapon crate in reachable areas.
+	/// (Perk machines are turned off until the perk system is revisited, see the commented-out block below.)
 	/// </summary>
 	private void PlaceBuyStations()
 	{
@@ -563,13 +570,15 @@ public sealed class ZombiesRoundSystem : Component
 
 		var entries = new List<(ZombiesBuyKind Kind, Action<ZombiesBuyStation> Setup)>();
 
-		foreach ( var perk in new[] { ZombiesPerk.QuickRevive, ZombiesPerk.Juggernog, ZombiesPerk.SpeedCola, ZombiesPerk.DoubleTap, ZombiesPerk.StaminUp } )
-		{
-			var p = perk;
-			entries.Add( (ZombiesBuyKind.Perk, s => { s.Kind = ZombiesBuyKind.Perk; s.Perk = p; s.Cost = ZombiesBuyStation.PerkCost( p ); }) );
-		}
+		// Put back with perks: the perk machines, spread across reachable rooms. With none placed nobody can get a
+		// perk, so the perk HUD badges, perk effects and solo Second Wind self-revive never come into play.
+		// foreach ( var perk in new[] { ZombiesPerk.SecondWind, ZombiesPerk.IronTonic, ZombiesPerk.BoltSoda, ZombiesPerk.HotShot, ZombiesPerk.FleetFoot } )
+		// {
+		// 	var p = perk;
+		// 	entries.Add( (ZombiesBuyKind.Perk, s => { s.Kind = ZombiesBuyKind.Perk; s.Perk = p; s.Cost = ZombiesBuyStation.PerkCost( p ); }) );
+		// }
 
-		var weapons = GetMysteryBoxPool().OrderBy( x => x.ResourceName ).ToList();
+		var weapons = GetWeaponCratePool().OrderBy( x => x.ResourceName ).ToList();
 		var secondary = weapons.FirstOrDefault( x => x.Slot == EquipmentSlot.Secondary );
 		var primaries = weapons.Where( x => x.Slot == EquipmentSlot.Primary ).Take( 2 ).ToList();
 		if ( secondary is not null )
@@ -583,7 +592,10 @@ public sealed class ZombiesRoundSystem : Component
 		for ( int i = 0; i < 2; i++ )
 			entries.Add( (ZombiesBuyKind.AmmoBox, s => { s.Kind = ZombiesBuyKind.AmmoBox; s.Cost = ZombiesBuyStation.AmmoBoxCost; }) );
 
-		entries.Add( (ZombiesBuyKind.MysteryBox, s => { s.Kind = ZombiesBuyKind.MysteryBox; s.Cost = ZombiesBuyStation.MysteryBoxCost; }) );
+		// The workbench: attachments, armour, ammo and grenades (ZombiesWorkbench.cs).
+		entries.Add( (ZombiesBuyKind.Workbench, s => { s.Kind = ZombiesBuyKind.Workbench; }) );
+
+		entries.Add( (ZombiesBuyKind.WeaponCrate, s => { s.Kind = ZombiesBuyKind.WeaponCrate; s.Cost = ZombiesBuyStation.WeaponCrateCost; }) );
 
 		var centerNav = Scene.NavMesh.GetClosestPoint( center, 400f )
 			?? (spawns.Count > 0 ? Scene.NavMesh.GetClosestPoint( spawns[0], 200f ) : null)
@@ -597,7 +609,7 @@ public sealed class ZombiesRoundSystem : Component
 			var ring = center + Rotation.FromYaw( 360f / entries.Count * i ).Forward * 420f;
 			Vector3 pos;
 			Rotation rot;
-			var found = (kind == ZombiesBuyKind.Perk || kind == ZombiesBuyKind.AmmoBox) && placed.Count > 0
+			var found = (kind == ZombiesBuyKind.Perk || kind == ZombiesBuyKind.AmmoBox || kind == ZombiesBuyKind.Workbench) && placed.Count > 0
 				? TryPlaceSpreadStation( centerNav, ring, size, spawns, placed, out pos, out rot )
 				: TryPlaceStation( centerNav, ring, size, placed, false, out pos, out rot );
 
@@ -662,9 +674,10 @@ public sealed class ZombiesRoundSystem : Component
 	/// <summary>Collision size of each kind of station, matching <see cref="CreateStation"/>. X is its depth, front to back.</summary>
 	private static Vector3 StationSize( ZombiesBuyKind kind ) => kind switch
 	{
-		ZombiesBuyKind.Perk => new Vector3( 64f, 64f, 92f ),
-		ZombiesBuyKind.MysteryBox => new Vector3( 36f, 70f, 34f ),
+		ZombiesBuyKind.Perk => new Vector3( 64f, 64f, 103f ),
+		ZombiesBuyKind.WeaponCrate => new Vector3( 36f, 70f, 34f ),
 		ZombiesBuyKind.AmmoBox => new Vector3( 40f, 68f, 48f ),
+		ZombiesBuyKind.Workbench => new Vector3( 40f, 72f, 72f ),
 		_ => new Vector3( 10f, 60f, 60f ),
 	};
 
@@ -715,13 +728,9 @@ public sealed class ZombiesRoundSystem : Component
 		if ( HumanPawns( Scene ).Any( p => Near( p.WorldPosition ) ) ) return false;
 		if ( GameUtils.GetSpawnPoints().Any( s => Near( s.Transform.Position ) ) ) return false;
 
-		// Out of the way of doors swinging open.
-		var doorClearance = relaxed ? 70f : 110f;
-		foreach ( var door in Scene.GetAllComponents<TerrorTown.MapMover>() )
-		{
-			var doorCenter = door.GetComponent<ModelRenderer>()?.Bounds.Center ?? door.WorldPosition;
-			if ( doorCenter.WithZ( 0 ).Distance( pos.WithZ( 0 ) ) < doorClearance && MathF.Abs( doorCenter.z - pos.z ) < 120f ) return false;
-		}
+		// Out of the way of doors swinging open, even for the relaxed search: an ammo box inside a hotel door's swing
+		// left too little room between it and the open door to get through.
+		if ( Scene.GetAllComponents<TerrorTown.MapMover>().Any( door => InDoorsWay( door, pos, size ) ) ) return false;
 
 		// Nothing in the way of the station itself (lifted off the floor, and a touch smaller so the wall it backs onto doesn't count).
 		var rot = Rotation.LookAt( forward );
@@ -734,6 +743,11 @@ public sealed class ZombiesRoundSystem : Component
 			.Run();
 		if ( blocked.Hit || blocked.StartedSolid ) return false;
 
+		// Not across a walkway: room for a player to pass in front, and, standing free of a wall, down one side.
+		if ( FreeDistance( middle, rot.Forward ) - size.x * 0.5f < PassWidth ) return false;
+		if ( closestWall >= 100f && FreeDistance( middle, rot.Right ) - size.y * 0.5f < PassWidth
+			&& FreeDistance( middle, -rot.Right ) - size.y * 0.5f < PassWidth ) return false;
+
 		// Standing room in front, and players can walk to it.
 		var front = Scene.NavMesh.GetClosestPoint( pos + forward * (size.x * 0.5f + 40f), 48f );
 		if ( front is not { } frontNav || !CanWalk( center, frontNav, 5000f ) ) return false;
@@ -741,6 +755,35 @@ public sealed class ZombiesRoundSystem : Component
 		position = pos;
 		rotation = rot;
 		return true;
+	}
+
+	/// <summary> Room a player needs to get past a station: their 32-unit box and a little over. </summary>
+	private const float PassWidth = 48f;
+
+	/// <summary>
+	/// Whether a station here would be in a door's way: in a hinged door's swing (plus room to get past), or close to
+	/// anything else that moves.
+	/// </summary>
+	private static bool InDoorsWay( TerrorTown.MapMover door, Vector3 pos, Vector3 size )
+	{
+		if ( door is TerrorTown.FuncDoorRotating hinged )
+		{
+			var hinge = hinged.HingePosition;
+			var reach = hinged.SwingRadius + size.WithZ( 0f ).Length * 0.5f + PassWidth;
+			return MathF.Abs( hinge.z - pos.z ) < 120f && hinge.WithZ( 0f ).Distance( pos.WithZ( 0f ) ) < reach;
+		}
+
+		var center = door.GetComponent<ModelRenderer>()?.Bounds.Center ?? door.WorldPosition;
+		return MathF.Abs( center.z - pos.z ) < 120f && center.WithZ( 0f ).Distance( pos.WithZ( 0f ) ) < 110f;
+	}
+
+	/// <summary> How far from a station's middle to the nearest wall that way (doors don't count, they open). </summary>
+	private float FreeDistance( Vector3 from, Vector3 direction )
+	{
+		var tr = Scene.Trace.Ray( from, from + direction * 200f )
+			.WithoutTags( "player", "enemy", "trigger", TerrorTown.MapMover.DoorTag )
+			.Run();
+		return tr.Hit ? tr.Distance : 200f;
 	}
 
 	private void CreateStation( Vector3 pos, Rotation rot, Action<ZombiesBuyStation> setup )
@@ -755,8 +798,9 @@ public sealed class ZombiesRoundSystem : Component
 		var color = station.Kind switch
 		{
 			ZombiesBuyKind.Perk => ZombiesBuyStation.PerkColor( station.Perk ),
-			ZombiesBuyKind.MysteryBox => new Color( 0.3f, 0.6f, 1f ),
+			ZombiesBuyKind.WeaponCrate => new Color( 0.3f, 0.6f, 1f ),
 			ZombiesBuyKind.AmmoBox => new Color( 0.3f, 1f, 0.35f ),
+			ZombiesBuyKind.Workbench => new Color( 1f, 0.72f, 0.35f ),
 			_ => new Color( 1f, 0.85f, 0.6f ),
 		};
 
@@ -766,11 +810,11 @@ public sealed class ZombiesRoundSystem : Component
 			case ZombiesBuyKind.Perk:
 				// Custom soda-fountain dispensers with a distinct illustrated face per perk.
 				CreatePerkDispenser( go, station.Perk, color );
-				size = new Vector3( 64f, 64f, 92f );
+				size = new Vector3( 64f, 64f, 103f );
 				break;
 
-			case ZombiesBuyKind.MysteryBox:
-				AddFittedModel( go, MysteryBoxModel, 32f, Color.White, lengthAlongY: true );
+			case ZombiesBuyKind.WeaponCrate:
+				AddFittedModel( go, WeaponCrateModel, 32f, Color.White, lengthAlongY: true );
 				size = new Vector3( 36f, 70f, 34f );
 				break;
 
@@ -780,6 +824,11 @@ public sealed class ZombiesRoundSystem : Component
 				crate.LocalScale = 2.5f;
 				ZombiesPowerUp.CreateAmmoCase( crate );
 				size = new Vector3( 40f, 68f, 48f );
+				break;
+
+			case ZombiesBuyKind.Workbench:
+				ZombiesBuyStation.CreateBenchModel( go );
+				size = new Vector3( 40f, 72f, 72f );
 				break;
 
 			default:
@@ -821,30 +870,33 @@ public sealed class ZombiesRoundSystem : Component
 		go.NetworkSpawn( null );
 	}
 
-	/// <summary>Build a pressed-metal soda-fountain dispenser with a unique illustrated face for each perk.</summary>
+	/// <summary>
+	/// Build a pressed-metal soda-fountain dispenser: its enamel in the perk's colour, a poster with the perk's
+	/// illustration and a lit name sign on top.
+	/// </summary>
 	private static void CreatePerkDispenser( GameObject parent, ZombiesPerk perk, Color glow )
 	{
 		var dark = new Color( 0.055f, 0.065f, 0.058f );
 		var steel = new Color( 0.54f, 0.53f, 0.46f );
+		// The enamel texture is grey, so this is the paint colour. Keep Assets/Perks/preview_dispenser.py in step.
+		var enamel = perk switch
+		{
+			ZombiesPerk.SecondWind => new Color( 0.16f, 0.30f, 0.58f ),
+			ZombiesPerk.BoltSoda => new Color( 0.12f, 0.40f, 0.20f ),
+			ZombiesPerk.HotShot => new Color( 0.30f, 0.09f, 0.07f ),
+			ZombiesPerk.FleetFoot => new Color( 0.78f, 0.38f, 0.10f ),
+			_ => new Color( 0.60f, 0.10f, 0.09f )
+		};
+		var art = ZombiesBuyStation.PerkArt( perk );
 
 		// These meshes share one origin: the shell, bezel, spout and tray are designed
 		// together, instead of being a stack of independently scaled primitives.
-		AddPerkMesh( parent, "Pressed enamel cabinet", "Perks/perk_enamel.vmdl", Color.White );
+		AddPerkMesh( parent, "Pressed enamel cabinet", "Perks/perk_enamel.vmdl", enamel );
 		AddPerkMesh( parent, "Cast fittings and bezel", "Perks/perk_metal.vmdl", steel );
 		AddPerkMesh( parent, "Recesses and vents", "Perks/perk_dark.vmdl", dark );
 		AddPerkMesh( parent, "Perk lamps", "Perks/perk_accent.vmdl", glow );
-
-		var face = AddStationPart( parent, $"{perk} illustrated face", new Vector3( 29.18f, 0, 58 ), new Vector3( 0.18f, 29.6f, 42.6f ), Color.White, standardBox: true );
-		var decal = perk switch
-		{
-			ZombiesPerk.QuickRevive => "Perks/quickrevive_label.vmat",
-			ZombiesPerk.SpeedCola => "Perks/speedcola_label.vmat",
-			ZombiesPerk.DoubleTap => "Perks/doubletap_label.vmat",
-			ZombiesPerk.StaminUp => "Perks/staminup_label.vmat",
-			_ => "Perks/juggernog_label.vmat"
-		};
-		face.MaterialOverride = Material.Load( decal );
-
+		AddPerkMesh( parent, $"{perk} poster", "Perks/perk_card.vmdl", Color.White ).MaterialOverride = Material.Load( $"Perks/{art}_poster.vmat" );
+		AddPerkMesh( parent, $"{perk} sign", "Perks/perk_sign.vmdl", Color.White ).MaterialOverride = Material.Load( $"Perks/{art}_sign.vmat" );
 	}
 
 	private static ModelRenderer AddPerkMesh( GameObject parent, string name, string asset, Color tint )
@@ -853,18 +905,6 @@ public sealed class ZombiesRoundSystem : Component
 		var renderer = part.Components.Create<ModelRenderer>();
 		renderer.Model = Model.Load( asset );
 		renderer.Tint = tint;
-		return renderer;
-	}
-
-	private static ModelRenderer AddStationPart( GameObject parent, string name, Vector3 center, Vector3 size, Color tint, bool standardBox = false, string modelAsset = null )
-	{
-		var part = new GameObject( parent, true, name );
-		var renderer = part.Components.Create<ModelRenderer>();
-		renderer.Model = Model.Load( modelAsset ?? (standardBox ? "models/dev/box.vmdl" : "Perks/bevel_box.vmdl") );
-		renderer.Tint = tint;
-		var bounds = renderer.Model.Bounds;
-		part.LocalScale = new Vector3( size.x / bounds.Size.x, size.y / bounds.Size.y, size.z / bounds.Size.z );
-		part.LocalPosition = center - bounds.Center * part.LocalScale;
 		return renderer;
 	}
 

@@ -21,8 +21,8 @@
         "__enabled": true,
         "Arms": {
           "_type": "component",
-          "component_id": "a70fcb9c-c580-4ebc-a403-8f3a604e6084",
-          "go": "d04febe8-e3ba-4783-bd66-f3290d2be4c9",
+          "component_id": "280fa4de-cfba-4edc-ae2c-424ba32e2fee",
+          "go": "6cf14b84-8489-4229-b80d-01bc04203149",
           "component_type": "SkinnedModelRenderer"
         },
         "EjectionPort": null,
@@ -49,7 +49,7 @@
         "__type": "Sandbox.SkinnedModelRenderer",
         "__guid": "280fa4de-cfba-4edc-ae2c-424ba32e2fee",
         "__enabled": true,
-        "AnimationGraph": null,
+        "AnimationGraph": "weapons/throwable/first_person_arms_hc1_throwables.vanmgrph",
         "BodyGroups": 21,
         "BoneMergeTarget": null,
         "CreateAttachments": false,
@@ -68,7 +68,9 @@
         "OnComponentUpdate": null,
         "Parameters": {
           "bools": {},
-          "ints": {},
+          "ints": {
+            "throwable_type": 0
+          },
           "floats": {},
           "vectors": {},
           "rotations": {}
@@ -88,6 +90,24 @@
         },
         "Tint": "1,1,1,1",
         "UseAnimGraph": true
+      },
+      {
+        "__type": "Facepunch.ThrowableViewModelGrip",
+        "__guid": "bd926877-77d1-4591-9d2a-68dc672ea083",
+        "__enabled": true,
+        "ItemCenterHeight": 1.5,
+        "Hands": {
+          "_type": "component",
+          "component_id": "280fa4de-cfba-4edc-ae2c-424ba32e2fee",
+          "go": "6cf14b84-8489-4229-b80d-01bc04203149",
+          "component_type": "SkinnedModelRenderer"
+        },
+        "Item": {
+          "_type": "component",
+          "component_id": "a70fcb9c-c580-4ebc-a403-8f3a604e6084",
+          "go": "d04febe8-e3ba-4783-bd66-f3290d2be4c9",
+          "component_type": "ModelRenderer"
+        }
       }
     ],
     "Children": [
@@ -108,39 +128,22 @@
         "OwnerTransfer": 1,
         "Components": [
           {
-            "__type": "Sandbox.SkinnedModelRenderer",
+            "__type": "Sandbox.ModelRenderer",
             "__guid": "a70fcb9c-c580-4ebc-a403-8f3a604e6084",
             "__enabled": true,
-            "AnimationGraph": "weapons/throwable/first_person_arms_hc1_throwables.vanmgrph",
-            "BodyGroups": 18446744073709551615,
-            "BoneMergeTarget": {
-              "_type": "component",
-              "component_id": "280fa4de-cfba-4edc-ae2c-424ba32e2fee",
-              "go": "6cf14b84-8489-4229-b80d-01bc04203149",
-              "component_type": "SkinnedModelRenderer"
-            },
+            "BodyGroups": 11,
             "CreateAttachments": false,
-            "CreateBoneObjects": false,
             "LodOverride": null,
             "MaterialGroup": null,
             "MaterialOverride": null,
             "Materials": null,
-            "Model": "models/weapons/sbox_grenade_explosive/v_he_grenade.vmdl",
-            "Morphs": {},
+            "Model": "models/weapons/sbox_grenade_explosive/w_he_grenade.vmdl",
             "OnComponentDestroy": null,
             "OnComponentDisabled": null,
             "OnComponentEnabled": null,
             "OnComponentFixedUpdate": null,
             "OnComponentStart": null,
             "OnComponentUpdate": null,
-            "Parameters": {
-              "bools": {},
-              "ints": {},
-              "floats": {},
-              "vectors": {},
-              "rotations": {}
-            },
-            "PlaybackRate": 1,
             "RenderOptions": {
               "GameLayer": false,
               "OverlayLayer": true,
@@ -148,13 +151,7 @@
               "AfterUILayer": false
             },
             "RenderType": "Off",
-            "Sequence": {
-              "Name": null,
-              "Looping": true,
-              "Blending": false
-            },
-            "Tint": "1,1,1,1",
-            "UseAnimGraph": true
+            "Tint": "1,1,1,1"
           }
         ],
         "Children": []
@@ -1494,7 +1491,7 @@
   "DontBreakAsTemplate": false,
   "__references": [
     "facepunch.v_first_person_arms_human#142949",
-    "facepunch.v_he_grenade#129021"
+    "facepunch.w_he_grenade#58001"
   ],
   "__version": 2
 }

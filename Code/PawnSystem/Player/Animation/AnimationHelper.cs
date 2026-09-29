@@ -55,6 +55,7 @@ public sealed class AnimationHelper : Component
 	{
 		// convert local to model
 		tx = Target.Transform.World.ToLocal( tx );
+		tx = MilitaryUniform.HandIkTransform( Target.Model, name, tx );
 
 		Target.Set( $"ik.{name}.enabled", true );
 		Target.Set( $"ik.{name}.position", tx.Position );

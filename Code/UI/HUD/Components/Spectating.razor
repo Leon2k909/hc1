@@ -12,10 +12,10 @@
     <div class="flex row">
         <InputHint Action="SpectatorPrev" />
         <div class="flex column with-background with-padding h-full align-center justify-center" style="min-width: 275px; height: 75px;">
-            <label class="text small upper">SPECTATING</label>
+            <label class="text small upper">@Tr( "SPECTATING" )</label>
             @if ( SpectateSystem.IsFreecam )
             {
-                <label>FREECAM</label>
+                <label>@Tr( "FREECAM" )</label>
             }
             else
             {
@@ -28,12 +28,12 @@
         @if (!SpectateSystem.IsFreecam )
         {
             <span>
-                <InputHint Action="SpectatorFreeCam" /> 
-                <label>Freecam</label>
+                <InputHint Action="SpectatorFreeCam" />
+                <label>@Tr( "Freecam" )</label>
             </span>
             <span>
                 <InputHint Action="SpectatorMode" Size="@InputGlyphSize.Small" />
-                <label>Mode</label>
+                <label>@Tr( "Mode" )</label>
              </span>
         }
     </div>

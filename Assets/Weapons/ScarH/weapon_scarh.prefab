@@ -100,7 +100,7 @@
               "go": "8f9b0f89-d493-4656-be19-e23bb64f2cea",
               "component_type": "WeaponAmmo"
             },
-            "BaseDamage": 20,
+            "BaseDamage": 36,
             "BaseDamageFalloff": [
               {
                 "x": 0,
@@ -181,7 +181,12 @@
               "Semi"
             ],
             "TracerEffect": null,
-            "VelocitySpreadScale": 0.25
+            "VelocitySpreadScale": 0.25,
+            "MuzzleVelocity": 792,
+            "DragFunction": "G7",
+            "BallisticCoefficient": 0.2,
+            "SightHeight": 3.38,
+            "ZeroRange": 300
           },
           {
             "__type": "Facepunch.Reloadable",
@@ -199,7 +204,7 @@
               "1.2": "sounds/guns/mp5/reload/mp5.mag.load.sound",
               "2": "sounds/guns/mp5/reload/mp5.mag.sound"
             },
-            "EmptyReloadTime": 2,
+            "EmptyReloadTime": 4.45,
             "InputActions": [
               "Reload"
             ],
@@ -210,7 +215,7 @@
             "OnComponentStart": null,
             "OnComponentUpdate": null,
             "OnInputAction": null,
-            "ReloadTime": 1.5,
+            "ReloadTime": 4.45,
             "RequiresAllInputActions": false,
             "SingleReload": false,
             "TimedReloadSounds": {

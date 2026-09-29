@@ -1,0 +1,27 @@
+// Each mode's card art, by the mode's ident as a class: ui/modes/playlists/<ident>.png (1.7:1 cuts of the mode key art),
+// the Multiplayer art for a mode that has none, and the rail's art for battle royale and Zombies. Named here rather than
+// in the markup so the pictures are packaged with the stylesheets that include it: the hub's playlists (HubPage) and the
+// map vote's other modes (MapVoteOverlay).
+// Mixins only: importing this file does not restyle anything by itself.
+
+@mixin mode-art
+{
+    background-image: url( "/ui/modes/multiplayer_wide.png" );
+    background-size: cover;
+    background-position: center;
+
+    &.tdm { background-image: url( "/ui/modes/playlists/tdm.png" ); }
+    &.domination { background-image: url( "/ui/modes/playlists/domination.png" ); }
+    &.hardpoint { background-image: url( "/ui/modes/playlists/hardpoint.png" ); }
+    &.defuse { background-image: url( "/ui/modes/playlists/defuse.png" ); }
+    &.dm { background-image: url( "/ui/modes/playlists/dm.png" ); }
+    &.gun_game { background-image: url( "/ui/modes/playlists/gun_game.png" ); }
+    &.gunfight_1v1 { background-image: url( "/ui/modes/playlists/gunfight_1v1.png" ); }
+    &.gunfight_2v2 { background-image: url( "/ui/modes/playlists/gunfight_2v2.png" ); }
+    &.retakes { background-image: url( "/ui/modes/playlists/retakes.png" ); }
+    &.cashgrab { background-image: url( "/ui/modes/playlists/cashgrab.png" ); }
+
+    // The 2:3 card art: its middle is the soldier over the city.
+    &.battle_royale { background-image: url( "/ui/modes/battle-royale.png" ); }
+    &.zombies { background-image: url( "/ui/modes/zombies_wide.png" ); }
+}

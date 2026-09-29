@@ -176,7 +176,12 @@
             "SupportedFireModes": [
               "Semi"
             ],
-            "VelocitySpreadScale": 0.25
+            "VelocitySpreadScale": 0.25,
+            "MuzzleVelocity": 255,
+            "DragFunction": "G1",
+            "BallisticCoefficient": 0.184,
+            "SightHeight": 0.79,
+            "ZeroRange": 25
           },
           {
             "__type": "Facepunch.Reloadable",
@@ -193,7 +198,7 @@
               "0.5": "sounds/guns/m1911/reload/m1911.reload.fow.sound",
               "1.2": "sounds/guns/m1911/reload/m1911.reload.load.sound"
             },
-            "EmptyReloadTime": 2,
+            "EmptyReloadTime": 1.5,
             "InputActions": [
               "Reload"
             ],
@@ -204,7 +209,7 @@
             "OnComponentStart": null,
             "OnComponentUpdate": null,
             "OnInputAction": null,
-            "ReloadTime": 1.5,
+            "ReloadTime": 1.4,
             "RequiresAllInputActions": false,
             "SingleReload": false,
             "TimedReloadSounds": {

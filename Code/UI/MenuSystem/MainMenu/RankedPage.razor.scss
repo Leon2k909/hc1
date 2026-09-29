@@ -1,179 +1,819 @@
 @import "/UI/Styles/Theme.scss";
 
+// The hub page's look (HubPage.razor.scss, HubSidebar.razor.scss): dark panels, the orange accent, uppercase spaced
+// labels. The tier colours (Rank.TierColors) are set inline where they're used.
 $accent: #FF7A1A;
-$panel-bg: rgba( 10, 12, 16, 0.78 );
-$panel-border: rgba( 255, 255, 255, 0.08 );
-$muted: rgba( 255, 255, 255, 0.45 );
+$accent-light: #FF9A4D;
+$line: rgba( 255, 255, 255, 0.08 );
+$muted: rgba( 255, 255, 255, 0.55 );
+$ease-out: cubic-bezier( 0.23, 1, 0.32, 1 );
+$ease-in-out: cubic-bezier( 0.77, 0, 0.175, 1 );
 
 .ranked-page
 {
     position: absolute;
     left: 0;
+    right: 0;
     top: 0;
-    width: 100%;
-    height: 100%;
-    flex-direction: column;
+    bottom: 0;
+    // Like the hub: the scene behind the menu shows through faintly, darkest under the nav bar.
+    background-image: linear-gradient( to bottom, rgba( 5, 5, 7, 0.92 ) 0%, rgba( 5, 5, 7, 0.7 ) 40%, rgba( 5, 5, 7, 0.56 ) 80%, rgba( 5, 5, 7, 0.82 ) 100% );
     justify-content: center;
     align-items: center;
+    padding: 34px 48px 74px 48px;
     font-family: $main-font;
+}
 
-    .ranked-shell
-    {
-        flex-direction: column;
-        align-items: center;
-        width: 560px;
-        gap: 8px;
-    }
+// Your tier's colour, glowing faintly behind your rank
+.ranked-atmosphere
+{
+    position: absolute;
+    left: -12%;
+    top: -18%;
+    width: 60%;
+    height: 90%;
+    pointer-events: none;
+}
 
-    .ranked-back
-    {
-        position: absolute;
-        left: 48px;
-        top: 36px;
-        flex-direction: row;
-        align-items: center;
-        gap: 8px;
-        padding: 9px 16px;
-        background-color: $panel-bg;
-        border: 1px solid $panel-border;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: all 0.12s ease-out;
+.ranked-container
+{
+    flex-direction: row;
+    gap: 24px;
+    width: 100%;
+    height: 100%;
+    max-width: 1900px;
+    min-height: 0;
+}
 
-        i { font-size: 18px; color: rgba( 255, 255, 255, 0.65 ); }
-        label { font-size: 14px; font-weight: bold; color: rgba( 255, 255, 255, 0.7 ); letter-spacing: 1px; cursor: pointer; }
+@keyframes ranked-in
+{
+    0% { opacity: 0; transform: translateY( 18px ); }
+    100% { opacity: 1; transform: translateY( 0px ); }
+}
 
-        &:hover { border-color: rgba( 255, 122, 26, 0.6 ); i, label { color: $accent; } }
-    }
+.ranked-left
+{
+    flex-direction: column;
+    flex-shrink: 0;
+    width: 420px;
+    gap: 14px;
+    min-height: 0;
+    animation: ranked-in 0.5s $ease-out both;
+}
 
-    .ranked-kicker
-    {
-        font-size: 13px;
-        font-weight: bold;
-        color: $accent;
-        letter-spacing: 5px;
-    }
+.ranked-center
+{
+    flex-direction: column;
+    flex-grow: 1;
+    flex-basis: 0px;
+    min-width: 0;
+    min-height: 0;
+    gap: 14px;
+    animation: ranked-in 0.5s $ease-out 0.08s both;
+}
 
-    .ranked-title
-    {
-        font-size: 48px;
-        font-weight: bold;
-        color: white;
-        letter-spacing: 3px;
-        line-height: 58px;
-        margin-bottom: 18px;
-    }
+// The hub's daily challenges and squad, sized here since HubPage.razor.scss's rules only reach the hub
+.ranked-page HubSidebar
+{
+    width: 330px;
+    height: 100%;
+    flex-shrink: 0;
+}
 
-    .rank-card
-    {
-        flex-direction: row;
-        align-items: center;
-        gap: 22px;
-        width: 100%;
-        padding: 26px;
-        background-color: $panel-bg;
-        border: 1px solid $panel-border;
-        border-radius: 8px;
-    }
+// ── Shared panel look (the hub sidebar's .side-panel) ────────────────────────
 
-    .rank-badge
-    {
-        width: 84px;
-        height: 84px;
-        border-radius: 8px;
-        justify-content: center;
-        align-items: center;
-        flex-shrink: 0;
+.ranked-panel
+{
+    flex-direction: column;
+    flex-shrink: 0;
+    background-color: rgba( 12, 13, 16, 0.86 );
+    border: 1px solid rgba( 255, 255, 255, 0.09 );
+    border-radius: 3px;
+    box-shadow: 0 14px 34px rgba( 0, 0, 0, 0.55 );
+}
 
-        i { font-size: 48px; color: rgba( 0, 0, 0, 0.85 ); }
-    }
+.panel-head
+{
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    height: 50px;
+    padding: 0 18px;
+    border-bottom: 1px solid $line;
+}
 
-    .rank-info
-    {
-        flex-direction: column;
-        flex-grow: 1;
-        gap: 5px;
-    }
+.panel-title
+{
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    color: white;
+    text-shadow: none;
+    white-space: nowrap;
+}
 
-    .rank-tier
+.panel-meta
+{
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: rgba( 255, 255, 255, 0.5 );
+    text-shadow: none;
+    white-space: nowrap;
+}
+
+// ── Heading ──────────────────────────────────────────────────────────────────
+
+.ranked-head
+{
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 14px;
+    margin-bottom: 2px;
+}
+
+.ranked-bar
+{
+    width: 3px;
+    height: 50px;
+    background-color: $accent;
+    box-shadow: 0 0 8px rgba( 255, 122, 26, 0.6 );
+}
+
+.ranked-heading
+{
+    flex-direction: column;
+}
+
+.ranked-kicker
+{
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 5px;
+    color: $accent;
+    text-shadow: none;
+}
+
+.ranked-title
+{
+    font-size: 40px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: white;
+    text-shadow: 0 4px 16px rgba( 0, 0, 0, 0.7 );
+    margin-left: -2px;
+}
+
+// ── Your rank ────────────────────────────────────────────────────────────────
+
+.rank-card
+{
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 22px 14px 8px;
+    border-left: 3px solid $accent;
+}
+
+.rank-emblem
+{
+    width: 156px;
+    height: 156px;
+    flex-shrink: 0;
+}
+
+.rank-info
+{
+    flex-direction: column;
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.rank-label
+{
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    color: rgba( 255, 255, 255, 0.5 );
+    text-shadow: none;
+}
+
+.rank-name
+{
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    white-space: nowrap;
+    text-shadow: 0 3px 12px rgba( 0, 0, 0, 0.7 );
+}
+
+.rank-progress
+{
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: rgba( 255, 255, 255, 0.88 );
+    text-shadow: none;
+}
+
+.rank-bar
+{
+    height: 6px;
+    margin: 12px 0 8px 0;
+    background-color: rgba( 255, 255, 255, 0.1 );
+}
+
+.rank-bar-fill
+{
+    height: 100%;
+    transition: width 0.6s $ease-out;
+}
+
+.rank-next
+{
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: $muted;
+    text-shadow: none;
+    white-space: normal;
+}
+
+// ── Play Ranked: the hub's outlined DEPLOY button, full width ─────────────────
+
+.play-ranked
+{
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    height: 68px;
+    padding: 0 20px 0 24px;
+    border: 1.5px solid $accent;
+    border-radius: 2px;
+    background-color: rgba( 255, 122, 26, 0.12 );
+    box-shadow: 0 0 14px rgba( 255, 122, 26, 0.25 );
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease-out;
+
+    i
     {
         font-size: 30px;
-        font-weight: bold;
-        letter-spacing: 2px;
+        color: $accent-light;
+        text-shadow: none;
+        transition: transform 0.25s $ease-out;
     }
 
-    .rank-sr
+    &:hover
     {
-        font-size: 15px;
-        font-weight: bold;
-        color: rgba( 255, 255, 255, 0.85 );
-        letter-spacing: 1px;
+        background-color: rgba( 255, 122, 26, 0.3 );
+        box-shadow: 0 0 26px rgba( 255, 122, 26, 0.55 );
+
+        i { transform: translateX( 5px ); }
     }
 
-    .rank-bar
+    &:active { transform: scale( 0.98 ); }
+
+    // Looking for a lobby: calmer, with the hourglass turning over
+    &.searching
     {
-        height: 9px;
-        background-color: rgba( 255, 255, 255, 0.10 );
-        border-radius: 5px;
-        overflow: hidden;
-        margin-top: 6px;
+        cursor: default;
+        border-color: rgba( 255, 122, 26, 0.5 );
+        background-color: rgba( 255, 122, 26, 0.06 );
+        box-shadow: none;
+
+        i { animation: ranked-hourglass 1.6s $ease-in-out infinite; }
+
+        &:active { transform: none; }
+    }
+}
+
+@keyframes ranked-hourglass
+{
+    0% { transform: rotate( 0deg ); }
+    35% { transform: rotate( 0deg ); }
+    65% { transform: rotate( 180deg ); }
+    100% { transform: rotate( 180deg ); }
+}
+
+.play-text
+{
+    flex-direction: column;
+}
+
+.play-label
+{
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: $accent-light;
+    text-shadow: none;
+}
+
+.play-sub
+{
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: rgba( 255, 255, 255, 0.6 );
+    text-shadow: none;
+    margin-top: 1px;
+}
+
+// ── Season ───────────────────────────────────────────────────────────────────
+
+.season-row
+{
+    flex-direction: row;
+    flex-shrink: 0;
+    gap: 14px;
+}
+
+.season-stat
+{
+    flex-direction: row;
+    align-items: center;
+    flex-grow: 1;
+    flex-basis: 0px;
+    min-width: 0;
+    gap: 12px;
+    height: 64px;
+    padding: 0 14px;
+
+    i
+    {
+        font-size: 26px;
+        color: rgba( 255, 255, 255, 0.7 );
+        text-shadow: none;
+    }
+}
+
+.season-emblem
+{
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    margin: 0 -6px;
+}
+
+.season-text
+{
+    flex-direction: column;
+    min-width: 0;
+}
+
+.season-label
+{
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: rgba( 255, 255, 255, 0.5 );
+    text-shadow: none;
+    white-space: nowrap;
+}
+
+.season-value
+{
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: white;
+    text-shadow: none;
+    white-space: nowrap;
+}
+
+// ── Rules ────────────────────────────────────────────────────────────────────
+
+.rules
+{
+    flex-shrink: 1;
+    min-height: 0;
+    overflow-y: scroll;
+}
+
+.rule
+{
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 14px;
+    padding: 11px 18px;
+    border-bottom: 1px solid $line;
+
+    &:last-child { border-bottom: 0px; }
+}
+
+// The hub sidebar's challenge-icon box
+.rule-icon
+{
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba( 255, 255, 255, 0.14 );
+    border-radius: 3px;
+    background-color: rgba( 255, 255, 255, 0.03 );
+
+    i
+    {
+        font-size: 20px;
+        color: $accent;
+        text-shadow: none;
+    }
+}
+
+.rule-text
+{
+    flex-direction: column;
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.rule-title
+{
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: white;
+    text-shadow: none;
+    white-space: nowrap;
+}
+
+.rule-desc
+{
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba( 255, 255, 255, 0.6 );
+    text-shadow: none;
+    margin-top: 2px;
+}
+
+// ── Rank ladder: the six tiers, yours raised and lit ────────────────────────
+
+.ladder
+{
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-height: 0;
+}
+
+// The tiers, centred in the panel's height, standing on one line so their tracks join up
+.ladder-tiers
+{
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: center;
+    padding: 18px;
+    min-height: 0;
+    gap: 20px;
+}
+
+.placement-status
+{
+    align-items: center;
+    flex-shrink: 0;
+    gap: 18px;
+    padding: 16px 20px;
+    background-color: rgba( 174, 187, 200, 0.05 );
+    border: 1px solid rgba( 174, 187, 200, 0.2 );
+    border-radius: 3px;
+}
+
+.placement-emblem
+{
+    width: 72px;
+    height: 72px;
+    flex-shrink: 0;
+}
+
+.placement-copy { flex-direction: column; flex-grow: 1; min-width: 0; gap: 6px; }
+.placement-title { font-size: 18px; font-weight: 700; color: white; letter-spacing: 1px; }
+.placement-description { font-size: 15px; font-weight: 500; color: rgba( 255, 255, 255, 0.72 ); }
+.placement-count
+{
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    label { font-size: 28px; color: white; }
+    .placement-count-label { font-size: 11px; letter-spacing: 2px; color: #aebbc8; }
+}
+
+.ladder-row
+{
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.ladder-tier
+{
+    flex-direction: column;
+    align-items: center;
+    flex-grow: 1;
+    flex-basis: 0px;
+    min-width: 0;
+    padding: 12px 10px 16px 10px;
+    border: 1px solid rgba( 255, 255, 255, 0 );
+    border-radius: 3px;
+
+    // Tiers still to climb
+    &.ahead
+    {
+        .ladder-emblem { opacity: 0.88; }
+        .ladder-name { color: rgba( 255, 255, 255, 0.75 ); }
     }
 
-    .rank-bar-fill
+    // Yours: wider, bigger, outlined in its colour (inline)
+    &.current
     {
-        height: 100%;
-        border-radius: 5px;
-    }
+        flex-grow: 1.35;
 
-    .rank-bar-label
-    {
-        font-size: 11px;
-        font-weight: bold;
-        color: $muted;
-        letter-spacing: 1px;
+        .ladder-you { opacity: 1; }
+        .ladder-emblem { width: 176px; height: 176px; }
+        .ladder-name { font-size: 18px; }
+        .ladder-range { color: rgba( 255, 255, 255, 0.8 ); }
     }
+}
 
-    .ranked-actions
-    {
-        flex-direction: column;
-        align-items: center;
-        width: 100%;
-        gap: 12px;
-        margin-top: 22px;
-    }
+.ladder-you
+{
+    padding: 2px 9px 1px 9px;
+    border-radius: 2px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2.5px;
+    color: #08090b;
+    text-shadow: none;
+    opacity: 0;
+    margin-bottom: 8px;
+}
 
-    .find-match
+.ladder-emblem
+{
+    width: 128px;
+    height: 128px;
+    flex-shrink: 0;
+    margin-bottom: 4px;
+}
+
+.rank-emblem, .season-emblem, .ladder-emblem, .placement-emblem
+{
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.ladder-name
+{
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    color: white;
+    text-shadow: none;
+    white-space: nowrap;
+}
+
+.ladder-range
+{
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: rgba( 255, 255, 255, 0.5 );
+    text-shadow: none;
+    white-space: nowrap;
+    margin-top: 2px;
+}
+
+// Each tier's stretch of the climb, cut into its three divisions
+.ladder-track
+{
+    position: relative;
+    width: 100%;
+    height: 4px;
+    margin-top: 14px;
+    background-color: rgba( 255, 255, 255, 0.1 );
+}
+
+.ladder-fill
+{
+    height: 100%;
+}
+
+.ladder-tick
+{
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    width: 2px;
+    background-color: #0c0d10;
+
+    &.first { left: 33.3%; }
+    &.second { left: 66.6%; }
+}
+
+// Next rank, percentage progress, and the matchmaking pool.
+.ladder-stats
+{
+    flex-direction: row;
+    flex-shrink: 0;
+    border-top: 1px solid $line;
+}
+
+.ladder-stat
+{
+    flex-direction: column;
+    align-items: center;
+    flex-grow: 1;
+    flex-basis: 0px;
+    min-width: 0;
+    padding: 14px 10px;
+    border-left: 1px solid $line;
+
+    &:first-child { border-left: 0px; }
+}
+
+.stat-label
+{
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: rgba( 255, 255, 255, 0.5 );
+    text-shadow: none;
+    white-space: nowrap;
+}
+
+.stat-value
+{
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: white;
+    text-shadow: none;
+    white-space: nowrap;
+    margin-top: 2px;
+}
+
+// ── Map pool ─────────────────────────────────────────────────────────────────
+
+.pool-row
+{
+    flex-direction: row;
+    gap: 14px;
+    height: 200px;
+    padding: 16px 18px 18px 18px;
+}
+
+.pool-map
+{
+    position: relative;
+    flex-grow: 1;
+    flex-basis: 0px;
+    min-width: 0;
+    border-radius: 3px;
+    overflow: hidden;
+    background-color: #0b0c0f;
+    border: 1px solid rgba( 255, 255, 255, 0.12 );
+}
+
+.pool-art
+{
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-size: cover;
+    background-position: center;
+
+    &.placeholder
     {
-        flex-direction: row;
         align-items: center;
         justify-content: center;
-        gap: 12px;
-        width: 100%;
-        padding: 18px;
-        background-color: $accent;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: all 0.12s ease-out;
 
-        i { font-size: 24px; color: black; }
-        label { font-size: 21px; font-weight: bold; color: black; letter-spacing: 3px; cursor: pointer; }
-
-        &:hover { background-color: #ff8c33; }
-
-        &.searching
+        i
         {
-            background-color: rgba( 255, 255, 255, 0.10 );
-            i { color: $accent; }
-            label { color: $accent; }
+            font-size: 42px;
+            color: rgba( 255, 255, 255, 0.18 );
         }
     }
+}
 
-    .ranked-note
-    {
-        font-size: 12px;
-        font-weight: bold;
-        color: $muted;
-        letter-spacing: 0.5px;
-        text-align: center;
-    }
+.pool-shade
+{
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-image: linear-gradient( to top, rgba( 7, 7, 9, 0.94 ) 0%, rgba( 7, 7, 9, 0.35 ) 50%, rgba( 7, 7, 9, 0 ) 100% );
+}
+
+.pool-caption
+{
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    flex-direction: column;
+    padding: 12px 16px;
+}
+
+.pool-mode
+{
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    color: $accent;
+    text-shadow: 0 2px 6px rgba( 0, 0, 0, 0.8 );
+}
+
+.pool-name
+{
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: white;
+    white-space: nowrap;
+    text-shadow: 0 3px 10px rgba( 0, 0, 0, 0.8 );
+}
+
+.pool-count
+{
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 150px;
+    border: 1px solid rgba( 255, 255, 255, 0.12 );
+    border-radius: 3px;
+    background-color: rgba( 255, 255, 255, 0.03 );
+}
+
+.pool-count-number
+{
+    font-size: 50px;
+    font-weight: 800;
+    color: white;
+    text-shadow: none;
+}
+
+.pool-count-label
+{
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: $muted;
+    text-shadow: none;
+    text-align: center;
+}
+
+// ── Smaller screens ──────────────────────────────────────────────────────────
+
+// Below 16:9 width the middle column is narrower
+.main-menu-root.tight-nav
+{
+    .ladder-emblem { width: 100px; height: 100px; }
+    .ladder-tier.current .ladder-emblem { width: 140px; height: 140px; }
+    .ladder-name { font-size: 13px; letter-spacing: 1.5px; }
+    .ladder-range { font-size: 10px; letter-spacing: 0px; }
+    .stat-value { font-size: 16px; }
+}
+
+// The hub hides its sidebar at this size too
+.main-menu-root.compact .ranked-page HubSidebar
+{
+    display: none;
+}
+
+.main-menu-root.narrow
+{
+    .ranked-left { width: 360px; }
+    .rank-emblem { width: 120px; height: 120px; }
+    .rank-name { font-size: 26px; }
+    .ladder-range { display: none; }
+    .ladder-emblem { width: 80px; height: 80px; }
+    .ladder-tier.current .ladder-emblem { width: 110px; height: 110px; }
+    .pool-count { width: 110px; }
+    .placement-status { padding: 12px; gap: 10px; }
+    .placement-emblem { width: 48px; height: 48px; }
+    .placement-title { font-size: 15px; }
+    .placement-description { font-size: 13px; }
+    .placement-count label { font-size: 22px; }
+    .placement-count .placement-count-label { font-size: 10px; }
+    .ladder .panel-meta { display: none; }
+}
+
+.main-menu-root.short
+{
+    .ranked-page { padding-top: 20px; padding-bottom: 50px; }
+    .ranked-title { font-size: 32px; }
+    .rank-emblem { width: 110px; height: 110px; }
+    .rule { padding: 8px 18px; }
+    .rule-desc { display: none; }
+    .ladder-emblem { width: 84px; height: 84px; }
+    .ladder-tier.current .ladder-emblem { width: 116px; height: 116px; }
+    .pool-row { height: 140px; }
 }

@@ -1,0 +1,156 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using Sandbox.UI.Navigation;
+
+@inherits Panel
+@attribute [StyleSheet]
+@namespace Facepunch.UI
+
+@* The hub page's "Play" tabs, left of its featured screen: a compact card per mode. Multiplayer, Battle Royale and
+   Zombies pick what the featured screen shows, and the picked one is lit; Campaign is locked. The toggle in the
+   heading folds it down to a strip of icons, which name themselves on hover (.rail-tip). Each card sits in a
+   .rail-slot with its tip, because the card's overflow: hidden would clip a tip inside it. *@
+<root class="hub-rail">
+    <div class="rail-head">
+        <div class="rail-bar" />
+        <div class="rail-heading">
+            <label class="rail-title">@Tr( "PLAY" )</label>
+        </div>
+        <div class="rail-toggle" onclick=@ToggleCollapsed onmouseover=@PlayHoverSound>
+            <i>chevron_left</i>
+        </div>
+    </div>
+
+    <div class="rail-slot">
+        <div class="rail-card locked" onmouseover=@PlayHoverSound>
+            <div class="rail-bg campaign-art" />
+            <div class="rail-shade" />
+            <div class="rail-content">
+                <i class="rail-icon">military_tech</i>
+                <label class="rail-name @Fit( Tr( "CAMPAIGN" ) )">@Tr( "CAMPAIGN" )</label>
+                <label class="rail-desc">@Tr( "STORY EXPERIENCE" )</label>
+            </div>
+            <div class="rail-mini"><i class="rail-icon">military_tech</i></div>
+            <i class="rail-lock">lock</i>
+        </div>
+        <div class="rail-tip">
+            <div class="rail-tip-row"><i>lock</i><label class="rail-tip-name">@Tr( "CAMPAIGN" )</label></div>
+            <label class="rail-tip-desc">@Tr( "STORY EXPERIENCE" )</label>
+        </div>
+    </div>
+
+    <div class="rail-slot">
+        <div class="rail-card @Lit( HubPage.Operation.Multiplayer )" onclick=@(() => Select( HubPage.Operation.Multiplayer )) onmouseover=@PlayHoverSound>
+            <div class="rail-bg multiplayer-art" />
+            <div class="rail-shade" />
+            <div class="rail-content">
+                <i class="rail-icon">gps_fixed</i>
+                <label class="rail-name @Fit( Tr( "MULTIPLAYER" ) )">@Tr( "MULTIPLAYER" )</label>
+                <label class="rail-desc">@Tr( "COMPETE ONLINE" )</label>
+            </div>
+            <div class="rail-mini"><i class="rail-icon">gps_fixed</i></div>
+        </div>
+        <div class="rail-tip">
+            <label class="rail-tip-name">@Tr( "MULTIPLAYER" )</label>
+            <label class="rail-tip-desc">@Tr( "COMPETE ONLINE" )</label>
+        </div>
+    </div>
+
+    <div class="rail-slot">
+        <div class="rail-card battle-royale @Lit( HubPage.Operation.BattleRoyale )" onclick=@(() => Select( HubPage.Operation.BattleRoyale )) onmouseover=@PlayHoverSound>
+            <div class="rail-bg br-art" />
+            <div class="rail-shade" />
+            <div class="rail-content">
+                <i class="rail-icon">paragliding</i>
+                <label class="rail-name @Fit( Tr( "BATTLE ROYALE" ) )">@Tr( "BATTLE ROYALE" )</label>
+                <label class="rail-desc">@Tr( "LAST ONE STANDING" )</label>
+            </div>
+            <div class="rail-mini"><i class="rail-icon">paragliding</i></div>
+        </div>
+        <div class="rail-tip battle-royale">
+            <label class="rail-tip-name">@Tr( "BATTLE ROYALE" )</label>
+            <label class="rail-tip-desc">@Tr( "LAST ONE STANDING" )</label>
+        </div>
+    </div>
+
+    <div class="rail-slot">
+        <div class="rail-card zombies @Lit( HubPage.Operation.Zombies )" onclick=@(() => Select( HubPage.Operation.Zombies )) onmouseover=@PlayHoverSound>
+            <div class="rail-bg zombies-art" />
+            <div class="rail-shade" />
+            <div class="rail-content">
+                @* Material Icons has no skull, so this is the minimap's (ui/modes/zombies_icon.png). *@
+                <div class="rail-icon skull" />
+                <label class="rail-name @Fit( Tr( "ZOMBIES" ) )">@Tr( "ZOMBIES" )</label>
+                <label class="rail-desc">@Tr( "FIGHT THE UNDEAD" )</label>
+            </div>
+            <div class="rail-mini"><div class="rail-icon skull" /></div>
+        </div>
+        <div class="rail-tip zombies">
+            <label class="rail-tip-name">@Tr( "ZOMBIES" )</label>
+            <label class="rail-tip-desc">@Tr( "FIGHT THE UNDEAD" )</label>
+        </div>
+    </div>
+</root>
+
+@code
+{
+    /// <summary>The tab the featured screen is showing.</summary>
+    public HubPage.Operation Selected { get; set; }
+
+    public Action<HubPage.Operation> OnSelect { get; set; }
+
+    string Lit( HubPage.Operation operation ) => Selected == operation ? "featured" : "";
+
+    /// <summary>A translated name longer than the English ones (Tryb wieloosobowy, Королевская битва) is set smaller, so
+    /// it stays on the card's one line.</summary>
+    static string Fit( string name ) => name.Length > 14 ? "long" : "";
+
+    void Select( HubPage.Operation operation )
+    {
+        if ( operation == Selected ) return;
+        Sound.Play( "ui_button_press" );
+        OnSelect?.Invoke( operation );
+    }
+
+    void PlayHoverSound() => Sound.Play( "ui_button_hover" );
+
+    const string CollapsedCookie = "hc1.hub.rail.collapsed";
+
+    /// <summary>Folded down to a strip of icons by the toggle in the heading. Remembered between visits. A field, since
+    /// the code generator copies a property's initializer into an attribute, which a cookie read can't be.</summary>
+    bool _collapsed = Game.Cookies.Get<bool>( CollapsedCookie, false );
+
+    /// <summary>Below 1900 wide (MainMenuRoot's tight-nav) there's only room for the folded strip, so it stays folded
+    /// there, without its heading and toggle. It's still the featured screen's only mode switch.</summary>
+    bool Tight => Ancestors.Any( x => x.HasClass( "tight-nav" ) );
+
+    void ToggleCollapsed()
+    {
+        Sound.Play( "ui_button_press" );
+        _collapsed = !_collapsed;
+        Game.Cookies.Set( CollapsedCookie, _collapsed );
+        UpdateClasses();
+    }
+
+    // Set here rather than in the root's class attribute, which adds classes but never takes them off again.
+    void UpdateClasses()
+    {
+        var tight = Tight;
+        SetClass( "collapsed", _collapsed || tight );
+        SetClass( "tight", tight );
+    }
+
+    protected override void OnAfterTreeRender( bool firstTime )
+    {
+        base.OnAfterTreeRender( firstTime );
+        UpdateClasses();
+    }
+
+    public override void Tick()
+    {
+        base.Tick();
+        UpdateClasses();
+    }
+
+    protected override int BuildHash() => HashCode.Combine( Selected, _collapsed );
+}

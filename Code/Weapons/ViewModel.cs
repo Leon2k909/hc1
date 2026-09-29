@@ -39,6 +39,13 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 	[Property, Range( 0, 1 ), Group( "Configuration" )] public float MoveBobScale { get; set; } = 1f;
 	[Property, Range( 0, 2 ), Group( "Configuration" )] public float YawInertiaScale { get; set; } = 2f;
 
+	/// <summary>
+	/// Seconds to bring the sights up or down, on viewmodels whose animgraph takes the aim as a weight
+	/// (ironsights_weight, Tools/kastov_animgraph.py). The others blend their own ironsights.
+	/// </summary>
+	[Property, Group( "Configuration" )] public float AimTime { get; set; } = 0.25f;
+	private float _aimProgress;
+
 	[Property]
 	public float ReloadSpeed { get; set; } = 1f;
 
@@ -56,6 +63,19 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 
 	IEnumerable<IViewModelOffset> Offsets => Equipment.GetComponentsInChildren<IViewModelOffset>();
 
+	/// <summary> Whether a weapon is the SCAR-H, whose viewmodel has its own parameters (deploy, fire, reload) and poses. </summary>
+	public static bool IsScarH( EquipmentResource resource ) =>
+		resource.IsValid() && resource.ResourceName.Contains( "scarh", StringComparison.OrdinalIgnoreCase );
+
+	/// <summary> The SCAR-H's iron sight aim offset, higher with an optic's mount fitted. </summary>
+	public static (Vector3 Position, Angles Angles) ScarHAimOffset( bool hasOptic ) => hasOptic
+		? (new Vector3( 0.36f, 2.181f, 0.596f ), new Angles( -1.47f, 0.44f, 0f ))
+		: (new Vector3( 0.36f, 2.163f, 0.233f ), new Angles( -0.1f, 0.34f, 0f ));
+
+	/// <summary> The SCAR-H's sprint pose, which its animations don't have. </summary>
+	public static readonly Vector3 ScarHSprintPosition = new( 4.29f, -0.86f, -1.1f );
+	public static readonly Angles ScarHSprintAngles = new( 8.41f, 59.66f, 0f );
+
 	void ICameraSetup.Setup( CameraComponent cc )
 	{
 		if ( !Owner.IsValid() || !Owner.CharacterController.IsValid() )
@@ -63,6 +83,10 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 
 		WorldPosition = cc.WorldPosition;
 		WorldRotation = cc.WorldRotation;
+
+		// Corner slicing cants the whole gun about the line of sight, so the sights stay on target (ViewModel.CornerSlicing.cs).
+		UpdateCornerSlicing( cc );
+		WorldRotation *= Rotation.FromRoll( CornerRoll );
 
 		ApplyInertia();
 		ApplyOffsets();
@@ -119,18 +143,7 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 			{
 				var manualOffset = Equipment.GetComponentInChildren<ManualOffset>();
 				if ( manualOffset.IsValid() )
-				{
-					if ( hasOptic )
-					{
-						manualOffset.AimOffset = new Vector3( 0.36f, 2.181f, 0.596f );
-						manualOffset.AimAngleOffset = new Angles( -1.47f, 0.44f, 0f );
-					}
-					else
-					{
-						manualOffset.AimOffset = new Vector3( 0.36f, 2.163f, 0.233f );
-						manualOffset.AimAngleOffset = new Angles( -0.1f, 0.34f, 0f );
-					}
-				}
+					(manualOffset.AimOffset, manualOffset.AimAngleOffset) = ScarHAimOffset( hasOptic );
 			}
 		}
 	}
@@ -199,8 +212,8 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 		{
 			var isAiming = Equipment.HasTag( "aiming" );
 			var isSprinting = Owner.IsValid() && Owner.IsSprinting && !isAiming;
-			var targetSprintPos = isSprinting ? new Vector3( 4.29f, -0.86f, -1.1f ) : Vector3.Zero;
-			var targetSprintAngle = isSprinting ? new Angles( 8.41f, 59.66f, 0f ) : Angles.Zero;
+			var targetSprintPos = isSprinting ? ScarHSprintPosition : Vector3.Zero;
+			var targetSprintAngle = isSprinting ? ScarHSprintAngles : Angles.Zero;
 
 			sprintPosOffset = sprintPosOffset.LerpTo( targetSprintPos, Time.Delta * 10f );
 			sprintAngleOffset = Angles.Lerp( sprintAngleOffset, targetSprintAngle, Time.Delta * 10f );
@@ -349,6 +362,11 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 		// Ironsights
 		ModelRenderer.Set( "ironsights", aiming ? 1 : 0 );
 		ModelRenderer.Set( "ironsights_fire_scale", aiming ? IronsightsFireScale : 0f );
+
+		// A weight moving at a steady pace turns back from wherever it is, so letting go of aim halfway in doesn't snap
+		// the gun to the sights first (an animgraph selector restarts its blend from the full old pose).
+		_aimProgress = _aimProgress.Approach( aiming ? 1f : 0f, Time.Delta / MathF.Max( AimTime, 0.01f ) );
+		ModelRenderer.Set( "ironsights_weight", _aimProgress * _aimProgress * (3f - 2f * _aimProgress) );
 
 		ModelRenderer.Set( "speed_ironsights", 1 );
 

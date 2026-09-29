@@ -60,6 +60,11 @@ public sealed class HardpointManager : Component
 
 	private List<Vector3> SelectHardpointLocations()
 	{
+		// A map's own zone spots (ObjectiveSpot), if it has any.
+		var spots = ObjectiveSpot.All( Scene, ObjectiveSpot.SpotKind.HotZone );
+		if ( spots.Count > 0 )
+			return spots.Select( x => x.WorldPosition ).ToList();
+
 		var spawnPoints = GameUtils.GetSpawnPoints().Select( x => x.Transform.Position ).ToList();
 		if ( spawnPoints.Count == 0 )
 		{
@@ -159,7 +164,7 @@ public sealed class HardpointManager : Component
 
 		_timeSinceLastRelocation = 0f;
 
-		Facepunch.UI.Toast.Instance?.Show( "Hardpoint has relocated!", Facepunch.UI.ToastType.Generic );
+		Facepunch.UI.Toast.Instance?.Show( "The zone has moved!", Facepunch.UI.ToastType.Generic );
 	}
 
 	protected override void OnUpdate()

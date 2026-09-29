@@ -41,17 +41,17 @@ public sealed class DominationFlag : Component,
 		{
 			if ( CapturingTeam != Team.Unassigned )
 			{
-				var capturingName = CapturingTeam == Team.Terrorist ? "Terrorists" : "Counter-Terrorists";
-				return $"Capturing {FlagName} ({MathF.Round( CaptureProgress * 100 )}% by {capturingName})";
+				var capturingName = Tr( CapturingTeam.GetName() );
+				return Tr( "Capturing {0} ({1}% by {2})", FlagName, MathF.Round( CaptureProgress * 100 ), capturingName );
 			}
 
 			if ( ControllingTeam != Team.Unassigned )
 			{
-				var teamName = ControllingTeam == Team.Terrorist ? "T" : "CT";
+				var teamName = Tr( ControllingTeam.GetName() );
 				return $"[{FlagName}] - {teamName}";
 			}
 
-			return $"[{FlagName}] - Neutral";
+			return $"[{FlagName}] - {Tr( "Neutral" )}";
 		}
 	}
 
@@ -274,7 +274,7 @@ public sealed class DominationFlag : Component,
 				// If controlled by enemy, neutralize it first!
 				ControllingTeam = Team.Unassigned;
 				CapturingTeam = Team.Unassigned;
-				BroadcastNotification( $"{FlagName} Neutralized!", "neutralized" );
+				BroadcastNotification( "{0} Neutralized!", "neutralized", FlagName );
 				Sound.Play( "sounds/ui/buttons/ui_press.sound" );
 			}
 			else
@@ -282,8 +282,7 @@ public sealed class DominationFlag : Component,
 				// Neutral flag captured!
 				ControllingTeam = team;
 				CapturingTeam = Team.Unassigned;
-				var teamName = team == Team.Terrorist ? "Terrorists" : "Counter-Terrorists";
-				BroadcastNotification( $"{teamName} Captured {FlagName}!", "captured" );
+				BroadcastNotification( "{0} Captured {1}!", "captured", team, FlagName );
 				Sound.Play( "sounds/ui/buttons/ui_action.sound" );
 			}
 
@@ -291,8 +290,10 @@ public sealed class DominationFlag : Component,
 		}
 	}
 
-	private void BroadcastNotification( string message, string type )
+	// The message goes to the toast in English with its values apart, and the toast puts it in the player's language
+	// (a team shows as its translated name).
+	private void BroadcastNotification( string message, string type, params object[] args )
 	{
-		Facepunch.UI.Toast.Instance?.Show( message, Facepunch.UI.ToastType.Generic );
+		Facepunch.UI.Toast.Instance?.Show( message, Facepunch.UI.ToastType.Generic, 5f, args );
 	}
 }

@@ -1,0 +1,407 @@
+{
+  "RootObject": {
+    "__guid": "b7bb0edf-1619-5d59-b906-b406ef6180b3",
+    "__version": 1,
+    "Flags": 0,
+    "Name": "weapon_bizon",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Tags": "player",
+    "Enabled": true,
+    "NetworkMode": 2,
+    "NetworkInterpolation": true,
+    "NetworkOrphaned": 0,
+    "OwnerTransfer": 1,
+    "Components": [
+      {
+        "__type": "Facepunch.Equipment",
+        "__guid": "6150526f-3e40-570f-86fa-19ba5c5bb6ae",
+        "__enabled": true,
+        "AimFovOffset": -5,
+        "CrosshairType": "Default",
+        "DeploySound": "weapons/bizon/sounds/bizon.raise.sound",
+        "Handedness": "Right",
+        "HoldType": "Rifle",
+        "MountedPrefab": {
+          "_type": "gameobject",
+          "prefab": "weapons/bizon/mount_bizon.prefab"
+        },
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Resource": "weapons/bizon/bizon.equip",
+        "SpeedPenalty": 30,
+        "UseCrosshair": true
+      },
+      {
+        "__type": "Facepunch.TagBinder",
+        "__guid": "d882973e-e0d3-5e93-b464-862b1b618c1a",
+        "__enabled": true,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "6f290163-85aa-5889-95eb-d3ff9b78af42",
+        "__version": 1,
+        "Flags": 0,
+        "Name": "Functions",
+        "Position": "0,0,0",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Tags": "",
+        "Enabled": true,
+        "NetworkMode": 2,
+        "NetworkInterpolation": true,
+        "NetworkOrphaned": 0,
+        "OwnerTransfer": 1,
+        "Components": [
+          {
+            "__type": "Facepunch.Lowerable",
+            "__guid": "1c8cff6c-e956-5e4c-af43-0154309f16ec",
+            "__enabled": true,
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null
+          },
+          {
+            "__type": "Facepunch.WeaponAmmo",
+            "__guid": "9222880b-3721-5284-9d6c-516676e7ed8e",
+            "__enabled": true,
+            "Ammo": 64,
+            "HasAmmo": true,
+            "MaxAmmo": 64,
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null
+          },
+          {
+            "__type": "Facepunch.Shootable",
+            "__guid": "acfdbd07-a472-5966-a4fc-d9d4c8f61b31",
+            "__enabled": true,
+            "AmmoComponent": {
+              "_type": "component",
+              "component_id": "9222880b-3721-5284-9d6c-516676e7ed8e",
+              "go": "6f290163-85aa-5889-95eb-d3ff9b78af42",
+              "component_type": "WeaponAmmo"
+            },
+            "BaseDamage": 12,
+            "BaseDamageFalloff": [
+              {
+                "x": 0,
+                "y": 1,
+                "in": 0,
+                "out": 0,
+                "mode": "Mirrored"
+              },
+              {
+                "x": 0.42559522,
+                "y": 0.496058,
+                "in": 2.2198632,
+                "out": -2.2198632,
+                "mode": "Mirrored"
+              },
+              {
+                "x": 1,
+                "y": 0,
+                "in": 0,
+                "out": 0,
+                "mode": "Mirrored"
+              }
+            ],
+            "BloodEjectDistance": 512,
+            "BulletCount": 1,
+            "BulletSize": 8.0,
+            "BulletSpread": 0,
+            "BurstAmount": 3,
+            "BurstEndDelay": 0.2,
+            "CurrentFireMode": "Automatic",
+            "DryFireSound": "sounds/guns/gun_dryfire.sound",
+            "DryShootDelay": 0.15,
+            "EjectionPrefab": {
+              "_type": "gameobject",
+              "prefab": "prefabs/weapon_effects/9mm_spent_casing.prefab"
+            },
+            "FireModeSwitchDelay": 0.3,
+            "FireRate": 680,
+            "SuppressorFireRateScale": 1.05,
+            "InAirSpreadMultiplier": 2,
+            "InputActions": [
+              "Attack1"
+            ],
+            "MaxEffectsPlayDistance": 4194304,
+            "MaxRange": 8000,
+            "MaxRicochetAngle": 45,
+            "MuzzleFlashChance": 0.12,
+            "MuzzleFlashScale": 0.45,
+            "MuzzleSmokePrefab": {
+              "_type": "gameobject",
+              "prefab": "prefabs/weapon_effects/gun_smoke.prefab"
+            },
+            "MuzzleSmokeScale": 0.8,
+            "MuzzleFlashPrefab": {
+              "_type": "gameobject",
+              "prefab": "prefabs/weapon_effects/pistol_muzzleflash.prefab"
+            },
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "OnInputAction": null,
+            "PenetrationThickness": 32,
+            "PlayerVelocityLimit": 300,
+            "RequiresAllInputActions": false,
+            "RequiresHasAmmo": true,
+            "RicochetMaxHits": 2,
+            "ShootSound": "weapons/bizon/sounds/bizon.fire.sound",
+            "SupportedFireModes": [
+              "Automatic",
+              "Semi"
+            ],
+            "TracerEffect": null,
+            "VelocitySpreadScale": 0.25,
+            "SuppressedShootSound": "weapons/bizon/sounds/bizon.fire_suppressed.sound",
+            "SuppressedMuzzleFlashChance": 0,
+            "MuzzleVelocity": 320,
+            "DragFunction": "G1",
+            "BallisticCoefficient": 0.122,
+            "SightHeight": 2.01,
+            "ZeroRange": 100
+          },
+          {
+            "__type": "Facepunch.Reloadable",
+            "__guid": "82d778ce-31e2-5f94-a52c-976df3161de9",
+            "__enabled": true,
+            "AmmoComponent": {
+              "_type": "component",
+              "component_id": "9222880b-3721-5284-9d6c-516676e7ed8e",
+              "go": "6f290163-85aa-5889-95eb-d3ff9b78af42",
+              "component_type": "WeaponAmmo"
+            },
+            "EmptyReloadSounds": {
+              "0.033": "weapons/bizon/sounds/bizon.reload_empty.raise.sound",
+              "0.067": "weapons/bizon/sounds/bizon.reload_empty.magout.sound",
+              "1.033": "weapons/bizon/sounds/bizon.reload_empty.mvmnt.sound",
+              "1.333": "weapons/bizon/sounds/bizon.reload_empty.maghit.sound",
+              "1.6": "weapons/bizon/sounds/bizon.reload_empty.magin.sound",
+              "2.133": "weapons/bizon/sounds/bizon.reload_empty.charge.sound",
+              "2.3": "weapons/bizon/sounds/bizon.reload_empty.end.sound"
+            },
+            "EmptyReloadTime": 2.8,
+            "InputActions": [
+              "Reload"
+            ],
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "OnInputAction": null,
+            "ReloadTime": 2.1,
+            "RequiresAllInputActions": false,
+            "SingleReload": false,
+            "TimedReloadSounds": {
+              "0.067": "weapons/bizon/sounds/bizon.reload.raise.sound",
+              "0.233": "weapons/bizon/sounds/bizon.reload.magout.sound",
+              "0.567": "weapons/bizon/sounds/bizon.reload.armdown.sound",
+              "1.033": "weapons/bizon/sounds/bizon.reload.mvmnt.sound",
+              "1.267": "weapons/bizon/sounds/bizon.reload.maghit.sound",
+              "1.6": "weapons/bizon/sounds/bizon.reload.magin.sound",
+              "1.633": "weapons/bizon/sounds/bizon.reload.end.sound"
+            }
+          },
+          {
+            "__type": "Facepunch.ShootRecoil",
+            "__guid": "e9ca2cb2-a3bd-52c5-9e56-6183d47635c3",
+            "__enabled": true,
+            "HorizontalSpread": "2 -2",
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "RecoilPattern": {
+              "Points": [
+                "-0.0251255,4.851695",
+                "-0.0251255,4.639831",
+                "-0.04187679,4.470339",
+                "-0.17588,4.279661",
+                "-0.4103851,4.067797",
+                "-0.6783919,3.877119",
+                "-0.8626466,3.728814",
+                "-1.130653,3.601695",
+                "-1.281407,3.368644",
+                "-1.080402,3.15678",
+                "-0.4773865,2.902542",
+                "0.0251255,2.711864",
+                "0.4438858,2.542373",
+                "0.8961477,2.309322",
+                "1.147404,2.13983",
+                "1.331658,1.927966",
+                "1.231156,1.800848",
+                "0.7956457,1.567797",
+                "0.4773865,1.419492",
+                "0.1088781,1.25",
+                "-0.3098826,1.059322",
+                "-0.7118931,0.8474576",
+                "-0.9128981,0.7415254",
+                "-0.9966502,0.6567795",
+                "-0.8123951,0.5084746",
+                "-0.5276384,0.3601695",
+                "-0.226131,0.2330509",
+                "-0.0251255,0.1483051"
+              ],
+              "LoopStart": 3,
+              "LoopEnd": 27,
+              "IsLooping": false
+            },
+            "ResetTime": 0.3,
+            "Scale": "0.43,2.6",
+            "UseRecoilPattern": true,
+            "VerticalSpread": "3.5"
+          },
+          {
+            "__type": "Facepunch.ManualOffset",
+            "__guid": "7b958d6a-2823-51ac-923e-609fae4d1e73",
+            "__enabled": true,
+            "AimAngleOffset": "0,0,0",
+            "AimOffset": "0,0,0",
+            "InputActions": [
+              "Attack2"
+            ],
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "OnInputAction": null,
+            "RequiresAllInputActions": false,
+            "OpticAimCorrection": "2.554,0,-1.353"
+          },
+          {
+            "__type": "Facepunch.ViewPunch",
+            "__guid": "2542ef12-5cc6-535f-bf91-35f71055a8bb",
+            "__enabled": true,
+            "AnglesOffset": "-0.25,0,0",
+            "Curve": [
+              {
+                "x": 0,
+                "y": 0,
+                "in": 0,
+                "out": 0,
+                "mode": "Mirrored"
+              },
+              {
+                "x": 0.32886904,
+                "y": 1,
+                "in": 0,
+                "out": 0,
+                "mode": "Mirrored"
+              },
+              {
+                "x": 1,
+                "y": 0,
+                "in": 0,
+                "out": 0,
+                "mode": "Mirrored"
+              }
+            ],
+            "Lifetime": 0.15,
+            "MaxAnglesOffset": "-0.25,0,0",
+            "MaxPositionOffset": "0.3,0,0.5",
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "PositionOffset": "0.3,0,0.5"
+          },
+          {
+            "__type": "Facepunch.FovOffset",
+            "__guid": "87c222a8-3cb4-59ee-8afa-a7f42e63110b",
+            "__enabled": true,
+            "Curve": [
+              {
+                "x": 0,
+                "y": 0,
+                "in": 0,
+                "out": 0,
+                "mode": "Mirrored"
+              },
+              {
+                "x": 0.15,
+                "y": 1,
+                "in": 0,
+                "out": 0,
+                "mode": "Mirrored"
+              },
+              {
+                "x": 1,
+                "y": 0,
+                "in": 0,
+                "out": 0,
+                "mode": "Mirrored"
+              }
+            ],
+            "Length": 0.1,
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "Size": 2
+          }
+        ],
+        "Children": []
+      }
+    ],
+    "__properties": {
+      "NetworkInterpolation": true,
+      "TimeScale": 1,
+      "WantsSystemScene": true,
+      "Metadata": {},
+      "NavMesh": {
+        "Enabled": false,
+        "IncludeStaticBodies": true,
+        "IncludeKeyframedBodies": true,
+        "EditorAutoUpdate": true,
+        "AgentHeight": 64,
+        "AgentRadius": 16,
+        "AgentStepSize": 18,
+        "AgentMaxSlope": 40,
+        "ExcludedBodies": "",
+        "IncludedBodies": ""
+      }
+    },
+    "__variables": []
+  },
+  "ResourceVersion": 2,
+  "ShowInMenu": false,
+  "MenuPath": null,
+  "MenuIcon": null,
+  "DontBreakAsTemplate": false,
+  "__references": [],
+  "__version": 2
+}

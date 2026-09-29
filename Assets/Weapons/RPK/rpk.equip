@@ -1,0 +1,32 @@
+{
+  "Name": "RPK",
+  "Description": "Soviet 7.62x39mm light machine gun: an AKM with a longer, heavier barrel and a 75-round drum.",
+  "Slot": "Primary",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": true,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/guns/rpk_01.png",
+  "IsPurchasable": true,
+  "Price": 3200,
+  "KillReward": 300,
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/rpk/weapon_rpk.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/rpk/wm_rpk.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/rpk/vm_rpk.prefab"
+  },
+  "WorldModel": "weapons/rpk/w_rpk.vmdl",
+  "ArmorReduction": null,
+  "HelmetReduction": null,
+  "WorldModelBodyGroups": 0,
+  "__references": [],
+  "__version": 0,
+  "Category": "LMG",
+  "GunsmithOffset": "0,0,4"
+}

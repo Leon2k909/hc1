@@ -7,27 +7,27 @@
 @namespace Facepunch.UI
 @attribute [StyleSheet]
 
-<root class="hc1 blur settings-page">
+<root class="hc1 settings-page">
     <MenuTopbar Title="SETTINGS" />
 
     <div class="set-body">
         <div class="set-nav">
             <div class="set-head">
                 <div class="set-accent"></div>
-                <label class="set-title">SETTINGS</label>
+                <label class="set-title">@Tr( "CATEGORIES" )</label>
             </div>
 
             @foreach ( var grouping in TypeLibrary.GetPropertyDescriptions( GameSettingsSystem.Current ).GroupBy( x => x.Group ) )
             {
                 <div class="set-cat @(SelectedGroup == grouping.Key ? "active" : "")" onclick=@(() => SetGroup( grouping.Key ) )>
-                    <label>@grouping.Key</label>
+                    <label>@Tr( grouping.Key )</label>
                     <i>chevron_right</i>
                 </div>
             }
         </div>
 
         <div class="set-content">
-            <label class="set-group-title">@SelectedGroup</label>
+            <label class="set-group-title">@Tr( SelectedGroup )</label>
 
             <div class="set-list">
                 @if ( !string.IsNullOrEmpty( SelectedGroup ) )
@@ -46,6 +46,11 @@
                         {
                             <SettingEntry Target=@GameSettingsSystem.Current Description=@property />
                         }
+
+                        @if ( SelectedGroup == "Video" )
+                        {
+                            <SboxSettingsLinks />
+                        }
                     }
                 }
             </div>
@@ -53,14 +58,19 @@
     </div>
 
     <div class="set-footer">
-        <div class="set-btn" onclick=@(() => Game.Overlay.ShowBinds())><i>keyboard</i><label>Edit Input Bindings</label></div>
-        <div class="set-btn" onclick=@(() => ReportBug())><i>bug_report</i><label>Report a Bug</label></div>
-        <div class="set-btn primary" onclick=@(() => Save())><i>save</i><label>Save</label></div>
+        <div class="set-btn" onclick=@(() => ReportBug())><i>bug_report</i><label>@Tr( "Report a Bug" )</label></div>
+        <div class="set-btn primary" onclick=@(() => Save())><i>save</i><label>@Tr( "Save" )</label></div>
     </div>
 </root>
 
 @code
 {
+    public override void Tick()
+    {
+        base.Tick();
+        ResponsiveLayout.Update( this );
+    }
+
     private string SelectedGroup { get; set; } = null;
 
     protected override void OnAfterTreeRender( bool firstTime )

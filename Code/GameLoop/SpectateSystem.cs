@@ -14,6 +14,9 @@ public sealed class SpectateSystem : SingletonComponent<SpectateSystem>
 	
 	private bool _wasSpectating { get; set; }
 
+	/// <summary> Where the view last was while it followed a pawn: the freecam starts there once nobody's left to follow. </summary>
+	private (Vector3 Position, Angles Angles)? _lastView;
+
 	private void OnSpectateBegin()
 	{
 		// try to find someone to spectate
@@ -30,6 +33,9 @@ public sealed class SpectateSystem : SingletonComponent<SpectateSystem>
 				Client.Local.Possess();
 			}
 		}
+
+		if ( !IsFreecam && Client.Viewer.IsValid() && Client.Viewer.Pawn.IsValid() && Scene.Camera.IsValid() )
+			_lastView = (Scene.Camera.WorldPosition, Scene.Camera.WorldRotation.Angles());
 
 		// Do we have no pawn? Spectate!
 		if ( IsSpectating )
@@ -120,6 +126,13 @@ public sealed class SpectateSystem : SingletonComponent<SpectateSystem>
 			var rotation = Client.Viewer.Pawn.EyeAngles;
 			FreecamController.EyeAngles = rotation;
 			FreecamController.WorldPosition = Client.Viewer.Pawn.GameObject.WorldPosition + (rotation.Forward * 8.0f);
+		}
+		else if ( !IsFreecam && _lastView is { } view )
+		{
+			// Nobody left to follow (out of a battle royale with no other players): from where we were, not the map's
+			// default spot, which can be far off.
+			FreecamController.EyeAngles = view.Angles;
+			FreecamController.WorldPosition = view.Position;
 		}
 
 		FreecamController.Possess();

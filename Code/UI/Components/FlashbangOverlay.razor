@@ -10,21 +10,22 @@
 {
     [ConVar( "hc1_hide_flashbang_overlay" )]
     public static bool HideFlashbangOverlay { get; set; } = false;
-    
-    public TimeUntil EndTime { get; set; }
-    
+
+    /// <summary>
+    /// How much of the view the flash's white covers, 0 to 1. Set every frame by FlashbangEffect.
+    /// </summary>
+    public float Amount { get; set; }
+
     private Panel Overlay { get; set; }
 
     float GetOpacity()
     {
         if ( Networking.IsHost && Game.IsEditor && HideFlashbangOverlay )
             return 0f;
-        
-        var f = EndTime.Fraction;
-        if ( f < 0.5f )  return 1f;
-        return 1f - ((1f / 0.5f) * (f - 0.5f));
+
+        return Amount.Clamp( 0f, 1f );
     }
-    
+
     protected override void OnEnabled()
     {
         GetOrAddComponent<ScreenPanel>();
@@ -34,7 +35,7 @@
     protected override void OnUpdate()
     {
         base.OnUpdate();
-        
+
         if ( Overlay.IsValid() )
         {
             Overlay.Style.Opacity = GetOpacity();

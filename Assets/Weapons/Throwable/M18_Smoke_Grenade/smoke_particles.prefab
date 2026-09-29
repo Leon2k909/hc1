@@ -31,31 +31,29 @@
               "mode": "Mirrored"
             },
             {
-              "x": 0.038690478,
-              "y": 0.9893617,
+              "x": 0.12,
+              "y": 0.24,
               "in": 0,
               "out": 0,
               "mode": "Mirrored"
             },
             {
-              "x": 0.8333333,
-              "y": 0.8772552,
-              "in": 0.3405728,
-              "out": -0.3405728,
+              "x": 0.3,
+              "y": 0.6,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.65,
+              "y": 0.45,
+              "in": 0,
+              "out": 0,
               "mode": "Mirrored"
             },
             {
               "x": 1,
               "y": 0,
-              "in": 0,
-              "out": 0,
-              "mode": "Mirrored"
-            }
-          ],
-          "CurveB": [
-            {
-              "x": 0.5,
-              "y": 0.5,
               "in": 0,
               "out": 0,
               "mode": "Mirrored"
@@ -66,16 +64,16 @@
         "ApplyColor": true,
         "ApplyRotation": true,
         "ApplyShape": true,
-        "Bounce": 1,
+        "Bounce": 0.05,
         "Brightness": 1,
         "Bumpiness": 0,
-        "Collision": false,
-        "CollisionIgnore": null,
+        "Collision": true,
+        "CollisionIgnore": "grenade,player,trigger,particles",
         "CollisionPrefab": null,
         "CollisionPrefabAlign": false,
         "CollisionPrefabChance": 1,
         "CollisionPrefabRotation": 0,
-        "CollisionRadius": 1,
+        "CollisionRadius": 2,
         "ConstantMovement": {
           "X": 0,
           "Y": 0,
@@ -90,41 +88,37 @@
         "ForceDirection": "0,0,0",
         "ForceScale": 1,
         "ForceSpace": "World",
-        "Friction": 1,
+        "Friction": 0.6,
         "Gradient": {
           "Type": "Range",
           "Evaluation": "Particle",
-          "GradientA": {
-            "blend": "Linear",
-            "color": [
-              {
-                "t": 0.5,
-                "c": "1,1,1,1"
-              }
-            ],
-            "alpha": []
-          },
-          "GradientB": {
-            "blend": "Linear",
-            "color": [
-              {
-                "t": 0.5,
-                "c": "1,1,1,1"
-              }
-            ],
-            "alpha": []
-          },
-          "ConstantA": "0.33488,0.33488,0.33488,1",
-          "ConstantB": "0.13488,0.13488,0.13488,1"
+          "ConstantA": "0.97,0.97,0.97,1",
+          "ConstantB": "1,1,1,1"
         },
         "InitialVelocity": {
-          "X": 0,
-          "Y": 0,
-          "Z": 0
+          "X": {
+            "Type": "Range",
+            "Evaluation": "Seed",
+            "Constants": "-8,8,0,0"
+          },
+          "Y": {
+            "Type": "Range",
+            "Evaluation": "Seed",
+            "Constants": "-8,8,0,0"
+          },
+          "Z": {
+            "Type": "Range",
+            "Evaluation": "Seed",
+            "Constants": "20,32,0,0"
+          }
         },
-        "Lifetime": 20,
+        "Lifetime": {
+          "Type": "Range",
+          "Evaluation": "Seed",
+          "Constants": "10,13,0,0"
+        },
         "LocalSpace": 0,
-        "MaxParticles": 100,
+        "MaxParticles": 240,
         "OnComponentDestroy": null,
         "OnComponentDisabled": null,
         "OnComponentEnabled": null,
@@ -146,25 +140,66 @@
         "Roll": {
           "Type": "Range",
           "Evaluation": "Seed",
-          "Constants": "-30,30,0,0"
+          "Constants": "-5,5,0,0"
         },
         "Scale": {
-          "Type": "Range",
-          "Evaluation": "Seed",
-          "Constants": "150,200,0,0"
+          "Type": "Curve",
+          "Evaluation": "Life",
+          "CurveA": [
+            {
+              "x": 0,
+              "y": 5,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.15,
+              "y": 28,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.5,
+              "y": 90,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 145,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ]
         },
         "SequenceId": 0,
         "SequenceSpeed": 1,
         "SequenceTime": 1,
         "SheetSequence": false,
         "StartDelay": 0,
-        "StartVelocity": 1,
+        "StartVelocity": 0,
         "Stretch": 0,
         "TimeScale": 1,
         "Timing": "GameTime",
         "Tint": "1,1,1,1",
         "UsePrefabFeature": false,
-        "Yaw": 0
+        "Yaw": 0,
+        "InitialScale": {
+          "Type": "Range",
+          "Evaluation": "Seed",
+          "Constants": "0.85,1.15,0,0"
+        },
+        "InitialRoll": {
+          "Type": "Range",
+          "Evaluation": "Seed",
+          "Constants": "0,360,0,0"
+        },
+        "Space": "World",
+        "SequenceFitToLifetime": false
       },
       {
         "__type": "Sandbox.ParticleSpriteRenderer",
@@ -175,11 +210,11 @@
         "BlurAmount": 0.5,
         "BlurOpacity": 0.5,
         "BlurSpacing": 0.5,
-        "DepthFeather": 10,
+        "DepthFeather": 24,
         "FaceVelocity": false,
         "FogStrength": 1,
         "LeadingTrail": true,
-        "Lighting": false,
+        "Lighting": true,
         "MotionBlur": false,
         "OnComponentDestroy": null,
         "OnComponentDisabled": null,
@@ -199,17 +234,17 @@
         "Scale": 1,
         "Shadows": false,
         "SortMode": "ByDistance",
-        "Texture": "textures/particles/smoke/smoke_loop_a.vtex",
+        "Texture": "textures/particles/smoke/smoke1.vtex",
         "TextureFilter": "Bilinear"
       },
       {
         "__type": "Sandbox.ParticleSphereEmitter",
         "__guid": "2df42b3b-c8c2-4aeb-ade3-195039449a3f",
         "__enabled": true,
-        "Burst": 1,
+        "Burst": 0,
         "Delay": 0,
-        "DestroyOnEnd": true,
-        "Duration": 20,
+        "DestroyOnEnd": false,
+        "Duration": 70,
         "Loop": false,
         "OnComponentDestroy": null,
         "OnComponentDisabled": null,
@@ -218,10 +253,57 @@
         "OnComponentStart": null,
         "OnComponentUpdate": null,
         "OnEdge": false,
-        "Radius": 150,
-        "Rate": 100,
+        "Radius": 0.35,
+        "Rate": {
+          "Type": "Curve",
+          "Evaluation": "Life",
+          "CurveA": [
+            {
+              "x": 0,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.014285714,
+              "y": 3,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.057142857,
+              "y": 14,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.114285714,
+              "y": 24,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.928571429,
+              "y": 24,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ]
+        },
         "RateOverDistance": 0,
-        "Velocity": 50
+        "Velocity": 12
       },
       {
         "__type": "DestroyBetweenRounds",
@@ -239,9 +321,9 @@
         "__guid": "2e72d821-a891-4657-9441-e3a04c48a73c",
         "__enabled": true,
         "AutoStart": true,
-        "DestroyOnFinish": true,
+        "DestroyOnFinish": false,
         "Follow": true,
-        "LifeTime": 6,
+        "LifeTime": 70,
         "MixerName": "Game",
         "OnComponentDestroy": null,
         "OnComponentDisabled": null,
@@ -267,6 +349,27 @@
             "mode": "Mirrored"
           }
         ]
+      },
+      {
+        "__type": "Facepunch.SmokeSimulation",
+        "__guid": "6b9db51f-a283-4f27-9a95-8ec6636a3ecf",
+        "__enabled": true,
+        "ParticleEffect": {
+          "_type": "component",
+          "component_id": "71893983-3dc6-449a-8c0b-04d0731cc21b",
+          "go": "b8ecd362-c345-47ea-93ad-dc4fd7940528",
+          "component_type": "ParticleEffect"
+        },
+        "Turbulence": 12,
+        "Buoyancy": 18,
+        "AirResponse": 1.4
+      },
+      {
+        "__type": "Facepunch.DestroyAfter",
+        "__guid": "9cc85b7c-a7c3-482e-8156-4d564fdce690",
+        "__enabled": true,
+        "Time": 84,
+        "WaitForChildEffects": false
       }
     ],
     "Children": [],
@@ -295,6 +398,8 @@
   "MenuPath": null,
   "MenuIcon": null,
   "DontBreakAsTemplate": false,
-  "__references": [],
+  "__references": [
+    "facepunch.impactfleshmist#110498"
+  ],
   "__version": 2
 }

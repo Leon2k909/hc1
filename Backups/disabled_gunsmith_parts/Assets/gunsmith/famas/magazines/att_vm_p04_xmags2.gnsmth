@@ -1,0 +1,36 @@
+{
+  "Name": "60 Round Mag",
+  "Category": "Magazine",
+  "EligibleEquipment": [
+    "weapons/famas/famas.equip"
+  ],
+  "RequiredLevel": 0,
+  "Description": "High-capacity 60-round magazine. Reloads in 2.6s (2.9s when empty).",
+  "ModifyBodygroups": true,
+  "Bodygroups": {
+    "magazine": 2
+  },
+  "VerticalRecoilScale": 1.0,
+  "HorizontalRecoilScale": 1.0,
+  "MagazineCapacity": 60,
+  "ReloadTimeMultiplier": 1.0,
+  "ReloadAnimation": 2,
+  "ReloadTime": 2.6,
+  "EmptyReloadTime": 2.9,
+  "ReloadSounds": {
+    "0.033": "weapons/famas/sounds/famas.reload_01.sound",
+    "0.667": "weapons/famas/sounds/famas.reload_02.sound",
+    "1.167": "weapons/famas/sounds/famas.reload_03.sound",
+    "1.433": "weapons/famas/sounds/famas.reload_04.sound",
+    "1.767": "weapons/famas/sounds/famas.reload_05.sound"
+  },
+  "EmptyReloadSounds": {
+    "0.000": "weapons/famas/sounds/famas.reload_empty_xmag_01.sound",
+    "0.167": "weapons/famas/sounds/famas.reload_empty_xmag_03.sound",
+    "1.233": "weapons/famas/sounds/famas.reload_empty_xmag_04.sound",
+    "1.700": "weapons/famas/sounds/famas.reload_empty_xmag_05.sound",
+    "2.067": "weapons/famas/sounds/famas.reload_empty_xmag_06.sound"
+  },
+  "__references": [],
+  "__version": 0
+}

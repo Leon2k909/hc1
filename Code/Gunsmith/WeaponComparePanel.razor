@@ -1,0 +1,309 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using Facepunch;
+
+@namespace Facepunch.Gunsmith
+@inherits Panel
+
+<root class="compare-panel">
+    @* The gunsmith's WEAPON STATS: the real figures behind the bars (GunsmithStats), side by side with another weapon
+       or with this one from the factory. Better values are green, worse red. As the gunsmith's DETAILS (Live) it's
+       the build beside the factory gun, with no controls. *@
+    @if ( !Live )
+    {
+    <div class="wc-controls">
+        <div class="wc-toggle">
+            <div class="wc-toggle-opt @(Factory ? "" : "on")" onclick=@(() => SetFactory( false ))><label>@Tr( "YOUR BUILDS" )</label></div>
+            <div class="wc-toggle-opt @(Factory ? "on" : "")" onclick=@(() => SetFactory( true ))><label>@Tr( "FACTORY" )</label></div>
+        </div>
+        <label class="wc-controls-hint">@Tr( Factory ? "No attachments, no tuning" : "Attachments as saved for each weapon, with tuning" )</label>
+    </div>
+
+    <label class="wc-label">@Tr( "COMPARE WITH" )</label>
+    <div class="wc-chips">
+        <div class="wc-chip @(Other is null && !VsFactory ? "on" : "")" onclick=@(() => Pick( null ))><label>@Tr( "NONE" )</label></div>
+        @if ( !Factory )
+        {
+            <div class="wc-chip factory @(VsFactory ? "on" : "")" onclick=@PickFactory><label>@Tr( "FACTORY" )</label></div>
+        }
+        @foreach ( var weapon in Candidates )
+        {
+            <div class="wc-chip @(weapon == Other ? "on" : "")" onclick=@(() => Pick( weapon ))><label>@weapon.Name.ToUpperInvariant()</label></div>
+        }
+    </div>
+
+    @if ( VsFactory )
+    {
+        <label class="wc-factory-hint">@Tr( "The factory gun: no attachments, no tuning" )</label>
+    }
+    }
+
+    @if ( _mine.IsFirearm )
+    {
+        var theirs = (Live || VsFactory || Other is not null) && _theirs.IsFirearm ? _theirs : null;
+        <div class="wc-table">
+            <div class="wc-row wc-names">
+                <label class="wc-name"></label>
+                <label class="wc-val mine">@(Live ? Tr( "BUILD" ) : Weapon.Name.ToUpperInvariant())</label>
+                @if ( theirs is not null )
+                {
+                    <label class="wc-val theirs">@(Live || VsFactory ? Tr( "FACTORY" ) : Other.Name.ToUpperInvariant())</label>
+                }
+            </div>
+            @foreach ( var row in Rows( _mine, theirs ) )
+            {
+                @if ( row.Section is not null )
+                {
+                    <label class="wc-section">@Tr( row.Section )</label>
+                }
+                else
+                {
+                    var verdict = Verdict( row, true, theirs is not null );
+                    @* Live, the factory gun is only the yardstick: the build's figure and its row show the change. *@
+                    <div class="wc-row @(Live ? verdict : "")">
+                        <label class="wc-name">@(row.Raw ? row.Name : Tr( row.Name ))</label>
+                        <label class="wc-val mine @verdict">@row.Mine</label>
+                        @if ( theirs is not null )
+                        {
+                            <label class="wc-val theirs @Verdict( row, false, !Live )">@row.Theirs</label>
+                        }
+                    </div>
+                }
+            }
+        </div>
+        <label class="wc-note">@Tr( "HARDCORE HITS: THE HEAD OR NECK ALWAYS KILLS. A BODY HIT MAY KILL OUTRIGHT (THE CHANCE ABOVE), ELSE IT WOUNDS FOR 3× DAMAGE. A LIMB HIT DOES 1.7× DAMAGE, AT MOST HALF YOUR HEALTH. ALL WITHIN FULL DAMAGE RANGE." )</label>
+    }
+    else
+    {
+        <label class="wc-note">@Tr( "This equipment doesn't shoot, so it has no weapon stats." )</label>
+    }
+</root>
+
+@code
+{
+    /// <summary> The gunsmith's weapon, the left column. </summary>
+    public EquipmentResource Weapon { get; set; }
+
+    /// <summary> The weapon compared with it, the right column; null for none. </summary>
+    private EquipmentResource Other { get; set; }
+
+    /// <summary> Compare the factory guns instead of the saved builds. </summary>
+    private bool Factory { get; set; }
+
+    /// <summary> The right column is this weapon from the factory, so it shows what the build changes. </summary>
+    private bool VsFactory { get; set; }
+
+    /// <summary>
+    /// The gunsmith's DETAILS, beside its parts list: <see cref="Stats"/> against <see cref="FactoryStats"/>, which the
+    /// gunsmith works out as parts go on and off, with no controls.
+    /// </summary>
+    public bool Live { get; set; }
+
+    /// <summary> Live: the build's figures (GunsmithPanel's, so they change as soon as its bars do). </summary>
+    public GunsmithStats Stats { get; set; }
+
+    /// <summary> Live: the factory gun's. </summary>
+    public GunsmithStats FactoryStats { get; set; }
+
+    /// <summary> The last weapon compared with, so reopening the panel keeps it. </summary>
+    private static string _lastOtherPath;
+
+    private GunsmithStats _mine = new();
+    private GunsmithStats _theirs = new();
+    private EquipmentResource _statsFor;
+    private RealTimeSince _sinceStats;
+    private List<EquipmentResource> _candidates;
+
+    /// <summary> PlayerPawn's hit points, which the hardcore hits are counted against (HealthComponent.MaxHealth). </summary>
+    private const float Health = 100f;
+
+    private const float MetersPerUnit = 0.0254f;
+
+    /// <summary> A section's title, or a figure's row. <paramref name="Raw"/> names aren't translated (distances). </summary>
+    private record Row( string Section, string Name, string Mine, string Theirs, float MineValue, float TheirsValue, int Better, bool Raw = false );
+
+    /// <summary> Every gun that goes in a primary or secondary slot, the gunsmith's own list. </summary>
+    private List<EquipmentResource> Candidates => _candidates ??= ResourceLibrary.GetAll<EquipmentResource>()
+        .Where( x => (x.Slot is EquipmentSlot.Primary or EquipmentSlot.Secondary) && x.ViewModelPrefab.IsValid() && x.MainPrefab.IsValid()
+            && !GunsmithLoadoutManager.IsMergedWeaponResource( x ) && x.MainPrefab.GetComponentInChildren<Shootable>( true ).IsValid() )
+        .OrderBy( x => x.Slot ).ThenBy( x => x.Category ).ThenBy( x => x.Name )
+        .ToList();
+
+    public override void Tick()
+    {
+        base.Tick();
+        SetClass( "live", Live );
+
+        if ( Live )
+        {
+            _mine = Stats ?? new GunsmithStats();
+            _theirs = FactoryStats ?? new GunsmithStats();
+            return;
+        }
+
+        if ( _statsFor != Weapon )
+        {
+            _statsFor = Weapon;
+            VsFactory = false;
+            Other = PickDefault();
+            _sinceStats = 10f;
+        }
+
+        // The builds and tuning can change under the panel, so the figures are read again a few times a second.
+        if ( _sinceStats < 0.5f )
+            return;
+
+        _sinceStats = 0f;
+        _mine = Weapon is not null ? GunsmithStats.Compute( Weapon, !Factory ) : new GunsmithStats();
+        _theirs = VsFactory && Weapon is not null ? GunsmithStats.Compute( Weapon, false )
+            : Other is not null ? GunsmithStats.Compute( Other, !Factory ) : new GunsmithStats();
+    }
+
+    /// <summary> The weapon compared last, else another of the same kind (the RPK against the Kastovs), else none. </summary>
+    private EquipmentResource PickDefault()
+    {
+        var others = Candidates.Where( x => x != Weapon ).ToList();
+        return others.FirstOrDefault( x => string.Equals( x.ResourcePath, _lastOtherPath, StringComparison.OrdinalIgnoreCase ) )
+            ?? others.FirstOrDefault( x => x.Category == Weapon?.Category )
+            ?? others.FirstOrDefault( x => x.Slot == Weapon?.Slot );
+    }
+
+    private void Pick( EquipmentResource weapon )
+    {
+        VsFactory = false;
+        Other = weapon == Weapon ? null : weapon;
+        _lastOtherPath = Other?.ResourcePath;
+        _sinceStats = 10f;
+        StateHasChanged();
+    }
+
+    private void PickFactory()
+    {
+        VsFactory = true;
+        Other = null;
+        _sinceStats = 10f;
+        StateHasChanged();
+    }
+
+    private void SetFactory( bool factory )
+    {
+        Factory = factory;
+        // The factory gun beside itself would show nothing.
+        if ( factory )
+            VsFactory = false;
+        _sinceStats = 10f;
+        StateHasChanged();
+    }
+
+    private IEnumerable<Row> Rows( GunsmithStats a, GunsmithStats b )
+    {
+        yield return Section( "FIREPOWER" );
+        yield return Compare( "DAMAGE", a, b, s => s.BulletDamage * s.Pellets, DamageText, 1 );
+        yield return Compare( "FIRE RATE", a, b, s => s.Rpm, s => $"{s.Rpm:0} RPM", 1 );
+        yield return Compare( "DAMAGE PER SECOND", a, b, Dps, s => $"{Dps( s ):0}", 1 );
+        yield return Compare( "TIME TO EMPTY", a, b, EmptyTime, s => SecondsText( EmptyTime( s ) ), 0 );
+
+        yield return Section( "HARDCORE HITS" );
+        yield return Compare( "BODY KILL CHANCE", a, b, BodyKillChance, s => $"{BodyKillChance( s ) * 100f:0}%", 1 );
+        yield return Compare( "BODY HITS TO KILL", a, b, s => BodyHits( s ), s => HitsText( BodyHits( s ), s ), -1 );
+        yield return Compare( "BODY TIME TO KILL", a, b, s => KillTime( BodyHits( s ), s ), s => KillTimeText( BodyHits( s ), s ), -1 );
+        yield return Compare( "LIMB HITS TO KILL", a, b, s => LimbHits( s ), s => HitsText( LimbHits( s ), s ), -1 );
+        yield return Compare( "LIMB TIME TO KILL", a, b, s => KillTime( LimbHits( s ), s ), s => KillTimeText( LimbHits( s ), s ), -1 );
+
+        yield return Section( "DAMAGE BY RANGE" );
+        yield return AtRange( 10, a, b, s => s.RangeDamage.At10 );
+        yield return AtRange( 25, a, b, s => s.RangeDamage.At25 );
+        yield return AtRange( 50, a, b, s => s.RangeDamage.At50 );
+        yield return AtRange( 100, a, b, s => s.RangeDamage.At100 );
+        yield return AtRange( 200, a, b, s => s.RangeDamage.At200 );
+
+        yield return Section( "RANGE" );
+        yield return Compare( "FULL DAMAGE RANGE", a, b, s => s.FullDamageRange ?? 100000f, s => s.FullDamageRange is { } m ? $"{m:0} M" : Tr( "NO FALLOFF" ), 1 );
+        yield return Compare( "MUZZLE VELOCITY", a, b, s => s.MuzzleVelocity, s => s.MuzzleVelocity > 0f ? $"{s.MuzzleVelocity:0} M/S" : "-", 1 );
+
+        yield return Section( "HANDLING" );
+        yield return Compare( "AIM DOWN SIGHTS", a, b, s => s.AimTime, s => $"{s.AimTime * 1000f:0} MS", -1 );
+        yield return Compare( "RELOAD", a, b, s => s.ReloadTime, s => ReloadText( s.ReloadTime, s ), -1 );
+        yield return Compare( "EMPTY RELOAD", a, b, s => s.EmptyReloadTime, s => ReloadText( s.EmptyReloadTime, s ), -1 );
+        yield return Compare( "RECOIL CONTROL", a, b, s => s.Control, s => s.ControlText, 1 );
+        yield return Compare( "VERTICAL RECOIL", a, b, s => s.VerticalRecoil, s => $"{s.VerticalRecoil * 100f:0}", -1 );
+        yield return Compare( "HORIZONTAL RECOIL", a, b, s => s.HorizontalRecoil, s => $"{s.HorizontalRecoil * 100f:0}", -1 );
+
+        yield return Section( "MOBILITY" );
+        yield return Compare( "WALK SPEED", a, b, s => s.WalkSpeedUnits, s => SpeedText( s.WalkSpeedUnits ), 1 );
+        yield return Compare( "SPRINT SPEED", a, b, s => s.SprintSpeedUnits, s => SpeedText( s.SprintSpeedUnits ), 1 );
+        yield return Compare( "CROUCH SPEED", a, b, s => s.CrouchSpeedUnits, s => SpeedText( s.CrouchSpeedUnits ), 1 );
+        yield return Compare( "PRONE SPEED", a, b, s => s.ProneSpeedUnits, s => SpeedText( s.ProneSpeedUnits ), 1 );
+
+        yield return Section( "AMMO" );
+        yield return Compare( "MAGAZINE", a, b, s => s.Rounds, s => $"{s.Rounds}", 1 );
+        yield return Compare( "SPARE ROUNDS", a, b, s => s.Reserve, s => $"{s.Reserve}", 1 );
+        yield return Compare( "FIRE MODE", a, b, s => 0f, s => s.FireModeShown, 0 );
+    }
+
+    private static Row Section( string title ) => new( title, null, null, null, 0f, 0f, 0 );
+
+    /// <summary> One shot's damage where it hits at <paramref name="meters"/>: each pellet's, times the pellets. </summary>
+    private static Row AtRange( int meters, GunsmithStats a, GunsmithStats b, Func<GunsmithStats, float> bullet )
+    {
+        string Text( GunsmithStats s ) => bullet( s ) <= 0f ? "-" : s.Pellets > 1 ? $"{bullet( s ):0.#} ×{s.Pellets}" : $"{bullet( s ):0.#}";
+        return new( null, $"{meters} M", Text( a ), b is null ? null : Text( b ), bullet( a ) * a.Pellets, b is null ? 0f : bullet( b ) * b.Pellets, 1, true );
+    }
+
+    /// <summary> A row: each weapon's value and text, and whether more (1) or less (-1) is better (0: neither). </summary>
+    private static Row Compare( string name, GunsmithStats a, GunsmithStats b, Func<GunsmithStats, float> value, Func<GunsmithStats, string> text, int better ) =>
+        new( null, name, text( a ), b is null ? null : text( b ), value( a ), b is null ? 0f : value( b ), better );
+
+    /// <summary> "better" or "worse" for one side of a row, when it's compared and the two differ. </summary>
+    private static string Verdict( Row row, bool mine, bool compared )
+    {
+        if ( !compared || row.Better == 0 )
+            return "";
+
+        var (own, other) = mine ? (row.MineValue, row.TheirsValue) : (row.TheirsValue, row.MineValue);
+        if ( MathF.Abs( own - other ) <= MathF.Max( MathF.Abs( own ), MathF.Abs( other ) ) * 0.005f )
+            return "";
+
+        return (own > other) == (row.Better > 0) ? "better" : "worse";
+    }
+
+    private static string DamageText( GunsmithStats s ) => s.Pellets > 1 ? $"{s.BulletDamage:0.#} ×{s.Pellets}" : $"{s.BulletDamage:0.#}";
+
+    private static float Dps( GunsmithStats s ) => s.BulletDamage * s.Pellets * s.Rpm / 60f;
+
+    /// <summary> From the first round to the last of a full magazine, at the full fire rate. </summary>
+    private static float EmptyTime( GunsmithStats s ) => s.Rpm <= 0f ? 0f : (s.Rounds - 1) * 60f / s.Rpm;
+
+    /// <summary> From the first hit to the killing one, at the full fire rate, if every shot hits. </summary>
+    private static float KillTime( int shots, GunsmithStats s ) => shots <= 0 || s.Rpm <= 0f ? 0f : (shots - 1) * 60f / s.Rpm;
+
+    private static string KillTimeText( int shots, GunsmithStats s ) => shots <= 0 || s.Rpm <= 0f ? "-" : $"{KillTime( shots, s ) * 1000f:0} MS";
+
+    private static string SecondsText( float seconds ) => seconds <= 0f ? "-" : $"{seconds:0.00} S";
+
+    /// <summary>
+    /// HealthComponent.HardcoreBullet: each bullet (or pellet) in the chest kills outright with a chance of its damage over
+    /// 40, at most 95%. For a shotgun, the chance that any of a full blast's pellets does.
+    /// </summary>
+    private static float BodyKillChance( GunsmithStats s )
+    {
+        var chance = MathF.Min( s.BulletDamage / HealthComponent.BodyKillDamage, HealthComponent.MaxBodyKillChance );
+        return 1f - MathF.Pow( 1f - chance, s.Pellets );
+    }
+
+    /// <summary> Shots to kill with body hits that don't kill outright: each wounds for 3× its damage. </summary>
+    private static int BodyHits( GunsmithStats s ) => ShotsFor( s.BulletDamage * HealthComponent.BodyWoundScale * s.Pellets );
+
+    /// <summary> Shots to kill with arm and leg hits: 1.7× the damage, each bullet at most half the health. </summary>
+    private static int LimbHits( GunsmithStats s ) => ShotsFor( MathF.Min( s.BulletDamage * HealthComponent.LimbWoundScale, Health * 0.5f ) * s.Pellets );
+
+    private static int ShotsFor( float damagePerShot ) => damagePerShot <= 0f ? 0 : (int)MathF.Ceiling( Health / damagePerShot - 0.0001f );
+
+    private static string HitsText( int shots, GunsmithStats s ) => shots <= 0 ? "-" : s.Pellets > 1 ? Tr( shots == 1 ? "{0} BLAST" : "{0} BLASTS", shots ) : $"{shots}";
+
+    private static string ReloadText( float seconds, GunsmithStats s ) => seconds <= 0f ? "-" : s.SingleReload ? Tr( "{0:0.0#} S / ROUND", seconds ) : $"{seconds:0.0#} S";
+
+    private static string SpeedText( float unitsPerSecond ) => $"{unitsPerSecond * MetersPerUnit:0.00} M/S";
+
+    protected override int BuildHash() => HashCode.Combine( Weapon, Other, Factory, VsFactory, Live, _mine, _theirs );
+}

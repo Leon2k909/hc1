@@ -240,12 +240,15 @@ public sealed class CameraController : PawnCameraController, IGameEventHandler<D
 		}
 
 		ApplyRecoil();
+		ApplyWoundSway();
+		ApplyFlashSway();
 		ApplyScope();
 
 		Boom.LocalPosition = Vector3.Zero.WithZ( eyeHeight );
 
 		ApplyCameraEffects();
 		ScreenShaker?.Apply( Camera );
+		ApplyFlashRoll();
 		UpdateMouseVisibility();
 
 		TargetFieldOfView = TargetFieldOfView.LerpTo( baseFov + FieldOfViewOffset, Time.Delta * 5f );
@@ -328,6 +331,63 @@ public sealed class CameraController : PawnCameraController, IGameEventHandler<D
 
 		if ( Player.CurrentEquipment.GetComponentInChildren<ShootRecoil>() is { } fn )
 			Player.EyeAngles += fn.Current;
+	}
+
+	/// <summary>How far the aim wanders per arm wound (up to two count), in degrees, standing.</summary>
+	private const float WoundSwayDegrees = 0.35f;
+	private Angles _woundSway;
+
+	/// <summary>
+	/// Hardcore: a shot arm or hand can't hold the gun still (<see cref="HealthComponent.ArmWounds"/>). The aim wanders
+	/// slowly around where you point it, with a slight tremor, less when braced crouching or prone, and you have to keep
+	/// correcting it. The shots go where the sights are.
+	/// </summary>
+	void ApplyWoundSway()
+	{
+		var health = Player.HealthComponent;
+		var wounds = Player.IsLocallyControlled && health.State == LifeState.Alive ? Math.Min( health.ArmWounds, 2 ) : 0;
+		var amplitude = WoundSwayDegrees * wounds * (Player.IsProne ? 0.4f : Player.IsCrouching ? 0.7f : 1f);
+
+		// Sines that never line up, so the drift doesn't visibly repeat.
+		var t = Time.Now;
+		var sway = new Angles(
+			MathF.Sin( t * 1.1f ) * 0.55f + MathF.Sin( t * 2.3f + 1.7f ) * 0.35f + MathF.Sin( t * 6.7f + 0.3f ) * 0.1f,
+			MathF.Sin( t * 0.9f + 0.6f ) * 0.55f + MathF.Sin( t * 1.9f + 2.9f ) * 0.35f + MathF.Sin( t * 7.9f ) * 0.1f,
+			0f ) * amplitude;
+
+		Player.EyeAngles += sway - _woundSway;
+		_woundSway = sway;
+	}
+
+	private Angles _flashSway;
+
+	/// <summary>
+	/// A flashbang's blast upsets the balance, so the aim wanders while it wears off (<see cref="FlashbangEffect"/>):
+	/// quicker and shakier than a wounded arm's drift, and gone in a few seconds.
+	/// </summary>
+	void ApplyFlashSway()
+	{
+		var amplitude = Player.IsLocallyControlled ? FlashbangEffect.SwayDegrees( Player ) : 0f;
+
+		var t = Time.Now;
+		var sway = new Angles(
+			MathF.Sin( t * 2.1f ) * 0.5f + MathF.Sin( t * 3.7f + 1.1f ) * 0.35f + MathF.Sin( t * 8.3f + 0.4f ) * 0.15f,
+			MathF.Sin( t * 1.7f + 0.8f ) * 0.5f + MathF.Sin( t * 3.1f + 2.3f ) * 0.35f + MathF.Sin( t * 7.3f ) * 0.15f,
+			0f ) * amplitude;
+
+		Player.EyeAngles += sway - _flashSway;
+		_flashSway = sway;
+	}
+
+	/// <summary>
+	/// A flashbang's blast upsets the inner ear, so the room seems to tilt to and fro while it wears off
+	/// (<see cref="FlashbangEffect.RollDegrees"/>). Only the camera rolls, about where it looks, so the aim stays put.
+	/// </summary>
+	void ApplyFlashRoll()
+	{
+		var roll = FlashbangEffect.RollDegrees( Player );
+		if ( roll != 0f )
+			Camera.LocalRotation *= Rotation.FromRoll( roll );
 	}
 
 	void OnModeChanged()

@@ -25,7 +25,11 @@ public abstract class WeaponInputAction : EquipmentComponent,
 
 	bool RunningWhileDeployed { get; set; }
 
-	void IGameEventHandler<EquipmentDeployedEvent>.OnGameEvent( EquipmentDeployedEvent eventArgs )
+	// The body is a named method: hotload can't re-link static lambdas inside explicit generic interface methods
+	// ("Unable to find matching substitution for a static method"), so they'd throw after every hotload.
+	void IGameEventHandler<EquipmentDeployedEvent>.OnGameEvent( EquipmentDeployedEvent eventArgs ) => OnWeaponDeployed( eventArgs );
+
+	void OnWeaponDeployed( EquipmentDeployedEvent eventArgs )
 	{
 		if ( Equipment?.Owner?.IsLocallyControlled ?? false )
 		{
@@ -93,8 +97,8 @@ public abstract class WeaponInputAction : EquipmentComponent,
 
 		bool matched = false;
 
-		// Clicking a class in the class menu isn't weapon input.
-		var menuOpen = UI.ClassSelect.IsAnyOpen;
+		// Clicking a class in the class menu, or anything at the Zombies workbench, isn't weapon input.
+		var menuOpen = UI.ClassSelect.IsAnyOpen || UI.ZombiesWorkbenchPanel.IsAnyOpen;
 
 		foreach ( var action in InputActions )
 		{

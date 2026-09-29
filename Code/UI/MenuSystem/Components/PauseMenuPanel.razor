@@ -59,7 +59,8 @@
         if ( Input.EscapePressed )
         {
             Input.EscapePressed = false;
-            SetOpen( !IsOpen );
+            if ( !LanguageMenu.CloseAny() && !GunsmithPanel.HandleEscapeAny() )
+                SetOpen( !IsOpen );
         }
     }
 

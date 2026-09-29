@@ -1,0 +1,28 @@
+{
+  "Name": "Recon Drone",
+  "Description": "Hand-launch a camera drone that climbs and circles above the launch area. Spots visible nearby enemies for 30 seconds.",
+  "Slot": "Tactical",
+  "Category": "None",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": true,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/recon_drone.svg",
+  "IsPurchasable": true,
+  "Price": 500,
+  "KillReward": 0,
+  "WorldModel": "models/recon_drone/recon_drone_handheld.vmdl",
+  "__version": 0,
+  "__references": [],
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/recon_drone/weapon_recon_drone.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/recon_drone/vm_recon_drone.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/recon_drone/wm_recon_drone.prefab"
+  }
+}

@@ -11,7 +11,7 @@
     @if ( Player.IsValid() && !Player.InPlayArea && Player.HealthComponent.State == LifeState.Alive )
     {
         <div class="warning">
-            <label class="important">Return to the AO</label>
+            <label class="important">@Tr( "Return to the AO" )</label>
             <label class="important">@Elapsed</label>
         </div>
     }
@@ -23,7 +23,8 @@
     public Panel Overlay { get; set; }
     public PlayerPawn Player => Client.Viewer.Pawn as PlayerPawn;
 
-    public string Elapsed => TimeSpan.FromSeconds( Player.TimeUntilPlayAreaKill ).ToString( @"ss\:fff" );
+    // Seconds left, as "3.3": "ss:fff" read like minutes and seconds ("03:345").
+    public string Elapsed => MathF.Max( 0f, (float)Player.TimeUntilPlayAreaKill ).ToString( "0.0" );
 
     float GetOpacity()
     {

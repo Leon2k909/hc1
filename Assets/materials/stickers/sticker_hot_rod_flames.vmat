@@ -1,0 +1,16 @@
+// Tools/weapon_stickers.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_ALPHA_TEST "1"
+    F_SPECULAR "1"
+    g_flAlphaTestReference "0.5"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.00"
+    TextureColor "materials/stickers/sticker_hot_rod_flames.png"
+    TextureTranslucency "materials/stickers/sticker_hot_rod_flames_mask.png"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureRoughness "materials/default/default_rough_s1import.tga"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1.0 1.0 1.0 1.0]"
+}

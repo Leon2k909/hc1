@@ -1,0 +1,33 @@
+{
+  "Name": "FN FAL",
+  "Description": "Belgian 7.62x51mm battle rifle: heavy and hard-kicking, with a 21-inch barrel and a 20-round magazine.",
+  "Slot": "Primary",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": true,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/guns/fal_01.png",
+  "IsPurchasable": true,
+  "Price": 2800,
+  "KillReward": 300,
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/fal/weapon_fal.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/fal/wm_fal.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/fal/vm_fal.prefab"
+  },
+  "WorldModel": "weapons/fal/w_fal.vmdl",
+  "ArmorReduction": null,
+  "HelmetReduction": null,
+  "WorldModelBodyGroups": 0,
+  "__references": [],
+  "__version": 0,
+  "Category": "AssaultRifle",
+  "GunsmithOffset": "0,0,4",
+  "ReviewNote": "Not checked in a match yet: the iron sights and the optics' aim (derived: tune with dev_optic_correction), recoil, reload timing and sounds (the 30-round magazine's too), the look sway and sprint, the left hand in first and third person, and the 18-inch barrel's muzzle flash and devices."
+}

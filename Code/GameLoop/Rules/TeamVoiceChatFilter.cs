@@ -5,6 +5,23 @@ namespace Facepunch;
 /// </summary>
 public partial class TeamVoiceChatFilter : Component, IVoiceFilter
 {
+	/// <summary>
+	/// The local player's Voice Chat Mode, with Auto settled: Team Only in Defuse and Retakes, else Global. The HUD's
+	/// voice list (<see cref="Facepunch.UI.Voices"/>) shows it on your own row, so change them together.
+	/// </summary>
+	public static VoiceChatMode ActiveMode
+	{
+		get
+		{
+			var mode = GameSettingsSystem.Current.VoiceChatMode;
+			if ( mode != VoiceChatMode.Auto )
+				return mode;
+
+			var ident = GameMode.Instance?.Ident;
+			return ident == "defuse" || ident == "retakes" ? VoiceChatMode.TeamOnly : VoiceChatMode.Global;
+		}
+	}
+
 	private bool DontSendFilter( Client player )
 	{
 		// Send voices to spectators
@@ -29,20 +46,7 @@ public partial class TeamVoiceChatFilter : Component, IVoiceFilter
 		}
 
 		// Don't send to enemies if Team Only Voice is enabled
-		var mode = GameSettingsSystem.Current.VoiceChatMode;
-
-		if ( mode == VoiceChatMode.Auto )
-		{
-			var ident = GameMode.Instance?.Ident;
-			if ( ident == "defuse" || ident == "retakes" )
-			{
-				mode = VoiceChatMode.TeamOnly;
-			}
-			else
-			{
-				mode = VoiceChatMode.Global;
-			}
-		}
+		var mode = ActiveMode;
 
 		if ( mode == VoiceChatMode.PartyOnly )
 		{

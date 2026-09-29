@@ -12,7 +12,8 @@ import json
 import uuid
 from pathlib import Path
 
-from audit_mw19_mp5 import active_choices, attachment_source
+import part_names
+from audit_mw19_mp5 import active_choices
 
 
 ASSETS = Path(__file__).resolve().parents[1] / "Assets"
@@ -46,8 +47,8 @@ def import_choice(key: str, category: str) -> bool:
 
     old = M4_RESOURCES / (key + ".gnsmth")
     old_data = json.loads(old.read_text(encoding="utf-8")) if old.is_file() else {}
-    _, workshop_name, _ = attachment_source(key)
-    name = old_data.get("Name") or workshop_name or key.replace("att_vm_", "").replace("_", " ").title()
+    # Our name (part_names.py), never the workshop's CoD one.
+    name = part_names.name(key) or old_data.get("Name") or key.replace("att_vm_", "").replace("_", " ").title()
     position = "0.7,0,9.7" if category == "Optic" else "12,0,8.13"
     mount_type = "Facepunch.Gunsmith.GunsmithBoneAttachment"
     mount = {
@@ -94,7 +95,7 @@ def import_choice(key: str, category: str) -> bool:
         "MainPrefab": {"_type": "gameobject", "prefab": f"attachments/mpapa5/prefabs/{key}.prefab"},
         "EligibleEquipment": [EQUIPMENT],
         "RequiredLevel": 0,
-        "Description": f"MW2019 {category.lower()} fitted for the existing MP5.",
+        "Description": "",
         "__references": [],
         "__version": 0,
     }

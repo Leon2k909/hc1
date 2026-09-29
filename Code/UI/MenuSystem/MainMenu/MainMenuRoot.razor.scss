@@ -1,5 +1,9 @@
 @import "/UI/Styles/Theme.scss";
 
+$accent: #FF7A1A;
+$nav-height: 76px;
+$ease-out: cubic-bezier( 0.23, 1, 0.32, 1 );
+
 /* ================================================================
    Global shell — root + persistent nav bar
    ================================================================ */
@@ -14,52 +18,39 @@
 /* ── Global nav bar ─────────────────────────────────────────── */
 
 .global-nav {
-    min-height: 56px;
+    min-height: $nav-height;
     flex-shrink: 0;
     display: flex;
     flex-direction: row;
     align-items: center;
-    padding: 0 20px 0 16px;
-    background-color: rgba( 0, 0, 0, 0.75 );
-    border-bottom: 1px solid rgba( 255, 255, 255, 0.07 );
+    padding: 0 22px 0 20px;
+    background-image: linear-gradient( to bottom, rgba( 8, 8, 10, 0.97 ), rgba( 13, 13, 15, 0.9 ) );
+    border-bottom: 1px solid rgba( 255, 255, 255, 0.08 );
+    box-shadow: 0 8px 28px rgba( 0, 0, 0, 0.6 );
     z-index: 200;
 }
 
-/* Logo */
+/* Logo: the wordmark on its own */
 .gnav-logo {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 12px;
-    width: 200px;
     flex-shrink: 0;
+    margin-right: 24px;
     cursor: pointer;
-    opacity: 0.9;
-
-    img { width: 58px; height: 32px; }
+    opacity: 0.92;
+    transition: opacity 0.15s ease;
 
     &:hover { opacity: 1; }
 }
 
-.gnav-logo-text {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-}
-
 .gnav-game-name {
-    font-size: 21px;
-    font-weight: 900;
-    color: white;
-    letter-spacing: 4px;
     font-family: $main-font;
-}
-
-.gnav-game-sub {
-    font-size: 12px;
-    font-weight: 700;
-    color: #FF7A1A;
-    letter-spacing: 4px;
+    font-size: 26px;
+    font-weight: 500;
+    letter-spacing: 9px;
+    color: #F0F0F0;
+    text-shadow: 0 2px 12px rgba( 0, 0, 0, 0.7 );
 }
 
 /* Centre tabs */
@@ -68,37 +59,76 @@
     flex-direction: row;
     flex-grow: 1;
     justify-content: center;
-    gap: 4px;
     min-width: 0;
     flex-wrap: wrap;
 }
 
+/* Full-height tab buttons */
 .gnav-item {
+    position: relative;
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    color: rgba( 255, 255, 255, 0.6 );
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: 2px;
-    cursor: pointer;
-    font-family: $main-font;
-    border-bottom: 2px solid transparent;
     flex-shrink: 0;
+    gap: 8px;
+    height: $nav-height;
+    padding: 0 12px;
+    color: rgba( 255, 255, 255, 0.55 );
+    border-left: 1px solid transparent;
+    border-right: 1px solid transparent;
+    cursor: pointer;
     white-space: nowrap;
+    transition: color 0.15s ease, background-color 0.15s ease;
 
-    i { font-size: 19px; }
+    i {
+        font-size: 21px;
+        color: rgba( 255, 255, 255, 0.4 );
+        text-shadow: none;
+        transition: color 0.15s ease;
+    }
+
+    label {
+        font-size: 17px;
+        font-weight: 600;
+        letter-spacing: 1.2px;
+        text-shadow: none;
+    }
 
     &:hover {
-        color: rgba( 255, 255, 255, 0.9 );
+        color: rgba( 255, 255, 255, 0.92 );
+        background-color: rgba( 255, 255, 255, 0.03 );
+
+        i { color: rgba( 255, 255, 255, 0.75 ); }
+        .gnav-item-bar { opacity: 0.35; transform: scaleX( 0.6 ); }
     }
 
-    &.active {
+    /* A tab that takes you somewhere clicks as it's pressed (Tools/ui_sounds.py, as the gunsmith's header does); the tab you're on doesn't */
+    &:not( .active ):active { sound-in: ui_nav_tab; }
+
+    /* The tab you're on lights up like a button: a warm wash rising to a glowing bar along the bottom */
+    &.active, &.selected {
         color: white;
-        border-bottom-color: #FF7A1A;
+        background-image: linear-gradient( to bottom, rgba( 255, 122, 26, 0 ) 0%, rgba( 255, 122, 26, 0.07 ) 55%, rgba( 255, 122, 26, 0.2 ) 100% );
+        border-left-color: rgba( 255, 122, 26, 0.16 );
+        border-right-color: rgba( 255, 122, 26, 0.16 );
+
+        i { color: $accent; }
+        .gnav-item-bar { opacity: 1; transform: scaleX( 1 ); }
     }
+}
+
+.gnav-item-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    background-color: $accent;
+    box-shadow: 0 0 14px rgba( 255, 122, 26, 0.9 );
+    opacity: 0;
+    transform: scaleX( 0.3 );
+    transition: opacity 0.2s $ease-out, transform 0.2s $ease-out;
+    pointer-events: none;
 }
 
 /* Nav tabs + bumper wrapper — keeps LB/RB snug against the tabs */
@@ -158,26 +188,183 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 6px;
-    width: 320px;
+    gap: 16px;
     flex-shrink: 0;
     justify-content: flex-end;
+    margin-left: 10px;
+}
+
+/* Round outlined buttons: quick menu, notifications, settings */
+.gnav-round-btns {
+    position: relative;
+    flex-direction: row;
+    gap: 9px;
+}
+
+.gnav-round-btn {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1.5px solid rgba( 255, 255, 255, 0.3 );
+    background-color: rgba( 255, 255, 255, 0.02 );
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.1s ease-out;
+
+    i {
+        font-size: 20px;
+        color: rgba( 255, 255, 255, 0.85 );
+        text-shadow: none;
+    }
+
+    &:hover {
+        border-color: rgba( 255, 255, 255, 0.65 );
+        background-color: rgba( 255, 255, 255, 0.08 );
+
+        i { color: white; }
+    }
+
+    &:active { transform: scale( 0.93 ); }
+
+    &.open {
+        border-color: $accent;
+        background-color: rgba( 255, 122, 26, 0.14 );
+
+        i { color: $accent; }
+    }
+}
+
+/* Menus that drop from the round buttons */
+.gnav-dropdown {
+    position: absolute;
+    top: 64px;
+    left: 0;
+    width: 260px;
+    flex-direction: column;
+    padding: 6px;
+    background-color: rgba( 12, 12, 15, 0.98 );
+    border: 1px solid rgba( 255, 255, 255, 0.08 );
+    border-top: 2px solid $accent;
+    border-radius: 3px;
+    box-shadow: 0 20px 50px rgba( 0, 0, 0, 0.75 );
+    z-index: 300;
+    transform-origin: 0% 0%;
+    transition: opacity 0.16s $ease-out, transform 0.16s $ease-out;
+
+    &:intro {
+        opacity: 0;
+        transform: translateY( -6px ) scale( 0.97 );
+    }
+
+    &.notifications {
+        width: 300px;
+        padding: 14px 16px;
+    }
+}
+
+.gnav-menu-item {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 12px;
+    border-radius: 2px;
+    color: rgba( 255, 255, 255, 0.8 );
+    cursor: pointer;
+    transition: background-color 0.12s ease, color 0.12s ease;
+
+    i {
+        font-size: 20px;
+        color: rgba( 255, 255, 255, 0.5 );
+        text-shadow: none;
+    }
+
+    label {
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        text-shadow: none;
+    }
+
+    &:hover {
+        color: white;
+        background-color: rgba( 255, 255, 255, 0.06 );
+
+        i { color: $accent; }
+    }
+
+    &.warn:hover {
+        color: #FF6B5E;
+        background-color: rgba( 255, 70, 50, 0.1 );
+
+        i { color: #FF6B5E; }
+    }
+}
+
+.gnav-menu-divider {
+    height: 1px;
+    margin: 4px 8px;
+    background-color: rgba( 255, 255, 255, 0.08 );
+}
+
+.gnav-dropdown-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: $accent;
+    text-shadow: none;
+    margin-bottom: 4px;
+}
+
+.gnav-notifications-empty {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 22px 0 14px 0;
+
+    i {
+        font-size: 30px;
+        color: rgba( 255, 255, 255, 0.25 );
+        text-shadow: none;
+    }
+
+    label {
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        color: rgba( 255, 255, 255, 0.5 );
+        text-shadow: none;
+    }
+}
+
+/* Catches a click anywhere else while a menu is open (above the page, under the nav) */
+.gnav-dismiss {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 150;
 }
 
 .gnav-icon-btn {
+    position: relative;
     width: 40px;
     height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba( 255, 255, 255, 0.5 );
+    color: rgba( 255, 255, 255, 0.6 );
     background-color: transparent;
     border: 0;
     border-radius: 50%;
     cursor: pointer;
     flex-shrink: 0;
+    transition: color 0.15s ease, background-color 0.15s ease;
 
-    i { font-size: 24px; }
+    i { font-size: 26px; text-shadow: none; }
 
     &:hover {
         color: white;
@@ -186,57 +373,73 @@
 }
 
 .gnav-profile {
+    position: relative;
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 10px;
-    padding: 4px 8px;
+    gap: 12px;
+    padding: 4px 6px 4px 8px;
     cursor: pointer;
     border: 1px solid transparent;
+    border-radius: 2px;
     min-width: 0;
     flex-shrink: 1;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
 
-    &:hover { border-color: rgba( 255, 255, 255, 0.12 ); }
+    &:hover {
+        border-color: rgba( 255, 255, 255, 0.12 );
+        background-color: rgba( 255, 255, 255, 0.03 );
+    }
+}
+
+.gnav-prestige {
+    width: 46px;
+    height: 46px;
+    object-fit: contain;
+    filter: drop-shadow( 0 2px 4px rgba( 0, 0, 0, 0.8 ) );
+    flex-shrink: 0;
 }
 
 .gnav-profile-info {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    gap: 2px;
+    align-items: flex-start;
+    gap: 1px;
     min-width: 0;
 }
 
 .gnav-profile-name {
-    font-size: 16px;
-    font-weight: 800;
+    font-size: 17px;
+    font-weight: 700;
     color: white;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
     font-family: $main-font;
-    max-width: 140px;
+    max-width: 150px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-shadow: none;
 }
 
 .gnav-profile-level {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
-    color: #FF7A1A;
+    color: $accent;
     letter-spacing: 2px;
+    text-shadow: none;
 }
 
+/* Square, like the Steam avatar itself: the old 40x48 portrait card cropped its sides off */
 .gnav-avatar {
-    width: 44px;
-    height: 44px;
+    width: 46px;
+    height: 46px;
     border-radius: 2px;
+    border: 1px solid rgba( 255, 255, 255, 0.18 );
     object-fit: cover;
     flex-shrink: 0;
 }
 
 .gnav-avatar-placeholder {
-    width: 44px;
-    height: 44px;
     background-color: rgba( 255, 255, 255, 0.1 );
     display: flex;
     align-items: center;
@@ -244,6 +447,79 @@
 
     i { font-size: 26px; color: rgba(255,255,255,0.5); }
 }
+
+/* The party sits beside the round buttons, so its circles match them */
+.main-menu-root PartyPanel {
+    height: 40px;
+    margin: 0 0 0 12px;
+
+    .party-bar { height: 40px; gap: 8px; padding: 0; }
+
+    .party-avatar-slot,
+    .party-invite-slot {
+        width: 40px;
+        height: 40px;
+        border: 1.5px solid rgba( 255, 255, 255, 0.3 );
+        background-color: rgba( 255, 255, 255, 0.02 );
+
+        &:hover {
+            border-color: rgba( 255, 255, 255, 0.65 );
+            background-color: rgba( 255, 255, 255, 0.08 );
+        }
+    }
+
+    .party-self { border-color: rgba( 255, 122, 26, 0.7 ); }
+    .party-avatar { width: 36px; height: 36px; }
+
+    .party-invite-popup,
+    .party-toast { top: 58px; }
+
+    /* The leave badge sits on the bar's top corner, so its label drops below the circles like the others */
+    .party-leave-btn .gnav-tip { top: 52px; margin-top: 0; }
+}
+
+/* Hover labels under the header's icon buttons (the party bar's too), after a short hover */
+.gnav-tip {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-top: 10px;
+    transform: translateX( -50% );
+    padding: 6px 10px 5px 10px;
+    background-color: rgba( 12, 12, 15, 0.97 );
+    border: 1px solid rgba( 255, 255, 255, 0.1 );
+    border-top: 2px solid $accent;
+    border-radius: 2px;
+    box-shadow: 0 8px 20px rgba( 0, 0, 0, 0.6 );
+    font-family: $main-font;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: white;
+    white-space: nowrap;
+    text-shadow: none;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 400;
+    transition: opacity 0.1s ease;
+
+    /* The rightmost button's label lines up with its right edge so it stays on screen */
+    &.right { left: auto; right: 0; transform: none; }
+}
+
+.gnav-round-btn:hover .gnav-tip,
+.gnav-icon-btn:hover .gnav-tip,
+.gnav-profile:hover .gnav-tip,
+.party-avatar-slot:hover .gnav-tip,
+.party-invite-slot:hover .gnav-tip,
+.party-leave-btn:hover .gnav-tip {
+    opacity: 1;
+    transition: opacity 0.12s ease 0.3s;
+}
+
+/* An open menu is already below its button. Hidden by opacity, not display: none: a label brought back from
+   display: none could be drawn with no layout, its text alone at the top of the button with no box. */
+.gnav-round-btns .gnav-round-btn.open .gnav-tip { opacity: 0; transition: none; }
 
 /* ── Navigator canvas (page area below nav) ──────────────────── */
 
@@ -255,28 +531,38 @@
     overflow: hidden;
 }
 
+/* Narrower than 16:9 (16:10, windowed): tighter tabs so the header still fits on one row. */
+.main-menu-root.tight-nav {
+    .global-nav { padding: 0 14px; }
+    .gnav-logo { margin-right: 12px; }
+    .gnav-item { padding: 0 8px; gap: 6px; }
+    .gnav-item label { font-size: 15px; letter-spacing: 0.8px; }
+    .gnav-right { gap: 10px; }
+}
+
 .main-menu-root.compact {
-    .global-nav { padding: 6px 12px; }
-    .gnav-logo { width: 170px; }
-    .gnav-right { width: 280px; }
-    .gnav-item { padding: 8px; letter-spacing: 1px; }
+    .gnav-game-name { font-size: 20px; letter-spacing: 5px; }
+    .gnav-prestige { display: none; }
+    .gnav-profile-info { display: none; }
+    .gnav-item label { font-size: 14px; }
 }
 
 .main-menu-root.narrow {
-    .global-nav { flex-wrap: wrap; gap: 4px; }
+    .global-nav { flex-wrap: wrap; gap: 4px; padding: 6px 12px 0 12px; }
     .gnav-logo { flex-grow: 1; }
-    .gnav-right { order: 1; width: auto; }
+    .gnav-right { order: 1; }
     .gnav-tabs-group { order: 2; width: 100%; flex-shrink: 0; }
     .gnav-items { flex-grow: 1; }
-    .gnav-item { padding: 8px 10px; }
+    .gnav-item { height: 48px; padding: 0 10px; }
     PartyPanel { order: 1; margin: 0 6px; }
 }
 
 .main-menu-root.portrait {
-    .gnav-item { padding: 8px; }
+    .gnav-item { padding: 0 8px; }
     .gnav-profile-name { max-width: 110px; }
-    .gnav-logo { width: auto; }
-    .gnav-logo-text, .gnav-profile-info { display: none; }
+    .gnav-logo, .gnav-profile-info { display: none; }
+    .gnav-round-btns { gap: 5px; }
+    .gnav-round-btn { width: 34px; height: 34px; }
     PartyPanel { margin: 0 4px; }
     PartyPanel .party-bar { gap: 3px; padding: 0; }
     PartyPanel .party-invite-popup, PartyPanel .party-toast { position: fixed; top: 64px; left: 12px; right: 12px; width: auto; }

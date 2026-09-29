@@ -295,6 +295,51 @@ ClassSelect {
         margin-bottom: 4px;
     }
 
+    // Category tabs over a weapon slot's choices, like the gunsmith's.
+    .categories {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-bottom: 4px;
+    }
+
+    // They share each row between them, so a wrapped row lines up too.
+    .category {
+        flex-grow: 1;
+        height: 34px;
+        padding: 0 10px;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba( black, 0.6 );
+        border-radius: $rounding;
+        transition: all 0.08s ease;
+
+        label {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            opacity: 0.75;
+        }
+
+        &:hover {
+            cursor: pointer;
+            background-color: rgba( white, 0.16 );
+
+            label {
+                opacity: 1;
+            }
+        }
+
+        &.active {
+            background-color: $main-color;
+            color: black;
+
+            label {
+                opacity: 1;
+            }
+        }
+    }
+
     .picker-hint {
         font-size: 18px;
         opacity: 0.8;

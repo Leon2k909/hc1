@@ -1,0 +1,39 @@
+{
+  "Name": "40 Round Extended Magazine",
+  "Category": "Magazine",
+  "EligibleEquipment": [
+    "weapons/kastov/kastov762.equip"
+  ],
+  "RequiredLevel": 0,
+  "Description": "Long 7.62 box magazine. Reloads in 3s (3.4s when empty).",
+  "ModifyBodygroups": true,
+  "Bodygroups": {
+    "magazine": 2
+  },
+  "VerticalRecoilScale": 1.0,
+  "HorizontalRecoilScale": 1.0,
+  "MagazineCapacity": 40,
+  "ReloadTimeMultiplier": 1.0,
+  "ReloadAnimation": 1,
+  "ReloadTime": 3.0,
+  "EmptyReloadTime": 3.4,
+  "ReloadSounds": {
+    "0.000000": "sounds/weapons/kastov/kastov_xmag_reload_01.sound",
+    "0.433333": "sounds/weapons/kastov/kastov_xmag_reload_02.sound",
+    "0.566667": "sounds/weapons/kastov/kastov_xmag_reload_03.sound",
+    "1.100000": "sounds/weapons/kastov/kastov_xmag_reload_04.sound",
+    "1.200000": "sounds/weapons/kastov/kastov_xmag_reload_05.sound",
+    "1.866667": "sounds/weapons/kastov/kastov_xmag_reload_06.sound",
+    "2.466667": "sounds/weapons/kastov/kastov_xmag_reload_07.sound"
+  },
+  "EmptyReloadSounds": {
+    "0.000000": "sounds/weapons/kastov/kastov_xmag_reload_empty_01.sound",
+    "0.466667": "sounds/weapons/kastov/kastov_xmag_reload_empty_02.sound",
+    "1.033333": "sounds/weapons/kastov/kastov_xmag_reload_empty_03.sound",
+    "1.766667": "sounds/weapons/kastov/kastov_xmag_reload_empty_04.sound",
+    "2.466667": "sounds/weapons/kastov/kastov_xmag_reload_empty_05.sound",
+    "2.933333": "sounds/weapons/kastov/kastov_xmag_reload_empty_06.sound"
+  },
+  "__references": [],
+  "__version": 0
+}

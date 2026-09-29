@@ -7,120 +7,82 @@
 @attribute [StyleSheet]
 @namespace Facepunch.UI
 
-<root class="hc1" style="display: flex; flex-direction: column; width: 100%; height: 100%; position: absolute;">
-    <MenuTopbar Title="PROGRESSION" />
-    
-    <div style="flex-grow: 1; overflow: hidden; display: flex; flex-direction: column;">
-        <div class="flex layout row gap" style="width: 100%; height: 100%; justify-content: center; align-items: flex-start; overflow-y: scroll; padding: 40px 0;">
-                <div class="inset column layout with-background line-left" style="width: 15%;">
-                    <VerticalDivider />
+<root class="hc1 progression-page">
+    <MenuTopbar Title="CAREER RECORD" ParentTitle="PROFILE" ParentAction=@BackToBarracks BackAction=@BackToBarracks />
+    <div class="progression-body">
+        <div class="player-stats">
+            <label class="section-title">@Tr( "FIELD STATISTICS" )</label>
+            <CareerStat Name="Kills" Stat="kills" />
+            <CareerStat Name="Headshot Kills" Stat="kills-headshots" />
+            <CareerStat Name="Deaths" Stat="deaths" />
+        </div>
 
-                    <div class="layout padding-extra with-gap column">
-                        <label class="text emphasis">
-                            Player Stats
-                        </label>
-                        
-                        <CareerStat Name="Kills" Stat="kills" />
-                        <CareerStat Name="Headshot Kills" Stat="kills-headshots" />
-                        <CareerStat Name="Deaths" Stat="deaths" />
+        <div class="progression-content">
+            <div class="career-heading">
+                <label class="career-title">@Tr( "CAREER RECORD" )</label>
+                <label class="career-subtitle">@Tr( "Your experience, milestones and performance in the field." )</label>
+            </div>
+            <div class="player-rank-card">
+                <label class="rank-badge">@Progression.GetLevel()</label>
+                <div class="rank-info">
+                    <div class="rank-title">
+                        @if ( Progression.GetPrestige() > 0 )
+                        {
+                            <img class="rank-prestige" src="/ui/prestige/prestige_@(Progression.GetPrestige())_readable.png" />
+                            <label>@Tr( "PRESTIGE {0}", Progression.GetPrestige() )</label>
+                            <label class="rank-separator">/</label>
+                        }
+                        <label>@Tr( "LEVEL {0}", Progression.GetLevel() )</label>
                     </div>
-
-                    <VerticalDivider />
-                </div>
-
-                <div class="inset column layout with-background line-left" style="width: 60%;">
-                    <VerticalDivider />
-
-                    <div class="layout padding-extra with-gap column" style="padding-bottom: 64px;">
-
-                        @* ── Player rank card ── *@
-                        <div class="player-rank-card">
-                            <div class="rank-badge">@Progression.GetLevel()</div>
-                            <div class="rank-info">
-                                <div class="rank-title" style="flex-direction: row; align-items: center;">
-                                    @if( Progression.GetPrestige() > 0 )
-                                    {
-                                        <img src="/ui/prestige/prestige_@(Progression.GetPrestige()).png" style="height: 42px; margin-right: 12px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));" />
-                                        <label style="font-size: 24px; margin-right: 8px;">PRESTIGE @Progression.GetPrestige()</label>
-                                        <label style="font-size: 24px; color: rgba(255,255,255,0.5); margin-right: 8px;">·</label>
-                                    }
-                                    <label style="font-size: 24px;">LEVEL @Progression.GetLevel()</label>
-                                </div>
-                                <div class="rank-xp-wrap">
-                                    <div class="rank-xp-fill" style="width: @((Progression.GetLevelProgress() * 100f).ToString("0.#"))%;" />
-                                </div>
-                                <div class="rank-xp-label">
-                                    @if ( Progression.GetLevel() >= Progression.MaxLevel )
-                                    {
-                                        <text>MAX LEVEL</text>
-                                    }
-                                    else
-                                    {
-                                        <text>@Progression.GetXPForNextLevel() XP TO LEVEL @(Progression.GetLevel() + 1)</text>
-                                    }
-                                </div>
-                                @if ( Progression.GetLevel() >= Progression.MaxLevel && Progression.GetPrestige() < 10 )
-                                {
-                                    <div class="button standard" style="margin-top: 12px; background-color: #8c7634; color: white; width: 100%; justify-content: center; animation: pulse 2s infinite;" onclick=@(() => EnterPrestigeMode())>
-                                        ENTER PRESTIGE MODE
-                                    </div>
-                                }
-                            </div>
-                        </div>
-
-                        <label class="text emphasis">
-                            Prestige Path
-                        </label>
-
-                        <div class="layout row wrap gap" style="margin-bottom: 20px;">
-                            @for (int i = 1; i <= 10; i++)
-                            {
-                                var isUnlocked = Progression.GetPrestige() >= i;
-                                <div class="prestige-card @(isUnlocked ? "unlocked" : "locked")" style="width: 18%; padding: 10px; background-color: rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px;">
-                                    <img src="/ui/prestige/prestige_@(i).png" style="height: 180px; object-fit: contain; opacity: @(isUnlocked ? "1" : "0.2"); filter: @(isUnlocked ? "grayscale(0%) drop-shadow(0 4px 8px rgba(0,0,0,0.5))" : "grayscale(100%)");" />
-                                    <label style="font-weight: bold; margin-top: 8px; color: @(isUnlocked ? "white" : "#666");">Prestige @i</label>
-                                    @if( i == 10 )
-                                    {
-                                        <label style="font-size: 10px; color: #ffcc00; text-align: center; margin-top: 4px;">Master Prestige Status</label>
-                                    }
-                                    else
-                                    {
-                                        <label style="font-size: 10px; color: #aaa; text-align: center; margin-top: 4px;">Reset Attachments</label>
-                                        <label style="font-size: 10px; color: #ffaa00; text-align: center;">Keep Camos</label>
-                                    }
-                                </div>
-                            }
-                        </div>
-
-                        <label class="text emphasis">
-                            Weapon Stats
-                        </label>
-
-                        <div class="layout row wrap">
-                            @foreach ( var equip in ResourceLibrary.GetAll<EquipmentResource>().Where( x => x.Slot == EquipmentSlot.Primary || x.Slot == EquipmentSlot.Secondary ) )
-                            {
-                                <CareerWeapon style="width: 49%;" Equipment=@equip />
-                            }
-                        </div>
-
+                    <div class="rank-xp-wrap">
+                        <div class="rank-xp-fill" style="width: @((Progression.GetLevelProgress() * 100f).ToString("0.#"))%;" />
                     </div>
-
-                    <VerticalDivider />
+                    <label class="rank-xp-label">@RankProgressLabel</label>
+                    @if ( Progression.GetLevel() >= Progression.MaxLevel && Progression.GetPrestige() < 10 )
+                    {
+                        <div class="prestige-action primary" onclick=@EnterPrestigeMode><label>@Tr( "ENTER PRESTIGE MODE" )</label></div>
+                    }
                 </div>
+            </div>
+
+            <div class="milestone-heading">
+                <label class="section-title">@Tr( "SERVICE MILESTONES" )</label>
+                <label class="milestone-description">@Tr( "Each prestige resets your player level and weapon attachment unlocks. You keep your camos. Reach Prestige 10 for Master Prestige status." )</label>
+            </div>
+            <div class="prestige-grid">
+                @for ( int i = 1; i <= 10; i++ )
+                {
+                    var isUnlocked = Progression.GetPrestige() >= i;
+                    <div class="prestige-card @(isUnlocked ? "unlocked" : "locked")">
+                        <img src="/ui/prestige/prestige_@(i)_readable.png" />
+                        <label class="prestige-name">@Tr( "PRESTIGE {0}", i )</label>
+                        <label class="prestige-status">@Tr( isUnlocked ? "REACHED" : "LOCKED" )</label>
+                    </div>
+                }
+            </div>
+
+            <label class="section-title">@Tr( "WEAPON RECORD" )</label>
+            <div class="weapon-stats-grid">
+                @foreach ( var equip in ResourceLibrary.GetAll<EquipmentResource>().Where( x => x.Slot == EquipmentSlot.Primary || x.Slot == EquipmentSlot.Secondary ) )
+                {
+                    <CareerWeapon Equipment=@equip />
+                }
+            </div>
         </div>
     </div>
 </root>
 
 @code
 {
-    void Quit()
-    {
-        Game.Close();
-    }
+    private string RankProgressLabel => Progression.GetLevel() >= Progression.MaxLevel
+        ? Tr( "MAXIMUM LEVEL REACHED" )
+        : Tr( "{0} XP TO LEVEL {1}", Math.Max( 0, Progression.GetXPForNextLevel() - Progression.GetXPIntoLevel() ).ToString( "N0" ), Progression.GetLevel() + 1 );
+
+    private void BackToBarracks() => this.Navigate( "/barracks" );
        
     public void OnNavigationOpen()
     {
-        MainMenuRoot.Instance?.SetActiveRoute( "/career" );
+        MainMenuRoot.Instance?.SetActiveRoute( "/barracks" );
         if ( MainMenuRoot.Instance.IsValid() )
             MainMenuRoot.Instance.SetBlur( true );
     }
@@ -141,6 +103,6 @@
 
     protected override int BuildHash()
     {
-        return HashCode.Combine( Progression.GetXP(), Progression.GetLevel() );
+        return HashCode.Combine( Progression.GetXP(), Progression.GetLevel(), Progression.GetPrestige() );
     }
 }

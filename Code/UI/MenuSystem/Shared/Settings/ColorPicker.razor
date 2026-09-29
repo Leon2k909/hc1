@@ -1,22 +1,40 @@
 @namespace Facepunch.UI
 @inherits Panel
 
+<style>
+    ColorPicker .channels
+    {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Each channel box grows to 180px, and in a narrower row the three share it instead of wrapping. */
+    ColorPicker .channel
+    {
+        flex-grow: 1;
+        flex-shrink: 1;
+        flex-basis: 0;
+        min-width: 0;
+        max-width: 180px;
+    }
+</style>
+
 <root class="layout column">
     <ColorSlider Value:bind="@Value" />
 
-    <div class="layout padding gap align-center" style="width: 100%; justify-content: center;">
-        <div class="layout padding with-background flex center space-between" style="width: 180px;">
-            <label class="small slight">Red</label>
+    <div class="channels layout padding gap align-center">
+        <div class="channel layout padding with-background flex center space-between">
+            <label class="small slight">@Tr( "Red" )</label>
             <TextEntry Value:bind="@Red" />
         </div>
 
-        <div class="layout padding with-background flex center space-between" style="width: 180px;">
-            <label class="small slight">Green</label>
+        <div class="channel layout padding with-background flex center space-between">
+            <label class="small slight">@Tr( "Green" )</label>
             <TextEntry Value:bind="@Green" />
         </div>
 
-        <div class="layout padding with-background flex center space-between" style="width: 180px;">
-            <label class="small slight">Blue</label>
+        <div class="channel layout padding with-background flex center space-between">
+            <label class="small slight">@Tr( "Blue" )</label>
             <TextEntry Value:bind="@Blue" />
         </div>
     </div>

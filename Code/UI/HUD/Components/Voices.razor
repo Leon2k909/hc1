@@ -2,50 +2,212 @@
 @attribute [StyleSheet]
 @inherits Panel
 
+@* Who's talking, one plate each like the kill feed's: their level, avatar, name and team, ending in their team's
+   colour at the screen edge. You're on it too while your mic hears you, with who can hear you. The green square at
+   the top right is s&box's own mic light (its MicOverlay), which it draws over every game. *@
 <root>
-    @foreach (var voice in VoiceList.Where( x => CanDisplay( x ) ) )
+    @foreach ( var row in Rows )
     {
-        <div class="row">
-            <div class="item-row with-background">
-                @{
-                    var player = GetPlayer( voice );
-                }
+        var teamColor = row.Team.GetColor().Hex;
+        var logo = LogoPath( row );
 
-                <Icon class="square rounded shrink-0" File="/ui/chat/radio.png" size="24" Transform="@($"scale({GetAmplitudeScale( voice )})")" />
-                <img class="avatar" src="avatar:@player.SteamId" />
-                <PlayerPanel Client=@player />
+        <div @key="row.Key" class="speaker @(row.IsLocal ? "is-me" : "") @(row.IsDead ? "dead" : "")">
+            <VoiceMeter Voice=@row.Voice Steady=@(row.IsLocal || row.Voice is null) />
+            <img class="avatar" src="avatar:@row.SteamId" style="border-color: @teamColor;" />
+
+            <div class="who">
+                <label class="name">@row.Name</label>
+                <div class="tags">
+                    @foreach ( var tag in Tags( row ) )
+                    {
+                        <div class="@tag.Class">
+                            @if ( tag.Icon is not null )
+                            {
+                                <i>@tag.Icon</i>
+                            }
+                            <label style="@(tag.Color is null ? "" : $"color: {tag.Color};")">@tag.Text</label>
+                        </div>
+                    }
+                </div>
             </div>
+
+            @if ( !string.IsNullOrEmpty( logo ) )
+            {
+                <div class="logo" style="background-image: url( @logo );"></div>
+            }
+
+            <div class="edge" style="background-color: @teamColor;"></div>
         </div>
     }
-
 </root>
 
 @code
 {
-    public IEnumerable<PlayerVoiceComponent> VoiceList => Scene.GetAllComponents<PlayerVoiceComponent>().Where( x => x.Client.IsValid() && x.Client.IsConnected );
+    /// <summary> How long a row stays after the voice stops, so the gaps between words don't flicker it. </summary>
+    private const float Linger = 0.4f;
 
-    private Client GetPlayer( PlayerVoiceComponent voice )
+    /// <summary> dev_voices_sample: made-up rows to check the layout with, as well as anyone really talking. </summary>
+    public static bool ShowSample { get; set; }
+
+    /// <summary> Someone talking, and what the list says about them. </summary>
+    private sealed record Row( Guid Key, string Name, ulong SteamId, Team Team, Voice Voice, bool IsLocal, bool IsSpectator,
+        bool IsEnemy, bool IsSquadmate, bool IsDead );
+
+    /// <summary> One of a row's labels: its text, CSS class, colour (a team's) and Material icon. </summary>
+    private sealed record Tag( string Text, string Class, string Color = null, string Icon = null );
+
+    /// <summary> Everyone talking, in the scene's order, so rows don't move when someone else starts. </summary>
+    private List<Row> Rows
     {
-        return voice.Client.IsValid() ? voice.Client : voice.GetComponent<Client>();
+        get
+        {
+            var rows = new List<Row>();
+
+            foreach ( var voice in Scene.GetAllComponents<PlayerVoiceComponent>() )
+            {
+                var client = voice.Client.IsValid() ? voice.Client : voice.GetComponent<Client>();
+                if ( !client.IsValid() || !client.IsConnected )
+                    continue;
+
+                var isLocal = client.IsLocalPlayer;
+                if ( IsTalking( voice, client, isLocal ) )
+                {
+                    rows.Add( new Row( client.Id, client.DisplayName, client.SteamId, client.Team, voice, isLocal, IsSpectator( client ),
+                        IsEnemy( client ), IsSquadmate( client ), IsDead( client ) ) );
+                }
+            }
+
+            if ( ShowSample )
+                rows.AddRange( SampleRows() );
+
+            return rows;
+        }
     }
 
-    private bool CanDisplay( PlayerVoiceComponent voice )
-    {
-        var player = GetPlayer( voice );
-        if ( !player.IsValid() || CommunicationMuteState.IsVoiceMuted( player ) )
-            return false;
+    /// <summary> When your mic last heard you. </summary>
+    private RealTimeSince _sinceHeardYou = 999f;
 
-        return voice.LastPlayed < 0.25f;
+    private bool IsTalking( PlayerVoiceComponent voice, Client client, bool isLocal )
+    {
+        if ( isLocal )
+        {
+            // IsRecording is only whether the mic is open (all the time without push-to-talk), and your own voice never
+            // plays here to set LastPlayed. Application.IsMicrophoneRecording is whether the mic actually hears you.
+            if ( voice.IsRecording && Application.IsMicrophoneRecording )
+                _sinceHeardYou = 0;
+
+            return _sinceHeardYou < Linger;
+        }
+
+        // A muted player's voice isn't played (PlayerVoiceComponent.ShouldHearVoice); this also drops their row at once.
+        return !CommunicationMuteState.IsVoiceMuted( client ) && voice.LastPlayed < Linger;
     }
 
-    private string GetAmplitudeScale( Voice voice )
+    private IEnumerable<Tag> Tags( Row row )
     {
-        var scale = 0.5f + ( voice.Amplitude * 2.365f );
-        return ( 1f + scale ).ToString( "0.#" );
+        if ( row.IsLocal )
+        {
+            yield return new Tag( Tr( "YOU" ), "chip me" );
+            yield return new Tag( LocalScope, "scope", Icon: "hearing" );
+        }
+        else if ( row.IsSpectator )
+        {
+            yield return new Tag( Tr( "SPECTATOR" ), "team spectator" );
+        }
+        else if ( row.Team != Team.Unassigned )
+        {
+            yield return new Tag( Tr( row.Team.GetName().ToUpperInvariant() ), "team", row.Team.GetColor().Hex );
+
+            if ( row.IsEnemy )
+                yield return new Tag( Tr( "ENEMY" ), "chip" );
+        }
+
+        if ( row.IsSquadmate )
+            yield return new Tag( Tr( "SQUAD" ), "chip squad" );
+
+        if ( row.IsDead )
+            yield return new Tag( Tr( "DEAD" ), "chip dead" );
     }
+
+    /// <summary>
+    /// Who hears you, by your Voice settings: TeamVoiceChatFilter's rules, which also send everything to spectators and
+    /// to your killer for a moment (Death Comms). Everyone is unassigned in free-for-all, so Team Only reaches everyone.
+    /// </summary>
+    private string LocalScope
+    {
+        get
+        {
+            if ( !Scene.GetAllComponents<TeamVoiceChatFilter>().Any() )
+                return Tr( "EVERYONE" );
+
+            if ( GameSettingsSystem.Current.VoiceProximity )
+                return Tr( "NEARBY" );
+
+            return TeamVoiceChatFilter.ActiveMode switch
+            {
+                VoiceChatMode.TeamOnly when !GameUtils.IsFreeForAllMode => Tr( "TEAM ONLY" ),
+                VoiceChatMode.PartyOnly => Tr( "PARTY ONLY" ),
+                _ => Tr( "EVERYONE" ),
+            };
+        }
+    }
+
+    /// <summary> Watching a team game from neither team. </summary>
+    private static bool IsSpectator( Client client ) => !GameUtils.IsFreeForAllMode && client.Team == Team.Unassigned;
+
+    /// <summary> On the other team from you, which you hear through Global or Proximity Voice or Death Comms. </summary>
+    private static bool IsEnemy( Client client )
+    {
+        var you = Client.Local;
+        return you.IsValid() && you.Team != Team.Unassigned && client.Team != Team.Unassigned && !client.IsFriendly( you );
+    }
+
+    /// <summary> In your Steam party, the menus' squad (as the scoreboard marks them). </summary>
+    private static bool IsSquadmate( Client client )
+    {
+        var connection = client.Connection;
+        return !client.IsLocalPlayer && connection is not null && (PartyRoom.Current?.Members.Any( x => x.Id == connection.SteamId ) ?? false);
+    }
+
+    /// <summary> Their body lies where they died until they respawn, so a player with no pawn yet isn't dead. </summary>
+    private static bool IsDead( Client client )
+    {
+        var pawn = client.PlayerPawn;
+        return pawn.IsValid() && pawn.HealthComponent.IsValid() && pawn.HealthComponent.State == LifeState.Dead;
+    }
+
+    /// <summary> Their team's crest, the spectators' eye, or nothing in free-for-all. </summary>
+    private static string LogoPath( Row row ) => row.IsSpectator ? "/ui/teams/spectator.png" : row.Team.GetIconPath();
+
+    /// <summary>
+    /// You, a squadmate on your team, a dead enemy with a long name and (in team modes) a spectator, all with your
+    /// avatar. Outside a team you're on Red Team.
+    /// </summary>
+    private static IEnumerable<Row> SampleRows()
+    {
+        var you = Client.Local;
+        var ffa = GameUtils.IsFreeForAllMode;
+        var team = ffa ? Team.Unassigned : you.IsValid() && you.Team != Team.Unassigned ? you.Team : Team.Terrorist;
+        var steamId = (ulong)Game.SteamId;
+
+        yield return new Row( SampleKey( 1 ), you.IsValid() ? you.DisplayName : "You", steamId, team, null, true, false, false, false, false );
+        yield return new Row( SampleKey( 2 ), "Sample Squadmate", steamId, team, null, false, false, false, true, false );
+        yield return new Row( SampleKey( 3 ), "Sample Enemy With A Long Name", steamId, team.GetOpponents(), null, false, false, !ffa, false, true );
+
+        if ( !ffa )
+            yield return new Row( SampleKey( 4 ), "Sample Spectator", steamId, Team.Unassigned, null, false, true, false, false, false );
+    }
+
+    private static Guid SampleKey( int n ) => new( n, 0, 0, new byte[8] );
 
     protected override int BuildHash()
     {
-        return HashCode.Combine( Time.Now );
+        var hash = new HashCode();
+
+        foreach ( var row in Rows )
+            hash.Add( row );
+
+        hash.Add( LocalScope );
+        return hash.ToHashCode();
     }
 }

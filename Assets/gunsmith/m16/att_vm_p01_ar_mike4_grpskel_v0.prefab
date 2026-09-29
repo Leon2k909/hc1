@@ -1,0 +1,30 @@
+{
+  "RootObject": {
+    "__guid": "b8c47cb2-4e25-5fff-8333-60f3bfeefaf1",
+    "Name": "Skeleton Pistol Grip",
+    "Enabled": true,
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "e1698ae1-cf30-5406-a704-5b799828bb26",
+        "Model": "attachments/mw2022/models/att_vm_p01_ar_mike4_grpskel_v0/att_vm_p01_ar_mike4_grpskel_v0.vmdl",
+        "Tint": "1,1,1,1"
+      },
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithMw22Attachment",
+        "__guid": "0163757d-e072-561e-a5cd-7b12a7fc04f7",
+        "BindPosition": "-1.610000,0.000000,5.580000",
+        "PartScale": "1,1,1",
+        "PartAngles": "0,0,0",
+        "BoneName": "weapon_root",
+        "BodygroupChoices": {},
+        "IsLauncher": false
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__version": 2
+}

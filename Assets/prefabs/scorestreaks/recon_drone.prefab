@@ -1,0 +1,50 @@
+{
+  "RootObject": {
+    "__guid": "d9c9d2da-2e3b-42b4-8606-4ba210f7b4c0",
+    "Name": "Recon Drone",
+    "Enabled": true,
+    "NetworkMode": 2,
+    "NetworkInterpolation": true,
+    "Tags": "recon_drone",
+    "Components": [
+      {
+        "__type": "Facepunch.ReconDroneVisual",
+        "__guid": "ecb6b5d9-563f-42c4-8d9a-f847bd9f59fb",
+        "__enabled": true,
+        "OrbitRadius": 1400,
+        "OrbitSeconds": 24,
+        "Propeller": { "_type": "gameobject", "go": "a5a6e527-a842-4d4d-b24a-1b9718a4cdfb" }
+      },
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "fc163af2-7525-4113-b6e7-b91b70969c1d",
+        "__enabled": true,
+        "Model": "models/recon_drone/recon_drone.vmdl",
+        "RenderType": "On",
+        "Tint": "1,1,1,1"
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "a5a6e527-a842-4d4d-b24a-1b9718a4cdfb",
+        "Name": "Pusher propeller",
+        "Position": "-66,0,6",
+        "Enabled": true,
+        "NetworkMode": 0,
+        "Components": [
+          {
+            "__type": "Sandbox.ModelRenderer",
+            "__guid": "238723a2-cce0-4948-9605-58d09b2fc7dd",
+            "__enabled": true,
+            "Model": "models/recon_drone/recon_propeller.vmdl",
+            "RenderType": "On",
+            "Tint": "1,1,1,1"
+          }
+        ]
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__references": [],
+  "__version": 2
+}

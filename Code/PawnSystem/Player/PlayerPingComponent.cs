@@ -156,7 +156,8 @@ public partial class PlayerPingComponent : Component
 			var tr = GetTrace();
 			if ( !tr.Hit ) return;
 
-			var target = tr.GameObject.Root.GetComponent<IPingReceiver>() as Component;
+			// Map clutter (trees) has collision but no GameObject
+			var target = tr.GameObject.IsValid() ? tr.GameObject.Root.GetComponent<IPingReceiver>() as Component : null;
 
 			// Send a RPC to my teammates
 			using ( NetworkUtils.RpcMyTeam() )

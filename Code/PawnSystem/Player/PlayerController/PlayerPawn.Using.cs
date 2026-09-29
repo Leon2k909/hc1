@@ -39,6 +39,15 @@ partial class PlayerPawn
 
 	public IUse Hovered { get; private set; }
 
+	/// <summary>
+	/// How far from your eyes E picks up a dropped gun you're looking towards. You don't have to aim right at it: a gun
+	/// lies flat on the floor, where the thin use trace (<see cref="UseDistance"/>) barely reaches when you're standing.
+	/// </summary>
+	public const float PickupReach = 96f;
+
+	/// <summary>How far off your aim a dropped gun can be for E to pick it up: the cosine of about 30 degrees.</summary>
+	private const float PickupAimCone = 0.866f;
+
 	private IEnumerable<IUse> GetUsables()
 	{
 		var hits = Scene.Trace.Ray( AimRay, UseDistance )
@@ -47,10 +56,39 @@ partial class PlayerPawn
 			.HitTriggers()
 			.RunAll() ?? Array.Empty<SceneTraceResult>();
 
+		// Nearest first, so E uses what's under the crosshair and not something behind it.
 		var usables = hits
+			.OrderBy( x => x.Distance )
 			.Select( x => x.GameObject.GetComponentInParent<IUse>() );
 
 		return usables;
+	}
+
+	/// <summary>The dropped gun within <see cref="PickupReach"/> nearest the middle of your view, with nothing in the way.</summary>
+	private DroppedEquipment FindDroppedEquipmentInView( Ray ray )
+	{
+		DroppedEquipment best = null;
+		var bestDot = PickupAimCone;
+
+		foreach ( var dropped in Scene.GetAllComponents<DroppedEquipment>() )
+		{
+			var toGun = dropped.Center - ray.Position;
+			if ( toGun.Length > PickupReach ) continue;
+
+			var dot = ray.Forward.Dot( toGun.Normal );
+			if ( dot < bestDot ) continue;
+
+			var blocked = Scene.Trace.Ray( ray.Position, dropped.Center )
+				.IgnoreGameObjectHierarchy( GameObject )
+				.WithoutTags( "pickup", "ragdoll", "movement" )
+				.Run().Hit;
+			if ( blocked ) continue;
+
+			best = dropped;
+			bestDot = dot;
+		}
+
+		return best;
 	}
 
 	private void UpdateUse()
@@ -69,11 +107,14 @@ partial class PlayerPawn
 		}
 	}
 
+	/// <summary>Press E without input (dev_use), for testing through the editor bridge.</summary>
+	internal void DevUse() => TryUse( AimRay );
+
 	[Rpc.Owner]
 	private void TryUse( Ray ray )
 	{
 		var hits = GetUsables();
-		var usable = hits.FirstOrDefault( x => x is not null );
+		var usable = hits.FirstOrDefault( x => x is not null ) ?? FindDroppedEquipmentInView( ray );
 
 		if ( usable.IsValid() && usable.CanUse( this ) is { } useResult )
 		{

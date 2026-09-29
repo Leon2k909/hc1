@@ -36,7 +36,11 @@ public partial class EquipmentDropper : Component,
 		return Categories.Contains( weapon.Resource.Slot );
 	}
 
-	void IGameEventHandler<KillEvent>.OnGameEvent( KillEvent eventArgs )
+	// The body is a named method: hotload can't re-link static lambdas inside explicit generic interface methods
+	// ("Unable to find matching substitution for a static method"), so they'd throw after every hotload.
+	void IGameEventHandler<KillEvent>.OnGameEvent( KillEvent eventArgs ) => DropOnKill( eventArgs );
+
+	void DropOnKill( KillEvent eventArgs )
 	{
 		if ( !Networking.IsHost )
 			return;

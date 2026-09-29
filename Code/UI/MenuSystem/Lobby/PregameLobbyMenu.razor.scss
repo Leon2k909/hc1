@@ -1,196 +1,69 @@
 @import "/UI/Styles/Theme.scss";
+@import "/UI/Styles/MenuPage.scss";
 
-PregameLobbyMenu
+PregameLobbyMenu.hc1
 {
-	position: absolute;
-	inset: 0;
-	background-color: rgba( 0, 0, 0, 0.7 );
-	backdrop-filter: blur( 20px );
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	font-family: Inter, sans-serif;
-	pointer-events: all;
+    @include menu-page;
+    pointer-events: all;
+    padding: 40px 48px;
+    justify-content: center;
+
+    .lobby-container { flex-grow: 1; min-height: 0; min-width: 0; flex-direction: row; gap: 24px; }
+    .panel-title { font-size: 24px; font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 24px; border-bottom: 1px solid $menu-border; padding-bottom: 18px; flex-shrink: 0; }
+    .settings-panel, .roster-panel { @include menu-panel; flex-direction: column; min-width: 0; min-height: 0; padding: 24px; }
+    .settings-panel { width: 340px; flex-shrink: 0; overflow-y: scroll; }
+    .roster-panel { flex-grow: 1; gap: 0; }
+    .setting-group { flex-direction: column; gap: 10px; margin-bottom: 24px; flex-shrink: 0; > label { @include menu-section-title; color: $menu-accent; } }
+    .button-list { flex-direction: column; gap: 6px; max-height: 230px; overflow-y: scroll; &.row { flex-direction: row; } }
+    .lobby-button
+    {
+        @include menu-action;
+        min-height: 42px;
+        font-size: 13px;
+        padding: 10px 14px;
+        backdrop-filter: none;
+        &.selected { border-color: $menu-accent; color: $menu-accent; background-color: rgba( 255, 122, 26, 0.1 ); }
+        &.primary { min-height: 50px; margin-top: 18px; background-color: $menu-accent; border-color: $menu-accent; color: #08090b; &:hover { background-color: $menu-accent-hover; } }
+    }
+    .setting-info { flex-direction: row; align-items: center; gap: 12px; margin-bottom: 16px; .info-label { color: $menu-muted; width: 60px; } .info-value { color: white; font-size: 18px; font-weight: 700; } }
+    .waiting-label { color: $menu-accent; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; margin-top: 20px; }
+    .teams-container { flex-grow: 1; min-height: 0; flex-direction: row; gap: 16px; margin-bottom: 20px; }
+    .team-column { flex: 1; min-width: 0; min-height: 0; flex-direction: column; background-color: #08090b; border: 1px solid rgba( white, 0.06 ); border-radius: 2px; overflow: hidden; }
+    .team-header
+    {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        padding: 12px;
+        flex-shrink: 0;
+        > label { font-weight: 700; font-size: 13px; color: white; text-transform: uppercase; letter-spacing: 1px; }
+        .lobby-button { min-height: 32px; padding: 6px 10px; font-size: 11px; }
+        &.ct { background-color: rgba( 65, 132, 197, 0.12 ); border-bottom: 2px solid #4184c5; }
+        &.t { background-color: rgba( 200, 72, 60, 0.12 ); border-bottom: 2px solid #c8483c; }
+        &.un { background-color: rgba( white, 0.04 ); border-bottom: 2px solid rgba( white, 0.25 ); }
+    }
+    .player-list { flex-direction: column; min-height: 0; gap: 4px; padding: 10px; overflow-y: scroll; }
+    .player-card { background-color: rgba( white, 0.04 ); padding: 12px; flex-shrink: 0; > label { color: white; font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } }
+    .grow { flex-grow: 1; }
 }
-
-.lobby-container
+PregameLobbyMenu.compact
 {
-	display: flex;
-	flex-direction: row;
-	gap: 40px;
-	width: 80%;
-	height: 80%;
+    padding: 24px 32px;
+    .settings-panel { width: 300px; }
+    .teams-container { gap: 10px; }
+    .team-header { flex-wrap: wrap; }
 }
-
-.panel-title
+PregameLobbyMenu.narrow
 {
-	font-size: 24px;
-	font-weight: 800;
-	color: white;
-	text-transform: uppercase;
-	letter-spacing: 2px;
-	margin-bottom: 20px;
-	border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-	padding-bottom: 10px;
+    padding: 20px 24px;
+    .lobby-container { flex-direction: column; overflow-y: scroll; }
+    .settings-panel, .roster-panel { width: 100%; flex-shrink: 0; }
+    .settings-panel { overflow-y: visible; }
+    .roster-panel { min-height: 380px; }
 }
-
-.settings-panel, .roster-panel
+PregameLobbyMenu.portrait
 {
-	display: flex;
-	flex-direction: column;
-	background-color: rgba( 255, 255, 255, 0.03 );
-	border: 1px solid rgba( 255, 255, 255, 0.05 );
-	border-radius: 8px;
-	padding: 24px;
-}
-
-.settings-panel
-{
-	flex: 1;
-}
-
-.roster-panel
-{
-	flex: 2;
-}
-
-.setting-group
-{
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
-	margin-bottom: 20px;
-
-	> label
-	{
-		font-size: 14px;
-		color: rgba(255, 255, 255, 0.6);
-		text-transform: uppercase;
-		letter-spacing: 1px;
-	}
-}
-
-.button-list
-{
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
-	max-height: 250px;
-	overflow-y: scroll;
-	padding-right: 10px;
-
-	&.row
-	{
-		flex-direction: row;
-	}
-}
-
-.setting-info
-{
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 10px;
-	margin-bottom: 10px;
-
-	.info-label
-	{
-		color: rgba(255,255,255,0.5);
-		font-weight: bold;
-		width: 60px;
-	}
-	.info-value
-	{
-		color: white;
-		font-weight: bold;
-		font-size: 18px;
-	}
-}
-
-.waiting-label
-{
-	color: rgba( 255, 180, 0, 0.8 );
-	font-size: 18px;
-	font-weight: bold;
-	align-self: center;
-	text-transform: uppercase;
-	letter-spacing: 2px;
-	animation: pulse 2s infinite ease-in-out;
-}
-
-@keyframes pulse
-{
-	0% { opacity: 0.5; }
-	50% { opacity: 1; }
-	100% { opacity: 0.5; }
-}
-
-.teams-container
-{
-	display: flex;
-	flex-direction: row;
-	gap: 20px;
-	height: 100%;
-}
-
-.team-column
-{
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-	background-color: rgba(0,0,0,0.3);
-	border-radius: 6px;
-	overflow: hidden;
-}
-
-.team-header
-{
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-	padding: 12px 16px;
-	
-	> label
-	{
-		font-weight: bold;
-		font-size: 14px;
-		color: white;
-		text-transform: uppercase;
-	}
-
-	&.ct { background-color: rgba( 0, 150, 255, 0.3 ); border-bottom: 2px solid rgba( 0, 150, 255, 0.8 ); }
-	&.t { background-color: rgba( 255, 50, 50, 0.3 ); border-bottom: 2px solid rgba( 255, 50, 50, 0.8 ); }
-	&.un { background-color: rgba( 150, 150, 150, 0.3 ); border-bottom: 2px solid rgba( 150, 150, 150, 0.8 ); }
-}
-
-.player-list
-{
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-	padding: 10px;
-	overflow-y: scroll;
-}
-
-.player-card
-{
-	background-color: rgba(255,255,255,0.05);
-	padding: 10px 14px;
-	border-radius: 4px;
-	border-left: 3px solid transparent;
-	transition: all 0.2s;
-
-	> label
-	{
-		color: white;
-		font-weight: bold;
-		font-size: 14px;
-	}
-
-	&:hover
-	{
-		background-color: rgba(255,255,255,0.1);
-		border-left: 3px solid white;
-	}
+    .teams-container { flex-direction: column; }
+    .team-column { flex: 0 0 auto; min-height: 160px; }
 }

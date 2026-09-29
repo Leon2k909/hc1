@@ -1,0 +1,34 @@
+{
+  "Name": "45 Round Mag",
+  "Category": "Magazine",
+  "EligibleEquipment": [
+    "weapons/m16/m16.equip"
+  ],
+  "RequiredLevel": 0,
+  "Description": "45-round 5.56 magazine with its matching reload animations.",
+  "ModifyBodygroups": true,
+  "Bodygroups": {
+    "magazine": 2
+  },
+  "MagazineCapacity": 45,
+  "ReloadTimeMultiplier": 1,
+  "ReloadAnimation": 2,
+  "ReloadTime": 2.8,
+  "EmptyReloadTime": 2.9667,
+  "ReloadSounds": {
+    "0": "weapons/m16/sounds/m16_reload_xmag_raise.sound",
+    "0.733": "weapons/m16/sounds/m16_reload_xmag_magout.sound",
+    "1.2": "weapons/m16/sounds/m16_reload_xmag_magin.sound",
+    "1.7": "weapons/m16/sounds/m16_reload_xmag_end.sound"
+  },
+  "EmptyReloadSounds": {
+    "0": "weapons/m16/sounds/m16_reload_empty_xmag_raise.sound",
+    "0.267": "weapons/m16/sounds/m16_reload_empty_xmag_magout.sound",
+    "0.733": "weapons/m16/sounds/m16_reload_empty_xmag_rotate.sound",
+    "1.267": "weapons/m16/sounds/m16_reload_empty_xmag_magin.sound",
+    "1.667": "weapons/m16/sounds/m16_reload_empty_xmag_end.sound",
+    "2.033": "weapons/m16/sounds/m16_reload_empty_xmag_charge.sound"
+  },
+  "__references": [],
+  "__version": 0
+}

@@ -81,7 +81,7 @@ public class CustomizationMenu : Panel
 
 			categoryP.AddEventListener( "onmouseover", () =>
 			{
-				PlaySound( "ui.button.over" );
+				PlaySound( "ui_button_hover" );
 			} );
 		}
 	}
@@ -151,7 +151,7 @@ public class CustomizationMenu : Panel
 			attachmentP.AddEventListener( "onmouseover", () =>
 			{
 				hoveredAttachment = attachment;
-				PlaySound( "ui.button.over" );
+				PlaySound( "ui_button_hover" );
 				CreateDescriptionPanel( attachment );
 			} );
 

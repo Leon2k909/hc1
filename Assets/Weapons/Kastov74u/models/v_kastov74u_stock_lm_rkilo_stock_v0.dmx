@@ -134,7 +134,9 @@
 		"element" "5b6d4293-41bc-5bf5-94b2-c484fc9d1d92",
 		"element" "f924d8db-70dd-58e2-9bd6-1b45d8e5c332",
 		"element" "0c3fd2ee-bd52-5115-974a-16de5163017a",
-		"element" "3ed46559-9259-53c6-9ec1-8dda1a1936ce"
+		"element" "3ed46559-9259-53c6-9ec1-8dda1a1936ce",
+		"element" "1dbfc170-5887-59f9-80b2-710ac59fd413",
+		"element" "4203760c-5b66-5b50-96b0-52e0c40a3007"
 	]
 	"baseStates" "element_array"
 	[
@@ -1999,7 +2001,9 @@
 		"element" "42853147-040d-5fc2-9726-2e88e2453adf",
 		"element" "4bf4bad5-623c-560d-965f-75db8346d655",
 		"element" "5b6d4293-41bc-5bf5-94b2-c484fc9d1d92",
-		"element" "f924d8db-70dd-58e2-9bd6-1b45d8e5c332"
+		"element" "f924d8db-70dd-58e2-9bd6-1b45d8e5c332",
+		"element" "1dbfc170-5887-59f9-80b2-710ac59fd413",
+		"element" "4203760c-5b66-5b50-96b0-52e0c40a3007"
 	]
 }
 
@@ -3455,6 +3459,64 @@
 	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
 }
 
+"DmeJoint"
+{
+	"id" "elementid" "1dbfc170-5887-59f9-80b2-710ac59fd413"
+	"name" "string" "ik_hand_L"
+	"transform" "element" "db0ba894-c2a1-5aae-9925-7f0973cdcd67"
+	"shape" "element" ""
+	"visible" "bool" "1"
+	"lockInfluenceWeights" "bool" "0"
+	"children" "element_array"
+	[
+	]
+}
+
+"DmeTransform"
+{
+	"id" "elementid" "db0ba894-c2a1-5aae-9925-7f0973cdcd67"
+	"name" "string" "ik_hand_L"
+	"position" "vector3" "12.816313 2.317889 -0.639360"
+	"orientation" "quaternion" "0.423773 -0.073327 -0.179404 0.884791"
+}
+
+"DmeTransform"
+{
+	"id" "elementid" "cca2b226-b0a8-5143-bf28-6d62245dd09c"
+	"name" "string" "ik_hand_L"
+	"position" "vector3" "12.816313 2.317889 -0.639360"
+	"orientation" "quaternion" "0.423773 -0.073327 -0.179404 0.884791"
+}
+
+"DmeJoint"
+{
+	"id" "elementid" "4203760c-5b66-5b50-96b0-52e0c40a3007"
+	"name" "string" "ik_hand_R"
+	"transform" "element" "248a6962-8db2-5ce4-b27f-a42a7ee8e0a5"
+	"shape" "element" ""
+	"visible" "bool" "1"
+	"lockInfluenceWeights" "bool" "0"
+	"children" "element_array"
+	[
+	]
+}
+
+"DmeTransform"
+{
+	"id" "elementid" "248a6962-8db2-5ce4-b27f-a42a7ee8e0a5"
+	"name" "string" "ik_hand_R"
+	"position" "vector3" "-0.485390 -0.026497 -2.752456"
+	"orientation" "quaternion" "0.631414 -0.181395 -0.046026 0.752525"
+}
+
+"DmeTransform"
+{
+	"id" "elementid" "82ea65d5-b32b-5d6f-a322-2a5389b9e9d1"
+	"name" "string" "ik_hand_R"
+	"position" "vector3" "-0.485390 -0.026497 -2.752456"
+	"orientation" "quaternion" "0.631414 -0.181395 -0.046026 0.752525"
+}
+
 "DmeTransformList"
 {
 	"id" "elementid" "2c4416ab-e7d1-5054-93c9-aa30749170b2"
@@ -3571,7 +3633,9 @@
 		"element" "7506d989-3b3e-5210-8803-398c38e59d8e",
 		"element" "83c09a31-0978-564d-b973-acce8851959a",
 		"element" "55722b87-b142-564b-93f8-a407a7910c64",
-		"element" "f0fbe047-7897-5b9f-b243-9e4d7a68244d"
+		"element" "f0fbe047-7897-5b9f-b243-9e4d7a68244d",
+		"element" "cca2b226-b0a8-5143-bf28-6d62245dd09c",
+		"element" "82ea65d5-b32b-5d6f-a322-2a5389b9e9d1"
 	]
 }
 

@@ -1,0 +1,32 @@
+{
+  "Name": "AK-105",
+  "Description": "Russian 5.45x39mm carbine: the AK-74M cut down to a 314 mm barrel, with a side-folding stock.",
+  "Slot": "Primary",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": true,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/guns/ak105_01.png",
+  "IsPurchasable": true,
+  "Price": 2500,
+  "KillReward": 300,
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/ak105/weapon_ak105.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/ak105/wm_ak105.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/ak105/vm_ak105.prefab"
+  },
+  "WorldModel": "weapons/ak105/w_ak105.vmdl",
+  "ArmorReduction": null,
+  "HelmetReduction": null,
+  "WorldModelBodyGroups": 0,
+  "__references": [],
+  "__version": 0,
+  "Category": "AssaultRifle",
+  "GunsmithOffset": "0,0,4"
+}

@@ -1,0 +1,317 @@
+{
+  "RootObject": {
+    "__guid": "f2a47bf3-758e-577f-b2ed-89ee9e57fbb6",
+    "Flags": 0,
+    "Name": "wm_m16",
+    "Enabled": true,
+    "Components": [
+      {
+        "__type": "Sandbox.SkinnedModelRenderer",
+        "__guid": "a8cdf1bc-a202-5082-820f-6e02c1045c34",
+        "AnimationGraph": null,
+        "BodyGroups": 9087989,
+        "BoneMergeTarget": null,
+        "CreateAttachments": false,
+        "CreateBoneObjects": false,
+        "MaterialGroup": null,
+        "MaterialOverride": null,
+        "Model": "weapons/m16/w_m16.vmdl",
+        "Morphs": {},
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Parameters": {
+          "bools": {},
+          "ints": {},
+          "floats": {},
+          "vectors": {},
+          "rotations": {}
+        },
+        "PlaybackRate": 1,
+        "RenderOptions": {
+          "GameLayer": true,
+          "OverlayLayer": false,
+          "BloomLayer": false,
+          "AfterUILayer": false
+        },
+        "RenderType": "On",
+        "Sequence": {
+          "Name": null
+        },
+        "Tint": "1,1,1,1",
+        "UseAnimGraph": true
+      },
+      {
+        "__type": "Facepunch.WorldModel",
+        "__guid": "6534e515-ab4c-54fe-9c69-bab431e70eeb",
+        "EjectionPort": {
+          "_type": "gameobject",
+          "go": "2e28bb7d-2aad-5162-9a4a-82de974067b7"
+        },
+        "IkLeftHand": {
+          "_type": "gameobject",
+          "go": "05d1c90f-47fc-5bd9-a439-309ec86d9bbb"
+        },
+        "ModelRenderer": {
+          "_type": "component",
+          "component_id": "a8cdf1bc-a202-5082-820f-6e02c1045c34",
+          "go": "f2a47bf3-758e-577f-b2ed-89ee9e57fbb6",
+          "component_type": "SkinnedModelRenderer"
+        },
+        "Muzzle": {
+          "_type": "gameobject",
+          "go": "2c9677dc-422f-570e-95b7-83e9d3f7d61c"
+        },
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "2c9677dc-422f-570e-95b7-83e9d3f7d61c",
+        "Flags": 0,
+        "Name": "Muzzle",
+        "Position": "23.77,0,4.951",
+        "Enabled": true
+      },
+      {
+        "__guid": "2e28bb7d-2aad-5162-9a4a-82de974067b7",
+        "Flags": 0,
+        "Name": "EjectionPort",
+        "Position": "0.549,-0.62,5.197",
+        "Enabled": true
+      },
+      {
+        "__guid": "05d1c90f-47fc-5bd9-a439-309ec86d9bbb",
+        "Flags": 0,
+        "Name": "LeftHandIK",
+        "Position": "5.7,2.19,2.68",
+        "Rotation": "-0.6308,0.3714,-0.448,0.5133",
+        "Enabled": true
+      },
+      {
+        "__guid": "3bf6dc50-b6a6-5028-b207-a249aa14ebf0",
+        "Flags": 0,
+        "Name": "Optic Attachment Point",
+        "Position": "-0.686,0,6.153",
+        "Enabled": true,
+        "Components": [
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithAttachmentPoint",
+            "__guid": "ef9016b4-e766-530b-bea0-6ea1508ebee5",
+            "Category": "Optic",
+            "MountBone": "tag_sling",
+            "MountOffset": "-0.936,0,-2.577",
+            "FittedBodygroups": {
+              "carry_handle": 1
+            }
+          }
+        ]
+      },
+      {
+        "__guid": "a82ef5f6-cc27-5fab-ac68-726b32ec3753",
+        "Flags": 0,
+        "Name": "Muzzle Attachment Point",
+        "Position": "22.186,0,4.951",
+        "Enabled": true,
+        "Components": [
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithAttachmentPoint",
+            "__guid": "9de8b662-9a31-531e-b096-316c70064ab2",
+            "Category": "Muzzle",
+            "MountBone": "tag_sling",
+            "MountOffset": "4.566,0,-2.4637",
+            "FittedBodygroups": {
+              "muzzle_tip": 1
+            }
+          }
+        ]
+      },
+      {
+        "__guid": "41ff588a-ddc0-562c-b3a6-ea878c603b53",
+        "Flags": 0,
+        "Name": "Underbarrel Attachment Point",
+        "Position": "10.67,0,3.862",
+        "Enabled": true,
+        "Components": [
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithAttachmentPoint",
+            "__guid": "2de07733-2646-590e-b85e-a73bfe2c032a",
+            "Category": "Underbarrel",
+            "MountBone": "tag_sling",
+            "MountOffset": "2.37,0,-2.338",
+            "FittedBodygroups": {
+              "grip_cover": 1
+            }
+          }
+        ]
+      },
+      {
+        "__guid": "9d52b9cd-2287-5132-877b-2429f2106b76",
+        "Flags": 0,
+        "Name": "Laser Attachment Point",
+        "Position": "10.154,-1.093,4.961",
+        "Enabled": true,
+        "Components": [
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithAttachmentPoint",
+            "__guid": "f207f06d-1868-5974-b0d3-fd1c953af65d",
+            "Category": "Laser",
+            "MountBone": "tag_sling",
+            "MountOffset": "1.554,0.127,-2.4537",
+            "FittedBodygroups": {
+              "laser_rail": 1
+            }
+          }
+        ]
+      },
+      {
+        "__guid": "5c478720-0651-5829-af9f-e8fef6900f5b",
+        "Flags": 0,
+        "Name": "Charm Attachment Point",
+        "Position": "0,1.75,2.3",
+        "Enabled": true,
+        "Components": [
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithAttachmentPoint",
+            "__guid": "5b6f9c34-a36a-5dc8-90da-dd82562fe0ae",
+            "Category": "Charm"
+          }
+        ]
+      },
+      {
+        "__guid": "dbf05770-7830-5bac-81e3-806df3f885f5",
+        "Flags": 0,
+        "Name": "Stock Attachment Point",
+        "Position": "-5.80688,0,4.94922",
+        "Enabled": true,
+        "Components": [
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithAttachmentPoint",
+            "__guid": "10c3a99b-9360-5d30-8a5e-02bdc48e76a0",
+            "Category": "Stock",
+            "MountBone": "tag_sling",
+            "MountOffset": "-1.7569,0,-2.4655",
+            "FittedBodygroups": {
+              "factory_stock": 1
+            }
+          }
+        ]
+      },
+      {
+        "__guid": "9e8bf375-5482-5163-a5e5-3612452f1542",
+        "Flags": 0,
+        "Name": "RearGrip Attachment Point",
+        "Position": "-3,0,3",
+        "Enabled": true,
+        "Components": [
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithAttachmentPoint",
+            "__guid": "83215b75-7253-5076-acb5-caf83844194e",
+            "Category": "RearGrip",
+            "MountBone": "tag_sling",
+            "MountOffset": "-1.39,0,-2.58",
+            "FittedBodygroups": {
+              "factory_grip": 1
+            }
+          }
+        ]
+      },
+      {
+        "__guid": "37d6d3fb-927d-5bb9-8cc6-2dbb793e4ba1",
+        "Flags": 0,
+        "Name": "Barrel Attachment Point",
+        "Position": "2.41992,0,6.15332",
+        "Enabled": true,
+        "Components": [
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithAttachmentPoint",
+            "__guid": "ef27f593-1d67-5781-9a7a-cf3ce77d36e2",
+            "Category": "Barrel",
+            "MountBone": "tag_sling",
+            "MountOffset": "-1.9001,0,-2.4724",
+            "FittedBodygroups": {
+              "factory_barrel": 1,
+              "factory_handguard": 1,
+              "factory_front_sight": 1,
+              "muzzle_tip": 1,
+              "grip_cover": 1,
+              "laser_rail": 2
+            }
+          }
+        ]
+      },
+      {
+        "__guid": "6360b5d7-d8e6-516f-9a40-ac8f221c731b",
+        "Flags": 0,
+        "Name": "Magazine Attachment Point",
+        "Position": "1.95898,0,2.22363",
+        "Enabled": true,
+        "Components": [
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithAttachmentPoint",
+            "__guid": "5416e20b-f3f8-5f8c-add3-ba3d48c6682d",
+            "Category": "Magazine",
+            "MountBone": "tag_sling",
+            "MountOffset": "0,0,0",
+            "FittedBodygroups": {}
+          }
+        ]
+      },
+      {
+        "__guid": "30f8838a-0d8d-5cbc-91b7-2ad1ffbb8f10",
+        "Flags": 0,
+        "Name": "Sticker Attachment Point",
+        "Position": "1.193,0.5583,3.8305",
+        "Rotation": "0.000000,0.000000,0.707107,0.707107",
+        "Enabled": true,
+        "Components": [
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithAttachmentPoint",
+            "__guid": "1a527c93-0aee-50a8-b821-2dbda865cb42",
+            "Category": "Sticker",
+            "StickerSize": "1.4,0.7"
+          }
+        ]
+      }
+    ],
+    "__variables": [],
+    "__properties": {
+      "FixedUpdateFrequency": 50,
+      "MaxFixedUpdates": 5,
+      "NetworkFrequency": 30,
+      "NetworkInterpolation": true,
+      "PhysicsSubSteps": 1,
+      "ThreadedAnimation": true,
+      "TimeScale": 1,
+      "UseFixedUpdate": true,
+      "Metadata": {},
+      "NavMesh": {
+        "Enabled": false,
+        "IncludeStaticBodies": true,
+        "IncludeKeyframedBodies": true,
+        "EditorAutoUpdate": true,
+        "AgentHeight": 64,
+        "AgentRadius": 16,
+        "AgentStepSize": 18,
+        "AgentMaxSlope": 40,
+        "ExcludedBodies": "",
+        "IncludedBodies": ""
+      }
+    }
+  },
+  "ShowInMenu": false,
+  "MenuPath": null,
+  "MenuIcon": null,
+  "DontBreakAsTemplate": false,
+  "ResourceVersion": 1,
+  "__references": [],
+  "__version": 1
+}

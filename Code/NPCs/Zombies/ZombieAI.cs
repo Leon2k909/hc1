@@ -13,7 +13,10 @@ public enum ZombieSpeed
 public sealed class ZombieAI : Component, Component.IDamageable
 {
 	public const string ZombieModel = "zombie_project/models/zombie_male.vmdl";
-	public const string DriverModel = "models/citizen_human/citizen_human_male.vmdl";
+	/// <summary>Invisible citizen that plays NMRIH's zombie clips (ZombieClips, Tools/zombie_anims.py) as sequences.</summary>
+	public const string DriverModel = "models/zombie/zombie_driver.vmdl";
+	/// <summary>Stand-in driver if that one's missing: the citizen, walking with its human animgraph.</summary>
+	public const string CitizenModel = "models/citizen_human/citizen_human_male.vmdl";
 
 	/// <summary>The visible zombie mesh (bone-merged onto the hidden animated driver).</summary>
 	private SkinnedModelRenderer Body => Components.GetAll<SkinnedModelRenderer>( FindMode.InDescendants ).FirstOrDefault( r => r != Renderer ) ?? Renderer;
@@ -38,10 +41,8 @@ public sealed class ZombieAI : Component, Component.IDamageable
 	/// <summary>Host decides, everyone plays it — the renderer itself isn't networked.</summary>
 	[Sync( SyncFlags.FromHost )] private AnimState Anim { get; set; } = AnimState.Idle;
 	[Sync( SyncFlags.FromHost )] private bool IsDead { get; set; }
-
-	private const string MoveSeq = "walk";
-	private const string IdleSeq = "idle";
-	private const string AttackSeq = "attack";
+	/// <summary>Counts swings, so every client starts each one and picks the same attack clip.</summary>
+	[Sync( SyncFlags.FromHost )] private int SwingCount { get; set; }
 
 	// Attack: the swing winds up, then lands only if the target is still in reach.
 	private const float AttackWindup = 0.45f;
@@ -65,9 +66,6 @@ public sealed class ZombieAI : Component, Component.IDamageable
 		ZombieSpeed.Jog => 135f,
 		_ => 70f
 	};
-
-	/// <summary>Walk cycle playback rate, so faster zombies' legs keep up with their feet.</summary>
-	private float AnimRate => Anim == AnimState.Move ? MoveSpeed / 80f : 1f;
 
 	protected override void OnStart()
 	{
@@ -253,6 +251,7 @@ public sealed class ZombieAI : Component, Component.IDamageable
 		_lastAttack = 0;
 		_timeSinceAttackStart = 0;
 		_swingPending = true;
+		SwingCount++;
 		SetAnim( AnimState.Attack );
 		PlaySound( "zombie.attack" );
 	}
@@ -275,44 +274,94 @@ public sealed class ZombieAI : Component, Component.IDamageable
 	}
 
 	private string _playingSeq;
+	private int _playingSwing = -1;
 
 	private Vector3 _lastPos;
 	private Vector3 _smoothVel;
 
 	private void UpdateAnimation()
 	{
-		if ( !Renderer.IsValid() ) return;
-		if ( Renderer.UseAnimGraph ) { UpdateAnimGraph(); return; }
-		if ( Anim == AnimState.Dead ) return;
+		if ( !Renderer.IsValid() || Anim == AnimState.Dead ) return;
 
-		var (seq, loop) = Anim switch
-		{
-			AnimState.Move => (MoveSeq, true),
-			AnimState.Attack => (AttackSeq, false),
-			_ => (IdleSeq, true)
-		};
-
-		if ( _playingSeq != seq )
-		{
-			_playingSeq = seq;
-			Renderer.Sequence.Name = seq;
-			Renderer.Sequence.Looping = loop;
-			Renderer.Sequence.Time = 0;
-		}
-
-		Renderer.Sequence.Time += Time.Delta * AnimRate;
-	}
-
-	/// <summary>Citizen anim graph: velocity from position deltas so proxies animate too.</summary>
-	private void UpdateAnimGraph()
-	{
-		if ( Anim == AnimState.Dead ) return;
-
+		// Velocity from position deltas, so proxies animate too.
 		var vel = Time.Delta > 0f ? (WorldPosition - _lastPos) / Time.Delta : Vector3.Zero;
 		_lastPos = WorldPosition;
 		if ( vel.Length > 600f ) vel = Vector3.Zero; // teleports / spawn
 		_smoothVel = _smoothVel.LerpTo( vel.WithZ( 0 ), Time.Delta * 10f );
 
+		if ( Renderer.UseAnimGraph ) UpdateAnimGraph();
+		else UpdateSequence();
+	}
+
+	/// <summary>A per-zombie constant in [0, 1), the same on every client: its walk, and where in the cycle it
+	/// starts, so a crowd doesn't march in step.</summary>
+	private float Quirk => (GameObject.Id.GetHashCode() & 0xffff) / 65536f;
+
+	private ZombieClip MoveClip => Speed == ZombieSpeed.Walk
+		? ZombieClips.Walks[(int)(Quirk * ZombieClips.Walks.Length)]
+		: ZombieClips.Run;
+
+	private static int Scramble( int x )
+	{
+		unchecked
+		{
+			var h = (uint)x * 0x9E3779B1u;
+			return (int)((h ^ (h >> 16)) & 0x7fffffff);
+		}
+	}
+
+	/// <summary>The zombie driver's clips, crossfaded.</summary>
+	private void UpdateSequence()
+	{
+		var seq = Renderer.Sequence;
+		switch ( Anim )
+		{
+			case AnimState.Move:
+			{
+				var clip = MoveClip;
+				if ( _playingSeq != clip.Name ) Play( clip, true, Quirk * clip.Duration );
+
+				// Feet keep pace with the ground. Walkers (70) outpace even the lengthened shamble (48): past 1.4x its
+				// cadence turns frantic, so their feet slide a little instead. Jogs are the run slowed down.
+				var (min, max) = Speed == ZombieSpeed.Walk ? (0.6f, 1.4f) : (0.55f, 1.3f);
+				seq.PlaybackRate = (_smoothVel.Length / clip.Speed).Clamp( min, max ) * (0.93f + 0.14f * Quirk);
+				break;
+			}
+
+			case AnimState.Attack:
+			{
+				// Each swing picks an attack; pounding on a door repeats it.
+				if ( _playingSwing != SwingCount || _playingSeq?.StartsWith( "attack" ) != true || seq.IsFinished )
+				{
+					var clip = ZombieClips.Attacks[Scramble( GameObject.Id.GetHashCode() + SwingCount ) % ZombieClips.Attacks.Length];
+					// Start part-way in, so the blow lands when the damage does (AttackWindup).
+					Play( clip, false, (clip.Hit - AttackWindup).Clamp( 0f, clip.Duration ) );
+					_playingSwing = SwingCount;
+				}
+				seq.PlaybackRate = 1f;
+				break;
+			}
+
+			default:
+				if ( _playingSeq != ZombieClips.Idle.Name ) Play( ZombieClips.Idle, true, Quirk * ZombieClips.Idle.Duration );
+				seq.PlaybackRate = 1f;
+				break;
+		}
+	}
+
+	private void Play( ZombieClip clip, bool loop, float time )
+	{
+		var seq = Renderer.Sequence;
+		seq.Blending = true;
+		seq.Name = clip.Name;
+		seq.Looping = loop;
+		seq.Time = time;
+		_playingSeq = clip.Name;
+	}
+
+	/// <summary>Fallback citizen driver: its human anim graph.</summary>
+	private void UpdateAnimGraph()
+	{
 		var local = WorldRotation.Inverse * _smoothVel;
 		Renderer.Set( "move_x", local.x );
 		Renderer.Set( "move_y", local.y );
@@ -369,6 +418,12 @@ public sealed class ZombieAI : Component, Component.IDamageable
 	private bool IsHeadshot( Vector3 hitPos )
 	{
 		if ( !Renderer.IsValid() || hitPos == default ) return false;
+
+		// Bullets stop on the capsule, so go by height: from the jaw up (the head bone is the top of the neck).
+		// Zombies hunch and lunge, so their head is well below the capsule's top.
+		if ( Renderer.TryGetBoneTransform( "head", out var head ) )
+			return hitPos.z > head.Position.z - 1f;
+
 		var bounds = Renderer.Bounds;
 		var height = bounds.Maxs.z - bounds.Mins.z;
 		return height > 1f && hitPos.z > bounds.Maxs.z - height * 0.2f;
@@ -379,37 +434,43 @@ public sealed class ZombieAI : Component, Component.IDamageable
 		if ( IsDead || !Networking.IsHost ) return;
 
 		var attacker = info.Attacker?.GetComponentInParent<PlayerPawn>();
-		var headshot = IsHeadshot( info.Position );
+
+		// Fire (SurfaceFire) isn't a hit: no blood, hitmarker or flinch, and only the kill pays.
+		var burn = info.Tags?.Has( "burn" ) == true;
+		var headshot = !burn && IsHeadshot( info.Position );
 
 		var damage = info.Damage;
 		if ( headshot ) damage *= 2f;
-		if ( attacker.IsValid() && ZombiesPlayerState.For( attacker )?.HasPerk( ZombiesPerk.DoubleTap ) == true ) damage *= 2f;
-		if ( ZombiesRoundSystem.Current?.IsPowerUpActive( ZombiesPowerUpType.InstaKill ) == true ) damage = Health + 1f;
+		if ( attacker.IsValid() && ZombiesPlayerState.For( attacker )?.HasPerk( ZombiesPerk.HotShot ) == true ) damage *= 2f;
+		if ( ZombiesRoundSystem.Current?.IsPowerUpActive( ZombiesPowerUpType.OneHitKills ) == true ) damage = Health + 1f;
 
 		// One brief impact, even for headshots; group near-simultaneous shotgun pellets.
-		if ( damage > 0f && _timeSinceBloodImpact >= 0.03f )
+		if ( damage > 0f && !burn && _timeSinceBloodImpact >= 0.03f )
 		{
 			_timeSinceBloodImpact = 0;
 			SpawnBlood( info.Position == default ? WorldPosition + Vector3.Up * 30f : info.Position );
 		}
 		Health -= damage;
 
+		if ( damage > 0f && !burn && attacker.IsValid() )
+			ShowHitmarker( attacker, Health <= 0, headshot );
+
 		var eco = attacker?.GetComponent<ZombiesPlayerEconomy>();
 
 		if ( Health <= 0 )
 		{
-			eco?.AddPoints( headshot ? 100 : 60 );
+			eco?.AddPoints( headshot ? 100 : 60, "Killed a zombie" );
 			eco?.AddKill();
 			Kill( attacker?.GameObject );
 		}
-		else
+		else if ( !burn )
 		{
 			eco?.AddPoints( 10 );
 			PlaySound( "zombie.pain" );
 		}
 	}
 
-	/// <summary>Host: kill this zombie (from damage, or a Nuke with no attacker).</summary>
+	/// <summary>Host: kill this zombie (from damage, or a Clean Sweep with no attacker).</summary>
 	public void Kill( GameObject attacker )
 	{
 		if ( IsDead || !Networking.IsHost ) return;
@@ -458,8 +519,10 @@ public sealed class ZombieAI : Component, Component.IDamageable
 		if ( !Renderer.IsValid() || Renderer.Model?.Physics is null ) return;
 		_ragdolled = true;
 		Renderer.UseAnimGraph = false;
-		// Footsteps look through corpses to the floor (PlayerFootsteps).
+		// Footsteps look through corpses to the floor (PlayerFootsteps), and players walk through them (their movement
+		// ignores "ragdoll").
 		GameObject.Tags.Add( "corpse" );
+		GameObject.Tags.Add( "ragdoll" );
 
 		if ( _rb.IsValid() ) _rb.Enabled = false;
 		foreach ( var c in Components.GetAll<Collider>() ) c.Enabled = false;
@@ -482,6 +545,21 @@ public sealed class ZombieAI : Component, Component.IDamageable
 	private void PlaySound( string sound )
 	{
 		Sound.Play( sound, WorldPosition );
+	}
+
+	/// <summary>
+	/// The shooter's hitmarker, and on a kill the kill sound, on whichever machine is viewing them. A bot's hit sends them
+	/// through HealthComponent's DamageGivenEvent and KillEvent, but zombies take damage here instead.
+	/// </summary>
+	[Rpc.Broadcast]
+	private void ShowHitmarker( PlayerPawn attacker, bool kill, bool headshot )
+	{
+		if ( !attacker.IsValid() || !attacker.IsViewer )
+			return;
+
+		Crosshair.Instance?.ShowHit( kill, headshot );
+		if ( kill )
+			KillSounds.OnZombieKill( headshot );
 	}
 
 	private TimeSince _timeSinceBloodImpact = 1f;

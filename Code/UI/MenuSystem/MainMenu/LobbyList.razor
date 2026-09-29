@@ -16,8 +16,8 @@
     </div>
 
     <div class="sb-footer">
-        <div class="sb-btn" onclick=@(() => Refresh())><i>refresh</i><label>Refresh</label></div>
-        <a class="sb-btn" href="/new"><i>add</i><label>Create Game</label></a>
+        <div class="sb-btn" onclick=@(() => Refresh())><i>refresh</i><label>@Tr( "Refresh" )</label></div>
+        <a class="sb-btn" href="/new"><i>add</i><label>@Tr( "Create Game" )</label></a>
         <div class="sb-btn primary @(CanJoin ? "" : "disabled")" onclick=@(() => TryJoin())><i>play_arrow</i><label>@JoinLabel</label></div>
     </div>
 </root>
@@ -30,7 +30,7 @@
 
     private bool CanJoin => Lobby.HasValue && !Lobby.Value.IsFull;
 
-    private string JoinLabel => Lobby.HasValue && Lobby.Value.IsFull ? "Session Full" : "Join Session";
+    private string JoinLabel => Tr( Lobby.HasValue && Lobby.Value.IsFull ? "Session Full" : "Join Session" );
 
     private void Refresh()
     {
@@ -46,7 +46,7 @@
     {
         if ( !Lobby?.HasData ?? false )
         {
-            DialogModal.Show("This server is outdated and you may experience issues - we'd advise making your own lobby instead!", "OK", "Join anyway", null, () =>
+            DialogModal.Show(Tr( "This server is outdated and you may experience issues - we'd advise making your own lobby instead!" ), Tr( "OK" ), Tr( "Join anyway" ), null, () =>
             {
                 Join();
             });

@@ -159,10 +159,11 @@ public sealed class GunGameManager : Component,
 		var playerName = player.Client?.DisplayName ?? "Unknown";
 
 		var msg = advanced
-			? $"{playerName} → {weaponName} (Tier {newTier + 1}/{TotalTiers})"
-			: $"{playerName} was demoted to {weaponName}";
+			? "{0} → {1} (Tier {2}/{3})"
+			: "{0} was demoted to {1}";
 
-		Facepunch.UI.Toast.Instance?.Show( msg, Facepunch.UI.ToastType.Generic );
+		// Every machine shows this itself, and the toast puts the English in its player's language.
+		Facepunch.UI.Toast.Instance?.Show( msg, Facepunch.UI.ToastType.Generic, 5f, playerName, weaponName, newTier + 1, TotalTiers );
 	}
 
 	[Rpc.Broadcast( NetFlags.HostOnly )]
@@ -171,7 +172,7 @@ public sealed class GunGameManager : Component,
 		if ( !winner.IsValid() ) return;
 
 		var name = winner.Client?.DisplayName ?? "Unknown";
-		Facepunch.UI.Toast.Instance?.Show( $"🏆 {name} won Gun Game!", Facepunch.UI.ToastType.Generic );
+		Facepunch.UI.Toast.Instance?.Show( "🏆 {0} won Gun Game!", Facepunch.UI.ToastType.Generic, 5f, name );
 
 		if ( Networking.IsHost )
 		{

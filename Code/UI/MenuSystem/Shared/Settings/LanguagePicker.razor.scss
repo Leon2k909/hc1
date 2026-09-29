@@ -1,0 +1,44 @@
+@import "/UI/Styles/MenuPage.scss";
+
+// Settings → Game → Language: a field like a text box with the language in it, opening LanguageMenu below it.
+.language-picker
+{
+    flex-direction: row;
+    flex-shrink: 0;
+    align-items: center;
+    width: 400px;
+    height: 44px;
+    padding: 0 10px 0 14px;
+    gap: 10px;
+    background-color: #111316;
+    border: 1px solid rgba( white, 0.16 );
+    cursor: pointer;
+    transition: border-color 0.12s ease, background-color 0.12s ease;
+
+    label, i { pointer-events: none; text-shadow: none; }
+
+    .lp-globe { font-size: 20px; color: $menu-accent; flex-shrink: 0; }
+    .lp-native { font-size: 16px; font-weight: 700; color: white; flex-shrink: 0; }
+    .lp-english
+    {
+        min-width: 0; flex-shrink: 1;
+        font-size: 14px; font-weight: 500; color: $menu-muted;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .lp-spacer { flex-grow: 1; }
+    .lp-chevron { font-size: 24px; color: rgba( white, 0.6 ); flex-shrink: 0; transition: transform 0.15s ease, color 0.12s ease; }
+
+    &:hover
+    {
+        border-color: $menu-accent;
+        sound-in: ui_button_hover;
+        .lp-chevron { color: white; }
+    }
+
+    &.open
+    {
+        border-color: $menu-accent;
+        background-color: rgba( 255, 122, 26, 0.08 );
+        .lp-chevron { color: $menu-accent; transform: rotate( 180deg ); }
+    }
+}

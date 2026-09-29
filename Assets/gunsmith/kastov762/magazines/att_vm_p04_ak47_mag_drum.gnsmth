@@ -1,0 +1,42 @@
+{
+  "Name": "75 Round Drum",
+  "Category": "Magazine",
+  "EligibleEquipment": [
+    "weapons/kastov/kastov762.equip"
+  ],
+  "RequiredLevel": 0,
+  "Description": "Large 7.62 drum magazine. Reloads in 3.4s (4.4s when empty).",
+  "ModifyBodygroups": true,
+  "Bodygroups": {
+    "magazine": 3
+  },
+  "VerticalRecoilScale": 1.0,
+  "HorizontalRecoilScale": 1.0,
+  "MagazineCapacity": 75,
+  "ReloadTimeMultiplier": 1.0,
+  "ReloadAnimation": 2,
+  "ReloadTime": 3.4,
+  "EmptyReloadTime": 4.4,
+  "ReloadSounds": {
+    "0.000000": "sounds/weapons/kastov/kastov_drum_reload_01.sound",
+    "0.433333": "sounds/weapons/kastov/kastov_drum_reload_02.sound",
+    "1.000000": "sounds/weapons/kastov/kastov_drum_reload_03.sound",
+    "1.833333": "sounds/weapons/kastov/kastov_drum_reload_04.sound",
+    "2.066667": "sounds/weapons/kastov/kastov_drum_reload_05.sound",
+    "2.900000": "sounds/weapons/kastov/kastov_drum_reload_06.sound",
+    "3.166667": "sounds/weapons/kastov/kastov_drum_reload_07.sound"
+  },
+  "EmptyReloadSounds": {
+    "0.000000": "sounds/weapons/kastov/kastov_drum_reload_empty_01.sound",
+    "0.533333": "sounds/weapons/kastov/kastov_drum_reload_empty_02.sound",
+    "0.766667": "sounds/weapons/kastov/kastov_drum_reload_empty_03.sound",
+    "1.833333": "sounds/weapons/kastov/kastov_drum_reload_empty_04.sound",
+    "2.366667": "sounds/weapons/kastov/kastov_drum_reload_empty_05.sound",
+    "2.900000": "sounds/weapons/kastov/kastov_drum_reload_empty_06.sound",
+    "3.266667": "sounds/weapons/kastov/kastov_drum_reload_empty_07.sound",
+    "3.833333": "sounds/weapons/kastov/kastov_drum_reload_empty_08.sound",
+    "4.233333": "sounds/weapons/kastov/kastov_drum_reload_empty_09.sound"
+  },
+  "__references": [],
+  "__version": 0
+}

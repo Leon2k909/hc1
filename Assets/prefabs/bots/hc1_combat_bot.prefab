@@ -99,13 +99,12 @@
         "TeamBaseModels": {
           "Terrorist": {
             "Models": [
-              "models/player/t_side/t_side_player_01/t_side_player_01_v2.vmdl"
+              "models/citizen_human/citizen_human_male.vmdl"
             ]
           },
           "CounterTerrorist": {
             "Models": [
-              "models/player/ct_side/ct_side_player_01/ct_side_player_01_v2.vmdl",
-              "models/player/ct_side/ct_side_riot_player/ct_side_riot_player.vmdl"
+              "models/citizen_human/citizen_human_male.vmdl"
             ]
           }
         },
@@ -132,6 +131,27 @@
         "OwnerTransfer": 1,
         "Components": [
           {
+            "__type": "Facepunch.MilitaryUniform",
+            "__guid": "11079cc6-e58f-44e5-bca0-ea9871de37ee",
+            "__enabled": true,
+            "Flags": 0,
+            "Pieces": [
+              "models/citizen_clothes/hat/tactical_helmet/tactical_helmet_army.clothing",
+              "models/citizen_clothes/shirt/army_shirt/army_shirt.clothing",
+              "models/citizen_clothes/trousers/cargopants/cargo_pants_army.clothing",
+              "models/citizen_clothes/vest/tactical_vest/models/tactical_vest_army.clothing",
+              "models/citizen_clothes/shoes/boots/army_boots.clothing"
+            ],
+            "FieldPieces": [
+              "models/citizen_clothes/hat/tactical_helmet/tactical_helmet_army.clothing",
+              "models/citizen_clothes/shirt/army_shirt/army_shirt.clothing",
+              "models/citizen_clothes/trousers/cargopants/cargo_pants_army.clothing",
+              "models/citizen_clothes/vest/tactical_vest/models/tactical_vest_army.clothing",
+              "models/citizen_clothes/shoes/boots/army_boots.clothing",
+              "models/citizen_clothes/gloves/fingerless_gloves/fingerless_gloves.clothing"
+            ]
+          },
+          {
             "__type": "Sandbox.SkinnedModelRenderer",
             "__guid": "ce1ba59d-ce66-4bc7-ae07-cbc8eb04e737",
             "__enabled": true,
@@ -145,7 +165,7 @@
             "MaterialGroup": null,
             "MaterialOverride": null,
             "Materials": null,
-            "Model": "models/player/t_side/t_side_player_01/t_side_player_01_v2.vmdl",
+            "Model": "models/citizen_human/citizen_human_male.vmdl",
             "Morphs": {},
             "OnComponentDestroy": null,
             "OnComponentDisabled": null,

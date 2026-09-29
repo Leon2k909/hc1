@@ -20,6 +20,30 @@ public sealed class FuncDoorRotating : MapMover
 
 	Vector3 _localPivot;
 
+	/// <summary> The hinge in world space, where the door stood closed. </summary>
+	public Vector3 HingePosition => (GameObject.Parent?.WorldTransform ?? global::Transform.Zero)
+		.PointToWorld( StartTransform.PointToWorld( _localPivot ) );
+
+	/// <summary>
+	/// How far the door reaches from its hinge. It can open either way, so it sweeps a full circle this size.
+	/// </summary>
+	public float SwingRadius
+	{
+		get
+		{
+			if ( GetComponent<ModelRenderer>()?.Model is not { } model )
+				return 56f;
+
+			var b = model.Bounds;
+			var reach = 0f;
+			foreach ( var x in new[] { b.Mins.x, b.Maxs.x } )
+				foreach ( var y in new[] { b.Mins.y, b.Maxs.y } )
+					reach = MathF.Max( reach, new Vector2( x - _localPivot.x, y - _localPivot.y ).Length );
+
+			return reach * WorldScale.x;
+		}
+	}
+
 	protected override void OnStart()
 	{
 		_localPivot = PivotTarget.IsValid() ? WorldTransform.PointToLocal( PivotTarget.WorldPosition ) : Pivot;

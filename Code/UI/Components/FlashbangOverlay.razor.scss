@@ -12,5 +12,7 @@ FlashbangOverlay
         background-color: rgb( 255, 255, 255, 1 );
         width: 100%;
         height: 100%;
+        // Set every frame; until the first one, the white mustn't blink on at full strength.
+        opacity: 0;
     }
 }

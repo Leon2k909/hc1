@@ -1,0 +1,13 @@
+"Layer0"
+{
+	shader "shaders/complex.shader"
+	F_SPECULAR "1"
+	F_METALNESS_TEXTURE "1"
+	g_flRoughnessScaleFactor "1"
+	g_vColorTint "[1 1 1 1]"
+	TextureColor "weapons/famas/materials/famas_v1_stock_stable_color.png"
+	TextureNormal "weapons/famas/materials/famas_v1_stock_stable_normal.png"
+	TextureRoughness "weapons/famas/materials/famas_v1_stock_stable_roughness.png"
+	TextureMetalness "weapons/famas/materials/famas_v1_stock_stable_metalness.png"
+	TextureAmbientOcclusion "materials/default/default_ao.tga"
+}

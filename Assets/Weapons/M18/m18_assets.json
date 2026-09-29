@@ -1,0 +1,89 @@
+{
+  "materials": {
+    "weapon_vm_pi_papa320_frame": "weapons/m18/materials/m18_frame.vmat",
+    "weapon_vm_pi_papa320_slide": "weapons/m18/materials/m18_slide.vmat",
+    "weapon_vm_pi_papa320_slide_black": "weapons/m18/materials/m18_slide_black.vmat",
+    "weapon_vm_pi_papa320_slide_vented": "weapons/m18/materials/m18_slide_vented.vmat",
+    "weapon_vm_pi_papa320_barrel_ext": "weapons/m18/materials/m18_slide_long.vmat",
+    "weapon_vm_pi_papa320_sights": "weapons/m18/materials/m18_sights.vmat",
+    "weapon_vm_pi_papa320_mag": "weapons/m18/materials/m18_mag.vmat",
+    "weapon_vm_pi_papa320_mag_ext": "weapons/m18/materials/m18_mag_21.vmat",
+    "weapon_vm_pi_papa320_mag_ext2": "weapons/m18/materials/m18_mag_32.vmat"
+  },
+  "sounds": {
+    "fire": "weapons/m18/sounds/m18.fire.sound",
+    "raise_up": "weapons/m18/sounds/m18.raise_up.sound",
+    "raise": "weapons/m18/sounds/m18.raise_up.sound",
+    "drop_down": "weapons/m18/sounds/m18.drop_down.sound",
+    "drop": "weapons/m18/sounds/m18.drop_down.sound",
+    "reload_start": "weapons/m18/sounds/m18.reload_start.sound",
+    "reload_magout_01": "weapons/m18/sounds/m18.reload_magout_01.sound",
+    "reload_wiggle": "weapons/m18/sounds/m18.reload_wiggle.sound",
+    "reload_magin_v2_01": "weapons/m18/sounds/m18.reload_magin_v2_01.sound",
+    "reload_magin_v2_02": "weapons/m18/sounds/m18.reload_magin_v2_02.sound",
+    "reload_end": "weapons/m18/sounds/m18.reload_end.sound",
+    "reload_empty_start": "weapons/m18/sounds/m18.reload_empty_start.sound",
+    "reload_empty_magout_01": "weapons/m18/sounds/m18.reload_empty_magout_01.sound",
+    "reload_empty_regrip": "weapons/m18/sounds/m18.reload_empty_regrip.sound",
+    "reload_empty_arm": "weapons/m18/sounds/m18.reload_empty_arm.sound",
+    "reload_empty_magin_v2_01": "weapons/m18/sounds/m18.reload_empty_magin_v2_01.sound",
+    "reload_empty_magin_v2_02": "weapons/m18/sounds/m18.reload_empty_magin_v2_02.sound",
+    "reload_empty_end": "weapons/m18/sounds/m18.reload_empty_end.sound",
+    "reload_empty_charge_01": "weapons/m18/sounds/m18.reload_empty_charge_01.sound",
+    "reload_xmag_start": "weapons/m18/sounds/m18.reload_xmag_start.sound",
+    "reload_xmag_arm": "weapons/m18/sounds/m18.reload_xmag_arm.sound",
+    "reload_xmag_magout_01": "weapons/m18/sounds/m18.reload_xmag_magout_01.sound",
+    "reload_xmag_thumb": "weapons/m18/sounds/m18.reload_xmag_thumb.sound",
+    "reload_xmag_magin_v2_01": "weapons/m18/sounds/m18.reload_xmag_magin_v2_01.sound",
+    "reload_xmag_magin_v2_02": "weapons/m18/sounds/m18.reload_xmag_magin_v2_02.sound",
+    "reload_xmag_wiggle": "weapons/m18/sounds/m18.reload_xmag_wiggle.sound",
+    "reload_xmag_end": "weapons/m18/sounds/m18.reload_xmag_end.sound",
+    "reload_empty_xmag_start": "weapons/m18/sounds/m18.reload_empty_xmag_start.sound",
+    "reload_empty_xmag_magout_01": "weapons/m18/sounds/m18.reload_empty_xmag_magout_01.sound",
+    "reload_empty_xmag_regrip": "weapons/m18/sounds/m18.reload_empty_xmag_regrip.sound",
+    "reload_empty_xmag_arm": "weapons/m18/sounds/m18.reload_empty_xmag_arm.sound",
+    "reload_empty_xmag_magin_v2_01": "weapons/m18/sounds/m18.reload_empty_xmag_magin_v2_01.sound",
+    "reload_empty_xmag_magin_v2_02": "weapons/m18/sounds/m18.reload_empty_xmag_magin_v2_02.sound",
+    "reload_empty_xmag_end": "weapons/m18/sounds/m18.reload_empty_xmag_end.sound"
+  },
+  "reloads": {
+    "reload": {
+      "0": "weapons/m18/sounds/m18.reload_start.sound",
+      "0.333": "weapons/m18/sounds/m18.reload_magout_01.sound",
+      "0.667": "weapons/m18/sounds/m18.reload_wiggle.sound",
+      "0.9": "weapons/m18/sounds/m18.reload_magin_v2_01.sound",
+      "1.033": "weapons/m18/sounds/m18.reload_magin_v2_02.sound",
+      "1.2": "weapons/m18/sounds/m18.reload_end.sound"
+    },
+    "reload_empty": {
+      "0": "weapons/m18/sounds/m18.reload_empty_start.sound",
+      "0.367": "weapons/m18/sounds/m18.reload_empty_magout_01.sound",
+      "0.5": "weapons/m18/sounds/m18.reload_empty_regrip.sound",
+      "1.033": "weapons/m18/sounds/m18.reload_empty_arm.sound",
+      "1.1": "weapons/m18/sounds/m18.reload_empty_magin_v2_01.sound",
+      "1.333": "weapons/m18/sounds/m18.reload_empty_magin_v2_02.sound",
+      "1.633": "weapons/m18/sounds/m18.reload_empty_end.sound",
+      "1.643": "weapons/m18/sounds/m18.reload_empty_charge_01.sound"
+    },
+    "reload_xmag": {
+      "0": "weapons/m18/sounds/m18.reload_xmag_start.sound",
+      "0.3": "weapons/m18/sounds/m18.reload_xmag_arm.sound",
+      "0.367": "weapons/m18/sounds/m18.reload_xmag_magout_01.sound",
+      "0.667": "weapons/m18/sounds/m18.reload_xmag_thumb.sound",
+      "0.9": "weapons/m18/sounds/m18.reload_xmag_magin_v2_01.sound",
+      "1.033": "weapons/m18/sounds/m18.reload_xmag_magin_v2_02.sound",
+      "1.133": "weapons/m18/sounds/m18.reload_xmag_wiggle.sound",
+      "1.433": "weapons/m18/sounds/m18.reload_xmag_end.sound"
+    },
+    "reload_empty_xmag": {
+      "0": "weapons/m18/sounds/m18.reload_empty_xmag_start.sound",
+      "0.333": "weapons/m18/sounds/m18.reload_empty_xmag_magout_01.sound",
+      "0.5": "weapons/m18/sounds/m18.reload_empty_xmag_regrip.sound",
+      "1": "weapons/m18/sounds/m18.reload_empty_xmag_arm.sound",
+      "1.1": "weapons/m18/sounds/m18.reload_empty_xmag_magin_v2_01.sound",
+      "1.333": "weapons/m18/sounds/m18.reload_empty_xmag_magin_v2_02.sound",
+      "1.633": "weapons/m18/sounds/m18.reload_empty_charge_01.sound",
+      "1.667": "weapons/m18/sounds/m18.reload_empty_xmag_end.sound"
+    }
+  }
+}

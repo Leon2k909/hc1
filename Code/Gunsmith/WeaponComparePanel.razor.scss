@@ -1,0 +1,183 @@
+// The gunsmith's WEAPON STATS modal: the weapon's real figures beside another's. Text sizes go on the labels
+// themselves: the theme's `label { font-size: 18px }` beats anything inherited.
+
+$accent: #FF7A1A;
+$accent-ink: #16100A;
+$line: rgba( 255, 255, 255, 0.08 );
+$text-dim: rgba( 255, 255, 255, 0.5 );
+$text-mid: rgba( 255, 255, 255, 0.72 );
+$good: #7BD66B;
+$bad: #FF5C4D;
+$theirs: #5AB4FF;
+
+WeaponComparePanel
+{
+    flex-direction: column;
+    flex-shrink: 0;
+    margin-top: 12px;
+    color: white;
+
+    label { text-shadow: none; }
+
+    .wc-controls
+    {
+        flex-direction: row;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 14px;
+    }
+
+    .wc-toggle
+    {
+        flex-direction: row;
+        border: 1px solid rgba( 255, 255, 255, 0.16 );
+    }
+
+    .wc-toggle-opt
+    {
+        padding: 7px 14px;
+        cursor: pointer;
+
+        label { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; color: $text-mid; }
+
+        &:hover { background-color: rgba( 255, 255, 255, 0.06 ); }
+
+        &.on
+        {
+            background-color: $accent;
+
+            label { color: $accent-ink; }
+        }
+    }
+
+    .wc-controls-hint { font-size: 12px; color: $text-dim; }
+
+    // Under the chips while the right column is this gun from the factory.
+    .wc-factory-hint { font-size: 12px; color: $text-dim; margin: -8px 0 12px 0; }
+
+    .wc-label
+    {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: rgba( 255, 255, 255, 0.45 );
+        margin-bottom: 6px;
+    }
+
+    .wc-chips
+    {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 16px;
+    }
+
+    .wc-chip
+    {
+        padding: 6px 10px;
+        border: 1px solid rgba( 255, 255, 255, 0.14 );
+        background-color: rgba( 255, 255, 255, 0.03 );
+        cursor: pointer;
+
+        label { font-size: 12px; font-weight: 600; letter-spacing: 1px; color: $text-mid; }
+
+        &:hover { border-color: rgba( 255, 255, 255, 0.35 ); }
+
+        &.on
+        {
+            border-color: $theirs;
+            background-color: rgba( 90, 180, 255, 0.14 );
+
+            label { color: white; }
+        }
+    }
+
+    .wc-table
+    {
+        flex-direction: column;
+        border-top: 1px solid $line;
+    }
+
+    .wc-section
+    {
+        margin-top: 12px;
+        padding: 4px 0;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 2.5px;
+        color: $accent;
+        border-bottom: 1px solid $line;
+    }
+
+    .wc-row
+    {
+        flex-direction: row;
+        align-items: center;
+        min-height: 30px;
+        border-bottom: 1px solid rgba( 255, 255, 255, 0.04 );
+
+        &:hover { background-color: rgba( 255, 255, 255, 0.03 ); }
+    }
+
+    .wc-names
+    {
+        min-height: 40px;
+
+        .wc-val { font-size: 13px; font-weight: 700; letter-spacing: 1.5px; }
+        .wc-val.mine { color: $accent; }
+        .wc-val.theirs { color: $theirs; }
+    }
+
+    .wc-name
+    {
+        width: 40%;
+        flex-shrink: 0;
+        padding-left: 4px;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        color: $text-mid;
+    }
+
+    .wc-val
+    {
+        width: 30%;
+        flex-shrink: 0;
+        padding-right: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        color: white;
+        text-align: right;
+        white-space: nowrap;
+
+        &.better { color: $good; }
+        &.worse { color: $bad; }
+    }
+
+    .wc-note
+    {
+        margin-top: 14px;
+        font-size: 11px;
+        line-height: 16px;
+        letter-spacing: 0.5px;
+        color: $text-dim;
+    }
+
+    // The gunsmith's DETAILS, in the loadout column (300-392 wide): tighter, and the factory column is only the yardstick.
+    &.live
+    {
+        margin-top: 0;
+
+        .wc-names { min-height: 32px; }
+        .wc-names .wc-val { font-size: 11px; }
+        .wc-names .wc-val.theirs { color: $text-dim; }
+        .wc-section { margin-top: 10px; font-size: 10px; letter-spacing: 2px; }
+        .wc-row { min-height: 26px; }
+        .wc-row.better { background-color: rgba( 123, 214, 107, 0.08 ); }
+        .wc-row.worse { background-color: rgba( 255, 92, 77, 0.08 ); }
+        .wc-name { width: 46%; font-size: 12px; letter-spacing: 0.5px; }
+        .wc-val { width: 27%; padding-right: 6px; font-size: 13px; white-space: normal; }
+        .wc-val.theirs { color: $text-dim; }
+        .wc-note { font-size: 10px; line-height: 14px; }
+    }
+}

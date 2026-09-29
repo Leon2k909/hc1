@@ -80,10 +80,11 @@ public static class GunsmithLoadoutManager
 		return string.IsNullOrEmpty( v ) ? DefaultPrimaryResourceName : v;
 	}
 
-	public static bool GetCamoOnOptics() => Game.Cookies.Get<bool>( $"hc1.gunsmith.class{GetActiveClassIndex()}.camoonoptics", false );
+	public static bool GetCamoOnOptics() => _fitting?.CamoOnOptics
+		?? Game.Cookies.Get<bool>( $"hc1.gunsmith.class{GetActiveClassIndex()}.camoonoptics", false );
 
-	public static bool GetEmblemOnGun( EquipmentResource resource ) =>
-		Game.Cookies.Get<bool>( $"hc1.gunsmith.class{GetActiveClassIndex()}.{resource.ResourcePath}.emblemOnGun", false );
+	public static bool GetEmblemOnGun( EquipmentResource resource ) => _fitting?.EmblemOnGun
+		?? Game.Cookies.Get<bool>( $"hc1.gunsmith.class{GetActiveClassIndex()}.{resource.ResourcePath}.emblemOnGun", false );
 	public static void SetEmblemOnGun( EquipmentResource resource, bool value ) =>
 		Game.Cookies.Set( $"hc1.gunsmith.class{GetActiveClassIndex()}.{resource.ResourcePath}.emblemOnGun", value );
 
@@ -100,14 +101,20 @@ public static class GunsmithLoadoutManager
 	public static bool IsFavorite( string resourcePath ) => Game.Cookies.Get<bool>( $"hc1.gunsmith.favorite.{resourcePath}", false );
 	public static void SetFavorite( string resourcePath, bool isFavorite ) => Game.Cookies.Set( $"hc1.gunsmith.favorite.{resourcePath}", isFavorite );
 
-	public static bool GetUseCustomCamoColor( EquipmentResource resource ) =>
-		Game.Cookies.Get<bool>( $"hc1.gunsmith.class{GetActiveClassIndex()}.{resource.ResourcePath}.usecustomcamo", false );
+	public static bool GetUseCustomCamoColor( EquipmentResource resource ) => _fitting?.UseCustomCamo
+		?? Game.Cookies.Get<bool>( $"hc1.gunsmith.class{GetActiveClassIndex()}.{resource.ResourcePath}.usecustomcamo", false );
 
 	public static void SetUseCustomCamoColor( EquipmentResource resource, bool value ) =>
 		Game.Cookies.Set( $"hc1.gunsmith.class{GetActiveClassIndex()}.{resource.ResourcePath}.usecustomcamo", value );
 
 	public static Color GetCustomCamoColor( EquipmentResource resource )
 	{
+		if ( _fitting is { } build )
+		{
+			var opacity = build.CustomCamoOpacity.Clamp( 0f, 1f );
+			return Color.TryParse( build.CustomCamo ?? "", out var color ) ? color.WithAlpha( opacity ) : Color.White.WithAlpha( opacity );
+		}
+
 		var val = Game.Cookies.Get<string>( CustomCamoColorKey( resource ), "" );
 		if ( string.IsNullOrEmpty( val ) )
 			return Color.White.WithAlpha( Game.Cookies.Get<float>( CustomCamoOpacityKey( resource ), 1f ).Clamp( 0f, 1f ) );
@@ -124,14 +131,17 @@ public static class GunsmithLoadoutManager
 		Game.Cookies.Set( CustomCamoOpacityKey( resource ), color.a.Clamp( 0f, 1f ) );
 	}
 
-	public static bool GetUseCustomAnimatedCamoSpeed( EquipmentResource resource ) =>
-		Game.Cookies.Get<bool>( $"hc1.gunsmith.class{GetActiveClassIndex()}.{resource.ResourcePath}.usecustomanimationspeed", false );
+	public static bool GetUseCustomAnimatedCamoSpeed( EquipmentResource resource ) => _fitting?.UseCustomAnimatedSpeed
+		?? Game.Cookies.Get<bool>( $"hc1.gunsmith.class{GetActiveClassIndex()}.{resource.ResourcePath}.usecustomanimationspeed", false );
 
 	public static void SetUseCustomAnimatedCamoSpeed( EquipmentResource resource, bool value ) =>
 		Game.Cookies.Set( $"hc1.gunsmith.class{GetActiveClassIndex()}.{resource.ResourcePath}.usecustomanimationspeed", value );
 
 	public static Vector2 GetCustomAnimatedCamoSpeed( EquipmentResource resource )
 	{
+		if ( _fitting is { } build )
+			return new Vector2( build.CustomAnimatedSpeedX, build.CustomAnimatedSpeedY );
+
 		var valX = Game.Cookies.Get<float>( $"hc1.gunsmith.class{GetActiveClassIndex()}.{resource.ResourcePath}.animationspeedx", 0.0f );
 		var valY = Game.Cookies.Get<float>( $"hc1.gunsmith.class{GetActiveClassIndex()}.{resource.ResourcePath}.animationspeedy", 0.0f );
 		return new Vector2( valX, valY );
@@ -144,8 +154,8 @@ public static class GunsmithLoadoutManager
 	}
 
 	/// <summary>0 = Matte, 1 = Semi-Gloss, 2 = Gloss, 3 = Chrome</summary>
-	public static int GetCustomCamoFinish( EquipmentResource resource ) =>
-		Game.Cookies.Get<int>( $"hc1.gunsmith.class{GetActiveClassIndex()}.{resource.ResourcePath}.camofinish", 1 );
+	public static int GetCustomCamoFinish( EquipmentResource resource ) => _fitting?.CustomCamoFinish
+		?? Game.Cookies.Get<int>( $"hc1.gunsmith.class{GetActiveClassIndex()}.{resource.ResourcePath}.camofinish", 1 );
 
 	public static void SetCustomCamoFinish( EquipmentResource resource, int finish ) =>
 		Game.Cookies.Set( $"hc1.gunsmith.class{GetActiveClassIndex()}.{resource.ResourcePath}.camofinish", finish );
@@ -162,7 +172,8 @@ public static class GunsmithLoadoutManager
 
 	public static Color GetCustomReticleColor( EquipmentResource resource )
 	{
-		var val = Game.Cookies.Get<string>( $"hc1.gunsmith.class{GetActiveClassIndex()}.{resource.ResourcePath}.reticlecolor", "" );
+		var val = _fitting is { } build ? build.ReticleColor
+			: Game.Cookies.Get<string>( $"hc1.gunsmith.class{GetActiveClassIndex()}.{resource.ResourcePath}.reticlecolor", "" );
 		if ( string.IsNullOrEmpty( val ) ) return Color.Red;
 		if ( Color.TryParse( val, out var col ) ) return col;
 		return Color.Red;
@@ -175,21 +186,21 @@ public static class GunsmithLoadoutManager
 		$"hc1.gunsmith.class{GetActiveClassIndex()}.{resource.ResourcePath}.reticle{setting}";
 
 	public static float GetCustomReticleScale( EquipmentResource resource ) =>
-		Game.Cookies.Get<float>( ReticleSettingKey( resource, "scale" ), 1f ).Clamp( 0.25f, 3f );
+		(_fitting?.ReticleScale ?? Game.Cookies.Get<float>( ReticleSettingKey( resource, "scale" ), 1f )).Clamp( 0.25f, 3f );
 
 	public static void SetCustomReticleScale( EquipmentResource resource, float scale ) =>
 		Game.Cookies.Set( ReticleSettingKey( resource, "scale" ), scale.Clamp( 0.25f, 3f ) );
 
 	public static float GetCustomReticleRotation( EquipmentResource resource ) =>
-		Game.Cookies.Get<float>( ReticleSettingKey( resource, "rotation" ), 0f ).Clamp( -180f, 180f );
+		(_fitting?.ReticleRotation ?? Game.Cookies.Get<float>( ReticleSettingKey( resource, "rotation" ), 0f )).Clamp( -180f, 180f );
 
 	public static void SetCustomReticleRotation( EquipmentResource resource, float degrees ) =>
 		Game.Cookies.Set( ReticleSettingKey( resource, "rotation" ), degrees.Clamp( -180f, 180f ) );
 
 	/// <summary>Reticle position in lens UV units, limited to eight percent from centre on each axis.</summary>
 	public static Vector2 GetCustomReticleOffset( EquipmentResource resource ) => new(
-		Game.Cookies.Get<float>( ReticleSettingKey( resource, "offsetx" ), 0f ).Clamp( -0.08f, 0.08f ),
-		Game.Cookies.Get<float>( ReticleSettingKey( resource, "offsety" ), 0f ).Clamp( -0.08f, 0.08f ) );
+		(_fitting?.ReticleOffsetX ?? Game.Cookies.Get<float>( ReticleSettingKey( resource, "offsetx" ), 0f )).Clamp( -0.08f, 0.08f ),
+		(_fitting?.ReticleOffsetY ?? Game.Cookies.Get<float>( ReticleSettingKey( resource, "offsety" ), 0f )).Clamp( -0.08f, 0.08f ) );
 
 	public static void SetCustomReticleOffset( EquipmentResource resource, Vector2 offset )
 	{
@@ -454,7 +465,23 @@ public static class GunsmithLoadoutManager
 		return WeaponBuildCodePrefix + EncodeBase64Url( Encoding.UTF8.GetBytes( json ) );
 	}
 
-	public static bool TryImportWeaponBuildCode( EquipmentResource resource, string code, out string error )
+	/// <summary>
+	/// A build code for <paramref name="resource"/> with only <paramref name="parts"/> fitted, no camo and the factory
+	/// reticle, for <see cref="ApplyBuild"/>: a bot's issued gun (a suppressor, say), whatever the local loadout holds.
+	/// </summary>
+	public static string BuildCode( EquipmentResource resource, params GunsmithPart[] parts )
+	{
+		var payload = new SharedWeaponBuild { Version = 1, Weapon = resource?.ResourcePath };
+		foreach ( var part in parts )
+		{
+			if ( part.IsValid() )
+				payload.Attachments[part.Category.ToString()] = part.ResourcePath;
+		}
+
+		return WeaponBuildCodePrefix + EncodeBase64Url( Encoding.UTF8.GetBytes( JsonSerializer.Serialize( payload ) ) );
+	}
+
+	public static bool TryImportWeaponBuildCode( EquipmentResource resource, string code, out GunsmithMessage error )
 	{
 		error = null;
 
@@ -485,7 +512,7 @@ public static class GunsmithLoadoutManager
 				.FirstOrDefault( x => x.ResourcePath.Equals( payload.Weapon ?? "", StringComparison.OrdinalIgnoreCase ) );
 
 			error = expected.IsValid()
-				? $"This code is for {expected.Name}. Select that weapon first."
+				? new GunsmithMessage( "This code is for {0}. Select that weapon first.", expected.Name )
 				: "This code is for a different weapon.";
 			return false;
 		}
@@ -495,7 +522,7 @@ public static class GunsmithLoadoutManager
 		{
 			if ( !Enum.TryParse<GunsmithPartType>( entry.Key, out var category ) )
 			{
-				error = $"Unknown attachment category: {entry.Key}.";
+				error = new GunsmithMessage( "Unknown attachment category: {0}.", entry.Key );
 				return false;
 			}
 
@@ -507,7 +534,8 @@ public static class GunsmithLoadoutManager
 
 			if ( !part.IsValid() )
 			{
-				error = $"Missing or incompatible {category} attachment.";
+				error = new GunsmithMessage( "Missing or incompatible {0} attachment.",
+					new GunsmithMessage( category == GunsmithPartType.RearGrip ? "Rear Grip" : category.ToString() ) );
 				return false;
 			}
 
@@ -540,7 +568,7 @@ public static class GunsmithLoadoutManager
 		return true;
 	}
 
-	private static bool TryDecodeWeaponBuildCode( string code, out SharedWeaponBuild payload, out string error )
+	private static bool TryDecodeWeaponBuildCode( string code, out SharedWeaponBuild payload, out GunsmithMessage error )
 	{
 		payload = null;
 		error = null;
@@ -614,6 +642,32 @@ public static class GunsmithLoadoutManager
 		"TextureMetalness",
 	};
 
+	/// <summary>
+	/// A build <see cref="ApplyBuild"/> is fitting. While it's set, the getters <see cref="ApplyAttachments"/> reads (the
+	/// attachments, camo, finish and reticle) return its values rather than the saved loadout's.
+	/// </summary>
+	private static SharedWeaponBuild _fitting;
+
+	/// <summary>
+	/// Fits a build code (<see cref="ExportWeaponBuildCode"/>) to <paramref name="root"/> as <see cref="ApplyAttachments"/>
+	/// fits the saved loadout, saving nothing: the Theater's first-person gun wears the build the match was played with.
+	/// Its parts aren't checked against the weapon's level, as they were when the code was made. False, with nothing
+	/// fitted, for a code that can't be read or is for another weapon.
+	/// </summary>
+	public static bool ApplyBuild( EquipmentResource resource, GameObject root, string code )
+	{
+		if ( !resource.IsValid() || !root.IsValid() || string.IsNullOrWhiteSpace( code )
+			|| !TryDecodeWeaponBuildCode( code, out var build, out _ )
+			|| !resource.ResourcePath.Equals( build.Weapon ?? "", StringComparison.OrdinalIgnoreCase ) )
+			return false;
+
+		_fitting = build;
+		try { ApplyAttachments( resource, root ); }
+		finally { _fitting = null; }
+
+		return true;
+	}
+
 	public static void ApplyAttachments( EquipmentResource resource, GameObject root, GunsmithPart previewCamo = null )
 	{
 		if ( !resource.IsValid() || !root.IsValid() )
@@ -660,7 +714,8 @@ public static class GunsmithLoadoutManager
 				}
 			}
 			// A bodygroup barrel (ModifyBodygroups) has no prefab: it switches the weapon's own barrel in its Barrel slot.
-			else if ( !barrelPart.IsValid() || !barrelPart.ModifyBodygroups )
+			// A build being fitted (ApplyBuild) isn't the saved loadout, so there's nothing to clear.
+			else if ( _fitting is null && (!barrelPart.IsValid() || !barrelPart.ModifyBodygroups) )
 			{
 				// Broken/missing barrel part — nuke the cookie entirely (empty string, NOT __none)
 				// so TryGetAttachment returns false and the barrel logic stops firing.
@@ -732,6 +787,14 @@ public static class GunsmithLoadoutManager
 			try { camoTex = Texture.Load( camoPart.CamoTexture ); }
 			catch ( System.Exception e ) { Log.Warning( $"Gunsmith: couldn't load camo '{camoPart.CamoTexture}': {e.Message}" ); }
 		}
+		// A solid colour is paint too, like a Cerakote job: its colour replaces the gun's, as a pattern's does, over the
+		// gun's own normal and AO. As a tint it multiplied the gun's dark colour, so it barely showed on most of the gun
+		// and turned lighter parts (the FAMAS's magazine) lime.
+		else if ( hasCamo && !useCustomCamo && camoPart.IsValid() && camoPart.Category == GunsmithPartType.Camoflague
+			&& string.IsNullOrEmpty( camoPart.CamoMaterial ) )
+		{
+			camoTex = FlatTexture( camoPart.CamoTint );
+		}
 
 		Material camoMat = null;
 		if ( hasCamo && !useCustomCamo && camoPart.IsValid() && !string.IsNullOrEmpty( camoPart.CamoMaterial ) )
@@ -785,6 +848,10 @@ public static class GunsmithLoadoutManager
 		{
 			// Only re-skin the gun itself — never the first-person arms / hands.
 			if ( renderer.Model is not null && renderer.Model == armsModel )
+				continue;
+
+			// A sticker is vinyl over the paint, so the camo doesn't go on it.
+			if ( renderer.Components.Get<GunsmithSticker>( FindMode.EverythingInSelf ).IsValid() )
 				continue;
 
 			// Separate optic meshes obey the same camo toggle as built-in optic bodygroups.
@@ -951,7 +1018,21 @@ public static class GunsmithLoadoutManager
 						continue;
 					}
 
-					if ( hasCamo )
+					if ( hasCustomCamo )
+					{
+						// A custom colour is paint too, as a solid colour is: it replaces the gun's colour, over its
+						// normal and AO, in the finish picked. Below full opacity the gun's own colour shows through.
+						// As a tint it multiplied the gun's dark colour, as the solid colours did.
+						var copy = mats[i].CreateCopy();
+						var paint = CustomPaintTexture( mats[i], customCamoColor );
+						copy.Set( "g_flUseFactoryFinish", 0f );
+						copy.Set( "TextureColor", paint );
+						copy.Set( "Color", paint );
+						copy.Set( "g_tColor", paint );
+						ApplyCustomFinish( copy, GetCustomCamoFinish( resource ) );
+						renderer.Materials.SetOverride( i, copy );
+					}
+					else if ( hasCamo )
 					{
 						var copy = mats[i].CreateCopy();
 						copy.Set( "g_vColorTint", camoTint );
@@ -965,17 +1046,6 @@ public static class GunsmithLoadoutManager
 							copy.Set( "g_flSelfIllumScale", 5.0f );
 							copy.Set( "SelfIllumMask", Texture.White );
 							copy.Set( "g_vSelfIllumTint", camoTint );
-						}
-
-						// Apply gloss/matte finish when using custom colour camo.
-						if ( useCustomCamo )
-						{
-							copy.Set( "g_flModelTintAmount", 1f );
-							var finish = GetCustomCamoFinish( resource );
-							finish = System.Math.Clamp( finish, 0, FinishMetalness.Length - 1 );
-							copy.Set( "g_flMetalness", FinishMetalness[finish] );
-							copy.Set( "TextureRoughness", Texture.White );
-							copy.Set( "g_flRoughnessScaleFactor", FinishRoughness[finish] );
 						}
 
 						renderer.Materials.SetOverride( i, copy );
@@ -1090,6 +1160,128 @@ public static class GunsmithLoadoutManager
 		material.Set( "g_flAmbientOcclusionDirectSpecular", 1f );
 	}
 
+	private static readonly Dictionary<uint, Texture> FlatTextures = new();
+
+	/// <summary> A flat texture of <paramref name="color"/>: a solid colour's paint, or a flat map for a finish. </summary>
+	private static Texture FlatTexture( Color color )
+	{
+		static byte Byte( float value ) => (byte)(value.Clamp( 0f, 1f ) * 255f + 0.5f);
+		var rgb = new[] { Byte( color.r ), Byte( color.g ), Byte( color.b ) };
+		var key = (uint)(rgb[0] << 16 | rgb[1] << 8 | rgb[2]);
+		if ( FlatTextures.TryGetValue( key, out var texture ) && texture.IsValid() )
+			return texture;
+
+		const int size = 4;
+		var data = new byte[size * size * 4];
+		for ( var i = 0; i < data.Length; i += 4 )
+		{
+			data[i] = rgb[0];
+			data[i + 1] = rgb[1];
+			data[i + 2] = rgb[2];
+			data[i + 3] = byte.MaxValue;
+		}
+
+		texture = Texture.Create( size, size ).WithStaticUsage().WithData( data ).Finish();
+		FlatTextures[key] = texture;
+		return texture;
+	}
+
+	/// <summary> The most a colour map is read back at, across, to paint over it (<see cref="CustomPaintTexture"/>). </summary>
+	private const int PaintOverSize = 512;
+
+	private sealed record ColourMap( Color32[] Pixels, int Width, int Height );
+
+	/// <summary> Colour maps read back to paint over, or null for one that couldn't be read. </summary>
+	private static readonly Dictionary<Texture, ColourMap> ColourMaps = new();
+	private static readonly Dictionary<(Texture, uint), Texture> PaintedOver = new();
+
+	/// <summary>
+	/// The colour map for <paramref name="material"/> under a custom colour: the paint, flat, at full opacity, and below it
+	/// the material's own colour showing through it, as through a thin coat. Flat paint if the material's own map can't
+	/// be read.
+	/// </summary>
+	private static Texture CustomPaintTexture( Material material, Color paint )
+	{
+		var opacity = paint.a.Clamp( 0f, 1f );
+		var source = opacity < 0.995f ? material.GetTexture( "TextureColor" ) ?? material.GetTexture( "g_tColor" ) : null;
+		if ( source is null || !source.IsValid() || !TryReadColourMap( source, out var map ) )
+			return FlatTexture( paint.WithAlpha( 1f ) );
+
+		static byte Byte( float value ) => (byte)(value.Clamp( 0f, 1f ) * 255f + 0.5f);
+		var key = (source, (uint)(Byte( paint.r ) << 24 | Byte( paint.g ) << 16 | Byte( paint.b ) << 8 | Byte( opacity )));
+		if ( PaintedOver.TryGetValue( key, out var texture ) && texture.IsValid() )
+			return texture;
+
+		// A colour picker's drag makes a new one each step, so the cache doesn't grow without end. A texture a gun still
+		// wears stays alive through its material.
+		if ( PaintedOver.Count >= 64 )
+			PaintedOver.Clear();
+
+		var keep = 1f - opacity;
+		var r = Byte( paint.r ) * opacity + 0.5f;
+		var g = Byte( paint.g ) * opacity + 0.5f;
+		var b = Byte( paint.b ) * opacity + 0.5f;
+		var data = new byte[map.Width * map.Height * 4];
+		for ( int p = 0, j = 0; p < map.Pixels.Length; p++, j += 4 )
+		{
+			var pixel = map.Pixels[p];
+			data[j] = (byte)(pixel.r * keep + r);
+			data[j + 1] = (byte)(pixel.g * keep + g);
+			data[j + 2] = (byte)(pixel.b * keep + b);
+			data[j + 3] = pixel.a;
+		}
+
+		texture = Texture.Create( map.Width, map.Height ).WithStaticUsage().WithData( data ).Finish();
+		PaintedOver[key] = texture;
+		return texture;
+	}
+
+	/// <summary> Reads <paramref name="source"/> back once, at its first mip no more than <see cref="PaintOverSize"/> across. </summary>
+	private static bool TryReadColourMap( Texture source, out ColourMap map )
+	{
+		if ( ColourMaps.TryGetValue( source, out map ) )
+			return map is not null;
+
+		try
+		{
+			var mip = 0;
+			while ( mip < source.Mips - 1 && Math.Max( source.Width >> mip, source.Height >> mip ) > PaintOverSize )
+				mip++;
+
+			var width = Math.Max( 1, source.Width >> mip );
+			var height = Math.Max( 1, source.Height >> mip );
+			var pixels = source.GetPixels( mip );
+			if ( pixels is not null && pixels.Length == width * height )
+				map = new ColourMap( pixels, width, height );
+		}
+		catch ( Exception e )
+		{
+			Log.Warning( $"Gunsmith: couldn't read '{source.ResourcePath}' to paint over it ({e.Message})" );
+		}
+
+		ColourMaps[source] = map;
+		return map is not null;
+	}
+
+	/// <summary> The custom colour's finish (<see cref="FinishNames"/>), set the way <see cref="ApplyPaintFinish"/> sets satin. </summary>
+	private static void ApplyCustomFinish( Material material, int finish )
+	{
+		finish = Math.Clamp( finish, 0, FinishMetalness.Length - 1 );
+		var metalness = FinishMetalness[finish];
+		var metalnessMap = FlatTexture( new Color( metalness, metalness, metalness ) );
+		material.Set( "TextureMetalness", metalnessMap );
+		material.Set( "g_tMetalness", metalnessMap );
+		material.Set( "g_flMetalness", metalness );
+		material.Set( "TextureRoughness", Texture.White );
+		material.Set( "g_tRoughness", Texture.White );
+		material.Set( "g_flRoughnessScaleFactor", FinishRoughness[finish] );
+		material.Set( "g_flRoughness", FinishRoughness[finish] );
+		material.Set( "g_flSelfIllumScale", 0f );
+		material.Set( "g_flSelfIllumBrightness", 0f );
+		material.Set( "g_flAmbientOcclusionDirectDiffuse", 1f );
+		material.Set( "g_flAmbientOcclusionDirectSpecular", 1f );
+	}
+
 	private static Color GetCustomCamoPaintTint( Color color )
 	{
 		var amount = color.a.Clamp( 0f, 1f );
@@ -1101,6 +1293,49 @@ public static class GunsmithLoadoutManager
 	}
 
 	public static bool TryGetAttachment( EquipmentResource resource, GunsmithPartType category, out GunsmithPart part )
+	{
+		if ( _fitting is { } build )
+			return TryGetBuildAttachment( build, resource, category, out part );
+
+		if ( !TryGetSavedAttachment( resource, category, out part ) )
+			return false;
+
+		// A part the weapon's level hasn't unlocked (AttachmentUnlocks) stays saved but isn't fitted: it reads as no
+		// choice saved, not as "none", which ApplyAttachments would take as a broken barrel and clear.
+		if ( part.IsValid() && !AttachmentUnlocks.IsUnlocked( resource, part ) )
+		{
+			part = null;
+			return false;
+		}
+
+		return true;
+	}
+
+	/// <summary> Saved attachments the weapon's level hasn't unlocked yet, which stay off the gun until it has. </summary>
+	public static List<GunsmithPart> GetLockedAttachments( EquipmentResource resource ) => Enum.GetValues<GunsmithPartType>()
+		.Where( AttachmentUnlocks.IsAttachment )
+		.Select( category => TryGetSavedAttachment( resource, category, out var part ) ? part : null )
+		.Where( part => part.IsValid() && !AttachmentUnlocks.IsUnlocked( resource, part ) )
+		.ToList();
+
+	/// <summary> The part a build has in a slot. A build code only lists the slots with a part in them. </summary>
+	private static bool TryGetBuildAttachment( SharedWeaponBuild build, EquipmentResource resource, GunsmithPartType category, out GunsmithPart part )
+	{
+		part = null;
+		if ( !resource.IsValid() || build.Attachments is null || !build.Attachments.TryGetValue( category.ToString(), out var value )
+			|| string.IsNullOrEmpty( value ) )
+			return false;
+
+		part = ResourceLibrary.GetAll<GunsmithPart>()
+			.FirstOrDefault( x => x.Category == category
+				&& (x.ResourcePath.Equals( value, StringComparison.OrdinalIgnoreCase )
+					|| x.ResourceName.Equals( value, StringComparison.OrdinalIgnoreCase )) );
+
+		return part.IsValid();
+	}
+
+	/// <summary> The part saved in a slot, locked or not. </summary>
+	private static bool TryGetSavedAttachment( EquipmentResource resource, GunsmithPartType category, out GunsmithPart part )
 	{
 		part = null;
 		if ( !resource.IsValid() )

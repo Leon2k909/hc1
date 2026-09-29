@@ -1,0 +1,604 @@
+@import "/UI/Styles/Theme.scss";
+
+$bench-points: #ffd24a;
+$bench-armour: #4fa3ff;
+$bench-error: #ff5a4f;
+$bench-line: rgba( white, 0.1 );
+
+ZombiesWorkbenchPanel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 110;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+    font-family: $main-font;
+    color: white;
+
+    &.visible {
+        pointer-events: all;
+        cursor: default;
+        background-color: rgba( black, 0.5 );
+        backdrop-filter: blur( 6px );
+    }
+
+    .window {
+        position: relative;
+        flex-direction: column;
+        width: 1240px;
+        height: 680px;
+        background-color: rgba( 12, 12, 14, 0.94 );
+        border: 1px solid $bench-line;
+        border-radius: $rounding;
+    }
+
+    // ── Header ──
+
+    .head {
+        flex-direction: row;
+        align-items: center;
+        flex-shrink: 0;
+        gap: 16px;
+        height: 84px;
+        padding: 0 24px;
+        border-bottom: 1px solid $bench-line;
+    }
+
+    .head-icon {
+        width: 52px;
+        height: 52px;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba( $main-color, 0.14 );
+        border: 1px solid rgba( $main-color, 0.55 );
+        border-radius: $rounding;
+
+        i {
+            font-size: 32px;
+            color: $main-color;
+        }
+    }
+
+    .head-titles {
+        flex-direction: column;
+        flex-grow: 1;
+        gap: 2px;
+    }
+
+    .head-title {
+        font-size: 30px;
+        font-weight: 700;
+        letter-spacing: 3px;
+    }
+
+    .head-sub {
+        font-size: 15px;
+        opacity: 0.65;
+    }
+
+    .head-points {
+        flex-direction: column;
+        align-items: flex-end;
+        flex-shrink: 0;
+    }
+
+    .points-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: $bench-points;
+    }
+
+    .points-label {
+        font-size: 12px;
+        letter-spacing: 2px;
+        opacity: 0.6;
+    }
+
+    .head-close {
+        width: 40px;
+        height: 40px;
+        flex-shrink: 0;
+        margin-left: 8px;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid transparent;
+        border-radius: $rounding;
+        transition: all 0.08s ease;
+
+        i {
+            font-size: 26px;
+        }
+
+        &:hover {
+            cursor: pointer;
+            background-color: rgba( white, 0.12 );
+        }
+    }
+
+    .body {
+        flex-direction: row;
+        flex-grow: 1;
+        gap: 16px;
+        padding: 16px 24px 20px 24px;
+    }
+
+    // ── Attachments ──
+
+    .gunsmith {
+        flex-direction: column;
+        flex-grow: 1;
+        gap: 10px;
+    }
+
+    .weapon-tabs {
+        flex-direction: row;
+        flex-shrink: 0;
+        gap: 8px;
+    }
+
+    .weapon-tab {
+        flex-direction: row;
+        align-items: center;
+        flex-grow: 1;
+        flex-basis: 0;
+        gap: 10px;
+        height: 72px;
+        padding: 0 14px;
+        background-color: rgba( white, 0.05 );
+        border: 1px solid transparent;
+        border-radius: $rounding;
+        transition: all 0.08s ease;
+
+        &:hover {
+            cursor: pointer;
+            background-color: rgba( white, 0.1 );
+        }
+
+        &.selected {
+            background-color: rgba( $main-color, 0.1 );
+            border-color: $main-color;
+
+            .tab-name {
+                color: $main-color;
+            }
+        }
+    }
+
+    .tab-copy {
+        flex-direction: column;
+        flex-grow: 1;
+        gap: 2px;
+    }
+
+    .tab-slot {
+        font-size: 12px;
+        letter-spacing: 2px;
+        opacity: 0.6;
+    }
+
+    .tab-name {
+        font-size: 20px;
+        font-weight: 600;
+    }
+
+    .tab-icon {
+        width: 150px;
+        height: 56px;
+        flex-shrink: 0;
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    .list-head {
+        flex-direction: row;
+        align-items: center;
+        flex-shrink: 0;
+        gap: 10px;
+        height: 40px;
+    }
+
+    .back {
+        width: 36px;
+        height: 36px;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba( white, 0.08 );
+        border: 1px solid transparent;
+        border-radius: $rounding;
+        transition: all 0.08s ease;
+
+        i {
+            font-size: 22px;
+        }
+
+        &:hover {
+            cursor: pointer;
+            background-color: $main-color;
+            color: black;
+        }
+    }
+
+    .list-title {
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: 2px;
+    }
+
+    .list-count {
+        margin-left: auto;
+        font-size: 13px;
+        letter-spacing: 1.5px;
+        opacity: 0.6;
+    }
+
+    .list {
+        flex-direction: column;
+        flex-grow: 1;
+        flex-basis: 0;
+        gap: 4px;
+        overflow-y: scroll;
+    }
+
+    .row {
+        flex-direction: row;
+        align-items: center;
+        flex-shrink: 0;
+        gap: 14px;
+        min-height: 78px;
+        padding: 4px 16px 4px 4px;
+        background-color: rgba( white, 0.05 );
+        border: 1px solid transparent;
+        border-radius: $rounding;
+        transition: all 0.08s ease;
+
+        &:hover {
+            cursor: pointer;
+            background-color: rgba( white, 0.1 );
+            border-color: rgba( $main-color, 0.45 );
+        }
+
+        &.fitted .row-name {
+            color: $main-color;
+        }
+
+        &.equipped {
+            background-color: rgba( $main-color, 0.1 );
+            border-color: rgba( $main-color, 0.8 );
+
+            .row-name, .row-mark {
+                color: $main-color;
+                opacity: 1;
+            }
+        }
+
+        &.locked {
+            .picture, .pic i, .copy .row-name, .copy .row-desc {
+                opacity: 0.45;
+            }
+
+            &:hover {
+                cursor: default;
+                border-color: rgba( $bench-error, 0.4 );
+            }
+        }
+    }
+
+    .pic {
+        width: 124px;
+        height: 70px;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba( black, 0.35 );
+        border-radius: $rounding;
+
+        i {
+            font-size: 28px;
+            opacity: 0.5;
+        }
+    }
+
+    .picture {
+        width: 112px;
+        height: 70px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    .copy {
+        flex-direction: column;
+        flex-grow: 1;
+        flex-shrink: 1;
+        gap: 2px;
+    }
+
+    .row-caption {
+        font-size: 12px;
+        letter-spacing: 2px;
+        opacity: 0.55;
+    }
+
+    .row-name {
+        font-size: 19px;
+        font-weight: 600;
+    }
+
+    .row-desc {
+        font-size: 13px;
+        opacity: 0.65;
+    }
+
+    .row-state {
+        font-size: 12px;
+        letter-spacing: 1px;
+        color: $bench-error;
+    }
+
+    .row-count {
+        flex-shrink: 0;
+        font-size: 13px;
+        letter-spacing: 1px;
+        opacity: 0.55;
+    }
+
+    .row-mark {
+        flex-shrink: 0;
+        font-size: 24px;
+        opacity: 0.6;
+    }
+
+    .empty {
+        padding: 24px 4px;
+        font-size: 18px;
+        opacity: 0.6;
+    }
+
+    .gunsmith-note {
+        flex-shrink: 0;
+        font-size: 12px;
+        letter-spacing: 1.5px;
+        opacity: 0.45;
+    }
+
+    // ── Supplies ──
+
+    .shop {
+        flex-direction: column;
+        flex-shrink: 0;
+        gap: 12px;
+        width: 400px;
+    }
+
+    .card {
+        flex-direction: column;
+        flex-shrink: 0;
+        gap: 10px;
+        padding: 14px 16px;
+        background-color: rgba( white, 0.05 );
+        border: 1px solid transparent;
+        border-radius: $rounding;
+    }
+
+    .card-head {
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+
+        i {
+            font-size: 22px;
+            color: $main-color;
+        }
+    }
+
+    .card-title {
+        font-size: 17px;
+        font-weight: 700;
+        letter-spacing: 2px;
+    }
+
+    .card-value {
+        margin-left: auto;
+        font-size: 17px;
+        font-weight: 600;
+        color: $bench-armour;
+    }
+
+    .card-note {
+        font-size: 13px;
+        opacity: 0.6;
+    }
+
+    .plates {
+        flex-direction: row;
+        gap: 6px;
+    }
+
+    .plate {
+        flex-grow: 1;
+        flex-basis: 0;
+        height: 14px;
+        background-color: rgba( white, 0.08 );
+        border: 1px solid rgba( white, 0.16 );
+    }
+
+    .plate-fill {
+        height: 100%;
+        background-color: $bench-armour;
+    }
+
+    .buy-row {
+        flex-direction: row;
+        gap: 8px;
+    }
+
+    .buy {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        flex-grow: 1;
+        flex-basis: 0;
+        gap: 8px;
+        height: 44px;
+        padding: 0 12px;
+        background-color: $main-color;
+        color: black;
+        border: 1px solid transparent;
+        border-radius: $rounding;
+        transition: all 0.08s ease;
+
+        &:hover {
+            cursor: pointer;
+            background-color: #ffd24d;
+        }
+
+        &.small {
+            flex-grow: 0;
+            flex-basis: auto;
+            flex-shrink: 0;
+            width: 132px;
+            height: 40px;
+        }
+
+        &.wide {
+            flex-grow: 0;
+            flex-basis: auto;
+            width: 100%;
+        }
+
+        &.disabled {
+            background-color: rgba( white, 0.08 );
+            color: rgba( white, 0.4 );
+
+            &:hover {
+                background-color: rgba( white, 0.1 );
+            }
+        }
+    }
+
+    .buy-label {
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 1px;
+    }
+
+    .buy-cost {
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    .item-row {
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .item-icon {
+        width: 44px;
+        height: 44px;
+        flex-shrink: 0;
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    .item-copy {
+        flex-direction: column;
+        flex-grow: 1;
+        flex-shrink: 1;
+        gap: 2px;
+    }
+
+    .item-name {
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .item-sub {
+        font-size: 12px;
+        opacity: 0.6;
+    }
+
+    // ── What just happened ──
+
+    .flash {
+        position: absolute;
+        top: 96px;
+        left: 0;
+        right: 0;
+        justify-content: center;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+
+        &.show {
+            opacity: 1;
+        }
+    }
+
+    .flash-pill {
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 18px;
+        background-color: rgba( 20, 20, 22, 0.96 );
+        border: 1px solid $main-color;
+        border-radius: $rounding;
+
+        i {
+            font-size: 20px;
+            color: $main-color;
+        }
+
+        label {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+        }
+    }
+
+    .flash.error .flash-pill {
+        border-color: $bench-error;
+
+        i {
+            color: $bench-error;
+        }
+    }
+
+    // ── Keys ──
+
+    .footer {
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        margin-top: 14px;
+    }
+
+    .key {
+        min-width: 30px;
+        height: 30px;
+        padding: 0 8px;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba( black, 0.55 );
+        border: 1px solid rgba( white, 0.6 );
+        border-radius: $rounding;
+
+        label {
+            font-size: 14px;
+            font-weight: 700;
+        }
+    }
+
+    .footer-label {
+        margin-right: 14px;
+        font-size: 15px;
+        opacity: 0.85;
+    }
+}

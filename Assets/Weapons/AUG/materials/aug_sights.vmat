@@ -1,0 +1,13 @@
+"Layer0"
+{
+	shader "shaders/complex.shader"
+	F_SPECULAR "1"
+	F_METALNESS_TEXTURE "1"
+	g_flRoughnessScaleFactor "1"
+	g_vColorTint "[1 1 1 1]"
+	TextureColor "weapons/aug/materials/aug_sights_color.png"
+	TextureNormal "weapons/aug/materials/aug_sights_normal.png"
+	TextureRoughness "weapons/aug/materials/aug_sights_roughness.png"
+	TextureMetalness "weapons/aug/materials/aug_sights_metalness.png"
+	TextureAmbientOcclusion "materials/default/default_ao.tga"
+}

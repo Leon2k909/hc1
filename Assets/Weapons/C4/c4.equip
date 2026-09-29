@@ -1,11 +1,11 @@
 {
   "Name": "C4",
-  "Description": "",
+  "Description": "Carry to site A or B. Hold fire to arm the device.",
   "Slot": "Special",
   "Team": "Terrorist",
   "CanOtherTeamPickUp": false,
   "DropOnDisconnect": true,
-  "Icon": "ui/items/c4.png",
+  "Icon": "ui/items/field_device.svg",
   "IsPurchasable": false,
   "Price": 0,
   "KillReward": 300,
@@ -17,7 +17,11 @@
     "_type": "gameobject",
     "prefab": "weapons/c4/vm_c4.prefab"
   },
-  "WorldModel": "weapons/throwable/c4_bomb/c4_bomb.vmdl",
+  "WorldModel": "weapons/c4/field_device/field_device.vmdl",
   "__references": [],
-  "__version": 0
+  "__version": 0,
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/c4/wm_c4.prefab"
+  }
 }

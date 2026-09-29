@@ -1,0 +1,33 @@
+{
+  "Name": "Steyr AUG A3",
+  "Description": "Austrian 5.56x45mm bullpup rifle: a 16-inch barrel with a folding foregrip, and the magazine behind the pistol grip.",
+  "Slot": "Primary",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": true,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/guns/aug_01.png",
+  "IsPurchasable": true,
+  "Price": 2800,
+  "KillReward": 300,
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/aug/weapon_aug.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/aug/wm_aug.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/aug/vm_aug.prefab"
+  },
+  "WorldModel": "weapons/aug/w_aug.vmdl",
+  "ArmorReduction": null,
+  "HelmetReduction": null,
+  "WorldModelBodyGroups": 0,
+  "__references": [],
+  "__version": 0,
+  "Category": "AssaultRifle",
+  "GunsmithOffset": "0,0,4",
+  "ReviewNote": "Not checked in a match yet: the iron sights and the optics' aim (derived: tune with dev_optic_correction), recoil, reload timing and sounds, the look sway, and the left hand on the foregrip in first and third person."
+}

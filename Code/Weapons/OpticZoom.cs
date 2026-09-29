@@ -33,14 +33,19 @@ public sealed class OpticZoom : Component
 	/// <summary>0..1, how well the optic lines up with the eye. The lens picture fades out as the gun is pulled away.</summary>
 	public static float LensVisibility { get; private set; }
 
-	/// <summary>Distance in front of the eye where the lens is anchored to the optic (roughly the rear glass).</summary>
+	/// <summary>Distance in front of the eye where the lens is anchored to an optic whose eyepiece isn't known.</summary>
 	private const float AnchorDistance = 4f;
 
 	private CameraComponent _lensCamera;
 	private CameraComponent _main;
+	private ViewModel _viewModel;
 	private GameObject _optic;
 	private float _magnification = 1f;
 	private bool _reloading;
+
+	// The eyepiece's rear glass in the optic's own space, and its diameter (GunsmithPart.OpticEyepiece). 0 when not known.
+	private Vector3 _eyepiece;
+	private float _eyepieceDiameter;
 
 	// Where the eye's line of sight passes through the optic, and the aim direction, in the optic's own space.
 	// Learned while fully aimed, so the lens can then be drawn wherever the optic actually is (reloads, sway, recoil).
@@ -72,7 +77,11 @@ public sealed class OpticZoom : Component
 			Deactivate();
 			return;
 		}
-		LensDiameter = optic.OpticLensDiameter.Clamp( 0.05f, 0.5f );
+		// With the eyepiece known, OnPreRender sizes the lens to its glass each frame.
+		_eyepiece = optic.OpticEyepiece;
+		_eyepieceDiameter = optic.OpticEyepieceDiameter;
+		if ( _eyepieceDiameter <= 0f )
+			LensDiameter = optic.OpticLensDiameter.Clamp( 0.05f, 0.5f );
 		OverlayDotVisible = optic.OpticOverlayDot;
 
 		var aimFov = Equipment.ZoomFov( baseFov + equipment.AimFovOffset, ViewMagnification );
@@ -88,6 +97,7 @@ public sealed class OpticZoom : Component
 
 		viewModel.GameObject.Tags.Add( "optic_viewmodel" );
 		_main = main;
+		_viewModel = viewModel;
 		_reloading = equipment.HasTag( "reloading" );
 		_magnification = optic.OpticMagnification.Clamp( 1f, 8f ) / ViewMagnification;
 		_optic = FindOptic( viewModel );
@@ -117,11 +127,20 @@ public sealed class OpticZoom : Component
 		var cam = _main.WorldTransform;
 		var optic = _optic.WorldTransform;
 
+		// Corner slicing cants the gun about the line of sight (ViewModel.CornerSlicing.cs). Measure the optic against the
+		// canted view, and turn the lens back, so the magnified picture stays level (as a real scope's does) while the gun cants.
+		var cant = Rotation.FromRoll( _viewModel.IsValid() ? _viewModel.CornerRoll : 0f );
+
+		// The lens is anchored where the line of sight crosses the eyepiece's glass, or a guess at it.
+		var fitted = _eyepieceDiameter > 0f;
+		var eyepiece = optic.PointToWorld( _eyepiece );
+		var anchorDistance = fitted ? MathF.Max( cam.PointToLocal( eyepiece ).x, 0.5f ) : AnchorDistance;
+
 		// Learn (and slowly refine) how the optic sits in front of the eye while properly aimed in.
 		if ( ScopeBlend >= 0.98f && !_reloading )
 		{
-			var anchor = optic.PointToLocal( cam.Position + cam.Rotation.Forward * AnchorDistance );
-			var aim = optic.Rotation.Inverse * cam.Rotation;
+			var anchor = optic.PointToLocal( cam.Position + cam.Rotation.Forward * anchorDistance );
+			var aim = optic.Rotation.Inverse * cam.Rotation * cant;
 			if ( !_calibrated )
 			{
 				_anchorLocal = anchor;
@@ -137,10 +156,10 @@ public sealed class OpticZoom : Component
 		}
 
 		var lensRotation = cam.Rotation;
-		var lensPoint = cam.Position + cam.Rotation.Forward * AnchorDistance;
+		var lensPoint = fitted ? eyepiece : cam.Position + cam.Rotation.Forward * AnchorDistance;
 		if ( _calibrated )
 		{
-			lensRotation = optic.Rotation * _aimLocal;
+			lensRotation = optic.Rotation * _aimLocal * cant.Inverse;
 			lensPoint = optic.PointToWorld( _anchorLocal );
 		}
 
@@ -149,7 +168,16 @@ public sealed class OpticZoom : Component
 		var local = cam.PointToLocal( lensPoint );
 		var depth = MathF.Max( local.x, 0.5f );
 		ScopeOffset = new Vector2( -local.y / depth * focal / Screen.Height, -local.z / depth * focal / Screen.Height );
-		LensScale = (AnchorDistance / depth).Clamp( 0.3f, 2f );
+		if ( fitted )
+		{
+			// The picture fills the eyepiece's glass: its diameter over its distance from the eye, on screen.
+			LensDiameter = (_eyepieceDiameter / depth * focal / Screen.Height).Clamp( 0.05f, 1.5f );
+			LensScale = 1f;
+		}
+		else
+		{
+			LensScale = (AnchorDistance / depth).Clamp( 0.3f, 2f );
+		}
 
 		// Fade the picture out as the optic turns away from the eye (e.g. tilted for a reload).
 		var angle = Vector3.GetAngle( lensRotation.Forward, cam.Rotation.Forward );

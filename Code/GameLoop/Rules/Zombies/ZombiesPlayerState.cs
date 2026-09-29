@@ -10,11 +10,11 @@ namespace Facepunch;
 public enum ZombiesPerk
 {
 	None = 0,
-	Juggernog = 1,
-	SpeedCola = 2,
-	DoubleTap = 4,
-	QuickRevive = 8,
-	StaminUp = 16,
+	IronTonic = 1,
+	BoltSoda = 2,
+	HotShot = 4,
+	SecondWind = 8,
+	FleetFoot = 16,
 }
 
 /// <summary>
@@ -25,10 +25,10 @@ public sealed class ZombiesPlayerState : Component, IUse,
 	IGameEventHandler<ModifyDamageTakenEvent>
 {
 	public const float BaseMaxHealth = 100f;
-	public const float JuggernogMaxHealth = 250f;
+	public const float IronTonicMaxHealth = 250f;
 	public const float BleedOutTime = 30f;
 	public const float ReviveTime = 4f;
-	public const float QuickReviveTime = 2f;
+	public const float SecondWindReviveTime = 2f;
 	public const float SoloSelfReviveTime = 8f;
 	public const float ReviveRange = 110f;
 
@@ -40,7 +40,7 @@ public sealed class ZombiesPlayerState : Component, IUse,
 	/// <summary>Time since going down (valid while <see cref="IsDowned"/>).</summary>
 	[Sync( SyncFlags.FromHost )] public TimeSince TimeSinceDowned { get; private set; }
 
-	/// <summary>Solo with Quick Revive: you get back up by yourself (uses up the perk).</summary>
+	/// <summary>Solo with Second Wind: you get back up by yourself (uses up the perk).</summary>
 	[Sync( SyncFlags.FromHost )] public bool IsSelfReviving { get; private set; }
 
 	public PlayerPawn Player => GetComponent<PlayerPawn>();
@@ -60,16 +60,16 @@ public sealed class ZombiesPlayerState : Component, IUse,
 
 	// ── Perk effect helpers used by weapon / movement code ──────────────────────
 	public static float ReloadScale( PlayerPawn owner ) =>
-		For( owner ) is { } s && s.HasPerk( ZombiesPerk.SpeedCola ) ? 0.5f : 1f;
+		For( owner ) is { } s && s.HasPerk( ZombiesPerk.BoltSoda ) ? 0.5f : 1f;
 
 	public static float FireDelayScale( PlayerPawn owner ) =>
-		For( owner ) is { } s && s.HasPerk( ZombiesPerk.DoubleTap ) ? 0.75f : 1f;
+		For( owner ) is { } s && s.HasPerk( ZombiesPerk.HotShot ) ? 0.75f : 1f;
 
 	public static float MoveSpeedScale( PlayerPawn owner )
 	{
 		if ( For( owner ) is not { } s ) return 1f;
 		if ( s.IsDowned ) return 0.4f;
-		return s.HasPerk( ZombiesPerk.StaminUp ) ? 1.15f : 1f;
+		return s.HasPerk( ZombiesPerk.FleetFoot ) ? 1.15f : 1f;
 	}
 
 	// ── Perks ───────────────────────────────────────────────────────────────────
@@ -91,7 +91,7 @@ public sealed class ZombiesPlayerState : Component, IUse,
 		var hc = Player?.HealthComponent;
 		if ( !hc.IsValid() ) return;
 
-		var max = HasPerk( ZombiesPerk.Juggernog ) ? JuggernogMaxHealth : BaseMaxHealth;
+		var max = HasPerk( ZombiesPerk.IronTonic ) ? IronTonicMaxHealth : BaseMaxHealth;
 		var gained = max > hc.MaxHealth;
 		hc.MaxHealth = max;
 		hc.Health = gained ? max : Math.Min( hc.Health, max );
@@ -117,16 +117,36 @@ public sealed class ZombiesPlayerState : Component, IUse,
 			return;
 		}
 
+		AbsorbWithArmor( e );
+
 		if ( hc.Health - e.DamageInfo.Damage <= 0f )
 		{
 			var canSelfRevive = ZombiesRoundSystem.CountHumanPlayers() <= 1
-				&& HasPerk( ZombiesPerk.QuickRevive );
+				&& HasPerk( ZombiesPerk.SecondWind );
 			// Without a rescue option, let the lethal hit kill normally.
 			if ( !canSelfRevive && !HasPotentialReviver() ) return;
 
 			e.DamageInfo = e.DamageInfo with { Damage = Math.Max( 0f, hc.Health - 1f ) };
 			GoDown();
 		}
+	}
+
+	/// <summary>
+	/// Armour plates bought at the workbench (<see cref="ZombiesBuyStation.PlateArmor"/>) take the damage first, point for
+	/// point, like CoD's plates. Falls land on the legs, and fire burns what plates don't cover, so they go straight
+	/// through.
+	/// </summary>
+	private void AbsorbWithArmor( ModifyDamageTakenEvent e )
+	{
+		var armor = Player?.ArmorComponent;
+		if ( !armor.IsValid() || armor.Armor <= 0f || e.DamageInfo.WasFallDamage ) return;
+		if ( e.DamageInfo.Flags.HasFlag( DamageFlags.Burn ) ) return;
+
+		var absorbed = Math.Min( armor.Armor, e.DamageInfo.Damage );
+		if ( absorbed <= 0f ) return;
+
+		armor.Armor -= absorbed;
+		e.DamageInfo = e.DamageInfo with { Damage = e.DamageInfo.Damage - absorbed };
 	}
 
 	private bool HasPotentialReviver() => Scene.GetAllComponents<PlayerPawn>().Any( pawn =>
@@ -141,19 +161,19 @@ public sealed class ZombiesPlayerState : Component, IUse,
 		TimeSinceDowned = 0;
 		ReviveProgress = 0;
 		Reviver = null;
-		var hadQuickRevive = _hadQuickRevive || HasPerk( ZombiesPerk.QuickRevive );
+		var hadSecondWind = _hadSecondWind || HasPerk( ZombiesPerk.SecondWind );
 		ClearPerks();
 
 		var solo = ZombiesRoundSystem.CountHumanPlayers() <= 1;
-		IsSelfReviving = solo && hadQuickRevive;
-		_hadQuickRevive = false;
+		IsSelfReviving = solo && hadSecondWind;
+		_hadSecondWind = false;
 
 		Log.Info( $"[Zombies] {Player?.DisplayName} went down (solo={solo}, selfRevive={IsSelfReviving})" );
 		ZombiesRoundSystem.Current?.OnPlayerDowned( this );
 	}
 
 	// Tracked separately because ClearPerks() runs before the solo check.
-	private bool _hadQuickRevive;
+	private bool _hadSecondWind;
 
 	private void Revive()
 	{
@@ -176,7 +196,7 @@ public sealed class ZombiesPlayerState : Component, IUse,
 		IsSelfReviving = false;
 		ReviveProgress = 0;
 		Reviver = null;
-		_hadQuickRevive = false;
+		_hadSecondWind = false;
 		ClearPerks();
 	}
 
@@ -207,8 +227,8 @@ public sealed class ZombiesPlayerState : Component, IUse,
 	{
 		if ( !Networking.IsHost ) return;
 
-		// Remember Quick Revive so a solo player can self-revive after going down.
-		if ( HasPerk( ZombiesPerk.QuickRevive ) ) _hadQuickRevive = true;
+		// Remember Second Wind so a solo player can self-revive after going down.
+		if ( HasPerk( ZombiesPerk.SecondWind ) ) _hadSecondWind = true;
 
 		if ( !IsDowned ) return;
 
@@ -236,7 +256,7 @@ public sealed class ZombiesPlayerState : Component, IUse,
 
 			if ( stillReviving )
 			{
-				var time = For( Reviver )?.HasPerk( ZombiesPerk.QuickRevive ) == true ? QuickReviveTime : ReviveTime;
+				var time = For( Reviver )?.HasPerk( ZombiesPerk.SecondWind ) == true ? SecondWindReviveTime : ReviveTime;
 				ReviveProgress += Time.Delta / time;
 				if ( ReviveProgress >= 1f )
 				{

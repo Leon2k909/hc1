@@ -164,7 +164,12 @@
               "Semi"
             ],
             "TracerEffect": null,
-            "VelocitySpreadScale": 0.25
+            "VelocitySpreadScale": 0.25,
+            "MuzzleVelocity": 799,
+            "DragFunction": "G7",
+            "BallisticCoefficient": 0.243,
+            "SightHeight": 1.5,
+            "ZeroRange": 100
           },
           {
             "__type": "Facepunch.Reloadable",
@@ -182,7 +187,7 @@
               "1.2": "sounds/guns/mp5/reload/mp5.mag.load.sound",
               "2": "sounds/guns/mp5/reload/mp5.mag.sound"
             },
-            "EmptyReloadTime": 2,
+            "EmptyReloadTime": 2.3,
             "InputActions": [
               "Reload"
             ],
@@ -193,7 +198,7 @@
             "OnComponentStart": null,
             "OnComponentUpdate": null,
             "OnInputAction": null,
-            "ReloadTime": 1.5,
+            "ReloadTime": 1.95,
             "RequiresAllInputActions": false,
             "SingleReload": false,
             "TimedReloadSounds": {

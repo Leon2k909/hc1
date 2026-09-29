@@ -1,0 +1,67 @@
+// The breadcrumb bar under the header: a back button, then the way to the page, with the page itself in orange.
+// The gunsmith (.gs-crumbs) and every menu page (MenuTopbar) draw theirs with these, so they look the same.
+// Mixins only: importing this file does not restyle anything by itself.
+
+$crumbs-accent: #FF7A1A;
+
+@mixin crumbs-bar
+{
+    flex-shrink: 0;
+    height: 42px;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: 0 30px;
+    background-color: rgba( 4, 4, 6, 0.72 );
+    border-bottom: 1px solid rgba( 255, 255, 255, 0.08 );
+    pointer-events: all;
+}
+
+@mixin crumbs-back
+{
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 6px;
+    height: 28px;
+    padding: 0 12px 0 8px;
+    margin-right: 8px;
+    border: 1px solid rgba( 255, 255, 255, 0.14 );
+    border-radius: 2px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+
+    i { font-size: 16px; color: rgba( 255, 255, 255, 0.72 ); }
+    label { font-size: 12px; font-weight: 700; letter-spacing: 2px; color: rgba( 255, 255, 255, 0.72 ); }
+
+    &:hover
+    {
+        border-color: $crumbs-accent;
+        background-color: rgba( 255, 122, 26, 0.12 );
+
+        i, label { color: white; }
+    }
+}
+
+@mixin crumb
+{
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    color: rgba( 255, 255, 255, 0.5 );
+
+    &.link
+    {
+        cursor: pointer;
+
+        &:hover { color: white; }
+    }
+
+    &.current { color: $crumbs-accent; }
+}
+
+@mixin crumb-sep
+{
+    font-size: 16px;
+    color: rgba( 255, 255, 255, 0.3 );
+}

@@ -1,0 +1,20 @@
+DefuseObjectiveHud {
+    position: absolute;
+    top: 7%;
+    left: 50%;
+    transform: translateX(-50%);
+    flex-direction: column;
+    align-items: center;
+    color: #f0efea;
+    pointer-events: none;
+    // The panel is in the HUD in every mode, so it's only a box while it has something to show.
+    &.shown {
+        padding: 12px 24px;
+        background-color: rgba(12, 13, 14, 0.82);
+        border-top: 2px solid #e9913c;
+    }
+    .objective-heading { font-size: 15px; font-weight: 700; letter-spacing: 2px; }
+    .objective-instruction { align-items: center; gap: 10px; margin-top: 5px; font-size: 16px; color: #dbd8d1; }
+    .timer { font-size: 28px; font-weight: 700; color: #ffae65; margin-top: 4px; }
+    &.armed { border-color: #e66b4d; }
+}

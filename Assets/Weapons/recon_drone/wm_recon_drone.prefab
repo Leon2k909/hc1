@@ -1,0 +1,64 @@
+{
+  "RootObject": {
+    "__guid": "266a30c9-4bfd-5270-ac45-fa74f3693016",
+    "Name": "Recon Drone World Model",
+    "Enabled": true,
+    "NetworkMode": 0,
+    "Components": [
+      {
+        "__type": "Sandbox.SkinnedModelRenderer",
+        "__guid": "6c3df67b-2a6d-5eef-9db6-1a94a2e7407d",
+        "__enabled": true,
+        "Model": "models/recon_drone/recon_drone_handheld.vmdl",
+        "Tint": "1,1,1,1",
+        "RenderType": "On",
+        "RenderOptions": {
+          "GameLayer": true,
+          "OverlayLayer": false
+        },
+        "UseAnimGraph": false
+      },
+      {
+        "__type": "Facepunch.WorldModel",
+        "__guid": "65dc20f8-db58-5c35-923f-7a70c7697ba7",
+        "__enabled": true,
+        "ModelRenderer": {
+          "_type": "component",
+          "component_id": "6c3df67b-2a6d-5eef-9db6-1a94a2e7407d",
+          "go": "266a30c9-4bfd-5270-ac45-fa74f3693016",
+          "component_type": "SkinnedModelRenderer"
+        }
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "411e9575-87f2-5876-8ad4-507767a16a3b",
+        "Name": "world-propeller",
+        "Enabled": true,
+        "NetworkMode": 0,
+        "Components": [
+          {
+            "__type": "Sandbox.ModelRenderer",
+            "__guid": "e45f3f8f-d154-5498-a9bc-390cb8230c29",
+            "__enabled": true,
+            "Model": "models/recon_drone/recon_propeller_handheld.vmdl",
+            "Tint": "1,1,1,1",
+            "RenderType": "On",
+            "RenderOptions": {
+              "GameLayer": true,
+              "OverlayLayer": false
+            },
+            "UseAnimGraph": false
+          }
+        ],
+        "Children": [],
+        "Position": "-5.94,0,0.54"
+      }
+    ],
+    "Position": "2,0,2",
+    "Rotation": "0,0,0,1"
+  },
+  "ResourceVersion": 2,
+  "__references": [],
+  "__version": 2
+}

@@ -1,0 +1,33 @@
+{
+  "Name": "SIG Sauer M18",
+  "Description": "American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine.",
+  "Slot": "Secondary",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": true,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/guns/m18_01.png",
+  "IsPurchasable": true,
+  "Price": 300,
+  "KillReward": 300,
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/m18/weapon_m18.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/m18/wm_m18.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/m18/vm_m18.prefab"
+  },
+  "WorldModel": "weapons/m18/w_m18.vmdl",
+  "ArmorReduction": 0.775,
+  "HelmetReduction": 0.4,
+  "WorldModelBodyGroups": 0,
+  "__references": [],
+  "__version": 0,
+  "Category": "Pistol",
+  "GunsmithOffset": "0,0,0",
+  "ReviewNote": "Not checked in a match yet: the iron sights, recoil, the slide locking back on the last round, reload timing and sounds (the 21-round magazine's too), the look sway, the M4's sprint on a pistol, and the third-person hold."
+}

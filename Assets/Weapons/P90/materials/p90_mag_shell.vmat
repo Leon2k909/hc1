@@ -1,0 +1,14 @@
+"Layer0"
+{
+	shader "shaders/complex.shader"
+	F_SPECULAR "1"
+	F_TRANSLUCENT "1"
+	g_flRoughnessScaleFactor "1"
+	g_vColorTint "[1 1 1 1]"
+	TextureColor "weapons/p90/materials/p90_mag_shell_color.png"
+	TextureNormal "weapons/p90/materials/p90_mag_shell_normal.png"
+	TextureRoughness "weapons/p90/materials/p90_mag_shell_roughness.png"
+	g_flMetalness "0"
+	TextureTranslucency "weapons/p90/materials/p90_mag_shell_opacity.png"
+	TextureAmbientOcclusion "materials/default/default_ao.tga"
+}

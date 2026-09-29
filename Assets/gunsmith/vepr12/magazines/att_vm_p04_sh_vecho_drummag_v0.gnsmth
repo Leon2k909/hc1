@@ -1,0 +1,47 @@
+{
+  "Name": "25 Round Drum",
+  "Category": "Magazine",
+  "EligibleEquipment": [
+    "weapons/vepr12/vepr12.equip"
+  ],
+  "RequiredLevel": 0,
+  "Description": "25-round drum. Much heavier and slower to change. Reloads in 3.17s (4.2s when empty).",
+  "ModifyBodygroups": true,
+  "Bodygroups": {
+    "magazine": 2
+  },
+  "VerticalRecoilScale": 1.0,
+  "HorizontalRecoilScale": 1.0,
+  "MagazineCapacity": 25,
+  "ReloadTimeMultiplier": 1.0,
+  "ReloadAnimation": 2,
+  "ReloadTime": 3.17,
+  "EmptyReloadTime": 4.2,
+  "ReloadSounds": {
+    "0.2": "weapons/vepr12/sounds/vepr12.reload_drum_raise.sound",
+    "0.6": "weapons/vepr12/sounds/vepr12.reload_drum_armdown.sound",
+    "0.8": "weapons/vepr12/sounds/vepr12.reload_drum_drumout.sound",
+    "1.033": "weapons/vepr12/sounds/vepr12.reload_drum_shake.sound",
+    "1.367": "weapons/vepr12/sounds/vepr12.reload_drum_armup.sound",
+    "1.967": "weapons/vepr12/sounds/vepr12.reload_drum_mvmnt.sound",
+    "2.133": "weapons/vepr12/sounds/vepr12.reload_drum_drumhits.sound",
+    "2.5": "weapons/vepr12/sounds/vepr12.reload_drum_shake.sound",
+    "2.8": "weapons/vepr12/sounds/vepr12.reload_drum_drumin.sound",
+    "3.167": "weapons/vepr12/sounds/vepr12.reload_drum_end.sound"
+  },
+  "EmptyReloadSounds": {
+    "0.167": "weapons/vepr12/sounds/vepr12.reload_empty_raise.sound",
+    "0.533": "weapons/vepr12/sounds/vepr12.reload_empty_drum_drumgrab.sound",
+    "0.8": "weapons/vepr12/sounds/vepr12.reload_empty_drum_drumout.sound",
+    "1": "weapons/vepr12/sounds/vepr12.reload_empty_drum_mvmnt.sound",
+    "1.333": "weapons/vepr12/sounds/vepr12.reload_empty_drum_armdown.sound",
+    "1.933": "weapons/vepr12/sounds/vepr12.reload_empty_drum_shake.sound",
+    "2.133": "weapons/vepr12/sounds/vepr12.reload_empty_drum_drumhits.sound",
+    "2.767": "weapons/vepr12/sounds/vepr12.reload_empty_drum_drumin.sound",
+    "3.167": "weapons/vepr12/sounds/vepr12.reload_empty_drum_drumsmack.sound",
+    "3.767": "weapons/vepr12/sounds/vepr12.reload_empty_drum_charge.sound",
+    "3.867": "weapons/vepr12/sounds/vepr12.reload_empty_drum_end.sound"
+  },
+  "__references": [],
+  "__version": 0
+}

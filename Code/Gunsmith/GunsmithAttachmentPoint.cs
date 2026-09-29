@@ -39,11 +39,41 @@ public partial class GunsmithAttachmentPoint : Component
 	[Property]
 	public Dictionary<string, int> FittedBodygroups { get; set; } = new();
 
+	/// <summary>
+	/// A sticker point's room: how wide (along the point's local Y) and high (along its Z) the flat patch it sits on
+	/// is, in the model's units. The point's +X is the patch's outward normal. <see cref="GunsmithSticker"/> fits the
+	/// artwork inside it at the artwork's own shape.
+	/// </summary>
+	[Property, ShowIf( nameof( Category ), GunsmithPartType.Sticker )]
+	public Vector2 StickerSize { get; set; } = new( 1.5f, 1.5f );
+
+	/// <summary>
+	/// The bone a sticker rides when the point can't sit under that bone's object: the point is then a child of the
+	/// model's own object, placed in the model's bind space, and <see cref="GunsmithSticker"/> follows the bone's
+	/// animation from there. The older guns' viewmodels use it, since their bone objects' frames differ gun to gun.
+	/// Empty: the sticker stays on the point.
+	/// </summary>
+	[Property, ShowIf( nameof( Category ), GunsmithPartType.Sticker )]
+	public string StickerBone { get; set; }
+
 	/// <summary>The fitted barrel's <see cref="GunsmithPart.MuzzleShift"/> on this weapon, zero for the factory barrel.</summary>
 	public static Vector3 MuzzleShift( GameObject weapon ) =>
 		weapon.Components.GetAll<GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants )
 			.FirstOrDefault( p => p.Category == GunsmithPartType.Barrel && p.CurrentPart.IsValid() )?.CurrentPart.MuzzleShift
 		?? Vector3.Zero;
+
+	/// <summary>
+	/// Where the shots leave the fitted barrel, from the factory muzzle: its <see cref="GunsmithPart.MuzzleShift"/>, plus
+	/// its own flash hider's <see cref="GunsmithPart.TipShift"/> while no muzzle device is fitted. Zero for the factory barrel.
+	/// </summary>
+	public static Vector3 DischargeShift( GameObject weapon )
+	{
+		var points = weapon.Components.GetAll<GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants ).ToArray();
+		var barrel = points.FirstOrDefault( p => p.Category == GunsmithPartType.Barrel && p.CurrentPart.IsValid() )?.CurrentPart;
+		if ( !barrel.IsValid() ) return Vector3.Zero;
+		var device = points.Any( p => p.Category == GunsmithPartType.Muzzle && p.CurrentPart.IsValid() );
+		return device ? barrel.MuzzleShift : barrel.MuzzleShift + barrel.TipShift;
+	}
 
 	/// <summary>
 	/// Set the gunsmith part to this part
@@ -57,10 +87,10 @@ public partial class GunsmithAttachmentPoint : Component
 			CurrentGameObject.Destroy();
 		}
 
+		var previousPart = CurrentPart;
 		CurrentPart = part;
 
-		ResetCategoryBodygroups();
-		ApplyFittedBodygroups();
+		ApplyBodygroups( previousPart );
 
 		if ( CurrentPart is null )
 		{
@@ -98,98 +128,47 @@ public partial class GunsmithAttachmentPoint : Component
 			}
 		}
 
-		if ( CurrentPart.ModifyBodygroups )
-		{
-			ApplyBodygroups();
-		}
 	}
 
-	private void ApplyFittedBodygroups()
-	{
-		if ( FittedBodygroups is null || FittedBodygroups.Count == 0 )
-			return;
+	/// <summary>Resolve the whole fitted build together so changing slots in either order gives the same mesh choices.</summary>
+	private readonly HashSet<string> modifiedBodygroups = new();
 
+	internal void ApplyBodygroups( GunsmithPart previousPart = null )
+	{
 		var renderer = GetComponentInParent<SkinnedModelRenderer>( true );
-		if ( !renderer.IsValid() )
-			return;
-
-		var fitted = renderer.Components.GetAll<GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants )
-			.Where( p => p.CurrentPart.IsValid() && p.FittedBodygroups is not null ).ToList();
-		foreach ( var name in FittedBodygroups.Keys )
-			renderer.SetBodyGroup( name, fitted.Select( p => p.FittedBodygroups.TryGetValue( name, out var choice ) ? choice : 0 )
-				.DefaultIfEmpty( 0 ).Max() );
-	}
-
-	internal void ApplyBodygroups()
-	{
-		ApplyFittedBodygroups();
-		if ( !CurrentPart.IsValid() || !CurrentPart.ModifyBodygroups || CurrentPart.Bodygroups is null )
-			return;
-
-		var renderer = GetComponentInParent<SkinnedModelRenderer>( true );
-		if ( !renderer.IsValid() )
+		if ( !renderer.IsValid() ) return;
+		var points = renderer.GetComponentsInChildren<GunsmithAttachmentPoint>( true ).ToArray();
+		var choices = new Dictionary<string, int>();
+		void Remember( GunsmithAttachmentPoint point, GunsmithPart part )
 		{
-			Log.Warning( $"ApplyBodygroups FAILED: SkinnedModelRenderer not found on parent of {GameObject.Name}" );
-			return;
+			if ( !part.IsValid() || !part.ModifyBodygroups ) return;
+			point.modifiedBodygroups.UnionWith( part.GetBodygroups( renderer.Model ).Keys );
+			point.modifiedBodygroups.UnionWith( part.OpticBodygroups.Keys );
 		}
-
-		Log.Warning( $"ApplyBodygroups on {renderer.GameObject.Name}: before BodyGroups={renderer.BodyGroups}" );
-		foreach ( var kv in CurrentPart.GetBodygroups( renderer.Model ) )
+		Remember( this, previousPart );
+		// Reset only groups this build has touched; unrelated factory choices stay intact.
+		foreach ( var point in points )
 		{
-			if ( int.TryParse( kv.Key, out var index ) )
-			{
-				renderer.SetBodyGroup( index, kv.Value );
-			}
-			else
-			{
-				renderer.SetBodyGroup( kv.Key, kv.Value );
-			}
-			Log.Warning( $"  SetBodyGroup {kv.Key} = {kv.Value} (now BodyGroups={renderer.BodyGroups})" );
+			Remember( point, point.CurrentPart );
+			foreach ( var key in point.modifiedBodygroups ) choices.TryAdd( key, 0 );
+			foreach ( var key in point.FittedBodygroups.Keys ) choices.TryAdd( key, 0 );
 		}
-	}
-
-	private void ResetBodygroups( GunsmithPart part )
-	{
-		if ( !part.IsValid() || part.Bodygroups is null )
-			return;
-
-		var renderer = GetComponentInParent<SkinnedModelRenderer>( true );
-		if ( !renderer.IsValid() )
+		var optic = points.Any( p => p.Category == GunsmithPartType.Optic && p.CurrentPart.IsValid() );
+		void Merge( IReadOnlyDictionary<string, int> groups )
 		{
-			Log.Warning( $"ResetBodygroups FAILED: SkinnedModelRenderer not found on parent of {GameObject.Name}" );
-			return;
+			foreach ( var group in groups ) choices[group.Key] = Math.Max( choices.GetValueOrDefault( group.Key ), group.Value );
 		}
-
-		Log.Warning( $"ResetBodygroups on {renderer.GameObject.Name}: before BodyGroups={renderer.BodyGroups}" );
-		// Reset effected bodygroups
-		foreach ( var kv in part.GetBodygroups( renderer.Model ) )
+		foreach ( var point in points.Where( p => p.CurrentPart.IsValid() ) )
 		{
-			if ( int.TryParse( kv.Key, out var index ) )
-			{
-				renderer.SetBodyGroup( index, 0 );
-			}
-			else
-			{
-				renderer.SetBodyGroup( kv.Key, 0 );
-			}
-			Log.Warning( $"  ResetBodyGroup {kv.Key} = 0 (now BodyGroups={renderer.BodyGroups})" );
+			Merge( point.FittedBodygroups );
+			if ( !point.CurrentPart.ModifyBodygroups ) continue;
+			Merge( point.CurrentPart.GetBodygroups( renderer.Model ) );
+			if ( optic ) Merge( point.CurrentPart.OpticBodygroups );
 		}
-	}
-
-	private void ResetCategoryBodygroups()
-	{
-		var parts = ResourceLibrary.GetAll<GunsmithPart>()
-			.Where( part => part.IsValid() && part.Category == Category );
-
-		var resource = GetComponentInParent<GunsmithWeapon>( true )?.Resource ??
-		               GetComponentInParent<Equipment>( true )?.Resource;
-
-		foreach ( var part in parts )
+		foreach ( var choice in choices )
 		{
-			if ( resource.IsValid() && !part.Supports( resource ) )
-				continue;
-
-			ResetBodygroups( part );
+			if ( int.TryParse( choice.Key, out var index ) ) renderer.SetBodyGroup( index, choice.Value );
+			else renderer.SetBodyGroup( choice.Key, choice.Value );
 		}
 	}
 }

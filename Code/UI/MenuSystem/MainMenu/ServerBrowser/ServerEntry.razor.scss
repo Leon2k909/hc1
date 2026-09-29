@@ -1,5 +1,6 @@
-// Rows behave like the pause menu items: yellow left edge + fading yellow wash on hover / selection.
-$sb-accent: #ffbd24;
+@import "/UI/Styles/MenuPage.scss";
+
+$sb-accent: $menu-accent;
 $sb-warn: #ff6a5a;
 
 ServerEntry
@@ -8,7 +9,7 @@ ServerEntry
 	align-items: center;
 	flex-shrink: 0;
 	gap: 16px;
-	height: 56px;
+	height: 54px;
 	padding: 0 20px;
 	border-left: 4px solid transparent;
 	border-bottom: 1px solid rgba( white, 0.05 );
@@ -19,7 +20,7 @@ ServerEntry
 	{
 		flex-grow: 1;
 		min-width: 0;
-		font-size: 20px;
+		font-size: 17px;
 		font-weight: 700;
 		color: rgba( white, 0.8 );
 		white-space: nowrap;
@@ -54,9 +55,9 @@ ServerEntry
 
 	&:hover
 	{
-		border-left-color: rgba( 255, 189, 36, 0.5 );
-		background: linear-gradient( to right, rgba( 255, 189, 36, 0.12 ), rgba( 255, 189, 36, 0 ) );
-		sound-in: ui.button.over;
+		border-left-color: rgba( 255, 122, 26, 0.5 );
+		background: linear-gradient( to right, rgba( 255, 122, 26, 0.12 ), rgba( 255, 122, 26, 0 ) );
+		sound-in: ui_button_hover;
 
 		.se-name { color: white; }
 	}
@@ -64,7 +65,7 @@ ServerEntry
 	&.selected
 	{
 		border-left-color: $sb-accent;
-		background: linear-gradient( to right, rgba( 255, 189, 36, 0.24 ), rgba( 255, 189, 36, 0 ) );
+		background: linear-gradient( to right, rgba( 255, 122, 26, 0.24 ), rgba( 255, 122, 26, 0 ) );
 
 		.se-name { color: white; }
 		.se-players i { color: $sb-accent; }

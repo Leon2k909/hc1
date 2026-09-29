@@ -13,19 +13,28 @@
     <div class="pause-side">
         <div class="pause-head">
             <div class="pause-accent"></div>
-            <label class="pause-title">PAUSED</label>
+            <label class="pause-title">@Tr( "PAUSED" )</label>
         </div>
 
         <div class="pause-items">
-            <div class="pause-item primary" onclick=@(()=>PauseMenuPanel.CloseAny())><i>play_arrow</i><label>Resume</label></div>
-            <div class="pause-item" onclick=@(()=>OpenGunsmith())><i>build</i><label>Gunsmith</label></div>
-            <a class="pause-item" href="/settings"><i>settings</i><label>Settings</label></a>
-            <div class="pause-item" onclick=@(()=>ReportBug())><i>bug_report</i><label>Report a Bug</label></div>
+            <div class="pause-item primary" onclick=@(()=>PauseMenuPanel.CloseAny())><i>play_arrow</i><label>@Tr( "Resume" )</label></div>
+            <div class="pause-item" onclick=@(()=>ChangeClass())><i>badge</i><label>@Tr( "Change Class" )</label></div>
+            <div class="pause-item" onclick=@(()=>OpenGunsmith())><i>build</i><label>@Tr( "Gunsmith" )</label></div>
+            <a class="pause-item" href="/settings"><i>settings</i><label>@Tr( "Settings" )</label></a>
+            <div class="pause-item" onclick=@(()=>ReportBug())><i>bug_report</i><label>@Tr( "Report a Bug" )</label></div>
 
             <div class="pause-sep"></div>
 
-            <div class="pause-item warn" onclick=@(()=>HandleDisconnect())><i>logout</i><label>Leave Match</label></div>
-            <div class="pause-item warn" onclick=@(()=>Quit())><i>power_settings_new</i><label>Quit to Desktop</label></div>
+            <div class="pause-item warn" onclick=@(()=>HandleDisconnect())><i>logout</i><label>@Tr( "Leave Match" )</label></div>
+            @* A game can't close s&box, so Game.Close only goes back to s&box's menu, except in a standalone build (QuitPrompt). *@
+            @if ( Application.IsStandalone )
+            {
+                <div class="pause-item warn" onclick=@(()=>Quit())><i>power_settings_new</i><label>@Tr( "Quit to Desktop" )</label></div>
+            }
+            else
+            {
+                <div class="pause-item warn" onclick=@(()=>Quit())><i>power_settings_new</i><label>@Tr( "Quit to s&box" )</label></div>
+            }
         </div>
     </div>
 
@@ -33,11 +42,11 @@
     {
         <div class="pause-modal-overlay">
             <div class="pause-modal">
-                <label class="pause-modal-title">LEAVE MATCH</label>
-                <label class="pause-modal-text">Do you want to bring your party members with you?</label>
-                <div class="pause-item primary" @onclick=@BringParty><i>group</i><label>Bring Party</label></div>
-                <div class="pause-item" @onclick=@LeaveAlone><i>person</i><label>Leave Alone</label></div>
-                <div class="pause-item" @onclick=@(() => showPartyModal = false)><i>close</i><label>Cancel</label></div>
+                <label class="pause-modal-title">@Tr( "LEAVE MATCH" )</label>
+                <label class="pause-modal-text">@Tr( "Do you want to bring your party members with you?" )</label>
+                <div class="pause-item primary" @onclick=@BringParty><i>group</i><label>@Tr( "Bring Party" )</label></div>
+                <div class="pause-item" @onclick=@LeaveAlone><i>person</i><label>@Tr( "Leave Alone" )</label></div>
+                <div class="pause-item" @onclick=@(() => showPartyModal = false)><i>close</i><label>@Tr( "Cancel" )</label></div>
             </div>
         </div>
     }
@@ -85,6 +94,12 @@
         }
 
         PauseMenuPanel.CloseAny();
+    }
+
+    void ChangeClass()
+    {
+        PauseMenuPanel.CloseAny();
+        ClassSelect.OpenAny();
     }
 
     void Quit()

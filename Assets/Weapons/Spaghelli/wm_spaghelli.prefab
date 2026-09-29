@@ -51,6 +51,10 @@
           "_type": "gameobject",
           "go": "8010d538-161c-486a-9781-1e812c0cc52d"
         },
+        "IkLeftHand": {
+          "_type": "gameobject",
+          "go": "1a78200f-b4cc-47d8-a766-a16efbf03401"
+        },
         "ModelRenderer": {
           "_type": "component",
           "component_id": "0da0ed03-c109-424d-b320-a0a41f8a9896",
@@ -71,6 +75,14 @@
     ],
     "Children": [
       {
+        "__guid": "1a78200f-b4cc-47d8-a766-a16efbf03401",
+        "Flags": 0,
+        "Name": "LeftHandIK",
+        "Position": "5.8,2.48,3.07",
+        "Rotation": "-0.6308,0.3714,-0.448,0.5133",
+        "Enabled": true
+      },
+      {
         "__guid": "ab00b98d-27b0-48f1-ae49-99ee0adc65c2",
         "Flags": 0,
         "Name": "Muzzle",
@@ -82,6 +94,22 @@
         "Name": "EjectionPort",
         "Position": "-0.2785015,-1.175216,6.871462",
         "Enabled": true
+      },
+      {
+        "__guid": "97032b07-fd28-5ce4-8f3b-467e0585fe56",
+        "Flags": 0,
+        "Name": "Sticker Attachment Point",
+        "Position": "-6.5368,0.8495,5.4675",
+        "Rotation": "0.000000,0.000000,0.707107,0.707107",
+        "Enabled": true,
+        "Components": [
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithAttachmentPoint",
+            "__guid": "bacb7ef6-e67c-5232-b927-8f9d9a38ff3d",
+            "Category": "Sticker",
+            "StickerSize": "1.6,0.8"
+          }
+        ]
       }
     ],
     "__variables": [],

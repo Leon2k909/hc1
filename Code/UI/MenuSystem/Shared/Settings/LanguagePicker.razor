@@ -1,0 +1,56 @@
+@using Sandbox;
+@using Sandbox.UI;
+
+@namespace Facepunch.UI
+@inherits Panel
+@attribute [StyleSheet]
+
+<root class="language-picker">
+    <i class="lp-globe">language</i>
+    <label class="lp-native">@GameText.NativeName( GameText.Current )</label>
+    @if ( LanguageMenu.ShowsEnglishName( GameText.Current ) )
+    {
+        <label class="lp-english">@GameText.EnglishName( GameText.Current )</label>
+    }
+    <div class="lp-spacer"></div>
+    <i class="lp-chevron">expand_more</i>
+</root>
+
+@code
+{
+    // The Language setting (Game settings): a field showing the game's language that opens LanguageMenu, the
+    // searchable list.
+
+    /// <summary> The list this field opened, until it closes. </summary>
+    private LanguageMenu Menu;
+
+    protected override void OnMouseDown( MousePanelEvent e )
+    {
+        base.OnMouseDown( e );
+        if ( e.MouseButton != MouseButtons.Left ) return;
+        e.StopPropagation();
+
+        // s&box closes popups on any press outside them before this runs, so a press here while the list is open has
+        // already closed it, and it stays closed instead of opening again.
+        if ( Menu is not null )
+        {
+            Menu = null;
+            return;
+        }
+
+        Sound.Play( "ui_button_press" );
+        Menu = LanguageMenu.Open( this );
+    }
+
+    public override void Tick()
+    {
+        base.Tick();
+
+        if ( Menu is not null && (!Menu.IsValid() || Menu.IsDeleting) )
+            Menu = null;
+
+        SetClass( "open", Menu is not null );
+    }
+
+    protected override int BuildHash() => HashCode.Combine( GameText.Current );
+}
