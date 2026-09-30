@@ -123,6 +123,43 @@
   magazine part sets `GunsmithPart.ReloadAnimation` (1-based index into reload_variants) plus its own
   ReloadTime / EmptyReloadTime / ReloadSounds / EmptyReloadSounds (`Part.reload_variant`, `Part.reload_times`;
   sounds from `rpk_assets.json` "reloads"). `Equipment.ReloadMagazine` hands it to `Reloadable` and `ViewModel`.
+- The shot it shares with the Kastov 762 is voiced away from CoD's sound design (`Tools/kastov762_shot.py` on
+  `shot_voicing.py`, 2026-09-30), like the AK-105's and M16A4's. The user asked that each gun worked on gets some of
+  its CoD sounds, shot or reload, moved towards the real thing.
+  - The rip is MW2019's AK-47 close shot mixed with CoD's "atmosphere" layer. That layer opens with a 45-180 Hz boom
+    as loud as the blast's midrange, then washes out over 4.7 s like a hall. Under the close shot a designed rumble
+    under 150 Hz runs on for a second.
+  - Now it's the close shots alone:
+    - 2% lower, for the 7.62's heavier report;
+    - a 40 Hz high-pass, and under 130 Hz eased 6 dB after the first 40 ms;
+    - the rip's own sound eased 10 dB from 110 ms, after the bolt carrier's clack at ~92 ms, which stays;
+    - 1.5-5 kHz up 2 dB for 20 ms, and the ground at 7.1 ms;
+    - echoes from 35 ms to 1.4 s, as on the other voiced rifles.
+  - Loudness is within 0.1 dB of the old shot's. The tail is -32.5 dB 0.4 s after the loudest 100 ms (the rip's was
+    -22).
+  - Four takes (`kastov_shot_01-04.wav`, 04 new), pitch spread 0.98-1.02. The suppressed shots are unchanged.
+  - `kastov_sounds.py` builds the shot through it. `--preview <wav>` plays the old and new shots; the old WAVs and
+    event are in `Backups/kastov762_shot_rip/`.
+- Its reload foley is voiced too (`Tools/rpk_foley.py` on `Tools/foley_voicing.py`, 2026-09-30).
+  - As ripped, the drum going in and the bolt being charged were louder than the shot (loudest 100 ms -1.2 and -1.6 dB
+    against -4.7). The drum's seating was clipped flat for 50 ms at a time, and the draw and the gun's return to the
+    shoulder boomed at 45-90 Hz.
+  - Now:
+    - a 90 Hz high-pass, which takes the booms 17-20 dB down;
+    - the moves' lows under 250 Hz eased 6 dB;
+    - one gain for the whole set (-19.5 dB), so the loudest clack is 16 dB under the shot and the rip's balance between
+      the files stays.
+  - The level comes from rough real figures at the ear (a shot ~137 dB(A) over 100 ms, a reload's loudest clack ~100,
+    a walking footstep ~63), squeezed the way the game's mix squeezes the shot-to-footstep gap (74 dB to 32).
+    `foley_voicing`'s docstring has it.
+  - The 30-round magazine used the 74u's events. It now has its own voiced copies (`rpk.ak_*`, `rpk_assets.own_name`),
+    and `att_vm_p04_ar_akilo_mag_v0.gnsmth` points at them, as `kastov_prefabs.py` would write it. The 74u's own
+    sounds are unchanged.
+  - Every other gun's reload is still at CoD's level, 15-19 dB louder than the RPK's.
+  - `rpk_assets.py --sounds-only` rebuilds the sounds without the materials. `rpk_foley.py --preview <wav>` plays the
+    shot and both drum reloads, before and after. The ripped WAVs are in `Backups/rpk_foley_rip/`.
+- Both were made offline: the WAVs, the new events and the part need compiling, and none of it has been heard
+  in-game.
 
 ## PP-19 Bizon (MWII's "Minibak", mg_iw9_beta, addon 3499492742)
 - The real 9x18 Makarov Bizon (category SMG) under its real name: the 64-round helical mag, 680 rpm, auto and semi,
@@ -2372,8 +2409,8 @@ simulate_input.
   `specs/p90.json`, the MP7A1 `specs/mp7.json`, the AUG `specs/aug.json`, the Uzi `specs/uzi.json`, the FAL
   `specs/fal.json` and the M18 `specs/m18.json`.
 - Still CoD's: the ported guns' and parts' models, animations and sounds, and the Zombies numbers (the crate's 950, the
-  perk prices, the points for kills). Only the names and markings have changed, and the AK-105's and M16A4's shots are
-  reworked (see AK-105 and M16A4).
+  perk prices, the points for kills). Only the names and markings have changed. Reworked so far: the AK-105's, M16A4's
+  and Kastov 762's shots (the RPK fires the 762's), and the RPK's reloads (see AK-105, M16A4 and RPK).
 
 ## Theater (match replays: `MatchRecorder`, `TheaterController`)
 - The user asked for a Theater that doesn't lag, or else for it to be commented out and hidden. It was rewritten to

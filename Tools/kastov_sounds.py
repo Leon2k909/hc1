@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Convert the Kastov 762's sounds (from the MW base addon) to WAV and write HC1 sound events for them.
 
-Gunshots mix each close shot with its matching atmosphere tail (the MW base plays both, the tail at 0.65 volume).
+The shot is voiced away from CoD's sound design by kastov762_shot.py, from the close shots alone. The suppressed shots
+mix each close shot with its matching atmosphere tail (the MW base plays both, the tail at 0.65 volume).
 Reload foley follows the CoD reload's sound events; each .sound picks randomly among its variants.
 
 Needs ffmpeg on PATH. Run: python Tools/kastov_sounds.py
@@ -77,13 +78,11 @@ def sound_event(path: Path, clips: list[str], gunshot: bool) -> None:
 
 
 def main() -> None:
+    import kastov762_shot
     OUT.mkdir(parents=True, exist_ok=True)
-    shots, suppressed = [], []
+    shots = [path.stem for path in kastov762_shot.build(OUT)]
+    suppressed = []
     for index in (1, 2, 3):
-        name = f"kastov_shot_{index:02d}"
-        mix(SOURCE / "fire" / f"weap_rex_akilo_fire_plr_shot_{index:02d}.wav",
-            SOURCE / "fire" / f"weap_rex_akilo_fire_plr_atmo_{index:02d}.wav", OUT / f"{name}.wav")
-        shots.append(name)
         name = f"kastov_shot_sup_{index:02d}"
         mix(SOURCE / "fire" / f"weap_rex_akilo_sup_plr_shot_{index:02d}.wav",
             SOURCE / "fire" / f"weap_rex_akilo_sup_plr_atmo_{index:02d}.wav", OUT / f"{name}.wav")

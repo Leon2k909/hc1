@@ -30,9 +30,7 @@
   },
   "sounds": {
     "raise_rattle": "weapons/rpk/sounds/rpk.raise_rattle.sound",
-    "raise": "weapons/rpk/sounds/rpk.raise_rattle.sound",
     "drop_rattle": "weapons/rpk/sounds/rpk.drop_rattle.sound",
-    "drop": "weapons/rpk/sounds/rpk.drop_rattle.sound",
     "reload_raise": "weapons/rpk/sounds/rpk.reload_raise.sound",
     "reload_magout": "weapons/rpk/sounds/rpk.reload_magout.sound",
     "reload_maghit": "weapons/rpk/sounds/rpk.reload_maghit.sound",
@@ -46,6 +44,20 @@
     "reload_empty_mag_bump": "weapons/rpk/sounds/rpk.reload_empty_mag_bump.sound",
     "reload_empty_boltcharge": "weapons/rpk/sounds/rpk.reload_empty_boltcharge.sound",
     "reload_empty_end_end": "weapons/rpk/sounds/rpk.reload_empty_end_end.sound",
+    "ak_reload_mvt": "weapons/rpk/sounds/rpk.ak_reload_mvt.sound",
+    "ak_reload_maggrab": "weapons/rpk/sounds/rpk.ak_reload_maggrab.sound",
+    "ak_reload_magout": "weapons/rpk/sounds/rpk.ak_reload_magout.sound",
+    "ak_reload_magbump": "weapons/rpk/sounds/rpk.ak_reload_magbump.sound",
+    "ak_reload_magclick": "weapons/rpk/sounds/rpk.ak_reload_magclick.sound",
+    "ak_reload_mvt2": "weapons/rpk/sounds/rpk.ak_reload_mvt2.sound",
+    "ak_reload_shoulder": "weapons/rpk/sounds/rpk.ak_reload_shoulder.sound",
+    "ak_reload_empty_mvt": "weapons/rpk/sounds/rpk.ak_reload_empty_mvt.sound",
+    "ak_reload_empty_magout": "weapons/rpk/sounds/rpk.ak_reload_empty_magout.sound",
+    "ak_reload_empty_magbump": "weapons/rpk/sounds/rpk.ak_reload_empty_magbump.sound",
+    "ak_reload_empty_magin": "weapons/rpk/sounds/rpk.ak_reload_empty_magin.sound",
+    "ak_reload_empty_mvt2": "weapons/rpk/sounds/rpk.ak_reload_empty_mvt2.sound",
+    "ak_reload_empty_charge": "weapons/rpk/sounds/rpk.ak_reload_empty_charge.sound",
+    "ak_reload_empty_shoulder": "weapons/rpk/sounds/rpk.ak_reload_empty_shoulder.sound",
     "reload_xmag_mvt": "weapons/rpk/sounds/rpk.reload_xmag_mvt.sound",
     "reload_xmag_magout": "weapons/rpk/sounds/rpk.reload_xmag_magout.sound",
     "reload_xmag_mvt2": "weapons/rpk/sounds/rpk.reload_xmag_mvt2.sound",
@@ -56,7 +68,9 @@
     "reload_xmag_empty_maghit": "weapons/rpk/sounds/rpk.reload_xmag_empty_maghit.sound",
     "reload_xmag_empty_magin": "weapons/rpk/sounds/rpk.reload_xmag_empty_magin.sound",
     "reload_xmag_empty_charge": "weapons/rpk/sounds/rpk.reload_xmag_empty_charge.sound",
-    "reload_xmag_empty_shoulder": "weapons/rpk/sounds/rpk.reload_xmag_empty_shoulder.sound"
+    "reload_xmag_empty_shoulder": "weapons/rpk/sounds/rpk.reload_xmag_empty_shoulder.sound",
+    "raise": "weapons/rpk/sounds/rpk.raise_rattle.sound",
+    "drop": "weapons/rpk/sounds/rpk.drop_rattle.sound"
   },
   "reloads": {
     "reload": {
@@ -77,22 +91,22 @@
       "4.2": "weapons/rpk/sounds/rpk.reload_empty_end_end.sound"
     },
     "reload_mag": {
-      "0": "weapons/kastov74u/sounds/ks74u.reload.mvt.sound",
-      "0.4": "weapons/kastov74u/sounds/ks74u.reload.maggrab.sound",
-      "0.6": "weapons/kastov74u/sounds/ks74u.reload.magout.sound",
-      "0.967": "weapons/kastov74u/sounds/ks74u.reload.magbump.sound",
-      "1.167": "weapons/kastov74u/sounds/ks74u.reload.magclick.sound",
-      "1.7": "weapons/kastov74u/sounds/ks74u.reload.mvt2.sound",
-      "2.167": "weapons/kastov74u/sounds/ks74u.reload.shoulder.sound"
+      "0": "weapons/rpk/sounds/rpk.ak_reload_mvt.sound",
+      "0.4": "weapons/rpk/sounds/rpk.ak_reload_maggrab.sound",
+      "0.6": "weapons/rpk/sounds/rpk.ak_reload_magout.sound",
+      "0.967": "weapons/rpk/sounds/rpk.ak_reload_magbump.sound",
+      "1.167": "weapons/rpk/sounds/rpk.ak_reload_magclick.sound",
+      "1.7": "weapons/rpk/sounds/rpk.ak_reload_mvt2.sound",
+      "2.167": "weapons/rpk/sounds/rpk.ak_reload_shoulder.sound"
     },
     "reload_empty_mag": {
-      "0": "weapons/kastov74u/sounds/ks74u.reload_empty.mvt.sound",
-      "0.533": "weapons/kastov74u/sounds/ks74u.reload_empty.magout.sound",
-      "0.933": "weapons/kastov74u/sounds/ks74u.reload_empty.magbump.sound",
-      "1.233": "weapons/kastov74u/sounds/ks74u.reload_empty.magin.sound",
-      "1.733": "weapons/kastov74u/sounds/ks74u.reload_empty.mvt2.sound",
-      "1.933": "weapons/kastov74u/sounds/ks74u.reload_empty.charge.sound",
-      "2.5": "weapons/kastov74u/sounds/ks74u.reload_empty.shoulder.sound"
+      "0": "weapons/rpk/sounds/rpk.ak_reload_empty_mvt.sound",
+      "0.533": "weapons/rpk/sounds/rpk.ak_reload_empty_magout.sound",
+      "0.933": "weapons/rpk/sounds/rpk.ak_reload_empty_magbump.sound",
+      "1.233": "weapons/rpk/sounds/rpk.ak_reload_empty_magin.sound",
+      "1.733": "weapons/rpk/sounds/rpk.ak_reload_empty_mvt2.sound",
+      "1.933": "weapons/rpk/sounds/rpk.ak_reload_empty_charge.sound",
+      "2.5": "weapons/rpk/sounds/rpk.ak_reload_empty_shoulder.sound"
     },
     "reload_xmag": {
       "0": "weapons/rpk/sounds/rpk.reload_xmag_mvt.sound",
