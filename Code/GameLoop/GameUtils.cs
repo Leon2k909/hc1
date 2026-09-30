@@ -579,6 +579,26 @@ public static partial class GameUtils
 	}
 
 	/// <summary>
+	/// Loads a match's map. A host brings everyone connected along (<see cref="Game.ChangeScene"/>), and each of them
+	/// gets their Client as they finish loading. A plain Scene.Load only loads it here: the others got none, and the new
+	/// map's networked objects were spawned into the scene they were still in.
+	/// </summary>
+	public static void LoadMap( SceneFile map )
+	{
+		if ( map is null ) return;
+
+		if ( Networking.IsActive && Networking.IsHost )
+		{
+			var options = new SceneLoadOptions();
+			options.SetScene( map );
+			Game.ChangeScene( options );
+			return;
+		}
+
+		Game.ActiveScene.Load( map );
+	}
+
+	/// <summary>
 	/// Log all known player states to the console.
 	/// </summary>
 	public static void LogPlayers()

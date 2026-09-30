@@ -27,6 +27,6 @@ public static class DefuseTesting
 		var map = GameUtils.GetAvailableMaps().FirstOrDefault( x => x.ResourcePath.Contains( mapContains, StringComparison.OrdinalIgnoreCase ) );
 		if ( !mode.IsValid() || map is null ) return;
 		GameMode.SetCurrent( mode );
-		Game.ActiveScene.Load( map );
+		GameUtils.LoadMap( map );
 	}
 }

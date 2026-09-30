@@ -93,7 +93,7 @@ public partial class MapVoteSystem : SingletonComponent<MapVoteSystem>
 		{
 			var option = WinningOption.Value;
 			GameMode.SetCurrent( option.Mode );
-			Game.ActiveScene.Load( option.Map );
+			GameUtils.LoadMap( option.Map );
 		}
 	}
 

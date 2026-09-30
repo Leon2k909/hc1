@@ -179,11 +179,16 @@ public partial class PlayerPawn
 		// The death's own jolt replaces the old shove on every part (5-20 times the damage, at random).
 		Body.DamageTakenForce = Vector3.Zero;
 
+		// The body leaves the pawn before it goes limp. The engine builds no ragdoll on an object another machine owns
+		// (ModelPhysics.CreatePhysics returns on a proxy), so everyone else saw a player's body stand in its bind pose,
+		// a T-pose, when it left the pawn after. Out on its own it's a local object, and every machine plays out the
+		// same DeathPlan.
+		Body.GameObject.SetParent( null, true );
+
 		if ( Client.IsValid() && Client.IsBot )
 		{
 			Body.SetRagdoll( true );
 			DyingBody.Begin( Body.Physics, death );
-			Body.GameObject.SetParent( null, true );
 			Body.GameObject.Name = $"Ragdoll (BOT {DisplayName})";
 
 			var comp = Body.Components.Create<DestroyAfter>();
@@ -195,7 +200,6 @@ public partial class PlayerPawn
 
 		Body.SetRagdoll( true );
 		DyingBody.Begin( Body.Physics, death );
-		Body.GameObject.SetParent( null, true );
 		Body.GameObject.Name = $"Ragdoll ({DisplayName})";
 
 		var ev = new OnPlayerRagdolledEvent();

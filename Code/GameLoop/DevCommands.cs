@@ -21,7 +21,7 @@ public static class DevCommands
 		if ( mode is null ) { Log.Warning( "dev_quickplay: no map/mode found" ); return; }
 
 		GameMode.SetCurrent( mode );
-		Game.ActiveScene.Load( map );
+		GameUtils.LoadMap( map );
 	}
 
 	/// <summary>Start the zombies mode the same way the hub's Zombies button does.</summary>
@@ -38,7 +38,7 @@ public static class DevCommands
 
 		GameMode.SetCurrent( mode );
 		GameMode.SetHardcore( false );
-		Game.ActiveScene.Load( scene );
+		GameUtils.LoadMap( scene );
 	}
 
 	/// <summary>Zombies: give the local player points.</summary>

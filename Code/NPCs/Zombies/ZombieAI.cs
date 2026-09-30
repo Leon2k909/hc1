@@ -528,10 +528,18 @@ public sealed class ZombieAI : Component, Component.IDamageable
 		foreach ( var c in Components.GetAll<Collider>() ) c.Enabled = false;
 
 		// Bumping into a corpse is silent: no flesh impact sounds from its bodies.
-		var physics = Components.Create<ModelPhysics>();
-		physics.RigidbodyFlags |= RigidbodyFlags.DisableCollisionSounds;
-		physics.Model = Renderer.Model;
-		physics.Renderer = Renderer;
+		ModelPhysics physics;
+		if ( IsProxy )
+		{
+			physics = CreateLocalCorpse();
+		}
+		else
+		{
+			physics = Components.Create<ModelPhysics>();
+			physics.RigidbodyFlags |= RigidbodyFlags.DisableCollisionSounds;
+			physics.Model = Renderer.Model;
+			physics.Renderer = Renderer;
+		}
 
 		foreach ( var part in physics.Bodies )
 		{
@@ -539,6 +547,56 @@ public sealed class ZombieAI : Component, Component.IDamageable
 			rb.RigidbodyFlags |= RigidbodyFlags.DisableCollisionSounds;
 			rb.Velocity = push * 200f + Vector3.Up * 60f;
 		}
+	}
+
+	private GameObject _localCorpse;
+
+	/// <summary>
+	/// The corpse on a machine that doesn't own the zombie. The engine builds no ragdoll on an object another machine
+	/// owns (ModelPhysics.CreatePhysics returns on a proxy), so on every client a zombie's body stood in its bind pose, a
+	/// T-pose, and the driver's physics can't go on the zombie itself. So it's a local object: a copy of the hidden
+	/// driver whose bodies start from the zombie's pose, with the zombie mesh moved across and bone-merged onto it. It
+	/// goes when the zombie does.
+	/// </summary>
+	private ModelPhysics CreateLocalCorpse()
+	{
+		var corpse = new GameObject( true, "Zombie corpse" );
+		corpse.WorldTransform = Renderer.WorldTransform;
+		corpse.Tags.Add( "corpse" );
+		corpse.Tags.Add( "ragdoll" );
+
+		var driver = corpse.Components.Create<SkinnedModelRenderer>();
+		driver.Model = Renderer.Model;
+		driver.UseAnimGraph = false;
+		driver.RenderType = Renderer.RenderType;
+		driver.RenderOptions.Game = Renderer.RenderOptions.Game;
+		driver.Tint = Renderer.Tint;
+
+		// Built from the zombie's own renderer, so the bodies start where its bones are, then they drive the copy.
+		var physics = corpse.Components.Create<ModelPhysics>( false );
+		physics.RigidbodyFlags |= RigidbodyFlags.DisableCollisionSounds;
+		physics.Model = Renderer.Model;
+		physics.Renderer = Renderer;
+		physics.Enabled = true;
+		physics.Renderer = driver;
+
+		foreach ( var mesh in Components.GetAll<SkinnedModelRenderer>( FindMode.InDescendants ).ToList() )
+		{
+			if ( mesh == Renderer || mesh.BoneMergeTarget != Renderer ) continue;
+			mesh.GameObject.SetParent( corpse, true );
+			mesh.BoneMergeTarget = driver;
+		}
+
+		Renderer.Enabled = false;
+		corpse.DestroyAsync( CorpseLifetime );
+		_localCorpse = corpse;
+		return physics;
+	}
+
+	protected override void OnDestroy()
+	{
+		if ( _localCorpse.IsValid() )
+			_localCorpse.Destroy();
 	}
 
 	[Rpc.Broadcast]

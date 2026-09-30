@@ -121,6 +121,12 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 
 		public SkinnedModelRenderer FindBody() => Bot.IsValid() ? Bot.Renderer : PlayerBody.IsValid() ? PlayerBody.Renderer : null;
 
+		/// <summary>
+		/// The object that leaves its parent when the soldier dies: a player's body (the scope) leaves the pawn, and a
+		/// bot's body leaves the bot (LightweightCombatBot's OnKill).
+		/// </summary>
+		public GameObject Leaver => Bot.IsValid() && Body.IsValid() ? Body.GameObject : Scope;
+
 		public bool IsDead()
 		{
 			if ( Body.IsValid() && !Body.UseAnimGraph )
@@ -341,7 +347,7 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 			Spawned = time
 		};
 
-		soldier.LastParent = soldier.Scope.Parent;
+		soldier.LastParent = soldier.Leaver.Parent;
 
 		// A bot's sprint isn't sent to clients: playback works it out from its speed.
 		soldier.Actions = new TheaterReplays.LifeActions { Sprinting = soldier.Bot.IsValid() ? null : new() };
@@ -387,8 +393,9 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 		if ( soldier.Entry.Died < 0f )
 			CaptureActions( soldier, time );
 
-		// A player's body leaves the pawn when it dies: its position jumps from the pawn's space to the world's.
-		var parent = soldier.Scope.Parent;
+		// A player's body leaves the pawn when it dies, and a bot's the bot: its position jumps from its parent's space
+		// to the world's.
+		var parent = soldier.Leaver.Parent;
 		if ( parent != soldier.LastParent )
 		{
 			soldier.LastParent = parent;
@@ -608,16 +615,41 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 				recorder.GetTrackRecorder( soldier.Root, soldier.Entry.Track );
 			}
 
-			// Disabled ones too, so a hidden gun or holstered part records being hidden. Not a model built at runtime
-			// (a gunsmith sticker): a replay can only name models that are files.
-			foreach ( var renderer in soldier.Scope.GetComponentsInChildren<ModelRenderer>( true, true ) )
-			{
-				if ( renderer.Model is { IsProcedural: true } )
-					continue;
+			CaptureRenderers( recorder, soldier.Scope );
 
-				recorder.GetTrackRecorder( renderer )?.Capture();
-			}
+			// A bot's body once it has left the bot. Its tracks were made while it was the bot's, so they stay under the
+			// soldier's, and its Parent records the move.
+			var leaver = soldier.Leaver;
+			if ( leaver != soldier.Scope && !IsWithin( leaver, soldier.Scope ) )
+				CaptureRenderers( recorder, leaver );
 		}
+	}
+
+	/// <summary>
+	/// Every renderer on <paramref name="scope"/> and under it. Disabled ones too, so a hidden gun or holstered part
+	/// records being hidden. Not a model built at runtime (a gunsmith sticker): a replay can only name models that are
+	/// files.
+	/// </summary>
+	static void CaptureRenderers( MovieRecorder recorder, GameObject scope )
+	{
+		foreach ( var renderer in scope.GetComponentsInChildren<ModelRenderer>( true, true ) )
+		{
+			if ( renderer.Model is { IsProcedural: true } )
+				continue;
+
+			recorder.GetTrackRecorder( renderer )?.Capture();
+		}
+	}
+
+	static bool IsWithin( GameObject go, GameObject ancestor )
+	{
+		for ( var parent = go.Parent; parent.IsValid(); parent = parent.Parent )
+		{
+			if ( parent == ancestor )
+				return true;
+		}
+
+		return false;
 	}
 
 	void Finish()

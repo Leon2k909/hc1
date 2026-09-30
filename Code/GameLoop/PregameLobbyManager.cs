@@ -49,7 +49,7 @@ public sealed class PregameLobbyManager : Component
         // GameMode.SetHardcore( IsHardcore );
         GameMode.SetHardcore( true );
 
-        Game.ActiveScene.Load( map );
+        GameUtils.LoadMap( map );
     }
 
     [Rpc.Owner]

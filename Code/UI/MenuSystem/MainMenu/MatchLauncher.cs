@@ -18,7 +18,7 @@ public static class MatchLauncher
 		// (LandingPage) had a commented-out toggle for.
 		GameMode.SetCurrent( mode );
 		GameMode.SetHardcore( !IsZombies( mode ) );
-		Game.ActiveScene.Load( map );
+		GameUtils.LoadMap( map );
 	}
 
 	/// <summary>

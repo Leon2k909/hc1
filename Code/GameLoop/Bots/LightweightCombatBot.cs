@@ -88,6 +88,9 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 	private GameObject _weaponHold;
 	private bool _dying;
 
+	/// <summary> The body once it has left the bot to fall (see OnKill). It goes when the bot does. </summary>
+	private GameObject _corpse;
+
 	private const int KillScore = 25;
 	private const int TeamKillScore = -25;
 	private const int SuicideScore = -10;
@@ -896,6 +899,22 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 
 		if ( Renderer.IsValid() )
 		{
+			// The body leaves the bot before it goes limp, as a player's leaves the pawn. The engine builds no ragdoll
+			// on an object another machine owns (ModelPhysics.CreatePhysics returns on a proxy), and on every client
+			// the host's bots are, so their bodies stood in the bind pose, a T-pose, until they were removed. Out on its
+			// own the body is a local object on every machine, and each one plays out the same DeathPlan. The tags the
+			// bot's children took from it go with it, and it goes when the bot does (OnDestroy).
+			var body = Renderer.GameObject;
+			if ( body != GameObject )
+			{
+				body.SetParent( null, true );
+				body.Tags.Add( "dead" );
+				body.Tags.Add( "ragdoll" );
+				body.Tags.Add( "corpse" );
+				body.DestroyAsync( CorpseLifetime );
+				_corpse = body;
+			}
+
 			Renderer.UseAnimGraph = false;
 			var physics = Renderer.Components.GetOrCreate<Sandbox.ModelPhysics>();
 			physics.Enabled = true;
@@ -906,6 +925,12 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 		}
 
 		GameObject.DestroyAsync( CorpseLifetime );
+	}
+
+	protected override void OnDestroy()
+	{
+		if ( _corpse.IsValid() )
+			_corpse.Destroy();
 	}
 
 	void IGameEventHandler<KillEvent>.OnGameEvent( KillEvent eventArgs )
