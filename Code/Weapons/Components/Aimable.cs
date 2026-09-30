@@ -8,13 +8,16 @@ public partial class Aimable : WeaponInputAction
 
 	/// <summary>
 	/// ADS walk speed multiplier from tuning. +10 = 20% faster ADS walking.
+	/// Weapon tuning is off (see WeaponTuningManager), so it's 1.
 	/// </summary>
 	internal float GetAdsMoveScale()
 	{
-		var weaponId = Equipment?.Resource?.ResourceName ?? string.Empty;
-		if ( string.IsNullOrEmpty( weaponId ) ) return 1f;
-		var tune = WeaponTuningManager.GetTuning( weaponId );
-		return 1f + tune.AdsMoveSpeed * 0.02f;
+		return 1f;
+		// Put back with tuning:
+		// var weaponId = Equipment?.Resource?.ResourceName ?? string.Empty;
+		// if ( string.IsNullOrEmpty( weaponId ) ) return 1f;
+		// var tune = WeaponTuningManager.GetTuning( weaponId );
+		// return 1f + tune.AdsMoveSpeed * 0.02f;
 	}
 
 	protected void OnIsAimingChanged( bool before, bool after )

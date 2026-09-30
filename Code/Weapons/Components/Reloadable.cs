@@ -136,9 +136,11 @@ public partial class Reloadable : WeaponInputAction,
 		get
 		{
 			var multiplier = Equipment?.AttachmentReloadMultiplier ?? 1f;
-			var weaponId = Equipment?.Resource?.ResourceName ?? string.Empty;
-			if ( string.IsNullOrEmpty( weaponId ) ) return multiplier;
-			return multiplier * (1f - WeaponTuningManager.GetTuning( weaponId ).Reload * 0.015f);
+			return multiplier;
+			// Weapon tuning is off (see WeaponTuningManager). Put back with tuning:
+			// var weaponId = Equipment?.Resource?.ResourceName ?? string.Empty;
+			// if ( string.IsNullOrEmpty( weaponId ) ) return multiplier;
+			// return multiplier * (1f - WeaponTuningManager.GetTuning( weaponId ).Reload * 0.015f);
 		}
 	}
 

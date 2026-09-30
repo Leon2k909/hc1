@@ -21,13 +21,16 @@ public partial class ShootRecoil : EquipmentComponent
 
 	/// <summary>
 	/// Recoil scale from tuning. +10 = -15% recoil, -10 = +15% recoil.
+	/// Weapon tuning is off (see WeaponTuningManager), so it's 1.
 	/// </summary>
 	private float GetRecoilScale()
 	{
-		var weaponId = Equipment?.Resource?.ResourceName ?? string.Empty;
-		if ( string.IsNullOrEmpty( weaponId ) ) return 1f;
-		var tune = WeaponTuningManager.GetTuning( weaponId );
-		return 1f - tune.Recoil * 0.015f;
+		return 1f;
+		// Put back with tuning:
+		// var weaponId = Equipment?.Resource?.ResourceName ?? string.Empty;
+		// if ( string.IsNullOrEmpty( weaponId ) ) return 1f;
+		// var tune = WeaponTuningManager.GetTuning( weaponId );
+		// return 1f - tune.Recoil * 0.015f;
 	}
 
 	internal void Shoot()

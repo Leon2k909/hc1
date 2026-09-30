@@ -555,25 +555,29 @@ public partial class Shootable : WeaponInputAction,
 		return true;
 	}
 
-	/// <summary>
-	/// Returns the weapon's resource name, used as the tuning key.
-	/// </summary>
-	private string TuningId => Equipment?.Resource?.ResourceName ?? string.Empty;
+	// Weapon tuning is off (see WeaponTuningManager): damage and rate ignore saved tunings. Put back with tuning:
+	// /// <summary>
+	// /// Returns the weapon's resource name, used as the tuning key.
+	// /// </summary>
+	// private string TuningId => Equipment?.Resource?.ResourceName ?? string.Empty;
 
 	/// <summary>
-	/// Base damage scaled by the player's tuning preference.
+	/// Base damage scaled by the player's tuning preference (while tuning is on).
 	/// </summary>
 	private float GetEffectiveDamage()
 	{
 		// A suppressor changes the report, not the cartridge's damage.
 		var baseDamage = BaseDamage;
-		if ( string.IsNullOrEmpty( TuningId ) ) return baseDamage;
-		var tune = WeaponTuningManager.GetTuning( TuningId );
-		return baseDamage * (1f + tune.Damage * 0.025f);
+		return baseDamage;
+		// Put back with tuning:
+		// if ( string.IsNullOrEmpty( TuningId ) ) return baseDamage;
+		// var tune = WeaponTuningManager.GetTuning( TuningId );
+		// return baseDamage * (1f + tune.Damage * 0.025f);
 	}
 
 	/// <summary>
-	/// Effective RPM after fitted parts (gas system length, suppressor back-pressure) and fire-rate tuning. +10 tuning = +12% RPM.
+	/// Effective RPM after fitted parts (gas system length, suppressor back-pressure) and, while tuning is on,
+	/// fire-rate tuning. +10 tuning = +12% RPM.
 	/// </summary>
 	private float GetEffectiveFireRate()
 	{
@@ -587,9 +591,11 @@ public partial class Shootable : WeaponInputAction,
 			partScale *= SuppressorRateScale( parts );
 
 		var rate = FireRate * partScale * perkScale;
-		if ( string.IsNullOrEmpty( TuningId ) ) return rate;
-		var tune = WeaponTuningManager.GetTuning( TuningId );
-		return rate * (1f + tune.FireRate * 0.012f);
+		return rate;
+		// Put back with tuning:
+		// if ( string.IsNullOrEmpty( TuningId ) ) return rate;
+		// var tune = WeaponTuningManager.GetTuning( TuningId );
+		// return rate * (1f + tune.FireRate * 0.012f);
 	}
 
 	/// <summary> A suppressor's back-pressure on the rate, unless a fitted gas regulator is on its suppressed setting. </summary>

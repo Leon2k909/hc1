@@ -103,7 +103,9 @@ public sealed record GunsmithStats
 			return new GunsmithStats();
 
 		var parts = GunsmithAttachmentEffects.ForBuild( build ? resource : null );
-		var tune = build ? WeaponTuningManager.GetTuning( resource.ResourceName ) : new WeaponTuningManager.WeaponTuning();
+		// Weapon tuning is off (see WeaponTuningManager), so every build is untuned. Put back with tuning:
+		// var tune = build ? WeaponTuningManager.GetTuning( resource.ResourceName ) : new WeaponTuningManager.WeaponTuning();
+		var tune = new WeaponTuningManager.WeaponTuning();
 		var suppressed = shootable.HasBuiltInSuppressor || (build && HasSuppressor( resource, shootable ));
 		var bolt = prefab.GetComponentInChildren<Boltable>( true ).IsValid();
 

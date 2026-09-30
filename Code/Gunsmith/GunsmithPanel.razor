@@ -493,6 +493,7 @@
                         </div>
                         <i class="gs-action-lock">lock</i>
                     </div>
+                    @* Weapon tuning is off (see WeaponTuningManager). Put back with tuning:
                     <div class="gs-action tuning @(ShowTuning ? "open" : "")" @onclick=@ToggleTuning>
                         <i class="gs-action-icon">tune</i>
                         <div class="gs-action-copy">
@@ -500,6 +501,7 @@
                             <label class="gs-action-sub @(IsTuned( equip ) ? "tuned" : "")">@Tr( IsTuned( equip ) ? "TUNED" : "FINE TUNE STATS" )</label>
                         </div>
                     </div>
+                    *@
                     @if ( _stats.IsFirearm )
                     {
                         <div class="gs-action compare @(ShowCompare ? "open" : "")" @onclick=@OpenCompare>
@@ -882,6 +884,7 @@
     }
 
     @* ===================== TUNING ===================== *@
+    @* Weapon tuning is off (see WeaponTuningManager). Put back with tuning:
     @if ( ShowTuning )
     {
         <div class="gs-modal-backdrop" @onclick=@(( PanelEvent e ) => ClickBackdrop( e, CloseTuning ))>
@@ -897,6 +900,7 @@
             </div>
         </div>
     }
+    *@
 
     @* ===================== WEAPON STATS / COMPARE ===================== *@
     @if ( ShowCompare )
@@ -1300,6 +1304,7 @@
         StateHasChanged();
     }
 
+    /// <summary> Whether the weapon has saved tuning. Only the commented-out TUNING button reads it. </summary>
     private static bool IsTuned( EquipmentResource resource )
     {
         if ( resource is null )
@@ -2178,6 +2183,10 @@
         or GunsmithPartType.GlowingCamo
         or GunsmithPartType.Camoflague3D;
 
+    /// <summary>
+    /// The WEAPON TUNING modal. Tuning is off, and its button and modal are commented out, so this stays false; it's
+    /// kept, with the Escape and back chains that close it, for when tuning comes back.
+    /// </summary>
     private bool ShowTuning { get; set; }
 
     private void ToggleTuning()

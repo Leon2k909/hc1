@@ -3,6 +3,9 @@ namespace Facepunch;
 /// <summary>
 /// Client-local per-weapon tuning. Persists via Game.Cookies.
 /// Each stat value ranges from -10 to +10.
+/// Tuning is off for now: the gunsmith's TUNING button and modal are commented out, and the gameplay reads
+/// (Shootable, ShootRecoil, Reloadable, Aimable, WeaponAmmo, GunsmithStats) ignore saved tunings. Each is marked
+/// "Put back with tuning". This class and WeaponTuningPanel are kept for when it comes back.
 /// </summary>
 public static class WeaponTuningManager
 {
