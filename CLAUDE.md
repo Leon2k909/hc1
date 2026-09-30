@@ -2400,24 +2400,63 @@ simulate_input.
     to the gun's `MaxRange`.
 - The path is taken as straight from the aim ray to where the round stopped, so drop is left out (a few cm off at the
   ranges a crack is heard). The bot's rounds leave from its muzzle.
+- Scattered tail (`PlayScatter`, 2026-09-30): the patches of ground, wall and ceiling the cone sweeps each throw a
+  little of it back every way, not only the mirror bounce. That's the rattle after a real crack.
+  - Each reflector is taken as a plane. Its energy is summed over a grid of patches round the path's point nearest the
+    listener: along the path and across it (up a wall), finest near the path. The ground's grid is 14 x 11 patches out to
+    60 m back, 120 m ahead and 30 m to each side.
+  - A patch of area A sends `s E cos i A cos o / (pi r^2)` to the listener r away, where E is the wave's energy there
+    (its own `TryShock`, 16 halvings) and s is the surface's scattering coefficient (`Reflector.Scatter`: hard ground
+    0.12, walls 0.25, earth 0.14, grass 0.1, cloth 0.05). That's Lambert's law. It arrives when the wave got there plus
+    r / c.
+  - The energy is binned by arrival into five windows (0-6, 6-20, 20-60, 60-180 and 180-600 ms after the direct
+    crack). Each window plays as one grain (`MakeScatter`): rounded cracks of the patches' mean length (soft off grass
+    and earth), coming at random ~6000 a second with Gaussian weights, fading over the window's own decay.
+  - Each grain plays from where its energy came from. The more evenly it comes from all round, the less it's placed
+    (`SpacialBlend` is the length of the energy-weighted mean direction).
+  - The tail is as loud against the direct crack as it really is, less the direct crack's share when that was capped.
+    Over hard ground it's 10-15 dB under the crack (K-weighted, loudest 100 ms), 17 dB at a 0.5 m miss. Most of it
+    comes within 50 ms, and at a 30 m miss it lasts ~150 ms.
+  - It's worked out for the first pellet only, and at most once every 60 ms (`TailInterval`). Surfaces aren't traced
+    past where the probes met them, so a wall is taken to run on ±30 m. Trees and props scatter nothing.
+- The ear's acoustic reflex (`AcousticReflex`, `Code/GameLoop/Audio/AcousticReflex.cs`, 2026-09-30): after a loud enough
+  sound the stapedius muscle stiffens the middle ear, which dulls what follows.
+  - It's set off by the crack's real energy over the ear's ~200 ms integration, whatever level the crack plays at: an
+    ~85 dB threshold, and full strength 25 dB over it. A 1 m miss is ~116 dB (full strength), 20 m ~100 dB and 100 m
+    ~91 dB.
+  - It starts 30 ms after a strong crack and 120 ms after a weak one, so the crack itself goes in whole. It peaks
+    ~60 ms after that and has let go within ~0.5 s.
+  - Cracks arriving within 50 ms of each other (a shotgun's pellets) add their energies.
+  - At full strength `ReflexProcessor` takes up to 15 dB off the lows: ~13 dB at 500 Hz, 9 at 1 kHz, 5 at 2 kHz and
+    under 2 above 4 kHz. It's two first-order low shelves at 2 kHz on the Game mixer (every world sound: the reports,
+    impacts, footsteps and the tails). The UI, music, radio and voice mixers aren't the character's ears, so they're
+    left alone. It's added the first time a crack sets it off, and at rest it passes the sound through untouched.
+  - The latency, twitch times and threshold are textbook figures, first guesses to tune by ear.
+  - Not modelled: the reflex from the player's own shots, a nearby report or explosions. It would dull the mix after
+    every shot the player fires, a big change to how the guns sound, so it's left for the user to decide.
 - `Tools/bullet_cracks.py` replicates the crack synthesis and levels offline, and `python Tools/bullet_cracks.py <wav>`
   writes an M855's cracks at 1-50 m with each front. `--scenes <wav>` writes an M16A4 fired from 100 m and 300 m
-  missing by 0.5-30 m, each crack with its ground reflection and then the report, at the game's levels and delays, and
-  prints how loud each is. None of it has been heard in-game:
-  not the levels, the reflections, the whizz, or the delayed reports and impacts.
-- Checked against the report (2026-09-30, `--scenes`; the user asked whether it really sounds right):
-  - Fired from 100 m, a 1 m miss's crack is 9 dB over the report (K-weighted, loudest 100 ms), and from 300 m, 19 dB.
-    In the field it's roughly 15-25 dB and 25-35 dB (the crack's energy is Whitham's; the report's real level at range
-    is the uncertain part, +-5 dB).
-  - So within ~3 m a crack is 5-15 dB too quiet against the report, and 0.5 m and 1 m misses sound the same. A crack is
-    4-6 samples long at 44.1 kHz, so full scale holds its energy down. A soft clipper doesn't help (tried: under
-    1.5 dB, since band-limiting so short a wave puts its peak back). From ~10 m out it's within a few dB of real.
-  - Levers not pulled yet, as they change the whole mix (the user's call): the reports' level (`GunshotAudio` holds the
-    shooter's own level out to 4 m, where a real rifle's blast in front is roughly 7-10 dB under what the shooter hears),
-    or the ear's acoustic reflex after a near crack (it takes 10-15 dB off the lows of what follows, for a few hundred
-    ms).
-  - It's dry: the direct crack and up to four mirror reflections, with no scattered tail from the ground, trees and
-    buildings the cone sweeps over. The game has no reverb for `ReverbEnabled` to use.
+  missing by 0.5-30 m. Each scene has the crack, its ground reflection and the ground's tail, then the report, at the
+  game's levels and delays. It plays twice: first without the tail and the reflex, then with them. It prints how loud
+  each part is.
+  None of it has been heard in-game: not the levels, the reflections, the tail, the reflex, the whizz, or the delayed
+  reports and impacts.
+- Checked against the report (2026-09-30, `--scenes`; the user asked whether it really sounds right), K-weighted, loudest
+  100 ms:
+  - Before the tail and the reflex: fired from 100 m, a 1 m miss's crack was 9 dB over the report, and from 300 m
+    19 dB. In the field it's roughly 15-25 dB and 25-35 dB. The crack's energy is Whitham's; the report's real level at
+    range is the uncertain part, +-5 dB.
+  - Close in, the gap is because a crack is only 4-6 samples long at 44.1 kHz, so full scale holds its energy down, and
+    0.5 m and 1 m misses sound the same. A soft clipper doesn't help (tried: under 1.5 dB, since band-limiting so short
+    a wave puts its peak back). From ~10 m out it's within a few dB of real.
+  - With them, from 100 m the reflex is at 0.66-0.72 of full when the report arrives, 150-180 ms after the crack, and
+    takes 4.4 dB off it (at a 30 m miss 0.46, 3.9 dB). A 0.5-3 m miss's crack is now 13.5-13.9 dB over the report,
+    10 m 7 dB, 30 m 1 dB.
+  - From 300 m the report comes ~0.5 s after the crack, when the reflex has let go (0.08), so the gap is as it was:
+    +19 dB at 1 m.
+  - The lever left, the user's call as it changes the whole mix: the reports' level. `GunshotAudio` holds the shooter's
+    own level out to 4 m, and a real rifle's blast in front is roughly 7-10 dB under what the shooter hears.
+  - The game has no reverb for `ReverbEnabled` to use, so the tails and reflections are the only room the cracks get.
 
 ## Weapon fire rates and bots
 - The SCAR-H's BaseDamage 36 is the M4's 20 scaled by muzzle energy: M80 at its prefab's 792 m/s is 2,989 J, and the
