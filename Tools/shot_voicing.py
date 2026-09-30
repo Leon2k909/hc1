@@ -168,7 +168,8 @@ def surroundings(v, rng):
         end = v.echo_dulling[i + 1][0] if i + 1 < len(v.echo_dulling) else v.echo_end
         pick = (times >= start) & (times < end)
         part = np.zeros(n)
-        np.add.at(part, (times[pick] * SR).astype(int), amps[pick])
+        # An echo just short of echo_end can round onto the last sample's index + 1.
+        np.add.at(part, np.minimum((times[pick] * SR).astype(int), n - 1), amps[pick])
         ir += signal.sosfilt(sos(2, cutoff, "lowpass"), part)
     # Leaves, rough walls and uneven ground don't mirror the blast: each echo is smeared over a few ms.
     m = int(0.003 * SR)

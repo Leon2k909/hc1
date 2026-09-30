@@ -191,7 +191,7 @@ public sealed class HardpointZone : Component,
 			{
 				ControllingTeam = Team.Terrorist;
 				BroadcastNotification( "Zone secured by {0}!", "captured", Team.Terrorist );
-				Sound.Play( "sounds/ui/buttons/ui_action.sound" );
+				Sound.Play( "sounds/ui/menu/ui_nav_tab.sound" );
 			}
 		}
 		else if ( ctCount > 0 )
@@ -201,7 +201,7 @@ public sealed class HardpointZone : Component,
 			{
 				ControllingTeam = Team.CounterTerrorist;
 				BroadcastNotification( "Zone secured by {0}!", "captured", Team.CounterTerrorist );
-				Sound.Play( "sounds/ui/buttons/ui_action.sound" );
+				Sound.Play( "sounds/ui/menu/ui_nav_tab.sound" );
 			}
 		}
 		else

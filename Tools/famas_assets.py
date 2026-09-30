@@ -50,6 +50,10 @@ def sounds():
             filters = ["-af", f"volume={-12 if suppressed else 0}dB,alimiter=limit=0.891:attack=1:release=50:level=false"] if shot else []
             ffmpeg(["-i", str(EXTRACTED / "sound" / file), *filters, "-ar", "44100", "-ac", "2" if shot else "1", "-c:a", "pcm_s16le", str(wav)])
             wavs.append(wav)
+        if shot and not suppressed:
+            # The rip's shot, voiced away from CoD's sound design (ported_shots.py).
+            import ported_shots
+            wavs = ported_shots.build("famas", out)
         event = out / f"famas.{name}.sound"
         if shot:
             template = ASSETS / ("sounds/swb/attachments/silencer/swb_rifle.silenced.fire.sound" if suppressed else "sounds/weapons/m4a1/m4_shot.sound")
@@ -73,6 +77,12 @@ def sounds():
             name = alias.removeprefix("wfoly_plr_ar_falpha_")
             timed[f"{frame / 30:.3f}"] = convert(name, aliases[alias])
         reloads[clip] = timed
+    # The suppressed shot, voiced like the open shot (suppressed_shots.py).
+    import suppressed_shots
+    suppressed_shots.voice("famas")
+    # The foley, voiced away from CoD's sound design (ported_foley.py).
+    import ported_foley
+    ported_foley.voice("famas")
     return result, reloads
 
 

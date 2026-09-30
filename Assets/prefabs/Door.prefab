@@ -18,9 +18,10 @@
             "y": 1
           }
         ],
-        "CloseSound": "sound/hl2_door_soft_close.sound",
+        "CloseFinishedSound": "sounds/buildings/door_close.sound",
+        "CloseSound": "sounds/buildings/door_swing.sound",
         "OpenAwayFromPlayer": true,
-        "OpenSound": "sound/hl2_door_open.sound",
+        "OpenSound": "sounds/buildings/door_open.sound",
         "OpenTime": 0.35,
         "TargetAngle": 90
       },
@@ -47,9 +48,7 @@
   "MenuIcon": null,
   "ResourceVersion": 1,
   "__references": [
-    "facepunch.door_single_dev#57525",
-    "viasoundcorner.hl2_door_open#19085",
-    "viasoundcorner.hl2_door_soft_close#19084"
+    "facepunch.door_single_dev#57525"
   ],
   "__version": 1
 }

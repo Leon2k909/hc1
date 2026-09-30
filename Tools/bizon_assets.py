@@ -17,6 +17,9 @@ import re
 import sys
 from pathlib import Path
 
+import ported_foley
+import ported_shots
+import suppressed_shots
 from ks74u_assets import ASSETS, EXTRACTED, asset_path, build_material, ffmpeg, sound_event
 
 DEST = ASSETS / "Weapons" / "Bizon"
@@ -83,8 +86,9 @@ def build_sounds() -> dict[str, str]:
     # Same curve as sounds/weapons/m4a1/m4_shot.sound.
     m4 = json.loads((ASSETS / "sounds" / "weapons" / "m4a1" / "m4_shot.sound").read_text(encoding="utf-8"))
     fire = out / "bizon.fire.sound"
-    sound_event(fire, level_shots(out, "fire_plr_shot", "bizon_shot"), pitch="0.98 1.02", decibels=m4["Decibels"],
-                distance=m4["Distance"], falloff=m4["Falloff"])
+    # The rip's shot, voiced away from CoD's sound design (ported_shots.py).
+    sound_event(fire, ported_shots.build("bizon", out), pitch=ported_shots.event_pitch("bizon"),
+                decibels=m4["Decibels"], distance=m4["Distance"], falloff=m4["Falloff"])
 
     # The shared suppressed-SMG event's settings and curve, with the Bizon's own suppressed shots.
     suppressed = json.loads((ASSETS / "sounds" / "swb" / "attachments" / "silencer" / "swb_smg.silenced.fire.sound")
@@ -102,6 +106,10 @@ def build_sounds() -> dict[str, str]:
         event = out / f"bizon.{name}.sound"
         sound_event(event, [wav], pitch="1", decibels=70, distance=1000, falloff=[{"y": 1}, {"x": 1}])
         events[name] = asset_path(event)
+    # The suppressed shots, voiced like the open shot (suppressed_shots.py).
+    suppressed_shots.voice("bizon")
+    # The foley, voiced away from CoD's sound design (ported_foley.py).
+    ported_foley.voice("bizon")
     return events
 
 

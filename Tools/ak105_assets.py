@@ -23,6 +23,8 @@ import sys
 from pathlib import Path
 
 import ak105_shot
+import ported_foley
+import suppressed_shots
 from ks74u_assets import ASSETS, EXTRACTED, FOLEY as KS74U_FOLEY, asset_path, build_material, ffmpeg, sound_event
 
 DEST = ASSETS / "Weapons" / "AK105"
@@ -139,6 +141,10 @@ def build_sounds() -> tuple[dict[str, str], dict[str, dict[str, str]]]:
         sounds[name] = event_for(alias)
     reloads = {exported: {f"{round(frame / 30, 3):g}": event_for(alias) for frame, alias in events[clip]}
                for clip, exported in RELOAD_CLIPS.items()}
+    # The suppressed shots, voiced like the open shot (suppressed_shots.py).
+    suppressed_shots.voice("ak105")
+    # The foley, voiced away from CoD's sound design (ported_foley.py).
+    ported_foley.voice("ak105")
     return sounds, reloads
 
 

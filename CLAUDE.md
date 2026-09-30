@@ -137,7 +137,8 @@
     - echoes from 35 ms to 1.4 s, as on the other voiced rifles.
   - Loudness is within 0.1 dB of the old shot's. The tail is -32.5 dB 0.4 s after the loudest 100 ms (the rip's was
     -22).
-  - Four takes (`kastov_shot_01-04.wav`, 04 new), pitch spread 0.98-1.02. The suppressed shots are unchanged.
+  - Four takes (`kastov_shot_01-04.wav`, 04 new), pitch spread 0.98-1.02. The suppressed shots are voiced from the
+    same settings (see The ported guns' sounds).
   - `kastov_sounds.py` builds the shot through it. `--preview <wav>` plays the old and new shots; the old WAVs and
     event are in `Backups/kastov762_shot_rip/`.
 - Its reload foley is voiced too (`Tools/rpk_foley.py` on `Tools/foley_voicing.py`, 2026-09-30).
@@ -155,7 +156,8 @@
   - The 30-round magazine used the 74u's events. It now has its own voiced copies (`rpk.ak_*`, `rpk_assets.own_name`),
     and `att_vm_p04_ar_akilo_mag_v0.gnsmth` points at them, as `kastov_prefabs.py` would write it. The 74u's own
     sounds are unchanged.
-  - Every other gun's reload is still at CoD's level, 15-19 dB louder than the RPK's.
+  - The other ported guns' reloads were voiced the same way afterwards (see The ported guns' sounds). Only the
+    Kastov-74u's are still at CoD's level.
   - `rpk_assets.py --sounds-only` rebuilds the sounds without the materials. `rpk_foley.py --preview <wav>` plays the
     shot and both drum reloads, before and after. The ripped WAVs are in `Backups/rpk_foley_rip/`.
 - Both were made offline: the WAVs, the new events and the part need compiling, and none of it has been heard
@@ -194,7 +196,7 @@
   - The tail sits where the M16A4's and AUG's do (-33 dB 0.4 s after the loudest 100 ms). Loudness matches the old
     shot's within 0.2 dB (K-weighted, loudest 100 ms), through a soft clipper, since the limiter alone ducked the blast.
   - The two recordings make four takes (`ak105_shot_01-04.wav`), and the event's pitch spread is 0.98-1.02.
-  - The suppressed shots are unchanged.
+  - The suppressed shots are voiced from the same settings (see The ported guns' sounds).
   - `--preview <wav>` writes the old and new shots and eight-round bursts. The old WAVs and event are in
     `Backups/ak105_shot_rip/`.
   - Made with the editor closed: the WAVs and `ak105.fire.sound` need compiling (03 and 04 are new), and it hasn't
@@ -286,7 +288,8 @@
     direct sound (the muzzle 0.75 m ahead of the ear); echoes from 35 ms to 1.4 s, as the AK-105's.
   - The tail is where the rip's was (-32.7 dB 0.4 s after the loudest 100 ms, against -32.5), but it's echoes, not a
     low rumble. Loudness matches the old shot's within 0.1 dB.
-  - Four takes (`m16_shot_01-04.wav`), pitch spread 0.98-1.02 (was 0.96-1.04). The suppressed shots are unchanged.
+  - Four takes (`m16_shot_01-04.wav`), pitch spread 0.98-1.02 (was 0.96-1.04). The suppressed shots are voiced from
+    the same settings (see The ported guns' sounds).
   - `--preview <wav>` writes the old and new shots and three three-round bursts each. The old WAVs and event are in
     `Backups/m16_shot_rip/`.
   - Made with the editor closed: the WAVs and `m16.fire.sound` need compiling (03 and 04 are new), and it hasn't been
@@ -2025,8 +2028,13 @@ simulate_input.
     The user heard the stock click there and wanted the menus' sounds to match. The card's INVITE FRIENDS, LEAVE and
     ALL FRIENDS use the menus' press (below).
 - The rest of the menus use `ui_button_press` / `ui_button_hover` (see World sounds), which replaced s&box's stock
-  `ui.button.press` / `ui.button.over`, and upstream's `ui_press` / `ui_action`. Upstream's events set no mixer, so they
-  go to the default one (Game, which the SFX slider sets).
+  `ui.button.press` / `ui.button.over`. Upstream's `ui_press` and `ui_action` went on 2026-09-30:
+  - `sound-in: ui_press` (Buttons.scss, the map vote, the mode and map cards) is `ui_button_press`;
+  - `.action:active`'s `ui_action` is `ui_nav_tab`;
+  - Domination's and Hot Zone's capture cues (`DominationFlag`, `HardpointZone`) play `ui_button_press` and
+    `ui_nav_tab`.
+  Upstream's events set no mixer, so they went to the default one (Game, which the SFX slider sets). Nothing plays them
+  now, nor upstream's `ui_hover`.
 - Not yet heard in-game.
 
 ## World sounds (`WorldSounds`, `Tools/world_sounds.py`)
@@ -2080,7 +2088,15 @@ simulate_input.
     the surface, scaled by `BounceVolume` (speed^1.2, none under ~1 m/s, at most 2x), at most one every 0.06 s. Once
     the events have compiled, `OnStart` turns off the Rigidbody's own collision sounds (`EnableCollisionSounds`).
     Whether that also silences the engine's sound for the surface it hits wasn't checked: listen for a double knock.
-- Still s&box's or not there at all:
+  - Doors (2026-09-30): `prefabs/Door.prefab` (Refinery's doors and the test scenes') played HL2's door sounds from a
+    cloud package. It now plays the Ridgeback buildings' synthesised ones (`sounds/buildings/door_open`, `door_swing`
+    as it starts to shut, `door_close` when it's shut; see Ridgeback buildings). Innocent Hotel's doors are the cloud
+    map's own and keep its sounds.
+- Still s&box's, upstream's or not there at all:
+  - The zombies' voices (s&box's `zombie.attack`, `zombie.pain` and `zombie.die`) and Zombies' buy chime (upstream's
+    `buy.sound`). Nothing real to match them to.
+  - The upstream guns' sounds (M4A1, MP5, SCAR-H, USP, M700, Spaghelli, 1911) and the grenades' blasts and pins:
+    upstream's own recordings, not CoD's or s&box's.
   - Impacts are heard by everyone within ~76 m, when the round gets there and the sound has come back (see Bullet
     cracks). The shooter's machine plays them where its rounds struck; the others find them by a short trace at the
     round's end.
@@ -2211,6 +2227,46 @@ simulate_input.
   it can't fire before then. The shell's sound plays at 0.65 s, as the shell goes into the tube.
 - Some ported guns' declared times end 0.1-0.4 s before their clips level the gun: the Vityaz, Kastov 762, P90 and
   the Bizon's non-empty reload. They weren't changed.
+
+## The ported guns' sounds (`ported_shots.py`, `suppressed_shots.py`, `ported_foley.py`)
+- The user asked for each gun worked on to have its CoD sounds moved towards the real thing, then (2026-09-30) for any
+  CoD or s&box sounds left to be changed. So every ported gun's shot, suppressed shot and reload foley is voiced from
+  its rip, bar the Kastov-74u's (another session's hand-tuned sounds). Each script's docstring has what the rips get
+  wrong and every step.
+- Open shots: the AK-105, M16A4 and Kastov 762 have their own scripts (see their sections). `Tools/ported_shots.py`
+  voices the Vityaz, Bizon, Vepr-12, P90, MP7A1, AUG, Uzi, FAL, M18 and FAMAS with `shot_voicing.py`'s steps, a
+  `Voicing` each:
+  - pitch by the charge and the barrel: the 9 mm guns and the P90 2% up, the MP7A1 3%, the FAMAS 1%, the Vepr-12 1%
+    down, the FAL 2% down, the AUG and M18 as ripped;
+  - a 40 Hz high-pass (the Uzi's 70), the lows eased 3-10 dB after the blast's first 20-50 ms, and the FAL's, Vepr-12's,
+    AUG's and Uzi's designed tails eased;
+  - the blast's 1.5-5 kHz up 2-4 dB for 20-25 ms (the dark Uzi's 1-6 kHz 7 dB for 30 ms);
+  - the ground reflection by the gun's length, and echoes from 35 ms to 1.4 s, as loud against the blast as the
+    muzzle's distance from the ear gives (0.4 s after the loudest 100 ms: -31.5 dB for the FAL to -36 for the P90).
+  - Loudness stays each rip's. A gun with one recording gets several takes with their own echoes (pitch 0.97-1.03).
+- Suppressed shots (`Tools/suppressed_shots.py`): the Kastov 762's, Vityaz's, Bizon's, AK-105's, M16A4's, P90's,
+  MP7A1's, AUG's, Uzi's, FAL's and FAMAS's. The Vepr-12 and the M18 have none.
+  - As ripped they were levelled to each other, not to their guns: 1.4 dB (the Kastov) to 10.6 dB (the P90) under the
+    open shot, counting the SMG events' Volume 0.5. The Uzi's WAV was louder than its open shot's.
+  - A real suppressor takes about 20-25 dB off at the shooter's ear. Squeezed as the rest of the mix is (0.43 times,
+    see RPK), a suppressed shot sits 10 dB under its gun's voiced open shot (`SUPPRESSION_DB`), counting its event.
+  - Each is voiced with its gun's open-shot `Voicing`, but with no pitch change or presence lift (the can takes the
+    crack off) and the lows under 130 Hz eased 6 dB after 25 ms, which takes MW2019's designed thumps (the P90's, AUG's,
+    FAL's, FAMAS's and M16A4's) down 2-8 dB. Its echoes sit where the open shot's do.
+- Reload foley (`Tools/ported_foley.py`, on `foley_voicing.py`, as the RPK's): the Kastov 762's (its drum and xmag sets
+  too), Vityaz's, Bizon's, AK-105's, Vepr-12's, M16A4's, P90's, MP7A1's, AUG's, Uzi's, FAL's, M18's and FAMAS's.
+  - Every set's loudest file but the Kastov's was louder than the gun's voiced shot, by up to 4.4 dB (the AK-105's bolt
+    pull).
+  - Now: a 90 Hz high-pass; the moves' lows under 250 Hz eased 6 dB (`MOVES`, by name; the Kastov's and FAMAS's files
+    are only numbered, so theirs are listed by number); and one gain per set, so its loudest 100 ms is 16 dB under the
+    shot. The sets came down 15-20.4 dB. Mono files stay mono.
+- The rips are in `Backups/{ported_shots,suppressed_shots,ported_foley}_rip/<gun>/`. Each script voices from them,
+  backing up any file that has no copy there yet, so a rerun writes the same files. After a re-rip, delete that gun's
+  backups first. Each gun's assets script (`kastov_sounds.py`, and `ak47_gunsmith.py` for the Kastov's drum and xmag
+  sets) calls them after writing those sounds. `ported_foley.py <gun> --list` shows which files count as moves, and
+  `ported_shots.py` / `ported_foley.py --preview <wav>` play the rip and then the voiced sounds.
+- Made offline on 2026-09-30 with the editor closed. The WAVs and the fire events need compiling, and none of it has
+  been heard in-game.
 
 ## Gunshot audio (`GunshotAudio`)
 - The user: gunshots were "far too loud". The guns' sound events fell only 9 dB by 79 m and had occlusion off, so a
@@ -2580,8 +2636,9 @@ simulate_input.
   `specs/p90.json`, the MP7A1 `specs/mp7.json`, the AUG `specs/aug.json`, the Uzi `specs/uzi.json`, the FAL
   `specs/fal.json` and the M18 `specs/m18.json`.
 - Still CoD's: the ported guns' and parts' models, animations and sounds, and the Zombies numbers (the crate's 950, the
-  perk prices, the points for kills). Only the names and markings have changed. Reworked so far: the AK-105's, M16A4's
-  and Kastov 762's shots (the RPK fires the 762's), and the RPK's reloads (see AK-105, M16A4 and RPK).
+  perk prices, the points for kills). Only the names and markings have changed. The sounds of every ported gun but the
+  Kastov-74u have been voiced towards the real thing: shots, suppressed shots and reloads (see RPK and The ported
+  guns' sounds).
 
 ## Theater (match replays: `MatchRecorder`, `TheaterController`)
 - The user asked for a Theater that doesn't lag, or else for it to be commented out and hidden. It was rewritten to

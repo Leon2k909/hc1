@@ -20,6 +20,9 @@ import re
 import sys
 from pathlib import Path
 
+import ported_foley
+import ported_shots
+import suppressed_shots
 from ks74u_assets import ASSETS, TOOLS, asset_path, build_material, ffmpeg, sound_event
 
 EXTRACTED = TOOLS / "extracted" / "2802430252"
@@ -116,7 +119,8 @@ def build_sounds() -> tuple[dict[str, str], dict[str, dict[str, str]]]:
     # Same curve as sounds/weapons/m4a1/m4_shot.sound. One recording only, so more pitch spread than the other guns'.
     m4 = json.loads((ASSETS / "sounds" / "weapons" / "m4a1" / "m4_shot.sound").read_text(encoding="utf-8"))
     fire = out / "uzi.fire.sound"
-    sound_event(fire, [level_shot(out, SHOT, "uzi_shot", SHOT_GAIN_DB)], pitch="0.95 1.05",
+    # The rip's shot, voiced away from CoD's sound design (ported_shots.py).
+    sound_event(fire, ported_shots.build("uzi", out), pitch=ported_shots.event_pitch("uzi"),
                 decibels=m4["Decibels"], distance=m4["Distance"], falloff=m4["Falloff"])
 
     # The shared suppressed-SMG event's settings and curve, with the Uzi's own suppressed shot.
@@ -145,6 +149,10 @@ def build_sounds() -> tuple[dict[str, str], dict[str, dict[str, str]]]:
         frame, alias = events[clip][0]
         sounds[name] = event_for(alias)
     reloads = {exported: timed(events[clip], event_for) for clip, exported in RELOAD_CLIPS.items()}
+    # The suppressed shots, voiced like the open shot (suppressed_shots.py).
+    suppressed_shots.voice("uzi")
+    # The foley, voiced away from CoD's sound design (ported_foley.py).
+    ported_foley.voice("uzi")
     return sounds, reloads
 
 

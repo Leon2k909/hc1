@@ -3,7 +3,8 @@
 
 The shot is voiced away from CoD's sound design by kastov762_shot.py, from the close shots alone. The suppressed shots
 mix each close shot with its matching atmosphere tail (the MW base plays both, the tail at 0.65 volume).
-Reload foley follows the CoD reload's sound events; each .sound picks randomly among its variants.
+Reload foley follows the CoD reload's sound events; each .sound picks randomly among its variants. It's then voiced
+away from CoD's sound design by ported_foley.py.
 
 Needs ffmpeg on PATH. Run: python Tools/kastov_sounds.py
 """
@@ -89,6 +90,9 @@ def main() -> None:
         suppressed.append(name)
     sound_event(OUT / "kastov_shot.sound", shots, gunshot=True)
     sound_event(OUT / "kastov_shot_sup.sound", suppressed, gunshot=True)
+    # The suppressed shots, voiced like the open shot (suppressed_shots.py).
+    import suppressed_shots
+    suppressed_shots.voice("kastov762")
 
     for event, variants in FOLEY_EVENTS.items():
         clips = []
@@ -97,6 +101,9 @@ def main() -> None:
             convert(SOURCE / f"{FOLEY}{variant}.ogg", OUT / f"{name}.wav")
             clips.append(name)
         sound_event(OUT / f"kastov_{event}.sound", clips, gunshot=False)
+    # The foley, with ak47_gunsmith.py's drum and xmag sets, voiced away from CoD's sound design (ported_foley.py).
+    import ported_foley
+    ported_foley.voice("kastov762")
     print(f"wrote {len(list(OUT.glob('*.wav')))} wavs and {len(list(OUT.glob('*.sound')))} sound events to {OUT}")
 
 

@@ -275,7 +275,7 @@ public sealed class DominationFlag : Component,
 				ControllingTeam = Team.Unassigned;
 				CapturingTeam = Team.Unassigned;
 				BroadcastNotification( "{0} Neutralized!", "neutralized", FlagName );
-				Sound.Play( "sounds/ui/buttons/ui_press.sound" );
+				Sound.Play( "sounds/ui/menu/ui_button_press.sound" );
 			}
 			else
 			{
@@ -283,7 +283,7 @@ public sealed class DominationFlag : Component,
 				ControllingTeam = team;
 				CapturingTeam = Team.Unassigned;
 				BroadcastNotification( "{0} Captured {1}!", "captured", team, FlagName );
-				Sound.Play( "sounds/ui/buttons/ui_action.sound" );
+				Sound.Play( "sounds/ui/menu/ui_nav_tab.sound" );
 			}
 
 			UpdateVisuals();

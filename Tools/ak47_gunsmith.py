@@ -12,6 +12,7 @@ import kastov_materials as M
 import kastov_prefabs as P
 import kastov_sounds as S
 import kastov_weapons as W
+import ported_foley
 from port_kastov import Kastov
 
 WEAPON = W.KASTOV_762
@@ -52,6 +53,8 @@ def attachment_assets():
         assert events, clip
         reloads[clip] = events
     (WEAPON.folder / "kastov_attachment_assets.json").write_text(json.dumps({"reloads": reloads}, indent=2) + "\n")
+    # The foley, with kastov_sounds.py's, voiced away from CoD's sound design (ported_foley.py).
+    ported_foley.voice("kastov762")
 
 
 def meshes():

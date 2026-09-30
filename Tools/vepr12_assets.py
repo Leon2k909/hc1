@@ -20,6 +20,8 @@ import re
 import sys
 from pathlib import Path
 
+import ported_foley
+import ported_shots
 from ks74u_assets import ASSETS, EXTRACTED, asset_path, build_material, ffmpeg, sound_event
 
 DEST = ASSETS / "Weapons" / "Vepr12"
@@ -110,7 +112,8 @@ def build_sounds() -> tuple[dict[str, str], dict[str, dict[str, str]]]:
     # other guns' eight.
     m4 = json.loads((ASSETS / "sounds" / "weapons" / "m4a1" / "m4_shot.sound").read_text(encoding="utf-8"))
     fire = out / "vepr12.fire.sound"
-    sound_event(fire, level_shots(out, [SHOT, f"{SHOT}_ads"], "vepr12_shot"), pitch="0.96 1.04",
+    # The rip's shot, voiced away from CoD's sound design (ported_shots.py).
+    sound_event(fire, ported_shots.build("vepr12", out), pitch=ported_shots.event_pitch("vepr12"),
                 decibels=m4["Decibels"], distance=m4["Distance"], falloff=m4["Falloff"])
 
     events, files = clip_events(), alias_files()
@@ -131,6 +134,8 @@ def build_sounds() -> tuple[dict[str, str], dict[str, dict[str, str]]]:
         frame, alias = events[clip][0]
         sounds[name] = event_for(alias)
     reloads = {exported: timed(events[clip], event_for) for clip, exported in RELOAD_CLIPS.items()}
+    # The foley, voiced away from CoD's sound design (ported_foley.py).
+    ported_foley.voice("vepr12")
     return sounds, reloads
 
 
