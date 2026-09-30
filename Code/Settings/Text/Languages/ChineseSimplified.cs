@@ -1074,6 +1074,7 @@ public static partial class GameText
 		["MUZZLE VELOCITY"] = "枪口初速",
 		["EMPTY RELOAD"] = "空仓装填",
 		["RECOIL CONTROL"] = "后坐力控制",
+		["WEIGHT"] = "重量",
 		["WALK SPEED"] = "行走速度",
 		["SPRINT SPEED"] = "冲刺速度",
 		["CROUCH SPEED"] = "蹲姿移速",

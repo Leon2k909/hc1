@@ -550,6 +550,7 @@ public static partial class GameText
 		["MUZZLE VELOCITY"] = "Velocità alla bocca",
 		["EMPTY RELOAD"] = "Ricarica a vuoto",
 		["RECOIL CONTROL"] = "Controllo del rinculo",
+		["WEIGHT"] = "Peso",
 		["WALK SPEED"] = "Velocità di camminata",
 		["SPRINT SPEED"] = "Velocità di scatto",
 		["CROUCH SPEED"] = "Velocità da accovacciato",

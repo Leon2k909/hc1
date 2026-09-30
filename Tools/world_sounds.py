@@ -1,7 +1,8 @@
 """
-World sounds modelled on the real thing, in place of s&box's stock ones: bullet impacts by material, a soldier's boot
-footsteps, running steps and landings by floor, and the menus' button press and hover. They're synthesised from the
-physics of each event, so there are no samples, and every figure here can be re-tuned.
+World sounds modelled on the real thing, in place of s&box's stock ones: bullet impacts by material, a knife's strikes
+by material and its swing, grenades' bounces by floor, a soldier's boot footsteps, running steps and landings by floor,
+and the menus' button press and hover. They're synthesised from the physics of each event, so there are no samples, and
+every figure here can be re-tuned.
 
     python Tools/world_sounds.py [--preview <wav>] [--compare <wav>] [--out <dir>]
 
@@ -9,11 +10,14 @@ Writes, with a .sound event for each set if it doesn't exist yet (an event may b
 overwritten; delete one to have it rewritten):
 - Assets/sounds/world/impacts/bullet_<material>_<n>.wav: masonry, tile, metal, sheetmetal, glass, wood, plastic, dirt,
   grass, fabric and flesh;
+- Assets/sounds/world/knife/knife_<material>_<n>.wav (the impacts' materials) and knife_swing_<n>.wav;
+- Assets/sounds/world/grenades/{frag,can}_<floor>_<n>.wav: concrete, tile, wood, metal, dirt, grass and soft;
 - Assets/sounds/world/footsteps/{step,run,land}_<floor>_<n>.wav: concrete, tile, wood, metal, dirt and grass;
 - Assets/sounds/ui/menu/ui_button_{press,hover}_<n>.wav.
-Code/World/WorldSounds.cs picks the impact, step and landing for a surface. --preview writes every take in a row, with
-walks, runs and bursts; --compare writes s&box's stock sound, then the new one, for each set (decoded from the s&box
-install, each pair at its events' volumes). --out writes the sounds under another folder instead of Assets.
+Code/World/WorldSounds.cs picks the impact, knife strike, bounce, step and landing for a surface. --preview writes every
+take in a row, with walks, runs, bursts and bouncing grenades; --compare writes s&box's stock sound, then the new one,
+for each set (decoded from the s&box install or the project's Assets, each pair at its events' volumes). --out writes
+the sounds under another folder instead of Assets.
 
 What each is, and why it sounds like it does:
 
@@ -45,6 +49,29 @@ later, early reflections and a short diffuse tail, kept low (s&box plays a sound
 Their octave spectra were compared with s&box's recordings of the same materials (real Foley), which showed the first
 version had almost no low end. Most now follow them within about 6 dB from 125 Hz to 4 kHz. Dirt and grass are up to
 9 dB brighter at 1-2 kHz, since s&box's are a melee blow's, not a round's spray.
+
+A knife's strike (a slash or thrust lands with a few tens of joules, a bullet with over a thousand, so it barely moves a
+wall): the steel tip's click, the blade's own ring (a ~17 cm blade's bending modes at a cantilever's ratios over
+~110 Hz, damped by the fist within tens of ms, so only the upper ones carry: the "tink" of steel), the fist and handle
+jolting to a stop, and what the tip does to the face: skating over stone or tile, a thick plate's "tang" ringing on, a
+sheet booming and sometimes punched through, a pane's "tink" and short ring, the tip biting into wood (which grips the
+blade, so it barely rings), soil and turf giving, cloth tearing. Into a body: the uniform punctured, the fist and guard
+slapping it and its dull thud, far quieter than a round's hit (PlayerPawn plays it for a knifed player). They sit 9-12 dB
+under the bullet impacts, and are heard by everyone nearby (Melee broadcasts them).
+The swing: vortices shed off the blade's spine as it cuts the air at 12-18 m/s (Strouhal, 0.2 v / 4 mm: ~750 Hz at
+15 m/s), a band of noise whose pitch follows the blade's speed and whose pressure goes as its cube (aeolian dipole
+sound), the edge's finer vortices two octaves up, the arm's low whump and the sleeve and kit. It's about as loud as a
+walking step on concrete. The old swing was 19 dB louder, a bullet impact's level, heard to 5000 units.
+
+Grenade bounces, at ~6 m/s (a harder landing plays louder, WorldSounds.BounceVolume, as speed^1.2: Hertz contact):
+- frag: an M67, a 64 mm steel sphere filled with Composition B, which damps its shell modes to a dull clunk, and its
+  fuze's striker ticking.
+- can: smoke, stun and thermite grenades, a thin sheet-steel can: a hollow tonk (modes from 700-1000 Hz) that rings a
+  little longer, and its lid and fuze rattling.
+Then the floor: on concrete a click from the ~0.2 ms steel-on-stone contact and the slab's dull knock, on tile its
+glazed ring, a steel deck's ring on (the loudest), floorboards' hollow modes, soil and turf giving with a thud (and
+grass's blades), a body's or a cushion's dull thump. The frag on concrete's octave spectrum was compared with s&box's
+metal-on-hard-surface Foley: within 6 dB of it from 250 Hz up, but for the click's 2 kHz band, 8 dB brighter.
 
 Footsteps of a soldier in combat boots (rubber lug soles, ~95 kg with kit). Each part of the sole that meets the floor
 (heel, then forefoot) slaps the rubber on it, the heel's rubber and the leg behind it compress (a 150-650 Hz knock, the
@@ -101,6 +128,45 @@ IMPACTS = {
     "fabric": (-26.0, 2000, 4),
     "flesh": (-21.0, 2500, 5),
 }
+
+# Knife strikes: (target loudness in dB, the event's distance in units). A thrust lands with a few tens of joules
+# against a round's ~1,700, so a knife on a wall is ~25 dB under a bullet's strike in real life, squeezed here as the
+# game squeezes a shot against a footstep (foley_voicing): ~12 dB under the bullet impacts. s&box played the surface's
+# bullet impact for it, at a bullet's level.
+KNIVES = {
+    "masonry": (-27.0, 2000),
+    "tile": (-27.0, 2000),
+    "metal": (-23.0, 2500),
+    "sheetmetal": (-24.0, 2500),
+    "glass": (-27.0, 2000),
+    "wood": (-29.0, 1800),
+    "plastic": (-31.0, 1500),
+    "dirt": (-34.0, 1200),
+    "grass": (-36.0, 1200),
+    "fabric": (-35.0, 1200),
+    "flesh": (-30.0, 1500),
+}
+KNIFE_TAKES = 4
+KNIFE_REFERENCE = 48
+# The slash's whoosh is faint (aeolian sound off a blade at 15 m/s, 55-65 dB at the ear), about a walking step's
+# level. The old one was upstream's -15.3 dB, a bullet impact's, heard to 5000 units with no occlusion.
+KNIFE_SWING = (-34.0, 800, 4)
+
+# Grenade bounces: (target loudness, distance) by floor, for a frag at ~6 m/s. A steel grenade on concrete at 1 m is
+# about as loud as a hammer's light tap, 85-90 dB, ~25 dB over a walking step (-36 here): squeezed, about 8 dB over it.
+# Harder bounces are louder in the game (WorldSounds.GrenadeBounce). A can rings a little more on a hard floor.
+BOUNCE_FLOORS = {
+    "concrete": (-28.0, 2500),
+    "tile": (-27.0, 2500),
+    "wood": (-26.0, 2500),
+    "metal": (-23.0, 3000),
+    "dirt": (-37.0, 1500),
+    "grass": (-40.0, 1500),
+    "soft": (-38.0, 1500),
+}
+BOUNCE_BODIES = {"frag": 0.0, "can": 0.5}
+BOUNCE_TAKES = 4
+BOUNCE_REFERENCE = 64
 
 # Footsteps: the walk's target loudness by floor. s&box's concrete walk measures -36.3 dB at its event's volume.
 FLOORS = {
@@ -714,6 +780,321 @@ def creak(rng, seconds):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+# The knife
+
+def blade(rng):
+    """The knife's own ring: a ~17 cm blade, 4 mm at the spine, gripped in the fist. Its flat bending modes stand at a
+    cantilever's ratios over a fundamental of ~110 Hz (6.27, 17.5, 34.4, 56.8 and 85 times it), its edgewise ones about
+    7.5 times higher, and the hand damps them within tens of ms. So thin a blade only radiates the upper ones: the
+    "tink" of steel."""
+    f1 = rng.uniform(100, 135)
+    freqs = [f1 * r * rng.uniform(0.96, 1.04) for r in (6.27, 17.55, 34.39, 56.84, 84.9)]
+    freqs += [f1 * 7.5 * r * rng.uniform(0.95, 1.05) for r in (1.0, 6.27)]
+    partials = [(f, min(1.0, (f / 3000) ** 0.6) * rng.lognormal(0, 0.25), float(np.clip(0.05 * (2000 / f) ** 0.5,
+                                                                                            0.008, 0.06)))
+                for f in freqs]
+    return unit(modes(0.3, partials, 0.00005, rng))
+
+
+def skid(rng, seconds, low, high):
+    """The tip skating over a hard face it can't bite: stick-slip friction, a gritty scrape."""
+    t = seconds_axis(seconds)
+    grit = 0.4 + unit(np.abs(band(rng.standard_normal(len(t)), 0, 600)))
+    return noise(rng, len(t), low, high) * grit * envelope(t, 0.002, seconds * 0.3)
+
+
+def rip(rng, seconds, low, high):
+    """Cloth tearing: its threads parting one after another, a train of tiny snaps at a wavering rate."""
+    t = seconds_axis(seconds)
+    rate = rng.uniform(250, 600) * (1 + 0.3 * np.sin(2 * np.pi * rng.uniform(8, 20) * t))
+    train = np.zeros(len(t))
+    phase = np.cumsum(rate) / SR
+    at = np.nonzero(np.diff(np.floor(phase)) > 0)[0]
+    train[at] = rng.lognormal(0, 0.6, len(at)) * rng.choice([-1.0, 1.0], len(at))
+    snaps = unit(band(train, low, high)) if np.any(train) else train
+    return unit(0.7 * snaps + 0.4 * noise(rng, len(t), low, high)) * envelope(t, 0.002, seconds * 0.4)
+
+
+# A thrust or a slash lands with a few tens of joules, a bullet with over a thousand, so the knife barely moves a wall:
+# what's heard is the steel tip, the blade's ring and whatever the tip does to the face.
+
+def knife_masonry(rng, take):
+    out = np.zeros(int(0.5 * SR))
+    add(out, 0.8 * spike(rng, 0.00005), 0.0)
+    add(out, 0.55 * blade(rng), 0.0001)
+    add(out, 0.35 * crackle(rng, 0.02, int(rng.integers(8, 20)), 2000, 10000, 0.002), 0.0002)
+    add(out, 0.3 * knock(rng, 200, 1200, 0.004), 0.0)       # the fist and the handle jolting to a stop
+    add(out, 0.12 * structure(rng, 120, 500, 6, 0.01, 0.2), 0.0003)
+    if take != 2:
+        add(out, 0.3 * skid(rng, rng.uniform(0.03, 0.08), 2500, 9000), rng.uniform(0.002, 0.006))
+    grit = falling(rng, int(rng.integers(10, 30)), (0.5, 1.4), (0.0, 0.5), 0.2, 0)
+    add(out, 0.04 * patter(rng, 0.5, grit, 3000, 10000), 0.0)
+    return surroundings(rng, out, 0.6, 0.4)
+
+
+def knife_tile(rng, take):
+    out = np.zeros(int(0.5 * SR))
+    add(out, 0.9 * spike(rng, 0.00004), 0.0)
+    add(out, 0.6 * blade(rng), 0.0001)
+    ring = [(rng.uniform(2100, 2700), 1.0, 0.006), (rng.uniform(3300, 3900), 0.6, 0.004),
+            (rng.uniform(4800, 5600), 0.4, 0.003)]
+    add(out, 0.3 * unit(modes(0.05, ring, 0.0001, rng)), 0.0001)
+    add(out, 0.1 * structure(rng, 150, 600, 6, 0.008, 0.2), 0.0003)
+    if take != 1:
+        add(out, 0.25 * skid(rng, rng.uniform(0.03, 0.07), 3000, 10000), rng.uniform(0.002, 0.005))
+    return surroundings(rng, out, 0.6, 0.4)
+
+
+def knife_metal(rng, take):
+    """Steel on thick steel: the tip's "tang", and the plate ringing on."""
+    out = np.zeros(int(0.9 * SR))
+    add(out, 0.9 * spike(rng, 0.00004), 0.0)
+    add(out, 0.55 * blade(rng), 0.0001)
+    freqs = np.exp(rng.uniform(np.log(300), np.log(9000), 18))
+    plate = [(f, (f / 1000) ** -0.1 * rng.lognormal(0, 0.35), float(np.clip(0.15 * (500 / f) ** 0.6, 0.02, 0.2)))
+             for f in freqs]
+    add(out, 0.6 * unit(modes(0.8, plate, 0.00005, rng)), 0.0001)
+    base = rng.uniform(1300, 2000)
+    ping = [(base * r * rng.uniform(0.98, 1.02), r ** -0.5, 0.2 * r ** -0.8) for r in (1.0, 1.58, 2.13, 2.71)]
+    add(out, 0.4 * unit(modes(0.8, ping, 0.00005, rng)), 0.0001)
+    if take % 2 == 0:
+        add(out, 0.2 * skid(rng, rng.uniform(0.03, 0.06), 3500, 11000), rng.uniform(0.002, 0.005))
+    return surroundings(rng, out, 0.7, 0.6)
+
+
+def knife_sheetmetal(rng, take):
+    """A car door or a tin roof: the thin sheet booms and wobbles, and half the time the tip punches through."""
+    out = np.zeros(int(0.7 * SR))
+    add(out, 0.8 * spike(rng, 0.00008), 0.0)
+    add(out, 0.45 * blade(rng), 0.0001)
+    freqs = np.exp(rng.uniform(np.log(90), np.log(6000), 32))
+    sheet = [(f, (f / 300) ** -0.3 * rng.lognormal(0, 0.4), float(np.clip(0.18 * (300 / f) ** 0.5, 0.02, 0.25)))
+             for f in freqs]
+    add(out, 0.7 * unit(modes(0.6, sheet, 0.0002, rng)), 0.0002)
+    low = rng.uniform(60, 110)
+    add(out, 0.25 * unit(modes(0.5, [(low, 1.0, 0.15), (low * rng.uniform(1.04, 1.09), 0.8, 0.12)], 0.002, rng)),
+        0.001)
+    if take % 2 == 1:
+        add(out, 0.4 * crackle(rng, 0.02, int(rng.integers(10, 25)), 2000, 11000, 0.0015), 0.0003)
+    return surroundings(rng, out, 0.7, 0.6)
+
+
+def knife_glass(rng, take):
+    """The tip on a pane that holds: a sharp "tink", the pane's thump and a short ring. No crack."""
+    out = np.zeros(int(0.5 * SR))
+    add(out, 0.9 * spike(rng, 0.00004), 0.0)
+    add(out, 0.5 * blade(rng), 0.0001)
+    add(out, 0.25 * structure(rng, 80, 600, 8, 0.02, 0.3), 0.0003)
+    pane = [(rng.uniform(1800, 2600), 1.0, 0.04), (rng.uniform(3500, 4500), 0.7, 0.03),
+            (rng.uniform(5500, 6800), 0.45, 0.02)]
+    add(out, 0.45 * unit(modes(0.3, pane, 0.0001, rng)), 0.0001)
+    if take == 3:
+        add(out, 0.2 * skid(rng, 0.04, 4000, 12000), 0.003)
+    return surroundings(rng, out, 0.6, 0.4)
+
+
+def knife_wood(rng, take):
+    """The tip bites in: the fibres crush and the member knocks, and the wood grips the blade, so it barely rings."""
+    out = np.zeros(int(0.5 * SR))
+    add(out, 0.5 * spike(rng, 0.00012), 0.0)
+    f1 = rng.uniform(140, 300)
+    member = [(f1 * r * rng.uniform(0.95, 1.05), r ** -0.35, 25 / (np.pi * f1 * r)) for r in (1.0, 2.76, 5.4, 8.9)]
+    add(out, 0.5 * unit(modes(0.3, member, 0.0003, rng)), 0.0002)
+    add(out, 0.4 * crackle(rng, 0.03, int(rng.integers(10, 25)), 1500, 8000, 0.006), 0.0003)
+    add(out, 0.3 * burst(rng, 0.03, 300, 3000, 0.0003, 0.003), 0.0)
+    add(out, 0.15 * blade(rng), 0.0001)
+    return surroundings(rng, out, 0.6, 0.4)
+
+
+def knife_plastic(rng, take):
+    out = np.zeros(int(0.4 * SR))
+    add(out, 0.4 * spike(rng, 0.0001), 0.0)
+    f1 = rng.uniform(150, 300)
+    shell = [(f1 * r * rng.uniform(0.95, 1.05), r ** -0.4, 0.025 / r ** 0.7) for r in (1.0, 1.9, 2.8, 4.1, 5.5)]
+    add(out, 0.7 * unit(modes(0.25, shell, 0.0004, rng)), 0.0002)
+    add(out, 0.4 * burst(rng, 0.02, 1000, 8000, 0.0002, 0.0015), 0.0)
+    add(out, 0.25 * blade(rng), 0.0001)
+    return surroundings(rng, out, 0.6, 0.4)
+
+
+def knife_dirt(rng, take):
+    """The blade sinks into the soil: a soft chuff and the grains crunching, no ring."""
+    out = np.zeros(int(0.4 * SR))
+    t = seconds_axis(0.08)
+    add(out, 0.6 * np.sin(2 * np.pi * rng.uniform(120, 200) * t) * envelope(t, 0.002, 0.01), 0.0)
+    add(out, 0.7 * burst(rng, 0.1, 200, 2000, 0.002, 0.02), 0.0)
+    add(out, 0.4 * crackle(rng, 0.05, int(rng.integers(20, 45)), 500, 5000, 0.015, 0.8), 0.001)
+    if take == 0:
+        add(out, 0.2 * fragment(rng, rng.uniform(2500, 5000), rng.uniform(0.001, 0.002), 2), rng.uniform(0.0, 0.01))
+    return surroundings(rng, out, 0.5, 0.3)
+
+
+def knife_grass(rng, take):
+    out = np.zeros(int(0.45 * SR))
+    t = seconds_axis(0.08)
+    add(out, 0.5 * np.sin(2 * np.pi * rng.uniform(110, 180) * t) * envelope(t, 0.002, 0.01), 0.0)
+    add(out, 0.4 * burst(rng, 0.1, 200, 2000, 0.002, 0.02), 0.0)
+    rustle_t = seconds_axis(0.2)
+    flicks = unit(band(rng.standard_normal(len(rustle_t)), 0, 80)) ** 2
+    add(out, 0.45 * noise(rng, len(rustle_t), 1500, 10000) * (0.35 + flicks) * envelope(rustle_t, 0.004, 0.04), 0.0)
+    add(out, 0.3 * crackle(rng, 0.03, int(rng.integers(3, 9)), 2000, 7000, 0.006), 0.0)
+    return surroundings(rng, out, 0.5, 0.3)
+
+
+def knife_fabric(rng, take):
+    """Cloth, a cushion, a sandbag: the tip snags and tears the face, and what's behind it takes the blow."""
+    out = np.zeros(int(0.4 * SR))
+    add(out, 0.7 * rip(rng, rng.uniform(0.04, 0.09), 800, 7000), 0.0)
+    add(out, 0.45 * knock(rng, 150, 600, 0.008), 0.002)
+    add(out, 0.3 * thump(rng, 90, 140, 0.012), 0.002)
+    return surroundings(rng, out, 0.5, 0.3)
+
+
+def knife_flesh(rng, take):
+    """A stab into a soldier: the uniform's cloth punctured, the fist and the guard slapping the body, and the body's
+    dull thud. The kit on it knocks as it's jolted. No crack, no ring, no debris: quieter by far than a bullet's hit."""
+    out = np.zeros(int(0.4 * SR))
+    add(out, 0.45 * rip(rng, rng.uniform(0.02, 0.04), 1000, 6000), 0.0)
+    add(out, 0.8 * burst(rng, 0.04, 400, 3000, 0.0003, 0.004), 0.003)
+    add(out, 0.8 * knock(rng, 200, 900, 0.006), 0.003)
+    add(out, 0.25 * thump(rng, 90, 130, 0.012), 0.004)
+    if take % 2 == 0:
+        add(out, 0.08 * rattle(rng, int(rng.integers(2, 4)), 0.05), 0.01)
+    return surroundings(rng, out, 0.5, 0.3)
+
+
+KNIFE_IMPACTS = {
+    "masonry": knife_masonry,
+    "tile": knife_tile,
+    "metal": knife_metal,
+    "sheetmetal": knife_sheetmetal,
+    "glass": knife_glass,
+    "wood": knife_wood,
+    "plastic": knife_plastic,
+    "dirt": knife_dirt,
+    "grass": knife_grass,
+    "fabric": knife_fabric,
+    "flesh": knife_flesh,
+}
+
+
+def knife_swing(rng, take):
+    """The blade cutting the air in a slash of ~0.2 s, its tip peaking at 12-18 m/s. Vortices shed off the spine
+    (Strouhal: 0.2 v / 4 mm, ~750 Hz at 15 m/s) and the edge's finer ones make a band of noise whose pitch follows the
+    blade's speed and whose pressure goes as its cube (a dipole's aeolian sound). The sleeve and the kit move with it."""
+    seconds = 0.5
+    t = seconds_axis(seconds)
+    start, sweep = rng.uniform(0.01, 0.03), rng.uniform(0.15, 0.24)
+    phase = np.clip((t - start) / sweep, 0.0, 1.0)
+    speed = rng.uniform(12, 18) * np.sin(np.pi * phase ** rng.uniform(0.8, 1.2)) ** 1.3
+    centre = np.maximum(0.2 * speed / 0.004, 60.0)
+    amplitude = (speed / speed.max()) ** 3
+    white = rng.standard_normal(len(t))
+    freqs, times, spectrum = signal.stft(white, SR, nperseg=512, noverlap=448)
+    fc = np.interp(times, t, centre)
+    amp = np.interp(times, t, amplitude)
+    logs = np.log(np.maximum(freqs, 1.0)[:, None] / fc[None, :])
+    tone = np.exp(-0.5 * (logs / 0.3) ** 2)                      # the spine's shedding, about an octave wide
+    edge = np.exp(-0.5 * ((logs - np.log(4.0)) / 0.7) ** 2) * 0.35  # the edge's finer vortices, two octaves up
+    _, swish = signal.istft(spectrum * (tone + edge) * amp[None, :], SR, nperseg=512, noverlap=448)
+    swish = unit(swish[: len(t)])
+    out = np.zeros(len(t))
+    add(out, swish, 0.0)
+    # The arm's own air, a low whump, and the sleeve and kit.
+    add(out, 0.15 * unit(band(rng.standard_normal(len(t)), 80, 400)) * (speed / speed.max()) ** 2, 0.0)
+    add(out, rustle(rng, sweep + 0.1, 0.12), max(start - 0.02, 0.0))
+    if take % 2 == 1:
+        add(out, 0.05 * rattle(rng, int(rng.integers(1, 3)), 0.1), start + sweep * 0.8)
+    return out
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Grenade bounces
+
+def grenade_body(rng, body, hardness):
+    """The grenade's own sound as it strikes, `hardness` how hard the floor is (1 for concrete, tile and steel, less
+    for wood, little for soil, grass or a body, which stop it too slowly to set its shell ringing).
+    - frag: an M67, a 64 mm steel sphere with a 2.5 mm wall, 0.4 kg filled with Composition B, which damps its shell
+      modes to a dull "clunk"; the fuze's striker and spring tick in the fuze body a moment later.
+    - can: an M18 smoke, M84 or AN-M14, a thin sheet-steel can over its filler: a hollow "tonk" that rings a little
+      longer, and its lid and fuze rattling."""
+    out = np.zeros(int(0.3 * SR))
+    if body == "frag":
+        shell = [(rng.uniform(2000, 2600), 1.0, 0.004), (rng.uniform(3300, 4000), 0.7, 0.003),
+                 (rng.uniform(5200, 6200), 0.4, 0.002), (rng.uniform(900, 1200), 0.5, 0.005)]
+        add(out, hardness * unit(modes(0.1, shell, 0.0001, rng)), 0.0)
+        add(out, 0.25 * hardness * fragment(rng, rng.uniform(4500, 7000), rng.uniform(0.002, 0.004), 3),
+            rng.uniform(0.001, 0.003))
+    else:
+        f1 = rng.uniform(700, 1000)
+        can = [(f1 * r * rng.uniform(0.97, 1.03), r ** -0.3, 0.014 / r ** 0.5) for r in (1.0, 1.62, 2.31, 3.12, 4.4)]
+        add(out, hardness * unit(modes(0.15, can, 0.0001, rng)), 0.0)
+        for _ in range(int(rng.integers(1, 4))):
+            add(out, 0.2 * hardness * fragment(rng, rng.uniform(2500, 6000), rng.uniform(0.001, 0.003), 2),
+                rng.uniform(0.002, 0.02))
+    return out
+
+
+def bounce(rng, body, floor):
+    """A thrown grenade striking `floor` at about 6 m/s (its later bounces; GrenadeBounce plays harder ones louder)."""
+    seconds = 0.8
+    out = np.zeros(int(seconds * SR))
+    if floor in ("concrete", "tile", "metal"):
+        # Steel on a hard floor: a contact of ~0.2 ms (Hertz, for 0.4 kg at 6 m/s), a sharp click.
+        add(out, 0.8 * spike(rng, 0.00006), 0.0)
+        add(out, 0.8 * grenade_body(rng, body, 1.0), 0.0001)
+        if floor == "concrete":
+            # 0.4 kg stopping dead jolts the slab round the contact: a dull knock under the click.
+            add(out, 0.25 * crackle(rng, 0.01, int(rng.integers(3, 10)), 2500, 9000, 0.001), 0.0001)
+            add(out, 0.4 * knock(rng, 300, 1500, 0.003), 0.0)
+            add(out, 0.3 * structure(rng, 150, 700, 6, 0.008, 0.2), 0.0003)
+        elif floor == "tile":
+            ring = [(rng.uniform(2000, 2600), 1.0, 0.007), (rng.uniform(3200, 3800), 0.6, 0.005),
+                    (rng.uniform(4700, 5500), 0.35, 0.003)]
+            add(out, 0.35 * unit(modes(0.06, ring, 0.0001, rng)), 0.0001)
+            add(out, 0.3 * knock(rng, 300, 1500, 0.003), 0.0)
+            add(out, 0.25 * structure(rng, 150, 700, 6, 0.008, 0.2), 0.0003)
+        else:
+            # A steel deck or a plate rings on: the loudest floor to land a grenade on.
+            freqs = np.exp(rng.uniform(np.log(70), np.log(6000), 20))
+            plate = [(f, (f / 300) ** -0.3 * rng.lognormal(0, 0.3), float(np.clip(0.2 * (300 / f) ** 0.5, 0.03, 0.3)))
+                     for f in freqs]
+            add(out, 0.8 * unit(modes(0.7, plate, 0.0003, rng)), 0.0001)
+    elif floor == "wood":
+        # Floorboards over joists: the board's hollow modes carry most of it.
+        add(out, 0.5 * spike(rng, 0.00012), 0.0)
+        add(out, 0.5 * grenade_body(rng, body, 0.6), 0.0001)
+        f1 = rng.uniform(95, 140)
+        board = [(f1, 1.0, 0.07), (f1 * rng.uniform(2.2, 2.5), 0.8, 0.05), (f1 * rng.uniform(3.9, 4.4), 0.6, 0.03),
+                 (f1 * rng.uniform(6.5, 7.2), 0.35, 0.018), (f1 * rng.uniform(10, 11.5), 0.2, 0.01)]
+        add(out, 0.8 * unit(modes(0.4, board, 0.001, rng)), 0.0001)
+        add(out, 0.3 * knock(rng, 200, 1500, 0.004), 0.0)
+    elif floor in ("dirt", "grass"):
+        # The soil gives: a thud and a crunch, and the grenade barely rings.
+        t = seconds_axis(0.1)
+        add(out, 0.7 * np.sin(2 * np.pi * rng.uniform(90, 150) * t) * envelope(t, 0.003, 0.012), 0.0)
+        add(out, 0.6 * knock(rng, 150, 800, 0.008), 0.0)
+        add(out, 0.12 * grenade_body(rng, body, 0.3), 0.0005)
+        if floor == "dirt":
+            add(out, 0.35 * crackle(rng, 0.05, int(rng.integers(15, 35)), 500, 5000, 0.01, 0.8), 0.001)
+            if rng.random() < 0.5:
+                add(out, 0.15 * fragment(rng, rng.uniform(2500, 5000), rng.uniform(0.001, 0.002), 2),
+                    rng.uniform(0.0, 0.01))
+        else:
+            rustle_t = seconds_axis(0.2)
+            flicks = unit(band(rng.standard_normal(len(rustle_t)), 0, 80)) ** 2
+            add(out, 0.4 * noise(rng, len(rustle_t), 1500, 10000) * (0.35 + flicks) * envelope(rustle_t, 0.004, 0.04),
+                0.0)
+    else:
+        # Cloth, a cushion or a body: a dull thump.
+        add(out, 0.6 * knock(rng, 150, 600, 0.01), 0.0)
+        add(out, 0.4 * thump(rng, 90, 140, 0.014), 0.0)
+        add(out, 0.25 * burst(rng, 0.04, 400, 3000, 0.001, 0.006), 0.0)
+        add(out, 0.08 * grenade_body(rng, body, 0.3), 0.001)
+    return surroundings(rng, out, 0.7, 0.6)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
 # Menus
 
 def ui_button_press(rng):
@@ -840,6 +1221,26 @@ def sets():
                                          IMPACT_DRIVE)
         out.append((folder, "sounds/world/impacts", f"bullet_{material}", names, takes, volume, 1.5, "0.95 1.05",
                     distance, IMPACT_REFERENCE))
+    folder = os.path.join(ASSETS, "sounds", "world", "knife")
+    for index, (material, (target, distance)) in enumerate(KNIVES.items()):
+        names, takes, volume = build_set(f"knife_{material}", KNIFE_IMPACTS[material], KNIFE_TAKES, 2000 + 100 * index,
+                                         target, IMPACT_DRIVE)
+        out.append((folder, "sounds/world/knife", f"knife_{material}", names, takes, volume, 1.5, "0.95 1.05",
+                    distance, KNIFE_REFERENCE))
+    target, distance, count = KNIFE_SWING
+    names, takes, volume = build_set("knife_swing", knife_swing, count, 3200, target)
+    out.append((folder, "sounds/world/knife", "knife_swing", names, takes, volume, 2.0, "0.94 1.06", distance,
+                KNIFE_REFERENCE))
+    folder = os.path.join(ASSETS, "sounds", "world", "grenades")
+    for body_index, (body, over) in enumerate(BOUNCE_BODIES.items()):
+        for index, (floor, (target, distance)) in enumerate(BOUNCE_FLOORS.items()):
+            hard = floor in ("concrete", "tile", "metal")
+            make = lambda rng, i, body=body, floor=floor: bounce(rng, body, floor)
+            names, takes, volume = build_set(f"{body}_{floor}", make, BOUNCE_TAKES,
+                                             7000 + 1000 * body_index + 100 * index, target + (over if hard else 0.0),
+                                             IMPACT_DRIVE)
+            out.append((folder, "sounds/world/grenades", f"{body}_{floor}", names, takes, volume, 1.5, "0.95 1.05",
+                        distance, BOUNCE_REFERENCE))
     folder = os.path.join(ASSETS, "sounds", "world", "footsteps")
     for index, (floor, walk) in enumerate(FLOORS.items()):
         for kind, count, target, distance, offset in (
@@ -890,15 +1291,27 @@ STOCK = {
     "step_dirt": "sounds/footsteps/footstep-dirt.sound",
     "step_grass": "sounds/footsteps/footstep-grass.sound",
     "land_concrete": "sounds/footsteps/footstep-concrete-land.sound",
+    "knife_masonry": "sounds/impacts/bullets/impact-bullet-generic.sound",
+    "knife_metal": "sounds/impacts/bullets/impact-bullet-metal.sound",
+    "knife_wood": "sounds/impacts/bullets/impact-bullet-wood.sound",
+    "knife_swing": "sounds/guns/knife/knife.swing.sound",
+    "frag_concrete": "sounds/impacts/melee/impact-melee-metal.sound",
+    "frag_wood": "sounds/impacts/melee/impact-melee-metal.sound",
     "ui_button_press": "sounds/kenney/ui/ui.button.press.sound",
     "ui_button_hover": "sounds/kenney/ui/ui.button.over.sound",
 }
 
 
+def stock_file(path):
+    """A compiled file from s&box's core, or else from the project's own Assets (upstream's sounds)."""
+    core = os.path.join(SBOX_CORE, path + "_c")
+    return core if os.path.exists(core) else os.path.join(ROOT, "Assets", path + "_c")
+
+
 def stock_event(path):
     """A compiled core event's takes and volume: its source JSON is kept in the _c."""
     import re
-    data = open(os.path.join(SBOX_CORE, path + "_c"), "rb").read()
+    data = open(stock_file(path), "rb").read()
     source = json.loads(re.search(rb"\{.*\}", data, re.S).group().decode("utf-8", "replace"))
     volume = source.get("Volume", source.get("volume", 1))
     volume = float(str(volume).replace(",", " ").split()[0])
@@ -908,7 +1321,7 @@ def stock_event(path):
 def stock_audio(vsnd):
     """A compiled vsnd's samples: the DATA block holds the rate, format and channels, and 16-bit PCM follows the
     header. None for other formats."""
-    data = open(os.path.join(SBOX_CORE, vsnd + "_c"), "rb").read()
+    data = open(stock_file(vsnd), "rb").read()
     head = struct.unpack("<I", data[:4])[0]
     block = data.find(b"DATA")
     offset = struct.unpack("<I", data[block + 4:block + 8])[0]
@@ -932,6 +1345,17 @@ def sequence(takes, volume, interval, count, rng):
     out = np.zeros(int((interval * count + 1.0) * SR))
     for i in range(count):
         add(out, takes[rng.integers(len(takes))] * volume, i * interval)
+    return out
+
+
+def bouncing(takes, rng, speed=9.0, restitution=0.4):
+    """A grenade landing at `speed` m/s and bouncing on, each bounce as loud as GrenadeBounce plays it."""
+    out = np.zeros(int(3.0 * SR))
+    at = 0.0
+    while speed > 1.0 and at < 2.5:
+        add(out, takes[rng.integers(len(takes))] * min(2.0, (speed / 6.0) ** 1.2), at)
+        at += 2 * speed / G
+        speed *= restitution
     return out
 
 
@@ -970,6 +1394,8 @@ def main():
                 section += [sequence(takes, 1.0, 0.25, 10, rng)]
             elif name.startswith("bullet_"):
                 section += [sequence(takes, 1.0, 60 / 800, 5, rng)]
+            elif name.startswith(("frag_", "can_")):
+                section += [bouncing(takes, rng)]
             parts += [unit(np.concatenate(section)) * 0.7, gap(1.0)]
         write_wav(args.preview, np.concatenate(parts))
         print(f"preview: {args.preview}")

@@ -140,10 +140,11 @@ public partial class PlayerPawn : IGameEventHandler<DamageGivenEvent>, IGameEven
 					blood.DestroyAsync( 2f );
 			}
 
-			// A fall isn't a hit: the landing has its own sound.
-			if ( BloodImpactSound is not null && !damageInfo.Flags.HasFlag( DamageFlags.FallDamage ) )
+			// A fall isn't a hit: the landing has its own sound. A knife's stab isn't a bullet's thwack.
+			var impactSound = damageInfo.Flags.HasFlag( DamageFlags.Melee ) ? WorldSounds.KnifeFlesh ?? BloodImpactSound : BloodImpactSound;
+			if ( impactSound is not null && !damageInfo.Flags.HasFlag( DamageFlags.FallDamage ) )
 			{
-				var snd = Sound.Play( BloodImpactSound, position );
+				var snd = Sound.Play( impactSound, position );
 				if ( !snd.IsValid() ) return;
 
 				snd.SpacialBlend = IsViewer ? 0 : snd.SpacialBlend;

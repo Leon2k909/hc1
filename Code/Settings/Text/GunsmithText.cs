@@ -512,6 +512,7 @@ public static partial class GameText
 		["MUZZLE VELOCITY"] = ("Vitesse initiale", "Mündungsgeschwindigkeit", "Velocidad de salida", "Velocidade de saída"),
 		["EMPTY RELOAD"] = ("Recharger à vide", "Nachladen (leer)", "Recargar en vacío", "Recarregar (vazio)"),
 		["RECOIL CONTROL"] = ("Contrôle du recul", "Rückstoßkontrolle", "Control del retroceso", "Controle de recuo"),
+		["WEIGHT"] = ("Poids", "Gewicht", "Peso", "Peso"),
 		["WALK SPEED"] = ("Vitesse de marche", "Gehgeschwindigkeit", "Velocidad al caminar", "Velocidade ao andar"),
 		["SPRINT SPEED"] = ("Vitesse de sprint", "Sprintgeschwindigkeit", "Velocidad al esprintar", "Velocidade de corrida"),
 		["CROUCH SPEED"] = ("Vitesse accroupi", "Geschwindigkeit geduckt", "Velocidad agachado", "Velocidade agachado"),

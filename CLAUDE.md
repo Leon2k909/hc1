@@ -1119,6 +1119,43 @@
   field in the compiled data, but nobody has seen them in the gunsmith: if the Action or Trigger slot is missing,
   `recompile_asset` them after the code has hotloaded. None of it has been checked in-game.
 
+## Part weight (`GunsmithPart.Mass`, `Equipment.LoadedMass`, `Tools/part_masses.py`)
+- The user asked whether the parts have real-life downsides and wanted the missing ones in (2026-09-30). The main gap
+  was weight: a drum, a scope or a can weighed nothing.
+- Downsides that were already modelled:
+  - tracers give the shooter away;
+  - lasers show on the world model;
+  - brakes are louder, heard further and flash more, and compensators flash more;
+  - suppressors change the rate as the action would;
+  - bigger magazines reload with their own, slower clips;
+  - stocks change the recoil by how they brace.
+- Left out: a magnified optic's eye box, reliability, heat mirage off the barrel, a can's shift of the point of impact,
+  and gas in the face.
+- `GunsmithPart.Mass` is what a part adds against the factory part it replaces, in kg, so it can be negative (the
+  RPK's AKM 30 against its 75-round drum, -1.304). Magazines count loaded. `Equipment.LoadedMass` is the gun's own
+  weight with a loaded factory magazine, from the makers' figures (0 = unknown, read as 3.75 kg).
+- `GunsmithAttachmentEffects.ApplyMass` works out three things from the gun plus its parts (at least half the gun):
+  - Recoil: times gun / total, since free recoil goes as one over the weight.
+  - Aiming in: times the square root of (total + 4) / (gun + 4), where the 4 kg is the arms swung up with it.
+    `ViewModel` stretches `AimTime` by it, and the Facepunch-graph guns get `speed_ironsights` 1 / that.
+  - Moving: 1% slower per kg over 3.75 kg (`AttachmentWeightSlowdown`, added to the gun's own `WeightSlowdown` in
+    `PlayerPawn.GetWishSpeed`). A gun under 3.75 kg doesn't get faster than the rifles.
+  - Examples: the M4 with a 60-round mag (+0.61) kicks 15% less and aims in 4% slower. The Vepr-12's drum (+1.63)
+    kicks 25% less, aims in 9% slower and moves 1.6% slower.
+  - The owner works it out in `RefreshAmmunitionLoadout`, which runs on every shot. A magazine doesn't get lighter as
+    it empties.
+- The gunsmith shows it:
+  - each part's weight change under its description (`GunsmithAttachmentBrowser`, "+0.61 KG");
+  - WEIGHT in DETAILS and COMPARE (`GunsmithStats.Mass`);
+  - the recoil and ADS bars and figures include it.
+- `python Tools/part_masses.py` writes every part's Mass (tables with sources, by gun and file) and every gun's
+  LoadedMass (`GUN_KG`). `--check` lists what it would change and any part without a figure. `kastov_prefabs.py` and
+  `m16_gunsmith.py` write the same figures when they regenerate parts and prefabs. The Kastov-74u's hand-tuned prefab
+  got the new field only.
+- Made offline, and compiled with dotnet. The new `.gnsmth` and prefab fields only load into files compiled after the
+  code has them, so `recompile_asset` the parts and weapon prefabs after the hotload. None of it has been checked
+  in-game.
+
 ## Magnified optics: eye relief and the lens picture (`OpticZoom`, `Tools/optic_eyepieces.py`)
 - The user aimed the FAMAS F1's 2x Magnifier and Holo and asked if a scope really looks like that (2026-09-29). The
   eyepiece's housing filled most of the screen, with a small magnified circle inside a ring of plain glass.
@@ -1995,14 +2032,18 @@ simulate_input.
 ## World sounds (`WorldSounds`, `Tools/world_sounds.py`)
 - The user asked which of s&box's default sounds the game used, then for them to be replaced with sounds as close to
   the real thing as possible, and for every sound to be made that way from now on (2026-09-29): "ultra real 1:1 or
-  close enough". Replaced so far: bullet impacts, footsteps, running steps and landings, and the menus' press and hover.
+  close enough". Replaced so far: bullet impacts, knife strikes and the knife's swing, grenade bounces, footsteps,
+  running steps and landings, and the menus' press and hover.
 - `Tools/world_sounds.py` synthesises them from the physics of each event, with no samples. Its docstring has every
   layer and why.
-  - It writes `sounds/world/impacts/bullet_<material>`, `sounds/world/footsteps/{step,run,land}_<floor>` and
+  - It writes `sounds/world/impacts/bullet_<material>`, `sounds/world/knife/knife_<material>` and `knife_swing`,
+    `sounds/world/grenades/{frag,can}_<floor>`, `sounds/world/footsteps/{step,run,land}_<floor>` and
     `sounds/ui/menu/ui_button_{press,hover}`: WAVs and a `.sound` event per set.
-  - A re-run rewrites the WAVs but keeps an existing event, which may have been tuned.
-  - `--compare <wav>` plays s&box's stock sound, then the new one, for each set (decoded from the s&box install), and
-    `--preview <wav>` every take, with walks, runs and bursts. `--out <dir>` writes somewhere else, to try changes.
+  - A re-run rewrites the WAVs but keeps an existing event, which may have been tuned. Its takes are seeded, so a re-run
+    writes the same WAVs.
+  - `--compare <wav>` plays s&box's stock sound, then the new one, for each set (decoded from the s&box install or the
+    project's Assets), and `--preview <wav>` every take, with walks, runs, bursts and bouncing grenades. `--out <dir>`
+    writes somewhere else, to try changes.
 - Impacts: masonry, tile, metal, sheet metal, glass, wood, plastic, dirt, grass, fabric and flesh. Footsteps: concrete,
   tile, wood, metal, dirt and grass. The script's octave spectra were compared with s&box's own recordings, which
   showed the first version had almost no low end.
@@ -2027,22 +2068,34 @@ simulate_input.
     faster you land: volume times speed / 300, from 0.6 to 2 (a jump lands at ~280 u/s).
   - Every `"ui.button.press"` / `"ui.button.over"` (Sound.Play and scss `sound-in`) is now `"ui_button_press"` /
     `"ui_button_hover"`.
+  - Knives (2026-09-30):
+    - `Melee.CreateImpactEffects` broadcasts `WorldSounds.KnifeImpact`, so everyone nearby hears the strike. It used to
+      be the surface's stock bullet sound, and only the swinger heard it.
+    - A knifed player plays `WorldSounds.KnifeFlesh` on every machine instead of the bullet's thwack
+      (`PlayerPawn.Health`, by `DamageFlags.Melee`).
+    - The swing is `WorldSounds.KnifeSwing` ahead of the prefab's `SwingSound` (upstream's, 19 dB louder, heard to
+      5000 units), which stays as the fallback.
+  - Grenades (2026-09-30): `BaseGrenade` is a collision listener. On the thrower's machine (it simulates the grenade)
+    each bounce broadcasts `WorldSounds.GrenadeBounce` for the grenade's `Body` (`HEGrenade`: Frag, the rest: Can) and
+    the surface, scaled by `BounceVolume` (speed^1.2, none under ~1 m/s, at most 2x), at most one every 0.06 s. Once
+    the events have compiled, `OnStart` turns off the Rigidbody's own collision sounds (`EnableCollisionSounds`).
+    Whether that also silences the engine's sound for the surface it hits wasn't checked: listen for a double knock.
 - Still s&box's or not there at all:
   - Impacts are heard by everyone within ~76 m, when the round gets there and the sound has come back (see Bullet
     cracks). The shooter's machine plays them where its rounds struck; the others find them by a short trace at the
     round's end.
-  - Knife hits (`Melee`) still play the surface's stock bullet sound.
   - Bots' shots make no impact effects, only the sounds, and bots make no footsteps.
-  - Grenade bounces are the surfaces' own.
-- The editor has to compile the new WAVs and events. They were made without it (2026-09-29), so none of it has been
-  heard in-game. The code compiled offline with dotnet.
+- The editor has to compile the new WAVs and events. They were made without it (2026-09-29, the knife and grenade sets
+  2026-09-30), so none of it has been heard in-game. The code compiled offline with dotnet.
 
 ## No start sting
 - The user didn't like the noise when a game starts, so on 2026-09-28 the music sting
   (`sounds/music/round_intro/round_start.sound`) came out: the `Facepunch.PlaySound` component that played it in every
   game-mode prefab, and Zombies' call in `StartNextRound`. Don't put them back.
-- Still there, offered to the user but not asked for: the radio's ~2 s RoundStarted voice line (`RadioSounds`), and the
-  same sting when a Zombies power-up is picked up (`ZombiesRoundSystem`).
+- The radio's ~2 s RoundStarted voice line is off too (2026-09-30, the user: "i dont like the talking when i first spawn
+  in"): its `Facepunch.PlayRadio` component is disabled (`__enabled: false`) in all nine game-mode prefabs that had one.
+  Don't turn it back on. `RadioSounds` and the other voice lines are unchanged.
+- Still there: the same sting when a Zombies power-up is picked up (`ZombiesRoundSystem`).
 
 ## Scoreboard over the HUD (`Scoreboard.razor.scss`)
 - The user saw the medals (double kill and the rest) drawn over the scoreboard. Held open, it's now over the rest of the
@@ -2227,8 +2280,23 @@ simulate_input.
 - The path is taken as straight from the aim ray to where the round stopped, so drop is left out (a few cm off at the
   ranges a crack is heard). The bot's rounds leave from its muzzle.
 - `Tools/bullet_cracks.py` replicates the crack synthesis and levels offline, and `python Tools/bullet_cracks.py <wav>`
-  writes an M855's cracks at 1-50 m with each front. None of it has been heard in-game:
-  not the levels (the close cracks may want tuning), the reflections, the whizz, or the delayed reports and impacts.
+  writes an M855's cracks at 1-50 m with each front. `--scenes <wav>` writes an M16A4 fired from 100 m and 300 m
+  missing by 0.5-30 m, each crack with its ground reflection and then the report, at the game's levels and delays, and
+  prints how loud each is. None of it has been heard in-game:
+  not the levels, the reflections, the whizz, or the delayed reports and impacts.
+- Checked against the report (2026-09-30, `--scenes`; the user asked whether it really sounds right):
+  - Fired from 100 m, a 1 m miss's crack is 9 dB over the report (K-weighted, loudest 100 ms), and from 300 m, 19 dB.
+    In the field it's roughly 15-25 dB and 25-35 dB (the crack's energy is Whitham's; the report's real level at range
+    is the uncertain part, +-5 dB).
+  - So within ~3 m a crack is 5-15 dB too quiet against the report, and 0.5 m and 1 m misses sound the same. A crack is
+    4-6 samples long at 44.1 kHz, so full scale holds its energy down. A soft clipper doesn't help (tried: under
+    1.5 dB, since band-limiting so short a wave puts its peak back). From ~10 m out it's within a few dB of real.
+  - Levers not pulled yet, as they change the whole mix (the user's call): the reports' level (`GunshotAudio` holds the
+    shooter's own level out to 4 m, where a real rifle's blast in front is roughly 7-10 dB under what the shooter hears),
+    or the ear's acoustic reflex after a near crack (it takes 10-15 dB off the lows of what follows, for a few hundred
+    ms).
+  - It's dry: the direct crack and up to four mirror reflections, with no scattered tail from the ground, trees and
+    buildings the cone sweeps over. The game has no reverb for `ReverbEnabled` to use.
 
 ## Weapon fire rates and bots
 - The SCAR-H's BaseDamage 36 is the M4's 20 scaled by muzzle energy: M80 at its prefab's 792 m/s is 2,989 J, and the

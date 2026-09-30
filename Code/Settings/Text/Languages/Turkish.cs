@@ -999,6 +999,7 @@ public static partial class GameText
 		["MUZZLE VELOCITY"] = "Namlu çıkış hızı",
 		["EMPTY RELOAD"] = "Boşken yeniden doldurma",
 		["RECOIL CONTROL"] = "Geri tepme kontrolü",
+		["WEIGHT"] = "Ağırlık",
 		["WALK SPEED"] = "Yürüme hızı",
 		["SPRINT SPEED"] = "Koşma hızı",
 		["CROUCH SPEED"] = "Eğilme hızı",

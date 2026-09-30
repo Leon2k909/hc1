@@ -33,6 +33,7 @@ import numpy as np
 from PIL import Image
 
 import kastov_weapons
+import part_masses
 from kastov_dmx import rotation_to_quaternion
 from kastov_weapons import Weapon
 
@@ -1701,6 +1702,8 @@ def weapon_prefab(weapon: Weapon, prefabs: Prefabs) -> dict:
     equipment["Resource"] = f"{weapon.asset}/{weapon.name}.equip"
     equipment["MountedPrefab"] = {"_type": "gameobject", "prefab": f"{weapon.asset}/mount_{weapon.name}.prefab"}
     equipment["DeploySound"] = prefabs.deploy_sound
+    # The M4's prefab has a LoadedMass, so the gun's own takes its place in the key order.
+    equipment["LoadedMass"] = part_masses.gun_kg(weapon.name)
 
     functions = find(root, "Functions")
 
@@ -1732,7 +1735,9 @@ def patched_weapon_prefab(weapon: Weapon, prefabs: Prefabs) -> dict:
     """An existing gameplay prefab with the viewmodel's ADS and deploy sound."""
     document = load(weapon.folder / f"weapon_{weapon.name}.prefab")
     root = document["RootObject"]
-    component(root, "Equipment")["DeploySound"] = prefabs.deploy_sound
+    equipment = component(root, "Equipment")
+    equipment["DeploySound"] = prefabs.deploy_sound
+    equipment["LoadedMass"] = part_masses.gun_kg(weapon.name)
     set_aim(find(root, "Functions"), prefabs)
     return document
 
@@ -1931,6 +1936,8 @@ def own_parts(weapon: Weapon, prefabs: Prefabs) -> int:
                 document["RailIronAimCorrection"] = vector(part.rail_iron_aim)
             document.update({"__references": [], "__version": 0})
             path = ASSETS / "gunsmith" / weapon.name / folder / f"att_vm_p04_{choice}.gnsmth"
+            # Its weight against the factory part's (GunsmithPart.Mass).
+            document = part_masses.put(document, path.relative_to(ASSETS).as_posix())
             path.parent.mkdir(parents=True, exist_ok=True)
             save(path, document)
     return sum(part.offered for part in prefabs.parts.values())

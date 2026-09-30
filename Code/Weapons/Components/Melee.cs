@@ -37,9 +37,11 @@ public partial class Melee : WeaponInputAction
 	{
 		MatchRecorder.NoteShot( Equipment?.Owner?.GameObject );
 
-		if ( SwingSound is not null )
+		// The blade cutting the air (WorldSounds), or the weapon's own swing until that's compiled.
+		var swing = WorldSounds.KnifeSwing ?? SwingSound;
+		if ( swing is not null )
 		{
-			if ( Sound.Play( SwingSound, Equipment.WorldPosition ) is SoundHandle snd )
+			if ( Sound.Play( swing, Equipment.WorldPosition ) is SoundHandle snd )
 			{
 				snd.SpacialBlend = (Equipment.Owner?.IsViewer ?? false) ? 0 : snd.SpacialBlend;
 			}
@@ -57,8 +59,9 @@ public partial class Melee : WeaponInputAction
 		}
 	}
 
-	private void CreateImpactEffects( GameObject hitObject, Surface surface, Vector3 pos, Vector3 normal )
+	private void CreateImpactEffects( in SceneTraceResult tr, Surface surface, Vector3 pos, Vector3 normal )
 	{
+		var hitObject = tr.GameObject;
 		var impactPrefab = surface.GetBluntImpact();
 
 		if ( impactPrefab is not null )
@@ -73,10 +76,15 @@ public partial class Melee : WeaponInputAction
 			impact.Transform.ClearInterpolation();
 		}
 
-		if ( surface.SoundCollection.Bullet.IsValid() )
-		{
-			Sound.Play( surface.SoundCollection.Bullet, pos );
-		}
+		// The blade's strike, heard by everyone nearby rather than only the one swinging.
+		if ( WorldSounds.KnifeImpact( tr, surface ) is { } sound && sound.IsValid() )
+			PlayImpactSound( sound.ResourcePath, pos );
+	}
+
+	[Rpc.Broadcast]
+	private void PlayImpactSound( string sound, Vector3 position )
+	{
+		Sound.Play( sound, position );
 	}
 
 	public void Swing()
@@ -92,7 +100,7 @@ public partial class Melee : WeaponInputAction
 			}
 
 			DoEffects( tr.GameObject );
-			CreateImpactEffects( tr.GameObject, tr.GetImpactSurface(), tr.EndPosition, tr.Normal );
+			CreateImpactEffects( tr, tr.GetImpactSurface(), tr.EndPosition, tr.Normal );
 
 			// Inflict damage on whatever we find.
 

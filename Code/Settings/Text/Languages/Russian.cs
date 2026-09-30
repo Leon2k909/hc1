@@ -545,6 +545,7 @@ public static partial class GameText
 		["MUZZLE VELOCITY"] = "Начальная скорость",
 		["EMPTY RELOAD"] = "Перезарядка пустого магазина",
 		["RECOIL CONTROL"] = "Контроль отдачи",
+		["WEIGHT"] = "Масса",
 		["WALK SPEED"] = "Скорость ходьбы",
 		["SPRINT SPEED"] = "Скорость бега",
 		["CROUCH SPEED"] = "Скорость в приседе",

@@ -545,6 +545,7 @@ public static partial class GameText
 		["MUZZLE VELOCITY"] = "총구 속도",
 		["EMPTY RELOAD"] = "빈 탄창 재장전",
 		["RECOIL CONTROL"] = "반동 제어",
+		["WEIGHT"] = "무게",
 		["WALK SPEED"] = "걷기 속도",
 		["SPRINT SPEED"] = "전력 질주 속도",
 		["CROUCH SPEED"] = "앉기 속도",

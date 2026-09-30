@@ -223,6 +223,7 @@
 
         yield return Section( "HANDLING" );
         yield return Compare( "AIM DOWN SIGHTS", a, b, s => s.AimTime, s => $"{s.AimTime * 1000f:0} MS", -1 );
+        yield return Compare( "WEIGHT", a, b, s => s.Mass, s => s.Mass > 0f ? $"{s.Mass:0.00} KG" : "-", -1 );
         yield return Compare( "RELOAD", a, b, s => s.ReloadTime, s => ReloadText( s.ReloadTime, s ), -1 );
         yield return Compare( "EMPTY RELOAD", a, b, s => s.EmptyReloadTime, s => ReloadText( s.EmptyReloadTime, s ), -1 );
         yield return Compare( "RECOIL CONTROL", a, b, s => s.Control, s => s.ControlText, 1 );

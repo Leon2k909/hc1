@@ -70,6 +70,10 @@
                     <div class="ab-copy">
                         <label class="ab-part">@(part?.Name ?? StandardName( SelectedPoint.Category ))</label>
                         <label class="ab-desc">@OptionDescription( part )</label>
+                        @if ( part.IsValid() && MathF.Abs( part.Mass ) >= 0.005f )
+                        {
+                            <label class="ab-weight">@WeightText( part )</label>
+                        }
                         @if ( state is not null )
                         {
                             <label class="ab-state">@state</label>
@@ -287,6 +291,9 @@
         : !string.IsNullOrWhiteSpace( part?.Description ) ? Tr( part.Description )
         : SelectedPoint.Category == GunsmithPartType.Ammunition ? Tr( part?.UsesTracerRounds == true ? "Visible bullet trails" : "No visible bullet trails" )
         : part is null ? Tr( "Original weapon part" ) : part.IsSuppressor ? Tr( "Suppressor" ) : CategoryName( part.Category );
+
+    /// <summary> What the part adds to the gun's weight (GunsmithPart.Mass), e.g. "+0.45 KG". </summary>
+    private static string WeightText( GunsmithPart part ) => $"{part.Mass:+0.00;-0.00} KG";
 
     private static string CategoryName( GunsmithPartType category ) => Tr( category == GunsmithPartType.RearGrip ? "REAR GRIP" : category.ToString().ToUpperInvariant() );
     private static string CategoryIcon( GunsmithPartType category ) => category switch

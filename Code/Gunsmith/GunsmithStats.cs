@@ -83,6 +83,8 @@ public sealed record GunsmithStats
 	public float SprintSpeedUnits { get; init; }
 	public float CrouchSpeedUnits { get; init; }
 	public float ProneSpeedUnits { get; init; }
+	/// <summary> The gun's loaded weight with its parts, kg (<see cref="Equipment.LoadedMass"/>); 0 if not known. </summary>
+	public float Mass { get; init; }
 
 	/// <summary> Up to three words on the gun's character, "|"-separated so the record still compares by value. </summary>
 	public string Tags { get; init; } = "";
@@ -117,12 +119,14 @@ public sealed record GunsmithStats
 		rpm *= 1f + tune.FireRate * 0.012f;
 
 		var viewModel = resource.ViewModelPrefab.IsValid() ? resource.ViewModelPrefab.GetComponentInChildren<ViewModel>( true ) : null;
-		var aimTime = viewModel.IsValid() ? viewModel.AimTime : 0.25f;
+		var aimTime = (viewModel.IsValid() ? viewModel.AimTime : 0.25f) * parts.AimTime;
 
-		// PlayerPawn.Movement: the gun's SpeedPenalty comes off the walk speed, then its weight slows every gait.
+		// PlayerPawn.Movement: the gun's SpeedPenalty comes off the walk speed, then its weight (and its parts') slows
+		// every gait.
 		var equipment = prefab.GetComponentInChildren<Equipment>( true );
 		var penalty = equipment.IsValid() ? equipment.SpeedPenalty : 0f;
-		var weight = equipment.IsValid() ? equipment.WeightSlowdown : 0f;
+		var weight = (equipment.IsValid() ? equipment.WeightSlowdown : 0f) + parts.WeightSlowdown;
+		var gunMass = equipment.IsValid() ? equipment.LoadedMass : 0f;
 		var speedShare = (WalkSpeed - penalty) / WalkSpeed * (1f - weight);
 
 		float? meters = null;
@@ -208,6 +212,7 @@ public sealed record GunsmithStats
 			SprintSpeedUnits = (SprintSpeed - penalty * 0.5f) * (1f - weight),
 			CrouchSpeedUnits = CrouchSpeed * (1f - weight),
 			ProneSpeedUnits = ProneSpeed * (1f - weight),
+			Mass = gunMass > 0f && build ? parts.LoadedMass : gunMass,
 		};
 	}
 

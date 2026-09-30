@@ -365,10 +365,13 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 
 		// A weight moving at a steady pace turns back from wherever it is, so letting go of aim halfway in doesn't snap
 		// the gun to the sights first (an animgraph selector restarts its blend from the full old pose).
-		_aimProgress = _aimProgress.Approach( aiming ? 1f : 0f, Time.Delta / MathF.Max( AimTime, 0.01f ) );
+		// The fitted parts' weight slows it (Equipment.AttachmentAimTimeScale).
+		var weight = Equipment.AttachmentAimTimeScale > 0f ? Equipment.AttachmentAimTimeScale : 1f;
+		_aimProgress = _aimProgress.Approach( aiming ? 1f : 0f, Time.Delta / MathF.Max( AimTime * weight, 0.01f ) );
 		ModelRenderer.Set( "ironsights_weight", _aimProgress * _aimProgress * (3f - 2f * _aimProgress) );
 
-		ModelRenderer.Set( "speed_ironsights", 1 );
+		// The Facepunch guns' graphs (the M4's and the others') bring the sights up by their own clips, at this rate.
+		ModelRenderer.Set( "speed_ironsights", 1f / weight );
 
 		var reloadDuration = Equipment.GetComponentInChildren<Reloadable>()?.DurationMultiplier ?? 1f;
 		ModelRenderer.Set( "reload_speed", ReloadSpeed / reloadDuration );

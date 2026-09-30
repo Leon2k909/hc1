@@ -5,6 +5,9 @@ public partial class HEGrenade : BaseGrenade, IMarkerObject, IDescription
 {
 	[Property] public float DamageRadius { get; set; } = 512f;
 	[Property] public float MaxDamage { get; set; } = 100f;
+
+	/// <summary> A filled steel body, an M67's: its bounces are a dull clunk, not a can's tonk. </summary>
+	protected override WorldSounds.GrenadeBody Body => WorldSounds.GrenadeBody.Frag;
 	[Property] public float ScreenShakeIntensity { get; set; } = 3f;
 	[Property] public float ScreenShakeLifeTime { get; set; } = 1.5f;
 	[Property] public Curve DamageFalloff { get; set; } = new Curve( new Curve.Frame( 1.0f, 1.0f ), new Curve.Frame( 0.0f, 0.0f ) );

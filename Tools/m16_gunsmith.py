@@ -20,6 +20,7 @@ import kastov_prefabs as P
 import kastov_vmdl as V
 import kastov_weapons as W
 import m16_assets as A
+import part_masses
 from kastov_smd import Smd, matrix, euler_to_mat, write_smd
 from port_kastov import Kastov
 
@@ -155,6 +156,8 @@ def resources():
                 mount["PartScale"] = "1,1,1"
                 save(DEST / f"{key}.prefab", prefab)
                 part["MainPrefab"]["prefab"] = f"gunsmith/m16/{key}.prefab"
+            # The M4 part's weight is against the M4's parts; the M16A4's fixed stock and 20-inch barrel are heavier.
+            part = part_masses.put(part, f"gunsmith/m16/{key}.gnsmth")
             save(DEST / f"{key}.gnsmth", part)
     sounds = P.m16_reload_sounds()
     for index, (choice, (key, capacity)) in enumerate(MAGAZINES.items()):
@@ -162,14 +165,14 @@ def resources():
             continue
         clips = [f"{prefix}_{choice}" for prefix in ("reload", "reload_empty")]
         times = [(len(Smd(W.M16.decompiled / W.M16.cod_anims / f"{clip}.smd").frames) - 1) / 30 for clip in clips]
-        save(DEST / f"{key}.gnsmth", {
+        save(DEST / f"{key}.gnsmth", part_masses.put({
             "Name": f"{capacity} Round Mag", "Category": "Magazine", "EligibleEquipment": [RESOURCE],
             "RequiredLevel": 0, "Description": f"{capacity}-round 5.56 magazine with its matching reload animations.",
             "ModifyBodygroups": True, "Bodygroups": {"magazine": index}, "MagazineCapacity": capacity,
             "ReloadTimeMultiplier": 1, "ReloadAnimation": index, "ReloadTime": round(times[0], 4),
             "EmptyReloadTime": round(times[1], 4), "ReloadSounds": sounds[clips[0]], "EmptyReloadSounds": sounds[clips[1]],
             "__references": [], "__version": 0,
-        })
+        }, f"gunsmith/m16/{key}.gnsmth"))
 
 
 def slots():

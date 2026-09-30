@@ -818,9 +818,9 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 			speed = Global.WalkSpeed - GetSpeedPenalty();
 		}
 
-		// A heavy gun slows every gait by the same fraction.
+		// A heavy gun slows every gait by the same fraction, and so do heavy parts on it.
 		if ( CurrentEquipment.IsValid() )
-			speed *= 1f - CurrentEquipment.WeightSlowdown;
+			speed *= 1f - (CurrentEquipment.WeightSlowdown + CurrentEquipment.AttachmentWeightSlowdown);
 
 		// A shot leg or foot (hardcore), or a landing hard enough to hurt.
 		speed *= HealthComponent.WoundSpeedScale;

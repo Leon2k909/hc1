@@ -6,6 +6,10 @@ namespace Facepunch.Gunsmith;
 /// the real part does: a different gas system length or a heavier or lighter AR buffer (<see cref="FireRate"/>), or
 /// suppressor back-pressure (<see cref="Shootable.SuppressorFireRateScale"/>, which depends on the action, and which a
 /// gas regulator's suppressed setting takes away: <see cref="SuppressedGas"/>).
+/// <para>
+/// Every part's weight counts too (<see cref="GunsmithPart.Mass"/>, <see cref="ApplyMass"/>): a heavier gun kicks less,
+/// but it's slower to bring up to the eye and to carry.
+/// </para>
 /// </summary>
 public struct GunsmithAttachmentEffects
 {
@@ -18,6 +22,35 @@ public struct GunsmithAttachmentEffects
 	public float FireRate { get; private set; }
 	/// <summary> A fitted gas regulator is on its suppressed setting (<see cref="GunsmithPart.SuppressedGasSetting"/>). </summary>
 	public bool SuppressedGas { get; private set; }
+	/// <summary> What the fitted parts add to the gun's loaded weight, in kg (negative if they take weight off). </summary>
+	public float Mass { get; private set; }
+	/// <summary> The gun's loaded weight with its parts, in kg (0 before <see cref="ApplyMass"/>). </summary>
+	public float LoadedMass { get; private set; }
+	/// <summary> Aiming-in time against the factory gun's, from the parts' weight. </summary>
+	public float AimTime { get; private set; }
+	/// <summary>
+	/// How much more the parts' weight slows every gait, added to <see cref="Equipment.WeightSlowdown"/> (0.01 = 1% slower).
+	/// </summary>
+	public float WeightSlowdown { get; private set; }
+
+	/// <summary> The AKM's 3.75 kg, loaded: the weight the rifles' speeds and aiming time are set for. </summary>
+	public const float ReferenceMass = 3.75f;
+	/// <summary>
+	/// About what a soldier's arms add to the weight they swing up to the eye, in kg. Aiming in takes time as the square
+	/// root of the moving weight (a fixed push moves a heavier load more slowly), which is how the RPK's 0.3 s is set
+	/// against the rifles' 0.25 s.
+	/// </summary>
+	public const float ArmsMass = 4f;
+	/// <summary> Every gait slows by about 1% per kg carried over the rifles' weight (Hunt et al., 2016). </summary>
+	public const float SlowdownPerKg = 0.01f;
+
+	/// <summary> The categories whose parts have effects, weight included. Charms, camos and stickers weigh next to nothing. </summary>
+	private static readonly GunsmithPartType[] EffectSlots =
+	{
+		GunsmithPartType.Muzzle, GunsmithPartType.Barrel, GunsmithPartType.Stock, GunsmithPartType.Underbarrel,
+		GunsmithPartType.RearGrip, GunsmithPartType.Action, GunsmithPartType.Optic, GunsmithPartType.Magazine,
+		GunsmithPartType.Laser, GunsmithPartType.Rail, GunsmithPartType.Ammunition
+	};
 
 	public static GunsmithAttachmentEffects For( Equipment equipment )
 	{
@@ -29,7 +62,8 @@ public struct GunsmithAttachmentEffects
 			FlashChance = 1f,
 			HearingDistance = 1f,
 			SoundVolume = 1f,
-			FireRate = 1f
+			FireRate = 1f,
+			AimTime = 1f
 		};
 
 		// Loadout cookies are local to the shooter. The owner computes shot effects
@@ -39,13 +73,10 @@ public struct GunsmithAttachmentEffects
 			return effects;
 
 		var prone = equipment.Owner.IsProne;
-		ApplySelected( ref effects, equipment.Resource, GunsmithPartType.Muzzle, prone );
-		ApplySelected( ref effects, equipment.Resource, GunsmithPartType.Barrel, prone );
-		ApplySelected( ref effects, equipment.Resource, GunsmithPartType.Stock, prone );
-		ApplySelected( ref effects, equipment.Resource, GunsmithPartType.Underbarrel, prone );
-		ApplySelected( ref effects, equipment.Resource, GunsmithPartType.RearGrip, prone );
-		ApplySelected( ref effects, equipment.Resource, GunsmithPartType.Action, prone );
+		foreach ( var slot in EffectSlots )
+			ApplySelected( ref effects, equipment.Resource, slot, prone );
 
+		effects.ApplyMass( equipment.LoadedMass );
 		return effects;
 	}
 
@@ -63,20 +94,51 @@ public struct GunsmithAttachmentEffects
 			FlashChance = 1f,
 			HearingDistance = 1f,
 			SoundVolume = 1f,
-			FireRate = 1f
+			FireRate = 1f,
+			AimTime = 1f
 		};
 
 		if ( !resource.IsValid() )
 			return effects;
 
-		ApplySelected( ref effects, resource, GunsmithPartType.Muzzle, false );
-		ApplySelected( ref effects, resource, GunsmithPartType.Barrel, false );
-		ApplySelected( ref effects, resource, GunsmithPartType.Stock, false );
-		ApplySelected( ref effects, resource, GunsmithPartType.Underbarrel, false );
-		ApplySelected( ref effects, resource, GunsmithPartType.RearGrip, false );
-		ApplySelected( ref effects, resource, GunsmithPartType.Action, false );
+		foreach ( var slot in EffectSlots )
+			ApplySelected( ref effects, resource, slot, false );
 
+		effects.ApplyMass( GunMass( resource ) );
 		return effects;
+	}
+
+	/// <summary> <paramref name="resource"/>'s loaded weight from its prefab's <see cref="Equipment.LoadedMass"/>, else 0. </summary>
+	public static float GunMass( EquipmentResource resource )
+	{
+		var equipment = resource?.MainPrefab?.GetComponent<Equipment>( true );
+		return equipment.IsValid() ? equipment.LoadedMass : 0f;
+	}
+
+	/// <summary>
+	/// What the fitted parts' weight does to a gun that weighs <paramref name="gunMass"/> kg loaded (0: not known, taken as
+	/// <see cref="ReferenceMass"/>).
+	/// <list type="bullet">
+	/// <item>Recoil: the same round kicks a heavier gun back more slowly (free recoil goes as one over the weight), so it's
+	/// scaled by the gun's weight over the gun's with its parts.</item>
+	/// <item>Aiming in: as the square root of the weight swung up with the arms (<see cref="ArmsMass"/>).</item>
+	/// <item>Moving: <see cref="SlowdownPerKg"/> for each kg over <see cref="ReferenceMass"/>, as a heavy gun's own
+	/// <see cref="Equipment.WeightSlowdown"/> is set. A gun under it doesn't get faster than the rifles.</item>
+	/// </list>
+	/// </summary>
+	private void ApplyMass( float gunMass )
+	{
+		var gun = gunMass > 0f ? gunMass : ReferenceMass;
+		var total = MathF.Max( gun + Mass, gun * 0.5f );
+		LoadedMass = total;
+		if ( Mass == 0f )
+			return;
+
+		var recoil = gun / total;
+		VerticalRecoil *= recoil;
+		HorizontalRecoil *= recoil;
+		AimTime = MathF.Sqrt( (total + ArmsMass) / (gun + ArmsMass) );
+		WeightSlowdown = SlowdownPerKg * (MathF.Max( total, ReferenceMass ) - MathF.Max( gun, ReferenceMass ));
 	}
 
 	private static void ApplySelected( ref GunsmithAttachmentEffects effects, EquipmentResource resource,
@@ -96,12 +158,13 @@ public struct GunsmithAttachmentEffects
 		if ( part.DamageFalloffScale > 0f ) DamageFalloffDistance *= part.DamageFalloffScale;
 		if ( part.FireRateScale > 0f ) FireRate *= part.FireRateScale;
 		if ( part.SuppressedGasSetting ) SuppressedGas = true;
+		Mass += part.Mass;
 
 		if ( (part.Category is GunsmithPartType.Muzzle or GunsmithPartType.Barrel)
 			&& (part.IsSuppressor || Has( "suppressor" ) || Has( "silencer" )) )
 		{
-			// Gas and added muzzle mass soften recoil; the report still exists. The can adds a little
-			// effective barrel length, so the bullet leaves slightly faster.
+			// The can traps the muzzle gas, whose jet otherwise adds to the kick (its weight counts through Mass); the
+			// report still exists. The can adds a little effective barrel length, so the bullet leaves slightly faster.
 			VerticalRecoil *= 0.94f;
 			HorizontalRecoil *= 0.94f;
 			HearingDistance *= 0.20f;

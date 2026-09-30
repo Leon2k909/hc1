@@ -1,8 +1,9 @@
 namespace Facepunch;
 
 /// <summary>
-/// The world's sounds by what's struck or stood on, in place of s&amp;box's stock ones: a bullet's impact, a boot's step
-/// and run, and a landing (sounds/world, made by Tools/world_sounds.py from the physics of each). A surface is sorted
+/// The world's sounds by what's struck or stood on, in place of s&amp;box's stock ones: a bullet's impact, a knife's strike
+/// and swing, a grenade's bounce, a boot's step and run, and a landing (sounds/world, made by Tools/world_sounds.py from
+/// the physics of each). A surface is sorted
 /// into one of the materials the script has sounds for by its name, then its base surfaces' names. Anything else (water,
 /// snow, mud, a carpet underfoot) keeps its own surface's sounds, and so does a set whose event hasn't compiled yet.
 /// </summary>
@@ -112,23 +113,84 @@ public static class WorldSounds
 	/// null for none. A living player's body has none here: <see cref="PlayerPawn.BloodImpactSound"/> plays it on every
 	/// machine. Other bodies (bots, zombies, corpses) sound like flesh whatever their colliders' surfaces are.
 	/// </summary>
-	public static SoundEvent BulletImpact( in SceneTraceResult tr, Surface surface )
+	public static SoundEvent BulletImpact( in SceneTraceResult tr, Surface surface ) => Strike( tr, surface, "impacts/bullet" );
+
+	/// <summary>
+	/// The sound of a knife's blade striking what <paramref name="tr"/> hit, like <see cref="BulletImpact"/>: the steel
+	/// tip, the blade's ring and what the tip does to the face, far quieter than a round's strike. A living player's
+	/// body plays <see cref="KnifeFlesh"/> on every machine as it takes the stab.
+	/// </summary>
+	public static SoundEvent KnifeImpact( in SceneTraceResult tr, Surface surface ) => Strike( tr, surface, "knife/knife" );
+
+	/// <summary> A knife's stab into a body, or null until it's compiled. </summary>
+	public static SoundEvent KnifeFlesh => Event( "sounds/world/knife/knife_flesh.sound" );
+
+	/// <summary> A knife's blade cutting the air in a swing, or null until it's compiled. </summary>
+	public static SoundEvent KnifeSwing => Event( "sounds/world/knife/knife_swing.sound" );
+
+	private static SoundEvent Strike( in SceneTraceResult tr, Surface surface, string set )
 	{
 		if ( tr.Hitbox is not null || (tr.GameObject.IsValid() && tr.GameObject.GetComponentInParent<ZombieAI>().IsValid()) )
 		{
 			if ( tr.GameObject.IsValid() && tr.GameObject.Root.GetComponentInChildren<PlayerPawn>().IsValid() )
 				return null;
 
-			return Event( "sounds/world/impacts/bullet_flesh.sound" ) ?? surface?.SoundCollection.Bullet;
+			return Event( $"sounds/world/{set}_flesh.sound" ) ?? surface?.SoundCollection.Bullet;
 		}
 
 		if ( tr.Collider is Terrain || tr.GameObject?.Components.Get<Terrain>() is not null )
 			surface = SurfaceAt( tr );
 
 		var material = Classify( surface );
-		var ours = material is Material.Own ? null : Event( $"sounds/world/impacts/bullet_{Name( material )}.sound" );
+		var ours = material is Material.Own ? null : Event( $"sounds/world/{set}_{Name( material )}.sound" );
 		return ours ?? surface?.SoundCollection.Bullet ?? surface?.GetBaseSurface()?.SoundCollection.Bullet;
 	}
+
+	/// <summary> What a thrown grenade is, for the sound of its bounces. </summary>
+	public enum GrenadeBody
+	{
+		/// <summary> A filled steel sphere, an M67: a dull clunk. </summary>
+		Frag,
+		/// <summary> A thin sheet-steel can (smoke, stun, thermite): a hollow tonk that rings a little. </summary>
+		Can,
+	}
+
+	/// <summary> The impact speed, in units a second, at which a bounce plays at its event's own volume (~6 m/s). </summary>
+	public const float BounceReferenceSpeed = 240f;
+
+	/// <summary> Slower than this (~1 m/s) a grenade rolls or settles without a knock worth hearing. </summary>
+	public const float BounceMinSpeed = 40f;
+
+	/// <summary> Whether the grenade bounces have compiled, so a grenade can turn the engine's own collision sounds off. </summary>
+	public static bool HasGrenadeBounces => Event( "sounds/world/grenades/frag_concrete.sound" ) is not null;
+
+	/// <summary>
+	/// A grenade of <paramref name="body"/> striking <paramref name="surface"/>, or null where we have none (water, snow,
+	/// mud): the caller plays the surface's own. <see cref="BounceVolume"/> scales it by how hard it hit.
+	/// </summary>
+	public static SoundEvent GrenadeBounce( Surface surface, GrenadeBody body )
+	{
+		var floor = Classify( surface ) switch
+		{
+			Material.Masonry => "concrete",
+			Material.Tile or Material.Glass => "tile",
+			Material.Wood or Material.Plastic => "wood",
+			Material.Metal or Material.SheetMetal => "metal",
+			Material.Dirt => "dirt",
+			Material.Grass => "grass",
+			Material.Fabric or Material.Flesh => "soft",
+			_ => null,
+		};
+		return floor is null ? null : Event( $"sounds/world/grenades/{body.ToString().ToLowerInvariant()}_{floor}.sound" );
+	}
+
+	/// <summary>
+	/// How loud a bounce at <paramref name="speed"/> (into the surface) is against one at
+	/// <see cref="BounceReferenceSpeed"/>: an elastic impact's peak force, and so its sound, grows as the speed to the 1.2
+	/// (Hertz). 0 under <see cref="BounceMinSpeed"/>, at most 2 (a throw's first landing, ~12 m/s).
+	/// </summary>
+	public static float BounceVolume( float speed ) =>
+		speed < BounceMinSpeed ? 0f : MathF.Min( MathF.Pow( speed / BounceReferenceSpeed, 1.2f ), 2f );
 
 	/// <summary>
 	/// A boot on this floor: a walking step or, sprinting, a running one. <paramref name="left"/> picks the surface's own

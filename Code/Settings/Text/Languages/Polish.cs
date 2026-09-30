@@ -545,6 +545,7 @@ public static partial class GameText
 		["MUZZLE VELOCITY"] = "Prędkość wylotowa",
 		["EMPTY RELOAD"] = "Przeładowanie (pusty magazynek)",
 		["RECOIL CONTROL"] = "Kontrola odrzutu",
+		["WEIGHT"] = "Masa",
 		["WALK SPEED"] = "Prędkość chodu",
 		["SPRINT SPEED"] = "Prędkość sprintu",
 		["CROUCH SPEED"] = "Prędkość w przysiadzie",

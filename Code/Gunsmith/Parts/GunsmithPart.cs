@@ -117,6 +117,13 @@ public partial class GunsmithPart : GameResource
 	/// </summary>
 	[Property, Group( "Effects" )] public bool SuppressedGasSetting { get; set; }
 	/// <summary>
+	/// What the part adds to the gun's weight, in kg, against the factory part it replaces (for a part that fits where the
+	/// gun has nothing, its own weight with its mount). Negative for a lighter part. A magazine's is loaded, rounds and
+	/// all. Weight slows aiming in and moving, and lowers free recoil (<see cref="GunsmithAttachmentEffects.Mass"/>).
+	/// Written by <c>Tools/part_masses.py</c>, with its sources.
+	/// </summary>
+	[Property, Group( "Effects" )] public float Mass { get; set; }
+	/// <summary>
 	/// A fire control group's selector positions, in the order the fire-mode key steps through them. Empty keeps the
 	/// weapon's own (<see cref="Shootable.SupportedFireModes"/>).
 	/// </summary>

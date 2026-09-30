@@ -57,6 +57,13 @@ public partial class Equipment : Component, Component.INetworkListener, IDescrip
 	[Property, Group( "Movement" )] public float WeightSlowdown { get; set; }
 
 	/// <summary>
+	/// The real gun's weight in kg with its factory parts and a loaded factory magazine. The gunsmith's parts add to it or
+	/// take from it (<see cref="GunsmithPart.Mass"/>), which changes the recoil, the aiming-in time and the speeds by the
+	/// weight's share (<see cref="Gunsmith.GunsmithAttachmentEffects.ApplyMass"/>). 0 if not known.
+	/// </summary>
+	[Property, Group( "Movement" )] public float LoadedMass { get; set; }
+
+	/// <summary>
 	/// What prefab should we spawn as the mounted version of this piece of equipment?
 	/// </summary>
 	[Property, Group( "Mount Points" )] public GameObject MountedPrefab { get; set; }

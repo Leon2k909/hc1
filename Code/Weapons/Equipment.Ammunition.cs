@@ -20,6 +20,14 @@ public partial class Equipment
 	/// </summary>
 	public IReadOnlyList<FireMode> TriggerFireModes { get; private set; }
 
+	/// <summary>
+	/// The fitted parts' weight against the factory gun's: <see cref="ViewModel.AimTime"/>'s multiplier, and what it adds
+	/// to <see cref="WeightSlowdown"/> (<see cref="GunsmithAttachmentEffects.ApplyMass"/>). Only the owner has them: the
+	/// viewmodel and the movement are the owner's.
+	/// </summary>
+	public float AttachmentAimTimeScale { get; private set; } = 1f;
+	public float AttachmentWeightSlowdown { get; private set; }
+
 	internal void RefreshAmmunitionLoadout()
 	{
 		// Cookies belong to this client. Never apply them to another player's weapon or a bot.
@@ -38,6 +46,9 @@ public partial class Equipment
 			TriggerFireModes = triggerModes;
 			GetComponentInChildren<Shootable>( true )?.KeepFireModeFitted();
 		}
+		var effects = GunsmithAttachmentEffects.For( this );
+		AttachmentAimTimeScale = effects.AimTime;
+		AttachmentWeightSlowdown = effects.WeightSlowdown;
 		// Changing capacity never manufactures ammunition. A smaller magazine discards excess rounds.
 		if ( oldCapacity != AttachmentMagazineCapacity )
 		{
