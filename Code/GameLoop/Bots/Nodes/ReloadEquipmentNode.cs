@@ -21,7 +21,7 @@ public class ReloadWeaponNode : BaseBehaviorNode
 
 		var reloadable = weapon.GetComponentInChildren<Reloadable>();
 		if ( reloadable == null )
-			return NodeResult.Success; // weapon doesn’t need reload
+			return NodeResult.Success; // weapon doesnâ€™t need reload
 
 		// If currently reloading
 		if ( reloadable.IsReloading )

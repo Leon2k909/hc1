@@ -1,7 +1,7 @@
 namespace Facepunch;
 
 /// <summary>
-/// Aims the bot’s view at a weighted random hitbox on the current target.
+/// Aims the botâ€™s view at a weighted random hitbox on the current target.
 /// </summary>
 public class AimAtTargetNode : BaseBehaviorNode
 {
