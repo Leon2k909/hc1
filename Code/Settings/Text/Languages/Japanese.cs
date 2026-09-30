@@ -160,6 +160,9 @@ public static partial class GameText
 		["Rear Grip"] = "リアグリップ",
 		["Grip"] = "グリップ",
 		["Laser"] = "レーザー",
+		["Rail"] = "レール",
+		["Action"] = "作動機構",
+		["Trigger"] = "トリガー",
 		["Ammunition"] = "弾薬",
 		["Ammo"] = "弾薬",
 		["Armour"] = "アーマー",
@@ -500,6 +503,18 @@ public static partial class GameText
 		["Textured rubber grip. 2% less recoil."] = "滑り止め加工のラバーグリップ。反動が2%減少。",
 		["The 18-inch barrel of the folding-stock 50.62, with a short flash hider. Damage falls off 5% earlier at distance."] =
 			"折りたたみストック型50.62の18インチ銃身。短いフラッシュハイダー付き。ダメージが減衰し始める距離が5%短くなる。",
+		["A standard 3.0 oz carbine buffer, 1.6 oz lighter than the M4A1's H2. The bolt carrier cycles faster: 9.5% more rounds a minute."] =
+			"標準的な3.0オンスのカービンバッファー。M4A1のH2より1.6オンス軽い。ボルトキャリアの作動が速くなり、毎分の発射数が9.5%増える。",
+		["A 3.8 oz buffer, 0.8 oz lighter than the M4A1's H2. The bolt carrier cycles faster: 4.5% more rounds a minute."] =
+			"3.8オンスのバッファー。M4A1のH2より0.8オンス軽い。ボルトキャリアの作動が速くなり、毎分の発射数が4.5%増える。",
+		["A 5.4 oz buffer, 0.8 oz heavier than the M4A1's H2, often fitted to slow a suppressed gun down. The bolt carrier cycles slower: 4% fewer rounds a minute."] =
+			"5.4オンスのバッファー。M4A1のH2より0.8オンス重く、サプレッサー装着時の連射を抑えるためによく使われる。ボルトキャリアの作動が遅くなり、毎分の発射数が4%減る。",
+		["The M4's fire control group: semi-automatic and three-round burst in place of automatic."] =
+			"M4のトリガーグループ。フルオートの代わりにセミオートと3点バースト。",
+		["The M16A3's fire control group: semi-automatic and automatic in place of the three-round burst."] =
+			"M16A3のトリガーグループ。3点バーストの代わりにセミオートとフルオート。",
+		["An adjustable gas regulator, set for a suppressor: less gas reaches the piston, cancelling the can's back-pressure, so the rate doesn't rise 10%. Without a suppressor it's on its normal setting."] =
+			"サプレッサー用に設定した調整式ガスレギュレーター。ピストンに届くガスが減り、サプレッサーの背圧を打ち消すので、連射速度が10%上がらない。サプレッサーがなければ通常の設定になる。",
 		["The 30-round magazine of the FAL's heavy-barrel squad rifle. Longer and heavier. Reloads in 2.67s (3.57s when empty)."] =
 			"FALの重銃身分隊支援ライフル用の30発マガジン。より長く重い。リロード時間2.67秒（空の状態から3.57秒）。",
 		["The AK-74's standard pistol grip. No effect on recoil."] = "AK-74の標準ピストルグリップ。反動への影響なし。",

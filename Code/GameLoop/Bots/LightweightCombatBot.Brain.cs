@@ -1909,7 +1909,7 @@ public sealed partial class LightweightCombatBot
 		_recoil += RecoilPerShot;
 		TimeSinceFired = 0f;
 		// Send the firing weapon's ammo choice with the shot so every observer sees the same effect.
-		DoShootEffects( GetMuzzlePosition(), trace.EndPosition, UsesTracerRounds );
+		DoShootEffects( GetMuzzlePosition(), trace.EndPosition, UsesTracerRounds, trace.Hit );
 
 		if ( trace.Hit )
 			ApplyHit( trace, shotDirection );

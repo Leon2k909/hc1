@@ -162,6 +162,9 @@ public static partial class GameText
 		["Rear Grip"] = "Arka kabza",
 		["Grip"] = "Kabza",
 		["Laser"] = "Lazer",
+		["Rail"] = "Ray",
+		["Action"] = "Mekanizma",
+		["Trigger"] = "Tetik",
 		["Ammunition"] = "Mühimmat",
 		["Ammo"] = "Cephane",
 		["Armour"] = "Zırh",
@@ -953,6 +956,18 @@ public static partial class GameText
 		["Textured rubber grip. 2% less recoil."] = "Dokulu kauçuk kabza. %2 daha az geri tepme.",
 		["The 18-inch barrel of the folding-stock 50.62, with a short flash hider. Damage falls off 5% earlier at distance."] =
 			"Katlanır dipçikli 50.62'nin 18 inçlik namlusu, kısa bir alev gizleyiciyle. Hasar mesafeyle %5 daha erken düşer.",
+		["A standard 3.0 oz carbine buffer, 1.6 oz lighter than the M4A1's H2. The bolt carrier cycles faster: 9.5% more rounds a minute."] =
+			"Standart 3,0 oz karabina tamponu, M4A1'in H2'sinden 1,6 oz daha hafif. Kama taşıyıcı daha hızlı çalışır: dakikada %9,5 daha fazla atış.",
+		["A 3.8 oz buffer, 0.8 oz lighter than the M4A1's H2. The bolt carrier cycles faster: 4.5% more rounds a minute."] =
+			"3,8 oz'luk bir tampon, M4A1'in H2'sinden 0,8 oz daha hafif. Kama taşıyıcı daha hızlı çalışır: dakikada %4,5 daha fazla atış.",
+		["A 5.4 oz buffer, 0.8 oz heavier than the M4A1's H2, often fitted to slow a suppressed gun down. The bolt carrier cycles slower: 4% fewer rounds a minute."] =
+			"5,4 oz'luk bir tampon, M4A1'in H2'sinden 0,8 oz daha ağır; susturuculu bir silahı yavaşlatmak için sık takılır. Kama taşıyıcı daha yavaş çalışır: dakikada %4 daha az atış.",
+		["The M4's fire control group: semi-automatic and three-round burst in place of automatic."] =
+			"M4'ün tetik grubu: otomatik yerine yarı otomatik ve üçlü seri atış.",
+		["The M16A3's fire control group: semi-automatic and automatic in place of the three-round burst."] =
+			"M16A3'ün tetik grubu: üçlü seri atış yerine yarı otomatik ve otomatik.",
+		["An adjustable gas regulator, set for a suppressor: less gas reaches the piston, cancelling the can's back-pressure, so the rate doesn't rise 10%. Without a suppressor it's on its normal setting."] =
+			"Susturucuya ayarlı, ayarlanabilir bir gaz regülatörü: pistona daha az gaz ulaşır ve susturucunun geri basıncını dengeler, böylece atış hızı %10 artmaz. Susturucu yokken normal ayardadır.",
 		["The 30-round magazine of the FAL's heavy-barrel squad rifle. Longer and heavier. Reloads in 2.67s (3.57s when empty)."] =
 			"FAL'ın ağır namlulu manga tüfeğinin 30 mermilik şarjörü. Daha uzun ve daha ağır. Yeniden doldurma 2,67 sn (boşken 3,57 sn).",
 		["The AK-74's standard pistol grip. No effect on recoil."] =

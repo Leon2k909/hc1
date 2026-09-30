@@ -468,7 +468,7 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 	}
 
 	[Rpc.Broadcast]
-	private void DoShootEffects( Vector3 startPosition, Vector3 endPosition, bool usesTracerRounds )
+	private void DoShootEffects( Vector3 startPosition, Vector3 endPosition, bool usesTracerRounds, bool hit )
 	{
 		var suppressed = IsSuppressed;
 		MatchRecorder.NoteShot( GameObject, suppressed );
@@ -531,6 +531,14 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 			?? (string.IsNullOrWhiteSpace( ShootSound ) ? null : ResourceLibrary.Get<SoundEvent>( ShootSound ));
 		if ( shootSound is not null && BotSystem.CanHear( shootSound, startPosition ) )
 			GunshotAudio.Play( shootSound, startPosition, direction, false );
+
+		// The round's crack for anyone it passes, and what it strikes, heard when it gets there. A miss flies on to the
+		// gun's range.
+		if ( shootable.IsValid() )
+		{
+			var flightEnd = hit ? endPosition : startPosition + direction * shootable.MaxRange;
+			BulletFlyby.Pass( shootable, startPosition, flightEnd, flyby: true, impact: hit, reflections: true );
+		}
 
 		Renderer?.Set( "b_attack", true );
 	}

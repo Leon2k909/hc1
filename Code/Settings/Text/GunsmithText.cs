@@ -439,6 +439,36 @@ public static partial class GameText
 			"Der 18-Zoll-Lauf des Klappschaft-Modells 50.62, mit kurzem Mündungsfeuerdämpfer. Der Schaden fällt auf Distanz 5 % früher ab.",
 			"El cañón de 18 pulgadas del 50.62 de culata plegable, con un apagallamas corto. El daño cae un 5 % antes con la distancia.",
 			"O cano de 18 polegadas do 50.62 de coronha dobrável, com um quebra-chamas curto. O dano cai 5% mais cedo com a distância." ),
+		["A standard 3.0 oz carbine buffer, 1.6 oz lighter than the M4A1's H2. The bolt carrier cycles faster: 9.5% more rounds a minute."] = (
+			"Un amortisseur de carabine standard de 3,0 oz, 1,6 oz plus léger que le H2 du M4A1. Le porte-culasse cycle plus vite : 9,5 % de coups en plus par minute.",
+			"Ein Standard-Karabinerpuffer mit 3,0 oz, 1,6 oz leichter als der H2 des M4A1. Der Verschlussträger läuft schneller: 9,5 % mehr Schuss pro Minute.",
+			"Un amortiguador de carabina estándar de 3,0 oz, 1,6 oz más ligero que el H2 del M4A1. El portacerrojo cicla más rápido: un 9,5 % más de disparos por minuto.",
+			"Um amortecedor de carabina padrão de 3,0 oz, 1,6 oz mais leve que o H2 da M4A1. O transportador do ferrolho cicla mais rápido: 9,5% mais disparos por minuto." ),
+		["A 3.8 oz buffer, 0.8 oz lighter than the M4A1's H2. The bolt carrier cycles faster: 4.5% more rounds a minute."] = (
+			"Un amortisseur de 3,8 oz, 0,8 oz plus léger que le H2 du M4A1. Le porte-culasse cycle plus vite : 4,5 % de coups en plus par minute.",
+			"Ein Puffer mit 3,8 oz, 0,8 oz leichter als der H2 des M4A1. Der Verschlussträger läuft schneller: 4,5 % mehr Schuss pro Minute.",
+			"Un amortiguador de 3,8 oz, 0,8 oz más ligero que el H2 del M4A1. El portacerrojo cicla más rápido: un 4,5 % más de disparos por minuto.",
+			"Um amortecedor de 3,8 oz, 0,8 oz mais leve que o H2 da M4A1. O transportador do ferrolho cicla mais rápido: 4,5% mais disparos por minuto." ),
+		["A 5.4 oz buffer, 0.8 oz heavier than the M4A1's H2, often fitted to slow a suppressed gun down. The bolt carrier cycles slower: 4% fewer rounds a minute."] = (
+			"Un amortisseur de 5,4 oz, 0,8 oz plus lourd que le H2 du M4A1, souvent monté pour ralentir une arme silencieuse. Le porte-culasse cycle plus lentement : 4 % de coups en moins par minute.",
+			"Ein Puffer mit 5,4 oz, 0,8 oz schwerer als der H2 des M4A1, oft verbaut, um eine schallgedämpfte Waffe zu bremsen. Der Verschlussträger läuft langsamer: 4 % weniger Schuss pro Minute.",
+			"Un amortiguador de 5,4 oz, 0,8 oz más pesado que el H2 del M4A1, que se suele montar para frenar un arma con supresor. El portacerrojo cicla más despacio: un 4 % menos de disparos por minuto.",
+			"Um amortecedor de 5,4 oz, 0,8 oz mais pesado que o H2 da M4A1, muitas vezes montado para desacelerar uma arma com supressor. O transportador do ferrolho cicla mais devagar: 4% menos disparos por minuto." ),
+		["The M4's fire control group: semi-automatic and three-round burst in place of automatic."] = (
+			"Le groupe de détente du M4 : semi-automatique et rafale de trois coups au lieu de l'automatique.",
+			"Die Abzugsgruppe des M4: Einzelfeuer und Dreischuss-Feuerstoß statt Dauerfeuer.",
+			"El grupo de disparo del M4: semiautomático y ráfaga de tres disparos en lugar de automático.",
+			"O grupo do gatilho do M4: semiautomático e rajada de três disparos no lugar do automático." ),
+		["The M16A3's fire control group: semi-automatic and automatic in place of the three-round burst."] = (
+			"Le groupe de détente du M16A3 : semi-automatique et automatique au lieu de la rafale de trois coups.",
+			"Die Abzugsgruppe des M16A3: Einzelfeuer und Dauerfeuer statt des Dreischuss-Feuerstoßes.",
+			"El grupo de disparo del M16A3: semiautomático y automático en lugar de la ráfaga de tres disparos.",
+			"O grupo do gatilho do M16A3: semiautomático e automático no lugar da rajada de três disparos." ),
+		["An adjustable gas regulator, set for a suppressor: less gas reaches the piston, cancelling the can's back-pressure, so the rate doesn't rise 10%. Without a suppressor it's on its normal setting."] = (
+			"Un régulateur de gaz réglable, en position silencieux : moins de gaz atteint le piston, ce qui compense la contre-pression du silencieux, donc la cadence n'augmente pas de 10 %. Sans silencieux, il reste en position normale.",
+			"Ein verstellbarer Gasregler in der Schalldämpferstellung: Weniger Gas erreicht den Kolben und gleicht den Rückstau des Dämpfers aus, sodass die Kadenz nicht um 10 % steigt. Ohne Schalldämpfer steht er auf normal.",
+			"Un regulador de gases ajustable, en la posición para supresor: llega menos gas al pistón, lo que compensa la contrapresión del supresor, así que la cadencia no sube un 10 %. Sin supresor, queda en la posición normal.",
+			"Um regulador de gás ajustável, na posição para supressor: menos gás chega ao pistão, compensando a contrapressão do supressor, então a cadência não sobe 10%. Sem supressor, fica na posição normal." ),
 		["The 30-round magazine of the FAL's heavy-barrel squad rifle. Longer and heavier. Reloads in 2.67s (3.57s when empty)."] = (
 			"Le chargeur de 30 cartouches du fusil d'appui à canon lourd du FAL. Plus long et plus lourd. Rechargement en 2,67 s (3,57 s à vide).",
 			"Das 30-Schuss-Magazin des FAL-Gruppengewehrs mit schwerem Lauf. Länger und schwerer. Nachladen in 2,67 s (3,57 s wenn leer).",

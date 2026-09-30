@@ -162,6 +162,9 @@ public static partial class GameText
 		["Rear Grip"] = "Impugnatura posteriore",
 		["Grip"] = "Impugnatura",
 		["Laser"] = "Laser",
+		["Rail"] = "Slitta",
+		["Action"] = "Meccanismo",
+		["Trigger"] = "Grilletto",
 		["Ammunition"] = "Munizioni",
 		["Ammo"] = "Munizioni",
 		["Armour"] = "Corazza",
@@ -502,6 +505,18 @@ public static partial class GameText
 		["Textured rubber grip. 2% less recoil."] = "Impugnatura in gomma zigrinata. Rinculo ridotto del 2%.",
 		["The 18-inch barrel of the folding-stock 50.62, with a short flash hider. Damage falls off 5% earlier at distance."] =
 			"La canna da 18 pollici del 50.62 a calcio pieghevole, con uno spegnifiamma corto. I danni calano il 5% prima con la distanza.",
+		["A standard 3.0 oz carbine buffer, 1.6 oz lighter than the M4A1's H2. The bolt carrier cycles faster: 9.5% more rounds a minute."] =
+			"Un buffer da carabina standard da 3,0 oz, 1,6 oz più leggero dell'H2 dell'M4A1. Il portaotturatore cicla più in fretta: il 9,5% di colpi in più al minuto.",
+		["A 3.8 oz buffer, 0.8 oz lighter than the M4A1's H2. The bolt carrier cycles faster: 4.5% more rounds a minute."] =
+			"Un buffer da 3,8 oz, 0,8 oz più leggero dell'H2 dell'M4A1. Il portaotturatore cicla più in fretta: il 4,5% di colpi in più al minuto.",
+		["A 5.4 oz buffer, 0.8 oz heavier than the M4A1's H2, often fitted to slow a suppressed gun down. The bolt carrier cycles slower: 4% fewer rounds a minute."] =
+			"Un buffer da 5,4 oz, 0,8 oz più pesante dell'H2 dell'M4A1, spesso montato per rallentare un'arma silenziata. Il portaotturatore cicla più piano: il 4% di colpi in meno al minuto.",
+		["The M4's fire control group: semi-automatic and three-round burst in place of automatic."] =
+			"Il gruppo di scatto dell'M4: semiautomatico e raffica da tre colpi al posto dell'automatico.",
+		["The M16A3's fire control group: semi-automatic and automatic in place of the three-round burst."] =
+			"Il gruppo di scatto dell'M16A3: semiautomatico e automatico al posto della raffica da tre colpi.",
+		["An adjustable gas regulator, set for a suppressor: less gas reaches the piston, cancelling the can's back-pressure, so the rate doesn't rise 10%. Without a suppressor it's on its normal setting."] =
+			"Un regolatore del gas regolabile, impostato per il silenziatore: meno gas raggiunge il pistone e compensa la contropressione del silenziatore, così la cadenza non sale del 10%. Senza silenziatore resta sull'impostazione normale.",
 		["The 30-round magazine of the FAL's heavy-barrel squad rifle. Longer and heavier. Reloads in 2.67s (3.57s when empty)."] =
 			"Il caricatore da 30 colpi del fucile di squadra a canna pesante del FAL. Più lungo e più pesante. Ricarica in 2,67 s (3,57 s a vuoto).",
 		["The AK-74's standard pistol grip. No effect on recoil."] =

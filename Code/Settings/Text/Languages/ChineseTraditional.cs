@@ -159,6 +159,9 @@ public static partial class GameText
 		["Rear Grip"] = "後握把",
 		["Grip"] = "握把",
 		["Laser"] = "雷射",
+		["Rail"] = "導軌",
+		["Action"] = "自動機構",
+		["Trigger"] = "扳機",
 		["Ammunition"] = "彈藥",
 		["Ammo"] = "彈藥",
 		["Armour"] = "護甲",
@@ -484,6 +487,18 @@ public static partial class GameText
 		["Textured rubber grip. 2% less recoil."] = "紋理橡膠握把。後座力降低 2%。",
 		["The 18-inch barrel of the folding-stock 50.62, with a short flash hider. Damage falls off 5% earlier at distance."] =
 			"折疊槍托型 50.62 的 18 英寸槍管，配短消焰器。傷害衰減距離縮短 5%。",
+		["A standard 3.0 oz carbine buffer, 1.6 oz lighter than the M4A1's H2. The bolt carrier cycles faster: 9.5% more rounds a minute."] =
+			"標準 3.0 盎司卡賓槍緩衝器，比 M4A1 的 H2 輕 1.6 盎司。槍機框循環更快：射速提高 9.5%。",
+		["A 3.8 oz buffer, 0.8 oz lighter than the M4A1's H2. The bolt carrier cycles faster: 4.5% more rounds a minute."] =
+			"3.8 盎司緩衝器，比 M4A1 的 H2 輕 0.8 盎司。槍機框循環更快：射速提高 4.5%。",
+		["A 5.4 oz buffer, 0.8 oz heavier than the M4A1's H2, often fitted to slow a suppressed gun down. The bolt carrier cycles slower: 4% fewer rounds a minute."] =
+			"5.4 盎司緩衝器，比 M4A1 的 H2 重 0.8 盎司，常用於讓加裝滅音器的槍慢下來。槍機框循環更慢：射速降低 4%。",
+		["The M4's fire control group: semi-automatic and three-round burst in place of automatic."] =
+			"M4 的擊發機組件：以半自動和三發點放取代全自動。",
+		["The M16A3's fire control group: semi-automatic and automatic in place of the three-round burst."] =
+			"M16A3 的擊發機組件：以半自動和全自動取代三發點放。",
+		["An adjustable gas regulator, set for a suppressor: less gas reaches the piston, cancelling the can's back-pressure, so the rate doesn't rise 10%. Without a suppressor it's on its normal setting."] =
+			"調到滅音器檔的可調氣體調節器：進入活塞的火藥氣體減少，抵銷滅音器的背壓，因此射速不會提高 10%。不裝滅音器時處於普通檔。",
 		["The 30-round magazine of the FAL's heavy-barrel squad rifle. Longer and heavier. Reloads in 2.67s (3.57s when empty)."] =
 			"FAL 重槍管班用支援步槍的 30 發彈匣。更長更重。裝填需 2.67 秒（空倉時 3.57 秒）。",
 		["The AK-74's standard pistol grip. No effect on recoil."] = "AK-74 的標準手槍握把。不影響後座力。",

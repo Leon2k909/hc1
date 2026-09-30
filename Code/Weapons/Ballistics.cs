@@ -18,7 +18,8 @@ public static class Ballistics
 
 	// ICAO standard atmosphere at sea level: 15 C, 1013.25 hPa, dry. The drag constant is the air's density (1.225 kg/m3)
 	// times pi / 8, over 703.07 (1 lb/in2 in kg/m2) since ballistic coefficients are published in lb/in2.
-	private const float SpeedOfSound = 340.29f;
+	/// <summary>The speed of sound in that air, in m/s.</summary>
+	public const float SpeedOfSound = 340.29f;
 	private const float DragConstant = 6.84222e-4f;
 	private const float Gravity = 9.80665f;
 	private const float TimeStep = 0.001f;
@@ -32,8 +33,12 @@ public static class Ballistics
 		/// <summary>Time of flight, in seconds.</summary>
 		public float[] Time { get; init; }
 
+		/// <summary>The bullet's speed, in m/s.</summary>
+		public float[] Speed { get; init; }
+
 		public float DropAt( float metres ) => Sample( Drop, metres );
 		public float TimeAt( float metres ) => Sample( Time, metres );
+		public float SpeedAt( float metres ) => Sample( Speed, metres );
 
 		private static float Sample( float[] values, float metres )
 		{
@@ -49,7 +54,8 @@ public static class Ballistics
 	public static Trajectory Get( DragFunction drag, float muzzleVelocity, float ballisticCoefficient )
 	{
 		var key = (drag, muzzleVelocity, ballisticCoefficient);
-		if ( !Solved.TryGetValue( key, out var trajectory ) )
+		// A path solved before a hotload added a table has it missing: solve it again.
+		if ( !Solved.TryGetValue( key, out var trajectory ) || trajectory.Speed is null )
 			Solved[key] = trajectory = Solve( drag, muzzleVelocity, ballisticCoefficient );
 		return trajectory;
 	}
@@ -59,6 +65,8 @@ public static class Ballistics
 	{
 		var drop = new float[SolvedRange + 1];
 		var time = new float[SolvedRange + 1];
+		var speeds = new float[SolvedRange + 1];
+		speeds[0] = muzzleVelocity;
 		var table = drag switch { DragFunction.G7 => G7, DragFunction.Sphere => GS, _ => G1 };
 		var k = DragConstant / ballisticCoefficient;
 
@@ -80,14 +88,17 @@ public static class Ballistics
 			var a4 = Acceleration( vx + TimeStep * a3.X, vy + TimeStep * a3.Y );
 			var nx = x + TimeStep / 6f * (vx + 2f * (vx + 0.5f * TimeStep * a1.X) + 2f * (vx + 0.5f * TimeStep * a2.X) + (vx + TimeStep * a3.X));
 			var ny = y + TimeStep / 6f * (vy + 2f * (vy + 0.5f * TimeStep * a1.Y) + 2f * (vy + 0.5f * TimeStep * a2.Y) + (vy + TimeStep * a3.Y));
+			var speed = MathF.Sqrt( vx * vx + vy * vy );
 			vx += TimeStep / 6f * (a1.X + 2f * a2.X + 2f * a3.X + a4.X);
 			vy += TimeStep / 6f * (a1.Y + 2f * a2.Y + 2f * a3.Y + a4.Y);
+			var nextSpeed = MathF.Sqrt( vx * vx + vy * vy );
 
 			for ( ; metre <= SolvedRange && nx >= metre; metre++ )
 			{
 				var f = (metre - x) / (nx - x);
 				drop[metre] = -(y + f * (ny - y));
 				time[metre] = t + f * TimeStep;
+				speeds[metre] = speed + f * (nextSpeed - speed);
 			}
 
 			x = nx;
@@ -100,9 +111,10 @@ public static class Ballistics
 		{
 			drop[metre] = drop[metre - 1];
 			time[metre] = time[metre - 1];
+			speeds[metre] = 0f;
 		}
 
-		return new Trajectory { Drop = drop, Time = time };
+		return new Trajectory { Drop = drop, Time = time, Speed = speeds };
 	}
 
 	/// <summary>A drag table's drag coefficient at a Mach number, straight between its points.</summary>

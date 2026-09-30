@@ -160,6 +160,9 @@ public static partial class GameText
 		["Rear Grip"] = "후방 손잡이",
 		["Grip"] = "손잡이",
 		["Laser"] = "레이저",
+		["Rail"] = "레일",
+		["Action"] = "작동 기구",
+		["Trigger"] = "방아쇠",
 		["Ammunition"] = "탄약",
 		["Ammo"] = "탄약",
 		["Armour"] = "방어구",
@@ -500,6 +503,18 @@ public static partial class GameText
 		["Textured rubber grip. 2% less recoil."] = "질감 처리된 고무 손잡이입니다. 반동이 2% 감소합니다.",
 		["The 18-inch barrel of the folding-stock 50.62, with a short flash hider. Damage falls off 5% earlier at distance."] =
 			"접이식 개머리판 모델인 50.62의 18인치 총열로, 짧은 소염기가 달려 있습니다. 피해 감쇠가 5% 더 가까운 거리에서 시작됩니다.",
+		["A standard 3.0 oz carbine buffer, 1.6 oz lighter than the M4A1's H2. The bolt carrier cycles faster: 9.5% more rounds a minute."] =
+			"표준 3.0온스 카빈 버퍼로, M4A1의 H2보다 1.6온스 가볍습니다. 볼트 캐리어가 더 빠르게 작동해 분당 발사 수가 9.5% 늘어납니다.",
+		["A 3.8 oz buffer, 0.8 oz lighter than the M4A1's H2. The bolt carrier cycles faster: 4.5% more rounds a minute."] =
+			"3.8온스 버퍼로, M4A1의 H2보다 0.8온스 가볍습니다. 볼트 캐리어가 더 빠르게 작동해 분당 발사 수가 4.5% 늘어납니다.",
+		["A 5.4 oz buffer, 0.8 oz heavier than the M4A1's H2, often fitted to slow a suppressed gun down. The bolt carrier cycles slower: 4% fewer rounds a minute."] =
+			"5.4온스 버퍼로, M4A1의 H2보다 0.8온스 무거우며 소음기를 단 총의 속도를 늦추려고 자주 씁니다. 볼트 캐리어가 더 느리게 작동해 분당 발사 수가 4% 줄어듭니다.",
+		["The M4's fire control group: semi-automatic and three-round burst in place of automatic."] =
+			"M4의 격발 기구입니다. 자동 대신 반자동과 3점사를 씁니다.",
+		["The M16A3's fire control group: semi-automatic and automatic in place of the three-round burst."] =
+			"M16A3의 격발 기구입니다. 3점사 대신 반자동과 자동을 씁니다.",
+		["An adjustable gas regulator, set for a suppressor: less gas reaches the piston, cancelling the can's back-pressure, so the rate doesn't rise 10%. Without a suppressor it's on its normal setting."] =
+			"소음기용으로 맞춘 조절식 가스 레귤레이터입니다. 피스톤에 닿는 가스가 줄어 소음기의 배압을 상쇄하므로 연사 속도가 10% 오르지 않습니다. 소음기가 없으면 일반 설정으로 둡니다.",
 		["The 30-round magazine of the FAL's heavy-barrel squad rifle. Longer and heavier. Reloads in 2.67s (3.57s when empty)."] =
 			"FAL 중총열 분대 지원 소총의 30발 탄창입니다. 더 길고 무겁습니다. 재장전에 2.67초가 걸립니다(빈 탄창일 때 3.57초).",
 		["The AK-74's standard pistol grip. No effect on recoil."] = "AK-74의 표준 권총 손잡이입니다. 반동에는 영향이 없습니다.",

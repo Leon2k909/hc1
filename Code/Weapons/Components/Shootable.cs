@@ -22,9 +22,10 @@ public partial class Shootable : WeaponInputAction,
 	/// <summary> Cyclic rate in rounds per minute. Set to the real firearm's rate. </summary>
 	[Property, Group( "Bullet" ), EquipmentResourceProperty] public float FireRate { get; set; } = 0.2f;
 	/// <summary>
-	/// Rate multiplier with a suppressor fitted. Back-pressure speeds up gas-operated actions: a lot on a direct-impingement
-	/// AR, less on roller-delayed or long-stroke guns, and not at all on guns with a suppressed gas setting (SCAR) or
-	/// trigger-limited semi-autos.
+	/// Rate multiplier with a suppressor fitted. Back-pressure speeds up gas-operated and blowback actions: ~10% on a
+	/// direct-impingement AR or an AK, ~5% on blowback and roller-delayed SMGs. 1 where the gun's gas can be set for the
+	/// can (the SCAR-H's suppressed setting, the FAL's adjustable regulator) and on semi-only guns, whose rate is the
+	/// trigger finger's. A fitted gas regulator part with a suppressed setting takes it away too (<see cref="SuppressorRateScale"/>).
 	/// </summary>
 	[Property, Group( "Bullet" )] public float SuppressorFireRateScale { get; set; } = 1f;
 	[Property, Group( "Bullet" )] public float DryShootDelay { get; set; } = 0.15f;
@@ -118,6 +119,32 @@ public partial class Shootable : WeaponInputAction,
 	/// How long after we finish a burst until we can shoot again?
 	/// </summary>
 	[Property, Group( "Fire Modes" )] public float BurstEndDelay { get; set; } = 0.2f;
+
+	/// <summary>
+	/// The selector's positions: a fitted fire control group's (<see cref="Equipment.TriggerFireModes"/>, which only the
+	/// owner has), else <see cref="SupportedFireModes"/>.
+	/// </summary>
+	public IReadOnlyList<FireMode> FireModes =>
+		Equipment.IsValid() && Equipment.TriggerFireModes is { Count: > 0 } modes ? modes : SupportedFireModes;
+
+	/// <summary>
+	/// After the fire control group changes: a fire mode the new selector lacks becomes its counterpart (burst for
+	/// automatic and back, as the M4's group and the M4A1's differ), else the selector's first.
+	/// </summary>
+	internal void KeepFireModeFitted()
+	{
+		var modes = FireModes;
+		if ( modes.Count == 0 || modes.Contains( CurrentFireMode ) ) return;
+		var counterpart = CurrentFireMode switch
+		{
+			FireMode.Automatic => FireMode.Burst,
+			FireMode.Burst => FireMode.Automatic,
+			_ => FireMode.Semi
+		};
+		CurrentFireMode = modes.Contains( counterpart ) ? counterpart : modes[0];
+		ClearBurst();
+		Equipment.ViewModel?.OnFireMode( CurrentFireMode );
+	}
 
 	[Sync] public TimeSince TimeSinceFireModeSwitch { get; set; }
 	[Sync] public TimeSince TimeSinceBurstFinished { get; set; }
@@ -266,9 +293,10 @@ public partial class Shootable : WeaponInputAction,
 			impact.Transform.ClearInterpolation();
 		}
 
-		// What the round strikes, by its material (Tools/world_sounds.py).
+		// What the round strikes, by its material (Tools/world_sounds.py), heard once the round has got there and the
+		// sound has come back.
 		if ( WorldSounds.BulletImpact( tr, surface ) is { } sound )
-			Sound.Play( sound, pos );
+			GunshotAudio.PlayDelayed( sound, pos, ImpactSoundDelay( pos ) );
 	}
 
 	/// <summary>
@@ -308,6 +336,7 @@ public partial class Shootable : WeaponInputAction,
 		new Tec.AI.AudioStim( Player.Team.ToFaction(), Player.WorldPosition, 30000f * hearingScale,
 			AudioStim.AudioStimType.Shoot, AudioStim.AudioStimDurationType.Finite, 1f );
 
+		_flybys.Clear();
 		for ( int i = 0; i < BulletCount; i++ )
 		{
 			int count = 0;
@@ -320,6 +349,10 @@ public partial class Shootable : WeaponInputAction,
 
 				if ( trace.Distance == 0 )
 					continue;
+
+				// Where the round stops, for its crack: the last thing it meets that isn't glass.
+				if ( _flybys.Count > 0 && trace.GameObject?.GetComponent<BreakableGlass>() is null )
+					_flybys[^1] = new Flyby( trace.EndPosition, true );
 
 				// The trace's box touches several of a body's hitboxes (both legs and the pelvis at once), but the bullet
 				// hits that body once, where its line goes.
@@ -359,6 +392,8 @@ public partial class Shootable : WeaponInputAction,
 				count++;
 			}
 		}
+
+		SendFlybys();
 
 		// If we have a recoil function, let it know.
 		var recoil = Equipment.GetComponentInChildren<ShootRecoil>();
@@ -485,6 +520,7 @@ public partial class Shootable : WeaponInputAction,
 	{
 		var start = WeaponRay.Position;
 		var rot = Rotation.LookAt( WeaponRay.Forward );
+		_flybyOrigin = start;
 
 		var forward = rot.Forward;
 		forward += (Vector3.Random + Vector3.Random + Vector3.Random + Vector3.Random) * (BulletSpread + Equipment.Owner.Spread) * 0.25f;
@@ -494,6 +530,8 @@ public partial class Shootable : WeaponInputAction,
 		ApplyBallistics( ref start, ref forward, rot );
 
 		var end = start + forward * (MaxRange - _pathTravelled);
+		// Until it meets something, the round flies its full range.
+		_flybys.Add( new Flyby( end, false ) );
 		var original = DoTraceBullet( start, end, BulletSize ).ToArray();
 		var firstHit = original.FirstOrDefault( trace => trace.Hit );
 		PlayTracer( firstHit.Hit ? firstHit.EndPosition : end, start );
@@ -542,16 +580,20 @@ public partial class Shootable : WeaponInputAction,
 		// Zombies Hot Shot: a shorter delay between shots means a higher RPM.
 		var perkScale = 1f / ZombiesPlayerState.FireDelayScale( Equipment?.Owner );
 
-		var partScale = GunsmithAttachmentEffects.For( Equipment ).FireRate;
+		var parts = GunsmithAttachmentEffects.For( Equipment );
+		var partScale = parts.FireRate;
 		// An integral suppressor is already part of the prefab's rate.
 		if ( !HasBuiltInSuppressor && UseSuppressedEffects() )
-			partScale *= SuppressorFireRateScale;
+			partScale *= SuppressorRateScale( parts );
 
 		var rate = FireRate * partScale * perkScale;
 		if ( string.IsNullOrEmpty( TuningId ) ) return rate;
 		var tune = WeaponTuningManager.GetTuning( TuningId );
 		return rate * (1f + tune.FireRate * 0.012f);
 	}
+
+	/// <summary> A suppressor's back-pressure on the rate, unless a fitted gas regulator is on its suppressed setting. </summary>
+	public float SuppressorRateScale( GunsmithAttachmentEffects parts ) => parts.SuppressedGas ? 1f : SuppressorFireRateScale;
 
 	protected float RPMToSeconds()
 	{
@@ -662,7 +704,7 @@ public partial class Shootable : WeaponInputAction,
 	protected int GetFireModeIndex( FireMode fireMode )
 	{
 		int i = 0;
-		foreach ( var mode in SupportedFireModes )
+		foreach ( var mode in FireModes )
 		{
 			if ( mode == fireMode ) return i;
 			i++;
@@ -678,13 +720,14 @@ public partial class Shootable : WeaponInputAction,
 		if ( IsDown() ) return;
 
 		var curIndex = GetFireModeIndex( CurrentFireMode );
-		var length = SupportedFireModes.Count;
+		var modes = FireModes;
+		var length = modes.Count;
 		var newIndex = (curIndex + 1 + length) % length;
 
 		// We didn't change anything
 		if ( newIndex == curIndex ) return;
 
-		CurrentFireMode = SupportedFireModes[newIndex];
+		CurrentFireMode = modes[newIndex];
 
 		Equipment.ViewModel?.OnFireMode( CurrentFireMode );
 

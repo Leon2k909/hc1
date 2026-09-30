@@ -214,6 +214,8 @@ public static partial class GameText
 		["Rear Grip"] = ("Poignée arrière", "Hinterer Griff", "Empuñadura trasera", "Empunhadura traseira"),
 		["Grip"] = ("Poignée", "Griff", "Empuñadura", "Empunhadura"),
 		["Laser"] = ("Laser", "Laser", "Láser", "Laser"),
+		["Action"] = ("Mécanisme", "Mechanik", "Mecanismo", "Mecanismo"),
+		["Trigger"] = ("Détente", "Abzug", "Gatillo", "Gatilho"),
 		["Ammunition"] = ("Munitions", "Munition", "Munición", "Munição"),
 		["Ammo"] = ("Munitions", "Munition", "Munición", "Munição"),
 		["Armour"] = ("Armure", "Panzerung", "Blindaje", "Blindagem"),

@@ -162,6 +162,9 @@ public static partial class GameText
 		["Rear Grip"] = "Задняя рукоятка",
 		["Grip"] = "Рукоятка",
 		["Laser"] = "Лазер",
+		["Rail"] = "Планка",
+		["Action"] = "Механизм",
+		["Trigger"] = "Спуск",
 		["Ammunition"] = "Боеприпасы",
 		["Ammo"] = "Патроны",
 		["Armour"] = "Броня",
@@ -499,6 +502,18 @@ public static partial class GameText
 		["Textured rubber grip. 2% less recoil."] = "Резиновая рукоятка с насечкой. Отдача слабее на 2%.",
 		["The 18-inch barrel of the folding-stock 50.62, with a short flash hider. Damage falls off 5% earlier at distance."] =
 			"18-дюймовый ствол модели 50.62 со складным прикладом, с коротким пламегасителем. Урон начинает падать на 5% ближе.",
+		["A standard 3.0 oz carbine buffer, 1.6 oz lighter than the M4A1's H2. The bolt carrier cycles faster: 9.5% more rounds a minute."] =
+			"Стандартный карабинный буфер 3,0 унции, на 1,6 унции легче H2 у M4A1. Затворная рама ходит быстрее: на 9,5% больше выстрелов в минуту.",
+		["A 3.8 oz buffer, 0.8 oz lighter than the M4A1's H2. The bolt carrier cycles faster: 4.5% more rounds a minute."] =
+			"Буфер 3,8 унции, на 0,8 унции легче H2 у M4A1. Затворная рама ходит быстрее: на 4,5% больше выстрелов в минуту.",
+		["A 5.4 oz buffer, 0.8 oz heavier than the M4A1's H2, often fitted to slow a suppressed gun down. The bolt carrier cycles slower: 4% fewer rounds a minute."] =
+			"Буфер 5,4 унции, на 0,8 унции тяжелее H2 у M4A1, его часто ставят, чтобы замедлить оружие с глушителем. Затворная рама ходит медленнее: на 4% меньше выстрелов в минуту.",
+		["The M4's fire control group: semi-automatic and three-round burst in place of automatic."] =
+			"Ударно-спусковой механизм M4: одиночный огонь и очередь по три выстрела вместо автоматического огня.",
+		["The M16A3's fire control group: semi-automatic and automatic in place of the three-round burst."] =
+			"Ударно-спусковой механизм M16A3: одиночный и автоматический огонь вместо очереди по три выстрела.",
+		["An adjustable gas regulator, set for a suppressor: less gas reaches the piston, cancelling the can's back-pressure, so the rate doesn't rise 10%. Without a suppressor it's on its normal setting."] =
+			"Регулируемый газовый регулятор в положении для глушителя: к поршню доходит меньше газа, что гасит противодавление глушителя, и темп не растёт на 10%. Без глушителя стоит в обычном положении.",
 		["The 30-round magazine of the FAL's heavy-barrel squad rifle. Longer and heavier. Reloads in 2.67s (3.57s when empty)."] =
 			"Магазин на 30 патронов от тяжелоствольной версии FAL для поддержки отделения. Длиннее и тяжелее. Перезарядка за 2,67 с (3,57 с, если магазин пуст).",
 		["The AK-74's standard pistol grip. No effect on recoil."] =

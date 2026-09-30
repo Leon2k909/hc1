@@ -475,7 +475,8 @@
     {
         GunsmithPartType.Muzzle => 0, GunsmithPartType.Barrel => 1, GunsmithPartType.Optic => 2,
         GunsmithPartType.Underbarrel => 3, GunsmithPartType.Magazine => 4, GunsmithPartType.RearGrip => 5,
-        GunsmithPartType.Stock => 6, GunsmithPartType.Laser => 7, GunsmithPartType.Ammunition => 8, _ => 9
+        GunsmithPartType.Stock => 6, GunsmithPartType.Laser => 7, GunsmithPartType.Action => 8, GunsmithPartType.Trigger => 9,
+        GunsmithPartType.Ammunition => 10, _ => 11
     };
 
     // "PRIMARY · LV 5", built here: a "·" in the markup between two values was dropped.
@@ -491,7 +492,8 @@
         GunsmithPartType.Optic => "filter_center_focus", GunsmithPartType.Muzzle => "volume_off",
         GunsmithPartType.Barrel => "straighten", GunsmithPartType.Stock => "view_week",
         GunsmithPartType.Underbarrel => "pan_tool", GunsmithPartType.RearGrip => "back_hand",
-        GunsmithPartType.Magazine => "view_stream", GunsmithPartType.Ammunition => "linear_scale", GunsmithPartType.Laser => "flare", _ => "build"
+        GunsmithPartType.Magazine => "view_stream", GunsmithPartType.Ammunition => "linear_scale", GunsmithPartType.Laser => "flare",
+        GunsmithPartType.Action => "autorenew", GunsmithPartType.Trigger => "touch_app", _ => "build"
     };
 
     private static string Describe( GunsmithPartType category, GunsmithPart part ) => GunsmithAttachmentEffects.Describe( part ) is { } effects ? Tr( effects )

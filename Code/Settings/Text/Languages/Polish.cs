@@ -162,6 +162,9 @@ public static partial class GameText
 		["Rear Grip"] = "Tylny chwyt",
 		["Grip"] = "Chwyt",
 		["Laser"] = "Laser",
+		["Rail"] = "Szyna",
+		["Action"] = "Mechanizm",
+		["Trigger"] = "Spust",
 		["Ammunition"] = "Amunicja",
 		["Ammo"] = "Amunicja",
 		["Armour"] = "Pancerz",
@@ -499,6 +502,18 @@ public static partial class GameText
 		["Textured rubber grip. 2% less recoil."] = "Gumowy chwyt z fakturą. Odrzut mniejszy o 2%.",
 		["The 18-inch barrel of the folding-stock 50.62, with a short flash hider. Damage falls off 5% earlier at distance."] =
 			"18-calowa lufa wersji 50.62 ze składaną kolbą, z krótkim tłumikiem płomienia. Obrażenia spadają z odległością 5% wcześniej.",
+		["A standard 3.0 oz carbine buffer, 1.6 oz lighter than the M4A1's H2. The bolt carrier cycles faster: 9.5% more rounds a minute."] =
+			"Standardowy bufor karabinkowy 3,0 oz, o 1,6 oz lżejszy od H2 w M4A1. Suwadło pracuje szybciej: 9,5% więcej strzałów na minutę.",
+		["A 3.8 oz buffer, 0.8 oz lighter than the M4A1's H2. The bolt carrier cycles faster: 4.5% more rounds a minute."] =
+			"Bufor 3,8 oz, o 0,8 oz lżejszy od H2 w M4A1. Suwadło pracuje szybciej: 4,5% więcej strzałów na minutę.",
+		["A 5.4 oz buffer, 0.8 oz heavier than the M4A1's H2, often fitted to slow a suppressed gun down. The bolt carrier cycles slower: 4% fewer rounds a minute."] =
+			"Bufor 5,4 oz, o 0,8 oz cięższy od H2 w M4A1, często montowany, by spowolnić broń z tłumikiem. Suwadło pracuje wolniej: 4% mniej strzałów na minutę.",
+		["The M4's fire control group: semi-automatic and three-round burst in place of automatic."] =
+			"Mechanizm spustowy M4: ogień pojedynczy i seria trzystrzałowa zamiast ognia ciągłego.",
+		["The M16A3's fire control group: semi-automatic and automatic in place of the three-round burst."] =
+			"Mechanizm spustowy M16A3: ogień pojedynczy i ciągły zamiast serii trzystrzałowej.",
+		["An adjustable gas regulator, set for a suppressor: less gas reaches the piston, cancelling the can's back-pressure, so the rate doesn't rise 10%. Without a suppressor it's on its normal setting."] =
+			"Regulowany regulator gazowy ustawiony pod tłumik: do tłoka dociera mniej gazu, co znosi przeciwciśnienie tłumika, więc szybkostrzelność nie rośnie o 10%. Bez tłumika pracuje na ustawieniu normalnym.",
 		["The 30-round magazine of the FAL's heavy-barrel squad rifle. Longer and heavier. Reloads in 2.67s (3.57s when empty)."] =
 			"Magazynek na 30 naboi z ciężkolufowego karabinu drużynowego FAL. Dłuższy i cięższy. Przeładowanie w 2,67 s (3,57 s, gdy pusty).",
 		["The AK-74's standard pistol grip. No effect on recoil."] =

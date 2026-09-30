@@ -113,7 +113,7 @@ public sealed record GunsmithStats
 		// Shootable.GetEffectiveFireRate: an integral suppressor is already part of the prefab's rate.
 		var rpm = shootable.FireRate * parts.FireRate;
 		if ( suppressed && !shootable.HasBuiltInSuppressor )
-			rpm *= shootable.SuppressorFireRateScale;
+			rpm *= shootable.SuppressorRateScale( parts );
 		rpm *= 1f + tune.FireRate * 0.012f;
 
 		var viewModel = resource.ViewModelPrefab.IsValid() ? resource.ViewModelPrefab.GetComponentInChildren<ViewModel>( true ) : null;
@@ -189,7 +189,7 @@ public sealed record GunsmithStats
 			Control = control,
 			ControlText = $"{control * 100f:0}",
 			Rounds = rounds,
-			FireModeText = bolt ? "BOLT-ACTION" : FireModes( shootable.SupportedFireModes ),
+			FireModeText = bolt ? "BOLT-ACTION" : FireModes( build ? BuildFireModes( resource, shootable ) : shootable.SupportedFireModes ),
 			Tags = string.Join( "|", tags.Take( 3 ) ),
 			BulletDamage = damage,
 			Pellets = pellets,
@@ -212,6 +212,11 @@ public sealed record GunsmithStats
 	}
 
 	/// <summary> Shootable.UseSuppressedEffects, for the saved build rather than a spawned gun. </summary>
+	/// <summary> Equipment.TriggerFireModes: a fitted fire control group's selector, else the weapon's own. </summary>
+	private static IReadOnlyList<FireMode> BuildFireModes( EquipmentResource resource, Shootable shootable ) =>
+		GunsmithLoadoutManager.TryGetAttachment( resource, GunsmithPartType.Trigger, out var trigger ) && trigger.IsValid()
+			&& trigger.FireModes is { Count: > 0 } ? trigger.FireModes : shootable.SupportedFireModes;
+
 	private static bool HasSuppressor( EquipmentResource resource, Shootable shootable )
 	{
 		if ( GunsmithLoadoutManager.TryGetAttachment( resource, GunsmithPartType.Muzzle, out var muzzle ) && muzzle.IsValid() && muzzle.IsSuppressor )
@@ -281,7 +286,7 @@ public sealed record GunsmithStats
 		return (min * min + max * max) / (2f * (max - min));
 	}
 
-	private static string FireModes( List<FireMode> modes )
+	private static string FireModes( IReadOnlyList<FireMode> modes )
 	{
 		if ( modes is null || modes.Count == 0 )
 			return "SEMI-AUTO";

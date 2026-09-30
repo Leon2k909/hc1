@@ -182,7 +182,7 @@
             },
             "FireModeSwitchDelay": 0.3,
             "FireRate": 450,
-            "SuppressorFireRateScale": 1.1,
+            "SuppressorFireRateScale": 1,
             "InAirSpreadMultiplier": 2,
             "InputActions": [
               "Attack1"
@@ -225,7 +225,9 @@
             "DragFunction": "Sphere",
             "BallisticCoefficient": 0.071,
             "SightHeight": 1.92,
-            "ZeroRange": 25
+            "ZeroRange": 25,
+            "BulletDiameter": 8.38,
+            "BulletLength": 8.38
           },
           {
             "__type": "Facepunch.Reloadable",

@@ -17,6 +17,12 @@ public partial class Shootable
 	/// <summary>The gun's standard zero, in metres: where the path comes back down through the line of sight.</summary>
 	[Property, Group( "Ballistics" )] public float ZeroRange { get; set; }
 
+	/// <summary>The bullet's diameter, in mm. With <see cref="BulletLength"/>, it sets how loud its supersonic crack is and how long it lasts (<see cref="BulletFlyby"/>).</summary>
+	[Property, Group( "Ballistics" )] public float BulletDiameter { get; set; }
+
+	/// <summary>The bullet's length, in mm (a buckshot ball's is its diameter).</summary>
+	[Property, Group( "Ballistics" )] public float BulletLength { get; set; }
+
 	/// <summary>How far along the real path the last shot's trace starts, in units, for its damage falloff.</summary>
 	private float _pathTravelled;
 

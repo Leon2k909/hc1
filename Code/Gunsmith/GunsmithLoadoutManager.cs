@@ -685,16 +685,22 @@ public static class GunsmithLoadoutManager
 		}
 
 		var attachmentPoints = root.Components.GetAll<GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants ).ToList();
-		// Ammunition is a loadout option, so its preview slot needs no external mesh or mounting socket.
-		if ( root.Components.Get<GunsmithWeapon>( FindMode.EverythingInSelf ).IsValid()
-			&& !attachmentPoints.Any( x => x.Category == GunsmithPartType.Ammunition )
-			&& ResourceLibrary.GetAll<GunsmithPart>().Any( x => x.Category == GunsmithPartType.Ammunition && x.Supports( resource ) ) )
+		// Ammunition, the action and the trigger are loadout options, so their preview slots need no external mesh or
+		// mounting socket (AttachmentUnlocks.IsInternalSlot).
+		if ( root.Components.Get<GunsmithWeapon>( FindMode.EverythingInSelf ).IsValid() )
 		{
-			var slot = new GameObject( root, true, "Ammunition" );
-			slot.Flags |= GameObjectFlags.NotSaved | GameObjectFlags.NotNetworked;
-			var point = slot.Components.Create<GunsmithAttachmentPoint>();
-			point.Category = GunsmithPartType.Ammunition;
-			attachmentPoints.Add( point );
+			foreach ( var category in new[] { GunsmithPartType.Action, GunsmithPartType.Trigger, GunsmithPartType.Ammunition } )
+			{
+				if ( attachmentPoints.Any( x => x.Category == category )
+					|| !ResourceLibrary.GetAll<GunsmithPart>().Any( x => x.Category == category && x.Supports( resource ) ) )
+					continue;
+
+				var slot = new GameObject( root, true, category.ToString() );
+				slot.Flags |= GameObjectFlags.NotSaved | GameObjectFlags.NotNetworked;
+				var point = slot.Components.Create<GunsmithAttachmentPoint>();
+				point.Category = category;
+				attachmentPoints.Add( point );
+			}
 		}
 		
 		if ( TryGetAttachment( resource, GunsmithPartType.Barrel, out var barrelPart ) )

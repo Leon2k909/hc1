@@ -277,17 +277,34 @@ def sound_times(frames: dict[int, str]) -> dict[str, str]:
     return {f"{round(frame / 30, 3):g}": f"{SOUNDS_762}/kastov_{name}.sound" for frame, name in frames.items()}
 
 
-def ballistics(velocity: float, drag: str, coefficient: float, sight_mm: float, zero: float) -> dict:
+def ballistics(velocity: float, drag: str, coefficient: float, sight_mm: float, zero: float,
+               bullet: tuple[float, float]) -> dict:
     """Shootable's real bullet path (Shootable.Ballistics.cs): the load's muzzle velocity from this barrel (m/s), its
-    bullet's ballistic coefficient for the G1 or G7 drag function, the sights' height over the bore and the gun's zero (m)."""
+    bullet's ballistic coefficient for the G1 or G7 drag function, the sights' height over the bore, the gun's zero (m)
+    and the bullet's diameter and length (mm, one of the loads below), which set its supersonic crack (BulletFlyby.cs)."""
     return {"MuzzleVelocity": velocity, "DragFunction": drag, "BallisticCoefficient": coefficient,
-            "SightHeight": round(sight_mm / 25.4, 2), "ZeroRange": zero}
+            "SightHeight": round(sight_mm / 25.4, 2), "ZeroRange": zero,
+            "BulletDiameter": bullet[0], "BulletLength": bullet[1]}
+
+
+# Bullets' diameters and lengths (mm), from the loads' drawings and published dimensions.
+M855_BULLET = (5.70, 23.0)      # 5.56x45 M855, 62 gr
+M193_BULLET = (5.70, 19.0)      # 5.56x45 M193, 55 gr
+PS_BULLET = (7.92, 26.8)        # 7.62x39 PS (57-N-231)
+N7N6_BULLET = (5.60, 25.5)      # 5.45x39 7N6
+M80_BULLET = (7.82, 28.7)       # 7.62x51 M80, 147 gr
+NINE_BULLET = (9.02, 15.5)      # 9x19, 124 gr FMJ
+M1152_BULLET = (9.02, 14.7)     # 9x19 M1152, 115 gr FMJ
+MAKAROV_BULLET = (9.27, 11.5)   # 9x18 57-N-181S
+SS190_BULLET = (5.70, 21.6)     # 5.7x28 SS190
+DM11_BULLET = (4.65, 16.5)      # 4.6x30 DM11 (the length is an estimate)
+BUCK_00_BALL = (8.38, 8.38)     # 00 buckshot: a sphere
 
 
 # 7.62x39 PS (57-N-231): G7 0.149 fits the AKM manual's (1970) velocity table, and with a ~50 mm sight height (not
 # published) reproduces its trajectory table to ~1 cm. The AKM's and RPK's battle zero is sight 3 (the AKM's "П"): the
 # path crosses the line of sight again at 300 m, 25 cm high at 100 m.
-PS_BALLISTICS = {"drag": "G7", "coefficient": 0.149, "sight_mm": 50, "zero": 300}
+PS_BALLISTICS = {"drag": "G7", "coefficient": 0.149, "sight_mm": 50, "zero": 300, "bullet": PS_BULLET}
 
 
 def gameplay_762() -> Gameplay:
@@ -322,7 +339,7 @@ def gameplay_vityaz() -> Gameplay:
             "Shootable": {"FireRate": 750, "ShootSound": sounds["fire"],
                           "SuppressedShootSound": sounds["fire_suppressed"],
                           "SupportedFireModes": ["Automatic", "Semi"], "CurrentFireMode": "Automatic",
-                          **ballistics(380, "G1", 0.145, 55, 100)},
+                          **ballistics(380, "G1", 0.145, 55, 100, NINE_BULLET)},
             # Ammo is back in once the gun is level again (2.5s, and 3.2s after the empty reload's bolt pull).
             "Reloadable": {"ReloadTime": 2.5, "EmptyReloadTime": 3.1,
                            "TimedReloadSounds": times(assets["reload_sounds"]),
@@ -356,7 +373,7 @@ def gameplay_bizon() -> Gameplay:
             "Shootable": {"FireRate": 680, "ShootSound": sounds["fire"],
                           "SuppressedShootSound": sounds["fire_suppressed"],
                           "SupportedFireModes": ["Automatic", "Semi"], "CurrentFireMode": "Automatic",
-                          **ballistics(320, "G1", 0.122, 51, 100)},
+                          **ballistics(320, "G1", 0.122, 51, 100, MAKAROV_BULLET)},
             # Ammo is back in once the gun is level again (2.1s, and 2.8s after the empty reload's bolt pull).
             "Reloadable": {"ReloadTime": 2.1, "EmptyReloadTime": 2.8,
                            "TimedReloadSounds": assets["reload_sounds"],
@@ -431,7 +448,7 @@ def gameplay_ak105() -> Gameplay:
         "Shootable": {"BaseDamage": 20, "FireRate": 600, "ShootSound": sounds["fire"],
                       "SuppressedShootSound": sounds["fire_suppressed"],
                       "SupportedFireModes": ["Automatic", "Semi"], "CurrentFireMode": "Automatic",
-                      **ballistics(840, "G7", 0.157, 48.5, 300)},
+                      **ballistics(840, "G7", 0.157, 48.5, 300, N7N6_BULLET)},
         # Ammo is back in once the gun is level again (2.3s, and 2.6s after the empty reload's bolt pull).
         "Reloadable": {"ReloadTime": 2.3, "EmptyReloadTime": 2.6, "TimedReloadSounds": reloads["reload"],
                        "EmptyReloadSounds": reloads["reload_empty"]},
@@ -473,11 +490,12 @@ def gameplay_vepr12() -> Gameplay:
             # automatic), which caps how fast the trigger can be pulled. Nine 8.4 mm, 3.49 g pellets at 365 m/s from the
             # 305 mm barrel. A cylinder bore throws them in a ~49 cm pattern at 25 yd (~0.021 rad across; Shootable's
             # spread puts nine pellets 0.82 x BulletSpread apart on average). The sights sit 48.7 mm over the bore (the
-            # model's sight line), zeroed at 25 m like the other buckshot guns.
-            "Shootable": {"BulletCount": 9, "BulletSpread": 0.026, "FireRate": 450,
+            # model's sight line), zeroed at 25 m like the other buckshot guns. Semi only, so a suppressor's back-pressure
+            # wouldn't change how fast it fires (it takes none, having no Muzzle slot).
+            "Shootable": {"BulletCount": 9, "BulletSpread": 0.026, "FireRate": 450, "SuppressorFireRateScale": 1,
                           "MaxRange": round(BUCKSHOT_RANGE * 39.3701), "BaseDamageFalloff": BUCKSHOT_FALLOFF,
                           "ShootSound": sounds["fire"], "SupportedFireModes": ["Semi"], "CurrentFireMode": "Semi",
-                          **ballistics(365, "Sphere", 0.071, 48.7, 25)},
+                          **ballistics(365, "Sphere", 0.071, 48.7, 25, BUCK_00_BALL)},
             # Ammo is back in once the left hand is back on the grip (the clips' grip-pose events: 2.3s, and 2.87s after
             # the empty reload's bolt pull).
             "Reloadable": {"ReloadTime": 2.3, "EmptyReloadTime": 2.87, "TimedReloadSounds": reloads["reload"],
@@ -519,7 +537,7 @@ def gameplay_m16() -> Gameplay:
         "Shootable": {"BaseDamage": 20, "FireRate": 800, "ShootSound": sounds["fire"],
                       "SuppressedShootSound": sounds["fire_suppressed"],
                       "SupportedFireModes": ["Semi", "Burst"], "CurrentFireMode": "Semi", "BurstAmount": 3,
-                      "BurstEndDelay": 0, **ballistics(945, "G7", 0.151, 68.5, 300)},
+                      "BurstEndDelay": 0, **ballistics(945, "G7", 0.151, 68.5, 300, M855_BULLET)},
         # Ammo is back in once the gun is level again (2.3s, and 2.4s after the empty reload's bolt release).
         "Reloadable": {"ReloadTime": 2.3, "EmptyReloadTime": 2.4, "TimedReloadSounds": reloads["reload"],
                        "EmptyReloadSounds": reloads["reload_empty"]},
@@ -546,7 +564,7 @@ def gameplay_p90() -> Gameplay:
             "Shootable": {"FireRate": 900, "ShootSound": sounds["fire"],
                           "SuppressedShootSound": sounds["fire_suppressed"],
                           "SupportedFireModes": ["Automatic", "Semi"], "CurrentFireMode": "Automatic",
-                          **ballistics(715, "G1", 0.155, 101, 100)},
+                          **ballistics(715, "G1", 0.155, 101, 100, SS190_BULLET)},
             # Ammo is back in once the left hand is back on the grip (the clips' grip-pose events: 2.53s, and 2.93s
             # after the empty reload's charging handle) and the reload's last foley has played.
             "Reloadable": {"ReloadTime": 2.55, "EmptyReloadTime": 3.05, "TimedReloadSounds": reloads["reload"],
@@ -581,7 +599,7 @@ def gameplay_mp7() -> Gameplay:
             "Shootable": {"FireRate": 950, "ShootSound": sounds["fire"],
                           "SuppressedShootSound": sounds["fire_suppressed"],
                           "SupportedFireModes": ["Automatic", "Semi"], "CurrentFireMode": "Automatic",
-                          **ballistics(720, "G1", 0.145, 73.5, 100)},
+                          **ballistics(720, "G1", 0.145, 73.5, 100, DM11_BULLET)},
             # Ammo is back in once the gun is level again (2.1s, and 2.17s after the empty reload's bolt release).
             "Reloadable": {"ReloadTime": 2.1, "EmptyReloadTime": 2.17, "TimedReloadSounds": reloads["reload"],
                            "EmptyReloadSounds": reloads["reload_empty"]},
@@ -626,7 +644,7 @@ def gameplay_uzi() -> Gameplay:
             "Shootable": {"FireRate": 600, "ShootSound": sounds["fire"],
                           "SuppressedShootSound": sounds["fire_suppressed"],
                           "SupportedFireModes": ["Automatic", "Semi"], "CurrentFireMode": "Automatic",
-                          **ballistics(400, "G1", 0.145, 47, 100)},
+                          **ballistics(400, "G1", 0.145, 47, 100, NINE_BULLET)},
             # When the gun is level again in its own clips (tag_sling back within 4 degrees and 0.6 of idle, relative to
             # the camera): 2.53s, and 3.23s after the empty reload's cocking knob pull. The grip-pose events come earlier
             # (2.3s and 2.97s), with the gun still tilted 12 and 27 degrees. The xmag clips level it at the same times.
@@ -664,7 +682,7 @@ def gameplay_aug() -> Gameplay:
         "Shootable": {"BaseDamage": 20, "FireRate": 715, "ShootSound": sounds["fire"],
                       "SuppressedShootSound": sounds["fire_suppressed"],
                       "SupportedFireModes": ["Automatic", "Semi"], "CurrentFireMode": "Automatic",
-                      **ballistics(916, "G7", 0.151, 61.7, 300)},
+                      **ballistics(916, "G7", 0.151, 61.7, 300, M855_BULLET)},
         # Ammo is back in once the left hand is back on the foregrip (the clips' grip-pose events: 1.83s, and 2.97s
         # after the empty reload's charging handle), after the reload's last foley.
         "Reloadable": {"ReloadTime": 1.83, "EmptyReloadTime": 2.97, "TimedReloadSounds": reloads["reload"],
@@ -691,10 +709,12 @@ def gameplay_fal() -> Gameplay:
             # against M855's from the M4 (1,646 J) scales the M4's damage 20 to 41, so in hardcore a body hit at full
             # damage always kills. The sights sit 48.6 mm over the bore (the model's sight line through the rear
             # aperture and the front post's tip), zeroed at 200 m: the rear sight's lowest setting, the battle zero.
-            "Shootable": {"BaseDamage": 41, "FireRate": 675, "ShootSound": sounds["fire"],
+            # A suppressor doesn't speed it up: its gas regulator is set for the gun as it's fitted (FN's procedure closes
+            # it click by click until the bolt just locks back, then two clicks more), so a can's back-pressure is taken out.
+            "Shootable": {"BaseDamage": 41, "FireRate": 675, "SuppressorFireRateScale": 1, "ShootSound": sounds["fire"],
                           "SuppressedShootSound": sounds["fire_suppressed"],
                           "SupportedFireModes": ["Semi", "Automatic"], "CurrentFireMode": "Semi",
-                          **ballistics(840, "G7", 0.200, 48.6, 200)},
+                          **ballistics(840, "G7", 0.200, 48.6, 200, M80_BULLET)},
             # When the gun is level again in its own clips (tag_sling back within 4 degrees and 0.6 of idle, relative to
             # the camera): 2.67s, and 3.4s after the empty reload's charging handle.
             "Reloadable": {"ReloadTime": 2.67, "EmptyReloadTime": 3.4, "TimedReloadSounds": reloads["reload"],
@@ -720,7 +740,7 @@ def gameplay_famas() -> Gameplay:
                       "SuppressedShootSound": sounds["fire_suppressed"],
                       "SupportedFireModes": ["Automatic", "Burst", "Semi"], "CurrentFireMode": "Automatic",
                       "BurstAmount": 3, "BurstEndDelay": 0,
-                      **ballistics(930, "G1", .243, 80, 300)},
+                      **ballistics(930, "G1", .243, 80, 300, M193_BULLET)},
         "Reloadable": {"ReloadTime": 2.3, "EmptyReloadTime": 2.8,
                        "TimedReloadSounds": reloads["reload"], "EmptyReloadSounds": reloads["reload_empty"]},
         "ShootRecoil": {"Scale": "1.9,4.7"},
@@ -747,14 +767,15 @@ def gameplay_m18() -> Gameplay:
             # The 17-round magazine.
             "WeaponAmmo": {"Ammo": 17, "MaxAmmo": 17},
             # Semi only. A pistol fires as fast as its trigger is pulled, so FireRate is the shortest split, 0.13 s, as
-            # for the USP. M1152 ball (115 gr FMJ) leaves the 3.9-inch barrel at ~375 m/s, G1 0.14. The sights sit
+            # for the USP, and a suppressor wouldn't change it. M1152 ball (115 gr FMJ) leaves the 3.9-inch barrel at ~375 m/s, G1 0.14. The sights sit
             # 16 mm over the bore (the model's front post and rear notch against the barrel's axis), zeroed at 25 m like
             # the other pistols. That's 524 J against the MP5's 643 J (124 gr at 400 m/s), so damage falls off over
             # 0.815 of its distance (MaxRange 8000).
             "Shootable": {"BaseDamage": mp5["BaseDamage"], "BaseDamageFalloff": mp5["BaseDamageFalloff"],
-                          "MaxRange": round(mp5["MaxRange"] * 0.815), "FireRate": 450, "ShootSound": sounds["fire"],
+                          "MaxRange": round(mp5["MaxRange"] * 0.815), "FireRate": 450, "SuppressorFireRateScale": 1,
+                          "ShootSound": sounds["fire"],
                           "SupportedFireModes": ["Semi"], "CurrentFireMode": "Semi",
-                          **ballistics(375, "G1", 0.14, 16, 25)},
+                          **ballistics(375, "G1", 0.14, 16, 25, M1152_BULLET)},
             # When the gun is level again in its own clips (tag_sling back within 4 degrees and 0.6 of idle, relative to
             # the camera): 1.57 s, and 2.1 s after the empty reload's slide release.
             "Reloadable": {"ReloadTime": 1.57, "EmptyReloadTime": 2.1, "TimedReloadSounds": reloads["reload"],

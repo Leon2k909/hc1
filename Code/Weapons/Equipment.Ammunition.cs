@@ -14,6 +14,12 @@ public partial class Equipment
 	/// </summary>
 	public GunsmithPart ReloadMagazine { get; private set; }
 
+	/// <summary>
+	/// The fitted fire control group's selector positions (<see cref="GunsmithPart.FireModes"/>), else null for the
+	/// weapon's own. Only the owner has it: the owner switches fire modes and fires (<see cref="Shootable.FireModes"/>).
+	/// </summary>
+	public IReadOnlyList<FireMode> TriggerFireModes { get; private set; }
+
 	internal void RefreshAmmunitionLoadout()
 	{
 		// Cookies belong to this client. Never apply them to another player's weapon or a bot.
@@ -25,6 +31,13 @@ public partial class Equipment
 		AttachmentMagazineCapacity = hasMagazine ? Math.Max( 0, magazine.MagazineCapacity ) : 0;
 		AttachmentReloadMultiplier = hasMagazine ? magazine.ReloadTimeMultiplier.Clamp( 0.5f, 2f ) : 1f;
 		ReloadMagazine = hasMagazine && magazine.ReloadAnimation > 0 ? magazine : null;
+		var triggerModes = ApplySavedAttachments && GunsmithLoadoutManager.TryGetAttachment( Resource, GunsmithPartType.Trigger, out var trigger )
+			&& trigger.IsValid() && trigger.FireModes is { Count: > 0 } ? trigger.FireModes : null;
+		if ( !ReferenceEquals( triggerModes, TriggerFireModes ) )
+		{
+			TriggerFireModes = triggerModes;
+			GetComponentInChildren<Shootable>( true )?.KeepFireModeFitted();
+		}
 		// Changing capacity never manufactures ammunition. A smaller magazine discards excess rounds.
 		if ( oldCapacity != AttachmentMagazineCapacity )
 		{

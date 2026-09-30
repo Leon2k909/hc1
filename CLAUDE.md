@@ -1081,6 +1081,44 @@
 - The USP's suppressor is its model's own threaded barrel and 9mm can: `muzzle` 2 on v_usp, `barrel` 2 on w_usp
   (`ModelBodygroups`), 6.696 past the bare muzzle (`MuzzleShift`). Choice 1 of each is a match compensator, not offered.
 
+## Fire rate and fire modes in the gunsmith (the Action and Trigger slots)
+- The user (2026-09-30): a suppressor shouldn't change a gun's rate unless a real one would, every part should do what
+  the real one does, and there could be a category for changing fire rates "however you would do that in real life".
+- What really sets a cyclic rate, and what the game models:
+  - A suppressor's back-pressure speeds up gas-operated and blowback actions (`Shootable.SuppressorFireRateScale`): about
+    10% on direct-impingement ARs and AKs (the M4A1 template the rifles copy in `kastov_prefabs.py`), about 5% on
+    blowback and roller-delayed SMGs (the MP5's, which the SMGs borrow). It's 1 where a real one wouldn't change the
+    rate: the semi-only M18 and Vepr-12 (the trigger finger sets their pace) and the FAL, whose adjustable regulator is
+    set for the can (FN's procedure). The SCAR-H and the old pistols and bolt guns have none.
+  - The gas system's length: the AR barrels already did it (`GunsmithAttachmentEffects.FireRate`).
+  - The buffer's mass, and a gas regulator: the Action slot (`GunsmithPartType.Action`, `GunsmithPart.FireRateScale`,
+    `GunsmithPart.SuppressedGasSetting`).
+  - A trigger can't change the cyclic rate. A fire control group changes the modes the selector has: the Trigger slot
+    (`GunsmithPartType.Trigger`, `GunsmithPart.FireModes`).
+- Action and Trigger are internal slots like Ammunition (`AttachmentUnlocks.IsInternalSlot`): no mesh, no socket.
+  `GunsmithLoadoutManager.ApplyAttachments` makes their runtime attachment points, and `AttachmentUnlocks.GetSlots` lists
+  a slot only for a weapon with a part for it. Their parts carry an explicit `RequiredLevel`, so the unlock ladder
+  leaves them out.
+- The parts:
+  - M4A1 buffers (`Assets/gunsmith/m4a1/action/`), against its factory H2 (4.6 oz) at 800 rpm: Carbine Buffer (3.0 oz,
+    x1.095, ~876 rpm, level 12), H Buffer (3.8 oz, x1.045, ~836, level 6), H3 Buffer (5.4 oz, x0.959, ~767, level 18).
+    The cycle time goes as (bolt carrier 11.5 oz + buffer) to the power 0.87, fitted to a measured pair: 5.6 oz to
+    7.5 oz buffers took an AR from 971 to 886 rpm.
+  - AUG A3 Suppressed Gas Regulator (`Assets/gunsmith/aug/action/`, level 12): with a suppressor it keeps the rate at
+    715 instead of 10% higher, and without one it changes nothing (the regulator's normal setting).
+    `Shootable.SuppressorRateScale` reads it.
+  - M4 Trigger Group (`Assets/gunsmith/m4a1/trigger/`, level 10): the real M4's semi and three-round burst in place of
+    the M4A1's automatic. The M4A1's `BurstEndDelay` is 0 like the M16A4's, so the next pull follows at the cyclic rate.
+  - M16A3 Trigger Group (`Assets/gunsmith/m16/trigger/`, level 14): semi and automatic in place of the M16A4's burst.
+- Fire modes: `Equipment.TriggerFireModes` (owner-side, set in `RefreshAmmunitionLoadout`) overrides
+  `Shootable.SupportedFireModes`, and everything that lists modes reads `Shootable.FireModes` (the selector, the HUD's
+  ammo counter, the gunsmith's figures through `GunsmithStats.BuildFireModes`). When a trigger group takes the mode
+  you're on away, `KeepFireModeFitted` switches automatic to burst (or back), else the first mode.
+- The DETAILS and COMPARE rate follows the fitted buffer and regulator, as the gun does.
+- Made offline (2026-09-30). The open editor compiled the six `.gnsmth` files as they were written, with every new
+  field in the compiled data, but nobody has seen them in the gunsmith: if the Action or Trigger slot is missing,
+  `recompile_asset` them after the code has hotloaded. None of it has been checked in-game.
+
 ## Magnified optics: eye relief and the lens picture (`OpticZoom`, `Tools/optic_eyepieces.py`)
 - The user aimed the FAMAS F1's 2x Magnifier and Holo and asked if a scope really looks like that (2026-09-29). The
   eyepiece's housing filled most of the screen, with a small magnified circle inside a ring of plain glass.
@@ -1714,6 +1752,9 @@ simulate_input.
   `kastov_prefabs.ballistics()` (`PS_BALLISTICS`); the other guns, including the patched 74u, have them set in the
   prefab. Optics don't change `SightHeight` (a few cm at most), and barrel parts don't change `MuzzleVelocity`: their
   length only moves the damage falloff (see the pipeline notes).
+- Each gun also has its bullet's `BulletDiameter` and `BulletLength` (mm, from the load's drawings; a buckshot ball's
+  length is its diameter), which set its supersonic crack (see Bullet cracks). The ported guns' come from
+  `kastov_prefabs.py` (`ballistics(..., bullet)`, the `*_BULLET` constants).
 - Near misses from drop still hit bodies, thanks to the box (see Bullet traces). Bots (`LightweightCombatBot`) do their
   own traces, a line with no drop.
 
@@ -1987,9 +2028,11 @@ simulate_input.
   - Every `"ui.button.press"` / `"ui.button.over"` (Sound.Play and scss `sound-in`) is now `"ui_button_press"` /
     `"ui_button_hover"`.
 - Still s&box's or not there at all:
-  - Impacts are heard only by the shooter, as before (`CreateImpactEffects` runs on the shooter's machine).
+  - Impacts are heard by everyone within ~76 m, when the round gets there and the sound has come back (see Bullet
+    cracks). The shooter's machine plays them where its rounds struck; the others find them by a short trace at the
+    round's end.
   - Knife hits (`Melee`) still play the surface's stock bullet sound.
-  - Bots' shots make no impacts, and bots make no footsteps.
+  - Bots' shots make no impact effects, only the sounds, and bots make no footsteps.
   - Grenade bounces are the surfaces' own.
 - The editor has to compile the new WAVs and events. They were made without it (2026-09-29), so none of it has been
   heard in-game. The code compiled offline with dotnet.
@@ -2127,6 +2170,65 @@ simulate_input.
   - the blast's directivity: 6 dB quieter straight behind the muzzle, 2.5 dB off to the side.
 - The shooter's own shot is unchanged: flat (2D) at full level.
 - Compiled on 2026-09-29, not yet heard in a match.
+- Since 2026-09-30 anyone else's shot is heard when its sound gets there, at 340 m/s (`GunshotAudio.PlayDelayed`: 0.3 s
+  from 100 m). `PlayDelayed` plays an event as `Sound.Play` does, with `Sound.PlayFile`'s delay. The engine delays a
+  sound by holding back its samples, which it can only do once the file has loaded: a file played for the first time
+  that hasn't loaded yet plays at once.
+
+## Bullet cracks (`BulletFlyby`, `Code/Weapons/BulletFlyby.cs`)
+- The user asked for "hyper realistic supersonic cracks at the right distances and everything" (2026-09-30). A round
+  that passes someone is heard as it really is:
+  - A supersonic round's crack: its Mach cone sweeping over them, an N-wave a few hundred microseconds long.
+  - A subsonic round's whizz, within 6 m: the .45s, and the 9x18 Bizon.
+  - Then what it strikes, once it's got there and the sound has come back.
+  - The report from the gun comes at the speed of sound too (Gunshot audio), so downrange the crack comes first and the
+    gap grows with the range: the crack-thump soldiers judge a shooter's distance by.
+- Where and when:
+  - The crack leaves the path where the cone through the listener meets it, `miss / sqrt(M^2 - 1)` before the point
+    nearest them, at the Mach number the round had there (`TryShock`, solved by halving). So it's heard from there, not
+    from the gun.
+  - It arrives at the round's time of flight to that point plus the sound's way from it. The speeds along the path are
+    the load's (`Ballistics.Trajectory.Speed`, solved with the drop table), so a crack weakens and lengthens downrange.
+  - There's none beside or behind the gun, past where the round stopped, more than 100 m off the path, or where the
+    round is under Mach 1.03.
+- How loud and how long: Whitham's far-field N-wave, which measured small-arms cracks follow:
+  - overpressure `0.53 p0 (M^2 - 1)^(1/8) d / (b^(3/4) l^(1/4))`;
+  - length `1.82 M b^(1/4) d / (c (M^2 - 1)^(3/8) l^(1/4))`;
+  - for a bullet of diameter d and length l passing b away (at least 0.15 m).
+  - An M855 a metre away is ~985 Pa (154 dB peak) for ~106 us; 20 m away, 104 Pa (134 dB) for 224 us. A 9 mm round is
+    about as loud and twice as long, a duller snap.
+  - A full-scale sample stands for 356 Pa (`FullScalePascals`: the shots' mastering puts a full-scale sine at ~142 dB
+    SPL). So closer than about 3-5 m a crack is capped at full scale, well under a real one.
+  - The engine's distance falloff is off for it, but air absorption and occlusion are on.
+- Reflections: the ground under the listener, a ceiling over them and the nearest two walls (eight probes 30 m out, kept
+  for 0.25 s) each send a second crack (`PlayReflection`).
+  - Each is the crack that reaches the listener's mirror image in the surface, played from the mirror image of where it
+    left, and only if the wave's way to the surface is clear and the listener can see the spot.
+  - Hard surfaces send back 0.9 of the pressure. Grass sends 0.45, earth 0.6 and cloth 0.3, with a rounded front.
+  - Standing on hard ground, that's the real "double crack".
+  - Only the first pellet of a shot gets them.
+- The sounds are made at runtime, not recorded, and cached by name for the session (`SoundFile.FromPcm`,
+  `hc1/flyby/...`):
+  - Cracks: an N-wave drawn at 16 times 44.1 kHz and band-limited to 20 kHz (`MakeCrack`), in 21 lengths from 40 us,
+    20% apart.
+    - Each has a sharp, firm, spiked (turbulence focusing it) or rounded front. It's rounded more often the further it
+      came (`PickFront`: 10%, rising to 60% at 60 m).
+    - The soft front is only for grass and earth's reflections.
+  - Whizzes: band-passed noise heard through the Doppler shift as the round comes and goes (`MakeWhizz`). The level
+    grows with the speed cubed and the diameter, and falls with the miss: 0.05 of full scale at 1 m for a .45.
+- Networking:
+  - `Shootable.Shoot` records each pellet's path: from the aim ray to the last thing it met that wasn't glass, or its
+    full range. `SendFlybys` broadcasts up to four of them, unreliably (`DoFlybyEffects`, a `ByteStream`).
+  - Everyone but the shooter hears them pass. Everyone but the owner's machine, which played its own impact effects,
+    hears them strike.
+  - The shooter's own impacts are delayed the same way (`ImpactSoundDelay`).
+  - Bots' shots call `BulletFlyby.Pass` in their `DoShootEffects`, which now gets whether the shot hit. A miss flies on
+    to the gun's `MaxRange`.
+- The path is taken as straight from the aim ray to where the round stopped, so drop is left out (a few cm off at the
+  ranges a crack is heard). The bot's rounds leave from its muzzle.
+- `Tools/bullet_cracks.py` replicates the crack synthesis and levels offline, and `python Tools/bullet_cracks.py <wav>`
+  writes an M855's cracks at 1-50 m with each front. None of it has been heard in-game:
+  not the levels (the close cracks may want tuning), the reflections, the whizz, or the delayed reports and impacts.
 
 ## Weapon fire rates and bots
 - The SCAR-H's BaseDamage 36 is the M4's 20 scaled by muzzle energy: M80 at its prefab's 792 m/s is 2,989 J, and the
@@ -2136,7 +2238,8 @@ simulate_input.
   burst, MP5 800, Vityaz 750, AUG 715, Kastov-74u 700, Bizon 680, FAL 675, SCAR-H 600, RPK 600, Kastov 762 600,
   AK-105 600, Uzi 600, Vepr-12 450 in semi).
   Shots are scheduled with carry-over (`_nextShotTime`), so any RPM fires exactly; don't tune values to the 50 Hz tick.
-  Part effects on the rate: `GunsmithAttachmentEffects.FireRate` (AR barrel gas length) and `Shootable.SuppressorFireRateScale`.
+  Part effects on the rate: `GunsmithAttachmentEffects.FireRate` (AR barrel gas length, the Action slot's buffers) and
+  `Shootable.SuppressorFireRateScale` (see Fire rate and fire modes in the gunsmith).
 - Bot AI (sight/hearing, reaction, aim error, movement, bursts, reloads) is in `Code/GameLoop/Bots/LightweightCombatBot.Brain.cs`.
   Each bot name keeps its rolled Skill, its `Habits` (see Play styles) and its kills/deaths/score for the match (`LightweightBotManager`
   `_roster`, reused by `SpawnBot`). Every life is a new bot object and bodies last 15 s, so the scoreboard shows one row

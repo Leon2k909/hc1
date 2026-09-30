@@ -3,8 +3,9 @@ namespace Facepunch.Gunsmith;
 /// <summary>
 /// Effects that the current firearm model can represent. These are relative to the
 /// weapon prefab, so a fitted part never changes cartridge damage. It changes the fire rate only where
-/// the real part does: a different gas system length (<see cref="FireRate"/>), or suppressor
-/// back-pressure (<see cref="Shootable.SuppressorFireRateScale"/>, which depends on the action).
+/// the real part does: a different gas system length or a heavier or lighter AR buffer (<see cref="FireRate"/>), or
+/// suppressor back-pressure (<see cref="Shootable.SuppressorFireRateScale"/>, which depends on the action, and which a
+/// gas regulator's suppressed setting takes away: <see cref="SuppressedGas"/>).
 /// </summary>
 public struct GunsmithAttachmentEffects
 {
@@ -15,6 +16,8 @@ public struct GunsmithAttachmentEffects
 	public float HearingDistance { get; private set; }
 	public float SoundVolume { get; private set; }
 	public float FireRate { get; private set; }
+	/// <summary> A fitted gas regulator is on its suppressed setting (<see cref="GunsmithPart.SuppressedGasSetting"/>). </summary>
+	public bool SuppressedGas { get; private set; }
 
 	public static GunsmithAttachmentEffects For( Equipment equipment )
 	{
@@ -41,6 +44,7 @@ public struct GunsmithAttachmentEffects
 		ApplySelected( ref effects, equipment.Resource, GunsmithPartType.Stock, prone );
 		ApplySelected( ref effects, equipment.Resource, GunsmithPartType.Underbarrel, prone );
 		ApplySelected( ref effects, equipment.Resource, GunsmithPartType.RearGrip, prone );
+		ApplySelected( ref effects, equipment.Resource, GunsmithPartType.Action, prone );
 
 		return effects;
 	}
@@ -70,6 +74,7 @@ public struct GunsmithAttachmentEffects
 		ApplySelected( ref effects, resource, GunsmithPartType.Stock, false );
 		ApplySelected( ref effects, resource, GunsmithPartType.Underbarrel, false );
 		ApplySelected( ref effects, resource, GunsmithPartType.RearGrip, false );
+		ApplySelected( ref effects, resource, GunsmithPartType.Action, false );
 
 		return effects;
 	}
@@ -89,6 +94,8 @@ public struct GunsmithAttachmentEffects
 		VerticalRecoil *= part.VerticalRecoilScale;
 		HorizontalRecoil *= part.HorizontalRecoilScale;
 		if ( part.DamageFalloffScale > 0f ) DamageFalloffDistance *= part.DamageFalloffScale;
+		if ( part.FireRateScale > 0f ) FireRate *= part.FireRateScale;
+		if ( part.SuppressedGasSetting ) SuppressedGas = true;
 
 		if ( (part.Category is GunsmithPartType.Muzzle or GunsmithPartType.Barrel)
 			&& (part.IsSuppressor || Has( "suppressor" ) || Has( "silencer" )) )

@@ -40,14 +40,23 @@ public static class AttachmentUnlocks
 	/// <summary> The Build tab's slots, which unlock by level. Camos, charms, stickers and reticles have their own rules. </summary>
 	public static bool IsAttachment( GunsmithPartType category ) => category is GunsmithPartType.Muzzle or GunsmithPartType.Barrel
 		or GunsmithPartType.Optic or GunsmithPartType.Underbarrel or GunsmithPartType.Stock or GunsmithPartType.RearGrip
-		or GunsmithPartType.Magazine or GunsmithPartType.Ammunition or GunsmithPartType.Laser or GunsmithPartType.Rail;
+		or GunsmithPartType.Magazine or GunsmithPartType.Ammunition or GunsmithPartType.Laser or GunsmithPartType.Rail
+		or GunsmithPartType.Action or GunsmithPartType.Trigger;
+
+	/// <summary>
+	/// Slots with no mesh or socket, which change how the gun works rather than what's on it: the rounds loaded, the action
+	/// (a buffer, a gas regulator) and the fire control group. GunsmithLoadoutManager.ApplyAttachments makes them at
+	/// runtime, for a gun a part of theirs fits.
+	/// </summary>
+	public static bool IsInternalSlot( GunsmithPartType category ) =>
+		category is GunsmithPartType.Ammunition or GunsmithPartType.Action or GunsmithPartType.Trigger;
 
 	/// <summary> The order a weapon's slots take turns on its ladder: sights and muzzles first, as in CoD. </summary>
 	private static GunsmithPartType[] SlotOrder => new[]
 	{
 		GunsmithPartType.Optic, GunsmithPartType.Muzzle, GunsmithPartType.Underbarrel, GunsmithPartType.Magazine,
 		GunsmithPartType.Stock, GunsmithPartType.RearGrip, GunsmithPartType.Barrel, GunsmithPartType.Laser,
-		GunsmithPartType.Ammunition, GunsmithPartType.Rail,
+		GunsmithPartType.Action, GunsmithPartType.Trigger, GunsmithPartType.Ammunition, GunsmithPartType.Rail,
 	};
 
 	public static bool IsUnlocked( EquipmentResource weapon, GunsmithPart part )
@@ -85,7 +94,10 @@ public static class AttachmentUnlocks
 		? Enumerable.Empty<GunsmithPart>()
 		: GetWeaponParts( weapon ).Where( p => GetRequiredLevel( weapon, p ) == level );
 
-	/// <summary> The weapon's slots that take attachments: its prefab's attachment points, plus ammunition when a part fits. </summary>
+	/// <summary>
+	/// The weapon's slots that take attachments: its prefab's attachment points, plus ammunition, and the action and trigger
+	/// when a part of theirs fits.
+	/// </summary>
 	public static HashSet<GunsmithPartType> GetSlots( EquipmentResource weapon )
 	{
 		var slots = new HashSet<GunsmithPartType>();
@@ -101,8 +113,14 @@ public static class AttachmentUnlocks
 			}
 		}
 
-		// GunsmithLoadoutManager.ApplyAttachments adds an ammunition slot to every gun an ammunition part fits.
+		// GunsmithLoadoutManager.ApplyAttachments adds an ammunition slot to every gun an ammunition part fits, and an action
+		// or trigger slot to a gun one of their parts fits: only some guns have real ones (IsInternalSlot).
 		slots.Add( GunsmithPartType.Ammunition );
+		foreach ( var part in ResourceLibrary.GetAll<GunsmithPart>() )
+		{
+			if ( part.IsValid() && (part.Category is GunsmithPartType.Action or GunsmithPartType.Trigger) && part.Supports( weapon ) )
+				slots.Add( part.Category );
+		}
 		return slots;
 	}
 
@@ -116,9 +134,12 @@ public static class AttachmentUnlocks
 		return ResourceLibrary.GetAll<GunsmithPart>().Where( p => p.IsValid() && slots.Contains( p.Category ) && IsOffered( p ) && p.Supports( weapon ) );
 	}
 
-	/// <summary> GunsmithAttachmentBrowser's rule: a part with something to fit, a prefab or bodygroups (ammunition has neither). </summary>
+	/// <summary>
+	/// GunsmithAttachmentBrowser's rule: a part with something to fit, a prefab or bodygroups, or one for a slot that has
+	/// neither (<see cref="IsInternalSlot"/>).
+	/// </summary>
 	public static bool IsOffered( GunsmithPart part ) =>
-		part.MainPrefab.IsValid() || part.ModifyBodygroups || part.Category == GunsmithPartType.Ammunition;
+		part.MainPrefab.IsValid() || part.ModifyBodygroups || IsInternalSlot( part.Category );
 
 	/// <summary> Player levels per unlock point: one at level 5, 10, 15 and so on, 11 by the top level. </summary>
 	public const int LevelsPerPoint = 5;

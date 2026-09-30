@@ -276,7 +276,8 @@
     {
         GunsmithPartType.Muzzle => 0, GunsmithPartType.Barrel => 1, GunsmithPartType.Optic => 2,
         GunsmithPartType.Underbarrel => 3, GunsmithPartType.Magazine => 4, GunsmithPartType.RearGrip => 5,
-        GunsmithPartType.Stock => 6, GunsmithPartType.Laser => 7, GunsmithPartType.Rail => 8, GunsmithPartType.Ammunition => 9, _ => 10
+        GunsmithPartType.Stock => 6, GunsmithPartType.Laser => 7, GunsmithPartType.Rail => 8, GunsmithPartType.Action => 9,
+        GunsmithPartType.Trigger => 10, GunsmithPartType.Ammunition => 11, _ => 12
     };
 
     // These return text in the player's language, for showing.
@@ -293,7 +294,8 @@
         GunsmithPartType.Optic => "filter_center_focus", GunsmithPartType.Muzzle => "volume_off",
         GunsmithPartType.Barrel => "straighten", GunsmithPartType.Stock => "view_week", GunsmithPartType.Rail => "horizontal_rule",
         GunsmithPartType.Underbarrel => "pan_tool", GunsmithPartType.RearGrip => "back_hand",
-        GunsmithPartType.Magazine => "view_stream", GunsmithPartType.Ammunition => "linear_scale", GunsmithPartType.Laser => "flare", _ => "build"
+        GunsmithPartType.Magazine => "view_stream", GunsmithPartType.Ammunition => "linear_scale", GunsmithPartType.Laser => "flare",
+        GunsmithPartType.Action => "autorenew", GunsmithPartType.Trigger => "touch_app", _ => "build"
     };
 
     protected override int BuildHash()

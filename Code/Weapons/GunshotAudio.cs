@@ -13,6 +13,10 @@ namespace Facepunch;
 /// The blast is louder in front of the muzzle than behind it: here 6 dB quieter straight behind the shot, 2.5 dB off to
 /// the side (measured rifle blasts are 5-10 dB down behind).
 /// </para>
+/// <para>
+/// Anyone else's shot is heard when its sound gets there, at the speed of sound (<see cref="PlayDelayed"/>): 0.3 s from
+/// 100 m. Downrange of a supersonic round its crack comes first (<see cref="BulletFlyby"/>).
+/// </para>
 /// The shooter's own shot stays as it was: flat (2D) at full level.
 /// </summary>
 public static class GunshotAudio
@@ -32,16 +36,24 @@ public static class GunshotAudio
 	/// </summary>
 	public static SoundHandle Play( SoundEvent sound, Vector3 position, Vector3 forward, bool own, float volume = 1f )
 	{
-		if ( sound is null || Sound.Play( sound, position ) is not { } handle )
+		if ( sound is null )
+			return null;
+
+		if ( own )
+		{
+			if ( Sound.Play( sound, position ) is not { } flat )
+				return null;
+
+			flat.Volume *= volume;
+			flat.SpacialBlend = 0f;
+			return flat;
+		}
+
+		// Anyone else's shot reaches the listener at the speed of sound: 0.3 s from 100 m.
+		if ( PlayDelayed( sound, position, SoundDelay( position ) ) is not { } handle )
 			return null;
 
 		handle.Volume *= volume;
-		if ( own )
-		{
-			handle.SpacialBlend = 0f;
-			return handle;
-		}
-
 		if ( sound.DistanceAttenuation && sound.Distance > ReferenceDistance )
 		{
 			handle.Distance = sound.Distance;
@@ -51,6 +63,49 @@ public static class GunshotAudio
 		handle.OcclusionEnabled = true;
 		handle.AirAbsorption = true;
 		handle.Volume *= Directivity( position, forward );
+		return handle;
+	}
+
+	/// <summary> How long a sound made at <paramref name="position"/> takes to reach the listener, in seconds. </summary>
+	public static float SoundDelay( Vector3 position )
+	{
+		var listener = Game.ActiveScene?.Camera;
+		return listener.IsValid() ? listener.WorldPosition.Distance( position ) / BulletFlyby.SoundSpeed : 0f;
+	}
+
+	/// <summary>
+	/// Plays <paramref name="sound"/> at <paramref name="position"/> as <see cref="Sound.Play(SoundEvent, Vector3, float)"/>
+	/// does (one of its files at random, its volume, pitch, mixer, distance, falloff, occlusion, air absorption and
+	/// reverb), <paramref name="delay"/> seconds from now. Null if nothing played.
+	/// <para>
+	/// The engine delays a sound by holding back its samples, which it can only do once the file has loaded: a file
+	/// played for the first time that hasn't loaded yet plays at once.
+	/// </para>
+	/// </summary>
+	public static SoundHandle PlayDelayed( SoundEvent sound, Vector3 position, float delay )
+	{
+		if ( sound is null || Application.IsHeadless )
+			return null;
+
+		if ( delay <= 0.001f || sound.UI || sound.Sounds is not { Count: > 0 } files )
+			return Sound.Play( sound, position );
+
+		var file = files[Game.Random.Int( 0, files.Count - 1 )];
+		if ( !file.IsValid() )
+			return null;
+
+		var handle = Sound.PlayFile( file, sound.Volume.GetValue(), pitch: sound.Pitch.GetValue(), delay: delay );
+		if ( !handle.IsValid() )
+			return null;
+
+		handle.Position = position;
+		handle.Distance = sound.Distance;
+		handle.Falloff = sound.Falloff;
+		handle.TargetMixer = sound.DefaultMixer.Get();
+		handle.DistanceAttenuation = sound.DistanceAttenuation;
+		handle.AirAbsorption = sound.AirAbsorption;
+		handle.OcclusionEnabled = sound.OcclusionEnabled;
+		handle.ReverbEnabled = sound.ReverbEnabled;
 		return handle;
 	}
 

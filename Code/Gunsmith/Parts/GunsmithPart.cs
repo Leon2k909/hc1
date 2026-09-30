@@ -20,7 +20,11 @@ public enum GunsmithPartType
 	RearGrip = 14,
 	Magazine = 15,
 	Laser = 16,
-	Rail = 17
+	Rail = 17,
+	// What cycles the gun: an AR's buffer, a gas regulator. It changes the cyclic rate (FireRateScale).
+	Action = 18,
+	// The fire control group: which fire modes the selector has (FireModes).
+	Trigger = 19
 }
 
 [GameResource( "HC1/Gunsmith Part", "gnsmth", "A gunsmith part" )]
@@ -102,6 +106,22 @@ public partial class GunsmithPart : GameResource
 	/// this) leaves it unchanged.
 	/// </summary>
 	[Property, Group( "Effects" )] public float DamageFalloffScale { get; set; } = 1f;
+	/// <summary>
+	/// Cyclic rate multiplier for a part that changes how fast the action cycles: a heavier or lighter AR buffer. 1 (or 0,
+	/// a part loaded before a hotload added this) leaves it unchanged.
+	/// </summary>
+	[Property, Group( "Effects" )] public float FireRateScale { get; set; } = 1f;
+	/// <summary>
+	/// A gas regulator with a suppressed setting, which the shooter uses with a suppressor fitted: it bleeds off the can's
+	/// back-pressure, so the gun keeps its unsuppressed rate (<see cref="Shootable.SuppressorFireRateScale"/> doesn't apply).
+	/// </summary>
+	[Property, Group( "Effects" )] public bool SuppressedGasSetting { get; set; }
+	/// <summary>
+	/// A fire control group's selector positions, in the order the fire-mode key steps through them. Empty keeps the
+	/// weapon's own (<see cref="Shootable.SupportedFireModes"/>).
+	/// </summary>
+	[Property, ShowIf( nameof( Category ), GunsmithPartType.Trigger )]
+	public List<FireMode> FireModes { get; set; } = new();
 
 	/// <summary>
 	/// Which weapons does this part support? By default, if it's empty, it's universal
