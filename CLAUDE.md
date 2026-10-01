@@ -1624,6 +1624,58 @@
   editor (2026-09-28), but nothing has been seen in the engine. The lighting, the navmesh, bots, the modes' objects and
   the vista are all unchecked.
 
+## Oceanarium (multiplayer map, `Tools/oceanarium_map.py`)
+- The user asked for a big map for 10-12 players, built out from my_project's aquarium, with many rooms, each with
+  several ways out, and a few headglitch spots (2026-10-01). They asked for it to be made without the editor, so it
+  was built and checked offline only.
+- my_project's aquarium hall (`Tools/oceanarium_hall.py`: the rotunda, the ocean tunnel, the jellyfish room and the
+  corridor, in my_project's coordinates) is the middle of a bigger building. The building is made by script, the way
+  Belltower is (`Tools/map_kit.py`, with Belltower's props, checks and pictures). The script's docstring has the layout
+  and the conventions. It writes:
+  - the hall's models and its own to `Assets/models/maps/oceanarium/`: `oceanarium_rooms`, `oceanarium_outside`, their
+    `_glow` halves (lamps, water surfaces and glass, which cast no shadows, as in my_project) and `oceanarium_vista`
+    (the sea and the town round the site, with no collision and no shadows);
+  - the scene, `Assets/scenes/maps/Oceanarium/oceanarium.scene`, whole on every run, so change the layout in the
+    script, not in the editor;
+  - the radar picture, `ui/minimaps/minimap_oceanarium.png`, and the menus' picture (`ui/maps/oceanarium.png`) if
+    there isn't one. That's a stand-in: the aerial preview. Replace it with an in-engine capture, 1920x1080.
+- The building (e -1474..1474, n -580..1474) stands between the spawn yards: Red Team west, Blue Team east. Three
+  lanes join them:
+  - North, the back of house: the Stores, the Filter Hall (a catwalk along its back wall), the Labs (rows of benches),
+    the Pump Room (bomb site A, with a raised platform) and the Workshop. There are two doors between each room and
+    the next, staggered so no line runs through all of them.
+  - Middle: the Kelp Hall (a gallery along its west wall, and a kelp tank), the hall's ocean tunnel to the rotunda, the
+    corridor, and the East Lobby round the corridor's end.
+  - South: the Gift Shop, the Cloakroom, the Ticket Hall and the Café along the front. Outside are the forecourt with
+    its fountain, the West Court, the East Garden with its raised terrace (bomb site B), and the promenade along the
+    sea.
+  - The Reef Hall (a raised walkway and an octagonal tank) joins the lobby to the Pump Room and the Workshop.
+- Every room has at least two ways out. Doorways are 96 by 120, the yards' loading doors 160 by 144. Rooms have
+  ceilings of 240-320, and the roof (344..360) covers the whole building, so nothing can get onto it.
+- Headglitch spots are cover 50-54 high against an eye at 64: the counters, the lab benches, the display cases, the
+  planters, the crates, the cars, the hedges, the terrace's walls, and the parapets of the raised gallery, walkway,
+  catwalk and platform.
+- Crates stand in front of every door onto the spawn yards (one of each pair 52 high, the other 96), so nobody in a
+  doorway sees straight into the spawns.
+- The hall leaves out my_project's stone floor ("Steinboden") and its glass entrance doors. The map lays one floor
+  under everything, z -16..0, with each area's surface (`floor_collision`): wood in the Gift Shop and on the
+  promenade, tile in the Labs and the Café, grass in the garden.
+- The scene has 100 point lights (the hall's own, a grid in each room, the tanks' and the lamp posts'), the hall's 23
+  spotlights and its ambient light, and 16 reflection probes: one per room, per part of the hall and outside.
+- Spots, all checked on every run:
+  - Team spawns: 12 a side in the yards, off in Deathmatch and Gun Game. Free-for-all spawns: 29, only in those two.
+  - Retakes spawns for both sites, tagged like Belltower's.
+  - Domination's flags: A in the Kelp Hall, B in the rotunda, C in the Reef Hall. Nine Hot Zones, and Cash Grab's three
+    points.
+- `check_spots` here goes by each collision shape as it is, not its bounding box: the tunnel's walls run diagonally,
+  so their boxes covered its floor. `check_reach` is Belltower's grid, with floors over 340 (the ceilings' tops)
+  left out.
+- In `GameUtils.MainMenuMapOrder` and `IsMatchReadyMap`, with every mode but battle royale. Ranked plays it as Defuse.
+- Not ported: my_project's fish and `AquariumLife`. The tanks have kelp and a rock, and nothing swims.
+- To play it: `dev_mode team_deathmatch oceanarium`.
+- Checked offline only (2026-10-01): the previews, the radar picture and the two checks. Nothing has been compiled or
+  seen in the engine: the models, the materials, the lighting, the probes, the navmesh, bots and the modes' objects.
+
 ## Hotload: no lambdas in explicit IGameEventHandler<T> methods
 - s&box's hotloader can't re-link static lambdas inside explicit generic interface methods
   (`void IGameEventHandler<T>.OnGameEvent`), so after any hotload they throw "Unable to find matching substitution for

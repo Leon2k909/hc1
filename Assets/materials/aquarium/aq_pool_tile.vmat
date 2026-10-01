@@ -1,0 +1,23 @@
+// Türkisgraue Steinfliesen der Innenwand, Lichtnetz unter Wasser (erzeugt von tools/aquarium/aq_tex.js)
+// Bilder-Stand 444742995c0c
+Layer0
+{
+	shader "shaders/aquarium_pool_floor.shader"
+	g_flModelTintAmount "1.000"
+	g_vColorTint "[1.000000 1.000000 1.000000 1.000000]"
+	TextureColor "textures/aquarium/pool_tile_color.png"
+	TextureNormal "textures/aquarium/pool_tile_normal.png"
+	TextureRoughness "textures/aquarium/pool_tile_rough.png"
+	g_flRoughnessScaleFactor "1.000"
+	g_bFogEnabled "1"
+	g_flMetalness "0.000"
+	g_flWaterZ "27.500000"
+	g_flCausticSpeed "0.450000"
+	g_flCaustics "0.900000"
+	g_flCausticScale "36.000000"
+	g_nScaleTexCoordUByModelScaleAxis "0"
+	g_nScaleTexCoordVByModelScaleAxis "0"
+	g_vTexCoordOffset "[0.000 0.000]"
+	g_vTexCoordScale "[1.000 1.000]"
+	g_vTexCoordScrollSpeed "[0.000 0.000]"
+}
