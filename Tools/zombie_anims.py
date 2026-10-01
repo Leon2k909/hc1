@@ -15,8 +15,9 @@ Inputs (not in the repo):
 Retargeting: every mapped bone takes its ValveBiped counterpart's world-space rotation change from the reference pose.
 Limbs are first turned so their rest direction matches the ValveBiped's (the two A-poses differ). Hands and fingers
 are aimed at where the source's knuckles and finger joints are instead (some clips were made on a skeleton with
-differently rolled hand bones). The elbows bend only as hinges, and the forearms turn the hands only as far as a
-person's can (`Clip.turn`). The ValveBiped has no
+differently rolled hand bones). The elbows bend only as hinges, the forearms turn the hands only as far as a
+person's can (`Clip.turn`), and the wrists and fingers keep to a relaxed hand's range (WRIST_*, FINGER_BEND). The
+ValveBiped has no
 neck or head; its headcrab bone sits on the head, so the head follows that, and the neck goes halfway. The pelvis
 moves by the ValveBiped's, scaled by leg length, with the forward travel taken out (ZombieAI moves the zombie) and the
 lowest foot kept at the ValveBiped's height.
@@ -109,6 +110,21 @@ HINGES = {f"arm_lower_{s}" for s in "LR"}
 # out, and attack E's right hand a whole turn; rolling the forearm at the elbow to follow that wrung the arms. A hand
 # turned past the clip's limits stays at the nearer one, and turns back round through the range no faster than this:
 FOREARM_TURN_RATE = np.radians(720.0)  # per second
+
+# The forearm turns the whole hand about its own axis, bend and all (`limit_wrist`'s caller): turning the hand about
+# its own length instead kept each claw pointing where the source pointed it, so a claw turned palm down bent sideways
+# at the wrist, up to 60 degrees, where a person's goes ~20 towards the thumb and ~30 towards the little finger.
+# The classic zombie's claws are also bent 60-70 degrees at the wrist and clenched into fists, which suits its big
+# claws but on a person's hands reads as broken. So the wrist keeps to a relaxed hand's range (soft limits, radians;
+# a wrist reaches ~80 flexion, ~70 extension, ~20 radial and ~30 ulnar), and each finger joint curls at most
+# FINGER_BEND past the citizen's relaxed rest pose: a loose claw, never a tight fist.
+WRIST_FLEXION, WRIST_EXTENSION = np.radians(45.0), np.radians(35.0)
+WRIST_ULNAR, WRIST_RADIAL = np.radians(20.0), np.radians(12.0)
+FINGER_BEND = np.radians(45.0)
+# In the citizen hand bone's space: +X runs along the hand to the knuckles, the palm faces +Z on the left hand and -Z
+# on the right, and -Y is the little finger's side.
+PALM = {"L": np.array([0.0, 0.0, 1.0]), "R": np.array([0.0, 0.0, -1.0])}
+ULNAR = np.array([0.0, -1.0, 0.0])
 
 # Hands and fingers are posed from where the source's knuckles and finger joints are, not from rotation changes: the
 # NMRIH clips (idle, walk, run, attacks A and C) were made on NMRIH's own skeleton, whose hand bone is rolled ~90 degrees
@@ -224,6 +240,41 @@ def forearm_turn(world: list[np.ndarray], index: dict[str, int], side: str) -> f
         palm = -palm
     angle = float(np.arctan2(np.dot(np.cross(flexion, palm), forearm), np.dot(flexion, palm)))
     return -angle if side == "R" else angle
+
+
+def soft_limit(angle: float, lo: float, hi: float) -> float:
+    """The angle, eased into [lo, hi] (lo < 0 < hi): unchanged up to 60% of the way, then never quite reaching it."""
+    limit = hi if angle >= 0 else -lo
+    knee = 0.6 * limit
+    if abs(angle) <= knee:
+        return angle
+    return float(np.sign(angle)) * (knee + (limit - knee) * float(np.tanh((abs(angle) - knee) / (limit - knee))))
+
+
+def limit_wrist(local: np.ndarray, side: str) -> np.ndarray:
+    """A hand's rotation from its rest pose on the forearm, with the wrist's bend (the swing, after its twist on the
+    forearm) eased into the WRIST_ ranges: flexion towards the palm and extension away from it, and deviation towards
+    the little finger (ulnar) or the thumb (radial). The twist is the forearm's, limited before this."""
+    x = np.array([1.0, 0.0, 0.0])
+    twist = axis_rotation(x, twist_angle(local, x))
+    bend = rotation_vector(local @ twist.T)
+    palm, ulnar = twist @ PALM[side], twist @ ULNAR
+    flex_axis, dev_axis = np.cross(x, palm), np.cross(x, ulnar)  # turning about these takes the hand towards them
+    flex = soft_limit(float(bend @ flex_axis), -WRIST_EXTENSION, WRIST_FLEXION)
+    dev = soft_limit(float(bend @ dev_axis), -WRIST_RADIAL, WRIST_ULNAR)
+    return from_rotation_vector(flex * flex_axis + dev * dev_axis) @ twist
+
+
+def limit_bend(rest: np.ndarray, aim: np.ndarray, limit: float) -> np.ndarray:
+    """`aim`, turned back towards `rest` so it's at most about `limit` from it (eased, like soft_limit)."""
+    angle = float(np.arccos(np.clip(np.dot(rest, aim) / (np.linalg.norm(rest) * np.linalg.norm(aim)), -1.0, 1.0)))
+    eased = soft_limit(angle, -limit, limit)
+    if angle < 1e-6 or eased >= angle:
+        return aim
+    axis = np.cross(rest, aim)
+    if np.linalg.norm(axis) < 1e-9:
+        return aim
+    return axis_rotation(axis, eased) @ (rest / np.linalg.norm(rest)) * np.linalg.norm(aim)
 
 
 def yaw(angle: float) -> np.ndarray:
@@ -516,12 +567,17 @@ def port(clip: Clip, cit: Skeleton, src_dir: Path, fps: float) -> Ported:
                 w[:3, :3] = delta @ turn @ cit.bind_world[i][:3, :3]
             elif name in HANDS:
                 source = hand(f, name)
-                w[:3, :3] = source @ axis_rotation(x_axis, hand_twists[name])
+                # From the hand's rest pose on its forearm: the forearm turns it about the forearm's axis (the bone's
+                # X), and the wrist's bend is kept to a relaxed hand's.
+                rest_on_forearm = world[p][:3, :3] @ cit.bind_local[i][:3, :3]
+                local = axis_rotation(x_axis, hand_twists[name]) @ rest_on_forearm.T @ source
+                w[:3, :3] = rest_on_forearm @ limit_wrist(local, name[-1])
                 turned[name[-1]] = w[:3, :3] @ source.T
             elif name in FINGERS:
                 a, b = FINGERS[name]
                 aim = turned[name[-1]] @ (at(b) - at(a))
-                w[:3, :3] = rotation_between(w[:3, :3] @ cit.bind_local[next_joint[name]][:3, 3], aim) @ w[:3, :3]
+                rest = w[:3, :3] @ cit.bind_local[next_joint[name]][:3, 3]
+                w[:3, :3] = rotation_between(rest, limit_bend(rest, aim, FINGER_BEND)) @ w[:3, :3]
             elif name in TIPS:
                 j = ci[TIPS[name]]
                 bend = cit.bind_local[j][:3, :3].T @ world[cit.parents[j]][:3, :3].T @ world[j][:3, :3]

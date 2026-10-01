@@ -1392,8 +1392,23 @@
   wrists bent ~60 degrees, which on a person's hands read as bent back towards the zombie, so they use `CLAW_TURN`
   (100-170): palm down, the bent wrists droop. Attack E's right hand spins a whole turn, and the forearm used to roll
   at the elbow to follow it (`WRIST_TWIST`, now gone).
-- All nine clips were checked in-game 2026-09-26 by posing a driver and body out of sight (`Sequence.Time`, playback
-  rate 0) and capturing them.
+- That turn didn't fix it (the user, 2026-10-01: "i keep asking for this to be fixed but it never gets changed").
+  The hand was turned about its own length, which kept each claw pointing where the source pointed it, so a palm-down
+  claw's 60-degree wrist bend became a sideways bend at the wrist, up to 60 degrees where a person's goes 20-30. The
+  classic attacks also held clenched fists bent back at the belly.
+  - Now the forearm turns the whole hand, bend and all.
+  - `limit_wrist` keeps the wrist to a relaxed hand's range: 45 degrees flexion, 35 extension, 20 towards the little
+    finger and 12 towards the thumb (`WRIST_*`, soft limits).
+  - Each finger joint curls at most `FINGER_BEND` (45 degrees) past the citizen's relaxed pose: a loose claw, never a
+    tight fist.
+  - The worst wrist went from ~60 degrees sideways to ~22, and the fingers' total curl from 177-187 degrees to at
+    most 138.
+- The "checked in-game 2026-09-26" captures (a driver and body posed out of sight with `Sequence.Time`, playback rate
+  0) showed whole bodies, too small to judge the hands. On 2026-10-01 the hands were checked in Blender close-ups of the
+  zombie mesh skinned on the clips. The editor recompiled `zombie_driver.vmdl_c` by itself, and its clips matched the
+  script to 0.01 degrees (Source2Viewer-CLI's glTF export with `--gltf_mesh_list nomesh`, after stripping the
+  vmdl_c's GUID block, which it can't read). Not yet seen in a match.
+- The run pumps its left fist up in front of the face. That's the arm swing, not the wrist, and it's unchanged.
 - The move clips' side-to-side sway is cut down (`Clip.sway`, `Clip.stance`; the user said the full a_WalkN "looks
   like they're having a dance"). `damp_sway` scales the hips' and spine's roll and yaw, and the hips' sideways shift,
   about their loop average (walk 0.35, run 0.6). The arms turn with the chest, and `plant_leg` IKs the legs so the
