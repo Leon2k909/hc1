@@ -31,6 +31,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
+from scipy import sparse
+from scipy.optimize import linprog
 
 import kastov_dmx as dmx
 
@@ -49,32 +51,51 @@ class Clip:
     sway: float = 1.0  # move clips: share of the hips' and spine's side-to-side roll, yaw and shift that's kept
     stance: float = 1.0  # move clips (with sway): share of the feet's sideways spread from the midline that's kept
     stride: float = 1.0  # move clips: the feet's forward and back reach is scaled by this (so is the clip's speed), the
-                         # hips sinking as far as the longer steps need
+                         # hips sinking as far as the longer steps need, only on the frames that need it (`hips_drop`)
     turn: tuple[float, float] = (5.0, 170.0)  # degrees the forearms may turn the hands to (see forearm_turn)
+    arms: float = 1.0   # share of the source's arm pose (clavicles to forearms) that's kept; the rest hangs like the
+                        # idle's arms. The arms' swing about their average is kept (`relax`), times `swing`
+    swing: float = 1.0  # share of the arms' swing about their average pose that's kept
+    hands: float = 1.0  # share of the source's hand pose (the wrists and fingers) that's kept; the rest is a relaxed
+                        # hand (RELAXED_WRIST, RELAXED_CURL)
+    lean: float = 1.0   # share of the trunk's forward lean from the citizen's upright rest (the pelvis to the neck,
+                        # seen from the side) that's kept; the spine straightens the rest (`straighten`)
+    gait: bool = False  # move clips: the legs walk an even heel-to-toe gait (GAIT_*, `walk_feet`) at `stride` times
+                        # the source's speed, in place of the source's legs, and the rest of the body is evened out to
+                        # its steps (`even_steps`); `stance` isn't used
 
 
-# The walk (a_WalkN) and the classic zombie's own attacks (B, D, E and F) hold the claws palm up, on average 0-40
+# The classic zombie's own attacks (B, D, E and F), like its old walk (a_WalkN), hold the claws palm up, on average 0-40
 # degrees from full supination, and bent ~60 degrees at the wrist: on a person's hands that reads as twisted, the hand
 # bent back towards the zombie. Their hands are kept turned palm down instead, so the bent wrists droop like a zombie's.
 CLAW_TURN = (100.0, 170.0)
 
-# NMRIH's other shambles (walk1-10) are 12-22 units/s, or walk upright like a person (walk7): too slow for a 70 u/s
-# Walker without racing the clip. walk3 (one arm reaching out) and walk2/walk9 (lurching, head lolling back) would suit
-# slower zombies.
+# The walk is walk7, NMRIH's one shamble that walks upright like a person, made into an ordinary walk. The classic
+# zombie's a_WalkN (the walk until 2026-10-01) is a crouched waddle: hips 1-5" low, knees bent throughout, feet 19"
+# apart, the arms up and bent with the hands clawed. Its 17" steps only covered 32 u/s, and stretched to the Walkers'
+# 70 by IK they sank the hips 3" more: a deep squat (the user: "we're exaggerating what a zombie would look like").
+# walk7 has the hips at full height, but shuffles (15" steps, at ~132 a minute: 33 u/s) with the forearms held up in
+# front. Its legs are replaced by an even heel-to-toe walk (`gait`) with steps twice as long: 65.4 u/s, 0.76 m steps at
+# ~132 a minute, which a Walker (70 u/s) plays at ~1.07x, a person's brisk walk. The hips bob ~2.5" and the knees bend
+# 15-20 degrees through the stance. Its arms hang (`arms`), keeping their swing, its hands are relaxed (`hands`), and
+# its trunk keeps a little over half its forward lean (`lean`): it leaned up to 16 degrees, now 9.
+# The other shambles (walk1-6, 8-10) are 10-20 u/s: walk3-6 hold both arms out in front, walk2/9 lurch with the head
+# lolling back, walk8 holds the arms out to the sides, walk10 flails one arm, and walk1 limps.
 CLIPS = [
-    Clip("idle", "walk", "Idle01", "idle"),
-    # a_WalkN rolls and twists the hips and chest ~22/35 and ~34/57 degrees, swinging the head 21" side to side, on
-    # feet planted 19" apart; at the Walkers' sped-up cadence that waddle looks like dancing. Its 17" steps also only
-    # cover 32 u/s, so a Walker (70) had to play it at 1.7x, a frantic scurry: its steps are made 1.5x as long (hips
-    # ~3" lower), which brings that down to ~1.45x. Longer steps turn it into a squatting lunge.
-    Clip("walk_a", "walk", "a_WalkN", "move", sway=0.35, stance=0.6, stride=1.5, turn=CLAW_TURN),
-    Clip("run", "run", "walk1", "move", sway=0.6),
-    Clip("attack_a", "walk", "attackA", "attack"),
-    Clip("attack_b", "walk", "attackB", "attack", turn=CLAW_TURN),
-    Clip("attack_c", "walk", "attackC", "attack"),
-    Clip("attack_d", "walk", "attackD", "attack", turn=CLAW_TURN),
-    Clip("attack_e", "walk", "attackE", "attack", turn=CLAW_TURN),
-    Clip("attack_f", "walk", "attackF", "attack", turn=CLAW_TURN),
+    # Idle01 stands like a person, but with its hands curled into claws.
+    Clip("idle", "walk", "Idle01", "idle", hands=0.25),
+    Clip("walk_a", "walk", "walk7", "move", sway=0.6, stride=2.0, arms=0.3, hands=0.25, lean=0.6, gait=True),
+    # The run's arms are held up and out, and fling to shoulder height as they swing, and its hands are claws: about
+    # half of each is kept. It leans 21-34 degrees, which reads as falling forward; a runner at its 4.8 m/s leans
+    # ~10-15 (`lean`).
+    Clip("run", "run", "walk1", "move", sway=0.6, arms=0.6, swing=0.6, hands=0.5, lean=0.55),
+    # The attacks keep their swings, with the hands half way to relaxed: grabbing, not clawing.
+    Clip("attack_a", "walk", "attackA", "attack", hands=0.5),
+    Clip("attack_b", "walk", "attackB", "attack", turn=CLAW_TURN, hands=0.5),
+    Clip("attack_c", "walk", "attackC", "attack", hands=0.5),
+    Clip("attack_d", "walk", "attackD", "attack", turn=CLAW_TURN, hands=0.5),
+    Clip("attack_e", "walk", "attackE", "attack", turn=CLAW_TURN, hands=0.5),
+    Clip("attack_f", "walk", "attackF", "attack", turn=CLAW_TURN, hands=0.5),
 ]
 
 # SMD space faces -Y (studiomdl turns it 90 degrees); model space faces +X.
@@ -125,6 +146,48 @@ FINGER_BEND = np.radians(45.0)
 # on the right, and -Y is the little finger's side.
 PALM = {"L": np.array([0.0, 0.0, 1.0]), "R": np.array([0.0, 0.0, -1.0])}
 ULNAR = np.array([0.0, -1.0, 0.0])
+
+# A relaxed hand (`Clip.hands`): a hanging hand's wrist is bent a little towards the palm and the little finger, and its
+# fingers curl a little more than the citizen's rest pose, each joint further than the one before (radians, per joint:
+# knuckle, middle, tip). The thumb rests along the index finger.
+RELAXED_WRIST = (np.radians(10.0), np.radians(8.0))  # flexion, ulnar deviation
+RELAXED_CURL = (np.radians(10.0), np.radians(18.0), np.radians(12.0))
+RELAXED_THUMB = (np.radians(5.0), np.radians(8.0), np.radians(5.0))
+ARM_CHAIN = [f"{b}_{s}" for s in "LR" for b in ("clavicle", "arm_upper", "arm_lower")]
+HAND_BONES = [f"hand_{s}" for s in "LR"] + [f"finger_{f}_{j}_{s}" for s in "LR"
+                                             for f in ("thumb", "index", "middle", "ring", "pinky") for j in range(3)]
+
+# Longer steps (`Clip.stride`) sink the hips only on the frames that need it, so they bob as a walker's do, lowest as the
+# weight passes from one foot to the other. A leg reaches at most HIP_REACH of its length (its knee then bent ~16
+# degrees), and the hips' height changes no faster than HIP_ACCEL allows (inches/s^2, about a tenth of g).
+HIP_REACH = 0.99
+HIP_ACCEL = 40.0
+
+# An even walk (`Clip.gait`), after a person's at a brisk pace. Each foot is down GAIT_STANCE of its cycle. It lands
+# heel first, the toes up GAIT_HEEL_STRIKE, and rolls flat by GAIT_FLAT of its stance. From GAIT_HEEL_OFF it lifts its
+# heel about the ball, the toes staying flat on the floor, and leaves with the foot pitched GAIT_TOE_OFF. The ankle
+# passes under the hip GAIT_MID of the way through the stance, so a foot lands less far ahead than it leaves behind, as
+# a person's does. The heel's back is GAIT_HEEL behind the ankle and the toes reach GAIT_TOES past the ball. Ankles are
+# GAIT_WIDTH apart, the toes turned out GAIT_TOE_OUT. The swinging foot keeps GAIT_CLEARANCE off the floor at mid-swing,
+# heel, ball and toes.
+GAIT_STANCE = 0.55
+GAIT_HEEL_STRIKE = np.radians(15.0)
+GAIT_FLAT = 0.15
+GAIT_HEEL_OFF = 0.5
+GAIT_TOE_OFF = np.radians(65.0)
+GAIT_MID = 0.38
+GAIT_HEEL = 1.5
+GAIT_TOES = 2.5
+GAIT_WIDTH = 6.0
+GAIT_TOE_OUT = np.radians(7.0)
+GAIT_CLEARANCE = 0.75
+# The hips rise as far as the legs reach (GAIT_REACH of their length: the knee bent ~11 degrees) and sink as far as the
+# steps need, lowest as the weight passes from foot to foot, their height's acceleration within GAIT_ACCEL either way
+# (inches/s^2, ~0.5 g, as a brisk walker's centre of mass). They keep GAIT_SURGE of the source's own surge forward and
+# back.
+GAIT_REACH = 0.995
+GAIT_ACCEL = 190.0
+GAIT_SURGE = 0.2
 
 # Hands and fingers are posed from where the source's knuckles and finger joints are, not from rotation changes: the
 # NMRIH clips (idle, walk, run, attacks A and C) were made on NMRIH's own skeleton, whose hand bone is rolled ~90 degrees
@@ -454,8 +517,10 @@ def damp_sway(anim: list[list[np.ndarray]], bones: list[int], carried: dict[int,
     return out
 
 
-def plant_leg(world: list[np.ndarray], cit: "Skeleton", side: str, ankle: np.ndarray) -> None:
-    """Two-bone IK: bend the thigh and shin so the ankle reaches `ankle`, keeping the knee's side and the foot's turn."""
+def plant_leg(world: list[np.ndarray], cit: "Skeleton", side: str, ankle: np.ndarray,
+              knee: np.ndarray | None = None) -> None:
+    """Two-bone IK: bend the thigh and shin so the ankle reaches `ankle`, the knee pointing its own way or `knee`'s,
+    keeping the foot's turn."""
     ci = cit.index
     up, lo = ci[f"leg_upper_{side}"], ci[f"leg_lower_{side}"]
     hip = (world[cit.parents[up]] @ cit.bind_local[up])[:3, 3]
@@ -465,7 +530,8 @@ def plant_leg(world: list[np.ndarray], cit: "Skeleton", side: str, ankle: np.nda
     d = float(np.clip(np.linalg.norm(to), abs(a - b) + 1e-3, (a + b) * 0.9999))
     u = to / np.linalg.norm(to)
     knee_now = world[up][:3, :3] @ thigh
-    pole = knee_now - np.dot(knee_now, u) * u
+    pole = knee_now if knee is None else knee
+    pole = pole - np.dot(pole, u) * u
     pole /= np.linalg.norm(pole)
     cos_hip = (a * a + d * d - b * b) / (2 * a * d)
     knee = a * (cos_hip * u + np.sqrt(max(0.0, 1 - cos_hip * cos_hip)) * pole)
@@ -474,22 +540,282 @@ def plant_leg(world: list[np.ndarray], cit: "Skeleton", side: str, ankle: np.nda
     world[lo][:3, :3] = rotation_between(shin_now, d * u - knee) @ world[lo][:3, :3]
 
 
-def hips_drop(cit: "Skeleton", worlds: list[list[np.ndarray]], ankles: dict[str, np.ndarray], reach: float = 0.96) -> float:
-    """How far the hips must sink (inches) so no leg has to stretch past `reach` of its length to its ankle target."""
+def hips_drop(cit: "Skeleton", worlds: list[list[np.ndarray]], ankles: dict[str, np.ndarray], fps: float,
+              reach: float = HIP_REACH, accel: float = HIP_ACCEL, rise: bool = False) -> np.ndarray:
+    """How far the hips sink on each frame of a loop (inches) so no leg has to stretch past `reach` of its length to
+    its ankle target: the least drop each frame needs, eased so its height changes no faster than `accel` allows (the
+    upper envelope of parabolas of that curvature hung from each frame's need). With `rise` the hips may also rise (a
+    negative drop) as far as the legs reach: they ride as high as they can with their height's acceleration within
+    `accel` both ways (a linear programme), rounded off over ~0.03 s. The loop's last frame is its first."""
     ci = cit.index
     length = float(np.linalg.norm(cit.bind_local[ci["leg_lower_L"]][:3, 3]) + np.linalg.norm(cit.bind_local[ci["ankle_L"]][:3, 3]))
-    drop = 0.0
+    need = np.full(len(worlds), -np.inf if rise else 0.0)
     for t, world in enumerate(worlds):
         for s in "LR":
             hip = (world[ci["pelvis"]] @ np.linalg.inv(cit.bind_world[ci["pelvis"]]) @ cit.bind_world[ci[f"leg_upper_{s}"]])[:3, 3]
             to = ankles[s][t] - hip
             # With the ankle this far out, the hip can be at most this high above it.
             highest = float(np.sqrt(max(0.0, (reach * length) ** 2 - float(np.dot(to[:2], to[:2])))))
-            drop = max(drop, -float(to[2]) - highest)
-    return drop
+            need[t] = max(need[t], -float(to[2]) - highest)
+    period = len(worlds) - 1
+    loop = need[:period]
+    k = np.arange(period)
+    if rise:
+        # Least total drop, each frame's at least its need, the second difference round the loop within accel either
+        # way. The hips then hang at the top of each bob as long as the curvature lets them, and drop as late.
+        second = sparse.lil_matrix((period, period))
+        for t in range(period):
+            second[t, (t - 1) % period] += 1.0
+            second[t, t] -= 2.0
+            second[t, (t + 1) % period] += 1.0
+        second = second.tocsr()
+        res = linprog(np.ones(period), A_ub=sparse.vstack([second, -second]),
+                      b_ub=np.full(2 * period, accel / fps ** 2), bounds=[(float(n), None) for n in loop],
+                      method="highs")
+        assert res.success, res.message
+        # Its acceleration jumps from one limit to the other: round that off, then sink it back as far as that left
+        # any frame short of its need.
+        kernel = np.exp(-0.5 * (np.minimum(k, period - k) / (0.03 * fps)) ** 2)
+        kernel /= kernel.sum()
+        drop = np.real(np.fft.ifft(np.fft.fft(res.x) * np.fft.fft(kernel)))
+        drop += max(0.0, float(np.max(loop - drop)))
+    else:
+        gap = np.minimum(k, period - k) / fps  # seconds round the loop
+        drop = np.array([float(np.max(np.roll(loop, -t) - 0.5 * accel * gap ** 2)) for t in range(period)])
+        drop = np.maximum(drop, 0.0)
+    return np.append(drop, drop[0])
 
 
-def port(clip: Clip, cit: Skeleton, src_dir: Path, fps: float) -> Ported:
+def touchdowns(anim: list[list[np.ndarray]], si: dict[str, int], fps: float, speed: float) -> list[tuple[float, str]]:
+    """When each foot of an in-place walk loop comes down (fractional frames, sorted), with its side: the end of each
+    swing, where the foot's speed relative to the body turns from forward to back. A swing counts once the foot has
+    gone forward faster than the walk's `speed` (both in the source's units)."""
+    period = len(anim) - 1
+    out = []
+    for s in "LR":
+        x = np.array([f[si[f"{s}_Foot"]][0, 3] for f in anim])
+        v = np.diff(x) * fps  # v[t] is between frames t and t + 1
+        start = int(np.argmin(v))  # go round the loop from a moment the foot is down
+        peak = 0.0
+        for k in range(1, period + 1):
+            prev, t = (start + k - 1) % period, (start + k) % period
+            if v[prev] > 0:
+                peak = max(peak, float(v[prev]))
+                if v[t] <= 0:
+                    if peak > speed:
+                        out.append(((prev + 0.5 + v[prev] / (v[prev] - v[t])) % period, s))
+                    peak = 0.0
+    return sorted(out)
+
+
+def even_steps(anim: list[list[np.ndarray]], si: dict[str, int], fps: float,
+               speed: float) -> tuple[list[list[np.ndarray]], list[tuple[float, str]]]:
+    """The loop retimed so its steps come evenly, and the frames the feet now come down on. NMRIH's shambles step
+    unevenly (walk7's steps take 10 to 18 frames), so the body's sway, bob and arm swing are moved in time to match a
+    steady gait's steps: each step's span of frames is stretched or squeezed to the same length."""
+    period = len(anim) - 1
+    steps = touchdowns(anim, si, fps, speed)
+    sides = [s for _, s in steps]
+    assert len(steps) >= 2 and len(steps) % 2 == 0 and all(a != b for a, b in zip(sides, sides[1:] + sides[:1])), steps
+    gap = period / len(steps)
+    times = np.array([t for t, _ in steps])
+    # Even times as near the source's as they can be (the mean offset round the loop).
+    turn = np.exp(2j * np.pi * (times - gap * np.arange(len(steps))) / period)
+    even = float(np.angle(np.mean(turn))) * period / (2 * np.pi) + gap * np.arange(len(steps))
+    warp_u = np.concatenate([even - period, even, even + period])
+    warp_s = np.concatenate([times - period, times, times + period])
+    out = []
+    for u in range(period):
+        s = float(np.interp(u, warp_u, warp_s)) % period
+        i = int(np.floor(s))
+        f = s - i
+        frame = []
+        for a, b in zip(anim[i], anim[i + 1]):
+            w = np.eye(4)
+            w[:3, :3] = slerp(a[:3, :3], b[:3, :3], f)
+            w[:3, 3] = a[:3, 3] + f * (b[:3, 3] - a[:3, 3])
+            frame.append(w)
+        out.append(frame)
+    out.append([w.copy() for w in out[0]])
+    return out, [(float(u % period), side) for u, side in zip(even, sides)]
+
+
+def walk_feet(cit: "Skeleton", posed: list[list[np.ndarray]], steps: list[tuple[float, str]], speed: float,
+              fps: float) -> dict[str, list[tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]]]:
+    """Each foot's ankle position and rotation, its toes' rotation and the way its knee points, per frame of a loop
+    walking an even heel-to-toe gait (GAIT_*) at `speed`, the feet coming down on `steps` (frame, side). A planted
+    foot slides back at exactly the clip's speed, so in the game it holds still on the ground."""
+    ci = cit.index
+    period = len(posed) - 1
+    cycle = 2 * period / len(steps)
+    stance = GAIT_STANCE * cycle
+    v = speed / fps  # inches a frame
+    up = np.array([0.0, 0.0, 1.0])
+    pelvis = ci["pelvis"]
+    hip = lambda w, s: (w[pelvis] @ np.linalg.inv(cit.bind_world[pelvis]) @ cit.bind_world[ci[f"leg_upper_{s}"]])[:3, 3]
+    mid_y = float(np.mean([w[pelvis][1, 3] for w in posed[:period]]))
+    smooth = lambda u: u * u * (3 - 2 * u)
+    feet = {}
+    for s in "LR":
+        sign = 1.0 if s == "L" else -1.0
+        ankle_b, ball_b = cit.bind_world[ci[f"ankle_{s}"]], cit.bind_world[ci[f"ball_{s}"]]
+        toe = ball_b[:3, 3] - ankle_b[:3, 3]
+        turn = euler_matrix(0, 0, sign * GAIT_TOE_OUT - np.arctan2(toe[1], toe[0]))
+        foot, toes = turn @ ankle_b[:3, :3], turn @ ball_b[:3, :3]  # flat on the floor, turned out
+        toes_on_foot = ankle_b[:3, :3].T @ ball_b[:3, :3]
+        ahead = turn @ np.array([toe[0], toe[1], 0.0])
+        ahead /= np.linalg.norm(ahead)
+        axis = np.cross(up, ahead)  # turning the foot about this tips its toes down
+        height = float(ankle_b[2, 3])
+        # Points on the sole, from the ankle of a flat foot: the heel's back and under the ball. The toes reach
+        # GAIT_TOES past the ball, the way they point.
+        heel = -GAIT_HEEL * ahead - height * up
+        ball = turn @ toe
+        ball[2] = -height
+        land = float(np.mean([hip(w, s)[0] for w in posed[:period]])) + v * GAIT_MID * stance
+        y = mid_y + sign * GAIT_WIDTH / 2
+
+        def planted(sigma: float) -> tuple[np.ndarray, np.ndarray, np.ndarray, float]:
+            """The ankle, the foot's and the toes' rotations and the foot's pitch, this share of the way through the
+            stance. The foot rocks about its heel, then lies flat, then rolls up about the ball."""
+            flat = np.array([land - v * stance * sigma, y, height])
+            if sigma < GAIT_FLAT:
+                pitch, pivot = -GAIT_HEEL_STRIKE * (0.5 + 0.5 * np.cos(np.pi * sigma / GAIT_FLAT)), heel
+            elif sigma < GAIT_HEEL_OFF:
+                pitch, pivot = 0.0, heel
+            else:
+                pitch, pivot = GAIT_TOE_OFF * ((sigma - GAIT_HEEL_OFF) / (1 - GAIT_HEEL_OFF)) ** 2, ball
+            r = axis_rotation(axis, pitch)
+            rot = r @ foot
+            return flat + pivot - r @ pivot, rot, toes if pitch > 0 else rot @ toes_on_foot, pitch
+
+        leave, arrive = planted(1.0), planted(0.0)
+        bent = leave[1].T @ leave[2]  # the toes on the foot as it leaves the floor
+
+        def swinging(w: float) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+            """The same, this share of the way through the swing: the ankle goes from toe-off to heel strike by a
+            minimum-jerk path, the foot levels off by mid-swing, and the toes straighten in its first third."""
+            pitch = leave[3] + (arrive[3] - leave[3]) * smooth(min(1.0, w / 0.75))
+            r = axis_rotation(axis, pitch)
+            rot = r @ foot
+            toe_rot = rot @ slerp(bent, toes_on_foot, smooth(min(1.0, w / 0.35)))
+            ankle = leave[0] + (arrive[0] - leave[0]) * (w ** 3 * (10 - 15 * w + 6 * w * w))
+            # The toes' tips go where the toes point, which starts out flat on the floor, not along the foot.
+            tip = r @ ball + GAIT_TOES * (toe_rot @ toes.T @ ahead)
+            low = min(float((ankle + q)[2]) for q in (r @ heel, r @ ball, tip))
+            ankle[2] += max(0.0, GAIT_CLEARANCE * float(np.sin(np.pi * w)) - low)
+            return ankle, rot, toe_rot
+
+        downs = [u for u, side in steps if side == s]
+        frames = []
+        for t in range(period + 1):
+            d = min((t - u) % period for u in downs)
+            ankle, rot, toe_rot = planted(d / stance)[:3] if d < stance else swinging((d - stance) / (cycle - stance))
+            frames.append((ankle, rot, toe_rot, ahead))
+        feet[s] = frames
+    return feet
+
+
+def relaxed_hands(cit: "Skeleton") -> dict[str, np.ndarray]:
+    """Each HAND_BONES bone's rotation on its parent in a relaxed hand: the citizen's rest pose, with the wrist and the
+    finger joints bent a little further towards the palm (RELAXED_WRIST, RELAXED_CURL, RELAXED_THUMB)."""
+    ci, x = cit.index, np.array([1.0, 0.0, 0.0])
+    out = {}
+    for s in "LR":
+        hand = ci[f"hand_{s}"]
+        bend = RELAXED_WRIST[0] * np.cross(x, PALM[s]) + RELAXED_WRIST[1] * np.cross(x, ULNAR)
+        out[f"hand_{s}"] = cit.bind_local[hand][:3, :3] @ from_rotation_vector(bend)
+        palm = cit.bind_world[hand][:3, :3] @ PALM[s]
+        for name in HAND_BONES:
+            if not name.startswith("finger_") or not name.endswith(s):
+                continue
+            i = ci[name]
+            towards = cit.bind_world[i][:3, :3].T @ palm  # the palm's way, in the joint's own space
+            curl = (RELAXED_THUMB if "thumb" in name else RELAXED_CURL)[int(name[-3])]
+            out[name] = cit.bind_local[i][:3, :3] @ axis_rotation(np.cross(x, towards), curl)
+    return out
+
+
+def hanging_arms(cit: "Skeleton", idle: "Ported") -> dict[str, np.ndarray]:
+    """Each ARM_CHAIN bone's average rotation on its parent in the idle, whose arms hang at its sides."""
+    ci = cit.index
+    return {b: mean_rotation([w[cit.parents[ci[b]]][:3, :3].T @ w[ci[b]][:3, :3] for w in idle.world])
+            for b in ARM_CHAIN}
+
+
+SPINE = ["spine_0", "spine_1", "spine_2"]
+
+
+def lean_of(cit: "Skeleton", world: list[np.ndarray]) -> float:
+    """How far forward the trunk leans, from the pelvis to the neck seen from the side (radians)."""
+    v = world[cit.index["neck_0"]][:3, 3] - world[cit.index["pelvis"]][:3, 3]
+    return float(np.arctan2(v[0], v[2]))
+
+
+def straighten(cit: "Skeleton", frames: list[list[np.ndarray]], lean: float) -> None:
+    """Keep `lean` of the trunk's forward lean from the rest pose's, in place: each SPINE joint bends back an equal
+    share of the rest, everything above it turning with it. Positions are rebuilt from the parents, as `finish` does."""
+    ci, parents = cit.index, cit.parents
+    above = {b: [i for i in range(len(parents)) if i == ci[b] or any(a == ci[b] for a in ancestors(parents, i))]
+             for b in SPINE}
+    rest = lean_of(cit, cit.bind_world)
+
+    def bent(world: list[np.ndarray], angle: float) -> list[np.ndarray]:
+        out = [w.copy() for w in world]
+        turn = axis_rotation(np.array([0.0, 1.0, 0.0]), angle / len(SPINE))
+        for b in SPINE:
+            for i in above[b]:
+                out[i][:3, :3] = turn @ out[i][:3, :3]
+        for i, p in enumerate(parents):
+            if p >= 0:
+                out[i][:3, 3] = (out[p] @ cit.bind_local[i])[:3, 3]
+        return out
+
+    for world in frames:
+        now = lean_of(cit, world)
+        target = rest + lean * (now - rest)
+        # The lean follows the bend nearly in proportion: one trial bend, then the bend that reaches the target.
+        trial = target - now
+        moved = lean_of(cit, bent(world, trial)) - now
+        world[:] = bent(world, trial * (target - now) / moved if abs(moved) > 1e-6 else trial)
+
+
+def ancestors(parents: list[int], i: int) -> list[int]:
+    out = []
+    while parents[i] >= 0:
+        i = parents[i]
+        out.append(i)
+    return out
+
+
+def relax(cit: "Skeleton", frames: list[list[np.ndarray]], clip: Clip, hang: dict[str, np.ndarray] | None) -> None:
+    """Hang the arms (`Clip.arms`) and relax the hands (`Clip.hands`), in place. The arm bones' average rotation on
+    their parents goes that share of the way to the idle's, keeping `Clip.swing` of the swing about it; the hands'
+    rotations go that share of the way to a relaxed hand's. Everything below moves with them; the twist bones are left
+    to `finish`."""
+    ci, parents = cit.index, cit.parents
+    locals_ = [[w[i].copy() if p < 0 else np.linalg.inv(w[p]) @ w[i] for i, p in enumerate(parents)] for w in frames]
+    if clip.arms < 1 or clip.swing < 1:
+        assert hang is not None or clip.arms == 1, clip
+        for b in ARM_CHAIN:
+            i = ci[b]
+            mean = mean_rotation([f[i][:3, :3] for f in locals_])
+            target = slerp(hang[b], mean, clip.arms) if clip.arms < 1 else mean
+            for f in locals_:
+                f[i][:3, :3] = slerp(np.eye(3), f[i][:3, :3] @ mean.T, clip.swing) @ target
+    if clip.hands < 1:
+        relaxed = relaxed_hands(cit)
+        for b in HAND_BONES:
+            i = ci[b]
+            for f in locals_:
+                f[i][:3, :3] = slerp(relaxed[b], f[i][:3, :3], clip.hands)
+    for world, f in zip(frames, locals_):
+        for i, p in enumerate(parents):
+            if p >= 0:
+                world[i] = world[p] @ f[i]
+
+
+def port(clip: Clip, cit: Skeleton, src_dir: Path, fps: float, hang: dict[str, np.ndarray] | None = None) -> Ported:
     ref_names, ref_parents, ref_frames = read_smd(src_dir / "Zombie_reference.smd")
     names, parents, frames = read_smd(src_dir / "classic_anims" / f"{clip.source}.smd")
     assert names == ref_names, clip
@@ -510,10 +836,14 @@ def port(clip: Clip, cit: Skeleton, src_dir: Path, fps: float) -> Ported:
             shift = np.eye(4)
             shift[0, 3] = -distance * t / (n - 1)
             anim[t] = [shift @ w for w in f]
+    steps: list[tuple[float, str]] = []
+    if clip.gait:
+        anim, steps = even_steps(anim, si, fps, distance / ((n - 1) / fps))
 
     ci = cit.index
     leg = lambda w, i, a, b, c: np.linalg.norm(w[i[a]][:3, 3] - w[i[b]][:3, 3]) + np.linalg.norm(w[i[b]][:3, 3] - w[i[c]][:3, 3])
     scale = leg(cit.bind_world, ci, "leg_upper_L", "leg_lower_L", "ankle_L") / leg(ref, si, "L_Thigh", "L_Calf", "L_Foot")
+    speed = clip.stride * scale * distance / ((n - 1) / fps) if clip.kind == "move" else 0.0
 
     turns = {}
     for bone, (vb, child, vb_child) in LIMBS.items():
@@ -649,34 +979,61 @@ def port(clip: Clip, cit: Skeleton, src_dir: Path, fps: float) -> Ported:
         out.append(pose(f, wrists))
         finish(out[-1])
 
-    if clip.kind == "move" and (clip.sway < 1 or clip.stride != 1):
+    if clip.kind == "move" and (clip.gait or clip.sway < 1 or clip.stance != 1 or clip.stride != 1):
         # Calmer hips and chest, the arms turning with the chest. The legs are bent to put the feet where the full sway
         # did, drawn in towards the midline (a constant sideways scale, so planted feet don't slide), and stretched
         # forward and back by the stride (planted feet then slide back that much faster, so the clip's speed goes up).
+        # With `gait` they walk `walk_feet`'s steps instead, and the hips' height is the gait's, not the source's.
         chest = si["Spine4"]
         trunk = [si[vb] for vb in TRUNK.values()]
         below_chest = lambda b: parents[b] >= 0 and (parents[b] == chest or below_chest(parents[b]))
         arms = {b: chest for b in range(len(names)) if b not in trunk and below_chest(b)}
         damped = damp_sway(anim, trunk, arms, si["Pelvis"], clip.sway)
-        ankles = {s: np.array([w[ci[f"ankle_{s}"]][:3, 3] for w in out]) for s in "LR"}
-        mid = float(np.mean([ankles[s][:, 1] for s in "LR"]))
-        for s in "LR":
-            ankles[s][:, 1] = mid + clip.stance * (ankles[s][:, 1] - mid)
-            centre = float(np.mean(ankles[s][:, 0]))
-            ankles[s][:, 0] = centre + clip.stride * (ankles[s][:, 0] - centre)
+        if clip.gait:
+            hips = np.array([f[si["Pelvis"]][:3, 3] for f in damped[:-1]])
+            for f in damped:
+                f[si["Pelvis"]][0, 3] = hips[:, 0].mean() + GAIT_SURGE * (f[si["Pelvis"]][0, 3] - hips[:, 0].mean())
+                f[si["Pelvis"]][2, 3] = hips[:, 2].mean()
         wrists = {}
         posed = [pose(g, wrists) for g in damped]
-        crouch = hips_drop(cit, posed, ankles)
-        for t, world in enumerate(posed):
-            world[ci["pelvis"]][2, 3] -= crouch
+        if clip.gait:
+            feet = walk_feet(cit, posed, steps, speed, fps)
+            ankles = {s: np.array([f[0] for f in feet[s]]) for s in "LR"}
+            crouch = hips_drop(cit, posed, ankles, fps, GAIT_REACH, GAIT_ACCEL, rise=True)
+        else:
+            ankles = {s: np.array([w[ci[f"ankle_{s}"]][:3, 3] for w in out]) for s in "LR"}
+            mid = float(np.mean([ankles[s][:, 1] for s in "LR"]))
             for s in "LR":
-                plant_leg(world, cit, s, ankles[s][t])
+                ankles[s][:, 1] = mid + clip.stance * (ankles[s][:, 1] - mid)
+                centre = float(np.mean(ankles[s][:, 0]))
+                ankles[s][:, 0] = centre + clip.stride * (ankles[s][:, 0] - centre)
+            crouch = hips_drop(cit, posed, ankles, fps)
+        for t, world in enumerate(posed):
+            world[ci["pelvis"]][2, 3] -= crouch[t]
+            for s in "LR":
+                if clip.gait:
+                    ankle, foot, toes, knee = feet[s][t]
+                    plant_leg(world, cit, s, ankle, knee)
+                    world[ci[f"ankle_{s}"]][:3, :3] = foot
+                    world[ci[f"ball_{s}"]][:3, :3] = toes
+                else:
+                    plant_leg(world, cit, s, ankles[s][t])
             finish(world)
             out[t] = world
 
+    if clip.arms < 1 or clip.swing < 1 or clip.hands < 1:
+        relax(cit, out, clip, hang)
+        for world in out:
+            finish(world)
+
+    if clip.lean != 1:
+        straighten(cit, out, clip.lean)
+        for world in out:
+            finish(world)
+
     for f, world in zip(anim, out):
-        # Feet: the lowest sole point stays at the ValveBiped's (scaled) height.
-        drop = scale * lowest(f, src_feet) - lowest(world, cit_feet)
+        # Feet: the lowest sole point stays at the ValveBiped's (scaled) height. A gait's soles are on the floor already.
+        drop = 0.0 if clip.gait else scale * lowest(f, src_feet) - lowest(world, cit_feet)
         for w in world:
             w[2, 3] += drop
 
@@ -691,7 +1048,6 @@ def port(clip: Clip, cit: Skeleton, src_dir: Path, fps: float) -> Ported:
     if clip.kind == "attack":
         reach = [max(f[si["L_Hand"]][0, 3], f[si["R_Hand"]][0, 3]) - f[si["Pelvis"]][0, 3] for f in anim]
         hit = int(np.argmax(reach)) / fps
-    speed = clip.stride * scale * distance / ((n - 1) / fps) if clip.kind == "move" else 0.0
     return Ported(clip, fps, out, speed, hit)
 
 
@@ -818,7 +1174,11 @@ def port_all(args) -> tuple[Skeleton, list[Ported]]:
     cit = read_model_skeleton(Path(args.citizen_data))
     dirs = {"walk": Path(args.walk_pack), "run": Path(args.run_pack)}
     fps = {pack: qc_fps(d / "classic.qc") for pack, d in dirs.items()}
-    ported = [port(c, cit, dirs[c.pack], fps[c.pack].get(c.source.lower(), 30.0)) for c in CLIPS]
+    rate = lambda c: fps[c.pack].get(c.source.lower(), 30.0)
+    # The arms hang as the idle's do, as it stands before its own hands are relaxed (which doesn't move the arms).
+    idle = next(c for c in CLIPS if c.kind == "idle")
+    hang = hanging_arms(cit, port(Clip(idle.name, idle.pack, idle.source, "idle"), cit, dirs[idle.pack], rate(idle)))
+    ported = [port(c, cit, dirs[c.pack], rate(c), hang) for c in CLIPS]
     return cit, ported
 
 

@@ -1430,11 +1430,35 @@
 - `Tools/zombie_anims.py` writes the clips, the vmdl and `Code/NPCs/Zombies/ZombieClips.cs`. Its docstring covers the
   sources (GMod addons 3255961963 / 3255991053 decompiled with Crowbar, the citizen skeleton from a Source2Viewer dump)
   and the retarget. The zombie mesh is skinned mostly to twist/helper bones, so the clips bake those too.
-- Clips: idle, `walk_a` (NMRIH's hunched walk), run (188.7 u/s) and six attacks. The slower shambles (walk2/3/9)
-  aren't ported. a_WalkN's 17" steps only cover 31.8 u/s, and Walkers move at 70: at the old 1.7x playback it was a
-  frantic scurry (the user: "their animation is too fast"). `Clip.stride` 1.5 makes the steps longer by IK, with the
-  hips sinking as far as the legs need (`hips_drop`, ~3"), so the clip covers 47.8 u/s. ZombieAI caps the walk at 1.4x,
-  so the feet slide ~4%. Past stride ~1.5 it turns into a squatting lunge.
+- Clips: idle, `walk_a` (65.4 u/s), run (188.7 u/s) and six attacks. NMRIH's other shambles (walk1-6, 8-10) aren't
+  ported: they're 10-20 u/s, and hold the arms out, lurch, flail or limp.
+- The walk was the classic zombie's a_WalkN until 2026-10-01: a crouched waddle with the hips 1-5" low, the feet 19"
+  apart and the arms up with clawed hands. Its 17" steps covered only 31.8 u/s against the Walkers' 70 (the user: "their
+  animation is too fast"), and lengthening them by IK (`Clip.stride` 1.5, 47.8 u/s) sank the hips 3" more. The user
+  then saw zombies in a deep, wide squat with raised arms and claws: "it feels like we're exaggerating what a zombie
+  would look like". So the whole pose was toned down to a person's (2026-10-01):
+  - The walk is now walk7, NMRIH's one shamble that walks upright, with its legs replaced by an even heel-to-toe gait
+    (`Clip.gait`: `even_steps` evens out the source's timing, `walk_feet` places the feet, `plant_leg` IKs the legs).
+    Its steps are twice the source's: 0.76 m at ~132 a minute, 65.4 u/s, so a Walker (70) plays it at ~1.07x.
+  - Each foot lands heel first with the toes 15 degrees up, rolls flat, lifts its heel about the ball from half way
+    through the stance, and leaves pitched 65 degrees. The feet are 6" apart with the toes turned out 7 degrees, and
+    the swinging foot's heel, ball and toes clear the floor by 0.75" (`GAIT_*`).
+  - The hips (`hips_drop` with `rise`) sit as high as the legs reach (99.5% of their length) and sink only as far as
+    the steps need, with their height's acceleration within ~0.5 g, as a brisk walker's centre of mass. That's a linear
+    programme (scipy's `linprog`), smoothed over 0.03 s. They bob ~2.5" (34.1-36.6 against the bind pose's 36.6), and
+    the knees bend ~11 degrees at heel strike, ~20 taking the weight, ~15 at mid-stance and ~49 at most in the swing.
+  - `Clip.arms` keeps that share of the source's arm pose and lets the rest hang like the idle's, keeping the swing
+    about it (`relax`, times `Clip.swing`). `Clip.hands` keeps that share of the source's wrists and fingers, and the
+    rest is a relaxed hand (`RELAXED_*`: the wrist bent a little towards the palm, the fingers lightly curled).
+  - `Clip.lean` keeps that share of the trunk's forward lean from the citizen's upright rest (the pelvis to the neck,
+    seen from the side), and `straighten` bends spine_0-2 equally to take the rest out.
+  - Per clip: the walk keeps 0.3 of its arms, 0.25 of its hands and 0.6 of its lean (up to 16 degrees, now 9). The run
+    keeps 0.6 of its arms and swing (it flung them to shoulder height), 0.5 of its hands and 0.55 of its lean (21-34
+    degrees, now 11-18; a runner at its 4.8 m/s leans ~10-15). The idle keeps 0.25 of its hands. The attacks keep their
+    swings, with the hands half way to relaxed.
+  - Checked in Blender renders of the zombie mesh skinned on the new clips (side and front, every clip, and the hands
+    close up), against renders of the old walk. Not yet seen in the engine: the editor recompiles `zombie_driver.vmdl`
+    from the new DMX by itself (register them if it misses some, see the Kastov pipeline notes).
 - Hands and fingers are posed from where the source's knuckles and finger joints are (`HANDS`, `FINGERS`, `TIPS`),
   not from rotation changes. The NMRIH-made clips (idle, walk, run, attacks A and C) use NMRIH's own skeleton, whose
   hand bone is rolled ~90 degrees from the classic zombie's reference pose, which twisted the palms sideways and the
@@ -1447,8 +1471,8 @@
 - The forearms turn the hands only as far as a person's can (the user: "the zombies hands are like backwards",
   "twisted"). `forearm_turn` measures the turn from the elbow's hinge (0 = palm fully towards the biceps, 180 = fully
   away; the citizen rests at ~102). Each clip keeps it in `Clip.turn` (5-170), and a hand past it turns back through
-  the range at `FOREARM_TURN_RATE` at most. The walk and attacks B, D, E and F hold their claws palm up (0-40) with the
-  wrists bent ~60 degrees, which on a person's hands read as bent back towards the zombie, so they use `CLAW_TURN`
+  the range at `FOREARM_TURN_RATE` at most. The old walk (a_WalkN) and attacks B, D, E and F hold their claws palm up
+  (0-40) with the wrists bent ~60 degrees, which on a person's hands read as bent back towards the zombie, so they use `CLAW_TURN`
   (100-170): palm down, the bent wrists droop. Attack E's right hand spins a whole turn, and the forearm used to roll
   at the elbow to follow it (`WRIST_TWIST`, now gone).
 - That turn didn't fix it (the user, 2026-10-01: "i keep asking for this to be fixed but it never gets changed").
@@ -1467,11 +1491,12 @@
   zombie mesh skinned on the clips. The editor recompiled `zombie_driver.vmdl_c` by itself, and its clips matched the
   script to 0.01 degrees (Source2Viewer-CLI's glTF export with `--gltf_mesh_list nomesh`, after stripping the
   vmdl_c's GUID block, which it can't read). Not yet seen in a match.
-- The run pumps its left fist up in front of the face. That's the arm swing, not the wrist, and it's unchanged.
-- The move clips' side-to-side sway is cut down (`Clip.sway`, `Clip.stance`; the user said the full a_WalkN "looks
-  like they're having a dance"). `damp_sway` scales the hips' and spine's roll and yaw, and the hips' sideways shift,
-  about their loop average (walk 0.35, run 0.6). The arms turn with the chest, and `plant_leg` IKs the legs so the
-  feet land where they did, with the walk's 19" stance narrowed to 0.6 of that. Pitch (the lean and bob) is untouched.
+- The run pumped its left fist up in front of the face. That's the arm swing, not the wrist; its swing is now 0.6 of
+  the source's.
+- The move clips' side-to-side sway is cut down (`Clip.sway`; the user said the full a_WalkN "looks like they're
+  having a dance"). `damp_sway` scales the hips' and spine's roll and yaw, and the hips' sideways shift, about their
+  loop average (0.6 for the walk and the run). The arms turn with the chest. A clip without `gait` can also narrow its
+  feet (`Clip.stance`, through `plant_leg`).
 - The attacks start part-way in, so the swing's furthest reach (`ZombieClip.Hit`) lands at `AttackWindup`.
   `SwingCount` is synced, so every client picks the same attack.
 - Headshots go by the driver's head bone height (bullets stop on the capsule), not the renderer bounds.

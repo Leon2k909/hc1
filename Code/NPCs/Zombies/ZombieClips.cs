@@ -27,7 +27,7 @@ public static class ZombieClips
 	public static readonly ZombieClip Run = new( "run", 0.491f, 188.7f, 0.00f );
 	public static readonly ZombieClip[] Walks =
 	{
-		new( "walk_a", 1.067f, 47.8f, 0.00f ),
+		new( "walk_a", 2.733f, 65.4f, 0.00f ),
 	};
 	public static readonly ZombieClip[] Attacks =
 	{
