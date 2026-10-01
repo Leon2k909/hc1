@@ -59,6 +59,10 @@ public sealed class ZombieAI : Component, Component.IDamageable
 	private Vector3 _stuckAnchor;
 	private float _bestDistance = float.MaxValue;
 	private Rigidbody _rb;
+	/// <summary>When it groans next while it hunts (host).</summary>
+	private TimeUntil _nextGroan;
+	/// <summary>Hits a moment apart (a burst, a shotgun's pellets) get one grunt.</summary>
+	private TimeSince _timeSincePain = 10f;
 
 	public float MoveSpeed => Speed switch
 	{
@@ -84,6 +88,7 @@ public sealed class ZombieAI : Component, Component.IDamageable
 
 		_rb = Components.GetOrCreate<Rigidbody>();
 		_rb.MotionEnabled = false;
+		_nextGroan = Game.Random.Float( 0.5f, 6f );
 	}
 
 	protected override void OnUpdate()
@@ -112,12 +117,17 @@ public sealed class ZombieAI : Component, Component.IDamageable
 				_rb.MotionEnabled = false;
 				if ( Agent.IsValid() ) Agent.Enabled = true;
 			}
+			// Physics moved it: KeepOut starts again from wherever it lands.
+			_hasStep = false;
 			return;
 		}
 
 		// Not leaping, so the agent should be driving. Recover if something switched it off.
 		if ( Agent.IsValid() && !Agent.Enabled )
 			Agent.Enabled = true;
+
+		if ( Agent.IsValid() && Agent.Enabled )
+			KeepOut();
 
 		if ( _timeSinceRetarget > 0.5f || !IsValidTarget( _target ) )
 		{
@@ -147,10 +157,19 @@ public sealed class ZombieAI : Component, Component.IDamageable
 
 		if ( Agent.IsValid() && Agent.Enabled )
 		{
-			if ( attacking && dist < AttackRange )
+			// It stops at arm's length to swing rather than walking on into them.
+			var close = WorldPosition.WithZ( 0 ).Distance( _target.WorldPosition.WithZ( 0 ) ) < StandOff
+				&& MathF.Abs( WorldPosition.z - _target.WorldPosition.z ) < 48f;
+			if ( close || attacking && dist < AttackRange )
 				Agent.Stop();
 			else
 				Agent.MoveTo( _target.WorldPosition + GetSeparationOffset() );
+		}
+
+		if ( !attacking && _nextGroan <= 0f )
+		{
+			_nextGroan = Game.Random.Float( 5f, 12f );
+			PlayVoice( ZombieVoice.Groan );
 		}
 
 		if ( !attacking )
@@ -199,6 +218,110 @@ public sealed class ZombieAI : Component, Component.IDamageable
 			ZombiesRoundSystem.Current?.OnZombieRecycled();
 			GameObject.Destroy();
 		}
+	}
+
+	// ── Keeping out of shut doors and players (host) ────────────────────────────
+	/// <summary>
+	/// How close its centre comes to a player's. Its capsule (16) and their box (12 to a side, 17 at the corners) touch at
+	/// 28-33. Walked into them, it pinned them: their box started inside its capsule, and the controller could only hop
+	/// them about trying to get out.
+	/// </summary>
+	private const float PlayerClearance = 34f;
+	/// <summary>Where it stops short of its target to swing at them: inside AttackRange, outside PlayerClearance.</summary>
+	private const float StandOff = 40f;
+	/// <summary>A step longer than this is a teleport, not a walk.</summary>
+	private const float MaxStep = 120f;
+
+	private Vector3 _lastStep;
+	private bool _hasStep;
+
+	/// <summary>
+	/// The navmesh agent moves a zombie with no collision, and doors are left out of the navmesh so paths go through
+	/// doorways. FindDoorAhead only stops it for a door within 80 straight ahead, so on Innocent Hotel zombies coming at a
+	/// door from an angle walked through it. So each update the agent's last step is checked, and taken back if it went
+	/// into a shut door (which it then opens and waits for, as WaitForDoor does) or into a player.
+	/// </summary>
+	private void KeepOut()
+	{
+		var to = WorldPosition;
+		var from = _lastStep;
+		if ( !_hasStep || from.DistanceSquared( to ) > MaxStep * MaxStep )
+		{
+			_lastStep = to;
+			_hasStep = true;
+			return;
+		}
+
+		if ( from.DistanceSquared( to ) < 0.0001f )
+			return;
+
+		var door = ShutDoorOnStep( from, to );
+		if ( door.IsValid() )
+		{
+			if ( !_door.IsValid() && door.OpenForNpc( from ) )
+			{
+				_door = door;
+				_doorGiveUp = 2f;
+				Agent.Stop();
+				SetAnim( AnimState.Attack );
+			}
+		}
+		else if ( PlayerInTheWay( from, to ) is { } blocker )
+		{
+			// Someone else stepped in front of it: they're who it goes for now.
+			if ( blocker != _target && IsValidTarget( blocker ) )
+			{
+				_target = blocker;
+				_timeSinceRetarget = 0;
+			}
+		}
+		else
+		{
+			_lastStep = to;
+			return;
+		}
+
+		Agent.SetAgentPosition( from );
+		WorldPosition = from;
+	}
+
+	/// <summary>A door that isn't open enough to get through, if the zombie's body ran into it on the step from
+	/// <paramref name="from"/> to <paramref name="to"/>.</summary>
+	private TerrorTown.MapMover ShutDoorOnStep( Vector3 from, Vector3 to )
+	{
+		var waist = Vector3.Up * 40f;
+		var tr = Scene.Trace.Sphere( 16f, from + waist, to + waist )
+			.WithTag( TerrorTown.MapMover.DoorTag )
+			.IgnoreGameObjectHierarchy( GameObject )
+			.Run();
+
+		// Started inside it: the door shut on it, so let it get out.
+		if ( !tr.Hit || tr.StartedSolid )
+			return null;
+
+		var door = tr.GameObject?.GetComponentInParent<TerrorTown.MapMover>();
+		return door.IsValid() && door.OpenAmount < TerrorTown.MapMover.OpenEnough ? door : null;
+	}
+
+	/// <summary>A player the step took it nearer to, within PlayerClearance. Downed players count: one stood on would get
+	/// up inside it.</summary>
+	private PlayerPawn PlayerInTheWay( Vector3 from, Vector3 to )
+	{
+		foreach ( var pawn in Scene.GetAllComponents<PlayerPawn>() )
+		{
+			if ( !pawn.IsValid() || pawn.HealthComponent.State != LifeState.Alive )
+				continue;
+
+			var at = pawn.WorldPosition;
+			if ( MathF.Abs( at.z - to.z ) > 72f )
+				continue;
+
+			var near = to.WithZ( 0 ).Distance( at.WithZ( 0 ) );
+			if ( near < PlayerClearance && near < from.WithZ( 0 ).Distance( at.WithZ( 0 ) ) )
+				return pawn;
+		}
+
+		return null;
 	}
 
 	private TerrorTown.MapMover _door;
@@ -253,7 +376,7 @@ public sealed class ZombieAI : Component, Component.IDamageable
 		_swingPending = true;
 		SwingCount++;
 		SetAnim( AnimState.Attack );
-		PlaySound( "zombie.attack" );
+		PlayVoice( ZombieVoice.Attack );
 	}
 
 	private void LandSwing()
@@ -466,7 +589,11 @@ public sealed class ZombieAI : Component, Component.IDamageable
 		else if ( !burn )
 		{
 			eco?.AddPoints( 10 );
-			PlaySound( "zombie.pain" );
+			if ( _timeSincePain > 0.35f )
+			{
+				_timeSincePain = 0;
+				PlayVoice( ZombieVoice.Pain );
+			}
 		}
 	}
 
@@ -500,7 +627,7 @@ public sealed class ZombieAI : Component, Component.IDamageable
 			_rb.AngularVelocity = Vector3.Random * 8f;
 		}
 
-		PlaySound( "zombie.die" );
+		PlayVoice( ZombieVoice.Death );
 
 		// Corpses stop soaking up bullets meant for the zombies behind them.
 		GameObject.Tags.Remove( "enemy" );
@@ -597,12 +724,48 @@ public sealed class ZombieAI : Component, Component.IDamageable
 	{
 		if ( _localCorpse.IsValid() )
 			_localCorpse.Destroy();
+
+		// A recycled zombie stops groaning. A dead one's rattle isn't parented to it, so it plays out.
+		if ( !IsDead )
+			_voice?.Stop( 0.1f );
 	}
 
+	// ── Voice (Tools/zombie_sounds.py) ──────────────────────────────────────────
+	private enum ZombieVoice { Groan, Attack, Pain, Death }
+
+	private SoundHandle _voice;
+
+	/// <summary>
+	/// Its voice, from the mouth, following it. A new sound cuts the last one short, since it has one throat. Each set is
+	/// synthesised (Tools/zombie_sounds.py); until its event has compiled, s&box's stock zombie sound plays instead.
+	/// </summary>
 	[Rpc.Broadcast]
-	private void PlaySound( string sound )
+	private void PlayVoice( ZombieVoice voice )
 	{
-		Sound.Play( sound, WorldPosition );
+		if ( Application.IsDedicatedServer )
+			return;
+
+		var (path, stock) = voice switch
+		{
+			ZombieVoice.Attack => ("sounds/zombies/zombie_attack.sound", "zombie.attack"),
+			ZombieVoice.Pain => ("sounds/zombies/zombie_pain.sound", "zombie.pain"),
+			ZombieVoice.Death => ("sounds/zombies/zombie_death.sound", "zombie.die"),
+			_ => ("sounds/zombies/zombie_groan.sound", null),
+		};
+
+		var mouth = WorldPosition + Vector3.Up * 58f;
+		var evt = ResourceLibrary.Get<SoundEvent>( path );
+		if ( evt is null && stock is null )
+			return;
+
+		_voice?.Stop( 0.08f );
+		_voice = evt is not null ? Sound.Play( evt, mouth ) : Sound.Play( stock, mouth );
+		if ( _voice is null || voice == ZombieVoice.Death )
+			return;
+
+		// It moves while it groans. A dying one's last breath stays where it fell.
+		_voice.Parent = GameObject;
+		_voice.FollowParent = true;
 	}
 
 	/// <summary>

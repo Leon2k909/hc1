@@ -1322,6 +1322,13 @@
 - Checked in-game 2026-09-26 (`dev_zombies`): the Zombies intro and no "Preparing to start", Blue Team, and the
   scoreboard's Points and Kills list. Solo, an idle player with the class menu open (it opens on joining a match) is
   downed about 17 s into round 1, and with nobody to revive them that's game over.
+- The pause menu pauses the match only for a player on their own (`ZombiesRoundSystem.ApplyMenuPause`). The pause is
+  the scene's TimeScale, and any player's menu used to freeze everyone where they stood. A match paused solo plays on
+  when someone joins.
+- A revived player stands up (`PlayerPawn.BuildInput`'s `_wasDowned`): they used to stay prone after a revive.
+- The points and perk badges are `ZombiesPointsPanel`, in MainHUD's right column above the weapon list, which pushes
+  them up as it grows. Pinned at a fixed height in `ZombiesRoundUI`, they were drawn over the list's rows (the user's
+  screenshot, 2026-10-01).
 
 ## Zombies perk dispensers and badges
 - Perk machines are turned off: the user will revisit the perk system later. Their placement in
@@ -1335,8 +1342,18 @@
   effect plates instead of being stretched. `preview_dispenser.py` renders all five; keep its colours matching the code.
 
 ## Zombies workbench (`ZombiesWorkbench.cs`, `ZombiesWorkbenchPanel`)
-- One `ZombiesBuyKind.Workbench` station per match (`PlaceBuyStations`), built in code from dev boxes and the game's own
-  M4, reflex sight, suppressor and ammo can (`CreateBenchModel`). Nothing was added to Assets.
+- One `ZombiesBuyKind.Workbench` station per match (`PlaceBuyStations`). Its model is the user's own Blender workbench
+  (`C:/Users/leon2/Documents/Workbench/`, the game-ready copy in `GameReady/Workbench_GameReady.blend`), which the user
+  saw had been left out for a stand-in built from dev boxes (2026-10-01).
+  - `Tools/zombies_workbench.py` (headless Blender) bakes its procedural materials into three texture sets (the bench,
+    the props on it, the pegboard) and writes `Assets/models/zombies/workbench/`: the OBJ, the vmdl, the PNGs and the
+    vmats. Its docstring has the axes and the bakes.
+  - It bakes a dozen objects at a time onto a joined copy of them (`CHUNK`), then grows each UV island 16 texels
+    (`grow_islands`). One bake for all 255 props took minutes a map and left some objects unbaked; Blender's own margin
+    can't be used, since one chunk's would paint over the islands of those baked before it.
+  - The model faces +X with its back at x -20: 72 wide, 86 tall and 40 deep, with wood shavings 13 further out on the
+    floor. The station's BoxCollider is 40 x 72 x 86 (`StationSize`, `CreateStation`), and the vmdl has no collision.
+  - `CreateBenchModel` loads `workbench.vmdl`, and builds the old stand-in (`CreateStandInBench`) if it hasn't compiled.
 - Use opens its menu on the player's own machine (the panel's Tick checks `PlayerPawn.Hovered`); the host's `OnUse` does
   nothing for it. E, Escape (one step back at a time, from MainHUD's chain), walking more than `WorkbenchRange` away,
   going down or dying closes it. It's in `IsInteractiveMouseUiOpen` / `GetCombatMouseBlockReason` (cursor) and
@@ -1362,6 +1379,39 @@
   100 for a headshot, doubled under Point Boost. Hits, the Clean Sweep and revives pass no reason, so they stay out of it.
 - Zombie kills still raise no `KillEvent`, so they stay out of the kill feed, medals, daily challenges and stats.
 - Checked in-game 2026-09-26 with `dev_zombie_hit`: the hitmarker on a hit, and "Killed a zombie 100" for a headshot kill.
+
+## Zombies, doors and players (`ZombieAI.KeepOut`)
+- The user (2026-10-01): zombies walked through doors on Innocent Hotel, and players got stuck in Zombies.
+- Doors: a NavMeshAgent moves a zombie with no collision, and doors are left out of the navmesh (the `door` tag), so
+  paths go through doorways. `MapMover.FindDoorAhead` stopped a zombie only for a door within 80 straight ahead, so one
+  coming at a door from an angle walked through it. Now each host update `KeepOut` sweeps a 16-unit sphere at the waist
+  along the agent's last step. If it meets a door that's less than `OpenEnough` open, the step is taken back
+  (`Agent.SetAgentPosition`) and the zombie opens the door and waits for it, as `WaitForDoor` does. A step that starts
+  inside a door (one shut on it) isn't stopped.
+- Players: zombies walked up to the player's centre. Once a zombie's capsule (16) was over a player's box, the box
+  started solid, and `CharacterController.TryUnstuck` hopped them about on the spot.
+  - A zombie now stops at `StandOff` (40, horizontally) from its target to swing, inside its 64 reach.
+  - `KeepOut` takes back any step that brings it within `PlayerClearance` (34) of a living player, downed ones included,
+    and it goes for whoever that was.
+  - A player whose box starts inside a zombie walks through zombies until clear of them all
+    (`CharacterController._throughEnemies`, the `enemy` tag).
+- Not yet checked in-game.
+
+## Zombie voices (`ZombieAI.PlayVoice`, `Tools/zombie_sounds.py`)
+- ZombieAI played s&box's `zombie.attack`, `zombie.pain` and `zombie.die`, events the game doesn't have, so zombies were
+  silent (the user, 2026-10-01). `Tools/zombie_sounds.py` synthesises their voices with no samples, from a source-filter
+  model of a man's voice (its docstring has every layer):
+  - groans while they hunt, every 5-12 s;
+  - a snarl as they swing;
+  - a grunt when hit, at most one every 0.35 s;
+  - a groan as they die, the last breath bubbling out.
+- Levels are a real voice's against a walk on concrete, squeezed as the rest of the mix is: groans -32 dB, the death
+  groan -30, the grunt -29 and the snarl -23.5.
+- `sounds/zombies/zombie_{groan,attack,pain,death}.sound`. A re-run rewrites the WAVs and keeps the events.
+  `--preview <wav>` plays every take.
+- The voice comes from the mouth and follows the zombie (the death groan stays where it fell). One throat, so a new sound
+  cuts the last short. Until an event has compiled, the stock name plays, which is silent.
+- The editor compiled the WAVs and events as they were written (2026-10-01), but they haven't been heard in-game.
 
 ## Zombie animations (NMRIH mocap on the citizen skeleton)
 - A zombie is an invisible driver with the zombie mesh bone-merged onto it (`SpawnZombie`). The driver is
@@ -2173,8 +2223,8 @@ simulate_input.
     as it starts to shut, `door_close` when it's shut; see Ridgeback buildings). Innocent Hotel's doors are the cloud
     map's own and keep its sounds.
 - Still s&box's, upstream's or not there at all:
-  - The zombies' voices (s&box's `zombie.attack`, `zombie.pain` and `zombie.die`) and Zombies' buy chime (upstream's
-    `buy.sound`). Nothing real to match them to.
+  - Zombies' buy chime (upstream's `buy.sound`). Nothing real to match it to. The zombies' voices are synthesised now
+    (see Zombie voices).
   - The upstream guns' sounds (M4A1, MP5, SCAR-H, USP, M700, Spaghelli, 1911) and the grenades' blasts and pins:
     upstream's own recordings, not CoD's or s&box's.
   - Impacts are heard by everyone within ~76 m, when the round gets there and the sound has come back (see Bullet

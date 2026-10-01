@@ -1,0 +1,92 @@
+@namespace Facepunch.UI
+@attribute [StyleSheet]
+@using Sandbox
+@using Sandbox.UI
+@inherits Panel
+
+@* The player's Zombies points and perk badges. It sits in MainHUD's right column above the weapon list, so the list
+   pushes it up as it grows: pinned at a fixed height, it was drawn over the list's rows. *@
+@if ( ZombiesRoundSystem.Current == null ) return;
+
+<root>
+    <div class="popups">
+        @foreach ( var p in Popups )
+        {
+            <label class="popup @(p.Amount < 0 ? "spent" : "")" style="bottom: @((int)(p.Age * 60f))px; opacity: @(Math.Clamp( 1.2f - p.Age, 0f, 1f ));">@(p.Amount > 0 ? "+" : "")@p.Amount</label>
+        }
+    </div>
+    <label class="points">@(Economy?.Points ?? 0)</label>
+    <div class="perks">
+        @foreach ( var perk in OwnedPerks )
+        {
+            var color = ZombiesBuyStation.PerkColor( perk );
+            <div @key="perk" class="perk" style="border-color: @color.Hex; box-shadow: 0px 0px 10px @color.WithAlpha( 0.55f ).Rgba; background-image: url( ui/zombies/perks/@(ZombiesBuyStation.PerkArt( perk )).png );"></div>
+        }
+    </div>
+    @if ( NewPerk is { } gained && NewPerkAge < NewPerkShowTime )
+    {
+        <div class="perk-gained" style="opacity: @NewPerkOpacity;">
+            <label class="pg-name" style="color: @ZombiesBuyStation.PerkColor( gained ).Hex;">@ZombiesBuyStation.PerkName( gained ).ToUpperInvariant()</label>
+            <label class="pg-desc">@Tr( ZombiesBuyStation.PerkDescription( gained ) )</label>
+        </div>
+    }
+</root>
+
+@code
+{
+    private static readonly ZombiesPerk[] AllPerks = { ZombiesPerk.IronTonic, ZombiesPerk.BoltSoda, ZombiesPerk.HotShot, ZombiesPerk.SecondWind, ZombiesPerk.FleetFoot };
+
+    // Badges in the order they were bought; the newest one's name shows beside them for a moment.
+    private readonly List<ZombiesPerk> OwnedPerks = new();
+    private ZombiesPerk? NewPerk;
+    private RealTimeSince NewPerkAge;
+    private const float NewPerkShowTime = 3f;
+    private float NewPerkOpacity => MathF.Round( Math.Clamp( (NewPerkShowTime - NewPerkAge) / 0.6f, 0f, 1f ), 2 );
+
+    private void UpdatePerks()
+    {
+        var perks = State?.Perks ?? ZombiesPerk.None;
+        OwnedPerks.RemoveAll( p => (perks & p) == 0 );
+        if ( NewPerk is { } shown && (perks & shown) == 0 ) NewPerk = null;
+
+        foreach ( var perk in AllPerks )
+        {
+            if ( (perks & perk) == 0 || OwnedPerks.Contains( perk ) ) continue;
+            OwnedPerks.Add( perk );
+            NewPerk = perk;
+            NewPerkAge = 0;
+        }
+    }
+
+    private record Popup( int Amount, RealTimeSince Age );
+    private readonly List<Popup> Popups = new();
+
+    private PlayerPawn LocalPawn => Client.Local?.PlayerPawn;
+    private ZombiesPlayerEconomy Economy => LocalPawn?.GetComponent<ZombiesPlayerEconomy>();
+    private ZombiesPlayerState State => LocalPawn?.GetComponent<ZombiesPlayerState>();
+
+    // Points popups come from watching the synced total, so they work for every client.
+    private int? _lastPoints;
+    private ZombiesPlayerEconomy _lastEconomy;
+
+    public override void Tick()
+    {
+        var eco = Economy;
+        if ( eco != _lastEconomy ) { _lastEconomy = eco; _lastPoints = eco?.Points; }
+        else if ( eco is not null && _lastPoints is { } last && eco.Points != last )
+        {
+            Popups.Add( new Popup( eco.Points - last, 0 ) );
+            _lastPoints = eco.Points;
+        }
+
+        Popups.RemoveAll( x => x.Age > 1.2f );
+        UpdatePerks();
+    }
+
+    protected override int BuildHash()
+    {
+        var animating = NewPerk is not null && NewPerkAge < NewPerkShowTime + 0.1f;
+        return HashCode.Combine( Economy?.Points, State?.Perks, animating ? (int)(Time.Now * 30f) : 0, Popups.Count,
+            Popups.Count > 0 ? (int)(Popups[^1].Age * 30) : 0 );
+    }
+}

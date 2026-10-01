@@ -61,6 +61,9 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	/// keep a key down to stay on the floor.
 	/// </summary>
 	[Sync] public bool IsProne { get; set; }
+
+	/// <summary>Downed in Zombies last update, so a revive stands them up.</summary>
+	private bool _wasDowned;
 	[Sync] private bool IsFallKnockedDown { get; set; }
 	[Sync] private TimeSince TimeSinceFallKnockdown { get; set; }
 
@@ -379,12 +382,17 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 		if ( gotUpWithJump )
 			ToggleProne();
 
-		// Zombies: downed players are stuck on the floor until revived.
+		// Zombies: downed players are stuck on the floor until revived, and get up when they are.
 		if ( downed )
 		{
 			IsProne = true;
 			IsSprinting = false;
 		}
+		else if ( _wasDowned )
+		{
+			IsProne = false;
+		}
+		_wasDowned = downed;
 
 		IsCrouching = Input.Down( "Duck" ) && !IsNoclipping;
 		IsUsing = Input.Down( "Use" );

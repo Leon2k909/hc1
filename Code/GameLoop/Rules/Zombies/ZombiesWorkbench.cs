@@ -209,12 +209,34 @@ public sealed partial class ZombiesBuyStation
 
 	// ── The bench itself ────────────────────────────────────────────────────────
 
+	/// <summary> The user's own workbench, modelled in Blender and baked by Tools/zombies_workbench.py. </summary>
+	internal const string BenchModelPath = "models/zombies/workbench/workbench.vmdl";
+
+	/// <summary>
+	/// The user's workbench (<see cref="BenchModelPath"/>): facing +X like the other stations, its back at x -20, 72
+	/// wide and 86 tall to the shop light over its top shelf. The wood shavings on the floor reach 13 past the station's
+	/// box. If the model hasn't compiled, the stand-in (<see cref="CreateStandInBench"/>).
+	/// </summary>
+	internal static void CreateBenchModel( GameObject parent )
+	{
+		var model = Model.Load( BenchModelPath );
+		if ( model is null || model.IsError )
+		{
+			Log.Warning( $"Zombies workbench: {BenchModelPath} didn't load, building the stand-in" );
+			CreateStandInBench( parent );
+			return;
+		}
+
+		var bench = new GameObject( parent, true, "Workbench" );
+		bench.Components.Create<ModelRenderer>().Model = model;
+	}
+
 	/// <summary>
 	/// A steel-legged workbench with a pegboard back: a rifle lying on the top with a sight and a suppressor beside it, a
 	/// vise, a plate carrier's plates against the pegboard and an ammo can on the shelf. Built from dev boxes and the
 	/// game's own weapon models, facing +X like the other stations, 40 deep, 72 wide and 72 tall.
 	/// </summary>
-	internal static void CreateBenchModel( GameObject parent )
+	private static void CreateStandInBench( GameObject parent )
 	{
 		var wood = new Color( 0.42f, 0.29f, 0.17f );
 		var darkWood = new Color( 0.26f, 0.18f, 0.11f );

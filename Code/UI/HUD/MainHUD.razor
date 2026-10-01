@@ -86,6 +86,10 @@
 
             @if ( isValidPlayer )
             {
+                @if ( isZombies )
+                {
+                    <ZombiesPointsPanel />
+                }
                 <WeaponInfoComponent />
                 <Ammo />
                 

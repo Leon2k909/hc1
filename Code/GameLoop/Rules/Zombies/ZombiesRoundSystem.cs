@@ -73,7 +73,10 @@ public sealed class ZombiesRoundSystem : Component
 		BeginIntermission( 9999f );
 	}
 
-	/// <summary>Pause or resume the Zombies match from the pause menu.</summary>
+	/// <summary>
+	/// Pause or resume the Zombies match from the pause menu. Only a player on their own pauses it: the pause is the
+	/// whole scene's time, so with others in the match, whoever opened the menu froze everyone where they stood.
+	/// </summary>
 	public void SetPausedFromMenu( bool paused )
 	{
 		if ( !Networking.IsHost )
@@ -90,7 +93,7 @@ public sealed class ZombiesRoundSystem : Component
 
 	private void ApplyMenuPause( bool paused )
 	{
-		IsPaused = paused;
+		IsPaused = paused && CountHumanPlayers() <= 1;
 		ApplyPauseTimeScale();
 	}
 
@@ -132,6 +135,10 @@ public sealed class ZombiesRoundSystem : Component
 	{
 		ApplyPauseTimeScale();
 		if ( !Networking.IsHost ) return;
+
+		// Someone joined a match paused on its own: play on.
+		if ( IsPaused && CountHumanPlayers() > 1 )
+			ApplyMenuPause( false );
 
 		RemoveCombatBots();
 		TrackDeadPlayers();
@@ -677,7 +684,7 @@ public sealed class ZombiesRoundSystem : Component
 		ZombiesBuyKind.Perk => new Vector3( 64f, 64f, 103f ),
 		ZombiesBuyKind.WeaponCrate => new Vector3( 36f, 70f, 34f ),
 		ZombiesBuyKind.AmmoBox => new Vector3( 40f, 68f, 48f ),
-		ZombiesBuyKind.Workbench => new Vector3( 40f, 72f, 72f ),
+		ZombiesBuyKind.Workbench => new Vector3( 40f, 72f, 86f ),
 		_ => new Vector3( 10f, 60f, 60f ),
 	};
 
@@ -828,7 +835,7 @@ public sealed class ZombiesRoundSystem : Component
 
 			case ZombiesBuyKind.Workbench:
 				ZombiesBuyStation.CreateBenchModel( go );
-				size = new Vector3( 40f, 72f, 72f );
+				size = new Vector3( 40f, 72f, 86f );
 				break;
 
 			default:

@@ -1,0 +1,84 @@
+@import "/UI/Styles/Theme.scss";
+
+// The Zombies points and perk badges, in MainHUD's right column above the weapon list (see ZombiesPointsPanel.razor).
+// Text sizes go on the labels themselves: the theme's `label { font-size: 18px }` beats inherited ones.
+ZombiesPointsPanel
+{
+    flex-direction: column;
+    align-items: flex-end;
+    flex-shrink: 0;
+    gap: 8px;
+    padding: 0px 48px 12px 0px;
+    pointer-events: none;
+    font-family: Poppins;
+    color: white;
+    text-shadow: 2px 2px 4px rgba( 0, 0, 0, 1 );
+
+    .popups
+    {
+        position: relative;
+        height: 0;
+        width: 140px;
+    }
+
+    .popup
+    {
+        position: absolute;
+        right: 0;
+        font-size: 22px;
+        font-weight: 800;
+        color: #ffd24a;
+
+        &.spent { color: #ff6a5a; }
+    }
+
+    .points
+    {
+        font-size: 40px;
+        font-weight: 900;
+        color: #ffd24a;
+        padding: 2px 16px;
+        background-color: rgba( 0, 0, 0, 0.45 );
+        border-right: 4px solid #ffd24a;
+    }
+
+    .perks
+    {
+        flex-direction: row;
+        gap: 8px;
+    }
+
+    // The badge art (ui/zombies/perks) is round with its own cream rim; the border is the perk's colour.
+    .perk
+    {
+        width: 50px;
+        height: 50px;
+        border-radius: 25px;
+        border: 2px solid white;
+        background-size: 100% 100%;
+        background-position: center;
+        transition: transform 0.35s ease-out, opacity 0.35s ease-out;
+
+        &:intro
+        {
+            transform: scale( 1.8 );
+            opacity: 0;
+        }
+    }
+
+    // Beside the points, left of them, so it covers neither the weapon list below nor the popups above, and the
+    // points and badges don't move when it comes and goes.
+    .perk-gained
+    {
+        position: absolute;
+        right: 100%;
+        bottom: 12px;
+        margin-right: 12px;
+        flex-direction: column;
+        align-items: flex-end;
+        white-space: nowrap;
+
+        .pg-name { font-size: 20px; font-weight: 900; letter-spacing: 3px; }
+        .pg-desc { font-size: 14px; font-weight: 600; color: rgba( white, 0.8 ); }
+    }
+}

@@ -88,9 +88,20 @@ public class CharacterController : Component
 	SceneTrace BuildTrace( SceneTrace source )
 	{
 		var trace = source.Size( BoundingBox ).IgnoreGameObjectHierarchy( GameObject );
+		trace = UseCollisionRules ? trace.WithCollisionRules( Tags ) : trace.WithoutTags( IgnoreLayers );
 
-		return UseCollisionRules ? trace.WithCollisionRules( Tags ) : trace.WithoutTags( IgnoreLayers );
+		return _throughEnemies ? trace.WithoutTags( EnemyTag ) : trace;
 	}
+
+	/// <summary>Zombies' capsules (ZombiesRoundSystem.SpawnZombie).</summary>
+	const string EnemyTag = "enemy";
+
+	/// <summary>
+	/// Set when the box finds itself inside a zombie, until it's clear of every zombie: meanwhile it walks through them.
+	/// A zombie can end up over a player (one walks into them, or stands where a downed player gets up), and the box
+	/// starting solid used to leave them hopping about on the spot trying to get unstuck.
+	/// </summary>
+	bool _throughEnemies;
 
 	/// <summary>
 	/// Trace the controller's current position to the specified delta
@@ -247,7 +258,17 @@ public class CharacterController : Component
 
 	bool TryUnstuck()
 	{
+		if ( _throughEnemies && !InsideEnemy() )
+			_throughEnemies = false;
+
 		var result = BuildTrace( WorldPosition, WorldPosition ).Run();
+
+		// Inside a zombie: walk out of it.
+		if ( result.StartedSolid && !_throughEnemies && InsideEnemy() )
+		{
+			_throughEnemies = true;
+			result = BuildTrace( WorldPosition, WorldPosition ).Run();
+		}
 
 		// Not stuck, we cool
 		if ( !result.StartedSolid )
@@ -287,6 +308,12 @@ public class CharacterController : Component
 		_stuckTries++;
 
 		return true;
+	}
+
+	bool InsideEnemy()
+	{
+		var box = Scene.Trace.Box( BoundingBox, WorldPosition, WorldPosition ).WithTag( EnemyTag ).IgnoreGameObjectHierarchy( GameObject );
+		return box.Run().StartedSolid;
 	}
 
 }
