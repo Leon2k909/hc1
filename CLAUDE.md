@@ -1552,6 +1552,8 @@
   - Retakes spawns, tagged like Refinery's (`retakes,<site>,<role>`). Each site has Red planters and defenders and
     Blue attackers. `ActiveBombSiteSelector` turns on the round's site. The mode's `TeamSpawnAssigner` puts one Red
     player on a `planter` spawn, and `SpecialWeaponAllocator` gives that player the C4.
+    - No Red spawn can see a Blue one at either site, standing or crouched (checked against the script's collision on
+      2026-10-01). The spawn deaths the user had were the bots' (see Retakes and Defuse rounds).
   - Buy zones on the spawn roads, callouts for every area, the play area, and a player clip over the south parapet, so
     nobody jumps off the drop. A catch floor 3100 below stops anything thrown over the walls.
   - `MapSpawnSettings` turns off map spawn points and navmesh spawns: every spawn is placed.
@@ -2766,6 +2768,59 @@ simulate_input.
     holders plant.
   - `dev_bot_styles` logs every living bot's style, habits, gun and current move.
   - Compiled and hotloaded into the user's match on 2026-09-29, not yet watched.
+
+## Retakes and Defuse rounds (`BotFillRule.RestartRound`)
+- The user (2026-10-01): in Retakes on Belltower they spawned among the enemies and died at once.
+- Bots were never reset between Retakes rounds. They stood where the last round left them, and in the first round
+  where the Waiting state's spawns put them. Belltower's Blue spawn road is beside both bomb sites, so a Red player
+  could spawn among them.
+- Now every round mode (Defuse and Retakes, `BotFillRule.IsRoundMode`) starts each round afresh:
+  - `RespawnPlayers` calls `RestartRound` before respawning the players. It clears the last round's bots, so they
+    don't count in the players' spawn picks.
+  - 0.1 s later the full roster comes back at this round's enabled spawns.
+- `ClearBots` disables each bot before destroying it. A destroy only happens at the end of the frame, and the players'
+  spawn picks in that frame would still find them.
+- Once a round is under way (its bomb handlers are active), a late join or a state change doesn't refill a round mode's
+  bots (`UpdatePlayerCount` returns), so teammates killed earlier in the round stay dead.
+- A bot's spawn point (`LightweightBotManager.GetSpawnTransform`) is one nobody stands on (within
+  `OccupiedSpawnRadius`, 48) where there is one. Retakes places a whole team on as few points as it has players.
+- Compiled offline, not yet checked in a match.
+
+## C4 detonation (`DemolitionBlast`, `c4_explosion.prefab`)
+- The user (2026-10-01): the bomb's explosion "doesnt look very realistic, it should be really destructive, not just a
+  little grenade style effect". It was a puff of smoke, a small flipbook flame, a flare and glowing shrapnel. Those
+  children are gone; the old prefab is in `Backups/c4_explosion_old/`.
+- `DemolitionBlast` (`Code/Weapons/Grenades/DemolitionBlast.cs`) builds the blast in code on every machine, from the
+  engine's own sheets, sized from the real charge:
+  - 9 kg of C4 (`ChargeKg`) is ~12 kg of TNT (`TntEquivalence` 1.34). On the ground its blast acts like ~22 kg in the
+    open (`SurfaceBurstFactor` 1.8, `EquivalentKg`).
+  - The detonation's flash (`explosion_03`, additive), then a fireball ~8 m across: measured HE fireballs scale as
+    ~3.4 m per kg^(1/3) of TNT. It's 11 `explosion_01` sprites in a dome, full size in 50 ms, white-hot for ~0.1 s,
+    then orange, then soot that rolls up (`FireballParticles`).
+  - The ground's own dust: a burst thrown up with the chunks (`explosion_02` on soil, `smoke_burst_c` on masonry), and
+    the base surge, a ring of 24 puffs driven along the ground that stops 9-15 m out and hangs for 7-10 s
+    (`BlastCloudParticles`).
+  - A column of soot, then dust, fed for 3 s and rising 15-25 m, which drifts with `WorldWind` and thins out over
+    24-34 s.
+  - Up to 80 chunks of the ground (`rock_chunks_01`, a shape per sheet sequence: `Particle.Sequence` reaches the
+    shader) and a spray of grit, thrown 10-45 m/s. They fly under real gravity (9.81 m/s², not the players' 800 u/s²)
+    with quadratic drag for a stone of their size (`DebrisParticles`), bounce, and lie there for 14-22 s.
+  - 60 hot sparks, a light that flares with the flash and fades with the fireball, and a 10 m scorch
+    (`burnt_patch.decal`) under the old 9 m `grenade_scorchmark` decal.
+  - The dust and the chunks take the ground's colours, by `WorldSounds.Classify`: soil, grass, wood or masonry.
+  - Loose rigidbodies within 25 m in the open are thrown, ~12 m/s at 3 m and ~2 m/s at 10 m. Each machine throws the
+    ones it simulates.
+  - The view shakes when the blast reaches the viewer, by Kinney and Graham's peak overpressure there
+    (`OverpressureKpa`): as hard as it goes inside ~6 m, a jolt at 30 m (~9 kPa), a faint thump at 100 m.
+- The host also breaks every `BreakableGlass` pane the blast reaches in the open, out to 1 psi (`WindowBreakKpa`,
+  ~37 m; `DemolitionBlast.BreakWindows`, from `TimedExplosive.Explode`). Damage is still the bomb site's
+  (`BombSite.GetExplosionDamage`).
+- The explosion object lasts 40 s (`DestroyAfter`) so the column can thin out, and goes at the round's cleanup
+  (`DestroyBetweenRounds`).
+- Lit sprites go dark on cloud maps (see Smoke grenade), so every sprite is unlit, with its colour in its tint.
+- Not seen yet: it compiled offline with dotnet, and nothing has been looked at in the engine. To tune by eye: the
+  fireball's size and how long it glows, the surge's and column's density, the chunks' tint, the light's brightness and
+  the shake.
 
 ## Leg animation speeds (`rigged_human.vanmgrph`, players and bots)
 - The lower-body Blend2Ds ("Stood Lower Body", "Crouched Lower Body"; X = move_y, right, Y = move_x, forward) put each

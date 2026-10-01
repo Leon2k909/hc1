@@ -135,6 +135,10 @@ public sealed class TimedExplosive : Component, IUse, IMinimapIcon, IDescription
 		{
 			var explosion = ExplosionPrefab.Clone( WorldPosition, Rotation.FromYaw( Random.Shared.NextSingle() * 360f ) );
 			explosion.NetworkSpawn();
+
+			// Every machine shows the blast itself (DemolitionBlast); the host breaks the windows it reaches.
+			if ( explosion.GetComponent<DemolitionBlast>() is { } blast )
+				DemolitionBlast.BreakWindows( Scene, WorldPosition, blast.EquivalentKg, GameObject );
 		}
 
 		Scene.Dispatch( new BombDetonatedEvent( GameObject, BombSite ) );

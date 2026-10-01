@@ -1071,6 +1071,9 @@ public sealed partial class LightweightBotManager : SingletonComponent<Lightweig
 	[Property] public float MapSpawnMinPlayerDistance { get; set; } = 500f;
 	[Property] public float MinSpawnDistanceFromBots { get; set; } = 800f;
 
+	/// <summary> Someone within this of a spawn point (a body's width and a bit) is standing on it. </summary>
+	private const float OccupiedSpawnRadius = 48f;
+
 	/// <summary>
 	/// A bot doesn't spawn closer than this to a living teammate bot (~10 m), and a spot closer than twice this counts
 	/// against it. At 150 units a team's reinforcements came in as a bunch and stayed one.
@@ -1344,6 +1347,9 @@ public sealed partial class LightweightBotManager : SingletonComponent<Lightweig
 	{
 		foreach ( var bot in Bots.ToArray() )
 		{
+			// Disabled first, so they're out of every scene query at once (the players' spawn picks that follow a
+			// round's reset); the destroy only happens at the end of the frame.
+			bot.GameObject.Enabled = false;
 			bot.GameObject.Destroy();
 		}
 	}
@@ -1367,11 +1373,21 @@ public sealed partial class LightweightBotManager : SingletonComponent<Lightweig
 		if ( spawnPoints.Length == 0 )
 			return global::Transform.Zero;
 
+		// A spawn point someone is already standing on is the last resort: a round mode places a whole team at once
+		// on as few points as it has players (Retakes' five attackers), and two on one point are stuck in each other.
+		var standing = GameUtils.PlayerPawns.Where( x => x.IsValid() && x.HealthComponent.State == LifeState.Alive )
+			.Select( x => x.WorldPosition )
+			.Concat( Bots.Where( x => x.IsValid() && x.IsAlive ).Select( x => x.WorldPosition ) )
+			.ToArray();
 		var candidates = spawnPoints
-			.OrderByDescending( x => GetSpawnScore( x.Position ) )
+			.OrderBy( x => standing.Any( p => p.Distance( x.Position ) < OccupiedSpawnRadius ) )
+			.ThenByDescending( x => GetSpawnScore( x.Position ) )
 			.Where( x => IsOnMainNavMesh( x.Position ) )
 			.Take( 5 )
 			.ToArray();
+		var free = candidates.Where( x => !standing.Any( p => p.Distance( x.Position ) < OccupiedSpawnRadius ) ).ToArray();
+		if ( free.Length > 0 )
+			candidates = free;
 
 		var spawn = Random.Shared.FromArray( candidates, spawnPoints[0] );
 		return spawn.Transform.WithScale( 1f );

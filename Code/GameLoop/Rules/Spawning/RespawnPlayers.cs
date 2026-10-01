@@ -17,10 +17,11 @@ public sealed class RespawnPlayers : Component,
 	void IGameEventHandler<EnterStateEvent>.OnGameEvent( EnterStateEvent eventArgs )
 	{
 		DefuseTesting.PrepareRound();
+		// The last round's bots go first, so the players' spawns aren't picked against where they stood.
+		GameMode.Instance?.Get<BotFillRule>()?.RestartRound();
 		foreach ( var player in GameUtils.AllPlayers )
 		{
 			player.Respawn( ForceNew );
 		}
-		GameMode.Instance?.Get<BotFillRule>()?.RestartDefuseRound();
 	}
 }

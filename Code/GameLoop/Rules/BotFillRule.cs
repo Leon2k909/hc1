@@ -117,7 +117,7 @@ public sealed class BotFillRule : Component,
 
 		// A plant or a late join must not replace teammates killed earlier in this round.
 		var mode = GameMode.Instance;
-		if ( mode?.Ident == "defuse" && (mode.Get<BombPlantedEventComponent>() is not null || mode.Get<BombDefusedEventHandler>() is not null) )
+		if ( IsRoundMode && (mode.Get<BombPlantedEventComponent>() is not null || mode.Get<BombDefusedEventHandler>() is not null) )
 			return;
 
 		var customGame = CustomGameSettings.Current;
@@ -148,9 +148,20 @@ public sealed class BotFillRule : Component,
 		}
 	}
 
-	internal void RestartDefuseRound()
+	/// <summary>
+	/// Defuse and Retakes, whose every round starts afresh. Their bots are cleared and placed again at each round's
+	/// spawns with the players (<see cref="RestartRound"/>).
+	/// </summary>
+	private static bool IsRoundMode => GameMode.Instance?.Ident is "defuse" or "retakes";
+
+	/// <summary>
+	/// A round mode's new round: the last round's bots go, and the full roster comes back at this round's spawns once
+	/// the players have theirs. In Retakes the survivors used to stay where the last round left them, and on the first
+	/// round at the Waiting spawns: the Blue spawn road is beside both bomb sites, so a Red player spawned among them.
+	/// </summary>
+	internal void RestartRound()
 	{
-		if ( !HasHostAuthority || GameMode.Instance?.Ident != "defuse" ) return;
+		if ( !HasHostAuthority || !IsRoundMode ) return;
 		if ( UseLightweightNpcBots ) GetLightweightBotManager()?.ClearBots();
 		// Let the previous pawns and bots finish destroying before counting the new roster.
 		_timeSinceDefuseReset = 0;
