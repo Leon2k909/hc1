@@ -95,11 +95,24 @@ public sealed class ActiveBombSiteSelector : Component,
 		CurrentBombSite = bombSite;
 
 		var name = bombSite.GameObject.Name.ToLower();
-		var spawns = Scene.GetComponentsInChildren<TeamSpawnPoint>();
+		// Every spawn, the ones the last round's site switched off included. GetComponentsInChildren only finds enabled
+		// ones, so the first round at the other site switched every spawn off, and both teams spawned together at the
+		// world's origin (TeamSpawnAssigner's and the bots' fallback).
+		var spawns = Scene.Components.GetAll<TeamSpawnPoint>( FindMode.EverythingInSelfAndDescendants ).ToArray();
 
 		foreach ( var spawn in spawns )
 		{
+			// Another mode's spawns, under an object the mode leaves off, stay as they are.
+			if ( !spawn.GameObject.Active )
+				continue;
+
 			spawn.Enabled = spawn.GameObject.Tags.Contains( name );
+		}
+
+		foreach ( var team in GameUtils.Teams )
+		{
+			if ( !spawns.Any( x => x.Enabled && x.GameObject.Active && x.Team == team ) )
+				Log.Warning( $"Retakes: {bombSite.GameObject.Name} has no spawns for {team}" );
 		}
 
 		GameMode.Instance.ShowToast( $"Retakes: {bombSite.Zone.DisplayName}", duration: 3f );
