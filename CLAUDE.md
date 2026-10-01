@@ -2082,6 +2082,19 @@ simulate_input.
   preview, not seen. The 2026-09-29 white, blur and roll compiled and hotloaded into a running game, but haven't been
   seen yet. None of it has been checked in-game yet.
 
+## Smoke grenade colour (`smoke_particles.prefab`)
+- The user saw the smoke grenade's cloud come out dark navy, almost black, in an Innocent Hotel room (2026-10-01). A
+  screening smoke grenade's HC smoke is white-grey; only coloured signal smoke is anything else.
+- The sprite (`smoke1.vtex`, from a cloud package) is a neutral light grey, about 0.8, and the tint was white. The cause
+  was the renderer's `Lighting`. In the engine's `sprite_ps.shader`, a lit sprite gets the dynamic lights plus either
+  baked light (a lightmap or light probes) or, if it has neither, the scene's flat `AmbientLightColor`. A cloud map's
+  rooms are lit by baked light the sprites don't receive, so the smoke got only the sky's dark blue ambient.
+- The sprite renderer can't be part-lit, so the smoke is now unlit with a tint of 0.85 (`ParticleEffect.Tint`): about 0.7
+  of white with the texture. It's the same brightness everywhere, so in a dark spot it can look a little bright.
+- The fire's smoke (`FireParticles`, the thermite and grass fires) is still lit, since its own flames' light falls on
+  it. Indoors on a cloud map, away from the fire, it may darken the same way.
+- Not yet seen in-game.
+
 ## Deaths (`DyingBody`, `DeathPlan`, `Code/PawnSystem/DyingBody.cs`)
 - The user asked for "more variance in the way people die", some "slowly" dropping, with "hyper realism". Every death
   used to be a limp ragdoll at once, shoved by 5-20 times the damage (players) or 50 times the force (bots) on every
