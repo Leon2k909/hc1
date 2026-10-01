@@ -1051,6 +1051,9 @@
   (`ClickBackdrop`). Without that, the tuning panel's DONE closed it and the backdrop's toggle opened it again.
 - Header hover labels (`.gnav-tip`) on an open round button are hidden with `opacity: 0`, not `display: none`, in the
   menu and the gunsmith: a label back from `display: none` was sometimes drawn as bare text with no box.
+- A label in a row with a `flex-grow` sibling can shrink to one letter's width and wrap letter by letter. The weapon
+  cards' "LV" did, beside the XP bar (the user's report, 2026-10-01). Short labels like that get `flex-shrink: 0` and
+  `white-space: nowrap` (`.gs-lv-key`, `.gs-lv-num`), and the growing sibling `min-width: 0`.
 - Equipment icons (lethal, tactical) are drawn in a square about twice their box, and the box clips them: the
   loadout's 56 px `.gs-gear-img` holds a 110 px `.gs-img-square`, the picker's 44 px box a 90 px one. So an icon must
   be framed like the grenade PNGs, with the item centred and about 40% of the canvas wide. The Recon Drone's SVG filled

@@ -577,8 +577,12 @@ GunsmithPanel
         border-radius: 2px;
     }
 
+    // Beside the cards' growing XP bar a label shrank to one letter's width, so "LV" wrapped to "L" over "V". Both keep
+    // their width, and translations as long as "Stufe" or "Poz." stay on one line.
     .gs-lv-key
     {
+        flex-shrink: 0;
+        white-space: nowrap;
         font-size: 12px;
         font-weight: 700;
         letter-spacing: 1.5px;
@@ -587,6 +591,8 @@ GunsmithPanel
 
     .gs-lv-num
     {
+        flex-shrink: 0;
+        white-space: nowrap;
         font-size: 14px;
         font-weight: 700;
         color: $accent;
@@ -783,6 +789,7 @@ GunsmithPanel
     .gs-card-xp
     {
         flex-grow: 1;
+        min-width: 0;
         height: 4px;
         margin-left: 8px;
         background-color: rgba( 255, 255, 255, 0.1 );
