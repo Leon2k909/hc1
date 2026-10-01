@@ -192,6 +192,38 @@ public static class WorldSounds
 	public static float BounceVolume( float speed ) =>
 		speed < BounceMinSpeed ? 0f : MathF.Min( MathF.Pow( speed / BounceReferenceSpeed, 1.2f ), 2f );
 
+	/// <summary> What a spent case is, for the sound of it landing. </summary>
+	public enum Brass
+	{
+		/// <summary> A rifle's long, thin-walled bottleneck case (5.56, 7.62): a ringing tink. </summary>
+		Rifle,
+		/// <summary> A pistol's or SMG's short, thicker straight case (9 mm, .45): higher and shorter. </summary>
+		Pistol,
+	}
+
+	/// <summary> The impact speed, in units a second, at which a case's bounce plays at its event's own volume (~6 m/s). </summary>
+	public const float CasingReferenceSpeed = 240f;
+
+	/// <summary> Slower than this (~0.6 m/s) a case rolls or settles without a tink worth hearing. </summary>
+	public const float CasingMinSpeed = 25f;
+
+	/// <summary>
+	/// A spent case of <paramref name="brass"/> landing on <paramref name="surface"/>, or null where we have none (water,
+	/// snow, cloth): the caller plays its own. Scale it by <see cref="CasingVolume"/>.
+	/// </summary>
+	public static SoundEvent CasingBounce( Surface surface, Brass brass )
+	{
+		var floor = Floor( Classify( surface ) );
+		return floor is null ? null : Event( $"sounds/world/casings/brass_{brass.ToString().ToLowerInvariant()}_{floor}.sound" );
+	}
+
+	/// <summary>
+	/// How loud a case's bounce at <paramref name="speed"/> is against one at <see cref="CasingReferenceSpeed"/>, as
+	/// <see cref="BounceVolume"/> works it out for a grenade: 0 under <see cref="CasingMinSpeed"/>, at most 2.
+	/// </summary>
+	public static float CasingVolume( float speed ) =>
+		speed < CasingMinSpeed ? 0f : MathF.Min( MathF.Pow( speed / CasingReferenceSpeed, 1.2f ), 2f );
+
 	/// <summary>
 	/// A boot on this floor: a walking step or, sprinting, a running one. <paramref name="left"/> picks the surface's own
 	/// left or right step where it keeps its own.

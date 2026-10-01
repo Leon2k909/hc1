@@ -34,38 +34,12 @@
         "WaitForChildEffects": false
       },
       {
-        "__type": "Sandbox.Audio.SoundEmitter",
-        "__guid": "8d774fe2-b1f6-4ba4-96d6-24de88658310",
+        "__type": "Facepunch.BlastSound",
+        "__guid": "2c240942-efde-47dc-8125-cd7782ce55bd",
         "__enabled": true,
-        "AutoStart": true,
-        "DestroyOnFinish": true,
-        "Follow": true,
-        "LifeTime": 1,
-        "MixerName": "Game",
-        "OnComponentDestroy": null,
-        "OnComponentDisabled": null,
-        "OnComponentEnabled": null,
-        "OnComponentFixedUpdate": null,
-        "OnComponentStart": null,
-        "OnComponentUpdate": null,
-        "SoundEvent": "sounds/weapons/grenade/he_grenade_explode.sound",
-        "VolumeModifier": false,
-        "VolumeOverTime": [
-          {
-            "x": 0,
-            "y": 1,
-            "in": 0,
-            "out": 0,
-            "mode": "Mirrored"
-          },
-          {
-            "x": 1,
-            "y": 1,
-            "in": 0,
-            "out": 0,
-            "mode": "Mirrored"
-          }
-        ]
+        "Far": "sounds/weapons/grenade/frag_blast_far.sound",
+        "FarDistance": 1600,
+        "Near": "sounds/weapons/grenade/frag_blast_near.sound"
       }
     ],
     "Children": [

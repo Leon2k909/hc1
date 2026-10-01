@@ -112,8 +112,9 @@ public partial class FlashbangGrenade : BaseGrenade, IMarkerObject
 	{
 		base.Explode();
 
+		// The flash is seen at once, the bang heard when it gets there.
 		if ( ExplodeSound is not null )
-			Sound.Play( ExplodeSound, WorldPosition );
+			GunshotAudio.PlayDelayed( ExplodeSound, WorldPosition, GunshotAudio.SoundDelay( WorldPosition ) );
 
 		var viewer = Client.Viewer?.PlayerPawn;
 		if ( !viewer.IsValid() || viewer.HealthComponent.State != LifeState.Alive )

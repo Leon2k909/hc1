@@ -18,10 +18,12 @@
         }
       },
       {
-        "__type": "Facepunch.SoundEmitter",
-        "__guid": "a67d111c-14ab-44d6-b051-41613e7fbb61",
-        "Follow": true,
-        "SoundEvent": "sounds/weapons/bomb/c4_explode.sound"
+        "__type": "Facepunch.BlastSound",
+        "__guid": "79496285-36ea-4f00-b4c8-c5ef70e84717",
+        "__enabled": true,
+        "Far": "sounds/weapons/bomb/c4_blast_far.sound",
+        "FarDistance": 4000,
+        "Near": "sounds/weapons/bomb/c4_blast_near.sound"
       }
     ],
     "Children": [

@@ -866,6 +866,9 @@ class Prefabs:
     equip_fields: dict = field(default_factory=dict)
     # The share of the icon's width the gun spans: 0.9 like the M4's, less for a pistol (the USP's spans 0.35).
     icon_width: float = 0.9
+    # The dry-fire click (Tools/handling_sounds.py): "rifle" (an AR's hammer), "ak" (the heavier hammer in a stamped
+    # receiver, for the AK-pattern guns) or "pistol".
+    dry_fire: str = "rifle"
 
 
 PARTS_AK47 = {
@@ -895,6 +898,7 @@ PREFABS = {
         description="Hard-hitting 7.62 assault rifle. Fires slower and kicks harder than the M4.",
         price=2700,
         deploy_sound="sounds/weapons/kastov/kastov_raise.sound",
+        dry_fire="ak",
         icon_source="3803722029/materials/vgui/entities/mg_mw4_ak47",
         default_mesh_groups=340002817,
         bones={
@@ -963,6 +967,7 @@ PREFABS = {
         description="Russian 9x19mm submachine gun built on the AK-74. Straight blowback, 30-round magazine.",
         price=1500,
         deploy_sound="weapons/vityaz/sounds/vityaz.raise.sound",
+        dry_fire="ak",
         icon_source="3499492742/materials/vgui/entities/mg_iw9_aviktor",
         # The muzzle tip (factory, the long barrel's, none) and the factory stock, grip, magazine and barrel.
         default_mesh_groups=22036489,
@@ -1002,6 +1007,7 @@ PREFABS = {
         description="Soviet 7.62x39mm light machine gun: an AKM with a longer, heavier barrel and a 75-round drum.",
         price=3200,
         deploy_sound="weapons/rpk/sounds/rpk.raise_rattle.sound",
+        dry_fire="ak",
         icon_source="3499492742/materials/vgui/entities/mg_iw9_rkilo",
         # The brake and the factory stock, grip and drum; the rails hidden.
         default_mesh_groups=2363477,
@@ -1039,6 +1045,7 @@ PREFABS = {
                     "helical magazine under the barrel.",
         price=1400,
         deploy_sound="weapons/bizon/sounds/bizon.raise.sound",
+        dry_fire="ak",
         icon_source="3499492742/materials/vgui/entities/mg_iw9_beta",
         # The muzzle nut and the factory stock and grip; the side rail hidden.
         default_mesh_groups=2129941,
@@ -1075,6 +1082,7 @@ PREFABS = {
         description="Russian 5.45x39mm carbine: the AK-74M cut down to a 314 mm barrel, with a side-folding stock.",
         price=2500,
         deploy_sound="weapons/ak105/sounds/ak105.raise.sound",
+        dry_fire="ak",
         icon_source="3499492742/materials/vgui/entities/mg_iw9_akilo105",
         # The flash hider, the stock hinge and the factory stock, grip and magazine; the optic mount hidden.
         default_mesh_groups=285343829,
@@ -1110,6 +1118,7 @@ PREFABS = {
         description="Russian 12-gauge semi-automatic shotgun on the Kalashnikov action, fed from 8-round box magazines.",
         price=2200,
         deploy_sound="weapons/vepr12/sounds/vepr12.raise.sound",
+        dry_fire="ak",
         icon_source="3499492742/materials/vgui/entities/mg_iw9_vecho",
         # The muzzle brake and the factory stock, grip and magazine; the gas block's side rail hidden.
         default_mesh_groups=37814293,
@@ -1510,6 +1519,7 @@ PREFABS = {
                     "17-round magazine.",
         price=300,
         deploy_sound="weapons/m18/sounds/m18.raise_up.sound",
+        dry_fire="pistol",
         icon_source="2459723892/materials/vgui/entities/mg_p320",
         # The coyote slide and the 17-round magazine, by the bit rule (read it again from the compiled model).
         default_mesh_groups=145,
@@ -1727,6 +1737,7 @@ def weapon_prefab(weapon: Weapon, prefabs: Prefabs) -> dict:
                                             "__enabled": True})
         target(root, suffix).update(deepcopy(values))
 
+    target(root, "Shootable")["DryFireSound"] = f"sounds/guns/handling/dryfire_{prefabs.dry_fire}.sound"
     set_aim(functions, prefabs)
     return document
 

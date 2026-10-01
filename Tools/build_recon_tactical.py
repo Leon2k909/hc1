@@ -82,7 +82,7 @@ prefab('vm_recon_drone', json.loads(text))
 prefab('weapon_recon_drone', obj('Recon Drone Equipment', [
     component('equipment', 'Facepunch.Equipment', Resource=f'{BASE}/recon_drone.equip',
         HoldType='HoldItem', Handedness='Right', UseCrosshair=True,
-        DeploySound='sounds/guns/switch/weapon_switch.sound'),
+        DeploySound='sounds/guns/handling/draw_grenade.sound'),
     component('tags', 'Facepunch.TagBinder')
 ], [obj('Recon Drone Throw', [component('throw', 'Facepunch.ReconDroneThrowable',
     InputActions=['Attack1'], CookTime=0.2, ThrowPower=650,

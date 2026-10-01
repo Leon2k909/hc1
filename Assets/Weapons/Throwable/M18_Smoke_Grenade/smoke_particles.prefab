@@ -331,8 +331,56 @@
         "OnComponentFixedUpdate": null,
         "OnComponentStart": null,
         "OnComponentUpdate": null,
-        "SoundEvent": "sounds/weapons/grenade/smoke_grenade.sound.sound",
+        "SoundEvent": "sounds/weapons/grenade/smoke_burn.sound",
         "VolumeModifier": true,
+        "VolumeOverTime": [
+          {
+            "x": 0,
+            "y": 0,
+            "in": 0,
+            "out": 0,
+            "mode": "Linear"
+          },
+          {
+            "x": 0.02,
+            "y": 1,
+            "in": 0,
+            "out": 0,
+            "mode": "Linear"
+          },
+          {
+            "x": 0.93,
+            "y": 1,
+            "in": 0,
+            "out": 0,
+            "mode": "Linear"
+          },
+          {
+            "x": 1,
+            "y": 0,
+            "in": 0,
+            "out": 0,
+            "mode": "Linear"
+          }
+        ]
+      },
+      {
+        "__type": "Sandbox.Audio.SoundEmitter",
+        "__guid": "51456a42-17e0-432e-a31c-6f3183cb7a7d",
+        "__enabled": true,
+        "AutoStart": true,
+        "DestroyOnFinish": false,
+        "Follow": true,
+        "LifeTime": 70,
+        "MixerName": "Game",
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "SoundEvent": "sounds/weapons/grenade/smoke_ignite.sound",
+        "VolumeModifier": false,
         "VolumeOverTime": [
           {
             "x": 0,

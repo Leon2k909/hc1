@@ -5,7 +5,10 @@ public sealed class SpentCasing : Component
 {
 	public const int MaxActiveCasings = 96;
 	[Property] public float Lifetime { get; set; } = 8f;
+	/// <summary> Played where there's no case sound of our own for the floor (<see cref="WorldSounds.CasingBounce"/>). </summary>
 	[Property] public SoundEvent BounceSound { get; set; }
+	/// <summary> A rifle's case or a pistol's, for its tink as it lands. </summary>
+	[Property] public WorldSounds.Brass Brass { get; set; } = WorldSounds.Brass.Rifle;
 	public Vector3 Velocity { get; private set; }
 	public bool HasSettled { get; private set; }
 
@@ -65,11 +68,7 @@ public sealed class SpentCasing : Component
 			WorldRotation *= Rotation.From( _spin.x * step, _spin.y * step, _spin.z * step );
 			if ( !hit.Hit ) continue;
 
-			if ( _bounces++ < 2 && Velocity.Length > 35f && BounceSound is not null )
-			{
-				var sound = Sound.Play( BounceSound, WorldPosition );
-				if ( sound is not null ) sound.Volume = 0.18f;
-			}
+			PlayBounce( hit );
 			Velocity = Vector3.Reflect( Velocity, hit.Normal ) * 0.32f;
 			_spin *= 0.45f;
 			if ( hit.Normal.z > 0.6f && Velocity.Length < 18f )
@@ -80,6 +79,31 @@ public sealed class SpentCasing : Component
 				if ( alongSurface.Length > 0.001f ) WorldRotation = Rotation.LookAt( alongSurface.Normal, hit.Normal );
 				break;
 			}
+		}
+	}
+
+	/// <summary>
+	/// A case landing: our own tink for the floor, as loud as the speed into it gives, while it's still hard enough to
+	/// hear. A case chatters on as it slows, so every bounce plays, not only the first.
+	/// </summary>
+	private void PlayBounce( in SceneTraceResult hit )
+	{
+		var speed = -Velocity.Dot( hit.Normal );
+		var ours = WorldSounds.CasingBounce( WorldSounds.SurfaceAt( hit ), Brass );
+		if ( ours is not null )
+		{
+			var volume = WorldSounds.CasingVolume( speed );
+			if ( volume <= 0f ) return;
+
+			var sound = Sound.Play( ours, WorldPosition );
+			if ( sound.IsValid() ) sound.Volume *= volume;
+			return;
+		}
+
+		if ( _bounces++ < 2 && Velocity.Length > 35f && BounceSound is not null )
+		{
+			var sound = Sound.Play( BounceSound, WorldPosition );
+			if ( sound.IsValid() ) sound.Volume = 0.18f;
 		}
 	}
 
