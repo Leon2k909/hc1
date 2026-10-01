@@ -444,10 +444,12 @@ public sealed class ZombieAI : Component, Component.IDamageable
 				var clip = MoveClip;
 				if ( _playingSeq != clip.Name ) Play( clip, true, Quirk * clip.Duration );
 
-				// Feet keep pace with the ground: Walkers (70) play the walk (65.4) at ~1.07x. Past 1.4x its cadence
-				// turns frantic, so faster feet slide a little instead. Jogs are the run slowed down.
+				// Feet keep pace with the ground: Walkers (70) play the walk (made for 70) at 1x. Past 1.4x its cadence
+				// turns frantic, so faster feet slide a little instead. Jogs are the run slowed down. Each zombie starts
+				// at its own point in the cycle (Quirk), so a crowd doesn't march in step; a rate of its own would make
+				// its feet slide.
 				var (min, max) = Speed == ZombieSpeed.Walk ? (0.6f, 1.4f) : (0.55f, 1.3f);
-				seq.PlaybackRate = (_smoothVel.Length / clip.Speed).Clamp( min, max ) * (0.93f + 0.14f * Quirk);
+				seq.PlaybackRate = (_smoothVel.Length / clip.Speed).Clamp( min, max );
 				break;
 			}
 
