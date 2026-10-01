@@ -56,6 +56,19 @@
         "SpawnTags": ""
       },
       {
+        "__type": "Facepunch.SkirmishArena",
+        "__guid": "396e2406-bdc6-46e9-93f7-f9d74d99bd49",
+        "__enabled": true,
+        "BigMapSeparation": 2.2,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Radius": 1000
+      },
+      {
         "__type": "Facepunch.DefaultEquipment",
         "__guid": "b1260496-0fea-43a7-a741-411cdc0108bc",
         "__enabled": true,
@@ -164,7 +177,8 @@
         "__type": "Facepunch.BotFillRule",
         "__guid": "7e1e5a0a-7cef-4388-aa2f-44ac5088662e",
         "__enabled": true,
-        "MinPlayerCount": 10,
+        "MaxTeamSize": 1,
+        "MinPlayerCount": 2,
         "OnComponentDestroy": null,
         "OnComponentDisabled": null,
         "OnComponentEnabled": null,
@@ -284,7 +298,7 @@
                 "OnComponentFixedUpdate": null,
                 "OnComponentStart": null,
                 "OnComponentUpdate": null,
-                "SkipPlayerCount": 10
+                "SkipPlayerCount": 2
               },
               {
                 "__type": "Facepunch.ShowStatusText",

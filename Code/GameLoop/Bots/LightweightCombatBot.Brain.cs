@@ -1658,7 +1658,15 @@ public sealed partial class LightweightCombatBot
 		Agent?.Stop();
 	}
 
-	private Vector3 NavPoint( Vector3 position ) => Scene.NavMesh.GetClosestPoint( position ) ?? position;
+	/// <summary>
+	/// The navmesh point nearest <paramref name="position"/>. Every place a bot heads for comes through here, so in a
+	/// Skirmish held to an arena it's kept inside it (<see cref="SkirmishArena.Clamp"/>).
+	/// </summary>
+	private Vector3 NavPoint( Vector3 position )
+	{
+		position = SkirmishArena.Clamp( position );
+		return Scene.NavMesh.GetClosestPoint( position ) ?? position;
+	}
 
 	/// <summary> Maps have navmesh islands nobody can walk to, like a sealed traitor room behind a wall. </summary>
 	private bool CanWalkTo( Vector3 position ) => Scene.NavMesh.CalculatePath( new Sandbox.Navigation.CalculatePathRequest

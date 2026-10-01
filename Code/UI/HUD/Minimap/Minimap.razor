@@ -41,6 +41,11 @@
         </div>
 
         <div class="markers">
+            @if ( SkirmishArena.Active is { } arena && Renderer.Size > 0 )
+            {
+                <div class="arena" style="@ArenaStyle( arena )" />
+            }
+
             @foreach ( var element in Scene.GetAllComponents<IMinimapElement>() )
             {
                 @if ( !element.IsValid() || ( Client.Viewer.Pawn is PlayerPawn player && !element.IsVisible( player ) ) )
@@ -102,6 +107,14 @@
     {
         var position = Renderer.FromWorldRadar( worldPosition, ViewPos, FixedMode ? 0 : ViewYaw, Zoom );
         return $"left: {CssPercent( position.x )}; top: {CssPercent( position.y )};";
+    }
+
+    // The Skirmish arena's edge: a ring round its middle, as far across as the radar's scale makes it.
+    string ArenaStyle( SkirmishArena arena )
+    {
+        var centre = Renderer.FromWorldRadar( arena.Centre, ViewPos, FixedMode ? 0 : ViewYaw, Zoom, clamp: false );
+        var radius = arena.ActiveRadius / (Renderer.Size * 0.5f / Zoom);
+        return $"left: {CssPercent( centre.x - radius )}; top: {CssPercent( centre.y - radius )}; width: {CssPercent( radius * 2f )}; height: {CssPercent( radius * 2f )};";
     }
 
     string LabelStyles( IMinimapLabel label )

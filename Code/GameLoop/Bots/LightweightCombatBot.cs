@@ -1364,6 +1364,10 @@ public sealed partial class LightweightBotManager : SingletonComponent<Lightweig
 
 	private Transform GetSpawnTransform( Team team )
 	{
+		// Skirmish on a big map: the arena's ring, away from the enemy.
+		if ( SkirmishArena.Settled is { } arena )
+			return arena.PickSpawn( team ).Transform.WithScale( 1f );
+
 		if ( MapSpawnSettings.MapSpawnPointsAllowed && Random.Shared.Float() < MapSpawnChance && TryGetMapSpawn( out var mapSpawn ) )
 			return mapSpawn;
 		if ( MapSpawnSettings.NavMeshSpawnsAllowed && TryGetNavSpawn( team, out var navSpawn ) )

@@ -126,6 +126,10 @@ public sealed class BotFillRule : Component,
 
 		var targetPlayers = customGame?.PlayerLimit ?? MinPlayerCount;
 		var teamSize = customGame is null ? MaxTeamSize : Math.Max( 1, targetPlayers / 2 );
+		// Never more a side than the mode takes: 1v1 and 2v2 Skirmish filled to five a side before their own
+		// BotFillRule was set, because the rule's defaults are a 5v5's.
+		if ( mode?.Get<TeamAssigner>() is { MaxTeamSize: > 0 } assigner )
+			teamSize = Math.Min( teamSize, assigner.MaxTeamSize );
 
 		if ( UseLightweightNpcBots )
 		{

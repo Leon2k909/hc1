@@ -198,6 +198,11 @@ public sealed partial class PlayerPawn : Pawn, IDescription, IAreaDamageReceiver
 			return;
 		}
 
+		// The host judges every player's play area. It used to only judge its own pawn (this ran for the locally
+		// controlled pawn, host only), so nobody else was ever sent back to the AO.
+		if ( !Client.IsBot )
+			UpdatePlayArea();
+
 		if ( Networking.IsHost && Client.IsBot )
 		{
 			// BuildWishVelocity();
@@ -215,7 +220,6 @@ public sealed partial class PlayerPawn : Pawn, IDescription, IAreaDamageReceiver
 
 		_previousVelocity = cc.Velocity;
 
-		UpdatePlayArea();
 		UpdateUse();
 		BuildWishInput();
 		BuildWishVelocity();
@@ -235,18 +239,26 @@ public sealed partial class PlayerPawn : Pawn, IDescription, IAreaDamageReceiver
 	{
 		if ( !Networking.IsHost ) return;
 
-		// Don't have any play areas, dont bother.
-		if ( Scene.GetSystem<PlayAreaSystem>().Count < 1 )
+		bool inside;
+		if ( SkirmishArena.Active is { } arena )
 		{
-			// Takes down a warning left by a play area that's gone.
+			// Skirmish on a big map: only its arena counts, not the map's own play area.
+			inside = arena.Contains( WorldPosition );
+		}
+		else if ( Scene.GetSystem<PlayAreaSystem>().Count < 1 )
+		{
+			// Don't have any play areas, dont bother. Takes down a warning left by a play area that's gone.
 			if ( !InPlayArea )
 				InPlayArea = true;
 
 			return;
 		}
+		else
+		{
+			inside = GetZone<PlayArea>().IsValid();
+		}
 
-		var playArea = GetZone<PlayArea>();
-		if ( !playArea.IsValid() )
+		if ( !inside )
 		{
 			if ( InPlayArea )
 			{

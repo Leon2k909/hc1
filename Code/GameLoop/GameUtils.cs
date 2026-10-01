@@ -488,9 +488,9 @@ public static partial class GameUtils
 	}
 
 	/// <summary>
-	/// Get all spawn point transforms for the given team.
+	/// Get all spawn point transforms for the given team. In a Skirmish held to an arena, the arena's.
 	/// </summary>
-	public static IEnumerable<SpawnPointInfo> GetSpawnPoints( Team team, params string[] tags ) => Game.ActiveScene
+	public static IEnumerable<SpawnPointInfo> GetSpawnPoints( Team team, params string[] tags ) => ArenaSpawnPoints() ?? Game.ActiveScene
 		.GetAllComponents<TeamSpawnPoint>()
 		.Where( x => x.Team == team )
 		.Where( x => tags.Length == 0 || tags.Any( x.Tags.Contains ) )
@@ -498,13 +498,16 @@ public static partial class GameUtils
 		.Concat( GetMapSpawnPoints() );
 
 	/// <summary>
-	/// Get all spawn point transforms
+	/// Get all spawn point transforms. In a Skirmish held to an arena, the arena's.
 	/// </summary>
-	public static IEnumerable<SpawnPointInfo> GetSpawnPoints( params string[] tags ) => Game.ActiveScene
+	public static IEnumerable<SpawnPointInfo> GetSpawnPoints( params string[] tags ) => ArenaSpawnPoints() ?? Game.ActiveScene
 		.GetAllComponents<TeamSpawnPoint>()
 		.Where( x => tags.Length == 0 || tags.Any( x.Tags.Contains ) )
 		.Select( x => new SpawnPointInfo( x.Transform.World, x.GameObject.Tags.ToArray() ) )
 		.Concat( GetMapSpawnPoints() );
+
+	/// <summary> The Skirmish arena's spawns (<see cref="SkirmishArena"/>), or null when the match isn't held to one. </summary>
+	private static IEnumerable<SpawnPointInfo> ArenaSpawnPoints() => SkirmishArena.Settled?.SpawnPoints;
 
 	/// <summary>
 	/// The map's own info_player_starts, unless the scene's <see cref="MapSpawnSettings"/> turns them off.

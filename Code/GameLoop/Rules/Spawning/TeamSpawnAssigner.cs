@@ -28,6 +28,10 @@ public sealed class TeamSpawnAssigner : Component,
 
 	public SpawnPointInfo GetSpawnPoint( Client player )
 	{
+		// Skirmish on a big map: the arena's ring, away from the enemy.
+		if ( SkirmishArena.Settled is { } arena )
+			return arena.PickSpawn( player.Team, player.PlayerPawn?.GameObject );
+
 		var team = player.Team;
 		var spawns = GameUtils.GetSpawnPoints( team, SpawnTags.ToArray() ).Shuffle();
 

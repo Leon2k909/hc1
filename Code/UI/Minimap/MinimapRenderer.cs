@@ -35,7 +35,11 @@ public partial class MinimapRenderer : Component, Component.ExecuteInEditor
 		return new Vector2(minimapY, minimapX);
 	}
 
-	public Vector3 FromWorldRadar( Vector3 worldPos, Vector3 playerPos, float yaw, float zoom )
+	/// <summary>
+	/// Where <paramref name="worldPos"/> is on the radar, from its centre: 1 is its edge. Held to the edge unless
+	/// <paramref name="clamp"/> is false (something drawn round a point, like the Skirmish arena's ring).
+	/// </summary>
+	public Vector3 FromWorldRadar( Vector3 worldPos, Vector3 playerPos, float yaw, float zoom, bool clamp = true )
 	{
 		// Get relative world position
 		Vector3 dir = (playerPos - worldPos);
@@ -52,7 +56,8 @@ public partial class MinimapRenderer : Component, Component.ExecuteInEditor
 		);
 
 		// Limit to radar bounds (so we stick to the edge)
-		return new Vector3( rotatedDirection.y, rotatedDirection.x).ClampLength(1);
+		var position = new Vector3( rotatedDirection.y, rotatedDirection.x );
+		return clamp ? position.ClampLength( 1 ) : position;
 	}
 
 	protected override void DrawGizmos()
