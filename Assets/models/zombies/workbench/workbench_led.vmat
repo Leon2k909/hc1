@@ -1,0 +1,13 @@
+// Tools/zombies_workbench.py: the shop light's lens, self-lit
+
+Layer0
+{
+	shader "shaders/complex.shader"
+	F_SELF_ILLUM 1
+	TextureColor "[1.0 0.96 0.88 1.0]"
+	TextureSelfIllumMask "[1.0 1.0 1.0 1.0]"
+	g_flSelfIllumBrightness "4.0"
+	g_flSelfIllumAlbedoFactor "1.0"
+	g_flMetalness "0.000"
+	g_bFogEnabled "1"
+}

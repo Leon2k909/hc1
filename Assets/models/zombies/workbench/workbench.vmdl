@@ -1,0 +1,52 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc29:version{3cec427c-1b0e-4d48-a90a-0436f33a6041} -->
+{
+	rootNode =
+	{
+		_class = "RootNode"
+		children =
+		[
+			{
+				_class = "MaterialGroupList"
+				children =
+				[
+					{
+						_class = "DefaultMaterialGroup"
+						remaps =
+						[
+							{ from = "workbench_bench.vmat" to = "models/zombies/workbench/workbench_bench.vmat" },
+							{ from = "workbench_glass.vmat" to = "models/zombies/workbench/workbench_glass.vmat" },
+							{ from = "workbench_led.vmat" to = "models/zombies/workbench/workbench_led.vmat" },
+							{ from = "workbench_pegboard.vmat" to = "models/zombies/workbench/workbench_pegboard.vmat" },
+							{ from = "workbench_props.vmat" to = "models/zombies/workbench/workbench_props.vmat" }
+						]
+						use_global_default = false
+						global_default_material = ""
+					},
+				]
+			},
+			{
+				_class = "RenderMeshList"
+				children =
+				[
+					{
+						_class = "RenderMeshFile"
+						name = "workbench"
+						filename = "models/zombies/workbench/workbench.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+				]
+			},
+		]
+		model_archetype = ""
+		primary_associated_entity = ""
+		anim_graph_name = ""
+		base_model_name = ""
+	}
+}

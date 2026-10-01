@@ -1,0 +1,13 @@
+// Tools/zombies_workbench.py: the jars' glass
+
+Layer0
+{
+	shader "shaders/complex.shader"
+	F_SPECULAR 1
+	F_TRANSLUCENT 1
+	TextureColor "[0.716 0.694 0.604 1.0]"
+	TextureTranslucency "[0.30 0.30 0.30 1.0]"
+	TextureRoughness "[0.08 0.08 0.08 1.0]"
+	g_flMetalness "0.000"
+	g_bFogEnabled "1"
+}

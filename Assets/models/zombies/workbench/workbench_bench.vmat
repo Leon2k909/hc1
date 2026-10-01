@@ -1,0 +1,19 @@
+// Tools/zombies_workbench.py
+
+Layer0
+{
+	shader "shaders/complex.shader"
+	F_SPECULAR 1
+	F_METALNESS_TEXTURE 1
+	TextureMetalness "models/zombies/workbench/workbench_bench_metal.png"
+	TextureColor "models/zombies/workbench/workbench_bench_color.png"
+	TextureNormal "models/zombies/workbench/workbench_bench_normal.png"
+	TextureRoughness "models/zombies/workbench/workbench_bench_rough.png"
+	g_flRoughnessScaleFactor "1.000"
+	TextureAmbientOcclusion "models/zombies/workbench/workbench_bench_ao.png"
+	g_flAmbientOcclusionDirectDiffuse "0.600"
+	g_flAmbientOcclusionDirectSpecular "0.700"
+	g_vColorTint "[1.000000 1.000000 1.000000 0.000000]"
+	g_flModelTintAmount "1.000"
+	g_bFogEnabled "1"
+}

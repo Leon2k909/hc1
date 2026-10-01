@@ -1354,6 +1354,12 @@
   - The model faces +X with its back at x -20: 72 wide, 86 tall and 40 deep, with wood shavings 13 further out on the
     floor. The station's BoxCollider is 40 x 72 x 86 (`StationSize`, `CreateStation`), and the vmdl has no collision.
   - `CreateBenchModel` loads `workbench.vmdl`, and builds the old stand-in (`CreateStandInBench`) if it hasn't compiled.
+  - A full run (2048 textures, 8 samples, AO 128) took 40 minutes on the RTX 5070; `--size 512 --samples 2
+    --ao-samples 16 --out <dir>` takes 25 and is enough to check the look. A render (Cycles, the OBJ with its textures)
+    showed every prop in its colours on 2026-10-01: the painted vise, the toolbox, the clamps and the tools' handles.
+    About 2% of the bench's texels baked facing away (hidden faces, black in the AO), which didn't show.
+  - Not yet seen in the engine: the editor hadn't compiled the vmdl when it was written, and nothing in a match has
+    loaded it yet.
 - Use opens its menu on the player's own machine (the panel's Tick checks `PlayerPawn.Hovered`); the host's `OnUse` does
   nothing for it. E, Escape (one step back at a time, from MainHUD's chain), walking more than `WorkbenchRange` away,
   going down or dying closes it. It's in `IsInteractiveMouseUiOpen` / `GetCombatMouseBlockReason` (cursor) and
