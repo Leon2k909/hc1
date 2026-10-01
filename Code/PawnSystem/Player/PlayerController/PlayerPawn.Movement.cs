@@ -190,6 +190,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	private void OnUpdateMovement()
 	{
 		UpdateFallKnockdown();
+		UpdateMantleBlend();
 
 		var cc = CharacterController;
 		CurrentHoldType = CurrentEquipment.IsValid() ? CurrentEquipment.GetHoldType() : AnimationHelper.HoldTypes.None;
@@ -311,7 +312,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	private bool WantsToggleSprint { get; set; }
 
 	private bool HasSprintMovement => WishMove.x > 0.2f || (MathF.Abs( WishMove.y ) > 0.2f && WishMove.x >= 0f);
-	private bool CanSprint => !IsFallKnockedDown && !IsSlowWalking && !IsProne && !IsGettingUp && !HasEquipmentTag( "no_sprint" );
+	private bool CanSprint => !IsMantling && !IsFallKnockedDown && !IsSlowWalking && !IsProne && !IsGettingUp && !HasEquipmentTag( "no_sprint" );
 
 	private bool GetWantsToSprint()
 	{
@@ -433,9 +434,17 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 
 		if ( CharacterController.IsOnGround && !IsFrozen && !gotUpWithJump )
 		{
+			// A ledge in front of you is climbed, or a low wall vaulted, rather than jumped at.
+			var mantled = Input.Pressed( "Jump" ) && TryStartMantle( airborne: false );
+
 			var bhop = Global.BunnyHopping;
-			if ( bhop ? Input.Down( "Jump" ) : Input.Pressed( "Jump" ) )
+			if ( !mantled && (bhop ? Input.Down( "Jump" ) : Input.Pressed( "Jump" )) )
 				Jump();
+		}
+		else if ( !CharacterController.IsOnGround && !IsFrozen && Input.Down( "Jump" ) )
+		{
+			// Holding Jump in the air catches a ledge the jump brings into reach.
+			TryStartMantle( airborne: true );
 		}
 	}
 
@@ -571,10 +580,12 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 			if ( vel >= FallKnockdownVelocity )
 				StartFallKnockdown();
 
-			if ( vel > MinimumFallSoundVelocity )
+			// A vault's landing is heard even off a wall too low for a fall's sound.
+			if ( vel > MinimumFallSoundVelocity || _vaultLanding )
 			{
 				PlayFallSound( vel );
 			}
+			_vaultLanding = false;
 			if ( vel > minimumVelocity )
 			{
 				var velPastAmount = vel - minimumVelocity;
@@ -789,6 +800,8 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 
 	float GetEyeHeightOffset()
 	{
+		// Tucked going over a ledge (PlayerPawn.Mantle.cs).
+		if ( IsMantling && HealthComponent.State == LifeState.Alive ) return MantleEyeOffset;
 		if ( IsProne ) return -40f;
 		if ( IsCrouching ) return -16f;
 		if ( HealthComponent.State == LifeState.Dead ) return -48f;

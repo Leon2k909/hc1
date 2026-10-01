@@ -104,6 +104,18 @@ public class CharacterController : Component
 	bool _throughEnemies;
 
 	/// <summary>
+	/// Trace a box of another size from one place to another, hitting what the controller would hit. Mantling checks the
+	/// way up and over a ledge with it (<see cref="PlayerPawn.TryStartMantle"/>).
+	/// </summary>
+	public SceneTraceResult TraceBox( in BBox box, Vector3 from, Vector3 to )
+	{
+		var trace = Scene.Trace.Ray( from, to ).Size( box ).IgnoreGameObjectHierarchy( GameObject );
+		trace = UseCollisionRules ? trace.WithCollisionRules( Tags ) : trace.WithoutTags( IgnoreLayers );
+
+		return (_throughEnemies ? trace.WithoutTags( EnemyTag ) : trace).Run();
+	}
+
+	/// <summary>
 	/// Trace the controller's current position to the specified delta
 	/// </summary>
 	public SceneTraceResult TraceDirection( Vector3 direction )

@@ -145,7 +145,7 @@ public partial class Crosshair : Component
 			linesTarget *= 0.25f;
 		}
 
-		if ( player.IsValid() && player.IsSprinting )
+		if ( player.IsValid() && (player.IsSprinting || player.IsMantling) )
 		{
 			linesTarget = 0;
 		}

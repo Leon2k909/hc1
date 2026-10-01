@@ -76,6 +76,12 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 	public static readonly Vector3 ScarHSprintPosition = new( 4.29f, -0.86f, -1.1f );
 	public static readonly Angles ScarHSprintAngles = new( 8.41f, 59.66f, 0f );
 
+	/// <summary> Where the gun goes while mantling, in the view's space (forward, left, up): back, right and well down. </summary>
+	private static readonly Vector3 MantlePosition = new( -3f, -3f, -8f );
+
+	/// <summary> The gun's turn while mantling: muzzle down and a little left, canted right. </summary>
+	private static readonly Angles MantleAngles = new( 30f, 10f, 30f );
+
 	void ICameraSetup.Setup( CameraComponent cc )
 	{
 		if ( !Owner.IsValid() || !Owner.CharacterController.IsValid() )
@@ -239,6 +245,15 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 				targetPositionOffset += new Vector3( bobX, 0f, bobZ );
 				targetRotationOffset *= new Angles( bobZ * 2f, bobX * 2f, bobX * 2f ).ToRotation();
 			}
+		}
+
+		// Mantling: the support hand goes onto the ledge, so the firing hand swings the gun down and to the right, canted,
+		// out of the way (PlayerPawn.Mantle.cs).
+		var mantle = Owner.IsValid() ? Owner.MantleBlend : 0f;
+		if ( mantle > 0f )
+		{
+			targetPositionOffset += MantlePosition * mantle;
+			targetRotationOffset *= (MantleAngles * mantle).ToRotation();
 		}
 
 		// Smoothly interpolate position and rotation

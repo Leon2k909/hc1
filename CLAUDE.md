@@ -1626,7 +1626,8 @@ headshot), `dev_give <weapon>`, `dev_force_aim 1`,
 `dev_force_move 1` / `-1` (walks forward/back without input; reset to 0 after), `dev_legshot [damage]` (a hardcore
 leg hit on yourself, default 1 damage, for testing the limp), `dev_fall [damage]` (fall damage on yourself, default 10),
 `dev_jumps [count]` (jumps again the moment you land, for testing jump stamina), `dev_prone [count] [interval]` (presses
-Prone that many times, default 6 at 0.2 s, logging prone stamina), `dev_use` (presses E on whatever
+Prone that many times, default 6 at 0.2 s, logging prone stamina), `dev_mantle` (mantles the ledge you're looking
+at, as if you'd pressed Jump while moving at it, and logs the plan or why there's none), `dev_use` (presses E on whatever
 you're looking at), `dev_escape` (presses Escape as the next update starts, `DevEscapeSystem`: the bridge runs
 commands at any point in the frame, and setting `Input.EscapePressed` straight from one often came too late),
 `dev_menu <route>` (opens a main menu page), `dev_click <class[.class]> [n]` (clicks the nth
@@ -1681,6 +1682,38 @@ simulate_input.
   sprint with a 24-unit capsule. A Jump press that gets you up is spent on that: it no longer also jumps off the floor.
 - Forced prone (fall knockdown, Zombies' downed) costs nothing. Not yet checked in-game; `dev_prone [count] [interval]`
   presses it through the same path and logs the capsule height and fatigue.
+
+## Mantling (`PlayerPawn.Mantle.cs`)
+- The user (2026-10-01): "currently i just sort of hop over larger objects". Jump while moving forward at a ledge 28-84
+  over the floor you're on (mid-thigh to ~2.1 m) and you climb onto it, in place of the jump. Lower than 28 is a step or a
+  jump. Holding Jump in the air catches a ledge the jump brings into reach, up to 10 higher (`AirMantleBonus`), unless
+  you're falling faster than 250 u/s.
+- `PlanMantle` finds the ledge: a body box traced `MantleReach` (20) ahead finds a wall facing you within ~53 degrees,
+  then a thin probe climbs its face in 6-unit steps for solid with free space above it (so a rail or an overhang works),
+  and a trace down finds the top, which must be level enough to stand on (normal z 0.7).
+  - A top no deeper than 24 (`VaultMaxDepth`: walls, fences, sandbags, rails) with a floor within 160 below on the other
+    side (`VaultMaxDrop`, ~4 m) is vaulted over. A deeper top, or a parapet over a long drop, is climbed onto, and the
+    crouched body has to fit there.
+  - The body goes over tucked: 36 high for a vault (the eye 28 down), so a vault goes through a window-sized gap, and
+    48 for a climb (the eye 16 down, `MantleEyeOffset`, synced).
+  - Before it starts, the whole path (up, then over, overlapping) is traced with the tucked box at 16 points. If that's
+    blocked it tries straight up and then over, and if that's blocked too there's no mantle.
+- The owner then moves the pawn along the path (`UpdateMantle`, smoothstepped), with the controller's velocity set to
+  match. Anything that moves it more than 8 units off the path (a teleport, a death) ends it.
+  - Timing: the rise takes 0.12 + 0.004h + 0.0001h^2 s for h units: 0.33 s for the lowest ledge, 0.46 s waist high,
+    0.69 s chest high, 1.2 s for 84. A vault goes over at your speed, 150-260 u/s, and you carry on at that speed; a climb
+    at 150, leaving at half that. A waist-high vault takes about 0.55 s, an 84 climb about 1.35 s.
+- Never climbed: people (`player`, the bots' `movement` and zombies' `enemy` boxes), doors (`MapMover.DoorTag`), glass,
+  player clips (a window's), and the Ridgeback's trees and hedges (clutter bodies, by the shape's `clutter` tag).
+- While mantling: no shooting or aiming (the `no_shooting` / `no_aiming` tags, and an aim already held is cancelled),
+  no sprinting and no inspect. The gun swings down and to the right (`ViewModel.MantlePosition` / `MantleAngles`), the
+  camera dips 6 degrees and rolls 3 in first person (`CameraController.ApplyMantleTilt`), and the crosshair's lines go,
+  all eased by `MantleBlend` on every machine. Other players see the airborne pose with the body tucked (the duck from
+  the eye offset): there's no climbing clip.
+- Sounds (`PlayMantleSound`, broadcast): a hand on the ledge at the start (the surface's footstep at 0.6), the feet on
+  the top at the end of a climb, and a vault's landing is always heard, even off a drop too short for a fall's sound.
+- Compiled offline on 2026-10-01, not yet checked in-game. To try it: walk at a crate or a low wall and press Jump, or
+  look at one and run `dev_mantle`.
 
 ## Battle royale (Warzone, `Code/GameLoop/Rules/BattleRoyale/`)
 - Solos on Flatgrass (the user's first pick, for its size) or Ridgeback (below), picked on the hub's Battle Royale

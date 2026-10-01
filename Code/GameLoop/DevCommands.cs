@@ -72,6 +72,17 @@ public static class DevCommands
 		pawn?.HealthComponent?.TakeDamage( new DamageInfo( pawn, damage, Flags: DamageFlags.FallDamage ) );
 	}
 
+	/// <summary>
+	/// Mantle whatever's in front of the local player, the way they're looking, as a Jump press moving forward would, and
+	/// log the climb or vault it planned or why it couldn't (the bridge's held inputs don't reach the movement).
+	/// </summary>
+	[ConCmd( "dev_mantle" )]
+	public static void Mantle()
+	{
+		var pawn = Client.Local?.PlayerPawn;
+		pawn?.TryStartMantle( !pawn.CharacterController.IsOnGround, ignoreInput: true, log: true );
+	}
+
 	/// <summary>Jump the local player again the moment they land, for testing jump stamina through the editor bridge.</summary>
 	[ConCmd( "dev_jumps" )]
 	public static async void Jumps( int count = 6 )

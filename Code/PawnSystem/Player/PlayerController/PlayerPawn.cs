@@ -103,8 +103,8 @@ public sealed partial class PlayerPawn : Pawn, IDescription, IAreaDamageReceiver
 	protected override void OnStart()
 	{
 		// TODO: expose these parameters please
-		TagBinder.BindTag( "no_shooting", () => IsFallKnockedDown || TimeSinceWeaponDeployed < 0.66f || ((IsSprinting || TimeSinceSprintChanged < 0.25f) && !HasEquipmentTag( "aiming" )) );
-		TagBinder.BindTag( "no_aiming", () => IsFallKnockedDown || TimeSinceGroundedChanged < 0.25f );
+		TagBinder.BindTag( "no_shooting", () => IsMantling || IsFallKnockedDown || TimeSinceWeaponDeployed < 0.66f || ((IsSprinting || TimeSinceSprintChanged < 0.25f) && !HasEquipmentTag( "aiming" )) );
+		TagBinder.BindTag( "no_aiming", () => IsMantling || IsFallKnockedDown || TimeSinceGroundedChanged < 0.25f );
 
 		GameObject.Name = $"Player ({DisplayName})";
 
@@ -195,6 +195,9 @@ public sealed partial class PlayerPawn : Pawn, IDescription, IAreaDamageReceiver
 
 		if ( HealthComponent.State != LifeState.Alive )
 		{
+			if ( IsMantling && IsLocallyControlled )
+				StopMantle( Vector3.Zero );
+
 			return;
 		}
 
@@ -223,6 +226,15 @@ public sealed partial class PlayerPawn : Pawn, IDescription, IAreaDamageReceiver
 		UpdateUse();
 		BuildWishInput();
 		BuildWishVelocity();
+
+		// Mid-climb the pawn follows the mantle's path, and the usual input and movement wait until it's over.
+		if ( IsMantling )
+		{
+			UpdateMantle();
+			UpdateRecoilAndSpread();
+			return;
+		}
+
 		BuildInput();
 
 		UpdateRecoilAndSpread();

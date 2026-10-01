@@ -249,6 +249,7 @@ public sealed class CameraController : PawnCameraController, IGameEventHandler<D
 		ApplyCameraEffects();
 		ScreenShaker?.Apply( Camera );
 		ApplyFlashRoll();
+		ApplyMantleTilt();
 		UpdateMouseVisibility();
 
 		TargetFieldOfView = TargetFieldOfView.LerpTo( baseFov + FieldOfViewOffset, Time.Delta * 5f );
@@ -388,6 +389,20 @@ public sealed class CameraController : PawnCameraController, IGameEventHandler<D
 		var roll = FlashbangEffect.RollDegrees( Player );
 		if ( roll != 0f )
 			Camera.LocalRotation *= Rotation.FromRoll( roll );
+	}
+
+	/// <summary>
+	/// Going over a ledge the head comes forward and down, leaning a little to the support hand on the ledge
+	/// (<see cref="PlayerPawn.MantleBlend"/>). Only the camera turns, and you can't shoot meanwhile.
+	/// </summary>
+	void ApplyMantleTilt()
+	{
+		if ( Mode != CameraMode.FirstPerson )
+			return;
+
+		var blend = Player.MantleBlend;
+		if ( blend > 0f )
+			Camera.LocalRotation *= Rotation.From( 6f * blend, 0f, -3f * blend );
 	}
 
 	void OnModeChanged()
