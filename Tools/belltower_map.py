@@ -893,7 +893,7 @@ def solid_house( model, e0, e1, n0, n1, eave, render, faces, ridge, rng, blocks,
         surround = SURROUNDS.get( render )
     style = { "trim": trim, "shutter": shutter, "sill": "ashlar", "door": "planks_dark", "sign": sign,
               "awning": awning_paint, "surround": surround, "solid": True, "names": list( names ) }
-    gutter = "copper" if chance( 0.55, "gutter", e0, n0 ) else "metal"
+    gutter = "copper_brown" if chance( 0.55, "gutter", e0, n0 ) else "metal"
     levels = floors_of( eave )
     shown = { face: exposure( box, face, blocks ) for face in ( "+n", "-n", "+e", "-e" ) }
 
@@ -1692,7 +1692,7 @@ def bakery( model, lights, rng ):
     slab_at( model, walls["+n"], -1105, -995, 0.0, 3.0, 119.9, 140.1, { walls["+n"].outward: "sign_2", "default": "trim_red" } )
     model.collision_box( ( e0 + T, n0 + T, GF ), ( e1 - T, n1 - T, EAVE ), STONE )
     ceiling( model, e0 + T, e1 - T, n0 + T, n1 - T, GF, "planks", ( "e", 70 ) )
-    gable_roof( model, e0, e1, n0, n1, EAVE, "e", "roof_tiles", paints["outside"], gutter="copper" )
+    gable_roof( model, e0, e1, n0, n1, EAVE, "e", "roof_tiles", paints["outside"], gutter="copper_brown" )
     floor( model, e0, e1, n0, n1, "quarry_tiles" )
     inner_wall( model, "e", ( e0 + T, e1 - T ), ( 894, 906 ), ( 0, GF ), [ ( -1150, 64, 0, 104, "door" ) ], "whitewash" )
     # The shop: its counter and shelves.

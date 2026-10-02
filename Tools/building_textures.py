@@ -830,7 +830,8 @@ def iron( rng, n ):
 def copper( rng, n ):
     """ Copper sheet gone to verdigris on the tower's roof: pale blue-green, darker where rain runs off the standing
     seams (every 16 units, up the picture), the sheets lapped every 32, brown copper showing through in places.
-    8 px to the unit. """
+    8 px to the unit. copper_brown is the same sheet as the houses' gutters and downpipes have it: copper's dark brown
+    oxide, which the water running through them keeps from going green, with a little verdigris in the streaks. """
     ppu = n / TILE_UNITS["copper"]
     y, x = np.mgrid[0:n, 0:n] + 0.5
     bay = x / ( 16 * ppu )
@@ -845,8 +846,10 @@ def copper( rng, n ):
     lum = 1.0 + 0.05 * fine + 0.06 * blotch - 0.12 * streak
     patina = mix( paint( ( 112, 170, 146 ), lum ), paint( ( 64, 104, 90 ), lum ), streak * 0.6 )
     colour = mix( patina, paint( ( 118, 78, 52 ), lum ), bare * 0.8 )
+    brown = mix( mix( paint( ( 84, 56, 40 ), lum ), paint( ( 126, 84, 56 ), lum ), bare * 0.7 ),
+                 paint( ( 80, 112, 94 ), lum ), streak * 0.35 )
     rough = np.clip( 0.7 + 0.05 * fine - 0.3 * bare, 0.0, 1.0 )
-    return { "copper": colour }, rough, 0.4 + 0.45 * seam + 0.15 * cross + 0.01 * fine, 4.0
+    return { "copper": colour, "copper_brown": brown }, rough, 0.4 + 0.45 * seam + 0.15 * cross + 0.01 * fine, 4.0
 
 
 PLANKS = {
@@ -1060,7 +1063,7 @@ PAINTS = {
     "rubble": "rubble", "setts": "setts", "flagstones": "flagstones", "glass": "glass", "canvas_red": "canvas",
     "canvas_green": "canvas", "canvas_blue": "canvas", "canvas_plain": "canvas", "sandbags": "sandbags",
     "corrugated": "corrugated", "roller_grey": "roller", "roller_green": "roller", "iron_black": "iron",
-    "iron_green": "iron", "copper": "copper", "planks": "planks", "planks_dark": "planks", "water": "water",
+    "iron_green": "iron", "copper": "copper", "copper_brown": "copper", "planks": "planks", "planks_dark": "planks", "water": "water",
     "clock": "clock", "hedge": "hedge", "slate": "slate", "gravel": "gravel", "soil": "soil", "lawn": "lawn",
     "rock": "rock",
     # The Town House's
