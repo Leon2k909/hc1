@@ -14,12 +14,21 @@
 
     private static PauseMenuPanel Instance { get; set; }
 
+    /// <summary>
+    /// The pause menu's screen panel draws over every other one, the map vote's (999, MapVoteSystem) included. The
+    /// prefabs gave it 999 too, and on a tie the panel made later (the vote) drew on top of the menu.
+    /// </summary>
+    public const int ScreenZIndex = 1000;
+
     private bool IsOpen = false;
 
     protected override void OnStart()
     {
         base.OnStart();
         Instance = this;
+
+        if ( Components.GetInAncestorsOrSelf<ScreenPanel>() is { } screenPanel )
+            screenPanel.ZIndex = ScreenZIndex;
     }
 
     public static void CloseAny()
@@ -34,7 +43,7 @@
             var pauseObject = Game.ActiveScene.CreateObject();
             pauseObject.Name = "PauseMenu";
             Instance = pauseObject.Components.Create<PauseMenuPanel>();
-            pauseObject.Components.Create<ScreenPanel>();
+            pauseObject.Components.Create<ScreenPanel>().ZIndex = ScreenZIndex;
         }
 
         Instance.SetOpen( !Instance.IsOpen );

@@ -1545,6 +1545,9 @@
   random, and `WinnerIndex` is synced for the cards. Don't put `hud` on the overlay's root: its `pointer-events: none`
   and `cursor: none` made the cards unclickable and hid the cursor. A card's `.art` must stay `position: relative`:
   absolute panels go by the nearest positioned ancestor, so the map name landed in the screen's corner over the hint.
+- The vote's ScreenPanel is ZIndex 999 and the pause menu's 1000 (`PauseMenuPanel.ScreenZIndex`, set in its OnStart
+  over the prefabs' 999), so Escape over the vote opens the pause menu on top. At 999 each, the vote, made later, drew
+  over the menu (the user's screenshot, 2026-10-02). Compiled offline, not yet seen in-game.
 - Vote card pictures (`MapArt`) are the scene's `MapInformation.Image` if it's a wide screenshot (at least 960 px wide
   and 1.5:1), otherwise the wide thumbnail of the cloud map its MapInstance loads (`Package.FetchAsync`), cached.
 - Under the maps, the vote offers every other mode (PLAY A DIFFERENT MODE, the user's ask): the playlists
