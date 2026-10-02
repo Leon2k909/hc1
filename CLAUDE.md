@@ -1660,6 +1660,9 @@
 - Three houses in four have painted window surrounds (cornici, `belltower_map.SURROUNDS`): a pale band round a
   coloured house's windows, grey stone round a pale one's, each with a little hood over its head that throws a line of
   shadow (`dress`). They're drawn only, with no collision. Checked in the script's flat previews (2026-10-02).
+- The gutters and downpipes are copper's brown oxide (`copper_brown`, a second colour of building_textures' copper
+  sheet): the tower roof's verdigris read as bright teal along every eave. The market stalls' counters are two tiers
+  of slatted crates on a pallet (`crate_counter`), drawn over the stall's own collision box, so the cover is the same.
 - Its look (the user: it "doesn't look AAA", the textures and the low-poly plants, 2026-09-29):
   - `Tools/belltower_materials.py` draws Belltower's own materials with numpy into `Assets/materials/belltower/`: the
     walls' rubble and ashlar (and a grey ashlar), the parasols' canvas (red and cream, blue for the east) and the
