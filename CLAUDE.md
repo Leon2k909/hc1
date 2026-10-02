@@ -1610,9 +1610,42 @@
   - Its Hot Zones: Market, Council Hall, Square, Gardens, West Street and East Street.
   - Cash Grab's three points: the Market's cash is taken to the gardens, the Gardens' to the market, and the Square's
     up to the Council Hall.
-- The vista (`build_vista`) is drawn only, with no collision and no shadows:
-  - the hill falling away from 250 under the walls, with fields, nine farms and trees;
-  - then hills and mountains out to 40000, into the scene's fog (the player camera's ZFar is 100000).
+- The land round the town (2026-10-02, the user's goal of an AAA look, after a reference picture of an Italian hill
+  town): `Tools/belltower_vista.py` shapes it, and `belltower_map.py` writes it through `Vista.write_land`:
+  `belltower_vista.obj` / `.vmdl`, one mesh with shared vertices (~338k triangles), drawn only, with no collision and
+  no shadows. The old flat-shaded vista, with its farm buildings and trees, is gone.
+  - Forced perspective (`SCALE`, `scale`, `apparent`, `real_place`): past 1200 out from the walls, a point d out is
+    drawn as if it were scale( d ) times as far from the town's middle: 1.07 at 3000, 2.6 at the river and 8 at the
+    land's edge, so 2.3 km of land plays a landscape 18 km deep. Patterns (fields, rows, districts) are laid out at the
+    apparent place, and things (trees) are drawn round, at their real size over the scale.
+  - Its lowest point is -5409. The catch floor is at `CATCH_FLOOR_Z` (-6500), and `belltower_map.py` asserts the land
+    stays above it.
+  - The fog: `GradientFog` alpha 0.75 from 3000 to 95000, falloff 1.5, up to 9000 high (the player camera's ZFar is
+    100000).
+- `Tools/belltower_vista_paint.py [--size N] [--zones abcd] [--out <dir>] [--sheet <png>]` paints the land's textures
+  into `Assets/materials/belltower/vista/` with numba, from the land's own heights and slopes. A full run at 4096 takes
+  about 3 minutes, numba's first compile included. `--preview <dir> [--views name ...]` renders the town's views
+  (`belltower_vista.PREVIEW_VIEWS`) with the painted textures, per pixel as the shader picks the zones, with the town
+  flat-coloured; with no `--zones` it paints nothing. On 2026-10-02 those renders from the terrace and the gardens
+  showed wooded hills with clearings, a patchwork of fields in the valley and blue haze towards the far hills. None of
+  it has been seen in the engine: Steam and the editor were closed when the models were written.
+  - Four nested zones, A by the walls out to D at the horizon (texels of 1.9, 3.9, 17.8 and 46 units at 4096), each a
+    colour JPG, a kind PNG (grass, soil or stone) and a normal JPG, plus three tiling detail textures and
+    `vista_land.vmat`.
+  - What it paints: districts of fields (Voronoi cells, their crops by the land: plain, hill farms, vines, uplands),
+    laid in rows like bricks, with hedges, tracks, ditches or trees between; olive terraces; vineyards; woods; scrub
+    and rock on the steepest slopes; the river.
+  - Every tree is a spheroid crown, shaded per channel by the sun and the sky, with its sun shadow (the sun is to the
+    west-south-west, so shadows fall east-north-east). Crowns smaller than a texel are averaged into the ground.
+  - `shaders/hc1_vista.shader` picks the zone by how far out from the town a point is (Chebyshev), blends the zones
+    over 12% of each, adds the detail textures near the walls (fading from 700 to 2600 out) and sets the roughness by
+    kind.
+- `Tools/belltower_sky.py` bakes the sky: a clear summer afternoon with fair-weather cumulus, an HDR panorama for
+  s&box's sky shader. The core atmosphere shader had no clouds and tinted the whole sky grey-cyan with the sun's colour.
+- `Tools/belltower_finishes.py` draws the houses' finishes, like the lime render (`plaster_<colour>`, anchored at the
+  ground: rising damp, salts, splashed mud, render blown off). `Tools/belltower_fronts.py` draws the shutters, windows,
+  doors, shop signs, railings, plants and painted lettering, as decal paints at their real size in the project's own
+  fonts.
 - Its look (the user: it "doesn't look AAA", the textures and the low-poly plants, 2026-09-29):
   - `Tools/belltower_materials.py` draws Belltower's own materials with numpy into `Assets/materials/belltower/`: the
     walls' rubble and ashlar (and a grey ashlar), the parasols' canvas (red and cream, blue for the east) and the
@@ -1628,8 +1661,8 @@
     in its normals, which would count twice on a round fruit.
   - Round things (fruit, the furniture's bars) have a normal per point (`map_kit.Model.polygon`'s `normals`), so they
     shade smoothly.
-  - Checked only in Cycles renders of a run into scratch (2026-09-29). Until the two scripts are run again, Assets
-    still has the models and materials from before.
+  - Checked only in Cycles renders of a run into scratch (2026-09-29). Assets got the new models and materials on
+    2026-10-02.
 - Every run checks all 94 spawn, objective and cash spots:
   - `check_spots`: room for a player and a floor under each spot;
   - `check_reach`: a way to walk there from the spawn roads. It uses a 2.5D grid of the collision's level tops, kept 16

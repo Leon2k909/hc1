@@ -723,8 +723,9 @@ def camera( eye, target, size, fov ):
     return eye, forward, right, up, focal
 
 
-def render_view( look, scene, eye, target, size=( 1280, 720 ), fov=80.0 ):
-    """ scene: a list of ( triangles ( T, 3, 3 ) in plan, colours ( T, 3, 3 ) linear HDR before fog ). """
+def render_view( look, scene, eye, target, size=( 1280, 720 ), fov=80.0, raw=False ):
+    """ scene: a list of ( triangles ( T, 3, 3 ) in plan, colours ( T, 3, 3 ) linear HDR before fog ). raw: return
+    the linear image as an array, not the displayed picture. """
     width, height = size
     eye, forward, right, up, focal = camera( eye, target, size, fov )
     xs = ( np.arange( width ) + 0.5 - width / 2 ) / focal
@@ -764,7 +765,7 @@ def render_view( look, scene, eye, target, size=( 1280, 720 ), fov=80.0 ):
                              height / 2 - focal * cam[:, :, 1] / cam[:, :, 2] ), axis=-1 )
         _rasterise( np.ascontiguousarray( screen ), np.ascontiguousarray( 1.0 / cam[:, :, 2] ),
                     np.ascontiguousarray( cols ), image, zbuf )
-    return Image.fromarray( look.S.display( image ) )
+    return image if raw else Image.fromarray( look.S.display( image ) )
 
 
 def preview_land_albedo( verts, normals ):

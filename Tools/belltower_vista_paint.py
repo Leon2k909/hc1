@@ -7,7 +7,9 @@ hc1_vista.shader's four zones, and the tiling detail the shader adds up close.
 
 --size is the colour maps' size (4096; the normal maps are half that). --out writes the textures somewhere else, to try
 changes, and --sheet writes a picture of the zones to look at. --preview renders the textured land and the town from
-the town's streets (belltower_vista.PREVIEW_VIEWS) from the textures in --out (or the project's).
+the town's streets (belltower_vista.PREVIEW_VIEWS, or the --views named) from the textures in --out (or the
+project's), per pixel as the shader picks the zones; the town is flat-coloured. With --preview and no --zones, nothing
+is painted.
 
 The land's shape is belltower_vista's. Painted on it:
 - Patterns are laid out where the forced perspective plays them (belltower_vista.apparent), at their real sizes there.
@@ -1259,13 +1261,78 @@ def write_sheet( out_dir, path ):
     sheet.save( path, quality=90 )
 
 
+class _RawLook:
+    """ A Look for render_view's raw passes: no fog, and the sky as NaN (or the real sky). """
+
+    def __init__( self, look, sky=False ):
+        self.look, self.sky, self.fog_colour = look, sky, np.zeros( 3 )
+
+    def fog_amount( self, eye, points ):
+        return np.zeros( points.shape[:-1] )
+
+    def sky_colour( self, eye, rays ):
+        return self.look.sky_colour( eye, rays ) if self.sky else np.full( rays.shape, np.nan )
+
+
+def preview( out_dir, tex_dir, views ):
+    """ The town's views of the land with its painted colour maps: render_view's raw passes give each pixel's place,
+    normal and the town's colour, then each land pixel takes its zones' texels, lit and fogged by belltower_vista's
+    Look. """
+    import belltower_map as BM
+    out_dir.mkdir( parents=True, exist_ok=True )
+    look = V.Look()
+    verts, normals, tris, _ = V.land_mesh()
+    town, town_normals, paints = V.town_triangles()
+    names = sorted( set( paints ) )
+    albedo = np.array( [ BM.paint_colour( p ) for p in names ] ) ** 2.2
+    index = { p: k for k, p in enumerate( names ) }
+    town_colours = np.repeat( look.light( albedo[[ index[p] for p in paints ]], town_normals )[:, None, :], 3, axis=1 )
+    town_up = np.repeat( town_normals[:, None, :], 3, axis=1 )
+    maps = { zone: np.asarray( Image.open( tex_dir / f"vista_{zone}_color.jpg" ).convert( "RGB" ) ) for zone, _ in ZONES }
+    reach = max( V.TE1 - V.CENTRE[0], V.CENTRE[0] - V.TE0, V.TN1 - V.CENTRE[1], V.CENTRE[1] - V.TN0 )
+    flat, sky = _RawLook( look ), _RawLook( look, sky=True )
+    for name, eye, target, fov in V.PREVIEW_VIEWS:
+        if views and name not in views:
+            continue
+        place = V.render_view( flat, [ ( verts[tris], verts[tris] ), ( town, town ) ], eye, target, fov=fov, raw=True )
+        up = V.render_view( flat, [ ( verts[tris], normals[tris] ), ( town, town_up ) ], eye, target, fov=fov, raw=True )
+        land_mark = np.full( ( len( tris ), 3, 3 ), -1.0 )
+        colour = V.render_view( flat, [ ( verts[tris], land_mark ), ( town, town_colours ) ], eye, target, fov=fov,
+                                raw=True )
+        image = V.render_view( sky, [], eye, target, fov=fov, raw=True )
+        hit = ~np.isnan( place[..., 0] )
+        land = hit & ( colour[..., 0] < -0.5 )
+        p = place[land]
+        out = V.town_distance( p[:, 0], p[:, 1] )
+        texel = np.zeros_like( p )
+        left = np.ones( len( p ) )
+        for k, ( zone, margin ) in enumerate( ZONES ):
+            weight = left if k == len( ZONES ) - 1 else left * np.clip( ( margin - out ) / ( ZONE_BLEND * margin ), 0, 1 )
+            half = reach + margin
+            size = maps[zone].shape[0]
+            col = np.clip( ( ( p[:, 0] - V.CENTRE[0] + half ) / ( 2 * half ) * size ).astype( int ), 0, size - 1 )
+            row = np.clip( ( ( V.CENTRE[1] + half - p[:, 1] ) / ( 2 * half ) * size ).astype( int ), 0, size - 1 )
+            texel += weight[:, None] * ( maps[zone][row, col] / 255.0 ) ** 2.2
+            left = left - weight
+        n = up[land] / np.maximum( np.linalg.norm( up[land], axis=1, keepdims=True ), 1e-6 )
+        colour[land] = look.light( texel, n )
+        fog = look.fog_amount( np.asarray( eye, float ), place[hit] )[:, None]
+        image[hit] = colour[hit] * ( 1 - fog ) + look.fog_colour * fog
+        Image.fromarray( look.S.display( image ) ).save( out_dir / f"{name}.jpg", quality=90 )
+        print( f"wrote {out_dir / name}.jpg" )
+
+
 def main():
     parser = argparse.ArgumentParser( description=__doc__.split( "\n\n" )[0] )
     parser.add_argument( "--size", type=int, default=COLOUR_SIZE )
-    parser.add_argument( "--zones", default="abcd" )
+    parser.add_argument( "--zones" )
     parser.add_argument( "--out", type=Path, default=OUT_DIR )
     parser.add_argument( "--sheet", type=Path )
+    parser.add_argument( "--preview", type=Path )
+    parser.add_argument( "--views", nargs="*" )
     args = parser.parse_args()
+    if args.zones is None:
+        args.zones = "" if args.preview else "abcd"
     args.out.mkdir( parents=True, exist_ok=True )
     inner = 0.0
     for zone, margin in ZONES:
@@ -1280,6 +1347,8 @@ def main():
         vmat.write_text( text, encoding="utf-8", newline="\n" )
     if args.sheet:
         write_sheet( args.out, args.sheet )
+    if args.preview:
+        preview( args.preview, args.out, args.views )
 
 
 if __name__ == "__main__":
