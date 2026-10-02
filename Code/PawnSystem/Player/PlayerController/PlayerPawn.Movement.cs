@@ -318,7 +318,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	{
 		// Shooting breaks the sprint. Without this, holding fire while running is simply swallowed by
 		// the no_shooting tag and you stay stuck in the run animation until you let go of Run.
-		if ( Input.Down( "Attack1" ) && !HasEquipmentTag( "aiming" ) )
+		if ( IsPullingTrigger() && !HasEquipmentTag( "aiming" ) )
 		{
 			WantsToggleSprint = false;
 			return false;
@@ -342,6 +342,28 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 		WantsToggleSprint = false;
 		return Input.Down( "Run" ) && CanSprint && HasSprintMovement;
 	}
+	/// <summary>
+	/// Whether the equipment in hand takes the press on fire (Attack1) as a pull of its trigger
+	/// (<see cref="WeaponInputAction.IsTakingInput"/>). A press it ignores breaks no sprint: one held since before it was
+	/// drawn, or a click in the class menu. Going by the button alone, fire held through a respawn (clicking past the
+	/// deathcam) stopped every sprint while the gun wouldn't fire, until the next shot let go of it.
+	/// </summary>
+	private bool IsPullingTrigger()
+	{
+		if ( !Input.Down( "Attack1" ) || !CurrentEquipment.IsValid() )
+			return false;
+
+		foreach ( var action in CurrentEquipment.Components.GetAll<WeaponInputAction>( FindMode.EnabledInSelfAndDescendants ) )
+		{
+			if ( action.IsTakingInput && action.InputActions.Any( IsAttack1 ) )
+				return true;
+		}
+
+		return false;
+	}
+
+	private static bool IsAttack1( string action ) => string.Equals( action, "Attack1", StringComparison.OrdinalIgnoreCase );
+
 	TimeSince TimeSinceSprintChanged { get; set; } = 100;
 
 	private void OnSprintChanged( bool before, bool after )

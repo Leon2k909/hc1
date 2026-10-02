@@ -1725,6 +1725,19 @@ simulate_input.
 - Forced prone (fall knockdown, Zombies' downed) costs nothing. Not yet checked in-game; `dev_prone [count] [interval]`
   presses it through the same path and logs the capsule height and fatigue.
 
+## Sprint and fire (`PlayerPawn.IsPullingTrigger`)
+- Firing breaks a sprint (unless aimed), but only a press the gun takes counts (`WeaponInputAction.IsTakingInput`).
+  It used to go by the raw button.
+  - Fire held through a respawn (clicking past the deathcam) is ignored by the new gun until it's let go
+    (`RunningWhileDeployed`), so the gun wouldn't shoot, but the raw button still stopped every sprint.
+  - The user found they had to shoot before they could sprint (2026-10-02).
+  - A click in the class menu doesn't count either.
+- A new pawn's gun can be deployed before the pawn is possessed (`OnClientRespawn`'s RPC comes after), so the deploy
+  event never noted the held button. `WeaponInputAction` now works it out on its first update as the owner's
+  (`_heldInputChecked`).
+- Compiled offline, not yet checked in-game. To check: die, hold fire through the respawn with W and Shift down. You
+  should sprint, and the gun should only fire once fire is pressed again.
+
 ## Mantling (`PlayerPawn.Mantle.cs`)
 - The user (2026-10-01): "currently i just sort of hop over larger objects". Jump while moving forward at a ledge 28-84
   over the floor you're on (mid-thigh to ~2.1 m) and you climb onto it, in place of the jump. Lower than 28 is a step or a

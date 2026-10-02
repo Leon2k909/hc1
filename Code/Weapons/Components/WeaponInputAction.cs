@@ -25,13 +25,21 @@ public abstract class WeaponInputAction : EquipmentComponent,
 
 	bool RunningWhileDeployed { get; set; }
 
+	/// <summary>
+	/// Whether <see cref="RunningWhileDeployed"/> has been worked out since the equipment was deployed. A new pawn's
+	/// equipment can be deployed before the pawn is possessed (that comes by RPC after it spawns), so it's worked out on
+	/// the first update the owner is ours. Without that, fire held through a respawn counted as a new pull.
+	/// </summary>
+	bool _heldInputChecked;
+
 	// The body is a named method: hotload can't re-link static lambdas inside explicit generic interface methods
 	// ("Unable to find matching substitution for a static method"), so they'd throw after every hotload.
 	void IGameEventHandler<EquipmentDeployedEvent>.OnGameEvent( EquipmentDeployedEvent eventArgs ) => OnWeaponDeployed( eventArgs );
 
 	void OnWeaponDeployed( EquipmentDeployedEvent eventArgs )
 	{
-		if ( Equipment?.Owner?.IsLocallyControlled ?? false )
+		_heldInputChecked = Equipment?.Owner?.IsLocallyControlled ?? false;
+		if ( _heldInputChecked )
 		{
 			RunningWhileDeployed = InputActions.Any( x => Input.Down( x ) );
 		}
@@ -40,6 +48,12 @@ public abstract class WeaponInputAction : EquipmentComponent,
 	bool isDown = false;
 
 	protected bool IsDown() => isDown;
+
+	/// <summary>
+	/// Whether the equipment takes this action's input: it's held, and wasn't held since before the equipment was
+	/// deployed or clicked in a menu. The pawn's sprint goes by it (<c>PlayerPawn.IsPullingTrigger</c>).
+	/// </summary>
+	public bool IsTakingInput => isDown && !RunningWhileDeployed;
 
 	/// <summary>
 	/// Called when the input method succeeds.
@@ -84,6 +98,12 @@ public abstract class WeaponInputAction : EquipmentComponent,
 		// We only care about input actions coming from the owning object.
 		if ( !Equipment.Owner.IsLocallyControlled )
 			return;
+
+		if ( !_heldInputChecked )
+		{
+			RunningWhileDeployed = InputActions.Any( x => Input.Down( x ) );
+			_heldInputChecked = true;
+		}
 
 		if ( InputActions.All( x => !Input.Down( x ) ) )
 		{
