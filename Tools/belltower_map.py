@@ -97,6 +97,11 @@ STOREY = 120                     # and every floor above it
 # the shops' names (belltower_fronts.SIGNS' indexes). 0 is the café's, 2 the Bakery's and 5 the Inn's; the other houses'
 # shops take SHOP_NAMES in turn (_shops counts them). The east's mirror repaints each west name to one of its own.
 LOUVRES = { "shutter_green": "green", "shutter_red": "red", "shutter_brown": "brown", "shutter_blue": "blue" }
+# Painted window surrounds (cornici), by a house's render: a pale band round a coloured house's windows, grey stone
+# round a pale one's. Three houses in four have them (solid_house), each window with a hood over its head (dress).
+SURROUNDS = { "render_rose": "render_cream", "render_ochre": "render_cream", "render_terracotta": "render_cream",
+              "render_sage": "render_white", "render_blue": "render_white", "render_cream": "ashlar_grey",
+              "render_pale": "ashlar_grey", "render_white": "ashlar_grey" }
 AWNING_KEYS = { "canvas_red": "red", "canvas_green": "green", "canvas_blue": "blue" }
 SHOP_NAMES = ( 1, 3, 4, 6, 7, 8, 9 )
 EAST_SIGNS = { 0: 10, 1: 11, 2: 14, 3: 13, 4: 19, 5: 12, 6: 16, 7: 15, 8: 17, 9: 18 }
@@ -545,6 +550,10 @@ def dress( model, wall, style, rng ):
             slab_at( model, wall, o.r0 - band, o.r0, 0.0, 1.5, o.z0, o.z1 + band, paint )
             slab_at( model, wall, o.r1, o.r1 + band, 0.0, 1.5, o.z0, o.z1 + band, paint )
             slab_at( model, wall, o.r0, o.r1, 0.0, 1.5, o.z1, o.z1 + band, paint )
+            # Its hood: a little cornice over the head, which throws a line of shadow, where it clears the eaves and
+            # the openings beside it.
+            if o.z1 + band + 4.5 <= wall.z[1] and room_beside( wall, o.r0 - band - 2, o.r1 + band + 2 ):
+                slab_at( model, wall, o.r0 - band - 2, o.r1 + band + 2, 0.0, 3.0, o.z1 + band, o.z1 + band + 2.5, paint )
 
 
 def shop_name( style, glazed, key ):
@@ -880,6 +889,8 @@ def solid_house( model, e0, e1, n0, n1, eave, render, faces, ridge, rng, blocks,
     ( face, end, paint ) street plaques on its fronts' corners (street_plaque). """
     box = ( e0, e1, n0, n1, eave )
     model.collision_box( ( e0, n0, 0 ), ( e1, n1, eave ), STONE )
+    if surround is None and chance( 0.75, "surround", e0, n0 ):
+        surround = SURROUNDS.get( render )
     style = { "trim": trim, "shutter": shutter, "sill": "ashlar", "door": "planks_dark", "sign": sign,
               "awning": awning_paint, "surround": surround, "solid": True, "names": list( names ) }
     gutter = "copper" if chance( 0.55, "gutter", e0, n0 ) else "metal"

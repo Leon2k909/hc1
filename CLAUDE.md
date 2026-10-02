@@ -1657,6 +1657,9 @@
   ground: rising damp, salts, splashed mud, render blown off). `Tools/belltower_fronts.py` draws the shutters, windows,
   doors, shop signs, railings, plants and painted lettering, as decal paints at their real size in the project's own
   fonts.
+- Three houses in four have painted window surrounds (cornici, `belltower_map.SURROUNDS`): a pale band round a
+  coloured house's windows, grey stone round a pale one's, each with a little hood over its head that throws a line of
+  shadow (`dress`). They're drawn only, with no collision. Checked in the script's flat previews (2026-10-02).
 - Its look (the user: it "doesn't look AAA", the textures and the low-poly plants, 2026-09-29):
   - `Tools/belltower_materials.py` draws Belltower's own materials with numpy into `Assets/materials/belltower/`: the
     walls' rubble and ashlar (and a grey ashlar), the parasols' canvas (red and cream, blue for the east) and the
