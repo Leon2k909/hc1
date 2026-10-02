@@ -25,6 +25,7 @@
 							{ from = "canvas_red.vmat" to = "materials/buildings/canvas_red.vmat" },
 							{ from = "chalkboard_a.vmat" to = "materials/belltower/chalkboard_a.vmat" },
 							{ from = "chalkboard_b.vmat" to = "materials/belltower/chalkboard_b.vmat" },
+							{ from = "clay_pot.vmat" to = "materials/buildings/clay_pot.vmat" },
 							{ from = "copper.vmat" to = "materials/buildings/copper.vmat" },
 							{ from = "copper_brown.vmat" to = "materials/buildings/copper_brown.vmat" },
 							{ from = "corrugated.vmat" to = "materials/buildings/corrugated.vmat" },
@@ -922,6 +923,15 @@
 					{
 						_class = "PhysicsShapeBox"
 						parent_bone = ""
+						surface_prop = "ceramic"
+						collision_tags = "solid"
+						origin = [ 1586.0000, 1862.0000, 9.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 18.0000, 18.0000, 18.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
 						surface_prop = "default"
 						collision_tags = "solid"
 						origin = [ 1625.0000, 1445.0000, 131.0000 ]
@@ -945,6 +955,15 @@
 						origin = [ 1625.0000, 940.0000, 145.0000 ]
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 240.0000, 350.0000, 290.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "ceramic"
+						collision_tags = "solid"
+						origin = [ 1438.0000, 961.0000, 9.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 18.0000, 18.0000, 18.0000 ]
 					},
 					{
 						_class = "PhysicsShapeBox"
@@ -976,6 +995,24 @@
 					{
 						_class = "PhysicsShapeBox"
 						parent_bone = ""
+						surface_prop = "ceramic"
+						collision_tags = "solid"
+						origin = [ 1438.0000, 189.0000, 9.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 18.0000, 18.0000, 18.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "ceramic"
+						collision_tags = "solid"
+						origin = [ 1438.0000, 111.0000, 9.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 18.0000, 18.0000, 18.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
 						surface_prop = "default"
 						collision_tags = "solid"
 						origin = [ 975.0000, 1625.0000, 158.0000 ]
@@ -1003,6 +1040,15 @@
 					{
 						_class = "PhysicsShapeBox"
 						parent_bone = ""
+						surface_prop = "ceramic"
+						collision_tags = "solid"
+						origin = [ 514.0000, 1862.0000, 9.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 18.0000, 18.0000, 18.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
 						surface_prop = "default"
 						collision_tags = "solid"
 						origin = [ -225.0000, 1625.0000, 155.0000 ]
@@ -1026,6 +1072,15 @@
 						origin = [ -775.0000, 1625.0000, 148.0000 ]
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 450.0000, 250.0000, 296.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "ceramic"
+						collision_tags = "solid"
+						origin = [ -736.0000, 1388.0000, 9.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 18.0000, 18.0000, 18.0000 ]
 					},
 					{
 						_class = "PhysicsShapeBox"

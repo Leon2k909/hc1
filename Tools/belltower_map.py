@@ -508,6 +508,11 @@ def dress( model, wall, style, rng ):
                                       ( rc, o.z1 + 32 ) ):
                         if wall_lantern( model, wall, r, z_top, but=o ):
                             break
+                if chance( 0.4, "pots", *key ):
+                    # Potted bushes beside it, as people keep at their front doors: a pair, or one.
+                    sides = ( -1, 1 ) if chance( 0.5, "pair", *key ) else ( pick( ( -1, 1 ), "pot_side", *key ), )
+                    for side in sides:
+                        door_pot( model, wall, rc + side * ( width / 2 + 15 ), ( *key, side ) )
             elif width < 70:
                 slab_at( model, wall, o.r0 + width * 0.25, o.r1 - width * 0.25, -6.0, -5.0, o.z0 + 38, o.z0 + 40, "iron_black" )
         elif kind == "door":
@@ -567,6 +572,24 @@ def shop_name( style, glazed, key ):
     name = SHOP_NAMES[_shops[0] % len( SHOP_NAMES )]
     _shops[0] += 1
     return name
+
+
+def door_pot( model, wall, r, key ):
+    """ A terracotta pot with a clipped bush, against the wall at r beside a street door, where there's room. Its
+    collision is a box the pot's size. """
+    if not room_beside( wall, r - 11, r + 11 ):
+        return False
+    d, sign, _ = wall_out( wall )
+    c = wall.point( r, d + sign * 12, 0.0 )
+    Detail.lathe( model, c[:2], 0.0, [ ( 7.0, 0.0 ), ( 9.0, 15.0 ), ( 10.2, 15.5 ), ( 10.2, 18.0 ), ( 9.2, 18.0 ), ( 9.0, 16.5 ) ],
+                  "clay_pot", sides=14 )
+    soil = [ np.array( ( c[0] + 9.0 * math.cos( t ), c[1] + 9.0 * math.sin( t ), 16.5 ) )
+             for t in np.linspace( 0.0, 2 * math.pi, 14, endpoint=False ) ]
+    Detail.outward( model, "soil", soil, ( 0, 0, 1 ) )
+    size = 10.0 + keyed( "pot_size", *key ) % 5
+    Detail.shrub( model, ( c[0], c[1], 17.0 + size * 0.6 ), size, squash=0.9, seed=keyed( "pot", *key ) )
+    model.collision_box( ( c[0] - 9, c[1] - 9, 0 ), ( c[0] + 9, c[1] + 9, 18 ), TILE )
+    return True
 
 
 def window_box( model, wall, o, key ):

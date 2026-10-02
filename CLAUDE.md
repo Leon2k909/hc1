@@ -1663,6 +1663,8 @@
 - The gutters and downpipes are copper's brown oxide (`copper_brown`, a second colour of building_textures' copper
   sheet): the tower roof's verdigris read as bright teal along every eave. The market stalls' counters are two tiers
   of slatted crates on a pallet (`crate_counter`), drawn over the stall's own collision box, so the cover is the same.
+- Some street doors have terracotta pots with clipped bushes beside them (`door_pot`: building_textures' `clay_pot`,
+  the beech bush scaled down). Each has a collision box the pot's size.
 - Its look (the user: it "doesn't look AAA", the textures and the low-poly plants, 2026-09-29):
   - `Tools/belltower_materials.py` draws Belltower's own materials with numpy into `Assets/materials/belltower/`: the
     walls' rubble and ashlar (and a grey ashlar), the parasols' canvas (red and cream, blue for the east) and the

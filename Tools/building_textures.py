@@ -193,6 +193,8 @@ def render( rng, n ):
         "render_cream": mix( paint( ( 228, 212, 170 ), lum ), dirt, grime ),
         "render_sage": mix( paint( ( 170, 182, 150 ), lum ), dirt, grime ),
         "render_terracotta": mix( paint( ( 192, 124, 90 ), lum ), dirt, grime ),
+        # Belltower's flowerpots: unglazed terracotta, its fine grain the render's.
+        "clay_pot": mix( paint( ( 170, 96, 64 ), lum ), dirt, grime * 0.6 ),
     }
     return colours, rough, height, 2.5
 
@@ -1058,7 +1060,7 @@ PAINTS = {
     "shutter_brown": "shutter_boards", "shutter_green": "shutter_boards", "brick": "brick", "metal": "metal",
     # Belltower's
     "render_rose": "render", "render_blue": "render", "render_cream": "render", "render_sage": "render",
-    "render_terracotta": "render", "trim_blue": "painted_wood", "trim_red": "painted_wood",
+    "render_terracotta": "render", "clay_pot": "render", "trim_blue": "painted_wood", "trim_red": "painted_wood",
     "shutter_blue": "shutter_boards", "shutter_red": "shutter_boards", "ashlar": "ashlar", "ashlar_grey": "ashlar",
     "rubble": "rubble", "setts": "setts", "flagstones": "flagstones", "glass": "glass", "canvas_red": "canvas",
     "canvas_green": "canvas", "canvas_blue": "canvas", "canvas_plain": "canvas", "sandbags": "sandbags",
