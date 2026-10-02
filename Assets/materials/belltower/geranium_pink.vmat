@@ -1,0 +1,18 @@
+// Tools/belltower_fronts.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    F_ALPHA_TEST "1"
+    g_flAlphaTestReference "0.5"
+    g_flAntiAliasedEdgeStrength "1"
+    TextureTranslucency "materials/belltower/geranium_pink_alpha.png"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.00"
+    TextureColor "materials/belltower/geranium_pink_color.png"
+    TextureNormal "materials/belltower/geranium_pink_normal.png"
+    TextureRoughness "materials/belltower/geranium_pink_rough.png"
+    TextureAmbientOcclusion "materials/belltower/geranium_pink_ao.png"
+    g_vColorTint "[1.0 1.0 1.0 1.0]"
+    g_flModelTintAmount "1.0"
+}

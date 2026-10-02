@@ -9,6 +9,10 @@ Round things (fruit, bars) carry a normal per point (Model.polygon's normals), s
 facets. A crate of produce is a low mound under a picture of the heaped fruit (belltower_materials.produce_pile), with a
 few whole fruit loose on top, drawn with their kind's skin alone (produce_skin): the pile's picture carries each
 fruit's roundness in its normals, which on a round fruit would count it twice.
+
+The lamps are lit, as a town's are on a bright day: a lantern's panes, a dish lamp's bulb and the enamel inside its
+shade are belltower_fronts' self-lit lamp pictures. Lanterns hang from wall brackets or stand on the street lamps' posts;
+dish lamps hang from wires strung across the streets.
 """
 import math
 import numpy as np
@@ -16,6 +20,8 @@ import numpy as np
 from pathlib import Path
 
 import belltower_materials as Materials
+import belltower_finishes as Finishes
+import belltower_fronts as Fronts
 
 OAK = "models/sbox_props/trees/oak/tree_oak_small_a.vmdl"
 OAK_BIG = "models/sbox_props/trees/oak/tree_oak_medium_a.vmdl"
@@ -28,7 +34,7 @@ OWN = Materials.RESOURCE_DIR
 MATERIALS = {
     "planks": "materials/wood/brown_planks_03.vmat",
     "planks_dark": "materials/wood/brown_planks_03.vmat",
-    "setts": f"{OWN}/cobbles.vmat",
+    "setts": f"{OWN}/street_cobbles.vmat",
     "rubble": f"{OWN}/rubble.vmat",
     "ashlar": f"{OWN}/ashlar.vmat",
     "ashlar_grey": f"{OWN}/ashlar_grey.vmat",
@@ -40,18 +46,46 @@ MATERIALS = {
     **{f"produce_{kind}": f"{OWN}/produce_{kind}.vmat" for kind in Materials.PRODUCE},
     "produce_skin": f"{OWN}/produce_skin.vmat",
 }
+# The houses' lime render (belltower_finishes.PLASTERS). "whitewash" stays building_textures' flat whitewash for the
+# rooms inside; an outside wall in whitewash is "render_white".
+PLASTERS = {paint: f"{OWN}/{Finishes.plaster_paint(paint)}.vmat" for paint in Finishes.PLASTERS if paint != "whitewash"}
+PLASTERS["render_white"] = f"{OWN}/plaster_whitewash.vmat"
+MATERIALS.update(PLASTERS)
+
+# The fronts' pictures (belltower_fronts): each drawn once across its own polygon (map_kit's decal paints).
+FRONT_DECALS = (
+    [f"louvre_{c}" for c in Fronts.LOUVRE_PAINTS] + [f"louvre_pair_{c}" for c in Fronts.LOUVRE_PAINTS]
+    + [f"window_{k}" for k in "abcd"] + [f"shopfront_{k}" for k in "abc"] + [f"door_{k}" for k in "abcdefg"]
+    + [f"sign_{k}" for k in range(len(Fronts.SIGNS))] + [f"letters_{k}" for k in range(len(Fronts.SIGNS))]
+    + [f"geranium_{k}" for k in Fronts.GERANIUMS] + ["trailing", "ivy_climb", "ivy_hang", "bougainvillea"]
+    + [f"chalkboard_{k}" for k in Fronts.CHALKBOARDS] + [f"plaque_{k}" for k in range(len(Fronts.PLAQUES))]
+    + [f"banner_{k}" for k in Fronts.BANNERS] + [f"ghost_{k}" for k in range(len(Fronts.GHOSTS))]
+    + ["lantern_glass", "lamp_bulb", "lamp_reflector"] + [f"insegna_{k}" for k in range(len(Fronts.INSEGNE))])
+# Repeating along their run, with UVs given where they're built: railing bays, awning canvas and its valance.
+FRONT_TILED = ["railing"] + [f"awning_{k}" for k in Fronts.AWNINGS] + [f"valance_{k}" for k in Fronts.AWNINGS]
+MATERIALS.update({paint: f"{OWN}/{paint}.vmat" for paint in FRONT_DECALS + FRONT_TILED})
 # World units a texture tile covers: the stone's own tiles (belltower_materials' RUBBLE_TILE, ASHLAR_TILE), the scans'
 # real sizes. Parasols and produce are given their UVs, so theirs only stand in.
 TILES = {"planks": 48, "planks_dark": 48, "setts": 64, "rubble": Materials.RUBBLE_TILE, "ashlar": Materials.ASHLAR_TILE,
          "ashlar_grey": Materials.ASHLAR_TILE, "flagstones": 96, "parasol_red": Materials.PARASOL_TILE,
          "parasol_cream": Materials.PARASOL_TILE, "parasol_blue": Materials.PARASOL_TILE,
          **{f"produce_{kind}": Materials.produce_tile(kind) for kind in Materials.PRODUCE}, "produce_skin": 12.0}
+TILES["setts"] = Finishes.COBBLE_TILE
+TILES.update({paint: Finishes.PLASTER_TILE for paint in PLASTERS})
+# Decals are drawn once across their polygon whatever the tile; the rest are given their UVs.
+TILES.update({paint: 64.0 for paint in FRONT_DECALS})
+TILES.update({paint: 48.0 for paint in FRONT_TILED})
 
 
-def configure(model):
+def configure(model, render=True):
+    """ render: the render paints in lime plaster, its picture standing on z 0 (map_kit's anchored paints). The vista's
+    farms keep building_textures' flat renders: they stand far below z 0, where the plaster's damp would float. """
     model.grain_paints.update(("planks", "planks_dark"))
-    model.material_overrides.update(MATERIALS)
-    model.tile_overrides.update(TILES)
+    materials = MATERIALS if render else {p: m for p, m in MATERIALS.items() if p not in PLASTERS or p == "render_white"}
+    model.material_overrides.update(materials)
+    model.tile_overrides.update({p: t for p, t in TILES.items() if p in materials or p not in MATERIALS})
+    model.anchored_paints = set(PLASTERS) if render else set()
+    model.decal_paints = set(FRONT_DECALS)
 
 
 def material_colour_file(paint, assets):
@@ -445,3 +479,195 @@ def produce_crate(model, centre, yaw, kind, rng, z=0.0, width=26.0, depth=20.0, 
         q = heights[j0:j0 + 2, i0:i0 + 2]
         hz = (q[0, 0]*(1 - ti) + q[0, 1]*ti)*(1 - tj) + (q[1, 0]*(1 - ti) + q[1, 1]*ti)*tj
         fruit(model, at((lx, ly, hz + radius*squash*0.35)), kind, rng)
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Lamps: lanterns on brackets and posts, dish lamps on wires, and the cafés' A-frame boards
+
+LANTERN_HANG = 20.35    # a hanging lantern's ring top over its tray's underside, at scale 1
+
+
+def ball(model, centre, r, paint, rings=5, segments=10):
+    """ A sphere shaded smooth (a finial, a bulb). """
+    c = np.asarray(centre, float)
+
+    def d(i, k):
+        t, a = math.pi*i/rings, 2*math.pi*k/segments
+        return np.array((math.sin(t)*math.cos(a), math.sin(t)*math.sin(a), math.cos(t)))
+    for i in range(rings):
+        for k in range(segments):
+            ds = [d(i, k), d(i, k + 1), d(i + 1, k + 1), d(i + 1, k)]
+            if i == 0:
+                ds = [ds[0], ds[2], ds[3]]
+            elif i == rings - 1:
+                ds = ds[:3]
+            outward(model, paint, [c + r*q for q in ds], sum(ds), normals=ds)
+
+
+def hoop(model, centre, u, v, radius, r, paint, segments=10):
+    """ A ring of round bar in the plane of u and v (a lantern's ring, a bracket's scroll). """
+    c, u, v = np.asarray(centre, float), np.asarray(u, float), np.asarray(v, float)
+    pts = [c + radius*(math.cos(2*math.pi*k/segments)*u + math.sin(2*math.pi*k/segments)*v) for k in range(segments)]
+    for k in range(segments):
+        rod(model, pts[k], pts[(k + 1) % segments], r, paint, sides=5)
+
+
+def frustum(model, P, h0, z0, h1, z1, paint, caps=(True, True)):
+    """ A square frustum in a frame P( x, y, z ): half-width h0 at z0 to h1 at z1, its ends drawn where caps says. """
+    corners = ((1, 1), (-1, 1), (-1, -1), (1, -1))
+    c0 = [P(sx*h0, sy*h0, z0) for sx, sy in corners]
+    c1 = [P(sx*h1, sy*h1, z1) for sx, sy in corners]
+    m0, m1 = P(0, 0, z0), P(0, 0, z1)
+    for k in range(4):
+        q = [c0[k], c0[(k + 1) % 4], c1[(k + 1) % 4], c1[k]]
+        outward(model, paint, q, sum(q)/4 - (m0 + m1)/2)
+    if caps[0]:
+        outward(model, paint, c0, m0 - m1)
+    if caps[1]:
+        outward(model, paint, c1, m1 - m0)
+
+
+def lantern(model, origin, yaw=0.0, scale=1.0, hanging=True, iron="iron_black", glass="lantern_glass"):
+    """ A lantern: four tapered panes of lit glass (belltower_fronts' lantern_glass) between iron corner posts, on a
+    tray over an inverted pyramid, under a band, an eaved hipped cap and a chimney. 10.6 wide at its eave and 24 tall
+    hanging, at scale 1. origin: the tray's underside. hanging: a ring on top to hang it by (LANTERN_HANG over origin)
+    and a drop finial under it; else a ball finial on top, to stand on a post. No collision. Returns its top. """
+    at, _, _ = local(origin, yaw)
+    s = scale
+
+    def P(x, y, z):
+        return at((x*s, y*s, z*s))
+    frustum(model, P, 1.4, -1.4, 4.2, 0.0, iron, caps=(True, False))
+    frustum(model, P, 4.6, 0.0, 4.6, 1.0, iron)
+    b, t, z0, z1 = 3.4, 4.25, 1.0, 11.0
+    for k in range(4):
+        a = k*math.pi/2
+        d, r = np.array((math.cos(a), math.sin(a))), np.array((-math.sin(a), math.cos(a)))
+        pts = [P(*(d*b - r*b), z0), P(*(d*b + r*b), z0), P(*(d*t + r*t), z1), P(*(d*t - r*t), z1)]
+        outward(model, glass, pts, P(*d, 0) - P(0, 0, 0), uv=[(0, 0), (1, 0), (1, 1), (0, 1)])
+        c = np.array((math.cos(a + math.pi/4), math.sin(a + math.pi/4)))*math.sqrt(2)
+        model.beam(P(*(c*b), z0), P(*(c*t), z1), (0.7*s, 0.7*s), iron)
+    frustum(model, P, 4.45, 11.0, 4.45, 12.0, iron)
+    frustum(model, P, 5.3, 12.0, 5.3, 12.45, iron)
+    frustum(model, P, 5.0, 12.45, 1.3, 15.4, iron, caps=(False, True))
+    frustum(model, P, 1.1, 15.4, 1.1, 16.6, iron, caps=(False, False))
+    frustum(model, P, 1.7, 16.6, 1.7, 17.0, iron)
+    if hanging:
+        rod(model, P(0, 0, -1.4), P(0, 0, -2.6), 0.32*s, iron, sides=6)
+        ball(model, P(0, 0, -3.2), 0.75*s, iron)
+        rod(model, P(0, 0, 17.0), P(0, 0, 18.1), 0.3*s, iron, sides=6)
+        hoop(model, P(0, 0, 19.1), P(1, 0, 0) - P(0, 0, 0), np.array((0, 0, 1.0))*s, 1.0, 0.25*s, iron)
+        return P(0, 0, LANTERN_HANG)
+    ball(model, P(0, 0, 17.9), 0.9*s, iron)
+    rod(model, P(0, 0, 18.8), P(0, 0, 20.0), 0.25*s, iron, sides=6)
+    return P(0, 0, 20.0)
+
+
+def hanging_lantern(model, hook, yaw=0.0, scale=1.0, **kw):
+    """ A lantern hanging by its ring from hook. """
+    return lantern(model, np.asarray(hook, float) - (0, 0, LANTERN_HANG*scale), yaw, scale, True, **kw)
+
+
+def dish_lamp(model, hook, scale=1.0, shade="iron_black", inside="lamp_reflector", bulb="lamp_bulb", sides=16):
+    """ A street lamp hung from its wire: an enamelled dish shade on a drop rod, white and lit inside, a bare bulb under
+    its socket. 18 across, hook: where it hangs. No collision. Returns the bulb's centre. """
+    h, s = np.asarray(hook, float), scale
+    rod(model, h, h - (0, 0, 5.2*s), 0.3*s, shade, sides=6)
+    # The shade's profile ( r, z under the hook ), flaring out to a rolled rim.
+    profile = [(2.2, -5.0), (4.6, -6.4), (7.0, -8.0), (8.6, -9.2), (9.0, -9.7)]
+    rim = []
+    for r, z in profile:
+        rim.append([np.array((math.cos(2*math.pi*k/sides), math.sin(2*math.pi*k/sides), 0.0)) for k in range(sides)])
+    normals = []
+    for i, (r, z) in enumerate(profile):
+        (ra, za), (rb, zb) = profile[max(i - 1, 0)], profile[min(i + 1, len(profile) - 1)]
+        n = np.array((-(zb - za), rb - ra))
+        normals.append(n/np.linalg.norm(n))
+    for i in range(len(profile) - 1):
+        (r0, z0), (r1, z1) = profile[i], profile[i + 1]
+        for k in range(sides):
+            a, b = rim[i][k], rim[i][(k + 1) % sides]
+            q = [h + (a*r0 + (0, 0, z0))*s, h + (b*r0 + (0, 0, z0))*s, h + (b*r1 + (0, 0, z1))*s, h + (a*r1 + (0, 0, z1))*s]
+            n0, n1 = normals[i], normals[i + 1]
+            ns = [a*n0[0] + (0, 0, n0[1]), b*n0[0] + (0, 0, n0[1]), b*n1[0] + (0, 0, n1[1]), a*n1[0] + (0, 0, n1[1])]
+            outward(model, shade, q, sum(ns), normals=ns)
+            outward(model, inside, q, -sum(ns), normals=[-n for n in ns])
+    top = [h + (rim[0][k]*profile[0][0] + (0, 0, profile[0][1]))*s for k in range(sides)]
+    outward(model, shade, top, (0, 0, 1.0))
+    rod(model, h + (0, 0, -5.0*s), h + (0, 0, -7.2*s), 1.1*s, shade, sides=8)
+    centre = h + (0, 0, -8.5*s)
+    ball(model, centre, 1.5*s, bulb, rings=4, segments=8)
+    return centre
+
+
+def wire(model, a, b, sag, paint="iron_black", thick=0.45, segments=10):
+    """ A wire from a to b sagging sag at its middle, as thin bars. """
+    a, b = np.asarray(a, float), np.asarray(b, float)
+    pts = [a + (b - a)*t - np.array((0, 0, 4*sag*t*(1 - t))) for t in np.linspace(0, 1, segments + 1)]
+    for p, q in zip(pts, pts[1:]):
+        model.beam(p, q, (thick, thick), paint)
+
+
+def sandwich_board(model, centre, yaw, picture, z=0.0, frame="planks_dark"):
+    """ An A-frame chalkboard on the pavement: two 24 x 36 boards hinged at the top and 16 apart at the foot, each
+    showing picture (belltower_fronts' chalkboard_<k>, its own frame drawn in) on its outer face, the front one
+    facing yaw. No collision. """
+    at, x, _ = local((centre[0], centre[1], z), yaw)
+    foot, top, height = 8.0, 0.9, 35.0
+    for side in (-1, 1):
+        p0, p1 = at((side*foot, 0, 0)), at((side*top, 0, height))
+        model.beam(p0, p1, (24.0, 1.2), frame)
+        along = (p1 - p0)/np.linalg.norm(p1 - p0)
+        out = side*x*height/math.hypot(height, foot - top) + np.array((0, 0, (foot - top)/math.hypot(height, foot - top)))
+        out = out/np.linalg.norm(out)
+        y = np.cross(out, along)
+        f = 0.7
+        pts = [p0 + out*f - y*12, p0 + out*f + y*12, p1 + out*f + y*12, p1 + out*f - y*12]
+        outward(model, picture, pts, out)
+    rod(model, at((0, -12.5, height + 0.4)), at((0, 12.5, height + 0.4)), 0.5, "iron_black", sides=6)
+
+
+def lathe(model, centre, z, profile, paint, sides=12, caps=(False, False), turn=0.0):
+    """ A turned shape about a vertical axis through centre: profile [ ( r, height over z ) ] from the bottom up (no
+    radius of 0), shaded smooth round and faceted along it. caps: close its bottom and top. """
+    c = np.array((centre[0], centre[1], z), float)
+    rim = [np.array((math.cos(turn + 2*math.pi*k/sides), math.sin(turn + 2*math.pi*k/sides), 0.0)) for k in range(sides)]
+
+    def p(d, r, h):
+        return c + d*r + (0, 0, h)
+    for (r0, h0), (r1, h1) in zip(profile, profile[1:]):
+        n = np.array((h1 - h0, -(r1 - r0)))
+        if np.linalg.norm(n) < 1e-9:
+            continue
+        n /= np.linalg.norm(n)
+        for k in range(sides):
+            a, b = rim[k], rim[(k + 1) % sides]
+            na, nb = a*n[0] + (0, 0, n[1]), b*n[0] + (0, 0, n[1])
+            outward(model, paint, [p(a, r0, h0), p(b, r0, h0), p(b, r1, h1), p(a, r1, h1)], na + nb,
+                    normals=[na, nb, nb, na])
+    for cap, (r, h), up in ((caps[0], profile[0], -1.0), (caps[1], profile[-1], 1.0)):
+        if cap:
+            outward(model, paint, [p(d, r, h) for d in rim], (0, 0, up))
+
+
+def street_lamp(model, centre, z=0.0, iron="iron_black"):
+    """ A cast-iron street lamp 147 tall: an octagonal plinth and a moulded base, a tapering column with two collars, a
+    capital with four brackets curving up under a lantern (scale 1.5) standing on it. Drawn only: belltower_map gives it
+    a plain base and shaft to collide with. """
+    e, n = centre
+    lathe(model, centre, z, [(7.6, 0.0), (7.6, 3.0), (6.9, 3.8)], iron, sides=8, caps=(False, True), turn=math.pi/8)
+    lathe(model, centre, z, [(6.6, 3.8), (6.6, 5.6), (5.7, 7.0), (5.0, 9.4), (5.0, 12.8), (5.9, 13.8), (5.9, 15.2),
+                             (4.7, 16.4), (4.1, 18.8), (3.5, 21.4), (3.5, 22.8), (2.7, 23.8), (2.3, 104.0)], iron)
+    for h in (34.0, 66.0):
+        lathe(model, centre, z, [(2.6, h), (3.3, h + 0.6), (3.3, h + 2.0), (2.6, h + 2.6)], iron)
+    lathe(model, centre, z, [(2.3, 104.0), (3.3, 104.8), (3.3, 106.2), (2.5, 107.0), (2.5, 109.0), (3.1, 110.6),
+                             (4.2, 113.2), (4.4, 114.4), (3.6, 115.0)], iron, caps=(False, True))
+    base = np.array((e, n, z), float)
+    for k in range(4):
+        a = k*math.pi/2
+        d = np.array((math.cos(a), math.sin(a), 0.0))
+        p0, p1, p2 = base + d*2.4 + (0, 0, 100.0), base + d*5.6 + (0, 0, 108.0), base + d*6.4 + (0, 0, 116.4)
+        rod(model, p0, p1, 0.45, iron, sides=6)
+        rod(model, p1, p2, 0.45, iron, sides=6)
+        ball(model, p1, 0.75, iron, rings=3, segments=6)
+    lantern(model, (e, n, z + 117.0), 0.0, 1.5, False, iron=iron)

@@ -21,8 +21,9 @@ Inn (west) and the Tavern (east) with their beer gardens, the churchyards, and t
 square, the churchyards and the terrace.
 
 - Writes the models to Assets/models/maps/belltower/ (<name>.obj/.mtl, their collision hulls and <name>.vmdl): the
-  centre, the west half, the east half, and the vista (the hill falling away to fields, farms and mountains, drawn
-  only: no collision, no shadows). Also the scene to Assets/scenes/maps/Belltower/belltower.scene (spawns for every
+  centre, the west half and the east half, and through Tools/belltower_vista.py the land round the town (the hill
+  falling away to fields, woods, farms and hills, painted by Tools/belltower_vista_paint.py, drawn only: no collision,
+  no shadows). Also the scene to Assets/scenes/maps/Belltower/belltower.scene (spawns for every
   mode, the bomb sites, buy zones, callouts, Cash Grab's points, the Domination and Hot Zone spots, light) and the radar
   picture to Assets/ui/minimaps/minimap_belltower.png. The scene is written whole every run: edit the layout here, not
   in the editor.
@@ -54,6 +55,7 @@ from PIL import Image, ImageDraw
 import building_textures as BT
 import map_kit as K
 import belltower_detail as Detail
+import belltower_vista as Vista
 from map_kit import Model, Wall, arc, normalise
 
 TITLE = "Belltower"
@@ -90,11 +92,31 @@ ROOF_PITCH = 42.0                # steeper than the navmesh's 40 degrees
 GROUND_STOREY = 130              # a house's first floor
 STOREY = 120                     # and every floor above it
 
+# The fronts' pictures (Tools/belltower_fronts.py): shutter paints to their louvres, awning canvases to their cloth, and
+# the shops' names (belltower_fronts.SIGNS' indexes). 0 is the café's, 2 the Bakery's and 5 the Inn's; the other houses'
+# shops take SHOP_NAMES in turn (_shops counts them). The east's mirror repaints each west name to one of its own.
+LOUVRES = { "shutter_green": "green", "shutter_red": "red", "shutter_brown": "brown", "shutter_blue": "blue" }
+AWNING_KEYS = { "canvas_red": "red", "canvas_green": "green", "canvas_blue": "blue" }
+SHOP_NAMES = ( 1, 3, 4, 6, 7, 8, 9 )
+EAST_SIGNS = { 0: 10, 1: 11, 2: 14, 3: 13, 4: 19, 5: 12, 6: 16, 7: 15, 8: 17, 9: 18 }
+_shops = [ 0 ]
+
 # West paints to east ones: warm colours on Red Team's side, cool ones on Blue Team's.
 EAST_PAINTS = {
     "render_rose": "render_blue", "render_terracotta": "render_sage", "render_ochre": "render_pale",
-    "render_cream": "whitewash", "shutter_red": "shutter_blue", "trim_red": "trim_blue",
+    "render_cream": "render_white", "shutter_red": "shutter_blue", "trim_red": "trim_blue",
     "canvas_red": "canvas_blue", "shutter_brown": "shutter_green", "parasol_red": "parasol_blue",
+    "louvre_red": "louvre_blue", "louvre_pair_red": "louvre_pair_blue",
+    "louvre_brown": "louvre_green", "louvre_pair_brown": "louvre_pair_green",
+    "awning_red": "awning_blue", "awning_green": "awning_navy", "valance_red": "valance_blue",
+    "valance_green": "valance_navy", "banner_red": "banner_blue", "door_c": "door_d", "door_f": "door_g", "door_g": "door_f",
+    "window_a": "window_c", "window_c": "window_a", "window_b": "window_d", "window_d": "window_b",
+    "shopfront_a": "shopfront_c", "shopfront_c": "shopfront_a",
+    "ghost_0": "ghost_2", "ghost_1": "ghost_3",
+    **{ f"sign_{w}": f"sign_{e}" for w, e in EAST_SIGNS.items() },
+    **{ f"letters_{w}": f"letters_{e}" for w, e in EAST_SIGNS.items() },
+    **{ f"plaque_{k}": f"plaque_{k + 3}" for k in range( 3 ) },
+    "insegna_0": "insegna_1",
 }
 
 
@@ -247,12 +269,12 @@ def stair( model, lo, hi, z0, z1, climb, tread, side, surface=WOOD ):
 
 def gable_roof( model, e0, e1, n0, n1, eave, ridge_axis, tiles, gable, over=14.0, ends_over=( 14.0, 14.0 ),
                 thick=5.0, soffit="planks_dark", trim="trim_brown", pitch=ROOF_PITCH, hull=STONE, slab_surface=None,
-                gables=( True, True ), cap=True ):
+                gables=( True, True ), cap=True, gutter=None ):
     """ A gable roof over e0..e1 x n0..n1 with its ridge along ridge_axis ('e' or 'n') and its eaves at z eave on the long
     sides, overhanging by over there and by ends_over past the gable ends ( low end, high end ). gable paints the gable
     ends' triangles (None leaves one out, as gables does). hull fills the roof's space with a collision hull (no attic
     floor for the navmesh); slab_surface gives the slabs their own collision instead, for a roof seen from inside.
-    Returns the ridge height. """
+    gutter paints a gutter along each eave, under the tiles' edge (downpipe() meets it). Returns the ridge height. """
     t = math.tan( math.radians( pitch ) )
     if ridge_axis == "e":
         along, across = np.array( ( 1.0, 0.0, 0.0 ) ), np.array( ( 0.0, 1.0, 0.0 ) )
@@ -289,6 +311,13 @@ def gable_roof( model, e0, e1, n0, n1, eave, ridge_axis, tiles, gable, over=14.0
     if hull:
         pts = [ point( a, c, z ) for a in ( a0, a1 ) for c, z in ( ( c0, eave ), ( c1, eave ), ( mid, ridge ) ) ]
         model.hull( [ tuple( p ) for p in pts ], hull )
+    if gutter:
+        # Gutters hang just inside the tiles' edge and under it, the length of the eaves.
+        for side in ( -1, 1 ):
+            g0 = point( a0 - ends_over[0] + 1, mid + side * ( half + over - 1.2 ), eave - over * t - 4.0 )
+            g1 = point( a1 + ends_over[1] - 1, mid + side * ( half + over - 1.2 ), eave - over * t - 4.0 )
+            axle( model, ( g0 + g1 ) / 2, along, 2.4, float( np.linalg.norm( g1 - g0 ) ), { "side": gutter, "end": gutter },
+                  sides=8 )
     return ridge
 
 
@@ -347,35 +376,108 @@ def room_beside( wall, r0, r1 ):
     return not any( o.r0 < r1 + 4 and o.r1 > r0 - 4 for o in wall.openings if not ( o.r0 >= r0 and o.r1 <= r1 ) )
 
 
+def keyed( *key ):
+    """ A steady hash of key (numbers to a tenth), for choices that mustn't draw on the shared rng: every draw from it
+    would move every house's choices after it. """
+    text = ",".join( f"{float( k ):.1f}" if isinstance( k, ( int, float, np.integer, np.floating ) ) else str( k )
+                     for k in key )
+    return zlib.crc32( text.encode() )
+
+
+def pick( options, *key ):
+    return options[keyed( *key ) % len( options )]
+
+
+def chance( share, *key ):
+    return ( keyed( *key ) % 10007 ) / 10007.0 < share
+
+
+def card( model, paint, points, towards, uv=None, both=False ):
+    """ A polygon wound to face towards, as facing() winds it, with uv (one ( u, v ) a point, kept with its point when
+    the winding turns) and its back drawn too if both. """
+    pts = [ np.asarray( p, float ) for p in points ]
+    normal = np.zeros( 3 )
+    for k in range( 1, len( pts ) - 1 ):
+        normal += np.cross( pts[k] - pts[0], pts[k + 1] - pts[0] )
+    if np.linalg.norm( normal ) < 1e-9:
+        return
+    if np.dot( normal, towards ) < 0:
+        pts = pts[:1] + pts[:0:-1]
+        if uv is not None:
+            uv = list( uv[:1] ) + list( uv[:0:-1] )
+    model.polygon( paint, pts, both_sides=both, uv=uv )
+
+
+def r_right( wall ):
+    """ +1 where r runs to the right of someone looking at the wall's outer face, -1 where it runs to their left. """
+    return 1.0 if wall.outward in ( "-n", "+e" ) else -1.0
+
+
+def picture( model, wall, r0, r1, z0, z1, depth, paint, crop=None, both=False ):
+    """ A picture on the wall over r0..r1, z0..z1, depth out of its outer face (negative: into it), facing out. crop
+    ( u0, u1, v0, v1 ) shows that part of a decal paint's picture, the right way round from in front (a mirrored half
+    shows it mirrored, so no lettering); without it the whole picture is stretched across (map_kit's decals). """
+    d, sign, out = wall_out( wall )
+    pts = [ wall.point( r0, d + sign * depth, z0 ), wall.point( r1, d + sign * depth, z0 ),
+            wall.point( r1, d + sign * depth, z1 ), wall.point( r0, d + sign * depth, z1 ) ]
+    uv = None
+    if crop is not None:
+        u0, u1, v0, v1 = crop
+        if r_right( wall ) < 0:
+            u0, u1 = u1, u0
+        uv = [ ( u0, v0 ), ( u1, v0 ), ( u1, v1 ), ( u0, v1 ) ]
+    card( model, paint, pts, out, uv, both )
+
+
 def shutters_open( model, wall, o, paint ):
-    """ A pair of board shutters folded back flat against the wall either side of a window, where there's room. """
+    """ A pair of louvred shutters folded back flat against the wall either side of a window, where there's room: a leaf
+    a side, or a wide window's leaves folded side by side. """
     width = ( o.r1 - o.r0 ) / 2
     left, right = ( o.r0 - 2 - width, o.r0 - 2 ), ( o.r1 + 2, o.r1 + 2 + width )
     if not ( room_beside( wall, *left ) and room_beside( wall, *right ) ):
         return False
+    louvre = LOUVRES.get( paint )
+    leaves = max( 1, round( width / 24 ) )
     for r0, r1 in ( left, right ):
+        if louvre and leaves == 1:
+            slab_at( model, wall, r0, r1, 0.0, 2.0, o.z0, o.z1, { wall.outward: f"louvre_{louvre}", "default": paint } )
+            continue
         slab_at( model, wall, r0, r1, 0.0, 2.0, o.z0, o.z1, { "default": paint } )
+        if louvre:
+            step = ( r1 - r0 ) / leaves
+            for k in range( leaves ):
+                picture( model, wall, r0 + k * step + 0.15, r0 + ( k + 1 ) * step - 0.15, o.z0, o.z1, 2.05,
+                         f"louvre_{louvre}" )
     return True
 
 
 def dress( model, wall, style, rng ):
     """ Fill and trim a wall's openings. style: 'trim', 'shutter', 'sill', 'door', 'roller', 'awning' (canvas paint or
-    None), 'sign', 'surround' (paint or None), and 'solid' (True for a house nobody goes into: every opening is
-    closed). """
+    None), 'sign', 'surround' (paint or None), 'names' (a list of belltower_fronts.SIGNS' names for its shops' signs,
+    used up in turn), and 'solid' (True for a house nobody goes into: every opening is closed, and its glass shows the
+    rooms behind it). """
     trim, shutter = style["trim"], style.get( "shutter" )
+    solid = style.get( "solid" )
+    louvre = LOUVRES.get( shutter )
     for o in wall.openings:
         kind = o.kind
         width = o.r1 - o.r0
+        rc = ( o.r0 + o.r1 ) / 2
+        key = ( wall.outward, wall.across[0], rc, o.z0 )
         if kind in ( "glass", "glass_arch" ):
-            closed = style.get( "solid" ) and shutter and not o.arched and rng.random() < 0.22
+            closed = solid and shutter and not o.arched and rng.random() < 0.22
             if closed:
-                slab_at( model, wall, o.r0, o.r1, -5.0, -3.0, o.z0, o.z1, shutter )
+                slab_at( model, wall, o.r0, o.r1, -5.0, -3.0, o.z0, o.z1,
+                         { wall.outward: f"louvre_pair_{louvre}", "default": shutter } if louvre else shutter )
             else:
-                pane( model, wall, o, "glass", 5.0 )
+                room = solid and not o.arched and not style.get( "glass_surface" )
+                pane( model, wall, o, f"window_{pick( 'abcd', *key )}" if room else "glass", 5.0 )
                 frame( model, wall, o, trim, 4.0 )
                 if style.get( "glass_surface" ):
                     # In a building people go into, the pane stops shots too.
                     slab_at( model, wall, o.r0, o.r1, -6.0, -4.0, o.z0, o.z1, None, style["glass_surface"] )
+                if room and o.z0 > 120 and o.z1 - o.z0 < 80 and chance( 0.35, "box", *key ):
+                    window_box( model, wall, o, key )
             if o.z0 > 20 and not o.arched:
                 slab_at( model, wall, o.r0 - 3, o.r1 + 3, -0.5, 3.0, o.z0 - 4, o.z0, style.get( "sill", "ashlar" ) )
             if not closed and shutter and not o.arched and style.get( "shutters", True ) and rng.random() < 0.8:
@@ -389,7 +491,18 @@ def dress( model, wall, style, rng ):
         elif kind == "shut":
             slab_at( model, wall, o.r0, o.r1, -8.0, -6.0, o.z0, o.z1, style.get( "door", "planks_dark" ) )
             frame( model, wall, o, trim, 5.0, mullion=False, foot=False )
-            if width < 70:
+            if solid and 40 <= width <= 60:
+                # A pair of panelled street doors inside the frame, over a stone step.
+                picture( model, wall, o.r0 + 3, o.r1 - 3, o.z0, o.z1 - 3, -5.95, f"door_{pick( 'abcde', 'door', *key )}" )
+                slab_at( model, wall, o.r0 - 3, o.r1 + 3, -6.0, 4.0, 0.0, 1.5, "ashlar" )
+                if chance( 0.6, "lantern", *key ):
+                    # A lantern on a bracket beside it, on whichever side has room, else over it.
+                    side = pick( ( -1, 1 ), "lantern_side", *key )
+                    for r, z_top in ( ( rc + side * ( width / 2 + 12 ), o.z1 + 14 ), ( rc - side * ( width / 2 + 12 ), o.z1 + 14 ),
+                                      ( rc, o.z1 + 32 ) ):
+                        if wall_lantern( model, wall, r, z_top, but=o ):
+                            break
+            elif width < 70:
                 slab_at( model, wall, o.r0 + width * 0.25, o.r1 - width * 0.25, -6.0, -5.0, o.z0 + 38, o.z0 + 40, "iron_black" )
         elif kind == "door":
             frame( model, wall, o, trim, 1.5, mullion=False, foot=False )
@@ -397,17 +510,34 @@ def dress( model, wall, style, rng ):
             roller = style.get( "roller", "roller_grey" )
             glazed = rng.random() < 0.4
             if glazed:
-                pane( model, wall, o, "glass", 6.0 )
+                if solid:
+                    # The shop behind its window: the middle of belltower_fronts' shopfront, as wide as the glass.
+                    span = min( 1.0, width / 112.0 )
+                    picture( model, wall, o.r0, o.r1, o.z0, o.z1, -6.0, f"shopfront_{pick( 'abc', 'shop', *key )}",
+                             crop=( 0.5 - span / 2, 0.5 + span / 2, 0.0, 1.0 ) )
+                else:
+                    pane( model, wall, o, "glass", 6.0 )
                 frame( model, wall, o, trim, 5.0, bar=4.0 )
                 slab_at( model, wall, o.r0, o.r1, -6.0, -1.0, o.z0, o.z0 + 24, trim )
             else:
                 pane( model, wall, o, roller, 4.0 )
                 slab_at( model, wall, o.r0, o.r1, -4.0, 4.0, o.z1 - 12, o.z1, "iron_black" )
-            sign = style.get( "sign", trim )
-            slab_at( model, wall, o.r0 - 4, o.r1 + 4, 0.0, 2.5, o.z1 + 6, o.z1 + 28, { "default": sign } )
+            name = shop_name( style, glazed, key )
             canvas = style.get( "awning" )
+            sign = style.get( "sign", trim )
+            o.awning = bool( canvas )
             if canvas:
-                awning( model, wall, o.r0 - 6, o.r1 + 6, o.z1 + 34, 54, canvas )
+                awning( model, wall, o.r0 - 6, o.r1 + 6, o.z1 + 34, 54, canvas, name )
+            elif name is not None:
+                # The shop's painted board over its window, belltower_fronts' 120 x 22 at most.
+                bw = min( width + 8, 120.0 )
+                bh = bw * 22 / 120
+                zc = o.z1 + 17
+                slab_at( model, wall, rc - bw / 2, rc + bw / 2, 0.0, 2.5, zc - bh / 2, zc + bh / 2,
+                         { wall.outward: f"sign_{name}", "default": sign } )
+            elif chance( 0.5, "fascia", *key ):
+                # A shut shop's board, its name painted out.
+                slab_at( model, wall, o.r0 - 4, o.r1 + 4, 0.0, 2.5, o.z1 + 6, o.z1 + 28, { "default": sign } )
         if style.get( "surround" ) and kind in ( "glass", "window" ) and not o.arched:
             band = 5.0
             paint = style["surround"]
@@ -416,34 +546,242 @@ def dress( model, wall, style, rng ):
             slab_at( model, wall, o.r0, o.r1, 0.0, 1.5, o.z1, o.z1 + band, paint )
 
 
-def awning( model, wall, r0, r1, z, reach, paint ):
-    """ A canvas awning off the wall from z, sloping down and out by reach, with short sides. No collision. """
+def shop_name( style, glazed, key ):
+    """ Which of belltower_fronts.SIGNS a shop's sign shows: the style's own names first, then the town's in turn. A shut
+    shop may have lost its name (None). """
+    names = style.get( "names" )
+    if names:
+        return names.pop( 0 )
+    if not ( glazed or chance( 0.6, "name", *key ) ):
+        return None
+    name = SHOP_NAMES[_shops[0] % len( SHOP_NAMES )]
+    _shops[0] += 1
+    return name
+
+
+def window_box( model, wall, o, key ):
+    """ A window box of geraniums on two iron brackets under an upper window, some of it trailing over the front. Cards
+    of belltower_fronts' planting, no collision. """
+    d, sign, _ = wall_out( wall )
+    rc = ( o.r0 + o.r1 ) / 2
+    r0, r1, z0 = rc - 20, rc + 20, o.z0
+    slab_at( model, wall, r0, r1, 3.0, 10.0, z0 - 8, z0 + 2, { "+z": "soil", "default": "planks_dark" } )
+    for r in ( r0 + 4, r1 - 5 ):
+        slab_at( model, wall, r, r + 1, 0.0, 9.0, z0 - 9, z0 - 8, "iron_black" )
+        model.beam( wall.point( r + 0.5, d + sign * 0.5, z0 - 18 ), wall.point( r + 0.5, d + sign * 8.5, z0 - 8.5 ), ( 1, 1 ),
+                    "iron_black" )
+    back, front = pick( ( ( "red", "pink" ), ( "pink", "red" ), ( "red", "red" ) ), "flowers", *key )
+    picture( model, wall, r0 + 1, r1 - 1, z0 + 1, z0 + 17, 5.5, f"geranium_{back}" )
+    picture( model, wall, r0 + 1, r1 - 1, z0 - 1, z0 + 15, 8.0, f"geranium_{front}" )
+    picture( model, wall, r0 + 1, r1 - 1, z0 - 17.5, z0 + 2.5, 10.3, "trailing" )
+
+
+def awning( model, wall, r0, r1, z, reach, paint, name=None ):
+    """ A canvas awning off the wall from z, sloping down and out by reach, with side cheeks and a scalloped valance
+    along its front carrying the shop's name (name: belltower_fronts.SIGNS' index) in cut-out letters. No collision. """
     d, sign, out = wall_out( wall )
+    key = AWNING_KEYS.get( paint )
+    canvas, flap = ( f"awning_{key}", f"valance_{key}" ) if key else ( paint, paint )
     drop = reach * 0.45
-    p = [ wall.point( r0, d, z ), wall.point( r1, d, z ), wall.point( r1, d + sign * reach, z - drop ),
-          wall.point( r0, d + sign * reach, z - drop ) ]
-    facing( model, paint, p, out + np.array( ( 0, 0, 2.0 ) ) )
-    facing( model, paint, p, -out - np.array( ( 0, 0, 2.0 ) ) )
+    slope = math.hypot( reach, drop )
+    length = r1 - r0
+    front = d + sign * reach
+    top = z - drop
+    # The canvas: belltower_fronts' 48 x 48 tile, x along the front and y up the slope from the front edge.
+    p = [ wall.point( r0, d, z ), wall.point( r1, d, z ), wall.point( r1, front, top ), wall.point( r0, front, top ) ]
+    uv = [ ( 0.0, slope / 48 ), ( length / 48, slope / 48 ), ( length / 48, 0.0 ), ( 0.0, 0.0 ) ] if key else None
+    card( model, canvas, p, out + np.array( ( 0, 0, 2.0 ) ), uv, both=True )
     for r, side in ( ( r0, -1 ), ( r1, 1 ) ):
         along = np.zeros( 3 )
         along[0 if wall.axis == "e" else 1] = side
-        tri = [ wall.point( r, d, z ), wall.point( r, d + sign * reach, z - drop ), wall.point( r, d + sign * reach, z - drop - 10 ) ]
-        facing( model, paint, tri, along )
-        facing( model, paint, tri, -along )
-    # The valance along the front.
-    front = [ wall.point( r0, d + sign * reach, z - drop ), wall.point( r1, d + sign * reach, z - drop ),
-              wall.point( r1, d + sign * reach, z - drop - 10 ), wall.point( r0, d + sign * reach, z - drop - 10 ) ]
-    facing( model, paint, front, out )
-    facing( model, paint, front, -out )
+        card( model, canvas, [ wall.point( r, d, z ), wall.point( r, front, top ), wall.point( r, front, top - 12 ) ], along,
+              both=True )
+    # The valance, 48 x 12 a repeat.
+    v = [ wall.point( r0, front, top - 12 ), wall.point( r1, front, top - 12 ), wall.point( r1, front, top ),
+          wall.point( r0, front, top ) ]
+    card( model, flap, v, out, [ ( 0.0, 0.0 ), ( length / 48, 0.0 ), ( length / 48, 1.0 ), ( 0.0, 1.0 ) ] if key else None,
+          both=True )
+    if name is not None and key:
+        lw = min( length - 4, 117.0 )
+        lh = lw * 10 / 130
+        rc, zc, f = ( r0 + r1 ) / 2, top - 4.6, front + sign * 0.25
+        facing( model, f"letters_{name}", [ wall.point( rc - lw / 2, f, zc - lh / 2 ), wall.point( rc + lw / 2, f, zc - lh / 2 ),
+                                             wall.point( rc + lw / 2, f, zc + lh / 2 ), wall.point( rc - lw / 2, f, zc + lh / 2 ) ],
+                out )
 
 
-def balcony( model, wall, r0, r1, z, reach=30.0, rail="iron_black", slab="ashlar" ):
-    """ A balcony on the wall at floor height z: a stone slab and an iron railing. No collision (it's out of reach). """
+def balcony( model, wall, r0, r1, z, reach=30.0, rail="iron_black", slab="ashlar", key=None ):
+    """ A balcony on the wall at floor height z: a stone slab on two stepped corbels and a wrought-iron railing (a cut-out
+    card of belltower_fronts' railing) with its handrail and corner posts, sometimes with a bougainvillea over it
+    (key: the window's, for the choice). No collision: it's out of reach. """
+    d, sign, out = wall_out( wall )
     slab_at( model, wall, r0, r1, 0.0, reach, z - 7, z, slab )
-    slab_at( model, wall, r0, r1, reach - 1.5, reach, z, z + 36, rail )
-    slab_at( model, wall, r0, r0 + 1.5, 0.0, reach - 1.5, z, z + 36, rail )
-    slab_at( model, wall, r1 - 1.5, r1, 0.0, reach - 1.5, z, z + 36, rail )
-    slab_at( model, wall, r0, r1, reach - 2.5, reach + 1, z + 34, z + 37, rail )
+    for r in ( r0 + 5, r1 - 13 ):
+        slab_at( model, wall, r, r + 8, 0.0, reach - 8, z - 13, z - 7, slab )
+        slab_at( model, wall, r + 1, r + 7, 0.0, reach - 18, z - 19, z - 13, slab )
+    f = reach - 1.0
+    a, b = r0 + 1, r1 - 1
+    rails = [ ( [ wall.point( a, d + sign * f, z ), wall.point( b, d + sign * f, z ), wall.point( b, d + sign * f, z + 36 ),
+                  wall.point( a, d + sign * f, z + 36 ) ], out, b - a ) ]
+    for r, side in ( ( a, -1 ), ( b, 1 ) ):
+        along = np.zeros( 3 )
+        along[0 if wall.axis == "e" else 1] = side
+        rails.append( ( [ wall.point( r, d + sign * 0.5, z ), wall.point( r, d + sign * f, z ), wall.point( r, d + sign * f, z + 36 ),
+                          wall.point( r, d + sign * 0.5, z + 36 ) ], along, f - 0.5 ) )
+    for pts, towards, span in rails:
+        card( model, "railing", pts, towards, [ ( 0.0, 0.0 ), ( span / 36, 0.0 ), ( span / 36, 1.0 ), ( 0.0, 1.0 ) ], both=True )
+    slab_at( model, wall, a - 0.75, b + 0.75, f - 0.9, f + 0.9, z + 34.5, z + 36.5, rail )
+    for r in ( a, b ):
+        slab_at( model, wall, r - 0.9, r + 0.9, 0.0, f + 0.9, z + 34.5, z + 36.5, rail )
+        slab_at( model, wall, r - 0.75, r + 0.75, f - 0.75, f + 0.75, z, z + 34.5, rail )
+    if key is not None and chance( 0.3, "bougainvillea", *key ):
+        lo, hi = ( a, a + 44 ) if chance( 0.5, "side", *key ) else ( b - 44, b )
+        picture( model, wall, lo, hi, z - 14, z + 34, f + 1.2, "bougainvillea" )
+
+
+def downpipe( model, wall, r, eave, paint, over=14.0 ):
+    """ A rainwater pipe down the wall at r from the gutter under the eaves (gable_roof's, over out) to the ground: a
+    swan neck under the cornice, a bracket a storey. Drawn only. """
+    d, sign, _ = wall_out( wall )
+    t = math.tan( math.radians( ROOF_PITCH ) )
+    stand, top = 4.0, eave - 26.0
+    out_g, z_g = over - 1.2, eave - over * t - 4.0
+    base = wall.point( r, d + sign * stand, 0.0 )
+    model.cylinder( base[:2], 1.6, 0.0, top, { "side": paint, "top": paint, "bottom": paint }, sides=8 )
+    model.cylinder( base[:2], 2.1, 0.0, 10.0, { "side": paint, "top": paint, "bottom": paint }, sides=8 )
+    model.beam( wall.point( r, d + sign * stand, top - 1.0 ), wall.point( r, d + sign * out_g, z_g - 3.5 ), ( 3.0, 3.0 ), paint )
+    model.beam( wall.point( r, d + sign * out_g, z_g - 3.5 ), wall.point( r, d + sign * out_g, z_g ), ( 3.0, 3.0 ), paint )
+    for zb in np.arange( 70.0, top - 10.0, 110.0 ):
+        slab_at( model, wall, r - 2.2, r + 2.2, 0.0, stand + 2.0, zb, zb + 1.2, "iron_black" )
+
+
+def keep_clear( o ):
+    """ The wall round an opening that dress() and solid_house() may put things on, as ( r0, r1, z0, z1 ) boxes: a
+    window's folded shutters, sill and window box, a balcony's slab, railing and corbels, a shop's board or awning, a
+    door's frame. """
+    width, rc = o.r1 - o.r0, ( o.r0 + o.r1 ) / 2
+    if o.kind in ( "glass", "glass_arch", "window" ):
+        boxes = [ ( o.r0 - width / 2 - 3, o.r1 + width / 2 + 3, o.z0 - 6, o.z1 + 4 ) ]
+        if o.z0 > 120 and o.z1 - o.z0 < 80:
+            boxes.append( ( rc - 21, rc + 21, o.z0 - 20, o.z0 ) )
+        if o.z1 - o.z0 > 85:
+            boxes += [ ( rc - 35, rc + 35, o.z0 - 8, o.z0 + 37 ), ( rc - 30, rc + 30, o.z0 - 20, o.z0 ) ]
+        return boxes
+    if o.kind == "shop":
+        # Up to its awning's top, or its board's (dress() notes which it got; until then, the awning).
+        return [ ( o.r0 - 9, o.r1 + 9, o.z0 - 4, o.z1 + ( 44 if getattr( o, "awning", True ) else 30 ) ) ]
+    return [ ( o.r0 - 4, o.r1 + 4, o.z0 - 4, o.z1 + 4 ) ]
+
+
+def fixture_room( wall, r0, r1, z0, z1, but=None ):
+    """ Is the wall clear for a fixture over r0..r1, z0..z1: inside its run by 12 (downpipes come down its ends), clear of
+    its openings' keep_clear() and of the fixtures already on it (wall.fixtures)? but: the opening it goes with. """
+    if r0 < wall.run[0] + 12 or r1 > wall.run[1] - 12:
+        return False
+    for o in wall.openings:
+        if o is not but and any( a < r1 and b > r0 and c < z1 and d > z0 for a, b, c, d in keep_clear( o ) ):
+            return False
+    return not any( a < r1 + 2 and b > r0 - 2 and c < z1 and d > z0 for a, b, c, d in getattr( wall, "fixtures", () ) )
+
+
+def wall_lantern( model, wall, r, z_top, but=None, reach=15.0, scale=0.8 ):
+    """ A lantern hanging from a wrought-iron bracket on the wall at r: a back plate, an arm reach out at z_top with a
+    brace and a scroll under it, a finial on its end and the lantern (belltower_detail's, scale 0.8) on a hook near it.
+    Only where fixture_room() finds the wall clear; it's then noted in wall.fixtures. Drawn only. """
+    box = ( r - 6, r + 6, z_top - 22, z_top + 3 )
+    if not fixture_room( wall, *box, but=but ):
+        return False
+    wall.fixtures = list( getattr( wall, "fixtures", () ) ) + [ box ]
+    d, sign, out = wall_out( wall )
+
+    def at( depth, z ):
+        return wall.point( r, d + sign * depth, z )
+    slab_at( model, wall, r - 2.5, r + 2.5, 0.0, 1.0, z_top - 10, z_top + 3, "iron_black" )
+    model.beam( at( 1.0, z_top ), at( reach, z_top ), ( 1.2, 1.2 ), "iron_black" )
+    model.beam( at( 1.0, z_top - 8 ), at( 9.0, z_top ), ( 0.9, 0.9 ), "iron_black" )
+    Detail.hoop( model, at( 4.6, z_top - 3.4 ), out, ( 0, 0, 1.0 ), 2.4, 0.35, "iron_black" )
+    Detail.ball( model, at( reach + 0.6, z_top ), 0.9, "iron_black", rings=4, segments=8 )
+    hook = at( reach - 2.0, z_top )
+    Detail.rod( model, hook, hook - ( 0, 0, 1.2 ), 0.3, "iron_black", sides=6 )
+    Detail.hanging_lantern( model, hook - ( 0, 0, 1.2 ), yaw=math.degrees( math.atan2( out[1], out[0] ) ), scale=scale )
+    return True
+
+
+PLAQUE = ( 24.0, 9.0 )      # belltower_fronts' street plaques, w x h
+
+
+def street_plaque( model, wall, end, paint ):
+    """ A street's name on a marble plaque an inch proud of the wall (paint: one of belltower_fronts' plaque pictures),
+    as near the wall's corner at end (0: its run's low end, 1: its high end) as fixture_room() allows: just under the
+    first floor's string course, else just over it (over a shop's board), else over a shop's awning. It's then noted in
+    wall.fixtures. Drawn only. """
+    w, h = PLAQUE
+    for inset in ( 14.0, 24.0, 34.0, 44.0, 54.0, 64.0 ):
+        r0 = wall.run[0] + inset if end == 0 else wall.run[1] - inset - w
+        for z0 in ( 110.0, 134.0, 148.0 ):
+            if fixture_room( wall, r0, r0 + w, z0, z0 + h ):
+                wall.fixtures = list( getattr( wall, "fixtures", () ) ) + [ ( r0, r0 + w, z0, z0 + h ) ]
+                slab_at( model, wall, r0, r0 + w, 0.0, 1.0, z0, z0 + h, { wall.outward: paint, "default": "ashlar" } )
+                return True
+    return False
+
+
+def ghost_sign( model, wall, r0, r1, z0, paint ):
+    """ An old sign painted on the render over r0..r1 from z0 (paint: one of belltower_fronts' ghost pictures, 4 : 1),
+    a hair proud of the wall so it doesn't flicker into it. The wall must be clear there (fixture_room()); it's then
+    noted in wall.fixtures. Drawn only. """
+    z1 = z0 + ( r1 - r0 ) / 4
+    assert fixture_room( wall, r0, r1, z0, z1 ), ( "no room for", paint, wall.outward, r0, z0 )
+    wall.fixtures = list( getattr( wall, "fixtures", () ) ) + [ ( r0, r1, z0, z1 ) ]
+    picture( model, wall, r0, r1, z0, z1, 0.25, paint )
+
+
+IVY = ( 48.0, 96.0 )        # belltower_fronts' ivy patches, w x h
+
+
+def ivy( model, wall, rc, z0, scale, paint="ivy_climb", out=3.2, key=() ):
+    """ A patch of ivy on the wall centred on rc, scale times belltower_fronts' 48 x 96 (paint: ivy_climb, rooted at z0,
+    or ivy_hang, coming over the wall's top at z0), out from its face: in front of a plinth or a coping. Only where
+    fixture_room() finds the wall clear; it's then noted in wall.fixtures. key picks which way round it shows. Drawn
+    only. """
+    w, h = IVY[0] * scale, IVY[1] * scale
+    z_lo, z_hi = ( z0, z0 + h ) if paint == "ivy_climb" else ( z0 - h, z0 )
+    box = ( rc - w / 2, rc + w / 2, z_lo, z_hi )
+    if not fixture_room( wall, *box ):
+        return False
+    wall.fixtures = list( getattr( wall, "fixtures", () ) ) + [ box ]
+    crop = ( 1.0, 0.0, 0.0, 1.0 ) if chance( 0.5, "ivy_flip", *key ) else ( 0.0, 1.0, 0.0, 1.0 )
+    picture( model, wall, box[0], box[1], z_lo, z_hi, out, paint, crop=crop )
+    return True
+
+
+def climb_ivy( model, wall, scale, key, z0=0.0, out=3.2 ):
+    """ A patch of ivy climbing the wall from z0 (ivy()) where it's clear: beside a door if there's room there, else at
+    whichever clear spot key picks. Returns whether there was room anywhere. """
+    w, h = IVY[0] * scale, IVY[1] * scale
+    clear = [ float( rc ) for rc in np.arange( wall.run[0] + 12 + w / 2, wall.run[1] - 12 - w / 2 + 1e-6, 4.0 )
+              if fixture_room( wall, rc - w / 2, rc + w / 2, z0, z0 + h ) ]
+    if not clear:
+        return False
+    doors = [ o for o in wall.openings if o.kind in ( "shut", "door" ) ]
+    by_door = [ rc for rc in clear if any( min( abs( rc - w / 2 - o.r1 ), abs( o.r0 - rc - w / 2 ) ) < 14 for o in doors ) ]
+    return ivy( model, wall, pick( by_door or clear, "ivy_spot", *key ), z0, scale, "ivy_climb", out, key )
+
+
+def wall_top_ivy( model, axis, run, across, outward, z0, z1, gaps, key, every=150.0, share=0.5, piers=True ):
+    """ Ivy hanging over a garden wall's top (wall_run's, z0..z1) down its outward face, here and there along it: a
+    patch at each step of every where chance() says so, clear of its gaps and their piers (piers: wall_run's, 18 wide
+    and capped 2 wider, either side of each gap), its longest stems ending above the wall's foot. """
+    wall = Wall( axis, run, across, ( z0, z1 ), outward )
+    for g0, g1 in gaps:
+        wall.add( ( g0 + g1 ) / 2, g1 - g0 + ( 36 if piers else 0 ), z0, z1 + 30, "gap" )
+    longest = ( z1 - z0 ) / ( 0.85 * IVY[1] )
+    for k, rc in enumerate( np.arange( run[0] + every / 2, run[1], every ) ):
+        at = key + ( k, )
+        if chance( share, "hang", *at ):
+            rc += pick( ( -24, -12, 0, 12, 24 ), "hang_shift", *at )
+            scale = min( pick( ( 0.9, 1.0, 1.15 ), "hang_scale", *at ), longest )
+            ivy( model, wall, rc, z1 + 0.5, scale, "ivy_hang", 2.4, at )
 
 
 def bands( model, wall, levels, paint, skip=() ):
@@ -531,16 +869,19 @@ def subtract( span, cut ):
 
 def solid_house( model, e0, e1, n0, n1, eave, render, faces, ridge, rng, blocks, roof="roof_tiles", trim="trim_white",
                  shutter="shutter_green", sign="trim_red", awning_paint=None, surround=None,
-                 ends_over=( 14.0, 14.0 ), gables=( True, True ), balconies=0.25, plinth="ashlar_grey" ):
+                 ends_over=( 14.0, 14.0 ), gables=( True, True ), balconies=0.25, plinth="ashlar_grey", names=(),
+                 plaques=() ):
     """ A house nobody goes into: one collision box up to its eaves and its roof's hull, with the fronts in faces drawn
     over it. faces maps a face ('+n', '-n', '+e', '-e') to ( ground, run ): ground is a letter a bay along the ground
     floor ('s' shop, 'd' door, 'w' window, 'g' garage, '-' blank), the upper floors get a window a bay; run limits the
     front to part of the side (None for all of it). Whatever else of its sides shows over its neighbours (blocks, as
-    ( e0, e1, n0, n1, height )) is plain render. """
+    ( e0, e1, n0, n1, height )) is plain render. names: belltower_fronts.SIGNS' names for its shops, in turn. plaques:
+    ( face, end, paint ) street plaques on its fronts' corners (street_plaque). """
     box = ( e0, e1, n0, n1, eave )
     model.collision_box( ( e0, n0, 0 ), ( e1, n1, eave ), STONE )
     style = { "trim": trim, "shutter": shutter, "sill": "ashlar", "door": "planks_dark", "sign": sign,
-              "awning": awning_paint, "surround": surround, "solid": True }
+              "awning": awning_paint, "surround": surround, "solid": True, "names": list( names ) }
+    gutter = "copper" if chance( 0.55, "gutter", e0, n0 ) else "metal"
     levels = floors_of( eave )
     shown = { face: exposure( box, face, blocks ) for face in ( "+n", "-n", "+e", "-e" ) }
 
@@ -564,10 +905,11 @@ def solid_house( model, e0, e1, n0, n1, eave, render, faces, ridge, rng, blocks,
     def cornice_along( wall ):
         slab_at( model, wall, *returned( wall.outward, *wall.run, eave - 12, 7.0 ), 0.0, 7.0, eave - 12, eave, trim )
 
-    fronts = {}
+    fronts, front_walls = {}, {}
     for face, ( ground, run ) in faces.items():
         wall = face_wall( e0, e1, n0, n1, face, 0, eave, run=run, corners=True )
         fronts[face] = wall.run
+        front_walls[face] = wall
         r0, r1 = wall.run
         bays = len( ground )
         bay = ( r1 - r0 ) / bays
@@ -585,7 +927,8 @@ def solid_house( model, e0, e1, n0, n1, eave, render, faces, ridge, rng, blocks,
             for z in levels:
                 if letter == "-" and ( k % 2 ):
                     continue
-                if rng.random() < balconies and bay >= 80:
+                # Not over a shop: its awning or board is in the way.
+                if rng.random() < balconies and bay >= 80 and not ( letter in "sg" and z == levels[0] ):
                     wall.add( rc, 44, z, z + 92, "glass" )
                     balcony_bays.append( ( rc, z ) )
                 else:
@@ -594,10 +937,17 @@ def solid_house( model, e0, e1, n0, n1, eave, render, faces, ridge, rng, blocks,
         wall.build( model, render, None, render, end, surface=None )
         dress( model, wall, style, rng )
         for rc, z in balcony_bays:
-            balcony( model, wall, rc - 34, rc + 34, z )
+            balcony( model, wall, rc - 34, rc + 34, z, key=( wall.outward, wall.across[0], rc, z ) )
         plinth_along( wall )
         bands( model, wall, [ z - 6 for z in levels ], "ashlar" )
         cornice_along( wall )
+    for face, end, paint in plaques:
+        assert street_plaque( model, front_walls[face], end, paint ), ( "no room for", paint, "on", e0, n0, face )
+    # Ivy up some of its fronts from the pavement, by a door where it can be. Few have room for it between their
+    # shutters. The north row's backs look out over the hill, where nobody sees them.
+    for face, wall in front_walls.items():
+        if not ( face == "+n" and n1 >= NORTH_ROW[1] ) and chance( 0.75, "ivy", e0, n0, face ):
+            climb_ivy( model, wall, pick( ( 1.0, 1.15, 1.3 ), "ivy_scale", e0, n0, face ), ( e0, n0, face ) )
     # The rest of the sides that show, plain. The n sides' walls fill the corners.
     for face, pieces in shown.items():
         for a, b, z0 in pieces:
@@ -607,7 +957,16 @@ def solid_house( model, e0, e1, n0, n1, eave, render, faces, ridge, rng, blocks,
                 if z0 <= 0:
                     plinth_along( wall )
                 cornice_along( wall )
-    return gable_roof( model, e0, e1, n0, n1, eave, ridge, roof, render, ends_over=ends_over, gables=gables )
+    # A downpipe from the gutter on each eaves side that shows down to the street, at one end, clear of the openings.
+    for face in ( ( "+n", "-n" ) if ridge == "e" else ( "+e", "-e" ) ):
+        lo, hi = ( e0, e1 ) if face in ( "+n", "-n" ) else ( n0, n1 )
+        ends = ( lo + 5.0, hi - 5.0 ) if chance( 0.5, "pipe", e0, n0, face ) else ( hi - 5.0, lo + 5.0 )
+        for r in ends:
+            openings = front_walls[face].openings if face in front_walls else ()
+            if shows_at( shown[face], r, 0 ) and not any( o.r0 - 12 < r < o.r1 + 12 for o in openings ):
+                downpipe( model, face_wall( e0, e1, n0, n1, face, 0, eave, corners=True ), r, eave, gutter )
+                break
+    return gable_roof( model, e0, e1, n0, n1, eave, ridge, roof, render, ends_over=ends_over, gables=gables, gutter=gutter )
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -903,6 +1262,11 @@ def church( model, lights ):
             for n in ( -440, -520, -600, -700, -780, -860 ):
                 slab_at( model, wall, n - 12, n + 12, 0.0, 30.0, 0, 200, "ashlar", STONE )
                 slab_at( model, wall, n - 12, n + 12, 0.0, 16.0, 200, 240, "ashlar", STONE )
+                wall.fixtures = list( getattr( wall, "fixtures", () ) ) + [ ( n - 12, n + 12, 0, 240 ) ]
+            # Ivy at the foot of some of the bays between them, under the windows, in front of the plinth's courses.
+            for o in wall.openings:
+                if o.kind == "glass_arch" and chance( 0.5, "church_ivy", face, o.r0 ):
+                    ivy( model, wall, ( o.r0 + o.r1 ) / 2, 0, 0.92, "ivy_climb", 4.6, ( "church", face, o.r0 ) )
     # Hoods over the doors.
     for face, wall in walls.items():
         for o in wall.openings:
@@ -1101,11 +1465,10 @@ def tree( model, centre, z, height, spread, seed, leaves="hedge", trunk_r=9.0, s
 
 
 def lamp_post( model, centre, z=0.0 ):
-    model.cylinder( centre, 6, z, z + 18, { "side": "iron_black", "top": "iron_black" }, sides=8, surface=METAL )
-    model.cylinder( centre, 3, z + 18, z + 128, { "side": "iron_black" }, sides=6, surface=METAL )
-    e, n = centre
-    model.box( ( e - 7, n - 7, z + 128 ), ( e + 7, n + 7, z + 146 ), { "default": "glass", "+z": None } )
-    pyramid( model, e - 9, e + 9, n - 9, n + 9, z + 146, z + 156, "iron_black" )
+    """ A cast-iron street lamp (belltower_detail's street_lamp) over a plain base and shaft to collide with. """
+    model.cylinder( centre, 6, z, z + 18, {}, sides=8, surface=METAL )
+    model.cylinder( centre, 3, z + 18, z + 128, {}, sides=6, surface=METAL )
+    Detail.street_lamp( model, centre, z )
 
 
 def bench( model, centre, yaw, length=84.0, z=0.0 ):
@@ -1204,13 +1567,13 @@ def area( model, e0, e1, n0, n1, z, base, overlays=() ):
 HOUSES = [
     # Market Street's north side, facing south onto it, their backs to the drop.
     ( -1850, -1560, 1450, 1800, 300, "render_ochre", { "-n": ( "sws", None ), "-e": ( "wdw", None ), "+n": ( "ww", None ) },
-      "e", {} ),
+      "e", { "plaques": ( ( "-n", 0, "plaque_6" ), ) } ),
     ( -1560, -1330, 1450, 1800, 262, "render_rose", { "-n": ( "sd", None ), "+n": ( "ww", None ) }, "n",
       { "awning": "canvas_red" } ),
     ( -1330, -1060, 1450, 1800, 336, "render_cream", { "-n": ( "sws", None ), "+n": ( "w-w", None ) }, "e", {} ),
     ( -1060, -820, 1450, 1800, 290, "render_terracotta", { "-n": ( "ds", None ), "+n": ( "ww", None ) }, "e",
       { "awning": "canvas_green" } ),
-    ( -820, -560, 1450, 1800, 318, "whitewash", { "-n": ( "sws", None ), "+n": ( "w-w", None ) }, "e",
+    ( -820, -560, 1450, 1800, 318, "render_white", { "-n": ( "sws", None ), "+n": ( "w-w", None ) }, "e",
       { "shutter": "shutter_brown" } ),
     ( -560, -300, 1450, 1800, 276, "render_rose", { "-n": ( "wds", None ), "+n": ( "ww", None ) }, "n",
       { "awning": "canvas_red" } ),
@@ -1220,26 +1583,27 @@ HOUSES = [
         "balconies": 0.0, "surround": "ashlar_grey" } ),
     # The block between the spawn road and the north alley.
     ( -1850, -1400, 850, 1100, 316, "render_terracotta", { "+n": ( "sws", None ), "-e": ( "wdw", None ), "+e": ( "wdw", None ) },
-      "e", { "awning": "canvas_green" } ),
+      "e", { "awning": "canvas_green", "plaques": ( ( "+e", 1, "plaque_1" ), ) } ),
     ( -1850, -1400, 600, 850, 276, "render_cream", { "-e": ( "wdw", None ), "+e": ( "wdw", None ) }, "e", {} ),
     ( -1850, -1400, 350, 600, 300, "render_rose", { "-n": ( "sws", None ), "-e": ( "wdw", None ), "+e": ( "wdw", None ) },
-      "e", {} ),
+      "e", { "plaques": ( ( "-n", 0, "plaque_0" ), ( "-e", 0, "plaque_7" ) ) } ),
     # Between the spawn road and the south alley.
     ( -1850, -1400, -350, -100, 310, "render_cream", { "+n": ( "sws", None ), "-e": ( "wdw", None ), "+e": ( "ww", None ) },
-      "e", { "awning": "canvas_red" } ),
+      "e", { "awning": "canvas_red", "plaques": ( ( "+e", 1, "plaque_2" ), ) } ),
     ( -1850, -1400, -650, -350, 270, "render_ochre", { "-e": ( "wdww", None ), "+e": ( "wdw", None ) }, "e", {} ),
     ( -1850, -1400, -900, -650, 296, "render_rose", { "-n": ( "wdw", None ), "-e": ( "ww", None ), "+e": ( "wdw", None ) },
-      "e", {} ),
+      "e", { "plaques": ( ( "-n", 0, "plaque_8" ), ) } ),
     # Beside the Bakery and the Town Hall, facing Market Street.
     ( -850, -650, 700, 1100, 310, "render_rose", { "+n": ( "sd", None ) }, "n", {} ),
     ( -650, -450, 700, 1100, 290, "render_ochre", { "+n": ( "ws", None ) }, "n", { "awning": "canvas_red" } ),
     # The square's north-west corner, its side onto the Bakery's yard.
     ( -850, -650, 350, 700, 300, "render_terracotta", { "-n": ( "ds", None ), "+e": ( "sw", ( 350, 550 ) ), "-e": ( "-w-", None ) },
       "n", { "awning": "canvas_green" } ),
-    ( -650, -450, 550, 700, 280, "render_cream", { "-n": ( "ws", None ) }, "e", { "awning": "canvas_red" } ),
+    ( -650, -450, 550, 700, 280, "render_cream", { "-n": ( "ws", None ) }, "e",
+      { "awning": "canvas_red", "plaques": ( ( "-n", 0, "plaque_9" ), ) } ),
     # The square's south-west corner: a café's shopfronts onto the square (the churchyard wall meets its south bay).
     ( -800, -650, -450, -100, 300, "render_terracotta", { "+n": ( "ds", None ), "+e": ( "-ss", None ), "-n": ( "w", None ) },
-      "n", { "awning": "canvas_red" } ),
+      "n", { "awning": "canvas_red", "names": ( 0, 0, 0 ) } ),
 ]
 
 # The buildings people go into, and the walls, that the houses stand against: ( e0, e1, n0, n1, height ), west half.
@@ -1273,7 +1637,8 @@ def west_houses( model, rng ):
                      shutter=extras.get( "shutter", shutters[int( rng.integers( 0, len( shutters ) ) )] ),
                      sign=extras.get( "sign", "trim_green" ), awning_paint=extras.get( "awning" ),
                      surround=extras.get( "surround" ), ends_over=extras.get( "ends_over", ( 14.0, 14.0 ) ),
-                     gables=extras.get( "gables", ( True, True ) ), balconies=extras.get( "balconies", 0.25 ) )
+                     gables=extras.get( "gables", ( True, True ) ), balconies=extras.get( "balconies", 0.25 ),
+                     names=extras.get( "names", () ), plaques=extras.get( "plaques", () ) )
         if rng.random() < 0.6:
             # A chimney on the ridge.
             if ridge == "e":
@@ -1308,11 +1673,14 @@ def bakery( model, lights, rng ):
         dress( model, wall, style, rng )
         courses( model, wall, 0, 20, 2.5, "ashlar_grey" )
         slab_at( model, wall, wall.run[0], wall.run[1], 0.0, 7.0, EAVE - 12, EAVE, "trim_white" )
+    # An old sign for the bread and pasta between the upper windows over the yard, seen over its wall from West Street.
+    ghost_sign( model, walls["-n"], -1106, -994, 201, "ghost_1" )
+    climb_ivy( model, walls["-n"], 1.3, ( "bakery", "-n" ) )
     # The shop sign over the door and the upper floor, which nobody goes into.
-    slab_at( model, walls["+n"], -1100, -1000, 0.0, 3.0, 118, 146, "trim_red" )
+    slab_at( model, walls["+n"], -1105, -995, 0.0, 3.0, 119.9, 140.1, { walls["+n"].outward: "sign_2", "default": "trim_red" } )
     model.collision_box( ( e0 + T, n0 + T, GF ), ( e1 - T, n1 - T, EAVE ), STONE )
     ceiling( model, e0 + T, e1 - T, n0 + T, n1 - T, GF, "planks", ( "e", 70 ) )
-    gable_roof( model, e0, e1, n0, n1, EAVE, "e", "roof_tiles", paints["outside"] )
+    gable_roof( model, e0, e1, n0, n1, EAVE, "e", "roof_tiles", paints["outside"], gutter="copper" )
     floor( model, e0, e1, n0, n1, "quarry_tiles" )
     inner_wall( model, "e", ( e0 + T, e1 - T ), ( 894, 906 ), ( 0, GF ), [ ( -1150, 64, 0, 104, "door" ) ], "whitewash" )
     # The shop: its counter and shelves.
@@ -1334,6 +1702,9 @@ def bakery( model, lights, rng ):
     # The yard: walls onto West Street and the alley, a cart and the woodpile.
     wall_run( model, "e", ( -1250, -850 ), ( 350, 362 ), 0, 96, [ ( -1105, -995 ) ] )
     wall_run( model, "n", ( 362, 700 ), ( -1250, -1238 ), 0, 96, [ ( 490, 560 ) ] )
+    # Ivy from the yard over its walls, onto West Street and the alley.
+    wall_top_ivy( model, "e", ( -1250, -850 ), ( 350, 362 ), "-n", 0, 96, [ ( -1105, -995 ) ], ( "yard", "-n" ), share=0.7 )
+    wall_top_ivy( model, "n", ( 362, 700 ), ( -1250, -1238 ), "-e", 0, 96, [ ( 490, 560 ) ], ( "yard", "-e" ), share=0.6 )
     cart( model, ( -1150, 470 ), 98, load="sacks" )
     model.box( ( -1236, 664, 0 ), ( -1130, 698, 42 ), { "default": "planks_dark", "+z": "planks" }, WOOD )
     for k in range( 6 ):
@@ -1379,7 +1750,7 @@ def inn( model, lights, rng ):
              holes=[ ( stair_lo[0], stair_hi[0], stair_lo[1], stair_hi[1] ) ] )
     ceiling( model, e0 + T, e1 - T, n0 + T, n1 - T, CEIL, None, ( "e", 75 ) )
     # Its east gable stands over the café's roof.
-    gable_roof( model, e0, e1, n0, n1, EAVE, "e", "roof_tiles", paints["outside"], ends_over=( 14, 0 ) )
+    gable_roof( model, e0, e1, n0, n1, EAVE, "e", "roof_tiles", paints["outside"], ends_over=( 14, 0 ), gutter="metal" )
     model.box( ( -830, -300, EAVE ), ( -806, -250, 470 ), { "default": "brick", "+z": "iron_black" } )
     # The taproom: the bar, its shelf of bottles, tables and barrels.
     model.box( ( -960, -370, 0 ), ( -920, -180, 42 ), { "+z": "planks", "default": "planks_dark" }, WOOD )
@@ -1398,9 +1769,21 @@ def inn( model, lights, rng ):
         model.box( ( ea, -438, FL ), ( ea + 42, -430, FL + 40 ), "planks_dark", WOOD )
     model.box( ( e0 + T, -250, FL ), ( e0 + T + 24, -190, FL + 88 ), "planks_dark", WOOD )
     model.box( ( -1050, -300, FL ), ( -1000, -260, FL + 30 ), { "+z": "planks", "default": "planks_dark" }, WOOD )
-    # The inn sign on its bracket.
-    model.beam( ( -1110, -100, 196 ), ( -1110, -58, 196 ), ( 3, 3 ), "iron_black" )
-    model.box( ( -1112, -94, 156 ), ( -1108, -62, 190 ), { "default": "trim_red", "+e": "canvas_plain", "-e": "canvas_plain" } )
+    # The inn's sign (belltower_fronts' insegna) hanging from a wrought-iron bracket, and lanterns either side of its door.
+    model.box( ( -1114, -100, 180 ), ( -1106, -99, 206 ), "iron_black" )
+    model.beam( ( -1110, -99, 200 ), ( -1110, -56, 200 ), ( 1.6, 1.6 ), "iron_black" )
+    model.beam( ( -1110, -99, 182 ), ( -1110, -78, 200 ), ( 1.2, 1.2 ), "iron_black" )
+    Detail.hoop( model, ( -1110, -91, 194 ), ( 0, 1.0, 0 ), ( 0, 0, 1.0 ), 3.0, 0.4, "iron_black" )
+    Detail.ball( model, ( -1110, -55.2, 200 ), 1.1, "iron_black", rings=4, segments=8 )
+    for n in ( -93, -69 ):
+        Detail.rod( model, ( -1110, n, 199.2 ), ( -1110, n, 187.8 ), 0.3, "iron_black", sides=6 )
+    model.box( ( -1110.6, -96, 166 ), ( -1109.4, -66, 188 ), { "+e": "insegna_0", "-e": "insegna_0", "default": "planks_dark" } )
+    door = next( o for o in walls["+n"].openings if o.kind == "door" )
+    for r in ( door.r0 - 12, door.r1 + 12 ):
+        wall_lantern( model, walls["+n"], r, door.z1 + 14, but=door )
+    # An old sign for its kitchen up its side wall, over the alley.
+    ghost_sign( model, walls["-e"], -226, -126, 198, "ghost_0" )
+    climb_ivy( model, walls["-n"], 1.3, ( "inn", "-n" ) )
     lights.append( light( "Inn Taproom", ( -1040, -280, 110 ) ) )
     lights.append( light( "Inn Upstairs", ( -1030, -280, 240 ), radius=360 ) )
 
@@ -1408,6 +1791,10 @@ def inn( model, lights, rng ):
     wall_run( model, "e", ( -1250, -650 ), ( -900, -888 ), 0, 90, [ ( -1010, -930 ) ] )
     wall_run( model, "n", ( -888, -450 ), ( -1250, -1238 ), 0, 90, [ ( -720, -650 ) ] )
     wall_run( model, "n", ( -888, -450 ), ( -662, -650 ), 0, 90, [ ( -830, -760 ) ] )
+    # Ivy from the garden over its walls, onto the terrace, the alley and the churchyard.
+    wall_top_ivy( model, "e", ( -1250, -650 ), ( -900, -888 ), "-n", 0, 90, [ ( -1010, -930 ) ], ( "beer", "-n" ) )
+    wall_top_ivy( model, "n", ( -888, -450 ), ( -1250, -1238 ), "-e", 0, 90, [ ( -720, -650 ) ], ( "beer", "-e" ) )
+    wall_top_ivy( model, "n", ( -888, -450 ), ( -662, -650 ), "+e", 0, 90, [ ( -830, -760 ) ], ( "beer", "+e" ) )
     for e in ( -1180, -1080, -980 ):
         for n in ( -560, -680 ):
             model.cylinder( ( e, n ), 5, 0, 104, { "side": "planks_dark" }, sides=6, surface=WOOD )
@@ -1479,6 +1866,9 @@ def terrace( model, rng ):
             if cheek[1] > 0:
                 continue
             model.box( ( cheek[0], STAIR_FOOT, GARDEN_Z ), ( cheek[1], -1000, 6 ), { "default": "rubble", "+z": "ashlar_grey" }, STONE )
+    # Ivy over the parapet, down the drop into the gardens: its gaps are the stairs and their cheeks.
+    wall_top_ivy( model, "e", ( ROAD[1], gaps[-1][0] ), ( TERRACE[0], TERRACE[0] + 12 ), "-n", GARDEN_Z, 32,
+                  [ ( ea - 12, eb + 12 ) for ea, eb in gaps[:-1] ], ( "terrace", ), every=130.0, share=0.55, piers=False )
     for e in ( -1640, -1340, -820, -420 ):
         bench( model, ( e, -965 ), 0, 80 )
     for e in ( -1500, -900, -300 ):
@@ -1591,8 +1981,41 @@ def town_walls( model ):
         for nn in ( n0 + 36, n1 - 36 ):
             model.box( ( -2410, nn - 12, 360 - 30 ), ( -2398, nn + 12, 362 ), "rubble", STONE )
             model.box( ( -2292, nn - 12, 330 ), ( -2280, nn + 12, 362 ), "rubble", STONE )
-        facing( model, "iron_black", [ ( -2279.5, ( n0 + n1 ) / 2 - 3, 180 ), ( -2279.5, ( n0 + n1 ) / 2 + 3, 180 ),
-                                      ( -2279.5, ( n0 + n1 ) / 2 + 3, 230 ), ( -2279.5, ( n0 + n1 ) / 2 - 3, 230 ) ], ( 1, 0, 0 ) )
+        # The town's banner over the road (belltower_fronts' 36 x 72, half as big again), hung flat from an iron rod
+        # on two brackets. The east's is blue (EAST_PAINTS).
+        face, nc, top = TOWN_WALL[1] + 20, ( n0 + n1 ) / 2, 252.0
+        for nb in ( nc - 24, nc + 24 ):
+            model.box( ( face, nb - 2, top - 6 ), ( face + 0.8, nb + 2, top + 3 ), "iron_black" )
+            model.beam( ( face + 0.8, nb, top ), ( face + 5.0, nb, top ), ( 1.0, 1.0 ), "iron_black" )
+        model.beam( ( face + 4.5, nc - 30, top ), ( face + 4.5, nc + 30, top ), ( 1.2, 1.2 ), "iron_black" )
+        for nb in ( nc - 30.8, nc + 30.8 ):
+            Detail.ball( model, ( face + 4.5, nb, top ), 1.2, "iron_black", rings=4, segments=8 )
+        facing( model, "banner_red", [ ( face + 4.0, nc - 27, top - 108 ), ( face + 4.0, nc + 27, top - 108 ),
+                                       ( face + 4.0, nc + 27, top - 0.5 ), ( face + 4.0, nc - 27, top - 0.5 ) ], ( 1, 0, 0 ) )
+    # Ivy up the wall's inner face over the road, now and then, where the road is level along the patch: north of the
+    # ramp down to the gardens, and between it and the south parapet. Clear of the gate's towers and the trough.
+    inner = Wall( "n", ( SOUTH_EDGE, 1800 ), TOWN_WALL, ( GARDEN_Z, 240 ), "+e" )
+    level = ( ( GARDENS[0] + 4, RAMP[0] - 4 ), ( RAMP[1] + 4, 1800 ) )
+    kept_off = ( ( -245, 245 ), ( 320, 440 ) )
+    for k, n in enumerate( ( -1380, -1270, -900, -700, -500, 500, 700, 900, 1100, 1300, 1500, 1700 ) ):
+        if not chance( 0.6, "wall_ivy", k ):
+            continue
+        n += pick( ( -40, -20, 0, 20, 40 ), "wall_ivy_shift", k )
+        scale = pick( ( 1.5, 1.75, 2.0 ), "wall_ivy_scale", k )
+        side = pick( ( -1, 1 ), "wall_ivy_side", k )
+        pair = chance( 0.5, "wall_ivy_pair", k )
+        # Its span along the wall, with the smaller patch beside it if it gets one.
+        lo, hi = n - IVY[0] * scale / 2, n + IVY[0] * scale / 2
+        if pair:
+            lo, hi = min( lo, n - IVY[0] * scale * 1.05 ), max( hi, n + IVY[0] * scale * 1.05 )
+        if not any( a <= lo and hi <= b for a, b in level ) or any( a < hi and lo < b for a, b in kept_off ):
+            continue
+        z0 = float( floor_level( TOWN_WALL[1] + 1, n ) )
+        if ivy( model, inner, n, z0, scale, "ivy_climb", 1.2, ( "wall", k ) ) and pair:
+            # A second, smaller patch overlapping its side, a little further out.
+            first = inner.fixtures.pop()
+            ivy( model, inner, n + side * IVY[0] * scale * 0.7, z0, scale * 0.7, "ivy_climb", 1.9, ( "wall", k, "b" ) )
+            inner.fixtures.append( first )
     # Merlons along the walls' outer edges.
     for n in np.arange( SOUTH_EDGE + 30, 1860, 70 ):
         if -250 < n < 250:
@@ -1644,6 +2067,26 @@ def ground( model ):
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Street furniture
+
+# Wires strung across the streets under the eaves, each with a dish lamp hung at its middle: ( e, n0, n1, z ), the
+# wire's ends on the house fronts at n0 (facing +n) and n1 (facing -n), clear of their windows and cornices.
+CABLES = ( ( -1700, MARKET[0], MARKET[1], 252 ), ( -1110, MARKET[0], MARKET[1], 252 ), ( -545, MARKET[0], MARKET[1], 252 ),
+           ( -1700, MID[0], MID[1], 252 ), ( -730, MID[0], MID[1], 252 ) )
+
+
+def street_cables( model ):
+    """ CABLES: each wire's ends on wall plates with eye bolts, pulled down 12 to the dish lamp at its middle. Drawn
+    only. """
+    for e, n0, n1, z in CABLES:
+        mid = np.array( ( e, ( n0 + n1 ) / 2, z - 12.0 ) )
+        for n, out in ( ( n0, 1.0 ), ( n1, -1.0 ) ):
+            model.box( ( e - 2.5, min( n, n + out ), z - 4 ), ( e + 2.5, max( n, n + out ), z + 4 ), "iron_black" )
+            eye = np.array( ( e, n + out * 3.2, z ) )
+            Detail.rod( model, ( e, n + out, z ), eye, 0.35, "iron_black", sides=6 )
+            Detail.hoop( model, eye + ( 0, out * 0.9, 0 ), ( 0, 1.0, 0 ), ( 0, 0, 1.0 ), 0.9, 0.25, "iron_black", segments=8 )
+            Detail.wire( model, eye + ( 0, out * 1.8, 0 ), mid, 1.5 )
+        Detail.dish_lamp( model, mid )
+
 
 def street_props( model, rng ):
     # Market Street's stalls, the lorry, crates and barrels.
@@ -1708,9 +2151,15 @@ def street_props( model, rng ):
     model.box( ( -2290, 330, 0 ), ( -2260, 430, 30 ), { "default": "ashlar_grey", "+z": "water" }, STONE )
     for n in ( -800, -350, 450, 1000, 1550 ):
         lamp_post( model, ( -1870, n ) )
+    # Menu boards on the pavement: the café's onto the square, the Bakery's and the Inn's by their doors.
+    Detail.sandwich_board( model, ( -628, -218 ), 0, "chalkboard_a" )
+    Detail.sandwich_board( model, ( -1000, 1124 ), 90, "chalkboard_b" )
+    Detail.sandwich_board( model, ( -972, -84 ), 90, "chalkboard_a" )
+    street_cables( model )
 
 
 def build_west( lights, rng ):
+    _shops[0] = 0
     model = Model()
     ground( model )
     town_walls( model )
@@ -1725,178 +2174,10 @@ def build_west( lights, rng ):
 
 
 # ---------------------------------------------------------------------------------------------------------------------
-# The land beyond the town: the hill falling away to fields and farms, then hills and mountains. Drawn only: no
-# collision (nobody can get out there) and no shadows.
+# The land beyond the town is Tools/belltower_vista.py's (its shape and model) and Tools/belltower_vista_paint.py's
+# (its textures). Drawn only: no collision (nobody can get out there) and no shadows.
 
 TOWN_RECT = ( TOWN_WALL[0], -TOWN_WALL[0], SOUTH_EDGE, NORTH_ROW[1] )    # e0, e1, n0, n1
-VISTA_REACH = 40000.0
-FARM_COUNT = 9
-VISTA_TREES = 170
-
-
-def noise( x, y, seed=0 ):
-    """ A smooth, steady field in -1..1: four sine waves across each other. """
-    total = 0.0
-    for k, ( angle, rate, amp ) in enumerate( ( ( 0.3, 1.0, 1.0 ), ( 1.9, 1.7, 0.6 ), ( 3.4, 2.9, 0.35 ), ( 4.6, 4.3, 0.2 ) ) ):
-        a = angle + 1.37 * seed
-        total = total + amp * np.sin( rate * ( x * math.cos( a ) + y * math.sin( a ) ) + 2.1 * seed + 0.7 * k )
-    return total / 2.15
-
-
-def smoothstep( t ):
-    t = np.clip( t, 0.0, 1.0 )
-    return t * t * ( 3 - 2 * t )
-
-
-def town_distance( e, n ):
-    """ How far a plan point is outside the town's rectangle (0 inside). """
-    de = np.maximum( np.maximum( TOWN_RECT[0] - e, e - TOWN_RECT[1] ), 0.0 )
-    dn = np.maximum( np.maximum( TOWN_RECT[2] - n, n - TOWN_RECT[3] ), 0.0 )
-    return np.hypot( de, dn )
-
-
-def land_height( e, n ):
-    """ The land: 250 under the streets at the town's walls, falling steeply at first and then gently, to 2750 down;
-    hills rising from 8000 out, mountains from 20000. """
-    d = town_distance( e, n )
-    h = -250.0 - 2500.0 * ( 1 - np.exp( -d / 3000.0 ) )
-    h = h + 5500.0 * smoothstep( ( d - 8000.0 ) / 12000.0 ) * ( 0.55 + 0.45 * noise( e / 9000.0, n / 9000.0 ) )
-    h = h + 1200.0 * smoothstep( ( d - 9000.0 ) / 8000.0 ) * noise( e / 2500.0, n / 2500.0, 5 )
-    return h + 60.0 * noise( e / 1500.0, n / 1500.0, 3 ) * np.clip( d / 800.0, 0.0, 1.0 )
-
-
-def slope_at( e, n, span=300.0 ):
-    """ The land's steepest rise over span either side of a point, as a gradient. """
-    return max( abs( float( land_height( e + span, n ) - land_height( e - span, n ) ) ),
-                abs( float( land_height( e, n + span ) - land_height( e, n - span ) ) ) ) / ( 2 * span )
-
-
-def vista_lines( lo, hi, inner=250.0, first=120.0, growth=1.18 ):
-    """ Grid lines along one axis: about every inner across the town's span lo..hi, then out from each side in steps
-    that start at first and grow by growth, to VISTA_REACH. """
-    lines = list( np.linspace( lo, hi, max( 1, round( ( hi - lo ) / inner ) ) + 1 ) )
-    for side, edge in ( ( 1, hi ), ( -1, lo ) ):
-        step, x = first, edge
-        while abs( x ) < VISTA_REACH:
-            x = side * min( abs( x + side * step ), VISTA_REACH )
-            lines.append( x )
-            step *= growth
-    return np.array( sorted( lines ) )
-
-
-def field_of( e, n ):
-    """ The crop in the 1800 x 1400 plot a point is in: ploughed soil, woodland or grass. """
-    h = zlib.crc32( f"{math.floor( e / 1800 )},{math.floor( n / 1400 )}".encode() ) % 100
-    return "soil" if h < 20 else "hedge" if h < 30 else "lawn"
-
-
-def land_paint( e, n, up ):
-    """ Rock where it's steep; woods and pasture on the far hills; fields nearer. """
-    if up < 0.82:
-        return "rock"
-    if town_distance( e, n ) > 14000:
-        return "hedge" if noise( e / 4000.0, n / 4000.0, 7 ) > -0.1 else "lawn"
-    return field_of( e, n )
-
-
-def farm_sites():
-    """ ( e, n, ridge axis ) of the farms, on the gentle ground round the hill's foot. """
-    rng = np.random.default_rng( 1873 )
-    sites = []
-    for _ in range( 20000 ):
-        if len( sites ) >= FARM_COUNT:
-            break
-        e, n = rng.uniform( -9500, 9500 ), rng.uniform( -9000, 9500 )
-        if not 1500 < town_distance( e, n ) < 7000 or slope_at( e, n ) > 0.3:
-            continue
-        if any( math.hypot( e - a, n - b ) < 1500 for a, b, _ in sites ):
-            continue
-        sites.append( ( e, n, "e" if rng.random() < 0.5 else "n" ) )
-    return sites
-
-
-def farm_building( model, e, n, along, length, width, eave, walls, roof, door ):
-    """ A farm building on sloping land: a box from under its lowest corner, eave above its highest, a gable roof with
-    its ridge along along ('e' or 'n'), dark windows along its long sides and a door in one. """
-    half_e, half_n = ( length / 2, width / 2 ) if along == "e" else ( width / 2, length / 2 )
-    e0, e1, n0, n1 = e - half_e, e + half_e, n - half_n, n + half_n
-    corners = [ float( land_height( a, b ) ) for a in ( e0, e1 ) for b in ( n0, n1 ) ]
-    ground = max( corners )
-    model.box( ( e0, n0, min( corners ) - 30 ), ( e1, n1, ground + eave ), { "default": walls, "+z": None, "-z": None } )
-    gable_roof( model, e0, e1, n0, n1, ground + eave, along, roof, walls, over=12, ends_over=( 8, 8 ), thick=4, hull=None,
-                cap=False )
-    for side in ( -1, 1 ):
-        for k, r in enumerate( ( -0.3, 0.0, 0.3 ) ):
-            wide, low, high = ( 50, 0, 90 ) if ( side, k ) == ( 1, 1 ) else ( 28, eave * 0.3, eave * 0.3 + 40 )
-            paint = door if ( side, k ) == ( 1, 1 ) else "iron_black"
-            c = r * length
-            if along == "e":
-                y = n1 + 0.5 if side > 0 else n0 - 0.5
-                pts = [ ( e + c - wide / 2, y, ground + low ), ( e + c + wide / 2, y, ground + low ),
-                        ( e + c + wide / 2, y, ground + high ), ( e + c - wide / 2, y, ground + high ) ]
-                facing( model, paint, pts, ( 0, side, 0 ) )
-            else:
-                x = e1 + 0.5 if side > 0 else e0 - 0.5
-                pts = [ ( x, n + c - wide / 2, ground + low ), ( x, n + c + wide / 2, ground + low ),
-                        ( x, n + c + wide / 2, ground + high ), ( x, n + c - wide / 2, ground + high ) ]
-                facing( model, paint, pts, ( side, 0, 0 ) )
-
-
-def farm( model, e, n, along, rng ):
-    """ A farmhouse and its barn, 420 apart along their ridges. """
-    render = ( "render_cream", "render_ochre", "whitewash", "render_rose" )[int( rng.integers( 0, 4 ) )]
-    de, dn = ( 210, 0 ) if along == "e" else ( 0, 210 )
-    farm_building( model, e - de, n - dn, along, 300, 220, 200, render, "roof_tiles", "planks_dark" )
-    farm_building( model, e + de, n + dn, along, 380, 260, 240, "planks_dark", "corrugated", "planks" )
-
-
-def vista_trees( model, farms ):
-    """ Trees down the hill and over the fields, thinning out with distance, thicker in the woods' plots. """
-    rng = np.random.default_rng( 4242 )
-    placed = 0
-    for _ in range( 400000 ):
-        if placed >= VISTA_TREES:
-            break
-        e, n = rng.uniform( -11400, 11400 ), rng.uniform( -10500, 10800 )
-        d = float( town_distance( e, n ) )
-        if not 350 < d < 9000:
-            continue
-        crop = field_of( e, n )
-        if rng.random() > math.exp( -d / 4000.0 ) * ( 3.0 if crop == "hedge" else 1.0 ):
-            continue
-        if crop == "soil" or slope_at( e, n, 60.0 ) > 0.55:
-            continue
-        if any( math.hypot( e - a, n - b ) < 450 for a, b, _ in farms ):
-            continue
-        tree( model, ( e, n ), float( land_height( e, n ) ) - 8, rng.uniform( 380, 560 ), rng.uniform( 110, 170 ),
-              seed=int( rng.integers( 0, 1 << 30 ) ), solid=False, coarse=True )
-        placed += 1
-
-
-def build_vista():
-    model = Model()
-    es = vista_lines( TOWN_RECT[0], TOWN_RECT[1] )
-    ns = vista_lines( TOWN_RECT[2], TOWN_RECT[3] )
-    grid_e, grid_n = np.meshgrid( es, ns, indexing="ij" )
-    heights = land_height( grid_e, grid_n )
-    for i in range( len( es ) - 1 ):
-        for j in range( len( ns ) - 1 ):
-            ce, cn = ( es[i] + es[i + 1] ) / 2, ( ns[j] + ns[j + 1] ) / 2
-            if TOWN_RECT[0] < ce < TOWN_RECT[1] and TOWN_RECT[2] < cn < TOWN_RECT[3]:
-                continue
-            p00 = np.array( ( es[i], ns[j], heights[i, j] ) )
-            p10 = np.array( ( es[i + 1], ns[j], heights[i + 1, j] ) )
-            p11 = np.array( ( es[i + 1], ns[j + 1], heights[i + 1, j + 1] ) )
-            p01 = np.array( ( es[i], ns[j + 1], heights[i, j + 1] ) )
-            paint = land_paint( ce, cn, normalise( np.cross( p11 - p00, p01 - p10 ) )[2] )
-            model.polygon( paint, [ p00, p10, p11 ] )
-            model.polygon( paint, [ p00, p11, p01 ] )
-    farms = farm_sites()
-    rng = np.random.default_rng( 99 )
-    for e, n, along in farms:
-        farm( model, e, n, along, rng )
-    vista_trees( model, farms )
-    return model
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -2094,7 +2375,7 @@ def check_reach( models, spots, picture=None ):
 # ---------------------------------------------------------------------------------------------------------------------
 # Previews: flat-shaded pictures drawn with the paints' mean colours (a numpy z-buffer), for checking without the editor
 
-SUN = normalise( ( -0.548, -0.384, 0.743 ) )     # towards the scene's sun (pitch 48, yaw -55), plan
+SUN = normalise( ( -0.739, -0.376, 0.559 ) )     # towards the scene's sun (SUN_PITCH 34, SUN_YAW -63), plan
 SKY = ( np.array( ( 0.80, 0.85, 0.90 ) ), np.array( ( 0.40, 0.57, 0.82 ) ) )     # horizon, zenith
 FOG = np.array( ( 0.72, 0.78, 0.86 ) )
 _paint_colours = {}
@@ -2238,14 +2519,12 @@ def top_down( tris, normals, colours, bounds, scale ):
     return Image.fromarray( ( np.clip( image, 0, 1 ) * 255 ).astype( np.uint8 ) )
 
 
-def write_previews( out_dir, town, vista ):
+def write_previews( out_dir, town ):
     out_dir = Path( out_dir )
     out_dir.mkdir( parents=True, exist_ok=True )
     tris, normals, colours = triangles( town )
     top_down( tris, normals, colours, ( -2600, 2600, -1650, 2050 ), 2.5 ).save( out_dir / "top.png" )
     print( f"wrote {out_dir / 'top.png'}" )
-    vt, vn, vc = triangles( [ vista ] )
-    tris, normals, colours = np.concatenate( ( tris, vt ) ), np.concatenate( ( normals, vn ) ), np.concatenate( ( colours, vc ) )
     for name, eye, target, fov in VIEWS:
         perspective( tris, normals, colours, eye, target, fov=fov ).save( out_dir / f"{name}.png" )
         print( f"wrote {out_dir / name}.png" )
@@ -2482,6 +2761,47 @@ def model_object( name, key, model_name, collide=True, shadows=True ):
     return K.game_object( ids, name, key, components=components )
 
 
+# The sun (write_scene), and towards it in plan for the previews' shading (SUN).
+SUN_PITCH, SUN_YAW = 34.0, -63.0
+
+# The sky (Tools/belltower_sky.py) and the exposure it's made for (its DESIGN_EXPOSURE). The fog is drawn over the sky
+# too (sky.shader takes the gradient fog), so its colour is the sky's 2 degrees up (belltower_sky.reference_sky), which
+# hazes the vista's hills into the horizon instead of greying the sky.
+SKY_MATERIAL = "materials/belltower/sky/belltower_sky.vmat"
+SKY_EXPOSURE = 2
+FOG_COLOUR = "0.351,0.594,1.048"
+
+
+def look_object():
+    """ The map's grade, an infinite post-process volume over the player camera's own effects. Only the effects the camera
+    doesn't use for gameplay go in it (a volume's effect replaces the camera's of the same type): ambient occlusion for
+    the contact shadow in corners, under eaves and round the cobbles, a warm white balance, and a light vignette.
+
+    And the exposure. The player camera's auto exposure runs from 1 to 2, and in a sunlit street it sits at 1, where the
+    sunlit plaster comes out a dull mid-grey and the sky dark. The materials and the sky (belltower_sky.DESIGN_EXPOSURE)
+    are made for 2, a bright summer day's: the town's auto exposure runs from 2 to 3, so the shade of the church and the
+    houses can open up a little. """
+    return K.game_object( ids, "Look", "look", components=[
+        K.component( ids, "Sandbox.PostProcessVolume", "look/volume", BlendDistance=50, BlendWeight=1, EditorPreview=True,
+                     Priority=0, SceneVolume={ "Type": "Infinite", "Sphere": { "Center": "0,0,0", "Radius": 10 },
+                                               "Box": { "Mins": "-50,-50,-50", "Maxs": "50,50,50" },
+                                               "Capsule": { "CenterA": "0,0,10", "CenterB": "0,0,90", "Radius": 10 } } ),
+        K.component( ids, "Sandbox.AmbientOcclusion", "look/ao", **{ "__version": 1 }, FalloffRange=1, Intensity=0.6, Radius=96,
+                     ThinCompensation=5 ),
+        K.component( ids, "Sandbox.ColorGrading", "look/grade", GradingMethod="TemperatureControl", ColorTempK=5900,
+                     BlendFactor=0.45, ColorSpace="None", LookupTexture=None ),
+        K.component( ids, "Sandbox.Vignette", "look/vignette", Center="0.5,0.5", Color="0,0,0,1", Intensity=0.22, Roundness=1,
+                     Smoothness=1 ),
+        K.component( ids, "Sandbox.Tonemapping", "look/tonemap", **{ "__version": 3 }, AutoExposureEnabled=True,
+                     ExposureCompensation=0, ExposureMethod="RGB", MinimumExposure=SKY_EXPOSURE, MaximumExposure=3,
+                     Mode="ACES", Rate=1 ),
+    ] )
+
+
+# Under the lowest land, so nothing thrown over the walls falls for ever.
+CATCH_FLOOR_Z = -6500
+
+
 def write_scene( lights, models ):
     foliage = []
     for region, model in models:
@@ -2549,7 +2869,7 @@ def write_scene( lights, models ):
     clip_centre, clip_scale = plan_box( TOWN_RECT[0], TOWN_RECT[1], SOUTH_EDGE, SOUTH_EDGE + 10, -12, 400 )
     clip = K.game_object( ids, "Player Clip", "clip", clip_centre, tags="playerclip", components=[
         box_collider( "clip/box", clip_scale, trigger=False ) ] )
-    catch = K.game_object( ids, "Catch Floor", "catch", ( 200, 0, -3100 ), components=[
+    catch = K.game_object( ids, "Catch Floor", "catch", ( 200, 0, CATCH_FLOOR_Z ), components=[
         box_collider( "catch/box", ( 30000, 30000, 100 ), trigger=False ) ] )
 
     objective_spots = [
@@ -2576,19 +2896,22 @@ def write_scene( lights, models ):
             K.component( ids, "Facepunch.MinimapRenderer", "minimap/renderer", CurrentMinimapPath=MINIMAP_PATH,
                          ExportResolution=f"{MINIMAP_PIXELS},{MINIMAP_PIXELS}", Size=int( MINIMAP_SIZE ) ),
         ] ),
-        K.game_object( ids, "Sun", "sun", ( 0, 0, 3000 ), K.angles_rotation( 48, -55 ), tags="light_directional,light", components=[
-            K.component( ids, "Sandbox.DirectionalLight", "sun/light", ContactShadows=False, FogMode="Enabled", FogStrength=1,
-                         LightColor="1,0.93,0.8,1", ShadowBias=0.0005, ShadowCascadeCount=4, ShadowCascadeSplitRatio=0.91,
-                         ShadowHardness=0, Shadows=True, SkyColor="0.38,0.45,0.55,1" ),
+        # A late-afternoon sun from the west-south-west, 34 degrees up: it lights Market Street's north row and the west
+        # faces, and throws long shadows across the streets, as the light does in a hill town before evening.
+        K.game_object( ids, "Sun", "sun", ( 0, 0, 3000 ), K.angles_rotation( SUN_PITCH, SUN_YAW ), tags="light_directional,light",
+                       components=[
+            K.component( ids, "Sandbox.DirectionalLight", "sun/light", ContactShadows=True, FogMode="Enabled", FogStrength=1,
+                         LightColor="1.32,1.06,0.76,1", ShadowBias=0.0005, ShadowCascadeCount=4, ShadowCascadeSplitRatio=0.91,
+                         ShadowHardness=0, Shadows=True, SkyColor="0.42,0.48,0.58,1" ),
         ] ),
         K.game_object( ids, "Sky", "sky", tags="skybox", components=[
-            K.component( ids, "Sandbox.SkyBox2D", "sky/box", SkyIndirectLighting=True, SkyMaterial="materials/sky/atmosphere_sky.vmat",
-                         Tint="1,1,1,1" ),
+            K.component( ids, "Sandbox.SkyBox2D", "sky/box", SkyIndirectLighting=True, SkyMaterial=SKY_MATERIAL, Tint="1,1,1,1" ),
         ] ),
         K.game_object( ids, "Fog", "fog", components=[
-            K.component( ids, "Sandbox.GradientFog", "fog/gradient", Color="0.72,0.78,0.86,0.6", StartDistance=2500,
-                         EndDistance=42000, FalloffExponent=1.3, Height=3000, VerticalFalloffExponent=1.2 ),
+            K.component( ids, "Sandbox.GradientFog", "fog/gradient", Color=f"{FOG_COLOUR},0.75", StartDistance=3000,
+                         EndDistance=95000, FalloffExponent=1.5, Height=9000, VerticalFalloffExponent=1.2 ),
         ] ),
+        look_object(),
         town,
         K.game_object( ids, "Trees and planting", "foliage", children=foliage ),
         K.game_object( ids, "Lights", "lights", children=light_objects ),
@@ -2653,17 +2976,19 @@ def main():
     centre = build_centre( centre_lights )
     west = build_west( west_lights, np.random.default_rng( 2024 ) )
     east = west.mirrored( EAST_PAINTS )
-    vista = build_vista()
-    models = [("centre", centre), ("west", west), ("east", east), ("vista", vista)]
-    for _, model in models:
-        Detail.configure( model )
+    models = [("centre", centre), ("west", west), ("east", east)]
+    for name, model in models:
+        Detail.configure( model, render=( name != "vista" ) )
     lights = centre_lights + west_lights + mirrored_lights( west_lights )
 
-    for name, model in ( ( "belltower_centre", centre ), ( "belltower_west", west ), ( "belltower_east", east ),
-                         ( "belltower_vista", vista ) ):
+    for name, model in ( ( "belltower_centre", centre ), ( "belltower_west", west ), ( "belltower_east", east ) ):
         count = K.write_model( OUT_DIR, RESOURCE_DIR, name, model )
         print( f"{name}: {count} triangles, {len( model.boxes )} boxes, {len( model.hulls )} hulls" )
-    painted = { paint for model in ( centre, west, east, vista ) for paint in model.polygons }
+    # The land round the town: Tools/belltower_vista.py's shape, painted by Tools/belltower_vista_paint.py.
+    count, lowest = Vista.write_land( OUT_DIR, RESOURCE_DIR )
+    print( f"{Vista.LAND_NAME}: {count} triangles, lowest at {lowest:.0f}" )
+    assert lowest > CATCH_FLOOR_Z, "the land goes below the catch floor"
+    painted = { paint for model in ( centre, west, east ) for paint in model.polygons }
     missing = sorted( p for p in painted if p not in Detail.MATERIALS and not ( BT.OUT_DIR / f"{p}_color.png" ).exists() )
     if missing:
         print( f"paints with no material: {', '.join( missing )}" )
@@ -2681,7 +3006,8 @@ def main():
         write_minimap( aabbs )
         write_scene( lights, models )
     if args.preview:
-        write_previews( args.preview, [ centre, west, east ], vista )
+        write_previews( args.preview, [ centre, west, east ] )
+        Vista.write_land_previews( Path( args.preview ) / "vista" )
 
 
 if __name__ == "__main__":

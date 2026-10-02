@@ -15,6 +15,7 @@ OBJ as ( y, z, x ).
 """
 import json
 import math
+import os
 import time
 import uuid
 import zlib
@@ -473,9 +474,14 @@ def write_obj( path, model, name ):
     offset = uv_offset( name )
     lines = [ "# Tools/map_kit.py", f"mtllib {path.stem}.mtl", f"o {path.stem}" ]
     vertices, uvs, normals, faces = [], [], [], []
+    anchored = getattr( model, "anchored_paints", () )
+    decals = getattr( model, "decal_paints", () )
     for paint in sorted( model.polygons ):
         faces.append( f"usemtl {paint}" )
-        decal = paint in BT.DECALS
+        decal = paint in BT.DECALS or paint in decals
+        # An anchored paint's picture starts at the ground (z 0) on every wall, so what's drawn at its foot (rising damp,
+        # splashback) stays at the foot of the wall.
+        shift = ( offset[0], 0.0 ) if paint in anchored else offset
         for index, (points, normal) in enumerate(model.polygons[paint]):
             base = len( vertices )
             wn = to_world( normal )
@@ -486,7 +492,7 @@ def write_obj( path, model, name ):
             else:
                 normals.extend( f"vn {obj_vector( to_world( n ) )}" for n in smooth )
             world = [ to_world( p ) for p in points ]
-            coords = [ face_uv( wp, wn, paint, offset, model.tile_overrides.get( paint ) ) for wp in world ]
+            coords = [ face_uv( wp, wn, paint, shift, model.tile_overrides.get( paint ) ) for wp in world ]
             if paint in model.grain_paints:
                 # Boards, rails and spokes need grain along their length, regardless of their world orientation.
                 edges = [world[(i+1)%len(world)]-p for i,p in enumerate(world)]
@@ -495,8 +501,9 @@ def write_obj( path, model, name ):
                 tile = model.tile_overrides[paint] if paint in model.tile_overrides else BT.tile_units(paint)
                 coords = [(float(np.dot(wp,across)/tile+offset[0]), float(np.dot(wp,along)/tile+offset[1])) for wp in world]
             coords = model.polygon_uvs.get((paint,index), coords)
-            if decal:
-                # Once across the polygon, whatever its size.
+            if decal and ( paint, index ) not in model.polygon_uvs:
+                # Once across the polygon, whatever its size. UVs given where it's built (a picture cropped to its
+                # opening) are kept as they are.
                 us, vs = [ u for u, _ in coords ], [ v for _, v in coords ]
                 coords = [ ( ( u - min( us ) ) / ( max( us ) - min( us ) ), ( v - min( vs ) ) / ( max( vs ) - min( vs ) ) )
                            for u, v in coords ]
@@ -657,9 +664,15 @@ def write_vmdl( path, resource_dir, name, model ):
 
 def write_text( path, text, newline="\n" ):
     """ Writes a file through a temporary one beside it, renamed over it once complete, so the editor, which compiles a
-    changed file straight away, never reads it half-written. """
+    changed file straight away, never reads it half-written. A file that already holds the same text is left alone, so
+    a re-run doesn't make the editor recompile every model. """
+    # As Path.write_text takes newline: None is the system's line ending, "" the text's own.
+    newline = os.linesep if newline is None else newline
+    data = ( text.replace( "\n", newline ) if newline else text ).encode( "utf-8" )
+    if path.exists() and path.read_bytes() == data:
+        return
     temp = path.with_name( f"{path.name}.writing" )
-    temp.write_text( text, encoding="utf-8", newline=newline )
+    temp.write_bytes( data )
     # The editor (or OneDrive) can hold the old file open for a moment while it reads it: try again a few times.
     for attempt in range( 20 ):
         try:

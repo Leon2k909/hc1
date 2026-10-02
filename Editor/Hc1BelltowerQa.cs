@@ -2,6 +2,7 @@ using Editor;
 using Sandbox;
 using Facepunch;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -10,6 +11,113 @@ using System.Threading.Tasks;
 
 public static class Hc1BelltowerQa
 {
+	// The scene's top-level objects that make the picture (`hc1_belltower_views`): everything else is gameplay.
+	private static readonly HashSet<string> Visual = new( StringComparer.OrdinalIgnoreCase )
+	{
+		"Sun", "Sky", "Fog", "Town", "Trees and planting", "Lights", "Street Detail", "Ambient", "Reflections",
+		"Indirect Light", "Look", "Volumetric Fog",
+	};
+
+	// ( name, eye, target, fov ), in plan ( east, north, up ): world is ( north, -east, up ).
+	private static readonly (string Name, Vector3 Eye, Vector3 Target, float Fov)[] Views =
+	{
+		( "market", new( -1760, 1275, 64 ), new( 0, 1240, 170 ), 80 ),
+		( "market_tower", new( -1150, 1170, 64 ), new( 0, 825, 640 ), 80 ),
+		( "west_street", new( -1800, 125, 64 ), new( -400, 160, 130 ), 80 ),
+		( "square", new( -560, -320, 64 ), new( 0, 700, 330 ), 85 ),
+		( "road", new( -2075, -760, 64 ), new( -2075, 1700, 150 ), 80 ),
+		( "gate", new( -1960, -330, 64 ), new( -2340, 0, 170 ), 80 ),
+		( "alley", new( -1325, 380, 64 ), new( -1325, 1100, 130 ), 80 ),
+		( "terrace", new( -1760, -950, 64 ), new( 0, -950, 110 ), 80 ),
+		( "gardens", new( -1560, -1380, 16 ), new( 0, -1000, 120 ), 80 ),
+		( "aerial", new( -2900, -2600, 1500 ), new( 0, 300, 0 ), 70 ),
+		( "out_south", new( -1600, -1430, 40 ), new( -1600, -9000, -1400 ), 80 ),
+	};
+
+	private static (string Name, Vector3 Eye, Vector3 Target, float Fov)? _shot;
+
+	private static Vector3 World( Vector3 plan ) => new( plan.y, -plan.x, plan.z );
+
+	/// <summary>
+	/// Belltower's views, offscreen, from the map's own scene file: its town, planting, lights, sun, sky, fog and look are
+	/// copied into a scene of their own, so the editor's open scene isn't touched. The camera has the player camera's
+	/// tonemapping and bloom at a fixed exposure. Writes output/belltower/views/&lt;view&gt;.png.
+	/// </summary>
+	[ConCmd( "hc1_belltower_views" )]
+	public static async void RenderViews( string filter = "", float exposure = 1f )
+	{
+		if ( rendering ) return;
+		rendering = true;
+		var folder = Path.Combine( Folder, "views" );
+		Directory.CreateDirectory( folder );
+		var scene = new Scene();
+		try
+		{
+			var root = JsonNode.Parse( File.ReadAllText( Path.Combine( Project.Current.GetRootPath(), "Assets/scenes/maps/Belltower/belltower.scene" ) ) ).AsObject();
+			var objects = new JsonArray();
+			foreach ( var item in root["GameObjects"].AsArray() )
+			{
+				var name = item["Name"]?.GetValue<string>();
+				if ( name is not null && Visual.Contains( name ) ) objects.Add( item.DeepClone() );
+			}
+			root["GameObjects"] = objects;
+			root["SceneProperties"]["NavMesh"]["Enabled"] = false;
+			root["SceneProperties"]["WantsSystemScene"] = false;
+			CameraComponent camera;
+			using ( scene.Push() )
+			{
+				scene.Deserialize( root );
+				var holder = new GameObject( false, "QA Camera" );
+				camera = holder.Components.Create<CameraComponent>();
+				camera.ZNear = 4;
+				camera.ZFar = 100000;
+				var tonemap = holder.Components.Create<Tonemapping>();
+				tonemap.Mode = Tonemapping.TonemappingMode.ACES;
+				tonemap.AutoExposureEnabled = false;
+				tonemap.ExposureCompensation = exposure;
+				var bloom = holder.Components.Create<Bloom>();
+				bloom.Mode = SceneCamera.BloomAccessor.BloomMode.Additive;
+				bloom.Strength = 0.15f;
+				bloom.Threshold = 1.33f;
+				holder.Enabled = true;
+				scene.EditorTick( .016f, .016f );
+			}
+			var views = _shot is { } one ? new[] { one } : Views;
+			_shot = null;
+			using var bitmap = new Bitmap( 1600, 900 );
+			var first = true;
+			foreach ( var view in views )
+			{
+				if ( !string.IsNullOrEmpty( filter ) && !view.Name.Contains( filter, StringComparison.OrdinalIgnoreCase ) ) continue;
+				var eye = World( view.Eye );
+				using ( scene.Push() )
+				{
+					camera.WorldPosition = eye;
+					camera.WorldRotation = Rotation.LookAt( World( view.Target ) - eye );
+					camera.FieldOfView = view.Fov;
+					scene.EditorTick( .016f, .016f );
+					camera.RenderToBitmap( bitmap );
+				}
+				// Textures stream in once they're seen: render again when they have.
+				await Task.Delay( first ? 4000 : 1500 );
+				first = false;
+				using ( scene.Push() ) camera.RenderToBitmap( bitmap );
+				File.WriteAllBytes( Path.Combine( folder, view.Name + ".png" ), bitmap.ToPng() );
+			}
+			Log.Info( $"Belltower views: {objects.Count} objects, written to {folder}" );
+		}
+		catch ( Exception e ) { Log.Warning( $"Belltower views failed: {e}" ); }
+		finally { scene.Destroy(); rendering = false; }
+	}
+
+	/// <summary>One view: `hc1_belltower_shot name east north up east north up [fov] [exposure]`, eye then target in plan.</summary>
+	[ConCmd( "hc1_belltower_shot" )]
+	public static void RenderShot( string name, float ee, float en, float ez, float te, float tn, float tz, float fov = 80f, float exposure = 1f )
+	{
+		_shot = (name, new Vector3( ee, en, ez ), new Vector3( te, tn, tz ), fov);
+		RenderViews( name, exposure );
+	}
+
 	private static string Folder => Path.Combine( Project.Current.GetRootPath(), "output/belltower" );
 	private static bool rendering;
 

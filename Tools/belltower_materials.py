@@ -225,13 +225,16 @@ def per_stone( rng, count, *shape ):
 # iron-stained or darker, in lime mortar.
 RUBBLE_TILE = 160.0
 RUBBLE_STONE = [ ( 170, 163, 150 ), ( 186, 178, 162 ), ( 154, 148, 138 ), ( 178, 162, 134 ), ( 142, 138, 131 ),
-                 ( 198, 190, 174 ), ( 160, 138, 110 ), ( 128, 124, 118 ), ( 176, 170, 160 ) ]
-RUBBLE_MORTAR = ( 176, 170, 156 )
+                 ( 198, 190, 174 ), ( 160, 138, 110 ), ( 128, 124, 118 ), ( 176, 170, 160 ), ( 168, 150, 128 ) ]
+RUBBLE_MORTAR = ( 168, 160, 146 )
 
 
 def rubble( rng, n ):
-    """ Roughly coursed rubble: courses 4-11 inches high of stones one to three times as long as they're high, split
-    faces (a dome cut by a few flat facets), pinning stones between some, edges spalled, joints weathered back ~0.5". """
+    """ Roughly coursed rubble: courses 4-11 inches high of stones one to three times as long as they're high, pinning
+    stones between some. Each stone is a broken block bedded in lime mortar: its face split into a few flat planes,
+    its arrises worn round and now and then chipped, its flanks going down into joints raked back half an inch to an
+    inch. The shading comes from that shape (the normals and a broad AO), not from lines drawn round the stones: an
+    earlier version darkened a thin ring round every stone, which read as an ink outline in the sun. """
     ppu = n / RUBBLE_TILE
     heights = []
     while sum( heights ) < RUBBLE_TILE:
@@ -258,54 +261,83 @@ def rubble( rng, n ):
                          -rng.uniform( 1.2, 2.2 ) * ppu, 2.4 * ppu, 2.4 * ppu ) )
     count = len( stones )
     size_h = np.array( [ s[4] for s in stones ] ) / ppu          # inches
-    size_l = np.array( [ s[5] for s in stones ] ) / ppu
-    warp = ( noise( rng, n, 2.4, 4, 60 ) * 0.5 * ppu + noise( rng, n, 1.8, 30, 160 ) * 0.12 * ppu,
-             noise( rng, n, 2.4, 4, 60 ) * 0.5 * ppu + noise( rng, n, 1.8, 30, 160 ) * 0.12 * ppu )
+    # Broken stone has straight-ish edges and blunt corners: the outline only wanders a little, and slowly.
+    warp = ( noise( rng, n, 2.6, 3, 30 ) * 0.45 * ppu + noise( rng, n, 2.0, 16, 70 ) * 0.06 * ppu,
+             noise( rng, n, 2.6, 3, 30 ) * 0.45 * ppu + noise( rng, n, 2.0, 16, 70 ) * 0.06 * ppu )
     cell, border, along, across = segment_cells( rng, n, [ s[:4] for s in stones ], 1.15, warp )
     b = border / ppu                                            # inches to the joint's centre line
 
-    # Joints: 0.35-0.6" each side of the line, the stones' arrises spalled back irregularly.
-    joint = 0.45 + 0.08 * noise( rng, n, 2.0, 6, 60 )
-    spall = np.maximum( noise( rng, n, 1.8, 12, 200 ), 0.0 ) * 0.12 + np.maximum( noise( rng, n, 2.2, 4, 40 ) - 1.2, 0 ) * 0.4
-    edge = b - joint - spall
-    inside = smoothstep( -0.06, 0.06, edge )
+    # Joints 0.4-0.75" each side of the line; now and then a bite out of an arris.
+    joint = 0.55 + 0.12 * noise( rng, n, 2.4, 3, 30 )
+    chips = np.maximum( noise( rng, n, 2.4, 6, 50 ) - 1.4, 0.0 ) * 0.7
+    edge = b - joint - chips                                    # inches in from the stone's outline
+    inside = smoothstep( -0.04, 0.04, edge )
 
-    # The face: a dome that rises over ~a third of the stone's height, capped by up to three split planes.
+    # How far the joints are raked back from the stones' arrises, and the mortar's own face: a little proud where it
+    # was pointed up to the stones, sandy, with grit and the odd hole.
+    recess = 0.75 + 0.22 * noise( rng, n, 2.4, 2, 24 ) + 0.25 * smoothstep( 0.8, 2.2, noise( rng, n, 2.8, 1, 10 ) )
+    # Pressed up against each stone and hollowed between, flattening out (no slope) on the joint's centre line however
+    # wide the joint is there, so no crease shows down the middle of a joint.
+    u = np.clip( -edge / np.maximum( joint + chips, 0.2 ), 0.0, 1.0 )
+    near = ( 1.0 - u ) ** 2                                     # 1 against a stone, 0 on the joint's centre line
+    sand = noise( rng, n, 1.0, 120, None )
+    holes = np.maximum( noise( rng, n, 1.6, 40, 300 ) - 2.2, 0.0 )
+    mortar_h = -recess + 0.22 * near + 0.015 * sand + 0.04 * noise( rng, n, 2.2, 8, 80 ) - 0.12 * holes
+
+    # The face: split planes over a low dome, standing 0.4-1.4" proud of the arrises.
     hs = size_h[cell]
-    crown = ( 0.7 + 0.6 * rng.random( count ) )[cell] * np.clip( hs / 8.0, 0.45, 1.4 )
-    dome = crown * ( 1.0 - np.exp( -np.maximum( edge, 0.0 ) / ( 0.22 * hs ) ) )
     u_in, v_in = along / ppu, across / ppu
+    crown = ( 0.55 + 0.6 * rng.random( count ) )[cell] * np.clip( hs / 8.0, 0.5, 1.35 )
+    dome = crown * ( 1.0 - np.exp( -np.maximum( edge, 0.0 ) / ( 0.3 * hs ) ) )
     facets = np.full( ( n, n ), np.inf )
     for _ in range( 3 ):
         theta = rng.uniform( 0, 2 * math.pi, count )
-        slope = np.tan( np.radians( rng.uniform( 5, 24, count ) ) )
-        level = rng.uniform( 0.5, 0.95, count ) * ( 0.7 + 0.6 * rng.random( count ) )
+        slope = np.tan( np.radians( rng.uniform( 4, 20, count ) ) )
+        level = rng.uniform( 0.55, 1.0, count ) * ( 0.75 + 0.5 * rng.random( count ) )
         plane = ( level * np.clip( size_h / 8.0, 0.4, 1.3 ) )[cell] - slope[cell] * (
             np.cos( theta )[cell] * u_in + np.sin( theta )[cell] * v_in )
         facets = np.minimum( facets, plane )
-    face = np.minimum( dome, np.maximum( facets, 0.25 * dome ) )
+    face = np.minimum( dome, np.maximum( facets, 0.35 * dome ) )
+    # Broken stone isn't smooth: shallow conchoidal hollows and the ridges between them, an inch to a few across.
+    ridges = 1.0 - np.abs( noise( rng, n, 2.0, 8, 60 ) )
+    face += 0.14 * ( ridges - 0.6 ) + 0.06 * noise( rng, n, 1.8, 12, 160 )
     grain = noise( rng, n, 1.3, 40, None )
     pits = np.maximum( noise( rng, n, 1.4, 60, 500 ) - 2.0, 0.0 )
     face += 0.05 * noise( rng, n, 2.2, 6, 120 ) + 0.003 * grain - 0.04 * pits
 
-    mortar_h = -0.45 + 0.012 * noise( rng, n, 1.2, 60, None ) + 0.07 * noise( rng, n, 2.2, 6, 60 )
-    height = mortar_h + inside * np.maximum( face + 0.45, 0.0 )
+    # The arris worn round: the flank comes up out of the mortar on a quarter circle about an inch across (less on
+    # small stones), then the face carries on from there.
+    radius = np.clip( 0.16 * hs, 0.5, 1.2 )
+    t = np.clip( edge / radius, 0.0, 1.0 )
+    arris = np.sqrt( 1.0 - ( 1.0 - t ) ** 2 )
+    stone_h = mortar_h + ( recess - 0.22 * near + 0.1 ) * arris + face * smoothstep( 0.0, 1.0, t )
+    height = np.where( edge > 0.0, np.maximum( stone_h, mortar_h ), mortar_h )
 
     # Colour, in linear light.
     base = to_linear( RUBBLE_STONE )[rng.integers( 0, len( RUBBLE_STONE ), count )]
-    base *= rng.uniform( 0.82, 1.12, ( count, 1 ) )
+    base *= rng.uniform( 0.7, 1.0, ( count, 1 ) ) * np.where( rng.random( ( count, 1 ) ) < 0.08, 0.72, 1.0 )
     stone = base[cell]
     mottle = noise( rng, n, 2.4, 3, 80 )
     fine = noise( rng, n, 1.1, 80, None )
     stone = stone * ( 1.0 + 0.07 * mottle + 0.035 * fine )[..., None]
     stain = smoothstep( 0.6, 2.2, noise( rng, n, 2.6, 3, 40 ) ) * ( rng.random( count ) < 0.3 )[cell]
     stone = lerp( stone, stone * to_linear( ( 214, 168, 118 ) ) / to_linear( ( 190, 190, 190 ) ), 0.55 * stain )
-    # Weathered crowns lighter, the arrises darker where dirt sits.
-    stone = stone * ( 0.72 + 0.34 * smoothstep( 0.0, 0.6, face ) )[..., None]
+    # The weathered planes a touch lighter than the flanks, where dust and soot settle; chips show fresher stone.
+    stone = stone * ( 0.86 + 0.16 * smoothstep( 0.0, 0.8, t ) )[..., None]
+    stone = lerp( stone, base[cell] * 1.12, 0.6 * smoothstep( 0.05, 0.3, chips ) * inside )
     specks = smoothstep( 2.4, 3.2, noise( rng, n, 0.6, 200, None ) )
-    stone = lerp( stone, stone * 0.55, specks * 0.6 )
-    mortar = to_linear( RUBBLE_MORTAR ) * ( 0.92 + 0.08 * noise( rng, n, 1.0, 80, None ) )[..., None]
-    mortar = mortar * ( 0.82 + 0.1 * noise( rng, n, 2.0, 4, 60 ) )[..., None]
+    stone = lerp( stone, stone * 0.6, specks * 0.5 )
+    mortar = to_linear( RUBBLE_MORTAR ) * ( 0.93 + 0.07 * sand )[..., None]
+    mortar = mortar * ( 0.84 + 0.1 * noise( rng, n, 2.0, 4, 60 ) )[..., None]
+    # Dust and soot held in the mortar's sandy face, patchy across the wall.
+    mortar = lerp( mortar, mortar * to_linear( ( 150, 146, 138 ) ) / to_linear( ( 184, 176, 160 ) ),
+                   smoothstep( -0.5, 1.5, noise( rng, n, 2.6, 2, 30 ) ) )
+    # Grit in the mortar: small dark and light grains.
+    grit = noise( rng, n, 0.4, 300, None )
+    mortar = lerp( mortar, mortar * 0.62, 0.5 * smoothstep( 1.6, 2.4, grit ) )
+    mortar = lerp( mortar, mortar * 1.15, 0.5 * smoothstep( 1.6, 2.4, -grit ) )
+    # Dirt lodged deep in the raked joints, and the holes.
+    mortar = mortar * ( 1.0 - 0.22 * smoothstep( 0.8, 1.3, recess ) - 0.3 * smoothstep( 0.0, 0.08, holes ) )[..., None]
     colour = lerp( mortar, stone, inside )
 
     lichen_grey = spots( rng, n, 70, ( 0.6 * ppu, 2.4 * ppu ) ) * smoothstep( -0.2, 1.0, noise( rng, n, 3.0, 1, 6 ) )
@@ -317,10 +349,12 @@ def rubble( rng, n ):
     runs = smoothstep( 0.5, 2.0, blur( noise( rng, n, 1.5, 20, 200 ), ( 0.1 * ppu, 0.02 * ppu ) ) )
     under = np.clip( 1.0 - np.abs( v_in ) / ( hs * 0.5 ), 0, 1 ) * ( v_in < 0 )
     grime = runs * smoothstep( 0.0, 1.0, np.roll( 1.0 - inside, int( 0.6 * ppu ), 0 ) + under * 0.3 )
-    colour = colour * ( 1.0 - 0.18 * grime )[..., None]
+    colour = colour * ( 1.0 - 0.15 * grime )[..., None]
 
-    hollow = cavity( height, ppu )
-    colour = colour * np.exp( -1.4 * hollow )[..., None]
+    # The AO: broad, from how far each px sits below its surroundings over an inch or more, so a joint darkens across
+    # its width rather than along the stones' edges.
+    hollow = cavity( height, ppu, radii=( 1.0, 2.5, 5.0 ), weights=( 0.35, 0.3, 0.15 ) )
+    colour = colour * np.exp( -0.35 * hollow )[..., None]
     rough = np.clip( 0.84 + 0.05 * fine - 0.05 * smoothstep( 0.2, 0.7, face ) * inside + 0.08 * ( 1 - inside )
                      + 0.04 * lichen_grey, 0.0, 1.0 )
     return { "rubble": to_srgb( colour ) }, height, rough, hollow, ppu
