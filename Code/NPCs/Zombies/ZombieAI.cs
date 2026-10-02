@@ -497,7 +497,7 @@ public sealed class ZombieAI : Component, Component.IDamageable
 		Renderer.Set( "wish_y", local.y );
 		Renderer.Set( "wish_speed", _smoothVel.Length );
 		Renderer.Set( "move_style", Speed == ZombieSpeed.Walk ? 1 : 2 );
-		Renderer.Set( "b_grounded", true );
+		Renderer.SetBool( "b_grounded", true );
 		// Keep the unarmed pose while moving, then use the punch upper-body pose
 		// only for the attack window so the arms visibly join the lunge.
 		var closeToTarget = IsValidTarget( _target )

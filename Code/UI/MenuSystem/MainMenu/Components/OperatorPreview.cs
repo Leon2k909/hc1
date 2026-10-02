@@ -48,7 +48,7 @@ public sealed class OperatorPreview : ScenePanel
 		body.Model = model;
 		body.CreateBoneObjects = false;
 		if ( MilitaryUniform.UsesHumanSkeleton( model ) ) MilitaryUniform.SetModel( body, model, outfit.Style );
-		body.Set( "b_grounded", true );
+		body.SetBool( "b_grounded", true );
 		body.Set( "holdtype", 0 );
 		body.WorldRotation = Rotation.FromYaw( yaw );
 	}

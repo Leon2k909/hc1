@@ -159,7 +159,7 @@ public sealed class AnimationHelper : Component
 	public bool IsGrounded
 	{
 		get => Target.GetBool( "b_grounded" );
-		set => Target.Set( "b_grounded", value );
+		set => Target.SetBool( "b_grounded", value );
 	}
 
 	public bool IsSwimming

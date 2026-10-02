@@ -602,7 +602,7 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 		Renderer.Set( "holdtype", (int)AnimationHelper.HoldTypes.Rifle );
 		Renderer.Set( "holdtype_handedness", (int)AnimationHelper.Hand.Right );
 		Renderer.Set( "b_twohanded", true );
-		Renderer.Set( "b_grounded", true );
+		Renderer.SetBool( "b_grounded", true );
 		Renderer.Set( "move_speed", velocity.Length );
 		Renderer.Set( "move_groundspeed", velocity.WithZ( 0f ).Length );
 		Renderer.Set( "move_x", forward );

@@ -3061,6 +3061,32 @@ simulate_input.
   fireball's size and how long it glows, the surge's and column's density, the chunks' tint, the light's brightness and
   the shake.
 
+## s&box 26.10.02: bool anim parameters can't be set true (`AnimBools`)
+- After the 2026-10-02 s&box update the user saw no first-person reload animations, no pistol kick, and bots gliding
+  with their legs up in the air pose. Every `SkinnedModelRenderer.Set( name, true )` reaches the graph as false.
+  Floats, ints, enums, vectors and rotations are fine.
+- The cause is engine commit #5893 ("Simplify managed anim parameter storage", 2026-09-30):
+  - Parameters now go to native code as an `AnimVariant`, and a bool is built as
+    `new Vector4( value ? BitConverter.Int32BitsToSingle( 1 ) : 0f, ... )`.
+  - The JIT folds that constant, a denormal float, through a double. A thread with denormals-are-zero set (the
+    engine's) folds it to 0.
+  - Reproduced offline on 2026-10-02 against the installed Sandbox.Engine.dll (`scratchpad/dazt`, `_controlfp_s`
+    with `_DN_FLUSH`): `(AnimVariant)true` came out all zeroes, `(AnimVariant)1` (an int) didn't.
+  - The replays show it: bots' `b_grounded` and IK enables false all life, where 2026-10-01's were true.
+- Game code can't build a correct true. Every conversion into a bool parameter (from an int, a float or an enum) goes
+  through the same constructor. A parameter's default comes from native code, so it does arrive intact.
+  `AnimBools.SetBool` sets a parameter whose graph default is true by resetting it (`Parameters.Reset`).
+  - That fixes `b_grounded` on the bodies (`AnimationHelper.IsGrounded`, bots, zombies' fallback, `IdleAnimator`,
+    `OperatorPreview`): the floating bots.
+  - Every other bool in our graphs defaults to false. Viewmodel `b_reload`, `b_attack`, `b_deploy`, `b_empty` and
+    `b_sprint`, the bodies' `ik.hand_*.enabled` and `b_jump` all stay broken until Facepunch fixes it.
+  - Converting them to int parameters in the 26 graphs was left for the user to decide.
+- Facepunch's fix would be to write the bool's bits through an int field at offset 0 rather than a float. The int and
+  byte constructors have the same flaw if a constant is inlined into them, though none was in the replays (bots'
+  `holdtype` arrived as 2).
+- Once s&box is fixed, `SetBool` is harmless and can stay.
+- Compiled offline, not yet seen in-game.
+
 ## Leg animation speeds (`rigged_human.vanmgrph`, players and bots)
 - The lower-body Blend2Ds ("Stood Lower Body", "Crouched Lower Body"; X = move_y, right, Y = move_x, forward) put each
   clip at the velocity its planted feet carry the body: walks ~33 u/s, jogs 93 sideways, 103 ahead, 91 back and

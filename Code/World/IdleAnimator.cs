@@ -53,7 +53,7 @@ public sealed class IdleAnimator : Component
 			Renderer.Set( "idle_type", (int)IdleType );
 			if ( MilitaryUniform.UsesHumanSkeleton( Renderer.Model ) )
 			{
-				Renderer.Set( "b_grounded", true );
+				Renderer.SetBool( "b_grounded", true );
 				Renderer.Set( "holdtype", IdleType == IdleType.WithRifle ? 2 : IdleType == IdleType.WithPistol ? 1 : 0 );
 			}
 		}
