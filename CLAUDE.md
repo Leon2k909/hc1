@@ -1601,7 +1601,8 @@
       2026-10-01). The spawn deaths the user had came from every spawn being switched off (see Retakes and Defuse
       rounds).
   - Buy zones on the spawn roads, callouts for every area, the play area, and a player clip over the south parapet, so
-    nobody jumps off the drop. A catch floor 3100 below stops anything thrown over the walls.
+    nobody jumps off the drop. A catch floor under the lowest land (`CATCH_FLOOR_Z`) stops anything thrown over the
+    walls.
   - `MapSpawnSettings` turns off map spawn points and navmesh spawns: every spawn is placed.
 - `ObjectiveSpot` (`Code/Maps/ObjectiveSpot.cs`) is a map's own place for an objective. Domination uses a map's spots
   when it has at least three, named by their labels. Hot Zone uses them whenever there are any. Otherwise both fall back
@@ -1640,6 +1641,16 @@
   - `shaders/hc1_vista.shader` picks the zone by how far out from the town a point is (Chebyshev), blends the zones
     over 12% of each, adds the detail textures near the walls (fading from 700 to 2600 out) and sets the roughness by
     kind.
+- `Tools/belltower_vista_props.py` builds the vista's buildings and trees, drawn to the vista's forced perspective
+  (`World.k_at`): a walled hill town with its gate, a villa with its walled garden and cypress avenue, a village,
+  farms, chapels, and cypresses and pines. `belltower_map.py` writes it (`belltower_vista_props.obj` / `.vmdl`, ~53k
+  triangles) as the scene's "Vista Props", drawn only, with no collision and no shadows.
+  - The painter grounds it (`World.paint_data`): the yards (a town's paving and kitchen gardens, a farm's beaten earth,
+    the villa's parterre, gravel), the white roads out of the gate and down the avenue (`winding_road`), and the
+    buildings' and trees' shadows. It clears its own painted trees off all of that (`clear_crowns`). `--no-props`
+    leaves it all out.
+  - After changing the props, run `belltower_vista_paint.py` (the repaint, ~1.5 min), then `belltower_map.py`.
+  - Checked in the painter's previews only (2026-10-02), not in the engine.
 - `Tools/belltower_sky.py` bakes the sky: a clear summer afternoon with fair-weather cumulus, an HDR panorama for
   s&box's sky shader. The core atmosphere shader had no clouds and tinted the whole sky grey-cyan with the sun's colour.
 - `Tools/belltower_finishes.py` draws the houses' finishes, like the lime render (`plaster_<colour>`, anchored at the

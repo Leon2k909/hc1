@@ -56,6 +56,7 @@ import building_textures as BT
 import map_kit as K
 import belltower_detail as Detail
 import belltower_vista as Vista
+import belltower_vista_props as VistaProps
 from map_kit import Model, Wall, arc, normalise
 
 TITLE = "Belltower"
@@ -2816,6 +2817,7 @@ def write_scene( lights, models ):
         model_object( "West Half", "town/west", "belltower_west" ),
         model_object( "East Half", "town/east", "belltower_east" ),
         model_object( "Vista", "town/vista", "belltower_vista", collide=False, shadows=False ),
+        model_object( "Vista Props", "town/vista_props", VistaProps.NAME, collide=False, shadows=False ),
     ] )
     light_objects = [
         K.game_object( ids, name, f"light/{name}", K.to_world( position ), tags="light_point,light", components=[
@@ -2987,6 +2989,8 @@ def main():
     # The land round the town: Tools/belltower_vista.py's shape, painted by Tools/belltower_vista_paint.py.
     count, lowest = Vista.write_land( OUT_DIR, RESOURCE_DIR )
     print( f"{Vista.LAND_NAME}: {count} triangles, lowest at {lowest:.0f}" )
+    # Its buildings and trees (Tools/belltower_vista_props.py). The painter grounds them: their yards, roads and shadows.
+    print( f"{VistaProps.NAME}: {VistaProps.write( OUT_DIR, RESOURCE_DIR )} triangles" )
     assert lowest > CATCH_FLOOR_Z, "the land goes below the catch floor"
     painted = { paint for model in ( centre, west, east ) for paint in model.polygons }
     missing = sorted( p for p in painted if p not in Detail.MATERIALS and not ( BT.OUT_DIR / f"{p}_color.png" ).exists() )

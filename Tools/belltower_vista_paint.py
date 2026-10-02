@@ -29,6 +29,10 @@ The land's shape is belltower_vista's. Painted on it:
   mean: the canopy's colour and shading, and the share of the ground between that's in shade. From 1.5 to 3 texels
   across, fewer trees are drawn and the mean makes up the rest. Trees are placed where they're played and drawn round
   where they stand, so a tree is the same in every zone that draws it.
+- The vista's buildings and trees (Tools/belltower_vista_props.py) are models, so only what they do to the ground is
+  painted: the ground they stand on (a town's paving and kitchen gardens, a farm's beaten earth, the villa's parterre,
+  a cemetery's gravel), their white roads, and their shadows (each building as a box up to halfway up its roof). The
+  painter's own trees keep off all of it.
 - Anything finer than a texel is left out: noise, stripes and edges are box-filtered over the texel's footprint where
   it's played (its size times the forced perspective's stretch there).
 
@@ -43,6 +47,7 @@ from pathlib import Path
 import numba
 import numpy as np
 from PIL import Image
+from scipy.spatial import cKDTree
 
 import belltower_vista as V
 
@@ -136,6 +141,14 @@ FLOWERS = linear( [ ( 196, 28, 22 ), ( 220, 192, 40 ), ( 226, 224, 210 ), ( 126,
                                                                                                 # daisy, vetch
 # Each crop's flowers: how many (in a lush patch) and which, as weights of FLOWERS.
 POPPIES = np.array( ( 0.8, 0.1, 0.1, 0.0 ) )
+# The props' ground (belltower_vista_props.YARD_*): a town's paving, a farm's beaten earth, a garden's lawn, gravel.
+YARD_COLOURS = linear( [ ( 152, 142, 122 ), ( 176, 160, 128 ), ( 104, 120, 60 ), ( 190, 184, 166 ) ] )
+YARD_KINDS = np.array( ( STONE, SOIL, GRASS, SOIL ) )
+YARD_FLAT = np.array( ( 0.7, 0.4, 0.6, 0.5 ) )      # how much of the land's small relief each smooths away
+KITCHEN_GARDEN = linear( ( 92, 106, 56 ) )
+BOX_HEDGE = linear( ( 52, 70, 36 ) )
+ROAD = linear( ( 206, 194, 166 ) )                  # a strada bianca: limestone gravel
+VERGE = linear( ( 168, 156, 112 ) )                 # its dust on the grass beside it
 MEADOW_FLOWERS = np.array( ( 0.15, 0.4, 0.3, 0.15 ) )
 
 # The districts: what they grow, by the land at their middle.
@@ -997,9 +1010,11 @@ def crowns_for( zone, margin, es, ns, Z, w, inner ):
 @numba.njit( cache=True, fastmath=True )
 def _tops( crowns, e0, n0, we, wn, w, top, ccol, cov, cid, grads ):
     """ Each crown's top over the ground: where it's the highest thing, its colour, lit as a spheroid (lumpy where it's
-    big enough to show its clumps of leaves). """
+    big enough to show its clumps of leaves). A crown with no colour (-1) is a prop's: its model draws it. """
     rows, cols = top.shape
     for k in range( crowns.shape[0] ):
+        if crowns[k, 7] < 0.0:
+            continue
         ce, cn, zg, a, hc, bb = crowns[k, 0], crowns[k, 1], crowns[k, 2], crowns[k, 3], crowns[k, 4], crowns[k, 5]
         c0 = max( int( ( ce - a - e0 ) / we ) - 1, 0 )
         c1 = min( int( ( ce + a - e0 ) / we ) + 1, cols - 1 )
@@ -1092,6 +1107,300 @@ def _shadows( crowns, e0, n0, we, wn, w, top, cid, shadow ):
 
 
 # ---------------------------------------------------------------------------------------------------------------------
+# What the vista's buildings and trees (Tools/belltower_vista_props.py) do to the ground
+
+_PROPS = []
+
+
+def props_world():
+    """ belltower_vista_props' buildings and trees, built once. """
+    if not _PROPS:
+        import belltower_vista_props as B
+        _PROPS.append( B.build() )
+    return _PROPS[0]
+
+
+@numba.njit( cache=True, fastmath=True, inline="always" )
+def _lay( ground, kinds, micro, over, alpha, shade, row, col, r, g, b, a, kind, flat ):
+    """ Ground of colour r, g, b over a share a of a texel, of a kind where it's most of it. It clears the mean of the
+    trees there, their shade with it, and flat of the land's small relief. """
+    ground[row, col, 0] = ground[row, col, 0] * ( 1.0 - a ) + r * a
+    ground[row, col, 1] = ground[row, col, 1] * ( 1.0 - a ) + g * a
+    ground[row, col, 2] = ground[row, col, 2] * ( 1.0 - a ) + b * a
+    if a > 0.5:
+        kinds[row, col] = kind
+    micro[row, col] *= 1.0 - flat * a
+    for c in range( 3 ):
+        over[row, col, c] *= 1.0 - a
+    alpha[row, col] *= 1.0 - a
+    shade[row, col] += ( 1.0 - shade[row, col] ) * a
+
+
+@numba.njit( cache=True, fastmath=True, inline="always" )
+def _strip( d, half, w ):
+    """ The share of a footprint w across, centred d from a band's middle, that a band half either side covers. """
+    return max( min( d + 0.5 * w, half ) - max( d - 0.5 * w, -half ), 0.0 ) / w
+
+
+@numba.njit( cache=True, fastmath=True )
+def _yard( poly, kind, k, e0, n0, we, wn, w, ground, kinds, micro, over, alpha, shade, weight, grads ):
+    """ A yard's ground inside a plan outline, k units a metre: soft-edged (a farm's ragged, where the yard wears into
+    the grass), each kind with its own wear and pattern. weight keeps the most of a texel any yard or road covers. """
+    rows, cols = weight.shape
+    count = poly.shape[0]
+    soft = max( w, 1.0 * k )
+    ragged = 2.5 * k if kind == 1 else 0.0
+    pad = 0.5 * soft + 1.5 * ragged + w
+    c0 = max( int( ( poly[:, 0].min() - pad - e0 ) / we ), 0 )
+    c1 = min( int( ( poly[:, 0].max() + pad - e0 ) / we ) + 1, cols - 1 )
+    r0 = max( int( ( n0 - poly[:, 1].max() - pad ) / wn ), 0 )
+    r1 = min( int( ( n0 - poly[:, 1].min() + pad ) / wn ) + 1, rows - 1 )
+    # A garden's own frame, for its parterre: metres along its first edge and its last.
+    ue, un = poly[1, 0] - poly[0, 0], poly[1, 1] - poly[0, 1]
+    ve, vn = poly[count - 1, 0] - poly[0, 0], poly[count - 1, 1] - poly[0, 1]
+    ul, vl = math.sqrt( ue * ue + un * un ), math.sqrt( ve * ve + vn * vn )
+    wm = w / k
+    for row in range( r0, r1 + 1 ):
+        n = n0 - row * wn
+        for col in range( c0, c1 + 1 ):
+            e = e0 + col * we
+            inside = False
+            d2 = 1e30
+            for i in range( count ):
+                j = i + 1 if i + 1 < count else 0
+                ae, an, be, bn = poly[i, 0], poly[i, 1], poly[j, 0], poly[j, 1]
+                if ( an > n ) != ( bn > n ):
+                    if ae + ( n - an ) * ( be - ae ) / ( bn - an ) > e:
+                        inside = not inside
+                de, dn = be - ae, bn - an
+                t = min( max( ( ( e - ae ) * de + ( n - an ) * dn ) / max( de * de + dn * dn, 1e-9 ), 0.0 ), 1.0 )
+                qe, qn = ae + t * de - e, an + t * dn - n
+                d2 = min( d2, qe * qe + qn * qn )
+            s = math.sqrt( d2 ) if inside else -math.sqrt( d2 )
+            if ragged > 0.0:
+                s += ragged * V._fbm( e, n, 9.0 * k, 3, 0.5, 4401, w, grads )
+            a = min( max( s / soft + 0.5, 0.0 ), 1.0 )
+            if a <= 0.0:
+                continue
+            mottle = 1.0 + 0.12 * V._fbm( e, n, 5.0 * k, 3, 0.55, 4402 + kind, w, grads )
+            r = YARD_COLOURS[kind, 0] * mottle
+            g = YARD_COLOURS[kind, 1] * mottle
+            b = YARD_COLOURS[kind, 2] * mottle
+            kd = YARD_KINDS[kind]
+            if kind == 0:
+                # Kitchen gardens between the houses.
+                veg = 0.8 * V._smooth( 0.1, 0.45, V._fbm( e, n, 16.0 * k, 2, 0.5, 4403, w, grads ) )
+                r, g, b = _mix( r, KITCHEN_GARDEN[0], veg ), _mix( g, KITCHEN_GARDEN[1], veg ), _mix( b, KITCHEN_GARDEN[2], veg )
+            elif kind == 1:
+                # Dry grass in patches, more of it towards the edge, and straw.
+                grass = V._smooth( 0.0, 0.6, V._fbm( e, n, 7.0 * k, 3, 0.5, 4404, w, grads ) + 0.5 - s / ( 9.0 * k ) )
+                r, g, b = _mix( r, DRY_GRASS[0], grass ), _mix( g, DRY_GRASS[1], grass ), _mix( b, DRY_GRASS[2], grass )
+            elif kind == 2:
+                # A parterre: gravel walks round and across, four lawn beds edged with low box, a basin in the middle.
+                um = ( ( e - poly[0, 0] ) * ue + ( n - poly[0, 1] ) * un ) / ( ul * k )
+                vm = ( ( e - poly[0, 0] ) * ve + ( n - poly[0, 1] ) * vn ) / ( vl * k )
+                lu, lv = ul / k, vl / k
+                into = min( min( um - 5.0, lu - 5.0 - um ), abs( um - 0.5 * lu ) - 1.5 )
+                into = min( into, min( min( vm - 3.0, lv - 3.0 - vm ), abs( vm - 0.5 * lv ) - 1.5 ) )
+                bed = min( max( into / wm + 0.5, 0.0 ), 1.0 )
+                hedge = _strip( into - 0.35, 0.35, wm )
+                basin = min( max( ( 2.5 - math.hypot( um - 0.5 * lu, vm - 0.5 * lv ) ) / wm + 0.5, 0.0 ), 1.0 )
+                rim = _strip( math.hypot( um - 0.5 * lu, vm - 0.5 * lv ) - 2.7, 0.3, wm )
+                r = _mix( YARD_COLOURS[3, 0], YARD_COLOURS[2, 0] * mottle, bed )
+                g = _mix( YARD_COLOURS[3, 1], YARD_COLOURS[2, 1] * mottle, bed )
+                b = _mix( YARD_COLOURS[3, 2], YARD_COLOURS[2, 2] * mottle, bed )
+                r, g, b = _mix( r, BOX_HEDGE[0], hedge ), _mix( g, BOX_HEDGE[1], hedge ), _mix( b, BOX_HEDGE[2], hedge )
+                r, g, b = _mix( r, WALL_TOP[0], rim ), _mix( g, WALL_TOP[1], rim ), _mix( b, WALL_TOP[2], rim )
+                r, g, b = _mix( r, WATER_EDGE[0], basin ), _mix( g, WATER_EDGE[1], basin ), _mix( b, WATER_EDGE[2], basin )
+                kd = GRASS if bed > 0.5 else ( WATER if basin > 0.5 else SOIL )
+            else:
+                # Gravel, the grass coming through it.
+                grass = 0.35 * V._smooth( 0.05, 0.5, V._fbm( e, n, 4.0 * k, 2, 0.5, 4405, w, grads ) )
+                r, g, b = _mix( r, GREEN_GRASS[0], grass ), _mix( g, GREEN_GRASS[1], grass ), _mix( b, GREEN_GRASS[2], grass )
+            _lay( ground, kinds, micro, over, alpha, shade, row, col, r, g, b, a, kd, YARD_FLAT[kind] )
+            weight[row, col] = max( weight[row, col], a )
+
+
+@numba.njit( cache=True, fastmath=True )
+def _road( line, ks, half, e0, n0, we, wn, w, ground, kinds, micro, over, alpha, shade, weight, grads ):
+    """ A white road along a plan line, half either side of it: limestone gravel, palest in the wheel tracks, grass
+    down its crown, and its dust on the verges. ks: units a metre at each point. """
+    rows, cols = weight.shape
+    count = line.shape[0]
+    pad = half + 2.5 * ks.max() + w
+    c0 = max( int( ( line[:, 0].min() - pad - e0 ) / we ), 0 )
+    c1 = min( int( ( line[:, 0].max() + pad - e0 ) / we ) + 1, cols - 1 )
+    r0 = max( int( ( n0 - line[:, 1].max() - pad ) / wn ), 0 )
+    r1 = min( int( ( n0 - line[:, 1].min() + pad ) / wn ) + 1, rows - 1 )
+    for row in range( r0, r1 + 1 ):
+        n = n0 - row * wn
+        for col in range( c0, c1 + 1 ):
+            e = e0 + col * we
+            d2 = 1e30
+            k = ks[0]
+            for i in range( count - 1 ):
+                ae, an, be, bn = line[i, 0], line[i, 1], line[i + 1, 0], line[i + 1, 1]
+                if e < min( ae, be ) - pad or e > max( ae, be ) + pad or n < min( an, bn ) - pad or n > max( an, bn ) + pad:
+                    continue
+                de, dn = be - ae, bn - an
+                t = min( max( ( ( e - ae ) * de + ( n - an ) * dn ) / max( de * de + dn * dn, 1e-9 ), 0.0 ), 1.0 )
+                qe, qn = ae + t * de - e, an + t * dn - n
+                q2 = qe * qe + qn * qn
+                if q2 < d2:
+                    d2 = q2
+                    k = ks[i]
+            if d2 >= pad * pad:
+                continue
+            d = math.sqrt( d2 )
+            soft = max( w, 0.5 * k )
+            a = min( max( ( half - d ) / soft + 0.5, 0.0 ), 1.0 )
+            verge = min( max( ( half + 2.0 * k - d ) / soft + 0.5, 0.0 ), 1.0 ) - a
+            if a <= 0.0 and verge <= 0.0:
+                continue
+            if verge > 0.0:
+                _lay( ground, kinds, micro, over, alpha, shade, row, col, VERGE[0], VERGE[1], VERGE[2], 0.5 * verge,
+                      kinds[row, col], 0.0 )
+            if a > 0.0:
+                mottle = 1.0 + 0.07 * V._fbm( e, n, 3.0 * k, 3, 0.5, 4410, w, grads )
+                crown = 0.5 * _strip( d, 0.3 * k, w )
+                r = _mix( ROAD[0] * mottle, DRY_GRASS[0], crown )
+                g = _mix( ROAD[1] * mottle, DRY_GRASS[1], crown )
+                b = _mix( ROAD[2] * mottle, DRY_GRASS[2], crown )
+                _lay( ground, kinds, micro, over, alpha, shade, row, col, r, g, b, a, SOIL, 0.8 )
+            weight[row, col] = max( weight[row, col], a + 0.5 * verge )
+
+
+@numba.njit( cache=True, fastmath=True )
+def _building_shadows( boxes, e0, n0, we, wn, w, top, shadow ):
+    """ Where each building keeps the sun off: a ray from each texel's surface towards the sun, against the building
+    as a box up to halfway up its roof, box-filtered over the texel at its sides and its tip. boxes: the four corners'
+    e and n, the base, the eaves and the ridge. """
+    rows, cols = top.shape
+    se, sn = SUN_PLAN[0], SUN_PLAN[1]
+    rise = V.SUN[2] / math.hypot( V.SUN[0], V.SUN[1] )     # the ray's climb along the ground
+    pe, pn = -sn, se                                        # across the rays
+    ce = np.empty( 5 )
+    cn = np.empty( 5 )
+    for b in range( boxes.shape[0] ):
+        height = boxes[b, 9] + 0.5 * ( boxes[b, 10] - boxes[b, 9] )
+        area = 0.0
+        for i in range( 4 ):
+            ce[i], cn[i] = boxes[b, 2 * i], boxes[b, 2 * i + 1]
+        ce[4], cn[4] = ce[0], cn[0]
+        for i in range( 4 ):
+            area += ce[i] * cn[i + 1] - ce[i + 1] * cn[i]
+        turn = 1.0 if area > 0.0 else -1.0         # the outward normals' side
+        lo, hi = 1e30, -1e30
+        emin, emax, nmin, nmax = 1e30, -1e30, 1e30, -1e30
+        for i in range( 4 ):
+            p = ce[i] * pe + cn[i] * pn
+            lo, hi = min( lo, p ), max( hi, p )
+            emin, emax = min( emin, ce[i] ), max( emax, ce[i] )
+            nmin, nmax = min( nmin, cn[i] ), max( nmax, cn[i] )
+        reach = 1.5 * ( height - boxes[b, 8] ) / rise + 2.0 * w
+        c0 = max( int( ( min( emin, emin - se * reach ) - w - e0 ) / we ), 0 )
+        c1 = min( int( ( max( emax, emax - se * reach ) + w - e0 ) / we ) + 1, cols - 1 )
+        r0 = max( int( ( n0 - max( nmax, nmax - sn * reach ) - w ) / wn ), 0 )
+        r1 = min( int( ( n0 - min( nmin, nmin - sn * reach ) + w ) / wn ) + 1, rows - 1 )
+        for row in range( r0, r1 + 1 ):
+            n = n0 - row * wn
+            for col in range( c0, c1 + 1 ):
+                e = e0 + col * we
+                z = top[row, col]
+                if z >= height + rise * w:
+                    continue
+                # Across the rays: the share of the texel the building's silhouette covers, and the ray through it.
+                p = e * pe + n * pn
+                side = max( min( p + 0.5 * w, hi ) - max( p - 0.5 * w, lo ), 0.0 ) / w
+                if side <= 0.0:
+                    continue
+                shift = min( max( p, lo + 1e-3 ), hi - 1e-3 ) - p
+                re, rn = e + pe * shift, n + pn * shift
+                s_in, s_out = 0.0, 1e30
+                miss = False
+                for i in range( 4 ):
+                    xe, xn = turn * ( cn[i + 1] - cn[i] ), -turn * ( ce[i + 1] - ce[i] )
+                    num = xe * ( re - ce[i] ) + xn * ( rn - cn[i] )
+                    den = xe * se + xn * sn
+                    if abs( den ) < 1e-12:
+                        if num > 0.0:
+                            miss = True
+                        continue
+                    t = -num / den
+                    if den < 0.0:
+                        s_in = max( s_in, t )
+                    else:
+                        s_out = min( s_out, t )
+                if miss or s_out <= s_in:
+                    continue
+                tip = min( max( ( height - z - s_in * rise ) / ( rise * w ) + 0.5, 0.0 ), 1.0 )
+                val = tip * side
+                if val > shadow[row, col]:
+                    shadow[row, col] = val
+
+
+def clear_crowns( crowns, es, ns, weight, boxes, prop_crowns ):
+    """ The painter's own crowns, less those on the props' yards and roads, over their buildings, or in their trees. """
+    if not len( crowns ):
+        return crowns
+    we, wn = es[1] - es[0], ns[0] - ns[1]
+    col = np.clip( ( ( crowns[:, 0] - es[0] ) / we ).astype( np.int64 ), 0, len( es ) - 1 )
+    row = np.clip( ( ( ns[0] - crowns[:, 1] ) / wn ).astype( np.int64 ), 0, len( ns ) - 1 )
+    keep = weight[row, col] < 0.3
+    if len( boxes ):
+        corners = boxes[:, :8].reshape( -1, 4, 2 )
+        middle = corners.mean( 1 )
+        reach = np.linalg.norm( corners - middle[:, None], axis=2 ).max( 1 )
+        tree = cKDTree( middle )
+        far = crowns[:, 3].max() + reach.max()
+        near = np.flatnonzero( keep & np.isfinite( tree.query( crowns[:, :2], distance_upper_bound=far )[0] ) )
+        for i in near:
+            for j in tree.query_ball_point( crowns[i, :2], crowns[i, 3] + reach.max() ):
+                if _quad_distance( crowns[i, :2], corners[j] ) < crowns[i, 3]:
+                    keep[i] = False
+                    break
+    if len( prop_crowns ):
+        d, j = cKDTree( prop_crowns[:, :2] ).query( crowns[:, :2] )
+        keep &= d >= 0.8 * ( crowns[:, 3] + prop_crowns[j, 3] )
+    return crowns[keep]
+
+
+def _quad_distance( p, quad ):
+    """ How far plan point p is from a convex quad (0 inside it). """
+    inside = True
+    best = np.inf
+    area = sum( quad[i, 0] * quad[( i + 1 ) % 4, 1] - quad[( i + 1 ) % 4, 0] * quad[i, 1] for i in range( 4 ) )
+    for i in range( 4 ):
+        a, b = quad[i], quad[( i + 1 ) % 4]
+        ab = b - a
+        if ( ab[0] * ( p[1] - a[1] ) - ab[1] * ( p[0] - a[0] ) ) * area < 0.0:
+            inside = False
+        t = min( max( float( np.dot( p - a, ab ) / max( np.dot( ab, ab ), 1e-9 ) ), 0.0 ), 1.0 )
+        best = min( best, float( np.linalg.norm( a + ab * t - p ) ) )
+    return 0.0 if inside else best
+
+
+def props_ground( es, ns, w, ground, kind, micro, over, alpha, shade ):
+    """ The props' yards and roads, painted into a zone's ground. Returns how much of each texel they cover. """
+    t0 = time.time()
+    world = props_world()
+    _, _, yards, roads = world.paint_data()
+    we, wn = es[1] - es[0], ns[0] - ns[1]
+    weight = np.zeros( kind.shape, np.float32 )
+    for yard_kind, outline in yards:
+        outline = np.ascontiguousarray( outline, float )
+        k = world.k_at( *outline.mean( 0 ) )
+        _yard( outline, int( yard_kind ), k, es[0], ns[0], we, wn, w, ground, kind, micro, over, alpha, shade,
+               weight, V._GRADIENTS )
+    for half, line in roads:
+        line = np.ascontiguousarray( line, float )
+        ks = np.array( [ world.k_at( e, n ) for e, n in line ] )
+        _road( line, ks, half, es[0], ns[0], we, wn, w, ground, kind, micro, over, alpha, shade, weight, V._GRADIENTS )
+    print( f"  {len( yards )} yards and {len( roads )} roads in {time.time() - t0:.1f} s" )
+    return weight
+
+
+# ---------------------------------------------------------------------------------------------------------------------
 # A zone, start to finish
 
 def zone_grid( margin, size ):
@@ -1103,8 +1412,9 @@ def zone_grid( margin, size ):
     return es, ns
 
 
-def paint_zone( zone, margin, inner, size ):
-    """ A zone's colour (sRGB, H x W x 3), kind (0..3) and normal map (half size, plan normals). """
+def paint_zone( zone, margin, inner, size, props=True ):
+    """ A zone's colour (sRGB, H x W x 3), kind (0..3) and normal map (half size, plan normals). With props, what
+    belltower_vista_props' buildings and trees do to the ground. """
     t0 = time.time()
     es, ns = zone_grid( margin, size )
     we, wn = es[1] - es[0], ns[0] - ns[1]
@@ -1125,9 +1435,14 @@ def paint_zone( zone, margin, inner, size ):
     shade = np.ones( ( size, size ), np.float32 )
     _paint( es, ns, Z, GX, GY, w, V._GRADIENTS, ground, kind, micro, over, alpha, shade )
     print( f"  ground in {time.time() - t1:.1f} s" )
+    if props:
+        boxes, prop_crowns, _, _ = props_world().paint_data()
+        covered = props_ground( es, ns, w, ground, kind, micro, over, alpha, shade )
 
     t2 = time.time()
     crowns = crowns_for( zone, margin, es, ns, Z, w, inner )
+    if props:
+        crowns = np.concatenate( ( clear_crowns( crowns, es, ns, covered, boxes, prop_crowns ), prop_crowns ) )
     top = Z.copy()
     ccol = np.zeros( ( size, size, 3 ) )
     cov = np.zeros( ( size, size ) )
@@ -1135,6 +1450,8 @@ def paint_zone( zone, margin, inner, size ):
     _tops( crowns, es[0], ns[0], we, wn, w, top, ccol, cov, cid, V._GRADIENTS )
     shadow = np.zeros( ( size, size ) )
     _shadows( crowns, es[0], ns[0], we, wn, w, top, cid, shadow )
+    if props:
+        _building_shadows( np.ascontiguousarray( boxes ), es[0], ns[0], we, wn, w, top, shadow )
     print( f"  {len( crowns )} crowns drawn in {time.time() - t2:.1f} s" )
 
     # The ground in the shade of the trees too small to draw, their mean canopy over it, the drawn trees over that, and
@@ -1274,10 +1591,11 @@ class _RawLook:
         return self.look.sky_colour( eye, rays ) if self.sky else np.full( rays.shape, np.nan )
 
 
-def preview( out_dir, tex_dir, views ):
+def preview( out_dir, tex_dir, views, props=True ):
     """ The town's views of the land with its painted colour maps: render_view's raw passes give each pixel's place,
     normal and the town's colour, then each land pixel takes its zones' texels, lit and fogged by belltower_vista's
-    Look. """
+    Look. With props, the buildings and trees of Tools/belltower_vista_props.py stand on it, textured the same way
+    from their own maps (built afresh, so they needn't have been written). """
     import belltower_map as BM
     out_dir.mkdir( parents=True, exist_ok=True )
     look = V.Look()
@@ -1291,17 +1609,46 @@ def preview( out_dir, tex_dir, views ):
     maps = { zone: np.asarray( Image.open( tex_dir / f"vista_{zone}_color.jpg" ).convert( "RGB" ) ) for zone, _ in ZONES }
     reach = max( V.TE1 - V.CENTRE[0], V.CENTRE[0] - V.TE0, V.TN1 - V.CENTRE[1], V.CENTRE[1] - V.TN0 )
     flat, sky = _RawLook( look ), _RawLook( look, sky=True )
+    land_tris = verts[tris]
+    land_mark = np.full( ( len( tris ), 3, 3 ), -1.0 )
+    if props:
+        world = props_world()
+        prop_tris, prop_normals, prop_uvm = world.mesh.preview_triangles()
+        prop_maps = world.preview_textures()
+        prop_mark = np.full( prop_tris.shape, -2.0 )
+
+    def scene( land_values, town_values, prop_values ):
+        out = [ ( land_tris, land_values ), ( town, town_values ) ]
+        if props:
+            out.append( ( prop_tris, prop_values ) )
+        return out
+
     for name, eye, target, fov in V.PREVIEW_VIEWS:
         if views and name not in views:
             continue
-        place = V.render_view( flat, [ ( verts[tris], verts[tris] ), ( town, town ) ], eye, target, fov=fov, raw=True )
-        up = V.render_view( flat, [ ( verts[tris], normals[tris] ), ( town, town_up ) ], eye, target, fov=fov, raw=True )
-        land_mark = np.full( ( len( tris ), 3, 3 ), -1.0 )
-        colour = V.render_view( flat, [ ( verts[tris], land_mark ), ( town, town_colours ) ], eye, target, fov=fov,
-                                raw=True )
+        place = V.render_view( flat, scene( land_tris, town, prop_tris if props else None ), eye, target, fov=fov,
+                               raw=True )
+        up = V.render_view( flat, scene( normals[tris], town_up, prop_normals if props else None ), eye, target,
+                            fov=fov, raw=True )
+        colour = V.render_view( flat, scene( land_mark, town_colours, prop_mark if props else None ), eye, target,
+                                fov=fov, raw=True )
         image = V.render_view( sky, [], eye, target, fov=fov, raw=True )
         hit = ~np.isnan( place[..., 0] )
-        land = hit & ( colour[..., 0] < -0.5 )
+        land = hit & ( colour[..., 0] < -0.5 ) & ( colour[..., 0] > -1.5 )
+        if props:
+            # The props' pixels: their maps' texels at the UVs a further pass gives, lit by their normals.
+            uvm = V.render_view( flat, scene( np.zeros_like( land_tris ), np.zeros_like( town ), prop_uvm ), eye,
+                                 target, fov=fov, raw=True )
+            mine = hit & ( colour[..., 0] < -1.5 )
+            u, v, m = uvm[mine, 0], uvm[mine, 1], np.rint( uvm[mine, 2] ).astype( int )
+            texel = np.zeros( ( len( u ), 3 ) )
+            for k, tex in enumerate( prop_maps ):
+                sel = m == k
+                size = tex.shape[0]
+                texel[sel] = tex[np.floor( ( 1.0 - v[sel] ) * size ).astype( int ) % size,
+                                 np.floor( u[sel] * size ).astype( int ) % size]
+            n = up[mine] / np.maximum( np.linalg.norm( up[mine], axis=1, keepdims=True ), 1e-6 )
+            colour[mine] = look.light( texel, n )
         p = place[land]
         out = V.town_distance( p[:, 0], p[:, 1] )
         texel = np.zeros_like( p )
@@ -1330,6 +1677,8 @@ def main():
     parser.add_argument( "--sheet", type=Path )
     parser.add_argument( "--preview", type=Path )
     parser.add_argument( "--views", nargs="*" )
+    parser.add_argument( "--no-props", action="store_true",
+                         help="leave the vista's buildings and trees out: their ground, their shadows and --preview" )
     args = parser.parse_args()
     if args.zones is None:
         args.zones = "" if args.preview else "abcd"
@@ -1337,7 +1686,7 @@ def main():
     inner = 0.0
     for zone, margin in ZONES:
         if zone in args.zones:
-            colour, kind, normal = paint_zone( zone, margin, inner, args.size )
+            colour, kind, normal = paint_zone( zone, margin, inner, args.size, props=not args.no_props )
             write_zone( args.out, zone, colour, kind, normal )
         inner = margin * ( 1.0 - ZONE_BLEND )
     write_details( args.out )
@@ -1348,7 +1697,7 @@ def main():
     if args.sheet:
         write_sheet( args.out, args.sheet )
     if args.preview:
-        preview( args.preview, args.out, args.views )
+        preview( args.preview, args.out, args.views, props=not args.no_props )
 
 
 if __name__ == "__main__":
