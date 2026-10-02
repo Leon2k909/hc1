@@ -428,7 +428,7 @@ public static partial class GameUtils
 		return Team.Unassigned;
 	}
 
-	private static readonly string[] MainMenuMapOrder = { "Refinery", "Flatgrass", "Depot", "Innocent Hotel", "Belltower", "Aesthetic Mall" };
+	private static readonly string[] MainMenuMapOrder = { "Refinery", "Flatgrass", "Depot", "Innocent Hotel", "Belltower", "Reef Hall", "Aesthetic Mall" };
 
 	/// <summary>Maps currently excluded from quick play / lobby selection (work in progress).</summary>
 	private static readonly HashSet<string> DisabledMaps = new( StringComparer.OrdinalIgnoreCase )
@@ -457,7 +457,8 @@ public static partial class GameUtils
 			|| path.Contains( "scenes/maps/flatgrass/flatgrass.scene", StringComparison.OrdinalIgnoreCase )
 			|| path.Contains( "scenes/maps/depot/depot.scene", StringComparison.OrdinalIgnoreCase )
 			|| path.Contains( "scenes/maps/innocenthotel/innocent_hotel.scene", StringComparison.OrdinalIgnoreCase )
-			|| path.Contains( "scenes/maps/belltower/belltower.scene", StringComparison.OrdinalIgnoreCase );
+			|| path.Contains( "scenes/maps/belltower/belltower.scene", StringComparison.OrdinalIgnoreCase )
+			|| path.Contains( "scenes/maps/reefhall/reefhall.scene", StringComparison.OrdinalIgnoreCase );
 	}
 
 	/// <summary>
@@ -470,7 +471,8 @@ public static partial class GameUtils
 		var path = map?.ResourcePath ?? "";
 		return path.Contains( "scenes/maps/flatgrass/flatgrass.scene", StringComparison.OrdinalIgnoreCase )
 			|| path.Contains( "scenes/maps/innocenthotel/innocent_hotel.scene", StringComparison.OrdinalIgnoreCase )
-			|| path.Contains( "scenes/maps/belltower/belltower.scene", StringComparison.OrdinalIgnoreCase );
+			|| path.Contains( "scenes/maps/belltower/belltower.scene", StringComparison.OrdinalIgnoreCase )
+			|| path.Contains( "scenes/maps/reefhall/reefhall.scene", StringComparison.OrdinalIgnoreCase );
 	}
 
 	private static int GetMainMenuMapOrder( SceneFile map )

@@ -1519,8 +1519,8 @@
 - Headshots go by the driver's head bone height (bullets stop on the capsule), not the renderer bounds.
 
 ## Maps
-- Match maps (map picker, Quick Play, end-of-match vote) are `GameUtils.IsMatchReadyMap`: Flatgrass, Innocent Hotel and
-  Belltower (see Belltower below).
+- Match maps (map picker, Quick Play, end-of-match vote) are `GameUtils.IsMatchReadyMap`: Flatgrass, Innocent Hotel,
+  Belltower and Reef Hall (see their sections below).
 - The hub (`HubPage`) is one featured screen for the tab picked on its left rail (`HubModeRail`, `HubPage.Operation`:
   Multiplayer, Battle Royale or Zombies; Campaign is locked), like the user's CoD-style mockup. Its art is
   `ui/modes/<mode>_wide.png`, a 1024x720 cut of the 2:3 card art. Battle Royale has no wide cut or blurred backdrop, so
@@ -1790,6 +1790,103 @@ simulate_input.
   guns). Close bots are untouched.
 - A big map's navmesh can still be building after the scene loads, so the first circle, the bots' drop-in and the zone's
   start all wait for `Scene.NavMesh.IsGenerating` to clear (`EnsureFirstCircle`, `SpawnSomeBots`, `StartZone`).
+
+## Reef Hall (multiplayer map, `Tools/reefhall_map.py`)
+- The user asked for an aquarium map for 10-15 players, built as close to 1:1 as possible from five reference pictures
+  (2026-10-01): the rotunda round its central tank, the entrance lobby, the control room behind the big panoramic tank,
+  the filter hall and the glass tunnel. No rooms beyond those, except connectors in the same style. The look is modern
+  concrete, dark metal, glass, blue tank light and warm downlights: no neon, nothing military.
+- Built by script like Belltower (`Tools/map_kit.py`). The script's docstring has the layout and conventions. It writes:
+  - one model per room, plus the tanks' insides with no collision, to `Assets/models/maps/reefhall/`;
+  - the scene, `Assets/scenes/maps/ReefHall/reefhall.scene`, rewritten whole on every run (change the layout in the
+    script, not in the editor);
+  - the radar picture, `ui/minimaps/minimap_reefhall.png`.
+  The materials are `Tools/reefhall_materials.py`'s (`Assets/materials/reefhall/`, drawn with numpy).
+- Layout: Red Team spawns in the lobby (west), Blue Team in the control room (east). Three lanes join them:
+  - Middle: the West and East Galleries, lined with small tanks, into the Rotunda. The Rotunda's ring balcony (z 208)
+    is reached by two curved stairs and by the upper galleries.
+  - North: the Filter Hall, with its two glass filter columns, the catwalk and the mezzanine. Bomb site A is its east
+    half.
+  - South: the Tunnel Hall, a glass barrel vault under a tank, with a sunken aisle (z -40). Bomb site B is its east
+    half.
+  - Between: the Rotunda's north and south passages, and four service corridors.
+- Modes: the scene lists TDM and Defuse. Domination's flags are A (west), B (Rotunda) and C (east). Its Hot Zones and
+  Cash Grab points are the halls (`ObjectiveSpot`). It also has deathmatch spawns (28) and Retakes spawns per site.
+- Every run checks all 89 spawn, objective and cash spots (room, floor, a walk from both spawns), as Belltower's does.
+- Tank glass: `shaders/hc1_tank_glass.shader`, one material per tank (`rh_tank_glass_<tank>.vmat`, with the tank's
+  surface height and depth). It reads the depth behind the pane and puts the water in between:
+  - Beer-Lambert absorption by the water path, and the water's own scattered light;
+  - moving caustics and light shafts;
+  - a little refraction, a glass reflection, and acrylic's green at a glancing angle.
+  The panes are 8 thick with the `glass` surface: they stop bullets and players, and bots can't see through them.
+  Railings' glass panels are 1 thick, so rounds go through.
+  - It finds what's behind the pane with `Depth::GetWorldPosition( screen pixel )`, which returns the absolute world
+    position. It used to invert the normalised depth itself, which read every pixel as far away, so from a few metres
+    off every tank looked solid blue (fixed 2026-10-02).
+  - Absorption is kept low (`g_vWaterAbsorb` 0.006/0.0012/0.0006 per inch, turbidity 0.0006): the references' water is
+    clear right to the tanks' backs.
+- The reef in each tank is the script's own (`rock`, `rock_arch`, `CORAL_KINDS`, `kelp`, `sea_grass`): the big tanks
+  get a rock arch, as the references' do. The tanks' insides come to about 1 million triangles in all.
+- Light: each tank's lamps (`COOL`) are over its water, and a window 120 or more wide also throws its blue into the room
+  (`SPILL`, a light on the room side). Every wall light (`sconce`) has a small unshadowed warm light just off it
+  (`SCONCE`, radius 130), so it washes its wall as in the references. `build_mirrored` collects them.
+- `hc1_reefhall_views [filter] [exposure]` (`Editor/Hc1ReefHallQa.cs`) renders the views to compare with the
+  references into `output/reefhall/`, and `hc1_reefhall_shot name e n z e n z [fov]` one view, eye and target in plan.
+  Offscreen renders skip post-processing and screen-space reflections, so the floor's gloss doesn't show in them.
+  Run in play mode, they render the play scene, with its bots and the floors' gloss.
+- Each room against its reference (2026-10-02):
+  - Control room: the panorama is four panes between 64-wide concrete pillars, with a concrete lintel over them. The
+    ceiling has a coffer with a warm cove and downlights round it, and the consoles are steel.
+  - Filter Hall: each column stands on a concrete base under a steel cap with gunmetal bands, and a pipe rises from
+    it to the ceiling. Concrete pilasters with wall lights stand on the south wall between the doors. Downlight lines
+    run over the floor and the catwalk.
+  - Rotunda: six steel columns stand round the drum, and its lid is a dark disc (`lamp_lid`; `ring=True` adds the old
+    white LED ring, which glared). The ceiling's cove round the drum is `rh_frosted_lit`: `rh_led_cool` glared white.
+  - Lobby: the frosted doors are `rh_frosted_lit`, a dimmer self-lit glass than `rh_led_warm`, which burnt out white.
+    The coral display's corals sit on the mound's surface and round its foot.
+- `map_kit.write_text` retries the final rename for up to 10 s: the editor or OneDrive can hold a file being replaced.
+- Doorways have no doors, since bots can't open doors.
+- `map_kit.write_obj` now reads `tile_overrides` before `BT.tile_units`. Before, `dict.get`'s default called
+  `tile_units` even for an overridden paint, which fails for paints `building_textures` doesn't know.
+- Never let the editor compile a vmdl whose OBJ has no faces: it hangs for good, with one thread at 100% and nothing
+  logged. The service rooms have no tanks, so `reefhall_service_tanks` was an empty OBJ.
+  - On 2026-10-01 it froze the editor until Windows killed it.
+  - On 2026-10-02 it froze every editor start, at the startup asset compile.
+  - Now `map_kit.write_model` writes no empty model and deletes any old one (`is_empty`, `delete_model`), and
+    `write_scene` leaves out a room's Tanks object when it has none.
+
+### Reef Hall's animals (`TankFauna`, `hc1_fish.shader`, `Tools/reefhall_fauna.py`)
+- Grey reef sharks, manta rays, and schools of yellow tangs and blue-green chromis. They're scenery: each machine runs
+  its own, nothing is networked, and nothing runs on a dedicated server.
+- `Tools/reefhall_fauna.py` builds the four animals (lofted bodies and fins, painted with numpy) into
+  `Assets/models/maps/reefhall/fauna/`. `--preview <dir>` renders them from the side, the top and below.
+- `shaders/hc1_fish.shader` swims them in the vertex shader. A fish has a wave from head to tail that grows towards
+  the tail. A ray flaps its wings, the wave running back from the leading edge. Each animal's scale (0.85-1.15) sets
+  its phase, so a school doesn't beat in step.
+- `Code/Maps/TankFauna.cs` (one per tank's water) moves them:
+  - The water is a box or an upright cylinder, less a glass tube (the tunnel) and the tank's rocks, coral and kelp
+    (`Obstacles`: cones, which kelp's negative taper widens upwards).
+  - Each kind keeps a reach clear of all of it, so no nose, fin or wingtip goes into glass or rock. A move that would
+    end deeper in than it started is taken back.
+  - Sharks, rays and each school's leader cruise to points they can swim to in a straight line. When the water ahead
+    is blocked, they look round a fan of 72 ways for the open one nearest where they're going, and turn into it hard
+    and slowed down. School fish keep their places beside the leader, loosely.
+  - Past `FarDistance` from the camera it updates 4 times a second, and the small fish aren't drawn.
+- `reefhall_map.py` puts the water, the obstacles and the counts on each tank (`fauna_volumes`). A kind goes only into
+  a tank with enough free water for it (`FAUNA_ROOM`, `free_share`). The scene has 8 sharks, 3 rays and 725 small fish.
+- Checked offline only: a Python copy of the steering ran every tank for 120 s with three seeds. No animal overlapped
+  its limits by more than 0.05, and sharks and rays kept 85-95% of their cruising speed (the Rotunda's shark 60-80%).
+  The C# compiled with dotnet.
+- Checked in the editor on 2026-10-02:
+  - The navmesh is baked (`reefhall_scene_data/navmesh/baked.navdata`). `get_navmesh_path` reaches all 88 spawn,
+    objective and cash spots from both team spawns, and every level: the Rotunda's, lobby's and control room's
+    balconies, the office, the Filter Hall's catwalk and mezzanine, the tunnel's aisle and the upper galleries.
+  - A TDM with 9-10 bots of every play style: they fought across the map, and the frame took 9.65 ms (p50).
+  - Renders of every view against the references, in and out of play mode.
+- The menu picture (`ui/maps/reefhall.png`) is an editor capture of the Rotunda from its balcony
+  (`hc1_reefhall_shot art 700 -300 272 -300 300 260 90`).
+- Not yet checked: the animals in a match, sightlines with players, and the cost of the 394 lights and the tanks'
+  ~1.1 million triangles on a slower machine.
 
 ## Ridgeback (battle royale map, `Assets/scenes/maps/Ridgeback/`)
 - The second battle royale map, a base to build on: a valley about 1.2 km across in a ring of mountains, on an s&box

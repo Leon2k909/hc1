@@ -15,6 +15,7 @@ OBJ as ( y, z, x ).
 """
 import json
 import math
+import time
 import uuid
 import zlib
 from collections import defaultdict
@@ -491,7 +492,7 @@ def write_obj( path, model, name ):
                 edges = [world[(i+1)%len(world)]-p for i,p in enumerate(world)]
                 along = normalise(max(edges, key=lambda e: np.linalg.norm(e)))
                 across = np.cross(wn, along)
-                tile = model.tile_overrides.get(paint, BT.tile_units(paint))
+                tile = model.tile_overrides[paint] if paint in model.tile_overrides else BT.tile_units(paint)
                 coords = [(float(np.dot(wp,across)/tile+offset[0]), float(np.dot(wp,along)/tile+offset[1])) for wp in world]
             coords = model.polygon_uvs.get((paint,index), coords)
             if decal:
@@ -659,13 +660,41 @@ def write_text( path, text, newline="\n" ):
     changed file straight away, never reads it half-written. """
     temp = path.with_name( f"{path.name}.writing" )
     temp.write_text( text, encoding="utf-8", newline=newline )
-    temp.replace( path )
+    # The editor (or OneDrive) can hold the old file open for a moment while it reads it: try again a few times.
+    for attempt in range( 20 ):
+        try:
+            temp.replace( path )
+            return
+        except PermissionError:
+            if attempt == 19:
+                raise
+            time.sleep( 0.5 )
+
+
+def is_empty( model ):
+    return not model.polygons and not model.boxes and not model.hulls
+
+
+def delete_model( out_dir, name ):
+    """ Deletes <name>'s vmdl, OBJs and their compiled files and .meta, the vmdl first. """
+    paths = [ out_dir / f"{name}.vmdl", out_dir / f"{name}.obj", out_dir / f"{name}.mtl",
+              *out_dir.glob( f"{name}_hulls_*.obj" ) ]
+    for path in paths:
+        for file in ( path, path.with_name( f"{path.name}_c" ), path.with_name( f"{path.name}.meta" ) ):
+            file.unlink( missing_ok=True )
 
 
 def write_model( out_dir, resource_dir, name, model ):
     """ <name>.obj/.mtl, its hulls' OBJs and <name>.vmdl, then deletes the hull OBJs the model no longer uses. They
     aren't deleted first: the editor compiled the old vmdl the moment they went, and failed to find them. Returns the
-    triangle count. """
+    triangle count.
+
+    An empty model isn't written, and any old files of its are deleted: the editor hung for good (2026-10-01/02, one
+    thread at 100%, the editor and its startup) compiling a vmdl whose OBJ had no faces (Reef Hall's service tanks).
+    So check `is_empty` before putting a model in a scene. """
+    if is_empty( model ):
+        delete_model( out_dir, name )
+        return 0
     out_dir.mkdir( parents=True, exist_ok=True )
     old_hulls = set( out_dir.glob( f"{name}_hulls_*.obj" ) )
     triangles = write_obj( out_dir / f"{name}.obj", model, name )
