@@ -1423,12 +1423,49 @@ def cart( model, centre, yaw, z=0.0, load="sacks" ):
         crate( model, p.at( ( 22, 2, 0 ) ), 32, yaw - 7, z + 32 )
 
 
+def crate_counter( model, p, w, d, top ):
+    """ A stall's counter as market traders build one: two tiers of slatted crates on a pallet, under a board top, from
+    -w to w along local x, -d to d along y and up to top. Drawn only: the stall's own box is the cover. """
+    pallet = 6.0
+    p.box( model, ( -w + 1, -d + 1, pallet ), ( w - 1, d - 1, top - 1 ), "planks_dark" )
+    p.box( model, ( -w, -d, pallet - 1.5 ), ( w, d, pallet ), "planks" )
+    for x in ( -w + 4, 0.0, w - 4 ):
+        p.box( model, ( x - 4, -d, 0 ), ( x + 4, d, pallet - 1.5 ), "planks_dark" )
+    p.box( model, ( -w - 1, -d - 1, top - 1 ), ( w + 1, d + 1, top ), "planks" )
+    tier = ( top - 1 - pallet ) / 2
+
+    def crates_along( axis, side, half, count ):
+        """ count crates' ends across a face: axis 0 faces local x, 1 faces y; side -1 or 1; half the face's half-length. """
+        span = 2 * half / count
+        for row in range( 2 ):
+            z0 = pallet + row * tier
+            for k in range( count ):
+                a0, a1 = -half + k * span + 0.6, -half + ( k + 1 ) * span - 0.6
+                for b in range( 3 ):
+                    za, zb = z0 + 0.5 + b * ( tier - 1 ) / 3 + 0.35, z0 + 0.5 + ( b + 1 ) * ( tier - 1 ) / 3 - 0.35
+                    out = ( w if axis == 0 else d ) * side
+                    lo, hi = [ 0.0, 0.0, za ], [ 0.0, 0.0, zb ]
+                    lo[axis], hi[axis] = out - side * 1.0, out
+                    lo[1 - axis], hi[1 - axis] = a0 + 1.6, a1 - 1.6
+                    p.box( model, np.minimum( lo, hi ), np.maximum( lo, hi ), "planks" )
+                for a in ( a0, a1 - 1.6 ):
+                    lo, hi = [ 0.0, 0.0, z0 + 0.4 ], [ 0.0, 0.0, z0 + tier - 0.4 ]
+                    lo[axis], hi[axis] = out - side * 1.0, out + side * 0.4
+                    lo[1 - axis], hi[1 - axis] = a, a + 1.6
+                    p.box( model, np.minimum( lo, hi ), np.maximum( lo, hi ), "planks_dark" )
+
+    for side in ( -1, 1 ):
+        crates_along( 1, side, w, 4 )
+        crates_along( 0, side, d, 2 )
+
+
 def stall( model, centre, yaw, canvas, rng, width=120.0, depth=64.0 ):
-    """ A market stall, its front along local +y: a counter with four crates of produce, four posts and a canvas
-    roof. """
+    """ A market stall, its front along local +y: a counter of crates with four crates of produce on it, four posts
+    and a canvas roof. """
     p = Place( ( centre[0], centre[1], 0 ), yaw )
     w, d = width / 2, depth / 2
-    p.box( model, ( -w, -d, 0 ), ( w, d, 32 ), { "+z": "planks", "default": "planks_dark" }, WOOD )
+    p.box( model, ( -w, -d, 0 ), ( w, d, 32 ), None, WOOD )
+    crate_counter( model, p, w, d, 32.0 )
     # The draws the stall's goods always took, so everything placed after it stays where it was.
     goods = np.random.default_rng( [ int( rng.integers( 0, 5 ) ) * 1000 + int( rng.integers( 0, 1000 ) ) for _ in range( 4 ) ] )
     kinds = list( goods.permutation( list( Detail.PRODUCE ) ) )
