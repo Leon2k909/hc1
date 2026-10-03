@@ -250,6 +250,12 @@ public static partial class GameText
 			"Austriacki karabin bullpup kalibru 5,56x45 mm: 16-calowa lufa ze składanym chwytem przednim i magazynek za chwytem pistoletowym.",
 		["Belgian 7.62x51mm battle rifle: heavy and hard-kicking, with a 21-inch barrel and a 20-round magazine."] =
 			"Belgijski karabin bojowy kalibru 7,62x51 mm: ciężki i o silnym odrzucie, z 21-calową lufą i 20-nabojowym magazynkiem.",
+		["French 5.56x45mm bullpup rifle with a 25-round magazine, a fixed carry handle and selectable automatic, three-round burst and semi-automatic fire."] =
+			"Francuski karabin bullpup kalibru 5,56x45 mm z 25-nabojowym magazynkiem, stałym chwytem transportowym i przełącznikiem ognia: ciągły, seria trzystrzałowa i pojedynczy.",
+		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
+			"Amerykański pistolet służbowy kalibru 9x19 mm: kompaktowy P320 armii USA, z lufą 3,9 cala i 17-nabojowym magazynkiem.",
+		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =
+			"Amerykański karabinek z krótką lufą kalibru 5,56x45 mm: broń z tłokiem gazowym o krótkim skoku, 11,5-calową lufą i składaną kolbą.",
 		["Russian 5.45x39mm carbine: the AK-74M cut down to a 314 mm barrel, with a side-folding stock."] =
 			"Rosyjski karabinek 5,45x39 mm: AK-74M skrócony do lufy 314 mm, ze składaną na bok kolbą.",
 		["Russian 9x18mm submachine gun built on the AKS-74. Straight blowback, fed from a 64-round helical magazine under the barrel."] =

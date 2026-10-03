@@ -1,0 +1,51 @@
+{
+  "materials": {
+    "weapon_vm_ar_mcharlie_lower": "weapons/mcx/materials/mcx_lower.vmat",
+    "weapon_vm_ar_mcharlie_upper": "weapons/mcx/materials/mcx_upper.vmat",
+    "weapon_vm_ar_mcharlie_sights": "weapons/mcx/materials/mcx_sights.vmat",
+    "weapon_vm_ar_mcharlie_barrel": "weapons/mcx/materials/mcx_barrel.vmat",
+    "attachment_vm_muzzledefault01": "weapons/mcx/materials/mcx_flash_hider.vmat",
+    "weapon_vm_ar_mcharlie_mag": "weapons/mcx/materials/mcx_mag.vmat",
+    "weapon_vm_ar_mcharlie_mag_interior": "weapons/mcx/materials/mcx_mag_interior.vmat",
+    "weapon_vm_ar_mcharlie_mag_trans": "weapons/mcx/materials/mcx_mag_window.vmat",
+    "weapon_vm_ar_mcharlie_stock": "weapons/mcx/materials/mcx_stock.vmat",
+    "weapon_vm_ar_mcharlie_stock_lw": "weapons/mcx/materials/mcx_thin_stock.vmat",
+    "weapon_vm_ar_mcharlie_stock_hinge": "weapons/mcx/materials/mcx_thin_stock_hinge.vmat"
+  },
+  "sounds": {
+    "fire": "weapons/mcx/sounds/mcx.fire.sound",
+    "fire_suppressed": "weapons/mcx/sounds/mcx.fire_suppressed.sound",
+    "raise": "weapons/mcx/sounds/mcx.raise.sound",
+    "drop": "weapons/mcx/sounds/mcx.drop.sound",
+    "reload_rotate": "weapons/mcx/sounds/mcx.reload_rotate.sound",
+    "reload_magout_01": "weapons/mcx/sounds/mcx.reload_magout_01.sound",
+    "reload_magin_v2_01": "weapons/mcx/sounds/mcx.reload_magin_v2_01.sound",
+    "reload_end": "weapons/mcx/sounds/mcx.reload_end.sound",
+    "reload_magin_v2_02": "weapons/mcx/sounds/mcx.reload_magin_v2_02.sound",
+    "reload_empty_rotate": "weapons/mcx/sounds/mcx.reload_empty_rotate.sound",
+    "reload_empty_mvmnt": "weapons/mcx/sounds/mcx.reload_empty_mvmnt.sound",
+    "reload_empty_magout_01": "weapons/mcx/sounds/mcx.reload_empty_magout_01.sound",
+    "reload_empty_magin_v2_01": "weapons/mcx/sounds/mcx.reload_empty_magin_v2_01.sound",
+    "reload_empty_magin_v2_02": "weapons/mcx/sounds/mcx.reload_empty_magin_v2_02.sound",
+    "reload_empty_bolt_release": "weapons/mcx/sounds/mcx.reload_empty_bolt_release.sound",
+    "reload_empty_end": "weapons/mcx/sounds/mcx.reload_empty_end.sound"
+  },
+  "reloads": {
+    "reload": {
+      "0.067": "weapons/mcx/sounds/mcx.reload_rotate.sound",
+      "0.3": "weapons/mcx/sounds/mcx.reload_magout_01.sound",
+      "1.1": "weapons/mcx/sounds/mcx.reload_magin_v2_01.sound",
+      "1.11": "weapons/mcx/sounds/mcx.reload_end.sound",
+      "1.333": "weapons/mcx/sounds/mcx.reload_magin_v2_02.sound"
+    },
+    "reload_empty": {
+      "0.067": "weapons/mcx/sounds/mcx.reload_empty_rotate.sound",
+      "0.533": "weapons/mcx/sounds/mcx.reload_empty_mvmnt.sound",
+      "0.7": "weapons/mcx/sounds/mcx.reload_empty_magout_01.sound",
+      "1.367": "weapons/mcx/sounds/mcx.reload_empty_magin_v2_01.sound",
+      "1.467": "weapons/mcx/sounds/mcx.reload_empty_magin_v2_02.sound",
+      "1.9": "weapons/mcx/sounds/mcx.reload_empty_bolt_release.sound",
+      "1.91": "weapons/mcx/sounds/mcx.reload_empty_end.sound"
+    }
+  }
+}

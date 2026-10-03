@@ -6,7 +6,7 @@ frame, which the animgraph adds on top of its state machine. So are the look swa
 single frame of sway.dmx. The viewmodel also gets the M4's arm IK chains, which the animgraph solves onto the hands'
 IK targets.
 
-Run: python Tools/kastov_vmdl.py [--weapon kastov762|kastov74u|vityaz|rpk|bizon|ak105|vepr12|m16|p90|mp7|aug|uzi|fal|m18]
+Run: python Tools/kastov_vmdl.py [--weapon kastov762|kastov74u|vityaz|rpk|bizon|ak105|vepr12|m16|p90|mp7|aug|uzi|fal|famas|m18|mcx]
 """
 
 from __future__ import annotations

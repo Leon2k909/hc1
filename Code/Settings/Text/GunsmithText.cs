@@ -129,6 +129,21 @@ public static partial class GameText
 			"Belgisches Kampfgewehr im Kaliber 7,62x51 mm: schwer, mit kräftigem Rückstoß, 21-Zoll-Lauf und 20-Schuss-Magazin.",
 			"Fusil de combate belga de 7,62x51 mm: pesado y de fuerte retroceso, con cañón de 21 pulgadas y cargador de 20 cartuchos.",
 			"Fuzil de batalha belga 7,62x51 mm: pesado e de recuo forte, com cano de 21 polegadas e carregador de 20 cartuchos." ),
+		["French 5.56x45mm bullpup rifle with a 25-round magazine, a fixed carry handle and selectable automatic, three-round burst and semi-automatic fire."] = (
+			"Fusil bullpup français en 5,56x45 mm, avec un chargeur de 25 cartouches, une poignée de transport fixe et un tir sélectif automatique, en rafale de trois coups ou semi-automatique.",
+			"Französisches Bullpup-Gewehr im Kaliber 5,56x45 mm mit 25-Schuss-Magazin, festem Tragegriff und wählbarem Dauerfeuer, Drei-Schuss-Feuerstoß und Einzelfeuer.",
+			"Fusil bullpup francés de 5,56x45 mm con cargador de 25 cartuchos, asa de transporte fija y selector de tiro automático, ráfaga de tres disparos y semiautomático.",
+			"Fuzil bullpup francês 5,56x45 mm com carregador de 25 cartuchos, alça de transporte fixa e seletor de tiro automático, rajada de três tiros e semiautomático." ),
+		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] = (
+			"Pistolet réglementaire américain en 9x19 mm : le P320 compact de l'US Army, avec un canon de 3,9 pouces et un chargeur de 17 cartouches.",
+			"Amerikanische Dienstpistole im Kaliber 9x19 mm: die kompakte P320 der US Army, mit 3,9-Zoll-Lauf und 17-Schuss-Magazin.",
+			"Pistola reglamentaria estadounidense de 9x19 mm: la P320 compacta del Ejército de EE. UU., con cañón de 3,9 pulgadas y cargador de 17 cartuchos.",
+			"Pistola de serviço americana 9x19 mm: a P320 compacta do Exército dos EUA, com cano de 3,9 polegadas e carregador de 17 cartuchos." ),
+		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] = (
+			"Fusil à canon court américain en 5,56x45 mm : une arme à piston à course courte, avec un canon de 11,5 pouces et une crosse repliable.",
+			"Amerikanisches Kurzlaufgewehr im Kaliber 5,56x45 mm: ein Gasdrucklader mit Kurzhubkolben, 11,5-Zoll-Lauf und Klappschaft.",
+			"Fusil de cañón corto estadounidense de 5,56x45 mm: un arma de pistón de carrera corta con cañón de 11,5 pulgadas y culata plegable.",
+			"Fuzil de cano curto americano 5,56x45 mm: uma arma de pistão de curso curto, com cano de 11,5 polegadas e coronha dobrável." ),
 		["Russian 5.45x39mm carbine: the AK-74M cut down to a 314 mm barrel, with a side-folding stock."] = (
 			"Carabine russe en 5,45x39 mm : l'AK-74M raccourci à un canon de 314 mm, avec une crosse à pliage latéral.",
 			"Russischer Karabiner im Kaliber 5,45x39 mm: die AK-74M, gekürzt auf einen 314-mm-Lauf, mit seitlich klappbarem Schaft.",

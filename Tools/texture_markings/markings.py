@@ -3,7 +3,7 @@
 A spec is a list of entries:
   {"vmat": "weapons/kastov/materials/x.vmat",
    "regions": [{"rect": [x, y, w, h], "mode": "fill" | "glyphs", "offset": [dx, dy], "k": 11, "pad": 3,
-                "ring": [cx, cy, r0, r1, a0, a1], "note": "serial"}],
+                "ring": [cx, cy, r0, r1, a0, a1], "maps": ["TextureColor", "TextureRoughness"], "note": "serial"}],
    "clear_translucency": false}
 
 Coordinates are colour-map pixels. For each region, the pixels to replace (the mask) are the rect grown by `pad`
@@ -14,7 +14,14 @@ rect can't follow a band between two grooves, or round a primer, without taking 
 They're replaced by the same shape copied from `offset` away (source = target + offset), plus a smooth correction that
 makes the patch meet its surroundings exactly (the difference between target and source around the mask, interpolated
 across it). Without an offset, the one whose surroundings best match the target's is picked among nearby candidates.
-Every map in the vmat gets the same edit, scaled to its size. "clear_translucency" makes a decal material's
+Every map in the vmat gets the same edit, scaled to its size, unless "maps" names the ones to edit: a painted mark is
+only in the colour and roughness maps, so the normal map, which has the surface's relief under the paint, is left as it
+was. Then a groove or an edge the patch's border crosses stays exactly where it was: its relief isn't on the patch's
+source, so in the normal map the correction would smear it across the patch. A region with "keep": true is never
+replaced: its pixels are left as they are, even where another region's rect takes them in, and don't count as any
+patch's surroundings, for a groove or a line right against a mark that has to go (a capacity number's moulded
+underline), which would otherwise smear into the patch. A "ring" with a far centre makes it a slanted band.
+"clear_translucency" makes a decal material's
 translucency map fully transparent. The result depends only on the rip's pixels and the spec, so cleaning a fresh
 rip again gives the same textures.
 
@@ -155,6 +162,7 @@ class Material:
         self.normal = T.resize_to(normal, (self.h, self.w)) if normal is not None else None
         lum = luminance(self.color)
         dev = np.abs(lum - ndimage.median_filter(lum, size=9))
+        self.lum_dev = dev.copy()
         if self.normal is not None:
             for c in (0, 1):
                 ch = self.normal[:, :, c]
@@ -163,9 +171,9 @@ class Material:
         self.lum = lum
         self.forbidden = np.zeros((self.h, self.w), dtype=bool)
 
-    def features(self) -> np.ndarray:
+    def features(self, normals: bool = True) -> np.ndarray:
         f = [self.lum]
-        if self.normal is not None:
+        if normals and self.normal is not None:
             f += [self.normal[:, :, 0] * 0.6, self.normal[:, :, 1] * 0.6]
         return np.stack(f, axis=2)
 
@@ -206,13 +214,18 @@ def ring_mask(mat: Material, ring) -> np.ndarray:
     return mask
 
 
-def choose_offset(mat: Material, mask: np.ndarray, rect, pending: np.ndarray) -> tuple[int, int, float]:
+def choose_offset(mat: Material, mask: np.ndarray, rect, pending: np.ndarray,
+                  maps: list[str] | None = None) -> tuple[int, int, float]:
+    """The source offset whose surroundings match the target's best, by the maps the region edits: a region that
+    leaves the normal map alone doesn't need its relief matched."""
+    normals = maps is None or "TextureNormal" in maps
+    dev_map = mat.dev if normals else mat.lum_dev
     x, y, w, h = rect
     m = max(6, min(w, h) // 3)
     wy0, wy1, wx0, wx1 = max(0, y - m), min(mat.h, y + h + m), max(0, x - m), min(mat.w, x + w + m)
     win_mask = mask[wy0:wy1, wx0:wx1]
     ring = ndimage.binary_dilation(win_mask, iterations=m) & ~win_mask & ~pending[wy0:wy1, wx0:wx1]
-    feats = mat.features()
+    feats = mat.features(normals)
     target = feats[wy0:wy1, wx0:wx1]
     target_ring = target[ring]
     target_mean = target_ring[:, 0].mean()
@@ -230,7 +243,7 @@ def choose_offset(mat: Material, mask: np.ndarray, rect, pending: np.ndarray) ->
             continue
         source = feats[sy0:sy1, sx0:sx1]
         ring_diff = np.abs(target_ring - source[ring]).mean()
-        src = mat.dev[sy0:sy1, sx0:sx1][win_mask]
+        src = dev_map[sy0:sy1, sx0:sx1][win_mask]
         # No detail of its own in the patch: its average and its strongest local contrast both count.
         src_dev = src.mean() + 0.35 * np.percentile(src, 98)
         # Prefer matching brightness overall, not just texture, and nearby sources.
@@ -249,12 +262,17 @@ def scaled_mask(mask: np.ndarray, mw: int, mh: int) -> np.ndarray:
     return np.asarray(Image.fromarray(mask.astype(np.uint8) * 255).resize((mw, mh), Image.BILINEAR)) > 0
 
 
-def apply_region(mat: Material, mask: np.ndarray, rect, offset, pending: np.ndarray) -> None:
-    """Clone + correct every map of the material in the rect's window. Pixels still to be cleaned (pending) don't
-    count as the patch's surroundings."""
+def apply_region(mat: Material, mask: np.ndarray, rect, offset, pending: np.ndarray,
+                 maps: list[str] | None = None) -> None:
+    """Clone + correct every map of the material (or those named in maps) in the rect's window. Pixels still to be
+    cleaned (pending) don't count as the patch's surroundings."""
     x, y, w, h = rect
     dx, dy = offset
+    if maps is not None and (unknown := set(maps) - set(mat.images)):
+        raise ValueError(f"{mat.vmat} has no {', '.join(sorted(unknown))}")
     for map_key, (img, mode) in mat.images.items():
+        if maps is not None and map_key not in maps:
+            continue
         mh, mw = img.shape[:2]
         sx, sy = mw / mat.w, mh / mat.h
         # The masks at this map's size.
@@ -327,11 +345,21 @@ def process(entry: dict, dry: bool, previews: bool = True, verbose: bool = True)
         if "ring" in r:
             mask &= ring_mask(mat, r["ring"])
         masks.append(mask)
+    keep = np.zeros((mat.h, mat.w), dtype=bool)
+    for r, mask in zip(regions, masks):
+        if r.get("keep"):
+            keep |= mask
+    masks = [mask if r.get("keep") else mask & ~keep for r, mask in zip(regions, masks)]
     pending = np.zeros((mat.h, mat.w), dtype=bool)
     for mask in masks:
         pending |= mask
     for i, r in enumerate(regions):
         rect, mask = rects[i], masks[i]
+        if r.get("keep"):
+            # Stays pending to the end: never written, never part of a patch's surroundings or source.
+            if verbose:
+                print(f"{vmat} region {i} {rect} kept, pixels={int(mask.sum())}  {r.get('note', '')}")
+            continue
         # Sources can't take in anything still to be cleaned, this region included.
         mat.forbidden = ndimage.binary_dilation(pending, iterations=2)
         pending &= ~mask
@@ -339,8 +367,8 @@ def process(entry: dict, dry: bool, previews: bool = True, verbose: bool = True)
             dx, dy = r["offset"]
             score = float("nan")
         else:
-            dx, dy, score = choose_offset(mat, mask, rect, pending)
-        apply_region(mat, mask, rect, (dx, dy), pending)
+            dx, dy, score = choose_offset(mat, mask, rect, pending, r.get("maps"))
+        apply_region(mat, mask, rect, (dx, dy), pending, r.get("maps"))
         mat.color = mat.images["TextureColor"][0]
         mat.lum = luminance(mat.color)
         if mat.normal is not None:

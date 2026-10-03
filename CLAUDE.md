@@ -18,12 +18,12 @@
 ## Kastov viewmodel pipeline (CoD MWII rips → HC1 arms)
 - Per-weapon config lives in `Tools/kastov_weapons.py`. Run `port_kastov.py`, `kastov_vmdl.py`, `kastov_animgraph.py`
   and `kastov_prefabs.py` in that order, each with
-  `--weapon kastov762|kastov74u|vityaz|rpk|bizon|ak105|vepr12|m16|p90|mp7|aug|uzi|fal|famas|m18` (default kastov762).
-  The 74u's, Vityaz's, RPK's, Bizon's, AK-105's, Vepr-12's, M16A4's, P90's, MP7A1's, AUG's, Uzi's, FAL's and M18's
-  materials and sounds come first, from `Tools/ks74u_assets.py` / `Tools/vityaz_assets.py` / `Tools/rpk_assets.py` /
-  `Tools/bizon_assets.py` / `Tools/ak105_assets.py` / `Tools/vepr12_assets.py` / `Tools/m16_assets.py` /
-  `Tools/p90_assets.py` / `Tools/mp7_assets.py` / `Tools/aug_assets.py` / `Tools/uzi_assets.py` /
-  `Tools/fal_assets.py` / `Tools/p320_assets.py`.
+  `--weapon kastov762|kastov74u|vityaz|rpk|bizon|ak105|vepr12|m16|p90|mp7|aug|uzi|fal|famas|m18|mcx`
+  (default kastov762). The 74u's, Vityaz's, RPK's, Bizon's, AK-105's, Vepr-12's, M16A4's, P90's, MP7A1's, AUG's, Uzi's,
+  FAL's, M18's and MCX's materials and sounds come first, from `Tools/ks74u_assets.py` / `Tools/vityaz_assets.py` /
+  `Tools/rpk_assets.py` / `Tools/bizon_assets.py` / `Tools/ak105_assets.py` / `Tools/vepr12_assets.py` /
+  `Tools/m16_assets.py` / `Tools/p90_assets.py` / `Tools/mp7_assets.py` / `Tools/aug_assets.py` /
+  `Tools/uzi_assets.py` / `Tools/fal_assets.py` / `Tools/p320_assets.py` / `Tools/mcx_assets.py`.
 - ADS is the animgraph's float `ironsights_weight`, which `ViewModel` moves over `AimTime` and eases, so it turns
   back from wherever it is. Don't go back to a selector on the `ironsights` enum: a Source 2 selector restarts its
   blend from the full old pose, so spamming aim snapped the gun to the sights or the hip.
@@ -31,7 +31,7 @@
   by `aim_offset`, the MW base's ADS fraction. The port only had the hip clip, which the graph plays under the ADS
   layer, so a hip clip that rolls the gun rocks the sights. `Weapon.ads_fire` (`"fire_2"`) exports the aimed clip as
   `fire_ads`, and the graph's fire state blends the two by `ironsights_weight` (`fire_aim`, not looping, so the state
-  still finishes). The P90, the MP7A1, the AUG, the FAL and the M18 have it so far. The 762's, 74u's, RPK's and
+  still finishes). The P90, the MP7A1, the AUG, the FAL, the M18 and the MCX have it so far. The 762's, 74u's, RPK's and
   AK-105's fire clips don't move the gun, and nor do the M16A4's and the Uzi's, which `Weapon.steady_fire` holds still
   (see M16A4), so don't give them `ads_fire`. The Vityaz's, Vepr-12's and Bizon's hip clips roll it (up to 2.6, 8.6 and 0.5
   degrees), so they rock aimed until they get `ads_fire` and a rerun of `port_kastov.py`, `kastov_vmdl.py` and
@@ -66,8 +66,8 @@
   `Editor.AssetSystem.RegisterFile` them all in one `execute_csharp`), then recompile its vmdl and vanmgrph.
 - `weapon_kastov74u.prefab` holds another session's hand-tuned gameplay values and sounds, so the prefab script only
   patches its DeploySound, aim offsets and OpticAimCorrection (`Prefabs.gameplay=None`). The 762's, Vityaz's,
-  RPK's, Bizon's, AK-105's, Vepr-12's, M16A4's, P90's, MP7A1's, AUG's, Uzi's, FAL's and M18's weapon prefabs are fully
-  generated.
+  RPK's, Bizon's, AK-105's, Vepr-12's, M16A4's, P90's, MP7A1's, AUG's, Uzi's, FAL's, M18's and MCX's weapon prefabs
+  are fully generated.
 - The obj/mtl files in `Assets/Weapons/Kastov74u/models` are unused: `w_kastov74u.vmdl` now comes from the pipeline
   so the gunsmith's attachments mount on the world model.
 - The 74u's stocks, pistol grips and magazines are bodygroups (`Weapon.part_choices`, choice 0 = factory part).
@@ -94,7 +94,7 @@
   the base mesh; the default sets each group's choice 0 plus the base (762 = 341, 74u = 605028693,
   Vityaz = 22036489, RPK = 2363477, Bizon = 2129941, AK-105 = 285343829, Vepr-12 = 37814293, M16A4 = 341,
   P90 = 21 (by that rule, not yet read from its compiled model), MP7A1 = 85, AUG = 85, Uzi = 1173, FAL = 174761,
-  M18 = 145).
+  M18 = 145, MCX = 341, also by the rule).
   After changing any bodygroup, re-read it from the compiled model. An empty choice (a rail's or a folded sight's
   "off") still has its bit in the default, but the Parts API gives it mask 0, so setting each group's choice 0 with
   `SetBodyGroup` leaves those bits out (the FAL's 174209). It draws the same gun.
@@ -750,6 +750,87 @@
   sticker, and the world model in hand and holstered. Its gunsmith review note stays until they've been checked in a
   match.
 
+## SIG MCX Virtus (MW2019's "M13", mg_mcharlie, Viper's MW2019 Assault Rifles pack 2528829149)
+- The real SIG MCX Virtus SBR (category AssaultRifle) in 5.56x45, through the Kastov pipeline from MW2019
+  (`extracted/2528829149`, decompiled to `decompiled/mcharlie`). The user asked for a real gun from the packs that looks
+  like the real one, not one changed for CoD (2026-10-03). MW2019's M13 is the Virtus SBR as SIG sells it, at the real
+  gun's size: the 11.5-inch barrel, the free-float M-LOK handguard with its full-length top rail, flip-up sights, SIG's
+  three-prong flash hider, a 30-round polymer magazine and the folding telescoping stock. Its figures are in
+  `kastov_prefabs.gameplay_mcx`:
+  - 850 rpm (the middle of the 800-900 usually quoted), automatic and semi, from the 30-round magazine.
+  - M855 at ~837 m/s from the 292 mm (11.5-inch) barrel, where the M4's 14.5-inch gives 905, G7 0.151. The sights sit
+    68 mm over the bore (the sight line through the rear aperture and the front post's tip), zeroed at 300 m like the
+    other M855 rifles.
+  - The M4's M855 damage (20), falloff curve and recoil pattern, with MaxRange cut to 0.855 of the M4's: the short
+    barrel's share of its muzzle energy, as for the M18.
+  - About 2.9 kg empty and 3.4 kg loaded, what the M4 weighs: SpeedPenalty 40, no WeightSlowdown, 0.25 s ADS. The
+    recoil scale (1.85,4.62) is the M4's (2,5) scaled by free recoil (~1.72 against 1.86 m/s).
+  - A suppressor doesn't change its rate (`SuppressorFireRateScale` 1): the Virtus's short-stroke piston has a
+    two-position gas valve with a setting for one.
+  - Reload times are when the gun is level again: 2.33 s, and 2.6 s empty, after the bolt release.
+  - Bots can be issued it: it's a Primary AssaultRifle, so it's in `WeaponPool` and shares the rifles' half.
+- Like the FAL's, its rig has no pistol grip part (the grip is the lower receiver's), so `tag_pistolgrip_attach` is an
+  extra bone on the centreline. The viewmodel's stock adapter (its `tag_stock` bodygroup) is left out: it's for MW's
+  generic stocks, and each MCX stock carries its own hinge. The flip-up sights are two models' pieces joined with `+`
+  (`port_kastov.part_triangles`): the rear sight is the receiver model's `tag_sight` bodygroup, the front the barrel's.
+- Materials and sounds are from `Tools/mcx_assets.py`: the MCX's own lower (with the pistol grip, magazine well and
+  trigger guard), upper (the handguard and the top rail), flip-up sights, barrel, flash hider, magazine (its window
+  see-through, the vmt's `$translucent`) and both stocks.
+  - The shot is the pack's six dry recordings, each levelled to the same loudness (+9 dB), so every shot sounds a little
+    different, at about the AUG's level. The pack's own event plays a premixed copy of the first, with a long reverb
+    tail baked in. The suppressed shot is the six suppressed recordings at -12 dB. The .300 BLK conversion's subsonic
+    set isn't used.
+  - Reload foley plays at the viewmodel QC's event frames. The MW base's generic rattles and magazine drop are left out.
+  - All three are voiced like the other ported guns' (see The ported guns' sounds). The rip's shot has a designed low
+    ring (under 150 Hz at -11 dB 100-250 ms after the onset, where the other voiced rifles' are at -19 to -24) and is
+    dark (its first 30 ms centre at 0.67-1.15 kHz). A short barrel's blast at the shooter is a sharp crack, with much of
+    the powder burning past the muzzle, so it keeps its pitch and gets the lows eased 8 dB and 5 dB of presence: voiced,
+    the ring is at -23 dB and the first 30 ms centre at 1.1-1.55 kHz. The reload foley came down 17.2 dB: its loudest
+    file, the empty reload's magazine going in, was 1.2 dB over the shot.
+- It was ported with markings on: QR codes and a coded strip on the lower and one on the handguard, serials (TA
+  300248-B-77 and TA 300240-B-77, and TA 300249-B-77 on the Thin Folding Stock's hinge), the rip's made-up makers TEMPUS
+  ARMAMENT INC (its name and address, and its logo on the handguard), CRONEN and SOLOZERO OPTICS (its name, and its
+  chevron logo on the rear sight's leaf and a knob), a RESTRICTED MILITARY/GOVERNMENT LAW ENFORCEMENT USE ONLY label,
+  the selector's lettering, the rail's slot numbers, lettering on the charging handle's latch, a helmeted skull emblem
+  on the upper's round plate, a worn stamp, the sights' R and UP, the magazine's round counts (10, 20, 30) and a painted
+  181, and handwriting (T8) inside it. `Tools/texture_markings/specs/mcx.json` takes them off (64 regions over 8
+  materials), checked in before/after close-ups of the textures on 2026-10-03, not yet on the model. The selector's
+  pictograms, the sights' arrows and the counts' moulded underlines stay.
+  - The markings tool got two keys for it (its README has them): a region with `maps` edits only those maps (the 181 is
+    paint, so only the colour and roughness), and a `keep` region's pixels are never written (the underlines).
+- Bodygroups (DefaultMask 341 by the bit rule, not yet read from the compiled models):
+  - `muzzle_tip`: the flash hider, hidden under a muzzle device.
+  - `iron_sights` and `sight_folded`: the flip-up sights raised, and folded down under an optic.
+  - `stock`: the factory stock and the Thin Folding Stock.
+- Slots: Optic on the top rail (`tag_reflex`; an optic folds the sights), Muzzle at the flash hider's rear face
+  (`tag_tip`), Underbarrel on the handguard's flat bottom near its front (`tag_grip_attach`, ahead of the left hand's
+  fingers) and Laser on the handguard's right side at the bore's height, ahead of the fingertips, then Stock. 56 of the
+  M4's MWII parts are made eligible (optics, muzzle devices, grips, lasers and tracer rounds).
+- Its own part (`Prefabs.parts`, `Assets/gunsmith/mcx/stocks/`): the Thin Folding Stock, SIG's thin folding stock (the
+  pack's light stock), a skeleton stock with a narrow buttplate: 5% more recoil, and 0.06 kg lighter. Left out: the
+  pack's other stock (CoD's), its 50- and 60-round magazines, its .300 BLK magazine and barrel (another calibre), and
+  its other barrels.
+- No `GripFit`: the idle left hand has 84 vertices inside the handguard, at most 0.08" deep (the verified 762's 52 go
+  0.10"), and 128 aimed, at most 0.15". The right hand's go up to 0.39" into the gun (155 vertices; the 762's 0.37").
+- The iron sights use ads_in's last frame. The addon's aim (`0,-1,0`) left the rear aperture's centre 0.01 above the
+  camera and the front post's tip 0.058 degrees over the aim point; `kastov_weapons.MCX.aim` lowers the gun onto the
+  line through them and turns out its tilt. Checked in a render, not in-game.
+- Aimed, it fires with the pack's `fire_2` (`Weapon.ads_fire`, see the pipeline notes): the hip clip rolls the gun up to
+  2.5 degrees about the bore and pitches it 1.1 every shot, and at 850 rpm each shot starts it again; `fire_2` rolls it
+  0.5 at most and kicks it 0.5" straight back.
+- It sprints with the M4's sprint and has the look sway and hand IK (see the pipeline notes).
+- The charm hangs on the stock's hinge block at the back of the receiver, by the real gun's QD sling sockets, which both
+  stocks share: not over the grip, where the right thumb rests, nor on the factory stock, where it would float beside
+  the thin one. Every hand joint stays 1.07" or more from it through every clip. The sticker is on the upper receiver's
+  left side above the magazine well.
+- Its `OpticAimCorrection` `3.118,0,-0.274` is derived with the Bizon's formula, NOT checked in-game. Its z is small
+  (the Kastovs' are about -1.2): its flip-up sights stand on the top rail, as the M4's do.
+- Its third-person left hand (`4.2,2.735,2.49`, see Third-person left hand) hasn't been rendered.
+- Made offline on 2026-10-03 with the editor closed: nothing has been compiled (the models, the animgraph, materials,
+  sounds, prefabs and parts), and nothing has been checked in-game. When the editor next opens, check that `v_mcx.vmdl`
+  compiles (see the pipeline notes: the FAL's first compile left no file), and `recompile_asset` the 56 shared parts
+  after the hotload. Its gunsmith review note stays until all of it has been checked in a match.
+
 ## MP5 barrels (Workshop MW19 parts)
 - The Rail Handguard (`gunsmith/mpapa5/underbarrel/rail_grip.gnsmth`) only swaps the handguard. It hides
   `v_mp5_b` (handguard + barrel + both sights) and shows `native_front.vmdl`, a copy of `v_mp5_b` without the
@@ -1094,10 +1175,10 @@
 - A gun still to be checked in a match carries a review note (`EquipmentResource.ReviewNote`, written from
   `kastov_prefabs.Prefabs.review_note`). The user asked for it so a new gun gets a careful look before it's trusted.
   Only the developer sees it (`ShowReviewNote`: in the editor, or on `AttachmentUnlocks.IsDeveloper`'s account): CHECK
-  on the gun's row, NEEDS CHECKING by its name in the hero, and the note under its description, in `$caution` amber.
-  The FAL and the AUG have one. Once a gun has been checked in a match, empty its `review_note` and rerun
-  `kastov_prefabs.py` for it: the .equip's `ReviewNote` comes from there. The note is plain English with no `Tr`,
-  since only the developer reads it.
+  on the gun's row, NEEDS CHECKING by its name in the hero, and the note under its description, in `$caution` amber. The
+  AUG, the FAL, the M18 and the MCX have one. Once a gun has been checked in a match, empty its `review_note` and rerun
+  `kastov_prefabs.py` for it: the .equip's `ReviewNote` comes from there. The note is plain English with no `Tr`, since
+  only the developer reads it.
 - Parts are what the real gun takes (the user: "as close to real as possible"; optics are left alone). On 2026-09-29
   the FAMAS F1's 50- and 60-round magazines (the F1 only feeds from its own 25-round one) and the MP5's 10mm 30-round
   magazine (the MP5/10 is another gun) came out. Their files are in `Backups/disabled_gunsmith_parts/` under their
@@ -1137,11 +1218,12 @@
 - The user (2026-09-30): a suppressor shouldn't change a gun's rate unless a real one would, every part should do what
   the real one does, and there could be a category for changing fire rates "however you would do that in real life".
 - What really sets a cyclic rate, and what the game models:
-  - A suppressor's back-pressure speeds up gas-operated and blowback actions (`Shootable.SuppressorFireRateScale`): about
-    10% on direct-impingement ARs and AKs (the M4A1 template the rifles copy in `kastov_prefabs.py`), about 5% on
+  - A suppressor's back-pressure speeds up gas-operated and blowback actions (`Shootable.SuppressorFireRateScale`):
+    about 10% on direct-impingement ARs and AKs (the M4A1 template the rifles copy in `kastov_prefabs.py`), about 5% on
     blowback and roller-delayed SMGs (the MP5's, which the SMGs borrow). It's 1 where a real one wouldn't change the
-    rate: the semi-only M18 and Vepr-12 (the trigger finger sets their pace) and the FAL, whose adjustable regulator is
-    set for the can (FN's procedure). The SCAR-H and the old pistols and bolt guns have none.
+    rate: the semi-only M18 and Vepr-12 (the trigger finger sets their pace), the FAL, whose adjustable regulator is set
+    for the can (FN's procedure), and the MCX Virtus, whose two-position gas valve has a setting for one. The SCAR-H and
+    the old pistols and bolt guns have none.
   - The gas system's length: the AR barrels already did it (`GunsmithAttachmentEffects.FireRate`).
   - The buffer's mass, and a gas regulator: the Action slot (`GunsmithPartType.Action`, `GunsmithPart.FireRateScale`,
     `GunsmithPart.SuppressedGasSetting`).
@@ -2148,14 +2230,14 @@ simulate_input.
   sphere table for buckshot. One trajectory per load is cached, to 1500 m. It was checked against FM 3-22.9 (M855) and
   the AK/RPK/AKS-74U manuals' tables to within about 2 cm.
 - Per-gun data are real loads and real sights, with no tuning: `MuzzleVelocity` (m/s), `DragFunction`,
-  `BallisticCoefficient` (the published BC in lb/in²), `SightHeight` (in) and `ZeroRange` (the doctrinal zero: M4
-  and M16A4 M855 and SCAR-H M80 300 m, AKM/RPK PS 300 m, AKS-74U 7N6 275 m (sight "П"), AK-105 7N6 300 m, M700 M118LR 100 m,
-  9 mm guns, the P90's SS190 and the MP7A1's DM11 100 m (the two PDWs zeroed like the SMGs; the MP7's own zero wasn't
-  found), pistols and buckshot 25 m). The battle zeros put the rifles 15–30 cm HIGH at 150–200 m. That's
-  real, not a bug. The P90's BC (G1 0.155) is an estimate: none is published for SS190. The AUG takes the M4's zero
-  (M855, 300 m). The FAL's M80 is zeroed at 200 m, its rear sight's lowest setting (the battle zero).
-- The Kastov 762, Vityaz, RPK, Bizon, AK-105, Vepr-12, M16A4, P90, MP7A1, AUG, Uzi, FAL and M18 take theirs from
-  `kastov_prefabs.ballistics()` (`PS_BALLISTICS`); the other guns, including the patched 74u, have them set in the
+  `BallisticCoefficient` (the published BC in lb/in²), `SightHeight` (in) and `ZeroRange` (the doctrinal zero: M4, M16A4
+  and MCX M855 and SCAR-H M80 300 m, AKM/RPK PS 300 m, AKS-74U 7N6 275 m (sight "П"), AK-105 7N6 300 m, M700 M118LR
+  100 m, 9 mm guns, the P90's SS190 and the MP7A1's DM11 100 m (the two PDWs zeroed like the SMGs; the MP7's own zero
+  wasn't found), pistols and buckshot 25 m). The battle zeros put the rifles 15–30 cm HIGH at 150–200 m. That's real,
+  not a bug. The P90's BC (G1 0.155) is an estimate: none is published for SS190. The AUG takes the M4's zero (M855,
+  300 m). The FAL's M80 is zeroed at 200 m, its rear sight's lowest setting (the battle zero).
+- The Kastov 762, Vityaz, RPK, Bizon, AK-105, Vepr-12, M16A4, P90, MP7A1, AUG, Uzi, FAL, M18 and MCX take theirs
+  from `kastov_prefabs.ballistics()` (`PS_BALLISTICS`); the other guns, including the patched 74u, have them set in the
   prefab. Optics don't change `SightHeight` (a few cm at most), and barrel parts don't change `MuzzleVelocity`: their
   length only moves the damage falloff (see the pipeline notes).
 - Each gun also has its bullet's `BulletDiameter` and `BulletLength` (mm, from the load's drawings; a buckshot ball's
@@ -2705,18 +2787,18 @@ simulate_input.
   its rip, bar the Kastov-74u's (another session's hand-tuned sounds). Each script's docstring has what the rips get
   wrong and every step.
 - Open shots: the AK-105, M16A4 and Kastov 762 have their own scripts (see their sections). `Tools/ported_shots.py`
-  voices the Vityaz, Bizon, Vepr-12, P90, MP7A1, AUG, Uzi, FAL, M18 and FAMAS with `shot_voicing.py`'s steps, a
-  `Voicing` each:
+  voices the Vityaz, Bizon, Vepr-12, P90, MP7A1, AUG, Uzi, FAL, M18, FAMAS and MCX with `shot_voicing.py`'s steps,
+  a `Voicing` each:
   - pitch by the charge and the barrel: the 9 mm guns and the P90 2% up, the MP7A1 3%, the FAMAS 1%, the Vepr-12 1%
-    down, the FAL 2% down, the AUG and M18 as ripped;
+    down, the FAL 2% down, the AUG, M18 and MCX as ripped;
   - a 40 Hz high-pass (the Uzi's 70), the lows eased 3-10 dB after the blast's first 20-50 ms, and the FAL's, Vepr-12's,
     AUG's and Uzi's designed tails eased;
-  - the blast's 1.5-5 kHz up 2-4 dB for 20-25 ms (the dark Uzi's 1-6 kHz 7 dB for 30 ms);
+  - the blast's 1.5-5 kHz up 2-5 dB for 20-25 ms (the dark Uzi's 1-6 kHz 7 dB for 30 ms);
   - the ground reflection by the gun's length, and echoes from 35 ms to 1.4 s, as loud against the blast as the
     muzzle's distance from the ear gives (0.4 s after the loudest 100 ms: -31.5 dB for the FAL to -36 for the P90).
   - Loudness stays each rip's. A gun with one recording gets several takes with their own echoes (pitch 0.97-1.03).
 - Suppressed shots (`Tools/suppressed_shots.py`): the Kastov 762's, Vityaz's, Bizon's, AK-105's, M16A4's, P90's,
-  MP7A1's, AUG's, Uzi's, FAL's and FAMAS's. The Vepr-12 and the M18 have none.
+  MP7A1's, AUG's, Uzi's, FAL's, FAMAS's and MCX's. The Vepr-12 and the M18 have none.
   - As ripped they were levelled to each other, not to their guns: 1.4 dB (the Kastov) to 10.6 dB (the P90) under the
     open shot, counting the SMG events' Volume 0.5. The Uzi's WAV was louder than its open shot's.
   - A real suppressor takes about 20-25 dB off at the shooter's ear. Squeezed as the rest of the mix is (0.43 times,
@@ -2725,7 +2807,8 @@ simulate_input.
     crack off) and the lows under 130 Hz eased 6 dB after 25 ms, which takes MW2019's designed thumps (the P90's, AUG's,
     FAL's, FAMAS's and M16A4's) down 2-8 dB. Its echoes sit where the open shot's do.
 - Reload foley (`Tools/ported_foley.py`, on `foley_voicing.py`, as the RPK's): the Kastov 762's (its drum and xmag sets
-  too), Vityaz's, Bizon's, AK-105's, Vepr-12's, M16A4's, P90's, MP7A1's, AUG's, Uzi's, FAL's, M18's and FAMAS's.
+  too), Vityaz's, Bizon's, AK-105's, Vepr-12's, M16A4's, P90's, MP7A1's, AUG's, Uzi's, FAL's, M18's, FAMAS's and
+  MCX's.
   - Every set's loudest file but the Kastov's was louder than the gun's voiced shot, by up to 4.4 dB (the AK-105's bolt
     pull).
   - Now: a 90 Hz high-pass; the moves' lows under 250 Hz eased 6 dB (`MOVES`, by name; the Kastov's and FAMAS's files
@@ -2868,9 +2951,9 @@ simulate_input.
 - The SCAR-H's BaseDamage 36 is the M4's 20 scaled by muzzle energy: M80 at its prefab's 792 m/s is 2,989 J, and the
   M4's M855 at 905 m/s is 1,646 J. So in hardcore a body hit at full damage always kills (see Hardcore hit locations).
   The FAL's 41 is the same sum for M80 from its longer barrel (840 m/s, 3,362 J).
-- `Shootable.FireRate` holds real-world cyclic rates (MP7A1 950, P90 900, M4 800, M16A4 800 in semi and three-round
-  burst, MP5 800, Vityaz 750, AUG 715, Kastov-74u 700, Bizon 680, FAL 675, SCAR-H 600, RPK 600, Kastov 762 600,
-  AK-105 600, Uzi 600, Vepr-12 450 in semi).
+- `Shootable.FireRate` holds real-world cyclic rates (MP7A1 950, P90 900, MCX 850, M4 800, M16A4 800 in semi and
+  three-round burst, MP5 800, Vityaz 750, AUG 715, Kastov-74u 700, Bizon 680, FAL 675, SCAR-H 600, RPK 600,
+  Kastov 762 600, AK-105 600, Uzi 600, Vepr-12 450 in semi).
   Shots are scheduled with carry-over (`_nextShotTime`), so any RPM fires exactly; don't tune values to the 50 Hz tick.
   Part effects on the rate: `GunsmithAttachmentEffects.FireRate` (AR barrel gas length, the Action slot's buffers) and
   `Shootable.SuppressorFireRateScale` (see Fire rate and fire modes in the gunsmith).
@@ -3213,8 +3296,9 @@ simulate_input.
   by the rules above) hasn't been rendered. It holds the Rifle hold type. Nor has the M16A4's (`5.7,2.19,2.68`, the
   middle of the handguard, where the first-person hand holds it), the P90's (`-2.5,2.84,-1.55`, under the frame's
   front, where the first-person hand holds it), the MP7A1's (`-0.9,2.29,2.47`, under the receiver's front, where
-  the first-person hand holds it) or the Uzi's (`-0.13,2.59,1.8`, under the lower receiver's front, where the
-  first-person hand holds it). The FAL's (`6.4,2.37,2.16`, where the first-person hand holds the handguard) was
+  the first-person hand holds it), the Uzi's (`-0.13,2.59,1.8`, under the lower receiver's front, where the
+  first-person hand holds it) or the MCX's (`4.2,2.735,2.49`, under the handguard where the first-person hand holds
+  it, by the rules above). The FAL's (`6.4,2.37,2.16`, where the first-person hand holds the handguard) was
   rendered on both teams' models on 2026-09-28: the IK reaches it exactly, with the thumb along the handguard's left
   side and the fingers round its right.
 - Pistols, knives and grenades have no `LeftHandIK`, so the IK stays off for them.
@@ -3250,8 +3334,8 @@ simulate_input.
 - The user's rule (2026-09-26): nothing players see may come from Call of Duty, so the game isn't a CoD clone. That
   means no CoD names for weapons, attachments, perks, modes, streaks or camos, and no CoD writing, numbers, logos or
   QR codes on textures. Weapons go by their real-world names (AK-47, AKS-74U, PP-19-01 Vityaz, RPK, PP-19 Bizon,
-  AK-105, Vepr-12, M16A4, FN P90, MP7A1, Steyr AUG A3, Uzi, FN FAL, SIG Sauer M18) and attachments by plain
-  descriptions ("Vented Suppressor").
+  AK-105, Vepr-12, M16A4, FN P90, MP7A1, Steyr AUG A3, Uzi, FN FAL, SIG Sauer M18, SIG Sauer MCX Virtus) and
+  attachments by plain descriptions ("Vented Suppressor").
 - Renamed:
   - Zombies perks: Juggernog → Iron Tonic, Speed Cola → Bolt Soda, Double Tap → Hot Shot, Quick Revive → Second Wind,
     Stamin-Up → Fleet Foot (`ZombiesPerk`, `ZombiesBuyStation.PerkName`). Their art (`Assets/Perks/<perk>_*`,
@@ -3273,7 +3357,7 @@ simulate_input.
   textures deleted. A new port goes through the README's steps before it ships: `after_rip()` leaves a material with
   no spec as ripped, without a warning. The M16A4 has `specs/m16.json`, the Vepr-12 `specs/vepr12.json`, the P90
   `specs/p90.json`, the MP7A1 `specs/mp7.json`, the AUG `specs/aug.json`, the Uzi `specs/uzi.json`, the FAL
-  `specs/fal.json` and the M18 `specs/m18.json`.
+  `specs/fal.json`, the M18 `specs/m18.json` and the MCX `specs/mcx.json`.
 - Still CoD's: the ported guns' and parts' models, animations and sounds, and the Zombies numbers (the crate's 950, the
   perk prices, the points for kills). Only the names and markings have changed. The sounds of every ported gun but the
   Kastov-74u have been voiced towards the real thing: shots, suppressed shots and reloads (see RPK and The ported

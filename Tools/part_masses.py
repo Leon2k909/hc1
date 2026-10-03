@@ -56,6 +56,7 @@ GUN_KG = {
     "FAL/weapon_fal": 5.0,            # FAL 50.00 4.25 kg + a loaded 20
     "FAMAS/weapon_famas": 4.0,        # FAMAS F1 3.6 kg + a loaded 25
     "M18/weapon_m18": 0.95,           # M18 0.74 kg + a loaded 17
+    "MCX/weapon_mcx": 3.4,            # MCX Virtus SBR 2.9 kg + a loaded 30
 }
 
 
@@ -77,7 +78,7 @@ ROUND_KG = {
 GUN_ROUND = {
     "kastov762": "7.62x39", "rpk": "7.62x39", "kastov74u": "5.45", "ak105": "5.45", "vityaz": "9x19", "uzi": "9x19",
     "vepr12": "12ga", "aug": "5.56", "famas": "5.56", "m16": "5.56", "m4a1": "5.56", "fal": "7.62x51",
-    "scarh": "7.62x51", "mp5": "9x19", "m18": "9x19 M1152",
+    "scarh": "7.62x51", "mp5": "9x19", "m18": "9x19 M1152", "mcx": "5.56",
 }
 
 # Empty magazines, kg, and how many rounds they hold. The AK-74's polymer 30 is 0.23 kg; the AKM's steel 30 0.33; the
@@ -127,6 +128,7 @@ OWN_CHOICES = {
               "stock_stable": 0.05, "stock_tactical_v1": 0.25, "classic": 0.0, "low": 0.0},
     "uzi": {"sm_uzulu_stock": 0.0, "sm_uzulu_stock_folded": 0.0, "sm_uzulu_stockh": 0.10},
     "m18": {"pi_papa320_slide": 0.0, "pi_papa320_slide_black": 0.0},  # the same slide in another finish
+    "mcx": {"factory": 0.0, "thin": -0.06},  # SIG's thin folding stock, ~2 oz under its folding telescoping one
 }
 
 # The MWII attachments shared across guns, by file stem, wherever they're fitted.

@@ -1109,8 +1109,82 @@ M18 = Weapon(
     reload_variants=["_xmag"],
 )
 
+def mcx_materials() -> dict[str, str]:
+    # Built by mcx_assets.py.
+    assets = json.loads((ASSETS / "Weapons" / "MCX" / "mcx_assets.json").read_text(encoding="utf-8"))
+    return assets["materials"]
+
+
+_MCX = "v_mcharlie"
+_MCX_BARREL = "attachment_vm_ar_mcharlie_barrel/attachment_vm_ar_mcharlie_barrel"
+# The receiver model the MW base bone-merges onto the viewmodel, for its rear sight.
+_MCX_RECEIVER = "attachment_vm_ar_mcharlie_receiver/attachment_vm_ar_mcharlie"
+
+
+def _mcx_sights(state: str) -> str:
+    """The flip-up sights, raised (on) or folded down (off): the rear one at the back of the top rail (the receiver
+    model's tag_sight bodygroup) and the front one at its front (the barrel's), each placed by its own model's reference
+    pose."""
+    return f"{_MCX_RECEIVER}_tag_sight_{state}.smd+{_MCX_BARREL}_tag_sight_{state}.smd"
+
+
+# The SIG MCX Virtus SBR (5.56x45mm): MW2019's "M13" (mg_mcharlie) from Viper's MW2019 Assault Rifles pack (Workshop
+# 2528829149), the 11.5-inch short-barrelled rifle as SIG sells it: the free-float M-LOK handguard with its full-length
+# top rail, flip-up sights, SIG's three-prong flash hider, a 30-round polymer magazine and the folding telescoping stock.
+# It's the real gun's size. Like the FAL's, its rig has no pistol grip part (the grip is the lower receiver's), so
+# tag_pistolgrip_attach is an extra bone. The gunsmith's own part is SIG's thin folding stock (the pack's light stock).
+MCX = Weapon(
+    name="mcx",
+    folder=ASSETS / "Weapons" / "MCX",
+    asset="weapons/mcx",
+    model="mcx",
+    decompiled=DECOMPILED / "mcharlie",
+    cod_anims=f"{_MCX}/{_MCX}_anims",
+    # The viewmodel's own receiver mesh (the lower and the upper), in its bind pose. Its stock adapter (the tag_stock
+    # bodygroup) is left out: it's an adapter for MW's generic stocks, and each MCX stock carries its own hinge.
+    vm_meshes=[f"{_MCX}/attachment_vm_ar_mcharlie_receiver.smd"],
+    # The barrel with its handguard (each MW barrel has its own length of handguard), and the magazine: the fitted one
+    # on j_mag1 and the reload's fresh one on j_mag2.
+    part_meshes=[(f"{_MCX_BARREL}.smd", f"{_MCX_BARREL}.smd"),
+                 ("attachment_vm_ar_mcharlie_mag/attachment_vm_ar_mcharlie_mag.smd",
+                  "attachment_vm_ar_mcharlie_mag/attachment_vm_ar_mcharlie_mag.smd")],
+    # The stock: the factory folding telescoping one, then SIG's thin folding stock. Left out: the pack's other stock
+    # (CoD's), its 50- and 60-round magazines, its .300 BLK magazine and barrel (another calibre), and its other barrels.
+    part_choices={
+        "stock": [("factory", "attachment_vm_ar_mcharlie_stock/attachment_vm_ar_mcharlie_stock.smd"),
+                  ("thin", "attachment_vm_ar_mcharlie_lightstock/attachment_vm_ar_mcharlie_lightstock.smd")],
+    },
+    optional_meshes={
+        "muzzle_tip": (f"{_MCX_BARREL}_tip.smd", f"{_MCX_BARREL}.smd"),  # the flash hider
+        # The flip-up sights raised, and folded down under an optic.
+        "iron_sights": (_mcx_sights("on"), _mcx_sights("on")),
+        "sight_folded": (_mcx_sights("off"), _mcx_sights("off")),
+    },
+    extra_bones={
+        # 0.2 inside the front of the flash hider's prongs, on the bore (the barrel's tag_flash_attachment is 0.6
+        # behind their tips).
+        "muzzle": ("tag_barrel_attach", np.array([12.819, 0.0, -0.023])),
+        # Where the rifles' pistol grip mounts sit from the right wrist (as for the P90), on the centreline.
+        "tag_pistolgrip_attach": ("tag_sling", np.array([2.747, 0.0, -1.872])),
+    },
+    materials=mcx_materials,
+    # From the addon's lua/weapons/mg_mcharlie/shared.lua, except aim. The addon's iron-sight aim (0, -1, 0) leaves the
+    # rear aperture's centre 0.01 above the camera and the front post's tip 0.058 deg over the aim point; this lowers the
+    # gun onto the line through them and turns out its tilt, which puts both on the aim point (ads_in's last frame).
+    hip=view_offset(),
+    aim=view_offset((0.0, -1.0, -0.007), (0.036, 0.0, 0.0)),
+    sprint=view_offset(),
+    m4_sprint=True,
+    ads_pose=("ads_in", slice(-1, None)),
+    # The hip clip rolls the gun up to 2.5 degrees about the bore and pitches it 1.1 every shot, and at 850 rpm each shot
+    # starts it again; the aimed one rolls it 0.5 at most and kicks it 0.5 straight back.
+    ads_fire="fire_2",
+    report_bones=["tag_tip", "tag_silencer", "tag_flash_attachment", "tag_flash", "tag_laser_attach", "tag_reflex",
+                  "tag_sight_on", "tag_grip_attach", "tag_folding_grip"],
+)
+
 WEAPONS = {weapon.name: weapon for weapon in (KASTOV_762, KASTOV_74U, VITYAZ, RPK, BIZON, AK105, VEPR12, M16, P90,
-                                              MP7, AUG, UZI, FAL, FAMAS, M18)}
+                                              MP7, AUG, UZI, FAL, FAMAS, M18, MCX)}
 
 
 def add_argument(parser: argparse.ArgumentParser) -> None:

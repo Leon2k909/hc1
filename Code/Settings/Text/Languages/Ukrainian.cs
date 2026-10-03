@@ -258,6 +258,12 @@ public static partial class GameText
 			"Австрійська гвинтівка-булпап під набій 5,56x45 мм: 16-дюймовий ствол зі складаним переднім руків'ям і магазин позаду пістолетного руків'я.",
 		["Belgian 7.62x51mm battle rifle: heavy and hard-kicking, with a 21-inch barrel and a 20-round magazine."] =
 			"Бельгійська бойова гвинтівка під набій 7,62x51 мм: важка, із сильною віддачею, 21-дюймовим стволом і магазином на 20 набоїв.",
+		["French 5.56x45mm bullpup rifle with a 25-round magazine, a fixed carry handle and selectable automatic, three-round burst and semi-automatic fire."] =
+			"Французька гвинтівка-булпап під набій 5,56x45 мм з магазином на 25 набоїв, незнімною ручкою для перенесення та перемикачем вогню: автоматичний, черги по три постріли й одиночний.",
+		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
+			"Американський штатний пістолет під набій 9x19 мм: компактний P320 армії США зі стволом 3,9 дюйма та магазином на 17 набоїв.",
+		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =
+			"Американська короткоствольна гвинтівка під набій 5,56x45 мм: зброя з газовим поршнем із коротким ходом, 11,5-дюймовим стволом і складаним прикладом.",
 		["Russian 5.45x39mm carbine: the AK-74M cut down to a 314 mm barrel, with a side-folding stock."] =
 			"Російський укорочений автомат під набій 5,45x39 мм: AK-74M з укороченим до 314 мм стволом і прикладом, що складається вбік.",
 		["Russian 9x18mm submachine gun built on the AKS-74. Straight blowback, fed from a 64-round helical magazine under the barrel."] =

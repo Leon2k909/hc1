@@ -249,6 +249,12 @@ public static partial class GameText
 			"奧地利製 5.56x45mm 無托步槍：16 英吋槍管配折疊式前握把，彈匣位於手槍式握把後方。",
 		["Belgian 7.62x51mm battle rifle: heavy and hard-kicking, with a 21-inch barrel and a 20-round magazine."] =
 			"比利時製 7.62x51mm 戰鬥步槍：沉重且後座力強，配備 21 英吋槍管與 20 發彈匣。",
+		["French 5.56x45mm bullpup rifle with a 25-round magazine, a fixed carry handle and selectable automatic, three-round burst and semi-automatic fire."] =
+			"法國製 5.56x45mm 無托步槍，配備 25 發彈匣與固定提把，可選全自動、三發點放與半自動射擊。",
+		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
+			"美國 9x19mm 制式手槍：美國陸軍的緊湊型 P320，配備 3.9 英吋槍管與 17 發彈匣。",
+		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =
+			"美國 5.56x45mm 短槍管步槍：短行程活塞式，配備 11.5 英吋槍管與折疊式槍托。",
 		["Russian 5.45x39mm carbine: the AK-74M cut down to a 314 mm barrel, with a side-folding stock."] =
 			"俄製 5.45x39mm 卡賓槍：將 AK-74M 的槍管截短至 314mm，配備側折式槍托。",
 		["Russian 9x18mm submachine gun built on the AKS-74. Straight blowback, fed from a 64-round helical magazine under the barrel."] =

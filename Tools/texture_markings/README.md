@@ -37,6 +37,11 @@ Run from this folder. Paths to .vmat files are relative to `Assets`. Previews an
   to a band round a centre, from angle a0 round to a1, for lettering round a ring (a drum's face, a shell's
   headstamp): it's covered a sector at a time, each copied from plain surface, as in `specs/vepr12.json`. Fit the
   centre to the grooves or rim in the normal map first; a few pixels off and the band clips the lettering at one end.
+  `"maps": ["TextureColor", "TextureRoughness"]` edits only those maps, for paint: a painted number has no relief, so
+  the normal map is left alone, and a groove the patch's border crosses (a panel's edge under a number) stays crisp
+  instead of smearing into the patch, as in `specs/mcx.json`. Check first that the mark isn't in the other maps.
+  `"keep": true` marks a region that's left alone and kept out of every patch's border, for a groove or line right
+  against a mark that has to go (in `specs/mcx.json`, a capacity number's moulded underline).
   `"clear_translucency": true` makes a decal material invisible.
 - `python restore.py <vmat>` puts a material's maps back from the backup that `clean.py` took before its first write.
 - `python clean.py --check` lists the materials in `specs/` whose maps aren't as cleaned (`cleaned.json` has each map's

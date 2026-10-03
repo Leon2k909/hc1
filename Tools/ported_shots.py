@@ -5,7 +5,7 @@ shot_voicing.py's; this holds each gun's Voicing, where its rip comes from and w
 
     python Tools/ported_shots.py <gun>|all [--preview <wav>]
 
-<gun> is vityaz, bizon, vepr12, p90, mp7, aug, uzi, fal, m18 or famas. Each gun's assets script builds its shot with
+<gun> is vityaz, bizon, vepr12, p90, mp7, aug, uzi, fal, m18, famas or mcx. Each gun's assets script builds its shot with
 build() here. Run on its own, this does the same: it rewrites the gun's <name>_NN.wav takes and its fire event's list
 and pitch, leaving the gun's other sounds alone. --preview writes a demo instead: the ripped shot, the voiced one, then
 a burst at the gun's rate each way. The ripped shots and events as they were are in Backups/ported_shots_rip/<gun>/.
@@ -36,7 +36,7 @@ Each gun's voicing, by shot_voicing's steps:
    a pistol at arm's length): 6.6 ms for the FAL (0.87 m) to 7.7 ms for the P90 (0.4 m, a bullpup).
 5. Echoes from 35 ms to 1.4 s, the same surroundings as the voiced rifles'. The echoes' level against the direct blast
    follows how far the muzzle is from the ear: -33 dB 0.4 s after the loudest 100 ms at a rifle's 0.6-0.7 m, -35 for
-   the SMGs' ~0.47 m, -36 for the P90's 0.4, -31.5 for the FAL's 0.87.
+   the SMGs' ~0.47 m, -36 for the P90's 0.4, -31.5 for the FAL's 0.87, -34 for the MCX's 0.54.
 Loudness matches each rip as its assets script levelled it (K-weighted, loudest 100 ms). The event's pitch spread is
 0.98-1.02 where the rip has several recordings, and 0.97-1.03 where it has one (the takes' echoes vary, not the blast).
 """
@@ -121,6 +121,12 @@ def _single(module):
 
 def _fal():
     import fal_assets as a
+    raw = shot_voicing.decode([a.EXTRACTED / "sound" / s for s in a.SHOTS], a.SHOT_GAIN_DB)
+    return raw, _levelled(lambda out: a.level_shots(out, a.SHOTS, "x", a.SHOT_GAIN_DB))
+
+
+def _mcx():
+    import mcx_assets as a
     raw = shot_voicing.decode([a.EXTRACTED / "sound" / s for s in a.SHOTS], a.SHOT_GAIN_DB)
     return raw, _levelled(lambda out: a.level_shots(out, a.SHOTS, "x", a.SHOT_GAIN_DB))
 
@@ -240,6 +246,17 @@ GUNS = {
         presence_db=4.0, presence_hold=0.025, ground_delay=0.0071, tail_at_400ms=-33.0),
         "Weapons/FAMAS/sounds", "Weapons/FAMAS/sounds/famas.fire.sound", _famas,
         "a bullpup, 0.76 m long: the muzzle ~0.62 m ahead"),
+    # M855 from a 292 mm (11.5-inch) barrel, 850 rpm, six dry recordings. As levelled: a designed low ring, under
+    # 150 Hz at -11 dB 100-250 ms after the onset (the voiced rifles' -19 to -24), and dark: the first 30 ms centre at
+    # 0.67-1.15 kHz (theirs at 1.25-1.85), the lows in the first 150 ms as loud as anything; -36 to -41 dB at 0.4 s. An
+    # SBR's blast at the shooter is a sharp crack, much of its powder burning past the muzzle, so it keeps its pitch and
+    # gets the lows eased 8 dB and 5 dB of presence: voiced, -23 dB and 1.1-1.55 kHz.
+    "mcx": Gun(Voicing(
+        name="mcx_shot", pitch=1.0, event_pitch="0.98 1.02", takes=_takes(6, 2001), rip_pitch=(0.97, 1.03),
+        rpm=850, preview_bursts=(8,), low_split=130.0, low_cut_db=-8.0, low_hold=0.03, low_ease=0.035,
+        presence_db=5.0, presence_hold=0.025, ground_delay=0.0073, tail_at_400ms=-34.0),
+        "Weapons/MCX/sounds", "Weapons/MCX/sounds/mcx.fire.sound", _mcx,
+        "stock extended, 0.76 m long: the muzzle ~0.54 m ahead"),
 }
 
 

@@ -249,6 +249,12 @@ public static partial class GameText
 			"Австрийская винтовка-буллпап под патрон 5,56x45 мм: 16-дюймовый ствол со складной передней рукояткой и магазин позади пистолетной рукоятки.",
 		["Belgian 7.62x51mm battle rifle: heavy and hard-kicking, with a 21-inch barrel and a 20-round magazine."] =
 			"Бельгийская боевая винтовка под патрон 7,62x51 мм: тяжёлая, с сильной отдачей, 21-дюймовым стволом и магазином на 20 патронов.",
+		["French 5.56x45mm bullpup rifle with a 25-round magazine, a fixed carry handle and selectable automatic, three-round burst and semi-automatic fire."] =
+			"Французская винтовка-буллпап под патрон 5,56x45 мм с магазином на 25 патронов, несъёмной ручкой для переноски и переводчиком огня: автоматический, очередями по три выстрела и одиночный.",
+		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
+			"Американский штатный пистолет под патрон 9x19 мм: компактный P320 армии США со стволом 3,9 дюйма и магазином на 17 патронов.",
+		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =
+			"Американская короткоствольная винтовка под патрон 5,56x45 мм: оружие с газовым поршнем с коротким ходом, 11,5-дюймовым стволом и складным прикладом.",
 		["Russian 5.45x39mm carbine: the AK-74M cut down to a 314 mm barrel, with a side-folding stock."] =
 			"Российский укороченный автомат под патрон 5,45x39 мм: AK-74M с укороченным до 314 мм стволом и складывающимся вбок прикладом.",
 		["Russian 9x18mm submachine gun built on the AKS-74. Straight blowback, fed from a 64-round helical magazine under the barrel."] =

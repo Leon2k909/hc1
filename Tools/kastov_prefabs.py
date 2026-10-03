@@ -16,7 +16,7 @@ The 74u's gameplay prefab and icon were made by hand (see Prefabs.gameplay), so 
 are set.
 
 GUIDs are derived from the template GUIDs, so re-running produces identical files.
-Run: python Tools/kastov_prefabs.py [--weapon kastov762|kastov74u|vityaz|rpk|bizon|ak105|vepr12|m16|p90|mp7|uzi|aug|fal|m18]
+Run: python Tools/kastov_prefabs.py [--weapon kastov762|kastov74u|vityaz|rpk|bizon|ak105|vepr12|m16|p90|mp7|uzi|aug|fal|famas|m18|mcx]
 """
 
 from __future__ import annotations
@@ -796,6 +796,38 @@ def gameplay_m18() -> Gameplay:
     )
 
 
+def gameplay_mcx() -> Gameplay:
+    """The real SIG MCX Virtus SBR's figures with M855 from its 11.5-inch barrel: the M4's round (its damage, falloff
+    curve and recoil pattern), with the falloff distance cut by the short barrel's muzzle energy, as the M18's is."""
+    assets = load(ASSETS / "Weapons" / "MCX" / "mcx_assets.json")
+    sounds, reloads = assets["sounds"], assets["reloads"]
+    m4 = component(find(load(M4 / "weapon_m4a1.prefab")["RootObject"], "Functions"), "Shootable")
+    return Gameplay({
+        # ~2.9 kg empty with the 11.5-inch barrel and the folding telescoping stock, ~3.4 kg with a loaded 30-round
+        # magazine, what the M4 weighs: the rifles' penalty, and no WeightSlowdown.
+        "Equipment": {"SpeedPenalty": 40},
+        "WeaponAmmo": {"Ammo": 30, "MaxAmmo": 30},
+        # 850 rpm, the middle of the 800-900 usually quoted; automatic and semi. M855 leaves the 292 mm (11.5-inch)
+        # barrel at ~837 m/s (~2,750 ft/s; the M4's 14.5-inch at 905), G7 0.151 like theirs. That's 0.855 of the M4's
+        # muzzle energy, so damage falls off over 0.855 of its distance (MaxRange). The sights sit 68 mm over the bore
+        # (the model's sight line through the rear aperture and the front post's tip), zeroed at 300 m like the other
+        # M855 rifles. A suppressor doesn't speed it up: the Virtus's short-stroke piston has a two-position gas valve,
+        # with a setting for a suppressor.
+        "Shootable": {"BaseDamage": 20, "MaxRange": round(m4["MaxRange"] * 0.855), "FireRate": 850,
+                      "SuppressorFireRateScale": 1, "ShootSound": sounds["fire"],
+                      "SuppressedShootSound": sounds["fire_suppressed"],
+                      "SupportedFireModes": ["Automatic", "Semi"], "CurrentFireMode": "Automatic",
+                      **ballistics(837, "G7", 0.151, 68.0, 300, M855_BULLET)},
+        # When the gun is level again in its own clips (tag_sling back within 4 degrees and 0.6 of idle, relative to
+        # the camera): 2.33s, and 2.6s after the empty reload's bolt release.
+        "Reloadable": {"ReloadTime": 2.33, "EmptyReloadTime": 2.6, "TimedReloadSounds": reloads["reload"],
+                       "EmptyReloadSounds": reloads["reload_empty"]},
+        # Free recoil against the M4's (2,5): an M855 round (4.02 g at 837 m/s, 1.7 g of powder) kicks the loaded
+        # ~3.4 kg MCX back at ~1.72 m/s, the loaded M4 at ~1.86 m/s.
+        "ShootRecoil": {"Scale": "1.85,4.62"},
+    })
+
+
 @dataclass(frozen=True)
 class Prefabs:
     """The HC1 side of a gun: its equipment resource, prefabs and gunsmith mounts."""
@@ -1559,6 +1591,61 @@ PREFABS = {
         review_note="Not checked in a match yet: the iron sights, recoil, the slide locking back on the last round, "
                     "reload timing and sounds (the 21-round magazine's too), the look sway, the M4's sprint on a "
                     "pistol, and the third-person hold.",
+    ),
+    "mcx": Prefabs(
+        title="SIG Sauer MCX Virtus",
+        description="American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and "
+                    "a folding stock.",
+        price=2800,
+        deploy_sound="weapons/mcx/sounds/mcx.raise.sound",
+        icon_source="2528829149/materials/vgui/entities/mg_mcharlie",
+        # The flash hider, the raised sights and the factory stock; the folded sights hidden (by the bit rule, not yet
+        # read from the compiled models).
+        default_mesh_groups=341,
+        bones={
+            "tag_sling": (None, "-5.747,0,4.872", "0,0,0,1"),
+            "tag_barrel_attach": ("tag_sling", "7.535,0,0.277", "0,0,0,1"),
+            "muzzle": ("tag_barrel_attach", "12.819,0,-0.023", "0,0,0,1"),
+            "tag_brass": ("tag_sling", "5.845,-0.438,0.532", "0,0,-0.707107,0.707107"),
+        },
+        world_muzzle="14.607,0,5.126",
+        world_eject="0.098,-0.438,5.404",
+        # By the rule, where the first-person hand holds the handguard (its wrist at x 4.2): the handguard's sides are
+        # 0.765 from centre, and its bottom is at 3.683.
+        world_left_hand="4.2,2.735,2.49",
+        slots=[
+            # tag_reflex, on the upper's rail. An optic folds the flip-up sights down.
+            ("Optic", (-2.710, 0, 6.649), (0.25, 0, 8.73), {"iron_sights": 1, "sight_folded": 1}),
+            ("Muzzle", (12.911, 0, 5.114), (17.62, 0, 7.4147), {"muzzle_tip": 1}),  # tag_tip, the flash hider's rear face
+            # tag_grip_attach, on the handguard's flat bottom (5.5 to 12) near its front, ahead of the left hand's
+            # fingers (the index finger wraps it at 9.1).
+            ("Underbarrel", (11.168, 0, 3.688), (8.3, 0, 6.2), {}),
+            # The handguard's right side at the bore's height, ahead of the left hand's fingertips there (7.5).
+            ("Laser", (9.0, -0.765, 5.114), (8.6, -1.22, 7.4147), {}),
+        ],
+        # The stock's hinge block at the back of the receiver, by the real gun's QD sling sockets, which both stocks
+        # share (the charm's anchor sits 0.57 ahead of this, 0.71 in and 1.84 over it, on the block's left side). Not on
+        # the receiver's left side over the grip, where the right thumb rests, nor on the factory stock, where it would
+        # float beside the thin one. Every hand joint stays 1.07 or more from it through every clip (the right thumb's
+        # the nearest).
+        charm=(-8.07, 1.78, 3.66),
+        # The upper receiver's left side above the magazine well.
+        sticker=((0.6, 0.614, 5.7), (0.0, 1.0, 0.0), (1.6, 0.8)),
+        # The 762's measured correction moved by how far the MCX's ADS pose puts its optic slot from the 762's, like the
+        # 74u's. Tune in-game with dev_optic_correction.
+        optic_aim_correction="3.118,0,-0.274",
+        gameplay=gameplay_mcx,
+        guid_salt="mcx/",
+        # SIG's thin folding stock (the pack's light stock): a skeleton stock with a narrow buttplate, less to brace
+        # against than the factory folding telescoping stock, like the FAL Para's.
+        parts={
+            "thin": Part("Thin Folding Stock", "SIG's thin folding stock. Lighter, with a narrow buttplate.", 1.05, 1.05),
+        },
+        # tag_stock_attach.
+        part_slot_positions={"stock": (-7.723, 0, 5.252)},
+        review_note="Not checked in a match yet: the iron sights and the optics' aim (derived: tune with "
+                    "dev_optic_correction), recoil, reload timing and sounds, the look sway and sprint, the left hand "
+                    "in first and third person, the parts on its slots, the charm and the sticker.",
     ),
 }
 

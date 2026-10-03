@@ -250,6 +250,12 @@ public static partial class GameText
 			"Fucile bullpup austriaco in 5,56x45 mm: una canna da 16 pollici con impugnatura anteriore ripiegabile e il caricatore dietro l'impugnatura a pistola.",
 		["Belgian 7.62x51mm battle rifle: heavy and hard-kicking, with a 21-inch barrel and a 20-round magazine."] =
 			"Fucile da battaglia belga in 7,62x51 mm: pesante e dal rinculo violento, con canna da 21 pollici e caricatore da 20 colpi.",
+		["French 5.56x45mm bullpup rifle with a 25-round magazine, a fixed carry handle and selectable automatic, three-round burst and semi-automatic fire."] =
+			"Fucile bullpup francese in 5,56x45 mm con caricatore da 25 colpi, maniglia di trasporto fissa e selettore di fuoco automatico, a raffica da tre colpi e semiautomatico.",
+		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
+			"Pistola d'ordinanza statunitense in 9x19 mm: la P320 compatta dell'Esercito degli Stati Uniti, con canna da 3,9 pollici e caricatore da 17 colpi.",
+		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =
+			"Fucile a canna corta statunitense in 5,56x45 mm: un'arma a pistone a corsa corta con canna da 11,5 pollici e calcio pieghevole.",
 		["Russian 5.45x39mm carbine: the AK-74M cut down to a 314 mm barrel, with a side-folding stock."] =
 			"Carabina russa in 5,45x39 mm: l'AK-74M accorciato a una canna da 314 mm, con calcio ripiegabile lateralmente.",
 		["Russian 9x18mm submachine gun built on the AKS-74. Straight blowback, fed from a 64-round helical magazine under the barrel."] =

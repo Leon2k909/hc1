@@ -252,6 +252,12 @@ public static partial class GameText
 			"오스트리아제 5.56x45mm 불펍 소총으로, 접이식 포어그립이 달린 16인치 총열을 갖췄고 탄창은 권총형 손잡이 뒤에 있습니다.",
 		["Belgian 7.62x51mm battle rifle: heavy and hard-kicking, with a 21-inch barrel and a 20-round magazine."] =
 			"벨기에제 7.62x51mm 전투 소총으로, 무겁고 반동이 강하며 21인치 총열과 20발 탄창을 갖췄습니다.",
+		["French 5.56x45mm bullpup rifle with a 25-round magazine, a fixed carry handle and selectable automatic, three-round burst and semi-automatic fire."] =
+			"프랑스제 5.56x45mm 불펍 소총으로, 25발 탄창과 고정식 운반 손잡이를 갖췄고 자동, 3점사, 반자동을 선택할 수 있습니다.",
+		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
+			"미국의 9x19mm 제식 권총으로, 미 육군의 컴팩트형 P320이며 3.9인치 총열과 17발 탄창을 갖췄습니다.",
+		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =
+			"미국제 5.56x45mm 단총신 소총으로, 쇼트 스트로크 피스톤 방식에 11.5인치 총열과 접이식 개머리판을 갖췄습니다.",
 		["Russian 5.45x39mm carbine: the AK-74M cut down to a 314 mm barrel, with a side-folding stock."] =
 			"러시아제 5.45x39mm 카빈으로, AK-74M의 총열을 314mm로 줄이고 측면 접이식 개머리판을 갖췄습니다.",
 		["Russian 9x18mm submachine gun built on the AKS-74. Straight blowback, fed from a 64-round helical magazine under the barrel."] =

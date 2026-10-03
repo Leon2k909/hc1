@@ -704,6 +704,12 @@ public static partial class GameText
 			"Avusturya yapımı 5,56x45 mm bullpup tüfek: katlanır ön tutamaklı 16 inç namlu ve tabanca kabzasının arkasında şarjör.",
 		["Belgian 7.62x51mm battle rifle: heavy and hard-kicking, with a 21-inch barrel and a 20-round magazine."] =
 			"Belçika yapımı 7,62x51 mm muharebe tüfeği: ağır ve geri tepmesi sert, 21 inç namlulu ve 20 fişeklik şarjörlü.",
+		["French 5.56x45mm bullpup rifle with a 25-round magazine, a fixed carry handle and selectable automatic, three-round burst and semi-automatic fire."] =
+			"Fransız yapımı 5,56x45 mm bullpup tüfek: 25 fişeklik şarjör, sabit taşıma kolu ve seçilebilir tam otomatik, üçlü seri ve yarı otomatik atış.",
+		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
+			"ABD'nin 9x19 mm hizmet tabancası: ABD Ordusu'nun kompakt P320'si, 3,9 inç namlu ve 17 fişeklik şarjörle.",
+		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =
+			"ABD yapımı 5,56x45 mm kısa namlulu tüfek: kısa stroklu pistonlu, 11,5 inç namlulu ve katlanır dipçikli bir silah.",
 		["Russian 5.45x39mm carbine: the AK-74M cut down to a 314 mm barrel, with a side-folding stock."] =
 			"Rus 5,45x39 mm karabina: namlusu 314 mm'ye kısaltılmış, yana katlanır dipçikli bir AK-74M.",
 		["Russian 9x18mm submachine gun built on the AKS-74. Straight blowback, fed from a 64-round helical magazine under the barrel."] =

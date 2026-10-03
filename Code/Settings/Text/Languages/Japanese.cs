@@ -252,6 +252,12 @@ public static partial class GameText
 			"オーストリア製の5.56x45mmブルパップライフル。折りたたみ式フォアグリップ付きの16インチ銃身を備え、マガジンはピストルグリップの後ろにある。",
 		["Belgian 7.62x51mm battle rifle: heavy and hard-kicking, with a 21-inch barrel and a 20-round magazine."] =
 			"ベルギー製の7.62x51mmバトルライフル。重く反動が強い。21インチ銃身と20発マガジンを備える。",
+		["French 5.56x45mm bullpup rifle with a 25-round magazine, a fixed carry handle and selectable automatic, three-round burst and semi-automatic fire."] =
+			"フランス製の5.56x45mmブルパップライフル。25発マガジンと固定式キャリングハンドルを備え、フルオート、3点バースト、セミオートを切り替えられる。",
+		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
+			"米国の9x19mm制式拳銃。米陸軍のコンパクトなP320で、3.9インチ銃身と17発マガジンを備える。",
+		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =
+			"米国製の5.56x45mmショートバレルライフル。ショートストロークピストン式で、11.5インチ銃身と折りたたみ式ストックを備える。",
 		["Russian 5.45x39mm carbine: the AK-74M cut down to a 314 mm barrel, with a side-folding stock."] =
 			"ロシア製の5.45x39mmカービン。AK-74Mの銃身を314mmに切り詰め、横折りたたみ式ストックを備える。",
 		["Russian 9x18mm submachine gun built on the AKS-74. Straight blowback, fed from a 64-round helical magazine under the barrel."] =
