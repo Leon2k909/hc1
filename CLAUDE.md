@@ -3133,10 +3133,13 @@ simulate_input.
   - Every other bool in our graphs defaults to false. Viewmodel `b_reload`, `b_attack`, `b_deploy`, `b_empty` and
     `b_sprint`, the bodies' `ik.hand_*.enabled` and `b_jump` all stay broken until Facepunch fixes it.
   - Converting them to int parameters in the 26 graphs was left for the user to decide.
-- Facepunch's fix would be to write the bool's bits through an int field at offset 0 rather than a float. The int and
-  byte constructors have the same flaw if a constant is inlined into them, though none was in the replays (bots'
-  `holdtype` arrived as 2).
-- Once s&box is fixed, `SetBool` is harmless and can stay.
+- Facepunch fixed it in sbox-public #6000 (commit 4c1a4f98, 2026-10-03): the bool picks `value ? 1 : 0` as an int
+  before `Int32BitsToSingle`, which isn't folded. On 2026-10-03 the installed build (25681412, the 2026-10-02 update)
+  didn't have it yet: `scratchpad/dazt` still got all zeroes for `true`, and Steam had no update waiting. Once a build
+  with it is installed, the reloads, kick, deploy, sprint, hand IK and jump come back with no change on our side.
+  To check a build offline, convert `true` with the installed Sandbox.Engine.dll's `AnimVariant` on a thread with
+  denormals-are-zero set (`_controlfp_s` `_DN_FLUSH`), with tiered compilation off: the fixed one gives `01 00 00 00`.
+- `SetBool` is harmless after the fix and can stay.
 - Compiled offline, not yet seen in-game.
 
 ## Leg animation speeds (`rigged_human.vanmgrph`, players and bots)
