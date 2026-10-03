@@ -1,0 +1,24 @@
+// Tools/reefhall_fauna.py
+Layer0
+{
+	shader "shaders/hc1_fish.shader"
+
+	F_DO_NOT_CAST_SHADOWS 1
+	g_bFogEnabled "1"
+
+	g_flBodyLength "5.750"
+	g_flNoseX "2.550"
+	g_flSwingAmount "0.080"
+	g_flBeatRate "2.600"
+	g_flWaveLength "1.100"
+	g_flFinReach "1.062"
+	g_flFinSwing "0.300"
+	g_flFinRate "2.400"
+	g_flMinRoughness "0.400"
+
+	TextureColor "models/maps/reefhall/fauna/sergeant_major_color.png"
+	TextureNormal "materials/default/default_normal.tga"
+	TextureRoughness "[0.400 0.400 0.400 0.000]"
+	TextureMetalness "[0.000 0.000 0.000 0.000]"
+	TextureAmbientOcclusion "materials/default/default_ao.tga"
+}

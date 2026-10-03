@@ -324,6 +324,38 @@ def obstacle( model, base, radius, height, taper ):
                           "height": height, "taper": taper } )
 
 
+def polygon_counts( model ):
+    """ How many polygons each paint has, to find what a builder adds (`fit_obstacle`). """
+    return { paint: len( items ) for paint, items in model.polygons.items() }
+
+
+def fit_obstacle( model, before, axis=None, margin=0.6 ):
+    """ The obstacle for everything drawn since `before` (polygon_counts): the narrowest upright frustum round it, on
+    an axis through `axis` (plan x y; else the middle of what was drawn), that holds every corner of it. A frustum is
+    convex, so it holds the polygons too: no fish's reach can then reach into a rock, a coral or a kelp leaf. """
+    points = [ p for paint, items in model.polygons.items() for pts, _ in items[before.get( paint, 0 ):] for p in pts ]
+    if not points:
+        return
+    p = np.asarray( points, float )
+    if axis is None:
+        axis = ( ( p[:, 0].min() + p[:, 0].max() ) / 2, ( p[:, 1].min() + p[:, 1].max() ) / 2 )
+    z0, z1 = float( p[:, 2].min() ), float( p[:, 2].max() )
+    height = max( z1 - z0, 0.5 )
+    d = np.hypot( p[:, 0] - axis[0], p[:, 1] - axis[1] )
+    zf = ( p[:, 2] - z0 ) / height
+    best = None
+    for taper in np.linspace( -2.0, 0.9, 59 ):
+        radius = float( np.max( d / ( 1 - taper * zf ) ) )
+        volume = radius * radius * ( 1 - taper + taper * taper / 3 )
+        if best is None or volume < best[0]:
+            best = ( volume, radius, taper )
+    _, radius, taper = best
+    # The margin all round: a frustum grown by it sideways (its taper's share of the larger radius) and over its top
+    grown = radius + margin
+    taper = 1 - ( radius * ( 1 - taper ) + margin ) / grown
+    obstacle( model, ( axis[0], axis[1], z0 - margin ), grown, height + 2 * margin, float( taper ) )
+
+
 def tank_box( inside, fr, u0, u1, w0, w1, z0, z1, rng, floor_z=None, back="rh_tankback", decor="reef" ):
     """ A tank's insides behind a window (w0 < w1, w1 at the glass): its walls facing in, a sand floor, rock and coral.
     Drawn only (the glass holds everyone out). """
@@ -436,7 +468,7 @@ def rock( model, base, r, height, rng, paint="rh_rock", corals=True ):
     growing on its ledges, as the live rock in a show tank is. """
     rng = np.random.default_rng( int( rng.integers( 1 << 30 ) ) )
     b = np.asarray( base, float )
-    obstacle( model, b, r * 1.35, height + 4, 0.45 )
+    before = polygon_counts( model )
     z = b[2]
     level = 0
     ledges = []
@@ -464,6 +496,7 @@ def rock( model, base, r, height, rng, paint="rh_rock", corals=True ):
                 th, ph = rng.uniform( 0.0, 0.7 ), rng.uniform( 0, 2 * math.pi )
                 p = centre + np.array( ( rx * math.sin( th ) * math.cos( ph ), ry * math.sin( th ) * math.sin( ph ), rz * math.cos( th ) ) ) * 0.82
                 coral( model, p, rng.uniform( 6, 12 ) * min( 1.2, max( 0.6, r / 36 ) ), rng )
+    fit_obstacle( model, before, ( b[0], b[1] ) )
     return ledges
 
 
@@ -482,13 +515,14 @@ def rock_arch( model, a, b, height, thick, rng, paint="rh_rock" ):
         rr = thick * ( 0.8 + 0.5 * leg ) * rng.uniform( 0.9, 1.1 )
         foot = i in ( 0, n )
         centre = p - np.array( ( 0, 0, rr * 0.35 ) ) if foot else p
+        before = polygon_counts( model )
         lump( model, centre, rr, rr * rng.uniform( 0.8, 1.0 ), rr * rng.uniform( 0.85, 1.1 ), paint, rng, segments=13,
               rings=8, wobble=0.18, crag=0.08, flat_bottom=foot )
-        obstacle( model, np.array( ( p[0], p[1], max( a[2], p[2] - rr * 1.1 ) ) ), rr * 1.05, rr * 2.2, 0.0 )
         if not foot and rng.random() < 0.4:
             ph = rng.uniform( 0, 2 * math.pi )
             top = p + np.array( ( math.cos( ph ) * rr * 0.4, math.sin( ph ) * rr * 0.4, rr * 0.85 ) )
             coral( model, top, rng.uniform( 6, 11 ), rng )
+        fit_obstacle( model, before, ( p[0], p[1] ) )
     for foot in ( a, b ):
         rock( model, foot, thick * 1.3, thick * 1.6, rng, paint )
 
@@ -518,7 +552,7 @@ def coral( model, base, size, rng, kind=None ):
     sponges, each in one of the colony colours. """
     rng = np.random.default_rng( int( rng.integers( 1 << 30 ) ) )
     b = np.asarray( base, float )
-    obstacle( model, b, size * 1.6, size * 2.6, 0.0 )
+    before = polygon_counts( model )
     paint = CORALS[rng.integers( len( CORALS ) )]
     if kind is None:
         names, weights = zip( *CORAL_KINDS )
@@ -556,6 +590,7 @@ def coral( model, base, size, rng, kind=None ):
             d = normalise( up + np.array( ( *rng.uniform( -0.2, 0.2, 2 ), 0.0 ) ) )
             r = size * rng.uniform( 0.16, 0.26 )
             tube( model, b + off - ( 0, 0, 1 ), b + off + d * size * rng.uniform( 1.0, 2.2 ), r * 0.9, paint, sides=8, cap=True, radius1=r )
+    fit_obstacle( model, before, ( b[0], b[1] ) )
 
 
 def tube( model, p0, p1, radius, paint, sides=10, cap=False, radius1=None ):
@@ -584,8 +619,7 @@ def kelp( model, base, height, rng, blades=3 ):
     angled up and drooping at their tips, and a long blade at the top. The leaves are alpha-tested, both sides. """
     rng = np.random.default_rng( int( rng.integers( 1 << 30 ) ) )
     b = np.asarray( base, float )
-    # The stipes lean up to 0.12 of their height and sway 5 off that, and their leaves reach 20 out: a widening cone.
-    obstacle( model, b, 22.0, height, -( 5 + 0.14 * height ) / 22.0 )
+    before = polygon_counts( model )
     lump( model, b, 7, 6, 4, "rh_coral_green", rng, segments=8, rings=4, wobble=0.2 )
     up = np.array( ( 0.0, 0.0, 1.0 ) )
     for s in range( max( 2, blades ) ):
@@ -613,6 +647,8 @@ def kelp( model, base, height, rng, blades=3 ):
             side = -side
             t += spacing
         leaf( model, pts[-1], normalise( pts[-1] - pts[-2] + sway * 0.3 ), rng.uniform( 40, 60 ), rng.uniform( 8, 11 ), rng )
+    # Its stipes lean and its leaves reach out, so it widens upwards: the frustum fitted round it does too.
+    fit_obstacle( model, before, ( b[0], b[1] ) )
 
 
 def leaf( model, base, along, length, width, rng ):
@@ -629,7 +665,7 @@ def sea_grass( model, base, rng, count=None, height=None ):
     b = np.asarray( base, float )
     count = count or int( rng.integers( 6, 12 ) )
     height = height or rng.uniform( 16, 34 )
-    obstacle( model, b, 10.0, height, 0.0 )
+    before = polygon_counts( model )
     for k in range( count ):
         a = rng.uniform( 0, 2 * math.pi )
         d = np.array( ( math.cos( a ), math.sin( a ), 0.0 ) )
@@ -643,6 +679,7 @@ def sea_grass( model, base, rng, count=None, height=None ):
                        uv=[ ( 0.1, 0.0 ), ( 0.9, 0.0 ), ( 0.85, 0.55 ), ( 0.15, 0.55 ) ] )
         model.polygon( "rh_kelp", [ mid - across * w * 0.8, mid + across * w * 0.8, tip ], both_sides=True,
                        uv=[ ( 0.15, 0.55 ), ( 0.85, 0.55 ), ( 0.5, 1.0 ) ] )
+    fit_obstacle( model, before, ( b[0], b[1] ) )
 
 
 def railing( model, p0, p1, z, height=42.0, glass=True, post_every=60.0, rail="rh_steel", collide=True ):
@@ -2787,32 +2824,95 @@ def probe_object( name, centre, box ):
 
 FAUNA = "models/maps/reefhall/fauna"
 
-# TankFauna's kinds: ( reach sideways and lengthways, reach up and down ). A school's leader keeps the school's room.
-FAUNA_SHARK = ( 40.0, 22.0 )
-FAUNA_RAY = ( 74.0, 40.0 )
-FAUNA_FISH = 6.0
-# The least share of a tank's water each needs free to be put in it (free_share): checked by simulating them offline.
-FAUNA_ROOM = { "shark": 0.05, "ray": 0.08, "school": 0.1 }
+# What lives in each tank, by its size. Each entry is ( species, how many ): a group's count is the whole group (a pair
+# is 2), a solo species' how many lone fish. Neighbouring tanks of a size take the variants in turn, so no two beside
+# each other hold the same mix. All of them are Indo-Pacific reef species, so every tank is a plausible reef community:
+# the clownfish and Banggai cardinals near the rocks, mandarins on the sand, the tangs, angels and idols grazing along the
+# reef, the chromis, sergeant majors and fusiliers schooling over it, and the sharks and mantas in the open water of the
+# biggest tanks. Every tank gets fish: where none of its mix fits, the first small fish that does.
+FAUNA_SMALL = [
+    [ ( "clownfish", 2 ), ( "banggai", 6 ), ( "chromis", 10 ) ],
+    [ ( "mandarin", 1 ), ( "clownfish", 2 ), ( "chromis", 12 ) ],
+    [ ( "lionfish", 1 ), ( "banggai", 5 ), ( "mandarin", 1 ) ],
+    [ ( "copperband", 1 ), ( "chromis", 10 ), ( "clownfish", 2 ) ],
+    [ ( "banggai", 7 ), ( "mandarin", 2 ), ( "yellow_tang", 3 ) ],
+    [ ( "puffer", 1 ), ( "clownfish", 2 ), ( "chromis", 8 ) ],
+]
+FAUNA_MID = [
+    [ ( "yellow_tang", 5 ), ( "moorish_idol", 2 ), ( "chromis", 14 ), ( "clownfish", 2 ) ],
+    [ ( "blue_tang", 4 ), ( "regal_angel", 1 ), ( "copperband", 1 ), ( "sergeant_major", 10 ) ],
+    [ ( "yellow_tang", 4 ), ( "blue_tang", 3 ), ( "puffer", 1 ), ( "banggai", 6 ) ],
+    [ ( "moorish_idol", 2 ), ( "regal_angel", 1 ), ( "lionfish", 1 ), ( "chromis", 16 ) ],
+    [ ( "sergeant_major", 12 ), ( "copperband", 1 ), ( "clownfish", 2 ), ( "mandarin", 1 ) ],
+]
+FAUNA_BIG = [
+    [ ( "fusilier", 22 ), ( "yellow_tang", 7 ), ( "blue_tang", 5 ), ( "moorish_idol", 2 ), ( "puffer", 1 ) ],
+    [ ( "sergeant_major", 18 ), ( "fusilier", 16 ), ( "regal_angel", 2 ), ( "lionfish", 1 ), ( "chromis", 18 ) ],
+    [ ( "blue_tang", 6 ), ( "yellow_tang", 6 ), ( "copperband", 2 ), ( "moorish_idol", 2 ), ( "sergeant_major", 14 ) ],
+]
+FAUNA_HUGE = [
+    [ ( "reef_shark", 2 ), ( "fusilier", 30 ), ( "sergeant_major", 20 ), ( "yellow_tang", 8 ), ( "blue_tang", 6 ),
+      ( "moorish_idol", 2 ), ( "puffer", 2 ), ( "regal_angel", 1 ) ],
+    [ ( "reef_shark", 2 ), ( "manta_ray", 1 ), ( "fusilier", 34 ), ( "sergeant_major", 22 ), ( "yellow_tang", 8 ),
+      ( "blue_tang", 7 ), ( "moorish_idol", 2 ), ( "puffer", 2 ), ( "chromis", 20 ) ],
+    [ ( "reef_shark", 2 ), ( "manta_ray", 2 ), ( "fusilier", 36 ), ( "sergeant_major", 24 ), ( "yellow_tang", 8 ),
+      ( "blue_tang", 8 ), ( "moorish_idol", 2 ), ( "regal_angel", 2 ), ( "puffer", 1 ) ],
+]
+FAUNA_FALLBACK = [ "clownfish", "mandarin", "banggai", "chromis" ]
+# The least share of a tank's water (in the species' own depth band) where a body, or a group with its room, finds
+# open water to swim to: below it the group shrinks, then the species is left out.
+FAUNA_ROOM = 0.06
 
 
-def school_reach( size ):
-    """ The room a school's leader keeps: 0.6 of the school's spread, since each fish also keeps its own room. """
-    reach = FAUNA_FISH * 2.2 * size ** ( 1 / 3 ) * 0.6
-    return ( reach, reach * 0.5 )
+def fauna_sizes():
+    """ Each model's reach and length (written by Tools/reefhall_fauna.py) with its behaviour (its SPECIES table). """
+    import reefhall_fauna as F
+    sizes = json.loads( ( Path( __file__ ).parent.parent / "Assets" / FAUNA / "fauna_species.json" ).read_text() )
+    keys = ( "speed", "turn", "response", "climb", "bank", "low", "high", "above", "rocks", "home", "pause", "pausemin",
+             "pausemax", "group", "spread" )
+    out = {}
+    for name, spec in F.SPECIES.items():
+        out[name] = dict( sizes[name], **{ k: spec[k] for k in keys } )
+        out[name].update( scalemin=spec["scale"][0], scalemax=spec["scale"][1], beat=spec["swim"]["beat"],
+                          fin=spec["swim"]["fin"], ray=1 if spec.get( "ray" ) else 0 )
+    return out
 
 
-def free_share( prop, obstacles, reach, up, samples=4000, seed=1 ):
-    """ The share of the tank's water where a body of this reach is clear of the water's edges, the glass tube and the
-    rocks, as TankFauna.TryPickPoint finds it (its margin of 12 and 8 included). """
-    reach, up = reach + min( 12, reach ), up + min( 8, up )
+def fauna_room( spec, count ):
+    """ The room TankFauna gives one of a species, or its group's leader (TankFauna.SpawnGroup): ( reach, up, and the
+    spare room it wants round a destination, sideways and up ). """
+    reach, up, length = spec["reach"] * spec["scalemax"], spec["up"] * spec["scalemax"], spec["length"]
+    if spec["group"] == "solo" or count == 1:
+        soft = min( max( length * spec["scalemax"] * 0.8, 2 ), 40 )
+        return reach, up, soft * 0.6, soft * 0.3
+    spacing = length * spec["scalemax"] * max( spec["spread"], 0.6 )
+    radius = spacing * 0.5 if spec["group"] == "pair" else spacing * 0.55 * count ** ( 1 / 3 )
+    soft = min( max( length * 1.5 + radius * 0.3, 3 ), 40 )
+    return reach + radius * 0.7, up + radius * 0.35, soft * 0.6, soft * 0.3
+
+
+def free_share( prop, obstacles, reach, up, band=( 0.0, 1.0 ), above=0.0, spare=( 0.0, 0.0 ), samples=4000, seed=1 ):
+    """ The share of the water, within a depth band (shares of its height) and no higher than `above` over the sand,
+    where a body of this reach (plus `spare` from the walls) is clear of the water's edges, the glass tube and the
+    rocks, as TankFauna.TryPickGoal finds it. """
     rng = np.random.default_rng( seed )
     half = np.asarray( prop["size"], float ) / 2
-    p = rng.uniform( -half, half, ( samples, 3 ) )
-    ok = np.abs( p[:, 2] ) <= half[2] - up
+    floor = -half[2]
+    lo = max( floor + band[0] * 2 * half[2], floor + up )
+    hi = min( floor + band[1] * 2 * half[2], half[2] - up )
+    if above > 0:
+        hi = min( hi, floor + above )
+    if hi < lo:
+        return 0.0
+    p = rng.uniform( ( -half[0], -half[1], lo ), ( half[0], half[1], hi ), ( samples, 3 ) )
+    wall, wall_up = reach + spare[0], up + spare[1]
+    ok = np.abs( p[:, 2] ) <= half[2] - wall_up
+    water = np.ones( samples, bool )
     if prop["fauna"] == "cylinder":
-        ok &= np.hypot( p[:, 0], p[:, 1] ) <= half[0] - reach
+        ok &= np.hypot( p[:, 0], p[:, 1] ) <= half[0] - wall
+        water = np.hypot( p[:, 0], p[:, 1] ) <= half[0]
     else:
-        ok &= ( np.abs( p[:, 0] ) <= half[0] - reach ) & ( np.abs( p[:, 1] ) <= half[1] - reach )
+        ok &= ( np.abs( p[:, 0] ) <= half[0] - wall ) & ( np.abs( p[:, 1] ) <= half[1] - wall )
     if prop["hole"]:
         centre = np.asarray( prop["position"], float )
         along = np.asarray( prop["along"], float )
@@ -2823,13 +2923,35 @@ def free_share( prop, obstacles, reach, up, samples=4000, seed=1 ):
         within = ( p[:, 2] >= z - up ) & ( p[:, 2] <= z + height + up )
         t = np.clip( ( p[:, 2] - z ) / max( height, 1 ), 0, 1 )
         ok &= ~( within & ( np.hypot( p[:, 0] - x, p[:, 1] - y ) < radius * ( 1 - taper * t ) + reach ) )
-    return float( ok.mean() )
+    return float( ok.sum() / max( 1, water.sum() ) )
+
+
+def fits( prop, obstacles, spec, count ):
+    reach, up, spare, spare_up = fauna_room( spec, count )
+    return free_share( prop, obstacles, reach, up, ( spec["low"], spec["high"] ), spec["above"], ( spare, spare_up ) ) >= FAUNA_ROOM
+
+
+def fauna_class( prop ):
+    """ small, mid, big or huge: which list of mixes a tank takes. """
+    size = prop["size"]
+    across = min( size[0], size[1] )
+    volume = math.pi * ( size[0] / 2 ) ** 2 * size[2] if prop["fauna"] == "cylinder" else float( np.prod( size ) )
+    if across >= 500 or ( prop["fauna"] == "cylinder" and across >= 450 ):
+        return "huge"
+    if volume >= 3.5e7:
+        return "big"
+    if volume >= 5.5e6:
+        return "mid"
+    return "small"
 
 
 def fauna_volumes( rooms ):
-    """ Each tank's water, with the rocks, coral and kelp standing in it and how many animals it holds:
-    [ ( room, prop, obstacles (local x y z radius height taper), sharks, rays, schools, school size ) ]. Obstacles go to
-    the water their foot is in. """
+    """ Each tank's water, with the rocks, coral and kelp standing in it and what lives there:
+    [ ( room, prop, obstacles (local x y z radius height taper), [ ( species, count ) ] ) ]. Obstacles go to the water
+    their foot is in. A species goes in only where it finds room (`fits`); a group too big for its tank gets smaller. """
+    sizes = fauna_sizes()
+    variants = { "small": FAUNA_SMALL, "mid": FAUNA_MID, "big": FAUNA_BIG, "huge": FAUNA_HUGE }
+    turn = { key: 0 for key in variants }
     out = []
     for name, _, inside in rooms:
         volumes = [ prop for prop in inside.props if prop["fauna"] in ( "box", "cylinder" ) ]
@@ -2839,8 +2961,6 @@ def fauna_volumes( rooms ):
             along = np.asarray( prop["along"], float )
             left = np.array( ( -along[1], along[0] ) )
             size = np.asarray( prop["size"], float )
-            if min( size ) < 60:
-                continue
 
             def local( point ):
                 d = np.asarray( point, float ) - centre
@@ -2856,37 +2976,48 @@ def fauna_volumes( rooms ):
                 if inside_it and -size[2] / 2 - 40 <= q[2] <= size[2] / 2:
                     mine.append( ( *q, ob["radius"], ob["height"], ob["taper"] ) )
 
-            if prop["fauna"] == "cylinder":
-                volume = math.pi * ( size[0] / 2 ) ** 2 * size[2]
-                across = size[0]
-            else:
-                volume = float( np.prod( size ) )
-                across = min( size[0], size[1] )
-            # A shark turns in ~170 across; a manta needs its 140 span and room to bank.
-            sharks = min( 2 if prop["fauna"] == "cylinder" else 3, max( 1, round( volume / 4e7 ) ) )                 if across >= 300 and size[2] >= 200 else 0
-            rays = ( 2 if volume > 6e8 else 1 ) if ( across >= 450 or ( prop["fauna"] == "cylinder" and across >= 500 ) )                 and size[2] >= 250 else 0
-            schools = max( 1, min( 5, round( volume / 1e7 ) ) )
-            school_size = int( 7 + min( 7, volume / 3e7 ) )
-
-            # Only as many as find room: the big animals need open water to turn in, not a gap between two rocks, and a
-            # school too big for its tank's free water gets smaller.
-            if sharks and free_share( prop, mine, *FAUNA_SHARK ) < FAUNA_ROOM["shark"]:
-                sharks = 0
-            if rays and free_share( prop, mine, *FAUNA_RAY ) < FAUNA_ROOM["ray"]:
-                rays = 0
-            while school_size > 3 and free_share( prop, mine, *school_reach( school_size ) ) < FAUNA_ROOM["school"]:
-                school_size -= 1
-            if free_share( prop, mine, *school_reach( school_size ) ) < FAUNA_ROOM["school"] / 2:
-                schools = 0
-            if not ( sharks or rays or schools ):
-                continue
-            out.append( ( name, prop, mine, sharks, rays, schools, school_size ) )
+            kind = fauna_class( prop )
+            mix = variants[kind][turn[kind] % len( variants[kind] )]
+            turn[kind] += 1
+            groups = []
+            for species, count in mix:
+                spec = sizes[species]
+                grouped = spec["group"] not in ( "solo", "pair" )
+                while grouped and count > 3 and not fits( prop, mine, spec, count ):
+                    count -= 1
+                if spec["group"] == "pair" and not fits( prop, mine, spec, count ):
+                    count = 1
+                if fits( prop, mine, spec, 1 if spec["group"] == "solo" else count ):
+                    groups.append( ( species, count ) )
+            if not groups:
+                for species in FAUNA_FALLBACK:
+                    if fits( prop, mine, sizes[species], 1 ):
+                        groups.append( ( species, 1 ) )
+                        break
+            if not groups:
+                raise SystemExit( f"no fish fit the {name} tank at {np.round( centre )}" )
+            out.append( ( name, prop, mine, groups ) )
     return out
 
 
+def fauna_spec( spec, species, count ):
+    """ A TankFauna group entry: "model=... key=value ...". One fish of a group species lives as a lone one. """
+    keys = ( "count", "group", "reach", "up", "length", "scalemin", "scalemax", "speed", "turn", "response", "climb", "bank",
+             "low", "high", "above", "rocks", "home", "pause", "pausemin", "pausemax", "spread", "beat", "fin", "ray" )
+    values = dict( spec, count=count )
+    if count == 1:
+        values["group"] = "solo"
+    text = " ".join( f"{key}={values[key]}" if isinstance( values[key], str ) else f"{key}={float( values[key] ):g}"
+                     for key in keys )
+    return f"model={FAUNA}/{species}.vmdl {text}"
+
+
 def fauna_objects( rooms ):
+    sizes = fauna_sizes()
     objects = []
-    for k, ( name, prop, obstacles, sharks, rays, schools, school_size ) in enumerate( fauna_volumes( rooms ) ):
+    totals = {}
+    allocation = fauna_volumes( rooms )
+    for k, ( name, prop, obstacles, groups ) in enumerate( allocation ):
         key = f"fauna/{name}/{k}"
         centre = np.asarray( prop["position"], float )
         along = np.asarray( prop["along"], float )
@@ -2896,17 +3027,19 @@ def fauna_objects( rooms ):
             d = np.asarray( prop["hole"][1], float ) - centre
             hole_centre = ( float( np.dot( d[:2], along ) ), float( np.dot( d[:2], ( -along[1], along[0] ) ) ), float( d[2] ) )
         text = ";".join( " ".join( f"{v:.1f}" if j < 3 else f"{v:.2f}" for j, v in enumerate( ob ) ) for ob in obstacles )
+        for species, count in groups:
+            totals[species] = totals.get( species, 0 ) + count
         obj = K.game_object( ids, f"{name.title()} Fauna {k}", key, K.to_world( centre ),
                              rotation=K.yaw_rotation( K.plan_yaw( along ) ), components=[
             K.component( ids, "Facepunch.TankFauna", f"{key}/fauna",
                          Shape="Cylinder" if prop["fauna"] == "cylinder" else "Box",
                          Size=K.vec( prop["size"] ), HoleRadius=round( hole_radius, 2 ), HoleCentre=K.vec( hole_centre ),
-                         Obstacles=text, Sharks=sharks, Rays=rays, Schools=schools, SchoolSize=school_size,
-                         SchoolModels=[ f"{FAUNA}/yellow_tang.vmdl", f"{FAUNA}/chromis.vmdl" ],
-                         SharkModel=f"{FAUNA}/reef_shark.vmdl", RayModel=f"{FAUNA}/manta_ray.vmdl",
+                         Obstacles=text, Groups=[ fauna_spec( sizes[s], s, c ) for s, c in groups ],
                          Seed=7000 + k, FarDistance=3000 ) ] )
         obj["NetworkMode"] = 0
         objects.append( obj )
+    print( f"fauna: {len( allocation )} tanks, {sum( totals.values() )} animals: "
+           + ", ".join( f"{totals[s]} {s}" for s in sorted( totals ) ) )
     return objects
 
 

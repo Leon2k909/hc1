@@ -58,8 +58,10 @@ public static class Hc1ReefHallQa
 				holder.Name = "__reefhall_qa_camera";
 				holder.Flags |= GameObjectFlags.NotSaved | GameObjectFlags.Hidden;
 				camera = holder.Components.Create<CameraComponent>();
-				camera.IsMainCamera = false;
-				camera.Priority = -100;
+				// The scene's camera while it renders, so the tanks' animals near the view are drawn and updated
+				// (TankFauna culls and slows down by the distance from Scene.Camera)
+				camera.IsMainCamera = true;
+				camera.Priority = 1000;
 				camera.ZNear = 4;
 				camera.ZFar = 20000;
 				var tonemap = holder.Components.Create<Tonemapping>();

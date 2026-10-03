@@ -1,0 +1,24 @@
+// Tools/reefhall_fauna.py
+Layer0
+{
+	shader "shaders/hc1_fish.shader"
+
+	F_DO_NOT_CAST_SHADOWS 1
+	g_bFogEnabled "1"
+
+	g_flBodyLength "3.170"
+	g_flNoseX "1.450"
+	g_flSwingAmount "0.100"
+	g_flBeatRate "3.200"
+	g_flWaveLength "1.100"
+	g_flFinReach "0.760"
+	g_flFinSwing "0.400"
+	g_flFinRate "3.600"
+	g_flMinRoughness "0.400"
+
+	TextureColor "models/maps/reefhall/fauna/clownfish_color.png"
+	TextureNormal "materials/default/default_normal.tga"
+	TextureRoughness "[0.400 0.400 0.400 0.000]"
+	TextureMetalness "[0.000 0.000 0.000 0.000]"
+	TextureAmbientOcclusion "materials/default/default_ao.tga"
+}

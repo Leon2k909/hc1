@@ -2006,27 +2006,77 @@ simulate_input.
     `write_scene` leaves out a room's Tanks object when it has none.
 
 ### Reef Hall's animals (`TankFauna`, `hc1_fish.shader`, `Tools/reefhall_fauna.py`)
-- Grey reef sharks, manta rays, and schools of yellow tangs and blue-green chromis. They're scenery: each machine runs
-  its own, nothing is networked, and nothing runs on a dedicated server.
-- `Tools/reefhall_fauna.py` builds the four animals (lofted bodies and fins, painted with numpy) into
-  `Assets/models/maps/reefhall/fauna/`. `--preview <dir>` renders them from the side, the top and below.
-- `shaders/hc1_fish.shader` swims them in the vertex shader. A fish has a wave from head to tail that grows towards
-  the tail. A ray flaps its wings, the wave running back from the leading edge. Each animal's scale (0.85-1.15) sets
-  its phase, so a school doesn't beat in step.
-- `Code/Maps/TankFauna.cs` (one per tank's water) moves them:
+- The user asked for realistic fish in every tank, suited to it, alone, in small groups and in schools, that never
+  swim into the glass, rocks, plants or each other (2026-10-02). They sent pictures of 14 species. All but one are
+  here, life size, in real colours, alongside the grey reef sharks and manta rays from before:
+  - blue tang, yellow tang, copperband butterflyfish, red lionfish, regal angelfish, mandarinfish;
+  - white-spotted puffer, blue-green chromis, yellow-and-blueback fusilier, Banggai cardinalfish;
+  - Indo-Pacific sergeant, Moorish idol and ocellaris clownfish.
+  The freshwater angelfish is left out: every tank is a reef. The Filter Hall's two glass columns are sand filters, so
+  they hold no fish.
+- They're scenery: each machine runs its own, nothing is networked, and nothing runs on a dedicated server.
+- `Tools/reefhall_fauna.py` builds the 15 animals (lofted bodies, lens-shaped fins, colours painted with numpy from
+  where each texel is on the fish) into `Assets/models/maps/reefhall/fauna/`, with `fauna_species.json` (each one's
+  reach, height, length and nose). Its docstring has the sizes and the texture layout. `--preview <dir>` renders them.
+  How each species swims is its `SPECIES` entry: speed, turn rate, response, climb, bank, depth band (`low`/`high`, a
+  share of the water's height; `above`, inches over the sand), how often it goes to a rock, a home's radius, how often
+  and how long it hovers, its group and spacing, and its tail and fin beats.
+- `shaders/hc1_fish.shader` swims them in the vertex shader:
+  - A fish's wave runs from head to tail, growing towards the tail. A ray flaps its wings, the wave running back.
+  - The pectorals (the texture's U 0.5-0.58 strip) scull from their roots.
+  - TankFauna drives each one's `SwimPhase`, `SwimAmount`, `FinPhase` and `FinAmount` (`SwimDriven` 1): the tail beats
+    harder when it speeds up or turns and barely when it hovers, when the pectorals scull instead.
+- `Code/Maps/TankFauna.cs` (one per tank's water) moves them. Each species is a `Groups` entry, "key=value" pairs
+  (`Species.Parse`), written by `reefhall_map.fauna_spec`.
   - The water is a box or an upright cylinder, less a glass tube (the tunnel) and the tank's rocks, coral and kelp
     (`Obstacles`: cones, which kelp's negative taper widens upwards).
-  - Each kind keeps a reach clear of all of it, so no nose, fin or wingtip goes into glass or rock. A move that would
-    end deeper in than it started is taken back.
-  - Sharks, rays and each school's leader cruise to points they can swim to in a straight line. When the water ahead
-    is blocked, they look round a fan of 72 ways for the open one nearest where they're going, and turn into it hard
-    and slowed down. School fish keep their places beside the leader, loosely.
-  - Past `FarDistance` from the camera it updates 4 times a second, and the small fish aren't drawn.
-- `reefhall_map.py` puts the water, the obstacles and the counts on each tank (`fauna_volumes`). A kind goes only into
-  a tank with enough free water for it (`FAUNA_ROOM`, `free_share`). The scene has 8 sharks, 3 rays and 725 small fish.
-- Checked offline only: a Python copy of the steering ran every tank for 120 s with three seeds. No animal overlapped
-  its limits by more than 0.05, and sharks and rays kept 85-95% of their cruising speed (the Rotunda's shark 60-80%).
-  The C# compiled with dotnet.
+  - Groups: `solo`, `pair`, `shoal` (loose, milling) or `school` (tight, aligned). A group follows an invisible leader
+    that turns more slowly than its fish and keeps the whole group's room clear. Each fish holds a drifting place round
+    it, so the group keeps a loose shape and turns together. Where a group doesn't fit, its fish live alone.
+  - Lone fish and leaders swim to points they can reach in a straight line: in their depth band, or beside a rock
+    (`rocks`), near a home (`home`: the clownfish's and Banggai cardinals' patch of reef). On arriving, some hover
+    for a while (`pause`), turning slowly to look about.
+  - Steering: back towards the depth band and home, away from the walls, glass, sand and rocks within a soft margin,
+    and away from other fish (the smaller gives way, and every fish keeps well clear of a shark or a ray; leaders take
+    their group out of a big animal's way). It feels ahead, and when that's blocked it looks round a fan for the open
+    way nearest where it wants to go and turns into it, slowed down. Turns ease in and out (`response`), and pitch and
+    bank are limited per species, so big animals turn wide and slow.
+  - Hard limits: each body keeps its reach clear of the water's edges and the rocks, and a move that would end deeper
+    in is taken back. `Separate` then pushes any two bodies that overlap apart (a segment from nose to tail with its
+    half-thickness and half-height each, `BodyLine`), the smaller one most, never into glass or rock.
+  - Past `FarDistance` from the camera a tank updates 4 times a second, and small fish aren't drawn past
+    `CullDistance` (260 lengths, 800-3000).
+  - In the editor nothing is culled (`Scene.IsEditor`): its view is the editor's camera, which the scene can't see.
+    The scene's `Scene.Camera` there was the minimap's capture camera (`MinimapRenderer`, 7500 over the map), so every
+    tank counted as far off and only the sharks and rays showed (the user: "wo sind die fische?", 2026-10-02). That
+    camera is no longer a main camera (`IsMainCamera` false).
+  - The fish are life size, so most are 2-6" long: from the middle of a gallery they're specks, and they're best
+    seen from the glass.
+- `reefhall_map.py` stocks each tank by its size (`fauna_class`: small, mid, big, huge), from that class's mixes
+  (`FAUNA_SMALL` ... `FAUNA_HUGE`), neighbours taking different ones. A group shrinks until it has open water in its
+  band (`FAUNA_ROOM`, `free_share`); a species with none is swapped for a small one that fits. The scene has 68 stocked
+  tanks and 1363 animals: 6 sharks, 3 mantas, 452 chromis, 218 sergeants, 176 fusiliers, 138 Banggai cardinals, 106
+  yellow and 71 blue tangs, 70 clownfish, 32 Moorish idols, 29 mandarins, 18 copperbands, 17 puffers, 15 regal angels
+  and 12 lionfish.
+- `hc1_fauna_check [seconds]` (in play mode: it reads `Game.ActiveScene`) runs every tank that long at once and logs:
+  how far any body comes into glass or rock, how often two bodies overlap (and which kinds), fish stuck outside their
+  hovers, and each species' mean speed against its cruise.
+- Checked with `hc1_fauna_check 20` in play mode on 2026-10-02 (68 tanks, 1363 animals, about 545,000 fish-steps a run):
+  - No body came more than 0.010 into glass or rock (none of the steps over 0.05).
+  - 60-120 fish-steps a run had two bodies overlapping by over 0.05 (about 0.02%), at most 0.35 deep, all in the dense
+    chromis, sergeant and fusilier schools.
+  - 0-1 fish stuck (`Check` counts one that swam under 15% of its cruise outside its hovers): a slow puffer.
+  - Mean speeds near cruise: chromis 4.2 (cruise 4.3), fusiliers 12.4 (13.6), mantas 21-26 (30.3), sharks 28-29
+    (42.7: they slow in their wide turns), Banggai cardinals 1.0 (1.4), mandarins 0.7 (1.0).
+  - Every tank's step together took 1.24 ms, all of them close up and none skipped. In play only the near tanks run every
+    frame.
+  - The check needs a scene whose tanks are the current ones. With two editors open on the project (both answer the
+    bridge, in turn), one kept a stale scene resource with the old 45 tanks that `load_scene` and `recompile_asset` didn't
+    refresh. Loading a copy of the scene under another name did.
+- `hc1_reefhall_views` / `hc1_reefhall_shot` make their camera the scene's main camera while they render, since
+  TankFauna culls the small fish and slows the far tanks by the distance from `Scene.Camera`. The renders on 2026-10-02
+  showed the lionfish by its rock, a chromis school, fusiliers and a tang in a lobby tank, and the sharks and a manta
+  in the control room's panorama.
 - Checked in the editor on 2026-10-02:
   - The navmesh is baked (`reefhall_scene_data/navmesh/baked.navdata`). `get_navmesh_path` reaches all 88 spawn,
     objective and cash spots from both team spawns, and every level: the Rotunda's, lobby's and control room's
@@ -2035,8 +2085,8 @@ simulate_input.
   - Renders of every view against the references, in and out of play mode.
 - The menu picture (`ui/maps/reefhall.png`) is an editor capture of the Rotunda from its balcony
   (`hc1_reefhall_shot art 700 -300 272 -300 300 260 90`).
-- Not yet checked: the animals in a match, sightlines with players, and the cost of the 394 lights and the tanks'
-  ~1.1 million triangles on a slower machine.
+- Not yet checked: the fish seen by a player in a match (swimming, the schools' turns, the shader's tail beat), sightlines
+  with players, and the cost of the 394 lights and the tanks' ~1.1 million triangles on a slower machine.
 
 ## Ridgeback (battle royale map, `Assets/scenes/maps/Ridgeback/`)
 - The second battle royale map, a base to build on: a valley about 1.2 km across in a ring of mountains, on an s&box

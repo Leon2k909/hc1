@@ -171,6 +171,8 @@ public partial class MinimapRenderer : Component, Component.ExecuteInEditor
 		Camera = CameraGameObject.Components.Create<CameraComponent>();
 		Camera.RenderExcludeTags.Add( "skybox" );
 		Camera.Flags = ComponentFlags.NotSaved;
+		// Only a capture camera: never the scene's main camera, which other components take for the view
+		Camera.IsMainCamera = false;
 		Camera.Orthographic = true;
 		Camera.OrthographicHeight = Size;
 		Camera.BackgroundColor = Color.Transparent;
