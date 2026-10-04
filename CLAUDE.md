@@ -826,10 +826,10 @@
 - Its `OpticAimCorrection` `3.118,0,-0.274` is derived with the Bizon's formula, NOT checked in-game. Its z is small
   (the Kastovs' are about -1.2): its flip-up sights stand on the top rail, as the M4's do.
 - Its third-person left hand (`4.2,2.735,2.49`, see Third-person left hand) hasn't been rendered.
-- Made offline on 2026-10-03 with the editor closed: nothing has been compiled (the models, the animgraph, materials,
-  sounds, prefabs and parts), and nothing has been checked in-game. When the editor next opens, check that `v_mcx.vmdl`
-  compiles (see the pipeline notes: the FAL's first compile left no file), and `recompile_asset` the 56 shared parts
-  after the hotload. Its gunsmith review note stays until all of it has been checked in a match.
+- Made offline on 2026-10-03 with the editor closed. When the editor next opened (2026-10-04) it compiled the models
+  (`v_mcx.vmdl_c` 1 MB, `w_mcx.vmdl_c`), the animgraph, the materials, sounds, prefabs and its part, each leaving a
+  compiled file. Nothing has been checked in-game. If the gunsmith doesn't offer it the 56 shared parts,
+  `recompile_asset` them after a hotload. Its gunsmith review note stays until all of it has been checked in a match.
 
 ## MP5 barrels (Workshop MW19 parts)
 - The Rail Handguard (`gunsmith/mpapa5/underbarrel/rail_grip.gnsmth`) only swaps the handguard. It hides
@@ -2239,17 +2239,28 @@ simulate_input.
   cascades. In s&box's source the cascades are fitted in managed code (`ShadowMapper.Directional`), which only reads
   that ConVar, so `SceneDirectionalLight.SetCascadeDistanceScale` doesn't shorten them.
 - Layout (east, north): Town (centre), Farm (NW), Airfield (N, a runway pad), Lumber Camp (NE), Quarry (SW, a pit with
-  32-degree walls), Military Base (SE), Radio Hill (S, flat top 1350 up), West Camp and East Crossing. A dry river runs
+  32-degree walls), Military Base (SE), Radio Hill (S, flat top 1350 up), West Camp and East Crossing. A river runs
   west to east through gorges in the ring, with a bed that only falls eastward and 24-degree banks. Eight roads join
   the sites, fording the river.
+- The river's water (`Tools/ridgeback_river.py`, 2026-09-28) is 21 strips (`models/maps/ridgeback/river/river_NN`)
+  along `ridgeback_map.RIVER`, 22-38 over its bed, in the scene's "River" group. They're tagged `water`, with no
+  collision or shadows, so players wade through.
+  - The script fits the strips to the terrain the editor has, exported by `ridgeback_river_export`
+    (`Editor/RidgebackRiverTools.cs`, into `output/river/`). It replaces only that group in the scene.
+  - `ridgeback_river_validate` checks the depths in the running scene.
+  - `shaders/ridgeback_river.shader` scrolls two normal maps downstream and fades the water out over the shallows, by
+    the depth behind it. The strips are 1240 wide, and the banks cut them off.
+  - Its material's keys were `TextureNormalA` / `TextureNormalB`. The shader has no inputs by those names, so the water
+    drew with flat default normals and no ripples. Since 2026-10-04 the keys are `NormalA` / `NormalB`: a vmat's
+    texture key is the name in the shader's `CreateInputTexture2D`. Not yet seen in-game.
 - Everything in the valley is walkable (under 40 degrees, the navmesh's `AgentMaxSlope`) except a few small spots: pads
   and roads are cut and filled at 22/20 degrees at most (`terrace`), and the mountains past the foothills are the
   walls. The map's edges have invisible walls (`Map Bounds`), and the river gorges lead out to them.
-- The scene: the terrain, grass, sun, sky, fog, `battle_royale.prefab`, `game_setup.prefab`, a bot manager, a spawn at each
-  site (the fallback while there are no drop points; Town's is first, so `IsOnMainNavMesh` paths to it), the buildings
-  (under "Buildings") and a `BattleRoyaleArea` (the first circle, radius 24000 on the valley). The navmesh has custom bounds (±28500), whose
-  corners take in ledges up in the mountains that nobody can reach: a circle sampled from the navmesh would stretch to
-  them, hence the area. The navmesh doesn't update in the editor by itself.
+- The scene: the terrain, grass, sun, sky, fog, `battle_royale.prefab`, `game_setup.prefab`, a bot manager, a spawn at
+  each site (the fallback while there are no drop points; Town's is first, so `IsOnMainNavMesh` paths to it), the
+  buildings (under "Buildings") and a `BattleRoyaleArea` (the first circle, radius 24000 on the valley). The navmesh has
+  custom bounds (±28500), whose corners take in ledges up in the mountains that nobody can reach: a circle sampled from
+  the navmesh would stretch to them, hence the area. The navmesh doesn't update in the editor by itself.
 - The ground and grass were checked in play (2026-09-26), and the far grass and trees on 2026-09-27. Loading the map
   in a running game (`dev_mode battle_royale ridgeback`) takes ~18 s, with or without the trees. Play starts in the
   editor often stall first: 50-90 s before the trees, 80-160 s with them (2026-09-27, each time ending just before
