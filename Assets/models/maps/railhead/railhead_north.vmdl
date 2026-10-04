@@ -1,0 +1,89 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc29:version{3cec427c-1b0e-4d48-a90a-0436f33a6041} -->
+{
+	rootNode =
+	{
+		_class = "RootNode"
+		children =
+		[
+			{
+				_class = "MaterialGroupList"
+				children =
+				[
+					{
+						_class = "DefaultMaterialGroup"
+						remaps =
+						[
+							{ from = "ashlar_grey.vmat" to = "materials/buildings/ashlar_grey.vmat" },
+							{ from = "brick.vmat" to = "materials/buildings/brick.vmat" },
+							{ from = "copper.vmat" to = "materials/buildings/copper.vmat" },
+							{ from = "gravel.vmat" to = "materials/buildings/gravel.vmat" },
+							{ from = "iron_black.vmat" to = "materials/buildings/iron_black.vmat" },
+							{ from = "metal.vmat" to = "materials/buildings/metal.vmat" },
+							{ from = "planks_dark.vmat" to = "materials/buildings/planks_dark.vmat" },
+							{ from = "render_cream.vmat" to = "materials/buildings/render_cream.vmat" },
+							{ from = "render_pale.vmat" to = "materials/buildings/render_pale.vmat" },
+							{ from = "render_rose.vmat" to = "materials/buildings/render_rose.vmat" },
+							{ from = "roller_grey.vmat" to = "materials/buildings/roller_grey.vmat" },
+							{ from = "roof_tiles.vmat" to = "materials/buildings/roof_tiles.vmat" },
+							{ from = "rw_asphalt.vmat" to = "materials/railhead/rw_asphalt.vmat" },
+							{ from = "rw_black.vmat" to = "materials/railhead/rw_black.vmat" },
+							{ from = "rw_concrete.vmat" to = "materials/railhead/rw_concrete.vmat" },
+							{ from = "rw_dressed.vmat" to = "materials/railhead/rw_dressed.vmat" },
+							{ from = "rw_dressed_red.vmat" to = "materials/railhead/rw_dressed_red.vmat" },
+							{ from = "rw_glass.vmat" to = "materials/railhead/rw_glass.vmat" },
+							{ from = "rw_kerb.vmat" to = "materials/railhead/rw_kerb.vmat" },
+							{ from = "rw_lamp_cool.vmat" to = "materials/railhead/rw_lamp_cool.vmat" },
+							{ from = "rw_lamp_warm.vmat" to = "materials/railhead/rw_lamp_warm.vmat" },
+							{ from = "rw_line_white.vmat" to = "materials/railhead/rw_line_white.vmat" },
+							{ from = "rw_paving.vmat" to = "materials/railhead/rw_paving.vmat" },
+							{ from = "rw_paving_warm.vmat" to = "materials/railhead/rw_paving_warm.vmat" },
+							{ from = "rw_posters.vmat" to = "materials/railhead/rw_posters.vmat" },
+							{ from = "rw_rail_head.vmat" to = "materials/railhead/rw_rail_head.vmat" },
+							{ from = "rw_sandstone.vmat" to = "materials/railhead/rw_sandstone.vmat" },
+							{ from = "rw_shopsigns.vmat" to = "materials/railhead/rw_shopsigns.vmat" },
+							{ from = "rw_signal_green.vmat" to = "materials/railhead/rw_signal_green.vmat" },
+							{ from = "rw_signal_red.vmat" to = "materials/railhead/rw_signal_red.vmat" },
+							{ from = "rw_steel.vmat" to = "materials/railhead/rw_steel.vmat" },
+							{ from = "rw_steel_dark.vmat" to = "materials/railhead/rw_steel_dark.vmat" },
+							{ from = "rw_steel_grey.vmat" to = "materials/railhead/rw_steel_grey.vmat" },
+							{ from = "rw_tactile.vmat" to = "materials/railhead/rw_tactile.vmat" },
+							{ from = "rw_window_dark.vmat" to = "materials/railhead/rw_window_dark.vmat" },
+							{ from = "rw_wood.vmat" to = "materials/railhead/rw_wood.vmat" },
+							{ from = "setts.vmat" to = "materials/buildings/setts.vmat" },
+							{ from = "slate.vmat" to = "materials/buildings/slate.vmat" },
+							{ from = "trim_brown.vmat" to = "materials/buildings/trim_brown.vmat" },
+							{ from = "trim_green.vmat" to = "materials/buildings/trim_green.vmat" },
+							{ from = "trim_white.vmat" to = "materials/buildings/trim_white.vmat" },
+							{ from = "water.vmat" to = "materials/buildings/water.vmat" }
+						]
+						use_global_default = false
+						global_default_material = ""
+					},
+				]
+			},
+			{
+				_class = "RenderMeshList"
+				children =
+				[
+					{
+						_class = "RenderMeshFile"
+						name = "railhead_north"
+						filename = "models/maps/railhead/railhead_north.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+				]
+			},
+		]
+		model_archetype = ""
+		primary_associated_entity = ""
+		anim_graph_name = ""
+		base_model_name = ""
+	}
+}

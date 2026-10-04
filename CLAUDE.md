@@ -1602,7 +1602,7 @@
 
 ## Maps
 - Match maps (map picker, Quick Play, end-of-match vote) are `GameUtils.IsMatchReadyMap`: Flatgrass, Innocent Hotel,
-  Belltower and Reef Hall (see their sections below).
+  Belltower, Reef Hall and Railhead (see their sections below).
 - The hub (`HubPage`) is one featured screen for the tab picked on its left rail (`HubModeRail`, `HubPage.Operation`:
   Multiplayer, Battle Royale or Zombies; Campaign is locked), like the user's CoD-style mockup. Its art is
   `ui/modes/<mode>_wide.png`, a 1024x720 cut of the 2:3 card art. Battle Royale has no wide cut or blurred backdrop, so
@@ -2087,6 +2087,89 @@ simulate_input.
   (`hc1_reefhall_shot art 700 -300 272 -300 300 260 90`).
 - Not yet checked: the fish seen by a player in a match (swimming, the schools' turns, the shader's tail beat), sightlines
   with players, and the cost of the 394 lights and the tanks' ~1.1 million triangles on a slower machine.
+
+## Railhead (multiplayer map, `Tools/railhead_map.py`)
+- The user asked for a new AAA map, made without the editor or MCP (2026-10-03). Railhead is Hohenwald Hauptbahnhof
+  (Hohenwald Hbf, a made-up city), a German terminus at 14:03 on 3 October. It's built by script like Belltower and
+  Reef Hall (`Tools/map_kit.py`), from these scripts:
+  - `railhead_station.py`: the structure. It has a real terminus's figures (its docstring has them):
+    - 760 mm platforms and standard gauge;
+    - a shed of two 30.5 m iron-and-glass spans, like Frankfurt's and Leipzig's;
+    - the sandstone head building with its vaulted booking hall and gallery;
+    - the footbridge, the platform canopies, the cab roads' arcades, the goods sheds on their loading banks and the
+      signal box.
+  - `railhead_props.py`: the track and its equipment, the rolling stock, containers, furniture and yard clutter. Its
+    docstring has each prop's API, conventions and triangle and collision budget.
+    - Track: UIC 60 rail, crossovers, buffer stops, Ks signals and the overhead line.
+    - Rolling stock: two-car EMUs, a locomotive and coaches, and wagons.
+    - Furniture and clutter: benches, machines, kiosks, shelters, hanging displays and signs, clocks, lamps, fences,
+      pallets, forklifts, cars and vans.
+    - `--preview <dir>` renders its showcase.
+  - `railhead_backdrop.py`: the city round the station. Its docstring has the layout and the sources.
+    - The play area's east and west walls are rows of five-storey Gründerzeit (1880-1910) tenements across the cab
+      roads (`edge_blocks`, the only backdrop model with collision). Each side is built in place, in its own colours,
+      so its shop signs read the right way round: don't mirror it.
+    - North: the Bahnhofsplatz with its tram stop, the hotel and office block facing the station, and the cab roads
+      running on north. The east cab road's view ends at a minster's twin spires (76 m), the west's at a brick hall
+      church (71 m).
+    - South: the line runs out in a cutting to a tunnel portal at n -8000. The cutting has a road overbridge
+      (n -3100) and a railcar depot, with a machine works, a gasholder, allotments, a village on the hill and woods
+      beside it.
+    - Round it all: a skyline of 55 m blocks out to ~600 m (the city's ground ends at 24500, `R0`), with a Baroque
+      onion dome, a 1970s office tower (104 m), a slab block, a brewery chimney and a water tower, then hills rising to
+      86 m by the world's edge (40000, ~1 km).
+    - 188 trees are Facepunch's cloud oaks and beech bushes, in the scene's `__references` as Belltower's are.
+    - `--preview <dir> [view ...]` renders its own 31 views, with the station from `railhead_station`.
+    - The map script lays the corridor's track, ballast and overhead line from the throat to 20 m into the tunnel,
+      and the depot's lead off track C (`depot_lead`). The depot pit's wall splays out from the bridge to `THROAT_E`
+      so the lead runs in beside it, and the lead's sleepers stop where C's are under them.
+  - `railhead_materials.py`: the rw_ paints, drawn with numpy into `Assets/materials/railhead/`, and their atlases
+    (`ATLASES`, `rect_uv`): signs, displays, posters, shop signs and the bronze lettering. The texts are German words,
+    generic train categories (RE, RB, S, IC) and made-up places, with no real operator's name, logo or clock.
+  - `railhead_sky.py`: Belltower's sky baked again with Railhead's sun (38 degrees up, 15 west of south: 14:03 summer
+    time on 3 October at 48 N, 11 E). The scene's sun takes the same angles.
+  - `railhead_preview.py`: flat-shaded views for `--preview`.
+- The map script dresses the station (where every train, sign, bench and lamp goes) and writes:
+  - the models, to `Assets/models/maps/railhead/`;
+  - the scene, `Assets/scenes/maps/Railhead/railhead.scene`, rewritten whole on every run (change the layout in the
+    script, not in the editor);
+  - the radar picture, `ui/minimaps/minimap_railhead.png`.
+  - `--preview <dir> [view ...]` writes the views and the reach grid's picture, and `--backdrop` puts the city in them.
+    With `--art` it also writes the menus' stand-in picture, `ui/maps/railhead.png`, from the aerial view. Replace that
+    with an in-engine capture.
+- The layout is mirrored across e = 0. Red Team spawns on the west cab road and Blue Team on the east. There are three
+  lanes:
+  - North: the concourse across the platforms' heads, with the booking hall behind it. Bomb site A is the concourse's
+    east end.
+  - Middle: the platforms under the shed, crossed by the footbridge. Trains stand at four of the six tracks.
+  - South: the platform ends under their canopies, the throat round the signal box, and the goods yards. Bomb site B is
+    in the east goods yard, among the containers.
+- Modes: the scene lists TDM and Defuse.
+  - Deathmatch has its own spawns.
+  - Retakes has spawns per site, as Belltower's are.
+  - Domination's flags are on the outer platforms (A west, C east) and the centre platform (B).
+  - The Hot Zones and the Cash Grab points are `ObjectiveSpot`s.
+  - It's in `GameUtils.MainMenuMapOrder`, `IsMainMenuMap` and `IsMatchReadyMap`.
+- Every run checks all 97 spawn, objective and cash spots, as Belltower's does:
+  - room for a player and a floor under each;
+  - a walk to each from the spawns (`check_reach`, a 2.5D grid that stands in for the navmesh);
+  - that no Retakes Red spawn can see a Blue one.
+  On 2026-10-04 all three passed.
+- The navmesh:
+  - Its bounds stop at `NAV_TOP` (420): over the footbridge's deck, the highest floor anyone walks on, and under the
+    shed's roofs.
+  - The canopies' glass and the goods sheds' roofs are in `railhead_glass`, tagged `navskip`, which the NavMesh's
+    `ExcludedBodies` leaves out. On their own they'd be islands.
+  - Islands left below NAV_TOP are the roofs of the trains, the platform canopies, the footbridge, the wings' closed
+    upper storeys, and the kiosks and shelters. Nobody can reach them, and bots check their paths.
+- Theater doesn't record it: there's no MapInstance for playback to load.
+- To play it: `dev_mode team_deathmatch railhead`.
+- Made offline. When the editor next opened on the project (2026-10-04), it compiled the scene, the 15 models, the 68
+  materials (~275 MB of PNGs) and the sky with no errors.
+  - The log's one Railhead error, `Error loading resource file "prefabs/game_modes/team_deathmatch.prefab,
+    prefabs/game_modes/bomb_defusal.prefab_c"`, is harmless. The engine's dependency scan reads the scene's
+    `GameModes` metadata (`MapInformation`'s ", "-joined list) as a path, and every scene with two modes gets it.
+  - None of it has been checked in the engine: the lighting, the navmesh, bots and the modes' objects.
 
 ## Ridgeback (battle royale map, `Assets/scenes/maps/Ridgeback/`)
 - The second battle royale map, a base to build on: a valley about 1.2 km across in a ring of mountains, on an s&box
