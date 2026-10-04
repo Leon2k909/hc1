@@ -106,7 +106,7 @@ public partial class Throwable : WeaponInputAction,
 			SpawnProjectile( player );
 
 		if ( player.BodyRenderer.IsValid() )
-			player.BodyRenderer.Set( "b_throw_grenade", true );
+			player.BodyRenderer.SetBool( "b_throw_grenade", true );
 
 		if ( !Networking.IsHost ) return;
 		if ( PlayGrenadeRadio ) RadioSounds.Play( player.GameObject.GetTeam(), RadioSound.ThrownGrenade );

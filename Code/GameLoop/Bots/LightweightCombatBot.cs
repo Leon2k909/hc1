@@ -543,7 +543,7 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 			BulletFlyby.Pass( shootable, startPosition, flightEnd, flyby: true, impact: hit, reflections: true );
 		}
 
-		Renderer?.Set( "b_attack", true );
+		Renderer?.SetBool( "b_attack", true );
 	}
 
 	private Vector3 GetMuzzlePosition()
@@ -601,7 +601,7 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 
 		Renderer.Set( "holdtype", (int)AnimationHelper.HoldTypes.Rifle );
 		Renderer.Set( "holdtype_handedness", (int)AnimationHelper.Hand.Right );
-		Renderer.Set( "b_twohanded", true );
+		Renderer.SetBool( "b_twohanded", true );
 		Renderer.SetBool( "b_grounded", true );
 		Renderer.Set( "move_speed", velocity.Length );
 		Renderer.Set( "move_groundspeed", velocity.WithZ( 0f ).Length );
@@ -727,13 +727,13 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 		var target = GetWeaponWorldModel()?.IkLeftHand;
 		if ( IsReloadClipPlaying || !target.IsValid() || !target.Active )
 		{
-			Renderer.Set( "ik.hand_left.enabled", false );
+			Renderer.SetBool( "ik.hand_left.enabled", false );
 			return;
 		}
 
 		var hand = Renderer.WorldTransform.ToLocal( target.WorldTransform );
 		hand = MilitaryUniform.HandIkTransform( Renderer.Model, "hand_left", hand );
-		Renderer.Set( "ik.hand_left.enabled", true );
+		Renderer.SetBool( "ik.hand_left.enabled", true );
 		Renderer.Set( "ik.hand_left.position", hand.Position );
 		Renderer.Set( "ik.hand_left.rotation", hand.Rotation );
 	}
@@ -791,11 +791,11 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 
 		if ( !gun.IsValid() || ShoulderedHandIk( Renderer, gun, _eyeOnGun, aim ) is not { } hand )
 		{
-			Renderer.Set( "ik.hand_right.enabled", false );
+			Renderer.SetBool( "ik.hand_right.enabled", false );
 			return;
 		}
 
-		Renderer.Set( "ik.hand_right.enabled", true );
+		Renderer.SetBool( "ik.hand_right.enabled", true );
 		Renderer.Set( "ik.hand_right.position", hand.Position );
 		Renderer.Set( "ik.hand_right.rotation", hand.Rotation );
 	}

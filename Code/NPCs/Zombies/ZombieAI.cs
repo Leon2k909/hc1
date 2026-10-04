@@ -508,7 +508,7 @@ public sealed class ZombieAI : Component, Component.IDamageable
 		if ( Anim == AnimState.Attack && _playingSeq != "attack" )
 		{
 			_playingSeq = "attack";
-			Renderer.Set( "b_attack", true );
+			Renderer.SetBool( "b_attack", true );
 		}
 		else if ( Anim != AnimState.Attack )
 		{

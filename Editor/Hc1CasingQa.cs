@@ -34,9 +34,9 @@ public static class Hc1CasingQa
 					r.RenderOptions.Game = true;
 					r.RenderOptions.Overlay = false;
 				}
-				view.ModelRenderer.Set( "b_deploy_skip", true );
-				view.ModelRenderer.Set( "b_grounded", true );
-				view.ModelRenderer.Set( "b_twohanded", true );
+				view.ModelRenderer.SetBool( "b_deploy_skip", true );
+				view.ModelRenderer.SetBool( "b_grounded", true );
+				view.ModelRenderer.SetBool( "b_twohanded", true );
 				root.Enabled = true;
 				camera = new GameObject( true, "Casing QA camera" ).Components.Create<CameraComponent>();
 				camera.BackgroundColor = new Color( 0.12f, 0.15f, 0.18f );

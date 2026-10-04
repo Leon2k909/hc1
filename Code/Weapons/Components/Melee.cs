@@ -48,14 +48,14 @@ public partial class Melee : WeaponInputAction
 		}
 
 		// Third person
-		Equipment?.Owner?.BodyRenderer?.Set( "b_attack", true );
+		Equipment?.Owner?.BodyRenderer?.SetBool( "b_attack", true );
 
 		// First person
-		Equipment?.ViewModel?.ModelRenderer.Set( "b_attack", true );
+		Equipment?.ViewModel?.ModelRenderer.SetBool( "b_attack", true );
 
 		if ( hit.IsValid() )
 		{
-			Equipment?.ViewModel?.ModelRenderer.Set( "b_attack_has_hit", true );
+			Equipment?.ViewModel?.ModelRenderer.SetBool( "b_attack_has_hit", true );
 		}
 	}
 

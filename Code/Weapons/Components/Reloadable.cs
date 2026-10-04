@@ -174,15 +174,15 @@ public partial class Reloadable : WeaponInputAction,
 		if ( SingleReload )
 		{
 			// Tags will be better so we can just react to stimuli.
-			Equipment.ViewModel?.ModelRenderer?.Set( "b_reloading", true );
+			Equipment.ViewModel?.ModelRenderer?.SetBool( "b_reloading", true );
 
 			bool hasAmmo = AmmoComponent.HasAmmo;
-			Equipment.ViewModel?.ModelRenderer.Set( !hasAmmo ? "b_reloading_first_shell" : "b_reloading_shell", true );
+			Equipment.ViewModel?.ModelRenderer.SetBool( !hasAmmo ? "b_reloading_first_shell" : "b_reloading_shell", true );
 		}
 		else
 		{
 			// Tags will be better so we can just react to stimuli.
-			Equipment.ViewModel?.ModelRenderer?.Set( "b_reload", true );
+			Equipment.ViewModel?.ModelRenderer?.SetBool( "b_reload", true );
 		}
 
 
@@ -192,7 +192,7 @@ public partial class Reloadable : WeaponInputAction,
 			PlayAsyncSound( kv.Key * DurationMultiplier, kv.Value, () => IsReloading );
 		}
 
-		Equipment.Owner?.BodyRenderer?.Set( "b_reload", true );
+		Equipment.Owner?.BodyRenderer?.SetBool( "b_reload", true );
 	}
 
 	[Rpc.Owner]
@@ -205,9 +205,9 @@ public partial class Reloadable : WeaponInputAction,
 		}
 
 		// Tags will be better so we can just react to stimuli.
-		Equipment.ViewModel?.ModelRenderer?.Set( "b_reload", false );
-		Equipment.Owner?.BodyRenderer?.Set( "b_reload", false );
-		Equipment.ViewModel?.ModelRenderer?.Set( "b_reloading", false );
+		Equipment.ViewModel?.ModelRenderer?.SetBool( "b_reload", false );
+		Equipment.Owner?.BodyRenderer?.SetBool( "b_reload", false );
+		Equipment.ViewModel?.ModelRenderer?.SetBool( "b_reloading", false );
 	}
 
 	[Rpc.Owner]
@@ -231,7 +231,7 @@ public partial class Reloadable : WeaponInputAction,
 					StartReload();
 				else
 				{
-					Equipment.ViewModel?.ModelRenderer?.Set( "b_reloading", false );
+					Equipment.ViewModel?.ModelRenderer?.SetBool( "b_reloading", false );
 
 					// The closing animation plays before the gun can fire.
 					if ( ReloadExitTime > 0f )
@@ -261,7 +261,7 @@ public partial class Reloadable : WeaponInputAction,
 		}
 
 		// Tags will be better so we can just react to stimuli.
-		Equipment.ViewModel?.ModelRenderer.Set( "b_reload", false );
+		Equipment.ViewModel?.ModelRenderer.SetBool( "b_reload", false );
 	}
 
 	[Property] public Dictionary<float, SoundEvent> TimedReloadSounds { get; set; } = new();

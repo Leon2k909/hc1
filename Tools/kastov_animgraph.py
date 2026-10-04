@@ -33,6 +33,7 @@ from __future__ import annotations
 import zlib
 from pathlib import Path
 
+import animgraph_flags
 import kastov_sway
 import kastov_weapons
 from kastov_weapons import Weapon
@@ -310,8 +311,11 @@ class Graph:
             "m_cameraSettings": {"m_flFov": 60.0, "m_sLockBoneName": "camera", "m_bLockCamera": False,
                                  "m_bViewModelCamera": False},
         }
-        text = kv3(document)
-        path.write_text(f"{HEADER}\n{text.lstrip()}\n", encoding="utf-8", newline="\n")
+        text = f"{HEADER}\n{kv3(document).lstrip()}\n"
+        if animgraph_flags.ENABLED:
+            # The bool parameters as enums, while s&box can't set a bool true (see animgraph_flags).
+            text, _ = animgraph_flags.convert_text(text, label=path.name)
+        path.write_text(text, encoding="utf-8", newline="\n")
 
 
 def build(weapon: Weapon) -> Graph:

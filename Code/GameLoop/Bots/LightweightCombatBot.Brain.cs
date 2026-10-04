@@ -1996,7 +1996,7 @@ public sealed partial class LightweightCombatBot
 	private void PlayReloadAnimation()
 	{
 		_sinceReloadClip = 0f;
-		Renderer?.Set( "b_reload", true );
+		Renderer?.SetBool( "b_reload", true );
 	}
 
 	#endregion

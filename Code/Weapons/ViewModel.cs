@@ -122,7 +122,7 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 		{
 			ModelRenderer = Components.Get<SkinnedModelRenderer>( FindMode.EverythingInSelfAndDescendants );
 		}
-		ModelRenderer?.Set( "b_deploy_skip", true );
+		ModelRenderer?.SetBool( "b_deploy_skip", true );
 	}
 
 	protected override void OnUpdate()
@@ -176,7 +176,7 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 		if ( Equipment.IsValid() && Equipment.HasTag( "aiming" ) )
 			return;
 
-		ModelRenderer?.Set( "b_jump", true );
+		ModelRenderer?.SetBool( "b_jump", true );
 	}
 
 	void ApplyAnimationTransform()
@@ -369,10 +369,10 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 	void ApplyAnimationParameters()
 	{
 		var aiming = Equipment.HasTag( "aiming" );
-		ModelRenderer.Set( "b_sprint", Owner.IsSprinting && !aiming );
+		ModelRenderer.SetBool( "b_sprint", Owner.IsSprinting && !aiming );
 		// Airborne viewmodel blends can roll the weapon slightly out of the sights.
 		// Keep the aimed pose stable until the player leaves ADS.
-		ModelRenderer.Set( "b_grounded", Owner.IsGrounded || aiming );
+		ModelRenderer.SetBool( "b_grounded", Owner.IsGrounded || aiming );
 
 		// Ironsights
 		ModelRenderer.Set( "ironsights", aiming ? 1 : 0 );
@@ -391,18 +391,18 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 		var reloadDuration = Equipment.GetComponentInChildren<Reloadable>()?.DurationMultiplier ?? 1f;
 		ModelRenderer.Set( "reload_speed", ReloadSpeed / reloadDuration );
 
-		ModelRenderer.Set( "b_grab", Owner.Hovered.IsValid() );
+		ModelRenderer.SetBool( "b_grab", Owner.Hovered.IsValid() );
 
-		ModelRenderer.Set( "b_lower_weapon", Equipment.HasTag( "lowered" ) );
+		ModelRenderer.SetBool( "b_lower_weapon", Equipment.HasTag( "lowered" ) );
 
 		// Handedness
 		var holdType = Equipment.GetHoldType();
 		ModelRenderer.Set( "holdtype", (int)holdType );
 		ModelRenderer.Set( "holdtype_handedness", (int)Equipment.GetHandedness() );
-		ModelRenderer.Set( "b_twohanded", holdType is AnimationHelper.HoldTypes.Rifle or AnimationHelper.HoldTypes.Shotgun );
+		ModelRenderer.SetBool( "b_twohanded", holdType is AnimationHelper.HoldTypes.Rifle or AnimationHelper.HoldTypes.Shotgun );
 
 		// Weapon state
-		ModelRenderer.Set( "b_empty", !Equipment.GetComponentInChildren<WeaponAmmo>()?.HasAmmo ?? false );
+		ModelRenderer.SetBool( "b_empty", !Equipment.GetComponentInChildren<WeaponAmmo>()?.HasAmmo ?? false );
 		// A magazine with its own reload animations (the RPK's box magazines) picks them; 0 is the weapon's own reload.
 		ModelRenderer.Set( "reload_variant", Equipment.ReloadMagazine?.ReloadAnimation ?? 0 );
 
@@ -417,11 +417,11 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 					var hasAmmo = reloadable.AmmoComponent.IsValid() && reloadable.AmmoComponent.HasAmmo;
 					if ( !hasAmmo )
 					{
-						ModelRenderer?.Set( "reload_empty", true );
+						ModelRenderer?.SetBool( "reload_empty", true );
 					}
 					else
 					{
-						ModelRenderer?.Set( "reload", true );
+						ModelRenderer?.SetBool( "reload", true );
 					}
 				}
 				_wasReloading = reloadable.IsReloading;
@@ -434,11 +434,11 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 				{
 					if ( aiming )
 					{
-						ModelRenderer?.Set( "fireAimed", true );
+						ModelRenderer?.SetBool( "fireAimed", true );
 					}
 					else
 					{
-						ModelRenderer?.Set( "fire", true );
+						ModelRenderer?.SetBool( "fire", true );
 					}
 				}
 				_lastTimeSinceShoot = shootable.TimeSinceShoot;
@@ -453,13 +453,13 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 	{
 		set
 		{
-			ModelRenderer?.Set( "b_deploy", value );
-			ModelRenderer?.Set( "b_deploy_skip", !value );
+			ModelRenderer?.SetBool( "b_deploy", value );
+			ModelRenderer?.SetBool( "b_deploy_skip", !value );
 
 			// Map to SCAR-H deploy parameter
 			if ( Equipment.IsValid() && Equipment.Resource.IsValid() && Equipment.Resource.ResourceName.Contains( "scarh", StringComparison.OrdinalIgnoreCase ) )
 			{
-				ModelRenderer?.Set( "deploy", value );
+				ModelRenderer?.SetBool( "deploy", value );
 			}
 		}
 	}
@@ -474,9 +474,9 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 		if ( !throwFn.IsValid() )
 			return;
 
-		ModelRenderer.Set( "b_idle", throwFn.ThrowState == Throwable.State.Idle );
-		ModelRenderer.Set( "b_pull", throwFn.ThrowState == Throwable.State.Cook );
-		ModelRenderer.Set( "b_throw", throwFn.ThrowState == Throwable.State.Throwing );
+		ModelRenderer.SetBool( "b_idle", throwFn.ThrowState == Throwable.State.Idle );
+		ModelRenderer.SetBool( "b_pull", throwFn.ThrowState == Throwable.State.Cook );
+		ModelRenderer.SetBool( "b_throw", throwFn.ThrowState == Throwable.State.Throwing );
 	}
 
 	public void OnFireMode( FireMode currentFireMode )

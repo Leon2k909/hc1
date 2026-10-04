@@ -24,7 +24,7 @@ public sealed class AnimationHelper : Component
 		var localToBone = tx.Transform.Local.Position;
 		if ( localToBone == Vector3.Zero ) localToBone = Vector3.One;
 
-		Target.Set( "hit", true );
+		Target.SetBool( "hit", true );
 		Target.Set( "hit_bone", boneId );
 		Target.Set( "hit_offset", localToBone );
 		Target.Set( "hit_direction", force.Normal );
@@ -57,14 +57,14 @@ public sealed class AnimationHelper : Component
 		tx = Target.Transform.World.ToLocal( tx );
 		tx = MilitaryUniform.HandIkTransform( Target.Model, name, tx );
 
-		Target.Set( $"ik.{name}.enabled", true );
+		Target.SetBool( $"ik.{name}.enabled", true );
 		Target.Set( $"ik.{name}.position", tx.Position );
 		Target.Set( $"ik.{name}.rotation", tx.Rotation );
 	}
 
 	public void ClearIk( string name )
 	{
-		Target.Set( $"ik.{name}.enabled", false );
+		Target.SetBool( $"ik.{name}.enabled", false );
 	}
 
 	public Transform GetEyeWorldTransform
@@ -152,20 +152,20 @@ public sealed class AnimationHelper : Component
 
 	public bool IsSitting
 	{
-		get => Target.GetBool( "b_sit" );
-		set => Target.Set( "b_sit", value );
+		get => Target.GetFlag( "b_sit" );
+		set => Target.SetBool( "b_sit", value );
 	}
 
 	public bool IsGrounded
 	{
-		get => Target.GetBool( "b_grounded" );
+		get => Target.GetFlag( "b_grounded" );
 		set => Target.SetBool( "b_grounded", value );
 	}
 
 	public bool IsSwimming
 	{
-		get => Target.GetBool( "b_swim" );
-		set => Target.Set( "b_swim", value );
+		get => Target.GetFlag( "b_swim" );
+		set => Target.SetBool( "b_swim", value );
 	}
 
 	public float SkidAmount
@@ -176,20 +176,20 @@ public sealed class AnimationHelper : Component
 
 	public bool IsClimbing
 	{
-		get => Target.GetBool( "b_climbing" );
-		set => Target.Set( "b_climbing", value );
+		get => Target.GetFlag( "b_climbing" );
+		set => Target.SetBool( "b_climbing", value );
 	}
 
 	public bool IsNoclipping
 	{
-		get => Target.GetBool( "b_noclip" );
-		set => Target.Set( "b_noclip", value );
+		get => Target.GetFlag( "b_noclip" );
+		set => Target.SetBool( "b_noclip", value );
 	}
 
 	public bool IsWeaponLowered
 	{
-		get => Target.GetBool( "b_weapon_lower" );
-		set => Target.Set( "b_weapon_lower", value );
+		get => Target.GetFlag( "b_weapon_lower" );
+		set => Target.SetBool( "b_weapon_lower", value );
 	}
 
 	public enum HoldTypes
@@ -225,12 +225,12 @@ public sealed class AnimationHelper : Component
 
 	public void TriggerJump()
 	{
-		Target.Set( "b_jump", true );
+		Target.SetBool( "b_jump", true );
 	}
 
 	public void TriggerDeploy()
 	{
-		Target.Set( "b_deploy", true );
+		Target.SetBool( "b_deploy", true );
 	}
 
 	public enum MoveStyles

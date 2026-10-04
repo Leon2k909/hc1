@@ -266,11 +266,11 @@ public partial class Shootable : WeaponInputAction,
 
 		// Third person
 		if ( Equipment.Owner.IsValid() && Equipment.Owner.BodyRenderer.IsValid() )
-			Equipment.Owner.BodyRenderer.Set( "b_attack", true );
+			Equipment.Owner.BodyRenderer.SetBool( "b_attack", true );
 
 		// First person
 		if ( Equipment.ViewModel.IsValid() )
-			Equipment.ViewModel.ModelRenderer.Set( "b_attack", true );
+			Equipment.ViewModel.ModelRenderer.SetBool( "b_attack", true );
 	}
 
 	private void CreateImpactEffects( in SceneTraceResult tr, Surface surface )
@@ -438,7 +438,7 @@ public partial class Shootable : WeaponInputAction,
 		}
 
 		// First person
-		Equipment.ViewModel?.ModelRenderer.Set( "b_attack_dry", true );
+		Equipment.ViewModel?.ModelRenderer.SetBool( "b_attack_dry", true );
 	}
 
 	/// <summary>

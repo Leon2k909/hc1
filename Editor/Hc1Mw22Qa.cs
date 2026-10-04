@@ -198,7 +198,7 @@ public static class Hc1Mw22Qa
 			foreach ( var other in root.Components.GetAll<SkinnedModelRenderer>( FindMode.EverythingInSelfAndDescendants ) ) if ( other != renderer ) other.Enabled = false;
 			renderer.RenderOptions.Game = true; renderer.RenderOptions.Overlay = false;
 			renderer.UseAnimGraph = true; renderer.PlaybackRate = 1; renderer.PlayAnimationsInEditorScene = true;
-			renderer.Set( "ironsights", 1 ); renderer.Set( "speed_ironsights", 1 ); renderer.Set( "b_grounded", true );
+			renderer.Set( "ironsights", 1 ); renderer.Set( "speed_ironsights", 1 ); renderer.SetBool( "b_grounded", true );
 			var point = root.Components.GetAll<GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants ).Single( p => p.Category == GunsmithPartType.Optic );
 			var camera = new GameObject( true, "MW22 ADS camera" ).Components.Create<CameraComponent>();
 			camera.BackgroundColor = new Color( .15f, .22f, .29f ); camera.FieldOfView = 75; camera.ZNear = .1f;

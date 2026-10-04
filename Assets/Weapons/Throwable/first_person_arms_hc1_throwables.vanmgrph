@@ -103,8 +103,8 @@
 											}
 											m_comparisonValue = 
 											{
-												m_nType = 1
-												m_data = true
+												m_nType = 2
+												m_data = 1
 											}
 										},
 									]
@@ -170,8 +170,8 @@
 											}
 											m_comparisonValue = 
 											{
-												m_nType = 1
-												m_data = true
+												m_nType = 2
+												m_data = 1
 											}
 										},
 									]
@@ -237,8 +237,8 @@
 											}
 											m_comparisonValue = 
 											{
-												m_nType = 1
-												m_data = true
+												m_nType = 2
+												m_data = 1
 											}
 										},
 									]
@@ -304,8 +304,8 @@
 											}
 											m_comparisonValue = 
 											{
-												m_nType = 1
-												m_data = true
+												m_nType = 2
+												m_data = 1
 											}
 										},
 									]
@@ -341,8 +341,8 @@
 											}
 											m_comparisonValue = 
 											{
-												m_nType = 1
-												m_data = false
+												m_nType = 2
+												m_data = 0
 											}
 										},
 									]
@@ -408,8 +408,8 @@
 											}
 											m_comparisonValue = 
 											{
-												m_nType = 1
-												m_data = true
+												m_nType = 2
+												m_data = 1
 											}
 										},
 									]
@@ -960,7 +960,7 @@
 		m_Parameters = 
 		[
 			{
-				_class = "CBoolAnimParameter"
+				_class = "CEnumAnimParameter"
 				m_name = "b_pull"
 				m_id = 
 				{
@@ -969,10 +969,15 @@
 				m_previewButton = "ANIMPARAM_BUTTON_NONE"
 				m_bUseMostRecentValue = false
 				m_bAutoReset = false
-				m_bDefaultValue = false
+				m_defaultValue = 0
+				m_enumOptions = 
+				[
+					"false",
+					"true",
+				]
 			},
 			{
-				_class = "CBoolAnimParameter"
+				_class = "CEnumAnimParameter"
 				m_name = "b_throw"
 				m_id = 
 				{
@@ -981,7 +986,12 @@
 				m_previewButton = "ANIMPARAM_BUTTON_NONE"
 				m_bUseMostRecentValue = false
 				m_bAutoReset = true
-				m_bDefaultValue = false
+				m_defaultValue = 0
+				m_enumOptions = 
+				[
+					"false",
+					"true",
+				]
 			},
 			{
 				_class = "CEnumAnimParameter"
@@ -1003,7 +1013,7 @@
 				]
 			},
 			{
-				_class = "CBoolAnimParameter"
+				_class = "CEnumAnimParameter"
 				m_name = "b_deploy_skip"
 				m_id = 
 				{
@@ -1012,10 +1022,15 @@
 				m_previewButton = "ANIMPARAM_BUTTON_NONE"
 				m_bUseMostRecentValue = false
 				m_bAutoReset = false
-				m_bDefaultValue = false
+				m_defaultValue = 0
+				m_enumOptions = 
+				[
+					"false",
+					"true",
+				]
 			},
 			{
-				_class = "CBoolAnimParameter"
+				_class = "CEnumAnimParameter"
 				m_name = "b_deploy_new"
 				m_id = 
 				{
@@ -1024,10 +1039,15 @@
 				m_previewButton = "ANIMPARAM_BUTTON_NONE"
 				m_bUseMostRecentValue = false
 				m_bAutoReset = true
-				m_bDefaultValue = false
+				m_defaultValue = 0
+				m_enumOptions = 
+				[
+					"false",
+					"true",
+				]
 			},
 			{
-				_class = "CBoolAnimParameter"
+				_class = "CEnumAnimParameter"
 				m_name = "b_idle"
 				m_id = 
 				{
@@ -1036,7 +1056,12 @@
 				m_previewButton = "ANIMPARAM_BUTTON_NONE"
 				m_bUseMostRecentValue = false
 				m_bAutoReset = true
-				m_bDefaultValue = false
+				m_defaultValue = 0
+				m_enumOptions = 
+				[
+					"false",
+					"true",
+				]
 			},
 		]
 	}

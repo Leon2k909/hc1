@@ -222,8 +222,8 @@
 											}
 											m_comparisonValue = 
 											{
-												m_nType = 1
-												m_data = true
+												m_nType = 2
+												m_data = 1
 											}
 										},
 									]
@@ -260,8 +260,8 @@
 											}
 											m_comparisonValue = 
 											{
-												m_nType = 1
-												m_data = false
+												m_nType = 2
+												m_data = 0
 											}
 										},
 										{
@@ -273,8 +273,8 @@
 											}
 											m_comparisonValue = 
 											{
-												m_nType = 1
-												m_data = false
+												m_nType = 2
+												m_data = 0
 											}
 										},
 									]
@@ -372,8 +372,8 @@
 											}
 											m_comparisonValue = 
 											{
-												m_nType = 1
-												m_data = true
+												m_nType = 2
+												m_data = 1
 											}
 										},
 										{
@@ -415,8 +415,8 @@
 											}
 											m_comparisonValue = 
 											{
-												m_nType = 1
-												m_data = true
+												m_nType = 2
+												m_data = 1
 											}
 										},
 										{
@@ -489,8 +489,8 @@
 											}
 											m_comparisonValue = 
 											{
-												m_nType = 1
-												m_data = true
+												m_nType = 2
+												m_data = 1
 											}
 										},
 									]
@@ -852,8 +852,8 @@
 											}
 											m_comparisonValue = 
 											{
-												m_nType = 1
-												m_data = true
+												m_nType = 2
+												m_data = 1
 											}
 										},
 									]
@@ -890,8 +890,8 @@
 											}
 											m_comparisonValue = 
 											{
-												m_nType = 1
-												m_data = true
+												m_nType = 2
+												m_data = 1
 											}
 										},
 									]
@@ -928,8 +928,8 @@
 											}
 											m_comparisonValue = 
 											{
-												m_nType = 1
-												m_data = true
+												m_nType = 2
+												m_data = 1
 											}
 										},
 									]
@@ -1149,8 +1149,8 @@
 											}
 											m_comparisonValue = 
 											{
-												m_nType = 1
-												m_data = true
+												m_nType = 2
+												m_data = 1
 											}
 										},
 									]
@@ -1187,8 +1187,8 @@
 											}
 											m_comparisonValue = 
 											{
-												m_nType = 1
-												m_data = true
+												m_nType = 2
+												m_data = 1
 											}
 										},
 									]
@@ -1320,8 +1320,8 @@
 											}
 											m_comparisonValue = 
 											{
-												m_nType = 1
-												m_data = true
+												m_nType = 2
+												m_data = 1
 											}
 										},
 									]
@@ -1419,8 +1419,8 @@
 											}
 											m_comparisonValue = 
 											{
-												m_nType = 1
-												m_data = false
+												m_nType = 2
+												m_data = 0
 											}
 										},
 									]
@@ -1487,8 +1487,8 @@
 											}
 											m_comparisonValue = 
 											{
-												m_nType = 1
-												m_data = false
+												m_nType = 2
+												m_data = 0
 											}
 										},
 									]
@@ -2677,14 +2677,14 @@
 							m_id = 4294967295
 						},
 					]
-					m_selectionSource = "SelectionSource_Bool"
+					m_selectionSource = "SelectionSource_Enum"
 					m_boolParamID = 
 					{
-						m_id = 1945851716
+						m_id = 4294967295
 					}
 					m_enumParamID = 
 					{
-						m_id = 4294967295
+						m_id = 1945851716
 					}
 					m_intParamID = 
 					{
@@ -2805,7 +2805,7 @@
 				]
 			},
 			{
-				_class = "CBoolAnimParameter"
+				_class = "CEnumAnimParameter"
 				m_name = "b_jump"
 				m_id = 
 				{
@@ -2814,10 +2814,15 @@
 				m_previewButton = "ANIMPARAM_BUTTON_NONE"
 				m_bUseMostRecentValue = false
 				m_bAutoReset = true
-				m_bDefaultValue = false
+				m_defaultValue = 0
+				m_enumOptions = 
+				[
+					"false",
+					"true",
+				]
 			},
 			{
-				_class = "CBoolAnimParameter"
+				_class = "CEnumAnimParameter"
 				m_name = "b_grounded"
 				m_id = 
 				{
@@ -2826,7 +2831,12 @@
 				m_previewButton = "ANIMPARAM_BUTTON_NONE"
 				m_bUseMostRecentValue = false
 				m_bAutoReset = false
-				m_bDefaultValue = true
+				m_defaultValue = 1
+				m_enumOptions = 
+				[
+					"false",
+					"true",
+				]
 			},
 			{
 				_class = "CFloatAnimParameter"
@@ -2869,7 +2879,7 @@
 				m_fMaxValue = 1.0
 			},
 			{
-				_class = "CBoolAnimParameter"
+				_class = "CEnumAnimParameter"
 				m_name = "b_attack"
 				m_id = 
 				{
@@ -2878,10 +2888,15 @@
 				m_previewButton = "ANIMPARAM_BUTTON_NONE"
 				m_bUseMostRecentValue = false
 				m_bAutoReset = true
-				m_bDefaultValue = false
+				m_defaultValue = 0
+				m_enumOptions = 
+				[
+					"false",
+					"true",
+				]
 			},
 			{
-				_class = "CBoolAnimParameter"
+				_class = "CEnumAnimParameter"
 				m_name = "b_planting_bomb"
 				m_id = 
 				{
@@ -2890,10 +2905,15 @@
 				m_previewButton = "ANIMPARAM_BUTTON_NONE"
 				m_bUseMostRecentValue = false
 				m_bAutoReset = false
-				m_bDefaultValue = false
+				m_defaultValue = 0
+				m_enumOptions = 
+				[
+					"false",
+					"true",
+				]
 			},
 			{
-				_class = "CBoolAnimParameter"
+				_class = "CEnumAnimParameter"
 				m_name = "b_throw_grenade"
 				m_id = 
 				{
@@ -2902,10 +2922,15 @@
 				m_previewButton = "ANIMPARAM_BUTTON_NONE"
 				m_bUseMostRecentValue = false
 				m_bAutoReset = true
-				m_bDefaultValue = false
+				m_defaultValue = 0
+				m_enumOptions = 
+				[
+					"false",
+					"true",
+				]
 			},
 			{
-				_class = "CBoolAnimParameter"
+				_class = "CEnumAnimParameter"
 				m_name = "b_reload"
 				m_id = 
 				{
@@ -2914,10 +2939,15 @@
 				m_previewButton = "ANIMPARAM_BUTTON_NONE"
 				m_bUseMostRecentValue = false
 				m_bAutoReset = true
-				m_bDefaultValue = false
+				m_defaultValue = 0
+				m_enumOptions = 
+				[
+					"false",
+					"true",
+				]
 			},
 			{
-				_class = "CBoolAnimParameter"
+				_class = "CEnumAnimParameter"
 				m_name = "ik.hand_left.enabled"
 				m_id = 
 				{
@@ -2926,7 +2956,12 @@
 				m_previewButton = "ANIMPARAM_BUTTON_NONE"
 				m_bUseMostRecentValue = false
 				m_bAutoReset = false
-				m_bDefaultValue = false
+				m_defaultValue = 0
+				m_enumOptions = 
+				[
+					"false",
+					"true",
+				]
 			},
 			{
 				_class = "CVectorAnimParameter"

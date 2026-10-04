@@ -79,7 +79,7 @@ public static class Hc1Mw22EffectsQa
 			foreach ( var other in root.Components.GetAll<SkinnedModelRenderer>( FindMode.EverythingInSelfAndDescendants ) ) if ( other != renderer ) other.Enabled = false;
 			renderer.RenderOptions.Game = !overlay; renderer.RenderOptions.Overlay = overlay;
 			renderer.UseAnimGraph = true; renderer.PlaybackRate = 1; renderer.PlayAnimationsInEditorScene = true;
-			renderer.Set( "ironsights", 1 ); renderer.Set( "speed_ironsights", 1 ); renderer.Set( "b_grounded", true );
+			renderer.Set( "ironsights", 1 ); renderer.Set( "speed_ironsights", 1 ); renderer.SetBool( "b_grounded", true );
 			var point = root.Components.GetAll<GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants ).Single( p => p.Category == GunsmithPartType.Optic );
 			point.SetPart( part ); root.WorldPosition = part.OpticAimOffset;
 			root.Enabled = true; renderer.SceneModel.Transform = renderer.WorldTransform;

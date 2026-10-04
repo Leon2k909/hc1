@@ -48,7 +48,7 @@ public partial class DefuseC4 : WeaponInputAction, IGameEventHandler<EquipmentHo
 	[Rpc.Broadcast( NetFlags.HostOnly )]
 	private void SetPlantAnimation( PlayerPawn player, bool planting )
 	{
-		if ( player.IsValid() && player.BodyRenderer.IsValid() ) player.BodyRenderer.Set( "b_planting_bomb", planting );
+		if ( player.IsValid() && player.BodyRenderer.IsValid() ) player.BodyRenderer.SetBool( "b_planting_bomb", planting );
 	}
 
 	/// <summary>Only the host completes a plant. Retakes can pre-place its bomb before the round starts.</summary>

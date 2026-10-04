@@ -381,8 +381,8 @@
 											}
 											m_comparisonValue = 
 											{
-												m_nType = 1
-												m_data = true
+												m_nType = 2
+												m_data = 1
 											}
 										},
 									]
@@ -418,8 +418,8 @@
 											}
 											m_comparisonValue = 
 											{
-												m_nType = 1
-												m_data = true
+												m_nType = 2
+												m_data = 1
 											}
 										},
 									]
@@ -455,8 +455,8 @@
 											}
 											m_comparisonValue = 
 											{
-												m_nType = 1
-												m_data = true
+												m_nType = 2
+												m_data = 1
 											}
 										},
 									]
@@ -492,8 +492,8 @@
 											}
 											m_comparisonValue = 
 											{
-												m_nType = 1
-												m_data = true
+												m_nType = 2
+												m_data = 1
 											}
 										},
 									]
@@ -529,8 +529,8 @@
 											}
 											m_comparisonValue = 
 											{
-												m_nType = 1
-												m_data = true
+												m_nType = 2
+												m_data = 1
 											}
 										},
 									]
@@ -733,7 +733,7 @@
 		m_Parameters = 
 		[
 			{
-				_class = "CBoolAnimParameter"
+				_class = "CEnumAnimParameter"
 				m_name = "fire"
 				m_id = 
 				{
@@ -742,10 +742,15 @@
 				m_previewButton = "ANIMPARAM_BUTTON_NONE"
 				m_bUseMostRecentValue = false
 				m_bAutoReset = true
-				m_bDefaultValue = false
+				m_defaultValue = 0
+				m_enumOptions = 
+				[
+					"false",
+					"true",
+				]
 			},
 			{
-				_class = "CBoolAnimParameter"
+				_class = "CEnumAnimParameter"
 				m_name = "deploy"
 				m_id = 
 				{
@@ -754,10 +759,15 @@
 				m_previewButton = "ANIMPARAM_BUTTON_NONE"
 				m_bUseMostRecentValue = false
 				m_bAutoReset = true
-				m_bDefaultValue = false
+				m_defaultValue = 0
+				m_enumOptions = 
+				[
+					"false",
+					"true",
+				]
 			},
 			{
-				_class = "CBoolAnimParameter"
+				_class = "CEnumAnimParameter"
 				m_name = "reload"
 				m_id = 
 				{
@@ -766,10 +776,15 @@
 				m_previewButton = "ANIMPARAM_BUTTON_NONE"
 				m_bUseMostRecentValue = false
 				m_bAutoReset = true
-				m_bDefaultValue = false
+				m_defaultValue = 0
+				m_enumOptions = 
+				[
+					"false",
+					"true",
+				]
 			},
 			{
-				_class = "CBoolAnimParameter"
+				_class = "CEnumAnimParameter"
 				m_name = "reload_empty"
 				m_id = 
 				{
@@ -778,10 +793,15 @@
 				m_previewButton = "ANIMPARAM_BUTTON_NONE"
 				m_bUseMostRecentValue = false
 				m_bAutoReset = true
-				m_bDefaultValue = false
+				m_defaultValue = 0
+				m_enumOptions = 
+				[
+					"false",
+					"true",
+				]
 			},
 			{
-				_class = "CBoolAnimParameter"
+				_class = "CEnumAnimParameter"
 				m_name = "fireAimed"
 				m_id = 
 				{
@@ -790,7 +810,12 @@
 				m_previewButton = "ANIMPARAM_BUTTON_NONE"
 				m_bUseMostRecentValue = false
 				m_bAutoReset = true
-				m_bDefaultValue = false
+				m_defaultValue = 0
+				m_enumOptions = 
+				[
+					"false",
+					"true",
+				]
 			},
 		]
 	}

@@ -38,7 +38,7 @@ public partial class Boltable : WeaponInputAction,
 	{
 		if ( !CanBolt ) return;
 
-		Equipment.ViewModel?.ModelRenderer?.Set( "b_reload_bolt", true );
+		Equipment.ViewModel?.ModelRenderer?.SetBool( "b_reload_bolt", true );
 
 		GameObject.PlaySound( BoltReload );
 

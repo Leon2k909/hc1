@@ -35,7 +35,7 @@ public static class Hc1BotGripQa
 				var body = bot.Renderer;
 				if ( !bot.IsAlive || !body.IsValid() || body.SceneModel is null ) continue;
 				var gun = bot.GetComponentInChildren<WorldModel>();
-				if ( !gun.IsValid() || !gun.IkLeftHand.IsValid() || !body.GetBool( "ik.hand_left.enabled" ) ) continue;
+				if ( !gun.IsValid() || !gun.IkLeftHand.IsValid() || body.GetInt( "ik.hand_left.enabled" ) == 0 ) continue;
 				var left = body.Model.Bones.GetBone( "hand_L" ) ?? body.Model.Bones.GetBone( "l_hand" );
 				var right = body.Model.Bones.GetBone( "hand_R" ) ?? body.Model.Bones.GetBone( "r_hand" );
 				if ( left is null || right is null ) continue;
@@ -192,7 +192,7 @@ public static class Hc1BotGripQa
 	{
 		body.Set( "holdtype", (int)AnimationHelper.HoldTypes.Rifle );
 		body.Set( "holdtype_handedness", (int)AnimationHelper.Hand.Right );
-		body.Set( "b_grounded", true );
+		body.SetBool( "b_grounded", true );
 		body.Set( "move_speed", 0f );
 		body.Set( "move_groundspeed", 0f );
 		body.Set( "move_x", 0f );
@@ -204,7 +204,7 @@ public static class Hc1BotGripQa
 		body.SetLookDirection( "aim_body", aim, shouldered ? 1f : 0.75f );
 
 		var left = LeftTarget( body, gun );
-		body.Set( "ik.hand_left.enabled", left.HasValue );
+		body.SetBool( "ik.hand_left.enabled", left.HasValue );
 		if ( left is { } l )
 		{
 			body.Set( "ik.hand_left.position", l.Position );
@@ -212,7 +212,7 @@ public static class Hc1BotGripQa
 		}
 
 		var right = shouldered ? LightweightCombatBot.ShoulderedHandIk( body, gun, EyeOnGun( gun, tuning ), aim ) : null;
-		body.Set( "ik.hand_right.enabled", right.HasValue );
+		body.SetBool( "ik.hand_right.enabled", right.HasValue );
 		if ( right is { } r )
 		{
 			body.Set( "ik.hand_right.position", r.Position );

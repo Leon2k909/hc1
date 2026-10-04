@@ -12,7 +12,7 @@ public abstract partial class WeaponModel : Component
 
 	public void Deploy()
 	{
-		ModelRenderer.Set( "b_deploy", true );
+		ModelRenderer.SetBool( "b_deploy", true );
 	}
 
 }

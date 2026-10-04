@@ -182,17 +182,17 @@ public sealed class TheaterViewModel
 		var crouching = body.IsValid() && body.GetFloat( "duck" ) > 0.5f;
 
 		// A body that never had b_grounded set (a bot's) is on the ground.
-		var grounded = !body.IsValid() || !body.Parameters.Contains( "b_grounded" ) || body.GetBool( "b_grounded" );
+		var grounded = !body.IsValid() || !body.Parameters.Contains( "b_grounded" ) || body.GetFlag( "b_grounded" );
 
 		// Drawn: a new gun in their hands while the replay plays through it, rather than one found by seeking.
 		if ( changed )
 		{
 			var drawn = forward;
-			renderer.Set( "b_deploy", drawn );
-			renderer.Set( "b_deploy_skip", !drawn );
+			renderer.SetBool( "b_deploy", drawn );
+			renderer.SetBool( "b_deploy_skip", !drawn );
 
 			if ( _scar )
-				renderer.Set( "deploy", drawn );
+				renderer.SetBool( "deploy", drawn );
 		}
 
 		// Aiming down the sights: the viewmodel's own weight, and its weapon's offsets (ManualOffset).
@@ -216,25 +216,25 @@ public sealed class TheaterViewModel
 
 		if ( viewModel?.IsThrowable ?? false )
 		{
-			renderer.Set( "b_idle", true );
-			renderer.Set( "b_pull", false );
-			renderer.Set( "b_throw", false );
+			renderer.SetBool( "b_idle", true );
+			renderer.SetBool( "b_pull", false );
+			renderer.SetBool( "b_throw", false );
 		}
 		else
 		{
-			renderer.Set( "b_sprint", sprinting && !aiming );
-			renderer.Set( "b_grounded", grounded || aiming );
+			renderer.SetBool( "b_sprint", sprinting && !aiming );
+			renderer.SetBool( "b_grounded", grounded || aiming );
 			renderer.Set( "ironsights", aiming ? 1 : 0 );
 			renderer.Set( "ironsights_fire_scale", aiming ? viewModel?.IronsightsFireScale ?? 0.2f : 0f );
 			renderer.Set( "ironsights_weight", aimWeight );
 			renderer.Set( "speed_ironsights", 1 );
 			renderer.Set( "reload_speed", viewModel?.ReloadSpeed ?? 1f );
-			renderer.Set( "b_grab", false );
-			renderer.Set( "b_lower_weapon", false );
+			renderer.SetBool( "b_grab", false );
+			renderer.SetBool( "b_lower_weapon", false );
 			renderer.Set( "holdtype", (int)_weapon.HoldType );
 			renderer.Set( "holdtype_handedness", (int)_weapon.Handedness );
-			renderer.Set( "b_twohanded", _weapon.HoldType is AnimationHelper.HoldTypes.Rifle or AnimationHelper.HoldTypes.Shotgun );
-			renderer.Set( "b_empty", empty );
+			renderer.SetBool( "b_twohanded", _weapon.HoldType is AnimationHelper.HoldTypes.Rifle or AnimationHelper.HoldTypes.Shotgun );
+			renderer.SetBool( "b_empty", empty );
 			renderer.Set( "reload_variant", 0 );
 			renderer.Set( "firing_mode", _weapon.FiringMode );
 		}
@@ -264,9 +264,9 @@ public sealed class TheaterViewModel
 		if ( forward && lifeActions is not null
 			&& TheaterReplays.LifeActions.CountUpTo( lifeActions.Shots, seconds ) > TheaterReplays.LifeActions.CountUpTo( lifeActions.Shots, last ) )
 		{
-			renderer.Set( "b_attack", true );
+			renderer.SetBool( "b_attack", true );
 			if ( _scar )
-				renderer.Set( aiming ? "fireAimed" : "fire", true );
+				renderer.SetBool( aiming ? "fireAimed" : "fire", true );
 
 			Discharge( suppressed );
 		}
@@ -274,7 +274,7 @@ public sealed class TheaterViewModel
 		UpdateReload( renderer, lifeActions, reloading, empty, forward, seconds );
 
 		if ( forward && _grounded && !grounded && !aiming )
-			renderer.Set( "b_jump", true );
+			renderer.SetBool( "b_jump", true );
 
 		_grounded = grounded;
 
@@ -319,12 +319,12 @@ public sealed class TheaterViewModel
 			{
 				if ( seconds >= _lastShell )
 				{
-					renderer.Set( "b_reloading", false );
+					renderer.SetBool( "b_reloading", false );
 					_nextShell = 0f;
 				}
 				else if ( seconds >= _nextShell )
 				{
-					renderer.Set( "b_reloading_shell", true );
+					renderer.SetBool( "b_reloading_shell", true );
 					_nextShell += _weapon.ShellTime;
 				}
 			}
@@ -337,8 +337,8 @@ public sealed class TheaterViewModel
 
 		if ( !reloading )
 		{
-			renderer.Set( "b_reload", false );
-			renderer.Set( "b_reloading", false );
+			renderer.SetBool( "b_reload", false );
+			renderer.SetBool( "b_reloading", false );
 			return;
 		}
 
@@ -348,8 +348,8 @@ public sealed class TheaterViewModel
 
 		if ( _weapon.SingleReload )
 		{
-			renderer.Set( "b_reloading", true );
-			renderer.Set( empty ? "b_reloading_first_shell" : "b_reloading_shell", true );
+			renderer.SetBool( "b_reloading", true );
+			renderer.SetBool( empty ? "b_reloading_first_shell" : "b_reloading_shell", true );
 
 			// The shells stop when the recorded reload does, less the gun coming back up.
 			var toggles = actions?.Reloading;
@@ -360,9 +360,9 @@ public sealed class TheaterViewModel
 		}
 		else
 		{
-			renderer.Set( "b_reload", true );
+			renderer.SetBool( "b_reload", true );
 			if ( _scar )
-				renderer.Set( empty ? "reload_empty" : "reload", true );
+				renderer.SetBool( empty ? "reload_empty" : "reload", true );
 		}
 	}
 

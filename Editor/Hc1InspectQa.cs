@@ -87,9 +87,9 @@ public static class Hc1InspectQa
 				}
 				names = Enumerable.Range( 0, renderer.Model.AnimationCount ).Select( renderer.Model.GetAnimationName ).ToArray();
 				renderer.UseAnimGraph = true;
-				renderer.Set( "b_deploy_skip", true );
-				renderer.Set( "b_grounded", true );
-				renderer.Set( "b_twohanded", weapon != "usp" );
+				renderer.SetBool( "b_deploy_skip", true );
+				renderer.SetBool( "b_grounded", true );
+				renderer.SetBool( "b_twohanded", weapon != "usp" );
 				renderer.Set( "holdtype", (int)(weapon == "usp" ? AnimationHelper.HoldTypes.Pistol : AnimationHelper.HoldTypes.Rifle) );
 				root.Enabled = true;
 
