@@ -1037,6 +1037,9 @@ def gable_infill( model, n_out, n_in, z0, e0, e1, top, outside, inside, step=40.
 FACADE_DOORS = ( ( 0.0, 200.0, 320.0 ), ( -320.0, 160.0, 300.0 ), ( 320.0, 160.0, 300.0 ) )     # centre, width, crown
 FACADE_WING_DOORS = ( -900.0, 900.0 )
 FACADE_WING_WINDOWS = ( -1060.0, -740.0, 740.0, 1060.0 )
+# The wings' doors' and windows' arches end under the wings' ceiling (WING_CEILING), so their heads don't open into
+# the ceiling slab, whose edge isn't drawn: the doors' showed the sky through the slab and the empty storey above it.
+WING_DOOR_CROWN, WING_WINDOW_CROWN = 200.0, 204.0
 
 
 def south_facade( model, glass ):
@@ -1048,9 +1051,9 @@ def south_facade( model, glass ):
     for c, width, crown in FACADE_DOORS:
         w.add( c, width, 0, crown, "arch" )
     for c in FACADE_WING_DOORS:
-        w.add( c, 120, 0, 220, "arch" )
+        w.add( c, 120, 0, WING_DOOR_CROWN, "arch" )
     for c in FACADE_WING_WINDOWS:
-        w.add( c, 90, 50, 210, "glass_arch" )
+        w.add( c, 90, 50, WING_WINDOW_CROWN, "glass_arch" )
     w.build( model, "rw_sandstone", "render_cream", "rw_dressed", end=None )
     mid = ( n_out + n_in ) / 2
     for c, width, crown in FACADE_DOORS:
@@ -1070,8 +1073,9 @@ def south_facade( model, glass ):
         # Keystone and an archivolt band outside.
         model.box( ( c - 10, n_out - 4, crown - 8 ), ( c + 10, n_out, crown + 22 ), "rw_dressed" )
     for c in FACADE_WING_WINDOWS:
-        pane( glass, model, "e", mid, c - 45, c + 45, 50, 210, "rw_glass", arched=True )
-        glazing_bars( model, "e", mid, c - 45, c + 45, 50, 208, "rw_steel_dark", across=1, spring=165 )
+        pane( glass, model, "e", mid, c - 45, c + 45, 50, WING_WINDOW_CROWN, "rw_glass", arched=True )
+        glazing_bars( model, "e", mid, c - 45, c + 45, 50, WING_WINDOW_CROWN - 2, "rw_steel_dark", across=1,
+                      spring=WING_WINDOW_CROWN - 45 )
         model.box( ( c - 50, n_out - 4, 42 ), ( c + 50, n_out, 50 ), "rw_dressed" )
     # The wings' upper windows, dark: nobody goes up there.
     for c in ( -1060.0, -900.0, -740.0, 740.0, 900.0, 1060.0 ):

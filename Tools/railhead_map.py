@@ -666,7 +666,8 @@ def head_building( m, s ):
             n0 = 1570.0 + 45 * k
             m.box( ( e0, n0, 0 ), ( e1, n0 + 44, 86 ), { "default": "rw_steel_grey", "+e": None }, METAL )
         hanging_sign( m, 1000.0, 1660.0, S.WING_CEILING, [ "schliessfaecher" ], "e", bottom=110.0 )
-    hanging_sign( m, s * 900.0, 1360.0, S.WING_CEILING, [ "info" ], "n", bottom=120.0 )
+    # Well inside the wing's door, so its rod runs up out of sight behind the arch's head.
+    hanging_sign( m, s * 900.0, 1420.0, S.WING_CEILING, [ "info" ], "n", bottom=120.0 )
 
 
 def cab_road( m, s ):

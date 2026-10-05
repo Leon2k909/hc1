@@ -1,31 +1,16 @@
 @namespace Facepunch.UI
 @inherits Panel
 
+@* One piece of equipment in the loadout list (WeaponInfoComponent): its name, then its picture. *@
 <root class="@(IsActive ? "is-active" : "")">
-
     @if ( Equipment.IsValid() )
     {
+        <label class="gunname">@Equipment.Resource.Name</label>
+
         @if ( !string.IsNullOrEmpty( Equipment.Resource.Icon ) )
         {
-            <div class="column">
-
             <div class="icon">
                 <div class="image" style="background-image:url(@Equipment.Resource.Icon);" />
-            </div>
-
-            <span style="gap: 4px; align-items: flex-end;">
-                @if ( IsActive )
-                {
-                    <label class="gunname">@Equipment.Resource.Name</label>
-                }
-            </span>
-
-            </div>
-        }
-        else
-        {
-            <div class="row">
-                <label class="gunname">@Equipment.Resource.Name</label>
             </div>
         }
     }
@@ -43,12 +28,11 @@
     /// </summary>
     public Equipment Equipment { get; set; }
 
-    private WeaponAmmo HasAmmo => Equipment.IsValid() ? Equipment.GetComponent<WeaponAmmo>(true) : null;
     public PlayerPawn Player => Equipment?.Owner;
     public bool IsActive => Player?.CurrentEquipment == Equipment;
 
     protected override int BuildHash()
     {
-        return HashCode.Combine( IsActive, Equipment, HasAmmo?.Ammo );
-    }   
+        return HashCode.Combine( IsActive, Equipment );
+    }
 }

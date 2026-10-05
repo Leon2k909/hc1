@@ -1,44 +1,48 @@
-﻿@using System.Text;
 @namespace Facepunch.UI
 @inherits Panel
 @attribute [StyleSheet]
 
 @if ( !Pawn.IsValid() || !HealthComponent.IsValid() ) return;
 
-<root class="@BuildClass()">
-
-    <div class="inner with-background with-padding flex row gap-sm justify-start">
-        @if ( ArmorComponent.IsValid() )
-        {
-            <div class="armor-readout flex column">
-                <label class="armor-label">@Tr( "ARMOUR" )</label>
-                <span class="flex row align-center gap-sm">
-                    <Icon file="/ui/armor.png" size="24" />
-                    <label class="vital">@Armor</label>
-                </span>
-                @if ( HasHelmet )
-                {
-                    <span class="helmet-status flex row align-center">
-                        <Icon file="/ui/helmet.png" size="12" />
-                        <label>@Tr( "HELMET" )</label>
-                    </span>
-                }
+<root>
+    <div class="plate">
+        <div class="edge" />
+        <div class="rows">
+            <div class="health-row">
+                <Icon File="/ui/health.png" Size="20" />
+                <label class="value">@Health</label>
+                <div class="segments">
+                    @for ( var k = 0; k < Segments; k++ )
+                    {
+                        <div class="seg"><div class="fill" style="width: @(SegmentFill( k ))%;" /></div>
+                    }
+                </div>
             </div>
-        }
 
-        <div class="flex column">
-            <ProgressBar Value="@(Health)" width="128" />
-            <span class="flex row align-center gap-sm">
-                <Icon file="/ui/health.png" size="24" />
-                <label class="vital">@Health</label>
-            </span>
+            @if ( ArmorComponent.IsValid() )
+            {
+                <div class="armor-row">
+                    <Icon File="/ui/armor.png" Size="14" />
+                    <label class="value-sm">@Armor</label>
+                    <div class="armor-bar"><div class="fill" style="width: @(ArmorPercent)%;" /></div>
+                    @if ( HasHelmet )
+                    {
+                        <div class="chip">
+                            <Icon File="/ui/helmet.png" Size="10" />
+                            <label>@Tr( "HELMET" )</label>
+                        </div>
+                    }
+                </div>
+            }
         </div>
     </div>
-
 </root>
 
 @code
 {
+    // The health bar's segments: 10 points each at the usual 100.
+    private const int Segments = 10;
+
     public Pawn Pawn => Client.Viewer.Pawn;
     public HealthComponent HealthComponent => Pawn.HealthComponent;
     public ArmorComponent ArmorComponent => Pawn.GetComponent<ArmorComponent>();
@@ -46,18 +50,36 @@
     public int Armor => ArmorComponent?.Armor.CeilToInt() ?? 0;
     public bool HasHelmet => ArmorComponent?.HasHelmet ?? false;
 
-    protected override int BuildHash()
+    private float HealthFraction => HealthComponent.IsValid() && HealthComponent.MaxHealth > 0
+        ? Math.Clamp( HealthComponent.Health / HealthComponent.MaxHealth, 0f, 1f ) : 0f;
+
+    private int ArmorPercent
     {
-        return !Pawn.IsValid() ? 0 : HashCode.Combine( Health, Armor, HasHelmet, Pawn.HealthComponent?.State );
+        get
+        {
+            var max = ArmorComponent.IsValid() ? ArmorComponent.MaxArmor : 0f;
+            return max > 0 ? (int)Math.Round( Math.Clamp( ArmorComponent.Armor / max, 0f, 1f ) * 100f ) : 0;
+        }
     }
 
-    private string BuildClass()
+    /// How full segment k is, 0 to 100.
+    private int SegmentFill( int k )
     {
-        var sb = new StringBuilder();
-        
-        if ( Health < 30f )
-            sb.Append( "low-health" );
-        
-        return sb.ToString();
+        var filled = HealthFraction * Segments - k;
+        return (int)Math.Round( Math.Clamp( filled, 0f, 1f ) * 100f );
+    }
+
+    protected override int BuildHash()
+    {
+        return !Pawn.IsValid() ? 0 : HashCode.Combine( Health, Armor, HasHelmet, ArmorPercent, Pawn.HealthComponent?.State );
+    }
+
+    // The state's classes are set here: a <root class="@(...)"> adds a class but doesn't take it off again.
+    public override void Tick()
+    {
+        base.Tick();
+        var valid = Pawn.IsValid() && HealthComponent.IsValid();
+        SetClass( "low-health", valid && HealthFraction < 0.3f );
+        SetClass( "hurt", valid && HealthFraction >= 0.3f && HealthFraction < 0.6f );
     }
 }

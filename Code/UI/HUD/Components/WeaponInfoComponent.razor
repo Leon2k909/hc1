@@ -4,44 +4,87 @@
 
 @if ( !Player.IsValid() ) return;
 
-<root class="hud with-deadzone column">
+@* The loadout, right side. It shows only while the player is switching (a slot key, the wheel, a new weapon in hand
+   or a pickup) and fades out ShowSeconds after (Tick sets "shown"). *@
+<root class="hud">
     @foreach ( var slotGroup in Inventory.Equipment.OrderBy( x => x.Resource.Slot ).GroupBy( x => x.Resource.Slot ) )
     {
-        <div class="layout group @GroupClasses( slotGroup.Key )">
-            <div class="background" />
-
-            <InputHint Action="@($"Slot{SlotIndex(slotGroup.Key)}")" class="small" Size="@InputGlyphSize.Small" />
-
-            @foreach ( var equipment in slotGroup )
-            {
-                <EquipmentRow Equipment=@equipment/>
-            }
+        <div class="slot @SlotClass( slotGroup.Key )">
+            <div class="items">
+                @foreach ( var equipment in slotGroup )
+                {
+                    <EquipmentRow Equipment=@equipment />
+                }
+            </div>
+            <div class="key">
+                <InputHint Action="@($"Slot{SlotIndex( slotGroup.Key )}")" class="small" Size="@InputGlyphSize.Small" />
+            </div>
+            <div class="bar" />
         </div>
     }
 </root>
 
 @code
 {
+    /// How long the list stays up after the last switch.
+    private const float ShowSeconds = 2.2f;
+
     public PlayerPawn Player => Client.Viewer.PlayerPawn;
     public PlayerInventory Inventory => Player.Inventory;
     public Equipment CurrentEquipment => Player?.CurrentEquipment;
 
-    public string GroupClasses( EquipmentSlot slot )
+    private Equipment _lastEquipment;
+    private int _lastCount = -1;
+    private RealTimeSince _sinceSwitch = 999f;
+
+    public string SlotClass( EquipmentSlot slot )
     {
         var wpn = CurrentEquipment;
-        if (!wpn.IsValid()) return "";
-
-        if (wpn.Resource.Slot == slot) return "active color-border-right";
-
-        return "";
+        return wpn.IsValid() && wpn.Resource.Slot == slot ? "active" : "";
     }
 
-    public int SlotIndex( EquipmentSlot slot )
+    public int SlotIndex( EquipmentSlot slot ) => (int)slot;
+
+    public override void Tick()
     {
-        return (int)slot;
+        base.Tick();
+
+        if ( !Player.IsValid() )
+        {
+            SetClass( "shown", false );
+            return;
+        }
+
+        var current = CurrentEquipment;
+        var count = Inventory?.Equipment.Count() ?? 0;
+        if ( current != _lastEquipment || count != _lastCount || SwitchPressed() )
+            _sinceSwitch = 0f;
+
+        _lastEquipment = current;
+        _lastCount = count;
+        SetClass( "shown", _sinceSwitch < ShowSeconds );
     }
 
-    public int GetSlot( Equipment equipment ) => Inventory.Equipment.ToList().IndexOf( equipment );
+    /// The inputs PlayerInventory switches with, so pressing the slot already in hand still brings the list up.
+    private bool SwitchPressed()
+    {
+        if ( !Player.IsLocallyControlled )
+            return false;
+
+        if ( Input.MouseWheel.y != 0f && !Input.Keyboard.Down( "ALT" ) )
+            return true;
+
+        if ( Input.Pressed( "NextSlot" ) || Input.Pressed( "PrevSlot" ) )
+            return true;
+
+        foreach ( var slot in Enum.GetValues<EquipmentSlot>() )
+        {
+            if ( slot != EquipmentSlot.Undefined && Input.Pressed( $"Slot{(int)slot}" ) )
+                return true;
+        }
+
+        return false;
+    }
 
     protected override int BuildHash()
     {

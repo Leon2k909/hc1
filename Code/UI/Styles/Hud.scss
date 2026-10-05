@@ -1,3 +1,13 @@
+// The in-match HUD's palette: the menus' orange (MenuPage.scss's $menu-accent), dark plates, and health's states.
+$hud-accent: #FF7A1A;
+$hud-plate: rgba( 10, 11, 14, 0.72 );
+$hud-plate-edge: rgba( white, 0.08 );
+$hud-text-dim: rgba( white, 0.6 );
+$hud-health: #F2F2EE;
+$hud-warn: #FFB13D;
+$hud-danger: #FF4436;
+$hud-armor: #8EC4EC;
+
 .hud
 {
     pointer-events: none;

@@ -2105,6 +2105,11 @@ simulate_input.
       under the bridge you could walk into it between the parapets, and see out through the flight's undrawn underside
       (the user's screenshot, 2026-10-05). Now that space is solid (a collision box), closed by a concrete face at the
       deck's end under the girder. The hall's gallery stair was already walled in.
+    - The wings' doors from the concourse had arches up to 220, over the wings' ceiling (208), so each arch's head
+      opened into the ceiling slab, whose edges aren't drawn: the sky showed through it (the user's screenshot,
+      2026-10-05). The doors now end at 200 and the windows at 204 (`WING_DOOR_CROWN`, `WING_WINDOW_CROWN`). The info
+      sign that hung in the doorway, where its ceiling plate looked to float, hangs 60 further in (n 1420), its rod
+      going up behind the arch.
     - The footbridge's and the platform canopies' lights were boxes whose whole underside glowed (48 by 8 on the
       bridge); the user found them blocky (2026-10-05). They're now `luminaire`s: slim surface-mounted LED battens
       (1.5 m by 75 by 60 mm aluminium, chamfered, with end caps) whose lit part is a narrow opal lens.
@@ -2906,6 +2911,30 @@ simulate_input.
   in"): its `Facepunch.PlayRadio` component is disabled (`__enabled: false`) in all nine game-mode prefabs that had one.
   Don't turn it back on. `RadioSounds` and the other voice lines are unchanged.
 - Still there: the same sting when a Zombies power-up is picked up (`ZombiesRoundSystem`).
+
+## HUD look (`MainHUD`, 2026-10-05)
+- The user asked for the HUD to look different, and for the weapon list to show only while switching weapons. It's in
+  the menus' orange and charcoal now: `Hud.scss` has the palette (`$hud-accent` is MenuPage.scss's `$menu-accent`).
+  - Bottom left, `Vitals`: a dark plate with an edge in health's state colour. Health is a number and ten segments,
+    and armour is a thinner bar with the helmet's chip. It turns amber under 60% (`hurt`) and red under 30%
+    (`low-health`), where the edge pulses.
+  - Top centre, `RoundStateDisplay`: your team's score, the clock and the enemy's, each team in its colour, with a white
+    line under yours. The mode's name sits under it, and Hot Zone's countdown under that. Free-for-all shows the clock
+    only.
+    - The strip was bottom left, under the health, and the mode's name bottom right.
+    - `DefuseObjectiveHud` moved down to 104 px to clear the strip.
+    - Battle royale and Zombies have no strip, so their mode's name stays bottom right. `RoundStateTeam` is gone.
+  - Bottom right, `Ammo`: the weapon's name and fire mode over the magazine's rounds, the reserve, and a bar of how full
+    the magazine is. It's amber at a quarter or less and red when empty, and a knife or grenade shows its name only.
+  - The weapon list (`WeaponInfoComponent`) has a plate per slot, the slot key's glyph and an orange bar on the weapon
+    in hand.
+    - It shows only for 2.2 s after a switch (`ShowSeconds`): a new weapon in hand, a pickup, or the switch inputs
+      themselves. Those are the slot keys, the wheel and the gamepad's NextSlot / PrevSlot.
+    - It fades out but keeps its space, so nothing round it moves.
+- State classes are set in `Tick` with `SetClass`, since a `<root class="@(...)">` doesn't take a class off again.
+- Checked only in a browser mockup of the real SCSS (flattened by a script in the session's scratchpad) over a render of
+  Railhead's concourse. It compiled nowhere, since no s&box SDK was at hand: watch the editor's log for razor errors
+  after the hotload. Not yet seen in-game.
 
 ## Scoreboard over the HUD (`Scoreboard.razor.scss`)
 - The user saw the medals (double kill and the rest) drawn over the scoreboard. Held open, it's now over the rest of the

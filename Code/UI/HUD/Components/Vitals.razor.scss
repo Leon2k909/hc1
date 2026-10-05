@@ -1,45 +1,163 @@
-﻿@import "/UI/Styles/Theme.scss";
+@import "/UI/Styles/Theme.scss";
 
+// Health and armour, bottom left: a dark plate with an edge in the health's state colour, the health as a number and
+// ten segments, and the armour as a thinner bar with the helmet's chip.
 Vitals
 {
     position: relative;
+    font-family: $main-font;
 
-    .armor-readout
+    .plate
     {
-        min-width: 84px;
-        padding-right: 10px;
-        margin-right: 2px;
-        border-right: 1px solid rgba( white, 0.2 );
+        position: relative;
+        flex-direction: row;
+        min-width: 300px;
+        padding: 10px 16px 10px 14px;
+        background: linear-gradient( to right, $hud-plate, rgba( 10, 11, 14, 0.35 ) );
+        border-top: 1px solid $hud-plate-edge;
     }
 
-    .armor-label
+    .edge
     {
-        font-size: 10px;
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background-color: $hud-health;
+    }
+
+    .rows
+    {
+        flex-direction: column;
+        flex-grow: 1;
+        gap: 7px;
+    }
+
+    .health-row, .armor-row
+    {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .health-row
+    {
+        gap: 8px;
+
+        Icon { opacity: 0.85; }
+    }
+
+    .value
+    {
+        min-width: 50px;
+        font-size: 30px;
         font-weight: bold;
-        letter-spacing: 1px;
-        color: #c3d6e4;
+        line-height: 30px;
+        color: $hud-health;
+        text-shadow: 0 1px 3px rgba( black, 0.8 );
     }
 
-    .helmet-status
+    .segments
     {
+        flex-direction: row;
+        flex-grow: 1;
+        gap: 3px;
+        height: 10px;
+    }
+
+    .seg
+    {
+        position: relative;
+        flex-grow: 1;
+        height: 100%;
+        background-color: rgba( white, 0.14 );
+        overflow: hidden;
+
+        .fill
+        {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background-color: $hud-health;
+        }
+    }
+
+    .armor-row
+    {
+        gap: 7px;
+        padding-left: 3px;
+
+        Icon { opacity: 0.8; }
+    }
+
+    .value-sm
+    {
+        min-width: 34px;
+        font-size: 16px;
+        font-weight: bold;
+        color: $hud-armor;
+        text-shadow: 0 1px 2px rgba( black, 0.8 );
+    }
+
+    .armor-bar
+    {
+        position: relative;
+        flex-grow: 1;
+        height: 4px;
+        background-color: rgba( white, 0.12 );
+        overflow: hidden;
+
+        .fill
+        {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background-color: $hud-armor;
+        }
+    }
+
+    .chip
+    {
+        flex-direction: row;
+        align-items: center;
         gap: 4px;
-        font-size: 9px;
-        letter-spacing: 0.5px;
-        color: #c3d6e4;
+        padding: 2px 6px;
+        border: 1px solid rgba( $hud-armor, 0.45 );
+        background-color: rgba( $hud-armor, 0.12 );
+
+        label
+        {
+            font-size: 9px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: $hud-armor;
+        }
     }
 
-    &.low-health > .inner
+    &.hurt
     {
-        animation: LowHealth 1s linear infinite;
+        .edge, .seg .fill { background-color: $hud-warn; }
+        .value { color: $hud-warn; }
+    }
+
+    &.low-health
+    {
+        .edge, .seg .fill { background-color: $hud-danger; }
+        .value { color: $hud-danger; }
+        .edge { animation: LowHealthEdge 0.9s ease-in-out infinite; }
+
+        .plate
+        {
+            background: linear-gradient( to right, rgba( 70, 8, 6, 0.78 ), rgba( 10, 11, 14, 0.35 ) );
+        }
     }
 }
 
-@keyframes LowHealth {
-    0% {
-        box-shadow: 0 0 0 0 rgba( red, 0.5 );
-    }
-
-    100% {
-        box-shadow: 0 0 0 10px rgba( red, 0 );
-    }
+@keyframes LowHealthEdge
+{
+    0% { opacity: 1; }
+    50% { opacity: 0.35; }
+    100% { opacity: 1; }
 }

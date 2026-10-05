@@ -1,50 +1,116 @@
 @import "/UI/Styles/Theme.scss";
 
+// The weapon in hand, bottom right: a dark plate fading leftwards with an edge on the right, the weapon's name and
+// fire mode over the magazine's rounds (big) and the reserve, and a thin bar of how full the magazine is. Amber at a
+// quarter of a magazine or less ("low"), red when it's empty.
 Ammo
 {
-    separator
+    flex-direction: column;
+    align-items: flex-end;
+    margin: 0 $safe-zone-x $safe-zone-y 0;
+    font-family: $main-font;
+
+    .plate
     {
-        width: 1px;
-        height: 16px;
-        background-color: rgba( white, 0.5 );
+        position: relative;
+        flex-direction: column;
+        align-items: flex-end;
+        min-width: 230px;
+        padding: 8px 16px 10px 24px;
+        background: linear-gradient( to left, $hud-plate, rgba( 10, 11, 14, 0.3 ) );
+        border-top: 1px solid $hud-plate-edge;
     }
 
-    .ammo-count
+    .edge
     {
-        display: flex;
-        align-items: baseline;
-        gap: 5px;
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background-color: $hud-accent;
     }
 
-    .vital
+    .top-line
     {
-        min-width: 32px;
-        font-size: 30px;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .weapon-name
+    {
+        font-size: 14px;
         font-weight: bold;
+        letter-spacing: 1px;
         color: white;
-        text-shadow: 1px 1px 3px rgba( black, 0.9 );
-    }
-
-    .reserve
-    {
-        min-width: 28px;
-        color: rgba( white, 0.72 );
-        font-size: 16px;
-        text-shadow: 1px 1px 3px rgba( black, 0.9 );
+        text-shadow: 0 1px 2px rgba( black, 0.8 );
     }
 
     .firemode
     {
+        flex-direction: row;
         align-items: center;
-        margin-top: 4px;
+        gap: 4px;
+        opacity: 0.85;
+    }
 
-        InputHint
+    .count-line
+    {
+        flex-direction: row;
+        align-items: flex-end;
+        gap: 8px;
+        margin-top: 2px;
+    }
+
+    .mag
+    {
+        font-size: 36px;
+        font-weight: bold;
+        line-height: 38px;
+        color: $hud-health;
+        text-shadow: 0 1px 3px rgba( black, 0.8 );
+    }
+
+    .reserve
+    {
+        margin-bottom: 5px;
+        padding-left: 8px;
+        border-left: 1px solid rgba( white, 0.3 );
+        font-size: 16px;
+        font-weight: bold;
+        color: $hud-text-dim;
+    }
+
+    .mag-bar
+    {
+        position: relative;
+        width: 150px;
+        height: 3px;
+        margin-top: 6px;
+        background-color: rgba( white, 0.14 );
+        overflow: hidden;
+
+        .fill
         {
-            img
-            {
-                width: 32px;
-                height: 32px;
-            }
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            background-color: $hud-health;
         }
+    }
+
+    &.low
+    {
+        .mag { color: $hud-warn; }
+        .mag-bar .fill { background-color: $hud-warn; }
+    }
+
+    &.empty
+    {
+        .mag { color: $hud-danger; }
+        .reserve { color: rgba( $hud-danger, 0.8 ); }
+        .edge { background-color: $hud-danger; }
     }
 }

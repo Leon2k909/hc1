@@ -1,4 +1,4 @@
-﻿@namespace Facepunch.UI
+@namespace Facepunch.UI
 @inherits Panel
 @attribute [StyleSheet]
 
@@ -8,21 +8,33 @@
 @if ( !Player.CurrentEquipment.IsValid() )
     return;
 
-<root class="flex row gap align-center justify-end" style="width: 220px;">
-    @if ( Shoot.IsValid() )
-    {
-        <div class="layout firemode gap">
-            @if ( Shoot.FireModes.Count > 1 )
+@* The weapon in hand, bottom right: its name and fire mode over the rounds in it and the reserve, and a thin bar of
+   how full the magazine is. A knife or a grenade shows its name only. *@
+<root>
+    <div class="plate">
+        <div class="top-line">
+            @if ( Shoot.IsValid() )
             {
-             <InputHint Action="FireMode" />
+                <div class="firemode">
+                    @if ( Shoot.FireModes.Count > 1 )
+                    {
+                        <InputHint Action="FireMode" class="small" Size="@InputGlyphSize.Small" />
+                    }
+                    <Icon File=@FireModeFile Size="18" />
+                </div>
             }
-            <Icon File=@FireModeFile size="24" />
+            <label class="weapon-name">@Player.CurrentEquipment.Resource.Name</label>
         </div>
-    }
 
-    <div class="ammo-count">
-        <label class="vital">@AmmoDisplay</label>
-        <label class="reserve @(HasAmmo is { ReserveAmmo: 0 } ? "empty" : "")">/@(HasAmmo?.ReserveAmmo.ToString() ?? "∞")</label>
+        @if ( HasAmmo is { } ammo )
+        {
+            <div class="count-line">
+                <label class="mag">@AmmoDisplay</label>
+                <label class="reserve">@ammo.ReserveAmmo</label>
+            </div>
+            <div class="mag-bar"><div class="fill" style="width: @(MagPercent)%;" /></div>
+        }
+        <div class="edge" />
     </div>
 </root>
 
@@ -38,15 +50,40 @@
 
     private WeaponAmmo HasAmmo => Player?.CurrentEquipment?.Components?.Get<WeaponAmmo>(FindMode.EverythingInSelfAndDescendants);
 
-    /// Magazine + chamber, then reserve: "29+1 / 120".
+    /// Magazine + chamber: "29+1".
     private string AmmoDisplay
     {
         get
         {
             var ammo = HasAmmo;
-            if ( ammo is null ) return "∞";
+            if ( ammo is null ) return "";
             if ( ammo.ChamberedRounds < 1 ) return ammo.Ammo.ToString();
             return $"{ammo.AmmoInMagazine}+{ammo.ChamberedRounds}";
+        }
+    }
+
+    private float MagFraction
+    {
+        get
+        {
+            var ammo = HasAmmo;
+            if ( ammo is null ) return 1f;
+            var max = ammo.GetEffectiveMaxAmmo();
+            return max > 0 ? Math.Clamp( ammo.AmmoInMagazine / (float)max, 0f, 1f ) : 1f;
+        }
+    }
+
+    private int MagPercent => (int)Math.Round( MagFraction * 100f );
+
+    /// "empty" with nothing left to fire, "low" at a quarter of a magazine or less.
+    private string AmmoState
+    {
+        get
+        {
+            var ammo = HasAmmo;
+            if ( ammo is null ) return "no-ammo";
+            if ( ammo.Ammo <= 0 ) return "empty";
+            return MagFraction <= 0.25f ? "low" : "";
         }
     }
 
@@ -62,10 +99,20 @@
         }
     }
 
+    // The state's class is set here: a <root class="@(...)"> adds a class but doesn't take it off again.
+    public override void Tick()
+    {
+        base.Tick();
+        var state = Player.IsValid() && Player.CurrentEquipment.IsValid() ? AmmoState : "";
+        SetClass( "no-ammo", state == "no-ammo" );
+        SetClass( "empty", state == "empty" );
+        SetClass( "low", state == "low" );
+    }
+
     protected override int BuildHash()
     {
         if ( !Player.IsValid() || !Player.CurrentEquipment.IsValid() )
             return 0;
-        return HashCode.Combine( Player, HasAmmo?.Ammo, HasAmmo?.ReserveAmmo, Player?.CurrentEquipment, FireModeFile );
+        return HashCode.Combine( Player, HasAmmo?.Ammo, HasAmmo?.ReserveAmmo, Player?.CurrentEquipment, FireModeFile, AmmoState );
     }
 }

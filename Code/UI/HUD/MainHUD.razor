@@ -38,7 +38,15 @@
             var isBattleRoyale = GameUtils.IsBattleRoyale;
         }
 
-        <div class="hud with-deadzone bottom-left gap-sm flex column skew-left">
+        @* The round's strip (scores, clock, mode), top centre. *@
+        @if ( !isBattleRoyale && !isZombies && !winBanner )
+        {
+            <div class="hud top-middle round-top">
+                <RoundStateDisplay />
+            </div>
+        }
+
+        <div class="hud with-deadzone bottom-left gap-sm flex column">
             @if ( isValidPlayer )
             {
                 <Vitals />
@@ -48,13 +56,9 @@
             {
                 <BattleRoyaleRadar />
             }
-            else if ( !isZombies && !winBanner )
+            else if ( !isZombies && !winBanner && !(GameMode.Instance?.Hardcore ?? false) )
             {
-                <RoundStateDisplay />
-                @if ( !(GameMode.Instance?.Hardcore ?? false) )
-                {
-                    <Minimap />
-                }
+                <Minimap />
             }
         </div>
 
@@ -105,17 +109,11 @@
                 }
             }
 
-            @if ( GameMode.Instance.IsValid() && !winBanner )
+            @* The mode's name and Hot Zone's countdown are under the round's strip (RoundStateDisplay). In battle royale
+               and Zombies, which have no strip, the mode's name stays here. *@
+            @if ( GameMode.Instance.IsValid() && !winBanner && ( isBattleRoyale || isZombies ) )
             {
-                <div class="mode-name-label @(GameMode.Instance.Hardcore ? "hc" : "")" style="text-align: right; padding: 4px 8px; font-size: 9px; font-weight: bold; letter-spacing: 1px; color: rgba(255,255,255,0.6);">@Tr( GameMode.Instance.DisplayTitle )</div>
-                
-                var hpManager = GameMode.Instance.GetComponentInChildren<HardpointManager>();
-                if ( hpManager.IsValid() )
-                {
-                    <div style="text-align: right; padding: 0px 8px; font-size: 11px; font-weight: bold; color: #FFF; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
-                        @Tr( "NEXT ZONE: {0}s", Math.Max(0, Math.Ceiling(hpManager.RelocateTimer)) )
-                    </div>
-                }
+                <div class="mode-name-label" style="text-align: right; padding: 4px 8px; font-size: 9px; font-weight: bold; letter-spacing: 1px; color: rgba(255,255,255,0.6);">@Tr( GameMode.Instance.DisplayTitle )</div>
             }
         </div>
 
