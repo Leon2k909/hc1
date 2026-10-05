@@ -1589,6 +1589,8 @@ def main():
     kiosk_art = optional( "railhead_kiosk_art" )
     if kiosk_art is not None and kiosk_art.missing():
         kiosk_art.write()
+    if RM is not None and RM.vending_missing():
+        RM.write_texture( "vending", RM.OUT_DIR )
     models = build()
     written = set()
     for name, model in models.items():

@@ -2174,6 +2174,24 @@ simulate_input.
       - Every name on it is a plain German word (REISEN, Chips, Wasser...): no real title, brand or logo.
       - Checked only in offline WebGL renders of the generator's output with the textures, not in the engine. Rerun
         `railhead_map.py` to rebuild the models.
+    - The snack machine on each outer platform (`vending_machine`, n 300 against the shed's wall) is a modern black
+      one, rebuilt on 2026-10-05 as close as it could be to the user's picture of one. It's 990 x 850 x 1830 mm:
+      - the glass door shows five shelves of four slots in their spirals, each slot's code (A1-E4) in white on the
+        dark rail under it: crisps, chocolate, biscuits and sweets in pillow packs (`_pillow`), four 500 ml cans and
+        a bottle of water (`_vlathe`);
+      - LED strips light the window's top and sides, the cabinet's top corners and the pick-up bay's PUSH flap;
+      - a brushed steel panel holds the touch screen ("SELECT YOUR ITEM", in English as in the picture), the keypad
+        (1-9, a red cross, 0, a green tick), the contactless reader under its LED and the card slot.
+    - Its pictures are the `rw_vending` atlas (`railhead_materials.vending`, `VENDING_GOODS`), the goods self-lit a
+      little as from the machine's LEDs (`VENDING_GLOW`). Every brand is made up. The picture's SunBite, Chunky,
+      Twisties, Mintel and Citra are real names or close to them, so those are SolBite, Chunko, Knotties, Mintle and
+      Citraze. The cabinet is `rw_satin_black` (PAINTED): `rw_black`'s scuffs read as dirt over a whole cabinet.
+      `VENDING_COLUMNS` is in both scripts: change them together. 5.4k triangles each.
+    - The atlas's four PNGs aren't in the repository: LFS uploads were blocked in the session that drew them, as for
+      the kiosk's. `railhead_map.py` draws them when they're missing (`railhead_materials.vending_missing`, ~15 s),
+      so a run brings them back with the models. Commit them from a machine that can push LFS.
+    - Checked only in offline textured software renders of its OBJ beside the picture, not in the engine. Rerun
+      `railhead_map.py` to rebuild the dressing models.
     - `--preview <dir>` renders its showcase.
   - `railhead_backdrop.py`: the city round the station. Its docstring has the layout and the sources.
     - The play area's east and west walls are rows of five-storey Gründerzeit (1880-1910) tenements across the cab

@@ -63,7 +63,7 @@ STAND_INS = {
     "roof_tiles": ( 0.62, 0.30, 0.20 ), "copper": ( 0.36, 0.58, 0.50 ), "copper_brown": ( 0.38, 0.24, 0.16 ),
     "planks": ( 0.55, 0.42, 0.28 ), "planks_dark": ( 0.32, 0.24, 0.17 ), "setts": ( 0.45, 0.43, 0.41 ),
     "gravel": ( 0.55, 0.53, 0.50 ), "render_cream": ( 0.88, 0.82, 0.70 ), "trim_white": ( 0.90, 0.89, 0.85 ),
-    "iron_black": ( 0.10, 0.10, 0.11 ), "roller_grey": ( 0.52, 0.53, 0.54 ),
+    "iron_black": ( 0.10, 0.10, 0.11 ), "roller_grey": ( 0.52, 0.53, 0.54 ), "rw_vending": ( 0.42, 0.30, 0.34 ),
 }
 GLOWING = { "rw_lamp_warm", "rw_lamp_cool", "rw_signal_red", "rw_signal_green", "rw_signal_yellow", "rw_displays" }
 _colours = {}

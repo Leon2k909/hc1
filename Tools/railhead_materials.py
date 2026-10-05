@@ -5,7 +5,8 @@ façades round it. Drawn from scratch with numpy and PIL like Reef Hall's and Be
 strips, platform coping, ballast, sleepers, rails, asphalt, granite kerbs, formwork concrete, terrazzo, sandstone ashlar,
 riveted and modern steel, lattice girders, the town's rendered façades, glass, the trains' and wagons' paint, containers,
 lamps and signals, and the atlases: wayfinding signs, platform displays and the departures board, timetables and
-posters, shop signs, graffiti, the cast bronze lettering and the platform clock.
+posters, shop signs, graffiti, the cast bronze lettering, the platform clock and the snack machine's goods and
+controls.
 
     python Tools/railhead_materials.py [name ...] [--out <dir>] [--sheet <png>]
 
@@ -2811,6 +2812,638 @@ def lettering( rng, n ):
 
 
 # ---------------------------------------------------------------------------------------------------------------------
+# The snack machine (rw_vending): its goods' packets, cans and bottle, its touch screen, keys, card reader, pick-up
+# flap, the steel panel round its controls and the shelves' label rails. Every brand is made up.
+
+# The goods, by atlas entry: ( kind, brand, flavour, background top, background bottom, brand ink, brand outline,
+# picture ). Bags are pillow packs (crimped seals top and bottom); cans' labels wrap round them, their front in the
+# middle of the picture; the bottle's label is a band round its middle.
+VENDING_GOODS = {
+    "snack_solbite": ( "bag", "SolBite", "BBQ WAVE", ( 222, 36, 30 ), ( 150, 14, 16 ), ( 255, 214, 44 ),
+                       ( 110, 8, 10 ), "wave_chips" ),
+    "snack_cloudos": ( "bag", "Cloudos", "SEA SALT", ( 46, 122, 226 ), ( 18, 62, 160 ), ( 255, 255, 255 ),
+                       ( 12, 40, 110 ), "salted_chips" ),
+    "snack_zestix": ( "bag", "Zestix", "CHEESE BLAST", ( 250, 132, 24 ), ( 206, 72, 10 ), ( 255, 255, 255 ),
+                      ( 120, 36, 6 ), "nachos" ),
+    "snack_ridgerun": ( "bag", "RidgeRun", "SOUR CREAM & HERB", ( 44, 160, 64 ), ( 18, 98, 40 ), ( 255, 255, 255 ),
+                        ( 10, 62, 24 ), "ridged_chips" ),
+    "snack_novabar": ( "bag", "NovaBar", "CARAMEL", ( 124, 52, 186 ), ( 70, 22, 122 ), ( 255, 255, 255 ),
+                       ( 40, 10, 76 ), "caramel_bar" ),
+    "snack_chunko": ( "bag", "Chunko", "NUT CRUNCH", ( 132, 78, 44 ), ( 78, 40, 20 ), ( 252, 228, 180 ),
+                      ( 46, 22, 10 ), "nut_chunks" ),
+    "snack_meltz": ( "bag", "Meltz", "MILK CHOC", ( 214, 34, 44 ), ( 140, 14, 26 ), ( 255, 255, 255 ),
+                     ( 96, 8, 16 ), "choc_squares" ),
+    "snack_frost": ( "bag", "Frost", "COOKIE CREAM", ( 36, 146, 230 ), ( 14, 82, 172 ), ( 255, 255, 255 ),
+                     ( 8, 46, 110 ), "cream_cookies" ),
+    "snack_crumbly": ( "bag", "Crumbly", "CHOC CHIP", ( 244, 228, 196 ), ( 214, 186, 140 ), ( 120, 64, 30 ),
+                       ( 255, 248, 232 ), "chip_cookies" ),
+    "snack_jellyjoy": ( "bag", "JellyJoy", "FRUIT GUMS", ( 236, 60, 160 ), ( 170, 22, 112 ), ( 255, 255, 255 ),
+                        ( 110, 8, 70 ), "gummies" ),
+    "snack_polar": ( "bag", "Polar", "PEPPERMINT MINTS", ( 52, 152, 236 ), ( 18, 92, 194 ), ( 255, 255, 255 ),
+                     ( 10, 56, 130 ), "mints" ),
+    "snack_knotties": ( "bag", "Knotties", "HONEY PRETZELS", ( 252, 206, 48 ), ( 230, 156, 18 ), ( 176, 44, 22 ),
+                        ( 255, 246, 214 ), "pretzels" ),
+    "snack_mintle": ( "bag", "Mintle", "FRESH MINT", ( 22, 170, 156 ), ( 8, 108, 108 ), ( 255, 255, 255 ),
+                      ( 4, 70, 70 ), "mint_leaves" ),
+    "snack_bubblez": ( "bag", "Bubblez", "BUBBLE GUM", ( 246, 120, 186 ), ( 206, 62, 144 ), ( 255, 255, 255 ),
+                       ( 132, 20, 92 ), "gum_balls" ),
+    "snack_chocobitz": ( "bag", "ChocoBitz", "COOKIE BITES", ( 44, 98, 206 ), ( 20, 52, 142 ), ( 255, 255, 255 ),
+                         ( 10, 30, 90 ), "cookie_bites" ),
+    "drink_fizzup": ( "can", "FizzUp", "COLA", ( 214, 26, 34 ), ( 150, 12, 20 ), ( 255, 255, 255 ), ( 100, 6, 12 ),
+                      "cola" ),
+    "drink_citraze": ( "can", "Citraze", "ORANGE", ( 250, 150, 24 ), ( 226, 96, 10 ), ( 255, 255, 255 ),
+                       ( 150, 52, 4 ), "orange" ),
+    "drink_sparkleaf": ( "can", "SparkLeaf", "LEMON LIME", ( 40, 164, 66 ), ( 16, 104, 42 ), ( 255, 255, 255 ),
+                         ( 8, 64, 24 ), "lime" ),
+    "drink_groove": ( "can", "Groove", "GRAPE", ( 120, 52, 178 ), ( 68, 22, 118 ), ( 255, 255, 255 ),
+                      ( 40, 8, 74 ), "grapes" ),
+    "drink_hydro": ( "bottle", "Hydro+", "STILL WATER", ( 250, 252, 255 ), ( 204, 228, 248 ), ( 22, 102, 206 ),
+                     None, "water" ),
+}
+# The bags' sizes in inches ( width, height ), by the row they stand on (A at the top); cans and the bottle are round.
+VENDING_BAGS = { "A": ( 5.0, 8.2 ), "B": ( 5.0, 7.2 ), "C": ( 5.0, 7.2 ), "E": ( 5.0, 6.9 ) }
+VENDING_ROWS = "ABCDE"
+VENDING_COLUMNS = ( 0.14, 0.38, 0.62, 0.86 )            # the slots' centres across the shelves, a share of their width
+
+VENDING_RECTS = {}
+_bags = [ name for name, g in VENDING_GOODS.items() if g[0] == "bag" ]
+for _k, _name in enumerate( _bags ):
+    _row = "ABCE"[min( _k // 4, 3 )]
+    _w, _h = VENDING_BAGS[_row]
+    _x, _y = 8 + 248 * ( _k % 8 ), 8 + 408 * ( _k // 8 )
+    VENDING_RECTS[_name] = ( _x, _y, _x + 240, _y + int( round( 240 * _h / _w ) ) )
+for _k, _name in enumerate( name for name, g in VENDING_GOODS.items() if g[0] == "can" ):
+    VENDING_RECTS[_name] = ( 8 + 408 * _k, 824, 408 + 408 * _k, 1054 )
+VENDING_RECTS.update( {
+    "panel": ( 1744, 416, 1920, 1192 ), "screen": ( 8, 1062, 252, 1538 ), "reader": ( 260, 1062, 484, 1278 ),
+    "flap": ( 1028, 1062, 1628, 1268 ), "drink_hydro": ( 260, 1286, 682, 1411 ),
+    "cavity_side": ( 1448, 1420, 1704, 1932 ),
+} )
+for _k, _name in enumerate( ( "bottle_plastic", "bottle_cap", "can_lid", "cavity_back" ) ):
+    VENDING_RECTS[_name] = ( 690 + 72 * _k, 1286, 754 + 72 * _k, 1350 )
+for _k, _name in enumerate( ( "1", "2", "3", "4", "5", "6", "7", "8", "9", "x", "0", "ok" ) ):
+    VENDING_RECTS[f"key_{_name}"] = ( 492 + 88 * ( _k % 6 ), 1062 + 88 * ( _k // 6 ), 572 + 88 * ( _k % 6 ),
+                                      1142 + 88 * ( _k // 6 ) )
+for _k, _row in enumerate( VENDING_ROWS ):
+    VENDING_RECTS[f"rail_{_row.lower()}"] = ( 260, 1420 + 58 * _k, 1440, 1474 + 58 * _k )
+
+# Self-illumination (the illum mask) by kind of entry: the machine's LEDs light its goods and shelves from inside.
+VENDING_GLOW = { "goods": 0.2, "rail": 0.28, "cavity": 0.32, "screen": 0.9, "symbol": 0.35 }
+
+
+def _ss_grid( box ):
+    """ The px box at SS times its size, and u, v across it (0..1, v down). """
+    x0, y0, x1, y1 = ( int( round( v * SS ) ) for v in box )
+    v, u = np.mgrid[0:y1 - y0, 0:x1 - x0] + 0.5
+    return ( x0, y0, x1, y1 ), u / ( x1 - x0 ), v / ( y1 - y0 )
+
+
+def _paste_rgb( sh, box, rgb, mask=None ):
+    """ An sRGB picture (SS times box's size) into the sheet's colour, over mask (0..1) if given. """
+    ( x0, y0, x1, y1 ), _, _ = _ss_grid( box )
+    img = Image.fromarray( np.clip( np.rint( rgb ), 0, 255 ).astype( np.uint8 ), "RGB" )
+    m = None if mask is None else Image.fromarray( np.clip( np.rint( mask * 255 ), 0, 255 ).astype( np.uint8 ), "L" )
+    sh.colour.paste( img, ( x0, y0 ), m )
+
+
+def _gradient( sh, box, top, bottom, glow=None, glow_at=( 0.5, 0.25 ), glow_r=0.45 ):
+    """ box filled from top to bottom, with a soft round glow ( colour ) behind glow_at. """
+    _, u, v = _ss_grid( box )
+    w = ( box[2] - box[0] ) / ( box[3] - box[1] )
+    c = mix( np.array( top, float ), np.array( bottom, float ), smoothstep( 0.0, 1.0, v ) )
+    if glow is not None:
+        d = np.hypot( ( u - glow_at[0] ) * w, v - glow_at[1] ) / glow_r
+        c = mix( c, np.array( glow, float ), 0.85 * np.exp( -2.2 * d * d ) )
+    _paste_rgb( sh, box, c )
+
+
+def _brand( sh, cx, cy, s, face, cap, fill, outline=None, outline_w=0.0, angle=0.0, width=None, shadow=None,
+            layers=None ):
+    """ s centred on ( cx, cy ), outlined outline_w px, turned angle degrees anticlockwise, straight into the colour
+    (and layers, as Sheet.text's). A shadow ( dx, dy, colour ) goes under it. """
+    f, cap = fitted( face, s, cap * SS, width * SS ) if width is not None else ( sized( face, cap * SS ), cap * SS )
+    sw = int( round( outline_w * SS ) )
+    l, t, r, b = f.getbbox( s, anchor="mm", stroke_width=sw )
+    pad = sw + 6
+    W, H = r - l + 2 * pad, b - t + 2 * pad
+    ink = Image.new( "RGBA", ( W, H ), ( 0, 0, 0, 0 ) )
+    ImageDraw.Draw( ink ).text( ( pad - l, pad - t ), s, font=f, anchor="mm", fill=tuple( int( v ) for v in fill ) + ( 255, ),
+                                stroke_width=sw, stroke_fill=tuple( int( v ) for v in ( outline or fill ) ) + ( 255, ) )
+    if angle:
+        ink = ink.rotate( angle, resample=Image.BICUBIC, expand=True )
+    at = ( int( round( cx * SS - ink.width / 2 ) ), int( round( cy * SS - ink.height / 2 ) ) )
+    alpha = ink.getchannel( "A" )
+    if shadow is not None:
+        dx, dy, colour = shadow
+        sh.colour.paste( Image.new( "RGB", ink.size, tuple( int( v ) for v in colour ) ),
+                         ( at[0] + int( dx * SS ), at[1] + int( dy * SS ) ), alpha )
+    sh.colour.paste( ink.convert( "RGB" ), at, alpha )
+    for k, value in ( layers or {} ).items():
+        sh.layers[k].paste( Image.new( "L", ink.size, int( round( np.clip( value, 0, 1 ) * 255 ) ) ), at, alpha )
+
+
+def _blob( cx, cy, rx, ry, angle=0.0, wobble=0.0, rng=None, k=28 ):
+    """ An ellipse's outline as points (rx, ry across and along angle, radians), roughened by wobble. """
+    out = []
+    phase = rng.uniform( 0, 2 * math.pi, 3 ) if rng is not None else ( 0.0, 0.0, 0.0 )
+    for j in range( k ):
+        t = 2 * math.pi * j / k
+        r = 1.0 + wobble * ( 0.5 * math.sin( 3 * t + phase[0] ) + 0.3 * math.sin( 5 * t + phase[1] )
+                             + 0.2 * math.sin( 7 * t + phase[2] ) )
+        x, y = rx * r * math.cos( t ), ry * r * math.sin( t )
+        out.append( ( cx + x * math.cos( angle ) - y * math.sin( angle ), cy + x * math.sin( angle ) + y * math.cos( angle ) ) )
+    return out
+
+
+def _shade( rgb, factor ):
+    return darken_rgb( rgb, factor )
+
+
+def _chip( sh, rng, cx, cy, r, angle, base=( 236, 182, 72 ), wave=False, ridges=False, spice=None ):
+    """ A crisp seen at a slant: a golden curl with a darker rim, its waves or ridges, browned spots, and spice. """
+    sh.polygon( _blob( cx, cy + 0.06 * r, 1.04 * r, 0.7 * r, angle, 0.08, rng ), _shade( base, 0.45 ) )
+    sh.polygon( _blob( cx, cy, r, 0.66 * r, angle, 0.08, rng ), base )
+    sh.polygon( _blob( cx - 0.12 * r, cy - 0.1 * r, 0.62 * r, 0.36 * r, angle, 0.1, rng ), _shade( base, 1.25 ) )
+    if wave or ridges:
+        for j in range( -3, 4 ):
+            off = j * 0.24 * r
+            pts = []
+            for t in np.linspace( -0.85, 0.85, 9 ):
+                x = t * r
+                y = off * 0.66 + ( 0.07 * r * math.sin( 6 * t ) if wave else 0.0 )
+                if ( x / r ) ** 2 + ( y / ( 0.66 * r ) ) ** 2 > 0.8:
+                    continue
+                pts.append( ( cx + x * math.cos( angle ) - y * math.sin( angle ),
+                              cy + x * math.sin( angle ) + y * math.cos( angle ) ) )
+            if len( pts ) > 1:
+                sh.line( pts, _shade( base, 0.72 ), max( 1.0, 0.07 * r ) )
+    for _ in range( 4 ):
+        a, d = rng.uniform( 0, 2 * math.pi ), rng.uniform( 0.1, 0.6 ) * r
+        sh.dot( cx + d * math.cos( a ), cy + 0.6 * d * math.sin( a ), 0.06 * r, _shade( base, 0.6 ) )
+    if spice is not None:
+        for _ in range( 14 ):
+            a, d = rng.uniform( 0, 2 * math.pi ), rng.uniform( 0.0, 0.75 ) * r
+            sh.dot( cx + d * math.cos( a ), cy + 0.6 * d * math.sin( a ), rng.uniform( 0.03, 0.06 ) * r, spice )
+
+
+def _chocolate( sh, x0, y0, x1, y1, cols, rows, base=( 98, 52, 28 ) ):
+    """ A slab of chocolate: squares with lit top edges and shadowed grooves. """
+    sh.rectangle( ( x0, y0, x1, y1 ), _shade( base, 0.7 ), radius=0.04 * ( x1 - x0 ) )
+    gw, gh = ( x1 - x0 ) / cols, ( y1 - y0 ) / rows
+    for i in range( cols ):
+        for j in range( rows ):
+            a, b = x0 + i * gw, y0 + j * gh
+            sh.rectangle( ( a + 0.08 * gw, b + 0.08 * gh, a + 0.92 * gw, b + 0.92 * gh ), base, radius=0.1 * gw )
+            sh.rectangle( ( a + 0.2 * gw, b + 0.18 * gh, a + 0.8 * gw, b + 0.72 * gh ), _shade( base, 1.2 ),
+                          radius=0.1 * gw )
+
+
+def _cookie( sh, rng, cx, cy, r, base=( 214, 160, 92 ), chips=( 70, 38, 20 ), count=7 ):
+    sh.ellipse( ( cx - r, cy - 0.8 * r + 0.08 * r, cx + r, cy + 0.8 * r + 0.08 * r ), _shade( base, 0.6 ) )
+    sh.polygon( _blob( cx, cy, r, 0.8 * r, 0.0, 0.05, rng ), base )
+    sh.polygon( _blob( cx - 0.15 * r, cy - 0.15 * r, 0.55 * r, 0.4 * r, 0.0, 0.12, rng ), _shade( base, 1.15 ) )
+    for _ in range( count ):
+        a, d = rng.uniform( 0, 2 * math.pi ), rng.uniform( 0.0, 0.72 ) * r
+        s = rng.uniform( 0.08, 0.14 ) * r
+        sh.polygon( _blob( cx + d * math.cos( a ), cy + 0.8 * d * math.sin( a ), s, 0.8 * s, a, 0.2, rng ), chips )
+
+
+def _sandwich( sh, cx, cy, r, tilt=0.35 ):
+    """ A cream sandwich biscuit at a slant: two dark discs with the white filling between. """
+    dark, rim = ( 40, 26, 22 ), ( 24, 16, 14 )
+    for dy, colour in ( ( 0.3 * r, rim ), ( 0.22 * r, dark ) ):
+        sh.ellipse( ( cx - r, cy + dy - tilt * r, cx + r, cy + dy + tilt * r ), colour )
+    sh.rectangle( ( cx - 0.96 * r, cy + 0.02 * r, cx + 0.96 * r, cy + 0.16 * r ), ( 246, 244, 236 ) )
+    sh.ellipse( ( cx - 0.96 * r, cy + 0.16 * r - tilt * r, cx + 0.96 * r, cy + 0.16 * r + tilt * r ), ( 246, 244, 236 ) )
+    sh.ellipse( ( cx - r, cy - tilt * r, cx + r, cy + tilt * r ), dark )
+    sh.ellipse( ( cx - 0.72 * r, cy - 0.72 * tilt * r, cx + 0.72 * r, cy + 0.72 * tilt * r ), None,
+                outline=( 70, 50, 42 ), width=0.05 * r )
+    for k in range( 8 ):
+        a = k * math.pi / 4
+        sh.dot( cx + 0.45 * r * math.cos( a ), cy + 0.45 * tilt * r * math.sin( a ), 0.05 * r, ( 64, 44, 36 ) )
+
+
+def _pretzel( sh, cx, cy, s, base=( 150, 78, 26 ) ):
+    path = [ ( -0.3, 0.3 ), ( -0.14, 0.12 ), ( 0.0, -0.04 ), ( 0.16, -0.2 ), ( 0.3, -0.34 ), ( 0.46, -0.24 ),
+             ( 0.48, 0.0 ), ( 0.38, 0.24 ), ( 0.18, 0.38 ), ( 0.0, 0.4 ), ( -0.18, 0.38 ), ( -0.38, 0.24 ),
+             ( -0.48, 0.0 ), ( -0.46, -0.24 ), ( -0.3, -0.34 ), ( -0.16, -0.2 ), ( 0.0, -0.04 ), ( 0.14, 0.12 ),
+             ( 0.3, 0.3 ) ]
+    P = lambda pts, dy=0.0: [ ( cx + px * s, cy + ( py + dy ) * s ) for px, py in pts ]
+    _stroke( sh, P( _smooth( path ), 0.03 ), _shade( base, 0.55 ), 0.15 * s )
+    _stroke( sh, P( _smooth( path ) ), base, 0.13 * s )
+    _stroke( sh, P( _smooth( path ), -0.02 ), _shade( base, 1.35 ), 0.05 * s )
+    for k in range( 0, len( path ), 3 ):
+        sh.dot( cx + path[k][0] * s, cy + path[k][1] * s - 0.03 * s, 0.018 * s, ( 250, 250, 246 ) )
+
+
+def _leaf( sh, cx, cy, s, angle, colour=( 40, 170, 70 ) ):
+    pts = [ ( 0.0, -0.5 ), ( 0.22, -0.3 ), ( 0.26, 0.0 ), ( 0.16, 0.3 ), ( 0.0, 0.5 ), ( -0.16, 0.3 ), ( -0.26, 0.0 ),
+            ( -0.22, -0.3 ) ]
+    sh.polygon( rotated( _smooth( pts, 6, closed=True ), angle, cx, cy, s ), colour )
+    sh.line( rotated( [ ( 0.0, -0.45 ), ( 0.0, 0.45 ) ], angle, cx, cy, s ), _shade( colour, 0.6 ), 0.025 * s )
+    for t in ( -0.2, 0.0, 0.2 ):
+        for side in ( -1, 1 ):
+            sh.line( rotated( [ ( 0.0, t ), ( side * 0.16, t - 0.12 ) ], angle, cx, cy, s ), _shade( colour, 0.7 ),
+                     0.015 * s )
+
+
+def _glossy_ball( sh, cx, cy, r, colour ):
+    sh.dot( cx + 0.06 * r, cy + 0.08 * r, r, _shade( colour, 0.55 ) )
+    sh.dot( cx, cy, 0.96 * r, colour )
+    sh.dot( cx - 0.2 * r, cy - 0.2 * r, 0.55 * r, _shade( colour, 1.25 ) )
+    sh.dot( cx - 0.35 * r, cy - 0.38 * r, 0.18 * r, ( 255, 255, 255 ) )
+
+
+def _picture( sh, rng, kind, x0, y0, x1, y1 ):
+    """ The packet's picture of what's inside, in the box ( x0, y0, x1, y1 ). """
+    w, h = x1 - x0, y1 - y0
+    cx, cy = ( x0 + x1 ) / 2, ( y0 + y1 ) / 2
+    if kind in ( "wave_chips", "salted_chips", "ridged_chips" ):
+        spots = [ ( -0.24, 0.12, 0.3, -0.3 ), ( 0.22, 0.18, 0.28, 0.4 ), ( -0.02, -0.1, 0.3, 0.1 ), ( 0.02, 0.32, 0.26, -0.1 ),
+                  ( -0.3, -0.22, 0.2, 0.6 ), ( 0.3, -0.18, 0.2, -0.6 ) ]
+        if kind == "ridged_chips":                            # a scoop of the dip, with herbs
+            sh.polygon( _blob( cx + 0.2 * w, cy - 0.18 * h, 0.22 * w, 0.14 * w, 0.2, 0.15, rng ), ( 214, 214, 206 ) )
+            sh.polygon( _blob( cx + 0.18 * w, cy - 0.2 * h, 0.2 * w, 0.12 * w, 0.2, 0.15, rng ), ( 250, 250, 244 ) )
+            for _ in range( 16 ):
+                sh.dot( cx + 0.2 * w + rng.uniform( -0.15, 0.15 ) * w, cy - 0.2 * h + rng.uniform( -0.08, 0.08 ) * w,
+                        rng.uniform( 0.008, 0.016 ) * w, ( 40, 120, 40 ) )
+            spots = spots[:4]
+        for dx, dy, r, a in sorted( spots, key=lambda q: q[1] ):
+            spice = { "wave_chips": ( 170, 52, 20 ), "salted_chips": ( 250, 250, 250 ),
+                      "ridged_chips": ( 60, 130, 50 ) }[kind]
+            _chip( sh, rng, cx + dx * w, cy + dy * h, r * w, a, wave=kind == "wave_chips", ridges=kind == "ridged_chips",
+                   spice=spice )
+    elif kind == "nachos":
+        for dx, dy, a in ( ( -0.24, -0.12, 0.4 ), ( 0.2, -0.16, -0.3 ), ( -0.02, 0.0, 1.2 ), ( 0.26, 0.08, 0.9 ),
+                           ( -0.28, 0.16, -0.6 ), ( 0.04, 0.26, 0.2 ), ( 0.3, 0.32, -1.0 ), ( -0.18, 0.36, 2.0 ) ):
+            tri = rotated( _smooth( [ ( 0.0, -0.2 ), ( 0.18, 0.12 ), ( -0.18, 0.12 ) ], 5, closed=True ), a, cx + dx * w,
+                           cy + dy * h, w )
+            sh.polygon( [ ( x + 0.015 * w, y + 0.02 * w ) for x, y in tri ], ( 150, 66, 12 ) )
+            sh.polygon( tri, ( 250, 166, 40 ) )
+            for _ in range( 6 ):
+                px, py = tri[rng.integers( len( tri ) )]
+                qx, qy = cx + dx * w, cy + dy * h
+                t_ = rng.uniform( 0.2, 0.8 )
+                sh.dot( qx + ( px - qx ) * t_, qy + ( py - qy ) * t_, 0.01 * w, ( 214, 90, 16 ) )
+        sh.polygon( _blob( cx + 0.02 * w, cy - 0.3 * h, 0.22 * w, 0.07 * w, 0.0, 0.25, rng ), ( 255, 196, 40 ) )  # cheese
+        for k in range( 3 ):
+            sh.polygon( _blob( cx + ( k - 1 ) * 0.12 * w, cy - 0.26 * h, 0.025 * w, 0.06 * w, 0.0, 0.1, rng ),
+                        ( 255, 196, 40 ) )
+    elif kind in ( "caramel_bar", "nut_chunks", "choc_squares" ):
+        if kind == "caramel_bar":
+            _chocolate( sh, cx - 0.42 * w, cy - 0.02 * h, cx + 0.12 * w, cy + 0.34 * h, 3, 2 )
+            # A broken piece showing the caramel through its middle, a string of it running off.
+            bx0, by0, bx1, by1 = cx + 0.02 * w, cy - 0.26 * h, cx + 0.42 * w, cy + 0.06 * h
+            sh.rectangle( ( bx0, by0, bx1, by1 ), ( 74, 38, 20 ), radius=0.03 * w )
+            sh.rectangle( ( bx0 + 0.02 * w, by0 + 0.1 * ( by1 - by0 ), bx1 - 0.02 * w, by0 + 0.34 * ( by1 - by0 ) ),
+                          ( 110, 60, 32 ), radius=0.02 * w )
+            sh.rectangle( ( bx0, by0 + 0.45 * ( by1 - by0 ), bx1, by0 + 0.66 * ( by1 - by0 ) ), ( 232, 150, 44 ) )
+            sh.rectangle( ( bx0, by0 + 0.45 * ( by1 - by0 ), bx1, by0 + 0.5 * ( by1 - by0 ) ), ( 250, 196, 96 ) )
+            sh.polygon( _smooth( [ ( bx0 + 0.05 * w, by0 + 0.6 * ( by1 - by0 ) ), ( bx0 - 0.04 * w, by1 + 0.02 * h ),
+                                   ( bx0 - 0.1 * w, cy + 0.0 * h ), ( bx0 - 0.07 * w, by1 + 0.04 * h ),
+                                   ( bx0 + 0.02 * w, by0 + 0.7 * ( by1 - by0 ) ) ], 6, closed=True ), ( 232, 150, 44 ) )
+        elif kind == "nut_chunks":
+            for dx, dy, s in ( ( -0.2, 0.0, 0.3 ), ( 0.18, 0.1, 0.28 ), ( -0.05, 0.28, 0.3 ) ):
+                sh.polygon( _blob( cx + dx * w, cy + dy * h + 0.02 * w, s * w, 0.7 * s * w, 0.3, 0.25, rng ), ( 52, 26, 14 ) )
+                sh.polygon( _blob( cx + dx * w, cy + dy * h, s * w, 0.7 * s * w, 0.3, 0.25, rng ), ( 104, 56, 30 ) )
+                sh.polygon( _blob( cx + dx * w - 0.05 * w, cy + dy * h - 0.05 * w, 0.5 * s * w, 0.3 * s * w, 0.3, 0.3, rng ),
+                            ( 130, 74, 40 ) )
+            for _ in range( 7 ):
+                nx, ny = cx + rng.uniform( -0.35, 0.35 ) * w, cy + rng.uniform( -0.15, 0.35 ) * h
+                sh.ellipse( ( nx - 0.06 * w, ny - 0.045 * w, nx + 0.06 * w, ny + 0.045 * w ), ( 200, 150, 90 ) )
+                sh.ellipse( ( nx - 0.035 * w, ny - 0.03 * w, nx + 0.02 * w, ny + 0.0 * w ), ( 226, 184, 124 ) )
+        else:
+            _chocolate( sh, cx - 0.42 * w, cy - 0.12 * h, cx + 0.2 * w, cy + 0.32 * h, 3, 3 )
+            tri = [ ( cx + 0.08 * w, cy - 0.22 * h ), ( cx + 0.44 * w, cy - 0.1 * h ), ( cx + 0.3 * w, cy + 0.14 * h ) ]
+            sh.polygon( tri, ( 120, 64, 34 ) )
+            sh.polygon( _blob( cx - 0.1 * w, cy - 0.28 * h, 0.22 * w, 0.06 * w, -0.1, 0.2, rng ), ( 246, 240, 226 ) )  # milk
+    elif kind == "cream_cookies":
+        for dx, dy, r in ( ( -0.2, -0.12, 0.26 ), ( 0.2, -0.04, 0.26 ), ( -0.02, 0.22, 0.3 ) ):
+            _sandwich( sh, cx + dx * w, cy + dy * h, r * w )
+    elif kind == "chip_cookies":
+        for dx, dy, r in ( ( -0.22, -0.1, 0.26 ), ( 0.22, -0.02, 0.26 ), ( 0.0, 0.24, 0.3 ) ):
+            _cookie( sh, rng, cx + dx * w, cy + dy * h, r * w )
+    elif kind == "gummies":
+        colours = [ ( 230, 30, 40 ), ( 255, 200, 20 ), ( 60, 190, 60 ), ( 255, 120, 20 ), ( 170, 40, 200 ), ( 230, 30, 40 ),
+                    ( 60, 190, 60 ), ( 255, 200, 20 ) ]
+        for k, colour in enumerate( colours ):
+            gx = cx + ( ( k % 4 ) - 1.5 ) * 0.22 * w + ( 0.06 * w if k // 4 else 0.0 )
+            gy = cy + ( -0.1 + 0.26 * ( k // 4 ) ) * h
+            body = _blob( gx, gy, 0.1 * w, 0.13 * w, rng.uniform( -0.4, 0.4 ), 0.06, rng )
+            sh.polygon( [ ( x + 0.015 * w, y + 0.02 * w ) for x, y in body ], _shade( colour, 0.5 ) )
+            sh.polygon( body, colour )
+            sh.dot( gx - 0.03 * w, gy - 0.05 * w, 0.025 * w, ( 255, 255, 255 ) )
+    elif kind == "mints":
+        for k in range( 6 ):
+            mx = cx + ( ( k % 3 ) - 1 ) * 0.27 * w + ( 0.1 * w if k // 3 else -0.03 * w )
+            my = cy + ( -0.08 + 0.26 * ( k // 3 ) ) * h
+            r = 0.12 * w
+            sh.ellipse( ( mx - r, my - 0.7 * r + 0.1 * r, mx + r, my + 0.7 * r + 0.1 * r ), ( 150, 190, 220 ) )
+            sh.ellipse( ( mx - r, my - 0.7 * r, mx + r, my + 0.7 * r ), ( 248, 250, 252 ) )
+            sh.ellipse( ( mx - 0.5 * r, my - 0.35 * r, mx + 0.5 * r, my + 0.35 * r ), None, outline=( 200, 220, 236 ),
+                        width=0.08 * r )
+        for k in range( 3 ):                                             # a snowflake
+            a = k * math.pi / 3
+            sh.line( [ ( cx + 0.3 * w + 0.1 * w * math.cos( a ), cy - 0.33 * h + 0.1 * w * math.sin( a ) ),
+                       ( cx + 0.3 * w - 0.1 * w * math.cos( a ), cy - 0.33 * h - 0.1 * w * math.sin( a ) ) ],
+                     ( 255, 255, 255 ), 0.02 * w )
+    elif kind == "pretzels":
+        for dx, dy, s in ( ( -0.18, -0.08, 0.42 ), ( 0.2, 0.0, 0.4 ), ( 0.0, 0.26, 0.46 ) ):
+            _pretzel( sh, cx + dx * w, cy + dy * h, s * w )
+        sh.polygon( _blob( cx + 0.28 * w, cy - 0.3 * h, 0.12 * w, 0.06 * w, 0.0, 0.1, rng ), ( 250, 180, 30 ) )  # honey
+    elif kind == "mint_leaves":
+        for dx, dy, s, a in ( ( -0.18, -0.02, 0.42, -0.6 ), ( 0.16, 0.04, 0.44, 0.5 ), ( 0.0, 0.26, 0.4, 0.05 ) ):
+            _leaf( sh, cx + dx * w, cy + dy * h, s * w, a, ( 60, 200, 90 ) )
+        for k in range( 5 ):
+            sh.dot( cx + ( k - 2 ) * 0.17 * w, cy - 0.3 * h, 0.035 * w, ( 230, 255, 250 ) )
+    elif kind == "gum_balls":
+        for dx, dy, r, colour in ( ( -0.22, 0.0, 0.14, ( 255, 150, 200 ) ), ( 0.2, -0.04, 0.13, ( 250, 110, 180 ) ),
+                                   ( 0.0, 0.22, 0.15, ( 255, 170, 210 ) ), ( -0.28, 0.3, 0.1, ( 240, 90, 160 ) ),
+                                   ( 0.3, 0.28, 0.11, ( 255, 190, 220 ) ) ):
+            _glossy_ball( sh, cx + dx * w, cy + dy * h, r * w, colour )
+        sh.ellipse( ( cx - 0.12 * w, cy - 0.42 * h, cx + 0.32 * w, cy - 0.12 * h ), ( 255, 196, 226 ),
+                    outline=( 255, 255, 255 ), width=0.015 * w )            # a bubble
+    elif kind == "cookie_bites":
+        for k in range( 7 ):
+            bx = cx + ( ( k % 4 ) - 1.5 ) * 0.22 * w + ( 0.1 * w if k >= 4 else 0.0 )
+            by = cy + ( -0.06 + 0.26 * ( k // 4 ) ) * h
+            _cookie( sh, rng, bx, by, 0.11 * w, base=( 150, 90, 46 ), chips=( 40, 20, 10 ), count=4 )
+
+
+def _fruit( sh, rng, kind, cx, cy, s ):
+    """ A can's fruit, s px across, round ( cx, cy ). """
+    if kind == "cola":
+        for dx, dy in ( ( -0.18, 0.08 ), ( 0.16, 0.12 ) ):
+            sh.line( _smooth( [ ( cx + dx * s, cy + dy * s ), ( cx + 0.02 * s, cy - 0.2 * s ), ( cx + 0.08 * s, cy - 0.32 * s ) ] ),
+                     ( 70, 110, 30 ), 0.03 * s )
+            _glossy_ball( sh, cx + dx * s, cy + dy * s + 0.1 * s, 0.17 * s, ( 170, 10, 30 ) )
+        for _ in range( 12 ):
+            bx, by = cx + rng.uniform( -0.5, 0.5 ) * s, cy + rng.uniform( -0.4, 0.5 ) * s
+            r = rng.uniform( 0.02, 0.05 ) * s
+            sh.ellipse( ( bx - r, by - r, bx + r, by + r ), None, outline=( 255, 210, 210 ), width=0.012 * s )
+    elif kind in ( "orange", "lime" ):
+        peel, flesh, pith = ( ( 240, 120, 10 ), ( 255, 170, 40 ), ( 255, 236, 190 ) ) if kind == "orange" else \
+            ( ( 40, 140, 30 ), ( 170, 220, 60 ), ( 236, 250, 200 ) )
+        if kind == "lime":
+            _leaf( sh, cx + 0.28 * s, cy - 0.2 * s, 0.5 * s, 0.9, ( 30, 120, 40 ) )
+        r = 0.36 * s
+        sh.dot( cx, cy, r, peel )
+        sh.dot( cx, cy, 0.9 * r, pith )
+        sh.dot( cx, cy, 0.82 * r, flesh )
+        for k in range( 10 ):
+            a = k * 2 * math.pi / 10
+            sh.line( [ ( cx, cy ), ( cx + 0.82 * r * math.cos( a ), cy + 0.82 * r * math.sin( a ) ) ], pith, 0.04 * r )
+        sh.dot( cx, cy, 0.1 * r, pith )
+    elif kind == "grapes":
+        sh.line( [ ( cx, cy - 0.42 * s ), ( cx + 0.06 * s, cy - 0.3 * s ) ], ( 90, 70, 30 ), 0.03 * s )
+        _leaf( sh, cx + 0.16 * s, cy - 0.34 * s, 0.34 * s, 1.2, ( 60, 150, 50 ) )
+        for row, count in enumerate( ( 4, 3, 2, 1 ) ):
+            for k in range( count ):
+                gx = cx + ( k - ( count - 1 ) / 2 ) * 0.17 * s
+                gy = cy - 0.2 * s + row * 0.15 * s
+                _glossy_ball( sh, gx, gy, 0.09 * s, ( 130, 50, 170 ) )
+
+
+def _bag( sh, rng, name ):
+    """ A pillow pack's front: crimped seals at both ends, the brand big over a soft glow, the flavour on a ribbon and
+    the picture of what's inside. """
+    kind, brand, flavour, top, bottom, ink, outline, picture = VENDING_GOODS[name]
+    x0, y0, x1, y1 = sh.box( name )
+    w, h = x1 - x0, y1 - y0
+    seal = 0.065 * h
+    sh.rectangle( ( x0 - 4, y0 - 4, x1 + 4, y1 + 4 ), top, { "rough": 0.3, "light": VENDING_GLOW["goods"] } )
+    glow = tuple( min( 255, c * 1.25 + 30 ) for c in top )
+    _gradient( sh, ( x0, y0, x1, y1 ), top, bottom, glow, ( 0.5, 0.25 ), 0.32 )
+    for y_, s in ( ( y0, 1 ), ( y1 - seal, -1 ) ):                  # the seals: crimped ridges
+        sh.rectangle( ( x0, y_, x1, y_ + seal ), _shade( top, 0.9 ) )
+        for k in range( int( w / 6 ) ):
+            sx = x0 + 3 + 6 * k
+            sh.rectangle( ( sx, y_ + 2, sx + 2.4, y_ + seal - 2 ), _shade( top, 1.18 ), { "height": 0.8 } )
+        sh.rectangle( ( x0, y_ + ( seal - 3 if s > 0 else 0 ), x1, y_ + ( seal if s > 0 else 3 ) ), _shade( top, 0.7 ) )
+    face = "Mina-Bold" if len( brand ) <= 7 else "ChakraPetch-BoldItalic"
+    _brand( sh, x0 + 0.5 * w, y0 + 0.24 * h, brand, face, 0.17 * w, ink, outline, 0.025 * w, angle=7.0, width=0.86 * w,
+            shadow=( 0.012 * w, 0.02 * w, _shade( bottom, 0.5 ) ) )
+    rb = y0 + 0.335 * h
+    tw = sh.measure( flavour, "Dinish-Bold", 0.05 * w, 0.08 )
+    rw_ = min( 0.86 * w, tw + 0.12 * w )
+    sh.rectangle( ( x0 + 0.5 * w - rw_ / 2, rb, x0 + 0.5 * w + rw_ / 2, rb + 0.085 * w ), _shade( bottom, 0.6 ),
+                  radius=0.02 * w )
+    sh.text( ( x0 + 0.5 * w, rb + 0.066 * w ), flavour, "Dinish-Bold", 0.05 * w, ( 255, 255, 255 ), anchor="ms",
+             tracking=0.08, width=0.8 * w )
+    _picture( sh, rng, picture, x0 + 0.04 * w, y0 + 0.43 * h, x1 - 0.04 * w, y1 - seal - 0.02 * h )
+    sh.text( ( x1 - 0.06 * w, y1 - seal - 0.012 * h ), "80 g", "Dinish-Regular", 0.032 * w, ( 255, 255, 255 ), anchor="rs" )
+
+
+def _can_label( sh, rng, name ):
+    """ A can's printed wrap: its front (the brand, the flavour and the fruit) in the middle, a band of colour round
+    the back with the brand small, 500 ml. """
+    kind, brand, flavour, top, bottom, ink, outline, picture = VENDING_GOODS[name]
+    x0, y0, x1, y1 = sh.box( name )
+    w, h = x1 - x0, y1 - y0
+    sh.rectangle( ( x0 - 4, y0 - 4, x1 + 4, y1 + 4 ), top, { "rough": 0.24, "light": VENDING_GLOW["goods"] } )
+    glow = tuple( min( 255, c * 1.3 + 30 ) for c in top )
+    _gradient( sh, ( x0, y0, x1, y1 ), top, bottom, glow, ( 0.5, 0.3 ), 0.4 )
+    cx = x0 + 0.5 * w
+    for k in range( 3 ):                                          # swooshes round the can
+        yy = y0 + ( 0.7 + 0.07 * k ) * h
+        pts = [ ( x0 + t * w, yy + 0.05 * h * math.sin( 2 * math.pi * 2 * t + k ) ) for t in np.linspace( 0, 1, 40 ) ]
+        sh.line( pts, _shade( top, 1.3 + 0.1 * k ), 0.012 * h )
+    long_name = len( brand ) > 7
+    _brand( sh, cx, y0 + 0.26 * h, brand, "ChakraPetch-BoldItalic" if long_name else "Mina-Bold", 0.2 * h, ink, outline,
+            0.012 * w, angle=8.0, width=( 0.3 if long_name else 0.34 ) * w,
+            shadow=( 0.004 * w, 0.012 * h, _shade( bottom, 0.45 ) ) )
+    sh.text( ( cx, y0 + 0.46 * h ), flavour, "Dinish-Bold", 0.065 * h, ( 255, 255, 255 ), anchor="ms", tracking=0.1,
+             width=0.3 * w )
+    _fruit( sh, rng, picture, cx, y0 + 0.71 * h, 0.5 * h )
+    for bx in ( x0 + 0.04 * w, x1 - 0.04 * w ):                  # the back
+        sh.text( ( bx, y0 + 0.5 * h ), brand, "Mina-Bold", 0.07 * h, ink, anchor="ls" if bx < cx else "rs" )
+    sh.text( ( x0 + 0.28 * w, y1 - 0.06 * h ), "500 ml", "Dinish-Regular", 0.045 * h, ( 255, 255, 255 ), anchor="ms" )
+
+
+def _bottle_label( sh, name ):
+    """ The water's label, a band round the bottle: the brand over a drop on its front, waves round its foot. """
+    kind, brand, flavour, top, bottom, ink, outline, picture = VENDING_GOODS[name]
+    x0, y0, x1, y1 = sh.box( name )
+    w, h = x1 - x0, y1 - y0
+    sh.rectangle( ( x0 - 4, y0 - 4, x1 + 4, y1 + 4 ), top, { "rough": 0.3, "light": VENDING_GLOW["goods"] } )
+    _gradient( sh, ( x0, y0, x1, y1 ), top, bottom )
+    for k in range( 2 ):
+        yy = y0 + ( 0.8 + 0.1 * k ) * h
+        sh.line( [ ( x0 + t * w, yy + 0.04 * h * math.sin( 2 * math.pi * 4 * t + k ) ) for t in np.linspace( 0, 1, 60 ) ],
+                 ( 120, 180, 236 ) if k else ( 60, 140, 220 ), 0.05 * h )
+    cx = x0 + 0.5 * w
+    _brand( sh, cx, y0 + 0.3 * h, brand, "Mina-Bold", 0.26 * h, ink, ( 255, 255, 255 ), 0.01 * h, width=0.24 * w )
+    sh.text( ( cx, y0 + 0.53 * h ), "NATURAL MINERAL WATER", "Dinish-Bold", 0.06 * h, ( 40, 90, 160 ), anchor="ms",
+             width=0.22 * w )
+    drop = [ ( 0.0, -0.5 ), ( 0.24, -0.08 ), ( 0.3, 0.14 ), ( 0.2, 0.36 ), ( 0.0, 0.46 ), ( -0.2, 0.36 ), ( -0.3, 0.14 ),
+             ( -0.24, -0.08 ) ]
+    sh.polygon( rotated( _smooth( drop, 6, closed=True ), 0.0, cx, y0 + 0.67 * h, 0.2 * h ), ( 40, 140, 230 ) )
+    for bx in ( x0 + 0.12 * w, x1 - 0.12 * w ):                  # the back: the brand small, 0,5 L
+        sh.text( ( bx, y0 + 0.45 * h ), brand, "Mina-Bold", 0.14 * h, ink, anchor="ms" )
+        sh.text( ( bx, y0 + 0.62 * h ), "0,5 L", "Dinish-Bold", 0.08 * h, ( 40, 90, 160 ), anchor="ms" )
+
+
+def _hand( sh, cx, cy, s, ink, L ):
+    """ A hand tapping with its forefinger, in outline, s px tall: the touch screens' "tap here". """
+    finger = [ ( -0.07, 0.05 ), ( -0.07, -0.38 ), ( -0.06, -0.43 ), ( 0.0, -0.46 ), ( 0.06, -0.43 ), ( 0.07, -0.38 ),
+               ( 0.07, -0.04 ) ]
+    knuckles = [ ( 0.07, -0.04 ), ( 0.08, -0.1 ), ( 0.13, -0.12 ), ( 0.18, -0.1 ), ( 0.19, -0.03 ), ( 0.2, -0.08 ),
+                 ( 0.25, -0.09 ), ( 0.3, -0.06 ), ( 0.31, 0.0 ), ( 0.32, -0.03 ), ( 0.36, -0.03 ), ( 0.4, 0.0 ),
+                 ( 0.41, 0.06 ), ( 0.4, 0.22 ), ( 0.34, 0.36 ), ( 0.26, 0.44 ), ( 0.26, 0.5 ) ]
+    palm = [ ( -0.12, 0.5 ), ( -0.12, 0.44 ), ( -0.22, 0.34 ), ( -0.32, 0.2 ), ( -0.36, 0.1 ), ( -0.34, 0.05 ),
+             ( -0.28, 0.06 ), ( -0.2, 0.14 ), ( -0.07, 0.24 ), ( -0.07, 0.05 ) ]
+    outline = finger + knuckles[1:] + [ ( 0.26, 0.5 ) ] + palm
+    pts = [ ( cx + x * s, cy + y * s ) for x, y in outline ]
+    sh.line( pts + pts[:1], ink, 0.035 * s, L )
+    for x_ in ( 0.13, 0.25 ):                                     # the curled fingers' tips
+        sh.line( [ ( cx + x_ * s, cy - 0.08 * s ), ( cx + x_ * s, cy + 0.02 * s ) ], ink, 0.025 * s, L )
+    sh.line( [ ( cx - 0.12 * s, cy + 0.5 * s ), ( cx + 0.26 * s, cy + 0.5 * s ) ], ink, 0.035 * s, L )
+    for k, r in enumerate( ( 0.12, 0.2 ) ):                      # the tap's ripples round the fingertip
+        box = ( cx - r * s, cy - 0.46 * s - r * s, cx + r * s, cy - 0.46 * s + r * s )
+        for d, f in sh._each( ink, L ):
+            d.arc( tuple( v * SS for v in box ), 200, 340, fill=f, width=max( 1, int( 0.025 * s * SS ) ) )
+
+
+def _screen( sh ):
+    x0, y0, x1, y1 = sh.box( "screen" )
+    w, h = x1 - x0, y1 - y0
+    L = { "light": VENDING_GLOW["screen"] }
+    sh.rectangle( ( x0 - 4, y0 - 4, x1 + 4, y1 + 4 ), ( 12, 16, 26 ), { "rough": 0.08, "light": VENDING_GLOW["screen"] } )
+    _gradient( sh, ( x0, y0, x1, y1 ), ( 18, 26, 44 ), ( 8, 10, 18 ), ( 28, 40, 66 ), ( 0.5, 0.45 ), 0.5 )
+    white = ( 244, 246, 250 )
+    sh.text( ( x0 + 0.5 * w, y0 + 0.2 * h ), "SELECT", "Dinish-Bold", 0.062 * h, white, L, anchor="ms", tracking=0.06 )
+    sh.text( ( x0 + 0.5 * w, y0 + 0.3 * h ), "YOUR ITEM", "Dinish-Bold", 0.062 * h, white, L, anchor="ms", tracking=0.06,
+             width=0.86 * w )
+    _hand( sh, x0 + 0.5 * w, y0 + 0.62 * h, 0.4 * h, white, L )
+
+
+def _key( sh, name, label ):
+    x0, y0, x1, y1 = sh.box( name )
+    s = x1 - x0
+    sh.rectangle( ( x0 - 4, y0 - 4, x1 + 4, y1 + 4 ), ( 30, 31, 34 ), { "rough": 0.45, "light": 0.0, "height": 0.5 } )
+    sh.rectangle( ( x0, y0, x1, y1 ), ( 70, 72, 78 ), radius=0.12 * s )
+    sh.rectangle( ( x0 + 0.06 * s, y0 + 0.1 * s, x1 - 0.04 * s, y1 - 0.02 * s ), ( 22, 23, 26 ), radius=0.1 * s )
+    sh.rectangle( ( x0 + 0.06 * s, y0 + 0.06 * s, x1 - 0.06 * s, y1 - 0.08 * s ), ( 44, 46, 50 ), radius=0.1 * s )
+    cx, cy = ( x0 + x1 ) / 2, ( y0 + y1 ) / 2 - 0.01 * s
+    if label == "x":
+        for a in ( 1, -1 ):
+            sh.line( [ ( cx - 0.2 * s, cy - a * 0.2 * s ), ( cx + 0.2 * s, cy + a * 0.2 * s ) ], ( 236, 44, 44 ), 0.09 * s )
+    elif label == "ok":
+        sh.line( [ ( cx - 0.22 * s, cy + 0.0 * s ), ( cx - 0.06 * s, cy + 0.17 * s ), ( cx + 0.24 * s, cy - 0.19 * s ) ],
+                 ( 70, 200, 90 ), 0.09 * s )
+    else:
+        sh.text( ( cx, cy + 0.2 * s ), label, "Dinish-Bold", 0.42 * s, ( 246, 246, 246 ), anchor="ms" )
+
+
+def _reader( sh ):
+    x0, y0, x1, y1 = sh.box( "reader" )
+    w, h = x1 - x0, y1 - y0
+    sh.rectangle( ( x0 - 4, y0 - 4, x1 + 4, y1 + 4 ), ( 14, 14, 16 ), { "rough": 0.35, "light": 0.0 } )
+    sh.rectangle( ( x0, y0, x1, y1 ), ( 28, 29, 32 ), radius=0.08 * w )
+    sh.rectangle( ( x0 + 0.05 * w, y0 + 0.05 * h, x1 - 0.05 * w, y1 - 0.05 * h ), ( 16, 16, 18 ), radius=0.06 * w )
+    cx, cy = x0 + 0.5 * w, y0 + 0.6 * h
+    grey = ( 176, 180, 186 )
+    L = { "light": VENDING_GLOW["symbol"] }
+    sh.dot( cx, cy, 0.035 * w, grey, L )
+    for r in ( 0.13, 0.22 ):
+        box = tuple( v * SS for v in ( cx - r * w, cy - r * w, cx + r * w, cy + r * w ) )
+        for start, end in ( ( -50, 50 ), ( 130, 230 ) ):
+            for d, f in sh._each( grey, L ):
+                d.arc( box, start, end, fill=f, width=max( 1, int( 0.03 * w * SS ) ) )
+
+
+def _flap( sh ):
+    x0, y0, x1, y1 = sh.box( "flap" )
+    w, h = x1 - x0, y1 - y0
+    sh.rectangle( ( x0 - 4, y0 - 4, x1 + 4, y1 + 4 ), ( 34, 35, 38 ), { "rough": 0.42, "light": 0.0 } )
+    _gradient( sh, ( x0, y0, x1, y1 ), ( 24, 25, 28 ), ( 44, 46, 50 ) )
+    sh.text( ( x0 + 0.5 * w, y0 + 0.6 * h ), "PUSH", "Dinish-Bold", 0.2 * h, ( 96, 98, 104 ), { "height": 0.65 },
+             anchor="ms", tracking=0.35 )
+
+
+def _rail( sh, row ):
+    """ A shelf's front: a dark label strip under a bright metal edge, each slot's code in white under its slot. """
+    name = f"rail_{row.lower()}"
+    x0, y0, x1, y1 = sh.box( name )
+    w, h = x1 - x0, y1 - y0
+    sh.rectangle( ( x0 - 4, y0 - 4, x1 + 4, y1 + 4 ), ( 34, 36, 40 ), { "light": 0.05, "rough": 0.4 } )
+    sh.rectangle( ( x0, y0, x1, y0 + 0.16 * h ), ( 214, 218, 224 ), { "light": VENDING_GLOW["rail"] } )
+    sh.rectangle( ( x0, y0 + 0.16 * h, x1, y0 + 0.22 * h ), ( 110, 114, 120 ) )
+    sh.rectangle( ( x0, y1 - 0.1 * h, x1, y1 ), ( 70, 72, 78 ) )
+    for k, share in enumerate( VENDING_COLUMNS ):
+        sh.text( ( x0 + share * w, y0 + 0.86 * h ), f"{row}{k + 1}", "Dinish-Bold", 0.56 * h, ( 244, 246, 248 ),
+                 { "light": 0.5 }, anchor="ms" )
+
+
+def vending_missing( out=OUT_DIR ):
+    """ Whether any of the snack machine's pictures isn't there. They aren't in the repository (the session that drew
+    them couldn't upload to its LFS store), so railhead_map draws them then. """
+    names = ( "rw_vending_color", "vending_normal", "vending_rough", "vending_illum" )
+    return any( not ( Path( out ) / f"{name}.png" ).exists() for name in names )
+
+
+def vending( rng, n ):
+    """ The snack machine (rw_vending): the goods' packets, cans and bottle in their makers' colours (all made up),
+    the touch screen's "select your item" page, the keypad's keys, the card reader's face, the pick-up flap, the
+    brushed steel panel round the controls, the shelves' label rails and the lit cavity's walls. The goods, rails and
+    cavity glow a little (the machine's LEDs light them from inside), the screen fully. """
+    sh = Sheet( n, n, VENDING_RECTS, ( 20, 21, 24 ), rough=0.4, height=0.5, light=0.0 )
+    for name, ( kind, *_ ) in VENDING_GOODS.items():
+        if kind == "bag":
+            _bag( sh, rng, name )
+        elif kind == "can":
+            _can_label( sh, rng, name )
+        else:
+            _bottle_label( sh, name )
+    _screen( sh )
+    for key in ( "1", "2", "3", "4", "5", "6", "7", "8", "9", "x", "0", "ok" ):
+        _key( sh, f"key_{key}", key )
+    _reader( sh )
+    _flap( sh )
+    for row in VENDING_ROWS:
+        _rail( sh, row )
+    for name, colour, rough, light in ( ( "bottle_plastic", ( 214, 230, 244 ), 0.15, VENDING_GLOW["goods"] ),
+                                        ( "bottle_cap", ( 26, 104, 214 ), 0.35, VENDING_GLOW["goods"] ),
+                                        ( "can_lid", ( 196, 198, 202 ), 0.3, VENDING_GLOW["goods"] ),
+                                        ( "cavity_back", ( 26, 27, 30 ), 0.5, 0.06 ) ):
+        x0, y0, x1, y1 = sh.box( name )
+        sh.rectangle( ( x0 - 4, y0 - 4, x1 + 4, y1 + 4 ), colour, { "rough": rough, "light": light } )
+    x0, y0, x1, y1 = sh.box( "cavity_side" )                       # lit from the LED strip along its top
+    sh.rectangle( ( x0 - 4, y0 - 4, x1 + 4, y1 + 4 ), ( 120, 124, 130 ), { "rough": 0.35, "light": VENDING_GLOW["cavity"] } )
+    _gradient( sh, ( x0, y0, x1, y1 ), ( 196, 200, 208 ), ( 58, 60, 66 ) )
+    x0, y0, x1, y1 = sh.box( "panel" )                             # brushed stainless, satin
+    sh.rectangle( ( x0 - 4, y0 - 4, x1 + 4, y1 + 4 ), ( 150, 153, 158 ), { "rough": 0.32, "light": 0.0 } )
+    _, u, v = _ss_grid( ( x0, y0, x1, y1 ) )
+    hx, hy = u.shape[1], u.shape[0]
+    brush = np.cumsum( rng.standard_normal( ( 1, hx ) ), axis=1 )
+    brush = ( brush - brush.mean() ) / ( brush.std() + 1e-9 )
+    fine = rng.standard_normal( ( 1, hx ) )
+    sheen = 1.0 + 0.12 * np.exp( -( ( u - 0.32 ) / 0.22 ) ** 2 ) * ( 1.0 - 0.5 * v ) - 0.08 * v
+    lum = sheen * ( 1.0 + 0.025 * brush + 0.02 * fine ) + 0.006 * rng.standard_normal( ( hy, hx ) )
+    _paste_rgb( sh, ( x0, y0, x1, y1 ), lum_paint( ( 152, 155, 160 ), lum ) )
+    colour, layers = sh.arrays()
+    # The packets' foil: darker towards their crimped edges, a soft gloss down one side and fine crinkles.
+    x, y = coords( n )
+    shade = np.ones( ( n, n ) )
+    gloss = np.zeros( ( n, n ) )
+    crinkle = noise( rng, n, 1.2, n / 16, n / 3 )
+    for name, ( kind, *_ ) in VENDING_GOODS.items():
+        if kind != "bag":
+            continue
+        x0, y0, x1, y1 = VENDING_RECTS[name]
+        sl = ( slice( y0, y1 ), slice( x0, x1 ) )
+        u = ( x[sl] - x0 ) / ( x1 - x0 )
+        v = ( y[sl] - y0 ) / ( y1 - y0 )
+        body = smoothstep( 0.05, 0.1, v ) * smoothstep( 0.95, 0.9, v )
+        shade[sl] = ( 0.78 + 0.22 * np.sin( math.pi * u ) ** 0.6 ) * ( 1.0 + 0.04 * crinkle[sl] * body )
+        gloss[sl] = 0.1 * np.exp( -( ( u - 0.3 ) / 0.1 ) ** 2 ) * body * ( 1.0 - 0.4 * v )
+    colour = srgb( lin( colour ) * shade[..., None] + gloss[..., None] )
+    rough = np.clip( layers["rough"] - 0.15 * gloss, 0, 1 )
+    height = 0.03 * ( layers["height"] - 0.5 )
+    return { "rw_vending": colour }, rough, height, 24.0, { "illum": layers["light"] }
+
+
+# ---------------------------------------------------------------------------------------------------------------------
 # Tables
 
 # name: ( draw, size, seed, metalness, tile units ). The atlases, the clock and the lattice are placed by explicit UVs
@@ -2853,6 +3486,7 @@ TEXTURES = {
     "shopsigns": ( shopsigns, 2048, 35, 0.0, 1.0 ),
     "graffiti": ( graffiti, 2048, 36, 0.0, 1.0 ),
     "lettering": ( lettering, 2048, 37, 0.5, 1.0 ),
+    "vending": ( vending, 2048, 38, 0.0, 1.0 ),
 }
 
 # The paints each texture draws, so paints() needn't run them (write_texture checks them).
@@ -2876,13 +3510,14 @@ TEXTURE_PAINTS = {
     "wood": [ "rw_wood" ], "facade": [ "rw_facade_cream", "rw_facade_ochre", "rw_facade_grey", "rw_facade_rose" ],
     "clock": [ "rw_clock" ], "signs": [ "rw_signs" ], "displays": [ "rw_displays" ], "posters": [ "rw_posters" ],
     "shopsigns": [ "rw_shopsigns" ], "graffiti": [ "rw_graffiti" ], "lettering": [ "rw_lettering" ],
+    "vending": [ "rw_vending" ],
 }
 
 DECALS = { "rw_clock" }
 # Self-lit paints: brightness. Where the texture draws an illum mask (<texture>_illum.png: the signs' faces, the
 # displays' LEDs, the shop signs' lit letters and boxes) only that glows; otherwise the whole paint does, its colour the
 # light it gives.
-ILLUM = { "rw_signs": 1.4, "rw_displays": 2.4, "rw_shopsigns": 1.6, "rw_lamp_warm": 6.0, "rw_lamp_cool": 6.0,
+ILLUM = { "rw_signs": 1.4, "rw_displays": 2.4, "rw_shopsigns": 1.6, "rw_vending": 2.4, "rw_lamp_warm": 6.0, "rw_lamp_cool": 6.0,
           "rw_signal_red": 8.0, "rw_signal_green": 8.0, "rw_signal_yellow": 8.0 }
 # Metalness per paint where it differs from its texture's.
 METALNESS = { "rw_rail_head": 1.0, "rw_lettering": 0.5 }
@@ -2918,7 +3553,9 @@ PAINTED = { "rw_car_grey": ( ( 74, 78, 83 ), 0.4, 0.3 ),            # a metallic
             "rw_bottle_orange": ( ( 236, 126, 26 ), 0.0, 0.1 ),
             "rw_bottle_cola": ( ( 38, 20, 14 ), 0.0, 0.08 ),
             "rw_bottle_lemon": ( ( 226, 212, 116 ), 0.0, 0.1 ),
-            "rw_bottle_tea": ( ( 146, 76, 28 ), 0.0, 0.1 ) }
+            "rw_bottle_tea": ( ( 146, 76, 28 ), 0.0, 0.1 ),
+            # The snack machine's black powder coat, satin.
+            "rw_satin_black": ( ( 17, 17, 19 ), 0.0, 0.34 ) }
 # Textured glass on shaders/glass.shader (its texture's colour, normal and roughness): paint: absorption.
 TEXTURED_GLASS = { "rw_glass_roof": 0.45 }
 # Paints whose picture's bottom edge stands at z 0 (two storeys a tile).
@@ -2934,6 +3571,7 @@ ATLASES = {
     "rw_graffiti": ( 2048, 2048, GRAFFITI_RECTS ),
     "rw_lettering": ( 2048, 2048, LETTERING_RECTS ),
     "rw_kiosk": ( KIOSK.W, KIOSK.H, KIOSK.RECTS ),
+    "rw_vending": ( 2048, 2048, VENDING_RECTS ),
 }
 # Paints whose textures another script draws, placed by their atlases' explicit UVs: paint: the script.
 OWN_SCRIPT = { "rw_kiosk": "Tools/railhead_kiosk_art.py" }

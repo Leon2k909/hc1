@@ -2019,47 +2019,280 @@ def ticket_machine( model, e, n, z0=0.0, facing="+e" ):
     F.collide( model, -w, w, -11.0, 8.5, 0.0, 71.0, "metal" )
 
 
-VENDING_GOODS = ( "rw_red_paint", "rw_yellow_paint", "rw_train_blue", "rw_white_paint", "rw_container_green",
-                  "rw_container_orange", "rw_train_red" )
+VENDING = "rw_vending"
+BLACK = "rw_satin_black"         # the cabinet's powder coat (railhead_materials.PAINTED)
+# The machine's goods, a row of four a shelf from the top (rw_vending's entries): crisps, chocolate, biscuits and
+# sweets in pillow packs, then 500 ml cans, then more packs and a bottle of water.
+VENDING_SLOTS = ( ( "snack_solbite", "snack_cloudos", "snack_zestix", "snack_ridgerun" ),
+                  ( "snack_novabar", "snack_chunko", "snack_meltz", "snack_frost" ),
+                  ( "snack_crumbly", "snack_jellyjoy", "snack_polar", "snack_knotties" ),
+                  ( "drink_fizzup", "drink_citraze", "drink_sparkleaf", "drink_groove" ),
+                  ( "snack_mintle", "snack_bubblez", "snack_chocobitz", "drink_hydro" ) )
+VENDING_BAG_W = 5.0                                      # the packs' width; their height is their picture's
+VENDING_COLUMNS = ( 0.14, 0.38, 0.62, 0.86 )            # the slots' centres across the shelf (railhead_materials')
+VENDING_CAN = [ ( 1.36, 0.0 ), ( 1.6, 0.36 ), ( 1.6, 6.2 ), ( 1.34, 6.54 ), ( 1.28, 6.6 ) ]      # ( r, z ) from its foot
+VENDING_BOTTLE = [ ( 1.4, 0.0 ), ( 1.55, 0.3 ), ( 1.55, 5.4 ), ( 1.2, 6.2 ), ( 0.62, 6.8 ), ( 0.57, 7.2 ) ]
+VENDING_LABEL = ( 1.9, 4.8 )                             # the bottle's label band, z
+
+
+def _vuv( name ):
+    return _rect( VENDING, name )
+
+
+def _vface( model, F, name, x0, x1, z0, z1, y, toward=1.0 ):
+    """ An rw_vending entry on a rectangle across the frame at depth y, facing local y toward, upright. """
+    u0, v0, u1, v1 = _vuv( name )
+    if toward < 0:
+        u0, u1 = u1, u0
+    _frect( model, F, VENDING, x0, x1, y, z0, z1, toward, uv=[ ( u0, v0 ), ( u1, v0 ), ( u1, v1 ), ( u0, v1 ) ] )
+
+
+def _vswatch( model, F, name, pts, towards ):
+    """ A polygon in one flat rw_vending swatch (the middle of its entry). """
+    u0, v0, u1, v1 = _vuv( name )
+    c = ( ( u0 + u1 ) / 2, ( v0 + v1 ) / 2 )
+    _fpoly( model, F, VENDING, pts, towards, uv=[ c ] * len( pts ) )
+
+
+def _holed( model, F, paint, x0, x1, z0, z1, y, holes, toward=1.0 ):
+    """ A rectangle across the frame at depth y less the rectangular holes ( x0, x1, z0, z1 ) cut out of it. """
+    cuts = sorted( { z0, z1, *[ z for _, _, hz0, hz1 in holes for z in ( hz0, hz1 ) if z0 < z < z1 ] } )
+    for s0, s1 in zip( cuts, cuts[1:] ):
+        mid = ( s0 + s1 ) / 2
+        spans = [ ( hx0, hx1 ) for hx0, hx1, hz0, hz1 in holes if hz0 <= mid <= hz1 ]
+        for a, b in _subtract( ( x0, x1 ), spans ):
+            _frect( model, F, paint, a, b, y, s0, s1, toward )
+
+
+def _bevel( model, F, paint, x0, x1, z0, z1, y_out, y_in, inset ):
+    """ The four sloping sides of an opening x0..x1, z0..z1 in a face at y_out, closing in by inset to y_in. """
+    o = [ ( x0, y_out, z0 ), ( x1, y_out, z0 ), ( x1, y_out, z1 ), ( x0, y_out, z1 ) ]
+    i = [ ( x0 + inset, y_in, z0 + inset ), ( x1 - inset, y_in, z0 + inset ), ( x1 - inset, y_in, z1 - inset ),
+          ( x0 + inset, y_in, z1 - inset ) ]
+    for k, towards in enumerate( ( ( 0, 1, 1 ), ( -1, 1, 0 ), ( 0, 1, -1 ), ( 1, 1, 0 ) ) ):
+        _fpoly( model, F, paint, [ o[k], o[( k + 1 ) % 4], i[( k + 1 ) % 4], i[k] ], towards )
+
+
+def _rounded( x0, x1, z0, z1, r, steps=3 ):
+    """ A rounded rectangle's outline ( x, z ), counter-clockwise from its bottom edge. """
+    pts = []
+    for cx, cz, a0 in ( ( x1 - r, z0 + r, -90 ), ( x1 - r, z1 - r, 0 ), ( x0 + r, z1 - r, 90 ), ( x0 + r, z0 + r, 180 ) ):
+        for k in range( steps + 1 ):
+            a = math.radians( a0 + 90 * k / steps )
+            pts.append( ( cx + r * math.cos( a ), cz + r * math.sin( a ) ) )
+    return pts
+
+
+def _vplate( model, F, name, x0, x1, z0, z1, y0, y1, r, edge ):
+    """ A plate with rounded corners standing from y0 out to y1, its face an rw_vending entry, its edge in edge. """
+    u0, v0, u1, v1 = _vuv( name )
+    outline = _rounded( x0, x1, z0, z1, r )
+    uv = [ ( u0 + ( x - x0 ) / ( x1 - x0 ) * ( u1 - u0 ), v0 + ( z - z0 ) / ( z1 - z0 ) * ( v1 - v0 ) ) for x, z in outline ]
+    _fpoly( model, F, VENDING, [ ( x, y1, z ) for x, z in outline ], ( 0, 1, 0 ), uv=uv )
+    for ( xa, za ), ( xb, zb ) in zip( outline, outline[1:] + outline[:1] ):
+        nx, nz = zb - za, -( xb - xa )
+        _fpoly( model, F, edge, [ ( xa, y0, za ), ( xb, y0, zb ), ( xb, y1, zb ), ( xa, y1, za ) ], ( nx, 0, nz ) )
+
+
+def _pillow( model, F, name, xc, yc, z0, w, h, t, nx=6, nz=6, seal=0.065 ):
+    """ A pillow pack standing on z0: its front bulges t forward of its middle at yc, flat at the crimped seals top and
+    bottom and pinched to nothing at its sides; the front is its rw_vending picture, the back plain. """
+    u0, v0, u1, v1 = _vuv( name )
+    zs0, zs1 = z0 + seal * h, z0 + h - seal * h
+    vs0, vs1 = v0 + seal * ( v1 - v0 ), v1 - seal * ( v1 - v0 )
+
+    def surface( a, c ):
+        return t * math.sqrt( max( 0.0, 1.0 - a * a ) ) ** 0.8 * math.sqrt( max( 0.0, 1.0 - c ** 4 ) )
+
+    def point( a, c ):
+        return ( xc + a * w / 2, yc + surface( a, c ), ( zs0 + zs1 ) / 2 + c * ( zs1 - zs0 ) / 2 )
+
+    def normal( a, c ):
+        e = 1e-3
+        a0, a1 = max( -1.0, a - e ), min( 1.0, a + e )
+        c0, c1 = max( -1.0, c - e ), min( 1.0, c + e )
+        dx = np.subtract( point( a1, c ), point( a0, c ) )
+        dz = np.subtract( point( a, c1 ), point( a, c0 ) )
+        n = np.cross( dz, dx )
+        n = n if n[1] >= 0 else -n
+        return tuple( _unit( n ) )
+
+    As = [ -1.0 + 2.0 * k / nx for k in range( nx + 1 ) ]
+    Cs = [ -1.0 + 2.0 * k / nz for k in range( nz + 1 ) ]
+    for i in range( nx ):
+        for j in range( nz ):
+            corners = [ ( As[i], Cs[j] ), ( As[i + 1], Cs[j] ), ( As[i + 1], Cs[j + 1] ), ( As[i], Cs[j + 1] ) ]
+            uv = [ ( u0 + ( a + 1 ) / 2 * ( u1 - u0 ), vs0 + ( c + 1 ) / 2 * ( vs1 - vs0 ) ) for a, c in corners ]
+            _fpoly( model, F, VENDING, [ point( a, c ) for a, c in corners ], ( 0, 1, 0 ), uv=uv,
+                    normals=[ normal( a, c ) for a, c in corners ] )
+    for za, zb, va, vb in ( ( z0, zs0, v0, vs0 ), ( zs1, z0 + h, vs1, v1 ) ):          # the seals
+        _frect( model, F, VENDING, xc - w / 2, xc + w / 2, yc, za, zb,
+                uv=[ ( u0, va ), ( u1, va ), ( u1, vb ), ( u0, vb ) ] )
+    _vswatch( model, F, "cavity_back", [ ( xc - w / 2, yc - 0.02, z0 ), ( xc + w / 2, yc - 0.02, z0 ),
+                                         ( xc + w / 2, yc - 0.02, z0 + h ), ( xc - w / 2, yc - 0.02, z0 + h ) ],
+              ( 0, -1, 0 ) )
+
+
+def _vlathe( model, F, xc, yc, z0, profile, paint_at, sides=16, closed=True ):
+    """ A round thing standing on z0 round ( xc, yc ): profile ( r, z ) from the bottom up, each band painted by
+    paint_at( k ) -> ( entry, labelled ). A labelled band wraps its entry round once, the picture's middle facing the
+    front (local +y); the others take the entry's middle colour. Its top is closed with the last band's entry
+    unless closed is False. """
+    for k in range( len( profile ) - 1 ):
+        ( r0, za ), ( r1, zb ) = profile[k], profile[k + 1]
+        name, labelled = paint_at( k )
+        u0, v0, u1, v1 = _vuv( name )
+        slope = ( r0 - r1 ) / max( zb - za, 1e-6 )
+        for s in range( sides ):
+            t0, t1 = 2 * math.pi * s / sides, 2 * math.pi * ( s + 1 ) / sides
+            d0, d1 = ( math.sin( t0 ), math.cos( t0 ) ), ( math.sin( t1 ), math.cos( t1 ) )
+            pts = [ ( xc + r0 * d0[0], yc + r0 * d0[1], z0 + za ), ( xc + r0 * d1[0], yc + r0 * d1[1], z0 + za ),
+                    ( xc + r1 * d1[0], yc + r1 * d1[1], z0 + zb ), ( xc + r1 * d0[0], yc + r1 * d0[1], z0 + zb ) ]
+            nrm = [ _unit( ( d[0], d[1], slope ) ) for d in ( d0, d1, d1, d0 ) ]
+            if labelled:
+                ua = u0 + ( 0.5 + ( t0 if t0 <= math.pi else t0 - 2 * math.pi ) / ( 2 * math.pi ) ) * ( u1 - u0 )
+                ub = ua + ( u1 - u0 ) / sides
+                uv = [ ( ua, v0 ), ( ub, v0 ), ( ub, v1 ), ( ua, v1 ) ]
+            else:
+                uv = [ ( ( u0 + u1 ) / 2, ( v0 + v1 ) / 2 ) ] * 4
+            _fpoly( model, F, VENDING, pts, ( ( d0[0] + d1[0] ) / 2, ( d0[1] + d1[1] ) / 2, slope ), uv=uv,
+                    normals=nrm )
+    if not closed:
+        return
+    r, z = profile[-1]
+    _vswatch( model, F, paint_at( len( profile ) - 2 )[0],
+              [ ( xc + r * math.sin( 2 * math.pi * s / sides ), yc + r * math.cos( 2 * math.pi * s / sides ), z0 + z )
+                for s in range( sides ) ], ( 0, 0, 1 ) )
+
+
+def _spiral( model, F, xc, y_front, z_shelf, turns=2.0, pitch=2.3, r=1.85, wire=0.09, steps=8 ):
+    """ A vending spiral lying on the shelf: a steel wire coil r round, pitch apart, running back from y_front. """
+    pts = []
+    for k in range( int( turns * steps ) + 1 ):
+        a = 2 * math.pi * k / steps
+        pts.append( F.p( xc + r * math.sin( a ), y_front - pitch * k / steps, z_shelf + r + wire - r * math.cos( a ) ) )
+    polyline( model, pts, wire, BLACK, 4 )
 
 
 def vending_machine( model, e, n, z0=0.0, facing="+e" ):
-    """ A snack machine (900 x 850 x 1830 mm): a black cabinet with a red header band, its lit window showing five
-    shelves of packets behind the glass, the keypad panel beside it and the pick-up flap below. One metal box. """
+    """ A snack machine (990 x 850 x 1830 mm), a modern black one: its glass door on the left shows five shelves of
+    goods in their spirals, four to a shelf with each slot's code (A1 to E4) on the rail under it, lit by an LED strip
+    along the top inside the glass; on the right a brushed steel panel holds the touch screen ("select your item"),
+    the keypad, the contactless card reader under its LED and the card slot; below the door the pick-up bay with its
+    "push" flap under another LED, and thin LED strips light the cabinet's top corners. The goods, screen, keys,
+    reader and flap are rw_vending's (Tools/railhead_materials.py). One metal box. """
     F = frame_for( e, n, z0, facing )
-    w, d0, d1, h = 17.7, -16.0, 17.5, 72.0
-    gx0, gx1, gz0, gz1 = -15.7, 5.5, 24.0, 68.0
-    F.box( model, -w + 1.0, w - 1.0, d0 + 1.0, d1 - 1.5, 0.0, 3.0, DARK, skip=( "bottom", ) )
-    F.box( model, -w, w, d0, d1, 3.0, h, { "default": "rw_black", "front": None }, skip=( "bottom", ) )
-    for x0, x1, z0_, z1_, paint in ( ( -w, gx0, 3.0, h, "rw_black" ), ( gx1, w, 3.0, h, "rw_black" ),
-                                     ( gx0, gx1, 3.0, gz0, "rw_black" ), ( gx0, gx1, gz1, h, "rw_red_paint" ) ):
-        _frect( model, F, paint, x0, x1, d1, z0_, z1_ )
-    _frect( model, F, "rw_white_paint", gx0, gx1, d1 - 10.0, gz0, gz1 )                   # the lit cavity
-    _xrect( model, F, "rw_steel_grey", gx0, d1 - 10.0, d1, gz0, gz1, 1.0 )
-    _xrect( model, F, "rw_steel_grey", gx1, d1 - 10.0, d1, gz0, gz1, -1.0 )
-    _fpoly( model, F, "rw_lamp_cool", [ ( gx0, d1 - 10.0, gz1 ), ( gx1, d1 - 10.0, gz1 ), ( gx1, d1, gz1 ),
-                                        ( gx0, d1, gz1 ) ], ( 0, 0, -1 ) )
-    k = 0
-    for row in range( 5 ):
-        zs = gz0 + 1.0 + row * 8.6
-        _fpoly( model, F, "rw_steel_grey", [ ( gx0, d1 - 10.0, zs ), ( gx1, d1 - 10.0, zs ), ( gx1, d1 - 1.5, zs ),
-                                             ( gx0, d1 - 1.5, zs ) ], ( 0, 0, 1 ) )
-        _frect( model, F, "rw_steel_grey", gx0, gx1, d1 - 1.5, zs - 1.0, zs )
-        for col in range( 4 ):
-            x0 = gx0 + 0.6 + col * 5.15
-            paint = VENDING_GOODS[( k * 3 ) % len( VENDING_GOODS )]
-            k += 1
-            _frect( model, F, paint, x0, x0 + 4.4, d1 - 3.0, zs, zs + 5.6 )
-            _fpoly( model, F, paint, [ ( x0, d1 - 9.0, zs + 5.6 ), ( x0 + 4.4, d1 - 9.0, zs + 5.6 ),
-                                       ( x0 + 4.4, d1 - 3.0, zs + 5.6 ), ( x0, d1 - 3.0, zs + 5.6 ) ], ( 0, 0, 1 ) )
-    _frect( model, F, "rw_glass", gx0, gx1, d1 - 0.6, gz0, gz1 )
-    F.box( model, 7.0, w - 2.0, d1, d1 + 0.6, 30.0, 60.0, "rw_steel_grey", skip=( "back", ) )
-    F.quad( model, "rw_black", 12.35, d1 + 0.62, 55.5, 7.0, 3.0 )
-    F.quad( model, DARK, 12.35, d1 + 0.62, 45.0, 5.5, 7.5 )
-    F.box( model, 10.5, 14.0, d1 + 0.6, d1 + 1.2, 36.0, 38.5, DARK, skip=( "back", ) )
-    F.quad( model, DARK, gx0 + 10.6, d1 + 0.02, 15.0, 18.0, 8.0 )                          # the pick-up flap
-    F.box( model, gx0 + 3.0, gx1 - 3.0, d1, d1 + 0.8, 19.0, 19.8, "rw_steel_grey", skip=( "back", ) )
-    F.collide( model, -w, w, d0, d1 + 1.2, 0.0, h, "metal" )
+    w, back, front, top = 19.5, -16.0, 17.5, 72.0
+    yd = front + 0.4                                     # the door's and the control column's faces
+    split = 8.45                                         # between the door and the control column
+    wx0, wx1, wz0, wz1 = -16.9, 6.8, 20.3, 69.4          # the window (the glass)
+    bx0, bx1, bz0, bz1 = -14.6, 5.0, 8.2, 16.7           # the pick-up bay's opening
+    frame = 0.6                                          # the bevelled rims round the window and the bay
+    yg = yd - 0.9                                        # the glass
+    yb = yg - 13.0                                       # the back of the goods' cavity
+
+    # The cabinet, its plinth and the two slabs on its front: the door and the control column.
+    F.box( model, -w + 1.0, w - 1.0, back + 1.0, front - 1.0, 0.0, 2.2, "rw_black", skip=( "bottom", ) )
+    F.box( model, -w, w, back, front, 2.2, top, BLACK, skip=( "bottom", "front" ) )
+    for x0, x1, z0_, z1_ in ( ( -w, -w + 0.2, 2.2, top ), ( w - 0.2, w, 2.2, top ), ( -w + 0.2, w - 0.2, 2.2, 2.4 ),
+                              ( -w + 0.2, w - 0.2, top - 0.4, top ), ( split - 0.1, split + 0.1, 2.4, top - 0.4 ) ):
+        _frect( model, F, BLACK, x0, x1, front, z0_, z1_ )         # the cabinet's front round the slabs
+    for x0, x1 in ( ( -w + 0.2, split - 0.1 ), ( split + 0.1, w - 0.2 ) ):
+        F.box( model, x0, x1, front, yd, 2.4, top - 0.4, { "default": BLACK, "front": None }, skip=( "back", ) )
+    _holed( model, F, BLACK, -w + 0.2, split - 0.1, 2.4, top - 0.4, yd,
+            [ ( wx0 - frame, wx1 + frame, wz0 - frame, wz1 + frame ), ( bx0, bx1, bz0, bz1 ) ] )
+    _frect( model, F, BLACK, split + 0.1, w - 0.2, yd, 2.4, top - 0.4 )
+    for x in ( -w + 0.45, w - 0.45 ):                    # the corner LED strips
+        _frect( model, F, "rw_lamp_cool", x - 0.09, x + 0.09, yd + 0.01, top - 7.4, top - 1.0 )
+
+    # The window: a bevelled rim down to the glass, and behind it the lit cavity.
+    _bevel( model, F, BLACK, wx0 - frame, wx1 + frame, wz0 - frame, wz1 + frame, yd, yg, frame )
+    _frect( model, F, "rw_glass", wx0, wx1, yg, wz0, wz1 )
+    cx0, cx1, cz0, cz1 = wx0 - 0.3, wx1 + 0.3, wz0 - 0.6, wz1 + 0.6
+    _vface( model, F, "cavity_back", cx0, cx1, cz0, cz1, yb )
+    for x, s in ( ( cx0, 1.0 ), ( cx1, -1.0 ) ):
+        u0, v0, u1, v1 = _vuv( "cavity_side" )
+        _fpoly( model, F, VENDING, [ ( x, yb, cz0 ), ( x, yg, cz0 ), ( x, yg, cz1 ), ( x, yb, cz1 ) ], ( s, 0, 0 ),
+                uv=[ ( u0, v0 ), ( u1, v0 ), ( u1, v1 ), ( u0, v1 ) ] )
+    _vswatch( model, F, "cavity_back", [ ( cx0, yb, cz1 ), ( cx1, yb, cz1 ), ( cx1, yg, cz1 ), ( cx0, yg, cz1 ) ],
+              ( 0, 0, -1 ) )
+    _vswatch( model, F, "cavity_back", [ ( cx0, yb, cz0 ), ( cx1, yb, cz0 ), ( cx1, yg, cz0 ), ( cx0, yg, cz0 ) ],
+              ( 0, 0, 1 ) )
+    F.box( model, wx0 + 0.8, wx1 - 0.8, yg - 2.0, yg - 1.2, wz1 - 1.5, wz1 - 0.9,
+           { "default": "rw_lamp_cool", "back": None, "top": None } )
+    for x0, x1 in ( ( wx0 + 0.05, wx0 + 0.3 ), ( wx1 - 0.3, wx1 - 0.05 ) ):      # and down both sides
+        _frect( model, F, "rw_lamp_cool", x0, x1, yg - 0.3, wz0 + 0.4, wz1 - 0.4 )
+
+    # The shelves, their label rails and the goods in their spirals.
+    width = wx1 - wx0
+    for row, names in enumerate( VENDING_SLOTS ):
+        zs = 58.4 - 9.2 * row
+        F.box( model, cx0, cx1, yb, yg - 0.9, zs - 0.15, zs, BLACK, skip=( "front", "bottom" ) )
+        _vface( model, F, f"rail_{'abcde'[row]}", wx0, wx1, zs - 1.2, zs, yg - 0.85 )
+        F.box( model, wx0, wx1, yg - 0.9, yg - 0.85, zs - 1.2, zs, "rw_steel_grey", skip=( "front", ) )
+        for col, name in enumerate( names ):
+            xc = wx0 + VENDING_COLUMNS[col] * width
+            _spiral( model, F, xc, yg - 1.3, zs )
+            if name == "drink_hydro":
+                for depth, sides in ( ( 2.7, 16 ), ( 5.6, 8 ) ):
+                    _vlathe( model, F, xc, yg - depth, zs, VENDING_BOTTLE, lambda k: ( "bottle_plastic", False ), sides )
+                    _vlathe( model, F, xc, yg - depth, zs, [ ( 0.66, 7.0 ), ( 0.66, 7.75 ) ],
+                             lambda k: ( "bottle_cap", False ), sides )
+                _vlathe( model, F, xc, yg - 2.7, zs, [ ( 1.565, VENDING_LABEL[0] ), ( 1.565, VENDING_LABEL[1] ) ],
+                         lambda k: ( name, True ), closed=False )
+            elif name.startswith( "drink_" ):
+                for depth, sides in ( ( 2.7, 16 ), ( 5.9, 8 ) ):
+                    _vlathe( model, F, xc, yg - depth, zs, VENDING_CAN,
+                             lambda k: ( name, True ) if k == 1 else ( "can_lid", False ), sides )
+            else:
+                bw = VENDING_BAG_W
+                bh = bw / aspect( VENDING, name )
+                _pillow( model, F, name, xc, yg - 2.9, zs, bw, bh, 0.85 )
+                _vface( model, F, name, xc - bw / 2 + 0.2, xc + bw / 2 - 0.2, zs, zs + bh - 0.3, yg - 4.9 )
+
+    # The control column's brushed steel panel: the screen in its bezel, the keypad, the card reader and the slot.
+    yp = yd + 0.15
+    _vplate( model, F, "panel", 9.2, 18.0, 24.0, 62.8, yd, yp, 0.5, "rw_steel_grey" )
+    F.box( model, 10.4, 16.9, yp - 0.05, yp + 0.2, 48.5, 60.8, BLACK, skip=( "back", ) )
+    _vface( model, F, "screen", 10.72, 16.58, 48.82, 60.48, yp + 0.21 )
+    keys = ( "1", "2", "3", "4", "5", "6", "7", "8", "9", "x", "0", "ok" )
+    for k, key in enumerate( keys ):
+        kx, kz = 11.5 + 2.1 * ( k % 3 ), 45.5 - 2.1 * ( k // 3 )
+        F.box( model, kx - 0.8, kx + 0.8, yp - 0.05, yp + 0.3, kz - 0.8, kz + 0.8, { "default": BLACK, "front": None },
+               skip=( "back", ) )
+        _vface( model, F, f"key_{key}", kx - 0.8, kx + 0.8, kz - 0.8, kz + 0.8, yp + 0.3 )
+    F.box( model, 10.8, 16.4, yp - 0.05, yp + 0.6, 30.8, 36.2, { "default": BLACK, "front": None }, skip=( "back", ) )
+    _vface( model, F, "reader", 10.8, 16.4, 30.8, 36.2, yp + 0.6 )
+    _frect( model, F, "rw_lamp_cool", 12.4, 14.8, yp + 0.62, 35.25, 35.55 )
+    F.box( model, 11.5, 15.7, yp - 0.05, yp + 0.4, 26.3, 28.5, { "default": BLACK, "front": None }, skip=( "back", ) )
+    _holed( model, F, BLACK, 11.5, 15.7, 26.3, 28.5, yp + 0.4, [ ( 12.0, 15.2, 27.25, 27.55 ) ] )
+    _vswatch( model, F, "cavity_back", [ ( 12.0, yp, 27.25 ), ( 15.2, yp, 27.25 ), ( 15.2, yp, 27.55 ),
+                                         ( 12.0, yp, 27.55 ) ], ( 0, 1, 0 ) )
+    for zz, s in ( ( 27.25, 1.0 ), ( 27.55, -1.0 ) ):
+        _fpoly( model, F, BLACK, [ ( 12.0, yp, zz ), ( 15.2, yp, zz ), ( 15.2, yp + 0.4, zz ), ( 12.0, yp + 0.4, zz ) ],
+                ( 0, 0, s ) )
+
+    # The pick-up bay: a bevelled rim, the recess with its LED along the top, and the flap leaning back into it.
+    _bevel( model, F, BLACK, bx0, bx1, bz0, bz1, yd, yd - 0.5, 0.5 )
+    fx0, fx1, fz0, fz1 = bx0 + 0.5, bx1 - 0.5, bz0 + 0.5, bz1 - 0.5
+    yf0, yf1 = yd - 2.0, yd - 1.4                        # the flap's top and bottom
+    for pts, towards in ( ( [ ( fx0, yd - 0.5, fz1 ), ( fx1, yd - 0.5, fz1 ), ( fx1, yf0, fz1 ), ( fx0, yf0, fz1 ) ],
+                            ( 0, 0, -1 ) ),
+                          ( [ ( fx0, yd - 0.5, fz0 ), ( fx1, yd - 0.5, fz0 ), ( fx1, yf1, fz0 ), ( fx0, yf1, fz0 ) ],
+                            ( 0, 0, 1 ) ),
+                          ( [ ( fx0, yd - 0.5, fz0 ), ( fx0, yf1, fz0 ), ( fx0, yf0, fz1 ), ( fx0, yd - 0.5, fz1 ) ],
+                            ( 1, 0, 0 ) ),
+                          ( [ ( fx1, yd - 0.5, fz0 ), ( fx1, yf1, fz0 ), ( fx1, yf0, fz1 ), ( fx1, yd - 0.5, fz1 ) ],
+                            ( -1, 0, 0 ) ) ):
+        _vswatch( model, F, "cavity_back", pts, towards )
+    u0, v0, u1, v1 = _vuv( "flap" )
+    _fpoly( model, F, VENDING, [ ( fx0, yf1, fz0 ), ( fx1, yf1, fz0 ), ( fx1, yf0, fz1 ), ( fx0, yf0, fz1 ) ],
+            ( 0, 1, 0.1 ), uv=[ ( u0, v0 ), ( u1, v0 ), ( u1, v1 ), ( u0, v1 ) ] )
+    _fpoly( model, F, "rw_lamp_cool", [ ( fx0 + 2.0, yd - 0.55, fz1 - 0.01 ), ( fx1 - 2.0, yd - 0.55, fz1 - 0.01 ),
+                                        ( fx1 - 2.0, yd - 0.85, fz1 - 0.01 ), ( fx0 + 2.0, yd - 0.85, fz1 - 0.01 ) ],
+            ( 0, 0, -1 ) )
+    _frect( model, F, "rw_lamp_cool", fx0 + 2.0, fx1 - 2.0, yd - 0.5, fz1 - 0.3, fz1 - 0.02 )
+    F.collide( model, -w, w, back, yd + 0.8, 0.0, top, "metal" )
 
 
 def timetable_case( model, e, n, z0=0.0, facing="+e", two_sided=False ):
