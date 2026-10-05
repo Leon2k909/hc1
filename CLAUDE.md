@@ -2101,7 +2101,17 @@ simulate_input.
   - `railhead_props.py`: the track and its equipment, the rolling stock, containers, furniture and yard clutter. Its
     docstring has each prop's API, conventions and triangle and collision budget.
     - Track: UIC 60 rail, crossovers, buffer stops, Ks signals and the overhead line.
-    - Rolling stock: two-car EMUs, a locomotive and coaches, and wagons.
+    - Rolling stock: two-car double-deck EMUs, a locomotive and coaches, and wagons.
+      - The EMU (`emu`) was a low single-deck unit until 2026-10-05, when the user asked for it to look like a picture
+        of a German double-deck regional train: a raked, wrap-round windscreen under a black visor, headlight clusters,
+        grilles either side of an automatic coupler, two decks of windows, a light grey stripe low down and a grey roof.
+        It's 4.63 m tall (182.3) and still 1540 over the couplers, with its open doors where the old one's were. Its
+        visors show the departures board's trains in dot-matrix LEDs drawn as geometry (`EMU_FONT`, `destinations`):
+        RE München at Gleis 3, RE Nürnberg at Gleis 4. The picture's operator logo was left out.
+      - The luggage cart got round tyres on rims, a plank deck, a drawbar fork with a towing eye, slatted crates,
+        strapped suitcases and a kit bag (2026-10-05).
+      - Both were checked only in offline WebGL renders of the generators' output with the map's textures, not in the
+        engine: rerun `railhead_map.py` to rebuild the models.
     - Furniture and clutter: benches, machines, kiosks, shelters, hanging displays and signs, clocks, lamps, fences,
       pallets, forklifts, cars and vans.
     - `--preview <dir>` renders its showcase.

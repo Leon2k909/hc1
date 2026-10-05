@@ -117,7 +117,7 @@ MISSING = {}
 UNKNOWN_PAINTS = set()
 
 # Stand-in sizes: ( width, height, length ) of rolling stock, ( width, depth, height, paint, surface ) of furniture.
-VEHICLES = { "emu": ( 113.4, 164.6, None ), "loco": ( 118.0, 169.0, 772.0 ), "coach": ( 111.0, 160.0, 1039.0 ),
+VEHICLES = { "emu": ( 113.4, 182.3, None ), "loco": ( 118.0, 169.0, 772.0 ), "coach": ( 111.0, 160.0, 1039.0 ),
              "control_car": ( 111.0, 160.0, 1039.0 ), "covered_wagon": ( 112.0, 160.0, 620.0 ),
              "open_wagon": ( 115.0, 100.0, 553.0 ), "container_flat": ( 115.0, 150.0, 777.0 ) }
 FURNITURE = { "bench": ( 70, 20, 34, "rw_wood", WOOD ), "bin": ( 16, 16, 36, "rw_steel_grey", METAL ),
@@ -517,7 +517,9 @@ def signals( m, s ):
 def trains( m, s ):
     body = "rw_train_blue" if s > 0 else "rw_train_red"
     a, c = s * TRACK_A, s * TRACK_C
-    use( "emu", m, a, 720.0, +1, RAIL_Z, 2, body, -s, True, WIRE_Z,
+    # The double-deck units: the 14:05 to München at Gleis 3, the 14:08 to Nürnberg at Gleis 4 (the departures).
+    to = "RE Nürnberg" if s > 0 else "RE München"
+    use( "emu", m, a, 720.0, +1, RAIL_Z, 2, body, -s, True, WIRE_Z, destinations=( to, to ),
          stand_in=vehicle_stand_in( "emu", a, 720.0, 1, RAIL_Z, body, length=1540.0 ) )
     # A long-distance train at Gleis 1 and 6: its locomotive at the buffers and the first coach behind.
     far = use( "loco", m, c, 720.0, +1, RAIL_Z, body, WIRE_Z, stand_in=vehicle_stand_in( "loco", c, 720.0, 1, RAIL_Z, body ) )
