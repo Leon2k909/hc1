@@ -820,8 +820,20 @@
   pack's light stock), a skeleton stock with a narrow buttplate: 5% more recoil, and 0.06 kg lighter. Left out: the
   pack's other stock (CoD's), its 50- and 60-round magazines, its .300 BLK magazine and barrel (another calibre), and
   its other barrels.
-- No `GripFit`: the idle left hand has 84 vertices inside the handguard, at most 0.08" deep (the verified 762's 52 go
-  0.10"), and 128 aimed, at most 0.15". The right hand's go up to 0.39" into the gun (155 vertices; the 762's 0.37").
+- Its left thumb lies over the top rail from the left side. The user saw it sink into the rail (2026-10-05). An
+  earlier count had the idle left hand at 84 vertices inside the handguard (0.08") and 128 aimed (0.15"). So it has a
+  `GripFit` (`kastov_weapons.MCX.left_grip`): the arm 0.05 right and 0.15 up, and the thumb's bend 20% open.
+  - The thumb's axis went from 0.44 over the rail at the hip and 0.25 aimed to 0.60 and 0.52. The AK-105's, M16A4's
+    and FAL's thumbs keep 0.49-0.52.
+  - The fingertips went from 0.13 to 0.18 off the handguard, and the palm stays 0.57 off it (the M16A4's 0.57).
+  - The arms' mesh is a cloud model whose glTF export wasn't to hand, so this was measured from the bones (sample
+    points along the palm and each finger) against the skinned gun mesh, with the tools in `Tools/grip_fit/`.
+  - The rips weren't to hand either, so the fit went into the exported clips directly (`Tools/grip_fit/apply.js`),
+    as `port_kastov.Kastov.pose` would apply it: the same weight, arm shift, `ik_hand_L` and finger opening.
+    `port_kastov.py` from the rips gives the same clips. Don't run `apply.js` on them again: it would add the fit twice.
+  - Not yet seen in-game. If the old grip still shows, the editor missed the changed DMXs: recompile `v_mcx.vmdl` (see
+    the pipeline notes).
+  - The right hand's go up to 0.39" into the gun (155 vertices; the 762's 0.37").
 - The iron sights use ads_in's last frame. The addon's aim (`0,-1,0`) left the rear aperture's centre 0.01 above the
   camera and the front post's tip 0.058 degrees over the aim point; `kastov_weapons.MCX.aim` lowers the gun onto the
   line through them and turns out its tilt. Checked in a render, not in-game.

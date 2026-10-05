@@ -1181,9 +1181,15 @@ MCX = Weapon(
     ads_fire="fire_2",
     report_bones=["tag_tip", "tag_silencer", "tag_flash_attachment", "tag_flash", "tag_laser_attach", "tag_reflex",
                   "tag_sight_on", "tag_grip_attach", "tag_folding_grip"],
+    # The thumb lies over the top rail from its left side, and aimed CoD's hand sits lower: HC1's thicker thumb sank into
+    # the rail (the user's screenshot, 2026-10-05). Its axis was 0.44 over the rail at the hip and 0.25 aimed, where
+    # the AK-105's, M16A4's and FAL's thumbs keep 0.49-0.52. This lifts it to 0.60 and 0.52, the fingertips go from
+    # 0.13 to 0.18 off the handguard and the palm stays 0.57 off it (the M16A4's 0.57). Measured from the bones against
+    # the gun mesh, since the arms' mesh wasn't to hand; first applied to the exported clips, not from the rips.
+    left_grip=GripFit(shift=(0.0, -0.05, 0.15), thumb=0.2),
 )
 
-WEAPONS = {weapon.name: weapon for weapon in (KASTOV_762, KASTOV_74U, VITYAZ, RPK, BIZON, AK105, VEPR12, M16, P90,
+WEAPONS ={weapon.name: weapon for weapon in (KASTOV_762, KASTOV_74U, VITYAZ, RPK, BIZON, AK105, VEPR12, M16, P90,
                                               MP7, AUG, UZI, FAL, FAMAS, M18, MCX)}
 
 
