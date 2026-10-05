@@ -1278,5 +1278,51 @@ public static partial class GameText
 		["Blue"] = "Niebieski",
 		["Search languages"] = "Szukaj języka",
 		["No languages found"] = "Nie znaleziono języków",
+		// Custom game rules (CreateLobbyPage)
+		["RULES"] = "Zasady",
+		["BOT DIFFICULTY"] = "Poziom trudności botów",
+		["MIXED"] = "Mieszany",
+		["REGULAR"] = "Regularny",
+		["HARDENED"] = "Zaprawiony",
+		["Most bots are average, with a few recruits and veterans."] = "Większość botów jest przeciętna, z kilkoma rekrutami i weteranami.",
+		["Slow to react and wild with their aim."] = "Wolno reagują i źle celują.",
+		["About as quick and accurate as an average player."] = "Mniej więcej tak szybcy i celni jak przeciętny gracz.",
+		["Quick to react and accurate."] = "Szybko reagują i celnie strzelają.",
+		["Very quick and very accurate."] = "Bardzo szybcy i bardzo celni.",
+		["TIME LIMIT"] = "Limit czasu",
+		["How long the match lasts, unless a side reaches the score limit first."] =
+			"Jak długo trwa mecz, chyba że któraś strona wcześniej osiągnie limit punktów.",
+		["SCORE LIMIT"] = "Limit punktów",
+		["ROUNDS TO WIN"] = "Rundy do wygranej",
+		["ROUND LIMIT"] = "Limit rund",
+		["NO LIMIT"] = "Bez limitu",
+		["{0} MIN"] = "{0} min",
+		["RESPAWN DELAY"] = "Opóźnienie odrodzenia",
+		["How long the dead wait to come back, bots included."] = "Jak długo polegli czekają na odrodzenie, boty też.",
+		["INSTANT"] = "Natychmiast",
+		["{0} SEC"] = "{0} s",
+		["Teammates' shots, blasts and fire hurt each other, as in every hardcore match."] =
+			"Strzały, wybuchy i ogień ranią też członków drużyny, jak w każdym meczu hardcore.",
+		["Teammates can't hurt each other. Your own grenades still hurt you."] =
+			"Członkowie drużyny nie mogą się nawzajem ranić. Własne granaty nadal cię ranią.",
+		["Underlined values are a normal match's."] = "Podkreślone wartości to ustawienia zwykłego meczu.",
+		["RESET RULES"] = "Przywróć zasady",
+		["MAX HEALTH"] = "Maks. zdrowie",
+		["Head and neck shots kill at any health. More health makes body hits less often fatal and limbs take more hits."] =
+			"Trafienia w głowę i szyję zabijają przy każdym zdrowiu. Więcej zdrowia sprawia, że trafienia w tułów rzadziej zabijają, a kończyny wytrzymują więcej trafień.",
+		["HEALTH REGENERATION"] = "Regeneracja zdrowia",
+		["NORMAL"] = "Normalna",
+		["FAST"] = "Szybka",
+		["SLOW"] = "Wolna",
+		["Health starts coming back 4 s after the last hit, at 25 a second."] =
+			"Zdrowie zaczyna wracać 4 s po ostatnim trafieniu, 25 na sekundę.",
+		["Health starts coming back 2 s after the last hit, at 50 a second."] =
+			"Zdrowie zaczyna wracać 2 s po ostatnim trafieniu, 50 na sekundę.",
+		["Health starts coming back 8 s after the last hit, at 10 a second."] =
+			"Zdrowie zaczyna wracać 8 s po ostatnim trafieniu, 10 na sekundę.",
+		["Health doesn't come back until you respawn."] = "Zdrowie nie wraca aż do odrodzenia.",
+		["HEADSHOTS ONLY"] = "Tylko strzały w głowę",
+		["Bullets only hurt in the head or neck. Knives, explosives and fire hurt anywhere."] =
+			"Pociski ranią tylko w głowę lub szyję. Noże, materiały wybuchowe i ogień ranią wszędzie.",
 	};
 }

@@ -38,7 +38,8 @@ public partial class HealthComponent : Component, IRespawnable//, Component.IDam
 	[Sync( SyncFlags.FromHost ), Change( nameof( OnHealthPropertyChanged ) )]
 	public float Health { get; set; } = 100f;
 
-	[Property, Group( "Setup" )]
+	/// <summary>Synced, since a custom game can change the soldiers' (CustomGameSettings.ApplyMaxHealth) and the HUD shows health against it.</summary>
+	[Property, Group( "Setup" ), Sync( SyncFlags.FromHost )]
 	public float MaxHealth { get; set; } = 100f;
 
 	/// <summary>
@@ -89,6 +90,11 @@ public partial class HealthComponent : Component, IRespawnable//, Component.IDam
 
 		var gunDamage = damageInfo.Damage;
 		damageInfo = WithThisAsVictim( damageInfo );
+
+		// A custom game's rules can turn off teammates' damage, or every bullet that isn't to the head or neck.
+		if ( IsRuledOut( damageInfo ) )
+			return;
+
 		damageInfo = ModifyDamage( damageInfo );
 
 		// Hardcore bullets go by where they hit (HealthComponent.Wounds.cs). Explosions and knives to or from a bot still
@@ -129,6 +135,28 @@ public partial class HealthComponent : Component, IRespawnable//, Component.IDam
 		State = LifeState.Dead;
 
 		Kill( damageInfo );
+	}
+
+	/// <summary>
+	/// Damage a custom game's rules (CustomGameSettings) leave out: a teammate's with friendly fire off (your own still
+	/// counts), and with headshots only, a bullet anywhere but the head or neck. It's dropped before anyone hears of it,
+	/// so there's no hitmarker either.
+	/// </summary>
+	private bool IsRuledOut( DamageInfo damageInfo )
+	{
+		var rules = CustomGameSettings.ActiveRules;
+
+		if ( rules.HeadshotsOnly && IsBulletHit( damageInfo ) && (damageInfo.Hitbox & HeadOrNeck) == 0 )
+			return true;
+
+		if ( !rules.FriendlyFire && damageInfo.Attacker.IsValid() && damageInfo.Attacker.GameObject.Root != GameObject.Root )
+		{
+			var attackerTeam = GameUtils.GetTeamFromComponent( damageInfo.Attacker );
+			if ( attackerTeam != Team.Unassigned && attackerTeam == GameUtils.GetTeamFromComponent( this ) )
+				return true;
+		}
+
+		return false;
 	}
 
 	private DamageInfo WithThisAsVictim( DamageInfo damageInfo )

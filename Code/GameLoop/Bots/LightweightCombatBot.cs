@@ -178,6 +178,7 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 
 		if ( HealthComponent.IsValid() )
 		{
+			CustomGameSettings.ApplyMaxHealth( HealthComponent );
 			HealthComponent.Health = HealthComponent.MaxHealth;
 		}
 
@@ -1203,10 +1204,24 @@ public sealed partial class LightweightBotManager : SingletonComponent<Lightweig
 		MaintainTeam( Team.CounterTerrorist, Math.Max( 0, targetPerTeam + GetAdjustment( Team.CounterTerrorist ) ) );
 	}
 
+	/// <summary>
+	/// Bots killed within a custom game's respawn delay (CustomGameRules.RespawnDelay) still hold their place, so they
+	/// come back no sooner than a player would. Without one, a dead bot is replaced at the next fill check.
+	/// </summary>
+	private int AwaitingRespawn( Team? team )
+	{
+		if ( CustomGameSettings.ActiveRules.RespawnDelay is not { } delay || delay <= 0f )
+			return 0;
+
+		return Bots.Count( x => !x.IsAlive && (team is null || x.Team == team) && x.HealthComponent.IsValid()
+			&& x.HealthComponent.TimeSinceLifeStateChanged < delay );
+	}
+
 	private void MaintainFreeForAll( int targetPlayerCount )
 	{
 		var realPlayers = GameUtils.AllPlayers.Count( x => x.IsConnected && !x.IsBot );
 		var bots = Bots.Where( x => x.IsAlive ).ToList();
+		var waiting = AwaitingRespawn( null );
 
 		while ( realPlayers + bots.Count > targetPlayerCount && bots.Count > 0 )
 		{
@@ -1215,7 +1230,7 @@ public sealed partial class LightweightBotManager : SingletonComponent<Lightweig
 			bot.GameObject.Destroy();
 		}
 
-		while ( realPlayers + bots.Count < targetPlayerCount )
+		while ( realPlayers + bots.Count + waiting < targetPlayerCount )
 		{
 			var bot = SpawnBot( Team.Unassigned );
 			if ( !bot.IsValid() )
@@ -1229,6 +1244,7 @@ public sealed partial class LightweightBotManager : SingletonComponent<Lightweig
 	{
 		var realPlayers = GameUtils.GetPlayers( team ).Count( x => x.IsConnected && !x.IsBot );
 		var bots = Bots.Where( x => x.IsAlive && x.Team == team ).ToList();
+		var waiting = AwaitingRespawn( team );
 
 		while ( realPlayers + bots.Count > targetTeamSize && bots.Count > 0 )
 		{
@@ -1237,7 +1253,7 @@ public sealed partial class LightweightBotManager : SingletonComponent<Lightweig
 			bot.GameObject.Destroy();
 		}
 
-		while ( realPlayers + bots.Count < targetTeamSize )
+		while ( realPlayers + bots.Count + waiting < targetTeamSize )
 		{
 			var bot = SpawnBot( team );
 			if ( !bot.IsValid() )

@@ -1,4 +1,5 @@
 @using Sandbox;
+@using Sandbox.Events;
 @using Sandbox.Network;
 @using Sandbox.UI;
 @using Sandbox.UI.Navigation;
@@ -19,58 +20,196 @@
             </div>
             <div class="cl-columns">
                 <div class="cl-settings">
-                    <div class="cl-group">
-                        <label class="cl-label">@Tr( "MAP" )</label>
-                        <div class="cl-options">
-                            @foreach ( var map in Maps )
-                            {
-                                <div class="cl-option @(map == SelectedMap ? "selected" : "")" onclick=@(() => SelectMap( map ))>
-                                    <label>@map.GetMetadata( "Title", map.ResourceName ).ToUpper()</label>
-                                </div>
-                            }
-                        </div>
-                    </div>
-                    <div class="cl-group">
-                        <label class="cl-label">@Tr( "GAME MODE" )</label>
-                        <div class="cl-options modes">
-                            @foreach ( var mode in Modes )
-                            {
-                                <div class="cl-option @(mode.Ident == SelectedMode?.Ident ? "selected" : "")" onclick=@(() => SelectMode( mode ))>
-                                    <label>@Tr( mode.Title.ToUpper() )</label>
-                                </div>
-                            }
-                        </div>
-                        <label class="cl-help">@Tr( SelectedMode?.Description )</label>
-                    </div>
-                    <div class="cl-group">
-                        <label class="cl-label">@Tr( "PLAYER LIMIT" )</label>
-                        <div class="cl-options">
-                            @foreach ( var count in PlayerLimits )
-                            {
-                                <div class="cl-option @(count == PlayerLimit ? "selected" : "")" onclick=@(() => SetPlayerLimit( count ))><label>@count</label></div>
-                            }
-                        </div>
-                    </div>
-                    @if ( SelectedMode?.Ident != "zombies" )
+                    @* Zombies plays by its own rules, so it only has the match tab. *@
+                    @if ( HasRules )
                     {
-                        <div class="cl-group">
-                            <label class="cl-label">@Tr( "BOT FILL" )</label>
-                            <div class="cl-options">
-                                <div class="cl-option @(!FillWithBots ? "selected" : "")" onclick=@(() => SetBotFill( false ))><label>@Tr( "OFF" )</label></div>
-                                <div class="cl-option @(FillWithBots ? "selected" : "")" onclick=@(() => SetBotFill( true ))><label>@Tr( "FILL EMPTY SLOTS" )</label></div>
+                        <div class="cl-tabs">
+                            <div class="cl-tab @(_tab == SetupTab.Match ? "active" : "")" onclick=@(() => SetTab( SetupTab.Match ))>
+                                <i>tune</i><label>@Tr( "MATCH" )</label>
                             </div>
-                            <label class="cl-help">@Tr( FillWithBots ? "Bots fill the player limit and make room as players join." : "Play with whoever joins, or explore alone." )</label>
+                            <div class="cl-tab @(_tab == SetupTab.Rules ? "active" : "")" onclick=@(() => SetTab( SetupTab.Rules ))>
+                                <i>flag</i><label>@Tr( "RULES" )</label>
+                                @if ( ChangedRuleCount > 0 ) { <label class="cl-tab-count">@ChangedRuleCount</label> }
+                            </div>
+                            <div class="cl-tab @(_tab == SetupTab.Player ? "active" : "")" onclick=@(() => SetTab( SetupTab.Player ))>
+                                <i>favorite</i><label>@Tr( "PLAYER" )</label>
+                                @if ( ChangedPlayerCount > 0 ) { <label class="cl-tab-count">@ChangedPlayerCount</label> }
+                            </div>
                         </div>
                     }
-                    <div class="cl-group">
-                        <label class="cl-label">@Tr( "WHO CAN JOIN" )</label>
-                        <div class="cl-options">
-                            <div class="cl-option @(Privacy == LobbyPrivacy.Private ? "selected" : "")" onclick=@(() => SetPrivacy( LobbyPrivacy.Private ))><label>@Tr( "INVITE ONLY" )</label></div>
-                            <div class="cl-option @(Privacy == LobbyPrivacy.FriendsOnly ? "selected" : "")" onclick=@(() => SetPrivacy( LobbyPrivacy.FriendsOnly ))><label>@Tr( "FRIENDS" )</label></div>
-                            <div class="cl-option @(Privacy == LobbyPrivacy.Public ? "selected" : "")" onclick=@(() => SetPrivacy( LobbyPrivacy.Public ))><label>@Tr( "PUBLIC" )</label></div>
+
+                    @if ( _tab == SetupTab.Match || !HasRules )
+                    {
+                        <div class="cl-group">
+                            <label class="cl-label">@Tr( "MAP" )</label>
+                            <div class="cl-options">
+                                @foreach ( var map in Maps )
+                                {
+                                    <div class="cl-option @(map == SelectedMap ? "selected" : "")" onclick=@(() => SelectMap( map ))>
+                                        <label>@map.GetMetadata( "Title", map.ResourceName ).ToUpper()</label>
+                                    </div>
+                                }
+                            </div>
                         </div>
-                        <label class="cl-help">@Tr( AccessHelp )</label>
-                    </div>
+                        <div class="cl-group">
+                            <label class="cl-label">@Tr( "GAME MODE" )</label>
+                            <div class="cl-options modes">
+                                @foreach ( var mode in Modes )
+                                {
+                                    <div class="cl-option @(mode.Ident == SelectedMode?.Ident ? "selected" : "")" onclick=@(() => SelectMode( mode ))>
+                                        <label>@Tr( mode.Title.ToUpper() )</label>
+                                    </div>
+                                }
+                            </div>
+                            <label class="cl-help">@Tr( SelectedMode?.Description )</label>
+                        </div>
+                        <div class="cl-group">
+                            <label class="cl-label">@Tr( "PLAYER LIMIT" )</label>
+                            <div class="cl-options">
+                                @foreach ( var count in PlayerLimits )
+                                {
+                                    <div class="cl-option @(count == PlayerLimit ? "selected" : "")" onclick=@(() => SetPlayerLimit( count ))><label>@count</label></div>
+                                }
+                            </div>
+                        </div>
+                        @if ( HasRules )
+                        {
+                            <div class="cl-group">
+                                <label class="cl-label">@Tr( "BOT FILL" )</label>
+                                <div class="cl-options">
+                                    <div class="cl-option @(!FillWithBots ? "selected" : "")" onclick=@(() => SetBotFill( false ))><label>@Tr( "OFF" )</label></div>
+                                    <div class="cl-option @(FillWithBots ? "selected" : "")" onclick=@(() => SetBotFill( true ))><label>@Tr( "FILL EMPTY SLOTS" )</label></div>
+                                </div>
+                                <label class="cl-help">@Tr( FillWithBots ? "Bots fill the player limit and make room as players join." : "Play with whoever joins, or explore alone." )</label>
+                            </div>
+                            <div class="cl-group">
+                                <label class="cl-label">@Tr( "BOT DIFFICULTY" )</label>
+                                <div class="cl-options">
+                                    @foreach ( var difficulty in Enum.GetValues<BotDifficulty>() )
+                                    {
+                                        <div class="cl-option @(difficulty == _botDifficulty ? "selected" : "")" onclick=@(() => SetRule( () => _botDifficulty = difficulty ))>
+                                            <label>@DifficultyName( difficulty )</label>
+                                        </div>
+                                    }
+                                </div>
+                                <label class="cl-help">@DifficultyHelp( _botDifficulty )</label>
+                            </div>
+                        }
+                        <div class="cl-group">
+                            <label class="cl-label">@Tr( "WHO CAN JOIN" )</label>
+                            <div class="cl-options">
+                                <div class="cl-option @(Privacy == LobbyPrivacy.Private ? "selected" : "")" onclick=@(() => SetPrivacy( LobbyPrivacy.Private ))><label>@Tr( "INVITE ONLY" )</label></div>
+                                <div class="cl-option @(Privacy == LobbyPrivacy.FriendsOnly ? "selected" : "")" onclick=@(() => SetPrivacy( LobbyPrivacy.FriendsOnly ))><label>@Tr( "FRIENDS" )</label></div>
+                                <div class="cl-option @(Privacy == LobbyPrivacy.Public ? "selected" : "")" onclick=@(() => SetPrivacy( LobbyPrivacy.Public ))><label>@Tr( "PUBLIC" )</label></div>
+                            </div>
+                            <label class="cl-help">@Tr( AccessHelp )</label>
+                        </div>
+                    }
+                    else if ( _tab == SetupTab.Rules )
+                    {
+                        @if ( _info.TimeLimit is not null )
+                        {
+                            <div class="cl-group">
+                                <label class="cl-label">@Tr( "TIME LIMIT" )</label>
+                                <div class="cl-options">
+                                    @foreach ( var seconds in TimeChoices )
+                                    {
+                                        <div class="cl-option @(seconds == TimeLimit ? "selected" : "") @(seconds == _info.TimeLimit ? "default" : "")" onclick=@(() => SetRule( () => _timeLimit = seconds ))>
+                                            <label>@TimeName( seconds )</label>
+                                        </div>
+                                    }
+                                </div>
+                                <label class="cl-help">@Tr( "How long the match lasts, unless a side reaches the score limit first." )</label>
+                            </div>
+                        }
+                        @if ( _info.ScoreLimit is not null )
+                        {
+                            <div class="cl-group">
+                                <label class="cl-label">@ScoreLimitName</label>
+                                <div class="cl-options">
+                                    @foreach ( var score in ScoreChoices )
+                                    {
+                                        <div class="cl-option @(score == ScoreLimit ? "selected" : "") @(score == _info.ScoreLimit ? "default" : "")" onclick=@(() => SetRule( () => _scoreLimit = score ))>
+                                            <label>@ScoreName( score )</label>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                        @if ( _info.RespawnDelay is not null )
+                        {
+                            <div class="cl-group">
+                                <label class="cl-label">@Tr( "RESPAWN DELAY" )</label>
+                                <div class="cl-options">
+                                    @foreach ( var delay in RespawnChoices )
+                                    {
+                                        <div class="cl-option @(delay == RespawnDelay ? "selected" : "") @(delay == _info.RespawnDelay ? "default" : "")" onclick=@(() => SetRule( () => _respawnDelay = delay ))>
+                                            <label>@RespawnName( delay )</label>
+                                        </div>
+                                    }
+                                </div>
+                                <label class="cl-help">@Tr( "How long the dead wait to come back, bots included." )</label>
+                            </div>
+                        }
+                        @if ( _info.HasTeams )
+                        {
+                            <div class="cl-group">
+                                <label class="cl-label">@Tr( "FRIENDLY FIRE" )</label>
+                                <div class="cl-options">
+                                    <div class="cl-option default @(_friendlyFire ? "selected" : "")" onclick=@(() => SetRule( () => _friendlyFire = true ))><label>@Tr( "ON" )</label></div>
+                                    <div class="cl-option @(!_friendlyFire ? "selected" : "")" onclick=@(() => SetRule( () => _friendlyFire = false ))><label>@Tr( "OFF" )</label></div>
+                                </div>
+                                <label class="cl-help">@Tr( _friendlyFire ? "Teammates' shots, blasts and fire hurt each other, as in every hardcore match." : "Teammates can't hurt each other. Your own grenades still hurt you." )</label>
+                            </div>
+                        }
+                        <div class="cl-reset-row">
+                            <label class="cl-help">@Tr( "Underlined values are a normal match's." )</label>
+                            <div class="cl-reset @(ChangedRuleCount + ChangedPlayerCount == 0 ? "disabled" : "")" onclick=@ResetRules>
+                                <i>restart_alt</i><label>@Tr( "RESET RULES" )</label>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="cl-group">
+                            <label class="cl-label">@Tr( "MAX HEALTH" )</label>
+                            <div class="cl-options">
+                                @foreach ( var health in HealthChoices )
+                                {
+                                    <div class="cl-option @(health == _maxHealth ? "selected" : "") @(health == CustomGameRules.DefaultMaxHealth ? "default" : "")" onclick=@(() => SetRule( () => _maxHealth = health ))>
+                                        <label>@health</label>
+                                    </div>
+                                }
+                            </div>
+                            <label class="cl-help">@Tr( "Head and neck shots kill at any health. More health makes body hits less often fatal and limbs take more hits." )</label>
+                        </div>
+                        <div class="cl-group">
+                            <label class="cl-label">@Tr( "HEALTH REGENERATION" )</label>
+                            <div class="cl-options">
+                                @foreach ( var regen in Enum.GetValues<HealthRegen>() )
+                                {
+                                    <div class="cl-option @(regen == _regen ? "selected" : "") @(regen == HealthRegen.Normal ? "default" : "")" onclick=@(() => SetRule( () => _regen = regen ))>
+                                        <label>@RegenName( regen )</label>
+                                    </div>
+                                }
+                            </div>
+                            <label class="cl-help">@RegenHelp( _regen )</label>
+                        </div>
+                        <div class="cl-group">
+                            <label class="cl-label">@Tr( "HEADSHOTS ONLY" )</label>
+                            <div class="cl-options">
+                                <div class="cl-option default @(!_headshotsOnly ? "selected" : "")" onclick=@(() => SetRule( () => _headshotsOnly = false ))><label>@Tr( "OFF" )</label></div>
+                                <div class="cl-option @(_headshotsOnly ? "selected" : "")" onclick=@(() => SetRule( () => _headshotsOnly = true ))><label>@Tr( "ON" )</label></div>
+                            </div>
+                            <label class="cl-help">@Tr( "Bullets only hurt in the head or neck. Knives, explosives and fire hurt anywhere." )</label>
+                        </div>
+                        <div class="cl-reset-row">
+                            <label class="cl-help">@Tr( "Underlined values are a normal match's." )</label>
+                            <div class="cl-reset @(ChangedRuleCount + ChangedPlayerCount == 0 ? "disabled" : "")" onclick=@ResetRules>
+                                <i>restart_alt</i><label>@Tr( "RESET RULES" )</label>
+                            </div>
+                        </div>
+                    }
                 </div>
                 <div class="cl-summary">
                     <div class="cl-map-preview" style=@MapPreviewStyle>
@@ -84,6 +223,43 @@
                         <div class="cl-summary-row"><label>@Tr( "PLAYER LIMIT" )</label><label>@PlayerLimit</label></div>
                         <div class="cl-summary-row"><label>@Tr( "BOT FILL" )</label><label>@Tr( UseBotFill ? "ON" : "OFF" )</label></div>
                         <div class="cl-summary-row"><label>@Tr( "ACCESS" )</label><label>@Tr( AccessName )</label></div>
+                        @if ( HasRules )
+                        {
+                            <div class="cl-summary-rules">
+                                @if ( _info.TimeLimit is not null )
+                                {
+                                    <div class="cl-summary-row @(TimeChanged ? "changed" : "")"><label>@Tr( "TIME LIMIT" )</label><label>@TimeName( TimeLimit )</label></div>
+                                }
+                                @if ( _info.ScoreLimit is not null )
+                                {
+                                    <div class="cl-summary-row @(ScoreChanged ? "changed" : "")"><label>@ScoreLimitName</label><label>@ScoreName( ScoreLimit )</label></div>
+                                }
+                                @if ( RespawnChanged )
+                                {
+                                    <div class="cl-summary-row changed"><label>@Tr( "RESPAWN DELAY" )</label><label>@RespawnName( RespawnDelay )</label></div>
+                                }
+                                @if ( FriendlyFireChanged )
+                                {
+                                    <div class="cl-summary-row changed"><label>@Tr( "FRIENDLY FIRE" )</label><label>@Tr( "OFF" )</label></div>
+                                }
+                                @if ( _maxHealth != CustomGameRules.DefaultMaxHealth )
+                                {
+                                    <div class="cl-summary-row changed"><label>@Tr( "MAX HEALTH" )</label><label>@_maxHealth</label></div>
+                                }
+                                @if ( _regen != HealthRegen.Normal )
+                                {
+                                    <div class="cl-summary-row changed"><label>@Tr( "HEALTH REGENERATION" )</label><label>@RegenName( _regen )</label></div>
+                                }
+                                @if ( _headshotsOnly )
+                                {
+                                    <div class="cl-summary-row changed"><label>@Tr( "HEADSHOTS ONLY" )</label><label>@Tr( "ON" )</label></div>
+                                }
+                                @if ( _botDifficulty != BotDifficulty.Mixed )
+                                {
+                                    <div class="cl-summary-row changed"><label>@Tr( "BOT DIFFICULTY" )</label><label>@DifficultyName( _botDifficulty )</label></div>
+                                }
+                            </div>
+                        }
                         @if ( !string.IsNullOrEmpty( _error ) )
                         {
                             <label class="cl-error">@Tr( _error )</label>
@@ -102,6 +278,18 @@
 
 @code
 {
+    private enum SetupTab { Match, Rules, Player }
+
+    /// <summary>What the picked mode's prefab plays by, for the RULES tab's defaults. A null limit is one it hasn't got.</summary>
+    private struct ModeRules
+    {
+        public float? TimeLimit;
+        public int? ScoreLimit;
+        public float? RespawnDelay;
+        public bool RoundBased;
+        public bool HasTeams;
+    }
+
     private List<SceneFile> Maps = new();
     private List<GameMode> Modes = new();
     public SceneFile SelectedMap { get; private set; }
@@ -113,11 +301,126 @@
     private bool _closed;
     private string _error;
 
-    private bool UseBotFill => FillWithBots && SelectedMode?.Ident != "zombies";
+    private SetupTab _tab;
+    private ModeRules _info;
+
+    // The rules. A null limit keeps the mode's own; the rest start as a normal match has them.
+    private float? _timeLimit;
+    private int? _scoreLimit;
+    private float? _respawnDelay;
+    private float _maxHealth = CustomGameRules.DefaultMaxHealth;
+    private HealthRegen _regen = HealthRegen.Normal;
+    private bool _headshotsOnly;
+    private bool _friendlyFire = true;
+    private BotDifficulty _botDifficulty = BotDifficulty.Mixed;
+
+    private static readonly float[] TimeMinutes = { 5, 10, 15, 20, 30 };
+    private static readonly float[] RespawnSeconds = { 0, 1, 3, 5, 10 };
+    private static readonly float[] HealthChoices = { 30, 50, 100, 150, 200, 300 };
+
+    private bool IsZombies => SelectedMode?.Ident == "zombies";
+    private bool HasRules => SelectedMode.IsValid() && !IsZombies;
+    private bool UseBotFill => FillWithBots && !IsZombies;
     private bool CanStart => SelectedMap is not null && SelectedMode.IsValid() && Modes.Any( m => m.Ident == SelectedMode.Ident );
     private int ModePlayerLimit => SelectedMode?.Ident switch { "gunfight_1v1" => 2, "gunfight_2v2" => 4, "zombies" => 4, _ => 10 };
     private IEnumerable<int> PlayerLimits => new[] { 2, 4, 6, 8, 10 }.Where( count => count <= ModePlayerLimit );
     private string MapPreviewStyle => SelectedMap is null ? "" : $"background-image: url( '{MapArt.Get( SelectedMap )}' );";
+
+    private float TimeLimit => _timeLimit ?? _info.TimeLimit ?? 0f;
+    private int ScoreLimit => _scoreLimit ?? _info.ScoreLimit ?? 0;
+    private float RespawnDelay => _respawnDelay ?? _info.RespawnDelay ?? 0f;
+
+    private bool TimeChanged => _info.TimeLimit is not null && TimeLimit != _info.TimeLimit;
+    private bool ScoreChanged => _info.ScoreLimit is not null && ScoreLimit != _info.ScoreLimit;
+    private bool RespawnChanged => _info.RespawnDelay is not null && RespawnDelay != _info.RespawnDelay;
+    private bool FriendlyFireChanged => _info.HasTeams && !_friendlyFire;
+
+    private int ChangedRuleCount => (TimeChanged ? 1 : 0) + (ScoreChanged ? 1 : 0) + (RespawnChanged ? 1 : 0) + (FriendlyFireChanged ? 1 : 0);
+    private int ChangedPlayerCount => (_maxHealth != CustomGameRules.DefaultMaxHealth ? 1 : 0) + (_regen != HealthRegen.Normal ? 1 : 0) + (_headshotsOnly ? 1 : 0);
+
+    private IEnumerable<float> TimeChoices => WithDefault( TimeMinutes.Select( x => x * 60f ), _info.TimeLimit ).Append( 0f );
+    private IEnumerable<float> RespawnChoices => WithDefault( RespawnSeconds, _info.RespawnDelay );
+
+    /// <summary>The scores on offer for the mode, round its own. Unlimited only where the clock still ends the match.</summary>
+    private IEnumerable<int> ScoreChoices
+    {
+        get
+        {
+            int[] choices = SelectedMode?.Ident switch
+            {
+                "domination" => new[] { 100, 150, 200, 300, 400 },
+                "hardpoint" => new[] { 150, 200, 250, 300, 400 },
+                "cashgrab" => new[] { 25000, 50000, 75000, 100000 },
+                "defuse" => new[] { 3, 4, 5, 6, 8, 10 },
+                "retakes" => new[] { 10, 15, 20, 30, 40 },
+                _ => new[] { 25, 50, 75, 100, 150, 200 }
+            };
+
+            var list = choices.ToList();
+            if ( _info.ScoreLimit is { } own && !list.Contains( own ) )
+                list.Add( own );
+            list.Sort();
+
+            if ( !_info.RoundBased && _info.TimeLimit is not null )
+                list.Add( 0 );
+
+            return list;
+        }
+    }
+
+    private static IEnumerable<float> WithDefault( IEnumerable<float> choices, float? own )
+    {
+        var list = choices.ToList();
+        if ( own is { } value && !list.Contains( value ) )
+            list.Add( value );
+        list.Sort();
+        return list;
+    }
+
+    private string ScoreLimitName => SelectedMode?.Ident switch
+    {
+        "defuse" => Tr( "ROUNDS TO WIN" ),
+        "retakes" => Tr( "ROUND LIMIT" ),
+        _ => Tr( "SCORE LIMIT" )
+    };
+
+    private string TimeName( float seconds ) => seconds <= 0f ? Tr( "NO LIMIT" ) : Tr( "{0} MIN", (seconds / 60f).ToString( "0.#" ) );
+    private string RespawnName( float seconds ) => seconds <= 0f ? Tr( "INSTANT" ) : Tr( "{0} SEC", seconds );
+    private string ScoreName( int score ) => score <= 0 ? Tr( "NO LIMIT" ) : SelectedMode?.Ident == "cashgrab" ? $"£{score:N0}" : score.ToString();
+
+    private static string RegenName( HealthRegen regen ) => regen switch
+    {
+        HealthRegen.Fast => Tr( "FAST" ),
+        HealthRegen.Slow => Tr( "SLOW" ),
+        HealthRegen.Off => Tr( "OFF" ),
+        _ => Tr( "NORMAL" )
+    };
+
+    private static string RegenHelp( HealthRegen regen ) => regen switch
+    {
+        HealthRegen.Fast => Tr( "Health starts coming back 2 s after the last hit, at 50 a second." ),
+        HealthRegen.Slow => Tr( "Health starts coming back 8 s after the last hit, at 10 a second." ),
+        HealthRegen.Off => Tr( "Health doesn't come back until you respawn." ),
+        _ => Tr( "Health starts coming back 4 s after the last hit, at 25 a second." )
+    };
+
+    private static string DifficultyName( BotDifficulty difficulty ) => difficulty switch
+    {
+        BotDifficulty.Recruit => Tr( "RECRUIT" ),
+        BotDifficulty.Regular => Tr( "REGULAR" ),
+        BotDifficulty.Hardened => Tr( "HARDENED" ),
+        BotDifficulty.Veteran => Tr( "VETERAN" ),
+        _ => Tr( "MIXED" )
+    };
+
+    private static string DifficultyHelp( BotDifficulty difficulty ) => difficulty switch
+    {
+        BotDifficulty.Recruit => Tr( "Slow to react and wild with their aim." ),
+        BotDifficulty.Regular => Tr( "About as quick and accurate as an average player." ),
+        BotDifficulty.Hardened => Tr( "Quick to react and accurate." ),
+        BotDifficulty.Veteran => Tr( "Very quick and very accurate." ),
+        _ => Tr( "Most bots are average, with a few recruits and veterans." )
+    };
 
     private string AccessName => Privacy switch
     {
@@ -134,14 +437,37 @@
         _ => "Only players you invite can join.",
     };
 
+    /// <summary>Reads the limits the mode's prefab plays by (its play state's length, its win score, its respawner).</summary>
+    private static ModeRules ReadModeRules( GameMode mode )
+    {
+        if ( !mode.IsValid() )
+            return default;
+
+        const FindMode everything = FindMode.EverythingInSelfAndDescendants;
+        var states = mode.Components.GetAll<StateComponent>( everything );
+        var win = mode.Components.GetAll<TeamEarlyWinCondition>( everything ).FirstOrDefault();
+        var roundLimit = mode.Components.GetAll<RoundLimit>( everything ).FirstOrDefault();
+        var roundBased = mode.Components.GetAll<RoundCounter>( everything ).Any();
+        var respawner = mode.Components.GetAll<Respawner>( everything ).FirstOrDefault();
+
+        return new ModeRules
+        {
+            TimeLimit = states.FirstOrDefault( CustomGameSettings.IsTimedPlayState )?.DefaultDuration,
+            ScoreLimit = win?.TargetScore ?? roundLimit?.MaxRounds,
+            // Round modes respawn everyone at the next round, and Zombies at the next wave.
+            RespawnDelay = !roundBased && mode.Ident != "zombies" ? respawner?.RespawnDelaySeconds : null,
+            RoundBased = roundBased,
+            HasTeams = mode.Components.GetAll<TeamAssigner>( everything ).Any() && mode.Ident != "zombies"
+        };
+    }
+
     private void SelectMap( SceneFile map )
     {
         if ( _starting || map is null || !Maps.Contains( map ) ) return;
         SelectedMap = map;
         Modes = GameMode.GetAll( map ).ToList();
-        SelectedMode = Modes.FirstOrDefault( mode => mode.Ident == SelectedMode?.Ident )
-            ?? Modes.FirstOrDefault( mode => mode.Ident == "tdm" ) ?? Modes.FirstOrDefault();
-        PlayerLimit = Math.Min( PlayerLimit, ModePlayerLimit );
+        SetMode( Modes.FirstOrDefault( mode => mode.Ident == SelectedMode?.Ident )
+            ?? Modes.FirstOrDefault( mode => mode.Ident == "tdm" ) ?? Modes.FirstOrDefault() );
         _error = null;
         StateHasChanged();
     }
@@ -149,14 +475,62 @@
     private void SelectMode( GameMode mode )
     {
         if ( _starting || !Modes.Contains( mode ) ) return;
-        SelectedMode = mode;
-        PlayerLimit = Math.Min( PlayerLimit, ModePlayerLimit );
+        SetMode( mode );
         StateHasChanged();
     }
 
+    /// <summary>The time and score limits are the mode's own until picked again; the other rules carry over.</summary>
+    private void SetMode( GameMode mode )
+    {
+        if ( mode?.Ident != SelectedMode?.Ident )
+        {
+            _timeLimit = null;
+            _scoreLimit = null;
+        }
+
+        SelectedMode = mode;
+        _info = ReadModeRules( mode );
+        PlayerLimit = Math.Min( PlayerLimit, ModePlayerLimit );
+        if ( !HasRules ) _tab = SetupTab.Match;
+    }
+
+    private void SetTab( SetupTab tab ) { if ( !_starting ) { _tab = tab; StateHasChanged(); } }
+    private void SetRule( Action set ) { if ( !_starting ) { set(); StateHasChanged(); } }
     private void SetPlayerLimit( int count ) { if ( !_starting && PlayerLimits.Contains( count ) ) { PlayerLimit = count; StateHasChanged(); } }
     private void SetBotFill( bool fill ) { if ( !_starting ) { FillWithBots = fill; StateHasChanged(); } }
     private void SetPrivacy( LobbyPrivacy privacy ) { if ( !_starting ) { Privacy = privacy; StateHasChanged(); } }
+
+    private void ResetRules()
+    {
+        if ( _starting ) return;
+        _timeLimit = null;
+        _scoreLimit = null;
+        _respawnDelay = null;
+        _maxHealth = CustomGameRules.DefaultMaxHealth;
+        _regen = HealthRegen.Normal;
+        _headshotsOnly = false;
+        _friendlyFire = true;
+        StateHasChanged();
+    }
+
+    /// <summary>The rules to play by: only those the mode has, and the mode's own where nothing was picked. Zombies has none.</summary>
+    private CustomGameRules BuildRules()
+    {
+        if ( !HasRules )
+            return null;
+
+        return new CustomGameRules
+        {
+            TimeLimit = TimeChanged ? TimeLimit : null,
+            ScoreLimit = ScoreChanged ? ScoreLimit : null,
+            RespawnDelay = RespawnChanged ? RespawnDelay : null,
+            MaxHealth = _maxHealth,
+            Regen = _regen,
+            HeadshotsOnly = _headshotsOnly,
+            FriendlyFire = !FriendlyFireChanged,
+            BotDifficulty = _botDifficulty
+        };
+    }
 
     private async void StartMatch()
     {
@@ -176,9 +550,9 @@
             }
             if ( !IsValid || _closed ) return;
 
-            CustomGameSettings.Configure( PlayerLimit, UseBotFill, Privacy );
+            CustomGameSettings.Configure( PlayerLimit, UseBotFill, Privacy, BuildRules() );
             GameMode.SetCurrent( SelectedMode );
-            GameMode.SetHardcore( SelectedMode.Ident != "zombies" );
+            GameMode.SetHardcore( !IsZombies );
             Sound.Play( "ui_button_press" );
             // Use the map's complete game setup. The legacy pregame scene has no gameplay or spawn setup.
             Game.ActiveScene.Load( SelectedMap );

@@ -146,6 +146,8 @@ public sealed partial class GameMode : SingletonComponent<GameMode>, Component.I
 			Hardcore = ActiveHardcore;
 			InitializeRankedMatch();
 			GameObject.Components.GetOrCreate<ScorestreakManager>();
+			// A custom game's time, score and respawn rules go into the mode's own components before play starts.
+			CustomGameSettings.ApplyTo( this );
 		}
 
 		Scene.Dispatch( new GamemodeInitializedEvent( Title ) );

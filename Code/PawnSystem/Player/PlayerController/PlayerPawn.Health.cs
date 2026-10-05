@@ -22,9 +22,11 @@ public partial class PlayerPawn : IGameEventHandler<DamageGivenEvent>, IGameEven
 		var zombies = ZombiesPlayerState.For( this );
 		if ( zombies is { IsDowned: true } ) return;
 
-		var delay = zombies is not null ? 3f : 4f;
-		// Multiplayer: full health back in ~4s once you stop taking damage.
-		var rate = zombies is not null ? 40f : 25f;
+		// Multiplayer: full health back in ~4s once you stop taking damage, unless a custom game says otherwise.
+		var regen = zombies is not null ? (3f, 40f) : CustomGameSettings.ActiveRules.RegenSpeed;
+		if ( regen is not { } speed ) return;
+
+		var (delay, rate) = speed;
 		if ( _timeSinceLastDamage < delay ) return;
 
 		HealthComponent.Health = Math.Min( HealthComponent.MaxHealth,

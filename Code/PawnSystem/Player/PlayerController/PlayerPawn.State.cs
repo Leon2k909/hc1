@@ -109,6 +109,7 @@ public partial class PlayerPawn
 			ArmorComponent.Armor = 0f;
 		}
 
+		CustomGameSettings.ApplyMaxHealth( HealthComponent );
 		HealthComponent.Health = HealthComponent.MaxHealth;
 		HealthComponent.ClearWounds();
 

@@ -1275,5 +1275,51 @@ public static partial class GameText
 		["Blue"] = "Синій",
 		["Search languages"] = "Пошук мови",
 		["No languages found"] = "Мов не знайдено",
+		// Custom game rules (CreateLobbyPage)
+		["RULES"] = "Правила",
+		["BOT DIFFICULTY"] = "Складність ботів",
+		["MIXED"] = "Змішана",
+		["REGULAR"] = "Рядовий",
+		["HARDENED"] = "Загартований",
+		["Most bots are average, with a few recruits and veterans."] = "Більшість ботів середні, є кілька новобранців і ветеранів.",
+		["Slow to react and wild with their aim."] = "Повільно реагують і неточно стріляють.",
+		["About as quick and accurate as an average player."] = "Приблизно такі ж швидкі й точні, як пересічний гравець.",
+		["Quick to react and accurate."] = "Швидко реагують і влучно стріляють.",
+		["Very quick and very accurate."] = "Дуже швидкі й дуже влучні.",
+		["TIME LIMIT"] = "Ліміт часу",
+		["How long the match lasts, unless a side reaches the score limit first."] =
+			"Скільки триває матч, якщо жодна сторона раніше не набере ліміт очок.",
+		["SCORE LIMIT"] = "Ліміт очок",
+		["ROUNDS TO WIN"] = "Раундів для перемоги",
+		["ROUND LIMIT"] = "Ліміт раундів",
+		["NO LIMIT"] = "Без ліміту",
+		["{0} MIN"] = "{0} хв",
+		["RESPAWN DELAY"] = "Затримка відродження",
+		["How long the dead wait to come back, bots included."] = "Скільки загиблі чекають на відродження, включно з ботами.",
+		["INSTANT"] = "Миттєво",
+		["{0} SEC"] = "{0} с",
+		["Teammates' shots, blasts and fire hurt each other, as in every hardcore match."] =
+			"Постріли, вибухи й вогонь ранять і союзників, як у будь-якому хардкорному матчі.",
+		["Teammates can't hurt each other. Your own grenades still hurt you."] =
+			"Союзники не можуть поранити одне одного. Власні гранати все одно ранять вас.",
+		["Underlined values are a normal match's."] = "Підкреслені значення — як у звичайному матчі.",
+		["RESET RULES"] = "Скинути правила",
+		["MAX HEALTH"] = "Макс. здоров'я",
+		["Head and neck shots kill at any health. More health makes body hits less often fatal and limbs take more hits."] =
+			"Влучання в голову й шию вбивають за будь-якого здоров'я. Що більше здоров'я, то рідше смертельні влучання в тіло й то більше влучань витримують кінцівки.",
+		["HEALTH REGENERATION"] = "Відновлення здоров'я",
+		["NORMAL"] = "Звичайна",
+		["FAST"] = "Швидка",
+		["SLOW"] = "Повільна",
+		["Health starts coming back 4 s after the last hit, at 25 a second."] =
+			"Здоров'я починає відновлюватися через 4 с після останнього влучання, по 25 на секунду.",
+		["Health starts coming back 2 s after the last hit, at 50 a second."] =
+			"Здоров'я починає відновлюватися через 2 с після останнього влучання, по 50 на секунду.",
+		["Health starts coming back 8 s after the last hit, at 10 a second."] =
+			"Здоров'я починає відновлюватися через 8 с після останнього влучання, по 10 на секунду.",
+		["Health doesn't come back until you respawn."] = "Здоров'я не відновлюється до відродження.",
+		["HEADSHOTS ONLY"] = "Тільки в голову",
+		["Bullets only hurt in the head or neck. Knives, explosives and fire hurt anywhere."] =
+			"Кулі ранять лише в голову або шию. Ножі, вибухівка й вогонь ранять будь-куди.",
 	};
 }

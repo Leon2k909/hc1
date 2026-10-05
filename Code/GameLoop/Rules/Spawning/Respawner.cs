@@ -46,7 +46,8 @@ public abstract class Respawner : Component,
 				case RespawnState.Requested:
 					player.RespawnState = RespawnState.Delayed;
 
-					if ( !player.IsBot )
+					// An instant respawn (a custom game's) has nothing to wait for.
+					if ( !player.IsBot && RespawnDelaySeconds > 0f )
 					{
 						using ( Rpc.FilterInclude( player.Connection ) )
 						{

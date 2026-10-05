@@ -1277,5 +1277,51 @@ public static partial class GameText
 			"Kurucu sensin: ayrılırsan bu lobi herkes için kapanır",
 		["Starting {0}…"] = "{0} başlatılıyor…",
 		["Couldn't leave this lobby. Try again."] = "Bu lobiden ayrılınamadı. Tekrar dene.",
+		// Custom game rules (CreateLobbyPage)
+		["RULES"] = "Kurallar",
+		["BOT DIFFICULTY"] = "Bot zorluğu",
+		["MIXED"] = "Karışık",
+		["REGULAR"] = "Er",
+		["HARDENED"] = "Tecrübeli",
+		["Most bots are average, with a few recruits and veterans."] = "Botların çoğu ortalamadır; birkaç acemi ve kıdemli de vardır.",
+		["Slow to react and wild with their aim."] = "Geç tepki verirler ve nişanları kötüdür.",
+		["About as quick and accurate as an average player."] = "Ortalama bir oyuncu kadar hızlı ve isabetliler.",
+		["Quick to react and accurate."] = "Hızlı tepki verirler ve isabetlidirler.",
+		["Very quick and very accurate."] = "Çok hızlı ve çok isabetliler.",
+		["TIME LIMIT"] = "Süre sınırı",
+		["How long the match lasts, unless a side reaches the score limit first."] =
+			"Bir taraf önce skor sınırına ulaşmazsa maçın ne kadar süreceği.",
+		["SCORE LIMIT"] = "Skor sınırı",
+		["ROUNDS TO WIN"] = "Kazanmak için raunt",
+		["ROUND LIMIT"] = "Raunt sınırı",
+		["NO LIMIT"] = "Sınırsız",
+		["{0} MIN"] = "{0} dk",
+		["RESPAWN DELAY"] = "Yeniden doğma süresi",
+		["How long the dead wait to come back, bots included."] = "Ölenlerin yeniden doğmak için ne kadar bekleyeceği, botlar dahil.",
+		["INSTANT"] = "Anında",
+		["{0} SEC"] = "{0} sn",
+		["Teammates' shots, blasts and fire hurt each other, as in every hardcore match."] =
+			"Atışlar, patlamalar ve ateş, her hardcore maçta olduğu gibi takım arkadaşlarına da zarar verir.",
+		["Teammates can't hurt each other. Your own grenades still hurt you."] =
+			"Takım arkadaşları birbirine zarar veremez. Kendi bombaların sana yine zarar verir.",
+		["Underlined values are a normal match's."] = "Altı çizili değerler normal bir maçınkilerdir.",
+		["RESET RULES"] = "Kuralları sıfırla",
+		["MAX HEALTH"] = "Maks. sağlık",
+		["Head and neck shots kill at any health. More health makes body hits less often fatal and limbs take more hits."] =
+			"Kafa ve boyun vuruşları her sağlık değerinde öldürür. Daha fazla sağlık, gövde vuruşlarını daha seyrek ölümcül yapar ve uzuvlar daha çok vuruşa dayanır.",
+		["HEALTH REGENERATION"] = "Sağlık yenilenmesi",
+		["NORMAL"] = "Normal",
+		["FAST"] = "Hızlı",
+		["SLOW"] = "Yavaş",
+		["Health starts coming back 4 s after the last hit, at 25 a second."] =
+			"Sağlık, son isabetten 4 sn sonra saniyede 25 olarak geri gelmeye başlar.",
+		["Health starts coming back 2 s after the last hit, at 50 a second."] =
+			"Sağlık, son isabetten 2 sn sonra saniyede 50 olarak geri gelmeye başlar.",
+		["Health starts coming back 8 s after the last hit, at 10 a second."] =
+			"Sağlık, son isabetten 8 sn sonra saniyede 10 olarak geri gelmeye başlar.",
+		["Health doesn't come back until you respawn."] = "Sağlık, yeniden doğana kadar geri gelmez.",
+		["HEADSHOTS ONLY"] = "Sadece kafadan vuruş",
+		["Bullets only hurt in the head or neck. Knives, explosives and fire hurt anywhere."] =
+			"Mermiler yalnızca kafaya veya boyna isabet ederse zarar verir. Bıçaklar, patlayıcılar ve ateş her yere zarar verir.",
 	};
 }

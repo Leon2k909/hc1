@@ -18,9 +18,22 @@ partial class GameMode
 	{
 		DisplayedTimerMode.CountUp => TimeSpan.FromSeconds( Math.Clamp( Time.Now.CeilToInt() - TimerStart, 0f, TimerDuration ) ),
 		DisplayedTimerMode.CountDown => TimeSpan.FromSeconds( Math.Clamp( TimerStart + TimerDuration - Time.Now.CeilToInt() + 1f, 0f, TimerDuration ) ),
-		DisplayedTimerMode.StateCountDown => TimeSpan.FromSeconds( Math.Max( ( StateMachine.IsValid() ? StateMachine.NextStateTime : 0 ) - Time.Now.CeilToInt() + 1f, 0f ) ),
+		DisplayedTimerMode.StateCountDown => StateCountDown,
 		_ => null
 	};
+
+	/// <summary>No clock for a state with no end: a custom game with no time limit (CustomGameSettings.ApplyTo).</summary>
+	private TimeSpan? StateCountDown
+	{
+		get
+		{
+			var next = StateMachine.IsValid() ? StateMachine.NextStateTime : 0f;
+			if ( !float.IsFinite( next ) )
+				return null;
+
+			return TimeSpan.FromSeconds( Math.Max( next - Time.Now.CeilToInt() + 1f, 0f ) );
+		}
+	}
 
 	[Sync( SyncFlags.FromHost )]
 	private NetDictionary<Team, string> TeamStatusText { get; set; } = new();

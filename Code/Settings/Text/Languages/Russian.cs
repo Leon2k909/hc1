@@ -1277,5 +1277,51 @@ public static partial class GameText
 		["Blue"] = "Синий",
 		["Search languages"] = "Поиск языка",
 		["No languages found"] = "Языки не найдены",
+		// Custom game rules (CreateLobbyPage)
+		["RULES"] = "Правила",
+		["BOT DIFFICULTY"] = "Сложность ботов",
+		["MIXED"] = "Смешанная",
+		["REGULAR"] = "Рядовой",
+		["HARDENED"] = "Бывалый",
+		["Most bots are average, with a few recruits and veterans."] = "Большинство ботов средние, есть несколько новобранцев и ветеранов.",
+		["Slow to react and wild with their aim."] = "Медленно реагируют и плохо целятся.",
+		["About as quick and accurate as an average player."] = "Примерно так же быстры и точны, как средний игрок.",
+		["Quick to react and accurate."] = "Быстро реагируют и метко стреляют.",
+		["Very quick and very accurate."] = "Очень быстрые и очень меткие.",
+		["TIME LIMIT"] = "Лимит времени",
+		["How long the match lasts, unless a side reaches the score limit first."] =
+			"Сколько длится матч, если ни одна сторона раньше не наберёт лимит очков.",
+		["SCORE LIMIT"] = "Лимит очков",
+		["ROUNDS TO WIN"] = "Раундов для победы",
+		["ROUND LIMIT"] = "Лимит раундов",
+		["NO LIMIT"] = "Без лимита",
+		["{0} MIN"] = "{0} мин",
+		["RESPAWN DELAY"] = "Задержка возрождения",
+		["How long the dead wait to come back, bots included."] = "Сколько погибшие ждут возрождения, включая ботов.",
+		["INSTANT"] = "Мгновенно",
+		["{0} SEC"] = "{0} с",
+		["Teammates' shots, blasts and fire hurt each other, as in every hardcore match."] =
+			"Выстрелы, взрывы и огонь ранят и союзников, как в любом хардкорном матче.",
+		["Teammates can't hurt each other. Your own grenades still hurt you."] =
+			"Союзники не могут ранить друг друга. Собственные гранаты по-прежнему ранят вас.",
+		["Underlined values are a normal match's."] = "Подчёркнутые значения — как в обычном матче.",
+		["RESET RULES"] = "Сбросить правила",
+		["MAX HEALTH"] = "Макс. здоровье",
+		["Head and neck shots kill at any health. More health makes body hits less often fatal and limbs take more hits."] =
+			"Попадания в голову и шею убивают при любом здоровье. Чем больше здоровья, тем реже смертельны попадания в тело и тем больше попаданий выдерживают конечности.",
+		["HEALTH REGENERATION"] = "Восстановление здоровья",
+		["NORMAL"] = "Обычная",
+		["FAST"] = "Быстрая",
+		["SLOW"] = "Медленная",
+		["Health starts coming back 4 s after the last hit, at 25 a second."] =
+			"Здоровье начинает восстанавливаться через 4 с после последнего попадания, по 25 в секунду.",
+		["Health starts coming back 2 s after the last hit, at 50 a second."] =
+			"Здоровье начинает восстанавливаться через 2 с после последнего попадания, по 50 в секунду.",
+		["Health starts coming back 8 s after the last hit, at 10 a second."] =
+			"Здоровье начинает восстанавливаться через 8 с после последнего попадания, по 10 в секунду.",
+		["Health doesn't come back until you respawn."] = "Здоровье не восстанавливается до возрождения.",
+		["HEADSHOTS ONLY"] = "Только в голову",
+		["Bullets only hurt in the head or neck. Knives, explosives and fire hurt anywhere."] =
+			"Пули ранят только в голову или шею. Ножи, взрывчатка и огонь ранят куда угодно.",
 	};
 }

@@ -25,7 +25,8 @@ public partial class HealthComponent
 
 	/// <summary>
 	/// The chance a body hit kills outright is the round's damage over this: an M4's (20) half the time, a pistol's (15)
-	/// 37%, a shotgun pellet's (8) 20%, the M700's nearly always (<see cref="MaxBodyKillChance"/>).
+	/// 37%, a shotgun pellet's (8) 20%, the M700's nearly always (<see cref="MaxBodyKillChance"/>). At 100 health; a
+	/// custom game's other health scales it inversely.
 	/// </summary>
 	public const float BodyKillDamage = 40f;
 	public const float MaxBodyKillChance = 0.95f;
@@ -92,7 +93,10 @@ public partial class HealthComponent
 		}
 		else
 		{
-			var chance = Math.Min( gunDamage / BodyKillDamage, MaxBodyKillChance );
+			// More health (a custom game's) makes a body hit less often fatal, less makes it more: 50% for an M4 at 100,
+			// 25% at 200.
+			var toughness = MaxHealth > 0f ? CustomGameRules.DefaultMaxHealth / MaxHealth : 1f;
+			var chance = Math.Min( gunDamage / BodyKillDamage * toughness, MaxBodyKillChance );
 			if ( (hitbox & HitboxTags.Stomach) != 0 && (hitbox & Chest) == 0 )
 				chance *= AbdomenKillChanceScale;
 

@@ -210,8 +210,23 @@ public sealed partial class LightweightCombatBot
 	private Vector3? _callout;
 	private TimeUntil _calloutHeard;
 
-	/// <summary> A skill roll: most bots are average, a few are recruits or veterans. </summary>
-	public static float RollSkill() => MathX.Lerp( -0.1f, 1.1f, (Game.Random.Float() + Game.Random.Float()) * 0.5f ).Clamp( 0f, 1f );
+	/// <summary>
+	/// A skill roll: most bots are average, a few are recruits or veterans. A custom game can set their difficulty
+	/// (CustomGameRules.BotDifficulty), which narrows the roll round that level.
+	/// </summary>
+	public static float RollSkill()
+	{
+		var (low, high) = CustomGameSettings.ActiveRules.BotDifficulty switch
+		{
+			BotDifficulty.Recruit => (0f, 0.3f),
+			BotDifficulty.Regular => (0.3f, 0.6f),
+			BotDifficulty.Hardened => (0.55f, 0.85f),
+			BotDifficulty.Veteran => (0.8f, 1f),
+			_ => (-0.1f, 1.1f)
+		};
+
+		return MathX.Lerp( low, high, (Game.Random.Float() + Game.Random.Float()) * 0.5f ).Clamp( 0f, 1f );
+	}
 
 	private void RollPersonality()
 	{
