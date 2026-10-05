@@ -2117,6 +2117,16 @@ simulate_input.
       flares, a honeycomb grille, an LED light bar with boomerang intakes, dark 19-inch alloys, roof rails, wrap-round
       tail lights and German plates ("HW K 318", `PLATE_FONT`). No maker's badge. The taxis and the red and blue
       cars are still the old `car`.
+    - The white van on the east and west cab roads (e ±1940, n -900) is `van` (2026-10-05, from the user's picture of
+      a modern large panel van): 5.99 m long, 2.04 m wide and 2.36 m tall. Like `suv`, it's lofted through
+      `_road_body`, which both share. It has:
+      - a steep windscreen over a short bonnet, and a grille of four bars leaning back between slim headlights;
+      - a black bumper and sill band, with a silver sill strip;
+      - a cab door, a sliding door with its rail, and glazed rear doors;
+      - tall black mirrors, steel wheels and vertical tail lights.
+      No maker's badge.
+    - The parked cars and vans sat on the station's ground level (z 0), 6 above the cab roads' carriageway, so they
+      floated. They now stand on it (`railhead_station.ROAD_Z`, -6), stand-ins included.
     - Car paint is `railhead_materials.PAINTED` (`rw_car_grey` and five more): vmats only, a flat tint on
       `materials/default/default_color.tga` with one roughness, since every texture's dirt and the trains' panel seams
       looked wrong on a car. The vmats were written straight from `painted_vmat`; `railhead_materials.py` writes the

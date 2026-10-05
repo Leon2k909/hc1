@@ -2726,15 +2726,6 @@ ESTATE = HATCH[:7] + [   # the same car as an estate: 4.63 m long, 2.69 m wheelb
     ( 178.0, 34.4, 8.6, 30.0, 32.6, 40.8, 30.2, 41.6, 22.6, 42.2, 42.4 ),
     ( 182.4, 32.0, 9.5, 29.0, 31.0, 38.0, 29.6, 38.8, 22.0, 39.2, 39.4 ),
 ]
-VAN = [     # a generic panel van: 4.9 m long, 1.9 m wide, 1.99 m tall, 3.0 m wheelbase
-    ( 0.0, 33.5, 11.0, 24.0, 33.0, 34.0, 31.0, 36.5, 20.0, 37.3, 37.5 ),
-    ( 4.0, 36.5, 10.5, 30.0, 36.0, 38.5, 35.0, 39.3, 22.0, 39.9, 40.1 ),
-    ( 12.0, 37.5, 10.0, 33.0, 37.0, 41.0, 36.0, 41.6, 24.0, 42.2, 42.4 ),
-    ( 26.0, 37.5, 10.0, 33.0, 37.0, 43.5, 36.0, 44.0, 25.0, 45.0, 45.2 ),
-    ( 50.0, 37.5, 10.0, 33.0, 36.6, 44.5, 33.5, 74.0, 30.0, 77.6, 78.0 ),
-    ( 190.0, 37.5, 10.5, 33.0, 36.6, 45.0, 34.0, 75.0, 30.0, 78.0, 78.3 ),
-    ( 193.1, 36.8, 11.0, 33.0, 36.2, 45.0, 33.5, 74.5, 29.5, 77.0, 77.3 ),
-]
 CAR_PAINTS = ( "rw_train_grey", "rw_train_white", "rw_train_dark", "rw_train_blue", "rw_train_red" )
 
 
@@ -2923,7 +2914,8 @@ PLATE_FONT = {
     "K": "#...#|#..#.|#.#..|##...|#.#..|#..#.|#...#", "D": "####.|#...#|#...#|#...#|#...#|#...#|####.",
     "1": "..#..|.##..|..#..|..#..|..#..|..#..|.###.", "3": "####.|....#|....#|.###.|....#|....#|####.",
     "8": ".###.|#...#|#...#|.###.|#...#|#...#|.###.", "4": "...#.|..##.|.#.#.|#..#.|#####|...#.|...#.",
-    "-": ".....|.....|.....|.###.|.....|.....|.....", " ": ".....|.....|.....|.....|.....|.....|.....",
+    "L": "#....|#....|#....|#....|#....|#....|#####", "-": ".....|.....|.....|.###.|.....|.....|.....",
+    " ": ".....|.....|.....|.....|.....|.....|.....",
 }
 
 
@@ -3029,6 +3021,99 @@ class _Smooth:
             _fpoly( model, F, paint, pts, tuple( n ), normals=normals )
 
 
+def _road_body( model, F, profile, side_x, base_stations, axles, tyre, arch, inner_half, L, body_paint, paint_of,
+                wheel, band="rw_rubber", flare=3.0, flare_lift=0.7 ):
+    """ A road vehicle's body lofted through profile( a ) (its right half, bottom to the top's centre, the same number
+    of points at every a; point 1 is the black band's top and point 2 the side's widest line, over the wheel arches) at
+    base_stations plus the arches' cuts, front at a 0 and tail at L. paint_of( segment, a ) gives ( paint, part ): each
+    part shades smooth. Wheel arches of radius arch round the axles (depths) for wheels of radius tyre, with black
+    liners reaching inner_half in and flares flare wide standing flare_lift proud; the band paints the lower side below point 1.
+    side_x( a, z ) is the side's x at height z. wheel( ac, xs ) draws each wheel. Flat end faces close the body. """
+    S = _Smooth()
+    loc = lambda x, a, z: ( x, -a, z )
+    steps = 10
+    stations = sorted( set( base_stations ) | { ac - arch * math.cos( math.pi * j / steps )
+                                               for ac in axles for j in range( steps + 1 ) } )
+    profiles = { a: profile( a ) for a in stations }
+
+    def in_arch( a ):
+        return any( abs( a - ac ) < arch - 1e-6 for ac in axles )
+
+    def arch_z( a ):
+        ac = min( axles, key=lambda c: abs( a - c ) )
+        return tyre + math.sqrt( max( 0.0, arch ** 2 - ( a - ac ) ** 2 ) )
+
+    # The body's skin, both sides.
+    for a0, a1 in zip( stations, stations[1:] ):
+        p0, p1 = profiles[a0], profiles[a1]
+        mid = ( a0 + a1 ) / 2
+        arched = in_arch( mid )
+        for k in range( len( p0 ) - 1 ):
+            if arched and k <= 1:
+                continue
+            pnt, part = paint_of( k, mid )
+            for xs in ( 1.0, -1.0 ):
+                dx = ( p0[k + 1][0] - p0[k][0] + p1[k + 1][0] - p1[k][0] )
+                dz = ( p0[k + 1][1] - p0[k][1] + p1[k + 1][1] - p1[k][1] )
+                S.add( pnt, part, [ loc( xs * p0[k][0], a0, p0[k][1] ), loc( xs * p0[k + 1][0], a0, p0[k + 1][1] ),
+                                    loc( xs * p1[k + 1][0], a1, p1[k + 1][1] ), loc( xs * p1[k][0], a1, p1[k][1] ) ],
+                       ( xs * dz, 0.0, -dx ) )
+        if arched:          # round the wheel arches: the side from the arch's edge up to the widest line
+            for xs in ( 1.0, -1.0 ):
+                z0a, z1a = arch_z( a0 ), arch_z( a1 )
+                lo0, lo1 = p0[1][1], p1[1][1]
+                pts = [ loc( xs * side_x( a0, max( z0a, lo0 ) ), a0, max( z0a, lo0 ) ),
+                        loc( xs * side_x( a1, max( z1a, lo1 ) ), a1, max( z1a, lo1 ) ),
+                        loc( xs * p1[2][0], a1, p1[2][1] ), loc( xs * p0[2][0], a0, p0[2][1] ) ]
+                S.add( body_paint, "body", pts, ( xs, 0, 0 ) )
+                if z0a < lo0 or z1a < lo1:
+                    S.add( band, "clad", [ loc( xs * side_x( a0, min( z0a, lo0 ) ), a0, min( z0a, lo0 ) ),
+                                                  loc( xs * side_x( a1, min( z1a, lo1 ) ), a1, min( z1a, lo1 ) ),
+                                                  loc( xs * p1[1][0], a1, lo1 ), loc( xs * p0[1][0], a0, lo0 ) ],
+                           ( xs, 0, 0 ) )
+    # The nose and tail: flat faces of the end sections.
+    for a, toward in ( ( 0.0, 1.0 ), ( L, -1.0 ) ):
+        prof = profiles[a]
+        pts = [ loc( x, a, z ) for x, z in prof ] + [ loc( -x, a, z ) for x, z in reversed( prof ) if x > 0 ]
+        S.add( body_paint, "cap%d" % int( a ), pts, ( 0, toward, 0 ) )
+    S.draw( model, F )
+
+    # The underside, the arches' liners and flares, and the wheels.
+    for a0, a1 in zip( stations, stations[1:] ):
+        p0, p1 = profiles[a0], profiles[a1]
+        half = lambda p: inner_half if in_arch( ( a0 + a1 ) / 2 ) else p[0][0]
+        _fpoly( model, F, "rw_black", [ loc( -half( p0 ), a0, p0[0][1] ), loc( half( p0 ), a0, p0[0][1] ),
+                                        loc( half( p1 ), a1, p1[0][1] ), loc( -half( p1 ), a1, p1[0][1] ) ],
+                ( 0, 0, -1 ) )
+    for ac in axles:
+        arc = [ ( ac - arch * math.cos( math.pi * j / steps ), math.pi - math.pi * j / steps )
+                for j in range( steps + 1 ) ]
+        for xs in ( 1.0, -1.0 ):
+            for ( a0, t0 ), ( a1, t1 ) in zip( arc, arc[1:] ):
+                z0_, z1_ = tyre + arch * math.sin( t0 ), tyre + arch * math.sin( t1 )
+                xo0, xo1 = side_x( a0, z0_ ), side_x( a1, z1_ )
+                _fpoly( model, F, band, [ loc( xs * xo0, a0, z0_ ), loc( xs * xo1, a1, z1_ ),
+                                                 loc( xs * ( xo1 - 11.0 ), a1, z1_ ),
+                                                 loc( xs * ( xo0 - 11.0 ), a0, z0_ ) ],
+                        ( 0, ( a0 + a1 ) / 2 - ac, tyre - ( z0_ + z1_ ) / 2 ) )
+                # The flare: a black band round the arch, standing proud, with its inner edge.
+                ro = arch + flare
+                pts = []
+                for t, rad in ( ( t0, arch ), ( t0, ro ), ( t1, ro ), ( t1, arch ) ):
+                    aa, zz = ac + rad * math.cos( t ), tyre + rad * math.sin( t )
+                    pts.append( loc( xs * ( side_x( aa, zz ) + flare_lift ), aa, zz ) )
+                _fpoly( model, F, band, pts, ( xs, 0, 0 ) )
+                edge = []
+                for t, lift in ( ( t0, 0.0 ), ( t0, flare_lift ), ( t1, flare_lift ), ( t1, 0.0 ) ):
+                    aa, zz = ac + arch * math.cos( t ), tyre + arch * math.sin( t )
+                    edge.append( loc( xs * ( side_x( aa, zz ) + lift ), aa, zz ) )
+                _fpoly( model, F, band, edge, ( 0, ( a0 + a1 ) / 2 - ac, tyre - ( z0_ + z1_ ) / 2 ) )
+            wall = [ loc( xs * ( side_x( a, z ) - 11.0 ), a, z ) for a, z in
+                     [ ( ac + arch * math.cos( t ), tyre + arch * math.sin( t ) ) for _, t in arc ] ]
+            _fpoly( model, F, "rw_black", wall, ( xs, 0, 0 ) )
+            wheel( ac, xs )
+
+
 def _suv_wheel( model, F, ac, xs ):
     """ A wheel at depth ac on side xs: a 235/50 R19 tyre with rounded shoulders on a dark ten-spoke alloy (five pairs),
     the brake disc behind it. """
@@ -3119,21 +3204,8 @@ def suv( model, e, n, along="+n", paint="rw_car_grey", z0=0.0, plate="HW K 318" 
     the town's number plates. Two metal boxes: the body to the belt and the cabin. """
     L = SUV_L
     F = _vehicle_frame( e, n, along, L, z0 )
-    S = _Smooth()
     loc = lambda x, a, z: ( x, -a, z )
     axles = SUV_AXLES
-    steps = 10
-    stations = sorted( set( SUV_STATIONS ) | { ac - SUV_ARCH * math.cos( math.pi * j / steps )
-                                               for ac in axles for j in range( steps + 1 ) } )
-    profiles = { a: _suv_profile( a ) for a in stations }
-
-    def in_arch( a ):
-        return any( abs( a - ac ) < SUV_ARCH - 1e-6 for ac in axles )
-
-    def arch_z( a ):
-        ac = min( axles, key=lambda c: abs( a - c ) )
-        return SUV_TYRE + math.sqrt( max( 0.0, SUV_ARCH ** 2 - ( a - ac ) ** 2 ) )
-
     def paint_of( k, mid ):
         if k == 0:
             return "rw_rubber", "clad"
@@ -3158,75 +3230,8 @@ def suv( model, e, n, along="+n", paint="rw_car_grey", z0=0.0, plate="HW K 318" 
             return "rw_black", "frame"
         return paint, "body"
 
-    # The body's skin, both sides.
-    for a0, a1 in zip( stations, stations[1:] ):
-        p0, p1 = profiles[a0], profiles[a1]
-        mid = ( a0 + a1 ) / 2
-        arch = in_arch( mid )
-        for k in range( len( p0 ) - 1 ):
-            if arch and k <= 1:
-                continue
-            pnt, part = paint_of( k, mid )
-            for xs in ( 1.0, -1.0 ):
-                dx = ( p0[k + 1][0] - p0[k][0] + p1[k + 1][0] - p1[k][0] )
-                dz = ( p0[k + 1][1] - p0[k][1] + p1[k + 1][1] - p1[k][1] )
-                S.add( pnt, part, [ loc( xs * p0[k][0], a0, p0[k][1] ), loc( xs * p0[k + 1][0], a0, p0[k + 1][1] ),
-                                    loc( xs * p1[k + 1][0], a1, p1[k + 1][1] ), loc( xs * p1[k][0], a1, p1[k][1] ) ],
-                       ( xs * dz, 0.0, -dx ) )
-        if arch:            # round the wheel arches: the side from the arch's edge up to the widest line
-            for xs in ( 1.0, -1.0 ):
-                z0a, z1a = arch_z( a0 ), arch_z( a1 )
-                lo0, lo1 = p0[1][1], p1[1][1]
-                pts = [ loc( xs * _suv_side_x( a0, max( z0a, lo0 ) ), a0, max( z0a, lo0 ) ),
-                        loc( xs * _suv_side_x( a1, max( z1a, lo1 ) ), a1, max( z1a, lo1 ) ),
-                        loc( xs * p1[2][0], a1, p1[2][1] ), loc( xs * p0[2][0], a0, p0[2][1] ) ]
-                S.add( paint, "body", pts, ( xs, 0, 0 ) )
-                if z0a < lo0 or z1a < lo1:
-                    S.add( "rw_rubber", "clad", [ loc( xs * _suv_side_x( a0, min( z0a, lo0 ) ), a0, min( z0a, lo0 ) ),
-                                                  loc( xs * _suv_side_x( a1, min( z1a, lo1 ) ), a1, min( z1a, lo1 ) ),
-                                                  loc( xs * p1[1][0], a1, lo1 ), loc( xs * p0[1][0], a0, lo0 ) ],
-                           ( xs, 0, 0 ) )
-    # The nose and tail: flat faces of the end sections.
-    for a, toward in ( ( 0.0, 1.0 ), ( L, -1.0 ) ):
-        prof = profiles[a]
-        pts = [ loc( x, a, z ) for x, z in prof ] + [ loc( -x, a, z ) for x, z in reversed( prof ) if x > 0 ]
-        S.add( paint, "cap%d" % int( a ), pts, ( 0, toward, 0 ) )
-    S.draw( model, F )
-
-    # The underside, the arches' liners and flares, and the wheels.
-    for a0, a1 in zip( stations, stations[1:] ):
-        p0, p1 = profiles[a0], profiles[a1]
-        half = lambda p: SUV_TRACK - SUV_TYRE_W / 2 - 0.5 if in_arch( ( a0 + a1 ) / 2 ) else p[0][0]
-        _fpoly( model, F, "rw_black", [ loc( -half( p0 ), a0, p0[0][1] ), loc( half( p0 ), a0, p0[0][1] ),
-                                        loc( half( p1 ), a1, p1[0][1] ), loc( -half( p1 ), a1, p1[0][1] ) ],
-                ( 0, 0, -1 ) )
-    for ac in axles:
-        arc = [ ( ac - SUV_ARCH * math.cos( math.pi * j / steps ), math.pi - math.pi * j / steps )
-                for j in range( steps + 1 ) ]
-        for xs in ( 1.0, -1.0 ):
-            for ( a0, t0 ), ( a1, t1 ) in zip( arc, arc[1:] ):
-                z0_, z1_ = SUV_TYRE + SUV_ARCH * math.sin( t0 ), SUV_TYRE + SUV_ARCH * math.sin( t1 )
-                xo0, xo1 = _suv_side_x( a0, z0_ ), _suv_side_x( a1, z1_ )
-                _fpoly( model, F, "rw_rubber", [ loc( xs * xo0, a0, z0_ ), loc( xs * xo1, a1, z1_ ),
-                                                 loc( xs * ( xo1 - 11.0 ), a1, z1_ ),
-                                                 loc( xs * ( xo0 - 11.0 ), a0, z0_ ) ],
-                        ( 0, ( a0 + a1 ) / 2 - ac, SUV_TYRE - ( z0_ + z1_ ) / 2 ) )
-                # The flare: a black band 3.0 wide round the arch, standing 0.7 proud, with its inner edge.
-                ro = SUV_ARCH + 3.0
-                pts = []
-                for t, rad in ( ( t0, SUV_ARCH ), ( t0, ro ), ( t1, ro ), ( t1, SUV_ARCH ) ):
-                    aa, zz = ac + rad * math.cos( t ), SUV_TYRE + rad * math.sin( t )
-                    pts.append( loc( xs * ( _suv_side_x( aa, zz ) + 0.7 ), aa, zz ) )
-                _fpoly( model, F, "rw_rubber", pts, ( xs, 0, 0 ) )
-                edge = []
-                for t, lift in ( ( t0, 0.0 ), ( t0, 0.7 ), ( t1, 0.7 ), ( t1, 0.0 ) ):
-                    aa, zz = ac + SUV_ARCH * math.cos( t ), SUV_TYRE + SUV_ARCH * math.sin( t )
-                    edge.append( loc( xs * ( _suv_side_x( aa, zz ) + lift ), aa, zz ) )
-                _fpoly( model, F, "rw_rubber", edge, ( 0, ( a0 + a1 ) / 2 - ac, SUV_TYRE - ( z0_ + z1_ ) / 2 ) )
-            wall = [ loc( xs * ( _suv_side_x( a, z ) - 11.0 ), a, z ) for a, z in
-                     [ ( ac + SUV_ARCH * math.cos( t ), SUV_TYRE + SUV_ARCH * math.sin( t ) ) for _, t in arc ] ]
-            _fpoly( model, F, "rw_black", wall, ( xs, 0, 0 ) )
-            _suv_wheel( model, F, ac, xs )
+    _road_body( model, F, _suv_profile, _suv_side_x, SUV_STATIONS, axles, SUV_TYRE, SUV_ARCH,
+                SUV_TRACK - SUV_TYRE_W / 2 - 0.5, L, paint, paint_of, lambda ac, xs: _suv_wheel( model, F, ac, xs ) )
 
     def side_patch( pnt, xs, pts, lift=0.06 ):
         """ A flat patch on the side, its corners ( a, z ), lift off the skin. """
@@ -3417,35 +3422,288 @@ def suv( model, e, n, along="+n", paint="rw_car_grey", z0=0.0, plate="HW K 318" 
     F.collide( model, -30.0, 30.0, -( SUV_ROOF1 + 2.0 ), -( SUV_COWL + 2.0 ), 40.5, 63.2, "metal" )
 
 
-def van( model, e, n, along="+n", paint="rw_train_white", z0=0.0 ):
-    """ A parked generic panel van (4.9 m long, 1.9 m wide, 1.99 m tall, 3 m wheelbase, 215/65 R16 tyres): glazed
-    cab, blind load area with a sliding door's seam on each side, two rear doors. Its nose towards along, (e, n) its
-    footprint's centre. One metal box. """
-    L = VAN[-1][0]
+# A large panel van, as Europe's current ones are: 5.99 m long, 2.04 m wide and 2.36 m tall on a 3.64 m wheelbase,
+# 205/75 R16C tyres on steel wheels. A short bonnet under a steep windscreen, the grille leaning back between slim
+# headlights, a black bumper, a black band along the sills, a cab door with its quarter light, a sliding side door and
+# two rear doors. Lofted like the SUV (_road_body); no maker's badge.
+
+VAN_L = 235.7
+VAN_W = 40.2
+VAN_AXLES = ( 40.0, 183.3 )
+VAN_TYRE, VAN_TYRE_W, VAN_RIM = 14.05, 8.1, 8.0
+VAN_TRACK = 34.1
+VAN_ARCH = 16.4
+VAN_COWL, VAN_ROOF0 = 31.0, 71.0        # the windscreen's foot and top
+VAN_PLAN = [ ( 0.0, 36.0 ), ( 1.0, 37.9 ), ( 2.5, 39.0 ), ( 5.0, 39.8 ), ( 9.0, 40.2 ), ( 231.0, 40.2 ), ( 233.5, 39.7 ),
+             ( 235.0, 38.6 ), ( VAN_L, 37.2 ) ]
+VAN_BOTTOM = [ ( 0.0, 12.5 ), ( 10.0, 11.5 ), ( 28.0, 10.8 ), ( 215.0, 10.8 ), ( 230.0, 12.0 ), ( VAN_L, 13.0 ) ]
+VAN_TOP = [ ( 0.0, 27.0 ), ( 1.2, 29.5 ), ( 2.6, 33.0 ), ( 4.2, 36.6 ), ( 5.6, 39.3 ), ( 7.0, 41.0 ), ( 12.0, 42.4 ),
+            ( 24.0, 45.6 ), ( VAN_COWL, 47.6 ), ( VAN_ROOF0, 89.6 ), ( 78.0, 92.2 ), ( 120.0, 92.7 ), ( 232.0, 92.7 ),
+            ( VAN_L, 92.2 ) ]
+VAN_BELT = [ ( 0.0, 25.8 ), ( 7.0, 39.6 ), ( VAN_COWL, 47.0 ), ( 60.0, 52.5 ), ( 72.0, 54.6 ), ( VAN_L, 56.0 ) ]
+VAN_WINDOWS = ( ( 41.0, 63.6 ), ( 65.4, 100.8 ) )        # the cab's quarter light and door glass, along a
+VAN_STATIONS = [ 0.0, 0.4, 0.8, 1.2, 1.8, 2.6, 3.4, 4.2, 4.9, 5.6, 6.3, 7.0, 8.5, 10.0, 12.0, 16.0, 20.0, 24.0, 28.0,
+                 VAN_COWL, 32.6, 36.0, 41.0, 46.0, 51.0, 56.0, 61.0, 63.6, 65.4, 68.0, 70.2, VAN_ROOF0, 74.0, 78.0,
+                 84.0, 92.0, 100.8, 102.0, 106.0, 120.0, 140.0, 160.0, 200.0, 215.0, 225.0, 229.0, 231.0, 232.5,
+                 233.5, 234.3, 235.0, 235.4, VAN_L ]
+
+
+def _van_profile( a ):
+    """ The right half of the van's cross-section at depth a, bottom to the top's centre: the sill's tuck, the black
+    band's top, the side's crease (its widest line), the belt, then five points over the top (the fascia, the bonnet,
+    the windscreen or the roof). """
+    W = _interp( VAN_PLAN, a )
+    zb, zt = _interp( VAN_BOTTOM, a ), _interp( VAN_TOP, a )
+    belt = min( _interp( VAN_BELT, a ), zt - 1.2 )
+    crease = min( 52.0, belt - 1.0 )
+    lo = min( 26.0, crease - 1.0 )
+    side = [ ( W - 2.0, zb ), ( W - 0.3, lo ), ( W, crease ), ( W - 0.5, belt ) ]
+
+    def bonnet():
+        d = zt - belt
+        return [ ( W - 3.2, belt + 0.5 * d ), ( W - 7.0, belt + 0.8 * d ), ( min( 24.0, W - 11.0 ), belt + 0.94 * d ),
+                 ( 12.0, zt - 0.05 ), ( 0.0, zt ) ]
+
+    def cabin():                # the roof's side from the windows' top, its rounded edge and its crown
+        return [ ( W - 2.2, zt - 7.5 ), ( W - 4.2, zt - 2.6 ), ( W - 7.6, zt - 0.8 ), ( 16.0, zt - 0.1 ), ( 0.0, zt ) ]
+
+    if a <= VAN_COWL:
+        top = bonnet()
+    elif a < VAN_ROOF0:
+        t = ( a - VAN_COWL ) / ( VAN_ROOF0 - VAN_COWL )
+        t = t * t * ( 3 - 2 * t )
+        top = [ ( p[0] + ( q[0] - p[0] ) * t, p[1] + ( q[1] - p[1] ) * t ) for p, q in zip( bonnet(), cabin() ) ]
+    else:
+        top = cabin()
+    return side + top
+
+
+def _van_side_x( a, z ):
+    """ The van's side's x at height z (up to the roof's edge, or the fascia's) at depth a. """
+    prof = _van_profile( a )[:5]
+    if z <= prof[0][1]:
+        return prof[0][0]
+    for ( x0, z0 ), ( x1, z1 ) in zip( prof, prof[1:] ):
+        if z0 <= z <= z1:
+            return x0 + ( x1 - x0 ) * ( z - z0 ) / max( z1 - z0, 1e-6 )
+    return prof[4][0]
+
+
+def _van_top_z( a, x ):
+    """ The top surface's z at |x| (inside the belt) at depth a. """
+    prof = _van_profile( a )[3:]
+    x = abs( x )
+    for ( x0, z0 ), ( x1, z1 ) in zip( prof, prof[1:] ):
+        if x1 <= x <= x0:
+            return z0 + ( z1 - z0 ) * ( x0 - x ) / max( x0 - x1, 1e-6 )
+    return prof[0][1]
+
+
+def _van_wheel( model, F, ac, xs ):
+    """ A wheel at depth ac on side xs: a 205/75 R16C tyre on a silver steel wheel, its dished centre with six nuts,
+    six round vents and a black hub cap. """
+    r, w, rim = VAN_TYRE, VAN_TYRE_W, VAN_RIM
+    xo, xi = VAN_TRACK + w / 2, VAN_TRACK - w / 2
+
+    def p( x, rad, t ):
+        return ( xs * x, -( ac + rad * math.cos( t ) ), r + rad * math.sin( t ) )
+
+    rod( model, F.p( xs * ( xi + 0.9 ), -ac, r ), F.p( xs * ( xo - 0.9 ), -ac, r ), r, "rw_rubber", 28 )
+    for x0, x1 in ( ( xo - 0.9, xo ), ( xi + 0.9, xi ) ):
+        _frustum( model, F.p( xs * x0, -ac, r ), F.p( xs * x1, -ac, r ), r, r - 1.2, "rw_rubber", 28 )
+    n = 28
+    for k in range( n ):
+        t0, t1 = 2 * math.pi * k / n, 2 * math.pi * ( k + 1 ) / n
+        for x, r0, r1, paint, out in ( ( xo, rim + 0.5, r - 1.2, "rw_rubber", 1 ), ( xo + 0.02, rim - 0.1, rim + 0.5,
+                                                                                   "rw_steel_grey", 1 ),
+                                       ( xo - 0.7, 5.6, rim - 0.1, "rw_steel_grey", 1 ),     # the rim's well
+                                       ( xi, 0.0, r - 1.2, "rw_rubber", -1 ) ):
+            _fpoly( model, F, paint, [ p( x, r0, t0 ), p( x, r1, t0 ), p( x, r1, t1 ), p( x, r0, t1 ) ],
+                    ( out * xs, 0, 0 ) )
+    _frustum( model, F.p( xs * ( xo - 0.7 ), -ac, r ), F.p( xs * ( xo - 1.6 ), -ac, r ), 5.6, 4.2, "rw_steel_grey", 20 )
+    disc( model, "rw_steel_grey", F.p( xs * ( xo - 1.6 ), -ac, r ), ( xs * F.x ), 4.2, sides=20 )
+    for k in range( 6 ):
+        t = 2 * math.pi * ( k + 0.5 ) / 6
+        disc( model, "rw_black", F.p( *p( xo - 0.68, 6.6, t ) ), ( xs * F.x ), 0.75, sides=10 )
+        t = 2 * math.pi * k / 6
+        disc( model, "rw_steel_dark", F.p( *p( xo - 1.58, 2.9, t ) ), ( xs * F.x ), 0.42, sides=6 )
+    disc( model, "rw_black", F.p( xs * ( xo - 1.55 ), -ac, r ), ( xs * F.x ), 1.9, sides=14 )
+
+
+def van( model, e, n, along="+n", paint="rw_car_white", z0=0.0, plate="HW L 418" ):
+    """ A parked large panel van (VAN_*), its nose towards along ("+n", "-n", "+e", "-e"), (e, n) its footprint's
+    centre: body paint (the rw_car_* paints), a black bumper and sill band with a silver sill strip, black arch trims,
+    the grille's four bars in a dark frame, slim headlights with their running-light strips, fog lamps, black mirrors
+    with indicators, a cab door, a sliding door with its rail, glazed rear doors, vertical tail lights, steel wheels and
+    the town's number plates. Two metal boxes: the body to the bonnet, and the box behind the windscreen. """
+    L = VAN_L
     F = _vehicle_frame( e, n, along, L, z0 )
+    loc = lambda x, a, z: ( x, -a, z )
 
-    def paint_at( k, a0, a1 ):
-        mid = ( a0 + a1 ) / 2
-        if k == 2 and 26.0 <= mid <= 64.0:
-            return "rw_window_dark"
-        if k == 4 and 26.0 <= mid <= 50.0:
-            return "rw_window_dark"
-        return paint
+    def paint_of( k, mid ):
+        if k == 0:
+            return "rw_rubber", "band"
+        if k <= 2:
+            return paint, "body"
+        if k == 3:
+            if VAN_COWL + 2.0 < mid < VAN_ROOF0 + 32.0:
+                if any( w0 <= mid <= w1 for w0, w1 in VAN_WINDOWS ):
+                    return "rw_window_dark", "glass"
+                if VAN_WINDOWS[0][0] - 1.0 < mid < VAN_WINDOWS[1][1] + 1.2:
+                    return "rw_black", "frame"
+            return paint, "body"
+        if VAN_COWL < mid < VAN_COWL + 1.6 and k >= 5:
+            return "rw_black", "frame"                  # the scuttle under the windscreen
+        if VAN_COWL + 1.6 <= mid < VAN_ROOF0 - 0.6:
+            if k >= 6:
+                return "rw_window_dark", "glass"
+            if k == 5:
+                return "rw_black", "frame"              # the windscreen's black border
+        if VAN_ROOF0 - 0.6 <= mid < VAN_ROOF0 + 0.8 and k >= 5:
+            return "rw_black", "frame"
+        return paint, "body"
 
-    _road_vehicle( model, F, VAN, ( 37.0, 155.1 ), ( 13.5, 8.5, 8.0 ), 15.5, paint_at, [ 64.0 ] )
-    for xs in ( -1, 1 ):
-        F.quad( model, "rw_steel_grey", xs * 25.0, 0.04, 31.5, 12.0, 4.0 )
-        F.quad( model, "rw_red_paint", xs * 33.0, -L - 0.04, 40.0, 3.6, 16.0, "back" )
-        x0, x1 = sorted( ( xs * 36.6, xs * 41.5 ) )
-        F.box( model, x0, x1, -30.0, -27.0, 46.0, 56.0, { "default": "rw_black" } )
-        for a in ( 68.0, 112.0 ):                                   # the sliding door's seams
-            _seam( model, F, VAN, a, xs, 12.0, 73.0 )
-    F.quad( model, "rw_black", 0.0, 0.04, 31.0, 36.0, 5.0 )
-    F.quad( model, "rw_white_paint", 0.0, 0.06, 18.0, 20.5, 4.3 )
-    F.quad( model, "rw_black", 0.0, -L - 0.04, 44.0, 0.4, 62.0, "back" )
-    F.quad( model, "rw_white_paint", 0.0, -L - 0.06, 18.0, 20.5, 4.3, "back" )
-    F.quad( model, "rw_black", 0.0, -L - 0.04, 12.5, 66.0, 3.0, "back" )
-    F.collide( model, -37.5, 37.5, -L, 0.0, 0.0, 78.3, "metal" )
+    _road_body( model, F, _van_profile, _van_side_x, VAN_STATIONS, VAN_AXLES, VAN_TYRE, VAN_ARCH,
+                VAN_TRACK - VAN_TYRE_W / 2 - 0.5, L, paint, paint_of, lambda ac, xs: _van_wheel( model, F, ac, xs ),
+                flare=2.0, flare_lift=0.5 )
+
+    def side_patch( pnt, xs, pts, lift=0.06 ):
+        _fpoly( model, F, pnt, [ loc( xs * ( _van_side_x( a, z ) + lift ), a, z ) for a, z in pts ], ( xs, 0, 0 ) )
+
+    def seam( xs, line, width=0.32 ):
+        for ( a0, z0_ ), ( a1, z1_ ) in zip( line, line[1:] ):
+            dl = math.hypot( a1 - a0, z1_ - z0_ ) or 1.0
+            na, nz = -( z1_ - z0_ ) / dl * width / 2, ( a1 - a0 ) / dl * width / 2
+            side_patch( "rw_black", xs, [ ( a0 - na, z0_ - nz ), ( a1 - na, z1_ - nz ), ( a1 + na, z1_ + nz ),
+                                          ( a0 + na, z0_ + nz ) ], 0.05 )
+
+    belt = lambda a: _van_profile( a )[3][1]
+    top_side = 84.6                             # where the doors end under the roof's rounded edge
+    for xs in ( 1.0, -1.0 ):
+        # The cab door, the sliding door and its rail behind it, the handles, the silver sill strip.
+        seam( xs, [ ( 66.6, 26.2 ), ( 65.6, belt( 65.6 ) - 0.2 ) ] )
+        seam( xs, [ ( 103.0, 26.2 ), ( 103.0, top_side ) ] )
+        for a in ( 106.2, 157.8 ):
+            seam( xs, [ ( a, 26.2 ), ( a, top_side ) ] )
+        seam( xs, [ ( 106.2, top_side ), ( 157.8, top_side ) ] )
+        side_patch( "rw_black", xs, [ ( 158.6, 60.6 ), ( 226.0, 60.6 ), ( 226.0, 62.0 ), ( 158.6, 62.0 ) ], 0.1 )
+        side_patch( "rw_steel_grey", xs, [ ( 60.5, 12.4 ), ( 162.0, 12.4 ), ( 162.0, 14.6 ), ( 60.5, 14.6 ) ], 0.15 )
+        for a0 in ( 95.6, 108.2 ):
+            x0 = _van_side_x( a0 + 1.8, 57.5 )
+            F.box( model, xs * ( x0 + 0.05 ), xs * ( x0 + 0.7 ), -a0, -( a0 + 3.8 ), 56.6, 58.5, "rw_black" )
+        # The mirror: an arm off the door's front corner and a tall black housing, its glass facing back and an
+        # indicator in its outer face.
+        xm = _van_side_x( 69.0, 57.0 )
+        F.box( model, xs * ( xm - 0.6 ), xs * ( xm + 3.0 ), -66.8, -70.8, 55.0, 58.2, "rw_black" )
+        F.box( model, xs * ( xm + 2.4 ), xs * ( xm + 9.2 ), -66.2, -71.6, 55.6, 70.4, "rw_black" )
+        F.box( model, xs * ( xm + 2.8 ), xs * ( xm + 8.8 ), -71.6, -71.75, 56.4, 69.6, "rw_steel_grey" )
+        F.box( model, xs * ( xm + 9.2 ), xs * ( xm + 9.3 ), -69.0, -71.4, 56.8, 58.8, "rw_yellow_paint" )
+        # The tail lights' ends round the rear corners.
+        for a0, a1 in ( ( 233.4, 234.3 ), ( 234.3, 235.0 ), ( 235.0, 235.4 ) ):
+            for z0_, z1_ in ( ( 41.6, 52.0 ), ( 52.0, 56.0 ), ( 56.0, 60.2 ) ):
+                side_patch( "rw_red_paint", xs, [ ( a0, z0_ ), ( a1, z0_ ), ( a1, z1_ ), ( a0, z1_ ) ], 0.12 )
+
+    # Wipers on the windscreen's foot, the roof aerial.
+    for x0, x1 in ( ( 3.0, -24.0 ), ( 31.0, 5.0 ) ):
+        pa = [ ( x0, VAN_COWL + 2.4 ), ( x1, VAN_COWL + 8.5 ) ]
+        rod( model, *[ F.p( x, -a, _van_top_z( a, x ) + 0.4 ) for x, a in pa ], 0.34, "rw_black", 4 )
+    za = _van_top_z( 77.0, 10.0 )
+    rod( model, F.p( -10.0, -77.0, za ), F.p( -10.0, -86.0, za + 14.0 ), 0.22, "rw_black", 4 )
+    disc( model, "rw_black", F.p( -10.0, -77.0, za + 0.05 ), F.z, 1.2, sides=8 )
+
+    # The nose: the bumper's face at a 0, and the grille and headlights on the fascia leaning back above it.
+    def face( pnt, pts, lift ):
+        _fpoly( model, F, pnt, [ ( x, lift, z ) for x, z in pts ], ( 0, 1, 0 ) )
+
+    def nose( x, z, lift ):
+        """ The point at ( x, z ) on the bumper's face, or up on the fascia, lift off it, in the frame's own
+        coordinates. """
+        if z <= _van_top_z( 0.0, x ):
+            return ( x, lift, z )
+        lo, hi = 0.0, 9.0
+        for _ in range( 30 ):
+            m = ( lo + hi ) / 2
+            if _van_top_z( m, x ) < z:
+                lo = m
+            else:
+                hi = m
+        return ( x, -( lo + hi ) / 2 + lift, z + 0.45 * lift )
+
+    def fascia( pnt, x0, x1, zlo, zhi, lift, step=1.5 ):
+        """ A panel on the fascia from x0 to x1 between the heights zlo( x ) and zhi( x ), in strips. """
+        n_ = max( 1, int( math.ceil( abs( x1 - x0 ) / step ) ) )
+        xs_ = [ x0 + ( x1 - x0 ) * j / n_ for j in range( n_ + 1 ) ]
+        for xa, xb in zip( xs_, xs_[1:] ):
+            _fpoly( model, F, pnt, [ nose( xa, zlo( xa ), lift ), nose( xb, zlo( xb ), lift ),
+                                     nose( xb, zhi( xb ), lift ), nose( xa, zhi( xa ), lift ) ], ( 0, 1, 0.5 ) )
+
+    fx = lambda z: _van_side_x( 0.0, z )
+    face( "rw_rubber", [ ( -fx( 12.5 ), 12.5 ), ( fx( 12.5 ), 12.5 ), ( fx( 25.6 ) - 0.2, 25.6 ),
+                         ( -fx( 25.6 ) + 0.2, 25.6 ) ], 0.06 )
+    face( "rw_black", [ ( -13.0, 13.6 ), ( 13.0, 13.6 ), ( 13.8, 18.0 ), ( -13.8, 18.0 ) ], 0.12 )
+    for z in ( 14.8, 16.3 ):
+        face( "rw_rubber", [ ( -12.8, z ), ( 12.8, z ), ( 12.8, z + 0.5 ), ( -12.8, z + 0.5 ) ], 0.18 )
+    _plate( model, F, ( 0.0, 0.42, 21.5 ), ( 1, 0, 0 ), ( 0, 0, 1 ), ( 0, 1, 0 ), plate )
+    for xs in ( 1.0, -1.0 ):
+        face( "rw_black", [ ( xs * 24.6, 14.2 ), ( xs * 31.0, 14.2 ), ( xs * 31.4, 19.4 ), ( xs * 24.2, 19.4 ) ], 0.12 )
+        disc( model, "rw_steel_grey", F.p( xs * 27.6, 0.2, 16.8 ), F.y, 1.55, sides=14 )
+        disc( model, "rw_white_paint", F.p( xs * 27.6, 0.25, 16.8 ), F.y, 1.0, sides=14 )
+    # The grille: four bars in a dark frame, leaning back with the fascia.
+    gz0, gz1 = 27.6, 39.8
+    gw = lambda z: 17.0 + 2.6 * ( z - gz0 ) / ( gz1 - gz0 )
+    fascia( "rw_steel_dark", -gw( gz1 ), gw( gz1 ), lambda x: gz0 if abs( x ) <= gw( gz0 ) else
+            gz0 + ( abs( x ) - gw( gz0 ) ) / 2.6 * ( gz1 - gz0 ), lambda x: gz1, 0.08 )
+    gi = lambda z: gw( z ) - 1.0
+    fascia( "rw_black", -gi( gz1 - 1.0 ), gi( gz1 - 1.0 ), lambda x: gz0 + 1.0 if abs( x ) <= gi( gz0 + 1.0 ) else
+            gz0 + 1.0 + ( abs( x ) - gi( gz0 + 1.0 ) ) / 2.6 * ( gz1 - gz0 ), lambda x: gz1 - 1.0, 0.14 )
+    for zb_ in ( 29.7, 32.2, 34.7, 37.2 ):
+        half = gi( zb_ ) - 0.2
+        fascia( "rw_steel_dark", -half, half, lambda x, zb_=zb_: zb_, lambda x, zb_=zb_: zb_ + 1.25, 0.32 )
+    # The headlights: slim, rising to the corners, the running-light strip along their top and down their inner end.
+    for xs in ( 1.0, -1.0 ):
+        x0, x1 = 20.2, 36.9
+        lo_ = lambda x: 32.0 + 3.0 * ( abs( x ) - x0 ) / ( x1 - x0 )
+        hi_ = lambda x: 39.9 + 1.0 * ( abs( x ) - x0 ) / ( x1 - x0 )
+        fascia( "rw_black", xs * ( x0 - 0.4 ), xs * ( x1 + 0.3 ), lambda x: lo_( x ) - 0.4, lambda x: hi_( x ) + 0.35,
+                0.08 )
+        fascia( "rw_window_dark", xs * x0, xs * x1, lo_, hi_, 0.14 )
+        for c in ( 24.6, 30.4 ):
+            fascia( "rw_steel_grey", xs * ( c - 2.2 ), xs * ( c + 2.2 ), lambda x: lo_( x ) + 1.2,
+                    lambda x: hi_( x ) - 1.6, 0.2, 0.85 )
+        fascia( "rw_lamp_cool", xs * ( x0 + 0.6 ), xs * ( x1 - 0.4 ), lambda x: hi_( x ) - 0.85,
+                lambda x: hi_( x ) - 0.4, 0.24 )
+        fascia( "rw_lamp_cool", xs * ( x0 + 0.6 ), xs * ( x0 + 1.05 ), lambda x: lo_( x ) + 0.4,
+                lambda x: hi_( x ) - 0.4, 0.24, 0.45 )
+    fascia( "rw_black", -33.0, 33.0, lambda x: 40.55, lambda x: 40.85, 0.06, 3.0 )     # the bonnet's shut line
+
+    # The tail: the black bumper with its step and the plate, two doors with their glass, the lamps at the corners
+    # and the high brake light.
+    def back( pnt, pts, lift ):
+        _fpoly( model, F, pnt, [ ( x, -L - lift, z ) for x, z in pts ], ( 0, -1, 0 ) )
+
+    bx = lambda z: _van_side_x( L, z )
+    zr = _van_top_z( L, 0.0 )
+    back( "rw_rubber", [ ( -bx( 13.0 ), 13.0 ), ( bx( 13.0 ), 13.0 ), ( bx( 24.4 ) - 0.2, 24.4 ),
+                         ( -bx( 24.4 ) + 0.2, 24.4 ) ], 0.06 )
+    F.box( model, -18.0, 18.0, -L, -( L + 2.6 ), 22.6, 24.2, { "default": "rw_steel_grey", "bottom": "rw_black" } )
+    _plate( model, F, ( 0.0, -L - 0.42, 17.6 ), ( -1, 0, 0 ), ( 0, 0, 1 ), ( 0, -1, 0 ), plate )
+    for xs in ( 1.0, -1.0 ):
+        back( "rw_black", [ ( xs * 30.6, 27.6 ), ( xs * 35.6, 27.6 ), ( xs * 35.6, 60.8 ), ( xs * 30.6, 60.8 ) ], 0.06 )
+        for z0_, z1_, lamp in ( ( 28.2, 35.6, "rw_white_paint" ), ( 35.6, 41.6, "rw_yellow_paint" ),
+                                ( 41.6, 60.2, "rw_red_paint" ) ):
+            back( lamp, [ ( xs * 31.1, z0_ ), ( xs * 35.1, z0_ ), ( xs * 35.1, z1_ ), ( xs * 31.1, z1_ ) ], 0.12 )
+        back( "rw_black", [ ( xs * 3.0, 62.5 ), ( xs * 27.5, 62.5 ), ( xs * 27.5, 85.5 ), ( xs * 3.0, 85.5 ) ], 0.06 )
+        back( "rw_window_dark", [ ( xs * 3.8, 63.3 ), ( xs * 26.7, 63.3 ), ( xs * 26.7, 84.7 ), ( xs * 3.8, 84.7 ) ],
+              0.1 )
+    back( "rw_black", [ ( -0.18, 24.6 ), ( 0.18, 24.6 ), ( 0.18, zr - 3.0 ), ( -0.18, zr - 3.0 ) ], 0.08 )
+    back( "rw_black", [ ( -bx( 24.6 ) + 1.0, 24.6 ), ( bx( 24.6 ) - 1.0, 24.6 ), ( bx( 25.0 ) - 1.0, 25.0 ),
+                        ( -bx( 25.0 ) + 1.0, 25.0 ) ], 0.08 )
+    F.box( model, -7.4, -2.0, -L, -( L + 0.7 ), 54.2, 56.0, "rw_black" )
+    back( "rw_red_paint", [ ( -8.0, zr - 2.6 ), ( 8.0, zr - 2.6 ), ( 8.0, zr - 1.4 ), ( -8.0, zr - 1.4 ) ], 0.1 )
+
+    # Collision: the body to the bonnet's height, and the box behind the windscreen.
+    F.collide( model, -VAN_W, VAN_W, -L, 0.0, 0.0, 47.6, "metal" )
+    F.collide( model, -VAN_W + 1.0, VAN_W - 1.0, -L, -52.0, 47.6, 92.7, "metal" )
 
 
 def bollard( model, e, n, z0=0.0, kind="steel" ):
@@ -3592,7 +3850,7 @@ def showcase():
         ( "car hatchback", lambda m: car( m, -1000.0, -80.0, "+n", "rw_train_red" ) ),
         ( "car estate", lambda m: car( m, -1090.0, -80.0, "-n", "rw_train_grey", kind="estate" ) ),
         ( "car hatchback", lambda m: car( m, -1180.0, -80.0, "+n", "rw_train_blue" ) ),
-        ( "van", lambda m: van( m, -1280.0, -60.0, "+n", "rw_train_white" ) ),
+        ( "van", lambda m: van( m, -1280.0, -60.0, "+n", "rw_car_white" ) ),
         ( "suv", lambda m: suv( m, -1380.0, -80.0, "+n", "rw_car_grey" ) ),
         ( "car estate", lambda m: car( m, -1160.0, -700.0, "+e", "rw_train_dark", kind="estate" ) ),
     ]

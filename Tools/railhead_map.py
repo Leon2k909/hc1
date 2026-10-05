@@ -125,7 +125,7 @@ FURNITURE = { "bench": ( 70, 20, 34, "rw_wood", WOOD ), "bin": ( 16, 16, 36, "rw
               "info_pillar": ( 20, 20, 90, "rw_steel_dark", METAL ), "timetable_case": ( 50, 8, 80, "rw_steel_dark", METAL ),
               "forklift": ( 48, 90, 85, "rw_yellow_paint", METAL ), "car": ( 70, 180, 58, "rw_train_grey", METAL ),
               "suv": ( 71, 176, 63, "rw_car_grey", METAL ),
-              "van": ( 78, 210, 80, "rw_train_white", METAL ), "crate": ( 40, 40, 40, "rw_wood", WOOD ),
+              "van": ( 81, 236, 93, "rw_car_white", METAL ), "crate": ( 40, 40, 40, "rw_wood", WOOD ),
               "bollard": ( 8, 8, 36, "rw_steel_dark", METAL ), "luggage_cart": ( 40, 80, 36, "rw_steel", METAL ),
               "pallet_stack": ( 48, 40, 40, "rw_wood", WOOD ) }
 
@@ -662,12 +662,14 @@ def cab_road( m, s ):
     """ Taxis waiting at the head building's end of the cab road, nose to the station, cars parked further down, and
     street lamps along the far pavement. """
     for n in ( 600.0, 820.0, 1040.0 ):
-        use( "car", m, s * 1555.0, n, "+n", "rw_train_white", 0.0, "estate",
-             stand_in=furniture_stand_in( "car", s * 1555.0, n ) )
-    use( "suv", m, s * 1555.0, -900.0, "+n", "rw_car_grey", stand_in=furniture_stand_in( "suv", s * 1555.0, -900.0 ) )
-    use( "car", m, s * 1555.0, 1300.0, "+n", "rw_train_blue" if s > 0 else "rw_train_red",
-         stand_in=furniture_stand_in( "car", s * 1555.0, 1300.0 ) )
-    use( "van", m, s * 1940.0, -900.0, "-n", stand_in=furniture_stand_in( "van", s * 1940.0, -900.0 ) )
+        use( "car", m, s * 1555.0, n, "+n", "rw_train_white", ROAD_Z, "estate",
+             stand_in=furniture_stand_in( "car", s * 1555.0, n, z0=ROAD_Z ) )
+    use( "suv", m, s * 1555.0, -900.0, "+n", "rw_car_grey", ROAD_Z,
+         stand_in=furniture_stand_in( "suv", s * 1555.0, -900.0, z0=ROAD_Z ) )
+    use( "car", m, s * 1555.0, 1300.0, "+n", "rw_train_blue" if s > 0 else "rw_train_red", ROAD_Z,
+         stand_in=furniture_stand_in( "car", s * 1555.0, 1300.0, z0=ROAD_Z ) )
+    use( "van", m, s * 1940.0, -900.0, "-n", "rw_car_white", ROAD_Z,
+         stand_in=furniture_stand_in( "van", s * 1940.0, -900.0, z0=ROAD_Z ) )
     for n in ( -1000.0, -400.0, 200.0, 800.0, 1400.0 ):
         use( "lamp_post", m, s * 2100.0, n, 236.0,
              stand_in=lambda m_, n=n: m_.cylinder( ( s * 2100.0, n ), 2.5, 0, 236, "rw_steel_dark", sides=8, surface=METAL ) )
