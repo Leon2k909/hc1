@@ -12,7 +12,8 @@ posters, shop signs, graffiti, the cast bronze lettering and the platform clock.
 - Writes Assets/materials/railhead/<texture>_normal.png and _rough.png per texture (with _trans.png for the
   alpha-tested ones (lattice, graffiti, lettering) and _illum.png for the self-lit masks of the signs, displays
   and shop signs), and per paint <paint>_color.png and <paint>.vmat.
-  Most are on shaders/complex.shader; rw_glass and rw_glass_roof are on shaders/glass.shader.
+  Most are on shaders/complex.shader; rw_glass and rw_glass_roof are on shaders/glass.shader. The car paints
+  (PAINTED) are flat colours with no texture of their own, so they get a vmat only.
 - Every texture tiles over its tile units (paints(); map_kit's world-scale UVs read them through the model's
   tile_overrides), except the decal (DECALS: the clock, 0..1 across its polygon), the lattice (one panel per 1.0 of u)
   and the atlases (ATLASES), which the map scripts place by rect_uv().
@@ -2885,6 +2886,15 @@ METALNESS = { "rw_rail_head": 1.0, "rw_lettering": 0.5 }
 ALPHA_TESTED = { "rw_lattice", "rw_graffiti", "rw_lettering" }
 # Clear glass on shaders/glass.shader: ( tint, absorption ).
 GLASS = { "rw_glass": ( ( 0.92, 0.95, 0.94 ), 0.15 ) }
+# Car paint, with no texture of its own: white (materials/default/default_color.tga) tinted to the colour through
+# g_vColorTint, flat normals and one roughness all over, a clear coat's. paint: ( sRGB colour, metalness, roughness ).
+# The trains' paints have their grime and panel seams, and every other texture its dirt, which read wrong on a car.
+PAINTED = { "rw_car_grey": ( ( 74, 78, 83 ), 0.4, 0.3 ),            # a metallic graphite grey
+            "rw_car_silver": ( ( 160, 164, 168 ), 0.6, 0.3 ),
+            "rw_car_white": ( ( 226, 228, 228 ), 0.0, 0.28 ),
+            "rw_car_black": ( ( 20, 21, 23 ), 0.2, 0.25 ),
+            "rw_car_red": ( ( 140, 16, 22 ), 0.3, 0.28 ),
+            "rw_car_blue": ( ( 22, 44, 90 ), 0.4, 0.28 ) }
 # Textured glass on shaders/glass.shader (its texture's colour, normal and roughness): paint: absorption.
 TEXTURED_GLASS = { "rw_glass_roof": 0.45 }
 # Paints whose picture's bottom edge stands at z 0 (two storeys a tile).
@@ -2908,6 +2918,8 @@ def paints():
     out = { p: ( tex, TEXTURES[tex][4] ) for tex, ps in TEXTURE_PAINTS.items() for p in ps }
     for g in GLASS:
         out[g] = ( "glass", 64.0 )
+    for p in PAINTED:
+        out[p] = ( "painted", 96.0 )
     return out
 
 
@@ -2981,6 +2993,25 @@ def glass_vmat( paint_name, tint, absorption ):
              "}\n" )
 
 
+def painted_vmat( paint_name, colour, metalness, roughness ):
+    """ A PAINTED paint: a flat colour, flat normals, one roughness. """
+    r, g, b = ( c / 255.0 for c in colour )
+    return ( '// Tools/railhead_materials.py\n'
+             '"Layer0"\n'
+             "{\n"
+             '    shader "shaders/complex.shader"\n'
+             '    F_SPECULAR "1"\n'
+             '    g_flRoughnessScaleFactor "1"\n'
+             f'    g_flMetalness "{metalness:.2f}"\n'
+             '    TextureColor "materials/default/default_color.tga"\n'
+             '    TextureNormal "materials/default/default_normal.tga"\n'
+             f'    TextureRoughness "[{roughness:.6f} {roughness:.6f} {roughness:.6f} 0.000000]"\n'
+             f'    TextureAmbientOcclusion "{DEFAULT_AO}"\n'
+             f'    g_vColorTint "[{r:.6f} {g:.6f} {b:.6f} 1.000000]"\n'
+             '    g_flModelTintAmount "1.0"\n'
+             "}\n" )
+
+
 def textured_glass_vmat( paint_name, texture, absorption ):
     """ Glass with a picture (the wired, dirty roof glazing), as building_textures' glass_vmat: the colour is the light
     let through, and the roughness blurs what's behind. """
@@ -3042,6 +3073,14 @@ def write_glass( out_dir ):
     print( f"wrote glass: {', '.join( GLASS )}" )
 
 
+def write_painted( out_dir ):
+    out_dir.mkdir( parents=True, exist_ok=True )
+    for paint_name, ( colour, metalness, rough ) in PAINTED.items():
+        ( out_dir / f"{paint_name}.vmat" ).write_text( painted_vmat( paint_name, colour, metalness, rough ),
+                                                       encoding="utf-8", newline="\n" )
+    print( f"wrote paints: {', '.join( PAINTED )}" )
+
+
 def lit( colour, normal, alpha=None ):
     light = np.array( ( -0.45, 0.55, 0.7 ) )
     light /= np.linalg.norm( light )
@@ -3085,6 +3124,7 @@ def main():
             parser.error( f"unknown texture {name}" )
     results = { name: write_texture( name, out_dir ) for name in names }
     write_glass( out_dir )
+    write_painted( out_dir )
     if args.sheet:
         write_sheet( results, args.sheet )
 

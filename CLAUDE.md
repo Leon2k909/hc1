@@ -2112,6 +2112,15 @@ simulate_input.
         strapped suitcases and a kit bag (2026-10-05).
       - Both were checked only in offline WebGL renders of the generators' output with the map's textures, not in the
         engine: rerun `railhead_map.py` to rebuild the models.
+    - The grey car parked at each cab road's south end (n -900) is `suv` (2026-10-05, from the user's picture of a
+      modern crossover): a lofted body (`_suv_profile`) shaded smooth per part (`_Smooth`), black cladding and arch
+      flares, a honeycomb grille, an LED light bar with boomerang intakes, dark 19-inch alloys, roof rails, wrap-round
+      tail lights and German plates ("HW K 318", `PLATE_FONT`). No maker's badge. The taxis and the red and blue
+      cars are still the old `car`.
+    - Car paint is `railhead_materials.PAINTED` (`rw_car_grey` and five more): vmats only, a flat tint on
+      `materials/default/default_color.tga` with one roughness, since every texture's dirt and the trains' panel seams
+      looked wrong on a car. The vmats were written straight from `painted_vmat`; `railhead_materials.py` writes the
+      same ones.
     - Furniture and clutter: benches, machines, kiosks, shelters, hanging displays and signs, clocks, lamps, fences,
       pallets, forklifts, cars and vans.
     - `--preview <dir>` renders its showcase.

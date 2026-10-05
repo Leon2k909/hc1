@@ -2890,6 +2890,533 @@ def car( model, e, n, along="+n", paint="rw_train_grey", z0=0.0, kind="hatch" ):
     F.collide( model, -35.2, 35.2, -L, 0.0, 0.0, 57.3, "metal" )
 
 
+# ---------------------------------------------------------------------------------------------------------------------
+# A compact crossover SUV, as a modern one is: 4.47 m long, 1.81 m wide, 1.61 m tall, a 2.64 m wheelbase on 235/50 R19
+# tyres. Its body is lofted through cross-sections (_suv_profile) along a, the depth behind its front bumper's face,
+# shaded smooth within each part. No maker's name or badge: the grille is plain and the plates are the town's (HW).
+
+SUV_L = 176.0
+SUV_W = 35.6                # half its width over the body
+SUV_AXLES = ( 37.0, 141.0 )
+SUV_TYRE, SUV_TYRE_W, SUV_RIM = 14.1, 9.25, 9.5   # 235/50 R19
+SUV_TRACK = 30.6            # the tyres' centre lines off the car's
+SUV_ARCH = 15.6             # the arches' radius, with 3.0 of black flare round them
+SUV_COWL, SUV_ROOF0, SUV_ROOF1, SUV_GLASS1 = 49.0, 79.0, 153.0, 164.0   # the windscreen's foot and top, the roof's
+#                                                                         end and the rear window's foot
+SUV_PLAN = [ ( 0.0, 30.6 ), ( 1.0, 32.2 ), ( 2.5, 33.6 ), ( 5.0, 34.7 ), ( 9.0, 35.3 ), ( 16.0, 35.6 ),
+             ( 160.0, 35.6 ), ( 167.0, 35.2 ), ( 171.0, 34.5 ), ( 174.0, 33.3 ), ( 176.0, 31.2 ) ]
+SUV_BOTTOM = [ ( 0.0, 12.5 ), ( 8.0, 10.2 ), ( 24.0, 8.8 ), ( 152.0, 8.8 ), ( 168.0, 10.5 ), ( 176.0, 13.0 ) ]
+SUV_TOP = [ ( 0.0, 29.6 ), ( 0.8, 31.2 ), ( 1.8, 32.4 ), ( 3.2, 33.4 ), ( 6.0, 34.5 ), ( 10.0, 35.6 ), ( 30.0, 38.6 ),
+            ( SUV_COWL, 40.5 ), ( SUV_ROOF0, 61.0 ), ( 98.0, 63.2 ), ( 122.0, 62.8 ), ( 142.0, 61.2 ),
+            ( SUV_ROOF1, 59.6 ), ( SUV_GLASS1, 46.2 ), ( 172.0, 34.4 ), ( 174.0, 31.8 ), ( SUV_L, 30.6 ) ]
+SUV_BELT = [ ( 0.0, 32.6 ), ( 10.0, 34.6 ), ( 48.0, 39.7 ), ( 52.0, 40.7 ), ( 100.0, 42.5 ), ( 145.0, 44.8 ),
+             ( 153.0, 45.4 ) ]
+SUV_STATIONS = [ 0.0, 0.4, 0.8, 1.3, 1.8, 2.5, 3.2, 4.2, 5.0, 6.0, 7.0, 9.0, 12.0, 16.0, 21.0, 30.0, 40.0, SUV_COWL, 50.5, 52.5, 56.0,
+                 61.0, 66.0, 71.0, 75.0, SUV_ROOF0, 84.0, 90.0, 95.5, 99.5, 106.0, 113.0, 120.0, 127.0, 133.5,
+                 137.0, 145.0, 149.0, 151.5, SUV_ROOF1, 155.0, 157.5, 160.0, 162.0, SUV_GLASS1, 166.0, 168.0, 170.0,
+                 172.0, 173.2, 174.0, 175.0, 175.6, SUV_L ]
+SUV_WINDOWS = ( ( 53.5, 95.5 ), ( 99.5, 133.5 ), ( 137.0, 151.0 ) )      # side glass along a: the doors' and the
+#                                                                          rear quarter's; black pillars between
+# A 5 x 7 plate font (rows top to bottom), narrow like the German plates' own.
+PLATE_FONT = {
+    "H": "#...#|#...#|#...#|#####|#...#|#...#|#...#", "W": "#...#|#...#|#...#|#.#.#|#.#.#|##.##|#...#",
+    "K": "#...#|#..#.|#.#..|##...|#.#..|#..#.|#...#", "D": "####.|#...#|#...#|#...#|#...#|#...#|####.",
+    "1": "..#..|.##..|..#..|..#..|..#..|..#..|.###.", "3": "####.|....#|....#|.###.|....#|....#|####.",
+    "8": ".###.|#...#|#...#|.###.|#...#|#...#|.###.", "4": "...#.|..##.|.#.#.|#..#.|#####|...#.|...#.",
+    "-": ".....|.....|.....|.###.|.....|.....|.....", " ": ".....|.....|.....|.....|.....|.....|.....",
+}
+
+
+def _interp( table, a ):
+    return float( np.interp( a, [ t[0] for t in table ], [ t[1] for t in table ] ) )
+
+
+def _suv_profile( a ):
+    """ The right half of the body's cross-section at depth a, bottom to the roof's (or bonnet's, or tailgate's)
+    centre: the sill's tuck, the cladding's top, the widest line, the shoulder crease, the belt, then four points over
+    the top. """
+    W = _interp( SUV_PLAN, a )
+    zb, zt = _interp( SUV_BOTTOM, a ), _interp( SUV_TOP, a )
+    belt = min( _interp( SUV_BELT, a ), zt - 1.2 )
+    sh = min( 36.6, belt - 1.5 )
+    mx = min( 31.5, sh - 1.5 )
+    lo = min( 17.0, mx - 1.0 )
+    xb = W - 2.4
+    side = [ ( W - 2.2, zb ), ( W - 0.5, lo ), ( W, mx ), ( W - 0.9, sh ), ( xb, belt ) ]
+
+    def bonnet():               # across a bonnet or tailgate, from the fender line up to the centre
+        d = zt - belt
+        return [ ( xb - 3.2, belt + 0.5 * d ), ( xb - 6.5, belt + 0.78 * d ), ( min( 20.0, xb - 9.0 ), belt + 0.93 * d ),
+                 ( 10.0, zt - 0.06 ), ( 0.0, zt ) ]
+
+    def cabin():                # the window's top, its black frame's, the roof's side and its crown
+        return [ ( 30.4, zt - 4.0 ), ( 29.7, zt - 3.0 ), ( 28.0, zt - 1.4 ), ( 16.0, zt - 0.3 ), ( 0.0, zt ) ]
+
+    def blend( p, q, t ):
+        t = t * t * ( 3 - 2 * t )
+        return [ ( pa[0] + ( qa[0] - pa[0] ) * t, pa[1] + ( qa[1] - pa[1] ) * t ) for pa, qa in zip( p, q ) ]
+
+    if a <= SUV_COWL:
+        top = bonnet()
+    elif a < SUV_ROOF0:
+        top = blend( bonnet(), cabin(), ( a - SUV_COWL ) / ( SUV_ROOF0 - SUV_COWL ) )
+    elif a <= SUV_ROOF1:
+        top = cabin()
+    elif a < SUV_GLASS1:
+        top = blend( cabin(), bonnet(), ( a - SUV_ROOF1 ) / ( SUV_GLASS1 - SUV_ROOF1 ) )
+    else:
+        top = bonnet()
+    return side + top
+
+
+def _suv_side_x( a, z ):
+    """ The body side's x at height z (up to the belt) at depth a. """
+    prof = _suv_profile( a )[:5]
+    if z <= prof[0][1]:
+        return prof[0][0]
+    for ( x0, z0 ), ( x1, z1 ) in zip( prof, prof[1:] ):
+        if z0 <= z <= z1:
+            return x0 + ( x1 - x0 ) * ( z - z0 ) / max( z1 - z0, 1e-6 )
+    return prof[4][0]
+
+
+def _suv_top_z( a, x ):
+    """ The top surface's z at |x| (inside the belt) at depth a. """
+    prof = _suv_profile( a )[4:]
+    x = abs( x )
+    for ( x0, z0 ), ( x1, z1 ) in zip( prof, prof[1:] ):
+        if x1 <= x <= x0:
+            return z0 + ( z1 - z0 ) * ( x0 - x ) / max( x0 - x1, 1e-6 )
+    return prof[0][1]
+
+
+class _Smooth:
+    """ Polygons gathered with their part's name, then drawn with a normal per corner averaged over the faces that meet
+    there in the same part, so each part shades smooth and the edges between parts stay crisp. Points are the
+    vehicle frame's ( x, -a, z ). """
+
+    def __init__( self ):
+        self.faces = []
+        self.acc = {}
+
+    @staticmethod
+    def key( p, part ):
+        return ( round( p[0], 3 ), round( p[1], 3 ), round( p[2], 3 ), part )
+
+    def add( self, paint, part, pts, hint ):
+        pts = _clean( [ tuple( float( c ) for c in p ) for p in pts ] )
+        if len( pts ) < 3:
+            return
+        n = np.zeros( 3 )
+        for k in range( 1, len( pts ) - 1 ):
+            n += np.cross( np.subtract( pts[k], pts[0] ), np.subtract( pts[k + 1], pts[0] ) )
+        if np.linalg.norm( n ) < 1e-9:
+            return
+        if np.dot( n, hint ) < 0:
+            n = -n
+        self.faces.append( ( paint, part, pts, n ) )
+        for p in pts:
+            k = self.key( p, part )
+            self.acc[k] = self.acc.get( k, np.zeros( 3 ) ) + n
+
+    def draw( self, model, F ):
+        for paint, part, pts, n in self.faces:
+            normals = []
+            for p in pts:
+                v = self.acc[self.key( p, part )]
+                length = np.linalg.norm( v )
+                normals.append( tuple( v / length ) if length > 1e-9 else tuple( n / np.linalg.norm( n ) ) )
+            _fpoly( model, F, paint, pts, tuple( n ), normals=normals )
+
+
+def _suv_wheel( model, F, ac, xs ):
+    """ A wheel at depth ac on side xs: a 235/50 R19 tyre with rounded shoulders on a dark ten-spoke alloy (five pairs),
+    the brake disc behind it. """
+    r, w, rim = SUV_TYRE, SUV_TYRE_W, SUV_RIM
+    xo, xi = SUV_TRACK + w / 2, SUV_TRACK - w / 2
+
+    def p( x, rad, t ):         # x across, at radius rad and angle t round the hub, in the frame's own coordinates
+        return ( xs * x, -( ac + rad * math.cos( t ) ), r + rad * math.sin( t ) )
+
+    rod( model, F.p( xs * ( xi + 0.9 ), -ac, r ), F.p( xs * ( xo - 0.9 ), -ac, r ), r, "rw_rubber", 28 )
+    for x0, x1, r1 in ( ( xo - 0.9, xo, r - 1.1 ), ( xi + 0.9, xi, r - 1.1 ) ):
+        _frustum( model, F.p( xs * x0, -ac, r ), F.p( xs * x1, -ac, r ), r, r1, "rw_rubber", 28 )
+    n = 28
+    for k in range( n ):            # the sidewalls, the rim's lip and the barrel's back
+        t0, t1 = 2 * math.pi * k / n, 2 * math.pi * ( k + 1 ) / n
+        for x, r0, r1, paint, out in ( ( xo, rim + 0.6, r - 1.1, "rw_rubber", 1 ), ( xo + 0.02, rim, rim + 0.6,
+                                                                                    "rw_steel_dark", 1 ),
+                                       ( xi, 0.0, r - 1.1, "rw_rubber", -1 ) ):
+            _fpoly( model, F, paint, [ p( x, r0, t0 ), p( x, r1, t0 ), p( x, r1, t1 ), p( x, r0, t1 ) ],
+                    ( out * xs, 0, 0 ) )
+    disc( model, "rw_black", F.p( xs * ( xo - 3.2 ), -ac, r ), ( xs * F.x ), rim, sides=24 )
+    disc( model, "rw_steel_grey", F.p( xs * ( xo - 2.9 ), -ac, r ), ( xs * F.x ), 6.9, sides=24 )
+    disc( model, "rw_bogie", F.p( xs * ( xo - 2.85 ), -ac, r ), ( xs * F.x ), 3.4, sides=12 )
+    for pair in range( 5 ):         # five pairs of spokes, from the hub out to the lip, the hub sunk 0.9
+        for side in ( -1, 1 ):
+            t = 2 * math.pi * pair / 5 + side * math.radians( 9.0 )
+            rh, rl = 2.9, rim - 0.1
+            dh, dl = math.radians( 8.0 ), math.radians( 3.4 )
+            pts = [ p( xo - 0.9, rh, t - dh ), p( xo - 0.15, rl, t - dl ), p( xo - 0.15, rl, t + dl ),
+                    p( xo - 0.9, rh, t + dh ) ]
+            _fpoly( model, F, "rw_steel_dark", pts, ( xs, 0, 0 ) )
+    disc( model, "rw_steel_dark", F.p( xs * ( xo - 0.88 ), -ac, r ), ( xs * F.x ), 3.0, sides=16 )
+    disc( model, "rw_steel_grey", F.p( xs * ( xo - 0.8 ), -ac, r ), ( xs * F.x ), 1.2, sides=12 )
+    for k in range( 5 ):
+        t = 2 * math.pi * ( k + 0.5 ) / 5
+        disc( model, "rw_steel_grey", F.p( *p( xo - 0.82, 2.1, t ) ), ( xs * F.x ), 0.38, sides=6 )
+
+
+def _plate( model, F, centre, right, up, facing, text ):
+    """ A German number plate, 520 x 110 mm: white, the blue band with its ring of stars and D on the left, the text
+    in black in the plate font. centre, right (the reader's), up and facing in the vehicle frame's coordinates (which
+    are left-handed, so facing is given rather than worked out). """
+    c, r, u = np.asarray( centre, float ), _unit( right ), _unit( up )
+    face = _unit( facing )
+    P = lambda x, y, lift: tuple( c + r * x + u * y + face * lift )
+    W, H = 10.24, 2.17
+    _fpoly( model, F, "rw_black", [ P( -W - 0.25, -H - 0.25, 0 ), P( W + 0.25, -H - 0.25, 0 ), P( W + 0.25, H + 0.25, 0 ),
+                                    P( -W - 0.25, H + 0.25, 0 ) ], tuple( face ) )
+    _fpoly( model, F, "rw_white_paint", [ P( -W, -H, 0.05 ), P( W, -H, 0.05 ), P( W, H, 0.05 ), P( -W, H, 0.05 ) ],
+            tuple( face ) )
+    band = 1.58
+    _fpoly( model, F, "rw_train_blue", [ P( -W, -H, 0.08 ), P( -W + band, -H, 0.08 ), P( -W + band, H, 0.08 ),
+                                         P( -W, H, 0.08 ) ], tuple( face ) )
+    for k in range( 12 ):
+        t = 2 * math.pi * k / 12
+        x, y = -W + band / 2 + 0.42 * math.cos( t ), 0.9 + 0.42 * math.sin( t )
+        _fpoly( model, F, "rw_yellow_paint", [ P( x - 0.06, y - 0.06, 0.1 ), P( x + 0.06, y - 0.06, 0.1 ),
+                                               P( x + 0.06, y + 0.06, 0.1 ), P( x - 0.06, y + 0.06, 0.1 ) ],
+                tuple( face ) )
+
+    def write( s, x0, y0, px, py, paint, lift ):
+        for i, ch in enumerate( s ):
+            rows = PLATE_FONT.get( ch, PLATE_FONT[" "] ).split( "|" )
+            for rr, row in enumerate( rows ):
+                c0 = None
+                for cc, on in enumerate( row + "." ):
+                    if on == "#" and c0 is None:
+                        c0 = cc
+                    elif on != "#" and c0 is not None:
+                        xa, xb = x0 + ( 6 * i + c0 ) * px, x0 + ( 6 * i + cc ) * px
+                        ya, yb = y0 - ( rr + 1 ) * py, y0 - rr * py
+                        _fpoly( model, F, paint, [ P( xa, ya, lift ), P( xb, ya, lift ), P( xb, yb, lift ),
+                                                   P( xa, yb, lift ) ], tuple( face ) )
+                        c0 = None
+
+    write( "D", -W + band / 2 - 0.45, -0.25, 0.18, 0.22, "rw_white_paint", 0.11 )
+    px, py = 0.34, 0.46
+    width = ( 6 * len( text ) - 1 ) * px
+    x0 = -W + band + ( 2 * W - band - width ) / 2
+    write( text, x0, 7 * py / 2, px, py, "rw_black", 0.1 )
+
+
+def suv( model, e, n, along="+n", paint="rw_car_grey", z0=0.0, plate="HW K 318" ):
+    """ A parked compact crossover SUV (SUV_*), its nose towards along ("+n", "-n", "+e", "-e"), (e, n) its footprint's
+    centre. Body paint (the rw_car_* paints), black cladding round the sills and arches, tinted glass in black frames,
+    a black honeycomb grille, a slim LED light bar across the nose, boomerang air intakes at its corners lit along
+    their edges, wrap-round tail lights joined by a light bar, roof rails, a roof spoiler, dark ten-spoke alloys and
+    the town's number plates. Two metal boxes: the body to the belt and the cabin. """
+    L = SUV_L
+    F = _vehicle_frame( e, n, along, L, z0 )
+    S = _Smooth()
+    loc = lambda x, a, z: ( x, -a, z )
+    axles = SUV_AXLES
+    steps = 10
+    stations = sorted( set( SUV_STATIONS ) | { ac - SUV_ARCH * math.cos( math.pi * j / steps )
+                                               for ac in axles for j in range( steps + 1 ) } )
+    profiles = { a: _suv_profile( a ) for a in stations }
+
+    def in_arch( a ):
+        return any( abs( a - ac ) < SUV_ARCH - 1e-6 for ac in axles )
+
+    def arch_z( a ):
+        ac = min( axles, key=lambda c: abs( a - c ) )
+        return SUV_TYRE + math.sqrt( max( 0.0, SUV_ARCH ** 2 - ( a - ac ) ** 2 ) )
+
+    def paint_of( k, mid ):
+        if k == 0:
+            return "rw_rubber", "clad"
+        if k <= 3:
+            return paint, "body"
+        if k == 4:
+            if SUV_COWL < mid < SUV_ROOF1 + 0.5:
+                if any( w0 <= mid <= w1 for w0, w1 in SUV_WINDOWS ):
+                    return "rw_window_dark", "glass"
+                if mid > SUV_WINDOWS[0][0]:
+                    return "rw_black", "frame"
+            return paint, "body"
+        if k == 5:
+            if SUV_COWL < mid < SUV_GLASS1 - 0.5:     # the A pillars and the window frames
+                return "rw_black", "frame"
+            return paint, "body"
+        if SUV_COWL < mid < SUV_COWL + 1.5:
+            return "rw_black", "frame"
+        if SUV_COWL + 1.5 <= mid < SUV_ROOF0 or SUV_ROOF1 + 1.0 < mid < SUV_GLASS1 - 0.5:
+            return "rw_window_dark", "glass"
+        if k == 6 and SUV_ROOF1 <= mid <= SUV_ROOF1 + 1.0:
+            return "rw_black", "frame"
+        return paint, "body"
+
+    # The body's skin, both sides.
+    for a0, a1 in zip( stations, stations[1:] ):
+        p0, p1 = profiles[a0], profiles[a1]
+        mid = ( a0 + a1 ) / 2
+        arch = in_arch( mid )
+        for k in range( len( p0 ) - 1 ):
+            if arch and k <= 1:
+                continue
+            pnt, part = paint_of( k, mid )
+            for xs in ( 1.0, -1.0 ):
+                dx = ( p0[k + 1][0] - p0[k][0] + p1[k + 1][0] - p1[k][0] )
+                dz = ( p0[k + 1][1] - p0[k][1] + p1[k + 1][1] - p1[k][1] )
+                S.add( pnt, part, [ loc( xs * p0[k][0], a0, p0[k][1] ), loc( xs * p0[k + 1][0], a0, p0[k + 1][1] ),
+                                    loc( xs * p1[k + 1][0], a1, p1[k + 1][1] ), loc( xs * p1[k][0], a1, p1[k][1] ) ],
+                       ( xs * dz, 0.0, -dx ) )
+        if arch:            # round the wheel arches: the side from the arch's edge up to the widest line
+            for xs in ( 1.0, -1.0 ):
+                z0a, z1a = arch_z( a0 ), arch_z( a1 )
+                lo0, lo1 = p0[1][1], p1[1][1]
+                pts = [ loc( xs * _suv_side_x( a0, max( z0a, lo0 ) ), a0, max( z0a, lo0 ) ),
+                        loc( xs * _suv_side_x( a1, max( z1a, lo1 ) ), a1, max( z1a, lo1 ) ),
+                        loc( xs * p1[2][0], a1, p1[2][1] ), loc( xs * p0[2][0], a0, p0[2][1] ) ]
+                S.add( paint, "body", pts, ( xs, 0, 0 ) )
+                if z0a < lo0 or z1a < lo1:
+                    S.add( "rw_rubber", "clad", [ loc( xs * _suv_side_x( a0, min( z0a, lo0 ) ), a0, min( z0a, lo0 ) ),
+                                                  loc( xs * _suv_side_x( a1, min( z1a, lo1 ) ), a1, min( z1a, lo1 ) ),
+                                                  loc( xs * p1[1][0], a1, lo1 ), loc( xs * p0[1][0], a0, lo0 ) ],
+                           ( xs, 0, 0 ) )
+    # The nose and tail: flat faces of the end sections.
+    for a, toward in ( ( 0.0, 1.0 ), ( L, -1.0 ) ):
+        prof = profiles[a]
+        pts = [ loc( x, a, z ) for x, z in prof ] + [ loc( -x, a, z ) for x, z in reversed( prof ) if x > 0 ]
+        S.add( paint, "cap%d" % int( a ), pts, ( 0, toward, 0 ) )
+    S.draw( model, F )
+
+    # The underside, the arches' liners and flares, and the wheels.
+    for a0, a1 in zip( stations, stations[1:] ):
+        p0, p1 = profiles[a0], profiles[a1]
+        half = lambda p: SUV_TRACK - SUV_TYRE_W / 2 - 0.5 if in_arch( ( a0 + a1 ) / 2 ) else p[0][0]
+        _fpoly( model, F, "rw_black", [ loc( -half( p0 ), a0, p0[0][1] ), loc( half( p0 ), a0, p0[0][1] ),
+                                        loc( half( p1 ), a1, p1[0][1] ), loc( -half( p1 ), a1, p1[0][1] ) ],
+                ( 0, 0, -1 ) )
+    for ac in axles:
+        arc = [ ( ac - SUV_ARCH * math.cos( math.pi * j / steps ), math.pi - math.pi * j / steps )
+                for j in range( steps + 1 ) ]
+        for xs in ( 1.0, -1.0 ):
+            for ( a0, t0 ), ( a1, t1 ) in zip( arc, arc[1:] ):
+                z0_, z1_ = SUV_TYRE + SUV_ARCH * math.sin( t0 ), SUV_TYRE + SUV_ARCH * math.sin( t1 )
+                xo0, xo1 = _suv_side_x( a0, z0_ ), _suv_side_x( a1, z1_ )
+                _fpoly( model, F, "rw_rubber", [ loc( xs * xo0, a0, z0_ ), loc( xs * xo1, a1, z1_ ),
+                                                 loc( xs * ( xo1 - 11.0 ), a1, z1_ ),
+                                                 loc( xs * ( xo0 - 11.0 ), a0, z0_ ) ],
+                        ( 0, ( a0 + a1 ) / 2 - ac, SUV_TYRE - ( z0_ + z1_ ) / 2 ) )
+                # The flare: a black band 3.0 wide round the arch, standing 0.7 proud, with its inner edge.
+                ro = SUV_ARCH + 3.0
+                pts = []
+                for t, rad in ( ( t0, SUV_ARCH ), ( t0, ro ), ( t1, ro ), ( t1, SUV_ARCH ) ):
+                    aa, zz = ac + rad * math.cos( t ), SUV_TYRE + rad * math.sin( t )
+                    pts.append( loc( xs * ( _suv_side_x( aa, zz ) + 0.7 ), aa, zz ) )
+                _fpoly( model, F, "rw_rubber", pts, ( xs, 0, 0 ) )
+                edge = []
+                for t, lift in ( ( t0, 0.0 ), ( t0, 0.7 ), ( t1, 0.7 ), ( t1, 0.0 ) ):
+                    aa, zz = ac + SUV_ARCH * math.cos( t ), SUV_TYRE + SUV_ARCH * math.sin( t )
+                    edge.append( loc( xs * ( _suv_side_x( aa, zz ) + lift ), aa, zz ) )
+                _fpoly( model, F, "rw_rubber", edge, ( 0, ( a0 + a1 ) / 2 - ac, SUV_TYRE - ( z0_ + z1_ ) / 2 ) )
+            wall = [ loc( xs * ( _suv_side_x( a, z ) - 11.0 ), a, z ) for a, z in
+                     [ ( ac + SUV_ARCH * math.cos( t ), SUV_TYRE + SUV_ARCH * math.sin( t ) ) for _, t in arc ] ]
+            _fpoly( model, F, "rw_black", wall, ( xs, 0, 0 ) )
+            _suv_wheel( model, F, ac, xs )
+
+    def side_patch( pnt, xs, pts, lift=0.06 ):
+        """ A flat patch on the side, its corners ( a, z ), lift off the skin. """
+        _fpoly( model, F, pnt, [ loc( xs * ( _suv_side_x( a, z ) + lift ), a, z ) for a, z in pts ], ( xs, 0, 0 ) )
+
+    def seam( xs, line, width=0.32 ):
+        """ A panel gap along a line of ( a, z ) on the side. """
+        for ( a0, z0_ ), ( a1, z1_ ) in zip( line, line[1:] ):
+            dl = math.hypot( a1 - a0, z1_ - z0_ ) or 1.0
+            na, nz = -( z1_ - z0_ ) / dl * width / 2, ( a1 - a0 ) / dl * width / 2
+            side_patch( "rw_black", xs, [ ( a0 - na, z0_ - nz ), ( a1 - na, z1_ - nz ), ( a1 + na, z1_ + nz ),
+                                          ( a0 + na, z0_ + nz ) ], 0.05 )
+
+    belt = lambda a: _suv_profile( a )[4][1]
+    for xs in ( 1.0, -1.0 ):
+        # Door gaps: the front door's front edge behind the front arch, the B pillar's, the rear door's rear edge
+        # round the rear arch; the fuel filler on the right.
+        seam( xs, [ ( 55.0, 17.2 ), ( 54.2, 31.5 ), ( 53.4, belt( 53.4 ) - 0.3 ) ] )
+        seam( xs, [ ( 97.5, 17.2 ), ( 97.5, belt( 97.5 ) - 0.3 ) ] )
+        rear = [ ( 141.0 + 19.4 * math.cos( math.radians( t ) ), SUV_TYRE + 19.4 * math.sin( math.radians( t ) ) )
+                 for t in range( 172, 96, -12 ) ]
+        seam( xs, [ ( 121.6, 17.2 ) ] + rear + [ ( 138.4, belt( 138.4 ) - 0.3 ) ] )
+        if xs > 0:
+            seam( xs, [ ( 147.0, 38.0 ), ( 152.5, 38.0 ), ( 152.5, 42.5 ), ( 147.0, 42.5 ), ( 147.0, 38.0 ) ], 0.24 )
+        # Flush door handles on the shoulder, and the mirrors on the doors at the A pillar's foot.
+        for a0 in ( 80.0, 120.5 ):
+            side_patch( "rw_black", xs, [ ( a0 - 0.4, 37.1 ), ( a0 + 6.4, 37.1 ), ( a0 + 6.4, 38.9 ),
+                                          ( a0 - 0.4, 38.9 ) ], 0.08 )
+            x0 = _suv_side_x( a0 + 3.0, 38.0 )
+            F.box( model, xs * ( x0 + 0.1 ), xs * ( x0 + 0.75 ), -a0, -( a0 + 6.0 ), 37.35, 38.65, paint )
+        xm = _suv_side_x( 56.0, 42.0 )
+        F.box( model, xs * ( xm - 0.6 ), xs * ( xm + 1.6 ), -53.0, -58.4, 40.6, 43.6, "rw_rubber" )
+        F.box( model, xs * ( xm + 1.0 ), xs * ( xm + 5.8 ), -54.2, -58.4, 41.0, 45.2, { "default": paint,
+                                                                                         "back": "rw_black",
+                                                                                         "bottom": "rw_black" } )
+        F.box( model, xs * ( xm + 1.4 ), xs * ( xm + 5.4 ), -58.4, -58.55, 41.4, 44.8, "rw_steel_grey" )
+        # The tail lights wrapping round onto the sides.
+        side_patch( "rw_red_paint", xs, [ ( 165.5, 37.4 ), ( 173.2, 36.6 ), ( 173.2, 39.4 ), ( 166.5, 40.2 ) ], 0.08 )
+        side_patch( "rw_black", xs, [ ( 165.0, 37.0 ), ( 173.4, 36.2 ), ( 173.4, 39.8 ), ( 166.0, 40.6 ) ], 0.05 )
+        # Roof rails on their feet.
+        xr = 23.6
+        pts = [ ( a, _suv_top_z( a, xr ) + 2.0 ) for a in np.linspace( 86.0, 150.0, 9 ) ]
+        for ( a0, z0_ ), ( a1, z1_ ) in zip( pts, pts[1:] ):
+            rod( model, F.p( xs * xr, -a0, z0_ ), F.p( xs * xr, -a1, z1_ ), 0.75, "rw_black", 6 )
+        for a in ( 87.0, 118.0, 149.0 ):
+            z = _suv_top_z( a, xr )
+            F.box( model, xs * ( xr - 0.7 ), xs * ( xr + 0.7 ), -( a - 1.6 ), -( a + 1.6 ), z - 0.2, z + 2.2,
+                   "rw_black" )
+
+    # The roof spoiler over the rear window, with the high brake light under its edge, and the shark-fin aerial.
+    zs = _suv_top_z( SUV_ROOF1 - 2.0, 0.0 )
+    _fpoly( model, F, paint, [ loc( -26.0, SUV_ROOF1 - 3.0, zs + 0.05 ), loc( 26.0, SUV_ROOF1 - 3.0, zs + 0.05 ),
+                               loc( 26.0, SUV_ROOF1 + 3.4, zs - 1.0 ), loc( -26.0, SUV_ROOF1 + 3.4, zs - 1.0 ) ],
+            ( 0, -0.2, 1 ) )
+    _fpoly( model, F, "rw_black", [ loc( -26.0, SUV_ROOF1 + 3.4, zs - 1.0 ), loc( 26.0, SUV_ROOF1 + 3.4, zs - 1.0 ),
+                                    loc( 26.0, SUV_ROOF1 + 3.4, zs - 2.3 ), loc( -26.0, SUV_ROOF1 + 3.4, zs - 2.3 ) ],
+            ( 0, -1, 0 ) )
+    _fpoly( model, F, "rw_red_paint", [ loc( -9.0, SUV_ROOF1 + 3.45, zs - 1.3 ), loc( 9.0, SUV_ROOF1 + 3.45, zs - 1.3 ),
+                                        loc( 9.0, SUV_ROOF1 + 3.45, zs - 2.0 ), loc( -9.0, SUV_ROOF1 + 3.45, zs - 2.0 ) ],
+            ( 0, -1, 0 ) )
+    za = _suv_top_z( 147.0, 0.0 )
+    fin = [ ( 144.0, za - 0.1 ), ( 150.5, za - 0.4 ), ( 149.2, za + 2.4 ), ( 147.6, za + 2.6 ) ]
+    for xs in ( 1.0, -1.0 ):
+        _fpoly( model, F, "rw_black", [ loc( xs * ( 0.9 if z < za + 1 else 0.3 ), a, z ) for a, z in fin ],
+                ( xs, 0, 0 ) )
+    _fpoly( model, F, "rw_black", [ loc( -0.3, 149.2, za + 2.4 ), loc( 0.3, 149.2, za + 2.4 ), loc( 0.3, 147.6, za + 2.6 ),
+                                    loc( -0.3, 147.6, za + 2.6 ) ], ( 0, 0, 1 ) )
+    _fpoly( model, F, "rw_black", [ loc( -0.9, 144.0, za - 0.1 ), loc( 0.9, 144.0, za - 0.1 ), loc( 0.3, 147.6, za + 2.6 ),
+                                    loc( -0.3, 147.6, za + 2.6 ) ], ( 0, 1, 0.5 ) )
+    _fpoly( model, F, "rw_black", [ loc( -0.3, 149.2, za + 2.4 ), loc( 0.3, 149.2, za + 2.4 ), loc( 0.9, 150.5, za - 0.4 ),
+                                    loc( -0.9, 150.5, za - 0.4 ) ], ( 0, -1, 0.5 ) )
+
+    # Wipers: two on the windscreen's foot, one on the rear window.
+    for x0, x1 in ( ( 2.0, -21.0 ), ( 25.0, 3.0 ) ):
+        pa = [ ( x, SUV_COWL + 1.2 + ( 4.5 if x == x1 else 0.0 ) ) for x in ( x0, x1 ) ]
+        p = [ F.p( x, -a, _suv_top_z( a, x ) + 0.35 ) for x, a in pa ]
+        rod( model, p[0], p[1], 0.32, "rw_black", 4 )
+    p0, p1 = ( 0.0, SUV_GLASS1 - 0.6 ), ( -13.0, SUV_GLASS1 - 4.5 )
+    rod( model, F.p( p0[0], -p0[1], _suv_top_z( p0[1], 0.0 ) + 0.35 ),
+         F.p( p1[0], -p1[1], _suv_top_z( p1[1], 13.0 ) + 0.35 ), 0.3, "rw_black", 4 )
+
+    # The nose, on its face at a 0 (y = +lift): the lower bumper, the honeycomb grille with the plate on it, the light
+    # bar under the bonnet's edge with the headlights' dark glass under its ends, and the boomerang intakes.
+    def face( pnt, pts, lift ):
+        _fpoly( model, F, pnt, [ ( x, lift, z ) for x, z in pts ], ( 0, 1, 0 ) )
+
+    fx = lambda z: _suv_side_x( 0.0, z ) if z <= _suv_profile( 0.0 )[4][1] else _suv_profile( 0.0 )[4][0]
+    face( "rw_rubber", [ ( -fx( 12.5 ), 12.5 ), ( fx( 12.5 ), 12.5 ), ( fx( 15.2 ) - 0.2, 15.2 ),
+                         ( -fx( 15.2 ) + 0.2, 15.2 ) ], 0.06 )
+    face( "rw_steel_grey", [ ( -15.0, 12.8 ), ( 15.0, 12.8 ), ( 14.5, 14.2 ), ( -14.5, 14.2 ) ], 0.12 )
+    gz0, gz1, gw0, gw1 = 15.0, 28.9, 19.2, 21.8             # the grille, from the skid plate to the lamps' band
+    face( "rw_black", [ ( -gw0 - 0.7, gz0 - 0.5 ), ( gw0 + 0.7, gz0 - 0.5 ), ( gw1 + 0.7, gz1 + 0.5 ),
+                        ( -gw1 - 0.7, gz1 + 0.5 ) ], 0.08 )
+    face( "rw_steel_dark", [ ( -gw0, gz0 ), ( gw0, gz0 ), ( gw1, gz1 ), ( -gw1, gz1 ) ], 0.14 )
+    for row in range( 12 ):                 # honeycomb cells, 3 across, pointy side up
+        z = gz0 + 0.95 + row * 1.15
+        for col in range( -9, 10 ):
+            x = col * 2.48 + ( 1.24 if row % 2 else 0.0 )
+            half = gw0 + ( gw1 - gw0 ) * ( z - gz0 ) / ( gz1 - gz0 )
+            if abs( x ) > half - 1.3 or z > gz1 - 0.9:
+                continue
+            face( "rw_black", [ ( x + 1.08 * math.cos( math.radians( 30 + 60 * k ) ),
+                                  z + 0.84 * math.sin( math.radians( 30 + 60 * k ) ) ) for k in range( 6 ) ], 0.24 )
+    _plate( model, F, ( 0.0, 0.42, 18.3 ), ( 1, 0, 0 ), ( 0, 0, 1 ), ( 0, 1, 0 ), plate )
+
+    def nose( x, z, lift ):
+        """ The point at ( x, z ) on the face, or above it on the sloping fascia under the bonnet's edge, lift off it,
+        in the frame's own coordinates. """
+        if z <= _suv_top_z( 0.0, x ):
+            return ( x, lift, z )
+        lo, hi = 0.0, 12.0
+        for _ in range( 30 ):
+            m = ( lo + hi ) / 2
+            if _suv_top_z( m, x ) < z:
+                lo = m
+            else:
+                hi = m
+        return ( x, -( lo + hi ) / 2 + lift, z + 0.5 * lift )
+
+    def nose_patch( pnt, x0, x1, z0, z1, lift, step=2.0 ):
+        n = max( 1, int( math.ceil( abs( x1 - x0 ) / step ) ) )
+        xs_ = [ x0 + ( x1 - x0 ) * j / n for j in range( n + 1 ) ]
+        for xa, xb in zip( xs_, xs_[1:] ):
+            _fpoly( model, F, pnt, [ nose( xa, z0, lift ), nose( xb, z0, lift ), nose( xb, z1, lift ),
+                                     nose( xa, z1, lift ) ], ( 0, 1, 0.4 ) )
+
+    nose_patch( "rw_black", -27.4, 27.4, 29.0, 32.5, 0.06 )         # the lamps' black band under the bonnet's edge
+    nose_patch( "rw_lamp_cool", -26.6, 26.6, 31.55, 31.95, 0.14 )  # the light bar
+    for xs in ( 1.0, -1.0 ):
+        nose_patch( "rw_window_dark", xs * 18.0, xs * 27.0, 29.4, 31.2, 0.1 )
+        nose_patch( "rw_steel_grey", xs * 22.6, xs * 25.8, 29.75, 30.85, 0.14 )
+        for pts in ( [ ( 21.8, 26.1 ), ( fx( 26.1 ) - 1.1, 26.1 ), ( fx( 27.9 ) - 1.0, 27.9 ), ( 21.8, 27.9 ) ],
+                     [ ( fx( 18.7 ) - 3.4, 18.7 ), ( fx( 18.7 ) - 1.5, 18.7 ), ( fx( 26.1 ) - 1.1, 26.1 ),
+                       ( fx( 26.1 ) - 3.0, 26.1 ) ],
+                     [ ( 23.6, 15.6 ), ( fx( 15.6 ) - 1.6, 15.6 ), ( fx( 18.7 ) - 1.5, 18.7 ), ( 23.6, 18.7 ) ] ):
+            face( "rw_black", [ ( xs * x, z ) for x, z in pts ], 0.1 )
+        xe = lambda z: fx( z ) - 2.0
+        face( "rw_lamp_cool", [ ( xs * ( xe( 19.6 ) - 0.15 ), 19.6 ), ( xs * ( xe( 19.6 ) + 0.2 ), 19.6 ),
+                                ( xs * ( xe( 27.3 ) + 0.2 ), 27.3 ), ( xs * ( xe( 27.3 ) - 0.15 ), 27.3 ) ], 0.14 )
+        face( "rw_lamp_cool", [ ( xs * 23.0, 27.0 ), ( xs * ( xe( 27.3 ) + 0.2 ), 27.0 ),
+                                ( xs * ( xe( 27.35 ) + 0.2 ), 27.35 ), ( xs * 23.0, 27.35 ) ], 0.14 )
+        face( "rw_steel_grey", [ ( xs * 24.4, 20.0 ), ( xs * 26.4, 20.0 ), ( xs * 26.4, 21.4 ), ( xs * 24.4, 21.4 ) ],
+              0.13 )
+
+    # The tail: the black diffuser with its skid strip and reflectors on the bumper's face, the tailgate's light bar
+    # and lamps, and the plate on the tailgate's lower panel.
+    def back( pnt, pts, lift ):
+        _fpoly( model, F, pnt, [ ( x, -L - lift, z ) for x, z in pts ], ( 0, -1, 0 ) )
+
+    bx = lambda z: _suv_side_x( L, z )
+    back( "rw_rubber", [ ( -bx( 13.0 ), 13.0 ), ( bx( 13.0 ), 13.0 ), ( bx( 19.5 ) - 0.2, 19.5 ),
+                         ( -bx( 19.5 ) + 0.2, 19.5 ) ], 0.06 )
+    back( "rw_steel_grey", [ ( -16.0, 13.5 ), ( 16.0, 13.5 ), ( 15.4, 14.9 ), ( -15.4, 14.9 ) ], 0.12 )
+    for xs in ( 1.0, -1.0 ):
+        back( "rw_red_paint", [ ( xs * 23.5, 17.4 ), ( xs * 27.5, 17.4 ), ( xs * 27.5, 18.4 ), ( xs * 23.5, 18.4 ) ],
+              0.12 )
+
+    def hatch( x, z, lift ):
+        """ The point on the tailgate at ( x, z ), lift off it, found along a, in the frame's own coordinates. """
+        lo, hi = SUV_GLASS1 - 2.0, L
+        for _ in range( 30 ):
+            m = ( lo + hi ) / 2
+            if _suv_top_z( m, x ) > z:
+                lo = m
+            else:
+                hi = m
+        a = ( lo + hi ) / 2
+        return ( x, -( a + lift ), z + 0.35 * lift )
+
+    def tail( pnt, pts, lift, n=6 ):
+        """ A lamp or panel on the tailgate from corner ( x0, z0 ) to ( x1, z1 ), in strips that follow it. """
+        ( x0, z0_ ), ( x1, z1_ ) = pts
+        xs_ = list( np.linspace( x0, x1, n + 1 ) )
+        for xa, xb in zip( xs_, xs_[1:] ):
+            _fpoly( model, F, pnt, [ hatch( xa, z0_, lift ), hatch( xb, z0_, lift ), hatch( xb, z1_, lift ),
+                                     hatch( xa, z1_, lift ) ], ( 0, -1, 0.6 ) )
+
+    for xs in ( 1.0, -1.0 ):
+        tail( "rw_black", ( ( xs * 15.5, 37.0 ), ( xs * 31.0, 40.6 ) ), 0.06 )
+        tail( "rw_red_paint", ( ( xs * 17.0, 37.6 ), ( xs * 30.6, 40.0 ) ), 0.12 )
+    tail( "rw_red_paint", ( ( -15.5, 39.0 ), ( 15.5, 39.6 ) ), 0.1, 8 )
+    zp = 35.4
+    up = np.subtract( hatch( 0.0, zp + 1.0, 0.0 ), hatch( 0.0, zp - 1.0, 0.0 ) )
+    _plate( model, F, hatch( 0.0, zp, 0.3 ), ( -1, 0, 0 ), tuple( up ), ( 0, -up[2], up[1] ), plate )
+
+    # Collision: the body to the belt, and the cabin.
+    F.collide( model, -SUV_W, SUV_W, -L, 0.0, 0.0, 40.5, "metal" )
+    F.collide( model, -30.0, 30.0, -( SUV_ROOF1 + 2.0 ), -( SUV_COWL + 2.0 ), 40.5, 63.2, "metal" )
+
+
 def van( model, e, n, along="+n", paint="rw_train_white", z0=0.0 ):
     """ A parked generic panel van (4.9 m long, 1.9 m wide, 1.99 m tall, 3 m wheelbase, 215/65 R16 tyres): glazed
     cab, blind load area with a sliding door's seam on each side, two rear doors. Its nose towards along, (e, n) its
@@ -3066,6 +3593,7 @@ def showcase():
         ( "car estate", lambda m: car( m, -1090.0, -80.0, "-n", "rw_train_grey", kind="estate" ) ),
         ( "car hatchback", lambda m: car( m, -1180.0, -80.0, "+n", "rw_train_blue" ) ),
         ( "van", lambda m: van( m, -1280.0, -60.0, "+n", "rw_train_white" ) ),
+        ( "suv", lambda m: suv( m, -1380.0, -80.0, "+n", "rw_car_grey" ) ),
         ( "car estate", lambda m: car( m, -1160.0, -700.0, "+e", "rw_train_dark", kind="estate" ) ),
     ]
     for k in range( 6 ):

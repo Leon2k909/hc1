@@ -81,7 +81,14 @@ def paint_colour( paint ):
                 _colours[paint] = np.asarray( small, float ).reshape( -1, 3 ).mean( axis=0 ) / 255.0
                 break
         else:
-            _colours[paint] = np.array( STAND_INS.get( paint, ( 1.0, 0.0, 1.0 ) ), float )
+            colour = STAND_INS.get( paint, ( 1.0, 0.0, 1.0 ) )
+            try:                    # the car paints are flat colours with no texture (railhead_materials.PAINTED)
+                import railhead_materials as RM
+                if paint in RM.PAINTED:
+                    colour = tuple( c / 255.0 for c in RM.PAINTED[paint][0] )
+            except Exception:
+                pass
+            _colours[paint] = np.array( colour, float )
     return _colours[paint]
 
 

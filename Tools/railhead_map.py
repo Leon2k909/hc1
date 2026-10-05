@@ -124,6 +124,7 @@ FURNITURE = { "bench": ( 70, 20, 34, "rw_wood", WOOD ), "bin": ( 16, 16, 36, "rw
               "ticket_machine": ( 30, 24, 72, "rw_steel_grey", METAL ), "vending_machine": ( 40, 32, 74, "rw_steel_dark", METAL ),
               "info_pillar": ( 20, 20, 90, "rw_steel_dark", METAL ), "timetable_case": ( 50, 8, 80, "rw_steel_dark", METAL ),
               "forklift": ( 48, 90, 85, "rw_yellow_paint", METAL ), "car": ( 70, 180, 58, "rw_train_grey", METAL ),
+              "suv": ( 71, 176, 63, "rw_car_grey", METAL ),
               "van": ( 78, 210, 80, "rw_train_white", METAL ), "crate": ( 40, 40, 40, "rw_wood", WOOD ),
               "bollard": ( 8, 8, 36, "rw_steel_dark", METAL ), "luggage_cart": ( 40, 80, 36, "rw_steel", METAL ),
               "pallet_stack": ( 48, 40, 40, "rw_wood", WOOD ) }
@@ -663,7 +664,7 @@ def cab_road( m, s ):
     for n in ( 600.0, 820.0, 1040.0 ):
         use( "car", m, s * 1555.0, n, "+n", "rw_train_white", 0.0, "estate",
              stand_in=furniture_stand_in( "car", s * 1555.0, n ) )
-    use( "car", m, s * 1555.0, -900.0, "+n", "rw_train_grey", stand_in=furniture_stand_in( "car", s * 1555.0, -900.0 ) )
+    use( "suv", m, s * 1555.0, -900.0, "+n", "rw_car_grey", stand_in=furniture_stand_in( "suv", s * 1555.0, -900.0 ) )
     use( "car", m, s * 1555.0, 1300.0, "+n", "rw_train_blue" if s > 0 else "rw_train_red",
          stand_in=furniture_stand_in( "car", s * 1555.0, 1300.0 ) )
     use( "van", m, s * 1940.0, -900.0, "-n", stand_in=furniture_stand_in( "van", s * 1940.0, -900.0 ) )
