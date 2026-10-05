@@ -32,6 +32,33 @@ public partial class PlayerPawn : IGameEventHandler<DamageGivenEvent>, IGameEven
 	}
 
 	/// <summary>
+	/// Where the damage indicator points: where the damage came from, or null for none.
+	/// - A blast's Position is its centre, and a burn's the heat's source, so they point there.
+	/// - A bullet's or a blade's Position is where it struck you, inches from your own eye, which is no direction at all:
+	///   a round from behind that clipped the arms or the gun held out in front showed as a hit from the front. So they
+	///   point back along the round's path (Force is its direction).
+	/// - A zombie's claw has no direction (Position is your own middle), so it points at the zombie.
+	/// - Falls and other damage you did yourself show none.
+	/// </summary>
+	private Vector3? IndicatorSource( DamageInfo info )
+	{
+		if ( info.Flags.HasFlag( DamageFlags.FallDamage ) )
+			return null;
+
+		if ( info.Flags.HasFlag( DamageFlags.Explosion ) || info.Flags.HasFlag( DamageFlags.Burn ) )
+			return info.Position;
+
+		if ( !info.Force.IsNearZeroLength )
+			return info.Position - info.Force.Normal * 2000f;
+
+		var attacker = info.Attacker;
+		if ( attacker.IsValid() && attacker.GameObject.Root != GameObject.Root )
+			return attacker.WorldPosition;
+
+		return null;
+	}
+
+	/// <summary>
 	/// Called when YOU inflict damage on something
 	/// </summary>
 	void IGameEventHandler<DamageGivenEvent>.OnGameEvent( DamageGivenEvent eventArgs )
@@ -67,8 +94,8 @@ public partial class PlayerPawn : IGameEventHandler<DamageGivenEvent>, IGameEven
 		if ( damageInfo.Flags.HasFlag( DamageFlags.Burn ) )
 		{
 			_timeSinceLastDamage = 0f;
-			if ( IsViewer )
-				DamageIndicator.Current?.OnHit( position );
+			if ( IsViewer && IndicatorSource( damageInfo ) is { } heat )
+				DamageIndicator.Current?.OnHit( heat );
 			return;
 		}
 
@@ -90,9 +117,9 @@ public partial class PlayerPawn : IGameEventHandler<DamageGivenEvent>, IGameEven
 			return;
 
 		// Is this the local player?
-		if ( IsViewer )
+		if ( IsViewer && IndicatorSource( damageInfo ) is { } source )
 		{
-			DamageIndicator.Current?.OnHit( position );
+			DamageIndicator.Current?.OnHit( source );
 		}
 
 		_timeSinceLastDamage = 0f;

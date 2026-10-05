@@ -9,8 +9,17 @@ public partial class DamageIndicator : Panel
 		Current = this;
 	}
 
+	/// <summary>
+	/// A hit from pos: where the damage came from, not where it struck (PlayerPawn.IndicatorSource).
+	/// </summary>
 	public void OnHit( Vector3 pos )
 	{
+		// Straight over or under the view (a grenade at your feet) there's no way round to point: a flat direction of
+		// nothing read as dead ahead.
+		var camera = Scene.Camera;
+		if ( camera.IsValid() && pos.WithZ( 0 ).Distance( camera.WorldPosition.WithZ( 0 ) ) < 8f )
+			return;
+
 		var p = new HitPoint( pos );
 		p.Parent = this;
 	}
