@@ -1349,6 +1349,20 @@
 - `OpticZoom` anchors the lens where the line of sight crosses that glass, and sizes the picture to the glass's diameter
   over its distance, so the picture fills the eyepiece wherever it is on screen (sway, recoil, a rail's shift).
   Optics without eyepiece data (the MP5's, the Scout 3x) keep `OpticLensDiameter` at 4.
+- When the picture shows (2026-10-05, the user: aiming the 6x Precision Scope on the Uzi, "its delayed to move to the
+  magnified view"):
+  - It used to wait for the camera's zoom, which eases in exponentially (`CameraController`, `LerpTo` at 5/s). It came
+    in from 75% to 95% of the zoom: ~0.28 to ~0.6 s after pressing aim, though the scope was at the eye after ~0.3 s
+    (`ViewModel.AimTime` 0.25 s, then the aim offset's ease at 10/s).
+  - Now it goes by where the scope is (`OpticZoom.LensVisibility`, the overlay's opacity). It needs the optic pointing
+    along the view (full within 2 degrees, gone at 8) and the line of sight on the eyepiece's glass: full within
+    `FullOnAxis` (0.35) of its radius, gone off its edge. Optics without eyepiece data go by `ViewModel.AimProgress`
+    (75-95%).
+  - The lens stays active while the sights come down (`ScopeBlend` is `ViewModel.AimProgress`), so the picture leaves
+    with the scope instead of vanishing while it's still at the eye.
+  - The optic's place in front of the eye is learned once the aim has settled for `SettleTime` (0.15 s,
+    `ViewModel.IsAimSettled`), not after the zoom's 98% (~0.8 s). Until then the optic's own axis stands in for it.
+  - Compiled nowhere yet (made without a compiler), and not seen in-game.
 - The M4 holds an optic's origin 8.718 in front of the eye before its `OpticAimOffset` (`M4_OPTIC_DEPTH`: the 762's slot
   at its ADS pose plus its correction). The ported guns' `OpticAimCorrection`s copy that, so each relief holds on them:
   the 762, M16A4, P90 and Uzi all put a 2x's glass at the same depth. A rail's `RailOpticAimCorrection` moves the eye

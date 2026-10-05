@@ -46,6 +46,15 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 	[Property, Group( "Configuration" )] public float AimTime { get; set; } = 0.25f;
 	private float _aimProgress;
 
+	/// <summary> 0..1, how far the sights are up. It falls back to 0 as the gun comes down after letting go of aim. </summary>
+	public float AimProgress => _aimProgress;
+
+	/// <summary>
+	/// Fully aimed, with the aim offset's ease finished: the sights are where they'll stay. <see cref="OpticZoom"/> learns
+	/// how a magnified optic sits in front of the eye then.
+	/// </summary>
+	public bool IsAimSettled { get; private set; }
+
 	[Property]
 	public float ReloadSpeed { get; set; } = 1f;
 
@@ -259,6 +268,8 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 		// Smoothly interpolate position and rotation
 		lerpedPositionOffset = lerpedPositionOffset.LerpTo( targetPositionOffset, Time.Delta * 10f );
 		lerpedRotationOffset = Rotation.Lerp( lerpedRotationOffset, targetRotationOffset, Time.Delta * 10f );
+		IsAimSettled = _aimProgress >= 1f && Equipment.HasTag( "aiming" )
+			&& lerpedPositionOffset.Distance( targetPositionOffset ) < 0.01f && lerpedRotationOffset.Distance( targetRotationOffset ) < 0.05f;
 
 		// Apply the lerped offsets
 		WorldRotation *= lerpedRotationOffset;

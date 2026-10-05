@@ -26,7 +26,9 @@
     Panel Lens { get; set; }
     Texture _bound;
 
-    float Alpha => MathF.Round( ((OpticZoom.ScopeBlend - 0.75f) / 0.2f).Clamp( 0f, 1f ) * OpticZoom.LensVisibility, 3 );
+    // How well the optic lines up with the eye (OpticZoom works it out from where the eyepiece is), so the picture comes
+    // in as the scope reaches the eye rather than waiting for the camera's zoom.
+    float Alpha => MathF.Round( OpticZoom.LensVisibility, 3 );
 
     float LensHeightPercent => MathF.Round( Diameter * OpticZoom.LensScale * 100f, 2 );
     float LensWidthPercent => MathF.Round( Diameter * OpticZoom.LensScale * 100f * Screen.Height / Screen.Width, 2 );
