@@ -23,15 +23,19 @@
                         <div class="operator-card-copy">
                             <label class="operator-team">@Tr( outfit.Team.GetName() )</label>
                             <label class="operator-name">@Tr( outfit.Name )</label>
+                            @if ( OperatorOutfits.IsEquipped( outfit ) )
+                            {
+                                <label class="operator-equipped">@Tr( "EQUIPPED" )</label>
+                            }
                         </div>
-                        <i class="operator-selected">@(Selected.Id == outfit.Id ? "check" : "chevron_right")</i>
+                        <i class="operator-selected">@(Selected.Id == outfit.Id ? "visibility" : "chevron_right")</i>
                     </button>
                 }
             </div>
             <div class="operator-details">
                 <label class="operators-eyebrow">@Tr( "FIELD KIT" )</label>
                 <label class="operator-description">@Tr( Selected.Description )</label>
-                <div class="operator-team-note"><i>groups</i><label>@Tr( "Outfits are assigned by team." )</label></div>
+                <div class="operator-team-note"><i>groups</i><label>@Tr( "You wear the outfit you equip for your team. Bots are issued theirs at random." )</label></div>
             </div>
         </div>
         <div class="operator-viewer">
@@ -39,6 +43,15 @@
                 <label class="operator-preview-name">@Tr( Selected.Name )</label>
                 <label class="operator-preview-label">@Tr( "3D PREVIEW" )</label>
             </div>
+            @* Over the viewer rather than in the details, which the portrait layout hides. *@
+            @if ( OperatorOutfits.IsEquipped( Selected ) )
+            {
+                <div class="operator-equip equipped"><i>check</i><label>@Tr( "EQUIPPED" )</label></div>
+            }
+            else
+            {
+                <button class="operator-equip" @onclick=@(() => Equip( Selected ))><i>checkroom</i><label>@Tr( "EQUIP" )</label></button>
+            }
             <div class="operator-preview-host" @ref=PreviewHost />
             @if ( Preview?.HasError == true )
             {
@@ -60,7 +73,10 @@
 
 @code
 {
-    private string SelectedId { get; set; } = "military";
+    // Starts on the outfit you wear on Blue Team. A field, since the code generator copies a property's initializer
+    // into an attribute, which a cookie read can't be (as HubModeRail's _collapsed).
+    private string _selectedId = OperatorOutfits.GetEquipped( Team.CounterTerrorist ).Id;
+    private string SelectedId { get => _selectedId; set => _selectedId = value; }
     private OperatorOutfit Selected => OperatorOutfits.Find( SelectedId );
     private OperatorPreview Preview { get; set; }
     private Panel PreviewHost { get; set; }
@@ -103,5 +119,12 @@
         StateHasChanged();
     }
 
-    protected override int BuildHash() => HashCode.Combine( SelectedId, Preview?.HasError, GameText.Current );
+    private void Equip( OperatorOutfit outfit )
+    {
+        OperatorOutfits.Equip( outfit );
+        Sound.Play( "ui_button_press" );
+        StateHasChanged();
+    }
+
+    protected override int BuildHash() => HashCode.Combine( SelectedId, Preview?.HasError, GameText.Current, OperatorOutfits.LocalPicks );
 }

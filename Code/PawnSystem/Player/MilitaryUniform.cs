@@ -1,6 +1,7 @@
 namespace Facepunch;
 
-public enum MilitaryUniformStyle { Standard, Field }
+/// <summary>Which outfit a soldier wears (<see cref="OperatorOutfits"/>). Saved in prefabs by number: add new ones last.</summary>
+public enum MilitaryUniformStyle { Standard, Field, Tactical }
 
 /// <summary>Team military uniforms using the realistic human clothing variants.</summary>
 public sealed class MilitaryUniform : Component
@@ -17,9 +18,17 @@ public sealed class MilitaryUniform : Component
 	};
 	public static readonly string[] FieldClothingPaths = ClothingPaths.Append(
 		"models/citizen_clothes/gloves/fingerless_gloves/fingerless_gloves.clothing" ).ToArray();
+	/// <summary>
+	/// A counter-terror team's dark kit: the army garments dyed (<see cref="TacticalTint"/>), with a balaclava under the
+	/// helmet. The army pieces are used rather than the police helmet and vest because their colours are known, so the
+	/// tints could be worked out from the Military Operator's portrait.
+	/// </summary>
+	public static readonly string[] TacticalClothingPaths = FieldClothingPaths.Append(
+		"models/citizen_clothes/hat/balaclava/balaclava.clothing" ).ToArray();
 	[Property] public MilitaryUniformStyle Style { get; set; }
 	[Property] public List<Clothing> Pieces { get; set; } = new();
 	[Property] public List<Clothing> FieldPieces { get; set; } = new();
+	[Property] public List<Clothing> TacticalPieces { get; set; } = new();
 	private Model dressedModel;
 	private MilitaryUniformStyle dressedStyle;
 	private bool dressed;
@@ -73,8 +82,18 @@ public sealed class MilitaryUniform : Component
 		if ( dressed ) new ClothingContainer().Reset( renderer );
 
 		var outfit = new ClothingContainer { PrefersHuman = true };
-		var paths = Style == MilitaryUniformStyle.Field ? FieldClothingPaths : ClothingPaths;
-		var assigned = Style == MilitaryUniformStyle.Field ? FieldPieces : Pieces;
+		var paths = Style switch
+		{
+			MilitaryUniformStyle.Field => FieldClothingPaths,
+			MilitaryUniformStyle.Tactical => TacticalClothingPaths,
+			_ => ClothingPaths
+		};
+		var assigned = Style switch
+		{
+			MilitaryUniformStyle.Field => FieldPieces,
+			MilitaryUniformStyle.Tactical => TacticalPieces,
+			_ => Pieces
+		};
 		var pieces = assigned.Count > 0 ? assigned : paths.Select( ResourceLibrary.Get<Clothing> ).ToList();
 		// The wardrobe picker treats a shirt and vest as alternative tops. A uniform deliberately layers both.
 		foreach ( var piece in pieces.Where( c => c.IsValid() ) )
@@ -93,12 +112,34 @@ public sealed class MilitaryUniform : Component
 					: path.Contains( "boots" ) ? new Color( .46f, .50f, .43f )
 					: path.Contains( "gloves" ) ? Color.White : new Color( .76f, .86f, .66f );
 			}
+			else if ( Style == MilitaryUniformStyle.Tactical )
+			{
+				garment.Tint = TacticalTint( garment.Model?.Name ?? "" );
+			}
 		}
 		dressed = true;
 		dressedModel = renderer.Model;
 		dressedStyle = Style;
 		wornPieces = pieces.Where( c => c.IsValid() ).ToList();
 		if ( legsOnly ) HideAboveTheWaist( renderer );
+	}
+
+	/// <summary>
+	/// The Tactical Operator's dye for each garment. A tint multiplies the garment's colour in linear space (the Field
+	/// Operator's portrait matches its tints on the Military Operator's to within 2 sRGB steps), so each was worked out
+	/// from the army garments' colours in the Military Operator's portrait (sRGB) to land on: a black helmet (33,33,35),
+	/// a black plate carrier (36,36,38), dark grey camouflage (49,50,52 on the sleeves; the trousers take the same dye,
+	/// as they're the same cloth), black boots (30,29,29) and, from the Field Operator's undyed brown leather ones,
+	/// black gloves (30,27,27). The balaclava's own colour isn't known, so it's only darkened.
+	/// </summary>
+	public static Color TacticalTint( string modelPath )
+	{
+		if ( modelPath.Contains( "tactical_helmet" ) ) return new Color( .27f, .33f, .51f );
+		if ( modelPath.Contains( "tactical_vest" ) ) return new Color( .24f, .32f, .54f );
+		if ( modelPath.Contains( "boots" ) ) return new Color( .14f, .17f, .27f );
+		if ( modelPath.Contains( "gloves" ) ) return new Color( .45f, .62f, .85f );
+		if ( modelPath.Contains( "balaclava" ) ) return new Color( .6f, .6f, .62f );
+		return new Color( .58f, .64f, 1f );
 	}
 
 	/// <summary>

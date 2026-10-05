@@ -28,6 +28,15 @@
 .operator-team { font-size: 12px; font-weight: 600; color: #aaaeb5; text-transform: uppercase; letter-spacing: 1px; }
 .operator-name { font-size: 21px; font-weight: 600; }
 .operator-selected { font-size: 22px; flex-shrink: 0; color: #ff9a4d; }
+.operator-equipped { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: #ff9a4d; }
+.operator-equip {
+    position: absolute; top: 24px; right: 28px; z-index: 2; height: 40px; padding: 0 16px; gap: 8px; align-items: center;
+    border: 1px solid #ff7a1a; border-radius: 2px; background-color: rgba( 255, 122, 26, .14 ); color: white; cursor: pointer;
+    i { font-size: 20px; }
+    label { font-size: 14px; font-weight: 700; letter-spacing: 2px; }
+    &:hover { background-color: rgba( 255, 122, 26, .3 ); }
+    &.equipped { border-color: rgba( 255, 255, 255, .15 ); background-color: #191c21; color: #ff9a4d; cursor: default; }
+}
 .operator-details { flex-direction: column; gap: 12px; border-top: 1px solid rgba( 255, 255, 255, .12 ); padding-top: 22px; flex-shrink: 0; }
 .operator-description { font-size: 16px; line-height: 1.5; color: #d0d3d8; }
 .operator-team-note { gap: 10px; align-items: center; margin-top: 8px; color: #949aa4; font-size: 14px; i { font-size: 21px; flex-shrink: 0; } }
@@ -64,12 +73,13 @@ OperatorPreview { position: absolute; left: 0; right: 0; top: 0; bottom: 0; curs
     .operators-roster { width: 100%; overflow: visible; flex-shrink: 0; gap: 10px; }
     .operators-heading, .operator-details { display: none; }
     .operators-list { flex-direction: row; gap: 10px; }
-    .operator-card { width: 50%; height: 86px; flex-shrink: 1; }
+    .operator-card { width: 0; flex-grow: 1; height: 86px; flex-shrink: 1; }
     .operator-portrait { width: 64px; height: 84px; }
     .operator-selected { display: none; }
     .operator-viewer { min-height: 280px; }
     .operator-preview-name { font-size: 21px; }
     .operator-viewer-heading { top: 14px; left: 18px; }
+    .operator-equip { top: 12px; right: 12px; height: 34px; padding: 0 10px; }
     .operator-preview-host { top: 60px; bottom: 60px; }
     .operator-viewer-footer { left: 12px; right: 12px; bottom: 12px; justify-content: center; }
 }
