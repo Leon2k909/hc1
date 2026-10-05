@@ -1,7 +1,7 @@
 namespace Facepunch;
 
 /// <summary>Which outfit a soldier wears (<see cref="OperatorOutfits"/>). Saved in prefabs by number: add new ones last.</summary>
-public enum MilitaryUniformStyle { Standard, Field, Tactical }
+public enum MilitaryUniformStyle { Standard, Field, Tactical, Desert }
 
 /// <summary>Team military uniforms using the realistic human clothing variants.</summary>
 public sealed class MilitaryUniform : Component
@@ -84,13 +84,13 @@ public sealed class MilitaryUniform : Component
 		var outfit = new ClothingContainer { PrefersHuman = true };
 		var paths = Style switch
 		{
-			MilitaryUniformStyle.Field => FieldClothingPaths,
+			MilitaryUniformStyle.Field or MilitaryUniformStyle.Desert => FieldClothingPaths,
 			MilitaryUniformStyle.Tactical => TacticalClothingPaths,
 			_ => ClothingPaths
 		};
 		var assigned = Style switch
 		{
-			MilitaryUniformStyle.Field => FieldPieces,
+			MilitaryUniformStyle.Field or MilitaryUniformStyle.Desert => FieldPieces,
 			MilitaryUniformStyle.Tactical => TacticalPieces,
 			_ => Pieces
 		};
@@ -116,6 +116,10 @@ public sealed class MilitaryUniform : Component
 			{
 				garment.Tint = TacticalTint( garment.Model?.Name ?? "" );
 			}
+			else if ( Style == MilitaryUniformStyle.Desert )
+			{
+				garment.Tint = DesertTint( garment.Model?.Name ?? "" );
+			}
 		}
 		dressed = true;
 		dressedModel = renderer.Model;
@@ -140,6 +144,20 @@ public sealed class MilitaryUniform : Component
 		if ( modelPath.Contains( "gloves" ) ) return new Color( .45f, .62f, .85f );
 		if ( modelPath.Contains( "balaclava" ) ) return new Color( .6f, .6f, .62f );
 		return new Color( .58f, .64f, 1f );
+	}
+
+	/// <summary>
+	/// The Desert Operator's dye for each of the Field Operator's garments, worked out as <see cref="TacticalTint"/>'s were
+	/// to land on: a tan helmet (66,56,43) and vest (76,62,45), brown camouflage (65,50,36 on the sleeves) and brown boots
+	/// (70,55,40). The gloves stay the brown leather they are.
+	/// </summary>
+	public static Color DesertTint( string modelPath )
+	{
+		if ( modelPath.Contains( "tactical_helmet" ) ) return new Color( .97f, .85f, .73f );
+		if ( modelPath.Contains( "tactical_vest" ) ) return new Color( .97f, .88f, .74f );
+		if ( modelPath.Contains( "boots" ) ) return new Color( .66f, .53f, .47f );
+		if ( modelPath.Contains( "gloves" ) ) return Color.White;
+		return new Color( 1f, .64f, .51f );
 	}
 
 	/// <summary>
