@@ -383,7 +383,6 @@ public static partial class GameText
 		["UNLOCKS AT LV {0}"] = "Откроется на ур. {0}",
 		["UNLOCKS AT LV {0} · OR 1 UNLOCK POINT"] = "Откроется на ур. {0} · или за 1 очко разблокировки",
 		["UNLOCKED WITH A POINT"] = "Открыто за очко разблокировки",
-		["CHANGES SAVE AUTOMATICALLY"] = "Изменения сохраняются автоматически",
 		["This weapon has no attachment slots"] = "У этого оружия нет слотов для модулей",
 		["{0} IS LOCKED"] = "Заблокировано: {0}",
 		["Unlocks at {0} level {1}"] = "Откроется, когда {0} достигнет уровня {1}",

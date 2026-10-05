@@ -381,7 +381,6 @@ public static partial class GameText
 		["UNLOCKS AT LV {0}"] = "等級 {0} 解鎖",
 		["UNLOCKS AT LV {0} · OR 1 UNLOCK POINT"] = "等級 {0} 解鎖 · 或使用 1 點解鎖點數",
 		["UNLOCKED WITH A POINT"] = "已用點數解鎖",
-		["CHANGES SAVE AUTOMATICALLY"] = "變更會自動儲存",
 		["This weapon has no attachment slots"] = "此武器沒有配件欄位",
 		["{0} IS LOCKED"] = "{0} 已鎖定",
 		["Unlocks at {0} level {1}"] = "{0} 等級 {1} 解鎖",

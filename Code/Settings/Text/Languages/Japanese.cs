@@ -386,7 +386,6 @@ public static partial class GameText
 		["UNLOCKS AT LV {0}"] = "Lv.{0}でアンロック",
 		["UNLOCKS AT LV {0} · OR 1 UNLOCK POINT"] = "Lv.{0}でアンロック・アンロックポイント1でも可",
 		["UNLOCKED WITH A POINT"] = "ポイントでアンロック済み",
-		["CHANGES SAVE AUTOMATICALLY"] = "変更は自動的に保存されます",
 		["This weapon has no attachment slots"] = "この武器にはアタッチメントスロットがありません",
 		["{0} IS LOCKED"] = "{0}はロック中です",
 		["Unlocks at {0} level {1}"] = "{0}のレベル{1}でアンロック",

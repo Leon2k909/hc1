@@ -297,7 +297,6 @@ public static partial class GameText
 		["UNLOCKS AT LV {0}"] = ("Se débloque au niv. {0}", "Wird auf Stufe {0} freigeschaltet", "Se desbloquea al nv. {0}", "Desbloqueia no nv. {0}"),
 		["UNLOCKS AT LV {0} · OR 1 UNLOCK POINT"] = ("Se débloque au niv. {0} · ou 1 point de déblocage", "Wird auf Stufe {0} freigeschaltet · oder 1 Freischaltpunkt", "Se desbloquea al nv. {0} · o 1 punto de desbloqueo", "Desbloqueia no nv. {0} · ou 1 ponto de desbloqueio"),
 		["UNLOCKED WITH A POINT"] = ("Débloqué avec un point", "Mit einem Punkt freigeschaltet", "Desbloqueado con un punto", "Desbloqueado com um ponto"),
-		["CHANGES SAVE AUTOMATICALLY"] = ("Les modifications sont enregistrées automatiquement", "Änderungen werden automatisch gespeichert", "Los cambios se guardan automáticamente", "As alterações são salvas automaticamente"),
 		["This weapon has no attachment slots"] = ("Cette arme n'a aucun emplacement d'accessoire", "Diese Waffe hat keine Aufsatzplätze", "Esta arma no tiene ranuras de accesorios", "Esta arma não tem encaixes de acessórios"),
 		["{0} IS LOCKED"] = ("{0} est verrouillé", "{0} ist gesperrt", "{0} está bloqueado", "{0} está bloqueado"),
 		["Unlocks at {0} level {1}, or with an unlock point (next at player level {2})"] = (

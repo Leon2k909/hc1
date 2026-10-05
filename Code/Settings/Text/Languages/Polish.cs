@@ -383,7 +383,6 @@ public static partial class GameText
 		["UNLOCKS AT LV {0}"] = "Odblokowanie na poz. {0}",
 		["UNLOCKS AT LV {0} · OR 1 UNLOCK POINT"] = "Odblokowanie na poz. {0} · lub 1 punkt odblokowania",
 		["UNLOCKED WITH A POINT"] = "Odblokowano za punkt",
-		["CHANGES SAVE AUTOMATICALLY"] = "Zmiany zapisują się automatycznie",
 		["This weapon has no attachment slots"] = "Ta broń nie ma slotów na dodatki",
 		["{0} IS LOCKED"] = "Zablokowane: {0}",
 		["Unlocks at {0} level {1}"] = "Odblokowanie na poziomie {1} broni {0}",

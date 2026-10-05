@@ -385,7 +385,6 @@ public static partial class GameText
 		["UNLOCKS AT LV {0}"] = "레벨 {0}에 잠금 해제",
 		["UNLOCKS AT LV {0} · OR 1 UNLOCK POINT"] = "레벨 {0}에 잠금 해제 · 또는 잠금 해제 포인트 1개",
 		["UNLOCKED WITH A POINT"] = "포인트로 잠금 해제됨",
-		["CHANGES SAVE AUTOMATICALLY"] = "변경 사항이 자동으로 저장됩니다",
 		["This weapon has no attachment slots"] = "이 무기에는 부착물 슬롯이 없습니다",
 		["{0} IS LOCKED"] = "{0} 잠김",
 		["Unlocks at {0} level {1}"] = "{0} 레벨 {1}에 잠금 해제",

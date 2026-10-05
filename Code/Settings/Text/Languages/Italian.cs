@@ -385,7 +385,6 @@ public static partial class GameText
 		["UNLOCKS AT LV {0}"] = "Si sblocca al liv. {0}",
 		["UNLOCKS AT LV {0} · OR 1 UNLOCK POINT"] = "Si sblocca al liv. {0} · o con 1 punto di sblocco",
 		["UNLOCKED WITH A POINT"] = "Sbloccato con un punto",
-		["CHANGES SAVE AUTOMATICALLY"] = "Le modifiche vengono salvate automaticamente",
 		["This weapon has no attachment slots"] = "Quest'arma non ha slot per accessori",
 		["{0} IS LOCKED"] = "{0} è bloccato",
 		["Unlocks at {0} level {1}"] = "Si sblocca al livello {1} ({0})",

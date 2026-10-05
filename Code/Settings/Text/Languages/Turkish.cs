@@ -859,7 +859,6 @@ public static partial class GameText
 		["UNLOCKS AT LV {0}"] = "Sv. {0} ile açılır",
 		["UNLOCKS AT LV {0} · OR 1 UNLOCK POINT"] = "Sv. {0} ile açılır · ya da 1 kilit açma puanıyla",
 		["UNLOCKED WITH A POINT"] = "Puanla açıldı",
-		["CHANGES SAVE AUTOMATICALLY"] = "Değişiklikler otomatik kaydedilir",
 		["This weapon has no attachment slots"] = "Bu silahta eklenti yuvası yok",
 		["{0} IS LOCKED"] = "{0} kilitli",
 		["Unlocks at {0} level {1}"] = "{0} seviyesi {1} ile açılır",
