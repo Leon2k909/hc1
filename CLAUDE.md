@@ -1691,7 +1691,7 @@
 
 ## Maps
 - Match maps (map picker, Quick Play, end-of-match vote) are `GameUtils.IsMatchReadyMap`: Flatgrass, Innocent Hotel,
-  Belltower, Reef Hall and Railhead (see their sections below).
+  Belltower, Reef Hall, Railhead and Lowtide (see their sections below).
 - The hub (`HubPage`) is one featured screen for the tab picked on its left rail (`HubModeRail`, `HubPage.Operation`:
   Multiplayer, Battle Royale or Zombies; Campaign is locked), like the user's CoD-style mockup. Its art is
   `ui/modes/<mode>_wide.png`, a 1024x720 cut of the 2:3 card art. Battle Royale has no wide cut or blurred backdrop, so
@@ -2391,6 +2391,71 @@ simulate_input.
     prefabs/game_modes/bomb_defusal.prefab_c"`, is harmless. The engine's dependency scan reads the scene's
     `GameModes` metadata (`MapInformation`'s ", "-joined list) as a path, and every scene with two modes gets it.
   - None of it has been checked in the engine: the lighting, the navmesh, bots and the modes' objects.
+
+## Lowtide (multiplayer map, `Tools/lowtide_map.py`)
+- The user asked for a new map and left the theme to Claude (2026-10-05). Lowtide is the warehouse quarter of a made-up
+  North German port at low tide, after Hamburg's Speicherstadt. Six-storey red-brick warehouses stand straight up out of
+  a tidal canal (a Fleet), with stepped gables, winch oriels under copper hoods, and loading doors up their fronts. The
+  tide is out, so the Fleet's bed is mud with a channel of water down its middle.
+- One script, built like Railhead's with `map_kit`, writes:
+  - the models, to `Assets/models/maps/lowtide/`:
+    - the Fleet: its bed, the bridges and the barge;
+    - the east half, and its mirror the west half, repainted by `WEST_PAINTS` (sooty brick, cream frames, red doors);
+    - the dressing, built in place for each side so number plates read the right way round;
+    - the glass, the water, and the backdrop: the Fleet running on north under a building, the harbour, its far shore
+      and a tug;
+  - the scene, `Assets/scenes/maps/Lowtide/lowtide.scene`, rewritten whole on every run (change the layout in the
+    script, not in the editor);
+  - the `lt_` materials, `Assets/materials/lowtide/*.vmat`. They're text only:
+    - tinted copies of the project's own materials (`LT_MATERIALS`: sooty, glazed and slimed brick, wet mud, the
+      water, painted doors, jute, tarred timber, steel grating);
+    - flat paints (`LT_PAINTED`).
+    So the map needs no new pictures;
+  - the radar picture, `ui/minimaps/minimap_lowtide.png` (the folder is `ui/Minimaps` on disk);
+  - with `--art`, a stand-in menu picture, `ui/maps/lowtide.png`.
+- Levels:
+  - The streets and quays are at z 0.
+  - The Fleet's mud is 128 below them at its walls, under the 156 drop that hurts, with level flats at -130 along both
+    walls.
+  - Its channel's bottom is at -146, with water at -137 (`BED_PROFILE`), and the bed falls away into the harbour at its
+    mouth.
+- Layout: mirrored across e 0, the Fleet's middle. Red Team spawns on the west square, Blue Team on the east one. The
+  play is e -2200..2200, n -1650..1450.
+  - North: the street in front of the north row, over the Fleet on a riveted plate-girder bridge with cast-iron lattice
+    railings and a lamp on each end post.
+  - Middle: the two warehouses (east e 240..1000, n -400..1150).
+    - Each is open on its ground floor, a whitewashed hall of cast-iron columns, and on a mezzanine over its north half
+      (z 176), reached by a timber stair up the east wall.
+    - Two ground-floor loading bays onto the Fleet have steel landings with stairs down into it. Two mezzanine bays look
+      over it, with a 37-high bar across each, which you can vault.
+    - Bomb site A is the east warehouse's ground floor under the mezzanine.
+    - Between the warehouses is the Fleet's bed, with a steel lighter (a Schute) lying on the mud. Its sides are 73
+      over the mud and over its hold's floor, so you can mantle in and out.
+  - South: the yards, each with a brick shed, and the harbour quay, crossed over the Fleet's mouth on a pony-truss
+    footbridge. Two level-luffing cranes stand on each quay, with a 200-high portal you can walk under. Bomb site B is on
+    the east quay, among the cargo under a crane.
+  - A cross street each side runs from the north street to the quay, past the spawn square.
+  - Six stairs go down into the Fleet: one from each warehouse ground bay, and a public one from each quay. Iron
+    ladders on its walls are dressing only.
+- Modes:
+  - The scene lists TDM and Defuse, and the map is in `GameUtils`' three lists.
+  - It has deathmatch spawns and Retakes spawns for each site.
+  - Domination's flags: A in the west warehouse, B in the Fleet's channel, C in the east warehouse.
+  - The Hot Zones and the Cash Grab points are `ObjectiveSpot`s.
+- Every run checks all 91 spots with railhead_map's `check_spots`, `check_reach` and `check_retakes_sight`. The last two
+  now take another map's bounds and Retakes table. On 2026-10-05 all three passed.
+- The navmesh's bounds stop at `NAV_TOP` (300): over the mezzanines and under the warehouses' ceilings (352), above
+  which they're closed. The window panes' model is tagged `navskip`.
+- `map_kit` gained two things:
+  - `asset_file` finds an asset's file whatever its case. On Linux the scene's `scenes/maps/defusemap_01/game_setup.prefab`
+    is `DefuseMap_01/Game_setup.prefab`.
+  - A wall's arch skips a side painted None.
+- Made offline on 2026-10-05 and checked in software renders of the models with their textures, the reach grid and the
+  radar picture. It hasn't been opened in the editor: nothing has compiled, and the lighting, the navmesh, bots and the
+  modes' objects are all unchecked.
+- The radar and menu pictures are PNGs, kept in Git LFS, which this session couldn't push. Run
+  `python Tools/lowtide_map.py --art` once to write them.
+- To play it: `dev_mode team_deathmatch lowtide`.
 
 ## Ridgeback (battle royale map, `Assets/scenes/maps/Ridgeback/`)
 - The second battle royale map, a base to build on: a valley about 1.2 km across in a ring of mountains, on an s&box

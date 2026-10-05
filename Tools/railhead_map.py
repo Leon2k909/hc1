@@ -926,15 +926,15 @@ def hull_2d( points ):
     return np.array( lower[:-1] + upper[:-1] )
 
 
-def grid_shape():
-    e0, e1, n0, n1 = REACH_BOUNDS
+def grid_shape( bounds=REACH_BOUNDS ):
+    e0, e1, n0, n1 = bounds
     return int( ( e1 - e0 ) / REACH_CELL ), int( ( n1 - n0 ) / REACH_CELL )
 
 
-def reach_cells( outline, grow, size ):
+def reach_cells( outline, grow, size, bounds=REACH_BOUNDS ):
     """ The cells ( i, j ) whose centres are in a convex outline grown by grow, and their centres. """
     cols, rows = size
-    e0, _, n0, _ = REACH_BOUNDS
+    e0, _, n0, _ = bounds
     if len( outline ) < 3:
         return np.zeros( 0, int ), np.zeros( 0, int ), np.zeros( 0 ), np.zeros( 0 )
     lo, hi = outline.min( axis=0 ) - grow, outline.max( axis=0 ) + grow
@@ -980,12 +980,13 @@ def shapes( models ):
             yield np.array( points, float ), surface, False
 
 
-def check_reach( models, spots, picture=None ):
+def check_reach( models, spots, picture=None, bounds=REACH_BOUNDS ):
     """ Every spot must be on the largest walkable area. Prints the ones that aren't and returns how many; picture
     writes the grid: green walkable, blue upstairs, red and orange cut off. Hulls stand on their top faces: where the
-    face over a cell is 40 degrees or less from level it's a floor there, at its height. """
-    e0, e1, n0, n1 = REACH_BOUNDS
-    cols, rows = grid_shape()
+    face over a cell is 40 degrees or less from level it's a floor there, at its height. bounds ( e0, e1, n0, n1 ) is
+    the grid's extent (another map's checks pass their own). """
+    e0, e1, n0, n1 = bounds
+    cols, rows = grid_shape( bounds )
     in_way = {}
     floors = {}
 
@@ -997,18 +998,18 @@ def check_reach( models, spots, picture=None ):
         # two heights as well, so it's the faces that tell.
         flat = level or ( planes is not None and np.all( planes[0][:, 2] > 0.9999 ) )
         if flat:
-            ii, jj, _, _ = reach_cells( outline, REACH_RADIUS, ( cols, rows ) )
+            ii, jj, _, _ = reach_cells( outline, REACH_RADIUS, ( cols, rows ), bounds )
             for c in ( ii * rows + jj ).tolist():
                 in_way.setdefault( c, [] ).append( ( z0, z1 ) )
             top = pts[pts[:, 2] > z1 - 1e-3]
-            ii, jj, _, _ = reach_cells( hull_2d( top[:, :2] ), 0.0, ( cols, rows ) )
+            ii, jj, _, _ = reach_cells( hull_2d( top[:, :2] ), 0.0, ( cols, rows ), bounds )
             for c in ( ii * rows + jj ).tolist():
                 floors.setdefault( c, [] ).append( z1 )
             continue
         if planes is None:
             continue
         normals, offsets = planes
-        ii, jj, gx, gy = reach_cells( outline, REACH_RADIUS, ( cols, rows ) )
+        ii, jj, gx, gy = reach_cells( outline, REACH_RADIUS, ( cols, rows ), bounds )
         if len( ii ) == 0:
             continue
         heights = -( normals[None, :, 0] * gx[:, None] + normals[None, :, 1] * gy[:, None] + offsets[None, :] ) / normals[None, :, 2]
@@ -1016,7 +1017,7 @@ def check_reach( models, spots, picture=None ):
         top = np.clip( heights[np.arange( len( k ) ), k], z0, z1 )
         for c, t in zip( ( ii * rows + jj ).tolist(), top.tolist() ):
             in_way.setdefault( c, [] ).append( ( z0, t ) )
-        ii2, jj2, gx2, gy2 = reach_cells( outline, 0.0, ( cols, rows ) )
+        ii2, jj2, gx2, gy2 = reach_cells( outline, 0.0, ( cols, rows ), bounds )
         if len( ii2 ) == 0:
             continue
         heights = -( normals[None, :, 0] * gx2[:, None] + normals[None, :, 1] * gy2[:, None] + offsets[None, :] ) / normals[None, :, 2]
@@ -1153,11 +1154,11 @@ class Blockers:
         return False
 
 
-def check_retakes_sight( blockers ):
+def check_retakes_sight( blockers, retakes=None ):
     """ No Retakes Red spawn (planter or defender) may see a Blue one (attacker): eye to eye, standing (64 up) or
-    crouched (46), both ways. Returns how many pairs can. """
+    crouched (46), both ways. Returns how many pairs can. retakes: another map's table (RETAKES by default). """
     problems = 0
-    for site, roles in RETAKES.items():
+    for site, roles in ( retakes or RETAKES ).items():
         reds = roles["planter"] + roles["defender"]
         for r in reds:
             for b in roles["attacker"]:

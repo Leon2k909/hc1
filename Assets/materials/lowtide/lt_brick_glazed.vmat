@@ -1,0 +1,14 @@
+// Tools/lowtide_map.py, from materials/buildings/brick.vmat
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.00"
+    TextureColor "materials/buildings/brick_color.png"
+    TextureNormal "materials/buildings/brick_normal.png"
+    TextureRoughness "[0.320000 0.320000 0.320000 0.000000]"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.340 0.280 0.270 1.0]"
+    g_flModelTintAmount "1.0"
+}

@@ -409,6 +409,8 @@ class Wall:
         curve = arc( rc, zs, rad, steps )                       # left foot, over the crown, to the right foot
         half = steps // 2
         for d, paint in ( ( out_d, outside ), ( in_d, inside ) ):
+            if paint is None:
+                continue                                        # a side nobody sees (a blind front's inside)
             # The polygon is wound for the side it faces.
             facing = np.array( ( 0.0, 1.0 if d == max( d0, d1 ) else -1.0, 0.0 ) ) if self.axis == "e" else \
                 np.array( ( 1.0 if d == max( d0, d1 ) else -1.0, 0.0, 0.0 ) )
@@ -768,10 +770,25 @@ def game_object( ids, name, key, position=( 0, 0, 0 ), rotation="0,0,0,1", compo
     }
 
 
+def asset_file( path ):
+    """ An asset's file by its resource path, whose case can differ from the file's on a case-sensitive file system
+    (s&box's paths are lower case: scenes/maps/defusemap_01/game_setup.prefab is DefuseMap_01/Game_setup.prefab). """
+    exact = ASSETS / path
+    if exact.exists():
+        return exact
+    at = ASSETS
+    for part in Path( path ).parts:
+        found = [ child for child in at.iterdir() if child.name.lower() == part.lower() ] if at.is_dir() else []
+        if not found:
+            return exact
+        at = found[0]
+    return at
+
+
 def prefab_instance( ids, path, key=None, overrides=() ):
     """ A prefab dropped into the scene, with an instance id for everything in it (as the editor writes).
     overrides: ( property, value ) pairs on the prefab's root. """
-    prefab = json.loads( ( ASSETS / path ).read_text( encoding="utf-8-sig" ) )
+    prefab = json.loads( asset_file( path ).read_text( encoding="utf-8-sig" ) )
     found = set()
 
     def collect( node ):
@@ -789,7 +806,7 @@ def prefab_instance( ids, path, key=None, overrides=() ):
 
     collect( prefab["RootObject"] )
     root = prefab["RootObject"]["__guid"]
-    resource = json.loads( ( ASSETS / f"{path}.meta" ).read_text( encoding="utf-8" ) )["guid"]
+    resource = json.loads( asset_file( f"{path}.meta" ).read_text( encoding="utf-8" ) )["guid"]
     key = key or f"prefab/{path}"
     instance = ids( key )
     mapping = { pid: instance if pid == root else ids( f"{key}/{pid}" ) for pid in sorted( found ) }

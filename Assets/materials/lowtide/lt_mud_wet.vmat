@@ -1,0 +1,14 @@
+// Tools/lowtide_map.py, from materials/buildings/soil.vmat
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.00"
+    TextureColor "materials/buildings/soil_color.png"
+    TextureNormal "materials/buildings/soil_normal.png"
+    TextureRoughness "[0.140000 0.140000 0.140000 0.000000]"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.170 0.270 0.420 1.0]"
+    g_flModelTintAmount "1.0"
+}
