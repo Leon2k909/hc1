@@ -579,11 +579,22 @@ def throat( m, s ):
     m.collision_box( ( e0, -2330.0, BED_Z ), ( e1, -2266.0, BED_Z + 25.2 ), WOOD )
 
 
+# The kiosks: ( name, e0, e1, n0, n1, facing ), each lit by a light of its own in its serving window.
+KIOSKS = [ ( "West", -800.0, -700.0, 1000.0, 1080.0, "-n" ), ( "East", 700.0, 800.0, 1000.0, 1080.0, "-n" ),
+           ( "Centre", -50.0, 50.0, 640.0, 760.0, "-n" ) ]
+
+
+def kiosk( m, spec ):
+    _, e0, e1, n0, n1, facing = spec
+    use( "kiosk", m, e0, e1, n0, n1, facing,
+         stand_in=lambda m_: m_.box( ( min( e0, e1 ), min( n0, n1 ), 0 ), ( max( e0, e1 ), max( n0, n1 ), 110 ),
+                                     "rw_steel_dark", METAL ) )
+
+
 def concourse( m, s ):
     # The departure board over the concourse, hung from the rib at n 1060.
     hanging_display( m, s * 300.0, 1060.0, S.shed_z( 300.0 ) - 46, "departures", "n", bottom=230.0 )
-    use( "kiosk", m, s * 700.0, s * 800.0, 1000.0, 1080.0, "-n",
-         stand_in=lambda m_: m_.box( ( min( s * 700, s * 800 ), 1000.0, 0 ), ( max( s * 700, s * 800 ), 1080.0, 110 ), "rw_steel_dark", METAL ) )
+    kiosk( m, KIOSKS[1 if s > 0 else 0] )
     put( "ticket_machine", m, s * 1145.0, 1060.0, "-e" if s > 0 else "+e" )
     put( "ticket_machine", m, s * 1145.0, 1100.0, "-e" if s > 0 else "+e" )
     for e in ( 560.0, 1100.0 ):
@@ -694,8 +705,7 @@ def dress_centre():
     use( "info_pillar", m, 0.0, 940.0, stand_in=furniture_stand_in( "info_pillar", 0.0, 940.0 ) )
     hanging_sign( m, 0.0, 900.0, S.GUTTER_Z[0], [ "gleis_3_4" ], "n", bottom=150.0 )
     clock( m, 0.0, 1110.0, 240.0, "n" )
-    use( "kiosk", m, -50.0, 50.0, 640.0, 760.0, "-n",
-         stand_in=lambda m_: m_.box( ( -50.0, 640.0, 0 ), ( 50.0, 760.0, 110 ), "rw_steel_dark", METAL ) )
+    kiosk( m, KIOSKS[2] )
     for n in ( 460.0, -500.0 ):
         put( "bench", m, -12.0, n, "-e" )
         put( "bench", m, 12.0, n, "+e" )
@@ -748,6 +758,10 @@ def lights():
     for k, ( e, n ) in enumerate( ( e, n ) for e in ( -1037, -632, 0, 632, 1037 ) for n in ( 820, 340, -140, -620, -1100 ) ):
         out.append( ( f"Platform {k + 1}", ( e, n, 260 ), WARM, 360, False ) )
     out.append( ( "Signal Box", ( 0, -2040, 220 ), WARM, 260, False ) )
+    if P is not None and hasattr( P, "kiosk_lights" ):
+        for name, *spec in KIOSKS:
+            for k, ( position, radius ) in enumerate( P.kiosk_lights( *spec ) ):
+                out.append( ( f"Kiosk {name}{' Counter' if k else ''}", position, WARM, radius, False ) )
     return out
 
 
@@ -1572,6 +1586,9 @@ def main():
     parser.add_argument( "--art", action="store_true", help="write the menus' stand-in picture from the preview" )
     args = parser.parse_args()
 
+    kiosk_art = optional( "railhead_kiosk_art" )
+    if kiosk_art is not None and kiosk_art.missing():
+        kiosk_art.write()
     models = build()
     written = set()
     for name, model in models.items():

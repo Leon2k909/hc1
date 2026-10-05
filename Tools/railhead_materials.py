@@ -13,8 +13,9 @@ posters, shop signs, graffiti, the cast bronze lettering and the platform clock.
   alpha-tested ones (lattice, graffiti, lettering) and _illum.png for the self-lit masks of the signs, displays
   and shop signs), and per paint <paint>_color.png and <paint>.vmat.
   Most are on shaders/complex.shader; rw_glass and rw_glass_roof are on shaders/glass.shader. The car paints, the
-  signals' unlit lenses and the lanterns' opal glass (PAINTED) are flat colours with no texture of their own, so they
-  get a vmat only.
+  signals' unlit lenses, the lanterns' opal glass and the kiosk's counter, shelves, plant and bottles (PAINTED) are
+  flat colours with no texture of their own, so they get a vmat only. The kiosk's atlas, rw_kiosk, is
+  railhead_kiosk_art.py's (OWN_SCRIPT), drawn without numpy.
 - Every texture tiles over its tile units (paints(); map_kit's world-scale UVs read them through the model's
   tile_overrides), except the decal (DECALS: the clock, 0..1 across its polygon), the lattice (one panel per 1.0 of u)
   and the atlases (ATLASES), which the map scripts place by rect_uv().
@@ -38,6 +39,7 @@ from scipy.spatial import cKDTree
 
 import terrain_textures as T
 import building_textures as BT
+import railhead_kiosk_art as KIOSK
 
 ROOT = Path( __file__ ).resolve().parent.parent
 OUT_DIR = ROOT / "Assets/materials/railhead"
@@ -2902,7 +2904,21 @@ PAINTED = { "rw_car_grey": ( ( 74, 78, 83 ), 0.4, 0.3 ),            # a metallic
             "rw_lens_amber": ( ( 92, 58, 10 ), 0.0, 0.12 ),
             "rw_lens_green": ( ( 10, 50, 40 ), 0.0, 0.12 ),
             # Opal (milk) glass, the street lamps' and lanterns' by day, with the lamps off.
-            "rw_opal_glass": ( ( 214, 214, 206 ), 0.0, 0.3 ) }
+            "rw_opal_glass": ( ( 214, 214, 206 ), 0.0, 0.3 ),
+            # The kiosk's: its solid-surface stone counter, the shelves' warm white backs and trays, the pothos and
+            # its glazed pot, and the bottled drinks, the colour of what's in them through the clear PET.
+            "rw_kiosk_stone": ( ( 216, 210, 199 ), 0.0, 0.32 ),
+            "rw_kiosk_shelf": ( ( 232, 226, 214 ), 0.0, 0.6 ),
+            "rw_pot": ( ( 230, 228, 222 ), 0.0, 0.22 ),
+            "rw_soil": ( ( 46, 34, 26 ), 0.0, 0.95 ),
+            "rw_leaf": ( ( 46, 104, 40 ), 0.0, 0.42 ),
+            "rw_leaf_light": ( ( 104, 150, 58 ), 0.0, 0.42 ),
+            "rw_bottle_water": ( ( 178, 206, 218 ), 0.0, 0.08 ),
+            "rw_bottle_apple": ( ( 204, 148, 44 ), 0.0, 0.1 ),
+            "rw_bottle_orange": ( ( 236, 126, 26 ), 0.0, 0.1 ),
+            "rw_bottle_cola": ( ( 38, 20, 14 ), 0.0, 0.08 ),
+            "rw_bottle_lemon": ( ( 226, 212, 116 ), 0.0, 0.1 ),
+            "rw_bottle_tea": ( ( 146, 76, 28 ), 0.0, 0.1 ) }
 # Textured glass on shaders/glass.shader (its texture's colour, normal and roughness): paint: absorption.
 TEXTURED_GLASS = { "rw_glass_roof": 0.45 }
 # Paints whose picture's bottom edge stands at z 0 (two storeys a tile).
@@ -2917,7 +2933,10 @@ ATLASES = {
     "rw_shopsigns": ( 2048, 2048, SHOPSIGNS_RECTS ),
     "rw_graffiti": ( 2048, 2048, GRAFFITI_RECTS ),
     "rw_lettering": ( 2048, 2048, LETTERING_RECTS ),
+    "rw_kiosk": ( KIOSK.W, KIOSK.H, KIOSK.RECTS ),
 }
+# Paints whose textures another script draws, placed by their atlases' explicit UVs: paint: the script.
+OWN_SCRIPT = { "rw_kiosk": "Tools/railhead_kiosk_art.py" }
 
 
 def paints():
@@ -2928,6 +2947,8 @@ def paints():
         out[g] = ( "glass", 64.0 )
     for p in PAINTED:
         out[p] = ( "painted", 96.0 )
+    for p in OWN_SCRIPT:
+        out[p] = ( p, 1.0 )
     return out
 
 

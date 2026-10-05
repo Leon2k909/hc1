@@ -53,8 +53,12 @@ def _unit( v ):
 
 
 def _rect( atlas, name ):
-    """ An atlas entry's ( u0, v0, u1, v1 ) from railhead_materials, or the whole texture while it isn't there. """
+    """ An atlas entry's ( u0, v0, u1, v1 ) from railhead_materials (the kiosk's from railhead_kiosk_art), or the whole
+    texture while it isn't there. """
     try:
+        if atlas == "rw_kiosk":
+            import railhead_kiosk_art as KA
+            return KA.rect_uv( name )
         import railhead_materials as RM
         return tuple( float( x ) for x in RM.rect_uv( atlas, name ) )
     except Exception:
@@ -2169,69 +2173,500 @@ def shelter( model, e0, e1, n0, n1, z0=0.0, facing=None, poster=None ):
         bench( model, p[0], p[1], z0, facing, length=length )
 
 
-def kiosk( model, e0, e1, n0, n1, facing, z0=0.0, sign="kiosk" ):
-    """ A platform kiosk 2.7 m tall over e0..e1, n0..n1: anthracite steel walls glazed with dark glass above 1 m, the
-    serving hatch open in its front over a counter at 1 m, lit shelves of goods behind it and a rack of magazines
-    below, the backlit fascia (rw_shopsigns sign, 5:1) above and a flat roof overhanging 150 mm. Metal collision: the
-    kiosk, and the counter and rack. """
+# The kiosk: a modern station kiosk, anthracite with a light stone counter, after a picture the user sent. Heights from
+# its floor; railhead_kiosk_art.py draws its lettering, icons, menu board, poster and goods (the rw_kiosk atlas).
+KIOSK_PLINTH = 4.0              # the recessed black plinth's top
+KIOSK_COUNTER = 40.0            # the serving counter's top, 1.02 m
+KIOSK_OPEN = 86.0               # the serving window's top, where the fascia starts (2.18 m)
+KIOSK_FASCIA = 104.0            # the fascia's top, under the roof slab
+KIOSK_ROOF = 108.5              # the roof slab's top (2.76 m)
+KIOSK_SHELVES = ( 40.0, 51.5, 63.0, 74.5 )
+# The bottled drinks, by their rw_kiosk label: ( the liquid's paint, the cap's ); and the two kinds on each shelf.
+KIOSK_DRINKS = { "label_0": ( "rw_bottle_water", "rw_train_blue" ), "label_1": ( "rw_bottle_apple", "rw_container_green" ),
+                 "label_2": ( "rw_bottle_orange", "rw_yellow_paint" ), "label_3": ( "rw_bottle_cola", "rw_red_paint" ),
+                 "label_4": ( "rw_bottle_lemon", "rw_yellow_paint" ), "label_5": ( "rw_bottle_tea", "rw_white_paint" ) }
+KIOSK_DRINK_ROWS = ( ( "label_0", "label_1" ), ( "label_2", "label_4" ), ( "label_3", "label_5" ), ( "label_0", "label_3" ) )
+# A 0.5 l PET bottle's profile ( r, z ): its label is band 4 (1.7 to 4.7 up), its cap a lathe of its own.
+BOTTLE = [ ( 0.0, 0.0 ), ( 1.14, 0.0 ), ( 1.28, 0.2 ), ( 1.32, 0.6 ), ( 1.32, 1.7 ), ( 1.32, 4.7 ), ( 1.3, 5.5 ),
+           ( 1.16, 6.2 ), ( 0.86, 6.9 ), ( 0.6, 7.35 ), ( 0.52, 7.6 ), ( 0.6, 7.62 ), ( 0.6, 7.72 ) ]
+BOTTLE_CAP = [ ( 0.6, 7.72 ), ( 0.63, 7.74 ), ( 0.63, 8.4 ), ( 0.5, 8.46 ), ( 0.0, 8.46 ) ]
+# A pothos leaf's outline, ( along from the stalk, across ), for a leaf 1 long.
+LEAF = [ ( 0.0, 0.0 ), ( 0.1, 0.3 ), ( 0.4, 0.48 ), ( 0.72, 0.42 ), ( 0.95, 0.22 ), ( 1.12, 0.0 ), ( 0.95, -0.22 ),
+         ( 0.72, -0.42 ), ( 0.4, -0.48 ), ( 0.1, -0.3 ) ]
+# The trailing plant's vines, from the pot's base ( x, y forward, z up ): over the counter's front and along it.
+VINES = ( ( ( 0.6, 0.8, 4.6 ), ( 1.8, 3.6, 5.8 ), ( 2.4, 6.3, 3.4 ), ( 2.6, 7.0, 0.3 ), ( 2.9, 7.2, -7.0 ), ( 2.6, 7.3, -16.0 ) ),
+          ( ( -0.8, 0.9, 4.6 ), ( -2.4, 3.4, 5.4 ), ( -3.6, 6.4, 2.4 ), ( -4.0, 7.0, -1.8 ), ( -4.4, 7.2, -9.5 ) ),
+          ( ( 0.0, 1.0, 4.6 ), ( -0.2, 3.8, 6.2 ), ( -0.5, 6.5, 3.6 ), ( -0.6, 7.1, 0.0 ), ( -0.9, 7.3, -5.0 ),
+            ( -0.6, 7.4, -12.5 ), ( -1.0, 7.4, -20.0 ) ),
+          ( ( 1.4, 0.6, 4.6 ), ( 4.0, 3.0, 5.0 ), ( 5.6, 6.3, 2.4 ), ( 5.9, 7.0, -0.8 ), ( 6.2, 7.1, -6.5 ) ),
+          ( ( 1.0, -0.2, 4.6 ), ( 3.4, 0.5, 3.4 ), ( 6.4, 1.6, 0.7 ), ( 9.4, 2.4, 0.45 ), ( 12.0, 3.0, 0.5 ), ( 14.2, 3.4, 0.5 ) ),
+          ( ( -0.3, -0.5, 4.6 ), ( -0.7, -1.0, 7.6 ), ( 0.1, -1.6, 10.4 ) ),
+          ( ( 0.2, 0.3, 4.6 ), ( -1.4, -0.4, 7.2 ), ( -3.2, -1.6, 8.4 ), ( -4.4, -2.4, 7.6 ) ),
+          ( ( 0.9, 0.5, 4.6 ), ( 1.6, 1.4, 7.8 ), ( 1.2, 2.6, 9.6 ) ),
+          ( ( -0.6, -0.2, 4.6 ), ( -2.0, 0.6, 6.8 ), ( -3.6, 1.6, 7.0 ) ) )
+
+
+def _kiosk_uv( name ):
+    u0, v0, u1, v1 = _rect( "rw_kiosk", name )
+    return [ ( u0, v0 ), ( u1, v0 ), ( u1, v1 ), ( u0, v1 ) ]
+
+
+def _kiosk_aspect( name ):
+    try:
+        import railhead_kiosk_art as KA
+        return KA.aspect( name )
+    except Exception:
+        return 1.0
+
+
+def _lean( p, a ):
+    """ ( x, y, z ) turned about x by a radians, its top going back (towards -y). """
+    x, y, z = p
+    return ( x, y * math.cos( a ) - z * math.sin( a ), y * math.sin( a ) + z * math.cos( a ) )
+
+
+def _leaned( F, at, a ):
+    """ A function placing points of a thing standing at at ( x, y, z ) in the frame and leaning back by a radians. """
+    def place( x, y, z ):
+        lx, ly, lz = _lean( ( x, y, z ), a )
+        return F.p( at[0] + lx, at[1] + ly, at[2] + lz )
+    return place
+
+
+def _kbox( model, F, place, x0, x1, y0, y1, z0, z1, paints, cover=None, a=0.0 ):
+    """ A box in place's space (see _leaned): paints is one paint or { "front", "back", "sides", "top", "bottom" }; cover
+    puts rw_kiosk's entry on its front (+y) face. """
+    def paint( key ):
+        return paints.get( key, paints.get( "default" ) ) if isinstance( paints, dict ) else paints
+
+    c = [ [ [ place( x, y, z ) for z in ( z0, z1 ) ] for y in ( y0, y1 ) ] for x in ( x0, x1 ) ]
+    t = lambda v: _lean( v, a )
+    faces = { "front": ( [ c[0][1][0], c[1][1][0], c[1][1][1], c[0][1][1] ], t( ( 0, 1, 0 ) ) ),
+              "back": ( [ c[1][0][0], c[0][0][0], c[0][0][1], c[1][0][1] ], t( ( 0, -1, 0 ) ) ),
+              "right": ( [ c[1][1][0], c[1][0][0], c[1][0][1], c[1][1][1] ], t( ( 1, 0, 0 ) ) ),
+              "left": ( [ c[0][0][0], c[0][1][0], c[0][1][1], c[0][0][1] ], t( ( -1, 0, 0 ) ) ),
+              "top": ( [ c[0][1][1], c[1][1][1], c[1][0][1], c[0][0][1] ], t( ( 0, 0, 1 ) ) ),
+              "bottom": ( [ c[0][0][0], c[1][0][0], c[1][1][0], c[0][1][0] ], t( ( 0, 0, -1 ) ) ) }
+    for key, ( pts, towards ) in faces.items():
+        p = paint( "sides" if key in ( "left", "right" ) and isinstance( paints, dict ) and "sides" in paints else key )
+        if key == "front" and cover:
+            outward( model, "rw_kiosk", pts, _world( F, towards ), uv=_kiosk_uv( cover ) )
+        elif p:
+            outward( model, p, pts, _world( F, towards ) )
+
+
+def _lathe( model, F, at, profile, paints, sides=10, uv=None ):
+    """ A round thing turned about the frame's z through at ( x, y, z ): profile ( r, z ) from the bottom up, paints[k]
+    the band from point k to k + 1. uv: { k: rw_kiosk entry } wraps an entry once round band k, its seam at the back,
+    reading left to right from the front. Shaded smooth round, and up it where the profile turns less than 40 degrees. """
+    def ring( t ):
+        return -math.sin( t ) * F.x - math.cos( t ) * F.y
+
+    dirs = [ ring( 2 * math.pi * k / sides ) for k in range( sides + 1 ) ]
+    seg = []
+    for ( r0, z0 ), ( r1, z1 ) in zip( profile, profile[1:] ):
+        length = math.hypot( r1 - r0, z1 - z0 ) or 1.0
+        seg.append( ( ( z1 - z0 ) / length, ( r0 - r1 ) / length ) )      # ( outwards, up ) of the band's surface
+    o = F.p( *at )
+    for k, ( ( r0, z0 ), ( r1, z1 ) ) in enumerate( zip( profile, profile[1:] ) ):
+        paint = paints[k]
+        if paint is None or ( r0 == 0 and r1 == 0 ):
+            continue
+        ends = []
+        for j, nb in ( ( k - 1, 0 ), ( k + 1, 1 ) ):
+            a = seg[k]
+            if 0 <= j < len( seg ) and a[0] * seg[j][0] + a[1] * seg[j][1] > math.cos( math.radians( 40 ) ):
+                b = seg[j]
+                a = ( a[0] + b[0], a[1] + b[1] )
+                n = math.hypot( *a )
+                a = ( a[0] / n, a[1] / n )
+            ends.append( a )
+        u0, v0, u1, v1 = _rect( "rw_kiosk", uv[k] ) if uv and k in uv else ( 0, 0, 1, 1 )
+        for i in range( sides ):
+            d0, d1 = dirs[i], dirs[i + 1]
+            pts = [ o + r0 * d0 + z0 * F.z, o + r0 * d1 + z0 * F.z, o + r1 * d1 + z1 * F.z, o + r1 * d0 + z1 * F.z ]
+            nrm = [ ends[0][0] * d0 + ends[0][1] * F.z, ends[0][0] * d1 + ends[0][1] * F.z,
+                    ends[1][0] * d1 + ends[1][1] * F.z, ends[1][0] * d0 + ends[1][1] * F.z ]
+            mid = ( seg[k][0] * ( d0 + d1 ) / 2 + seg[k][1] * F.z )
+            if uv and k in uv:
+                a0, a1 = u0 + ( u1 - u0 ) * i / sides, u0 + ( u1 - u0 ) * ( i + 1 ) / sides
+                outward( model, "rw_kiosk", pts, mid, uv=[ ( a0, v0 ), ( a1, v0 ), ( a1, v1 ), ( a0, v1 ) ], normals=nrm )
+            elif r0 == 0 or r1 == 0:
+                if r0 == 0:
+                    tri, tri_n = [ pts[0], pts[2], pts[3] ], [ nrm[0], nrm[2], nrm[3] ]
+                else:
+                    tri, tri_n = [ pts[0], pts[1], pts[2] ], [ nrm[0], nrm[1], nrm[2] ]
+                outward( model, paint, tri, mid, normals=tri_n )
+            else:
+                outward( model, paint, pts, mid, normals=nrm )
+
+
+def _bottle( model, F, x, y, z, label ):
+    liquid, cap = KIOSK_DRINKS[label]
+    paints = [ liquid ] * ( len( BOTTLE ) - 1 )
+    _lathe( model, F, ( x, y, z ), BOTTLE, paints, 10, uv={ 4: label } )
+    _lathe( model, F, ( x, y, z ), BOTTLE_CAP, [ cap ] * ( len( BOTTLE_CAP ) - 1 ), 10 )
+
+
+def _packet( model, F, name, x, y, z, w, h, t, lean ):
+    """ A crisp packet standing on its bottom seal at ( x, y, z ), its front towards +y, leaning back lean degrees: a
+    foil pillow, flat at the crimped seals, printed with rw_kiosk's name front and back. """
+    u0, v0, u1, v1 = _rect( "rw_kiosk", name )
+    a = math.radians( lean )
+    seal = 0.09 * h
+
+    def depth( fx, fz ):
+        across = max( 0.0, 1.0 - ( 2 * fx / w ) ** 2 ) ** 0.5
+        along = 0.0 if fz <= seal or fz >= h - seal else math.sin( math.pi * ( fz - seal ) / ( h - 2 * seal ) ) ** 0.6
+        return across * ( 0.06 + t / 2 * along )
+
+    def point( fx, fz, s ):
+        lx, ly, lz = _lean( ( fx, s * depth( fx, fz ), fz ), a )
+        return F.p( x + lx, y + ly, z + lz )
+
+    def normal( fx, fz, s ):
+        e = 0.05
+        dx = ( depth( min( fx + e, w / 2 ), fz ) - depth( max( fx - e, -w / 2 ), fz ) ) / ( 2 * e )
+        dz = ( depth( fx, min( fz + e, h ) ) - depth( fx, max( fz - e, 0.0 ) ) ) / ( 2 * e )
+        return _unit( _world( F, _lean( ( -dx, s, -dz ), a ) ) )
+
+    xs = [ -w / 2 + w * i / 6 for i in range( 7 ) ]
+    zs = [ 0.0, seal ] + [ seal + ( h - 2 * seal ) * k / 6 for k in range( 1, 6 ) ] + [ h - seal, h ]
+    for s in ( 1.0, -1.0 ):
+        for i in range( 6 ):
+            for j in range( len( zs ) - 1 ):
+                corners = [ ( xs[i], zs[j] ), ( xs[i + 1], zs[j] ), ( xs[i + 1], zs[j + 1] ), ( xs[i], zs[j + 1] ) ]
+                pts = [ point( cx, cz, s ) for cx, cz in corners ]
+                nrm = [ normal( cx, cz, s ) for cx, cz in corners ]
+                uv = []
+                for cx, cz in corners:
+                    fu = ( cx + w / 2 ) / w
+                    uv.append( ( u0 + ( u1 - u0 ) * ( fu if s > 0 else 1.0 - fu ), v0 + ( v1 - v0 ) * cz / h ) )
+                outward( model, "rw_kiosk", pts, nrm[0] + nrm[1] + nrm[2] + nrm[3], uv=uv, normals=nrm )
+
+
+def _leaf( model, F, p, along, face, size, paint ):
+    """ A pothos leaf from p, its tip along along and its face turned towards face (frame vectors), folded a little at
+    the midrib. Drawn from both sides. """
+    a = _unit( _world( F, along ) )
+    f = _world( F, face )
+    across = _unit( np.cross( f, a ) )
+    up = np.cross( a, across )
+    base = F.p( *p )
+    pts = [ base + a * u * size + across * v * size + up * abs( v ) * size * 0.28 for u, v in LEAF ]
+    model.polygon( paint, pts, both_sides=True )
+
+
+def _catmull( points, per=4 ):
+    pts = [ points[0] ] + list( points ) + [ points[-1] ]
+    out = []
+    for k in range( 1, len( pts ) - 2 ):
+        p0, p1, p2, p3 = ( np.asarray( q, float ) for q in pts[k - 1:k + 3] )
+        for j in range( per ):
+            t = j / per
+            out.append( 0.5 * ( 2 * p1 + ( -p0 + p2 ) * t + ( 2 * p0 - 5 * p1 + 4 * p2 - p3 ) * t * t
+                                + ( -p0 + 3 * p1 - 3 * p2 + p3 ) * t ** 3 ) )
+    out.append( np.asarray( points[-1], float ) )
+    return out
+
+
+def _plant( model, F, x, y, z ):
+    """ A golden pothos trailing from a white ceramic pot standing at ( x, y, z ): its vines arch out of the pot, over
+    the counter's front edge and along it, a heart-shaped leaf every 1.4 in, growing smaller towards the tips. """
+    o = F.p( x, y, z )
+    _frustum( model, o + 0.0 * F.z, o + 4.4 * F.z, 2.1, 2.6, "rw_pot", sides=16 )
+    disc( model, "rw_pot", o + 0.02 * F.z, -F.z, 2.1, sides=16 )
+    _frustum( model, o + 3.9 * F.z, o + 4.4 * F.z, 2.38, 2.42, "rw_pot", sides=16, inside="rw_pot" )
+    for k in range( 16 ):
+        t0, t1 = 2 * math.pi * k / 16, 2 * math.pi * ( k + 1 ) / 16
+        d0, d1 = math.cos( t0 ) * F.x + math.sin( t0 ) * F.y, math.cos( t1 ) * F.x + math.sin( t1 ) * F.y
+        outward( model, "rw_pot", [ o + 4.4 * F.z + 2.42 * d0, o + 4.4 * F.z + 2.6 * d0, o + 4.4 * F.z + 2.6 * d1,
+                                    o + 4.4 * F.z + 2.42 * d1 ], F.z )
+    disc( model, "rw_soil", o + 4.0 * F.z, F.z, 2.45, sides=16 )
+    def rnd( *key ):
+        n = 0
+        for kk in key:
+            n = ( n * 73856093 ^ ( kk + 1 ) * 19349663 ) & 0xFFFFFF
+        return n % 1000 / 1000.0
+
+    for j in range( 7 ):                                # the crown, radiating from the pot
+        t = 2 * math.pi * j / 7 + 0.3
+        c, sn = math.cos( t ), math.sin( t )
+        at = ( x + 0.7 * c, y + 0.7 * sn, z + 4.7 + 0.6 * rnd( j, 1 ) )
+        _leaf( model, F, at, ( 0.85 * c, 0.85 * sn, 0.45 + 0.3 * rnd( j, 2 ) ), ( -0.35 * c, -0.35 * sn, 1.0 ), 1.7 + 0.4 * rnd( j, 3 ),
+               "rw_leaf_light" if j % 3 == 0 else "rw_leaf" )
+    k = 0
+    for v, vine in enumerate( VINES ):
+        path = _catmull( [ ( x + px, y + py, z + pz ) for px, py, pz in vine ], 5 )
+        polyline( model, [ F.p( *q ) for q in path ], 0.08, "rw_leaf", 4 )
+        run, total = 0.0, sum( float( np.linalg.norm( q - p ) ) for p, q in zip( path, path[1:] ) )
+        next_at = 0.6
+        for p, q in zip( path, path[1:] ):
+            seg = float( np.linalg.norm( q - p ) )
+            while next_at <= run + seg and next_at < total - 0.1:
+                at = p + ( q - p ) * ( ( next_at - run ) / seg )
+                tangent = ( q - p ) / seg
+                side = 1.0 if k % 2 else -1.0
+                h, h2, h3 = rnd( v, k, 1 ), rnd( v, k, 2 ), rnd( v, k, 3 )
+                sideways = np.cross( tangent, ( 0.0, 0.0, 1.0 ) )
+                if float( np.linalg.norm( sideways ) ) < 0.3:
+                    sideways = np.array( ( 1.0, 0.0, 0.0 ) )
+                sideways = _unit( sideways ) * side
+                if tangent[2] < -0.5:                   # hanging: the leaves turn out to the light and droop
+                    along = _unit( sideways * 0.75 + np.array( ( 0.4 * ( h2 - 0.5 ), 0.45, -0.35 - 0.3 * h3 ) ) )
+                    face = np.array( ( 0.5 * ( h3 - 0.5 ), 1.0, 0.25 + 0.3 * h2 ) )
+                else:
+                    along = _unit( sideways * 0.8 + tangent * 0.45 + np.array( ( 0.0, 0.0, 0.1 + 0.25 * h2 ) ) )
+                    face = np.array( ( 0.3 * side * ( h3 - 0.3 ), 0.25, 1.0 ) )
+                size = 1.0 + 0.9 * min( 1.0, ( total - next_at ) / 5.0 ) + 0.3 * h
+                _leaf( model, F, at, along, face, size, "rw_leaf_light" if h3 > 0.62 else "rw_leaf" )
+                k += 1
+                next_at += 0.9 + 0.4 * h
+            run += seg
+
+
+def _card_terminal( model, F, x, y, z ):
+    """ A card terminal on its swivel stand, its screen and keypad turned up towards the customer. """
+    o = F.p( x, y, z )
+    _frustum( model, o, o + 0.5 * F.z, 1.9, 1.7, DARK, sides=14 )
+    disc( model, DARK, o + 0.5 * F.z, F.z, 1.7, sides=14 )
+    rod( model, o + 0.5 * F.z, o + 1.6 * F.z, 0.35, "rw_black", 8 )
+    a = math.radians( 58 )
+    place = _leaned( F, ( x, y, z + 1.4 ), a )
+    _kbox( model, F, place, -1.7, 1.7, -0.9, 0.0, 0.0, 6.6, { "default": "rw_black" }, a=a )
+    _frect_place( model, F, place, -1.45, 1.45, 0.02, 3.4, 5.9, "pos_screen", a )
+    for r in range( 4 ):
+        for c in range( 3 ):
+            kx, kz = -1.0 + c * 1.0, 0.6 + r * 0.66
+            _frect_place( model, F, place, kx - 0.34, kx + 0.34, 0.03, kz, kz + 0.42, None, a,
+                          paint="rw_red_paint" if ( r, c ) == ( 0, 0 ) else ( "rw_container_green" if ( r, c ) == ( 0, 2 ) else "rw_steel_grey" ) )
+
+
+def _frect_place( model, F, place, x0, x1, y, z0, z1, name, a, paint=None ):
+    pts = [ place( x0, y, z0 ), place( x1, y, z0 ), place( x1, y, z1 ), place( x0, y, z1 ) ]
+    towards = _world( F, _lean( ( 0, 1, 0 ), a ) )
+    if name:
+        outward( model, "rw_kiosk", pts, towards, uv=_kiosk_uv( name ) )
+    else:
+        outward( model, paint, pts, towards )
+
+
+def _pen_cup( model, F, x, y, z ):
+    o = F.p( x, y, z )
+    _frustum( model, o, o + 3.6 * F.z, 1.15, 1.2, "rw_steel_grey", sides=12, inside=DARK )
+    disc( model, DARK, o + 0.4 * F.z, F.z, 1.1, sides=12 )
+    for k, ( dx, dy, paint ) in enumerate( ( ( 0.5, 0.2, "rw_train_blue" ), ( -0.4, 0.4, "rw_black" ), ( 0.1, -0.5, "rw_red_paint" ) ) ):
+        tip = o + ( dx * 2.6 ) * F.x + ( dy * 2.6 ) * F.y + 6.0 * F.z
+        rod( model, o + dx * 0.4 * F.x + dy * 0.4 * F.y + 0.5 * F.z, tip, 0.17, paint, 6, caps=( False, True ) )
+
+
+def _candy_tray( model, F, x0, x1, y, z, names ):
+    """ A counter display of sweet bars at the shelf's front: a sloping cardboard tray, the bars lying in it in shingled
+    rows with their wrappers up, a column of each of names across it. """
+    a = math.radians( 58 )
+    place = _leaned( F, ( 0.0, y, z ), a )
+    depth = 7.2
+    _kbox( model, F, place, x0, x1, -0.4, 0.0, 0.0, depth, "rw_kiosk_shelf", a=a )
+    for xa, side in ( ( x0, -1.0 ), ( x1, 1.0 ) ):
+        pts = [ place( xa, 0.0, 0.0 ), place( xa, 0.0, depth ), place( xa, 1.6, depth ), place( xa, 2.2, 0.0 ) ]
+        outward( model, "rw_kiosk_shelf", pts, side * F.x )
+        outward( model, "rw_kiosk_shelf", pts, -side * F.x )
+    lip = [ place( x0, 0.0, 0.0 ), place( x1, 0.0, 0.0 ), place( x1, 2.2, 0.0 ), place( x0, 2.2, 0.0 ) ]
+    outward( model, "rw_kiosk_shelf", lip, _world( F, _lean( ( 0, 0, -1 ), a ) ) )
+    outward( model, "rw_kiosk_shelf", lip, _world( F, _lean( ( 0, 0, 1 ), a ) ) )
+    width = ( x1 - x0 - 0.6 ) / len( names )
+    for c, name in enumerate( names ):
+        bx0 = x0 + 0.3 + c * width + 0.15
+        bx1 = bx0 + width - 0.3
+        for r in range( 4 ):
+            zb = 0.3 + r * 1.7
+            _kbox( model, F, place, bx0, bx1, 0.0, 0.55, zb, zb + 1.65, { "default": "rw_kiosk_shelf" }, cover=None, a=a )
+            _frect_place( model, F, place, bx0, bx1, 0.56, zb, zb + 1.65, name, a )
+
+
+def kiosk( model, e0, e1, n0, n1, facing, z0=0.0 ):
+    """ A modern station kiosk 2.76 m tall over e0..e1, n0..n1, after the user's reference picture: anthracite steel
+    cladding with shadow gaps on a recessed black plinth, a flat roof slab overhanging with warm LED strips under it,
+    and a fascia proud of the walls lettered "Kiosk" and "Zeitschriften · Getraenke · Snacks" in white on its front and
+    both ends. Its front has a pier with line icons (a newspaper, a bottle, a crisp packet), the serving window and a
+    corner pier; the window has a light stone counter on vertical oak slats lit from under it, and behind it lit
+    shelves of magazines, sweets, crisps and bottled drinks. On the counter: a trailing pothos in a white pot, a card
+    terminal and a pen cup. Its right end (from the front) has a menu board and a framed poster, its left the staff
+    door, its back a louvred vent. Collision: the kiosk, its counter, fascia
+    and roof slab (metal). """
     F = frame_for( ( e0 + e1 ) / 2, ( n0 + n1 ) / 2, z0, facing )
     along_e = abs( F.x[0] ) > 0.5
     hx = abs( e1 - e0 ) / 2 if along_e else abs( n1 - n0 ) / 2
     hy = abs( n1 - n0 ) / 2 if along_e else abs( e1 - e0 ) / 2
-    wall, top = 86.0, 104.0
-    ox = hx - 5.0                                                   # the hatch's half width
-    F.box( model, -hx, hx, -hy, hy, 0.0, wall, { "default": DARK, "front": None, "top": None }, skip=( "bottom", ) )
-    for x0, x1, z0_, z1_ in ( ( -hx, hx, 0.0, 36.0 ), ( -hx, -ox, 36.0, wall ), ( ox, hx, 36.0, wall ),
-                              ( -ox, ox, 84.0, wall ) ):
-        _frect( model, F, DARK, x0, x1, hy, z0_, z1_ )
-    for s, face in ( ( 1.0, "right" ), ( -1.0, "left" ) ):         # side and back glazing in 1 m bays
-        bays = max( 1, round( ( 2 * hy - 8.0 ) / 40.0 ) )
-        edges = np.linspace( -hy + 4.0, hy - 4.0, bays + 1 )
-        for y0, y1 in zip( edges, edges[1:] ):
-            _xrect( model, F, "rw_window_dark", s * ( hx + 0.03 ), y0 + 0.8, y1 - 0.8, 42.0, 80.0, s )
-    bays = max( 1, round( ( 2 * hx - 8.0 ) / 40.0 ) )
-    edges = np.linspace( -hx + 4.0, hx - 4.0, bays + 1 )
-    for x0, x1 in zip( edges, edges[1:] ):
-        _frect( model, F, "rw_window_dark", x0 + 0.8, x1 - 0.8, -hy - 0.03, 42.0, 80.0, -1.0 )
-    back = hy - 14.0                                                # the hatch's recess
-    _frect( model, F, "rw_steel_grey", -ox, ox, back, 39.5, 84.0 )
-    _xrect( model, F, DARK, -ox, back, hy, 39.5, 84.0, 1.0 )
-    _xrect( model, F, DARK, ox, back, hy, 39.5, 84.0, -1.0 )
-    _fpoly( model, F, "rw_lamp_warm", [ ( -ox, back, 84.0 ), ( ox, back, 84.0 ), ( ox, hy, 84.0 ), ( -ox, hy, 84.0 ) ],
-            ( 0, 0, -1 ) )
-    k = 0
-    for z in ( 52.0, 63.0, 74.0 ):
-        F.box( model, -ox, ox, back, back + 5.0, z - 1.0, z, "rw_wood", skip=( "back", ) )
-        count = max( 2, int( 2 * ox / 7.0 ) )
-        for j in range( count ):
-            x0 = -ox + 1.0 + j * ( 2 * ox - 2.0 ) / count
-            paint = VENDING_GOODS[( k * 5 ) % len( VENDING_GOODS )]
-            k += 1
-            x1 = x0 + ( 2 * ox - 2.0 ) / count - 1.2
-            _frect( model, F, paint, x0, x1, back + 4.0, z, z + 6.5 )
-            zt = z + 6.5
-            _fpoly( model, F, paint, [ ( x0, back + 0.5, zt ), ( x1, back + 0.5, zt ), ( x1, back + 4.0, zt ),
-                                       ( x0, back + 4.0, zt ) ], ( 0, 0, 1 ) )
-    F.box( model, -ox, ox, back, hy, 36.0, 39.5, "rw_steel_grey", skip=( "bottom", "back" ) )
-    F.box( model, -hx + 3.0, hx - 3.0, hy, hy + 8.0, 36.0, 39.5, "rw_steel_grey", skip=( "back", ) )
-    F.box( model, -hx + 8.0, hx - 8.0, hy, hy + 3.0, 6.0, 33.0, "rw_steel_grey", skip=( "back", ) )
-    papers = ( "rw_white_paint", "rw_red_paint", "rw_yellow_paint", "rw_train_blue", "rw_white_paint",
-               "rw_container_green" )
-    count = max( 1, int( ( 2 * hx - 18.0 ) / 8.0 ) )
-    for row, z in enumerate( ( 9.0, 21.0 ) ):
-        for j in range( count ):
-            x = -hx + 9.0 + ( j + 0.5 ) * ( 2 * hx - 18.0 ) / count
-            F.quad( model, papers[( j + row * 3 ) % len( papers )], x, hy + 3.03, z + 5.0, 6.6, 9.4 )
-    F.box( model, -hx - 1.0, hx + 1.0, -hy - 1.0, hy + 1.0, wall, top, DARK, skip=( "top", ) )
-    sh = min( 15.0, ( 2 * hx - 8.0 ) / 5.0 )
-    F.atlas( model, "rw_shopsigns", sign, 0.0, hy + 1.03, ( wall + top ) / 2, sh * 5.0, sh, "front" )
-    side = min( 15.0, ( 2 * hy - 8.0 ) / 5.0 )
-    if side >= 6.0:
-        F.atlas( model, "rw_shopsigns", sign, hx + 1.03, 0.0, ( wall + top ) / 2, side * 5.0, side, "right" )
-        F.atlas( model, "rw_shopsigns", sign, -hx - 1.03, 0.0, ( wall + top ) / 2, side * 5.0, side, "left" )
-    F.box( model, -hx - 6.0, hx + 6.0, -hy - 6.0, hy + 6.0, top, top + 2.0, DARK )
-    F.collide( model, -hx - 1.0, hx + 1.0, -hy - 1.0, hy + 1.0, 0.0, top + 2.0, "metal" )
-    F.collide( model, -hx + 3.0, hx - 3.0, hy, hy + 8.0, 0.0, 39.5, "metal" )
+    PL, ZC, ZO, ZF, ZR = KIOSK_PLINTH, KIOSK_COUNTER, KIOSK_OPEN, KIOSK_FASCIA, KIOSK_ROOF
+    CL, GAP = 0.4, 0.45                                 # the cladding panels' thickness and the shadow gaps
+    xl, xr = -hx + 15.0, hx - 17.0                      # the serving window between the piers
+    yb = hy - 30.0                                      # the shelves' back panel
+    fp = 1.2                                            # the fascia stands this far proud of the walls
+
+    # The plinth, and the walls' black core behind the cladding.
+    F.box( model, -hx + 1.0, hx - 1.0, -hy + 1.0, hy - 1.0, 0.0, PL, "rw_black", skip=( "bottom", "top" ) )
+    F.box( model, -hx + CL, hx - CL, -hy + CL, hy - CL, PL, ZO, { "default": "rw_black", "front": None },
+           skip=( "bottom", "top" ) )
+
+    def panels( lo, hi, width ):
+        count = max( 1, round( ( hi - lo ) / width ) )
+        edges = [ lo + ( hi - lo ) * k / count for k in range( count + 1 ) ]
+        return [ ( a + ( GAP / 2 if k else 0.0 ), b - ( GAP / 2 if k < count - 1 else 0.0 ) )
+                 for k, ( a, b ) in enumerate( zip( edges, edges[1:] ) ) ]
+
+    rows = ( ( PL, ZC - GAP / 2 ), ( ZC + GAP / 2, ZO ) )
+    for s in ( 1.0, -1.0 ):                             # the ends' cladding: 24 in panels, split at counter height
+        for a, b in panels( -hy, hy - CL, 24.0 ):
+            for z_0, z_1 in rows:
+                xa, xb = ( hx - CL, hx ) if s > 0 else ( -hx, -hx + CL )
+                F.box( model, xa, xb, a, b, z_0, z_1, DARK, skip=( "top", ) if z_1 >= ZO else () )
+    for a, b in panels( -hx + CL, hx - CL, 24.0 ):      # the back's, between the ends
+        for z_0, z_1 in rows:
+            F.box( model, a, b, -hy, -hy + CL, z_0, z_1, DARK, skip=( "top", ) if z_1 >= ZO else () )
+    for a, b in ( ( -hx, xl ), ( xr, hx ) ):            # the piers, one panel each
+        F.box( model, a, b, hy - CL, hy, PL, ZO, DARK, skip=( "top", ) )
+
+    # The pier's icons.
+    iw = 9.6
+    F.atlas( model, "rw_kiosk", "icons", ( -hx + xl ) / 2, hy + 0.04, 63.0, iw, iw / _kiosk_aspect( "icons" ), "front" )
+
+    # The fascia, the roof slab and its LED strips.
+    F.box( model, -hx - fp, hx + fp, -hy - fp, hy + fp, ZO, ZF, { "default": DARK, "bottom": "rw_black" } )
+    F.box( model, -hx - 7.0, hx + 7.0, -hy - 5.0, hy + 9.0, ZF, ZR, { "default": DARK, "bottom": "rw_black",
+                                                                       "top": "rw_concrete_dark" } )
+    for x0_, x1_, y0_, y1_ in ( ( -hx - 4.0, hx + 4.0, hy + 4.4, hy + 5.4 ), ( hx + 3.6, hx + 4.6, -hy - 2.0, hy + 5.4 ),
+                                ( -hx - 4.6, -hx - 3.6, -hy - 2.0, hy + 5.4 ) ):
+        F.box( model, x0_, x1_, y0_, y1_, ZF - 0.5, ZF, { "default": "rw_steel_grey", "bottom": "rw_lamp_warm" },
+               skip=( "top", ) )
+    # Lettering: "Kiosk" over the line of goods, on the front and both ends.
+    ww, sw = 30.5, 48.0
+    wh, sh = ww / _kiosk_aspect( "kiosk_word" ), sw / _kiosk_aspect( "kiosk_sub" )
+    for face, x, y in ( ( "front", 0.0, hy + fp + 0.04 ), ( "right", hx + fp + 0.04, 0.0 ), ( "left", -hx - fp - 0.04, 0.0 ) ):
+        F.atlas( model, "rw_kiosk", "kiosk_word", x, y, 97.8, ww, wh, face )
+        F.atlas( model, "rw_kiosk", "kiosk_sub", x, y, 89.3, sw, sh, face )
+
+    # The serving window: its reveals, ceiling (an LED line along its front, downlights over the shelves) and the
+    # space behind the counter.
+    _xrect( model, F, DARK, xl, yb, hy, PL, ZO, 1.0 )
+    _xrect( model, F, DARK, xr, yb, hy, PL, ZO, -1.0 )
+    _fpoly( model, F, "rw_black", [ ( xl, yb, ZO ), ( xr, yb, ZO ), ( xr, hy, ZO ), ( xl, hy, ZO ) ], ( 0, 0, -1 ) )
+    F.box( model, xl, xr, hy - 2.6, hy - 1.4, ZO - 0.5, ZO, { "default": "rw_steel_grey", "bottom": "rw_lamp_warm" },
+           skip=( "top", ) )
+    for k in range( 3 ):
+        x = xl + ( xr - xl ) * ( k + 0.5 ) / 3
+        disc( model, "rw_steel_grey", F.p( x, yb + 13.0, ZO - 0.03 ), -F.z, 1.6, sides=12 )
+        disc( model, "rw_lamp_warm", F.p( x, yb + 13.0, ZO - 0.06 ), -F.z, 1.05, sides=12 )
+    _fpoly( model, F, "rw_black", [ ( xl, yb, PL ), ( xr, yb, PL ), ( xr, hy - 14.0, PL ), ( xl, hy - 14.0, PL ) ], ( 0, 0, 1 ) )
+    _frect( model, F, DARK, xl, xr, hy - 14.0, PL, ZC - 2.0, -1.0 )
+
+    # The counter: a light stone top on oak slats, an LED strip under its front edge.
+    F.box( model, xl - 2.0, xr + 2.0, hy - 14.0, hy + 4.5, ZC - 2.0, ZC, "rw_kiosk_stone" )
+    F.box( model, xl, xr, hy + 2.5, hy + 3.5, ZC - 2.4, ZC - 2.0, { "default": "rw_steel_grey", "bottom": "rw_lamp_warm" },
+           skip=( "top", ) )
+    _frect( model, F, "rw_black", xl, xr, hy - 0.4, PL, ZC - 2.0 )
+    count = int( ( xr - xl ) / 2.5 )
+    pitch = ( xr - xl ) / count
+    for k in range( count ):
+        x = xl + pitch * ( k + 0.5 )
+        F.box( model, x - 0.9, x + 0.9, hy - 0.4, hy + 0.6, PL + 0.5, ZC - 2.0, "rw_wood", skip=( "back", "top" ) )
+
+    # The shelves: a base cabinet, three bays of wood shelves with an LED strip under each front edge.
+    F.box( model, xl, xr, yb, yb + 10.0, PL, KIOSK_SHELVES[0], { "default": DARK, "top": "rw_wood", "back": None } )
+    _frect( model, F, "rw_kiosk_shelf", xl, xr, yb, KIOSK_SHELVES[0], ZO )
+    bays = [ ( xl + ( xr - xl ) * k / 3, xl + ( xr - xl ) * ( k + 1 ) / 3 ) for k in range( 3 ) ]
+    for k, ( a, b ) in enumerate( bays ):
+        if k:
+            F.box( model, a - 0.6, a + 0.6, yb, yb + 10.4, KIOSK_SHELVES[0], ZO, "rw_wood", skip=( "back", "top" ) )
+        a, b = a + ( 0.6 if k else 0.0 ), b - ( 0.6 if k < 2 else 0.0 )
+        for z in KIOSK_SHELVES[1:]:
+            F.box( model, a, b, yb, yb + 10.0, z - 1.0, z, "rw_wood", skip=( "back", ) )
+            _frect( model, F, "rw_white_paint", a + 0.4, b - 0.4, yb + 10.03, z - 0.85, z - 0.2 )
+        for z in KIOSK_SHELVES:
+            under = z - 1.0 if z > KIOSK_SHELVES[0] else None
+            if under:
+                _fpoly( model, F, "rw_lamp_warm", [ ( a, yb + 8.4, under - 0.02 ), ( b, yb + 8.4, under - 0.02 ),
+                                                    ( b, yb + 9.0, under - 0.02 ), ( a, yb + 9.0, under - 0.02 ) ], ( 0, 0, -1 ) )
+        if k == 0:                                      # magazines, two covers a shelf, leaning on the back
+            for row, z in enumerate( KIOSK_SHELVES ):
+                for c in range( 2 ):
+                    name = f"mag_{( row * 2 + c ) % 8}"
+                    mw = 8.3
+                    mx = a + ( b - a ) * ( c + 0.5 ) / 2
+                    at = ( mx, yb + 3.4, z )
+                    lean = math.radians( 13.0 )
+                    _kbox( model, F, _leaned( F, at, lean ), -mw / 2, mw / 2, -0.7, 0.0, 0.0, 10.0,
+                           { "default": "rw_white_paint", "back": "rw_white_paint" }, cover=name, a=lean )
+                F.box( model, a + 0.3, b - 0.3, yb + 3.4, yb + 4.1, z, z + 1.4, "rw_steel_grey", skip=( "bottom", ) )
+        elif k == 1:                                    # sweets at the bottom, crisps above
+            _candy_tray( model, F, a + 0.6, ( a + b ) / 2 - 0.3, yb + 8.0, KIOSK_SHELVES[0], ( "candy_0", "candy_1" ) )
+            _candy_tray( model, F, ( a + b ) / 2 + 0.3, b - 0.6, yb + 8.0, KIOSK_SHELVES[0], ( "candy_2", "candy_3" ) )
+            for row, z in enumerate( KIOSK_SHELVES[1:] ):
+                for c in range( 3 ):
+                    px = a + ( b - a ) * ( c + 0.5 ) / 3
+                    _packet( model, F, f"chips_{( row * 3 + c ) % 5}", px, yb + 6.2, z, 6.3, 8.9, 2.6, 9.0 )
+        else:                                           # bottled drinks, two kinds a shelf
+            for row, z in enumerate( KIOSK_SHELVES ):
+                kinds = KIOSK_DRINK_ROWS[row]
+                for c in range( 6 ):
+                    bx = a + ( b - a ) * ( c + 0.5 ) / 6
+                    _bottle( model, F, bx, yb + 6.6, z, kinds[c // 3] )
+
+    # On the counter.
+    _plant( model, F, xl + 5.0, hy - 2.0, ZC )
+    _card_terminal( model, F, xr - 15.0, hy + 0.2, ZC )
+    _pen_cup( model, F, xr - 7.5, hy - 1.5, ZC )
+
+    # The right end: the menu board and a framed poster.
+    mw = 20.0
+    mh = mw / _kiosk_aspect( "menu" )
+    ym = hy - 20.0
+    F.box( model, hx, hx + 0.8, ym - mw / 2 - 0.5, ym + mw / 2 + 0.5, 60.0 - mh / 2 - 0.5, 60.0 + mh / 2 + 0.5,
+           "rw_steel_grey", skip=( "left", ) )
+    F.atlas( model, "rw_kiosk", "menu", hx + 0.84, ym, 60.0, mw, mh, "right" )
+    pw = 21.0
+    ph = pw / _kiosk_aspect( "poster" )
+    yp = ym - mw / 2 - 6.0 - pw / 2 - 1.4
+    if yp - pw / 2 - 1.4 > -hy + 4.0:
+        for y0_, y1_, z0_, z1_ in ( ( yp - pw / 2 - 1.4, yp + pw / 2 + 1.4, 60.0 + ph / 2, 60.0 + ph / 2 + 1.4 ),
+                                    ( yp - pw / 2 - 1.4, yp + pw / 2 + 1.4, 60.0 - ph / 2 - 1.4, 60.0 - ph / 2 ),
+                                    ( yp - pw / 2 - 1.4, yp - pw / 2, 60.0 - ph / 2, 60.0 + ph / 2 ),
+                                    ( yp + pw / 2, yp + pw / 2 + 1.4, 60.0 - ph / 2, 60.0 + ph / 2 ) ):
+            F.box( model, hx, hx + 1.1, y0_, y1_, z0_, z1_, "rw_wood", skip=( "left", ) )
+        _xrect( model, F, "rw_kiosk_shelf", hx + 0.5, yp - pw / 2, yp + pw / 2, 60.0 - ph / 2, 60.0 + ph / 2, 1.0 )
+        F.atlas( model, "rw_kiosk", "poster", hx + 0.56, yp, 60.0, pw - 3.0, ( pw - 3.0 ) / _kiosk_aspect( "poster" ), "right" )
+
+    # The left end: the staff door. The back: a louvred vent.
+    yd = -hy + 21.0
+    F.box( model, -hx - 0.12, -hx + 0.1, yd - 15.5, yd + 15.5, PL + 0.8, 82.5, "rw_black", skip=( "right", ) )
+    F.box( model, -hx - 0.3, -hx, yd - 15.0, yd + 15.0, PL + 1.3, 82.0, DARK, skip=( "right", ) )
+    rod( model, F.p( -hx - 0.3, yd + 11.5, 41.0 ), F.p( -hx - 2.2, yd + 11.5, 41.0 ), 0.35, "rw_steel_grey", 8 )
+    rod( model, F.p( -hx - 2.2, yd + 11.5, 41.0 ), F.p( -hx - 2.2, yd + 6.5, 41.0 ), 0.35, "rw_steel_grey", 8,
+         caps=( False, True ) )
+    disc( model, "rw_steel_grey", F.p( -hx - 0.33, yd + 11.5, 37.0 ), -F.x, 0.55, sides=10 )
+    for k in range( 7 ):
+        z = 70.0 + 1.6 * k
+        _obox( model, F, ( 0.0, -hy - 0.5, z ), ( 1, 0, 0 ), ( 0, 1, -0.7 ), ( 18.0, 1.2, 0.15 ), DARK )
+    for x0_, x1_, z0_, z1_ in ( ( -9.8, 9.8, 68.8, 69.4 ), ( -9.8, 9.8, 80.2, 80.8 ), ( -9.8, -9.2, 68.8, 80.8 ),
+                                ( 9.2, 9.8, 68.8, 80.8 ) ):
+        F.box( model, x0_, x1_, -hy - 0.9, -hy, z0_, z1_, DARK, skip=( "front", ) )
+    _frect( model, F, "rw_black", -9.2, 9.2, -hy - 0.02, 69.4, 80.2, -1.0 )
+
+    # Collision.
+    F.collide( model, -hx, hx, -hy, hy, 0.0, ZO, "metal" )
+    F.collide( model, xl - 2.0, xr + 2.0, hy, hy + 4.5, ZC - 2.0, ZC, "metal" )
+    F.collide( model, -hx - fp, hx + fp, -hy - fp, hy + fp, ZO, ZF, "metal" )
+    F.collide( model, -hx - 7.0, hx + 7.0, -hy - 5.0, hy + 9.0, ZF, ZR, "metal" )
+
+
+def kiosk_lights( e0, e1, n0, n1, facing, z0=0.0 ):
+    """ The kiosk's own lights for railhead_map: ( position, radius ) of one in its serving window's ceiling over the
+    shelves, and a small one under the counter's front edge washing the oak slats, as its LED strip would. """
+    F = frame_for( ( e0 + e1 ) / 2, ( n0 + n1 ) / 2, z0, facing )
+    along_e = abs( F.x[0] ) > 0.5
+    hy = abs( n1 - n0 ) / 2 if along_e else abs( e1 - e0 ) / 2
+    return [ ( tuple( float( v ) for v in F.p( 0.0, hy - 12.0, KIOSK_OPEN - 4.0 ) ), 110.0 ),
+             ( tuple( float( v ) for v in F.p( -1.0, hy + 3.0, KIOSK_COUNTER - 3.0 ) ), 42.0 ) ]
 
 
 def hanging_display( model, e, n, z_top, name, along="n", floor_z=0.0, width=118.1 ):

@@ -2147,6 +2147,33 @@ simulate_input.
       benches met at their backrests (the user saw the first, 2026-10-05). The bin is now at e 622 facing the
       concourse, and the hall's benches are 24 apart like the platforms'. A check of every piece `use` places, by the
       bounds of what it draws, found no other overlaps.
+    - The kiosks (`kiosk`; `railhead_map.KIOSKS`: the concourse's two, 100 by 80, and the centre platform's, 100 by
+      120) were rebuilt on 2026-10-05 after the user's picture of a modern station kiosk: "dont stop until its really
+      AAA like the img". The old one was a dark box with a hatch and coloured blocks for goods.
+      - The body: anthracite cladding (`rw_steel_dark`) in 24 in panels with shadow gaps, split at counter height, on
+        a recessed black plinth. On top, a fascia proud of the walls under a flat roof slab, with warm LED strips under
+        its overhang.
+      - The fascia reads "Kiosk" and "Zeitschriften · Getränke · Snacks" in white on the front and both ends. A pier
+        left of the window has line icons: a newspaper, a bottle and a crisp packet.
+      - Under the window, a light stone counter (`rw_kiosk_stone`) on vertical oak slats, with an LED strip under its
+        front edge. On the counter: a trailing pothos in a white pot (`_plant`, `VINES`), a card terminal and a pen
+        cup.
+      - Behind the counter, three bays of lit wood shelves on a warm white back: magazines, then sweets in trays and
+        crisp packets (foil pillows, `_packet`), then 0.5 l bottles (`_bottle`, lathed).
+      - The right end has a menu board and a framed poster, the left end the staff door, the back a louvred vent.
+      - Two lights each (`kiosk_lights`, in `lights()`): one in the window over the shelves, and a small one under the
+        counter washing the slats.
+      - `Tools/railhead_kiosk_art.py` draws the rw_kiosk atlas: the lettering, icons, menu, poster, the covers, packets,
+        labels and wrappers, and the card terminal's screen. It's plain Python (it reads the fonts' glyf outlines and
+        fills them itself), so it runs without numpy or PIL. The lettering is alpha-tested and self-lit, along with
+        the screen. railhead_materials lists the atlas (`ATLASES`, `OWN_SCRIPT`) but doesn't draw it. Its counter,
+        shelf, plant and bottle paints are PAINTED.
+      - The atlas's four PNGs aren't in the repository: the session that made them couldn't upload to its LFS store
+        (the storage host was blocked there). `railhead_map.py` draws them when they're missing (~12 s), so a run
+        brings them back. Commit them from a machine that can push LFS.
+      - Every name on it is a plain German word (REISEN, Chips, Wasser...): no real title, brand or logo.
+      - Checked only in offline WebGL renders of the generator's output with the textures, not in the engine. Rerun
+        `railhead_map.py` to rebuild the models.
     - `--preview <dir>` renders its showcase.
   - `railhead_backdrop.py`: the city round the station. Its docstring has the layout and the sources.
     - The play area's east and west walls are rows of five-storey Gründerzeit (1880-1910) tenements across the cab
