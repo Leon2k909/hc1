@@ -2098,6 +2098,9 @@ simulate_input.
     - the sandstone head building with its vaulted booking hall and gallery;
     - the footbridge, the platform canopies, the cab roads' arcades, the goods sheds on their loading banks and the
       signal box.
+    - The footbridge's inside handrail ran its whole length, so it crossed the top of each stair at waist height (the
+      user's screenshot, 2026-10-05). It now stops at each stair's opening and turns into the stair's handrails,
+      which run on 6 over the deck to meet it. It has no collision, so it never blocked anyone.
   - `railhead_props.py`: the track and its equipment, the rolling stock, containers, furniture and yard clutter. Its
     docstring has each prop's API, conventions and triangle and collision budget.
     - Track: UIC 60 rail, crossovers, buffer stops, Ks signals and the overhead line.

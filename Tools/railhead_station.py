@@ -527,8 +527,15 @@ def footbridge( model, glass ):
             for k in range( int( ( b - a ) // 60 ) + 1 ):
                 e = min( a + 60 * k, b - 1.5 )
                 model.box( ( e, wall_lo - 0.5, 250 ), ( e + 3, wall_hi + 0.5, BRIDGE_ROOF ), "rw_steel_dark" )
-        # The handrail inside.
-        model.beam( ( 0, side_n + inward * 6, 248 ), ( WALL_IN, side_n + inward * 6, 248 ), ( 2.0, 2.0 ), "rw_steel_grey" )
+        # The handrail inside, at the stairs' handrail height. It stops at each stair's opening, turning into the
+        # stair's own handrails (bridge_stair), which come up onto the deck to meet it.
+        rail_n, rail_z = side_n + inward * 6, DECK_Z + 36
+        ends = [ 0.0 ]
+        for a, b in sorted( ( a, b ) for a, b, d in BRIDGE_STAIRS if ( d > 0 ) == ( side_n == n1 ) ):
+            ends += [ a + 1.5 + 1.0, b - 1.5 - 1.0 ]
+        ends.append( WALL_IN )
+        for a, b in zip( ends[::2], ends[1::2] ):
+            model.beam( ( a, rail_n, rail_z ), ( b, rail_n, rail_z ), ( 2.0, 2.0 ), "rw_steel_grey" )
     model.box( ( 0, n0 - 6, BRIDGE_ROOF ), ( WALL_IN, n1 + 6, BRIDGE_ROOF + 6 ),
                { "+z": "corrugated", "-z": "rw_steel_grey", "default": "rw_steel_dark", "-e": None }, SHEET )
     for k in range( int( WALL_IN // 120 ) ):
@@ -575,6 +582,9 @@ def bridge_stair( model, e0, e1, down ):
         for a, za, b, zb in ( ( bottom_n, 36.0, n, landing_z + 36 ), ( n, landing_z + 36, n2, landing_z + 36 ),
                               ( n2, landing_z + 36, top_n, DECK_Z + 36 ) ):
             tube( model, ( e_rail, a, za ), ( e_rail, b, zb ), 1.0, "rw_steel_grey", sides=8 )
+        # On over the deck's edge to the bridge's handrail (footbridge), which ends at this one.
+        tube( model, ( e_rail, top_n, DECK_Z + 36 ), ( e_rail, top_n - down * 6, DECK_Z + 36 ), 1.0, "rw_steel_grey",
+              sides=8 )
     # Its bottom: a yellow line on the platform where the stair starts.
     na, nb = sorted( ( bottom_n, bottom_n - climb * 12 ) )
     model.polygon( "rw_line_yellow", [ ( e0, na, 0.05 ), ( e1, na, 0.05 ), ( e1, nb, 0.05 ), ( e0, nb, 0.05 ) ] )
