@@ -2953,8 +2953,36 @@ simulate_input.
   game-mode prefab, and Zombies' call in `StartNextRound`. Don't put them back.
 - The radio's ~2 s RoundStarted voice line is off too (2026-09-30, the user: "i dont like the talking when i first spawn
   in"): its `Facepunch.PlayRadio` component is disabled (`__enabled: false`) in all nine game-mode prefabs that had one.
-  Don't turn it back on. `RadioSounds` and the other voice lines are unchanged.
+  Don't turn it back on.
 - Still there: the same sting when a Zombies power-up is picked up (`ZombiesRoundSystem`).
+
+## No radio voice lines
+- The user had every radio voice line deleted (2026-10-05): the 39 events and 118 MP3s in `sounds/radio/`, and
+  `radio_sounds/terrorist.radio` and `counter_terrorist.radio`, which listed them.
+- `RadioSounds.Play( team, RadioSound )` does nothing now, and the radio menu's callouts (`Play( team, category,
+  sound )`) only put their text in team chat ("Planting bomb", "Defusing the bomb"). Don't put the playback back.
+  - Compiled files are git-ignored, so a machine that had the lines keeps its compiled `.radio_c` and `.sound_c` after
+    a pull, and a compiled file with no source still loads. Without the playback, those can't play.
+  - Delete the leftover `Assets/radio_sounds/` and `Assets/sounds/radio/` folders locally to tidy up.
+- The callers stay, so nothing else changed: `PlayRadio` (in the game-mode prefabs), `PlayRadioOnKill`, the
+  grenade throw's call in `Throwable`, the Radio volume slider and the Radio key (the radio menu, `Radio.razor`, is
+  already out of MainHUD). Not compiled or checked in-game.
+
+## Cloud sessions can't upload LFS files
+- From a cloud session the network policy refuses `github-cloud.s3.amazonaws.com`, where GitHub keeps LFS objects
+  (2026-10-05, and earlier for Railhead's atlases). Every `.wav`, `.png`, `.mp3`, `.fbx` and compiled model or
+  texture goes through LFS (`.gitattributes`), so a cloud session can't commit new ones. Downloads work
+  (`git lfs pull --include=<path>`). Deleting LFS files works too: it's only a commit.
+- So when the user asked for the remaining s&box, original-project and CoD sounds to be replaced (2026-10-05), they
+  called it off rather than have the WAVs go into plain git. The audit found what's left:
+  - CoD rips: all 16 ported guns' shots, suppressed shots, reloads and raises (~530 events), the Kastov-74u's unvoiced.
+  - The original project's: the M4A1, MP5, SCAR-H, USP, USP-SD, M700, Spaghelli and 1911 shots and reloads, the swb
+    suppressed shots, the swb guns' sounds, the C4's beeps and `loot_box`, the cash bag's and drone's draw
+    (`weapon_switch`), the drone's flight loop, Zombies' buy chime and power-up sting, and the spent-casing fallback
+    bounce (`shell_case_bounce`).
+  - s&box's own, by name: `impact-bullet-generic` (swb's impact fallback), `footstep-concrete-land` (the player's
+    `LandSound` fallback), `impact-melee-metal` (`grenade.surface`), `explosion_small` (`tec/explosion_med_tec`),
+    `countdown.beep` (`c4_planting_beep`), and the soundscape's `birdchirp`.
 
 ## HUD look (`MainHUD`, 2026-10-05)
 - The user asked for the HUD to look different, and for the weapon list to show only while switching weapons. It's in

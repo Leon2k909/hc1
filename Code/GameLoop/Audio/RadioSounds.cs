@@ -1,5 +1,4 @@
 using Facepunch.UI;
-using Sandbox.Audio;
 
 namespace Facepunch;
 
@@ -70,19 +69,11 @@ public class RadioSounds : GameResource
 	[Property, Group( "Data" )] public List<TeamRadioCategory> TeamSounds { get; set; }
 
 	/// <summary>
-	/// Called on the host to broadcast radio sounds to people
+	/// Played a team's voice line for a match event. The voice lines were deleted (the user, 2026-10-05), so it plays
+	/// nothing: a compiled .radio left on a machine after its source went would otherwise still load and play them.
 	/// </summary>
-	/// <param name="team"></param>
-	/// <param name="snd"></param>
 	public static void Play( Team team, RadioSound snd )
 	{
-		if ( !Networking.IsHost ) return;
-
-		// Only send this message to members of the specified team
-		using ( Rpc.FilterInclude( GameUtils.GetPlayers( team ).Select( x => x.Connection ) ) )
-		{
-			RpcPlay( team, snd );
-		}
 	}
 
 	/// <summary>
@@ -109,11 +100,11 @@ public class RadioSounds : GameResource
 		if ( player.HealthComponent.State != LifeState.Alive )
 			return;
 
-		// Only send this message to members of the specified team
+		// Only send this message to members of the specified team. It's the callout's text in team chat: its voice
+		// line was deleted with the rest.
 		using ( Rpc.FilterInclude( GameUtils.GetPlayers( team ).Select( x => x.Connection ) ) )
 		{
 			Chat.Instance?.AddText( sound, Chat.ChatModes.Team, "radio" );
-			RpcPlay( team, category, sound );
 		}
 	}
 
@@ -127,69 +118,6 @@ public class RadioSounds : GameResource
 
 		var team = Client.Local.Team;
 		Play( team, category, sound );
-	}
-
-	[Rpc.Broadcast]
-	private static void RpcPlay( Team team, string category, string sound )
-	{
-		if ( !Client.Local.IsValid() )
-		{
-			Log.Warning( "Tried to play a TEAM radio sound but there's no local Client" );
-			return;
-		}
-
-		var localPlayerTeam = Client.Local.Team;
-
-		var soundList = All.FirstOrDefault( x => x.Team == localPlayerTeam );
-		if ( soundList is null )
-			return;
-
-		// Multi-client testing
-		if ( team != localPlayerTeam )
-			return;
-
-		var categorySounds = soundList.TeamSounds.FirstOrDefault( x => x.Category == category );
-		if ( categorySounds is null )
-			return;
-
-		var entry = categorySounds.Entries.FirstOrDefault( x => x.Name == sound );
-		if ( entry is null )
-			return;
-
-		// Play the sound
-		var snd = Sound.Play( entry.Sound );
-		snd.TargetMixer = Mixer.FindMixerByName( "Radio" );
-	}
-
-	[Rpc.Broadcast]
-	private static void RpcPlay( Team team, RadioSound snd )
-	{
-		if ( !Client.Local.IsValid() )
-		{
-			Log.Warning( "Tried to play a radio sound but there's no local Client" );
-			return;
-		}
-
-		var localPlayerTeam = Client.Local.Team;
-
-		var soundList = All.FirstOrDefault( x => x.Team == localPlayerTeam );
-		if ( soundList is null )
-			return;
-
-		// Multi-client testing
-		if ( team != localPlayerTeam )
-			return;
-
-		if ( soundList.Sounds.TryGetValue( snd, out var sndEvent ) )
-		{
-			// play the sound
-			var s = Sound.Play( sndEvent );
-			s.TargetMixer = Mixer.FindMixerByName( "Radio" );
-		}
-		else
-		{
-			Log.Warning( $"No sound found for {snd}" );
-		}
 	}
 
 	protected override void PostLoad()

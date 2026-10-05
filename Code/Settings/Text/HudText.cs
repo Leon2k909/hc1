@@ -20,7 +20,7 @@ public static partial class GameText
 		["Everyone"] = ("Tout le monde", "Alle", "Todos", "Todos"),
 		["Nearby"] = ("À proximité", "In der Nähe", "Cercanos", "Próximos"),
 
-		// Radio menu and its lines in chat (Assets/radio_sounds/*.radio)
+		// Radio callouts' text in team chat (RadioSounds.Play). Their voice lines and the .radio files were deleted.
 		["Remarks"] = ("Remarques", "Bemerkungen", "Comentarios", "Comentários"),
 		["Good shot"] = ("Joli tir", "Guter Schuss", "Buen tiro", "Belo tiro"),
 		["Friendly Fire"] = ("Tir allié", "Eigenbeschuss", "Fuego amigo", "Fogo amigo"),
