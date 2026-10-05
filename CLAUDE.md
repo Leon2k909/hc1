@@ -587,6 +587,11 @@
   - The iron sights (ads_in's last frame with the pack's own aim, its lua's 3 forward).
   - Six optics on the claw mount, from the side and through them aiming: the fixed rear sight stays at least 0.29
     under each, and their windows are clear of it.
+- Magnified optics at the hip (2026-10-05): the claw mount holds every optic higher than the rifles' rails, so at the
+  hip its eyepiece is 0.2-0.8" above eye level (from idle.dmx's first frame: the 6x Precision Scope's 5.95" ahead, 2.48"
+  right and 0.51" up; the Kastov 762's 0.19" below). The 6x scopes fill the top right of the screen there. The user
+  saw it ("looks weird on the uzi"), was offered taking them off the Uzi or holding it lower at the hip with a
+  magnified optic, and chose to leave it as it is.
 - Not seen on it yet: the muzzle devices and lasers on their slots, the charm (at the back of the receiver's left
   side) and the third-person hand. None of it has been checked in-game yet.
 
