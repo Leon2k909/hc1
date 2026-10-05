@@ -166,6 +166,36 @@ $ease-in-out: cubic-bezier( 0.77, 0, 0.175, 1 );
     margin-left: -2px;
 }
 
+// Ranked isn't open yet: a band in the accent under the title
+.ranked-notice
+{
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 12px;
+    padding: 12px 18px;
+    background-color: rgba( 255, 122, 26, 0.12 );
+    border: 1px solid rgba( 255, 122, 26, 0.5 );
+    border-left: 3px solid $accent;
+    border-radius: 3px;
+
+    i
+    {
+        font-size: 22px;
+        color: $accent;
+        flex-shrink: 0;
+    }
+}
+
+.ranked-notice-text
+{
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 4px;
+    color: white;
+    white-space: nowrap;
+}
+
 // ── Your rank ────────────────────────────────────────────────────────────────
 
 .rank-card
@@ -809,6 +839,7 @@ $ease-in-out: cubic-bezier( 0.77, 0, 0.175, 1 );
 .main-menu-root.short
 {
     .ranked-page { padding-top: 20px; padding-bottom: 50px; }
+    .ranked-notice { padding: 8px 16px; }
     .ranked-title { font-size: 32px; }
     .rank-emblem { width: 110px; height: 110px; }
     .rule { padding: 8px 18px; }

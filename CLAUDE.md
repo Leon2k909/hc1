@@ -1123,6 +1123,8 @@
   when the page opens and on Play Ranked. The first time in a new season it drops SR one tier, keeping the division, and
   restarts the season high (`razed.rank.season_high`). The first check on a machine only records the season.
 - `RankedPage` (the RANKED tab), in the hub's style with no map picture:
+  - Under the title, a COMING SOON notice (`.ranked-notice`), which the user asked for (2026-10-05). PLAY RANKED still
+    works. Not yet seen in-game.
   - Left: your rank, Play Ranked, the season's countdown and high, and the rules. The rules restate `Rank.cs`, so change
     them together.
   - Middle: a ladder of the six tier emblems with yours lit, then the map pool. The pool is `GameUtils.GetMatchMaps()`,

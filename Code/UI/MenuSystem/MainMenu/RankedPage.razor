@@ -26,6 +26,12 @@
                 </div>
             </div>
 
+            @* Ranked isn't open yet (the user, 2026-10-05) *@
+            <div class="ranked-notice">
+                <i>schedule</i>
+                <label class="ranked-notice-text">@Tr( "COMING SOON" )</label>
+            </div>
+
             <div class="ranked-panel rank-card" style="border-left-color: @TierColor;">
                 <img class="rank-emblem" src=@(Rank.GetEmblem( Tier )) />
                 <div class="rank-info">
