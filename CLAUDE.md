@@ -2271,6 +2271,26 @@ simulate_input.
     - South: the line runs out in a cutting to a tunnel portal at n -8000. The cutting has a road overbridge
       (n -3100) and a railcar depot, with a machine works, a gasholder, allotments, a village on the hill and woods
       beside it.
+    - The Rotunde (`rotunda`, 2026-10-05) stands on the hill over the tunnel, in its park. Seen down the west cab road
+      past the goods shed, the hills there were one big flat-shaded green mass (the user: "the shitty green hill").
+      The user sent an AI-made picture of that view with a grand iron-and-glass hall there and sky above, and asked
+      for it "as close as possible".
+      - It's an exhibition rotunda like Vienna's of 1873 (108 m): a drum 107 m across on the line's axis
+        (`ROTUNDA`, centre n -10400), 51 m to its zinc cornice.
+      - The drum is 36 bays of two lights, iron framed (`rotunda_light`), with three tiers: tall arched windows
+        with tracery, a gridded clerestory, and a latticed frieze. Its roof is a low zinc cone with a glazed ring,
+        under 10 degrees so the rim stays its skyline from the streets.
+      - The south hills beyond the portal are gone (`south_z`): the park is level round it (`ROTUNDA_BASE`, 700),
+        then low farmland and woods roll to ~1300 out to the ring hills. Oaks ring the park, and three big trees by
+        the overbridge's west ramp (`ramp_trees`) frame its lower half from the cab road, as in the picture.
+      - Its paints are PAINTED (`rw_rotunda_glass`, `_iron`, `_panel`, `rw_zinc`), vmats only. 7k triangles; the
+        south model is 21.5k of its 80k.
+      - The user's screenshot was fitted from the station's arches and the vanishing point: eye (-1845, 1080, 58),
+        71.5 degrees horizontal, 3.3 east of south and 5.3 up (`VIEWS` `cab_west_south`). From there its rim is 15
+        degrees up and its centre 9 east of south, as in the picture.
+      - Checked only in offline textured renders of every model (a C rasteriser in a scratch session), from that
+        camera and from the east cab road, the footbridge, the throat, the portal and the air. Not seen in the engine;
+        rerun `railhead_map.py`.
     - Round it all: a skyline of 55 m blocks out to ~600 m (the city's ground ends at 24500, `R0`), with a Baroque
       onion dome, a 1970s office tower (104 m), a slab block, a brewery chimney and a water tower, then hills rising to
       86 m by the world's edge (40000, ~1 km).

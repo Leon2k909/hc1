@@ -13,7 +13,8 @@ railhead_map imports it; this script writes no models or assets itself. Plan inc
 - north_city(): the Bahnhofsplatz in front of the head building (n 1820..2700) with its tram stop, the hotel and the
   office block facing the station, and the cab roads running on north. Drawn only.
 - south_vista(): the line running south out of the station (cutting, retaining walls, a road overbridge at n -3100), the
-  allotments, a depot shed, the industry along the line, a small town and wooded hills. Drawn only.
+  allotments, a depot shed, the industry along the line, a small town, the Rotunde (an iron-and-glass exhibition
+  rotunda, 107 m across) in its park on the hill over the tunnel, and low farmland and woods beyond. Drawn only.
 - skyline(): the rest of the city, beside the edge rows (|e| 2700..) and north of north_city (n 3700..), on a grid of
   streets 2400 apart (blocks 2160 square, carriageways 240), out to its last street at |e| 23220 and n 25000; level
   ground to R0 (24500 as ring_z measures it), hills rising to ~3400 (86 m) by 39500, to the world's edge at 40000.
@@ -1664,6 +1665,9 @@ def onion_tower( model, e, n, base, square, shaft, paint="render_cream", trim="r
 CUT_N0 = -4400.0            # the land beside the line starts rising here...
 PORTAL_N = -8000.0          # ...to the tunnel portal
 PORTAL_Z = 640.0            # the land over the portal
+ROTUNDA = ( 0.0, -10400.0 )             # the Rotunde's centre: on the line's axis, over the tunnel
+ROTUNDA_R = 2100.0                      # its drum's radius: 107 m across, as Vienna's Rotunde of 1873 (108 m)
+ROTUNDA_BASE = PORTAL_Z + 60.0          # the park it stands in, level over the tunnel
 WALL_MAX = 250.0            # the cutting's walls stand this high, with a 1:1.25 grass slope above them...
 WALL_FULL_N = ( -7000.0, -7800.0 )      # ...until the portal's approach, walled to the top
 BED = -37.0                 # the lead's track bed
@@ -1695,16 +1699,19 @@ def ring_z( e, n ):
 
 def south_z( e, n ):
     """ The land south of the station: the city's level to n -4400, a slope up to the hill the line tunnels under at n
-    -8000 (640, 16 m), and wooded hills to ~3000 (76 m) beyond, rolling more the further they are from the line. """
+    -8000 (640, 16 m), the park on its top level round the Rotunde (ROTUNDA_BASE), and low farmland and woods beyond,
+    rolling to ~1300 (33 m), so the cab roads look past the Rotunde into open sky. """
     if n >= CUT_N0:
         z = 0.0
     elif n >= PORTAL_N + 200:
         z = PORTAL_Z * smooth( ( CUT_N0 - n ) / ( CUT_N0 - PORTAL_N - 200 ) )
     else:
-        z = PORTAL_Z + 2400.0 * smooth( ( PORTAL_N + 200 - n ) / 6000.0 )
-        k = smooth( ( -8600.0 - n ) / 4000.0 )
-        z += k * ( 380.0 * math.sin( e / 4100.0 + 1.3 ) * math.sin( n / 3300.0 + 0.4 )
-                   + 220.0 * math.sin( e / 2300.0 - n / 2900.0 + 2.0 ) )
+        z = PORTAL_Z + ( ROTUNDA_BASE - PORTAL_Z ) * smooth( ( PORTAL_N + 200 - n ) / 600.0 )
+        d = math.hypot( e - ROTUNDA[0], n - ROTUNDA[1] )
+        k = smooth( ( d - ROTUNDA_R - 900.0 ) / 2500.0 )
+        z += k * ( 380.0 * smooth( ( -9000.0 - n ) / 9000.0 )
+                   + 160.0 * math.sin( e / 4100.0 + 1.3 ) * math.sin( n / 3300.0 + 0.4 )
+                   + 90.0 * math.sin( e / 2300.0 - n / 2900.0 + 2.0 ) )
     if n < CUT_N0 - 600:
         away = smooth( ( abs( e ) - 2500.0 ) / 3000.0 ) * smooth( ( CUT_N0 - 600 - n ) / 1500.0 )
         z += away * 90.0 * math.sin( e / 1900.0 + 0.4 ) * math.cos( n / 2300.0 )
@@ -1808,6 +1815,8 @@ def crest_of( n, edge, s=1.0 ):
 def south_ground( e, n, z ):
     """ What covers the land at plan ( e, n ), south of the play area. """
     a = abs( e )
+    if n < PORTAL_N - 1 and math.hypot( e - ROTUNDA[0], n - ROTUNDA[1] ) < ROTUNDA_R + 1600:
+        return "lawn"                                                       # the Rotunde's park
     if n < PORTAL_N - 1 or a > 20000:
         if z > 900 or unit( "hill", int( e // 2600 ), int( n // 2100 ) ) < 0.45:
             return "hedge"                                                  # woods
@@ -2358,6 +2367,154 @@ def portal( model ):
     facing( model, "rw_black", [ ( -660, n0, BED ), ( 660, n0, BED ), ( 660, n0, oz ), ( -660, n0, oz ) ], ( 0, 1, 0 ) )
 
 
+# The Rotunde: the trade fair's exhibition rotunda of 1880 on the hill over the tunnel, an iron drum glazed all round,
+# in its park. Levels over ROTUNDA_BASE: the sandstone plinth, the arcade of tall arched windows, an entablature, the
+# clerestory, the iron frieze and the zinc cornice; a low zinc roof with a glazed ring and a lantern over it.
+ROTUNDA_BAYS = 36                       # pilasters round the drum (a bay 9.3 m wide)...
+ROTUNDA_LIGHTS = 2                      # ...each of two arched lights under two clerestory windows
+ROTUNDA_LEVELS = { "plinth": ( -60.0, 140.0 ), "arcade": ( 140.0, 1250.0 ), "band": ( 1250.0, 1330.0 ),
+                   "clerestory": ( 1330.0, 1650.0 ), "frieze": ( 1650.0, 1920.0 ), "cornice": ( 1920.0, 1990.0 ) }
+ROTUNDA_ARCH = ( 180.0, 1100.0 )        # the arched lights' sills and springing: 3.8 m wide and 25 m tall
+ROTUNDA_LIGHT_W = 150.0
+GLAZING, IRON, IRON_PANEL, ZINC = "rw_rotunda_glass", "rw_rotunda_iron", "rw_rotunda_panel", "rw_zinc"
+
+
+def curved( model, paint, points, centre, towards ):
+    """ A polygon on a drum round plan centre, shaded smooth with the drum (its normals radial), facing towards (a plan
+    or 3D direction). """
+    pts = [ np.asarray( p, float ) for p in points ]
+    towards = np.array( ( *towards, 0.0 ) )[:3] if len( towards ) == 2 else np.asarray( towards, float )
+    normals = [ K.normalise( np.array( ( p[0] - centre[0], p[1] - centre[1], 0.0 ) ) ) for p in pts ]
+    normal = np.zeros( 3 )
+    for k in range( 1, len( pts ) - 1 ):
+        normal += np.cross( pts[k] - pts[0], pts[k + 1] - pts[0] )
+    if np.linalg.norm( normal ) < 1e-9:
+        return
+    if np.dot( normal, towards ) < 0:
+        pts, normals = pts[:1] + pts[:0:-1], normals[:1] + normals[:0:-1]
+    model.polygon( paint, pts, normals=normals )
+
+
+def rotunda_light( model, c, p0, along, out, width, z0 ):
+    """ One light of the drum: a facet across along from p0 (plan), width wide, facing out; z over z0 (the base). The
+    tall arched window, its clerestory window over the band, and its panel of the frieze, all in iron frames. """
+    def P( s, z, d=0.0 ):
+        return ( p0[0] + along[0] * s + out[0] * d, p0[1] + along[1] * s + out[1] * d, z0 + z )
+
+    def quad( paint, s0, s1, za, zb, d=0.0 ):
+        if s1 - s0 > 1e-6 and zb - za > 1e-6:
+            curved( model, paint, [ P( s0, za, d ), P( s1, za, d ), P( s1, zb, d ), P( s0, zb, d ) ], c, out )
+
+    def bar( paint, a, b, half, d=1.0 ):
+        """ A thin bar between two ( s, z ) points, half wide, standing d proud. """
+        a, b = np.asarray( a, float ), np.asarray( b, float )
+        x = ( b - a ) / np.linalg.norm( b - a )
+        y = np.array( ( -x[1], x[0] ) ) * half
+        curved( model, paint, [ P( *( a - y ), d ), P( *( b - y ), d ), P( *( b + y ), d ), P( *( a + y ), d ) ], c, out )
+
+    w0, w1 = ( width - ROTUNDA_LIGHT_W ) / 2, ( width + ROTUNDA_LIGHT_W ) / 2
+    mid, r = ( w0 + w1 ) / 2, ( w1 - w0 ) / 2
+    thirds = ( w0 + ( w1 - w0 ) / 3, w0 + 2 * ( w1 - w0 ) / 3 )
+    sill, spring = ROTUNDA_ARCH
+    a0, a1 = ROTUNDA_LEVELS["arcade"]
+    quad( IRON, 0.0, w0, a0, a1 )
+    quad( IRON, w1, width, a0, a1 )
+    quad( IRON, w0, w1, a0, sill )
+    arch = [ ( mid + r * math.cos( math.pi * k / 10 ), spring + r * math.sin( math.pi * k / 10 ) ) for k in range( 11 ) ]
+    for ( sa, za ), ( sb, zb ) in zip( arch, arch[1:] ):                # the spandrels over the round head
+        curved( model, IRON, [ P( sa, za ), P( sb, zb ), P( sb, a1 ), P( sa, a1 ) ], c, out )
+    curved( model, GLAZING, [ P( w0, sill ), P( w1, sill ) ] + [ P( s, z ) for s, z in arch ], c, out )
+    for s in thirds:                                                    # its tracery: mullions, transoms, a radiating head
+        bar( IRON, ( s, sill ), ( s, spring ), 3.0 )
+    for z in np.linspace( sill, spring, 6 )[1:]:
+        bar( IRON, ( w0, z ), ( w1, z ), 2.5 )
+    for s in thirds:
+        top = spring + math.sqrt( max( r * r - ( s - mid ) ** 2, 0.0 ) )
+        bar( IRON, ( s, spring ), ( mid + ( s - mid ) * 0.4, top - 2.0 ), 2.5 )
+    b0, b1 = ROTUNDA_LEVELS["band"]
+    quad( IRON, 0.0, width, b0, b1 )
+    quad( "rw_dressed", 0.0, width, b0 + 45.0, b0 + 60.0, 1.0 )
+    k0, k1 = ROTUNDA_LEVELS["clerestory"]
+    g0, g1 = k0 + 30.0, k1 - 30.0
+    quad( IRON, 0.0, w0, k0, k1 )
+    quad( IRON, w1, width, k0, k1 )
+    quad( IRON, w0, w1, k0, g0 )
+    quad( IRON, w0, w1, g1, k1 )
+    quad( GLAZING, w0, w1, g0, g1 )
+    for s in thirds:
+        bar( IRON, ( s, g0 ), ( s, g1 ), 3.0 )
+    bar( IRON, ( w0, ( g0 + g1 ) / 2 ), ( w1, ( g0 + g1 ) / 2 ), 2.5 )
+    f0, f1 = ROTUNDA_LEVELS["frieze"]
+    quad( IRON, 0.0, width, f0, f1 )
+    i0, i1, j0, j1 = 14.0, width - 14.0, f0 + 28.0, f1 - 28.0          # a panel with its lattice
+    quad( IRON_PANEL, i0, i1, j0, j1, 0.5 )
+    for a, b in ( ( ( i0, j0 ), ( i1, j1 ) ), ( ( i0, j1 ), ( i1, j0 ) ) ):
+        bar( IRON, a, b, 4.0, 1.0 )
+
+
+def rotunda( model ):
+    """ The Rotunde on its plateau over the tunnel, and the oaks of its park. Returns nothing. """
+    c = np.array( ROTUNDA, float )
+    R, B = ROTUNDA_R, ROTUNDA_BASE
+    count = ROTUNDA_BAYS * ROTUNDA_LIGHTS
+    for k in range( count ):
+        a0, a1 = 2 * math.pi * k / count, 2 * math.pi * ( k + 1 ) / count
+        p0 = c + R * np.array( ( math.cos( a0 ), math.sin( a0 ) ) )
+        p1 = c + R * np.array( ( math.cos( a1 ), math.sin( a1 ) ) )
+        along = ( p1 - p0 ) / np.linalg.norm( p1 - p0 )
+        out = np.array( ( along[1], -along[0] ) )
+        if np.dot( out, ( p0 + p1 ) / 2 - c ) < 0:
+            out = -out
+        rotunda_light( model, c, p0, along, out, float( np.linalg.norm( p1 - p0 ) ), B )
+        # The plinth, standing proud, and the cornice, overhanging
+        q0, q1 = c + ( R + 10 ) * np.array( ( math.cos( a0 ), math.sin( a0 ) ) ), c + ( R + 10 ) * np.array( ( math.cos( a1 ), math.sin( a1 ) ) )
+        z0, z1 = ROTUNDA_LEVELS["plinth"]
+        curved( model, "rw_dressed", [ ( *q0, B + z0 ), ( *q1, B + z0 ), ( *q1, B + z1 ), ( *q0, B + z1 ) ], c, out )
+        facing( model, "rw_dressed", [ ( *p0, B + z1 ), ( *p1, B + z1 ), ( *q1, B + z1 ), ( *q0, B + z1 ) ], ( 0, 0, 1 ) )
+        k0, k1 = ROTUNDA_LEVELS["cornice"]
+        o0, o1 = c + ( R + 30 ) * np.array( ( math.cos( a0 ), math.sin( a0 ) ) ), c + ( R + 30 ) * np.array( ( math.cos( a1 ), math.sin( a1 ) ) )
+        curved( model, ZINC, [ ( *o0, B + k0 ), ( *o1, B + k0 ), ( *o1, B + k1 ), ( *o0, B + k1 ) ], c, out )
+        facing( model, ZINC, [ ( *p0, B + k0 ), ( *p1, B + k0 ), ( *o1, B + k0 ), ( *o0, B + k0 ) ], ( 0, 0, -1 ) )
+        if k % ROTUNDA_LIGHTS == 0:                                      # a pilaster between two bays
+            mid = c + ( R + 10 ) * np.array( ( math.cos( a0 ), math.sin( a0 ) ) )
+            radial = np.array( ( math.cos( a0 ), math.sin( a0 ), 0.0 ) )
+            tangent = np.array( ( -math.sin( a0 ), math.cos( a0 ), 0.0 ) )
+            zp0, zp1 = ROTUNDA_LEVELS["arcade"][0], ROTUNDA_LEVELS["frieze"][1]
+            model.oriented_box( ( *mid, B + ( zp0 + zp1 ) / 2 ), ( radial, tangent, ( 0.0, 0.0, 1.0 ) ),
+                                ( 20.0, 40.0, zp1 - zp0 ), { "default": IRON, "-x": None } )
+    # The roof: a low zinc cone from the cornice and a glazed ring round its middle, under 10 degrees, so from the
+    # streets the drum's rim is its skyline (it's 13-16 degrees up from the cab roads).
+    top = B + ROTUNDA_LEVELS["cornice"][1]
+    rise = math.tan( math.radians( 9.0 ) )
+    r1, r2 = 0.62 * R, 0.3 * R
+    z1 = top + ( R + 30 - r1 ) * rise
+    z2 = z1 + ( r1 - r2 ) * rise
+    lathe( model, ROTUNDA, [ ( R + 30, top ), ( r1, z1 ) ], ZINC, sides=count, cap=False )
+    lathe( model, ROTUNDA, [ ( r1, z1 ), ( r2, z2 ) ], GLAZING, sides=count, cap=False )
+    lathe( model, ROTUNDA, [ ( r2, z2 ), ( 0.0, z2 + r2 * rise ) ], ZINC, sides=count // 2 )
+    # The park's oaks round it, thicker on the side towards the station.
+    for k in range( 48 ):
+        a = 2 * math.pi * ( k + between( -0.3, 0.3, "rotunda", k ) ) / 48
+        north = max( 0.0, math.sin( a ) )
+        if not chance( 0.55 + 0.4 * north, "rotunda", k, "keep" ):
+            continue
+        d = R + between( 420.0, 900.0, "rotunda", k, "d" ) + 380.0 * north * unit( "rotunda", k, "row" )
+        e, n = c[0] + d * math.cos( a ), c[1] + d * math.sin( a )
+        if n > PORTAL_N - 250:
+            continue
+        big = chance( 0.6, "rotunda", k, "big" )
+        tree( model, OAK_BIG if big else OAK, e, n, land_z( e, n ) - 8, ( "rotunda", k ), 1.0 if big else 1.3 )
+
+
+def ramp_trees( model ):
+    """ Big trees at the foot of the overbridge's west ramp, by the line's fence and the allotment colony: from the
+    west cab road they stand either side of the Rotunde's lower half, over the goods shed. """
+    for k, e in enumerate( ( -1135.0, -1960.0, -2260.0 ) ):             # between the ramp and the gardens' hedges
+        n = -3340.0 + between( -8.0, 8.0, "ramp_tree", k )
+        tree( model, OAK_BIG, e + between( -20.0, 20.0, "ramp_tree", k, "e" ), n, land_z( e, n ) - 8, ( "ramp_tree", k ),
+              between( 1.3, 1.45, "ramp_tree", k, "s" ) )
+
+
 def south_blocks( model ):
     """ The city's blocks beside the line south of the ramp, out to the hills. """
     for s in ( 1.0, -1.0 ):
@@ -2399,7 +2556,8 @@ def south_trees( model, gardens ):
 def south_vista():
     """ Everything south of the play area (n < -2400) but the lead's corridor: the land and the cutting's walls, the
     road overbridge at n -3100, the lineside yards, allotments, the depot, the works and gasholder, a small town, the
-    tunnel portal at n -8000, the city's blocks either side and the wooded hills. Drawn only. """
+    tunnel portal at n -8000, the Rotunde in its park over the tunnel, the city's blocks either side and the low land
+    beyond. Drawn only. """
     model = K.Model()
     east = south_land( model, 1.0, True )
     west = south_land( model, -1.0, False )
@@ -2413,6 +2571,8 @@ def south_vista():
     gasholder( model )
     gardens = village( model )
     portal( model )
+    rotunda( model )
+    ramp_trees( model )
     south_blocks( model )
     south_trees( model, gardens )
     return configure( model )
@@ -3153,6 +3313,9 @@ def plan( P, raster, opaque, glass, bounds, scale ):
 VIEWS = [
     ( "cab_east_north", ( 1750, 0, 58 ), ( 1750, 1000, 120 ), 80 ),
     ( "cab_east_south", ( 1750, 0, 58 ), ( 1750, -1000, 40 ), 80 ),
+    # The user's screenshot of the Rotunde's view, fitted to the station's arches: 71.5 degrees, 3.3 east of south, 5.3 up
+    ( "cab_west_south", ( -1845, 1080, 58 ), ( -1787, 82, 151 ), 71.5 ),
+    ( "rotunda_aerial", ( -4500, -3500, 3200 ), ( 0, -9800, 900 ), 60 ),
     ( "cab_east_east", ( 1750, 0, 58 ), ( 2750, 0, 300 ), 80 ),
     ( "cab_east_long", ( 1600, -1250, 58 ), ( 2100, 1800, 200 ), 70 ),
     ( "footbridge_south", ( 0, -280, 294 ), ( 0, -1280, 200 ), 80 ),
