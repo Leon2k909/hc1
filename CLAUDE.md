@@ -2105,6 +2105,9 @@ simulate_input.
       under the bridge you could walk into it between the parapets, and see out through the flight's undrawn underside
       (the user's screenshot, 2026-10-05). Now that space is solid (a collision box), closed by a concrete face at the
       deck's end under the girder. The hall's gallery stair was already walled in.
+    - The footbridge's and the platform canopies' lights were boxes whose whole underside glowed (48 by 8 on the
+      bridge); the user found them blocky (2026-10-05). They're now `luminaire`s: slim surface-mounted LED battens
+      (1.5 m by 75 by 60 mm aluminium, chamfered, with end caps) whose lit part is a narrow opal lens.
   - `railhead_props.py`: the track and its equipment, the rolling stock, containers, furniture and yard clutter. Its
     docstring has each prop's API, conventions and triangle and collision budget.
     - Track: UIC 60 rail, crossovers, buffer stops, Ks signals and the overhead line.

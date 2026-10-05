@@ -156,6 +156,41 @@ def tube( model, p0, p1, radius, paint, sides=10, cap=False ):
         facing( model, paint, [ p0 + d * radius for d in dirs ], -axis )
 
 
+def luminaire( model, c, along, length=59.0, width=3.0, depth=2.4, paint="rw_steel_grey", lens="rw_lamp_cool" ):
+    """ A surface-mounted linear LED luminaire under a ceiling, as stations' are: an aluminium extrusion 1.5 m long,
+    75 mm wide and 60 mm deep with chamfered lower edges and end caps, the opal lens a narrow strip bulging from its
+    underside. c: the top's centre ( e, n, z ); along: 'e' or 'n'. No collision. """
+    c = np.asarray( c, float )
+    ax = np.array( ( 1.0, 0.0, 0.0 ) if along == "e" else ( 0.0, 1.0, 0.0 ) )
+    ac = np.array( ( 0.0, 1.0, 0.0 ) if along == "e" else ( 1.0, 0.0, 0.0 ) )
+
+    def p( t, x, z ):
+        return c + ax * t + ac * x + np.array( ( 0.0, 0.0, z ) )
+
+    hw, ch, L = width / 2, 0.5, length / 2
+    lw, bulge = hw - ch - 0.3, 0.18
+    prof = [ ( -hw, 0.0 ), ( -hw, -depth + ch ), ( -hw + ch, -depth ), ( -lw, -depth ), ( lw, -depth ),
+             ( hw - ch, -depth ), ( hw, -depth + ch ), ( hw, 0.0 ) ]
+    for k, ( ( x0, z0 ), ( x1, z1 ) ) in enumerate( zip( prof, prof[1:] ) ):
+        if k == 3:
+            continue                # the lens's slot
+        out = ac * ( x0 + x1 ) / 2 + np.array( ( 0.0, 0.0, ( z0 + z1 ) / 2 + depth / 2 ) )
+        facing( model, paint, [ p( -L, x0, z0 ), p( L, x0, z0 ), p( L, x1, z1 ), p( -L, x1, z1 ) ], out )
+    xs = [ lw * ( 2 * j / 6 - 1 ) for j in range( 7 ) ]
+    for x0, x1 in zip( xs, xs[1:] ):
+        z0, z1 = ( -depth - bulge * ( 1 - ( x / lw ) ** 2 ) for x in ( x0, x1 ) )
+        facing( model, lens, [ p( -L + 0.6, x0, z0 ), p( L - 0.6, x0, z0 ), p( L - 0.6, x1, z1 ), p( -L + 0.6, x1, z1 ) ],
+                ( 0, 0, -1 ) )
+    cap = [ ( -hw - 0.1, 0.0 ), ( -hw - 0.1, -depth + ch ), ( -hw + ch, -depth - 0.1 ), ( 0.0, -depth - bulge - 0.05 ),
+            ( hw - ch, -depth - 0.1 ), ( hw + 0.1, -depth + ch ), ( hw + 0.1, 0.0 ) ]
+    for t, sgn in ( ( -L - 0.3, -1.0 ), ( L + 0.3, 1.0 ) ):
+        facing( model, paint, [ p( t, x, z ) for x, z in cap ], ax * sgn )
+        for ( x0, z0 ), ( x1, z1 ) in zip( cap, cap[1:] ):
+            ta, tb = t - sgn * 0.6, t
+            out = ac * ( x0 + x1 ) / 2 + np.array( ( 0.0, 0.0, ( z0 + z1 ) / 2 + depth / 2 ) )
+            facing( model, paint, [ p( ta, x0, z0 ), p( tb, x0, z0 ), p( tb, x1, z1 ), p( ta, x1, z1 ) ], out )
+
+
 def column( model, e, n, z0, z1, radius, paint, surface=METAL, sides=16, base=None, capital=None ):
     """ A round column with an optional square base and capital ( half-width, height, paint ). """
     zs, ze = z0, z1
@@ -539,9 +574,7 @@ def footbridge( model, glass ):
     model.box( ( 0, n0 - 6, BRIDGE_ROOF ), ( WALL_IN, n1 + 6, BRIDGE_ROOF + 6 ),
                { "+z": "corrugated", "-z": "rw_steel_grey", "default": "rw_steel_dark", "-e": None }, SHEET )
     for k in range( int( WALL_IN // 120 ) ):
-        e = 60.0 + 120.0 * k
-        model.box( ( e - 24, ( n0 + n1 ) / 2 - 4, BRIDGE_ROOF - 3 ), ( e + 24, ( n0 + n1 ) / 2 + 4, BRIDGE_ROOF ),
-                   { "default": "rw_steel_dark", "-z": "rw_lamp_cool" } )
+        luminaire( model, ( 60.0 + 120.0 * k, ( n0 + n1 ) / 2, BRIDGE_ROOF ), "e" )
     for e0, e1, down in BRIDGE_STAIRS:
         bridge_stair( model, e0, e1, down )
 
@@ -623,7 +656,7 @@ def canopies( model ):
         for le in ( ( e0 + e1 ) / 2 - 70, ( e0 + e1 ) / 2 + 70 ) if e1 - e0 > 200 else ( ( e0 + e1 ) / 2 + 20, ):
             n = n0 + 50
             while n < n1 - 30:
-                model.box( ( le - 3, n, CANOPY_Z - 4 ), ( le + 3, n + 48, CANOPY_Z ), { "default": "rw_steel_grey", "-z": "rw_lamp_cool" } )
+                luminaire( model, ( le, n + 24, CANOPY_Z ), "n" )
                 n += 120
     return spine
 
