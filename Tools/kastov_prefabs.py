@@ -1617,9 +1617,12 @@ PREFABS = {
             # tag_reflex, on the upper's rail. An optic folds the flip-up sights down.
             ("Optic", (-2.710, 0, 6.649), (0.25, 0, 8.73), {"iron_sights": 1, "sight_folded": 1}),
             ("Muzzle", (12.911, 0, 5.114), (17.62, 0, 7.4147), {"muzzle_tip": 1}),  # tag_tip, the flash hider's rear face
-            # tag_grip_attach, on the handguard's flat bottom (5.5 to 12) near its front, ahead of the left hand's
-            # fingers (the index finger wraps it at 9.1).
-            ("Underbarrel", (11.168, 0, 3.688), (8.3, 0, 6.2), {}),
+            # On the handguard's flat bottom (5.82 to 12.0 in the world model), the grips' fronts 0.1 inside its front
+            # end, as on the other guns, and clear of the left hand's fingers (the index finger wraps it at 9.1). The
+            # M4's grips reach forward from their origin: the vertical ones 2.1 (the bipod 2.14), the angled one 4.2
+            # back. At the pack's tag_grip_attach (11.168) every vertical grip stood 1.3 past the handguard's front, out
+            # under the flash hider (the user's screenshot, 2026-10-05).
+            ("Underbarrel", (9.76, 0, 3.688), (8.3, 0, 6.2), {}),
             # The handguard's right side at the bore's height, ahead of the left hand's fingertips there (7.5).
             ("Laser", (9.0, -0.765, 5.114), (8.6, -1.22, 7.4147), {}),
         ],

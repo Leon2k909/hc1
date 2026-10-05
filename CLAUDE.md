@@ -803,9 +803,19 @@
   - `iron_sights` and `sight_folded`: the flip-up sights raised, and folded down under an optic.
   - `stock`: the factory stock and the Thin Folding Stock.
 - Slots: Optic on the top rail (`tag_reflex`; an optic folds the sights), Muzzle at the flash hider's rear face
-  (`tag_tip`), Underbarrel on the handguard's flat bottom near its front (`tag_grip_attach`, ahead of the left hand's
-  fingers) and Laser on the handguard's right side at the bore's height, ahead of the fingertips, then Stock. 56 of the
-  M4's MWII parts are made eligible (optics, muzzle devices, grips, lasers and tracer rounds).
+  (`tag_tip`), Underbarrel on the handguard's flat bottom (below) and Laser on the handguard's right side at the bore's
+  height, ahead of the fingertips, then Stock. 56 of the M4's MWII parts are made eligible (optics, muzzle devices,
+  grips, lasers and tracer rounds).
+- The Underbarrel slot's origin is at x 9.76 (2026-10-05). The handguard's flat bottom runs 5.82 to 12.0 in the world
+  model, and the left hand's index finger wraps it at 9.1.
+  - It was at the pack's `tag_grip_attach` (11.168). The M4's grips reach forward from their origin (the vertical ones
+    and the stubbies 2.1, the bipod 2.14; the angled one reaches 4.2 back), so every vertical grip ended 1.3 past the
+    handguard's front, out under the flash hider. The user saw it on the Bipod, Slotted Vertical, Stubby, Tall Vertical
+    and Wide Stubby Foregrips.
+  - Now their fronts are 0.1 inside the handguard's front, as on the other guns (their grips end at their rail's
+    front), and their backs 0.5 clear of the index finger. The angled grip runs 5.53 to 9.83.
+  - Measured from the OBJs and `w_mcx.dmx` (the DMXs are keyvalues2 text). The prefabs were patched by hand to what
+    `kastov_prefabs.py` writes. Not seen in-game.
 - Its own part (`Prefabs.parts`, `Assets/gunsmith/mcx/stocks/`): the Thin Folding Stock, SIG's thin folding stock (the
   pack's light stock), a skeleton stock with a narrow buttplate: 5% more recoil, and 0.06 kg lighter. Left out: the
   pack's other stock (CoD's), its 50- and 60-round magazines, its .300 BLK magazine and barrel (another calibre), and
