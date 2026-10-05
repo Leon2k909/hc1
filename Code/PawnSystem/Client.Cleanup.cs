@@ -7,6 +7,9 @@ public partial class Client : Component.INetworkListener
 	/// </summary>
 	RealTimeSince TimeSinceDisconnected { get; set; }
 
+	/// <summary> Sent again a second later while the host hasn't got them, rather than every frame until the sync comes back. </summary>
+	private RealTimeSince _timeSinceOperatorPicksSent = 10f;
+
 	/// <summary>
 	/// How long does it take to clean up a player once they disconnect?
 	/// </summary>
@@ -28,6 +31,12 @@ public partial class Client : Component.INetworkListener
 			if ( ClanTag != currentTag )
 			{
 				UpdateClanTag( currentTag ?? "" );
+			}
+			var operatorPicks = OperatorOutfits.LocalPicks;
+			if ( OperatorPicks != operatorPicks && _timeSinceOperatorPicksSent > 1f )
+			{
+				_timeSinceOperatorPicksSent = 0f;
+				UpdateOperatorPicks( operatorPicks );
 			}
 			var voice = Components.Get<PlayerVoiceComponent>();
 			if ( voice.IsValid() )

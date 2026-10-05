@@ -41,6 +41,12 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 	[Property, Group( "Movement" )] public float MoveAcceleration { get; set; } = 800f;
 	[Property, Group( "Movement" )] public float PatrolRadius { get; set; } = 900f;
 	[Property, Group( "Visuals" ), InlineEditor] public Dictionary<Team, HumanOutfitter.TeamModelEntry> TeamBaseModels { get; set; } = new();
+	/// <summary>
+	/// The outfit the bot manager issued this soldier (<see cref="OperatorOutfits.Roll"/>), or null for its team's
+	/// default. <see cref="ApplyTeamModel"/> dresses it before the bot is networked, and clients spawn it with the
+	/// uniform's style.
+	/// </summary>
+	public OperatorOutfit Outfit { get; set; }
 	/// <summary> Fallback world model, used when <see cref="WeaponResource"/> has none. </summary>
 	[Property, Group( "Visuals" )] public string WeaponWorldModelPrefab { get; set; } = "weapons/m4a1/wm_m4a1.prefab";
 	/// <summary>
@@ -160,8 +166,9 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 			&& !TeamBaseModels.TryGetValue( Team.Terrorist, out entry ) )
 			return;
 
+		var style = Outfit?.Style ?? MilitaryUniform.StyleForTeam( Team );
 		if ( entry.Models is { Count: > 0 } )
-			MilitaryUniform.SetModel( Renderer, Game.Random.FromList( entry.Models ), MilitaryUniform.StyleForTeam( Team ) );
+			MilitaryUniform.SetModel( Renderer, Game.Random.FromList( entry.Models ), style );
 	}
 
 	private void ConfigureComponents()
@@ -1107,6 +1114,8 @@ public sealed partial class LightweightBotManager : SingletonComponent<Lightweig
 		public EquipmentResource Weapon;
 		/// <summary> Its suppressor, if it was issued one with the gun. </summary>
 		public Gunsmith.GunsmithPart Muzzle;
+		/// <summary> What it wears, the same every life. </summary>
+		public OperatorOutfit Outfit;
 		public int Kills;
 		public int Deaths;
 		public int Score;
@@ -1282,6 +1291,9 @@ public sealed partial class LightweightBotManager : SingletonComponent<Lightweig
 				bot.WeaponResource = identity.Weapon;
 				bot.MuzzlePart = identity.Muzzle;
 			}
+			// Its outfit too, out of its team's.
+			identity.Outfit ??= OperatorOutfits.Roll( team );
+			bot.Outfit = identity.Outfit;
 			// How it fights goes with the gun it carries, and stays the same every life.
 			identity.Habits ??= BotHabits.Roll( bot.WeaponResource?.Category );
 			bot.Habits = identity.Habits.Value;

@@ -152,6 +152,31 @@ public partial class Client : Component, ITeam, IGameEventHandler<KillEvent>
 		ClanTag = tag;
 	}
 
+	/// <summary>
+	/// The outfits this player equipped on the Operators page, one id per team (<see cref="OperatorOutfits.LocalPicks"/>).
+	/// The host dresses their body from it (<see cref="HumanOutfitter"/>).
+	/// </summary>
+	[Sync( SyncFlags.FromHost ), Change( nameof( OnOperatorPicksChanged ) )] public string OperatorPicks { get; set; }
+
+	[Rpc.Host]
+	public void UpdateOperatorPicks( string picks )
+	{
+		OperatorPicks = picks?.Truncate( 128 );
+	}
+
+	/// <summary>
+	/// Picks that come in after the player spawned (they're sent once the client is up) dress the body they have. A dead
+	/// player's are put on at the respawn.
+	/// </summary>
+	private void OnOperatorPicksChanged( string before, string after )
+	{
+		if ( !Networking.IsHost || !PlayerPawn.IsValid() || PlayerPawn.HealthComponent?.State != LifeState.Alive )
+			return;
+
+		foreach ( var outfitter in PlayerPawn.GetComponentsInChildren<HumanOutfitter>( true ) )
+			outfitter.UpdateFromTeam( PlayerPawn.Team );
+	}
+
 	public void Kick( string reason = "No reason" )
 	{
 		if ( PlayerPawn.IsValid() )
