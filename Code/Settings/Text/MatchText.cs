@@ -157,6 +157,7 @@ public static partial class GameText
 		["{0:0.#}% THROUGH RANK"] = ("Rang accompli à {0:0.#} %", "{0:0.#} % des Rangs geschafft", "{0:0.#} % del rango completado", "{0:0.#}% do ranque concluído"),
 		["{0} / {1} PLACEMENT MATCHES"] = ("{0} / {1} matchs de placement", "{0} / {1} Platzierungsspiele", "{0} / {1} partidas de posicionamiento", "{0} / {1} partidas de posicionamento"),
 		["RETURNING TO RANKED"] = ("Retour au mode classé", "Zurück zu Gewertet", "Volviendo a competitivo", "Voltando para a ranqueada"),
+		["Play again"] = ("Rejouer", "Erneut spielen", "Volver a jugar", "Jogar novamente"),
 
 		// The map vote (MapVoteOverlay, MapVoteCard)
 		["Map vote"] = ("Vote de carte", "Kartenabstimmung", "Votación de mapa", "Votação de mapa"),

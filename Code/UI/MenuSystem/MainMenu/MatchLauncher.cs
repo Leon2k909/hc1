@@ -61,5 +61,12 @@ public static class MatchLauncher
 			.ToList();
 	}
 
+	/// <summary>The prefab of a running match's mode, to start it again (the end screen's PLAY AGAIN).</summary>
+	public static GameMode ModeOf( GameMode running )
+	{
+		var path = GameMode.GetPrefabPath( running );
+		return string.IsNullOrWhiteSpace( path ) ? null : GameObject.GetPrefab( path )?.GetComponent<GameMode>();
+	}
+
 	public static GameMode BattleRoyaleMode() => GameObject.GetPrefab( BattleRoyaleMatch.ModePrefab )?.GetComponent<GameMode>();
 }

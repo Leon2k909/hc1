@@ -101,9 +101,25 @@
 
     @* ── FOOTER ───────────────────────────────────────────────────── *@
     <div class="eom-footer">
-        <div class="eom-continue-btn" @onclick=@Dismiss>
-            <label>@Tr( "CONTINUE" )</label>
-        </div>
+        @if ( CanPlayAgain )
+        {
+            @if ( _startError is not null )
+            {
+                <label class="eom-footer-note">@Tr( _startError )</label>
+            }
+            <div class="eom-leave-btn @(_starting ? "disabled" : "")" @onclick=@LeaveGame>
+                <label>@Tr( "LEAVE GAME" )</label>
+            </div>
+            <div class="eom-continue-btn @(_starting ? "disabled" : "")" @onclick=@PlayAgain>
+                <label>@(_starting ? Tr( "STARTING…" ) : Tr( "PLAY AGAIN" ))</label>
+            </div>
+        }
+        else
+        {
+            <div class="eom-continue-btn" @onclick=@Dismiss>
+                <label>@Tr( "CONTINUE" )</label>
+            </div>
+        }
         <label class="eom-timer-label">@SecondsLeft<span class="eom-timer-s">s</span></label>
     </div>
 
@@ -234,6 +250,8 @@
         IsVisible    = true;
         TimeSinceShown = 0;
         XpAwarded    = false;
+        _starting    = false;
+        _startError  = null;
 
         AwardXp();
         StateHasChanged();
@@ -268,6 +286,64 @@
         StateHasChanged();
     }
 
+    // ── Play again ──────────────────────────────────────────────────
+
+    /// <summary>
+    /// A match that ends by sending everyone back to the menu (KillGameOnEnd: battle royale) offers the same mode on the
+    /// same map again. A map vote has its own choices, and a ranked match goes back to Ranked by itself.
+    /// </summary>
+    private static KillGameOnEnd MenuOnEnd => GameMode.Instance is { IsRanked: false } mode ? mode.Get<KillGameOnEnd>() : null;
+
+    private bool CanPlayAgain => _starting || MenuOnEnd is not null;
+
+    /// <summary>Set while the lobby closes and the new match's map loads.</summary>
+    private bool _starting;
+
+    /// <summary>Why the last try failed, in English (translated where it's drawn).</summary>
+    private string _startError;
+
+    /// <summary>
+    /// Leaves this match's lobby and starts the same mode on the same map in one of the player's own, as the map vote's
+    /// mode cards do (MatchLauncher.LeaveAndStart). Meanwhile KillGameOnEnd.IsLeaving stops the match sending this
+    /// machine to the menu over it.
+    /// </summary>
+    private async void PlayAgain()
+    {
+        if ( _starting ) return;
+
+        var mode = MatchLauncher.ModeOf( GameMode.Instance );
+        var map = Game.ActiveScene?.Source as SceneFile ?? (Royale is not null ? BattleRoyaleMatch.GetChosenMap() : null);
+        if ( !mode.IsValid() || map is null )
+        {
+            _startError = "Something went wrong";
+            StateHasChanged();
+            return;
+        }
+
+        var menuOnEnd = MenuOnEnd;
+        Sound.Play( "ui_button_press" );
+        _starting = true;
+        _startError = null;
+        if ( menuOnEnd.IsValid() ) menuOnEnd.IsLeaving = true;
+        StateHasChanged();
+
+        if ( await MatchLauncher.LeaveAndStart( mode, map ) || !IsValid ) return;
+
+        // Still in the lobby: the match goes back to the menu as before.
+        _starting = false;
+        _startError = "Couldn't leave this lobby. Try again.";
+        if ( menuOnEnd.IsValid() ) menuOnEnd.IsLeaving = false;
+        StateHasChanged();
+    }
+
+    private void LeaveGame()
+    {
+        if ( _starting ) return;
+
+        Sound.Play( "ui_button_press" );
+        GameUtils.ReturnToMainMenu();
+    }
+
     public override void Tick()
     {
         if ( !IsVisible ) return;
@@ -280,7 +356,8 @@
             return;
         }
 
-        if ( TimeSinceShown >= AutoDismissTime )
+        // Stays up while the next match starts: it's the only sign anything is happening.
+        if ( TimeSinceShown >= AutoDismissTime && !_starting )
         {
             Dismiss();
             return;

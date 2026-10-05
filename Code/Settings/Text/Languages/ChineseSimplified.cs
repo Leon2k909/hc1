@@ -1220,6 +1220,7 @@ public static partial class GameText
 		["{0:0.#}% THROUGH RANK"] = "晋级进度：{0:0.#}%",
 		["{0} / {1} PLACEMENT MATCHES"] = "定级赛：{0} / {1}",
 		["RETURNING TO RANKED"] = "正在返回排位赛",
+		["Play again"] = "再玩一次",
 		["Map vote"] = "地图投票",
 		["Something went wrong"] = "出现了问题",
 		["Next map"] = "下一张地图",

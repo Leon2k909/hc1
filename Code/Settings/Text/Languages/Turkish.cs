@@ -1254,6 +1254,7 @@ public static partial class GameText
 		["{0:0.#}% THROUGH RANK"] = "Rütbe ilerlemesi: %{0:0.#}",
 		["{0} / {1} PLACEMENT MATCHES"] = "{0} / {1} yerleştirme maçı",
 		["RETURNING TO RANKED"] = "Dereceli menüsüne dönülüyor",
+		["Play again"] = "Tekrar oyna",
 		["Map vote"] = "Harita oylaması",
 		["Something went wrong"] = "Bir şeyler ters gitti",
 		["Next map"] = "Sonraki harita",

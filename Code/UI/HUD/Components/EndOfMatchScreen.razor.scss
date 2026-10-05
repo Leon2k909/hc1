@@ -21,6 +21,10 @@ EndOfMatchScreen {
     gap: 20px;
     padding: 32px 48px;
     z-index: 100;
+    /* MainHUD (and this panel's root) turn clicks and the cursor off for everything in them, so the screen turns them
+       back on, as ClassSelect does: without it the buttons couldn't be clicked and no cursor showed. */
+    pointer-events: all;
+    cursor: default;
 }
 
 /* ── Result colour themes ──────────────────────────────────────── */
@@ -113,7 +117,8 @@ EndOfMatchScreen {
 /* Column widths */
 .col-mvp  { width: 22px; font-size: 14px; color: transparent; flex-shrink: 0; }
 .col-name { flex-grow: 1; font-size: 14px; font-weight: 600; color: white; }
-.col-stat { width: 72px; text-align: center; font-size: 13px; color: rgba( 255, 255, 255, 0.75 ); font-variant-numeric: tabular-nums; }
+/* nowrap: the header's DEATHS wrapped to "DEATH / S" in its 72 px */
+.col-stat { width: 72px; flex-shrink: 0; white-space: nowrap; text-align: center; font-size: 13px; color: rgba( 255, 255, 255, 0.75 ); font-variant-numeric: tabular-nums; }
 
 /* ── XP Section ─────────────────────────────────────────────────── */
 
@@ -218,6 +223,42 @@ EndOfMatchScreen {
 
 .eom-continue-btn:hover {
     background-color: rgba( 255, 255, 255, 0.8 );
+}
+
+/* Beside PLAY AGAIN: back to the menu now, rather than when the countdown ends */
+.eom-leave-btn {
+    border: 1px solid rgba( 255, 255, 255, 0.45 );
+    color: white;
+    padding: 9px 28px;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: background-color 0.1s, border-color 0.1s;
+}
+
+.eom-leave-btn:hover {
+    background-color: rgba( 255, 255, 255, 0.1 );
+    border-color: white;
+}
+
+.eom-continue-btn.disabled,
+.eom-leave-btn.disabled {
+    opacity: 0.55;
+    cursor: default;
+    pointer-events: none;
+}
+
+.eom-continue-btn label,
+.eom-leave-btn label {
+    white-space: nowrap;
+}
+
+.eom-footer-note {
+    flex-grow: 1;
+    min-width: 0;
+    font-size: 12px;
+    color: #ff6b6b;
 }
 
 .eom-timer-label {
