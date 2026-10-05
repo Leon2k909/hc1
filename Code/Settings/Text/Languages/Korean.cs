@@ -778,6 +778,7 @@ public static partial class GameText
 		["{0:0.#}% THROUGH RANK"] = "랭크 진행도 {0:0.#}%",
 		["{0} / {1} PLACEMENT MATCHES"] = "배치 경기 {0} / {1}",
 		["RETURNING TO RANKED"] = "랭크전으로 돌아가는 중",
+		["Play again"] = "다시 플레이",
 		["Map vote"] = "맵 투표",
 		["Something went wrong"] = "문제가 발생했습니다",
 		["Next map"] = "다음 맵",

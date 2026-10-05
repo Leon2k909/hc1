@@ -780,6 +780,7 @@ public static partial class GameText
 		["{0:0.#}% THROUGH RANK"] = "Пройдено {0:0.#}% рангу",
 		["{0} / {1} PLACEMENT MATCHES"] = "Кваліфікаційні матчі: {0} / {1}",
 		["RETURNING TO RANKED"] = "Повернення до рейтингу",
+		["Play again"] = "Грати знову",
 		["Map vote"] = "Голосування за карту",
 		["Something went wrong"] = "Щось пішло не так",
 		["Next map"] = "Наступна карта",

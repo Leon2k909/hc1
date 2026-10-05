@@ -760,6 +760,7 @@ public static partial class GameText
 		["{0:0.#}% THROUGH RANK"] = "牌位進度 {0:0.#}%",
 		["{0} / {1} PLACEMENT MATCHES"] = "定位賽 {0} / {1}",
 		["RETURNING TO RANKED"] = "正在返回積分對戰",
+		["Play again"] = "再玩一次",
 		["Map vote"] = "地圖投票",
 		["Something went wrong"] = "發生錯誤",
 		["Next map"] = "下一張地圖",

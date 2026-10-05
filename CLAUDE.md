@@ -1933,6 +1933,16 @@ simulate_input.
 - HUD: `BattleRoyaleRadar` in the minimap's corner (the zone and next circle turning with the view, alive, kills, the
   zone clock) and `BattleRoyaleHud` (the gas warning, the zone's news, your placing once you're out). The end screen
   reads "VICTORY" or "12TH PLACE" and lists the top ten. After death the freecam starts where your view was.
+- The end screen (`EndOfMatchScreen`) couldn't be clicked and showed no cursor (the user, 2026-10-05). It's inside
+  MainHUD, whose `pointer-events: none` and `cursor: none` its children inherit, so `.eom-screen` turns them back on, as
+  ClassSelect does. Any clickable panel inside MainHUD needs the same.
+- Its CONTINUE only hid the screen until the match sent everyone to the menu, so where a match ends that way
+  (`KillGameOnEnd`, battle royale, not ranked) it's PLAY AGAIN, which the user asked for, beside LEAVE GAME.
+  - PLAY AGAIN starts the same mode on the same map as the map vote's mode cards do (`MatchLauncher.LeaveAndStart`).
+    Meanwhile `KillGameOnEnd.IsLeaving` keeps the end of Post Game from loading the menu over it.
+  - LEAVE GAME goes to the menu at once.
+  - Ranked and the map-vote modes keep CONTINUE.
+  - Written without s&box or dotnet, so it hasn't been compiled. Not yet checked in-game.
 - Performance with lots of bots (`BotSystem`, all undone by `bot_lod_off 1`): bots far from every viewer look less
   often, share their lists of the living, re-route less, have no bone objects (the gun follows the hand bone,
   `FollowHands`), and skip muzzle flashes and blood nobody could see (`ShouldShowEffect`, judged by on-screen size, so a

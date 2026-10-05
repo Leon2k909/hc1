@@ -779,6 +779,7 @@ public static partial class GameText
 		["{0:0.#}% THROUGH RANK"] = "ランク進行度：{0:0.#}%",
 		["{0} / {1} PLACEMENT MATCHES"] = "プレイスメントマッチ：{0} / {1}",
 		["RETURNING TO RANKED"] = "ランクプレイに戻ります",
+		["Play again"] = "もう一度プレイ",
 		["Map vote"] = "マップ投票",
 		["Something went wrong"] = "問題が発生しました",
 		["Next map"] = "次のマップ",

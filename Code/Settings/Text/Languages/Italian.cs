@@ -784,6 +784,7 @@ public static partial class GameText
 		["{0:0.#}% THROUGH RANK"] = "{0:0.#}% del grado completato",
 		["{0} / {1} PLACEMENT MATCHES"] = "Partite di piazzamento: {0} / {1}",
 		["RETURNING TO RANKED"] = "Ritorno alla classificata",
+		["Play again"] = "Gioca ancora",
 		["Map vote"] = "Votazione mappa",
 		["Something went wrong"] = "Si è verificato un errore",
 		["Next map"] = "Prossima mappa",

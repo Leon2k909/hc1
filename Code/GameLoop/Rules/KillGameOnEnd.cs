@@ -13,9 +13,16 @@ public sealed class KillGameOnEnd : Component,
 	[Property, Sync( SyncFlags.FromHost )]
 	public string Message { get; set; } = "The game is over - returning to menu";
 
+	/// <summary>
+	/// Set on this machine while its player starts the next match from the end screen's PLAY AGAIN: sending them to the
+	/// menu now would load it over that match.
+	/// </summary>
+	public bool IsLeaving { get; set; }
+
 	[Rpc.Broadcast( NetFlags.HostOnly )]
 	private void Disconnect()
 	{
+		if ( IsLeaving ) return;
 		GameUtils.ReturnToMainMenu();
 	}
 
