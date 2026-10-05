@@ -2030,43 +2030,141 @@ def lamp_post( model, e, n, height, z0=0.0, along="n" ):
     return ( e, n, z0 + height - 2.0 )
 
 
+def _suitcase( model, F, x0, x1, y0, y1, z0, h, paint, trim=DARK, upright=False ):
+    """ A hard suitcase on the deck: its shell inset 0.5 round a lid seam, two straps round it, corner guards and a
+    carry handle on its top (lying flat) or its end face (stood upright, on the +y end). """
+    F.box( model, x0, x1, y0, y1, z0, z0 + h, paint, skip=( "bottom", ) )
+    seam = z0 + h * 0.55 if not upright else None
+    if seam is not None:
+        F.box( model, x0 - 0.25, x1 + 0.25, y0 - 0.25, y1 + 0.25, seam - 0.35, seam + 0.35, trim, skip=( "bottom", ) )
+    else:
+        xm = ( x0 + x1 ) / 2
+        F.box( model, xm - 0.35, xm + 0.35, y0 - 0.25, y1 + 0.25, z0, z0 + h + 0.25, trim, skip=( "bottom", ) )
+    long_x = ( x1 - x0 ) >= ( y1 - y0 )
+    for f in ( 0.25, 0.75 ):
+        if long_x:
+            x = x0 + ( x1 - x0 ) * f
+            F.box( model, x - 0.8, x + 0.8, y0 - 0.3, y1 + 0.3, z0, z0 + h + 0.3, "rw_black", skip=( "bottom", ) )
+        else:
+            y = y0 + ( y1 - y0 ) * f
+            F.box( model, x0 - 0.3, x1 + 0.3, y - 0.8, y + 0.8, z0, z0 + h + 0.3, "rw_black", skip=( "bottom", ) )
+    for cx in ( x0, x1 ):
+        for cy in ( y0, y1 ):
+            F.box( model, cx - 0.9, cx + 0.9, cy - 0.9, cy + 0.9, z0, z0 + 1.6, "rw_steel_grey", skip=( "bottom", ) )
+    if upright:
+        xm, zt = ( x0 + x1 ) / 2, z0 + h
+        for dx in ( -2.4, 2.4 ):
+            rod( model, F.p( xm + dx, ( y0 + y1 ) / 2, zt ), F.p( xm + dx, ( y0 + y1 ) / 2, zt + 1.6 ), 0.4, "rw_black",
+                 6 )
+        rod( model, F.p( xm - 2.6, ( y0 + y1 ) / 2, zt + 1.6 ), F.p( xm + 2.6, ( y0 + y1 ) / 2, zt + 1.6 ), 0.55,
+             "rw_black", 8, caps=( True, True ) )
+    else:
+        zt, ym = z0 + h, ( y0 + y1 ) / 2
+        xm = ( x0 + x1 ) / 2
+        a0, a1 = F.p( xm - 2.6, ym, zt + 1.4 ), F.p( xm + 2.6, ym, zt + 1.4 )
+        for q in ( a0, a1 ):
+            rod( model, q - np.array( ( 0, 0, 1.4 ) ), q, 0.4, "rw_black", 6 )
+        rod( model, a0, a1, 0.55, "rw_black", 8, caps=( True, True ) )
+
+
+def _crate( model, F, x0, x1, y0, y1, z0, z1 ):
+    """ A slatted wooden crate: its boards, with battens proud of each side at the corners and across the middle. """
+    model.grain_paints.add( "rw_wood" )
+    F.box( model, x0 + 0.6, x1 - 0.6, y0 + 0.6, y1 - 0.6, z0, z1 - 0.6, "rw_wood", skip=( "bottom", ) )
+    F.box( model, x0 + 0.6, x1 - 0.6, y0 + 0.6, y1 - 0.6, z1 - 0.6, z1, "rw_wood", skip=( "bottom", ) )
+    b = 1.6
+    for cx in ( x0, x1 - b ):
+        for cy in ( y0, y1 - b ):
+            F.box( model, cx, cx + b, cy, cy + b, z0, z1, "rw_wood", skip=( "bottom", ) )
+    for z in ( z0 + 0.4, z1 - 2.0, ( z0 + z1 ) / 2 - 0.8 ):
+        F.box( model, x0, x1, y0, y0 + 0.6, z, z + 1.6, "rw_wood" )
+        F.box( model, x0, x1, y1 - 0.6, y1, z, z + 1.6, "rw_wood" )
+        F.box( model, x0, x0 + 0.6, y0, y1, z, z + 1.6, "rw_wood" )
+        F.box( model, x1 - 0.6, x1, y0, y1, z, z + 1.6, "rw_wood" )
+    # Board gaps: dark lines between the slats on the long faces.
+    for k in range( 1, 4 ):
+        z = z0 + ( z1 - z0 ) * k / 4
+        F.box( model, x0 + 0.5, x1 - 0.5, y0 + 0.5, y1 - 0.5, z - 0.15, z + 0.15, "rw_black", skip=( "top", "bottom" ) )
+
+
 def luggage_cart( model, e, n, along="n", z0=0.0, loaded=True ):
-    """ An old platform luggage cart (2.5 x 1.2 m): a plank deck 600 mm up on a grey-green steel frame, four 400 mm
-    wheels on solid rubber tyres, the front pair on a turntable with the drawbar lying forward on the ground, tubular
-    gates 1 m high at both ends, and (loaded) two crates and three suitcases on it to about 1.15 m. along: "n", "-n",
-    "e" or "-e", the way the drawbar points. One wooden box to the gates' height. """
+    """ An old platform luggage cart (2.5 x 1.2 m): a deck of planks 600 mm up on a grey-green steel frame, four
+    400 mm wheels with solid rubber tyres on pressed-steel rims, the front pair on a turntable with the drawbar's fork
+    and towing eye lying forward on the ground, tubular gates 1 m high at both ends with corner gussets, and (loaded)
+    two slatted crates, three strapped suitcases and a kit bag on it to about 1.15 m. along: "n", "-n", "e" or "-e",
+    the way the drawbar points. One wooden box to the gates' height. """
     sign = -1.0 if along.startswith( "-" ) else 1.0
     F = Frame( ( e, n, z0 ), ( 0, sign ) if along.endswith( "n" ) else ( sign, 0 ) )
     hl, hw, deck = 49.2, 23.6, 23.6
     model.grain_paints.add( "rw_wood" )
-    F.box( model, -hw, hw, -hl, hl, deck - 1.4, deck, "rw_wood" )
+    # The deck: eight planks along the cart with narrow gaps over a dark bed.
+    F.box( model, -hw + 1.0, hw - 1.0, -hl + 1.0, hl - 1.0, deck - 1.6, deck - 1.4, DARK, skip=( "bottom", ) )
+    planks = 8
+    pw = 2 * hw / planks
+    for k in range( planks ):
+        x0 = -hw + k * pw + ( 0.15 if k else 0.0 )
+        x1 = -hw + ( k + 1 ) * pw - ( 0.15 if k < planks - 1 else 0.0 )
+        F.box( model, x0, x1, -hl, hl, deck - 1.4, deck, "rw_wood" )
+    for y in ( -hl + 4.0, hl - 4.0 ):
+        for xs in ( 1.0, -1.0 ):
+            disc( model, "rw_steel_dark", F.p( xs * ( hw - 6.0 ), y, deck + 0.02 ), F.z, 0.45, sides=6 )
+    # The frame: channel side rails with a lip, cross members.
     for xs in ( 1.0, -1.0 ):
         F.box( model, xs * ( hw - 2.0 ), xs * hw, -hl, hl, deck - 5.4, deck - 1.4, "rw_steel", skip=( "top", ) )
-    for y in ( -hl + 1.0, 0.0, hl - 1.0 ):
+        F.box( model, xs * ( hw - 3.2 ), xs * ( hw - 2.0 ), -hl, hl, deck - 5.4, deck - 4.6, "rw_steel", skip=( "top", ) )
+    for y in ( -hl + 1.0, -hl / 2, 0.0, hl / 2, hl - 1.0 ):
         F.box( model, -hw + 2.0, hw - 2.0, y - 1.0, y + 1.0, deck - 5.4, deck - 1.4, "rw_steel", skip=( "top", ) )
+    # Wheels: a 20-sided rubber tyre, a stepped steel rim, a hub boss and its axle nut.
     r = 7.9
     for y in ( -37.0, 33.0 ):
-        rod( model, F.p( -16.0, y, r ), F.p( 16.0, y, r ), 0.9, DARK, 4 )
+        rod( model, F.p( -16.0, y, r ), F.p( 16.0, y, r ), 0.9, DARK, 8 )
         for xs in ( 1.0, -1.0 ):
-            rod( model, F.p( xs * 16.0, y, r ), F.p( xs * 19.1, y, r ), r, "rw_rubber", 8, caps=( True, True ) )
-            disc( model, "rw_steel", F.p( xs * 19.15, y, r ), xs * F.x, 4.6, sides=6 )
-            F.box( model, xs * 13.0, xs * 15.0, y - 2.0, y + 2.0, r, deck - 5.4, "rw_steel", skip=( "top", ) )
-    F.box( model, -14.0, 14.0, 26.0, 40.0, deck - 8.0, deck - 5.4, DARK, skip=( "top", ) )
-    rod( model, F.p( 0.0, 38.0, r ), F.p( 0.0, 76.0, 1.5 ), 0.9, "rw_steel", 4 )
-    rod( model, F.p( -6.0, 76.0, 1.5 ), F.p( 6.0, 76.0, 1.5 ), 0.9, "rw_steel", 4, caps=( True, True ) )
+            rod( model, F.p( xs * 16.0, y, r ), F.p( xs * 19.1, y, r ), r, "rw_rubber", 20 )
+            rod( model, F.p( xs * 16.0, y, r ), F.p( xs * 19.1, y, r ), r - 2.2, "rw_steel", 20 )
+            disc( model, "rw_rubber", F.p( xs * 19.1, y, r ), xs * F.x, r, sides=20 )
+            disc( model, "rw_rubber", F.p( xs * 16.0, y, r ), -xs * F.x, r, sides=20 )
+            disc( model, "rw_steel", F.p( xs * 19.12, y, r ), xs * F.x, r - 2.3, sides=20 )
+            rod( model, F.p( xs * 19.1, y, r ), F.p( xs * 19.9, y, r ), 2.6, "rw_steel", 16, caps=( False, True ) )
+            rod( model, F.p( xs * 19.9, y, r ), F.p( xs * 20.6, y, r ), 1.0, "rw_steel_dark", 6, caps=( False, True ) )
+            # The fork: two plates either side of the wheel down from the frame.
+            for dx in ( 15.0, 13.4 ):
+                F.box( model, xs * dx - 0.4, xs * dx + 0.4, y - 2.4, y + 2.4, r, deck - 5.4, "rw_steel",
+                       skip=( "top", ) )
+            F.box( model, xs * 15.0 - 0.4, xs * 20.0, y - 2.4, y + 2.4, r + 8.4, r + 9.2, "rw_steel" )
+    # The turntable and the drawbar: a fork off the axle to a towing eye on the ground.
+    rod( model, F.p( 0.0, 33.0, deck - 8.0 ), F.p( 0.0, 33.0, deck - 5.4 ), 9.0, DARK, 16, caps=( True, False ) )
+    rod( model, F.p( 0.0, 33.0, deck - 8.6 ), F.p( 0.0, 33.0, deck - 8.0 ), 10.0, "rw_steel", 16,
+         caps=( True, True ) )
+    for xs in ( 1.0, -1.0 ):
+        rod( model, F.p( xs * 8.0, 33.0, r ), F.p( xs * 1.2, 50.0, 4.6 ), 0.8, "rw_steel", 6, caps=( True, False ) )
+    rod( model, F.p( 0.0, 50.0, 4.6 ), F.p( 0.0, 73.0, 1.6 ), 0.9, "rw_steel", 8 )
+    rod( model, F.p( -1.6, 49.0, 4.7 ), F.p( 1.6, 49.0, 4.7 ), 1.2, "rw_steel", 8, caps=( True, True ) )
+    eye = F.p( 0.0, 76.0, 1.4 )
+    for k in range( 10 ):
+        t0, t1 = 2 * math.pi * k / 10, 2 * math.pi * ( k + 1 ) / 10
+        rod( model, eye + 2.6 * ( math.cos( t0 ) * F.x + math.sin( t0 ) * F.y ),
+             eye + 2.6 * ( math.cos( t1 ) * F.x + math.sin( t1 ) * F.y ), 0.6, "rw_steel", 6 )
+    # The gates: posts, two rails and a gusset at each corner.
     for y in ( -hl + 1.0, hl - 1.0 ):
         for xs in ( 1.0, -1.0 ):
-            rod( model, F.p( xs * ( hw - 1.0 ), y, deck ), F.p( xs * ( hw - 1.0 ), y, 39.4 ), 0.85, "rw_steel", 4,
-                 caps=( False, True ), turn=math.pi / 4 )
+            rod( model, F.p( xs * ( hw - 1.0 ), y, deck ), F.p( xs * ( hw - 1.0 ), y, 39.4 ), 0.85, "rw_steel", 8,
+                 caps=( False, True ) )
+            F.box( model, xs * ( hw - 4.0 ), xs * ( hw - 1.0 ), y - 0.15, y + 0.15, deck, deck + 3.0, "rw_steel" )
         for z in ( 31.5, 39.4 ):
-            rod( model, F.p( -hw + 1.0, y, z ), F.p( hw - 1.0, y, z ), 0.85, "rw_steel", 4, turn=math.pi / 4 )
+            rod( model, F.p( -hw + 1.0, y, z ), F.p( hw - 1.0, y, z ), 0.85, "rw_steel", 8 )
+        for x in ( -hw / 3, hw / 3 ):
+            rod( model, F.p( x, y, deck ), F.p( x, y, 31.5 ), 0.5, "rw_steel", 6 )
     if loaded:
-        F.box( model, -20.0, 2.0, -45.0, -19.0, deck, 40.5, "rw_wood", skip=( "bottom", ) )
-        F.box( model, 3.0, 22.7, -46.0, -18.4, deck, deck + 9.8, "rw_steel_grey", skip=( "bottom", ) )
-        F.box( model, 5.0, 20.7, -43.0, -21.3, deck + 9.8, deck + 17.7, "rw_red_paint", skip=( "bottom", ) )
-        F.box( model, -14.0, 1.7, -10.0, -2.1, deck, deck + 21.7, "rw_train_blue", skip=( "bottom", ) )
-        F.box( model, -7.0, 19.0, 4.0, 30.0, deck, deck + 15.7, "rw_wood", skip=( "bottom", ) )
-        F.box( model, -19.0, -9.0, 8.0, 36.0, deck, deck + 9.0, "rw_black", skip=( "bottom", ) )
+        _crate( model, F, -20.0, 2.0, -45.0, -19.0, deck, 40.5 )
+        _suitcase( model, F, 3.0, 22.7, -46.0, -18.4, deck, 9.8, "rw_steel_grey" )
+        _suitcase( model, F, 5.0, 20.7, -43.0, -21.3, deck + 9.8, 7.4, "rw_red_paint" )
+        _suitcase( model, F, -14.0, 1.7, -10.0, -2.1, deck, 21.7, "rw_train_blue", upright=True )
+        _crate( model, F, -7.0, 19.0, 4.0, 30.0, deck, deck + 15.7 )
+        _suitcase( model, F, -19.0, -9.0, 8.0, 36.0, deck, 9.0, "rw_black", trim="rw_steel_dark" )
+        # A canvas kit bag lying across the front of the deck, drawn tight at both ends.
+        rod( model, F.p( -18.0, 40.0, deck + 4.2 ), F.p( 6.0, 41.0, deck + 4.2 ), 4.2, "rw_train_grey", 12,
+             caps=( True, True ), cap_paint=DARK )
+        rod( model, F.p( -7.0, 40.5, deck + 8.2 ), F.p( -3.0, 40.6, deck + 8.2 ), 0.5, "rw_black", 6 )
     F.collide( model, -hw, hw, -hl, hl, 0.0, 39.4, "wood" )
 
 
