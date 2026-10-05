@@ -1031,13 +1031,35 @@ def mark( model, paint, e0, e1, n0, n1 ):
 
 
 def street_lamp( model, e, n, out, z=0.0 ):
-    """ A street lamp: an 8 m steel mast at the kerb, its arm reaching 1.5 m out over the road, the lantern under it. """
+    """ A street lamp: an 8 m steel mast at the kerb, its arm reaching 1.5 m out over the road, the lantern under it,
+    its opal diffuser dark by day. """
     post( model, ( e, n ), 5.0, z, z + 36, "rw_steel_grey", sides=6 )
     post( model, ( e, n ), 3.0, z + 36, z + 312, "rw_steel_grey", sides=6 )
     tip = np.array( ( e + out[0] * 60, n + out[1] * 60, z + 318 ) )
     rod( model, ( e, n, z + 306 ), tip, 3.0, "rw_steel_grey" )
     lo, hi = tip - ( 11, 11, 8 ), tip + ( 11, 11, 0 )
-    model.box( lo, hi, { "default": "rw_steel_grey", "-z": "rw_lamp_cool" } )
+    model.box( lo, hi, { "default": "rw_steel_grey", "-z": "rw_opal_glass" } )
+
+
+def lantern( model, a ):
+    """ A four-sided lantern standing on a ( e, n, z ) socket: opal panes widening upwards between iron corner posts,
+    a crown ring, a pyramid roof and a finial. The lamps are off by day. """
+    e, n, z = a
+    lathe( model, ( e, n ), [ ( 1.6, z - 4.0 ), ( 3.6, z ), ( 0.0, z ) ], "iron_black", sides=8, cap=False )
+    lo, hi, z0, z1 = 4.4, 6.6, z + 1.0, z + 15.0
+    model.box( ( e - lo - 0.6, n - lo - 0.6, z ), ( e + lo + 0.6, n + lo + 0.6, z0 ), "iron_black" )
+    corners = [ ( 1, 1 ), ( -1, 1 ), ( -1, -1 ), ( 1, -1 ) ]
+    for ( sa, ta ), ( sb, tb ) in zip( corners, corners[1:] + corners[:1] ):
+        out = np.array( ( sa + sb, ta + tb, 0.0 ) ) / 2.0
+        facing( model, "rw_opal_glass", [ ( e + sa * lo, n + ta * lo, z0 ), ( e + sb * lo, n + tb * lo, z0 ),
+                                          ( e + sb * hi, n + tb * hi, z1 ), ( e + sa * hi, n + ta * hi, z1 ) ],
+                out + ( 0, 0, -0.15 ) )
+    for sa, ta in corners:
+        rod( model, ( e + sa * lo, n + ta * lo, z0 ), ( e + sa * hi, n + ta * hi, z1 ), 0.9, "iron_black" )
+    model.box( ( e - hi - 0.8, n - hi - 0.8, z1 ), ( e + hi + 0.8, n + hi + 0.8, z1 + 2.0 ), "iron_black" )
+    lathe( model, ( e, n ), [ ( ( hi + 1.6 ) * math.sqrt( 2 ), z1 + 2.0 ), ( 2.0, z1 + 10.0 ), ( 1.0, z1 + 11.0 ),
+                              ( 1.6, z1 + 12.5 ), ( 0.0, z1 + 15.0 ) ], "iron_black", sides=4, turn=math.pi / 4,
+           cap=False )
 
 
 def platz_lamp( model, e, n ):
@@ -1046,9 +1068,8 @@ def platz_lamp( model, e, n ):
                               ( 2.6, 164.0 ) ], "iron_black", sides=6, cap=False )
     for s in ( -1.0, 1.0 ):
         a = np.array( ( e + s * 24, n, 166.0 ) )
-        rod( model, ( e, n, 152.0 ), a, 2.0, "iron_black" )
-        model.box( a + ( -7, -7, -2 ), a + ( 7, 7, 16 ), { "default": "rw_lamp_warm", "+z": None } )
-        lathe( model, a[:2], [ ( 10.0, 180.0 ), ( 0.0, 192.0 ) ], "iron_black", sides=4, turn=math.pi / 4 )
+        rod( model, ( e, n, 152.0 ), a - ( 0, 0, 4.0 ), 2.0, "iron_black" )
+        lantern( model, a )
 
 
 def litfass( model, e, n, key ):
@@ -1069,16 +1090,65 @@ def litfass( model, e, n, key ):
                               ( r * 0.4, 156.0 ), ( 3.0, 160.0 ), ( 3.0, 170.0 ), ( 0.0, 176.0 ) ], "trim_green", sides=sides )
 
 
-def traffic_light( model, e, n, facing_n ):
-    """ A signal post at a junction: 3.4 m pole, a three-lamp head facing the oncoming traffic. """
-    post( model, ( e, n ), 2.5, 0, 134, "rw_steel_grey", sides=6 )
+def traffic_light( model, e, n, facing_n, lit="red" ):
+    """ A traffic signal at a stop line, as German ones are (RiLSA): a galvanised pole 114 mm across and 3.6 m tall, and
+    on two clamps on its traffic side a black head of three 200 mm lenses (red over amber over green), its lowest edge
+    2.3 m up. Each lens has its visor (Schute), longest over the top, and the head stands in a black backplate with a
+    white edge (Kontrastblende). lit: the lens that's on ("red", "amber", "green" or "red_amber"); the others are dark
+    tinted glass. """
     d = 1.0 if facing_n > 0 else -1.0
-    model.box( ( e - 6, n - 5, 98 ), ( e + 6, n + 5, 134 ), "rw_black" )
-    for k, paint in enumerate( ( "rw_signal_green", "rw_black", "rw_signal_red" ) ):
-        z = 102 + k * 10.5
-        face = n + d * 5.1
-        facing( model, paint, [ ( e - 3.5, face, z ), ( e + 3.5, face, z ), ( e + 3.5, face, z + 7 ), ( e - 3.5, face, z + 7 ) ],
+    post( model, ( e, n ), 2.9, 0, 3, "rw_steel_grey", sides=12 )
+    post( model, ( e, n ), 2.25, 3, 142, "rw_steel_grey", sides=12, top=False )
+    lathe( model, ( e, n ), [ ( 2.5, 142.0 ), ( 2.5, 143.0 ), ( 1.6, 144.6 ), ( 0.0, 145.2 ) ], "rw_steel_grey", sides=12 )
+    sec, hw = 10.4, 4.8
+    z0 = 90.0
+    z1 = z0 + 3 * sec
+    back = n + d * 4.3
+    front = back + d * 7.0
+    model.box( ( e - hw, min( back, front ), z0 ), ( e + hw, max( back, front ), z1 ), "rw_black" )
+    for k in ( 1, 2 ):                     # the joints between the sections
+        zj = z0 + k * sec
+        model.box( ( e - hw - 0.15, min( back, front ) - 0.15, zj - 0.25 ), ( e + hw + 0.15, max( back, front ) + 0.15,
+                   zj + 0.25 ), "rw_steel_dark" )
+    for zc in ( z0 + 6.0, z1 - 6.0 ):       # the clamps
+        post( model, ( e, n ), 2.7, zc - 1.0, zc + 1.0, "rw_black", sides=12 )
+        model.box( ( e - 1.3, min( n + d * 2.4, back ), zc - 1.3 ), ( e + 1.3, max( n + d * 2.4, back ), zc + 1.3 ),
+                   "rw_black" )
+    # The backplate, and its white edge on the face towards the traffic.
+    plate = back + d * 1.5
+    pw, pz0, pz1, edge = 8.4, z0 - 3.8, z1 + 3.8, 1.4
+    model.box( ( e - pw, plate - 0.15, pz0 ), ( e + pw, plate + 0.15, pz1 ), "rw_black" )
+    f = plate + d * 0.2
+    for e0, e1, za, zb in ( ( -pw, pw, pz0, pz0 + edge ), ( -pw, pw, pz1 - edge, pz1 ), ( -pw, -pw + edge, pz0, pz1 ),
+                            ( pw - edge, pw, pz0, pz1 ) ):
+        facing( model, "rw_white_paint", [ ( e + e0, f, za ), ( e + e1, f, za ), ( e + e1, f, zb ), ( e + e0, f, zb ) ],
                 ( 0, d, 0 ) )
+    # The lenses and their visors.
+    on = { "red": ( "red", ), "amber": ( "amber", ), "green": ( "green", ), "red_amber": ( "red", "amber" ) }[lit]
+    r, rv, sides = 3.94, 4.5, 20
+    for k, colour in enumerate( ( "green", "amber", "red" ) ):
+        zc = z0 + sec * ( k + 0.5 )
+        paint = ( "rw_signal_yellow" if colour == "amber" else f"rw_signal_{colour}" ) if colour in on else \
+            f"rw_lens_{colour}"
+        ring = [ 2 * math.pi * j / sides for j in range( sides ) ]
+        facing( model, "rw_steel_dark", [ ( e + ( r + 0.5 ) * math.cos( t ), front + d * 0.05, zc + ( r + 0.5 ) * math.sin( t ) )
+                                          for t in ring ], ( 0, d, 0 ) )
+        facing( model, paint, [ ( e + r * math.cos( t ), front + d * 0.3, zc + r * math.sin( t ) ) for t in ring ],
+                ( 0, d, 0 ) )
+        arc = [ math.radians( -35.0 + 250.0 * j / 14 ) for j in range( 15 ) ]
+        reach = lambda t: 3.0 + 4.5 * max( 0.0, math.sin( t ) )
+        for ta, tb in zip( arc, arc[1:] ):
+            ca, cb = np.array( ( math.cos( ta ), 0, math.sin( ta ) ) ), np.array( ( math.cos( tb ), 0, math.sin( tb ) ) )
+            mid = ( ca + cb ) / 2
+            for rad, out in ( ( rv, mid ), ( rv - 0.3, -mid ) ):
+                pa = np.array( ( e, front, zc ) ) + ca * rad
+                pb = np.array( ( e, front, zc ) ) + cb * rad
+                facing( model, "rw_black", [ pa, pb, pb + ( 0, d * reach( tb ), 0 ), pa + ( 0, d * reach( ta ), 0 ) ],
+                        out )
+            c0 = np.array( ( e, front, zc ) )
+            facing( model, "rw_black", [ c0 + ca * rv + ( 0, d * reach( ta ), 0 ), c0 + cb * rv + ( 0, d * reach( tb ), 0 ),
+                                         c0 + cb * ( rv - 0.3 ) + ( 0, d * reach( tb ), 0 ),
+                                         c0 + ca * ( rv - 0.3 ) + ( 0, d * reach( ta ), 0 ) ], ( 0, d, 0 ) )
 
 
 def bench( model, e0, e1, n, out ):
@@ -1286,8 +1356,8 @@ def platz( model ):
         litfass( model, s * 1350.0, 1960.0, ( "litfass", s ) )
         litfass( model, s * 2110.0, 2760.0 if s > 0 else 3020.0, ( "litfass2", s ) )
         # Signals on the right of the traffic they face
-        traffic_light( model, 2012.0 if s > 0 else -1488.0, 1990.0, -1.0 )
-        traffic_light( model, 1488.0 if s > 0 else -2012.0, 2470.0, 1.0 )
+        traffic_light( model, 2012.0 if s > 0 else -1488.0, 1990.0, -1.0, "red" )
+        traffic_light( model, 1488.0 if s > 0 else -2012.0, 2470.0, 1.0, "red" )
         for n in ( 2620.0, 3160.0 ):
             street_lamp( model, s * 2016.0, n, ( -s, 0 ) )
         for n in ( 2860.0, 3340.0 ):

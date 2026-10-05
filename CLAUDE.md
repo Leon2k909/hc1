@@ -2132,8 +2132,8 @@ simulate_input.
       floated. They now stand on it (`railhead_station.ROAD_Z`, -6), stand-ins included.
     - Car paint is `railhead_materials.PAINTED` (`rw_car_grey` and five more): vmats only, a flat tint on
       `materials/default/default_color.tga` with one roughness, since every texture's dirt and the trains' panel seams
-      looked wrong on a car. The vmats were written straight from `painted_vmat`; `railhead_materials.py` writes the
-      same ones.
+      looked wrong on a car. The signals' dark lenses and the lamps' opal glass are PAINTED too. The vmats were written
+      straight from `painted_vmat`; `railhead_materials.py` writes the same ones.
     - Furniture and clutter: benches, machines, kiosks, shelters, hanging displays and signs, clocks, lamps, fences,
       pallets, forklifts, cars and vans.
     - `--preview <dir>` renders its showcase.
@@ -2151,6 +2151,15 @@ simulate_input.
       onion dome, a 1970s office tower (104 m), a slab block, a brewery chimney and a water tower, then hills rising to
       86 m by the world's edge (40000, ~1 km).
     - 188 trees are Facepunch's cloud oaks and beech bushes, in the scene's `__references` as Belltower's are.
+    - The junctions' traffic signals (`traffic_light`) were black boxes with square red and green lamps, both lit (the
+      user: "these traffic lights look terrible", 2026-10-05). They're now German signals at RiLSA's sizes:
+      - a galvanised pole 114 mm across and 3.6 m tall;
+      - a head of three 200 mm lenses, each under its visor, in a black backplate with a white edge;
+      - one lens lit (`lit`: red at both junctions) and the others dark tinted glass (`rw_lens_*`).
+    - The candelabra's lanterns were glowing cubes, and the street lamps' undersides glowed too, at 14:03 on a sunny
+      day. The lanterns (`lantern`) now have four opal panes, iron corner posts and a pyramid roof, and every street lamp
+      is off (`rw_opal_glass`).
+    - Both were checked only in offline renders, not in the engine.
     - `--preview <dir> [view ...]` renders its own 31 views, with the station from `railhead_station`.
     - The map script lays the corridor's track, ballast and overhead line from the throat to 20 m into the tunnel,
       and the depot's lead off track C (`depot_lead`). The depot pit's wall splays out from the bridge to `THROAT_E`

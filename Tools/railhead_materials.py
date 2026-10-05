@@ -12,8 +12,9 @@ posters, shop signs, graffiti, the cast bronze lettering and the platform clock.
 - Writes Assets/materials/railhead/<texture>_normal.png and _rough.png per texture (with _trans.png for the
   alpha-tested ones (lattice, graffiti, lettering) and _illum.png for the self-lit masks of the signs, displays
   and shop signs), and per paint <paint>_color.png and <paint>.vmat.
-  Most are on shaders/complex.shader; rw_glass and rw_glass_roof are on shaders/glass.shader. The car paints
-  (PAINTED) are flat colours with no texture of their own, so they get a vmat only.
+  Most are on shaders/complex.shader; rw_glass and rw_glass_roof are on shaders/glass.shader. The car paints, the
+  signals' unlit lenses and the lanterns' opal glass (PAINTED) are flat colours with no texture of their own, so they
+  get a vmat only.
 - Every texture tiles over its tile units (paints(); map_kit's world-scale UVs read them through the model's
   tile_overrides), except the decal (DECALS: the clock, 0..1 across its polygon), the lattice (one panel per 1.0 of u)
   and the atlases (ATLASES), which the map scripts place by rect_uv().
@@ -2889,12 +2890,19 @@ GLASS = { "rw_glass": ( ( 0.92, 0.95, 0.94 ), 0.15 ) }
 # Car paint, with no texture of its own: white (materials/default/default_color.tga) tinted to the colour through
 # g_vColorTint, flat normals and one roughness all over, a clear coat's. paint: ( sRGB colour, metalness, roughness ).
 # The trains' paints have their grime and panel seams, and every other texture its dirt, which read wrong on a car.
+# The signals' dark lenses and the lamps' opal glass are flat colours the same way.
 PAINTED = { "rw_car_grey": ( ( 74, 78, 83 ), 0.4, 0.3 ),            # a metallic graphite grey
             "rw_car_silver": ( ( 160, 164, 168 ), 0.6, 0.3 ),
             "rw_car_white": ( ( 226, 228, 228 ), 0.0, 0.28 ),
             "rw_car_black": ( ( 20, 21, 23 ), 0.2, 0.25 ),
             "rw_car_red": ( ( 140, 16, 22 ), 0.3, 0.28 ),
-            "rw_car_blue": ( ( 22, 44, 90 ), 0.4, 0.28 ) }
+            "rw_car_blue": ( ( 22, 44, 90 ), 0.4, 0.28 ),
+            # A traffic signal's lenses while they're dark: tinted glass over a black reflector, glossy.
+            "rw_lens_red": ( ( 82, 14, 12 ), 0.0, 0.12 ),
+            "rw_lens_amber": ( ( 92, 58, 10 ), 0.0, 0.12 ),
+            "rw_lens_green": ( ( 10, 50, 40 ), 0.0, 0.12 ),
+            # Opal (milk) glass, the street lamps' and lanterns' by day, with the lamps off.
+            "rw_opal_glass": ( ( 214, 214, 206 ), 0.0, 0.3 ) }
 # Textured glass on shaders/glass.shader (its texture's colour, normal and roughness): paint: absorption.
 TEXTURED_GLASS = { "rw_glass_roof": 0.45 }
 # Paints whose picture's bottom edge stands at z 0 (two storeys a tile).
