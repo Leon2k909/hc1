@@ -572,6 +572,12 @@ def bridge_stair( model, e0, e1, down ):
     model.box( ( e0, la, 0 ), ( e1, lb, landing_z ), { "+z": "rw_paving_dark", "default": None }, STONE )
     n2 = n + climb * 48
     flight( model, "n", n2, climb, e0, e1, landing_z, 15, rise, tread, "rw_paving_dark", "rw_concrete" )
+    # The space under the upper flight is solid concrete, closed at the deck end under the girder: open, it was a
+    # hollow you could walk into from under the bridge, seen through the flight's undrawn underside.
+    na, nb = sorted( ( n2, top_n ) )
+    model.collision_box( ( e0, na, 0.0 ), ( e1, nb, landing_z ), STONE )
+    facing( model, "rw_concrete", [ ( e0, top_n, 0.0 ), ( e1, top_n, 0.0 ), ( e1, top_n, DECK_Z - 32 ),
+                                    ( e0, top_n, DECK_Z - 32 ) ], ( 0, -down, 0 ) )
     # Concrete parapets on both sides, 40 over the nosings, with a steel handrail.
     for w0, w1 in ( ( e0 - 6, e0 ), ( e1, e1 + 6 ) ):
         sloped_wall( model, w0, w1, bottom_n, n, 0.0, 40.0 + rise, landing_z + 40, "rw_concrete", "rw_concrete_dark", STONE )

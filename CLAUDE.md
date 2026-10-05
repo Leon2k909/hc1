@@ -2101,6 +2101,10 @@ simulate_input.
     - The footbridge's inside handrail ran its whole length, so it crossed the top of each stair at waist height (the
       user's screenshot, 2026-10-05). It now stops at each stair's opening and turns into the stair's handrails,
       which run on 6 over the deck to meet it. It has no collision, so it never blocked anyone.
+    - Each footbridge stair's upper flight starts at its landing (z 106), and nothing filled the space under it. From
+      under the bridge you could walk into it between the parapets, and see out through the flight's undrawn underside
+      (the user's screenshot, 2026-10-05). Now that space is solid (a collision box), closed by a concrete face at the
+      deck's end under the girder. The hall's gallery stair was already walled in.
   - `railhead_props.py`: the track and its equipment, the rolling stock, containers, furniture and yard clutter. Its
     docstring has each prop's API, conventions and triangle and collision budget.
     - Track: UIC 60 rail, crossovers, buffer stops, Ks signals and the overhead line.
@@ -2136,6 +2140,10 @@ simulate_input.
       straight from `painted_vmat`; `railhead_materials.py` writes the same ones.
     - Furniture and clutter: benches, machines, kiosks, shelters, hanging displays and signs, clocks, lamps, fences,
       pallets, forklifts, cars and vans.
+    - The concourse's bin stood 1.6" into its bench's end, its slots to the wall, and the booking hall's back-to-back
+      benches met at their backrests (the user saw the first, 2026-10-05). The bin is now at e 622 facing the
+      concourse, and the hall's benches are 24 apart like the platforms'. A check of every piece `use` places, by the
+      bounds of what it draws, found no other overlaps.
     - `--preview <dir>` renders its showcase.
   - `railhead_backdrop.py`: the city round the station. Its docstring has the layout and the sources.
     - The play area's east and west walls are rows of five-storey Gründerzeit (1880-1910) tenements across the cab

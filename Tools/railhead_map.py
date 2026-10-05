@@ -588,7 +588,7 @@ def concourse( m, s ):
     put( "ticket_machine", m, s * 1145.0, 1100.0, "-e" if s > 0 else "+e" )
     for e in ( 560.0, 1100.0 ):
         put( "bench", m, s * e, 1280.0, "-n" )
-    put( "bin", m, s * 610.0, 1284.0 )
+    put( "bin", m, s * 622.0, 1284.0, "-n" )        # clear of the bench's end, its slots towards the concourse
     use( "luggage_cart", m, s * 600.0, 950.0, "e", stand_in=furniture_stand_in( "luggage_cart", s * 600.0, 950.0, "+e" ) )
     # Platform signs over the platforms' heads, hung from the rib at n 820.
     island, outer = ( "gleis_5_6", "gleis_6" ) if s > 0 else ( "gleis_1_2", "gleis_3" if False else "gleis_1" )
@@ -643,8 +643,8 @@ def warn_plate( m, e, n ):
 def head_building( m, s ):
     # The booking hall's benches, back to back, and the wings: the travel centre's counter west, lockers east.
     for n in ( 1420.0, 1600.0 ):
-        put( "bench", m, s * 430.0, n - 11, "-n" )
-        put( "bench", m, s * 430.0, n + 11, "+n" )
+        put( "bench", m, s * 430.0, n - 12, "-n" )      # 12 each side, so the backrests don't meet
+        put( "bench", m, s * 430.0, n + 12, "+n" )
     e0, e1 = sorted( ( s * 1120.0, s * 1160.0 ) )
     if s < 0:
         m.box( ( e0, 1570.0, 0 ), ( e1, 1750.0, 40 ), { "default": "rw_wood", "+z": "rw_terrazzo_border" }, WOOD )
