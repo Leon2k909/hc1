@@ -1102,6 +1102,7 @@ public static partial class GameText
 		["LAYERS ({0} / {1})"] = "Шари ({0} / {1})",
 		["Layer {0}"] = "Шар {0}",
 		["+ ADD LAYER"] = "+ Додати шар",
+		["Drag a layer to move it, or a corner to scale it"] = "Перетягніть шар, щоб перемістити його, або кут, щоб змінити розмір",
 		["SHAPES"] = "Фігури",
 		["EMOJI"] = "Емодзі",
 		["FACES"] = "Обличчя",

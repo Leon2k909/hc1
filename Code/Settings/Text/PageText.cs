@@ -297,6 +297,11 @@ public static partial class GameText
 		["LAYERS ({0} / {1})"] = ("Calques ({0} / {1})", "Ebenen ({0} / {1})", "Capas ({0} / {1})", "Camadas ({0} / {1})"),
 		["Layer {0}"] = ("Calque {0}", "Ebene {0}", "Capa {0}", "Camada {0}"),
 		["+ ADD LAYER"] = ("+ Ajouter un calque", "+ Ebene hinzufügen", "+ Añadir capa", "+ Adicionar camada"),
+		["Drag a layer to move it, or a corner to scale it"] = (
+			"Faites glisser un calque pour le déplacer, ou un coin pour le redimensionner",
+			"Ziehe eine Ebene, um sie zu verschieben, oder eine Ecke, um sie zu skalieren",
+			"Arrastra una capa para moverla, o una esquina para escalarla",
+			"Arraste uma camada para movê-la, ou um canto para redimensioná-la" ),
 		["SHAPES"] = ("Formes", "Formen", "Formas", "Formas"),
 		["EMOJI"] = ("Émojis", "Emojis", "Emojis", "Emojis"),
 		["FACES"] = ("Visages", "Gesichter", "Caras", "Rostos"),

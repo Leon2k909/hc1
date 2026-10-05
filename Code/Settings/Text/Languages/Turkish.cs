@@ -472,6 +472,7 @@ public static partial class GameText
 		["LAYERS ({0} / {1})"] = "Katmanlar ({0} / {1})",
 		["Layer {0}"] = "Katman {0}",
 		["+ ADD LAYER"] = "+ Katman ekle",
+		["Drag a layer to move it, or a corner to scale it"] = "Taşımak için bir katmanı, boyutlandırmak için bir köşesini sürükle",
 		["SHAPES"] = "Şekiller",
 		["EMOJI"] = "Emoji",
 		["FACES"] = "Yüzler",

@@ -462,6 +462,7 @@ public static partial class GameText
 		["LAYERS ({0} / {1})"] = "图层（{0} / {1}）",
 		["Layer {0}"] = "图层{0}",
 		["+ ADD LAYER"] = "+ 添加图层",
+		["Drag a layer to move it, or a corner to scale it"] = "拖动图层可移动，拖动角可缩放",
 		["SHAPES"] = "形状",
 		["EMOJI"] = "表情符号",
 		["FACES"] = "笑脸",

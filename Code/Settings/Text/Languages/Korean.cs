@@ -1095,6 +1095,7 @@ public static partial class GameText
 		["LAYERS ({0} / {1})"] = "레이어 ({0} / {1})",
 		["Layer {0}"] = "레이어 {0}",
 		["+ ADD LAYER"] = "+ 레이어 추가",
+		["Drag a layer to move it, or a corner to scale it"] = "레이어를 드래그해 이동하고, 모서리를 드래그해 크기를 조절하세요",
 		["SHAPES"] = "도형",
 		["EMOJI"] = "이모지",
 		["FACES"] = "얼굴",

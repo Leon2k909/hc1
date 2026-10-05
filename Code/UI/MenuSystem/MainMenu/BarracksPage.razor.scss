@@ -90,6 +90,9 @@ BarracksPage.barracks-page
     .ee-layer-row.active { border-left-color: $menu-accent; background-color: rgba( 255, 122, 26, 0.1 ); }
     .ee-picker-tab.active { border-bottom-color: $menu-accent; color: $menu-accent; }
     .ee-shape-cell.active { border-color: $menu-accent; background-color: rgba( 255, 122, 26, 0.1 ); }
+    .ee-selection { border-color: rgba( 255, 122, 26, 0.85 ); }
+    .ee-handle { border-color: $menu-accent; }
+    .ee-canvas-hint { color: $menu-muted; font-size: 13px; }
     .ee-shapes, .ee-shape-grid { min-height: 0; }
 }
 .main-menu-root.compact BarracksPage

@@ -1,0 +1,192 @@
+@using System;
+@using System.Globalization;
+@using Sandbox.UI;
+@using Sandbox;
+
+@namespace Facepunch.UI
+@inherits Panel
+
+@* The emblem editor's canvas. Press a layer to select it and drag it about; drag a corner of the selected layer's box
+   to scale it. Its children take no pointer events, so the root is always the pressed panel and HasActive holds for
+   the whole drag (as in TheaterTimeline). *@
+<root class="ee-canvas-wrap">
+    <EmblemViewer Data=@Data />
+
+    @if ( Selected is { } layer )
+    {
+        <div class="ee-selection" style="@SelectionStyle( layer )">
+            <div class="ee-handle tl"></div>
+            <div class="ee-handle tr"></div>
+            <div class="ee-handle bl"></div>
+            <div class="ee-handle br"></div>
+        </div>
+    }
+</root>
+
+@code
+{
+    public EmblemData Data { get; set; }
+
+    public int SelectedIndex { get; set; } = -1;
+
+    /// <summary>A layer was pressed: select it.</summary>
+    public Action<int> OnSelect { get; set; }
+
+    /// <summary>The selected layer moved or scaled: the editor redraws its sliders.</summary>
+    public Action OnChanged { get; set; }
+
+    private EmblemLayer Selected => Data?.Layers is { } layers && SelectedIndex >= 0 && SelectedIndex < layers.Count ? layers[SelectedIndex] : null;
+
+    // The transform sliders' ranges (EmblemEditor), so a drag can't take a layer anywhere the sliders can't.
+    private const float MinPosition = -50f, MaxPosition = 150f, MinScale = 0.1f, MaxScale = 10f;
+
+    /// <summary>How near a corner, in UI pixels, a press counts as grabbing it.</summary>
+    private const float HandleReach = 12f;
+
+    /// <summary>Half the smallest area, in UI pixels, a press picks a layer up in.</summary>
+    private const float MinGrab = 12f;
+
+    private enum DragMode { None, Move, Scale }
+    private DragMode _mode;
+    private Vector2 _grabOffset;
+    private float _startDistance, _startScale;
+
+    /// <summary>
+    /// A layer's box in UI pixels: EmblemViewer draws an emoji in a 28 px box and a Material Icon at 32 px, times its
+    /// scale.
+    /// </summary>
+    private static float BoxSize( EmblemLayer layer ) => layer.Scale * (layer.IconType == EmblemIconType.Emoji ? 28f : 32f);
+
+    /// <summary>The outline round the selected layer: its box, placed and turned as EmblemViewer places it.</summary>
+    private static string SelectionStyle( EmblemLayer layer )
+    {
+        var size = BoxSize( layer );
+        return $"left: {F( layer.X )}%; top: {F( layer.Y )}%; width: {F( size )}px; height: {F( size )}px; " +
+            $"transform: translate( -50%, -50% ) rotate( {F( layer.Rotation )}deg );";
+    }
+
+    /// <summary>A number for a style, with a decimal point whatever the machine's language.</summary>
+    private static string F( float value ) => value.ToString( "0.###", CultureInfo.InvariantCulture );
+
+    /// <summary>A layer's centre on screen.</summary>
+    private Vector2 Centre( EmblemLayer layer ) => Box.Rect.Position + Box.Rect.Size * new Vector2( layer.X, layer.Y ) / 100f;
+
+    /// <summary>A screen point in the layer's own frame (its rotation taken out), relative to its centre.</summary>
+    private Vector2 ToLocal( EmblemLayer layer, Vector2 point )
+    {
+        var d = point - Centre( layer );
+        var r = layer.Rotation * MathF.PI / 180f;
+        var sin = MathF.Sin( r );
+        var cos = MathF.Cos( r );
+        return new Vector2( d.x * cos + d.y * sin, -d.x * sin + d.y * cos );
+    }
+
+    /// <summary>
+    /// Whether a press is on the layer: in its box, or for a small layer within <see cref="MinGrab"/> of its centre,
+    /// so it's easy to pick up.
+    /// </summary>
+    private bool Contains( EmblemLayer layer, Vector2 point )
+    {
+        var half = MathF.Max( BoxSize( layer ) * 0.5f, MinGrab ) * ScaleToScreen;
+        var local = ToLocal( layer, point );
+        return MathF.Abs( local.x ) <= half && MathF.Abs( local.y ) <= half;
+    }
+
+    /// <summary>
+    /// Whether a press is on one of the layer's corners: within <see cref="HandleReach"/> of it, and nearer it than the
+    /// centre, so the middle of a small layer still moves it.
+    /// </summary>
+    private bool OnHandle( EmblemLayer layer, Vector2 point )
+    {
+        var half = BoxSize( layer ) * ScaleToScreen * 0.5f;
+        var local = ToLocal( layer, point );
+        var corner = new Vector2( local.x < 0f ? -half : half, local.y < 0f ? -half : half );
+        var toCorner = (local - corner).Length;
+        return toCorner <= HandleReach * ScaleToScreen && toCorner < local.Length;
+    }
+
+    protected override void OnMouseDown( MousePanelEvent e )
+    {
+        base.OnMouseDown( e );
+
+        if ( e.MouseButton != MouseButtons.Left || Data?.Layers is not { } layers )
+            return;
+
+        e.StopPropagation();
+        var mouse = Mouse.Position;
+
+        // The selected layer's corners first: they can sit over another layer.
+        if ( Selected is { } selected && OnHandle( selected, mouse ) )
+        {
+            _mode = DragMode.Scale;
+            _startDistance = MathF.Max( (mouse - Centre( selected )).Length, 1f );
+            _startScale = selected.Scale;
+            return;
+        }
+
+        // Then the top layer under the press (the last one is drawn on top).
+        for ( var i = layers.Count - 1; i >= 0; i-- )
+        {
+            if ( !Contains( layers[i], mouse ) )
+                continue;
+
+            if ( i != SelectedIndex )
+            {
+                SelectedIndex = i;
+                OnSelect?.Invoke( i );
+            }
+
+            _mode = DragMode.Move;
+            _grabOffset = Centre( layers[i] ) - mouse;
+            return;
+        }
+
+        _mode = DragMode.None;
+    }
+
+    public override void Tick()
+    {
+        base.Tick();
+
+        if ( !HasActive )
+        {
+            _mode = DragMode.None;
+            return;
+        }
+
+        if ( _mode == DragMode.None || Selected is not { } layer || Box.Rect.Width < 1f || Box.Rect.Height < 1f )
+            return;
+
+        var mouse = Mouse.Position;
+
+        if ( _mode == DragMode.Move )
+        {
+            var centre = (mouse + _grabOffset - Box.Rect.Position) / Box.Rect.Size * 100f;
+            var x = MathF.Round( Math.Clamp( centre.x, MinPosition, MaxPosition ), 1 );
+            var y = MathF.Round( Math.Clamp( centre.y, MinPosition, MaxPosition ), 1 );
+            if ( x == layer.X && y == layer.Y )
+                return;
+
+            layer.X = x;
+            layer.Y = y;
+        }
+        else
+        {
+            var scale = _startScale * (mouse - Centre( layer )).Length / _startDistance;
+            scale = MathF.Round( Math.Clamp( scale, MinScale, MaxScale ), 2 );
+            if ( scale == layer.Scale )
+                return;
+
+            layer.Scale = scale;
+        }
+
+        StateHasChanged();
+        OnChanged?.Invoke();
+    }
+
+    protected override int BuildHash()
+    {
+        var layer = Selected;
+        return HashCode.Combine( Data, Data?.Layers?.Count ?? 0, SelectedIndex, layer?.X, layer?.Y, layer?.Scale, layer?.Rotation, layer?.IconType );
+    }
+}

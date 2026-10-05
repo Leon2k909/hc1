@@ -22,9 +22,9 @@
 
         @* LEFT: Canvas + transform controls *@
         <div class="ee-left">
-            <div class="ee-canvas-wrap">
-                <EmblemViewer Data=@Data />
-            </div>
+            @* Press a layer to select and drag it; drag a corner of its box to scale it *@
+            <EmblemCanvas Data=@Data SelectedIndex=@SelectedLayerIndex OnSelect=@SelectFromCanvas OnChanged=@CanvasChanged />
+            <label class="ee-canvas-hint">@Tr( "Drag a layer to move it, or a corner to scale it" )</label>
 
             @if ( SelectedLayer != null )
             {
@@ -103,21 +103,23 @@
                     }
                     else
                     {
-                        @* Emoji organised by category *@
-                        @foreach ( var (catName, emojis) in EmojiCategories )
-                        {
-                            <div class="ee-emoji-cat-label">@Tr( catName )</div>
-                            <div class="ee-shape-grid">
-                                @foreach ( var emoji in emojis )
-                                {
-                                    var em = emoji;
-                                    var active = SelectedLayer.Icon == em && SelectedLayer.IconType == EmblemIconType.Emoji;
-                                    <div class="ee-shape-cell @(active ? "active" : "")" @onclick=@(() => SetIcon( em, EmblemIconType.Emoji ))>
-                                        <label style="font-size: 20px;">@em</label>
-                                    </div>
-                                }
-                            </div>
-                        }
+                        @* Emoji organised by category, in one list that scrolls as a whole *@
+                        <div class="ee-emoji-list">
+                            @foreach ( var (catName, emojis) in EmojiCategories )
+                            {
+                                <div class="ee-emoji-cat-label">@Tr( catName )</div>
+                                <div class="ee-shape-grid ee-emoji-grid">
+                                    @foreach ( var emoji in emojis )
+                                    {
+                                        var em = emoji;
+                                        var active = SelectedLayer.Icon == em && SelectedLayer.IconType == EmblemIconType.Emoji;
+                                        <div class="ee-shape-cell @(active ? "active" : "")" @onclick=@(() => SetIcon( em, EmblemIconType.Emoji ))>
+                                            <label style="font-size: 20px;">@em</label>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
                     }
                 </div>
             }
@@ -139,6 +141,15 @@
         ? Data.Layers[SelectedLayerIndex] : null;
 
     private int PickerTab { get; set; } = 0;
+
+    private void SelectFromCanvas( int index )
+    {
+        SelectedLayerIndex = index;
+        StateHasChanged();
+    }
+
+    /// <summary>The canvas moved or scaled the selected layer: the transform sliders follow.</summary>
+    private void CanvasChanged() => StateHasChanged();
 
     private void SetIcon( string icon, EmblemIconType type )
     {

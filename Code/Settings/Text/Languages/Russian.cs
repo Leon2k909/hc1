@@ -1104,6 +1104,7 @@ public static partial class GameText
 		["LAYERS ({0} / {1})"] = "Слои ({0} / {1})",
 		["Layer {0}"] = "Слой {0}",
 		["+ ADD LAYER"] = "+ Добавить слой",
+		["Drag a layer to move it, or a corner to scale it"] = "Перетащите слой, чтобы переместить его, или угол, чтобы изменить размер",
 		["SHAPES"] = "Фигуры",
 		["EMOJI"] = "Эмодзи",
 		["FACES"] = "Лица",

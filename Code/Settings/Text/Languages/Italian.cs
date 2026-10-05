@@ -1109,6 +1109,7 @@ public static partial class GameText
 		["LAYERS ({0} / {1})"] = "Livelli ({0} / {1})",
 		["Layer {0}"] = "Livello {0}",
 		["+ ADD LAYER"] = "+ Aggiungi livello",
+		["Drag a layer to move it, or a corner to scale it"] = "Trascina un livello per spostarlo, o un angolo per ridimensionarlo",
 		["SHAPES"] = "Forme",
 		["EMOJI"] = "Emoji",
 		["FACES"] = "Facce",

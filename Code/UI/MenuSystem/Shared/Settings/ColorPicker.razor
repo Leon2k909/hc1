@@ -17,6 +17,20 @@
         min-width: 0;
         max-width: 180px;
     }
+
+    /* The channel's name keeps its width and the number gives way: in a narrow box "Green" wrapped letter by letter
+       ("Gree / n", the emblem editor, 2026-10-05). */
+    ColorPicker .channel label
+    {
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+
+    ColorPicker .channel TextEntry
+    {
+        min-width: 0;
+        flex-shrink: 1;
+    }
 </style>
 
 <root class="layout column">

@@ -83,11 +83,45 @@ EmblemEditor {
     position: relative;
     flex-shrink: 0;
     overflow: hidden;
+    // EmblemCanvas: press a layer to drag it, or a corner of its outline to scale it. Its children take no pointer
+    // events, so the canvas stays the pressed panel through a drag.
+    pointer-events: all;
+    cursor: pointer;
 
     EmblemViewer {
         position: absolute;
         left: 0; right: 0; top: 0; bottom: 0;
+        pointer-events: none;
     }
+}
+
+// The selected layer's outline, placed and turned like the layer, with a handle at each corner
+.ee-selection {
+    position: absolute;
+    border: 1px solid rgba( 255, 215, 0, 0.8 );
+    pointer-events: none;
+}
+
+.ee-handle {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    background-color: white;
+    border: 1px solid #ffd700;
+    pointer-events: none;
+
+    &.tl { left: -5px; top: -5px; }
+    &.tr { right: -5px; top: -5px; }
+    &.bl { left: -5px; bottom: -5px; }
+    &.br { right: -5px; bottom: -5px; }
+}
+
+.ee-canvas-hint {
+    margin-top: -14px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: rgba( 255, 255, 255, 0.4 );
+    text-align: center;
 }
 
 .ee-transforms {
@@ -263,7 +297,25 @@ EmblemEditor {
     &:hover { color: rgba( 255, 255, 255, 0.8 ); }
 }
 
+// The emoji tab scrolls as one list, and each category's grid keeps its full height. As separate grids that could
+// shrink, each was squeezed to about a row, and its other row spilled out under the next category's label (the
+// user's screenshot, 2026-10-05). The grids don't scroll themselves, so the wheel reaches the list.
+.ee-emoji-list {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    min-height: 0;
+    overflow-y: scroll;
+}
+
+.ee-shape-grid.ee-emoji-grid {
+    flex-grow: 0;
+    flex-shrink: 0;
+    overflow: visible;
+}
+
 .ee-emoji-cat-label {
+    flex-shrink: 0;
     font-size: 8px;
     font-weight: 800;
     letter-spacing: 2px;

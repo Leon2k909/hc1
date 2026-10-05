@@ -1104,6 +1104,7 @@ public static partial class GameText
 		["LAYERS ({0} / {1})"] = "Warstwy ({0} / {1})",
 		["Layer {0}"] = "Warstwa {0}",
 		["+ ADD LAYER"] = "+ Dodaj warstwę",
+		["Drag a layer to move it, or a corner to scale it"] = "Przeciągnij warstwę, aby ją przesunąć, lub róg, aby zmienić jej rozmiar",
 		["SHAPES"] = "Kształty",
 		["EMOJI"] = "Emoji",
 		["FACES"] = "Twarze",
