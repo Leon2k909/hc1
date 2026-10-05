@@ -3555,7 +3555,13 @@ PAINTED = { "rw_car_grey": ( ( 74, 78, 83 ), 0.4, 0.3 ),            # a metallic
             "rw_bottle_lemon": ( ( 226, 212, 116 ), 0.0, 0.1 ),
             "rw_bottle_tea": ( ( 146, 76, 28 ), 0.0, 0.1 ),
             # The snack machine's black powder coat, satin.
-            "rw_satin_black": ( ( 17, 17, 19 ), 0.0, 0.34 ) }
+            "rw_satin_black": ( ( 17, 17, 19 ), 0.0, 0.34 ),
+            # The Rotunde's (railhead_backdrop.rotunda): its glazing, which the sky lights from a distance, its iron
+            # frames and the frieze's panels in a dark green-grey, and the zinc of its cornice and roof.
+            "rw_rotunda_glass": ( ( 118, 138, 158 ), 0.0, 0.08 ),
+            "rw_rotunda_iron": ( ( 58, 66, 70 ), 0.25, 0.45 ),
+            "rw_rotunda_panel": ( ( 80, 88, 94 ), 0.25, 0.5 ),
+            "rw_zinc": ( ( 150, 155, 158 ), 0.35, 0.42 ) }
 # Textured glass on shaders/glass.shader (its texture's colour, normal and roughness): paint: absorption.
 TEXTURED_GLASS = { "rw_glass_roof": 0.45 }
 # Paints whose picture's bottom edge stands at z 0 (two storeys a tile).
