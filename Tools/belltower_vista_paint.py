@@ -41,6 +41,7 @@ painted in, for the sun and sky belltower_map's light has (SUN_RGB, AMBIENT): a 
 """
 import argparse
 import math
+import re
 import time
 from pathlib import Path
 
@@ -68,6 +69,7 @@ _fresh_cache()
 OUT_DIR = V.TEXTURE_DIR
 RESOURCE_DIR = V.TEXTURE_RESOURCE
 MATERIAL = "vista_land"
+SHADER = V.K.ASSETS / "shaders" / "hc1_vista.shader"
 M = 39.37                   # units a metre
 HECTARE = 1e4 * M * M
 
@@ -1540,6 +1542,9 @@ def write_details( out_dir ):
 
 
 def vmat_text():
+    """ The material. A texture's key is its CreateInputTexture2D's name in hc1_vista.shader, as it stands (ColorA, not
+    TextureColorA): a key the shader has no input for is dropped, and the material compiles with the input's default
+    texture. Until 2026-10-04 the keys had a Texture prefix, so the land drew plain white in the engine. """
     lines = [ "// Tools/belltower_vista_paint.py", '"Layer0"', "{", '    shader "shaders/hc1_vista.shader"',
               f'    g_vTown "[{V.TE0:.3f} {V.TE1:.3f} {V.TN0:.3f} {V.TN1:.3f}]"',
               '    g_vZoneMargins "[' + " ".join( f"{m:.3f}" for _, m in ZONES ) + ']"',
@@ -1550,12 +1555,16 @@ def vmat_text():
               '    g_flDetailNormal "0.800"', '    g_flDetailAlbedo "0.700"' ]
     for zone, _ in ZONES:
         z = zone.upper()
-        lines += [ f'    TextureColor{z} "{RESOURCE_DIR}/vista_{zone}_color.jpg"',
-                   f'    TextureKind{z} "{RESOURCE_DIR}/vista_{zone}_kind.png"',
-                   f'    TextureNormal{z} "{RESOURCE_DIR}/vista_{zone}_normal.jpg"' ]
+        lines += [ f'    Color{z} "{RESOURCE_DIR}/vista_{zone}_color.jpg"',
+                   f'    Kind{z} "{RESOURCE_DIR}/vista_{zone}_kind.png"',
+                   f'    Normal{z} "{RESOURCE_DIR}/vista_{zone}_normal.jpg"' ]
     for name in ( "Grass", "Soil", "Stone" ):
-        lines.append( f'    TextureDetail{name} "{RESOURCE_DIR}/detail_{name.lower()}.png"' )
-    return "\n".join( lines + [ "}", "" ] )
+        lines.append( f'    Detail{name} "{RESOURCE_DIR}/detail_{name.lower()}.png"' )
+    text = "\n".join( lines + [ "}", "" ] )
+    inputs = set( re.findall( r"CreateInputTexture2D\(\s*(\w+)", SHADER.read_text( encoding="utf-8" ) ) )
+    keys = set( re.findall( r'^    (\w+) "[^"]+\.(?:jpg|png)"$', text, re.M ) )
+    assert keys == inputs, ( "keys the shader has no input for", keys - inputs, "inputs left out", inputs - keys )
+    return text
 
 
 def write_sheet( out_dir, path ):

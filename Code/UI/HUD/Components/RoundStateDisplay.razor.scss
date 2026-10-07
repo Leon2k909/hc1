@@ -4,6 +4,13 @@
 // fading outwards, the mode's name under it. In free-for-all only the clock shows.
 RoundStateDisplay
 {
+    display: none;
+
+    &.visible
+    {
+        display: flex;
+    }
+
     flex-direction: column;
     align-items: center;
     font-family: $main-font;

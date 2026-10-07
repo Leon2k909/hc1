@@ -7,8 +7,7 @@ public partial class PlayerPawn : IGameEventHandler<DamageGivenEvent>, IGameEven
 	private TimeSince _timeSinceLastDamage = float.MaxValue;
 
 	/// <summary>
-	/// Called from OnUpdate. Regenerates health once you stop taking damage, hardcore included (you patch yourself up).
-	/// Hardcore's arm wounds stay; a shot leg heals by itself (HealthComponent.Wounds.cs).
+	/// Called from OnUpdate. Regenerates health in every ruleset using its configured delay and rate.
 	/// </summary>
 	internal void UpdateHealthRegen()
 	{

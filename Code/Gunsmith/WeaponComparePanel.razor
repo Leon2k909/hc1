@@ -203,8 +203,8 @@
         yield return Compare( "DAMAGE PER SECOND", a, b, Dps, s => $"{Dps( s ):0}", 1 );
         yield return Compare( "TIME TO EMPTY", a, b, EmptyTime, s => SecondsText( EmptyTime( s ) ), 0 );
 
-        yield return Section( "HARDCORE HITS" );
-        yield return Compare( "BODY KILL CHANCE", a, b, BodyKillChance, s => $"{BodyKillChance( s ) * 100f:0}%", 1 );
+        yield return Section( "HARDCORE HITS — UNARMORED / CLOSE RANGE" );
+        yield return Compare( "HEAD HITS TO KILL", a, b, s => HeadHits( s ), s => HitsText( HeadHits( s ), s ), -1 );
         yield return Compare( "BODY HITS TO KILL", a, b, s => BodyHits( s ), s => HitsText( BodyHits( s ), s ), -1 );
         yield return Compare( "BODY TIME TO KILL", a, b, s => KillTime( BodyHits( s ), s ), s => KillTimeText( BodyHits( s ), s ), -1 );
         yield return Compare( "LIMB HITS TO KILL", a, b, s => LimbHits( s ), s => HitsText( LimbHits( s ), s ), -1 );
@@ -282,18 +282,9 @@
 
     private static string SecondsText( float seconds ) => seconds <= 0f ? "-" : $"{seconds:0.00} S";
 
-    /// <summary>
-    /// HealthComponent.HardcoreBullet: each bullet (or pellet) in the chest kills outright with a chance of its damage over
-    /// 40, at most 95%. For a shotgun, the chance that any of a full blast's pellets does.
-    /// </summary>
-    private static float BodyKillChance( GunsmithStats s )
-    {
-        var chance = MathF.Min( s.BulletDamage / HealthComponent.BodyKillDamage, HealthComponent.MaxBodyKillChance );
-        return 1f - MathF.Pow( 1f - chance, s.Pellets );
-    }
-
-    /// <summary> Shots to kill with body hits that don't kill outright: each wounds for 3× its damage. </summary>
-    private static int BodyHits( GunsmithStats s ) => ShotsFor( s.BulletDamage * HealthComponent.BodyWoundScale * s.Pellets );
+    // Unarmored, full-damage regional trauma; range and protection change these counts.
+    private static int HeadHits( GunsmithStats s ) => ShotsFor( HardcoreTrauma.Damage( s.BulletDamage, TraumaRegion.Head, Health ) * s.Pellets );
+    private static int BodyHits( GunsmithStats s ) => ShotsFor( HardcoreTrauma.Damage( s.BulletDamage, TraumaRegion.Chest, Health ) * s.Pellets );
 
     /// <summary> Shots to kill with arm and leg hits: 1.7× the damage, each bullet at most half the health. </summary>
     private static int LimbHits( GunsmithStats s ) => ShotsFor( MathF.Min( s.BulletDamage * HealthComponent.LimbWoundScale, Health * 0.5f ) * s.Pellets );

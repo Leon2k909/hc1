@@ -2452,8 +2452,8 @@ def rotunda_light( model, c, p0, along, out, width, z0 ):
         bar( IRON, a, b, 4.0, 1.0 )
 
 
-def rotunda( model ):
-    """ The Rotunde on its plateau over the tunnel, and the oaks of its park. Returns nothing. """
+def rotunda_geometry( model ):
+    """Reusable full 3D Rotunde. Railhead uses its baked distant cutout instead."""
     c = np.array( ROTUNDA, float )
     R, B = ROTUNDA_R, ROTUNDA_BASE
     count = ROTUNDA_BAYS * ROTUNDA_LIGHTS
@@ -2492,7 +2492,23 @@ def rotunda( model ):
     lathe( model, ROTUNDA, [ ( R + 30, top ), ( r1, z1 ) ], ZINC, sides=count, cap=False )
     lathe( model, ROTUNDA, [ ( r1, z1 ), ( r2, z2 ) ], GLAZING, sides=count, cap=False )
     lathe( model, ROTUNDA, [ ( r2, z2 ), ( 0.0, z2 + r2 * rise ) ], ZINC, sides=count // 2 )
+
+
+def rotunda( model ):
+    """Two-triangle distant Rotunde, with its park retained as independent 3D trees."""
+    # Keep every corner inside the playable cameras' distant clip. The slightly
+    # smaller card compensates for moving the baked silhouette closer.
+    n = -7800.0
+    # Texture has a 1/32 transparent border on every edge to prevent mip wrap.
+    # Enlarge the card around its centre so the visible building stays in place.
+    half_width, height = 2300.0 / 0.9375, 2300.0 / 0.9375
+    low = ROTUNDA_BASE - 90.0 - (height - 2300.0) / 2
+    model.polygon( "rw_rotunda_impostor", [ (-half_width, n, low), (-half_width, n, low + height),
+                   (half_width, n, low + height), (half_width, n, low) ], normal=(0, 1, 0),
+                   uv=[ (1, 0), (1, 1), (0, 1), (0, 0) ] )
+    model.material_overrides["rw_rotunda_impostor"] = "materials/railhead/rw_rotunda_impostor.vmat"
     # The park's oaks round it, thicker on the side towards the station.
+    c, R = np.array( ROTUNDA, float ), ROTUNDA_R
     for k in range( 48 ):
         a = 2 * math.pi * ( k + between( -0.3, 0.3, "rotunda", k ) ) / 48
         north = max( 0.0, math.sin( a ) )
@@ -2516,11 +2532,13 @@ def ramp_trees( model ):
 
 
 def south_blocks( model ):
-    """ The city's blocks beside the line south of the ramp, out to the hills. """
+    """Only retain city blocks within the immediate playable-area backdrop."""
     for s in ( 1.0, -1.0 ):
         for row, ( n0, n1 ) in enumerate( ( ( -5500.0, -3300.0 ), ( -7900.0, -5900.0 ) ) ):
             for k, ( a0, a1 ) in enumerate( grid_blocks( CITY_E, WORLD ) ):
                 lo_e, hi_e = sorted( ( s * a0, s * a1 ) )
+                if near_play( lo_e, hi_e, n0, n1 ) > 1600.0:
+                    continue
                 detail = "near" if a0 < 9000 else "far" if a0 < 14000 else "slab"
                 city_block( model, lo_e, hi_e, n0 + 20, n1 - 20, ( "south", s, row, k ), detail, "render", land_z )
 
@@ -2902,8 +2920,8 @@ def minster( model ):
 
 
 def domplatz( model, block ):
-    """ The minster's square: the minster, a row of canons' houses either side, plane trees in front. """
-    minster( model )
+    """Civic square: a distant town hall cutout, surrounding houses and trees."""
+    civic_hall( model )
     e0, e1, n0, n1 = block
     for k, ( a0, a1, b0, b1 ) in enumerate( ( ( e1 - 560, e1 - 80, 9000.0, n1 - 80 ), ( e0 + 80, e0 + 560, 10200.0, n1 - 80 ) ) ):
         n = b0
@@ -2915,10 +2933,38 @@ def domplatz( model, block ):
             tree( model, OAK_BIG if j == 0 else OAK, e, n, 0.0, ( "dom", "tree", k, j ), 0.8 if j == 0 else 1.2 )
 
 
+def civic_hall( model ):
+    """Fixed image beyond the playable street; minster() preserves the old model."""
+    ax, n = 1750.0, 9300.0
+    height, width = 1850.0, 2775.0
+    left = ax - width / 2
+    model.polygon( "rw_civic_impostor", [ (left, n, 0), (left + width, n, 0),
+                   (left + width, n, height), (left, n, height) ], normal=(0, -1, 0),
+                   uv=[ (0, 0), (1, 0), (1, 1), (0, 1) ] )
+    model.material_overrides["rw_civic_impostor"] = "materials/railhead/rw_civic_impostor.vmat"
+
+
 def brick_church( model, block ):
-    """ The church square at the end of the west cab road: a Gothic hall church of brick (north German Backsteingotik)
-    with its west tower, 38 m to the eaves of its spire's broach and 71 m to the top, under a copper spire; houses down
-    both sides. """
+    """Distant brick church with a slate spire; keep the surrounding street in 3D.
+
+    The fixed cutout sits beyond the playable boundary and replaces only the
+    landmark geometry. It is deliberately not a camera-facing billboard.
+    """
+    _church_card( model )
+    _church_square( model, block )
+
+
+def _church_card( model ):
+    height, width = 2860.0, 2860.0 * 1024.0 / 1536.0
+    left, n = -1750.0 - width * 0.4, 6220.0
+    model.polygon( "rw_church_impostor", [ (left, n, 0), (left + width, n, 0),
+                   (left + width, n, height), (left, n, height) ], normal=(0, -1, 0),
+                   uv=[ (0, 0), (1, 0), (1, 1), (0, 1) ] )
+    model.material_overrides["rw_church_impostor"] = "materials/railhead/rw_church_impostor.vmat"
+
+
+def _legacy_church_geometry( model ):
+    """Kept for geometry-cost comparison and a reversible fallback."""
     ax, tn, th = -1750.0, 6400.0, 180.0
     model.box( ( ax - th, tn - th, -20 ), ( ax + th, tn + th, 1500 ), { "default": "brick", "-z": None } )
     lathe( model, ( ax, tn ), [ ( th / math.cos( math.pi / 8 ), 1500.0 ), ( 0.0, 2800.0 ) ], "copper", sides=8, turn=math.pi / 8 )
@@ -2942,6 +2988,10 @@ def brick_church( model, block ):
             if k + 1 < len( bays ):
                 m = ( n + bays[k + 1] ) / 2
                 windows_on( model, face_e=wall + s * 0.5, span=( m - 50, m + 50 ), z=( 120, 560 ), step=100, width=84, out=s, point=50 )
+    _church_square( model, KIRCHPLATZ )
+
+
+def _church_square( model, block ):
     e0, e1, b0, b1 = block
     for k, ( a0, a1 ) in enumerate( ( ( e0 + 80, e0 + 560 ), ( e1 - 560, e1 - 80 ) ) ):
         n = b0 + 80
@@ -3083,6 +3133,12 @@ def sky_blocks( model, blocks ):
     detail the further they are from the play area. """
     for block in sorted( blocks ):
         e0, e1, n0, n1 = block
+        # Keep the immediate perimeter plus the two cab-road sightlines. The
+        # hidden outer grid adds no detail from the playable streets or bridge.
+        near = near_play( e0, e1, n0, n1 ) <= 1600.0
+        cab_view = e0 >= -4000.0 and e1 <= 4000.0 and n0 < 8500.0
+        if not ( near or cab_view or block == DOMPLATZ ):
+            continue
         s = 1.0 if e0 + e1 > 0 else -1.0
         a0 = min( abs( e0 ), abs( e1 ) )
         if a0 == ROAD_E1 and n1 == CROSS_N0:

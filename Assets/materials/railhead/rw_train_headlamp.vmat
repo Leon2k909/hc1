@@ -1,0 +1,16 @@
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    F_SELF_ILLUM "1"
+    TextureSelfIllumMask "[1.0 1.0 1.0 0.0]"
+    g_flSelfIllumBrightness "1.6"
+    g_flSelfIllumAlbedoFactor "1.0"
+    g_vSelfIllumTint "[1.0 0.97 0.90 0.0]"
+    TextureColor "materials/railhead/rw_lamp_cool_color.png"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureRoughness "materials/railhead/lamps_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_flRoughnessScaleFactor "0.35"
+    g_flMetalness "0.0"
+}

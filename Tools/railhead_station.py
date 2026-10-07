@@ -141,6 +141,17 @@ def facing( model, paint, points, towards, uv=None ):
     model.polygon( paint, pts, uv=uv )
 
 
+def clock_dial( model, centre, normal, radius, sides=48 ):
+    """Round dial geometry with upright UVs, so no texture corners overhang its stone ring."""
+    c, n = np.asarray( centre, float ), np.asarray( normal, float )
+    up = np.array( ( 0.0, 0.0, 1.0 ) )
+    right = np.cross( up, n )
+    angles = [ 2 * math.pi * k / sides for k in range( sides ) ]
+    pts = [ c + radius * ( math.cos( a ) * right + math.sin( a ) * up ) for a in angles ]
+    uv = [ ( 0.5 + 0.5 * math.cos( a ), 0.5 + 0.5 * math.sin( a ) ) for a in angles ]
+    facing( model, "rw_clock", pts, n, uv=uv )
+
+
 def tube( model, p0, p1, radius, paint, sides=10, cap=False ):
     """ A round bar from p0 to p1, smooth-shaded. """
     p0, p1 = np.asarray( p0, float ), np.asarray( p1, float )
@@ -705,11 +716,7 @@ def cab_road( model, glass ):
     for k in range( int( ( SHED_N1 - n0 ) // 60 ) + 1 ):
         n = min( n0 + 60 * k, SHED_N1 - 2 )
         model.box( ( SHED_E + 16, n, 214 ), ( out_e - 6, n + 2, 218 ), "rw_steel_dark" )
-    facing( glass, "rw_glass", [ ( SHED_E + 10, n0, 218.5 ), ( out_e, n0, 218.5 ), ( out_e, SHED_N1, 218.5 ), ( SHED_E + 10, SHED_N1, 218.5 ) ], ( 0, 0, 1 ) )
-    facing( glass, "rw_glass", [ ( SHED_E + 10, n0, 218.5 ), ( out_e, n0, 218.5 ), ( out_e, SHED_N1, 218.5 ), ( SHED_E + 10, SHED_N1, 218.5 ) ], ( 0, 0, -1 ) )
-    # Its collision is the glass model's, which the navmesh leaves out (railhead_map.NAV_SKIP): nobody can get up
-    # there, and on it the navmesh would make an island.
-    glass.collision_box( ( SHED_E + 10, n0, 218 ), ( out_e, SHED_N1, 219 ), GLASS )
+    # Individual breakable canopy panes are supplied by railhead_canopy.
     # The road's north end, at the edge of the play area: a kerbed island with a hoarding is the map's; here the
     # pavements' end faces.
 
@@ -943,13 +950,9 @@ def head_wing( model, glass ):
         tube( model, p0, p1, 48.0, "rw_dressed", sides=24, cap=True )
         q = 42.0
         if face == "n":
-            pts = [ ( at + out * 4.3, centre_r - q, 770 - q ), ( at + out * 4.3, centre_r + q, 770 - q ),
-                    ( at + out * 4.3, centre_r + q, 770 + q ), ( at + out * 4.3, centre_r - q, 770 + q ) ]
-            facing( model, "rw_clock", pts, ( out, 0, 0 ) )
+            clock_dial( model, ( at + out * 4.3, centre_r, 770 ), ( out, 0, 0 ), q )
         else:
-            pts = [ ( centre_r - q, at + out * 4.3, 770 - q ), ( centre_r + q, at + out * 4.3, 770 - q ),
-                    ( centre_r + q, at + out * 4.3, 770 + q ), ( centre_r - q, at + out * 4.3, 770 + q ) ]
-            facing( model, "rw_clock", pts, ( 0, out, 0 ) )
+            clock_dial( model, ( centre_r, at + out * 4.3, 770 ), ( 0, out, 0 ), q )
     base = [ ( t0 - 8, u0 - 8 ), ( t1 + 8, u0 - 8 ), ( t1 + 8, u1 + 8 ), ( t0 - 8, u1 + 8 ) ]
     for k in range( 4 ):
         a, b = base[k], base[( k + 1 ) % 4]
@@ -1032,6 +1035,11 @@ def gable_infill( model, n_out, n_in, z0, e0, e1, top, outside, inside, step=40.
         facing( model, paint, [ ( a, n_in, z0 ), ( b, n_in, z0 ), ( b, n_in, tb ), ( a, n_in, ta ) ], ( 0, -out_dir, 0 ) )
         facing( model, "rw_dressed", [ ( a, n_out, ta ), ( b, n_out, tb ), ( b, n_in, tb ), ( a, n_in, ta ) ], ( 0, 0, 1 ) )
         model.hull( [ ( e, n, z ) for n in ( n_out, n_in ) for e, z in ( ( a, z0 ), ( b, z0 ), ( a, ta ), ( b, tb ) ) ], STONE )
+    # These returns are exposed at the side-wall joins; close the full thickness
+    # so the hall and shed cannot be seen through the gable's outer edges.
+    for e, out in ( ( e0, -1.0 ), ( e1, 1.0 ) ):
+        facing( model, outside, [ ( e, n_out, z0 ), ( e, n_in, z0 ), ( e, n_in, top( e ) ),
+                                 ( e, n_out, top( e ) ) ], ( out, 0, 0 ) )
 
 
 FACADE_DOORS = ( ( 0.0, 200.0, 320.0 ), ( -320.0, 160.0, 300.0 ), ( 320.0, 160.0, 300.0 ) )     # centre, width, crown
@@ -1047,14 +1055,15 @@ def south_facade( model, glass ):
     the booking hall with fanlights over them, doors and windows into the wings, a cornice, the station's name in
     bronze letters, and above it the gable that rises over the shed's two spans and the hall's roof, with two clocks. """
     n_out, n_in = HEAD_N0, HALL_N0
-    w = K.Wall( "e", ( -SHED_E, SHED_E ), ( n_out, n_in ), ( 0.0, 360.0 ), "-n" )
+    # Continue behind the cornice up to the gable, including its six-inch ledge.
+    w = K.Wall( "e", ( -SHED_E, SHED_E ), ( n_out, n_in ), ( 0.0, 366.0 ), "-n" )
     for c, width, crown in FACADE_DOORS:
         w.add( c, width, 0, crown, "arch" )
     for c in FACADE_WING_DOORS:
         w.add( c, 120, 0, WING_DOOR_CROWN, "arch" )
     for c in FACADE_WING_WINDOWS:
         w.add( c, 90, 50, WING_WINDOW_CROWN, "glass_arch" )
-    w.build( model, "rw_sandstone", "render_cream", "rw_dressed", end=None )
+    w.build( model, "rw_sandstone", "render_cream", "rw_dressed", end="rw_sandstone" )
     mid = ( n_out + n_in ) / 2
     for c, width, crown in FACADE_DOORS:
         spring = crown - width / 2
@@ -1097,8 +1106,7 @@ def south_facade( model, glass ):
     for c in ( -800.0, 800.0 ):
         tube( model, ( c, n_out, 560 ), ( c, n_out - 6, 560 ), 66.0, "rw_dressed", sides=28, cap=True )
         q = 55.0
-        facing( model, "rw_clock", [ ( c - q, n_out - 6.3, 560 - q ), ( c + q, n_out - 6.3, 560 - q ), ( c + q, n_out - 6.3, 560 + q ),
-                                     ( c - q, n_out - 6.3, 560 + q ) ], ( 0, -1, 0 ) )
+        clock_dial( model, ( c, n_out - 6.3, 560 ), ( 0, -1, 0 ), q )
     tube( model, ( 0, n_out, 530 ), ( 0, n_out - 6, 530 ), 70.0, "rw_dressed", sides=28, cap=False )
     ring = [ ( 60 * math.cos( 2 * math.pi * k / 24 ), n_out - 6.2, 530 + 60 * math.sin( 2 * math.pi * k / 24 ) ) for k in range( 24 ) ]
     facing( model, "rw_window_dark", ring, ( 0, -1, 0 ) )
@@ -1120,7 +1128,7 @@ def north_facade( model, glass ):
         w.add( c, width, z0, z1, "glass_arch" )
     for c in ( -960.0, -760.0, 760.0, 960.0 ):
         w.add( c, 80, 50, 180, "glass_arch" )
-    w.build( model, "rw_sandstone", "render_cream", "rw_dressed", end=None )
+    w.build( model, "rw_sandstone", "render_cream", "rw_dressed", end="rw_sandstone" )
     mid = ( n_in + n_out ) / 2
     for c, width, top in doors:
         pane( glass, model, "e", mid, c - width / 2, c + width / 2, 0, top, "rw_glass" )

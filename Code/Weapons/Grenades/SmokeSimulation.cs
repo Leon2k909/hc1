@@ -64,9 +64,12 @@ public sealed class SmokeSimulation : ParticleController
 		var p = particle.Position - flow.Velocity * flow.Time;
 		var eddies = Eddy( p / 80f, flow.Time * 0.4f, flow.Phase )
 			+ Eddy( p / 29f, flow.Time * 0.7f, flow.Phase + 7.3f ) * 0.35f;
-		// Newly emitted warm smoke rises, then cools and is carried mostly by the surrounding air.
+		// Newly emitted warm smoke rises, then cools and is carried mostly by the surrounding air. Vertical
+		// eddies fade with that lift: full-strength eddies outlasted it and made cooled puffs bob up and down.
 		var lift = flow.Buoyancy * MathF.Exp( -particle.Age / 3.5f );
-		var target = flow.Velocity + eddies * flow.Turbulence + Vector3.Up * lift;
+		var drift = eddies * flow.Turbulence;
+		drift.z = eddies.z * MathF.Min( flow.Turbulence * 0.2f, lift * 0.2f );
+		var target = flow.Velocity + drift + Vector3.Up * lift;
 		particle.Velocity += (target - particle.Velocity) * (1 - MathF.Exp( -delta * flow.Response ));
 	}
 

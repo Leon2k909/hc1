@@ -55,6 +55,7 @@ from PIL import Image, ImageDraw
 import building_textures as BT
 import map_kit as K
 import belltower_detail as Detail
+import belltower_fountain as Fountain
 import belltower_vista as Vista
 import belltower_vista_props as VistaProps
 from map_kit import Model, Wall, arc, normalise
@@ -1339,14 +1340,7 @@ GARDEN_WELL = ( 0.0, -1225.0 )
 
 
 def fountain( model ):
-    stone = { "outside": "ashlar", "inside": "ashlar", "top": "ashlar_grey" }
-    ring( model, FOUNTAIN, 96, 114, 0, 30, 12, stone, STONE )
-    model.cylinder( FOUNTAIN, 96, 21, 22, { "top": "water" }, sides=12, turn=math.pi / 12 )
-    model.cylinder( FOUNTAIN, 26, 0, 72, { "side": "ashlar", "top": "ashlar" }, sides=10, surface=STONE )
-    model.cylinder( FOUNTAIN, 54, 72, 84, { "side": "ashlar_grey", "bottom": "ashlar", "top": "ashlar" }, sides=12, surface=STONE )
-    model.cylinder( FOUNTAIN, 46, 84, 84.5, { "top": "water" }, sides=12 )
-    model.cylinder( FOUNTAIN, 9, 84, 126, { "side": "ashlar" }, sides=8 )
-    blob( model, ( *FOUNTAIN, 134 ), 12, "ashlar_grey", squash=1.0, segments=8, rings=4, seed=5 )
+    Fountain.build( model, FOUNTAIN, ring )
 
 
 def market_cross( model ):

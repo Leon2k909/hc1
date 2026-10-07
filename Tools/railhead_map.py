@@ -143,6 +143,9 @@ def use( name, target, *args, stand_in=None, **kw ):
         except Exception as error:
             MISSING.setdefault( name, f"{type( error ).__name__}: {error}" )
         else:
+            # Only track detail and overhead fittings may deliberately omit player collision.
+            if name not in { "rail", "track", "crossover", "contact_line", "roof_drop" } and not ( temp.boxes or temp.hulls ):
+                raise ValueError( f"{name} generated no collision" )
             target.extend( temp )
             return result
     return stand_in( target ) if stand_in else None
@@ -209,7 +212,7 @@ NORMALS = { "+e": ( 1.0, 0.0, 0.0 ), "-e": ( -1.0, 0.0, 0.0 ), "+n": ( 0.0, 1.0,
 
 def board( model, atlas, entries, e, n, bottom, height, along, z_top=None, frame="rw_steel_dark", depth=4.0 ):
     """ A double-sided board of atlas entries side by side, its faces' normals along ±along ("n" or "e"), bottom over
-    the floor, height tall; hung on two rods up to z_top if given. Visual only (it's over head height). """
+    the floor, height tall; hung on two rods up to z_top if given. Solid board with separate supports. """
     widths = [ height * atlas_aspect( atlas, name ) for name in entries ]
     total = sum( widths ) + 2.0 * ( len( entries ) - 1 )
     across = np.array( ( 1.0, 0.0, 0.0 ) ) if along == "n" else np.array( ( 0.0, 1.0, 0.0 ) )
@@ -218,6 +221,7 @@ def board( model, atlas, entries, e, n, bottom, height, along, z_top=None, frame
     half = across * ( total / 2 + 2 ) + normal * depth / 2
     lo, hi = np.minimum( c - half, c + half ), np.maximum( c - half, c + half )
     model.box( lo - ( 0, 0, height / 2 + 2 ), hi + ( 0, 0, height / 2 + 2 ), frame )
+    model.collision_box( lo - ( 0, 0, height / 2 + 2 ), hi + ( 0, 0, height / 2 + 2 ), METAL )
     for side in ( 1.0, -1.0 ):
         at = -total / 2
         for name, w in zip( entries, widths ):
@@ -230,6 +234,7 @@ def board( model, atlas, entries, e, n, bottom, height, along, z_top=None, frame
         for k in ( -1, 1 ):
             p = c + across * k * total * 0.35
             model.box( ( p[0] - 0.6, p[1] - 0.6, bottom + height + 2 ), ( p[0] + 0.6, p[1] + 0.6, z_top ), "rw_steel_dark" )
+            model.collision_box( ( p[0] - 0.6, p[1] - 0.6, bottom + height + 2 ), ( p[0] + 0.6, p[1] + 0.6, z_top ), METAL )
 
 
 def hanging_display( model, e, n, z_top, name, along="n", bottom=110.0 ):
@@ -522,10 +527,10 @@ def trains( m, s ):
     to = "RE Nürnberg" if s > 0 else "RE München"
     use( "emu", m, a, 720.0, +1, RAIL_Z, 2, body, -s, True, WIRE_Z, destinations=( to, to ),
          stand_in=vehicle_stand_in( "emu", a, 720.0, 1, RAIL_Z, body, length=1540.0 ) )
-    # A long-distance train at Gleis 1 and 6: its locomotive at the buffers and the first coach behind.
-    far = use( "loco", m, c, 720.0, +1, RAIL_Z, body, WIRE_Z, stand_in=vehicle_stand_in( "loco", c, 720.0, 1, RAIL_Z, body ) )
-    use( "coach", m, c, far - 1.0, +1, RAIL_Z, "rw_train_white",
-         stand_in=vehicle_stand_in( "coach", c, far - 1.0, 1, RAIL_Z, "rw_train_white" ) )
+    # The outer tracks use the same rounded double-deck passenger cab as the reference train.
+    # Keep the platform-side vestibules open, with the unit's own collision and gangway.
+    use( "emu", m, c, 720.0, +1, RAIL_Z, 2, body, s, True, WIRE_Z, destinations=( to, to ),
+         stand_in=vehicle_stand_in( "emu", c, 720.0, 1, RAIL_Z, body, length=1540.0 ) )
     for e in ( TRACK_A, TRACK_B, TRACK_C ):
         use( "buffer_stop", m, s * e, BUFFER_N, -1, RAIL_Z,
              stand_in=lambda m_, e=e: m_.box( ( s * e - 50, BUFFER_N, RAIL_Z - 7 ), ( s * e + 50, BUFFER_N + 140, RAIL_Z + 54 ),
@@ -649,6 +654,8 @@ def warn_plate( m, e, n ):
     m.cylinder( ( e, n ), 1.2, 0, 66, "rw_steel_grey", sides=6 )
     atlas_quad( m, "rw_signs", "warn_gleise", ( e, n - 1.4, 56 ), ( 1, 0, 0 ), ( 0, 0, 1 ), 30.0, 10.0 )
     m.box( ( e - 15.5, n - 1.3, 50.5 ), ( e + 15.5, n - 0.3, 61.5 ), "rw_white_paint" )
+    m.collision_box( ( e - 1.2, n - 1.2, 0 ), ( e + 1.2, n + 1.2, 66 ), METAL )
+    m.collision_box( ( e - 15.5, n - 1.4, 50.5 ), ( e + 15.5, n - 0.3, 61.5 ), METAL )
 
 
 def head_building( m, s ):
@@ -670,7 +677,10 @@ def head_building( m, s ):
     hanging_sign( m, s * 900.0, 1420.0, S.WING_CEILING, [ "info" ], "n", bottom=120.0 )
 
 
-def cab_road( m, s ):
+ROAD_VEHICLES_ENABLED = False  # Keep the placements and models for future restoration.
+
+
+def cab_road_vehicles( m, s ):
     """ Taxis waiting at the head building's end of the cab road, nose to the station, cars parked further down, and
     street lamps along the far pavement. """
     for n in ( 600.0, 820.0, 1040.0 ):
@@ -678,10 +688,13 @@ def cab_road( m, s ):
              stand_in=furniture_stand_in( "car", s * 1555.0, n, z0=ROAD_Z ) )
     use( "suv", m, s * 1555.0, -900.0, "+n", "rw_car_grey", ROAD_Z,
          stand_in=furniture_stand_in( "suv", s * 1555.0, -900.0, z0=ROAD_Z ) )
-    use( "car", m, s * 1555.0, 1300.0, "+n", "rw_train_blue" if s > 0 else "rw_train_red", ROAD_Z,
+    use( "car", m, s * 1555.0, 1300.0, "+n", "rw_car_blue" if s > 0 else "rw_car_red", ROAD_Z, "estate",
          stand_in=furniture_stand_in( "car", s * 1555.0, 1300.0, z0=ROAD_Z ) )
     use( "van", m, s * 1940.0, -900.0, "-n", "rw_car_white", ROAD_Z,
          stand_in=furniture_stand_in( "van", s * 1940.0, -900.0, z0=ROAD_Z ) )
+def cab_road( m, s ):
+    if ROAD_VEHICLES_ENABLED:
+        cab_road_vehicles( m, s )
     for n in ( -1000.0, -400.0, 200.0, 800.0, 1400.0 ):
         use( "lamp_post", m, s * 2100.0, n, 236.0,
              stand_in=lambda m_, n=n: m_.cylinder( ( s * 2100.0, n ), 2.5, 0, 236, "rw_steel_dark", sides=8, surface=METAL ) )
@@ -1375,6 +1388,8 @@ def write_scene( written, light_list, props ):
     station = K.game_object( ids, "Station", "station", children=[
         model_object( title, f"station/{name}", name, collide, shadows )
         for name, title, collide, shadows in SCENE_MODELS if name in written ] )
+    import railhead_canopy
+    station["Children"].append( railhead_canopy.scene_group() )
     light_objects = [
         K.game_object( ids, name, f"light/{name}", K.to_world( position ), tags="light_point,light", components=[
             K.component( ids, "Sandbox.PointLight", f"light/{name}/light", Attenuation=1, FogMode="Enabled", FogStrength=1,
@@ -1541,6 +1556,8 @@ PROP_PACKAGES = {
 def build():
     """ Every model by name. """
     station = S.build()
+    import railhead_canopy
+    station["railhead_canopy_pane"] = railhead_canopy.pane_model()
     models = dict( station )
     models["railhead_track"] = track_model()
     east, west, centre = dress_side( 1 ), dress_side( -1 ), dress_centre()
@@ -1591,6 +1608,12 @@ def main():
     kiosk_art = optional( "railhead_kiosk_art" )
     if kiosk_art is not None and kiosk_art.missing():
         kiosk_art.write()
+    import railhead_card_reader
+    if railhead_card_reader.missing():
+        railhead_card_reader.write()
+    import railhead_ticket_machine
+    if railhead_ticket_machine.missing():
+        railhead_ticket_machine.write()
     if RM is not None and RM.vending_missing():
         RM.write_texture( "vending", RM.OUT_DIR )
     models = build()

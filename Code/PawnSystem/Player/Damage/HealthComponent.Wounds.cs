@@ -1,14 +1,6 @@
 namespace Facepunch;
 
-/// <summary>
-/// Hardcore bullets go by where they hit, the same for players and bots. The head or neck kills. The body is a chance
-/// to kill outright (a hit to the heart, a major vessel or the spine), better the harder the round hits, and otherwise a
-/// heavy wound, so a rifle's second body hit kills unless you've healed in between. Three rifle hits to the arms or legs
-/// kill (more for pistols and SMGs); a shot leg or foot slows you down for a few seconds and a shot arm or hand makes
-/// the gun harder to hold steady until you die (health comes back, see PlayerPawn.UpdateHealthRegen). Everything scales
-/// with the round's damage after falloff, so a stray shotgun pellet at range is a scratch. A landing hard enough to hurt
-/// lames the legs like a leg hit, in every mode (see TakeDamage).
-/// </summary>
+/// <summary>Deterministic regional trauma for hardcore. No bleeding or random fatal-hit rolls.</summary>
 public partial class HealthComponent
 {
 	private const HitboxTags HeadOrNeck = HitboxTags.Head | HitboxTags.Neck;
@@ -19,20 +11,6 @@ public partial class HealthComponent
 
 	/// <summary>A limb hit takes this times the round's damage: 34 for an M4 (20), so three kill. At most half your health.</summary>
 	public const float LimbWoundScale = 1.7f;
-
-	/// <summary>A body hit that doesn't kill outright takes this times the round's damage: 60 for an M4, so two kill.</summary>
-	public const float BodyWoundScale = 3f;
-
-	/// <summary>
-	/// The chance a body hit kills outright is the round's damage over this: an M4's (20) half the time, a pistol's (15)
-	/// 37%, a shotgun pellet's (8) 20%, the M700's nearly always (<see cref="MaxBodyKillChance"/>). At 100 health; a
-	/// custom game's other health scales it inversely.
-	/// </summary>
-	public const float BodyKillDamage = 40f;
-	public const float MaxBodyKillChance = 0.95f;
-
-	/// <summary>A gut or pelvis hit is less often instantly fatal than one to the chest.</summary>
-	public const float AbdomenKillChanceScale = 0.6f;
 
 	/// <summary>How much slower each leg wound makes every gait (up to two count).</summary>
 	public const float LegWoundSlowdown = 0.15f;
@@ -81,31 +59,17 @@ public partial class HealthComponent
 	/// </summary>
 	private DamageInfo HardcoreBullet( DamageInfo damageInfo, float gunDamage, out bool lethal )
 	{
-		var hitbox = damageInfo.Hitbox;
+		// Armor was previously applied and then discarded here. Preserve coverage and
+		// weapon-specific protection; do not apply the core hitbox multipliers twice.
+		var total = damageInfo.Damage + damageInfo.ArmorDamage;
+		var transmission = total > 0f ? Math.Clamp( damageInfo.Damage / total, 0f, 1f ) : 1f;
+		var region = (damageInfo.Hitbox & HeadOrNeck) != 0 ? TraumaRegion.Head
+			: IsLimbHit( damageInfo ) ? TraumaRegion.Limb
+			: (damageInfo.Hitbox & HitboxTags.Stomach) != 0 && (damageInfo.Hitbox & Chest) == 0
+				? TraumaRegion.Abdomen : TraumaRegion.Chest;
+		var trauma = HardcoreTrauma.Damage( gunDamage, region, MaxHealth );
 		lethal = false;
-
-		if ( IsLimbHit( damageInfo ) )
-			return damageInfo with { Damage = MathF.Min( gunDamage * LimbWoundScale, MaxHealth * 0.5f ) };
-
-		if ( (hitbox & HeadOrNeck) != 0 )
-		{
-			lethal = true;
-		}
-		else
-		{
-			// More health (a custom game's) makes a body hit less often fatal, less makes it more: 50% for an M4 at 100,
-			// 25% at 200.
-			var toughness = MaxHealth > 0f ? CustomGameRules.DefaultMaxHealth / MaxHealth : 1f;
-			var chance = Math.Min( gunDamage / BodyKillDamage * toughness, MaxBodyKillChance );
-			if ( (hitbox & HitboxTags.Stomach) != 0 && (hitbox & Chest) == 0 )
-				chance *= AbdomenKillChanceScale;
-
-			lethal = Game.Random.Float() < chance;
-			if ( !lethal )
-				return damageInfo with { Damage = gunDamage * BodyWoundScale };
-		}
-
-		return damageInfo with { Damage = MaxHealth };
+		return damageInfo with { Damage = trauma * transmission, ArmorDamage = trauma * (1f - transmission) };
 	}
 
 	private void AddWound( HitboxTags hitbox )
@@ -121,7 +85,7 @@ public partial class HealthComponent
 
 	protected override void OnFixedUpdate()
 	{
-		// Host: a shot leg eases off once it hasn't been hit again for a moment, players and bots alike.
+		// Host: leg slowing eases off after the last hit in every ruleset.
 		if ( !Networking.IsHost || LegWounds <= 0f || _timeSinceLegWound < LegWoundRecoverDelay ) return;
 
 		LegWounds = Math.Max( 0f, LegWounds - LegWoundRecoverRate * Time.Delta );

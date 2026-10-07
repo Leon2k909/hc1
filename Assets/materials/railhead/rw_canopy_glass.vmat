@@ -1,0 +1,13 @@
+Layer0
+{
+    shader "shaders/complex.shader"
+    F_TRANSLUCENT "1"
+    F_RENDER_BACKFACES "1"
+    F_SPECULAR "1"
+    TextureColor "[0.70 0.83 0.88 1]"
+    TextureTranslucency "[0.24 0.24 0.24 0]"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureRoughness "[0.08 0.08 0.08 0]"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_flMetalness "0.25"
+}

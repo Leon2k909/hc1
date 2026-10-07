@@ -1,9 +1,10 @@
 "Layer0"
 {
     shader "shaders/complex.shader"
-    F_ALPHA_TEST "1"
     TextureColor "materials/default/default_color.tga"
-    TextureTranslucency "materials/default/default_black_mask.tga"
     TextureNormal "materials/default/default_normal.tga"
-    g_flAlphaTestReference "0.5"
+    TextureRoughness "materials/default/default_rough.tga"
+    g_flRoughnessScaleFactor "0.12"
+    g_flMetalness "0.65"
+    g_vColorTint "[0.025 0.04 0.055 1.0]"
 }

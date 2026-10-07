@@ -3587,6 +3587,11 @@ def paints():
     """ paint -> ( texture, tile units ) for every paint, without drawing anything. Atlases, the clock and the lattice
     have 1.0 (explicit UVs); the glass, 64. """
     out = { p: ( tex, TEXTURES[tex][4] ) for tex, ps in TEXTURE_PAINTS.items() for p in ps }
+    # The kiosk terminal authors its own atlas and the silver/plastic variants.
+    out.update({"rw_card_reader": ("card_reader", 1.0), "rw_card_reader_metal": ("card_reader", 1.0),
+                "rw_card_reader_screen": ("card_reader", 1.0)})
+    out.update({"rw_ticket_machine": ("ticket_machine", 1.0), "rw_ticket_machine_metal": ("ticket_machine", 1.0),
+                "rw_ticket_machine_display": ("ticket_machine", 1.0)})
     for g in GLASS:
         out[g] = ( "glass", 64.0 )
     for p in PAINTED:

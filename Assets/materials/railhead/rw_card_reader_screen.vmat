@@ -1,0 +1,19 @@
+// Tools/railhead_card_reader.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "0"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.00"
+    F_SELF_ILLUM "1"
+    TextureSelfIllumMask "materials/railhead/rw_card_reader_illum.png"
+    g_flSelfIllumBrightness "0.35"
+    g_flSelfIllumAlbedoFactor "1.0"
+    g_vSelfIllumTint "[1 1 1 0]"
+    TextureColor "materials/railhead/rw_card_reader_color.png"
+    TextureNormal "materials/railhead/rw_card_reader_normal.png"
+    TextureRoughness "materials/railhead/rw_card_reader_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1.0"
+}

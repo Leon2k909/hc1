@@ -636,7 +636,7 @@ def lathe(model, centre, z, profile, paint, sides=12, caps=(False, False), turn=
     def p(d, r, h):
         return c + d*r + (0, 0, h)
     for (r0, h0), (r1, h1) in zip(profile, profile[1:]):
-        n = np.array((h1 - h0, -(r1 - r0)))
+        n = np.array((h1 - h0, -(r1 - r0)), dtype=float)
         if np.linalg.norm(n) < 1e-9:
             continue
         n /= np.linalg.norm(n)

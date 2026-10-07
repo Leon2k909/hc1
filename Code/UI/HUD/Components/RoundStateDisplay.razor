@@ -19,7 +19,7 @@
         <div class="clock">
             @if ( IconPath is { } path && !string.IsNullOrEmpty( path ) )
             {
-                <Icon File="@path" Size="30" />
+                <Icon File="@path" Size="@(30)" />
             }
             else if ( Time.HasValue )
             {
@@ -86,6 +86,8 @@
 
     public override void Tick()
     {
+        SetClass( "visible", Input.Down( "Score" ) );
+
         if ( Scene is null || !Client.Local.IsValid() || !GameMode.Instance.IsValid() )
             return;
 

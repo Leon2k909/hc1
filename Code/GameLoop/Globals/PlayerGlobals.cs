@@ -159,22 +159,39 @@ public class PlayerGlobals : GlobalComponent, IGameEventHandler<ModifyDamageGlob
 		}
 
 		var resource = (eventArgs.DamageInfo.Inflictor as Equipment)?.Resource;
+		resource ??= GameUtils.GetLightweightBotFromComponent( eventArgs.DamageInfo.Inflictor )?.WeaponResource;
+		var hardcoreBullet = (GameMode.ActiveHardcore || (GameMode.Instance.IsValid() && GameMode.Instance.Hardcore))
+			&& !eventArgs.DamageInfo.WasFallDamage && !eventArgs.DamageInfo.WasExplosion && !eventArgs.DamageInfo.WasMelee
+			&& !eventArgs.DamageInfo.Flags.HasFlag( DamageFlags.Burn ) && !eventArgs.DamageInfo.Flags.HasFlag( DamageFlags.Zone );
+		// The current vest represents soft torso armor, not a rifle-rated plate.
+		// Resource overrides can represent ammunition that defeats it more readily.
+		var handgun = resource?.Category is WeaponCategory.Pistol or WeaponCategory.SMG or WeaponCategory.Shotgun;
+		var armor = hardcoreBullet ? (handgun ? 0.15f : 0.85f) : BaseArmorReduction;
+		var helmet = hardcoreBullet ? (handgun ? 0.3f : 0.95f) : BaseHelmetReduction;
+		IReadOnlyList<HitboxConfig> hitboxes = hardcoreBullet ? HardcoreHitboxes : Hitboxes;
 
 		GetDamageModifications(
 			eventArgs.DamageInfo.Flags, eventArgs.DamageInfo.Hitbox,
-			resource?.ArmorReduction ?? BaseArmorReduction,
-			resource?.HelmetReduction ?? BaseHelmetReduction,
-			Hitboxes,
+			resource?.ArmorReduction ?? armor,
+			resource?.HelmetReduction ?? helmet,
+			hitboxes,
 			out var damageScale, out var armorReduction, out var removeHelmet );
 
 		eventArgs.ScaleDamage( damageScale );
 		eventArgs.ApplyArmor( armorReduction );
 
-		if ( removeHelmet )
+		if ( removeHelmet && !hardcoreBullet && RemoveHelmetOnHeadshot )
 		{
 			eventArgs.RemoveHelmet();
 		}
 	}
+
+	private static readonly HitboxConfig[] HardcoreHitboxes =
+	{
+		new() { Tags = HitboxTags.Head, HelmetProtects = true },
+		new() { Tags = HitboxTags.Neck },
+		new() { Tags = HitboxTags.Chest | HitboxTags.Clavicle | HitboxTags.Spine, ArmorProtects = true }
+	};
 
 	public static void GetDamageModifications(
 		DamageFlags damageFlags,

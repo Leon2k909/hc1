@@ -1,0 +1,13 @@
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_ALPHA_TEST "1"
+    F_SELF_ILLUM "1"
+    TextureColor "materials/railhead/civic_impostor.png"
+    TextureTranslucency "materials/railhead/civic_impostor_alpha.png"
+    TextureSelfIllumMask "materials/default/default_color.tga"
+    TextureNormal "materials/default/default_normal.tga"
+    g_flAlphaTestReference "0.7"
+    g_flSelfIllumBrightness "0.5"
+    g_flSelfIllumAlbedoFactor "1"
+}

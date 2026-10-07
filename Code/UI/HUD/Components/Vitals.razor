@@ -9,7 +9,7 @@
         <div class="edge" />
         <div class="rows">
             <div class="health-row">
-                <Icon File="/ui/health.png" Size="20" />
+                <Icon File="/ui/health.png" Size="@(20)" />
                 <label class="value">@Health</label>
                 <div class="segments">
                     @for ( var k = 0; k < Segments; k++ )
@@ -22,13 +22,13 @@
             @if ( ArmorComponent.IsValid() )
             {
                 <div class="armor-row">
-                    <Icon File="/ui/armor.png" Size="14" />
+                    <Icon File="/ui/armor.png" Size="@(14)" />
                     <label class="value-sm">@Armor</label>
                     <div class="armor-bar"><div class="fill" style="width: @(ArmorPercent)%;" /></div>
                     @if ( HasHelmet )
                     {
                         <div class="chip">
-                            <Icon File="/ui/helmet.png" Size="10" />
+                            <Icon File="/ui/helmet.png" Size="@(10)" />
                             <label>@Tr( "HELMET" )</label>
                         </div>
                     }

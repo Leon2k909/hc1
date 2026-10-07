@@ -26,7 +26,7 @@
     Panel Lens { get; set; }
     Texture _bound;
 
-    float Alpha => MathF.Round( ((OpticZoom.ScopeBlend - 0.75f) / 0.2f).Clamp( 0f, 1f ) * OpticZoom.LensVisibility, 3 );
+    float Alpha => MathF.Round( (OpticZoom.ScopeBlend / 0.2f).Clamp( 0f, 1f ) * OpticZoom.LensVisibility, 3 );
 
     float LensHeightPercent => MathF.Round( Diameter * OpticZoom.LensScale * 100f, 2 );
     float LensWidthPercent => MathF.Round( Diameter * OpticZoom.LensScale * 100f * Screen.Height / Screen.Width, 2 );

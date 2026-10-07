@@ -108,9 +108,22 @@ public partial class HealthComponent : Component, IRespawnable//, Component.IDam
 			&& !damageInfo.Flags.HasFlag( DamageFlags.Zone ) && !damageInfo.Flags.HasFlag( DamageFlags.Burn ) )
 			lethal = true;
 
-		BroadcastDamage( damageInfo );
+		if ( IsGodMode || DevCommands.NoDamage )
+		{
+			BroadcastDamage( damageInfo );
+			return;
+		}
 
-		if ( IsGodMode || DevCommands.NoDamage ) return;
+		if ( bullet && damageInfo.ArmorDamage > 0f && !damageInfo.Hitbox.HasFlag( HitboxTags.Head )
+			&& GameUtils.GetPlayerFromComponent( this )?.ArmorComponent is { } armor )
+		{
+			// Protection cannot absorb more than the vest's remaining condition.
+			var absorbed = Math.Min( armor.Armor, damageInfo.ArmorDamage );
+			armor.Armor = Math.Max( 0f, armor.Armor - absorbed );
+			damageInfo = damageInfo with { Damage = damageInfo.Damage + damageInfo.ArmorDamage - absorbed, ArmorDamage = absorbed };
+		}
+
+		BroadcastDamage( damageInfo );
 
 		if ( bullet && State == LifeState.Alive && IsLimbHit( damageInfo ) )
 			AddWound( damageInfo.Hitbox );

@@ -1951,7 +1951,8 @@ public sealed partial class LightweightCombatBot
 			hitbox = HitboxTags.Chest;
 
 		var roundDamage = RoundDamage( trace.Distance );
-		var damage = victim is PlayerPawn ? roundDamage * RealPlayerDamageScale : roundDamage;
+		var hardcore = GameMode.ActiveHardcore || (GameMode.Instance.IsValid() && GameMode.Instance.Hardcore);
+		var damage = !hardcore && victim is PlayerPawn ? roundDamage * RealPlayerDamageScale : roundDamage;
 		var damageInfo = new DamageInfo( this, damage, this, trace.EndPosition, direction * damage, hitbox );
 
 		switch ( victim )

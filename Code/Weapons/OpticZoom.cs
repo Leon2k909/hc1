@@ -7,7 +7,7 @@ namespace Facepunch;
 /// hands and optic housing stay in view; a second camera renders the magnified world into a texture that
 /// <see cref="UI.ScopeOverlay"/> draws inside the optic's lens.
 /// </summary>
-public sealed class OpticZoom : Component
+public sealed class OpticZoom : Component, ICameraSetup
 {
 	/// <summary>How much the whole view zooms while aiming a magnified optic.</summary>
 	public const float ViewMagnification = 1.2f;
@@ -77,7 +77,7 @@ public sealed class OpticZoom : Component
 			Deactivate();
 			return;
 		}
-		// With the eyepiece known, OnPreRender sizes the lens to its glass each frame.
+		// With the eyepiece known, PostSetup sizes the lens to its glass each frame.
 		_eyepiece = optic.OpticEyepiece;
 		_eyepieceDiameter = optic.OpticEyepieceDiameter;
 		if ( _eyepieceDiameter <= 0f )
@@ -119,8 +119,9 @@ public sealed class OpticZoom : Component
 			.Select( p => p.CurrentGameObject ).FirstOrDefault();
 
 	// Viewmodel animation and camera effects are final by now; place the lens on the optic right before rendering.
-	protected override void OnPreRender()
+	void ICameraSetup.PostSetup( CameraComponent camera )
 	{
+		if ( camera != _main ) return;
 		if ( !_lensCamera.IsValid() || !_lensCamera.Enabled || !_main.IsValid() ) return;
 		if ( !_optic.IsValid() ) { LensVisibility = 0f; return; }
 
@@ -136,7 +137,7 @@ public sealed class OpticZoom : Component
 		var eyepiece = optic.PointToWorld( _eyepiece );
 		var anchorDistance = fitted ? MathF.Max( cam.PointToLocal( eyepiece ).x, 0.5f ) : AnchorDistance;
 
-		// Learn (and slowly refine) how the optic sits in front of the eye while properly aimed in.
+		// Learn the aim alignment once per optic. Relearning during movement would absorb sway into the calibration.
 		if ( ScopeBlend >= 0.98f && !_reloading )
 		{
 			var anchor = optic.PointToLocal( cam.Position + cam.Rotation.Forward * anchorDistance );
@@ -147,12 +148,6 @@ public sealed class OpticZoom : Component
 				_aimLocal = aim;
 				_calibrated = true;
 			}
-			else
-			{
-				var t = (Time.Delta * 2f).Clamp( 0f, 1f );
-				_anchorLocal = Vector3.Lerp( _anchorLocal, anchor, t );
-				_aimLocal = Rotation.Slerp( _aimLocal, aim, t );
-			}
 		}
 
 		var lensRotation = cam.Rotation;
@@ -160,7 +155,8 @@ public sealed class OpticZoom : Component
 		if ( _calibrated )
 		{
 			lensRotation = optic.Rotation * _aimLocal * cant.Inverse;
-			lensPoint = optic.PointToWorld( _anchorLocal );
+			// Known eyepieces follow their glass, never a screen-centred calibration sampled during sway.
+			if ( !fitted ) lensPoint = optic.PointToWorld( _anchorLocal );
 		}
 
 		// Project the anchor onto the screen (x forward, y left, z up in camera space).
@@ -182,7 +178,7 @@ public sealed class OpticZoom : Component
 		// Fade the picture out as the optic turns away from the eye (e.g. tilted for a reload).
 		var angle = Vector3.GetAngle( lensRotation.Forward, cam.Rotation.Forward );
 		var visible = local.x > 0.5f ? (1f - (angle - 2f) / 6f).Clamp( 0f, 1f ) : 0f;
-		LensVisibility = LensVisibility.Approach( visible, Time.Delta * 10f );
+		LensVisibility = visible;
 
 		// The lens shows the world magnified relative to what surrounds it: the angle the lens covers on screen,
 		// divided by the magnification, looking along the optic.

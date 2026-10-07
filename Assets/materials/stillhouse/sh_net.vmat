@@ -1,0 +1,19 @@
+// Tools/stillhouse_materials.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    F_ALPHA_TEST "1"
+    F_RENDER_BACKFACES "1"
+    TextureTranslucency "materials/stillhouse/net_trans.png"
+    g_flAlphaTestReference "0.5"
+    g_flAntiAliasedEdgeStrength "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.00"
+    TextureColor "materials/stillhouse/sh_net_color.png"
+    TextureNormal "materials/stillhouse/net_normal.png"
+    TextureRoughness "materials/stillhouse/net_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1.0 1.0 1.0 1.0]"
+    g_flModelTintAmount "1.0"
+}

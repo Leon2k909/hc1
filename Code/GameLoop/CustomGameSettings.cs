@@ -172,7 +172,17 @@ public sealed class CustomGameRules
 		_ => (4f, 25f)
 	};
 
-	public CustomGameRules Clone() => (CustomGameRules)MemberwiseClone();
+	public CustomGameRules Clone() => new()
+	{
+		TimeLimit = TimeLimit,
+		ScoreLimit = ScoreLimit,
+		RespawnDelay = RespawnDelay,
+		MaxHealth = MaxHealth,
+		Regen = Regen,
+		HeadshotsOnly = HeadshotsOnly,
+		FriendlyFire = FriendlyFire,
+		BotDifficulty = BotDifficulty
+	};
 
 	public override string ToString() =>
 		$"time {TimeLimit?.ToString() ?? "default"}, score {ScoreLimit?.ToString() ?? "default"}, " +
