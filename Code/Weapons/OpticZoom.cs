@@ -12,7 +12,10 @@ public sealed class OpticZoom : Component, ICameraSetup
 	/// <summary>How much the whole view zooms while aiming a magnified optic.</summary>
 	public const float ViewMagnification = 1.2f;
 
-	/// <summary>0..1 aim-in progress of the local player on a magnified optic. 0 when not using one.</summary>
+	/// <summary>
+	/// 0..1, how far the local player's sights are up on a magnified optic (<see cref="ViewModel.AimProgress"/>), and
+	/// still going while they come down. 0 when not using one.
+	/// </summary>
 	public static float ScopeBlend { get; private set; }
 
 	/// <summary>Magnified view for the lens, or null when inactive.</summary>
@@ -30,11 +33,24 @@ public sealed class OpticZoom : Component, ICameraSetup
 	/// <summary>On-screen size of the lens relative to its size when aimed (grows/shrinks as the optic moves).</summary>
 	public static float LensScale { get; private set; } = 1f;
 
-	/// <summary>0..1, how well the optic lines up with the eye. The lens picture fades out as the gun is pulled away.</summary>
+	/// <summary>
+	/// 0..1, how well the optic lines up with the eye: <see cref="UI.ScopeOverlay"/>'s opacity. The picture shows as the
+	/// eyepiece comes in front of the eye, and goes as the gun is pulled away.
+	/// </summary>
 	public static float LensVisibility { get; private set; }
 
 	/// <summary>Distance in front of the eye where the lens is anchored to an optic whose eyepiece isn't known.</summary>
 	private const float AnchorDistance = 4f;
+
+	/// <summary>
+	/// The picture is all there while the line of sight passes this share of the eyepiece's radius from its centre, and
+	/// gone once it's off the glass. Off to the side a real scope shows black, and the sway of a hard turn while aimed stays
+	/// inside it.
+	/// </summary>
+	private const float FullOnAxis = 0.35f;
+
+	/// <summary>How long the aim has to have settled before the optic's place in front of the eye is learned from it.</summary>
+	private const float SettleTime = 0.15f;
 
 	private CameraComponent _lensCamera;
 	private CameraComponent _main;
@@ -53,6 +69,7 @@ public sealed class OpticZoom : Component, ICameraSetup
 	private Rotation _aimLocal;
 	private bool _calibrated;
 	private GameObject _calibratedFor;
+	private float _settledFor;
 
 	protected override void OnDisabled() => Deactivate();
 
@@ -84,16 +101,17 @@ public sealed class OpticZoom : Component, ICameraSetup
 			LensDiameter = optic.OpticLensDiameter.Clamp( 0.05f, 0.5f );
 		OverlayDotVisible = optic.OpticOverlayDot;
 
-		var aimFov = Equipment.ZoomFov( baseFov + equipment.AimFovOffset, ViewMagnification );
-		ScopeBlend = equipment.HasTag( "aiming" )
-			? ((baseFov - main.FieldOfView) / MathF.Max( baseFov - aimFov, 0.01f )).Clamp( 0f, 1f )
-			: 0f;
+		// The gun's own aim, not the camera's zoom: that eases in more slowly, so the picture waited ~0.3 s after the scope
+		// was at the eye, and only showed fully after 0.6 s.
+		ScopeBlend = equipment.HasTag( "aiming" ) ? MathF.Max( viewModel.AimProgress, 0.001f ) : viewModel.AimProgress;
 
 		if ( ScopeBlend <= 0f )
 		{
 			Deactivate();
 			return;
 		}
+
+		_settledFor = viewModel.IsAimSettled ? _settledFor + Time.Delta : 0f;
 
 		viewModel.GameObject.Tags.Add( "optic_viewmodel" );
 		_main = main;
@@ -137,8 +155,8 @@ public sealed class OpticZoom : Component, ICameraSetup
 		var eyepiece = optic.PointToWorld( _eyepiece );
 		var anchorDistance = fitted ? MathF.Max( cam.PointToLocal( eyepiece ).x, 0.5f ) : AnchorDistance;
 
-		// Learn the aim alignment once per optic. Relearning during movement would absorb sway into the calibration.
-		if ( ScopeBlend >= 0.98f && !_reloading )
+		// Learn (and slowly refine) how the optic sits in front of the eye while properly aimed in.
+		if ( _settledFor >= SettleTime && !_reloading )
 		{
 			var anchor = optic.PointToLocal( cam.Position + cam.Rotation.Forward * anchorDistance );
 			var aim = optic.Rotation.Inverse * cam.Rotation * cant;
@@ -175,10 +193,23 @@ public sealed class OpticZoom : Component, ICameraSetup
 			LensScale = (AnchorDistance / depth).Clamp( 0.3f, 2f );
 		}
 
-		// Fade the picture out as the optic turns away from the eye (e.g. tilted for a reload).
-		var angle = Vector3.GetAngle( lensRotation.Forward, cam.Rotation.Forward );
+		// The picture shows while the eye is behind the eyepiece: the optic pointing along the view (not tilted for a
+		// reload), and its glass on the line of sight. Before the optic's aim is learned, its own axis stands in for it.
+		var axis = _calibrated ? lensRotation.Forward : optic.Rotation.Forward;
+		var angle = Vector3.GetAngle( axis, cam.Rotation.Forward );
 		var visible = local.x > 0.5f ? (1f - (angle - 2f) / 6f).Clamp( 0f, 1f ) : 0f;
-		LensVisibility = visible;
+		if ( fitted )
+		{
+			var radius = _eyepieceDiameter * 0.5f;
+			var offAxis = MathF.Sqrt( local.y * local.y + local.z * local.z );
+			visible *= (1f - (offAxis - radius * FullOnAxis) / (radius * (1f - FullOnAxis))).Clamp( 0f, 1f );
+		}
+		else
+		{
+			// Its glass isn't known, so only how far the sights are up says when the eye is behind it.
+			visible *= ((ScopeBlend - 0.75f) / 0.2f).Clamp( 0f, 1f );
+		}
+		LensVisibility = LensVisibility.Approach( visible, Time.Delta * 20f );
 
 		// The lens shows the world magnified relative to what surrounds it: the angle the lens covers on screen,
 		// divided by the magnification, looking along the optic.
@@ -197,6 +228,7 @@ public sealed class OpticZoom : Component, ICameraSetup
 		LensTexture = null;
 		OverlayDotVisible = true;
 		_optic = null;
+		_settledFor = 0f;
 		if ( _lensCamera.IsValid() ) _lensCamera.Enabled = false;
 	}
 

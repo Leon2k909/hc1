@@ -5,15 +5,16 @@ public sealed record OperatorOutfit( string Id, string Name, Team Team, string D
 	MilitaryUniformStyle Style = MilitaryUniformStyle.Standard )
 {
 	/// <summary>
-	/// The outfit's picture. The Tactical Operator's is drawn by Tools/operator_portraits.py and couldn't be committed from
-	/// where it was made, so until it's there the card shows the Military Operator's.
+	/// The outfit's picture. The Tactical and Desert Operators' are drawn by Tools/operator_portraits.py and couldn't be
+	/// committed from where they were made, so until they're there the card shows its team's first outfit's.
 	/// </summary>
 	public string Portrait
 	{
 		get
 		{
-			var path = $"ui/operators/{(Id == "field" ? "field_military" : Id)}.png";
-			return FileSystem.Mounted.FileExists( path ) ? $"/{path}" : "/ui/operators/military.png";
+			var path = $"/ui/operators/{(Id == "field" ? "field_military" : Id)}.png";
+			var standIn = OperatorOutfits.ForTeam( Team )[0];
+			return standIn == this || FileSystem.Mounted.FileExists( path.TrimStart( '/' ) ) ? path : standIn.Portrait;
 		}
 	}
 }
@@ -34,7 +35,10 @@ public static class OperatorOutfits
 			MilitaryUniform.HumanModelPath, MilitaryUniformStyle.Tactical ),
 		new( "field", "Field Operator", Team.Terrorist,
 			"Camouflage fatigues, olive tactical vest, combat helmet, gloves and boots.",
-			MilitaryUniform.HumanModelPath, MilitaryUniformStyle.Field )
+			MilitaryUniform.HumanModelPath, MilitaryUniformStyle.Field ),
+		new( "desert", "Desert Operator", Team.Terrorist,
+			"Brown camouflage fatigues, tan tactical vest, combat helmet, gloves and boots.",
+			MilitaryUniform.HumanModelPath, MilitaryUniformStyle.Desert )
 	};
 
 	private const string EquippedCookie = "hc1.operator.";

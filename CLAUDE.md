@@ -587,6 +587,11 @@
   - The iron sights (ads_in's last frame with the pack's own aim, its lua's 3 forward).
   - Six optics on the claw mount, from the side and through them aiming: the fixed rear sight stays at least 0.29
     under each, and their windows are clear of it.
+- Magnified optics at the hip (2026-10-05): the claw mount holds every optic higher than the rifles' rails, so at the
+  hip its eyepiece is 0.2-0.8" above eye level (from idle.dmx's first frame: the 6x Precision Scope's 5.95" ahead, 2.48"
+  right and 0.51" up; the Kastov 762's 0.19" below). The 6x scopes fill the top right of the screen there. The user
+  saw it ("looks weird on the uzi"), was offered taking them off the Uzi or holding it lower at the hip with a
+  magnified optic, and chose to leave it as it is.
 - Not seen on it yet: the muzzle devices and lasers on their slots, the charm (at the back of the receiver's left
   side) and the third-person hand. None of it has been checked in-game yet.
 
@@ -888,8 +893,9 @@
   colour.
 
 ## Operator outfits (`OperatorOutfits`, `MilitaryUniform`, the Operators page)
-- Blue Team has two outfits: the Military Operator (the army kit it always wore) and the Tactical Operator, which the
-  user asked for on 2026-10-05 ("we only have british military operator one"). Red Team has the Field Operator.
+- Each team has two outfits. Blue Team: the Military Operator (the army kit it always wore) and the Tactical Operator,
+  which the user asked for on 2026-10-05 ("we only have british military operator one"). Red Team: the Field Operator
+  and the Desert Operator, asked for next ("add another red team outfit too").
 - The Tactical Operator (`MilitaryUniformStyle.Tactical`) is a counter-terror team's dark kit: the same army garments
   dyed by `MilitaryUniform.TacticalTint`, plus the engine's balaclava under the helmet. A black helmet and plate carrier,
   dark grey camouflage, and black boots and fingerless gloves.
@@ -902,6 +908,10 @@
     they're not used.
   - `MilitaryUniformStyle` is saved in prefabs by number: add new styles last. Each style's garments are listed in the
     code (`TacticalClothingPaths`) and in the prefabs' `MilitaryUniform` (`TacticalPieces`), as Field's are.
+- The Desert Operator (`MilitaryUniformStyle.Desert`) wears the Field Operator's garments (its `FieldClothingPaths` /
+  `FieldPieces`) dyed by `MilitaryUniform.DesertTint`, worked out the same way: brown camouflage (65,50,36 on the
+  sleeves), a tan helmet (66,56,43) and vest (76,62,45) and brown boots (70,55,40). Its gloves stay the brown leather
+  they are. Every dye is at most 1, since a tint over 1 brightens and may not hold.
 - Who wears what:
   - A player wears the outfit they equipped for their team: EQUIP over the 3D preview on the Operators page (cookie
     `hc1.operator.<Team>`), else the team's first in `OperatorOutfits.All`. Their client sends its picks to the host
@@ -911,15 +921,16 @@
     dress the living body.
   - Each lightweight bot is issued one at random with its gun, kept per name all match (`BotIdentity.Outfit`), and set
     before networking, so clients spawn it with the uniform's style. A player-pawn bot gets one by its BotId.
-- The Tactical Operator's portrait (`ui/operators/tactical.png`) is a stand-in, not a render: `Tools/operator_portraits.py`
-  (standard library only) recolours military.png with the same dyes, draws the balaclava with an eye slot and puts the
-  gloves on. It isn't in the repository: the session that made it couldn't upload to the LFS store (Forbidden). Run
-  the script and commit the PNG from a machine that can push LFS. Until it's there, the card shows military.png
-  (`OperatorOutfit.Portrait`). Replace it with an in-engine capture like the other two (512x640, transparent).
+- The Tactical and Desert Operators' portraits (`ui/operators/tactical.png`, `desert.png`) are stand-ins, not renders:
+  `Tools/operator_portraits.py` (standard library only) recolours military.png with the same dyes, draws the
+  Tactical Operator's balaclava with an eye slot and puts the gloves on. They aren't in the repository: the session
+  that made them couldn't upload to the LFS store (Forbidden). Run the script and commit the PNGs from a machine that
+  can push LFS. Until they're there, a card shows its team's first outfit's picture (`OperatorOutfit.Portrait`).
+  Replace them with in-engine captures like the other two (512x640, transparent).
 - The Operators page's text wasn't in the nine languages after the four columns; it is now.
 - Made without the editor or a compiler (2026-10-05): none of it has been compiled or seen in-game. To check: the dyes
   in the 3D preview, the balaclava under the helmet (clipping), EQUIP, a client's pick reaching the host, a late
-  joiner seeing the right kit, and bots in both kits.
+  joiner seeing the right kit, and bots in every kit.
 
 ## Corner slicing (Black Ops 6/7-style gun tilt, `ViewModel.CornerSlicing.cs`)
 - Settings → Game → Corner Slicing (`GameSettings.CornerSlicing`, on by default). It's stored inverted (`plainCorners`)
@@ -1420,6 +1431,20 @@
 - `OpticZoom` anchors the lens where the line of sight crosses that glass, and sizes the picture to the glass's diameter
   over its distance, so the picture fills the eyepiece wherever it is on screen (sway, recoil, a rail's shift).
   Optics without eyepiece data (the MP5's, the Scout 3x) keep `OpticLensDiameter` at 4.
+- When the picture shows (2026-10-05, the user: aiming the 6x Precision Scope on the Uzi, "its delayed to move to the
+  magnified view"):
+  - It used to wait for the camera's zoom, which eases in exponentially (`CameraController`, `LerpTo` at 5/s). It came
+    in from 75% to 95% of the zoom: ~0.28 to ~0.6 s after pressing aim, though the scope was at the eye after ~0.3 s
+    (`ViewModel.AimTime` 0.25 s, then the aim offset's ease at 10/s).
+  - Now it goes by where the scope is (`OpticZoom.LensVisibility`, the overlay's opacity). It needs the optic pointing
+    along the view (full within 2 degrees, gone at 8) and the line of sight on the eyepiece's glass: full within
+    `FullOnAxis` (0.35) of its radius, gone off its edge. Optics without eyepiece data go by `ViewModel.AimProgress`
+    (75-95%).
+  - The lens stays active while the sights come down (`ScopeBlend` is `ViewModel.AimProgress`), so the picture leaves
+    with the scope instead of vanishing while it's still at the eye.
+  - The optic's place in front of the eye is learned once the aim has settled for `SettleTime` (0.15 s,
+    `ViewModel.IsAimSettled`), not after the zoom's 98% (~0.8 s). Until then the optic's own axis stands in for it.
+  - Compiled nowhere yet (made without a compiler), and not seen in-game.
 - The M4 holds an optic's origin 8.718 in front of the eye before its `OpticAimOffset` (`M4_OPTIC_DEPTH`: the 762's slot
   at its ADS pose plus its correction). The ported guns' `OpticAimCorrection`s copy that, so each relief holds on them:
   the 762, M16A4, P90 and Uzi all put a 2x's glass at the same depth. A rail's `RailOpticAimCorrection` moves the eye

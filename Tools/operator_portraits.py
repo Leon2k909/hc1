@@ -1,17 +1,18 @@
 """
-Draws the Tactical Operator's portrait (Assets/ui/operators/tactical.png) from the Military Operator's, standard
-library only.
+Draws the Tactical and Desert Operators' portraits (Assets/ui/operators/tactical.png, desert.png) from the Military
+Operator's, standard library only.
 
     python Tools/operator_portraits.py
 
-It's a stand-in until there's an in-engine capture like the other two portraits. Both outfits are the same army
-garments on the same body (MilitaryUniform), so it recolours military.png:
-  - every garment's pixels are dyed with MilitaryUniform.TacticalTint, multiplied in linear space as the engine does
-    (the Field Operator's portrait matches its tints on military.png to within 2 sRGB steps), so keep TACTICAL in step
-    with that table;
-  - the head and neck go under a black balaclava, shaded like the skin it covers, with an eye slot behind the helmet's
-    clear eye protection;
-  - the backs of the hands get the fingerless gloves, the Field Operator's brown leather ones dyed black.
+They're stand-ins until there are in-engine captures like the Military and Field Operators'. Every outfit is the same
+army garments on the same body (MilitaryUniform), so it recolours military.png:
+  - every garment's pixels are dyed with the outfit's MilitaryUniform tints (TacticalTint, DesertTint), multiplied in
+    linear space as the engine does (the Field Operator's portrait matches its tints on military.png to within 2 sRGB
+    steps), so keep OUTFITS in step with those tables;
+  - the Tactical Operator's head and neck go under a black balaclava, shaded like the skin it covers, with an eye slot
+    behind the helmet's clear eye protection;
+  - the backs of the hands get the fingerless gloves, the Field Operator's brown leather ones, dyed as the outfit dyes
+    them.
 Pixels are sorted by where they are in the 512x640 picture and by colour (skin is redder than any of the kit).
 """
 import os
@@ -20,13 +21,24 @@ import zlib
 
 OPERATORS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Assets", "ui", "operators")
 
-# MilitaryUniform.TacticalTint
-TACTICAL = {
-    "helmet": (.27, .33, .51),
-    "vest": (.24, .32, .54),
-    "boots": (.14, .17, .27),
-    "gloves": (.45, .62, .85),
-    "camo": (.58, .64, 1.0),
+# MilitaryUniform.TacticalTint and DesertTint
+OUTFITS = {
+    "tactical": {
+        "helmet": (.27, .33, .51),
+        "vest": (.24, .32, .54),
+        "boots": (.14, .17, .27),
+        "gloves": (.45, .62, .85),
+        "camo": (.58, .64, 1.0),
+        "balaclava": True,
+    },
+    "desert": {
+        "helmet": (.97, .85, .73),
+        "vest": (.97, .88, .74),
+        "boots": (.66, .53, .47),
+        "gloves": (1.0, 1.0, 1.0),
+        "camo": (1.0, .64, .51),
+        "balaclava": False,
+    },
 }
 GLOVES_UNDYED = (48, 36, 29)  # the Field Operator's gloves, which it doesn't tint
 KNIT = (30, 30, 32)  # a black balaclava
@@ -107,12 +119,11 @@ def is_skin(pixel):
     return r > 8 and (r - g) / r >= 0.2 and r >= b
 
 
-def main():
-    width, height, rows = read_png(os.path.join(OPERATORS, "military.png"))
+def draw(name, outfit, width, height, rows):
     pixel = lambda x, y: tuple(rows[y][x * 4:x * 4 + 4])
     face = [pixel(x, y) for y in range(112, 145) for x in range(235, 285) if pixel(x, y)[3] > 250 and is_skin(pixel(x, y))]
     skin_mean = sum(map(luminance, face)) / len(face)
-    gloves = dye(GLOVES_UNDYED, TACTICAL["gloves"])
+    gloves = dye(GLOVES_UNDYED, outfit["gloves"])
 
     def over_skin(colour, p):
         """`colour` shaded like the skin pixel it covers."""
@@ -130,25 +141,31 @@ def main():
             if y < HEAD[2] and HEAD[0] <= x <= HEAD[1]:
                 if skin:
                     in_slot = EYE_SLOT[0] <= x <= EYE_SLOT[2] and EYE_SLOT[1] <= y <= EYE_SLOT[3]
-                    colour = p[:3] if in_slot else over_skin(KNIT, p)
+                    colour = over_skin(KNIT, p) if outfit["balaclava"] and not in_slot else p[:3]
                 elif y >= COLLAR[2] and COLLAR[0] <= x <= COLLAR[1]:
-                    colour = dye(p, TACTICAL["camo"])
+                    colour = dye(p, outfit["camo"])
                 else:
-                    colour = dye(p, TACTICAL["helmet"])
+                    colour = dye(p, outfit["helmet"])
             elif skin:
                 colour = over_skin(gloves, p) if GLOVE_ROWS[0] <= y <= GLOVE_ROWS[1] else p[:3]
             elif y >= BOOT_TOP:
-                colour = dye(p, TACTICAL["boots"])
+                colour = dye(p, outfit["boots"])
             elif VEST[0] <= x <= VEST[2] and VEST[1] <= y <= VEST[3] and (p[0] - p[1]) / max(p[0], 1) >= 0.08:
-                colour = dye(p, TACTICAL["vest"])
+                colour = dye(p, outfit["vest"])
             else:
-                colour = dye(p, TACTICAL["camo"])
+                colour = dye(p, outfit["camo"])
             row[x * 4:x * 4 + 3] = bytes(colour)
         out.append(row)
 
-    path = os.path.join(OPERATORS, "tactical.png")
+    path = os.path.join(OPERATORS, f"{name}.png")
     write_png(path, width, height, out)
     print("wrote", os.path.normpath(path))
+
+
+def main():
+    width, height, rows = read_png(os.path.join(OPERATORS, "military.png"))
+    for name, outfit in OUTFITS.items():
+        draw(name, outfit, width, height, rows)
 
 
 if __name__ == "__main__":
