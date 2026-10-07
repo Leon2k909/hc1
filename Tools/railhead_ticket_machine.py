@@ -227,6 +227,11 @@ def build(model, F):
     F.collide(model, -16.7, 16.7, -11.0, 8.5, 0.0, 71.0, "metal")
 
 
+def lights(F):
+    """The two hood lamps: small local lights, without shadows or fog scattering."""
+    return [(F.p(x, 6.95, 57.25), 10.0) for x in (-8.95, 2.0)]
+
+
 def _font(size, bold=False):
     from PIL import ImageFont
     name = "Dinish-Bold.ttf" if bold else "Dinish-Regular.ttf"

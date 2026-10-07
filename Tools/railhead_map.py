@@ -776,6 +776,13 @@ def lights():
         for name, *spec in KIOSKS:
             for k, ( position, radius ) in enumerate( P.kiosk_lights( *spec ) ):
                 out.append( ( f"Kiosk {name}{' Counter' if k else ''}", position, WARM, radius, False ) )
+    if P is not None:
+        import railhead_ticket_machine as TM
+        for sign, side in ((-1, "West"), (1, "East")):
+            for n in (700, 1060, 1100):
+                frame = P.frame_for(sign * 1145, n, 0, "-e" if sign == 1 else "+e")
+                for k, (position, radius) in enumerate(TM.lights(frame)):
+                    out.append((f"Ticket {side} {n} lamp {k + 1}", position, "0.8,0.65,0.475,1", radius, False))
     return out
 
 
@@ -1392,7 +1399,8 @@ def write_scene( written, light_list, props ):
     station["Children"].append( railhead_canopy.scene_group() )
     light_objects = [
         K.game_object( ids, name, f"light/{name}", K.to_world( position ), tags="light_point,light", components=[
-            K.component( ids, "Sandbox.PointLight", f"light/{name}/light", Attenuation=1, FogMode="Enabled", FogStrength=1,
+            K.component( ids, "Sandbox.PointLight", f"light/{name}/light", Attenuation=1,
+                         FogMode="Disabled" if name.startswith("Ticket ") else "Enabled", FogStrength=0 if name.startswith("Ticket ") else 1,
                          LightColor=color, Radius=radius, Shadows=shadows ) ] )
         for name, position, color, radius, shadows in light_list ]
 
