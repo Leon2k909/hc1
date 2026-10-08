@@ -508,6 +508,44 @@ public static class DevCommands
 			? "dev_voices_sample: sample rows in the list of who's talking (run it again to take them off)"
 			: "dev_voices_sample: took the sample rows off the list of who's talking" );
 	}
+
+	/// <summary>
+	/// Set the match's weather (host): dev_weather clear|drizzle|steady|showers [mm/h]. With a rate the rain holds at
+	/// it; without one it follows the kind's own schedule. With no arguments it logs the weather now.
+	/// </summary>
+	[ConCmd( "dev_weather" )]
+	public static void SetWeather( string kind = "", float rate = -1f )
+	{
+		var scene = Game.ActiveScene;
+		if ( scene is null ) return;
+		var weather = Weather.Ensure( scene );
+		if ( !weather.IsValid() )
+		{
+			Log.Warning( "dev_weather: only the host can set the weather" );
+			return;
+		}
+
+		if ( string.IsNullOrWhiteSpace( kind ) )
+		{
+			Log.Info( $"dev_weather: {weather.Kind}, {weather.RainRate:0.##} mm/h" );
+			return;
+		}
+
+		if ( weather.IsProxy )
+		{
+			Log.Warning( "dev_weather: only the host can set the weather" );
+			return;
+		}
+
+		if ( !Enum.TryParse<WeatherKind>( kind, true, out var parsed ) )
+		{
+			Log.Warning( "dev_weather: clear, drizzle, steady or showers" );
+			return;
+		}
+
+		weather.Set( parsed, rate );
+		Log.Info( $"dev_weather: {weather.Kind}, {weather.RainRate:0.##} mm/h" );
+	}
 }
 
 /// <summary> Presses Escape for <see cref="DevCommands.PressEscape"/> as the scene's update starts, before anything takes it. </summary>

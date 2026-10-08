@@ -76,7 +76,8 @@ public static class FireFuels
 		var kmh = windKmh < 5f
 			? 0.054f + 0.269f * windKmh
 			: 1.4f + 0.838f * MathF.Pow( windKmh - 5f, 0.844f );
-		return kmh * MoistureFactor( b.Moisture, windKmh ) * CuringFactor( b.Curing ) / 3.6f;
+		// Rain wets the grass (Weather.FuelWetting), and past about 20% moisture a grass fire stops running.
+		return kmh * MoistureFactor( b.Moisture + Weather.FuelWetting, windKmh ) * CuringFactor( b.Curing ) / 3.6f;
 	}
 
 	/// <summary> The burnt area's length over its breadth (FBP, grass): round in still air, longer the stronger the wind. </summary>

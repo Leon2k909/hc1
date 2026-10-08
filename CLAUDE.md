@@ -3230,6 +3230,46 @@ simulate_input.
   the light indoors. Nor has glass been broken in play: the shards (an offscreen scene doesn't run particles), the
   sounds and the clips.
 
+## Rain (`Weather`, `RainView`, `Code/World/`)
+- The user asked for the maps to rain sometimes (2026-10-08). A quarter of matches rain (`Weather.RainChance`). Of those,
+  a quarter are drizzle, two fifths steady rain and the rest showers.
+  - Drizzle is 0.2-0.8 mm/h and steady rain 2-6 mm/h, each wandering about 30% over minutes.
+  - Showers come 10-90 s in, then last 3-8 minutes with dry gaps of 3-10 minutes. Most are moderate; a few reach
+    40 mm/h. The sky stays overcast in the gaps.
+  - Rain comes with a front's wind (`WorldWind`, on the calm's heading): 2-4 m/s in drizzle, 3-6 m/s in rain, gustier
+    in showers.
+  - A map with no sky (Reef Hall) never rains.
+- The host rolls it once the map has loaded (`Weather.Ensure`, from `GameMode.OnStart`). Only the kind, a seed and the
+  time are synced: every machine works the rate out from them (`Weather.Schedule`).
+- Each machine that draws makes a `RainView` round its own camera. Nothing in it is networked.
+  - Drops (`RainDropParticles`, up to 6000 in three rings out to 900): sizes from Marshall and Palmer's spread for the
+    rate, each at its size's terminal speed (4 m/s at 1 mm, 8.7 at 4 mm), drifting with the wind's gusts. More of them
+    show the harder it rains (`ActiveShare`). Each is a streak as long as it falls in ~45 ms, never thinner than two
+    pixels, and fainter for being drawn wider than it is.
+  - Shelter (`ShelterGrid`): 32-unit columns round the camera, each probed with a trace down and one up. Drops show only
+    over open sky and above where they'd land, so none fall indoors, under a roof or through a floor. A hit on the
+    map's sky brush or its lid counts as sky.
+  - Splashes (`RainSplashParticles`): crowns on open, level ground within ~13 m, more the harder it rains.
+  - Sound (`Tools/rain_sounds.py`, synthesised): light (2 mm/h) and heavy (20 mm/h) loops crossfaded by the rate
+    (`MixWeights`). They get quieter the less open sky there is round you, and a loop of rain on a roof plays while one
+    is over you. Light rain sits 5.5 dB under the walk on concrete and heavy rain at about its level.
+  - The look (`RainLook`), easing in over 20 s:
+    - the sky becomes an overcast panorama (`Tools/rain_sky.py`, `materials/weather/overcast_sky.vmat`), swapped at
+      halfway, and darkens in heavy rain;
+    - the sun drops to a third of its light in drizzle and about a seventh in a downpour, and goes grey;
+    - the fog closes in to rain's visibility (8 km dry, ~3.3 km at 5 mm/h, ~1.6 km at 25 mm/h);
+    - the reflection probes lose the clear sky's blue.
+    Every value is put back when it clears. Cloud maps' baked lighting isn't changed, so their shadows stay.
+- Fire: rain wets dead grass (`Weather.FuelWetting`, on the host). A tenth of a millimetre slows a grass fire, and
+  about half a millimetre stops it running (`FireFuels.HeadRate`). Thermite still burns.
+- `dev_weather [clear|drizzle|steady|showers] [mm/h]` (host) sets it. With a rate it holds at that rate; with none it
+  follows the kind's schedule. With no arguments it logs the weather now.
+- Not modelled: thunder, wet surfaces and puddles, rain on the gun or the screen, and a setting to turn it off. Theater
+  doesn't record it.
+- Made offline on 2026-10-08 and compiled with dotnet. The editor hasn't loaded it: nothing has been seen or heard
+  in-game. To check: `dev_weather steady 5` on Belltower and Railhead (the sky, the fog, no drops under the shed's roof,
+  the splashes, the roof's sound), the frame time with 6000 drops, and a second machine seeing the same weather.
+
 ## Bullet drop (real exterior ballistics on hitscan shots, Warzone only)
 - Only in Warzone (Battle Royale): a game mode has drop if it has the `BulletDrop` rule (`battle_royale.prefab`'s root).
   The user wants the main game's shots dead straight along the sights, and plans to come back to this system later.

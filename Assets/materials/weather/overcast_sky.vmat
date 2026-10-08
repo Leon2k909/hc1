@@ -1,0 +1,9 @@
+// Tools/rain_sky.py
+"Layer0"
+{
+    shader "shaders/sky.shader"
+    F_TEXTURE_FORMAT2 "6"
+    g_flBrightnessExposureBias "0"
+    g_flRenderOnlyExposureBias "0"
+    SkyTexture "materials/weather/overcast_sky.exr"
+}

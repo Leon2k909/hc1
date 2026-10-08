@@ -148,6 +148,8 @@ public sealed partial class GameMode : SingletonComponent<GameMode>, Component.I
 			GameObject.Components.GetOrCreate<ScorestreakManager>();
 			// A custom game's time, score and respawn rules go into the mode's own components before play starts.
 			CustomGameSettings.ApplyTo( this );
+			// Some matches rain: the host rolls it once the map has loaded.
+			Weather.Ensure( Scene );
 		}
 
 		Scene.Dispatch( new GamemodeInitializedEvent( Title ) );
