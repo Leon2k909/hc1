@@ -1,0 +1,75 @@
+{
+  "materials": {
+    "RON_HK416_Main": "weapons/hk416/materials/hk416_receiver.vmat",
+    "RON_HK416_Main_2": "weapons/hk416/materials/hk416_receiver.vmat",
+    "RON_HK416_Mag": "weapons/hk416/materials/hk416_mag.vmat",
+    "mag_stanag_hk_gen_2_pm_556x45_30_LOD0": "weapons/hk416/materials/hk416_polymer_mag.vmat",
+    "stock_ar15_hk_e1_LOD0": "weapons/hk416/materials/hk416_e1_stock.vmat",
+    "stock_ar15_hk_slim_line_LOD0": "weapons/hk416/materials/hk416_slim_line_stock.vmat",
+    "mount_m_lok_magpul_picatinny_rail_sections_LOD0": "weapons/hk416/materials/hk416_mlok_rail.vmat",
+    "laser_mount03": "weapons/hk416/materials/hk416_laser_mount.vmat",
+    "mag_stanag_magpul_pmag_gen_m3_556x45_20_LOD0_blk": "weapons/hk416/materials/hk416_pmag20.vmat",
+    "mag_stanag_magpul_pmag_gen_m3_window_556x45_30_LOD0_blk": "weapons/hk416/materials/hk416_pmag30.vmat",
+    "mag_stanag_magpul_pmag_gen_m3_window_556x45_30_LOD0_glass": "weapons/hk416/materials/hk416_pmag30_window.vmat",
+    "mag_stanag_magpul_pmag_gen_m3_556x45_40_LOD0_blk": "weapons/hk416/materials/hk416_pmag40.vmat"
+  },
+  "sounds": {
+    "fire": "weapons/hk416/sounds/hk416.fire.sound",
+    "fire_suppressed": "weapons/hk416/sounds/hk416.fire_suppressed.sound",
+    "raise": "weapons/hk416/sounds/hk416.raise.sound",
+    "drop": "weapons/hk416/sounds/hk416.drop.sound",
+    "reload_rotate": "weapons/hk416/sounds/hk416.reload_rotate.sound",
+    "reload_magout_01": "weapons/hk416/sounds/hk416.reload_magout_01.sound",
+    "magout": "weapons/hk416/sounds/hk416.magout.sound",
+    "magin": "weapons/hk416/sounds/hk416.magin.sound",
+    "reload_empty_rotate": "weapons/hk416/sounds/hk416.reload_empty_rotate.sound",
+    "kg_1_1": "weapons/hk416/sounds/hk416.kg_1_1.sound",
+    "xmag_reload_rotate": "weapons/hk416/sounds/hk416.xmag_reload_rotate.sound",
+    "mag_in1": "weapons/hk416/sounds/hk416.mag_in1.sound",
+    "xmag_reload_empty_rotate": "weapons/hk416/sounds/hk416.xmag_reload_empty_rotate.sound"
+  },
+  "reloads": {
+    "reload": {
+      "0.067": "weapons/hk416/sounds/hk416.reload_rotate.sound",
+      "0.3": "weapons/hk416/sounds/hk416.reload_magout_01.sound",
+      "0.667": "weapons/hk416/sounds/hk416.magout.sound",
+      "1.133": "weapons/hk416/sounds/hk416.magin.sound",
+      "1.767": "weapons/hk416/sounds/hk416.drop.sound"
+    },
+    "reload_empty": {
+      "0.067": "weapons/hk416/sounds/hk416.reload_empty_rotate.sound",
+      "0.633": "weapons/hk416/sounds/hk416.magout.sound",
+      "1.333": "weapons/hk416/sounds/hk416.magin.sound",
+      "2": "weapons/hk416/sounds/hk416.kg_1_1.sound",
+      "2.333": "weapons/hk416/sounds/hk416.drop.sound"
+    },
+    "reload_smag": {
+      "0.1": "weapons/hk416/sounds/hk416.reload_rotate.sound",
+      "0.133": "weapons/hk416/sounds/hk416.reload_magout_01.sound",
+      "0.3": "weapons/hk416/sounds/hk416.magout.sound",
+      "1.233": "weapons/hk416/sounds/hk416.magin.sound",
+      "1.767": "weapons/hk416/sounds/hk416.drop.sound"
+    },
+    "reload_empty_smag": {
+      "0.1": "weapons/hk416/sounds/hk416.reload_rotate.sound",
+      "0.167": "weapons/hk416/sounds/hk416.reload_magout_01.sound",
+      "0.267": "weapons/hk416/sounds/hk416.magout.sound",
+      "1.1": "weapons/hk416/sounds/hk416.magin.sound",
+      "1.6": "weapons/hk416/sounds/hk416.kg_1_1.sound",
+      "1.767": "weapons/hk416/sounds/hk416.drop.sound"
+    },
+    "reload_xmag": {
+      "0.067": "weapons/hk416/sounds/hk416.xmag_reload_rotate.sound",
+      "0.633": "weapons/hk416/sounds/hk416.magout.sound",
+      "1.333": "weapons/hk416/sounds/hk416.mag_in1.sound",
+      "2.167": "weapons/hk416/sounds/hk416.drop.sound"
+    },
+    "reload_empty_xmag": {
+      "0.033": "weapons/hk416/sounds/hk416.xmag_reload_empty_rotate.sound",
+      "0.767": "weapons/hk416/sounds/hk416.magout.sound",
+      "1.333": "weapons/hk416/sounds/hk416.mag_in1.sound",
+      "2.167": "weapons/hk416/sounds/hk416.kg_1_1.sound",
+      "2.5": "weapons/hk416/sounds/hk416.drop.sound"
+    }
+  }
+}

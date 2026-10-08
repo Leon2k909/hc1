@@ -16,7 +16,7 @@ The 74u's gameplay prefab and icon were made by hand (see Prefabs.gameplay), so 
 are set.
 
 GUIDs are derived from the template GUIDs, so re-running produces identical files.
-Run: python Tools/kastov_prefabs.py [--weapon kastov762|kastov74u|vityaz|rpk|bizon|ak105|vepr12|m16|p90|mp7|uzi|aug|fal|famas|m18|mcx|l85a2]
+Run: python Tools/kastov_prefabs.py [--weapon kastov762|kastov74u|vityaz|rpk|bizon|ak105|vepr12|m16|p90|mp7|uzi|aug|fal|famas|m18|mcx|l85a2|hk416]
 """
 
 from __future__ import annotations
@@ -858,6 +858,39 @@ def gameplay_l85a2() -> Gameplay:
     })
 
 
+
+def gameplay_hk416() -> Gameplay:
+    """The real HK416 A5's figures with M855 from its 11-inch barrel: the M4's round (its damage, falloff curve and
+    recoil pattern), with the falloff distance cut by the short barrel's muzzle energy, as the MCX's is."""
+    assets = load(ASSETS / "Weapons" / "HK416" / "hk416_assets.json")
+    sounds, reloads = assets["sounds"], assets["reloads"]
+    m4 = component(find(load(M4 / "weapon_m4a1.prefab")["RootObject"], "Functions"), "Shootable")
+    return Gameplay({
+        # 6.9 lb (3.13 kg) without a magazine with the 11-inch barrel (HK USA), ~3.75 kg with HK's steel 30-round
+        # magazine loaded (~0.25 kg, and 30 rounds of 12.3 g): the M4's weight, so the rifles' penalty and no
+        # WeightSlowdown.
+        "Equipment": {"SpeedPenalty": 40},
+        "WeaponAmmo": {"Ammo": 30, "MaxAmmo": 30},
+        # 850 rpm, the middle of the 700-900 usually quoted for the short-barrelled HK416s; automatic and semi. M855
+        # leaves the 279 mm (11-inch) barrel at ~826 m/s (between the 10.3-inch's ~790 and the MCX's 837 from 11.5
+        # inches; the M4's 14.5-inch gives 905), G7 0.151. That's 0.833 of the M4's muzzle energy, so damage falls off
+        # over 0.833 of its distance (MaxRange). The sights sit 72.5 mm over the bore (the eye's height over it at the
+        # ADS pose, through the flip-up rear sight's aperture), zeroed at 300 m like the other M855 rifles. A suppressor
+        # doesn't speed it up: the A5's gas regulator has two positions, N for normal fire and S for a suppressor.
+        "Shootable": {"BaseDamage": 20, "MaxRange": round(m4["MaxRange"] * 0.833), "FireRate": 850,
+                      "SuppressorFireRateScale": 1, "ShootSound": sounds["fire"],
+                      "SuppressedShootSound": sounds["fire_suppressed"],
+                      "SupportedFireModes": ["Automatic", "Semi"], "CurrentFireMode": "Automatic",
+                      **ballistics(826, "G7", 0.151, 72.5, 300, M855_BULLET)},
+        # When the gun is level again in its own clips (tag_sling back within 4 degrees and 0.6 of idle, relative to
+        # the camera): 2.33s, and 2.73s after the empty reload's bolt release.
+        "Reloadable": {"ReloadTime": 2.33, "EmptyReloadTime": 2.73, "TimedReloadSounds": reloads["reload"],
+                       "EmptyReloadSounds": reloads["reload_empty"]},
+        # Free recoil against the M4's (2,5): an M855 round (4.02 g at 826 m/s, 1.7 g of powder) kicks the loaded
+        # ~3.75 kg HK416 back at ~1.54 m/s, the loaded M4 at ~1.86 m/s.
+        "ShootRecoil": {"Scale": "1.66,4.14"},
+    })
+
 @dataclass(frozen=True)
 class Prefabs:
     """The HC1 side of a gun: its equipment resource, prefabs and gunsmith mounts."""
@@ -928,6 +961,8 @@ class Prefabs:
     equip_fields: dict = field(default_factory=dict)
     # The share of the icon's width the gun spans: 0.9 like the M4's, less for a pistol (the USP's spans 0.35).
     icon_width: float = 0.9
+    # The rows of the spawn icon the gun is in (first, last), where the icon also carries a logo to leave out.
+    icon_rows: tuple[int, int] | None = None
     # The dry-fire click (Tools/handling_sounds.py): "rifle" (an AR's hammer), "ak" (the heavier hammer in a stamped
     # receiver, for the AK-pattern guns) or "pistol".
     dry_fire: str = "rifle"
@@ -1727,6 +1762,79 @@ PREFABS = {
                     "dev_optic_correction), recoil, reload timing and sounds, the look sway and sprint, the left hand "
                     "in first and third person, the parts on its slots, the charm and the sticker.",
     ),
+    "hk416": Prefabs(
+        title="HK416 A5",
+        description="German 5.56x45mm carbine: a short-stroke piston rifle with an 11-inch barrel, flip-up sights and "
+                    "a gas regulator with a setting for a suppressor.",
+        price=2800,
+        deploy_sound="weapons/hk416/sounds/hk416.raise.sound",
+        icon_source="3385630838/materials/vgui/entities/mg_ron_hk416",
+        # The icon has the source game's logo over the gun (rows 19-44).
+        icon_rows=(60, 255),
+        # The flash hider, the raised sights, the factory magazine and stock; the folded sights and the laser's rail
+        # hidden (by the bit rule).
+        default_mesh_groups=74069,
+        bones={
+            "tag_sling": (None, "-4.974,0,4.561", "0,0,0,1"),
+            "tag_barrel_attach": ("tag_sling", "7.535,0,0.277", "0,0,0,1"),
+            "muzzle": ("tag_barrel_attach", "13.04,0,-0.035", "0,0,0,1"),
+            "tag_brass": ("tag_sling", "5.845,-0.438,0.532", "0,0,-0.707107,0.707107"),
+        },
+        world_muzzle="15.601,0,4.803",
+        world_eject="0.871,-0.438,5.093",
+        # By the rule, where the first-person hand holds the handguard (its wrist at x 4.97): the handguard's sides are
+        # 1.03 from centre, and its bottom is at 3.761.
+        world_left_hand="4.97,2.47,2.57",
+        # No Underbarrel slot: the left hand cups the handguard's underside from x 6.5 to 10.4, and its bottom rail ends
+        # at 11.1, leaving no room for the M4's vertical grips (they need 2.26).
+        slots=[
+            # tag_reflex, on the upper's rail. An optic folds the flip-up sights down.
+            ("Optic", (-1.937, 0, 6.338), (0.25, 0, 8.73), {"iron_sights": 1, "sight_folded": 1}),
+            # tag_silencer, the flash hider's rear face.
+            ("Muzzle", (13.684, 0, 4.803), (17.62, 0, 7.4147), {"muzzle_tip": 1}),
+            # The back of the M-LOK rail section a laser brings to the handguard's right side (9.34 to 11.72), ahead of
+            # the left hand's fingertips.
+            ("Laser", (9.34, -1.28, 4.93), (8.6, -1.22, 7.4147), {"laser_rail": 1}),
+        ],
+        # The receiver end plate's left side, by the real gun's QD sling socket, in front of every stock (they start at
+        # x -6.74; the charm's anchor sits 0.57 ahead of this, 0.71 in and 1.84 over it). Every hand joint stays 0.97
+        # or more from it through every clip (the right thumb's the nearest). On the end plate's front edge the thumb
+        # came within 0.8.
+        charm=(-6.27, 1.41, 3.06),
+        # The magazine well's left side: flat at y 0.60 from x 0.6 to 2.0 and z 2.2 to 4.4.
+        sticker=((1.3, 0.6, 3.3), (0.0, 1.0, 0.0), (1.3, 1.0)),
+        # The 762's measured correction moved by how far the HK416's ADS pose puts its optic slot from the 762's, like
+        # the 74u's. Its z is small (the Kastovs' are about -1.2): its flip-up sights stand on the top rail, as the
+        # M4's do. Tune in-game with dev_optic_correction.
+        optic_aim_correction="1.617,0,-0.105",
+        gameplay=gameplay_hk416,
+        guid_salt="hk416/",
+        # HK's E1 and Slim Line stocks, against the viewmodel's own collapsible stock: the E1's broad rubber buttpad
+        # braces it better, the Slim Line's thin one less. HK's polymer magazine and Magpul's PMAGs: the 20 and 40
+        # reload with their own clips (the gun level again at 2.07s/2.17s and 2.63s/3.13s), the 30s with the steel
+        # magazine's.
+        parts={
+            "e1": Part("E1 Stock", "HK's E1 stock, with a broad rubber buttpad. Steadier against the shoulder.",
+                       0.95, 0.95),
+            "slim_line": Part("Slim Line Stock", "HK's Slim Line stock. Lighter and narrower, with a thin buttpad.",
+                              1.05, 1.05),
+            "gen2": Part("Polymer 30 Round Mag", "HK's polymer 30-round magazine. Lighter than the steel one.",
+                         magazine_capacity=30),
+            "pmag20": Part("PMAG 20", "Magpul's short 20-round polymer magazine. Lighter and quicker to seat.",
+                           magazine_capacity=20, reload_variant="_smag", reload_times=(2.07, 2.17)),
+            "pmag30": Part("PMAG 30", "Magpul's 30-round polymer magazine, with a window to count the rounds.",
+                           magazine_capacity=30),
+            "pmag40": Part("PMAG 40", "Magpul's long 40-round polymer magazine. Heavier and slower to change.",
+                           magazine_capacity=40, reload_variant="_xmag", reload_times=(2.63, 3.13)),
+        },
+        # tag_stock_attach and tag_mag_attach.
+        part_slot_positions={"stock": (-6.95, 0, 4.941), "magazine": (2.315, 0, 2.311)},
+        reload_sounds=lambda: load(ASSETS / "Weapons" / "HK416" / "hk416_assets.json")["reloads"],
+        review_note="Not checked in a match yet: the iron sights and the optics' aim (derived: tune with "
+                    "dev_optic_correction), recoil, reload timing and sounds (the PMAG 20's and 40's too), the look "
+                    "sway and sprint, the left hand in first and third person, the parts on its slots, the charm and "
+                    "the sticker.",
+    ),
 }
 
 MOUNT_BONE = "tag_sling"
@@ -2125,7 +2233,11 @@ def icon(weapon: Weapon, prefabs: Prefabs) -> None:
     """White silhouette of the addon's spawn icon, framed like the other 1024px HC1 gun icons."""
     from kastov_materials import load_vtf_texture  # kastov_materials puts SourceIO on the path
     pixels, width, height, _ = load_vtf_texture((EXTRACTED / f"{prefabs.icon_source}.vtf").read_bytes())
-    alpha = np.frombuffer(pixels, np.uint8).reshape(height, width, 4)[:, :, 3]
+    alpha = np.frombuffer(pixels, np.uint8).reshape(height, width, 4)[:, :, 3].copy()
+    if prefabs.icon_rows is not None:
+        first, last = prefabs.icon_rows
+        alpha[:first] = 0
+        alpha[last + 1:] = 0
     # The gun is opaque; the soft, semi-transparent rim around it is a drop shadow.
     ys, xs = np.nonzero(alpha > 192)
     crop = alpha[ys.min():ys.max() + 1, xs.min():xs.max() + 1]

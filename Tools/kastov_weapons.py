@@ -132,6 +132,11 @@ class Weapon:
     # Rig bones the addon leaves where the real gun has nothing: name -> (parent, local offset), the bone keeping its
     # own turn. MW2019's L86 rig has tag_brass in the handguard, under the bore, where no case could come out.
     moved_bones: dict[str, tuple[str, np.ndarray]] = field(default_factory=dict)
+    # Attachment models the MW base draws as a VElement instead of bone-merging them: the model's origin on a rig bone,
+    # moved by an offset along the bone's own axes (forward, left, up). path (as written in part_meshes or
+    # part_choices) -> (bone, offset). RoN's HK416 fits its Tarkov stocks that way: their vertices sit in the model's
+    # own space on an unnamed bone with no parent, which bone-merge has nothing to put on.
+    part_mounts: dict[str, tuple[str, np.ndarray]] = field(default_factory=dict)
 
 
 def kastov762_materials() -> dict[str, str]:
@@ -1262,8 +1267,95 @@ L85A2 = Weapon(
     left_grip=GripFit(shift=(0.0, 0.55, -0.55), fingers=0.4, thumb=0.1),
 )
 
+
+def hk416_materials() -> dict[str, str]:
+    # Built by hk416_assets.py.
+    assets = json.loads((ASSETS / "Weapons" / "HK416" / "hk416_assets.json").read_text(encoding="utf-8"))
+    return assets["materials"]
+
+
+_HK = "v_ron_hk416"
+_HK_BARREL = "v_ron_hk416_barrel"
+
+
+def _hk416_mag(folder: str, mesh: str, rounds: str = "hk416_fmj") -> str:
+    """A magazine with its rounds: the body (on j_mag1, and the reload's fresh one on j_mag2) and the top rounds of
+    each."""
+    return f"{folder}/{mesh}+{folder}/{rounds}_1.smd+{folder}/{rounds}_2.smd"
+
+
+# The HK416 A5 (5.56x45mm), with the 11-inch barrel: RoN's HK416 for the MW base ("[MW Unofficial] RON HK416 A5", Workshop
+# 3385630838), the model Ready or Not ships, with Escape from Tarkov's HK E1 and Slim Line stocks and its Magpul and HK
+# magazines. It's about the real gun's size: 29.3 in from the butt to the muzzle with the factory stock collapsed, where HK
+# USA gives 27.9 in for the 11-inch A5's, and its top rail is 0.814 wide (a Picatinny rail's 0.835). Its own rig, not a
+# CoD one, so its pieces are the viewmodel's bodygroups (vm_meshes), its barrel and magazines are bone-merged models, and
+# its Tarkov stocks are VElements (part_mounts).
+HK416 = Weapon(
+    name="hk416",
+    folder=ASSETS / "Weapons" / "HK416",
+    asset="weapons/hk416",
+    model="hk416",
+    decompiled=DECOMPILED / "hk416",
+    cod_anims=f"{_HK}/{_HK}_anims",
+    # The receiver, the handguard, the pistol grip, the charging handle, the bolt carrier and the loose round the
+    # reloads chamber (on j_magrel).
+    vm_meshes=[f"{_HK}/hk416_body.smd", f"{_HK}/hk416_handguard.smd", f"{_HK}/hk416_pistolgrip.smd",
+               f"{_HK}/hk416_chargerhandle.smd", f"{_HK}/hk416_bolt.smd", f"{_HK}/hk416_bullet_fmj.smd"],
+    part_meshes=[(f"{_HK_BARREL}/hk416_barrel.smd", f"{_HK_BARREL}/hk416_barrel.smd")],
+    part_choices={
+        # The magazine: HK's steel 30-rounder (the gun's own), then HK's polymer Gen 2 and Magpul's PMAG Gen M3 in 20,
+        # 30 (with its window) and 40 rounds. Left out: the pack's ISO and TAQ magazines (Tarkov's made-up ones) and the
+        # speed-pull loops.
+        "magazine": [
+            ("factory", _hk416_mag("ron_hk416_magazine", "hk416_magazine.smd", "hk416_FMJ")),
+            ("gen2", _hk416_mag("ron_hk416_gen2_magazine", "hk_gen_2_mags.smd", "hk416_FMJ")),
+            ("pmag20", _hk416_mag("ron_hk416_magpul_20rd", "mag_stanag_magpul_pmag_gen_m3_556x45_20_LOD0.smd")),
+            ("pmag30", _hk416_mag("ron_hk416_magpul_30rd", "magpul_mag_1.smd")),
+            ("pmag40", _hk416_mag("ron_hk416_magpul_40rd", "magpul_mag_40.smd")),
+        ],
+        # The stock: the viewmodel's own collapsible stock, then Tarkov's HK E1 and HK Slim Line. Left out: the pack's
+        # other stocks (other makers' AR stocks and an AK-12's).
+        "stock": [("factory", f"{_HK}/hk416_stock.smd"),
+                  ("e1", "hk416_eft_e1_stock/hk_e1.smd"),
+                  ("slim_line", "hk416_eft_slim_line_stock/hk_slim_line.smd")],
+    },
+    # The pack's lua (mg_base/modules/attachmentss/hk416_ron/stock/hk416_e1.lua, hk416_slim_line.lua): both on
+    # tag_stock_attach at Vector(0, 1.6, -0.07), which MoveVElement reads as 1.6 forward and 0.07 down.
+    part_mounts={
+        "hk416_eft_e1_stock/hk_e1.smd": ("tag_stock_attach", np.array([1.6, 0.0, -0.07])),
+        "hk416_eft_slim_line_stock/hk_slim_line.smd": ("tag_stock_attach", np.array([1.6, 0.0, -0.07])),
+    },
+    optional_meshes={
+        "muzzle_tip": (f"{_HK_BARREL}/hk416_muz.smd", f"{_HK_BARREL}/hk416_barrel.smd"),  # the flash hider
+        # HK's flip-up diopter sights raised, and folded down under an optic.
+        "iron_sights": (f"{_HK}/hk416_iro.smd", None),
+        "sight_folded": (f"{_HK}/hk416_iro_off.smd", None),
+        # The M-LOK rail section on the handguard's right side, under a laser. There's no Underbarrel slot (so no rail
+        # on the bottom): the left hand cups the handguard's underside from 6.5 to 10.4, and its bottom rail ends at 11.1.
+        "laser_rail": (f"{_HK}/mlok_right.smd", None),
+    },
+    extra_bones={
+        # 0.2 inside the front of the flash hider, on the bore (the rig's tag_flash is 0.8 inside it).
+        "muzzle": ("tag_barrel_attach", np.array([13.04, 0.0, -0.035])),
+        # Where the rifles' pistol grip mounts sit from the right wrist (as for the P90), on the centreline: 4.2 in front
+        # of the idle clip's wrist and 2.3 above it.
+        "tag_pistolgrip_attach": ("tag_sling", np.array([1.974, 0.0, -1.561])),
+    },
+    materials=hk416_materials,
+    # From the addon's lua/weapons/mg_ron_hk416/shared.lua: Idle (0, 0.5, 0) and Aim (0, 0.5, -0.18).
+    hip=view_offset((0.0, 0.5, 0.0)),
+    aim=view_offset((0.0, 0.5, -0.18)),
+    sprint=view_offset(),
+    m4_sprint=True,
+    ads_pose=("ads_in", slice(-1, None)),
+    ads_fire="fire_2",
+    reload_variants=["_smag", "_xmag"],
+    report_bones=["tag_flash", "tag_silencer", "tag_brass", "tag_reflex", "tag_holo", "tag_acog_2", "tag_sight_on",
+                  "tag_stock_attach", "tag_mag_attach", "tag_ik_loc_le", "tag_grip_hide"],
+)
+
 WEAPONS ={weapon.name: weapon for weapon in (KASTOV_762, KASTOV_74U, VITYAZ, RPK, BIZON, AK105, VEPR12, M16, P90,
-                                              MP7, AUG, UZI, FAL, FAMAS, M18, MCX, L85A2)}
+                                              MP7, AUG, UZI, FAL, FAMAS, M18, MCX, L85A2, HK416)}
 
 
 def add_argument(parser: argparse.ArgumentParser) -> None:

@@ -139,6 +139,11 @@ public static partial class GameText
 			"Britisches Bullpup-Gewehr im Kaliber 5,56x45 mm: das Dienstgewehr SA80, mit 20,4-Zoll-Lauf, offener Visierung auf einem Tragegriff und 30-Schuss-Magazin.",
 			"Fusil bullpup británico de 5,56x45 mm: el fusil reglamentario SA80, con cañón de 20,4 pulgadas, miras metálicas sobre un asa de transporte y cargador de 30 cartuchos.",
 			"Fuzil bullpup britânico 5,56x45 mm: o fuzil de serviço SA80, com cano de 20,4 polegadas, miras mecânicas sobre uma alça de transporte e carregador de 30 cartuchos." ),
+		["German 5.56x45mm carbine: a short-stroke piston rifle with an 11-inch barrel, flip-up sights and a gas regulator with a setting for a suppressor."] = (
+			"Carabine allemande en 5,56x45 mm : un fusil à piston à course courte avec un canon de 11 pouces, des organes de visée rabattables et un régulateur de gaz doté d'une position pour silencieux.",
+			"Deutscher Karabiner im Kaliber 5,56x45 mm: ein Gewehr mit Kurzhub-Gaskolben, 11-Zoll-Lauf, klappbarer Visierung und einem Gasregler mit einer Stellung für den Schalldämpfer.",
+			"Carabina alemana de 5,56x45 mm: un fusil de pistón de carrera corta con cañón de 11 pulgadas, miras abatibles y un regulador de gases con una posición para supresor.",
+			"Carabina alemã 5,56x45 mm: um fuzil de pistão de curso curto com cano de 11 polegadas, miras rebatíveis e um regulador de gases com uma posição para supressor." ),
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] = (
 			"Pistolet réglementaire américain en 9x19 mm : le P320 compact de l'US Army, avec un canon de 3,9 pouces et un chargeur de 17 cartouches.",
 			"Amerikanische Dienstpistole im Kaliber 9x19 mm: die kompakte P320 der US Army, mit 3,9-Zoll-Lauf und 17-Schuss-Magazin.",
@@ -501,6 +506,36 @@ public static partial class GameText
 			"O carregador de aço de 30 cartuchos do AKM. Muito mais rápido de trocar que o tambor. Recarga em 2,2 s (2,6 s vazio)." ),
 		["The AKS-74U's side-folding skeleton stock. 9% more recoil."] = ("La crosse squelette à pliage latéral de l'AKS-74U. Recul augmenté de 9 %.", "Der seitlich klappbare Skelettschaft der AKS-74U. 9 % mehr Rückstoß.", "La culata esqueletizada de plegado lateral del AKS-74U. Un 9 % más de retroceso.", "A coronha esqueletizada de dobra lateral do AKS-74U. 9% mais recuo."),
 		["The FAL Para's tubular folding stock. Lighter, with a thin buttplate. 5% more recoil."] = ("La crosse pliante tubulaire du FAL Para. Plus légère, avec une plaque de couche fine. Recul augmenté de 5 %.", "Der klappbare Rohrschaft des FAL Para. Leichter, mit dünner Schaftkappe. 5 % mehr Rückstoß.", "La culata plegable tubular del FAL Para. Más ligera, con una cantonera delgada. Un 5 % más de retroceso.", "A coronha dobrável tubular do FAL Para. Mais leve, com uma soleira fina. 5% mais recuo."),
+		["HK's E1 stock, with a broad rubber buttpad. Steadier against the shoulder. 5% less recoil."] = (
+			"La crosse E1 de HK, avec une large plaque de couche en caoutchouc. Plus stable à l'épaule. Recul réduit de 5 %.",
+			"Der E1-Schaft von HK, mit breiter Gummischaftkappe. Liegt ruhiger an der Schulter. 5 % weniger Rückstoß.",
+			"La culata E1 de HK, con una cantonera ancha de goma. Más estable contra el hombro. Un 5 % menos de retroceso.",
+			"A coronha E1 da HK, com uma soleira larga de borracha. Mais firme contra o ombro. 5% menos recuo." ),
+		["HK's Slim Line stock. Lighter and narrower, with a thin buttpad. 5% more recoil."] = (
+			"La crosse Slim Line de HK. Plus légère et plus étroite, avec une plaque de couche fine. Recul augmenté de 5 %.",
+			"Der Slim-Line-Schaft von HK. Leichter und schmaler, mit dünner Schaftkappe. 5 % mehr Rückstoß.",
+			"La culata Slim Line de HK. Más ligera y estrecha, con una cantonera delgada. Un 5 % más de retroceso.",
+			"A coronha Slim Line da HK. Mais leve e estreita, com uma soleira fina. 5% mais recuo." ),
+		["HK's polymer 30-round magazine. Lighter than the steel one. Standard reload speed."] = (
+			"Le chargeur polymère de 30 cartouches de HK. Plus léger que celui en acier. Vitesse de rechargement standard.",
+			"Das 30-Schuss-Polymermagazin von HK. Leichter als das Stahlmagazin. Normale Nachladezeit.",
+			"El cargador de polímero de 30 balas de HK. Más ligero que el de acero. Velocidad de recarga estándar.",
+			"O carregador de polímero de 30 cartuchos da HK. Mais leve que o de aço. Velocidade de recarga padrão." ),
+		["Magpul's short 20-round polymer magazine. Lighter and quicker to seat. Reloads in 2.07s (2.17s when empty)."] = (
+			"Le court chargeur polymère de 20 cartouches de Magpul. Plus léger et plus rapide à engager. Rechargement en 2,07 s (2,17 s à vide).",
+			"Das kurze 20-Schuss-Polymermagazin von Magpul. Leichter und schneller eingesetzt. Nachladen in 2,07 s (2,17 s wenn leer).",
+			"El cargador corto de polímero de 20 balas de Magpul. Más ligero y rápido de insertar. Recarga en 2,07 s (2,17 s en vacío).",
+			"O carregador curto de polímero de 20 cartuchos da Magpul. Mais leve e rápido de encaixar. Recarga em 2,07 s (2,17 s vazio)." ),
+		["Magpul's 30-round polymer magazine, with a window to count the rounds. Standard reload speed."] = (
+			"Le chargeur polymère de 30 cartouches de Magpul, avec une fenêtre pour compter les cartouches. Vitesse de rechargement standard.",
+			"Das 30-Schuss-Polymermagazin von Magpul, mit Sichtfenster zum Zählen der Patronen. Normale Nachladezeit.",
+			"El cargador de polímero de 30 balas de Magpul, con una ventana para contar los cartuchos. Velocidad de recarga estándar.",
+			"O carregador de polímero de 30 cartuchos da Magpul, com uma janela para contar os cartuchos. Velocidade de recarga padrão." ),
+		["Magpul's long 40-round polymer magazine. Heavier and slower to change. Reloads in 2.63s (3.13s when empty)."] = (
+			"Le long chargeur polymère de 40 cartouches de Magpul. Plus lourd et plus lent à changer. Rechargement en 2,63 s (3,13 s à vide).",
+			"Das lange 40-Schuss-Polymermagazin von Magpul. Schwerer und langsamer zu wechseln. Nachladen in 2,63 s (3,13 s wenn leer).",
+			"El cargador largo de polímero de 40 balas de Magpul. Más pesado y lento de cambiar. Recarga en 2,63 s (3,13 s en vacío).",
+			"O carregador longo de polímero de 40 cartuchos da Magpul. Mais pesado e lento de trocar. Recarga em 2,63 s (3,13 s vazio)." ),
 		["The RPK's heavy wooden stock. 12% less recoil."] = ("La lourde crosse en bois du RPK. Recul réduit de 12 %.", "Der schwere Holzschaft des RPK. 12 % weniger Rückstoß.", "La pesada culata de madera del RPK. Un 12 % menos de retroceso.", "A pesada coronha de madeira do RPK. 12% menos recuo."),
 		["The RPK's heavy wooden stock. 4% less recoil."] = ("La lourde crosse en bois du RPK. Recul réduit de 4 %.", "Der schwere Holzschaft des RPK. 4 % weniger Rückstoß.", "La pesada culata de madera del RPK. Un 4 % menos de retroceso.", "A pesada coronha de madeira do RPK. 4% menos recuo."),
 		["The RPK's own 40-round box magazine. Quicker to change than the drum. Reloads in 2.3s (2.8s when empty)."] = (

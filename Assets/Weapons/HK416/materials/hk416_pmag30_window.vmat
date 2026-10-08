@@ -1,0 +1,14 @@
+"Layer0"
+{
+	shader "shaders/complex.shader"
+	F_SPECULAR "1"
+	F_TRANSLUCENT "1"
+	g_flMetalness "0"
+	g_flRoughnessScaleFactor "1"
+	g_vColorTint "[1 1 1 1]"
+	TextureColor "weapons/hk416/materials/hk416_pmag30_window_color.png"
+	TextureNormal "materials/default/default_normal.tga"
+	TextureRoughness "weapons/hk416/materials/hk416_pmag30_window_roughness.png"
+	TextureTranslucency "weapons/hk416/materials/hk416_pmag30_window_opacity.png"
+	TextureAmbientOcclusion "materials/default/default_ao.tga"
+}

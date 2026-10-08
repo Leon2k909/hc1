@@ -133,10 +133,12 @@ def load_vtf(base: str, extracted: Path = EXTRACTED) -> np.ndarray:
 
 
 def build_material(name: str, base: str, out: Path = DEST / "materials", extracted: Path = EXTRACTED,
-                   translucent: bool = False) -> Path:
+                   translucent: bool = False, metalness_scale: float = 1.0) -> Path:
     """A complex.shader material from a pack's _rgb/_n/_e textures (extracted: the gmad-extracted pack; another pack
     that packs its textures the same way, like the M16's). A translucent material ($translucent in its vmt, like a
-    see-through magazine's strip) has opacity in the _rgb alpha instead of the metal mask."""
+    see-through magazine's strip) has opacity in the _rgb alpha instead of the metal mask. metalness_scale scales the
+    mask: where a pack's mask covers nearly everything and only darkens it to $color2 (RoN's HK416's .35), the
+    surface is 1 - $color2 metal, which leaves it the diffuse Source draws."""
     out.mkdir(parents=True, exist_ok=True)
     rgb = load_vtf(base + "_rgb", extracted)
     normal = load_vtf(base + "_n", extracted)
@@ -147,7 +149,8 @@ def build_material(name: str, base: str, out: Path = DEST / "materials", extract
     flipped[:, :, 1] = 255 - flipped[:, :, 1]
     Image.fromarray(flipped).save(out / f"{name}_normal.png")
     Image.fromarray(255 - exponent[:, :, 3]).save(out / f"{name}_roughness.png")
-    Image.fromarray(rgb[:, :, 3].copy()).save(out / f"{name}_{'opacity' if translucent else 'metalness'}.png")
+    mask = rgb[:, :, 3] if translucent else np.round(rgb[:, :, 3] * metalness_scale).astype(np.uint8)
+    Image.fromarray(mask.copy()).save(out / f"{name}_{'opacity' if translucent else 'metalness'}.png")
 
     vmat = out / f"{name}.vmat"
     rel = lambda suffix: asset_path(out / f"{name}_{suffix}.png")

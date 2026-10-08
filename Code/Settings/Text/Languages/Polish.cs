@@ -254,6 +254,8 @@ public static partial class GameText
 			"Francuski karabin bullpup kalibru 5,56x45 mm z 25-nabojowym magazynkiem, stałym chwytem transportowym i przełącznikiem ognia: ciągły, seria trzystrzałowa i pojedynczy.",
 		["British 5.56x45mm bullpup rifle: the SA80 service rifle, with a 20.4-inch barrel, iron sights on a carrying handle and a 30-round magazine."] =
 			"Brytyjski karabin bullpup kalibru 5,56x45 mm: służbowy karabin SA80, z lufą 20,4 cala, przyrządami celowniczymi na chwycie transportowym i 30-nabojowym magazynkiem.",
+		["German 5.56x45mm carbine: a short-stroke piston rifle with an 11-inch barrel, flip-up sights and a gas regulator with a setting for a suppressor."] =
+			"Niemiecki karabinek kalibru 5,56x45 mm: karabin z krótkoskokowym tłokiem gazowym, lufą 11 cali, składanymi przyrządami celowniczymi i regulatorem gazowym z nastawą do tłumika.",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"Amerykański pistolet służbowy kalibru 9x19 mm: kompaktowy P320 armii USA, z lufą 3,9 cala i 17-nabojowym magazynkiem.",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =
@@ -531,6 +533,18 @@ public static partial class GameText
 			"Składana na bok kolba szkieletowa z AKS-74U. Odrzut większy o 9%.",
 		["The FAL Para's tubular folding stock. Lighter, with a thin buttplate. 5% more recoil."] =
 			"Rurowa składana kolba z FAL Para. Lżejsza, z cienką stopką. Odrzut większy o 5%.",
+		["HK's E1 stock, with a broad rubber buttpad. Steadier against the shoulder. 5% less recoil."] =
+			"Kolba E1 firmy HK, z szeroką gumową stopką. Stabilniej leży w ramieniu. Odrzut mniejszy o 5%.",
+		["HK's Slim Line stock. Lighter and narrower, with a thin buttpad. 5% more recoil."] =
+			"Kolba Slim Line firmy HK. Lżejsza i węższa, z cienką stopką. Odrzut większy o 5%.",
+		["HK's polymer 30-round magazine. Lighter than the steel one. Standard reload speed."] =
+			"Polimerowy magazynek HK na 30 naboi. Lżejszy od stalowego. Standardowy czas przeładowania.",
+		["Magpul's short 20-round polymer magazine. Lighter and quicker to seat. Reloads in 2.07s (2.17s when empty)."] =
+			"Krótki polimerowy magazynek Magpul na 20 naboi. Lżejszy i szybciej się go wpina. Przeładowanie w 2,07 s (2,17 s, gdy pusty).",
+		["Magpul's 30-round polymer magazine, with a window to count the rounds. Standard reload speed."] =
+			"Polimerowy magazynek Magpul na 30 naboi, z okienkiem do liczenia naboi. Standardowy czas przeładowania.",
+		["Magpul's long 40-round polymer magazine. Heavier and slower to change. Reloads in 2.63s (3.13s when empty)."] =
+			"Długi polimerowy magazynek Magpul na 40 naboi. Cięższy i wolniej się go wymienia. Przeładowanie w 2,63 s (3,13 s, gdy pusty).",
 		["The RPK's heavy wooden stock. 12% less recoil."] = "Ciężka drewniana kolba RPK. Odrzut mniejszy o 12%.",
 		["The RPK's heavy wooden stock. 4% less recoil."] = "Ciężka drewniana kolba RPK. Odrzut mniejszy o 4%.",
 		["The RPK's own 40-round box magazine. Quicker to change than the drum. Reloads in 2.3s (2.8s when empty)."] =

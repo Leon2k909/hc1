@@ -58,6 +58,7 @@ GUN_KG = {
     "M18/weapon_m18": 0.95,           # M18 0.74 kg + a loaded 17
     "MCX/weapon_mcx": 3.4,            # MCX Virtus SBR 2.9 kg + a loaded 30
     "L85A2/weapon_l85a2": 4.7,        # L85A2 3.82 kg + the iron sights' carrying handle + a loaded 30
+    "HK416/weapon_hk416": 3.75,       # HK416 A5 11-inch 3.13 kg (HK USA's 6.9 lb) + HK's steel 30 loaded
 }
 
 
@@ -80,6 +81,7 @@ GUN_ROUND = {
     "kastov762": "7.62x39", "rpk": "7.62x39", "kastov74u": "5.45", "ak105": "5.45", "vityaz": "9x19", "uzi": "9x19",
     "vepr12": "12ga", "aug": "5.56", "famas": "5.56", "m16": "5.56", "m4a1": "5.56", "fal": "7.62x51",
     "scarh": "7.62x51", "mp5": "9x19", "m18": "9x19 M1152", "mcx": "5.56",
+    "hk416": "5.56",
 }
 
 # Empty magazines, kg, and how many rounds they hold. The AK-74's polymer 30 is 0.23 kg; the AKM's steel 30 0.33; the
@@ -102,6 +104,9 @@ OWN_MAGAZINES = {
     "famas": {"factory": (0.15, 25)},
     "m18": {"pi_papa320_mag": (0.075, 17), "pi_papa320_mag_ext": (0.085, 21)},
     "m16": {"standard": (0.117, 30), "smag": (0.08, 15), "xmag": (0.20, 45), "xmaglrg": (0.36, 60)},
+    # HK's steel 30 (~0.25 kg) and polymer 30 (~0.14); Magpul's PMAG Gen M3 20, 30 and 40 (3.9, 4.8 and 6.3 oz).
+    "hk416": {"factory": (0.25, 30), "gen2": (0.14, 30), "pmag20": (0.11, 20), "pmag30": (0.136, 30),
+              "pmag40": (0.18, 40)},
 }
 
 # AK-platform stocks and pistol grips, each on its own, kg: the AKS-74U's folding stock 0.35, the AK-74M's polymer
@@ -130,6 +135,8 @@ OWN_CHOICES = {
     "uzi": {"sm_uzulu_stock": 0.0, "sm_uzulu_stock_folded": 0.0, "sm_uzulu_stockh": 0.10},
     "m18": {"pi_papa320_slide": 0.0, "pi_papa320_slide_black": 0.0},  # the same slide in another finish
     "mcx": {"factory": 0.0, "thin": -0.06},  # SIG's thin folding stock, ~2 oz under its folding telescoping one
+    # Against the collapsible stock (~0.25 kg): HK's E1 with its rubber buttpad ~0.3, the Slim Line ~0.2.
+    "hk416": {"factory": 0.0, "e1": 0.05, "slim_line": -0.05},
 }
 
 # The MWII attachments shared across guns, by file stem, wherever they're fitted.

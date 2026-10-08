@@ -25,7 +25,7 @@ Hand IK: both arms solved onto their IK targets (bones on the gun that hold each
   turned to match, as the M4's are. On a clip's own frames it changes nothing; it keeps the hands on the gun while
   the gun sways, in every state.
 
-Run: python Tools/kastov_animgraph.py [--weapon kastov762|kastov74u|vityaz|rpk|bizon|ak105|vepr12|m16|p90|mp7|aug|uzi|fal|famas|m18|mcx|l85a2]
+Run: python Tools/kastov_animgraph.py [--weapon kastov762|kastov74u|vityaz|rpk|bizon|ak105|vepr12|m16|p90|mp7|aug|uzi|fal|famas|m18|mcx|l85a2|hk416]
 """
 
 from __future__ import annotations

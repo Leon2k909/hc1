@@ -1,0 +1,402 @@
+{
+  "RootObject": {
+    "__guid": "8957ffc1-cd9e-577a-aab7-e006604b9905",
+    "__version": 1,
+    "Flags": 0,
+    "Name": "weapon_hk416",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Tags": "player",
+    "Enabled": true,
+    "NetworkMode": 2,
+    "NetworkInterpolation": true,
+    "NetworkOrphaned": 0,
+    "OwnerTransfer": 1,
+    "Components": [
+      {
+        "__type": "Facepunch.Equipment",
+        "__guid": "afa85742-9e05-5bf1-be32-77d074c94578",
+        "__enabled": true,
+        "AimFovOffset": -5,
+        "CrosshairType": "Default",
+        "DeploySound": "weapons/hk416/sounds/hk416.raise.sound",
+        "Handedness": "Right",
+        "HoldType": "Rifle",
+        "MountedPrefab": {
+          "_type": "gameobject",
+          "prefab": "weapons/hk416/mount_hk416.prefab"
+        },
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Resource": "weapons/hk416/hk416.equip",
+        "LoadedMass": 3.75,
+        "SpeedPenalty": 40,
+        "UseCrosshair": true
+      },
+      {
+        "__type": "Facepunch.TagBinder",
+        "__guid": "99c60c6b-7b5a-5d8f-946c-9055192cb8e6",
+        "__enabled": true,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "756cc892-50f8-51de-9d84-4b70f7f44827",
+        "__version": 1,
+        "Flags": 0,
+        "Name": "Functions",
+        "Position": "0,0,0",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Tags": "",
+        "Enabled": true,
+        "NetworkMode": 2,
+        "NetworkInterpolation": true,
+        "NetworkOrphaned": 0,
+        "OwnerTransfer": 1,
+        "Components": [
+          {
+            "__type": "Facepunch.Lowerable",
+            "__guid": "c9b27191-72f5-52ea-aae1-ca68ee2e093b",
+            "__enabled": true,
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null
+          },
+          {
+            "__type": "Facepunch.WeaponAmmo",
+            "__guid": "a1f4cbd6-45a6-5f9a-a6a1-8c87ff62177c",
+            "__enabled": true,
+            "Ammo": 30,
+            "HasAmmo": true,
+            "MaxAmmo": 30,
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null
+          },
+          {
+            "__type": "Facepunch.Shootable",
+            "__guid": "872b6dd5-3924-5bb5-a1d5-7c392f7646a5",
+            "__enabled": true,
+            "AmmoComponent": {
+              "_type": "component",
+              "component_id": "a1f4cbd6-45a6-5f9a-a6a1-8c87ff62177c",
+              "go": "756cc892-50f8-51de-9d84-4b70f7f44827",
+              "component_type": "WeaponAmmo"
+            },
+            "BaseDamage": 20,
+            "BaseDamageFalloff": [
+              {
+                "x": 0,
+                "y": 1,
+                "in": 0,
+                "out": 0,
+                "mode": "Mirrored"
+              },
+              {
+                "x": 0.37202382,
+                "y": 0.91245157,
+                "in": 0.5832836,
+                "out": -0.5832836,
+                "mode": "Mirrored"
+              },
+              {
+                "x": 1,
+                "y": 0,
+                "in": 0,
+                "out": 0,
+                "mode": "Mirrored"
+              }
+            ],
+            "BloodEjectDistance": 512,
+            "BulletCount": 1,
+            "BulletSize": 8.0,
+            "BulletSpread": 0,
+            "BurstAmount": 3,
+            "BurstEndDelay": 0,
+            "CurrentFireMode": "Automatic",
+            "DryFireSound": "sounds/guns/handling/dryfire_rifle.sound",
+            "DryShootDelay": 0.15,
+            "EjectionPrefab": {
+              "_type": "gameobject",
+              "prefab": "prefabs/weapon_effects/556_spent_casing.prefab"
+            },
+            "FireModeSwitchDelay": 0.3,
+            "FireRate": 850,
+            "SuppressorFireRateScale": 1,
+            "InAirSpreadMultiplier": 2,
+            "InputActions": [
+              "Attack1"
+            ],
+            "MaxEffectsPlayDistance": 4194304,
+            "MaxRange": 8330,
+            "MaxRicochetAngle": 45,
+            "MuzzleFlashChance": 0.12,
+            "MuzzleFlashScale": 0.5,
+            "MuzzleSmokePrefab": {
+              "_type": "gameobject",
+              "prefab": "prefabs/weapon_effects/gun_smoke.prefab"
+            },
+            "MuzzleSmokeScale": 1.0,
+            "MuzzleFlashPrefab": {
+              "_type": "gameobject",
+              "prefab": "prefabs/weapon_effects/rifle_muzzleflash.prefab"
+            },
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "OnInputAction": null,
+            "PenetrationThickness": 32,
+            "PlayerVelocityLimit": 300,
+            "RequiresAllInputActions": false,
+            "RequiresHasAmmo": true,
+            "RicochetMaxHits": 2,
+            "ShootSound": "weapons/hk416/sounds/hk416.fire.sound",
+            "SupportedFireModes": [
+              "Automatic",
+              "Semi"
+            ],
+            "TracerEffect": null,
+            "VelocitySpreadScale": 0.25,
+            "SuppressedShootSound": "weapons/hk416/sounds/hk416.fire_suppressed.sound",
+            "SuppressedMuzzleFlashChance": 0,
+            "MuzzleVelocity": 826,
+            "DragFunction": "G7",
+            "BallisticCoefficient": 0.151,
+            "SightHeight": 2.85,
+            "ZeroRange": 300,
+            "BulletDiameter": 5.7,
+            "BulletLength": 23.0
+          },
+          {
+            "__type": "Facepunch.Reloadable",
+            "__guid": "44894a79-061b-5261-a85b-e0b0ac8fe011",
+            "__enabled": true,
+            "AmmoComponent": {
+              "_type": "component",
+              "component_id": "a1f4cbd6-45a6-5f9a-a6a1-8c87ff62177c",
+              "go": "756cc892-50f8-51de-9d84-4b70f7f44827",
+              "component_type": "WeaponAmmo"
+            },
+            "EmptyReloadSounds": {
+              "0.067": "weapons/hk416/sounds/hk416.reload_empty_rotate.sound",
+              "0.633": "weapons/hk416/sounds/hk416.magout.sound",
+              "1.333": "weapons/hk416/sounds/hk416.magin.sound",
+              "2": "weapons/hk416/sounds/hk416.kg_1_1.sound",
+              "2.333": "weapons/hk416/sounds/hk416.drop.sound"
+            },
+            "EmptyReloadTime": 2.73,
+            "InputActions": [
+              "Reload"
+            ],
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "OnInputAction": null,
+            "ReloadTime": 2.33,
+            "RequiresAllInputActions": false,
+            "SingleReload": false,
+            "TimedReloadSounds": {
+              "0.067": "weapons/hk416/sounds/hk416.reload_rotate.sound",
+              "0.3": "weapons/hk416/sounds/hk416.reload_magout_01.sound",
+              "0.667": "weapons/hk416/sounds/hk416.magout.sound",
+              "1.133": "weapons/hk416/sounds/hk416.magin.sound",
+              "1.767": "weapons/hk416/sounds/hk416.drop.sound"
+            }
+          },
+          {
+            "__type": "Facepunch.ShootRecoil",
+            "__guid": "69796932-b744-5c5a-83e2-a1dd83b81a09",
+            "__enabled": true,
+            "HorizontalSpread": "-5 5",
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "RecoilPattern": {
+              "Points": [
+                "0,4.93644",
+                "-0.0190115,4.661017",
+                "-0.09505701,4.322034",
+                "-0.2471485,4.067797",
+                "-0.3992395,3.855932",
+                "-0.513308,3.665254",
+                "-0.6273766,3.495763",
+                "-0.7794676,3.347458",
+                "-0.9505706,3.072034",
+                "-1.045627,2.838983",
+                "-1.140685,2.605932",
+                "-1.254753,2.330508",
+                "-1.292776,2.076271",
+                "-1.292776,1.779661",
+                "-1.311787,1.525424",
+                "-1.311787,1.313559",
+                "-1.273764,1.080508",
+                "-1.235741,0.8898305",
+                "-1.21673,0.7203389",
+                "-1.08365,0.5296611",
+                "-0.8745246,0.2966102",
+                "-0.7604561,0.2118644",
+                "-0.456274,0.06355932",
+                "-0.1711025,0.02118644"
+              ],
+              "LoopStart": 1,
+              "LoopEnd": 23,
+              "IsLooping": false
+            },
+            "ResetTime": 0.3,
+            "Scale": "1.66,4.14",
+            "UseRecoilPattern": true,
+            "VerticalSpread": "1 3"
+          },
+          {
+            "__type": "Facepunch.ManualOffset",
+            "__guid": "22f46ca1-e127-5cd3-9d31-bc35874f250e",
+            "__enabled": true,
+            "AimAngleOffset": "0,0,0",
+            "AimOffset": "0,0,0",
+            "InputActions": [
+              "Attack2"
+            ],
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "OnInputAction": null,
+            "RequiresAllInputActions": false,
+            "OpticAimCorrection": "1.617,0,-0.105"
+          },
+          {
+            "__type": "Facepunch.ViewPunch",
+            "__guid": "cb56953e-570b-518b-9326-fb4368abd54b",
+            "__enabled": true,
+            "AnglesOffset": "-0.4,-0.1,-0.5",
+            "Curve": [
+              {
+                "x": 0,
+                "y": 0,
+                "in": 0,
+                "out": 0,
+                "mode": "Mirrored"
+              },
+              {
+                "x": 0.21428572,
+                "y": 1,
+                "in": 0,
+                "out": 0,
+                "mode": "Mirrored"
+              },
+              {
+                "x": 1,
+                "y": 0,
+                "in": 0,
+                "out": 0,
+                "mode": "Mirrored"
+              }
+            ],
+            "Lifetime": 0.45,
+            "MaxAnglesOffset": "-0.7,0.1,0.5",
+            "MaxPositionOffset": "-0.5,-0.2,-0.75",
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "PositionOffset": "0.5,0.2,0.75"
+          },
+          {
+            "__type": "Facepunch.FovOffset",
+            "__guid": "b49758d1-edc5-5eba-9169-50159bf15a38",
+            "__enabled": true,
+            "Curve": [
+              {
+                "x": 0,
+                "y": 0,
+                "in": 0,
+                "out": 0,
+                "mode": "Mirrored"
+              },
+              {
+                "x": 0.15,
+                "y": 1,
+                "in": 0,
+                "out": 0,
+                "mode": "Mirrored"
+              },
+              {
+                "x": 1,
+                "y": 0,
+                "in": 0,
+                "out": 0,
+                "mode": "Mirrored"
+              }
+            ],
+            "Length": 0.1,
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "Size": 2
+          }
+        ],
+        "Children": []
+      }
+    ],
+    "__properties": {
+      "NetworkInterpolation": true,
+      "TimeScale": 1,
+      "WantsSystemScene": true,
+      "Metadata": {},
+      "NavMesh": {
+        "Enabled": false,
+        "IncludeStaticBodies": true,
+        "IncludeKeyframedBodies": true,
+        "EditorAutoUpdate": true,
+        "AgentHeight": 64,
+        "AgentRadius": 16,
+        "AgentStepSize": 18,
+        "AgentMaxSlope": 40,
+        "ExcludedBodies": "",
+        "IncludedBodies": ""
+      }
+    },
+    "__variables": []
+  },
+  "ResourceVersion": 2,
+  "ShowInMenu": false,
+  "MenuPath": null,
+  "MenuIcon": null,
+  "DontBreakAsTemplate": false,
+  "__references": [],
+  "__version": 2
+}

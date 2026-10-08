@@ -1,0 +1,33 @@
+{
+  "Name": "HK416 A5",
+  "Description": "German 5.56x45mm carbine: a short-stroke piston rifle with an 11-inch barrel, flip-up sights and a gas regulator with a setting for a suppressor.",
+  "Slot": "Primary",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": true,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/guns/hk416_01.png",
+  "IsPurchasable": true,
+  "Price": 2800,
+  "KillReward": 300,
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/hk416/weapon_hk416.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/hk416/wm_hk416.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/hk416/vm_hk416.prefab"
+  },
+  "WorldModel": "weapons/hk416/w_hk416.vmdl",
+  "ArmorReduction": null,
+  "HelmetReduction": null,
+  "WorldModelBodyGroups": 0,
+  "__references": [],
+  "__version": 0,
+  "Category": "AssaultRifle",
+  "GunsmithOffset": "0,0,4",
+  "ReviewNote": "Not checked in a match yet: the iron sights and the optics' aim (derived: tune with dev_optic_correction), recoil, reload timing and sounds (the PMAG 20's and 40's too), the look sway and sprint, the left hand in first and third person, the parts on its slots, the charm and the sticker."
+}

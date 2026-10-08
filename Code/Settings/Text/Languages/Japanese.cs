@@ -256,6 +256,8 @@ public static partial class GameText
 			"フランス製の5.56x45mmブルパップライフル。25発マガジンと固定式キャリングハンドルを備え、フルオート、3点バースト、セミオートを切り替えられる。",
 		["British 5.56x45mm bullpup rifle: the SA80 service rifle, with a 20.4-inch barrel, iron sights on a carrying handle and a 30-round magazine."] =
 			"イギリス製の5.56x45mmブルパップライフル。制式小銃SA80で、20.4インチ銃身、キャリングハンドル上のアイアンサイト、30発マガジンを備える。",
+		["German 5.56x45mm carbine: a short-stroke piston rifle with an 11-inch barrel, flip-up sights and a gas regulator with a setting for a suppressor."] =
+			"ドイツ製の5.56x45mmカービン。ショートストローク・ピストン式のライフルで、11インチ銃身、折りたたみ式サイト、サプレッサー用の設定を持つガスレギュレーターを備える。",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"米国の9x19mm制式拳銃。米陸軍のコンパクトなP320で、3.9インチ銃身と17発マガジンを備える。",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =
@@ -531,6 +533,18 @@ public static partial class GameText
 			"AKS-74Uの横折りたたみ式スケルトンストック。反動が9%増加。",
 		["The FAL Para's tubular folding stock. Lighter, with a thin buttplate. 5% more recoil."] =
 			"FAL Paraのパイプ型折りたたみストック。より軽く、バットプレートが薄い。反動が5%増加。",
+		["HK's E1 stock, with a broad rubber buttpad. Steadier against the shoulder. 5% less recoil."] =
+			"HKのE1ストック。幅広のラバー製バットパッドを備える。肩に当てたときに安定する。反動が5%減少。",
+		["HK's Slim Line stock. Lighter and narrower, with a thin buttpad. 5% more recoil."] =
+			"HKのSlim Lineストック。より軽く細身で、バットパッドが薄い。反動が5%増加。",
+		["HK's polymer 30-round magazine. Lighter than the steel one. Standard reload speed."] =
+			"HKのポリマー製30発マガジン。スチール製より軽い。リロード速度は標準。",
+		["Magpul's short 20-round polymer magazine. Lighter and quicker to seat. Reloads in 2.07s (2.17s when empty)."] =
+			"Magpulの短い20発ポリマーマガジン。より軽く、素早く装着できる。リロード時間2.07秒（空の状態から2.17秒）。",
+		["Magpul's 30-round polymer magazine, with a window to count the rounds. Standard reload speed."] =
+			"Magpulの30発ポリマーマガジン。残弾を数えられる窓が付いている。リロード速度は標準。",
+		["Magpul's long 40-round polymer magazine. Heavier and slower to change. Reloads in 2.63s (3.13s when empty)."] =
+			"Magpulの長い40発ポリマーマガジン。重く、交換に時間がかかる。リロード時間2.63秒（空の状態から3.13秒）。",
 		["The RPK's heavy wooden stock. 12% less recoil."] = "RPKの重い木製ストック。反動が12%減少。",
 		["The RPK's heavy wooden stock. 4% less recoil."] = "RPKの重い木製ストック。反動が4%減少。",
 		["The RPK's own 40-round box magazine. Quicker to change than the drum. Reloads in 2.3s (2.8s when empty)."] =

@@ -1,0 +1,35 @@
+{
+  "UI": false,
+  "Volume": "1",
+  "Pitch": "0.98 1.02",
+  "Decibels": 10000,
+  "SelectionMode": "Random",
+  "Sounds": [
+    "weapons/hk416/sounds/hk416_shot_01.vsnd",
+    "weapons/hk416/sounds/hk416_shot_02.vsnd",
+    "weapons/hk416/sounds/hk416_shot_03.vsnd",
+    "weapons/hk416/sounds/hk416_shot_04.vsnd"
+  ],
+  "Occlusion": false,
+  "AirAbsorption": true,
+  "Transmission": true,
+  "OcclusionRadius": 64,
+  "DistanceAttenuation": true,
+  "Distance": 13000,
+  "Falloff": [
+    {
+      "y": 1
+    },
+    {
+      "x": 0.23809524,
+      "y": 0.3583625,
+      "in": 1.329805,
+      "out": -1.329805
+    },
+    {
+      "x": 1
+    }
+  ],
+  "__references": [],
+  "__version": 1
+}

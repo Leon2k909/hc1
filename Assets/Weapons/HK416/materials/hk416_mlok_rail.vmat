@@ -1,0 +1,13 @@
+"Layer0"
+{
+	shader "shaders/complex.shader"
+	F_SPECULAR "1"
+	F_METALNESS_TEXTURE "1"
+	g_flRoughnessScaleFactor "1"
+	g_vColorTint "[1 1 1 1]"
+	TextureColor "weapons/hk416/materials/hk416_mlok_rail_color.png"
+	TextureNormal "weapons/hk416/materials/hk416_mlok_rail_normal.png"
+	TextureRoughness "weapons/hk416/materials/hk416_mlok_rail_roughness.png"
+	TextureMetalness "weapons/hk416/materials/hk416_mlok_rail_metalness.png"
+	TextureAmbientOcclusion "materials/default/default_ao.tga"
+}

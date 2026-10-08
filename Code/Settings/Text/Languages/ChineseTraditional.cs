@@ -253,6 +253,8 @@ public static partial class GameText
 			"法國製 5.56x45mm 無托步槍，配備 25 發彈匣與固定提把，可選全自動、三發點放與半自動射擊。",
 		["British 5.56x45mm bullpup rifle: the SA80 service rifle, with a 20.4-inch barrel, iron sights on a carrying handle and a 30-round magazine."] =
 			"英國製 5.56x45mm 無托步槍：SA80 制式步槍，配備 20.4 吋槍管、提把上的機械瞄具與 30 發彈匣。",
+		["German 5.56x45mm carbine: a short-stroke piston rifle with an 11-inch barrel, flip-up sights and a gas regulator with a setting for a suppressor."] =
+			"德國製 5.56x45mm 卡賓槍：短行程活塞式步槍，配備 11 吋槍管、折疊式機械瞄具與具消音器檔位的導氣調節器。",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"美國 9x19mm 制式手槍：美國陸軍的緊湊型 P320，配備 3.9 英吋槍管與 17 發彈匣。",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =
@@ -514,6 +516,18 @@ public static partial class GameText
 		["The AKS-74U's side-folding skeleton stock. 9% more recoil."] = "AKS-74U 的側折式骨架槍托。後座力增加 9%。",
 		["The FAL Para's tubular folding stock. Lighter, with a thin buttplate. 5% more recoil."] =
 			"FAL Para 的管狀折疊槍托。更輕，托底板更薄。後座力增加 5%。",
+		["HK's E1 stock, with a broad rubber buttpad. Steadier against the shoulder. 5% less recoil."] =
+			"HK 的 E1 槍托，附寬大的橡膠托底墊。抵肩更穩。後座力降低 5%。",
+		["HK's Slim Line stock. Lighter and narrower, with a thin buttpad. 5% more recoil."] =
+			"HK 的 Slim Line 槍托。更輕更窄，托底墊更薄。後座力增加 5%。",
+		["HK's polymer 30-round magazine. Lighter than the steel one. Standard reload speed."] =
+			"HK 的 30 發聚合物彈匣。比鋼製彈匣更輕。裝填速度標準。",
+		["Magpul's short 20-round polymer magazine. Lighter and quicker to seat. Reloads in 2.07s (2.17s when empty)."] =
+			"Magpul 的短款 20 發聚合物彈匣。更輕，插入更快。裝填需 2.07 秒（空倉時 2.17 秒）。",
+		["Magpul's 30-round polymer magazine, with a window to count the rounds. Standard reload speed."] =
+			"Magpul 的 30 發聚合物彈匣，附可查看餘彈的窗口。裝填速度標準。",
+		["Magpul's long 40-round polymer magazine. Heavier and slower to change. Reloads in 2.63s (3.13s when empty)."] =
+			"Magpul 的長款 40 發聚合物彈匣。更重，更換更慢。裝填需 2.63 秒（空倉時 3.13 秒）。",
 		["The RPK's heavy wooden stock. 12% less recoil."] = "RPK 的重型木製槍托。後座力降低 12%。",
 		["The RPK's heavy wooden stock. 4% less recoil."] = "RPK 的重型木製槍托。後座力降低 4%。",
 		["The RPK's own 40-round box magazine. Quicker to change than the drum. Reloads in 2.3s (2.8s when empty)."] =

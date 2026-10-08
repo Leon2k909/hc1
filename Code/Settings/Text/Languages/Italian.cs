@@ -254,6 +254,8 @@ public static partial class GameText
 			"Fucile bullpup francese in 5,56x45 mm con caricatore da 25 colpi, maniglia di trasporto fissa e selettore di fuoco automatico, a raffica da tre colpi e semiautomatico.",
 		["British 5.56x45mm bullpup rifle: the SA80 service rifle, with a 20.4-inch barrel, iron sights on a carrying handle and a 30-round magazine."] =
 			"Fucile bullpup britannico in 5,56x45 mm: il fucile d'ordinanza SA80, con canna da 20,4 pollici, mire metalliche su una maniglia di trasporto e caricatore da 30 colpi.",
+		["German 5.56x45mm carbine: a short-stroke piston rifle with an 11-inch barrel, flip-up sights and a gas regulator with a setting for a suppressor."] =
+			"Carabina tedesca in 5,56x45 mm: un fucile a pistone a corsa corta con canna da 11 pollici, mire abbattibili e un regolatore dei gas con una posizione per il silenziatore.",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"Pistola d'ordinanza statunitense in 9x19 mm: la P320 compatta dell'Esercito degli Stati Uniti, con canna da 3,9 pollici e caricatore da 17 colpi.",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =
@@ -534,6 +536,18 @@ public static partial class GameText
 			"Il calcio scheletrato a ripiegamento laterale dell'AKS-74U. Rinculo aumentato del 9%.",
 		["The FAL Para's tubular folding stock. Lighter, with a thin buttplate. 5% more recoil."] =
 			"Il calcio pieghevole tubolare del FAL Para. Più leggero, con un calciolo sottile. Rinculo aumentato del 5%.",
+		["HK's E1 stock, with a broad rubber buttpad. Steadier against the shoulder. 5% less recoil."] =
+			"Il calcio E1 di HK, con un ampio calciolo in gomma. Più stabile contro la spalla. Rinculo ridotto del 5%.",
+		["HK's Slim Line stock. Lighter and narrower, with a thin buttpad. 5% more recoil."] =
+			"Il calcio Slim Line di HK. Più leggero e stretto, con un calciolo sottile. Rinculo aumentato del 5%.",
+		["HK's polymer 30-round magazine. Lighter than the steel one. Standard reload speed."] =
+			"Il caricatore in polimero da 30 colpi di HK. Più leggero di quello in acciaio. Velocità di ricarica standard.",
+		["Magpul's short 20-round polymer magazine. Lighter and quicker to seat. Reloads in 2.07s (2.17s when empty)."] =
+			"Il corto caricatore in polimero da 20 colpi di Magpul. Più leggero e più rapido da inserire. Ricarica in 2,07 s (2,17 s a vuoto).",
+		["Magpul's 30-round polymer magazine, with a window to count the rounds. Standard reload speed."] =
+			"Il caricatore in polimero da 30 colpi di Magpul, con una finestrella per contare i colpi. Velocità di ricarica standard.",
+		["Magpul's long 40-round polymer magazine. Heavier and slower to change. Reloads in 2.63s (3.13s when empty)."] =
+			"Il lungo caricatore in polimero da 40 colpi di Magpul. Più pesante e più lento da cambiare. Ricarica in 2,63 s (3,13 s a vuoto).",
 		["The RPK's heavy wooden stock. 12% less recoil."] =
 			"Il pesante calcio in legno dell'RPK. Rinculo ridotto del 12%.",
 		["The RPK's heavy wooden stock. 4% less recoil."] =

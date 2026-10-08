@@ -253,6 +253,8 @@ public static partial class GameText
 			"Французская винтовка-буллпап под патрон 5,56x45 мм с магазином на 25 патронов, несъёмной ручкой для переноски и переводчиком огня: автоматический, очередями по три выстрела и одиночный.",
 		["British 5.56x45mm bullpup rifle: the SA80 service rifle, with a 20.4-inch barrel, iron sights on a carrying handle and a 30-round magazine."] =
 			"Британская винтовка-буллпап под патрон 5,56x45 мм: штатная винтовка SA80 со стволом 20,4 дюйма, открытым прицелом на ручке для переноски и магазином на 30 патронов.",
+		["German 5.56x45mm carbine: a short-stroke piston rifle with an 11-inch barrel, flip-up sights and a gas regulator with a setting for a suppressor."] =
+			"Немецкий карабин под патрон 5,56x45 мм: винтовка с коротким ходом газового поршня, стволом 11 дюймов, откидным прицелом и газовым регулятором с положением для глушителя.",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"Американский штатный пистолет под патрон 9x19 мм: компактный P320 армии США со стволом 3,9 дюйма и магазином на 17 патронов.",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =
@@ -531,6 +533,18 @@ public static partial class GameText
 			"Скелетный приклад AKS-74U, складывающийся вбок. Отдача сильнее на 9%.",
 		["The FAL Para's tubular folding stock. Lighter, with a thin buttplate. 5% more recoil."] =
 			"Трубчатый складной приклад FAL Para. Легче, с тонким затыльником. Отдача сильнее на 5%.",
+		["HK's E1 stock, with a broad rubber buttpad. Steadier against the shoulder. 5% less recoil."] =
+			"Приклад E1 от HK с широким резиновым затыльником. Устойчивее упирается в плечо. Отдача слабее на 5%.",
+		["HK's Slim Line stock. Lighter and narrower, with a thin buttpad. 5% more recoil."] =
+			"Приклад Slim Line от HK. Легче и уже, с тонким затыльником. Отдача сильнее на 5%.",
+		["HK's polymer 30-round magazine. Lighter than the steel one. Standard reload speed."] =
+			"Полимерный магазин HK на 30 патронов. Легче стального. Обычная скорость перезарядки.",
+		["Magpul's short 20-round polymer magazine. Lighter and quicker to seat. Reloads in 2.07s (2.17s when empty)."] =
+			"Короткий полимерный магазин Magpul на 20 патронов. Легче и быстрее вставляется. Перезарядка за 2,07 с (2,17 с, если магазин пуст).",
+		["Magpul's 30-round polymer magazine, with a window to count the rounds. Standard reload speed."] =
+			"Полимерный магазин Magpul на 30 патронов с окошком для подсчёта патронов. Обычная скорость перезарядки.",
+		["Magpul's long 40-round polymer magazine. Heavier and slower to change. Reloads in 2.63s (3.13s when empty)."] =
+			"Длинный полимерный магазин Magpul на 40 патронов. Тяжелее и меняется медленнее. Перезарядка за 2,63 с (3,13 с, если магазин пуст).",
 		["The RPK's heavy wooden stock. 12% less recoil."] = "Тяжёлый деревянный приклад RPK. Отдача слабее на 12%.",
 		["The RPK's heavy wooden stock. 4% less recoil."] = "Тяжёлый деревянный приклад RPK. Отдача слабее на 4%.",
 		["The RPK's own 40-round box magazine. Quicker to change than the drum. Reloads in 2.3s (2.8s when empty)."] =

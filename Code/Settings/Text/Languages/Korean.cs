@@ -256,6 +256,8 @@ public static partial class GameText
 			"프랑스제 5.56x45mm 불펍 소총으로, 25발 탄창과 고정식 운반 손잡이를 갖췄고 자동, 3점사, 반자동을 선택할 수 있습니다.",
 		["British 5.56x45mm bullpup rifle: the SA80 service rifle, with a 20.4-inch barrel, iron sights on a carrying handle and a 30-round magazine."] =
 			"영국제 5.56x45mm 불펍 소총으로, SA80 제식 소총입니다. 20.4인치 총열, 운반 손잡이 위의 기계식 조준기, 30발 탄창을 갖췄습니다.",
+		["German 5.56x45mm carbine: a short-stroke piston rifle with an 11-inch barrel, flip-up sights and a gas regulator with a setting for a suppressor."] =
+			"독일제 5.56x45mm 카빈으로, 쇼트 스트로크 피스톤식 소총입니다. 11인치 총열, 접이식 조준기, 소음기용 설정이 있는 가스 조절기를 갖췄습니다.",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"미국의 9x19mm 제식 권총으로, 미 육군의 컴팩트형 P320이며 3.9인치 총열과 17발 탄창을 갖췄습니다.",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =
@@ -531,6 +533,18 @@ public static partial class GameText
 			"AKS-74U의 측면 접이식 스켈레톤 개머리판입니다. 반동이 9% 증가합니다.",
 		["The FAL Para's tubular folding stock. Lighter, with a thin buttplate. 5% more recoil."] =
 			"FAL Para의 관형 접이식 개머리판입니다. 더 가볍고 버트플레이트가 얇습니다. 반동이 5% 증가합니다.",
+		["HK's E1 stock, with a broad rubber buttpad. Steadier against the shoulder. 5% less recoil."] =
+			"HK의 E1 개머리판으로, 넓은 고무 개머리 패드를 갖췄습니다. 어깨에 더 안정적으로 밀착됩니다. 반동이 5% 감소합니다.",
+		["HK's Slim Line stock. Lighter and narrower, with a thin buttpad. 5% more recoil."] =
+			"HK의 Slim Line 개머리판입니다. 더 가볍고 좁으며 개머리 패드가 얇습니다. 반동이 5% 증가합니다.",
+		["HK's polymer 30-round magazine. Lighter than the steel one. Standard reload speed."] =
+			"HK의 폴리머 30발 탄창입니다. 강철 탄창보다 가볍습니다. 재장전 속도는 표준입니다.",
+		["Magpul's short 20-round polymer magazine. Lighter and quicker to seat. Reloads in 2.07s (2.17s when empty)."] =
+			"Magpul의 짧은 20발 폴리머 탄창입니다. 더 가볍고 빨리 끼울 수 있습니다. 재장전에 2.07초가 걸립니다(빈 탄창일 때 2.17초).",
+		["Magpul's 30-round polymer magazine, with a window to count the rounds. Standard reload speed."] =
+			"Magpul의 30발 폴리머 탄창으로, 남은 탄을 셀 수 있는 창이 있습니다. 재장전 속도는 표준입니다.",
+		["Magpul's long 40-round polymer magazine. Heavier and slower to change. Reloads in 2.63s (3.13s when empty)."] =
+			"Magpul의 긴 40발 폴리머 탄창입니다. 더 무겁고 교체가 느립니다. 재장전에 2.63초가 걸립니다(빈 탄창일 때 3.13초).",
 		["The RPK's heavy wooden stock. 12% less recoil."] = "RPK의 무거운 목제 개머리판입니다. 반동이 12% 감소합니다.",
 		["The RPK's heavy wooden stock. 4% less recoil."] = "RPK의 무거운 목제 개머리판입니다. 반동이 4% 감소합니다.",
 		["The RPK's own 40-round box magazine. Quicker to change than the drum. Reloads in 2.3s (2.8s when empty)."] =

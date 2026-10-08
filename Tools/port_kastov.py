@@ -23,7 +23,7 @@ Inputs that are not in the repo:
   HC1_GLTF    Source2Viewer glTF exports (with animations) of the cloud models v_m4a1.vmdl (its IdlePose is HC1's
               rifle grip, the retarget reference) and v_first_person_arms_human.vmdl (preview render only).
 
-Run: python Tools/port_kastov.py [--weapon kastov762|kastov74u|vityaz|rpk|bizon|ak105|vepr12|m16|p90|mp7|aug|uzi|fal|famas|m18|mcx|l85a2]
+Run: python Tools/port_kastov.py [--weapon kastov762|kastov74u|vityaz|rpk|bizon|ak105|vepr12|m16|p90|mp7|aug|uzi|fal|famas|m18|mcx|l85a2|hk416]
      [--preview]
 """
 
@@ -752,12 +752,13 @@ class Kastov:
         only the rest: some of MW2019's meshes carry a second copy of a piece in another material (the AUG's).
         Paths joined by + are one piece from several models on one skeleton (the M18's slide and its sights, which
         its attachment model has as a bodygroup), each placed by its own reference pose when the reference is the
-        path itself."""
+        path itself. A model in Weapon.part_mounts is placed on its rig bone instead, as the MW base's VElements are."""
         if "+" in path:
             pieces = path.split("+")
             references = pieces if reference_path == path else [reference_path] * len(pieces)
             return [triangle for piece, reference in zip(pieces, references)
                     for triangle in self.part_triangles(piece, reference)]
+        mount = self.weapon.part_mounts.get(path)
         path, _, materials = path.partition("@")
         path, _, bones = path.partition("#")
         smd = Smd(self.decompiled / path)
@@ -774,10 +775,10 @@ class Kastov:
                                 for *_, links in vertices for bone, weight in links) == keep]
         bind = smd.world(smd.dense_frames()[0])
         ref_world = self.part_reference(reference_path) if reference_path is not None else None
-        return [(material, [self._vertex(vertex, smd, bind, ref_world) for vertex in vertices])
+        return [(material, [self._vertex(vertex, smd, bind, ref_world, mount) for vertex in vertices])
                 for material, vertices in triangles]
 
-    def _vertex(self, vertex, smd: Smd, bind: list[np.ndarray], part_pose):
+    def _vertex(self, vertex, smd: Smd, bind: list[np.ndarray], part_pose, mount=None):
         position, normal, uv, links = vertex
         new_position = np.zeros(3)
         new_normal = np.zeros(3)
@@ -785,7 +786,12 @@ class Kastov:
         for bone, weight in links:
             name = smd.name(bone)
             target, extra = name, np.eye(4)
-            if part_pose is not None:
+            if mount is not None:
+                # A VElement (Weapon.part_mounts): the model's origin at the rig bone, moved by the offset along the
+                # bone's own axes, and every vertex where the model's own bind pose puts it from that origin.
+                target, offset = mount
+                extra = matrix(offset, np.eye(3)) @ bind[bone]
+            elif part_pose is not None:
                 # Bones missing from the viewmodel follow their nearest merged ancestor, as bone-merge does, and so do
                 # Weapon.unmerged_bones.
                 current = bone
