@@ -257,6 +257,12 @@ public static partial class GameText
 			"Немецкий карабин под патрон 5,56x45 мм: винтовка с коротким ходом газового поршня, стволом 11 дюймов, откидным прицелом и газовым регулятором с положением для глушителя.",
 		["Russian 5.45x39mm assault rifle: the Kalashnikov of 2018, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
 			"Российский автомат под патрон 5,45x39 мм: «Калашников» 2018 года, с планками на крышке ствольной коробки и цевье, складным телескопическим прикладом и режимом очереди по два выстрела.",
+		["Russian 7.62x39mm assault rifle: the AK-12 in the AKM's round, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
+			"Российский автомат калибра 7,62x39 мм: AK-12 под патрон AKM, с планками на крышке ствольной коробки и цевье, складным телескопическим прикладом и режимом очереди по два выстрела.",
+		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
+			"Стальной магазин AKM с рёбрами на 30 патронов. Обычная скорость перезарядки.",
+		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =
+			"Магазин RPK на 40 патронов. Длиннее и тяжелее, его дольше менять. Перезарядка за 2,4 с (2,75 с, если магазин пуст).",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"Американский штатный пистолет под патрон 9x19 мм: компактный P320 армии США со стволом 3,9 дюйма и магазином на 17 патронов.",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =

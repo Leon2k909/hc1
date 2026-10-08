@@ -1,0 +1,33 @@
+{
+  "Name": "AK-15",
+  "Description": "Russian 7.62x39mm assault rifle: the AK-12 in the AKM's round, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst.",
+  "Slot": "Primary",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": true,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/guns/ak15_01.png",
+  "IsPurchasable": true,
+  "Price": 2700,
+  "KillReward": 300,
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/ak15/weapon_ak15.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/ak15/wm_ak15.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/ak15/vm_ak15.prefab"
+  },
+  "WorldModel": "weapons/ak15/w_ak15.vmdl",
+  "ArmorReduction": null,
+  "HelmetReduction": null,
+  "WorldModelBodyGroups": 0,
+  "__references": [],
+  "__version": 0,
+  "Category": "AssaultRifle",
+  "GunsmithOffset": "0,0,4",
+  "ReviewNote": "Not checked in a match yet: the iron sights and the optics' aim (derived: tune with dev_optic_correction), recoil, the two-round burst, reload timing and sounds (the RPK 40's too), the look sway and sprint, the left hand in first and third person, the parts on its slots, the charm and the sticker."
+}

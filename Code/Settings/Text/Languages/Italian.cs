@@ -258,6 +258,12 @@ public static partial class GameText
 			"Carabina tedesca in 5,56x45 mm: un fucile a pistone a corsa corta con canna da 11 pollici, mire abbattibili e un regolatore dei gas con una posizione per il silenziatore.",
 		["Russian 5.45x39mm assault rifle: the Kalashnikov of 2018, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
 			"Fucile d'assalto russo in 5,45x39 mm: il Kalashnikov del 2018, con coperchio della culatta e paramano con slitte, calcio pieghevole e telescopico e raffica da due colpi.",
+		["Russian 7.62x39mm assault rifle: the AK-12 in the AKM's round, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
+			"Fucile d'assalto russo in 7,62x39 mm: l'AK-12 nella cartuccia dell'AKM, con coperchio della culatta e paramano con slitte, calcio pieghevole e telescopico e raffica da due colpi.",
+		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
+			"Il caricatore in acciaio nervato da 30 colpi dell'AKM. Velocità di ricarica standard.",
+		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =
+			"Il caricatore da 40 colpi dell'RPK. Più lungo e pesante da cambiare. Ricarica in 2,4 s (2,75 s a vuoto).",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"Pistola d'ordinanza statunitense in 9x19 mm: la P320 compatta dell'Esercito degli Stati Uniti, con canna da 3,9 pollici e caricatore da 17 colpi.",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =

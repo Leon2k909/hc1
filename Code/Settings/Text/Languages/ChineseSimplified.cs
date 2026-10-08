@@ -860,6 +860,12 @@ public static partial class GameText
 			"德国制5.56x45毫米卡宾枪：短行程活塞式步枪，配11英寸枪管、折叠式机械瞄具和带消音器档位的导气调节器。",
 		["Russian 5.45x39mm assault rifle: the Kalashnikov of 2018, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
 			"俄制5.45x39毫米突击步枪：2018年的卡拉什尼科夫，配带导轨的机匣盖和护木、折叠伸缩式枪托以及两发点射。",
+		["Russian 7.62x39mm assault rifle: the AK-12 in the AKM's round, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
+			"俄制7.62x39毫米突击步枪：使用AKM弹药的AK-12，配带导轨的机匣盖和护木、折叠伸缩式枪托以及两发点射。",
+		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
+			"AKM的带加强筋钢制30发弹匣。装填速度标准。",
+		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =
+			"RPK的40发弹匣。更长更重，更换起来更费时。装填用时2.4秒（空仓2.75秒）。",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"美国9x19毫米制式手枪：美国陆军的紧凑型P320，配3.9英寸枪管和17发弹匣。",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =

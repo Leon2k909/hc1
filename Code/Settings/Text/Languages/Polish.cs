@@ -258,6 +258,12 @@ public static partial class GameText
 			"Niemiecki karabinek kalibru 5,56x45 mm: karabin z krótkoskokowym tłokiem gazowym, lufą 11 cali, składanymi przyrządami celowniczymi i regulatorem gazowym z nastawą do tłumika.",
 		["Russian 5.45x39mm assault rifle: the Kalashnikov of 2018, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
 			"Rosyjski karabinek automatyczny kalibru 5,45x39 mm: Kałasznikow z 2018 roku, z szynami na pokrywie komory zamkowej i łożu, składaną i teleskopową kolbą oraz serią dwustrzałową.",
+		["Russian 7.62x39mm assault rifle: the AK-12 in the AKM's round, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
+			"Rosyjski karabinek automatyczny kalibru 7,62x39 mm: AK-12 na nabój AKM, z szynami na pokrywie komory zamkowej i łożu, składaną i teleskopową kolbą oraz serią dwustrzałową.",
+		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
+			"Żebrowany stalowy magazynek AKM na 30 naboi. Standardowy czas przeładowania.",
+		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =
+			"Magazynek RPK na 40 naboi. Dłuższy i cięższy, więc wymiana trwa dłużej. Przeładowanie w 2,4 s (2,75 s, gdy pusty).",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"Amerykański pistolet służbowy kalibru 9x19 mm: kompaktowy P320 armii USA, z lufą 3,9 cala i 17-nabojowym magazynkiem.",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =

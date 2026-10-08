@@ -260,6 +260,12 @@ public static partial class GameText
 			"ドイツ製の5.56x45mmカービン。ショートストローク・ピストン式のライフルで、11インチ銃身、折りたたみ式サイト、サプレッサー用の設定を持つガスレギュレーターを備える。",
 		["Russian 5.45x39mm assault rifle: the Kalashnikov of 2018, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
 			"ロシア製の5.45x39mmアサルトライフル。2018年のカラシニコフで、レイル付きのダストカバーとハンドガード、折りたたみ・伸縮式ストック、2点バーストを備える。",
+		["Russian 7.62x39mm assault rifle: the AK-12 in the AKM's round, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
+			"ロシア製の7.62x39mmアサルトライフル。AKMの弾薬を使うAK-12で、レイル付きのダストカバーとハンドガード、折りたたみ・伸縮式ストック、2点バーストを備える。",
+		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
+			"AKMのリブ付きスチール製30発マガジン。リロード速度は標準。",
+		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =
+			"RPKの40発マガジン。長く重いため交換に時間がかかる。リロード時間2.4秒（空の状態から2.75秒）。",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"米国の9x19mm制式拳銃。米陸軍のコンパクトなP320で、3.9インチ銃身と17発マガジンを備える。",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =

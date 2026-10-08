@@ -260,6 +260,12 @@ public static partial class GameText
 			"독일제 5.56x45mm 카빈으로, 쇼트 스트로크 피스톤식 소총입니다. 11인치 총열, 접이식 조준기, 소음기용 설정이 있는 가스 조절기를 갖췄습니다.",
 		["Russian 5.45x39mm assault rifle: the Kalashnikov of 2018, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
 			"러시아제 5.45x39mm 돌격소총으로, 2018년의 칼라시니코프입니다. 레일이 달린 기관부 덮개와 핸드가드, 접이식 신축 개머리판, 2점사를 갖췄습니다.",
+		["Russian 7.62x39mm assault rifle: the AK-12 in the AKM's round, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
+			"러시아제 7.62x39mm 돌격소총으로, AKM의 탄약을 쓰는 AK-12입니다. 레일이 달린 기관부 덮개와 핸드가드, 접이식 신축 개머리판, 2점사를 갖췄습니다.",
+		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
+			"AKM의 리브가 있는 강철 30발 탄창입니다. 재장전 속도는 표준입니다.",
+		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =
+			"RPK의 40발 탄창입니다. 더 길고 무거워 교체하기 번거롭습니다. 재장전에 2.4초가 걸립니다(빈 탄창일 때 2.75초).",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"미국의 9x19mm 제식 권총으로, 미 육군의 컴팩트형 P320이며 3.9인치 총열과 17발 탄창을 갖췄습니다.",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =

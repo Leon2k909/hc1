@@ -738,6 +738,12 @@ public static partial class GameText
 			"Alman yapımı 5,56x45 mm karabina: kısa kurslu pistonlu bir tüfek; 11 inçlik namlu, katlanır nişangâhlar ve susturucu için ayarı olan bir gaz regülatörü.",
 		["Russian 5.45x39mm assault rifle: the Kalashnikov of 2018, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
 			"Rus yapımı 5,45x39 mm saldırı tüfeği: 2018'in Kalaşnikof'u; raylı mekanizma kapağı ve el kundağı, katlanır ve teleskopik dipçik ve iki atımlık seri atış.",
+		["Russian 7.62x39mm assault rifle: the AK-12 in the AKM's round, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
+			"Rus yapımı 7,62x39 mm saldırı tüfeği: AKM'nin fişeğini kullanan AK-12; raylı mekanizma kapağı ve el kundağı, katlanır ve teleskopik dipçik ve iki atımlık seri atış.",
+		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
+			"AKM'nin 30 mermilik nervürlü çelik şarjörü. Standart yeniden doldurma hızı.",
+		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =
+			"RPK'nin 40 mermilik şarjörü. Daha uzun ve ağır, değiştirmesi zor. Yeniden doldurma 2,4 sn (boşken 2,75 sn).",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"ABD'nin 9x19 mm hizmet tabancası: ABD Ordusu'nun kompakt P320'si, 3,9 inç namlu ve 17 fişeklik şarjörle.",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =

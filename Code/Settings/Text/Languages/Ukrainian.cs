@@ -266,6 +266,12 @@ public static partial class GameText
 			"Німецький карабін під набій 5,56x45 мм: гвинтівка з коротким ходом газового поршня, стволом 11 дюймів, відкидним прицілом і газовим регулятором із положенням для глушника.",
 		["Russian 5.45x39mm assault rifle: the Kalashnikov of 2018, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
 			"Російський автомат під набій 5,45x39 мм: «Калашников» 2018 року, з планками на кришці ствольної коробки та цівці, складаним телескопічним прикладом і режимом черги по два постріли.",
+		["Russian 7.62x39mm assault rifle: the AK-12 in the AKM's round, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
+			"Російський автомат калібру 7,62x39 мм: AK-12 під набій AKM, з планками на кришці ствольної коробки та цівці, складаним телескопічним прикладом і режимом черги по два постріли.",
+		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
+			"Сталевий магазин AKM із ребрами на 30 набоїв. Звичайна швидкість перезарядки.",
+		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =
+			"Магазин RPK на 40 набоїв. Довший і важчий у заміні. Перезарядка — 2,4 с (2,75 с, якщо порожній).",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"Американський штатний пістолет під набій 9x19 мм: компактний P320 армії США зі стволом 3,9 дюйма та магазином на 17 набоїв.",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =

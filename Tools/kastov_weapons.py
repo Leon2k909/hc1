@@ -1417,8 +1417,59 @@ AK12 = Weapon(
     grip_pose="a_delta_barhvyshort_additive_for_offset",
 )
 
+
+def ak15_materials() -> dict[str, str]:
+    # Built by ak15_assets.py: the AK-12's, its own magazine and rounds, and the RPK's AKM and RPK magazines.
+    assets = json.loads((ASSETS / "Weapons" / "AK15" / "ak15_assets.json").read_text(encoding="utf-8"))
+    return assets["materials"]
+
+
+def _rkilo_part(model: str) -> tuple[str, str]:
+    """A part_choices entry for one of the RPK's own magazine models (decompiled to easy_att_vm_p04_<model>), from
+    another gun's decompile."""
+    choice, path = _rkilo(model, f"easy_att_vm_p04_{model}")
+    return choice, f"../rkilo/{path}"
+
+
+# The AK-15 (7.62x39mm, Kalashnikov's 6P71): the AK-12 in 7.62, with the same receiver, furniture, sights and brake
+# on a 7.62 barrel, so it's the AK-12's model and rig (above) with Tarkov's AK-103 polymer 30-round magazine and 7.62
+# rounds in place of the 5.45 magazine (Tools/ak15_rig.py writes rig/ak15_mag.smd).
+AK15 = Weapon(
+    name="ak15",
+    folder=ASSETS / "Weapons" / "AK15",
+    asset="weapons/ak15",
+    model="ak15",
+    decompiled=DECOMPILED / "ak12",
+    cod_anims="../akilo105/vm_iw9_akilo105_anims",
+    vm_meshes=[f"{_AK12_RIG}/ak12_receiver.smd"],
+    part_meshes=[],
+    optional_meshes={
+        "muzzle_tip": (f"{_AK12_RIG}/ak12_brake.smd", None),
+        "iron_sights": (f"{_AK12_RIG}/ak12_rear_sight.smd", None),
+    },
+    extra_bones={"muzzle": ("tag_sling", np.array([28.22, 0.573, 1.03]))},
+    materials=ak15_materials,
+    hip=view_offset(),
+    # The AK-12's: the same sights on the same receiver.
+    aim=view_offset((-0.009, 0.0, -0.234), (0.095, 0.0, 0.0)),
+    sprint=view_offset(),
+    m4_sprint=True,
+    ads_pose=("ads_in", slice(-1, None)),
+    report_bones=["tag_brass", "tag_mag_attach", "tag_stock_attach", "tag_pistolgrip_attach"],
+    part_choices={
+        "pistol_grip": AK12.part_choices["pistol_grip"],
+        # Its own AK-103 magazine, then the 7.62x39 magazines it takes: the AKM's 30-round steel one and the RPK's 40
+        # (the RPK's models).
+        "magazine": [("factory", f"{_AK12_RIG}/ak15_mag.smd"), _rkilo_part("ar_akilo_mag_v0"),
+                     _rkilo_part("ar_akilo_xmag_v0")],
+    },
+    # The RPK 40 reloads with the AK-105's 45-round clips, the nearest in length.
+    reload_variants=["_xmag"],
+    grip_pose="a_delta_barhvyshort_additive_for_offset",
+)
+
 WEAPONS ={weapon.name: weapon for weapon in (KASTOV_762, KASTOV_74U, VITYAZ, RPK, BIZON, AK105, VEPR12, M16, P90,
-                                              MP7, AUG, UZI, FAL, FAMAS, M18, MCX, L85A2, HK416, AK12)}
+                                              MP7, AUG, UZI, FAL, FAMAS, M18, MCX, L85A2, HK416, AK12, AK15)}
 
 
 def add_argument(parser: argparse.ArgumentParser) -> None:

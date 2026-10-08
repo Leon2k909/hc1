@@ -127,10 +127,10 @@ FACTORY = {
 }
 
 
-def vmt_textures(source: str) -> dict[str, str]:
+def vmt_textures(source: str, root: Path = EXTRACTED) -> dict[str, str]:
     """The textures a material's vmt names ($basetexture, $bumpmap, $phongexponenttexture), as paths under materials/,
-    and its $color2 if it isn't only blended by the colour map's alpha."""
-    matches = [p for p in (EXTRACTED / "materials" / EFT).rglob("*.vmt") if p.stem.lower() == source.lower()]
+    and its $color2 if it isn't only blended by the colour map's alpha. root: the extracted pack the vmt is in."""
+    matches = [p for p in (root / "materials" / EFT).rglob("*.vmt") if p.stem.lower() == source.lower()]
     assert len(matches) == 1, f"{source}: {matches}"
     text = matches[0].read_text(encoding="utf-8", errors="replace")
     pattern = r'^\s*"?(\$\w+)"?\s+"?([^"\n]*?)"?\s*$'
@@ -157,15 +157,15 @@ def write_vmat(name: str, out: Path, lines: list[str]) -> str:
     return asset_path(vmat)
 
 
-def build_eft(source: str, name: str, out: Path) -> str:
+def build_eft(source: str, name: str, out: Path, root: Path = EXTRACTED) -> str:
     """A complex.shader material from the vmt's _diff / _nrm / _gloss set: no metal, roughness from the exponent."""
-    textures = vmt_textures(source)
-    colour = tint(load_vtf(textures["$basetexture"], EXTRACTED)[:, :, :3], textures.get("$color2"))
+    textures = vmt_textures(source, root)
+    colour = tint(load_vtf(textures["$basetexture"], root)[:, :, :3], textures.get("$color2"))
     rel = lambda suffix: asset_path(out / f"{name}_{suffix}.png")
     Image.fromarray(colour.copy()).save(out / f"{name}_color.png")
-    exponent = load_vtf(textures["$phongexponenttexture"], EXTRACTED)
+    exponent = load_vtf(textures["$phongexponenttexture"], root)
     Image.fromarray(roughness_from_exponent(exponent[:, :, 0])).save(out / f"{name}_roughness.png")
-    normal = load_vtf(textures["$bumpmap"], EXTRACTED)[:, :, :3].copy()
+    normal = load_vtf(textures["$bumpmap"], root)[:, :, :3].copy()
     normal[:, :, 1] = 255 - normal[:, :, 1]
     Image.fromarray(normal).save(out / f"{name}_normal.png")
     return write_vmat(name, out, [

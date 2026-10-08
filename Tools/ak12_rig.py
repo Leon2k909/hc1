@@ -83,7 +83,9 @@ def sub_slot(parent_pos, parent_ang, sub_pos, sub_ang):
 Pieces = dict[str, list[tuple[str, str, np.ndarray, np.ndarray, np.ndarray]]]
 
 
-def assemble() -> Pieces:
+def weapon_bones() -> dict[str, np.ndarray]:
+    """Every c_ak12 bone in the idle pose, in the weapon bone's frame. The AK-100s' c_ak100 has the same skeleton and
+    clips (both include ak_anims.mdl), so its pieces pose on these too."""
     idle = Smd(SOURCE / "anims/ak_anims_anims/idle.smd")
     idle_world = idle.world(idle.dense_frames()[0])
     idle_named = {idle.name(i): idle_world[i] for i in range(len(idle.nodes))}
@@ -95,32 +97,52 @@ def assemble() -> Pieces:
     ref_weapon = np.linalg.inv(ref_world[ref_smd.index("weapon")])
     for i, (name, _) in enumerate(ref_smd.nodes):
         bones.setdefault(name, ref_weapon @ ref_world[i])
+    return bones
 
+
+def add_mesh(pieces: Pieces, bones: dict[str, np.ndarray], piece: str, path: Path, skip=()) -> None:
+    """A bodygroup mesh of the viewmodel, each vertex posed by its main bone."""
+    smd = Smd(path)
+    ref = smd.world(smd.dense_frames()[0])
+    out = pieces.setdefault(piece, [])
+    for material, verts in smd.triangles:
+        main = [max(links, key=lambda link: link[1])[0] for *_, links in verts]
+        bone = smd.name(main[0])
+        if bone in skip:
+            continue
+        ps, ns, uvs = [], [], []
+        for (position, normal, uv, _links), b in zip(verts, main):
+            m = bones[smd.name(b)] @ np.linalg.inv(ref[b])
+            ps.append((m @ np.append(position, 1.0))[:3])
+            ns.append(m[:3, :3] @ normal)
+            uvs.append(uv)
+        out.append((bone, material, np.array(ps), np.array(ns), np.array(uvs)))
+
+
+def place_model(pieces: Pieces, piece: str, place: np.ndarray, path: Path) -> None:
+    """An attachment model (one root bone at the origin) where ARC9 puts it."""
+    smd = Smd(path)
+    out = pieces.setdefault(piece, [])
+    for material, verts in smd.triangles:
+        ps = np.array([(place @ np.append(v[0], 1.0))[:3] for v in verts])
+        ns = np.array([place[:3, :3] @ v[1] for v in verts])
+        uvs = np.array([v[2] for v in verts])
+        out.append((piece, material, ps, ns, uvs))
+
+
+# The rounds' bodygroup also has the chambered round and the one in the ejection port, which the clips never show.
+ROUND_SKIP = ("patron_in_weapon", "shellport")
+
+
+def assemble() -> Pieces:
+    bones = weapon_bones()
     pieces: Pieces = {}
-
-    def add_mesh(piece: str, path: str, skip=()):
-        smd = Smd(SOURCE / path)
-        ref = smd.world(smd.dense_frames()[0])
-        out = pieces.setdefault(piece, [])
-        for material, verts in smd.triangles:
-            main = [max(links, key=lambda link: link[1])[0] for *_, links in verts]
-            bone = smd.name(main[0])
-            if bone in skip:
-                continue
-            ps, ns, uvs = [], [], []
-            for (position, normal, uv, _links), b in zip(verts, main):
-                m = bones[smd.name(b)] @ np.linalg.inv(ref[b])
-                ps.append((m @ np.append(position, 1.0))[:3])
-                ns.append(m[:3, :3] @ normal)
-                uvs.append(uv)
-            out.append((bone, material, np.array(ps), np.array(ns), np.array(uvs)))
-
     for path in ("ak12.smd", "ak122.smd", "body8_model0.smd", "reciever_ak12_izhmash_ak12_std_LOD0_0.smd",
                  "gas_block_ak12_izhmash_ak12_std_LOD0_0.smd", "handguard_ak12_izhmash_ak12_std_LOD0_0.smd",
                  "sight_rear_all_izhmash_ak12_rear_sight_base_LOD0_0.smd",
                  "muzzle_ak12_izhmash_ak12_muzzle_brake_std_545x39_LOD0_0.smd"):
-        add_mesh(Path(path).stem, path)
-    add_mesh("rounds", "545.smd", skip=("patron_in_weapon", "shellport"))
+        add_mesh(pieces, bones, Path(path).stem, SOURCE / path)
+    add_mesh(pieces, bones, "rounds", SOURCE / "545.smd", skip=ROUND_SKIP)
 
     # The attachment models (each has one root bone at the origin), placed as ARC9 places them (the pack's AK-12
     # attachment slots and the AK-12 stock tube's sub-slot).
@@ -141,13 +163,7 @@ def assemble() -> Pieces:
                               ("stock_tube", tube, "stock_ak12_izhmash_ak12_stock_tube_std_LOD0_0.smd"),
                               ("stock", stock, "stock_ar15_izhmash_ak12_std_LOD0_0new.smd"),
                               ("rear_sight", rear_sight, "sight_rear_ak_izhmash_ak12_rear_sight_std_LOD0_0.smd")):
-        smd = Smd(SOURCE / path)
-        out = pieces.setdefault(name, [])
-        for material, verts in smd.triangles:
-            ps = np.array([(place @ np.append(v[0], 1.0))[:3] for v in verts])
-            ns = np.array([place[:3, :3] @ v[1] for v in verts])
-            uvs = np.array([v[2] for v in verts])
-            out.append((name, material, ps, ns, uvs))
+        place_model(pieces, name, place, SOURCE / path)
     return pieces
 
 
@@ -187,30 +203,33 @@ SMDS = {
 }
 
 
-def rig(pieces: Pieces) -> dict[str, list]:
-    """The SMDs' skeleton and triangles (tag_sling space). Returns each SMD's triangles."""
-    rec = Smd(AK105 / "att_vm_p04_ar_akilo105_rec_v0_LOD0_edited.smd")
-    idle = Smd(AK105 / "vm_iw9_akilo105_anims/idle.smd")
-    idle_world = idle.world(idle.dense_frames()[0])
-    idle_named = {idle.name(i): idle_world[i] for i in range(len(idle.nodes))}
-    ts_inv = np.linalg.inv(idle_named["tag_sling"])
-    rec_world = rec.world(rec.dense_frames()[0])
-    rec_ts_inv = np.linalg.inv(rec_world[rec.index("tag_sling")])
-    world = [ts_inv @ idle_named[name] if name in idle_named else rec_ts_inv @ rec_world[i]
-             for i, (name, _) in enumerate(rec.nodes)]
-    for m in world:  # unit axes: the clips' matrices carry rounding
-        u, _, vt = np.linalg.svd(m[:3, :3])
-        m[:3, :3] = u @ vt
-    locals_ = [np.linalg.inv(world[parent]) @ world[i] if parent >= 0 else world[i]
-               for i, (_, parent) in enumerate(rec.nodes)]
-    index = {name: i for i, (name, _) in enumerate(rec.nodes)}
+class Rig:
+    """The AK-105 receiver's skeleton, every bone where the AK-105's idle clip has it relative to tag_sling."""
 
-    def triangles(piece: str, extra: np.ndarray | None = None, bone_override: str | None = None):
+    def __init__(self) -> None:
+        self.rec = Smd(AK105 / "att_vm_p04_ar_akilo105_rec_v0_LOD0_edited.smd")
+        idle = Smd(AK105 / "vm_iw9_akilo105_anims/idle.smd")
+        idle_world = idle.world(idle.dense_frames()[0])
+        idle_named = {idle.name(i): idle_world[i] for i in range(len(idle.nodes))}
+        ts_inv = np.linalg.inv(idle_named["tag_sling"])
+        rec_world = self.rec.world(self.rec.dense_frames()[0])
+        rec_ts_inv = np.linalg.inv(rec_world[self.rec.index("tag_sling")])
+        self.world = [ts_inv @ idle_named[name] if name in idle_named else rec_ts_inv @ rec_world[i]
+                      for i, (name, _) in enumerate(self.rec.nodes)]
+        for m in self.world:  # unit axes: the clips' matrices carry rounding
+            u, _, vt = np.linalg.svd(m[:3, :3])
+            m[:3, :3] = u @ vt
+        self.locals = [np.linalg.inv(self.world[parent]) @ self.world[i] if parent >= 0 else self.world[i]
+                       for i, (_, parent) in enumerate(self.rec.nodes)]
+        self.index = {name: i for i, (name, _) in enumerate(self.rec.nodes)}
+
+    def triangles(self, pieces: Pieces, piece: str, extra: np.ndarray | None = None,
+                  bone_override: str | None = None) -> list:
         result = []
         for bone, material, pos, nrm, uv in pieces[piece]:
             if material in DROP:
                 continue
-            b = index[bone_override or BONES.get(bone, "tag_sling")]
+            b = self.index[bone_override or BONES.get(bone, "tag_sling")]
             verts = []
             for k in range(3):
                 p, n = FIT @ pos[k] + SHIFT, FIT @ nrm[k]
@@ -222,27 +241,40 @@ def rig(pieces: Pieces) -> dict[str, list]:
             result.append((material, verts))
         return result
 
-    out = {name: [tri for piece in names for tri in triangles(piece)] for name, names in SMDS.items()}
-    # The magazine and its top rounds on j_mag1, and the same again on j_mag2 (the reload's fresh one), placed as the
-    # idle has j_mag2 from j_mag1.
-    spare = world[index["j_mag2"]] @ np.linalg.inv(world[index["j_mag1"]])
-    out["ak12_mag"] = (triangles("magazine") + triangles("rounds") + triangles("magazine", spare, "j_mag2")
-                       + triangles("rounds", spare, "j_mag2"))
-    RIG.mkdir(parents=True, exist_ok=True)
-    for name, tris in out.items():
-        write_smd(RIG / f"{name}.smd", rec.nodes, [locals_], tris)
+    def magazine(self, pieces: Pieces, spare: bool = True) -> list:
+        """The magazine and its top rounds on j_mag1, and (spare) the same again on j_mag2, the reload's fresh one,
+        placed as the idle has j_mag2 from j_mag1."""
+        tris = self.triangles(pieces, "magazine") + self.triangles(pieces, "rounds")
+        if spare:
+            move = self.world[self.index["j_mag2"]] @ np.linalg.inv(self.world[self.index["j_mag1"]])
+            tris += (self.triangles(pieces, "magazine", move, "j_mag2")
+                     + self.triangles(pieces, "rounds", move, "j_mag2"))
+        return tris
+
+    def write(self, name: str, tris: list) -> None:
+        RIG.mkdir(parents=True, exist_ok=True)
+        write_smd(RIG / f"{name}.smd", self.rec.nodes, [self.locals], tris)
         p = np.array([v[0] for _, vs in tris for v in vs])
         print(f"{name:18s} {len(tris):6d} tris  {np.round(p.min(0), 3)}..{np.round(p.max(0), 3)}")
-    # The icon leaves out the reload's spare magazine.
-    out["ak12_mag"] = triangles("magazine") + triangles("rounds")
+
+
+def rig(pieces: Pieces) -> dict[str, list]:
+    """Writes the SMDs (tag_sling space). Returns each one's triangles, the magazine's without the spare."""
+    rig_ = Rig()
+    out = {name: [tri for piece in names for tri in rig_.triangles(pieces, piece)] for name, names in SMDS.items()}
+    for name, tris in out.items():
+        rig_.write(name, tris)
+    rig_.write("ak12_mag", rig_.magazine(pieces))
+    out["ak12_mag"] = rig_.magazine(pieces, spare=False)
     return out
 
 
 # --- the icon --------------------------------------------------------------------------------------------------------
 
-def icon(smds: dict[str, list], width: float = 0.9, supersample: int = 4) -> None:
-    """The gun's left side as a white silhouette, `width` of the 1024px icon wide and centred (the other icons' 0.9)."""
-    tris = np.array([[v[0] for v in verts] for name in SMDS.keys() | {"ak12_mag"} for _, verts in smds[name]])
+def icon(smds: dict[str, list], path: Path = ICON, width: float = 0.9, supersample: int = 4) -> None:
+    """The gun's left side (every SMD in smds) as a white silhouette, `width` of the 1024px icon wide and centred (the
+    other icons' 0.9)."""
+    tris = np.array([[v[0] for v in verts] for tris in smds.values() for _, verts in tris])
     # Seen from its left: the muzzle (+x) to the left, up (+z) up.
     flat = np.stack([-tris[:, :, 0], -tris[:, :, 2]], -1)
     lo, hi = flat.reshape(-1, 2).min(0), flat.reshape(-1, 2).max(0)
@@ -257,9 +289,9 @@ def icon(smds: dict[str, list], width: float = 0.9, supersample: int = 4) -> Non
     white = Image.new("RGBA", small.size, (255, 255, 255, 255))
     white.putalpha(small)
     out.alpha_composite(white, ((1024 - small.size[0]) // 2, (1024 - small.size[1]) // 2))
-    ICON.parent.mkdir(parents=True, exist_ok=True)
-    out.save(ICON, optimize=True)
-    print(f"icon {ICON.relative_to(ASSETS)}: {small.size[0]}x{small.size[1]}")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    out.save(path, optimize=True)
+    print(f"icon {path.relative_to(ASSETS)}: {small.size[0]}x{small.size[1]}")
 
 
 def main() -> None:
