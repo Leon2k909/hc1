@@ -1,0 +1,16 @@
+// Tools/railhead_buffer.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    F_METALNESS_TEXTURE "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.000"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1"
+    TextureColor "materials/railhead/rw_track_stone_warm_color.png"
+    TextureNormal "materials/railhead/rw_track_stone_warm_normal.png"
+    TextureRoughness "materials/railhead/rw_track_stone_warm_rough.png"
+    TextureMetalness "materials/railhead/rw_track_stone_warm_metal.png"
+    TextureAmbientOcclusion "materials/railhead/rw_track_stone_warm_ao.png"
+}

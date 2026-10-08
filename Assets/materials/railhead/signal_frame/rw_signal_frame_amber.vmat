@@ -1,0 +1,18 @@
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    F_SELF_ILLUM "1"
+    TextureSelfIllumMask "[1.000000 1.000000 1.000000 0.000000]"
+    g_flSelfIllumBrightness "5"
+    g_flSelfIllumAlbedoFactor "1.0"
+    g_vSelfIllumTint "[1.000000 1.000000 1.000000 0.000000]"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1.0"
+    g_flMetalness "0"
+    g_flRoughnessScaleFactor "0.3"
+    TextureColor "materials/railhead/signal_frame/rw_signal_frame_amber_color.png"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureRoughness "materials/default/default_rough.tga"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+}

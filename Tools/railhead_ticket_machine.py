@@ -7,8 +7,10 @@ contactless markings and independently lit screen/sign surfaces. Geometry uses
 the existing 850 x 500 x 1800 mm machine footprint and one metal collision box.
 """
 import argparse
+import io
 import math
 from pathlib import Path
+import time
 
 import numpy as np
 
@@ -102,12 +104,12 @@ def _recess(model, F, outer, inner, front_y, back_y, entry="body", paint=BODY):
     e, f, g, h = inner
     front = [(a, front_y, c), (b, front_y, c), (b, front_y, d), (a, front_y, d)]
     back = [(e, back_y, g), (f, back_y, g), (f, back_y, h), (e, back_y, h)]
+    centre = F.p((a + b + e + f) / 4, (front_y + back_y) / 2, (c + d + g + h) / 4)
     for k in range(4):
         j = (k + 1) % 4
         pts = [F.p(*p) for p in (front[k], front[j], back[j], back[k])]
         # Inward-facing sides: their normal always looks into the pocket, toward its centre.
-        normal = -np.cross(pts[1] - pts[0], pts[2] - pts[0])
-        P.outward(model, paint, pts, normal,
+        P.outward(model, paint, pts, centre - np.mean(pts, axis=0),
                   uv=[_uv(entry, u, v) for u, v in ((0, 0), (1, 0), (1, 1), (0, 1))])
 
 
@@ -199,7 +201,7 @@ def build(model, F):
     # Banknote pocket, with four inclined metal faces and a dark throat.
     _solid(model, F, (8.65, 14.12, 8.02, 8.18, 22.93, 31.27), "metal", METAL, radius=.3, front=False, back=False)
     _plate_with_hole(model, F, (8.79, 13.98, 8.185, 23.08, 31.12), (9.16, 13.65, 26.22, 30.87), "metal", METAL)
-    _recess(model, F, (9.16, 13.65, 26.22, 30.87), (9.66, 13.10, 26.90, 30.58), 8.19, 5.82, "dark_steel", METAL)
+    _recess(model, F, (9.16, 13.65, 26.22, 30.87), (9.66, 13.10, 26.90, 30.58), 8.19, 5.82, "metal", METAL)
     _face(model, F, (9.66, 13.10, 5.84, 26.90, 30.58), "black")
     _solid(model, F, (10.66, 12.15, 5.92, 6.22, 30.16, 30.44), "black", radius=.1)
     _face(model, F, (10.86, 12.2, 8.19, 23.63, 24.97), "qr", METAL, radius=.01)
@@ -341,15 +343,18 @@ def _screen():
     _text(d, (732, 59), "14:32", 34, (248, 250, 255), anchor="rm")
     _text(d, (40, 190), "Willkommen", 60, (248, 250, 255), bold=True, anchor="lm")
     _text(d, (40, 267), "Wohin soll es gehen?", 35, (244, 248, 253), anchor="lm")
-    ink = (20, 49, 88)
+    ink = (6, 20, 42)
     labels = (("location", "Ziel eingeben"), ("return", "Hin- und Rückfahrt"),
               ("clock", "Tageskarte"), ("group", "Gruppenkarte"),
               ("card", "BahnCard"), ("more", "Weitere Optionen"))
     for k, (name, words) in enumerate(labels):
         x, y = 36 + (k % 2) * 370, 342 + (k // 2) * 156
-        d.rounded_rectangle((x, y, x + 355, y + 142), radius=9, fill=(210, 223, 240), outline=(232, 242, 253), width=2)
+        d.rounded_rectangle((x, y, x + 355, y + 142), radius=9, fill=(188, 203, 224), outline=(221, 231, 245), width=2)
         _icon(d, name, x + 64, y + 70, 64, ink)
-        _text(d, (x + 119, y + 71), words, 25, ink, anchor="lm")
+        size = 30
+        while _font(size, bold=True).getlength(words) > 226:
+            size -= 1
+        _text(d, (x + 115, y + 71), words, size, ink, bold=True, anchor="lm")
     d.line((0, 848, 768, 848), fill=(148, 175, 203), width=2)
     for i, name in enumerate(("de", "uk", "fr", "it", "es")):
         _flag(d, 94 + i * 125, 896, name)
@@ -360,7 +365,7 @@ def _grain(w, h, entry, rng):
     from PIL import Image, ImageDraw
     yy, xx = np.mgrid[:h, :w]
     noise = rng.normal(0, 1, (h, w))
-    metal = entry in ("metal", "dark_steel", "lock") or entry in set("0123456789")
+    metal = entry in ("metal", "dark_steel", "lock", "cancel", "accept") or entry in set("0123456789")
     if metal:
         value = 171 if entry == "metal" else 76 if entry == "dark_steel" else 167
         grain = rng.normal(0, 1.3, (1, w)) + noise * .8
@@ -394,7 +399,7 @@ def _markings(tile, name):
     w, h = tile.size
     white = (224, 230, 233)
     if name in set("0123456789"):
-        _text(d, (w / 2, h / 2 + 2), name, 120, (247, 250, 251))
+        _text(d, (w / 2, h / 2 + 2), name, 120, (24, 27, 29))
     elif name == "cancel":
         for a, b in (((74, 38), (143, 107)), ((143, 38), (74, 107))):
             d.line((*a, *b), fill=(216, 35, 40), width=16)
@@ -498,7 +503,22 @@ def write(out=OUT):
             atlas.paste(patch.crop((0, 0, w, 1)).resize((w, 8)), (x0, y0 - 8))
             atlas.paste(patch.crop((0, h - 1, w, h)).resize((w, 8)), (x0, y1))
     for name, atlas in (("color", color), ("normal", normal), ("rough", rough), ("illum", illum)):
-        atlas.save(out / f"rw_ticket_machine_{name}.png", optimize=True)
+        buffer = io.BytesIO()
+        atlas.save(buffer, format="PNG", optimize=True)
+        data = buffer.getvalue()
+        path = out / f"rw_ticket_machine_{name}.png"
+        if path.exists() and path.read_bytes() == data:
+            continue
+        temporary = path.with_name(path.name + ".writing")
+        temporary.write_bytes(data)
+        for attempt in range(20):
+            try:
+                temporary.replace(path)
+                break
+            except PermissionError:
+                if attempt == 19:
+                    raise
+                time.sleep(.5)
     for metal, display, name in ((False, False, BODY), (True, False, METAL), (False, True, DISPLAY)):
         K.write_text(out / f"{name}.vmat", vmat(metal, display))
     print(f"wrote ticket machine: {len(RECTS)} atlas entries, three materials, {SIZE}px")

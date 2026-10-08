@@ -1,0 +1,14 @@
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    F_METALNESS_TEXTURE "1"
+    g_flRoughnessScaleFactor "1"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1"
+    TextureColor "materials/railhead/luggage/luggage_color.png"
+    TextureNormal "materials/railhead/luggage/luggage_normal.png"
+    TextureRoughness "materials/railhead/luggage/luggage_roughness.png"
+    TextureMetalness "materials/railhead/luggage/luggage_metalness.png"
+    TextureAmbientOcclusion "materials/railhead/luggage/luggage_ao.png"
+}

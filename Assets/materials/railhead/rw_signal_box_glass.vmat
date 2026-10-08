@@ -1,0 +1,19 @@
+// Tools/railhead_materials.py
+"Layer0"
+{
+    shader "shaders/glass.shader"
+    F_GLASS_QUALITY "2"
+    g_bFogEnabled "1"
+    g_flBlurAmount "0.005"
+    g_flRefractionStrength "1.002"
+    AlbedoAbsorption "0.16"
+    g_flTintColor "[1.000000 1.000000 1.000000 0.000000]"
+    TextureColor "[0.930000 0.955000 0.940000 0.000000]"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureRoughness "[0.040000 0.040000 0.040000 0.000000]"
+    TextureMetalness "[0.000000 0.000000 0.000000 0.000000]"
+    TextureAmbientOcclusion "[1.000000 1.000000 1.000000 0.000000]"
+    TextureBlendMask "materials/default/default_blend.tga"
+    TextureTintMask "materials/default/default.tga"
+    TextureTranslucency "materials/default/default_trans.tga"
+}

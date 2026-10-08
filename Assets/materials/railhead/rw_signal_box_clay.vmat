@@ -1,0 +1,14 @@
+// Tools/railhead_signal_box.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flMetalness "0"
+    g_flRoughnessScaleFactor "1"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1"
+    TextureColor "materials/railhead/rw_signal_box_clay_color.png"
+    TextureNormal "materials/railhead/rw_signal_box_clay_normal.png"
+    TextureRoughness "materials/railhead/rw_signal_box_clay_rough.png"
+    TextureAmbientOcclusion "materials/railhead/rw_signal_box_clay_ao.png"
+}

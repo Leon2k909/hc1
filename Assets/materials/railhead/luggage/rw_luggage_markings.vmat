@@ -1,0 +1,17 @@
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    F_ALPHA_TEST "1"
+    g_flAlphaTestReference "0.45"
+    g_flAntiAliasedEdgeStrength "1"
+    g_flMetalness "0"
+    g_flRoughnessScaleFactor "1"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1"
+    TextureColor "materials/railhead/luggage/luggage_markings_color.png"
+    TextureTranslucency "materials/railhead/luggage/luggage_markings_alpha.png"
+    TextureNormal "materials/railhead/luggage/luggage_markings_normal.png"
+    TextureRoughness "materials/railhead/luggage/luggage_markings_roughness.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+}

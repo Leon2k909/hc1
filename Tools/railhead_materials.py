@@ -8,6 +8,9 @@ lamps and signals, and the atlases: wayfinding signs, platform displays and the 
 posters, shop signs, graffiti, the cast bronze lettering, the platform clock and the snack machine's goods and
 controls.
 
+The close stone, timber and concrete surfaces also use curated CC0 scans through railhead_scanned.py; source channels
+and provenance are recorded in railhead_scanned_sources.json.
+
     python Tools/railhead_materials.py [name ...] [--out <dir>] [--sheet <png>]
 
 - Writes Assets/materials/railhead/<texture>_normal.png and _rough.png per texture (with _trans.png for the
@@ -496,7 +499,7 @@ def ballast( rng, n ):
     colours = {}
     c = mix( base, np.array( ( 156, 152, 146 ), float ), 0.14 * tops * dust )
     colours["rw_ballast"] = T.shaded( c, ao, 0.55 )
-    rust = np.clip( 0.55 + 0.25 * noise( rng, n, 2.4, 2, 40 ), 0.0, 1.0 )
+    rust = np.clip( 0.25 + 0.16 * noise( rng, n, 2.4, 2, 40 ), 0.0, 0.65 )
     c = darken( tinted( base, ( 116, 72, 46 ), rust ), 0.92 + 0.0 * rust )
     colours["rw_ballast_rusty"] = T.shaded( c, ao, 0.55 )
     soil = 1.0 - smoothstep( -0.95, -0.25, height + 0.25 * noise( rng, n, 2.0, 8, 200 ) )
@@ -505,7 +508,7 @@ def ballast( rng, n ):
     c = mix( c, lum_paint( ( 90, 78, 60 ), 1.0 + 0.15 * fines ), 0.9 * soil )
     c = mix( c, lum_paint( ( 78, 92, 50 ), 1.0 + 0.2 * grain ), 0.55 * moss )
     colours["rw_ballast_old"] = T.shaded( c, ao, 0.55 )
-    return colours, ground.rough, height, 1024 / 160.0
+    return colours, ground.rough, height, 1024 / 160.0, { "ao": ao }
 
 
 def sleeper( rng, n ):
@@ -3463,8 +3466,8 @@ TEXTURES = {
     "kerb": ( kerb, 1024, 12, 0.0, 48.0 ),
     "concrete": ( concrete, 2048, 13, 0.0, 256.0 ),
     "terrazzo": ( terrazzo, 2048, 14, 0.0, 192.0 ),
-    "sandstone": ( sandstone, 2048, 15, 0.0, 192.0 ),
-    "dressed": ( dressed, 1024, 16, 0.0, 96.0 ),
+    "sandstone": ( sandstone, 4096, 15, 0.0, 96.0 ),
+    "dressed": ( dressed, 2048, 16, 0.0, 96.0 ),
     "steel": ( steel, 1024, 17, 0.0, 64.0 ),
     "steel_modern": ( steel_modern, 1024, 18, 0.0, 64.0 ),
     "lattice": ( lattice, 1024, 19, 0.0, 1.0 ),
@@ -3587,11 +3590,18 @@ def paints():
     """ paint -> ( texture, tile units ) for every paint, without drawing anything. Atlases, the clock and the lattice
     have 1.0 (explicit UVs); the glass, 64. """
     out = { p: ( tex, TEXTURES[tex][4] ) for tex, ps in TEXTURE_PAINTS.items() for p in ps }
+    import railhead_buffer
+    out.update( { p: ( "buffer", tile ) for p, tile in railhead_buffer.PAINTS.items() } )
     # The kiosk terminal authors its own atlas and the silver/plastic variants.
     out.update({"rw_card_reader": ("card_reader", 1.0), "rw_card_reader_metal": ("card_reader", 1.0),
                 "rw_card_reader_screen": ("card_reader", 1.0)})
     out.update({"rw_ticket_machine": ("ticket_machine", 1.0), "rw_ticket_machine_metal": ("ticket_machine", 1.0),
                 "rw_ticket_machine_display": ("ticket_machine", 1.0)})
+    out.update({"rw_luggage_body": ("luggage", 1.0), "rw_luggage_markings": ("luggage", 1.0)})
+    import railhead_train as EMU
+    out.update({paint: ("emu", 96.0 if paint in (EMU.RED, EMU.BLUE) else 1.0) for paint in EMU.PAINTS})
+    import railhead_signal_box as SIGNAL_BOX
+    out.update({paint: ("signal_box", tile) for paint, tile in SIGNAL_BOX.PAINTS.items()})
     for g in GLASS:
         out[g] = ( "glass", 64.0 )
     for p in PAINTED:
@@ -3606,6 +3616,8 @@ def tile_units( paint_name ):
 
 
 def material_path( paint_name ):
+    if paint_name in ("rw_luggage_body", "rw_luggage_markings"):
+        return f"{RESOURCE_DIR}/luggage/{paint_name}.vmat"
     return f"{RESOURCE_DIR}/{paint_name}.vmat"
 
 
@@ -3628,6 +3640,7 @@ def save_rgb( path, a ):
 
 
 def vmat( paint_name, texture, metalness, extra ):
+    ao_path = f"{RESOURCE_DIR}/{texture}_ao.png" if "ao" in extra else DEFAULT_AO
     lines_ = [ "// Tools/railhead_materials.py", '"Layer0"', "{", '    shader "shaders/complex.shader"', '    F_SPECULAR "1"' ]
     if paint_name in ALPHA_TESTED:
         lines_ += [ '    F_ALPHA_TEST "1"', '    F_RENDER_BACKFACES "1"',
@@ -3642,7 +3655,8 @@ def vmat( paint_name, texture, metalness, extra ):
                 f'    TextureColor "{RESOURCE_DIR}/{paint_name}_color.png"',
                 f'    TextureNormal "{RESOURCE_DIR}/{texture}_normal.png"',
                 f'    TextureRoughness "{RESOURCE_DIR}/{texture}_rough.png"',
-                f'    TextureAmbientOcclusion "{DEFAULT_AO}"', '    g_vColorTint "[1.0 1.0 1.0 1.0]"',
+                f'    TextureAmbientOcclusion "{ao_path}"',
+                '    g_vColorTint "[1.0 1.0 1.0 1.0]"',
                 '    g_flModelTintAmount "1.0"', "}" ]
     return "\n".join( lines_ ) + "\n"
 
@@ -3715,6 +3729,10 @@ def textured_glass_vmat( paint_name, texture, absorption ):
 
 
 def write_texture( name, out_dir ):
+    import railhead_scanned
+    scanned = railhead_scanned.write_surface( name, out_dir )
+    if scanned is not None:
+        return scanned
     draw, size, seed, metalness, units = TEXTURES[name]
     rng = np.random.default_rng( seed )
     result = draw( rng, size )
@@ -3724,9 +3742,15 @@ def write_texture( name, out_dir ):
     height = np.asarray( height, float ) * np.ones( ( size, size ) )
     rough = np.asarray( rough, float ) * np.ones( ( size, size ) )
     normal = gl_normals( height, strength * size / 1024.0 )
+    if name == "concrete":
+        colours, rough, normal = railhead_scanned.concrete_detail( colours, rough, normal )
+    elif name == "dressed":
+        colours, rough, normal = railhead_scanned.dressed_detail( colours, rough, normal )
     out_dir.mkdir( parents=True, exist_ok=True )
     save_rgb( out_dir / f"{name}_normal.png", ( normal * 0.5 + 0.5 ) * 255 )
     save_grey( out_dir / f"{name}_rough.png", np.clip( rough, 0, 1 ) )
+    if "ao" in extra:
+        save_grey( out_dir / f"{name}_ao.png", np.clip( extra["ao"], 0, 1 ) )
     if "trans" in extra:
         save_grey( out_dir / f"{name}_trans.png", np.clip( extra["trans"], 0, 1 ) )
     if "illum" in extra:

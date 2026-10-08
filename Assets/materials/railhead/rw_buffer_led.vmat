@@ -1,0 +1,18 @@
+// Tools/railhead_buffer.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "materials/railhead/rw_buffer_led_color.png"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureRoughness "[0.150000 0.150000 0.150000 0.000000]"
+    g_flMetalness "0"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1.000000 1.000000 1.000000 0.000000]"
+    g_flModelTintAmount "1"
+    F_SELF_ILLUM "1"
+    g_flSelfIllumBrightness "8.0"
+    TextureSelfIllumMask "[1.000000 1.000000 1.000000 0.000000]"
+    g_flSelfIllumAlbedoFactor "1.0"
+    g_vSelfIllumTint "[1.000000 1.000000 1.000000 0.000000]"
+}

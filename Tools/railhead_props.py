@@ -275,7 +275,13 @@ def sleeper( model, e0, e1, n, rail_z, kind="concrete", rails=() ):
     rail ( e ). """
     length, width, height, spacing, paint = SLEEPERS[kind]
     top = rail_z - 6.8 - ( 0.6 if kind == "wood" else 0.0 )
-    model.box( ( e0, n - width / 2, top - height ), ( e1, n + width / 2, top ), paint, skip=( "-z", ) )
+    if kind == "concrete" and 310 < n < 880 and rail_z == -30:
+        import railhead_buffer as detail
+        detail.bevel_box( model, Frame( ( 0, 0, 0 ), ( 0, 1 ) ),
+                          ( -e1, n - width / 2, top - height ), ( -e0, n + width / 2, top ), paint, 0.45 )
+        detail.track_fittings( model, e0, e1, n, rail_z, rails )
+    else:
+        model.box( ( e0, n - width / 2, top - height ), ( e1, n + width / 2, top ), paint, skip=( "-z", ) )
     if kind == "wood":
         for x in rails:
             model.box( ( x - 7.1, n - 3.15, top ), ( x + 7.1, n + 3.15, top + 0.6 ), "rw_rail", skip=( "-z", ) )
@@ -465,25 +471,8 @@ def buffer_stop( model, e, n, facing, rail_z=-30.0 ):
     on a red buffer beam, braced back to brake shoes on both rails, with a Sh 2 board (a red square in a white border)
     and its red lamp. (e, n) is the track's centre at the buffers' faces; facing +1 if they face north. It reaches 140
     behind them: run the track that far. One metal box. """
-    f = vehicle_frame( e, n, facing, rail_z )
-    red, dark = "rw_red_paint", "rw_steel_dark"
-    for y in ( -BUFFER_HALF, BUFFER_HALF ):
-        x = y * ( -1 if facing > 0 else 1 )         # Frame x is to the right of someone facing the buffers
-        rod( model, f.p( x, 0.0, BUFFER_Z ), f.p( x, -1.6, BUFFER_Z ), 8.9, "rw_steel_grey", 12, caps=( True, False ) )
-        rod( model, f.p( x, -1.6, BUFFER_Z ), f.p( x, -9.0, BUFFER_Z ), 3.6, "rw_steel_grey", 8 )
-        rod( model, f.p( x, -9.0, BUFFER_Z ), f.p( x, -21.0, BUFFER_Z ), 5.3, red, 10, caps=( True, False ) )
-    f.box( model, -47, 47, -33, -21, 30, 54, red )
-    for x in ( -GAUGE_HALF, GAUGE_HALF ):
-        f.box( model, x - 4, x + 4, -140, -10, -2.0, 6.0, dark )                    # brake shoes on the rail head
-        f.box( model, x - 3, x + 3, -31, -23, 6.0, 30.0, red )                      # posts down to them
-        model.beam( f.p( x, -30, 46 ), f.p( x, -122, 6 ), ( 6.0, 6.0 ), red )      # struts back to the shoes
-    f.box( model, -GAUGE_HALF + 4, GAUGE_HALF - 4, -140, -130, 1.0, 7.0, red )
-    f.box( model, -1.5, 1.5, -27.5, -24.5, 54, 98, "rw_steel_grey" )
-    f.box( model, -12.6, 12.6, -24.5, -24.0, 72.0, 97.2, "rw_white_paint" )        # Sh 2: 600 mm board
-    f.quad( model, "rw_red_paint", 0.0, -23.95, 84.6, 19.6, 19.6 )
-    f.box( model, -3.5, 3.5, -24.5, -21.0, 58.5, 68.5, dark )
-    disc( model, "rw_signal_red", f.p( 0.0, -20.95, 63.5 ), f.y, 2.6, 12 )
-    f.collide( model, -50, 50, -140, 0, -7, 54, "metal" )
+    import railhead_buffer
+    railhead_buffer.buffer_stop( model, e, n, facing, rail_z )
 
 
 def ks_signal( model, e, n, rail_z, facing, side=+1, aspect="red", offset=94.0, height=150.0 ):
@@ -927,7 +916,7 @@ def _pantograph( model, F, a, roof_z, head_z=None ):
 # Stadler's KISS): two 19.4 m cars on their own bogies, a cab at each end of the unit, 2.88 m wide and 4.63 m tall.
 # Each car has mid-level ends over its bogies and two decks between them; the doors are at the double-deck part's
 # ends, their floor 760 mm over the rail, level with the platforms. The livery is the regional trains' usual one, red
-# (or the body paint) with a light grey stripe low down and a grey roof, without any operator's name or logo.
+# (or the body paint) with grey belts and roof, glazed saloons, and the reference's operator and class markings.
 
 EMU_CAR = 763.0             # a car from its cab's coupler face (or the gangway's) to its inner end
 EMU_W = 56.7
@@ -937,21 +926,22 @@ EMU_GAP = 14.0              # the gangway between the cars
 EMU_SKIRT = 19.0            # the mid-level ends' underframe
 EMU_LOW = 13.0              # the lower deck's underside, between the bogies
 EMU_CUT = 42.0              # the bogie cut-outs' top
-EMU_SIDE_TOP = 146.0        # the side wall is upright to here, then curves into the roof
-EMU_UPPER = [ ( EMU_W, EMU_SIDE_TOP ), ( 56.4, 152.0 ), ( 55.5, 158.0 ), ( 53.5, 164.0 ), ( 50.0, 169.0 ),
-              ( 44.5, 174.0 ), ( 36.0, 178.0 ), ( 25.0, 180.8 ), ( 12.0, 182.0 ), ( 0.0, EMU_ROOF ) ]
-EMU_ROOF_LINE = 164.0       # red below it, grey roof above
-EMU_STRIPE = ( 19.0, 24.0 )
+EMU_SIDE_TOP = 158.0        # upright glazed saloon sides, then the rounded shoulder
+EMU_UPPER = [ ( EMU_W, EMU_SIDE_TOP ), ( 56.4, 162.0 ), ( 55.5, 166.0 ), ( 53.5, 170.0 ), ( 50.0, 173.0 ),
+              ( 44.5, 176.0 ), ( 36.0, 179.0 ), ( 25.0, 180.8 ), ( 12.0, 182.0 ), ( 0.0, EMU_ROOF ) ]
+EMU_ROOF_LINE = 166.0       # thin grey roof above the red shoulder
+EMU_STRIPE = ( 18.0, 29.0 )
 EMU_NOSE = 112.0            # the cab's loft reaches this far behind the coupler face
 EMU_WHEELBASE = 98.0        # 2.5 m bogies
 EMU_WHEEL = 18.1            # 920 mm wheels
 # Along a car, behind its cab's coupler face: the bogies' centres, the doors' openings and the decks.
 EMU_BOGIES = ( 175.0, 670.0 )
-EMU_DOORS = ( 245.0, 548.0 )                # each opening 51 long
-EMU_DECKS = ( 296.0, 548.0 )                # the double-deck part
-EMU_LOWER_WIN = ( 38.0, 76.0 )              # the lower deck's windows, z
-EMU_UPPER_WIN = ( 108.0, 144.0 )            # the upper deck's
-EMU_MID_WIN = ( 66.0, 104.0 )               # the mid-level ends'
+EMU_DOORS = ( 232.0, 564.0 )                # each opening 64 long, with 32-inch plug-door leaves
+EMU_DOOR_TOP = 130.0
+EMU_DECKS = ( 296.0, 564.0 )                # the double-deck part
+EMU_LOWER_WIN = ( 48.0, 87.0 )              # the lower deck's windows, z
+EMU_UPPER_WIN = ( 123.0, 154.0 )            # the upper deck's
+EMU_MID_WIN = ( 60.0, 98.0 )                # the mid-level ends'
 # The cab: ( z, the face's depth behind the coupler face on the centre line, its corners' radius in plan ). The face
 # is near upright to the windscreen's foot (z 100), the windscreen leans back 21 degrees to its top (152) under a black
 # visor (to 166) carrying the destination display, and the roof rounds down to it.
@@ -1052,12 +1042,9 @@ def _chamfered( d0, d1, z0, z1, c ):
 
 
 def _emu_window( car, xs, d0, d1, z0, z1, frame=1.4 ):
-    """ A tinted window in a black rubber frame, on the side at xs, d0..d1 along the car, z0..z1. """
-    x = xs * EMU_W
-    car.poly( "rw_black", [ ( x + xs * 0.08, d, z ) for d, z in _chamfered( d0 - frame, d1 + frame, z0 - frame,
-                                                                             z1 + frame, 4.0 ) ], ( xs, 0, 0 ) )
-    car.poly( "rw_window_dark", [ ( x + xs * 0.16, d, z ) for d, z in _chamfered( d0, d1, z0, z1, 3.2 ) ],
-              ( xs, 0, 0 ) )
+    """Rounded aperture, recessed glazing and a three-dimensional rubber seal."""
+    import railhead_train as T
+    T.window(car, xs, d0, d1, z0, z1, car.body)
 
 
 def _emu_ring( car, paint, xs, d, z, r0, r1, sides=14 ):
@@ -1083,7 +1070,7 @@ def _emu_stroke( car, paint, xs, p, q, w ):
 
 def _emu_bicycle( car, xs, d, z ):
     """ The white bicycle pictogram beside a door, 16 long, centred on ( d, z ); it reads forwards on either side. """
-    sd = -xs * car.s              # +1 when the car's d runs to the viewer's right
+    sd = xs * car.s               # +1 when the car's d runs to the viewer's right
     k = lambda u, v: ( d + sd * u, z + v )
     for u in ( -4.6, 4.6 ):
         _emu_ring( car, "rw_white_paint", xs, d + sd * u, z - 1.6, 2.6, 3.4 )
@@ -1328,11 +1315,17 @@ def _emu_car( car, body, platform_xs, doors_open, cab, destination, roof="ac" ):
     """ One car: its cab (cab True) or its front end at the gangway, two bogies, the mid-level ends, the doors and
     the two decks, windows, roof and collision. platform_xs: the frame x sign of the side whose doors stand open.
     roof: "ac" for an air-conditioning unit over the inner end, else nothing (the pantograph goes there). """
+    import railhead_train as T
     F, model = car.F, car.model
+    car.body = body
     start = EMU_NOSE if cab else 0.0
     end = EMU_CAR
     zones = [ ( c - EMU_WHEELBASE / 2 - 13.0, c + EMU_WHEELBASE / 2 + 13.0 ) for c in EMU_BOGIES ]
-    doors = [ ( d, d + 51.0 ) for d in EMU_DOORS ]
+    doors = [ ( d, d + 64.0 ) for d in EMU_DOORS ]
+    windows = [(w0, w1, *height) for w0, w1 in ((324.0, 380.0), (390.0, 446.0), (456.0, 512.0))
+               for height in (EMU_LOWER_WIN, EMU_UPPER_WIN)]
+    windows += [(w0, w1, *EMU_MID_WIN) for w0, w1 in
+                (((696.0, 752.0), (124.0, 180.0)) if cab else ((696.0, 752.0), (20.0, 80.0), (88.0, 180.0)))]
     for c in EMU_BOGIES:
         _bogie( model, F, car.a( c ), EMU_WHEELBASE, EMU_WHEEL, cab and c == EMU_BOGIES[0] )
     if cab:
@@ -1349,28 +1342,23 @@ def _emu_car( car, body, platform_xs, doors_open, cab, destination, roof="ac" ):
     pieces = [ ( c0, c1, bottom_at( ( c0 + c1 ) / 2 ) ) for c0, c1 in zip( cuts, cuts[1:] ) ]
     bands = lambda zb: [ ( z0, z1, p ) for z0, z1, p in ( ( EMU_LOW, EMU_STRIPE[0], "rw_train_dark" ),
                                                           ( EMU_STRIPE[0], EMU_STRIPE[1], "rw_train_white" ),
-                                                          ( EMU_STRIPE[1], EMU_SIDE_TOP, body ) )
+                                                          ( EMU_STRIPE[1], 146.0, body ),
+                                                          ( 146.0, 151.0, "rw_train_white" ),
+                                                          ( 151.0, EMU_SIDE_TOP, body ) )
                          if z1 > zb ]
     for xs in ( 1.0, -1.0 ):
         open_side = doors_open and xs == platform_xs
         for d0, d1, zb in pieces:
-            gaps = [ ( d0 - 1, d1 + 1, EMU_FLOOR, 108.0 ) for g0, g1 in doors if g0 <= ( d0 + d1 ) / 2 <= g1 ]
+            gaps = [ ( g0, g1, EMU_FLOOR, EMU_DOOR_TOP ) for g0, g1 in doors ]
+            gaps += [(w0 - 1.7, w1 + 1.7, z0 - 1.7, z1 + 1.7) for w0, w1, z0, z1 in windows]
             a0, a1 = car.span( d0, d1 )
             _banded_side( model, F, xs, EMU_W, a0, a1, [ ( max( z0, zb ), z1, p ) for z0, z1, p in bands( zb ) ],
-                          [ ( a0 - 1, a1 + 1, z0, z1 ) for _, _, z0, z1 in gaps ] )
+                          [ (*car.span(g0, g1), z0, z1) for g0, g1, z0, z1 in gaps ] )
         for d0, d1 in doors:
-            a0, a1 = car.span( d0, d1 )
-            if open_side:
-                _emu_vestibule( model, F, xs, a0, a1 )
-            else:
-                _emu_door( model, F, xs, a0, a1 )
+            T.doorway(car, xs, d0, d1, open_side)
         # Windows: the lower and upper decks' between the doors, the mid-level ends' over the bogies.
-        for w0, w1 in ( ( 324.0, 384.0 ), ( 392.0, 452.0 ), ( 460.0, 520.0 ) ):
-            _emu_window( car, xs, w0, w1, *EMU_LOWER_WIN )
-            _emu_window( car, xs, w0, w1, *EMU_UPPER_WIN )
-        for w0, w1 in ( ( 630.0, 690.0 ), ( 698.0, 752.0 ) ) + ( ( ( 124.0, 194.0 ), ) if cab else
-                                                                   ( ( 20.0, 80.0 ), ( 88.0, 194.0 ) ) ):
-            _emu_window( car, xs, w0, w1, *EMU_MID_WIN )
+        for w0, w1, z0, z1 in windows:
+            _emu_window(car, xs, w0, w1, z0, z1)
         if cab:      # the cab's side window, its front edge leaning with the windscreen
             car.poly( "rw_black", [ ( xs * ( EMU_W + 0.08 ), d, z ) for d, z in
                                     ( ( 62.0, 104.6 ), ( 106.4, 104.6 ), ( 106.4, 145.4 ), ( 80.0, 145.4 ) ) ],
@@ -1378,7 +1366,9 @@ def _emu_car( car, body, platform_xs, doors_open, cab, destination, roof="ac" ):
             car.poly( "rw_window_dark", [ ( xs * ( EMU_W + 0.16 ), d, z ) for d, z in
                                           ( ( 65.0, 106.0 ), ( 105.0, 106.0 ), ( 105.0, 144.0 ), ( 82.0, 144.0 ) ) ],
                       ( xs, 0, 0 ) )
-        _emu_bicycle( car, xs, 208.0, 84.0 )
+        T.markings(car, xs, doors)
+    T.interior(car)
+    T.underframe(car)
     # The roof and the side walls' curve into it, the underside and its steps, the inner end.
     a0, a1 = car.span( start, end )
     _extrude( model, F, EMU_UPPER, a0, a1, lambda k: body if EMU_UPPER[k][1] < EMU_ROOF_LINE else "rw_train_grey",
@@ -1419,20 +1409,22 @@ def _emu_car( car, body, platform_xs, doors_open, cab, destination, roof="ac" ):
             car.collide( 0.0, platform_xs * W, p0, p1, -7.0, top )
         else:
             car.collide( 0.0, platform_xs * W, p0, p1, -7.0, EMU_FLOOR )
-            car.collide( 0.0, platform_xs * W, p0, p1, 108.0, top )
+            car.collide( 0.0, platform_xs * W, p0, p1, EMU_DOOR_TOP, top )
 
 
-def emu( model, e, n_front, facing, rail_z=-30.0, cars=2, body="rw_train_blue", platform_side=-1, doors_open=True,
+def emu( model, e, n_front, facing, rail_z=-30.0, cars=2, body="rw_train_blue", platform_side=-1, doors_open=False,
          wire_z=None, destinations=( "RE München", "RE München" ) ):
-    """ A two-car double-deck EMU (39.1 m over the couplers), a cab at each end, two pairs of 1.3 m sliding plug
+    """ A two-car double-deck EMU (39.1 m over the couplers), a cab at each end, two pairs of 1.6 m sliding plug
     doors a side per car. Livery: body paint with a light grey stripe low down, black window frames and visors, a
-    grey roof. platform_side (+1 east, -1 west): the side whose doors stand open (doors_open), each into a 1.4 m deep
-    vestibule floored level with the platform (rail_z + 30) under a 2 m ceiling; the other side's stay shut.
+    grey roof. Doors are closed by default. platform_side (+1 east, -1 west): the side to open when doors_open is True,
+    each into a 1.4 m deep vestibule floored level with the platform (rail_z + 30) under a 2.5 m ceiling.
     wire_z: the contact wire's z, to raise the pantograph on to it; None leaves it down. destinations: the front and
-    rear cabs' displays (the letters in EMU_FONT). Metal collision per car, hollowed at the open vestibules, and across
+    rear cabs' displays (the letters in EMU_FONT). Metal collision per car, solid when closed, hollowed at open vestibules, and across
     the gangway. cars must be 2. Returns the far coupler's n. """
     if cars != 2:
         raise ValueError( "the double-deck EMU is a two-car unit" )
+    import railhead_train as T
+    body = {"rw_train_red": T.RED, "rw_train_blue": T.BLUE}.get(body, body)
     F = vehicle_frame( e, n_front, facing, rail_z )
     xs_open = platform_side * F.x[0]
     total = 2 * EMU_CAR + EMU_GAP
@@ -1444,49 +1436,6 @@ def emu( model, e, n_front, facing, rail_z=-30.0, cars=2, body="rw_train_blue", 
     F.collide( model, -40, 40, -EMU_CAR, -( EMU_CAR + EMU_GAP ), -7.0, 168.0, "metal" )
     _pantograph( model, F, total - 690.0, EMU_ROOF - 1.5, None if wire_z is None else wire_z - rail_z )
     return n_front - ( 1 if facing > 0 else -1 ) * total
-
-
-def _emu_door( model, F, xs, d0, d1 ):
-    """ A shut pair of sliding plug doors filling the doorway d0..d1. """
-    x = xs * ( EMU_W + 0.1 )
-    _fpoly( model, F, "rw_train_white", [ ( x, -d0, EMU_FLOOR ), ( x, -d1, EMU_FLOOR ), ( x, -d1, 108.0 ),
-                                          ( x, -d0, 108.0 ) ], ( xs, 0, 0 ) )
-    x2 = xs * ( EMU_W + 0.2 )
-    mid = ( d0 + d1 ) / 2
-    for p0, p1 in ( ( d0 + 4.0, mid - 3.0 ), ( mid + 3.0, d1 - 4.0 ) ):
-        _fpoly( model, F, "rw_window_dark", [ ( x2, -p0, 62.0 ), ( x2, -p1, 62.0 ), ( x2, -p1, 100.0 ),
-                                              ( x2, -p0, 100.0 ) ], ( xs, 0, 0 ) )
-    _fpoly( model, F, "rw_black", [ ( x2, -( mid - 0.4 ), EMU_FLOOR ), ( x2, -( mid + 0.4 ), EMU_FLOOR ),
-                                    ( x2, -( mid + 0.4 ), 108.0 ), ( x2, -( mid - 0.4 ), 108.0 ) ], ( xs, 0, 0 ) )
-
-
-def _emu_vestibule( model, F, xs, d0, d1 ):
-    """ An open doorway: the leaves slid open outside the skin, and the vestibule behind it to the car's centre line,
-    floored at the platform's height, with its glazed screens, ceiling light and grab poles. """
-    W = EMU_W
-    for p0, p1 in ( ( d0 - 25.5, d0 ), ( d1, d1 + 25.5 ) ):
-        F.box( model, xs * W, xs * ( W + 1.6 ), -p0, -p1, EMU_FLOOR + 1.0, 107.0, "rw_train_white" )
-        F.collide( model, xs * W, xs * ( W + 1.6 ), -p0, -p1, EMU_FLOOR + 1.0, 107.0, "metal" )
-        x = xs * ( W + 1.65 )
-        _fpoly( model, F, "rw_window_dark", [ ( x, -( p0 + 4.0 ), 62.0 ), ( x, -( p1 - 4.0 ), 62.0 ),
-                                              ( x, -( p1 - 4.0 ), 100.0 ), ( x, -( p0 + 4.0 ), 100.0 ) ], ( xs, 0, 0 ) )
-    xw = xs * W
-    _fpoly( model, F, "rw_rubber", [ ( 0, -d0, EMU_FLOOR ), ( xw, -d0, EMU_FLOOR ), ( xw, -d1, EMU_FLOOR ),
-                                     ( 0, -d1, EMU_FLOOR ) ], ( 0, 0, 1 ) )
-    _fpoly( model, F, "rw_train_white", [ ( 0, -d0, 108.0 ), ( xw, -d0, 108.0 ), ( xw, -d1, 108.0 ),
-                                          ( 0, -d1, 108.0 ) ], ( 0, 0, -1 ) )
-    _fpoly( model, F, "rw_lamp_cool", [ ( xs * 8, -( ( d0 + d1 ) / 2 - 2 ), 107.9 ),
-                                        ( xs * ( W - 8 ), -( ( d0 + d1 ) / 2 - 2 ), 107.9 ),
-                                        ( xs * ( W - 8 ), -( ( d0 + d1 ) / 2 + 2 ), 107.9 ),
-                                        ( xs * 8, -( ( d0 + d1 ) / 2 + 2 ), 107.9 ) ], ( 0, 0, -1 ) )
-    for a, into in ( ( d0, -1 ), ( d1, 1 ) ):
-        for z0, z1, paint in ( ( EMU_FLOOR, 66.0, "rw_train_white" ), ( 66.0, 108.0, "rw_window_dark" ) ):
-            _fpoly( model, F, paint, [ ( 0, -a, z0 ), ( xw, -a, z0 ), ( xw, -a, z1 ), ( 0, -a, z1 ) ], ( 0, into, 0 ) )
-    for z0, z1, paint in ( ( EMU_FLOOR, 60.0, "rw_train_white" ), ( 60.0, 108.0, "rw_window_dark" ) ):
-        _fpoly( model, F, paint, [ ( 0, -d0, z0 ), ( 0, -d1, z0 ), ( 0, -d1, z1 ), ( 0, -d0, z1 ) ], ( xs, 0, 0 ) )
-    for a in ( d0 + 4.0, d1 - 4.0 ):
-        rod( model, F.p( xs * ( W - 6.0 ), -a, EMU_FLOOR ), F.p( xs * ( W - 6.0 ), -a, 108.0 ), 0.75,
-             "rw_yellow_paint", 6 )
 
 
 def _far( n_front, facing, length ):
@@ -2944,20 +2893,26 @@ def kiosk_lights( e0, e1, n0, n1, facing, z0=0.0 ):
              ( tuple( float( v ) for v in F.p( -1.0, hy + 3.0, KIOSK_COUNTER - 3.0 ) ), 42.0 ) ]
 
 
-def hanging_display( model, e, n, z_top, name, along="n", floor_z=0.0, width=118.1 ):
+def hanging_display( model, e, n, z_top, name, along="n", floor_z=0.0, width=118.1, ceiling=None ):
     """ A platform display (rw_displays name, 5:1; 3 m by default) in a 150 mm deep anthracite housing, lit on both
     faces, hung on two rods up to z_top: 450 mm under it, or higher to keep its bottom HEADROOM over floor_z. along:
-    the faces look both ways along n or e. Metal collision on the housing. """
+    the faces look both ways along n or e. Metal collision on the housing. An optional ceiling(e, n) supplies a
+    curved mounting surface: keep the whole housing below it and give each rod its own attachment height. """
     F = _along_frame( e, n, along )
     h = width / aspect( "rw_displays", name )
     hw, hh, d = width / 2 + 1.6, h / 2 + 1.6, 2.95
-    bottom = _hang( z_top, 2 * hh, floor_z, 17.7 )
+    limit = z_top
+    if ceiling is not None:
+        limit = min( limit, *( ceiling( *F.p( x, y, 0.0 )[:2] ) for x in ( -hw, hw ) for y in ( -d, d ) ) )
+    bottom = _hang( limit, 2 * hh, floor_z, 17.7 )
     zc = bottom + hh
     F.box( model, -hw, hw, -d, d, bottom, bottom + 2 * hh, DARK )
     F.collide( model, -hw, hw, -d, d, bottom, bottom + 2 * hh, "metal" )
     F.atlas( model, "rw_displays", name, 0.0, d + 0.03, zc, width, h, "front" )
     F.atlas( model, "rw_displays", name, 0.0, -d - 0.03, zc, width, h, "back" )
-    _rods( model, F, ( -hw + 10.0, hw - 10.0 ), bottom + 2 * hh, z_top )
+    for x in ( -hw + 10.0, hw - 10.0 ):
+        mount = z_top if ceiling is None else ceiling( *F.p( x, 0.0, 0.0 )[:2] ) + 0.5
+        _rods( model, F, ( x, ), bottom + 2 * hh, mount )
 
 
 def hanging_sign( model, e, n, z_top, names, along="n", floor_z=0.0, height=13.8, back_names=None ):
@@ -3090,84 +3045,9 @@ def _crate( model, F, x0, x1, y0, y1, z0, z1 ):
 
 
 def luggage_cart( model, e, n, along="n", z0=0.0, loaded=True ):
-    """ An old platform luggage cart (2.5 x 1.2 m): a deck of planks 600 mm up on a grey-green steel frame, four
-    400 mm wheels with solid rubber tyres on pressed-steel rims, the front pair on a turntable with the drawbar's fork
-    and towing eye lying forward on the ground, tubular gates 1 m high at both ends with corner gussets, and (loaded)
-    two slatted crates, three strapped suitcases and a kit bag on it to about 1.15 m. along: "n", "-n", "e" or "-e",
-    the way the drawbar points. One wooden box to the gates' height. """
-    sign = -1.0 if along.startswith( "-" ) else 1.0
-    F = Frame( ( e, n, z0 ), ( 0, sign ) if along.endswith( "n" ) else ( sign, 0 ) )
-    hl, hw, deck = 49.2, 23.6, 23.6
-    model.grain_paints.add( "rw_wood" )
-    # The deck: eight planks along the cart with narrow gaps over a dark bed.
-    F.box( model, -hw + 1.0, hw - 1.0, -hl + 1.0, hl - 1.0, deck - 1.6, deck - 1.4, DARK, skip=( "bottom", ) )
-    planks = 8
-    pw = 2 * hw / planks
-    for k in range( planks ):
-        x0 = -hw + k * pw + ( 0.15 if k else 0.0 )
-        x1 = -hw + ( k + 1 ) * pw - ( 0.15 if k < planks - 1 else 0.0 )
-        F.box( model, x0, x1, -hl, hl, deck - 1.4, deck, "rw_wood" )
-    for y in ( -hl + 4.0, hl - 4.0 ):
-        for xs in ( 1.0, -1.0 ):
-            disc( model, "rw_steel_dark", F.p( xs * ( hw - 6.0 ), y, deck + 0.02 ), F.z, 0.45, sides=6 )
-    # The frame: channel side rails with a lip, cross members.
-    for xs in ( 1.0, -1.0 ):
-        F.box( model, xs * ( hw - 2.0 ), xs * hw, -hl, hl, deck - 5.4, deck - 1.4, "rw_steel", skip=( "top", ) )
-        F.box( model, xs * ( hw - 3.2 ), xs * ( hw - 2.0 ), -hl, hl, deck - 5.4, deck - 4.6, "rw_steel", skip=( "top", ) )
-    for y in ( -hl + 1.0, -hl / 2, 0.0, hl / 2, hl - 1.0 ):
-        F.box( model, -hw + 2.0, hw - 2.0, y - 1.0, y + 1.0, deck - 5.4, deck - 1.4, "rw_steel", skip=( "top", ) )
-    # Wheels: a 20-sided rubber tyre, a stepped steel rim, a hub boss and its axle nut.
-    r = 7.9
-    for y in ( -37.0, 33.0 ):
-        rod( model, F.p( -16.0, y, r ), F.p( 16.0, y, r ), 0.9, DARK, 8 )
-        for xs in ( 1.0, -1.0 ):
-            rod( model, F.p( xs * 16.0, y, r ), F.p( xs * 19.1, y, r ), r, "rw_rubber", 20 )
-            rod( model, F.p( xs * 16.0, y, r ), F.p( xs * 19.1, y, r ), r - 2.2, "rw_steel", 20 )
-            disc( model, "rw_rubber", F.p( xs * 19.1, y, r ), xs * F.x, r, sides=20 )
-            disc( model, "rw_rubber", F.p( xs * 16.0, y, r ), -xs * F.x, r, sides=20 )
-            disc( model, "rw_steel", F.p( xs * 19.12, y, r ), xs * F.x, r - 2.3, sides=20 )
-            rod( model, F.p( xs * 19.1, y, r ), F.p( xs * 19.9, y, r ), 2.6, "rw_steel", 16, caps=( False, True ) )
-            rod( model, F.p( xs * 19.9, y, r ), F.p( xs * 20.6, y, r ), 1.0, "rw_steel_dark", 6, caps=( False, True ) )
-            # The fork: two plates either side of the wheel down from the frame.
-            for dx in ( 15.0, 13.4 ):
-                F.box( model, xs * dx - 0.4, xs * dx + 0.4, y - 2.4, y + 2.4, r, deck - 5.4, "rw_steel",
-                       skip=( "top", ) )
-            F.box( model, xs * 15.0 - 0.4, xs * 20.0, y - 2.4, y + 2.4, r + 8.4, r + 9.2, "rw_steel" )
-    # The turntable and the drawbar: a fork off the axle to a towing eye on the ground.
-    rod( model, F.p( 0.0, 33.0, deck - 8.0 ), F.p( 0.0, 33.0, deck - 5.4 ), 9.0, DARK, 16, caps=( True, False ) )
-    rod( model, F.p( 0.0, 33.0, deck - 8.6 ), F.p( 0.0, 33.0, deck - 8.0 ), 10.0, "rw_steel", 16,
-         caps=( True, True ) )
-    for xs in ( 1.0, -1.0 ):
-        rod( model, F.p( xs * 8.0, 33.0, r ), F.p( xs * 1.2, 50.0, 4.6 ), 0.8, "rw_steel", 6, caps=( True, False ) )
-    rod( model, F.p( 0.0, 50.0, 4.6 ), F.p( 0.0, 73.0, 1.6 ), 0.9, "rw_steel", 8 )
-    rod( model, F.p( -1.6, 49.0, 4.7 ), F.p( 1.6, 49.0, 4.7 ), 1.2, "rw_steel", 8, caps=( True, True ) )
-    eye = F.p( 0.0, 76.0, 1.4 )
-    for k in range( 10 ):
-        t0, t1 = 2 * math.pi * k / 10, 2 * math.pi * ( k + 1 ) / 10
-        rod( model, eye + 2.6 * ( math.cos( t0 ) * F.x + math.sin( t0 ) * F.y ),
-             eye + 2.6 * ( math.cos( t1 ) * F.x + math.sin( t1 ) * F.y ), 0.6, "rw_steel", 6 )
-    # The gates: posts, two rails and a gusset at each corner.
-    for y in ( -hl + 1.0, hl - 1.0 ):
-        for xs in ( 1.0, -1.0 ):
-            rod( model, F.p( xs * ( hw - 1.0 ), y, deck ), F.p( xs * ( hw - 1.0 ), y, 39.4 ), 0.85, "rw_steel", 8,
-                 caps=( False, True ) )
-            F.box( model, xs * ( hw - 4.0 ), xs * ( hw - 1.0 ), y - 0.15, y + 0.15, deck, deck + 3.0, "rw_steel" )
-        for z in ( 31.5, 39.4 ):
-            rod( model, F.p( -hw + 1.0, y, z ), F.p( hw - 1.0, y, z ), 0.85, "rw_steel", 8 )
-        for x in ( -hw / 3, hw / 3 ):
-            rod( model, F.p( x, y, deck ), F.p( x, y, 31.5 ), 0.5, "rw_steel", 6 )
-    if loaded:
-        _crate( model, F, -20.0, 2.0, -45.0, -19.0, deck, 40.5 )
-        _suitcase( model, F, 3.0, 22.7, -46.0, -18.4, deck, 9.8, "rw_steel_grey" )
-        _suitcase( model, F, 5.0, 20.7, -43.0, -21.3, deck + 9.8, 7.4, "rw_red_paint" )
-        _suitcase( model, F, -14.0, 1.7, -10.0, -2.1, deck, 21.7, "rw_train_blue", upright=True )
-        _crate( model, F, -7.0, 19.0, 4.0, 30.0, deck, deck + 15.7 )
-        _suitcase( model, F, -19.0, -9.0, 8.0, 36.0, deck, 9.0, "rw_black", trim="rw_steel_dark" )
-        # A canvas kit bag lying across the front of the deck, drawn tight at both ends.
-        rod( model, F.p( -18.0, 40.0, deck + 3.9 ), F.p( 6.0, 41.0, deck + 3.9 ), 3.9, "rw_container_green", 12,
-             caps=( True, True ), cap_paint="rw_rubber" )
-        rod( model, F.p( -7.0, 40.5, deck + 8.2 ), F.p( -3.0, 40.6, deck + 8.2 ), 0.5, "rw_black", 6 )
-    F.collide( model, -hw, hw, -hl, hl, 0.0, 39.4, "wood" )
+    """The detailed reusable trolley; map placements share its standalone model."""
+    import railhead_luggage
+    railhead_luggage.emit( model, e, n, along, z0, loaded )
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -4571,8 +4451,8 @@ def showcase():
     m = prop( "portal" )
     portal( m, -130.0, 330.0, supports[1], rz, [ ( A, wa[1][1] ), ( B, wb[1][1] ) ] )
 
-    m = prop( "emu (2 cars, doors open east)" )
-    emu( m, B, 200.0, +1, rz, platform_side=+1, doors_open=True, wire_z=wire_z )
+    m = prop( "emu (2 cars, doors closed)" )
+    emu( m, B, 200.0, +1, rz, platform_side=+1, doors_open=False, wire_z=wire_z )
     m = prop( "loco" )
     n = loco( m, A, 150.0, +1, rz, wire_z=wire_z )
     m = prop( "coach" )
@@ -4584,8 +4464,8 @@ def showcase():
                         containers=( "40", { "size": "20", "paint": "rw_container_red" } ) )
     m = prop( "open wagon" )
     n = open_wagon( m, S, n - 1.0, +1, rz )
-    m = prop( "covered wagon (doors open)" )
-    covered_wagon( m, S, n - 1.0, +1, rz, doors_open=True )
+    m = prop( "covered wagon (doors closed)" )
+    covered_wagon( m, S, n - 1.0, +1, rz, doors_open=False )
 
     m = prop( "container 40 ft (doors open)" )
     container( m, -760.0, -420.0, 0.0, "40", "n", "rw_container_green", doors_open=True )

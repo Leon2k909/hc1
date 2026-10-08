@@ -104,6 +104,9 @@ RAIL_Z, BED_Z, ROAD_Z = S.RAIL_Z, S.BED_Z, S.ROAD_Z
 # Track centres and Gleis numbers: west C 1, west B 2, west A 3, east A 4, east B 5, east C 6.
 TRACK_A, TRACK_B, TRACK_C = S.TRACKS["A"], S.TRACKS["B"], S.TRACKS["C"]
 GLEIS = { ( -1, "C" ): 1, ( -1, "B" ): 2, ( -1, "A" ): 3, ( 1, "A" ): 4, ( 1, "B" ): 5, ( 1, "C" ): 6 }
+# Keep the train definitions in the builder so they can be restored without re-authoring them.
+# IDs are west_inner, west_outer, east_inner and east_outer.
+HIDDEN_TRAINS = { "west_outer", "east_inner", "east_outer" }
 BUFFER_N = 740.0                # the buffer stops' faces: they reach 140 behind, to the trench's end wall at 880
 PORTAL_N = getattr( RB, "PORTAL_N", -8000.0 )     # the tunnel portal the corridor ends at (railhead_backdrop's)
 SOUTH_END = PORTAL_N - 780.0    # where the drawn track ends: 20 m into the bore, where it's gone dark
@@ -238,7 +241,9 @@ def board( model, atlas, entries, e, n, bottom, height, along, z_top=None, frame
 
 
 def hanging_display( model, e, n, z_top, name, along="n", bottom=110.0 ):
+    # A level display must clear the rib across its full width, including the sloping ends of the shed.
     use( "hanging_display", model, e, n, z_top, name, along,
+         ceiling=lambda at_e, at_n: S.shed_rib_z( at_e ),
          stand_in=lambda m: board( m, "rw_displays", [ name ], e, n, bottom, 26.0 if name != "departures" else 100.0,
                                    along, z_top ) )
 
@@ -269,7 +274,7 @@ def clock( model, e, n, z, along="n" ):
 # ---------------------------------------------------------------------------------------------------------------------
 # Paints
 
-GLASS_PAINTS = ( "rw_glass", "rw_glass_roof" )
+GLASS_PAINTS = ( "rw_glass", "rw_glass_roof", "rw_emu_glass", "rw_signal_box_glass" )
 
 def configure( model ):
     """ Points every rw_ paint at its material with its tile size (railhead_materials' paints(), else the backdrop's
@@ -306,6 +311,8 @@ def configure( model ):
     model.grain_paints |= { p for p in model.polygons if p in grain }
     model.anchored_paints = { p for p in model.polygons if p in anchored }
     model.decal_paints = { p for p in model.polygons if p in decals }
+    import railhead_masonry
+    railhead_masonry.align_uvs( model )
     return model
 
 
@@ -521,16 +528,21 @@ def signals( m, s ):
 # Dressing one side (s = 1 east, -1 west). Built per side rather than mirrored, so signs and trains read right.
 
 def trains( m, s ):
+    train_side = "east" if s > 0 else "west"
     body = "rw_train_blue" if s > 0 else "rw_train_red"
     a, c = s * TRACK_A, s * TRACK_C
     # The double-deck units: the 14:05 to München at Gleis 3, the 14:08 to Nürnberg at Gleis 4 (the departures).
     to = "RE Nürnberg" if s > 0 else "RE München"
-    use( "emu", m, a, 720.0, +1, RAIL_Z, 2, body, -s, True, WIRE_Z, destinations=( to, to ),
-         stand_in=vehicle_stand_in( "emu", a, 720.0, 1, RAIL_Z, body, length=1540.0 ) )
+    if f"{train_side}_inner" not in HIDDEN_TRAINS:
+        use( "emu", m, a, 720.0, +1, RAIL_Z, cars=2, body=body, platform_side=-s, doors_open=False,
+             wire_z=WIRE_Z, destinations=( to, to ),
+             stand_in=vehicle_stand_in( "emu", a, 720.0, 1, RAIL_Z, body, length=1540.0 ) )
     # The outer tracks use the same rounded double-deck passenger cab as the reference train.
-    # Keep the platform-side vestibules open, with the unit's own collision and gangway.
-    use( "emu", m, c, 720.0, +1, RAIL_Z, 2, body, s, True, WIRE_Z, destinations=( to, to ),
-         stand_in=vehicle_stand_in( "emu", c, 720.0, 1, RAIL_Z, body, length=1540.0 ) )
+    # All passenger doors are closed, with solid collision across the former vestibules.
+    if f"{train_side}_outer" not in HIDDEN_TRAINS:
+        use( "emu", m, c, 720.0, +1, RAIL_Z, cars=2, body=body, platform_side=s, doors_open=False,
+             wire_z=WIRE_Z, destinations=( to, to ),
+             stand_in=vehicle_stand_in( "emu", c, 720.0, 1, RAIL_Z, body, length=1540.0 ) )
     for e in ( TRACK_A, TRACK_B, TRACK_C ):
         use( "buffer_stop", m, s * e, BUFFER_N, -1, RAIL_Z,
              stand_in=lambda m_, e=e: m_.box( ( s * e - 50, BUFFER_N, RAIL_Z - 7 ), ( s * e + 50, BUFFER_N + 140, RAIL_Z + 54 ),
@@ -605,7 +617,7 @@ def concourse( m, s ):
     for e in ( 560.0, 1100.0 ):
         put( "bench", m, s * e, 1280.0, "-n" )
     put( "bin", m, s * 622.0, 1284.0, "-n" )        # clear of the bench's end, its slots towards the concourse
-    use( "luggage_cart", m, s * 600.0, 950.0, "e", stand_in=furniture_stand_in( "luggage_cart", s * 600.0, 950.0, "+e" ) )
+    # Luggage trolleys are shared model instances added by write_scene().
     # Platform signs over the platforms' heads, hung from the rib at n 820.
     island, outer = ( "gleis_5_6", "gleis_6" ) if s > 0 else ( "gleis_1_2", "gleis_3" if False else "gleis_1" )
     hanging_sign( m, s * 632.0, 820.0, S.shed_z( 632.0 ) - 46, [ island ], "n", bottom=150.0 )
@@ -647,7 +659,7 @@ def platforms( m, s ):
     # "Keep off the tracks" plates at the platforms' ends, facing whoever comes up the ramps.
     for e in ( island, s * 1037.0, s * 90.0 ):
         warn_plate( m, e, -1690.0 )
-    use( "luggage_cart", m, island, -1250.0, "n", stand_in=furniture_stand_in( "luggage_cart", island, -1250.0 ) )
+    # The platform trolley uses the same reusable asset as the concourse carts.
 
 
 def warn_plate( m, e, n ):
@@ -740,7 +752,7 @@ def dress_centre():
     atlas_quad( m, "rw_lettering", "year", ( 0.0, S.HEAD_N0 - 0.4, 442.0 ), ( 1, 0, 0 ), ( 0, 0, 1 ),
                 year_h * atlas_aspect( "rw_lettering", "year" ), year_h )
     # The signal box's name board.
-    atlas_quad( m, "rw_posters", "stellwerk_hf", ( 0.0, S.BOX[3] + 0.6, S.BOX_FLOOR + 140 ), ( -1, 0, 0 ), ( 0, 0, 1 ), 48.0, 16.0 )
+    atlas_quad( m, "rw_posters", "stellwerk_hf", ( -50.0, S.BOX[3] + 0.6, S.BOX_FLOOR + 22 ), ( -1, 0, 0 ), ( 0, 0, 1 ), 48.0, 16.0 )
     return m
 
 
@@ -771,7 +783,12 @@ def lights():
                 out.append( ( f"{side} {name} Canopy {k + 1}", ( 0 if e == 75 else s * e, n, 190 ), WARM, 300, False ) )
     for k, ( e, n ) in enumerate( ( e, n ) for e in ( -1037, -632, 0, 632, 1037 ) for n in ( 820, 340, -140, -620, -1100 ) ):
         out.append( ( f"Platform {k + 1}", ( e, n, 260 ), WARM, 360, False ) )
-    out.append( ( "Signal Box", ( 0, -2040, 220 ), WARM, 260, False ) )
+    import railhead_signal_box as SIGNAL_BOX
+    out.extend( SIGNAL_BOX.lights() )
+    for e in ( -TRACK_C, -TRACK_B, -TRACK_A, TRACK_A, TRACK_B, TRACK_C ):
+        out.append( ( f"Buffer {e:g}", ( e, BUFFER_N + 6.5, RAIL_Z + 63.5 ), "1.1,0.009,0.003,1", 32, False ) )
+    for s in ( -1, 1 ):
+        out.append( ( f"Buffer Siding {s}", ( s * S.SIDING_E, -1613.5, 63.5 ), "1.1,0.009,0.003,1", 32, False ) )
     if P is not None and hasattr( P, "kiosk_lights" ):
         for name, *spec in KIOSKS:
             for k, ( position, radius ) in enumerate( P.kiosk_lights( *spec ) ):
@@ -783,6 +800,13 @@ def lights():
                 frame = P.frame_for(sign * 1145, n, 0, "-e" if sign == 1 else "+e")
                 for k, (position, radius) in enumerate(TM.lights(frame)):
                     out.append((f"Ticket {side} {n} lamp {k + 1}", position, "0.8,0.65,0.475,1", radius, False))
+        import railhead_train as EMU
+        for sign, side in ((-1, "West"), (1, "East")):
+            for track, e, platform_side in (("inner", TRACK_A, -sign), ("outer", TRACK_C, sign)):
+                if f"{side.lower()}_{track}" in HIDDEN_TRAINS:
+                    continue
+                for name, position, color, radius in EMU.lights(sign * e, 720, 1, RAIL_Z, platform_side):
+                    out.append((f"Train {side} {track} {name}", position, color, radius, False))
     return out
 
 
@@ -791,6 +815,8 @@ PROBES = [
     ( "Concourse", ( 0, 1090, 160 ), ( -1160, 1160, 880, 1300, 0, 700 ) ),
     ( "Shed West", ( -600, -230, 150 ), ( -1160, 0, -1340, 880, -37, 700 ) ),
     ( "Shed East", ( 600, -230, 150 ), ( 0, 1160, -1340, 880, -37, 700 ) ),
+    ( "Track Ends West", ( -600, 610, 80 ), ( -1160, 0, 300, 880, -37, 240 ) ),
+    ( "Track Ends East", ( 600, 610, 80 ), ( 0, 1160, 300, 880, -37, 240 ) ),
     ( "Booking Hall", ( 0, 1520, 160 ), ( -600, 600, 1340, 1780, 0, 680 ) ),
     ( "West Wing", ( -900, 1560, 100 ), ( -1160, -660, 1340, 1780, 0, 208 ) ),
     ( "East Wing", ( 900, 1560, 100 ), ( 660, 1160, 1340, 1780, 0, 208 ) ),
@@ -1347,7 +1373,9 @@ def probe_object( name, centre, box ):
     key = f"probe/{name}"
     return K.game_object( ids, f"Probe {name}", key, at, components=[
         K.component( ids, "Sandbox.EnvmapProbe", f"{key}/probe", Bounds={ "Mins": K.vec( lo ), "Maxs": K.vec( hi ) },
-                     DelayBetweenUpdates=0.1, Feathering=0.04, FrameInterval=5, MaxDistance=512, Projection="Box",
+                     DelayBetweenUpdates=0.1, Feathering=0.04, FrameInterval=5,
+                     MaxDistance=1024 if name.startswith( "Track Ends" ) else 512,
+                     Priority=2 if name.startswith( "Track Ends" ) else 0, Projection="Box",
                      RenderDynamically=True, TintColor="1,1,1,1", UpdateStrategy="OnEnabled", ZFar=4096, ZNear=8 ) ] )
 
 
@@ -1397,10 +1425,15 @@ def write_scene( written, light_list, props ):
         for name, title, collide, shadows in SCENE_MODELS if name in written ] )
     import railhead_canopy
     station["Children"].append( railhead_canopy.scene_group() )
+    import railhead_luggage
+    station["Children"].append( railhead_luggage.scene_group() )
+    import railhead_signal_frame
+    station["Children"].append( railhead_signal_frame.scene_group() )
     light_objects = [
         K.game_object( ids, name, f"light/{name}", K.to_world( position ), tags="light_point,light", components=[
             K.component( ids, "Sandbox.PointLight", f"light/{name}/light", Attenuation=1,
-                         FogMode="Disabled" if name.startswith("Ticket ") else "Enabled", FogStrength=0 if name.startswith("Ticket ") else 1,
+                         FogMode="Disabled" if name.startswith(("Ticket ", "Train ", "Buffer ", "Signal Box ")) else "Enabled",
+                         FogStrength=0 if name.startswith(("Ticket ", "Train ", "Buffer ", "Signal Box ")) else 1,
                          LightColor=color, Radius=radius, Shadows=shadows ) ] )
         for name, position, color, radius, shadows in light_list ]
 
@@ -1568,6 +1601,8 @@ def build():
     station["railhead_canopy_pane"] = railhead_canopy.pane_model()
     models = dict( station )
     models["railhead_track"] = track_model()
+    import railhead_buffer
+    railhead_buffer.ballast_detail( models["railhead_track"] )
     east, west, centre = dress_side( 1 ), dress_side( -1 ), dress_centre()
     glass = Model()
     for m in ( east, west, centre ):
@@ -1622,6 +1657,21 @@ def main():
     import railhead_ticket_machine
     if railhead_ticket_machine.missing():
         railhead_ticket_machine.write()
+    import railhead_train
+    if railhead_train.missing():
+        railhead_train.write()
+    import railhead_signal_box
+    if railhead_signal_box.missing():
+        railhead_signal_box.write_materials()
+    import railhead_buffer
+    if railhead_buffer.missing():
+        railhead_buffer.write()
+    import railhead_luggage
+    if railhead_luggage.missing():
+        railhead_luggage.write()
+    import railhead_signal_frame
+    if railhead_signal_frame.missing():
+        railhead_signal_frame.write()
     if RM is not None and RM.vending_missing():
         RM.write_texture( "vending", RM.OUT_DIR )
     models = build()
@@ -1644,6 +1694,10 @@ def main():
 
     solid_names = [ name for name, _, collide, _ in SCENE_MODELS if collide and name in models ]
     solid = [ models[name] for name in solid_names ]
+    trolley_collisions = railhead_luggage.placed_collisions()
+    solid.append( trolley_collisions )
+    frame_collisions = railhead_signal_frame.placed_collisions()
+    solid.append( frame_collisions )
     print( "checking spots:" )
     problems = check_spots( collision_aabbs( solid ), all_spots() )
     print( f"  {problems} problem(s) in {len( all_spots() )} spots" )
@@ -1651,6 +1705,8 @@ def main():
     if out:
         out.mkdir( parents=True, exist_ok=True )
     walked = [ models[name] for name in solid_names if name not in NAV_SKIP ]
+    walked.append( trolley_collisions )
+    walked.append( frame_collisions )
     cut_off = check_reach( walked, all_spots(), out / "reach.png" if out else None )
     print( f"  {cut_off} spot(s) cut off from the spawns" )
     seen = check_retakes_sight( Blockers( solid ) )

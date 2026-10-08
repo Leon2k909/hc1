@@ -1,0 +1,13 @@
+// Tools/railhead_train.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flMetalness "0.18"
+    TextureColor "materials/railhead/rw_emu_color.png"
+    TextureNormal "materials/railhead/rw_emu_normal.png"
+    TextureRoughness "materials/railhead/rw_emu_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1.0"
+}
