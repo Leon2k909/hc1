@@ -775,11 +775,22 @@ def inside_atlas():
     f = regions["front"]
     t = ( ( f.x + DOOR_POST ) / ( 2 * DOOR_POST ) * 5 ) % 1.0
     f.height += 1.4 * ( 1.0 - smoothstep( 0.1, 0.32, t ) * smoothstep( 0.9, 0.68, t ) )
+    # The doors' inner faces (an open container's leaves): the back of door_end's panel, so its five ribs are channels
+    # here, inside the leaf's box-section frame, and the black rubber gasket round the leaf's edge.
     d = regions["doors"]
     lx = np.abs( d.x )
-    frame = ( ( lx < 2.8 ) | ( lx > DOOR_POST - 3.0 ) | ( d.z < 3.0 ) | ( d.z > INSIDE_HEIGHT - 3.0 ) ).astype( np.float32 )
-    d.height += 0.5 * frame
-    d.lay( lin( ( 10, 10, 10 ) ), np.exp( -0.5 * ( d.x / 0.25 ) ** 2 ), height=-0.6 )
+    zl = d.z + FLOOR                                  # the region's z is from the floor's top; door_end's from the ground
+    rim = 2.6
+    panel = ( ( lx > 0.2 + rim ) & ( lx < DOOR_POST - 0.4 - rim ) & ( zl > DOOR_SILL + rim ) & ( zl < DOOR_HEADER - rim ) ).astype( np.float32 )
+    phase = ( zl - DOOR_SILL - rim ) / ( ( DOOR_HEADER - rim ) - ( DOOR_SILL + rim ) ) * 5.0
+    rib = smoothstep( 0.12, 0.3, phase % 1.0 ) * smoothstep( 0.88, 0.7, phase % 1.0 )
+    # How far in from the leaf's edge. The door frame round the opening samples this region too, outside the leaves.
+    edge = np.minimum( np.minimum( lx - 0.4, DOOR_POST - lx ), np.minimum( zl - DOOR_SILL, DOOR_HEADER - zl ) )
+    on_leaf = ( edge > 0.0 ).astype( np.float32 )
+    d.height += 0.6 * ( 1.0 - panel ) * on_leaf - 0.8 * rib * panel
+    d.colour *= ( 1.0 - 0.07 * rib * panel )[..., None]
+    gasket = smoothstep( 1.5, 1.1, edge ).astype( np.float32 ) * on_leaf
+    d.lay( lin( ( 20, 20, 20 ) ), gasket * 0.92, rough=0.85, height=0.3 )
     for name, r in regions.items():
         x, y, w, h = INSIDE[name]
         c_, ro, he = r.maps()
@@ -820,7 +831,7 @@ def concrete( n=None ):
     broom_a = ndimage.gaussian_filter( nz( 0.8, 2, 0.19 ), ( 0, 6 ), mode="wrap" )
     broom_b = ndimage.gaussian_filter( nz( 0.8, 2, 0.19 ), ( 6, 0 ), mode="wrap" )
     broom = np.where( slab_i == 0, broom_a, broom_b )
-    height = 0.02 * broom + 0.03 * grit + 0.15 * mid
+    height = 0.02 * broom + 0.03 * grit + 0.04 * mid      # a power-floated slab: flat to a few mm over a metre
     # Worn: the paste gone and the aggregate showing, where the traffic runs.
     worn = smoothstep( 0.2, 1.6, nz( 2.4, 200, 20 ) )
     aggregate = smoothstep( 0.3, 1.2, nz( 0.8, 1.2, 0.19 ) )

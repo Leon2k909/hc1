@@ -1,0 +1,5428 @@
+{
+  "__guid": "4f8eb6a5-7b7e-5c57-b2e9-119881d1337c",
+  "GameObjects": [
+    {
+      "__guid": "be0620c6-234c-5cb5-a45b-5783619fb6b5",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Scene Information",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.SceneInformation",
+          "__guid": "91aab5fd-df1b-550c-936e-65eb68014a18",
+          "__enabled": true,
+          "Flags": 0,
+          "Title": "Boxyard",
+          "Author": null,
+          "Changes": "",
+          "Description": "A walled container yard at a port terminal: two rows of shipping containers along its walls and four stacks round an open middle, for close, fast fights.",
+          "Group": null,
+          "SceneTags": "",
+          "Version": null
+        },
+        {
+          "__type": "Facepunch.MapInformation",
+          "__guid": "eda87e62-5b37-50b0-a8b6-ea95adc98544",
+          "__enabled": true,
+          "Flags": 0,
+          "Image": "ui/maps/boxyard.png",
+          "IsVisibleInMenu": true
+        },
+        {
+          "__type": "Facepunch.MapSpawnSettings",
+          "__guid": "c99b7f75-81c2-5899-8485-320da08de2ad",
+          "__enabled": true,
+          "Flags": 0,
+          "UseMapSpawnPoints": false,
+          "AllowNavMeshSpawns": false
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "1643affd-9a16-5982-8e60-71d205fd8db7",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Minimap Renderer",
+      "Position": "0,-0,1500",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Facepunch.MinimapRenderer",
+          "__guid": "c47d87c7-f159-594d-bf2e-2d166b39e91d",
+          "__enabled": true,
+          "Flags": 0,
+          "CurrentMinimapPath": "ui/minimaps/minimap_boxyard.png",
+          "ExportResolution": "1024,1024",
+          "Size": 1800
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "c591ebea-1873-51b1-a351-9b97dded63dc",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Sun",
+      "Position": "0,0,3000",
+      "Rotation": "0.0424952,0.3227829,-0.1234149,0.9374295",
+      "Scale": "1,1,1",
+      "Tags": "light_directional,light",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.DirectionalLight",
+          "__guid": "30d6e488-dccf-5cef-ab78-0456cf527570",
+          "__enabled": true,
+          "Flags": 0,
+          "ContactShadows": true,
+          "FogMode": "Enabled",
+          "FogStrength": 1,
+          "LightColor": "1.32,1.08,0.82,1",
+          "ShadowBias": 0.0005,
+          "ShadowCascadeCount": 4,
+          "ShadowCascadeSplitRatio": 0.91,
+          "ShadowHardness": 0,
+          "Shadows": true,
+          "SkyColor": "0.42,0.48,0.58,1"
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "17ef4407-65ea-548b-9675-f861345931cd",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Sky",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "skybox",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.SkyBox2D",
+          "__guid": "2ad7c381-34b8-53b7-b48e-d857659e7c0b",
+          "__enabled": true,
+          "Flags": 0,
+          "SkyIndirectLighting": true,
+          "SkyMaterial": "materials/railhead/sky/railhead_sky.vmat",
+          "Tint": "1,1,1,1"
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "cc64534c-e786-5c55-b9b7-566975771ffe",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Fog",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.GradientFog",
+          "__guid": "45b00e0a-d317-57f2-badd-8b002f30ec30",
+          "__enabled": true,
+          "Flags": 0,
+          "Color": "0.351,0.594,1.048,0.75",
+          "StartDistance": 2500,
+          "EndDistance": 40000,
+          "FalloffExponent": 1.5,
+          "Height": 9000,
+          "VerticalFalloffExponent": 1.2
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "8d426413-1958-5f73-986e-88f1b1056bf7",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Look",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.PostProcessVolume",
+          "__guid": "a4218d84-d07e-5767-be43-60a4563b5183",
+          "__enabled": true,
+          "Flags": 0,
+          "BlendDistance": 50,
+          "BlendWeight": 1,
+          "EditorPreview": true,
+          "Priority": 0,
+          "SceneVolume": {
+            "Type": "Infinite",
+            "Sphere": {
+              "Center": "0,0,0",
+              "Radius": 10
+            },
+            "Box": {
+              "Mins": "-50,-50,-50",
+              "Maxs": "50,50,50"
+            },
+            "Capsule": {
+              "CenterA": "0,0,10",
+              "CenterB": "0,0,90",
+              "Radius": 10
+            }
+          }
+        },
+        {
+          "__type": "Sandbox.AmbientOcclusion",
+          "__guid": "58920602-b3c6-532c-90f1-7692ed1bff13",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "FalloffRange": 1,
+          "Intensity": 0.6,
+          "Radius": 96,
+          "ThinCompensation": 5
+        },
+        {
+          "__type": "Sandbox.ColorGrading",
+          "__guid": "9900ba29-c2ea-5693-8452-88a8e573f916",
+          "__enabled": true,
+          "Flags": 0,
+          "GradingMethod": "TemperatureControl",
+          "ColorTempK": 5900,
+          "BlendFactor": 0.45,
+          "ColorSpace": "None",
+          "LookupTexture": null
+        },
+        {
+          "__type": "Sandbox.Vignette",
+          "__guid": "3e681286-54d8-5faa-92eb-66c6448165d9",
+          "__enabled": true,
+          "Flags": 0,
+          "Center": "0.5,0.5",
+          "Color": "0,0,0,1",
+          "Intensity": 0.22,
+          "Roundness": 1,
+          "Smoothness": 1
+        },
+        {
+          "__type": "Sandbox.Tonemapping",
+          "__guid": "36de39c9-44cc-5fbe-85dc-496718c2ce9e",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 3,
+          "AutoExposureEnabled": true,
+          "ExposureCompensation": 0,
+          "ExposureMethod": "RGB",
+          "MinimumExposure": 2.0,
+          "MaximumExposure": 3,
+          "Mode": "ACES",
+          "Rate": 1
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "fdd57ada-1e69-593f-a264-db09882406b0",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Boxyard",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [],
+      "Children": [
+        {
+          "__guid": "da48dae2-728f-5327-b703-d292f7e7c9da",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Yard",
+          "Position": "0,0,0",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "49451850-bb99-50ac-9eee-2edb823f1803",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "Model": "models/maps/boxyard/boxyard_yard.vmdl",
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            },
+            {
+              "__type": "Sandbox.ModelCollider",
+              "__guid": "d0735229-e110-5de8-8e1e-c283782b3cda",
+              "__enabled": true,
+              "Flags": 0,
+              "IsTrigger": false,
+              "Model": "models/maps/boxyard/boxyard_yard.vmdl",
+              "Static": true
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "3a171ddd-f793-535b-9fdd-168646204f36",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Containers",
+          "Position": "0,0,0",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "6c94f2d1-42e5-54dd-9e36-174b28574649",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "Model": "models/maps/boxyard/boxyard_containers.vmdl",
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            },
+            {
+              "__type": "Sandbox.ModelCollider",
+              "__guid": "e75e9e01-0fed-5f5d-ba4c-1225be6b6f52",
+              "__enabled": true,
+              "Flags": 0,
+              "IsTrigger": false,
+              "Model": "models/maps/boxyard/boxyard_containers.vmdl",
+              "Static": true
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "8b83170c-b151-5bb5-9a7c-4790d33d6b4d",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Props",
+          "Position": "0,0,0",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "0016983d-3a89-5d61-9fd9-cb2c6a047609",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "Model": "models/maps/boxyard/boxyard_props.vmdl",
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            },
+            {
+              "__type": "Sandbox.ModelCollider",
+              "__guid": "8a984d26-7cde-5626-b831-ce5a77fab3ea",
+              "__enabled": true,
+              "Flags": 0,
+              "IsTrigger": false,
+              "Model": "models/maps/boxyard/boxyard_props.vmdl",
+              "Static": true
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "f7d90f90-f310-5e89-9c2c-b451937349f4",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Backdrop",
+          "Position": "0,0,0",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "1215e509-2e98-5bc4-a164-eec5d1dc2501",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "Model": "models/maps/boxyard/boxyard_backdrop.vmdl",
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        }
+      ]
+    },
+    {
+      "__guid": "f3032841-814a-5146-94a8-0d72b247024e",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Lights",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [],
+      "Children": [
+        {
+          "__guid": "2c49c1d2-3d03-5bd7-a921-edb08f1cdb92",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "North Row Open Inside",
+          "Position": "688,-30,85",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "75910b52-3cad-5191-a89d-c8a92bc8743a",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 1,
+              "LightColor": "0.45,0.42,0.38,1",
+              "Radius": 180,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "ffda8666-abff-555d-889a-cb49148ad579",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "South Row Open Inside",
+          "Position": "-784,-30,85",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "9e4c4a51-daee-56e9-a70e-24b363725a07",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 1,
+              "LightColor": "0.45,0.42,0.38,1",
+              "Radius": 180,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "cc6cbfb7-b182-5917-b1de-f8744643fb5b",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "South East Outer Inside",
+          "Position": "-258,-272,85",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "a77d2f74-dc55-5997-bdcf-a5fd3dd8b0ba",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 1,
+              "LightColor": "0.45,0.42,0.38,1",
+              "Radius": 180,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "62573479-7fa1-50bb-8095-11326241e5d8",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "South West Inner Inside",
+          "Position": "-258,176,85",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "4cf55086-73c0-5955-b661-7e6e3af67d39",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 1,
+              "LightColor": "0.45,0.42,0.38,1",
+              "Radius": 180,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "e8f935d5-543a-5273-89dc-40e41989606c",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "North West Outer Inside",
+          "Position": "258,272,85",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "cd378b08-e46b-5697-b284-f49222c832b8",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 1,
+              "LightColor": "0.45,0.42,0.38,1",
+              "Radius": 180,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "84bee2dd-4641-51f6-b142-246536b91c08",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "North East Inner Inside",
+          "Position": "258,-176,85",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "a3e80829-c051-5a12-a4cd-f6bea4e6d86b",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 1,
+              "LightColor": "0.45,0.42,0.38,1",
+              "Radius": 180,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        }
+      ]
+    },
+    {
+      "__guid": "49501761-f72e-5ea3-a09a-af07857c31d0",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Reflection Probes",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [],
+      "Children": [
+        {
+          "__guid": "d03ed993-ba06-5e0e-973a-5b5f2d90461b",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Probe Yard",
+          "Position": "0,0,100",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.EnvmapProbe",
+              "__guid": "a5febb7e-dfdc-576d-a312-0eeba53b7e22",
+              "__enabled": true,
+              "Flags": 0,
+              "Bounds": {
+                "Mins": "-832,-800,-120",
+                "Maxs": "832,800,300"
+              },
+              "DelayBetweenUpdates": 0.1,
+              "Feathering": 0.04,
+              "FrameInterval": 5,
+              "MaxDistance": 512,
+              "Projection": "Box",
+              "RenderDynamically": true,
+              "TintColor": "1,1,1,1",
+              "UpdateStrategy": "OnEnabled",
+              "ZFar": 4096,
+              "ZNear": 8
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "3f79db19-f25d-5ee5-8fd3-96cf9aea859a",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Probe North Row Open",
+          "Position": "688,-0,50",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.EnvmapProbe",
+              "__guid": "184efadb-eba9-5d28-8ccb-2964c8609d8b",
+              "__enabled": true,
+              "Flags": 0,
+              "Bounds": {
+                "Mins": "-46,-115.8,-44",
+                "Maxs": "46,115.8,50"
+              },
+              "DelayBetweenUpdates": 0.1,
+              "Feathering": 0.04,
+              "FrameInterval": 5,
+              "MaxDistance": 512,
+              "Projection": "Box",
+              "RenderDynamically": true,
+              "TintColor": "1,1,1,1",
+              "UpdateStrategy": "OnEnabled",
+              "ZFar": 4096,
+              "ZNear": 8
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "47ecc871-6bb7-5a65-adcf-63f17bcff125",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Probe South Row Open",
+          "Position": "-784,-0,50",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.EnvmapProbe",
+              "__guid": "9d447029-6d3e-5567-bd63-58aeae71d0b4",
+              "__enabled": true,
+              "Flags": 0,
+              "Bounds": {
+                "Mins": "-46,-115.8,-44",
+                "Maxs": "46,115.8,50"
+              },
+              "DelayBetweenUpdates": 0.1,
+              "Feathering": 0.04,
+              "FrameInterval": 5,
+              "MaxDistance": 512,
+              "Projection": "Box",
+              "RenderDynamically": true,
+              "TintColor": "1,1,1,1",
+              "UpdateStrategy": "OnEnabled",
+              "ZFar": 4096,
+              "ZNear": 8
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "f9b7b0ce-d28e-50e1-bd1a-5810a026e5ab",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Probe South East Outer",
+          "Position": "-288,-272,50",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.EnvmapProbe",
+              "__guid": "08b3202f-0ced-5038-ab29-ba0128fd8ae2",
+              "__enabled": true,
+              "Flags": 0,
+              "Bounds": {
+                "Mins": "-115.8,-46,-44",
+                "Maxs": "115.8,46,50"
+              },
+              "DelayBetweenUpdates": 0.1,
+              "Feathering": 0.04,
+              "FrameInterval": 5,
+              "MaxDistance": 512,
+              "Projection": "Box",
+              "RenderDynamically": true,
+              "TintColor": "1,1,1,1",
+              "UpdateStrategy": "OnEnabled",
+              "ZFar": 4096,
+              "ZNear": 8
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "1e303dd3-dc48-569d-8414-0b44b3c1ddb9",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Probe South West Inner",
+          "Position": "-288,176,50",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.EnvmapProbe",
+              "__guid": "ca749e60-f0fc-589e-ba52-c95ddeab119c",
+              "__enabled": true,
+              "Flags": 0,
+              "Bounds": {
+                "Mins": "-115.8,-46,-44",
+                "Maxs": "115.8,46,50"
+              },
+              "DelayBetweenUpdates": 0.1,
+              "Feathering": 0.04,
+              "FrameInterval": 5,
+              "MaxDistance": 512,
+              "Projection": "Box",
+              "RenderDynamically": true,
+              "TintColor": "1,1,1,1",
+              "UpdateStrategy": "OnEnabled",
+              "ZFar": 4096,
+              "ZNear": 8
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "cf636d0a-62f4-5672-aeb6-fe7c7f3eee20",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Probe North West Outer",
+          "Position": "288,272,50",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.EnvmapProbe",
+              "__guid": "f919f6cd-443f-51ef-824f-ad43cd70b52f",
+              "__enabled": true,
+              "Flags": 0,
+              "Bounds": {
+                "Mins": "-115.8,-46,-44",
+                "Maxs": "115.8,46,50"
+              },
+              "DelayBetweenUpdates": 0.1,
+              "Feathering": 0.04,
+              "FrameInterval": 5,
+              "MaxDistance": 512,
+              "Projection": "Box",
+              "RenderDynamically": true,
+              "TintColor": "1,1,1,1",
+              "UpdateStrategy": "OnEnabled",
+              "ZFar": 4096,
+              "ZNear": 8
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "96328aaf-5976-566f-b24a-2c798248816e",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Probe North East Inner",
+          "Position": "288,-176,50",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.EnvmapProbe",
+              "__guid": "c09921df-f75f-51fe-9e07-08bcdb0d1bd1",
+              "__enabled": true,
+              "Flags": 0,
+              "Bounds": {
+                "Mins": "-115.8,-46,-44",
+                "Maxs": "115.8,46,50"
+              },
+              "DelayBetweenUpdates": 0.1,
+              "Feathering": 0.04,
+              "FrameInterval": 5,
+              "MaxDistance": 512,
+              "Projection": "Box",
+              "RenderDynamically": true,
+              "TintColor": "1,1,1,1",
+              "UpdateStrategy": "OnEnabled",
+              "ZFar": 4096,
+              "ZNear": 8
+            }
+          ],
+          "Children": []
+        }
+      ]
+    },
+    {
+      "__guid": "d545a472-8d44-500c-a1fc-418f0bd5406a",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Team Spawns",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Facepunch.GameModeObject",
+          "__guid": "8349d37c-eab6-5ef1-935b-51ee82025572",
+          "__enabled": true,
+          "Flags": 0,
+          "GameModes": [
+            "Deathmatch",
+            "Gun Game"
+          ],
+          "Inverse": true
+        }
+      ],
+      "Children": [
+        {
+          "__guid": "b284a6ba-b728-5c8e-8936-5f913cb2257e",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Red Spawn 1",
+          "Position": "160,480,0",
+          "Rotation": "0,0,-0.7469540,0.6648757",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "3eae914a-2c82-5360-8a9d-3ec2668e03d9",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Terrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "ad7d3b02-ceb3-5aca-b885-65cc0adc5a4e",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Red Spawn 2",
+          "Position": "-160,480,0",
+          "Rotation": "0,0,-0.6648757,0.7469540",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "952c1e16-5ba2-5011-93e9-6bb4bd89e923",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Terrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "562cf5da-4029-528a-a0aa-1ec1593d483c",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Red Spawn 3",
+          "Position": "300,480,0",
+          "Rotation": "0,0,-0.7790048,0.6270180",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "eb573950-c076-5452-aeb5-eebb6d495d58",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Terrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "2c9d9eb2-651f-5e67-9de1-c2ccd9099875",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Red Spawn 4",
+          "Position": "-300,480,0",
+          "Rotation": "0,0,-0.6270180,0.7790048",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "75d71927-9621-5dcc-bd11-e3d3cae55bec",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Terrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "3b31e119-70ec-5643-a0fd-96226d33d45f",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Red Spawn 5",
+          "Position": "450,420,0",
+          "Rotation": "0,0,-0.8219256,0.5695948",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "604fd47e-bac3-5190-b2ef-dfc7a60d345d",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Terrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "793516b2-7dcb-5574-90b8-781a65f11f81",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Red Spawn 6",
+          "Position": "-450,420,0",
+          "Rotation": "0,0,-0.5695948,0.8219256",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "3463767d-df93-5051-8b43-eb3d225222c9",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Terrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "ee6ae4cf-0b93-5278-a950-e9aa021a849f",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Red Spawn 7",
+          "Position": "220,700,0",
+          "Rotation": "0,0,-0.7447619,0.6673303",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "c9862e5d-7dc6-50c1-b23a-6be9c3da36ca",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Terrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "dc02fc33-0e36-5f1c-9865-f3c6a0e2a5f6",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Red Spawn 8",
+          "Position": "-220,700,0",
+          "Rotation": "0,0,-0.6673303,0.7447619",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "2855f300-c6d4-5c86-ad5e-5faf111ff302",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Terrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "19f4b95b-bc75-54ca-a3ca-b957d3d7b9f3",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Red Spawn 9",
+          "Position": "380,700,0",
+          "Rotation": "0,0,-0.7702794,0.6377066",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "7619bfde-8dd9-5135-8967-a495d99c74c3",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Terrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "03d3def6-c593-520f-a993-9ddacc35938a",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Red Spawn 10",
+          "Position": "-380,700,0",
+          "Rotation": "0,0,-0.6377066,0.7702794",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "a005b286-fd34-5504-ace1-51d7956ea34a",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Terrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "07dcd522-eb67-5671-8f97-373de6bbc3c4",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Red Spawn 11",
+          "Position": "420,520,0",
+          "Rotation": "0,0,-0.7975060,0.6033111",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "42a2a033-aa2b-54ce-ab40-c5d5e27412a9",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Terrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "ca7071db-9125-5e56-af4c-31e3cb3ee6cf",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Red Spawn 12",
+          "Position": "-480,560,0",
+          "Rotation": "0,0,-0.5969305,0.8022929",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "eb17aacd-3acb-5845-8664-c5d90b2da582",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Terrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "f4d270f5-9069-59e5-8c70-7247bf6c7c35",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Blue Spawn 1",
+          "Position": "-160,-480,0",
+          "Rotation": "0,0,0.6648757,0.7469540",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "70fae66c-ad6b-54ea-9a67-761fbb135e2a",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "e5bf6ab3-77ea-5c95-8218-573ffefa542d",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Blue Spawn 2",
+          "Position": "160,-480,0",
+          "Rotation": "0,0,0.7469540,0.6648757",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "b66e5ebb-d38a-5534-82e5-8ff0f1a935e4",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "84b6d71d-9487-53b4-9e38-e9ce5592b19c",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Blue Spawn 3",
+          "Position": "-300,-480,0",
+          "Rotation": "0,0,0.6270180,0.7790048",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "478e7b5f-8166-5356-bd05-f95b19fe3b69",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "045b9070-a6d8-5f24-a197-55e2420e588e",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Blue Spawn 4",
+          "Position": "300,-480,0",
+          "Rotation": "0,0,0.7790048,0.6270180",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "debd1bc0-12e5-52e2-8deb-bc1d4c98124d",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "5deb722b-3615-5723-8f5d-793898cb248e",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Blue Spawn 5",
+          "Position": "-450,-420,0",
+          "Rotation": "0,0,0.5695948,0.8219256",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "4b1d6619-7814-57c5-8bf6-f66a1a0654c3",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "c5ddf85a-75a8-56c1-90b8-8ac849901901",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Blue Spawn 6",
+          "Position": "450,-420,0",
+          "Rotation": "0,0,0.8219256,0.5695948",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "a4b2a41a-d48b-5bd0-ad99-79d0ef7d0ae1",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "2f20bfa6-e123-5e51-af9b-50b828791914",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Blue Spawn 7",
+          "Position": "-220,-700,0",
+          "Rotation": "0,0,0.6673303,0.7447619",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "e955a68f-aeb9-5ad2-9239-bc5bae85ef28",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "b7d9b8d6-0efa-5de1-b1cd-48ed86312f55",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Blue Spawn 8",
+          "Position": "220,-700,0",
+          "Rotation": "0,0,0.7447619,0.6673303",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "748dde7a-a8f5-5b7d-b2ea-d0c0f585902b",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "f52269b3-cb8a-50ca-b6f4-7c23d02dd437",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Blue Spawn 9",
+          "Position": "-380,-700,0",
+          "Rotation": "0,0,0.6377066,0.7702794",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "8ca71a29-6034-5e77-915e-21b799103842",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "61b44f5c-768a-599e-ad5b-364360fbe65a",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Blue Spawn 10",
+          "Position": "380,-700,0",
+          "Rotation": "0,0,0.7702794,0.6377066",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "6554de8e-13ff-5ab0-8b04-c385ede4565a",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "d52d0dba-dc94-5f9a-b349-20775d80e6e2",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Blue Spawn 11",
+          "Position": "-420,-520,0",
+          "Rotation": "0,0,0.6033111,0.7975060",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "3bb74238-905e-5638-96f0-6c991b195177",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "c058cded-8247-5a2b-8113-c33ea6708cd0",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Blue Spawn 12",
+          "Position": "480,-560,0",
+          "Rotation": "0,0,0.8022929,0.5969305",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "38b8957c-6ead-56ab-bb58-47f1772e99ed",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        }
+      ]
+    },
+    {
+      "__guid": "9219b9d7-1961-5cb4-ae05-1a1587e8a67c",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Deathmatch Spawns",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Facepunch.GameModeObject",
+          "__guid": "a58ea843-5714-5c26-9b58-e91a68262738",
+          "__enabled": true,
+          "Flags": 0,
+          "GameModes": [
+            "Deathmatch",
+            "Gun Game"
+          ],
+          "Inverse": false
+        }
+      ],
+      "Children": [
+        {
+          "__guid": "bfa56137-b87c-5961-ae07-59c640152161",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "DM Spawn 1",
+          "Position": "0,-400,0",
+          "Rotation": "0,0,0.7071068,0.7071068",
+          "Scale": "1,1,1",
+          "Tags": "deathmatch",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "cf4f1817-baa4-5773-bc03-31a6b2dfe556",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Unassigned"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "eeff9f4e-a3ee-5cb3-a6e8-4cf153bf4854",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "DM Spawn 2",
+          "Position": "0,400,0",
+          "Rotation": "0,0,-0.7071068,0.7071068",
+          "Scale": "1,1,1",
+          "Tags": "deathmatch",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "ef3124b7-2503-5ec4-9977-45490355095b",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Unassigned"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "f1798c0a-04ca-57b0-8835-281f062e6569",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "DM Spawn 3",
+          "Position": "100,0,0",
+          "Rotation": "0,0,1.0000000,0.0000000",
+          "Scale": "1,1,1",
+          "Tags": "deathmatch",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "24e0ceba-019d-5b5c-b3a3-68a82473d6cd",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Unassigned"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "d769e965-d33a-58d7-872e-e65cf02abcc1",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "DM Spawn 4",
+          "Position": "-100,0,0",
+          "Rotation": "0,0,0.0000000,1.0000000",
+          "Scale": "1,1,1",
+          "Tags": "deathmatch",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "42e5ed3b-4ebd-5724-ba4a-382f9d3cddc4",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Unassigned"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "4a9f434e-8776-5750-9b53-8cc4e23aa59d",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "DM Spawn 5",
+          "Position": "-500,90,0",
+          "Rotation": "0,0,-0.2352788,0.9719279",
+          "Scale": "1,1,1",
+          "Tags": "deathmatch",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "fedd8c97-674d-5fb6-a131-7fd33b69d5fe",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Unassigned"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "ac78e6ef-1cae-5146-b5a5-7bc07ff5f398",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "DM Spawn 6",
+          "Position": "500,-90,0",
+          "Rotation": "0,0,0.9719279,0.2352788",
+          "Scale": "1,1,1",
+          "Tags": "deathmatch",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "a6ba9d91-d52c-529f-8c0c-30326aaa6d84",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Unassigned"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "1d002a1b-1c1f-50f0-8e57-86b249323464",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "DM Spawn 7",
+          "Position": "-470,-330,0",
+          "Rotation": "0,0,0.5262469,0.8503318",
+          "Scale": "1,1,1",
+          "Tags": "deathmatch",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "7d2c9e90-f270-5311-90ea-7325b25332c2",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Unassigned"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "2a20a11e-c181-528f-98e3-e4a3b8a2d918",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "DM Spawn 8",
+          "Position": "500,330,0",
+          "Rotation": "0,0,-0.8568847,0.5155082",
+          "Scale": "1,1,1",
+          "Tags": "deathmatch",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "9149e68c-793e-5970-bd6c-e6e175b3404d",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Unassigned"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "d28f3e81-d212-5639-8efa-3f1aa02c194a",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "DM Spawn 9",
+          "Position": "-780,740,0",
+          "Rotation": "0,0,-0.5717882,0.8204013",
+          "Scale": "1,1,1",
+          "Tags": "deathmatch",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "193e44eb-3ab2-5300-b449-48836d8bd08a",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Unassigned"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "134d57bc-bd91-5dc8-bb83-cbf69d392c84",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "DM Spawn 10",
+          "Position": "790,-750,0",
+          "Rotation": "0,0,0.8203378,0.5718792",
+          "Scale": "1,1,1",
+          "Tags": "deathmatch",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "3e1dd390-fd78-525d-ae2c-6160b9c34618",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Unassigned"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "e2ae2d7d-4e70-5b08-adec-9fa07f5cfae8",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "DM Spawn 11",
+          "Position": "-760,-700,0",
+          "Rotation": "0,0,0.5677950,0.8231700",
+          "Scale": "1,1,1",
+          "Tags": "deathmatch",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "9a41ea90-816e-57f6-8547-57552151138e",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Unassigned"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "ee3eafaf-3b20-58db-8e09-2549ec66835d",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "DM Spawn 12",
+          "Position": "760,700,0",
+          "Rotation": "0,0,-0.8231700,0.5677950",
+          "Scale": "1,1,1",
+          "Tags": "deathmatch",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "14008481-fcc6-55f3-ba7e-f01c2026d1eb",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Unassigned"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "c5ee72d0-ae5d-5ca2-adf6-4ad5a7809890",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "DM Spawn 13",
+          "Position": "-760,-220,0",
+          "Rotation": "0,0,0.3386809,0.9409013",
+          "Scale": "1,1,1",
+          "Tags": "deathmatch",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "039ed501-f34d-5d02-a1b2-6ddf72a59f2d",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Unassigned"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "d699fd0f-1625-55c3-b52c-8f0a67df9d20",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "DM Spawn 14",
+          "Position": "760,220,0",
+          "Rotation": "0,0,-0.9409013,0.3386809",
+          "Scale": "1,1,1",
+          "Tags": "deathmatch",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "cb067615-aabc-5a07-8692-47d29ae621d6",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Unassigned"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "d55b774e-95fb-5972-b0cc-7c30c7339848",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "DM Spawn 15",
+          "Position": "-560,200,0",
+          "Rotation": "0,0,-0.3873444,0.9219351",
+          "Scale": "1,1,1",
+          "Tags": "deathmatch",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "8f3a057a-e57e-5092-b9c3-c5d1781bc4af",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Unassigned"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "5e2c25fa-480f-5cfd-aecf-5de159d4256e",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "DM Spawn 16",
+          "Position": "560,-200,0",
+          "Rotation": "0,0,0.9219351,0.3873444",
+          "Scale": "1,1,1",
+          "Tags": "deathmatch",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "0238b7b2-01da-566a-b542-d86bf8400c88",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Unassigned"
+            }
+          ],
+          "Children": []
+        }
+      ]
+    },
+    {
+      "__guid": "53eca73e-1e26-5167-8f78-d7bbbbf6efbe",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Retakes Spawns",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Facepunch.GameModeObject",
+          "__guid": "2ef9b280-a4ba-50a6-96f1-fe2d9f7d1395",
+          "__enabled": true,
+          "Flags": 0,
+          "GameModes": [
+            "Retakes"
+          ],
+          "Inverse": false
+        }
+      ],
+      "Children": [
+        {
+          "__guid": "1efd4f65-a2b7-5667-8897-0dda9166ddff",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "bombsite_a planter 1",
+          "Position": "700,-400,0",
+          "Rotation": "0,0,0.8724426,0.4887166",
+          "Scale": "1,1,1",
+          "Tags": "retakes,bombsite_a,planter",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "4272643a-9ba8-5bac-8eaf-73bb459b7ab3",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Terrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "2950757f-3678-57d7-a135-85bbae1e8c66",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "bombsite_a planter 2",
+          "Position": "590,-330,0",
+          "Rotation": "0,0,0.8747744,0.4845304",
+          "Scale": "1,1,1",
+          "Tags": "retakes,bombsite_a,planter",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "c2ceabeb-ae2a-58d1-b6a3-6cc7f79bc856",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Terrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "2029c9eb-f640-5ccc-a4db-08cc93bed578",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "bombsite_a defender 1",
+          "Position": "790,-640,0",
+          "Rotation": "0,0,0.8356437,0.5492719",
+          "Scale": "1,1,1",
+          "Tags": "retakes,bombsite_a,defender",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "61b2d446-a58c-516d-805f-e44019a273ad",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Terrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "60706287-e762-5a18-807c-805cb2ba31e9",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "bombsite_a defender 2",
+          "Position": "600,-180,0",
+          "Rotation": "0,0,0.9378850,0.3469462",
+          "Scale": "1,1,1",
+          "Tags": "retakes,bombsite_a,defender",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "6cb9b111-7a8a-5e41-9ff3-208ede98ae46",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Terrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "4390f1e1-793f-5f92-ab25-6cc7796ae038",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "bombsite_a defender 3",
+          "Position": "792,-740,0",
+          "Rotation": "0,0,0.8218244,0.5697409",
+          "Scale": "1,1,1",
+          "Tags": "retakes,bombsite_a,defender",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "7959aa88-f532-5266-89ee-174d92aafd49",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Terrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "e902dd86-bf09-5b1a-b149-ba64ffeb7de0",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "bombsite_a attacker 1",
+          "Position": "160,480,0",
+          "Rotation": "0,0,-0.7469540,0.6648757",
+          "Scale": "1,1,1",
+          "Tags": "retakes,bombsite_a,attacker",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "0aa81003-cd4f-5aa1-92c5-f05553abd130",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "8c4299bc-b155-5da0-a0bf-492da8c4eae6",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "bombsite_a attacker 2",
+          "Position": "-160,480,0",
+          "Rotation": "0,0,-0.6648757,0.7469540",
+          "Scale": "1,1,1",
+          "Tags": "retakes,bombsite_a,attacker",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "e4fb4eb4-1eb6-5964-a1a9-aa016238ca55",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "0b84f48b-7de9-5799-a36b-84619514f8a1",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "bombsite_a attacker 3",
+          "Position": "300,480,0",
+          "Rotation": "0,0,-0.7790048,0.6270180",
+          "Scale": "1,1,1",
+          "Tags": "retakes,bombsite_a,attacker",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "2dfccfd4-f2bb-5277-8a99-caddd3b004f0",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "7e3701ad-c88a-5440-a98d-07052ff6dd44",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "bombsite_a attacker 4",
+          "Position": "-300,480,0",
+          "Rotation": "0,0,-0.6270180,0.7790048",
+          "Scale": "1,1,1",
+          "Tags": "retakes,bombsite_a,attacker",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "509078b6-7d4e-546b-90ae-07c4b6d0ae1b",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "31eeac6e-9288-5fb1-9b26-4938ce9e5f61",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "bombsite_a attacker 5",
+          "Position": "220,700,0",
+          "Rotation": "0,0,-0.7447619,0.6673303",
+          "Scale": "1,1,1",
+          "Tags": "retakes,bombsite_a,attacker",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "bc4192f8-d1ed-546e-abe4-11f802fd92b5",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "7b2fcb1f-6c43-5641-bd55-4f94bacd0647",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "bombsite_a attacker 6",
+          "Position": "-220,700,0",
+          "Rotation": "0,0,-0.6673303,0.7447619",
+          "Scale": "1,1,1",
+          "Tags": "retakes,bombsite_a,attacker",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "ec9a95c7-963b-5a07-9cb1-ee52c0cf46eb",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "4436e3c4-0bc3-5bed-b3f4-7a77f15b2d23",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "bombsite_b planter 1",
+          "Position": "-760,-400,0",
+          "Rotation": "0,0,0.4723669,0.8814020",
+          "Scale": "1,1,1",
+          "Tags": "retakes,bombsite_b,planter",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "edc004dc-f168-5989-a592-79b28af00f98",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Terrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "6c9cf72b-cba4-576d-a1da-f097bab3378a",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "bombsite_b planter 2",
+          "Position": "-600,-330,0",
+          "Rotation": "0,0,0.4812092,0.8766058",
+          "Scale": "1,1,1",
+          "Tags": "retakes,bombsite_b,planter",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "36e3f685-5fba-5313-8edd-4805808dba99",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Terrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "dc5299af-f69a-586a-b875-cc679c8f6991",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "bombsite_b defender 1",
+          "Position": "-775,-640,0",
+          "Rotation": "0,0,0.5521655,0.8337345",
+          "Scale": "1,1,1",
+          "Tags": "retakes,bombsite_b,defender",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "125d9a90-0491-5150-a835-999544716ae9",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Terrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "5b4cf906-27e7-5dc1-a33f-943450ceb838",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "bombsite_b defender 2",
+          "Position": "-600,-180,0",
+          "Rotation": "0,0,0.3469462,0.9378850",
+          "Scale": "1,1,1",
+          "Tags": "retakes,bombsite_b,defender",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "6f0ff7ce-0b28-563d-82bb-951a4205636e",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Terrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "1e70bddc-fc5d-5694-8c3f-1dd2a3560b12",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "bombsite_b defender 3",
+          "Position": "-440,-720,0",
+          "Rotation": "0,0,0.6288251,0.7775468",
+          "Scale": "1,1,1",
+          "Tags": "retakes,bombsite_b,defender",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "f4cd8e56-77c1-5c41-9c8b-a7acef9ff11c",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Terrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "ded1d491-23a2-5cb4-9035-c368eccbe88e",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "bombsite_b attacker 1",
+          "Position": "160,480,0",
+          "Rotation": "0,0,-0.7469540,0.6648757",
+          "Scale": "1,1,1",
+          "Tags": "retakes,bombsite_b,attacker",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "e4a01c9f-9e71-5869-af78-0935da7cd73f",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "49624dfa-181f-5e4e-a9c5-70f04775fe3b",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "bombsite_b attacker 2",
+          "Position": "-160,480,0",
+          "Rotation": "0,0,-0.6648757,0.7469540",
+          "Scale": "1,1,1",
+          "Tags": "retakes,bombsite_b,attacker",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "9e877ccd-50a3-5e01-8af0-1a0eb0c3607f",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "a0a1b67e-0941-5083-bbb2-442bfb7b9354",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "bombsite_b attacker 3",
+          "Position": "300,480,0",
+          "Rotation": "0,0,-0.7790048,0.6270180",
+          "Scale": "1,1,1",
+          "Tags": "retakes,bombsite_b,attacker",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "8b4399be-9aeb-5d47-ae50-1685b60955dc",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "7c77fbf3-5c7f-59a5-8da2-c1e8e6164419",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "bombsite_b attacker 4",
+          "Position": "-300,480,0",
+          "Rotation": "0,0,-0.6270180,0.7790048",
+          "Scale": "1,1,1",
+          "Tags": "retakes,bombsite_b,attacker",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "fe97e48a-e300-560a-9cf7-eaba77399e87",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "9ad1303b-bc45-53c5-b9dd-f15f90db3027",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "bombsite_b attacker 5",
+          "Position": "220,700,0",
+          "Rotation": "0,0,-0.7447619,0.6673303",
+          "Scale": "1,1,1",
+          "Tags": "retakes,bombsite_b,attacker",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "1459ea06-8acf-5c4d-a744-8317207c2904",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "4d8b820c-6e3e-552f-abcf-b610bb506e20",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "bombsite_b attacker 6",
+          "Position": "-220,700,0",
+          "Rotation": "0,0,-0.6673303,0.7447619",
+          "Scale": "1,1,1",
+          "Tags": "retakes,bombsite_b,attacker",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "TeamSpawnPoint",
+              "__guid": "e7aa006b-2351-5302-ae04-829c47584fbe",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "CounterTerrorist"
+            }
+          ],
+          "Children": []
+        }
+      ]
+    },
+    {
+      "__guid": "e6994ec3-ec1e-5775-a076-d204667f55ff",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Bomb Sites",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [],
+      "Children": [
+        {
+          "__guid": "a75db45f-5265-5f4e-8ffe-ab0662f39a65",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "bombsite_a",
+          "Position": "660,-420,0",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "zone,bombsite",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "BombSite",
+              "__guid": "360e6e17-81f6-5c66-8b8b-0bd6b6bd16d2",
+              "__enabled": true,
+              "Flags": 0,
+              "DamageFalloffDistance": 1750,
+              "Index": 0,
+              "MaxBombDamage": 500
+            },
+            {
+              "__type": "Zone",
+              "__guid": "0fc66bdb-3c66-57d9-97ed-334f86ff81d5",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "1,0,0,1",
+              "DisplayName": "Bomb Site A"
+            },
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "da279090-96ef-5858-bb73-3080dd083098",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,78",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": true,
+              "RollingResistance": null,
+              "Scale": "280,280,156",
+              "Static": false,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "1af2802e-3277-5d71-b83b-c2fd519af69d",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "bombsite_b",
+          "Position": "-660,-440,0",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "zone,bombsite",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "BombSite",
+              "__guid": "e081112a-c5bd-5804-9b01-d7588ba25d40",
+              "__enabled": true,
+              "Flags": 0,
+              "DamageFalloffDistance": 1750,
+              "Index": 1,
+              "MaxBombDamage": 500
+            },
+            {
+              "__type": "Zone",
+              "__guid": "0afe3f75-c8b3-5c42-a9a7-e7ac9ee29f56",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "1,0,0,1",
+              "DisplayName": "Bomb Site B"
+            },
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "4ae885b4-a178-5875-bebd-dcad500fb5ae",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,78",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": true,
+              "RollingResistance": null,
+              "Scale": "280,320,156",
+              "Static": false,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        }
+      ]
+    },
+    {
+      "__guid": "0737e13a-1359-5486-a761-773041ab3358",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Buy Zones",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [],
+      "Children": [
+        {
+          "__guid": "8f54c472-472d-57e3-90c8-06234abbc5e3",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "buyzone_t",
+          "Position": "0,590,125",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "zone",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.BuyZone",
+              "__guid": "4379873d-195d-56f6-b2a0-275928e0e3eb",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "Terrorist"
+            },
+            {
+              "__type": "Zone",
+              "__guid": "227b0c18-0a69-520f-b893-c454cb9a720b",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "1,0.18,0.2,1",
+              "DisplayName": "Red Team Buy Zone"
+            },
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "078e9c61-8cb8-5b45-98e6-3ef4915320e7",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": true,
+              "RollingResistance": null,
+              "Scale": "1040,420,270",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "391f9238-7e1c-539b-be1b-3c841d9e1291",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "buyzone_ct",
+          "Position": "0,-590,125",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "zone",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.BuyZone",
+              "__guid": "275aeeaf-46f1-5abb-9e05-8d52dda00769",
+              "__enabled": true,
+              "Flags": 0,
+              "Team": "CounterTerrorist"
+            },
+            {
+              "__type": "Zone",
+              "__guid": "2b5f23e2-1dc6-5bfb-ac8d-c0af70147a73",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0,0.41569,1,1",
+              "DisplayName": "Blue Team Buy Zone"
+            },
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "8345dbb1-383a-5344-886f-9456ec05369d",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": true,
+              "RollingResistance": null,
+              "Scale": "1040,420,270",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        }
+      ]
+    },
+    {
+      "__guid": "70d29b14-20a3-50dc-ab3f-04c50c232825",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Callouts",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [],
+      "Children": [
+        {
+          "__guid": "2f845983-319c-5f55-9977-33b664414b47",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "NORTH WEST",
+          "Position": "641,566,195",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "zone",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.MapLocation",
+              "__guid": "23fa7ab8-25db-5c07-8f61-cd5e949ff48b",
+              "__enabled": true,
+              "Flags": 0
+            },
+            {
+              "__type": "Zone",
+              "__guid": "8148a0e7-ed8c-5261-9f31-c91471cc04dc",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.51056,0.70698,0.49653,1",
+              "DisplayName": "NORTH WEST"
+            },
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "6566ecb5-eca5-5d30-86ca-218c06c8082b",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": true,
+              "RollingResistance": null,
+              "Scale": "382,468,410",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "fa992bc4-2b39-556c-bdbd-0e960c08daa7",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "RED YARD",
+          "Position": "0,566,195",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "zone",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.MapLocation",
+              "__guid": "e860e344-7a11-545f-8f03-5918e04db048",
+              "__enabled": true,
+              "Flags": 0
+            },
+            {
+              "__type": "Zone",
+              "__guid": "5c5c1852-fb02-545c-a20f-54d869ab4ba4",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.51056,0.70698,0.49653,1",
+              "DisplayName": "RED YARD"
+            },
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "8db32f60-c5f8-5130-ae92-b449876c07fd",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": true,
+              "RollingResistance": null,
+              "Scale": "900,468,410",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "26086078-8456-5403-83b1-71d917addc51",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "SOUTH WEST",
+          "Position": "-641,566,195",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "zone",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.MapLocation",
+              "__guid": "570d4f1b-171e-542e-9640-ec1a45169785",
+              "__enabled": true,
+              "Flags": 0
+            },
+            {
+              "__type": "Zone",
+              "__guid": "7820609a-6b69-5a89-8c02-8a211a9060b1",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.51056,0.70698,0.49653,1",
+              "DisplayName": "SOUTH WEST"
+            },
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "2c0a806d-01bc-5de2-a12e-c0f0775a5abe",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": true,
+              "RollingResistance": null,
+              "Scale": "382,468,410",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "2f3862fd-9732-5d3a-87eb-8fc29faf2c10",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "A SITE",
+          "Position": "641,-566,195",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "zone",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.MapLocation",
+              "__guid": "ea6f50a3-05cd-5c35-a599-19e6934111f3",
+              "__enabled": true,
+              "Flags": 0
+            },
+            {
+              "__type": "Zone",
+              "__guid": "4e297b23-2761-5295-9882-cda50d0e7e45",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.51056,0.70698,0.49653,1",
+              "DisplayName": "A SITE"
+            },
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "228522cb-c187-5c01-b9b0-7072d7ee7c16",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": true,
+              "RollingResistance": null,
+              "Scale": "382,468,410",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "5c1cc0eb-ab8e-5083-b348-fe00ca971166",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "BLUE YARD",
+          "Position": "0,-566,195",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "zone",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.MapLocation",
+              "__guid": "dcbe5ae1-d718-568a-9527-400ce9d7cf22",
+              "__enabled": true,
+              "Flags": 0
+            },
+            {
+              "__type": "Zone",
+              "__guid": "21d350b4-ddc2-5953-8543-bc2ceaba19dc",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.51056,0.70698,0.49653,1",
+              "DisplayName": "BLUE YARD"
+            },
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "4abf331d-7a05-535c-824f-98e425b87b92",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": true,
+              "RollingResistance": null,
+              "Scale": "900,468,410",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "ad5ee197-d413-5740-875d-02d0d1cca52d",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "B SITE",
+          "Position": "-641,-566,195",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "zone",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.MapLocation",
+              "__guid": "0890a21f-eff1-55c5-bf20-8aace8b9a354",
+              "__enabled": true,
+              "Flags": 0
+            },
+            {
+              "__type": "Zone",
+              "__guid": "c3010aa3-27ab-5630-8796-dfca6d3b6786",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.51056,0.70698,0.49653,1",
+              "DisplayName": "B SITE"
+            },
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "7a153b63-66fb-5eb0-8f1a-ec1195c4995f",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": true,
+              "RollingResistance": null,
+              "Scale": "382,468,410",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "1aa5fb1e-a5f4-5ce6-a87a-251cd9446e5f",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "NORTH ROW",
+          "Position": "736,-0,195",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "zone",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.MapLocation",
+              "__guid": "0400571e-88e7-55be-8604-9f867544f806",
+              "__enabled": true,
+              "Flags": 0
+            },
+            {
+              "__type": "Zone",
+              "__guid": "1a73b559-12cb-5e71-a2e6-98e5da2786a4",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.51056,0.70698,0.49653,1",
+              "DisplayName": "NORTH ROW"
+            },
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "fe076939-60ad-51fc-a43a-5d19eaf87456",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": true,
+              "RollingResistance": null,
+              "Scale": "192,664,410",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "98f6f38f-c7a1-5501-90a8-4bc322e3fc74",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "NORTH LANE",
+          "Position": "529.5,-0,195",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "zone",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.MapLocation",
+              "__guid": "f748ee98-139c-5d3a-ab63-4e75bfb13623",
+              "__enabled": true,
+              "Flags": 0
+            },
+            {
+              "__type": "Zone",
+              "__guid": "6da1a194-0e56-5695-8f9f-57af93215d06",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.51056,0.70698,0.49653,1",
+              "DisplayName": "NORTH LANE"
+            },
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "47f8a072-05ee-5110-b92b-280d0f531e26",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": true,
+              "RollingResistance": null,
+              "Scale": "221,664,410",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "cfb396cd-2ab3-525a-b8e6-706c48856ce8",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "WEST STACKS",
+          "Position": "0,224,195",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "zone",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.MapLocation",
+              "__guid": "3b3a2f44-ec07-5c42-8a72-6f1defa25b18",
+              "__enabled": true,
+              "Flags": 0
+            },
+            {
+              "__type": "Zone",
+              "__guid": "f141256d-bf6a-5933-82df-72246ca2ae4d",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.51056,0.70698,0.49653,1",
+              "DisplayName": "WEST STACKS"
+            },
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "76474fa0-d1fd-5691-9d0b-023b38ba830e",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": true,
+              "RollingResistance": null,
+              "Scale": "838,216,410",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "070fe980-61ad-5cc4-8752-f68b71a28bc7",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "MIDDLE",
+          "Position": "0,-0,195",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "zone",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.MapLocation",
+              "__guid": "6b122289-5448-591c-8554-57f755647cef",
+              "__enabled": true,
+              "Flags": 0
+            },
+            {
+              "__type": "Zone",
+              "__guid": "056caaaf-f0ad-5de2-aa46-70876e80b66e",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.51056,0.70698,0.49653,1",
+              "DisplayName": "MIDDLE"
+            },
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "76b7a825-614c-55b3-81ae-0fb78604971e",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": true,
+              "RollingResistance": null,
+              "Scale": "838,232,410",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "2d230b6c-0c6b-534c-a787-7d4788bcd639",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "EAST STACKS",
+          "Position": "0,-224,195",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "zone",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.MapLocation",
+              "__guid": "653d0d0e-2c09-5ee5-9d28-5f36e9eba231",
+              "__enabled": true,
+              "Flags": 0
+            },
+            {
+              "__type": "Zone",
+              "__guid": "8619f817-934f-569f-b102-39d0f452ec95",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.51056,0.70698,0.49653,1",
+              "DisplayName": "EAST STACKS"
+            },
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "b2ae5afd-10c8-5621-91db-bbb6ec074098",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": true,
+              "RollingResistance": null,
+              "Scale": "838,216,410",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "6e8db342-2f31-5336-ab33-0501a03e03a5",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "SOUTH LANE",
+          "Position": "-529.5,-0,195",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "zone",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.MapLocation",
+              "__guid": "e3e65cf3-a148-53af-93d0-933478c3eea5",
+              "__enabled": true,
+              "Flags": 0
+            },
+            {
+              "__type": "Zone",
+              "__guid": "46c51e3f-8b8d-51fa-ab01-8db02f252092",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.51056,0.70698,0.49653,1",
+              "DisplayName": "SOUTH LANE"
+            },
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "47f6cc03-56e1-520a-b0d9-04232476ffe8",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": true,
+              "RollingResistance": null,
+              "Scale": "221,664,410",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "4518923d-e030-5e8d-81e4-3dedc1cecab2",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "SOUTH ROW",
+          "Position": "-736,-0,195",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "zone",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.MapLocation",
+              "__guid": "981342be-082c-5ec6-af47-9eb870890f91",
+              "__enabled": true,
+              "Flags": 0
+            },
+            {
+              "__type": "Zone",
+              "__guid": "aa7a1540-ef28-560b-8574-b44d6b29339a",
+              "__enabled": true,
+              "Flags": 0,
+              "Color": "0.51056,0.70698,0.49653,1",
+              "DisplayName": "SOUTH ROW"
+            },
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "542143ba-edc9-50a3-b8b2-76e42ed8b8bb",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": true,
+              "RollingResistance": null,
+              "Scale": "192,664,410",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        }
+      ]
+    },
+    {
+      "__guid": "35722fcb-455e-5742-a93b-a50070c9dfa8",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Play Area",
+      "Position": "0,-0,350",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "zone",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Zone",
+          "__guid": "69472b0c-cd74-56bc-9c8d-b41dd3794089",
+          "__enabled": true,
+          "Flags": 0,
+          "Color": "1,1,1,1",
+          "DisplayName": null
+        },
+        {
+          "__type": "Facepunch.PlayArea",
+          "__guid": "19afcc87-758c-5b5a-8ce7-917e8526020b",
+          "__enabled": true,
+          "Flags": 0,
+          "Zone": {
+            "_type": "component",
+            "component_id": "69472b0c-cd74-56bc-9c8d-b41dd3794089",
+            "go": "35722fcb-455e-5742-a93b-a50070c9dfa8",
+            "component_type": "Zone"
+          }
+        },
+        {
+          "__type": "Sandbox.BoxCollider",
+          "__guid": "0dd4968c-2c60-5acf-ba2f-8e5330b71202",
+          "__enabled": true,
+          "Flags": 0,
+          "Center": "0,0,0",
+          "ColliderFlags": 0,
+          "Elasticity": null,
+          "Friction": null,
+          "IsTrigger": true,
+          "RollingResistance": null,
+          "Scale": "1664,1600,1300",
+          "Static": true,
+          "Surface": null,
+          "SurfaceVelocity": "0,0,0"
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "985f58bf-e640-57f0-8fb8-a68853ea55f5",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Player Clips",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [],
+      "Children": [
+        {
+          "__guid": "eff0b652-1cb6-5b53-a2e3-ef8713475489",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Player Clip North Row",
+          "Position": "784,-0,551",
+          "Rotation": "0,0,-0.7071068,0.7071068",
+          "Scale": "1,1,1",
+          "Tags": "playerclip",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "1ac0a0c3-8718-545a-8acc-cf77dd3b9d5f",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": false,
+              "RollingResistance": null,
+              "Scale": "238.6,96,898",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "e711103b-c34c-5839-b714-f824141ddfac",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Player Clip North Row Open",
+          "Position": "688,-0,551",
+          "Rotation": "0,0,-0.7071068,0.7071068",
+          "Scale": "1,1,1",
+          "Tags": "playerclip",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "3764bd21-e740-54af-a2a8-a3f2c4930db2",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": false,
+              "RollingResistance": null,
+              "Scale": "238.6,96,898",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "c4d076ff-c219-5c20-8ab9-8521436f7820",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Player Clip South Row Open",
+          "Position": "-784,-0,551",
+          "Rotation": "0,0,-0.7071068,0.7071068",
+          "Scale": "1,1,1",
+          "Tags": "playerclip",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "7f7864e1-42ee-53e7-b95c-8b5d1e41c194",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": false,
+              "RollingResistance": null,
+              "Scale": "238.6,96,898",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "f915966f-f3c1-51bd-bb36-7b466b6d30e0",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Player Clip South Row",
+          "Position": "-688,-0,551",
+          "Rotation": "0,0,-0.7071068,0.7071068",
+          "Scale": "1,1,1",
+          "Tags": "playerclip",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "9a9c9aa6-3073-52c9-a899-9646f317abae",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": false,
+              "RollingResistance": null,
+              "Scale": "238.6,96,898",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "8c76d927-2273-595b-ad24-14ec2694b1dc",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Player Clip East Stack",
+          "Position": "0,-586.6,602",
+          "Rotation": "0,0,0.0000000,1.0000000",
+          "Scale": "1,1,1",
+          "Tags": "playerclip",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "f2737c69-8556-5a9b-bec6-dd0971ebb29c",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": false,
+              "RollingResistance": null,
+              "Scale": "238.6,96,796",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "67b84f03-d103-58bd-9528-b0d193589ee5",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Player Clip East Angled",
+          "Position": "0,-714.6,551",
+          "Rotation": "0,0,-0.1305262,0.9914449",
+          "Scale": "1,1,1",
+          "Tags": "playerclip",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "e99b89fb-454d-5bbe-8359-16d36d0e793b",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": false,
+              "RollingResistance": null,
+              "Scale": "238.6,96,898",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "7068c2ba-98b0-5ef6-ba53-2b26747abd56",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Player Clip West Stack",
+          "Position": "0,592.3,551",
+          "Rotation": "0,0,0.0000000,1.0000000",
+          "Scale": "1,1,1",
+          "Tags": "playerclip",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "d7b7f327-3d12-5990-a458-7bee694f2d02",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": false,
+              "RollingResistance": null,
+              "Scale": "238.6,96,898",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "dd7c3c60-0509-57d9-86f3-a9a2017d97c3",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Player Clip West Angled",
+          "Position": "0,720.3,551",
+          "Rotation": "0,0,0.1305262,0.9914449",
+          "Scale": "1,1,1",
+          "Tags": "playerclip",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "07911e9f-c310-5b95-b293-d8bd3c22290e",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": false,
+              "RollingResistance": null,
+              "Scale": "238.6,96,898",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "e62c2f44-00ef-5236-ab0d-eb2146181d46",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Player Clip South East Inner",
+          "Position": "-288,-176,602",
+          "Rotation": "0,0,0.0000000,1.0000000",
+          "Scale": "1,1,1",
+          "Tags": "playerclip",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "776be398-1085-598e-9e72-c5a130a46360",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": false,
+              "RollingResistance": null,
+              "Scale": "238.6,96,796",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "2f686d0b-4188-5b1e-8836-1f039159902a",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Player Clip South East Outer",
+          "Position": "-288,-272,602",
+          "Rotation": "0,0,0.0000000,1.0000000",
+          "Scale": "1,1,1",
+          "Tags": "playerclip",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "14cd11cb-86af-5873-8c77-1efc3a01a84d",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": false,
+              "RollingResistance": null,
+              "Scale": "238.6,96,796",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "2d477462-6281-5507-b5e8-c838cca19e29",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Player Clip South West Inner",
+          "Position": "-288,176,551",
+          "Rotation": "0,0,0.0000000,1.0000000",
+          "Scale": "1,1,1",
+          "Tags": "playerclip",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "182cbd89-b6e8-5a55-8f15-4a47d8f990eb",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": false,
+              "RollingResistance": null,
+              "Scale": "238.6,96,898",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "36265d8c-045c-5dac-97e0-b420f0f761f4",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Player Clip South West Outer",
+          "Position": "-288,272,551",
+          "Rotation": "0,0,0.0000000,1.0000000",
+          "Scale": "1,1,1",
+          "Tags": "playerclip",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "bbce81b9-8395-55d0-bcc6-bc692e18af7f",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": false,
+              "RollingResistance": null,
+              "Scale": "238.6,96,898",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "36e46f03-b6eb-54a8-a1c3-4ceccbfa96f9",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Player Clip North West Inner",
+          "Position": "288,176,551",
+          "Rotation": "0,0,0.0000000,1.0000000",
+          "Scale": "1,1,1",
+          "Tags": "playerclip",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "480bdd8f-74fd-516e-96db-b10ca2e4f9e8",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": false,
+              "RollingResistance": null,
+              "Scale": "238.6,96,898",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "14216916-76a7-5437-ad02-f216b0210721",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Player Clip North West Outer",
+          "Position": "288,272,551",
+          "Rotation": "0,0,-1.0000000,0.0000000",
+          "Scale": "1,1,1",
+          "Tags": "playerclip",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "1dc92e34-b347-5fea-afe8-7300cc4e5d61",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": false,
+              "RollingResistance": null,
+              "Scale": "238.6,96,898",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "5deb2e51-6374-54f5-98da-41de99d02267",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Player Clip North East Inner",
+          "Position": "288,-176,551",
+          "Rotation": "0,0,-1.0000000,0.0000000",
+          "Scale": "1,1,1",
+          "Tags": "playerclip",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "a6f4cae9-caff-5135-b876-fc612d7fef89",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": false,
+              "RollingResistance": null,
+              "Scale": "238.6,96,898",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "cb93205e-0e3c-5b42-93d0-3da96d91c230",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Player Clip North East Outer",
+          "Position": "288,-272,551",
+          "Rotation": "0,0,0.0000000,1.0000000",
+          "Scale": "1,1,1",
+          "Tags": "playerclip",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "eca1699a-683d-532b-80d3-27a51baeb0cb",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": false,
+              "RollingResistance": null,
+              "Scale": "238.6,96,898",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "913fa72f-03f9-5f1e-a770-9ddb28c0077c",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Player Clip A Site",
+          "Position": "677.5,-627.9,551",
+          "Rotation": "0,0,-0.8415108,0.5402403",
+          "Scale": "1,1,1",
+          "Tags": "playerclip",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "89c7c3fa-b5e6-54c1-8f23-3c9e6e222c40",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": false,
+              "RollingResistance": null,
+              "Scale": "238.6,96,898",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "b23842d7-2492-5ab0-ba81-36243ec96259",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Player Clip South East Lone",
+          "Position": "-630,-508,551",
+          "Rotation": "0,0,-0.6360782,0.7716246",
+          "Scale": "1,1,1",
+          "Tags": "playerclip",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "5fd590e6-1eae-5b6d-9b99-ce3ad61f1a72",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": false,
+              "RollingResistance": null,
+              "Scale": "238.6,96,898",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "e44beaff-9e60-50d7-8567-ddd936d55054",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Player Clip East Wall",
+          "Position": "0,-835,564",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "playerclip",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "3469c3fb-a0ba-5a57-98cc-744558639341",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": false,
+              "RollingResistance": null,
+              "Scale": "1760,90,872",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "60ad1579-a86b-5392-8acd-09a9a6be53ad",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Player Clip West Wall",
+          "Position": "0,835,564",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "playerclip",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "eed20d49-685c-5fcf-91e4-f101f8d1917f",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": false,
+              "RollingResistance": null,
+              "Scale": "1760,90,872",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "9d9a4598-fbfb-53cb-977e-c621d875846f",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Player Clip North Wall",
+          "Position": "851,-0,564",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "playerclip",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "4b6f1e60-39a9-5e52-a4e7-2409ee41ec79",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": false,
+              "RollingResistance": null,
+              "Scale": "58,1760,872",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "93612057-840f-5206-9ea4-310689bcf3a9",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Player Clip South Wall",
+          "Position": "-851,-0,564",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "playerclip",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.BoxCollider",
+              "__guid": "4e6aa2e6-7994-5508-8a9c-b2115998c003",
+              "__enabled": true,
+              "Flags": 0,
+              "Center": "0,0,0",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": false,
+              "RollingResistance": null,
+              "Scale": "58,1760,872",
+              "Static": true,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        }
+      ]
+    },
+    {
+      "__guid": "ae7a2f1c-b489-563e-bfee-0fb0194df22a",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Catch Floor",
+      "Position": "0,0,-3000",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.BoxCollider",
+          "__guid": "6ad1dac7-e6dd-540d-9d0e-cbcecf8e374b",
+          "__enabled": true,
+          "Flags": 0,
+          "Center": "0,0,0",
+          "ColliderFlags": 0,
+          "Elasticity": null,
+          "Friction": null,
+          "IsTrigger": false,
+          "RollingResistance": null,
+          "Scale": "60000,60000,100",
+          "Static": true,
+          "Surface": null,
+          "SurfaceVelocity": "0,0,0"
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "63454ab6-e6f9-57ce-8e71-a16013fb7883",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Objective Spots",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [],
+      "Children": [
+        {
+          "__guid": "b29fa38a-91c0-5ba2-a9fb-6638d2cd8ab1",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Domination A",
+          "Position": "0,480,0",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.ObjectiveSpot",
+              "__guid": "44e5f4a9-5734-575f-97c1-302e45687575",
+              "__enabled": true,
+              "Flags": 0,
+              "Kind": "Domination",
+              "Label": "A"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "3df8d446-e0d2-5de9-bda2-adb5c4922450",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Domination B",
+          "Position": "0,0,0",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.ObjectiveSpot",
+              "__guid": "ebd6df6d-71b1-5a2e-b0db-70b4d22caa41",
+              "__enabled": true,
+              "Flags": 0,
+              "Kind": "Domination",
+              "Label": "B"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "5bb64057-7996-57ab-8acb-84b8e43e88ad",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Domination C",
+          "Position": "0,-480,0",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.ObjectiveSpot",
+              "__guid": "e05f213f-1b3e-5861-972b-037c034cd6ac",
+              "__enabled": true,
+              "Flags": 0,
+              "Kind": "Domination",
+              "Label": "C"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "8de85a8c-7a93-597d-ba41-0ae54d981f81",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Hot Zone Middle",
+          "Position": "0,0,0",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.ObjectiveSpot",
+              "__guid": "cae0dd5c-7095-5161-8d5d-2a6cad67c1ca",
+              "__enabled": true,
+              "Flags": 0,
+              "Kind": "HotZone",
+              "Label": "Middle"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "28c1747c-d520-5c92-96cc-1b7b32ecff16",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Hot Zone North Lane",
+          "Position": "520,0,0",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.ObjectiveSpot",
+              "__guid": "fce5d433-4dd4-576a-bfa3-54ddeb3ae474",
+              "__enabled": true,
+              "Flags": 0,
+              "Kind": "HotZone",
+              "Label": "North Lane"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "c76472fd-47bd-5b13-a4e8-63b7c53f36b1",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Hot Zone South Lane",
+          "Position": "-520,0,0",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.ObjectiveSpot",
+              "__guid": "291c8130-1051-506f-9bf5-3494c0c1bf8d",
+              "__enabled": true,
+              "Flags": 0,
+              "Kind": "HotZone",
+              "Label": "South Lane"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "fae415db-e577-5be1-b848-c33aed6e72cf",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Hot Zone West Yard",
+          "Position": "0,480,0",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.ObjectiveSpot",
+              "__guid": "3c60fbbe-9191-5202-bdf2-e3169be4efad",
+              "__enabled": true,
+              "Flags": 0,
+              "Kind": "HotZone",
+              "Label": "West Yard"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "5edbe9e1-9c4d-5252-b10f-eb897dca8833",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Hot Zone East Yard",
+          "Position": "0,-480,0",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.ObjectiveSpot",
+              "__guid": "6662c8d0-5f84-522e-9bff-8e725eeb6a47",
+              "__enabled": true,
+              "Flags": 0,
+              "Kind": "HotZone",
+              "Label": "East Yard"
+            }
+          ],
+          "Children": []
+        }
+      ]
+    },
+    {
+      "__guid": "acf1136f-f7b7-5685-9cb5-8fa9aee65b21",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Cash Grab",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Facepunch.GameModeObject",
+          "__guid": "b87a109b-2e65-51f5-88d8-73e9d88329cb",
+          "__enabled": true,
+          "Flags": 0,
+          "GameModes": [
+            "Cash Grab"
+          ],
+          "Inverse": false
+        }
+      ],
+      "Children": [
+        {
+          "__guid": "2e9ce93b-1236-5254-bf19-cd218264d921",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Cash Grab (North Lane)",
+          "Position": "520,0,8",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 1,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.CashPoint",
+              "__guid": "7f4d6058-3d96-58e4-bbd7-770d42a677a6",
+              "__enabled": true,
+              "Flags": 0,
+              "Extracts": [
+                {
+                  "_type": "component",
+                  "component_id": "2f82c859-ffa3-55dc-a586-c034900b6a85",
+                  "go": "d13f344a-c5dc-53a4-9436-be58fc736d98",
+                  "component_type": "ExtractionPoint"
+                }
+              ],
+              "Resource": "weapons/special/cash_bag/cash_bag.equip",
+              "State": "Inactive"
+            }
+          ],
+          "Children": [
+            {
+              "__guid": "d13f344a-c5dc-53a4-9436-be58fc736d98",
+              "__version": 2,
+              "Flags": 0,
+              "Name": "Extract North Lane",
+              "Position": "-1040,0,24",
+              "Rotation": "0,0,0,1",
+              "Scale": "1,1,1",
+              "Tags": "",
+              "Enabled": true,
+              "NetworkMode": 1,
+              "NetworkFlags": 0,
+              "NetworkOrphaned": 0,
+              "NetworkTransmit": true,
+              "OwnerTransfer": 1,
+              "Components": [
+                {
+                  "__type": "Facepunch.ExtractionPoint",
+                  "__guid": "2f82c859-ffa3-55dc-a586-c034900b6a85",
+                  "__enabled": true,
+                  "Flags": 0,
+                  "CashPoint": {
+                    "_type": "component",
+                    "component_id": "7f4d6058-3d96-58e4-bbd7-770d42a677a6",
+                    "go": "2e9ce93b-1236-5254-bf19-cd218264d921",
+                    "component_type": "CashPoint"
+                  },
+                  "Trigger": {
+                    "_type": "component",
+                    "component_id": "3b1ad04e-64db-5c5d-8ddb-f6537c8e1491",
+                    "go": "d13f344a-c5dc-53a4-9436-be58fc736d98",
+                    "component_type": "BoxCollider"
+                  },
+                  "WorldPanel": {
+                    "_type": "component",
+                    "component_id": "34ac727d-9156-5a2c-b11b-649dae090030",
+                    "go": "16390b8b-8e67-5288-aa9c-bf083e1e899e",
+                    "component_type": "WorldPanel"
+                  }
+                },
+                {
+                  "__type": "Sandbox.BoxCollider",
+                  "__guid": "3b1ad04e-64db-5c5d-8ddb-f6537c8e1491",
+                  "__enabled": true,
+                  "Flags": 0,
+                  "Center": "0,0,0",
+                  "ColliderFlags": 0,
+                  "Elasticity": null,
+                  "Friction": null,
+                  "IsTrigger": true,
+                  "RollingResistance": null,
+                  "Scale": "50,50,50",
+                  "Static": false,
+                  "Surface": null,
+                  "SurfaceVelocity": "0,0,0"
+                }
+              ],
+              "Children": [
+                {
+                  "__guid": "16390b8b-8e67-5288-aa9c-bf083e1e899e",
+                  "__version": 2,
+                  "Flags": 0,
+                  "Name": "Object",
+                  "Position": "0,0,-31.8334",
+                  "Rotation": "0,-0.707106829,0,0.707106829",
+                  "Scale": "1,1,1",
+                  "Tags": "",
+                  "Enabled": true,
+                  "NetworkMode": 2,
+                  "NetworkFlags": 0,
+                  "NetworkOrphaned": 0,
+                  "NetworkTransmit": true,
+                  "OwnerTransfer": 1,
+                  "Components": [
+                    {
+                      "__type": "Sandbox.WorldPanel",
+                      "__guid": "34ac727d-9156-5a2c-b11b-649dae090030",
+                      "__enabled": false,
+                      "Flags": 0,
+                      "HorizontalAlign": "Center",
+                      "InteractionRange": 1000,
+                      "LookAtCamera": false,
+                      "PanelSize": "1500,1500",
+                      "RenderOptions": {
+                        "GameLayer": true,
+                        "OverlayLayer": false,
+                        "BloomLayer": false,
+                        "AfterUILayer": false
+                      },
+                      "RenderScale": 1,
+                      "VerticalAlign": "Center"
+                    },
+                    {
+                      "__type": "Facepunch.UI.GameModes.CashGrab.ExtractPointWorldPanel",
+                      "__guid": "1a81c933-c79a-5eeb-ba1d-85e750e1f91c",
+                      "__enabled": true,
+                      "Flags": 0
+                    }
+                  ],
+                  "Children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "__guid": "1ef6840a-6a2b-5d1d-8b1d-8e8088eaf7e9",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Cash Grab (South Lane)",
+          "Position": "-520,0,8",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 1,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.CashPoint",
+              "__guid": "8c7b6b4e-0a1f-50a8-af0c-2c7d740eac01",
+              "__enabled": true,
+              "Flags": 0,
+              "Extracts": [
+                {
+                  "_type": "component",
+                  "component_id": "eb1cbdc5-736c-5d9f-a1b9-5a8c27068565",
+                  "go": "3e415468-64fd-50e2-92ca-d59a4e025031",
+                  "component_type": "ExtractionPoint"
+                }
+              ],
+              "Resource": "weapons/special/cash_bag/cash_bag.equip",
+              "State": "Inactive"
+            }
+          ],
+          "Children": [
+            {
+              "__guid": "3e415468-64fd-50e2-92ca-d59a4e025031",
+              "__version": 2,
+              "Flags": 0,
+              "Name": "Extract South Lane",
+              "Position": "1040,0,24",
+              "Rotation": "0,0,0,1",
+              "Scale": "1,1,1",
+              "Tags": "",
+              "Enabled": true,
+              "NetworkMode": 1,
+              "NetworkFlags": 0,
+              "NetworkOrphaned": 0,
+              "NetworkTransmit": true,
+              "OwnerTransfer": 1,
+              "Components": [
+                {
+                  "__type": "Facepunch.ExtractionPoint",
+                  "__guid": "eb1cbdc5-736c-5d9f-a1b9-5a8c27068565",
+                  "__enabled": true,
+                  "Flags": 0,
+                  "CashPoint": {
+                    "_type": "component",
+                    "component_id": "8c7b6b4e-0a1f-50a8-af0c-2c7d740eac01",
+                    "go": "1ef6840a-6a2b-5d1d-8b1d-8e8088eaf7e9",
+                    "component_type": "CashPoint"
+                  },
+                  "Trigger": {
+                    "_type": "component",
+                    "component_id": "b8db6f69-1e91-502a-ac5b-b26eec751373",
+                    "go": "3e415468-64fd-50e2-92ca-d59a4e025031",
+                    "component_type": "BoxCollider"
+                  },
+                  "WorldPanel": {
+                    "_type": "component",
+                    "component_id": "ae0ff49b-2f10-5bc9-9752-266a0de88c03",
+                    "go": "4730faeb-065f-504c-8e69-95b4e3d63ef2",
+                    "component_type": "WorldPanel"
+                  }
+                },
+                {
+                  "__type": "Sandbox.BoxCollider",
+                  "__guid": "b8db6f69-1e91-502a-ac5b-b26eec751373",
+                  "__enabled": true,
+                  "Flags": 0,
+                  "Center": "0,0,0",
+                  "ColliderFlags": 0,
+                  "Elasticity": null,
+                  "Friction": null,
+                  "IsTrigger": true,
+                  "RollingResistance": null,
+                  "Scale": "50,50,50",
+                  "Static": false,
+                  "Surface": null,
+                  "SurfaceVelocity": "0,0,0"
+                }
+              ],
+              "Children": [
+                {
+                  "__guid": "4730faeb-065f-504c-8e69-95b4e3d63ef2",
+                  "__version": 2,
+                  "Flags": 0,
+                  "Name": "Object",
+                  "Position": "0,0,-31.8334",
+                  "Rotation": "0,-0.707106829,0,0.707106829",
+                  "Scale": "1,1,1",
+                  "Tags": "",
+                  "Enabled": true,
+                  "NetworkMode": 2,
+                  "NetworkFlags": 0,
+                  "NetworkOrphaned": 0,
+                  "NetworkTransmit": true,
+                  "OwnerTransfer": 1,
+                  "Components": [
+                    {
+                      "__type": "Sandbox.WorldPanel",
+                      "__guid": "ae0ff49b-2f10-5bc9-9752-266a0de88c03",
+                      "__enabled": false,
+                      "Flags": 0,
+                      "HorizontalAlign": "Center",
+                      "InteractionRange": 1000,
+                      "LookAtCamera": false,
+                      "PanelSize": "1500,1500",
+                      "RenderOptions": {
+                        "GameLayer": true,
+                        "OverlayLayer": false,
+                        "BloomLayer": false,
+                        "AfterUILayer": false
+                      },
+                      "RenderScale": 1,
+                      "VerticalAlign": "Center"
+                    },
+                    {
+                      "__type": "Facepunch.UI.GameModes.CashGrab.ExtractPointWorldPanel",
+                      "__guid": "f2aeb5a8-2745-5b17-beb6-e8052d871398",
+                      "__enabled": true,
+                      "Flags": 0
+                    }
+                  ],
+                  "Children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "__guid": "31845e58-a5a8-52c4-abb2-428712767d4d",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Cash Grab (Middle)",
+          "Position": "0,0,8",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 1,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.CashPoint",
+              "__guid": "ae9814ff-47c8-5256-871c-b42f79e6f48c",
+              "__enabled": true,
+              "Flags": 0,
+              "Extracts": [
+                {
+                  "_type": "component",
+                  "component_id": "b2bdd5f6-a9e2-541c-90de-a8c716e17d12",
+                  "go": "dfd9be61-8d6a-54cd-b057-c5e8adedef20",
+                  "component_type": "ExtractionPoint"
+                }
+              ],
+              "Resource": "weapons/special/cash_bag/cash_bag.equip",
+              "State": "Inactive"
+            }
+          ],
+          "Children": [
+            {
+              "__guid": "dfd9be61-8d6a-54cd-b057-c5e8adedef20",
+              "__version": 2,
+              "Flags": 0,
+              "Name": "Extract Middle",
+              "Position": "688,0,30",
+              "Rotation": "0,0,0,1",
+              "Scale": "1,1,1",
+              "Tags": "",
+              "Enabled": true,
+              "NetworkMode": 1,
+              "NetworkFlags": 0,
+              "NetworkOrphaned": 0,
+              "NetworkTransmit": true,
+              "OwnerTransfer": 1,
+              "Components": [
+                {
+                  "__type": "Facepunch.ExtractionPoint",
+                  "__guid": "b2bdd5f6-a9e2-541c-90de-a8c716e17d12",
+                  "__enabled": true,
+                  "Flags": 0,
+                  "CashPoint": {
+                    "_type": "component",
+                    "component_id": "ae9814ff-47c8-5256-871c-b42f79e6f48c",
+                    "go": "31845e58-a5a8-52c4-abb2-428712767d4d",
+                    "component_type": "CashPoint"
+                  },
+                  "Trigger": {
+                    "_type": "component",
+                    "component_id": "f6184eca-83d7-5361-a19e-4a2d639ccd0a",
+                    "go": "dfd9be61-8d6a-54cd-b057-c5e8adedef20",
+                    "component_type": "BoxCollider"
+                  },
+                  "WorldPanel": {
+                    "_type": "component",
+                    "component_id": "f0bc92c9-effd-518d-8861-2e363e9466ae",
+                    "go": "c2f0bda1-c0e7-52ce-b43e-73629b9ae339",
+                    "component_type": "WorldPanel"
+                  }
+                },
+                {
+                  "__type": "Sandbox.BoxCollider",
+                  "__guid": "f6184eca-83d7-5361-a19e-4a2d639ccd0a",
+                  "__enabled": true,
+                  "Flags": 0,
+                  "Center": "0,0,0",
+                  "ColliderFlags": 0,
+                  "Elasticity": null,
+                  "Friction": null,
+                  "IsTrigger": true,
+                  "RollingResistance": null,
+                  "Scale": "50,50,50",
+                  "Static": false,
+                  "Surface": null,
+                  "SurfaceVelocity": "0,0,0"
+                }
+              ],
+              "Children": [
+                {
+                  "__guid": "c2f0bda1-c0e7-52ce-b43e-73629b9ae339",
+                  "__version": 2,
+                  "Flags": 0,
+                  "Name": "Object",
+                  "Position": "0,0,-31.8334",
+                  "Rotation": "0,-0.707106829,0,0.707106829",
+                  "Scale": "1,1,1",
+                  "Tags": "",
+                  "Enabled": true,
+                  "NetworkMode": 2,
+                  "NetworkFlags": 0,
+                  "NetworkOrphaned": 0,
+                  "NetworkTransmit": true,
+                  "OwnerTransfer": 1,
+                  "Components": [
+                    {
+                      "__type": "Sandbox.WorldPanel",
+                      "__guid": "f0bc92c9-effd-518d-8861-2e363e9466ae",
+                      "__enabled": false,
+                      "Flags": 0,
+                      "HorizontalAlign": "Center",
+                      "InteractionRange": 1000,
+                      "LookAtCamera": false,
+                      "PanelSize": "1500,1500",
+                      "RenderOptions": {
+                        "GameLayer": true,
+                        "OverlayLayer": false,
+                        "BloomLayer": false,
+                        "AfterUILayer": false
+                      },
+                      "RenderScale": 1,
+                      "VerticalAlign": "Center"
+                    },
+                    {
+                      "__type": "Facepunch.UI.GameModes.CashGrab.ExtractPointWorldPanel",
+                      "__guid": "c3f2f49e-e199-5225-8ce4-5e0432ca5afe",
+                      "__enabled": true,
+                      "Flags": 0
+                    }
+                  ],
+                  "Children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "__guid": "345c021b-c869-59f7-81ad-1c15b6aef40b",
+      "__version": 2,
+      "__Prefab": {
+        "Id": "2511d0e8-bd1b-426e-b0c1-27b2b2dc3797",
+        "Path": "prefabs/game_modes/team_deathmatch.prefab"
+      },
+      "__PrefabInstancePatch": {
+        "AddedObjects": [],
+        "RemovedObjects": [],
+        "PropertyOverrides": [],
+        "MovedObjects": []
+      },
+      "__PrefabIdToInstanceId": {
+        "00d323b8-6637-4615-bf9c-4acefc31c448": "b62ebbc1-8861-5929-8d09-b9b2799f5920",
+        "020a8d1e-fc64-4a6a-b8ab-9797113f26a2": "47a6a69a-a6a5-5256-979a-d28d45907e43",
+        "04dbb62e-024d-49a5-8406-a82525261799": "cd955183-9cae-5e57-a8f2-7a584846066a",
+        "0b8d88b7-2fa4-4405-8896-36a411363e3a": "e064b8af-8cbd-5aa9-9ed4-cdf4a6317de6",
+        "100d9f09-2c5b-41ea-a4d6-e73e2e7a7474": "2a09f3b4-5a25-5e87-a986-5ed6a595db02",
+        "188025de-1b23-4cc9-a89f-dcbc112f8a8a": "84d5dbcc-285d-5596-ac35-4f58a43b3d15",
+        "18c6af28-d7f2-4ee1-9369-b6e74775b935": "1ac32854-65b7-5f61-bb03-b98e22bff5d0",
+        "196af5b3-533e-47f7-b9ce-3fbfcd6860cb": "aab83038-1d78-56ca-93e4-874455c128bb",
+        "19d65ae4-28c5-47b5-80fc-8240b0d78368": "f14e86b3-4af2-517d-8216-683be4d134f7",
+        "1b9c9d4a-e513-4025-8ba4-8975bf498b6f": "1304661f-8e5a-5f2f-b623-85269e306c87",
+        "1d13bb54-0bc7-486f-ba05-50fc059aab8a": "15d091c6-7038-502d-bb3d-7a9d2a2e2c98",
+        "1ef5a15e-79c1-4571-bcf3-4d923760cc0e": "cac963d1-b9af-56a3-9c04-e40ae9cfd9ae",
+        "1fd1898f-a9bb-42d0-9e1c-3bf36e9a98ef": "e0deee19-d2f5-566e-9b52-7b09c97efe44",
+        "22f62d20-a0d2-4ab3-b282-aac29691fc99": "80ae2b06-6203-5a3e-87a2-d2eb73c7b7d7",
+        "2a579962-863e-419a-92a3-bffcbdeac43c": "040519a6-8f7f-54e4-8ff2-fd14895c6087",
+        "2d5f9694-5062-485f-9ea2-0ca6c18d167d": "5407a80a-c81f-5ed9-bf7c-f08a2a112adf",
+        "307b4c84-f018-4384-87e3-0c43ed3659e7": "cc507daf-ed4f-511e-b65d-1d31e5392281",
+        "35f22135-8476-417b-b33c-fea8b2524a75": "24ed5472-03bf-59f9-a63e-3b09e0195251",
+        "39bfe2ad-98a5-4fc8-aab8-cbc29f1ffd05": "6d00ea1f-5749-543b-b16c-edec2f99232b",
+        "3b615d8e-5bb8-4652-8f25-6441adb0d684": "281e52c6-209d-52dd-8493-d7fb488312c2",
+        "41dcf6fc-64e0-406a-badf-6b879c370c0b": "f79cbb98-af96-520d-b7cf-7ff19baa5529",
+        "45305a9c-ebba-480b-b65c-a573a56843ae": "e4e29424-f005-5e59-85b6-7d52209d9172",
+        "45a9b96f-c3ca-4120-81cc-909eb2aa4111": "6eb91c84-56ee-58c7-9242-29134deebdfe",
+        "45d2f9c1-e34d-4756-807d-b5197dfc0e92": "a9769d95-9bd5-5121-9599-221aa0fd814a",
+        "46d6ff07-4596-4f6f-9f01-51568736df65": "be863655-cd4f-5b1e-8dc8-76c0765160c7",
+        "470a668e-f7be-471b-adb7-b92686430ad2": "56622cc2-e01b-51de-a71f-12f2bfae3529",
+        "49109783-18b2-44e7-8f29-0dcddd0a6da9": "6c9d8fc9-767b-5b8a-95db-f03bb8b0a2bf",
+        "49fc0437-6e51-4ea0-9057-09e41e1b1c77": "1f148292-4651-5a6d-8c83-beef4af17e58",
+        "4c82737a-111e-4745-aa9f-7e36ff9cbb36": "1d328b62-7104-5cd3-882c-cb97d5216f85",
+        "4d013707-b969-48aa-9b32-3ec46ecb8977": "62facb49-f0dc-5ad1-b172-09392471a41f",
+        "503695f8-ae28-4816-b3ed-c37017a9b847": "3712d595-322e-5aff-9904-ae215c9b1a4a",
+        "51495847-64a3-463e-8145-a8992dae1ec2": "af0a37c0-073e-5e41-9369-ec495686b428",
+        "5356112e-1fb8-47aa-820f-0dbbf60caeed": "598de49d-9aad-5cf9-95c3-965c8bff3eb2",
+        "5b253708-de7c-4c86-8893-b86fb4822642": "cfc5872c-1c64-5329-a606-659f72a0ea90",
+        "5c407fa4-4734-428b-8317-26d0efc269bd": "d3899d3a-00b1-541c-90d9-fb4f4fd50f76",
+        "6f8c1e1b-00f3-4ad6-a2d3-f73657da9d04": "30d92e5a-de03-509b-9d92-475b3c8b3450",
+        "73c32974-c759-440d-80bb-eb65411f3508": "7b8ad25b-954a-5374-8b9b-dc919f5e7bb3",
+        "7e1e5a0a-7cef-4388-aa2f-44ac5088662e": "73ea0257-9e9f-5ddd-971c-1e1b8e1cff8d",
+        "83a62c25-6c75-4ee0-abb7-7d7f1d033fe6": "5b8836e4-5809-58e5-9862-d0d949dfb1e9",
+        "871b8e76-31c0-437f-a365-b9e7032abbd2": "1dece3a4-4b1a-5c74-aa45-a3b23cc73f94",
+        "879c4006-f472-4c34-972d-7778361d9b3e": "941c54c1-c124-50c1-996a-eeaf901b1474",
+        "8e4fef47-033e-4a13-a3c8-7d2e4f18365f": "adfc7c92-d95f-505a-be53-ec0673494211",
+        "8ec842f2-cfc7-41de-81a1-9b2dfe5302f4": "0da834d3-f3c7-55e3-a29a-40026813f5cd",
+        "91ab47da-c178-479c-8af6-c7515eba5759": "8d6dab69-c89f-56a5-97b1-86c07d2dba1a",
+        "97a813f1-1d8c-4c6e-8ab9-3c8221ac7dbd": "a783c667-f389-5335-879b-b0e636d03db0",
+        "9b3f9359-1a40-46a8-8c1f-52dfbf3e0150": "65841d45-f3d6-560b-8a2b-84a182b98bfb",
+        "9b9b18a7-d286-40d8-b3af-8e957af2b900": "f8564b47-c845-5f38-b3f4-c859ba91b080",
+        "9d66ab60-1204-429a-9ac6-5a2af9b6c4b9": "09709f1b-b13b-51c1-9675-cefad8e51482",
+        "a09d63a2-ff22-4a58-b9d1-b8b7d34d0483": "72b5db63-9956-5007-a599-673a23a06030",
+        "a3c71da9-fdac-4273-85cb-06f10444a501": "647507c5-e831-5992-b067-640407250d02",
+        "a611e014-1844-472b-b1b2-d35d21b56eef": "a064f462-6316-5fce-ab63-463d903b9b94",
+        "afed815e-6a51-4e66-b94c-3bda199ea631": "182010a0-4c5c-5de0-90d0-2a2512e3b5ca",
+        "b1260496-0fea-43a7-a741-411cdc0108bc": "a2dd8818-5820-5fcf-9877-f2be2dd998d2",
+        "b4e7cb1e-f2aa-4667-aec1-945f77b57a25": "c37a9ea5-4546-5c32-b241-18983653295b",
+        "bdd00ce5-fc14-432b-9f34-eb55f85aca40": "658cf5f8-0e49-5d96-a52c-afbec015e7a8",
+        "c041252e-1262-42a4-b630-c032cce27ace": "d7a2e229-692d-5a7d-a18b-4d9b1a6af7a8",
+        "c167e62e-6407-4edf-9ac5-dffe5f0688c1": "cb858379-0e2e-55de-b107-bc2dfc0fda60",
+        "c82d52b1-a9e2-4e71-9bbe-496694888959": "22839c08-dd99-5b5e-bc88-343dbc779182",
+        "c8e58e7e-5e12-4067-8053-4f7bd98fb9f3": "0f61a62e-3f2b-5dfd-bff8-a79f1db6fc42",
+        "cc2b3a78-7da1-44f0-8e8b-e5581f8096e9": "3670e0c3-627a-54a1-a424-25104a804e29",
+        "dd670bdb-d28d-4c3a-860d-51bdba991934": "737ec8c6-6d57-584a-8d2a-b49c9fd6ba69",
+        "e202fa43-68f7-4d19-8046-f39ed2edd444": "067e32fe-36c1-5362-a90c-d920d1c80249",
+        "e3523077-dc7e-4d0a-a45f-e8598919832a": "ce7241d9-0890-57b6-89a3-40fdb605ff59",
+        "e49a0ef0-42e0-4da2-86bd-97f062161e3d": "8fbe73e5-0106-5ef5-b5cd-18291bb12951",
+        "ea1adeea-9fa1-4666-ab56-e0e0c00e58cb": "486bc09d-4990-531e-ae97-0fbad70edc47",
+        "ea635d1f-635b-48d4-9e6b-92c52aa96a0b": "4631d44f-43ec-5efe-be5d-45c3edc033b7",
+        "ea6ec2aa-0c1b-44ba-bce1-5529320cd815": "3addf037-48c3-5e84-9c2a-0fadea308199",
+        "eb15b2f6-b2a6-48a1-8439-b3383fefc746": "842582f9-5343-55bf-becc-45a602e91e79",
+        "eb59db6f-2e1b-4290-8ea3-98f00b7ad4bc": "f8d1f40c-b4e9-5cef-8668-2fd7baad6e77",
+        "ec32f16b-5053-4522-8948-4eaef65a809a": "0187eded-6e7a-5888-a2af-522922775a39",
+        "ef00cd8e-0e42-45d1-99d3-9db06a912677": "bc97c037-821b-58b8-8828-e7f820bc2fd9",
+        "f7c25223-1ca5-4076-9d06-aa3c3c46f4a1": "345c021b-c869-59f7-81ad-1c15b6aef40b",
+        "fa9131b6-22be-4312-ae77-e3e7da7a7cf9": "46c52591-2cbf-5f7d-bc4a-3c9dfed48232",
+        "fec41e74-67b6-4ce4-9d93-31e46c97da45": "8199272a-606b-5b51-9da3-c7743e965409"
+      }
+    },
+    {
+      "__guid": "b52ba6ce-66d0-59ad-b4a6-045c36c93a43",
+      "__version": 2,
+      "__Prefab": {
+        "Id": "af50feff-a263-4c20-997f-58b4bb560e1f",
+        "Path": "prefabs/game_modes/bomb_defusal.prefab"
+      },
+      "__PrefabInstancePatch": {
+        "AddedObjects": [],
+        "RemovedObjects": [],
+        "PropertyOverrides": [],
+        "MovedObjects": []
+      },
+      "__PrefabIdToInstanceId": {
+        "0081680c-818f-4289-8c45-95be3a423250": "6f4897bd-dea3-5829-90bf-f4c26f0acd56",
+        "01e48aeb-9352-4716-ad31-3833d2f5ccef": "deb4bf78-0d3d-5069-8eba-d708bc6b2ddc",
+        "025a017a-a04a-48e7-80b0-20aa407a69b8": "492cad4e-7278-5e00-abdb-7a914fb150e6",
+        "05e1ae65-18c1-4b93-907e-d0d9cfbf3588": "58c8c74a-7631-56d8-8c67-763163956ec2",
+        "07759ff2-f643-4a09-859c-579af117267d": "b3614a2e-9c73-5c61-9a29-74de3c605611",
+        "0b470ea5-433f-4e86-954b-6eaf4e5daf35": "b7241270-22bb-5b0b-b589-3c967948b9c9",
+        "0bcf0905-c31b-4fd3-9e30-ca45eab602ef": "d3819e59-3626-5c3b-ab85-f0f68a652df2",
+        "0c7baf15-3ff9-4f84-899f-9804bc7b5226": "c2ebeb0c-bca9-5255-9f7f-a0e5547f06c5",
+        "128dd230-e63e-465b-95ba-15018638e31f": "bae27398-7fae-5eb6-9044-bbcdd7e2ff84",
+        "1494f78e-d3de-409d-aff7-ed68ad849e40": "a040b17a-1ce2-5360-96ef-6dae61a49b1c",
+        "1745a8a5-d0cb-4502-aa59-f93105f316cc": "887ac273-2b31-5e5f-9a69-c55dfe3419a9",
+        "17770cec-1343-4b87-bf5e-41eb641c70c3": "c1c2274d-c11b-5ea7-a0bf-5427ebcab72d",
+        "17dbb5a8-4d87-4040-9536-8ed42df16c01": "5a9163b1-079c-5baf-8b6e-3916224101b1",
+        "19ab3b1a-2121-4023-8723-bf7e84a3ad0d": "5f1cb5f0-e88f-50b8-b75a-d4622d0973c7",
+        "1a8d535e-eb43-4044-9bb4-55666c89a752": "20258091-013f-5a8f-94f7-67637e3a1de1",
+        "1b1b0c27-e7c8-42c3-b0dd-25a7529129f5": "f41fa0f1-2a5f-530c-ba39-a3c452f51901",
+        "1d2befa3-ad2f-4cc5-8a3d-2b6a6e9d5d74": "74c12b6d-aabb-5dc4-8407-606bdf7c9073",
+        "208d0f2e-a3de-4cbf-a808-70f7182bb2c3": "2f769245-8744-5e5e-a594-685d293308d1",
+        "20fa6051-a73b-4087-9a12-2f45bb6fcbcc": "2bc670ff-76c7-5f05-935f-472fdfd6d377",
+        "218ad0e2-5183-47a4-90b5-3911c286884f": "f648fa3c-38bd-5924-98a3-a2df601f9fac",
+        "23e64397-5b55-4997-9f69-dcc8adc02cd5": "91f3e39a-9f3d-52e5-a870-1654c43a4998",
+        "25968e4f-e4ca-4e63-b1cc-d677d1213541": "f72c55aa-05a7-5d5e-b12c-ed068a442095",
+        "2b78331a-868e-4f99-b3fa-1fc8ff2034c1": "13b30bc7-ec5e-5156-a5a1-fddb7d824806",
+        "2c48ca2b-1924-47fb-ace4-2180e88ebc34": "9e81dca3-7269-591e-9644-3de174cd2a56",
+        "2cb1d53c-1e80-4518-9ce8-fa5dc765c5e6": "995a251d-a0bf-573f-a26e-6eea5b864bd2",
+        "3047e6e9-5b10-4f00-8c15-b5071a95ec49": "62404b52-da37-5618-8581-e7d928aa43c3",
+        "3092e09d-2b87-48a4-bd44-e77deca7778b": "59df15e8-15a2-5a0b-ae2a-626b4f311ebb",
+        "32d8bb65-e088-4d19-b2c6-d42e646bbc4d": "ffa8e4b7-f3ed-510f-acd1-865a4fcd4996",
+        "346f5964-c987-4952-a09f-8e25298daba2": "bb967bbc-33ad-5a07-9971-9d47444e81e6",
+        "353eec32-ccda-493e-a835-b9a50afa4b45": "5f4a1212-9e1f-51e3-b189-b2dc945e43ce",
+        "35583140-7654-4aba-a8e3-84e829282f6d": "74c5f0f5-a5fc-52da-9eee-4be35ef4af7a",
+        "369890a1-3d7f-431c-94d8-ae9367587cf1": "1016a45e-1f42-5576-aca3-e3f0bc28dd7f",
+        "36deea8a-f5b4-4a7b-b9c0-9d2b21f7e032": "07813403-9246-58da-b924-2f63a02721b7",
+        "372309d2-b21e-49c5-91d5-b8087cd7a743": "12847a8a-6142-5e0d-80b7-86851c5ddf35",
+        "385d9bf9-8adc-4b89-88af-dda216c9d38e": "e0e0f301-9003-510c-a024-70a693951d21",
+        "38c146d2-4976-497a-8575-2d676c9779fc": "3b4cabb0-e8d0-5776-b1ba-af485d4e6d82",
+        "38e754d5-a42e-4ffd-adcf-545b2f90a92a": "6402e865-2592-5881-ba32-691c29114bca",
+        "3a8b06e0-1c8f-4f76-af80-47d0f1d072cb": "b1894995-97f5-5c9f-8861-0dc8c4a4eefa",
+        "3bfa5bfa-222c-4b88-92b4-58c8b097c492": "82121839-ca0d-5b03-b4f3-5e78bf063769",
+        "3c4a1d80-3d92-41bf-9051-c1abd609227a": "c61a83f9-e051-50fe-902b-7633cd644104",
+        "3cddef63-18fe-4ba1-9005-b76e10d8199e": "7d704e5e-85e5-5d43-a774-6530a721f964",
+        "3d316172-22ea-48e3-b3c5-244ef04d8ba8": "c39d11b9-3d3e-561f-a5c9-3d414d3c0ad7",
+        "4147f4b3-7d06-4393-8a66-78d9d1a166f1": "5a54009b-bd95-5bf1-86d6-4cf8168b43d6",
+        "438e2d35-d858-4a8b-967d-ddda466e9e92": "822d1705-ee38-5752-80d1-ca3c2f248d63",
+        "4403ed17-c00e-44a3-bb43-c2002a17f7dd": "061381b2-0d86-58e7-a57a-410549740cb6",
+        "47d83a15-5ecb-4246-a531-7b03df7c3eb7": "bb7c8544-374e-5722-adc5-86a7c5f8562f",
+        "49a0734b-7af2-4771-81c2-876a43fa7a61": "7695972b-2e8c-5e0e-9496-1d871b0a05b6",
+        "4d547204-8240-4e3c-9a86-05be1381fde1": "91c1114c-d0a8-59cc-a980-96981071af51",
+        "508d63c0-db97-4539-aaa6-5b4095e7ab82": "85dd0589-f8e9-58c0-af1a-f4666bfc3d8e",
+        "50a9dca5-4f8b-492d-b4d4-dbd144427728": "14dfc5df-14f2-5ff5-944a-95c8dd9f3293",
+        "540328b1-bdd9-4c32-b515-3824c42c2227": "68afcc05-b62f-5275-92b9-16b3dc822a64",
+        "597af6de-1ecc-43f1-9f3e-dd11ee0c0036": "fde83c79-4331-5b11-b162-cb91760870fc",
+        "5ab96d95-505a-48b6-bb43-524d45893aaf": "bf7552f5-f988-5499-b50e-19f9e28453c3",
+        "5dfb1386-aad1-4901-b24a-293d3cfac60f": "c058d13d-dbfe-5767-b52a-58bee14fbb33",
+        "5e9023d6-f4e5-435b-a805-1481593acfd2": "bf4f36b8-396e-551f-9185-65a580fade88",
+        "5f88a79a-af54-48f6-8e73-578a10f5b982": "6303bf2f-4d9f-5e25-9d6f-64c267515341",
+        "5fbad405-d206-4094-be63-ad939c75f830": "8b56bc1a-1fcc-50fd-af7b-056c688ad8ce",
+        "6277f054-b587-4141-8e1b-2c62c118e49a": "d8557c69-d5cc-55a3-a3c1-239503e24b34",
+        "63ac63f8-cd20-401f-8d73-4a13d738a793": "157c65e9-ee1f-5528-b82a-23793e5706b3",
+        "6be94b5a-91f5-4576-b07a-ca143773d035": "89d6d208-c139-5740-a289-daee6b51252a",
+        "75be0391-97e4-4f45-8049-37e04e249881": "607cc6cd-cc72-58f3-80b4-1aa55bc3c79e",
+        "75ef5955-5346-4233-a002-367e1dca71c1": "135afc21-7b9e-5019-8ccd-741f4a3d7029",
+        "76cc6aa2-74e6-4a75-bcae-1ed029d6179e": "e03dca65-4826-5114-8be2-eaf074018bec",
+        "77404e61-6aab-4f31-b216-2752c7c767c0": "716cbf10-9f68-5855-933d-7d8f8fc5f764",
+        "7b6daed5-5d86-4294-b269-65868fd14bdc": "f225f51f-ca2e-5a74-94e8-8a6fbe998308",
+        "7c1720b4-9c06-4399-9ad9-dc8c9236680e": "a017d1af-244c-5697-8cb7-36484866fb11",
+        "7e92a240-73c1-4860-9025-6e4f64c27b4f": "9c80146d-5342-5324-b18f-4b97277def07",
+        "7f2bada1-c911-467f-8648-feca0748483f": "a6ba56fc-36c5-5aa2-aa71-ec26da02fa4f",
+        "7f496705-e715-4463-8b37-2ea16b08e703": "45ea9a77-f3b9-5edb-8309-a7a2455e320a",
+        "7fb24345-0d07-464c-9e13-968831fe9f9e": "1738b8a3-3d5d-5a89-850e-bfcaaf2924ae",
+        "800e6b75-595b-4b94-b521-2ed8b44a6460": "a539595d-0fab-5566-9d68-e09ee4049118",
+        "81da66d0-027a-43f8-9306-88dfafa3a3f8": "693adb87-3620-567f-b270-01ba3a869269",
+        "83b2287d-8fa6-40d2-8fc3-89d593b38ae6": "764b82a9-2544-5bea-8ed3-650362e64579",
+        "8482d1fc-90f5-44f8-b33f-fca078658077": "06e83a54-0148-5825-8d1e-58ee30c22aa2",
+        "84ff0616-05f1-4774-a390-ce9525baab9a": "f3ff7a8d-4c35-56d1-9d0f-47f5f2807e29",
+        "8869030b-e87b-4e23-af06-8447c49c2510": "fc198468-1091-5c6d-8e29-012d10574c16",
+        "89a4b468-7aa5-4741-ac9b-4998eb0cefed": "95897eb7-67dd-5280-b15e-3c398a0b5211",
+        "8b5b2b41-64b4-4718-ad43-d9d10ac391cf": "4df444ed-e42d-568b-b9f4-6baf5d2b5b5b",
+        "8dbbbafb-a7ec-4140-88ae-29cf800f2bd7": "16881f47-8f44-50e5-9798-d9c4148965a2",
+        "8f2a629c-0d39-4eb1-a17a-03df62cfcc4b": "9f261e02-11c4-5bbe-88a9-3a6f037d919e",
+        "8fa8c162-65eb-40b3-918f-144e17e90978": "9345c6b9-ca0b-5bab-a18e-fe1ae70a9098",
+        "9040f7cb-6fbb-4756-9849-1303d6e71b82": "6d7354da-d313-540f-8677-5405e686e7e0",
+        "9269103b-219e-4886-89b9-efcfce1f1ee1": "ef2ef920-2602-5f39-ba72-21757c6c3ffc",
+        "93420f8a-c6a8-419a-9164-07e17e4f0710": "872a0362-e15e-52aa-9898-1952631458a3",
+        "941f07d5-e38a-4836-8162-85dcc2038650": "a2cc5b27-3758-58b2-92cd-5c8ce0d719c1",
+        "9dabf43b-2795-4877-a135-327a1630d0ce": "2dfa4375-0972-5e2b-ab9d-5a61f0c4e18b",
+        "a1b2c3d4-e5f6-7890-abcd-ef1234567890": "aa2e4b5a-44a1-57dc-82fa-ab2a50d21b96",
+        "a1dc363e-9102-428a-ad8e-fd84c4735d95": "4b267ec9-b670-52e3-9b64-d565f50efc6f",
+        "a205b96a-8a6b-48cf-86b7-11a98c3170e0": "12399553-df24-54af-ad15-b7e6e2cd4ac7",
+        "a2c66f8c-58fb-476f-8a2a-b7bdc1c2c9f4": "1f146b3b-355a-56b2-8359-180713354194",
+        "a389eb52-11f7-43a1-a605-82ff84f08afb": "9dae8d98-7eff-5f2b-a468-52ef5ce9d35d",
+        "a3a74cfa-fb01-442b-830c-1b445a6b5109": "b9b0c4e0-6c7f-50ed-a979-cd4ccec3e065",
+        "a76e74fc-8847-4d49-a181-37eec6506e55": "c7c20224-3849-57e3-9136-dfb2567369c4",
+        "a89eed29-39eb-408d-9eac-bab4cf475c86": "2de2921d-80d3-548d-b8e7-3619bf32c296",
+        "a9dafd0c-3d57-4cc5-b8ac-c7ff621d935f": "4b809188-76a1-506f-bfe9-dc5d9857b99e",
+        "ac41427a-b724-477d-9538-6b6dd052ea51": "6a771fa1-2466-5ac1-a5fc-fc59c8ebe722",
+        "aeb1687b-2368-4edc-ba2a-939a2f8eac8f": "e4babf7c-f4d2-58c6-a7f2-77cec87588e7",
+        "af98f2ea-530a-45d7-a125-bb8e22014429": "03fdd3cd-f09d-5b0c-b17c-9d8fb91b1955",
+        "b1e935ca-df43-44a4-83ae-3af7bee18dd9": "b50a62a1-42f3-54b0-9c15-abb9128a69cc",
+        "b4ac207d-d982-44eb-af14-9dc91e6ffe81": "e875236e-6368-514a-a502-b10e92d0fe2c",
+        "b593cc58-e030-4625-abcf-236e7e7b6384": "681283e0-2841-5108-a8f5-4488eaf0d16c",
+        "b6b85172-89e8-451f-9238-354ca3680f2d": "fdd39904-630c-555d-ad7c-94a123b9ebaa",
+        "bd4a6f9a-e3ee-46f8-80cb-d4f55e7905b1": "73b485ee-8b19-5d0e-8924-bb9f244fde58",
+        "c3b437df-9396-434e-90be-11b99ef6f0c5": "d25f877b-9362-5000-8990-ed0045aa341b",
+        "c3de11f5-491e-48e8-92f2-0ca9778bf18b": "b9111ad1-3d44-5352-bde3-910b1734d14e",
+        "c4175b34-32ea-4bd7-8ab4-9464ecc9f906": "e2076b7a-e8de-5ca2-a903-8bff34569d1a",
+        "c7630538-0160-4d93-8c3a-6643524d8b39": "91a9e9cf-b95b-5afb-a565-19017d188d6a",
+        "c8ec8313-d118-49cf-9480-6b2e7ef80ae8": "663f63d6-0644-55ff-8a48-114154f1dc73",
+        "c9c2faf2-0ea5-48d5-9fef-e501a9fcf3d5": "40765317-5612-5482-a722-37ae98bc7540",
+        "cb568ad0-a5ea-471e-8a1c-186b7a6e4a17": "283f5fa5-f57a-5d7d-8466-ec8b54178d03",
+        "d0a63684-f740-460e-aa80-687424d55ec0": "b5fc0877-b270-5b29-b480-d0816b0e1bdb",
+        "d1112904-6e20-4e1e-9ad3-a20de1f1a1a6": "ac3bc1f8-18c0-52e9-9a51-e3005a1d2ba2",
+        "d1721277-8f52-43e6-8706-6e58084a2d40": "6fa95d24-adc8-549d-9a5d-6aa84fec73e4",
+        "d56b1c52-df76-49c0-a972-d08c080ba023": "1ecd7d16-7da9-5ad9-bf70-9ce9256f9bd0",
+        "d56b939f-aca3-4c38-87fe-71cca36f462d": "1f47ba50-0363-5b25-a3ad-41e876cbe999",
+        "d5c89b98-a4e2-4148-9890-4c6dcb56d60a": "fa41ad1f-c8bc-58b9-9c91-e4ea007703e0",
+        "dbaa1631-46a7-4019-accc-de8a0445800b": "861fb64c-4158-57e9-a635-46464c957202",
+        "dbc1901b-5f09-4268-aaba-1030d02e6a49": "b044f709-a75c-566e-8a0b-e00708960e5e",
+        "dd0d2444-b755-4db1-8074-3067912a6e62": "c7506f08-de5b-5575-b0bd-a20318fc6537",
+        "de5f436b-72ea-4ae9-bcb9-99dbda4f990c": "f9da8810-ea46-519d-a248-64de6130ef07",
+        "e1fc0b81-cf76-4a3a-802a-c7569b4c8ba4": "3eaddce9-d886-5987-86fe-3e13c474dd9a",
+        "e2155f6e-7202-4fde-9e9f-972fb87dac92": "dee71645-a8d6-5343-a98a-f5cc2fa43a2a",
+        "e2ddbaad-7772-4437-8e93-be2b6896ed0c": "4d37c539-e36f-5da1-b906-e643ea01d1ca",
+        "e443653c-eae6-4e45-aac1-dad13ac2ad35": "32b965e3-7392-5843-8e70-2945fae4ac1c",
+        "e6a53ace-1071-45c4-b4fd-8db2c437262c": "30dfe0ac-3ab8-5fa6-8cad-e7d08e3b54f1",
+        "e782b3b5-7699-4fc2-baca-11cc0ccfe3b5": "4791dd25-31e7-53ea-b3b9-866628898b4b",
+        "e804d5d6-339a-49c8-8aac-c8092d86e483": "7aae5f8c-7eea-5f02-95f4-313a27dafe0a",
+        "e8744fa0-b90b-4d9a-9d31-f905725c82ec": "1b29331f-aa53-5101-80d1-a6e1a50e0010",
+        "e876e4bc-4c3c-470e-9786-6a750381c4c6": "f0228288-61cc-5893-b06b-5f608d9ea548",
+        "e8ecb68b-0016-4b18-9649-4a5fb9b6efd3": "bf624c79-0712-5d25-ae6d-d2f8570b4116",
+        "eac01b1a-8031-4a2d-92f6-b82c1d0e0ff5": "2a8a1a18-6239-50ff-a7c9-6d719a0ff7f6",
+        "edbe1e51-c4ca-4673-b67a-5674096a8220": "f9a2cef2-0865-5ede-b7b2-58b595906889",
+        "f051c22c-30ad-417a-b1d5-92058c9b2d21": "5b215bc4-5989-58c9-bf76-f01d416f52e7",
+        "f2651786-cf22-4cf7-92f8-0379f1d456d0": "9eb68f02-cd4e-5c44-86cb-6a8bf38dda18",
+        "f4254054-0124-4bb0-a795-d7dd6187b665": "e00645cb-215e-50ac-804e-b657ff621217",
+        "f4fe73a9-6aa7-4002-8b52-a120444c3473": "b52ba6ce-66d0-59ad-b4a6-045c36c93a43",
+        "f57b65e7-8078-403a-9e17-e6de2aadd336": "5ea65138-2195-5736-adfd-fd4528578c0c",
+        "f633c914-8fc0-4fa9-9bf3-14afc7b55c78": "62e2ff1d-f087-5c37-aa2c-d4c1c7bf8b3e",
+        "f7709a3f-19cb-4c2b-97a9-4102ac11a02e": "89430c36-c0c7-5c63-9c2e-0d9d5852dbe4",
+        "f77a6dfc-d833-47b5-8b7d-a67b1303f961": "2807a939-5416-56c6-80e0-70d6cf1ca7a7",
+        "f8643bca-89bc-44f8-b645-9da4e855fde3": "1c547bd3-70f9-5268-bf80-7804b3d0e219",
+        "f95406f8-4f3c-4332-84c0-207e89a85c38": "c9cf73a6-6d9d-54ff-bc36-937eed53c58c",
+        "f9e53ea8-60fc-44a6-a844-0ad36bd116cd": "39f745e5-f013-58b8-b5f1-bddfccb88034",
+        "f9e6010f-47d4-4ed7-8b24-ecfd9853c9e7": "6d21b66f-1414-562d-a233-08780efd6c95",
+        "fa1b2714-75f6-4567-9c19-912127850841": "11bf3f12-597a-52f9-b479-323d5c3e3486",
+        "fd005496-e87a-4ba9-b8cf-349050d2c97a": "2c92ae92-d9aa-5c3a-820b-5e53ff15e8c3",
+        "fe095be3-3702-44db-9d46-fd191f054ea3": "0baf5cea-4ce9-5d28-8a49-28914011eee3",
+        "fed1922f-4144-4ee2-a296-a3910253a101": "a0b5f87b-e6a7-591c-9a39-91cb2066965e",
+        "ffa72673-9c28-4bf8-a0f2-b8eb3e73944b": "344fbc96-efed-5d59-9c2f-e9dab7e98954",
+        "fff5d192-d6a7-4392-b17c-1fec9b2437dc": "03203a4e-7aa3-5172-ab68-cdb73db242b0"
+      }
+    },
+    {
+      "__guid": "53f67cfd-3803-5e44-b6e8-1b615d05d8fe",
+      "__version": 2,
+      "__Prefab": {
+        "Id": "ee813720-722c-4ee9-89c2-d1907b232008",
+        "Path": "scenes/maps/defusemap_01/game_setup.prefab"
+      },
+      "__PrefabInstancePatch": {
+        "AddedObjects": [],
+        "RemovedObjects": [],
+        "PropertyOverrides": [],
+        "MovedObjects": []
+      },
+      "__PrefabIdToInstanceId": {
+        "05ddf668-2a23-425d-80a9-2fbd99aebd3c": "12bade6a-67ef-5a3c-8f25-abe9687e7a53",
+        "0c0279e4-5ed6-474c-bd2a-7884a4d68b4b": "e79121e7-e1ec-511f-a4a1-17a6033bc87a",
+        "12c896c3-9c7f-432c-b611-5235bc0b256d": "237bd8db-2406-5940-b93d-3e91169349f9",
+        "1812ebb9-9d7f-42c7-9a1b-cc7e3cc08b66": "03e30690-b487-52fd-b799-23bca6981843",
+        "181fcfdf-894c-4f8d-909c-198a6ce025ab": "85afc9df-d9b4-5e44-9f88-672d6438276d",
+        "197c4584-e218-4ca6-bf89-c681d85dde64": "65e19148-452e-5048-a370-e4542bafaae4",
+        "1fbe1885-c54f-4870-916f-05a56271e8fd": "3777c762-2de9-5c3c-8db4-8474c6f10f2f",
+        "20c78d91-5ca6-442a-a6b5-ab8b1602e80f": "9552de2e-2528-5fae-94d8-a3e7add72331",
+        "277c324d-4d24-4dcf-9d9c-5f7dc9051932": "642d7a61-d297-546a-96c7-36cb01d93a99",
+        "3951a691-bb25-49f8-9a58-e276f08222cf": "8389a4ed-1cfd-5044-b8de-15c2e250c3d1",
+        "49ccfd38-c5e1-45fd-aa44-5efbadaa0577": "9d0b4d48-7eae-5151-b9f8-7be044fcf75b",
+        "4dc414cd-ed6d-4fcd-bd26-0c4c340b5301": "4db0ef1d-7bdc-5c25-90e5-cb43ccc353b0",
+        "50de49ef-0287-435d-b570-e48047718014": "8b5b8cbb-64b3-5856-8556-a5b410408edd",
+        "58807d92-54d1-46b8-8cb5-b611520f2ede": "25f77e23-43af-593a-af88-f5e0b05f6cee",
+        "5a78ef35-8400-4326-bd0e-e5073d2bcba3": "680fab18-2895-5e6b-884b-331aec7d867c",
+        "62e7124f-7d96-4d4a-b3ba-4c0ef58f6b4a": "e6c60e8c-4570-52de-a4d6-66d86fc7c6cc",
+        "69d5003a-44d7-41fe-a620-32f6bf0c4cd0": "ca91b8b0-e7d8-5de0-a19a-48076d577f57",
+        "6a983fb1-0d55-435e-8fcb-732b1ea27724": "a666c1ce-51fe-51ba-82fd-c42595f9d173",
+        "705ab2e0-5402-4947-8a33-bcf05f4e4048": "77ba2678-525c-5c9d-bfa1-ee2b7236c12d",
+        "71b39898-e489-4c21-85a1-7d37b7aeec54": "f758a209-88cc-54c6-a4e1-982668b94a3a",
+        "7a4dcb57-1bdf-41df-8ae3-2089c598fdef": "a4f0ba3e-2d30-5039-b284-e84cd482e940",
+        "843ab22f-5541-4fb8-bc8c-759f41e35140": "35737cad-81dd-58da-a5fb-4fffe7167df6",
+        "89e9bfbf-5479-448a-be07-24914e1c82c3": "f5aaea8b-1d95-57c0-8a99-12e96e909da9",
+        "91d5d71c-7576-48cb-8996-eb3c468aaf59": "7ab886af-ae7e-57e0-9998-6079ae983a23",
+        "95a4c168-2c12-41b9-8496-7737babe56ef": "82897a48-eaed-532d-93aa-2f3d1af9c4cc",
+        "9a4ca0dc-a7e9-466c-8bd6-ad5fab460ce9": "be4127d6-d898-55d7-a590-60ee58522c7d",
+        "a0ca5a0f-4af9-416f-8308-bb7fa5dfb8f7": "d609c6b4-5118-5266-8d98-8a6eff521a0d",
+        "a90ee9f3-b357-4eb5-9dd4-415402592b57": "7123f34d-1ca4-51c6-a508-343e0c907cab",
+        "ab3d0a25-9952-4038-af53-1686d287eb5d": "0499ba92-02ab-561f-a889-637b4a790509",
+        "b4ca6d36-f647-49b3-9151-8ef4c63aeddd": "b62c33c6-8bfe-597c-9da3-7014ed9d54c5",
+        "d0c8d522-0524-4dbb-92a9-04b45bf7d1c7": "53f67cfd-3803-5e44-b6e8-1b615d05d8fe",
+        "d5595acd-b863-410f-8172-dd5551b1e049": "ce71928e-01b5-5a18-a1d1-5f12b76015e2"
+      }
+    }
+  ],
+  "SceneProperties": {
+    "NetworkInterpolation": true,
+    "PhysicsMode": "Physics3D",
+    "TimeScale": 1,
+    "WantsSystemScene": true,
+    "Metadata": {
+      "Title": "Boxyard",
+      "Image": "ui/maps/boxyard.png",
+      "IsVisibleInMenu": "True",
+      "GameModes": "prefabs/game_modes/team_deathmatch.prefab, prefabs/game_modes/bomb_defusal.prefab"
+    },
+    "NavMesh": {
+      "Enabled": true,
+      "IncludeStaticBodies": true,
+      "IncludeKeyframedBodies": true,
+      "EditorAutoUpdate": true,
+      "AgentHeight": 64,
+      "AgentRadius": 16,
+      "AgentStepSize": 18,
+      "AgentMaxSlope": 40,
+      "ExcludedBodies": "zone",
+      "IncludedBodies": "",
+      "DeferGeneration": false,
+      "CustomBounds": true,
+      "Bounds": {
+        "Mins": "-832,-800,-40",
+        "Maxs": "832,800,98"
+      }
+    }
+  },
+  "ResourceVersion": 3,
+  "Title": "Boxyard",
+  "Description": null,
+  "__references": [],
+  "__version": 3
+}
