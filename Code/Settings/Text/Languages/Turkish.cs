@@ -736,6 +736,8 @@ public static partial class GameText
 			"İngiliz yapımı 5,56x45 mm bullpup tüfek: SA80 hizmet tüfeği; 20,4 inçlik namlu, taşıma kolu üzerinde mekanik nişangâh ve 30 fişeklik şarjör.",
 		["German 5.56x45mm carbine: a short-stroke piston rifle with an 11-inch barrel, flip-up sights and a gas regulator with a setting for a suppressor."] =
 			"Alman yapımı 5,56x45 mm karabina: kısa kurslu pistonlu bir tüfek; 11 inçlik namlu, katlanır nişangâhlar ve susturucu için ayarı olan bir gaz regülatörü.",
+		["Russian 5.45x39mm assault rifle: the Kalashnikov of 2018, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
+			"Rus yapımı 5,45x39 mm saldırı tüfeği: 2018'in Kalaşnikof'u; raylı mekanizma kapağı ve el kundağı, katlanır ve teleskopik dipçik ve iki atımlık seri atış.",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"ABD'nin 9x19 mm hizmet tabancası: ABD Ordusu'nun kompakt P320'si, 3,9 inç namlu ve 17 fişeklik şarjörle.",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =
@@ -1007,6 +1009,10 @@ public static partial class GameText
 			"FAL'ın ağır namlulu manga tüfeğinin 30 mermilik şarjörü. Daha uzun ve daha ağır. Yeniden doldurma 2,67 sn (boşken 3,57 sn).",
 		["The AK-74's standard pistol grip. No effect on recoil."] =
 			"AK-74'ün standart tabanca kabzası. Geri tepmeye etkisi yok.",
+		["The AK-74M's polymer 30-round magazine, with no window. Standard reload speed."] =
+			"AK-74M'nin 30 mermilik polimer şarjörü, penceresiz. Standart yeniden doldurma hızı.",
+		["The AK-74M's polymer pistol grip. No effect on recoil."] =
+			"AK-74M'nin polimer tabanca kabzası. Geri tepmeye etkisi yok.",
 		["The AKM's 30-round steel magazine. Much quicker to change than the drum. Reloads in 2.2s (2.6s when empty)."] =
 			"AKM'nin 30 mermilik çelik şarjörü. Değiştirmesi tamburdan çok daha çabuk. Yeniden doldurma 2,2 sn (boşken 2,6 sn).",
 		["The AKS-74U's side-folding skeleton stock. 9% more recoil."] =

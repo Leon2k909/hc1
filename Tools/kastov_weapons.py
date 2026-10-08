@@ -1354,8 +1354,71 @@ HK416 = Weapon(
                   "tag_stock_attach", "tag_mag_attach", "tag_ik_loc_le", "tag_grip_hide"],
 )
 
+def ak12_materials() -> dict[str, str]:
+    # Built by ak12_assets.py; the AK-105's magazines and the AK grips keep the AK-105's and 74u's materials.
+    assets = json.loads((ASSETS / "Weapons" / "AK12" / "ak12_assets.json").read_text(encoding="utf-8"))
+    return assets["materials"]
+
+
+def _ak105_part(model: str) -> tuple[str, str]:
+    """A part_choices entry for one of the AK-105's own attachment models, from another gun's decompile."""
+    choice, path = _attachment(model)
+    return choice, f"../akilo105/{path}"
+
+
+# The AK-12 (5.45x39mm, Kalashnikov's 6P70 of 2020): Escape from Tarkov's model from the ARC9 EFT Assault Rifles pack
+# (Workshop 2962829818), on the AK-105's CoD rig and clips. The real gun is an AK: its magazine well, trigger group,
+# selector and mag catch are the AK-74M's, so they're fitted onto the AK-105's (within 0.08 at the trigger, the catch
+# and the magazine's top), and its 415 mm barrel, gas block with the front sight, railed dust cover and handguard and
+# its folding, telescoping stock come with it. Tools/ak12_rig.py writes the pieces as SMDs on the AK-105's skeleton
+# (decompiled/ak12/rig): the bolt carrier on j_boltcarrier, the trigger on j_trigger, the selector on j_fireselect, the
+# mag catch on j_magrelease and the magazine with its top rounds on j_mag1 and j_mag2.
+_AK12_RIG = "rig"
+AK12 = Weapon(
+    name="ak12",
+    folder=ASSETS / "Weapons" / "AK12",
+    asset="weapons/ak12",
+    model="ak12",
+    decompiled=DECOMPILED / "ak12",
+    cod_anims="../akilo105/vm_iw9_akilo105_anims",
+    vm_meshes=[f"{_AK12_RIG}/ak12_receiver.smd"],
+    part_meshes=[],
+    optional_meshes={
+        "muzzle_tip": (f"{_AK12_RIG}/ak12_brake.smd", None),  # the 5.45 muzzle brake, off under a muzzle device
+        "iron_sights": (f"{_AK12_RIG}/ak12_rear_sight.smd", None),  # the diopter rear sight on the dust cover's rail
+    },
+    # 0.2 inside the front of the muzzle brake, on the bore.
+    extra_bones={"muzzle": ("tag_sling", np.array([28.22, 0.573, 1.03]))},
+    materials=ak12_materials,
+    hip=view_offset(),
+    # The AK-105's ads_in leaves its own sights' line on the eye. The AK-12's diopter sits 0.23 higher and its front post
+    # is a little lower, so this lowers the gun until the aperture's centre is on the aim point and pitches it 0.095
+    # degrees up onto the post's tip (measured at ads_in's last frame: both within 0.001 and 0.005 degrees).
+    aim=view_offset((-0.009, 0.0, -0.234), (0.095, 0.0, 0.0)),
+    sprint=view_offset(),
+    m4_sprint=True,
+    ads_pose=("ads_in", slice(-1, None)),
+    report_bones=["tag_brass", "tag_mag_attach", "tag_stock_attach", "tag_pistolgrip_attach"],
+    part_choices={
+        # The AK-12's own grip, then the AK-74M's and the AK-platform grips: it takes any AK grip.
+        "pistol_grip": [("factory", f"{_AK12_RIG}/ak12_pgrip.smd"), _ak105_part("ar_akilo105_pgrip_v0")] + [
+            _kastovia(model) for model in (
+                "sh_vecho_pgrip_v0", "ar_akilo_griptac_v0", "ar_akilo_gripstdy_v0", "ar_akilo_gripass_v0",
+                "sh_vecho_gripsnp_v0", "ar_akilo_pstlgrp_v0")],
+        # The AK-12's own 30-round magazine (with its window), then the 5.45 AK-74 magazines it takes: the AK-74M's
+        # 30, a 20, the RPK-74's 45 and a four-column 60. Each holds the fitted magazine (j_mag1) and the reload's
+        # fresh one (j_mag2).
+        "magazine": [("factory", f"{_AK12_RIG}/ak12_mag.smd"), _ak105_part("ar_akilo105_mag_v0"),
+                     _kastovia("ar_akilo105_smag_v0"), _kastovia("ar_akilo105_xmag_v0"),
+                     _ak105_part("ar_akilo105_xmaglrg_v0")],
+    },
+    reload_variants=["_smag", "_xmag", "_xmaglrg"],
+    # The AK-105's factory barrel's (att_vm_p04_ar_akilo105_barrel_v0.lua: grip_pose_l_offset).
+    grip_pose="a_delta_barhvyshort_additive_for_offset",
+)
+
 WEAPONS ={weapon.name: weapon for weapon in (KASTOV_762, KASTOV_74U, VITYAZ, RPK, BIZON, AK105, VEPR12, M16, P90,
-                                              MP7, AUG, UZI, FAL, FAMAS, M18, MCX, L85A2, HK416)}
+                                              MP7, AUG, UZI, FAL, FAMAS, M18, MCX, L85A2, HK416, AK12)}
 
 
 def add_argument(parser: argparse.ArgumentParser) -> None:

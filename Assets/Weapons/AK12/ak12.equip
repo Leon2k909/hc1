@@ -1,0 +1,33 @@
+{
+  "Name": "AK-12",
+  "Description": "Russian 5.45x39mm assault rifle: the Kalashnikov of 2018, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst.",
+  "Slot": "Primary",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": true,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/guns/ak12_01.png",
+  "IsPurchasable": true,
+  "Price": 2700,
+  "KillReward": 300,
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/ak12/weapon_ak12.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/ak12/wm_ak12.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/ak12/vm_ak12.prefab"
+  },
+  "WorldModel": "weapons/ak12/w_ak12.vmdl",
+  "ArmorReduction": null,
+  "HelmetReduction": null,
+  "WorldModelBodyGroups": 0,
+  "__references": [],
+  "__version": 0,
+  "Category": "AssaultRifle",
+  "GunsmithOffset": "0,0,4",
+  "ReviewNote": "Not checked in a match yet: the iron sights and the optics' aim (derived: tune with dev_optic_correction), recoil, the two-round burst, reload timing and sounds, the look sway and sprint, the left hand in first and third person, the parts on its slots, the charm and the sticker."
+}

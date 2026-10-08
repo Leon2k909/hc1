@@ -256,6 +256,8 @@ public static partial class GameText
 			"Fucile bullpup britannico in 5,56x45 mm: il fucile d'ordinanza SA80, con canna da 20,4 pollici, mire metalliche su una maniglia di trasporto e caricatore da 30 colpi.",
 		["German 5.56x45mm carbine: a short-stroke piston rifle with an 11-inch barrel, flip-up sights and a gas regulator with a setting for a suppressor."] =
 			"Carabina tedesca in 5,56x45 mm: un fucile a pistone a corsa corta con canna da 11 pollici, mire abbattibili e un regolatore dei gas con una posizione per il silenziatore.",
+		["Russian 5.45x39mm assault rifle: the Kalashnikov of 2018, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
+			"Fucile d'assalto russo in 5,45x39 mm: il Kalashnikov del 2018, con coperchio della culatta e paramano con slitte, calcio pieghevole e telescopico e raffica da due colpi.",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"Pistola d'ordinanza statunitense in 9x19 mm: la P320 compatta dell'Esercito degli Stati Uniti, con canna da 3,9 pollici e caricatore da 17 colpi.",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =
@@ -530,6 +532,10 @@ public static partial class GameText
 			"Il caricatore da 30 colpi del fucile di squadra a canna pesante del FAL. Più lungo e più pesante. Ricarica in 2,67 s (3,57 s a vuoto).",
 		["The AK-74's standard pistol grip. No effect on recoil."] =
 			"L'impugnatura a pistola standard dell'AK-74. Nessun effetto sul rinculo.",
+		["The AK-74M's polymer 30-round magazine, with no window. Standard reload speed."] =
+			"Il caricatore in polimero da 30 colpi dell'AK-74M, senza finestra. Velocità di ricarica standard.",
+		["The AK-74M's polymer pistol grip. No effect on recoil."] =
+			"L'impugnatura a pistola in polimero dell'AK-74M. Nessun effetto sul rinculo.",
 		["The AKM's 30-round steel magazine. Much quicker to change than the drum. Reloads in 2.2s (2.6s when empty)."] =
 			"Il caricatore in acciaio da 30 colpi dell'AKM. Molto più rapido da cambiare rispetto al tamburo. Ricarica in 2,2 s (2,6 s a vuoto).",
 		["The AKS-74U's side-folding skeleton stock. 9% more recoil."] =

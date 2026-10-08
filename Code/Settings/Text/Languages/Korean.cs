@@ -258,6 +258,8 @@ public static partial class GameText
 			"영국제 5.56x45mm 불펍 소총으로, SA80 제식 소총입니다. 20.4인치 총열, 운반 손잡이 위의 기계식 조준기, 30발 탄창을 갖췄습니다.",
 		["German 5.56x45mm carbine: a short-stroke piston rifle with an 11-inch barrel, flip-up sights and a gas regulator with a setting for a suppressor."] =
 			"독일제 5.56x45mm 카빈으로, 쇼트 스트로크 피스톤식 소총입니다. 11인치 총열, 접이식 조준기, 소음기용 설정이 있는 가스 조절기를 갖췄습니다.",
+		["Russian 5.45x39mm assault rifle: the Kalashnikov of 2018, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
+			"러시아제 5.45x39mm 돌격소총으로, 2018년의 칼라시니코프입니다. 레일이 달린 기관부 덮개와 핸드가드, 접이식 신축 개머리판, 2점사를 갖췄습니다.",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"미국의 9x19mm 제식 권총으로, 미 육군의 컴팩트형 P320이며 3.9인치 총열과 17발 탄창을 갖췄습니다.",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =
@@ -527,6 +529,10 @@ public static partial class GameText
 		["The 30-round magazine of the FAL's heavy-barrel squad rifle. Longer and heavier. Reloads in 2.67s (3.57s when empty)."] =
 			"FAL 중총열 분대 지원 소총의 30발 탄창입니다. 더 길고 무겁습니다. 재장전에 2.67초가 걸립니다(빈 탄창일 때 3.57초).",
 		["The AK-74's standard pistol grip. No effect on recoil."] = "AK-74의 표준 권총 손잡이입니다. 반동에는 영향이 없습니다.",
+		["The AK-74M's polymer 30-round magazine, with no window. Standard reload speed."] =
+			"AK-74M의 폴리머 30발 탄창으로, 창이 없습니다. 재장전 속도는 표준입니다.",
+		["The AK-74M's polymer pistol grip. No effect on recoil."] =
+			"AK-74M의 폴리머 권총 손잡이입니다. 반동에는 영향이 없습니다.",
 		["The AKM's 30-round steel magazine. Much quicker to change than the drum. Reloads in 2.2s (2.6s when empty)."] =
 			"AKM의 30발 강철 탄창입니다. 드럼 탄창보다 훨씬 빨리 교체할 수 있습니다. 재장전에 2.2초가 걸립니다(빈 탄창일 때 2.6초).",
 		["The AKS-74U's side-folding skeleton stock. 9% more recoil."] =

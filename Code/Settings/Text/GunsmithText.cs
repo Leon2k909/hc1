@@ -144,6 +144,11 @@ public static partial class GameText
 			"Deutscher Karabiner im Kaliber 5,56x45 mm: ein Gewehr mit Kurzhub-Gaskolben, 11-Zoll-Lauf, klappbarer Visierung und einem Gasregler mit einer Stellung für den Schalldämpfer.",
 			"Carabina alemana de 5,56x45 mm: un fusil de pistón de carrera corta con cañón de 11 pulgadas, miras abatibles y un regulador de gases con una posición para supresor.",
 			"Carabina alemã 5,56x45 mm: um fuzil de pistão de curso curto com cano de 11 polegadas, miras rebatíveis e um regulador de gases com uma posição para supressor." ),
+		["Russian 5.45x39mm assault rifle: the Kalashnikov of 2018, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] = (
+			"Fusil d'assaut russe en 5,45x39 mm : la Kalachnikov de 2018, avec couvre-culasse et garde-main à rails, une crosse pliante et télescopique et une rafale de deux coups.",
+			"Russisches Sturmgewehr im Kaliber 5,45x39 mm: die Kalaschnikow von 2018, mit Schienen auf Verschlussdeckel und Handschutz, klapp- und ausziehbarer Schulterstütze und Zweischuss-Feuerstoß.",
+			"Fusil de asalto ruso de 5,45x39 mm: el Kaláshnikov de 2018, con tapa del cajón de mecanismos y guardamanos con rieles, culata plegable y telescópica y ráfaga de dos disparos.",
+			"Fuzil de assalto russo 5,45x39 mm: o Kalashnikov de 2018, com tampa da caixa da culatra e guarda-mão com trilhos, coronha rebatível e telescópica e rajada de dois tiros." ),
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] = (
 			"Pistolet réglementaire américain en 9x19 mm : le P320 compact de l'US Army, avec un canon de 3,9 pouces et un chargeur de 17 cartouches.",
 			"Amerikanische Dienstpistole im Kaliber 9x19 mm: die kompakte P320 der US Army, mit 3,9-Zoll-Lauf und 17-Schuss-Magazin.",
@@ -499,6 +504,16 @@ public static partial class GameText
 			"El cargador de 30 balas del fusil de apoyo de cañón pesado del FAL. Más largo y más pesado. Recarga en 2,67 s (3,57 s en vacío).",
 			"O carregador de 30 cartuchos do fuzil de apoio de cano pesado do FAL. Mais longo e mais pesado. Recarga em 2,67 s (3,57 s vazio)." ),
 		["The AK-74's standard pistol grip. No effect on recoil."] = ("La poignée pistolet standard de l'AK-74. Aucun effet sur le recul.", "Der Standard-Pistolengriff der AK-74. Kein Einfluss auf den Rückstoß.", "La empuñadura de pistola estándar del AK-74. No afecta al retroceso.", "A empunhadura de pistola padrão do AK-74. Não afeta o recuo."),
+		["The AK-74M's polymer 30-round magazine, with no window. Standard reload speed."] = (
+			"Le chargeur polymère de 30 cartouches de l'AK-74M, sans fenêtre. Vitesse de rechargement standard.",
+			"Das 30-Schuss-Polymermagazin der AK-74M, ohne Sichtfenster. Normale Nachladezeit.",
+			"El cargador de polímero de 30 balas del AK-74M, sin ventana. Velocidad de recarga estándar.",
+			"O carregador de polímero de 30 cartuchos do AK-74M, sem janela. Velocidade de recarga padrão." ),
+		["The AK-74M's polymer pistol grip. No effect on recoil."] = (
+			"La poignée pistolet en polymère de l'AK-74M. Aucun effet sur le recul.",
+			"Der Polymer-Pistolengriff der AK-74M. Kein Einfluss auf den Rückstoß.",
+			"La empuñadura de pistola de polímero del AK-74M. No afecta al retroceso.",
+			"A empunhadura de pistola de polímero do AK-74M. Não afeta o recuo." ),
 		["The AKM's 30-round steel magazine. Much quicker to change than the drum. Reloads in 2.2s (2.6s when empty)."] = (
 			"Le chargeur en acier de 30 cartouches de l'AKM. Bien plus rapide à changer que le tambour. Rechargement en 2,2 s (2,6 s à vide).",
 			"Das 30-Schuss-Stahlmagazin der AKM. Viel schneller zu wechseln als die Trommel. Nachladen in 2,2 s (2,6 s wenn leer).",

@@ -212,6 +212,18 @@ PARTS_AK105 = {
                                    magazine_capacity=60, reload_variant="_xmaglrg", reload_times=(2.5, 2.8)),
 }
 
+# The AK-12's parts: it takes any AK-74 magazine and any AK pistol grip, as the real one does. Its own grip and its
+# windowed 30-round magazine are the factory parts; the AK-74M's grip and 30 come next, then the AK-105's other
+# magazines (it plays the AK-105's clips, so their reload times are the AK-105's) and the AK-platform grips.
+_AK12_CHOICES = kastov_weapons.AK12.part_choices
+PARTS_AK12 = {
+    "ar_akilo105_pgrip_v0": Part("AK-74M Pistol Grip", "The AK-74M's polymer pistol grip."),
+    **{choice: _AK105_GRIPS[choice] for choice, _ in _AK12_CHOICES["pistol_grip"][2:]},
+    "ar_akilo105_mag_v0": Part("AK-74M 30 Round Mag", "The AK-74M's polymer 30-round magazine, with no window.",
+                               magazine_capacity=30),
+    **{choice: PARTS_AK105[choice] for choice, _ in _AK12_CHOICES["magazine"][2:]},
+}
+
 
 # The Vepr-12's own parts. Its factory stock is the strut stock, so the stocks' recoil is relative to that; its factory
 # grip, the shotgun pistol grip, has the 74u's grips' baseline. The 12-round magazine and the drum reload with their own
@@ -889,6 +901,34 @@ def gameplay_hk416() -> Gameplay:
         # Free recoil against the M4's (2,5): an M855 round (4.02 g at 826 m/s, 1.7 g of powder) kicks the loaded
         # ~3.75 kg HK416 back at ~1.54 m/s, the loaded M4 at ~1.86 m/s.
         "ShootRecoil": {"Scale": "1.66,4.14"},
+    })
+
+
+def gameplay_ak12() -> Gameplay:
+    """The real AK-12's figures (6P70; Rosoboronexport's catalogue) on the M4's prefab, with the 5.45mm round doing the
+    M4's 5.56 damage like the AK-105's."""
+    assets = load(ASSETS / "Weapons" / "AK12" / "ak12_assets.json")
+    sounds, reloads = assets["sounds"], assets["reloads"]
+    return Gameplay({
+        # 3.5 kg without a magazine, ~4.0 kg with a loaded 30: the M16A4's weight, too little over the AKM's 3.75 kg for
+        # a WeightSlowdown. The rifles' penalty.
+        "Equipment": {"SpeedPenalty": 40},
+        "WeaponAmmo": {"Ammo": 30, "MaxAmmo": 30},
+        # 700 rpm cyclic. The 2018-2022 rifles' selector: automatic, a two-round burst and semi (the 2023 model dropped
+        # the burst). 7N6 ball leaves the 415 mm barrel at 900 m/s, as from the AK-74M's (G7 0.157). The sights sit
+        # 55.3 mm over the bore (the eye's height over it at the ADS pose, through the diopter's aperture), zeroed at
+        # 300 m like the AK-105.
+        "Shootable": {"BaseDamage": 20, "FireRate": 700, "ShootSound": sounds["fire"],
+                      "SuppressedShootSound": sounds["fire_suppressed"],
+                      "SupportedFireModes": ["Automatic", "Burst", "Semi"], "CurrentFireMode": "Automatic",
+                      "BurstAmount": 2, "BurstEndDelay": 0,
+                      **ballistics(900, "G7", 0.157, 55.3, 300, N7N6_BULLET)},
+        # It plays the AK-105's clips: the gun is level again at 2.3s, and 2.6s after the empty reload's bolt pull.
+        "Reloadable": {"ReloadTime": 2.3, "EmptyReloadTime": 2.6, "TimedReloadSounds": reloads["reload"],
+                       "EmptyReloadSounds": reloads["reload_empty"]},
+        # Free recoil against the M4's (2,5): a 7N6 round (3.42 g at 900 m/s, 1.45 g of powder) kicks the loaded
+        # ~4.0 kg AK-12 back at ~1.33 m/s, an M855 round the loaded M4 at ~1.86 m/s.
+        "ShootRecoil": {"Scale": "1.43,3.58"},
     })
 
 @dataclass(frozen=True)
@@ -1834,6 +1874,54 @@ PREFABS = {
                     "dev_optic_correction), recoil, reload timing and sounds (the PMAG 20's and 40's too), the look "
                     "sway and sprint, the left hand in first and third person, the parts on its slots, the charm and "
                     "the sticker.",
+    ),
+    "ak12": Prefabs(
+        title="AK-12",
+        description="Russian 5.45x39mm assault rifle: the Kalashnikov of 2018, with railed dust cover and handguard, a "
+                    "folding, telescoping stock and a two-round burst.",
+        price=2700,
+        deploy_sound="weapons/ak105/sounds/ak105.raise.sound",
+        dry_fire="ak",
+        # The pack's icon is a three-quarter render: ak12_rig.py draws the side-on ak12_01.png from the model instead.
+        icon_source=None,
+        # The muzzle brake, the diopter rear sight and the factory grip and magazine (by the bit rule).
+        default_mesh_groups=135189,
+        bones={
+            "tag_sling": (None, "-6.971,-0.573,3.351", "0,0,0,1"),
+            "tag_barrel_attach": ("tag_sling", "13.312,0.573,2.527", "0,0,0,1"),
+            "muzzle": ("tag_barrel_attach", "14.908,0,-1.497", "0,0,0,1"),
+            "tag_brass": ("tag_sling", "9.102,-0.17,1.884", "0.000005,0.000013,-0.707106,0.707107"),
+        },
+        world_muzzle="21.249,0,4.381",
+        world_eject="2.131,-0.743,5.235",
+        # By the rule, where the first-person hand holds the handguard: its sides bulge to 0.95 from centre, and its
+        # bottom rail is at 3.418.
+        world_left_hand="6.9,2.55,2.23",
+        slots=[
+            # The dust cover's rail (-4.5 to 4.0). An optic takes the diopter off, as on the real gun: it slides off the
+            # same rail.
+            ("Optic", (-2.2, 0, 6.173), (0.25, 0, 8.73), {"iron_sights": 1}),
+            ("Muzzle", (17.937, 0, 4.381), (17.62, 0, 7.4147), {"muzzle_tip": 1}),  # the brake's rear face
+            ("Underbarrel", (8.5, 0, 3.418), (8.3, 0, 6.2), {}),  # the handguard's bottom rail (6.5 to 10.5)
+            ("Laser", (9.2, -0.95, 4.17), (8.6, -1.22, 7.4147), {}),  # the handguard's right side
+        ],
+        charm=(0.0, 1.75, 2.3),
+        # The receiver's left side above the magazine well, flat at y 0.697.
+        sticker=((2.98, 0.697, 3.65), (0.0, 1.0, 0.0), (1.4, 0.7)),
+        # The 762's measured correction moved by how far the AK-12's ADS pose puts its optic slot from the 762's, like
+        # the 74u's: the AK-105's but for its sights' aim, which sits the gun 0.23 lower. Tune in-game with
+        # dev_optic_correction.
+        optic_aim_correction="3.18,0,-1.032",
+        gameplay=gameplay_ak12,
+        guid_salt="ak12/",
+        parts=PARTS_AK12,
+        # port_kastov.py's world grip and mag points (tag_pistolgrip_attach, tag_mag_attach).
+        part_slot_positions={"pistol_grip": (-3.0, 0, 3.0), "magazine": (2.514, 0, 3.257)},
+        reload_sounds=lambda: load(ASSETS / "Weapons" / "AK12" / "ak12_assets.json")["reloads"],
+        review_note="Not checked in a match yet: the iron sights and the optics' aim (derived: tune with "
+                    "dev_optic_correction), recoil, the two-round burst, reload timing and sounds, the look sway and "
+                    "sprint, the left hand in first and third person, the parts on its slots, the charm and the "
+                    "sticker.",
     ),
 }
 

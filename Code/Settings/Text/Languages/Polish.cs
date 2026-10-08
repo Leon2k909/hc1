@@ -256,6 +256,8 @@ public static partial class GameText
 			"Brytyjski karabin bullpup kalibru 5,56x45 mm: służbowy karabin SA80, z lufą 20,4 cala, przyrządami celowniczymi na chwycie transportowym i 30-nabojowym magazynkiem.",
 		["German 5.56x45mm carbine: a short-stroke piston rifle with an 11-inch barrel, flip-up sights and a gas regulator with a setting for a suppressor."] =
 			"Niemiecki karabinek kalibru 5,56x45 mm: karabin z krótkoskokowym tłokiem gazowym, lufą 11 cali, składanymi przyrządami celowniczymi i regulatorem gazowym z nastawą do tłumika.",
+		["Russian 5.45x39mm assault rifle: the Kalashnikov of 2018, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
+			"Rosyjski karabinek automatyczny kalibru 5,45x39 mm: Kałasznikow z 2018 roku, z szynami na pokrywie komory zamkowej i łożu, składaną i teleskopową kolbą oraz serią dwustrzałową.",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"Amerykański pistolet służbowy kalibru 9x19 mm: kompaktowy P320 armii USA, z lufą 3,9 cala i 17-nabojowym magazynkiem.",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =
@@ -527,6 +529,10 @@ public static partial class GameText
 			"Magazynek na 30 naboi z ciężkolufowego karabinu drużynowego FAL. Dłuższy i cięższy. Przeładowanie w 2,67 s (3,57 s, gdy pusty).",
 		["The AK-74's standard pistol grip. No effect on recoil."] =
 			"Standardowy chwyt pistoletowy AK-74. Bez wpływu na odrzut.",
+		["The AK-74M's polymer 30-round magazine, with no window. Standard reload speed."] =
+			"Polimerowy magazynek AK-74M na 30 naboi, bez okienka. Standardowy czas przeładowania.",
+		["The AK-74M's polymer pistol grip. No effect on recoil."] =
+			"Polimerowy chwyt pistoletowy AK-74M. Bez wpływu na odrzut.",
 		["The AKM's 30-round steel magazine. Much quicker to change than the drum. Reloads in 2.2s (2.6s when empty)."] =
 			"Stalowy magazynek AKM na 30 naboi. Wymienia się go znacznie szybciej niż bęben. Przeładowanie w 2,2 s (2,6 s, gdy pusty).",
 		["The AKS-74U's side-folding skeleton stock. 9% more recoil."] =

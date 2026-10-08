@@ -2,9 +2,9 @@
 The ported guns' reload foley, voiced away from CoD's sound design with foley_voicing.py's steps, as rpk_foley.py does
 for the RPK: the Kastov 762's (the RPK's parts use their own copies), the PP-19-01 Vityaz's, PP-19 Bizon's, AK-105's,
 Vepr-12's, M16A4's, FN P90's, MP7A1's, Steyr AUG's, Uzi's, FN FAL's, SIG M18's, FAMAS F1's, SIG MCX Virtus's,
-L85A2's and HK416's. The Kastov-74u's are left alone (another session's hand-tuned sounds). Each gun's shot was voiced
-first (ported_shots.py, ak105_shot.py, m16_shot.py, kastov762_shot.py), and its voiced takes are what the foley are
-levelled against.
+L85A2's, HK416's and AK-12's. The Kastov-74u's are left alone (another session's hand-tuned sounds). Each gun's shot
+was voiced first (ported_shots.py, ak105_shot.py, m16_shot.py, kastov762_shot.py), and its voiced takes are what the
+foley are levelled against.
 
 What the rips get wrong is what foley_voicing's docstring says, on every gun:
 - the moves (the gun raised, lowered, tilted or shouldered, an arm or a hand moving, a magazine grabbed from a pouch)
@@ -118,6 +118,8 @@ GUNS = {
                  manifest="Weapons/L85A2/l85a2_assets.json"),
     "hk416": Gun("Weapons/HK416/sounds", "hk416", "hk416_shot_0[1-9].wav",
                  manifest="Weapons/HK416/hk416_assets.json"),
+    "ak12": Gun("Weapons/AK12/sounds", "ak12", "ak12_shot_0[1-9].wav",
+                manifest="Weapons/AK12/ak12_assets.json"),
 }
 
 # Where each gun's ripped shot was backed up when it was voiced, for --preview.

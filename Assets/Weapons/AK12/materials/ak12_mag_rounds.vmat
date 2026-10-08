@@ -1,0 +1,16 @@
+"Layer0"
+{
+	shader "shaders/complex.shader"
+	F_SPECULAR "1"
+	F_ALPHA_TEST "1"
+	g_flAlphaTestReference "0.5"
+	g_flAntiAliasedEdgeStrength "1"
+	g_flMetalness "0"
+	g_flRoughnessScaleFactor "1"
+	g_vColorTint "[1 1 1 1]"
+	TextureColor "weapons/ak12/materials/ak12_mag_rounds_color.png"
+	TextureNormal "materials/default/default_normal.tga"
+	TextureRoughness "weapons/ak12/materials/ak12_mag_rounds_roughness.png"
+	TextureTranslucency "weapons/ak12/materials/ak12_mag_rounds_opacity.png"
+	TextureAmbientOcclusion "materials/default/default_ao.tga"
+}

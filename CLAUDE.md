@@ -18,13 +18,13 @@
 ## Kastov viewmodel pipeline (CoD MWII rips → HC1 arms)
 - Per-weapon config lives in `Tools/kastov_weapons.py`. Run `port_kastov.py`, `kastov_vmdl.py`, `kastov_animgraph.py`
   and `kastov_prefabs.py` in that order, each with
-  `--weapon kastov762|kastov74u|vityaz|rpk|bizon|ak105|vepr12|m16|p90|mp7|aug|uzi|fal|famas|m18|mcx|l85a2|hk416`
+  `--weapon kastov762|kastov74u|vityaz|rpk|bizon|ak105|vepr12|m16|p90|mp7|aug|uzi|fal|famas|m18|mcx|l85a2|hk416|ak12`
   (default kastov762). The 74u's, Vityaz's, RPK's, Bizon's, AK-105's, Vepr-12's, M16A4's, P90's, MP7A1's, AUG's, Uzi's,
-  FAL's, M18's, MCX's, L85A2's and HK416's materials and sounds come first, from `Tools/ks74u_assets.py` /
+  FAL's, M18's, MCX's, L85A2's, HK416's and AK-12's materials and sounds come first, from `Tools/ks74u_assets.py` /
   `Tools/vityaz_assets.py` / `Tools/rpk_assets.py` / `Tools/bizon_assets.py` / `Tools/ak105_assets.py` /
   `Tools/vepr12_assets.py` / `Tools/m16_assets.py` / `Tools/p90_assets.py` / `Tools/mp7_assets.py` /
   `Tools/aug_assets.py` / `Tools/uzi_assets.py` / `Tools/fal_assets.py` / `Tools/p320_assets.py` /
-  `Tools/mcx_assets.py` / `Tools/l85a2_assets.py` / `Tools/hk416_assets.py`.
+  `Tools/mcx_assets.py` / `Tools/l85a2_assets.py` / `Tools/hk416_assets.py` / `Tools/ak12_assets.py`.
 - ADS is the animgraph's float `ironsights_weight`, which `ViewModel` moves over `AimTime` and eases, so it turns
   back from wherever it is. Don't go back to a selector on the `ironsights` enum: a Source 2 selector restarts its
   blend from the full old pose, so spamming aim snapped the gun to the sights or the hip.
@@ -33,7 +33,7 @@
   layer, so a hip clip that rolls the gun rocks the sights. `Weapon.ads_fire` (`"fire_2"`) exports the aimed clip as
   `fire_ads`, and the graph's fire state blends the two by `ironsights_weight` (`fire_aim`, not looping, so the state
   still finishes). The P90, the MP7A1, the AUG, the FAL, the M18, the MCX, the L85A2 and the HK416 have it so far. The 762's, 74u's, RPK's and
-  AK-105's fire clips don't move the gun, and nor do the M16A4's and the Uzi's, which `Weapon.steady_fire` holds still
+  AK-105's fire clips don't move the gun (the AK-12 plays the AK-105's), and nor do the M16A4's and the Uzi's, which `Weapon.steady_fire` holds still
   (see M16A4), so don't give them `ads_fire`. The Vityaz's, Vepr-12's and Bizon's hip clips roll it (up to 2.6, 8.6 and 0.5
   degrees), so they rock aimed until they get `ads_fire` and a rerun of `port_kastov.py`, `kastov_vmdl.py` and
   `kastov_animgraph.py`.
@@ -71,8 +71,8 @@
   VElement, for a part whose vertices don't sit where it fits: the HK416's Tarkov stocks.
 - `weapon_kastov74u.prefab` holds another session's hand-tuned gameplay values and sounds, so the prefab script only
   patches its DeploySound, aim offsets and OpticAimCorrection (`Prefabs.gameplay=None`). The 762's, Vityaz's,
-  RPK's, Bizon's, AK-105's, Vepr-12's, M16A4's, P90's, MP7A1's, AUG's, Uzi's, FAL's, M18's, MCX's, L85A2's and HK416's
-  weapon prefabs are fully generated.
+  RPK's, Bizon's, AK-105's, Vepr-12's, M16A4's, P90's, MP7A1's, AUG's, Uzi's, FAL's, M18's, MCX's, L85A2's, HK416's
+  and AK-12's weapon prefabs are fully generated.
 - The obj/mtl files in `Assets/Weapons/Kastov74u/models` are unused: `w_kastov74u.vmdl` now comes from the pipeline
   so the gunsmith's attachments mount on the world model.
 - The 74u's stocks, pistol grips and magazines are bodygroups (`Weapon.part_choices`, choice 0 = factory part).
@@ -99,7 +99,7 @@
   the base mesh; the default sets each group's choice 0 plus the base (762 = 341, 74u = 605028693,
   Vityaz = 22036489, RPK = 2363477, Bizon = 2129941, AK-105 = 285343829, Vepr-12 = 37814293, M16A4 = 341,
   P90 = 21 (by that rule, not yet read from its compiled model), MP7A1 = 85, AUG = 85, Uzi = 1173, FAL = 174761,
-  M18 = 145, MCX = 341 (also by the rule), L85A2 = 85, HK416 = 74069 (by the rule)).
+  M18 = 145, MCX = 341 (also by the rule), L85A2 = 85, HK416 = 74069 and AK-12 = 135189 (by the rule)).
   After changing any bodygroup, re-read it from the compiled model. An empty choice (a rail's or a folded sight's
   "off") still has its bit in the default, but the Parts API gives it mask 0, so setting each group's choice 0 with
   `SetBodyGroup` leaves those bits out (the FAL's 174209). It draws the same gun.
@@ -275,8 +275,8 @@
   - Reload times are when the gun is level again: 2.3 s, 2.4 s empty.
 - Burst (`Shootable.OnInputUpdate`): a trigger pull fires one whole burst, and holding the trigger fires no more, as in
   semi. A burst also ends when the magazine runs dry. `BurstEndDelay` is 0, so the next pull can follow at the cyclic
-  rate. The real gun's non-resetting burst cam isn't modelled, and letting go doesn't cut a burst short. No other gun
-  uses Burst. With a gun that has no automatic, bots fire at most `BurstAmount` rounds a pull
+  rate. The real gun's non-resetting burst cam isn't modelled, and letting go doesn't cut a burst short. The AK-12's
+  two-round burst works the same way (see AK-12). With a gun that has no automatic, bots fire at most `BurstAmount` rounds a pull
   (`LightweightCombatBot._roundsPerPull`) instead of their 3-7 round strings.
 - Materials and sounds are from `Tools/m16_assets.py`: the M16's own receiver, carry handle, barrel, handguard, rails
   and stock, plus the MWII M4 flash hider, pistol grip, 30-round magazine (with a see-through window) and rounds that
@@ -1026,6 +1026,93 @@
 - The models, the animgraph, the prefabs and its parts compiled in the editor on 2026-10-08, each leaving a compiled
   file. Nothing has been checked in-game. Its gunsmith review note stays until all of it has been checked in a match.
 
+## AK-12 (Escape from Tarkov's AK-12, ARC9 EFT Assault Rifles 2962829818)
+- The real Kalashnikov AK-12 (6P70, category AssaultRifle) in 5.45x39, the 2018-2022 production rifle. It's the third
+  of the user's list, after the L85A2 and the HK416 (see L85A2). The model is Tarkov's, from darsu_eft's ARC9 pack
+  (`extracted/2962829818`, decompiled to `decompiled/ak12`), on the AK-105's CoD rig and clips. Its figures are in
+  `kastov_prefabs.gameplay_ak12`, from Rosoboronexport's catalogue:
+  - 700 rpm, with the 2018-2022 rifles' selector: automatic, a two-round burst and semi (the 2023 model dropped the
+    burst). It starts on automatic. The burst is the M16A4's (`BurstAmount` 2, `BurstEndDelay` 0): a pull fires both
+    rounds, and letting go doesn't cut it short. It has automatic, so bots fire their usual strings with it.
+  - 7N6 at 900 m/s from the 415 mm barrel, as from the AK-74M's, G7 0.157. The sights sit 55.3 mm over the bore (the
+    eye's height over it at the ADS pose, through the diopter's aperture), zeroed at 300 m like the AK-105.
+  - The M4's 5.56 damage (20) and falloff, as the AK-105's 5.45 has.
+  - 3.5 kg without a magazine, ~4.0 kg with a loaded 30: the M16A4's weight, too little over the AKM's 3.75 kg for a
+    WeightSlowdown. So SpeedPenalty 40 and 0.25 s ADS. The recoil scale (1.43,3.58) is the M4's (2,5) scaled by free
+    recoil (~1.33 against 1.86 m/s).
+  - Reload times are the AK-105's clips': the gun is level again at 2.3 s, and 2.6 s after the empty reload's bolt pull.
+  - Bots can be issued it: it's a Primary AssaultRifle, so it's in `WeaponPool` and shares the rifles' half.
+- `Tools/ak12_rig.py` puts Tarkov's pieces on the AK-105's skeleton as ARC9 draws them, and writes them as SMDs
+  (`decompiled/ak12/rig`):
+  - the receiver with the 415 mm barrel, the gas block's front sight, the railed dust cover and handguard and the
+    folding, telescoping stock, then the muzzle brake (`muzzle_tip`), the diopter rear sight (`iron_sights`), the grip
+    and the windowed magazine;
+  - the bolt carrier on `j_boltcarrier`, the trigger on `j_trigger`, the selector on `j_fireselect`, the mag catch on
+    `j_magrelease` and the magazine with its top rounds on `j_mag1` / `j_mag2`. The real gun's magazine well, trigger
+    group, selector and catch are the AK-74M's, so they fit the AK-105's to within 0.08.
+  - `muzzle` is an extra bone, 0.2 inside the brake's front.
+  - The pack's icon is a three-quarter render, so the script draws the side-on `ui/weapons/guns/ak12_01.png` from the
+    model.
+- Materials and sounds are from `Tools/ak12_assets.py`:
+  - Tarkov's sheets are Source VertexLitGeneric (colour, normal, phong exponent), built like the HK416's Tarkov parts:
+    no metal, roughness from the exponent.
+  - The magazine's window points at a glass texture the pack doesn't ship, so it's a flat smoked translucent polymer.
+    The rounds seen through it are a stack drawn on an alpha-tested card, greened towards Russian lacquered steel cases
+    like the loose rounds.
+  - The AK-105's magazines and the AK grips, which it takes as parts, keep the AK-105's and 74u's materials.
+  - The shot: Tarkov plays one shot as one of four 81 ms starts (`_loop1-4`) under the last round's tail (`_loopt`),
+    so each take is the two mixed, levelled to the AK-105's (the same 7N6). Voiced (see The ported guns' sounds) at its
+    own pitch, with the lows under 130 Hz eased 8 dB after 30 ms, Tarkov's tail eased 14 dB from 80 ms (it was 23 dB
+    under the blast at 0.4 s, where the voiced rifles' are 33), 3 dB of presence for 25 ms, the ground at 6.9 ms (the
+    muzzle ~0.73 m ahead of the ear) and the echoes at -33 dB. Four takes, pitch 0.98-1.02.
+  - The suppressed shot is Tarkov's three suppressed takes, built the same way, 10 dB under the voiced open shot.
+  - Reload foley: the AK-105's moves, and Tarkov's AK-74 recordings for the AK-12's own parts. The charging handle goes
+    back and home, and the mag catch, the magazine coming out and going in (split into the front lug catching and the
+    catch locking) each sound on the frame the AK-105's clip moves that part. Voiced as one set, so the magazine's clicks
+    stay ~9 dB under the bolt.
+- It was ported with markings on, which `Tools/texture_markings/specs/ak12.json` takes off (8 materials):
+  - the receiver's selector markings (АВ, 2, ОД; the track's line and detents stay), the index and calibre (6П70,
+    5.45x39), a serial and small stamps;
+  - the magazine's round counts (10 to 30, on both sides) and its moulded maker's mark;
+  - a mould number on the grip, the stock tube's position numbers 1-4 (the holes stay), the calibre on the rear sight's
+    base, the bolt's acceptance stamps and serial, and the rounds' headstamps;
+  - the rear sight leaf's range numbers 1-8 and the battle setting's П, each copied from the plain leaf above them. The
+    scale's ticks and the leaf's groove rims are `keep` regions, out of the patches' borders. The 1 and 5 patches are a
+    little smoother than the leaf round them.
+  Checked in the tool's previews of each patch on 2026-10-08, not on the model.
+- Bodygroups (DefaultMask 135189 by the bit rule, not yet read from the compiled models): `muzzle_tip` (the brake,
+  hidden under a muzzle device), `iron_sights` (the diopter, which an optic takes off: on the real gun it slides off
+  the same rail), `pistol_grip` and `magazine` (the factory parts and the ones below).
+- Slots: Optic on the dust cover's rail (-4.5 to 4.0), Muzzle at the brake's rear face, Underbarrel on the handguard's
+  bottom rail (6.5 to 10.5) and Laser on the handguard's right side, then Pistol Grip and Magazine. 56 of the M4's MWII
+  parts are made eligible (optics, muzzle devices, grips, lasers and tracer rounds). A fitted foregrip hasn't been seen
+  beside the left hand.
+- Parts (`PARTS_AK12`, `Assets/gunsmith/ak12/`), 11 in all: it takes any AK-74 magazine and AK grip, as the real one
+  does.
+  - AK-74M Pistol Grip, then the AK-105's AK-platform grips.
+  - AK-74M 30 Round Mag (no window), then the AK-105's 20, RPK-74 45 and four-column 60, with the AK-105's reloads and
+    reload times (`reload_variants` `_smag`, `_xmag`, `_xmaglrg`).
+  - No stocks or barrels. `part_masses.py` has its own magazine at 0.215 kg and its own grip at 0.09.
+- Hands: the left hand holds the handguard through the AK-105's grip pose (`a_delta_barhvyshort_additive_for_offset`).
+  No `GripFit`:
+  - the idle left hand has 57 vertices inside the gun, at most 0.14" deep, about what the AK-105's does;
+  - the right hand's are on the grip, below the view at the hip and aiming. The empty reload's bolt pull puts 25 into
+    the receiver on screen, at most 0.09" deep (the AK-105's 0.08").
+- It plays the AK-105's fire clip, which doesn't move the gun, so it has no `ads_fire`.
+- The iron sights use ads_in's last frame. The AK-105's aim left the diopter 0.23 high, so `kastov_weapons.AK12.aim`
+  lowers the gun until the aperture's centre is on the aim point and pitches it 0.095 degrees up onto the post's tip
+  (within 0.001 and 0.005 degrees). Checked in a render (the post centred in the aperture), not in-game.
+- Its `OpticAimCorrection` `3.18,0,-1.032` is the 762's measured correction moved by how far the AK-12's ADS pose puts
+  its optic slot from the 762's, like the 74u's. NOT checked in-game: tune it with `dev_optic_correction`.
+- It sprints with the M4's sprint and has the look sway and hand IK (see the pipeline notes).
+- The sticker is on the receiver's left side above the magazine well. Neither it nor the charm has been seen on it.
+- Its third-person left hand (`6.9,2.55,2.23`, see Third-person left hand) hasn't been rendered.
+- Made on 2026-10-08 with the editor's bridge down. The editor compiled the prefabs, the .equip and the sounds, but not
+  yet the models, the animgraph, the materials or the parts. If the first-person gun is invisible or keeps old clips,
+  register its DMX and recompile `v_ak12.vmdl` and `v_ak12.vanmgrph` (see the pipeline notes), and `recompile_asset`
+  the shared parts if the gunsmith doesn't offer them. Nothing has been checked in-game. Its gunsmith review note stays
+  until all of it has been checked in a match.
+
 ## MP5 barrels (Workshop MW19 parts)
 - The Rail Handguard (`gunsmith/mpapa5/underbarrel/rail_grip.gnsmth`) only swaps the handguard. It hides
   `v_mp5_b` (handguard + barrel + both sights) and shows `native_front.vmdl`, a copy of `v_mp5_b` without the
@@ -1490,7 +1577,7 @@
   `kastov_prefabs.Prefabs.review_note`). The user asked for it so a new gun gets a careful look before it's trusted.
   Only the developer sees it (`ShowReviewNote`: in the editor, or on `AttachmentUnlocks.IsDeveloper`'s account): CHECK
   on the gun's row, NEEDS CHECKING by its name in the hero, and the note under its description, in `$caution` amber. The
-  AUG, the FAL, the M18, the MCX, the L85A2 and the HK416 have one. Once a gun has been checked in a match, empty its `review_note` and rerun
+  AUG, the FAL, the M18, the MCX, the L85A2, the HK416 and the AK-12 have one. Once a gun has been checked in a match, empty its `review_note` and rerun
   `kastov_prefabs.py` for it: the .equip's `ReviewNote` comes from there. The note is plain English with no `Tr`, since
   only the developer reads it.
 - Parts are what the real gun takes (the user: "as close to real as possible"; optics are left alone). On 2026-09-29
@@ -3091,12 +3178,12 @@ simulate_input.
   the AK/RPK/AKS-74U manuals' tables to within about 2 cm.
 - Per-gun data are real loads and real sights, with no tuning: `MuzzleVelocity` (m/s), `DragFunction`,
   `BallisticCoefficient` (the published BC in lb/in²), `SightHeight` (in) and `ZeroRange` (the doctrinal zero: M4, M16A4,
-  MCX, L85A2 and HK416 M855 and SCAR-H M80 300 m, AKM/RPK PS 300 m, AKS-74U 7N6 275 m (sight "П"), AK-105 7N6 300 m, M700 M118LR
+  MCX, L85A2 and HK416 M855 and SCAR-H M80 300 m, AKM/RPK PS 300 m, AKS-74U 7N6 275 m (sight "П"), AK-105 and AK-12 7N6 300 m, M700 M118LR
   100 m, 9 mm guns, the P90's SS190 and the MP7A1's DM11 100 m (the two PDWs zeroed like the SMGs; the MP7's own zero
   wasn't found), pistols and buckshot 25 m). The battle zeros put the rifles 15–30 cm HIGH at 150–200 m. That's real,
   not a bug. The P90's BC (G1 0.155) is an estimate: none is published for SS190. The AUG takes the M4's zero (M855,
   300 m). The FAL's M80 is zeroed at 200 m, its rear sight's lowest setting (the battle zero).
-- The Kastov 762, Vityaz, RPK, Bizon, AK-105, Vepr-12, M16A4, P90, MP7A1, AUG, Uzi, FAL, M18, MCX, L85A2 and HK416 take
+- The Kastov 762, Vityaz, RPK, Bizon, AK-105, Vepr-12, M16A4, P90, MP7A1, AUG, Uzi, FAL, M18, MCX, L85A2, HK416 and AK-12 take
   theirs from `kastov_prefabs.ballistics()` (`PS_BALLISTICS`); the other guns, including the patched 74u, have them set in the
   prefab. Optics don't change `SightHeight` (a few cm at most), and barrel parts don't change `MuzzleVelocity`: their
   length only moves the damage falloff (see the pipeline notes).
@@ -3728,18 +3815,18 @@ simulate_input.
   its rip, bar the Kastov-74u's (another session's hand-tuned sounds). Each script's docstring has what the rips get
   wrong and every step.
 - Open shots: the AK-105, M16A4 and Kastov 762 have their own scripts (see their sections). `Tools/ported_shots.py`
-  voices the Vityaz, Bizon, Vepr-12, P90, MP7A1, AUG, Uzi, FAL, M18, FAMAS, MCX, L85A2 and HK416 with `shot_voicing.py`'s
-  steps, a `Voicing` each:
+  voices the Vityaz, Bizon, Vepr-12, P90, MP7A1, AUG, Uzi, FAL, M18, FAMAS, MCX, L85A2, HK416 and AK-12 with
+  `shot_voicing.py`'s steps, a `Voicing` each:
   - pitch by the charge and the barrel: the 9 mm guns and the P90 2% up, the MP7A1 3%, the FAMAS 1%, the Vepr-12 1%
-    down, the FAL 2% down, the AUG, M18, MCX, L85A2 and HK416 as ripped;
+    down, the FAL 2% down, the AUG, M18, MCX, L85A2, HK416 and AK-12 as ripped;
   - a 40 Hz high-pass (the Uzi's 70), the lows eased 3-10 dB after the blast's first 20-50 ms, and the FAL's, Vepr-12's,
-    AUG's, Uzi's and HK416's designed tails eased;
+    AUG's, Uzi's, HK416's and AK-12's designed tails eased;
   - the blast's 1.5-5 kHz up 2-5 dB for 20-25 ms (the dark Uzi's 1-6 kHz 7 dB for 30 ms);
   - the ground reflection by the gun's length, and echoes from 35 ms to 1.4 s, as loud against the blast as the
     muzzle's distance from the ear gives (0.4 s after the loudest 100 ms: -31.5 dB for the FAL to -36 for the P90).
   - Loudness stays each rip's. A gun with one recording gets several takes with their own echoes (pitch 0.97-1.03).
 - Suppressed shots (`Tools/suppressed_shots.py`): the Kastov 762's, Vityaz's, Bizon's, AK-105's, M16A4's, P90's,
-  MP7A1's, AUG's, Uzi's, FAL's, FAMAS's, MCX's, L85A2's and HK416's. The Vepr-12 and the M18 have none.
+  MP7A1's, AUG's, Uzi's, FAL's, FAMAS's, MCX's, L85A2's, HK416's and AK-12's. The Vepr-12 and the M18 have none.
   - As ripped they were levelled to each other, not to their guns: 1.4 dB (the Kastov) to 10.6 dB (the P90) under the
     open shot, counting the SMG events' Volume 0.5. The Uzi's WAV was louder than its open shot's.
   - A real suppressor takes about 20-25 dB off at the shooter's ear. Squeezed as the rest of the mix is (0.43 times,
@@ -3749,7 +3836,7 @@ simulate_input.
     FAL's, FAMAS's and M16A4's) down 2-8 dB. Its echoes sit where the open shot's do.
 - Reload foley (`Tools/ported_foley.py`, on `foley_voicing.py`, as the RPK's): the Kastov 762's (its drum and xmag sets
   too), Vityaz's, Bizon's, AK-105's, Vepr-12's, M16A4's, P90's, MP7A1's, AUG's, Uzi's, FAL's, M18's, FAMAS's, MCX's,
-  L85A2's and HK416's.
+  L85A2's, HK416's and AK-12's.
   - Every set's loudest file but the Kastov's was louder than the gun's voiced shot, by up to 4.4 dB (the AK-105's bolt
     pull).
   - Now: a 90 Hz high-pass; the moves' lows under 250 Hz eased 6 dB (`MOVES`, by name; the Kastov's and FAMAS's files
@@ -3893,7 +3980,7 @@ simulate_input.
   M4's M855 at 905 m/s is 1,646 J. So in hardcore a body hit at full damage always kills (see Hardcore hit locations).
   The FAL's 41 is the same sum for M80 from its longer barrel (840 m/s, 3,362 J).
 - `Shootable.FireRate` holds real-world cyclic rates (MP7A1 950, P90 900, MCX 850, HK416 850, M4 800, M16A4 800 in semi and
-  three-round burst, MP5 800, Vityaz 750, AUG 715, Kastov-74u 700, L85A2 690, Bizon 680, FAL 675, SCAR-H 600, RPK 600,
+  three-round burst, MP5 800, Vityaz 750, AUG 715, Kastov-74u 700, AK-12 700 (and a two-round burst), L85A2 690, Bizon 680, FAL 675, SCAR-H 600, RPK 600,
   Kastov 762 600, AK-105 600, Uzi 600, Vepr-12 450 in semi).
   Shots are scheduled with carry-over (`_nextShotTime`), so any RPM fires exactly; don't tune values to the 50 Hz tick.
   Part effects on the rate: `GunsmithAttachmentEffects.FireRate` (AR barrel gas length, the Action slot's buffers) and
@@ -4265,8 +4352,9 @@ simulate_input.
   front, where the first-person hand holds it), the MP7A1's (`-0.9,2.29,2.47`, under the receiver's front, where
   the first-person hand holds it), the Uzi's (`-0.13,2.59,1.8`, under the lower receiver's front, where the
   first-person hand holds it), the MCX's (`4.2,2.735,2.49`, under the handguard where the first-person hand holds
-  it, by the rules above), the L85A2's (`-0.62,1.76,1.33`, where the first-person hand holds the handguard) or the
-  HK416's (`4.97,2.47,2.57`, where the first-person hand holds the handguard, by the rules above). The FAL's (`6.4,2.37,2.16`, where the first-person hand holds the handguard) was
+  it, by the rules above), the L85A2's (`-0.62,1.76,1.33`, where the first-person hand holds the handguard), the
+  HK416's (`4.97,2.47,2.57`, where the first-person hand holds the handguard, by the rules above) or the AK-12's
+  (`6.9,2.55,2.23`, the same, by the rules above). The FAL's (`6.4,2.37,2.16`, where the first-person hand holds the handguard) was
   rendered on both teams' models on 2026-09-28: the IK reaches it exactly, with the thumb along the handguard's left
   side and the fingers round its right.
 - Pistols, knives and grenades have no `LeftHandIK`, so the IK stays off for them.
@@ -4303,7 +4391,7 @@ simulate_input.
   means no CoD names for weapons, attachments, perks, modes, streaks or camos, and no CoD writing, numbers, logos or
   QR codes on textures. Weapons go by their real-world names (AK-47, AKS-74U, PP-19-01 Vityaz, RPK, PP-19 Bizon,
   AK-105, Vepr-12, M16A4, FN P90, MP7A1, Steyr AUG A3, Uzi, FN FAL, SIG Sauer M18, SIG Sauer MCX Virtus, L85A2,
-  HK416 A5) and
+  HK416 A5, AK-12) and
   attachments by plain descriptions ("Vented Suppressor").
 - Renamed:
   - Zombies perks: Juggernog → Iron Tonic, Speed Cola → Bolt Soda, Double Tap → Hot Shot, Quick Revive → Second Wind,
@@ -4326,8 +4414,9 @@ simulate_input.
   textures deleted. A new port goes through the README's steps before it ships: `after_rip()` leaves a material with
   no spec as ripped, without a warning. The M16A4 has `specs/m16.json`, the Vepr-12 `specs/vepr12.json`, the P90
   `specs/p90.json`, the MP7A1 `specs/mp7.json`, the AUG `specs/aug.json`, the Uzi `specs/uzi.json`, the FAL
-  `specs/fal.json`, the M18 `specs/m18.json`, the MCX `specs/mcx.json`, the L85A2 `specs/l85a2.json` and the HK416
-  `specs/hk416.json` (Ready or Not's made-up maker, HaKa, and HK's and Magpul's markings).
+  `specs/fal.json`, the M18 `specs/m18.json`, the MCX `specs/mcx.json`, the L85A2 `specs/l85a2.json`, the HK416
+  `specs/hk416.json` (Ready or Not's made-up maker, HaKa, and HK's and Magpul's markings) and the AK-12
+  `specs/ak12.json` (Kalashnikov's stamps and the sights' and magazine's numbers).
 - Still CoD's: the ported guns' and parts' models, animations and sounds, and the Zombies numbers (the crate's 950, the
   perk prices, the points for kills). Only the names and markings have changed. The sounds of every ported gun but the
   Kastov-74u have been voiced towards the real thing: shots, suppressed shots and reloads (see RPK and The ported

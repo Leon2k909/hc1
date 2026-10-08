@@ -255,6 +255,8 @@ public static partial class GameText
 			"Британская винтовка-буллпап под патрон 5,56x45 мм: штатная винтовка SA80 со стволом 20,4 дюйма, открытым прицелом на ручке для переноски и магазином на 30 патронов.",
 		["German 5.56x45mm carbine: a short-stroke piston rifle with an 11-inch barrel, flip-up sights and a gas regulator with a setting for a suppressor."] =
 			"Немецкий карабин под патрон 5,56x45 мм: винтовка с коротким ходом газового поршня, стволом 11 дюймов, откидным прицелом и газовым регулятором с положением для глушителя.",
+		["Russian 5.45x39mm assault rifle: the Kalashnikov of 2018, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
+			"Российский автомат под патрон 5,45x39 мм: «Калашников» 2018 года, с планками на крышке ствольной коробки и цевье, складным телескопическим прикладом и режимом очереди по два выстрела.",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"Американский штатный пистолет под патрон 9x19 мм: компактный P320 армии США со стволом 3,9 дюйма и магазином на 17 патронов.",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =
@@ -527,6 +529,10 @@ public static partial class GameText
 			"Магазин на 30 патронов от тяжелоствольной версии FAL для поддержки отделения. Длиннее и тяжелее. Перезарядка за 2,67 с (3,57 с, если магазин пуст).",
 		["The AK-74's standard pistol grip. No effect on recoil."] =
 			"Стандартная пистолетная рукоятка AK-74. Не влияет на отдачу.",
+		["The AK-74M's polymer 30-round magazine, with no window. Standard reload speed."] =
+			"Полимерный магазин AK-74M на 30 патронов, без окна. Обычная скорость перезарядки.",
+		["The AK-74M's polymer pistol grip. No effect on recoil."] =
+			"Полимерная пистолетная рукоятка AK-74M. Не влияет на отдачу.",
 		["The AKM's 30-round steel magazine. Much quicker to change than the drum. Reloads in 2.2s (2.6s when empty)."] =
 			"Стальной магазин AKM на 30 патронов. Меняется гораздо быстрее барабанного. Перезарядка за 2,2 с (2,6 с, если магазин пуст).",
 		["The AKS-74U's side-folding skeleton stock. 9% more recoil."] =

@@ -258,6 +258,8 @@ public static partial class GameText
 			"イギリス製の5.56x45mmブルパップライフル。制式小銃SA80で、20.4インチ銃身、キャリングハンドル上のアイアンサイト、30発マガジンを備える。",
 		["German 5.56x45mm carbine: a short-stroke piston rifle with an 11-inch barrel, flip-up sights and a gas regulator with a setting for a suppressor."] =
 			"ドイツ製の5.56x45mmカービン。ショートストローク・ピストン式のライフルで、11インチ銃身、折りたたみ式サイト、サプレッサー用の設定を持つガスレギュレーターを備える。",
+		["Russian 5.45x39mm assault rifle: the Kalashnikov of 2018, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
+			"ロシア製の5.45x39mmアサルトライフル。2018年のカラシニコフで、レイル付きのダストカバーとハンドガード、折りたたみ・伸縮式ストック、2点バーストを備える。",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"米国の9x19mm制式拳銃。米陸軍のコンパクトなP320で、3.9インチ銃身と17発マガジンを備える。",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =
@@ -527,6 +529,10 @@ public static partial class GameText
 		["The 30-round magazine of the FAL's heavy-barrel squad rifle. Longer and heavier. Reloads in 2.67s (3.57s when empty)."] =
 			"FALの重銃身分隊支援ライフル用の30発マガジン。より長く重い。リロード時間2.67秒（空の状態から3.57秒）。",
 		["The AK-74's standard pistol grip. No effect on recoil."] = "AK-74の標準ピストルグリップ。反動への影響なし。",
+		["The AK-74M's polymer 30-round magazine, with no window. Standard reload speed."] =
+			"AK-74Mのポリマー製30発マガジン。窓はない。リロード速度は標準。",
+		["The AK-74M's polymer pistol grip. No effect on recoil."] =
+			"AK-74Mのポリマー製ピストルグリップ。反動への影響なし。",
 		["The AKM's 30-round steel magazine. Much quicker to change than the drum. Reloads in 2.2s (2.6s when empty)."] =
 			"AKMの30発スチールマガジン。ドラムマガジンよりはるかに素早く交換できる。リロード時間2.2秒（空の状態から2.6秒）。",
 		["The AKS-74U's side-folding skeleton stock. 9% more recoil."] =

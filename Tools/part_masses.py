@@ -59,6 +59,7 @@ GUN_KG = {
     "MCX/weapon_mcx": 3.4,            # MCX Virtus SBR 2.9 kg + a loaded 30
     "L85A2/weapon_l85a2": 4.7,        # L85A2 3.82 kg + the iron sights' carrying handle + a loaded 30
     "HK416/weapon_hk416": 3.75,       # HK416 A5 11-inch 3.13 kg (HK USA's 6.9 lb) + HK's steel 30 loaded
+    "AK12/weapon_ak12": 4.0,          # AK-12 3.5 kg without a magazine (Rosoboronexport's catalogue) + a loaded 30
 }
 
 
@@ -81,7 +82,7 @@ GUN_ROUND = {
     "kastov762": "7.62x39", "rpk": "7.62x39", "kastov74u": "5.45", "ak105": "5.45", "vityaz": "9x19", "uzi": "9x19",
     "vepr12": "12ga", "aug": "5.56", "famas": "5.56", "m16": "5.56", "m4a1": "5.56", "fal": "7.62x51",
     "scarh": "7.62x51", "mp5": "9x19", "m18": "9x19 M1152", "mcx": "5.56",
-    "hk416": "5.56",
+    "hk416": "5.56", "ak12": "5.45",
 }
 
 # Empty magazines, kg, and how many rounds they hold. The AK-74's polymer 30 is 0.23 kg; the AKM's steel 30 0.33; the
@@ -107,6 +108,7 @@ OWN_MAGAZINES = {
     # HK's steel 30 (~0.25 kg) and polymer 30 (~0.14); Magpul's PMAG Gen M3 20, 30 and 40 (3.9, 4.8 and 6.3 oz).
     "hk416": {"factory": (0.25, 30), "gen2": (0.14, 30), "pmag20": (0.11, 20), "pmag30": (0.136, 30),
               "pmag40": (0.18, 40)},
+    "ak12": {"factory": (0.215, 30)},  # the AK-12's polymer 30 with its window, a little lighter than the AK-74M's
 }
 
 # AK-platform stocks and pistol grips, each on its own, kg: the AKS-74U's folding stock 0.35, the AK-74M's polymer
@@ -137,6 +139,7 @@ OWN_CHOICES = {
     "mcx": {"factory": 0.0, "thin": -0.06},  # SIG's thin folding stock, ~2 oz under its folding telescoping one
     # Against the collapsible stock (~0.25 kg): HK's E1 with its rubber buttpad ~0.3, the Slim Line ~0.2.
     "hk416": {"factory": 0.0, "e1": 0.05, "slim_line": -0.05},
+    "ak12": {"factory": 0.09},  # the AK-12's own pistol grip, a little bigger than the AK-74M's
 }
 
 # The MWII attachments shared across guns, by file stem, wherever they're fitted.

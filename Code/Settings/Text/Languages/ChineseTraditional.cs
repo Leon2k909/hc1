@@ -255,6 +255,8 @@ public static partial class GameText
 			"英國製 5.56x45mm 無托步槍：SA80 制式步槍，配備 20.4 吋槍管、提把上的機械瞄具與 30 發彈匣。",
 		["German 5.56x45mm carbine: a short-stroke piston rifle with an 11-inch barrel, flip-up sights and a gas regulator with a setting for a suppressor."] =
 			"德國製 5.56x45mm 卡賓槍：短行程活塞式步槍，配備 11 吋槍管、折疊式機械瞄具與具消音器檔位的導氣調節器。",
+		["Russian 5.45x39mm assault rifle: the Kalashnikov of 2018, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
+			"俄製 5.45x39mm 突擊步槍：2018 年的卡拉什尼科夫，配備帶導軌的機匣蓋與護木、折疊伸縮式槍托以及兩發點放。",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"美國 9x19mm 制式手槍：美國陸軍的緊湊型 P320，配備 3.9 英吋槍管與 17 發彈匣。",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =
@@ -511,6 +513,10 @@ public static partial class GameText
 		["The 30-round magazine of the FAL's heavy-barrel squad rifle. Longer and heavier. Reloads in 2.67s (3.57s when empty)."] =
 			"FAL 重槍管班用支援步槍的 30 發彈匣。更長更重。裝填需 2.67 秒（空倉時 3.57 秒）。",
 		["The AK-74's standard pistol grip. No effect on recoil."] = "AK-74 的標準手槍握把。不影響後座力。",
+		["The AK-74M's polymer 30-round magazine, with no window. Standard reload speed."] =
+			"AK-74M 的 30 發聚合物彈匣，沒有觀察窗。裝填速度標準。",
+		["The AK-74M's polymer pistol grip. No effect on recoil."] =
+			"AK-74M 的聚合物手槍握把。不影響後座力。",
 		["The AKM's 30-round steel magazine. Much quicker to change than the drum. Reloads in 2.2s (2.6s when empty)."] =
 			"AKM 的 30 發鋼製彈匣。更換速度比彈鼓快得多。裝填需 2.2 秒（空倉時 2.6 秒）。",
 		["The AKS-74U's side-folding skeleton stock. 9% more recoil."] = "AKS-74U 的側折式骨架槍托。後座力增加 9%。",

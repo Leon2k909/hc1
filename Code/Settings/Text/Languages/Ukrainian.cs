@@ -264,6 +264,8 @@ public static partial class GameText
 			"Британська гвинтівка-булпап під набій 5,56x45 мм: штатна гвинтівка SA80 зі стволом 20,4 дюйма, відкритим прицілом на ручці для перенесення та магазином на 30 набоїв.",
 		["German 5.56x45mm carbine: a short-stroke piston rifle with an 11-inch barrel, flip-up sights and a gas regulator with a setting for a suppressor."] =
 			"Німецький карабін під набій 5,56x45 мм: гвинтівка з коротким ходом газового поршня, стволом 11 дюймів, відкидним прицілом і газовим регулятором із положенням для глушника.",
+		["Russian 5.45x39mm assault rifle: the Kalashnikov of 2018, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
+			"Російський автомат під набій 5,45x39 мм: «Калашников» 2018 року, з планками на кришці ствольної коробки та цівці, складаним телескопічним прикладом і режимом черги по два постріли.",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"Американський штатний пістолет під набій 9x19 мм: компактний P320 армії США зі стволом 3,9 дюйма та магазином на 17 набоїв.",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =
@@ -528,6 +530,10 @@ public static partial class GameText
 			"Магазин на 30 набоїв від важкоствольної версії FAL для підтримки відділення. Довший і важчий. Перезарядка — 2,67 с (3,57 с, якщо порожній).",
 		["The AK-74's standard pistol grip. No effect on recoil."] =
 			"Стандартне пістолетне руків'я AK-74. Не впливає на віддачу.",
+		["The AK-74M's polymer 30-round magazine, with no window. Standard reload speed."] =
+			"Полімерний магазин AK-74M на 30 набоїв, без вікна. Звичайна швидкість перезарядки.",
+		["The AK-74M's polymer pistol grip. No effect on recoil."] =
+			"Полімерне пістолетне руків'я AK-74M. Не впливає на віддачу.",
 		["The AKM's 30-round steel magazine. Much quicker to change than the drum. Reloads in 2.2s (2.6s when empty)."] =
 			"Сталевий магазин AKM на 30 набоїв. Міняється набагато швидше за барабан. Перезарядка — 2,2 с (2,6 с, якщо порожній).",
 		["The AKS-74U's side-folding skeleton stock. 9% more recoil."] =

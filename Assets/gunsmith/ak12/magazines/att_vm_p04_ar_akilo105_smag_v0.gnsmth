@@ -1,0 +1,41 @@
+{
+  "Name": "20 Round Mag",
+  "Category": "Magazine",
+  "Mass": -0.15,
+  "EligibleEquipment": [
+    "weapons/ak12/ak12.equip"
+  ],
+  "RequiredLevel": 0,
+  "Description": "Short 20-round magazine. Lighter and quicker to seat. Reloads in 2.05s (2.3s when empty).",
+  "ModifyBodygroups": true,
+  "Bodygroups": {
+    "magazine": 2
+  },
+  "VerticalRecoilScale": 1.0,
+  "HorizontalRecoilScale": 1.0,
+  "MagazineCapacity": 20,
+  "ReloadTimeMultiplier": 1.0,
+  "ReloadAnimation": 1,
+  "ReloadTime": 2.05,
+  "EmptyReloadTime": 2.3,
+  "ReloadSounds": {
+    "0.1": "weapons/ak105/sounds/ak105.reload_smag_raise.sound",
+    "0.4": "weapons/ak105/sounds/ak105.reload_smag_magout.sound",
+    "1.167": "weapons/ak105/sounds/ak105.reload_smag_arm.sound",
+    "1.333": "weapons/ak105/sounds/ak105.reload_smag_maghit.sound",
+    "1.6": "weapons/ak105/sounds/ak105.reload_smag_magin.sound",
+    "1.733": "weapons/ak105/sounds/ak105.reload_smag_end.sound"
+  },
+  "EmptyReloadSounds": {
+    "0.157": "weapons/ak12/sounds/ak12.slider_up.sound",
+    "0.2": "weapons/ak105/sounds/ak105.reload_smag_empty_raise.sound",
+    "1": "weapons/ak105/sounds/ak105.reload_smag_empty_magout.sound",
+    "1.333": "weapons/ak105/sounds/ak105.reload_smag_empty_maghit.sound",
+    "1.433": "weapons/ak105/sounds/ak105.reload_smag_empty_rattle.sound",
+    "1.5": "weapons/ak105/sounds/ak105.reload_smag_empty_magin.sound",
+    "1.753": "weapons/ak12/sounds/ak12.slider_down.sound",
+    "1.933": "weapons/ak105/sounds/ak105.reload_smag_empty_end.sound"
+  },
+  "__references": [],
+  "__version": 0
+}
