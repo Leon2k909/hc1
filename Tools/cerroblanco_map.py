@@ -652,8 +652,10 @@ def courtyard( m, d ):
     for e0, e1, n0, n1 in ( ( -620, -420, -900, -860 ), ( -620, -580, -900, -700 ), ( 280, 440, -900, -860 ),
                             ( 400, 440, -900, -700 ), ( -520, -200, 380, 420 ), ( 100, 340, 380, 420 ) ):
         P.hedge_box( d, e0, e1, n0, n1, height=30, planter=16 )
-    for e, n in ( ( -500, -560 ), ( 300, -560 ), ( -380, 650 ), ( 200, 620 ) ):
-        P.tree( d, e, n, f"{P.OAK}/tree_oak_medium_a.vmdl", 1.0 )
+    # Two small trees by the South Gallery. The pictures' courtyard is open to the sky round its planter: big trees here
+    # hid the rotunda and the stage.
+    for e, n in ( ( -500, -560 ), ( 300, -560 ) ):
+        P.tree( d, e, n, f"{P.OAK}/tree_oak_small_a.vmdl", 0.9 )
     for e, n, along in ( ( -250, -800, "e" ), ( 100, -800, "e" ), ( -420, 150, "n" ), ( -280, 520, "e" ), ( 220, 520, "e" ) ):
         P.bench( d, e, n, length=90, along=along )
     for e, n in ( ( -540, 870 ), ( -420, 940 ), ( -540, 990 ), ( -300, 920 ) ):
@@ -837,7 +839,10 @@ def terrain_z( e, n ):
     dn = np.maximum( 0, np.maximum( PLAY[2] - n, n - PLAY[3] ) )
     dist = np.hypot( de, dn )
     bearing = np.arctan2( n - 0, e - 0 )
-    slope = 0.18 * np.sin( bearing ) + 0.06 * np.cos( bearing )
+    # Gentle to the north, so from the courtyard the land stays under the galleries' roofs and only sky shows over
+    # them, as in the pictures; steeper falling away to the south, to the town.
+    north = np.sin( bearing )
+    slope = np.where( north > 0, 0.07, 0.18 ) * north + 0.04 * np.cos( bearing )
     swell = 260 * np.sin( e / 2300.0 ) * np.cos( n / 1900.0 ) + 140 * np.sin( ( e + n ) / 1100.0 )
     far = np.clip( ( dist - 9000 ) / 6000, 0, 1 )
     z = slope * dist + swell * np.clip( dist / 1500, 0, 1 ) + far * 2200

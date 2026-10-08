@@ -584,7 +584,7 @@ def round_planter( m, centre, r, seed=1, tree_path=f"{OAK}/tree_oak_small_a.vmdl
         rr = inside * ( 0.66 + jitter( 0.12, "rr", k, seed ) )
         path = ( f"{BEECH}/beech_bush_regular_small.vmdl", f"{PINE}/pine_bush_low_a.vmdl", f"{BEECH}/beech_bush_small.vmdl" )[k % 3]
         bush( m, ce + rr * math.cos( a ), cn + rr * math.sin( a ), wall_h - 2, path, 0.8 + 0.3 * ( keyed( k, seed ) % 10 ) / 10 )
-    tree( m, ce + 26, cn - 18, tree_path, 1.0, z=wall_h + 10, grate=False )
+    tree( m, ce + 26, cn - 18, tree_path, 0.75, z=wall_h + 10, grate=False )
 
 
 def sweep( m, paint, path, profile, normals_smooth=True ):
