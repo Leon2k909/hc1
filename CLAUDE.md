@@ -1969,7 +1969,7 @@
 
 ## Maps
 - Match maps (map picker, Quick Play, end-of-match vote) are `GameUtils.IsMatchReadyMap`: Flatgrass, Innocent Hotel,
-  Belltower, Reef Hall, Railhead and Lowtide (see their sections below).
+  Belltower, Reef Hall, Railhead, Lowtide, Boxyard and Cerro Blanco (see their sections below).
 - The hub (`HubPage`) is one featured screen for the tab picked on its left rail (`HubModeRail`, `HubPage.Operation`:
   Multiplayer, Battle Royale or Zombies; Campaign is locked), like the user's CoD-style mockup. Its art is
   `ui/modes/<mode>_wide.png`, a 1024x720 cut of the 2:3 card art. Battle Royale has no wide cut or blurred backdrop, so
@@ -2807,6 +2807,65 @@ simulate_input.
   (`railhead_render.py` with Boxyard's scene). Nothing has compiled, and the lighting, the navmesh, bots and the modes'
   objects are all unchecked.
 - To play it: `dev_mode team_deathmatch boxyard`.
+
+## Cerro Blanco (multiplayer map, `Tools/cerroblanco_map.py`)
+- The user asked for a map as close as possible to MWII's Valderas Museum in looks and layout, under another name
+  (2026-10-07). They sent four pictures: the courtyard with its round boulder planter and the stage with a piano, the
+  South Gallery's portico with its red sculptures, an overhead of the courtyard (banners, hedges) and the South Gallery
+  close up. Cerro Blanco is the Museo Cerro Blanco, a made-up art museum on a white hill over a Mexican town. Its text is
+  made-up Spanish, with no Call of Duty name or marking.
+- Built by script like Belltower, Railhead and Lowtide (`map_kit`), from three scripts:
+  - `cerroblanco_materials.py` draws the museum's own materials with numpy into `Assets/materials/cerroblanco/`.
+    Its docstring has each one:
+    - cleft-cut travertine walls and honed travertine paving, on a 30-inch module;
+    - off-white enamelled panels for the upper floors;
+    - four exhibition banners with abstract pictures;
+    - the museum's name in bronze letters.
+    Run it before the map script.
+  - `cerroblanco_parts.py` has the pieces:
+    - the walls, glazing, stairs, railings and curved walls;
+    - the round boulder planter, the stage and its grand piano, the red sculptures and the bronze sphere;
+    - benches, cafe tables under parasols, banners and the sign.
+  - `cerroblanco_map.py` lays them out and writes:
+    - the models, to `Assets/models/maps/cerroblanco/`: the buildings, the grounds, the dressing, the glass, the
+      canopies, and the backdrop (hills and the town below, drawn only);
+    - the scene, `Assets/scenes/maps/CerroBlanco/cerroblanco.scene`, rewritten whole on every run (change the layout in
+      the script, not in the editor);
+    - the flat paints and `cb_glass` (text-only vmats);
+    - the radar picture, `ui/minimaps/minimap_cerroblanco.png`;
+    - with `--art`, a stand-in menu picture, `ui/maps/cerroblanco.png` (a flat-coloured preview: replace it with an
+      in-engine capture).
+  - `--preview <dir>` and `--views <dir>` write flat-shaded views (`VIEWS`) for comparing with the pictures.
+    Trees aren't drawn in them.
+- The museum stands round its courtyard: travertine below and white panels above, with flat roofs and parapets.
+  - The rotunda is the entrance hall: a travertine drum with a band of curved glass and an oculus.
+  - The West Gallery (two storeys, an L, a stair inside) is on the courtyard's west side. On its east side are the cafe
+    (its roof a terrace, up a stair from the courtyard), the North Gallery (two storeys) and the East Hall, with its
+    mezzanine.
+  - The South Gallery (one tall storey) closes the courtyard's south side, with a portico of columns under a louvred
+    canopy, and the red sculptures in front.
+  - In the courtyard: the round planter with its boulders and a tree, the stage with the piano, hedges, benches and
+    the cafe's tables.
+  - The banners hang down the fronts (`BANNERS`).
+- Red Team spawns on the forecourt at the north, by the car park and the museum's sign. Blue Team spawns on the south
+  plaza, past the portico. Three lanes:
+  - West: the West Garden's lawns, the West Gallery, then the garden circle round its bronze sphere (bomb site B) and
+    the south-west lawns.
+  - Middle: the rotunda, the courtyard and the stage, then the South Gallery.
+  - East: the promenade, the cafe and its terrace, the North Gallery, then the East Hall (bomb site A), the covered
+    walkway and the east terrace.
+- Modes:
+  - The scene lists TDM and Defuse, and it's in `GameUtils`' three map lists.
+  - It has deathmatch spawns (34) and Retakes spawns for each site.
+  - Domination's flags: A at the rotunda, B in the courtyard, C at the South Gallery.
+  - Hot Zones and Cash Grab points are `ObjectiveSpot`s.
+- Every run checks all 95 spots with railhead_map's `check_spots`, `check_reach` and `check_retakes_sight`. On
+  2026-10-08 all three passed.
+- The navmesh's bounds stop at `NAV_TOP` (300): over the first floors (180) and under the roofs (330-360). The glass and
+  the canopies are tagged `navskip`.
+- Made offline on 2026-10-08, with the editor closed: nothing has compiled. The lighting, the navmesh, bots and the
+  modes' objects are all unchecked, and none of it has been seen in the engine.
+- To play it: `dev_mode team_deathmatch cerroblanco`.
 
 ## Ridgeback (battle royale map, `Assets/scenes/maps/Ridgeback/`)
 - The second battle royale map, a base to build on: a valley about 1.2 km across in a ring of mountains, on an s&box

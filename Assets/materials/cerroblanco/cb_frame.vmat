@@ -1,0 +1,14 @@
+// Tools/cerroblanco_map.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.55"
+    TextureColor "materials/default/default_color.tga"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureRoughness "[0.380000 0.380000 0.380000 0.000000]"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.211765 0.223529 0.235294 1.000000]"
+    g_flModelTintAmount "1.0"
+}
