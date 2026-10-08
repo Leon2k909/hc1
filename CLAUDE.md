@@ -1051,6 +1051,30 @@
 - That modal opens in the editor too, a frame after the call (checked 2026-09-26). A second call while it's open
   closes it, so only one handler in a click's bubble path may call it.
 
+## Field of view settings (Settings → Video)
+- The user asked for CoD-style control over the field of view, "affected or independent etc" (2026-10-08).
+  - Field Of View is 60-120 (was 65-110), horizontal, default 85.
+  - ADS Field Of View (`GameSettings.IndependentAdsFov`): Affected (the default) or Independent.
+  - Third Person Field Of View (`ThirdPersonFieldOfView`, 60-120, default 85) is used whenever
+    `CameraController.Mode` is ThirdPerson: the deathcam and spectating from behind (`CameraController.HipFieldOfView`).
+    Its getter reads 0 as 85, since a settings file or a hotloaded settings object from before it existed has 0.
+- How aiming zooms now (`Equipment.AimFov`, `OffsetMagnification`, `ReferenceFov` 85):
+  - A gun's `AimFovOffset` (-5 on most, the M700's -30) is degrees off 85. It's turned into a magnification, and a
+    magnified optic multiplies it by `OpticZoom.ViewMagnification` (1.2).
+  - Affected zooms the player's own Field Of View by that magnification. At 110 the irons aim at 105.2 (it was 110 - 5).
+  - Independent zooms 85 by it, so the ADS view is the same at any Field Of View: irons 80, the M700 55 and a magnified
+    optic 69.9.
+  - `GetAimFovOffset`, `TheaterViewModel` and `FlatScope.GetMagnification` (its `ZoomLevels` are degrees off 85) all go
+    through it. The scope lens (`OpticZoom`) works from the main camera's field of view, so it follows either choice
+    unchanged.
+- There's no Weapon (viewmodel) field of view. The viewmodel draws in the main camera's overlay pass, with the main
+  camera's field of view. A separate one would need either:
+  - a second camera, which loses the post-processing and breaks `ViewModelMask` and the scope lens;
+  - or the viewmodel squashed along the view, which skews the bone-mounted attachments and misplaces the lens.
+- Aim sensitivity doesn't follow the zoom: irons aren't scaled at all (`ManualOffset` only divides `AimDampening` by
+  a magnified optic's power). So at a high Field Of View, Independent irons feel faster than Affected ones.
+- Compiled with dotnet and hotloaded into the user's match (2026-10-08). Not yet checked in-game.
+
 ## Quitting (`QuitPrompt`): a game can't close s&box
 - Escape on the main menu (`MainMenuRoot.HandleEscape`) closes one thing at a time: the language list, the bug report,
   the quit prompt, a header menu, the hub's playlists or zombies map picker, then the squad's privacy menu. With

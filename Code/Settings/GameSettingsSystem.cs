@@ -107,8 +107,17 @@ public class GameSettings
 	[Title( "Clan Tag" ), Description( "A short tag prepended to your name" ), Group( "Game" )]
 	public string ClanTag { get; set; } = "";
 
-	[Title( "Field Of View" ), Description( "Effects the camera's vision." ), Group( "Video" ), Icon( "grid_view" ), Range( 65, 110, 1 )]
+	[Title( "Field Of View" ), Description( "How wide you see in first person, in degrees across the screen." ), Group( "Video" ), Icon( "grid_view" ), Range( 60, 120, 1 )]
 	public float FieldOfView { get; set; } = 85;
+
+	// Equipment.AimFov. Affected (false) is the default, as in CoD.
+	[Title( "ADS Field Of View" ), Description( "Affected: aiming zooms your own field of view, so a wider one stays wider while aiming. Independent: aiming always zooms to the same view, whatever your field of view." ), Group( "Video" ), Icon( "center_focus_weak" ), Choices( "Affected", "Independent" )]
+	public bool IndependentAdsFov { get; set; } = false;
+
+	// Read through the property: a settings file or a hotloaded settings object from before it existed has 0.
+	[Title( "Third Person Field Of View" ), Description( "How wide you see from behind a player: the deathcam and spectating in third person." ), Group( "Video" ), Icon( "videocam" ), Range( 60, 120, 1 )]
+	public float ThirdPersonFieldOfView { get => thirdPersonFov > 0f ? thirdPersonFov : 85f; set => thirdPersonFov = value; }
+	private float thirdPersonFov;
 
 	[Title( "Picture-In-Picture Scopes" ), Description( "Render live 3D scope lenses. Turn this off if scoped weapons cause render artifacts or performance issues." ), Group( "Video" ), Icon( "center_focus_strong" )]
 	public bool PictureInPictureScopes { get; set; } = true;

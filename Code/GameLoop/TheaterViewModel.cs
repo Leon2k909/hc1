@@ -289,11 +289,13 @@ public sealed class TheaterViewModel
 			camera.WorldRotation = view * (bone.Rotation * scale);
 		}
 
-		// Aiming zooms as the game does (Equipment.GetAimFovOffset): a magnified optic further.
-		var aimFov = _weapon.AimFovOffset;
+		// Aiming zooms as the game does (Equipment.GetAimFovOffset): a magnified optic further, and by the viewer's
+		// ADS Field Of View setting.
+		var magnification = Equipment.OffsetMagnification( _weapon.AimFovOffset );
 		if ( _optic.IsValid() && _optic.OverrideAimOffset && _optic.OpticMagnification > 1f )
-			aimFov = Equipment.ZoomFov( baseFov + _weapon.AimFovOffset, OpticZoom.ViewMagnification ) - baseFov;
+			magnification *= OpticZoom.ViewMagnification;
 
+		var aimFov = Equipment.AimFov( baseFov, magnification ) - baseFov;
 		camera.FieldOfView = baseFov + aimFov * aimWeight;
 
 		Advance( held, time );

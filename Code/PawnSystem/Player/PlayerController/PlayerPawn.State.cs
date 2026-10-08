@@ -49,7 +49,7 @@ public partial class PlayerPawn
 
 			Inventory.Clear();
 			CreateRagdoll( (int)death.Style, death.Duration, death.FallDirection, death.HitSide, death.Velocity,
-				death.HitPosition, death.HitVelocity, death.Blast );
+				death.HitPosition, death.HitVelocity, death.Blast, death.SeveredLimbs );
 		}
 
 		PlayerBoxCollider.Enabled = false;
@@ -166,7 +166,7 @@ public partial class PlayerPawn
 
 	[Rpc.Broadcast( NetFlags.HostOnly )]
 	private void CreateRagdoll( int style, float duration, Vector3 fallDirection, Vector3 hitSide, Vector3 velocity,
-		Vector3 hitPosition, Vector3 hitVelocity, bool blast )
+		Vector3 hitPosition, Vector3 hitVelocity, bool blast, BlastLimb severedLimbs )
 	{
 		if ( !Body.IsValid() )
 			return;
@@ -174,7 +174,8 @@ public partial class PlayerPawn
 		var death = new DeathPlan
 		{
 			Style = (DeathStyle)style, Duration = duration, FallDirection = fallDirection, HitSide = hitSide,
-			Velocity = velocity, HitPosition = hitPosition, HitVelocity = hitVelocity, Blast = blast
+			Velocity = velocity, HitPosition = hitPosition, HitVelocity = hitVelocity, Blast = blast,
+			SeveredLimbs = blast ? severedLimbs : BlastLimb.None
 		};
 
 		// The death's own jolt replaces the old shove on every part (5-20 times the damage, at random).

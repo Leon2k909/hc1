@@ -95,6 +95,9 @@ public record DamageInfo( Component Attacker, float Damage, Component Inflictor 
 	/// </summary>
 	public Component Victim { get; init; }
 
+	/// <summary>Exposed limbs selected by the host for a near-contact explosion.</summary>
+	public BlastLimb SeveredLimbs { get; init; }
+
 	/// <inheritdoc cref="DamageFlags.Armor"/>
 	public bool HasArmor => Flags.HasFlag( DamageFlags.Armor );
 

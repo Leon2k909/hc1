@@ -21,6 +21,29 @@ public sealed class OpticZoom : Component, ICameraSetup
 	/// <summary>Magnified view for the lens, or null when inactive.</summary>
 	public static Texture LensTexture { get; private set; }
 
+	/// <summary>The camera used to project HUD markers onto the magnified picture.</summary>
+	public static CameraComponent LensCamera { get; private set; }
+
+	/// <summary>
+	/// Project into the square lens texture. CameraComponent.PointToScreenNormal uses the main screen's aspect
+	/// ratio even when its camera renders to a square target, which would displace markers vertically.
+	/// </summary>
+	public static Vector2 PointToLensNormal( CameraComponent camera, Vector3 position, out bool isBehind )
+	{
+		if ( !camera.IsValid() )
+		{
+			isBehind = true;
+			return Vector2.Zero;
+		}
+
+		var local = camera.WorldTransform.PointToLocal( position );
+		isBehind = local.x <= 0f;
+		if ( isBehind ) return Vector2.Zero;
+
+		var focal = 0.5f / MathF.Tan( camera.FieldOfView.Clamp( 0.01f, 179f ).DegreeToRadian() * 0.5f );
+		return new Vector2( 0.5f - local.y / local.x * focal, 0.5f - local.z / local.x * focal );
+	}
+
 	/// <summary>Lens diameter as a fraction of screen height. Set by the overlay; drives the lens camera FOV.</summary>
 	public static float LensDiameter { get; set; } = 0.3f;
 	public static bool OverlayDotVisible { get; private set; } = true;
@@ -28,29 +51,21 @@ public sealed class OpticZoom : Component, ICameraSetup
 	/// <summary>Eyepiece offset from screen centre as a fraction of screen height (x right, y down), from sway/recoil.</summary>
 	public static Vector2 ScopeOffset { get; private set; }
 
+	/// <summary>Moving exit-pupil shadow inside the lens, independent of the overlay's aim transition.</summary>
+	public static ScopeEyeBox EyeBox { get; private set; } = new( Vector2.Zero, 1f, 0f );
+
 	[Property] public CameraController CameraController { get; set; }
 
 	/// <summary>On-screen size of the lens relative to its size when aimed (grows/shrinks as the optic moves).</summary>
 	public static float LensScale { get; private set; } = 1f;
 
 	/// <summary>
-	/// 0..1, how well the optic lines up with the eye: <see cref="UI.ScopeOverlay"/>'s opacity. The picture shows as the
-	/// eyepiece comes in front of the eye, and goes as the gun is pulled away.
+	/// 0..1, <see cref="UI.ScopeOverlay"/>'s aim-transition opacity. Off-axis shading is handled by <see cref="EyeBox"/>.
 	/// </summary>
 	public static float LensVisibility { get; private set; }
 
 	/// <summary>Distance in front of the eye where the lens is anchored to an optic whose eyepiece isn't known.</summary>
 	private const float AnchorDistance = 4f;
-
-	/// <summary>
-	/// The picture is all there while the line of sight passes this share of the eyepiece's radius from its centre, and
-	/// gone once it's off the glass. Off to the side a real scope shows black, and the sway of a hard turn while aimed stays
-	/// inside it.
-	/// </summary>
-	private const float FullOnAxis = 0.35f;
-
-	/// <summary>How long the aim has to have settled before the optic's place in front of the eye is learned from it.</summary>
-	private const float SettleTime = 0.15f;
 
 	private CameraComponent _lensCamera;
 	private CameraComponent _main;
@@ -65,11 +80,10 @@ public sealed class OpticZoom : Component, ICameraSetup
 
 	// Where the eye's line of sight passes through the optic, and the aim direction, in the optic's own space.
 	// Learned while fully aimed, so the lens can then be drawn wherever the optic actually is (reloads, sway, recoil).
-	private Vector3 _anchorLocal;
-	private Rotation _aimLocal;
-	private bool _calibrated;
 	private GameObject _calibratedFor;
-	private float _settledFor;
+	private readonly ScopeEyeAlignment _alignment = new();
+	private readonly ScopeEyeMotion _eyeMotion = new();
+	private Rotation _viewRotation;
 
 	protected override void OnDisabled() => Deactivate();
 
@@ -111,8 +125,6 @@ public sealed class OpticZoom : Component, ICameraSetup
 			return;
 		}
 
-		_settledFor = viewModel.IsAimSettled ? _settledFor + Time.Delta : 0f;
-
 		viewModel.GameObject.Tags.Add( "optic_viewmodel" );
 		_main = main;
 		_viewModel = viewModel;
@@ -122,19 +134,30 @@ public sealed class OpticZoom : Component, ICameraSetup
 
 		if ( _calibratedFor != _optic )
 		{
-			_calibrated = false;
+			_alignment.Reset();
+			_eyeMotion.Reset();
 			_calibratedFor = _optic;
+			EyeBox = new( Vector2.Zero, 1f, 0f );
 		}
 
 		EnsureLensCamera( main );
 		_lensCamera.Enabled = true;
 		LensTexture = _lensCamera.RenderTarget;
+		LensCamera = _lensCamera;
 	}
 
 	private static GameObject FindOptic( ViewModel viewModel ) =>
 		viewModel.GameObject.Components.GetAll<GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants )
 			.Where( p => p.Category == GunsmithPartType.Optic && p.CurrentGameObject.IsValid() )
 			.Select( p => p.CurrentGameObject ).FirstOrDefault();
+
+	void ICameraSetup.PreSetup( CameraComponent camera )
+	{
+		if ( camera != _main ) return;
+		// Sample head movement before the viewmodel adds its camera-bone animation. Raising the gun must not
+		// look like a downward mouse flick and create a bottom shadow during the aim transition.
+		_viewRotation = camera.WorldRotation;
+	}
 
 	// Viewmodel animation and camera effects are final by now; place the lens on the optic right before rendering.
 	void ICameraSetup.PostSetup( CameraComponent camera )
@@ -155,26 +178,19 @@ public sealed class OpticZoom : Component, ICameraSetup
 		var eyepiece = optic.PointToWorld( _eyepiece );
 		var anchorDistance = fitted ? MathF.Max( cam.PointToLocal( eyepiece ).x, 0.5f ) : AnchorDistance;
 
-		// Learn (and slowly refine) how the optic sits in front of the eye while properly aimed in.
-		if ( _settledFor >= SettleTime && !_reloading )
-		{
-			var anchor = optic.PointToLocal( cam.Position + cam.Rotation.Forward * anchorDistance );
-			var aim = optic.Rotation.Inverse * cam.Rotation * cant;
-			if ( !_calibrated )
-			{
-				_anchorLocal = anchor;
-				_aimLocal = aim;
-				_calibrated = true;
-			}
-		}
+		var motion = _eyeMotion.Update( _viewRotation, Time.Delta );
+		var estimatedRadius = fitted ? _eyepieceDiameter * 0.5f : AnchorDistance * LensDiameter
+			* Screen.Height / Screen.Width * MathF.Tan( _main.FieldOfView.DegreeToRadian() * 0.5f );
+		_alignment.Update( cam, optic, cant, anchorDistance, estimatedRadius,
+			_viewModel.IsAimSettled && !_reloading, _eyeMotion.TurnSpeed < 15f && motion.Length < 0.015f, Time.Delta );
 
 		var lensRotation = cam.Rotation;
 		var lensPoint = fitted ? eyepiece : cam.Position + cam.Rotation.Forward * AnchorDistance;
-		if ( _calibrated )
+		if ( _alignment.Calibrated )
 		{
-			lensRotation = optic.Rotation * _aimLocal * cant.Inverse;
+			lensRotation = optic.Rotation * _alignment.AimLocal * cant.Inverse;
 			// Known eyepieces follow their glass, never a screen-centred calibration sampled during sway.
-			if ( !fitted ) lensPoint = optic.PointToWorld( _anchorLocal );
+			if ( !fitted ) lensPoint = optic.PointToWorld( _alignment.AnchorLocal );
 		}
 
 		// Project the anchor onto the screen (x forward, y left, z up in camera space).
@@ -195,21 +211,27 @@ public sealed class OpticZoom : Component, ICameraSetup
 
 		// The picture shows while the eye is behind the eyepiece: the optic pointing along the view (not tilted for a
 		// reload), and its glass on the line of sight. Before the optic's aim is learned, its own axis stands in for it.
-		var axis = _calibrated ? lensRotation.Forward : optic.Rotation.Forward;
+		var axis = _alignment.Calibrated ? lensRotation.Forward : optic.Rotation.Forward;
 		var angle = Vector3.GetAngle( axis, cam.Rotation.Forward );
-		var visible = local.x > 0.5f ? (1f - (angle - 2f) / 6f).Clamp( 0f, 1f ) : 0f;
-		if ( fitted )
-		{
-			var radius = _eyepieceDiameter * 0.5f;
-			var offAxis = MathF.Sqrt( local.y * local.y + local.z * local.z );
-			visible *= (1f - (offAxis - radius * FullOnAxis) / (radius * (1f - FullOnAxis))).Clamp( 0f, 1f );
-		}
-		else
-		{
-			// Its glass isn't known, so only how far the sights are up says when the eye is behind it.
-			visible *= ((ScopeBlend - 0.75f) / 0.2f).Clamp( 0f, 1f );
-		}
+		// Misalignment shades the lens black; only lowering/tilting the optic out of view removes the overlay.
+		var visible = local.x > 0.5f ? (1f - (angle - 12f) / 18f).Clamp( 0f, 1f ) : 0f;
+		visible *= ((ScopeBlend - 0.65f) / 0.25f).Clamp( 0f, 1f );
 		LensVisibility = LensVisibility.Approach( visible, Time.Delta * 20f );
+
+		// The neutral eye is stored in optic space, so cant and camera animation cannot mix coordinate systems.
+		// Pose shading starts only after settling; turn lag is independent and still responds during a moving aim-in.
+		var eye = _alignment.Displacement( cam, optic, lensRotation );
+		var glassRadius = fitted ? _eyepieceDiameter * 0.5f : LensDiameter * LensScale * Screen.Height * depth / (2f * focal);
+		var eyeOffset = new Vector2( -eye.y, -eye.z ) / MathF.Max( glassRadius, 0.05f ) + motion;
+		// The neutral eye is learned where the optic sits, so a tuned Eye Position (OpticTuning) would read as its rated
+		// relief. Measure from the rated one: slid forward, the eye is that much further back from the eyepiece.
+		// It comes in with the pose shading (the alignment's Blend).
+		var railShift = (_optic.Parent?.Components.Get<GunsmithAttachmentPoint>()?.OpticRailShift ?? 0f) * _alignment.Blend;
+		var relief = (eye.x - railShift) / MathF.Max( anchorDistance * 0.3f, 1f );
+		var shadow = ScopeEyeBox.Calculate( eyeOffset, relief, _magnification * ViewMagnification );
+		var smoothing = 1f - MathF.Exp( -Time.Delta * 40f );
+		EyeBox = new( EyeBox.Offset.LerpTo( shadow.Offset, smoothing ),
+			EyeBox.Radius.LerpTo( shadow.Radius, smoothing ), EyeBox.Blackout.LerpTo( shadow.Blackout, smoothing ) );
 
 		// The lens shows the world magnified relative to what surrounds it: the angle the lens covers on screen,
 		// divided by the magnification, looking along the optic.
@@ -226,9 +248,12 @@ public sealed class OpticZoom : Component, ICameraSetup
 		LensScale = 1f;
 		LensVisibility = 0f;
 		LensTexture = null;
+		LensCamera = null;
 		OverlayDotVisible = true;
+		EyeBox = new( Vector2.Zero, 1f, 0f );
 		_optic = null;
-		_settledFor = 0f;
+		_alignment.BeginAim();
+		_eyeMotion.Reset();
 		if ( _lensCamera.IsValid() ) _lensCamera.Enabled = false;
 	}
 

@@ -1176,6 +1176,10 @@ public static partial class GameText
 		["View Bob"] = "Похитування камери",
 		["Streak Type"] = "Тип серій",
 		["Field Of View"] = "Поле зору",
+		["ADS Field Of View"] = "Поле зору при прицілюванні",
+		["Affected"] = "Залежне",
+		["Independent"] = "Незалежне",
+		["Third Person Field Of View"] = "Поле зору від третьої особи",
 		["Picture-In-Picture Scopes"] = "Оптика «картинка в картинці»",
 		["s&box Settings"] = "Налаштування s&box",
 		["Resolution, window mode and graphics quality are set in s&box itself and apply to every game."] =

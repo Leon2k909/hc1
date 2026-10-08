@@ -1171,6 +1171,10 @@ public static partial class GameText
 		["View Bob"] = "화면 흔들림",
 		["Streak Type"] = "스트릭 유형",
 		["Field Of View"] = "시야각",
+		["ADS Field Of View"] = "조준 시 시야각",
+		["Affected"] = "연동",
+		["Independent"] = "독립",
+		["Third Person Field Of View"] = "3인칭 시야각",
 		["Picture-In-Picture Scopes"] = "화면 속 화면 조준경",
 		["s&box Settings"] = "s&box 설정",
 		["Resolution, window mode and graphics quality are set in s&box itself and apply to every game."] =

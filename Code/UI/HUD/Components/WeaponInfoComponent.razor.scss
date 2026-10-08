@@ -1,7 +1,6 @@
 @import "/UI/Styles/Theme.scss";
 
-// The loadout list, right side, over the ammo: a plate a slot, its key's glyph on the right, the weapon in hand marked
-// by the orange bar and a brighter plate. Hidden but for a moment round each switch ("shown", WeaponInfoComponent).
+// The selected weapon is brighter; the loadout appears briefly around each switch.
 WeaponInfoComponent
 {
     position: relative;
@@ -9,17 +8,15 @@ WeaponInfoComponent
     align-items: stretch;           // every slot as wide as the widest, so their edges line up
     align-self: flex-end;
     flex-grow: 0;
-    gap: 4px;
-    margin: 0 $safe-zone-x 12px 0;
+    gap: 3px;
+    margin: 0 0 8px 0;
     opacity: 0;
-    transform: translateX( 24px );
-    transition: opacity 0.45s ease-in, transform 0.45s ease-in;
+    transition: opacity 0.24s ease-in;
 
     &.shown
     {
         opacity: 1;
-        transform: translateX( 0px );
-        transition: opacity 0.12s ease-out, transform 0.12s ease-out;
+        transition: opacity 0.12s ease-out;
     }
 
     .slot
@@ -29,16 +26,14 @@ WeaponInfoComponent
         align-items: center;
         min-width: 230px;
         justify-content: flex-end;
-        padding: 4px 10px 4px 16px;
-        background: linear-gradient( to right, rgba( 10, 11, 14, 0.1 ), rgba( 10, 11, 14, 0.7 ) );
-        opacity: 0.8;
+        padding: 4px 8px 4px 12px;
+        background-color: rgba( black, 0.3 );
+        opacity: 0.65;
 
         &.active
         {
             opacity: 1;
-            background: linear-gradient( to right, rgba( 10, 11, 14, 0.35 ), rgba( 10, 11, 14, 0.9 ) );
-
-            > .bar { background-color: $hud-accent; }
+            background-color: rgba( black, 0.48 );
         }
     }
 
@@ -57,15 +52,6 @@ WeaponInfoComponent
         align-items: center;
     }
 
-    .bar
-    {
-        position: absolute;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        width: 3px;
-        background-color: rgba( white, 0.18 );
-    }
 }
 
 EquipmentRow
@@ -77,10 +63,9 @@ EquipmentRow
 
     .gunname
     {
-        font-family: $main-font;
-        font-size: 13px;
-        font-weight: bold;
-        letter-spacing: 0.5px;
+        font-family: $hud-font;
+        font-size: 14px;
+        font-weight: normal;
         color: $hud-text-dim;
         text-shadow: 0 1px 2px rgba( black, 0.8 );
     }

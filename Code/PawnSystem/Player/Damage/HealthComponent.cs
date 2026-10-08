@@ -101,7 +101,7 @@ public partial class HealthComponent : Component, IRespawnable//, Component.IDam
 		// kill outright. The battle royale's zone and burns only ever wear health down.
 		var hurt = damageInfo.Damage > 0f;
 		var bullet = isHardcore && hurt && IsBulletHit( damageInfo );
-		var lethal = false;
+		var lethal = hurt && damageInfo.WasExplosion && damageInfo.SeveredLimbs != BlastLimb.None;
 		if ( bullet )
 			damageInfo = HardcoreBullet( damageInfo, gunDamage, out lethal );
 		else if ( isHardcore && hurt && (isHcBot || isHcBotAttackOnPlayer)
@@ -223,7 +223,7 @@ public partial class HealthComponent : Component, IRespawnable//, Component.IDam
 	{
 		BroadcastKill( damageInfo.Damage, damageInfo.Position, damageInfo.Force,
 			damageInfo.Attacker, damageInfo.Inflictor,
-			damageInfo.Hitbox, damageInfo.Flags );
+			damageInfo.Hitbox, damageInfo.Flags, damageInfo.SeveredLimbs );
 
 		KillFeed.RecordEvent( damageInfo );
 	}
@@ -260,11 +260,12 @@ public partial class HealthComponent : Component, IRespawnable//, Component.IDam
 	}
 
 	[Rpc.Broadcast]
-	private void BroadcastKill( float damage, Vector3 position, Vector3 force, Component attacker, Component inflictor = default, HitboxTags hitbox = default, DamageFlags flags = default )
+	private void BroadcastKill( float damage, Vector3 position, Vector3 force, Component attacker, Component inflictor = default, HitboxTags hitbox = default, DamageFlags flags = default, BlastLimb severedLimbs = BlastLimb.None )
 	{
 		var damageInfo = new DamageInfo( attacker, damage, inflictor, position, force, hitbox, flags )
 		{
-			Victim = this
+			Victim = this,
+			SeveredLimbs = flags.HasFlag( DamageFlags.Explosion ) ? severedLimbs : BlastLimb.None
 		};
 
 		Scene.Dispatch( new KillEvent( damageInfo ) );

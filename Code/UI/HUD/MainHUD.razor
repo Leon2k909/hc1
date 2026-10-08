@@ -94,19 +94,21 @@
                 {
                     <ZombiesPointsPanel />
                 }
-                <WeaponInfoComponent />
-                <Ammo />
-                
-                var score = Client.Viewer.GetComponent<Facepunch.UI.PlayerScore>();
-                if ( score.IsValid() && score.BankedUAVs > 0 )
-                {
-                    <div style="display: flex; align-items: center; justify-content: flex-end; margin-top: 10px; margin-bottom: 10px; gap: 8px;">
-                        <div style="font-size: 14px; font-weight: bold; color: #FFF; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
-                            @Tr( "UAV READY ({0})", score.BankedUAVs )
+                <div class="combat-readout">
+                    <WeaponInfoComponent />
+                    <Ammo />
+
+                    @{
+                        var score = Client.Viewer.GetComponent<Facepunch.UI.PlayerScore>();
+                    }
+                    @if ( score.IsValid() && score.BankedUAVs > 0 )
+                    {
+                        <div class="scorestreak-ready">
+                            <label>@Tr( "UAV READY ({0})", score.BankedUAVs )</label>
+                            <InputHint Action="Scorestreak" class="small" Size="@InputGlyphSize.Small" />
                         </div>
-                        <InputHint Action="Scorestreak" class="small" Size="@InputGlyphSize.Small" />
-                    </div>
-                }
+                    }
+                </div>
             }
 
             @* The mode's name and Hot Zone's countdown are under the round's strip (RoundStateDisplay). In battle royale

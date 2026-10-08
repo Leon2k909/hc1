@@ -83,6 +83,7 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 	Type IMarkerObject.MarkerPanelTypeOverride => typeof( UI.LightweightBotMarkerPanel );
 	Vector3 IMarkerObject.MarkerPosition => WorldPosition + Vector3.Up * 78f;
 	bool IMarkerObject.ShowChevron => false;
+	bool IMarkerObject.LookOpacity => false;
 
 	bool IMarkerObject.ShouldShow()
 	{
@@ -437,6 +438,7 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 
 	private readonly BotSupportHand _supportHand = new();
 	private readonly BotSupportHand _gripHand = new( true );
+	private readonly BotWeaponPose _weaponPose = new();
 	private float _supportGripWeight;
 
 	/// <summary>Finish the gun and support arm together, using the pose the renderer will draw this frame.</summary>
@@ -444,35 +446,30 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 	{
 		if ( _weaponModel.IsValid() ) _weaponModel.LocalTransform = global::Transform.Zero;
 		FollowHand();
-		var target = GetWeaponWorldModel()?.IkLeftHand;
-		if ( !IsAlive || IsReloadClipPlaying || !Renderer.IsValid() || !target.IsValid() || !target.Active )
+		var gun = GetWeaponWorldModel();
+		if ( !IsAlive || !Renderer.IsValid() || !gun.IsValid() )
 		{
 			_supportGripWeight = 0f;
 			return;
 		}
 
-		_supportGripWeight = MathF.Min( 1f, _supportGripWeight + Time.Delta / .2f );
+		var target = gun.IkLeftHand;
+		var supportActive = !IsReloadClipPlaying && target.IsValid() && target.Active;
+		_supportGripWeight = supportActive ? MathF.Min( 1f, _supportGripWeight + Time.Delta / .2f ) : 0f;
 		// Long handguards can fall beyond the support arm during a low carry or a turn. Bring the whole gun
 		// and its gripping hand within both arms' reach before fitting the support arm; never stretch a wrist.
 		var rightBone = Renderer.Model.Bones.GetBone( "hand_R" ) ?? Renderer.Model.Bones.GetBone( "r_hand" );
 		if ( rightBone is not null && Renderer.SceneModel.IsValid() )
 		{
 			var right = Renderer.SceneModel.GetBoneWorldTransform( rightBone.Index );
-			var shift = Vector3.Zero;
-			for ( var i = 0; i < 4; i++ )
-			{
-				var leftAt = target.WorldPosition + shift;
-				shift += _supportHand.Reachable( Renderer, leftAt ) - leftAt;
-				var rightAt = right.Position + shift;
-				shift += _gripHand.Reachable( Renderer, rightAt ) - rightAt;
-			}
-			shift *= _supportGripWeight;
+			var shift = _weaponPose.Fit( Renderer, gun, _supportHand, _gripHand, right.Position, _supportGripWeight );
 			if ( shift.LengthSquared > .0001f )
 			{
 				_gripHand.Apply( Renderer, right.WithPosition( right.Position + shift ) );
-				_weaponModel.WorldPosition += shift;
+				_weaponModel.WorldPosition += Renderer.SceneModel.GetBoneWorldTransform( rightBone.Index ).Position - right.Position;
 			}
 		}
+		if ( !supportActive ) return;
 		var hand = Renderer.WorldTransform.ToLocal( target.WorldTransform );
 		hand = MilitaryUniform.HandIkTransform( Renderer.Model, "hand_left", hand );
 		_supportHand.Apply( Renderer, Renderer.WorldTransform.ToWorld( hand ), _supportGripWeight );

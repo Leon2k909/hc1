@@ -8,8 +8,7 @@
 @if ( !Player.CurrentEquipment.IsValid() )
     return;
 
-@* The weapon in hand, bottom right: its name and fire mode over the rounds in it and the reserve, and a thin bar of
-   how full the magazine is. A knife or a grenade shows its name only. *@
+@* Weapon and fire mode above magazine + chamber / reserve. Melee shows the weapon name alone. *@
 <root>
     <div class="plate">
         <div class="top-line">
@@ -30,11 +29,10 @@
         {
             <div class="count-line">
                 <label class="mag">@AmmoDisplay</label>
+                <label class="separator">/</label>
                 <label class="reserve">@ammo.ReserveAmmo</label>
             </div>
-            <div class="mag-bar"><div class="fill" style="width: @(MagPercent)%;" /></div>
         }
-        <div class="edge" />
     </div>
 </root>
 
@@ -72,8 +70,6 @@
             return max > 0 ? Math.Clamp( ammo.AmmoInMagazine / (float)max, 0f, 1f ) : 1f;
         }
     }
-
-    private int MagPercent => (int)Math.Round( MagFraction * 100f );
 
     /// "empty" with nothing left to fire, "low" at a quarter of a magazine or less.
     private string AmmoState

@@ -10,11 +10,6 @@
 
         <div @key="entry.Id" class="entry">
             <div class="plate @(died ? "died" : mine ? "mine" : "")">
-                @if ( mine && !died )
-                {
-                    <div class="flash" />
-                }
-
                 @if ( entry.Attacker is not null )
                 {
                     <div class="name @(mine ? "is-me" : "")">
@@ -79,7 +74,6 @@
                     </div>
                 }
 
-                <div class="edge" />
             </div>
         </div>
     }

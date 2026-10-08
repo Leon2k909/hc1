@@ -41,6 +41,7 @@ public struct DeathPlan
 	/// <summary> The jolt the hit gives the part it hit (every part, for a blast), in units a second. </summary>
 	public Vector3 HitVelocity;
 	public bool Blast;
+	public BlastLimb SeveredLimbs;
 
 	public static DeathPlan Limp => new() { Style = DeathStyle.Drop };
 
@@ -67,6 +68,7 @@ public struct DeathPlan
 			Velocity = velocity,
 			HitPosition = damage.Position,
 			Blast = flags.HasFlag( DamageFlags.Explosion ),
+			SeveredLimbs = flags.HasFlag( DamageFlags.Explosion ) ? damage.SeveredLimbs : BlastLimb.None,
 			HitSide = (damage.Position - position).WithZ( 0f ).Dot( right ) >= 0f ? right : -right
 		};
 
@@ -333,6 +335,9 @@ public sealed class DyingBody : Component
 
 		if ( !Plan.Blast && struck.IsValid() )
 			struck.Velocity += Plan.HitVelocity;
+
+		if ( Plan.Blast )
+			BlastDismemberment.Apply( Physics, Plan.SeveredLimbs, Plan.HitPosition );
 
 		// Sitting back: the hips go back as the legs fold under them.
 		if ( Plan.Style == DeathStyle.SitBack && _pelvis.IsValid() )

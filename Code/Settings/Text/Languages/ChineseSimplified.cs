@@ -536,6 +536,10 @@ public static partial class GameText
 		["View Bob"] = "视角晃动",
 		["Streak Type"] = "连续奖励类型",
 		["Field Of View"] = "视野",
+		["ADS Field Of View"] = "瞄准视野",
+		["Affected"] = "受影响",
+		["Independent"] = "独立",
+		["Third Person Field Of View"] = "第三人称视野",
 		["Picture-In-Picture Scopes"] = "画中画瞄准镜",
 		["s&box Settings"] = "s&box设置",
 		["Resolution, window mode and graphics quality are set in s&box itself and apply to every game."] =

@@ -1173,6 +1173,10 @@ public static partial class GameText
 		["View Bob"] = "視点の揺れ",
 		["Streak Type"] = "ストリークの種類",
 		["Field Of View"] = "視野角",
+		["ADS Field Of View"] = "エイム時の視野角",
+		["Affected"] = "連動",
+		["Independent"] = "独立",
+		["Third Person Field Of View"] = "三人称視点の視野角",
 		["Picture-In-Picture Scopes"] = "ピクチャー・イン・ピクチャー・スコープ",
 		["s&box Settings"] = "s&boxの設定",
 		["Resolution, window mode and graphics quality are set in s&box itself and apply to every game."] =

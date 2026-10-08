@@ -1179,6 +1179,10 @@ public static partial class GameText
 		["View Bob"] = "Kołysanie widoku",
 		["Streak Type"] = "Rodzaj serii",
 		["Field Of View"] = "Pole widzenia",
+		["ADS Field Of View"] = "Pole widzenia przy celowaniu",
+		["Affected"] = "Zależne",
+		["Independent"] = "Niezależne",
+		["Third Person Field Of View"] = "Pole widzenia w trzeciej osobie",
 		["Picture-In-Picture Scopes"] = "Lunety z obrazem w obrazie",
 		["s&box Settings"] = "Ustawienia s&box",
 		["Resolution, window mode and graphics quality are set in s&box itself and apply to every game."] =

@@ -1,37 +1,27 @@
 @import "/UI/Styles/Theme.scss";
 
-// Health and armour, bottom left: a dark plate with an edge in the health's state colour, the health as a number and
-// ten segments, and the armour as a thinner bar with the helmet's chip.
+// The numbers and bars carry the information; the backing only keeps them readable over the world.
 Vitals
 {
     position: relative;
-    font-family: $main-font;
+    font-family: $hud-font;
+
+    label { font-family: $hud-font; }
 
     .plate
     {
         position: relative;
         flex-direction: row;
-        min-width: 300px;
-        padding: 10px 16px 10px 14px;
-        background: linear-gradient( to right, $hud-plate, rgba( 10, 11, 14, 0.35 ) );
-        border-top: 1px solid $hud-plate-edge;
-    }
-
-    .edge
-    {
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 3px;
-        background-color: $hud-health;
+        min-width: 280px;
+        padding: 10px 12px;
+        background-color: $hud-plate;
     }
 
     .rows
     {
         flex-direction: column;
         flex-grow: 1;
-        gap: 7px;
+        gap: 6px;
     }
 
     .health-row, .armor-row
@@ -49,10 +39,10 @@ Vitals
 
     .value
     {
-        min-width: 50px;
-        font-size: 30px;
+        min-width: 46px;
+        font-size: 32px;
         font-weight: bold;
-        line-height: 30px;
+        line-height: 34px;
         color: $hud-health;
         text-shadow: 0 1px 3px rgba( black, 0.8 );
     }
@@ -61,8 +51,8 @@ Vitals
     {
         flex-direction: row;
         flex-grow: 1;
-        gap: 3px;
-        height: 10px;
+        gap: 2px;
+        height: 6px;
     }
 
     .seg
@@ -93,9 +83,9 @@ Vitals
 
     .value-sm
     {
-        min-width: 34px;
+        min-width: 32px;
         font-size: 16px;
-        font-weight: bold;
+        font-weight: normal;
         color: $hud-armor;
         text-shadow: 0 1px 2px rgba( black, 0.8 );
     }
@@ -104,7 +94,7 @@ Vitals
     {
         position: relative;
         flex-grow: 1;
-        height: 4px;
+        height: 3px;
         background-color: rgba( white, 0.12 );
         overflow: hidden;
 
@@ -118,46 +108,21 @@ Vitals
         }
     }
 
-    .chip
+    .helmet
     {
-        flex-direction: row;
         align-items: center;
-        gap: 4px;
-        padding: 2px 6px;
-        border: 1px solid rgba( $hud-armor, 0.45 );
-        background-color: rgba( $hud-armor, 0.12 );
-
-        label
-        {
-            font-size: 9px;
-            font-weight: bold;
-            letter-spacing: 1px;
-            color: $hud-armor;
-        }
+        opacity: 0.8;
     }
 
     &.hurt
     {
-        .edge, .seg .fill { background-color: $hud-warn; }
+        .seg .fill { background-color: $hud-warn; }
         .value { color: $hud-warn; }
     }
 
     &.low-health
     {
-        .edge, .seg .fill { background-color: $hud-danger; }
+        .seg .fill { background-color: $hud-danger; }
         .value { color: $hud-danger; }
-        .edge { animation: LowHealthEdge 0.9s ease-in-out infinite; }
-
-        .plate
-        {
-            background: linear-gradient( to right, rgba( 70, 8, 6, 0.78 ), rgba( 10, 11, 14, 0.35 ) );
-        }
     }
-}
-
-@keyframes LowHealthEdge
-{
-    0% { opacity: 1; }
-    50% { opacity: 0.35; }
-    100% { opacity: 1; }
 }

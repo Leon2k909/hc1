@@ -104,10 +104,14 @@ public class FlatScope : WeaponInputAction
 		EndZoom();
 	}
 
-	public float GetFOV()
+	/// <summary>
+	/// How much the current zoom level magnifies. <see cref="ZoomLevels"/> are degrees off the default field of view
+	/// (<see cref="Equipment.ReferenceFov"/>), so a wider or narrower one zooms by as much.
+	/// </summary>
+	public float GetMagnification()
 	{
-		if ( ZoomLevel < 1 ) return 0f;
-		return ZoomLevels[Math.Clamp( ZoomLevel - 1, 0, ZoomLevels.Count )];
+		if ( ZoomLevel < 1 || ZoomLevels.Count == 0 ) return 1f;
+		return Equipment.OffsetMagnification( -ZoomLevels[Math.Clamp( ZoomLevel - 1, 0, ZoomLevels.Count - 1 )] );
 	}
 
 	protected override void OnUpdate()

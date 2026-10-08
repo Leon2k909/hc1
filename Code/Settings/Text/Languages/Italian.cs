@@ -1184,6 +1184,10 @@ public static partial class GameText
 		["View Bob"] = "Oscillazione della visuale",
 		["Streak Type"] = "Tipo di serie",
 		["Field Of View"] = "Campo visivo",
+		["ADS Field Of View"] = "Campo visivo in mira",
+		["Affected"] = "Influenzato",
+		["Independent"] = "Indipendente",
+		["Third Person Field Of View"] = "Campo visivo in terza persona",
 		["Picture-In-Picture Scopes"] = "Ottiche picture-in-picture",
 		["s&box Settings"] = "Impostazioni di s&box",
 		["Resolution, window mode and graphics quality are set in s&box itself and apply to every game."] =

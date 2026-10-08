@@ -38,6 +38,9 @@ public partial class PlayerMarker : Component, IMarkerObject, IDirectionalMinima
 	/// </summary>
 	Vector3 IMarkerObject.MarkerPosition => WorldPosition + Vector3.Up * 70f + DistOffset;
 
+	// Friendly identification must stay visible when aiming directly at a teammate.
+	bool IMarkerObject.LookOpacity => !Player.IsFriendly( Client.Viewer?.PlayerPawn );
+
 	bool IMarkerObject.ShouldShow()
 	{
 		if ( IsBot )

@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 /// up from its IK target and where the butt sits against the right shoulder. headDrop, buttToEye and side (the gun
 /// that far right of the eye) try out other shouldered poses than the bot's, into &lt;gun&gt;_d.._b.._s...png. Never
 /// edits the open scene.
+/// Optional pitch, yaw, movement speed, crouch and reload time exercise the full weapon correction in other poses.
 /// </summary>
 public static class Hc1BotGripQa
 {
@@ -66,15 +67,15 @@ public static class Hc1BotGripQa
 		File.WriteAllText( Path.Combine( folder, $"motion-{System.IO.Path.GetFileName( label )}.txt" ), $"Left: {Stats( errors )}\nRight mount: {Stats( rightErrors )}\nReturning from reload/spawn: {returning}\nWorst: {worst}" );
 	}
 
-	private record struct Tuning( float HeadDrop, float ButtToEye, float Side );
+	private record struct Tuning( float HeadDrop, float ButtToEye, float Side, float Pitch = 0f, float Yaw = 0f, float Speed = 0f, bool Crouch = false, float ReloadTime = -1f );
 
 	[ConCmd( "hc1_bot_grip_preview" )]
 	public static async void Preview( string only = "", bool dress = true, float headDrop = LightweightCombatBot.ShoulderedHeadDrop,
-		float buttToEye = LightweightCombatBot.ButtToEye, float side = 0f )
+		float buttToEye = LightweightCombatBot.ButtToEye, float side = 0f, float pitch = 0f, float yaw = 0f, float speed = 0f, bool crouch = false, float reloadTime = -1f )
 	{
-		var tuning = new Tuning( headDrop, buttToEye, side );
+		var tuning = new Tuning( headDrop, buttToEye, side, pitch, yaw, speed, crouch, reloadTime );
 		var suffix = tuning == new Tuning( LightweightCombatBot.ShoulderedHeadDrop, LightweightCombatBot.ButtToEye, 0f )
-			? "" : $"_d{headDrop:0.#}_b{buttToEye:0.#}_s{side:0.#}";
+			? "" : $"_d{headDrop:0.#}_b{buttToEye:0.#}_s{side:0.#}_p{pitch:0.#}_y{yaw:0.#}_v{speed:0.#}_c{crouch}_r{reloadTime:0.##}";
 		var folder = Path.Combine( Project.Current.GetRootPath(), "output", "bot-grip" );
 		Directory.CreateDirectory( folder );
 		foreach ( var weapon in LightweightCombatBot.WeaponPool().OrderBy( x => x.ResourceName ) )
@@ -108,6 +109,8 @@ public static class Hc1BotGripQa
 			WorldModel gun;
 			Transform handToGun;
 			var supportHand = new BotSupportHand();
+			var gripHand = new BotSupportHand( true );
+			var weaponPose = new BotWeaponPose();
 			CameraComponent camera;
 			using ( scene.Push() )
 			{
@@ -142,19 +145,30 @@ public static class Hc1BotGripQa
 			}
 
 			// 0.8 s: past the IK's 0.35 s blend, short of the rifle pose's long idle (1.1 s stood still).
-			var aim = new Vector3( 1f, 0f, -0.04f ).Normal;
+			var aim = Rotation.From( tuning.Pitch, tuning.Yaw, 0f ) * new Vector3( 1f, 0f, -0.04f ).Normal;
 			var time = 0f;
-			for ( var i = 0; i < 16; i++ )
+			var ticks = 16 + (tuning.ReloadTime >= 0f ? (int)MathF.Ceiling( tuning.ReloadTime / .05f ) + 1 : 0);
+			for ( var i = 0; i < ticks; i++ )
 			{
 				using ( scene.Push() )
 				{
-					Pose( body, gun, aim, shouldered, tuning );
+					var reloading = tuning.ReloadTime >= 0f && i >= 16;
+					if ( reloading && i == 16 ) body.SetBool( "b_reload", true );
+					Pose( body, gun, aim, shouldered, tuning, reloading );
 					time += 0.05f;
 					scene.EditorTick( time, 0.05f );
 					foreach ( var renderer in body.GameObject.Components.GetAll<SkinnedModelRenderer>( FindMode.EverythingInSelfAndDescendants ) )
 						renderer.SceneModel?.Update( 0.05f );
 					Follow( body, gun, handToGun );
-					if ( LeftTarget( body, gun ) is { } target )
+					var right = body.Model.Bones.GetBone( "hand_R" );
+					if ( right is not null )
+					{
+						var wrist = body.SceneModel.GetBoneWorldTransform( right.Index );
+						var shift = weaponPose.Fit( body, gun, supportHand, gripHand, wrist.Position, reloading ? 0f : 1f );
+						gripHand.Apply( body, wrist.WithPosition( wrist.Position + shift ) );
+						Follow( body, gun, handToGun );
+					}
+					if ( !reloading && LeftTarget( body, gun ) is { } target )
 						supportHand.Apply( body, body.WorldTransform.ToWorld( target ) );
 				}
 
@@ -171,9 +185,10 @@ public static class Hc1BotGripQa
 					(new Vector3( 62f, -34f, 60f ), new Vector3( 4f, 0f, 53f )),
 					(new Vector3( 4f, -62f, 58f ), new Vector3( 4f, 0f, 54f )),
 				};
+				var cameraDrop = tuning.Crouch && body.TryGetBoneTransform( "neck_0", out var neck ) ? Vector3.Up * (neck.Position.z - 57f) : Vector3.Zero;
 				for ( var v = 0; v < views.Length; v++ )
 				{
-					camera.WorldPosition = views[v].Item1;
+					camera.WorldPosition = views[v].Item1 + cameraDrop;
 					camera.WorldRotation = Rotation.LookAt( views[v].Item2 - views[v].Item1 );
 					scene.EditorTick( time, 0f );
 					camera.RenderToBitmap( tile );
@@ -188,22 +203,28 @@ public static class Hc1BotGripQa
 	}
 
 	/// <summary> The bot's parameters for standing still aiming along <paramref name="aim"/> (LightweightCombatBot.UpdateAnimation). </summary>
-	private static void Pose( SkinnedModelRenderer body, WorldModel gun, Vector3 aim, bool shouldered, Tuning tuning )
+	private static void Pose( SkinnedModelRenderer body, WorldModel gun, Vector3 aim, bool shouldered, Tuning tuning, bool reloading = false )
 	{
+		shouldered &= !reloading;
 		body.Set( "holdtype", (int)AnimationHelper.HoldTypes.Rifle );
 		body.Set( "holdtype_handedness", (int)AnimationHelper.Hand.Right );
+		body.SetBool( "b_twohanded", true );
 		body.SetBool( "b_grounded", true );
-		body.Set( "move_speed", 0f );
-		body.Set( "move_groundspeed", 0f );
-		body.Set( "move_x", 0f );
+		body.Set( "move_speed", tuning.Speed );
+		body.Set( "move_groundspeed", tuning.Speed );
+		body.Set( "move_x", tuning.Speed );
 		body.Set( "move_y", 0f );
 		body.Set( "move_z", 0f );
-		body.Set( "duck", 0f );
+		body.Set( "move_rate", 1f );
+		body.Set( "speed_move", 1f );
+		body.Set( "move_style", (int)AnimationHelper.MoveStyles.Run );
+		body.Set( "move_direction", 0f );
+		body.Set( "duck", tuning.Crouch ? 1f : 0f );
 		body.SetLookDirection( "aim_eyes", aim, 1f );
 		body.SetLookDirection( "aim_head", LightweightCombatBot.Lowered( aim, shouldered ? tuning.HeadDrop : 0f ), 1f );
 		body.SetLookDirection( "aim_body", aim, shouldered ? 1f : 0.75f );
 
-		var left = LeftTarget( body, gun );
+		var left = reloading ? null : LeftTarget( body, gun );
 		body.SetBool( "ik.hand_left.enabled", left.HasValue );
 		if ( left is { } l )
 		{
@@ -252,17 +273,19 @@ public static class Hc1BotGripQa
 
 	private static void Report( EquipmentResource weapon, SkinnedModelRenderer body, WorldModel gun, Vector3 aim, bool shouldered, Tuning tuning )
 	{
-		var left = LeftTarget( body, gun );
+		var left = tuning.ReloadTime >= 0f ? null : LeftTarget( body, gun );
 		var leftError = left is { } l && body.TryGetBoneTransform( "hand_L", out var leftHand )
 			? leftHand.Position.Distance( body.WorldTransform.PointToWorld( l.Position ) ) : -1f;
 		var eyeOnGun = EyeOnGun( gun, tuning );
-		var right = shouldered ? LightweightCombatBot.ShoulderedHandIk( body, gun, eyeOnGun, aim ) : null;
+		var right = shouldered && tuning.ReloadTime < 0f ? LightweightCombatBot.ShoulderedHandIk( body, gun, eyeOnGun, aim ) : null;
 		var rightError = right is { } r && body.TryGetBoneTransform( "hand_R", out var rightHand )
 			? rightHand.Position.Distance( body.WorldTransform.PointToWorld( r.Position ) ) : -1f;
 		var eye = body.GetAttachment( "eye_R_forward" );
 		var sights = eye is { } e ? gun.WorldTransform.PointToLocal( e.Position ) : Vector3.Zero;
 		var bounds = gun.ModelRenderer?.Model?.Bounds;
-		Log.Info( $"HC1_BOT_GRIP {weapon.ResourceName} {(shouldered ? "shouldered" : "carried")} leftError={leftError:0.00} rightError={rightError:0.00} eyeOnGun={eyeOnGun} eyeInGun={sights} bounds={bounds}" );
+		var mountError = body.TryGetBoneTransform( "hand_R", out var mountHand )
+			? gun.WorldPosition.Distance( mountHand.WithScale( 1f ).ToWorld( MilitaryUniform.WeaponHandOffset( body.Model ) ).Position ) : -1f;
+		Log.Info( $"HC1_BOT_GRIP {weapon.ResourceName} {(shouldered ? "shouldered" : "carried")} leftError={leftError:0.00} rightIkError={rightError:0.00} rightMountError={mountError:0.00} eyeOnGun={eyeOnGun} eyeInGun={sights} bounds={bounds}" );
 		if ( !shouldered || bounds is not { } b )
 			return;
 

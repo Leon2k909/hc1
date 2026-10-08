@@ -186,12 +186,21 @@ public sealed class CameraController : PawnCameraController, IGameEventHandler<D
 		if ( !Player.CurrentEquipment.IsValid() )
 			return;
 
+		// The scope zooms the aimed view further, so it follows the ADS Field Of View setting too.
 		if ( Player.CurrentEquipment.GetComponentInChildren<FlatScope>() is { } scope )
 		{
-			var fov = scope.GetFOV();
-			FieldOfViewOffset -= fov;
+			var aimed = HipFieldOfView + FieldOfViewOffset;
+			FieldOfViewOffset += Equipment.ZoomFov( aimed, scope.GetMagnification() ) - aimed;
 		}
 	}
+
+	/// <summary>
+	/// The field of view before aiming and effects: Settings → Video's Field Of View in first person, its Third Person
+	/// Field Of View from behind (the deathcam, spectating).
+	/// </summary>
+	public float HipFieldOfView => Mode == CameraMode.ThirdPerson
+		? GameSettingsSystem.Current.ThirdPersonFieldOfView
+		: GameSettingsSystem.Current.FieldOfView;
 
 	OpticZoom opticZoom;
 	bool fetchedInitial = false;
@@ -199,7 +208,7 @@ public sealed class CameraController : PawnCameraController, IGameEventHandler<D
 
 	private void Update( float eyeHeight )
 	{
-		var baseFov = GameSettingsSystem.Current.FieldOfView;
+		var baseFov = HipFieldOfView;
 		FieldOfViewOffset = 0;
 
 		if ( !Player.IsValid() )

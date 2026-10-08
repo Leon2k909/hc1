@@ -122,22 +122,29 @@
             pawn = Client.Viewer.PlayerPawn;
         }
 
-        var camera = pawn.IsValid() ? pawn.CameraController.Camera : Scene.Camera;
+        var system = Parent as MarkerSystem;
+        var camera = system is not null ? system.ProjectionCamera
+            : pawn.IsValid() ? pawn.CameraController.Camera : Scene.Camera;
         if ( !camera.IsValid() )
             return;
-
-        var toScreen = camera.PointToScreenNormal( Object.MarkerPosition, out IsBehind );
-
-        if ( Object.MarkerMaxDistance != 0f && camera.WorldPosition.Distance( Object.MarkerPosition ) > Object.MarkerMaxDistance )
-            IsBehind = true;
 
         bool wasOffScreen = IsOffScreen;
         bool wasBehind = IsBehind;
 
+        var toScreen = system?.ScopeView == true
+            ? OpticZoom.PointToLensNormal( camera, Object.MarkerPosition, out IsBehind )
+            : camera.PointToScreenNormal( Object.MarkerPosition, out IsBehind );
+
+        if ( Object.MarkerMaxDistance != 0f && camera.WorldPosition.Distance( Object.MarkerPosition ) > Object.MarkerMaxDistance )
+            IsBehind = true;
+
         SetClass( "is-behind", IsBehind );
 
         if ( IsBehind && !ClampToScreen )
+        {
+            if ( wasBehind != IsBehind ) StateHasChanged();
             return;
+        }
 
         CenterDistance = DistanceFromCenter( toScreen );
 

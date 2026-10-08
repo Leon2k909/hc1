@@ -1,12 +1,8 @@
 @import "/UI/Styles/Theme.scss";
 
-// One dark plate per kill, like the medal banners: it fades out towards the middle of the screen and ends in a thin
-// bar at the screen edge, gold on your kills (with one warm flash) and red on your deaths. Guns are their silhouettes,
-// mirrored to point at the victim; anything without one (grenades, falls) is written out.
+// Neutral entries keep team colours and weapon silhouettes readable without a decorative rail or flash.
 
 $feed-ease: cubic-bezier( 0.23, 1, 0.32, 1 );
-$kill-gold: #ffc96a;
-$death-red: #e0463c;
 
 KillFeed
 {
@@ -16,8 +12,10 @@ KillFeed
     flex-direction: column;
     align-items: flex-end;
     gap: 4px;
-    font-family: $main-font;
+    font-family: $hud-font;
     pointer-events: none;
+
+    label { font-family: $hud-font; }
 
     // The entry only fades out; the plate inside slides in, so the two animations don't fight over transform.
     .entry
@@ -35,46 +33,21 @@ KillFeed
     {
         position: relative;
         height: 34px;
-        padding: 0px 16px 0px 80px;
+        padding: 0px 12px;
         gap: 10px;
         align-items: center;
-        background-image: linear-gradient( to right, rgba( 10, 14, 20, 0 ), rgba( 10, 14, 20, 0.6 ) 30%, rgba( 10, 14, 20, 0.86 ) 65% );
+        background-color: $hud-plate;
         animation: feed-in 0.32s $feed-ease both;
 
         &.mine
         {
-            background-image: linear-gradient( to right, rgba( 44, 32, 12, 0 ), rgba( 44, 32, 12, 0.62 ) 30%, rgba( 58, 42, 14, 0.9 ) 65% );
-
-            .edge { background-color: $kill-gold; }
+            background-color: rgba( black, 0.52 );
         }
 
         &.died
         {
-            background-image: linear-gradient( to right, rgba( 48, 12, 12, 0 ), rgba( 48, 12, 12, 0.62 ) 30%, rgba( 62, 14, 14, 0.9 ) 65% );
-
-            .edge { background-color: $death-red; }
+            background-color: rgba( 45, 10, 10, 0.48 );
         }
-    }
-
-    .edge
-    {
-        position: absolute;
-        top: 0px;
-        bottom: 0px;
-        right: 0px;
-        width: 3px;
-        background-color: rgba( white, 0.2 );
-    }
-
-    .flash
-    {
-        position: absolute;
-        left: 0px;
-        top: 0px;
-        right: 0px;
-        bottom: 0px;
-        background-image: linear-gradient( to right, rgba( 255, 201, 106, 0 ), rgba( 255, 201, 106, 0.4 ) );
-        animation: feed-flash 0.7s linear both;
     }
 
     .name
@@ -84,7 +57,7 @@ KillFeed
 
         label
         {
-            font-size: 17px;
+            font-size: 16px;
             font-weight: 700;
             white-space: nowrap;
             text-shadow: 0px 1px 2px black;
@@ -129,8 +102,6 @@ KillFeed
     {
         font-size: 12px;
         font-weight: 700;
-        font-style: italic;
-        letter-spacing: 1px;
         text-transform: uppercase;
         color: rgba( white, 0.8 );
         white-space: nowrap;
@@ -140,12 +111,6 @@ KillFeed
 
 @keyframes feed-in
 {
-    0% { opacity: 0; transform: translateX( 32px ); }
+    0% { opacity: 0; transform: translateX( 12px ); }
     100% { opacity: 1; transform: translateX( 0px ); }
-}
-
-@keyframes feed-flash
-{
-    0% { opacity: 1; }
-    100% { opacity: 0; }
 }

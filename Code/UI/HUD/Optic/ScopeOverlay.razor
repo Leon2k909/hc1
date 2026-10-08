@@ -9,11 +9,12 @@
 <root style="opacity: @Alpha">
     <div class="mount" style="left: @(OffsetX)%; top: @(OffsetY)%;">
         <div class="lens" @ref="Lens" style="width: @(LensWidthPercent)%; height: @(LensHeightPercent)%;">
-            <div class="vignette"></div>
+            <MarkerSystem ScopeView="@(true)" />
             @if (OpticZoom.OverlayDotVisible)
             {
                 <div class="dot"></div>
             }
+            <ScopeShadow class="eye-shadow" />
         </div>
     </div>
 </root>
@@ -26,8 +27,7 @@
     Panel Lens { get; set; }
     Texture _bound;
 
-    // How well the optic lines up with the eye (OpticZoom works it out from where the eyepiece is), so the picture comes
-    // in as the scope reaches the eye rather than waiting for the camera's zoom.
+    // Fade only as the optic reaches/leaves the eye. Misalignment inside a raised scope is opaque black shadow.
     float Alpha => MathF.Round( OpticZoom.LensVisibility, 3 );
 
     float LensHeightPercent => MathF.Round( Diameter * OpticZoom.LensScale * 100f, 2 );

@@ -52,7 +52,11 @@ public static class Explosion
 			var force = direction * distance * 50f;
 
 			DamageInfo damageInfo =
-				new DamageInfo( attacker, damage, inflictor, point, force, Flags: DamageFlags.Explosion );
+				new DamageInfo( attacker, damage, inflictor, point, force, Flags: DamageFlags.Explosion )
+				{
+					SeveredLimbs = hc.IsValid() && damage > 0f
+						? BlastDismemberment.Select( hc, point, trace ) : BlastLimb.None
+				};
 			
 			hc?.TakeDamage(damageInfo);
 			prop?.OnDamage( Tec.Utils.CreateDamageInfo(damageInfo) );

@@ -35,6 +35,12 @@ public static partial class GameText
 			"Ocultar nombres de compañeros", "Ocultar nomes dos aliados"),
 		["Streak Type"] = ("Type de série", "Serientyp", "Tipo de racha", "Tipo de sequência"),
 		["Field Of View"] = ("Champ de vision", "Sichtfeld", "Campo de visión", "Campo de visão"),
+		["ADS Field Of View"] = ("Champ de vision en visée", "Sichtfeld beim Zielen", "Campo de visión al apuntar",
+			"Campo de visão ao mirar"),
+		["Affected"] = ("Affecté", "Beeinflusst", "Afectado", "Afetado"),
+		["Independent"] = ("Indépendant", "Unabhängig", "Independiente", "Independente"),
+		["Third Person Field Of View"] = ("Champ de vision à la troisième personne", "Sichtfeld in der Verfolgerperspektive",
+			"Campo de visión en tercera persona", "Campo de visão em terceira pessoa"),
 		["Picture-In-Picture Scopes"] = ("Lunettes en incrustation d'image", "Bild-in-Bild-Zielfernrohre",
 			"Miras con imagen en imagen", "Lunetas com imagem na imagem"),
 

@@ -11,7 +11,8 @@ namespace Facepunch.UI;
 /// main camera, and <c>hc1_viewmodel_mask.shader</c> turns that into the mask: white where the view is open, black
 /// where the gun, its parts or the arms cover it. Only surfaces that write depth cover it, and reticles and lens glass
 /// don't (<c>m4_optic_lens.shader</c>), so markers still show through a red dot's window, the iron sights' aperture and
-/// see-through magazines. A magnified optic's picture writes depth, so it hides them.
+/// see-through magazines. The magnified lens hides the main camera's markers; ScopeOverlay draws a separate set
+/// projected by the lens camera there.
 /// </remarks>
 public sealed class ViewModelMask : IDisposable
 {
@@ -121,6 +122,12 @@ public sealed class ViewModelMask : IDisposable
 
 		_commands.SetRenderTarget( _target );
 		_commands.Attributes.Set( "GunDepth", depth.DepthTexture, 0 );
+		// Hide unzoomed markers beneath the magnified UI picture, including optics with transparent glass.
+		var lensCenter = new Vector2( width * 0.5f, height * 0.5f )
+			+ OpticZoom.ScopeOffset * height;
+		var lensRadius = OpticZoom.LensDiameter * OpticZoom.LensScale * height * 0.5f;
+		_blitAttributes.Set( "ScopeLens", new Vector4( lensCenter.x, lensCenter.y, lensRadius,
+			OpticZoom.LensTexture is not null ? OpticZoom.LensVisibility : 0f ) );
 		_commands.Blit( MaskMaterial, _blitAttributes );
 		_commands.ClearRenderTarget();
 		_commands.ReleaseRenderTarget( depth );

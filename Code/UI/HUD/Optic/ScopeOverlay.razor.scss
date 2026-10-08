@@ -32,14 +32,13 @@ ScopeOverlay
         align-items: center;
     }
 
-    // Light falling off towards the rim of the glass.
-    .vignette
+    // Painted after the reticle: an off-centre eye sees an opaque crescent, including over HUD markers.
+    .eye-shadow
     {
         position: absolute;
         width: 100%;
         height: 100%;
         border-radius: 50%;
-        background-image: radial-gradient( rgba( black, 0 ) 70%, rgba( black, 0.35 ) 90%, rgba( black, 0.8 ) 100% );
     }
 
     .dot

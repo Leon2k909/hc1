@@ -547,6 +547,10 @@ public static partial class GameText
 		["View Bob"] = "Kamera sallanması",
 		["Streak Type"] = "Seri türü",
 		["Field Of View"] = "Görüş alanı",
+		["ADS Field Of View"] = "Nişan alırken görüş alanı",
+		["Affected"] = "Bağlı",
+		["Independent"] = "Bağımsız",
+		["Third Person Field Of View"] = "Üçüncü şahıs görüş alanı",
 		["Picture-In-Picture Scopes"] = "Dürbünlerde resim içinde resim",
 		["s&box Settings"] = "s&box ayarları",
 		["Resolution, window mode and graphics quality are set in s&box itself and apply to every game."] =

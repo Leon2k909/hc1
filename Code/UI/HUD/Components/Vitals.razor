@@ -6,7 +6,6 @@
 
 <root>
     <div class="plate">
-        <div class="edge" />
         <div class="rows">
             <div class="health-row">
                 <Icon File="/ui/health.png" Size="@(20)" />
@@ -27,9 +26,8 @@
                     <div class="armor-bar"><div class="fill" style="width: @(ArmorPercent)%;" /></div>
                     @if ( HasHelmet )
                     {
-                        <div class="chip">
-                            <Icon File="/ui/helmet.png" Size="@(10)" />
-                            <label>@Tr( "HELMET" )</label>
+                        <div class="helmet" title="@Tr( "HELMET" )">
+                            <Icon File="/ui/helmet.png" Size="@(16)" />
                         </div>
                     }
                 </div>
