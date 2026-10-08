@@ -1,0 +1,11 @@
+{
+  "tool": "image_gen.imagegen (built-in)",
+  "reference": "codex-clipboard-e50a2c14-ba08-4edf-9d27-e156bb3a178b.png",
+  "albedo": "lt_skip_color.png",
+  "albedoDimensions": [
+    1774,
+    887
+  ],
+  "prompt": "Use case: texture-extraction.\nAsset type: game prop PBR base-colour texture, one flat rectangular steel panel, 3072 x 1536 landscape.\nInput image 1: reference for the exact industrial mustard-yellow paint, scratches and rust only.\nPrimary request: transform the yellow steel surface from the reference into a flat, front-on, full-bleed albedo texture. Remove all geometry, ribs, perspective, rim, background, light and shadow. Fill every pixel with the material.\nMaterials: aged ochre yellow enamel on steel, roughly 85 percent surviving yellow paint, scattered fine irregular chips revealing dark grey steel and brown corrosion, thin random abrasion scratches, small gritty rust pits, subtle vertical rust drips. Modestly denser rust and scraped paint within the top and bottom five percent of the panel. Match the reference's yellow-orange hue and realistic small-scale damage. Sharp fine photographic detail; wear must remain varied and believable across the large panel.\nLighting: perfectly diffuse and even, base colour only with no baked highlights, shadows or ambient occlusion.\nConstraints: no letters, logo, warning stripes, borders, seams, screws, ribs, bevels, object silhouette or surrounding scene. Single continuous flat material, no collage or texture-map grid.",
+  "materialData": "Tools/lowtide_skip.py derives normal, roughness and metalness; the generated base colour is unchanged."
+}

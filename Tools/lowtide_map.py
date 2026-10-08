@@ -52,6 +52,9 @@ import map_kit as K
 from map_kit import Model, Wall, arc
 import railhead_map as R
 import railhead_preview as PV
+import lowtide_skip as SKIP
+import lowtide_forklift as FORKLIFT
+import lowtide_shipyard as SHIPYARD
 
 TITLE = "Lowtide"
 OUT_DIR = K.ASSETS / "models/maps/lowtide"
@@ -67,10 +70,10 @@ ids = K.SceneIds( "c3f0a2d4-6b1e-4f7a-9d25-8e41b7c06a93" )
 
 METAL, STONE, WOOD, GLASS, DIRT = "metal", "default", "wood", "glass", "dirt"
 
-# Railhead's sky and its sun (a clear afternoon, the sun 38 degrees up from the south-south-west): the Fleet runs north
-# and south, so the sun looks straight up it from the harbour.
+# Keep the warm afternoon sun shining up the Fleet from the harbour. Lowtide has
+# its own coastal sky: shaded cloud layers drift while the sun remains fixed.
 SUN_PITCH, SUN_YAW = R.SUN_PITCH, R.SUN_YAW
-SKY_MATERIAL = R.SKY_MATERIAL
+SKY_MATERIAL = "materials/lowtide/sky/lowtide_sky.vmat"
 SKY_EXPOSURE = R.SKY_EXPOSURE
 FOG_COLOUR = R.FOG_COLOUR
 CATCH_FLOOR_Z = -3000
@@ -129,7 +132,6 @@ LT_PAINTED = {
     "lt_hull_black": ( ( 30, 31, 33 ), 0.2, 0.5 ),
     "lt_rope": ( ( 140, 118, 84 ), 0.0, 0.85 ),
     "lt_rubber": ( ( 26, 26, 27 ), 0.0, 0.8 ),
-    "lt_skip": ( ( 196, 142, 28 ), 0.1, 0.55 ),
 }
 GRAIN = { "lt_timber" }          # wood whose grain runs along each piece
 # The west half's repaint, so each side reads as its team's: sooty brick, cream frames, red doors.
@@ -165,6 +167,9 @@ def write_materials():
     for name, ( colour, metal, rough ) in LT_PAINTED.items():
         text = RM.painted_vmat( name, colour, metal, rough ).replace( "Tools/railhead_materials.py", "Tools/lowtide_map.py" )
         K.write_text( MAT_DIR / f"{name}.vmat", text )
+    SKIP.write_materials()
+    FORKLIFT.write_materials()
+    SHIPYARD.write_materials()
 
 
 def configure( model ):
@@ -174,6 +179,8 @@ def configure( model ):
             model.material_overrides[paint] = f"materials/lowtide/{paint}.vmat"
             model.tile_overrides[paint] = lt_tile( paint )
     R.configure( model )
+    SKIP.configure( model )
+    SHIPYARD.configure( model )
     model.grain_paints |= { p for p in model.polygons if p in GRAIN }
     return model
 
@@ -1269,14 +1276,16 @@ def water_model():
     w = 128.0
     m.polygon( "lt_water", [ ( -w, MOUTH_N, WATER_Z ), ( w, MOUTH_N, WATER_Z ), ( w, NORTH_ROW_N, WATER_Z ), ( -w, NORTH_ROW_N, WATER_Z ) ] )
     m.polygon( "lt_water", [ ( -w - 20, PLAY[2], HARBOUR_Z + 4 ), ( w + 20, PLAY[2], HARBOUR_Z + 4 ), ( w, MOUTH_N, WATER_Z ), ( -w, MOUTH_N, WATER_Z ) ] )
-    m.polygon( "lt_water", [ ( -12000, -16000, HARBOUR_Z ), ( 12000, -16000, HARBOUR_Z ), ( 12000, QUAY_N, HARBOUR_Z ), ( -12000, QUAY_N, HARBOUR_Z ) ] )
+    harbour_width = SHIPYARD.SHORE_EXTENT + 500.0
+    m.polygon( "lt_water", [ ( -harbour_width, -16000, HARBOUR_Z ), ( harbour_width, -16000, HARBOUR_Z ),
+                            ( harbour_width, QUAY_N, HARBOUR_Z ), ( -harbour_width, QUAY_N, HARBOUR_Z ) ] )
     puddles( m, MOUTH_N, STREET_N[0] - 40, 26, 7 )
     puddles( m, STREET_N[1] + 40, NORTH_ROW_N - 100, 18, 11 )
     return m
 
 
 # ---------------------------------------------------------------------------------------------------------------------
-# The backdrop: the Fleet running on north to the building over its head, the harbour's far shore, a tug at the quay
+# The backdrop: the Fleet running on north to the building over its head and the harbour's far shore
 
 def backdrop():
     m = Model()
@@ -1299,79 +1308,21 @@ def backdrop():
     card( m, "lt_brick_slime", [ ( -150, NORTH_ROW_N - 0.3, BED_Z - 12 ), ( 150, NORTH_ROW_N - 0.3, BED_Z - 12 ),
                                  ( 150, NORTH_ROW_N - 0.3, -58 ), ( -150, NORTH_ROW_N - 0.3, -58 ) ], ( 0, -1, 0 ) )
     far_shore( m )
-    tug( m, 1720.0, -1800.0 )
     return m
 
 
-def far_shore( m, n=-7600.0 ):
-    """ The harbour's far side, 150 m off and in the haze: a quay with long brick and iron sheds, quay cranes, a ship
-    at its berth, and the city's blocks behind. """
-    card( m, "ashlar_grey", [ ( -12000, n, HARBOUR_Z - 10 ), ( 12000, n, HARBOUR_Z - 10 ), ( 12000, n, 40 ), ( -12000, n, 40 ) ], ( 0, 1, 0 ) )
-    m.polygon( "rw_concrete_dark", [ ( -12000, n - 2600, 40 ), ( 12000, n - 2600, 40 ), ( 12000, n, 40 ), ( -12000, n, 40 ) ] )
-    rng = np.random.default_rng( 5 )
-    e = -10000.0
-    while e < 10000:
-        length = rng.uniform( 900, 1600 )
-        height = rng.uniform( 260, 520 )
-        paint = rng.choice( [ "brick", "lt_brick_soot", "corrugated" ] )
-        m.box( ( e, n - 1000, 40 ), ( e + length, n - 300, 40 + height ), { "default": paint, "-z": None } )
-        roof( m, e, e + length, n - 1000, n - 300, 40 + height, along="e", pitch=0.35, paint="slate" if paint != "corrugated" else "corrugated" )
-        e += length + rng.uniform( 120, 400 )
-    for e in np.arange( -9200, 9600, 1150 ):
-        far_crane( m, e + rng.uniform( -150, 150 ), n - 120 )
-    # A ship at the berth: hull, superstructure aft, two deck cranes.
-    m.prism( [ ( -3400, n + 320 ), ( -600, n + 320 ), ( -350, n + 200 ), ( -600, n + 80 ), ( -3400, n + 80 ), ( -3480, n + 200 ) ],
-             HARBOUR_Z - 30, 120, { "side": "lt_hull_black", "top": "rw_concrete_dark" }, None )
-    m.box( ( -3300, n + 110, 120 ), ( -2900, n + 290, 420 ), "rw_white_paint" )
-    m.box( ( -3200, n + 140, 420 ), ( -3000, n + 260, 500 ), "rw_white_paint" )
-    for e in ( -2300, -1500 ):
-        m.box( ( e - 20, n + 180, 120 ), ( e + 20, n + 220, 420 ), "lt_crane_red" )
-        m.beam( ( e, n + 200, 400 ), ( e + 450, n + 200, 330 ), ( 18.0, 14.0 ), "lt_crane_red" )
-    # The city behind: blocks of offices and warehouses rising into the haze, and a church tower.
-    for k in range( 26 ):
-        e = -11000 + k * 860 + rng.uniform( -200, 200 )
-        depth = n - 2800 - rng.uniform( 0, 2500 )
-        h = rng.uniform( 500, 1500 )
-        w = rng.uniform( 400, 800 )
-        m.box( ( e, depth - 600, 40 ), ( e + w, depth, 40 + h ), { "default": rng.choice( [ "brick", "lt_brick_soot", "rw_facade_grey" ] ),
-                                                                    "-z": None } )
-    m.box( ( 2600, n - 3900, 40 ), ( 2900, n - 3600, 2200 ), { "default": "lt_brick_soot", "-z": None } )
-    spire( m, ( 2750, n - 3750 ), 2200, 200.0, 1100.0, "copper", sides=8 )
-
-
-def far_crane( m, e, n ):
-    """ A level-luffing quay crane, far off: a portal, the machinery house and the jib reaching out over the water. """
-    for de in ( -60, 60 ):
-        for dn in ( -70, 70 ):
-            m.box( ( e + de - 8, n + dn - 8, 40 ), ( e + de + 8, n + dn + 8, 300 ), "lt_crane_red" )
-    m.box( ( e - 90, n - 90, 300 ), ( e + 90, n + 90, 460 ), "lt_crane_red" )
-    m.beam( ( e, n + 60, 460 ), ( e, n + 1200, 900 ), ( 30.0, 30.0 ), "lt_crane_red" )
-    m.beam( ( e, n - 20, 520 ), ( e, n + 70, 1050 ), ( 20.0, 20.0 ), "lt_crane_red" )
-
-
-def tug( m, e, n ):
-    """ A harbour tug alongside the quay: black hull, red boot-topping, white wheelhouse, a buff funnel. """
-    z = HARBOUR_Z
-    hull = [ ( e - 60, n - 170 ), ( e + 60, n - 170 ), ( e + 70, n - 40 ), ( e + 55, n + 130 ), ( e, n + 200 ), ( e - 55, n + 130 ),
-             ( e - 70, n - 40 ) ]
-    m.prism( hull, z - 20, z + 6, { "side": "lt_hull_red", "top": None, "bottom": None }, None )
-    m.prism( hull, z + 6, z + 64, { "side": "lt_hull_black", "top": "rw_concrete_dark", "bottom": None }, None )
-    m.prism( [ ( x + ( e - x ) * 0.06, y + ( n - y ) * 0.06 ) for x, y in hull ], z + 64, z + 70, { "side": "lt_rubber", "top": None }, None )
-    m.box( ( e - 40, n - 60, z + 64 ), ( e + 40, n + 40, z + 140 ), "rw_white_paint" )
-    m.box( ( e - 36, n - 10, z + 140 ), ( e + 36, n + 40, z + 190 ), { "default": "rw_white_paint", "+n": "rw_window_dark",
-                                                                         "-e": "rw_window_dark", "+e": "rw_window_dark" } )
-    m.box( ( e - 42, n - 14, z + 190 ), ( e + 42, n + 44, z + 194 ), "rw_white_paint" )
-    m.cylinder( ( e, n - 40 ), 16, z + 140, z + 230, { "side": "rw_yellow_paint", "top": "rw_black" }, sides=10 )
-    for k in range( 7 ):
-        t = -0.9 + 0.3 * k
-        tyre( m, e + 70 * math.sin( t ) * 1.02, n - 40 + 120 * math.cos( t ) * 0.5 - 60, z + 30 )
+def far_shore( m ):
+    """ Detailed photographic shipyard across the harbour; the near quay remains normal map geometry. """
+    SHIPYARD.build( m )
 
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Dressing, built for each side in place (so number plates read the right way round): s is +1 east, -1 west
 
 def use( name, m, *args, **kw ):
-    """ railhead_props' <name>, through railhead_map's `use` (reported if it fails, with no stand-in). """
+    """Lowtide's forklift, or shared Railhead props through its checked builder."""
+    if name == "forklift":
+        return FORKLIFT.build( m, *args, **kw )
     return R.use( name, m, *args, **kw )
 
 
@@ -1437,23 +1388,8 @@ def quay_crane( m, s, e ):
 
 
 def skip_bin( m, s, e, n, along="n" ):
-    """ A builder's skip, yellow, open: a trapezoid steel box with its rubble. """
-    e = s * e
-    l0, l1, w, h = 72.0, 52.0, 34.0, 38.0
-    if along == "n":
-        base = [ ( e - w, n - l1 ), ( e + w, n - l1 ), ( e + w, n + l1 ), ( e - w, n + l1 ) ]
-        top = [ ( e - w - 4, n - l0 ), ( e + w + 4, n - l0 ), ( e + w + 4, n + l0 ), ( e - w - 4, n + l0 ) ]
-    else:
-        base = [ ( e - l1, n - w ), ( e + l1, n - w ), ( e + l1, n + w ), ( e - l1, n + w ) ]
-        top = [ ( e - l0, n - w - 4 ), ( e + l0, n - w - 4 ), ( e + l0, n + w + 4 ), ( e - l0, n + w + 4 ) ]
-    for k in range( 4 ):
-        a, b = base[k], base[( k + 1 ) % 4]
-        c, d = top[( k + 1 ) % 4], top[k]
-        mid = np.array( ( ( a[0] + b[0] ) / 2 - e, ( a[1] + b[1] ) / 2 - n, 0.0 ) )
-        card( m, "lt_skip", [ ( *a, 4.0 ), ( *b, 4.0 ), ( *c, h ), ( *d, h ) ], mid )
-    m.polygon( "rubble", [ ( *p, h - 6 ) for p in top ] )
-    xs, ys = [ p[0] for p in top ], [ p[1] for p in top ]
-    m.collision_box( ( min( xs ), min( ys ), 0.0 ), ( max( xs ), max( ys ), h ), METAL )
+    """Reference-detailed yellow steel skip, with an open interior and the original cover collider."""
+    SKIP.build( m, ( s * e, n, 0.0 ), along )
 
 
 def tree( m, s, e, n, scale=1.0 ):
@@ -1487,26 +1423,19 @@ def dress_side( s ):
     crates( m, s, 560, 460, FLOOR1, [ ( 0, 0, 2 ), ( 1, 0, 1 ) ], seed=5 )
     crates( m, s, 420, 900, FLOOR1, [ ( 0, 0, 1 ), ( 1, 0, 2 ), ( 1, 1, 1 ) ], seed=10 )
     crates( m, s, 820, 600, FLOOR1, [ ( 0, 0, 2 ), ( 0, 1, 1 ) ], seed=11 )
-    # The yard: a skip, pallets, a van at the shed.
+    # The yard: a skip and pallets.
     skip_bin( m, s, 860, -560 )
     use( "pallet_stack", m, s * 700, -1000, 0.0, 5, "e" )
-    use( "van", m, s * 780, -800, "+n", "rw_car_white", 0.0, "HL K 3814" if s > 0 else "HL W 1384" )
     crates( m, s, 420, -560, 0.0, [ ( 0, 0, 2 ), ( 1, 0, 1 ) ], seed=6 )
     # The cross street and the square.
-    use( "car", m, s * 1255, 200, "+n", "rw_car_blue" if s > 0 else "rw_car_red", 0.0, "hatch" )
-    use( "car", m, s * 1255, -400, "-n", "rw_car_grey", 0.0, "estate" )
     for n in ( -820.0, -100.0, 620.0 ):
         use( "lamp_post", m, s * 1285, n, 190.0 )
     tree( m, s, 1450, -430 )
     tree( m, s, 1450, 430 )
     for n in ( -280.0, 280.0 ):
         use( "bench", m, s * 1420, n, 0.0, face( s, "+e" ) )
-    use( "van", m, s * 2120, -420, "+n", "rw_car_silver", 0.0, "HL D 1834" if s > 0 else "HL L 4381" )
-    use( "car", m, s * 1700, -540, "+e" if s > 0 else "-e", "rw_car_white", 0.0, "hatch" )
-    use( "car", m, s * 1940, -540, "+e" if s > 0 else "-e", "rw_car_grey", 0.0, "estate" )
     use( "pallet_stack", m, s * 2130, 300, 0.0, 5, "n" )
-    # The north street: a parked car, bollards along the kerb, lamps.
-    use( "car", m, s * 1500, 1240, "+e" if s > 0 else "-e", "rw_car_black", 0.0, "estate" )
+    # The north street: bollards along the kerb, lamps.
     for e in np.arange( 1050, 2200, 160 ):
         use( "bollard", m, s * e, 1205, 5.0 )
     for e in ( 900.0, 1700.0 ):
@@ -1518,7 +1447,7 @@ def dress_side( s ):
     use( "container", m, s * 1760, -1150, 0.0, "20", "e", "rw_container_grey" )
     crates( m, s, 1380, -1470, 0.0, [ ( 0, 0, 2 ), ( 1, 0, 3 ), ( 0, 1, 1 ) ], seed=7 )
     sacks_at( m, s, 1820, -1450, 0.0, rows=2, cols=3, layers=3, along="e" )
-    use( "forklift", m, s * 1100, -1180, face( s, "+e" ), 0.0, 20.0 )
+    use( "forklift", m, s * 1100, -1180, face( s, "+e" ), 0.0, 0.0 )
     crates( m, s, 900, -1420, 0.0, [ ( 0, 0, 2 ), ( 0, 1, 2 ), ( 1, 1, 1 ) ], seed=8 )
     use( "pallet_stack", m, s * 2080, -1150, 0.0, 6, "n" )
     for e in np.arange( 360, 2200, 330 ):
@@ -1938,7 +1867,7 @@ def write_scene( written, light_list, props ):
             K.component( ids, "Facepunch.MinimapRenderer", "minimap/renderer", CurrentMinimapPath=MINIMAP_PATH,
                          ExportResolution=f"{MINIMAP_PIXELS},{MINIMAP_PIXELS}", Size=int( MINIMAP_SIZE ) ),
         ] ),
-        # Railhead's sun, matching the sky: from the south-south-west, 38 degrees up, so it shines up the Fleet from
+        # The sun, matching Lowtide's sky: from the south-south-west, 38 degrees up, so it shines up the Fleet from
         # the harbour and lights the warehouses' south ends and the quay.
         K.game_object( ids, "Sun", "sun", ( 0, 0, 3000 ), K.angles_rotation( SUN_PITCH, SUN_YAW ), tags="light_directional,light",
                        components=[
@@ -1948,6 +1877,7 @@ def write_scene( written, light_list, props ):
         ] ),
         K.game_object( ids, "Sky", "sky", tags="skybox", components=[
             K.component( ids, "Sandbox.SkyBox2D", "sky/box", SkyIndirectLighting=True, SkyMaterial=SKY_MATERIAL, Tint="1,1,1,1" ),
+            K.component( ids, "Facepunch.DriftingCloudSky", "sky/cloud_clock" ),
         ] ),
         K.game_object( ids, "Fog", "fog", components=[
             K.component( ids, "Sandbox.GradientFog", "fog/gradient", Color=f"{FOG_COLOUR},0.75", StartDistance=3000,
@@ -2032,6 +1962,9 @@ def write_map_art( models ):
         PV._colours[paint] = PV.paint_colour( source.split( "/" )[1] ) * np.array( tint )
     for paint, ( colour, _, _ ) in LT_PAINTED.items():
         PV._colours[paint] = np.array( colour ) / 255.0
+    skip_colour = np.asarray( Image.open( MAT_DIR / "lt_skip_color.png" ).convert( "RGB" ), float ).mean( axis=( 0, 1 ) ) / 255.0
+    for paint, ( tint, _ ) in SKIP.PAINTS.items():
+        PV._colours[paint] = skip_colour * np.array( tint )
     opaque, glass = PV.triangles( models ), PV.triangles( models, glass=True )
     image = PV.perspective( opaque, glass, ( 0, -1900, 420 ), ( 0, 600, 60 ), size=( 960, 540 ), fov=70 )
     MAP_ART_FILE.parent.mkdir( parents=True, exist_ok=True )

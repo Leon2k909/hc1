@@ -1,14 +1,18 @@
-// Tools/lowtide_map.py
+// Tools/lowtide_skip.py: yellow enamel, chipped steel and corrosion
 "Layer0"
 {
     shader "shaders/complex.shader"
     F_SPECULAR "1"
-    g_flRoughnessScaleFactor "1"
-    g_flMetalness "0.10"
-    TextureColor "materials/default/default_color.tga"
-    TextureNormal "materials/default/default_normal.tga"
-    TextureRoughness "[0.550000 0.550000 0.550000 0.000000]"
-    TextureAmbientOcclusion "materials/default/default_ao.tga"
-    g_vColorTint "[0.768627 0.556863 0.109804 1.000000]"
-    g_flModelTintAmount "1.0"
+    F_METALNESS_TEXTURE "1"
+    g_flAmbientOcclusionDirectDiffuse "1"
+    g_flAmbientOcclusionDirectSpecular "1"
+    g_flRoughnessScaleFactor "1.000"
+    g_flMetalness "0"
+    g_vColorTint "[1.0 1.0 1.0 1]"
+    g_flModelTintAmount "1"
+    TextureAmbientOcclusion "materials/lowtide/lt_skip_ao.png"
+    TextureColor "materials/lowtide/lt_skip_color.png"
+    TextureNormal "materials/lowtide/lt_skip_normal.png"
+    TextureRoughness "materials/lowtide/lt_skip_rough.png"
+    TextureMetalness "materials/lowtide/lt_skip_metal.png"
 }
