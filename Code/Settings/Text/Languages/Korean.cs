@@ -262,6 +262,8 @@ public static partial class GameText
 			"러시아제 5.45x39mm 돌격소총으로, 2018년의 칼라시니코프입니다. 레일이 달린 기관부 덮개와 핸드가드, 접이식 신축 개머리판, 2점사를 갖췄습니다.",
 		["Russian 7.62x39mm assault rifle: the AK-12 in the AKM's round, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
 			"러시아제 7.62x39mm 돌격소총으로, AKM의 탄약을 쓰는 AK-12입니다. 레일이 달린 기관부 덮개와 핸드가드, 접이식 신축 개머리판, 2점사를 갖췄습니다.",
+		["Russian 5.45x39mm assault rifle: the Russian army's standard Kalashnikov since 1991, with a black polymer handguard and side-folding stock. Optics go on a side mount, as on the real gun."] =
+			"러시아제 5.45x39mm 돌격소총으로, 1991년부터 러시아군의 제식 칼라시니코프입니다. 검은 폴리머 핸드가드와 측면 접이식 개머리판을 갖췄습니다. 조준경은 실총처럼 측면 마운트에 올립니다.",
 		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
 			"AKM의 리브가 있는 강철 30발 탄창입니다. 재장전 속도는 표준입니다.",
 		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =

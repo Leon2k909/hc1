@@ -1468,8 +1468,62 @@ AK15 = Weapon(
     grip_pose="a_delta_barhvyshort_additive_for_offset",
 )
 
+def ak74m_materials() -> dict[str, str]:
+    # Built by ak74m_assets.py: Tarkov's AK-74M, plus the AK-12's manifest (the AK-105's magazines and rail mount, and the
+    # AK grips).
+    assets = json.loads((ASSETS / "Weapons" / "AK74M" / "ak74m_assets.json").read_text(encoding="utf-8"))
+    return assets["materials"]
+
+
+# The AK-74M (5.45x39mm, Kalashnikov's 6P20): Escape from Tarkov's AK-74M from the ARC9 EFT Assault Rifles pack (Workshop
+# 2962829818), the real gun as issued: its 415 mm barrel with the 6P20 0-20 muzzle brake, the plain dust cover, the
+# black polymer handguard and side-folding stock, the tangent rear sight and the 6L23 polymer magazine. It's on the
+# AK-105's CoD rig and clips like the AK-12 (the AK-105 is the AK-74M cut down), placed by the AK-12's fit:
+# Tools/ak74m_rig.py writes the pieces as SMDs (decompiled/ak74m/rig). The real gun has no top rail: an optic goes on a
+# bracket clamped to the dovetail on the receiver's left side, here Zenit's B-13 (the pack's), a Picatinny rail over the
+# dust cover.
+_AK74M_RIG = "rig"
+AK74M = Weapon(
+    name="ak74m",
+    folder=ASSETS / "Weapons" / "AK74M",
+    asset="weapons/ak74m",
+    model="ak74m",
+    decompiled=DECOMPILED / "ak74m",
+    cod_anims="../akilo105/vm_iw9_akilo105_anims",
+    # The rear sight stays under an optic, as on the real gun: the B-13's rail ends behind it.
+    vm_meshes=[f"{_AK74M_RIG}/ak74m_receiver.smd", f"{_AK74M_RIG}/ak74m_rear_sight.smd"],
+    part_meshes=[],
+    optional_meshes={
+        "muzzle_tip": (f"{_AK74M_RIG}/ak74m_brake.smd", None),  # the 6P20 0-20 brake, off under a muzzle device
+        "optic_rail": (f"{_AK74M_RIG}/ak74m_mount.smd", None),  # the Zenit B-13 side mount, under an optic
+    },
+    # 0.2 inside the front of the muzzle brake, on the bore.
+    extra_bones={"muzzle": ("tag_sling", np.array([29.24, 0.573, 1.012]))},
+    materials=ak74m_materials,
+    hip=view_offset(),
+    # The AK-105's aim left the AK-74M's rear notch 0.123 high, so the gun comes down until the notch's centre, at its
+    # shoulders' height, is on the aim point, and turns 0.12 degrees down and 0.023 left onto the front post's tip
+    # (within 0.002 degrees: the post level with the shoulders, centred in the notch, the real sight picture).
+    aim=view_offset((-0.012, 0.0, -0.123), (-0.12, 0.0227, 0.0)),
+    sprint=view_offset(),
+    m4_sprint=True,
+    ads_pose=("ads_in", slice(-1, None)),
+    report_bones=["tag_brass", "tag_mag_attach", "tag_stock_attach", "tag_pistolgrip_attach", "tag_rail"],
+    part_choices={
+        # The AK-74M's own black polymer grip, then the AK-105's (the same grip in CoD's model) and the AK-platform grips.
+        "pistol_grip": [("factory", f"{_AK74M_RIG}/ak74m_pgrip.smd")] + AK12.part_choices["pistol_grip"][2:],
+        # Its own 6L23 polymer 30-round magazine, then the AK-105's 20, the RPK-74's 45 and a four-column 60. Each holds
+        # the fitted magazine (j_mag1) and the reload's fresh one (j_mag2).
+        "magazine": [("factory", f"{_AK74M_RIG}/ak74m_mag.smd")] + AK12.part_choices["magazine"][2:],
+    },
+    reload_variants=["_smag", "_xmag", "_xmaglrg"],
+    # The AK-105's factory barrel's (att_vm_p04_ar_akilo105_barrel_v0.lua: grip_pose_l_offset).
+    grip_pose="a_delta_barhvyshort_additive_for_offset",
+)
+
 WEAPONS ={weapon.name: weapon for weapon in (KASTOV_762, KASTOV_74U, VITYAZ, RPK, BIZON, AK105, VEPR12, M16, P90,
-                                              MP7, AUG, UZI, FAL, FAMAS, M18, MCX, L85A2, HK416, AK12, AK15)}
+                                              MP7, AUG, UZI, FAL, FAMAS, M18, MCX, L85A2, HK416, AK12, AK15,
+                                              AK74M)}
 
 
 def add_argument(parser: argparse.ArgumentParser) -> None:

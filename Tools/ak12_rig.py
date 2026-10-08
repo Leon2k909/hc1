@@ -119,11 +119,13 @@ def add_mesh(pieces: Pieces, bones: dict[str, np.ndarray], piece: str, path: Pat
         out.append((bone, material, np.array(ps), np.array(ns), np.array(uvs)))
 
 
-def place_model(pieces: Pieces, piece: str, place: np.ndarray, path: Path) -> None:
-    """An attachment model (one root bone at the origin) where ARC9 puts it."""
+def place_model(pieces: Pieces, piece: str, place: np.ndarray, path: Path, materials=None) -> None:
+    """An attachment model (one root bone at the origin) where ARC9 puts it: its triangles in `materials`, or all of them."""
     smd = Smd(path)
     out = pieces.setdefault(piece, [])
     for material, verts in smd.triangles:
+        if materials is not None and material not in materials:
+            continue
         ps = np.array([(place @ np.append(v[0], 1.0))[:3] for v in verts])
         ns = np.array([place[:3, :3] @ v[1] for v in verts])
         uvs = np.array([v[2] for v in verts])
@@ -206,7 +208,8 @@ SMDS = {
 class Rig:
     """The AK-105 receiver's skeleton, every bone where the AK-105's idle clip has it relative to tag_sling."""
 
-    def __init__(self) -> None:
+    def __init__(self, out: Path = RIG) -> None:
+        self.out = out
         self.rec = Smd(AK105 / "att_vm_p04_ar_akilo105_rec_v0_LOD0_edited.smd")
         idle = Smd(AK105 / "vm_iw9_akilo105_anims/idle.smd")
         idle_world = idle.world(idle.dense_frames()[0])
@@ -252,8 +255,8 @@ class Rig:
         return tris
 
     def write(self, name: str, tris: list) -> None:
-        RIG.mkdir(parents=True, exist_ok=True)
-        write_smd(RIG / f"{name}.smd", self.rec.nodes, [self.locals], tris)
+        self.out.mkdir(parents=True, exist_ok=True)
+        write_smd(self.out / f"{name}.smd", self.rec.nodes, [self.locals], tris)
         p = np.array([v[0] for _, vs in tris for v in vs])
         print(f"{name:18s} {len(tris):6d} tris  {np.round(p.min(0), 3)}..{np.round(p.max(0), 3)}")
 

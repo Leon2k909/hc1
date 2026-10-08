@@ -260,6 +260,8 @@ public static partial class GameText
 			"Fucile d'assalto russo in 5,45x39 mm: il Kalashnikov del 2018, con coperchio della culatta e paramano con slitte, calcio pieghevole e telescopico e raffica da due colpi.",
 		["Russian 7.62x39mm assault rifle: the AK-12 in the AKM's round, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
 			"Fucile d'assalto russo in 7,62x39 mm: l'AK-12 nella cartuccia dell'AKM, con coperchio della culatta e paramano con slitte, calcio pieghevole e telescopico e raffica da due colpi.",
+		["Russian 5.45x39mm assault rifle: the Russian army's standard Kalashnikov since 1991, with a black polymer handguard and side-folding stock. Optics go on a side mount, as on the real gun."] =
+			"Fucile d'assalto russo in 5,45x39 mm: il Kalashnikov d'ordinanza dell'esercito russo dal 1991, con paramano in polimero nero e calcio ripiegabile lateralmente. Le ottiche vanno su un attacco laterale, come sull'arma vera.",
 		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
 			"Il caricatore in acciaio nervato da 30 colpi dell'AKM. Velocità di ricarica standard.",
 		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =

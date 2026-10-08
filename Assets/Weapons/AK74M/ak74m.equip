@@ -1,0 +1,33 @@
+{
+  "Name": "AK-74M",
+  "Description": "Russian 5.45x39mm assault rifle: the Russian army's standard Kalashnikov since 1991, with a black polymer handguard and side-folding stock. Optics go on a side mount, as on the real gun.",
+  "Slot": "Primary",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": true,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/guns/ak74m_01.png",
+  "IsPurchasable": true,
+  "Price": 2500,
+  "KillReward": 300,
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/ak74m/weapon_ak74m.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/ak74m/wm_ak74m.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/ak74m/vm_ak74m.prefab"
+  },
+  "WorldModel": "weapons/ak74m/w_ak74m.vmdl",
+  "ArmorReduction": null,
+  "HelmetReduction": null,
+  "WorldModelBodyGroups": 0,
+  "__references": [],
+  "__version": 0,
+  "Category": "AssaultRifle",
+  "GunsmithOffset": "0,0,4",
+  "ReviewNote": "Not checked in a match yet: the iron sights and the optics' aim on the B-13 (derived: tune with dev_optic_correction), recoil, reload timing and sounds, the look sway and sprint, the left hand in first and third person, the parts on its slots, the charm and the sticker."
+}

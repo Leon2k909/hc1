@@ -262,6 +262,8 @@ public static partial class GameText
 			"ロシア製の5.45x39mmアサルトライフル。2018年のカラシニコフで、レイル付きのダストカバーとハンドガード、折りたたみ・伸縮式ストック、2点バーストを備える。",
 		["Russian 7.62x39mm assault rifle: the AK-12 in the AKM's round, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
 			"ロシア製の7.62x39mmアサルトライフル。AKMの弾薬を使うAK-12で、レイル付きのダストカバーとハンドガード、折りたたみ・伸縮式ストック、2点バーストを備える。",
+		["Russian 5.45x39mm assault rifle: the Russian army's standard Kalashnikov since 1991, with a black polymer handguard and side-folding stock. Optics go on a side mount, as on the real gun."] =
+			"ロシア製の5.45x39mmアサルトライフル。1991年からロシア軍の制式カラシニコフで、黒いポリマー製ハンドガードと横折れ式ストックを備える。光学照準器は実銃と同じくサイドマウントに載せる。",
 		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
 			"AKMのリブ付きスチール製30発マガジン。リロード速度は標準。",
 		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =

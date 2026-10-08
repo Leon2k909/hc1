@@ -154,6 +154,11 @@ public static partial class GameText
 			"Russisches Sturmgewehr im Kaliber 7,62x39 mm: die AK-12 in der Patrone der AKM, mit Schienen auf Verschlussdeckel und Handschutz, klapp- und ausziehbarer Schulterstütze und Zweischuss-Feuerstoß.",
 			"Fusil de asalto ruso de 7,62x39 mm: el AK-12 en el cartucho del AKM, con tapa del cajón de mecanismos y guardamanos con rieles, culata plegable y telescópica y ráfaga de dos disparos.",
 			"Fuzil de assalto russo 7,62x39 mm: o AK-12 no cartucho do AKM, com tampa da caixa da culatra e guarda-mão com trilhos, coronha rebatível e telescópica e rajada de dois tiros." ),
+		["Russian 5.45x39mm assault rifle: the Russian army's standard Kalashnikov since 1991, with a black polymer handguard and side-folding stock. Optics go on a side mount, as on the real gun."] = (
+			"Fusil d'assaut russe en 5,45x39 mm : la Kalachnikov réglementaire de l'armée russe depuis 1991, avec garde-main en polymère noir et crosse repliable sur le côté. Les optiques se montent sur une embase latérale, comme sur l'arme réelle.",
+			"Russisches Sturmgewehr im Kaliber 5,45x39 mm: die Standard-Kalaschnikow der russischen Armee seit 1991, mit schwarzem Polymer-Handschutz und seitlich klappbarer Schulterstütze. Optiken sitzen wie bei der echten Waffe auf einer Seitenmontage.",
+			"Fusil de asalto ruso de 5,45x39 mm: el Kaláshnikov reglamentario del ejército ruso desde 1991, con guardamanos de polímero negro y culata plegable lateral. Las miras ópticas van en un soporte lateral, como en el arma real.",
+			"Fuzil de assalto russo 5,45x39 mm: o Kalashnikov padrão do exército russo desde 1991, com guarda-mão de polímero preto e coronha rebatível lateralmente. As miras ópticas vão num suporte lateral, como na arma real." ),
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] = (
 			"Pistolet réglementaire américain en 9x19 mm : le P320 compact de l'US Army, avec un canon de 3,9 pouces et un chargeur de 17 cartouches.",
 			"Amerikanische Dienstpistole im Kaliber 9x19 mm: die kompakte P320 der US Army, mit 3,9-Zoll-Lauf und 17-Schuss-Magazin.",

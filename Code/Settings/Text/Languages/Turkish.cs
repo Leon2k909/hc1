@@ -740,6 +740,8 @@ public static partial class GameText
 			"Rus yapımı 5,45x39 mm saldırı tüfeği: 2018'in Kalaşnikof'u; raylı mekanizma kapağı ve el kundağı, katlanır ve teleskopik dipçik ve iki atımlık seri atış.",
 		["Russian 7.62x39mm assault rifle: the AK-12 in the AKM's round, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
 			"Rus yapımı 7,62x39 mm saldırı tüfeği: AKM'nin fişeğini kullanan AK-12; raylı mekanizma kapağı ve el kundağı, katlanır ve teleskopik dipçik ve iki atımlık seri atış.",
+		["Russian 5.45x39mm assault rifle: the Russian army's standard Kalashnikov since 1991, with a black polymer handguard and side-folding stock. Optics go on a side mount, as on the real gun."] =
+			"Rus yapımı 5,45x39 mm saldırı tüfeği: 1991'den beri Rus ordusunun standart Kalaşnikof'u; siyah polimer el kundağı ve yana katlanır dipçik. Nişangahlar, gerçek silahta olduğu gibi yan montaja takılır.",
 		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
 			"AKM'nin 30 mermilik nervürlü çelik şarjörü. Standart yeniden doldurma hızı.",
 		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =

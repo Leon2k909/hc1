@@ -234,6 +234,14 @@ PARTS_AK15 = {
                              magazine_capacity=40, reload_variant="_xmag", reload_times=(2.4, 2.75)),
 }
 
+# The AK-74M's parts: any AK pistol grip and any AK-74 magazine, as the real one takes. Its own 6P1 Sb.8 grip and 6L23
+# polymer 30 are the factory parts, so the AK-12's AK-74M grip and 30 aren't offered again; then the AK-platform grips and
+# the AK-105's other magazines (it plays the AK-105's clips, so their reload times are the AK-105's).
+PARTS_AK74M = {
+    **{choice: PARTS_AK12[choice] for choice, _ in kastov_weapons.AK74M.part_choices["pistol_grip"][1:]},
+    **{choice: PARTS_AK12[choice] for choice, _ in kastov_weapons.AK74M.part_choices["magazine"][1:]},
+}
+
 
 # The Vepr-12's own parts. Its factory stock is the strut stock, so the stocks' recoil is relative to that; its factory
 # grip, the shotgun pistol grip, has the 74u's grips' baseline. The 12-round magazine and the drum reload with their own
@@ -966,6 +974,32 @@ def gameplay_ak15() -> Gameplay:
         # Free recoil against the M4's (2,5): a PS round (7.9 g at 715 m/s, 1.6 g of powder) kicks the loaded ~4.24 kg
         # AK-15 back at ~1.80 m/s, an M855 round the loaded M4 at ~1.86 m/s.
         "ShootRecoil": {"Scale": "1.94,4.85"},
+    })
+
+
+def gameplay_ak74m() -> Gameplay:
+    """The real AK-74M's figures (6P20; Rosoboronexport's catalogue) on the M4's prefab, with the 5.45mm round doing the
+    M4's 5.56 damage like the AK-105's and AK-12's."""
+    assets = load(ASSETS / "Weapons" / "AK74M" / "ak74m_assets.json")
+    sounds, reloads = assets["sounds"], assets["reloads"]
+    return Gameplay({
+        # 3.4 kg without a magazine, ~3.95 kg with a loaded 6L23 polymer 30 (0.23 kg, and 30 rounds of 10.5 g): about the
+        # AK-12's weight, too little over the AKM's 3.75 kg for a WeightSlowdown. The rifles' penalty.
+        "Equipment": {"SpeedPenalty": 40},
+        "WeaponAmmo": {"Ammo": 30, "MaxAmmo": 30},
+        # 600 rpm cyclic (the catalogue's figure); automatic and semi. 7N6 ball leaves the 415 mm barrel at 900 m/s
+        # (G7 0.157). The sights sit 52.9 mm over the bore (the eye's height over it at the ADS pose, on the line from
+        # the rear notch's shoulders to the front post's tip), zeroed at 300 m like the AK-105 and AK-12.
+        "Shootable": {"BaseDamage": 20, "FireRate": 600, "ShootSound": sounds["fire"],
+                      "SuppressedShootSound": sounds["fire_suppressed"],
+                      "SupportedFireModes": ["Automatic", "Semi"], "CurrentFireMode": "Automatic",
+                      **ballistics(900, "G7", 0.157, 52.9, 300, N7N6_BULLET)},
+        # It plays the AK-105's clips: the gun is level again at 2.3s, and 2.6s after the empty reload's bolt pull.
+        "Reloadable": {"ReloadTime": 2.3, "EmptyReloadTime": 2.6, "TimedReloadSounds": reloads["reload"],
+                       "EmptyReloadSounds": reloads["reload_empty"]},
+        # Free recoil against the M4's (2,5): a 7N6 round (3.42 g at 900 m/s, 1.45 g of powder) kicks the loaded
+        # ~3.95 kg AK-74M back at ~1.35 m/s, an M855 round the loaded M4 at ~1.86 m/s.
+        "ShootRecoil": {"Scale": "1.45,3.62"},
     })
 
 @dataclass(frozen=True)
@@ -2006,6 +2040,54 @@ PREFABS = {
                     "dev_optic_correction), recoil, the two-round burst, reload timing and sounds (the RPK 40's "
                     "too), the look sway and sprint, the left hand in first and third person, the parts on its slots, "
                     "the charm and the sticker.",
+    ),
+    "ak74m": Prefabs(
+        title="AK-74M",
+        description="Russian 5.45x39mm assault rifle: the Russian army's standard Kalashnikov since 1991, with a black "
+                    "polymer handguard and side-folding stock. Optics go on a side mount, as on the real gun.",
+        price=2500,
+        deploy_sound="weapons/ak105/sounds/ak105.raise.sound",
+        dry_fire="ak",
+        # ak74m_rig.py draws the side-on ak74m_01.png from the model, as for the AK-12.
+        icon_source=None,
+        # The muzzle brake, the side mount's "off" and the factory grip and magazine (by the bit rule).
+        default_mesh_groups=34837,
+        bones={
+            "tag_sling": (None, "-6.971,-0.573,3.351", "0,0,0,1"),
+            "tag_barrel_attach": ("tag_sling", "13.312,0.573,2.527", "0,0,0,1"),
+            "muzzle": ("tag_barrel_attach", "15.928,0,-1.515", "0,0,0,1"),
+            "tag_brass": ("tag_sling", "9.102,-0.17,1.884", "0.000005,0.000013,-0.707106,0.707107"),
+        },
+        world_muzzle="22.269,0,4.363",
+        world_eject="2.131,-0.743,5.235",
+        # By the rule, where the first-person hand holds the handguard: its right side is at -0.8 and its bottom at
+        # 3.455.
+        world_left_hand="6.9,2.7,2.27",
+        slots=[
+            # The Zenit B-13's Picatinny rail (-4.55 to 2.86, its ridges' top at 6.379), on its arm from the dovetail on
+            # the receiver's left side. An optic brings the mount on, and the rear sight stays: the rail ends behind it.
+            ("Optic", (-2.2, 0, 6.38), (0.25, 0, 8.73), {"optic_rail": 1}),
+            ("Muzzle", (19.219, 0, 4.363), (17.62, 0, 7.4147), {"muzzle_tip": 1}),  # the brake's rear face
+            # No Underbarrel or Laser slot: the AK-74M's polymer handguard has no rails.
+        ],
+        # The AK family's: the anchor sits on the dovetail, just in front of the B-13's arm, and the chain hangs 0.27
+        # clear of its clamp. The empty reload's left index finger comes within 0.2, as on the AK-105 and AK-12.
+        charm=(0.0, 1.75, 2.3),
+        # The receiver's left side above the magazine well, flat at y 0.68, between the dovetail and the rivets.
+        sticker=((2.33, 0.68, 4.03), (0.0, 1.0, 0.0), (1.0, 0.6)),
+        # The 762's measured correction moved by how far the AK-74M's ADS pose puts the B-13's rail from the 762's
+        # slot: the AK-12's x, and 0.34 lower, since the B-13 holds an optic higher over the bore. Tune in-game with
+        # dev_optic_correction.
+        optic_aim_correction="3.18,0,-1.371",
+        gameplay=gameplay_ak74m,
+        guid_salt="ak74m/",
+        parts=PARTS_AK74M,
+        # port_kastov.py's world grip and mag points (tag_pistolgrip_attach, tag_mag_attach), the AK-12's.
+        part_slot_positions={"pistol_grip": (-3.0, 0, 3.0), "magazine": (2.514, 0, 3.257)},
+        reload_sounds=lambda: load(ASSETS / "Weapons" / "AK74M" / "ak74m_assets.json")["reloads"],
+        review_note="Not checked in a match yet: the iron sights and the optics' aim on the B-13 (derived: tune with "
+                    "dev_optic_correction), recoil, reload timing and sounds, the look sway and sprint, the left hand "
+                    "in first and third person, the parts on its slots, the charm and the sticker.",
     ),
 }
 

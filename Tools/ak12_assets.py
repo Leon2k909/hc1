@@ -127,10 +127,11 @@ FACTORY = {
 }
 
 
-def vmt_textures(source: str, root: Path = EXTRACTED) -> dict[str, str]:
+def vmt_textures(source: str, root: Path = EXTRACTED, folder: str = EFT) -> dict[str, str]:
     """The textures a material's vmt names ($basetexture, $bumpmap, $phongexponenttexture), as paths under materials/,
-    and its $color2 if it isn't only blended by the colour map's alpha. root: the extracted pack the vmt is in."""
-    matches = [p for p in (root / "materials" / EFT).rglob("*.vmt") if p.stem.lower() == source.lower()]
+    and its $color2 if it isn't only blended by the colour map's alpha. root: the extracted pack the vmt is in; folder:
+    the materials folder it's under (the packs' shared attachments are under models/weapons/arc9_eft_shared)."""
+    matches = [p for p in (root / "materials" / folder).rglob("*.vmt") if p.stem.lower() == source.lower()]
     assert len(matches) == 1, f"{source}: {matches}"
     text = matches[0].read_text(encoding="utf-8", errors="replace")
     pattern = r'^\s*"?(\$\w+)"?\s+"?([^"\n]*?)"?\s*$'
@@ -157,15 +158,19 @@ def write_vmat(name: str, out: Path, lines: list[str]) -> str:
     return asset_path(vmat)
 
 
-def build_eft(source: str, name: str, out: Path, root: Path = EXTRACTED) -> str:
-    """A complex.shader material from the vmt's _diff / _nrm / _gloss set: no metal, roughness from the exponent."""
-    textures = vmt_textures(source, root)
-    colour = tint(load_vtf(textures["$basetexture"], root)[:, :, :3], textures.get("$color2"))
+def build_eft(source: str, name: str, out: Path, root: Path = EXTRACTED, texture_root: Path | None = None,
+              folder: str = EFT) -> str:
+    """A complex.shader material from the vmt's _diff / _nrm / _gloss set: no metal, roughness from the exponent.
+    root: the pack the vmt is in; texture_root: the one its textures are in, if another (EFT SHARED's, for some);
+    folder: the vmt's materials folder (vmt_textures)."""
+    textures = vmt_textures(source, root, folder)
+    texture_root = texture_root or root
+    colour = tint(load_vtf(textures["$basetexture"], texture_root)[:, :, :3], textures.get("$color2"))
     rel = lambda suffix: asset_path(out / f"{name}_{suffix}.png")
     Image.fromarray(colour.copy()).save(out / f"{name}_color.png")
-    exponent = load_vtf(textures["$phongexponenttexture"], root)
+    exponent = load_vtf(textures["$phongexponenttexture"], texture_root)
     Image.fromarray(roughness_from_exponent(exponent[:, :, 0])).save(out / f"{name}_roughness.png")
-    normal = load_vtf(textures["$bumpmap"], root)[:, :, :3].copy()
+    normal = load_vtf(textures["$bumpmap"], texture_root)[:, :, :3].copy()
     normal[:, :, 1] = 255 - normal[:, :, 1]
     Image.fromarray(normal).save(out / f"{name}_normal.png")
     return write_vmat(name, out, [

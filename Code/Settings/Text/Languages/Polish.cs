@@ -260,6 +260,8 @@ public static partial class GameText
 			"Rosyjski karabinek automatyczny kalibru 5,45x39 mm: Kałasznikow z 2018 roku, z szynami na pokrywie komory zamkowej i łożu, składaną i teleskopową kolbą oraz serią dwustrzałową.",
 		["Russian 7.62x39mm assault rifle: the AK-12 in the AKM's round, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
 			"Rosyjski karabinek automatyczny kalibru 7,62x39 mm: AK-12 na nabój AKM, z szynami na pokrywie komory zamkowej i łożu, składaną i teleskopową kolbą oraz serią dwustrzałową.",
+		["Russian 5.45x39mm assault rifle: the Russian army's standard Kalashnikov since 1991, with a black polymer handguard and side-folding stock. Optics go on a side mount, as on the real gun."] =
+			"Rosyjski karabinek automatyczny kalibru 5,45x39 mm: standardowy kałasznikow armii rosyjskiej od 1991 roku, z czarnym polimerowym łożem i kolbą składaną na bok. Celowniki optyczne montuje się na bocznym wsporniku, jak w prawdziwej broni.",
 		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
 			"Żebrowany stalowy magazynek AKM na 30 naboi. Standardowy czas przeładowania.",
 		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =

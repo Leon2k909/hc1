@@ -259,6 +259,8 @@ public static partial class GameText
 			"Российский автомат под патрон 5,45x39 мм: «Калашников» 2018 года, с планками на крышке ствольной коробки и цевье, складным телескопическим прикладом и режимом очереди по два выстрела.",
 		["Russian 7.62x39mm assault rifle: the AK-12 in the AKM's round, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
 			"Российский автомат калибра 7,62x39 мм: AK-12 под патрон AKM, с планками на крышке ствольной коробки и цевье, складным телескопическим прикладом и режимом очереди по два выстрела.",
+		["Russian 5.45x39mm assault rifle: the Russian army's standard Kalashnikov since 1991, with a black polymer handguard and side-folding stock. Optics go on a side mount, as on the real gun."] =
+			"Российский автомат калибра 5,45x39 мм: штатный автомат Калашникова российской армии с 1991 года, с чёрным полимерным цевьём и складывающимся вбок прикладом. Прицелы ставятся на боковой кронштейн, как на настоящем оружии.",
 		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
 			"Стальной магазин AKM с рёбрами на 30 патронов. Обычная скорость перезарядки.",
 		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =

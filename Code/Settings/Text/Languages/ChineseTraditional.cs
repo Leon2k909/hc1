@@ -259,6 +259,8 @@ public static partial class GameText
 			"俄製 5.45x39mm 突擊步槍：2018 年的卡拉什尼科夫，配備帶導軌的機匣蓋與護木、折疊伸縮式槍托以及兩發點放。",
 		["Russian 7.62x39mm assault rifle: the AK-12 in the AKM's round, with railed dust cover and handguard, a folding, telescoping stock and a two-round burst."] =
 			"俄製 7.62x39mm 突擊步槍：使用 AKM 彈藥的 AK-12，配備帶導軌的機匣蓋與護木、折疊伸縮式槍托以及兩發點放。",
+		["Russian 5.45x39mm assault rifle: the Russian army's standard Kalashnikov since 1991, with a black polymer handguard and side-folding stock. Optics go on a side mount, as on the real gun."] =
+			"俄製 5.45x39mm 突擊步槍：1991 年起俄軍的制式卡拉什尼科夫步槍，配備黑色聚合物護木與側折式槍托。瞄具與真槍一樣裝在側面座上。",
 		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
 			"AKM 的帶加強筋鋼製 30 發彈匣。裝填速度標準。",
 		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =
