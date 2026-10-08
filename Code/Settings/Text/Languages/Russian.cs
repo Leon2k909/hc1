@@ -251,6 +251,8 @@ public static partial class GameText
 			"Бельгийская боевая винтовка под патрон 7,62x51 мм: тяжёлая, с сильной отдачей, 21-дюймовым стволом и магазином на 20 патронов.",
 		["French 5.56x45mm bullpup rifle with a 25-round magazine, a fixed carry handle and selectable automatic, three-round burst and semi-automatic fire."] =
 			"Французская винтовка-буллпап под патрон 5,56x45 мм с магазином на 25 патронов, несъёмной ручкой для переноски и переводчиком огня: автоматический, очередями по три выстрела и одиночный.",
+		["British 5.56x45mm bullpup rifle: the SA80 service rifle, with a 20.4-inch barrel, iron sights on a carrying handle and a 30-round magazine."] =
+			"Британская винтовка-буллпап под патрон 5,56x45 мм: штатная винтовка SA80 со стволом 20,4 дюйма, открытым прицелом на ручке для переноски и магазином на 30 патронов.",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"Американский штатный пистолет под патрон 9x19 мм: компактный P320 армии США со стволом 3,9 дюйма и магазином на 17 патронов.",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =

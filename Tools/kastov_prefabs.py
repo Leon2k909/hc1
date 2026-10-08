@@ -16,7 +16,7 @@ The 74u's gameplay prefab and icon were made by hand (see Prefabs.gameplay), so 
 are set.
 
 GUIDs are derived from the template GUIDs, so re-running produces identical files.
-Run: python Tools/kastov_prefabs.py [--weapon kastov762|kastov74u|vityaz|rpk|bizon|ak105|vepr12|m16|p90|mp7|uzi|aug|fal|famas|m18|mcx]
+Run: python Tools/kastov_prefabs.py [--weapon kastov762|kastov74u|vityaz|rpk|bizon|ak105|vepr12|m16|p90|mp7|uzi|aug|fal|famas|m18|mcx|l85a2]
 """
 
 from __future__ import annotations
@@ -825,6 +825,36 @@ def gameplay_mcx() -> Gameplay:
         # Free recoil against the M4's (2,5): an M855 round (4.02 g at 837 m/s, 1.7 g of powder) kicks the loaded
         # ~3.4 kg MCX back at ~1.72 m/s, the loaded M4 at ~1.86 m/s.
         "ShootRecoil": {"Scale": "1.85,4.62"},
+    })
+
+
+def gameplay_l85a2() -> Gameplay:
+    """The real L85A2's figures with 5.56x45 SS109 (L2A2) ball, which is M855: the M4's round (its damage, falloff
+    curve and recoil pattern), from the 518 mm (20.4-inch) barrel."""
+    assets = load(ASSETS / "Weapons" / "L85A2" / "l85a2_assets.json")
+    sounds, reloads = assets["sounds"], assets["reloads"]
+    return Gameplay({
+        # 3.82 kg empty, ~4.7 kg with the iron sights' carrying handle and a loaded 30-round magazine (0.49 kg): ~1%
+        # slower per kg over the AKM's 3.75 kg, as for the RPK.
+        "Equipment": {"SpeedPenalty": 40, "WeightSlowdown": 0.0095},
+        "WeaponAmmo": {"Ammo": 30, "MaxAmmo": 30},
+        # 690 rpm, the middle of the 610-775 quoted; automatic and semi. SS109 leaves the 20.4-inch barrel at ~940 m/s,
+        # the M16A4's figure from about the same length, G7 0.151. The sights sit 100 mm over the bore (the model's
+        # sight line through the carrying handle's aperture and the front post's tip), zeroed at 300 m like the other
+        # 5.56 rifles. Its short-stroke piston's regulator has no setting for a suppressor (normal, adverse and gas off
+        # for rifle grenades), so a can speeds it up as on the other rifles.
+        "Shootable": {"BaseDamage": 20, "FireRate": 690, "ShootSound": sounds["fire"],
+                      "SuppressedShootSound": sounds["fire_suppressed"],
+                      "SupportedFireModes": ["Automatic", "Semi"], "CurrentFireMode": "Automatic",
+                      **ballistics(940, "G7", 0.151, 100.0, 300, M855_BULLET)},
+        # When the gun is level again in its own clips (tag_sling back within 4 degrees and 0.6 of idle, relative to
+        # the camera): 3.53s, and 4.0s after the empty reload's cocking handle. A bullpup's magazine is behind the grip,
+        # so its reloads are slow.
+        "Reloadable": {"ReloadTime": 3.53, "EmptyReloadTime": 4.0, "TimedReloadSounds": reloads["reload"],
+                       "EmptyReloadSounds": reloads["reload_empty"]},
+        # Free recoil against the M4's (2,5): an M855 round (4.02 g at 940 m/s, 1.7 g of powder) kicks the loaded
+        # ~4.7 kg L85A2 back at ~1.40 m/s, the loaded M4 at ~1.86 m/s.
+        "ShootRecoil": {"Scale": "1.5,3.76"},
     })
 
 
@@ -1646,6 +1676,53 @@ PREFABS = {
         },
         # tag_stock_attach.
         part_slot_positions={"stock": (-7.723, 0, 5.252)},
+        review_note="Not checked in a match yet: the iron sights and the optics' aim (derived: tune with "
+                    "dev_optic_correction), recoil, reload timing and sounds, the look sway and sprint, the left hand "
+                    "in first and third person, the parts on its slots, the charm and the sticker.",
+    ),
+    "l85a2": Prefabs(
+        title="L85A2",
+        description="British 5.56x45mm bullpup rifle: the SA80 service rifle, with a 20.4-inch barrel, iron sights on "
+                    "a carrying handle and a 30-round magazine.",
+        price=2800,
+        deploy_sound="weapons/l85a2/sounds/l85a2.raise.sound",
+        icon_source="2960120610/materials/vgui/entities/mg_lima86",
+        # The flash hider and the carrying handle's sights; the laser's mount hidden (read from the compiled models).
+        default_mesh_groups=85,
+        bones={
+            "tag_sling": (None, "-11.011,0,5.328", "0,0,0,1"),
+            "tag_barrel_attach": ("tag_sling", "16.329,0,-0.537", "0,0,0,1"),
+            "muzzle": ("tag_barrel_attach", "5.54,0,0", "0,0,0,1"),
+            # Moved to the ejection port (kastov_weapons.L85A2.moved_bones): the rig's tag_brass is in the handguard.
+            "tag_brass": ("tag_sling", "-2.6,-0.75,-0.1", "0,0,-0.707107,0.707107"),
+        },
+        world_muzzle="10.858,0,4.791",
+        world_eject="-13.611,-0.75,5.228",
+        # By the rule, where the first-person hand holds the handguard (its wrist at x -0.62): the side rail's right
+        # face is 1.74 from centre, and the bottom rail's underside is at 2.518.
+        world_left_hand="-0.62,1.76,1.33",
+        # No Underbarrel slot: the left hand's fingers wrap the bottom rail up to x 15.6 in the viewmodel, and it ends at
+        # 18.0, leaving 2.1 where the M4's vertical grips need 2.26 (the FAL's case).
+        slots=[
+            # tag_reflex, on the receiver's top rail. An optic takes the carrying handle and its sights off, as on the
+            # real gun, where the sight or the handle clamps to the same rail.
+            ("Optic", (-7.001, 0, 6.262), (0.25, 0, 8.73), {"iron_sights": 1}),
+            ("Muzzle", (8.859, 0, 4.791), (17.62, 0, 7.4147), {"muzzle_tip": 1}),  # tag_tip, the flash hider's rear face
+            # The back of the mount a laser brings to the handguard's right side (tag_laser_attach is its front).
+            ("Laser", (3.419, -2.166, 4.116), (8.6, -1.22, 7.4147), {"laser_rail": 1}),
+        ],
+        # The receiver's left side behind the magazine well (the charm's anchor sits 0.57 ahead of this, 0.71 in and
+        # 1.84 over it, at the receiver's surface). Every hand joint stays 1.9 or more from it through every clip (the
+        # empty reload's left thumb the nearest). Above the magazine well that thumb came within 0.2.
+        charm=(-15.08, 1.55, 2.488),
+        # The upper receiver's left side under the carrying handle: flat at y 0.722 from x -10.4 to -8.8.
+        sticker=((-9.611, 0.722, 5.408), (0.0, 1.0, 0.0), (1.6, 0.7)),
+        # The 762's measured correction moved by how far the L85A2's ADS pose puts its optic slot from the 762's, like
+        # the 74u's. Its z is high (the Kastovs' are about -1.2) because the carrying handle holds the sight line 2.47
+        # over the rail's tag_reflex, as the M16A4's does. Tune in-game with dev_optic_correction.
+        optic_aim_correction="-0.004,0,1.047",
+        gameplay=gameplay_l85a2,
+        guid_salt="l85a2/",
         review_note="Not checked in a match yet: the iron sights and the optics' aim (derived: tune with "
                     "dev_optic_correction), recoil, reload timing and sounds, the look sway and sprint, the left hand "
                     "in first and third person, the parts on its slots, the charm and the sticker.",

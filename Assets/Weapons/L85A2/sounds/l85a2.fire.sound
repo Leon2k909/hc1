@@ -1,0 +1,35 @@
+{
+  "UI": false,
+  "Volume": "1",
+  "Pitch": "0.97 1.03",
+  "Decibels": 10000,
+  "SelectionMode": "Random",
+  "Sounds": [
+    "weapons/l85a2/sounds/l85a2_shot_01.vsnd",
+    "weapons/l85a2/sounds/l85a2_shot_02.vsnd",
+    "weapons/l85a2/sounds/l85a2_shot_03.vsnd",
+    "weapons/l85a2/sounds/l85a2_shot_04.vsnd"
+  ],
+  "Occlusion": false,
+  "AirAbsorption": true,
+  "Transmission": true,
+  "OcclusionRadius": 64,
+  "DistanceAttenuation": true,
+  "Distance": 13000,
+  "Falloff": [
+    {
+      "y": 1
+    },
+    {
+      "x": 0.23809524,
+      "y": 0.3583625,
+      "in": 1.329805,
+      "out": -1.329805
+    },
+    {
+      "x": 1
+    }
+  ],
+  "__references": [],
+  "__version": 1
+}

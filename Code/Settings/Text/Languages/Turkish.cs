@@ -732,6 +732,8 @@ public static partial class GameText
 			"Belçika yapımı 7,62x51 mm muharebe tüfeği: ağır ve geri tepmesi sert, 21 inç namlulu ve 20 fişeklik şarjörlü.",
 		["French 5.56x45mm bullpup rifle with a 25-round magazine, a fixed carry handle and selectable automatic, three-round burst and semi-automatic fire."] =
 			"Fransız yapımı 5,56x45 mm bullpup tüfek: 25 fişeklik şarjör, sabit taşıma kolu ve seçilebilir tam otomatik, üçlü seri ve yarı otomatik atış.",
+		["British 5.56x45mm bullpup rifle: the SA80 service rifle, with a 20.4-inch barrel, iron sights on a carrying handle and a 30-round magazine."] =
+			"İngiliz yapımı 5,56x45 mm bullpup tüfek: SA80 hizmet tüfeği; 20,4 inçlik namlu, taşıma kolu üzerinde mekanik nişangâh ve 30 fişeklik şarjör.",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"ABD'nin 9x19 mm hizmet tabancası: ABD Ordusu'nun kompakt P320'si, 3,9 inç namlu ve 17 fişeklik şarjörle.",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =

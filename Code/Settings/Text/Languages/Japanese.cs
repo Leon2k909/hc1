@@ -254,6 +254,8 @@ public static partial class GameText
 			"ベルギー製の7.62x51mmバトルライフル。重く反動が強い。21インチ銃身と20発マガジンを備える。",
 		["French 5.56x45mm bullpup rifle with a 25-round magazine, a fixed carry handle and selectable automatic, three-round burst and semi-automatic fire."] =
 			"フランス製の5.56x45mmブルパップライフル。25発マガジンと固定式キャリングハンドルを備え、フルオート、3点バースト、セミオートを切り替えられる。",
+		["British 5.56x45mm bullpup rifle: the SA80 service rifle, with a 20.4-inch barrel, iron sights on a carrying handle and a 30-round magazine."] =
+			"イギリス製の5.56x45mmブルパップライフル。制式小銃SA80で、20.4インチ銃身、キャリングハンドル上のアイアンサイト、30発マガジンを備える。",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"米国の9x19mm制式拳銃。米陸軍のコンパクトなP320で、3.9インチ銃身と17発マガジンを備える。",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =

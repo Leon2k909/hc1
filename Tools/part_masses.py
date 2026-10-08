@@ -57,6 +57,7 @@ GUN_KG = {
     "FAMAS/weapon_famas": 4.0,        # FAMAS F1 3.6 kg + a loaded 25
     "M18/weapon_m18": 0.95,           # M18 0.74 kg + a loaded 17
     "MCX/weapon_mcx": 3.4,            # MCX Virtus SBR 2.9 kg + a loaded 30
+    "L85A2/weapon_l85a2": 4.7,        # L85A2 3.82 kg + the iron sights' carrying handle + a loaded 30
 }
 
 

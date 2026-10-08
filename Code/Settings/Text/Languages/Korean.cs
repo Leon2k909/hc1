@@ -254,6 +254,8 @@ public static partial class GameText
 			"벨기에제 7.62x51mm 전투 소총으로, 무겁고 반동이 강하며 21인치 총열과 20발 탄창을 갖췄습니다.",
 		["French 5.56x45mm bullpup rifle with a 25-round magazine, a fixed carry handle and selectable automatic, three-round burst and semi-automatic fire."] =
 			"프랑스제 5.56x45mm 불펍 소총으로, 25발 탄창과 고정식 운반 손잡이를 갖췄고 자동, 3점사, 반자동을 선택할 수 있습니다.",
+		["British 5.56x45mm bullpup rifle: the SA80 service rifle, with a 20.4-inch barrel, iron sights on a carrying handle and a 30-round magazine."] =
+			"영국제 5.56x45mm 불펍 소총으로, SA80 제식 소총입니다. 20.4인치 총열, 운반 손잡이 위의 기계식 조준기, 30발 탄창을 갖췄습니다.",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"미국의 9x19mm 제식 권총으로, 미 육군의 컴팩트형 P320이며 3.9인치 총열과 17발 탄창을 갖췄습니다.",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =

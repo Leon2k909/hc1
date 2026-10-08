@@ -252,6 +252,8 @@ public static partial class GameText
 			"Belgijski karabin bojowy kalibru 7,62x51 mm: ciężki i o silnym odrzucie, z 21-calową lufą i 20-nabojowym magazynkiem.",
 		["French 5.56x45mm bullpup rifle with a 25-round magazine, a fixed carry handle and selectable automatic, three-round burst and semi-automatic fire."] =
 			"Francuski karabin bullpup kalibru 5,56x45 mm z 25-nabojowym magazynkiem, stałym chwytem transportowym i przełącznikiem ognia: ciągły, seria trzystrzałowa i pojedynczy.",
+		["British 5.56x45mm bullpup rifle: the SA80 service rifle, with a 20.4-inch barrel, iron sights on a carrying handle and a 30-round magazine."] =
+			"Brytyjski karabin bullpup kalibru 5,56x45 mm: służbowy karabin SA80, z lufą 20,4 cala, przyrządami celowniczymi na chwycie transportowym i 30-nabojowym magazynkiem.",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"Amerykański pistolet służbowy kalibru 9x19 mm: kompaktowy P320 armii USA, z lufą 3,9 cala i 17-nabojowym magazynkiem.",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =

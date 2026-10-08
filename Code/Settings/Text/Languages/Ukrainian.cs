@@ -260,6 +260,8 @@ public static partial class GameText
 			"Бельгійська бойова гвинтівка під набій 7,62x51 мм: важка, із сильною віддачею, 21-дюймовим стволом і магазином на 20 набоїв.",
 		["French 5.56x45mm bullpup rifle with a 25-round magazine, a fixed carry handle and selectable automatic, three-round burst and semi-automatic fire."] =
 			"Французька гвинтівка-булпап під набій 5,56x45 мм з магазином на 25 набоїв, незнімною ручкою для перенесення та перемикачем вогню: автоматичний, черги по три постріли й одиночний.",
+		["British 5.56x45mm bullpup rifle: the SA80 service rifle, with a 20.4-inch barrel, iron sights on a carrying handle and a 30-round magazine."] =
+			"Британська гвинтівка-булпап під набій 5,56x45 мм: штатна гвинтівка SA80 зі стволом 20,4 дюйма, відкритим прицілом на ручці для перенесення та магазином на 30 набоїв.",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"Американський штатний пістолет під набій 9x19 мм: компактний P320 армії США зі стволом 3,9 дюйма та магазином на 17 набоїв.",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =

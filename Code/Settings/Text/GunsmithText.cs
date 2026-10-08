@@ -134,6 +134,11 @@ public static partial class GameText
 			"Französisches Bullpup-Gewehr im Kaliber 5,56x45 mm mit 25-Schuss-Magazin, festem Tragegriff und wählbarem Dauerfeuer, Drei-Schuss-Feuerstoß und Einzelfeuer.",
 			"Fusil bullpup francés de 5,56x45 mm con cargador de 25 cartuchos, asa de transporte fija y selector de tiro automático, ráfaga de tres disparos y semiautomático.",
 			"Fuzil bullpup francês 5,56x45 mm com carregador de 25 cartuchos, alça de transporte fixa e seletor de tiro automático, rajada de três tiros e semiautomático." ),
+		["British 5.56x45mm bullpup rifle: the SA80 service rifle, with a 20.4-inch barrel, iron sights on a carrying handle and a 30-round magazine."] = (
+			"Fusil bullpup britannique en 5,56x45 mm : le fusil de service SA80, avec un canon de 20,4 pouces, des organes de visée sur une poignée de transport et un chargeur de 30 cartouches.",
+			"Britisches Bullpup-Gewehr im Kaliber 5,56x45 mm: das Dienstgewehr SA80, mit 20,4-Zoll-Lauf, offener Visierung auf einem Tragegriff und 30-Schuss-Magazin.",
+			"Fusil bullpup británico de 5,56x45 mm: el fusil reglamentario SA80, con cañón de 20,4 pulgadas, miras metálicas sobre un asa de transporte y cargador de 30 cartuchos.",
+			"Fuzil bullpup britânico 5,56x45 mm: o fuzil de serviço SA80, com cano de 20,4 polegadas, miras mecânicas sobre uma alça de transporte e carregador de 30 cartuchos." ),
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] = (
 			"Pistolet réglementaire américain en 9x19 mm : le P320 compact de l'US Army, avec un canon de 3,9 pouces et un chargeur de 17 cartouches.",
 			"Amerikanische Dienstpistole im Kaliber 9x19 mm: die kompakte P320 der US Army, mit 3,9-Zoll-Lauf und 17-Schuss-Magazin.",

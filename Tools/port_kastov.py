@@ -23,7 +23,7 @@ Inputs that are not in the repo:
   HC1_GLTF    Source2Viewer glTF exports (with animations) of the cloud models v_m4a1.vmdl (its IdlePose is HC1's
               rifle grip, the retarget reference) and v_first_person_arms_human.vmdl (preview render only).
 
-Run: python Tools/port_kastov.py [--weapon kastov762|kastov74u|vityaz|rpk|bizon|ak105|vepr12|m16|p90|mp7|aug|uzi|fal|famas|m18|mcx]
+Run: python Tools/port_kastov.py [--weapon kastov762|kastov74u|vityaz|rpk|bizon|ak105|vepr12|m16|p90|mp7|aug|uzi|fal|famas|m18|mcx|l85a2]
      [--preview]
 """
 
@@ -522,6 +522,10 @@ class Kastov:
             elif name in kastov_sway.IK_TARGETS:
                 # Where its hand is, so the animgraph's IK changes nothing on the clip's own frames.
                 world.append(arms[kastov_sway.IK_TARGETS[name]])
+            elif name in self.weapon.moved_bones:
+                parent_name, offset = self.weapon.moved_bones[name]
+                parent_world = cod[parent_name]
+                world.append(matrix(parent_world[:3, 3] + parent_world[:3, :3] @ (offset * self.shrink), cod[name][:3, :3]))
             else:
                 world.append(cod[name])
         return world

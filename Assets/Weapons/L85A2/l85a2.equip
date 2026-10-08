@@ -1,0 +1,33 @@
+{
+  "Name": "L85A2",
+  "Description": "British 5.56x45mm bullpup rifle: the SA80 service rifle, with a 20.4-inch barrel, iron sights on a carrying handle and a 30-round magazine.",
+  "Slot": "Primary",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": true,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/guns/l85a2_01.png",
+  "IsPurchasable": true,
+  "Price": 2800,
+  "KillReward": 300,
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/l85a2/weapon_l85a2.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/l85a2/wm_l85a2.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/l85a2/vm_l85a2.prefab"
+  },
+  "WorldModel": "weapons/l85a2/w_l85a2.vmdl",
+  "ArmorReduction": null,
+  "HelmetReduction": null,
+  "WorldModelBodyGroups": 0,
+  "__references": [],
+  "__version": 0,
+  "Category": "AssaultRifle",
+  "GunsmithOffset": "0,0,4",
+  "ReviewNote": "Not checked in a match yet: the iron sights and the optics' aim (derived: tune with dev_optic_correction), recoil, reload timing and sounds, the look sway and sprint, the left hand in first and third person, the parts on its slots, the charm and the sticker."
+}

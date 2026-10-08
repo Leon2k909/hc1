@@ -5,18 +5,18 @@ shot_voicing.py's; this holds each gun's Voicing, where its rip comes from and w
 
     python Tools/ported_shots.py <gun>|all [--preview <wav>]
 
-<gun> is vityaz, bizon, vepr12, p90, mp7, aug, uzi, fal, m18, famas or mcx. Each gun's assets script builds its shot with
-build() here. Run on its own, this does the same: it rewrites the gun's <name>_NN.wav takes and its fire event's list
-and pitch, leaving the gun's other sounds alone. --preview writes a demo instead: the ripped shot, the voiced one, then
-a burst at the gun's rate each way. The ripped shots and events as they were are in Backups/ported_shots_rip/<gun>/.
-The suppressed shots are voiced from these voicings by suppressed_shots.py.
+<gun> is vityaz, bizon, vepr12, p90, mp7, aug, uzi, fal, m18, famas, mcx or l85a2. Each gun's assets script builds its
+shot with build() here. Run on its own, this does the same: it rewrites the gun's <name>_NN.wav takes and its fire
+event's list and pitch, leaving the gun's other sounds alone. --preview writes a demo instead: the ripped shot, the
+voiced one, then a burst at the gun's rate each way. The ripped shots and events as they were are in
+Backups/ported_shots_rip/<gun>/. The suppressed shots are voiced from these voicings by suppressed_shots.py.
 
 What every rip here gets wrong, measured on the levelled files (python's describe(): the loudest 100 ms, the level
 0.2 / 0.4 s after it, and the lows under 150 Hz against the blast's first 100 ms, 100-250 ms after the onset):
 - The lows ring on after the blast. At a real shooter's ear the thump is the blast's own and over in tens of ms; CoD
   holds a designed boom under it. It's at its worst in the FAL (as loud as the blast at 100-250 ms), the Vepr-12 (-2 dB)
   and the Vityaz (-9 dB); the voiced rifles have it at -22.
-- The single-recording MW2019 guns (P90, MP7A1, AUG, Uzi, FAMAS) are dry: nothing of the surroundings, or a short
+- The single-recording MW2019 guns (P90, MP7A1, AUG, Uzi, FAMAS, L85A2) are dry: nothing of the surroundings, or a short
   designed room, and one recording replayed for every round. Here each recording makes several takes with their own
   echoes.
 - Some are dark: the Uzi's first 150 ms sit almost all under 300 Hz (its first 30 ms centre at 435 Hz, the voiced
@@ -25,8 +25,8 @@ What every rip here gets wrong, measured on the levelled files (python's describ
 Each gun's voicing, by shot_voicing's steps:
 1. Pitch, by the charge and the barrel. A smaller charge, burnt out in a short barrel, makes a smaller, shorter blast
    (so higher); a heavier one a longer, deeper one: the 9 mm guns and the P90 2% up, the MP7A1's 4.6x30 3%, the FAMAS's
-   5.56 from a 488 mm barrel 1%, the AUG as ripped (MW2019's 5.56 conversion), the M18 as ripped (a 9 mm pistol burns
-   much of its powder past the muzzle), the Vepr-12's 12-gauge 1% down and the FAL's 7.62x51 2% down.
+   5.56 from a 488 mm barrel 1%, the AUG and the L85A2 as ripped (MW2019's 5.56 shots), the M18 as ripped (a 9 mm
+   pistol burns much of its powder past the muzzle), the Vepr-12's 12-gauge 1% down and the FAL's 7.62x51 2% down.
 2. Low end: a 40 Hz high-pass (the Uzi's at 70), and after the blast's first 20-50 ms (the Uzi's 8) the lows ease
    down 3-10 dB. The FAL's, Vepr-12's and AUG's designed tails are eased too, from 100, 150 and 80 ms, as the
    M16A4's is, and the Uzi's a little from 120 ms.
@@ -257,6 +257,15 @@ GUNS = {
         presence_db=5.0, presence_hold=0.025, ground_delay=0.0073, tail_at_400ms=-34.0),
         "Weapons/MCX/sounds", "Weapons/MCX/sounds/mcx.fire.sound", _mcx,
         "stock extended, 0.76 m long: the muzzle ~0.54 m ahead"),
+    # M855 from a 518 mm barrel, 690 rpm, one recording (MW2019's L86A2: its short barrel makes it the L85A2). As
+    # levelled: the lows at -6 dB 30-100 ms after the onset and -18 at 100-250, a little more than the voiced rifles'
+    # -19 to -23; its first 30 ms centre at 1.35 kHz, about the M16A4's. So it's eased and lifted as the M16A4's is.
+    "l85a2": Gun(Voicing(
+        name="l85a2_shot", pitch=1.0, event_pitch="0.97 1.03", takes=_takes(1, 2011, 4), rip_pitch=(0.95, 1.05),
+        rpm=690, preview_bursts=(8,), low_split=130.0, low_cut_db=-6.0, low_hold=0.03, low_ease=0.035,
+        presence_db=3.0, presence_hold=0.025, ground_delay=0.0071, tail_at_400ms=-33.0),
+        "Weapons/L85A2/sounds", "Weapons/L85A2/sounds/l85a2.fire.sound", _single("l85a2_assets"),
+        "a bullpup, 0.79 m long: the muzzle ~0.64 m ahead"),
 }
 
 

@@ -251,6 +251,8 @@ public static partial class GameText
 			"比利時製 7.62x51mm 戰鬥步槍：沉重且後座力強，配備 21 英吋槍管與 20 發彈匣。",
 		["French 5.56x45mm bullpup rifle with a 25-round magazine, a fixed carry handle and selectable automatic, three-round burst and semi-automatic fire."] =
 			"法國製 5.56x45mm 無托步槍，配備 25 發彈匣與固定提把，可選全自動、三發點放與半自動射擊。",
+		["British 5.56x45mm bullpup rifle: the SA80 service rifle, with a 20.4-inch barrel, iron sights on a carrying handle and a 30-round magazine."] =
+			"英國製 5.56x45mm 無托步槍：SA80 制式步槍，配備 20.4 吋槍管、提把上的機械瞄具與 30 發彈匣。",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"美國 9x19mm 制式手槍：美國陸軍的緊湊型 P320，配備 3.9 英吋槍管與 17 發彈匣。",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =

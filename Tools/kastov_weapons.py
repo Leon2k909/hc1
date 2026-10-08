@@ -129,6 +129,9 @@ class Weapon:
     # empty_offset layer). The port exports it as empty_delta, and fire_empty (the fire clip with the slide staying
     # back), and the animgraph adds it while b_empty holds.
     slide_lock: str | None = None
+    # Rig bones the addon leaves where the real gun has nothing: name -> (parent, local offset), the bone keeping its
+    # own turn. MW2019's L86 rig has tag_brass in the handguard, under the bore, where no case could come out.
+    moved_bones: dict[str, tuple[str, np.ndarray]] = field(default_factory=dict)
 
 
 def kastov762_materials() -> dict[str, str]:
@@ -1189,8 +1192,78 @@ MCX = Weapon(
     left_grip=GripFit(shift=(0.0, -0.05, 0.15), thumb=0.2),
 )
 
+def l85a2_materials() -> dict[str, str]:
+    # Built by l85a2_assets.py.
+    assets = json.loads((ASSETS / "Weapons" / "L85A2" / "l85a2_assets.json").read_text(encoding="utf-8"))
+    return assets["materials"]
+
+
+_L85 = "v_lima86"
+_L85_BARREL = "attachment_vm_lm_lima86_barrel_short/attachment_vm_lm_lima86_barrel_short"
+
+
+# The L85A2 (5.56x45mm): MW2019's "SA87" (mg_lima86) from Viper's MW2019 LMG pack (Workshop 2960120610). The pack's
+# default is the L86A2 light support weapon's long barrel; with its short one it's the L85A2 rifle, at the real gun's
+# size (785 mm long, 518 mm barrel): the A2's railed handguard, the carrying handle with its rear aperture and the
+# foresight on its bracket (the non-infantry iron sights), the MW flash hider and a 30-round magazine. Like the FAL's,
+# its rig has no pistol grip part (the grip is the receiver's), so tag_pistolgrip_attach is an extra bone.
+L85A2 = Weapon(
+    name="l85a2",
+    folder=ASSETS / "Weapons" / "L85A2",
+    asset="weapons/l85a2",
+    model="l85a2",
+    decompiled=DECOMPILED / "lima86",
+    cod_anims=f"{_L85}/{_L85}_anims",
+    # The viewmodel's own bodygroup meshes, in its bind pose: the receiver (with the front end) and the butt plate.
+    vm_meshes=[f"{_L85}/attachment_vm_lm_lima86_receiver.smd", f"{_L85}/attachment_vm_lm_lima86_stock.smd"],
+    # The short barrel, and the magazine: the fitted one on j_mag1 and the reload's fresh one on j_mag2. Left out: the
+    # pack's long and mid barrels (the L86A2's), its bipod, its 60-round magazines and CoD's stocks.
+    part_meshes=[(f"{_L85_BARREL}.smd", f"{_L85_BARREL}.smd"),
+                 ("attachment_vm_lm_lima86_mag/attachment_vm_lm_lima86_mag.smd",
+                  "attachment_vm_lm_lima86_mag/attachment_vm_lm_lima86_mag.smd")],
+    optional_meshes={
+        "muzzle_tip": (f"{_L85_BARREL}_tip.smd", f"{_L85_BARREL}.smd"),  # the flash hider
+        # The carrying handle with the rear aperture, and the foresight on its bracket: an optic takes both off, as on
+        # the real gun, where they're one kit.
+        "iron_sights": (f"{_L85}/attachment_vm_lm_lima86_sight.smd", None),
+        # The laser's mount on the handguard's right side, shown only under a laser.
+        "laser_rail": (f"{_L85}/attachment_vm_lm_lima86_laser.smd", None),
+    },
+    extra_bones={
+        # 0.2 inside the front of the flash hider, on the bore (the barrel's tag_flash_attachment is 0.67 inside it).
+        "muzzle": ("tag_barrel_attach", np.array([5.54, 0.0, 0.0])),
+        # Where the rifles' pistol grip mounts sit from the right wrist (as for the P90), on the centreline: 4.2 in front
+        # of the idle clip's wrist and 2.3 above it.
+        "tag_pistolgrip_attach": ("tag_sling", np.array([8.011, 0.0, -2.328])),
+    },
+    materials=l85a2_materials,
+    # From the addon's lua/weapons/mg_lima86/shared.lua.
+    hip=view_offset(),
+    aim=view_offset((0.0, 1.0, 0.0)),
+    sprint=view_offset(),
+    m4_sprint=True,
+    ads_pose=("ads_in", slice(-1, None)),
+    # About 4.7 kg loaded with the iron sights (3.82 kg empty, 4.98 kg with SUSAT and a loaded magazine), 0.95 kg over
+    # the AKM's 3.75: 0.25 s x sqrt((4.7 + 4) / (3.75 + 4)), as for the RPK.
+    ads_time=0.26,
+    # The hip clip rolls the gun 2.5 degrees about the bore and yaws it 1.2 every shot; the aimed one only kicks it
+    # 0.24 straight back.
+    ads_fire="fire_2",
+    report_bones=["tag_tip", "tag_silencer", "tag_flash_attachment", "tag_flash", "tag_laser_attach", "tag_laser_show",
+                  "tag_reflex", "tag_acog_2", "tag_grip_attach", "tag_stock_attach", "tag_mag_attach"],
+    # The rig's tag_brass is in the handguard (17.8 ahead of tag_sling, 3 under the bore). The real ejection port is
+    # behind the cocking handle's slot, under its hinged cover (x -3.93 to -1.62, z -0.49 to 0.33, the receiver's wall
+    # at y -0.68 and the cover at -0.83): the cases leave its middle.
+    moved_bones={"tag_brass": ("tag_sling", np.array([-2.6, -0.75, -0.1]))},
+    # The handguard's lower half: where CoD's hand sits, HC1's palm heel and thumb sank 0.39 into its left side and the
+    # fingers into the bottom rail. Measured by skinning the arms against the gun mesh (417 vertices, 0.39 deep -> 24,
+    # 0.10 at the hip and 26, 0.10 aimed; the verified Kastov 762 has 54 and 49, 0.10). The fingers still wrap the
+    # rail's underside.
+    left_grip=GripFit(shift=(0.0, 0.55, -0.55), fingers=0.4, thumb=0.1),
+)
+
 WEAPONS ={weapon.name: weapon for weapon in (KASTOV_762, KASTOV_74U, VITYAZ, RPK, BIZON, AK105, VEPR12, M16, P90,
-                                              MP7, AUG, UZI, FAL, FAMAS, M18, MCX)}
+                                              MP7, AUG, UZI, FAL, FAMAS, M18, MCX, L85A2)}
 
 
 def add_argument(parser: argparse.ArgumentParser) -> None:

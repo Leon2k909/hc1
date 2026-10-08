@@ -252,6 +252,8 @@ public static partial class GameText
 			"Fucile da battaglia belga in 7,62x51 mm: pesante e dal rinculo violento, con canna da 21 pollici e caricatore da 20 colpi.",
 		["French 5.56x45mm bullpup rifle with a 25-round magazine, a fixed carry handle and selectable automatic, three-round burst and semi-automatic fire."] =
 			"Fucile bullpup francese in 5,56x45 mm con caricatore da 25 colpi, maniglia di trasporto fissa e selettore di fuoco automatico, a raffica da tre colpi e semiautomatico.",
+		["British 5.56x45mm bullpup rifle: the SA80 service rifle, with a 20.4-inch barrel, iron sights on a carrying handle and a 30-round magazine."] =
+			"Fucile bullpup britannico in 5,56x45 mm: il fucile d'ordinanza SA80, con canna da 20,4 pollici, mire metalliche su una maniglia di trasporto e caricatore da 30 colpi.",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"Pistola d'ordinanza statunitense in 9x19 mm: la P320 compatta dell'Esercito degli Stati Uniti, con canna da 3,9 pollici e caricatore da 17 colpi.",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =

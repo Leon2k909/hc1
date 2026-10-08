@@ -832,6 +832,8 @@ public static partial class GameText
 			"比利时制7.62x51毫米战斗步枪：沉重且后坐力强，配21英寸枪管和20发弹匣。",
 		["French 5.56x45mm bullpup rifle with a 25-round magazine, a fixed carry handle and selectable automatic, three-round burst and semi-automatic fire."] =
 			"法国制5.56x45毫米无托步枪，配25发弹匣和固定提把，可选全自动、三发点射和半自动射击。",
+		["British 5.56x45mm bullpup rifle: the SA80 service rifle, with a 20.4-inch barrel, iron sights on a carrying handle and a 30-round magazine."] =
+			"英国制5.56x45毫米无托步枪：SA80制式步枪，配20.4英寸枪管、提把上的机械瞄具和30发弹匣。",
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] =
 			"美国9x19毫米制式手枪：美国陆军的紧凑型P320，配3.9英寸枪管和17发弹匣。",
 		["American 5.56x45mm short-barrelled rifle: a short-stroke piston gun with an 11.5-inch barrel and a folding stock."] =
