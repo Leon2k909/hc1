@@ -1,11 +1,17 @@
-// Combat readouts use the bundled DIN face and neutral colours; warnings carry their own state colour.
+// The in-match HUD, in the menus' look: charcoal plates darkest at the screen's edge and fading towards its middle,
+// DIN numerals with small spaced capitals, the menus' orange (MenuPage.scss's $menu-accent) for what's in hand, and
+// health's and ammo's states in amber and red.
 $hud-font: Dinish;
-$hud-plate: rgba( 0, 0, 0, 0.38 );
-$hud-text-dim: rgba( white, 0.7 );
-$hud-health: #F2F2EE;
-$hud-warn: #E5B664;
-$hud-danger: #E06B63;
-$hud-armor: #C4C8CA;
+$hud-accent: #FF7A1A;
+$hud-ink: #080A0D;
+$hud-plate: rgba( $hud-ink, 0.84 );
+$hud-plate-fade: rgba( $hud-ink, 0 );
+$hud-text-dim: rgba( white, 0.58 );
+$hud-health: #F4F4F0;
+$hud-warn: #FFB13D;
+$hud-danger: #FF4436;
+$hud-armor: #8FBEDC;
+$hud-track: rgba( white, 0.13 );
 
 .hud
 {

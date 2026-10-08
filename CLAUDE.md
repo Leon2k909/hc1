@@ -3306,29 +3306,43 @@ simulate_input.
     `LandSound` fallback), `impact-melee-metal` (`grenade.surface`), `explosion_small` (`tec/explosion_med_tec`),
     `countdown.beep` (`c4_planting_beep`), and the soundscape's `birdchirp`.
 
-## HUD look (`MainHUD`, 2026-10-05)
-- The user asked for the HUD to look different, and for the weapon list to show only while switching weapons. It's in
-  the menus' orange and charcoal now: `Hud.scss` has the palette (`$hud-accent` is MenuPage.scss's `$menu-accent`).
-  - Bottom left, `Vitals`: a dark plate with an edge in health's state colour. Health is a number and ten segments,
-    and armour is a thinner bar with the helmet's chip. It turns amber under 60% (`hurt`) and red under 30%
-    (`low-health`), where the edge pulses.
-  - Top centre, `RoundStateDisplay`: your team's score, the clock and the enemy's, each team in its colour, with a white
-    line under yours. The mode's name sits under it, and Hot Zone's countdown under that. Free-for-all shows the clock
-    only.
-    - The strip was bottom left, under the health, and the mode's name bottom right.
-    - `DefuseObjectiveHud` moved down to 104 px to clear the strip.
-    - Battle royale and Zombies have no strip, so their mode's name stays bottom right. `RoundStateTeam` is gone.
-  - Bottom right, `Ammo`: the weapon's name and fire mode over the magazine's rounds, the reserve, and a bar of how full
-    the magazine is. It's amber at a quarter or less and red when empty, and a knife or grenade shows its name only.
-  - The weapon list (`WeaponInfoComponent`) has a plate per slot, the slot key's glyph and an orange bar on the weapon
-    in hand.
+## HUD look (`MainHUD`, 2026-10-05, restyled 2026-10-08)
+- The user asked for the HUD to look different (2026-10-05), and for the weapon list to show only while switching
+  weapons. On 2026-10-08 they found it washed out ("this ui doesnt look great"): its plates were 38% black, so over a
+  pale map the HUD was light grey boxes. It's in the menus' look now. `Hud.scss` has the palette: `$hud-accent` is
+  MenuPage.scss's `$menu-accent`, and `$hud-ink` the plates' charcoal.
+  - Every plate is charcoal, 84% at its outer edge. It stays solid under its content and fades out over its last fifth,
+    towards the screen's middle. A longer fade (0.66 by 62%) left the text on almost nothing over pale ground, and the
+    fade looked smeared.
+  - Bottom left, `Vitals`:
+    - health's number (42 px) beside a HEALTH caption and ten skewed segments;
+    - armour's icon, number and bar under it, with the helmet's chip;
+    - the plate's outer edge in health's colour: white, amber under 60% (`hurt`), red under 30% (`low-health`), where
+      the edge pulses (`vitals-pulse`) and the plate turns dark red;
+    - with no armour the armour row dims (`no-armor`).
+  - Bottom right, `Ammo`:
+    - the fire mode (its key, icon and name: FULL-AUTO, SEMI-AUTO or BURST, the gunsmith's keys), then the weapon's name;
+    - the magazine's rounds (46 px), the chambered round as a raised "+1", and the reserve;
+    - a pip per round the magazine holds, and an orange one for the chamber (a bar past 50 rounds, `MaxPips`).
+    It's amber at a quarter of a magazine or less and red when empty. The plate's outer edge is orange. A knife or
+    grenade shows its name alone.
+  - The weapon list (`WeaponInfoComponent`): a plate per slot with the slot key's glyph. The weapon in hand has an
+    orange edge, a white name and its picture at full strength. The others are on lighter plates with dim names: lowered
+    opacity lost them over pale ground.
     - It shows only for 2.2 s after a switch (`ShowSeconds`): a new weapon in hand, a pickup, or the switch inputs
       themselves. Those are the slot keys, the wheel and the gamepad's NextSlot / PrevSlot.
     - It fades out but keeps its space, so nothing round it moves.
+  - Top centre, `RoundStateDisplay`, only while Score (Tab) is held: your team's score, the clock and the enemy's, each
+    team in its colour. The mode's name sits under it in spaced capitals on a dark tab, and Hot Zone's countdown under
+    that. Free-for-all shows the clock only. `DefuseObjectiveHud` is at 104 px to clear the strip.
 - State classes are set in `Tick` with `SetClass`, since a `<root class="@(...)">` doesn't take a class off again.
-- Checked only in a browser mockup of the real SCSS (flattened by a script in the session's scratchpad) over a render of
-  Railhead's concourse. It compiled nowhere, since no s&box SDK was at hand: watch the editor's log for razor errors
-  after the hotload. Not yet seen in-game.
+  `EquipmentRow`'s `is-active` was a `<root class>`, so a row could stay lit after a switch.
+- Checked on 2026-10-08:
+  - the four stylesheets parse in the editor (`StyleSheet.FromFile`, no invalid properties), and the code hotloaded
+    with no errors;
+  - a browser mockup of the real SCSS (flattened with Sass, rendered in headless Chromium at 1920x1080), over a pale
+    green field like the user's screenshot and over Depot and Railhead, in every state.
+  Not yet seen in a match.
 
 ## Damage indicator (`DamageIndicator`, `PlayerPawn.IndicatorSource`)
 - The user, shot in the back, saw the red bar for a hit from the front, from where nobody could stand (2026-10-05). The

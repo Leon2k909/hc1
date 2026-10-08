@@ -2,7 +2,7 @@
 @inherits Panel
 
 @* One piece of equipment in the loadout list (WeaponInfoComponent): its name, then its picture. *@
-<root class="@(IsActive ? "is-active" : "")">
+<root>
     @if ( Equipment.IsValid() )
     {
         <label class="gunname">@Equipment.Resource.Name</label>
@@ -30,6 +30,13 @@
 
     public PlayerPawn Player => Equipment?.Owner;
     public bool IsActive => Player?.CurrentEquipment == Equipment;
+
+    // Set here: a <root class="@(...)"> adds a class but doesn't take it off again, so a row could stay lit after a switch.
+    public override void Tick()
+    {
+        base.Tick();
+        SetClass( "is-active", IsActive );
+    }
 
     protected override int BuildHash()
     {

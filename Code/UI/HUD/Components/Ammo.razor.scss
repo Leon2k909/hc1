@@ -1,6 +1,8 @@
 @import "/UI/Styles/Theme.scss";
 
-// Magazine and reserve are separated by scale and spacing. Colour signals low or empty ammo.
+// Bottom right, the vitals' mirror: the plate fades out towards the screen's middle, with its edge on the right. The
+// magazine is big and white, the reserve small and dim; the pips are the rounds, emptying from the left. Amber at a
+// quarter of a magazine or less, red when empty.
 Ammo
 {
     flex-direction: column;
@@ -14,68 +16,173 @@ Ammo
         position: relative;
         flex-direction: column;
         align-items: flex-end;
-        min-width: 160px;
-        padding: 8px 12px;
-        background-color: $hud-plate;
+        min-width: 300px;
+        padding: 10px 17px 12px 52px;
+        background-image: linear-gradient( to left, $hud-plate 0%, rgba( $hud-ink, 0.76 ) 80%, $hud-plate-fade 100% );
+    }
+
+    // The outer edge: the menus' orange for the weapon in hand.
+    .edge
+    {
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background-color: $hud-accent;
+    }
+
+    .sheen
+    {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        height: 1px;
+        background-image: linear-gradient( to left, rgba( white, 0.24 ), rgba( white, 0 ) );
     }
 
     .top-line
     {
         flex-direction: row;
         align-items: center;
-        gap: 8px;
-    }
-
-    .weapon-name
-    {
-        font-size: 14px;
-        font-weight: normal;
-        color: white;
-        text-shadow: 0 1px 2px rgba( black, 0.8 );
+        gap: 10px;
     }
 
     .firemode
     {
         flex-direction: row;
         align-items: center;
-        gap: 4px;
-        opacity: 0.85;
+        gap: 5px;
+
+        Icon { opacity: 0.8; }
+    }
+
+    .mode-name
+    {
+        font-size: 11px;
+        font-weight: bold;
+        letter-spacing: 2px;
+        color: $hud-text-dim;
+    }
+
+    .divider
+    {
+        width: 1px;
+        height: 14px;
+        background-color: rgba( white, 0.22 );
+    }
+
+    .weapon-name
+    {
+        font-size: 15px;
+        font-weight: bold;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: white;
+        text-shadow: 0 1px 3px rgba( black, 0.7 );
     }
 
     .count-line
     {
         flex-direction: row;
         align-items: flex-end;
-        gap: 10px;
-        margin-top: 2px;
+        margin-top: 4px;
     }
 
     .mag
     {
-        font-size: 34px;
+        font-size: 46px;
         font-weight: bold;
-        line-height: 36px;
+        line-height: 42px;
         color: $hud-health;
-        text-shadow: 0 1px 3px rgba( black, 0.8 );
+        text-shadow: 0 1px 4px rgba( black, 0.7 );
+    }
+
+    // The chambered round, raised beside the magazine's count.
+    .chamber
+    {
+        align-self: flex-start;
+        margin-left: 2px;
+        font-size: 17px;
+        font-weight: bold;
+        color: rgba( $hud-health, 0.7 );
     }
 
     .separator, .reserve
     {
-        margin-bottom: 4px;
-        font-weight: normal;
+        margin-bottom: 3px;
+        font-weight: bold;
         color: $hud-text-dim;
-        text-shadow: 0 1px 2px rgba( black, 0.8 );
+        text-shadow: 0 1px 2px rgba( black, 0.7 );
     }
 
     .separator
     {
+        margin-left: 10px;
+        margin-right: 6px;
         font-size: 18px;
-        opacity: 0.6;
+        color: rgba( white, 0.3 );
     }
 
     .reserve
     {
-        font-size: 16px;
+        font-size: 22px;
+    }
+
+    // A pip per round: 4 px wide, 3 px past 30 rounds, so a 30's row is as long as a 50's.
+    .rounds
+    {
+        flex-direction: row;
+        align-items: flex-end;
+        gap: 2px;
+        margin-top: 8px;
+
+        .pip
+        {
+            width: 4px;
+            height: 11px;
+            background-color: $hud-track;
+            transform: skewX( -16deg );
+
+            &.loaded { background-color: $hud-health; }
+
+            // The round in the chamber, set apart from the magazine's.
+            &.chamber
+            {
+                margin-left: 4px;
+                height: 14px;
+                background-color: rgba( $hud-accent, 0.25 );
+
+                &.loaded { background-color: $hud-accent; }
+            }
+        }
+
+        &.thin .pip
+        {
+            width: 3px;
+
+            &.chamber { width: 4px; }
+        }
+    }
+
+    .mag-bar
+    {
+        position: relative;
+        width: 220px;
+        height: 6px;
+        margin-top: 8px;
+        background-color: $hud-track;
+        transform: skewX( -16deg );
+
+        .fill
+        {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            background-color: $hud-health;
+        }
     }
 
     &.no-ammo .plate
@@ -85,11 +192,14 @@ Ammo
 
     &.low
     {
-        .mag { color: $hud-warn; }
+        .mag, .chamber { color: $hud-warn; }
+        .rounds .pip.loaded, .mag-bar .fill { background-color: $hud-warn; }
+        .rounds .pip.chamber.loaded { background-color: $hud-accent; }
     }
 
     &.empty
     {
         .mag { color: $hud-danger; }
+        .rounds .pip, .mag-bar { background-color: rgba( $hud-danger, 0.3 ); }
     }
 }

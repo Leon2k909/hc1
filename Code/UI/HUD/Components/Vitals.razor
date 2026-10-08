@@ -4,12 +4,20 @@
 
 @if ( !Pawn.IsValid() || !HealthComponent.IsValid() ) return;
 
+@* Bottom left: health's number and bar, armour's under it. The plate is darkest at the screen's edge and fades out
+   towards the middle, and its edge takes health's state colour (Tick). *@
 <root>
     <div class="plate">
-        <div class="rows">
-            <div class="health-row">
-                <Icon File="/ui/health.png" Size="@(20)" />
-                <label class="value">@Health</label>
+        <div class="edge" />
+        <div class="sheen" />
+
+        <div class="health-row">
+            <label class="value">@Health</label>
+            <div class="bar-column">
+                <div class="caption-row">
+                    <Icon File="/ui/health.png" Size="@(12)" />
+                    <label class="caption">@Tr( "HEALTH" )</label>
+                </div>
                 <div class="segments">
                     @for ( var k = 0; k < Segments; k++ )
                     {
@@ -17,22 +25,24 @@
                     }
                 </div>
             </div>
-
-            @if ( ArmorComponent.IsValid() )
-            {
-                <div class="armor-row">
-                    <Icon File="/ui/armor.png" Size="@(14)" />
-                    <label class="value-sm">@Armor</label>
-                    <div class="armor-bar"><div class="fill" style="width: @(ArmorPercent)%;" /></div>
-                    @if ( HasHelmet )
-                    {
-                        <div class="helmet" title="@Tr( "HELMET" )">
-                            <Icon File="/ui/helmet.png" Size="@(16)" />
-                        </div>
-                    }
-                </div>
-            }
         </div>
+
+        @if ( ArmorComponent.IsValid() )
+        {
+            <div class="armor-row">
+                <div class="armor-value">
+                    <Icon File="/ui/armor.png" Size="@(13)" />
+                    <label class="value-sm">@Armor</label>
+                </div>
+                <div class="armor-bar"><div class="fill" style="width: @(ArmorPercent)%;" /></div>
+                @if ( HasHelmet )
+                {
+                    <div class="helmet" title="@Tr( "HELMET" )">
+                        <Icon File="/ui/helmet.png" Size="@(14)" />
+                    </div>
+                }
+            </div>
+        }
     </div>
 </root>
 
@@ -79,5 +89,6 @@
         var valid = Pawn.IsValid() && HealthComponent.IsValid();
         SetClass( "low-health", valid && HealthFraction < 0.3f );
         SetClass( "hurt", valid && HealthFraction >= 0.3f && HealthFraction < 0.6f );
+        SetClass( "no-armor", valid && ( !ArmorComponent.IsValid() || Armor <= 0 ) );
     }
 }

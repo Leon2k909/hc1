@@ -1,6 +1,7 @@
 @import "/UI/Styles/Theme.scss";
 
-// The numbers and bars carry the information; the backing only keeps them readable over the world.
+// Bottom left. The plate keeps the numbers readable over the world without a box's hard edge: it fades out towards the
+// screen's middle. Health is white, amber when hurt and red when low, where the edge pulses.
 Vitals
 {
     position: relative;
@@ -11,48 +12,83 @@ Vitals
     .plate
     {
         position: relative;
-        flex-direction: row;
-        min-width: 280px;
-        padding: 10px 12px;
-        background-color: $hud-plate;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 320px;
+        padding: 11px 46px 12px 17px;
+        background-image: linear-gradient( to right, $hud-plate 0%, rgba( $hud-ink, 0.76 ) 82%, $hud-plate-fade 100% );
     }
 
-    .rows
+    // The outer edge, in health's state colour.
+    .edge
     {
-        flex-direction: column;
-        flex-grow: 1;
-        gap: 6px;
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background-color: rgba( $hud-health, 0.85 );
+    }
+
+    // A hairline along the top, fading out with the plate.
+    .sheen
+    {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        height: 1px;
+        background-image: linear-gradient( to right, rgba( white, 0.24 ), rgba( white, 0 ) );
     }
 
     .health-row, .armor-row
     {
         flex-direction: row;
         align-items: center;
-    }
-
-    .health-row
-    {
-        gap: 8px;
-
-        Icon { opacity: 0.85; }
+        gap: 12px;
     }
 
     .value
     {
-        min-width: 46px;
-        font-size: 32px;
+        min-width: 64px;
+        font-size: 42px;
         font-weight: bold;
-        line-height: 34px;
+        line-height: 40px;
         color: $hud-health;
-        text-shadow: 0 1px 3px rgba( black, 0.8 );
+        text-shadow: 0 1px 4px rgba( black, 0.7 );
     }
 
+    .bar-column
+    {
+        flex-grow: 1;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .caption-row
+    {
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+
+        Icon { opacity: 0.7; }
+    }
+
+    .caption
+    {
+        font-size: 11px;
+        font-weight: bold;
+        letter-spacing: 2.5px;
+        color: $hud-text-dim;
+    }
+
+    // Ten segments, each a tenth of the bar, leaning like the menus' cut corners.
     .segments
     {
         flex-direction: row;
-        flex-grow: 1;
-        gap: 2px;
-        height: 6px;
+        gap: 3px;
+        height: 11px;
+        padding-left: 2px;
     }
 
     .seg
@@ -60,8 +96,8 @@ Vitals
         position: relative;
         flex-grow: 1;
         height: 100%;
-        background-color: rgba( white, 0.14 );
-        overflow: hidden;
+        background-color: $hud-track;
+        transform: skewX( -16deg );
 
         .fill
         {
@@ -73,30 +109,33 @@ Vitals
         }
     }
 
-    .armor-row
+    .armor-value
     {
-        gap: 7px;
-        padding-left: 3px;
+        min-width: 64px;
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
 
-        Icon { opacity: 0.8; }
+        Icon { opacity: 0.85; }
     }
 
     .value-sm
     {
-        min-width: 32px;
-        font-size: 16px;
-        font-weight: normal;
+        font-size: 18px;
+        font-weight: bold;
+        line-height: 18px;
         color: $hud-armor;
-        text-shadow: 0 1px 2px rgba( black, 0.8 );
+        text-shadow: 0 1px 3px rgba( black, 0.7 );
     }
 
     .armor-bar
     {
         position: relative;
         flex-grow: 1;
-        height: 3px;
-        background-color: rgba( white, 0.12 );
-        overflow: hidden;
+        height: 5px;
+        margin-left: 2px;
+        background-color: $hud-track;
+        transform: skewX( -16deg );
 
         .fill
         {
@@ -110,19 +149,41 @@ Vitals
 
     .helmet
     {
+        height: 20px;
+        padding: 0 4px;
         align-items: center;
-        opacity: 0.8;
+        border: 1px solid rgba( $hud-armor, 0.5 );
+        background-color: rgba( $hud-armor, 0.14 );
+    }
+
+    &.no-armor
+    {
+        .value-sm { color: $hud-text-dim; }
+        .armor-value Icon { opacity: 0.4; }
     }
 
     &.hurt
     {
-        .seg .fill { background-color: $hud-warn; }
+        .edge, .seg .fill { background-color: $hud-warn; }
         .value { color: $hud-warn; }
     }
 
     &.low-health
     {
-        .seg .fill { background-color: $hud-danger; }
+        .edge, .seg .fill { background-color: $hud-danger; }
         .value { color: $hud-danger; }
+        .edge { animation: vitals-pulse 0.9s linear infinite; }
+
+        .plate
+        {
+            background-image: linear-gradient( to right, rgba( 58, 8, 6, 0.88 ) 0%, rgba( 34, 7, 6, 0.76 ) 82%, rgba( 34, 7, 6, 0 ) 100% );
+        }
     }
+}
+
+@keyframes vitals-pulse
+{
+    0% { opacity: 1; }
+    50% { opacity: 0.25; }
+    100% { opacity: 1; }
 }

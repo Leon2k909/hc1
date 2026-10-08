@@ -8,9 +8,14 @@
 @if ( !Player.CurrentEquipment.IsValid() )
     return;
 
-@* Weapon and fire mode above magazine + chamber / reserve. Melee shows the weapon name alone. *@
+@* Bottom right: the fire mode and the weapon, then the magazine, the chambered round and the reserve, then a pip per
+   round the magazine holds (a bar past MaxPips). A knife or grenade shows its name alone. The plate fades out towards
+   the screen's middle like the vitals'. *@
 <root>
     <div class="plate">
+        <div class="edge" />
+        <div class="sheen" />
+
         <div class="top-line">
             @if ( Shoot.IsValid() )
             {
@@ -19,8 +24,10 @@
                     {
                         <InputHint Action="FireMode" class="small" Size="@InputGlyphSize.Small" />
                     }
-                    <Icon File=@FireModeFile Size="@(18)" />
+                    <Icon File=@FireModeFile Size="@(16)" />
+                    <label class="mode-name">@Tr( FireModeKey )</label>
                 </div>
+                <div class="divider" />
             }
             <label class="weapon-name">@Player.CurrentEquipment.Resource.Name</label>
         </div>
@@ -28,16 +35,43 @@
         @if ( HasAmmo is { } ammo )
         {
             <div class="count-line">
-                <label class="mag">@AmmoDisplay</label>
+                <label class="mag">@ammo.AmmoInMagazine</label>
+                @if ( ammo.ChamberedRounds > 0 )
+                {
+                    <label class="chamber">+@ammo.ChamberedRounds</label>
+                }
                 <label class="separator">/</label>
                 <label class="reserve">@ammo.ReserveAmmo</label>
             </div>
+
+            var capacity = ammo.GetEffectiveMaxAmmo();
+            @if ( capacity > 0 && capacity <= MaxPips )
+            {
+                var spent = capacity - Math.Clamp( ammo.AmmoInMagazine, 0, capacity );
+                <div class="rounds @(capacity > 30 ? "thin" : "")">
+                    @for ( var k = 0; k < capacity; k++ )
+                    {
+                        <div class="pip @(k >= spent ? "loaded" : "")" />
+                    }
+                    @if ( ammo.HasChamber )
+                    {
+                        <div class="pip chamber @(ammo.ChamberedRounds > 0 ? "loaded" : "")" />
+                    }
+                </div>
+            }
+            else if ( capacity > MaxPips )
+            {
+                <div class="mag-bar"><div class="fill" style="width: @(MagPercent)%;" /></div>
+            }
         }
     </div>
 </root>
 
 @code
 {
+    /// A magazine bigger than this shows a bar instead of a pip per round.
+    private const int MaxPips = 50;
+
     /// <summary>
     /// The player's inventory
     /// </summary>
@@ -47,18 +81,6 @@
     public PlayerPawn Player => Client.Viewer.PlayerPawn;
 
     private WeaponAmmo HasAmmo => Player?.CurrentEquipment?.Components?.Get<WeaponAmmo>(FindMode.EverythingInSelfAndDescendants);
-
-    /// Magazine + chamber: "29+1".
-    private string AmmoDisplay
-    {
-        get
-        {
-            var ammo = HasAmmo;
-            if ( ammo is null ) return "";
-            if ( ammo.ChamberedRounds < 1 ) return ammo.Ammo.ToString();
-            return $"{ammo.AmmoInMagazine}+{ammo.ChamberedRounds}";
-        }
-    }
 
     private float MagFraction
     {
@@ -70,6 +92,8 @@
             return max > 0 ? Math.Clamp( ammo.AmmoInMagazine / (float)max, 0f, 1f ) : 1f;
         }
     }
+
+    private int MagPercent => (int)Math.Round( MagFraction * 100f );
 
     /// "empty" with nothing left to fire, "low" at a quarter of a magazine or less.
     private string AmmoState
@@ -95,6 +119,15 @@
         }
     }
 
+    // The gunsmith's names for the modes. Built outside the Tr call, which check_translations.py reads its first string
+    // literal from.
+    private string FireModeKey => !Shoot.IsValid() ? "" : Shoot.CurrentFireMode switch
+    {
+        FireMode.Automatic => "FULL-AUTO",
+        FireMode.Burst => "BURST",
+        _ => "SEMI-AUTO",
+    };
+
     // The state's class is set here: a <root class="@(...)"> adds a class but doesn't take it off again.
     public override void Tick()
     {
@@ -109,6 +142,8 @@
     {
         if ( !Player.IsValid() || !Player.CurrentEquipment.IsValid() )
             return 0;
-        return HashCode.Combine( Player, HasAmmo?.Ammo, HasAmmo?.ReserveAmmo, Player?.CurrentEquipment, FireModeFile, AmmoState );
+        var ammo = HasAmmo;
+        return HashCode.Combine( Player, ammo?.Ammo, ammo?.ReserveAmmo, ammo?.GetEffectiveMaxAmmo(), Player?.CurrentEquipment,
+                                 FireModeFile, AmmoState );
     }
 }
