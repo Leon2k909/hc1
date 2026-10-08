@@ -6,6 +6,7 @@
 .vs/*
 .vscode/*
 *.csproj
+!Tools/BlastLimbExport/BlastLimbExport.csproj
 obj
 bin
 Properties/*
@@ -32,3 +33,6 @@ Exports/*
 # Python bytecode (Tools scripts)
 __pycache__/
 *.pyc
+
+# Generated sources and validation captures for split ragdoll clothing
+/output/blast-limbs/

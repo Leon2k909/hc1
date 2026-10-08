@@ -1249,7 +1249,7 @@ def write_shatter_prefab( path ):
         "Alpha": { "Type": "Curve", "Evaluation": "Life", "CurveA": curve_frames( [ ( 0.0, 1.0 ), ( 0.8, 1.0 ), ( 1.0, 0.0 ) ] ),
                    "CurveB": [ { "x": 0.5, "y": 0.5, "in": 0, "out": 0, "mode": "Mirrored" } ] },
         "ApplyAlpha": True, "ApplyColor": True, "ApplyRotation": True, "ApplyShape": True,
-        "Bounce": 0.15, "Brightness": 1, "Bumpiness": 0,
+        "Bounce": 0, "Brightness": 1, "Bumpiness": 0,
         "Collision": True, "CollisionIgnore": "playerclip", "CollisionPrefab": None, "CollisionPrefabAlign": False,
         "CollisionPrefabChance": 1, "CollisionPrefabRotation": 0, "CollisionRadius": 0.25,
         "ConstantMovement": zero, "Damping": 0.2, "DieOnCollisionChance": 0,
