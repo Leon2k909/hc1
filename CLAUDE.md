@@ -4321,6 +4321,42 @@ simulate_input.
   legs and feet), the trousers and boots on and the other garments off. A body dressed before the code hotloaded in had
   every garment off, since it had no record of what it wore; a respawn fixed it. Not yet seen from the camera.
 
+## First-person clothing (`ViewModelClothing`, `Code/Weapons/ViewModelClothing.cs`)
+- The user (2026-10-08): "when holding a gun i dont see my clothes on my arms". Every viewmodel's arms are
+  `v_first_person_arms_human.vmdl`, bare skin whatever the outfit.
+- `Equipment.CreateViewModel` adds a `ViewModelClothing` to the viewmodel (`Fit`). Once the body wears a uniform
+  (the human model with a `MilitaryUniform`), it dresses the arms:
+  - It hides the arms' own mesh: their `arms` bodygroup goes to its last, empty choice, and comes back when it undresses.
+  - In its place it draws a copy of the body (a "Clothing" child of the arms), dressed by its own `MilitaryUniform` in
+    the body's style and pieces: the shirt's sleeves, the gloves (the Tactical and Desert Operators' tints too), and the
+    skin where nothing covers it (the Military Operator's bare hands).
+  - The Head, Legs and Feet bodygroups are hidden, and so is every garment with no arm, hand or finger bones (helmet,
+    balaclava, trousers, boots).
+  - It's drawn on the overlay layer with no shadow, like the arms, so `ViewModelMask` counts it as the gun.
+  - It checks the body every 0.5 s and dresses again when the style changes (an outfit pick reaching the host).
+  - It follows the arms' Enabled, so it goes while the tablet flies the drone, and with the developer menu's Toggle
+    View Model.
+- Why not sleeves over the first-person arms: their forearm is 0.2-0.35" thicker than the body's, so the body's
+  garments poked through. The body's own arms keep its garments fitted as in third person.
+- The pose, in `ICameraSetup.LateSetup` (new: after PostSetup, so after `SwbArmsRetarget` and the tablet's, the
+  defuse kit's and the throwables' arm posers):
+  - The arm and finger bones (the two skeletons share their names and axes) take the first-person arms' model-space
+    transforms as they are.
+  - The torso has no first-person bones. spine_2 goes half way between where each clavicle puts it, and every bone off
+    the arms keeps its bind pose relative to it.
+  - The forearm's twist bones take the hand's turn about the forearm as the citizen's constraints do (twist0 none, twist1
+    two thirds), and the elbow helper sits half way between the upper arm and the forearm.
+  - It goes in as bone overrides in model space plus the world transforms, as `SwbArmsRetarget`'s does. Garments are
+    posed from the same pose (not bone-merged a frame behind), and a garment bone the body lacks keeps its bind pose
+    against the torso.
+- The camo pass (`GunsmithLoadoutManager`) skips it, as it skips the arms: it leaves any renderer under a
+  `MilitaryUniform`.
+- Not on the gunsmith's stage or in Theater (no owner), nor on the legacy player models.
+- Compiled offline with dotnet (2026-10-08), with the editor closed. Nothing has been seen in-game. To check: the
+  sleeves and gloves on each outfit at the hip, aiming, reloading and sprinting; that the first-person arms' longer
+  bones don't stretch the elbows or wrists; the cuffs against the gloves; whether the shirt's collar, the vest or the
+  chest shows when looking down or sprinting; and the hands on the tablet and the defuse kit.
+
 ## Third-person left hand (world models' `LeftHandIK`, players and bots)
 - `rigged_human.vanmgrph` had no IK, so the world models' `LeftHandIK` points did nothing. The left hand followed the
   rifle clip and missed short handguards (the user saw bots' hands off the Kastov-74u). The graph now ends in a

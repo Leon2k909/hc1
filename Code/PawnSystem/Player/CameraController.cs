@@ -18,6 +18,9 @@ public interface ICameraSetup : ISceneEvent<ICameraSetup>
 
 	// Effects including viewmodel
 	public void PostSetup( CameraComponent cc ) { }
+
+	// Follows the viewmodel's final pose, after PostSetup's arm posers
+	public void LateSetup( CameraComponent cc ) { }
 }
 
 public sealed class CameraController : PawnCameraController, IGameEventHandler<DamageTakenEvent>
@@ -92,6 +95,7 @@ public sealed class CameraController : PawnCameraController, IGameEventHandler<D
 		ICameraSetup.Post( x => x.PreSetup( Camera ) );
 		ICameraSetup.Post( x => x.Setup( Camera ) );
 		ICameraSetup.Post( x => x.PostSetup( Camera ) );
+		ICameraSetup.Post( x => x.LateSetup( Camera ) );
 
 		UpdateMouseVisibility();
 	}

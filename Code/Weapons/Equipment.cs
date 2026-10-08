@@ -330,6 +330,9 @@ public partial class Equipment : Component, Component.INetworkListener, IDescrip
 			// equipment needs to know about the ViewModel
 			ViewModel = viewModelComponent;
 
+			// The player's own sleeves, gloves and skin on the first-person arms.
+			ViewModelClothing.Fit( viewModelComponent, player );
+
 			viewModelGameObject.BreakFromPrefab();
 		}
 

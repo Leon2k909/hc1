@@ -919,6 +919,10 @@ public static class GunsmithLoadoutManager
 			if ( renderer.Model is not null && renderer.Model == armsModel )
 				continue;
 
+			// Nor the sleeves, gloves and skin drawn over them (ViewModelClothing's body wears a MilitaryUniform).
+			if ( renderer.GetComponentInParent<MilitaryUniform>( true ).IsValid() )
+				continue;
+
 			// A sticker is vinyl over the paint, so the camo doesn't go on it.
 			if ( renderer.Components.Get<GunsmithSticker>( FindMode.EverythingInSelf ).IsValid() )
 				continue;
