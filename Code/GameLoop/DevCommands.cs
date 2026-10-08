@@ -546,6 +546,34 @@ public static class DevCommands
 		weather.Set( parsed, rate );
 		Log.Info( $"dev_weather: {weather.Kind}, {weather.RainRate:0.##} mm/h" );
 	}
+
+	/// <summary>
+	/// Holds every puddle at a fill, 0-1 of its hollow (this machine only), to look at them without waiting for the rain
+	/// to fill them. With no argument, or below 0, they follow the rain again. Puddles only show while it rains.
+	/// </summary>
+	[ConCmd( "dev_puddles" )]
+	public static void SetPuddles( float fill = -1f )
+	{
+		RainPuddles.ForcedFill = fill < 0f ? -1f : Math.Clamp( fill, 0f, 1f );
+		Log.Info( fill < 0f ? "dev_puddles: following the rain" : $"dev_puddles: held at {RainPuddles.ForcedFill:0.##}" );
+	}
+
+	/// <summary>
+	/// A lightning strike <paramref name="distance"/> m off in the way you're looking (this machine only), flash and
+	/// thunder: dev_thunder [metres] [cloud]. It only shows while it rains.
+	/// </summary>
+	[ConCmd( "dev_thunder" )]
+	public static void Thunder( float distance = 1500f, int cloud = 0 )
+	{
+		var camera = Game.ActiveScene?.Camera;
+		var forward = camera.IsValid() ? camera.WorldRotation.Forward : Vector3.Forward;
+		var bearing = MathF.Atan2( forward.y, forward.x );
+		distance = MathF.Max( distance, 50f );
+		RainView.RequestStrike( distance, bearing, cloud != 0 );
+		// A flash in the cloud is heard from the cloud over it, about 6 km up.
+		var heard = cloud != 0 ? MathF.Sqrt( distance * distance + 6000f * 6000f ) : distance;
+		Log.Info( $"dev_thunder: {(cloud != 0 ? "in the cloud" : "to the ground")} {distance:0} m off, heard in {heard / 338f:0.0} s" );
+	}
 }
 
 /// <summary> Presses Escape for <see cref="DevCommands.PressEscape"/> as the scene's update starts, before anything takes it. </summary>

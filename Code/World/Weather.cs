@@ -110,6 +110,11 @@ public sealed class Weather : Component
 		// Of the rainy matches: a quarter drizzle, two fifths steady rain, the rest showers.
 		var pick = Random.Shared.NextSingle();
 		Set( pick < 0.25f ? WeatherKind.Drizzle : pick < 0.65f ? WeatherKind.Steady : WeatherKind.Showers, -1f );
+
+		// The grass is as wet as the rain before the match left it.
+		_wetMm = 0f;
+		for ( var t = -7200f; t < 0f; t += 60f )
+			_wetMm = (_wetMm + Schedule.RateAt( Kind, Seed, t + 30f ) / 3600f * 60f) * MathF.Exp( -60f / 3600f );
 		Log.Info( $"Weather: {Kind}" );
 	}
 
@@ -176,14 +181,25 @@ public sealed class Weather : Component
 
 		private static readonly Dictionary<int, Shower[]> Showers = new();
 
+		/// <summary>
+		/// The rate at <paramref name="time"/> seconds into the match. It's rained before the match too (negative times),
+		/// so the ground is as wet as that left it (<see cref="RainPuddles"/>): drizzle and steady rain set in 10 minutes
+		/// to 2 hours before, and showers have often had one in the last hour.
+		/// </summary>
 		public static float RateAt( WeatherKind kind, int seed, float time ) => kind switch
 		{
 			// Drizzle and stratiform rain come and go slowly, with the deck's own lumps.
-			WeatherKind.Drizzle => MathX.Lerp( 0.2f, 0.8f, Hash01( seed, 1 ) ) * Wander( seed, time, 0.3f ),
-			WeatherKind.Steady => MathX.Lerp( 2f, 6f, Hash01( seed, 2 ) ) * Wander( seed, time, 0.35f ),
+			WeatherKind.Drizzle => MathX.Lerp( 0.2f, 0.8f, Hash01( seed, 1 ) ) * Wander( seed, time, 0.3f ) * SetIn( seed, time ),
+			WeatherKind.Steady => MathX.Lerp( 2f, 6f, Hash01( seed, 2 ) ) * Wander( seed, time, 0.35f ) * SetIn( seed, time ),
 			WeatherKind.Showers => ShowerRate( seed, time ),
 			_ => 0f,
 		};
+
+		/// <summary> When a front's rain set in, before the match: 10 minutes to 2 hours. </summary>
+		public static float RainStart( int seed ) => -MathX.Lerp( 600f, 7200f, Hash01( seed, 6 ) );
+
+		/// <summary> 0 before the rain set in, coming in over its first five minutes. </summary>
+		private static float SetIn( int seed, float time ) => RainView.SmoothStep( RainStart( seed ), RainStart( seed ) + 300f, time );
 
 		/// <summary> 1 give or take <paramref name="amount"/>, wandering over ten minutes, three and under one. </summary>
 		private static float Wander( int seed, float time, float amount )
@@ -223,6 +239,18 @@ public sealed class Weather : Component
 				if ( Showers.TryGetValue( seed, out var list ) ) return list;
 				var random = new System.Random( seed );
 				var showers = new List<Shower>();
+
+				// Seven times in ten, one went over in the hour before the match, ending 5 minutes to an hour before it.
+				// It has its own random numbers, so the match's showers are the same with or without it.
+				var before = new System.Random( seed ^ 0x5BD1E995 );
+				if ( before.NextSingle() < 0.7f )
+				{
+					var end = -(300f + 3300f * before.NextSingle());
+					var length = 180f + 300f * before.NextSingle();
+					var v = before.NextSingle();
+					showers.Add( new Shower( end - length, length, 4f + 36f * v * v ) );
+				}
+
 				// The first comes soon after the start, then a gap of 3 to 10 minutes after each, for four hours.
 				var at = 10f + 80f * random.NextSingle();
 				while ( at < 4 * 3600f )
@@ -238,7 +266,122 @@ public sealed class Weather : Component
 			}
 		}
 
-		private static float Hash01( int seed, int salt )
+		/// <summary>
+		/// A lightning flash: when (seconds into the match), how far off (m), its bearing in the map's plan (radians from
+		/// +X), whether it stayed in the cloud, and a number for its strokes and its thunder's take.
+		/// </summary>
+		public readonly record struct Strike( float Time, float Distance, float Bearing, bool IsCloud, int Salt );
+
+		private static readonly Dictionary<(WeatherKind, int), Strike[]> StrikeLists = new();
+
+		/// <summary> Past this, thunder isn't heard (it's refracted up over the listener); the flash still shows. </summary>
+		public const float AudibleRange = 18000f;
+
+		/// <summary>
+		/// The match's lightning, in time order. A shower that peaks over 12 mm/h is a thunderstorm's: its cell drifts past
+		/// at 6-14 m/s with the others, closest 0.5-6 km off when the rain's heaviest, and flashes from 5 minutes before
+		/// its rain to 3 after, most in its mature middle, half a flash to three a minute for the strongest. Three in five
+		/// flashes stay in the cloud. One steady rain in three has embedded storms far off, with a rumble every 3-6 minutes.
+		/// Drizzle has none.
+		/// </summary>
+		public static Strike[] Strikes( WeatherKind kind, int seed )
+		{
+			lock ( StrikeLists )
+			{
+				if ( StrikeLists.TryGetValue( (kind, seed), out var cached ) ) return cached;
+
+				var random = new System.Random( seed ^ 0x2545F491 );
+				var strikes = new List<Strike>();
+				var steering = Hash01( seed, 8 ) * MathF.Tau;
+
+				if ( kind == WeatherKind.Showers )
+				{
+					foreach ( var shower in ShowersOf( seed ) )
+					{
+						if ( shower.Peak <= 12f ) continue;
+						var perSecond = MathX.Lerp( 0.5f, 3f, (shower.Peak - 12f) / 28f ) / 60f;
+						var heading = steering + (random.NextSingle() - 0.5f) * 1.0f;
+						var speed = 6f + 8f * random.NextSingle();
+						var miss = (500f + 5500f * random.NextSingle() * random.NextSingle()) * (random.NextSingle() < 0.5f ? -1f : 1f);
+						var dir = new Vector2( MathF.Cos( heading ), MathF.Sin( heading ) );
+						var side = new Vector2( -dir.y, dir.x );
+						var from = shower.Start - 300f;
+						var to = shower.Start + shower.Duration + 180f;
+						var mid = shower.Start + shower.Duration * 0.5f;
+
+						// A Poisson stream at the peak rate, thinned to a bell over the cell's life.
+						for ( var t = from; ; )
+						{
+							t += -MathF.Log( 1f - 0.999f * random.NextSingle() ) / perSecond;
+							if ( t > to ) break;
+							var x = (t - mid) / (0.5f * (to - from));
+							var keep = random.NextSingle() < MathF.Exp( -2.5f * x * x );
+							var r = 1800f * MathF.Sqrt( -2f * MathF.Log( 1f - 0.999f * random.NextSingle() ) );
+							var a = random.NextSingle() * MathF.Tau;
+							var cloud = random.NextSingle() < 0.6f;
+							var salt = random.Next();
+							if ( !keep ) continue;
+
+							var at = dir * (speed * (t - mid)) + side * miss + new Vector2( MathF.Cos( a ), MathF.Sin( a ) ) * r;
+							strikes.Add( new Strike( t, MathF.Max( at.Length, 150f ), MathF.Atan2( at.y, at.x ), cloud, salt ) );
+						}
+					}
+				}
+				else if ( kind == WeatherKind.Steady && Hash01( seed, 7 ) < 0.3f )
+				{
+					for ( var t = 60f + 120f * random.NextSingle(); t < 4 * 3600f; t += 180f + 180f * random.NextSingle() )
+					{
+						var bearing = steering + (random.NextSingle() - 0.5f) * 2f;
+						strikes.Add( new Strike( t, 6000f + 9000f * random.NextSingle(), bearing, random.NextSingle() < 0.8f, random.Next() ) );
+					}
+				}
+
+				strikes.Sort( ( a, b ) => a.Time.CompareTo( b.Time ) );
+				var list = strikes.ToArray();
+				StrikeLists[(kind, seed)] = list;
+				return list;
+			}
+		}
+
+		/// <summary>
+		/// How bright a flash is <paramref name="t"/> seconds after it began, against a ground strike's 2 km off. A ground
+		/// flash is 2-5 return strokes 35-85 ms apart, each a blink that's gone in a few tens of milliseconds, with the
+		/// channel glowing between them. A flash in the cloud lights it from inside: dimmer, softer pulses over half a
+		/// second. Under the cloud the light comes from all round, so it falls off slower than a point's would.
+		/// </summary>
+		public static float FlashAt( in Strike strike, float t )
+		{
+			if ( t < 0f || t > 1.2f ) return 0f;
+			var light = 0f;
+			var at = 0f;
+			if ( strike.IsCloud )
+			{
+				var pulses = 3 + (int)(Hash01( strike.Salt, 1 ) * 4f);
+				for ( var i = 0; i < pulses && at <= t; i++ )
+				{
+					var rise = Math.Clamp( (t - at) / 0.02f, 0f, 1f );
+					light += (0.5f + 0.5f * Hash01( strike.Salt, 10 + i )) * rise * MathF.Exp( -(t - at) / 0.07f );
+					at += 0.06f + 0.12f * Hash01( strike.Salt, 20 + i );
+				}
+				light *= 0.45f;
+			}
+			else
+			{
+				var strokes = 2 + (int)(Hash01( strike.Salt, 1 ) * 4f);
+				for ( var i = 0; i < strokes && at <= t; i++ )
+				{
+					light += (i == 0 ? 1f : 0.6f + 0.3f * Hash01( strike.Salt, 10 + i )) * MathF.Exp( -(t - at) / 0.025f );
+					at += 0.035f + 0.05f * Hash01( strike.Salt, 20 + i );
+				}
+				// The continuing current between and after the strokes.
+				light += 0.2f * MathF.Exp( -t / 0.2f );
+			}
+
+			var reach = Math.Clamp( MathF.Pow( 2000f / MathF.Max( strike.Distance, 100f ), 1.5f ), 0.04f, 1.5f );
+			return light * reach;
+		}
+
+		internal static float Hash01( int seed, int salt )
 		{
 			var h = (uint)seed * 0x9E3779B1u ^ (uint)salt * 0x85EBCA77u;
 			h ^= h >> 15;

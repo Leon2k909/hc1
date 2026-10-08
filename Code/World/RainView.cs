@@ -2,9 +2,10 @@ namespace Facepunch;
 
 /// <summary>
 /// The rain as one machine sees and hears it, round its own camera: the drops (<see cref="RainDropParticles"/>), their
-/// splashes on open ground (<see cref="RainSplashParticles"/>), the rain's sound, and the overcast look of the sky,
-/// sun and fog (<see cref="RainLook"/>). Made by <see cref="Weather"/> while it rains, and it goes once the weather has
-/// cleared and the look has eased back. Nothing here is networked.
+/// splashes on open ground (<see cref="RainSplashParticles"/>), the puddles (<see cref="RainPuddles"/>), the rain's
+/// sound, the overcast look of the sky, sun and fog (<see cref="RainLook"/>), and the lightning's flashes and thunder
+/// (<see cref="Weather.Schedule.Strikes"/>). Made by <see cref="Weather"/> while it rains, and it goes once the weather
+/// has cleared and the look has eased back. Nothing here is networked.
 /// </summary>
 public sealed class RainView : Component
 {
@@ -26,6 +27,7 @@ public sealed class RainView : Component
 
 	private readonly ShelterGrid _grid = new();
 	private readonly RainLook _look = new();
+	private readonly RainPuddles _puddles = new();
 	private ParticleEffect _drops;
 	private ParticleEffect _splashes;
 	private RainDropParticles _dropController;
@@ -51,12 +53,14 @@ public sealed class RainView : Component
 	protected override void OnDisabled()
 	{
 		_look.Restore();
+		_puddles.Dispose();
 		StopSounds( 0.5f );
 	}
 
 	protected override void OnDestroy()
 	{
 		_look.Restore();
+		_puddles.Dispose();
 		StopSounds( 0.5f );
 	}
 
@@ -69,6 +73,7 @@ public sealed class RainView : Component
 		if ( !raining && _k <= 0f )
 		{
 			_look.Restore();
+			_puddles.Dispose();
 			StopSounds( 1f );
 			GameObject.Destroy();
 			return;
@@ -76,14 +81,18 @@ public sealed class RainView : Component
 
 		var look = SmoothStep( 0f, 1f, _k );
 		var darkening = MathX.Lerp( 1f, 0.62f, SmoothStep( 1f, 30f, rate ) * look );
-		_look.Apply( Scene, look, rate );
 
 		var camera = Scene.Camera;
+		var eye = camera.IsValid() ? camera.WorldPosition : WorldPosition;
+		// Indoors the flash comes in through the windows and doors, so it shows less.
+		var flash = UpdateLightning( eye ) * look * (0.25f + 0.75f * _outdoorGain);
+		_look.Apply( Scene, look, rate, flash );
+
 		if ( !camera.IsValid() ) return;
-		var eye = camera.WorldPosition;
 		WorldPosition = eye;
 
 		_grid.Update( Scene, eye );
+		_puddles.Update( Scene, Weather, _grid, eye, look );
 
 		// The rain comes in with the cloud, over the first few seconds of the look.
 		var opacity = SmoothStep( 0f, 0.2f, rate ) * Math.Clamp( _k / 0.3f, 0f, 1f );
@@ -255,6 +264,147 @@ public sealed class RainView : Component
 		if ( _light.IsValid() ) _light.Stop( fade );
 		if ( _heavy.IsValid() ) _heavy.Stop( fade );
 		if ( _roof.IsValid() ) _roof.Stop( fade );
+		foreach ( var thunder in _thunder )
+			if ( thunder.Handle.IsValid() ) thunder.Handle.Stop( fade * 4f );
+		_thunder.Clear();
+		_rumbles.Clear();
+	}
+
+	// ── Lightning ───────────────────────────────────────────────────────────────
+
+	private const string ThunderNear = "sounds/weather/thunder_near.sound";
+	private const string ThunderMid = "sounds/weather/thunder_mid.sound";
+	private const string ThunderFar = "sounds/weather/thunder_far.sound";
+
+	/// <summary> The speed of sound in cool, wet air (m/s). </summary>
+	private const float SoundSpeed = 338f;
+
+	/// <summary> A flash in the cloud is about this high (m), so its thunder comes from at least that far. </summary>
+	private const float CloudFlashHeight = 6000f;
+
+	/// <summary> Strikes dev_thunder asked for, started on the next frame. </summary>
+	private static readonly List<Weather.Schedule.Strike> Requested = new();
+
+	private readonly record struct Rumble( float At, Weather.Schedule.Strike Strike );
+	private readonly record struct Thunder( SoundHandle Handle, Vector3 Direction, float Volume );
+
+	private readonly List<Rumble> _rumbles = new();
+	private readonly List<Thunder> _thunder = new();
+	private readonly List<(float Start, Weather.Schedule.Strike Strike)> _flashes = new();
+	private float _strikesTo = float.NaN;
+	private WeatherKind _strikesKind;
+	private int _strikesSeed;
+
+	/// <summary> A strike <paramref name="distance"/> m off on a bearing (radians), seen and heard on this machine only (dev_thunder). </summary>
+	public static void RequestStrike( float distance, float bearing, bool cloud )
+	{
+		lock ( Requested )
+			Requested.Add( new Weather.Schedule.Strike( 0f, distance, bearing, cloud, Random.Shared.Next() ) );
+	}
+
+	/// <summary>
+	/// Starts the flashes that have come since the last frame, and their thunder once its sound gets here, and returns
+	/// how bright the flashes are now. A machine that joins mid-match starts from then, so it doesn't see the old ones.
+	/// </summary>
+	private float UpdateLightning( Vector3 eye )
+	{
+		var clock = (float)RealTime.Now;
+		if ( Weather.IsValid() && Weather.IsRaining )
+		{
+			var now = (float)Weather.Elapsed;
+			if ( float.IsNaN( _strikesTo ) || Weather.Kind != _strikesKind || Weather.Seed != _strikesSeed || now < _strikesTo )
+			{
+				_strikesTo = now;
+				_strikesKind = Weather.Kind;
+				_strikesSeed = Weather.Seed;
+			}
+
+			foreach ( var strike in Weather.Schedule.Strikes( Weather.Kind, Weather.Seed ) )
+			{
+				if ( strike.Time <= _strikesTo ) continue;
+				if ( strike.Time > now ) break;
+				Begin( strike, clock - (now - strike.Time) );
+			}
+			_strikesTo = now;
+		}
+
+		lock ( Requested )
+		{
+			foreach ( var strike in Requested ) Begin( strike, clock );
+			Requested.Clear();
+		}
+
+		for ( var i = _rumbles.Count - 1; i >= 0; i-- )
+		{
+			if ( _rumbles[i].At > clock ) continue;
+			PlayThunder( _rumbles[i].Strike, eye );
+			_rumbles.RemoveAt( i );
+		}
+
+		for ( var i = _thunder.Count - 1; i >= 0; i-- )
+		{
+			var thunder = _thunder[i];
+			if ( !thunder.Handle.IsValid() || thunder.Handle.Finished )
+			{
+				_thunder.RemoveAt( i );
+				continue;
+			}
+			// It comes from that way wherever the camera goes, quieter indoors, where only its lows come through.
+			thunder.Handle.Position = eye + thunder.Direction * 1500f;
+			thunder.Handle.Volume = thunder.Volume * (0.4f + 0.6f * _outdoorGain);
+		}
+
+		var flash = 0f;
+		for ( var i = _flashes.Count - 1; i >= 0; i-- )
+		{
+			var t = clock - _flashes[i].Start;
+			if ( t > 1.2f )
+			{
+				_flashes.RemoveAt( i );
+				continue;
+			}
+			flash += Weather.Schedule.FlashAt( _flashes[i].Strike, t );
+		}
+		return MathF.Min( flash, 2f );
+	}
+
+	private void Begin( Weather.Schedule.Strike strike, float start )
+	{
+		_flashes.Add( (start, strike) );
+		var heard = HeardFrom( strike );
+		if ( heard <= Weather.Schedule.AudibleRange )
+			_rumbles.Add( new Rumble( start + heard / SoundSpeed, strike ) );
+	}
+
+	/// <summary> How far the nearest part of the channel is (m): a ground strike's foot, or the cloud over a flash in it. </summary>
+	private static float HeardFrom( Weather.Schedule.Strike strike ) => strike.IsCloud
+		? MathF.Sqrt( strike.Distance * strike.Distance + CloudFlashHeight * CloudFlashHeight )
+		: strike.Distance;
+
+	/// <summary>
+	/// Each set was made for a distance (<c>Tools/thunder_sounds.py</c>): within 2 km the crack and the tearing of the
+	/// near channel, 2-6 km a peal, past that a low rumble. Within its band the level goes by the distance, squeezed as
+	/// the rest of the mix is.
+	/// </summary>
+	private void PlayThunder( Weather.Schedule.Strike strike, Vector3 eye )
+	{
+		var distance = HeardFrom( strike );
+		var (path, reference) = distance < 2000f ? (ThunderNear, 1000f) : distance < 6000f ? (ThunderMid, 3500f) : (ThunderFar, 9000f);
+
+		// A ground strike is heard most from its lower channel, low over the horizon; one in the cloud from up in it.
+		var elevation = MathF.Atan2( strike.IsCloud ? CloudFlashHeight : 1200f, MathF.Max( strike.Distance, 300f ) );
+		var direction = new Vector3( MathF.Cos( strike.Bearing ) * MathF.Cos( elevation ),
+			MathF.Sin( strike.Bearing ) * MathF.Cos( elevation ), MathF.Sin( elevation ) );
+		var handle = Sound.Play( path, eye + direction * 1500f );
+		if ( !handle.IsValid() ) return;
+
+		handle.DistanceAttenuation = false;
+		handle.OcclusionEnabled = false;
+		// A long channel, not a point: it has a direction, but not as sharp as a gunshot's.
+		handle.SpacialBlend = 0.6f;
+		var volume = handle.Volume * Math.Clamp( MathF.Pow( reference / distance, 0.43f ), 0.35f, 2f );
+		handle.Volume = volume * (0.4f + 0.6f * _outdoorGain);
+		_thunder.Add( new Thunder( handle, direction, volume ) );
 	}
 
 	// ── Effects and their sprites ───────────────────────────────────────────────
@@ -396,7 +546,7 @@ public sealed class RainView : Component
 
 		public const byte Unknown = 0, Open = 1, Covered = 2;
 
-		private static readonly string[] Ignore =
+		internal static readonly string[] Ignore =
 			{ "player", "movement", "ragdoll", "trigger", "playerclip", "enemy", "particles", "viewer", "corpse", "water" };
 
 		private readonly int[] _keyX = new int[N * N];
@@ -519,7 +669,7 @@ public sealed class RainView : Component
 		}
 
 		/// <summary> The map's sky brush or its lid, not a roof: rain comes from up there. </summary>
-		private bool IsSkyCeiling( SceneTraceResult up, float eyeZ )
+		internal bool IsSkyCeiling( SceneTraceResult up, float eyeZ )
 		{
 			var surface = up.Surface?.ResourceName ?? "";
 			if ( surface.Contains( "sky", StringComparison.OrdinalIgnoreCase ) ) return true;
@@ -589,7 +739,11 @@ public sealed class RainView : Component
 		/// <summary> The overcast sky (<c>Tools/rain_sky.py</c>). </summary>
 		private static Material Overcast => _overcast ??= Material.Load( "materials/weather/overcast_sky.vmat" );
 
-		public void Apply( Scene scene, float k, float rate )
+		/// <summary>
+		/// <paramref name="flash"/> is the lightning's light now (<see cref="Weather.Schedule.FlashAt"/>): it lights the
+		/// cloud, the sky's light and the rain's haze a bluish white, and the scene a little from the sun's side.
+		/// </summary>
+		public void Apply( Scene scene, float k, float rate, float flash )
 		{
 			if ( _sinceScan > 1f )
 			{
@@ -604,7 +758,7 @@ public sealed class RainView : Component
 				if ( !sky.IsValid() ) continue;
 				var material = k > 0.5f && Overcast is not null ? Overcast : was.Material;
 				if ( sky.SkyMaterial != material ) sky.SkyMaterial = material;
-				sky.Tint = Lerp( was.Tint, new Color( dark, dark, dark, was.Tint.a ), k );
+				sky.Tint = Lit( Lerp( was.Tint, new Color( dark, dark, dark, was.Tint.a ), k ), flash * 3f );
 			}
 
 			// Under a deck of cloud the sun is a pale disc at a seventh to a third of its light, and the sky's light grey.
@@ -613,15 +767,15 @@ public sealed class RainView : Component
 			{
 				if ( !sun.IsValid() ) continue;
 				var lum = Luminance( was.Light ) * sunShare;
-				sun.LightColor = Lerp( was.Light, new Color( 0.93f * lum, 0.96f * lum, lum, was.Light.a ), k );
+				sun.LightColor = Lit( Lerp( was.Light, new Color( 0.93f * lum, 0.96f * lum, lum, was.Light.a ), k ), flash * 0.8f );
 				var sky = Luminance( was.Sky ) * dark;
-				sun.SkyColor = Lerp( was.Sky, new Color( sky, sky, sky, was.Sky.a ), k );
+				sun.SkyColor = Lit( Lerp( was.Sky, new Color( sky, sky, sky, was.Sky.a ), k ), flash * 4f );
 			}
 
 			// Rain's visibility (km): 1/V = 0.125 + 0.25 R^0.63 / 3.912, the haze's 8 km dry.
 			var visibility = 1f / (0.125f + 0.25f * MathF.Pow( MathF.Max( rate, 0f ), 0.63f ) / 3.912f);
 			var end = 0.75f * visibility * 39370f;
-			var grey = new Color( 0.224f * dark, 0.231f * dark, 0.244f * dark, 0.98f );
+			var grey = Lit( new Color( 0.224f * dark, 0.231f * dark, 0.244f * dark, 0.98f ), flash * 2f );
 			foreach ( var (fog, was) in _fogs )
 			{
 				if ( !fog.IsValid() ) continue;
@@ -727,6 +881,14 @@ public sealed class RainView : Component
 		}
 
 		private static float Luminance( Color c ) => 0.2126f * c.r + 0.7152f * c.g + 0.0722f * c.b;
+
+		/// <summary> A colour brightened by <paramref name="amount"/> times its own light, in lightning's bluish white. </summary>
+		private static Color Lit( Color c, float amount )
+		{
+			if ( amount <= 0f ) return c;
+			var l = Luminance( c ) * amount;
+			return new Color( c.r + 0.85f * l, c.g + 0.9f * l, c.b + l, c.a );
+		}
 
 		private static Color Lerp( Color a, Color b, float t ) => new(
 			a.r + (b.r - a.r) * t, a.g + (b.g - a.g) * t, a.b + (b.b - a.b) * t, a.a + (b.a - a.a) * t );
