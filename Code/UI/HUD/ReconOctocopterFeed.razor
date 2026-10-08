@@ -1,0 +1,277 @@
+@using System.Globalization
+@namespace Facepunch.UI
+@inherits Panel
+@attribute [StyleSheet]
+
+@* The recon octocopter's ground station. Piloting, the whole screen is the drone's video with the station's flight
+   display over it, laid out as a gimbal camera's is: link and recording top left, the battery top right, the heading
+   tape over the middle, height and speed down the sides, the zoom and the camera's tilt underneath. Holding the station
+   with no link, a line at the bottom says what the trigger will do. *@
+<root class="@( Drone.IsValid() ? "piloting" : "" )">
+    @if ( Drone.IsValid() )
+    {
+        var drone = Drone;
+        <div class="corner tl" /><div class="corner tr" /><div class="corner bl" /><div class="corner br" />
+
+        <div class="reticle">
+            <div class="tick up" /><div class="tick down" /><div class="tick left" /><div class="tick right" />
+            <div class="dot" />
+        </div>
+
+        @foreach ( var contact in Contacts )
+        {
+            <div class="contact" style="left: @Percent( contact.x ); top: @Percent( contact.y );">
+                <div class="box" />
+                <label class="contact-label">@Tr( "CONTACT" ) @contact.z.ToString( "0", CultureInfo.InvariantCulture ) m</label>
+            </div>
+        }
+
+        <div class="top-left">
+            <div class="row">
+                <label class="key">@Tr( "LINK" )</label>
+                <div class="bars">
+                    @for ( var k = 0; k < 5; k++ )
+                    {
+                        <div class="bar b@(k) @( k < SignalBars ? "on" : "" )" />
+                    }
+                </div>
+            </div>
+            <div class="row">
+                <div class="rec-dot @( RecBlink ? "on" : "" )" />
+                <label class="key">@Tr( "REC" )</label>
+                <label class="value">@Clock( (1f - drone.Battery) * drone.BatterySeconds )</label>
+            </div>
+        </div>
+
+        <div class="top-right">
+            <div class="row">
+                <label class="key">@Tr( "BATT" )</label>
+                <label class="value @( drone.LowBattery ? "danger" : "" )">@((int)MathF.Ceiling( drone.Battery * 100f ))%</label>
+            </div>
+            <div class="battery @( drone.LowBattery ? "danger" : "" )">
+                <div class="fill" style="width: @Percent( drone.Battery );" />
+            </div>
+            <label class="value small">@Clock( drone.Battery * drone.BatterySeconds )</label>
+        </div>
+
+        <div class="heading">
+            <div class="tape">
+                @foreach ( var mark in HeadingMarks )
+                {
+                    <div class="mark @( mark.label is null ? "" : "major" )" style="left: @Pixels( mark.x );">
+                        <div class="line" />
+                        @if ( mark.label is not null )
+                        {
+                            <label class="mark-label">@mark.label</label>
+                        }
+                    </div>
+                }
+            </div>
+            <div class="pointer" />
+            <label class="heading-value">@(((int)MathF.Round( Heading ) % 360).ToString( "000", CultureInfo.InvariantCulture ))</label>
+        </div>
+
+        <div class="side left">
+            <label class="key">@Tr( "ALT" )</label>
+            <label class="big">@drone.AltitudeMetres.ToString( "0.0", CultureInfo.InvariantCulture )</label>
+            <label class="unit">m</label>
+            <label class="value small @( VerticalSpeed >= 0f ? "" : "down" )">@(VerticalArrow + " " + MathF.Abs( VerticalSpeed ).ToString( "0.0", CultureInfo.InvariantCulture ) + " m/s")</label>
+        </div>
+
+        <div class="side right">
+            <label class="key">@Tr( "SPD" )</label>
+            <label class="big">@drone.SpeedMetres.ToString( "0.0", CultureInfo.InvariantCulture )</label>
+            <label class="unit">m/s</label>
+            <label class="key gap">@Tr( "DIST" )</label>
+            <label class="value">@DistanceMetres.ToString( "0", CultureInfo.InvariantCulture ) m</label>
+        </div>
+
+        <div class="bottom">
+            <div class="zoom">
+                @foreach ( var step in ReconOctocopter.ZoomSteps )
+                {
+                    <label class="step @( MathF.Abs( step - drone.Zoom ) < 0.01f ? "on" : "" )">@step.ToString( "0", CultureInfo.InvariantCulture )x</label>
+                }
+            </div>
+            <div class="row">
+                <label class="key">@Tr( "TILT" )</label>
+                <label class="value">@((-drone.GimbalPitch).ToString( "0", CultureInfo.InvariantCulture ) + "°")</label>
+                <label class="key">@Tr( "FOV" )</label>
+                <label class="value">@(drone.HorizontalFieldOfView.ToString( "0.0", CultureInfo.InvariantCulture ) + "°")</label>
+            </div>
+        </div>
+
+        @if ( Warning is not null )
+        {
+            <div class="warning @WarningClass">
+                <label>@Warning</label>
+                @if ( drone.State == ReconOctocopter.FlightState.Landed && drone.Battery > 0f )
+                {
+                    <div class="hint"><InputHint Action="Jump" class="small" Size="@InputGlyphSize.Small" /><label>@Tr( "Take off" )</label></div>
+                }
+            </div>
+        }
+
+        <div class="hints">
+            <div class="hint"><InputHint Action="Use" class="small" Size="@InputGlyphSize.Small" /><label>@Tr( "Back to body" )</label></div>
+            <div class="hint"><InputHint Action="Attack1" class="small" Size="@InputGlyphSize.Small" /><InputHint Action="Attack2" class="small" Size="@InputGlyphSize.Small" /><label>@Tr( "Zoom" )</label></div>
+            <div class="hint"><InputHint Action="Jump" class="small" Size="@InputGlyphSize.Small" /><label>@Tr( "Climb" )</label></div>
+            <div class="hint"><InputHint Action="Duck" class="small" Size="@InputGlyphSize.Small" /><label>@Tr( "Descend" )</label></div>
+            <div class="hint"><InputHint Action="Run" class="small" Size="@InputGlyphSize.Small" /><label>@Tr( "Sport" )</label></div>
+        </div>
+    }
+    else if ( HoldingStation )
+    {
+        <div class="station">
+            @if ( ReconTabletLink.SinceRefused < 2f )
+            {
+                <label class="refused">@Tr( "NO ROOM TO LAUNCH" )</label>
+            }
+            else
+            {
+                var own = ReconTabletLink.OwnDrone( Pawn );
+                <InputHint Action="Attack1" class="small" Size="@InputGlyphSize.Small" />
+                <label>@( own.IsValid() ? Tr( "TAKE CONTROL" ) : Tr( "LAUNCH DRONE" ) )</label>
+                @if ( own.IsValid() )
+                {
+                    <label class="value small">@((int)MathF.Ceiling( own.Battery * 100f ))%</label>
+                }
+            }
+        </div>
+    }
+</root>
+
+@code
+{
+    /// Pixels a degree along the heading tape, and how far either side of the heading it shows.
+    private const float TapePixelsPerDegree = 6f;
+    private const float TapeHalfDegrees = 40f;
+
+    private PlayerPawn Pawn => Client.Viewer.IsValid() ? Client.Viewer.PlayerPawn : null;
+
+    /// The drone this machine's viewer is looking through.
+    private ReconOctocopter Drone => ReconOctocopter.IsPiloting( Pawn ) ? ReconOctocopter.Piloted : null;
+
+    private bool HoldingStation => Pawn.IsValid() && Pawn.HealthComponent.State == LifeState.Alive
+        && Pawn.CurrentEquipment.IsValid() && Pawn.CurrentEquipment.GetComponentInChildren<ReconTabletLink>().IsValid();
+
+    /// A compass heading: clockwise from +X, the maps' north. The engine's yaw turns the other way.
+    private float Heading => ((-(Drone?.CameraYaw ?? 0f)) % 360f + 360f) % 360f;
+
+    private int SignalBars = 5;
+    private TimeSince _sinceSignal = 1f;
+    private float VerticalSpeed;
+    private float _lastAltitude;
+    private bool RecBlink => Time.Now % 1f < 0.5f;
+    private string VerticalArrow => VerticalSpeed >= 0f ? "▲" : "▼";
+    private float DistanceMetres => Drone.IsValid() && Pawn.IsValid() ? Drone.WorldPosition.Distance( Pawn.WorldPosition ) / 39.37f : 0f;
+
+    private List<Vector3> Contacts = new();
+    private List<(float x, string label)> HeadingMarks = new();
+
+    private string Warning
+    {
+        get
+        {
+            var drone = Drone;
+            if ( !drone.IsValid() ) return null;
+            if ( drone.State == ReconOctocopter.FlightState.Landed )
+                return drone.Battery > 0f ? Tr( "LANDED" ) : Tr( "BATTERY EMPTY" );
+            if ( drone.IsAutoLanding ) return Tr( "AUTO LANDING" );
+            if ( drone.LowBattery ) return Tr( "LOW BATTERY" );
+            return null;
+        }
+    }
+
+    private string WarningClass
+    {
+        get
+        {
+            var drone = Drone;
+            if ( !drone.IsValid() ) return "";
+            if ( drone.State == ReconOctocopter.FlightState.Landed ) return drone.Battery > 0f ? "info" : "danger";
+            if ( drone.IsAutoLanding ) return "warn";
+            return Time.Now % 0.8f < 0.5f ? "danger" : "danger dim";
+        }
+    }
+
+    public override void Tick()
+    {
+        var drone = Drone;
+        if ( !drone.IsValid() ) return;
+
+        // The rate of climb, smoothed: the altitude comes in a frame at a time.
+        var altitude = drone.AltitudeMetres;
+        if ( Time.Delta > 0f )
+            VerticalSpeed = VerticalSpeed.LerpTo( (altitude - _lastAltitude) / Time.Delta, Time.Delta * 4f );
+        _lastAltitude = altitude;
+
+        // The link's bars: full in the clear, fewer through walls and with distance (a 2.4 GHz link's range is
+        // kilometres in the open; a building takes a lot of it).
+        if ( _sinceSignal > 0.25f && Pawn.IsValid() )
+        {
+            _sinceSignal = 0;
+            var eye = Pawn.WorldPosition + Vector3.Up * 64f;
+            var blocked = Scene.Trace.Ray( eye, drone.WorldPosition )
+                .IgnoreGameObjectHierarchy( Pawn.GameObject )
+                .IgnoreGameObjectHierarchy( drone.GameObject )
+                .WithoutTags( "trigger", "playerclip", "glass", "movement", "ragdoll", "player" )
+                .Run().Hit;
+            var bars = 5 - (int)(DistanceMetres / 400f) - (blocked ? 2 : 0);
+            SignalBars = Math.Clamp( bars, 1, 5 );
+        }
+
+        UpdateHeadingTape();
+        UpdateContacts( drone );
+    }
+
+    private void UpdateHeadingTape()
+    {
+        HeadingMarks.Clear();
+        var heading = Heading;
+        var first = MathF.Ceiling( (heading - TapeHalfDegrees) / 5f ) * 5f;
+        for ( var degrees = first; degrees <= heading + TapeHalfDegrees; degrees += 5f )
+        {
+            var wrapped = ((int)degrees % 360 + 360) % 360;
+            string label = null;
+            if ( wrapped % 90 == 0 ) label = wrapped switch { 0 => "N", 90 => "E", 180 => "S", _ => "W" };
+            else if ( wrapped % 15 == 0 ) label = wrapped.ToString( CultureInfo.InvariantCulture );
+            HeadingMarks.Add( ((degrees - heading) * TapePixelsPerDegree, label) );
+        }
+    }
+
+    private void UpdateContacts( ReconOctocopter drone )
+    {
+        Contacts.Clear();
+        var camera = drone.FeedCamera;
+        if ( !camera.IsValid() ) return;
+        foreach ( var target in drone.ContactObjects )
+        {
+            // The middle of the body: the box frames from the knees to the head.
+            var point = target.WorldPosition + Vector3.Up * 40f;
+            var screen = camera.PointToScreenNormal( point, out var behind );
+            if ( behind || screen.x < 0f || screen.x > 1f || screen.y < 0f || screen.y > 1f ) continue;
+            Contacts.Add( new Vector3( screen.x, screen.y, camera.WorldPosition.Distance( point ) / 39.37f ) );
+        }
+    }
+
+    private static string Percent( float fraction ) =>
+        (fraction * 100f).ToString( "0.###", CultureInfo.InvariantCulture ) + "%";
+
+    private static string Pixels( float pixels ) =>
+        pixels.ToString( "0.#", CultureInfo.InvariantCulture ) + "px";
+
+    private static string Clock( float seconds )
+    {
+        var whole = Math.Max( 0, (int)MathF.Ceiling( seconds ) );
+        return $"{whole / 60}:{whole % 60:00}";
+    }
+
+    protected override int BuildHash()
+    {
+        if ( Drone.IsValid() ) return HashCode.Combine( Time.Now );
+        if ( !HoldingStation ) return 0;
+        var own = ReconTabletLink.OwnDrone( Pawn );
+        return HashCode.Combine( own.IsValid(), own.IsValid() ? (int)(own.Battery * 100f) : 0, ReconTabletLink.SinceRefused < 2f );
+    }
+}

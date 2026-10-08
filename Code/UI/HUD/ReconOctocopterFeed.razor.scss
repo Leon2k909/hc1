@@ -1,0 +1,391 @@
+@import "/UI/Styles/Theme.scss";
+
+// A gimbal camera's flight display: thin white type with a dark outline so it reads over sky and ground alike, no
+// plates over the picture, the warnings in the HUD's amber and red.
+ReconOctocopterFeed
+{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    font-family: $hud-font;
+    color: white;
+    z-index: 50;
+
+    label
+    {
+        font-family: $hud-font;
+        text-shadow: 0 0 3px rgba( black, 0.9 );
+    }
+
+    .key
+    {
+        font-size: 14px;
+        letter-spacing: 2px;
+        color: rgba( white, 0.7 );
+    }
+
+    .value
+    {
+        font-size: 18px;
+        font-weight: bold;
+
+        &.small { font-size: 14px; }
+        &.danger { color: $hud-danger; }
+        &.down { color: rgba( white, 0.85 ); }
+    }
+
+    .row
+    {
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+    }
+
+    // The picture's corners.
+    .corner
+    {
+        position: absolute;
+        width: 48px;
+        height: 48px;
+        border-color: rgba( white, 0.75 );
+
+        &.tl { left: 40px; top: 40px; border-left: 2px solid rgba( white, 0.75 ); border-top: 2px solid rgba( white, 0.75 ); }
+        &.tr { right: 40px; top: 40px; border-right: 2px solid rgba( white, 0.75 ); border-top: 2px solid rgba( white, 0.75 ); }
+        &.bl { left: 40px; bottom: 40px; border-left: 2px solid rgba( white, 0.75 ); border-bottom: 2px solid rgba( white, 0.75 ); }
+        &.br { right: 40px; bottom: 40px; border-right: 2px solid rgba( white, 0.75 ); border-bottom: 2px solid rgba( white, 0.75 ); }
+    }
+
+    // A cross with an open middle, so it doesn't hide what it's on.
+    .reticle
+    {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 0;
+        height: 0;
+
+        .tick
+        {
+            position: absolute;
+            background-color: rgba( white, 0.85 );
+            box-shadow: 0 0 2px rgba( black, 0.8 );
+
+            &.up { left: -1px; top: -34px; width: 2px; height: 22px; }
+            &.down { left: -1px; top: 12px; width: 2px; height: 22px; }
+            &.left { left: -34px; top: -1px; width: 22px; height: 2px; }
+            &.right { left: 12px; top: -1px; width: 22px; height: 2px; }
+        }
+
+        .dot
+        {
+            position: absolute;
+            left: -2px;
+            top: -2px;
+            width: 4px;
+            height: 4px;
+            border-radius: 2px;
+            background-color: rgba( white, 0.9 );
+        }
+    }
+
+    .contact
+    {
+        position: absolute;
+        width: 0;
+        height: 0;
+
+        .box
+        {
+            position: absolute;
+            left: -22px;
+            top: -38px;
+            width: 44px;
+            height: 76px;
+            border: 2px solid $hud-danger;
+        }
+
+        .contact-label
+        {
+            position: absolute;
+            left: -60px;
+            top: -60px;
+            width: 120px;
+            justify-content: center;
+            text-align: center;
+            font-size: 13px;
+            letter-spacing: 1px;
+            color: $hud-danger;
+            white-space: nowrap;
+        }
+    }
+
+    .top-left
+    {
+        position: absolute;
+        left: 104px;
+        top: 52px;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .bars
+    {
+        flex-direction: row;
+        align-items: flex-end;
+        gap: 3px;
+        height: 18px;
+
+        .bar
+        {
+            width: 5px;
+            background-color: rgba( white, 0.22 );
+
+            &.on { background-color: white; }
+            &.b0 { height: 6px; }
+            &.b1 { height: 9px; }
+            &.b2 { height: 12px; }
+            &.b3 { height: 15px; }
+            &.b4 { height: 18px; }
+        }
+    }
+
+    .rec-dot
+    {
+        width: 10px;
+        height: 10px;
+        border-radius: 5px;
+        background-color: rgba( $hud-danger, 0.25 );
+
+        &.on { background-color: $hud-danger; }
+    }
+
+    .top-right
+    {
+        position: absolute;
+        right: 104px;
+        top: 52px;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 6px;
+    }
+
+    .battery
+    {
+        width: 120px;
+        height: 8px;
+        border: 1px solid rgba( white, 0.8 );
+        padding: 1px;
+
+        .fill { height: 100%; background-color: white; }
+
+        &.danger
+        {
+            border-color: $hud-danger;
+            .fill { background-color: $hud-danger; }
+        }
+    }
+
+    // The heading tape across the top, the heading boxed under its pointer.
+    .heading
+    {
+        position: absolute;
+        left: 50%;
+        top: 48px;
+        width: 480px;
+        margin-left: -240px;
+        flex-direction: column;
+        align-items: center;
+
+        .tape
+        {
+            position: relative;
+            width: 480px;
+            height: 34px;
+            overflow: hidden;
+            border-bottom: 1px solid rgba( white, 0.5 );
+        }
+
+        .mark
+        {
+            position: absolute;
+            bottom: 0;
+            margin-left: 240px;
+            width: 0;
+            height: 100%;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+
+            .line
+            {
+                position: absolute;
+                bottom: 0;
+                left: -1px;
+                width: 1px;
+                height: 7px;
+                background-color: rgba( white, 0.7 );
+            }
+
+            &.major .line { height: 12px; width: 2px; background-color: white; }
+
+            .mark-label
+            {
+                position: absolute;
+                bottom: 13px;
+                left: -20px;
+                width: 40px;
+                justify-content: center;
+                text-align: center;
+                font-size: 13px;
+            }
+        }
+
+        .pointer
+        {
+            width: 2px;
+            height: 10px;
+            background-color: $hud-accent;
+        }
+
+        .heading-value
+        {
+            margin-top: 2px;
+            padding: 0 8px;
+            font-size: 18px;
+            font-weight: bold;
+            border: 1px solid rgba( white, 0.8 );
+        }
+    }
+
+    .side
+    {
+        position: absolute;
+        top: 50%;
+        margin-top: -60px;
+        flex-direction: column;
+        gap: 2px;
+
+        &.left { left: 104px; align-items: flex-start; }
+        &.right { right: 104px; align-items: flex-end; }
+
+        .big
+        {
+            font-size: 34px;
+            font-weight: bold;
+            line-height: 34px;
+        }
+
+        .unit
+        {
+            font-size: 13px;
+            color: rgba( white, 0.7 );
+        }
+
+        .gap { margin-top: 12px; }
+    }
+
+    .bottom
+    {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 56px;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+
+        .zoom
+        {
+            flex-direction: row;
+            gap: 4px;
+
+            .step
+            {
+                padding: 1px 7px;
+                font-size: 14px;
+                color: rgba( white, 0.5 );
+                border: 1px solid rgba( white, 0 );
+
+                &.on
+                {
+                    color: white;
+                    font-weight: bold;
+                    border: 1px solid white;
+                }
+            }
+        }
+    }
+
+    .warning
+    {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 62%;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+
+        > label
+        {
+            padding: 3px 14px;
+            font-size: 22px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            background-color: rgba( $hud-ink, 0.55 );
+        }
+
+        &.danger > label { color: $hud-danger; border: 1px solid $hud-danger; }
+        &.danger.dim > label { opacity: 0.35; }
+        &.warn > label { color: $hud-warn; border: 1px solid $hud-warn; }
+        &.info > label { color: white; border: 1px solid rgba( white, 0.8 ); }
+    }
+
+    .hint
+    {
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+
+        label
+        {
+            font-size: 13px;
+            letter-spacing: 1px;
+            color: rgba( white, 0.8 );
+        }
+    }
+
+    .hints
+    {
+        position: absolute;
+        right: 104px;
+        bottom: 52px;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+    }
+
+    // Holding the station, with no link: what the trigger does.
+    .station
+    {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 21%;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+
+        label
+        {
+            font-size: 16px;
+            letter-spacing: 2px;
+        }
+
+        .refused { color: $hud-warn; }
+    }
+}

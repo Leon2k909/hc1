@@ -1,0 +1,709 @@
+{
+  "RootObject": {
+    "__guid": "24ea04eb-f18f-5723-b1e1-184c053d042d",
+    "Name": "Recon Octocopter",
+    "Enabled": true,
+    "NetworkMode": 2,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "d1d403bc-ebbe-58b9-8fcd-c91db9f2afdc",
+        "__enabled": true,
+        "Model": "models/recon_octocopter/recon_octocopter.vmdl",
+        "Tint": "1,1,1,1",
+        "RenderType": "On",
+        "RenderOptions": {
+          "GameLayer": true,
+          "OverlayLayer": false
+        },
+        "UseAnimGraph": false
+      },
+      {
+        "__type": "Facepunch.ReconOctocopter",
+        "__guid": "e3d598d0-20c0-5dce-b6bb-ac63e6bdad7b",
+        "__enabled": true,
+        "Gimbal": {
+          "_type": "gameobject",
+          "go": "eefb4a8c-27b8-590e-beee-73f3042fbcc9"
+        },
+        "RotorSound": "sounds/drones/octocopter_rotors.sound",
+        "SparksPrefab": "prefabs/impact_fx/impact_sparks.prefab",
+        "LensOffset": "1.969,0,0"
+      },
+      {
+        "__type": "Sandbox.BoxCollider",
+        "__guid": "845f0865-be88-5a81-b2aa-000b668ae235",
+        "__enabled": true,
+        "Center": "0.197,0,-0.079",
+        "Scale": "20.472,11.812,5.196",
+        "IsTrigger": false,
+        "Static": false,
+        "Surface": "surfaces/metal.sheet.surface"
+      },
+      {
+        "__type": "Sandbox.BoxCollider",
+        "__guid": "7711b23f-768b-5cbd-970d-2d6fb46ec58e",
+        "__enabled": true,
+        "Center": "0,0,-9.7045",
+        "Scale": "16,26,14.055",
+        "IsTrigger": false,
+        "Static": false,
+        "Surface": "surfaces/metal.sheet.surface"
+      },
+      {
+        "__type": "Sandbox.BoxCollider",
+        "__guid": "7b606e28-2be2-5158-b1ab-1d824b772b81",
+        "__enabled": true,
+        "Center": "16.703,16.703,0",
+        "Scale": "25.984,25.984,7",
+        "IsTrigger": false,
+        "Static": false,
+        "Surface": "surfaces/metal.sheet.surface"
+      },
+      {
+        "__type": "Sandbox.BoxCollider",
+        "__guid": "ff7e9836-bfaf-5d1c-a649-daf28372c1dd",
+        "__enabled": true,
+        "Center": "-16.703,16.703,0",
+        "Scale": "25.984,25.984,7",
+        "IsTrigger": false,
+        "Static": false,
+        "Surface": "surfaces/metal.sheet.surface"
+      },
+      {
+        "__type": "Sandbox.BoxCollider",
+        "__guid": "f93bd7c2-ca1a-548d-a741-93193f118ce7",
+        "__enabled": true,
+        "Center": "-16.703,-16.703,0",
+        "Scale": "25.984,25.984,7",
+        "IsTrigger": false,
+        "Static": false,
+        "Surface": "surfaces/metal.sheet.surface"
+      },
+      {
+        "__type": "Sandbox.BoxCollider",
+        "__guid": "729d76a1-d321-5e3d-8a91-56b970640162",
+        "__enabled": true,
+        "Center": "16.703,-16.703,0",
+        "Scale": "25.984,25.984,7",
+        "IsTrigger": false,
+        "Static": false,
+        "Surface": "surfaces/metal.sheet.surface"
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "eefb4a8c-27b8-590e-beee-73f3042fbcc9",
+        "Name": "Gimbal",
+        "Enabled": true,
+        "NetworkMode": 0,
+        "Components": [
+          {
+            "__type": "Sandbox.ModelRenderer",
+            "__guid": "0fe694d6-9ce4-59c5-87e9-f8a85bb103d6",
+            "__enabled": true,
+            "Model": "models/recon_octocopter/recon_octocopter_gimbal.vmdl",
+            "Tint": "1,1,1,1",
+            "RenderType": "On",
+            "RenderOptions": {
+              "GameLayer": true,
+              "OverlayLayer": false
+            },
+            "UseAnimGraph": false
+          }
+        ],
+        "Children": [],
+        "Position": "6.693,0,-5.984"
+      },
+      {
+        "__guid": "928ca947-6d82-582a-a715-7075eabe1a12",
+        "Name": "Rotor 1",
+        "Enabled": true,
+        "NetworkMode": 0,
+        "Components": [
+          {
+            "__type": "Facepunch.ReconRotor",
+            "__guid": "51e12048-818a-5cc5-8815-de3e7ae8bf5a",
+            "__enabled": true,
+            "Spin": 1,
+            "Blades": {
+              "_type": "component",
+              "component_id": "385343bf-1dfc-5530-a7b5-f18f09eea01d",
+              "go": "dd2b42ec-40fd-5bcb-8e8f-6c8efbcb6d5c",
+              "component_type": "ModelRenderer"
+            },
+            "Disc": {
+              "_type": "component",
+              "component_id": "d90338c2-29e0-566d-9c28-81b5abd3c6ed",
+              "go": "9a43fdf4-2c74-5712-97dd-68c416a442b0",
+              "component_type": "ModelRenderer"
+            }
+          }
+        ],
+        "Children": [
+          {
+            "__guid": "dd2b42ec-40fd-5bcb-8e8f-6c8efbcb6d5c",
+            "Name": "Rotor 1 Blades",
+            "Enabled": true,
+            "NetworkMode": 0,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "385343bf-1dfc-5530-a7b5-f18f09eea01d",
+                "__enabled": true,
+                "Model": "models/recon_octocopter/recon_octocopter_prop_ccw.vmdl",
+                "Tint": "1,1,1,1",
+                "RenderType": "On",
+                "RenderOptions": {
+                  "GameLayer": true,
+                  "OverlayLayer": false
+                },
+                "UseAnimGraph": false
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "9a43fdf4-2c74-5712-97dd-68c416a442b0",
+            "Name": "Rotor 1 Disc",
+            "Enabled": true,
+            "NetworkMode": 0,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "d90338c2-29e0-566d-9c28-81b5abd3c6ed",
+                "__enabled": true,
+                "Model": "models/recon_octocopter/recon_octocopter_disc.vmdl",
+                "Tint": "1,1,1,1",
+                "RenderType": "Off",
+                "RenderOptions": {
+                  "GameLayer": true,
+                  "OverlayLayer": false
+                },
+                "UseAnimGraph": false
+              }
+            ],
+            "Children": []
+          }
+        ],
+        "Position": "16.703,16.703,2.835"
+      },
+      {
+        "__guid": "626ceff2-2df6-567d-946a-7f27a12ab24e",
+        "Name": "Rotor 2",
+        "Enabled": true,
+        "NetworkMode": 0,
+        "Components": [
+          {
+            "__type": "Facepunch.ReconRotor",
+            "__guid": "8834ec75-799a-5d59-b18b-20f71b177d24",
+            "__enabled": true,
+            "Spin": -1,
+            "Blades": {
+              "_type": "component",
+              "component_id": "d166a404-5dcb-50d0-96fa-65fcd7dd542a",
+              "go": "75623956-952c-5449-8604-97fd9f5bc664",
+              "component_type": "ModelRenderer"
+            },
+            "Disc": {
+              "_type": "component",
+              "component_id": "a4f0fe1c-3d1b-5566-a3b3-ee038314556f",
+              "go": "880d722d-c9f5-56db-8c5b-1f30b85c4ff0",
+              "component_type": "ModelRenderer"
+            }
+          }
+        ],
+        "Children": [
+          {
+            "__guid": "75623956-952c-5449-8604-97fd9f5bc664",
+            "Name": "Rotor 2 Blades",
+            "Enabled": true,
+            "NetworkMode": 0,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "d166a404-5dcb-50d0-96fa-65fcd7dd542a",
+                "__enabled": true,
+                "Model": "models/recon_octocopter/recon_octocopter_prop_cw.vmdl",
+                "Tint": "1,1,1,1",
+                "RenderType": "On",
+                "RenderOptions": {
+                  "GameLayer": true,
+                  "OverlayLayer": false
+                },
+                "UseAnimGraph": false
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "880d722d-c9f5-56db-8c5b-1f30b85c4ff0",
+            "Name": "Rotor 2 Disc",
+            "Enabled": true,
+            "NetworkMode": 0,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "a4f0fe1c-3d1b-5566-a3b3-ee038314556f",
+                "__enabled": true,
+                "Model": "models/recon_octocopter/recon_octocopter_disc.vmdl",
+                "Tint": "1,1,1,1",
+                "RenderType": "Off",
+                "RenderOptions": {
+                  "GameLayer": true,
+                  "OverlayLayer": false
+                },
+                "UseAnimGraph": false
+              }
+            ],
+            "Children": []
+          }
+        ],
+        "Position": "16.703,16.703,-2.835"
+      },
+      {
+        "__guid": "f6d74958-d3bb-514f-87be-5eb66d0ec3be",
+        "Name": "Rotor 3",
+        "Enabled": true,
+        "NetworkMode": 0,
+        "Components": [
+          {
+            "__type": "Facepunch.ReconRotor",
+            "__guid": "2b9ebb90-70eb-5b56-9de0-a5e086a4551e",
+            "__enabled": true,
+            "Spin": -1,
+            "Blades": {
+              "_type": "component",
+              "component_id": "69b8a5f2-ee16-579d-a2bd-70c2b0adc272",
+              "go": "56e3235d-68a6-5fd7-9dfe-0474bb44a39d",
+              "component_type": "ModelRenderer"
+            },
+            "Disc": {
+              "_type": "component",
+              "component_id": "66f4356f-2cd8-5b81-8765-8abd3bc3a6ea",
+              "go": "59cbf5ad-ce38-53d2-82dc-82f65234bdd3",
+              "component_type": "ModelRenderer"
+            }
+          }
+        ],
+        "Children": [
+          {
+            "__guid": "56e3235d-68a6-5fd7-9dfe-0474bb44a39d",
+            "Name": "Rotor 3 Blades",
+            "Enabled": true,
+            "NetworkMode": 0,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "69b8a5f2-ee16-579d-a2bd-70c2b0adc272",
+                "__enabled": true,
+                "Model": "models/recon_octocopter/recon_octocopter_prop_cw.vmdl",
+                "Tint": "1,1,1,1",
+                "RenderType": "On",
+                "RenderOptions": {
+                  "GameLayer": true,
+                  "OverlayLayer": false
+                },
+                "UseAnimGraph": false
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "59cbf5ad-ce38-53d2-82dc-82f65234bdd3",
+            "Name": "Rotor 3 Disc",
+            "Enabled": true,
+            "NetworkMode": 0,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "66f4356f-2cd8-5b81-8765-8abd3bc3a6ea",
+                "__enabled": true,
+                "Model": "models/recon_octocopter/recon_octocopter_disc.vmdl",
+                "Tint": "1,1,1,1",
+                "RenderType": "Off",
+                "RenderOptions": {
+                  "GameLayer": true,
+                  "OverlayLayer": false
+                },
+                "UseAnimGraph": false
+              }
+            ],
+            "Children": []
+          }
+        ],
+        "Position": "-16.703,16.703,2.835"
+      },
+      {
+        "__guid": "0bb48980-fd21-5238-b84a-7fbfff14fe76",
+        "Name": "Rotor 4",
+        "Enabled": true,
+        "NetworkMode": 0,
+        "Components": [
+          {
+            "__type": "Facepunch.ReconRotor",
+            "__guid": "5743dec8-9c9b-5714-8b66-af283348aa4d",
+            "__enabled": true,
+            "Spin": 1,
+            "Blades": {
+              "_type": "component",
+              "component_id": "6345b74d-9403-51cf-8ad9-918ad6902ab6",
+              "go": "eec9318c-2dd3-5acf-87da-96e5db860b33",
+              "component_type": "ModelRenderer"
+            },
+            "Disc": {
+              "_type": "component",
+              "component_id": "40d97048-ffd4-5035-b549-61c79e73c575",
+              "go": "cb4f5ee5-876b-5378-8007-a545fd76fa4c",
+              "component_type": "ModelRenderer"
+            }
+          }
+        ],
+        "Children": [
+          {
+            "__guid": "eec9318c-2dd3-5acf-87da-96e5db860b33",
+            "Name": "Rotor 4 Blades",
+            "Enabled": true,
+            "NetworkMode": 0,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "6345b74d-9403-51cf-8ad9-918ad6902ab6",
+                "__enabled": true,
+                "Model": "models/recon_octocopter/recon_octocopter_prop_ccw.vmdl",
+                "Tint": "1,1,1,1",
+                "RenderType": "On",
+                "RenderOptions": {
+                  "GameLayer": true,
+                  "OverlayLayer": false
+                },
+                "UseAnimGraph": false
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "cb4f5ee5-876b-5378-8007-a545fd76fa4c",
+            "Name": "Rotor 4 Disc",
+            "Enabled": true,
+            "NetworkMode": 0,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "40d97048-ffd4-5035-b549-61c79e73c575",
+                "__enabled": true,
+                "Model": "models/recon_octocopter/recon_octocopter_disc.vmdl",
+                "Tint": "1,1,1,1",
+                "RenderType": "Off",
+                "RenderOptions": {
+                  "GameLayer": true,
+                  "OverlayLayer": false
+                },
+                "UseAnimGraph": false
+              }
+            ],
+            "Children": []
+          }
+        ],
+        "Position": "-16.703,16.703,-2.835"
+      },
+      {
+        "__guid": "f747287e-cfe6-5835-827b-f8bd52629d20",
+        "Name": "Rotor 5",
+        "Enabled": true,
+        "NetworkMode": 0,
+        "Components": [
+          {
+            "__type": "Facepunch.ReconRotor",
+            "__guid": "bb3c865c-64a5-58cf-ab72-10b9e7afb547",
+            "__enabled": true,
+            "Spin": 1,
+            "Blades": {
+              "_type": "component",
+              "component_id": "ada2a1e4-4cff-58f2-b591-f63c7b5102ac",
+              "go": "88113193-785e-5f94-bd7b-0d8e3de627e1",
+              "component_type": "ModelRenderer"
+            },
+            "Disc": {
+              "_type": "component",
+              "component_id": "d6b3f5fb-e164-5385-b214-14f598b978c6",
+              "go": "c089738b-71c9-58a7-9deb-e826041b13fb",
+              "component_type": "ModelRenderer"
+            }
+          }
+        ],
+        "Children": [
+          {
+            "__guid": "88113193-785e-5f94-bd7b-0d8e3de627e1",
+            "Name": "Rotor 5 Blades",
+            "Enabled": true,
+            "NetworkMode": 0,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "ada2a1e4-4cff-58f2-b591-f63c7b5102ac",
+                "__enabled": true,
+                "Model": "models/recon_octocopter/recon_octocopter_prop_ccw.vmdl",
+                "Tint": "1,1,1,1",
+                "RenderType": "On",
+                "RenderOptions": {
+                  "GameLayer": true,
+                  "OverlayLayer": false
+                },
+                "UseAnimGraph": false
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "c089738b-71c9-58a7-9deb-e826041b13fb",
+            "Name": "Rotor 5 Disc",
+            "Enabled": true,
+            "NetworkMode": 0,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "d6b3f5fb-e164-5385-b214-14f598b978c6",
+                "__enabled": true,
+                "Model": "models/recon_octocopter/recon_octocopter_disc.vmdl",
+                "Tint": "1,1,1,1",
+                "RenderType": "Off",
+                "RenderOptions": {
+                  "GameLayer": true,
+                  "OverlayLayer": false
+                },
+                "UseAnimGraph": false
+              }
+            ],
+            "Children": []
+          }
+        ],
+        "Position": "-16.703,-16.703,2.835"
+      },
+      {
+        "__guid": "d802e48b-1366-5935-88b9-1e51ff9d9aa4",
+        "Name": "Rotor 6",
+        "Enabled": true,
+        "NetworkMode": 0,
+        "Components": [
+          {
+            "__type": "Facepunch.ReconRotor",
+            "__guid": "258a4151-9421-54a3-a732-13f04943f5fb",
+            "__enabled": true,
+            "Spin": -1,
+            "Blades": {
+              "_type": "component",
+              "component_id": "ba2fb582-ced9-50f8-a69e-8fb2ba54c584",
+              "go": "fb783f38-92f6-5403-9694-ebe8a6c5ba82",
+              "component_type": "ModelRenderer"
+            },
+            "Disc": {
+              "_type": "component",
+              "component_id": "8fc0ff2d-0c76-50e4-adb9-a1514fb92842",
+              "go": "172ac729-8ef6-55f7-ac84-64a991e4db30",
+              "component_type": "ModelRenderer"
+            }
+          }
+        ],
+        "Children": [
+          {
+            "__guid": "fb783f38-92f6-5403-9694-ebe8a6c5ba82",
+            "Name": "Rotor 6 Blades",
+            "Enabled": true,
+            "NetworkMode": 0,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "ba2fb582-ced9-50f8-a69e-8fb2ba54c584",
+                "__enabled": true,
+                "Model": "models/recon_octocopter/recon_octocopter_prop_cw.vmdl",
+                "Tint": "1,1,1,1",
+                "RenderType": "On",
+                "RenderOptions": {
+                  "GameLayer": true,
+                  "OverlayLayer": false
+                },
+                "UseAnimGraph": false
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "172ac729-8ef6-55f7-ac84-64a991e4db30",
+            "Name": "Rotor 6 Disc",
+            "Enabled": true,
+            "NetworkMode": 0,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "8fc0ff2d-0c76-50e4-adb9-a1514fb92842",
+                "__enabled": true,
+                "Model": "models/recon_octocopter/recon_octocopter_disc.vmdl",
+                "Tint": "1,1,1,1",
+                "RenderType": "Off",
+                "RenderOptions": {
+                  "GameLayer": true,
+                  "OverlayLayer": false
+                },
+                "UseAnimGraph": false
+              }
+            ],
+            "Children": []
+          }
+        ],
+        "Position": "-16.703,-16.703,-2.835"
+      },
+      {
+        "__guid": "59424bd6-2a19-5d36-9e25-870d13954fe9",
+        "Name": "Rotor 7",
+        "Enabled": true,
+        "NetworkMode": 0,
+        "Components": [
+          {
+            "__type": "Facepunch.ReconRotor",
+            "__guid": "e143576f-e339-5562-8202-2b27af2ce780",
+            "__enabled": true,
+            "Spin": -1,
+            "Blades": {
+              "_type": "component",
+              "component_id": "1053d72c-d137-5cac-92e1-27f57bfe9f0e",
+              "go": "4f5b0372-e91e-5a66-8f47-1e18a776767b",
+              "component_type": "ModelRenderer"
+            },
+            "Disc": {
+              "_type": "component",
+              "component_id": "6421f013-3b1e-58b8-a47f-11cece23e8a6",
+              "go": "6d191c8a-d0f4-5282-8729-fb39fd659045",
+              "component_type": "ModelRenderer"
+            }
+          }
+        ],
+        "Children": [
+          {
+            "__guid": "4f5b0372-e91e-5a66-8f47-1e18a776767b",
+            "Name": "Rotor 7 Blades",
+            "Enabled": true,
+            "NetworkMode": 0,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "1053d72c-d137-5cac-92e1-27f57bfe9f0e",
+                "__enabled": true,
+                "Model": "models/recon_octocopter/recon_octocopter_prop_cw.vmdl",
+                "Tint": "1,1,1,1",
+                "RenderType": "On",
+                "RenderOptions": {
+                  "GameLayer": true,
+                  "OverlayLayer": false
+                },
+                "UseAnimGraph": false
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "6d191c8a-d0f4-5282-8729-fb39fd659045",
+            "Name": "Rotor 7 Disc",
+            "Enabled": true,
+            "NetworkMode": 0,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "6421f013-3b1e-58b8-a47f-11cece23e8a6",
+                "__enabled": true,
+                "Model": "models/recon_octocopter/recon_octocopter_disc.vmdl",
+                "Tint": "1,1,1,1",
+                "RenderType": "Off",
+                "RenderOptions": {
+                  "GameLayer": true,
+                  "OverlayLayer": false
+                },
+                "UseAnimGraph": false
+              }
+            ],
+            "Children": []
+          }
+        ],
+        "Position": "16.703,-16.703,2.835"
+      },
+      {
+        "__guid": "26920f5c-f059-5891-ba2d-f66accb2b65d",
+        "Name": "Rotor 8",
+        "Enabled": true,
+        "NetworkMode": 0,
+        "Components": [
+          {
+            "__type": "Facepunch.ReconRotor",
+            "__guid": "8c265781-f7ee-56bd-ab00-c1ab7d76a3b3",
+            "__enabled": true,
+            "Spin": 1,
+            "Blades": {
+              "_type": "component",
+              "component_id": "01edf100-7b10-5819-90a5-f7721a6e157f",
+              "go": "2eed8a33-2692-5fbb-ad9e-968fd39ce548",
+              "component_type": "ModelRenderer"
+            },
+            "Disc": {
+              "_type": "component",
+              "component_id": "a06838c1-a50c-5f62-9064-66dd0ed24527",
+              "go": "04d96968-fd9a-53f7-bc1e-295f73c596fe",
+              "component_type": "ModelRenderer"
+            }
+          }
+        ],
+        "Children": [
+          {
+            "__guid": "2eed8a33-2692-5fbb-ad9e-968fd39ce548",
+            "Name": "Rotor 8 Blades",
+            "Enabled": true,
+            "NetworkMode": 0,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "01edf100-7b10-5819-90a5-f7721a6e157f",
+                "__enabled": true,
+                "Model": "models/recon_octocopter/recon_octocopter_prop_ccw.vmdl",
+                "Tint": "1,1,1,1",
+                "RenderType": "On",
+                "RenderOptions": {
+                  "GameLayer": true,
+                  "OverlayLayer": false
+                },
+                "UseAnimGraph": false
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "04d96968-fd9a-53f7-bc1e-295f73c596fe",
+            "Name": "Rotor 8 Disc",
+            "Enabled": true,
+            "NetworkMode": 0,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "a06838c1-a50c-5f62-9064-66dd0ed24527",
+                "__enabled": true,
+                "Model": "models/recon_octocopter/recon_octocopter_disc.vmdl",
+                "Tint": "1,1,1,1",
+                "RenderType": "Off",
+                "RenderOptions": {
+                  "GameLayer": true,
+                  "OverlayLayer": false
+                },
+                "UseAnimGraph": false
+              }
+            ],
+            "Children": []
+          }
+        ],
+        "Position": "16.703,-16.703,-2.835"
+      }
+    ],
+    "NetworkInterpolation": true,
+    "Tags": "recon_octocopter"
+  },
+  "ResourceVersion": 2,
+  "__references": [],
+  "__version": 2
+}

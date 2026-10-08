@@ -1,0 +1,28 @@
+{
+  "Name": "Recon Octocopter",
+  "Description": "Fly a camera drone from a tablet: a long zoom, and enemies in its picture are marked for your team.",
+  "Slot": "Tactical",
+  "Category": "None",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": false,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/recon_octocopter.svg",
+  "IsPurchasable": true,
+  "Price": 750,
+  "KillReward": 0,
+  "WorldModel": "models/recon_octocopter/recon_tablet.vmdl",
+  "__version": 0,
+  "__references": [],
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/recon_octocopter/weapon_recon_octocopter.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/recon_octocopter/vm_recon_octocopter.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/recon_octocopter/wm_recon_octocopter.prefab"
+  }
+}

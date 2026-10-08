@@ -121,6 +121,15 @@ public partial class FlashbangGrenade : BaseGrenade, IMarkerObject
 			return;
 
 		var exposure = Measure( viewer );
+
+		// Flying a drone from its tablet, the flash and the bang reach the operator's body all the same: they look up
+		// from the screen, and the effects play on the body's own camera.
+		if ( exposure.Any && viewer.IsPilotingDrone )
+		{
+			ReconOctocopter.DropLink( viewer );
+			exposure = Measure( viewer );
+		}
+
 		if ( exposure.Any )
 			FlashbangEffect.Apply( viewer, exposure, SoundEffect );
 	}

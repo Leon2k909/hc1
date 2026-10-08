@@ -124,6 +124,10 @@ public partial class PlayerInventory : Component
 		if ( !Player.IsLocallyControlled )
 			return;
 
+		// Flying the recon octocopter, the wheel zooms its camera and the tablet stays in hand.
+		if ( Player.IsPilotingDrone )
+			return;
+
 		if ( Input.Pressed( "Drop" ) && Current.IsValid() )
 		{
 			Drop( Current );

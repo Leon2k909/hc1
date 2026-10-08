@@ -66,7 +66,9 @@ public partial class PlayerBody : Component
 	private void UpdateFirstPersonBodyVisibility()
 	{
 		if ( !FirstPersonBody.IsValid() ) return;
-		FirstPersonBody.Enabled = IsFirstPerson && Player.IsValid() && !Player.HideFirstPersonBodyForStance;
+		// From the drone's camera the operator's own body is seen whole, so the legs-only copy would be a second one.
+		FirstPersonBody.Enabled = IsFirstPerson && Player.IsValid() && !Player.HideFirstPersonBodyForStance
+			&& !Player.IsPilotingDrone;
 
 		// Only its legs are for seeing: the human model's face came into view when it leaned into a walk.
 		if ( !_firstPersonUniform.IsValid() )

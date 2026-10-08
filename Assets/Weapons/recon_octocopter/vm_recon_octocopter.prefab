@@ -1,0 +1,208 @@
+{
+  "RootObject": {
+    "__guid": "2961b0aa-1e33-55a7-aa1a-604c3ad3de6f",
+    "__version": 1,
+    "Flags": 0,
+    "Name": "Recon Octocopter View Model",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Tags": "viewmodel,player",
+    "Enabled": true,
+    "NetworkMode": 0,
+    "NetworkInterpolation": true,
+    "NetworkOrphaned": 0,
+    "NetworkTransmit": true,
+    "OwnerTransfer": 1,
+    "Components": [
+      {
+        "__type": "Facepunch.ViewModel",
+        "__guid": "f23c2df6-1622-56d2-805c-8b55b62599f5",
+        "__enabled": true,
+        "Arms": {
+          "_type": "component",
+          "component_id": "1078153f-4591-5826-9ee5-827e947a668b",
+          "go": "bb31ae79-b5db-5b5b-ae48-5bd290bc65d9",
+          "component_type": "SkinnedModelRenderer"
+        },
+        "EjectionPort": null,
+        "IronsightsFireScale": 0.2,
+        "IsThrowable": false,
+        "ModelRenderer": {
+          "_type": "component",
+          "component_id": "f8837845-7a8f-563c-be5d-b292ccdbb515",
+          "go": "3735d4a3-caf7-5391-8ab5-b381ae9afd4b",
+          "component_type": "SkinnedModelRenderer"
+        },
+        "Muzzle": null,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "ReloadSpeed": 1,
+        "ThrowableType": "HEGrenade",
+        "UseMovementInertia": true,
+        "MoveBobScale": 0.3,
+        "YawInertiaScale": 0.5
+      },
+      {
+        "__type": "Facepunch.TabletViewModel",
+        "__guid": "a9daac5e-0434-5f54-a589-ee784281d5f9",
+        "Device": {
+          "_type": "component",
+          "component_id": "f8837845-7a8f-563c-be5d-b292ccdbb515",
+          "go": "3735d4a3-caf7-5391-8ab5-b381ae9afd4b",
+          "component_type": "SkinnedModelRenderer"
+        },
+        "Arms": {
+          "_type": "component",
+          "component_id": "1078153f-4591-5826-9ee5-827e947a668b",
+          "go": "bb31ae79-b5db-5b5b-ae48-5bd290bc65d9",
+          "component_type": "SkinnedModelRenderer"
+        },
+        "__enabled": true
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "bb31ae79-b5db-5b5b-ae48-5bd290bc65d9",
+        "__version": 1,
+        "Flags": 0,
+        "Name": "Object",
+        "Position": "0,0,0",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Tags": "",
+        "Enabled": true,
+        "NetworkMode": 0,
+        "NetworkInterpolation": true,
+        "NetworkOrphaned": 0,
+        "NetworkTransmit": true,
+        "OwnerTransfer": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.SkinnedModelRenderer",
+            "__guid": "1078153f-4591-5826-9ee5-827e947a668b",
+            "__enabled": true,
+            "AnimationGraph": null,
+            "BodyGroups": 21,
+            "BoneMergeTarget": null,
+            "CreateAttachments": false,
+            "CreateBoneObjects": false,
+            "LodOverride": null,
+            "MaterialGroup": null,
+            "MaterialOverride": null,
+            "Materials": null,
+            "Model": "models/first_person/v_first_person_arms_human.vmdl",
+            "Morphs": {},
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "Parameters": {
+              "bools": {},
+              "ints": {},
+              "floats": {},
+              "vectors": {},
+              "rotations": {}
+            },
+            "PlaybackRate": 1,
+            "RenderOptions": {
+              "GameLayer": false,
+              "OverlayLayer": true,
+              "BloomLayer": false,
+              "AfterUILayer": false
+            },
+            "RenderType": "Off",
+            "Sequence": {
+              "Name": null,
+              "Looping": true,
+              "Blending": false
+            },
+            "Tint": "1,1,1,1",
+            "UseAnimGraph": false
+          }
+        ],
+        "Children": []
+      },
+      {
+        "__guid": "3735d4a3-caf7-5391-8ab5-b381ae9afd4b",
+        "Name": "Ground Station",
+        "Enabled": true,
+        "NetworkMode": 0,
+        "Components": [
+          {
+            "__type": "Sandbox.SkinnedModelRenderer",
+            "__guid": "f8837845-7a8f-563c-be5d-b292ccdbb515",
+            "__enabled": true,
+            "AnimationGraph": null,
+            "BodyGroups": 18446744073709551615,
+            "BoneMergeTarget": null,
+            "CreateAttachments": false,
+            "CreateBoneObjects": false,
+            "LodOverride": null,
+            "MaterialGroup": null,
+            "MaterialOverride": null,
+            "Materials": null,
+            "Model": "models/recon_octocopter/recon_tablet.vmdl",
+            "Morphs": {},
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "Parameters": {
+              "bools": {},
+              "ints": {},
+              "floats": {},
+              "vectors": {},
+              "rotations": {}
+            },
+            "PlaybackRate": 1,
+            "RenderOptions": {
+              "GameLayer": false,
+              "OverlayLayer": true,
+              "BloomLayer": false,
+              "AfterUILayer": false
+            },
+            "RenderType": "Off",
+            "Sequence": {
+              "Name": null,
+              "Looping": true,
+              "Blending": false
+            },
+            "Tint": "1,1,1,1",
+            "UseAnimGraph": false
+          }
+        ]
+      }
+    ],
+    "__properties": {
+      "NetworkInterpolation": true,
+      "TimeScale": 1,
+      "WantsSystemScene": true,
+      "Metadata": {},
+      "NavMesh": {
+        "Enabled": false,
+        "IncludeStaticBodies": true,
+        "IncludeKeyframedBodies": true,
+        "EditorAutoUpdate": true,
+        "AgentHeight": 64,
+        "AgentRadius": 16,
+        "AgentStepSize": 18,
+        "AgentMaxSlope": 40,
+        "ExcludedBodies": "",
+        "IncludedBodies": ""
+      }
+    },
+    "__variables": []
+  },
+  "ResourceVersion": 2,
+  "__references": [],
+  "__version": 2
+}

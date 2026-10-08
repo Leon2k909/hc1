@@ -1,0 +1,52 @@
+{
+  "RootObject": {
+    "__guid": "a12e7546-065e-5927-b673-26ca97551705",
+    "Name": "Recon Octocopter Equipment",
+    "Enabled": true,
+    "NetworkMode": 0,
+    "Components": [
+      {
+        "__type": "Facepunch.Equipment",
+        "__guid": "c9990e3a-e629-5f54-b06c-bb4a6fe7ff1d",
+        "__enabled": true,
+        "Resource": "weapons/recon_octocopter/recon_octocopter.equip",
+        "HoldType": "HoldItem",
+        "Handedness": "Right",
+        "UseCrosshair": false,
+        "DeploySound": "sounds/guns/handling/draw_grenade.sound"
+      },
+      {
+        "__type": "Facepunch.TagBinder",
+        "__guid": "fcb7414a-1056-5ba7-939e-831f32e0d214",
+        "__enabled": true
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "c4a73d3b-4359-5021-9d90-4c9f51880029",
+        "Name": "Ground Station Link",
+        "Enabled": true,
+        "NetworkMode": 0,
+        "Components": [
+          {
+            "__type": "Facepunch.ReconTabletLink",
+            "__guid": "60f9c7f5-3612-5aef-a1d8-fae8c841e228",
+            "__enabled": true,
+            "InputActions": [
+              "Attack1"
+            ],
+            "LaunchDistance": 70,
+            "Prefab": {
+              "_type": "gameobject",
+              "prefab": "weapons/recon_octocopter/recon_octocopter_airborne.prefab"
+            }
+          }
+        ],
+        "Children": []
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__references": [],
+  "__version": 2
+}

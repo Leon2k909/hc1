@@ -109,6 +109,10 @@ public partial class PlayerPingComponent : Component
 	/// <returns></returns>
 	private bool CanPing()
 	{
+		// Through the drone's camera the pawn's aim isn't what the player is looking at.
+		if ( Player.IsPilotingDrone )
+			return false;
+
 		var tr = GetTrace();
 		if ( !tr.Hit )
 			return false;

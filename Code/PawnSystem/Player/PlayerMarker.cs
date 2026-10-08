@@ -115,7 +115,8 @@ public partial class PlayerMarker : Component, IMarkerObject, IDirectionalMinima
 		{
 			if ( Client.Viewer == null ) return false;
 			var uavActive = ScorestreakManager.Instance?.IsUavActiveForTeam( Client.Viewer.Team ) == true
-				|| ReconDroneFlight.Reveals( Player.GameObject, Client.Viewer.PlayerPawn );
+				|| ReconDroneFlight.Reveals( Player.GameObject, Client.Viewer.PlayerPawn )
+				|| ReconOctocopter.Reveals( Player.GameObject, Client.Viewer.PlayerPawn );
 			if ( !uavActive ) return false;
 
 			var hasGhost = Player.Components.TryGet<PlayerPerks>( out var perks, FindMode.EnabledInSelf ) && perks.HasPerk( "ghost" );

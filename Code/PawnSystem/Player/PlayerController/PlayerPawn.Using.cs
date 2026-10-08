@@ -93,6 +93,14 @@ partial class PlayerPawn
 
 	private void UpdateUse()
 	{
+		// Use takes you back from the drone's camera; that press isn't for whatever's in front of you.
+		if ( IsPilotingDrone || ReconOctocopter.JustUnlinked )
+		{
+			IsUsing = false;
+			Hovered = null;
+			return;
+		}
+
 		IsUsing = Input.Down( "Use" );
 
 		var usables = GetUsables();

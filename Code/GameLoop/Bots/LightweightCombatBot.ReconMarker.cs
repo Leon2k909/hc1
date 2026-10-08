@@ -4,7 +4,7 @@ public sealed partial class LightweightCombatBot : ICustomMinimapIcon
 {
 	bool IMinimapElement.IsVisible( Pawn viewer ) => IsAlive && viewer.IsValid()
 		&& ((Team != Team.Unassigned && viewer.Team == Team && !GameUtils.IsFreeForAllMode)
-			|| ReconDroneFlight.Reveals( GameObject, viewer ));
+			|| ReconDroneFlight.Reveals( GameObject, viewer ) || ReconOctocopter.Reveals( GameObject, viewer ));
 	Vector3 IMinimapElement.WorldPosition => WorldPosition;
 	string IMinimapIcon.IconPath => Client.Viewer?.Team == Team && !GameUtils.IsFreeForAllMode
 		? "ui/minimaps/player_icon.png" : "ui/minimaps/enemy_icon.png";

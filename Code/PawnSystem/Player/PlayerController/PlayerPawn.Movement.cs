@@ -77,6 +77,9 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	/// </summary>
 	[Sync] public bool IsSprinting { get; set; }
 
+	/// <summary>Looking through a recon octocopter's camera on its tablet, on this machine (<see cref="ReconOctocopter"/>).</summary>
+	public bool IsPilotingDrone => ReconOctocopter.IsPiloting( this );
+
 	/// <summary>
 	/// Is the player noclipping?
 	/// </summary>
@@ -210,7 +213,8 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 		// Eye input
 		if ( IsPossessed && cc.IsValid() )
 		{
-			if ( IsLocallyControlled && HealthComponent.State == LifeState.Alive )
+			// Flying the recon octocopter, the mouse turns its camera and the head stays on the tablet.
+			if ( IsLocallyControlled && HealthComponent.State == LifeState.Alive && !IsPilotingDrone )
 			{
 				EyeAngles += Input.AnalogLook * AimDampening;
 				EyeAngles = EyeAngles.WithPitch( EyeAngles.pitch.Clamp( -90, 90 ) );
@@ -378,6 +382,21 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	private void BuildInput()
 	{
 		bool wasSprinting = IsSprinting;
+
+		// Flying the recon octocopter, the keys fly it: the body stands (or crouches) where it was, looking at the tablet.
+		if ( IsPilotingDrone )
+		{
+			IsSprinting = false;
+			WantsToggleSprint = false;
+			IsSlowWalking = false;
+			IsUsing = false;
+			if ( wasSprinting ) OnSprintChanged( true, false );
+			if ( CharacterController.IsOnGround )
+				JumpFatigue = MathF.Max( 0f, JumpFatigue - JumpFatigueRecovery * Time.Delta );
+			if ( ProneFatigue > 0f )
+				ProneFatigue = MathF.Max( 0f, ProneFatigue - ProneFatigueRecovery * Time.Delta );
+			return;
+		}
 
 		IsSlowWalking = !IsFallKnockedDown && Input.Down( "Walk" );
 		IsSprinting = GetWantsToSprint();
@@ -771,7 +790,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	{
 		WishMove = 0f;
 
-		if ( IsFrozen || IsFallKnockedDown )
+		if ( IsFrozen || IsFallKnockedDown || IsPilotingDrone )
 			return;
 
 		WishMove += Input.AnalogMove;

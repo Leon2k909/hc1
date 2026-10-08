@@ -11,7 +11,9 @@
     // While a team-win banner is up it's the only thing on screen: no spectate panel, crosshair or scores over it.
     var winBanner = Toast.IsWinShowing;
     var hasPawn = Client.Viewer.IsValid() && Client.Viewer.Pawn.IsValid();
-    var isValidPlayer = hasPawn && !winBanner;
+    // Flying the recon octocopter, the screen is its camera's feed and the feed's own display (ReconOctocopterFeed).
+    var piloting = Client.Viewer.IsValid() && ReconOctocopter.IsPiloting( Client.Viewer.PlayerPawn );
+    var isValidPlayer = hasPawn && !winBanner && !piloting;
     var hideCombatMouse = isValidPlayer && GameUtils.ShouldHideCombatMouse();
     var rootClass = IsHudEnabled ? (hideCombatMouse ? "combat-cursor-hidden" : "") : "hidden";
 }
@@ -39,7 +41,7 @@
         }
 
         @* The round's strip (scores, clock, mode), top centre. *@
-        @if ( !isBattleRoyale && !isZombies && !winBanner )
+        @if ( !isBattleRoyale && !isZombies && !winBanner && !piloting )
         {
             <div class="hud top-middle round-top">
                 <RoundStateDisplay />
@@ -52,11 +54,11 @@
                 <Vitals />
             }
 
-            @if ( isBattleRoyale && !winBanner )
+            @if ( isBattleRoyale && !winBanner && !piloting )
             {
                 <BattleRoyaleRadar />
             }
-            else if ( !isZombies && !winBanner && !(GameMode.Instance?.Hardcore ?? false) )
+            else if ( !isZombies && !winBanner && !piloting && !(GameMode.Instance?.Hardcore ?? false) )
             {
                 <Minimap />
             }
@@ -138,6 +140,11 @@
 
         <PlayAreaOverlay />
         <DeployedPawnOverlay />
+    }
+
+    @if ( hasPawn && !winBanner )
+    {
+        <ReconOctocopterFeed />
         <CombatMouseLock />
     }
 
@@ -217,6 +224,7 @@
         bool isHardcore = GameMode.Instance.IsValid() && GameMode.Instance.Hardcore;
         var score = Client.Viewer.IsValid() ? Client.Viewer.GetComponent<Facepunch.UI.PlayerScore>() : null;
         int bankedUAVs = score.IsValid() ? score.BankedUAVs : 0;
-        return HashCode.Combine(IsHudEnabled, Client.Viewer.IsValid(), Client.Viewer.IsValid() && Client.Viewer.Pawn.IsValid(), Math.Ceiling( relocateTimer ), isHardcore, bankedUAVs, Toast.IsWinShowing );
+        return HashCode.Combine(IsHudEnabled, Client.Viewer.IsValid(), Client.Viewer.IsValid() && Client.Viewer.Pawn.IsValid(), Math.Ceiling( relocateTimer ), isHardcore, bankedUAVs, Toast.IsWinShowing,
+            Client.Viewer.IsValid() && ReconOctocopter.IsPiloting( Client.Viewer.PlayerPawn ) );
     }
 }
