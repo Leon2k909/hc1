@@ -2297,6 +2297,9 @@ def viewmodel_prefab(weapon: Weapon, prefabs: Prefabs) -> dict:
     renderer["__guid"] = new_guid(f"{salt}vm/renderer")
     gunsmith["__guid"] = new_guid(f"{salt}vm/gunsmith")
     renderer["Model"] = f"{weapon.asset}/v_{weapon.model}.vmdl"
+    # The gun's own graph, which its vmdl names. The M4's prefab is pinned to its decompiled graph
+    # (animgraph_flags.VIEWMODELS), whose clips this model doesn't have, and copied, it left the gun out of the hands.
+    renderer["AnimationGraph"] = None
     renderer["BodyGroups"] = prefabs.default_mesh_groups
     renderer["CreateBoneObjects"] = True
 

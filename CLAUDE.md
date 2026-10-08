@@ -70,6 +70,12 @@
   keeping its own turn). The L85A2's rig had `tag_brass` in the handguard, under the bore, so cases came out of it.
 - `Weapon.part_mounts` places a part's model on a rig bone (bone and offset along it), as the MW base draws a
   VElement, for a part whose vertices don't sit where it fits: the HK416's Tarkov stocks.
+- A ported gun's viewmodel prefab plays its model's own graph (`AnimationGraph` null; the vmdl names
+  `v_<gun>.vanmgrph`). `kastov_prefabs.viewmodel_prefab` copies `vm_m4a1.prefab`, which is pinned to the M4's
+  decompiled graph (see s&box 26.10.02), and until 2026-10-09 it kept that pin. So the L85A2, HK416, AK-12, AK-15 and
+  AK-74M played the M4's graph, whose clips their models don't have: the gun sat 216 units behind the camera, and the
+  user saw no gun in their hands (the AK-12, 2026-10-09). Checked offscreen after the fix: each holds its gun where
+  the AK-105 does (the AK-12's `tag_sling` 4.4 ahead of the camera). Not yet seen in a match.
 - `weapon_kastov74u.prefab` holds another session's hand-tuned gameplay values and sounds, so the prefab script only
   patches its DeploySound, aim offsets and OpticAimCorrection (`Prefabs.gameplay=None`). The 762's, Vityaz's,
   RPK's, Bizon's, AK-105's, Vepr-12's, M16A4's, P90's, MP7A1's, AUG's, Uzi's, FAL's, M18's, MCX's, L85A2's, HK416's,
