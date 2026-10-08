@@ -2820,7 +2820,7 @@ simulate_input.
     - cleft-cut travertine walls and honed travertine paving, on a 30-inch module;
     - off-white enamelled panels for the upper floors;
     - four exhibition banners with abstract pictures;
-    - the museum's name in bronze letters.
+    - the museum's name in bronze letters, and the South Gallery's name in grey ones.
     Run it before the map script.
   - `cerroblanco_parts.py` has the pieces:
     - the walls, glazing, stairs, railings and curved walls;
@@ -2837,16 +2837,36 @@ simulate_input.
       in-engine capture).
   - `--preview <dir>` and `--views <dir>` write flat-shaded views (`VIEWS`) for comparing with the pictures.
     Trees aren't drawn in them.
-- The museum stands round its courtyard: travertine below and white panels above, with flat roofs and parapets.
+- The museum stands round its courtyard: travertine below and warm off-white panels above (grey joints), with flat roofs
+  and parapets.
   - The rotunda is the entrance hall: a travertine drum with a band of curved glass and an oculus.
-  - The West Gallery (two storeys, an L, a stair inside) is on the courtyard's west side. On its east side are the cafe
-    (its roof a terrace, up a stair from the courtyard), the North Gallery (two storeys) and the East Hall, with its
-    mezzanine.
-  - The South Gallery (one tall storey) closes the courtyard's south side, with a portico of columns under a louvred
-    canopy, and the red sculptures in front.
-  - In the courtyard: the round planter with its boulders and a tree, the stage with the piano, hedges, benches and
-    the cafe's tables.
-  - The banners hang down the fronts (`BANNERS`).
+  - The West Gallery (two storeys, an L, a stair inside) is on the courtyard's west side. Its east front has the
+    pictures' curved balcony (`west_balcony`): a slab along the first floor with a rounded south-east corner, a steel
+    rail, slim columns and a canopy, with five banners hanging from it (`BALCONY_BANNERS`). On the courtyard's east side
+    are the cafe (its roof a terrace, up a stair from the courtyard), the North Gallery (two storeys) and the East Hall,
+    with its mezzanine.
+  - The South Gallery (one tall storey) closes the courtyard's south side. Its front is the pictures' (`south_front`):
+    - an enclosed balcony box in white panels over the entrance, its south-west corner rounded, on fat round columns;
+    - over it a flat white roof on slim columns, open in louvres at its east end;
+    - "galería sur" in grey letters on the wall under the balcony (`P.lettering`, `cb_label_sur`, drawn by
+      `cerroblanco_materials.labels`);
+    - a travertine planter of shrubs against the glass west of the entrance.
+    All of it but the columns and the planter is in the canopies' model, out of reach.
+  - In front of it, on the south plaza, the two red sculptures: a tall curved spike with a fin on a travertine block
+    (`spire_sculpture`, two bowed steel sheets) and box beams welded into a zigzag beside a post (`zigzag_sculpture`).
+    A smaller zigzag stands in the east garden.
+    - The spike's sheets are crescents in section. Their normals come from each ring's own tangent: from the ring's
+      middle they pointed into the concave face, which then drew inside out (only its edges showed).
+  - In the courtyard: the round two-tier planter with its boulders and a tree, the stage along the cafe's west wall
+    (`P.stage`: a black deck on a white pleated skirt, a truss with lamps, grey drapes and a white one down its end) with
+    the piano, speakers, monitors, flight cases and cables, hedges, benches and the cafe's tables.
+  - The banners (`BANNERS`) read the right way round: `banner` swapped them for a viewer's left and right
+    (fixed 2026-10-08).
+- The sky is its own (`Tools/cerroblanco_sky.py`, on belltower_sky's code): cloudless and deep blue, as in the
+  pictures, baked with the map's sun. `--width 2048 --supersample 1` is plenty for a gradient.
+- Offline renders (railhead_render through Blender's Cycles, with the scene's sky and the models'
+  textures) were compared with the pictures on 2026-10-08: the courtyard and stage, the West Gallery's balcony and
+  banners, and the South Gallery's front with its sculptures from the pictures' angle.
 - Red Team spawns on the forecourt at the north, by the car park and the museum's sign. Blue Team spawns on the south
   plaza, past the portico. Three lanes:
   - West: the West Garden's lawns, the West Gallery, then the garden circle round its bronze sphere (bomb site B) and

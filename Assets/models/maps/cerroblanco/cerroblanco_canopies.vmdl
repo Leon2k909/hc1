@@ -13,7 +13,10 @@
 						_class = "DefaultMaterialGroup"
 						remaps =
 						[
+							{ from = "cb_honed.vmat" to = "materials/cerroblanco/cb_honed.vmat" },
 							{ from = "cb_lamp.vmat" to = "materials/cerroblanco/cb_lamp.vmat" },
+							{ from = "cb_panel.vmat" to = "materials/cerroblanco/cb_panel.vmat" },
+							{ from = "cb_steel.vmat" to = "materials/cerroblanco/cb_steel.vmat" },
 							{ from = "cb_white.vmat" to = "materials/cerroblanco/cb_white.vmat" },
 							{ from = "gravel.vmat" to = "materials/buildings/gravel.vmat" }
 						]
@@ -48,11 +51,83 @@
 					{
 						_class = "PhysicsShapeBox"
 						parent_bone = ""
-						surface_prop = "metal"
+						surface_prop = "default"
 						collision_tags = "solid"
-						origin = [ -2285.0000, 275.0000, 264.0000 ]
+						origin = [ -2265.0000, 140.0000, 204.0000 ]
 						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 1570.0000, 270.0000, 16.0000 ]
+						dimensions = [ 880.0000, 230.0000, 16.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "default"
+						collision_tags = "solid"
+						origin = [ -2205.0000, 640.0000, 204.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 120.0000, 110.0000, 16.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "default"
+						collision_tags = "solid"
+						origin = [ -2377.0000, 140.0000, 231.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 880.0000, 6.0000, 70.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "default"
+						collision_tags = "solid"
+						origin = [ -2265.0000, -297.0000, 231.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 6.0000, 230.0000, 70.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "default"
+						collision_tags = "solid"
+						origin = [ -2205.0000, 697.0000, 231.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 6.0000, 110.0000, 70.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "default"
+						collision_tags = "solid"
+						origin = [ -2250.0000, 290.0000, 411.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 940.0000, 380.0000, 14.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "default"
+						collision_tags = "solid"
+						origin = [ -2434.0000, -310.0000, 408.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 260.0000, 12.0000, 20.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "default"
+						collision_tags = "solid"
+						origin = [ -2066.0000, -310.0000, 408.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 260.0000, 12.0000, 20.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "default"
+						collision_tags = "solid"
+						origin = [ -2250.0000, -434.0000, 408.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 12.0000, 356.0000, 20.0000 ]
 					},
 					{
 						_class = "PhysicsShapeBox"
@@ -62,6 +137,26 @@
 						origin = [ -604.0000, -1520.0000, 205.0000 ]
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 240.0000, 1172.0000, 10.0000 ]
+					},
+					{
+						_class = "PhysicsHullFile"
+						name = "cerroblanco_canopies_hulls_default"
+						parent_bone = ""
+						surface_prop = "default"
+						collision_tags = "solid"
+						recenter_on_parent_bone = false
+						offset_origin = [ 0.0, 0.0, 0.0 ]
+						offset_angles = [ 0.0, 0.0, 0.0 ]
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						filename = "models/maps/cerroblanco/cerroblanco_canopies_hulls_default.obj"
+						import_scale = 1.0
+						faceMergeAngle = 10.0
+						maxHullVertices = 0
+						import_mode = "HullPerElement"
+						optimization_algorithm = "QEM"
+						import_filter = { exclude_by_default = false exception_list = [ ] }
 					},
 				]
 			},

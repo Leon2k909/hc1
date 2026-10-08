@@ -277,13 +277,13 @@ def panel( rng, n ):
     dome = 0.01 * np.sin( math.pi * u / 30 ) * np.sin( math.pi * v / 30 ) * rng.uniform( -1, 1, 16 )[cell]
     height = -0.6 * ( 1 - inside ) + inside * ( 0.1 * bevel + wave + dome )
     hollow = cavity( height, ppu, radii=( 0.2, 0.8 ), weights=( 1.0, 0.4 ) )
-    white = to_linear( ( 236, 235, 230 ) ) * rng.uniform( 0.985, 1.012, ( 16, 1 ) )
+    white = to_linear( ( 233, 227, 214 ) ) * rng.uniform( 0.985, 1.012, ( 16, 1 ) )
     stone = white[cell] * ( 1.0 + 0.006 * noise( rng, n, 1.0, 60, None ) )[..., None]
     # A faint grey wash down from each panel's top edge (rain), and some dust settled near the joints.
     rain = smoothstep( 1.0, 2.6, blur( noise( rng, n, 1.4, 8, 200 ), ( 3.0 * ppu, 0.08 * ppu ) ) ) * ( 1 - v / 30.0 )
     stone = lerp( stone, stone * 0.9, 0.35 * rain )
     stone = lerp( stone, stone * 0.93, 0.5 * ( 1 - bevel ) * inside )
-    joint = to_linear( ( 40, 40, 41 ) ) * np.ones( ( n, n, 3 ) )
+    joint = to_linear( ( 104, 100, 93 ) ) * np.ones( ( n, n, 3 ) )
     colour = lerp( joint, stone, inside ) * np.exp( -0.8 * hollow )[..., None]
     rough = np.clip( 0.3 + 0.03 * rng.uniform( -1, 1, 16 )[cell] + 0.04 * noise( rng, n, 1.0, 60, None ) + 0.1 * rain, 0, 1 )
     rough = np.where( inside < 0.5, 0.9, rough )
@@ -424,12 +424,36 @@ def sign( out ):
                                               '    g_flAntiAliasedEdgeStrength "1"\n' ) ) )
 
 
+# The galleries' names on their walls: grey letters, alpha tested, 8:1
+
+LABELS = { "sur": "galería sur" }
+
+
+def labels( out ):
+    for key, text in LABELS.items():
+        mask = Image.new( "L", ( SIGN_W, SIGN_H ), 0 )
+        draw = ImageDraw.Draw( mask )
+        draw.text( ( SIGN_W / 2, SIGN_H / 2 ), text, font=font( "Dinish-Regular.ttf", 170 ), fill=255, anchor="mm" )
+        a = np.asarray( mask, float ) / 255.0
+        grey = np.full( ( SIGN_H, SIGN_W, 3 ), 92.0 )
+        save_rgb( out / f"label_{key}_color.png", grey )
+        save_grey( out / f"label_{key}_trans.png", a )
+        write_vmat( out, f"cb_label_{key}", vmat( f"cb_label_{key}", f"{RESOURCE_DIR}/label_{key}_color.png",
+                                                  "materials/default/default_normal.tga", "[0.600000 0.600000 0.600000 0.000000]",
+                                                  "materials/default/default_ao.tga", metal=0.6,
+                                                  extra=( '    F_ALPHA_TEST "1"\n'
+                                                          f'    TextureTranslucency "{RESOURCE_DIR}/label_{key}_trans.png"\n'
+                                                          '    g_flAlphaTestReference "0.5"\n'
+                                                          '    g_flAntiAliasedEdgeStrength "1"\n' ) ) )
+
+
 # ---------------------------------------------------------------------------------------------------------------------
 
 def missing( out=OUT_DIR ):
     """ Whether any map is missing (the PNGs live in Git LFS: a checkout without them gets them drawn again). """
     names = [ f"{name}_{kind}.png" for name in DRAWN for kind in ( "color", "normal", "rough", "ao" ) ]
     names += [ f"banner_{k}_color.png" for k in range( len( BANNERS ) ) ] + [ "sign_color.png", "sign_trans.png" ]
+    names += [ f"label_{key}_{kind}.png" for key in LABELS for kind in ( "color", "trans" ) ]
     return [ name for name in names if not ( out / name ).exists() ]
 
 
@@ -448,13 +472,13 @@ def write_sheet( path ):
 
 def main( argv=None ):
     parser = argparse.ArgumentParser( description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter )
-    parser.add_argument( "names", nargs="*", help="only these (travertine, paving, honed, panel, banners, sign)" )
+    parser.add_argument( "names", nargs="*", help="only these (travertine, paving, honed, panel, banners, sign, labels)" )
     parser.add_argument( "--out", help="write here instead" )
     parser.add_argument( "--sheet", help="also write a lit sheet of the stone and panels" )
     args = parser.parse_args( argv )
     out = Path( args.out ) if args.out else OUT_DIR
     out.mkdir( parents=True, exist_ok=True )
-    names = args.names or list( DRAWN ) + [ "banners", "sign" ]
+    names = args.names or list( DRAWN ) + [ "banners", "sign", "labels" ]
     for name in names:
         if name in DRAWN:
             drawn_material( name, out )
@@ -462,6 +486,8 @@ def main( argv=None ):
             banners( out )
         elif name == "sign":
             sign( out )
+        elif name == "labels":
+            labels( out )
         print( f"drew {name}" )
     if args.sheet:
         write_sheet( args.sheet )

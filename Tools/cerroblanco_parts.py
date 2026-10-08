@@ -25,14 +25,18 @@ TILED = { TRAV: 120.0, PANEL: 120.0, PAVE: 120.0, HONED: 120.0 }
 PLASTER, WHITE, FRAME, RED, BRONZE = "cb_plaster", "cb_white", "cb_frame", "cb_red", "cb_bronze"
 PIANO, CURTAIN, BLACK, STEEL, TEAK = "cb_piano", "cb_curtain", "cb_black", "cb_steel", "cb_teak"
 IVORY, FELT, LAMP, GLAZE = "cb_ivory", "cb_felt", "cb_lamp", "cb_glass"
+DRAPE, SKIRT, DECK = "cb_drape", "cb_skirt", "cb_deck"
 CB_PAINTED = {
     PLASTER: ( ( 236, 233, 226 ), 0.0, 0.85 ),       # the galleries' white walls and ceilings
-    WHITE: ( ( 238, 238, 234 ), 0.1, 0.32 ),         # painted steel: columns, canopies, pergolas, railings, sunshades
+    WHITE: ( ( 236, 231, 220 ), 0.1, 0.32 ),         # painted steel: columns, canopies, pergolas, railings, sunshades
     FRAME: ( ( 54, 57, 60 ), 0.55, 0.38 ),           # the curtain walls' anodised mullions and door frames
-    RED: ( ( 176, 30, 28 ), 0.05, 0.36 ),            # the sculptures' lacquered steel
+    RED: ( ( 112, 16, 15 ), 0.05, 0.55 ),            # the sculptures' lacquered steel
     BRONZE: ( ( 92, 66, 40 ), 0.9, 0.34 ),           # the garden's sphere
     PIANO: ( ( 12, 12, 13 ), 0.0, 0.06 ),            # a concert grand's lacquer
-    CURTAIN: ( ( 36, 36, 40 ), 0.0, 0.95 ),          # the stage's drapes
+    CURTAIN: ( ( 36, 36, 40 ), 0.0, 0.95 ),          # speaker cloth
+    DRAPE: ( ( 150, 148, 146 ), 0.0, 0.92 ),         # the stage's grey velour drapes
+    SKIRT: ( ( 236, 234, 230 ), 0.0, 0.9 ),          # the stage's white pleated skirt, and a white drape
+    DECK: ( ( 34, 34, 36 ), 0.0, 0.7 ),              # the stage's black-painted deck
     BLACK: ( ( 22, 22, 24 ), 0.1, 0.55 ),            # speakers, stage skirts, trusses
     STEEL: ( ( 160, 162, 164 ), 0.85, 0.32 ),        # stainless: handrails, posts, bins
     TEAK: ( ( 132, 92, 58 ), 0.0, 0.55 ),            # benches' and cafe tables' slats
@@ -532,13 +536,21 @@ def boulder( m, centre, size, seed, paint=ROCK, surface=STONE, points=18 ):
 # ---------------------------------------------------------------------------------------------------------------------
 # Props
 
-def round_planter( m, centre, r, rim_h=22.0, rim_w=14.0, seed=1, tree_path=f"{OAK}/tree_oak_small_a.vmdl" ):
-    """ The courtyard's round planter: a honed travertine ring, soil heaped inside it, boulders bedded in the soil and
-    low shrubs round a small tree. You can step up onto its rim and the boulders. """
-    ring( m, centre, r - rim_w, r, 0, rim_h, outer=HONED, inner=HONED, top=HONED, step=6.0 )
+def round_planter( m, centre, r, seed=1, tree_path=f"{OAK}/tree_oak_small_a.vmdl", gap=135.0 ):
+    """ The courtyard's round planter, two tiers as in the pictures: a low travertine ledge round the outside (r), open
+    on one side (gap, degrees), a paved ring inside it, then the planter's own wall of travertine blocks, chest high,
+    with soil heaped inside, a pile of pale boulders on it and shrubs and a small tree round them. You can hop onto the
+    ledge, and mantle onto the wall and the boulders. """
+    ledge_w, ledge_h = 22.0, 26.0
+    ring( m, centre, r - ledge_w, r, 0, ledge_h, outer=TRAV, inner=TRAV, top=HONED, step=6.0,
+          gaps=[ ( gap, 96.0, 0.0, ledge_h ) ] )
+    ri = round( r * 0.6 )
+    wall_w, wall_h = 16.0, 56.0
+    ring( m, centre, ri - wall_w, ri, 0, wall_h, outer=TRAV, inner=TRAV, top=HONED, step=6.0 )
     ce, cn = centre
+    inside = ri - wall_w
     # The soil: a low dome of rings, so it isn't a flat plate.
-    rings = [ ( r - rim_w, rim_h - 3 ), ( r * 0.7, rim_h + 5 ), ( r * 0.35, rim_h + 10 ), ( 0, rim_h + 12 ) ]
+    rings = [ ( inside, wall_h - 4 ), ( inside * 0.65, wall_h + 4 ), ( inside * 0.3, wall_h + 10 ), ( 0, wall_h + 12 ) ]
     sides = 36
     for ( ra, za ), ( rb, zb ) in zip( rings, rings[1:] ):
         for k in range( sides ):
@@ -549,19 +561,30 @@ def round_planter( m, centre, r, rim_h=22.0, rim_w=14.0, seed=1, tree_path=f"{OA
                 pts = pts[:3]
             m.polygon( SOIL, pts )
     m.hull( [ ( ce + ra * math.cos( 2 * math.pi * k / 12 ), cn + ra * math.sin( 2 * math.pi * k / 12 ), z )
-              for ra, za in rings[:2] for k in range( 12 ) for z in ( 0, za ) ], DIRT )
+              for ra, za in rings[:3] for k in range( 12 ) for z in ( 0, za ) ], DIRT )
     rng = np.random.default_rng( seed )
-    for k in range( 7 ):
-        a = 2 * math.pi * ( k / 7 + rng.random() * 0.08 )
-        rr = ( r - rim_w ) * ( 0.42 + 0.3 * rng.random() )
-        size = ( 38 + 26 * rng.random(), 32 + 22 * rng.random(), 30 + 24 * rng.random() )
-        boulder( m, ( ce + rr * math.cos( a ), cn + rr * math.sin( a ), rim_h ), size, seed * 100 + k )
-    for k in range( 12 ):
-        a = 2 * math.pi * ( k + 0.5 ) / 12 + jitter( 0.2, "shrub", k, seed )
-        rr = ( r - rim_w ) * ( 0.72 + jitter( 0.1, "rr", k, seed ) )
+    # The boulders: a ring of big ones bedded round the middle, smaller ones on and between them, a few at the rim.
+    for k in range( 8 ):
+        a = 2 * math.pi * ( k / 8 + rng.random() * 0.06 )
+        rr = inside * ( 0.38 + 0.22 * rng.random() )
+        size = ( 46 + 26 * rng.random(), 38 + 22 * rng.random(), 30 + 22 * rng.random() )
+        boulder( m, ( ce + rr * math.cos( a ), cn + rr * math.sin( a ), wall_h - 2 ), size, seed * 100 + k )
+    for k in range( 5 ):
+        a = 2 * math.pi * ( k / 5 + 0.1 + rng.random() * 0.08 )
+        rr = inside * ( 0.12 + 0.18 * rng.random() )
+        size = ( 40 + 20 * rng.random(), 34 + 16 * rng.random(), 26 + 16 * rng.random() )
+        boulder( m, ( ce + rr * math.cos( a ), cn + rr * math.sin( a ), wall_h + 14 ), size, seed * 100 + 20 + k )
+    for k in range( 6 ):
+        a = 2 * math.pi * ( k / 6 + 0.05 + rng.random() * 0.1 )
+        rr = inside * ( 0.8 + 0.08 * rng.random() )
+        size = ( 26 + 14 * rng.random(), 22 + 12 * rng.random(), 16 + 10 * rng.random() )
+        boulder( m, ( ce + rr * math.cos( a ), cn + rr * math.sin( a ), wall_h - 4 ), size, seed * 100 + 40 + k )
+    for k in range( 14 ):
+        a = 2 * math.pi * ( k + 0.5 ) / 14 + jitter( 0.2, "shrub", k, seed )
+        rr = inside * ( 0.66 + jitter( 0.12, "rr", k, seed ) )
         path = ( f"{BEECH}/beech_bush_regular_small.vmdl", f"{PINE}/pine_bush_low_a.vmdl", f"{BEECH}/beech_bush_small.vmdl" )[k % 3]
-        bush( m, ce + rr * math.cos( a ), cn + rr * math.sin( a ), rim_h - 2, path, 0.8 + 0.3 * ( keyed( k, seed ) % 10 ) / 10 )
-    tree( m, ce + 30, cn - 20, tree_path, 1.0, z=rim_h + 8, grate=False )
+        bush( m, ce + rr * math.cos( a ), cn + rr * math.sin( a ), wall_h - 2, path, 0.8 + 0.3 * ( keyed( k, seed ) % 10 ) / 10 )
+    tree( m, ce + 26, cn - 18, tree_path, 1.0, z=wall_h + 10, grate=False )
 
 
 def sweep( m, paint, path, profile, normals_smooth=True ):
@@ -584,47 +607,76 @@ def sweep( m, paint, path, profile, normals_smooth=True ):
         card( m, paint, ring_, c - np.mean( other, axis=0 ) )
 
 
-def spire_sculpture( m, e, n, height=330.0, seed=3, paint=RED ):
-    """ The plaza's tall red sculpture: a flat steel blade rising from a honed plinth, sweeping up in a long curve and
-    twisting a quarter turn as it narrows to a point, like the lacquered steel pieces of the 1990s. """
-    box_at( m, ( e, n, 6 ), ( 70, 70, 12 ), { "default": HONED, "-z": None }, STONE )
-    profile = [ ( math.cos( 2 * math.pi * k / 14 ), 0.32 * math.sin( 2 * math.pi * k / 14 ) ) for k in range( 14 ) ]
-    frames = []
-    steps = 22
-    for k in range( steps + 1 ):
-        t = k / steps
-        bend = 70.0 * t * t
-        point = np.array( ( e + bend * 0.8, n + bend * 0.6, 12 + height * t ) )
-        twist = math.radians( 95 * t )
-        side = np.array( ( math.cos( twist ), math.sin( twist ), 0.0 ) )
-        up = np.array( ( -math.sin( twist ), math.cos( twist ), 0.0 ) )
-        width = 30.0 * ( 1 - t ) ** 0.8 + 1.0
-        frames.append( ( point, side, up, ( width, width ) ) )
-    sweep( m, paint, frames, profile )
-    m.collision_box( ( e - 26, n - 26, 12 ), ( e + 26, n + 26, 12 + height * 0.5 ), METAL )
-    m.collision_box( ( e - 10, n - 10, 12 + height * 0.5 ), ( e + 60, n + 50, 12 + height ), METAL )
+def spire_sculpture( m, e, n, yaw=0.0, height=420.0, paint=RED ):
+    """ The plaza's tall red sculpture on its travertine block, as in the pictures: two curved sheets of lacquered steel
+    rising from the block, a wide one sweeping up into a long leaning spike and a shorter fin in front of it, both bowed
+    across their width like pieces cut from a cone. """
+    x, y, up = turned( 0, 0, yaw )
+    o = np.array( ( e, n, 0.0 ) )
+    base = 72.0
+    obox( m, o, yaw, ( 0, 0, base / 2 ), ( 190, 150, base ), { "default": TRAV, "+z": HONED, "-z": None }, STONE )
+    obox( m, o, yaw, ( 0, 0, base + 1 ), ( 194, 154, 2 ), { "default": HONED, "-z": None } )
+
+    def blade( left, right, top, y0, bow, thick, steps=26 ):
+        """ A sheet whose left and right edges (functions of t, 0 at the block, 1 at its tip) run up to top. """
+        profile = [ ( math.cos( 2 * math.pi * k / 16 ), math.sin( 2 * math.pi * k / 16 ) ) for k in range( 16 ) ]
+        frames = []
+        for k in range( steps + 1 ):
+            t = k / steps
+            lo, hi = left( t ), right( t )
+            mid, half = ( lo + hi ) / 2, max( ( hi - lo ) / 2, 0.4 )
+            point = o + x * mid + y * ( y0 + bow * math.sin( math.pi * t * 0.5 ) ) + up * ( base + top * t )
+            frames.append( ( point, x, y, ( half, thick * ( 1 - 0.7 * t ) + 0.3 ) ) )
+        # Bowed across: the profile's y goes as x squared, in inches, so the sheet curves like a cone's side.
+        # The bow makes each ring a crescent, so its normals come from the ring itself: the profile runs anticlockwise
+        # in ( side, up ), so the outward normal is its tangent turned a quarter clockwise. (Normals from the ring's
+        # middle pointed into the concave face, which then drew inside out.)
+        rings, ring_normals = [], []
+        for point, side, upv, ( half, th ) in frames:
+            bend = 10.0 * min( half / 40.0, 1.0 )
+            flat = [ ( px * half, py * th - bend * px * px ) for px, py in profile ]
+            rings.append( [ point + side * a + upv * b for a, b in flat ] )
+            normals = []
+            for k in range( len( flat ) ):
+                ( a0, b0 ), ( a1, b1 ) = flat[k - 1], flat[( k + 1 ) % len( flat )]
+                normals.append( K.normalise( side * ( b1 - b0 ) - upv * ( a1 - a0 ) ) )
+            ring_normals.append( normals )
+        count = len( profile )
+        for ( ra, na ), ( rb, nb ) in zip( zip( rings, ring_normals ), zip( rings[1:], ring_normals[1:] ) ):
+            for k in range( count ):
+                j = ( k + 1 ) % count
+                normals = [ na[k], na[j], nb[j], nb[k] ]
+                card( m, paint, [ ra[k], ra[j], rb[j], rb[k] ], sum( normals ), normals=normals )
+        card( m, paint, rings[0], -up )
+        # Its collision: hulls round slices of it.
+        for a, b in zip( rings[::6], rings[6::6] + [ rings[-1] ] ):
+            if a is not b:
+                m.hull( [ tuple( q ) for q in a + b ], METAL )
+
+    blade( lambda t: -72 - 34 * t ** 1.6, lambda t: -106 + 182 * ( 1 - t ) ** 1.45, height, 0.0, 14.0, 3.2 )
+    blade( lambda t: -18 - 22 * t ** 1.3, lambda t: -40 + 96 * ( 1 - t ) ** 1.25, height * 0.48, -16.0, -8.0, 2.6, steps=16 )
 
 
-def folded_sculpture( m, e, n, yaw=0.0, paint=RED, scale=1.0 ):
-    """ The second red piece: steel plates folded into a leaning, angular arch, standing on its own feet. """
-    pts = [ ( -70, 0, 0 ), ( -40, 10, 140 ), ( 30, -8, 190 ), ( 80, 0, 60 ), ( 70, 6, 0 ) ]
-    x, y, z = turned( 0, 0, yaw )
-    origin = np.array( ( e, n, 0.0 ) )
-    world = [ origin + ( x * p[0] + y * p[1] + z * p[2] ) * scale for p in pts ]
-    thick = 9.0 * scale
-    width = 56.0 * scale
-    for a, b in zip( world, world[1:] ):
-        along = K.normalise( b - a )
-        side = K.normalise( np.cross( along, z ) ) if abs( along[2] ) < 0.99 else y
-        normal = np.cross( side, along )
-        corners = [ a - side * width / 2, b - side * width / 2, b + side * width / 2, a + side * width / 2 ]
-        for off, facing in ( ( thick / 2, normal ), ( -thick / 2, -normal ) ):
-            card( m, paint, [ c + normal * off for c in corners ], facing )
-        for s in ( -1, 1 ):
-            edge = [ a + side * s * width / 2 - normal * thick / 2, b + side * s * width / 2 - normal * thick / 2,
-                     b + side * s * width / 2 + normal * thick / 2, a + side * s * width / 2 + normal * thick / 2 ]
-            card( m, paint, edge, side * s )
-        m.hull( [ tuple( c + normal * o ) for c in corners for o in ( -thick / 2, thick / 2 ) ], METAL )
+def zigzag_sculpture( m, e, n, yaw=0.0, paint=RED, scale=1.0 ):
+    """ The second red piece, as in the pictures: box-section steel beams welded into a tall zigzag beside an upright
+    post, the ends cut on the slant, on a low travertine block. """
+    x, y, up = turned( 0, 0, yaw )
+    o = np.array( ( e, n, 0.0 ) )
+    base = 40.0 * scale
+    obox( m, o, yaw, ( 10 * scale, 0, base / 2 ), ( 150 * scale, 84 * scale, base ), { "default": TRAV, "+z": HONED, "-z": None }, STONE )
+
+    def at( px, pz, py=0.0 ):
+        return o + ( x * px + y * py ) * scale + up * ( base + pz * scale )
+    size = ( 13.0 * scale, 9.0 * scale )
+    post = [ ( -38, -2 ), ( -33, 300 ) ]
+    zig = [ ( -30, 8 ), ( 46, 92 ), ( -24, 150 ), ( 54, 236 ), ( 6, 286 ), ( 40, 330 ) ]
+    for py, path in ( ( -6.0, post ), ( 6.0, zig ) ):
+        for ( ax, az ), ( bx, bz ) in zip( path, path[1:] ):
+            m.beam( at( ax, az, py ), at( bx, bz, py ), size, paint, METAL, up=tuple( y ) )
+    # A short brace from the post to the zigzag's first bend, and a second, thinner zigzag behind the first.
+    m.beam( at( -38, 120, 0 ), at( 40, 96, 0 ), ( 9.0 * scale, 7.0 * scale ), paint, METAL, up=tuple( y ) )
+    for ( ax, az ), ( bx, bz ) in zip( zig[1:4], zig[2:5] ):
+        m.beam( at( ax + 4, az + 10, 14 ), at( bx + 4, bz + 10, 14 ), ( 8.0 * scale, 6.0 * scale ), paint, METAL, up=tuple( y ) )
 
 
 def bronze_sphere( m, e, n, r=58.0, plinth=24.0 ):
@@ -706,36 +758,13 @@ def speaker( m, e, n, z, yaw, tall=True ):
         obox( m, o, yaw, ( 0, 0, 7 ), ( 16, 26, 14 ), BLACK, METAL )
 
 
-def stage( m, e0, e1, n0, n1, height=30.0, front="+e" ):
-    """ The courtyard's stage: a platform with a black skirt and a honed edge, steps down at each end of its front,
-    a black truss frame over it, and drapes along its back. """
-    m.box( ( e0, n0, 0 ), ( e1, n1, height ), { "+z": TEAK, "-z": None, "default": BLACK }, WOOD )
-    m.box( ( e0 - 1, n0 - 1, height ), ( e1 + 1, n1 + 1, height + 1.5 ), { "+z": None, "-z": None, "default": STEEL } )
-    span = ( n0, n1 ) if front in ( "+e", "-e" ) else ( e0, e1 )
-    # Steps down at both ends of the front.
-    for end in ( 0, 1 ):
-        if front == "+e":
-            r0, r1 = ( n0 + 10, n0 + 70 ) if end == 0 else ( n1 - 70, n1 - 10 )
-            flight( m, "e", r0, r1, e1, e1 + 4 * 11, height, 0, tread=HONED, riser=BLACK, side=BLACK, base=0 )
-        elif front == "-e":
-            r0, r1 = ( n0 + 10, n0 + 70 ) if end == 0 else ( n1 - 70, n1 - 10 )
-            flight( m, "e", r0, r1, e0, e0 - 4 * 11, height, 0, tread=HONED, riser=BLACK, side=BLACK, base=0 )
-        elif front == "+n":
-            r0, r1 = ( e0 + 10, e0 + 70 ) if end == 0 else ( e1 - 70, e1 - 10 )
-            flight( m, "n", r0, r1, n1, n1 + 4 * 11, height, 0, tread=HONED, riser=BLACK, side=BLACK, base=0 )
-        else:
-            r0, r1 = ( e0 + 10, e0 + 70 ) if end == 0 else ( e1 - 70, e1 - 10 )
-            flight( m, "n", r0, r1, n0, n0 - 4 * 11, height, 0, tread=HONED, riser=BLACK, side=BLACK, base=0 )
-    # Truss: four uprights and a box frame over it, drawn as square tubes.
-    top = height + 190
-    corners = [ ( e0 + 6, n0 + 6 ), ( e1 - 6, n0 + 6 ), ( e1 - 6, n1 - 6 ), ( e0 + 6, n1 - 6 ) ]
-    for ce, cn in corners:
-        m.box( ( ce - 5, cn - 5, height ), ( ce + 5, cn + 5, top ), BLACK, METAL )
-    for ( ae, an ), ( be, bn ) in zip( corners, corners[1:] + corners[:1] ):
-        for dz in ( 0.0, -12.0 ):
-            m.beam( ( ae, an, top + dz ), ( be, bn, top + dz ), ( 3, 3 ), BLACK )
-    # Spotlights hanging off the front truss, and drapes along the back, in folds. Worked in the stage's own axes:
-    # r along its front, d across it (towards the audience is +d).
+def stage( m, e0, e1, n0, n1, height=30.0, front="+e", white_end=0 ):
+    """ The courtyard's stage, as in the pictures: a black deck on risers hidden by a white pleated skirt, steps down at
+    each end of its front, a black truss frame over it with lamps on the front truss, grey drapes along its back and a
+    white one down one end (white_end: 0 the end at the low r, 1 the other). """
+    m.box( ( e0, n0, 0 ), ( e1, n1, height ), { "+z": DECK, "-z": None, "default": BLACK }, WOOD )
+    m.box( ( e0 - 0.6, n0 - 0.6, height - 3 ), ( e1 + 0.6, n1 + 0.6, height ), { "+z": None, "-z": None, "default": BLACK } )
+    # Worked in the stage's own axes: r along its front, d across it (towards the audience is +d).
     along_e = front in ( "+n", "-n" )
     sign = 1.0 if front in ( "+e", "+n" ) else -1.0
     r0_, r1_ = ( e0, e1 ) if along_e else ( n0, n1 )
@@ -746,24 +775,132 @@ def stage( m, e0, e1, n0, n1, height=30.0, front="+e" ):
         return ( r, d, z ) if along_e else ( d, r, z )
 
     def lohi( ra, rb, da, db, za, zb ):
-        a, b = at( ra, da, za ), at( rb, db, zb )
-        return np.minimum( a, b ), np.maximum( a, b )
+        a, b = np.array( at( ra, da, za ), float ), np.array( at( rb, db, zb ), float )
+        return tuple( np.minimum( a, b ) ), tuple( np.maximum( a, b ) )
 
+    def plan( r, d ):
+        return np.array( at( r, d, 0 )[:2], float )
+
+    # Steps down at both ends of the front.
+    steps = [ ( r0_ + 10, r0_ + 70 ), ( r1_ - 70, r1_ - 10 ) ]
+    for ra, rb in steps:
+        flight( m, "n" if along_e else "e", ra, rb, d_front, d_front + sign * 4 * 11, height, 0, tread=DECK, riser=BLACK,
+                side=BLACK, base=0 )
+
+    def skirt( p0, p1, out ):
+        """ Pleats hung off the deck's edge from p0 to p1 (plan points), out the way they face. """
+        p0, p1, out = np.asarray( p0, float ), np.asarray( p1, float ), np.asarray( out, float )
+        length = float( np.linalg.norm( p1 - p0 ) )
+        if length < 4:
+            return
+        along = ( p1 - p0 ) / length
+        count = max( 2, int( length / 3.0 ) )
+        pts = [ p0 + along * length * k / count + out * ( 1.4 if k % 2 else 0.4 ) for k in range( count + 1 ) ]
+        for a, b in zip( pts, pts[1:] ):
+            facing = np.cross( np.append( b - a, 0.0 ), ( 0.0, 0.0, 1.0 ) )
+            if np.dot( facing[:2], out ) < 0:
+                facing = -facing
+            card( m, SKIRT, [ ( *a, 1.0 ), ( *b, 1.0 ), ( *b, height - 2.5 ), ( *a, height - 2.5 ) ], facing )
+        m.beam( ( *( p0 + out * 1.6 ), height - 1.5 ), ( *( p1 + out * 1.6 ), height - 1.5 ), ( 1.2, 3.0 ), BLACK )
+
+    out_front = plan( 0, sign ) - plan( 0, 0 )
+    out_r = plan( 1, 0 ) - plan( 0, 0 )
+    for ra, rb in ( ( r0_, steps[0][0] ), ( steps[0][1], steps[1][0] ), ( steps[1][1], r1_ ) ):
+        skirt( plan( ra, d_front ), plan( rb, d_front ), out_front )
+    skirt( plan( r0_, d_back ), plan( r0_, d_front ), -out_r )
+    skirt( plan( r1_, d_back ), plan( r1_, d_front ), out_r )
+
+    # Truss: four uprights and a box frame over the deck, square tubes with lattice faces.
+    top = height + 190
+    corners = [ at( r0_ + 6, d_back + sign * 6, 0 ), at( r1_ - 6, d_back + sign * 6, 0 ),
+                at( r1_ - 6, d_front - sign * 6, 0 ), at( r0_ + 6, d_front - sign * 6, 0 ) ]
+    for ce, cn, _ in corners:
+        m.box( ( ce - 5, cn - 5, height ), ( ce + 5, cn + 5, top ), BLACK, METAL )
+        m.box( ( ce - 9, cn - 9, height ), ( ce + 9, cn + 9, height + 1 ), STEEL )
+    for ( ae, an, _ ), ( be, bn, _ ) in zip( corners, corners[1:] + corners[:1] ):
+        for dz in ( 0.0, -12.0 ):
+            m.beam( ( ae, an, top + dz ), ( be, bn, top + dz ), ( 2.4, 2.4 ), BLACK )
+        length = math.hypot( be - ae, bn - an )
+        for k in range( int( length / 12 ) ):
+            t0, t1 = k * 12 / length, ( k + 1 ) * 12 / length
+            pa = ( ae + ( be - ae ) * t0, an + ( bn - an ) * t0, top - ( 12 if k % 2 else 0 ) )
+            pb = ( ae + ( be - ae ) * t1, an + ( bn - an ) * t1, top - ( 0 if k % 2 else 12 ) )
+            rod( m, pa, pb, 0.6, BLACK, sides=4 )
+    # Lamps hanging off the front truss: a hanger, a can and its lens.
     fd = d_front - sign * 6
-    for k in range( 5 ):
-        rr = r0_ + ( r1_ - r0_ ) * ( k + 0.5 ) / 5
-        m.box( *lohi( rr - 4, rr + 4, fd - 5, fd + 5, top - 30, top - 18 ), BLACK )
-        lens = fd + sign * 5
-        m.box( *lohi( rr - 3, rr + 3, lens, lens + sign * 0.2, top - 28, top - 20 ), LAMP )
-    bd = d_back + sign * 3
-    folds = int( ( r1_ - r0_ - 12 ) / 9 )
+    for k in range( 6 ):
+        rr = r0_ + ( r1_ - r0_ ) * ( k + 0.5 ) / 6
+        m.box( *lohi( rr - 0.8, rr + 0.8, fd - 0.8, fd + 0.8, top - 22, top - 12 ), BLACK )
+        m.box( *lohi( rr - 4.5, rr + 4.5, fd - 5, fd + 7, top - 32, top - 22 ), BLACK )
+        lens = fd + sign * 7
+        m.box( *lohi( rr - 3.5, rr + 3.5, lens, lens + sign * 0.2, top - 31, top - 23 ), LAMP )
+
+    # Grey drapes along the back, in folds.
+    bd = d_back + sign * 4
+    folds = max( 1, int( ( r1_ - r0_ - 12 ) / 9 ) )
     towards = np.array( at( 0, sign, 0 ), float )
     for k in range( folds ):
-        ra, rb = r0_ + 6 + k * 9, r0_ + 6 + ( k + 1 ) * 9
-        dd = 3.0 if k % 2 else 0.0
-        card( m, CURTAIN, [ at( ra, bd + sign * dd, height ), at( rb, bd + sign * ( 3 - dd ), height ),
-                            at( rb, bd + sign * ( 3 - dd ), top - 14 ), at( ra, bd + sign * dd, top - 14 ) ], towards, both=True )
-    m.collision_box( *lohi( r0_ + 6, r1_ - 6, bd - sign * 2, bd + sign * 5, height, top - 14 ), FABRIC )
+        a, b = r0_ + 6 + ( r1_ - r0_ - 12 ) * k / folds, r0_ + 6 + ( r1_ - r0_ - 12 ) * ( k + 1 ) / folds
+        da, db = sign * ( 3.0 if k % 2 else 0.0 ), sign * ( 0.0 if k % 2 else 3.0 )
+        card( m, DRAPE, [ at( a, bd + da, height + 0.5 ), at( b, bd + db, height + 0.5 ), at( b, bd + db, top - 14 ),
+                          at( a, bd + da, top - 14 ) ], towards, both=True )
+    m.collision_box( *lohi( r0_ + 6, r1_ - 6, bd - sign * 1, bd + sign * 4, height, top - 14 ), FABRIC )
+    # The white drape down one end, from the back towards the front, folded across d.
+    end_r = r0_ + 8 if white_end == 0 else r1_ - 8
+    span = abs( d_front - d_back ) * 0.45
+    folds = max( 1, int( span / 8 ) )
+    for k in range( folds ):
+        da, db = bd + sign * span * k / folds, bd + sign * span * ( k + 1 ) / folds
+        ra = end_r + ( 2.5 if k % 2 else 0.0 )
+        rb = end_r + ( 0.0 if k % 2 else 2.5 )
+        card( m, SKIRT, [ at( ra, da, height + 0.5 ), at( rb, db, height + 0.5 ), at( rb, db, top - 14 ), at( ra, da, top - 14 ) ],
+              np.array( at( 1, 0, 0 ), float ), both=True )
+
+
+def flight_case( m, e, n, z, yaw, size=( 24.0, 40.0, 28.0 ), lid=False ):
+    """ A road case: black ply with aluminium edge extrusions, ball corners, latches and handles. size is ( depth,
+    length, height ) in its own axes; lid opens it, with the lid stood against its back (-x). """
+    x, y, up = turned( 0, 0, yaw )
+    o = np.array( ( e, n, z ), float )
+    dx, dy, dz = size
+    body = dz * ( 0.72 if lid else 1.0 )
+    obox( m, o, yaw, ( 0, 0, body / 2 ), ( dx, dy, body ), { "default": BLACK, "-z": None }, METAL )
+    for sx in ( -1, 1 ):
+        for sy in ( -1, 1 ):
+            p = o + x * sx * dx / 2 + y * sy * dy / 2
+            obox( m, p, yaw, ( 0, 0, body / 2 ), ( 1.6, 1.6, body + 0.4 ), STEEL )
+            for zz in ( 0.8, body - 0.8 ):
+                obox( m, p, yaw, ( 0, 0, zz ), ( 2.4, 2.4, 1.6 ), STEEL )
+    for zz in ( 0.6, body - 0.6 ):
+        obox( m, o, yaw, ( dx / 2, 0, zz ), ( 0.4, dy, 1.0 ), STEEL )
+        obox( m, o, yaw, ( -dx / 2, 0, zz ), ( 0.4, dy, 1.0 ), STEEL )
+        obox( m, o, yaw, ( 0, dy / 2, zz ), ( dx, 0.4, 1.0 ), STEEL )
+        obox( m, o, yaw, ( 0, -dy / 2, zz ), ( dx, 0.4, 1.0 ), STEEL )
+    for py in ( -dy * 0.3, dy * 0.3 ):
+        obox( m, o, yaw, ( dx / 2 + 0.4, py, body - 4 ), ( 0.8, 3.5, 2.5 ), STEEL )
+    for sy in ( -1, 1 ):
+        obox( m, o, yaw, ( 0, sy * ( dy / 2 + 0.6 ), body * 0.6 ), ( 6, 1.2, 2.4 ), STEEL )
+    if lid:
+        lz = dz - body
+        obox( m, o + x * ( -dx / 2 - lz / 2 - 0.5 ), yaw, ( 0, 0, dx / 2 ), ( lz, dy, dx ), BLACK, METAL )
+        obox( m, o, yaw, ( 0, 0, body - 0.2 ), ( dx - 2, dy - 2, 0.4 ), FELT )
+
+
+def cable( m, points, r=0.45, z=0.5, paint=BLACK ):
+    """ A cable lying on the ground along a smooth curve through points (plan ( e, n )), with no collision. """
+    pts = np.asarray( points, float )
+    if len( pts ) > 2:
+        fine = []
+        for k in range( len( pts ) - 1 ):
+            p0, p1, p2 = pts[max( k - 1, 0 )], pts[k], pts[k + 1]
+            p3 = pts[min( k + 2, len( pts ) - 1 )]
+            for t in np.linspace( 0, 1, 6, endpoint=False ):
+                fine.append( 0.5 * ( 2 * p1 + ( -p0 + p2 ) * t + ( 2 * p0 - 5 * p1 + 4 * p2 - p3 ) * t * t
+                                     + ( -p0 + 3 * p1 - 3 * p2 + p3 ) * t ** 3 ) )
+        fine.append( pts[-1] )
+        pts = np.array( fine )
+    for a, b in zip( pts, pts[1:] ):
+        rod( m, ( *a, z ), ( *b, z ), r, paint, sides=4 )
 
 
 def bench( m, e, n, length=96.0, along="e", height=17.0, depth=20.0, teak=True ):
@@ -816,19 +953,21 @@ def parasol( m, e, n, z=0.0, r=48.0, paint=WHITE ):
     m.box( ( e - 9, n - 9, z ), ( e + 9, n + 9, z + 3 ), BLACK )
 
 
-def banner( m, k, centre, z_top, outward, width=64.0, height=192.0, off=14.0, along=None ):
+def banner( m, k, centre, z_top, outward, width=64.0, height=192.0, off=14.0, along=None, hangers=None ):
     """ An exhibition banner (cb_banner_k) hung off a façade: two white arms out of the wall, the banner between them on
     a top and a bottom rod. centre is a point on the wall's face, outward the plan direction out of it; the banner hangs
-    flat, parallel to the wall, off out of it. """
+    flat, parallel to the wall, off out of it. hangers hangs it instead from two rods that long up from its top rod
+    (under a canopy). """
     out = K.normalise( np.array( ( outward[0], outward[1], 0.0 ) ) )
     side = np.array( ( out[1], -out[0], 0.0 ) ) if along is None else K.normalise( np.array( ( *along, 0.0 ) ) )
     c = np.array( ( centre[0], centre[1], 0.0 ) ) + out * off
     z0, z1 = z_top - height, z_top
     corners = [ c - side * width / 2 + ( 0, 0, z0 ), c + side * width / 2 + ( 0, 0, z0 ), c + side * width / 2 + ( 0, 0, z1 ),
                 c - side * width / 2 + ( 0, 0, z1 ) ]
-    # Seen from outside, the picture reads left to right: u along -side... flipped so it isn't mirrored.
+    # Seen from outside, the picture reads left to right: the viewer's left is -side when side x up points out of the
+    # wall, so the corners swap when it points into it.
     uv = [ ( 0.0, 0.0 ), ( 1.0, 0.0 ), ( 1.0, 1.0 ), ( 0.0, 1.0 ) ]
-    if np.dot( np.cross( side, ( 0, 0, 1 ) ), out ) > 0:
+    if np.dot( np.cross( side, ( 0, 0, 1 ) ), out ) < 0:
         corners = [ corners[1], corners[0], corners[3], corners[2] ]
     card( m, f"cb_banner_{k}", corners, out, uv=uv )
     back = [ p - out * 0.3 for p in corners ]
@@ -837,6 +976,10 @@ def banner( m, k, centre, z_top, outward, width=64.0, height=192.0, off=14.0, al
     for z in ( z0 - 2, z1 + 2 ):
         rod( m, c - side * ( width / 2 + 2 ) + ( 0, 0, z ), c + side * ( width / 2 + 2 ) + ( 0, 0, z ), 0.9, WHITE, sides=6 )
     for s in ( -1, 1 ):
+        if hangers:
+            p = c + side * s * width * 0.4
+            rod( m, p + ( 0, 0, z1 + 2 ), p + ( 0, 0, z1 + 2 + hangers ), 0.6, STEEL, sides=6 )
+            continue
         for z in ( z0 + 10, z1 - 6 ):
             rod( m, wall + side * s * width * 0.38 + ( 0, 0, z ), c + side * s * width * 0.38 + ( 0, 0, z ), 0.8, WHITE, sides=6 )
 
@@ -850,6 +993,17 @@ def sign_letters( m, centre, z0, width, outward ):
     corners = [ c + side * width / 2 + ( 0, 0, z0 ), c - side * width / 2 + ( 0, 0, z0 ), c - side * width / 2 + ( 0, 0, z0 + h ),
                 c + side * width / 2 + ( 0, 0, z0 + h ) ]
     card( m, "cb_sign", corners, out, uv=[ ( 0.0, 0.0 ), ( 1.0, 0.0 ), ( 1.0, 1.0 ), ( 0.0, 1.0 ) ] )
+
+
+def lettering( m, paint, centre, z0, width, outward, off=1.0 ):
+    """ A line of letters cut from a wall's paint (an alpha-tested 8:1 card, cb_label_*) standing off it. """
+    out = K.normalise( np.array( ( outward[0], outward[1], 0.0 ) ) )
+    side = np.array( ( out[1], -out[0], 0.0 ) )
+    c = np.array( ( centre[0], centre[1], 0.0 ) ) + out * off
+    h = width / 8
+    corners = [ c + side * width / 2 + ( 0, 0, z0 ), c - side * width / 2 + ( 0, 0, z0 ), c - side * width / 2 + ( 0, 0, z0 + h ),
+                c + side * width / 2 + ( 0, 0, z0 + h ) ]
+    card( m, paint, corners, out, uv=[ ( 0.0, 0.0 ), ( 1.0, 0.0 ), ( 1.0, 1.0 ), ( 0.0, 1.0 ) ] )
 
 
 def bollard_light( m, e, n, h=34.0 ):

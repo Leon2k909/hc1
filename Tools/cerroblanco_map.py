@@ -63,9 +63,9 @@ TRAV, PANEL, PAVE, HONED = P.TRAV, P.PANEL, P.PAVE, P.HONED
 PLASTER, WHITE, FRAME, RED, BLACK, STEEL, TEAK, LAMP = P.PLASTER, P.WHITE, P.FRAME, P.RED, P.BLACK, P.STEEL, P.TEAK, P.LAMP
 LAWN, HEDGE, SOIL, ROCK, GRAVEL = P.LAWN, P.HEDGE, P.SOIL, P.ROCK, P.GRAVEL
 
-# Belltower's clear summer afternoon: the same sky, sun and haze.
+# A cloudless highland afternoon: its own deep blue sky (Tools/cerroblanco_sky.py), with the sun it was baked for.
 SUN_PITCH, SUN_YAW = 34.0, -63.0
-SKY_MATERIAL = "materials/belltower/sky/belltower_sky.vmat"
+SKY_MATERIAL = "materials/cerroblanco/sky/cerroblanco_sky.vmat"
 SKY_EXPOSURE = 2
 FOG_COLOUR = "0.351,0.594,1.048"
 CATCH_FLOOR_Z = -3000
@@ -82,6 +82,8 @@ DOOR_H = 124.0
 
 ROTUNDA = ( 313.0, 1200.0 )
 ROT_IN, ROT_OUT = 375.0, 393.0
+ROT_UP = 250.0                   # the upper drum's outside radius
+ROT_BAY = ( 216.0, 260.0 )       # the curtain wall's arc, degrees anticlockwise from east: towards the courtyard
 GARDEN = ( -1743.0, -1359.0 )    # the garden circle's middle (bomb site B)
 GARDEN_R = 560.0                 # its hedge's outside
 
@@ -160,7 +162,7 @@ def door_frame( m, axis, d, c, w, z0, z1, thickness ):
 
 
 def wall( m, g, axis, run, across, outward, z0=0.0, z1=ROOF, doors=(), windows=(), ends=True, lower=TRAV, upper_=PANEL,
-          inside=PLASTER, split=P.LOWER_TOP, parapet=False ):
+          inside=PLASTER, split=P.LOWER_TOP, parapet=False, parapet_paint=PANEL ):
     """ A wall with open doorways and glazed windows: doors and windows are ( centre, width, z0, z1 ). outward None is an
     inside wall (inside paint both sides). parapet puts the roof's parapet on it (z1 .. z1 + 30). """
     openings = [ ( c, w, a, b, "door" ) for c, w, a, b in doors ] + [ ( c, w, a, b, "window" ) for c, w, a, b in windows ]
@@ -176,12 +178,13 @@ def wall( m, g, axis, run, across, outward, z0=0.0, z1=ROOF, doors=(), windows=(
     for c, w, a, b in doors:
         door_frame( m, axis, d, c, w, a, b, thick )
     if parapet:
-        parapet_on( m, axis, run, across, outward, z1 )
+        parapet_on( m, axis, run, across, outward, z1, paint=parapet_paint )
 
 
-def parapet_on( m, axis, run, across, outward, z, h=30.0 ):
-    """ The roof's parapet along a wall: enamelled panel both sides, a honed coping with a lip proud of the façade. """
-    m.box( *lohi( axis, run, across, z, z + h ), { "default": PANEL, "+z": HONED, "-z": None }, STONE )
+def parapet_on( m, axis, run, across, outward, z, h=30.0, paint=PANEL ):
+    """ The roof's parapet along a wall: enamelled panel (or paint) both sides, a honed coping with a lip proud of the
+    façade. """
+    m.box( *lohi( axis, run, across, z, z + h ), { "default": paint, "+z": HONED, "-z": None }, STONE )
     a, b = min( across ), max( across )
     if outward in ( "-n", "-e" ):
         a -= 2.5
@@ -212,16 +215,19 @@ def column( m, e, n, z0, z1, r=9.0, paint=WHITE, surface=STONE ):
 
 def west_gallery( m, g, d ):
     wall( m, g, "e", ( -1126, -650 ), ( -160, -142 ), "-n", doors=[ door( -890 ) ],
-          windows=[ glass( -1030, 120 ), glass( -750, 120 ), upper( -1010 ), upper( -770 ) ], parapet=True )
+          windows=[ glass( -1030, 120, 20, 150 ), glass( -750, 120, 20, 150 ), upper( -1010 ) ], parapet=True, upper_=TRAV,
+          parapet_paint=TRAV )
     wall( m, g, "n", ( -142, 1492 ), ( -1126, -1108 ), "-e", doors=[ door( 200 ), door( 1300 ) ],
           windows=[ glass( 500, 160 ), glass( 800, 160 ), glass( 1030, 140 ),
                     upper( 0 ), upper( 350 ), upper( 650 ), upper( 950 ), upper( 1250 ) ], ends=False, parapet=True )
     wall( m, g, "e", ( -1126, -200 ), ( 1492, 1510 ), "+n", doors=[ door( -650 ) ],
           windows=[ glass( -950, 200 ), glass( -400, 200 ), upper( -1000 ), upper( -800 ), upper( -500 ), upper( -330 ) ],
           parapet=True )
-    wall( m, g, "n", ( -142, 1050 ), ( -668, -650 ), "+e", doors=[ door( 100 ), door( 650 ) ],
-          windows=[ glass( 380, 300 ), glass( 880, 200 ), upper( 100 ), upper( 380 ), upper( 880 ) ], ends=False, parapet=True )
-    wall( m, g, "e", ( -650, -200 ), ( 1050, 1068 ), "-n", windows=[ glass( -300, 120 ), upper( -560 ), upper( -300 ) ],
+    wall( m, g, "n", ( -142, 1050 ), ( -668, -650 ), "+e", doors=[ door( 100 ), door( 650 ), door( 380, 100, FLOOR1, 110 ) ],
+          windows=[ glass( 380, 300, 20, 150 ), glass( 880, 200, 20, 150 ), upper( 140, 120, 200, 286 ),
+                    upper( 640, 120, 200, 286 ), upper( 880, 120, 200, 286 ) ],
+          ends=False, parapet=True, lower=PANEL, upper_=TRAV, split=300, parapet_paint=TRAV )
+    wall( m, g, "e", ( -650, -200 ), ( 1050, 1068 ), "-n", windows=[ glass( -300, 120 ), upper( -470 ), upper( -300 ) ],
           parapet=True )
     wall( m, g, "n", ( 1068, 1492 ), ( -218, -200 ), "+e", doors=[ door( 1300 ) ],
           windows=[ glass( 1150, 120 ), upper( 1150 ), upper( 1400 ) ], ends=False, parapet=True )
@@ -256,6 +262,46 @@ def west_gallery( m, g, d ):
         upstairs_wall( d, e0, e1, n0, n1 )
     for e, n in ( ( -820, 300 ), ( -820, 1060 ), ( -400, 1300 ) ):
         upstairs_plinth( d, e, n )
+    west_balcony( m, d )
+
+
+# The exhibition's banners on the West Gallery's balcony, hung from its canopy: ( k, n ).
+BALCONY_BANNERS = [ ( 0, 80 ), ( 1, 200 ), ( 2, 320 ), ( 3, 440 ), ( 0, 560 ) ]
+BALCONY = ( -716.0, -100.0 )     # the middle of its curve round the block's south-east corner
+
+
+def west_balcony( m, d ):
+    """ The balcony along the West Gallery's courtyard face and round its south-east corner, as in the pictures: a
+    honed slab off the upper floor (a door out at n 380) on white columns, a white fascia and upstand with a stainless
+    rail along its edge, the corner rounded, and a white canopy over it with the exhibition's banners hung under it. """
+    c = BALCONY
+    face, front = -650.0, -584.0
+    # The slab, its fascia and upstand: the east run, the curve and a short south run.
+    m.box( ( face, -100, SLAB ), ( front - 4, 1050, FLOOR1 ), { "+z": HONED, "-z": PLASTER, "default": None }, STONE )
+    m.box( ( front - 4, -100, 150 ), ( front, 1050, 196 ), { "default": PANEL, "+z": HONED, "-n": None, "+n": None }, STONE )
+    P.ring( m, c, 60, 128, SLAB, FLOOR1, outer=None, inner=None, top=HONED, bottom=PLASTER, a0=-90, a1=0, step=5.0 )
+    P.ring( m, c, 128, 132, 150, 196, outer=PANEL, inner=PANEL, top=HONED, bottom=PANEL, reveal=PANEL, a0=-90, a1=0, step=5.0 )
+    m.box( ( -800, -228, SLAB ), ( -716, -160, FLOOR1 ), { "+z": HONED, "-z": PLASTER, "default": None }, STONE )
+    m.box( ( -800, -232, 150 ), ( -716, -228, 196 ), { "default": PANEL, "+z": HONED, "+e": None }, STONE )
+    m.box( ( -804, -232, 150 ), ( -800, -160, 196 ), { "default": PANEL, "+z": HONED, "+n": None }, STONE )
+    # The rail: posts and three stainless rails over the upstand.
+    line = [ ( front - 2, 1050 ), ( front - 2, -100 ) ] + P.arc_points( c, 130, 0, -90, step=7.5 )[1:] + [ ( -802, -230 ), ( -802, -160 ) ]
+    P.rail_along( m, line, 196, height=26, paint=P.STEEL, posts=60, bars=False )
+    for a, b in zip( line, line[1:] ):
+        m.beam( ( *a, 196 + 13 ), ( *b, 196 + 13 ), ( 1.0, 1.0 ), P.STEEL )
+    # Its columns.
+    for e, n in ( ( -604, -40 ), ( -604, 240 ), ( -604, 520 ), ( -604, 800 ), ( -604, 1020 ), ( -645, -171 ), ( -760, -205 ) ):
+        column( m, e, n, 0, SLAB, r=9 )
+    # The canopy over it, its fascia a deep white band rounded at the corner.
+    m.box( ( face, -100, 300 ), ( -576, 1050, 312 ), { "+z": HONED, "-z": PLASTER, "default": None }, STONE )
+    m.box( ( -576, -100, 294 ), ( -570, 1050, 326 ), { "default": PANEL, "+z": HONED, "-n": None, "+n": None }, STONE )
+    P.ring( m, c, 60, 140, 300, 312, outer=None, inner=None, top=HONED, bottom=PLASTER, a0=-90, a1=0, step=5.0 )
+    P.ring( m, c, 140, 146, 294, 326, outer=PANEL, inner=PANEL, top=HONED, bottom=PANEL, reveal=PANEL, a0=-90, a1=0, step=5.0 )
+    m.box( ( -800, -240, 300 ), ( -716, -160, 312 ), { "+z": HONED, "-z": PLASTER, "default": None }, STONE )
+    m.box( ( -800, -246, 294 ), ( -716, -240, 326 ), { "default": PANEL, "+z": HONED, "+e": None }, STONE )
+    m.box( ( -806, -246, 294 ), ( -800, -160, 326 ), { "default": PANEL, "+z": HONED, "+n": None }, STONE )
+    for k, n in BALCONY_BANNERS:
+        P.banner( d, k, ( face, n ), 290, ( 1, 0 ), width=64, height=130, off=70, hangers=8 )
 
 
 def upstairs_wall( m, e0, e1, n0, n1, h=120.0 ):
@@ -271,19 +317,36 @@ def upstairs_plinth( m, e, n, w=26.0, h=40.0 ):
 # The rotunda: the entrance hall, a drum of travertine with a band of glass under its panelled top
 
 def rotunda( m, g, d ):
+    """ The entrance hall: a drum clad in the white panels, with a tall curtain wall of gridded glass towards the
+    courtyard, and a smaller drum set back on its roof, ringed with square windows, as the pictures' rotunda has. """
     c = ROTUNDA
     gaps = [ ( a, 110.0, 0.0, DOOR_H + 6 ) for a in ( 0.0, 90.0, 180.0, 270.0 ) ]
-    P.ring( m, c, ROT_IN, ROT_OUT, 0, 220, outer=TRAV, inner=PLASTER, top=HONED, gaps=gaps )
-    P.curved_glazing( m, g, c, ( ROT_IN + ROT_OUT ) / 2, 0, 360, 220, 290, transoms=( 255.0, ) )
-    P.ring( m, c, ROT_IN, ROT_OUT, 290, 352, outer=PANEL, inner=PLASTER, top=HONED, bottom=HONED )
+    bay0, bay1 = ROT_BAY
+    bay_mid = ( bay0 + bay1 ) / 2
+    bay_w = math.radians( bay1 - bay0 ) * ROT_OUT
+    P.ring( m, c, ROT_IN, ROT_OUT, 0, 352, outer=PANEL, inner=PLASTER, top=HONED, gaps=gaps + [ ( bay_mid, bay_w, 20.0, 330.0 ) ] )
+    # The curtain wall: a grid of glass, a mullion every 4 degrees (~27 inches) and a transom every 52.
+    P.curved_glazing( m, g, c, ( ROT_IN + ROT_OUT ) / 2, bay0, bay1, 20, 330, step=4.0,
+                      transoms=( 72.0, 124.0, 176.0, 228.0, 280.0 ) )
+    # The cornice band and the parapet round the lower drum's roof.
+    P.ring( m, c, ROT_OUT, ROT_OUT + 6, 336, 352, outer=PANEL, inner=None, top=HONED, bottom=HONED, surface=None )
     P.ring( m, c, ROT_IN + 4, ROT_OUT + 2, 352, 380, outer=PANEL, inner=PANEL, top=HONED, bottom=None )
-    m.cylinder( c, ROT_IN + 1, 336, 352, { "side": None, "top": GRAVEL, "bottom": PLASTER }, sides=48, surface=STONE )
-    # The oculus' light, a ring of downlights round it and a lantern over it.
-    P.disc( m, LAMP, ( c[0], c[1] ), 70, 335.5, facing=-1.0, sides=32 )
-    m.cylinder( c, 76, 352, 368, { "side": FRAME, "top": P.GLAZE, "bottom": None }, sides=32 )
+    # The hall's ceiling is a ring: the upper drum over its middle is the hall's clerestory.
+    P.ring( m, c, ROT_UP - 16, ROT_IN + 1, 336, 352, outer=None, inner=PLASTER, top=GRAVEL, bottom=PLASTER, step=6.0 )
+    # The upper drum, set back on the roof, its square windows all round.
+    windows = [ ( 15.0 + 30.0 * k, 46.0, 384.0, 432.0 ) for k in range( 12 ) ]
+    P.ring( m, c, ROT_UP - 16, ROT_UP, 352, 470, outer=PANEL, inner=PLASTER, top=HONED, gaps=windows )
+    for a, w, z0, z1 in windows:
+        half = math.degrees( w / 2 / ROT_UP )
+        P.curved_glazing( m, g, c, ROT_UP - 8, a - half, a + half, z0, z1, step=2 * half + 0.01 )
+    P.ring( m, c, ROT_UP - 2, ROT_UP + 4, 470, 476, outer=PANEL, inner=None, top=HONED, bottom=HONED, surface=None )
+    m.cylinder( c, ROT_UP - 15, 454, 470, { "side": None, "top": GRAVEL, "bottom": PLASTER }, sides=48, surface=STONE )
+    # The oculus' light in the clerestory's ceiling, a lantern over it, and a ring of downlights in the hall's ceiling.
+    P.disc( m, LAMP, ( c[0], c[1] ), 70, 453.5, facing=-1.0, sides=32 )
+    m.cylinder( c, 76, 470, 486, { "side": FRAME, "top": P.GLAZE, "bottom": None }, sides=32 )
     for k in range( 16 ):
         a = 2 * math.pi * ( k + 0.5 ) / 16
-        P.disc( m, LAMP, ( c[0] + 250 * math.cos( a ), c[1] + 250 * math.sin( a ) ), 5, 335.5, facing=-1.0, sides=10 )
+        P.disc( m, LAMP, ( c[0] + 310 * math.cos( a ), c[1] + 310 * math.sin( a ) ), 5, 335.5, facing=-1.0, sides=10 )
     # Door frames in the drum's four openings.
     for a in ( 0.0, 90.0, 180.0, 270.0 ):
         u = np.array( ( math.cos( math.radians( a ) ), math.sin( math.radians( a ) ) ) )
@@ -307,7 +370,7 @@ def rotunda( m, g, d ):
 
 def east_block( m, g, d ):
     # The cafe, one storey, with the roof terrace over it.
-    wall( m, g, "n", ( 0, 697 ), ( 480, 498 ), "-e", 0, CAFE_TOP, doors=[ door( 200, 120 ) ], ends=False )
+    wall( m, g, "n", ( 0, 697 ), ( 480, 498 ), "-e", 0, CAFE_TOP, doors=[ door( 290, 90 ) ], ends=False )
     wall( m, g, "e", ( 480, 1000 ), ( 697, 715 ), "+n", 0, CAFE_TOP, doors=[ door( 740 ) ],
           windows=[ glass( 600, 160, 20, 140 ), glass( 880, 160, 20, 140 ) ] )
     floor( m, *CAFE )
@@ -388,7 +451,7 @@ def east_block( m, g, d ):
     P.picture( d, ( 980, -270 ), 82, 64, 90, ( 1, 0 ), "cb_banner_2" )
     for e, n, thing in ( ( 620, -800, True ), ( 1100, -820, "vase" ), ( 700, -300, "vase" ), ( 1100, -150, True ) ):
         P.display_plinth( d, e, n, w=30, thing=thing )
-    P.folded_sculpture( d, 860, -820, yaw=20.0, scale=0.75 )
+    P.zigzag_sculpture( d, 860, -820, yaw=20.0, scale=0.7 )
     for e, n in ( ( 1300, -800 ), ( 1300, -150 ) ):
         upstairs_plinth( d, e, n )
 
@@ -400,8 +463,9 @@ def south_gallery( m, g, d, c ):
     wall( m, g, "e", ( -1030, 480 ), ( -1018, -1000 ), "+n", 0, SG_ROOF, doors=[ door( -100, 120 ), door( 300 ) ],
           windows=[ glass( -560, 360 ), glass( 120, 200 ) ], parapet=True )
     wall( m, g, "e", ( -1030, 480 ), ( -2150, -2132 ), "-n", 0, SG_ROOF, doors=[ door( -600 ), door( -100, 120 ), door( 250 ) ],
-          windows=[ glass( -850, 260, 20, 230 ), glass( -350, 300, 20, 230 ), glass( 75, 150, 20, 230 ),
-                    glass( 390, 110, 20, 230 ) ], parapet=True )
+          windows=[ glass( -850, 260, 20, 230 ), glass( -380, 220, 20, 150 ), glass( 75, 150, 20, 150 ),
+                    glass( 390, 110, 20, 230 ), upper( -380, 220, 236, 310 ), upper( 75, 150, 236, 310 ) ],
+          parapet=True, lower=PANEL )
     wall( m, g, "n", ( -2132, -1018 ), ( -1030, -1012 ), "-e", 0, SG_ROOF, doors=[ door( -1300 ), door( -1700 ) ],
           windows=[ glass( -1500, 160 ) ], ends=False, parapet=True )
     wall( m, g, "n", ( -2132, -1018 ), ( 462, 480 ), "+e", 0, SG_ROOF, doors=[ door( -1500 ) ],
@@ -427,21 +491,64 @@ def south_gallery( m, g, d, c ):
         P.display_plinth( d, e, n, w=30, thing=thing )
     P.bronze_sphere( d, -200, -1230, r=40, plinth=30 )
 
-    # The portico along its south front: slim white columns under a deep louvred sunshade.
-    for k in range( 10 ):
-        e = -1000 + k * 160
-        column( m, e, -2380, 0, 256, r=9 )
-    top, bottom = 272.0, 256.0
-    c.box( ( -1060, -2420, bottom ), ( 510, -2400, top ), WHITE )
-    c.box( ( -1060, -2400, bottom ), ( -1040, -2150, top ), WHITE )
-    c.box( ( 490, -2400, bottom ), ( 510, -2150, top ), WHITE )
-    c.box( ( -1060, -2170, bottom ), ( 510, -2150, top ), WHITE )
-    for k in range( 1, 87 ):
-        e = -1060 + k * 18
-        c.box( ( e - 1, -2400, bottom + 2 ), ( e + 1, -2170, top - 1 ), WHITE )
-    c.collision_box( ( -1060, -2420, bottom ), ( 510, -2150, top ), METAL )
-    for k in range( 9 ):
-        P.disc( c, LAMP, ( -920 + k * 160, -2285 ), 6, bottom - 0.5, facing=-1.0, sides=10 )
+    south_front( m, d, c )
+
+
+SG_BALCONY = ( -700.0, 300.0, -2380.0, -2150.0 )    # e0, e1, n0, n1: the box over the South Gallery's entrance
+SG_CORNER = ( -580.0, -2260.0 )                       # the middle of its rounded south-west corner
+SG_CANOPY = ( -760.0, 440.0, -2440.0, -2060.0 )
+
+
+def south_front( m, d, c ):
+    """ The South Gallery's front, as in the pictures: an enclosed balcony in white panels over the entrance, its south-
+    west corner rounded, on fat round columns; a flat white roof over it on slim columns, open in louvres at its east
+    end; the gallery's name in grey letters on the wall under it. All of it is out of reach: it's in the canopies'
+    model, which the navmesh leaves out. """
+    e0, e1, n0, n1 = SG_BALCONY
+    cc, r = SG_CORNER, SG_CORNER[0] - SG_BALCONY[0]
+    under, floor_, top = 196.0, 212.0, 266.0
+    slab = { "+z": HONED, "-z": PANEL, "default": None }
+    c.box( ( cc[0], n0, under ), ( e1, n1, floor_ ), slab, STONE )
+    c.box( ( e0, cc[1], under ), ( cc[0], n1, floor_ ), slab, STONE )
+    P.ring( c, cc, 1, r, under, floor_, outer=None, inner=None, top=HONED, bottom=PANEL, a0=180, a1=270, step=5.0 )
+    # Its walls: a band of panels all round, 6 thick, with a coping.
+    band = { "default": PANEL, "+z": HONED }
+    c.box( ( cc[0], n0, under ), ( e1, n0 + 6, top ), { **band, "-e": None }, STONE )
+    c.box( ( e1 - 6, n0, under ), ( e1, n1, top ), { **band, "-n": None, "+n": None }, STONE )
+    c.box( ( e0, cc[1], under ), ( e0 + 6, n1, top ), { **band, "-n": None, "+n": None }, STONE )
+    P.ring( c, cc, r - 6, r, under, top, outer=PANEL, inner=PANEL, top=HONED, bottom=PANEL, reveal=PANEL, a0=180, a1=270, step=5.0 )
+    line = [ ( e0 + 3, n1 - 2 ), ( e0 + 3, cc[1] ) ] + P.arc_points( cc, r - 3, 180, 270, step=7.5 )[1:] + [ ( e1 - 3, n0 + 3 ),
+                                                                                                               ( e1 - 3, n1 - 2 ) ]
+    P.rail_along( c, line, top, height=16, paint=P.STEEL, posts=70, bars=False, surface=None )
+    # The fat columns under it.
+    for e, n in ( ( -572, -2340 ), ( -150, -2340 ), ( 250, -2340 ) ):
+        column( m, e, n, 0, under, r=16, paint=PANEL )
+    # Downlights in its soffit.
+    for e in np.arange( -500, 260, 150 ):
+        P.disc( c, LAMP, ( e, -2265 ), 6, under - 0.5, facing=-1.0, sides=10 )
+    # The flat roof over it, on slim columns from the balcony and the gallery's roof, open in louvres at its east end.
+    f0, f1, g0, g1 = SG_CANOPY
+    roof, lip = 404.0, 418.0
+    louvre = 180.0
+    c.box( ( f0, g0, roof ), ( louvre, g1, lip ), { "+z": HONED, "-z": PANEL, "default": PANEL }, STONE )
+    for lo, hi in ( ( ( louvre, g0, roof - 6 ), ( f1, g0 + 12, lip ) ), ( ( louvre, g1 - 12, roof - 6 ), ( f1, g1, lip ) ),
+                    ( ( f1 - 12, g0 + 12, roof - 6 ), ( f1, g1 - 12, lip ) ) ):
+        c.box( lo, hi, { "default": PANEL, "+z": HONED }, STONE )
+    for k in range( 1, 12 ):
+        e = louvre + ( f1 - 12 - louvre ) * k / 12
+        c.box( ( e - 2.5, g0 + 12, roof + 2 ), ( e + 2.5, g1 - 12, lip - 1 ), WHITE )
+    c.box( ( f0, g0, roof - 8 ), ( louvre, g0 + 4, lip + 2 ), { "default": PANEL, "+z": HONED, "-e": None, "+e": None } )
+    for e in ( -540, -150, 160 ):
+        column( m, e, -2360, floor_, roof, r=8, paint=PANEL )
+        column( m, e, -2090, SG_ROOF, roof, r=8, paint=PANEL )
+    for e in ( -540, -150 ):
+        P.disc( c, LAMP, ( e + 190, -2250 ), 7, roof - 0.5, facing=-1.0, sides=10 )
+    # The gallery's name over its windows.
+    for e in ( -380, 75 ):
+        P.lettering( m, "cb_label_sur", ( e, -2150 ), 156, 260, ( 0, -1 ) )
+    # A travertine planter of low shrubs against the glass west of the entrance, under the balcony.
+    m.box( ( -480, -2290, 0 ), ( -268, -2196, 40 ), { "default": TRAV, "+z": HONED, "-z": None }, STONE )
+    P.hedge_box( d, -470, -278, -2280, -2206, height=16, z0=38 )
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -526,28 +633,36 @@ def garden_circle( m, d ):
 
 
 def courtyard( m, d ):
-    """ The courtyard: the round boulder planter, the stage with its piano, hedges in planters, trees, benches and the
-    cafe's tables. """
-    P.round_planter( d, ( -80, -350 ), 270, seed=4 )
-    P.stage( d, -630, -370, 830, 1030, front="-n" )
-    P.grand_piano( d, -500, 930, 30, 180.0 )
-    P.speaker( d, -610, 800, 0, -90.0 )
-    P.speaker( d, -390, 800, 0, -90.0 )
-    P.speaker( d, -560, 1000, 30, -90.0, tall=False )
+    """ The courtyard: the round boulder planter, the stage along the cafe's wall with its piano and PA, hedges in
+    planters, trees, benches and the cafe's tables in the north-west corner. """
+    P.round_planter( d, ( -80, -350 ), 270, seed=4, gap=110.0 )
+    P.stage( d, 330, 470, -80, 220, front="-e", white_end=1 )
+    P.grand_piano( d, 405, 60, 30, 90.0 )
+    P.speaker( d, 300, -115, 0, 180.0 )
+    P.speaker( d, 300, 255, 0, 180.0 )
+    P.speaker( d, 345, -40, 30, 0.0, tall=False )
+    P.speaker( d, 345, 130, 30, 0.0, tall=False )
+    P.flight_case( d, 444, -50, 30, 0.0 )
+    P.flight_case( d, 440, 190, 30, 0.0, lid=True )
+    P.flight_case( d, 440, -118, 0, 0.0, ( 30.0, 48.0, 34.0 ) )
+    P.flight_case( d, 440, -118, 34, 0.0, ( 24.0, 36.0, 20.0 ) )
+    P.cable( d, [ ( 300, -109 ), ( 309, -98 ), ( 318, -92 ), ( 329, -90 ) ] )
+    P.cable( d, [ ( 300, 249 ), ( 310, 238 ), ( 320, 230 ), ( 329, 226 ) ] )
+    P.cable( d, [ ( 286, 110 ), ( 250, 128 ), ( 205, 100 ), ( 160, 132 ), ( 110, 96 ), ( 70, 118 ) ] )
     for e0, e1, n0, n1 in ( ( -620, -420, -900, -860 ), ( -620, -580, -900, -700 ), ( 280, 440, -900, -860 ),
-                            ( 400, 440, -900, -700 ), ( -560, -200, 380, 420 ), ( 100, 340, 380, 420 ) ):
+                            ( 400, 440, -900, -700 ), ( -520, -200, 380, 420 ), ( 100, 340, 380, 420 ) ):
         P.hedge_box( d, e0, e1, n0, n1, height=30, planter=16 )
-    for e, n in ( ( -500, -560 ), ( 300, -560 ), ( -500, 600 ), ( 200, 620 ) ):
+    for e, n in ( ( -500, -560 ), ( 300, -560 ), ( -380, 650 ), ( 200, 620 ) ):
         P.tree( d, e, n, f"{P.OAK}/tree_oak_medium_a.vmdl", 1.0 )
     for e, n, along in ( ( -250, -800, "e" ), ( 100, -800, "e" ), ( -420, 150, "n" ), ( -280, 520, "e" ), ( 220, 520, "e" ) ):
         P.bench( d, e, n, length=90, along=along )
-    for e, n in ( ( 260, 110 ), ( 380, 130 ), ( 270, 260 ), ( 390, 290 ) ):
+    for e, n in ( ( -540, 870 ), ( -420, 940 ), ( -540, 990 ), ( -300, 920 ) ):
         P.cafe_table( d, e, n )
         for k in range( 2 ):
             a = 180 * k + 20
             P.cafe_chair( d, e + 24 * math.cos( math.radians( a ) ), n + 24 * math.sin( math.radians( a ) ), a + 180 )
         P.parasol( d, e, n, r=44 )
-    for e, n in ( ( -600, -150 ), ( 430, -150 ), ( -600, 780 ), ( 430, 760 ) ):
+    for e, n in ( ( -560, -170 ), ( 400, -170 ), ( -560, 780 ), ( 430, 760 ) ):
         P.bollard_light( d, e, n )
     for e, n in ( ( -150, 50 ), ( 380, -650 ) ):
         P.litter_bin( d, e, n )
@@ -556,14 +671,14 @@ def courtyard( m, d ):
 def west_walk( m, d, c ):
     """ The pergola between the West Gallery and the South Gallery: white posts, beams and slats overhead. """
     for e in ( -1100.0, -676.0 ):
-        for n in np.linspace( -980, -190, 6 ):
+        for n in np.linspace( -980, -260, 6 ):
             column( d, e, n, 0, 118, r=5, surface=STONE )
-    for n in np.linspace( -980, -190, 6 ):
+    for n in np.linspace( -980, -260, 6 ):
         c.box( ( -1110, n - 2.5, 118 ), ( -666, n + 2.5, 128 ), WHITE )
     for e in ( -1100.0, -676.0 ):
-        c.box( ( e - 3, -990, 128 ), ( e + 3, -180, 136 ), WHITE )
+        c.box( ( e - 3, -990, 128 ), ( e + 3, -250, 136 ), WHITE )
     for e in np.arange( -1080, -680, 20 ):
-        c.box( ( e - 1, -990, 136 ), ( e + 1, -180, 138 ), WHITE )
+        c.box( ( e - 1, -990, 136 ), ( e + 1, -250, 138 ), WHITE )
     for n, along in ( ( -720, "n" ), ( -420, "n" ) ):
         P.bench( d, -1060, n, length=96, along=along )
         P.bench( d, -716, n, length=96, along=along )
@@ -600,8 +715,8 @@ def grounds( m, d, c ):
     P.hedge_box( d, -1760, -1500, -2140, -2110, height=38, z0=6.5 )
 
     # The south plaza: the red sculptures, planters, benches.
-    P.spire_sculpture( d, -300, -2650 )
-    P.folded_sculpture( d, 400, -2620, yaw=-15.0 )
+    P.spire_sculpture( d, -380, -2680, yaw=8.0 )
+    P.zigzag_sculpture( d, 380, -2560, yaw=-12.0 )
     for e0, e1, n0, n1 in ( ( -1200, -900, -2750, -2600 ), ( 900, 1200, -2750, -2600 ), ( -1500, -1300, -3050, -2900 ),
                             ( 1300, 1500, -3050, -2900 ) ):
         m.box( ( e0, n0, 0 ), ( e1, n1, 30 ), { "+z": None, "-z": None, "default": TRAV }, STONE )
@@ -895,7 +1010,7 @@ def callouts():
         ( "WEST GARDEN", -2560, -1126, -778, 1510, -10, 400 ), ( "B SITE", GARDEN_SQUARE[0], GARDEN_SQUARE[1],
                                                                  GARDEN_SQUARE[2], GARDEN_SQUARE[3], -10, 400 ),
         ( "WEST WALK", -1126, -650, -1000, -160, -10, 400 ), ( "SOUTH-WEST LAWNS", -2560, -1030, -2400, -1919, -10, 400 ),
-        ( "COURTYARD", -650, 480, -1000, 1050, -10, 400 ), ( "STAGE", -650, -350, 780, 1050, -10, 400 ),
+        ( "COURTYARD", -650, 480, -1000, 1050, -10, 400 ), ( "STAGE", 286, 480, -100, 240, -10, 400 ),
         ( "CAFE", 480, 1000, 0, 715, -10, UP[0] ), ( "TERRACE", 420, 1000, 0, 715, *UP ),
         ( "NORTH GALLERY", 1000, 2060, -18, 715, -10, UP[0] ), ( "NORTH GALLERY UPPER", 1000, 2060, -18, 715, *UP ),
         ( "A SITE", 480, 1220, -1000, 0, -10, 400 ), ( "MEZZANINE", 1220, 1400, -1000, 0, *UP ),
@@ -905,6 +1020,7 @@ def callouts():
         ( "EAST TERRACE", 1640, 2520, -1190, -18, -10, 400 ), ( "EAST LAWNS", 480, 2520, -2400, -1190, -10, 400 ),
         ( "SOUTH GALLERY", -1030, 480, -2150, -1000, -10, 400 ), ( "PORTICO", -1100, 560, -2440, -2150, -10, 400 ),
         ( "PLAZA", -2560, 2520, -3250, -2440, -10, 400 ), ( "PASSAGE", -200, -50, 1050, 1510, -10, 400 ),
+        ( "BALCONY", -650, -560, -250, 1050, *UP ),
     ]
 
 
@@ -1249,7 +1365,6 @@ def write_scene( written, light_list, props ):
 
 # The exhibition's banners down the façades: ( k, wall point, outward, top, height )
 BANNERS = [
-    ( 0, ( -650, 250 ), ( 1, 0 ), 345, 150 ), ( 1, ( -650, 550 ), ( 1, 0 ), 345, 150 ), ( 2, ( -650, 720 ), ( 1, 0 ), 345, 150 ),
     ( 3, ( 480, -500 ), ( -1, 0 ), 340, 190 ), ( 0, ( 480, -200 ), ( -1, 0 ), 340, 190 ),
     ( 1, ( -800, -1000 ), ( 0, 1 ), 318, 150 ), ( 2, ( -320, -1000 ), ( 0, 1 ), 318, 150 ), ( 3, ( 380, -1000 ), ( 0, 1 ), 318, 160 ),
     ( 2, ( 1375, 715 ), ( 0, 1 ), 345, 150 ), ( 3, ( 1725, 715 ), ( 0, 1 ), 345, 150 ),
