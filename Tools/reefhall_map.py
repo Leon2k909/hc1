@@ -30,7 +30,8 @@ Three lanes run between them:
   the upper floors (L1) are at z 208, the tunnel's aisle at -40.
 - Tank glass is 8 thick with the "glass" surface (3 penetrable), so it stops bullets and players, and bots can't see
   through it (the map model isn't tagged glass). Railings' glass panels are 1 thick, so rounds go through them.
-- Doorways have no doors: bots can't open them.
+- Doorways have no doors: bots can't open them. The lobby's glass entrance doors are shut for good, with a closed
+  gallery behind them that's only there to be seen through the glass.
 """
 import argparse
 import json
@@ -1447,19 +1448,191 @@ LOBBY_TANK = ( -2420.0, 0.0 )
 LOBBY_DISPLAY = ( -1980.0, 0.0 )
 
 
-def frosted_door( model, fr, u0, u1, height=150.0 ):
-    """ A closed pair of glass entrance doors on a wall's front, frosted and lit from behind (the street). """
-    mid = ( u0 + u1 ) / 2
-    facing( model, "rh_frosted_lit", [ fr.p( u0, 0.3, 0 ), fr.p( u1, 0.3, 0 ), fr.p( u1, 0.3, height ), fr.p( u0, 0.3, height ) ],
-            fr.vec( 0, 1, 0 ) )
-    facing( model, "rh_glass_office", [ fr.p( u0, 1.2, 0 ), fr.p( u1, 1.2, 0 ), fr.p( u1, 1.2, height ), fr.p( u0, 1.2, height ) ],
-            fr.vec( 0, 1, 0 ) )
-    for a, b in ( ( u0 - 6, u0 ), ( u1, u1 + 6 ), ( mid - 2, mid + 2 ) ):
-        fbox( model, fr, a, b, 0, 3.0, 0, height, "rh_gunmetal", skip=( "back", "bottom" ) )
-    fbox( model, fr, u0 - 6, u1 + 6, 0, 3.0, height, height + 8, "rh_gunmetal", skip=( "back", ) )
-    fbox( model, fr, u0, u1, 0, 3.0, 0, 6, "rh_gunmetal", skip=( "back", "bottom" ) )
-    for a, b in ( ( u0 + 10, mid - 10 ), ( mid + 10, u1 - 10 ) ):
-        tube( model, fr.p( a, 4.5, 44 ), fr.p( b, 4.5, 44 ), 1.0, "rh_brass", sides=8, cap=True )
+# The entrance doors on the west wall, behind Red Team's spawn (2026-10-08, after the user's picture): three closed pairs
+# of glass doors in dark anodised frames, each in an anthracite portal in a wall of slate-grey cladding panels, with
+# bronze planters between them. Each pair's glass carries a frosted film (reefhall_materials.film: two wavy lines across
+# both leaves, a jellyfish on the right one), and through it there's a dim gallery with tanks, which nobody can reach.
+DOOR_S = 1.25                                  # the film's picture is drawn for a 95" leaf: these are 119" ( 3 m )
+DOOR_PAIRS = ( -197.5, 0.0, 197.5 )           # the pairs' middles ( plan n )
+DOOR_HALF = 51.0 * DOOR_S                     # the opening's half width
+DOOR_TOP = 100.0 * DOOR_S                     # the opening's head
+DOOR_PORTAL = 6.0 * DOOR_S                    # the anthracite band round it
+DOOR_GALLERY = ( -3200.0, -2920.0, -400.0, 400.0 )
+DOOR_GALLERY_TOP = 180.0
+
+
+def uv_quad( model, paint, points, uvs, towards, both_sides=False ):
+    """ A polygon with its own uvs ( one per point ), wound to face towards: the points and uvs turn round together. """
+    pts = [ np.asarray( p, float ) for p in points ]
+    uvs = [ tuple( map( float, t ) ) for t in uvs ]
+    normal = np.zeros( 3 )
+    for k in range( 1, len( pts ) - 1 ):
+        normal += np.cross( pts[k] - pts[0], pts[k + 1] - pts[0] )
+    if np.linalg.norm( normal ) < 1e-9:
+        return
+    if np.dot( normal, towards ) < 0:
+        pts, uvs = pts[:1] + pts[:0:-1], uvs[:1] + uvs[:0:-1]
+    model.polygon( paint, pts, uv=uvs, both_sides=both_sides )
+
+
+def door_pair( model, fr, c ):
+    """ A closed pair of glass doors in a wall opening at u c ( c +- DOOR_HALF, up to DOOR_TOP ), its front the frame's
+    front: the fixed frame, two leaves ( stiles 4.5" and rails 6", scaled ), the glass and its film, the pull bars on
+    the meeting stiles, the closer's cover and the threshold. The leaves' frames are drawn only: one glass box holds
+    the opening ( rounds go through it into the gallery, whose walls stop them ). """
+    S = DOOR_S
+    half, top = DOOR_HALF, DOOR_TOP
+    gap, g_out = RM.FILM_GAP * S, RM.FILM_W / 2 * S          # the glass's inner and outer edges, out from c
+    g_z0, g_z1 = 6.5 * S, ( 6.5 + RM.FILM_H ) * S
+    leaf_in, leaf_out = 0.125 * S, 48.0 * S
+    leaf_z1 = 95.5 * S
+    lw0, lw1 = -7.0, -5.0                                     # the leaves' back and front
+    frame = { "default": "rh_anodised" }
+    # The fixed frame: the jambs and the head.
+    fbox( model, fr, c - half, c - leaf_out, -12.0, -2.0, 0.0, top, frame, skip=( "bottom", ) )
+    fbox( model, fr, c + leaf_out, c + half, -12.0, -2.0, 0.0, top, frame, skip=( "bottom", ) )
+    fbox( model, fr, c - leaf_out, c + leaf_out, -12.0, -2.0, leaf_z1, top, frame, skip=( "top", ) )
+    fbox( model, fr, c - half, c + half, lw0, lw1, 0.0, top, None, GLASS )
+    # The threshold, and the closer's cover on the head.
+    fbox( model, fr, c - half, c + half, -20.0, 0.0, -0.5, 0.35, { "top": "rh_stainless", "default": None } )
+    fbox( model, fr, c - 13 * S, c + 13 * S, -2.0, -1.2, leaf_z1 + 0.6, leaf_z1 + 2.6, "rh_stainless", skip=( "back", ) )
+    for s in ( -1, 1 ):
+        def span( a, b ):
+            return c + min( s * a, s * b ), c + max( s * a, s * b )
+        for a, b in ( ( leaf_in, gap ), ( g_out, leaf_out ) ):
+            fbox( model, fr, *span( a, b ), lw0, lw1, 0.5, leaf_z1, frame )
+        u0, u1 = span( gap, g_out )
+        fbox( model, fr, u0, u1, lw0, lw1, 0.5, g_z0, frame, skip=( "left", "right" ) )
+        fbox( model, fr, u0, u1, lw0, lw1, g_z1, leaf_z1, frame, skip=( "left", "right" ) )
+        # The glass, and the film on its lobby side: one picture across the pair, each leaf its share of it.
+        gw = ( lw0 + lw1 ) / 2
+        quad = lambda w: [ fr.p( u0, w, g_z0 ), fr.p( u1, w, g_z0 ), fr.p( u1, w, g_z1 ), fr.p( u0, w, g_z1 ) ]
+        facing( model, "rh_glass", quad( gw ), fr.vec( 0, 1, 0 ) )
+        x = lambda u: ( u - c + g_out ) / ( 2 * g_out )
+        uv_quad( model, "rh_film", quad( gw + 0.08 ), [ ( x( u0 ), 0 ), ( x( u1 ), 0 ), ( x( u1 ), 1 ), ( x( u0 ), 1 ) ],
+                 fr.vec( 0, 1, 0 ) )
+        # The pull bar on the meeting stile, on two standoffs.
+        u = c + s * 4.4 * S
+        bar_w = lw1 + 3.0
+        tube( model, fr.p( u, bar_w, 26.0 ), fr.p( u, bar_w, 66.0 ), 1.0, "rh_stainless", sides=12, cap=True )
+        for z in ( 29.5, 62.5 ):
+            tube( model, fr.p( u, lw1, z ), fr.p( u, bar_w, z ), 0.55, "rh_stainless", sides=8 )
+    # The portal: an anthracite band round the opening, a little proud of the cladding.
+    for a, b in ( ( c - half - DOOR_PORTAL, c - half ), ( c + half, c + half + DOOR_PORTAL ) ):
+        fbox( model, fr, a, b, 0.0, 1.5, 0.0, top + DOOR_PORTAL, "rh_portal", skip=( "back", "bottom" ) )
+    fbox( model, fr, c - half, c + half, 0.0, 1.5, top, top + DOOR_PORTAL, "rh_portal", skip=( "back", "left", "right" ) )
+
+
+def clad( model, fr, u0, u1, z0, z1, rng, width=56.0 ):
+    """ Cladding panels across u0..u1, z0..z1 on a frame wall's front, as near width wide as divides it, with shadow
+    gaps between them ( the wall behind is painted dark ). Drawn only. """
+    count = max( 1, round( ( u1 - u0 ) / width ) )
+    for k in range( count ):
+        a, b = u0 + ( u1 - u0 ) * k / count, u0 + ( u1 - u0 ) * ( k + 1 ) / count
+        paint = "rh_panel" if rng.random() < 0.6 else "rh_panel_b"
+        fbox( model, fr, a + 0.15, b - 0.15, 0.0, 0.75, z0 + 0.15, z1 - 0.15, paint, skip=( "back", ) )
+
+
+def bronze_planter( model, centre, z=0.0, width=17.5 * DOOR_S, height=37.0 * DOOR_S, foot=0.8 ):
+    """ A tall square planter tapering to its foot ( foot: its width there, a share of the top's ), bronze, with a
+    rolled lip and soil a little under it. Returns the soil's height. """
+    e, n = centre[:2]
+    t, b, z1 = width / 2, width / 2 * foot, z + height
+    corners = lambda r, zz: [ ( e - r, n - r, zz ), ( e + r, n - r, zz ), ( e + r, n + r, zz ), ( e - r, n + r, zz ) ]
+    low, high = corners( b, z ), corners( t, z1 - 1.2 )
+    for k in range( 4 ):
+        quad = [ low[k], low[( k + 1 ) % 4], high[( k + 1 ) % 4], high[k] ]
+        mid = np.mean( quad, axis=0 )
+        facing( model, "rh_bronze", quad, ( mid[0] - e, mid[1] - n, 0 ) )
+    model.box( ( e - t - 0.35, n - t - 0.35, z1 - 1.2 ), ( e + t + 0.35, n + t + 0.35, z1 ), { "default": "rh_bronze", "-z": None } )
+    soil = z1 - 1.8
+    model.box( ( e - t + 0.6, n - t + 0.6, soil - 1 ), ( e + t - 0.6, n + t - 0.6, soil ), { "+z": "rh_soil", "default": None } )
+    for k in range( 4 ):
+        inner = corners( t - 0.6, soil ) + corners( t - 0.6, z1 + 0.01 )
+        quad = [ inner[k], inner[( k + 1 ) % 4], inner[4 + ( k + 1 ) % 4], inner[4 + k] ]
+        mid = np.mean( quad, axis=0 )
+        facing( model, "rh_bronze", quad, ( e - mid[0], n - mid[1], 0 ) )
+    model.hull( low + corners( t + 0.35, z1 ), METAL )
+    return soil
+
+
+def dracaena( model, base, rng, scale=1.0, leaves=24 ):
+    """ A potted dracaena: strap leaves out of a crown, the young ones upright and the old ones arching out and down,
+    each channelled along its midrib and drawn from both sides ( rh_leaf: u across, v from base to tip ). Drawn only. """
+    base = np.asarray( base, float )
+    crown = base + ( 0, 0, 2.5 * scale )
+    for k in range( leaves ):
+        age = k / ( leaves - 1 )                                # 0: the youngest, at the middle
+        az = k * 2.39996 + rng.uniform( -0.2, 0.2 )
+        rise = math.radians( rng.uniform( 72, 84 ) - 48 * age )
+        droop = math.radians( rng.uniform( 18, 34 ) + 40 * age )
+        length = scale * rng.uniform( 15.0, 19.0 ) * ( 1.08 - 0.25 * age )
+        width = scale * rng.uniform( 1.7, 2.2 )
+        twist = rng.uniform( -0.35, 0.35 )
+        side0 = np.array( ( -math.sin( az ), math.cos( az ), 0.0 ) )
+        start = crown + np.array( ( math.cos( az ), math.sin( az ), 0.0 ) ) * rng.uniform( 0.2, 1.0 ) * scale \
+            + ( 0, 0, rng.uniform( 0, 2.5 ) * scale * ( 1 - age ) )
+        steps = 8
+        mids, lefts, rights = [], [], []
+        p = start.copy()
+        for i in range( steps + 1 ):
+            t = i / steps
+            el = rise - droop * t ** 1.4
+            d = np.array( ( math.cos( el ) * math.cos( az ), math.cos( el ) * math.sin( az ), math.sin( el ) ) )
+            up = np.cross( d, side0 )
+            ang = twist * t
+            side = side0 * math.cos( ang ) + up * math.sin( ang )
+            up = np.cross( d, side )
+            w = width * ( 1 - t ) ** 0.55 * ( 0.32 + 0.68 * min( 1.0, t / 0.3 ) ) / 2
+            mids.append( p.copy() )
+            lefts.append( p - side * w + up * w * 0.35 )
+            rights.append( p + side * w + up * w * 0.35 )
+            if i < steps:
+                t_mid = ( i + 0.5 ) / steps
+                el_mid = rise - droop * t_mid ** 1.4
+                p = p + np.array( ( math.cos( el_mid ) * math.cos( az ), math.cos( el_mid ) * math.sin( az ),
+                                    math.sin( el_mid ) ) ) * length / steps
+        for i in range( steps ):
+            v0, v1 = i / steps, ( i + 1 ) / steps
+            for edge, u_edge in ( ( lefts, 0.0 ), ( rights, 1.0 ) ):
+                if i == steps - 1:
+                    pts, uvs = [ mids[i], mids[i + 1], edge[i] ], [ ( 0.5, v0 ), ( 0.5, v1 ), ( u_edge, v0 ) ]
+                else:
+                    pts = [ mids[i], mids[i + 1], edge[i + 1], edge[i] ]
+                    uvs = [ ( 0.5, v0 ), ( 0.5, v1 ), ( u_edge, v1 ), ( u_edge, v0 ) ]
+                model.polygon( "rh_leaf", pts, uv=uvs, both_sides=True )
+
+
+def door_gallery( model, inside, lights, rng ):
+    """ The dim gallery behind the entrance doors' glass: tanks in its walls, columns and raised planters, as the
+    user's picture shows through the doors. Closed: nobody gets in, so it has no spots, and the navmesh stops short. """
+    e0, e1, n0, n1 = DOOR_GALLERY
+    top = DOOR_GALLERY_TOP
+    floor_rect( model, e0, e1, n0, n1, 0.0 )
+    ceiling_rect( model, e0, e1, n0, n1, top, paint="rh_black", thick=16.0 )
+    dark = { "front": "rh_wall_dark", "edge": "rh_gunmetal", "back": None }
+    tank = lambda a, b: Hole( a, b, 22, 150, glass="gallery", frame="rh_gunmetal", sill="rh_gunmetal" )
+    # A tank left of each pair's middle, and one more by the north end, which the north pair shows from the lobby.
+    back = [ tank( c - 160, c - 40 ) for c in DOOR_PAIRS ] + [ tank( 250, 370 ) ]
+    sides = [ tank( -3160, -3010 ) ]
+    side_wall( model, DOOR_GALLERY, "w", 0, top, back, paints=dark )
+    for k, h in enumerate( back ):
+        window_tank( inside, lights, DOOR_GALLERY, "w", h, rng, 120, f"Door gallery tank {k}", top=top, bottom=0 )
+    for side in ( "n", "s" ):
+        side_wall( model, DOOR_GALLERY, side, 0, top, sides, paints=dark )
+        window_tank( inside, lights, DOOR_GALLERY, side, sides[0], rng, 110, f"Door gallery {side} tank", top=top, bottom=0 )
+    for c in DOOR_PAIRS:
+        # A dark column, and a raised concrete planter with a dracaena behind the right leaf.
+        model.box( ( -3088, c - 8, 0 ), ( -3072, c + 8, top ), { "default": "rh_gunmetal", "+z": None, "-z": None }, STONE )
+        pe, pn = -3150.0, c + 62.0
+        model.box( ( pe - 22, pn - 22, 0 ), ( pe + 22, pn + 22, 30 ), { "default": "rh_smooth", "+z": "rh_soil" }, STONE )
+        dracaena( model, ( pe, pn, 30 ), rng, scale=1.2, leaves=22 )
+        downlight_rings( model, ( pe, pn ), top )
+        lights.append( light( f"Door gallery planter {int( c )}", ( pe + 10, pn, top - 16 ), "0.6,0.74,0.92,1", 150 ) )
+        lights.append( light( f"Door gallery wash {int( c )}", ( -3040, c + 20, 120 ), "0.22,0.48,0.72,1", 240 ) )
+    for c in ( -300.0, 0.0, 300.0 ):
+        downlight_rings( model, ( -3000, c ), top )
+    lights.append( light( "Door gallery fill", ( -3020, 0, 150 ), "0.3,0.55,0.8,1", 360 ) )
 
 
 def banner( model, fr, u0, u1, z0, z1, paint, w=0.0 ):
@@ -1607,22 +1780,37 @@ def lobby( model, inside, lights, rng ):
     for n in ( -880.0, -300.0, 300.0, 880.0 ):
         sconce( model, fr, n - base, 110 )
 
-    # The west wall: the frosted street doors behind the spawn, three tall tanks over the balcony.
-    fr, base = side_wall( model, LOBBY, "w", 0, L1 - SLAB, [] )
+    # The west wall: the glass entrance doors behind the spawn, in a wall of cladding panels, with the gallery behind
+    # them, and three tall tanks over the balcony.
+    openings = [ Hole( c - DOOR_HALF, c + DOOR_HALF, 0.0, DOOR_TOP ) for c in DOOR_PAIRS ]
+    fr, base = side_wall( model, LOBBY, "w", 0, L1 - SLAB, openings, paints={ "front": "rh_portal", "edge": "rh_portal", "back": None } )
     high = [ Hole( a, b, L1 + 20, 600, glass="lobby", frame="rh_gunmetal", sill="rh_gunmetal" )
              for a, b in ( ( -700, -250 ), ( -170, 170 ), ( 250, 700 ) ) ]
     side_wall( model, LOBBY, "w", L1 - SLAB, LOBBY_TOP, high )
     for k, h in enumerate( high ):
         window_tank( inside, lights, LOBBY, "w", h, rng, 240, f"Lobby west tank {k}", top=LOBBY_TOP, bottom=L1 - SLAB + 4 )
         mullions( model, fr, h.u0 - base, h.u1 - base, h.z0, h.z1, 2 )
-    for a, b in ( ( -340, -180 ), ( -80, 80 ), ( 180, 340 ) ):
-        frosted_door( model, fr, a - base, b - base )
-    baseboard( model, fr, 0, -340 - base )
-    baseboard( model, fr, -180 - base, -80 - base )
-    baseboard( model, fr, 80 - base, 180 - base )
-    baseboard( model, fr, 340 - base, n1 - n0 )
+    portals = [ ( c - base - DOOR_HALF - DOOR_PORTAL, c - base + DOOR_HALF + DOOR_PORTAL ) for c in DOOR_PAIRS ]
+    joint = DOOR_TOP + DOOR_PORTAL
+    clad_rng, door_rng = np.random.default_rng( 7 ), np.random.default_rng( 11 )
+    edges = [ 0.0 ] + [ x for p in portals for x in p ] + [ n1 - n0 ]
+    for a, b in zip( edges[::2], edges[1::2] ):
+        clad( model, fr, a, b, 3.0, joint, clad_rng )
+        clad( model, fr, a, b, joint, L1 - SLAB, clad_rng )
+        fbox( model, fr, a, b, 0.0, 0.4, 0.0, 3.0, "rh_portal", skip=( "back", "bottom" ) )
+    for k, ( a, b ) in enumerate( portals ):
+        clad( model, fr, a, b, joint, L1 - SLAB, clad_rng, width=( b - a ) / 2 )
+        c = DOOR_PAIRS[k] - base
+        door_pair( model, fr, c )
+        downlight_rings( model, fr.p( c, 16, 0 )[:2], L1 - SLAB )
+        lights.append( light( f"Lobby door {k}", fr.p( c, 15, L1 - SLAB - 12 ), WARM, 190 ) )
+    for c0, c1 in zip( DOOR_PAIRS, DOOR_PAIRS[1:] ):
+        n = ( c0 + c1 ) / 2
+        soil = bronze_planter( model, fr.p( n - base, 3.5 + 17.5 * DOOR_S / 2, 0 ) )
+        dracaena( model, fr.p( n - base, 3.5 + 17.5 * DOOR_S / 2, soil ), door_rng, scale=1.5, leaves=30 )
     for n in ( -600.0, 600.0 ):
-        sconce( model, fr, n - base, 110 )
+        sconce( model, fr, n - base, 110, w=0.75 )
+    door_gallery( model, inside, lights, door_rng )
 
     # The west and east balconies (the north and south ones come with the halves) and the railings round the void.
     for be0, be1, side in ( ( e0, v_e0, "e" ), ( v_e1, e1, "w" ) ):
@@ -2614,7 +2802,7 @@ def write_minimap( models ):
     for pts in collision_shapes( models ):
         z0, z1 = float( pts[:, 2].min() ), float( pts[:, 2].max() )
         outline = hull_2d( pts[:, :2] )
-        if len( outline ) < 3:
+        if len( outline ) < 3 or outline[:, 0].mean() < -2925:     # the closed gallery behind the lobby's doors
             continue
         f = float( floor_level( *outline.mean( axis=0 ) ) )
         screen = [ ( ( e - left ) / scale, ( top - n ) / scale ) for e, n in outline ]
@@ -2710,6 +2898,7 @@ PROBES = [
     ( "North-East Service", ( 1300, 610, 90 ), ( 900, 1720, 500, 1100, 0, 180 ) ),
     ( "South-West Service", ( -1300, -610, 90 ), ( -1720, -900, -1100, -500, 0, 180 ) ),
     ( "South-East Service", ( 1300, -610, 90 ), ( 900, 1720, -1100, -500, 0, 180 ) ),
+    ( "Lobby Door Gallery", ( -3060, 0, 90 ), ( -3200, -2920, -400, 400, 0, 180 ) ),
 ]
 
 
@@ -3182,6 +3371,7 @@ def write_scene( rooms, lights ):
 
 VIEWS = [
     ( "lobby", ( -2860, -500, 64 ), ( -1800, 300, 260 ), 90 ),
+    ( "lobby_doors", ( -2600, 120, 70 ), ( -2900, -20, 80 ), 75 ),
     ( "lobby_balcony", ( -1800, 900, 272 ), ( -2700, -300, 200 ), 90 ),
     ( "west_gallery", ( -1690, 0, 64 ), ( -800, 0, 80 ), 80 ),
     ( "rotunda", ( -780, -200, 64 ), ( 0, 0, 260 ), 90 ),

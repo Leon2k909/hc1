@@ -2,12 +2,13 @@
 Reef Hall's materials (Tools/reefhall_map.py), drawn from scratch with numpy and PIL like Belltower's: polished concrete
 floor slabs, form-panelled wall concrete, dark painted steel, gunmetal frames, brushed brass trim, navy quilted vinyl
 (the crates' pads), trench drain grating, hazard and yellow floor lines, painted pipes, tank sand, reef rock, coral,
-kelp, the floor emblem, the banners, LED strips, the control room's screens and whale bone.
+kelp, the floor emblem, the banners, LED strips, the control room's screens and whale bone, and the lobby's entrance
+doors: their wall's cladding, anodised and stainless metal, the frosted film on their glass and the planters' plants.
 
     python Tools/reefhall_materials.py [name ...] [--out <dir>] [--sheet <png>]
 
-- Writes Assets/materials/reefhall/<name>_color.png, _normal.png, _rough.png (and _trans.png for kelp, _illum.png for
-  the lit ones) and <name>.vmat. Most are on shaders/complex.shader. The tank glass is on shaders/hc1_tank_glass.shader
+- Writes Assets/materials/reefhall/<name>_color.png, _normal.png, _rough.png (and _trans.png for kelp and the film,
+  _illum.png for the lit ones) and <name>.vmat. Most are on shaders/complex.shader. The tank glass is on shaders/hc1_tank_glass.shader
   and the offices' and display cases' glass on shaders/glass.shader.
 - Every picture tiles, except the decals (DECALS: the emblem, the banners and the screens), which reefhall_map.py maps
   once across their polygon. TILE_UNITS is how many inches a tile covers, which map_kit's world-scale UVs read through
@@ -158,7 +159,7 @@ def brass( rng, n ):
     tarnish = smoothstep( 0.5, 2.0, noise( rng, n, 2.6, 2, 24 ) )
     height = 0.5 + 0.004 * brush
     lum = 1.0 + 0.05 * brush - 0.18 * tarnish
-    colours = { "rh_brass": paint( ( 168, 132, 78 ), lum ) }
+    colours = { "rh_brass": paint( ( 168, 132, 78 ), lum ), "rh_bronze": paint( ( 150, 96, 58 ), lum ) }
     rough = np.clip( 0.30 + 0.06 * brush + 0.12 * tarnish, 0, 1 )
     return colours, rough, height, 0.6
 
@@ -338,9 +339,124 @@ def plain( rng, n ):
     colours = { "rh_laminate": paint( ( 44, 48, 56 ), lum ), "rh_rubber": paint( ( 22, 24, 26 ), lum ),
                 "rh_ceiling": paint( ( 120, 126, 132 ), lum ), "rh_led_warm": paint( ( 255, 214, 160 ), 1.0 + 0.01 * fine ),
                 "rh_led_cool": paint( ( 186, 222, 255 ), 1.0 + 0.01 * fine ), "rh_black": paint( ( 12, 13, 15 ), lum ),
-                "rh_frosted_lit": paint( ( 168, 158, 140 ), 1.0 + 0.02 * blotch ) }
+                "rh_frosted_lit": paint( ( 168, 158, 140 ), 1.0 + 0.02 * blotch ),
+                "rh_soil": paint( ( 44, 34, 27 ), 1.0 + 0.12 * fine + 0.08 * blotch ) }
     rough = np.clip( 0.5 + 0.05 * fine, 0, 1 )
     return colours, rough, 0.5 + 0.01 * fine, 0.4
+
+
+def panel( rng, n ):
+    """ The lobby's entrance wall cladding (the user's door reference): large satin panels in a dark blue-grey, faintly
+    mottled with a fine orange peel, hung with real shadow gaps (reefhall_map's clad_wall draws each panel), so the
+    picture has no joints. rh_panel_b is a slightly darker panel to set among them, rh_portal the near-black anthracite
+    of the doors' surrounds and reveals, which also shows in the gaps. """
+    blotch = noise( rng, n, 3.0, 1, 8 )
+    peel = noise( rng, n, 1.1, n / 12 )
+    fine = noise( rng, n, 1.0, n / 4 )
+    smear = BT.stretched( rng, n, 2.0, 2, 30, ( 1.0, 16.0 ) )
+    lum = 1.0 + 0.035 * blotch + 0.012 * peel + 0.01 * fine + 0.02 * smear
+    colours = { "rh_panel": paint( ( 82, 87, 94 ), lum ), "rh_panel_b": paint( ( 74, 79, 86 ), lum ),
+                "rh_portal": paint( ( 32, 34, 38 ), lum ) }
+    rough = np.clip( 0.46 + 0.04 * peel + 0.03 * blotch - 0.03 * smear, 0, 1 )
+    return colours, rough, 0.5 + 0.006 * peel + 0.002 * fine, 0.5
+
+
+def doorframe( rng, n ):
+    """ The entrance doors' metal: dark grey anodised aluminium (the frames, 'rh_anodised'), finely brushed with a satin
+    sheen (its dyed oxide reads more like a satin paint than bare metal), and brushed stainless steel (the pull bars,
+    the closer's cover, the threshold: 'rh_stainless'). """
+    brush = BT.stretched( rng, n, 1.0, 8, n / 2, ( 0.4, 14.0 ) )
+    blotch = noise( rng, n, 3.0, 1, 8 )
+    scratch = BT.cracks( rng, n, 18, ( 8, 40 ), 0.5, branch=0.0 )
+    height = 0.5 + 0.002 * brush - 0.02 * scratch
+    lum = 1.0 + 0.015 * brush + 0.02 * blotch
+    colours = { "rh_anodised": paint( ( 74, 77, 82 ), lum + 0.05 * scratch ),
+                "rh_stainless": paint( ( 204, 206, 208 ), lum - 0.03 * scratch ) }
+    rough = np.clip( 0.36 + 0.03 * brush + 0.02 * blotch - 0.04 * scratch, 0, 1 )
+    return colours, rough, height, 0.5
+
+
+# The entrance doors' frosted film covers both leaves' glass of a pair as one picture, so its waves run on from one leaf
+# into the other. FILM_W x FILM_H inches: from the left leaf's glass's outer edge to the right one's, and from the
+# glass's foot to its head. reefhall_map's door_pair lays each leaf's glass on its own part of the picture.
+FILM_W, FILM_H = 87.0, 83.0
+FILM_GAP = 4.625                # the glass's inner edge, either side of the pair's middle
+FILM_WAVES = ( 23.5, 30.0 )     # the two lines' middles, up from the glass's foot
+FILM_JELLY = ( 76.1, 55.0, 63.5 )   # the jellyfish's middle across, its bell's rim and top, up from the glass's foot
+
+
+def film( rng, n ):
+    """ The entrance doors' frosted vinyl (the user's reference): two wavy lines across both leaves, and a jellyfish
+    on the right leaf, a plain bell with five wavy tentacles under it. Alpha tested (the trans map is
+    the cut), frosted white with a fine sandblasted grain. The picture is FILM_W x FILM_H inches over the square. """
+    y, x = np.mgrid[0:n, 0:n].astype( float )
+    sx, sy = FILM_W / n, FILM_H / n
+    ux = ( x + 0.5 ) * sx                       # inches across the pair's glass
+    uy = FILM_H - ( y + 0.5 ) * sy              # inches up from the glass's foot (the picture's top is up)
+    px = min( sx, sy )
+
+    def edge( d ):                              # a signed distance (inches, inside < 0) to coverage
+        return np.clip( 0.5 - d / px, 0.0, 1.0 )
+
+    cover = np.zeros( ( n, n ) )
+    # The waves: one sine across the whole pair, the two lines in step, 1.3 in wide.
+    lam, amp = 46.0, 1.7
+    phase = 2 * math.pi * ux / lam + 0.9
+    slope = amp * 2 * math.pi / lam * np.cos( phase )
+    for y0 in FILM_WAVES:
+        d = np.abs( uy - ( y0 + amp * np.sin( phase ) ) ) / np.sqrt( 1 + slope ** 2 ) - 0.65
+        cover = np.maximum( cover, edge( d ) )
+    # The jellyfish's bell: a squared-off dome over a rim with four soft scallops.
+    jx, rim, top = FILM_JELLY
+    rx, ry = 6.3, top - rim
+    dx = ux - jx
+    t = np.clip( ( uy - rim ) / ry, 0, None )
+    p = 2.4
+    dome = ( np.abs( dx ) / rx ) ** p + t ** p
+    bell_out = ( dome ** ( 1 / p ) - 1.0 ) * min( rx, ry )
+    scallop = 0.55 * np.abs( np.sin( np.clip( dx / rx, -1, 1 ) * math.pi * 2.0 ) ) + 0.15
+    below = ( rim - scallop ) - uy                       # under the rim: outside by this much
+    bell = np.maximum( bell_out, below )
+    cover = np.maximum( cover, edge( bell ) )
+    # Five tentacles, each a wavy line hanging from the rim, the middle ones longest, thinning to a rounded tip.
+    for k, ( x0, length, ph ) in enumerate( ( ( -4.5, 10.5, 0.3 ), ( -2.25, 12.5, 2.4 ), ( 0.0, 14.0, 4.4 ),
+                                              ( 2.25, 12.0, 1.2 ), ( 4.5, 10.0, 3.4 ) ) ):
+        s = np.clip( ( rim - 0.2 ) - uy, 0, None )                    # inches down the tentacle
+        wob = 0.42 + 0.22 * s / length
+        cx = jx + x0 + wob * np.sin( 2 * math.pi * s / 4.2 + ph ) * np.clip( s / 2.0, 0, 1 )
+        dcx = wob * 2 * math.pi / 4.2 * np.cos( 2 * math.pi * s / 4.2 + ph )
+        half = 0.42 - 0.12 * np.clip( s / length, 0, 1 )
+        d = np.abs( ux - cx ) / np.sqrt( 1 + dcx ** 2 ) - half
+        d = np.where( s > length, np.hypot( ux - cx, uy - ( rim - 0.2 - length ) ) - half, d )
+        d = np.where( uy > rim + 0.5, 9.0, d )
+        cover = np.maximum( cover, edge( d ) )
+    grain = noise( rng, n, 0.6, n / 4 )
+    blotch = noise( rng, n, 3.0, 1, 6 )
+    lum = 1.0 + 0.025 * grain + 0.02 * blotch
+    colour = paint( ( 214, 220, 224 ), lum )
+    rough = np.clip( 0.62 + 0.05 * grain, 0, 1 )
+    return { "rh_film": colour }, rough, 0.5 + 0.01 * grain, 0.4, { "trans": cover }
+
+
+def plantleaf( rng, n ):
+    """ A dracaena's strap leaf, the lobby planters' plants: u across the leaf (its edges at 0 and 1), v from its base to
+    its tip. Deep green at the edges, a paler yellow-green band down the middle and a narrow pale midrib, with fine
+    parallel veins along it. The leaves' outlines are their own geometry, so no cut. """
+    y, x = np.mgrid[0:n, 0:n].astype( float )
+    u = ( x + 0.5 ) / n - 0.5
+    v = 1.0 - ( y + 0.5 ) / n
+    band = np.exp( -( u / 0.2 ) ** 4 )
+    midrib = np.exp( -( u / 0.025 ) ** 2 )
+    veins = np.cos( u * 2 * math.pi * 26 ) ** 8 * 0.5
+    blot = noise( rng, n, 2.6, 2, 20 )
+    streak = BT.stretched( rng, n, 1.6, 4, n / 4, ( 18.0, 0.6 ) )
+    lum = 1.0 + 0.06 * blot + 0.04 * streak - 0.06 * veins - 0.18 * ( np.abs( u ) / 0.5 ) ** 3 + 0.08 * v
+    green = paint( ( 46, 104, 44 ), lum )
+    light = paint( ( 128, 160, 62 ), lum )
+    colour = BT.mix( green, light, np.clip( 0.75 * band + 0.6 * midrib, 0, 1 ) )
+    height = 0.5 + 0.08 * midrib - 0.03 * veins + 0.01 * streak
+    rough = np.clip( 0.42 + 0.04 * streak, 0, 1 )
+    return { "rh_leaf": colour }, rough, height, 1.0
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -521,15 +637,20 @@ TEXTURES = {
     "emblem_ray": ( emblem_ray, 2048, 19, 0.0, 192.0 ),
     "banner": ( banner, 1024, 20, 0.0, 96.0 ),
     "screens": ( screens, 1024, 21, 0.0, 48.0 ),
+    "panel": ( panel, 1024, 22, 0.0, 128.0 ),
+    "doorframe": ( doorframe, 512, 23, 0.8, 32.0 ),
+    "film": ( film, 2048, 24, 0.0, FILM_W ),
+    "plantleaf": ( plantleaf, 512, 25, 0.0, 24.0 ),
 }
 
 DECALS = { "rh_emblem", "rh_emblem_ray", "rh_banner_manta", "rh_banner_jelly", "rh_screen_map", "rh_screen_sonar",
            "rh_screen_data" }
 # Self-lit paints: ( brightness ). Their colour is the light they give.
-ILLUM = { "rh_frosted_lit": 0.4, "rh_led_warm": 6.0, "rh_led_cool": 5.0, "rh_screen_map": 2.2, "rh_screen_sonar": 2.2, "rh_screen_data": 2.2 }
+ILLUM = { "rh_film": 0.12, "rh_frosted_lit": 0.4, "rh_led_warm": 6.0, "rh_led_cool": 5.0, "rh_screen_map": 2.2, "rh_screen_sonar": 2.2, "rh_screen_data": 2.2 }
 # Metalness per paint where it differs from its texture's.
-METALNESS = { "rh_laminate": 0.0, "rh_rubber": 0.0, "rh_black": 0.0, "rh_steel_blue": 0.15 }
-ALPHA_TESTED = { "rh_kelp" }
+METALNESS = { "rh_laminate": 0.0, "rh_rubber": 0.0, "rh_black": 0.0, "rh_soil": 0.0, "rh_steel_blue": 0.15,
+              "rh_stainless": 0.85, "rh_anodised": 0.3 }
+ALPHA_TESTED = { "rh_kelp", "rh_film" }
 # Glass on shaders/glass.shader: ( tint, absorption ). The tank glass is its own shader (write_tank_glass).
 GLASS = { "rh_glass": ( ( 0.92, 0.96, 0.98 ), 0.15 ), "rh_glass_office": ( ( 0.85, 0.92, 0.96 ), 0.35 ) }
 
@@ -538,14 +659,17 @@ def paints():
     """ paint -> ( texture, tile units ) for every paint the textures draw (without running them). """
     known = {
         "floor": [ "rh_floor" ], "wall": [ "rh_wall", "rh_wall_dark" ], "smooth": [ "rh_smooth", "rh_block" ],
-        "steel": [ "rh_steel", "rh_steel_blue" ], "gunmetal": [ "rh_gunmetal" ], "brass": [ "rh_brass" ],
+        "steel": [ "rh_steel", "rh_steel_blue" ], "gunmetal": [ "rh_gunmetal" ], "brass": [ "rh_brass", "rh_bronze" ],
         "pad": [ "rh_pad", "rh_pad_dark" ], "grate": [ "rh_grate" ], "lines": [ "rh_hazard", "rh_line" ],
         "pipe": [ "rh_pipe", "rh_pipe_dark" ], "sand": [ "rh_sand" ], "rock": [ "rh_rock" ],
         "coral": [ "rh_coral_pink", "rh_coral_orange", "rh_coral_yellow", "rh_coral_purple", "rh_coral_green", "rh_coral_white" ],
         "kelp": [ "rh_kelp" ], "bone": [ "rh_bone" ], "tankback": [ "rh_tankback" ],
-        "plain": [ "rh_laminate", "rh_rubber", "rh_ceiling", "rh_led_warm", "rh_led_cool", "rh_black", "rh_frosted_lit" ],
+        "plain": [ "rh_laminate", "rh_rubber", "rh_ceiling", "rh_led_warm", "rh_led_cool", "rh_black", "rh_frosted_lit",
+                   "rh_soil" ],
         "emblem": [ "rh_emblem" ], "emblem_ray": [ "rh_emblem_ray" ], "banner": [ "rh_banner_manta", "rh_banner_jelly" ],
         "screens": [ "rh_screen_map", "rh_screen_sonar", "rh_screen_data" ],
+        "panel": [ "rh_panel", "rh_panel_b", "rh_portal" ], "doorframe": [ "rh_anodised", "rh_stainless" ],
+        "film": [ "rh_film" ], "plantleaf": [ "rh_leaf" ],
     }
     out = { p: ( tex, TEXTURES[tex][4] ) for tex, ps in known.items() for p in ps }
     for g in GLASS:

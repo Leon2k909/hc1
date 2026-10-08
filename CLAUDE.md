@@ -2138,10 +2138,31 @@ simulate_input.
     run over the floor and the catwalk.
   - Rotunda: six steel columns stand round the drum, and its lid is a dark disc (`lamp_lid`; `ring=True` adds the old
     white LED ring, which glared). The ceiling's cove round the drum is `rh_frosted_lit`: `rh_led_cool` glared white.
-  - Lobby: the frosted doors are `rh_frosted_lit`, a dimmer self-lit glass than `rh_led_warm`, which burnt out white.
-    The coral display's corals sit on the mound's surface and round its foot.
+  - Lobby: the coral display's corals sit on the mound's surface and round its foot.
+- The lobby's west wall (Red Team's spawn side) has three pairs of glass entrance doors, as close as could be got to the
+  user's picture of them (2026-10-08). They used to be self-lit frosted panels (`frosted_door`). Now:
+  - Each pair (`door_pair`, `DOOR_PAIRS` n -197.5, 0 and 197.5) has dark grey anodised frames (`rh_anodised`) with
+    4.5" stiles and 6" rails, and clear glass (`rh_glass`). It also has stainless pull bars on the meeting stiles, a
+    closer's cover on the head and a threshold (`rh_stainless`), all in an anthracite portal (`rh_portal`).
+  - The picture's doors look about 3 m tall, so they're drawn at 1.25 times a real 95" leaf (`DOOR_S`).
+  - Frosted vinyl on the glass (`rh_film`, alpha tested): two wavy lines across both leaves and a plain jellyfish on
+    each right leaf. `reefhall_materials.film` draws the film as one picture across the pair (`FILM_W`, `FILM_H`,
+    `FILM_WAVES`, `FILM_JELLY`). `door_pair` maps each leaf's glass onto its share of it (`uv_quad`), so the waves run
+    on from one leaf into the other.
+  - The wall round them is satin cladding with shadow gaps (`clad`, `rh_panel` / `rh_panel_b`), with a downlight and a
+    warm wash over each pair.
+  - Between the pairs stand tapered bronze planters (`bronze_planter`, 46" tall) with dracaenas (`dracaena`: strap
+    leaves in `rh_leaf`). Each planter has a metal hull.
+  - The doors are shut for good: one glass box fills each opening. Behind them is a closed gallery (`door_gallery`,
+    `DOOR_GALLERY` e -3200..-2920, n -400..400), there only to be seen through the glass:
+    - four tanks in its back wall and one in each end wall, stocked like the rest;
+    - a dark column, and a raised planter with a dracaena, behind each pair;
+    - cool lights, so every pair shows blue from the lobby.
+    It has no spots. The navmesh stops short of it, and the minimap leaves it out.
+  - Checked only in offline Cycles renders of the OBJs with their textures (a scratch wrapper round
+    `railhead_render.py`, with the tank glass as tinted water and no fish). Not yet seen in the engine.
 - `map_kit.write_text` retries the final rename for up to 10 s: the editor or OneDrive can hold a file being replaced.
-- Doorways have no doors, since bots can't open doors.
+- Doorways have no doors, since bots can't open doors. The lobby's glass entrance doors are shut for good (above).
 - `map_kit.write_obj` now reads `tile_overrides` before `BT.tile_units`. Before, `dict.get`'s default called
   `tile_units` even for an overridden paint, which fails for paints `building_textures` doesn't know.
 - Never let the editor compile a vmdl whose OBJ has no faces: it hangs for good, with one thread at 100% and nothing
@@ -2200,10 +2221,10 @@ simulate_input.
     seen from the glass.
 - `reefhall_map.py` stocks each tank by its size (`fauna_class`: small, mid, big, huge), from that class's mixes
   (`FAUNA_SMALL` ... `FAUNA_HUGE`), neighbours taking different ones. A group shrinks until it has open water in its
-  band (`FAUNA_ROOM`, `free_share`); a species with none is swapped for a small one that fits. The scene has 68 stocked
-  tanks and 1363 animals: 6 sharks, 3 mantas, 452 chromis, 218 sergeants, 176 fusiliers, 138 Banggai cardinals, 106
-  yellow and 71 blue tangs, 70 clownfish, 32 Moorish idols, 29 mandarins, 18 copperbands, 17 puffers, 15 regal angels
-  and 12 lionfish.
+  band (`FAUNA_ROOM`, `free_share`); a species with none is swapped for a small one that fits. The scene has 74 stocked
+  tanks and 1439 animals (since the door gallery's six tanks, 2026-10-08): 6 sharks, 3 mantas, 492 chromis, 218
+  sergeants, 176 fusiliers, 156 Banggai cardinals, 109 yellow and 71 blue tangs, 78 clownfish, 33 mandarins, 32 Moorish
+  idols, 19 copperbands, 18 puffers, 15 regal angels and 13 lionfish.
 - `hc1_fauna_check [seconds]` (in play mode: it reads `Game.ActiveScene`) runs every tank that long at once and logs:
   how far any body comes into glass or rock, how often two bodies overlap (and which kinds), fish stuck outside their
   hovers, and each species' mean speed against its cruise.
