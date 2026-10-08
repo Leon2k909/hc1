@@ -369,4 +369,147 @@ GunsmithAttachmentBrowser
         font-size: 14px;
         color: $text-dim;
     }
+
+    // ── Optic tuning (OpticTuning): TUNE on the fitted optic, and the tune view's sliders ──
+
+    .ab-tune-btn
+    {
+        flex-shrink: 0;
+        height: 30px;
+        flex-direction: row;
+        align-items: center;
+        gap: 4px;
+        margin-right: 8px;
+        padding: 0 8px;
+        border: 1px solid rgba( 255, 255, 255, 0.22 );
+        border-radius: 2px;
+        cursor: pointer;
+        transition: border-color 0.15s ease, background-color 0.15s ease;
+
+        i { font-size: 16px; color: rgba( 255, 255, 255, 0.8 ); }
+        label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: rgba( 255, 255, 255, 0.8 ); }
+
+        &:hover
+        {
+            border-color: $accent;
+            background-color: rgba( 255, 122, 26, 0.16 );
+
+            i, label { color: white; }
+        }
+
+        // Tuned off the optic's usual setup.
+        &.tuned
+        {
+            border-color: rgba( 255, 122, 26, 0.6 );
+
+            i, label { color: $accent; }
+        }
+    }
+
+    .ab-head .ab-tune-title
+    {
+        font-size: 15px;
+        letter-spacing: 1px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .ab-tune-reset
+    {
+        flex-shrink: 0;
+        height: 28px;
+        align-items: center;
+        padding: 0 10px;
+        border: 1px solid rgba( 255, 255, 255, 0.16 );
+        border-radius: 2px;
+        cursor: pointer;
+
+        label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: $text-mid; }
+
+        &:hover
+        {
+            border-color: $accent;
+            background-color: rgba( 255, 122, 26, 0.12 );
+
+            label { color: white; }
+        }
+    }
+
+    .ab-tune { gap: 10px; }
+
+    .ab-tune-card
+    {
+        flex-shrink: 0;
+        flex-direction: column;
+        gap: 6px;
+        padding: 12px 14px;
+        background-color: rgba( 255, 255, 255, 0.035 );
+        border: 1px solid $line;
+        border-left: 3px solid $accent;
+    }
+
+    .ab-tune-head
+    {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .ab-tune-name
+    {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: $accent;
+    }
+
+    .ab-tune-value
+    {
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: white;
+        white-space: nowrap;
+    }
+
+    .ab-tune-slider
+    {
+        flex-direction: column;
+
+        .slidercontrol .track-active { background-color: $accent; }
+        .slidercontrol .thumb { background-color: white; width: 10px; height: 16px; }
+    }
+
+    .ab-tune-ends
+    {
+        flex-direction: row;
+        justify-content: space-between;
+        margin-top: -2px;
+
+        label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: $text-dim; }
+    }
+
+    .ab-tune-row
+    {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 4px 0;
+        border-top: 1px solid $line;
+
+        label { font-size: 12px; font-weight: 600; color: $text-mid; }
+        .ab-tune-figure { font-weight: 700; color: white; white-space: nowrap; }
+    }
+
+    .ab-tune-note
+    {
+        margin-top: 2px;
+        font-size: 11px;
+        font-weight: 500;
+        color: $text-dim;
+
+        &.warn { color: rgba( 255, 170, 90, 0.85 ); }
+    }
 }

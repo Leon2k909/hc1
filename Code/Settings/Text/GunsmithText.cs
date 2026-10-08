@@ -557,5 +557,24 @@ public static partial class GameText
 		["Recoil"] = ("Recul", "Rückstoß", "Retroceso", "Recuo"),
 		["Mag Size"] = ("Capacité", "Magazingröße", "Capacidad", "Capacidade"),
 		["Reset All"] = ("Tout réinitialiser", "Alles zurücksetzen", "Restablecer todo", "Redefinir tudo"),
+
+		// Optic tuning (GunsmithAttachmentBrowser, OpticTuning)
+		["OPTIC TUNING"] = ("Réglage de l'optique", "Optikeinstellung", "Ajuste de la mira", "Ajuste da mira"),
+		["EYE POSITION"] = ("Position de l'œil", "Augenposition", "Posición del ojo", "Posição do olho"),
+		["NEAR"] = ("Près", "Nah", "Cerca", "Perto"),
+		["FAR"] = ("Loin", "Fern", "Lejos", "Longe"),
+		["TUNE"] = ("Régler", "Einstellen", "Ajustar", "Ajustar"),
+		["ZERO"] = ("Zérotage", "Einschießentfernung", "Puesta a cero", "Zeragem"),
+		["Rail position"] = ("Position sur le rail", "Schienenposition", "Posición en el riel", "Posição no trilho"),
+		["Sight picture"] = ("Image de visée", "Visierbild", "Imagen de la mira", "Imagem da mira"),
+		["Eye relief"] = ("Dégagement oculaire", "Augenabstand", "Distancia ocular", "Distância ocular"),
+		["As mounted"] = ("Telle que montée", "Wie montiert", "Tal como va montada", "Como montada"),
+		["{0} cm forward"] = ("{0} cm vers l'avant", "{0} cm nach vorn", "{0} cm hacia delante", "{0} cm para a frente"),
+		["{0} cm back"] = ("{0} cm vers l'arrière", "{0} cm nach hinten", "{0} cm hacia atrás", "{0} cm para trás"),
+		["{0} cm (rated {1} cm)"] = ("{0} cm (nominal {1} cm)", "{0} cm (Nennwert {1} cm)", "{0} cm (nominal {1} cm)", "{0} cm (nominal {1} cm)"),
+		["At {0} m"] = ("À {0} m", "Auf {0} m", "A {0} m", "A {0} m"),
+		["Nearer the eye, the sight fills more of the view. Further, more of the world shows round it."] = ("Plus près de l'œil, le viseur occupe davantage la vue. Plus loin, on voit davantage le monde autour.", "Näher am Auge füllt die Optik mehr vom Blickfeld. Weiter weg sieht man mehr von der Umgebung.", "Más cerca del ojo, la mira ocupa más de la vista. Más lejos, se ve más del mundo a su alrededor.", "Mais perto do olho, a mira ocupa mais da visão. Mais longe, aparece mais do mundo ao redor."),
+		["Off its rated eye relief, the scope's picture shrinks and shades at its edge."] = ("Hors de son dégagement oculaire nominal, l'image de la lunette rétrécit et s'assombrit sur les bords.", "Abseits des Nenn-Augenabstands wird das Bild des Zielfernrohrs kleiner und am Rand dunkel.", "Fuera de su distancia ocular nominal, la imagen del visor se encoge y se oscurece en el borde.", "Fora da distância ocular nominal, a imagem da luneta encolhe e escurece na borda."),
+		["Where bullets drop (Battle Royale), they cross the line of sight at the zero. Elsewhere they go where the sights point."] = ("Là où les balles chutent (Battle Royale), elles croisent la ligne de visée à la distance de zérotage. Ailleurs, elles vont là où pointe la visée.", "Wo Geschosse fallen (Battle Royale), kreuzen sie die Visierlinie auf der Einschießentfernung. Sonst treffen sie dorthin, wohin die Visierung zeigt.", "Donde las balas caen (Battle Royale), cruzan la línea de mira en la distancia de puesta a cero. En otros modos van adonde apuntan las miras.", "Onde as balas caem (Battle Royale), elas cruzam a linha de visada na distância de zeragem. Nos outros modos, vão para onde as miras apontam."),
 	};
 }

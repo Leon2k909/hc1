@@ -90,8 +90,12 @@ public sealed class GunsmithMw22Attachment : GunsmithAttachment, ICameraSetup
 		}
 		if ( AttachmentPoint.Category == GunsmithPartType.Muzzle ) position += GunsmithAttachmentPoint.MuzzleShift( weapon.GameObject );
 		if ( AttachmentPoint.Category == GunsmithPartType.Optic )
+		{
 			position += weapon.GetComponentsInChildren<GunsmithAttachmentPoint>( true )
 				.Where( p => p.CurrentPart.IsValid() ).Aggregate( Vector3.Zero, (shift, p) => shift + p.CurrentPart.OpticMountShift );
+			// Its tuned Eye Position: a slide along the rail, which runs with the bore (+x in bind space).
+			position += Vector3.Forward * AttachmentPoint.OpticRailShift;
+		}
 		position += offset;
 		var pose = BoneDelta( weapon, string.IsNullOrEmpty( AttachmentPoint.MountBone ) ? BoneName : AttachmentPoint.MountBone );
 		WorldPosition = pose.PointToWorld( position );

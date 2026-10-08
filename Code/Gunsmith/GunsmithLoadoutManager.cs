@@ -208,6 +208,50 @@ public static class GunsmithLoadoutManager
 		Game.Cookies.Set( ReticleSettingKey( resource, "offsety" ), offset.y.Clamp( -0.08f, 0.08f ) );
 	}
 
+	/// <summary>An optic's tune is kept per weapon and per optic, as each sight is set up on its own gun.</summary>
+	private static string OpticTuneKey( EquipmentResource resource, GunsmithPart optic, string setting ) =>
+		$"hc1.gunsmith.class{GetActiveClassIndex()}.{resource.ResourcePath}.optic.{optic.ResourcePath}.{setting}";
+
+	/// <summary>
+	/// The optic's tuned Eye Position (<see cref="OpticTuning"/>): Picatinny slots along the rail from where it mounts,
+	/// forward positive. 0 for an optic that doesn't take tuning.
+	/// </summary>
+	public static int GetOpticEyePosition( EquipmentResource resource, GunsmithPart optic )
+	{
+		if ( !resource.IsValid() || !OpticTuning.IsTunable( optic ) ) return 0;
+		var slots = _fitting is { } build
+			? (build.Attachments?.GetValueOrDefault( nameof( GunsmithPartType.Optic ) ) ?? "")
+				.Equals( optic.ResourcePath, StringComparison.OrdinalIgnoreCase ) ? build.OpticEye : 0
+			: Game.Cookies.Get<int>( OpticTuneKey( resource, optic, "eye" ), 0 );
+		return OpticTuning.ClampSlots( resource, slots );
+	}
+
+	public static void SetOpticEyePosition( EquipmentResource resource, GunsmithPart optic, int slots )
+	{
+		if ( !resource.IsValid() || !OpticTuning.IsTunable( optic ) ) return;
+		Game.Cookies.Set( OpticTuneKey( resource, optic, "eye" ), OpticTuning.ClampSlots( resource, slots ) );
+	}
+
+	/// <summary>
+	/// The optic's tuned zero in metres (<see cref="OpticTuning.ZeroChoices"/>), or 0 for the gun's own
+	/// (<see cref="Shootable.ZeroRange"/>).
+	/// </summary>
+	public static int GetOpticZero( EquipmentResource resource, GunsmithPart optic )
+	{
+		if ( !resource.IsValid() || !OpticTuning.IsTunable( optic ) ) return 0;
+		var zero = _fitting is { } build
+			? (build.Attachments?.GetValueOrDefault( nameof( GunsmithPartType.Optic ) ) ?? "")
+				.Equals( optic.ResourcePath, StringComparison.OrdinalIgnoreCase ) ? build.OpticZero : 0
+			: Game.Cookies.Get<int>( OpticTuneKey( resource, optic, "zero" ), 0 );
+		return Math.Clamp( zero, 0, OpticTuning.Zeros[^1] );
+	}
+
+	public static void SetOpticZero( EquipmentResource resource, GunsmithPart optic, int metres )
+	{
+		if ( !resource.IsValid() || !OpticTuning.IsTunable( optic ) ) return;
+		Game.Cookies.Set( OpticTuneKey( resource, optic, "zero" ), Math.Clamp( metres, 0, OpticTuning.Zeros[^1] ) );
+	}
+
 	/// <summary>
 	/// Saves <paramref name="resourceName"/> as the preferred primary.
 	/// </summary>
@@ -461,6 +505,12 @@ public static class GunsmithLoadoutManager
 				payload.Attachments[category.ToString()] = part.ResourcePath;
 		}
 
+		if ( TryGetAttachment( resource, GunsmithPartType.Optic, out var optic ) && optic.IsValid() )
+		{
+			payload.OpticEye = GetOpticEyePosition( resource, optic );
+			payload.OpticZero = GetOpticZero( resource, optic );
+		}
+
 		var json = JsonSerializer.Serialize( payload );
 		return WeaponBuildCodePrefix + EncodeBase64Url( Encoding.UTF8.GetBytes( json ) );
 	}
@@ -565,6 +615,12 @@ public static class GunsmithLoadoutManager
 		SetCustomReticleRotation( resource, payload.ReticleRotation );
 		SetCustomReticleOffset( resource, new Vector2( payload.ReticleOffsetX, payload.ReticleOffsetY ) );
 
+		if ( partsToApply.TryGetValue( GunsmithPartType.Optic, out var optic ) )
+		{
+			SetOpticEyePosition( resource, optic, payload.OpticEye );
+			SetOpticZero( resource, optic, payload.OpticZero );
+		}
+
 		return true;
 	}
 
@@ -628,6 +684,10 @@ public static class GunsmithLoadoutManager
 		public float ReticleRotation { get; set; }
 		public float ReticleOffsetX { get; set; }
 		public float ReticleOffsetY { get; set; }
+		/// <summary>The fitted optic's Eye Position, in rail slots (<see cref="GetOpticEyePosition"/>).</summary>
+		public int OpticEye { get; set; }
+		/// <summary>The fitted optic's zero in metres, 0 for the gun's own (<see cref="GetOpticZero"/>).</summary>
+		public int OpticZero { get; set; }
 	}
 
 	/// <summary>
@@ -746,6 +806,9 @@ public static class GunsmithLoadoutManager
 		foreach ( var point in attachmentPoints )
 		{
 			point.SetPart( TryGetAttachment( resource, point.Category, out var part ) ? part : null );
+			// The optic's tuned Eye Position, which RefreshMount (below) slides it along the rail by.
+			if ( point.Category == GunsmithPartType.Optic )
+				point.OpticRailShift = OpticTuning.RailShift( GetOpticEyePosition( resource, point.CurrentPart ) );
 		}
 
 		// A barrel kit and optic can affect the same gas-block bodygroup. Restore

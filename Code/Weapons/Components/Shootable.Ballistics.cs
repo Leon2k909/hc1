@@ -40,8 +40,9 @@ public partial class Shootable
 
 		var path = Ballistics.Get( DragFunction, MuzzleVelocity, BallisticCoefficient );
 		var sightHeight = SightHeight / Ballistics.UnitsPerMeter;
-		// The bore's angle above the line of sight, zeroed on level ground.
-		var elevation = (sightHeight + path.DropAt( ZeroRange )) / ZeroRange;
+		// The bore's angle above the line of sight, zeroed on level ground, at the optic's tuned zero if it has one.
+		var zero = Equipment.IsValid() ? Equipment.GetSightZero( ZeroRange ) : ZeroRange;
+		var elevation = (sightHeight + path.DropAt( zero )) / zero;
 
 		var sights = start;
 		var line = forward;

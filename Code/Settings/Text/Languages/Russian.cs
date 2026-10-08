@@ -1324,5 +1324,24 @@ public static partial class GameText
 		["HEADSHOTS ONLY"] = "Только в голову",
 		["Bullets only hurt in the head or neck. Knives, explosives and fire hurt anywhere."] =
 			"Пули ранят только в голову или шею. Ножи, взрывчатка и огонь ранят куда угодно.",
+
+		// Optic tuning (GunsmithAttachmentBrowser, OpticTuning)
+		["OPTIC TUNING"] = "Настройка прицела",
+		["EYE POSITION"] = "Положение глаза",
+		["NEAR"] = "Ближе",
+		["FAR"] = "Дальше",
+		["TUNE"] = "Настроить",
+		["ZERO"] = "Пристрелка",
+		["Rail position"] = "Положение на планке",
+		["Sight picture"] = "Изображение прицела",
+		["Eye relief"] = "Удаление зрачка",
+		["As mounted"] = "Как установлен",
+		["{0} cm forward"] = "{0} см вперёд",
+		["{0} cm back"] = "{0} см назад",
+		["{0} cm (rated {1} cm)"] = "{0} см (номинал {1} см)",
+		["At {0} m"] = "На {0} м",
+		["Nearer the eye, the sight fills more of the view. Further, more of the world shows round it."] = "Ближе к глазу прицел занимает больше обзора. Дальше — вокруг него видно больше.",
+		["Off its rated eye relief, the scope's picture shrinks and shades at its edge."] = "Вне номинального удаления зрачка изображение прицела уменьшается и темнеет по краю.",
+		["Where bullets drop (Battle Royale), they cross the line of sight at the zero. Elsewhere they go where the sights point."] = "Там, где пули снижаются (Королевская битва), они пересекают линию прицеливания на дальности пристрелки. В остальных режимах летят туда, куда смотрит прицел.",
 	};
 }

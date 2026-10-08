@@ -1281,5 +1281,24 @@ public static partial class GameText
 		["Health doesn't come back until you respawn."] = "重生前生命值不会恢复。",
 		["HEADSHOTS ONLY"] = "仅限爆头",
 		["Bullets only hurt in the head or neck. Knives, explosives and fire hurt anywhere."] = "子弹只有命中头部或颈部才会造成伤害。刀、爆炸物和火焰命中任何部位都会造成伤害。",
+
+		// Optic tuning (GunsmithAttachmentBrowser, OpticTuning)
+		["OPTIC TUNING"] = "瞄具调校",
+		["EYE POSITION"] = "眼睛位置",
+		["NEAR"] = "近",
+		["FAR"] = "远",
+		["TUNE"] = "调校",
+		["ZERO"] = "归零",
+		["Rail position"] = "导轨位置",
+		["Sight picture"] = "瞄准画面",
+		["Eye relief"] = "出瞳距离",
+		["As mounted"] = "按原位安装",
+		["{0} cm forward"] = "前移 {0} 厘米",
+		["{0} cm back"] = "后移 {0} 厘米",
+		["{0} cm (rated {1} cm)"] = "{0} 厘米（额定 {1} 厘米）",
+		["At {0} m"] = "{0} 米处",
+		["Nearer the eye, the sight fills more of the view. Further, more of the world shows round it."] = "离眼睛越近，瞄具占据的视野越大；越远，周围可见的世界越多。",
+		["Off its rated eye relief, the scope's picture shrinks and shades at its edge."] = "偏离额定出瞳距离时，瞄准镜的画面会缩小，边缘变暗。",
+		["Where bullets drop (Battle Royale), they cross the line of sight at the zero. Elsewhere they go where the sights point."] = "在子弹会下坠的模式（大逃杀）中，子弹会在归零距离与瞄准线相交。其他模式中，子弹飞向瞄具所指之处。",
 	};
 }

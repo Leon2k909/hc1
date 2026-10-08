@@ -1325,5 +1325,24 @@ public static partial class GameText
 		["HEADSHOTS ONLY"] = "Tylko strzały w głowę",
 		["Bullets only hurt in the head or neck. Knives, explosives and fire hurt anywhere."] =
 			"Pociski ranią tylko w głowę lub szyję. Noże, materiały wybuchowe i ogień ranią wszędzie.",
+
+		// Optic tuning (GunsmithAttachmentBrowser, OpticTuning)
+		["OPTIC TUNING"] = "Regulacja celownika",
+		["EYE POSITION"] = "Pozycja oka",
+		["NEAR"] = "Blisko",
+		["FAR"] = "Daleko",
+		["TUNE"] = "Reguluj",
+		["ZERO"] = "Przystrzelanie",
+		["Rail position"] = "Pozycja na szynie",
+		["Sight picture"] = "Obraz celownika",
+		["Eye relief"] = "Odsunięcie oka",
+		["As mounted"] = "Jak zamontowano",
+		["{0} cm forward"] = "{0} cm do przodu",
+		["{0} cm back"] = "{0} cm do tyłu",
+		["{0} cm (rated {1} cm)"] = "{0} cm (znamionowo {1} cm)",
+		["At {0} m"] = "Na {0} m",
+		["Nearer the eye, the sight fills more of the view. Further, more of the world shows round it."] = "Bliżej oka celownik zajmuje więcej widoku. Dalej widać więcej świata wokół.",
+		["Off its rated eye relief, the scope's picture shrinks and shades at its edge."] = "Poza znamionowym odsunięciem oka obraz lunety maleje i ciemnieje na brzegu.",
+		["Where bullets drop (Battle Royale), they cross the line of sight at the zero. Elsewhere they go where the sights point."] = "Tam, gdzie pociski opadają (Battle Royale), przecinają linię celowania na odległości przystrzelania. Gdzie indziej lecą tam, gdzie wskazują przyrządy celownicze.",
 	};
 }

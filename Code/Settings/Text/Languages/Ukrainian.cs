@@ -1322,5 +1322,24 @@ public static partial class GameText
 		["HEADSHOTS ONLY"] = "Тільки в голову",
 		["Bullets only hurt in the head or neck. Knives, explosives and fire hurt anywhere."] =
 			"Кулі ранять лише в голову або шию. Ножі, вибухівка й вогонь ранять будь-куди.",
+
+		// Optic tuning (GunsmithAttachmentBrowser, OpticTuning)
+		["OPTIC TUNING"] = "Налаштування приціла",
+		["EYE POSITION"] = "Положення ока",
+		["NEAR"] = "Ближче",
+		["FAR"] = "Далі",
+		["TUNE"] = "Налаштувати",
+		["ZERO"] = "Пристрілка",
+		["Rail position"] = "Положення на планці",
+		["Sight picture"] = "Зображення приціла",
+		["Eye relief"] = "Винесення зіниці",
+		["As mounted"] = "Як встановлено",
+		["{0} cm forward"] = "{0} см вперед",
+		["{0} cm back"] = "{0} см назад",
+		["{0} cm (rated {1} cm)"] = "{0} см (номінал {1} см)",
+		["At {0} m"] = "На {0} м",
+		["Nearer the eye, the sight fills more of the view. Further, more of the world shows round it."] = "Ближче до ока приціл займає більше огляду. Далі — довкола видно більше світу.",
+		["Off its rated eye relief, the scope's picture shrinks and shades at its edge."] = "Поза номінальним винесенням зіниці зображення приціла зменшується й темнішає по краю.",
+		["Where bullets drop (Battle Royale), they cross the line of sight at the zero. Elsewhere they go where the sights point."] = "Там, де кулі знижуються (Королівська битва), вони перетинають лінію прицілювання на дальності пристрілки. В інших режимах летять туди, куди вказує приціл.",
 	};
 }

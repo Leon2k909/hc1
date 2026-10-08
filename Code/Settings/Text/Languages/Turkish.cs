@@ -1324,5 +1324,24 @@ public static partial class GameText
 		["HEADSHOTS ONLY"] = "Sadece kafadan vuruş",
 		["Bullets only hurt in the head or neck. Knives, explosives and fire hurt anywhere."] =
 			"Mermiler yalnızca kafaya veya boyna isabet ederse zarar verir. Bıçaklar, patlayıcılar ve ateş her yere zarar verir.",
+
+		// Optic tuning (GunsmithAttachmentBrowser, OpticTuning)
+		["OPTIC TUNING"] = "Nişangâh ayarı",
+		["EYE POSITION"] = "Göz konumu",
+		["NEAR"] = "Yakın",
+		["FAR"] = "Uzak",
+		["TUNE"] = "Ayarla",
+		["ZERO"] = "Sıfırlama",
+		["Rail position"] = "Ray konumu",
+		["Sight picture"] = "Nişan görüntüsü",
+		["Eye relief"] = "Göz mesafesi",
+		["As mounted"] = "Takıldığı gibi",
+		["{0} cm forward"] = "{0} cm ileri",
+		["{0} cm back"] = "{0} cm geri",
+		["{0} cm (rated {1} cm)"] = "{0} cm (anma {1} cm)",
+		["At {0} m"] = "{0} m'de",
+		["Nearer the eye, the sight fills more of the view. Further, more of the world shows round it."] = "Göze yakın olunca nişangâh görüşün daha çoğunu kaplar. Uzakta, çevresinde dünyanın daha çoğu görünür.",
+		["Off its rated eye relief, the scope's picture shrinks and shades at its edge."] = "Anma göz mesafesinin dışında dürbünün görüntüsü küçülür ve kenarı kararır.",
+		["Where bullets drop (Battle Royale), they cross the line of sight at the zero. Elsewhere they go where the sights point."] = "Mermilerin düştüğü yerde (Battle Royale), sıfırlama mesafesinde nişan hattını keserler. Başka yerlerde nişangâhın gösterdiği yere giderler.",
 	};
 }

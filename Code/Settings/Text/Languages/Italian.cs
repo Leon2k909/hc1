@@ -1330,5 +1330,24 @@ public static partial class GameText
 		["HEADSHOTS ONLY"] = "Solo colpi alla testa",
 		["Bullets only hurt in the head or neck. Knives, explosives and fire hurt anywhere."] =
 			"I proiettili feriscono solo alla testa o al collo. Coltelli, esplosivi e fuoco feriscono ovunque.",
+
+		// Optic tuning (GunsmithAttachmentBrowser, OpticTuning)
+		["OPTIC TUNING"] = "Regolazione dell'ottica",
+		["EYE POSITION"] = "Posizione dell'occhio",
+		["NEAR"] = "Vicino",
+		["FAR"] = "Lontano",
+		["TUNE"] = "Regola",
+		["ZERO"] = "Azzeramento",
+		["Rail position"] = "Posizione sulla slitta",
+		["Sight picture"] = "Immagine di mira",
+		["Eye relief"] = "Estrazione pupillare",
+		["As mounted"] = "Come montata",
+		["{0} cm forward"] = "{0} cm in avanti",
+		["{0} cm back"] = "{0} cm indietro",
+		["{0} cm (rated {1} cm)"] = "{0} cm (nominale {1} cm)",
+		["At {0} m"] = "A {0} m",
+		["Nearer the eye, the sight fills more of the view. Further, more of the world shows round it."] = "Più vicino all'occhio, il mirino riempie di più la vista. Più lontano, si vede più mondo intorno.",
+		["Off its rated eye relief, the scope's picture shrinks and shades at its edge."] = "Fuori dalla sua estrazione pupillare nominale, l'immagine del cannocchiale si rimpicciolisce e si scurisce ai bordi.",
+		["Where bullets drop (Battle Royale), they cross the line of sight at the zero. Elsewhere they go where the sights point."] = "Dove i proiettili cadono (Battle Royale), incrociano la linea di mira alla distanza di azzeramento. Altrove vanno dove puntano le mire.",
 	};
 }

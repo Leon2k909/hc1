@@ -10,7 +10,18 @@
 }
 <root class="hc1 @(SelectedPoint.IsValid() ? "browsing" : "") @(points.Any() ? "has-slots" : "no-slots")">
     @* The gunsmith's right column: one row per slot, and picking a slot swaps the list for that slot's parts. *@
-    @if ( SelectedPoint.IsValid() )
+    @if ( IsTuning )
+    {
+        <div class="ab-head">
+            <div class="ab-back" onclick=@Back><i>arrow_back</i></div>
+            <div class="ab-heading">
+                <label class="ab-caption">@Tr( "OPTIC TUNING" )</label>
+                <label class="ab-title ab-tune-title">@SelectedPoint.CurrentPart.Name</label>
+            </div>
+            <div class="ab-tune-reset" onclick=@ResetTune><label>@Tr( "RESET" )</label></div>
+        </div>
+    }
+    else if ( SelectedPoint.IsValid() )
     {
         <div class="ab-head">
             <div class="ab-back" onclick=@Close><i>arrow_back</i></div>
@@ -34,7 +45,7 @@
     }
 
     @* Unlock points: one every 5 player levels, spent on any locked attachment (AttachmentUnlocks). *@
-    @if ( Weapon.IsValid() && !AttachmentUnlocks.UnlockAll )
+    @if ( Weapon.IsValid() && !AttachmentUnlocks.UnlockAll && !IsTuning )
     {
         <div class="ab-points @(unlockPoints > 0 ? "has-points" : "")">
             <i>key</i>
@@ -44,7 +55,74 @@
         </div>
     }
 
-    @if ( SelectedPoint.IsValid() )
+    @if ( IsTuning )
+    {
+        var optic = SelectedPoint.CurrentPart;
+        var travel = OpticTuning.RailTravel( Weapon.Resource );
+        var eye = (int)TuneEye;
+        var shift = OpticTuning.RailShift( eye );
+        var relief = OpticTuning.RatedEyeRelief( optic );
+        var shootable = OpticTuning.FactoryShootable( Weapon.Resource );
+        var zeros = OpticTuning.ZeroChoices( shootable );
+        var zero = CurrentZero( shootable );
+        <div class="ab-list ab-tune">
+            @* Eye Position: the optic slides along its rail, a slot at a time (OpticTuning). *@
+            <div class="ab-tune-card">
+                <div class="ab-tune-head">
+                    <label class="ab-tune-name">@Tr( "EYE POSITION" )</label>
+                    <label class="ab-tune-value">@(eye == 0 ? "0" : eye.ToString( "+0;-0" ))</label>
+                </div>
+                <div class="ab-tune-slider">
+                    <CustomSlider Value:bind="@TuneEye" Min=@((float)-travel.Back) Max=@((float)travel.Forward) Step=@(1f) NumberFormat="0" ShowTextEntry="@false" ShowValueTooltip="@false" />
+                </div>
+                <div class="ab-tune-ends"><label>@Tr( "NEAR" )</label><label>@Tr( "FAR" )</label></div>
+                <div class="ab-tune-row">
+                    <label>@Tr( "Rail position" )</label>
+                    <label class="ab-tune-figure">@RailText( shift )</label>
+                </div>
+                <div class="ab-tune-row">
+                    <label>@Tr( "Sight picture" )</label>
+                    <label class="ab-tune-figure">@PictureText( optic, shift )</label>
+                </div>
+                @if ( relief > 0f )
+                {
+                    <div class="ab-tune-row">
+                        <label>@Tr( "Eye relief" )</label>
+                        <label class="ab-tune-figure">@Tr( "{0} cm (rated {1} cm)", Cm( relief + shift ), Cm( relief ) )</label>
+                    </div>
+                }
+                <label class="ab-tune-note">@Tr( "Nearer the eye, the sight fills more of the view. Further, more of the world shows round it." )</label>
+                @if ( relief > 0f && eye != 0 )
+                {
+                    <label class="ab-tune-note warn">@Tr( "Off its rated eye relief, the scope's picture shrinks and shades at its edge." )</label>
+                }
+            </div>
+
+            @* Zero: the elevation turret, where the bullet's path crosses the line of sight. *@
+            @if ( zeros.Count > 1 )
+            {
+                <div class="ab-tune-card">
+                    <div class="ab-tune-head">
+                        <label class="ab-tune-name">@Tr( "ZERO" )</label>
+                        <label class="ab-tune-value">@ZeroText( zero, shootable )</label>
+                    </div>
+                    <div class="ab-tune-slider">
+                        <CustomSlider Value:bind="@TuneZero" Min=@(0f) Max=@((float)(zeros.Count - 1)) Step=@(1f) NumberFormat="0" ShowTextEntry="@false" ShowValueTooltip="@false" />
+                    </div>
+                    <div class="ab-tune-ends"><label>@RangeText( zeros[0] )</label><label>@RangeText( zeros[^1] )</label></div>
+                    @foreach ( var range in ImpactRanges )
+                    {
+                        <div class="ab-tune-row">
+                            <label>@Tr( "At {0} m", range )</label>
+                            <label class="ab-tune-figure">@ImpactText( shootable, zero, range )</label>
+                        </div>
+                    }
+                    <label class="ab-tune-note">@Tr( "Where bullets drop (Battle Royale), they cross the line of sight at the zero. Elsewhere they go where the sights point." )</label>
+                </div>
+            }
+        </div>
+    }
+    else if ( SelectedPoint.IsValid() )
     {
         var options = new List<GunsmithPart> { null };
         options.AddRange( GetParts( SelectedPoint.Category ) );
@@ -79,6 +157,10 @@
                             <label class="ab-state">@state</label>
                         }
                     </div>
+                    @if ( equipped && OpticTuning.IsTunable( part ) )
+                    {
+                        <div class="ab-tune-btn @(IsTuned( part ) ? "tuned" : "")" @onclick=@(( PanelEvent e ) => OpenTune( e, SelectedPoint ))><i>tune</i><label>@Tr( "TUNE" )</label></div>
+                    }
                     <div class="ab-plus"><i>@(equipped ? "check" : unlocked ? "add" : armed ? "lock_open" : unlockPoints > 0 ? "key" : "lock")</i></div>
                 </div>
             }
@@ -110,6 +192,10 @@
                         </div>
                         <label class="ab-part">@(current.IsValid() ? current.Name : StandardName( point.Category ))</label>
                     </div>
+                    @if ( OpticTuning.IsTunable( current ) )
+                    {
+                        <div class="ab-tune-btn @(IsTuned( current ) ? "tuned" : "")" @onclick=@(( PanelEvent e ) => OpenTune( e, point ))><i>tune</i><label>@Tr( "TUNE" )</label></div>
+                    }
                     <div class="ab-plus"><i>@(current.IsValid() ? "swap_horiz" : "add")</i></div>
                 </div>
             }
@@ -224,7 +310,132 @@
         selectedCategory = null;
         selectedWeaponPath = null;
         _armedPart = null;
+        _tuning = false;
         StateHasChanged();
+    }
+
+    /// <summary> One step back: tuning to the optic's parts, then the parts to the slots. </summary>
+    public void Back()
+    {
+        if ( IsTuning )
+        {
+            _tuning = false;
+            StateHasChanged();
+        }
+        else Close();
+    }
+
+    // ── Optic tuning (OpticTuning), after MWII's: Eye Position and the zero, saved per weapon and optic ──
+
+    private bool _tuning;
+
+    /// <summary> The tune view is open, for the Optic slot's fitted part (SelectedPoint). </summary>
+    public bool IsTuning => _tuning && Weapon.IsValid() && Weapon.Resource.IsValid() && SelectedPoint.IsValid()
+        && SelectedPoint.Category == GunsmithPartType.Optic && OpticTuning.IsTunable( SelectedPoint.CurrentPart );
+
+    /// <summary> TUNE, inside a clickable row: opens the tune view without the row's own click firing too. </summary>
+    private void OpenTune( PanelEvent e, GunsmithAttachmentPoint point )
+    {
+        e.StopPropagation();
+        if ( !point.IsValid() || !OpticTuning.IsTunable( point.CurrentPart ) ) return;
+        SelectPoint( point );
+        _armedPart = null;
+        _tuning = true;
+        StateHasChanged();
+    }
+
+    private bool IsTuned( GunsmithPart optic ) => Weapon.IsValid()
+        && (GunsmithLoadoutManager.GetOpticEyePosition( Weapon.Resource, optic ) != 0 || GunsmithLoadoutManager.GetOpticZero( Weapon.Resource, optic ) != 0);
+
+    /// <summary> Eye Position, in rail slots (forward positive). </summary>
+    private float TuneEye
+    {
+        get => IsTuning ? GunsmithLoadoutManager.GetOpticEyePosition( Weapon.Resource, SelectedPoint.CurrentPart ) : 0f;
+        set
+        {
+            if ( !IsTuning ) return;
+            GunsmithLoadoutManager.SetOpticEyePosition( Weapon.Resource, SelectedPoint.CurrentPart, (int)MathF.Round( value ) );
+            RefitRail();
+            StateHasChanged();
+        }
+    }
+
+    /// <summary> The zero, as its place in <see cref="OpticTuning.ZeroChoices"/>. The gun's own is saved as 0. </summary>
+    private float TuneZero
+    {
+        get
+        {
+            if ( !IsTuning ) return 0f;
+            var shootable = OpticTuning.FactoryShootable( Weapon.Resource );
+            return Math.Max( OpticTuning.ZeroChoices( shootable ).IndexOf( CurrentZero( shootable ) ), 0 );
+        }
+        set
+        {
+            if ( !IsTuning ) return;
+            var shootable = OpticTuning.FactoryShootable( Weapon.Resource );
+            var zeros = OpticTuning.ZeroChoices( shootable );
+            if ( zeros.Count == 0 ) return;
+            var zero = zeros[Math.Clamp( (int)MathF.Round( value ), 0, zeros.Count - 1 )];
+            GunsmithLoadoutManager.SetOpticZero( Weapon.Resource, SelectedPoint.CurrentPart, zero == FactoryZero( shootable ) ? 0 : zero );
+            StateHasChanged();
+        }
+    }
+
+    private void ResetTune()
+    {
+        if ( !IsTuning ) return;
+        GunsmithLoadoutManager.SetOpticEyePosition( Weapon.Resource, SelectedPoint.CurrentPart, 0 );
+        GunsmithLoadoutManager.SetOpticZero( Weapon.Resource, SelectedPoint.CurrentPart, 0 );
+        RefitRail();
+        StateHasChanged();
+    }
+
+    /// <summary> Slides the stage gun's optic to the saved Eye Position. Its mount follows the point every update. </summary>
+    private void RefitRail()
+    {
+        var shift = OpticTuning.RailShift( (int)TuneEye );
+        foreach ( var point in Weapon.GetComponentsInChildren<GunsmithAttachmentPoint>( true ).Where( p => p.Category == GunsmithPartType.Optic ) )
+            point.OpticRailShift = shift;
+    }
+
+    private static int FactoryZero( Shootable shootable ) => shootable.IsValid() ? (int)MathF.Round( shootable.ZeroRange ) : 0;
+
+    /// <summary> The range the sights are zeroed at, in metres: the tuned one, or the gun's own. </summary>
+    private int CurrentZero( Shootable shootable )
+    {
+        var zero = IsTuning ? GunsmithLoadoutManager.GetOpticZero( Weapon.Resource, SelectedPoint.CurrentPart ) : 0;
+        return zero > 0 ? zero : FactoryZero( shootable );
+    }
+
+    /// <summary> The ranges the zero card shows the bullet's height at. </summary>
+    private static readonly int[] ImpactRanges = { 50, 100, 200, 300 };
+
+    private static string Cm( float inches ) => (inches * 2.54f).ToString( "0.0" );
+
+    private static string RangeText( int metres ) => $"{metres} M";
+
+    private static string RailText( float shift ) => MathF.Abs( shift ) < 0.001f ? Tr( "As mounted" )
+        : shift > 0f ? Tr( "{0} cm forward", Cm( shift ) ) : Tr( "{0} cm back", Cm( -shift ) );
+
+    /// <summary>
+    /// How big the sight looks against its usual place: its window (or a scope's eyepiece) seen from further or nearer,
+    /// so its size goes as one over the distance.
+    /// </summary>
+    private static string PictureText( GunsmithPart optic, float shift )
+    {
+        var relief = OpticTuning.RatedEyeRelief( optic );
+        var distance = relief > 0f ? relief : OpticTuning.OriginDistance( optic );
+        return distance <= 0.5f ? "100%" : $"{100f * distance / MathF.Max( distance + shift, 0.5f ):0}%";
+    }
+
+    private static string ZeroText( int zero, Shootable shootable ) =>
+        zero == FactoryZero( shootable ) ? $"{RangeText( zero )} · {Tr( "FACTORY" )}" : RangeText( zero );
+
+    /// <summary> Where the bullet passes the point of aim at a range, e.g. "+12 CM". </summary>
+    private static string ImpactText( Shootable shootable, int zero, int range )
+    {
+        var cm = MathF.Round( OpticTuning.HeightAt( shootable, zero, range ) * 100f );
+        return cm == 0f ? "0 CM" : $"{cm:+0;-0} CM";
     }
 
     private void Equip( GunsmithPart part )
@@ -312,6 +523,8 @@
         hash.Add( AttachmentUnlocks.UnlockAll );
         hash.Add( AttachmentUnlocks.AvailablePoints ); hash.Add( AttachmentUnlocks.NextPointLevel );
         hash.Add( _armedPart ); hash.Add( AttachmentThumbnails.Version );
+        hash.Add( IsTuning );
+        if ( IsTuning ) { hash.Add( TuneEye ); hash.Add( TuneZero ); }
         foreach ( var point in GetPoints() )
         {
             hash.Add( point ); hash.Add( point.CurrentPart );

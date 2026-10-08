@@ -1311,5 +1311,24 @@ public static partial class GameText
 		["HEADSHOTS ONLY"] = "ヘッドショットのみ",
 		["Bullets only hurt in the head or neck. Knives, explosives and fire hurt anywhere."] =
 			"弾は頭か首に当たった時だけダメージを与えます。ナイフ、爆発物、炎はどこに当たってもダメージを与えます。",
+
+		// Optic tuning (GunsmithAttachmentBrowser, OpticTuning)
+		["OPTIC TUNING"] = "光学サイト調整",
+		["EYE POSITION"] = "目の位置",
+		["NEAR"] = "近",
+		["FAR"] = "遠",
+		["TUNE"] = "調整",
+		["ZERO"] = "ゼロイン",
+		["Rail position"] = "レール位置",
+		["Sight picture"] = "サイトの見え方",
+		["Eye relief"] = "アイレリーフ",
+		["As mounted"] = "取り付けたまま",
+		["{0} cm forward"] = "{0} cm 前方",
+		["{0} cm back"] = "{0} cm 後方",
+		["{0} cm (rated {1} cm)"] = "{0} cm（定格 {1} cm）",
+		["At {0} m"] = "{0} m地点",
+		["Nearer the eye, the sight fills more of the view. Further, more of the world shows round it."] = "目に近いほどサイトが視界を大きく占め、遠いほど周囲が多く見えます。",
+		["Off its rated eye relief, the scope's picture shrinks and shades at its edge."] = "定格のアイレリーフから外れると、スコープの像が小さくなり縁が暗くなります。",
+		["Where bullets drop (Battle Royale), they cross the line of sight at the zero. Elsewhere they go where the sights point."] = "弾が落下するモード（バトルロイヤル）では、ゼロイン距離で照準線と交わります。それ以外では照準の指す所へ飛びます。",
 	};
 }

@@ -1308,5 +1308,24 @@ public static partial class GameText
 		["HEADSHOTS ONLY"] = "헤드샷만",
 		["Bullets only hurt in the head or neck. Knives, explosives and fire hurt anywhere."] =
 			"총알은 머리나 목에 맞았을 때만 피해를 줍니다. 칼, 폭발물, 불은 어디든 피해를 줍니다.",
+
+		// Optic tuning (GunsmithAttachmentBrowser, OpticTuning)
+		["OPTIC TUNING"] = "조준경 튜닝",
+		["EYE POSITION"] = "눈 위치",
+		["NEAR"] = "가깝게",
+		["FAR"] = "멀게",
+		["TUNE"] = "튜닝",
+		["ZERO"] = "영점",
+		["Rail position"] = "레일 위치",
+		["Sight picture"] = "조준 화면",
+		["Eye relief"] = "아이 릴리프",
+		["As mounted"] = "장착 그대로",
+		["{0} cm forward"] = "{0}cm 앞으로",
+		["{0} cm back"] = "{0}cm 뒤로",
+		["{0} cm (rated {1} cm)"] = "{0}cm (정격 {1}cm)",
+		["At {0} m"] = "{0}m에서",
+		["Nearer the eye, the sight fills more of the view. Further, more of the world shows round it."] = "눈에 가까울수록 조준경이 시야를 더 많이 차지하고, 멀수록 주변이 더 많이 보입니다.",
+		["Off its rated eye relief, the scope's picture shrinks and shades at its edge."] = "정격 아이 릴리프를 벗어나면 스코프 화면이 작아지고 가장자리가 어두워집니다.",
+		["Where bullets drop (Battle Royale), they cross the line of sight at the zero. Elsewhere they go where the sights point."] = "탄이 낙하하는 곳(배틀 로얄)에서는 영점 거리에서 조준선과 교차합니다. 그 밖에는 조준점이 가리키는 곳으로 갑니다.",
 	};
 }

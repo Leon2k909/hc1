@@ -56,6 +56,12 @@ public partial class GunsmithAttachmentPoint : Component
 	[Property, ShowIf( nameof( Category ), GunsmithPartType.Sticker )]
 	public string StickerBone { get; set; }
 
+	/// <summary>
+	/// An Optic point's tuned Eye Position (<see cref="OpticTuning"/>): how far the optic slides along the bore from where
+	/// it mounts, in inches, forward positive. Set with the build by <see cref="GunsmithLoadoutManager.ApplyAttachments"/>.
+	/// </summary>
+	public float OpticRailShift { get; set; }
+
 	/// <summary>The fitted barrel's <see cref="GunsmithPart.MuzzleShift"/> on this weapon, zero for the factory barrel.</summary>
 	public static Vector3 MuzzleShift( GameObject weapon ) =>
 		weapon.Components.GetAll<GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants )

@@ -30,4 +30,16 @@ public partial class Equipment
 		var unzoomed = fov.Clamp( 10f, 150f );
 		return 2f * MathF.Atan( MathF.Tan( unzoomed * MathF.PI / 360f ) / magnification ) * 180f / MathF.PI;
 	}
+
+	/// <summary>
+	/// The range the sights are zeroed at, in metres: the fitted optic's tuned zero (<see cref="OpticTuning"/>), or
+	/// <paramref name="factory"/>. Only the owner's own build has a tune; a gun picked up off the floor shoots at its factory zero.
+	/// </summary>
+	public float GetSightZero( float factory )
+	{
+		if ( !ApplySavedAttachments || !Resource.IsValid() || !TryGetOpticAim( out var optic ) || !OpticTuning.IsTunable( optic ) )
+			return factory;
+		var zero = GunsmithLoadoutManager.GetOpticZero( Resource, optic );
+		return zero > 0 ? zero : factory;
+	}
 }
