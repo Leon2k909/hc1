@@ -3274,6 +3274,17 @@ simulate_input.
     (fixed 2026-10-08).
 - The sky is its own (`Tools/cerroblanco_sky.py`, on belltower_sky's code): cloudless and deep blue, as in the
   pictures, baked with the map's sun. `--width 2048 --supersample 1` is plenty for a gradient.
+- The clear glass (`cb_glass`) is rw_glass with a museum's low-e tint (0.78, 0.84, 0.85): it passes ~80% of the light,
+  a little cool, so the rooms behind it read darker than the sunlit outside and its reflections show.
+  - What it reflects comes from the probes (`PROBES`): one per room and the courtyard (priority 1), and `GROUNDS_PROBE`
+    over the whole play area (priority 0, reach 20000, far 60000), which gives the outside of every pane the sky, the
+    hills and the town.
+  - Without the grounds' probe, the panes outside every room's and the courtyard's box (the rotunda's front, the upper
+    drum, the galleries' outer windows) had no probe and read flat grey. The courtyard's box runs to e 496, past the
+    Glass Room's curtain wall (e 489), so those panes reflect the courtyard.
+  - Checked offscreen in the editor on 2026-10-09, with the probes forced (`CreateTexture`, then `RenderCubemap`, by
+    reflection), from the forecourt, the courtyard, the stage and the South Gallery: the panes show the dark rooms and
+    the sky, and the frit and the balustrades are unchanged.
 - Offline renders (railhead_render through Blender's Cycles, with the scene's sky and the models'
   textures) were compared with the pictures on 2026-10-08: the courtyard and stage, the West Gallery's balcony and
   banners, and the South Gallery's front with its sculptures from the pictures' angle.
@@ -3311,8 +3322,16 @@ simulate_input.
     - 9-10 bots fought a TDM across it: 48 kills in the first 3 minutes.
     - The rotunda's drums and the museum's sign were seen from the forecourt, and the Glass Room from inside (its
       panels, the curtain wall with the sky through it, the plinth, the door to the terrace).
-  - Not yet checked: Defuse and the other modes' objects (only TDM was played), and the clear glass, which reads flat
-    grey where the pictures' reflects the sky.
+  - The modes' objects were checked on a navmesh generated offscreen in the editor on 2026-10-09 (the scene's colliders
+    in a `new Scene()`, with the scene's agent, excluded tags and bounds):
+    - All 81 spawns (team, deathmatch and Retakes), both bomb sites, the Domination flags, the six Hot Zones and the
+      three cash and extraction points are on it, with complete paths from both team spawns.
+    - 40 random navmesh points in each bomb site and buy zone: all reachable from both spawns, except a few in Blue
+      Team's buy zone. Those are on top of the spire sculpture's travertine block (76 high, with a 4-high lip round it)
+      and a bench (32), which only mantling reaches. Bots check their paths, as on the other maps.
+    - The scene's mode objects match Belltower's: 2 bomb sites, 2 buy zones, 9 `ObjectiveSpot`s, 3 cash and 3
+      extraction points, and the same `GameModeObject` filters.
+  - Not yet checked: a Defuse, Retakes, Domination, Hot Zone or Cash Grab match played on it (only TDM was played).
 - To play it: `dev_mode team_deathmatch cerroblanco`.
 
 ## Ridgeback (battle royale map, `Assets/scenes/maps/Ridgeback/`)

@@ -123,7 +123,12 @@ def write_materials():
     glass = ( K.ASSETS / "materials/railhead/rw_glass.vmat" ).read_text( encoding="utf-8" )
     lines = [ "// Tools/cerroblanco_map.py, from materials/railhead/rw_glass.vmat" if line.startswith( "//" ) else line
               for line in glass.splitlines() ]
-    K.write_text( MAT_DIR / f"{P.GLAZE}.vmat", "\n".join( lines ) + "\n" )
+    # A museum's glazing is low-e coated: it lets through ~75-80% of the light, a little cool, where rw_glass passes 92%.
+    # So the rooms behind it read darker than the sunlit outside, and its reflections show, as in the references.
+    clear = { "TextureColor": "[0.780000 0.840000 0.850000 0.000000]" }
+    glaze = [ f'    {line.split()[0]} "{clear[line.split()[0]]}"' if line.split() and line.split()[0] in clear else line
+              for line in lines ]
+    K.write_text( MAT_DIR / f"{P.GLAZE}.vmat", "\n".join( glaze ) + "\n" )
     # The fritted panes: rough enough that 40% of their pale colour is lit, and the rest blurred through.
     frit = { "g_flBlurAmount": "0.25", "AlbedoAbsorption": "0.9", "TextureColor": "[0.820000 0.900000 0.880000 0.000000]",
              "TextureRoughness": "[0.450000 0.450000 0.450000 0.000000]" }
@@ -1017,7 +1022,10 @@ def lights():
     return out
 
 
-# ( name, centre, the box they cover e0, e1, n0, n1, z0, z1 )
+# ( name, centre, the box they cover e0, e1, n0, n1, z0, z1 ). The rooms' and the courtyard's probes win where their
+# boxes overlap the grounds' (priority 1 over 0). The grounds' probe gives the outside of every pane the sky, the hills
+# and the town: without it the glass outside the courtyard's box (the rotunda's front, the upper drum, the galleries'
+# outer windows) had no probe and reflected a flat grey.
 PROBES = [
     ( "West Gallery", ( -880, 650, 150 ), ( -1108, -668, -142, 1492, 0, 344 ) ),
     ( "West Gallery North", ( -430, 1280, 150 ), ( -668, -218, 1068, 1492, 0, 344 ) ),
@@ -1027,9 +1035,11 @@ PROBES = [
     ( "North Gallery", ( 1530, 350, 150 ), ( 1018, 2042, 0, 697, 0, 344 ) ),
     ( "East Hall", ( 940, -500, 150 ), ( 498, 1382, -982, -18, 0, 344 ) ),
     ( "South Gallery", ( -275, -1575, 150 ), ( -1012, 462, -2132, -1018, 0, 314 ) ),
-    ( "Courtyard", ( -80, 0, 150 ), ( -650, 480, -1000, 1050, -10, 500 ) ),
+    # To e 496, past the Glass Room's curtain wall (e 489), so its panes reflect the courtyard.
+    ( "Courtyard", ( -80, 0, 150 ), ( -650, 496, -1000, 1050, -10, 500 ) ),
     ( "Portico", ( -275, -2285, 120 ), ( -1060, 510, -2420, -2150, -10, 272 ) ),
 ]
+GROUNDS_PROBE = ( "Grounds", ( ROTUNDA[0], 2000, 220 ), ( PLAY[0], PLAY[1], PLAY[2], PLAY[3], -60, 900 ) )
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -1249,7 +1259,8 @@ def model_object( name, key, model_name, collide=True, shadows=True ):
     return K.game_object( ids, name, key, components=components, tags=tags )
 
 
-def probe_object( name, centre, box ):
+def probe_object( name, centre, box, priority=1, reach=512, far=4096 ):
+    """ An envmap probe. `reach` is how near a camera must be for it to render (EnvmapProbe.MaxDistance). """
     e0, e1, n0, n1, z0, z1 = box
     at = K.to_world( centre )
     lo = K.to_world( ( e1, n0, z0 ) ) - at
@@ -1257,8 +1268,9 @@ def probe_object( name, centre, box ):
     key = f"probe/{name}"
     return K.game_object( ids, f"Probe {name}", key, at, components=[
         K.component( ids, "Sandbox.EnvmapProbe", f"{key}/probe", Bounds={ "Mins": K.vec( lo ), "Maxs": K.vec( hi ) },
-                     DelayBetweenUpdates=0.1, Feathering=0.04, FrameInterval=5, MaxDistance=512, Projection="Box",
-                     RenderDynamically=True, TintColor="1,1,1,1", UpdateStrategy="OnEnabled", ZFar=4096, ZNear=8 ) ] )
+                     DelayBetweenUpdates=0.1, Feathering=0.04, FrameInterval=5, MaxDistance=reach, Priority=priority,
+                     Projection="Box", RenderDynamically=True, TintColor="1,1,1,1", UpdateStrategy="OnEnabled", ZFar=far,
+                     ZNear=8 ) ] )
 
 
 def look_object():
@@ -1389,7 +1401,8 @@ def write_scene( written, light_list, props ):
         world,
         K.game_object( ids, "Trees", "foliage", children=foliage ),
         K.game_object( ids, "Lights", "lights", children=light_objects ),
-        K.game_object( ids, "Reflection Probes", "probes", children=[ probe_object( *p ) for p in PROBES ] ),
+        K.game_object( ids, "Reflection Probes", "probes", children=[ probe_object( *p ) for p in PROBES ]
+                       + [ probe_object( *GROUNDS_PROBE, priority=0, reach=20000, far=60000 ) ] ),
         mode_group( "Team Spawns", "spawns", ( "Deathmatch", "Gun Game" ), team_spawns, inverse=True ),
         mode_group( "Deathmatch Spawns", "spawns/dm", ( "Deathmatch", "Gun Game" ), dm_spawns ),
         mode_group( "Retakes Spawns", "spawns/retakes", ( "Retakes", ), retakes_spawns ),
