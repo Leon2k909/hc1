@@ -1,141 +1,115 @@
 @import "/UI/Styles/Theme.scss";
 
-// Bottom left. The plate keeps the numbers readable over the world without a box's hard edge: it fades out towards the
-// screen's middle. Health is white, amber when hurt and red when low, where the edge pulses.
+// Bottom left, with no plate: the numbers and bars sit on the world with a dark halo. Health is white, amber when hurt
+// and red when low, where the bar pulses. Armour is the thin blue bar under it.
 Vitals
 {
     position: relative;
+    flex-direction: column;
+    width: 300px;
     font-family: $hud-font;
 
     label { font-family: $hud-font; }
 
-    .plate
+    .numbers
     {
-        position: relative;
-        flex-direction: column;
-        gap: 8px;
-        min-width: 320px;
-        padding: 11px 46px 12px 17px;
-        background-image: linear-gradient( to right, $hud-plate 0%, rgba( $hud-ink, 0.76 ) 82%, $hud-plate-fade 100% );
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: space-between;
+        margin-bottom: 5px;
     }
 
-    // The outer edge, in health's state colour.
-    .edge
-    {
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 3px;
-        background-color: rgba( $hud-health, 0.85 );
-    }
-
-    // A hairline along the top, fading out with the plate.
-    .sheen
-    {
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 0;
-        height: 1px;
-        background-image: linear-gradient( to right, rgba( white, 0.24 ), rgba( white, 0 ) );
-    }
-
-    .health-row, .armor-row
+    .health, .armor
     {
         flex-direction: row;
         align-items: center;
-        gap: 12px;
+        gap: 6px;
+    }
+
+    .glyph
+    {
+        filter: drop-shadow( $hud-halo-soft );
     }
 
     .value
     {
-        min-width: 64px;
-        font-size: 42px;
+        font-size: 38px;
         font-weight: bold;
-        line-height: 40px;
+        line-height: 36px;
         color: $hud-health;
-        text-shadow: 0 1px 4px rgba( black, 0.7 );
+        text-shadow: $hud-halo;
     }
 
-    .bar-column
+    .armor
     {
-        flex-grow: 1;
-        flex-direction: column;
-        gap: 6px;
+        margin-bottom: 3px;
+
+        .glyph { opacity: 0.9; }
     }
 
-    .caption-row
+    .value-sm
     {
-        flex-direction: row;
-        align-items: center;
-        gap: 6px;
-
-        Icon { opacity: 0.7; }
-    }
-
-    .caption
-    {
-        font-size: 11px;
+        min-width: 30px;
+        font-size: 19px;
         font-weight: bold;
-        letter-spacing: 2.5px;
-        color: $hud-text-dim;
+        line-height: 19px;
+        text-align: right;
+        color: $hud-armor;
+        text-shadow: $hud-halo;
     }
 
-    // Ten segments, each a tenth of the bar, leaning like the menus' cut corners.
-    .segments
+    .helmet
     {
-        flex-direction: row;
-        gap: 3px;
-        height: 11px;
-        padding-left: 2px;
+        margin-right: 4px;
+        filter: drop-shadow( $hud-halo-soft );
     }
 
-    .seg
+    // Health's bar: the track shows its full length over any floor, the ghost what the last hit took off.
+    .health-bar
     {
         position: relative;
-        flex-grow: 1;
-        height: 100%;
+        height: 8px;
         background-color: $hud-track;
-        transform: skewX( -16deg );
+        border: 1px solid $hud-track-edge;
 
-        .fill
+        .fill, .ghost
         {
             position: absolute;
             left: 0;
             top: 0;
             bottom: 0;
+        }
+
+        .fill
+        {
             background-color: $hud-health;
         }
-    }
 
-    .armor-value
-    {
-        min-width: 64px;
-        flex-direction: row;
-        align-items: center;
-        gap: 6px;
+        // Follows the fill down after a pause, so a hit's size shows for a moment; under the fill when healing.
+        .ghost
+        {
+            background-color: rgba( $hud-danger, 0.75 );
+            transition: width 0.45s ease-out 0.35s;
+        }
 
-        Icon { opacity: 0.85; }
-    }
-
-    .value-sm
-    {
-        font-size: 18px;
-        font-weight: bold;
-        line-height: 18px;
-        color: $hud-armor;
-        text-shadow: 0 1px 3px rgba( black, 0.7 );
+        .tick
+        {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            margin-left: -1px;
+            background-color: rgba( black, 0.55 );
+        }
     }
 
     .armor-bar
     {
         position: relative;
-        flex-grow: 1;
-        height: 5px;
-        margin-left: 2px;
+        height: 4px;
+        margin-top: 3px;
         background-color: $hud-track;
-        transform: skewX( -16deg );
+        border: 1px solid $hud-track-edge;
 
         .fill
         {
@@ -147,43 +121,30 @@ Vitals
         }
     }
 
-    .helmet
-    {
-        height: 20px;
-        padding: 0 4px;
-        align-items: center;
-        border: 1px solid rgba( $hud-armor, 0.5 );
-        background-color: rgba( $hud-armor, 0.14 );
-    }
-
     &.no-armor
     {
         .value-sm { color: $hud-text-dim; }
-        .armor-value Icon { opacity: 0.4; }
+        .armor .glyph { opacity: 0.45; }
     }
 
     &.hurt
     {
-        .edge, .seg .fill { background-color: $hud-warn; }
         .value { color: $hud-warn; }
+        .health-bar .fill { background-color: $hud-warn; }
     }
 
     &.low-health
     {
-        .edge, .seg .fill { background-color: $hud-danger; }
         .value { color: $hud-danger; }
-        .edge { animation: vitals-pulse 0.9s linear infinite; }
-
-        .plate
-        {
-            background-image: linear-gradient( to right, rgba( 58, 8, 6, 0.88 ) 0%, rgba( 34, 7, 6, 0.76 ) 82%, rgba( 34, 7, 6, 0 ) 100% );
-        }
+        .health-bar .fill { background-color: $hud-danger; animation: vitals-pulse 0.9s linear infinite; }
+        .health-bar { border-color: rgba( $hud-danger, 0.6 ); }
+        .health .glyph { animation: vitals-pulse 0.9s linear infinite; }
     }
 }
 
 @keyframes vitals-pulse
 {
     0% { opacity: 1; }
-    50% { opacity: 0.25; }
+    50% { opacity: 0.35; }
     100% { opacity: 1; }
 }

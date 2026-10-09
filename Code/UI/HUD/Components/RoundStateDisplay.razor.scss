@@ -1,7 +1,8 @@
 @import "/UI/Styles/Theme.scss";
 
-// The round's strip, top centre: your team's score left of the clock, the enemy's right, each in its team colour
-// fading outwards, the mode's name under it. In free-for-all only the clock shows.
+// The round's strip, top centre, while Score is held: your team's score left of the clock, the enemy's right, each on a
+// solid block of its team colour, and the clock on a dark one between them. The mode's name sits under it on the
+// world, with the HUD's dark halo. In free-for-all only the clock shows.
 RoundStateDisplay
 {
     display: none;
@@ -15,7 +16,7 @@ RoundStateDisplay
     align-items: center;
     font-family: $hud-font;
     font-weight: bold;
-    color: white;
+    color: $hud-text;
 
     label { font-family: $hud-font; }
 
@@ -23,12 +24,13 @@ RoundStateDisplay
     {
         flex-direction: row;
         align-items: stretch;
-        height: 38px;
+        height: 36px;
+        border: 1px solid rgba( black, 0.5 );
     }
 
     .team
     {
-        min-width: 74px;
+        min-width: 70px;
         padding: 0 14px;
         justify-content: center;
         align-items: center;
@@ -36,23 +38,23 @@ RoundStateDisplay
         .score
         {
             font-size: 24px;
-            text-shadow: 0 1px 3px rgba( black, 0.6 );
+            text-shadow: 0 1px 2px rgba( black, 0.55 );
         }
-
     }
 
     .clock
     {
-        min-width: 92px;
+        min-width: 88px;
         padding: 0 14px;
         justify-content: center;
         align-items: center;
-        background-color: $hud-plate;
+        background-color: rgba( $hud-ink, 0.9 );
+        border-bottom: 2px solid $hud-accent;
 
         .time
         {
             font-size: 22px;
-            color: $hud-health;
+            color: $hud-text;
 
             &.ending { color: $hud-warn; }
         }
@@ -60,21 +62,20 @@ RoundStateDisplay
 
     .mode
     {
-        margin-top: 4px;
-        padding: 3px 12px;
-        font-size: 11px;
+        margin-top: 6px;
+        font-size: 12px;
         font-weight: bold;
-        letter-spacing: 2px;
-        color: $hud-text-dim;
-        background-color: rgba( $hud-ink, 0.7 );
+        letter-spacing: 3px;
+        color: $hud-text;
+        text-shadow: $hud-halo;
     }
 
     .next-zone
     {
         margin-top: 2px;
-        font-size: 11px;
+        font-size: 12px;
         color: $hud-text-dim;
-        text-shadow: 0 1px 2px rgba( black, 0.8 );
+        text-shadow: $hud-halo;
     }
 
     .hc-badge

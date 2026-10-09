@@ -11,14 +11,16 @@
     {
         <div class="slot @SlotClass( slotGroup.Key )">
             <div class="items">
-                @foreach ( var equipment in slotGroup )
+                @* Each grenade is its own Equipment, so a kind carried twice is one row with its count. *@
+                @foreach ( var kind in slotGroup.GroupBy( x => x.Resource ) )
                 {
-                    <EquipmentRow Equipment=@equipment />
+                    <EquipmentRow Equipment=@(Pick( kind )) Count=@(kind.Count()) />
                 }
             </div>
             <div class="key">
                 <InputHint Action="@($"Slot{SlotIndex( slotGroup.Key )}")" class="small" Size="@InputGlyphSize.Small" />
             </div>
+            <div class="mark" />
         </div>
     }
 </root>
@@ -43,6 +45,19 @@
     }
 
     public int SlotIndex( EquipmentSlot slot ) => (int)slot;
+
+    /// The one in hand if it's of this kind, so its row lights up.
+    private Equipment Pick( IEnumerable<Equipment> kind )
+    {
+        var current = CurrentEquipment;
+        foreach ( var equipment in kind )
+        {
+            if ( equipment == current )
+                return equipment;
+        }
+
+        return kind.First();
+    }
 
     public override void Tick()
     {

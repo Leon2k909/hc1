@@ -4,53 +4,45 @@
 
 @if ( !Pawn.IsValid() || !HealthComponent.IsValid() ) return;
 
-@* Bottom left: health's number and bar, armour's under it. The plate is darkest at the screen's edge and fades out
-   towards the middle, and its edge takes health's state colour (Tick). *@
+@* Bottom left, straight on the world with no plate: health's number on the left and armour's on the right, over one
+   bar for health with armour's thin bar under it. The bar has ticks at each quarter, and a ghost of what a hit took
+   off that drains after it. Tick sets health's state. *@
 <root>
-    <div class="plate">
-        <div class="edge" />
-        <div class="sheen" />
-
-        <div class="health-row">
+    <div class="numbers">
+        <div class="health">
+            <Icon File="/ui/health.png" Size="@(15)" class="glyph" />
             <label class="value">@Health</label>
-            <div class="bar-column">
-                <div class="caption-row">
-                    <Icon File="/ui/health.png" Size="@(12)" />
-                    <label class="caption">@Tr( "HEALTH" )</label>
-                </div>
-                <div class="segments">
-                    @for ( var k = 0; k < Segments; k++ )
-                    {
-                        <div class="seg"><div class="fill" style="width: @(SegmentFill( k ))%;" /></div>
-                    }
-                </div>
-            </div>
         </div>
 
         @if ( ArmorComponent.IsValid() )
         {
-            <div class="armor-row">
-                <div class="armor-value">
-                    <Icon File="/ui/armor.png" Size="@(13)" />
-                    <label class="value-sm">@Armor</label>
-                </div>
-                <div class="armor-bar"><div class="fill" style="width: @(ArmorPercent)%;" /></div>
+            <div class="armor">
                 @if ( HasHelmet )
                 {
-                    <div class="helmet" title="@Tr( "HELMET" )">
-                        <Icon File="/ui/helmet.png" Size="@(14)" />
-                    </div>
+                    <Icon File="/ui/helmet.png" Size="@(16)" class="helmet" />
                 }
+                <Icon File="/ui/armor.png" Size="@(13)" class="glyph" />
+                <label class="value-sm">@Armor</label>
             </div>
         }
     </div>
+
+    <div class="health-bar">
+        <div class="ghost" style="width: @(HealthPercent)%;" />
+        <div class="fill" style="width: @(HealthPercent)%;" />
+        <div class="tick" style="left: 25%;" />
+        <div class="tick" style="left: 50%;" />
+        <div class="tick" style="left: 75%;" />
+    </div>
+
+    @if ( ArmorComponent.IsValid() )
+    {
+        <div class="armor-bar"><div class="fill" style="width: @(ArmorPercent)%;" /></div>
+    }
 </root>
 
 @code
 {
-    // The health bar's segments: 10 points each at the usual 100.
-    private const int Segments = 10;
-
     public Pawn Pawn => Client.Viewer.Pawn;
     public HealthComponent HealthComponent => Pawn.HealthComponent;
     public ArmorComponent ArmorComponent => Pawn.GetComponent<ArmorComponent>();
@@ -61,6 +53,8 @@
     private float HealthFraction => HealthComponent.IsValid() && HealthComponent.MaxHealth > 0
         ? Math.Clamp( HealthComponent.Health / HealthComponent.MaxHealth, 0f, 1f ) : 0f;
 
+    private int HealthPercent => (int)Math.Round( HealthFraction * 100f );
+
     private int ArmorPercent
     {
         get
@@ -70,16 +64,9 @@
         }
     }
 
-    /// How full segment k is, 0 to 100.
-    private int SegmentFill( int k )
-    {
-        var filled = HealthFraction * Segments - k;
-        return (int)Math.Round( Math.Clamp( filled, 0f, 1f ) * 100f );
-    }
-
     protected override int BuildHash()
     {
-        return !Pawn.IsValid() ? 0 : HashCode.Combine( Health, Armor, HasHelmet, ArmorPercent, Pawn.HealthComponent?.State );
+        return !Pawn.IsValid() ? 0 : HashCode.Combine( Health, Armor, HasHelmet, ArmorPercent, HealthPercent, Pawn.HealthComponent?.State );
     }
 
     // The state's classes are set here: a <root class="@(...)"> adds a class but doesn't take it off again.

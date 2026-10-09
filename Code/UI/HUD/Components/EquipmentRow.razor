@@ -1,11 +1,16 @@
 @namespace Facepunch.UI
 @inherits Panel
 
-@* One piece of equipment in the loadout list (WeaponInfoComponent): its name, then its picture. *@
+@* One kind of equipment in the loadout list (WeaponInfoComponent): its name, how many when more than one, then its
+   picture. *@
 <root>
     @if ( Equipment.IsValid() )
     {
         <label class="gunname">@Equipment.Resource.Name</label>
+        @if ( Count > 1 )
+        {
+            <label class="count">@($"\u00d7{Count}")</label>
+        }
 
         @if ( !string.IsNullOrEmpty( Equipment.Resource.Icon ) )
         {
@@ -28,6 +33,9 @@
     /// </summary>
     public Equipment Equipment { get; set; }
 
+    /// How many of its kind the player carries (each grenade is its own Equipment).
+    public int Count { get; set; } = 1;
+
     public PlayerPawn Player => Equipment?.Owner;
     public bool IsActive => Player?.CurrentEquipment == Equipment;
 
@@ -40,6 +48,6 @@
 
     protected override int BuildHash()
     {
-        return HashCode.Combine( IsActive, Equipment );
+        return HashCode.Combine( IsActive, Equipment, Count );
     }
 }
