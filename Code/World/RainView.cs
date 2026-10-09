@@ -2,8 +2,8 @@ namespace Facepunch;
 
 /// <summary>
 /// The rain as one machine sees and hears it, round its own camera: the drops (<see cref="RainDropParticles"/>), their
-/// splashes on open ground (<see cref="RainSplashParticles"/>), the puddles (<see cref="RainPuddles"/>), the rain's
-/// sound, the overcast look of the sky, sun and fog (<see cref="RainLook"/>), and the lightning's flashes and thunder
+/// splashes on open ground (<see cref="RainSplashParticles"/>), the puddles (<see cref="RainPuddles"/>) and the rings
+/// the drops make on them (<see cref="RainRippleParticles"/>), the rain's sound, the overcast look of the sky, sun and fog (<see cref="RainLook"/>), and the lightning's flashes and thunder
 /// (<see cref="Weather.Schedule.Strikes"/>). Made by <see cref="Weather"/> while it rains, and it goes once the weather
 /// has cleared and the look has eased back. Nothing here is networked.
 /// </summary>
@@ -12,8 +12,12 @@ public sealed class RainView : Component
 	public Weather Weather { get; set; }
 
 	/// <summary> The most drops in the air round the camera; how many show goes by the rate (<see cref="ActiveShare"/>). </summary>
-	public const int MaxDrops = 6000;
-	public const int MaxSplashes = 800;
+	public const int MaxDrops = 10000;
+	public const int MaxSplashes = 3000;
+	public const int MaxRipples = 3000;
+
+	/// <summary> Square units in a square metre. </summary>
+	private const float SquareUnitsPerSquareMetre = WorldWind.UnitsPerMetre * WorldWind.UnitsPerMetre;
 
 	/// <summary> How long the sky, sun and fog take to come in or go back (seconds). </summary>
 	private const float LookTime = 20f;
@@ -22,17 +26,24 @@ public sealed class RainView : Component
 	private const string HeavyLoop = "sounds/weather/rain_heavy.sound";
 	private const string RoofLoop = "sounds/weather/rain_roof.sound";
 
-	/// <summary> The drops' layers round the camera: radius and share of the drops. Most are close, where they show. </summary>
-	private static readonly (float Radius, float Share)[] Layers = { (220f, 0.45f), (520f, 0.35f), (900f, 0.2f) };
+	/// <summary>
+	/// The drops' layers round the camera: radius, share of the drops, and how strongly each of its drops is drawn. Most
+	/// are close, where they show. The outer layers hold 10 and 70 times fewer drops to the cubic unit than the inner
+	/// one, so each of their drops stands for a few of the many there, short of all of them: the fog does the rest.
+	/// </summary>
+	private static readonly (float Radius, float Share, float Weight)[] Layers =
+		{ (220f, 0.45f, 1f), (520f, 0.35f, 2.5f), (900f, 0.2f, 5.6f) };
 
 	private readonly ShelterGrid _grid = new();
 	private readonly RainLook _look = new();
 	private readonly RainPuddles _puddles = new();
 	private ParticleEffect _drops;
 	private ParticleEffect _splashes;
+	private ParticleEffect _ripples;
 	private RainDropParticles _dropController;
 	private RainSplashParticles _splashController;
-	private float _splashCarry;
+	private RainRippleParticles _rippleController;
+	private float _splashCarry, _rippleCarry;
 	private WorldWind _wind;
 
 	/// <summary> How far the overcast look has come in, 0-1. </summary>
@@ -42,12 +53,32 @@ public sealed class RainView : Component
 	private float _lightBase, _heavyBase, _roofBase;
 	private float _outdoorGain = 1f, _underGain;
 
-	protected override void OnStart()
+	protected override void OnStart() => EnsureEffects();
+
+	/// <summary> Makes any of the three effects that's missing, as after a hotload into a rain made before it. </summary>
+	private void EnsureEffects()
 	{
-		_drops = CreateEffect<RainDropParticles>( "Rain Drops", DropSprite, MaxDrops, 100000f, faceVelocity: true, upright: false );
-		_dropController = _drops.GetComponent<RainDropParticles>();
-		_splashes = CreateEffect<RainSplashParticles>( "Rain Splashes", SplashSprite, MaxSplashes, 0.5f, faceVelocity: false, upright: true );
-		_splashController = _splashes.GetComponent<RainSplashParticles>();
+		if ( !_drops.IsValid() )
+		{
+			_drops = CreateEffect<RainDropParticles>( "Rain Drops", DropSprite, MaxDrops, 100000f, faceVelocity: true,
+				ParticleSpriteRenderer.BillboardAlignment.LookAtCamera, Sandbox.Rendering.FilterMode.Trilinear );
+			_dropController = _drops.GetComponent<RainDropParticles>();
+		}
+
+		// Splashes and rings live one second of their own age, which each one's TimeScale fits to its life.
+		if ( !_splashes.IsValid() )
+		{
+			_splashes = CreateEffect<RainSplashParticles>( "Rain Splashes", SplashSprite, MaxSplashes, 1f, faceVelocity: false,
+				ParticleSpriteRenderer.BillboardAlignment.RotateToCamera, Sandbox.Rendering.FilterMode.Trilinear );
+			_splashController = _splashes.GetComponent<RainSplashParticles>();
+		}
+
+		if ( !_ripples.IsValid() )
+		{
+			_ripples = CreateEffect<RainRippleParticles>( "Rain Ripples", RippleSprite, MaxRipples, 1f, faceVelocity: false,
+				ParticleSpriteRenderer.BillboardAlignment.Particle, Sandbox.Rendering.FilterMode.Anisotropic );
+			_rippleController = _ripples.GetComponent<RainRippleParticles>();
+		}
 	}
 
 	protected override void OnDisabled()
@@ -90,6 +121,7 @@ public sealed class RainView : Component
 
 		if ( !camera.IsValid() ) return;
 		WorldPosition = eye;
+		EnsureEffects();
 
 		_grid.Update( Scene, eye );
 		_puddles.Update( Scene, Weather, _grid, eye, look );
@@ -97,8 +129,9 @@ public sealed class RainView : Component
 		// The rain comes in with the cloud, over the first few seconds of the look.
 		var opacity = SmoothStep( 0f, 0.2f, rate ) * Math.Clamp( _k / 0.3f, 0f, 1f );
 
-		UpdateDrops( camera, eye, rate, opacity, darkening );
-		UpdateSplashes( camera, eye, rate, opacity, darkening );
+		UpdateDrops( camera, eye, rate, opacity, darkening, flash );
+		UpdateSplashes( camera, eye, rate, opacity, darkening, flash );
+		UpdateRipples( camera, eye, rate, opacity, darkening, flash );
 		UpdateSound( eye, rate, opacity );
 	}
 
@@ -106,14 +139,17 @@ public sealed class RainView : Component
 
 	/// <summary>
 	/// The share of the drops that show at a rate (mm/h): more drops in the air the harder it rains, from a few hundred
-	/// in drizzle to all of them in a downpour.
+	/// in drizzle to all of them in a downpour (800 at 1 mm/h, 2,100 at 5 and 5,500 at 25).
 	/// </summary>
-	public static float ActiveShare( float rate ) => Math.Clamp( 500f * MathF.Pow( MathF.Max( rate, 0f ), 0.6f ), 150f, MaxDrops ) / MaxDrops;
+	public static float ActiveShare( float rate ) => Math.Clamp( 800f * MathF.Pow( MathF.Max( rate, 0f ), 0.6f ), 250f, MaxDrops ) / MaxDrops;
 
 	/// <summary> Marshall and Palmer's drop sizes: the slope of the exponential spread (per mm) at a rate (mm/h). </summary>
 	public static float MarshallPalmerLambda( float rate ) => 4.1f * MathF.Pow( MathF.Max( rate, 0.05f ), -0.21f );
 
-	private void UpdateDrops( CameraComponent camera, Vector3 eye, float rate, float opacity, float darkening )
+	/// <summary> What a lightning flash adds to the rain's colour: the drops and splashes catch it, blue-white. </summary>
+	private static Color FlashLight( float flash ) => new( 0.85f * flash, 0.88f * flash, 0.95f * flash, 0f );
+
+	private void UpdateDrops( CameraComponent camera, Vector3 eye, float rate, float opacity, float darkening, float flash )
 	{
 		if ( !_drops.IsValid() || !_dropController.IsValid() ) return;
 
@@ -126,13 +162,14 @@ public sealed class RainView : Component
 				Random.Shared.Float( -250f, 150f + 0.6f * radius ) );
 			var p = _drops.Emit( position, Random.Shared.NextSingle() );
 			p.StartPosition = new Vector3( Random.Shared.NextSingle(), Random.Shared.NextSingle(), radius );
+			p.StartAngles = new Angles( 0f, Layers[layer].Weight, 0f );
 			p.Alpha = 0f;
 			p.Size = new Vector3( 0.1f, 1f, 1f );
 		}
 
 		if ( !_wind.IsValid() ) _wind = Scene.GetAllComponents<WorldWind>().FirstOrDefault();
 		var lambda = MarshallPalmerLambda( rate );
-		var tint = new Color( 0.75f, 0.78f, 0.82f ) * darkening;
+		var tint = new Color( 0.75f, 0.78f, 0.82f ) * darkening + FlashLight( 0.6f * flash );
 		_dropController.Frame = new RainDropParticles.DropFrame(
 			Camera: eye,
 			Wind: _wind.IsValid() && _wind.Active ? _wind.Velocity * WorldWind.UnitsPerMetre : Vector3.Zero,
@@ -144,6 +181,7 @@ public sealed class RainView : Component
 			PixelAngle: PixelAngle( camera ),
 			Tint: new Color( tint.r, tint.g, tint.b, 1f ),
 			Opacity: opacity,
+			Flash: flash,
 			Grid: _grid );
 	}
 
@@ -169,48 +207,280 @@ public sealed class RainView : Component
 
 	// ── Splashes ────────────────────────────────────────────────────────────────
 
-	/// <summary> How far out splashes are made: past that, they're under a pixel. </summary>
-	private const float SplashRange = 500f;
+	/// <summary> How far out splashes are made: past that, even a thinned-out one is under a pixel. </summary>
+	private const float SplashRange = 900f;
 
-	private void UpdateSplashes( CameraComponent camera, Vector3 eye, float rate, float opacity, float darkening )
+	/// <summary> The most splashes made a second, and the most places tried for them in a frame. </summary>
+	private const float SplashBudget = 30000f;
+	private const int SplashTriesPerFrame = 3000;
+
+	/// <summary> The share of the places tried lately that were open ground in view, so the budget goes on those. </summary>
+	private float _splashAccept = 0.3f;
+	private int _splashTried, _splashMade;
+
+	/// <summary>
+	/// How many drops at least <paramref name="minDiameter"/> mm across land on a square unit each second at a rate
+	/// (mm/h): Marshall and Palmer's spread times each size's fall speed, summed. Over a square metre, about 730 drops
+	/// over 1 mm land a second at 5 mm/h, 150 at 1 mm/h and 2,500 at 25 mm/h.
+	/// </summary>
+	public static float DropFlux( float rate, float minDiameter )
+	{
+		if ( rate <= 0f ) return 0f;
+		var lambda = MarshallPalmerLambda( rate );
+		var perSquareMetre = 8000f * (9.65f * MathF.Exp( -lambda * minDiameter ) / lambda
+			- 10.3f * MathF.Exp( -(lambda + 0.6f) * minDiameter ) / (lambda + 0.6f));
+		return MathF.Max( perSquareMetre, 0f ) / SquareUnitsPerSquareMetre;
+	}
+
+	/// <summary>
+	/// The radius inside which every drop gets its splash, when past it a share (r0 / r)² of them do, out to
+	/// <paramref name="range"/>, so that <paramref name="flux"/> comes to <paramref name="budget"/> a second.
+	/// </summary>
+	private static float CoreRadius( float flux, float budget, float range )
+	{
+		if ( flux * MathF.PI * range * range <= budget ) return range;
+		// The disc's weighted area over 2 pi is r0² (1/2 + ln(range / r0)), which grows with r0.
+		var target = budget / (MathF.Tau * flux);
+		var low = 0.01f;
+		var high = range;
+		for ( var i = 0; i < 30; i++ )
+		{
+			var mid = 0.5f * (low + high);
+			if ( mid * mid * (0.5f + MathF.Log( range / mid )) > target ) high = mid;
+			else low = mid;
+		}
+		return low;
+	}
+
+	/// <summary> A drop's diameter (mm) from a uniform number, over the exponential spread from <paramref name="from"/> to 5 mm. </summary>
+	private static float DiameterFrom( float u, float lambda, float from ) =>
+		from - MathF.Log( 1f - u * (1f - MathF.Exp( -lambda * (RainDropParticles.MaxDiameter - from) )) ) / lambda;
+
+	/// <summary> The cosine of the half-angle of a cone round the camera's view that takes in the whole screen, and 3 degrees more. </summary>
+	private static float ViewCone( CameraComponent camera )
+	{
+		var fov = camera.FieldOfView.DegreeToRadian();
+		var aspect = MathF.Max( Screen.Aspect, 0.1f );
+		float tanH, tanV;
+		if ( camera.FovAxis == CameraComponent.Axis.Vertical )
+		{
+			tanV = MathF.Tan( fov * 0.5f );
+			tanH = tanV * aspect;
+		}
+		else
+		{
+			tanH = MathF.Tan( fov * 0.5f );
+			tanV = tanH / aspect;
+		}
+		var half = MathF.Atan( MathF.Sqrt( tanH * tanH + tanV * tanV ) ) + 3f.DegreeToRadian();
+		return MathF.Cos( MathF.Min( half, MathF.PI ) );
+	}
+
+	/// <summary>
+	/// A crown for each drop over 1 mm that lands on open, level ground in view: within the core radius every one, past
+	/// it a share (r0 / r)², each drawn stronger for the ones it stands for. A crown spreads to 5-9 times its drop's
+	/// width and is gone in 30-80 ms.
+	/// </summary>
+	private void UpdateSplashes( CameraComponent camera, Vector3 eye, float rate, float opacity, float darkening, float flash )
 	{
 		if ( !_splashes.IsValid() || !_splashController.IsValid() ) return;
 
-		var tint = new Color( 0.8f, 0.82f, 0.85f ) * darkening;
+		var tint = new Color( 0.85f, 0.87f, 0.9f ) * darkening + FlashLight( flash );
 		_splashController.Opacity = opacity;
 		_splashController.Tint = new Color( tint.r, tint.g, tint.b, 1f );
 
-		// Each one stands for the crowns of many drops landing together, so they come by the rate, not drop by drop.
-		var perSecond = 2500f * MathF.Min( MathF.Pow( rate / 25f, 0.7f ), 1f ) * SmoothStep( 0.5f, 2f, rate ) * opacity;
-		_splashCarry += perSecond * Time.Delta;
-		var count = (int)_splashCarry;
-		_splashCarry -= count;
-		if ( count <= 0 ) return;
+		var flux = DropFlux( rate, 1f ) * opacity;
+		if ( flux <= 0f ) return;
 
-		var forward = camera.WorldRotation.Forward.WithZ( 0f );
-		forward = forward.IsNearZeroLength ? Vector3.Forward : forward.Normal;
+		var core = CoreRadius( flux, SplashBudget / _splashAccept, SplashRange );
+		var inner = 0.5f * core * core;
+		var weighted = core * core * (0.5f + MathF.Log( SplashRange / core ));
+		_splashCarry += flux * MathF.Tau * weighted * Time.Delta;
+		var tries = (int)_splashCarry;
+		_splashCarry -= tries;
+		tries = Math.Min( tries, SplashTriesPerFrame );
+		if ( tries <= 0 ) return;
+
+		var forward = camera.WorldRotation.Forward;
+		var cone = ViewCone( camera );
+		var pixel = PixelAngle( camera );
 		var lambda = MarshallPalmerLambda( rate );
-		var lambdaC = 1f - MathF.Exp( -lambda * (RainDropParticles.MaxDiameter - RainDropParticles.MinDiameter) );
+		var made = 0;
 
-		for ( var i = 0; i < count * 3 && count > 0 && !_splashes.IsFull; i++ )
+		for ( var i = 0; i < tries && !_splashes.IsFull; i++ )
 		{
-			var distance = 16f + (SplashRange - 16f) * MathF.Pow( Random.Shared.NextSingle(), 0.75f );
+			// The distance, drawn with the core's weighting: evenly inside it, falling off as (r0 / r)² past it.
+			var m = Random.Shared.NextSingle() * weighted;
+			var r = m < inner ? MathF.Sqrt( 2f * m ) : core * MathF.Exp( (m - inner) / (core * core) );
+			if ( r < 16f ) continue;
 			var angle = Random.Shared.NextSingle() * MathF.Tau;
-			var offset = new Vector3( MathF.Cos( angle ), MathF.Sin( angle ), 0f );
-			if ( Vector3.Dot( offset, forward ) < -0.3f ) continue;
-
-			var at = eye + offset * distance;
+			var at = eye + new Vector3( MathF.Cos( angle ) * r, MathF.Sin( angle ) * r, 0f );
 			if ( !_grid.IsFlatOpenGround( at.x, at.y, out var floor ) || floor > eye.z ) continue;
 
-			var diameter = RainDropParticles.DiameterOf( Random.Shared.NextSingle(), lambda, lambdaC );
+			var to = at.WithZ( floor ) - eye;
+			var distance = to.Length;
+			if ( Vector3.Dot( to, forward ) < cone * distance ) continue;
+
+			var diameter = DiameterFrom( Random.Shared.NextSingle(), lambda, 1f );
+			var crown = Random.Shared.Float( 5f, 9f ) * diameter * 0.03937f;
+			// The crown's rim is 0.625 of the sprite's width.
+			var sprite = crown * 1.6f;
+			var life = (0.025f + 0.012f * diameter) * Random.Shared.Float( 0.7f, 1.3f );
+			// Never under a pixel and a half, but fainter by the area it's spread over.
+			var minWidth = distance * pixel * 1.5f;
+			var share = r <= core ? 1f : (core / r) * (core / r);
+			var cover = sprite >= minWidth ? 1f : (sprite / minWidth) * (sprite / minWidth);
+
 			var p = _splashes.Emit( at.WithZ( floor ), Random.Shared.NextSingle() );
-			p.StartPosition = new Vector3( 0.5f + 0.8f * diameter, Random.Shared.Float( 0.4f, 0.55f ), floor );
-			p.StartScale = 0.08f + 0.03f * diameter;
+			p.StartPosition = new Vector3( sprite, Random.Shared.Float( 0.4f, 0.55f ) * MathF.Min( 1f, cover * MathF.Min( 1f / share, 3f ) ), floor );
+			p.StartAngles = new Angles( minWidth, 0f, 0f );
+			p.TimeScale = 1f / life;
 			p.Alpha = 0f;
 			p.Size = Vector3.Zero;
 			p.Velocity = Vector3.Zero;
-			count--;
+			made++;
 		}
+
+		_splashTried += tries;
+		_splashMade += made;
+		if ( _splashTried >= 2000 )
+		{
+			_splashAccept = MathF.Max( MathX.Lerp( _splashAccept, (float)_splashMade / _splashTried, 0.5f ), 0.1f );
+			_splashTried = _splashMade = 0;
+		}
+	}
+
+	// ── Rings on the puddles ────────────────────────────────────────────────────
+
+	/// <summary> The most rings started a second, and in a frame. </summary>
+	private const float RippleBudget = 6000f;
+	private const int RipplesPerFrame = 400;
+
+	/// <summary> How fast a ring's leading crest spreads: about 0.2 m/s, as a drop's capillary waves do. </summary>
+	private const float RippleSpeed = 8f;
+
+	/// <summary> How far over the ground the rings are drawn, so the ground doesn't cut them. </summary>
+	private const float RippleLift = 0.35f;
+
+	private readonly List<float> _rippleRates = new();
+	private readonly List<float> _rippleDistances = new();
+
+	/// <summary>
+	/// A ring for each drop over 0.5 mm that lands on a puddle's water in view: out to a distance every one, past it a
+	/// share (reach / d)², so they come to the budget. Each starts in a random wet cell of the puddle's shape and fades
+	/// out before its crest would reach the water's edge.
+	/// </summary>
+	private void UpdateRipples( CameraComponent camera, Vector3 eye, float rate, float opacity, float darkening, float flash )
+	{
+		if ( !_ripples.IsValid() || !_rippleController.IsValid() ) return;
+
+		var tint = new Color( 0.72f, 0.74f, 0.77f ) * darkening + FlashLight( flash );
+		_rippleController.Opacity = opacity;
+		_rippleController.Tint = new Color( tint.r, tint.g, tint.b, 1f );
+
+		var waters = _puddles.Waters;
+		var flux = DropFlux( rate, 0.5f ) * opacity;
+		if ( waters.Count == 0 || flux <= 0f ) return;
+
+		var forward = camera.WorldRotation.Forward;
+		var half = MathF.Acos( ViewCone( camera ) );
+		_rippleRates.Clear();
+		_rippleDistances.Clear();
+		var all = 0f;
+		foreach ( var water in waters )
+		{
+			var to = water.Centre - eye;
+			var distance = MathF.Max( to.Length, 1f );
+			// In view, give or take its own size.
+			var off = MathF.Acos( Math.Clamp( Vector3.Dot( to, forward ) / distance, -1f, 1f ) );
+			var inView = off <= half + MathF.Asin( MathF.Min( 0.75f * water.Diameter / distance, 1f ) );
+			var perSecond = inView ? flux * water.Area * water.Alpha : 0f;
+			_rippleRates.Add( perSecond );
+			_rippleDistances.Add( distance );
+			all += perSecond;
+		}
+		if ( all <= 0f ) return;
+
+		var reach = float.PositiveInfinity;
+		if ( all > RippleBudget )
+		{
+			var low = 0f;
+			var high = 4000f;
+			for ( var i = 0; i < 24; i++ )
+			{
+				var mid = 0.5f * (low + high);
+				if ( ThinnedRate( mid ) > RippleBudget ) high = mid;
+				else low = mid;
+			}
+			reach = low;
+		}
+
+		var total = 0f;
+		for ( var i = 0; i < _rippleRates.Count; i++ )
+		{
+			_rippleRates[i] *= RippleShare( reach, _rippleDistances[i] );
+			total += _rippleRates[i];
+		}
+		if ( total <= 0f ) return;
+
+		_rippleCarry += total * Time.Delta;
+		var count = (int)_rippleCarry;
+		_rippleCarry -= count;
+		count = Math.Min( count, RipplesPerFrame );
+
+		var lambda = MarshallPalmerLambda( rate );
+		for ( var n = 0; n < count && !_ripples.IsFull; n++ )
+		{
+			var pick = Random.Shared.NextSingle() * total;
+			var i = 0;
+			while ( i < _rippleRates.Count - 1 && pick >= _rippleRates[i] )
+			{
+				pick -= _rippleRates[i];
+				i++;
+			}
+			var water = waters[i];
+			if ( water.WetCells <= 0 ) continue;
+
+			var cell = RainPuddles.WetOrder( water.Shape )[Random.Shared.Next( water.WetCells )];
+			var u = (cell % PuddleShapes.Cells + Random.Shared.NextSingle()) / PuddleShapes.Cells;
+			var v = (cell / PuddleShapes.Cells + Random.Shared.NextSingle()) / PuddleShapes.Cells;
+
+			// How far the water reaches round the cell: the widest of its rings still all under water, less the most a
+			// point in the cell can be off its middle.
+			var tables = PuddleShapes.Tables( water.Shape );
+			var k = 0;
+			while ( k + 1 < PuddleShapes.RingReach
+				&& tables[(k + 1) * PuddleShapes.Cells * PuddleShapes.Cells + cell] > water.Threshold )
+				k++;
+			var room = (k + 0.29f) * water.Diameter / PuddleShapes.Cells;
+
+			var diameter = DiameterFrom( Random.Shared.NextSingle(), lambda, 0.5f );
+			var speed = RippleSpeed * Random.Shared.Float( 0.85f, 1.15f );
+			var life = MathF.Min( (0.25f + 0.06f * diameter) * Random.Shared.Float( 0.8f, 1.2f ), room / speed );
+			if ( life < 0.06f ) continue;
+
+			var share = RippleShare( reach, _rippleDistances[i] );
+			var alpha = MathF.Min( Random.Shared.Float( 0.28f, 0.4f ) * MathF.Min( 1f / share, 2f ), 0.6f ) * water.Alpha;
+
+			var p = _ripples.Emit( water.PointAt( u, v ) + Vector3.Up * RippleLift, Random.Shared.NextSingle() );
+			p.StartPosition = new Vector3( speed * life, alpha, 0f );
+			p.Angles = new Angles( 90f, Random.Shared.NextSingle() * 360f, 0f );
+			p.TimeScale = 1f / life;
+			p.Alpha = 0f;
+			p.Size = Vector3.Zero;
+			p.Velocity = Vector3.Zero;
+		}
+	}
+
+	private static float RippleShare( float reach, float distance ) =>
+		distance <= reach ? 1f : (reach / distance) * (reach / distance);
+
+	private float ThinnedRate( float reach )
+	{
+		var sum = 0f;
+		for ( var i = 0; i < _rippleRates.Count; i++ )
+			sum += _rippleRates[i] * RippleShare( reach, _rippleDistances[i] );
+		return sum;
 	}
 
 	// ── Sound ───────────────────────────────────────────────────────────────────
@@ -409,7 +679,8 @@ public sealed class RainView : Component
 
 	// ── Effects and their sprites ───────────────────────────────────────────────
 
-	private ParticleEffect CreateEffect<T>( string name, Sprite sprite, int max, float lifetime, bool faceVelocity, bool upright )
+	private ParticleEffect CreateEffect<T>( string name, Sprite sprite, int max, float lifetime, bool faceVelocity,
+		ParticleSpriteRenderer.BillboardAlignment alignment, Sandbox.Rendering.FilterMode filter )
 		where T : ParticleController, new()
 	{
 		var go = new GameObject( GameObject, true, name );
@@ -430,19 +701,18 @@ public sealed class RainView : Component
 		renderer.DepthFeather = 0f;
 		renderer.FaceVelocity = faceVelocity;
 		renderer.SortMode = ParticleSpriteRenderer.ParticleSortMode.Unsorted;
-		renderer.Alignment = upright
-			? ParticleSpriteRenderer.BillboardAlignment.RotateToCamera
-			: ParticleSpriteRenderer.BillboardAlignment.LookAtCamera;
+		renderer.Alignment = alignment;
+		renderer.TextureFilter = filter;
 
 		go.AddComponent<T>();
 		return effect;
 	}
 
-	private static Sprite _dropSprite, _splashSprite;
+	private static Sprite _dropSprite, _splashSprite, _rippleSprite;
 
 	/// <summary>
 	/// A drop's streak: the length is the sprite's height (a sprite facing its velocity turns its up along it), solid
-	/// across its middle and fading at both ends. Small, since it's drawn a pixel or two wide and the texture has no mips.
+	/// across its middle and fading at both ends. Small, since it's drawn a pixel or two wide.
 	/// </summary>
 	private static Sprite DropSprite => _dropSprite ??= Sprite.FromTexture( MakeTexture( 8, 32, ( u, v ) =>
 		SmoothStep( 0f, 0.35f, u ) * SmoothStep( 1f, 0.65f, u ) * SmoothStep( 0f, 0.2f, v ) * SmoothStep( 1f, 0.8f, v ) ) );
@@ -490,6 +760,23 @@ public sealed class RainView : Component
 		return Math.Clamp( alpha, 0f, 1f );
 	}
 
+	/// <summary>
+	/// A drop's ring on water, seen from above: the leading crest 0.9 of the way out and the smaller ripples following it
+	/// inside, each fainter. It lies flat, so it needs its mips, or far rings shimmer.
+	/// </summary>
+	private static Sprite RippleSprite => _rippleSprite ??= Sprite.FromTexture( MakeTexture( 64, 64, RippleAlpha ) );
+
+	private static float RippleAlpha( float u, float v )
+	{
+		var dx = u - 0.5f;
+		var dy = v - 0.5f;
+		var r = 2f * MathF.Sqrt( dx * dx + dy * dy );
+		var alpha = Crest( r, 0.9f, 0.035f ) + 0.5f * Crest( r, 0.72f, 0.03f ) + 0.25f * Crest( r, 0.55f, 0.03f );
+		return Math.Clamp( alpha, 0f, 1f ) * (1f - SmoothStep( 0.96f, 1f, r ));
+	}
+
+	private static float Crest( float r, float at, float width ) => MathF.Exp( -((r - at) / width) * ((r - at) / width) );
+
 	/// <summary> A ring along an ellipse's outline, <paramref name="thickness"/> pixels thick. </summary>
 	private static float Ellipse( float x, float y, float cx, float cy, float rx, float ry, float thickness )
 	{
@@ -514,7 +801,7 @@ public sealed class RainView : Component
 				data[i + 3] = (byte)(Math.Clamp( a, 0f, 1f ) * 255f + 0.5f);
 			}
 		}
-		return Texture.Create( width, height ).WithStaticUsage().WithData( data ).Finish();
+		return Texture.Create( width, height ).WithStaticUsage().WithData( data ).WithMips().Finish();
 	}
 
 	/// <summary> Hermite smoothstep from <paramref name="edge0"/> to <paramref name="edge1"/>; the edges may be either way round. </summary>
@@ -898,8 +1185,9 @@ public sealed class RainView : Component
 /// <summary>
 /// The rain's drops, each falling at its size's terminal speed and drifting with the wind, wrapping round the camera
 /// so they never run out. Sizes follow Marshall and Palmer's spread for the rate. A drop shows only over open sky and
-/// above where it would land (<see cref="RainView.ShelterGrid"/>), as a streak as long as the eye sees it move in about
-/// a twentieth of a second, never thinner than a pixel or two (fainter for it).
+/// above where it would land (<see cref="RainView.ShelterGrid"/>), as a streak as long as it falls in a thirtieth of a
+/// second (a 30 fps camera's shutter), blurred by an eye's depth of field, and never thinner than a pixel and a half:
+/// widened, it's fainter by as much, so a far drop is a faint thread and a near one a clear streak.
 /// </summary>
 [Hide]
 public sealed class RainDropParticles : ParticleController
@@ -909,7 +1197,17 @@ public sealed class RainDropParticles : ParticleController
 
 	/// <summary> What the drops need this frame, from the main thread: the particle threads read nothing else. </summary>
 	public sealed record DropFrame( Vector3 Camera, Vector3 Wind, float Gust, float WindTime, float Lambda, float LambdaC,
-		float Active, float PixelAngle, Color Tint, float Opacity, RainView.ShelterGrid Grid );
+		float Active, float PixelAngle, Color Tint, float Opacity, float Flash, RainView.ShelterGrid Grid );
+
+	/// <summary> How long the eye sees a drop move for (seconds): a 30 fps camera's shutter. </summary>
+	private const float Exposure = 0.033f;
+
+	/// <summary>
+	/// The eye's depth of field: focused at 15 m with a 4 mm pupil, a drop at distance d is blurred over
+	/// <see cref="Aperture"/> |1 - d / <see cref="FocusDistance"/>| units, so near drops are soft and wide.
+	/// </summary>
+	private const float FocusDistance = 590f;
+	private const float Aperture = 0.157f;
 
 	public DropFrame Frame { get; set; }
 
@@ -967,16 +1265,18 @@ public sealed class RainDropParticles : ParticleController
 		}
 		p.Position = pos;
 
-		var velocity = WorldWind.Sample( pos, f.WindTime, f.Wind, f.Gust ) + Vector3.Down * FallSpeed( diameter );
-		p.Velocity = velocity;
-
 		var visible = state == RainView.ShelterGrid.Open && pos.z >= floor;
 		var active = Math.Clamp( (f.Active - u) / 0.02f, 0f, 1f );
 		if ( !visible || active <= 0f || f.Opacity <= 0f )
 		{
+			// Unseen, it only needs to keep falling: the gusts aren't worth working out.
+			p.Velocity = f.Wind + Vector3.Down * FallSpeed( diameter );
 			p.Alpha = 0f;
 			return;
 		}
+
+		var velocity = WorldWind.Sample( pos, f.WindTime, f.Wind, f.Gust ) + Vector3.Down * FallSpeed( diameter );
+		p.Velocity = velocity;
 
 		var toDrop = pos - cam;
 		var distance = toDrop.Length;
@@ -985,18 +1285,23 @@ public sealed class RainDropParticles : ParticleController
 		var across = MathF.Sqrt( MathF.Max( 0f, 1f - along * along ) );
 
 		var trueWidth = diameter * 0.03937f;
-		var drawnWidth = MathF.Max( trueWidth, distance * f.PixelAngle * 2f );
-		var length = MathF.Max( speed * 0.045f * across, drawnWidth );
+		var blur = Aperture * MathF.Abs( 1f - distance / FocusDistance );
+		var drawnWidth = MathF.Max( distance * f.PixelAngle * 1.5f, trueWidth + blur );
+		var length = MathF.Max( speed * Exposure * across + blur, drawnWidth );
 		p.Size = new Vector3( drawnWidth, length, 1f );
 
+		// How many drops this one stands for (its layer's weight; 1 for a drop from before the weights).
+		var weight = p.StartAngles.yaw > 0f ? p.StartAngles.yaw : 1f;
+		// Drops differ: how they catch the light, how they tumble.
+		var variance = 0.55f + 0.9f * Hash( (uint)(u * 16777216f) ^ 0xA511E9B3u );
 		var edge = Math.Clamp( (radius - MathF.Max( MathF.Abs( dx ), MathF.Abs( dy ) )) / (0.3f * radius), 0f, 1f );
 		var fadeTop = Math.Clamp( (top - pos.z) / 100f, 0f, 1f );
-		var near = Math.Clamp( (distance - 8f) / 24f, 0f, 1f );
-		var thin = MathF.Pow( trueWidth / drawnWidth, 0.7f );
-		var baseAlpha = MathF.Min( 0.33f * MathF.Sqrt( diameter / 2f ), 0.6f );
+		// Right in front of the eye a drop is a blur gone in a frame.
+		var near = RainView.SmoothStep( 12f, 60f, distance );
+		var strength = 0.45f * MathF.Sqrt( diameter / 2f ) * (trueWidth / drawnWidth) * weight * variance * (1f + 0.8f * f.Flash);
 
 		p.Color = f.Tint;
-		p.Alpha = baseAlpha * thin * edge * fadeTop * near * active * f.Opacity;
+		p.Alpha = MathF.Min( strength, 0.6f ) * edge * fadeTop * near * active * f.Opacity;
 	}
 
 	private static float Hash( uint x )
@@ -1011,8 +1316,8 @@ public sealed class RainDropParticles : ParticleController
 }
 
 /// <summary>
-/// Splashes on open, level ground near the camera: a crown that spreads and fades in a tenth of a second or so,
-/// bigger and longer for bigger drops. The view emits them; this only plays each out.
+/// Splashes on open, level ground in view: a crown that spreads and fades in 30-80 ms, bigger and longer for bigger
+/// drops. The view emits them, each with its TimeScale set so its age runs 0-1 over its life; this plays each out.
 /// </summary>
 [Hide]
 public sealed class RainSplashParticles : ParticleController
@@ -1031,20 +1336,47 @@ public sealed class RainSplashParticles : ParticleController
 
 	protected override void OnParticleStep( Particle p, float lifeDelta )
 	{
-		var life = MathF.Max( p.StartScale, 0.01f );
-		var t = p.Age / life;
-		if ( t >= 1f )
-		{
-			p.Alpha = 0f;
-			return;
-		}
-
-		var width = p.StartPosition.x * (0.5f + 0.5f * t);
+		var t = Math.Clamp( p.Age, 0f, 1f );
+		// Never under a pixel and a half across (the view made it fainter for that).
+		var width = MathF.Max( p.StartPosition.x * (0.5f + 0.5f * t), p.StartAngles.pitch );
 		p.Size = new Vector3( width, width, 1f );
 		// The crown's base is 0.3125 of the sprite's height under its middle.
 		p.Position = p.Position.WithZ( p.StartPosition.z + 0.3125f * width );
 		p.Velocity = Vector3.Zero;
 		p.Color = _tint;
 		p.Alpha = p.StartPosition.y * MathF.Pow( 1f - t, 1.5f ) * _opacity;
+	}
+}
+
+/// <summary>
+/// The rings drops make on the puddles, lying flat on the water: each spreads at a capillary wave's 0.2 m/s from where
+/// its drop struck and fades over a quarter to half a second, sooner where the water's edge is near. The view emits
+/// them, each with its TimeScale set so its age runs 0-1 over its life; this plays each out.
+/// </summary>
+[Hide]
+public sealed class RainRippleParticles : ParticleController
+{
+	public float Opacity { get; set; }
+	public Color Tint { get; set; } = Color.White;
+
+	private float _opacity;
+	private Color _tint;
+
+	protected override void OnBeforeStep( float delta )
+	{
+		_opacity = Opacity;
+		_tint = Tint;
+	}
+
+	protected override void OnParticleStep( Particle p, float lifeDelta )
+	{
+		var t = Math.Clamp( p.Age, 0f, 1f );
+		// The leading crest is 0.45 of the sprite's width out from its middle.
+		var radius = 0.15f + p.StartPosition.x * t;
+		var width = radius / 0.45f;
+		p.Size = new Vector3( width, width, 1f );
+		p.Velocity = Vector3.Zero;
+		p.Color = _tint;
+		p.Alpha = p.StartPosition.y * RainView.SmoothStep( 0f, 0.08f, t ) * MathF.Pow( 1f - t, 1.5f ) * _opacity;
 	}
 }

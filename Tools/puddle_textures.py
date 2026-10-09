@@ -25,6 +25,12 @@ Sizes: paving puddles are 20-140 units across, mud's 40-180, set by RainPuddles 
 100, which RainPuddles scales).
 
 --sheet draws each puddle half full and full over concrete and earth, lit from the top left, with its height map.
+
+It also writes Code/World/PuddleShapes.cs, where RainView puts the rain's rings on the water (--code-only writes just
+that, from the height maps already in Assets). For each shape it keeps four 32x32 tables, a cell per 1/32 of the
+decal's width: the lowest height within 1, 2, 3 and 4 cells of each cell's middle. A cell is under water when its first
+table's value is over 1 - CoverageAmount, and a ring of radius k cells round it stays on the water while its k-th
+table's value is.
 """
 import argparse
 import json
@@ -186,14 +192,85 @@ def write_sheet( shapes, colours, path ):
     print( f"wrote sheet {path}" )
 
 
+CODE_PATH = ROOT / "Code/World/PuddleShapes.cs"
+CELLS = 32
+RING_REACH = 4
+
+
+def shape_tables( h ):
+    """ The shape's four tables for the rings (see the docstring), as bytes: table k, then row (v), then column (u). """
+    n = h.shape[0]
+    cell = n / CELLS
+    centres = ( ( np.arange( CELLS ) + 0.5 ) * cell ).astype( int )
+    out = bytearray()
+    for k in range( 1, RING_REACH + 1 ):
+        r = k * cell
+        span = int( np.ceil( r ) )
+        yy, xx = np.mgrid[-span:span + 1, -span:span + 1]
+        disc = xx * xx + yy * yy <= r * r
+        low = ndimage.grey_erosion( h, footprint=disc, mode="constant", cval=0.0 )
+        # Rounded down, so a cell never counts as wetter than it is.
+        out += np.floor( low[np.ix_( centres, centres )] * 255.0 ).astype( np.uint8 ).tobytes()
+    return bytes( out )
+
+
+def write_code( shapes, path ):
+    import base64
+    lines = [
+        "namespace Facepunch;",
+        "",
+        "// Written by Tools/puddle_textures.py from the puddles' height maps: don't edit it by hand.",
+        "",
+        "/// <summary>",
+        "/// Where the water lies in each puddle shape, for the rain's rings (<see cref=\"RainPuddles\"/>). Each shape has four",
+        f"/// {CELLS}x{CELLS} tables, a cell per 1/{CELLS} of the decal's width (rows down its v, columns along its u): the lowest",
+        "/// height (0-255) within 1, 2, 3 and 4 cells of each cell's middle.",
+        "/// </summary>",
+        "public static class PuddleShapes",
+        "{",
+        f"\tpublic const int Cells = {CELLS};",
+        f"\tpublic const int RingReach = {RING_REACH};",
+        "",
+        "\tprivate static readonly string[] Data =",
+        "\t{",
+    ]
+    for h in shapes:
+        lines.append( f"\t\t\"{base64.b64encode( shape_tables( h ) ).decode()}\"," )
+    lines += [
+        "\t};",
+        "",
+        "\tprivate static byte[][] _tables;",
+        "",
+        "\t/// <summary> A shape's tables: table k-1 (within k cells) starts at (k-1) * Cells * Cells. </summary>",
+        "\tpublic static byte[] Tables( int shape )",
+        "\t{",
+        "\t\t_tables ??= Data.Select( Convert.FromBase64String ).ToArray();",
+        "\t\treturn _tables[Math.Clamp( shape, 0, _tables.Length - 1 )];",
+        "\t}",
+        "",
+        "\tpublic static int Count => Data.Length;",
+        "}",
+        "",
+    ]
+    path.write_text( "\n".join( lines ), encoding="utf-8", newline="\n" )
+    print( f"wrote {path}" )
+
+
 def main():
     parser = argparse.ArgumentParser( description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter )
     parser.add_argument( "--size", type=int, default=512 )
     parser.add_argument( "--sheet", help="also write a contact sheet here" )
     parser.add_argument( "--out", help="write everything here instead of Assets (for trying things out)" )
+    parser.add_argument( "--code-only", action="store_true", help="only write PuddleShapes.cs, from the height maps in Assets" )
     args = parser.parse_args()
 
     global DECAL_DIR
+    if args.code_only:
+        shapes = [ np.asarray( Image.open( DECAL_DIR / f"puddle_shape_{shape}_height.png" ).convert( "L" ), float ) / 255.0
+                   for shape in range( SHAPES ) ]
+        write_code( shapes, CODE_PATH )
+        return
+
     if args.out:
         DECAL_DIR = Path( args.out )
     DECAL_DIR.mkdir( parents=True, exist_ok=True )
@@ -217,6 +294,8 @@ def main():
             write_decal( ground, shape )
         wet = ( h > 0 ).mean()
         print( f"shape {shape}: {wet:.0%} of the square under water when full" )
+    write_code( [ np.floor( np.clip( h, 0, 1 ) * 255.0 + 0.5 ) / 255.0 for h in shapes ],
+                CODE_PATH if not args.out else DECAL_DIR / "PuddleShapes.cs" )
 
     if args.sheet:
         write_sheet( shapes, colours, args.sheet )

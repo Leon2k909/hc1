@@ -44,11 +44,45 @@ public sealed class RainPuddles
 
 	private enum Ground { Paving, Mud }
 
+	/// <summary>
+	/// A puddle's water as it shows now, for the rain's rings: the decal's middle and its axes (u runs along -Left and v
+	/// along -Up, each the decal's width), its shape (<see cref="PuddleShapes"/>), the height (0-255) the water's over,
+	/// how many of the shape's cells are under it, its fade, and the ground under it as a plane (its height at the
+	/// middle and its slope).
+	/// </summary>
+	public readonly record struct Water( Vector3 Centre, Vector3 Left, Vector3 Up, float Diameter, int Shape, int Threshold,
+		int WetCells, float Alpha, float GroundZ, Vector2 Slope )
+	{
+		/// <summary> The water's area (square units), from the cells under it. </summary>
+		public float Area => WetCells * (Diameter / PuddleShapes.Cells) * (Diameter / PuddleShapes.Cells);
+
+		/// <summary> Where a point on the decal's texture (0-1 each way) is in the world, on the ground. </summary>
+		public Vector3 PointAt( float u, float v )
+		{
+			var at = Centre + Left * ((0.5f - u) * Diameter) + Up * ((0.5f - v) * Diameter);
+			return at.WithZ( GroundZ + Slope.x * (at.x - Centre.x) + Slope.y * (at.y - Centre.y) );
+		}
+	}
+
+	/// <summary> The puddles with water showing this frame. </summary>
+	public IReadOnlyList<Water> Waters => _waters;
+
+	/// <summary>
+	/// How wet the open paving is, 0-1: the film it holds before it sheds any (half a millimetre), which wets it in the
+	/// first minutes of rain and dries over an hour or two after.
+	/// </summary>
+	public float Wetness => RainView.SmoothStep( 0f, 0.3f, _paveStore );
+
 	/// <summary> A puddle's hollow, and how full it is at the end of the last whole step of history. </summary>
 	private sealed class Site
 	{
 		public Vector3 Position;
 		public Ground Ground;
+		public int Shape;
+		public float Diameter;
+		public float GroundZ;
+		public Vector2 Slope;
+		public Vector3 Left, Up;
 		public float DepthMm;
 		public float Catchment;
 		public float Volume;
@@ -61,6 +95,7 @@ public sealed class RainPuddles
 
 	private readonly Dictionary<(int X, int Y), Site> _cells = new();
 	private readonly List<Site> _sites = new();
+	private readonly List<Water> _waters = new();
 	private static readonly (int X, int Y)[] Spiral = BuildSpiral();
 	private int _next;
 	private GameObject _root;
@@ -116,6 +151,7 @@ public sealed class RainPuddles
 		_root = null;
 		_cells.Clear();
 		_sites.Clear();
+		_waters.Clear();
 	}
 
 	private void Reset( Weather weather )
@@ -276,6 +312,7 @@ public sealed class RainPuddles
 		// The ground round it level, and the same ground, out to most of its width.
 		var low = down.HitPosition.z;
 		var high = low;
+		var tilt = Vector2.Zero;
 		for ( var i = 0; i < 8; i++ )
 		{
 			var angle = i * MathF.Tau / 8f;
@@ -286,19 +323,30 @@ public sealed class RainPuddles
 			if ( dz < -2f || dz > 4f || GroundOf( tr ) != kind ) return null;
 			low = MathF.Min( low, tr.HitPosition.z );
 			high = MathF.Max( high, tr.HitPosition.z );
+			tilt += new Vector2( MathF.Cos( angle ), MathF.Sin( angle ) ) * dz;
 		}
 
 		var depth = Hash01( cx, cy, 5 );
 		var catchment = Hash01( cx, cy, 6 );
+		var shape = (int)(Hash01( cx, cy, 7 ) * Shapes) % Shapes;
+		var roll = Hash01( cx, cy, 8 ) * 360f;
+		// The decal's own axes, as Decal turns it: its rotation, then the roll about its forward (down).
+		var turn = Rotation.LookAt( Vector3.Down ) * new Angles( 0f, 0f, roll ).ToRotation();
 		return new Site
 		{
 			Position = down.HitPosition.WithZ( (low + high) * 0.5f ),
 			Ground = kind,
+			Shape = shape,
+			Diameter = diameter,
+			// The plane through the ring's heights, by least squares (the eight points are evenly round it).
+			GroundZ = down.HitPosition.z,
+			Slope = tilt / (4f * diameter * 0.4f),
+			Left = turn.Left,
+			Up = turn.Up,
 			// Bigger hollows are deeper: a few millimetres in a paving slab's dip, up to 6 cm in a rut.
 			DepthMm = kind == Ground.Paving ? MathX.Lerp( 5f, 25f, 0.6f * u + 0.4f * depth ) : MathX.Lerp( 10f, 60f, 0.6f * u + 0.4f * depth ),
 			Catchment = kind == Ground.Paving ? MathX.Lerp( 3f, 12f, catchment ) : MathX.Lerp( 4f, 15f, catchment ),
-			Object = MakeDecal( kind, (int)(Hash01( cx, cy, 7 ) * Shapes) % Shapes, Hash01( cx, cy, 8 ) * 360f,
-				down.HitPosition.WithZ( (low + high) * 0.5f ), diameter, high - low ),
+			Object = MakeDecal( kind, shape, roll, down.HitPosition.WithZ( (low + high) * 0.5f ), diameter, high - low ),
 		};
 	}
 
@@ -350,6 +398,7 @@ public sealed class RainPuddles
 
 	private void Show( Weather weather, Vector3 eye, float now, float look )
 	{
+		_waters.Clear();
 		foreach ( var site in _sites )
 		{
 			if ( !site.Object.IsValid() ) continue;
@@ -372,9 +421,63 @@ public sealed class RainPuddles
 
 			var fadeIn = site.Shown ? Math.Clamp( site.SinceShown / 1.5f, 0f, 1f ) : 1f;
 			var far = 1f - RainView.SmoothStep( FadeFrom, Range, distance );
-			site.Decal.CoverageAmount = MathF.Min( fill, 0.97f );
-			site.Decal.ColorTint = Color.White.WithAlpha( fadeIn * far * look );
+			var coverage = MathF.Min( fill, 0.97f );
+			var alpha = fadeIn * far * look;
+			site.Decal.CoverageAmount = coverage;
+			site.Decal.ColorTint = Color.White.WithAlpha( alpha );
+
+			// The decal's height test passes a texel once it's over 1 - CoverageAmount (Decals.hlsl).
+			var threshold = (int)MathF.Ceiling( (1f - coverage) * 255f );
+			var wet = WetCells( site.Shape, threshold );
+			if ( wet > 0 && alpha > 0.01f )
+				_waters.Add( new Water( site.Position, site.Left, site.Up, site.Diameter, site.Shape, threshold, wet, alpha,
+					site.GroundZ, site.Slope ) );
 		}
+	}
+
+	// ── Where the water lies ────────────────────────────────────────────────────
+
+	private static int[][] _wetOrder;
+	private static byte[][] _wetSorted;
+
+	/// <summary> A shape's cells, wettest first (by their first table: the lowest height within a cell of them). </summary>
+	public static int[] WetOrder( int shape )
+	{
+		BuildWetOrder();
+		return _wetOrder[Math.Clamp( shape, 0, _wetOrder.Length - 1 )];
+	}
+
+	/// <summary> How many of a shape's cells are under water whose surface is over <paramref name="threshold"/> (0-255). </summary>
+	public static int WetCells( int shape, int threshold )
+	{
+		BuildWetOrder();
+		var sorted = _wetSorted[Math.Clamp( shape, 0, _wetSorted.Length - 1 )];
+		// The cells are wettest first, so the wet ones are a run at the start: find where it ends.
+		int lo = 0, hi = sorted.Length;
+		while ( lo < hi )
+		{
+			var mid = (lo + hi) / 2;
+			if ( sorted[mid] > threshold ) lo = mid + 1;
+			else hi = mid;
+		}
+		return lo;
+	}
+
+	private static void BuildWetOrder()
+	{
+		if ( _wetOrder is not null ) return;
+		var count = PuddleShapes.Count;
+		var cells = PuddleShapes.Cells * PuddleShapes.Cells;
+		var order = new int[count][];
+		var sorted = new byte[count][];
+		for ( var shape = 0; shape < count; shape++ )
+		{
+			var tables = PuddleShapes.Tables( shape );
+			order[shape] = Enumerable.Range( 0, cells ).OrderByDescending( i => tables[i] ).ToArray();
+			sorted[shape] = order[shape].Select( i => tables[i] ).ToArray();
+		}
+		_wetSorted = sorted;
+		_wetOrder = order;
 	}
 
 	private void Evict( Vector3 eye )
