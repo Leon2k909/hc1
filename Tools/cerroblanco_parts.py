@@ -25,12 +25,13 @@ TILED = { TRAV: 120.0, PANEL: 120.0, PAVE: 120.0, HONED: 120.0 }
 PLASTER, WHITE, FRAME, RED, BRONZE = "cb_plaster", "cb_white", "cb_frame", "cb_red", "cb_bronze"
 PIANO, CURTAIN, BLACK, STEEL, TEAK = "cb_piano", "cb_curtain", "cb_black", "cb_steel", "cb_teak"
 IVORY, FELT, LAMP, GLAZE = "cb_ivory", "cb_felt", "cb_lamp", "cb_glass"
-DRAPE, SKIRT, DECK = "cb_drape", "cb_skirt", "cb_deck"
+FRIT = "cb_glass_frit"       # milky, pale green-white panes, as in the grid over the pictures' stage (the map script writes it)
+DRAPE, SKIRT, DECK, ROOF = "cb_drape", "cb_skirt", "cb_deck", "cb_roof"
 CB_PAINTED = {
     PLASTER: ( ( 236, 233, 226 ), 0.0, 0.85 ),       # the galleries' white walls and ceilings
     WHITE: ( ( 236, 231, 220 ), 0.1, 0.32 ),         # painted steel: columns, canopies, pergolas, railings, sunshades
     FRAME: ( ( 54, 57, 60 ), 0.55, 0.38 ),           # the curtain walls' anodised mullions and door frames
-    RED: ( ( 112, 16, 15 ), 0.05, 0.55 ),            # the sculptures' lacquered steel
+    RED: ( ( 176, 30, 24 ), 0.05, 0.45 ),            # the sculptures' lacquered steel: a signal red, as in the pictures
     BRONZE: ( ( 92, 66, 40 ), 0.9, 0.34 ),           # the garden's sphere
     PIANO: ( ( 12, 12, 13 ), 0.0, 0.06 ),            # a concert grand's lacquer
     CURTAIN: ( ( 36, 36, 40 ), 0.0, 0.95 ),          # speaker cloth
@@ -43,6 +44,7 @@ CB_PAINTED = {
     IVORY: ( ( 236, 230, 214 ), 0.0, 0.3 ),          # the piano's keys
     FELT: ( ( 120, 24, 28 ), 0.0, 0.9 ),
     LAMP: ( ( 255, 246, 226 ), 0.0, 0.4 ),           # light fittings' diffusers
+    ROOF: ( ( 186, 184, 178 ), 0.0, 0.88 ),          # the flat roofs' pale grey membrane, as in the overhead picture
 }
 LAWN, HEDGE, SOIL, ROCK, GRAVEL = "lawn", "hedge", "soil", "rock", "gravel"
 
@@ -56,6 +58,7 @@ FOLIAGE = {
     f"{OAK}/tree_oak_dry_small_a.vmdl": ( "facepunch.treeoakdrysmalla#288926", ),
     f"{OAK}/tree_oak_dry_medium_a.vmdl": ( "facepunch.treeoakdrymediuma#289352", ),
     f"{BEECH}/beech_bush_small.vmdl": ( "facepunch.beech_bush_small#145429", ),
+    f"{BEECH}/beech_hedge_96x128.vmdl": ( "facepunch.beech_hedge_96x128#145491", ),
     f"{BEECH}/beech_bush_medium.vmdl": ( "facepunch.beech_bush_medium#145428", ),
     f"{BEECH}/beech_bush_regular_medium_a.vmdl": ( "facepunch.beech_bush_regular_medium_a#145432", ),
     f"{BEECH}/beech_bush_regular_small.vmdl": ( "facepunch.beech_bush_regular_small#145430", ),
@@ -181,19 +184,19 @@ def inner_wall( m, axis, run, across, z0, z1, openings=(), paint=PLASTER, reveal
     w.build( m, paint, paint, reveal, end=paint if ends else None, surface=surface )
 
 
-def glaze( m, glass, axis, d, r0, r1, z0, z1, pitch=60.0, transoms=(), frame=FRAME, depth=5.0, width=2.5, sill=True ):
+def glaze( m, glass, axis, d, r0, r1, z0, z1, pitch=60.0, transoms=(), frame=FRAME, depth=5.0, width=2.5, sill=True,
+           pane=GLAZE ):
     """ A curtain wall in an opening: an anodised frame round it, mullions about pitch apart, transoms at the heights
-    given, and panes (1.5 thick, colliding as glass) in glass. d is the wall's middle, across it. """
+    given, and panes (1.5 thick, colliding as glass, in pane's glass) in glass. d is the wall's middle, across it. """
     count = max( 1, int( round( ( r1 - r0 ) / pitch ) ) )
     rs = [ r0 + ( r1 - r0 ) * k / count for k in range( count + 1 ) ]
     zs = [ z0 ] + [ z for z in transoms if z0 < z < z1 ] + [ z1 ]
 
     def put( ra, rb, za, zb, dd, paint, surface=None ):
+        m_ = glass if paint in ( GLAZE, FRIT ) else m
         if axis == "e":
-            m_ = m if paint != GLAZE else glass
             m_.box( ( ra, d - dd / 2, za ), ( rb, d + dd / 2, zb ), paint, surface )
         else:
-            m_ = m if paint != GLAZE else glass
             m_.box( ( d - dd / 2, ra, za ), ( d + dd / 2, rb, zb ), paint, surface )
 
     for k, r in enumerate( rs ):
@@ -202,7 +205,7 @@ def glaze( m, glass, axis, d, r0, r1, z0, z1, pitch=60.0, transoms=(), frame=FRA
     for z in zs:
         put( r0, r1, max( z0, z - width / 2 ), min( z1, z + width / 2 ), depth, frame )
     for ra, rb in zip( rs, rs[1:] ):
-        put( ra, rb, z0, z1, 1.5, GLAZE, GLASS )
+        put( ra, rb, z0, z1, 1.5, pane, GLASS )
 
 
 def door_frame( m, axis, d, centre, width, z1, thickness, frame=FRAME ):
@@ -241,9 +244,9 @@ def slab( m, e0, e1, n0, n1, z0, z1, holes=(), top=PAVE, bottom=PLASTER, side=HO
             m.box( ( a, c, z0 ), ( b, d, z1 ), paints, surface )
 
 
-def roof( m, e0, e1, n0, n1, z, parapet=30.0, top=GRAVEL, coping=HONED, outside=PANEL, inside=PANEL, thick=16.0,
+def roof( m, e0, e1, n0, n1, z, parapet=30.0, top=ROOF, coping=HONED, outside=PANEL, inside=PANEL, thick=16.0,
           ceiling=PLASTER, wall=18.0, surface=STONE ):
-    """ A flat roof: its slab (z - thick .. z, ceiling under), gravel over it, and a parapet round it of the façade's
+    """ A flat roof: its slab (z - thick .. z, ceiling under), a pale membrane over it, and a parapet round it of the façade's
     paint with a honed coping. The parapet stands on the walls (its outside flush with theirs). """
     m.box( ( e0 + wall, n0 + wall, z - thick ), ( e1 - wall, n1 - wall, z ), { "+z": top, "-z": ceiling, "default": None }, surface )
     h = parapet
@@ -495,12 +498,28 @@ def lawn_poly( m, outline, raise_=5.0, kerb=8.0, kerb_paint=HONED, paint=LAWN ):
     m.polygon( paint, [ ( *p, top - 0.4 ) for p in inner ], normal=( 0, 0, 1 ) )
 
 
+HEDGE_MODEL = f"{BEECH}/beech_hedge_96x128.vmdl"
+HEDGE_SIZE = ( 48.0, 141.0, 90.0 )    # the model's width (x), length (y) and height (z), from its mesh: not its name's 96x128
+
+
 def hedge_box( m, e0, e1, n0, n1, height=34.0, z0=0.0, planter=None ):
-    """ A clipped hedge (box hedge), in a honed planter if planter is its kerb height. """
+    """ A hedge, in a travertine trough with a honed coping if planter is its kerb height, as in the pictures: leafy beech
+    (Facepunch's hedge model, scaled to the bed in pieces along it) round a clipped core that fills its gaps. Its
+    collision is the core's box. """
     if planter:
-        m.box( ( e0 - 6, n0 - 6, z0 ), ( e1 + 6, n1 + 6, z0 + planter ), { "+z": HONED, "-z": None, "default": HONED }, STONE )
+        m.box( ( e0 - 6, n0 - 6, z0 ), ( e1 + 6, n1 + 6, z0 + planter ), { "+z": HONED, "-z": None, "default": TRAV }, STONE )
         z0 += planter - 2
-    m.box( ( e0, n0, z0 ), ( e1, n1, z0 + height ), { "default": HEDGE, "-z": None }, WOOD )
+    m.box( ( e0 + 3, n0 + 3, z0 ), ( e1 - 3, n1 - 3, z0 + height - 4 ), { "default": HEDGE, "-z": None }, WOOD )
+    along_e = ( e1 - e0 ) >= ( n1 - n0 )
+    length, width = ( e1 - e0, n1 - n0 ) if along_e else ( n1 - n0, e1 - e0 )
+    pieces = max( 1, math.ceil( length / 110.0 ) )
+    piece = length / pieces
+    scale = ( ( width + 4 ) / HEDGE_SIZE[0], ( piece + 10 ) / HEDGE_SIZE[1], ( height + 2 ) / HEDGE_SIZE[2] )
+    for k in range( pieces ):
+        s = ( k + 0.5 ) * piece
+        e, n = ( e0 + s, ( n0 + n1 ) / 2 ) if along_e else ( ( e0 + e1 ) / 2, n0 + s )
+        # The model's length is its y, which is the plan's -e at yaw 0; turned 90 it runs along the plan's n.
+        m.props.append( { "path": HEDGE_MODEL, "position": ( e, n, z0 ), "yaw": 0.0 if along_e else 90.0, "scale": scale } )
 
 
 def tree( m, e, n, path=f"{OAK}/tree_oak_medium_a.vmdl", scale=1.0, z=0.0, grate=True, trunk=9.0 ):
@@ -539,7 +558,7 @@ def boulder( m, centre, size, seed, paint=ROCK, surface=STONE, points=18 ):
 def round_planter( m, centre, r, seed=1, tree_path=f"{OAK}/tree_oak_small_a.vmdl", gap=135.0 ):
     """ The courtyard's round planter, two tiers as in the pictures: a low travertine ledge round the outside (r), open
     on one side (gap, degrees), a paved ring inside it, then the planter's own wall of travertine blocks, chest high,
-    with soil heaped inside, a pile of pale boulders on it and shrubs and a small tree round them. You can hop onto the
+    with soil heaped inside, a pile of pale boulders on it, a few low plants at the rim and a big rounded shrub on top. You can hop onto the
     ledge, and mantle onto the wall and the boulders. """
     ledge_w, ledge_h = 22.0, 26.0
     ring( m, centre, r - ledge_w, r, 0, ledge_h, outer=TRAV, inner=TRAV, top=HONED, step=6.0,
@@ -579,12 +598,15 @@ def round_planter( m, centre, r, seed=1, tree_path=f"{OAK}/tree_oak_small_a.vmdl
         rr = inside * ( 0.8 + 0.08 * rng.random() )
         size = ( 26 + 14 * rng.random(), 22 + 12 * rng.random(), 16 + 10 * rng.random() )
         boulder( m, ( ce + rr * math.cos( a ), cn + rr * math.sin( a ), wall_h - 4 ), size, seed * 100 + 40 + k )
-    for k in range( 14 ):
-        a = 2 * math.pi * ( k + 0.5 ) / 14 + jitter( 0.2, "shrub", k, seed )
-        rr = inside * ( 0.66 + jitter( 0.12, "rr", k, seed ) )
-        path = ( f"{BEECH}/beech_bush_regular_small.vmdl", f"{PINE}/pine_bush_low_a.vmdl", f"{BEECH}/beech_bush_small.vmdl" )[k % 3]
-        bush( m, ce + rr * math.cos( a ), cn + rr * math.sin( a ), wall_h - 2, path, 0.8 + 0.3 * ( keyed( k, seed ) % 10 ) / 10 )
-    tree( m, ce + 26, cn - 18, tree_path, 0.75, z=wall_h + 10, grate=False )
+    # A few low plants at the rim, between the small boulders, so the pile of stones shows over the wall as in the
+    # pictures (fourteen bigger ones round the middle hid it).
+    for k in range( 7 ):
+        a = 2 * math.pi * ( k + 0.5 ) / 7 + jitter( 0.25, "shrub", k, seed )
+        rr = inside * ( 0.8 + jitter( 0.06, "rr", k, seed ) )
+        path = ( f"{PINE}/pine_bush_low_a.vmdl", f"{BEECH}/beech_bush_small.vmdl" )[k % 2]
+        bush( m, ce + rr * math.cos( a ), cn + rr * math.sin( a ), wall_h - 4, path, 0.6 + 0.25 * ( keyed( k, seed ) % 10 ) / 10 )
+    # A rounded shrub on the boulders, as in the pictures, not a tree.
+    bush( m, ce + 26, cn - 18, wall_h + 18, f"{BEECH}/beech_bush_regular_medium_a.vmdl", 1.15 )
 
 
 def sweep( m, paint, path, profile, normals_smooth=True ):

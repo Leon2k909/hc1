@@ -23,6 +23,8 @@ writes somewhere else; --sheet writes a lit picture of each.
 """
 import argparse
 import math
+import os
+import time
 from pathlib import Path
 
 import numpy as np
@@ -90,12 +92,28 @@ def cavity( height, ppu, radii=( 0.3, 1.0, 3.0 ), weights=( 1.0, 0.6, 0.3 ) ):
     return sum( w * np.maximum( blur( height, r * ppu ) - height, 0.0 ) for r, w in zip( radii, weights ) )
 
 
+def save_image( image, path ):
+    """ Saves through a temporary file, retrying the rename for up to 10 s: the open editor compiles each map as it
+    lands, and holds the next one's file open while it does. """
+    path = Path( path )
+    temp = path.with_name( f".{path.name}.tmp" )
+    image.save( temp, format="PNG", optimize=True )
+    for attempt in range( 40 ):
+        try:
+            os.replace( temp, path )
+            return
+        except OSError:
+            if attempt == 39:
+                raise
+            time.sleep( 0.25 )
+
+
 def save_grey( path, a ):
-    Image.fromarray( np.clip( np.rint( a * 255 ), 0, 255 ).astype( np.uint8 ), "L" ).save( path, optimize=True )
+    save_image( Image.fromarray( np.clip( np.rint( a * 255 ), 0, 255 ).astype( np.uint8 ), "L" ), path )
 
 
 def save_rgb( path, a ):
-    Image.fromarray( np.clip( np.rint( a ), 0, 255 ).astype( np.uint8 ), "RGB" ).save( path, optimize=True )
+    save_image( Image.fromarray( np.clip( np.rint( a ), 0, 255 ).astype( np.uint8 ), "RGB" ), path )
 
 
 def vmat( name, color, normal, rough, ao, metal=0.0, extra="" ):
@@ -151,8 +169,9 @@ def courses( rng, n, ppu, lengths=( ( 30, 30, 60 ), ( 60, 60 ), ( 30, 60, 30 ), 
 # ---------------------------------------------------------------------------------------------------------------------
 # Travertine
 
-TRAVERTINE = [ ( 224, 211, 186 ), ( 216, 200, 170 ), ( 229, 220, 201 ), ( 209, 194, 166 ), ( 221, 207, 179 ),
-               ( 212, 203, 186 ), ( 226, 214, 192 ) ]
+# Close in tone, as the pictures' stone is: from a distance the blocks read as one wall, not a checkerboard.
+TRAVERTINE = [ ( 224, 211, 186 ), ( 219, 205, 177 ), ( 227, 216, 195 ), ( 216, 202, 174 ), ( 222, 208, 181 ),
+               ( 218, 207, 188 ), ( 225, 213, 190 ) ]
 
 
 def travertine( rng, n ):
@@ -183,7 +202,7 @@ def travertine( rng, n ):
 
     hollow = cavity( height, ppu )
     palette = to_linear( TRAVERTINE )
-    base = palette[rng.integers( 0, len( palette ), count )] * rng.uniform( 0.95, 1.04, ( count, 1 ) )
+    base = palette[rng.integers( 0, len( palette ), count )] * rng.uniform( 0.975, 1.02, ( count, 1 ) )
     band = blur( rng.standard_normal( ( n, n ) ), ( 0.6 * ppu, 14.0 * ppu ) )
     band = band / band.std()
     honey = to_linear( ( 196, 170, 128 ) )
@@ -203,7 +222,8 @@ def travertine( rng, n ):
 # ---------------------------------------------------------------------------------------------------------------------
 # Honed travertine: the paving, and without joints for copings and benches
 
-PAVING = [ ( 228, 217, 196 ), ( 222, 209, 186 ), ( 232, 223, 206 ), ( 218, 205, 182 ), ( 226, 214, 194 ) ]
+# Within a few per cent of each other, as the pictures' paving is: an even cream, not a checkerboard of light and dark.
+PAVING = [ ( 228, 217, 196 ), ( 225, 213, 191 ), ( 230, 220, 201 ), ( 223, 211, 189 ), ( 227, 215, 194 ) ]
 
 
 def honed_face( rng, n, ppu, slab, count, angle ):
@@ -211,7 +231,7 @@ def honed_face( rng, n, ppu, slab, count, angle ):
     traffic grime. Returns the colour (linear) and its fine height. """
     y, x = np.mgrid[0:n, 0:n].astype( float )
     palette = to_linear( PAVING )
-    base = palette[rng.integers( 0, len( palette ), count )] * rng.uniform( 0.96, 1.04, ( count, 1 ) )
+    base = palette[rng.integers( 0, len( palette ), count )] * rng.uniform( 0.985, 1.015, ( count, 1 ) )
     along = blur( rng.standard_normal( ( n, n ) ), ( 0.5 * ppu, 12.0 * ppu ) )
     across = blur( rng.standard_normal( ( n, n ) ), ( 12.0 * ppu, 0.5 * ppu ) )
     vein = np.where( angle[slab] > 0, across, along )
@@ -220,7 +240,7 @@ def honed_face( rng, n, ppu, slab, count, angle ):
     pits_b = blur( rng.standard_normal( ( n, n ) ), ( 0.8 * ppu, 0.15 * ppu ) )
     pits = smoothstep( 2.4, 3.2, unit( np.where( angle[slab] > 0, pits_b, pits_a ) ) )
     stone = base[slab] * ( 1.0 + 0.03 * vein + 0.015 * noise( rng, n, 1.0, 100, None ) )[..., None]
-    stone = lerp( stone, stone * to_linear( ( 205, 186, 150 ) ) / to_linear( ( 225, 213, 192 ) ), 0.35 * smoothstep( 0.8, 2.2, vein ) )
+    stone = lerp( stone, stone * to_linear( ( 205, 186, 150 ) ) / to_linear( ( 225, 213, 192 ) ), 0.18 * smoothstep( 0.8, 2.2, vein ) )
     stone = lerp( stone, stone * 0.8, 0.6 * pits )
     grime = smoothstep( 0.4, 2.4, noise( rng, n, 3.0, 1, 10 ) )
     stone = lerp( stone, stone * 0.9, 0.4 * grime )
@@ -277,7 +297,7 @@ def panel( rng, n ):
     dome = 0.01 * np.sin( math.pi * u / 30 ) * np.sin( math.pi * v / 30 ) * rng.uniform( -1, 1, 16 )[cell]
     height = -0.6 * ( 1 - inside ) + inside * ( 0.1 * bevel + wave + dome )
     hollow = cavity( height, ppu, radii=( 0.2, 0.8 ), weights=( 1.0, 0.4 ) )
-    white = to_linear( ( 233, 227, 214 ) ) * rng.uniform( 0.985, 1.012, ( 16, 1 ) )
+    white = to_linear( ( 212, 207, 198 ) ) * rng.uniform( 0.985, 1.012, ( 16, 1 ) )   # a light warm grey, as pictured
     stone = white[cell] * ( 1.0 + 0.006 * noise( rng, n, 1.0, 60, None ) )[..., None]
     # A faint grey wash down from each panel's top edge (rain), and some dust settled near the joints.
     rain = smoothstep( 1.0, 2.6, blur( noise( rng, n, 1.4, 8, 200 ), ( 3.0 * ppu, 0.08 * ppu ) ) ) * ( 1 - v / 30.0 )

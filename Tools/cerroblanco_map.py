@@ -82,7 +82,13 @@ DOOR_H = 124.0
 
 ROTUNDA = ( 313.0, 1200.0 )
 ROT_IN, ROT_OUT = 375.0, 393.0
-ROT_UP = 250.0                   # the upper drum's outside radius
+ROT_TOP = 352.0                  # the lower drum's roof
+ROT_WIN = ( 186.0, 320.0 )       # the lower drum's tall windows
+ROT_UP = 290.0                   # the upper drum's outside radius: about three quarters of the lower's, as pictured
+ROT_UP_WALL = 26.0               # its walls' depth, which its windows are set into
+ROT_UP_TOP = 540.0
+ROT_UP_WIN = ( 96.0, 424.0, 488.0 )   # its twelve windows (1.5:1): width at the face, sill and head, high enough to clear
+                                      # the lower drum's parapet seen from the courtyard
 ROT_BAY = ( 216.0, 260.0 )       # the curtain wall's arc, degrees anticlockwise from east: towards the courtyard
 GARDEN = ( -1743.0, -1359.0 )    # the garden circle's middle (bomb site B)
 GARDEN_R = 560.0                 # its hedge's outside
@@ -91,7 +97,10 @@ GARDEN_R = 560.0                 # its hedge's outside
 WG_A = ( -1126.0, -650.0, -160.0, 1510.0 )
 WG_B = ( -650.0, -200.0, 1050.0, 1510.0 )
 CAFE = ( 480.0, 1000.0, 0.0, 715.0 )
-NG = ( 1000.0, 2060.0, -18.0, 715.0 )
+CAFE_UP = 340.0                              # the cafe's upper room over its south half, to the outside of its north wall
+CAFE_GRID = ( 24.0, 316.0, 190.0, 340.0, 11, 6 )   # its curtain wall over the stage: n0, n1, z0, z1, columns, rows
+CAFE_SKYLIGHT = ( 640.0, 880.0, 110.0, 230.0 )     # e0, e1, n0, n1
+NG =( 1000.0, 2060.0, -18.0, 715.0 )
 EH = ( 480.0, 1400.0, -1000.0, 0.0 )
 SG = ( -1030.0, 480.0, -2150.0, -1000.0 )
 CAR_PARK = ( 1000.0, 2400.0, 1700.0, 2500.0 )
@@ -115,6 +124,12 @@ def write_materials():
     lines = [ "// Tools/cerroblanco_map.py, from materials/railhead/rw_glass.vmat" if line.startswith( "//" ) else line
               for line in glass.splitlines() ]
     K.write_text( MAT_DIR / f"{P.GLAZE}.vmat", "\n".join( lines ) + "\n" )
+    # The fritted panes: rough enough that 40% of their pale colour is lit, and the rest blurred through.
+    frit = { "g_flBlurAmount": "0.25", "AlbedoAbsorption": "0.9", "TextureColor": "[0.820000 0.900000 0.880000 0.000000]",
+             "TextureRoughness": "[0.450000 0.450000 0.450000 0.000000]" }
+    lines = [ f'    {line.split()[0]} "{frit[line.split()[0]]}"' if line.split() and line.split()[0] in frit else line
+              for line in lines ]
+    K.write_text( MAT_DIR / f"{P.FRIT}.vmat", "\n".join( lines ) + "\n" )
 
 
 def configure( model ):
@@ -194,7 +209,7 @@ def parapet_on( m, axis, run, across, outward, z, h=30.0, paint=PANEL ):
 
 
 def roof_slab( m, e0, e1, n0, n1, z, thick=16.0 ):
-    m.box( ( e0, n0, z - thick ), ( e1, n1, z ), { "+z": GRAVEL, "-z": PLASTER, "default": None }, STONE )
+    m.box( ( e0, n0, z - thick ), ( e1, n1, z ), { "+z": P.ROOF, "-z": PLASTER, "default": None }, STONE )
 
 
 def floor( m, e0, e1, n0, n1, z=0.0, paint=HONED ):
@@ -232,7 +247,7 @@ def west_gallery( m, g, d ):
     wall( m, g, "n", ( 1068, 1492 ), ( -218, -200 ), "+e", doors=[ door( 1300 ) ],
           windows=[ glass( 1150, 120 ), upper( 1150 ), upper( 1400 ) ], ends=False, parapet=True )
     # The inside corner of the L, where the east wall meets the north wing's south wall.
-    m.box( ( -668, 1050, 0 ), ( -650, 1068, ROOF ), { "default": None, "-e": PLASTER, "+n": PLASTER, "+z": GRAVEL }, STONE )
+    m.box( ( -668, 1050, 0 ), ( -650, 1068, ROOF ), { "default": None, "-e": PLASTER, "+n": PLASTER, "+z": P.ROOF }, STONE )
     parapet_on( m, "e", ( -668, -650 ), ( 1050, 1068 ), None, ROOF )
     floor( m, *WG_A )
     floor( m, *WG_B )
@@ -314,39 +329,57 @@ def upstairs_plinth( m, e, n, w=26.0, h=40.0 ):
 
 
 # ---------------------------------------------------------------------------------------------------------------------
-# The rotunda: the entrance hall, a drum of travertine with a band of glass under its panelled top
+# The rotunda: the entrance hall, a panelled drum with a smaller one on its roof
 
 def rotunda( m, g, d ):
-    """ The entrance hall: a drum clad in the white panels, with a tall curtain wall of gridded glass towards the
-    courtyard, and a smaller drum set back on its roof, ringed with square windows, as the pictures' rotunda has. """
+    """ The entrance hall: a drum clad in the white panels, and a smaller, taller drum set back on its roof, ringed with
+    twelve deep-set windows, as the pictures' rotunda has. Towards the courtyard the lower drum has a big window of
+    nine panes over a band of panels and the ground floor's glazing, each set in deep from the face, and a tall
+    window over its west door. """
     c = ROTUNDA
-    gaps = [ ( a, 110.0, 0.0, DOOR_H + 6 ) for a in ( 0.0, 90.0, 180.0, 270.0 ) ]
+    doors = [ ( a, 110.0, 0.0, DOOR_H + 6 ) for a in ( 0.0, 90.0, 180.0, 270.0 ) ]
     bay0, bay1 = ROT_BAY
     bay_mid = ( bay0 + bay1 ) / 2
     bay_w = math.radians( bay1 - bay0 ) * ROT_OUT
-    P.ring( m, c, ROT_IN, ROT_OUT, 0, 352, outer=PANEL, inner=PLASTER, top=HONED, gaps=gaps + [ ( bay_mid, bay_w, 20.0, 330.0 ) ] )
-    # The curtain wall: a grid of glass, a mullion every 4 degrees (~27 inches) and a transom every 52.
-    P.curved_glazing( m, g, c, ( ROT_IN + ROT_OUT ) / 2, bay0, bay1, 20, 330, step=4.0,
-                      transoms=( 72.0, 124.0, 176.0, 228.0, 280.0 ) )
+    west_w = 104.0
+    windows = [ ( bay_mid, bay_w, 20.0, 140.0 ), ( bay_mid, bay_w, ROT_WIN[0], ROT_WIN[1] ),
+                ( 180.0, west_w, ROT_WIN[0], ROT_WIN[1] ) ]
+    P.ring( m, c, ROT_IN, ROT_OUT, 0, ROT_TOP, outer=PANEL, inner=PLASTER, top=HONED, gaps=doors + windows )
+    # The glazing sits at the wall's inside face, so each opening has a reveal its depth all round. The courtyard's
+    # windows are three panes across, the big one three high (as in the picture), the ground floor's one.
+    glass_r = ROT_IN + 1.5
+    third = ( bay1 - bay0 ) / 3 + 0.01
+    P.curved_glazing( m, g, c, glass_r, bay0, bay1, 20, 140, step=third )
+    h = ( ROT_WIN[1] - ROT_WIN[0] ) / 3
+    P.curved_glazing( m, g, c, glass_r, bay0, bay1, ROT_WIN[0], ROT_WIN[1], step=third,
+                      transoms=( ROT_WIN[0] + h, ROT_WIN[0] + 2 * h ) )
+    half = math.degrees( west_w / 2 / ROT_OUT )
+    P.curved_glazing( m, g, c, glass_r, 180.0 - half, 180.0 + half, ROT_WIN[0], ROT_WIN[1], step=half + 0.01,
+                      transoms=( ROT_WIN[0] + h, ROT_WIN[0] + 2 * h ) )
     # The cornice band and the parapet round the lower drum's roof.
-    P.ring( m, c, ROT_OUT, ROT_OUT + 6, 336, 352, outer=PANEL, inner=None, top=HONED, bottom=HONED, surface=None )
-    P.ring( m, c, ROT_IN + 4, ROT_OUT + 2, 352, 380, outer=PANEL, inner=PANEL, top=HONED, bottom=None )
+    P.ring( m, c, ROT_OUT, ROT_OUT + 6, ROT_TOP - 16, ROT_TOP, outer=PANEL, inner=None, top=HONED, bottom=HONED, surface=None )
+    P.ring( m, c, ROT_IN + 4, ROT_OUT + 2, ROT_TOP, ROT_TOP + 16, outer=PANEL, inner=PANEL, top=HONED, bottom=None )
     # The hall's ceiling is a ring: the upper drum over its middle is the hall's clerestory.
-    P.ring( m, c, ROT_UP - 16, ROT_IN + 1, 336, 352, outer=None, inner=PLASTER, top=GRAVEL, bottom=PLASTER, step=6.0 )
-    # The upper drum, set back on the roof, its square windows all round.
-    windows = [ ( 15.0 + 30.0 * k, 46.0, 384.0, 432.0 ) for k in range( 12 ) ]
-    P.ring( m, c, ROT_UP - 16, ROT_UP, 352, 470, outer=PANEL, inner=PLASTER, top=HONED, gaps=windows )
-    for a, w, z0, z1 in windows:
+    P.ring( m, c, ROT_UP - ROT_UP_WALL, ROT_IN + 1, ROT_TOP - 16, ROT_TOP, outer=None, inner=PLASTER, top=P.ROOF,
+            bottom=PLASTER, step=6.0 )
+    # The upper drum, set back on the roof. Its walls are thick, and its windows' glass is set in near their inside
+    # face, so each window is a deep box in the panels, as in the picture.
+    up_windows = [ ( 15.0 + 30.0 * k, ROT_UP_WIN[0], ROT_UP_WIN[1], ROT_UP_WIN[2] ) for k in range( 12 ) ]
+    P.ring( m, c, ROT_UP - ROT_UP_WALL, ROT_UP, ROT_TOP, ROT_UP_TOP, outer=PANEL, inner=PLASTER, top=HONED,
+            gaps=up_windows )
+    for a, w, z0, z1 in up_windows:
         half = math.degrees( w / 2 / ROT_UP )
-        P.curved_glazing( m, g, c, ROT_UP - 8, a - half, a + half, z0, z1, step=2 * half + 0.01 )
-    P.ring( m, c, ROT_UP - 2, ROT_UP + 4, 470, 476, outer=PANEL, inner=None, top=HONED, bottom=HONED, surface=None )
-    m.cylinder( c, ROT_UP - 15, 454, 470, { "side": None, "top": GRAVEL, "bottom": PLASTER }, sides=48, surface=STONE )
+        P.curved_glazing( m, g, c, ROT_UP - ROT_UP_WALL + 3, a - half, a + half, z0, z1, step=2 * half + 0.01 )
+    cap = ROT_UP_TOP - 16
+    m.cylinder( c, ROT_UP - ROT_UP_WALL + 1, cap, ROT_UP_TOP, { "side": None, "top": P.ROOF, "bottom": PLASTER },
+                sides=48, surface=STONE )
     # The oculus' light in the clerestory's ceiling, a lantern over it, and a ring of downlights in the hall's ceiling.
-    P.disc( m, LAMP, ( c[0], c[1] ), 70, 453.5, facing=-1.0, sides=32 )
-    m.cylinder( c, 76, 470, 486, { "side": FRAME, "top": P.GLAZE, "bottom": None }, sides=32 )
+    P.disc( m, LAMP, ( c[0], c[1] ), 70, cap - 0.5, facing=-1.0, sides=32 )
+    m.cylinder( c, 76, ROT_UP_TOP, ROT_UP_TOP + 14, { "side": FRAME, "top": P.GLAZE, "bottom": None }, sides=32 )
     for k in range( 16 ):
         a = 2 * math.pi * ( k + 0.5 ) / 16
-        P.disc( m, LAMP, ( c[0] + 310 * math.cos( a ), c[1] + 310 * math.sin( a ) ), 5, 335.5, facing=-1.0, sides=10 )
+        P.disc( m, LAMP, ( c[0] + 316 * math.cos( a ), c[1] + 316 * math.sin( a ) ), 5, ROT_TOP - 16.5, facing=-1.0,
+                sides=10 )
     # Door frames in the drum's four openings.
     for a in ( 0.0, 90.0, 180.0, 270.0 ):
         u = np.array( ( math.cos( math.radians( a ) ), math.sin( math.radians( a ) ) ) )
@@ -368,15 +401,52 @@ def rotunda( m, g, d ):
 # ---------------------------------------------------------------------------------------------------------------------
 # The east block: the cafe (its roof a terrace), the North Gallery, the East Hall (bomb site A)
 
+def cafe_upper( m, g, d ):
+    """ The cafe's upper room over its south half, as tall as the galleries, as the block behind the pictures' stage is:
+    enamelled panels with a curtain wall of square panes over the stage, a skylight and a plant room on its roof. The
+    terrace is north of it, with a door in. """
+    n0, n1, z0, z1, cols, rows = CAFE_GRID
+    P.facade( m, "n", ( 0, CAFE_UP ), ( 480, 498 ), "-e", FLOOR1, ROOF, [ ( ( n0 + n1 ) / 2, n1 - n0, z0, z1, "window" ) ],
+              lower=PANEL, upper=PANEL, split=FLOOR1 )
+    P.glaze( m, g, "n", 489, n0, n1, z0, z1, pitch=( n1 - n0 ) / cols,
+             transoms=[ z0 + ( z1 - z0 ) * k / rows for k in range( 1, rows ) ], frame=WHITE, pane=P.FRIT )
+    parapet_on( m, "n", ( 0, CAFE_UP ), ( 480, 498 ), "-e", ROOF )
+    wall( m, g, "e", ( 498, 1000 ), ( CAFE_UP - 18, CAFE_UP ), "+n", FLOOR1, ROOF, doors=[ door( 600, 100, FLOOR1, 120 ) ],
+          windows=[ ( 830, 200, FLOOR1 + 24, FLOOR1 + 140 ) ], ends=False, split=FLOOR1, parapet=True )
+
+    # The roof, with the skylight's hole: a white curb round it, and panes on anodised bars.
+    s0, s1, s2, s3 = CAFE_SKYLIGHT
+    P.slab( m, 498, 1000, 0, CAFE_UP - 18, ROOF - 16, ROOF, holes=[ CAFE_SKYLIGHT ], top=P.ROOF, bottom=PLASTER,
+            side=PLASTER )
+    for lo, hi in ( ( ( s0 - 5, s2 - 5 ), ( s1 + 5, s2 ) ), ( ( s0 - 5, s3 ), ( s1 + 5, s3 + 5 ) ),
+                    ( ( s0 - 5, s2 ), ( s0, s3 ) ), ( ( s1, s2 ), ( s1 + 5, s3 ) ) ):
+        m.box( ( lo[0], lo[1], ROOF ), ( hi[0], hi[1], ROOF + 12 ), { "default": WHITE, "-z": None }, STONE )
+    g.box( ( s0, s2, ROOF + 10 ), ( s1, s3, ROOF + 11.5 ), P.GLAZE, GLASS )
+    for k in range( 1, 4 ):
+        e = s0 + ( s1 - s0 ) * k / 4
+        m.box( ( e - 1.25, s2, ROOF + 9 ), ( e + 1.25, s3, ROOF + 12.5 ), FRAME )
+    m.box( ( s0, ( s2 + s3 ) / 2 - 1.25, ROOF + 9 ), ( s1, ( s2 + s3 ) / 2 + 1.25, ROOF + 12.5 ), FRAME )
+    # The plant room's unit, with its fan on top.
+    m.box( ( 900, 230, ROOF ), ( 970, 300, ROOF + 44 ), { "default": WHITE, "-z": None }, METAL )
+    P.disc( m, BLACK, ( 935, 265 ), 24, ROOF + 44.2 )
+
+    # Inside: two plinths and a canvas between the East Hall's windows.
+    for e, n in ( ( 600, 80 ), ( 900, 250 ) ):
+        upstairs_plinth( d, e, n )
+    P.picture( d, ( 750, 0 ), FLOOR1 + 90, 100, 70, ( 0, 1 ), "cb_banner_2" )
+
+
 def east_block( m, g, d ):
-    # The cafe, one storey, with the roof terrace over it.
+    # The cafe: the upper room over its south half (cafe_upper), the roof terrace over its north half.
     wall( m, g, "n", ( 0, 697 ), ( 480, 498 ), "-e", 0, CAFE_TOP, doors=[ door( 290, 90 ) ], ends=False )
     wall( m, g, "e", ( 480, 1000 ), ( 697, 715 ), "+n", 0, CAFE_TOP, doors=[ door( 740 ) ],
           windows=[ glass( 600, 160, 20, 140 ), glass( 880, 160, 20, 140 ) ] )
     floor( m, *CAFE )
-    P.slab( m, 480, 1000, 0, 715, SLAB, FLOOR1, top=PAVE )
-    P.balustrade( m, g, ( 482, 0 ), ( 482, 640 ), FLOOR1 )
+    P.slab( m, 480, 1000, 0, CAFE_UP, SLAB, FLOOR1, top=HONED )
+    P.slab( m, 480, 1000, CAFE_UP, 715, SLAB, FLOOR1, top=PAVE )
+    P.balustrade( m, g, ( 482, CAFE_UP ), ( 482, 640 ), FLOOR1 )
     P.balustrade( m, g, ( 480, 713 ), ( 1000, 713 ), FLOOR1 )
+    cafe_upper( m, g, d )
     # Its stair up from the courtyard, beside its west wall.
     P.flight( m, "n", 420, 480, 640, 340, FLOOR1, 0, side=TRAV )
     m.box( ( 420, 640, 0 ), ( 480, 715, FLOOR1 ), { "+z": HONED, "-z": None, "default": TRAV, "+e": None }, STONE )
@@ -652,10 +722,8 @@ def courtyard( m, d ):
     for e0, e1, n0, n1 in ( ( -620, -420, -900, -860 ), ( -620, -580, -900, -700 ), ( 280, 440, -900, -860 ),
                             ( 400, 440, -900, -700 ), ( -520, -200, 380, 420 ), ( 100, 340, 380, 420 ) ):
         P.hedge_box( d, e0, e1, n0, n1, height=30, planter=16 )
-    # Two small trees by the South Gallery. The pictures' courtyard is open to the sky round its planter: big trees here
-    # hid the rotunda and the stage.
-    for e, n in ( ( -500, -560 ), ( 300, -560 ) ):
-        P.tree( d, e, n, f"{P.OAK}/tree_oak_small_a.vmdl", 0.9 )
+    # No trees: the pictures' courtyard is open to the sky round its planter, and trees here hid the rotunda and the
+    # stage.
     for e, n, along in ( ( -250, -800, "e" ), ( 100, -800, "e" ), ( -420, 150, "n" ), ( -280, 520, "e" ), ( 220, 520, "e" ) ):
         P.bench( d, e, n, length=90, along=along )
     for e, n in ( ( -540, 870 ), ( -420, 940 ), ( -540, 990 ), ( -300, 920 ) ):
@@ -773,7 +841,7 @@ def covered_walkway( m, d, c ):
     """ A flat white canopy on slim columns along the East Hall's east wall, from the North Gallery to the lawns. """
     for n in np.arange( -1170, -20, 190 ):
         column( m, 1625, n, 0, 200, r=6 )
-    c.box( ( 1400, -1190, 200 ), ( 1640, -18, 210 ), { "default": WHITE, "-z": WHITE, "+z": GRAVEL } )
+    c.box( ( 1400, -1190, 200 ), ( 1640, -18, 210 ), { "default": WHITE, "-z": WHITE, "+z": P.ROOF } )
     c.collision_box( ( 1400, -1190, 200 ), ( 1640, -18, 210 ), METAL )
     for n in np.arange( -1100, -60, 160 ):
         P.disc( c, LAMP, ( 1520, n ), 6, 199.5, facing=-1.0, sides=10 )
@@ -935,6 +1003,7 @@ def lights():
     out.append( ( "Rotunda", ( ROTUNDA[0], ROTUNDA[1], 300 ), NEUTRAL, 560, True ) )
     out.append( ( "Rotunda Low", ( ROTUNDA[0], ROTUNDA[1], 120 ), WARM, 300, False ) )
     out.append( ( "Cafe", ( 740, 360, 140 ), WARM, 380, True ) )
+    out.append( ( "Cafe Upper", ( 750, 170, 320 ), NEUTRAL, 380, False ) )
     for k, ( e, n ) in enumerate( ( ( 1250, 350 ), ( 1800, 350 ) ) ):
         out.append( ( f"North Gallery Ground {k + 1}", ( e, n, 150 ), NEUTRAL, 420, k == 0 ) )
         out.append( ( f"North Gallery Upper {k + 1}", ( e, n, 330 ), NEUTRAL, 420, False ) )
@@ -954,6 +1023,7 @@ PROBES = [
     ( "West Gallery North", ( -430, 1280, 150 ), ( -668, -218, 1068, 1492, 0, 344 ) ),
     ( "Rotunda", ( ROTUNDA[0], ROTUNDA[1], 150 ), ( ROTUNDA[0] - 375, ROTUNDA[0] + 375, ROTUNDA[1] - 375, ROTUNDA[1] + 375, 0, 336 ) ),
     ( "Cafe", ( 740, 350, 80 ), ( 498, 1000, 0, 697, 0, 164 ) ),
+    ( "Cafe Upper", ( 750, 170, 260 ), ( 498, 1000, 0, CAFE_UP - 18, FLOOR1, ROOF - 16 ) ),
     ( "North Gallery", ( 1530, 350, 150 ), ( 1018, 2042, 0, 697, 0, 344 ) ),
     ( "East Hall", ( 940, -500, 150 ), ( 498, 1382, -982, -18, 0, 344 ) ),
     ( "South Gallery", ( -275, -1575, 150 ), ( -1012, 462, -2132, -1018, 0, 314 ) ),
@@ -972,7 +1042,7 @@ BLUE_BUY = ( -700, 950, -3150, -2650, -10, 260 )
 
 DM_SPAWNS = [
     ( -880, 1000, FLOOR1 ), ( -880, 300, 0 ), ( -400, 1300, 0 ), ( -430, 1300, FLOOR1 ), ( ROTUNDA[0], ROTUNDA[1] + 140, 0 ),
-    ( 740, 400, 0 ), ( 750, 400, FLOOR1 ), ( 1500, 200, FLOOR1 ), ( 1150, 550, 0 ), ( 1850, 600, 0 ), ( 700, -900, 0 ),
+    ( 740, 400, 0 ), ( 750, 400, FLOOR1 ), ( 760, 170, FLOOR1 ), ( 1500, 200, FLOOR1 ), ( 1150, 550, 0 ), ( 1850, 600, 0 ), ( 700, -900, 0 ),
     ( 1300, -700, FLOOR1 ), ( 1520, -600, 0 ), ( 2100, -200, 0 ), ( 2300, 400, 0 ), ( 1500, 1000, 0 ), ( 2300, 1000, 0 ),
     ( -300, 0, 0 ), ( 300, -700, 0 ), ( -300, -700, 0 ), ( -900, -600, 0 ), ( -1600, -1100, 0 ), ( -2400, -1700, 0 ),
     ( -2000, 650, 0 ), ( -1500, 1450, 0 ), ( -2400, -1000, 0 ), ( -600, -1400, 0 ), ( 200, -1900, 0 ), ( -1300, -2450, 0 ),
@@ -1016,7 +1086,8 @@ def callouts():
                                                                  GARDEN_SQUARE[2], GARDEN_SQUARE[3], -10, 400 ),
         ( "WEST WALK", -1126, -650, -1000, -160, -10, 400 ), ( "SOUTH-WEST LAWNS", -2560, -1030, -2400, -1919, -10, 400 ),
         ( "COURTYARD", -650, 480, -1000, 1050, -10, 400 ), ( "STAGE", 286, 480, -100, 240, -10, 400 ),
-        ( "CAFE", 480, 1000, 0, 715, -10, UP[0] ), ( "TERRACE", 420, 1000, 0, 715, *UP ),
+        ( "CAFE", 480, 1000, 0, 715, -10, UP[0] ), ( "TERRACE", 420, 1000, CAFE_UP, 715, *UP ),
+        ( "GLASS ROOM", 480, 1000, 0, CAFE_UP, *UP ),
         ( "NORTH GALLERY", 1000, 2060, -18, 715, -10, UP[0] ), ( "NORTH GALLERY UPPER", 1000, 2060, -18, 715, *UP ),
         ( "A SITE", 480, 1220, -1000, 0, -10, 400 ), ( "MEZZANINE", 1220, 1400, -1000, 0, *UP ),
         ( "A HALL", 1220, 1400, -1000, 0, -10, UP[0] ),
@@ -1087,7 +1158,7 @@ def write_minimap( models ):
     edge[:, :-1] |= ~shown[:, 1:]
     image[shown & edge] = ( 226, 233, 240, 255 )
     MINIMAP_FILE.parent.mkdir( parents=True, exist_ok=True )
-    Image.fromarray( image, "RGBA" ).save( MINIMAP_FILE )
+    CM.save_image( Image.fromarray( image, "RGBA" ), MINIMAP_FILE )
     print( f"wrote {MINIMAP_FILE.relative_to( K.ROOT )}" )
 
 
@@ -1407,9 +1478,10 @@ def build():
 
 def preview_colours():
     """ The preview renderer's colours for the cb_ paints: the drawn ones' mean colour, the flat ones' own. """
-    PV.is_glass = lambda p: p in ( "rw_glass", "rw_glass_roof", P.GLAZE )
+    PV.is_glass = lambda p: p in ( "rw_glass", "rw_glass_roof", P.GLAZE, P.FRIT )
     PV.GLOWING.add( LAMP )
     PV._colours[P.GLAZE] = np.array( ( 0.42, 0.55, 0.62 ) )
+    PV._colours[P.FRIT] = np.array( ( 0.72, 0.80, 0.78 ) )
     for paint, png in ( ( TRAV, "travertine" ), ( PANEL, "panel" ), ( PAVE, "paving" ), ( HONED, "honed" ), ( "cb_sign", "sign" ) ):
         PV._colours[paint] = np.asarray( Image.open( CM.OUT_DIR / f"{png}_color.png" ).convert( "RGB" ), float ).mean( axis=( 0, 1 ) ) / 255.0
     for k in range( 4 ):
@@ -1451,7 +1523,7 @@ def write_map_art( models ):
     opaque, glass_ = PV.triangles( models ), PV.triangles( models, glass=True )
     image = PV.perspective( opaque, glass_, ( 500, -1250, 620 ), ( -250, 400, 0 ), size=( 960, 540 ), fov=70 )
     MAP_ART_FILE.parent.mkdir( parents=True, exist_ok=True )
-    image.resize( ( 1920, 1080 ), Image.LANCZOS ).convert( "RGB" ).save( MAP_ART_FILE )
+    CM.save_image( image.resize( ( 1920, 1080 ), Image.LANCZOS ).convert( "RGB" ), MAP_ART_FILE )
     print( f"wrote {MAP_ART_FILE.relative_to( K.ROOT )}" )
 
 

@@ -3096,7 +3096,9 @@ simulate_input.
     - off-white enamelled panels for the upper floors;
     - four exhibition banners with abstract pictures;
     - the museum's name in bronze letters, and the South Gallery's name in grey ones.
-    Run it before the map script.
+    Run it before the map script (`cerroblanco_materials.py [name ...]` redraws only those). The open editor compiles
+    each map as it lands and holds the next one's file, so its saves go through a temporary file and retry the rename
+    for up to 10 s.
   - `cerroblanco_parts.py` has the pieces:
     - the walls, glazing, stairs, railings and curved walls;
     - the round boulder planter, the stage and its grand piano, the red sculptures and the bronze sphere;
@@ -3114,7 +3116,22 @@ simulate_input.
     Trees aren't drawn in them.
 - The museum stands round its courtyard: travertine below and warm off-white panels above (grey joints), with flat roofs
   and parapets.
-  - The rotunda is the entrance hall: a travertine drum with a band of curved glass and an oculus.
+  - The rotunda is the entrance hall, two drums in the white panels, as in the pictures:
+    - The lower drum (to `ROT_TOP`, 352) has a 3 x 3 gridded window towards the courtyard (`ROT_WIN`, 186-320) over a
+      band of panels, with the ground floor glazed under it, and a second window to the west.
+    - A smaller drum is set back on its roof (`ROT_UP`: radius 290, about three quarters of the lower's, up to 540).
+      Its walls are 26 deep (`ROT_UP_WALL`), and its twelve 1.5:1 windows (`ROT_UP_WIN`, 424-488) are set into them,
+      so their reveals show. It has a glazed lantern on top. The roofs round it are a pale membrane (`P.ROOF`,
+      `cb_roof`).
+  - The cafe's upper room (the GLASS ROOM callout, `cafe_upper`) is over its south half, the block behind the stage at
+    the galleries' height, as in the pictures:
+    - Over the stage, a curtain wall of 11 x 6 milky, pale green-white panes (`CAFE_GRID`, `P.FRIT`, `cb_glass_frit`)
+      in white mullions. The frit is glass.shader's rough glass (roughness 0.45, AlbedoAbsorption 0.9), so ~40% of its
+      colour is lit and the rest is the room blurred through. Plain `cb_glass` there read black.
+    - A skylight with a white curb and bars (`CAFE_SKYLIGHT`), a roof unit with a fan, two plinths and a picture
+      inside, and a door and a window from the terrace.
+    - The terrace is the cafe's roof north of it (`CAFE_UP`, 340), still up the stair from the courtyard.
+    - The pictures' large 2 x 2 window at that block's north end is left out.
   - The West Gallery (two storeys, an L, a stair inside) is on the courtyard's west side. Its east front has the
     pictures' curved balcony (`west_balcony`): a slab along the first floor with a rounded south-east corner, a steel
     rail, slim columns and a canopy, with five banners hanging from it (`BALCONY_BANNERS`). On the courtyard's east side
@@ -3132,9 +3149,18 @@ simulate_input.
     A smaller zigzag stands in the east garden.
     - The spike's sheets are crescents in section. Their normals come from each ring's own tangent: from the ring's
       middle they pointed into the concave face, which then drew inside out (only its edges showed).
-  - In the courtyard: the round two-tier planter with its boulders and a tree, the stage along the cafe's west wall
-    (`P.stage`: a black deck on a white pleated skirt, a truss with lamps, grey drapes and a white one down its end) with
-    the piano, speakers, monitors, flight cases and cables, hedges, benches and the cafe's tables.
+  - In the courtyard, which has no trees (they hid the rotunda and the stage, where the pictures' courtyard is open):
+    - the round two-tier planter with its boulders, seven low plants round its rim and a rounded beech shrub on top;
+    - the stage along the cafe's west wall (`P.stage`: a black deck on a white pleated skirt, a truss with lamps, grey
+      drapes and a white one down its end) with the piano, speakers, monitors, flight cases and cables;
+    - the hedges, benches and the cafe's tables.
+  - The hedges (`P.hedge_box`) are Facepunch's `beech_hedge_96x128` (its mesh is 48 x 141 x 90, `HEDGE_SIZE`), cut to
+    length in a travertine trough with a honed coping, over a clipped core box that is their collision.
+  - The stone's colours are within a few per cent of each other (`TRAVERTINE`, `PAVING`, the honed stone's jitter), so
+    from a distance the walls and the paving read as one even cream, as in the pictures, not a checkerboard. The
+    panels are a warm off-white (212, 207, 198) and the sculptures signal red (`RED`).
+  - The materials script saves each picture through a temporary file and retries for 10 s
+    (`cerroblanco_materials.save_image`), and the map script writes the radar and menu pictures through it.
   - The banners (`BANNERS`) read the right way round: `banner` swapped them for a viewer's left and right
     (fixed 2026-10-08).
 - The sky is its own (`Tools/cerroblanco_sky.py`, on belltower_sky's code): cloudless and deep blue, as in the
@@ -3151,15 +3177,26 @@ simulate_input.
     walkway and the east terrace.
 - Modes:
   - The scene lists TDM and Defuse, and it's in `GameUtils`' three map lists.
-  - It has deathmatch spawns (34) and Retakes spawns for each site.
+  - It has deathmatch spawns (35, one in the Glass Room) and Retakes spawns for each site.
   - Domination's flags: A at the rotunda, B in the courtyard, C at the South Gallery.
   - Hot Zones and Cash Grab points are `ObjectiveSpot`s.
-- Every run checks all 95 spots with railhead_map's `check_spots`, `check_reach` and `check_retakes_sight`. On
-  2026-10-08 all three passed.
+- Every run checks all 96 spots with railhead_map's `check_spots`, `check_reach` and `check_retakes_sight`. On
+  2026-10-09 all three passed.
 - The navmesh's bounds stop at `NAV_TOP` (300): over the first floors (180) and under the roofs (330-360). The glass and
   the canopies are tagged `navskip`.
-- Made offline on 2026-10-08, with the editor closed: nothing has compiled. The lighting, the navmesh, bots and the
-  modes' objects are all unchecked, and none of it has been seen in the engine.
+- Made offline on 2026-10-08. On 2026-10-09 the editor compiled every model, material and the scene with no Cerro
+  Blanco errors in its log, and the user played a match on it.
+  - The scene was loaded offscreen in the editor (a `new Scene()`, its objects deserialised from the file, the game
+    modes' prefabs left out): all 359 renderers loaded, none of them an error model.
+  - Renders from there (a camera with the scene's tonemapping and bloom) were compared with the pictures: the overhead,
+    the courtyard and stage, the West Gallery's balcony and the South Gallery's front. They led to the even stone, the
+    courtyard without trees, the planter's plants and the brighter red.
+  - The rotunda's drums and the Glass Room compiled on 2026-10-09 with no errors, and were compared offscreen with the
+    pictures from the courtyard, the stage and overhead.
+  - When a run adds a material, a model can compile before it ("Missing vmat"): `recompile_asset` the vmat, then the
+    vmdls.
+  - Not yet checked: the navmesh and bots, the modes' objects, the Glass Room in play, and the clear glass, which reads
+    flat grey where the pictures' reflects the sky.
 - To play it: `dev_mode team_deathmatch cerroblanco`.
 
 ## Ridgeback (battle royale map, `Assets/scenes/maps/Ridgeback/`)
