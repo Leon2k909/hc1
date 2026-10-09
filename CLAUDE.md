@@ -5277,6 +5277,13 @@ simulate_input.
     has no sound.
   - The body stands or crouches where it was (`PlayerPawn.IsPilotingDrone` stops the movement, use, inventory and ping
     input) and can be shot. Their legs-only body is off: from up there they're seen whole.
+  - The drone itself isn't drawn in its own feed (2026-10-09). The pilot's machine owns it and tags it `own_drone` while
+    the feed is up, which the feed camera leaves out. Other players still see it, and it still casts its shadow.
+    - The user saw something "clipping" while flying it. The lens hangs under the nose, inside the rotors' reach. Counted
+      from the OBJs: tilted 20-35 degrees into a flight, the front props come into the 62-degree picture 7" from the
+      lens. With the camera turned faster than the airframe follows (120 degrees a second), or looking back, the arms and
+      the props fill it. Tilted with the camera looking up, the nose is 0.8" from the lens, through the near plane (1).
+    - Built with dotnet. Not yet seen in-game.
   - MainHUD hides its HUD, markers, minimap and round strip, and `ReconOctocopterFeed` draws the feed's display: the link and
     recording, battery, heading tape, altitude, speed, distance, tilt, field of view, a box on each contact, zoom steps,
     warnings and key hints. Holding the tablet unlinked, it says what Attack1 does. Its 22 texts are in all ten tables.
@@ -5285,7 +5292,20 @@ simulate_input.
   - One drone a station: when it's destroyed, or lands with an empty battery or no operator, the tablet is taken out
     of the operator's inventory. A new launch retires an operator's last drone.
   - It goes at the round's cleanup and at a score reset.
-- Every machine spins its rotors (`ReconRotor`: blades under 900 rpm, a disc fading in above) and plays their sound.
+- Every machine spins its rotors (`ReconRotor`) and plays their sound.
+  - The hub (`recon_octocopter_hub`) looks the same turning, so it's always drawn. The blades are drawn under `BlurRpm`
+    (240) and a flat disc over it.
+  - The user found the disc "a fake white ring" (2026-10-09). It was a texture of each radius's blade share, with a
+    bright ring where the tips' white stripes were. The stripes are gone from the blades and the disc's textures with
+    them.
+  - The disc's look is worked out by `shaders/hc1_rotor_blur.shader` from the prop's real chord, twist and sweep: each
+    point darkened by the share of the time a blade covers it, seen edge-on or face-on. While the eye can still follow
+    the blades, each leaves a fading trail (ω x 0.025 s, `Persistence`). They fuse into an even, faintly see-through
+    disc between 20 and 50 blade passes a second (at hover's 2,900 rpm they pass 97 times). `ReconRotor` sets its
+    `RotorSpin`, `RotorTrail` and `RotorFusion` each frame, and the shader takes where the blades are from the disc,
+    which turns with the rotor.
+  - Written with the editor closed: the shader, the hub and the new props haven't compiled, and none of it has been
+    seen. If the disc draws as an error, check the editor's log for the shader.
 - The rotor sound (`Tools/octocopter_sounds.py`, `sounds/drones/octocopter_rotors`): an 8 s loop at hover, synthesised
   from how a coaxial multirotor makes its noise. Its docstring has every layer and why.
   - The blade-pass tone (96.7 Hz at 2,900 rpm) and its harmonics, the lower props harsher. The pairs' crossing tone
@@ -5302,7 +5322,8 @@ simulate_input.
     a blast's near or far sound (`BlastSound`, though it's heard from the body) and Reef Hall's fish. Screen shakes
     don't reach the feed (it has no `ScreenShaker`).
 - Made offline on 2026-10-08 with the editor closed after the models compiled. The code built with dotnet (0 errors),
-  but the prefabs, the .equip, the sound and the code haven't loaded in the editor. Nothing has been checked in-game:
+  but the prefabs, the .equip, the sound and the code haven't loaded in the editor. On 2026-10-09 the user flew it in
+  a match (its spinning props and the clipping above are theirs). Not yet checked otherwise:
   the tablet's first-person and third-person holds (`TabletViewModel.HoldPosition`, `HoldPitch`, `WristOffset` and the
   world model's grip are first guesses), the flight, the feed's display, spotting, damage and the sound.
 

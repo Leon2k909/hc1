@@ -26,8 +26,11 @@ There are two atlases: the drone's (body, gimbal ball and props) and the tablet'
 Models (OBJ, inches, written (Y, Z, X) for ModelDoc's Y-up import), each about its own origin:
 - recon_octocopter: the body, about the centre of gravity (arm height, hull middle). X forward, Z up.
 - recon_octocopter_gimbal: the camera ball, about its pitch axis; it looks along +X.
-- recon_octocopter_prop_ccw / _cw: a prop about its hub, thrust +Z; ccw turns anticlockwise seen from above.
-- recon_octocopter_disc: a spinning prop's blur, a translucent disc about the hub.
+- recon_octocopter_prop_ccw / _cw: a prop's blades and yoke about its hub, thrust +Z; ccw turns anticlockwise seen
+  from above. Drawn only while the prop turns slowly enough to see.
+- recon_octocopter_hub: the prop's hub, which looks the same turning, so it's always drawn.
+- recon_octocopter_disc: a turning prop's blur about the hub, a flat disc whose look is all worked out by
+  shaders/hc1_rotor_blur.shader from the prop's shape, its speed and the view.
 - recon_tablet: the station about its middle; the screen faces -X, Y is the holder's left, Z up.
 asset-info.json gives the hubs, spin directions, the gimbal's pivot and lens, the skids' height and the tablet's
 grips and screen, in inches, for the game.
@@ -511,7 +514,7 @@ PARTS = [
          {"body": [I3, MIRROR_Y]}, density=1.4),
     Part("ball", "ball", ball, {0: (12, 20), 1: (7, 12)}, {"gimbal": [I3]}, density=2.2),
     Part("hub", "hub", lathe(HUB, (0, 0, 0), (0, 0, 1), (-1, 0, 0)), {0: (7, 16), 1: (3, 10)},
-         {"prop_ccw": [I3], "prop_cw": [MIRROR_Y]}, density=2.0, a_rows=HUB.sampler({0: range(8), 1: (0, 2, 5, 7)})),
+         {"hub": [I3]}, density=2.0, a_rows=HUB.sampler({0: range(8), 1: (0, 2, 5, 7)})),
     Part("yoke", "hub", rbox((0.036, 0, 0), (0.016, 0.0135, 0.0078), 0.3), {0: (6, 10), 1: (4, 6)},
          {"prop_ccw": [I3, rot_z(180)], "prop_cw": [MIRROR_Y, MIRROR_Y @ rot_z(180)]}, density=2.0),
     Part("blade", "blade", blade, {0: (0, 9), 1: (0, 5)},
@@ -548,6 +551,7 @@ MODELS = {
     "gimbal": dict(file=f"{NAME}_gimbal", lods=(0, 1), thresholds=(0.0, 12.0), at=GIMBAL_C, group="drone"),
     "prop_ccw": dict(file=f"{NAME}_prop_ccw", lods=(0, 1), thresholds=(0.0, 10.0), at=BAKE_PROP_OFFSET, group="prop"),
     "prop_cw": dict(file=f"{NAME}_prop_cw", lods=(0, 1), thresholds=(0.0, 10.0), at=BAKE_PROP_OFFSET, group="prop"),
+    "hub": dict(file=f"{NAME}_hub", lods=(0, 1), thresholds=(0.0, 10.0), at=BAKE_PROP_OFFSET, group="prop"),
     "disc": dict(file=f"{NAME}_disc", lods=(0,), thresholds=(0.0,), at=None, group=None),
     "tablet": dict(file=TABLET, lods=(0, 1), thresholds=(0.0, 8.0), at=np.zeros(3), group="tablet"),
 }
@@ -715,7 +719,7 @@ def build_geometry():
             name = f"{info['file']}_lod{lod}"
             obj = make_object(name, v, f, uv, part, mats)
             obj.hide_set(lod != 0)
-            obj.hide_render = lod != 0 or model in ("prop_ccw", "prop_cw", "disc")
+            obj.hide_render = lod != 0 or model in ("prop_ccw", "prop_cw", "hub", "disc")
             if model == "tablet":
                 obj.location = VIEW_TABLET
             elif model == "gimbal":
@@ -728,6 +732,9 @@ def build_geometry():
         inst.location = pos
         inst.rotation_euler = (0, 0, math.radians(30 + 47 * i))
         bpy.context.scene.collection.objects.link(inst)
+        hub = bpy.data.objects.new(f"view_prop_hub_{i}", bpy.data.objects[f"{NAME}_hub_lod0"].data)
+        hub.location = pos
+        bpy.context.scene.collection.objects.link(hub)
 
 
 # ---------------------------------------------------------------------------------------------------------
@@ -1164,7 +1171,6 @@ def compose_drone(maps, out_dir):
     # --- Props (the prop frame: hub at the origin, thrust +Z) -----------------------------------------------------------
     bl = c.on("blade")
     rb = np.hypot(x, y)
-    c.paint(bl & (rb > PROP_R - 0.036) & (rb < PROP_R - 0.022), (232, 232, 228), 0.42)  # tip stripes
     c.paint(bl * (c.edge > 0.12) * (rb > 0.12) * smoothstep(0.35, 0.7, n2), (64, 64, 66), 0.5, amount=0.6)
     weave_b = np.sin(2 * np.pi * (rb + y * 0.3) / 0.005) * np.sin(2 * np.pi * (rb - y * 0.3) / 0.005)
     c.albedo *= (1 + 0.04 * weave_b * bl)[..., None]
@@ -1333,26 +1339,9 @@ def screen_texture():
     return np.clip(img, 0, 1)
 
 
-def disc_texture(size=512):
-    """A turning prop's blur: each radius covered by its blades' share of the circle (two blades), the tip
-    stripes' ring over it. Colour and opacity."""
-    yy, xx = np.mgrid[0:size, 0:size].astype(np.float32)
-    r = np.hypot(xx + 0.5 - size / 2, yy + 0.5 - size / 2) / (size / 2) * DISC_R1
-    chord = blade_chord(np.clip(r, BLADE_R0, PROP_R)) * tip_round(np.clip(PROP_R - r, 0, None), 0.014)
-    share = 2 * chord / (2 * np.pi * np.maximum(r, 0.01))
-    alpha = np.clip(1.8 * share, 0, 0.55) * (r < PROP_R) * smoothstep(0.026, 0.034, r)
-    stripe = (r > PROP_R - 0.036) & (r < PROP_R - 0.022)
-    colour = np.where(stripe[..., None], lin((232, 232, 228)), lin((26, 26, 27))).astype(np.float32)
-    alpha = np.where(stripe, np.maximum(alpha, 0.16), alpha)
-    return rd.to_srgb(colour), alpha.astype(np.float32)
-
-
 def write_extras(out_dir):
     out_dir.mkdir(parents=True, exist_ok=True)
     rd.write_png(out_dir / f"{TABLET}_screen.png", screen_texture()[::-1].copy())
-    colour, alpha = disc_texture()
-    rd.write_png(out_dir / f"{NAME}_disc_color.png", colour)
-    rd.write_png(out_dir / f"{NAME}_disc_trans.png", alpha)
     for name, rgb in LAMP_RGB.items():
         rd.write_png(out_dir / f"{NAME}_lamp_{name}.png", np.broadcast_to(np.array(rgb, np.float32) / 255, (8, 8, 3)).copy())
 
@@ -1499,19 +1488,13 @@ Layer0
 """
 
 
-DISC_VMAT = f"""// Generated by Tools/build_recon_octocopter.py: a turning prop's blur
+DISC_VMAT = """// Generated by Tools/build_recon_octocopter.py: a turning prop's blur, worked out by its shader
 
 Layer0
-{{
-	shader "shaders/complex.shader"
-	F_TRANSLUCENT 1
-	F_SPECULAR 1
-	TextureColor "{ASSET}/{NAME}_disc_color.png"
-	TextureTranslucency "{ASSET}/{NAME}_disc_trans.png"
-	TextureRoughness "[0.400000 0.400000 0.400000 0.000000]"
-	g_flMetalness "0.000"
+{
+	shader "shaders/hc1_rotor_blur.shader"
 	g_bFogEnabled "1"
-}}
+}
 """
 
 

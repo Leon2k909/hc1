@@ -126,6 +126,12 @@
             "__guid": "51e12048-818a-5cc5-8815-de3e7ae8bf5a",
             "__enabled": true,
             "Spin": 1,
+            "Hub": {
+              "_type": "component",
+              "component_id": "8b865403-007d-5e23-8388-b2f3f735a678",
+              "go": "ccff1dec-ac22-550c-b811-a11a7787064c",
+              "component_type": "ModelRenderer"
+            },
             "Blades": {
               "_type": "component",
               "component_id": "385343bf-1dfc-5530-a7b5-f18f09eea01d",
@@ -141,6 +147,28 @@
           }
         ],
         "Children": [
+          {
+            "__guid": "ccff1dec-ac22-550c-b811-a11a7787064c",
+            "Name": "Rotor 1 Hub",
+            "Enabled": true,
+            "NetworkMode": 0,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "8b865403-007d-5e23-8388-b2f3f735a678",
+                "__enabled": true,
+                "Model": "models/recon_octocopter/recon_octocopter_hub.vmdl",
+                "Tint": "1,1,1,1",
+                "RenderType": "On",
+                "RenderOptions": {
+                  "GameLayer": true,
+                  "OverlayLayer": false
+                },
+                "UseAnimGraph": false
+              }
+            ],
+            "Children": []
+          },
           {
             "__guid": "dd2b42ec-40fd-5bcb-8e8f-6c8efbcb6d5c",
             "Name": "Rotor 1 Blades",
@@ -199,6 +227,12 @@
             "__guid": "8834ec75-799a-5d59-b18b-20f71b177d24",
             "__enabled": true,
             "Spin": -1,
+            "Hub": {
+              "_type": "component",
+              "component_id": "785f6dd6-382e-5591-bfca-e9817b1d328e",
+              "go": "cc319759-38ca-5363-8e16-50ffddb527b3",
+              "component_type": "ModelRenderer"
+            },
             "Blades": {
               "_type": "component",
               "component_id": "d166a404-5dcb-50d0-96fa-65fcd7dd542a",
@@ -214,6 +248,28 @@
           }
         ],
         "Children": [
+          {
+            "__guid": "cc319759-38ca-5363-8e16-50ffddb527b3",
+            "Name": "Rotor 2 Hub",
+            "Enabled": true,
+            "NetworkMode": 0,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "785f6dd6-382e-5591-bfca-e9817b1d328e",
+                "__enabled": true,
+                "Model": "models/recon_octocopter/recon_octocopter_hub.vmdl",
+                "Tint": "1,1,1,1",
+                "RenderType": "On",
+                "RenderOptions": {
+                  "GameLayer": true,
+                  "OverlayLayer": false
+                },
+                "UseAnimGraph": false
+              }
+            ],
+            "Children": []
+          },
           {
             "__guid": "75623956-952c-5449-8604-97fd9f5bc664",
             "Name": "Rotor 2 Blades",
@@ -272,6 +328,12 @@
             "__guid": "2b9ebb90-70eb-5b56-9de0-a5e086a4551e",
             "__enabled": true,
             "Spin": -1,
+            "Hub": {
+              "_type": "component",
+              "component_id": "769364ef-4234-5345-8aa1-c567ba494f88",
+              "go": "3a0e1b2a-07a4-5eea-b675-702b2f1d51c8",
+              "component_type": "ModelRenderer"
+            },
             "Blades": {
               "_type": "component",
               "component_id": "69b8a5f2-ee16-579d-a2bd-70c2b0adc272",
@@ -287,6 +349,28 @@
           }
         ],
         "Children": [
+          {
+            "__guid": "3a0e1b2a-07a4-5eea-b675-702b2f1d51c8",
+            "Name": "Rotor 3 Hub",
+            "Enabled": true,
+            "NetworkMode": 0,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "769364ef-4234-5345-8aa1-c567ba494f88",
+                "__enabled": true,
+                "Model": "models/recon_octocopter/recon_octocopter_hub.vmdl",
+                "Tint": "1,1,1,1",
+                "RenderType": "On",
+                "RenderOptions": {
+                  "GameLayer": true,
+                  "OverlayLayer": false
+                },
+                "UseAnimGraph": false
+              }
+            ],
+            "Children": []
+          },
           {
             "__guid": "56e3235d-68a6-5fd7-9dfe-0474bb44a39d",
             "Name": "Rotor 3 Blades",
@@ -345,6 +429,12 @@
             "__guid": "5743dec8-9c9b-5714-8b66-af283348aa4d",
             "__enabled": true,
             "Spin": 1,
+            "Hub": {
+              "_type": "component",
+              "component_id": "3023ddbe-938d-597c-b388-e5571263800e",
+              "go": "e78b4acf-4afc-569a-aff8-177e26827845",
+              "component_type": "ModelRenderer"
+            },
             "Blades": {
               "_type": "component",
               "component_id": "6345b74d-9403-51cf-8ad9-918ad6902ab6",
@@ -360,6 +450,28 @@
           }
         ],
         "Children": [
+          {
+            "__guid": "e78b4acf-4afc-569a-aff8-177e26827845",
+            "Name": "Rotor 4 Hub",
+            "Enabled": true,
+            "NetworkMode": 0,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "3023ddbe-938d-597c-b388-e5571263800e",
+                "__enabled": true,
+                "Model": "models/recon_octocopter/recon_octocopter_hub.vmdl",
+                "Tint": "1,1,1,1",
+                "RenderType": "On",
+                "RenderOptions": {
+                  "GameLayer": true,
+                  "OverlayLayer": false
+                },
+                "UseAnimGraph": false
+              }
+            ],
+            "Children": []
+          },
           {
             "__guid": "eec9318c-2dd3-5acf-87da-96e5db860b33",
             "Name": "Rotor 4 Blades",
@@ -418,6 +530,12 @@
             "__guid": "bb3c865c-64a5-58cf-ab72-10b9e7afb547",
             "__enabled": true,
             "Spin": 1,
+            "Hub": {
+              "_type": "component",
+              "component_id": "f3138552-35c9-5ddc-a25b-9b9c4c58a105",
+              "go": "f7381894-8869-540d-9b57-86fa37035be3",
+              "component_type": "ModelRenderer"
+            },
             "Blades": {
               "_type": "component",
               "component_id": "ada2a1e4-4cff-58f2-b591-f63c7b5102ac",
@@ -433,6 +551,28 @@
           }
         ],
         "Children": [
+          {
+            "__guid": "f7381894-8869-540d-9b57-86fa37035be3",
+            "Name": "Rotor 5 Hub",
+            "Enabled": true,
+            "NetworkMode": 0,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "f3138552-35c9-5ddc-a25b-9b9c4c58a105",
+                "__enabled": true,
+                "Model": "models/recon_octocopter/recon_octocopter_hub.vmdl",
+                "Tint": "1,1,1,1",
+                "RenderType": "On",
+                "RenderOptions": {
+                  "GameLayer": true,
+                  "OverlayLayer": false
+                },
+                "UseAnimGraph": false
+              }
+            ],
+            "Children": []
+          },
           {
             "__guid": "88113193-785e-5f94-bd7b-0d8e3de627e1",
             "Name": "Rotor 5 Blades",
@@ -491,6 +631,12 @@
             "__guid": "258a4151-9421-54a3-a732-13f04943f5fb",
             "__enabled": true,
             "Spin": -1,
+            "Hub": {
+              "_type": "component",
+              "component_id": "7ed8d764-565c-53c2-aaca-6baf566ecb92",
+              "go": "ae3800d3-17c2-59f7-bdb7-aa1166176024",
+              "component_type": "ModelRenderer"
+            },
             "Blades": {
               "_type": "component",
               "component_id": "ba2fb582-ced9-50f8-a69e-8fb2ba54c584",
@@ -506,6 +652,28 @@
           }
         ],
         "Children": [
+          {
+            "__guid": "ae3800d3-17c2-59f7-bdb7-aa1166176024",
+            "Name": "Rotor 6 Hub",
+            "Enabled": true,
+            "NetworkMode": 0,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "7ed8d764-565c-53c2-aaca-6baf566ecb92",
+                "__enabled": true,
+                "Model": "models/recon_octocopter/recon_octocopter_hub.vmdl",
+                "Tint": "1,1,1,1",
+                "RenderType": "On",
+                "RenderOptions": {
+                  "GameLayer": true,
+                  "OverlayLayer": false
+                },
+                "UseAnimGraph": false
+              }
+            ],
+            "Children": []
+          },
           {
             "__guid": "fb783f38-92f6-5403-9694-ebe8a6c5ba82",
             "Name": "Rotor 6 Blades",
@@ -564,6 +732,12 @@
             "__guid": "e143576f-e339-5562-8202-2b27af2ce780",
             "__enabled": true,
             "Spin": -1,
+            "Hub": {
+              "_type": "component",
+              "component_id": "91623c26-7494-5c78-aef9-756f97f4691e",
+              "go": "9475661d-707b-509b-bbec-91c8397842d9",
+              "component_type": "ModelRenderer"
+            },
             "Blades": {
               "_type": "component",
               "component_id": "1053d72c-d137-5cac-92e1-27f57bfe9f0e",
@@ -579,6 +753,28 @@
           }
         ],
         "Children": [
+          {
+            "__guid": "9475661d-707b-509b-bbec-91c8397842d9",
+            "Name": "Rotor 7 Hub",
+            "Enabled": true,
+            "NetworkMode": 0,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "91623c26-7494-5c78-aef9-756f97f4691e",
+                "__enabled": true,
+                "Model": "models/recon_octocopter/recon_octocopter_hub.vmdl",
+                "Tint": "1,1,1,1",
+                "RenderType": "On",
+                "RenderOptions": {
+                  "GameLayer": true,
+                  "OverlayLayer": false
+                },
+                "UseAnimGraph": false
+              }
+            ],
+            "Children": []
+          },
           {
             "__guid": "4f5b0372-e91e-5a66-8f47-1e18a776767b",
             "Name": "Rotor 7 Blades",
@@ -637,6 +833,12 @@
             "__guid": "8c265781-f7ee-56bd-ab00-c1ab7d76a3b3",
             "__enabled": true,
             "Spin": 1,
+            "Hub": {
+              "_type": "component",
+              "component_id": "b2d49683-fb6f-5410-8b0d-63d7810436dc",
+              "go": "f4dd3c9c-0b3b-5faa-becb-4561c0906d56",
+              "component_type": "ModelRenderer"
+            },
             "Blades": {
               "_type": "component",
               "component_id": "01edf100-7b10-5819-90a5-f7721a6e157f",
@@ -652,6 +854,28 @@
           }
         ],
         "Children": [
+          {
+            "__guid": "f4dd3c9c-0b3b-5faa-becb-4561c0906d56",
+            "Name": "Rotor 8 Hub",
+            "Enabled": true,
+            "NetworkMode": 0,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "b2d49683-fb6f-5410-8b0d-63d7810436dc",
+                "__enabled": true,
+                "Model": "models/recon_octocopter/recon_octocopter_hub.vmdl",
+                "Tint": "1,1,1,1",
+                "RenderType": "On",
+                "RenderOptions": {
+                  "GameLayer": true,
+                  "OverlayLayer": false
+                },
+                "UseAnimGraph": false
+              }
+            ],
+            "Children": []
+          },
           {
             "__guid": "2eed8a33-2692-5fbb-ad9e-968fd39ce548",
             "Name": "Rotor 8 Blades",

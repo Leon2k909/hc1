@@ -32,6 +32,9 @@ public sealed class ReconOctocopter : Component, Component.IDamageable, ICustomM
 	private const float Metre = 39.37f;
 	private const float Gravity = 9.81f * Metre;
 
+	/// <summary>On the drone while its own feed is up, which leaves it out of the picture.</summary>
+	private const string OwnDroneTag = "own_drone";
+
 	/// <summary>The gimbal's model: its origin is the pivot, and the lens is <see cref="LensOffset"/> along its +X.</summary>
 	[Property] public GameObject Gimbal { get; set; }
 	[Property] public SoundEvent RotorSound { get; set; }
@@ -260,6 +263,10 @@ public sealed class ReconOctocopter : Component, Component.IDamageable, ICustomM
 		camera.ZFar = 100000f;
 		// The body's "viewer" tag isn't excluded: from up here the operator is just another soldier.
 		camera.RenderExcludeTags.Add( "invis" );
+		// Nor is the drone itself drawn. The lens hangs under the nose, inside the rotors' reach: tilted into a flight,
+		// looking up, or turned faster than the airframe follows, its own props and arms filled the picture, and the nose
+		// came within an inch of the lens, through the near plane.
+		camera.RenderExcludeTags.Add( OwnDroneTag );
 
 		// The same picture as the body's camera, so the map's lighting looks the same.
 		var source = Operator.CameraController?.Camera;
@@ -298,7 +305,12 @@ public sealed class ReconOctocopter : Component, Component.IDamageable, ICustomM
 	protected override void OnUpdate()
 	{
 		if ( !IsProxy )
+		{
 			Simulate( MathF.Min( Time.Delta, 0.05f ) );
+			// Only the pilot's own feed leaves it out (the feed is made on the owner's machine): it still casts its shadow,
+			// and everyone else sees it.
+			Tags.Set( OwnDroneTag, FeedCamera.IsValid() );
+		}
 
 		if ( Gimbal.IsValid() )
 			Gimbal.WorldRotation = Rotation.From( GimbalPitch, CameraYaw, 0f );

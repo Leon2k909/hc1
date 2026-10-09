@@ -2,7 +2,7 @@
 
 Writes to Assets/weapons/recon_octocopter/:
   - recon_octocopter_airborne.prefab: the aircraft (ReconOctocopter), its gimbal camera, its eight rotors (ReconRotor:
-    blades, and the disc they blur into) and its colliders;
+    the hub, the blades, and the disc they blur into) and its colliders;
   - vm_recon_octocopter.prefab: the ground station in both hands (TabletViewModel), on vm_c4's arms;
   - wm_recon_octocopter.prefab: the station in third person, the right hand on its right grip and the left hand's IK on
     its left one;
@@ -70,16 +70,19 @@ def box(name, centre, size):
 # ---- The aircraft ------------------------------------------------------------------------------------------------
 
 def rotor(index, hub):
-    """A rotor at its hub: the blades below the blur speed, the disc above it (ReconRotor turns both)."""
+    """A rotor at its hub: the hub always, the blades below the blur speed, the disc above it (ReconRotor turns them
+    and tells the disc's shader how the prop lies and turns)."""
     name = f'Rotor {index + 1}'
     spin = hub['spin']
     blades = 'recon_octocopter_prop_ccw' if spin > 0 else 'recon_octocopter_prop_cw'
     # The discs cast no shadow: a spinning rotor's shadow is a faint blur, and eight of them are costly for nothing.
     return obj(name, [
         component(name + '-rotor', 'Facepunch.ReconRotor', Spin=spin,
+                  Hub=ref(name + '-hub', 'ModelRenderer', name + ' Hub'),
                   Blades=ref(name + '-blades', 'ModelRenderer', name + ' Blades'),
                   Disc=ref(name + '-disc', 'ModelRenderer', name + ' Disc')),
     ], [
+        obj(name + ' Hub', [renderer(name + '-hub', 'recon_octocopter_hub')]),
         obj(name + ' Blades', [renderer(name + '-blades', blades)]),
         obj(name + ' Disc', [renderer(name + '-disc', 'recon_octocopter_disc', shadows=False)]),
     ], Position=vec(hub['position']))
