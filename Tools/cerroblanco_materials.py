@@ -9,8 +9,9 @@ any of it, so it's drawn here with numpy, from height fields in inches as bellto
 - travertine: the walls' cleft-cut blocks, 30 inches high and 30 or 60 long, hung with open joints. Travertine splits
   along its bedding, so a cleft face is ridged along the beds, and pitted with the long voids the spring water left.
   Each block is its own cream to honey colour.
-- paving: honed travertine squares, 30 inches, with thin grouted joints. Its pits are filled, a little darker, and its
-  veins run along each slab's bed.
+- paving: honed, filled cross-cut travertine in 30-inch squares with 3/16-inch sanded grout joints, weathered by years
+  outdoors: a warm beige whose beds show as swirls of ivory and walnut, the voids filled with a greyer cement, grime
+  along the joints, a few spills and chipped arrises. It tiles every 240 inches (8 x 8 slabs) at 4096 px.
 - honed: the same honed stone with no joints, for copings, benches, steps and planters' edges.
 - panel: the enamelled panels, 30 inches square with open joints, each a hair different and a little wavy, satin.
 - banner_0..3: the exhibition banners hung down the fronts: a made-up museum's own shows, each with its own abstract
@@ -42,7 +43,7 @@ TILE = 120.0                 # every stone and panel material tiles every 120 in
 SIZE = 2048
 
 # Every material's tile, for cerroblanco_map's tile_overrides.
-TILES = { "travertine": TILE, "paving": TILE, "honed": TILE, "panel": TILE }
+TILES = { "travertine": TILE, "paving": 240.0, "honed": TILE, "panel": TILE }
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -222,61 +223,200 @@ def travertine( rng, n ):
 # ---------------------------------------------------------------------------------------------------------------------
 # Honed travertine: the paving, and without joints for copings and benches
 
-# Within a few per cent of each other, as the pictures' paving is: an even cream, not a checkerboard of light and dark.
-PAVING = [ ( 228, 217, 196 ), ( 225, 213, 191 ), ( 230, 220, 201 ), ( 223, 211, 189 ), ( 227, 215, 194 ) ]
+# The paving tiles every 240 inches (8 x 8 slabs) at twice the size, the same 17 px an inch as the other stone: at 120
+# inches its 16 slabs repeated every 10 feet across the courtyard.
+PAVE_TILE = 240.0
+PAVE_SIZE = 4096
+
+# Classic cross-cut travertine, honed and filled, after years outdoors: a warm beige with ivory and walnut beds, close in
+# tone slab to slab. It used to be a near-white cream (225, 214, 193), which the sun blew out (the user, 2026-10-09:
+# "too bright"). A honed light travertine's albedo is about 0.45-0.5.
+PAVING = [ ( 189, 177, 155 ), ( 185, 172, 149 ), ( 192, 181, 160 ), ( 183, 171, 150 ), ( 188, 175, 152 ),
+           ( 186, 176, 157 ) ]
+IVORY = ( 211, 202, 183 )     # the light beds
+WALNUT = ( 156, 132, 98 )     # the dark ones
+FILLER = ( 166, 159, 146 )    # the cement filler in the voids: greyer than the stone
+GROUT = ( 152, 144, 130 )     # sanded grout, matched to the stone a shade down
 
 
-def honed_face( rng, n, ppu, slab, count, angle ):
-    """ A honed face: per slab its colour, veins along its bed (angle per slab), filled pits a little darker, a hint of
-    traffic grime. Returns the colour (linear) and its fine height. """
-    y, x = np.mgrid[0:n, 0:n].astype( float )
+def fblur( a, sigma ):
+    """ A periodic Gaussian blur through the FFT, for big sigmas on big maps (sigma in px; ( rows, columns ) too). """
+    sy, sx = sigma if isinstance( sigma, tuple ) else ( sigma, sigma )
+    fy = np.fft.fftfreq( a.shape[0] )[:, None]
+    fx = np.fft.rfftfreq( a.shape[1] )[None, :]
+    g = np.exp( -2.0 * math.pi ** 2 * ( ( fy * sy ) ** 2 + ( fx * sx ) ** 2 ) )
+    return np.fft.irfft2( np.fft.rfft2( a ) * g, s=a.shape )
+
+
+def fcavity( height, ppu, radii=( 0.2, 0.8 ), weights=( 1.0, 0.5 ) ):
+    return sum( w * np.maximum( fblur( height, r * ppu ) - height, 0.0 ) for r, w in zip( radii, weights ) )
+
+
+def strata( rng, length=400.0, step=0.01 ):
+    """ The beds the spring water laid, along a line down through them, step inches a sample: each bed's tone (about
+    unit deviation, a correlated walk from bed to bed, a little graded within it), whether it's porous, and a thin
+    dark seam at the top of some. Most beds are a fifth of an inch, a few over an inch. """
+    m = int( length / step )
+    tone = np.zeros( m )
+    porous = np.zeros( m )
+    t, level = 0.0, 0.0
+    while t < length:
+        thick = float( np.clip( rng.lognormal( math.log( 0.2 ), 0.9 ), 0.03, 2.5 ) )
+        level = 0.75 * level + 0.66 * rng.standard_normal()
+        i0, i1 = int( t / step ), min( m, int( ( t + thick ) / step ) + 1 )
+        tone[i0:i1] = level + rng.normal( 0.0, 0.3 ) * np.linspace( -0.5, 0.5, i1 - i0 )
+        porous[i0:i1] = float( rng.random() < 0.3 )
+        if rng.random() < 0.22:
+            w = max( 1, int( rng.uniform( 0.012, 0.04 ) / step ) )
+            tone[i0:i0 + w] -= rng.uniform( 0.8, 1.6 )
+        t += thick
+    return tone, porous, step
+
+
+def sample_strata( profile, t, ppu, grad ):
+    """ The beds' tone and porosity at depth t, filtered to each px's footprint across them (grad: inches of depth an
+    inch along the face), so beds crowded where the cut runs along them don't alias into noise. """
+    tone, porous, step = profile
+    length = len( tone ) * step
+    footprint = np.maximum( 0.6 * grad / ppu, 0.03 )
+    sigmas = 0.012 * 2.2 ** np.arange( 7 )
+    level = np.clip( np.log( footprint / sigmas[0] ) / math.log( 2.2 ), 0, len( sigmas ) - 1 )
+    tm = np.mod( t, length )
+    out_tone = np.zeros_like( t )
+    out_porous = np.zeros_like( t )
+    xp = np.arange( len( tone ) ) * step
+    for k, sigma in enumerate( sigmas ):
+        weight = np.maximum( 0.0, 1.0 - np.abs( level - k ) )
+        if not weight.any():
+            continue
+        a = ndimage.gaussian_filter1d( tone, sigma / step, mode="wrap" )
+        b = ndimage.gaussian_filter1d( porous, max( sigma, 0.05 ) / step, mode="wrap" )
+        out_tone += weight * np.interp( tm, xp, a, period=length )
+        out_porous += weight * np.interp( tm, xp, b, period=length )
+    return out_tone, out_porous
+
+
+def honed_face( rng, n, ppu, slab, count, edge ):
+    """ A honed, filled cross-cut face. The saw cut across the beds, which undulate, so each slab shows them as cloudy
+    swirls of ivory and walnut. The voids, most in the porous beds, are filled with a greyer cement flush with the face,
+    and a few have lost it. Then years outdoors: a mottle of weathering, dirt along the joints (edge: inches to the
+    nearest, None for jointless stone), a few spills, and paths polished by feet.
+
+    slab is each px's slab id (count of them). Each slab is its own piece of stone, from another part of the block and
+    turned any of the eight ways. Returns the colour (linear), the face's fine height, the filled and open voids, and
+    the roughness. """
+    iy, ix = np.mgrid[0:n, 0:n].astype( np.int32 )
+    turn = rng.integers( 0, 8, count )[slab]
+    swap = ( turn & 4 ) > 0
+    a = np.where( swap, ix, iy )
+    b = np.where( swap, iy, ix )
+    a = np.where( ( turn & 1 ) > 0, -a, a )
+    b = np.where( ( turn & 2 ) > 0, -b, b )
+    a = ( a + rng.integers( 0, n, count )[slab] ) % n
+    b = ( b + rng.integers( 0, n, count )[slab] ) % n
+    del iy, ix, swap, turn
+
+    tile = n / ppu
+    # The beds' depth under the face: broad undulations (periods of 6 inches to 3 feet) with smaller folds on them, and
+    # a slight dip one way, so the swirls run a little along the slab.
+    bed = ( 1.6 * noise( rng, n, 3.2, tile / 36.0, tile / 6.0 ) + 0.35 * noise( rng, n, 2.4, tile / 6.0, tile / 1.2 )
+            + 0.06 * noise( rng, n, 1.6, tile / 1.2, tile / 0.3 ) )
+    gy = ( np.roll( bed, -1, 0 ) - np.roll( bed, 1, 0 ) ) * 0.5 * ppu
+    gx = ( np.roll( bed, -1, 1 ) - np.roll( bed, 1, 1 ) ) * 0.5 * ppu
+    grad = np.hypot( gy, gx )[a, b]
+    t = bed[a, b] + rng.uniform( 0, 400, count )[slab]
+    del bed, gy, gx
+    dip = rng.uniform( 0, 2 * math.pi, count )
+    yy, xx = np.mgrid[0:n, 0:n] / ppu
+    t += 0.05 * ( xx * np.cos( dip )[slab] + yy * np.sin( dip )[slab] )
+    grad += 0.05
+    del yy, xx
+    tone, porous = sample_strata( strata( rng ), t, ppu, grad )
+    del t, grad
+
+    mean = to_linear( PAVING ).mean( axis=0 )
     palette = to_linear( PAVING )
-    base = palette[rng.integers( 0, len( palette ), count )] * rng.uniform( 0.985, 1.015, ( count, 1 ) )
-    along = blur( rng.standard_normal( ( n, n ) ), ( 0.5 * ppu, 12.0 * ppu ) )
-    across = blur( rng.standard_normal( ( n, n ) ), ( 12.0 * ppu, 0.5 * ppu ) )
-    vein = np.where( angle[slab] > 0, across, along )
-    vein = vein / vein.std()
-    pits_a = blur( rng.standard_normal( ( n, n ) ), ( 0.15 * ppu, 0.8 * ppu ) )
-    pits_b = blur( rng.standard_normal( ( n, n ) ), ( 0.8 * ppu, 0.15 * ppu ) )
-    pits = smoothstep( 2.4, 3.2, unit( np.where( angle[slab] > 0, pits_b, pits_a ) ) )
-    stone = base[slab] * ( 1.0 + 0.03 * vein + 0.015 * noise( rng, n, 1.0, 100, None ) )[..., None]
-    stone = lerp( stone, stone * to_linear( ( 205, 186, 150 ) ) / to_linear( ( 225, 213, 192 ) ), 0.18 * smoothstep( 0.8, 2.2, vein ) )
-    stone = lerp( stone, stone * 0.8, 0.6 * pits )
-    grime = smoothstep( 0.4, 2.4, noise( rng, n, 3.0, 1, 10 ) )
-    stone = lerp( stone, stone * 0.9, 0.4 * grime )
-    fine = 0.004 * noise( rng, n, 1.0, 100, None ) - 0.02 * pits
-    return stone, fine, pits
+    base = palette[rng.integers( 0, len( palette ), count )] * rng.uniform( 0.975, 1.025, ( count, 1 ) )
+    stone = base[slab]
+    tone = np.clip( tone, -3.0, 3.0 )
+    stone = lerp( stone, stone * to_linear( IVORY ) / mean, 0.45 * smoothstep( 0.3, 2.2, tone ) )
+    stone = lerp( stone, stone * to_linear( WALNUT ) / mean, 0.5 * smoothstep( -0.2, -2.2, tone ) )
+    # The crystals: a fine grain, and a few sparkles of clear calcite.
+    grain = noise( rng, n, 0.6, tile / 2.0, None )
+    stone *= ( 1.0 + 0.018 * grain )[..., None]
+    sparkle = smoothstep( 3.0, 3.6, noise( rng, n, 0.0, tile / 1.0, None ) )
+    stone = lerp( stone, stone * 1.08, 0.5 * sparkle )
+
+    # The voids: small rounded ones and a few longer, many more in the porous beds. Filled, they're what tells a plain
+    # stretch of the stone from concrete.
+    small = unit( ndimage.gaussian_filter( rng.standard_normal( ( n, n ) ), 0.09 * ppu, mode="wrap" ) )
+    large = unit( ndimage.gaussian_filter( rng.standard_normal( ( n, n ) ), ( 0.22 * ppu, 0.5 * ppu ), mode="wrap" ) )
+    lift = 0.8 * np.clip( porous, 0, 1 )
+    voids = np.maximum( smoothstep( 2.65 - lift, 2.95 - lift, small ), smoothstep( 3.0 - lift, 3.3 - lift, large[a, b] ) )
+    del small, large, porous, a, b
+    lost = voids * ( noise( rng, n, 2.0, tile / 8.0, tile / 1.5 ) > 1.9 )
+    filler = to_linear( FILLER ) * ( 1.0 + 0.03 * grain )[..., None]
+    stone = lerp( stone, filler, 0.6 * voids )
+    stone = lerp( stone, stone * 0.62, 0.8 * lost )
+
+    # Outdoors: a broad mottle of weathering, grime along the joints, a few spills, and the paths feet take.
+    mottle = noise( rng, n, 2.6, tile / 72.0, tile / 6.0 )
+    stone *= ( 1.0 + 0.035 * mottle )[..., None]
+    if edge is not None:
+        streaky = smoothstep( -1.0, 1.0, noise( rng, n, 1.5, tile / 4.0, None ) )
+        grime = np.exp( -np.maximum( edge, 0.0 ) / 0.7 ) * ( 0.65 + 0.35 * streaky )
+        stone = lerp( stone, stone * to_linear( ( 120, 110, 95 ) ) / mean, 0.22 * grime )
+    else:
+        grime = np.zeros( ( n, n ) )
+    spills = smoothstep( 2.3, 3.0, noise( rng, n, 3.0, tile / 10.0, tile / 1.5 ) )
+    stone = lerp( stone, stone * to_linear( ( 172, 158, 136 ) ) / mean, 0.5 * spills )
+    worn = noise( rng, n, 3.4, tile / 120.0, tile / 20.0 )
+
+    fine = 0.0015 * noise( rng, n, 1.0, tile / 1.0, None ) - 0.004 * voids - 0.05 * lost
+    rough = ( 0.66 + 0.03 * noise( rng, n, 1.0, tile / 2.0, None ) - 0.05 * smoothstep( 0.3, 1.8, worn )
+              + 0.06 * grime + 0.04 * spills - 0.07 * voids * ( 1 - lost ) + 0.2 * lost )
+    return stone, fine, voids, lost, rough
 
 
 def paving( rng, n ):
-    ppu = n / TILE
+    """ 30-inch slabs with 3/16-inch sanded grout joints a sixteenth under the face, the arrises eased, each slab a hair
+    proud or shy of the next and a little out of level, and here and there an arris chipped. """
+    ppu = n / PAVE_TILE
     y, x = np.mgrid[0:n, 0:n] / ppu
-    slab = ( np.floor( y / 30.0 ) * 4 + np.floor( x / 30.0 ) ).astype( int )
-    count = 16
+    across = int( PAVE_TILE / 30 )
+    count = across * across
+    slab = ( np.floor( y / 30.0 ) * across + np.floor( x / 30.0 ) ).astype( np.int32 )
     u, v = x % 30.0, y % 30.0
-    edge = np.minimum( np.minimum( u, 30 - u ), np.minimum( v, 30 - v ) ) + 0.02 * noise( rng, n, 2.0, 20, 300 )
-    inside = smoothstep( 0.09, 0.14, edge )
-    angle = rng.integers( 0, 2, count )
-    stone, fine, pits = honed_face( rng, n, ppu, slab, count, angle )
-    lip = rng.normal( 0, 0.012, count )[slab]
-    height = inside * ( 0.06 + lip + fine + 0.02 * smoothstep( 0.1, 0.5, edge ) )
-    grout = to_linear( ( 176, 166, 150 ) ) * ( 0.9 + 0.05 * noise( rng, n, 1.0, 100, None ) )[..., None]
-    hollow = cavity( height, ppu, radii=( 0.2, 0.8 ), weights=( 1.0, 0.5 ) )
-    colour = lerp( grout, stone, inside ) * np.exp( -1.5 * hollow )[..., None]
-    rough = np.clip( 0.62 + 0.06 * noise( rng, n, 1.0, 60, None ) + 0.12 * pits, 0, 1 )
-    rough = np.where( inside < 0.5, 0.92, rough )
+    del x, y
+    wobble = 0.015 * noise( rng, n, 2.0, PAVE_TILE / 12.0, PAVE_TILE / 0.5 )
+    edge = np.minimum( np.minimum( u, 30 - u ), np.minimum( v, 30 - v ) ) + wobble
+    joint = 0.094
+    inside = smoothstep( joint - 0.015, joint + 0.015, edge )
+    eased = smoothstep( joint, joint + 0.09, edge )
+    stone, fine, voids, lost, rough = honed_face( rng, n, ppu, slab, count, edge - joint )
+    chips = smoothstep( 2.7, 3.3, unit( ndimage.gaussian_filter( rng.standard_normal( ( n, n ) ), 0.3 * ppu, mode="wrap" ) ) )
+    chips *= 1.0 - smoothstep( joint + 0.2, joint + 0.6, edge )
+    lip = rng.normal( 0.0, 0.012, count )[slab]
+    tilt = ( rng.normal( 0.0, 0.006, count )[slab] * ( u / 15.0 - 1.0 )
+             + rng.normal( 0.0, 0.006, count )[slab] * ( v / 15.0 - 1.0 ) )
+    face = 0.0625 + lip + tilt + fine - 0.025 * ( 1.0 - eased ) - 0.07 * chips
+    sand = 0.004 * noise( rng, n, 0.8, PAVE_TILE / 1.0, None )
+    height = sand + ( face - sand ) * inside
+    grout = to_linear( GROUT ) * ( 0.94 + 0.05 * noise( rng, n, 1.2, PAVE_TILE / 2.0, None ) )[..., None]
+    stone = lerp( stone, stone * 0.8, 0.6 * chips )
+    hollow = fcavity( height, ppu )
+    colour = lerp( grout, stone, inside ) * np.exp( -0.5 * hollow )[..., None]
+    rough = np.clip( np.where( inside < 0.5, 0.9, rough + 0.15 * chips ), 0, 1 )
     return to_srgb( colour ), height, rough, hollow, ppu
 
 
 def honed( rng, n ):
+    """ The same stone with no joints, for copings, benches, steps and planters' edges. """
     ppu = n / TILE
-    slab = np.zeros( ( n, n ), int )
-    stone, fine, pits = honed_face( rng, n, ppu, slab, 1, np.zeros( 1, int ) )
-    stone *= ( 1.0 + 0.03 * noise( rng, n, 2.6, 2, 30 ) )[..., None]
-    height = fine
-    hollow = cavity( height, ppu, radii=( 0.2, 0.8 ), weights=( 1.0, 0.5 ) )
-    rough = np.clip( 0.58 + 0.06 * noise( rng, n, 1.0, 60, None ) + 0.12 * pits, 0, 1 )
-    return to_srgb( stone ), height, rough, hollow, ppu
+    slab = np.zeros( ( n, n ), np.int32 )
+    stone, fine, voids, lost, rough = honed_face( rng, n, ppu, slab, 1, None )
+    hollow = fcavity( fine, ppu )
+    return to_srgb( stone ), fine, np.clip( rough - 0.03, 0, 1 ), hollow, ppu
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -310,13 +450,15 @@ def panel( rng, n ):
     return to_srgb( colour ), height, rough, hollow, ppu
 
 
-DRAWN = { "travertine": ( travertine, 11 ), "paving": ( paving, 12 ), "honed": ( honed, 13 ), "panel": ( panel, 14 ) }
+# Each drawn material: how it's drawn, its seed and its maps' size.
+DRAWN = { "travertine": ( travertine, 11, SIZE ), "paving": ( paving, 12, PAVE_SIZE ), "honed": ( honed, 13, SIZE ),
+          "panel": ( panel, 14, SIZE ) }
 SHEETS = {}
 
 
 def drawn_material( name, out ):
-    draw, seed = DRAWN[name]
-    colour, height, rough, hollow, ppu = draw( np.random.default_rng( seed ), SIZE )
+    draw, seed, size = DRAWN[name]
+    colour, height, rough, hollow, ppu = draw( np.random.default_rng( seed ), size )
     normal = gl_normal( height, ppu, 1.0 )
     ao = np.clip( np.exp( -1.4 * hollow ), 0.0, 1.0 )
     save_rgb( out / f"{name}_color.png", colour )
@@ -326,7 +468,7 @@ def drawn_material( name, out ):
     r = RESOURCE_DIR
     write_vmat( out, f"cb_{name}", vmat( f"cb_{name}", f"{r}/{name}_color.png", f"{r}/{name}_normal.png", f"{r}/{name}_rough.png",
                                          f"{r}/{name}_ao.png" ) )
-    SHEETS[name] = ( colour, normal )
+    SHEETS[name] = ( colour, normal, ppu )
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -481,10 +623,11 @@ def write_sheet( path ):
     tiles = []
     light = np.array( ( -0.5, 0.5, 0.7 ) )
     light /= np.linalg.norm( light )
-    for name, ( colour, normal ) in SHEETS.items():
-        crop = slice( 0, 1024 )
+    for name, ( colour, normal, ppu ) in SHEETS.items():
+        crop = slice( 0, int( round( 60 * ppu ) ) )          # 60 inches of each, at 1024 px
         shade = np.clip( ( normal[crop, crop] * light ).sum( -1 ), 0, 1 ) * 0.75 + 0.35
-        tiles.append( np.clip( colour[crop, crop] * shade[..., None], 0, 255 ) )
+        lit = np.clip( colour[crop, crop] * shade[..., None], 0, 255 ).astype( np.uint8 )
+        tiles.append( np.asarray( Image.fromarray( lit, "RGB" ).resize( ( 1024, 1024 ), Image.LANCZOS ), float ) )
     if tiles:
         save_rgb( Path( path ), np.concatenate( tiles, axis=1 ) )
         print( f"wrote {path}" )

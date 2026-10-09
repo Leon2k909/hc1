@@ -19,18 +19,11 @@
 							{ from = "cb_banner_3.vmat" to = "materials/cerroblanco/cb_banner_3.vmat" },
 							{ from = "cb_black.vmat" to = "materials/cerroblanco/cb_black.vmat" },
 							{ from = "cb_bronze.vmat" to = "materials/cerroblanco/cb_bronze.vmat" },
-							{ from = "cb_curtain.vmat" to = "materials/cerroblanco/cb_curtain.vmat" },
-							{ from = "cb_deck.vmat" to = "materials/cerroblanco/cb_deck.vmat" },
-							{ from = "cb_drape.vmat" to = "materials/cerroblanco/cb_drape.vmat" },
-							{ from = "cb_felt.vmat" to = "materials/cerroblanco/cb_felt.vmat" },
 							{ from = "cb_frame.vmat" to = "materials/cerroblanco/cb_frame.vmat" },
 							{ from = "cb_honed.vmat" to = "materials/cerroblanco/cb_honed.vmat" },
-							{ from = "cb_ivory.vmat" to = "materials/cerroblanco/cb_ivory.vmat" },
 							{ from = "cb_lamp.vmat" to = "materials/cerroblanco/cb_lamp.vmat" },
-							{ from = "cb_piano.vmat" to = "materials/cerroblanco/cb_piano.vmat" },
 							{ from = "cb_plaster.vmat" to = "materials/cerroblanco/cb_plaster.vmat" },
 							{ from = "cb_red.vmat" to = "materials/cerroblanco/cb_red.vmat" },
-							{ from = "cb_skirt.vmat" to = "materials/cerroblanco/cb_skirt.vmat" },
 							{ from = "cb_steel.vmat" to = "materials/cerroblanco/cb_steel.vmat" },
 							{ from = "cb_teak.vmat" to = "materials/cerroblanco/cb_teak.vmat" },
 							{ from = "cb_travertine.vmat" to = "materials/cerroblanco/cb_travertine.vmat" },
@@ -840,159 +833,6 @@
 						origin = [ -1797.4062, 1304.5938, 72.0000 ]
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 16.2000, 16.2000, 144.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "wood"
-						collision_tags = "solid"
-						origin = [ 70.0000, -400.0000, 15.0000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 140.0000, 300.0000, 30.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ -74.0000, -464.0000, 125.0000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 10.0000, 10.0000, 190.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ 214.0000, -464.0000, 125.0000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 10.0000, 10.0000, 190.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ 214.0000, -336.0000, 125.0000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 10.0000, 10.0000, 190.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ -74.0000, -336.0000, 125.0000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 10.0000, 10.0000, 190.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "fabric"
-						collision_tags = "solid"
-						origin = [ 70.0000, -464.5000, 118.0000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 5.0000, 288.0000, 176.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ -115.0000, -300.0000, 76.0000 ]
-						angles = [ -0.0000, 90.0000, 0.0000 ]
-						dimensions = [ 15.0000, 20.0000, 36.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ -115.0000, -300.0000, 29.0000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 12.0000, 12.0000, 58.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ 255.0000, -300.0000, 76.0000 ]
-						angles = [ -0.0000, 90.0000, 0.0000 ]
-						dimensions = [ 15.0000, 20.0000, 36.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ 255.0000, -300.0000, 29.0000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 12.0000, 12.0000, 58.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ -40.0000, -345.0000, 37.0000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 16.0000, 26.0000, 14.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ 130.0000, -345.0000, 37.0000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 16.0000, 26.0000, 14.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ -50.0000, -444.0000, 44.0000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 24.0000, 40.0000, 28.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ 190.0000, -440.0000, 40.0800 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 24.0000, 40.0000, 20.1600 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ 190.0000, -423.5800, 42.0000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 7.8400, 40.0000, 24.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ -118.0000, -440.0000, 17.0000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 30.0000, 48.0000, 34.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ -118.0000, -440.0000, 44.0000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 24.0000, 36.0000, 20.0000 ]
 					},
 					{
 						_class = "PhysicsShapeBox"
@@ -2361,26 +2201,6 @@
 						align_origin_y_type = "None"
 						align_origin_z_type = "None"
 						filename = "models/maps/cerroblanco/cerroblanco_dressing_hulls_metal.obj"
-						import_scale = 1.0
-						faceMergeAngle = 10.0
-						maxHullVertices = 0
-						import_mode = "HullPerElement"
-						optimization_algorithm = "QEM"
-						import_filter = { exclude_by_default = false exception_list = [ ] }
-					},
-					{
-						_class = "PhysicsHullFile"
-						name = "cerroblanco_dressing_hulls_wood"
-						parent_bone = ""
-						surface_prop = "wood"
-						collision_tags = "solid"
-						recenter_on_parent_bone = false
-						offset_origin = [ 0.0, 0.0, 0.0 ]
-						offset_angles = [ 0.0, 0.0, 0.0 ]
-						align_origin_x_type = "None"
-						align_origin_y_type = "None"
-						align_origin_z_type = "None"
-						filename = "models/maps/cerroblanco/cerroblanco_dressing_hulls_wood.obj"
 						import_scale = 1.0
 						faceMergeAngle = 10.0
 						maxHullVertices = 0

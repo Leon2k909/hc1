@@ -1,7 +1,7 @@
 """
 Cerro Blanco: a multiplayer map. The Museo Cerro Blanco, a made-up modern art museum on a white hill above a Mexican
 town, built round a courtyard: travertine below and white enamelled panels above, a glass rotunda for its entrance hall,
-long galleries either side and a stage in the courtyard under the trees.
+long galleries either side and a courtyard open to the sky round its boulder planter.
 
     python Tools/cerroblanco_map.py [--preview <dir>] [--no-scene] [--art] [--views <dir>]
 
@@ -10,7 +10,7 @@ cerroblanco_parts.py and the museum's own drawn materials from cerroblanco_mater
 paving, honed stone, the exhibition banners and the sign).
 Writes:
 - the models, to Assets/models/maps/cerroblanco/: the buildings, the grounds (paving, lawns, walls), the dressing
-  (furniture, sculptures, the stage), the glass, the canopies, and the backdrop (the hills and the town below, drawn only);
+  (furniture, sculptures), the glass, the canopies, and the backdrop (the hills and their trees, drawn only);
 - the scene, Assets/scenes/maps/CerroBlanco/cerroblanco.scene, rewritten whole on every run (change the layout here,
   not in the editor);
 - the cb_ flat paints and cb_glass, Assets/materials/cerroblanco/*.vmat (the drawn ones are cerroblanco_materials');
@@ -22,8 +22,8 @@ car park and the museum's sign; Blue Team on the south plaza, past the South Gal
 The lanes:
 - West: the West Garden's lawns, the West Gallery (two storeys, a stair inside), the garden circle round its bronze
   sphere (bomb site B), and the south-west lawns.
-- Middle: the rotunda (the entrance hall), the courtyard with its round boulder planter, the stage with its grand piano,
-  the cafe tables, then the South Gallery and its portico.
+- Middle: the rotunda (the entrance hall), the courtyard with its round boulder planter and the cafe tables, then the
+  South Gallery and its portico.
 - East: the promenade, the cafe (its roof is a terrace, up a stair from the courtyard), the North Gallery (two
   storeys), the East Hall with its mezzanine (bomb site A), the covered walkway and the east terrace, and the east lawns.
 
@@ -98,7 +98,7 @@ WG_A = ( -1126.0, -650.0, -160.0, 1510.0 )
 WG_B = ( -650.0, -200.0, 1050.0, 1510.0 )
 CAFE = ( 480.0, 1000.0, 0.0, 715.0 )
 CAFE_UP = 340.0                              # the cafe's upper room over its south half, to the outside of its north wall
-CAFE_GRID = ( 24.0, 316.0, 190.0, 340.0, 11, 6 )   # its curtain wall over the stage: n0, n1, z0, z1, columns, rows
+CAFE_GRID = ( 24.0, 316.0, 190.0, 340.0, 11, 6 )   # its curtain wall over the courtyard: n0, n1, z0, z1, columns, rows
 CAFE_SKYLIGHT = ( 640.0, 880.0, 110.0, 230.0 )     # e0, e1, n0, n1
 NG =( 1000.0, 2060.0, -18.0, 715.0 )
 EH = ( 480.0, 1400.0, -1000.0, 0.0 )
@@ -408,7 +408,7 @@ def rotunda( m, g, d ):
 
 def cafe_upper( m, g, d ):
     """ The cafe's upper room over its south half, as tall as the galleries, as the block behind the pictures' stage is:
-    enamelled panels with a curtain wall of square panes over the stage, a skylight and a plant room on its roof. The
+    enamelled panels with a curtain wall of square panes over the courtyard, a skylight and a plant room on its roof. The
     terrace is north of it, with a door in. """
     n0, n1, z0, z1, cols, rows = CAFE_GRID
     P.facade( m, "n", ( 0, CAFE_UP ), ( 480, 498 ), "-e", FLOOR1, ROOF, [ ( ( n0 + n1 ) / 2, n1 - n0, z0, z1, "window" ) ],
@@ -708,27 +708,13 @@ def garden_circle( m, d ):
 
 
 def courtyard( m, d ):
-    """ The courtyard: the round boulder planter, the stage along the cafe's wall with its piano and PA, hedges in
-    planters, trees, benches and the cafe's tables in the north-west corner. """
+    """ The courtyard: the round boulder planter, hedges in planters, benches and the cafe's tables in the north-west
+    corner. The stage along the cafe's wall, with its piano and PA, came out on 2026-10-09 (the user's ask). """
     P.round_planter( d, ( -80, -350 ), 270, seed=4, gap=110.0 )
-    P.stage( d, 330, 470, -80, 220, front="-e", white_end=1 )
-    P.grand_piano( d, 405, 60, 30, 90.0 )
-    P.speaker( d, 300, -115, 0, 180.0 )
-    P.speaker( d, 300, 255, 0, 180.0 )
-    P.speaker( d, 345, -40, 30, 0.0, tall=False )
-    P.speaker( d, 345, 130, 30, 0.0, tall=False )
-    P.flight_case( d, 444, -50, 30, 0.0 )
-    P.flight_case( d, 440, 190, 30, 0.0, lid=True )
-    P.flight_case( d, 440, -118, 0, 0.0, ( 30.0, 48.0, 34.0 ) )
-    P.flight_case( d, 440, -118, 34, 0.0, ( 24.0, 36.0, 20.0 ) )
-    P.cable( d, [ ( 300, -109 ), ( 309, -98 ), ( 318, -92 ), ( 329, -90 ) ] )
-    P.cable( d, [ ( 300, 249 ), ( 310, 238 ), ( 320, 230 ), ( 329, 226 ) ] )
-    P.cable( d, [ ( 286, 110 ), ( 250, 128 ), ( 205, 100 ), ( 160, 132 ), ( 110, 96 ), ( 70, 118 ) ] )
     for e0, e1, n0, n1 in ( ( -620, -420, -900, -860 ), ( -620, -580, -900, -700 ), ( 280, 440, -900, -860 ),
                             ( 400, 440, -900, -700 ), ( -520, -200, 380, 420 ), ( 100, 340, 380, 420 ) ):
         P.hedge_box( d, e0, e1, n0, n1, height=30, planter=16 )
-    # No trees: the pictures' courtyard is open to the sky round its planter, and trees here hid the rotunda and the
-    # stage.
+    # No trees: the pictures' courtyard is open to the sky round its planter, and trees here hid the rotunda.
     for e, n, along in ( ( -250, -800, "e" ), ( 100, -800, "e" ), ( -420, 150, "n" ), ( -280, 520, "e" ), ( 220, 520, "e" ) ):
         P.bench( d, e, n, length=90, along=along )
     for e, n in ( ( -540, 870 ), ( -420, 940 ), ( -540, 990 ), ( -300, 920 ) ):
@@ -897,18 +883,18 @@ def perimeter( m ):
 
 
 # ---------------------------------------------------------------------------------------------------------------------
-# The backdrop: the hill falling away to the south and west, the town on its slopes, the sierra beyond
+# The backdrop: the hill falling away to the south and west, wooded slopes, the sierra beyond
 
 def terrain_z( e, n ):
     """ The land outside the play: level with it at its edge, rising to the north and east, falling to the south and
-    west towards the town and the valley. """
+    west towards the valley. """
     e, n = np.asarray( e, float ), np.asarray( n, float )
     de = np.maximum( 0, np.maximum( PLAY[0] - e, e - PLAY[1] ) )
     dn = np.maximum( 0, np.maximum( PLAY[2] - n, n - PLAY[3] ) )
     dist = np.hypot( de, dn )
     bearing = np.arctan2( n - 0, e - 0 )
     # Gentle to the north, so from the courtyard the land stays under the galleries' roofs and only sky shows over
-    # them, as in the pictures; steeper falling away to the south, to the town.
+    # them, as in the pictures; steeper falling away to the south.
     north = np.sin( bearing )
     slope = np.where( north > 0, 0.07, 0.18 ) * north + 0.04 * np.cos( bearing )
     swell = 260 * np.sin( e / 2300.0 ) * np.cos( n / 1900.0 ) + 140 * np.sin( ( e + n ) / 1100.0 )
@@ -939,22 +925,9 @@ def backdrop():
                 paint = ROCK
             m.polygon( paint, quad[:3] )
             m.polygon( paint, [ quad[0], quad[2], quad[3] ] )
-    # The white town on the slopes below: houses with tiled roofs, among the trees.
+    # The low-poly town that stood on the slopes below (170 rendered boxes with tiled roofs) came out on 2026-10-09:
+    # the user found it looked cheap. Only the trees are left on the hills.
     rng = np.random.default_rng( 7 )
-    placed = 0
-    while placed < 170:
-        e, n = rng.uniform( -14000, 14000 ), rng.uniform( -14000, 14000 )
-        de = max( 0, PLAY[0] - e, e - PLAY[1] )
-        dn = max( 0, PLAY[2] - n, n - PLAY[3] )
-        dist = math.hypot( de, dn )
-        if dist < 1400 or dist > 9000 or ( n > 0 and rng.random() < 0.7 ):
-            continue
-        z = float( terrain_z( e, n ) )
-        w, l, h = rng.uniform( 260, 520 ), rng.uniform( 300, 700 ), rng.uniform( 150, 320 )
-        yaw = rng.choice( ( 0.0, 90.0 ) ) + rng.uniform( -12, 12 )
-        paint = ( "whitewash", "render_pale", "render_cream", "whitewash", "render_ochre", "render_rose" )[placed % 6]
-        house( m, e, n, z - 60, w, l, h, yaw, paint )
-        placed += 1
     for k in range( 260 ):
         e, n = rng.uniform( -9000, 9000 ), rng.uniform( -9000, 9000 )
         dist = math.hypot( max( 0, PLAY[0] - e, e - PLAY[1] ), max( 0, PLAY[2] - n, n - PLAY[3] ) )
@@ -964,27 +937,6 @@ def backdrop():
                               "position": ( e, n, z - 10 ), "yaw": float( rng.uniform( 0, 360 ) ),
                               "scale": ( 1.2, 1.2, 1.2 ), "name": "Backdrop Tree" } )
     return m
-
-
-def house( m, e, n, z0, w, l, h, yaw, paint ):
-    """ A plain rendered house with a low hipped tiled roof (no collision: it's backdrop). """
-    x, y, _ = P.turned( 0, 0, yaw )
-    o = np.array( ( e, n, z0 ) )
-
-    def at( a, b, c ):
-        return o + x * a + y * b + np.array( ( 0, 0, c ) )
-
-    m.oriented_box( at( 0, 0, h / 2 ), ( x, y, ( 0, 0, 1 ) ), ( w, l, h ), { "default": paint, "-z": None } )
-    eave = 18
-    corners = [ at( sx * ( w / 2 + eave ), sy * ( l / 2 + eave ), h ) for sx, sy in ( ( -1, -1 ), ( 1, -1 ), ( 1, 1 ), ( -1, 1 ) ) ]
-    rise = min( w, l ) * 0.22
-    ridge = [ at( 0, -( l - w ) / 2 if l > w else 0, h + rise ), at( 0, ( l - w ) / 2 if l > w else 0, h + rise ) ]
-    centre = at( 0, 0, h )
-    P.card( m, "roof_tiles", [ corners[0], corners[1], ridge[0] ], ( corners[0] + corners[1] ) / 2 - centre + ( 0, 0, 60 ) )
-    P.card( m, "roof_tiles", [ corners[2], corners[3], ridge[1] ], ( corners[2] + corners[3] ) / 2 - centre + ( 0, 0, 60 ) )
-    P.card( m, "roof_tiles", [ corners[1], corners[2], ridge[1], ridge[0] ], ( corners[1] + corners[2] ) / 2 - centre + ( 0, 0, 60 ) )
-    P.card( m, "roof_tiles", [ corners[3], corners[0], ridge[0], ridge[1] ], ( corners[3] + corners[0] ) / 2 - centre + ( 0, 0, 60 ) )
-    P.card( m, "roof_tiles", corners, ( 0, 0, -1 ) )
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -1018,8 +970,8 @@ def lights():
 
 
 # ( name, centre, the box they cover e0, e1, n0, n1, z0, z1 ). The rooms' and the courtyard's probes win where their
-# boxes overlap the grounds' (priority 1 over 0). The grounds' probe gives the outside of every pane the sky, the hills
-# and the town: without it the glass outside the courtyard's box (the rotunda's front, the upper drum, the galleries'
+# boxes overlap the grounds' (priority 1 over 0). The grounds' probe gives the outside of every pane the sky and the
+# hills: without it the glass outside the courtyard's box (the rotunda's front, the upper drum, the galleries'
 # outer windows) had no probe and reflected a flat grey.
 PROBES = [
     ( "West Gallery", ( -880, 650, 150 ), ( -1108, -668, -142, 1492, 0, 344 ) ),
@@ -1090,7 +1042,7 @@ def callouts():
         ( "WEST GARDEN", -2560, -1126, -778, 1510, -10, 400 ), ( "B SITE", GARDEN_SQUARE[0], GARDEN_SQUARE[1],
                                                                  GARDEN_SQUARE[2], GARDEN_SQUARE[3], -10, 400 ),
         ( "WEST WALK", -1126, -650, -1000, -160, -10, 400 ), ( "SOUTH-WEST LAWNS", -2560, -1030, -2400, -1919, -10, 400 ),
-        ( "COURTYARD", -650, 480, -1000, 1050, -10, 400 ), ( "STAGE", 286, 480, -100, 240, -10, 400 ),
+        ( "COURTYARD", -650, 480, -1000, 1050, -10, 400 ),
         ( "CAFE", 480, 1000, 0, 715, -10, UP[0] ), ( "TERRACE", 420, 1000, CAFE_UP, 715, *UP ),
         ( "GLASS ROOM", 480, 1000, 0, CAFE_UP, *UP ),
         ( "NORTH GALLERY", 1000, 2060, -18, 715, -10, UP[0] ), ( "NORTH GALLERY UPPER", 1000, 2060, -18, 715, *UP ),
@@ -1369,8 +1321,8 @@ def write_scene( written, light_list, props ):
     objects = [
         K.game_object( ids, "Scene Information", "info", components=[
             K.component( ids, "Sandbox.SceneInformation", "info/scene", Title=TITLE, Author=None, Changes="",
-                         Description="A modern art museum on a white hill: travertine galleries round a courtyard with a "
-                                     "stage, a glass rotunda, a garden circle and a portico with red sculptures.",
+                         Description="A modern art museum on a white hill: travertine galleries round a courtyard, "
+                                     "a glass rotunda, a garden circle and a portico with red sculptures.",
                          Group=None, SceneTags="", Version=None ),
             K.component( ids, "Facepunch.MapInformation", "info/map", Image=MAP_ART_PATH, IsVisibleInMenu=True ),
             K.component( ids, "Facepunch.MapSpawnSettings", "info/spawns", UseMapSpawnPoints=False, AllowNavMeshSpawns=False ),

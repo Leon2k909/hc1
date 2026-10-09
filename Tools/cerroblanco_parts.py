@@ -17,9 +17,10 @@ from map_kit import Model, Wall
 
 METAL, STONE, WOOD, GLASS, DIRT, FABRIC = "metal", "default", "wood", "glass", "dirt", "fabric"
 
-# The museum's own drawn materials (cerroblanco_materials.py), on a 30-inch module, tiling every 120.
+# The museum's own drawn materials (cerroblanco_materials.py), on a 30-inch module, tiling every 120 (the paving every
+# 240, so its slabs don't repeat every 10 feet).
 TRAV, PANEL, PAVE, HONED = "cb_travertine", "cb_panel", "cb_paving", "cb_honed"
-TILED = { TRAV: 120.0, PANEL: 120.0, PAVE: 120.0, HONED: 120.0 }
+TILED = { TRAV: 120.0, PANEL: 120.0, PAVE: 240.0, HONED: 120.0 }
 
 # Flat paints: ( colour, metalness, roughness ), written as text-only materials by the map script.
 PLASTER, WHITE, FRAME, RED, BRONZE = "cb_plaster", "cb_white", "cb_frame", "cb_red", "cb_bronze"

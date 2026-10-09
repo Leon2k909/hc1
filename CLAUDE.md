@@ -3201,7 +3201,7 @@ simulate_input.
 - Built by script like Belltower, Railhead and Lowtide (`map_kit`), from three scripts:
   - `cerroblanco_materials.py` draws the museum's own materials with numpy into `Assets/materials/cerroblanco/`.
     Its docstring has each one:
-    - cleft-cut travertine walls and honed travertine paving, on a 30-inch module;
+    - cleft-cut travertine walls and honed, filled cross-cut travertine paving, on a 30-inch module;
     - off-white enamelled panels for the upper floors;
     - four exhibition banners with abstract pictures;
     - the museum's name in bronze letters, and the South Gallery's name in grey ones.
@@ -3210,11 +3210,11 @@ simulate_input.
     for up to 10 s.
   - `cerroblanco_parts.py` has the pieces:
     - the walls, glazing, stairs, railings and curved walls;
-    - the round boulder planter, the stage and its grand piano, the red sculptures and the bronze sphere;
+    - the round boulder planter, the red sculptures and the bronze sphere (and the stage, `P.stage`, now unused);
     - benches, cafe tables under parasols, banners and the sign.
   - `cerroblanco_map.py` lays them out and writes:
     - the models, to `Assets/models/maps/cerroblanco/`: the buildings, the grounds, the dressing, the glass, the
-      canopies, and the backdrop (hills and the town below, drawn only);
+      canopies, and the backdrop (the hills and their trees, drawn only);
     - the scene, `Assets/scenes/maps/CerroBlanco/cerroblanco.scene`, rewritten whole on every run (change the layout in
       the script, not in the editor);
     - the flat paints and `cb_glass` (text-only vmats);
@@ -3232,9 +3232,9 @@ simulate_input.
       Its walls are 26 deep (`ROT_UP_WALL`), and its twelve 1.5:1 windows (`ROT_UP_WIN`, 424-488) are set into them,
       so their reveals show. It has a glazed lantern on top. The roofs round it are a pale membrane (`P.ROOF`,
       `cb_roof`).
-  - The cafe's upper room (the GLASS ROOM callout, `cafe_upper`) is over its south half, the block behind the stage at
-    the galleries' height, as in the pictures:
-    - Over the stage, a curtain wall of 11 x 6 milky, pale green-white panes (`CAFE_GRID`, `P.FRIT`, `cb_glass_frit`)
+  - The cafe's upper room (the GLASS ROOM callout, `cafe_upper`) is over its south half, the block behind where the
+    pictures' stage is, at the galleries' height, as in the pictures:
+    - Over the courtyard, a curtain wall of 11 x 6 milky, pale green-white panes (`CAFE_GRID`, `P.FRIT`, `cb_glass_frit`)
       in white mullions. The frit is glass.shader's rough glass (roughness 0.45, AlbedoAbsorption 0.9), so ~40% of its
       colour is lit and the rest is the room blurred through. Plain `cb_glass` there read black.
     - A skylight with a white curb and bars (`CAFE_SKYLIGHT`), a roof unit with a fan, two plinths and a picture
@@ -3258,16 +3258,34 @@ simulate_input.
     A smaller zigzag stands in the east garden.
     - The spike's sheets are crescents in section. Their normals come from each ring's own tangent: from the ring's
       middle they pointed into the concave face, which then drew inside out (only its edges showed).
-  - In the courtyard, which has no trees (they hid the rotunda and the stage, where the pictures' courtyard is open):
+  - In the courtyard, which has no trees (they hid the rotunda, where the pictures' courtyard is open):
     - the round two-tier planter with its boulders, seven low plants round its rim and a rounded beech shrub on top;
-    - the stage along the cafe's west wall (`P.stage`: a black deck on a white pleated skirt, a truss with lamps, grey
-      drapes and a white one down its end) with the piano, speakers, monitors, flight cases and cables;
     - the hedges, benches and the cafe's tables.
+    - The pictures' stage along the cafe's west wall, with its grand piano, speakers and cases, came out on 2026-10-09
+      at the user's ask ("remove the piano area"). `P.stage` is still in the parts script, unused. The STAGE callout
+      went with it.
+  - The backdrop is the hills and their trees. The low-poly town on the slopes below (170 boxes with tiled roofs) came
+    out on 2026-10-09 too, at the user's ask ("the low poly buildings").
   - The hedges (`P.hedge_box`) are Facepunch's `beech_hedge_96x128` (its mesh is 48 x 141 x 90, `HEDGE_SIZE`), cut to
     length in a travertine trough with a honed coping, over a clipped core box that is their collision.
-  - The stone's colours are within a few per cent of each other (`TRAVERTINE`, `PAVING`, the honed stone's jitter), so
-    from a distance the walls and the paving read as one even cream, as in the pictures, not a checkerboard. The
-    panels are a warm off-white (212, 207, 198) and the sculptures signal red (`RED`).
+  - The stone's colours are within a few per cent of each other (`TRAVERTINE`, the honed stone's jitter), so from a
+    distance the walls read as one even cream, as in the pictures, not a checkerboard. The panels are a warm off-white
+    (212, 207, 198) and the sculptures signal red (`RED`).
+  - The paving and the honed stone (2026-10-09). The user found the floor "too bright" and not good enough: a near-white
+    cream (mean 225, 214, 193) that the sun blew out, blurry wood-like bands, a checkerboard from slab to slab, harsh
+    dark grout, dark specks, and a repeat every 10 feet. Now they're honed, filled cross-cut travertine after years
+    outdoors (`honed_face`):
+    - A warm beige (`PAVING`, mean about 186, 174, 152: an albedo of ~0.45-0.5), whose beds show as soft clouds of
+      ivory and walnut. Each slab is cut from its own part of the block (`strata`, `sample_strata`), turned any of the
+      eight ways.
+    - Small filled pores in a greyer cement, most in the porous beds, a few lost and open; a fine grain and sparkles of
+      calcite; weathering, grime by the joints, a few spills and paths worn by feet.
+    - 3/16-inch sanded grout a shade under the stone, eased and chipped arrises, and each slab a hair proud or out of
+      level.
+    - The paving tiles every 240 inches (8 x 8 slabs, 4096 px, `PAVE_TILE`, `PAVE_SIZE`; `P.TILED[PAVE]` 240), the same
+      17 px an inch as the other stone.
+    - Checked in the script's lit sheet and at full resolution, not in the engine: the editor was closed when it was
+      written.
   - The materials script saves each picture through a temporary file and retries for 10 s
     (`cerroblanco_materials.save_image`), and the map script writes the radar and menu pictures through it.
   - The banners (`BANNERS`) read the right way round: `banner` swapped them for a viewer's left and right
@@ -3283,7 +3301,7 @@ simulate_input.
     drum, the galleries' outer windows) had no probe and read flat grey. The courtyard's box runs to e 496, past the
     Glass Room's curtain wall (e 489), so those panes reflect the courtyard.
   - Checked offscreen in the editor on 2026-10-09, with the probes forced (`CreateTexture`, then `RenderCubemap`, by
-    reflection), from the forecourt, the courtyard, the stage and the South Gallery: the panes show the dark rooms and
+    reflection), from the forecourt, the courtyard, the stage (since removed) and the South Gallery: the panes show the dark rooms and
     the sky, and the frit and the balustrades are unchanged.
 - Offline renders (railhead_render through Blender's Cycles, with the scene's sky and the models'
   textures) were compared with the pictures on 2026-10-08: the courtyard and stage, the West Gallery's balcony and
@@ -3296,7 +3314,7 @@ simulate_input.
 - Three lanes:
   - West: the West Garden's lawns, the West Gallery, then the garden circle round its bronze sphere (bomb site B) and
     the south-west lawns.
-  - Middle: the rotunda, the courtyard and the stage, then the South Gallery.
+  - Middle: the rotunda and the courtyard, then the South Gallery.
   - East: the promenade, the cafe and its terrace, the North Gallery, then the East Hall (bomb site A), the covered
     walkway and the east terrace.
 - Modes:
