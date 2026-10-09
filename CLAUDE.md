@@ -3331,8 +3331,20 @@ simulate_input.
       and a bench (32), which only mantling reaches. Bots check their paths, as on the other maps.
     - The scene's mode objects match Belltower's: 2 bomb sites, 2 buy zones, 9 `ObjectiveSpot`s, 3 cash and 3
       extraction points, and the same `GameModeObject` filters.
-  - Not yet checked: a Defuse, Retakes, Domination, Hot Zone or Cash Grab match played on it (only TDM was played).
-- To play it: `dev_mode team_deathmatch cerroblanco`.
+  - Defuse was played in the editor on 2026-10-09 (`dev_mode bomb_defusal cerroblanco`, 5 v 5 with bots), through six
+    rounds of about a minute each:
+    - Both bomb sites were active (A in the East Hall, B at the garden circle). Red Team spawned on the forecourt with
+      the C4.
+    - The C4 was planted on site A by a bridge script. That was the player's own `DefuseC4`, deployed and started by
+      reflection: `CanPlant` held, and the planted bomb spawned. The HUD showed DEVICE ARMED 0:40, team chat
+      "Leon (A SITE) Planting bomb", and Blue Team's bots closed on it.
+    - It went off at 0:00, and the next round started 5 s later.
+    - Bots never defuse, on any map: `Code/GameLoop/Bots` has no defuse logic.
+    - While the win banner was up, every hit threw a NullReferenceException in `DamageIndicator.OnHit`. MainHUD takes
+      the indicator off for the banner, and `Current` still pointed at the deleted panel. Fixed the same day; the fix
+      hasn't been seen in a match.
+  - Not yet checked: a Retakes, Domination, Hot Zone or Cash Grab match played on it.
+- To play it: `dev_mode team_deathmatch cerroblanco` (or `dev_mode bomb_defusal cerroblanco`).
 
 ## Ridgeback (battle royale map, `Assets/scenes/maps/Ridgeback/`)
 - The second battle royale map, a base to build on: a valley about 1.2 km across in a ring of mountains, on an s&box

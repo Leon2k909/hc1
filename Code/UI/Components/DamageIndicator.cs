@@ -9,11 +9,24 @@ public partial class DamageIndicator : Panel
 		Current = this;
 	}
 
+	// MainHUD takes the indicator off while a win banner is up, and hits after that found the deleted panel, with no
+	// scene (NullReferenceException on Scene.Camera, every hit until the next round).
+	public override void OnDeleted()
+	{
+		if ( Current == this )
+			Current = null;
+
+		base.OnDeleted();
+	}
+
 	/// <summary>
 	/// A hit from pos: where the damage came from, not where it struck (PlayerPawn.IndicatorSource).
 	/// </summary>
 	public void OnHit( Vector3 pos )
 	{
+		if ( !IsValid || Scene is null )
+			return;
+
 		// Straight over or under the view (a grenade at your feet) there's no way round to point: a flat direction of
 		// nothing read as dead ahead.
 		var camera = Scene.Camera;
