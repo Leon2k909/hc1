@@ -12,9 +12,13 @@ namespace Facepunch;
 /// <list type="bullet">
 /// <item>The two skeletons share their arm and finger bones' names and axes, so those take the first-person arms'
 /// model-space transforms as they are.</item>
-/// <item>The torso has no first-person bones: it follows the clavicles (spine_2 between where each clavicle puts it),
-/// and everything off it keeps its bind pose relative to spine_2. Only the arms and hands are drawn: the Head, Legs and
-/// Feet bodygroups are hidden, and every garment with no arm, hand or finger bones (the helmet, trousers, boots).</item>
+/// <item>The torso has no first-person bones, so it's held where a body's is behind its eyes: the eyes (between eye_L
+/// and eye_R) at the camera, the body facing the way it looks, and every bone off the arms in its bind pose from there.
+/// It used to follow the clavicles, but the ported guns' clips swing those about: the M18's bring them 4" forward when
+/// aimed and 8" in its reloads, which put the shirt's collar and shoulders in front of the camera. Each clavicle still
+/// takes the first-person arms' own, so the sleeves are where they were. Only the arms and hands are drawn: the Head,
+/// Legs and Feet bodygroups are hidden, and every garment with no arm, hand or finger bones (the helmet, trousers,
+/// boots).</item>
 /// <item>The forearm's twist bones take the hand's turn about the forearm as the citizen's constraints do (twist0
 /// none of it, twist1 two thirds), and the elbow helper sits half way between the upper arm and the forearm.</item>
 /// <item>The pose goes in as bone overrides in model space, as <see cref="SwbArmsRetarget"/>'s does, in
@@ -52,8 +56,9 @@ public sealed class ViewModelClothing : Component, ICameraSetup
 		public int[] Order, Parent, From;
 		public Transform[] Bind, BindLocal, Pose;
 		public int Spine;
-		public Transform SpineFromClavicleR, SpineFromClavicleL;
-		public int ArmsClavicleR, ArmsClavicleL;
+
+		// The eyes' bind pose (between eye_L and eye_R, facing +X), which the camera stands in for.
+		public Transform Eyes;
 
 		// Per bone, for twists and helpers: the forearm, the hand, the upper arm and the twist weight.
 		public int[] Lower, Hand, Upper;
@@ -182,9 +187,14 @@ public sealed class ViewModelClothing : Component, ICameraSetup
 		return false;
 	}
 
-	void ICameraSetup.LateSetup( CameraComponent cc ) => Apply();
+	// Every camera in the scene runs this, so only the player's view (not a scope's lens or the minimap) places the body.
+	void ICameraSetup.LateSetup( CameraComponent cc )
+	{
+		if ( cc.IsMainCamera ) Apply( cc.WorldTransform );
+	}
 
-	void Apply()
+	/// <param name="eye">The camera's world transform, where the body's eyes go.</param>
+	void Apply( Transform eye )
 	{
 		if ( !_root.IsValid() || !_root.Active || !_skin.IsValid() || _skin.Model is null || Arms.Model is null ) return;
 		var from = Arms.SceneModel;
@@ -208,7 +218,7 @@ public sealed class ViewModelClothing : Component, ICameraSetup
 		if ( _source?.Length != armsBones ) _source = new Transform[armsBones];
 		for ( int i = 0; i < armsBones; i++ ) _source[i] = space.ToLocal( from.GetBoneWorldTransform( i ) );
 
-		Solve( rig );
+		Solve( rig, space.ToLocal( eye ) );
 
 		var count = rig.Pose.Length;
 		if ( _poseWorld?.Length != count ) _poseWorld = new Transform[count];
@@ -235,13 +245,11 @@ public sealed class ViewModelClothing : Component, ICameraSetup
 		}
 	}
 
-	void Solve( Rig rig )
+	/// <param name="eye">The camera in the body's model space.</param>
+	void Solve( Rig rig, Transform eye )
 	{
-		// The torso: spine_2 where each clavicle would put it, half way between the two.
-		var fromR = _source[rig.ArmsClavicleR].ToWorld( rig.SpineFromClavicleR );
-		var fromL = _source[rig.ArmsClavicleL].ToWorld( rig.SpineFromClavicleL );
-		var spinePose = new Transform( (fromR.Position + fromL.Position) * 0.5f, Rotation.Slerp( fromR.Rotation, fromL.Rotation, 0.5f ) );
-		var torso = spinePose.ToWorld( rig.Bind[rig.Spine].ToLocal( global::Transform.Zero ) );
+		// The torso: the body's eyes at the camera, facing the way it looks.
+		var torso = new Transform( eye.Position, eye.Rotation ).ToWorld( rig.Eyes.ToLocal( global::Transform.Zero ) );
 
 		for ( int i = 0; i < rig.Pose.Length; i++ )
 		{
@@ -333,11 +341,9 @@ public sealed class ViewModelClothing : Component, ICameraSetup
 			Weight = new float[count],
 			ForearmAxis = new Vector3[count],
 			Spine = BoneIndex( body, "spine_2" ),
-			ArmsClavicleR = BoneIndex( arms, "clavicle_R" ),
-			ArmsClavicleL = BoneIndex( arms, "clavicle_L" ),
 		};
-		int clavicleR = BoneIndex( body, "clavicle_R" ), clavicleL = BoneIndex( body, "clavicle_L" );
-		if ( rig.Spine < 0 || rig.ArmsClavicleR < 0 || rig.ArmsClavicleL < 0 || clavicleR < 0 || clavicleL < 0 ) return null;
+		int eyeL = BoneIndex( body, "eye_L" ), eyeR = BoneIndex( body, "eye_R" );
+		if ( rig.Spine < 0 || eyeL < 0 || eyeR < 0 || BoneIndex( arms, "clavicle_R" ) < 0 || BoneIndex( arms, "clavicle_L" ) < 0 ) return null;
 
 		for ( int i = 0; i < count; i++ )
 		{
@@ -347,8 +353,7 @@ public sealed class ViewModelClothing : Component, ICameraSetup
 			rig.BindLocal[i] = parent >= 0 ? body.GetBoneTransform( parent ).ToLocal( rig.Bind[i] ) : rig.Bind[i];
 			rig.From[i] = rig.Lower[i] = rig.Hand[i] = rig.Upper[i] = -1;
 		}
-		rig.SpineFromClavicleR = rig.Bind[clavicleR].ToLocal( rig.Bind[rig.Spine] );
-		rig.SpineFromClavicleL = rig.Bind[clavicleL].ToLocal( rig.Bind[rig.Spine] );
+		rig.Eyes = new Transform( (rig.Bind[eyeL].Position + rig.Bind[eyeR].Position) * 0.5f, Rotation.Identity );
 
 		// Parents before children.
 		rig.Order = Enumerable.Range( 0, count ).OrderBy( i => Depth( body, i ) ).ToArray();

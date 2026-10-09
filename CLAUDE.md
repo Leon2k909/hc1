@@ -4963,8 +4963,19 @@ simulate_input.
   defuse kit's and the throwables' arm posers):
   - The arm and finger bones (the two skeletons share their names and axes) take the first-person arms' model-space
     transforms as they are.
-  - The torso has no first-person bones. spine_2 goes half way between where each clavicle puts it, and every bone off
-    the arms keeps its bind pose relative to it.
+  - The torso has no first-person bones. It's held behind the eyes, as a body's is: the body's eye centre (between
+    eye_L and eye_R) at the camera, facing the way it looks, and every bone off the arms in its bind pose from there.
+    So neck_0 is 4.5 behind the camera and 7.4 under it, and the chest about 87 degrees under the view.
+    - It used to put spine_2 half way between where each clavicle put it. The ported guns' clips swing the clavicles
+      about, and the user saw their clothes in the camera aiming and reloading aimed with the M18 (2026-10-09). The
+      M18's clips bring the clavicles 4" forward aimed and 8" in its reloads, which put that torso's eyes 1.4" and
+      6.1" in front of the camera, and the shirt's collar and shoulders across the view. Even at the hip its eyes were
+      3-4" ahead on the FAL, Uzi and P90.
+    - The clavicles still take the first-person arms' own, so the sleeves are where they were. The shirt stretches
+      between the neck and the shoulders, all under the view: across eight guns' clips no shoulder joint comes into a
+      120-degree view (the nearest, the FAL's, is 45 degrees under its centre).
+    - Every camera in the scene runs `ICameraSetup`, so only a main camera places the body (not a scope's lens, the
+      minimap or the gunsmith's thumbnails).
   - The forearm's twist bones take the hand's turn about the forearm as the citizen's constraints do (twist0 none, twist1
     two thirds), and the elbow helper sits half way between the upper arm and the forearm.
   - It goes in as bone overrides in model space plus the world transforms, as `SwbArmsRetarget`'s does. Garments are
@@ -4977,6 +4988,11 @@ simulate_input.
   sleeves and gloves on each outfit at the hip, aiming, reloading and sprinting; that the first-person arms' longer
   bones don't stretch the elbows or wrists; the cuffs against the gloves; whether the shirt's collar, the vest or the
   chest shows when looking down or sprinting; and the hands on the tablet and the defuse kit.
+  - The torso held at the camera compiled with dotnet on 2026-10-09, with the editor closed. To check: the M18 aimed and
+    reloading aimed, and a rifle's sprint and reloads, for the collar, the shoulders and stretched sleeves.
+- `hc1_vm_clothing [weapon] [style] [view]` (`Editor/Hc1ViewModelClothingQa.cs`) renders a gun's viewmodel offscreen
+  with the clothing at the hip, aimed, and through aimed and hip reloads, into `output/vm-clothing/` (view 0 the eye,
+  1 from behind and above, 2 from the left, 3 from the right), and logs each garment's bone nearest the eye.
 
 ## Third-person left hand (world models' `LeftHandIK`, players and bots)
 - `rigged_human.vanmgrph` had no IK, so the world models' `LeftHandIK` points did nothing. The left hand followed the
