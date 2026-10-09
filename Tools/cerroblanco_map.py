@@ -7,7 +7,7 @@ long galleries either side and a stage in the courtyard under the trees.
 
 Built by script like Lowtide and Railhead, out of map_kit's boxes and polygons, with the pieces in
 cerroblanco_parts.py and the museum's own drawn materials from cerroblanco_materials.py (travertine, enamelled panels,
-paving, honed stone, the exhibition banners and the sign). Cars come from railhead_props through railhead_map's `use`.
+paving, honed stone, the exhibition banners and the sign).
 Writes:
 - the models, to Assets/models/maps/cerroblanco/: the buildings, the grounds (paving, lawns, walls), the dressing
   (furniture, sculptures, the stage), the glass, the canopies, and the backdrop (the hills and the town below, drawn only);
@@ -853,7 +853,7 @@ def covered_walkway( m, d, c ):
 
 
 def forecourt( m, d ):
-    """ The forecourt: the museum's sign on its low wall, planters, the car park, the spawn's edge. """
+    """ The forecourt: the museum's sign on its low wall, planters, the empty car park, the spawn's edge. """
     m.box( ( -900, 2280, 0 ), ( 300, 2310, 120 ), { "default": TRAV, "+z": HONED, "-z": None }, STONE )
     P.sign_letters( m, ( -300, 2310 ), 40, 900, ( 0, 1 ) )
     P.sign_letters( m, ( -300, 2280 ), 40, 900, ( 0, -1 ) )
@@ -882,12 +882,7 @@ def forecourt( m, d ):
     m.box( ( e0, ( n0 + n1 ) / 2 - 40, 0 ), ( e1 - 200, ( n0 + n1 ) / 2 + 40, 6 ), { "default": HONED, "-z": None }, STONE )
     for k, e in enumerate( np.linspace( e0 + 300, e1 - 400, 4 ) ):
         P.tree( d, e, ( n0 + n1 ) / 2, f"{P.OAK}/tree_oak_small_a.vmdl", 0.9, z=6, grate=False )
-    cars = [ ( "car", 1110, n0 + 100, "+n", "rw_car_white", {} ), ( "suv", 1310, n0 + 105, "+n", "rw_car_grey", { "plate": "HK 3148" } ),
-             ( "car", 1610, n0 + 100, "+n", "rw_car_red", {} ), ( "car", 1910, n0 + 100, "+n", "rw_car_silver", {} ),
-             ( "van", 2210, n0 + 120, "+n", "rw_car_white", { "plate": "WD 4813" } ), ( "car", 1210, n1 - 100, "-n", "rw_car_blue", {} ),
-             ( "car", 1510, n1 - 100, "-n", "rw_car_black", {} ), ( "suv", 2010, n1 - 105, "-n", "rw_car_white", { "plate": "KL 1384" } ) ]
-    for name, e, n, along, paint, kw in cars:
-        R.use( name, d, e, n, along, paint, **kw )
+    # No cars: the user had them taken out (2026-10-09), so the bays stand empty.
 
 
 def perimeter( m ):

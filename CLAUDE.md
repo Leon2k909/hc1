@@ -3289,7 +3289,11 @@ simulate_input.
   textures) were compared with the pictures on 2026-10-08: the courtyard and stage, the West Gallery's balcony and
   banners, and the South Gallery's front with its sculptures from the pictures' angle.
 - Red Team spawns on the forecourt at the north, by the car park and the museum's sign. Blue Team spawns on the south
-  plaza, past the portico. Three lanes:
+  plaza, past the portico.
+  - The car park has no cars: the user had them taken out (2026-10-09). Its asphalt, bays, kerbs, island and trees
+    stay. The eight cars, SUVs and van were railhead_props' (`R.use`), ~33,800 of the dressing's ~50,700 triangles.
+    Without them the spot checks still pass. The editor recompiled the dressing; it hasn't been seen in-game.
+- Three lanes:
   - West: the West Garden's lawns, the West Gallery, then the garden circle round its bronze sphere (bomb site B) and
     the south-west lawns.
   - Middle: the rotunda, the courtyard and the stage, then the South Gallery.
