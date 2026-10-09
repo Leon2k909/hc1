@@ -3522,14 +3522,23 @@ simulate_input.
     the rate, each at its size's terminal speed (4 m/s at 1 mm, 8.7 at 4 mm), drifting with the wind's gusts. More of
     them show the harder it rains (`ActiveShare`: 800 at 1 mm/h, 2,100 at 5, 5,500 at 25).
   - How a drop is drawn (2026-10-09, the user: "the rain looks a little fake"):
-    - a streak as long as it falls in 1/30 s, a camera's shutter (it was ~45 ms);
+    - a streak as long as it falls in 1/60 s, one frame at 60 fps (it was ~45 ms, then 1/30 s);
     - blurred by an eye's depth of field (a 4 mm pupil focused at 15 m), so a near drop is a soft, wide streak;
     - never under a pixel and a half wide (it was two), and fainter by as much as it's widened, so a far drop is a
       faint thread and a near one a clear streak;
     - each a little brighter or dimmer than the next (0.55-1.45), as drops catch the light differently;
-    - lit by a lightning flash.
+    - covering at most 35% of what's behind it (`MaxAlpha`; it was 60%).
     - The middle and far rings hold 10 and 70 times fewer drops to the cubic unit than the near one, so each of their
-      drops is drawn 2.5 and 5.6 times as strong (`Layers`' weight), short of the 10 and 70: the fog does the rest.
+      drops is drawn 1.6 and 2.4 times as strong (`Layers`' weight), far short of the 10 and 70: past 15-20 m nobody
+      makes out single drops, and the fog does the rest. At 2.5 and 5.6 the far ones read as bright threads.
+  - Their colour (2026-10-09, the user: "it has like white lines coming down"). The drops were a light grey (0.75),
+    about 3.4 times as bright as the overcast horizon they fell against, so they read as white lines. Water shows what's
+    round it: a drop refracts the scene behind it upside down through ~165 degrees, half sky (1-1.67 of the horizon in
+    `rain_sky.py`'s sky) and half wet ground (0.32), plus a few per cent reflected.
+    - So each is drawn in a share of the rain's haze (`RainView.Haze`: the fog's horizon grey, lit by lightning as the
+      fog is): drops 0.85 (`DropShade`), splashes 1.0 and the puddles' rings 1.3, whose tilted crests reflect sky
+      higher up.
+    - A drop is a little darker than the sky round it and a little brighter than a dark wall behind it, never white.
   - The user asked for no rain on the camera: no drops on the lens or the screen, no screen-space pass. Everything is in
     the world.
   - Shelter (`ShelterGrid`): 32-unit columns round the camera, each probed with a trace down and one up. Drops show only
@@ -3629,6 +3638,9 @@ simulate_input.
     with the editor's match running, and haven't been seen. To check: `dev_weather steady 5` and `25` (the streaks near
     and far, the splashes' density, the rings filling the puddles, not past their edges), and the frame time with
     10,000 drops, 3,000 splashes and 3,000 rings.
+  - The drops' haze colour, shorter streaks and lower far weights (2026-10-09, after the user's "white lines") compiled
+    with dotnet and haven't been seen. To check: the streaks against the sky and against a dark brick wall (neither
+    white nor black lines), a lightning flash lighting them, and whether they still show at all in drizzle.
 
 ## Bullet drop (real exterior ballistics on hitscan shots, Warzone only)
 - Only in Warzone (Battle Royale): a game mode has drop if it has the `BulletDrop` rule (`battle_royale.prefab`'s root).

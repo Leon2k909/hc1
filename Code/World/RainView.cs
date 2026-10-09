@@ -29,10 +29,11 @@ public sealed class RainView : Component
 	/// <summary>
 	/// The drops' layers round the camera: radius, share of the drops, and how strongly each of its drops is drawn. Most
 	/// are close, where they show. The outer layers hold 10 and 70 times fewer drops to the cubic unit than the inner
-	/// one, so each of their drops stands for a few of the many there, short of all of them: the fog does the rest.
+	/// one, so each of their drops stands for a few of the many there, short of all of them: past 15-20 m nobody makes
+	/// out single drops, and the fog does the rest. At 2.5 and 5.6 the far drops read as bright threads.
 	/// </summary>
 	private static readonly (float Radius, float Share, float Weight)[] Layers =
-		{ (220f, 0.45f, 1f), (520f, 0.35f, 2.5f), (900f, 0.2f, 5.6f) };
+		{ (220f, 0.45f, 1f), (520f, 0.35f, 1.6f), (900f, 0.2f, 2.4f) };
 
 	private readonly ShelterGrid _grid = new();
 	private readonly RainLook _look = new();
@@ -146,8 +147,28 @@ public sealed class RainView : Component
 	/// <summary> Marshall and Palmer's drop sizes: the slope of the exponential spread (per mm) at a rate (mm/h). </summary>
 	public static float MarshallPalmerLambda( float rate ) => 4.1f * MathF.Pow( MathF.Max( rate, 0.05f ), -0.21f );
 
-	/// <summary> What a lightning flash adds to the rain's colour: the drops and splashes catch it, blue-white. </summary>
-	private static Color FlashLight( float flash ) => new( 0.85f * flash, 0.88f * flash, 0.95f * flash, 0f );
+	/// <summary>
+	/// The rain's haze (linear): the overcast horizon of <c>Tools/rain_sky.py</c>'s sky, which the fog takes, lit by any
+	/// lightning as the fog is. Drops, splashes and rings are water, which shows what's round it, so each is drawn in a
+	/// share of it: never white, and never brighter than the sky it refracts.
+	/// </summary>
+	private static Color Haze( float darkening, float flash ) =>
+		RainLook.Lit( new Color( 0.224f * darkening, 0.231f * darkening, 0.244f * darkening, 1f ), 2f * flash );
+
+	/// <summary>
+	/// A drop's colour against the haze. It shows the scene behind it upside down through about 165 degrees, half sky
+	/// (the horizon to the zenith, 1-1.67 of the horizon) and half wet ground (0.32), plus a few per cent reflected off
+	/// its face. So it's a little darker than the sky round it, and brighter than a dark wall behind it.
+	/// </summary>
+	private const float DropShade = 0.85f;
+
+	/// <summary> A splash's crown, whose sheet of water reflects more of the sky at its grazing angles. </summary>
+	private const float SplashShade = 1f;
+
+	/// <summary> A ring's crests, tilted water that reflects sky higher up than the flat puddle does. </summary>
+	private const float RippleShade = 1.3f;
+
+	private static Color Shade( Color haze, float share ) => new( haze.r * share, haze.g * share, haze.b * share, 1f );
 
 	private void UpdateDrops( CameraComponent camera, Vector3 eye, float rate, float opacity, float darkening, float flash )
 	{
@@ -169,7 +190,7 @@ public sealed class RainView : Component
 
 		if ( !_wind.IsValid() ) _wind = Scene.GetAllComponents<WorldWind>().FirstOrDefault();
 		var lambda = MarshallPalmerLambda( rate );
-		var tint = new Color( 0.75f, 0.78f, 0.82f ) * darkening + FlashLight( 0.6f * flash );
+		var tint = Shade( Haze( darkening, flash ), DropShade );
 		_dropController.Frame = new RainDropParticles.DropFrame(
 			Camera: eye,
 			Wind: _wind.IsValid() && _wind.Active ? _wind.Velocity * WorldWind.UnitsPerMetre : Vector3.Zero,
@@ -179,9 +200,8 @@ public sealed class RainView : Component
 			LambdaC: 1f - MathF.Exp( -lambda * (RainDropParticles.MaxDiameter - RainDropParticles.MinDiameter) ),
 			Active: rate > 0f ? ActiveShare( rate ) : 0f,
 			PixelAngle: PixelAngle( camera ),
-			Tint: new Color( tint.r, tint.g, tint.b, 1f ),
+			Tint: tint,
 			Opacity: opacity,
-			Flash: flash,
 			Grid: _grid );
 	}
 
@@ -279,15 +299,14 @@ public sealed class RainView : Component
 	/// <summary>
 	/// A crown for each drop over 1 mm that lands on open, level ground in view: within the core radius every one, past
 	/// it a share (r0 / r)², each drawn stronger for the ones it stands for. A crown spreads to 5-9 times its drop's
-	/// width and is gone in 30-80 ms.
+	/// width and is gone in 25-110 ms.
 	/// </summary>
 	private void UpdateSplashes( CameraComponent camera, Vector3 eye, float rate, float opacity, float darkening, float flash )
 	{
 		if ( !_splashes.IsValid() || !_splashController.IsValid() ) return;
 
-		var tint = new Color( 0.85f, 0.87f, 0.9f ) * darkening + FlashLight( flash );
 		_splashController.Opacity = opacity;
-		_splashController.Tint = new Color( tint.r, tint.g, tint.b, 1f );
+		_splashController.Tint = Shade( Haze( darkening, flash ), SplashShade );
 
 		var flux = DropFlux( rate, 1f ) * opacity;
 		if ( flux <= 0f ) return;
@@ -374,9 +393,8 @@ public sealed class RainView : Component
 	{
 		if ( !_ripples.IsValid() || !_rippleController.IsValid() ) return;
 
-		var tint = new Color( 0.72f, 0.74f, 0.77f ) * darkening + FlashLight( flash );
 		_rippleController.Opacity = opacity;
-		_rippleController.Tint = new Color( tint.r, tint.g, tint.b, 1f );
+		_rippleController.Tint = Shade( Haze( darkening, flash ), RippleShade );
 
 		var waters = _puddles.Waters;
 		var flux = DropFlux( rate, 0.5f ) * opacity;
@@ -1062,7 +1080,8 @@ public sealed class RainView : Component
 			// Rain's visibility (km): 1/V = 0.125 + 0.25 R^0.63 / 3.912, the haze's 8 km dry.
 			var visibility = 1f / (0.125f + 0.25f * MathF.Pow( MathF.Max( rate, 0f ), 0.63f ) / 3.912f);
 			var end = 0.75f * visibility * 39370f;
-			var grey = Lit( new Color( 0.224f * dark, 0.231f * dark, 0.244f * dark, 0.98f ), flash * 2f );
+			var haze = Haze( dark, flash );
+			var grey = new Color( haze.r, haze.g, haze.b, 0.98f );
 			foreach ( var (fog, was) in _fogs )
 			{
 				if ( !fog.IsValid() ) continue;
@@ -1170,7 +1189,7 @@ public sealed class RainView : Component
 		private static float Luminance( Color c ) => 0.2126f * c.r + 0.7152f * c.g + 0.0722f * c.b;
 
 		/// <summary> A colour brightened by <paramref name="amount"/> times its own light, in lightning's bluish white. </summary>
-		private static Color Lit( Color c, float amount )
+		public static Color Lit( Color c, float amount )
 		{
 			if ( amount <= 0f ) return c;
 			var l = Luminance( c ) * amount;
@@ -1185,9 +1204,10 @@ public sealed class RainView : Component
 /// <summary>
 /// The rain's drops, each falling at its size's terminal speed and drifting with the wind, wrapping round the camera
 /// so they never run out. Sizes follow Marshall and Palmer's spread for the rate. A drop shows only over open sky and
-/// above where it would land (<see cref="RainView.ShelterGrid"/>), as a streak as long as it falls in a thirtieth of a
-/// second (a 30 fps camera's shutter), blurred by an eye's depth of field, and never thinner than a pixel and a half:
-/// widened, it's fainter by as much, so a far drop is a faint thread and a near one a clear streak.
+/// above where it would land (<see cref="RainView.ShelterGrid"/>), as a streak as long as it falls in a sixtieth of a
+/// second (a frame at 60 fps), blurred by an eye's depth of field, and never thinner than a pixel and a half: widened,
+/// it's fainter by as much, so a far drop is a faint thread and a near one a clear streak. Its colour is a share of the
+/// haze's (<c>RainView.DropShade</c>), so it's a little darker than the sky and a little brighter than a dark wall.
 /// </summary>
 [Hide]
 public sealed class RainDropParticles : ParticleController
@@ -1197,10 +1217,17 @@ public sealed class RainDropParticles : ParticleController
 
 	/// <summary> What the drops need this frame, from the main thread: the particle threads read nothing else. </summary>
 	public sealed record DropFrame( Vector3 Camera, Vector3 Wind, float Gust, float WindTime, float Lambda, float LambdaC,
-		float Active, float PixelAngle, Color Tint, float Opacity, float Flash, RainView.ShelterGrid Grid );
+		float Active, float PixelAngle, Color Tint, float Opacity, RainView.ShelterGrid Grid );
 
-	/// <summary> How long the eye sees a drop move for (seconds): a 30 fps camera's shutter. </summary>
-	private const float Exposure = 0.033f;
+	/// <summary>
+	/// How far a drop's streak runs (seconds of its fall): one frame at 60 fps, so at that rate each frame's streak meets
+	/// the last one's end with no gap and no overlap. A 30 fps camera's shutter (0.033 s) drew streaks twice as long,
+	/// which read as lines.
+	/// </summary>
+	private const float Exposure = 1f / 60f;
+
+	/// <summary> The most a drop's streak covers what's behind it. </summary>
+	private const float MaxAlpha = 0.35f;
 
 	/// <summary>
 	/// The eye's depth of field: focused at 15 m with a 4 mm pupil, a drop at distance d is blurred over
@@ -1298,10 +1325,10 @@ public sealed class RainDropParticles : ParticleController
 		var fadeTop = Math.Clamp( (top - pos.z) / 100f, 0f, 1f );
 		// Right in front of the eye a drop is a blur gone in a frame.
 		var near = RainView.SmoothStep( 12f, 60f, distance );
-		var strength = 0.45f * MathF.Sqrt( diameter / 2f ) * (trueWidth / drawnWidth) * weight * variance * (1f + 0.8f * f.Flash);
+		var strength = 0.45f * MathF.Sqrt( diameter / 2f ) * (trueWidth / drawnWidth) * weight * variance;
 
 		p.Color = f.Tint;
-		p.Alpha = MathF.Min( strength, 0.6f ) * edge * fadeTop * near * active * f.Opacity;
+		p.Alpha = MathF.Min( strength, MaxAlpha ) * edge * fadeTop * near * active * f.Opacity;
 	}
 
 	private static float Hash( uint x )
@@ -1316,7 +1343,7 @@ public sealed class RainDropParticles : ParticleController
 }
 
 /// <summary>
-/// Splashes on open, level ground in view: a crown that spreads and fades in 30-80 ms, bigger and longer for bigger
+/// Splashes on open, level ground in view: a crown that spreads and fades in 25-110 ms, bigger and longer for bigger
 /// drops. The view emits them, each with its TimeScale set so its age runs 0-1 over its life; this plays each out.
 /// </summary>
 [Hide]
