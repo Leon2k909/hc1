@@ -3195,8 +3195,15 @@ simulate_input.
     pictures from the courtyard, the stage and overhead.
   - When a run adds a material, a model can compile before it ("Missing vmat"): `recompile_asset` the vmat, then the
     vmdls.
-  - Not yet checked: the navmesh and bots, the modes' objects, the Glass Room in play, and the clear glass, which reads
-    flat grey where the pictures' reflects the sky.
+  - Played in the editor on 2026-10-09 (`dev_mode team_deathmatch cerroblanco`; starting play stalled the editor for
+    about 5 minutes first):
+    - The navmesh generated in play, with complete paths from Red Team's spawn to the Glass Room, the cafe's terrace
+      and Blue Team's spawn.
+    - 9-10 bots fought a TDM across it: 48 kills in the first 3 minutes.
+    - The rotunda's drums and the museum's sign were seen from the forecourt, and the Glass Room from inside (its
+      panels, the curtain wall with the sky through it, the plinth, the door to the terrace).
+  - Not yet checked: Defuse and the other modes' objects (only TDM was played), and the clear glass, which reads flat
+    grey where the pictures' reflects the sky.
 - To play it: `dev_mode team_deathmatch cerroblanco`.
 
 ## Ridgeback (battle royale map, `Assets/scenes/maps/Ridgeback/`)
