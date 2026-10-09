@@ -1496,6 +1496,8 @@ AK74M = Weapon(
     optional_meshes={
         "muzzle_tip": (f"{_AK74M_RIG}/ak74m_brake.smd", None),  # the 6P20 0-20 brake, off under a muzzle device
         "optic_rail": (f"{_AK74M_RIG}/ak74m_mount.smd", None),  # the Zenit B-13 side mount, under an optic
+        # The folding stock's release button on the receiver's rear, which the fixed stocks hide.
+        "stock_hinge": (f"{_AK74M_RIG}/ak74m_stock_hinge.smd", None),
     },
     # 0.2 inside the front of the muzzle brake, on the bore.
     extra_bones={"muzzle": ("tag_sling", np.array([29.24, 0.573, 1.012]))},
@@ -1510,11 +1512,18 @@ AK74M = Weapon(
     ads_pose=("ads_in", slice(-1, None)),
     report_bones=["tag_brass", "tag_mag_attach", "tag_stock_attach", "tag_pistolgrip_attach", "tag_rail"],
     part_choices={
-        # The AK-74M's own black polymer grip, then the AK-105's (the same grip in CoD's model) and the AK-platform grips.
-        "pistol_grip": [("factory", f"{_AK74M_RIG}/ak74m_pgrip.smd")] + AK12.part_choices["pistol_grip"][2:],
-        # Its own 6L23 polymer 30-round magazine, then the AK-105's 20, the RPK-74's 45 and a four-column 60. Each holds
-        # the fitted magazine (j_mag1) and the reload's fresh one (j_mag2).
-        "magazine": [("factory", f"{_AK74M_RIG}/ak74m_mag.smd")] + AK12.part_choices["magazine"][2:],
+        # Its own 6P34 Sb.15 side-folding polymer stock, then the AK-105's stocks, which go on the same AK-100 receiver.
+        # The AK-105's own side-folder and the polymer folding stock are this one, so they aren't offered again.
+        "stock": [("factory", f"{_AK74M_RIG}/ak74m_stock.smd")] + AK105.part_choices["stock"][1:-1],
+        # The AK-74M's own black polymer grip, then the AK-12's (on the same AK-74 grip mount) and the AK-platform
+        # grips.
+        "pistol_grip": [("factory", f"{_AK74M_RIG}/ak74m_pgrip.smd"),
+                        ("ak12_pgrip", f"../ak12/{_AK12_RIG}/ak12_pgrip.smd")] + AK12.part_choices["pistol_grip"][2:],
+        # Its own 6L23 polymer 30-round magazine, then the AK-12's windowed 30 (the 6L31, which fits any AK-74), the
+        # AK-105's 20, the RPK-74's 45 and a four-column 60. Each holds the fitted magazine (j_mag1) and the reload's
+        # fresh one (j_mag2).
+        "magazine": [("factory", f"{_AK74M_RIG}/ak74m_mag.smd"),
+                     ("ak12_mag", f"../ak12/{_AK12_RIG}/ak12_mag.smd")] + AK12.part_choices["magazine"][2:],
     },
     reload_variants=["_smag", "_xmag", "_xmaglrg"],
     # The AK-105's factory barrel's (att_vm_p04_ar_akilo105_barrel_v0.lua: grip_pose_l_offset).

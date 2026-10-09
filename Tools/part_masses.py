@@ -112,7 +112,8 @@ OWN_MAGAZINES = {
               "pmag40": (0.18, 40)},
     "ak12": {"factory": (0.215, 30)},  # the AK-12's polymer 30 with its window, a little lighter than the AK-74M's
     "ak15": {"factory": (0.25, 30)},  # the AK-103's polymer 30
-    "ak74m": {"factory": (0.23, 30)},  # the 6L23 polymer 30
+    # the 6L23 polymer 30, and the AK-12's 6L31 polymer 30 with its window
+    "ak74m": {"factory": (0.23, 30), "ak12_mag": (0.215, 30)},
 }
 
 # AK-platform stocks and pistol grips, each on its own, kg: the AKS-74U's folding stock 0.35, the AK-74M's polymer
@@ -126,7 +127,8 @@ AK_CHOICES = {
     "ar_akilo_pstlgrp_v0": 0.08, "ar_akilo105_pgrip_v0": 0.08, "ar_akilo_griptac_v0": 0.10,
     "ar_akilo_gripstdy_v0": 0.09, "ar_akilo_gripass_v0": 0.07, "sh_vecho_pgrip_v0": 0.09, "sh_vecho_gripsnp_v0": 0.13,
 }
-# Each gun's other own choices, kg, against a base of 0 where only the difference is known.
+# Each gun's other own choices, kg, against a base of 0 where only the difference is known. A gun with a factory choice
+# in more than one group keys each "<group>/factory".
 OWN_CHOICES = {
     "kastov762": {"ak47_stock_default": 0.50, "ak47_stock_adjustable": 0.45, "ak47_stock_heavy": 0.60,
                   "ak47_stock_padded": 0.45, "ak47_stock_light": 0.30, "ak47_stock_delete": 0.05,
@@ -145,7 +147,8 @@ OWN_CHOICES = {
     "hk416": {"factory": 0.0, "e1": 0.05, "slim_line": -0.05},
     "ak12": {"factory": 0.09},  # the AK-12's own pistol grip, a little bigger than the AK-74M's
     "ak15": {"factory": 0.09},  # the AK-12's grip
-    "ak74m": {"factory": 0.08},  # the 6P1 Sb.8 polymer grip, the AK-74's
+    # The 6P34 Sb.15 polymer side-folder (the AK-105's), the 6P1 Sb.8 polymer grip (the AK-74's) and the AK-12's grip.
+    "ak74m": {"stock/factory": 0.45, "pistol_grip/factory": 0.08, "ak12_pgrip": 0.09},
 }
 
 # The MWII attachments shared across guns, by file stem, wherever they're fitted.
@@ -300,7 +303,8 @@ def mass_of(relative: str) -> float:
             if group == "magazine":
                 return round(mag_change(gun, choice, names[0]), 3)
             table = {**AK_CHOICES, **OWN_CHOICES.get(gun, {})}
-            return round(table[choice] - table[names[0]], 3)
+            kg = [table.get(f"{group}/{name}", table.get(name)) for name in (choice, names[0])]
+            return round(kg[0] - kg[1], 3)
     return SHARED[Path(relative).stem]
 
 

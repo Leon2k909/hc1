@@ -106,7 +106,7 @@
   the base mesh; the default sets each group's choice 0 plus the base (762 = 341, 74u = 605028693,
   Vityaz = 22036489, RPK = 2363477, Bizon = 2129941, AK-105 = 285343829, Vepr-12 = 37814293, M16A4 = 341,
   P90 = 21 (by that rule, not yet read from its compiled model), MP7A1 = 85, AUG = 85, Uzi = 1173, FAL = 174761,
-  M18 = 145, MCX = 341 (also by the rule), L85A2 = 85, HK416 = 74069, AK-12 = 135189, AK-15 = 36885 (by the rule) and AK-74M = 34837 (read from its
+  M18 = 145, MCX = 341 (also by the rule), L85A2 = 85, HK416 = 74069, AK-12 = 135189, AK-15 = 36885 (by the rule) and AK-74M = 553713749 (read from its
   compiled models)).
   After changing any bodygroup, re-read it from the compiled model. An empty choice (a rail's or a folded sight's
   "off") still has its bit in the default, but the Parts API gives it mask 0, so setting each group's choice 0 with
@@ -1219,6 +1219,8 @@
   - The optic mount is Zenit's B-13 "Klassika" (the pack's `eft_mount_dovetail_b13`): a Picatinny rail over the dust
     cover, on an arm from the dovetail.
   - `muzzle` is an extra bone, 0.2 inside the brake's front.
+  - The side-folder (`ak74m_stock`) and its release button on the receiver's rear (`ak74m_stock_hinge`) are SMDs of
+    their own, so the AK-105's stocks can take the stock's place and the fixed ones can hide the button.
   - It draws the side-on icon `ui/weapons/guns/ak74m_01.png` from the model, as for the AK-12.
 - Materials and sounds are from `Tools/ak74m_assets.py`, run after `ak12_assets.py`:
   - Tarkov's sheets, built like the AK-12's (no metal, roughness from the phong exponent), from the Assault Rifles pack
@@ -1249,21 +1251,35 @@
     lettering and marks, and a number on the gas tube;
   - Zenit's markings on the B-13: ЗЕНИТКА™, its web address, ООО "ЗЕНИТ", Сделано в России and Б-13 "КЛАССИКА".
   Checked in close-ups of the textures on 2026-10-08, not on the model.
-- Bodygroups (DefaultMask 34837, read from the compiled `v_ak74m.vmdl_c` and `w_ak74m.vmdl_c` with an offline KV3
-  parser):
+- Bodygroups (DefaultMask 553713749, read from the compiled `v_ak74m.vmdl_c` and `w_ak74m.vmdl_c` in the editor on
+  2026-10-09; the two match):
   - `muzzle_tip` (the brake, hidden under a muzzle device);
   - `optic_rail` (the B-13, shown only under an optic);
-  - `pistol_grip` (7) and `magazine` (4): the factory parts and the ones below.
+  - `stock_hinge` (the folding stock's release button, hidden by the fixed stocks);
+  - `stock` (10), `pistol_grip` (8) and `magazine` (5): the factory parts and the ones below.
   - The rear sight has no bodygroup: it stays under an optic, as on the real gun, where the B-13's rail ends behind it.
-- Slots: Optic on the B-13's rail (-4.55 to 2.86) and Muzzle at the brake's rear face, then Pistol Grip and Magazine.
+- Slots: Optic on the B-13's rail (-4.55 to 2.86) and Muzzle at the brake's rear face, then Stock (at
+  `tag_stock_attach`, -5.716,0,3.649), Pistol Grip and Magazine.
   No Underbarrel or Laser slot: the polymer handguard has no rails. 45 of the M4's MWII parts are made eligible
   (optics, muzzle devices and tracer rounds).
-- Parts (`PARTS_AK74M`, `Assets/gunsmith/ak74m/`), 9 in all: any AK grip and any AK-74 magazine, as the real one takes.
-  - The AK-platform grips (6), the AK-12's parts.
-  - The AK-105's 20, RPK-74 45 and four-column 60, with the AK-105's reloads and reload times (`reload_variants`
-    `_smag`, `_xmag`, `_xmaglrg`).
-  - Its own 6P1 Sb.8 grip and 6L23 30 are the factory parts, so the AK-12's AK-74M grip and 30 aren't offered again.
-    `part_masses.py` has its magazine at 0.23 kg and its grip at 0.08.
+- Parts (`PARTS_AK74M`, `Assets/gunsmith/ak74m/`), 20 in all. The user saw only a few and asked why the other AKs'
+  parts weren't on it (2026-10-09). It takes what the real one takes:
+  - The AK-105's stocks (9: it's the same AK-100 receiver), with recoil relative to the AK-74M's side-folder, as the
+    AK-105's is. The AK-105's two copies of that side-folder aren't offered again. The Wooden, RPK Club-Foot and
+    Thumbhole stocks are fixed, so they hide the release button. Strictly a fixed stock needs a fixed-stock rear
+    trunnion, which a folding AK-74M doesn't have; they're offered as on the AK-105.
+  - The AK-12 Pistol Grip, then the AK-platform grips (6), the AK-12's parts.
+  - The AK-12 30 Round Mag (the 6L31, with a window; the factory reload), then the AK-105's 20, RPK-74 45 and
+    four-column 60, with the AK-105's reloads and reload times (`reload_variants` `_smag`, `_xmag`, `_xmaglrg`).
+  - Its own 6P34 Sb.15 side-folder, 6P1 Sb.8 grip and 6L23 30 are the factory parts, so the AK-12's AK-74M grip and
+    30 aren't offered again.
+  - `part_masses.py` has its stock at 0.45 kg, its grip at 0.08 and its magazine at 0.23, keyed by group
+    (`stock/factory`, `pistol_grip/factory`: see Part weight), and the AK-12's grip at 0.09 and 30 at 0.215.
+  - `hc1_ak74m_parts_check [filter] [view]` (`Editor/Hc1Ak74mGunsmithQa.cs`) fits every part on the world model
+    offscreen, checks the masks and each part's bodygroups, and renders it to `output/ak74m-gunsmith/` (view 0 the
+    stock and grip, 1 the whole gun, 2 the magazine). On 2026-10-09 all 21 passed, and in the renders every stock
+    seats on the receiver's rear and every grip and magazine sits where it should. Not yet seen in first person or
+    in a match.
 - Hands: the left hand holds the handguard through the AK-105's grip pose (`a_delta_barhvyshort_additive_for_offset`).
   No `GripFit`, and the left hand's fit on the polymer handguard hasn't been measured.
 - It plays the AK-105's fire clip, which doesn't move the gun, so it has no `ads_fire`.
@@ -1857,6 +1873,9 @@
   LoadedMass (`GUN_KG`). `--check` lists what it would change and any part without a figure. `kastov_prefabs.py` and
   `m16_gunsmith.py` write the same figures when they regenerate parts and prefabs. The Kastov-74u's hand-tuned prefab
   got the new field only.
+  - A gun's own choices (`OWN_CHOICES`) are looked up as `"<group>/<choice>"` first, then by the plain choice name,
+    so a gun with a factory choice in several groups keys each one by its group (the AK-74M's `stock/factory` and
+    `pistol_grip/factory`).
 - Made offline, and compiled with dotnet. The new `.gnsmth` and prefab fields only load into files compiled after the
   code has them, so `recompile_asset` the parts and weapon prefabs after the hotload. None of it has been checked
   in-game.

@@ -234,12 +234,23 @@ PARTS_AK15 = {
                              magazine_capacity=40, reload_variant="_xmag", reload_times=(2.4, 2.75)),
 }
 
-# The AK-74M's parts: any AK pistol grip and any AK-74 magazine, as the real one takes. Its own 6P1 Sb.8 grip and 6L23
-# polymer 30 are the factory parts, so the AK-12's AK-74M grip and 30 aren't offered again; then the AK-platform grips and
-# the AK-105's other magazines (it plays the AK-105's clips, so their reload times are the AK-105's).
+# The AK-74M's parts: the AK-105's stocks (the same AK-100 receiver), any AK pistol grip and any AK-74 magazine, as the
+# real one takes. Its own 6P34 Sb.15 side-folder, 6P1 Sb.8 grip and 6L23 polymer 30 are the factory parts, so the AK-105's
+# side-folder and the AK-12's AK-74M grip and 30 aren't offered again. The stocks' recoil is relative to its side-folder,
+# as the AK-105's is, and the fixed wooden stocks hide the folding stock's release button. Then the AK-12's grip and
+# windowed 30, the AK-platform grips and the AK-105's other magazines (it plays the AK-105's clips, so their reload
+# times are the AK-105's; the AK-12's 30 uses the factory reload).
+_AK74M_CHOICES = kastov_weapons.AK74M.part_choices
+_FIXED_STOCKS = ("ar_akilo_stockh_v0", "lm_rkilo_stock_v0", "lm_rkilo_stockh_v0")
 PARTS_AK74M = {
-    **{choice: PARTS_AK12[choice] for choice, _ in kastov_weapons.AK74M.part_choices["pistol_grip"][1:]},
-    **{choice: PARTS_AK12[choice] for choice, _ in kastov_weapons.AK74M.part_choices["magazine"][1:]},
+    **{choice: replace(_relative_to(PARTS_74U["ar_akilo_stock_v0"], _KASTOVIA_PARTS[choice]),
+                       bodygroups={"stock_hinge": 1} if choice in _FIXED_STOCKS else {})
+       for choice, _ in _AK74M_CHOICES["stock"][1:]},
+    "ak12_pgrip": Part("AK-12 Pistol Grip", "The AK-12's ergonomic polymer pistol grip."),
+    **{choice: PARTS_AK12[choice] for choice, _ in _AK74M_CHOICES["pistol_grip"][2:]},
+    "ak12_mag": Part("AK-12 30 Round Mag", "The AK-12's polymer 30-round magazine, with a window to see the rounds.",
+                     magazine_capacity=30),
+    **{choice: PARTS_AK12[choice] for choice, _ in _AK74M_CHOICES["magazine"][2:]},
 }
 
 
@@ -2050,8 +2061,9 @@ PREFABS = {
         dry_fire="ak",
         # ak74m_rig.py draws the side-on ak74m_01.png from the model, as for the AK-12.
         icon_source=None,
-        # The muzzle brake, the side mount's "off" and the factory grip and magazine (by the bit rule).
-        default_mesh_groups=34837,
+        # The muzzle brake, the side mount's "off", the stock's release button and the factory stock, grip and magazine
+        # (by the bit rule).
+        default_mesh_groups=553713749,
         bones={
             "tag_sling": (None, "-6.971,-0.573,3.351", "0,0,0,1"),
             "tag_barrel_attach": ("tag_sling", "13.312,0.573,2.527", "0,0,0,1"),
@@ -2082,12 +2094,14 @@ PREFABS = {
         gameplay=gameplay_ak74m,
         guid_salt="ak74m/",
         parts=PARTS_AK74M,
-        # port_kastov.py's world grip and mag points (tag_pistolgrip_attach, tag_mag_attach), the AK-12's.
-        part_slot_positions={"pistol_grip": (-3.0, 0, 3.0), "magazine": (2.514, 0, 3.257)},
+        # port_kastov.py's world stock, grip and mag points (tag_stock_attach, tag_pistolgrip_attach, tag_mag_attach),
+        # the AK-105's.
+        part_slot_positions={"stock": (-5.716, 0, 3.649), "pistol_grip": (-3.0, 0, 3.0), "magazine": (2.514, 0, 3.257)},
         reload_sounds=lambda: load(ASSETS / "Weapons" / "AK74M" / "ak74m_assets.json")["reloads"],
         review_note="Not checked in a match yet: the iron sights and the optics' aim on the B-13 (derived: tune with "
                     "dev_optic_correction), recoil, reload timing and sounds, the look sway and sprint, the left hand "
-                    "in first and third person, the parts on its slots, the charm and the sticker.",
+                    "in first and third person, the parts on its slots (the stocks, grips and magazines only in "
+                    "offscreen renders), the charm and the sticker.",
     ),
 }
 

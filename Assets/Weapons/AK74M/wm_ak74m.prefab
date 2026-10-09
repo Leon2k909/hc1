@@ -9,7 +9,7 @@
         "__type": "Sandbox.SkinnedModelRenderer",
         "__guid": "8f95ed10-7b31-59c2-8379-26cc5c9afe7a",
         "AnimationGraph": null,
-        "BodyGroups": 34837,
+        "BodyGroups": 553713749,
         "BoneMergeTarget": null,
         "CreateAttachments": false,
         "CreateBoneObjects": false,
@@ -131,6 +131,23 @@
             "FittedBodygroups": {
               "muzzle_tip": 1
             }
+          }
+        ]
+      },
+      {
+        "__guid": "e537eb25-67de-57a7-bb1a-6c17cb20a433",
+        "Flags": 0,
+        "Name": "Stock Attachment Point",
+        "Position": "-5.716,0,3.649",
+        "Enabled": true,
+        "Components": [
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithAttachmentPoint",
+            "__guid": "bfa8a969-7f3c-535d-8179-ffccf8fc94c1",
+            "Category": "Stock",
+            "MountBone": "tag_sling",
+            "MountOffset": "0,0,0",
+            "FittedBodygroups": {}
           }
         ]
       },

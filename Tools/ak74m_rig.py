@@ -29,6 +29,10 @@ Only their AK-74M handguard triangles are taken (HANDGUARD). The lower's front t
 ferrule (kolodka), where the M1-B's own collar covers it, so it's pressed back to the ferrule's middle (FERRULE_Y), where
 the Vityaz's lower ends.
 
+The stock is a mesh of its own (ak74m_stock), so the AK-105's stocks can take its place, and so is the release
+button on the receiver's rear (ak74m_stock_hinge): it belongs to the folding stock's latch, and the fixed stocks hide it,
+as the AK-105's hinge block does.
+
 The optic mount (ak74m_mount, shown only under an optic): the real AK-74M has no top rail. An optic goes on a bracket
 clamped to the dovetail on the receiver's left side (the planka), and Zenit's B-13 "Klassika" is the common one: a
 Picatinny rail over the dust cover, held by an arm from the dovetail. It's the pack's eft_mount_dovetail_b13 on the
@@ -120,11 +124,14 @@ def assemble() -> Pieces:
     return pieces
 
 
-# SMD name -> its pieces. The brake and the mount are bodygroups (muzzle_tip, optic_rail), the grip and magazine parts.
-# The rear sight is a mesh of its own but always shown: it stays under an optic, as on the real gun.
+# SMD name -> its pieces. The brake, the mount and the release button are bodygroups (muzzle_tip, optic_rail,
+# stock_hinge), the stock, grip and magazine parts. The rear sight is a mesh of its own but always shown: it stays under
+# an optic, as on the real gun.
 SMDS = {
-    "ak74m_receiver": ("ak74m", "ak74m_barrel", "ak_shared_parts", "ak100_planka", "stock_release", "kolodka",
-                       "dust_cover", "stock", "gas_tube", "handguard_lower", "handguard_upper"),
+    "ak74m_receiver": ("ak74m", "ak74m_barrel", "ak_shared_parts", "ak100_planka", "kolodka", "dust_cover", "gas_tube",
+                       "handguard_lower", "handguard_upper"),
+    "ak74m_stock": ("stock",),
+    "ak74m_stock_hinge": ("stock_release",),
     "ak74m_brake": ("brake",),
     "ak74m_rear_sight": ("rear_sight",),
     "ak74m_pgrip": ("pistol_grip",),
