@@ -262,6 +262,8 @@ public static partial class GameText
 			"Rosyjski karabinek automatyczny kalibru 7,62x39 mm: AK-12 na nabój AKM, z szynami na pokrywie komory zamkowej i łożu, składaną i teleskopową kolbą oraz serią dwustrzałową.",
 		["Russian 5.45x39mm assault rifle: the Russian army's standard Kalashnikov since 1991, with a black polymer handguard and side-folding stock. Optics go on a side mount, as on the real gun."] =
 			"Rosyjski karabinek automatyczny kalibru 5,45x39 mm: standardowy kałasznikow armii rosyjskiej od 1991 roku, z czarnym polimerowym łożem i kolbą składaną na bok. Celowniki optyczne montuje się na bocznym wsporniku, jak w prawdziwej broni.",
+		["American 6.8x51mm rifle: SIG's short-stroke piston MCX for the .277 Fury round, with a 13-inch barrel and a folding stock. The US Army's M7."] =
+			"Amerykański karabin kalibru 6,8x51 mm: MCX firmy SIG z tłokiem o krótkim skoku, na nabój .277 Fury, z 13-calową lufą i składaną kolbą. M7 armii USA.",
 		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
 			"Żebrowany stalowy magazynek AKM na 30 naboi. Standardowy czas przeładowania.",
 		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =
@@ -557,6 +559,8 @@ public static partial class GameText
 			"Krótki polimerowy magazynek Magpul na 20 naboi. Lżejszy i szybciej się go wpina. Przeładowanie w 2,07 s (2,17 s, gdy pusty).",
 		["Magpul's 30-round polymer magazine, with a window to count the rounds. Standard reload speed."] =
 			"Polimerowy magazynek Magpul na 30 naboi, z okienkiem do liczenia naboi. Standardowy czas przeładowania.",
+		["Lancer's L7 AWM 25-round magazine, with a see-through window. Standard reload speed."] =
+			"Magazynek Lancer L7 AWM na 25 naboi, z przezroczystym okienkiem. Standardowy czas przeładowania.",
 		["Magpul's long 40-round polymer magazine. Heavier and slower to change. Reloads in 2.63s (3.13s when empty)."] =
 			"Długi polimerowy magazynek Magpul na 40 naboi. Cięższy i wolniej się go wymienia. Przeładowanie w 2,63 s (3,13 s, gdy pusty).",
 		["The RPK's heavy wooden stock. 12% less recoil."] = "Ciężka drewniana kolba RPK. Odrzut mniejszy o 12%.",

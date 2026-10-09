@@ -159,6 +159,11 @@ public static partial class GameText
 			"Russisches Sturmgewehr im Kaliber 5,45x39 mm: die Standard-Kalaschnikow der russischen Armee seit 1991, mit schwarzem Polymer-Handschutz und seitlich klappbarer Schulterstütze. Optiken sitzen wie bei der echten Waffe auf einer Seitenmontage.",
 			"Fusil de asalto ruso de 5,45x39 mm: el Kaláshnikov reglamentario del ejército ruso desde 1991, con guardamanos de polímero negro y culata plegable lateral. Las miras ópticas van en un soporte lateral, como en el arma real.",
 			"Fuzil de assalto russo 5,45x39 mm: o Kalashnikov padrão do exército russo desde 1991, com guarda-mão de polímero preto e coronha rebatível lateralmente. As miras ópticas vão num suporte lateral, como na arma real." ),
+		["American 6.8x51mm rifle: SIG's short-stroke piston MCX for the .277 Fury round, with a 13-inch barrel and a folding stock. The US Army's M7."] = (
+			"Fusil américain en 6,8x51 mm : le MCX à piston à course courte de SIG pour la munition .277 Fury, avec un canon de 13 pouces et une crosse repliable. Le M7 de l'US Army.",
+			"Amerikanisches Gewehr im Kaliber 6,8x51 mm: SIGs MCX mit Kurzhub-Gaskolben für die Patrone .277 Fury, mit 13-Zoll-Lauf und klappbarer Schulterstütze. Das M7 der US Army.",
+			"Fusil estadounidense de 6,8x51 mm: el MCX de pistón de recorrido corto de SIG para el cartucho .277 Fury, con cañón de 13 pulgadas y culata plegable. El M7 del Ejército de EE. UU.",
+			"Fuzil americano 6,8x51 mm: o MCX de pistão de curso curto da SIG para o cartucho .277 Fury, com cano de 13 polegadas e coronha rebatível. O M7 do Exército dos EUA." ),
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] = (
 			"Pistolet réglementaire américain en 9x19 mm : le P320 compact de l'US Army, avec un canon de 3,9 pouces et un chargeur de 17 cartouches.",
 			"Amerikanische Dienstpistole im Kaliber 9x19 mm: die kompakte P320 der US Army, mit 3,9-Zoll-Lauf und 17-Schuss-Magazin.",
@@ -566,6 +571,11 @@ public static partial class GameText
 			"Das 30-Schuss-Polymermagazin von Magpul, mit Sichtfenster zum Zählen der Patronen. Normale Nachladezeit.",
 			"El cargador de polímero de 30 balas de Magpul, con una ventana para contar los cartuchos. Velocidad de recarga estándar.",
 			"O carregador de polímero de 30 cartuchos da Magpul, com uma janela para contar os cartuchos. Velocidade de recarga padrão." ),
+		["Lancer's L7 AWM 25-round magazine, with a see-through window. Standard reload speed."] = (
+			"Le chargeur L7 AWM de 25 cartouches de Lancer, avec une fenêtre transparente. Vitesse de rechargement standard.",
+			"Das L7-AWM-Magazin für 25 Schuss von Lancer, mit durchsichtigem Fenster. Normale Nachladezeit.",
+			"El cargador L7 AWM de 25 balas de Lancer, con una ventana transparente. Velocidad de recarga estándar.",
+			"O carregador L7 AWM de 25 cartuchos da Lancer, com uma janela transparente. Velocidade de recarga padrão." ),
 		["Magpul's long 40-round polymer magazine. Heavier and slower to change. Reloads in 2.63s (3.13s when empty)."] = (
 			"Le long chargeur polymère de 40 cartouches de Magpul. Plus lourd et plus lent à changer. Rechargement en 2,63 s (3,13 s à vide).",
 			"Das lange 40-Schuss-Polymermagazin von Magpul. Schwerer und langsamer zu wechseln. Nachladen in 2,63 s (3,13 s wenn leer).",

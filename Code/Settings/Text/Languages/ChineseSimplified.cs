@@ -864,6 +864,8 @@ public static partial class GameText
 			"俄制7.62x39毫米突击步枪：使用AKM弹药的AK-12，配带导轨的机匣盖和护木、折叠伸缩式枪托以及两发点射。",
 		["Russian 5.45x39mm assault rifle: the Russian army's standard Kalashnikov since 1991, with a black polymer handguard and side-folding stock. Optics go on a side mount, as on the real gun."] =
 			"俄制5.45x39毫米突击步枪：1991年起俄军的制式卡拉什尼科夫步枪，配黑色聚合物护木和侧折叠枪托。瞄准镜和真枪一样装在侧面支架上。",
+		["American 6.8x51mm rifle: SIG's short-stroke piston MCX for the .277 Fury round, with a 13-inch barrel and a folding stock. The US Army's M7."] =
+			"美制6.8x51毫米步枪：SIG为.277 Fury弹设计的短行程活塞式MCX，配13英寸枪管和折叠枪托。即美国陆军的M7。",
 		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
 			"AKM的带加强筋钢制30发弹匣。装填速度标准。",
 		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =
@@ -1134,6 +1136,8 @@ public static partial class GameText
 			"Magpul的短款20发聚合物弹匣。更轻，插入更快。装填用时2.07秒（空仓2.17秒）。",
 		["Magpul's 30-round polymer magazine, with a window to count the rounds. Standard reload speed."] =
 			"Magpul的30发聚合物弹匣，带可查看余弹的窗口。装填速度标准。",
+		["Lancer's L7 AWM 25-round magazine, with a see-through window. Standard reload speed."] =
+			"Lancer的L7 AWM 25发弹匣，带透明窗口。装填速度标准。",
 		["Magpul's long 40-round polymer magazine. Heavier and slower to change. Reloads in 2.63s (3.13s when empty)."] =
 			"Magpul的长款40发聚合物弹匣。更重，更换更慢。装填用时2.63秒（空仓3.13秒）。",
 		["The RPK's heavy wooden stock. 12% less recoil."] = "RPK的重型木质枪托。后坐力降低12%。",

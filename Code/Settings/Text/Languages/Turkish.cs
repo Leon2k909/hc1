@@ -742,6 +742,8 @@ public static partial class GameText
 			"Rus yapımı 7,62x39 mm saldırı tüfeği: AKM'nin fişeğini kullanan AK-12; raylı mekanizma kapağı ve el kundağı, katlanır ve teleskopik dipçik ve iki atımlık seri atış.",
 		["Russian 5.45x39mm assault rifle: the Russian army's standard Kalashnikov since 1991, with a black polymer handguard and side-folding stock. Optics go on a side mount, as on the real gun."] =
 			"Rus yapımı 5,45x39 mm saldırı tüfeği: 1991'den beri Rus ordusunun standart Kalaşnikof'u; siyah polimer el kundağı ve yana katlanır dipçik. Nişangahlar, gerçek silahta olduğu gibi yan montaja takılır.",
+		["American 6.8x51mm rifle: SIG's short-stroke piston MCX for the .277 Fury round, with a 13-inch barrel and a folding stock. The US Army's M7."] =
+			"Amerikan yapımı 6,8x51 mm tüfek: SIG'in .277 Fury fişeği için kısa stroklu pistonlu MCX'i; 13 inç namlu ve katlanır dipçik. ABD Ordusu'nun M7'si.",
 		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
 			"AKM'nin 30 mermilik nervürlü çelik şarjörü. Standart yeniden doldurma hızı.",
 		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =
@@ -1037,6 +1039,8 @@ public static partial class GameText
 			"Magpul'un kısa 20 mermilik polimer şarjörü. Daha hafif ve takması daha çabuk. Yeniden doldurma 2,07 sn (boşken 2,17 sn).",
 		["Magpul's 30-round polymer magazine, with a window to count the rounds. Standard reload speed."] =
 			"Magpul'un 30 mermilik polimer şarjörü; mermileri saymak için bir penceresi var. Standart yeniden doldurma hızı.",
+		["Lancer's L7 AWM 25-round magazine, with a see-through window. Standard reload speed."] =
+			"Lancer'ın L7 AWM 25 mermilik şarjörü; şeffaf bir penceresi var. Standart yeniden doldurma hızı.",
 		["Magpul's long 40-round polymer magazine. Heavier and slower to change. Reloads in 2.63s (3.13s when empty)."] =
 			"Magpul'un uzun 40 mermilik polimer şarjörü. Daha ağır ve değiştirmesi daha yavaş. Yeniden doldurma 2,63 sn (boşken 3,13 sn).",
 		["The RPK's heavy wooden stock. 12% less recoil."] = "RPK'nın ağır ahşap dipçiği. %12 daha az geri tepme.",

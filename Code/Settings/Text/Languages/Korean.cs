@@ -264,6 +264,8 @@ public static partial class GameText
 			"러시아제 7.62x39mm 돌격소총으로, AKM의 탄약을 쓰는 AK-12입니다. 레일이 달린 기관부 덮개와 핸드가드, 접이식 신축 개머리판, 2점사를 갖췄습니다.",
 		["Russian 5.45x39mm assault rifle: the Russian army's standard Kalashnikov since 1991, with a black polymer handguard and side-folding stock. Optics go on a side mount, as on the real gun."] =
 			"러시아제 5.45x39mm 돌격소총으로, 1991년부터 러시아군의 제식 칼라시니코프입니다. 검은 폴리머 핸드가드와 측면 접이식 개머리판을 갖췄습니다. 조준경은 실총처럼 측면 마운트에 올립니다.",
+		["American 6.8x51mm rifle: SIG's short-stroke piston MCX for the .277 Fury round, with a 13-inch barrel and a folding stock. The US Army's M7."] =
+			"미국제 6.8x51mm 소총으로, SIG가 .277 Fury 탄용으로 만든 쇼트 스트로크 피스톤식 MCX입니다. 13인치 총열과 접이식 개머리판을 갖췄습니다. 미 육군의 M7입니다.",
 		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
 			"AKM의 리브가 있는 강철 30발 탄창입니다. 재장전 속도는 표준입니다.",
 		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =
@@ -557,6 +559,8 @@ public static partial class GameText
 			"Magpul의 짧은 20발 폴리머 탄창입니다. 더 가볍고 빨리 끼울 수 있습니다. 재장전에 2.07초가 걸립니다(빈 탄창일 때 2.17초).",
 		["Magpul's 30-round polymer magazine, with a window to count the rounds. Standard reload speed."] =
 			"Magpul의 30발 폴리머 탄창으로, 남은 탄을 셀 수 있는 창이 있습니다. 재장전 속도는 표준입니다.",
+		["Lancer's L7 AWM 25-round magazine, with a see-through window. Standard reload speed."] =
+			"Lancer의 L7 AWM 25발 탄창으로, 투명한 창이 있습니다. 재장전 속도는 표준입니다.",
 		["Magpul's long 40-round polymer magazine. Heavier and slower to change. Reloads in 2.63s (3.13s when empty)."] =
 			"Magpul의 긴 40발 폴리머 탄창입니다. 더 무겁고 교체가 느립니다. 재장전에 2.63초가 걸립니다(빈 탄창일 때 3.13초).",
 		["The RPK's heavy wooden stock. 12% less recoil."] = "RPK의 무거운 목제 개머리판입니다. 반동이 12% 감소합니다.",

@@ -264,6 +264,8 @@ public static partial class GameText
 			"ロシア製の7.62x39mmアサルトライフル。AKMの弾薬を使うAK-12で、レイル付きのダストカバーとハンドガード、折りたたみ・伸縮式ストック、2点バーストを備える。",
 		["Russian 5.45x39mm assault rifle: the Russian army's standard Kalashnikov since 1991, with a black polymer handguard and side-folding stock. Optics go on a side mount, as on the real gun."] =
 			"ロシア製の5.45x39mmアサルトライフル。1991年からロシア軍の制式カラシニコフで、黒いポリマー製ハンドガードと横折れ式ストックを備える。光学照準器は実銃と同じくサイドマウントに載せる。",
+		["American 6.8x51mm rifle: SIG's short-stroke piston MCX for the .277 Fury round, with a 13-inch barrel and a folding stock. The US Army's M7."] =
+			"アメリカ製の6.8x51mmライフル。SIGが.277 Fury弾用に作ったショートストロークピストン式のMCXで、13インチ銃身と折りたたみ式ストックを備える。アメリカ陸軍のM7。",
 		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
 			"AKMのリブ付きスチール製30発マガジン。リロード速度は標準。",
 		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =
@@ -557,6 +559,8 @@ public static partial class GameText
 			"Magpulの短い20発ポリマーマガジン。より軽く、素早く装着できる。リロード時間2.07秒（空の状態から2.17秒）。",
 		["Magpul's 30-round polymer magazine, with a window to count the rounds. Standard reload speed."] =
 			"Magpulの30発ポリマーマガジン。残弾を数えられる窓が付いている。リロード速度は標準。",
+		["Lancer's L7 AWM 25-round magazine, with a see-through window. Standard reload speed."] =
+			"LancerのL7 AWM 25発マガジン。透明な窓が付いている。リロード速度は標準。",
 		["Magpul's long 40-round polymer magazine. Heavier and slower to change. Reloads in 2.63s (3.13s when empty)."] =
 			"Magpulの長い40発ポリマーマガジン。重く、交換に時間がかかる。リロード時間2.63秒（空の状態から3.13秒）。",
 		["The RPK's heavy wooden stock. 12% less recoil."] = "RPKの重い木製ストック。反動が12%減少。",

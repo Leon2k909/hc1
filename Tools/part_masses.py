@@ -62,6 +62,7 @@ GUN_KG = {
     "AK12/weapon_ak12": 4.0,          # AK-12 3.5 kg without a magazine (Rosoboronexport's catalogue) + a loaded 30
     "AK15/weapon_ak15": 4.24,         # AK-15 3.5 kg without a magazine (Rosoboronexport's catalogue) + a loaded 30
     "AK74M/weapon_ak74m": 3.95,       # AK-74M 3.4 kg without a magazine (Rosoboronexport's catalogue) + a loaded 30
+    "SPEAR/weapon_spear": 4.35,       # MCX-SPEAR 13-inch 3.8 kg (8.38 lb) without a magazine + a loaded Lancer 20
 }
 
 
@@ -76,6 +77,7 @@ ROUND_KG = {
     "5.45": 0.0105,     # 7N6
     "7.62x39": 0.0163,  # PS
     "7.62x51": 0.0254,  # M80
+    "6.8x51": 0.0194,   # .277 Fury 135 gr ball in its steel-and-brass hybrid case, ~a fifth lighter than M80
     "9x19": 0.012,      # 124 gr ball
     "9x19 M1152": 0.0115,  # 115 gr
     "12ga": 0.040,      # 2 3/4" 00 buck
@@ -85,6 +87,7 @@ GUN_ROUND = {
     "vepr12": "12ga", "aug": "5.56", "famas": "5.56", "m16": "5.56", "m4a1": "5.56", "fal": "7.62x51",
     "scarh": "7.62x51", "mp5": "9x19", "m18": "9x19 M1152", "mcx": "5.56",
     "hk416": "5.56", "ak12": "5.45", "ak15": "7.62x39", "ak74m": "5.45",
+    "spear": "6.8x51",
 }
 
 # Empty magazines, kg, and how many rounds they hold. The AK-74's polymer 30 is 0.23 kg; the AKM's steel 30 0.33; the
@@ -114,6 +117,8 @@ OWN_MAGAZINES = {
     "ak15": {"factory": (0.25, 30)},  # the AK-103's polymer 30
     # the 6L23 polymer 30, and the AK-12's 6L31 polymer 30 with its window
     "ak74m": {"factory": (0.23, 30), "ak12_mag": (0.215, 30)},
+    # Lancer's L7 AWM 20 and 25, polymer with a steel feed lip insert.
+    "spear": {"factory": (0.17, 20), "mag25": (0.19, 25)},
 }
 
 # AK-platform stocks and pistol grips, each on its own, kg: the AKS-74U's folding stock 0.35, the AK-74M's polymer

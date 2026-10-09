@@ -270,6 +270,8 @@ public static partial class GameText
 			"Російський автомат калібру 7,62x39 мм: AK-12 під набій AKM, з планками на кришці ствольної коробки та цівці, складаним телескопічним прикладом і режимом черги по два постріли.",
 		["Russian 5.45x39mm assault rifle: the Russian army's standard Kalashnikov since 1991, with a black polymer handguard and side-folding stock. Optics go on a side mount, as on the real gun."] =
 			"Російський автомат калібру 5,45x39 мм: штатний автомат Калашникова російської армії з 1991 року, з чорною полімерною цівкою і прикладом, що складається вбік. Приціли ставляться на бічний кронштейн, як на справжній зброї.",
+		["American 6.8x51mm rifle: SIG's short-stroke piston MCX for the .277 Fury round, with a 13-inch barrel and a folding stock. The US Army's M7."] =
+			"Американська гвинтівка калібру 6,8x51 мм: MCX від SIG з короткохідним газовим поршнем під набій .277 Fury, з 13-дюймовим стволом і складаним прикладом. M7 армії США.",
 		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
 			"Сталевий магазин AKM із ребрами на 30 набоїв. Звичайна швидкість перезарядки.",
 		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =
@@ -558,6 +560,8 @@ public static partial class GameText
 			"Короткий полімерний магазин Magpul на 20 набоїв. Легший і швидше вставляється. Перезарядка — 2,07 с (2,17 с, якщо порожній).",
 		["Magpul's 30-round polymer magazine, with a window to count the rounds. Standard reload speed."] =
 			"Полімерний магазин Magpul на 30 набоїв із віконцем для підрахунку набоїв. Звичайна швидкість перезарядки.",
+		["Lancer's L7 AWM 25-round magazine, with a see-through window. Standard reload speed."] =
+			"Магазин Lancer L7 AWM на 25 набоїв із прозорим віконцем. Звичайна швидкість перезарядки.",
 		["Magpul's long 40-round polymer magazine. Heavier and slower to change. Reloads in 2.63s (3.13s when empty)."] =
 			"Довгий полімерний магазин Magpul на 40 набоїв. Важчий і міняється повільніше. Перезарядка — 2,63 с (3,13 с, якщо порожній).",
 		["The RPK's heavy wooden stock. 12% less recoil."] = "Важкий дерев'яний приклад RPK. Віддача на 12% слабша.",

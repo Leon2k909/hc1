@@ -1,0 +1,33 @@
+{
+  "Name": "SIG Sauer MCX-SPEAR",
+  "Description": "American 6.8x51mm rifle: SIG's short-stroke piston MCX for the .277 Fury round, with a 13-inch barrel and a folding stock. The US Army's M7.",
+  "Slot": "Primary",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": true,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/guns/spear_01.png",
+  "IsPurchasable": true,
+  "Price": 3000,
+  "KillReward": 300,
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/spear/weapon_spear.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/spear/wm_spear.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/spear/vm_spear.prefab"
+  },
+  "WorldModel": "weapons/spear/w_spear.vmdl",
+  "ArmorReduction": null,
+  "HelmetReduction": null,
+  "WorldModelBodyGroups": 0,
+  "__references": [],
+  "__version": 0,
+  "Category": "AssaultRifle",
+  "GunsmithOffset": "0,0,4",
+  "ReviewNote": "Not checked in a match yet: the iron sights and the optics' aim (derived: tune with dev_optic_correction), recoil, reload timing and sounds, the look sway and sprint, the left hand in first and third person, the parts on its slots, the charm and the sticker."
+}

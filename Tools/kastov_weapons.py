@@ -1530,9 +1530,76 @@ AK74M = Weapon(
     grip_pose="a_delta_barhvyshort_additive_for_offset",
 )
 
+def spear_materials() -> dict[str, str]:
+    # Built by spear_assets.py.
+    assets = json.loads((ASSETS / "Weapons" / "SPEAR" / "spear_assets.json").read_text(encoding="utf-8"))
+    return assets["materials"]
+
+
+# The SIG MCX-SPEAR (6.8x51mm, .277 FURY): Escape from Tarkov's MCX-SPEAR from the ARC9 EFT Assault Rifles pack (Workshop
+# 2962829818), the real rifle the US Army adopted as the XM7: its 330 mm (13-inch) barrel, the Clutch-LOK QD flash hider,
+# the M-LOK handguard with its full-length top rail, SIG's flip-up sights, the side charging handle, SIG's locking hinge
+# and low-profile tube with a Magpul MOE SL-K stock, and Lancer's L7 AWM 20-round magazine, all in coyote tan. It's on
+# the MCX Virtus's CoD rig and clips (MW2019's M13): both are SIG's short-stroke piston MCX family on AR-15-pattern
+# lowers. Tools/spear_rig.py writes the pieces as SMDs (decompiled/spear/rig).
+_SPEAR_RIG = "rig"
+SPEAR = Weapon(
+    name="spear",
+    folder=ASSETS / "Weapons" / "SPEAR",
+    asset="weapons/spear",
+    model="spear",
+    decompiled=DECOMPILED / "spear",
+    cod_anims=f"../mcharlie/{_MCX}/{_MCX}_anims",
+    # The grip is SIG's reduced-angle pistol grip, the only one offered, so it's part of the receiver.
+    vm_meshes=[f"{_SPEAR_RIG}/spear_receiver.smd", f"{_SPEAR_RIG}/spear_pgrip.smd"],
+    part_meshes=[],
+    optional_meshes={
+        "muzzle_tip": (f"{_SPEAR_RIG}/spear_flash_hider.smd", None),  # the Clutch-LOK flash hider
+        # SIG's flip-up sights raised, and folded down under an optic.
+        "iron_sights": (f"{_SPEAR_RIG}/spear_sights_on.smd", None),
+        "sight_folded": (f"{_SPEAR_RIG}/spear_sights_off.smd", None),
+    },
+    extra_bones={
+        # 0.2 inside the front of the flash hider, on the bore.
+        "muzzle": ("tag_sling", np.array([22.844, 0.0, -0.03])),
+        # The MCX's: the SPEAR's grip sits where the MCX's lower puts its own.
+        "tag_pistolgrip_attach": ("tag_sling", np.array([2.747, 0.0, -1.872])),
+    },
+    materials=spear_materials,
+    # The MCX's, except aim. With the MCX's aim the SPEAR's rear aperture's centre sits 0.371 above the camera (its
+    # flip-up sights stand higher over the bore than the MCX's), so the gun comes down onto the line through the
+    # aperture's centre and the front post's tip and turns onto it, which puts both on the aim point (ads_in's last
+    # frame, within 0.001 degrees).
+    hip=view_offset(),
+    aim=view_offset((0.0, -1.0, -0.378), (0.046, -0.016, 0.0)),
+    sprint=view_offset(),
+    m4_sprint=True,
+    ads_pose=("ads_in", slice(-1, None)),
+    # ~4.35 kg loaded, 0.6 kg over the AKM's 3.75: by the RPK's scaling, 0.26 s.
+    ads_time=0.26,
+    # The MCX's clips: the hip one rolls the gun every shot, the aimed one only kicks it back.
+    ads_fire="fire_2",
+    # The rig's own tags: the SPEAR's barrel and flash hider are the receiver's, so the MCX barrel's tags aren't there.
+    report_bones=["tag_flash", "tag_reflex", "tag_sight_on", "tag_sight_off", "tag_brass", "tag_stock_attach",
+                  "tag_bipod_attach"],
+    # The rig's tag_brass is the MCX's, 0.5 behind the middle of the SPEAR's longer port and inside its receiver. The
+    # SPEAR's port runs x 4.7 to 8.0 and z -0.1 to 0.75, its wall at y -0.7: the cases leave its middle.
+    moved_bones={"tag_brass": ("tag_sling", np.array([6.4, -0.75, 0.3]))},
+    part_choices={
+        # Lancer's L7 AWM 20, then its 25. Each holds the fitted magazine (j_mag1) and the reload's fresh one (j_mag2).
+        # Both reload with the MCX's own clips: the 25 is only an inch longer.
+        "magazine": [("factory", f"{_SPEAR_RIG}/spear_mag.smd"), ("mag25", f"{_SPEAR_RIG}/spear_mag25.smd")],
+    },
+    # The MCX's fit, with the fingers 3% open: the SPEAR's handguard is wider than the MCX's, and with the MCX's fit
+    # alone the pinky's tip came within 0.05-0.07 of it (axis to surface; the verified 762's nearest fingertip is
+    # 0.118). Now the nearest, the pinky's middle joint, is 0.148 off it at the hip and aiming, the middle finger's tip
+    # 0.25-0.27 and the palm 0.49 (measured with Tools/grip_fit/measure.js).
+    left_grip=GripFit(shift=(0.0, -0.05, 0.15), fingers=0.03, thumb=0.2),
+)
+
 WEAPONS ={weapon.name: weapon for weapon in (KASTOV_762, KASTOV_74U, VITYAZ, RPK, BIZON, AK105, VEPR12, M16, P90,
                                               MP7, AUG, UZI, FAL, FAMAS, M18, MCX, L85A2, HK416, AK12, AK15,
-                                              AK74M)}
+                                              AK74M, SPEAR)}
 
 
 def add_argument(parser: argparse.ArgumentParser) -> None:

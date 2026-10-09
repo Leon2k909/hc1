@@ -340,6 +340,7 @@ M1152_BULLET = (9.02, 14.7)     # 9x19 M1152, 115 gr FMJ
 MAKAROV_BULLET = (9.27, 11.5)   # 9x18 57-N-181S
 SS190_BULLET = (5.70, 21.6)     # 5.7x28 SS190
 DM11_BULLET = (4.65, 16.5)      # 4.6x30 DM11 (the length is an estimate)
+SPEAR_BULLET = (7.04, 32.0)     # 6.8x51 (.277 Fury), 135 gr FMJ
 BUCK_00_BALL = (8.38, 8.38)     # 00 buckshot: a sphere
 
 
@@ -1012,6 +1013,35 @@ def gameplay_ak74m() -> Gameplay:
         # ~3.95 kg AK-74M back at ~1.35 m/s, an M855 round the loaded M4 at ~1.86 m/s.
         "ShootRecoil": {"Scale": "1.45,3.62"},
     })
+
+
+def gameplay_spear() -> Gameplay:
+    """The real SIG MCX-SPEAR's figures with 6.8x51 (.277 Fury) ball from the 13-inch barrel the US Army's M7 has."""
+    assets = load(ASSETS / "Weapons" / "SPEAR" / "spear_assets.json")
+    sounds, reloads = assets["sounds"], assets["reloads"]
+    return Gameplay({
+        # 3.8 kg (8.38 lb) without a magazine with the 13-inch barrel, ~4.35 kg with a loaded Lancer 20 (0.17 kg, and 20
+        # rounds of ~19.4 g): ~1% slower per kg over the AKM's 3.75 kg, as for the RPK.
+        "Equipment": {"SpeedPenalty": 40, "WeightSlowdown": 0.006},
+        "WeaponAmmo": {"Ammo": 20, "MaxAmmo": 20},
+        # 850 rpm, automatic and semi. The 6.8x51 135 gr ball leaves the 330 mm (13-inch) barrel at ~915 m/s (~3,000
+        # ft/s), G1 0.488. That's 3,663 J against M855's 1,646 J from the M4, so its damage is the M4's 20 scaled by
+        # muzzle energy (44), and in hardcore a body hit at full damage always kills, as with the FAL's M80. The sights
+        # sit 85 mm over the bore (the model's sight line through the rear aperture and the front post's tip), zeroed
+        # at 300 m like the other rifles. A suppressor doesn't speed it up: the SPEAR's short-stroke piston has an
+        # adjustable gas valve with a suppressed setting (the M7 is issued with one).
+        "Shootable": {"BaseDamage": 44, "FireRate": 850, "SuppressorFireRateScale": 1, "ShootSound": sounds["fire"],
+                      "SuppressedShootSound": sounds["fire_suppressed"],
+                      "SupportedFireModes": ["Automatic", "Semi"], "CurrentFireMode": "Automatic",
+                      **ballistics(915, "G1", 0.488, 85.0, 300, SPEAR_BULLET)},
+        # It plays the MCX's clips: the gun is level again at 2.33s, and 2.6s after the empty reload's bolt release.
+        "Reloadable": {"ReloadTime": 2.33, "EmptyReloadTime": 2.6, "TimedReloadSounds": reloads["reload"],
+                       "EmptyReloadSounds": reloads["reload_empty"]},
+        # Free recoil against the M4's (2,5): a 6.8x51 round (8.75 g at 915 m/s, ~3.3 g of powder) kicks the loaded
+        # ~4.35 kg SPEAR back at ~3.05 m/s, an M855 round the loaded M4 at ~1.86 m/s.
+        "ShootRecoil": {"Scale": "3.28,8.2"},
+    })
+
 
 @dataclass(frozen=True)
 class Prefabs:
@@ -2102,6 +2132,61 @@ PREFABS = {
                     "dev_optic_correction), recoil, reload timing and sounds, the look sway and sprint, the left hand "
                     "in first and third person, the parts on its slots (the stocks, grips and magazines only in "
                     "offscreen renders), the charm and the sticker.",
+    ),
+    "spear": Prefabs(
+        title="SIG Sauer MCX-SPEAR",
+        description="American 6.8x51mm rifle: SIG's short-stroke piston MCX for the .277 Fury round, with a 13-inch "
+                    "barrel and a folding stock. The US Army's M7.",
+        price=3000,
+        deploy_sound="weapons/mcx/sounds/mcx.raise.sound",
+        # spear_rig.py draws the side-on spear_01.png from the model, as for the AK-12.
+        icon_source=None,
+        # The flash hider, the raised sights and the factory magazine; the folded sights hidden (by the bit rule, the
+        # MCX's groups with a magazine where its stock was).
+        default_mesh_groups=341,
+        bones={
+            "tag_sling": (None, "-5.747,0,4.872", "0,0,0,1"),
+            "muzzle": ("tag_sling", "22.844,0,-0.03", "0,0,0,1"),
+            "tag_brass": ("tag_sling", "6.4,-0.75,0.3", "0,0,-0.707107,0.707107"),
+        },
+        world_muzzle="17.097,0,4.842",
+        world_eject="0.653,-0.75,5.172",
+        # By the rule, where the first-person hand holds the handguard (its wrist at x 4.2): the handguard's right side
+        # is at -0.926 and its bottom at 3.892.
+        world_left_hand="4.2,2.574,2.702",
+        slots=[
+            # The upper's top rail, where the MCX's tag_reflex is (the rail's ridges at 6.696). An optic folds the
+            # flip-up sights down.
+            ("Optic", (-2.71, 0, 6.696), (0.25, 0, 8.73), {"iron_sights": 1, "sight_folded": 1}),
+            ("Muzzle", (15.337, 0, 4.82), (17.62, 0, 7.4147), {"muzzle_tip": 1}),  # the flash hider's rear face
+            # The handguard's flat bottom (5.75 to 14.5 at 3.892): the M4's vertical grips reach 2.1 forward from their
+            # origin, so their fronts are 0.1 inside the handguard's front, clear of the left hand's index finger.
+            ("Underbarrel", (12.4, 0, 3.892), (8.3, 0, 6.2), {}),
+            # The handguard's right side at the bore's height, ahead of the left hand's fingertips.
+            ("Laser", (9.5, -0.926, 4.82), (8.6, -1.22, 7.4147), {}),
+        ],
+        # The MCX's: the stock's hinge block at the back of the receiver (-8.12 to -7.07), by the QD sling sockets. It
+        # plays the MCX's clips, so the hands keep the MCX's 1.07 or more from it.
+        charm=(-8.07, 1.78, 3.66),
+        # The magazine well's left side, flat at y 0.684.
+        sticker=((0.75, 0.684, 3.2), (0.0, 1.0, 0.0), (1.6, 1.0)),
+        # The 762's measured correction moved by how far the SPEAR's ADS pose puts its optic slot from the 762's, like
+        # the MCX's. Tune in-game with dev_optic_correction.
+        optic_aim_correction="3.118,0,0.052",
+        gameplay=gameplay_spear,
+        guid_salt="spear/",
+        # Lancer's L7 AWM 25 (the pack's), the longer of the two magazines SIG ships the SPEAR with in the US. It plays
+        # the factory reload.
+        parts={
+            "mag25": Part("25 Round Mag", "Lancer's L7 AWM 25-round magazine, with a see-through window.",
+                          magazine_capacity=25),
+        },
+        # tag_mag_attach.
+        part_slot_positions={"magazine": (1.542, 0, 2.622)},
+        reload_sounds=lambda: load(ASSETS / "Weapons" / "SPEAR" / "spear_assets.json")["reloads"],
+        review_note="Not checked in a match yet: the iron sights and the optics' aim (derived: tune with "
+                    "dev_optic_correction), recoil, reload timing and sounds, the look sway and sprint, the left hand "
+                    "in first and third person, the parts on its slots, the charm and the sticker.",
     ),
 }
 

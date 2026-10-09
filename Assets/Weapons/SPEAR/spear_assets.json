@@ -1,0 +1,58 @@
+{
+  "materials": {
+    "weapon_sig_mcx_spear_68x51_LOD0": "weapons/spear/materials/spear_lower.vmat",
+    "reciever_mcx_sig_spear_upper_LOD0": "weapons/spear/materials/spear_upper.vmat",
+    "reciever_mcx_sig_spear_upper_details_LOD0": "weapons/spear/materials/spear_upper_details.vmat",
+    "spear_internals_LOD0": "weapons/spear/materials/spear_internals.vmat",
+    "barrel_mcx_sig_spear_330mm_68x51_LOD0": "weapons/spear/materials/spear_barrel.vmat",
+    "gas_block_mcx_sig_adjustable_gas_piston_LOD0": "weapons/spear/materials/spear_gas_block.vmat",
+    "charge_spear_sig_spear_std_LOD0": "weapons/spear/materials/spear_charging_handle.vmat",
+    "handguard_mcx_sig_spear_m_lok_LOD0": "weapons/spear/materials/spear_handguard.vmat",
+    "muzzle_ar10_sig_clutch_lok_qd_flash_hider_68x51_LOD0": "weapons/spear/materials/spear_flash_hider.vmat",
+    "stock_all_sig_stock_locking_hinge_assembly_LOD0": "weapons/spear/materials/spear_stock_hinge.vmat",
+    "stock_base_sig_low_profile_tube_LOD0": "weapons/spear/materials/spear_stock_tube.vmat",
+    "stock_ar15_magpul_moe_sl_k_carbine_LOD0": "weapons/spear/materials/spear_stock.vmat",
+    "pistolgrip_ar15_sig_reduced_angle_pistol_grip_LOD0": "weapons/spear/materials/spear_pistol_grip.vmat",
+    "mag_ar10_lancer_l7_awm_762x51_20_LOD0": "weapons/spear/materials/spear_mag.vmat",
+    "mag_ar10_lancer_l7_awm_762x51_25_LOD0": "weapons/spear/materials/spear_mag25.vmat",
+    "patron_68x51_fmj": "weapons/spear/materials/spear_rounds.vmat",
+    "sight_rear_all_sig_flip_up_LOD0": "weapons/spear/materials/spear_rear_sight.vmat",
+    "sight_front_all_sig_flip_up_LOD0": "weapons/spear/materials/spear_front_sight.vmat"
+  },
+  "sounds": {
+    "fire": "weapons/spear/sounds/spear.fire.sound",
+    "fire_suppressed": "weapons/spear/sounds/spear.fire_suppressed.sound",
+    "raise": "weapons/mcx/sounds/mcx.raise.sound",
+    "drop": "weapons/mcx/sounds/mcx.drop.sound",
+    "reload_rotate": "weapons/mcx/sounds/mcx.reload_rotate.sound",
+    "reload_magout_01": "weapons/mcx/sounds/mcx.reload_magout_01.sound",
+    "reload_magin_v2_01": "weapons/mcx/sounds/mcx.reload_magin_v2_01.sound",
+    "reload_end": "weapons/mcx/sounds/mcx.reload_end.sound",
+    "reload_magin_v2_02": "weapons/mcx/sounds/mcx.reload_magin_v2_02.sound",
+    "reload_empty_rotate": "weapons/mcx/sounds/mcx.reload_empty_rotate.sound",
+    "reload_empty_mvmnt": "weapons/mcx/sounds/mcx.reload_empty_mvmnt.sound",
+    "reload_empty_magout_01": "weapons/mcx/sounds/mcx.reload_empty_magout_01.sound",
+    "reload_empty_magin_v2_01": "weapons/mcx/sounds/mcx.reload_empty_magin_v2_01.sound",
+    "reload_empty_magin_v2_02": "weapons/mcx/sounds/mcx.reload_empty_magin_v2_02.sound",
+    "reload_empty_bolt_release": "weapons/mcx/sounds/mcx.reload_empty_bolt_release.sound",
+    "reload_empty_end": "weapons/mcx/sounds/mcx.reload_empty_end.sound"
+  },
+  "reloads": {
+    "reload": {
+      "0.067": "weapons/mcx/sounds/mcx.reload_rotate.sound",
+      "0.3": "weapons/mcx/sounds/mcx.reload_magout_01.sound",
+      "1.1": "weapons/mcx/sounds/mcx.reload_magin_v2_01.sound",
+      "1.11": "weapons/mcx/sounds/mcx.reload_end.sound",
+      "1.333": "weapons/mcx/sounds/mcx.reload_magin_v2_02.sound"
+    },
+    "reload_empty": {
+      "0.067": "weapons/mcx/sounds/mcx.reload_empty_rotate.sound",
+      "0.533": "weapons/mcx/sounds/mcx.reload_empty_mvmnt.sound",
+      "0.7": "weapons/mcx/sounds/mcx.reload_empty_magout_01.sound",
+      "1.367": "weapons/mcx/sounds/mcx.reload_empty_magin_v2_01.sound",
+      "1.467": "weapons/mcx/sounds/mcx.reload_empty_magin_v2_02.sound",
+      "1.9": "weapons/mcx/sounds/mcx.reload_empty_bolt_release.sound",
+      "1.91": "weapons/mcx/sounds/mcx.reload_empty_end.sound"
+    }
+  }
+}

@@ -206,12 +206,16 @@ SMDS = {
 
 
 class Rig:
-    """The AK-105 receiver's skeleton, every bone where the AK-105's idle clip has it relative to tag_sling."""
+    """A CoD receiver's skeleton (by default the AK-105's), every bone where the gun's idle clip has it relative to
+    tag_sling. fit and shift take Tarkov's weapon frame there; bones and drop are as BONES and DROP."""
 
-    def __init__(self, out: Path = RIG) -> None:
+    def __init__(self, out: Path = RIG, receiver: Path = AK105 / "att_vm_p04_ar_akilo105_rec_v0_LOD0_edited.smd",
+                 idle: Path = AK105 / "vm_iw9_akilo105_anims/idle.smd", fit: np.ndarray = FIT,
+                 shift: np.ndarray = SHIFT, bones: dict[str, str] = BONES, drop=DROP) -> None:
         self.out = out
-        self.rec = Smd(AK105 / "att_vm_p04_ar_akilo105_rec_v0_LOD0_edited.smd")
-        idle = Smd(AK105 / "vm_iw9_akilo105_anims/idle.smd")
+        self.fit, self.shift, self.bones, self.drop = fit, shift, bones, drop
+        self.rec = Smd(receiver)
+        idle = Smd(idle)
         idle_world = idle.world(idle.dense_frames()[0])
         idle_named = {idle.name(i): idle_world[i] for i in range(len(idle.nodes))}
         ts_inv = np.linalg.inv(idle_named["tag_sling"])
@@ -230,12 +234,12 @@ class Rig:
                   bone_override: str | None = None) -> list:
         result = []
         for bone, material, pos, nrm, uv in pieces[piece]:
-            if material in DROP:
+            if material in self.drop:
                 continue
-            b = self.index[bone_override or BONES.get(bone, "tag_sling")]
+            b = self.index[bone_override or self.bones.get(bone, "tag_sling")]
             verts = []
             for k in range(3):
-                p, n = FIT @ pos[k] + SHIFT, FIT @ nrm[k]
+                p, n = self.fit @ pos[k] + self.shift, self.fit @ nrm[k]
                 if extra is not None:
                     p, n = (extra @ np.append(p, 1.0))[:3], extra[:3, :3] @ n
                 length = np.linalg.norm(n)

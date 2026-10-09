@@ -262,6 +262,8 @@ public static partial class GameText
 			"Fucile d'assalto russo in 7,62x39 mm: l'AK-12 nella cartuccia dell'AKM, con coperchio della culatta e paramano con slitte, calcio pieghevole e telescopico e raffica da due colpi.",
 		["Russian 5.45x39mm assault rifle: the Russian army's standard Kalashnikov since 1991, with a black polymer handguard and side-folding stock. Optics go on a side mount, as on the real gun."] =
 			"Fucile d'assalto russo in 5,45x39 mm: il Kalashnikov d'ordinanza dell'esercito russo dal 1991, con paramano in polimero nero e calcio ripiegabile lateralmente. Le ottiche vanno su un attacco laterale, come sull'arma vera.",
+		["American 6.8x51mm rifle: SIG's short-stroke piston MCX for the .277 Fury round, with a 13-inch barrel and a folding stock. The US Army's M7."] =
+			"Fucile americano in 6,8x51 mm: l'MCX a pistone a corsa corta di SIG per la cartuccia .277 Fury, con canna da 13 pollici e calcio pieghevole. L'M7 dell'esercito statunitense.",
 		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
 			"Il caricatore in acciaio nervato da 30 colpi dell'AKM. Velocità di ricarica standard.",
 		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =
@@ -560,6 +562,8 @@ public static partial class GameText
 			"Il corto caricatore in polimero da 20 colpi di Magpul. Più leggero e più rapido da inserire. Ricarica in 2,07 s (2,17 s a vuoto).",
 		["Magpul's 30-round polymer magazine, with a window to count the rounds. Standard reload speed."] =
 			"Il caricatore in polimero da 30 colpi di Magpul, con una finestrella per contare i colpi. Velocità di ricarica standard.",
+		["Lancer's L7 AWM 25-round magazine, with a see-through window. Standard reload speed."] =
+			"Il caricatore L7 AWM da 25 colpi di Lancer, con una finestrella trasparente. Velocità di ricarica standard.",
 		["Magpul's long 40-round polymer magazine. Heavier and slower to change. Reloads in 2.63s (3.13s when empty)."] =
 			"Il lungo caricatore in polimero da 40 colpi di Magpul. Più pesante e più lento da cambiare. Ricarica in 2,63 s (3,13 s a vuoto).",
 		["The RPK's heavy wooden stock. 12% less recoil."] =
