@@ -1,0 +1,259 @@
+{
+  "ShowInMenu": false,
+  "MenuPath": null,
+  "MenuIcon": null,
+  "DontBreakAsTemplate": false,
+  "ResourceVersion": 1,
+  "__references": [],
+  "__version": 1,
+  "RootObject": {
+    "__guid": "cc219f2c-a2b8-57b2-bbbd-41e5167d7861",
+    "Flags": 0,
+    "Name": "vm_m16a2",
+    "Tags": "player,viewmodel",
+    "Enabled": true,
+    "NetworkMode": 0,
+    "__variables": [],
+    "__properties": {
+      "FixedUpdateFrequency": 50,
+      "MaxFixedUpdates": 5,
+      "NetworkFrequency": 30,
+      "NetworkInterpolation": true,
+      "PhysicsSubSteps": 1,
+      "ThreadedAnimation": true,
+      "TimeScale": 1,
+      "UseFixedUpdate": true,
+      "Metadata": {},
+      "NavMesh": {
+        "Enabled": false,
+        "IncludeStaticBodies": true,
+        "IncludeKeyframedBodies": true,
+        "EditorAutoUpdate": true,
+        "AgentHeight": 64,
+        "AgentRadius": 16,
+        "AgentStepSize": 18,
+        "AgentMaxSlope": 40,
+        "ExcludedBodies": "",
+        "IncludedBodies": ""
+      }
+    },
+    "Components": [
+      {
+        "__type": "Facepunch.ViewModel",
+        "__guid": "4d639091-a045-5e4f-a084-9151896b2d66",
+        "Arms": {
+          "_type": "component",
+          "component_id": "50564c69-54f1-5248-a717-6f543db90e8f",
+          "go": "924fe197-9240-5452-b43a-37647223df77",
+          "component_type": "SkinnedModelRenderer"
+        },
+        "EjectionPort": {
+          "_type": "gameobject",
+          "go": "ba47f39b-7dee-529f-854e-91161e516b17"
+        },
+        "IronsightsFireScale": 0.1,
+        "InspectPoseScale": 0.8,
+        "InspectRotationScale": 0.6,
+        "IsThrowable": false,
+        "ModelRenderer": {
+          "_type": "component",
+          "component_id": "f228c232-ed56-5d06-982e-a882b149a099",
+          "go": "cc219f2c-a2b8-57b2-bbbd-41e5167d7861",
+          "component_type": "SkinnedModelRenderer"
+        },
+        "Muzzle": {
+          "_type": "gameobject",
+          "go": "d8bb34b8-0452-5517-8056-da7e709f4836"
+        },
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "ReloadSpeed": 1,
+        "ThrowableType": "HEGrenade",
+        "UseMovementInertia": true,
+        "AimTime": 0.25
+      },
+      {
+        "__type": "Sandbox.SkinnedModelRenderer",
+        "__guid": "f228c232-ed56-5d06-982e-a882b149a099",
+        "AnimationGraph": null,
+        "BodyGroups": 5,
+        "BoneMergeTarget": null,
+        "CreateAttachments": false,
+        "CreateBoneObjects": true,
+        "MaterialGroup": null,
+        "MaterialOverride": null,
+        "Model": "weapons/m16a2/v_m16a2.vmdl",
+        "Morphs": {},
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Parameters": {
+          "bools": {},
+          "ints": {},
+          "floats": {},
+          "vectors": {},
+          "rotations": {}
+        },
+        "PlaybackRate": 1,
+        "RenderOptions": {
+          "GameLayer": false,
+          "OverlayLayer": true,
+          "BloomLayer": false,
+          "AfterUILayer": false
+        },
+        "RenderType": "Off",
+        "Sequence": {
+          "Name": null
+        },
+        "Tint": "1,1,1,1",
+        "UseAnimGraph": true
+      },
+      {
+        "__type": "Facepunch.GunsmithWeapon",
+        "__guid": "7f7a2412-09d7-50a5-aba5-5af2e402b08e",
+        "Renderer": {
+          "_type": "component",
+          "component_id": "f228c232-ed56-5d06-982e-a882b149a099",
+          "go": "cc219f2c-a2b8-57b2-bbbd-41e5167d7861",
+          "component_type": "SkinnedModelRenderer"
+        },
+        "Resource": "weapons/m16a2/m16a2.equip"
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "924fe197-9240-5452-b43a-37647223df77",
+        "Flags": 0,
+        "Name": "Object",
+        "Enabled": true,
+        "NetworkMode": 0,
+        "Components": [
+          {
+            "__type": "Sandbox.SkinnedModelRenderer",
+            "__guid": "50564c69-54f1-5248-a717-6f543db90e8f",
+            "AnimationGraph": null,
+            "BodyGroups": 21,
+            "BoneMergeTarget": {
+              "_type": "component",
+              "component_id": "f228c232-ed56-5d06-982e-a882b149a099",
+              "go": "cc219f2c-a2b8-57b2-bbbd-41e5167d7861",
+              "component_type": "SkinnedModelRenderer"
+            },
+            "CreateAttachments": false,
+            "MaterialOverride": null,
+            "Model": "models/first_person/v_first_person_arms_human.vmdl",
+            "Morphs": {},
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "Parameters": {
+              "bools": {},
+              "ints": {},
+              "floats": {},
+              "vectors": {},
+              "rotations": {}
+            },
+            "PlaybackRate": 1,
+            "RenderOptions": {
+              "GameLayer": false,
+              "OverlayLayer": true,
+              "BloomLayer": false,
+              "AfterUILayer": false
+            },
+            "RenderType": "Off",
+            "Sequence": {
+              "Name": null
+            },
+            "Tint": "1,1,1,1",
+            "UseAnimGraph": true
+          }
+        ]
+      },
+      {
+        "__guid": "6487d6bb-c51e-580d-90c7-9d989cc9d13e",
+        "Flags": 4,
+        "Name": "tag_sling",
+        "Position": "-5.334,-0.701,4.271",
+        "Rotation": "0,0,0,1",
+        "Enabled": true,
+        "Children": [
+          {
+            "__guid": "d8bb34b8-0452-5517-8056-da7e709f4836",
+            "Flags": 4,
+            "Name": "muzzle",
+            "Position": "29.26,0.692,0.338",
+            "Rotation": "0,0,0,1",
+            "Enabled": true
+          },
+          {
+            "__guid": "ba47f39b-7dee-529f-854e-91161e516b17",
+            "Flags": 4,
+            "Name": "tag_brass",
+            "Position": "5.85,0.081,0.5",
+            "Rotation": "0,0,-0.707107,0.707107",
+            "Enabled": true
+          },
+          {
+            "__guid": "22469006-9796-5214-96df-6121ef9ca2d8",
+            "Flags": 0,
+            "Name": "Charm Attachment Point",
+            "Position": "5.334,2.451,-1.971",
+            "Enabled": true,
+            "Components": [
+              {
+                "__type": "Facepunch.Gunsmith.GunsmithAttachmentPoint",
+                "__guid": "cbe0be80-770f-592c-b8ad-d00a2833db39",
+                "Category": "Charm"
+              }
+            ]
+          },
+          {
+            "__guid": "6d214847-1225-5cb9-b7e4-6b39e0a50f28",
+            "Flags": 0,
+            "Name": "Sticker Attachment Point",
+            "Position": "6.703,1.2404,-1.171",
+            "Rotation": "0.000000,0.000000,0.707107,0.707107",
+            "Enabled": true,
+            "Components": [
+              {
+                "__type": "Facepunch.Gunsmith.GunsmithAttachmentPoint",
+                "__guid": "f6c7cd5e-6ccb-51f8-b723-38cb19f24e1e",
+                "Category": "Sticker",
+                "StickerSize": "1.2,0.6"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "__guid": "ae89f20d-0cab-588d-8883-b6acde08fd20",
+        "Flags": 0,
+        "Name": "Muzzle Attachment Point",
+        "Position": "22.355,0,4.609",
+        "Enabled": true,
+        "Components": [
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithAttachmentPoint",
+            "__guid": "4fa53be6-5ea6-51a4-8cfc-441027cddf31",
+            "Category": "Muzzle",
+            "MountBone": "tag_sling",
+            "MountOffset": "4.735,0,-2.8057",
+            "FittedBodygroups": {
+              "muzzle_tip": 1
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

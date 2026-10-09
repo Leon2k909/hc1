@@ -1,0 +1,33 @@
+{
+  "Name": "M16A2",
+  "Description": "US 5.56x45mm service rifle of the 1980s and 90s, with a 20-inch barrel, a fixed carry handle with its rear sight and a round ribbed handguard. Semi-automatic and three-round burst.",
+  "Slot": "Primary",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": true,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/guns/m16a2_01.png",
+  "IsPurchasable": true,
+  "Price": 2600,
+  "KillReward": 300,
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/m16a2/weapon_m16a2.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/m16a2/wm_m16a2.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/m16a2/vm_m16a2.prefab"
+  },
+  "WorldModel": "weapons/m16a2/w_m16a2.vmdl",
+  "ArmorReduction": null,
+  "HelmetReduction": null,
+  "WorldModelBodyGroups": 0,
+  "__references": [],
+  "__version": 0,
+  "Category": "AssaultRifle",
+  "GunsmithOffset": "0,0,4",
+  "ReviewNote": "Not checked in a match yet: the iron sights, recoil, reload timing and sounds, the look sway and sprint, the left hand in first and third person (its pinky rests on the handguard's vent hole), the muzzle devices, the charm and the sticker."
+}

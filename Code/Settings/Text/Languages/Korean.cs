@@ -266,6 +266,8 @@ public static partial class GameText
 			"러시아제 5.45x39mm 돌격소총으로, 1991년부터 러시아군의 제식 칼라시니코프입니다. 검은 폴리머 핸드가드와 측면 접이식 개머리판을 갖췄습니다. 조준경은 실총처럼 측면 마운트에 올립니다.",
 		["American 6.8x51mm rifle: SIG's short-stroke piston MCX for the .277 Fury round, with a 13-inch barrel and a folding stock. The US Army's M7."] =
 			"미국제 6.8x51mm 소총으로, SIG가 .277 Fury 탄용으로 만든 쇼트 스트로크 피스톤식 MCX입니다. 13인치 총열과 접이식 개머리판을 갖췄습니다. 미 육군의 M7입니다.",
+		["US 5.56x45mm service rifle of the 1980s and 90s, with a 20-inch barrel, a fixed carry handle with its rear sight and a round ribbed handguard. Semi-automatic and three-round burst."] =
+			"1980~90년대 미국의 5.56x45mm 제식 소총으로, 20인치 총열, 가늠자가 달린 고정식 운반 손잡이와 둥근 리브형 핸드가드를 갖췄습니다. 반자동과 3점사를 지원합니다.",
 		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
 			"AKM의 리브가 있는 강철 30발 탄창입니다. 재장전 속도는 표준입니다.",
 		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =

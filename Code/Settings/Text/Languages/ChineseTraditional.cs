@@ -263,6 +263,8 @@ public static partial class GameText
 			"俄製 5.45x39mm 突擊步槍：1991 年起俄軍的制式卡拉什尼科夫步槍，配備黑色聚合物護木與側折式槍托。瞄具與真槍一樣裝在側面座上。",
 		["American 6.8x51mm rifle: SIG's short-stroke piston MCX for the .277 Fury round, with a 13-inch barrel and a folding stock. The US Army's M7."] =
 			"美製 6.8x51mm 步槍：SIG 為 .277 Fury 彈設計的短行程活塞式 MCX，配備 13 吋槍管與折疊式槍托。即美國陸軍的 M7。",
+		["US 5.56x45mm service rifle of the 1980s and 90s, with a 20-inch barrel, a fixed carry handle with its rear sight and a round ribbed handguard. Semi-automatic and three-round burst."] =
+			"1980 至 90 年代的美國 5.56x45mm 制式步槍，配備 20 英吋槍管、附照門的固定提把與圓形帶肋護木。可半自動射擊與三發點放。",
 		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
 			"AKM 的帶加強筋鋼製 30 發彈匣。裝填速度標準。",
 		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =

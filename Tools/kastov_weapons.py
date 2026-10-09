@@ -1597,9 +1597,61 @@ SPEAR = Weapon(
     left_grip=GripFit(shift=(0.0, -0.05, 0.15), fingers=0.03, thumb=0.2),
 )
 
+def m16a2_materials() -> dict[str, str]:
+    # Built by m16a2_assets.py.
+    assets = json.loads((ASSETS / "Weapons" / "M16A2" / "m16a2_assets.json").read_text(encoding="utf-8"))
+    return assets["materials"]
+
+
+# The Colt M16A2 (5.56x45mm): Escape from Tarkov's M16A2 from the ARC9 EFT Assault Rifles pack (Workshop 2962829818),
+# the US service rifle of 1982 as issued: the A2 upper with its fixed carry handle and adjustable rear sight, the 20-inch
+# (508 mm) barrel with the front sight base on its gas block and the A2 birdcage flash hider, the round ribbed A2
+# handguard, the A2 fixed stock and pistol grip, the burst trigger group and Colt's 30-round aluminium magazine. It's on
+# the M16A4's CoD rig and clips (MWII's M16): the same Colt rifle on the same lower. Tools/m16a2_rig.py writes the pieces
+# as SMDs (decompiled/m16a2/rig).
+_M16A2_RIG = "rig"
+M16A2 = Weapon(
+    name="m16a2",
+    folder=ASSETS / "Weapons" / "M16A2",
+    asset="weapons/m16a2",
+    model="m16a2",
+    decompiled=DECOMPILED / "m16a2",
+    cod_anims="../mike16/vm_iw9_mike16_anims",
+    # The carry handle and the front sight base are part of the gun, as on the real one. The magazine is Colt's 30 only
+    # (the fitted one on j_mag1 and the reload's fresh one on j_mag2): the A2 took the USGI 20 and 30.
+    vm_meshes=[f"{_M16A2_RIG}/m16a2_receiver.smd", f"{_M16A2_RIG}/m16a2_mag.smd"],
+    part_meshes=[],
+    optional_meshes={
+        "muzzle_tip": (f"{_M16A2_RIG}/m16a2_flash_hider.smd", None),  # the A2 birdcage, off under a muzzle device
+    },
+    # 0.2 inside the front of the flash hider, on the bore.
+    extra_bones={"muzzle": ("tag_sling", np.array([29.26, 0.692, 0.338]))},
+    materials=m16a2_materials,
+    hip=view_offset(),
+    # The M16A4's clips, except aim. With the M16A4's aim the M16A2's rear aperture's centre and the front post's tip
+    # sit 0.44 under the camera (its bore sits 0.34 lower on the rig, and the A2's carry handle is lower than the A4's
+    # rail and its handle), so the gun comes up onto the line through them and turns onto it, which puts both on the aim
+    # point (ads_in's last frame).
+    aim=view_offset((-0.0045, 0.5001, 0.4617), (0.0715, -0.029, 0.0)),
+    sprint=view_offset(),
+    m4_sprint=True,
+    ads_pose=("ads_in", slice(-1, None)),
+    report_bones=["tag_flash", "tag_brass", "tag_mag_attach", "tag_stock_attach", "tag_pistolgrip_attach"],
+    # The rig's tag_brass is the M16A4's, 0.43 over the M16A2's port and inside its upper: the M16A2's bore sits 0.34
+    # lower on the rig. The port shows the bolt from x 4.3 to 7.4 and z 0.25 to 0.75, its wall at y ~0.
+    moved_bones={"tag_brass": ("tag_sling", np.array([5.85, 0.081, 0.5]))},
+    # The M16A4's grip, which its clips' left hand holds a thick handguard with.
+    grip_pose="a_delta_grip_barmidhvy_additive_for_offset",
+    # No GripFit: the pinky's knuckle lies over one of the handguard's vent holes under it, its bone 0.01 inside the
+    # hole's rear edge (the M16A4's pinky 0.03-0.04 off). Every shift tried (0.08 each way, the fingers 8-20% open) left
+    # it as deep or deeper.
+    # The M16A4's fire clip, held still but for the bolt, trigger and trigger finger (see M16).
+    steady_fire=15,
+)
+
 WEAPONS ={weapon.name: weapon for weapon in (KASTOV_762, KASTOV_74U, VITYAZ, RPK, BIZON, AK105, VEPR12, M16, P90,
                                               MP7, AUG, UZI, FAL, FAMAS, M18, MCX, L85A2, HK416, AK12, AK15,
-                                              AK74M, SPEAR)}
+                                              AK74M, SPEAR, M16A2)}
 
 
 def add_argument(parser: argparse.ArgumentParser) -> None:

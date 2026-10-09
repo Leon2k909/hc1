@@ -263,6 +263,8 @@ public static partial class GameText
 			"Российский автомат калибра 5,45x39 мм: штатный автомат Калашникова российской армии с 1991 года, с чёрным полимерным цевьём и складывающимся вбок прикладом. Прицелы ставятся на боковой кронштейн, как на настоящем оружии.",
 		["American 6.8x51mm rifle: SIG's short-stroke piston MCX for the .277 Fury round, with a 13-inch barrel and a folding stock. The US Army's M7."] =
 			"Американская винтовка калибра 6,8x51 мм: MCX от SIG с короткоходным газовым поршнем под патрон .277 Fury, с 13-дюймовым стволом и складным прикладом. M7 армии США.",
+		["US 5.56x45mm service rifle of the 1980s and 90s, with a 20-inch barrel, a fixed carry handle with its rear sight and a round ribbed handguard. Semi-automatic and three-round burst."] =
+			"Американская штатная винтовка под патрон 5,56x45 мм 1980-х и 90-х годов, с 20-дюймовым стволом, несъёмной ручкой для переноски с диоптрическим целиком и круглым ребристым цевьём. Одиночный огонь и очереди по три выстрела.",
 		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
 			"Стальной магазин AKM с рёбрами на 30 патронов. Обычная скорость перезарядки.",
 		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =

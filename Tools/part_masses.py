@@ -63,6 +63,7 @@ GUN_KG = {
     "AK15/weapon_ak15": 4.24,         # AK-15 3.5 kg without a magazine (Rosoboronexport's catalogue) + a loaded 30
     "AK74M/weapon_ak74m": 3.95,       # AK-74M 3.4 kg without a magazine (Rosoboronexport's catalogue) + a loaded 30
     "SPEAR/weapon_spear": 4.35,       # MCX-SPEAR 13-inch 3.8 kg (8.38 lb) without a magazine + a loaded Lancer 20
+    "M16A2/weapon_m16a2": 3.99,       # M16A2 3.53 kg (7.78 lb) + a loaded 30 (8.79 lb in all)
 }
 
 
@@ -87,7 +88,7 @@ GUN_ROUND = {
     "vepr12": "12ga", "aug": "5.56", "famas": "5.56", "m16": "5.56", "m4a1": "5.56", "fal": "7.62x51",
     "scarh": "7.62x51", "mp5": "9x19", "m18": "9x19 M1152", "mcx": "5.56",
     "hk416": "5.56", "ak12": "5.45", "ak15": "7.62x39", "ak74m": "5.45",
-    "spear": "6.8x51",
+    "spear": "6.8x51", "m16a2": "5.56",
 }
 
 # Empty magazines, kg, and how many rounds they hold. The AK-74's polymer 30 is 0.23 kg; the AKM's steel 30 0.33; the

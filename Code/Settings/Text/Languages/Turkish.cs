@@ -744,6 +744,8 @@ public static partial class GameText
 			"Rus yapımı 5,45x39 mm saldırı tüfeği: 1991'den beri Rus ordusunun standart Kalaşnikof'u; siyah polimer el kundağı ve yana katlanır dipçik. Nişangahlar, gerçek silahta olduğu gibi yan montaja takılır.",
 		["American 6.8x51mm rifle: SIG's short-stroke piston MCX for the .277 Fury round, with a 13-inch barrel and a folding stock. The US Army's M7."] =
 			"Amerikan yapımı 6,8x51 mm tüfek: SIG'in .277 Fury fişeği için kısa stroklu pistonlu MCX'i; 13 inç namlu ve katlanır dipçik. ABD Ordusu'nun M7'si.",
+		["US 5.56x45mm service rifle of the 1980s and 90s, with a 20-inch barrel, a fixed carry handle with its rear sight and a round ribbed handguard. Semi-automatic and three-round burst."] =
+			"ABD'nin 1980'ler ve 90'ların 5,56x45 mm standart piyade tüfeği: 20 inç namlu, gez nişangâhını taşıyan sabit taşıma kulpu ve yuvarlak, nervürlü el kundağı. Yarı otomatik ve üçlü seri atış.",
 		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
 			"AKM'nin 30 mermilik nervürlü çelik şarjörü. Standart yeniden doldurma hızı.",
 		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =

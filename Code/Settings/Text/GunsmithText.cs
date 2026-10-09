@@ -164,6 +164,11 @@ public static partial class GameText
 			"Amerikanisches Gewehr im Kaliber 6,8x51 mm: SIGs MCX mit Kurzhub-Gaskolben für die Patrone .277 Fury, mit 13-Zoll-Lauf und klappbarer Schulterstütze. Das M7 der US Army.",
 			"Fusil estadounidense de 6,8x51 mm: el MCX de pistón de recorrido corto de SIG para el cartucho .277 Fury, con cañón de 13 pulgadas y culata plegable. El M7 del Ejército de EE. UU.",
 			"Fuzil americano 6,8x51 mm: o MCX de pistão de curso curto da SIG para o cartucho .277 Fury, com cano de 13 polegadas e coronha rebatível. O M7 do Exército dos EUA." ),
+		["US 5.56x45mm service rifle of the 1980s and 90s, with a 20-inch barrel, a fixed carry handle with its rear sight and a round ribbed handguard. Semi-automatic and three-round burst."] = (
+			"Fusil de service américain en 5,56x45 mm des années 1980 et 90, avec un canon de 20 pouces, une poignée de transport fixe portant la hausse et un garde-main rond nervuré. Semi-automatique et rafale de trois coups.",
+			"US-Dienstgewehr im Kaliber 5,56x45 mm der 1980er- und 90er-Jahre, mit 20-Zoll-Lauf, festem Tragegriff mit dem Diopter und rundem, geripptem Handschutz. Halbautomatisch und Drei-Schuss-Feuerstoß.",
+			"Fusil reglamentario estadounidense de 5,56x45 mm de los años 80 y 90, con cañón de 20 pulgadas, asa de transporte fija con el alza y guardamanos redondo acanalado. Semiautomático y ráfaga de tres disparos.",
+			"Fuzil de serviço americano 5,56x45 mm dos anos 1980 e 90, com cano de 20 polegadas, alça de transporte fixa com a mira traseira e guarda-mão redondo com nervuras. Semiautomático e rajada de três tiros." ),
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] = (
 			"Pistolet réglementaire américain en 9x19 mm : le P320 compact de l'US Army, avec un canon de 3,9 pouces et un chargeur de 17 cartouches.",
 			"Amerikanische Dienstpistole im Kaliber 9x19 mm: die kompakte P320 der US Army, mit 3,9-Zoll-Lauf und 17-Schuss-Magazin.",

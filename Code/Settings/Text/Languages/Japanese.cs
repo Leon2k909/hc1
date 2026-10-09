@@ -266,6 +266,8 @@ public static partial class GameText
 			"ロシア製の5.45x39mmアサルトライフル。1991年からロシア軍の制式カラシニコフで、黒いポリマー製ハンドガードと横折れ式ストックを備える。光学照準器は実銃と同じくサイドマウントに載せる。",
 		["American 6.8x51mm rifle: SIG's short-stroke piston MCX for the .277 Fury round, with a 13-inch barrel and a folding stock. The US Army's M7."] =
 			"アメリカ製の6.8x51mmライフル。SIGが.277 Fury弾用に作ったショートストロークピストン式のMCXで、13インチ銃身と折りたたみ式ストックを備える。アメリカ陸軍のM7。",
+		["US 5.56x45mm service rifle of the 1980s and 90s, with a 20-inch barrel, a fixed carry handle with its rear sight and a round ribbed handguard. Semi-automatic and three-round burst."] =
+			"1980〜90年代の米国の5.56x45mm制式ライフル。20インチ銃身、リアサイト付きの固定キャリングハンドル、丸いリブ付きハンドガードを備え、セミオートと3点バーストで撃てる。",
 		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
 			"AKMのリブ付きスチール製30発マガジン。リロード速度は標準。",
 		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =

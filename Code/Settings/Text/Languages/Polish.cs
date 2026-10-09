@@ -264,6 +264,8 @@ public static partial class GameText
 			"Rosyjski karabinek automatyczny kalibru 5,45x39 mm: standardowy kałasznikow armii rosyjskiej od 1991 roku, z czarnym polimerowym łożem i kolbą składaną na bok. Celowniki optyczne montuje się na bocznym wsporniku, jak w prawdziwej broni.",
 		["American 6.8x51mm rifle: SIG's short-stroke piston MCX for the .277 Fury round, with a 13-inch barrel and a folding stock. The US Army's M7."] =
 			"Amerykański karabin kalibru 6,8x51 mm: MCX firmy SIG z tłokiem o krótkim skoku, na nabój .277 Fury, z 13-calową lufą i składaną kolbą. M7 armii USA.",
+		["US 5.56x45mm service rifle of the 1980s and 90s, with a 20-inch barrel, a fixed carry handle with its rear sight and a round ribbed handguard. Semi-automatic and three-round burst."] =
+			"Amerykański karabin służbowy kalibru 5,56x45 mm z lat 80. i 90., z 20-calową lufą, stałym chwytem transportowym z celownikiem przeziernikowym i okrągłym, żebrowanym łożem. Ogień pojedynczy i seria trzystrzałowa.",
 		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
 			"Żebrowany stalowy magazynek AKM na 30 naboi. Standardowy czas przeładowania.",
 		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =

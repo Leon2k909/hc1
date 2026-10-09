@@ -1043,6 +1043,35 @@ def gameplay_spear() -> Gameplay:
     })
 
 
+def gameplay_m16a2() -> Gameplay:
+    """The real Colt M16A2's figures on the M4's prefab: the M16A4's M855 round from the same 20-inch barrel, the M4's
+    damage, falloff and recoil pattern, semi-automatic and in three-round bursts. The rifle the US Marine Corps adopted
+    in 1983 and the Army in 1986, before the flat-top M16A4."""
+    assets = load(ASSETS / "Weapons" / "M16A2" / "m16a2_assets.json")
+    sounds, reloads = assets["sounds"], assets["reloads"]
+    return Gameplay({
+        # 3.53 kg empty and 3.99 kg with a loaded 30-round magazine (TM 9-1005-319-10), what the M16A4 weighs: the
+        # rifles' penalty, and too little over the AKM's 3.75 kg for a WeightSlowdown.
+        "Equipment": {"SpeedPenalty": 40},
+        "WeaponAmmo": {"Ammo": 30, "MaxAmmo": 30},
+        # 800 rpm cyclic, the middle of the M16A2's 700-900, like the M16A4's. Its selector is SAFE, SEMI and BURST, no
+        # automatic. The real burst cam doesn't reset when the trigger is let go, which isn't modelled (see M16A4).
+        # M855 leaves the 20-inch barrel at 945 m/s, G7 0.151 like the M16A4's. The sights sit 67.1 mm over the bore (the
+        # line through the carry handle's rear aperture and the front post's tip), zeroed at 300 m: the A2's battle zero,
+        # the rear sight's 300 m setting (FM 3-22.9).
+        "Shootable": {"BaseDamage": 20, "FireRate": 800, "ShootSound": sounds["fire"],
+                      "SuppressedShootSound": sounds["fire_suppressed"],
+                      "SupportedFireModes": ["Semi", "Burst"], "CurrentFireMode": "Semi", "BurstAmount": 3,
+                      "BurstEndDelay": 0, **ballistics(945, "G7", 0.151, 67.1, 300, M855_BULLET)},
+        # The M16A4's clips: the gun is level again at 2.3s, and 2.4s after the empty reload's bolt release.
+        "Reloadable": {"ReloadTime": 2.3, "EmptyReloadTime": 2.4, "TimedReloadSounds": reloads["reload"],
+                       "EmptyReloadSounds": reloads["reload_empty"]},
+        # The M16A4's: the same round from the same barrel kicks the loaded 3.99 kg rifle back at ~1.65 m/s, against the
+        # loaded M4's ~1.86 m/s and its (2,5).
+        "ShootRecoil": {"Scale": "1.78,4.44"},
+    })
+
+
 @dataclass(frozen=True)
 class Prefabs:
     """The HC1 side of a gun: its equipment resource, prefabs and gunsmith mounts."""
@@ -2187,6 +2216,45 @@ PREFABS = {
         review_note="Not checked in a match yet: the iron sights and the optics' aim (derived: tune with "
                     "dev_optic_correction), recoil, reload timing and sounds, the look sway and sprint, the left hand "
                     "in first and third person, the parts on its slots, the charm and the sticker.",
+    ),
+    "m16a2": Prefabs(
+        title="M16A2",
+        description="US 5.56x45mm service rifle of the 1980s and 90s, with a 20-inch barrel, a fixed carry handle with "
+                    "its rear sight and a round ribbed handguard. Semi-automatic and three-round burst.",
+        price=2600,
+        deploy_sound="weapons/m16/sounds/m16.raise_rattle.sound",
+        # m16a2_rig.py draws the side-on m16a2_01.png from the model, as for the AK-12.
+        icon_source=None,
+        # The flash hider (by the bit rule: its group's "on" and the base mesh).
+        default_mesh_groups=5,
+        bones={
+            "tag_sling": (None, "-5.334,-0.701,4.271", "0,0,0,1"),
+            "muzzle": ("tag_sling", "29.26,0.692,0.338", "0,0,0,1"),
+            "tag_brass": ("tag_sling", "5.85,0.081,0.5", "0,0,-0.707107,0.707107"),
+        },
+        world_muzzle="23.926,0,4.609",
+        world_eject="0.516,-0.62,4.771",
+        # By the rule, where the first-person hand holds the handguard (its wrist at x 5.7, as the M16A4's): the round
+        # handguard's right side is at -1.27 and its bottom at 3.40.
+        world_left_hand="5.7,2.23,2.21",
+        slots=[
+            # The A2 birdcage's rear face. There's no Optic slot: the carry handle is part of the upper, as on the real
+            # A2, which took a scope only on a carry-handle mount. No Underbarrel or Laser slot: the round handguard has
+            # no rails.
+            ("Muzzle", (22.355, 0, 4.609), (17.62, 0, 7.4147), {"muzzle_tip": 1}),
+        ],
+        # The M16A4's: the lower's left side above the magazine well, which the M16A2's lower shares.
+        charm=(0.0, 1.75, 2.3),
+        # The magazine well's flat left side, at y 0.539.
+        sticker=((1.369, 0.5394, 3.1), (0.0, 1.0, 0.0), (1.2, 0.6)),
+        # No optic fits it; the M16A4's, for the field's sake.
+        optic_aim_correction="1.613,0,0.079",
+        gameplay=gameplay_m16a2,
+        guid_salt="m16a2/",
+        reload_sounds=lambda: load(ASSETS / "Weapons" / "M16A2" / "m16a2_assets.json")["reloads"],
+        review_note="Not checked in a match yet: the iron sights, recoil, reload timing and sounds, the look sway and "
+                    "sprint, the left hand in first and third person (its pinky rests on the handguard's vent hole), "
+                    "the muzzle devices, the charm and the sticker.",
     ),
 }
 

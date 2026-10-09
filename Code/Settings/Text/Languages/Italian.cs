@@ -264,6 +264,8 @@ public static partial class GameText
 			"Fucile d'assalto russo in 5,45x39 mm: il Kalashnikov d'ordinanza dell'esercito russo dal 1991, con paramano in polimero nero e calcio ripiegabile lateralmente. Le ottiche vanno su un attacco laterale, come sull'arma vera.",
 		["American 6.8x51mm rifle: SIG's short-stroke piston MCX for the .277 Fury round, with a 13-inch barrel and a folding stock. The US Army's M7."] =
 			"Fucile americano in 6,8x51 mm: l'MCX a pistone a corsa corta di SIG per la cartuccia .277 Fury, con canna da 13 pollici e calcio pieghevole. L'M7 dell'esercito statunitense.",
+		["US 5.56x45mm service rifle of the 1980s and 90s, with a 20-inch barrel, a fixed carry handle with its rear sight and a round ribbed handguard. Semi-automatic and three-round burst."] =
+			"Fucile d'ordinanza statunitense in 5,56x45 mm degli anni '80 e '90, con canna da 20 pollici, maniglia di trasporto fissa con la diottra e guardamano tondo nervato. Semiautomatico e raffica da tre colpi.",
 		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
 			"Il caricatore in acciaio nervato da 30 colpi dell'AKM. Velocità di ricarica standard.",
 		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =
