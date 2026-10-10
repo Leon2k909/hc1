@@ -64,6 +64,7 @@ GUN_KG = {
     "AK74M/weapon_ak74m": 3.95,       # AK-74M 3.4 kg without a magazine (Rosoboronexport's catalogue) + a loaded 30
     "SPEAR/weapon_spear": 4.35,       # MCX-SPEAR 13-inch 3.8 kg (8.38 lb) without a magazine + a loaded Lancer 20
     "M16A2/weapon_m16a2": 3.99,       # M16A2 3.53 kg (7.78 lb) + a loaded 30 (8.79 lb in all)
+    "RPK16/weapon_rpk16": 6.4,        # RPK-16 4.5 kg without a magazine (Kalashnikov) + the loaded 95-round drum
 }
 
 
@@ -88,7 +89,7 @@ GUN_ROUND = {
     "vepr12": "12ga", "aug": "5.56", "famas": "5.56", "m16": "5.56", "m4a1": "5.56", "fal": "7.62x51",
     "scarh": "7.62x51", "mp5": "9x19", "m18": "9x19 M1152", "mcx": "5.56",
     "hk416": "5.56", "ak12": "5.45", "ak15": "7.62x39", "ak74m": "5.45",
-    "spear": "6.8x51", "m16a2": "5.56",
+    "spear": "6.8x51", "m16a2": "5.56", "rpk16": "5.45",
 }
 
 # Empty magazines, kg, and how many rounds they hold. The AK-74's polymer 30 is 0.23 kg; the AKM's steel 30 0.33; the
@@ -120,6 +121,9 @@ OWN_MAGAZINES = {
     "ak74m": {"factory": (0.23, 30), "ak12_mag": (0.215, 30)},
     # Lancer's L7 AWM 20 and 25, polymer with a steel feed lip insert.
     "spear": {"factory": (0.17, 20), "mag25": (0.19, 25)},
+    # The RPK-16's polymer 95-round drum (no weight is published for it: taken as the RPK's 75-round drum's 0.9), the
+    # 6L23 polymer 30 and the AK-12's 6L31 polymer 30 with its window.
+    "rpk16": {"factory": (0.9, 95), "ak74m_mag": (0.23, 30), "ak12_mag": (0.215, 30)},
 }
 
 # AK-platform stocks and pistol grips, each on its own, kg: the AKS-74U's folding stock 0.35, the AK-74M's polymer
@@ -155,6 +159,7 @@ OWN_CHOICES = {
     "ak15": {"factory": 0.09},  # the AK-12's grip
     # The 6P34 Sb.15 polymer side-folder (the AK-105's), the 6P1 Sb.8 polymer grip (the AK-74's) and the AK-12's grip.
     "ak74m": {"stock/factory": 0.45, "pistol_grip/factory": 0.08, "ak12_pgrip": 0.09},
+    "rpk16": {"factory": 0.09},  # the AK-12's grip
 }
 
 # The MWII attachments shared across guns, by file stem, wherever they're fitted.

@@ -169,6 +169,11 @@ public static partial class GameText
 			"US-Dienstgewehr im Kaliber 5,56x45 mm der 1980er- und 90er-Jahre, mit 20-Zoll-Lauf, festem Tragegriff mit dem Diopter und rundem, geripptem Handschutz. Halbautomatisch und Drei-Schuss-Feuerstoß.",
 			"Fusil reglamentario estadounidense de 5,56x45 mm de los años 80 y 90, con cañón de 20 pulgadas, asa de transporte fija con el alza y guardamanos redondo acanalado. Semiautomático y ráfaga de tres disparos.",
 			"Fuzil de serviço americano 5,56x45 mm dos anos 1980 e 90, com cano de 20 polegadas, alça de transporte fixa com a mira traseira e guarda-mão redondo com nervuras. Semiautomático e rajada de três tiros." ),
+		["Russian 5.45x39mm light machine gun on the AK-12's receiver, with a long heavy barrel, a railed dust cover and handguard and a 95-round drum. Automatic and semi."] = (
+			"Fusil-mitrailleur russe en 5,45x39 mm sur le boîtier de l'AK-12, avec un long canon lourd, un couvre-culasse et un garde-main à rails et un chargeur tambour de 95 coups. Automatique et semi-automatique.",
+			"Russisches leichtes Maschinengewehr im Kaliber 5,45x39 mm auf dem Gehäuse des AK-12, mit langem, schwerem Lauf, Verschlussdeckel und Handschutz mit Schienen und 95-Schuss-Trommelmagazin. Vollautomatisch und halbautomatisch.",
+			"Ametralladora ligera rusa de 5,45x39 mm sobre el cajón de mecanismos del AK-12, con cañón largo y pesado, tapa del cajón y guardamanos con rieles y cargador de tambor de 95 cartuchos. Automática y semiautomática.",
+			"Metralhadora leve russa 5,45x39 mm sobre a caixa da culatra do AK-12, com cano longo e pesado, tampa da caixa e guarda-mão com trilhos e carregador tambor de 95 tiros. Automática e semiautomática." ),
 		["American 9x19mm service pistol: the US Army's compact P320, with a 3.9-inch barrel and a 17-round magazine."] = (
 			"Pistolet réglementaire américain en 9x19 mm : le P320 compact de l'US Army, avec un canon de 3,9 pouces et un chargeur de 17 cartouches.",
 			"Amerikanische Dienstpistole im Kaliber 9x19 mm: die kompakte P320 der US Army, mit 3,9-Zoll-Lauf und 17-Schuss-Magazin.",

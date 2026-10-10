@@ -268,6 +268,8 @@ public static partial class GameText
 			"미국제 6.8x51mm 소총으로, SIG가 .277 Fury 탄용으로 만든 쇼트 스트로크 피스톤식 MCX입니다. 13인치 총열과 접이식 개머리판을 갖췄습니다. 미 육군의 M7입니다.",
 		["US 5.56x45mm service rifle of the 1980s and 90s, with a 20-inch barrel, a fixed carry handle with its rear sight and a round ribbed handguard. Semi-automatic and three-round burst."] =
 			"1980~90년대 미국의 5.56x45mm 제식 소총으로, 20인치 총열, 가늠자가 달린 고정식 운반 손잡이와 둥근 리브형 핸드가드를 갖췄습니다. 반자동과 3점사를 지원합니다.",
+		["Russian 5.45x39mm light machine gun on the AK-12's receiver, with a long heavy barrel, a railed dust cover and handguard and a 95-round drum. Automatic and semi."] =
+			"AK-12의 리시버를 바탕으로 한 러시아의 5.45x39mm 경기관총으로, 길고 무거운 총열, 레일이 달린 덮개와 핸드가드, 95발 드럼 탄창을 갖췄습니다. 자동과 반자동을 지원합니다.",
 		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
 			"AKM의 리브가 있는 강철 30발 탄창입니다. 재장전 속도는 표준입니다.",
 		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =

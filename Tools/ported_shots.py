@@ -5,7 +5,8 @@ shot_voicing.py's; this holds each gun's Voicing, where its rip comes from and w
 
     python Tools/ported_shots.py <gun>|all [--preview <wav>]
 
-<gun> is vityaz, bizon, vepr12, p90, mp7, aug, uzi, fal, m18, famas, mcx, l85a2, hk416, ak12, ak15, ak74m, spear or m16a2.
+<gun> is vityaz, bizon, vepr12, p90, mp7, aug, uzi, fal, m18, famas, mcx, l85a2, hk416, ak12, ak15, ak74m, spear,
+m16a2 or rpk16.
 Each gun's assets script builds its shot with build() here. Run on its own, this does the same: it rewrites the gun's
 <name>_NN.wav takes and its fire event's list and pitch, leaving the gun's other sounds alone. --preview writes a demo
 instead: the ripped shot, the voiced one, then a burst at the gun's rate each way. The ripped shots and events as they
@@ -26,29 +27,31 @@ What every rip here gets wrong, measured on the levelled files (python's describ
   (Tarkov's AKM) are built the same way, but their tail is already the voiced rifles', and the AK-74M's is quieter
   than theirs (36 dB under at 0.4 s). The MCX-SPEAR's run on louder than the AK-12's: 15 dB under the blast at 0.2 s
   and 21 at 0.4 s. The M16A2's (Tarkov's M4A1) are single shots with the echo in them, louder still: 13 dB under at
-  0.2 s and 11 at 0.4.
+  0.2 s and 11 at 0.4. The RPK-16's are built like the AK-12's, with a tail between theirs and the MCX-SPEAR's: 21-22
+  dB under the blast at 0.2 s and 27-28 at 0.4 s.
 - Some are dark: the Uzi's first 150 ms sit almost all under 300 Hz (its first 30 ms centre at 435 Hz, the voiced
   rifles' at 1.4-1.6 kHz), the AUG's and FAMAS's at 1.0-1.3 kHz. A small-arms blast at the shooter is a sharp crack.
 
 Each gun's voicing, by shot_voicing's steps:
 1. Pitch, by the charge and the barrel. A smaller charge, burnt out in a short barrel, makes a smaller, shorter blast
    (so higher); a heavier one a longer, deeper one: the 9 mm guns and the P90 2% up, the MP7A1's 4.6x30 3%, the FAMAS's
-   5.56 from a 488 mm barrel 1%, the AUG, the L85A2 and the HK416 as ripped (5.56 shots), the AK-12 and AK-74M as
-   ripped (5.45), the AK-15 (7.62x39 from the same barrel) and the MCX-SPEAR (6.8x51), the M16A2 2% up as the M16A4
+   5.56 from a 488 mm barrel 1%, the AUG, the L85A2 and the HK416 as ripped (5.56 shots), the AK-12, AK-74M and
+   RPK-16 as ripped (5.45), the AK-15 (7.62x39 from the same barrel) and the MCX-SPEAR (6.8x51), the M16A2 2% up as
+   the M16A4
    (a carbine's recording for a 20-inch barrel), the M18 as ripped (a 9 mm pistol burns much of its
    powder past the muzzle), the Vepr-12's 12-gauge 1% down and the FAL's 7.62x51 2% down.
 2. Low end: a 40 Hz high-pass (the Uzi's at 70), and after the blast's first 20-50 ms (the Uzi's 8) the lows ease
    down 3-10 dB. The FAL's, Vepr-12's and AUG's designed tails are eased too, from 100, 150 and 80 ms, as the
    M16A4's is, the Uzi's a little from 120 ms, the HK416's baked-in one 20 dB from 80 ms, the AK-12's 14 dB, the
-   MCX-SPEAR's 16 dB, the M16A2's 22 dB, and the AK-15's and AK-74M's 6 dB from 100 ms.
+   MCX-SPEAR's 16 dB, the M16A2's 22 dB, the RPK-16's 14 dB, and the AK-15's and AK-74M's 6 dB from 100 ms.
 3. The blast's 1.5-5 kHz up 2-4 dB for its first 20-25 ms: less on the rips that are already bright (Vityaz, Bizon,
-   P90), more on the dark ones (AUG, FAMAS, FAL, MP7A1, AK-74M, MCX-SPEAR). The Uzi's 1-6 kHz 7 dB, for 30 ms.
+   P90), more on the dark ones (AUG, FAMAS, FAL, MP7A1, AK-74M, MCX-SPEAR, RPK-16). The Uzi's 1-6 kHz 7 dB, for 30 ms.
 4. The ground, with the muzzle 1.5 m up and ahead of the ear by the gun's length (the cheek a little ahead of the butt;
-   a pistol at arm's length): 6.6 ms for the FAL (0.87 m) to 7.7 ms for the P90 (0.4 m, a bullpup).
+   a pistol at arm's length): 6.6 ms for the FAL and the RPK-16 (0.87 m) to 7.7 ms for the P90 (0.4 m, a bullpup).
 5. Echoes from 35 ms to 1.4 s, the same surroundings as the voiced rifles'. The echoes' level against the direct blast
    follows how far the muzzle is from the ear: -33 dB 0.4 s after the loudest 100 ms at a rifle's 0.6-0.7 m, -35 for
-   the SMGs' ~0.47 m, -36 for the P90's 0.4, -31.5 for the FAL's 0.87, -34 for the MCX's 0.54 and the HK416's 0.56,
-   and -33 for the AK-12's, AK-15's and AK-74M's 0.73, the MCX-SPEAR's 0.65 and the M16A2's 0.75.
+   the SMGs' ~0.47 m, -36 for the P90's 0.4, -31.5 for the FAL's and the RPK-16's 0.87, -34 for the MCX's 0.54 and
+   the HK416's 0.56, and -33 for the AK-12's, AK-15's and AK-74M's 0.73, the MCX-SPEAR's 0.65 and the M16A2's 0.75.
 Loudness matches each rip as its assets script levelled it (K-weighted, loudest 100 ms). The event's pitch spread is
 0.98-1.02 where the rip has several recordings, and 0.97-1.03 where it has one (the takes' echoes vary, not the blast).
 """
@@ -167,6 +170,7 @@ _ak12 = _start_and_tail("ak12_assets")
 _ak15 = _start_and_tail("ak15_assets")
 _ak74m = _start_and_tail("ak74m_assets")
 _spear = _start_and_tail("spear_assets")
+_rpk16 = _start_and_tail("rpk16_assets")
 
 
 def _m16a2():
@@ -378,6 +382,19 @@ GUNS = {
         ground_delay=0.0068, tail_at_400ms=-33.0),
         "Weapons/M16A2/sounds", "Weapons/M16A2/sounds/m16a2.fire.sound", _m16a2,
         "1.006 m long: the muzzle ~0.75 m ahead, as the M16A4's"),
+    # 7N6 from a 550 mm barrel, 700 rpm: Tarkov's RPK-16, four close starts each under its tail, mixed at 0 dB
+    # (rpk16_assets.py), where the AK-12's are. As levelled: dark and heavy, 60 Hz the loudest band in the first 150 ms,
+    # 120 Hz 1-5 dB under it and 800 Hz-5 kHz 6-10 dB under; the tail 21-22 dB under the blast at 0.2 s and 27-28 at
+    # 0.4 s. So it keeps its pitch (the same 7N6 as the AK-12, from a longer barrel), the lows are eased as the AK-12's,
+    # its tail 14 dB from 80 ms, and the presence lifted 4 dB, as the dark AK-74M's. The muzzle is as far ahead as the
+    # FAL's, so its echoes sit where the FAL's do.
+    "rpk16": Gun(Voicing(
+        name="rpk16_shot", pitch=1.0, event_pitch="0.98 1.02", takes=_takes(4, 2091), rip_pitch=(0.98, 1.02),
+        rpm=700, preview_bursts=(10,), low_split=130.0, low_cut_db=-8.0, low_hold=0.03, low_ease=0.035,
+        rip_tail_db=-14.0, rip_tail_hold=0.08, rip_tail_ease=0.08, presence_db=4.0, presence_hold=0.025,
+        ground_delay=0.0066, tail_at_400ms=-31.5),
+        "Weapons/RPK16/sounds", "Weapons/RPK16/sounds/rpk16.fire.sound", _rpk16,
+        "550 mm barrel, stock extended, ~1.08 m long: the muzzle ~0.87 m ahead, as the FAL's"),
 }
 
 

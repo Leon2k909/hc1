@@ -1,0 +1,33 @@
+{
+  "Name": "RPK-16",
+  "Description": "Russian 5.45x39mm light machine gun on the AK-12's receiver, with a long heavy barrel, a railed dust cover and handguard and a 95-round drum. Automatic and semi.",
+  "Slot": "Primary",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": true,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/guns/rpk16_01.png",
+  "IsPurchasable": true,
+  "Price": 3000,
+  "KillReward": 300,
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/rpk16/weapon_rpk16.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/rpk16/wm_rpk16.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/rpk16/vm_rpk16.prefab"
+  },
+  "WorldModel": "weapons/rpk16/w_rpk16.vmdl",
+  "ArmorReduction": null,
+  "HelmetReduction": null,
+  "WorldModelBodyGroups": 0,
+  "__references": [],
+  "__version": 0,
+  "Category": "LMG",
+  "GunsmithOffset": "0,0,4",
+  "ReviewNote": "Not checked in a match yet: the iron sights and the optics' aim (derived: tune with dev_optic_correction), recoil, reload timing and sounds (the box magazines' too), the look sway and sprint, the left hand in first and third person, the parts on its slots, the charm and the sticker."
+}

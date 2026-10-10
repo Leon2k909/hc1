@@ -268,6 +268,8 @@ public static partial class GameText
 			"アメリカ製の6.8x51mmライフル。SIGが.277 Fury弾用に作ったショートストロークピストン式のMCXで、13インチ銃身と折りたたみ式ストックを備える。アメリカ陸軍のM7。",
 		["US 5.56x45mm service rifle of the 1980s and 90s, with a 20-inch barrel, a fixed carry handle with its rear sight and a round ribbed handguard. Semi-automatic and three-round burst."] =
 			"1980〜90年代の米国の5.56x45mm制式ライフル。20インチ銃身、リアサイト付きの固定キャリングハンドル、丸いリブ付きハンドガードを備え、セミオートと3点バーストで撃てる。",
+		["Russian 5.45x39mm light machine gun on the AK-12's receiver, with a long heavy barrel, a railed dust cover and handguard and a 95-round drum. Automatic and semi."] =
+			"AK-12のレシーバーを基にしたロシアの5.45x39mm軽機関銃。長い重銃身、レール付きのダストカバーとハンドガード、95発ドラムマガジンを備え、フルオートとセミオートで撃てる。",
 		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
 			"AKMのリブ付きスチール製30発マガジン。リロード速度は標準。",
 		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =

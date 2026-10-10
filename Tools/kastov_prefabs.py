@@ -253,6 +253,19 @@ PARTS_AK74M = {
     **{choice: PARTS_AK12[choice] for choice, _ in _AK74M_CHOICES["magazine"][2:]},
 }
 
+# The RPK-16's parts: any AK pistol grip and any AK-74 magazine, as the real one takes. Its own AK-12 grip and 95-round
+# drum are the factory parts. It plays the RPK's clips: the 30s reload with the AKM 30's (_mag), the RPK-74 45 and the
+# four-column 60 with the RPK 40's (_xmag), so their reload times are those clips'.
+PARTS_RPK16 = {
+    **{choice: PARTS_AK12[choice] for choice, _ in kastov_weapons.RPK16.part_choices["pistol_grip"][1:]},
+    "ak74m_mag": replace(PARTS_AK12["ar_akilo105_mag_v0"], reload_variant="_mag", reload_times=(2.2, 2.6)),
+    "ak12_mag": replace(PARTS_AK74M["ak12_mag"], reload_variant="_mag", reload_times=(2.2, 2.6)),
+    "ar_akilo105_xmag_v0": replace(PARTS_AK105["ar_akilo105_xmag_v0"], reload_variant="_xmag",
+                                   reload_times=(2.3, 2.8)),
+    "ar_akilo105_xmaglrg_v0": replace(PARTS_AK105["ar_akilo105_xmaglrg_v0"], reload_variant="_xmag",
+                                      reload_times=(2.3, 2.8)),
+}
+
 
 # The Vepr-12's own parts. Its factory stock is the strut stock, so the stocks' recoil is relative to that; its factory
 # grip, the shotgun pistol grip, has the 74u's grips' baseline. The 12-round magazine and the drum reload with their own
@@ -1069,6 +1082,39 @@ def gameplay_m16a2() -> Gameplay:
         # The M16A4's: the same round from the same barrel kicks the loaded 3.99 kg rifle back at ~1.65 m/s, against the
         # loaded M4's ~1.86 m/s and its (2,5).
         "ShootRecoil": {"Scale": "1.78,4.44"},
+    })
+
+
+def gameplay_rpk16() -> Gameplay:
+    """The real RPK-16's figures (Kalashnikov's light machine gun of 2016 on the AK-12's receiver, which went to the
+    Russian army's trials in 2018-2019) with its long barrel and 95-round drum, on the M4's prefab, with the 5.45mm
+    round doing the M4's 5.56 damage like the AK-12's."""
+    assets = load(ASSETS / "Weapons" / "RPK16" / "rpk16_assets.json")
+    sounds, reloads = assets["sounds"], assets["reloads"]
+    return Gameplay({
+        # 4.5 kg without a magazine (Kalashnikov), and ~1.9 kg for the drum and its 95 rounds (an estimate: no weight is
+        # published for it), ~6.4 kg in all. By the RPK's scaling against the AKM's 3.75 kg, ~1% slower per kg over it.
+        "Equipment": {"SpeedPenalty": 40, "WeightSlowdown": 0.027},
+        "WeaponAmmo": {"Ammo": 95, "MaxAmmo": 95},
+        # 700 rpm cyclic, automatic and semi. 7N6 ball from the 580 mm long barrel at ~950 m/s, between the AK-74M's 900
+        # from 415 mm and the RPK-74's 960 from 590 mm (G7 0.157). The sights sit 60.3 mm over the bore (the line
+        # through the rear sight's aperture and the front post's tip), zeroed at 300 m like the AK-12's.
+        "Shootable": {"BaseDamage": 20, "FireRate": 700, "ShootSound": sounds["fire"],
+                      "SuppressedShootSound": sounds["fire_suppressed"],
+                      "SupportedFireModes": ["Automatic", "Semi"], "CurrentFireMode": "Automatic",
+                      **ballistics(950, "G7", 0.157, 60.3, 300, N7N6_BULLET)},
+        # It plays the RPK's clips: the drum is seated and the gun level at 4.25s, and 5.05s after the empty reload's
+        # bolt pull.
+        "Reloadable": {"ReloadTime": 4.25, "EmptyReloadTime": 5.05, "TimedReloadSounds": reloads["reload"],
+                       "EmptyReloadSounds": reloads["reload_empty"]},
+        # Free recoil against the M4's (2,5): a 7N6 round (3.42 g at 950 m/s, 1.45 g of powder) kicks the loaded ~6.4 kg
+        # RPK-16 back at ~0.88 m/s, an M855 round the loaded M4 at ~1.86 m/s.
+        "ShootRecoil": {"Scale": "0.94,2.36"},
+        # The RPK's heat model: a 7N6 round's 1.45 g of powder puts ~0.8 kJ into the long barrel (15%), ~1.4 C a round
+        # where the RPK's PS round gives ~1.5. The rest is the RPK's (see gameplay_rpk). The real gun's quick-change
+        # barrel isn't modelled.
+        "BarrelHeat": {"HeatPerShot": 1.4, "CoolingTime": 600, "DispersionStart": 200, "HotTemperature": 410,
+                       "HotDispersion": 0.3, "CookOffTemperature": 410, "CookOffTime": 10},
     })
 
 
@@ -2255,6 +2301,60 @@ PREFABS = {
         review_note="Not checked in a match yet: the iron sights, recoil, reload timing and sounds, the look sway and "
                     "sprint, the left hand in first and third person (its pinky rests on the handguard's vent hole), "
                     "the muzzle devices, the charm and the sticker.",
+    ),
+    "rpk16": Prefabs(
+        title="RPK-16",
+        description="Russian 5.45x39mm light machine gun on the AK-12's receiver, with a long heavy barrel, a railed "
+                    "dust cover and handguard and a 95-round drum. Automatic and semi.",
+        price=3000,
+        deploy_sound="weapons/rpk/sounds/rpk.raise_rattle.sound",
+        dry_fire="ak",
+        # rpk16_rig.py draws the side-on rpk16_01.png from the model, as for the AK-12.
+        icon_source=None,
+        # The muzzle brake, the rear sight and the factory grip and drum (by the bit rule).
+        default_mesh_groups=135189,
+        bones={
+            "tag_sling": (None, "-6.969,-0.573,3.351", "0,0,0,1"),
+            "tag_barrel_attach": ("tag_sling", "13.313,0.572,2.527", "0,0,0,1"),
+            "muzzle": ("tag_barrel_attach", "22.087,0.001,-1.527", "0,0,0,1"),
+            "tag_brass": ("tag_sling", "9.103,-0.17,1.884", "-0.000021,0.000057,-0.707106,0.707107"),
+        },
+        world_muzzle="28.431,0,4.351",
+        world_eject="2.134,-0.743,5.235",
+        # By the rule, where the first-person hand holds the handguard (its wrist at x 6.9, as the AK-12's): the
+        # handguard's sides bulge to 1.0 from centre there, and its bottom is at 3.219.
+        world_left_hand="6.9,2.5,2.03",
+        slots=[
+            # The dust cover's rail. An optic takes the rear sight off, as on the real gun: it clamps to the same rail.
+            ("Optic", (-2.2, 0, 6.111), (0.25, 0, 8.73), {"iron_sights": 1}),
+            ("Muzzle", (25.247, 0, 4.351), (17.62, 0, 7.4147), {"muzzle_tip": 1}),  # the brake's rear face
+            # No Underbarrel: the left hand's fingers wrap the bottom rail up to x 11.0, and the rail ends at 13.18.
+            # That leaves 2.18, where the M4's vertical grips need 2.26 (the L85A2's and HK416's case). The real
+            # handguard takes a small foregrip there, but a part can't move the hand.
+            # The back of the right side rail section (10.97 to 13.1).
+            ("Laser", (10.97, -1.136, 5.227), (8.6, -1.22, 7.4147), {}),
+        ],
+        # The folding stock tube's left side behind the receiver (the charm's anchor sits 0.57 ahead of this, 0.71 in
+        # and 1.84 over it, on the tube). The AKs' spot above the magazine well is over the 95-round drum, 0.26 from it,
+        # and the empty drum reload's left index finger came within 0.28 of it. Here every hand joint stays 1.03" or
+        # more from it through every clip.
+        charm=(-8.57, 1.75, 2.36),
+        # The receiver's left side above the drum, flat at y 0.68 (a rivet stands out to 0.75 at x 2.28).
+        sticker=((3.2, 0.68, 3.6), (0.0, 1.0, 0.0), (1.4, 0.6)),
+        # The 762's measured correction moved by how far the RPK-16's ADS pose puts its optic slot from the 762's,
+        # like the AK-12's. Tune in-game with dev_optic_correction.
+        optic_aim_correction="3.328,0,-0.971",
+        gameplay=gameplay_rpk16,
+        category="LMG",
+        guid_salt="rpk16/",
+        parts=PARTS_RPK16,
+        # port_kastov.py's world grip and mag points (tag_pistolgrip_attach, tag_mag_attach).
+        part_slot_positions={"pistol_grip": (-3.0, 0, 3.0), "magazine": (2.516, 0, 3.257)},
+        reload_sounds=lambda: load(ASSETS / "Weapons" / "RPK16" / "rpk16_assets.json")["reloads"],
+        review_note="Not checked in a match yet: the iron sights and the optics' aim (derived: tune with "
+                    "dev_optic_correction), recoil, reload timing and sounds (the box magazines' too), the look "
+                    "sway and sprint, the left hand in first and third person, the parts on its slots, the charm "
+                    "and the sticker.",
     ),
 }
 

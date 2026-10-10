@@ -1,0 +1,38 @@
+{
+  "Name": "45 Round Mag",
+  "Category": "Magazine",
+  "Mass": -1.135,
+  "EligibleEquipment": [
+    "weapons/rpk16/rpk16.equip"
+  ],
+  "RequiredLevel": 0,
+  "Description": "RPK-74 45-round magazine. Longer and heavier to change. Reloads in 2.3s (2.8s when empty).",
+  "ModifyBodygroups": true,
+  "Bodygroups": {
+    "magazine": 3
+  },
+  "VerticalRecoilScale": 1.0,
+  "HorizontalRecoilScale": 1.0,
+  "MagazineCapacity": 45,
+  "ReloadTimeMultiplier": 1.0,
+  "ReloadAnimation": 2,
+  "ReloadTime": 2.3,
+  "EmptyReloadTime": 2.8,
+  "ReloadSounds": {
+    "0": "weapons/rpk/sounds/rpk.reload_xmag_mvt.sound",
+    "0.433": "weapons/rpk/sounds/rpk.reload_xmag_magout.sound",
+    "0.9": "weapons/rpk/sounds/rpk.reload_xmag_mvt2.sound",
+    "1.2": "weapons/rpk/sounds/rpk.reload_xmag_magin.sound",
+    "1.833": "weapons/rpk/sounds/rpk.reload_xmag_shoulder.sound"
+  },
+  "EmptyReloadSounds": {
+    "0": "weapons/rpk/sounds/rpk.reload_xmag_empty_mvt.sound",
+    "0.6": "weapons/rpk/sounds/rpk.reload_xmag_empty_magout.sound",
+    "0.9": "weapons/rpk/sounds/rpk.reload_xmag_empty_maghit.sound",
+    "1.367": "weapons/rpk/sounds/rpk.reload_xmag_empty_magin.sound",
+    "2.1": "weapons/rpk/sounds/rpk.reload_xmag_empty_charge.sound",
+    "2.467": "weapons/rpk/sounds/rpk.reload_xmag_empty_shoulder.sound"
+  },
+  "__references": [],
+  "__version": 0
+}

@@ -266,6 +266,8 @@ public static partial class GameText
 			"Fucile americano in 6,8x51 mm: l'MCX a pistone a corsa corta di SIG per la cartuccia .277 Fury, con canna da 13 pollici e calcio pieghevole. L'M7 dell'esercito statunitense.",
 		["US 5.56x45mm service rifle of the 1980s and 90s, with a 20-inch barrel, a fixed carry handle with its rear sight and a round ribbed handguard. Semi-automatic and three-round burst."] =
 			"Fucile d'ordinanza statunitense in 5,56x45 mm degli anni '80 e '90, con canna da 20 pollici, maniglia di trasporto fissa con la diottra e guardamano tondo nervato. Semiautomatico e raffica da tre colpi.",
+		["Russian 5.45x39mm light machine gun on the AK-12's receiver, with a long heavy barrel, a railed dust cover and handguard and a 95-round drum. Automatic and semi."] =
+			"Mitragliatrice leggera russa in 5,45x39 mm sul castello dell'AK-12, con canna lunga e pesante, coperchio del castello e guardamano con slitte e caricatore a tamburo da 95 colpi. Automatica e semiautomatica.",
 		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
 			"Il caricatore in acciaio nervato da 30 colpi dell'AKM. Velocità di ricarica standard.",
 		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =

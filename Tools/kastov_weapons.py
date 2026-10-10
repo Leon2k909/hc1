@@ -1649,9 +1649,69 @@ M16A2 = Weapon(
     steady_fire=15,
 )
 
+
+def rpk16_materials() -> dict[str, str]:
+    # Built by rpk16_assets.py: Tarkov's RPK-16, plus the AK-74M's manifest (the AK-12's, the parts' and the rounds).
+    assets = json.loads((ASSETS / "Weapons" / "RPK16" / "rpk16_assets.json").read_text(encoding="utf-8"))
+    return assets["materials"]
+
+
+# The RPK-16 (5.45x39mm): Escape from Tarkov's RPK-16 from the ARC9 EFT Assault Rifles pack (Workshop 2962829818),
+# Kalashnikov's light machine gun of 2016 on the AK-12's receiver, as it went to the Russian army's trials: the long
+# barrel (580 mm on the real gun, ~550 mm in the pack's model) with its muzzle brake, the railed dust cover and
+# handguard, the tangent rear sight, the AK-12's telescoping stock on its own folding tube, the AK-12's pistol grip and
+# the 95-round drum. It's on the RPK's CoD rig and clips (MWII's mg_iw9_rkilo): an RPK's receiver bones sit where the
+# AK-105's do, so the AK-12's fit holds on it. Tools/rpk16_rig.py writes the pieces as SMDs (decompiled/rpk16/rig).
+_RPK16_RIG = "rig"
+RPK16 = Weapon(
+    name="rpk16",
+    folder=ASSETS / "Weapons" / "RPK16",
+    asset="weapons/rpk16",
+    model="rpk16",
+    decompiled=DECOMPILED / "rpk16",
+    cod_anims="../rkilo/vm_iw9_rkilo/vm_iw9_rkilo_anims",
+    # The stock is the AK-12's telescoping stock on the RPK-16's folding tube, the only one offered.
+    vm_meshes=[f"{_RPK16_RIG}/rpk16_receiver.smd", f"{_RPK16_RIG}/rpk16_stock.smd"],
+    part_meshes=[],
+    optional_meshes={
+        "muzzle_tip": (f"{_RPK16_RIG}/rpk16_brake.smd", None),  # the RPK-16's brake, off under a muzzle device
+        "iron_sights": (f"{_RPK16_RIG}/rpk16_rear_sight.smd", None),  # the rear sight's leaf, off under an optic
+    },
+    # 0.2 inside the front of the muzzle brake, on the bore.
+    extra_bones={"muzzle": ("tag_sling", np.array([35.4, 0.573, 1.0]))},
+    materials=rpk16_materials,
+    hip=view_offset(),
+    # The RPK's aim left the diopter's aperture 0.26 over the eye, so this lowers the gun onto the line through the
+    # aperture's centre and the hooded front post's tip and turns it onto it.
+    aim=view_offset((-0.1414, -0.2013, -0.2631), (-0.5919, -0.0592, -2.3363)),
+    sprint=view_offset((-0.4, 0.0, -0.1)),
+    m4_sprint=True,
+    ads_pose=("ads_in", slice(-1, None)),
+    # ~6.4 kg with a loaded drum (4.5 kg, and ~1.9 kg for the drum and its 95 rounds) against the AKM's 3.75, by the
+    # RPK's scaling (the square root of the moving mass, the gun plus ~4 kg of arms): sqrt(10.4 / 7.75) x 0.25 = 0.29 s.
+    ads_time=0.29,
+    report_bones=["tag_brass", "tag_mag_attach", "tag_stock_attach", "tag_pistolgrip_attach", "tag_reflex",
+                  "tag_flash"],
+    part_choices={
+        # The AK-12's grip, which it's issued with, then the AK-74M's and the AK-platform grips: it takes any AK grip.
+        "pistol_grip": [("factory", f"{_RPK16_RIG}/rpk16_pgrip.smd")] + AK12.part_choices["pistol_grip"][1:],
+        # Its own 95-round drum, then the 5.45 AK-74 magazines it takes: the AK-74M's 6L23 30, the AK-12's windowed 30,
+        # the RPK-74's 45 and a four-column 60. Each holds the fitted magazine (j_mag1) and the reload's fresh one
+        # (j_mag2).
+        "magazine": [("factory", f"{_RPK16_RIG}/rpk16_mag.smd"),
+                     ("ak74m_mag", "../ak74m/rig/ak74m_mag.smd"),
+                     ("ak12_mag", f"../ak12/{_AK12_RIG}/ak12_mag.smd"),
+                     _kastovia("ar_akilo105_xmag_v0"), _ak105_part("ar_akilo105_xmaglrg_v0")],
+    },
+    # The RPK's box magazines' reloads: the AKM 30's (reload_mag) for the 30s, the RPK 40's (reload_xmag) for the 45 and
+    # the 60. The factory reload is the RPK's 75-round drum's.
+    reload_variants=["_mag", "_xmag"],
+    left_grip=GripFit(shift=(0.0, 0.38, -0.1), fingers=0.25, thumb=0.1),
+)
+
 WEAPONS ={weapon.name: weapon for weapon in (KASTOV_762, KASTOV_74U, VITYAZ, RPK, BIZON, AK105, VEPR12, M16, P90,
                                               MP7, AUG, UZI, FAL, FAMAS, M18, MCX, L85A2, HK416, AK12, AK15,
-                                              AK74M, SPEAR, M16A2)}
+                                              AK74M, SPEAR, M16A2, RPK16)}
 
 
 def add_argument(parser: argparse.ArgumentParser) -> None:

@@ -2,7 +2,8 @@
 The ported guns' suppressed shots, voiced away from CoD's sound design with shot_voicing.py's steps, as their open shots
 were (ported_shots.py, ak105_shot.py, m16_shot.py, kastov762_shot.py): the Kastov 762's (which the RPK fires too), the
 PP-19-01 Vityaz's, PP-19 Bizon's, AK-105's, M16A4's, FN P90's, MP7A1's, Steyr AUG's, Uzi's, FN FAL's, FAMAS F1's,
-SIG MCX Virtus's, L85A2's, HK416's, AK-12's, AK-15's, AK-74M's, MCX-SPEAR's and M16A2's.
+SIG MCX Virtus's, L85A2's, HK416's, AK-12's, AK-15's, AK-74M's, MCX-SPEAR's, M16A2's and
+RPK-16's.
 The M18 and the Vepr-12 have none, and the Kastov-74u's are left alone.
 
 What the rips get wrong (2026-09-30, as levelled into Assets, counting the SMGs' suppressed events' volume of 0.5):
@@ -115,6 +116,8 @@ GUNS = {
                         "spear_shot_0[1-9].wav", "spear"),
     "m16a2": Suppressed("Weapons/M16A2/sounds", "m16a2_suppressed_shot_0*.wav", "m16a2.fire_suppressed.sound",
                         "m16a2_shot_0[1-9].wav", "m16a2"),
+    "rpk16": Suppressed("Weapons/RPK16/sounds", "rpk16_suppressed_shot_0*.wav", "rpk16.fire_suppressed.sound",
+                        "rpk16_shot_0[1-9].wav", "rpk16"),
 }
 
 

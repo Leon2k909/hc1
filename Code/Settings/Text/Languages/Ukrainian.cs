@@ -274,6 +274,8 @@ public static partial class GameText
 			"Американська гвинтівка калібру 6,8x51 мм: MCX від SIG з короткохідним газовим поршнем під набій .277 Fury, з 13-дюймовим стволом і складаним прикладом. M7 армії США.",
 		["US 5.56x45mm service rifle of the 1980s and 90s, with a 20-inch barrel, a fixed carry handle with its rear sight and a round ribbed handguard. Semi-automatic and three-round burst."] =
 			"Американська штатна гвинтівка під набій 5,56x45 мм 1980-х і 90-х років, із 20-дюймовим стволом, незнімною ручкою для перенесення з діоптричним цілком і круглою ребристою цівкою. Одиночний вогонь і черги по три постріли.",
+		["Russian 5.45x39mm light machine gun on the AK-12's receiver, with a long heavy barrel, a railed dust cover and handguard and a 95-round drum. Automatic and semi."] =
+			"Російський ручний кулемет під набій 5,45x39 мм на ствольній коробці АК-12, з довгим обважненим стволом, кришкою ствольної коробки та цівкою з планками і барабанним магазином на 95 набоїв. Автоматичний і одиночний вогонь.",
 		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
 			"Сталевий магазин AKM із ребрами на 30 набоїв. Звичайна швидкість перезарядки.",
 		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =

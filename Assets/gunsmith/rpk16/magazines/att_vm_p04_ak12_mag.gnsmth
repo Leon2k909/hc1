@@ -1,0 +1,41 @@
+{
+  "Name": "AK-12 30 Round Mag",
+  "Category": "Magazine",
+  "Mass": -1.367,
+  "EligibleEquipment": [
+    "weapons/rpk16/rpk16.equip"
+  ],
+  "RequiredLevel": 0,
+  "Description": "The AK-12's polymer 30-round magazine, with a window to see the rounds. Reloads in 2.2s (2.6s when empty).",
+  "ModifyBodygroups": true,
+  "Bodygroups": {
+    "magazine": 2
+  },
+  "VerticalRecoilScale": 1.0,
+  "HorizontalRecoilScale": 1.0,
+  "MagazineCapacity": 30,
+  "ReloadTimeMultiplier": 1.0,
+  "ReloadAnimation": 1,
+  "ReloadTime": 2.2,
+  "EmptyReloadTime": 2.6,
+  "ReloadSounds": {
+    "0": "weapons/rpk/sounds/rpk.ak_reload_mvt.sound",
+    "0.4": "weapons/rpk/sounds/rpk.ak_reload_maggrab.sound",
+    "0.6": "weapons/rpk/sounds/rpk.ak_reload_magout.sound",
+    "0.967": "weapons/rpk/sounds/rpk.ak_reload_magbump.sound",
+    "1.167": "weapons/rpk/sounds/rpk.ak_reload_magclick.sound",
+    "1.7": "weapons/rpk/sounds/rpk.ak_reload_mvt2.sound",
+    "2.167": "weapons/rpk/sounds/rpk.ak_reload_shoulder.sound"
+  },
+  "EmptyReloadSounds": {
+    "0": "weapons/rpk/sounds/rpk.ak_reload_empty_mvt.sound",
+    "0.533": "weapons/rpk/sounds/rpk.ak_reload_empty_magout.sound",
+    "0.933": "weapons/rpk/sounds/rpk.ak_reload_empty_magbump.sound",
+    "1.233": "weapons/rpk/sounds/rpk.ak_reload_empty_magin.sound",
+    "1.733": "weapons/rpk/sounds/rpk.ak_reload_empty_mvt2.sound",
+    "1.933": "weapons/rpk/sounds/rpk.ak_reload_empty_charge.sound",
+    "2.5": "weapons/rpk/sounds/rpk.ak_reload_empty_shoulder.sound"
+  },
+  "__references": [],
+  "__version": 0
+}

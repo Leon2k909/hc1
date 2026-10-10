@@ -265,6 +265,8 @@ public static partial class GameText
 			"美製 6.8x51mm 步槍：SIG 為 .277 Fury 彈設計的短行程活塞式 MCX，配備 13 吋槍管與折疊式槍托。即美國陸軍的 M7。",
 		["US 5.56x45mm service rifle of the 1980s and 90s, with a 20-inch barrel, a fixed carry handle with its rear sight and a round ribbed handguard. Semi-automatic and three-round burst."] =
 			"1980 至 90 年代的美國 5.56x45mm 制式步槍，配備 20 英吋槍管、附照門的固定提把與圓形帶肋護木。可半自動射擊與三發點放。",
+		["Russian 5.45x39mm light machine gun on the AK-12's receiver, with a long heavy barrel, a railed dust cover and handguard and a 95-round drum. Automatic and semi."] =
+			"以 AK-12 機匣為基礎的俄羅斯 5.45x39mm 輕機槍，配備長重型槍管、附導軌的機匣蓋與護木以及 95 發彈鼓。可全自動與半自動射擊。",
 		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
 			"AKM 的帶加強筋鋼製 30 發彈匣。裝填速度標準。",
 		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =

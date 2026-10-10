@@ -266,6 +266,8 @@ public static partial class GameText
 			"Amerykański karabin kalibru 6,8x51 mm: MCX firmy SIG z tłokiem o krótkim skoku, na nabój .277 Fury, z 13-calową lufą i składaną kolbą. M7 armii USA.",
 		["US 5.56x45mm service rifle of the 1980s and 90s, with a 20-inch barrel, a fixed carry handle with its rear sight and a round ribbed handguard. Semi-automatic and three-round burst."] =
 			"Amerykański karabin służbowy kalibru 5,56x45 mm z lat 80. i 90., z 20-calową lufą, stałym chwytem transportowym z celownikiem przeziernikowym i okrągłym, żebrowanym łożem. Ogień pojedynczy i seria trzystrzałowa.",
+		["Russian 5.45x39mm light machine gun on the AK-12's receiver, with a long heavy barrel, a railed dust cover and handguard and a 95-round drum. Automatic and semi."] =
+			"Rosyjski ręczny karabin maszynowy kalibru 5,45x39 mm na komorze zamkowej AK-12, z długą, ciężką lufą, pokrywą komory zamkowej i łożem z szynami oraz magazynkiem bębnowym na 95 naboi. Ogień ciągły i pojedynczy.",
 		["The AKM's ribbed steel 30-round magazine. Standard reload speed."] =
 			"Żebrowany stalowy magazynek AKM na 30 naboi. Standardowy czas przeładowania.",
 		["The RPK's 40-round magazine. Longer and heavier to change. Reloads in 2.4s (2.75s when empty)."] =
