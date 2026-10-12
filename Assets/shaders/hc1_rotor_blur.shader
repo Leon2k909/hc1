@@ -1,6 +1,6 @@
 HEADER
 {
-    Description = "A turning two-blade prop as the eye or a camera sees it: each point of its disc covered for the share of the time a blade is over it";
+    Description = "A turning two-blade prop as the eye or a camera sees it: each point of its disc covered for the share of the time a blade is over it. A smaller prop of the same shape is drawn scaled (RotorScale)";
 }
 MODES
 {
@@ -54,9 +54,14 @@ PS
     //   RotorSpin   +1 turning anticlockwise seen from above (from the disc's +z), -1 clockwise
     //   RotorTrail  how far back the eye still sees a blade it's following, radians of turn
     //   RotorFusion 0 while separate blades show, 1 once the eye can't follow them (blade passes over ~50 a second)
+    //   RotorScale  the octocopter's prop radius over this rotor's: a smaller rotor of the same shape (the nano
+    //               drone's, Tools/build_recon_nano.py) is drawn as the octocopter's scaled down
+    //   RotorYoke   1 where the blades fold on a yoke (the octocopter's), 0 where they don't (the nano's)
     float g_flRotorSpin < Attribute( "RotorSpin" ); Default( 1.0 ); >;
     float g_flRotorTrail < Attribute( "RotorTrail" ); Default( 0.03 ); >;
     float g_flRotorFusion < Attribute( "RotorFusion" ); Default( 1.0 ); >;
+    float g_flRotorScale < Attribute( "RotorScale" ); Default( 1.0 ); >;
+    float g_flRotorYoke < Attribute( "RotorYoke" ); Default( 1.0 ); >;
 
     // The disc's model is in inches.
     static const float InchesToMetres = 0.0254;
@@ -104,7 +109,8 @@ PS
         float3 F = normalize( i.vBladeWs - A * dot( i.vBladeWs, A ) );
         float3 L = cross( A, F );
 
-        float x = i.vPositionOs.x * InchesToMetres, y = i.vPositionOs.y * InchesToMetres;
+        float scale = max( g_flRotorScale, 0.01 );
+        float x = i.vPositionOs.x * InchesToMetres * scale, y = i.vPositionOs.y * InchesToMetres * scale;
         float r = length( float2( x, y ) );
         if ( r < HubRadius || r > PropRadius ) discard;
 
@@ -136,7 +142,7 @@ PS
 
         // The yoke's arms, a box section turning with the blades: always fused, as they're near the axis.
         float yoke = 0.0;
-        if ( r < YokeEnd )
+        if ( g_flRotorYoke > 0.5 && r < YokeEnd )
         {
             float hy = ( YokeHalfWidth * abs( dot( A, V ) ) + YokeHalfDepth * abs( dot( around, V ) ) ) / faceOn / r;
             hy = min( hy, Pi * 0.5 - 0.01 );

@@ -88,7 +88,7 @@
 
         <div class="bottom">
             <div class="zoom">
-                @foreach ( var step in ReconOctocopter.ZoomSteps )
+                @foreach ( var step in drone.AvailableZoomSteps )
                 {
                     <label class="step @( MathF.Abs( step - drone.Zoom ) < 0.01f ? "on" : "" )">@step.ToString( "0", CultureInfo.InvariantCulture )x</label>
                 }
@@ -129,7 +129,7 @@
             }
             else
             {
-                var own = ReconTabletLink.OwnDrone( Pawn );
+                var own = ReconTabletLink.OwnDrone( Pawn, Pawn.CurrentEquipment?.Resource?.ResourcePath );
                 <InputHint Action="Attack1" class="small" Size="@InputGlyphSize.Small" />
                 <label>@( own.IsValid() ? Tr( "TAKE CONTROL" ) : Tr( "LAUNCH DRONE" ) )</label>
                 @if ( own.IsValid() )
@@ -271,7 +271,7 @@
     {
         if ( Drone.IsValid() ) return HashCode.Combine( Time.Now );
         if ( !HoldingStation ) return 0;
-        var own = ReconTabletLink.OwnDrone( Pawn );
+        var own = ReconTabletLink.OwnDrone( Pawn, Pawn.CurrentEquipment?.Resource?.ResourcePath );
         return HashCode.Combine( own.IsValid(), own.IsValid() ? (int)(own.Battery * 100f) : 0, ReconTabletLink.SinceRefused < 2f );
     }
 }

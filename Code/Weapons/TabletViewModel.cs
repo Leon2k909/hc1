@@ -1,7 +1,7 @@
 namespace Facepunch;
 
 /// <summary>
-/// The recon octocopter's ground station, held in both hands by its side grips with the screen towards the eye, low in
+/// The recon ground station, held in both hands by its side grips with the screen towards the eye, low in
 /// the view as one is carried ready. The arms keep their real bone lengths and are solved onto the grips each frame, as
 /// <see cref="DefuseViewModel"/> does. While the operator is looking through the drone it isn't drawn: the feed is the
 /// whole screen.
@@ -27,6 +27,7 @@ public sealed class TabletViewModel : Component, ICameraSetup
 	private int[] order;
 	private TimeSince deployed;
 	private float lowered;
+	private float handRelease;
 
 	protected override void OnStart() => deployed = 0;
 
@@ -57,6 +58,10 @@ public sealed class TabletViewModel : Component, ICameraSetup
 		Arms.UseAnimGraph = false;
 		if ( rig != Arms.Model ) BuildRig();
 		if ( rig is null ) return;
+		var drone = ReconTabletLink.OwnDrone( owner, owner?.CurrentEquipment?.Resource?.ResourcePath );
+		var releaseTarget = drone.IsValid() && drone.IsHandReleasing
+			? MathF.Sin( drone.HandReleaseProgress * MathF.PI ) : 0f;
+		handRelease = handRelease.LerpTo( releaseTarget, Time.Delta * 18f );
 
 		Array.Copy( bind, pose, bind.Length );
 		PoseArm( "L", 1 );
@@ -104,6 +109,14 @@ public sealed class TabletViewModel : Component, ICameraSetup
 		var pointing = new Vector3( 0.75f, -sign * 0.35f, 0.55f ).Normal;
 		var targetFrame = frame.Rotation * Rotation.LookAt( pointing, Vector3.Left );
 		var handRotation = targetFrame * bindFrame.Inverse * bind[hand].Rotation;
+		if ( sign < 0 && handRelease > 0.001f )
+		{
+			// The right hand lifts off the station, palm up, and lets the nano helicopter rise from its fingertips.
+			wrist = wrist.LerpTo( new Vector3( 24f, -9f, -12f ), handRelease );
+			var releaseFrame = Rotation.LookAt( Vector3.Forward, Vector3.Up );
+			var releaseRotation = releaseFrame * bindFrame.Inverse * bind[hand].Rotation;
+			handRotation = Rotation.Slerp( handRotation, releaseRotation, handRelease );
+		}
 
 		var shoulder = new Vector3( -3f, sign * 7f, -10f );
 		float a = bind[upper].Position.Distance( bind[lower].Position ), b = bind[lower].Position.Distance( bind[hand].Position );

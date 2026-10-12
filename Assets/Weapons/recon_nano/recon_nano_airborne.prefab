@@ -1,0 +1,378 @@
+{
+  "RootObject": {
+    "__guid": "b9d6b563-0d37-544c-ac23-21b231964664",
+    "Name": "Nano Drone",
+    "Enabled": true,
+    "NetworkMode": 2,
+    "Components": [
+      {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "ff3c557b-9da3-58f3-9596-d9b9add1785e",
+        "__enabled": true,
+        "Model": "models/recon_nano/recon_nano.vmdl",
+        "Tint": "1,1,1,1",
+        "RenderType": "On",
+        "UseAnimGraph": false,
+        "RenderOptions": {
+          "GameLayer": true,
+          "OverlayLayer": false
+        }
+      },
+      {
+        "__type": "Facepunch.ReconOctocopter",
+        "__guid": "7da7a802-90f6-552e-8590-adaa40f84ef1",
+        "__enabled": true,
+        "DisplayName": "Nano Drone",
+        "IconPath": "ui/weapons/recon_nano.svg",
+        "StationResourcePath": "weapons/recon_nano/recon_nano.equip",
+        "HandLaunched": true,
+        "LinkDelay": 0.65,
+        "SpoolSeconds": 0.4,
+        "RotateCollisionHull": true,
+        "Gimbal": {
+          "_type": "gameobject",
+          "go": "a2010b74-5426-59f2-b740-5a66eed8767c"
+        },
+        "LensOffset": "0.35433,0,0",
+        "RotorSound": "sounds/drones/nano_rotors.sound",
+        "SparksPrefab": "prefabs/impact_fx/impact_sparks.prefab",
+        "Hull": {
+          "Mins": "-8.0315,-3.85827,-0.7874",
+          "Maxs": "3.46457,3.85827,2.20472"
+        },
+        "CruiseSpeed": 236.21999999999997,
+        "SportSpeed": 393.7,
+        "Acceleration": 157.48,
+        "ClimbRate": 78.74,
+        "DescentRate": 59.05499999999999,
+        "VerticalAcceleration": 118.10999999999999,
+        "Ceiling": 2362.2,
+        "TakeoffHeight": 55.117999999999995,
+        "BatterySeconds": 120,
+        "DragPerInch": 0.00055,
+        "MaxTilt": 28,
+        "HoverRpm": 4800,
+        "MaxIntegrity": 10,
+        "CrashSpeed": 120,
+        "ImpactDamageThreshold": 60,
+        "WideFieldOfView": 62,
+        "CameraZoomSteps": [
+          1,
+          2,
+          4
+        ],
+        "CameraNearPlane": 0.15,
+        "MaxGimbalPitch": 80,
+        "MinGimbalPitch": -25,
+        "SpotRange": 3000
+      },
+      {
+        "__type": "Sandbox.BoxCollider",
+        "__guid": "f93f9082-0f6b-57c6-9096-f5eb8ca17dce",
+        "__enabled": true,
+        "Center": "0.12,0,0.1",
+        "Scale": "4.2,1.4,1.6",
+        "IsTrigger": false,
+        "Static": false,
+        "Surface": "surfaces/metal.sheet.surface"
+      },
+      {
+        "__type": "Sandbox.BoxCollider",
+        "__guid": "5f727217-7a6a-5004-b6fb-5715b2a5303c",
+        "__enabled": true,
+        "Center": "-4.7,0,0.66",
+        "Scale": "5.8,0.28,0.8",
+        "IsTrigger": false,
+        "Static": false,
+        "Surface": "surfaces/metal.sheet.surface"
+      },
+      {
+        "__type": "Sandbox.BoxCollider",
+        "__guid": "6c3b9bbc-947c-5f21-ab78-7ddab486b242",
+        "__enabled": true,
+        "Center": "-6.89,0,1.3",
+        "Scale": "0.95,0.12,1.73",
+        "IsTrigger": false,
+        "Static": false,
+        "Surface": "surfaces/metal.sheet.surface"
+      },
+      {
+        "__type": "Sandbox.BoxCollider",
+        "__guid": "dda9a923-79c1-50d7-a9a8-3a05e233702f",
+        "__enabled": true,
+        "Center": "-0.47244,0,1.77165",
+        "Scale": "7.5,7.5,0.18",
+        "IsTrigger": false,
+        "Static": false,
+        "Surface": "surfaces/metal.sheet.surface"
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "a2010b74-5426-59f2-b740-5a66eed8767c",
+        "Name": "Gimbal",
+        "Enabled": true,
+        "NetworkMode": 0,
+        "Components": [
+          {
+            "__type": "Sandbox.ModelRenderer",
+            "__guid": "8db999a0-562c-5722-84cf-f8c1add08ef1",
+            "__enabled": true,
+            "Model": "models/recon_nano/recon_nano_gimbal.vmdl",
+            "Tint": "1,1,1,1",
+            "RenderType": "On",
+            "UseAnimGraph": false,
+            "RenderOptions": {
+              "GameLayer": true,
+              "OverlayLayer": false
+            }
+          },
+          {
+            "__type": "Sandbox.SphereCollider",
+            "__guid": "b8548649-8b6a-5989-b836-43583b0e613c",
+            "__enabled": true,
+            "Radius": 0.355,
+            "IsTrigger": false,
+            "Static": false,
+            "Surface": "surfaces/metal.sheet.surface"
+          }
+        ],
+        "Children": [],
+        "Position": "2.12598,0,-0.23622"
+      },
+      {
+        "__guid": "819244bb-9893-5747-95dd-607837ae3b8c",
+        "Name": "Main Rotor Mount",
+        "Enabled": true,
+        "NetworkMode": 0,
+        "Components": [],
+        "Children": [
+          {
+            "__guid": "c85b1241-d986-525b-8743-11bde171e826",
+            "Name": "Main Rotor",
+            "Enabled": true,
+            "NetworkMode": 0,
+            "Components": [
+              {
+                "__type": "Facepunch.ReconRotor",
+                "__guid": "de2a1de5-f4b4-57b9-86f4-0fdfe1a33f2d",
+                "__enabled": true,
+                "Spin": 1,
+                "RpmScale": 1.0,
+                "ShaderScale": 3.473684210526316,
+                "Yoke": false,
+                "Hub": {
+                  "_type": "component",
+                  "component_id": "01f063c8-5034-53b5-bf47-01453eeae4d1",
+                  "go": "c5c691e0-8756-5c07-8ed2-bb504f73b2a4",
+                  "component_type": "ModelRenderer"
+                },
+                "Blades": {
+                  "_type": "component",
+                  "component_id": "7839e963-78d0-5cbb-80f5-545ba97726d3",
+                  "go": "f243fd4e-33d8-584a-bdcc-e79cc4af2dec",
+                  "component_type": "ModelRenderer"
+                },
+                "Disc": {
+                  "_type": "component",
+                  "component_id": "4a718830-b787-56dc-a4b9-b4c14a8911b7",
+                  "go": "d89e123b-69db-55b6-a7f7-6f1ddc3febe1",
+                  "component_type": "ModelRenderer"
+                }
+              }
+            ],
+            "Children": [
+              {
+                "__guid": "c5c691e0-8756-5c07-8ed2-bb504f73b2a4",
+                "Name": "Main Rotor Hub",
+                "Enabled": true,
+                "NetworkMode": 0,
+                "Components": [
+                  {
+                    "__type": "Sandbox.ModelRenderer",
+                    "__guid": "01f063c8-5034-53b5-bf47-01453eeae4d1",
+                    "__enabled": true,
+                    "Model": "models/recon_nano/recon_nano_hub_main.vmdl",
+                    "Tint": "1,1,1,1",
+                    "RenderType": "On",
+                    "UseAnimGraph": false,
+                    "RenderOptions": {
+                      "GameLayer": true,
+                      "OverlayLayer": false
+                    }
+                  }
+                ],
+                "Children": []
+              },
+              {
+                "__guid": "f243fd4e-33d8-584a-bdcc-e79cc4af2dec",
+                "Name": "Main Rotor Blades",
+                "Enabled": true,
+                "NetworkMode": 0,
+                "Components": [
+                  {
+                    "__type": "Sandbox.ModelRenderer",
+                    "__guid": "7839e963-78d0-5cbb-80f5-545ba97726d3",
+                    "__enabled": true,
+                    "Model": "models/recon_nano/recon_nano_prop_main.vmdl",
+                    "Tint": "1,1,1,1",
+                    "RenderType": "On",
+                    "UseAnimGraph": false,
+                    "RenderOptions": {
+                      "GameLayer": true,
+                      "OverlayLayer": false
+                    }
+                  }
+                ],
+                "Children": []
+              },
+              {
+                "__guid": "d89e123b-69db-55b6-a7f7-6f1ddc3febe1",
+                "Name": "Main Rotor Disc",
+                "Enabled": true,
+                "NetworkMode": 0,
+                "Components": [
+                  {
+                    "__type": "Sandbox.ModelRenderer",
+                    "__guid": "4a718830-b787-56dc-a4b9-b4c14a8911b7",
+                    "__enabled": false,
+                    "Model": "models/recon_nano/recon_nano_disc_main.vmdl",
+                    "Tint": "1,1,1,1",
+                    "RenderType": "Off",
+                    "UseAnimGraph": false,
+                    "RenderOptions": {
+                      "GameLayer": true,
+                      "OverlayLayer": false
+                    }
+                  }
+                ],
+                "Children": []
+              }
+            ]
+          }
+        ],
+        "Position": "-0.47244,0,1.77165",
+        "Rotation": "0,0,0,1"
+      },
+      {
+        "__guid": "3a717a59-29cf-5418-9aae-fd94caab21d2",
+        "Name": "Tail Rotor Mount",
+        "Enabled": true,
+        "NetworkMode": 0,
+        "Components": [],
+        "Children": [
+          {
+            "__guid": "2f909fec-e63b-569c-af7e-329318e8f58a",
+            "Name": "Tail Rotor",
+            "Enabled": true,
+            "NetworkMode": 0,
+            "Components": [
+              {
+                "__type": "Facepunch.ReconRotor",
+                "__guid": "5b54a51e-10bf-598b-822f-64dfca653e19",
+                "__enabled": true,
+                "Spin": 1,
+                "RpmScale": 4.2,
+                "ShaderScale": 18.333333333333336,
+                "Yoke": false,
+                "Hub": {
+                  "_type": "component",
+                  "component_id": "6941e53a-3b4c-5b5c-b06c-0f36104117b3",
+                  "go": "78aaaf02-f0a8-5ada-8d04-ccecd0b24d66",
+                  "component_type": "ModelRenderer"
+                },
+                "Blades": {
+                  "_type": "component",
+                  "component_id": "1cd0178d-9616-511e-b72f-60137a9090ae",
+                  "go": "5e64adf4-bcda-532d-891e-a73939976be6",
+                  "component_type": "ModelRenderer"
+                },
+                "Disc": {
+                  "_type": "component",
+                  "component_id": "7e67932b-1b34-5e77-a09b-5dcff5823473",
+                  "go": "0f251123-c19b-5d5e-8322-60c15ee2c145",
+                  "component_type": "ModelRenderer"
+                }
+              }
+            ],
+            "Children": [
+              {
+                "__guid": "78aaaf02-f0a8-5ada-8d04-ccecd0b24d66",
+                "Name": "Tail Rotor Hub",
+                "Enabled": true,
+                "NetworkMode": 0,
+                "Components": [
+                  {
+                    "__type": "Sandbox.ModelRenderer",
+                    "__guid": "6941e53a-3b4c-5b5c-b06c-0f36104117b3",
+                    "__enabled": true,
+                    "Model": "models/recon_nano/recon_nano_hub_tail.vmdl",
+                    "Tint": "1,1,1,1",
+                    "RenderType": "On",
+                    "UseAnimGraph": false,
+                    "RenderOptions": {
+                      "GameLayer": true,
+                      "OverlayLayer": false
+                    }
+                  }
+                ],
+                "Children": []
+              },
+              {
+                "__guid": "5e64adf4-bcda-532d-891e-a73939976be6",
+                "Name": "Tail Rotor Blades",
+                "Enabled": true,
+                "NetworkMode": 0,
+                "Components": [
+                  {
+                    "__type": "Sandbox.ModelRenderer",
+                    "__guid": "1cd0178d-9616-511e-b72f-60137a9090ae",
+                    "__enabled": true,
+                    "Model": "models/recon_nano/recon_nano_prop_tail.vmdl",
+                    "Tint": "1,1,1,1",
+                    "RenderType": "On",
+                    "UseAnimGraph": false,
+                    "RenderOptions": {
+                      "GameLayer": true,
+                      "OverlayLayer": false
+                    }
+                  }
+                ],
+                "Children": []
+              },
+              {
+                "__guid": "0f251123-c19b-5d5e-8322-60c15ee2c145",
+                "Name": "Tail Rotor Disc",
+                "Enabled": true,
+                "NetworkMode": 0,
+                "Components": [
+                  {
+                    "__type": "Sandbox.ModelRenderer",
+                    "__guid": "7e67932b-1b34-5e77-a09b-5dcff5823473",
+                    "__enabled": false,
+                    "Model": "models/recon_nano/recon_nano_disc_tail.vmdl",
+                    "Tint": "1,1,1,1",
+                    "RenderType": "Off",
+                    "UseAnimGraph": false,
+                    "RenderOptions": {
+                      "GameLayer": true,
+                      "OverlayLayer": false
+                    }
+                  }
+                ],
+                "Children": []
+              }
+            ]
+          }
+        ],
+        "Position": "-7.12598,-0.23622,1.14173",
+        "Rotation": "0.707107,0,0,0.707107"
+      }
+    ],
+    "NetworkInterpolation": true,
+    "Tags": "recon_nano"
+  },
+  "ResourceVersion": 2,
+  "__references": [],
+  "__version": 2
+}

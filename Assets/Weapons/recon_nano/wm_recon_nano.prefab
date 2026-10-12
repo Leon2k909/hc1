@@ -1,0 +1,54 @@
+{
+  "RootObject": {
+    "__guid": "6ae9a302-dca6-56a9-b9bc-8a9aa006a752",
+    "Name": "Nano Drone World Model",
+    "Enabled": true,
+    "NetworkMode": 0,
+    "Components": [
+      {
+        "__type": "Sandbox.SkinnedModelRenderer",
+        "__guid": "9b3eb2ca-9afc-56eb-9282-cdb115073d07",
+        "__enabled": true,
+        "Model": "models/recon_octocopter/recon_tablet.vmdl",
+        "Tint": "1,1,1,1",
+        "RenderType": "On",
+        "RenderOptions": {
+          "GameLayer": true,
+          "OverlayLayer": false
+        },
+        "UseAnimGraph": false
+      },
+      {
+        "__type": "Facepunch.WorldModel",
+        "__guid": "ecf40b09-72a1-5e7d-988e-f195f39d9972",
+        "__enabled": true,
+        "ModelRenderer": {
+          "_type": "component",
+          "component_id": "9b3eb2ca-9afc-56eb-9282-cdb115073d07",
+          "go": "6ae9a302-dca6-56a9-b9bc-8a9aa006a752",
+          "component_type": "SkinnedModelRenderer"
+        },
+        "IkLeftHand": {
+          "_type": "gameobject",
+          "go": "d645e06c-fc80-5bcb-b4da-37bde93a478a"
+        }
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "d645e06c-fc80-5bcb-b4da-37bde93a478a",
+        "Name": "Left hand grip",
+        "Enabled": true,
+        "NetworkMode": 0,
+        "Components": [],
+        "Children": [],
+        "Position": "1.024,6.85,-0.433"
+      }
+    ],
+    "Position": "-0.6703,6.85,0.887",
+    "Rotation": "0,0.2588,0,0.9659"
+  },
+  "ResourceVersion": 2,
+  "__references": [],
+  "__version": 2
+}

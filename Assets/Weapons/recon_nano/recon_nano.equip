@@ -1,0 +1,28 @@
+{
+  "Name": "Nano Drone",
+  "Description": "Hand-launch a quiet scout and fly it from the recon tablet. Marks visible enemies for your team.",
+  "Slot": "Tactical",
+  "Category": "None",
+  "Team": "Unassigned",
+  "CanOtherTeamPickUp": false,
+  "DropOnDisconnect": false,
+  "Icon": "ui/weapons/recon_nano.svg",
+  "IsPurchasable": true,
+  "Price": 500,
+  "KillReward": 0,
+  "WorldModel": "models/recon_octocopter/recon_tablet.vmdl",
+  "MainPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/recon_nano/weapon_recon_nano.prefab"
+  },
+  "ViewModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/recon_nano/vm_recon_nano.prefab"
+  },
+  "WorldModelPrefab": {
+    "_type": "gameobject",
+    "prefab": "weapons/recon_nano/wm_recon_nano.prefab"
+  },
+  "__version": 0,
+  "__references": []
+}

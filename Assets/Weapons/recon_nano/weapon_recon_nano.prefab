@@ -1,0 +1,53 @@
+{
+  "RootObject": {
+    "__guid": "f6d339c6-9fe9-5bd5-af9f-9af5d0b5bbf1",
+    "Name": "Nano Drone Equipment",
+    "Enabled": true,
+    "NetworkMode": 0,
+    "Components": [
+      {
+        "__type": "Facepunch.Equipment",
+        "__guid": "d1b8e67d-512f-517e-a2ba-3c6856da0bb2",
+        "__enabled": true,
+        "Resource": "weapons/recon_nano/recon_nano.equip",
+        "HoldType": "HoldItem",
+        "Handedness": "Right",
+        "UseCrosshair": false,
+        "DeploySound": "sounds/guns/handling/draw_grenade.sound"
+      },
+      {
+        "__type": "Facepunch.TagBinder",
+        "__guid": "6df56d0a-7cd0-5342-9eca-9ab318b76325",
+        "__enabled": true
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "854182b0-0625-58fc-9e13-e671feffc121",
+        "Name": "Ground Station Link",
+        "Enabled": true,
+        "NetworkMode": 0,
+        "Components": [
+          {
+            "__type": "Facepunch.ReconTabletLink",
+            "__guid": "69319ee8-935a-5a67-94f0-04f194a66f54",
+            "__enabled": true,
+            "InputActions": [
+              "Attack1"
+            ],
+            "HandLaunch": true,
+            "LaunchDistance": 32,
+            "Prefab": {
+              "_type": "gameobject",
+              "prefab": "weapons/recon_nano/recon_nano_airborne.prefab"
+            }
+          }
+        ],
+        "Children": []
+      }
+    ]
+  },
+  "ResourceVersion": 2,
+  "__references": [],
+  "__version": 2
+}
