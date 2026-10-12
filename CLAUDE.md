@@ -3339,6 +3339,12 @@ simulate_input.
     footbridge. Two level-luffing cranes stand on each quay, with a 200-high portal you can walk under. Bomb site B is on
     the east quay, among the cargo under a crane.
   - A cross street each side runs from the north street to the quay, past the spawn square.
+  - The alley beside each quay shed (e ±1950..2200, n -1050..-600) is closed off from the quay by a yard wall
+    (`alley_wall`, `ALLEY_WALL`, 2026-10-12; the user: "you shouldnt be able to go this way"). It's 132 high, too high to
+    mantle, with a shut pair of gates, a granite coping and a player clip over it. The way from the spawn square to the
+    quay is the cross street. Not yet seen in-game.
+  - A shut door at a wall's foot has a stone threshold in its recess (`leaves_shut`). The recess had no floor, so a pale
+    strip of sky showed in front of the doors (the user's screenshots, 2026-10-12). Not yet seen in-game.
   - Six stairs go down into the Fleet: one from each warehouse ground bay, and a public one from each quay. Iron
     ladders on its walls are dressing only.
 - Modes:

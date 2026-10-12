@@ -441,7 +441,12 @@ def leaves_shut( m, wall, o, style ):
         slab( m, wall, o.r0 + 2, rc - 3, -8.0, -7.5, z - 1.5, z + 1.5, "iron_black" )
         slab( m, wall, rc + 3, o.r1 - 2, -8.0, -7.5, z - 1.5, z + 1.5, "iron_black" )
     slab( m, wall, o.r0 - 6, o.r1 + 6, 0.0, 1.4, o.z1, o.z1 + 10, style.band )
-    if o.z0 > 10:
+    if o.z0 <= wall.z[0] + 1e-6:
+        # At the wall's foot there's no wall under the opening, so the recess in front of the leaves had no floor and
+        # the sky showed through it. A stone threshold fills it, under the leaves and an inch over the street.
+        slab( m, wall, o.r0, o.r1, -10.0, -0.5, o.z0 - 4, o.z0 + 1, { "+z": style.stone, "default": None } )
+        slab( m, wall, o.r0 - 3, o.r1 + 3, -0.5, 3.0, o.z0 - 4, o.z0 + 1, style.stone )
+    elif o.z0 > 10:
         slab( m, wall, o.r0 - 3, o.r1 + 3, -0.5, 3.0, o.z0 - 4, o.z0, style.stone )
 
 
@@ -1094,6 +1099,27 @@ def pavement( m, e0, e1, n0, n1, kerbs ):
     m.box( ( e0, n0, -6 ), ( e1, n1, 5 ), { "+z": "rw_paving", "default": None, **{ k: "ashlar_grey" for k in kerbs } }, STONE )
 
 
+ALLEY_WALL = ( QUAY_SHED[1], SQUARE[1], -1050.0, -1050.0 + T, 132.0 )   # e0, e1, n0, n1, height
+
+
+def alley_wall( m, style ):
+    """ The brick wall across the alley's quay end, between the quay shed and the block east of the alley, with a shut
+    pair of gates, a granite plinth on both faces and a granite coping. One collision box: the gate has none of its own. """
+    e0, e1, n0, n1, height = ALLEY_WALL
+    gate = ( ( e0 + e1 ) / 2, 100.0, 0.0, 112.0 )
+    wall = Wall( "e", ( e0, e1 ), ( n0, n1 ), ( 0.0, height ), "-n" )
+    wall.add( *gate, kind="shut" )
+    wall.build( m, style.brick, style.brick, style.brick, None, None )
+    dress( m, wall, style )
+    courses( m, wall, style, () )
+    inner = Wall( "e", ( e0, e1 ), ( n0, n1 ), ( 0.0, height ), "+n" )
+    inner.add( *gate, kind="shut" )
+    courses( m, inner, style, () )
+    m.box( ( e0, n0 - 2, height ), ( e1, n1 + 2, height + 6 ), { "+z": style.stone, "-n": style.stone, "+n": style.stone,
+                                                                 "-z": style.stone, "default": None } )
+    m.collision_box( ( e0, n0, -10.0 ), ( e1, n1, height + 6 ), STONE )
+
+
 def half():
     """ The east half (the west is its mirror): everything east of the Fleet's wall. """
     m, glass = Model(), Model()
@@ -1167,6 +1193,9 @@ def half():
                     doors=( bays_along( -1050.0, SQUARE[3] )[1], bays_along( -1050.0, SQUARE[3] )[10] ),
                     levels=( 200.0, 350.0, 500.0, 650.0 ) ),
     }, style, roof_along="n" )
+    # The alley beside the quay shed is closed from the quay by a yard wall with a shut gate: the way from the spawn
+    # square to the quay is the cross street. Too high to mantle, and a player clip over it stops a boost.
+    alley_wall( m, style )
     north_row( m, style )
     # Closing the street's and the quay's views east of the play.
     block( m, EDGE_E, EDGE_E + 300, STREET_N[0] - 60, STREET_N[1] + 60, 700.0, {
@@ -2034,6 +2063,8 @@ def write_scene( written, light_list, props ):
         for name, ( n0_, n1_ ) in ( ( "Street", STREET_N ), ( "Quay", ( QUAY_N, -1050.0 ) ) ):
             a, b = sorted( ( s * PLAY[1], s * ( PLAY[1] + 12 ) ) )
             clips.append( ( f"{side} {name} End", ( a, b, n0_, n1_, -10, 1600 ) ) )
+        a, b = sorted( ( s * ALLEY_WALL[0], s * ALLEY_WALL[1] ) )
+        clips.append( ( f"{side} Alley Wall", ( a, b, ALLEY_WALL[2], ALLEY_WALL[3], -10, 1600 ) ) )
     clip_objects = []
     for name, box in clips:
         centre, scale = plan_box( *box )
