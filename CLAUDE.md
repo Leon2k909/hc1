@@ -3363,6 +3363,17 @@ simulate_input.
     quay is the cross street. Not yet seen in-game.
   - A shut door at a wall's foot has a stone threshold in its recess (`leaves_shut`). The recess had no floor, so a pale
     strip of sky showed in front of the doors (the user's screenshots, 2026-10-12). Not yet seen in-game.
+  - The granite plinth, the glazed brick bands at each floor and the cornice turn round a building's outside corners
+    (2026-10-12; the user's screenshot of the plinth stopping short of one: "this looks weird").
+    - A building's side walls (±e) run between its end walls (±n). Their mouldings stopped at the end walls' backs, 20
+      short of the corner, so bare brick and the plinth's cut end showed there.
+    - Now a side wall's plinth, bands and cornice band carry on past its run by the wall's thickness plus their own
+      depth, filling the corner square (`corner_reach`).
+    - The coping meets the end wall's, where it overlapped it on one side and left a notch on the other.
+    - `block` works out a building's corners from the fronts it draws (`corners`), and `speicher` passes the
+      warehouses' own.
+    - Only `lowtide_east` and `lowtide_west` were rebuilt (876 vertices moved in each; collision unchanged). Not yet
+      seen in-game.
   - Six stairs go down into the Fleet: one from each warehouse ground bay, and a public one from each quay. Iron
     ladders on its walls are dressing only.
 - Modes:

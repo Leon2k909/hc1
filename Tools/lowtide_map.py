@@ -463,16 +463,27 @@ def dress( m, wall, style, glass=None ):
             leaves_shut( m, wall, o, style )
 
 
-def courses( m, wall, style, levels, skip=() ):
+def corner_reach( corners, depth ):
+    """ How far past each end of its run a moulding depth proud of the wall goes, so it turns the building's outside
+    corners. corners holds, for each end, None where there's no corner, else how far short of the corner the run stops:
+    T where it runs inside the end front's thickness (a side front), 0 where it reaches the corner (an end front). The
+    side front carries the moulding round, out to the end front's own projection; the end front stops at the corner, so
+    nothing is drawn twice. """
+    return tuple( gap + depth if gap is not None and gap > 0 else 0.0 for gap in corners )
+
+
+def courses( m, wall, style, levels, skip=(), corners=( None, None ) ):
     """ The glazed brick bands at each floor line, along the whole wall, and a granite plinth at its foot between its
-    doorways. """
+    doorways, both turning the outside corners (corner_reach). """
     r0, r1 = wall.run
+    lo, hi = corner_reach( corners, 2.0 )
     for z in levels:
-        slab( m, wall, r0, r1, 0.0, 2.0, z - 11, z - 2, style.band )
+        slab( m, wall, r0 - lo, r1 + hi, 0.0, 2.0, z - 11, z - 2, style.band )
     if "plinth" not in skip:
+        lo, hi = corner_reach( corners, 2.5 )
         edges = sorted( [ ( o.r0, o.r1 ) for o in wall.openings if o.z0 <= 1 ] )
-        at = r0
-        for a, b in edges + [ ( r1, r1 ) ]:
+        at = r0 - lo
+        for a, b in edges + [ ( r1 + hi, r1 + hi ) ]:
             if a > at + 1:
                 slab( m, wall, at, a, 0.0, 2.5, 0.0, 44.0, style.stone )
             at = max( at, b )
@@ -484,15 +495,19 @@ def pilasters( m, wall, style, at, z0, z1, width=20.0 ):
         slab( m, wall, r - width / 2 - 2, r + width / 2 + 2, 0.0, 5.5, z1 - 6, z1, style.band )
 
 
-def cornice( m, wall, style, eaves ):
-    """ The eaves: a corbel frieze, a projecting band, and the parapet's granite coping (the wall rises to eaves + 40). """
+def cornice( m, wall, style, eaves, corners=( None, None ) ):
+    """ The eaves: a corbel frieze, a projecting band, and the parapet's granite coping (the wall rises to eaves + 40).
+    The band turns the outside corners like the courses (corner_reach). The coping is the other way round: at a corner
+    the end front's coping runs out over the side front's projection, and the side front's starts behind it. """
     r0, r1 = wall.run
     r = r0 + 10
     while r < r1 - 6:
         slab( m, wall, r - 3, r + 3, 0.0, 5.0, eaves - 36, eaves - 22, style.band )
         r += 16
-    slab( m, wall, r0, r1, 0.0, 7.0, eaves - 22, eaves - 12, style.band )
-    slab( m, wall, r0 - 2, r1 + 2, -wall_thick( wall ) - 2, 4.0, eaves + 40, eaves + 46, style.stone )
+    lo, hi = corner_reach( corners, 7.0 )
+    slab( m, wall, r0 - lo, r1 + hi, 0.0, 7.0, eaves - 22, eaves - 12, style.band )
+    cap = [ 2.0 if gap is None else ( -2.0 if gap > 0 else 4.0 ) for gap in corners ]
+    slab( m, wall, r0 - cap[0], r1 + cap[1], -wall_thick( wall ) - 2, 4.0, eaves + 40, eaves + 46, style.stone )
 
 
 def wall_thick( wall ):
@@ -695,11 +710,14 @@ def speicher( m, glass, style ):
         dress( m, wall, style )
         lo, hi = wall.lo_hi( *wall.run, *wall.across, *wall.z )
         m.collision_box( lo, hi, STONE )
+    # The long walls run inside the end walls, so their mouldings carry round the four corners (corner_reach).
     for wall, bays in ( ( west, FLEET_BAYS ), ( east, FLEET_BAYS ), ( north, END_BAYS ), ( south, END_BAYS ) ):
-        courses( m, wall, style, ( FLOOR1, ), skip=() if wall is not west else ( "plinth", ) )
+        corners = ( T, T ) if wall.axis == "n" else ( 0.0, 0.0 )
+        courses( m, wall, style, ( FLOOR1, ), skip=() if wall is not west else ( "plinth", ), corners=corners )
     for name, wall in up.items():
-        courses( m, wall, style, LEVELS[1:], skip=( "plinth", ) )
-        cornice( m, wall, style, EAVES )
+        corners = ( T, T ) if wall.axis == "n" else ( 0.0, 0.0 )
+        courses( m, wall, style, LEVELS[1:], skip=( "plinth", ), corners=corners )
+        cornice( m, wall, style, EAVES, corners=corners )
     # Pilasters every third bay up the long fronts over the open storeys (whose bays' leaves fold back where they'd
     # stand), and up the ends from the plinth.
     for name in ( "west", "east" ):
@@ -1012,10 +1030,11 @@ BLOCK_LEVELS = ( 200.0, 350.0, 500.0, 650.0 )
 
 
 def facade( m, wall, style, eaves, bays, levels=BLOCK_LEVELS, columns=(), doors=(), gable=None, gable_steps=5,
-            pilaster_every=3, base=0.0, end=True, door_w=64.0, door_h=132.0 ):
+            pilaster_every=3, base=0.0, end=True, door_w=64.0, door_h=132.0, corners=( None, None ) ):
     """ A blind front (nobody goes in): shut doors and dark windows on the ground storey, windows up the storeys from
     levels, loading columns (shut doors to the top storey, an oriel over that), string courses, pilasters, the
-    cornice, and a stepped gable over gable ( r0, r1 ). The wall itself is drawn only: its block has a box. """
+    cornice, and a stepped gable over gable ( r0, r1 ). The wall itself is drawn only: its block has a box. corners
+    are its ends' outside corners (corner_reach). """
     for r in bays:
         if r in columns:
             wall.add( r, 90.0, base, base + 150.0, "shut" )
@@ -1026,8 +1045,8 @@ def facade( m, wall, style, eaves, bays, levels=BLOCK_LEVELS, columns=(), doors=
     upper_storeys( wall, bays, levels, columns=columns )
     wall.build( m, style.brick, None, style.brick, style.brick if end else None, None )
     dress( m, wall, style )
-    courses( m, wall, style, levels )
-    cornice( m, wall, style, eaves )
+    courses( m, wall, style, levels, corners=corners )
+    cornice( m, wall, style, eaves, corners=corners )
     if pilaster_every and len( bays ) > 1:
         pitch = bays[1] - bays[0]
         for k in range( pilaster_every, len( bays ), pilaster_every ):
@@ -1050,20 +1069,35 @@ def block( m, e0, e1, n0, n1, eaves, faces, style, z0=0.0, roof_along="n" ):
     """ A block nobody goes into: one collision box, its fronts on the faces listed ( face: dict of facade()'s
     arguments, with 'run' to draw only part of it ), and a roof. """
     m.collision_box( ( e0, n0, z0 - 10 ), ( e1, n1, eaves + 40 ), STONE )
+    # Each front's run. The side fronts (+-e) run inside the end fronts' thickness where there are any, so the corners
+    # aren't drawn twice.
+    ends = any( f in faces for f in ( "+n", "-n" ) )
+    runs = { face: tuple( kw.get( "run", ( e0, e1 ) if face in ( "+n", "-n" ) else ( n0 + T, n1 - T ) if ends else ( n0, n1 ) ) )
+             for face, kw in faces.items() }
+
+    def meet( end_face, side_face ):
+        """ Whether an end front and a side front both reach the corner between them. """
+        if end_face not in runs or side_face not in runs:
+            return False
+        e_end = runs[end_face][0 if side_face == "-e" else 1]
+        n_side = runs[side_face][0 if end_face == "-n" else 1]
+        return abs( e_end - ( e0 if side_face == "-e" else e1 ) ) < 0.01 and \
+            abs( n_side - ( n0 + T if end_face == "-n" else n1 - T ) ) < 0.01
+
     for face, kw in faces.items():
         kw = dict( kw )
+        kw.pop( "run", None )
+        run = runs[face]
         if face in ( "+n", "-n" ):
-            run = kw.pop( "run", ( e0, e1 ) )
             across = ( n1 - T, n1 ) if face == "+n" else ( n0, n0 + T )
             wall = Wall( "e", run, across, ( z0, eaves + 40 ), face )
+            corners = tuple( 0.0 if meet( face, side ) else None for side in ( "-e", "+e" ) )
         else:
-            # Inside the end fronts' thickness where there are any, so the corners aren't drawn twice.
-            ends = any( f in faces for f in ( "+n", "-n" ) )
-            run = kw.pop( "run", ( n0 + T, n1 - T ) if ends else ( n0, n1 ) )
             across = ( e1 - T, e1 ) if face == "+e" else ( e0, e0 + T )
             wall = Wall( "n", run, across, ( z0, eaves + 40 ), face )
+            corners = tuple( T if meet( end, face ) else None for end in ( "-n", "+n" ) )
         bays = kw.pop( "bays", None ) or bays_along( *run )
-        facade( m, wall, style, eaves, bays, **kw )
+        facade( m, wall, style, eaves, bays, corners=corners, **kw )
     return roof( m, e0, e1, n0, n1, eaves + 40, along=roof_along, pitch=0.75 )
 
 
