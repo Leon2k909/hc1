@@ -2967,6 +2967,10 @@ simulate_input.
     `railhead_render.py`, with the tank glass as tinted water and no fish). Not yet seen in the engine.
 - `map_kit.write_text` retries the final rename for up to 10 s: the editor or OneDrive can hold a file being replaced.
 - Doorways have no doors, since bots can't open doors. The lobby's glass entrance doors are shut for good (above).
+- The Rotunda's curved stairs (`round_stair`) had both side faces pointing into the steps, so the near side was
+  culled. The user saw the alcove tank through the stair (2026-10-12). Now the inner side faces the centre and the
+  outer side away from it. A check of every face's normal against the steps' solid found 0 of 210 facing in (104
+  before). Not yet seen in-game.
 - `map_kit.write_obj` now reads `tile_overrides` before `BT.tile_units`. Before, `dict.get`'s default called
   `tile_units` even for an overridden paint, which fails for paints `building_textures` doesn't know.
 - Never let the editor compile a vmdl whose OBJ has no faces: it hangs for good, with one thread at 100% and nothing

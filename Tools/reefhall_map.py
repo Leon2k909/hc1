@@ -979,9 +979,10 @@ def round_stair( model, r0, r1, a_foot, a_top, z0, z1, tread="rh_floor", side="r
         down = polar( a - sign * 90, 1.0 )
         pa0, pa1 = polar( a, r0 ), polar( a, r1 )
         facing( model, side, [ ( *pa0, top - rise ), ( *pa1, top - rise ), ( *pa1, top ), ( *pa0, top ) ], ( *down, 0 ) )
+        # The sides face out of the step: the inner one towards the centre, the outer one away from it.
         lo_a, hi_a = min( a, b ), max( a, b )
-        drum( model, side, r0, lo_a, hi_a, z0, top, inward=False, steps=1, smooth=False )
-        drum( model, side, r1, lo_a, hi_a, z0, top, inward=True, steps=1, smooth=False )
+        drum( model, side, r0, lo_a, hi_a, z0, top, inward=True, steps=1, smooth=False )
+        drum( model, side, r1, lo_a, hi_a, z0, top, inward=False, steps=1, smooth=False )
         if nosing:
             na = a + ( b - a ) * 0.1
             facing( model, nosing, [ ( *polar( a, r0 ), top + 0.15 ), ( *polar( na, r0 ), top + 0.15 ),
