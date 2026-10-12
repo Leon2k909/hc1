@@ -1408,6 +1408,10 @@ public sealed partial class LightweightBotManager : SingletonComponent<Lightweig
 			.Select( x => x.WorldPosition )
 			.Concat( Bots.Where( x => x.IsValid() && x.IsAlive ).Select( x => x.WorldPosition ) )
 			.ToArray();
+
+		if ( !IsRoundMode && TryGetUncampedSpawn( team, spawnPoints, standing, out var uncamped ) )
+			return uncamped;
+
 		var candidates = spawnPoints
 			.OrderBy( x => standing.Any( p => p.Distance( x.Position ) < OccupiedSpawnRadius ) )
 			.ThenByDescending( x => GetSpawnScore( x.Position ) )
@@ -1421,6 +1425,230 @@ public sealed partial class LightweightBotManager : SingletonComponent<Lightweig
 		var spawn = Random.Shared.FromArray( candidates, spawnPoints[0] );
 		return spawn.Transform.WithScale( 1f );
 	}
+
+	/// <summary> A living enemy within this of a spawn (~30 m) is camping it, seen or not. </summary>
+	private const float CampedRadius = 1200f;
+
+	/// <summary> A living enemy who can see a spawn from within this (~76 m) is watching it. </summary>
+	private const float WatchedRange = 3000f;
+
+	/// <summary> Spawns within this of the enemy team's own spawns (~25 m) count against a flip: they respawn there. </summary>
+	private const float EnemySpawnRadius = 1000f;
+
+	/// <summary>
+	/// Round modes place everyone at the round's start, at that round's spawns (<see cref="BotFillRule"/>, Skirmish's
+	/// own rounds), so the spawns aren't camped and mustn't move.
+	/// </summary>
+	private static bool IsRoundMode => GameMode.Instance?.Ident is "defuse" or "retakes" or "gunfight_1v1" or "gunfight_2v2";
+
+	/// <summary>
+	/// The team's spawns, kept from an enemy camping them: one no living enemy is near (<see cref="CampedRadius"/>) or
+	/// can see (<see cref="WatchedRange"/>). When every one of them is camped, the team's spawn flips, as in CoD: the
+	/// bot comes in somewhere else on the map (<see cref="TryGetFlipSpawn"/>), away from the enemy and near its living
+	/// teammates. Before, a player standing over a team's spawns saw every respawn come in at them (Lowtide's squares).
+	/// False when no enemy is alive, so the usual pick stands.
+	/// </summary>
+	private bool TryGetUncampedSpawn( Team team, SpawnPointInfo[] spawnPoints, Vector3[] standing, out Transform transform )
+	{
+		transform = global::Transform.Zero;
+		var enemies = SpawnWatchers( team );
+		if ( enemies.Count == 0 )
+			return false;
+
+		var ranked = spawnPoints
+			.Where( x => !standing.Any( p => p.Distance( x.Position ) < OccupiedSpawnRadius ) )
+			.Where( x => IsOnMainNavMesh( x.Position ) )
+			.OrderByDescending( x => GetSpawnScore( x.Position ) )
+			.ToArray();
+		if ( ranked.Length == 0 )
+			return false;
+
+		var safe = new List<SpawnPointInfo>();
+		var leastDanger = float.MaxValue;
+		var leastDangerous = ranked[0];
+		foreach ( var spawn in ranked )
+		{
+			var danger = SpawnDanger( spawn.Position, enemies );
+			if ( danger <= 0f )
+			{
+				safe.Add( spawn );
+				if ( safe.Count >= 5 )
+					break;
+			}
+			else if ( danger < leastDanger )
+			{
+				leastDanger = danger;
+				leastDangerous = spawn;
+			}
+		}
+
+		if ( safe.Count > 0 )
+		{
+			transform = Random.Shared.FromArray( safe.ToArray() ).Transform.WithScale( 1f );
+			return true;
+		}
+
+		// Free-for-all already picks from every spawn on the map, so there's nowhere to flip to.
+		if ( team != Team.Unassigned && !GameUtils.IsFreeForAllMode
+			&& TryGetFlipSpawn( team, enemies, standing, leastDanger, out transform ) )
+			return true;
+
+		transform = leastDangerous.Transform.WithScale( 1f );
+		return true;
+	}
+
+	/// <summary>
+	/// Every spawn on the map a bot could come in at: this mode's, and the ones a <see cref="GameModeObject"/> left off
+	/// for other modes (on the scripted maps, the deathmatch spawns spread round the map). Not Retakes' spawns, which only
+	/// make sense at a bomb site's round, nor one a map switched off itself.
+	/// Scored by how far it is from the enemy, how near its living teammates (but not on top of them) and how far from
+	/// the enemy's own spawns, then by <see cref="SpawnDanger"/>. Only taken if it's less camped than the team's best.
+	/// </summary>
+	private bool TryGetFlipSpawn( Team team, IReadOnlyList<(Vector3 Eye, Vector3 Facing)> enemies, Vector3[] standing,
+		float ownDanger, out Transform transform )
+	{
+		transform = global::Transform.Zero;
+
+		var enemySpawns = Scene.GetAllComponents<TeamSpawnPoint>()
+			.Where( x => x.Team != team && x.Team != Team.Unassigned )
+			.Select( x => x.WorldPosition )
+			.ToArray();
+		var mates = GameUtils.PlayerPawns
+			.Where( x => x.IsValid() && x.HealthComponent.State == LifeState.Alive && !IsEnemy( team, x.Team ) )
+			.Select( x => x.WorldPosition )
+			.Concat( Bots.Where( x => x.IsValid() && x.IsAlive && !IsEnemy( team, x.Team ) ).Select( x => x.WorldPosition ) )
+			.ToArray();
+
+		var pool = new List<(Transform Transform, float Score)>();
+		foreach ( var spawn in Scene.Components.GetAll<TeamSpawnPoint>( FindMode.EverythingInSelfAndDescendants ) )
+		{
+			if ( !spawn.IsValid() || !spawn.Enabled || spawn.GameObject.Tags.Has( "retakes" ) )
+				continue;
+			if ( !spawn.GameObject.Active && !OffForAnotherMode( spawn.GameObject ) )
+				continue;
+
+			var position = spawn.WorldPosition;
+			if ( standing.Any( p => p.Distance( position ) < OccupiedSpawnRadius ) )
+				continue;
+
+			var mateDistance = mates.Select( p => p.Distance( position ) ).DefaultIfEmpty( float.MaxValue ).Min();
+			if ( mateDistance < MinSpawnDistanceFromTeammates )
+				continue;
+			if ( !IsOnMainNavMesh( position ) )
+				continue;
+
+			var enemyDistance = enemies.Select( x => x.Eye.Distance( position ) ).Min();
+			var score = MathF.Min( enemyDistance, 4000f )
+				+ MathF.Max( 0f, 1500f - mateDistance ) * 0.5f
+				- (enemySpawns.Any( p => p.Distance( position ) < EnemySpawnRadius ) ? 3000f : 0f);
+			pool.Add( (spawn.WorldTransform.WithScale( 1f ), score) );
+		}
+
+		// Traces are the cost, so the best by distance are looked at first, and the search stops at three safe ones.
+		var safe = new List<Transform>();
+		var best = (Transform: global::Transform.Zero, Danger: float.MaxValue);
+		foreach ( var (candidate, _) in pool.OrderByDescending( x => x.Score ).Take( 24 ) )
+		{
+			var danger = SpawnDanger( candidate.Position, enemies );
+			if ( danger <= 0f )
+			{
+				safe.Add( candidate );
+				if ( safe.Count >= 3 )
+					break;
+			}
+			else if ( danger < best.Danger )
+			{
+				best = (candidate, danger);
+			}
+		}
+
+		if ( safe.Count > 0 )
+		{
+			transform = Random.Shared.FromArray( safe.ToArray() );
+			return true;
+		}
+
+		if ( best.Danger >= ownDanger )
+			return false;
+
+		transform = best.Transform;
+		return true;
+	}
+
+	/// <summary>
+	/// Whether every switched-off object from here up is a mode's group (<see cref="GameModeObject"/>), which only says the
+	/// mode being played doesn't use it.
+	/// </summary>
+	private static bool OffForAnotherMode( GameObject gameObject )
+	{
+		for ( var current = gameObject; current.IsValid() && current is not Sandbox.Scene; current = current.Parent )
+		{
+			if ( !current.Enabled && current.Components.Get<GameModeObject>( FindMode.EverythingInSelf ) is null )
+				return false;
+		}
+
+		return true;
+	}
+
+	/// <summary> The living enemies' eyes and which way they're looking (a bot's aim). </summary>
+	private List<(Vector3 Eye, Vector3 Facing)> SpawnWatchers( Team team )
+	{
+		var watchers = new List<(Vector3 Eye, Vector3 Facing)>();
+		foreach ( var pawn in GameUtils.PlayerPawns )
+		{
+			if ( pawn.IsValid() && pawn.HealthComponent.State == LifeState.Alive && IsEnemy( team, pawn.Team ) )
+				watchers.Add( (pawn.EyePosition, pawn.EyeAngles.Forward) );
+		}
+
+		foreach ( var bot in Bots )
+		{
+			if ( bot.IsValid() && bot.IsAlive && IsEnemy( team, bot.Team ) )
+				watchers.Add( (bot.EyePosition, bot.AimDirection) );
+		}
+
+		return watchers;
+	}
+
+	/// <summary>
+	/// How camped a spawn is: 2-4 for each enemy within <see cref="CampedRadius"/> (more the closer), and 1 for each who
+	/// can see a body standing there from within <see cref="WatchedRange"/>, 2 if they're looking its way. 0 is safe.
+	/// </summary>
+	private float SpawnDanger( Vector3 position, IReadOnlyList<(Vector3 Eye, Vector3 Facing)> enemies )
+	{
+		var danger = 0f;
+		foreach ( var (eye, facing) in enemies )
+		{
+			var distance = eye.Distance( position );
+			if ( distance < CampedRadius )
+				danger += 2f + (1f - distance / CampedRadius) * 2f;
+
+			if ( distance > WatchedRange || !SeesSpawn( eye, position ) )
+				continue;
+
+			danger += 1f;
+			var flat = facing.WithZ( 0f );
+			if ( !flat.IsNearZeroLength && Vector3.GetAngle( flat, (position - eye).WithZ( 0f ) ) < 60f )
+				danger += 1f;
+		}
+
+		return danger;
+	}
+
+	/// <summary> Whether an eye here can see the chest or the head of someone standing at <paramref name="position"/>. </summary>
+	private bool SeesSpawn( Vector3 eye, Vector3 position )
+	{
+		foreach ( var height in SpawnSightHeights )
+		{
+			if ( !Scene.Trace.Ray( eye, position + Vector3.Up * height )
+				.WithoutTags( "player", "trigger", "playerclip", "movement", "ragdoll", BotTag, BreakableGlass.Tag )
+				.Run().Hit )
+				return true;
+		}
+
+		return false;
+	}
+
+	private static readonly float[] SpawnSightHeights = { 48f, 64f };
 
 	/// <summary>
 	/// Somewhere on the navmesh near the real players, so the fight comes to them: enemy bots around
