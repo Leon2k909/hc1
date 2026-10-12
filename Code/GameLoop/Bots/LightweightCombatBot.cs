@@ -1024,10 +1024,12 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 		if ( damageInfo.Damage > 0f && !burn && BloodEffect.IsValid() && !damageInfo.Flags.HasFlag( DamageFlags.Zone )
 			&& BotSystem.ShouldShowEffect( WorldPosition + Vector3.Up * 44f ) )
 		{
-			// Splash damage can report the blast origin, well outside the victim.
+			// Splash damage can report the blast origin, well outside the victim. A bullet's point is on the body, a leg's
+			// or a foot's as much as the chest's, so only a point outside the body moves to the chest.
 			var chest = WorldPosition + Vector3.Up * 44f;
 			var impact = damageInfo.Position;
-			if ( impact.DistanceSquared( chest ) > 32f * 32f )
+			var offset = impact - WorldPosition;
+			if ( offset.WithZ( 0f ).LengthSquared > 24f * 24f || offset.z < -4f || offset.z > 80f )
 				impact = chest;
 			var effectRotation = damageInfo.Force.IsNearZeroLength
 				? WorldRotation

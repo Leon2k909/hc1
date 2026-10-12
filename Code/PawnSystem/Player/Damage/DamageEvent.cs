@@ -255,25 +255,35 @@ public static class SceneTraceExtensions
 	/// <summary>
 	/// Where a bullet that reached this body really hit it. A box trace touches hitboxes the bullet's line only passed
 	/// near (the other leg), and a round goes through an arm held across the body and on into the chest. So this follows
-	/// the line through the body and takes the first vital hitbox on it, else the first limb. A near miss that only the
-	/// box touched keeps its hitbox.
+	/// the line through the body and takes the first vital hitbox on it, else the first limb.
+	/// <para>A near miss that the line takes past every hitbox keeps the body, but moves to where it came nearest: a box
+	/// trace's HitPosition, with Normal the body's surface there. The box's EndPosition is its centre on the bullet's
+	/// line, 7 units off the body (a zombie's capsule is 12 more), which put the blood and the impact beside it, in the
+	/// air.</para>
+	/// <para>A zombie is hit by its capsule, 16 round its middle, which stands well clear of its arms, legs and chest, so
+	/// the blood goes on its hitboxes too. A body without hitboxes takes the line's first hit on it.</para>
 	/// </summary>
 	public static SceneTraceResult ThroughBody( this SceneTraceResult tr, Scene scene )
 	{
 		var root = tr.GameObject?.Root;
-		if ( tr.Hitbox is null || root is null )
+		if ( root is null )
 			return tr;
 
-		var line = scene.Trace.Ray( tr.EndPosition - tr.Direction * 32f, tr.EndPosition + tr.Direction * 96f )
-			.UseHitboxes()
-			.WithoutTags( "trigger", "playerclip", "movement" )
-			.RunAll();
+		var start = tr.EndPosition - tr.Direction * 32f;
+		var end = tr.EndPosition + tr.Direction * 96f;
 
-		SceneTraceResult limb = default;
-		foreach ( var hit in line )
+		SceneTraceResult limb = default, shape = default;
+		foreach ( var hit in BodyTrace( scene, start, end ).RunAll() )
 		{
-			if ( !hit.Hit || hit.Hitbox is null || hit.GameObject?.Root != root )
+			if ( !hit.Hit || hit.GameObject?.Root != root )
 				continue;
+
+			if ( hit.Hitbox is null )
+			{
+				if ( !shape.Hit )
+					shape = hit;
+				continue;
+			}
 
 			var tags = hit.GetHitboxTags();
 			if ( (tags & Vitals) != 0 || (tags & Limbs) == 0 )
@@ -283,7 +293,41 @@ public static class SceneTraceExtensions
 				limb = hit;
 		}
 
-		return limb.Hit ? limb : tr;
+		if ( limb.Hit )
+			return limb;
+
+		// The box that found the body touched a hitbox: that's where it came nearest.
+		if ( tr.Hitbox is not null )
+			return AtContact( tr, tr ) ?? tr;
+
+		// It found a collider wider than the hitboxes (a zombie's capsule). A box the capsule's width finds the part of
+		// the body nearest the line; with no hitboxes, the line's own hit on the collider stands.
+		foreach ( var hit in BodyTrace( scene, start, end ).Size( 32f ).RunAll() )
+		{
+			if ( hit.Hit && !hit.StartedSolid && hit.Hitbox is not null && hit.GameObject?.Root == root )
+				return AtContact( hit, tr ) ?? (shape.Hit ? shape : tr);
+		}
+
+		return shape.Hit ? shape : AtContact( tr, tr ) ?? tr;
+	}
+
+	private static SceneTrace BodyTrace( Scene scene, Vector3 start, Vector3 end )
+	{
+		return scene.Trace.Ray( start, end ).UseHitboxes().WithoutTags( "trigger", "playerclip", "movement" );
+	}
+
+	/// <summary>
+	/// A box trace's hit moved to where the box touched the body. The contact must be within a box's reach of the
+	/// bullet's line (the M700's box is ±28, a zombie's capsule search ±16 more): anything further isn't one.
+	/// </summary>
+	private static SceneTraceResult? AtContact( SceneTraceResult hit, SceneTraceResult bullet )
+	{
+		var along = (hit.HitPosition - bullet.StartPosition).Dot( bullet.Direction );
+		if ( hit.HitPosition == default || along <= 0f
+			|| hit.HitPosition.DistanceSquared( bullet.StartPosition + bullet.Direction * along ) > 50f * 50f )
+			return null;
+
+		return hit with { EndPosition = hit.HitPosition };
 	}
 
 	public static HitboxTags GetHitboxTags( this Hitbox hitbox )

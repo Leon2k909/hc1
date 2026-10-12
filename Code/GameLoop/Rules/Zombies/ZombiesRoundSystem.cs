@@ -479,6 +479,12 @@ public sealed class ZombiesRoundSystem : Component
 				renderer.Tint = new Color( 0.45f, 0.6f, 0.35f );
 			}
 
+			// The capsule below stops bullets, but it stands well clear of the arms, legs and chest. A bullet's blood
+			// goes where it meets the driver's hitboxes, the body's own shape (SceneTraceExtensions.ThroughBody). Only traces
+			// that ask for hitboxes see them, so they don't change how zombies move or block.
+			var hitboxes = zombie.Components.Create<ModelHitboxes>();
+			hitboxes.Renderer = renderer;
+
 			var nav = zombie.Components.Create<NavMeshAgent>();
 			nav.Height = 72f;
 			nav.Radius = 16f;

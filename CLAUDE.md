@@ -3956,6 +3956,16 @@ simulate_input.
 - Checked in-game 2026-09-27 on Flatgrass: with the sights 3 units past a brick wall's edge, the old box hit the wall
   5 units away, and a real shot now lands 523 units away. Bots' near misses hit the same hitboxes as before. Not
   checked: a close shot straight into a wall, wallbangs, zombies and the M700.
+- Blood and flesh impacts go on the body (2026-10-12, the user: blood on bots "looks like its next to the npc").
+  - A near miss's impact went at the box's centre on the line (`EndPosition`), up to 7 units beside the body. Now
+    `SceneTraceExtensions.ThroughBody` moves it to where the box touched the body (`HitPosition`).
+  - Zombies are hit by their capsule (16 round their middle, well clear of the arms, legs and chest), so their impacts
+    were in the air. Code-built zombies now have `ModelHitboxes` on the driver (`SpawnZombie`): a hit on the capsule
+    takes the hitbox the line meets, else the nearest within a 32-unit box. The capsule still decides whether it's a
+    hit, and only traces that ask for hitboxes see them.
+  - A bot's blood moved any point over 32 from its chest to the chest, so leg and foot hits bled from the chest. Only
+    a point outside its body (24 round it, from its feet to 80 up) moves now.
+  - Compiled offline with dotnet, not yet seen in-game.
 
 ## Wallbangs (`Shootable.ResolvePenetration`, `Shootable.Penetration.cs`)
 - The user (2026-09-29): no wallbangs through brick or thick walls, where a real round couldn't go. Codex rewrote the

@@ -355,9 +355,9 @@ public partial class Shootable : WeaponInputAction,
 					_flybys[^1] = new Flyby( trace.EndPosition, true );
 
 				// The trace's box touches several of a body's hitboxes (both legs and the pelvis at once), but the bullet
-				// hits that body once, where its line goes.
+				// hits that body once, where its line goes, or where the box touched it on a near miss.
 				var tr = trace;
-				if ( tr.Hitbox is not null )
+				if ( IsBody( tr ) )
 				{
 					if ( !struck.Add( tr.GameObject.Root ) )
 						continue;
