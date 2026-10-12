@@ -612,7 +612,10 @@ A_BAY, S_BAY = 855.0, -55.0                        # the ground floor's loading 
 UPPER_BAYS = ( 595.0, 985.0 )                      # the mezzanine's, over the Fleet
 MEZZ_N = 380.0                                     # the mezzanine covers n 380..1130 (the north half)
 STAIR = ( 922.0, 978.0, 440.0, 733.0 )             # e0, e1, its foot's n, its top's n (up northwards)
-COLUMNS = [ ( e, n ) for e in ( 500.0, 740.0 ) for n in ( -120.0, 130.0, 380.0, 630.0, 880.0 ) ]
+COLUMNS = [ ( e, n ) for e in ( 500.0, 740.0 ) for n in ( -120.0, 130.0, 396.0, 630.0, 880.0 ) ]
+GIRDER_W = 8.0                                     # the timber girders' half-width (a 16-inch square balk)
+CEILING_GIRDER = ( CEILING - 28, CEILING - 12 )   # under the ceiling's joists
+MEZZ_GIRDER = ( FLOOR1 - 44, FLOOR1 - 28 )        # under the mezzanine's joists
 LANDING_W = 50.0                                   # the landings and stairs onto the Fleet stand out this far
 
 
@@ -727,12 +730,20 @@ def speicher( m, glass, style ):
         elif n < in1 - 20:
             m.box( ( ie0, n - 5, FLOOR1 - 28 ), ( STAIR[0], n + 5, FLOOR1 - 16 ), "lt_timber" )
     m.box( ( ie0, MEZZ_N - 4, FLOOR1 - 30 ), ( ie1, MEZZ_N + 4, FLOOR1 - 16 ), "lt_timber" )
+    # Each row of columns carries a timber girder under the joists, on a bolster over each column's cap. Under the
+    # mezzanine the girder runs from its edge beam, whose end stands free, to the north wall; the upper columns stand
+    # on the mezzanine's floor over the lower ones, and are a little slighter.
+    for e in sorted( { e for e, _ in COLUMNS } ):
+        girder( m, e, in0, in1, *CEILING_GIRDER, width=GIRDER_W )
+        girder( m, e, MEZZ_N - 4, in1, *MEZZ_GIRDER, width=GIRDER_W, south_end=FLOOR1 - 30 )
     for e, n in COLUMNS:
         if n >= MEZZ_N - 1:
-            iron_column( m, e, n, 0.0, FLOOR1 - 30 )
-            iron_column( m, e, n, FLOOR1, CEILING - 12 )
+            iron_column( m, e, n, 0.0, MEZZ_GIRDER[0] - 8 )
+            bolster( m, e, n, MEZZ_GIRDER[0] - 8, lo=MEZZ_N - 4, hi=in1, width=GIRDER_W )
+            iron_column( m, e, n, FLOOR1, CEILING_GIRDER[0] - 8, r0=5.2, r1=4.4 )
         else:
-            iron_column( m, e, n, 0.0, CEILING - 12 )
+            iron_column( m, e, n, 0.0, CEILING_GIRDER[0] - 8 )
+        bolster( m, e, n, CEILING_GIRDER[0] - 8, lo=in0, hi=in1, width=GIRDER_W )
     stairs( m, STAIR[0] + 2, STAIR[1] - 2, STAIR[3], STAIR[2], FLOOR1, 0.0, tread="planks_dark", riser="lt_timber",
             side="lt_timber", surface=WOOD )
     sloped_rail( m, ( STAIR[0] + 2, STAIR[2] + 12, 0.0 ), ( STAIR[0] + 2, STAIR[3], FLOOR1 ), surface=None )
@@ -744,13 +755,199 @@ def speicher( m, glass, style ):
         landing( m, r - 60, r + 60, way )
 
 
-def iron_column( m, e, n, z0, z1 ):
-    """ A cast-iron warehouse column: a round shaft on a square base, with a flared capital. """
-    m.box( ( e - 9, n - 9, z0 ), ( e + 9, n + 9, z0 + 10 ), "iron_black" )
-    m.cylinder( ( e, n ), 6.5, z0 + 10, z1 - 14, { "side": "iron_black", "top": None, "bottom": None }, sides=12 )
-    m.cylinder( ( e, n ), 9.0, z1 - 14, z1 - 6, { "side": "iron_black", "bottom": "iron_black", "top": None }, sides=12 )
-    m.box( ( e - 12, n - 12, z1 - 6 ), ( e + 12, n + 12, z1 ), "iron_black" )
-    m.collision_box( ( e - 9, n - 9, z0 ), ( e + 9, n + 9, z1 ), METAL )
+def iron_column( m, e, n, z0, zt, r0=6.0, r1=5.0 ):
+    """ A cast-iron warehouse column as the Speicherstadt's were cast, from its floor at z0 to its cap at zt, where a
+    timber bolster (bolster) takes the girder: a square foot plate with its edge chamfered, a moulded base (a torus,
+    a fillet, a cove and an astragal), a round shaft tapering from r0 to r1 with a little entasis, an astragal round
+    its neck, a bell capital flaring out to its lip, and a square cap plate, chamfered under, with its bolts' heads.
+    Turned smooth, every moulding sized to the shaft (drawn for a 6-inch shaft's radius). Its collision is boxes for
+    the plates and hulls round the rest. """
+    s = r0 / 6.0
+    plate, cap = 10.5 * s, 10.4 * s
+    height = zt - z0
+    m.box( ( e - plate, n - plate, z0 ), ( e + plate, n + plate, z0 + 3 * s ), { "-z": None, "+z": None, "default": "iron_black" } )
+    frustum( m, ( e, n ), z0 + 3 * s, z0 + 4 * s, plate, plate - 1.0 * s, "iron_black" )
+    base = arc_points( ( 7.9, 5.6 ), 1.6, -90.0, 90.0, 6 )                   # the torus, on the plate
+    base += [ ( 7.3, 7.2 ), ( 7.3, 7.7 ) ]                                  # a fillet
+    base += arc_points( ( 7.3, 8.7 ), 1.0, -90.0, -180.0, 3 )[1:]           # the cove
+    base += arc_points( ( 6.3, 9.5 ), 0.8, -90.0, 90.0, 4 )[1:]             # the astragal
+    profile = [ ( r * s, h * s ) for r, h in base ]
+    h_shaft, h_neck = 10.3 * s, height - 14.0 * s
+    for k in range( 5 ):
+        t = k / 4
+        profile.append( ( r0 - ( r0 - r1 ) * t ** 1.4, h_shaft + ( h_neck - h_shaft ) * t ) )
+    # The capital: the necking astragal, the neck, the bell to its lip, the lip.
+    profile.append( ( r1 + 0.3 * s, h_neck ) )
+    profile += arc_points( ( r1 + 0.3 * s, h_neck + 0.8 * s ), 0.8 * s, -90.0, 90.0, 4 )[1:]
+    profile += [ ( r1, h_neck + 1.6 * s ), ( r1, h_neck + 2.6 * s ) ]
+    for k in range( 1, 6 ):
+        t = k / 5
+        profile.append( ( r1 + 3.6 * s * t ** 2.2, h_neck + ( 2.6 + 6.0 * t ) * s ) )
+    profile += [ ( 9.2 * s, height - 5.4 * s ), ( 9.2 * s, height - 4.2 * s ) ]
+    lathe( m, ( e, n ), z0, profile, "iron_black" )
+    frustum( m, ( e, n ), zt - 4.2 * s, zt - 3.4 * s, cap - 0.8 * s, cap, "iron_black", top=False )
+    m.box( ( e - cap, n - cap, zt - 3.4 * s ), ( e + cap, n + cap, zt ), { "-z": None, "+z": None, "default": "iron_black" } )
+    for de in ( -1, 1 ):
+        for dn in ( -1, 1 ):
+            bolt_head( m, ( e + de * 3.5 * s, n + dn * 9.4 * s ), zt - 4.2 * s, 0.8 * s, 0.6 * s )
+    m.collision_box( ( e - plate, n - plate, z0 ), ( e + plate, n + plate, z0 + 4 * s ), METAL )
+    m.hull( ring( ( e, n ), 9.5 * s, z0 + 4 * s ) + ring( ( e, n ), 9.5 * s, z0 + 7.2 * s )
+            + ring( ( e, n ), 7.1 * s, z0 + h_shaft ), METAL )
+    m.hull( ring( ( e, n ), r0, z0 + h_shaft ) + ring( ( e, n ), r1, z0 + h_neck ), METAL )
+    m.hull( ring( ( e, n ), r1 + 1.1 * s, z0 + h_neck ) + ring( ( e, n ), 9.2 * s, zt - 5.4 * s )
+            + ring( ( e, n ), 9.2 * s, zt - 4.2 * s ), METAL )
+    m.collision_box( ( e - cap, n - cap, zt - 4.2 * s ), ( e + cap, n + cap, zt ), METAL )
+
+
+def ring( centre, r, z, sides=12 ):
+    """ Points round a level circle, for a hull. """
+    return [ ( centre[0] + r * math.cos( 2 * math.pi * k / sides ), centre[1] + r * math.sin( 2 * math.pi * k / sides ), z )
+             for k in range( sides ) ]
+
+
+def arc_points( centre, radius, a0, a1, steps ):
+    """ steps + 1 points along a circle in a profile's plane, from a0 to a1 degrees (0 along its x, 90 along its y). """
+    return [ ( centre[0] + radius * math.cos( math.radians( a0 + ( a1 - a0 ) * k / steps ) ),
+               centre[1] + radius * math.sin( math.radians( a0 + ( a1 - a0 ) * k / steps ) ) ) for k in range( steps + 1 ) ]
+
+
+def paint_tile( paint ):
+    return lt_tile( paint ) if paint.startswith( "lt_" ) else BT.tile_units( paint )
+
+
+def profile_normals( pts, closed=False, crease=40.0 ):
+    """ For a 2D outline with its material on the left of the way it runs, each edge's normals at its two ends: its
+    own outward normal ( dy, -dx ), shared with its neighbour's where the two turn by less than crease degrees (a
+    smooth curve), else its own (an arris). """
+    pts = [ np.asarray( p, float ) for p in pts ]
+    count = len( pts ) if closed else len( pts ) - 1
+    own = []
+    for k in range( count ):
+        d = pts[( k + 1 ) % len( pts )] - pts[k]
+        own.append( K.normalise( ( d[1], -d[0] ) ) )
+    limit = math.cos( math.radians( crease ) )
+
+    def shared( k, other ):
+        if other is None or np.dot( own[k], own[other] ) < limit:
+            return own[k]
+        return K.normalise( own[k] + own[other] )
+
+    ends = []
+    for k in range( count ):
+        before = ( k - 1 ) % count if closed or k > 0 else None
+        after = ( k + 1 ) % count if closed or k < count - 1 else None
+        ends.append( ( shared( k, before ), shared( k, after ) ) )
+    return ends
+
+
+def smooth_quad( m, paint, points, normals, uv=None ):
+    """ A quad shaded by a normal at each point, wound to face the way they do. """
+    pts = [ np.asarray( p, float ) for p in points ]
+    face = np.cross( pts[1] - pts[0], pts[2] - pts[0] ) + np.cross( pts[2] - pts[0], pts[3] - pts[0] )
+    if np.linalg.norm( face ) < 1e-9:
+        return
+    normals = list( normals )
+    if np.dot( face, np.sum( normals, axis=0 ) ) < 0:
+        pts, normals = pts[:1] + pts[:0:-1], normals[:1] + normals[:0:-1]
+        if uv is not None:
+            uv = list( uv[:1] ) + list( uv[:0:-1] )
+    m.polygon( paint, pts, normals=normals, uv=uv )
+
+
+def lathe( m, centre, z0, profile, paint, sides=20 ):
+    """ A round thing turned about an upright axis through centre (drawn only, its ends open): profile is its ( r, h )
+    points from the bottom up, h over z0. Smooth round it, and down the profile where it curves. """
+    ends = profile_normals( profile )
+    tile = paint_tile( paint )
+    r_uv = profile[0][0]
+    turns = [ 2 * math.pi * j / sides for j in range( sides + 1 ) ]
+    for k in range( len( profile ) - 1 ):
+        ( ra, ha ), ( rb, hb ) = profile[k], profile[k + 1]
+        na, nb = ends[k]
+        for j in range( sides ):
+            t0, t1 = turns[j], turns[j + 1]
+            c0, s0, c1, s1 = math.cos( t0 ), math.sin( t0 ), math.cos( t1 ), math.sin( t1 )
+            pts = [ ( centre[0] + ra * c0, centre[1] + ra * s0, z0 + ha ), ( centre[0] + ra * c1, centre[1] + ra * s1, z0 + ha ),
+                    ( centre[0] + rb * c1, centre[1] + rb * s1, z0 + hb ), ( centre[0] + rb * c0, centre[1] + rb * s0, z0 + hb ) ]
+            nrm = [ ( na[0] * c0, na[0] * s0, na[1] ), ( na[0] * c1, na[0] * s1, na[1] ),
+                    ( nb[0] * c1, nb[0] * s1, nb[1] ), ( nb[0] * c0, nb[0] * s0, nb[1] ) ]
+            uv = [ ( t0 * r_uv / tile, ha / tile ), ( t1 * r_uv / tile, ha / tile ),
+                   ( t1 * r_uv / tile, hb / tile ), ( t0 * r_uv / tile, hb / tile ) ]
+            smooth_quad( m, paint, pts, nrm, uv )
+
+
+def frustum( m, centre, z0, z1, a0, a1, paint, top=True ):
+    """ A square frustum about an upright axis (drawn only): half-widths a0 at z0 and a1 at z1, and its top (or, with
+    top False, its bottom) closed. """
+    e, n = centre
+    lo = [ ( e - a0, n - a0, z0 ), ( e + a0, n - a0, z0 ), ( e + a0, n + a0, z0 ), ( e - a0, n + a0, z0 ) ]
+    hi = [ ( e - a1, n - a1, z1 ), ( e + a1, n - a1, z1 ), ( e + a1, n + a1, z1 ), ( e - a1, n + a1, z1 ) ]
+    for k in range( 4 ):
+        out = ( np.add( lo[k], lo[( k + 1 ) % 4] ) / 2 - ( e, n, z0 ) ) * ( 1, 1, 0 )
+        card( m, paint, [ lo[k], lo[( k + 1 ) % 4], hi[( k + 1 ) % 4], hi[k] ], out + ( 0, 0, a0 - a1 ) )
+    m.polygon( paint, hi if top else lo[::-1] )
+
+
+def bolt_head( m, centre, z, r, h ):
+    """ A hex bolt head under a plate at z (drawn only). """
+    m.cylinder( centre, r, z - h, z, { "side": "iron_black", "bottom": "iron_black", "top": None }, sides=6, turn=math.pi / 6,
+                collide=None )
+
+
+def bolster( m, e, n, z, lo=None, hi=None, half=30.0, depth=8.0, width=6.5, bearing=14.0, rise=4.0 ):
+    """ A timber bolster (Sattelholz) on a column's cap at z, under a girder along n: depth deep, as wide as the girder
+    (2 x width) and 2 x half long. Its ends are rounded off underneath, from the bearing (bearing either side of the
+    column) up into the end face, rise up. An end past lo or hi, where the girder stops, is cut square there. Drawn
+    only: the girder's collision covers it, and its top is under the girder. """
+    tile = lt_tile( "lt_timber" )
+    cut = [ ( bearing + ( half - bearing ) * math.sin( math.radians( a ) ), rise * ( 1 - math.cos( math.radians( a ) ) ) )
+            for a in range( 0, 91, 15 ) ]
+    right = cut if hi is None or n + half <= hi else [ ( hi - n, 0.0 ) ]
+    left = [ ( -x, y ) for x, y in reversed( cut ) ] if lo is None or n - half >= lo else [ ( lo - n, 0.0 ) ]
+    # Counter-clockwise seen from +e (n to the right, z up), from the bottom's right end, closed along the bottom.
+    outline = right + [ ( right[-1][0], depth ), ( left[0][0], depth ) ] + left
+    ends = profile_normals( outline, closed=True )
+    run = [ 0.0 ]
+    for k in range( len( outline ) ):
+        run.append( run[-1] + math.dist( outline[k], outline[( k + 1 ) % len( outline )] ) )
+    for k in range( len( outline ) ):
+        a, b = outline[k], outline[( k + 1 ) % len( outline )]
+        if a[1] == depth and b[1] == depth:
+            continue
+        na, nb = ends[k]
+        pts = [ ( e - width, n + a[0], z + a[1] ), ( e + width, n + a[0], z + a[1] ),
+                ( e + width, n + b[0], z + b[1] ), ( e - width, n + b[0], z + b[1] ) ]
+        nrm = [ ( 0.0, na[0], na[1] ), ( 0.0, na[0], na[1] ), ( 0.0, nb[0], nb[1] ), ( 0.0, nb[0], nb[1] ) ]
+        uv = [ ( -width / tile, run[k] / tile ), ( width / tile, run[k] / tile ),
+               ( width / tile, run[k + 1] / tile ), ( -width / tile, run[k + 1] / tile ) ]
+        smooth_quad( m, "lt_timber", pts, nrm, uv )
+    # Its two sides, in upright strips under each edge of the bottom (the outline isn't convex).
+    under = left + right
+    for side in ( -1, 1 ):
+        for ( xa, ya ), ( xb, yb ) in zip( under, under[1:] ):
+            pts = [ ( e + side * width, n + xa, z + ya ), ( e + side * width, n + xb, z + yb ),
+                    ( e + side * width, n + xb, z + depth ), ( e + side * width, n + xa, z + depth ) ]
+            uv = [ ( ya / tile, ( n + xa ) / tile ), ( yb / tile, ( n + xb ) / tile ),
+                   ( depth / tile, ( n + xb ) / tile ), ( depth / tile, ( n + xa ) / tile ) ]
+            card( m, "lt_timber", pts, ( side, 0, 0 ), uv=uv )
+
+
+def girder( m, e, n0, n1, z0, z1, width=6.5, chamfer=1.0, south_end=None ):
+    """ A timber girder (Unterzug) along n from n0 to n1 under the joists, its bottom arrises chamfered. Its top is in
+    the joists and its ends in the walls, so they aren't drawn, but for a south end standing free: south_end is how
+    high it shows (up to whatever rests on it). """
+    m.box( ( e - width, n0, z0 + chamfer ), ( e + width, n1, z1 ), { "+e": "lt_timber", "-e": "lt_timber", "default": None } )
+    m.box( ( e - width + chamfer, n0, z0 ), ( e + width - chamfer, n1, z0 + chamfer ), { "-z": "lt_timber", "default": None } )
+    for side in ( -1, 1 ):
+        card( m, "lt_timber", [ ( e + side * width, n0, z0 + chamfer ), ( e + side * width, n1, z0 + chamfer ),
+                                ( e + side * ( width - chamfer ), n1, z0 ), ( e + side * ( width - chamfer ), n0, z0 ) ],
+              ( side, 0, -1 ) )
+    if south_end is not None:
+        top = min( south_end, z1 )
+        card( m, "lt_timber", [ ( e - width, n0, top ), ( e - width, n0, z0 + chamfer ), ( e - width + chamfer, n0, z0 ),
+                                ( e + width - chamfer, n0, z0 ), ( e + width, n0, z0 + chamfer ), ( e + width, n0, top ) ],
+              ( 0, -1, 0 ) )
+    m.collision_box( ( e - width, n0, z0 ), ( e + width, n1, z1 ), WOOD )
 
 
 def landing( m, n0, n1, way ):

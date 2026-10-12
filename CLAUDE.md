@@ -3302,6 +3302,18 @@ simulate_input.
   - Middle: the two warehouses (east e 240..1000, n -400..1150).
     - Each is open on its ground floor, a whitewashed hall of cast-iron columns, and on a mezzanine over its north half
       (z 176), reached by a timber stair up the east wall.
+    - The columns and beams (2026-10-12, the user: "this beam needs improvement", of a column built from a box, a
+      12-sided shaft, a band and a square cap):
+      - Each column is a Speicherstadt cast-iron one (`iron_column`, `lathe`): a chamfered base plate, a moulded base
+        (torus, cove and astragal), a shaft tapering 6 to 5 in radius, a neck ring, a bell capital and a cap plate
+        bolted to the timber above. Those on the mezzanine are slighter (5.2 to 4.4).
+      - They stand in two rows at e 500 and 740, n -120, 130, 396, 630 and 880 (the middle row was at 380, under the
+        mezzanine's edge).
+      - Each row carries a 16-inch square timber girder (`girder`, `GIRDER_W`) on a bolster with rounded ends
+        (`bolster`, a Sattelholz): under the ceiling's joists (z 324-340) the whole length, and under the mezzanine's
+        (z 132-148) from its edge north.
+      - About 1,600 triangles a column. Its collision is two boxes and three hulls; the bolts have none.
+      - Checked in offscreen renders in the editor (the base, the capital, the mezzanine), not in a match.
     - Two ground-floor loading bays onto the Fleet have steel landings with stairs down into it. Two mezzanine bays look
       over it, with a 37-high bar across each, which you can vault.
     - Bomb site A is the east warehouse's ground floor under the mezzanine.
