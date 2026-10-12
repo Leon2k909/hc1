@@ -439,6 +439,7 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 	private readonly BotSupportHand _supportHand = new();
 	private readonly BotSupportHand _gripHand = new( true );
 	private readonly BotWeaponPose _weaponPose = new();
+	private readonly BotHeadCant _headCant = new();
 	private float _supportGripWeight;
 
 	/// <summary>Finish the gun and support arm together, using the pose the renderer will draw this frame.</summary>
@@ -468,6 +469,13 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 				_gripHand.Apply( Renderer, right.WithPosition( right.Position + shift ) );
 				_weaponModel.WorldPosition += Renderer.SceneModel.GetBoneWorldTransform( rightBone.Index ).Position - right.Position;
 			}
+		}
+		// The cheek weld, where the face is big enough on this screen to see it.
+		if ( _headDrop > .5f && (Renderer.GetAttachment( "eye_R_forward" ) ?? Renderer.GetAttachment( "eyes" )) is { } eye
+			&& BotSystem.ShouldShowEffect( eye.Position, 60f, 800f ) )
+		{
+			_headCant.Apply( Renderer, eye.Position, AimDirection.IsNearZeroLength ? WorldRotation.Forward : AimDirection,
+				ShoulderedHeadCant * _headDrop / ShoulderedHeadDrop );
 		}
 		if ( !supportActive ) return;
 		var hand = Renderer.WorldTransform.ToLocal( target.WorldTransform );
@@ -758,6 +766,11 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 	public const float ButtToEye = 8f;
 	/// <summary> How far (degrees) the head tips forward onto the stock while shouldered. </summary>
 	public const float ShoulderedHeadDrop = 20f;
+	/// <summary>
+	/// How far (degrees) the head cants, right ear down, onto the stock while shouldered (<see cref="BotHeadCant"/>),
+	/// about the sighting eye, so the jaw clears the stock. Upright, it went through a FAMAS's, an AUG's and an M4's.
+	/// </summary>
+	public const float ShoulderedHeadCant = 20f;
 
 	/// <summary> Since the reload clip started, on every machine (<see cref="PlayReloadAnimation"/>). </summary>
 	private TimeSince _sinceReloadClip = 999f;

@@ -7,13 +7,14 @@ using System.Linq;
 using System.Threading.Tasks;
 
 /// <summary>
-/// The combat bot's body holding each gun it's issued, carried and shouldered (LightweightCombatBot's own IK), from
-/// its left, its front and its right, in an isolated scene: hc1_bot_grip_preview [gun] [dress] [headDrop] [buttToEye]
-/// [side]. Writes output/bot-grip/&lt;gun&gt;.png (top row carried, bottom shouldered) and logs how far each hand ended
-/// up from its IK target and where the butt sits against the right shoulder. headDrop, buttToEye and side (the gun
-/// that far right of the eye) try out other shouldered poses than the bot's, into &lt;gun&gt;_d.._b.._s...png. Never
-/// edits the open scene.
-/// Optional pitch, yaw, movement speed, crouch and reload time exercise the full weapon correction in other poses.
+/// The combat bot's body holding each gun it's issued, carried and shouldered (LightweightCombatBot's own IK), in an
+/// isolated scene: hc1_bot_grip_preview [gun] [dress] [headDrop] [buttToEye] [side] [pitch] [yaw] [speed] [crouch]
+/// [reloadTime] [cant]. Writes output/bot-grip/&lt;gun&gt;.png: carried, then shouldered, each from the bot's left, front
+/// and right, then two rows of close-ups round the shouldered head. Logs how far each hand ended up from its IK target,
+/// where the butt sits against the right shoulder, and how much of the face is inside the gun. headDrop, buttToEye, side
+/// (the gun that far right of the eye) and cant (the cheek weld's head roll) try out other shouldered poses than the
+/// bot's, into &lt;gun&gt;_d.._b.._s.._k...png. Pitch, yaw, movement speed, crouch and reload time exercise the full
+/// weapon correction in other poses. Never edits the open scene.
 /// </summary>
 public static class Hc1BotGripQa
 {
@@ -67,15 +68,16 @@ public static class Hc1BotGripQa
 		File.WriteAllText( Path.Combine( folder, $"motion-{System.IO.Path.GetFileName( label )}.txt" ), $"Left: {Stats( errors )}\nRight mount: {Stats( rightErrors )}\nReturning from reload/spawn: {returning}\nWorst: {worst}" );
 	}
 
-	private record struct Tuning( float HeadDrop, float ButtToEye, float Side, float Pitch = 0f, float Yaw = 0f, float Speed = 0f, bool Crouch = false, float ReloadTime = -1f );
+	private record struct Tuning( float HeadDrop, float ButtToEye, float Side, float Pitch = 0f, float Yaw = 0f, float Speed = 0f, bool Crouch = false, float ReloadTime = -1f, float Cant = LightweightCombatBot.ShoulderedHeadCant );
 
 	[ConCmd( "hc1_bot_grip_preview" )]
 	public static async void Preview( string only = "", bool dress = true, float headDrop = LightweightCombatBot.ShoulderedHeadDrop,
-		float buttToEye = LightweightCombatBot.ButtToEye, float side = 0f, float pitch = 0f, float yaw = 0f, float speed = 0f, bool crouch = false, float reloadTime = -1f )
+		float buttToEye = LightweightCombatBot.ButtToEye, float side = 0f, float pitch = 0f, float yaw = 0f, float speed = 0f, bool crouch = false, float reloadTime = -1f,
+		float cant = LightweightCombatBot.ShoulderedHeadCant )
 	{
-		var tuning = new Tuning( headDrop, buttToEye, side, pitch, yaw, speed, crouch, reloadTime );
+		var tuning = new Tuning( headDrop, buttToEye, side, pitch, yaw, speed, crouch, reloadTime, cant );
 		var suffix = tuning == new Tuning( LightweightCombatBot.ShoulderedHeadDrop, LightweightCombatBot.ButtToEye, 0f )
-			? "" : $"_d{headDrop:0.#}_b{buttToEye:0.#}_s{side:0.#}_p{pitch:0.#}_y{yaw:0.#}_v{speed:0.#}_c{crouch}_r{reloadTime:0.##}";
+			? "" : $"_d{headDrop:0.#}_b{buttToEye:0.#}_s{side:0.#}_p{pitch:0.#}_y{yaw:0.#}_v{speed:0.#}_c{crouch}_r{reloadTime:0.##}_k{cant:0.#}";
 		var folder = Path.Combine( Project.Current.GetRootPath(), "output", "bot-grip" );
 		Directory.CreateDirectory( folder );
 		foreach ( var weapon in LightweightCombatBot.WeaponPool().OrderBy( x => x.ResourceName ) )
@@ -85,7 +87,7 @@ public static class Hc1BotGripQa
 
 			try
 			{
-				using var sheet = new Bitmap( Tile * 3, Tile * 2 );
+				using var sheet = new Bitmap( Tile * 3, Tile * 4 );
 				sheet.Clear( Color.Black );
 				await Render( weapon, false, dress, tuning, sheet, 0 );
 				await Render( weapon, true, dress, tuning, sheet, Tile );
@@ -111,6 +113,7 @@ public static class Hc1BotGripQa
 			var supportHand = new BotSupportHand();
 			var gripHand = new BotSupportHand( true );
 			var weaponPose = new BotWeaponPose();
+			var headCant = new BotHeadCant();
 			CameraComponent camera;
 			using ( scene.Push() )
 			{
@@ -168,6 +171,9 @@ public static class Hc1BotGripQa
 						gripHand.Apply( body, wrist.WithPosition( wrist.Position + shift ) );
 						Follow( body, gun, handToGun );
 					}
+					// The cheek weld, as LightweightCombatBot.FinishWeaponPose cants it.
+					if ( shouldered && !reloading && (body.GetAttachment( "eye_R_forward" ) ?? body.GetAttachment( "eyes" )) is { } eye )
+						headCant.Apply( body, eye.Position, aim, tuning.Cant * tuning.HeadDrop / LightweightCombatBot.ShoulderedHeadDrop );
 					if ( !reloading && LeftTarget( body, gun ) is { } target )
 						supportHand.Apply( body, body.WorldTransform.ToWorld( target ) );
 				}
@@ -193,6 +199,29 @@ public static class Hc1BotGripQa
 					scene.EditorTick( time, 0f );
 					camera.RenderToBitmap( tile );
 					sheet.DrawBitmap( tile, new Rect( v * Tile, row, Tile, Tile ) );
+				}
+
+				// Shouldered, two rows of close-ups round the head: from the left, from ahead and to the left, and from above,
+				// then from the gun's side: from the right, from ahead and to the right, low, and from behind and above.
+				if ( shouldered && body.GetAttachment( "eye_R_forward" ) is { } eye )
+				{
+					var close = new[]
+					{
+						(new Vector3( 2f, 20f, 1f ), new Vector3( -1f, 0f, -2f )),
+						(new Vector3( 16f, 12f, 6f ), new Vector3( -2f, 0f, -2f )),
+						(new Vector3( -4f, 3f, 20f ), new Vector3( -2f, 0f, -3f )),
+						(new Vector3( 2f, -20f, 1f ), new Vector3( -1f, 0f, -2f )),
+						(new Vector3( 12f, -12f, -3f ), new Vector3( -3f, 0f, -3f )),
+						(new Vector3( -14f, -10f, 8f ), new Vector3( -3f, 0f, -2f )),
+					};
+					for ( var v = 0; v < close.Length; v++ )
+					{
+						camera.WorldPosition = eye.Position + close[v].Item1;
+						camera.WorldRotation = Rotation.LookAt( eye.Position + close[v].Item2 - camera.WorldPosition );
+						scene.EditorTick( time, 0f );
+						camera.RenderToBitmap( tile );
+						sheet.DrawBitmap( tile, new Rect( v % 3 * Tile, row + Tile * (1 + v / 3), Tile, Tile ) );
+					}
 				}
 			}
 		}
@@ -296,6 +325,101 @@ public static class Hc1BotGripQa
 		string Bone( string name ) => body.TryGetBoneTransform( name, out var t ) ? Round( body.WorldTransform.PointToLocal( t.Position ) ) : "-";
 		var shoulder = body.TryGetBoneTransform( "arm_upper_R", out var upperArm ) ? body.WorldTransform.PointToLocal( upperArm.Position ) : Vector3.Zero;
 		Log.Info( $"HC1_BOT_GRIP {weapon.ResourceName} body butt={Round( butt )} butt-shoulder={Round( butt - shoulder )} shoulder={Round( shoulder )} clavicle={Bone( "clavicle_R" )} neck={Bone( "neck_0" )} head={Bone( "head" )} eye={(eye is { } eyeAt ? Round( body.WorldTransform.PointToLocal( eyeAt.Position ) ) : "-")}" );
+		Face( weapon, body, gun, aim );
+	}
+
+	private const float Cell = 0.25f;
+	private static readonly System.Collections.Generic.Dictionary<Model, System.Collections.Generic.Dictionary<(int, int), (float Min, float Max)>> Shells = new();
+
+	/// <summary> The gun's mesh as columns over its (x, y) plane, each from the lowest to the highest surface in it. </summary>
+	private static System.Collections.Generic.Dictionary<(int, int), (float Min, float Max)> Shell( Model model )
+	{
+		if ( Shells.TryGetValue( model, out var shell ) )
+			return shell;
+
+		shell = new();
+		var vertices = model.GetVertices();
+		var indices = model.GetIndices();
+		var count = Math.Min( indices.Length, model.GetIndexCountForLod( 0 ) );
+		for ( var t = 0; t + 2 < count; t += 3 )
+		{
+			var a = vertices[indices[t]].Position;
+			var b = vertices[indices[t + 1]].Position;
+			var c = vertices[indices[t + 2]].Position;
+			var n = Math.Max( 1, (int)MathF.Ceiling( MathF.Max( a.Distance( b ), MathF.Max( b.Distance( c ), c.Distance( a ) ) ) / 0.2f ) );
+			for ( var i = 0; i <= n; i++ )
+			for ( var j = 0; i + j <= n; j++ )
+			{
+				var p = a + (b - a) * (i / (float)n) + (c - a) * (j / (float)n);
+				var key = ((int)MathF.Floor( p.x / Cell ), (int)MathF.Floor( p.y / Cell ));
+				shell[key] = shell.TryGetValue( key, out var r ) ? (MathF.Min( r.Min, p.z ), MathF.Max( r.Max, p.z )) : (p.z, p.z);
+			}
+		}
+
+		Shells[model] = shell;
+		return shell;
+	}
+
+	/// <summary>
+	/// The head's vertices (its bind pose, moved rigidly with the head bone) inside the gun's mesh: how many, how deep,
+	/// and how far the gun would have to come down for the face to clear it. Then the face's lowest points under the
+	/// eye, in the aim's frame (x along the aim, y left), for each half inch ahead of and beside the eye.
+	/// </summary>
+	private static void Face( EquipmentResource weapon, SkinnedModelRenderer body, WorldModel gun, Vector3 aim )
+	{
+		var renderer = gun.ModelRenderer.IsValid() ? gun.ModelRenderer : gun.GetComponentInChildren<SkinnedModelRenderer>();
+		var head = body.Model.Bones.GetBone( "head" );
+		if ( renderer?.Model is not { } model || head is null || body.GetAttachment( "eye_R_forward" ) is not { } eye )
+			return;
+
+		var headBind = body.Model.GetBoneTransform( head.Index );
+		var neckBind = body.Model.GetBoneTransform( body.Model.Bones.GetBone( "neck_0" ).Index );
+		var headNow = body.SceneModel.GetBoneWorldTransform( head.Index );
+		var shell = Shell( model );
+		var aimFrame = new Transform( eye.Position, Rotation.LookAt( aim, Vector3.Up ) );
+		var inside = 0;
+		var deepest = 0f;
+		var lift = 0f;
+		var liftAt = Vector3.Zero;
+		var profile = new System.Collections.Generic.Dictionary<(int, int), float>();
+		var slices = new System.Collections.Generic.SortedDictionary<int, float>();
+		foreach ( var vertex in body.Model.GetVertices() )
+		{
+			var bind = vertex.Position;
+			if ( bind.z < neckBind.Position.z + 1f || (bind - headBind.Position).WithZ( 0f ).Length > 6f )
+				continue;
+
+			var world = headNow.PointToWorld( headBind.PointToLocal( bind ) );
+			var local = renderer.WorldTransform.PointToLocal( world );
+			if ( shell.TryGetValue( ((int)MathF.Floor( local.x / Cell ), (int)MathF.Floor( local.y / Cell )), out var column )
+				&& local.z >= column.Min && local.z <= column.Max )
+			{
+				inside++;
+				deepest = MathF.Max( deepest, MathF.Min( local.z - column.Min, column.Max - local.z ) );
+				if ( column.Max - local.z > lift )
+				{
+					lift = column.Max - local.z;
+					liftAt = aimFrame.PointToLocal( world );
+				}
+
+				var slice = (int)MathF.Floor( aimFrame.PointToLocal( world ).x );
+				slices[slice] = MathF.Max( slices.TryGetValue( slice, out var previousLift ) ? previousLift : 0f, column.Max - local.z );
+			}
+
+			var a = aimFrame.PointToLocal( world );
+			var cell = ((int)MathF.Floor( a.x / 0.5f ), (int)MathF.Floor( a.y / 0.5f ));
+			profile[cell] = profile.TryGetValue( cell, out var low ) ? MathF.Min( low, a.z ) : a.z;
+		}
+
+		Log.Info( $"HC1_BOT_GRIP {weapon.ResourceName} face inside={inside} deepest={deepest:0.00} lift={lift:0.00} liftAt={Round( liftAt )} byInch={string.Join( " ", slices.Select( p => $"{p.Key}:{p.Value:0.00}" ) )}" );
+		var rows = new System.Text.StringBuilder();
+		for ( var x = -16; x <= 5; x++ )
+		{
+			rows.Append( $"\n x{x * 0.5f:+0.0;-0.0}:" );
+			for ( var y = -4; y <= 8; y++ )
+				rows.Append( profile.TryGetValue( (x, y), out var z ) ? $" {z,5:0.0}" : "     ." );
+		}
+		Log.Info( $"HC1_BOT_GRIP {weapon.ResourceName} face profile (lowest z under each half inch, y from -2.0 to +4.0):{rows}" );
 	}
 
 	private static string Round( Vector3 v ) => $"({v.x:0.0} {v.y:0.0} {v.z:0.0})";
