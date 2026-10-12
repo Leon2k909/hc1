@@ -16,6 +16,7 @@
 							{ from = "ashlar_grey.vmat" to = "materials/buildings/ashlar_grey.vmat" },
 							{ from = "iron_black.vmat" to = "materials/buildings/iron_black.vmat" },
 							{ from = "iron_green.vmat" to = "materials/buildings/iron_green.vmat" },
+							{ from = "lt_hold_rust.vmat" to = "materials/lowtide/lt_hold_rust.vmat" },
 							{ from = "lt_hull_black.vmat" to = "materials/lowtide/lt_hull_black.vmat" },
 							{ from = "lt_hull_red.vmat" to = "materials/lowtide/lt_hull_red.vmat" },
 							{ from = "lt_jute.vmat" to = "materials/lowtide/lt_jute.vmat" },
@@ -24,12 +25,10 @@
 							{ from = "lt_rubber.vmat" to = "materials/lowtide/lt_rubber.vmat" },
 							{ from = "lt_steel.vmat" to = "materials/lowtide/lt_steel.vmat" },
 							{ from = "lt_timber.vmat" to = "materials/lowtide/lt_timber.vmat" },
-							{ from = "lt_water.vmat" to = "materials/lowtide/lt_water.vmat" },
 							{ from = "planks.vmat" to = "materials/buildings/planks.vmat" },
 							{ from = "rw_black.vmat" to = "materials/railhead/rw_black.vmat" },
 							{ from = "rw_opal_glass.vmat" to = "materials/railhead/rw_opal_glass.vmat" },
 							{ from = "rw_paving.vmat" to = "materials/railhead/rw_paving.vmat" },
-							{ from = "rw_wagon_rust.vmat" to = "materials/railhead/rw_wagon_rust.vmat" },
 							{ from = "setts.vmat" to = "materials/buildings/setts.vmat" }
 						]
 						use_global_default = false
@@ -191,16 +190,16 @@
 						parent_bone = ""
 						surface_prop = "metal"
 						collision_tags = "solid"
-						origin = [ 460.0000, 37.0000, -140.0000 ]
+						origin = [ 460.0000, 37.0000, -138.5000 ]
 						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 144.0000, 500.0000, 6.0000 ]
+						dimensions = [ 144.0000, 500.0000, 9.0000 ]
 					},
 					{
 						_class = "PhysicsShapeBox"
 						parent_bone = ""
 						surface_prop = "wood"
 						collision_tags = "solid"
-						origin = [ 632.0000, 38.0000, -134.2500 ]
+						origin = [ 632.0000, 38.0000, -131.2500 ]
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 72.0000, 48.0000, 5.5000 ]
 					},
@@ -209,7 +208,7 @@
 						parent_bone = ""
 						surface_prop = "wood"
 						collision_tags = "solid"
-						origin = [ 632.0000, 38.0000, -123.2500 ]
+						origin = [ 632.0000, 38.0000, -120.2500 ]
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 68.0000, 44.0000, 27.5000 ]
 					},
@@ -218,7 +217,7 @@
 						parent_bone = ""
 						surface_prop = "wood"
 						collision_tags = "solid"
-						origin = [ 290.0000, -8.0000, -132.0000 ]
+						origin = [ 290.0000, -8.0000, -129.0000 ]
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 10.0000, 120.0000, 10.0000 ]
 					},
@@ -227,7 +226,7 @@
 						parent_bone = ""
 						surface_prop = "wood"
 						collision_tags = "solid"
-						origin = [ 320.0000, 2.0000, -132.0000 ]
+						origin = [ 320.0000, 2.0000, -129.0000 ]
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 10.0000, 120.0000, 10.0000 ]
 					},

@@ -3301,8 +3301,15 @@ simulate_input.
     - Two ground-floor loading bays onto the Fleet have steel landings with stairs down into it. Two mezzanine bays look
       over it, with a 37-high bar across each, which you can vault.
     - Bomb site A is the east warehouse's ground floor under the mezzanine.
-    - Between the warehouses is the Fleet's bed, with a steel lighter (a Schute) lying on the mud. Its sides are 73
-      over the mud and over its hold's floor, so you can mantle in and out.
+    - Between the warehouses is the Fleet's bed, with a steel lighter (a Schute) lying on the mud. Its sides are 70-82
+      over the mud and 70 over its hold's floor, so you can mantle in and out.
+    - The hold (2026-10-12, the user: "textures glitching on lowtide"):
+      - Its floor was at -137, level with the channel's water plane, which runs on under the hull, so the two
+        flickered through each other. It's now 3 higher (`WATER_Z + 3`), and the cargo with it.
+      - Its plate was `rw_wagon_rust`, a freight wagon's side, whose overpainted panels showed as dark blocks. It's
+        `lt_hold_rust` now, Boxyard's `bx_rust` darkened and tiling at its real size (`lt_tile`: 48).
+      - The green patch was an opaque `lt_water` puddle, which came out.
+      - Only `lowtide_fleet` was regenerated. Not yet seen in the engine.
   - South: the yards, each with a brick shed, and the harbour quay, crossed over the Fleet's mouth on a pony-truss
     footbridge. Two level-luffing cranes stand on each quay, with a 200-high portal you can walk under. Bomb site B is on
     the east quay, among the cargo under a crane.

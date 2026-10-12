@@ -122,6 +122,7 @@ LT_MATERIALS = {
     "lt_jute": ( "buildings/canvas_plain", ( 0.84, 0.70, 0.50 ), None ),      # coffee sacks
     "lt_timber": ( "railhead/rw_wood", ( 0.13, 0.13, 0.14 ), None ),          # tarred piles and balks
     "lt_grating": ( "buildings/metal", ( 0.42, 0.44, 0.45 ), None ),         # the landings' and Fleet stairs' steel
+    "lt_hold_rust": ( "boxyard/bx_rust", ( 0.64, 0.55, 0.50 ), None ),       # the lighter's hold: rusted brown
 }
 LT_PAINTED = {
     "lt_frame_green": ( ( 34, 62, 50 ), 0.0, 0.45 ),         # the east's window frames and ironwork
@@ -139,11 +140,13 @@ WEST_PAINTS = { "brick": "lt_brick_soot", "lt_frame_green": "lt_frame_cream", "l
 
 
 def lt_tile( paint ):
-    """ A paint's tile size: its source's (building_textures' or railhead_materials'), else 64. """
+    """ A paint's tile size: its source's (building_textures', railhead_materials' or boxyard_materials'), else 64. """
     if paint in LT_MATERIALS:
         folder, name = LT_MATERIALS[paint][0].split( "/" )
         if folder == "railhead":
             return float( R.RM.paints()[name][1] )
+        if folder == "boxyard":
+            return 48.0             # boxyard_materials.SMALL's, at their real size (boxyard_map.bx_tile)
         return BT.tile_units( name )
     return 64.0
 
@@ -1163,8 +1166,9 @@ def footbridge( m ):
 
 
 def barge( m ):
-    """ An old steel lighter left lying on the mud: raked ends, an open hold with a little rainwater and some cargo,
-    rubbing strakes and bitts. Its sides are 73 over the mud and its hold's floor, so you can climb in and out. """
+    """ An old steel lighter left lying on the mud: raked ends, an open hold of rusted plate with some cargo left in
+    it, rubbing strakes and bitts. Its sides are 70-82 over the mud and 70 over its hold's floor, so you can mantle in
+    and out. The hold's floor is over the channel's water, which runs on under the hull: level with it, they fought. """
     e0, e1, n0, n1 = BARGE
     zb, zt, t, rake = -143.0, -64.0, 3.0, 40.0
     waterline = -112.0
@@ -1176,7 +1180,7 @@ def barge( m ):
                     ( e, n0 + rake * ( 1 - f1 ), z1 ) ]
             card( m, paint, pts, ( out, 0, 0 ) )
         pts = [ ( inner, n0 + rake, zb ), ( inner, n1 - rake, zb ), ( inner, n1, zt ), ( inner, n0, zt ) ]
-        card( m, "rw_wagon_rust", pts, ( -out, 0, 0 ) )
+        card( m, "lt_hold_rust", pts, ( -out, 0, 0 ) )
         lo, hi = sorted( ( e, inner ) )
         m.box( ( lo - ( 1.5 if out < 0 else 0 ), n0 - 1, zt - 4 ), ( hi + ( 1.5 if out > 0 else 0 ), n1 + 1, zt ), "lt_hull_black" )
         m.box( ( min( e, e + out * 2 ), n0 + 30, -96 ), ( max( e, e + out * 2 ), n1 - 30, -91 ), "lt_hull_black" )
@@ -1185,17 +1189,15 @@ def barge( m ):
         pts = [ ( e0, n_in, zb ), ( e1, n_in, zb ), ( e1, n_out, zt ), ( e0, n_out, zt ) ]
         card( m, "lt_hull_black", pts, ( 0, sign * ( zt - zb ), rake ) )
         pts = [ ( e0 + t, n_in - sign * t, zb + t ), ( e1 - t, n_in - sign * t, zb + t ), ( e1 - t, n_out - sign * t, zt ), ( e0 + t, n_out - sign * t, zt ) ]
-        card( m, "rw_wagon_rust", pts, ( 0, -sign * ( zt - zb ), -rake ) )
+        card( m, "lt_hold_rust", pts, ( 0, -sign * ( zt - zb ), -rake ) )
         m.hull( [ ( e, n, z ) for e in ( e0, e1 ) for n, z in ( ( n_in, zb ), ( n_out, zt ), ( n_in - sign * t, zb ), ( n_out - sign * t, zt ) ) ],
                 METAL )
         m.box( ( e0, min( n_out, n_out - sign * 4 ), zt - 4 ), ( e1, max( n_out, n_out - sign * 4 ), zt ), "lt_hull_black" )
         # A pair of bitts on the end's deck.
         for e in ( e0 + 30, e1 - 30 ):
             m.cylinder( ( e, n_out - sign * 14 ), 3.5, zt - 4, zt + 9, "iron_black", sides=8 )
-    floor = zb + 6
-    m.box( ( e0 + t, n0 + rake, zb ), ( e1 - t, n1 - rake, floor ), { "+z": "rw_wagon_rust", "default": None }, METAL )
-    m.polygon( "lt_water", [ ( e0 + 20, n0 + 180, floor + 0.4 ), ( e0 + 70, n0 + 160, floor + 0.4 ), ( e0 + 110, n0 + 210, floor + 0.4 ),
-                          ( e0 + 80, n0 + 290, floor + 0.4 ), ( e0 + 25, n0 + 260, floor + 0.4 ) ], normal=( 0, 0, 1 ) )
+    floor = WATER_Z + 3
+    m.box( ( e0 + t, n0 + rake, zb ), ( e1 - t, n1 - rake, floor ), { "+z": "lt_hold_rust", "default": None }, METAL )
     # Left in the hold: a few sacks under a tarpaulin, and timber.
     sacks( m, e0 + 40, n1 - 140, floor, rows=2, cols=2, layers=2, along="n" )
     for k, ( e, n ) in enumerate( ( ( e1 - 30, n0 + 120 ), ( e1 - 40, n0 + 150 ) ) ):
@@ -1959,6 +1961,10 @@ def write_map_art( models ):
     """ The menus' picture, a stand-in until there's an in-engine capture: the preview's view up the Fleet from over the
     footbridge, 1920 x 1080. """
     for paint, ( source, tint, _ ) in LT_MATERIALS.items():
+        jpg = K.ASSETS / f"materials/{source}_color.jpg"        # the preview only looks for PNGs (Boxyard's are JPGs)
+        if jpg.exists():
+            small = np.asarray( Image.open( jpg ).convert( "RGB" ).resize( ( 32, 32 ) ), float )
+            PV._colours.setdefault( source.split( "/" )[1], small.reshape( -1, 3 ).mean( axis=0 ) / 255.0 )
         PV._colours[paint] = PV.paint_colour( source.split( "/" )[1] ) * np.array( tint )
     for paint, ( colour, _, _ ) in LT_PAINTED.items():
         PV._colours[paint] = np.array( colour ) / 255.0
