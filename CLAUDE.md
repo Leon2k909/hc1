@@ -2800,6 +2800,30 @@ simulate_input.
   floor is too thin to hit with the trace. `DroppedEquipment` (`Code/Weapons/DroppedWeapon.cs`) centres its collider
   and marker on the world model's bounds (`Center`).
 
+## Movement speeds (`PlayerGlobals`, `PlayerPawn.GetWishSpeed`)
+- The user asked for faster movement that feels like Black Ops Cold War's (2026-10-13: "make the sprint/movement speeds
+  etc faster it should feel cold war"). No mode, menu or text names it; it's only the feel.
+- `PlayerGlobals`' code defaults are live (no scene or prefab overrides them):
+  - WalkSpeed 250 (was 220), SprintingSpeed 330 (260), CrouchingSpeed 120 (100), SlowWalkSpeed 115 (100), ProneSpeed
+    60 (50).
+  - BaseAcceleration 11 (9). Friction, the other accelerations and JumpPower 290 are unchanged.
+- A gun's SpeedPenalty (0, 20, 30 or 40) comes off the walk in full and off the sprint by half, then WeightSlowdown,
+  wounds, perks and the flashbang scale it. On the ground each tick accelerates, then applies friction, so at 50 Hz a
+  walk tops out at 86% of its wish speed (friction 7) and the other gaits at 92% (friction 4). Real top speeds:
+  - a rifle (penalty 40): walk ~181 u/s (4.6 m/s, was ~155), sprint ~285 (7.2 m/s, was ~221);
+  - no penalty: walk ~215 (was ~189), sprint ~304 (was ~239);
+  - crouch ~110, slow walk ~106, prone ~55.
+  - A walk is at full speed in ~0.14 s (7 ticks; it was ~0.2 s).
+- Copies that have to change with them: `GunsmithStats` (`WalkSpeed`, `SprintSpeed`, `CrouchSpeed`, `ProneSpeed`, for
+  DETAILS and COMPARE) and the bots' `PlayerWalkSpeed` / `PlayerSprintSpeed` (`LightweightCombatBot.Brain`). Bots'
+  walks stay capped at 180 by `MaxShoulderedSpeed`, so only their sprint got faster.
+- A vault carries a sprint through it up to `VaultMaxSpeed` 310 (`PlayerPawn.Mantle.cs`, was 260).
+- Left as they were: the footsteps' cadence (`PlayerFootsteps.GetStepFrequency`), the guns' sprint-out times (each
+  gun's real figure), `IsNoisy`'s 180, and the viewmodel's bob range.
+- The legs' clips play at their own pace (players don't set `move_rate`, see Leg animation speeds), so a player's feet
+  slide more than they did.
+- Compiled with dotnet, not yet checked in-game.
+
 ## Jump stamina (`PlayerPawn.Movement.cs`)
 - Like CS2's, which the user asked for: each jump takes 15% of the jump speed left (`JumpFatigueCost`), so jumping
   again as you land goes 100%, 85%, 72%, 61%, 55% of full speed (about 50, 36, 26, 19, 15 units high), never below
@@ -2851,7 +2875,7 @@ simulate_input.
 - The owner then moves the pawn along the path (`UpdateMantle`, smoothstepped), with the controller's velocity set to
   match. Anything that moves it more than 8 units off the path (a teleport, a death) ends it.
   - Timing: the rise takes 0.12 + 0.004h + 0.0001h^2 s for h units: 0.33 s for the lowest ledge, 0.46 s waist high,
-    0.69 s chest high, 1.2 s for 84. A vault goes over at your speed, 150-260 u/s, and you carry on at that speed; a climb
+    0.69 s chest high, 1.2 s for 84. A vault goes over at your speed, 150-310 u/s, and you carry on at that speed; a climb
     at 150, leaving at half that. A waist-high vault takes about 0.55 s, an 84 climb about 1.35 s.
 - Never climbed: people (`player`, the bots' `movement` and zombies' `enemy` boxes), doors (`MapMover.DoorTag`), glass,
   player clips (a window's), and the Ridgeback's trees and hedges (clutter bodies, by the shape's `clutter` tag).
@@ -4866,9 +4890,10 @@ simulate_input.
 - Sprinting and awareness (2026-09-29, the user: "i never see any bots running to get the sprint to fire penalty",
   and round a corner they were "standing still or slowly moving forward instead of like real people who sometimes dont
   have the full situational awareness"). Bots used to move at 195-230 everywhere, gun carried but free to fire. Now:
-  - A bot walks and sprints at a player's speeds with its gun (`ReadGaits`): a walk of 220 less the gun's
-    SpeedPenalty, at most 180 (under `MaxShoulderedSpeed` 190), and a sprint of 260 less half the penalty, both slowed
-    by WeightSlowdown. The M16A4 (penalty 40) walks at 180 and sprints at 240.
+  - A bot walks and sprints at a player's speeds with its gun (`ReadGaits`): a walk of 250 less the gun's
+    SpeedPenalty, at most 180 (under `MaxShoulderedSpeed` 190), and a sprint of 330 less half the penalty, both slowed
+    by WeightSlowdown (see Movement speeds). The M16A4 (penalty 40) walks at 180 and sprints at 310. A NavMeshAgent
+    loses nothing to friction, so a bot's sprint is ~8% faster than a player's with the same gun (~285).
   - With no enemy in view it sprints, gun carried, and walks with the gun up only near where it's going
     (`ApproachSpeed`: `Lerp( 700, 150, Aggression )`, about 620 for the most cautious and 220 for the most
     aggressive). Getting somewhere it must (`UrgentSpeed`: out of the heat, into the zone) it sprints unless an enemy
@@ -5119,8 +5144,8 @@ simulate_input.
   `StoodClipRing` / `CrouchedClipRing` copy the graph's ring: change them together.
 - Feet that neither slide nor race need stride warping (IK). The graph has no node for it. `CFootLockAnimNode` could pin
   planted feet, but the player models define no feet or leg IK chains (only `left_arm_IK`).
-- Players don't set `move_rate` yet, so a player past the ring (180 sideways, the 240 sprint, a 100 crouch) still slides
-  as before. Inside the ring their legs match better than they did.
+- Players don't set `move_rate` yet, so a player past the ring (a rifle's ~181 walk sideways, the ~285-304 sprint, a
+  ~110 crouch, since the faster gaits of 2026-10-13) slides, more than before. Inside the ring their legs match better than they did.
 - Bots animate from their smoothed movement (`UpdateMoveVelocity`), not `Agent.Velocity`, which is zero on clients: in
   multiplayer every bot glided on idle legs there.
 - Between the walks and the jogs the blend still under-steps ~15%: its cycles are synced, and a walk cycle (1.33 s) is

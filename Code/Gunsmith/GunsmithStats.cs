@@ -15,12 +15,12 @@ namespace Facepunch.Gunsmith;
 public sealed record GunsmithStats
 {
 	/// <summary> PlayerGlobals' default walk speed, which each gun's SpeedPenalty comes off. </summary>
-	private const float WalkSpeed = 220f;
+	private const float WalkSpeed = 250f;
 
 	/// <summary> PlayerGlobals' other gaits (no scene sets its own): sprinting takes half the gun's SpeedPenalty off. </summary>
-	private const float SprintSpeed = 260f;
-	private const float CrouchSpeed = 100f;
-	private const float ProneSpeed = 50f;
+	private const float SprintSpeed = 330f;
+	private const float CrouchSpeed = 120f;
+	private const float ProneSpeed = 60f;
 
 	/// <summary> A MaxRange this long is a gun with no damage falloff (pistols, the M700, the shotgun). </summary>
 	private const float NoFalloffRange = 100000f;

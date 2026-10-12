@@ -116,21 +116,26 @@ public class PlayerGlobals : GlobalComponent, IGameEventHandler<ModifyDamageGlob
 	/// Can we control our movement in the air?
 	/// </summary>
 	[Property, Group( "Movement" )] public float AirAcceleration { get; set; } = 16f;
-	[Property, Group( "Movement" )] public float BaseAcceleration { get; set; } = 9f;
-	[Property, Group( "Movement" )] public float SlowWalkAcceleration { get; set; } = 10;
-	[Property, Group( "Movement" )] public float CrouchingAcceleration { get; set; } = 10;
-	[Property, Group( "Movement" )] public float SprintingAcceleration { get; set; } = 8f;
+	// Quick to get going and to change direction (2026-10-13, the user: movement should feel like Black Ops Cold War's).
+	// Each tick adds this times the wish speed times the tick, so 11 brings a walk up in ~0.15 s (9 took ~0.2 s).
+	[Property, Group( "Movement" )] public float BaseAcceleration { get; set; } = 11f;
+	[Property, Group( "Movement" )] public float SlowWalkAcceleration { get; set; } = 12;
+	[Property, Group( "Movement" )] public float CrouchingAcceleration { get; set; } = 12;
+	[Property, Group( "Movement" )] public float SprintingAcceleration { get; set; } = 10f;
 
 	// Acceleration
 	[Property, Group( "Movement" )] public float MaxAcceleration { get; set; } = 10f;
 	[Property, Group( "Movement" )] public float AirMaxAcceleration { get; set; } = 80f;
 
-	// Speed
-	[Property, Group( "Movement" )] public float WalkSpeed { get; set; } = 220f;
-	[Property, Group( "Movement" )] public float SlowWalkSpeed { get; set; } = 100f;
-	[Property, Group( "Movement" )] public float CrouchingSpeed { get; set; } = 100f;
-	[Property, Group( "Movement" )] public float ProneSpeed { get; set; } = 50f;
-	[Property, Group( "Movement" )] public float SprintingSpeed { get; set; } = 260f;
+	// Speed. Fast, as the user asked (2026-10-13: "it should feel cold war"), with the sprint well clear of the walk.
+	// Friction comes off after the acceleration each tick, so at 50 Hz a walk tops out at 86% of these and a sprint at
+	// 92%: a rifle (SpeedPenalty 40) walks at ~181 u/s (4.6 m/s) and sprints at ~285 (7.2 m/s). They were 220/100/100/50/260.
+	// GunsmithStats and the bots' gaits (LightweightCombatBot.Brain) keep copies: change them together.
+	[Property, Group( "Movement" )] public float WalkSpeed { get; set; } = 250f;
+	[Property, Group( "Movement" )] public float SlowWalkSpeed { get; set; } = 115f;
+	[Property, Group( "Movement" )] public float CrouchingSpeed { get; set; } = 120f;
+	[Property, Group( "Movement" )] public float ProneSpeed { get; set; } = 60f;
+	[Property, Group( "Movement" )] public float SprintingSpeed { get; set; } = 330f;
 
 	// Friction
 	[Property, Group( "Movement" )] public float WalkFriction { get; set; } = 7f;

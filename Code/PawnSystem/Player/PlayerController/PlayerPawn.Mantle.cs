@@ -43,9 +43,12 @@ public partial class PlayerPawn
 	/// <summary>Falling faster than this, you can't catch a ledge.</summary>
 	private const float MantleFallLimit = 250f;
 
-	/// <summary>A vault goes over at your speed, between these. A climb is slower, since the legs have to come under you first.</summary>
+	/// <summary>
+	/// A vault goes over at your speed, between these, so a sprint carries through it (the fastest sprint is ~304 u/s).
+	/// A climb is slower, since the legs have to come under you first.
+	/// </summary>
 	private const float VaultMinSpeed = 150f;
-	private const float VaultMaxSpeed = 260f;
+	private const float VaultMaxSpeed = 310f;
 	private const float ClimbOverSpeed = 150f;
 
 	/// <summary>Tags of things you don't climb: people, bots' and zombies' boxes, doors, glass and player clips (or trees).</summary>

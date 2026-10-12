@@ -98,11 +98,11 @@ public sealed partial class LightweightCombatBot
 	private const float RouteLookAhead = 160f;
 	/// <summary>
 	/// A player's gaits with a gun out (PlayerGlobals' defaults, as <see cref="Gunsmith.GunsmithStats"/> reads them): a
-	/// walk at 220 and a sprint at 260, less the gun's SpeedPenalty (all of it walking, half of it sprinting), and slower
+	/// walk at 250 and a sprint at 330, less the gun's SpeedPenalty (all of it walking, half of it sprinting), and slower
 	/// again for a heavy gun. A bot walks and sprints at the speeds a player would with its gun (<see cref="ReadGaits"/>).
 	/// </summary>
-	private const float PlayerWalkSpeed = 220f;
-	private const float PlayerSprintSpeed = 260f;
+	private const float PlayerWalkSpeed = 250f;
+	private const float PlayerSprintSpeed = 330f;
 	/// <summary>
 	/// A player can't fire while sprinting or for this long after (PlayerPawn's "no_shooting" tag), while the gun comes
 	/// up, and nor can a bot. So one caught at a run pays for it.
