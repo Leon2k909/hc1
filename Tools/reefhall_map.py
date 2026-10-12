@@ -25,7 +25,8 @@ Three lanes run between them:
   own surface), the scene to Assets/scenes/maps/ReefHall/reefhall.scene and the radar picture to
   Assets/ui/minimaps/minimap_reefhall.png. The scene is written whole every run: edit the layout here, not in the editor.
 - Every run checks each spawn, objective and cash point against the collision (room for a player, a floor under it, and
-  a way to walk there from both spawns), as Tools/belltower_map.py does.
+  a way to walk there from both spawns), as Tools/belltower_map.py does, and that no Retakes Red spawn can see a Blue
+  one (railhead_map's check_retakes_sight).
 - Plan coordinates: e east, n north, z up, in inches (map_kit's docstring has the world axes). The ground floor is z 0,
   the upper floors (L1) are at z 208, the tunnel's aisle at -40.
 - Tank glass is 8 thick with the "glass" surface (3 penetrable), so it stops bullets and players, and bots can't see
@@ -786,41 +787,12 @@ def stair_rail( model, lo, hi, z0, z1, climb, sides=( True, True ), glass=False 
         model.hull( hull, METAL )
 
 
-def crate( model, centre, size=( 48, 40, 40 ), yaw=0.0, z=0.0, paint="rh_pad", rng=None, lamp=True ):
-    """ A padded transport case as in the references: blue padded panels in a brass frame (corner posts and edge
-    rails), a gunmetal band round its middle and a small warm lamp low on one face. """
-    e, n = centre[:2]
-    fr = Frame( ( e, n ), ( math.cos( math.radians( yaw ) ), math.sin( math.radians( yaw ) ) ) )
-    sx, sy, sz = size
-    hx, hy = sx / 2, sy / 2
-    fbox( model, fr, -hx + 1.2, hx - 1.2, -hy + 1.2, hy - 1.2, z, z + sz - 0.8, { "default": "rh_smooth", "top": paint } )
-    # The padded panels on the long faces, standing a little proud of the case between the frame's rails.
-    for b in ( -1, 1 ):
-        w0, w1 = ( hy - 1.2, hy - 0.2 ) if b > 0 else ( -hy + 0.2, -hy + 1.2 )
-        fbox( model, fr, -hx + 3.6, hx - 3.6, w0, w1, z + 3.0, z + sz - 3.2, paint, skip=( "top", "bottom" ) )
-    model.boxes.append( ( fr.p( 0, 0, z + sz / 2 ), ( ( *fr.d, 0.0 ), ( *fr.f, 0.0 ), ( 0.0, 0.0, 1.0 ) ),
-                          np.array( ( sx, sy, sz ) ), METAL ) )
-    for a in ( -1, 1 ):
-        for b in ( -1, 1 ):
-            u, w = a * ( hx - 1.6 ), b * ( hy - 1.6 )
-            fbox( model, fr, u - 1.8, u + 1.8, w - 1.8, w + 1.8, z, z + sz, "rh_brass" )
-    for zz in ( z, z + sz - 2.4 ):
-        for b in ( -1, 1 ):
-            fbox( model, fr, -hx + 3.4, hx - 3.4, b * ( hy - 1.6 ) - 1.4, b * ( hy - 1.6 ) + 1.4, zz, zz + 2.4, "rh_brass" )
-        for a in ( -1, 1 ):
-            fbox( model, fr, a * ( hx - 1.6 ) - 1.4, a * ( hx - 1.6 ) + 1.4, -hy + 3.4, hy - 3.4, zz, zz + 2.4, "rh_brass" )
-    fbox( model, fr, -hx + 3.4, hx - 3.4, -hy, hy, z + sz * 0.46, z + sz * 0.54, "rh_gunmetal", skip=( "top", "bottom" ) )
-    if lamp:
-        fbox( model, fr, hx - 9.5, hx - 5.5, hy - 1.2, hy + 0.6, z + 5, z + 12, { "default": "rh_gunmetal", "front": "rh_led_warm" } )
-
-
-def crate_stack( model, centre, yaw, rng, z=0.0, tall=False ):
-    """ Two or three cases: one big, one beside it, sometimes one on top. """
-    fr = Frame( centre, ( math.cos( math.radians( yaw ) ), math.sin( math.radians( yaw ) ) ) )
-    crate( model, fr.p( 0, 0, 0 ), ( 56, 44, 44 ), yaw, z, rng=rng )
-    crate( model, fr.p( 46, 6, 0 ), ( 36, 32, 32 ), yaw + rng.uniform( -8, 8 ), z, paint="rh_pad_dark", rng=rng, lamp=False )
-    if tall:
-        crate( model, fr.p( -2, 2, 0 ), ( 44, 36, 28 ), yaw + rng.uniform( -10, 10 ), z + 44, rng=rng )
+def skip_cases( rng, stacks=1, tall=0 ):
+    """ Reef Hall's padded transport cases came out on 2026-10-12 (the user: "they look awful"). A stack of them drew
+    one of its room's random numbers, and a tall one two, so this draws the same: everything after it in the room
+    comes out as it did. """
+    for _ in range( stacks + tall ):
+        rng.uniform( -1, 1 )
 
 
 def downlight_rings( model, centre, z, radius=7.0 ):
@@ -1374,10 +1346,9 @@ def gallery_west( model, inside, lights, rng ):
         downlight_line( model, ( e0, 0 ), ( e1, 0 ), z, every=100 )
         for e in ( -1560.0, -1290.0, -1020.0 ):
             lights.append( light( f"West Gallery {int( z )} {int( e )}", ( e, 0, z - 20 ), WARM, 300 ) )
-    # Cover: a display case mid-way on the ground floor, cases against the walls; a bench and a case upstairs.
+    # Cover: a display case mid-way on the ground floor; a bench and a display case upstairs.
     display_case( model, ( -1290, 0 ), ( 44, 44 ), tank_name="display", rng=rng, inside=inside )
-    crate_stack( model, ( -1600, 72 ), 0.0, rng )
-    crate( model, ( -1000, -84 ), ( 52, 40, 40 ), 4.0 )
+    skip_cases( rng )
     drain( model, -1470, -1460, -100, 100 )
     bench( model, ( -1480, -92 ), 0.0, z=L1 )
     display_case( model, ( -1100, 70 ), ( 40, 40 ), z=L1, tank_name="display", rng=rng, inside=inside )
@@ -1426,8 +1397,7 @@ def service_northwest( model, inside, lights, rng ):
     pipe_run( model, [ ( -1676, 528, CORRIDOR_H ), ( -1676, 528, 162 ), ( -932, 528, 162 ), ( -932, 1036, 162 ), ( -932, 1036, CORRIDOR_H ) ], 3.5, paint="rh_pipe_dark" )
     for e in ( -1600.0, -1300.0, -1000.0 ):
         fbox( model, Frame( ( e, 500 ), ( 1, 0 ), ( 0, 1 ) ), -2, 2, 0, 34, 140, 144, "rh_gunmetal" )
-    crate_stack( model, ( -1450, 680 ), 0.0, rng )
-    crate( model, ( -1074, 960 ), ( 48, 40, 40 ), 90.0 )
+    skip_cases( rng )
     for e in ( -1640.0, -1400.0, -1180.0 ):
         downlight_rings( model, ( e, 610 ), CORRIDOR_H )
     for n in ( 640.0, 800.0, 960.0 ):
@@ -1697,14 +1667,11 @@ def lobby_north( model, inside, lights, rng ):
     stair( model, ( s_e0, s_n0 ), ( s_e1, s_n1 ), 0.0, L1, "-e", side="rh_wall_dark" )
     stair_rail( model, ( s_e0, s_n0 + 2 ), ( s_e1, s_n1 - 2 ), 0.0, L1, "-e" )
 
-    # Things on the floor: crates, cases, a drain; a bench and a case upstairs.
-    crate_stack( model, ( -2100, 700 ), 0.0, rng )
-    crate( model, ( -1830, 330 ), ( 52, 44, 40 ), 90.0 )
-    crate_stack( model, ( -2580, 250 ), 90.0, rng )
+    # Things on the floor: a display case and a drain; a bench and a display case upstairs.
+    skip_cases( rng, stacks=2 )
     display_case( model, ( -2060, 330 ), ( 44, 44 ), tank_name="display", rng=rng, inside=inside )
     drain( model, -2400, -1900, 375, 385 )
     bench( model, ( -2300, 972 ), 0.0, z=L1 )
-    crate( model, ( -1790, 900 ), ( 52, 44, 40 ), 0.0, z=L1 )
     display_case( model, ( -2850, 760 ), ( 40, 40 ), z=L1, tank_name="display", rng=rng, inside=inside )
 
 
@@ -2127,11 +2094,10 @@ def control_room( model, inside, lights, rng ):
                                         ( e + 50, 815, OFFICE_TOP - 0.2 ), ( e + 50, 805, OFFICE_TOP - 0.2 ) ] )
     desk( model, ( 1960, 780 ), 180.0, z=L1 )
     desk( model, ( 2150, 860 ), 0.0, z=L1 )
-    crate( model, ( 1780, 860 ), ( 48, 40, 40 ), 0.0, z=L1 )
     lights.append( light( "Control office", ( 1990, 810, 350 ), WARM, 300 ) )
-    crate_stack( model, ( 2335, 600 ), 180.0, rng, z=L1 )
+    skip_cases( rng )
 
-    # The hall: consoles facing the glass, beams with light strips, cover.
+    # The hall: consoles facing the glass, beams with light strips.
     for n in ( -260.0, 260.0 ):
         console( model, ( 2600, n ), 280, 90.0 + 180.0 )
     console( model, ( 2220, 0 ), 180, 90.0 + 180.0 )
@@ -2149,9 +2115,7 @@ def control_room( model, inside, lights, rng ):
     downlight_line( model, ( ce0, -875 ), ( ce1, -875 ), 396, every=150 )
     downlight_line( model, ( 2400, 545 ), ( ce1, 545 ), 396, every=150 )
     downlight_line( model, ( 1925, -800 ), ( 1925, 500 ), 396, every=150 )
-    crate_stack( model, ( 2080, -520 ), 15.0, rng )
-    crate( model, ( 2420, -260 ), ( 52, 44, 40 ), 80.0 )
-    crate( model, ( 2420, 300 ), ( 52, 44, 40 ), 95.0 )
+    skip_cases( rng )
     display_case( model, ( 2060, 300 ), ( 44, 44 ), tank_name="display", rng=rng, inside=inside )
     drain( model, 2690, 2706, -760, 760 )
     drain( model, 1950, 2690, -146, -130 )
@@ -2340,13 +2304,7 @@ def filter_hall( model, inside, lights, rng ):
     pump( model, ( -380, 1610 ), 0.0 )
     pump( model, ( 380, 1610 ), 180.0 )
     pump( model, ( -760, 1220 ), 90.0 )
-    crate_stack( model, ( -800, 1520 ), 90.0, rng )
-    crate_stack( model, ( 0, 1280 ), 0.0, rng, tall=True )
-    crate( model, ( 760, 1560 ), ( 52, 44, 40 ), 10.0 )
-    crate( model, ( 820, 1380 ), ( 48, 40, 40 ), 80.0 )
-    crate( model, ( 1060, 1760 ), ( 48, 40, 40 ), 0.0, z=L1 )
-    crate( model, ( -300, 1780 ), ( 52, 44, 40 ), 0.0, z=L1 )
-    crate( model, ( 800, 1180 ), ( 52, 44, 40 ), 90.0, z=L1 )
+    skip_cases( rng, stacks=2, tall=1 )
     drain( model, -1000, 1000, 1640, 1650 )
     line_strip( model, -1130, 1130, 1652, 1655 )
     for n in ( 1290.0, 1560.0 ):
@@ -2547,12 +2505,7 @@ def tunnel_hall( model, inside, lights, rng ):
         bench( model, ( e, -1500 ), 0.0, z=NAVE_Z )
     for e in ( -820.0, 820.0 ):
         display_case( model, ( e, -1500 ), ( 44, 44 ), z=NAVE_Z, tank_name="display", rng=rng, inside=inside )
-    crate_stack( model, ( 250, -1450 ), 0.0, rng, z=NAVE_Z )
-    crate( model, ( -250, -1560 ), ( 56, 44, 44 ), 6.0, z=NAVE_Z )
-    crate_stack( model, ( 700, -1200 ), 180.0, rng )
-    crate_stack( model, ( -700, -1810 ), 0.0, rng )
-    crate( model, ( 1000, -1810 ), ( 52, 44, 40 ), 90.0 )
-    crate( model, ( -1000, -1200 ), ( 52, 44, 40 ), 90.0 )
+    skip_cases( rng, stacks=3 )
     display_case( model, ( 400, -1820 ), ( 40, 40 ), tank_name="display", rng=rng, inside=inside )
     lectern( model, ( -400, -1180 ), 180.0 )
 
@@ -2850,7 +2803,7 @@ RETAKES = {
     "bombsite_a": { "planter": [ ( 700, 1300, 0 ), ( 800, 1460, 0 ) ],
                     "defender": [ ( 300, 1760, L1 ), ( 1060, 1500, L1 ), ( 950, 1200, L1 ), ( 0, 1500, 0 ) ],
                     "attacker": [ ( -1430, 610, 0 ), ( 1430, 610, 0 ), ( 1400, 50, 0 ), ( -1400, 50, 0 ), ( 520, -300, 0 ) ] },
-    "bombsite_b": { "planter": [ ( 700, -1440, NAVE_Z ), ( 400, -1580, NAVE_Z ) ],
+    "bombsite_b": { "planter": [ ( 850, -1440, NAVE_Z ), ( 400, -1580, NAVE_Z ) ],
                     "defender": [ ( 900, -1200, 0 ), ( 300, -1800, 0 ), ( 1050, -1580, NAVE_Z ), ( 500, -1180, 0 ) ],
                     "attacker": [ ( -1430, -610, 0 ), ( 1430, -610, 0 ), ( 1400, -50, 0 ), ( -1400, -50, 0 ), ( 520, 300, 0 ) ] },
 }
@@ -3424,6 +3377,9 @@ def main():
         Path( args.preview ).mkdir( parents=True, exist_ok=True )
     cut_off = check_reach( solid, all_spots(), Path( args.preview ) / "reach.png" if args.preview else None )
     print( f"  {cut_off} spot(s) cut off from the spawns" )
+    import railhead_map as R
+    seen = R.check_retakes_sight( R.Blockers( solid ), RETAKES )
+    print( f"  {seen} Retakes pair(s) in sight of each other" )
 
     if not args.no_scene:
         write_minimap( solid )

@@ -2912,7 +2912,16 @@ simulate_input.
   - Between: the Rotunda's north and south passages, and four service corridors.
 - Modes: the scene lists TDM and Defuse. Domination's flags are A (west), B (Rotunda) and C (east). Its Hot Zones and
   Cash Grab points are the halls (`ObjectiveSpot`). It also has deathmatch spawns (28) and Retakes spawns per site.
-- Every run checks all 89 spawn, objective and cash spots (room, floor, a walk from both spawns), as Belltower's does.
+- Every run checks all 89 spawn, objective and cash spots (room, floor, a walk from both spawns), as Belltower's does,
+  and that no Retakes Red spawn can see a Blue one (railhead_map's `check_retakes_sight`).
+- The padded transport cases (blue padded panels in a brass frame, `crate` / `crate_stack`) came out on 2026-10-12,
+  everywhere they stood, with their cover and collision. The user: "they look awful". Each room still draws the random
+  numbers the cases did (`skip_cases`), so nothing else in it moved.
+  - Without the stack at (700, -1200) in the Tunnel Hall, site B's Red planter at (700, -1440) could see a Blue
+    attacker in the Rotunda. It's at (850, -1440) now.
+  - The baked navmesh (2026-10-02) still leaves out the cases' footprints. That's harmless: bots path round empty
+    floor. It goes when the navmesh is next baked.
+  - Not yet seen in-game.
 - Tank glass: `shaders/hc1_tank_glass.shader`, one material per tank (`rh_tank_glass_<tank>.vmat`, with the tank's
   surface height and depth). It reads the depth behind the pane and puts the water in between:
   - Beer-Lambert absorption by the water path, and the water's own scattered light;

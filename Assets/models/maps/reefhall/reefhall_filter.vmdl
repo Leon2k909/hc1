@@ -13,15 +13,12 @@
 						_class = "DefaultMaterialGroup"
 						remaps =
 						[
-							{ from = "rh_brass.vmat" to = "materials/reefhall/rh_brass.vmat" },
 							{ from = "rh_ceiling.vmat" to = "materials/reefhall/rh_ceiling.vmat" },
 							{ from = "rh_floor.vmat" to = "materials/reefhall/rh_floor.vmat" },
 							{ from = "rh_grate.vmat" to = "materials/reefhall/rh_grate.vmat" },
 							{ from = "rh_gunmetal.vmat" to = "materials/reefhall/rh_gunmetal.vmat" },
 							{ from = "rh_led_warm.vmat" to = "materials/reefhall/rh_led_warm.vmat" },
 							{ from = "rh_line.vmat" to = "materials/reefhall/rh_line.vmat" },
-							{ from = "rh_pad.vmat" to = "materials/reefhall/rh_pad.vmat" },
-							{ from = "rh_pad_dark.vmat" to = "materials/reefhall/rh_pad_dark.vmat" },
 							{ from = "rh_pipe.vmat" to = "materials/reefhall/rh_pipe.vmat" },
 							{ from = "rh_pipe_dark.vmat" to = "materials/reefhall/rh_pipe_dark.vmat" },
 							{ from = "rh_smooth.vmat" to = "materials/reefhall/rh_smooth.vmat" },
@@ -1103,96 +1100,6 @@
 						origin = [ 1223.0000, 760.0000, 28.0000 ]
 						angles = [ -0.0000, -0.0000, 0.0000 ]
 						dimensions = [ 74.0000, 42.0000, 40.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ 1520.0000, 800.0000, 22.0000 ]
-						angles = [ -0.0000, -0.0000, 0.0000 ]
-						dimensions = [ 56.0000, 44.0000, 44.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ 1566.0000, 806.0000, 16.0000 ]
-						angles = [ -0.0000, -2.1511, 0.0000 ]
-						dimensions = [ 36.0000, 32.0000, 32.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ 1280.0000, -0.0000, 22.0000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 56.0000, 44.0000, 44.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ 1286.0000, -46.0000, 16.0000 ]
-						angles = [ -0.0000, -83.0695, 0.0000 ]
-						dimensions = [ 36.0000, 32.0000, 32.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ 1282.0000, 2.0000, 58.0000 ]
-						angles = [ -0.0000, -87.6832, 0.0000 ]
-						dimensions = [ 44.0000, 36.0000, 28.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ 1560.0000, -760.0000, 20.0000 ]
-						angles = [ -0.0000, -80.0000, 0.0000 ]
-						dimensions = [ 52.0000, 44.0000, 40.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ 1380.0000, -820.0000, 20.0000 ]
-						angles = [ -0.0000, -10.0000, 0.0000 ]
-						dimensions = [ 48.0000, 40.0000, 40.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ 1760.0000, -1060.0000, 228.0000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 48.0000, 40.0000, 40.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ 1780.0000, 300.0000, 228.0000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 52.0000, 44.0000, 40.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ 1180.0000, -800.0000, 228.0000 ]
-						angles = [ -0.0000, -0.0000, 0.0000 ]
-						dimensions = [ 52.0000, 44.0000, 40.0000 ]
 					},
 					{
 						_class = "PhysicsHullFile"
