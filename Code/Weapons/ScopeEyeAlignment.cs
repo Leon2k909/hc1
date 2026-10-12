@@ -4,6 +4,8 @@ namespace Facepunch;
 public sealed class ScopeEyeAlignment
 {
 	private const float SettleTime = 0.15f;
+	/// <summary>How fast a held-still eye re-centres (1/s): a steady offset is mostly gone in a second.</summary>
+	private const float SettleRate = 2.5f;
 	private bool _hasCandidate;
 	private bool _ready;
 	private Vector3 _candidateEye;
@@ -27,6 +29,15 @@ public sealed class ScopeEyeAlignment
 		if ( _ready )
 		{
 			Blend = Blend.Approach( 1f, delta * 12f );
+			// A shooter's head settles into the eye box. Held still, the neutral pose follows the eye, so a sight line
+			// learned slightly off (an idle pose that kept easing, a stance change) can't black the picture out for good;
+			// turns, recoil and sway still shade it while they last.
+			if ( quiet && delta > 0f && delta <= 0.1f )
+			{
+				var follow = 1f - MathF.Exp( -delta * SettleRate );
+				NeutralEyeLocal = NeutralEyeLocal.LerpTo( optic.PointToLocal( camera.Position ), follow );
+				AimLocal = Rotation.Slerp( AimLocal, optic.Rotation.Inverse * camera.Rotation * cant, follow );
+			}
 			return;
 		}
 		if ( !quiet || delta <= 0f || delta > 0.1f )

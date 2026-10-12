@@ -47,6 +47,8 @@ public sealed class OpticZoom : Component, ICameraSetup
 	/// <summary>Lens diameter as a fraction of screen height. Set by the overlay; drives the lens camera FOV.</summary>
 	public static float LensDiameter { get; set; } = 0.3f;
 	public static bool OverlayDotVisible { get; private set; } = true;
+	/// <summary>A hybrid optic's reflex dot, with no magnified camera or scope overlay.</summary>
+	public static bool ReflexSightVisible { get; private set; }
 
 	/// <summary>Eyepiece offset from screen centre as a fraction of screen height (x right, y down), from sway/recoil.</summary>
 	public static Vector2 ScopeOffset { get; private set; }
@@ -73,6 +75,9 @@ public sealed class OpticZoom : Component, ICameraSetup
 	private GameObject _optic;
 	private float _magnification = 1f;
 	private bool _reloading;
+	private bool _reflexSightActive;
+	private Vector3 _reflexEyepiece;
+	private float _reflexRadius;
 
 	// The eyepiece's rear glass in the optic's own space, and its diameter (GunsmithPart.OpticEyepiece). 0 when not known.
 	private Vector3 _eyepiece;
@@ -103,11 +108,25 @@ public sealed class OpticZoom : Component, ICameraSetup
 
 		if ( !main.IsValid() || !viewModel.IsValid() || !player.IsLocallyControlled
 			|| CameraController.Mode != CameraMode.FirstPerson
-			|| !equipment.TryGetOpticAim( out var optic ) || optic.OpticMagnification <= 1f )
+			|| !equipment.TryGetOpticAim( out var optic ) )
 		{
 			Deactivate();
 			return;
 		}
+		var magnification = equipment.GetOpticMagnification( optic );
+		if ( magnification <= 1f )
+		{
+			Deactivate();
+			_main = main;
+			_optic = FindOptic( viewModel );
+			_reflexEyepiece = optic.AlternateSightEyepiece;
+			_reflexRadius = optic.AlternateSightRadius;
+			_reflexSightActive = equipment.IsUsingAlternateSight( optic ) && equipment.HasTag( "aiming" )
+				&& viewModel.AimProgress >= 0.9f && !equipment.HasTag( "reloading" );
+			return;
+		}
+		_reflexSightActive = false;
+		ReflexSightVisible = false;
 		// With the eyepiece known, PostSetup sizes the lens to its glass each frame.
 		_eyepiece = optic.OpticEyepiece;
 		_eyepieceDiameter = optic.OpticEyepieceDiameter;
@@ -129,7 +148,7 @@ public sealed class OpticZoom : Component, ICameraSetup
 		_main = main;
 		_viewModel = viewModel;
 		_reloading = equipment.HasTag( "reloading" );
-		_magnification = optic.OpticMagnification.Clamp( 1f, 8f ) / ViewMagnification;
+		_magnification = magnification / ViewMagnification;
 		_optic = FindOptic( viewModel );
 
 		if ( _calibratedFor != _optic )
@@ -159,10 +178,24 @@ public sealed class OpticZoom : Component, ICameraSetup
 		_viewRotation = camera.WorldRotation;
 	}
 
-	// Viewmodel animation and camera effects are final by now; place the lens on the optic right before rendering.
-	void ICameraSetup.PostSetup( CameraComponent camera )
+	// Viewmodel animation and camera effects are final by now, and the attachments have re-mounted on this frame's
+	// bones (they do it in PostSetup): place the lens on the optic right before rendering. Measured in PostSetup, the
+	// optic could still be where last frame's bones had it, so walking or turning slid the picture off its glass
+	// (a crescent of plain world at one edge) and read as the eye leaving the eye box (a black lens).
+	void ICameraSetup.LateSetup( CameraComponent camera )
 	{
 		if ( camera != _main ) return;
+		if ( _reflexSightActive )
+		{
+			// A reflex dot is collimated onto the aim direction. Hide it while the glass moves
+			// off that line during the sight change or recoil, rather than drawing on the housing.
+			if ( !_optic.IsValid() ) { ReflexSightVisible = false; return; }
+			var glass = camera.WorldTransform.PointToLocal( _optic.WorldTransform.PointToWorld( _reflexEyepiece ) );
+			var radius = _reflexRadius * MathF.Min( MathF.Abs( _optic.WorldScale.y ), MathF.Abs( _optic.WorldScale.z ) );
+			ReflexSightVisible = glass.x > 0.5f && glass.y * glass.y + glass.z * glass.z < radius * radius
+				&& Vector3.GetAngle( _optic.WorldRotation.Forward, camera.WorldRotation.Forward ) < 12f;
+			return;
+		}
 		if ( !_lensCamera.IsValid() || !_lensCamera.Enabled || !_main.IsValid() ) return;
 		if ( !_optic.IsValid() ) { LensVisibility = 0f; return; }
 
@@ -243,6 +276,8 @@ public sealed class OpticZoom : Component, ICameraSetup
 
 	private void Deactivate()
 	{
+		_reflexSightActive = false;
+		ReflexSightVisible = false;
 		ScopeBlend = 0f;
 		ScopeOffset = Vector2.Zero;
 		LensScale = 1f;
@@ -271,6 +306,19 @@ public sealed class OpticZoom : Component, ICameraSetup
 		_lensCamera.RenderExcludeTags.Add( "viewmodel" );
 		_lensCamera.RenderExcludeTags.Add( "optic_viewmodel" );
 		_lensCamera.RenderTarget = Texture.CreateRenderTarget( "optic_lens", ImageFormat.RGBA8888, new Vector2( 1024, 1024 ) );
+		// The same grading as the eye's view. With none, the lens drew the scene untonemapped, so the picture read
+		// darker and flatter than the world round the housing.
+		_lensCamera.BackgroundColor = main.BackgroundColor;
+		CopyEffect<Tonemapping>( main.GameObject, go );
+		CopyEffect<ColorAdjustments>( main.GameObject, go );
+		CopyEffect<Bloom>( main.GameObject, go );
 		go.Enabled = true;
+	}
+
+	private static void CopyEffect<T>( GameObject source, GameObject target ) where T : Component, new()
+	{
+		var effect = source.GetComponent<T>();
+		if ( !effect.IsValid() ) return;
+		effect.CopyPropertiesTo( target.Components.Create<T>() );
 	}
 }

@@ -10,7 +10,7 @@
       {
         "__type": "Sandbox.ModelRenderer",
         "__guid": "f02db21a-0b64-5c5f-94f5-2942177f20a1",
-        "Model": "attachments/mw2022/models/att_vm_hybrid_west02/att_vm_hybrid_west02.vmdl",
+        "Model": "attachments/mw2022/models/att_vm_hybrid_west02/att_vm_hybrid_west02_mount.vmdl",
         "Tint": "1,1,1,1"
       },
       {
@@ -20,10 +20,37 @@
         "PartScale": "1.000000,1.000000,1.000000",
         "PartAngles": "0,0,0",
         "BoneName": "weapon_root",
-        "BodygroupChoices": {
-          "lens": 1
-        },
+        "BodygroupChoices": {},
         "IsLauncher": false
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "63630b63-0a42-57e1-9c7e-d19e94eaf764",
+        "Flags": 0,
+        "Name": "Magnifier",
+        "Position": "0,0,0",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Enabled": true,
+        "NetworkMode": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.ModelRenderer",
+            "__guid": "8919f316-c6a7-5e67-b3c1-f974f6dafc46",
+            "__enabled": true,
+            "Model": "attachments/mw2022/models/att_vm_hybrid_west02/att_vm_hybrid_west02_magnifier.vmdl",
+            "Tint": "1,1,1,1"
+          },
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithFlipMagnifier",
+            "__guid": "b453b424-d272-54b8-bea8-f28dfce3998e",
+            "__enabled": true,
+            "Hinge": "0,0.75,0.47",
+            "FlipAngle": -90.0
+          }
+        ],
+        "Children": []
       }
     ]
   },

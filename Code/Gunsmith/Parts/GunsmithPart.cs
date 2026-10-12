@@ -166,6 +166,16 @@ public partial class GunsmithPart : GameResource
 	[Property, ShowIf( nameof( Category ), GunsmithPartType.Optic )]
 	public bool OpticOverlayDot { get; set; } = true;
 
+	/// <summary>The optic has a separate unmagnified reflex sight above or beside its scope.</summary>
+	[Property, ShowIf( nameof( Category ), GunsmithPartType.Optic )] public bool HasAlternateSight { get; set; }
+	/// <summary>Translation from the scope's aim pose to the alternate sight, measured between their glass centres.</summary>
+	[Property, ShowIf( nameof( HasAlternateSight ), true )] public Vector3 AlternateSightAimOffset { get; set; }
+	[Property, ShowIf( nameof( HasAlternateSight ), true )] public Angles AlternateSightAimAngles { get; set; }
+	[Property, ShowIf( nameof( HasAlternateSight ), true ), Range( 1, 8 )] public float AlternateSightMagnification { get; set; } = 1f;
+	/// <summary>Reflex glass centre and safe aperture radius in optic model space, for clipping its collimated dot.</summary>
+	[Property, ShowIf( nameof( HasAlternateSight ), true )] public Vector3 AlternateSightEyepiece { get; set; }
+	[Property, ShowIf( nameof( HasAlternateSight ), true )] public float AlternateSightRadius { get; set; }
+
 	public Dictionary<string, int> GetBodygroups( Model model ) =>
 		model is not null && ModelBodygroups is not null && ModelBodygroups.TryGetValue( model.Name, out var groups )
 			? groups ?? Bodygroups : Bodygroups;

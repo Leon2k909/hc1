@@ -49,13 +49,13 @@ public partial class ManualOffset : Aimable, IViewModelOffset
 		if ( IsAiming && Equipment.IsValid() && Player.IsValid() && Player.IsLocallyControlled
 			&& Equipment.TryGetOpticAim( out var optic ) )
 		{
-			Player.AimDampening /= optic.OpticMagnification.Clamp( 1f, 8f );
+			Player.AimDampening /= Equipment.GetOpticMagnification( optic );
 		}
 	}
 
 	Vector3 IViewModelOffset.PositionOffset => IsAiming
 		? Equipment.IsValid() && Equipment.TryGetOpticAim( out var optic )
-			? optic.OpticAimOffset + OpticAimCorrection + (SightLine( optic )?.Position ?? Vector3.Zero) + RailCorrection( true )
+			? Equipment.GetOpticAimOffset( optic ) + OpticAimCorrection + (SightLine( optic )?.Position ?? Vector3.Zero) + RailCorrection( true )
 			: AimOffset + RailCorrection( false )
 		: Vector3.Zero;
 	private Vector3 RailCorrection( bool optic ) => Equipment.IsValid() && Equipment.ApplySavedAttachments
@@ -64,7 +64,7 @@ public partial class ManualOffset : Aimable, IViewModelOffset
 		? optic ? rail.RailOpticAimCorrection : rail.RailIronAimCorrection : Vector3.Zero;
 	Angles IViewModelOffset.AngleOffset => IsAiming
 		? Equipment.IsValid() && Equipment.TryGetOpticAim( out var optic )
-			? optic.OpticAimAngles + (SightLine( optic )?.Angles ?? Angles.Zero)
+			? Equipment.GetOpticAimAngles( optic ) + (SightLine( optic )?.Angles ?? Angles.Zero)
 			: AimAngleOffset
 		: Angles.Zero;
 

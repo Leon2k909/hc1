@@ -69,13 +69,25 @@ def obj_triangles(path):
 def eyepiece(part):
     """ The rear glass's centre (its rear face) and diameter, in the optic model's space. """
     prefab = json.loads((ASSETS / part["MainPrefab"]["prefab"]).read_text(encoding="utf-8"))
-    model = next(c["Model"] for c in prefab["RootObject"]["Components"] if c.get("__type") == "Sandbox.ModelRenderer")
-    vmdl = (ASSETS / model).read_text(encoding="utf-8")
-    remap = dict(re.findall(r'from = "([^"]+)\.vmat" to = "([^"]+)"', vmdl))
+    # A flip-to-side magnifier's glass is on the prefab's "Magnifier" child (flip_magnifiers.py), drawn in the
+    # optic's model space at rest, so look through every renderer for the one with the rear glass.
+    found = []
+    def visit(node):
+        for c in node.get("Components", []):
+            if c.get("__type") != "Sandbox.ModelRenderer" or not c.get("Model"):
+                continue
+            vmdl = (ASSETS / c["Model"]).read_text(encoding="utf-8")
+            remap = dict(re.findall(r'from = "([^"]+)\.vmat" to = "([^"]+)"', vmdl))
+            glass = [m for m, target in remap.items() if target.endswith("_reticle.vmat")]
+            if glass:
+                found.append((c["Model"], vmdl, glass))
+        for child in node.get("Children", []):
+            visit(child)
+    visit(prefab["RootObject"])
+    assert len(found) == 1 and len(found[0][2]) == 1, (part["MainPrefab"], found)
+    model, vmdl, glass = found[0]
     obj = ASSETS / re.search(r'filename = "([^"]+\.obj)"', vmdl).group(1)
     vertices, used = obj_triangles(obj)
-    glass = [m for m, target in remap.items() if target.endswith("_reticle.vmat")]
-    assert len(glass) == 1, (model, glass)
     points = [vertices[i] for i in used[glass[0]]]
     xs, ys, zs = zip(*points)
     centre = (min(xs), (min(ys) + max(ys)) / 2, (min(zs) + max(zs)) / 2)

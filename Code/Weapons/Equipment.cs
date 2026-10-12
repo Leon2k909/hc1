@@ -461,6 +461,8 @@ public partial class Equipment : Component, Component.INetworkListener, IDescrip
 
 	protected override void OnUpdate()
 	{
+		UpdateOpticInput();
+
 		if ( IsDeployed )
 			UpdateIkHands();
 

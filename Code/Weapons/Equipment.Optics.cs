@@ -4,6 +4,46 @@ namespace Facepunch;
 
 public partial class Equipment
 {
+	public const string SwitchOpticInputAction = "SwitchOptic";
+	[Sync] public bool UsingAlternateSight { get; private set; }
+	private GunsmithPart _opticSelectionFor;
+
+	/// <summary>Keep the selected sight on this weapon, and reset it when its fitted optic changes.</summary>
+	private void UpdateOpticInput()
+	{
+		if ( !IsDeployed || !Owner.IsValid() || !Owner.IsLocallyControlled || Owner.CurrentEquipment != this ) return;
+		TryGetOpticAim( out var optic );
+		if ( _opticSelectionFor != optic )
+		{
+			_opticSelectionFor = optic;
+			UsingAlternateSight = false;
+		}
+
+		if ( !Owner.HealthComponent.IsValid() || Owner.HealthComponent.State != LifeState.Alive
+			|| Owner.IsFrozen || Input.Suppressed || Input.EscapePressed
+			|| GameUtils.IsInteractiveMouseUiOpen() || GameUtils.IsGunsmithStudioOpen()
+			|| HasTag( "reloading" ) || (ViewModel.IsValid() && ViewModel.IsInspecting) ) return;
+
+		if ( Input.Pressed( SwitchOpticInputAction ) ) SwitchOpticSight();
+	}
+
+	/// <summary>Switch between a hybrid optic's scope and its separate reflex sight.</summary>
+	public bool SwitchOpticSight()
+	{
+		if ( !TryGetOpticAim( out var optic ) || !optic.HasAlternateSight ) return false;
+		_opticSelectionFor = optic;
+		UsingAlternateSight = !UsingAlternateSight;
+		return true;
+	}
+
+	public bool IsUsingAlternateSight( GunsmithPart optic ) => optic.IsValid() && optic.HasAlternateSight && UsingAlternateSight;
+	public Vector3 GetOpticAimOffset( GunsmithPart optic ) => optic.OpticAimOffset
+		+ (IsUsingAlternateSight( optic ) ? optic.AlternateSightAimOffset : Vector3.Zero);
+	public Angles GetOpticAimAngles( GunsmithPart optic ) => optic.OpticAimAngles
+		+ (IsUsingAlternateSight( optic ) ? optic.AlternateSightAimAngles : Angles.Zero);
+	public float GetOpticMagnification( GunsmithPart optic ) =>
+		(IsUsingAlternateSight( optic ) ? optic.AlternateSightMagnification : optic.OpticMagnification).Clamp( 1f, 8f );
+
 	/// <summary>Use the fitted sight's alignment, including factory optics on weapons picked up from bots.</summary>
 	public bool TryGetOpticAim( out GunsmithPart optic )
 	{
@@ -37,7 +77,7 @@ public partial class Equipment
 	public float GetAimFovOffset( float baseFov )
 	{
 		var magnification = OffsetMagnification( AimFovOffset );
-		if ( TryGetOpticAim( out var optic ) && optic.OpticMagnification > 1f )
+		if ( TryGetOpticAim( out var optic ) && GetOpticMagnification( optic ) > 1f )
 			magnification *= OpticZoom.ViewMagnification;
 
 		return AimFov( baseFov, magnification ) - baseFov;

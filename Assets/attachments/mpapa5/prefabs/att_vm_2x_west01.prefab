@@ -13,7 +13,7 @@
         "__type": "Sandbox.ModelRenderer",
         "__guid": "528d9629-8e9f-510d-b2fe-0019ed30806f",
         "__enabled": true,
-        "Model": "attachments/mw2022/models/att_vm_2x_west01/att_vm_2x_west01.vmdl",
+        "Model": "attachments/mw2022/models/att_vm_2x_west01/att_vm_2x_west01_mount.vmdl",
         "Tint": "1,1,1,1"
       },
       {
@@ -52,6 +52,33 @@
             "__type": "Facepunch.Gunsmith.GunsmithMp5OpticRiser",
             "__guid": "d55e6075-2922-4eb9-94e6-3a9022bf00ce",
             "__enabled": true
+          }
+        ],
+        "Children": []
+      },
+      {
+        "__guid": "dfc7af11-07d1-50e6-b63a-f5121e1a8e61",
+        "Flags": 0,
+        "Name": "Magnifier",
+        "Position": "0,0,0",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Enabled": true,
+        "NetworkMode": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.ModelRenderer",
+            "__guid": "22e06ac6-78a3-53aa-b3da-9400e2976abf",
+            "__enabled": true,
+            "Model": "attachments/mw2022/models/att_vm_2x_west01/att_vm_2x_west01_magnifier.vmdl",
+            "Tint": "1,1,1,1"
+          },
+          {
+            "__type": "Facepunch.Gunsmith.GunsmithFlipMagnifier",
+            "__guid": "5256ccbc-d91d-5c31-8ab6-96e4ba945beb",
+            "__enabled": true,
+            "Hinge": "0,-0.551,0.25",
+            "FlipAngle": 90.0
           }
         ],
         "Children": []

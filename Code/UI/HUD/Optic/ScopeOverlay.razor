@@ -6,8 +6,12 @@
     view (OpticZoom.LensTexture) over the optic's glass, with the reticle, edge darkening and a thin rim.
 *@
 
-<root style="opacity: @Alpha">
-    <div class="mount" style="left: @(OffsetX)%; top: @(OffsetY)%;">
+<root style="opacity: @(OpticZoom.ReflexSightVisible ? 1f : Alpha)">
+    @if (OpticZoom.ReflexSightVisible)
+    {
+        <div class="reflex-dot dot"></div>
+    }
+    <div class="mount" style="left: @(OffsetX)%; top: @(OffsetY)%; opacity: @(OpticZoom.ReflexSightVisible ? 0f : 1f);">
         <div class="lens" @ref="Lens" style="width: @(LensWidthPercent)%; height: @(LensHeightPercent)%;">
             <MarkerSystem ScopeView="@(true)" />
             @if (OpticZoom.OverlayDotVisible)
@@ -39,7 +43,7 @@
     public override void Tick()
     {
         var texture = OpticZoom.LensTexture;
-        SetClass( "hidden", Alpha <= 0f || texture is null );
+        SetClass( "hidden", !OpticZoom.ReflexSightVisible && (Alpha <= 0f || texture is null) );
 
         if ( Lens is not null && texture != _bound )
         {
@@ -48,5 +52,5 @@
         }
     }
 
-    protected override int BuildHash() => HashCode.Combine( Alpha, LensWidthPercent, LensHeightPercent, OffsetX, OffsetY, OpticZoom.OverlayDotVisible );
+    protected override int BuildHash() => HashCode.Combine( Alpha, LensWidthPercent, LensHeightPercent, OffsetX, OffsetY, OpticZoom.OverlayDotVisible, OpticZoom.ReflexSightVisible );
 }
