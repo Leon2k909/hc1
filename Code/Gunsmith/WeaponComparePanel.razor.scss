@@ -129,6 +129,22 @@ WeaponComparePanel
 
             label { color: white; }
         }
+
+        // The left column's builds take its colour.
+        &.mine.on
+        {
+            border-color: $accent;
+            background-color: rgba( 255, 122, 26, 0.14 );
+        }
+
+        // A saved build: its name over its gun's.
+        &.build
+        {
+            flex-direction: column;
+
+            .wc-chip-build { font-size: 12px; font-weight: 700; letter-spacing: 1px; color: rgba( 255, 255, 255, 0.85 ); }
+            .wc-chip-gun { font-size: 10px; font-weight: 600; letter-spacing: 1px; color: $text-dim; margin-top: 2px; }
+        }
     }
 
     .wc-table
@@ -158,13 +174,17 @@ WeaponComparePanel
         &:hover { background-color: rgba( 255, 255, 255, 0.03 ); }
     }
 
+    // The columns' heads: the gun, and under it the saved build's name (or CURRENT BUILD) when builds are compared.
     .wc-names
     {
         min-height: 40px;
+        padding: 4px 0;
 
-        .wc-val { font-size: 13px; font-weight: 700; letter-spacing: 1.5px; }
-        .wc-val.mine { color: $accent; }
-        .wc-val.theirs { color: $theirs; }
+        .wc-val { flex-direction: column; align-items: flex-end; justify-content: center; }
+        .wc-gun { font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-align: right; }
+        .wc-build { font-size: 11px; font-weight: 600; letter-spacing: 1px; color: $text-mid; text-align: right; white-space: normal; margin-top: 2px; }
+        .wc-val.mine .wc-gun { color: $accent; }
+        .wc-val.theirs .wc-gun { color: $theirs; }
     }
 
     .wc-name
@@ -208,8 +228,8 @@ WeaponComparePanel
         margin-top: 0;
 
         .wc-names { min-height: 32px; }
-        .wc-names .wc-val { font-size: 11px; }
-        .wc-names .wc-val.theirs { color: $text-dim; }
+        .wc-names .wc-gun { font-size: 11px; }
+        .wc-names .wc-val.theirs .wc-gun { color: $text-dim; }
         .wc-section { margin-top: 10px; font-size: 10px; letter-spacing: 2px; }
         .wc-row { min-height: 26px; }
         .wc-row.better { background-color: rgba( 123, 214, 107, 0.08 ); }

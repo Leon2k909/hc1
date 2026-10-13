@@ -2078,6 +2078,15 @@
     It opens on the compared gun's kind.
   - The YOUR BUILDS / FACTORY toggle is commented out (2026-10-13, the user: "just your build is enough to compare";
     they may want it back), so both columns are the saved builds. The FACTORY chip in COMPARE WITH stays.
+  - Saved builds (BUILDS, `GunsmithPresets`) can be compared in either column, two builds of the same gun included
+    (2026-10-13, the user: "if i have 2 ak 74us, i wanna be able to compare them too").
+    - Over the left column, YOUR BUILD chips: CURRENT BUILD and this gun's builds.
+    - COMPARE WITH has a SAVED BUILDS tab after the categories: every gun's builds, and this gun's CURRENT BUILD.
+    - A build's figures come from `GunsmithStats.Compute( resource, buildCode )`, through
+      `GunsmithLoadoutManager.TryReadWithBuild`, with any part the player hasn't unlocked left off.
+    - Picks are kept by the build's Id, so renaming one keeps it picked. The column heads show each build's name under
+      its gun.
+    - Compiled with dotnet, not yet seen in-game.
 - DETAILS (the stats card's `.gs-stats-details`, `ShowDetails`): the same figures in the loadout column, as the build
   beside the factory gun (`WeaponComparePanel.Live`, fed GunsmithPanel's `_stats` / `_baseStats`, so they change when
   the bars do). The user asked for more than the bars (2026-09-29), then to watch those figures while changing parts.

@@ -92,6 +92,14 @@ public sealed record GunsmithStats
 	public IEnumerable<string> TagList => Tags.Split( '|', StringSplitOptions.RemoveEmptyEntries );
 
 	/// <summary>
+	/// The stats of <paramref name="resource"/> with a saved build's parts (<see cref="GunsmithPresets"/>' code) instead
+	/// of the active class's. Empty for a code that can't be read or is for another weapon.
+	/// </summary>
+	public static GunsmithStats Compute( EquipmentResource resource, string buildCode ) =>
+		GunsmithLoadoutManager.TryReadWithBuild( resource, buildCode, () => Compute( resource, true ), out var stats )
+			? stats : new GunsmithStats();
+
+	/// <summary>
 	/// The stats of <paramref name="resource"/>: as built in the active class, or with <paramref name="build"/> false,
 	/// as it comes from the factory (no parts, no tuning), which the bars show the build's changes against.
 	/// </summary>

@@ -758,6 +758,34 @@ public static class GunsmithLoadoutManager
 		return true;
 	}
 
+	/// <summary>
+	/// Runs <paramref name="read"/> with a build code (<see cref="ExportWeaponBuildCode"/>) standing in for the saved
+	/// loadout, as <see cref="ApplyBuild"/> fits one, saving nothing: the gunsmith's COMPARE works out a saved build's
+	/// figures this way (<see cref="GunsmithStats.Compute(EquipmentResource, string)"/>). Parts the weapon's level
+	/// hasn't unlocked are left off, as they would be on the gun. False for a code that can't be read or is for another
+	/// weapon.
+	/// </summary>
+	public static bool TryReadWithBuild<T>( EquipmentResource resource, string code, Func<T> read, out T value )
+	{
+		value = default;
+		if ( !resource.IsValid() || read is null || string.IsNullOrWhiteSpace( code )
+			|| !TryDecodeWeaponBuildCode( code, out var build, out _ )
+			|| !resource.ResourcePath.Equals( build.Weapon ?? "", StringComparison.OrdinalIgnoreCase ) )
+			return false;
+
+		foreach ( var category in Enum.GetValues<GunsmithPartType>() )
+		{
+			if ( TryGetBuildAttachment( build, resource, category, out var part ) && !AttachmentUnlocks.IsUnlocked( resource, part ) )
+				build.Attachments.Remove( category.ToString() );
+		}
+
+		_fitting = build;
+		try { value = read(); }
+		finally { _fitting = null; }
+
+		return true;
+	}
+
 	public static void ApplyAttachments( EquipmentResource resource, GameObject root, GunsmithPart previewCamo = null )
 	{
 		if ( !resource.IsValid() || !root.IsValid() )

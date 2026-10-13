@@ -22,13 +22,31 @@
     </div>
     *@
 
+    @* The left column: the build on the gun in the active class, or one of this weapon's saved builds. *@
+    @if ( MyBuilds.Any() )
+    {
+        <label class="wc-label">@Tr( "YOUR BUILD" )</label>
+        <div class="wc-chips">
+            <div class="wc-chip mine @(MyBuild is null ? "on" : "")" onclick=@(() => PickMine( null ))><label>@Tr( "CURRENT BUILD" )</label></div>
+            @foreach ( var build in MyBuilds )
+            {
+                var b = build;
+                <div class="wc-chip mine @(b == MyBuild ? "on" : "")" onclick=@(() => PickMine( b ))><label>@b.Name</label></div>
+            }
+        </div>
+    }
+
     <label class="wc-label">@Tr( "COMPARE WITH" )</label>
     <div class="wc-filters">
-        <div class="wc-filter @(Filter is null ? "on" : "")" onclick=@(() => SetFilter( null ))><label>@Tr( "ALL" )</label></div>
+        <div class="wc-filter @(Filter is null && !BuildsTab ? "on" : "")" onclick=@(() => SetFilter( null ))><label>@Tr( "ALL" )</label></div>
         @foreach ( var category in Categories )
         {
             var c = category;
-            <div class="wc-filter @(Filter == c ? "on" : "")" onclick=@(() => SetFilter( c ))><label>@Tr( CategoryLabel( c ) )</label></div>
+            <div class="wc-filter @(Filter == c && !BuildsTab ? "on" : "")" onclick=@(() => SetFilter( c ))><label>@Tr( CategoryLabel( c ) )</label></div>
+        }
+        @if ( _builds.Count > 0 )
+        {
+            <div class="wc-filter @(BuildsTab ? "on" : "")" onclick=@ShowBuilds><label>@Tr( "SAVED BUILDS" )</label></div>
         }
     </div>
     <div class="wc-chips">
@@ -37,9 +55,28 @@
         {
             <div class="wc-chip factory @(VsFactory ? "on" : "")" onclick=@PickFactory><label>@Tr( "FACTORY" )</label></div>
         }
-        @foreach ( var weapon in Candidates.Where( x => Filter is null || x.Category == Filter ) )
+        @if ( BuildsTab )
         {
-            <div class="wc-chip @(weapon == Other ? "on" : "")" onclick=@(() => Pick( weapon ))><label>@weapon.Name.ToUpperInvariant()</label></div>
+            @* Every gun's saved builds, this one's too, so two builds of the same gun can go side by side. *@
+            <div class="wc-chip build @(Other == Weapon && OtherBuild is null ? "on" : "")" onclick=@PickCurrent>
+                <label class="wc-chip-build">@Tr( "CURRENT BUILD" )</label>
+                <label class="wc-chip-gun">@Weapon?.Name.ToUpperInvariant()</label>
+            </div>
+            @foreach ( var build in _builds )
+            {
+                var b = build;
+                <div class="wc-chip build @(b == OtherBuild ? "on" : "")" onclick=@(() => PickBuild( b ))>
+                    <label class="wc-chip-build">@b.Name</label>
+                    <label class="wc-chip-gun">@b.Weapon.Name.ToUpperInvariant()</label>
+                </div>
+            }
+        }
+        else
+        {
+            @foreach ( var weapon in Candidates.Where( x => Filter is null || x.Category == Filter ) )
+            {
+                <div class="wc-chip @(weapon == Other && weapon != Weapon && OtherBuild is null ? "on" : "")" onclick=@(() => Pick( weapon ))><label>@weapon.Name.ToUpperInvariant()</label></div>
+            }
         }
     </div>
 
@@ -55,10 +92,22 @@
         <div class="wc-table">
             <div class="wc-row wc-names">
                 <label class="wc-name"></label>
-                <label class="wc-val mine">@(Live ? Tr( "BUILD" ) : Weapon.Name.ToUpperInvariant())</label>
+                <div class="wc-val mine">
+                    <label class="wc-gun">@(Live ? Tr( "BUILD" ) : Weapon.Name.ToUpperInvariant())</label>
+                    @if ( !Live && BuildLine( MyBuild ) is { } mineBuild )
+                    {
+                        <label class="wc-build">@mineBuild</label>
+                    }
+                </div>
                 @if ( theirs is not null )
                 {
-                    <label class="wc-val theirs">@(Live || VsFactory ? Tr( "FACTORY" ) : Other.Name.ToUpperInvariant())</label>
+                    <div class="wc-val theirs">
+                        <label class="wc-gun">@(Live || VsFactory ? Tr( "FACTORY" ) : Other.Name.ToUpperInvariant())</label>
+                        @if ( !Live && !VsFactory && BuildLine( OtherBuild ) is { } theirsBuild )
+                        {
+                            <label class="wc-build">@theirsBuild</label>
+                        }
+                    </div>
                 }
             </div>
             @foreach ( var row in Rows( _mine, theirs ) )
@@ -116,8 +165,27 @@
     /// <summary> Live: the factory gun's. </summary>
     public GunsmithStats FactoryStats { get; set; }
 
-    /// <summary> The last weapon compared with, so reopening the panel keeps it. </summary>
+    /// <summary> The last weapon compared with, and its saved build (null: the current one), so reopening the panel keeps them. </summary>
     private static string _lastOtherPath;
+    private static string _lastOtherBuild;
+
+    /// <summary> A saved build (<see cref="GunsmithPresets"/>): a weapon's build code under its Id and a name, unique for the weapon. </summary>
+    private record Build( EquipmentResource Weapon, string Id, string Name, string Code );
+
+    /// <summary> The left column's saved build; null for the build on the gun in the active class. </summary>
+    private Build MyBuild { get; set; }
+
+    /// <summary> The right column's saved build; null for <see cref="Other"/>'s build in the active class. </summary>
+    private Build OtherBuild { get; set; }
+
+    /// <summary> The COMPARE WITH list shows the saved builds instead of the weapons. </summary>
+    private bool BuildsTab { get; set; }
+
+    /// <summary> Every gun's saved builds, read again with the figures. </summary>
+    private List<Build> _builds = new();
+    private int _buildsKey;
+
+    private IEnumerable<Build> MyBuilds => _builds.Where( x => x.Weapon == Weapon );
 
     /// <summary> The kind of gun the COMPARE WITH list shows; null for all of them. </summary>
     private WeaponCategory? Filter { get; set; }
@@ -163,8 +231,46 @@
     private void SetFilter( WeaponCategory? category )
     {
         Filter = category;
+        BuildsTab = false;
         StateHasChanged();
     }
+
+    private void ShowBuilds()
+    {
+        BuildsTab = true;
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// The saved builds of every gun in the list (the gunsmith's BUILDS), keeping each side's pick by its weapon and
+    /// Id: a build renamed or saved over keeps its place, and one deleted goes back to the current build.
+    /// </summary>
+    private void RefreshBuilds()
+    {
+        var weapons = Weapon is not null && !Candidates.Contains( Weapon ) ? Candidates.Prepend( Weapon ) : Candidates;
+        _builds = weapons
+            .SelectMany( w => GunsmithPresets.Get( w ).Where( p => !string.IsNullOrWhiteSpace( p.Name ) && !string.IsNullOrWhiteSpace( p.Code ) )
+                .Select( p => new Build( w, p.Id ?? p.Name, p.Name, p.Code ) ) )
+            .ToList();
+        _buildsKey = _builds.Aggregate( 17, ( hash, b ) => HashCode.Combine( hash, b.Weapon, b.Id, b.Name, b.Code ) );
+
+        MyBuild = Find( MyBuild?.Weapon, MyBuild?.Id );
+        OtherBuild = Find( OtherBuild?.Weapon, OtherBuild?.Id );
+        if ( _builds.Count == 0 )
+            BuildsTab = false;
+    }
+
+    private Build Find( EquipmentResource weapon, string id ) =>
+        weapon is null || id is null ? null : _builds.FirstOrDefault( x => x.Weapon == weapon && x.Id == id );
+
+    /// <summary>
+    /// The line under a column's gun: its saved build's name, or CURRENT BUILD when either side is a saved build or
+    /// both sides are this gun. Null when it's only guns side by side.
+    /// </summary>
+    private string BuildLine( Build build ) =>
+        build is not null ? build.Name
+        : MyBuild is not null || OtherBuild is not null || Other == Weapon ? Tr( "CURRENT BUILD" )
+        : null;
 
     public override void Tick()
     {
@@ -182,9 +288,13 @@
         {
             _statsFor = Weapon;
             VsFactory = false;
-            Other = PickDefault();
-            // The list opens on the compared gun's kind (else this one's), so its chip is in view.
-            Filter = (Other ?? Weapon)?.Category;
+            MyBuild = null;
+            OtherBuild = null;
+            RefreshBuilds();
+            (Other, OtherBuild) = PickDefault();
+            // The list opens on the compared build, or the compared gun's kind (else this one's), so its chip is in view.
+            BuildsTab = OtherBuild is not null;
+            Filter = BuildsTab ? null : (Other ?? Weapon)?.Category;
             _sinceStats = 10f;
         }
 
@@ -193,33 +303,83 @@
             return;
 
         _sinceStats = 0f;
-        _mine = Weapon is not null ? GunsmithStats.Compute( Weapon, !Factory ) : new GunsmithStats();
+        RefreshBuilds();
+        _mine = Weapon is null ? new GunsmithStats()
+            : MyBuild is not null ? GunsmithStats.Compute( Weapon, MyBuild.Code )
+            : GunsmithStats.Compute( Weapon, !Factory );
         _theirs = VsFactory && Weapon is not null ? GunsmithStats.Compute( Weapon, false )
-            : Other is not null ? GunsmithStats.Compute( Other, !Factory ) : new GunsmithStats();
+            : Other is null ? new GunsmithStats()
+            : OtherBuild is not null ? GunsmithStats.Compute( Other, OtherBuild.Code )
+            : GunsmithStats.Compute( Other, !Factory );
     }
 
-    /// <summary> The weapon compared last, else another of the same kind (the RPK against the Kastovs), else none. </summary>
-    private EquipmentResource PickDefault()
+    /// <summary>
+    /// The saved build compared last, if it's still there, else the weapon compared last, else another of the same
+    /// kind (the RPK against the Kastovs), else none. Never this weapon's current build beside itself.
+    /// </summary>
+    private (EquipmentResource Weapon, Build Build) PickDefault()
     {
+        var last = Candidates.FirstOrDefault( x => string.Equals( x.ResourcePath, _lastOtherPath, StringComparison.OrdinalIgnoreCase ) );
+        if ( Find( last, _lastOtherBuild ) is { } saved )
+            return (last, saved);
+
         var others = Candidates.Where( x => x != Weapon ).ToList();
-        return others.FirstOrDefault( x => string.Equals( x.ResourcePath, _lastOtherPath, StringComparison.OrdinalIgnoreCase ) )
+        return (others.FirstOrDefault( x => x == last )
             ?? others.FirstOrDefault( x => x.Category == Weapon?.Category )
-            ?? others.FirstOrDefault( x => x.Slot == Weapon?.Slot );
+            ?? others.FirstOrDefault( x => x.Slot == Weapon?.Slot ), null);
     }
 
     private void Pick( EquipmentResource weapon )
     {
         VsFactory = false;
         Other = weapon == Weapon ? null : weapon;
-        _lastOtherPath = Other?.ResourcePath;
+        OtherBuild = null;
+        Remember();
         _sinceStats = 10f;
         StateHasChanged();
+    }
+
+    /// <summary> The right column: a saved build of any gun, this one's included. </summary>
+    private void PickBuild( Build build )
+    {
+        VsFactory = false;
+        Other = build.Weapon;
+        OtherBuild = build;
+        Remember();
+        _sinceStats = 10f;
+        StateHasChanged();
+    }
+
+    /// <summary> The right column: this weapon's build in the active class, to set beside one of its saved builds. </summary>
+    private void PickCurrent()
+    {
+        VsFactory = false;
+        Other = Weapon;
+        OtherBuild = null;
+        Remember();
+        _sinceStats = 10f;
+        StateHasChanged();
+    }
+
+    /// <summary> The left column: one of this weapon's saved builds, or null for the current build. </summary>
+    private void PickMine( Build build )
+    {
+        MyBuild = build;
+        _sinceStats = 10f;
+        StateHasChanged();
+    }
+
+    private void Remember()
+    {
+        _lastOtherPath = Other?.ResourcePath;
+        _lastOtherBuild = OtherBuild?.Id;
     }
 
     private void PickFactory()
     {
         VsFactory = true;
         Other = null;
+        OtherBuild = null;
         _sinceStats = 10f;
         StateHasChanged();
     }
@@ -336,5 +496,6 @@
 
     private static string SpeedText( float unitsPerSecond ) => $"{unitsPerSecond * MetersPerUnit:0.00} M/S";
 
-    protected override int BuildHash() => HashCode.Combine( Weapon, Other, Factory, VsFactory, Live, Filter, _mine, _theirs );
+    protected override int BuildHash() =>
+        HashCode.Combine( HashCode.Combine( Weapon, Other, Factory, VsFactory, Live, Filter, _mine, _theirs ), MyBuild, OtherBuild, BuildsTab, _buildsKey );
 }
