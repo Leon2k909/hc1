@@ -19,13 +19,13 @@ public partial class PlayerPawn
 	/// <summary>
 	/// How fast a slide bleeds speed (a crouch's is 4). It starts almost free (<see cref="SlideFrictionStart"/>), holds
 	/// that for <see cref="SlideHoldTime"/>, then rises to <see cref="SlideFrictionEnd"/> over <see cref="SlideFrictionRamp"/>.
-	/// A rifle's 285 u/s sprint slides off at 400 and is still at ~375 half a second in; the slide lasts ~1.3 s and goes
-	/// ~430 units (11 m).
+	/// A rifle's 285 u/s sprint slides off at 400 and is still at ~370 half a second in; the slide lasts ~1.15 s and goes
+	/// ~375 units (9.5 m).
 	/// </summary>
 	private const float SlideFrictionStart = 0.12f;
-	private const float SlideFrictionEnd = 1.4f;
-	private const float SlideHoldTime = 0.4f;
-	private const float SlideFrictionRamp = 0.8f;
+	private const float SlideFrictionEnd = 1.6f;
+	private const float SlideHoldTime = 0.35f;
+	private const float SlideFrictionRamp = 0.7f;
 
 	/// <summary>How much the keys steer a slide: barely.</summary>
 	private const float SlideAcceleration = 1.5f;
@@ -59,10 +59,10 @@ public partial class PlayerPawn
 	/// <summary>The share of the slope's pull a slide gets: downhill keeps it going, uphill stops it sooner.</summary>
 	private const float SlideSlopeHelp = 0.5f;
 
-	/// <summary>Down on one hip, sliding. The body is crouched, footsteps are silent and the gun is canted.</summary>
+	/// <summary>Down on one hip, sliding. The body is crouched, footsteps are silent and the gun dips a little.</summary>
 	[Sync] public bool IsSliding { get; private set; }
 
-	/// <summary>0 to 1, eased in and out with <see cref="IsSliding"/> on every machine: the viewmodel and camera follow it.</summary>
+	/// <summary>0 to 1, eased in and out with <see cref="IsSliding"/> on every machine: the viewmodel follows it.</summary>
 	public float SlideBlend { get; private set; }
 
 	private TimeSince _slideTime;

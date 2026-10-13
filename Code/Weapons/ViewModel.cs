@@ -91,11 +91,8 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 	/// <summary> The gun's turn while mantling: muzzle down and a little left, canted right. </summary>
 	private static readonly Angles MantleAngles = new( 30f, 10f, 30f );
 
-	/// <summary> Where the gun goes in a slide, in the view's space: a little back, in and down. </summary>
+	/// <summary> Where the gun goes in a slide, in the view's space: a little back, in and down. It doesn't tilt. </summary>
 	private static readonly Vector3 SlidePosition = new( -1.5f, 1f, -1.5f );
-
-	/// <summary> The gun's turn in a slide: canted left with the body, muzzle a little down. </summary>
-	private static readonly Angles SlideAngles = new( 4f, 6f, -14f );
 
 	void ICameraSetup.Setup( CameraComponent cc )
 	{
@@ -271,13 +268,10 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 			targetRotationOffset *= (MantleAngles * mantle).ToRotation();
 		}
 
-		// Sliding: the gun cants with the body as it drops onto a hip, less as it's aimed (PlayerPawn.Slide.cs).
+		// Sliding: the gun dips a little as the body drops onto a hip, less as it's aimed, with no tilt (PlayerPawn.Slide.cs).
 		var slide = Owner.IsValid() ? Owner.SlideBlend * (1f - _aimProgress) : 0f;
 		if ( slide > 0f )
-		{
 			targetPositionOffset += SlidePosition * slide;
-			targetRotationOffset *= (SlideAngles * slide).ToRotation();
-		}
 
 		// Smoothly interpolate position and rotation
 		lerpedPositionOffset = lerpedPositionOffset.LerpTo( targetPositionOffset, Time.Delta * 10f );
