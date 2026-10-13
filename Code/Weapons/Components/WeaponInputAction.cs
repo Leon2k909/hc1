@@ -32,6 +32,15 @@ public abstract class WeaponInputAction : EquipmentComponent,
 	/// </summary>
 	bool _heldInputChecked;
 
+	/// <summary>
+	/// Whether a button held since before the equipment was deployed counts as held. Fire doesn't, so a click held
+	/// through a switch or a respawn isn't a new pull. Aiming does (<see cref="Aimable"/>): aim held through a switch
+	/// aims the gun switched to.
+	/// </summary>
+	protected virtual bool TakesInputHeldThroughDeploy => false;
+
+	bool HeldSinceBeforeDeploy() => !TakesInputHeldThroughDeploy && InputActions.Any( x => Input.Down( x ) );
+
 	// The body is a named method: hotload can't re-link static lambdas inside explicit generic interface methods
 	// ("Unable to find matching substitution for a static method"), so they'd throw after every hotload.
 	void IGameEventHandler<EquipmentDeployedEvent>.OnGameEvent( EquipmentDeployedEvent eventArgs ) => OnWeaponDeployed( eventArgs );
@@ -41,7 +50,7 @@ public abstract class WeaponInputAction : EquipmentComponent,
 		_heldInputChecked = Equipment?.Owner?.IsLocallyControlled ?? false;
 		if ( _heldInputChecked )
 		{
-			RunningWhileDeployed = InputActions.Any( x => Input.Down( x ) );
+			RunningWhileDeployed = HeldSinceBeforeDeploy();
 		}
 	}
 
@@ -101,7 +110,7 @@ public abstract class WeaponInputAction : EquipmentComponent,
 
 		if ( !_heldInputChecked )
 		{
-			RunningWhileDeployed = InputActions.Any( x => Input.Down( x ) );
+			RunningWhileDeployed = HeldSinceBeforeDeploy();
 			_heldInputChecked = true;
 		}
 
@@ -118,7 +127,7 @@ public abstract class WeaponInputAction : EquipmentComponent,
 		bool matched = false;
 
 		// Clicking a class in the class menu, or anything at the Zombies workbench, isn't weapon input.
-		var menuOpen = UI.ClassSelect.IsAnyOpen || UI.ZombiesWorkbenchPanel.IsAnyOpen;
+		var menuOpen = UI.ClassSelect.IsAnyOpen || UI.ZombiesWorkbenchPanel.IsAnyOpen || Equipment.Owner.IsPipeClimbing;
 
 		foreach ( var action in InputActions )
 		{

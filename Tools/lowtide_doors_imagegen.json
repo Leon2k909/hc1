@@ -1,0 +1,22 @@
+{
+  "mode": "built-in image_gen",
+  "use_case": "photorealistic-natural",
+  "green": {
+    "source": "Tools/lowtide_door_green_source.png",
+    "generated_file": "C:/Users/leon2/.codex/generated_images/01a13199-e644-75a0-a510-29315b87c41e/exec-55d65d7f-caa9-4f50-80aa-ec3f7a46e51e.png",
+    "prompt": "Use case: photorealistic-natural.\nAsset type: production game material base-colour / albedo texture for painted wooden warehouse loading doors in Lowtide, a North German red-brick dockyard.\nPrimary request: a sharp, realistic, seamless square texture of six vertical tongue-and-groove timber boards painted faded muted dockyard sage green. The board widths are roughly equal, the boards run straight from the top edge to the bottom edge with absolutely no horizontal joins or board ends.\nComposition/framing: orthographic front-on surface scan, wood fills every pixel edge to edge; narrow straight vertical recessed seams; all six boards continuous. Square high-resolution 2048 x 2048 texture. Opposite edges must tile seamlessly, including the top/bottom wood grain.\nMaterials/textures: weathered matte oil paint still covers about 85 percent of the surface, small restrained chipped patches along the seams revealing warm grey-brown timber, subtle long grain through the thin paint, fine hairline cracks, a few small natural knots, mild salt-air wear. Specific sharp microdetail, naturally varied but calm and believable at a distance. Boards should read as carpentry, not rows of masonry.\nColor palette: muted medium sage green paint, warm desaturated grey-brown exposed timber. Maintain enough lightness for a shaded in-game doorway.\nLighting: evenly lit diffuse albedo with no directional illumination, no baked highlights, no large shading gradient, no vignette, no cast shadows or deep black shading.\nConstraints: only the material surface; no frame, hinges, bolts, rivets, nails, handle, crossbars, braces, walls, borders, labels, text, watermark, perspective or surrounding scene. No horizontal planks, staggered end joints, rot holes, extreme peeling, oversaturated green, blur."
+  },
+  "red": {
+    "source": "Tools/lowtide_door_red_source.png",
+    "generated_file": "C:/Users/leon2/.codex/generated_images/01a13199-e644-75a0-a510-29315b87c41e/exec-59012fca-4833-43f0-a189-6aded7c26e4b.png",
+    "prompt": "Use case: precise-object-edit.\nAsset type: production game material base-colour / albedo texture, the red-team counterpart of Lowtide's green painted warehouse door boards.\nInput image: the generated green wooden board texture is the edit target.\nPrimary request: change only the sage green painted areas to a restrained faded iron-oxide red / dark terracotta warehouse paint. Keep enough lightness for a shaded in-game doorway. Bare exposed wood stays the same warm grey-brown.\nInvariants: preserve the exact square dimensions, board positions, six continuous vertical boards, straight narrow seams, wood grain, knots, fine cracks, small chips, distribution of wear, orthographic framing and seamless edge layout. Match surface detail pixel for pixel as closely as possible. Do not add anything.\nLighting: retain flat, evenly lit diffuse albedo; no gradients, cast shadows, highlights, vignette or baked environmental light.\nConstraints: wood fills every pixel edge to edge; no frame, handle, hinges, metal bars, rivets, nails, text, border, watermark or scene. No horizontal plank ends. Only repaint the existing green paint a muted weathered red."
+  },
+  "outputs": [
+    "Assets/materials/lowtide/lt_door_green_color.png",
+    "Assets/materials/lowtide/lt_door_red_color.png",
+    "Assets/materials/lowtide/lt_door_normal.png",
+    "Assets/materials/lowtide/lt_door_rough.png",
+    "Assets/materials/lowtide/lt_door_ao.png"
+  ],
+  "reproduction": "rtk proxy python Tools/lowtide_doors.py"
+}

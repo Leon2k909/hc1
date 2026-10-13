@@ -1,8 +1,8 @@
 """Lowtide's welded, open builder's skip and its reference-derived steel material.
 
 The base colour is an unchanged imagegen asset. The generated normal, roughness and
-metalness images are material data derived from its paint/steel/rust regions. Small
-fittings are visual detail; the skip keeps its original cover collider and location.
+metalness images are material data derived from its paint/steel/rust regions. The
+floor, tapered walls, rim and feet collide separately, leaving the interior open.
 """
 import math
 from pathlib import Path
@@ -130,11 +130,17 @@ class Skip:
                 uv=np.clip(coords, .001, .999),
                 normals=None if normals is None else [np.asarray(n) @ self.axes for n in normals])
 
-    def box(self, centre, size, paint="lt_skip", bevel=0.12, axes=None, role="panel"):
+    def box(self, centre, size, paint="lt_skip", bevel=0.12, axes=None, role="panel", collide=False):
         """Solid steel part with six faces, twelve bevels and eight bevelled corners."""
         c, half = np.asarray(centre, float), np.asarray(size, float) / 2
         axes = np.eye(3) if axes is None else np.asarray(axes, float)
         bevel = min(bevel, float(half.min()) * 0.7)
+        if collide:
+            collision_axes = axes @ self.axes
+            # The north-facing skip swaps the plan axes. Boxes require a proper rotation.
+            if np.linalg.det(collision_axes) < 0:
+                collision_axes[1] *= -1
+            self.m.boxes.append((self.p(c), collision_axes, half * 2, "metal"))
 
         def draw(points, normal, chamfer=False):
             coords = None
@@ -245,6 +251,9 @@ class Skip:
                 else:
                     towards = (0, -1 if value == 0 else 1, 0) if end else (-1 if value == 0 else 1, 0, 0)
                 self.poly("lt_skip_trim", pts, towards)
+        # Each tapered plate has its own thin hull; a hull around the whole skip seals the opening.
+        self.m.hull([self.p(at(u, v, inner)) for inner in (False, True)
+                     for u, v in ((0, 0), (1, 0), (1, 1), (0, 1))], "metal")
 
     def eye(self, x, y):
         """A thick rounded lifting plate with a genuinely open, bevelled hole."""
@@ -275,15 +284,15 @@ class Skip:
 
     def build(self):
         # Four welded plates and a real dirty steel floor replace the former rubble cap.
-        self.box((0, 0, 4.0), (104, 68, .8), "lt_skip_floor", bevel=.08, role="floor")
+        self.box((0, 0, 4.0), (104, 68, .8), "lt_skip_floor", bevel=.08, role="floor", collide=True)
         for sign in (-1, 1):
             self.panel(False, sign)
             self.panel(True, sign)
         # Rolled hollow-section rim, with softly rounded external corners.
         for y in (-38.0, 38.0):
-            self.box((0, y, 38.2), (148, 3.0, 3.5), "lt_skip_trim", bevel=.18, role="handled")
+            self.box((0, y, 38.2), (148, 3.0, 3.5), "lt_skip_trim", bevel=.18, role="handled", collide=True)
         for x in (-72.0, 72.0):
-            self.box((x, 0, 38.2), (3.0, 73.0, 3.5), "lt_skip_trim", bevel=.18, role="handled")
+            self.box((x, 0, 38.2), (3.0, 73.0, 3.5), "lt_skip_trim", bevel=.18, role="handled", collide=True)
         for sign in (-1, 1):
             normal = K.normalise((0, sign, -4 / 34))
             for x in (-34.0, 0.0, 34.0):
@@ -311,11 +320,8 @@ class Skip:
         # Four squat support feet; no floating bottom or paper-thin silhouette.
         for x in (-39.0, 39.0):
             for y in (-25.5, 25.5):
-                self.box((x, y, 2.15), (8.8, 7.5, 4.3), "lt_skip_trim", bevel=.22, role="foot")
+                self.box((x, y, 2.15), (8.8, 7.5, 4.3), "lt_skip_trim", bevel=.22, role="foot", collide=True)
                 self.weld((x - 4.4, y - 3.8, 3.8), (x + 4.4, y - 3.8, 3.8), .075)
-        # Original AABB remains the gameplay cover. Rim, lugs and welds are visual fittings.
-        corners = [self.p((x, y, z)) for x in (-LENGTH, LENGTH) for y in (-WIDTH, WIDTH) for z in (0, TOP)]
-        self.m.collision_box(np.min(corners, axis=0), np.max(corners, axis=0), "metal")
 
 
 def build(model, origin, along="n"):

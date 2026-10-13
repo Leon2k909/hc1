@@ -1,0 +1,36 @@
+{
+  "mode": "built-in image_gen",
+  "purpose": "Lowtide warehouse brick texture replacement",
+  "source": "C:\\Users\\leon2\\.codex\\generated_images\\01a118c3-728b-7dd0-91f4-5910a22332a0\\exec-679b7c88-e28a-44e0-b00a-cd0d8f4109f5.png",
+  "colour_asset": "Assets/materials/lowtide/lt_brick_color.png",
+  "source_dimensions": [
+    1254,
+    1254
+  ],
+  "colour_sha256": "5c38bfed606ac4df16cf907ce12d2e09e965e8fdafc3123638627e78ed34503b",
+  "reference_layout": "Assets/materials/buildings/brick_color.png",
+  "reference_style": "C:/Users/leon2/.codex/generated_images/01a118c3-728b-7dd0-91f4-5910a22332a0/exec-e546a631-4dd9-4ca8-b96f-0552dcd396b8.png",
+  "packing": "Generated source is preserved byte-for-byte; source pixels are repeated without resampling into a 2048x2048 atlas. The material samples a mortar-bounded region within the original pixels.",
+  "surface_maps": "OpenGL normal, roughness and AO data baked from the generated image mortar/clay mask; all maps share its exact pixel dimensions and UVs.",
+  "world_scale": "Brick scale measured from the generated mortar spacing, applied before repeating an interior mortar-bounded region on the existing 64-inch mesh UVs.",
+  "scope": "Lowtide plain, sooty, glazed and slimed brick materials only; shared buildings textures and map geometry/collision are untouched.",
+  "validation": "Source/pixel integrity, normal data, material references and generator remaps checked; native shader and material compilation passed. A headless Blender repeated-material preview was inspected; live gameplay was not exercised.",
+  "repeat_region_normalized": [
+    0.08984375,
+    0.021484375,
+    0.4306640625,
+    0.56982421875
+  ],
+  "repeat_scale": [
+    1.3333333333333333,
+    0.9254498714652957
+  ],
+  "shader": "Assets/shaders/hc1_brick.shader",
+  "shader_validation": "Native s&box vertex/forward/depth shader compilation passed; compiled shader is included.",
+  "material_import": "All four materials compiled successfully through the native s&box resource compiler in a standalone command-line tool.",
+  "source_asset": "Tools/lowtide_brick_source.png",
+  "atlas_dimensions": [
+    2048,
+    2048
+  ]
+}

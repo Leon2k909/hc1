@@ -20,7 +20,7 @@
             <div class="pause-item primary" onclick=@(()=>PauseMenuPanel.CloseAny())><i>play_arrow</i><label>@Tr( "Resume" )</label></div>
             <div class="pause-item" onclick=@(()=>ChangeClass())><i>badge</i><label>@Tr( "Change Class" )</label></div>
             <div class="pause-item" onclick=@(()=>OpenGunsmith())><i>build</i><label>@Tr( "Gunsmith" )</label></div>
-            <a class="pause-item" href="/settings"><i>settings</i><label>@Tr( "Settings" )</label></a>
+            <a class="pause-item" href="/settings" onclick=@ClosePartyPopups><i>settings</i><label>@Tr( "Settings" )</label></a>
             <div class="pause-item" onclick=@(()=>ReportBug())><i>bug_report</i><label>@Tr( "Report a Bug" )</label></div>
 
             <div class="pause-sep"></div>
@@ -36,6 +36,10 @@
                 <div class="pause-item warn" onclick=@(()=>Quit())><i>power_settings_new</i><label>@Tr( "Quit to s&box" )</label></div>
             }
         </div>
+    </div>
+
+    <div class="pause-social">
+        <PartyPanel @ref="PartyPanelRef" Expanded=@true />
     </div>
 
     @if ( showPartyModal )
@@ -81,6 +85,10 @@
     }
 
     private BugReportPanel BugReportPanelRef { get; set; }
+    private PartyPanel PartyPanelRef { get; set; }
+
+    public bool CloseSocialPopup() => PartyPanelRef?.ClosePopup() ?? false;
+    private void ClosePartyPopups() => CloseSocialPopup();
 
     void ReportBug() => BugReportPanelRef?.Open();
 

@@ -71,7 +71,7 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 	[Property, Group( "Effects" )] public string ShootSound { get; set; } = "sounds/weapons/m4a1/m4_shot.sound";
 
 	public bool IsAlive => HealthComponent.IsValid() && HealthComponent.State == LifeState.Alive;
-	public Vector3 EyePosition => WorldPosition + Vector3.Up * (IsCrouching ? 44f : 64f);
+	public Vector3 EyePosition => WorldTransform.PointToWorld( BotPronePose.EyeOffset( IsCrouching, _proneBlend ) );
 
 	[Sync( SyncFlags.FromHost ), Property, ReadOnly] public int Kills { get; private set; }
 	[Sync( SyncFlags.FromHost ), Property, ReadOnly] public int Deaths { get; private set; }
@@ -81,7 +81,7 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 	string IDescription.DisplayName => $"{BotName} BOT";
 	Color IDescription.Color => Team.GetColor();
 	Type IMarkerObject.MarkerPanelTypeOverride => typeof( UI.LightweightBotMarkerPanel );
-	Vector3 IMarkerObject.MarkerPosition => WorldPosition + Vector3.Up * 78f;
+	Vector3 IMarkerObject.MarkerPosition => EyePosition + Vector3.Up * 14f;
 	bool IMarkerObject.ShowChevron => false;
 	bool IMarkerObject.LookOpacity => false;
 
@@ -127,6 +127,7 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 		EnsureReferences();
 		AttachWeaponModel();
 		AttachMovementBox();
+		UpdateStance();
 		UpdateAnimation();
 
 		if ( IsProxy )
@@ -430,6 +431,8 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 
 		if ( Renderer.TryGetBoneTransform( _handBone, out var hand ) )
 		{
+			if ( _proneBlend > 0f && Renderer.SceneModel.IsValid() )
+				hand = Renderer.SceneModel.GetBoneWorldTransform( _handBone.Index );
 			if ( _handBone.Name is "hand_R" or "r_hand" )
 				_handOffset = MilitaryUniform.WeaponHandOffset( Renderer.Model );
 			_weaponHold.WorldTransform = hand.WithScale( 1f ).ToWorld( _handOffset );
@@ -445,6 +448,7 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 	/// <summary>Finish the gun and support arm together, using the pose the renderer will draw this frame.</summary>
 	internal void FinishWeaponPose()
 	{
+		if ( IsAlive ) _pronePose.Apply( Renderer, _proneBlend );
 		if ( _weaponModel.IsValid() ) _weaponModel.LocalTransform = global::Transform.Zero;
 		FollowHand();
 		var gun = GetWeaponWorldModel();
@@ -452,6 +456,13 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 		{
 			_supportGripWeight = 0f;
 			return;
+		}
+
+		if ( _proneBlend > 0f && IsAimingIn && !IsReloadClipPlaying
+			&& ShoulderedHandIk( Renderer, gun, EyeOnGun( gun ), AimDirection, EyePosition ) is { } sightedHand )
+		{
+			_gripHand.Apply( Renderer, Renderer.WorldTransform.ToWorld( sightedHand ) );
+			FollowHand();
 		}
 
 		var target = gun.IkLeftHand;
@@ -638,7 +649,7 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 			Renderer.Set( "wish_z", velocity.z );
 		}
 
-		Renderer.Set( "duck", IsCrouching ? 1f : 0f );
+		Renderer.Set( "duck", IsCrouching && _proneBlend <= 0f ? 1f : 0f );
 
 		// The host decides where the bot aims and syncs it, so every client sees it look at what it's shooting.
 		var aim = AimDirection.IsNearZeroLength ? WorldRotation.Forward : AimDirection;
@@ -738,7 +749,7 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 	private void UpdateLeftHandIk()
 	{
 		var target = GetWeaponWorldModel()?.IkLeftHand;
-		if ( IsReloadClipPlaying || !target.IsValid() || !target.Active )
+		if ( _proneBlend > 0f || IsReloadClipPlaying || !target.IsValid() || !target.Active )
 		{
 			Renderer.SetBool( "ik.hand_left.enabled", false );
 			return;
@@ -800,7 +811,7 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 	/// </summary>
 	private void UpdateRightHandIk( Vector3 aim, bool shouldered )
 	{
-		var gun = shouldered ? GetWeaponWorldModel() : null;
+		var gun = shouldered && _proneBlend <= 0f ? GetWeaponWorldModel() : null;
 		if ( gun.IsValid() && gun != _sightedGun )
 		{
 			_sightedGun = gun;
@@ -847,10 +858,14 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 	/// right eye. The gun rides the hand rigidly (a hold bone, or the hand and an offset), so the hand keeps its grip.
 	/// Null when the body has no eye or hand to go by.
 	/// </summary>
-	public static Transform? ShoulderedHandIk( SkinnedModelRenderer body, WorldModel gun, Vector3 eyeOnGun, Vector3 aim )
+	public static Transform? ShoulderedHandIk( SkinnedModelRenderer body, WorldModel gun, Vector3 eyeOnGun, Vector3 aim, Vector3? eyePosition = null )
 	{
-		if ( aim.IsNearZeroLength || (body.GetAttachment( "eye_R_forward" ) ?? body.GetAttachment( "eyes" )) is not { } eye )
-			return null;
+		if ( aim.IsNearZeroLength ) return null;
+		if ( !eyePosition.HasValue )
+		{
+			if ( (body.GetAttachment( "eye_R_forward" ) ?? body.GetAttachment( "eyes" )) is not { } eye ) return null;
+			eyePosition = eye.Position;
+		}
 
 		var handBone = body.Model?.Bones.GetBone( "hand_R" ) ?? body.Model?.Bones.GetBone( "r_hand" );
 		if ( handBone is null )
@@ -863,7 +878,7 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 		var grip = holdBone is null ? MilitaryUniform.WeaponHandOffset( body.Model )
 			: handBone.LocalTransform.ToLocal( holdBone.LocalTransform );
 		var rotation = Rotation.LookAt( aim.Normal, Vector3.Up );
-		var sighted = new Transform( eye.Position - rotation * eyeOnGun, rotation );
+		var sighted = new Transform( eyePosition.Value - rotation * eyeOnGun, rotation );
 		return body.WorldTransform.ToLocal( sighted.ToWorld( grip.ToLocal( global::Transform.Zero ) ) );
 	}
 
@@ -939,7 +954,7 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 
 			// Most go down over a second or two as their muscles let go; only some drop on the spot (DeathPlan).
 			DyingBody.Begin( physics, DeathPlan.Choose( damageInfo, GameObject.Id, WorldPosition, WorldRotation,
-				_moveVelocity, IsCrouching, down: false ) );
+				_moveVelocity, IsCrouching, down: IsProne || _proneBlend > 0.25f ) );
 		}
 
 		GameObject.DestroyAsync( CorpseLifetime );

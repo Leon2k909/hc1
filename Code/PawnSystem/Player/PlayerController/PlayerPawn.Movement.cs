@@ -194,6 +194,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	{
 		UpdateFallKnockdown();
 		UpdateMantleBlend();
+		UpdatePipeAnimation();
 
 		var cc = CharacterController;
 		CurrentHoldType = CurrentEquipment.IsValid() ? CurrentEquipment.GetHoldType() : AnimationHelper.HoldTypes.None;
@@ -226,7 +227,8 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 		if ( Body.IsValid() )
 		{
 			WorldRotation = Rotation.From( 0, EyeAngles.yaw, 0 );
-			Body.UpdateRotation( Rotation.FromYaw( EyeAngles.yaw ) );
+			var bodyRotation = IsPipeClimbing ? Rotation.LookAt( (PipeGripPosition - WorldPosition).WithZ( 0f ).Normal ) : Rotation.FromYaw( EyeAngles.yaw );
+			Body.UpdateRotation( bodyRotation );
 
 			// Use synced data for remote players, local data for the owner
 			var velocityForAnimation = ( IsLocallyControlled && cc.IsValid() ) ? cc.Velocity : SyncedVelocity;
@@ -316,7 +318,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	private bool WantsToggleSprint { get; set; }
 
 	private bool HasSprintMovement => WishMove.x > 0.2f || (MathF.Abs( WishMove.y ) > 0.2f && WishMove.x >= 0f);
-	private bool CanSprint => !IsMantling && !IsFallKnockedDown && !IsSlowWalking && !IsProne && !IsGettingUp && !HasEquipmentTag( "no_sprint" );
+	private bool CanSprint => !IsMantling && !IsPipeClimbing && !IsFallKnockedDown && !IsSlowWalking && !IsProne && !IsGettingUp && !HasEquipmentTag( "no_sprint" );
 
 	private bool GetWantsToSprint()
 	{

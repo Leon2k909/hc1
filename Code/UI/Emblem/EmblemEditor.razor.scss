@@ -195,6 +195,7 @@ EmblemEditor {
 .ee-layer-row {
     display: flex;
     flex-direction: row;
+    flex-shrink: 0;
     align-items: center;
     padding: 8px 14px;
     gap: 10px;
@@ -228,19 +229,21 @@ EmblemEditor {
 .ee-layer-btns {
     display: flex;
     flex-direction: row;
-    gap: 4px;
+    flex-shrink: 0;
+    gap: 8px;
 }
 
 .ee-icon-btn {
-    width: 24px;
-    height: 24px;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
     background-color: rgba( 255, 255, 255, 0.08 );
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
 
-    i { font-size: 14px; color: white; }
+    i { font-size: 24px; color: white; }
 
     &:hover { background-color: rgba( 255, 255, 255, 0.18 ); }
 
@@ -264,7 +267,7 @@ EmblemEditor {
     &:hover { background-color: rgba( 255, 255, 255, 0.14 ); }
 }
 
-/* Shape / Emoji picker ------------------------------------------ */
+/* Shape / Emoji / Letter picker --------------------------------- */
 
 .ee-shapes {
     display: flex;
@@ -300,7 +303,7 @@ EmblemEditor {
 // The emoji tab scrolls as one list, and each category's grid keeps its full height. As separate grids that could
 // shrink, each was squeezed to about a row, and its other row spilled out under the next category's label (the
 // user's screenshot, 2026-10-05). The grids don't scroll themselves, so the wheel reaches the list.
-.ee-emoji-list {
+.ee-emoji-list, .ee-letter-list {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
@@ -308,19 +311,35 @@ EmblemEditor {
     overflow-y: scroll;
 }
 
-.ee-shape-grid.ee-emoji-grid {
+.ee-shape-grid.ee-emoji-grid, .ee-shape-grid.ee-letter-grid {
     flex-grow: 0;
     flex-shrink: 0;
     overflow: visible;
 }
 
-.ee-emoji-cat-label {
+.ee-emoji-cat-label, .ee-letter-cat-label {
     flex-shrink: 0;
     font-size: 8px;
     font-weight: 800;
     letter-spacing: 2px;
     color: rgba( 255, 255, 255, 0.35 );
     padding: 8px 12px 4px;
+}
+
+.ee-letter-cat-label {
+    text-transform: none;
+}
+
+.ee-letter {
+    font-family: Chakra Petch;
+    font-size: 24px;
+    font-weight: bold;
+    text-transform: none;
+    letter-spacing: 0;
+    line-height: 1;
+    color: white;
+    pointer-events: none;
+    flex-shrink: 0;
 }
 
 .ee-shape-grid {

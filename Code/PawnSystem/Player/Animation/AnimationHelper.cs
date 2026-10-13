@@ -13,6 +13,8 @@ public sealed class AnimationHelper : Component
 	[Property] public GameObject IkRightHand { get; set; }
 	[Property] public GameObject IkLeftFoot { get; set; }
 	[Property] public GameObject IkRightFoot { get; set; }
+	/// <summary>An override in this model's own wrist axes, rather than a legacy weapon socket's axes.</summary>
+	public Transform? LeftHandOverride { get; set; }
 
 	public void ProceduralHitReaction( float damageScale = 1.0f, Vector3 force = default )
 	{
@@ -38,7 +40,8 @@ public sealed class AnimationHelper : Component
 		// SetIk( "left_hand", ... );
 		// SetIk( "right_hand", ... );
 
-		if ( IkLeftHand.IsValid() && IkLeftHand.Active ) SetIk( "hand_left", IkLeftHand.Transform.World );
+		if ( LeftHandOverride is { } leftHand ) SetIk( "hand_left", leftHand, convertHandAxes: false );
+		else if ( IkLeftHand.IsValid() && IkLeftHand.Active ) SetIk( "hand_left", IkLeftHand.Transform.World );
 		else ClearIk( "hand_left" );
 
 		if ( IkRightHand.IsValid() && IkRightHand.Active ) SetIk( "hand_right", IkRightHand.Transform.World );
@@ -51,11 +54,11 @@ public sealed class AnimationHelper : Component
 		else ClearIk( "foot_right" );
 	}
 
-	public void SetIk( string name, Transform tx )
+	public void SetIk( string name, Transform tx, bool convertHandAxes = true )
 	{
 		// convert local to model
 		tx = Target.Transform.World.ToLocal( tx );
-		tx = MilitaryUniform.HandIkTransform( Target.Model, name, tx );
+		if ( convertHandAxes ) tx = MilitaryUniform.HandIkTransform( Target.Model, name, tx );
 
 		Target.SetBool( $"ik.{name}.enabled", true );
 		Target.Set( $"ik.{name}.position", tx.Position );

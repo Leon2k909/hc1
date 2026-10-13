@@ -1102,16 +1102,27 @@ def save_rgb( path, a ):
 def vmat( paint_name, texture, metalness ):
     if paint_name in SEE_THROUGH:
         return glass_vmat( paint_name, texture, SEE_THROUGH[paint_name] )
-    return ( '// Tools/building_textures.py\n'
+    generated_planks = paint_name == "planks" and ( OUT_DIR / "planks_color_v2.png" ).is_file()
+    colour = f"{RESOURCE_DIR}/{paint_name}_color.png"
+    normal = f"{RESOURCE_DIR}/{texture}_normal.png"
+    roughness = f"{RESOURCE_DIR}/{texture}_rough.png"
+    comment = '// Tools/building_textures.py\n'
+    if generated_planks:
+        # Keep the generated albedo on rebuilds; the old relief has different end joints.
+        colour = f"{RESOURCE_DIR}/planks_color_v2.png"
+        normal = "materials/default/default_normal.tga"
+        roughness = "[0.82 0.82 0.82 0.00]"
+        comment = '// Tools/building_textures.py; built-in imagegen prompt in Tools/planks_imagegen.json\n'
+    return ( comment +
              '"Layer0"\n'
              "{\n"
              '    shader "shaders/complex.shader"\n'
              '    F_SPECULAR "1"\n'
              '    g_flRoughnessScaleFactor "1"\n'
              f'    g_flMetalness "{metalness:.2f}"\n'
-             f'    TextureColor "{RESOURCE_DIR}/{paint_name}_color.png"\n'
-             f'    TextureNormal "{RESOURCE_DIR}/{texture}_normal.png"\n'
-             f'    TextureRoughness "{RESOURCE_DIR}/{texture}_rough.png"\n'
+             f'    TextureColor "{colour}"\n'
+             f'    TextureNormal "{normal}"\n'
+             f'    TextureRoughness "{roughness}"\n'
              f'    TextureAmbientOcclusion "{DEFAULT_AO}"\n'
              '    g_vColorTint "[1.0 1.0 1.0 1.0]"\n'
              '    g_flModelTintAmount "1.0"\n'

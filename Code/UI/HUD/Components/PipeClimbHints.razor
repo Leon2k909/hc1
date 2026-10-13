@@ -1,0 +1,30 @@
+@using Sandbox
+@using Sandbox.UI
+@namespace Facepunch.UI
+@inherits Panel
+@attribute [StyleSheet]
+
+@if ( Pawn.IsValid() && Pawn.IsLocallyControlled && Pawn.HealthComponent.State == LifeState.Alive && !PauseMenuPanel.IsAnyOpen )
+{
+    @if ( Pawn.IsPipeClimbing )
+    {
+        <root class="pipe-climb-hints">
+            <div class="hint"><InputHint Action="Forward" Size=@InputGlyphSize.Small /><InputHint Action="Backward" Size=@InputGlyphSize.Small /><label>@Tr( "Climb pipe" )</label></div>
+            <div class="hint"><InputHint Action="Left" Size=@InputGlyphSize.Small /><InputHint Action="Right" Size=@InputGlyphSize.Small /><label>@Tr( "Move around pipe" )</label></div>
+            <div class="hint"><InputHint Action="Jump" Size=@InputGlyphSize.Small /><label>@Tr( "Jump off / mantle" )</label></div>
+            <div class="hint"><InputHint Action="Use" Size=@InputGlyphSize.Small /><label>@Tr( "Let go" )</label></div>
+        </root>
+    }
+    else if ( Pawn.Hovered is ClimbablePipe pipe && pipe.CanUse( Pawn ).CanUse )
+    {
+        <root class="pipe-climb-hints">
+            <div class="hint"><InputHint Action="Use" Size=@InputGlyphSize.Small /><label>@Tr( "Grab pipe" )</label></div>
+        </root>
+    }
+}
+
+@code
+{
+    private PlayerPawn Pawn => Client.Viewer.IsValid() ? Client.Viewer.PlayerPawn : null;
+    public override void Tick() => StateHasChanged();
+}

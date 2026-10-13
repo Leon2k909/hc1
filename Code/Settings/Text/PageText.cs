@@ -389,6 +389,14 @@ public static partial class GameText
 			"Cada prestígio redefine seu nível de jogador e os acessórios de armas desbloqueados. Você mantém suas camuflagens. Alcance o Prestígio 10 para obter o status de Prestígio Mestre." ),
 		["REACHED"] = ("Atteint", "Erreicht", "Alcanzado", "Alcançado"),
 		["WEAPON RECORD"] = ("Bilan des armes", "Waffenbilanz", "Historial de armas", "Histórico de armas"),
+		["ALL WEAPONS"] = ("Toutes les armes", "Alle Waffen", "Todas las armas", "Todas as armas"),
+		["{0} / {1} WEAPONS"] = ("{0} / {1} ARMES", "{0} / {1} WAFFEN", "{0} / {1} ARMAS", "{0} / {1} ARMAS"),
+		["Search weapons"] = ("Rechercher une arme", "Waffen suchen", "Buscar armas", "Buscar armas"),
+		["SORT BY"] = ("Trier par", "Sortieren nach", "Ordenar por", "Ordenar por"),
+		["CLEAR FILTERS"] = ("Effacer les filtres", "Filter löschen", "Borrar filtros", "Limpar filtros"),
+		["No weapons match your filters."] = ("Aucune arme ne correspond à vos filtres.", "Keine Waffen entsprechen deinen Filtern.", "Ninguna arma coincide con tus filtros.", "Nenhuma arma corresponde aos seus filtros."),
+		["Try another name or category."] = ("Essayez un autre nom ou une autre catégorie.", "Versuche einen anderen Namen oder eine andere Kategorie.", "Prueba otro nombre o categoría.", "Tente outro nome ou categoria."),
+		["OTHER"] = ("Autres", "Andere", "Otras", "Outras"),
 
 		// Emblem editor
 		["TRANSFORM"] = ("Transformation", "Transformation", "Transformación", "Transformação"),
@@ -406,6 +414,7 @@ public static partial class GameText
 			"Arraste uma camada para movê-la, ou um canto para redimensioná-la" ),
 		["SHAPES"] = ("Formes", "Formen", "Formas", "Formas"),
 		["EMOJI"] = ("Émojis", "Emojis", "Emojis", "Emojis"),
+		["LETTERS"] = ("Lettres", "Buchstaben", "Letras", "Letras"),
 		["FACES"] = ("Visages", "Gesichter", "Caras", "Rostos"),
 		["ANIMALS"] = ("Animaux", "Tiere", "Animales", "Animais"),
 		["NATURE & FIRE"] = ("Nature et feu", "Natur & Feuer", "Naturaleza y fuego", "Natureza e fogo"),

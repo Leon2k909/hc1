@@ -1,0 +1,12 @@
+PASS factory optic resolves before a viewmodel exists, without saved attachments
+PASS factory M4 viewmodel declares the visible holo sight
+PASS calibrated iron-sight defaults remain unchanged
+PASS bot pickup uses the visible holo despite skipping the saved loadout
+PASS picked-up holo uses its calibrated ADS offset
+PASS picked-up holo reticle is visible
+PASS picked-up holo reticle is centred: 799.674,450.189
+PASS a saved-loadout holo uses the same sight line
+PASS removing the optic restores iron-sight alignment without a stale saved optic
+PASS another fitted optic resolves independently of the saved-loadout flag
+PASS factory world model declares the same holo
+PASS all pickup optic checks

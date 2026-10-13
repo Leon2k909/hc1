@@ -1,0 +1,718 @@
+CareerLanding {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  color: white;
+  font-family: Chakra Petch;
+  font-size: 16px;
+  text-shadow: none;
+  background-color: #08090b;
+  background-image: linear-gradient(to bottom, #141416, #08090b);
+  backdrop-filter: none;
+}
+CareerLanding label, CareerLanding text, CareerLanding i {
+  text-shadow: none;
+}
+CareerLanding MenuTopbar {
+  padding: 0 48px;
+}
+CareerLanding .progression-body {
+  flex-grow: 1;
+  min-height: 0;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 32px 48px;
+  overflow-y: scroll;
+}
+CareerLanding .career-heading {
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+CareerLanding .career-title {
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+CareerLanding .career-subtitle {
+  font-size: 22px;
+  font-weight: 500;
+  color: #c4c8cd;
+}
+CareerLanding .section-title {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: white;
+  flex-shrink: 0;
+}
+CareerLanding .player-stats {
+  background-color: #101114;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  width: 310px;
+  flex-shrink: 0;
+  flex-direction: column;
+  padding: 24px;
+  gap: 20px;
+}
+CareerLanding .player-stats .section-title {
+  font-size: 24px;
+}
+CareerLanding CareerStat {
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  gap: 10px;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+CareerLanding CareerStat .name {
+  color: #c4c8cd;
+  font-size: 22px;
+  font-weight: 500;
+}
+CareerLanding CareerStat .value {
+  font-size: 44px;
+  font-weight: 700;
+}
+CareerLanding CareerStat:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+CareerLanding .progression-content {
+  flex-grow: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 24px;
+}
+CareerLanding .player-rank-card {
+  background-color: #101114;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  border-left: 3px solid #FF7A1A;
+  flex-direction: row;
+  align-items: center;
+  padding: 24px;
+  gap: 24px;
+  margin-bottom: 8px;
+}
+CareerLanding .rank-badge {
+  width: 96px;
+  height: 96px;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background-color: rgba(255, 122, 26, 0.1);
+  border: 1px solid rgba(255, 122, 26, 0.45);
+  color: #FF7A1A;
+  font-size: 44px;
+  font-weight: 700;
+}
+CareerLanding .rank-info {
+  flex-grow: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 14px;
+}
+CareerLanding .rank-title {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+CareerLanding .rank-title label {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+CareerLanding .rank-prestige {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+CareerLanding .rank-separator {
+  color: #c4c8cd;
+}
+CareerLanding .rank-xp-wrap {
+  height: 8px;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.14);
+}
+CareerLanding .rank-xp-fill {
+  height: 100%;
+  background-color: #FF7A1A;
+}
+CareerLanding .rank-xp-label {
+  font-size: 22px;
+  font-weight: 500;
+  color: #c4c8cd;
+}
+CareerLanding .prestige-action {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  min-height: 46px;
+  padding: 0 22px;
+  gap: 10px;
+  background-color: #1a1b1e;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 2px;
+  color: rgba(255, 255, 255, 0.85);
+  font-family: Chakra Petch;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  pointer-events: all;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+CareerLanding .prestige-action i {
+  font-size: 20px;
+}
+CareerLanding .prestige-action:hover {
+  background-color: #242426;
+  border-color: #FF7A1A;
+  color: white;
+  sound-in: ui_button_hover;
+}
+CareerLanding .prestige-action:active {
+  background-color: #303033;
+}
+CareerLanding .prestige-action.primary {
+  background-color: #FF7A1A;
+  border-color: #FF7A1A;
+  color: #08090b;
+}
+CareerLanding .prestige-action.primary:hover {
+  background-color: #FF963F;
+  border-color: #FF963F;
+  color: #08090b;
+}
+CareerLanding .prestige-action.disabled {
+  background-color: #1a1b1e;
+  border-color: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+  cursor: default;
+}
+CareerLanding .prestige-action {
+  align-self: flex-start;
+  margin-top: 8px;
+  min-height: 52px;
+}
+CareerLanding .prestige-action label {
+  font-size: 20px;
+}
+CareerLanding .milestone-heading {
+  flex-direction: column;
+  gap: 12px;
+}
+CareerLanding .milestone-description {
+  font-size: 22px;
+  font-weight: 500;
+  color: #c4c8cd;
+}
+CareerLanding .prestige-grid {
+  width: 100%;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+CareerLanding .prestige-card {
+  background-color: #101114;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  width: 18%;
+  flex-grow: 1;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 12px;
+  gap: 10px;
+}
+CareerLanding .prestige-card img {
+  width: 104px;
+  max-width: 100%;
+  height: 104px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin-bottom: 4px;
+}
+CareerLanding .prestige-card.unlocked {
+  border-color: rgba(255, 122, 26, 0.35);
+}
+CareerLanding .prestige-card.unlocked .prestige-status {
+  color: #ffa568;
+}
+CareerLanding .prestige-card.locked img {
+  opacity: 0.55;
+  filter: grayscale(100%);
+}
+CareerLanding .prestige-name {
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+}
+CareerLanding .prestige-status {
+  font-size: 20px;
+  font-weight: 500;
+  color: #c4c8cd;
+  text-align: center;
+}
+CareerLanding .weapon-record {
+  width: 100%;
+  flex-direction: column;
+  gap: 18px;
+}
+CareerLanding .weapon-record-heading {
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+CareerLanding .weapon-record-count {
+  color: #c4c8cd;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+CareerLanding .weapon-categories {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+CareerLanding .weapon-category {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  min-height: 46px;
+  padding: 0 22px;
+  gap: 10px;
+  background-color: #1a1b1e;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 2px;
+  color: rgba(255, 255, 255, 0.85);
+  font-family: Chakra Petch;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  pointer-events: all;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+CareerLanding .weapon-category i {
+  font-size: 20px;
+}
+CareerLanding .weapon-category:hover {
+  background-color: #242426;
+  border-color: #FF7A1A;
+  color: white;
+  sound-in: ui_button_hover;
+}
+CareerLanding .weapon-category:active {
+  background-color: #303033;
+}
+CareerLanding .weapon-category.primary {
+  background-color: #FF7A1A;
+  border-color: #FF7A1A;
+  color: #08090b;
+}
+CareerLanding .weapon-category.primary:hover {
+  background-color: #FF963F;
+  border-color: #FF963F;
+  color: #08090b;
+}
+CareerLanding .weapon-category.disabled {
+  background-color: #1a1b1e;
+  border-color: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+  cursor: default;
+}
+CareerLanding .weapon-category {
+  min-height: 46px;
+  padding: 0 16px;
+  font-size: 18px;
+  letter-spacing: 1px;
+}
+CareerLanding .weapon-category .category-count {
+  font-size: 16px;
+  color: #c4c8cd;
+}
+CareerLanding .weapon-category.active {
+  background-color: rgba(255, 122, 26, 0.12);
+  border-color: #FF7A1A;
+  color: #ffa568;
+}
+CareerLanding .weapon-category.active .category-count {
+  color: #ffa568;
+}
+CareerLanding .weapon-record-tools {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+CareerLanding .weapon-search {
+  background-color: #101114;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  flex-grow: 1;
+  min-width: 220px;
+  height: 48px;
+  align-items: center;
+  padding: 0 14px;
+  gap: 10px;
+  pointer-events: all;
+}
+CareerLanding .weapon-search i {
+  color: #c4c8cd;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+CareerLanding .weapon-search:hover {
+  border-color: rgba(255, 122, 26, 0.45);
+}
+CareerLanding .weapon-search-entry {
+  flex-grow: 1;
+  min-width: 0;
+  height: 100%;
+  align-items: center;
+  font-family: Chakra Petch;
+  font-size: 20px;
+  font-weight: 500;
+  color: white;
+  border-bottom: 1px solid transparent;
+}
+CareerLanding .weapon-search-entry:focus {
+  border-bottom-color: #FF7A1A;
+}
+CareerLanding .weapon-search-entry .content-label {
+  font-family: Chakra Petch;
+}
+CareerLanding .weapon-search-entry .placeholder {
+  opacity: 1;
+  color: #c4c8cd;
+}
+CareerLanding .weapon-sort {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+CareerLanding .weapon-sort-label {
+  color: #c4c8cd;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin-right: 6px;
+}
+CareerLanding .weapon-sort-option {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  min-height: 46px;
+  padding: 0 22px;
+  gap: 10px;
+  background-color: #1a1b1e;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 2px;
+  color: rgba(255, 255, 255, 0.85);
+  font-family: Chakra Petch;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  pointer-events: all;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+CareerLanding .weapon-sort-option i {
+  font-size: 20px;
+}
+CareerLanding .weapon-sort-option:hover {
+  background-color: #242426;
+  border-color: #FF7A1A;
+  color: white;
+  sound-in: ui_button_hover;
+}
+CareerLanding .weapon-sort-option:active {
+  background-color: #303033;
+}
+CareerLanding .weapon-sort-option.primary {
+  background-color: #FF7A1A;
+  border-color: #FF7A1A;
+  color: #08090b;
+}
+CareerLanding .weapon-sort-option.primary:hover {
+  background-color: #FF963F;
+  border-color: #FF963F;
+  color: #08090b;
+}
+CareerLanding .weapon-sort-option.disabled {
+  background-color: #1a1b1e;
+  border-color: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+  cursor: default;
+}
+CareerLanding .weapon-sort-option {
+  min-height: 48px;
+  padding: 0 14px;
+  font-size: 18px;
+  letter-spacing: 1px;
+}
+CareerLanding .weapon-sort-option.active {
+  border-color: #FF7A1A;
+  color: #ffa568;
+  background-color: rgba(255, 122, 26, 0.12);
+}
+CareerLanding .weapon-clear {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  min-height: 46px;
+  padding: 0 22px;
+  gap: 10px;
+  background-color: #1a1b1e;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 2px;
+  color: rgba(255, 255, 255, 0.85);
+  font-family: Chakra Petch;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  pointer-events: all;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+CareerLanding .weapon-clear i {
+  font-size: 20px;
+}
+CareerLanding .weapon-clear:hover {
+  background-color: #242426;
+  border-color: #FF7A1A;
+  color: white;
+  sound-in: ui_button_hover;
+}
+CareerLanding .weapon-clear:active {
+  background-color: #303033;
+}
+CareerLanding .weapon-clear.primary {
+  background-color: #FF7A1A;
+  border-color: #FF7A1A;
+  color: #08090b;
+}
+CareerLanding .weapon-clear.primary:hover {
+  background-color: #FF963F;
+  border-color: #FF963F;
+  color: #08090b;
+}
+CareerLanding .weapon-clear.disabled {
+  background-color: #1a1b1e;
+  border-color: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+  cursor: default;
+}
+CareerLanding .weapon-clear {
+  min-height: 48px;
+  padding: 0 14px;
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+CareerLanding .weapon-record-empty {
+  background-color: #101114;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  gap: 12px;
+  color: #c4c8cd;
+  font-size: 20px;
+  text-align: center;
+}
+CareerLanding .weapon-record-empty i {
+  font-size: 36px;
+}
+CareerLanding .weapon-record-empty .weapon-empty-title {
+  color: white;
+  font-size: 24px;
+  font-weight: 600;
+}
+CareerLanding .weapon-stats-grid {
+  width: 100%;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+CareerLanding CareerWeapon {
+  background-color: #101114;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  position: relative;
+  width: 48%;
+  flex-grow: 1;
+  flex-direction: column;
+  flex-shrink: 0;
+  min-width: 0;
+  padding: 24px;
+  gap: 18px;
+  overflow: hidden;
+}
+CareerLanding CareerWeapon .weapon-heading {
+  flex-direction: column;
+  min-height: 94px;
+  gap: 12px;
+}
+CareerLanding CareerWeapon .weapon-icon {
+  width: 100%;
+  height: 74px;
+  background-size: contain;
+  background-position: right center;
+  background-repeat: no-repeat;
+  opacity: 0.85;
+}
+CareerLanding CareerWeapon .weapon-name {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+CareerLanding CareerWeapon .weapon-level-row {
+  align-items: center;
+  gap: 12px;
+}
+CareerLanding CareerWeapon .weapon-level-badge {
+  color: #ffa568;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  flex-shrink: 0;
+}
+CareerLanding CareerWeapon .weapon-xp-bar-wrap {
+  flex-grow: 1;
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.14);
+}
+CareerLanding CareerWeapon .weapon-xp-bar-fill {
+  height: 100%;
+  background-color: #FF7A1A;
+}
+CareerLanding CareerWeapon .weapon-stat-row {
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 14px;
+}
+CareerLanding CareerWeapon .weapon-stat-row label {
+  font-size: 22px;
+  font-weight: 500;
+  color: #c4c8cd;
+}
+CareerLanding CareerWeapon .weapon-stat-row .weapon-stat-value {
+  color: white;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.main-menu-root.compact CareerLanding .progression-body {
+  padding: 24px 32px;
+  gap: 20px;
+}
+.main-menu-root.compact CareerLanding .player-stats {
+  width: 290px;
+  padding: 24px;
+}
+.main-menu-root.compact CareerLanding .prestige-card {
+  width: 31.5%;
+  flex-grow: 0;
+}
+
+.main-menu-root.narrow CareerLanding .progression-body {
+  flex-direction: column;
+  padding: 20px 24px;
+}
+.main-menu-root.narrow CareerLanding .player-stats {
+  width: 100%;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.main-menu-root.narrow CareerLanding CareerStat {
+  width: auto;
+  flex-grow: 1;
+  border-bottom: 0;
+  padding: 0;
+}
+.main-menu-root.narrow CareerLanding .progression-content {
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.main-menu-root.portrait CareerLanding .prestige-card {
+  width: 46%;
+}
+.main-menu-root.portrait CareerLanding CareerWeapon {
+  width: 100%;
+}
+.main-menu-root.portrait CareerLanding .weapon-search {
+  width: 100%;
+  min-width: 0;
+  flex-shrink: 0;
+}
+.main-menu-root.portrait CareerLanding .weapon-sort {
+  flex-grow: 1;
+}
+.main-menu-root.portrait CareerLanding .weapon-sort-option {
+  padding: 0 12px;
+}
+.main-menu-root.portrait CareerLanding .career-title {
+  font-size: 34px;
+}
+.main-menu-root.portrait CareerLanding .rank-title {
+  gap: 8px;
+}
+.main-menu-root.portrait CareerLanding .rank-title label {
+  font-size: 24px;
+}
+.main-menu-root.portrait CareerLanding .rank-badge {
+  width: 72px;
+  height: 72px;
+  font-size: 36px;
+}
+.main-menu-root.portrait CareerLanding .player-rank-card {
+  padding: 16px;
+  gap: 16px;
+}
+.main-menu-root.portrait CareerLanding MenuTopbar {
+  padding: 0 24px;
+}

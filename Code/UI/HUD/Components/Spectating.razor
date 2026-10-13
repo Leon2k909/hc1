@@ -4,49 +4,52 @@
 
 @attribute [StyleSheet]
 
-@if ( !SpectateSystem.IsValid() || !SpectateSystem.IsSpectating ) return;
+@if ( !Client.Viewer.IsValid() || !SpectateSystem.IsValid() || !SpectateSystem.IsSpectating ) return;
 
-@if (Client.Viewer.IsLocalPlayer && !SpectateSystem.Instance.IsFreecam) return;
+@if ( !SpectateSystem.IsFreecam && (Client.Viewer.IsLocalPlayer || !Player.IsValid()) ) return;
 
-<root class="hud with-deadzone flex column">
-    <div class="flex row">
-        <InputHint Action="SpectatorPrev" />
-        <div class="flex column with-background with-padding h-full align-center justify-center" style="min-width: 275px; height: 75px;">
-            <label class="text small upper">@Tr( "SPECTATING" )</label>
+<root class="hud with-deadzone">
+    <div class="spectator-target">
+        <InputHint class="cycle-hint small" Action="SpectatorPrev" Size="@InputGlyphSize.Small" />
+        <div class="spectator-identity">
+            <label class="spectator-title">@Tr( "SPECTATING" )</label>
             @if ( SpectateSystem.IsFreecam )
             {
-                <label>@Tr( "FREECAM" )</label>
+                <label class="spectator-name">@Tr( "FREECAM" )</label>
             }
             else
             {
-                <label>@Player.DisplayName</label>
+                <label class="spectator-name">@Player.DisplayName</label>
             }  
         </div>
-        <InputHint Action="SpectatorNext" />  
+        <InputHint class="cycle-hint small" Action="SpectatorNext" Size="@InputGlyphSize.Small" />
     </div>
-    <div class="flex row justify-center gap">
-        @if (!SpectateSystem.IsFreecam )
-        {
-            <span>
-                <InputHint Action="SpectatorFreeCam" />
+    @if ( !SpectateSystem.IsFreecam )
+    {
+        <div class="spectator-controls">
+            <div class="spectator-action">
+                <InputHint class="small" Action="SpectatorFreeCam" Size="@InputGlyphSize.Small" />
                 <label>@Tr( "Freecam" )</label>
-            </span>
-            <span>
-                <InputHint Action="SpectatorMode" Size="@InputGlyphSize.Small" />
+            </div>
+            <div class="spectator-action">
+                <InputHint class="small" Action="SpectatorMode" Size="@InputGlyphSize.Small" />
                 <label>@Tr( "Mode" )</label>
-             </span>
-        }
-    </div>
+            </div>
+        </div>
+    }
 </root>
 
 @code
 {
-    public PlayerPawn Player => Client.Viewer.PlayerPawn;
+    public PlayerPawn Player => Client.Viewer?.PlayerPawn;
 
     public SpectateSystem SpectateSystem => SpectateSystem.Instance;
 
     protected override int BuildHash()
     {
-        return !Player.IsValid() ? 0 : HashCode.Combine( SpectateSystem?.IsSpectating, Player );
+        if ( !SpectateSystem.IsValid() || !Client.Viewer.IsValid() ) return 0;
+
+        return HashCode.Combine( SpectateSystem.IsSpectating, SpectateSystem.IsFreecam,
+            Player, Player.IsValid() ? Player.DisplayName : null );
     }
 }

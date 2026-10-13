@@ -105,8 +105,8 @@ public partial class EquipmentResource : GameResource
 	public bool IsWip { get; set; } = false;
 
 	/// <summary>
-	/// What still needs checking in-game. The gunsmith tags the gun and shows this under its description, only in the
-	/// editor and on the developer's account (AttachmentUnlocks.IsDeveloper). Clear it once everything's been checked.
+	/// Development notes about what still needs checking in-game. Retained in the asset metadata; the gunsmith
+	/// does not display them. Clear once everything has been checked.
 	/// </summary>
 	[Category( "Base" )]
 	public string ReviewNote { get; set; } = "";

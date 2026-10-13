@@ -3,12 +3,12 @@
 {
     shader "shaders/complex.shader"
     F_SPECULAR "1"
+    g_flMetalness "0"
     g_flRoughnessScaleFactor "1"
-    g_flMetalness "0.00"
+    g_vColorTint "[0.130 0.130 0.140 1.0]"
+    g_flModelTintAmount "1"
     TextureColor "materials/railhead/rw_wood_color.png"
     TextureNormal "materials/railhead/wood_normal.png"
     TextureRoughness "materials/railhead/wood_rough.png"
-    TextureAmbientOcclusion "materials/default/default_ao.tga"
-    g_vColorTint "[0.130 0.130 0.140 1.0]"
-    g_flModelTintAmount "1.0"
+    TextureAmbientOcclusion "materials/railhead/wood_ao.png"
 }

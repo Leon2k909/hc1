@@ -1,0 +1,23 @@
+{
+  "generator": "built-in image_gen",
+  "date": "2026-10-13",
+  "use_case": "precise-object-edit",
+  "asset": "Assets/materials/buildings/planks_color_v2.png",
+  "material": "Assets/materials/buildings/planks.vmat",
+  "source_resolution": [
+    1254,
+    1254
+  ],
+  "inputs": [
+    {
+      "role": "edit target and layout reference",
+      "path": "Assets/materials/buildings/planks_color.png"
+    },
+    {
+      "role": "in-game context reference",
+      "path": "C:/Users/leon2/AppData/Local/Temp/codex-clipboard-04b45f6b-eec4-4bda-8989-28751cc4e6a3.png"
+    }
+  ],
+  "prompt": "Use case: precise-object-edit\nAsset type: seamless 2048 x 2048 RGB base-color texture for wooden shipping crates in a realistic first-person shooter.\nInput images: Image 1 is the existing flat plank texture, the edit target and layout reference. Image 2 is an in-game screenshot showing where that texture is used, for context only.\nPrimary request: replace the blurry, synthetic wood in Image 1 with sharply resolved, realistic weathered softwood. Output only the flat square material texture, filling the entire image edge to edge.\nComposition: preserve the target's twelve horizontal courses of narrow planks, staggered end joints, approximate board proportions, and subtle pairs of small iron nail heads at plank ends. Keep grain running horizontally along every plank. Preserve the seam layout so the existing crate UVs remain compatible.\nMaterials: sun-aged silver taupe and muted warm brown pine, clear fine wood fibres and growth rings, restrained natural knots, shallow lengthwise checks, occasional scuffs and saw marks, small dark oxidised nail heads with very slight staining. Each board has subtle tonal variation. Narrow straight gaps, with restrained dark cavity color.\nLighting: uniform neutral diffuse illumination, suitable as PBR albedo; no baked directional highlights, shadows, ambient gradient, or vignette.\nConstraints: seamless repeating left/right and top/bottom edges; crisp photographic surface detail with balanced contrast; opaque square texture. No complete crate, no surrounding scene, no perspective, no border or frame, no battens, no added metal straps, no text, no logos, no watermark. Keep the natural grey-brown timber character of the original, with substantially better grain and surface detail.",
+  "notes": "The generated RGB image is copied unchanged. The original procedural albedo is retained. Flat normals and constant dry-wood roughness avoid applying mismatched old plank joints to the new image."
+}

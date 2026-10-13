@@ -1,14 +1,16 @@
-// Tools/lowtide_map.py, from materials/buildings/planks.vmat
+// Tools/lowtide_doors.py: generated painted vertical timber, matching grain and groove relief.
 "Layer0"
 {
-    shader "shaders/complex.shader"
+    shader "shaders/hc1_lowtide_door.shader"
     F_SPECULAR "1"
     g_flRoughnessScaleFactor "1"
     g_flMetalness "0.00"
-    TextureColor "materials/buildings/planks_color.png"
-    TextureNormal "materials/buildings/planks_normal.png"
-    TextureRoughness "materials/buildings/planks_rough.png"
-    TextureAmbientOcclusion "materials/default/default_ao.tga"
-    g_vColorTint "[0.620 0.340 0.300 1.0]"
+    TextureColor "materials/lowtide/lt_door_red_color.png"
+    TextureNormal "materials/lowtide/lt_door_normal.png"
+    TextureRoughness "materials/lowtide/lt_door_rough.png"
+    TextureAmbientOcclusion "materials/lowtide/lt_door_ao.png"
+    g_vDoorRegion "[0.09106445 0.00024414 0.42626953 0.61181641]"
+    g_vDoorScale "[2.18181818 0.60000000]"
+    g_vColorTint "[1.0 1.0 1.0 1.0]"
     g_flModelTintAmount "1.0"
 }

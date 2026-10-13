@@ -5,14 +5,14 @@
     background-color: rgba( 0, 0, 0, 0.5 );
 
     .emblem-layer {
-        position: absolute;
         font-family: Material Icons;
         font-size: 32px;
+        line-height: 1;
+        flex-shrink: 0;
     }
 
-    /* Emoji wrapper — fixed-size box, flex-centred so position is based on
-       the box not on unpredictable emoji font ascender/descender metrics. */
-    .emblem-emoji-wrap {
+    /* Fixed-size boxes match the canvas selection instead of using text-line metrics. */
+    .emblem-emoji-wrap, .emblem-icon-wrap, .emblem-letter-wrap {
         position: absolute;
         display: flex;
         align-items: center;
@@ -22,6 +22,16 @@
     .emblem-emoji {
         font-family: Segoe UI Emoji, Apple Color Emoji, Noto Color Emoji, sans-serif;
         line-height: 1;
+        flex-shrink: 0;
+    }
+
+    .emblem-letter {
+        font-family: Chakra Petch;
+        font-weight: bold;
+        text-transform: none;
+        letter-spacing: 0;
+        line-height: 1;
+        text-shadow: none;
         flex-shrink: 0;
     }
 }

@@ -65,8 +65,15 @@ SettingsPage
             &:hover { border-color: $menu-accent; color: white; }
             &.selected { background-color: rgba( 255, 122, 26, 0.12 ); border-color: $menu-accent; color: $menu-accent; }
         }
-        // The language: its name and a note on the left, the searchable dropdown (LanguagePicker) on the right.
+        // Direct English region choices above the searchable picker for all languages.
         > .language-setting { flex-wrap: wrap; gap: 12px; padding-top: 12px; padding-bottom: 12px; }
+        .language-controls { width: 400px; max-width: 100%; flex-direction: column; gap: 8px; flex-shrink: 1; }
+        .language-controls .language-picker { width: 100%; min-width: 0; flex-shrink: 1; }
+        .english-variants { flex-wrap: nowrap; }
+        .english-variants .choice-option { flex-grow: 1; min-width: 0; padding: 10px; gap: 6px; }
+        .language-variant-text { flex-direction: column; gap: 3px; }
+        .language-spelling { font-size: 12px; color: $menu-muted; white-space: nowrap; }
+        .english-variants .choice-option.selected .language-spelling { color: rgba( white, 0.7 ); }
         .setting-text { flex-direction: column; gap: 4px; min-width: 0; flex-shrink: 1; }
         .setting-hint { font-size: 14px; color: $menu-muted; }
         // A bool setting with two named sides (GameSettings' [Choices], e.g. Kills / Score): both are

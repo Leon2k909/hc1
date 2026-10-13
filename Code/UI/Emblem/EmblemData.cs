@@ -4,12 +4,12 @@ using System.Text.Json;
 
 namespace Facepunch.UI;
 
-public enum EmblemIconType { MaterialIcon, Emoji }
+public enum EmblemIconType { MaterialIcon = 0, Emoji = 1, Letter = 2 }
 
 public class EmblemLayer
 {
     public string Icon { get; set; } = "star";
-    /// <summary>Whether Icon is a Material Icon name or a raw emoji character.</summary>
+    /// <summary>Whether Icon is a Material Icon name, an emoji, or a letter.</summary>
     public EmblemIconType IconType { get; set; } = EmblemIconType.MaterialIcon;
     public Color Color { get; set; } = Color.White;
     public float X { get; set; } = 50f;

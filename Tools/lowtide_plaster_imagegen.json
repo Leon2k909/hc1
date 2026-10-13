@@ -1,0 +1,15 @@
+{
+  "mode": "built-in image_gen",
+  "prompt": "Use case: photorealistic-natural.\nAsset type: production seamless base-colour / albedo texture for the lime-plastered interior walls of Lowtide's old red-brick North German dockside warehouses.\nPrimary request: a convincing aged warm off-white lime plaster surface with sharp, fine sandy mineral grain, shallow irregular trowel marks and a worn thin limewash coat. The broad wall should have character and readable surface texture rather than looking like blurry grey clouds. Naturally layered application, fine pores, small local scuffs, a few thin hairline shrinkage cracks and restrained irregular chips exposing a warmer beige plaster undercoat. Old working warehouse, reasonably maintained, believable wear.\nScale: the square represents about 3.25 metres of wall. Grain is mostly 1–2 mm, trowel strokes approximately 10–30 cm, occasional small scuffed/chipped patches 3–15 cm. About 90 percent intact ivory limewash. Cracks few and fine, no large repetitive crack network. Surface variation is subtle but tangible, not a smooth modern painted wall.\nColor palette: warm chalk white and pale bone/ivory, subdued stone-grey scuffs, tiny sand/ochre undercoat accents. Keep the wall predominantly light and neutral so it fits the red brick and dark timber. No glaring pure white and no dark mottled fog effect.\nComposition/framing: square high-resolution 2048 x 2048 orthographic straight-on surface scan, texture fills every pixel edge to edge. Truly seamless on all four edges. Wear distributed irregularly with no centre focal mark or frame, no obvious directional gradients, no floor-to-ceiling gradient.\nLighting: flat diffuse base colour only, evenly lit, no directional highlights, cast shadows, ambient occlusion, vignette or baked room lighting. Material relief will be provided by separate surface maps.\nConstraints: plaster surface only, no scene, no wall edges, brick grid, large exposed brick patches, doors, windows, trim, writing, graffiti, symbols, watermark or borders. No stone slabs, concrete board joints, wood grain, rust, dense black speckles, large pebbles, heavily destroyed plaster or stylized painterly brushwork. Crisp realistic material detail, avoid blur.",
+  "generated_file": "C:/Users/leon2/.codex/generated_images/01a13199-e644-75a0-a510-29315b87c41e/exec-c687cea0-d657-4928-844b-045da89953e3.png",
+  "source": "Tools/lowtide_plaster_source.png",
+  "outputs": [
+    "Assets/materials/lowtide/lt_plaster_color.png",
+    "Assets/materials/lowtide/lt_plaster_normal.png",
+    "Assets/materials/lowtide/lt_plaster_rough.png",
+    "Assets/materials/lowtide/lt_plaster_ao.png",
+    "Assets/materials/lowtide/lt_plaster.vmat",
+    "Assets/shaders/hc1_lowtide_plaster.shader"
+  ],
+  "reproduction": "rtk proxy python Tools/lowtide_plaster.py"
+}

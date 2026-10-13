@@ -1,0 +1,10 @@
+{
+  "tool": "image_gen.imagegen (built-in)",
+  "source": "Tools/lowtide_stairs_source.png",
+  "albedo": "materials/lowtide/stairs/wood_color.png",
+  "materials": [
+    "materials/lowtide/stairs/lt_stair_wood.vmat",
+    "materials/lowtide/stairs/lt_stair_riser.vmat"
+  ],
+  "prompt": "Use case: photorealistic-natural.\nAsset type: game environment PBR base-colour material for worn wooden stair treads in Lowtide's old dockside warehouse. One square 2048 x 2048 full-bleed wood grain scan.\nPrimary request: generate a sharp photographic texture of aged, dry, medium-dark brown timber. This is a continuous wood surface that will be cropped separately onto individual stair treads, so it must not depict a floor made of multiple planks.\nMaterials/textures: natural fine long wood fibres and growth grain running strictly left-to-right, subtly wavy grain with a few restrained small natural knots, shallow longitudinal checking, slight scuffing and rubbed fibres from years of foot traffic, faint embedded grey dust, gentle varied brown staining. Fine detailed exposed wood, matte and unvarnished. Restrained realistic wear, sound solid timber, no deep cracks or exaggerated damage. Medium-dark muted warm brown with some grey aging; avoid orange lacquer, fresh bright pine and black charred timber.\nComposition/framing: straight-on orthographic material scan; fill every pixel with one continuous seamless wood-grain surface. Consistent physical detail across the image. No distinct individual boards, plank ends or border strips. No dramatic knots dominating the pattern; the stairs need many distinct believable crops.\nLighting: absolutely even diffuse albedo with no baked lighting, directional highlights, shadows, bevel shading, vignette or ambient occlusion. All stair edge shading will come from the game geometry and lighting.\nConstraints: texture only. No staircase, step shape, seams between boards, butt joints, joints with nails, screws, nail heads, floor layout, stripes, dark gaps, wood silhouettes, borders, frames, perspective, objects, text, logos, watermark or PBR collage."
+}

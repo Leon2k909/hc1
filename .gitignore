@@ -8,6 +8,10 @@
 *.csproj
 !Tools/BlastLimbExport/BlastLimbExport.csproj
 !Tools/ReconChecks/ReconChecks.csproj
+!Tools/SharingChecks/SharingChecks.csproj
+!Tools/BotStanceChecks/BotStanceChecks.csproj
+!Tools/PipeClimbChecks/PipeClimbChecks.csproj
+!Tools/SmokeChecks/SmokeChecks.csproj
 obj
 bin
 Properties/*
@@ -37,3 +41,9 @@ __pycache__/
 
 # Generated sources and validation captures for split ragdoll clothing
 /output/blast-limbs/
+
+# Generated gun buddy preview scene and renders
+/output/pocket-scout/
+/output/lowtide-brick/
+/output/lowtide-water/
+/output/lowtide-bridge/

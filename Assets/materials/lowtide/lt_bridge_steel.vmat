@@ -1,0 +1,15 @@
+// Tools/lowtide_bridge_rails.py: photographic painted steel with physical edge wear.
+"Layer0"
+{
+    shader "shaders/hc1_bridge_steel.shader"
+    F_SPECULAR "1"
+    TextureColor "materials/lowtide/lt_bridge_steel_color.png"
+    TextureNormal "materials/lowtide/lt_bridge_steel_normal.png"
+    TextureRoughness "materials/lowtide/lt_bridge_steel_rough.png"
+    TextureMetalness "materials/lowtide/lt_bridge_steel_metal.png"
+    TextureAmbientOcclusion "materials/lowtide/lt_bridge_steel_ao.png"
+    g_flTintColor "[1.0 1.0 1.0]"
+    g_vSteelRegion "[0.000244141 0.000244141 0.611816406 0.611816406]"
+    g_flSteelTile "24"
+    g_flEdgeWearWidth "0.11"
+}

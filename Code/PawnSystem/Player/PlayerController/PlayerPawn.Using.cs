@@ -93,6 +93,13 @@ partial class PlayerPawn
 
 	private void UpdateUse()
 	{
+		if ( IsPipeClimbing )
+		{
+			IsUsing = false;
+			Hovered = null;
+			if ( Input.Pressed( "Use" ) ) StopPipeClimb( Vector3.Zero );
+			return;
+		}
 		// Use takes you back from the drone's camera; that press isn't for whatever's in front of you.
 		if ( IsPilotingDrone || ReconOctocopter.JustUnlinked )
 		{
@@ -104,7 +111,7 @@ partial class PlayerPawn
 		IsUsing = Input.Down( "Use" );
 
 		var usables = GetUsables();
-		Hovered = usables.FirstOrDefault();
+		Hovered = usables.FirstOrDefault( x => x is not null );
 
 		if ( Input.Pressed( "Use" ) )
 		{

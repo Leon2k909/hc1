@@ -61,11 +61,65 @@
                 }
             </div>
 
-            <label class="section-title">@Tr( "WEAPON RECORD" )</label>
-            <div class="weapon-stats-grid">
-                @foreach ( var equip in ResourceLibrary.GetAll<EquipmentResource>().Where( x => x.Slot == EquipmentSlot.Primary || x.Slot == EquipmentSlot.Secondary ) )
+            <div class="weapon-record">
+                @{
+                    var weapons = GetRecordWeapons();
+                    var visibleWeapons = GetVisibleWeapons( weapons );
+                }
+                <div class="weapon-record-heading">
+                    <label class="section-title">@Tr( "WEAPON RECORD" )</label>
+                    <label class="weapon-record-count">@Tr( "{0} / {1} WEAPONS", visibleWeapons.Count, weapons.Count )</label>
+                </div>
+                <div class="weapon-categories">
+                    <button class="weapon-category @(SelectedCategory is null ? "active" : "")" onclick=@(() => SelectCategory( null ))>
+                        <label>@Tr( "ALL WEAPONS" )</label>
+                        <label class="category-count">@weapons.Count</label>
+                    </button>
+                    @foreach ( var group in weapons.GroupBy( x => x.Category ).OrderBy( x => x.Key ) )
+                    {
+                        var category = group.Key;
+                        <button class="weapon-category @(SelectedCategory == category ? "active" : "")" onclick=@(() => SelectCategory( category ))>
+                            <label>@Tr( CategoryLabel( category ) )</label>
+                            <label class="category-count">@group.Count()</label>
+                        </button>
+                    }
+                </div>
+                <div class="weapon-record-tools">
+                    <div class="weapon-search">
+                        <i>search</i>
+                        <TextEntry class="weapon-search-entry" Value=@WeaponSearch OnTextEdited=@SetWeaponSearch Placeholder=@(Tr( "Search weapons" )) />
+                    </div>
+                    <div class="weapon-sort">
+                        <label class="weapon-sort-label">@Tr( "SORT BY" )</label>
+                        @foreach ( var sort in Enum.GetValues<WeaponRecordSort>() )
+                        {
+                            var option = sort;
+                            <button class="weapon-sort-option @(SelectedSort == option ? "active" : "")" onclick=@(() => SelectSort( option ))>
+                                <label>@Tr( SortLabel( option ) )</label>
+                            </button>
+                        }
+                    </div>
+                    @if ( HasWeaponFilters )
+                    {
+                        <button class="weapon-clear" onclick=@ClearWeaponFilters><i>close</i><label>@Tr( "CLEAR FILTERS" )</label></button>
+                    }
+                </div>
+                @if ( visibleWeapons.Count == 0 )
                 {
-                    <CareerWeapon Equipment=@equip />
+                    <div class="weapon-record-empty">
+                        <i>search_off</i>
+                        <label class="weapon-empty-title">@Tr( "No weapons match your filters." )</label>
+                        <label>@Tr( "Try another name or category." )</label>
+                    </div>
+                }
+                else
+                {
+                    <div class="weapon-stats-grid">
+                        @foreach ( var equip in visibleWeapons )
+                        {
+                            <CareerWeapon @key="equip.ResourcePath" Equipment=@equip />
+                        }
+                    </div>
                 }
             </div>
         </div>
@@ -74,6 +128,77 @@
 
 @code
 {
+    private enum WeaponRecordSort { Name, Kills, Level }
+
+    private WeaponCategory? SelectedCategory { get; set; }
+    private string WeaponSearch { get; set; } = "";
+    private WeaponRecordSort SelectedSort { get; set; } = WeaponRecordSort.Name;
+    private bool HasWeaponFilters => SelectedCategory.HasValue || !string.IsNullOrEmpty( WeaponSearch );
+
+    private static List<EquipmentResource> GetRecordWeapons() => ResourceLibrary.GetAll<EquipmentResource>()
+        .Where( x => x.Slot is EquipmentSlot.Primary or EquipmentSlot.Secondary ).ToList();
+
+    private List<EquipmentResource> GetVisibleWeapons( List<EquipmentResource> weapons )
+    {
+        var query = NormalizeWeaponName( WeaponSearch );
+        var matches = weapons.Where( x => (!SelectedCategory.HasValue || x.Category == SelectedCategory.Value)
+            && NormalizeWeaponName( x.Name ).Contains( query, StringComparison.OrdinalIgnoreCase ) );
+
+        var sorted = SelectedSort switch
+        {
+            WeaponRecordSort.Kills => matches.OrderByDescending( x => WeaponStats.Get( "kills", x ) ),
+            // XP also orders progress within the same level.
+            WeaponRecordSort.Level => matches.OrderByDescending( WeaponProgression.GetXP ),
+            _ => matches.OrderBy( x => x.Name, StringComparer.OrdinalIgnoreCase )
+        };
+
+        return sorted.ThenBy( x => x.Name, StringComparer.OrdinalIgnoreCase ).ThenBy( x => x.ResourcePath ).ToList();
+    }
+
+    private static string NormalizeWeaponName( string name ) => new string( (name ?? "")
+        .Where( char.IsLetterOrDigit ).ToArray() );
+
+    private static string CategoryLabel( WeaponCategory category ) => category switch
+    {
+        WeaponCategory.AssaultRifle => "ASSAULT",
+        WeaponCategory.Sniper => "SNIPER",
+        WeaponCategory.Marksman => "MARKSMAN",
+        WeaponCategory.None => "OTHER",
+        _ => category.ToString().ToUpperInvariant()
+    };
+
+    private static string SortLabel( WeaponRecordSort sort ) => sort switch
+    {
+        WeaponRecordSort.Kills => "Kills",
+        WeaponRecordSort.Level => "Level",
+        _ => "Name"
+    };
+
+    private void SelectCategory( WeaponCategory? category )
+    {
+        SelectedCategory = category;
+        StateHasChanged();
+    }
+
+    private void SetWeaponSearch( string text )
+    {
+        WeaponSearch = text ?? "";
+        StateHasChanged();
+    }
+
+    private void SelectSort( WeaponRecordSort sort )
+    {
+        SelectedSort = sort;
+        StateHasChanged();
+    }
+
+    private void ClearWeaponFilters()
+    {
+        SelectedCategory = null;
+        WeaponSearch = "";
+        StateHasChanged();
+    }
+
     private string RankProgressLabel => Progression.GetLevel() >= Progression.MaxLevel
         ? Tr( "MAXIMUM LEVEL REACHED" )
         : Tr( "{0} XP TO LEVEL {1}", Math.Max( 0, Progression.GetXPForNextLevel() - Progression.GetXPIntoLevel() ).ToString( "N0" ), Progression.GetLevel() + 1 );
@@ -103,6 +228,22 @@
 
     protected override int BuildHash()
     {
-        return HashCode.Combine( Progression.GetXP(), Progression.GetLevel(), Progression.GetPrestige() );
+        var hash = new HashCode();
+        hash.Add( Progression.GetXP() );
+        hash.Add( Progression.GetLevel() );
+        hash.Add( Progression.GetPrestige() );
+        hash.Add( GameText.Current );
+        hash.Add( SelectedCategory );
+        hash.Add( WeaponSearch );
+        hash.Add( SelectedSort );
+        foreach ( var weapon in GetRecordWeapons() )
+        {
+            hash.Add( weapon.ResourcePath );
+            hash.Add( weapon.Name );
+            hash.Add( weapon.Category );
+            if ( SelectedSort == WeaponRecordSort.Kills ) hash.Add( WeaponStats.Get( "kills", weapon ) );
+            if ( SelectedSort == WeaponRecordSort.Level ) hash.Add( WeaponProgression.GetXP( weapon ) );
+        }
+        return hash.ToHashCode();
     }
 }

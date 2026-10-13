@@ -1,0 +1,68 @@
+Spectating {
+  position: absolute;
+  top: 128px;
+  max-width: 80%;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  z-index: 50;
+}
+Spectating label {
+  font-family: Dinish;
+  font-weight: normal;
+  color: #F4F4F0;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.9);
+}
+Spectating .spectator-target {
+  align-items: center;
+  gap: 18px;
+  max-width: 100%;
+}
+Spectating .spectator-identity {
+  flex-direction: column;
+  align-items: center;
+  min-width: 220px;
+  max-width: 420px;
+  gap: 3px;
+}
+Spectating .spectator-title {
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(244, 244, 240, 0.64);
+}
+Spectating .spectator-name {
+  max-width: 100%;
+  font-size: 24px;
+  line-height: 28px;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+Spectating InputHint {
+  flex-shrink: 0;
+}
+Spectating InputHint img {
+  width: 24px;
+  height: 24px;
+  background-tint: #F4F4F0;
+  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.8));
+}
+Spectating .cycle-hint {
+  opacity: 0.72;
+}
+Spectating .spectator-controls {
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 22px;
+}
+Spectating .spectator-action {
+  align-items: center;
+  gap: 4px;
+}
+Spectating .spectator-action label {
+  font-size: 14px;
+  color: rgba(244, 244, 240, 0.72);
+}

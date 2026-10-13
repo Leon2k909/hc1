@@ -1,0 +1,130 @@
+@using System;
+@using Facepunch.Gunsmith;
+@using Sandbox.UI;
+
+@namespace Facepunch.UI
+@inherits Panel
+@attribute [StyleSheet]
+
+@if ( !Client.IsValid() ) { return; }
+
+<root>
+    <div class="details-backdrop" onclick=@Close />
+    <div class="details-card">
+        <div class="details-heading">
+            <PlayerAvatar Player=@Client ShowHealth=@false ShowBomb=@false />
+            <label class="details-name">@Client.DisplayName</label>
+            <button class="details-close" onclick=@Close tooltip=@(Tr( "Close" ))><i>close</i></button>
+        </div>
+        <label class="details-help">@Tr( "Builds replace the matching gun slot in {0}.", ActiveClassName )</label>
+
+        @foreach ( var slot in GunSlots )
+        {
+            var gunSlot = slot;
+            var code = GetBuild( slot );
+            var available = GunsmithLoadoutManager.TryGetSharedBuildWeapon( code, out var weapon );
+            <div class="details-item">
+                <div class="details-item-name">
+                    <label class="details-category">@Tr( slot == EquipmentSlot.Primary ? "Primary" : "Secondary" )</label>
+                    <label>@(available ? weapon.Name : Tr( "Build unavailable" ))</label>
+                </div>
+                <button class="details-action @(!available ? "disabled" : "")" onclick=@(() => CopyBuild( gunSlot ))>
+                    <i>download</i><label>@Tr( "Copy build" )</label>
+                </button>
+                <button class="details-code @(!available ? "disabled" : "")" onclick=@(() => CopyCode( gunSlot )) tooltip=@(Tr( "COPY CODE" ))>
+                    <i>content_copy</i>
+                </button>
+            </div>
+        }
+
+        <div class="details-item crosshair-item">
+            <div class="details-item-name">
+                <label class="details-category">@Tr( "Crosshair" )</label>
+                <label>@CrosshairStyleName</label>
+            </div>
+            <button class="details-action @(!HasCrosshair ? "disabled" : "")" onclick=@CopyCrosshair>
+                <i>gps_fixed</i><label>@Tr( "Copy crosshair" )</label>
+            </button>
+        </div>
+        <label class="details-help">@Tr( "Crosshairs apply immediately." )</label>
+
+        @if ( Message is not null )
+        {
+            <label class="details-message @(MessageIsError ? "error" : "")">@Message.Shown</label>
+        }
+        @if ( HasLockedParts )
+        {
+            <label class="details-help">@Tr( "Locked attachments stay saved until unlocked." )</label>
+        }
+    </div>
+</root>
+
+@code
+{
+    public Client Client { get; set; }
+    public Action OnClosed { get; set; }
+    private static readonly EquipmentSlot[] GunSlots = { EquipmentSlot.Primary, EquipmentSlot.Secondary };
+    private string ActiveClassName => GunsmithLoadoutManager.GetClassName( GunsmithLoadoutManager.GetActiveClassIndex() );
+    private GunsmithMessage Message { get; set; }
+    private bool MessageIsError { get; set; }
+    private bool HasLockedParts { get; set; }
+    private bool HasCrosshair => SharedCrosshair.TryRead( Client.SharedCrosshairSettings, out _ );
+    private string GetBuild( EquipmentSlot slot ) => slot == EquipmentSlot.Primary ? Client.SharedPrimaryBuild : Client.SharedSecondaryBuild;
+
+    private string CrosshairStyleName
+    {
+        get
+        {
+            if ( !SharedCrosshair.TryRead( Client.SharedCrosshairSettings, out var c ) ) return Tr( "Crosshair unavailable" );
+            if ( !c.Enabled || c.Style == "none" ) return Tr( "None" );
+            return c.Style switch { "hc1" => "HC1", "classic" => Tr( "Classic" ), "modern" => Tr( "Modern" ), _ => Tr( "Custom" ) };
+        }
+    }
+
+    private void Close() => OnClosed?.Invoke();
+
+    private void CopyBuild( EquipmentSlot slot )
+    {
+        var code = GetBuild( slot );
+        if ( !GunsmithLoadoutManager.TryGetSharedBuildWeapon( code, out var weapon ) || weapon.Slot != slot ) return;
+        if ( !GunsmithLoadoutManager.TryImportWeaponBuildCode( weapon, code, out var error ) )
+        {
+            ShowMessage( error, true );
+            return;
+        }
+
+        GunsmithLoadoutManager.SetSlot( slot, weapon.ResourcePath );
+        HasLockedParts = GunsmithLoadoutManager.GetLockedAttachments( weapon ).Count > 0;
+        var local = Client.Local;
+        GunsmithMessage timing = !PlayerLoadout.ClassesEnabled ? "Classes aren't used in this mode"
+            : local.IsValid() && local.Loadout.IsValid() && local.Loadout.SendActiveClass( true )
+                ? "Equipped now" : "Equipped when you next spawn";
+        ShowMessage( new GunsmithMessage( "Copied {0} to {1}. {2}", weapon.Name, ActiveClassName, timing ), false, keepLockedNotice: true );
+    }
+
+    private void CopyCode( EquipmentSlot slot )
+    {
+        var code = GetBuild( slot );
+        if ( !GunsmithLoadoutManager.TryGetSharedBuildWeapon( code, out _ ) ) return;
+        Clipboard.SetText( code );
+        ShowMessage( "Build code copied.", false );
+    }
+
+    private void CopyCrosshair()
+    {
+        if ( !CrosshairManager.TryCopySettings( Client.SharedCrosshairSettings ) ) return;
+        ShowMessage( new GunsmithMessage( "Copied {0}'s crosshair.", Client.DisplayName ), false );
+    }
+
+    private void ShowMessage( GunsmithMessage message, bool error, bool keepLockedNotice = false )
+    {
+        Message = message;
+        MessageIsError = error;
+        if ( !keepLockedNotice ) HasLockedParts = false;
+        StateHasChanged();
+    }
+
+    protected override int BuildHash() => !Client.IsValid() ? 0 : HashCode.Combine( HashCode.Combine( Client, Client.DisplayName ),
+        Client.SharedPrimaryBuild, Client.SharedSecondaryBuild, Client.SharedCrosshairSettings,
+        ActiveClassName, Message?.Shown, MessageIsError, HasLockedParts );
+}

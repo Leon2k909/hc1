@@ -1,0 +1,89 @@
+ScoreboardPlayerDetails {
+    position: absolute;
+    inset: 0;
+    align-items: center;
+    justify-content: center;
+    pointer-events: all;
+    z-index: 10;
+
+    .details-backdrop {
+        position: absolute;
+        inset: 0;
+        background-color: rgba(black, 0.75);
+    }
+
+    .details-card {
+        width: 570px;
+        padding: 24px;
+        flex-direction: column;
+        gap: 12px;
+        background-color: #121519;
+        border: 1px solid rgba(white, 0.2);
+        border-radius: 6px;
+        color: white;
+    }
+
+    .details-heading {
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 6px;
+
+        PlayerAvatar { width: 32px; height: 32px; }
+        .details-name { flex-grow: 1; font-size: 22px; }
+    }
+
+    .details-close, .details-code {
+        width: 34px;
+        height: 34px;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border-radius: 4px;
+        background-color: rgba(white, 0.06);
+        cursor: pointer;
+
+        i { font-size: 20px; }
+        &:hover { background-color: rgba(white, 0.18); }
+    }
+
+    .details-help { font-size: 13px; color: #a4adb8; }
+
+    .details-item {
+        padding: 14px;
+        gap: 10px;
+        align-items: center;
+        border: 1px solid rgba(white, 0.1);
+        border-radius: 4px;
+        background-color: rgba(white, 0.03);
+    }
+
+    .details-item-name {
+        flex-direction: column;
+        flex-grow: 1;
+        gap: 4px;
+        font-size: 17px;
+    }
+
+    .details-category { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #a4adb8; }
+
+    .details-action {
+        padding: 9px 12px;
+        gap: 7px;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border: 1px solid rgba(white, 0.2);
+        border-radius: 4px;
+        background-color: rgba(white, 0.1);
+        cursor: pointer;
+        font-size: 13px;
+
+        i { font-size: 17px; }
+        &:hover { background-color: rgba(white, 0.22); }
+    }
+
+    .disabled { opacity: 0.3; pointer-events: none; }
+    .crosshair-item { margin-top: 8px; }
+    .details-message { font-size: 14px; color: #9dd5a9; }
+    .details-message.error { color: #efaaaa; }
+}

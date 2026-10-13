@@ -5,7 +5,7 @@
 
 @attribute [StyleSheet]
 
-<root>
+<root class="@(Expanded ? "expanded" : "")">
 
     @* ── Invite popup (floats above party bar) ── *@
     @if ( _inviteOpen )
@@ -52,7 +52,89 @@
         </div>
     }
 
+    @if ( Expanded )
+    {
+        var members = GetOtherMembers().ToList();
+        var isLeader = ShowingNetworkParty ? LocalIsPartyLeader : LocalIsMenuPartyOwner;
+
+        <div class="party-roster-header">
+            <label class="party-roster-title">@Tr( "YOUR SQUAD" )</label>
+            <label class="party-roster-count">@(1 + members.Count) / @PartyLimit</label>
+        </div>
+
+        <div class="party-roster">
+            <div class="party-roster-row">
+                <img class="party-roster-avatar" src="avatar:@LocalSteamId" />
+                <div class="party-roster-identity">
+                    <label class="party-roster-name">@LocalName</label>
+                    <label class="party-roster-role">@Tr( isLeader ? "Party Leader" : "YOU" )</label>
+                </div>
+            </div>
+            @foreach ( var member in members )
+            {
+                <div class="party-roster-row">
+                    <img class="party-roster-avatar" src="avatar:@member.SteamId" />
+                    <div class="party-roster-identity">
+                        <label class="party-roster-name">@member.Name</label>
+                        @if ( member.IsLeader )
+                        {
+                            <label class="party-roster-role">@Tr( "Party Leader" )</label>
+                        }
+                    </div>
+                    @if ( ShowingNetworkParty && LocalIsPartyLeader && member.NetworkId != Guid.Empty )
+                    {
+                        <button class="party-roster-remove" @onclick=@(() => KickMember( member.NetworkId ))><i>person_remove</i></button>
+                    }
+                </div>
+            }
+        </div>
+
+        @if ( LocalIsInParty || MenuParty != null )
+        {
+            <button class="party-social-button party-social-leave" @onclick=@LeaveParty><i>logout</i><label>@Tr( "Leave Party" )</label></button>
+        }
+
+        <div class="party-social-actions">
+            <button class="party-social-button primary" @onclick=@InviteFromPause><i>person_add</i><label>@Tr( "Invite Friends" )</label></button>
+            <button class="party-social-button" @onclick=@ShowFriends><i>people</i><label>@Tr( "Friends" )</label></button>
+            @if ( MenuParty is null && Networking.IsActive && Party != null && (!LocalIsInParty || LocalIsPartyLeader) )
+            {
+                <button class="party-social-button" @onclick=@ToggleInvitePopup><i>group_add</i><label>@Tr( "Invite Players" )</label></button>
+            }
+            @if ( !ShowingNetworkParty )
+            {
+                <button class="party-social-button" @onclick=@(() => _privacyOpen = !_privacyOpen)><i>settings</i><label>@Tr( "Squad Privacy" )</label></button>
+            }
+        </div>
+
+        @if ( _privacyOpen )
+        {
+            <div class="party-privacy-options">
+                @foreach ( var mode in Enum.GetValues<SquadPrivacyMode>() )
+                {
+                    <button class="party-privacy-option @(SquadPrivacy.Mode == mode ? "selected" : "")" @onclick=@(() => SetPrivacy( mode ))>
+                        <label>@Tr( PrivacyTitle( mode ) )</label>
+                        @if ( SquadPrivacy.CanChange && SquadPrivacy.Mode == mode )
+                        {
+                            <i>check</i>
+                        }
+                    </button>
+                }
+                @if ( !SquadPrivacy.CanChange )
+                {
+                    <label class="party-privacy-note">@Tr( "Only the squad leader can change this." )</label>
+                }
+                else if ( SquadPrivacy.AppliesToNextSquad )
+                {
+                    <label class="party-privacy-note">@Tr( "Applies to your next squad" )</label>
+                }
+            </div>
+        }
+    }
+
     @* ── Party bar ── *@
+    @if ( !Expanded )
+    {
     <div class="party-bar">
 
         @* Your own avatar is already in the profile next to this, so it only joins the row in a party. *@
@@ -137,15 +219,72 @@
         }
 
     </div>
+    }
 
 </root>
 
 @code
 {
+    /// <summary>Show the full party roster and social controls, as used by the in-game pause menu.</summary>
+    public bool Expanded { get; set; }
+
     static string _inviteFromName;
     static Guid   _inviteFromId;
 
     bool _inviteOpen = false;
+    bool _privacyOpen;
+
+    // Friend invitations use the persistent Steam party. Prefer it in the pause roster when an older match party
+    // also exists, so newly invited friends appear in the party the player is looking at.
+    bool ShowingNetworkParty => LocalIsInParty && (!Expanded || MenuParty is null);
+    int PartyLimit => ShowingNetworkParty ? MaxPartySlots : SquadPrivacy.Limit( MenuParty );
+
+    void InviteFromPause()
+    {
+        ClosePopup();
+        if ( SquadPrivacy.Mode == SquadPrivacyMode.Private && SquadPrivacy.CanChange )
+        {
+            _privacyOpen = true;
+            return;
+        }
+
+        InviteFriends();
+    }
+
+    private static string PrivacyTitle( SquadPrivacyMode mode ) => mode switch
+    {
+        SquadPrivacyMode.Open => "OPEN SQUAD",
+        SquadPrivacyMode.InviteOnly => "INVITE ONLY",
+        _ => "PRIVATE SQUAD",
+    };
+
+    void SetPrivacy( SquadPrivacyMode mode )
+    {
+        if ( !SquadPrivacy.CanChange ) return;
+
+        SquadPrivacy.Set( mode );
+        _privacyOpen = false;
+    }
+
+    /// <summary>Escape closes the party's popups before resuming the match.</summary>
+    public bool ClosePopup()
+    {
+        if ( !_inviteOpen && !_privacyOpen ) return false;
+
+        _inviteOpen = false;
+        _privacyOpen = false;
+        StateHasChanged();
+        return true;
+    }
+
+    void ShowFriends()
+    {
+        Game.Overlay.ShowFriendsList( new Sandbox.Modals.FriendsListModalOptions()
+        {
+            ShowOnlineMembers = true,
+            ShowOfflineMembers = true,
+        } );
+    }
 
     public static void ShowInvite( string fromName, Guid fromId )
     {
@@ -160,7 +299,7 @@
 
     IEnumerable<PartyDisplayMember> GetOtherMembers()
     {
-        if ( LocalIsInParty )
+        if ( ShowingNetworkParty )
         {
             foreach ( var p in PartyMembers.Where( m => !m.IsLocalPlayer ) )
             {
@@ -202,7 +341,7 @@
     {
         get
         {
-            if ( LocalIsInParty )
+            if ( ShowingNetworkParty )
                 return 1 + PartyMembers.Count( m => !m.IsLocalPlayer );
 
             if ( MenuParty != null )
@@ -432,7 +571,8 @@
 
     void LeaveParty()
     {
-        if ( LocalIsInParty )
+        ClosePopup();
+        if ( ShowingNetworkParty )
         {
             Party.LeaveParty();
             return;
@@ -446,12 +586,22 @@
     protected override int BuildHash()
     {
         var h = new HashCode();
+        h.Add( Expanded );
+        h.Add( LocalName );
+        h.Add( LocalSteamId );
+        h.Add( _privacyOpen );
+        h.Add( SquadPrivacy.Mode );
+        h.Add( SquadPrivacy.CanChange );
+        h.Add( SquadPrivacy.AppliesToNextSquad );
+        h.Add( PartyLimit );
         h.Add( _inviteFromName );
         h.Add( _inviteOpen );
         h.Add( Party?.MemberIds.Count ?? 0 );
         h.Add( Party?.LeaderId );
         h.Add( MenuPartyMemberCount );
         h.Add( MenuPartyOwnerId );
+        foreach ( var member in GetOtherMembers() )
+            h.Add( member );
         foreach ( var member in MenuPartyMembers )
         {
             h.Add( SafeFriendId( member ) );

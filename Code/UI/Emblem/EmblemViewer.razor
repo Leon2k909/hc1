@@ -1,8 +1,10 @@
 @using System;
+@using System.Globalization;
 @using Sandbox.UI;
 @using Sandbox;
 
 @namespace Facepunch.UI
+@attribute [StyleSheet]
 @inherits Panel
 
 <root class="emblem-viewer">
@@ -16,16 +18,27 @@
                    not unreliable emoji text-line metrics.
                    Base size is 28px × scale (emojis render visually larger than their font-size). *@
                 var eSizePx = layer.Scale * 28f;
-                var eStyle  = $"left:{layer.X}%; top:{layer.Y}%; width:{eSizePx}px; height:{eSizePx}px; transform:translate(-50%,-50%) rotate({layer.Rotation}deg);";
+                var eStyle  = LayerStyle( layer, eSizePx );
                 <div class="emblem-emoji-wrap" style="@eStyle">
-                    <label class="emblem-emoji" style="font-size:{eSizePx}px; color:{layer.Color.Hex};">@layer.Icon</label>
+                    <label class="emblem-emoji" style="font-size: @(F( eSizePx ))px; color: @layer.Color.Hex;">@layer.Icon</label>
+                </div>
+            }
+            else if ( layer.IconType == EmblemIconType.Letter )
+            {
+                var size = layer.Scale * 32f;
+                <div class="emblem-letter-wrap" style="@LayerStyle( layer, size )">
+                    <label class="emblem-letter" style="font-size: @(F( size ))px; color: @layer.Color.Hex;">@layer.Icon</label>
                 </div>
             }
             else
             {
-                @* Material Icon: render via the icon font directly — no wrapper needed. *@
-                var iStyle = $"left:{layer.X}%; top:{layer.Y}%; font-size:{layer.Scale * 32f}px; color:{layer.Color.Hex}; transform:translate(-50%,-50%) rotate({layer.Rotation}deg);";
-                <i class="emblem-layer" style="@iStyle">@layer.Icon</i>
+                @* Use the same fixed-size box as the canvas selection and hit testing.
+                   The icon font's text-line height must not determine its position. *@
+                var iSizePx = layer.Scale * 32f;
+                var iStyle = LayerStyle( layer, iSizePx );
+                <div class="emblem-icon-wrap" style="@iStyle">
+                    <i class="emblem-layer" style="font-size: @(F( iSizePx ))px; color: @layer.Color.Hex;">@layer.Icon</i>
+                </div>
             }
         }
     }
@@ -33,6 +46,12 @@
 
 @code {
     public EmblemData Data { get; set; }
+
+    private static string LayerStyle( EmblemLayer layer, float size ) =>
+        $"left: {F( layer.X )}%; top: {F( layer.Y )}%; width: {F( size )}px; height: {F( size )}px; " +
+        $"transform: translate( -50%, -50% ) rotate( {F( layer.Rotation )}deg );";
+
+    private static string F( float value ) => value.ToString( "0.###", CultureInfo.InvariantCulture );
     
     [Property]
     public string JsonData

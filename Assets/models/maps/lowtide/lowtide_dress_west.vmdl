@@ -13,20 +13,31 @@
 						_class = "DefaultMaterialGroup"
 						remaps =
 						[
+							{ from = "lt_lamp_coat.vmat" to = "materials/lowtide/lamps/lt_lamp_coat.vmat" },
+							{ from = "lt_lamp_trim.vmat" to = "materials/lowtide/lamps/lt_lamp_trim.vmat" },
+							{ from = "lt_lamp_lens.vmat" to = "materials/lowtide/lamps/lt_lamp_lens.vmat" },
 							{ from = "iron_black.vmat" to = "materials/buildings/iron_black.vmat" },
 							{ from = "lt_crane_red.vmat" to = "materials/lowtide/lt_crane_red.vmat" },
-							{ from = "lt_fl_amber.vmat" to = "materials/lowtide/lt_fl_amber.vmat" },
-							{ from = "lt_fl_black.vmat" to = "materials/lowtide/lt_fl_black.vmat" },
-							{ from = "lt_fl_chrome.vmat" to = "materials/lowtide/lt_fl_chrome.vmat" },
-							{ from = "lt_fl_glass.vmat" to = "materials/lowtide/lt_fl_glass.vmat" },
-							{ from = "lt_fl_hub.vmat" to = "materials/lowtide/lt_fl_hub.vmat" },
-							{ from = "lt_fl_red.vmat" to = "materials/lowtide/lt_fl_red.vmat" },
-							{ from = "lt_fl_rubber.vmat" to = "materials/lowtide/lt_fl_rubber.vmat" },
-							{ from = "lt_fl_silver.vmat" to = "materials/lowtide/lt_fl_silver.vmat" },
-							{ from = "lt_fl_steel.vmat" to = "materials/lowtide/lt_fl_steel.vmat" },
-							{ from = "lt_fl_vinyl.vmat" to = "materials/lowtide/lt_fl_vinyl.vmat" },
-							{ from = "lt_fl_white.vmat" to = "materials/lowtide/lt_fl_white.vmat" },
-							{ from = "lt_fl_yellow.vmat" to = "materials/lowtide/lt_fl_yellow.vmat" },
+
+							{ from = "lt_crane_glass.vmat" to = "materials/lowtide/lt_crane_glass.vmat" },
+							{ from = "lt_crane_grate.vmat" to = "materials/lowtide/lt_crane_grate.vmat" },
+							{ from = "lt_crane_machined.vmat" to = "materials/lowtide/lt_crane_machined.vmat" },
+							{ from = "lt_crane_oily.vmat" to = "materials/lowtide/lt_crane_oily.vmat" },
+							{ from = "lt_crane_trim.vmat" to = "materials/lowtide/lt_crane_trim.vmat" },
+							{ from = "lt_crane_red_panels.vmat" to = "materials/lowtide/lt_crane_red_panels.vmat" },
+							{ from = "lt_fl_amber.vmat" to = "materials/lowtide/forklift/lt_fl_amber.vmat" },
+							{ from = "lt_fl_black.vmat" to = "materials/lowtide/forklift/lt_fl_black.vmat" },
+							{ from = "lt_fl_chrome.vmat" to = "materials/lowtide/forklift/lt_fl_chrome.vmat" },
+							{ from = "lt_fl_glass.vmat" to = "materials/lowtide/forklift/lt_fl_glass.vmat" },
+							{ from = "lt_fl_hub.vmat" to = "materials/lowtide/forklift/lt_fl_hub.vmat" },
+							{ from = "lt_fl_red.vmat" to = "materials/lowtide/forklift/lt_fl_red.vmat" },
+							{ from = "lt_fl_rubber.vmat" to = "materials/lowtide/forklift/lt_fl_rubber.vmat" },
+							{ from = "lt_fl_silver.vmat" to = "materials/lowtide/forklift/lt_fl_silver.vmat" },
+							{ from = "lt_fl_steel.vmat" to = "materials/lowtide/forklift/lt_fl_steel.vmat" },
+							{ from = "lt_fl_vinyl.vmat" to = "materials/lowtide/forklift/lt_fl_vinyl.vmat" },
+							{ from = "lt_fl_warning.vmat" to = "materials/lowtide/forklift/lt_fl_warning.vmat" },
+							{ from = "lt_fl_white.vmat" to = "materials/lowtide/forklift/lt_fl_white.vmat" },
+							{ from = "lt_fl_yellow.vmat" to = "materials/lowtide/forklift/lt_fl_yellow.vmat" },
 							{ from = "lt_jute.vmat" to = "materials/lowtide/lt_jute.vmat" },
 							{ from = "lt_skip.vmat" to = "materials/lowtide/lt_skip.vmat" },
 							{ from = "lt_skip_end.vmat" to = "materials/lowtide/lt_skip_end.vmat" },
@@ -35,12 +46,14 @@
 							{ from = "lt_skip_trim.vmat" to = "materials/lowtide/lt_skip_trim.vmat" },
 							{ from = "lt_skip_weld.vmat" to = "materials/lowtide/lt_skip_weld.vmat" },
 							{ from = "lt_steel.vmat" to = "materials/lowtide/lt_steel.vmat" },
+							{ from = "lt_pallet_side.vmat" to = "materials/lowtide/pallets/lt_pallet_side.vmat" },
+							{ from = "lt_pallet_wood.vmat" to = "materials/lowtide/pallets/lt_pallet_wood.vmat" },
 							{ from = "lt_timber.vmat" to = "materials/lowtide/lt_timber.vmat" },
 							{ from = "planks.vmat" to = "materials/buildings/planks.vmat" },
 							{ from = "rw_black.vmat" to = "materials/railhead/rw_black.vmat" },
 							{ from = "rw_concrete_dark.vmat" to = "materials/railhead/rw_concrete_dark.vmat" },
 							{ from = "rw_container_grey.vmat" to = "materials/railhead/rw_container_grey.vmat" },
-							{ from = "rw_container_red.vmat" to = "materials/railhead/rw_container_red.vmat" },
+							{ from = "rw_container_red.vmat" to = "materials/lowtide/containers/lt_container_red.vmat" },
 							{ from = "rw_lamp_cool.vmat" to = "materials/railhead/rw_lamp_cool.vmat" },
 							{ from = "rw_steel_dark.vmat" to = "materials/railhead/rw_steel_dark.vmat" },
 							{ from = "rw_steel_grey.vmat" to = "materials/railhead/rw_steel_grey.vmat" },
@@ -594,9 +607,81 @@
 						parent_bone = ""
 						surface_prop = "metal"
 						collision_tags = "solid"
-						origin = [ -560.0000, 860.0000, 19.0000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 76.0000, 144.0000, 38.0000 ]
+						origin = [ -560.0000, 860.0000, 4.0000 ]
+						angles = [ -0.0000, -0.0000, -0.0000 ]
+						dimensions = [ 104.0000, 68.0000, 0.8000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -560.0000, 898.0000, 38.2000 ]
+						angles = [ -0.0000, -0.0000, -0.0000 ]
+						dimensions = [ 148.0000, 3.0000, 3.5000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -560.0000, 822.0000, 38.2000 ]
+						angles = [ -0.0000, -0.0000, -0.0000 ]
+						dimensions = [ 148.0000, 3.0000, 3.5000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -632.0000, 860.0000, 38.2000 ]
+						angles = [ -0.0000, -0.0000, -0.0000 ]
+						dimensions = [ 3.0000, 73.0000, 3.5000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -488.0000, 860.0000, 38.2000 ]
+						angles = [ -0.0000, -0.0000, -0.0000 ]
+						dimensions = [ 3.0000, 73.0000, 3.5000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -599.0000, 885.5000, 2.1500 ]
+						angles = [ -0.0000, -0.0000, -0.0000 ]
+						dimensions = [ 8.8000, 7.5000, 4.3000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -599.0000, 834.5000, 2.1500 ]
+						angles = [ -0.0000, -0.0000, -0.0000 ]
+						dimensions = [ 8.8000, 7.5000, 4.3000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -521.0000, 885.5000, 2.1500 ]
+						angles = [ -0.0000, -0.0000, -0.0000 ]
+						dimensions = [ 8.8000, 7.5000, 4.3000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -521.0000, 834.5000, 2.1500 ]
+						angles = [ -0.0000, -0.0000, -0.0000 ]
+						dimensions = [ 8.8000, 7.5000, 4.3000 ]
 					},
 					{
 						_class = "PhysicsShapeBox"
@@ -1236,6 +1321,26 @@
 						origin = [ -1580.0000, 2010.0000, 12.5000 ]
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 18.0000, 18.0000, 25.0000 ]
+					},
+					{
+						_class = "PhysicsHullFile"
+						name = "lowtide_dress_west_hulls_metal"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						recenter_on_parent_bone = false
+						offset_origin = [ 0.0, 0.0, 0.0 ]
+						offset_angles = [ 0.0, 0.0, 0.0 ]
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						filename = "models/maps/lowtide/lowtide_dress_west_hulls_metal.obj"
+						import_scale = 1.0
+						faceMergeAngle = 10.0
+						maxHullVertices = 0
+						import_mode = "HullPerElement"
+						optimization_algorithm = "QEM"
+						import_filter = { exclude_by_default = false exception_list = [ ] }
 					},
 				]
 			},

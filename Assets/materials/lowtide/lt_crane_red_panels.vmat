@@ -1,0 +1,16 @@
+// Tools/lowtide_crane.py: generated weathered oxide-red paint with exposed steel.
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    F_METALNESS_TEXTURE "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0"
+    TextureColor "materials/lowtide/lt_crane_red_panels_color.png"
+    TextureNormal "materials/lowtide/lt_crane_red_panels_normal.png"
+    TextureRoughness "materials/lowtide/lt_crane_red_panels_rough.png"
+    TextureMetalness "materials/lowtide/lt_crane_red_panels_metal.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1.0 1.0 1.0 1.0]"
+    g_flModelTintAmount "1.0"
+}

@@ -7,8 +7,8 @@ mud with a channel of water down its middle, and you can drop into it.
     python Tools/lowtide_map.py [--preview <dir>] [--no-scene] [--art]
 
 Built by script like Belltower, Reef Hall and Railhead, out of map_kit's boxes and polygons. It paints with
-building_textures' and railhead_materials' paints and its own lt_ paints, which are text-only materials over textures
-the project already has (a sooty or slimed brick, wet mud, painted doors and frames, jute): see LT_MATERIALS. Furniture
+building_textures' and railhead_materials' paints and its own lt_ paints, including a generated brick material and
+tinted project textures (wet mud, painted doors and frames, jute): see LT_MATERIALS. Furniture
 and vehicles come from railhead_props, through railhead_map's `use`. Writes:
 - the models, to Assets/models/maps/lowtide/: the Fleet (its bed, the bridges and the barge), the east half and its
   mirror the west half, the glass, the water, and the backdrop (the Fleet running on north, the harbour and its far
@@ -54,7 +54,21 @@ import railhead_map as R
 import railhead_preview as PV
 import lowtide_skip as SKIP
 import lowtide_forklift as FORKLIFT
+import lowtide_stairs as STAIRS
+import lowtide_pallets as PALLETS
 import lowtide_shipyard as SHIPYARD
+import lowtide_brick as BRICK
+import lowtide_sacks as SACKS
+import lowtide_water as WATER
+import lowtide_bridge as DECK
+import lowtide_bridge_rails as RAILS
+import lowtide_doors as DOORS
+import lowtide_crane as CRANE
+import lowtide_plaster as PLASTER
+import lowtide_lamps as LAMPS
+import lowtide_lanterns as LANTERNS
+import lowtide_paving as PAVING
+import lowtide_container as CONTAINER
 
 TITLE = "Lowtide"
 OUT_DIR = K.ASSETS / "models/maps/lowtide"
@@ -106,7 +120,7 @@ def bed_z( e ):
 
 
 # ---------------------------------------------------------------------------------------------------------------------
-# Paints: the lt_ materials, over textures the project already has (so nothing here needs a new picture)
+# Paints: existing project materials, with a generated albedo and matching surface maps for Lowtide's bricks.
 
 # name: ( the material it copies, tint, roughness (None: the copy's own) ) or, for a flat paint, ( colour, metalness,
 # roughness ).
@@ -116,8 +130,8 @@ LT_MATERIALS = {
     "lt_brick_slime": ( "buildings/brick", ( 0.36, 0.42, 0.30 ), 0.3 ),      # the Fleet's walls under the tide line
     "lt_mud": ( "buildings/soil", ( 0.26, 0.40, 0.62 ), 0.42 ),             # grey estuary mud, drying on the flats
     "lt_mud_wet": ( "buildings/soil", ( 0.17, 0.27, 0.42 ), 0.14 ),         # and wet towards the channel
-    "lt_water": ( "buildings/water", ( 0.42, 0.46, 0.40 ), 0.06 ),           # the channel: dark, still, glossy
-    "lt_door_green": ( "buildings/planks", ( 0.40, 0.56, 0.46 ), None ),      # the loading doors: painted boards
+    "lt_water": ( "buildings/water", ( 1.0, 1.0, 1.0 ), None ),            # dedicated animated material, written by WATER
+    "lt_door_green": ( "buildings/planks", ( 0.40, 0.56, 0.46 ), None ),      # dedicated generated boards, written by DOORS
     "lt_door_red": ( "buildings/planks", ( 0.62, 0.34, 0.30 ), None ),
     "lt_jute": ( "buildings/canvas_plain", ( 0.84, 0.70, 0.50 ), None ),      # coffee sacks
     "lt_timber": ( "railhead/rw_wood", ( 0.13, 0.13, 0.14 ), None ),          # tarred piles and balks
@@ -128,7 +142,7 @@ LT_PAINTED = {
     "lt_frame_green": ( ( 34, 62, 50 ), 0.0, 0.45 ),         # the east's window frames and ironwork
     "lt_frame_cream": ( ( 210, 202, 182 ), 0.0, 0.5 ),       # the west's
     "lt_steel": ( ( 78, 86, 88 ), 0.3, 0.5 ),                # the footbridge and the cranes' painted steel
-    "lt_crane_red": ( ( 150, 52, 38 ), 0.2, 0.45 ),
+    "lt_crane_red": ( ( 150, 52, 38 ), 0.2, 0.45 ),          # generated painted steel, written by CRANE
     "lt_hull_red": ( ( 104, 40, 32 ), 0.1, 0.6 ),            # the barge's antifouling
     "lt_hull_black": ( ( 30, 31, 33 ), 0.2, 0.5 ),
     "lt_rope": ( ( 140, 118, 84 ), 0.0, 0.85 ),
@@ -141,6 +155,10 @@ WEST_PAINTS = { "brick": "lt_brick_soot", "lt_frame_green": "lt_frame_cream", "l
 
 def lt_tile( paint ):
     """ A paint's tile size: its source's (building_textures', railhead_materials' or boxyard_materials'), else 64. """
+    if paint == "lt_jute":
+        return SACKS.TILE
+    if paint in DOORS.VARIANTS:
+        return DOORS.TILE_UNITS
     if paint in LT_MATERIALS:
         folder, name = LT_MATERIALS[paint][0].split( "/" )
         if folder == "railhead":
@@ -153,7 +171,24 @@ def lt_tile( paint ):
 
 def write_materials():
     MAT_DIR.mkdir( parents=True, exist_ok=True )
+    BRICK.write_materials()
+    WATER.write_materials()
+    DECK.write_materials()
+    RAILS.write_materials()
+    DOORS.write_materials()
+    CRANE.write_materials()
+    PLASTER.write_materials()
+    LAMPS.write_materials()
+    LANTERNS.write_materials()
+    PAVING.write_materials()
     for name, ( source, tint, rough ) in LT_MATERIALS.items():
+        if name == "lt_water" or name in DOORS.VARIANTS:
+            continue
+        if name == "lt_jute":
+            SACKS.write_materials()
+            continue
+        if source == "buildings/brick":
+            continue  # Lowtide's brick variants were written above, with their original tint and wet/glazed finish.
         text = ( K.ASSETS / f"materials/{source}.vmat" ).read_text( encoding="utf-8" )
         lines = []
         for line in text.splitlines():
@@ -168,11 +203,16 @@ def write_materials():
         K.write_text( MAT_DIR / f"{name}.vmat", "\n".join( lines ) + "\n" )
     import railhead_materials as RM
     for name, ( colour, metal, rough ) in LT_PAINTED.items():
+        if name == CRANE.PAINT:
+            continue
         text = RM.painted_vmat( name, colour, metal, rough ).replace( "Tools/railhead_materials.py", "Tools/lowtide_map.py" )
         K.write_text( MAT_DIR / f"{name}.vmat", text )
     SKIP.write_materials()
     FORKLIFT.write_materials()
+    STAIRS.write_materials()
+    PALLETS.write_materials()
     SHIPYARD.write_materials()
+    CONTAINER.write_materials()
 
 
 def configure( model ):
@@ -183,7 +223,19 @@ def configure( model ):
             model.tile_overrides[paint] = lt_tile( paint )
     R.configure( model )
     SKIP.configure( model )
+    FORKLIFT.configure( model )
+    STAIRS.configure( model )
+    PALLETS.configure( model )
     SHIPYARD.configure( model )
+    BRICK.configure( model )
+    PAVING.configure( model )
+    CONTAINER.configure( model )
+    CRANE.configure( model )
+    DECK.configure( model )
+    RAILS.configure( model )
+    PLASTER.configure( model )
+    LAMPS.configure( model )
+    LANTERNS.configure( model )
     model.grain_paints |= { p for p in model.polygons if p in GRAIN }
     return model
 
@@ -228,6 +280,47 @@ def rod( m, a, b, r, paint, sides=6 ):
     for k in range( sides ):
         p, q = ring[k], ring[( k + 1 ) % sides]
         card( m, paint, [ a + p, a + q, b + q, b + p ], ( p + q ) / 2 )
+
+
+def bar( m, a, b, r, paint, sides=8 ):
+    """ A round bar from a to b, shaded smooth, its end at b capped (drawn only). """
+    a, b = np.asarray( a, float ), np.asarray( b, float )
+    axis = K.normalise( b - a )
+    side = np.cross( axis, ( 0.0, 0.0, 1.0 ) )
+    if np.linalg.norm( side ) < 1e-6:
+        side = np.array( ( 1.0, 0.0, 0.0 ) )
+    side = K.normalise( side )
+    up = np.cross( side, axis )
+    out = [ side * math.cos( 2 * math.pi * k / sides ) + up * math.sin( 2 * math.pi * k / sides ) for k in range( sides ) ]
+    for k in range( sides ):
+        p, q = out[k], out[( k + 1 ) % sides]
+        pts, nrm = [ a + p * r, a + q * r, b + q * r, b + p * r ], [ p, q, q, p ]
+        if np.dot( np.cross( pts[1] - pts[0], pts[2] - pts[0] ), p + q ) < 0:
+            pts, nrm = pts[:1] + pts[:0:-1], nrm[:1] + nrm[:0:-1]
+        m.polygon( paint, pts, normals=nrm )
+    card( m, paint, [ b + p * r for p in out ], axis )
+
+
+def torus( m, centre, u, v, R, r, paint, segments=18, sides=8 ):
+    """ A ring: its centre line a circle of radius R in the plane of u and v, the bar r thick, shaded smooth (drawn
+    only). """
+    c = np.asarray( centre, float )
+    u, v = K.normalise( u ), K.normalise( v )
+    w = K.normalise( np.cross( u, v ) )
+
+    def point( i, j ):
+        t, p = 2 * math.pi * i / segments, 2 * math.pi * j / sides
+        radial = u * math.cos( t ) + v * math.sin( t )
+        normal = radial * math.cos( p ) + w * math.sin( p )
+        return c + radial * R + normal * r, normal
+
+    for i in range( segments ):
+        for j in range( sides ):
+            quad = [ point( i, j ), point( i + 1, j ), point( i + 1, j + 1 ), point( i, j + 1 ) ]
+            pts, nrm = [ q[0] for q in quad ], [ q[1] for q in quad ]
+            if np.dot( np.cross( pts[1] - pts[0], pts[2] - pts[0] ), sum( nrm ) ) < 0:
+                pts, nrm = pts[:1] + pts[:0:-1], nrm[:1] + nrm[:0:-1]
+            m.polygon( paint, pts, normals=nrm )
 
 
 def column( m, e, n, z0, z1, r, paint, sides=10, surface=None ):
@@ -287,9 +380,12 @@ def stairs( m, e0, e1, n_top, n_foot, z_top, z_foot, tread="ashlar_grey", riser=
         top = z_top - step_z * k
         na = n_top + sign * step_n * k
         nb = na + sign * step_n
-        m.box( ( e0, min( na, nb ), base ), ( e1, max( na, nb ), top ),
-               { "+z": tread, "default": side, ( "+n" if sign > 0 else "-n" ): riser, ( "-n" if sign > 0 else "+n" ): None,
-                 "-z": None } )
+        if tread == STAIRS.TREAD:
+            STAIRS.step( m, e0, e1, na, nb, top, base, step_z, k, side )
+        else:
+            m.box( ( e0, min( na, nb ), base ), ( e1, max( na, nb ), top ),
+                   { "+z": tread, "default": side, ( "+n" if sign > 0 else "-n" ): riser, ( "-n" if sign > 0 else "+n" ): None,
+                     "-z": None } )
     first, last = n_top + sign * step_n, n_foot + sign * step_n
     pts = [ ( e, n, z ) for e in ( e0, e1 ) for n, z in ( ( n_top, z_top ), ( first, z_top ), ( last, z_foot ), ( n_top, base ),
                                                            ( last, base ) ) ]
@@ -429,6 +525,10 @@ def leaves_open( m, wall, o, style ):
         for z in ( o.z0 + 14, top - 14 ):
             slab( m, wall, r0 + 2, r1 - 2, 2.6, 3.1, z - 1.5, z + 1.5, "iron_black" )
     slab( m, wall, o.r0 - 6, o.r1 + 6, 0.0, 1.4, o.z1, o.z1 + 10, style.band )
+    # Ground-level openings have no wall below them to form a sill. Join the inner floor to the outer stone lip.
+    if o.z0 <= wall.z[0] + 1e-6:
+        slab( m, wall, o.r0, o.r1, -wall_thick( wall ), -0.5, o.z0 - 4, o.z0,
+              { "+z": style.stone, "default": None } )
     slab( m, wall, o.r0 - 3, o.r1 + 3, -0.5, 3.0, o.z0 - 4, o.z0, style.stone )
 
 
@@ -767,7 +867,7 @@ def speicher( m, glass, style ):
         else:
             iron_column( m, e, n, 0.0, CEILING_GIRDER[0] - 8 )
         bolster( m, e, n, CEILING_GIRDER[0] - 8, lo=in0, hi=in1, width=GIRDER_W )
-    stairs( m, STAIR[0] + 2, STAIR[1] - 2, STAIR[3], STAIR[2], FLOOR1, 0.0, tread="planks_dark", riser="lt_timber",
+    stairs( m, STAIR[0] + 2, STAIR[1] - 2, STAIR[3], STAIR[2], FLOOR1, 0.0, tread=STAIRS.TREAD, riser=STAIRS.RISER,
             side="lt_timber", surface=WOOD )
     sloped_rail( m, ( STAIR[0] + 2, STAIR[2] + 12, 0.0 ), ( STAIR[0] + 2, STAIR[3], FLOOR1 ), surface=None )
     railing( m, ( ie0, MEZZ_N + 2 ), ( ie1, MEZZ_N + 2 ), FLOOR1, height=40.0, paint="iron_black", posts=90.0 )
@@ -1129,8 +1229,9 @@ def ground( m, rects ):
 
 
 def pavement( m, e0, e1, n0, n1, kerbs ):
-    """ A pavement 5 up, granite kerbs on the sides listed. """
-    m.box( ( e0, n0, -6 ), ( e1, n1, 5 ), { "+z": "rw_paving", "default": None, **{ k: "ashlar_grey" for k in kerbs } }, STONE )
+    """ A pavement 5 up, granite kerbs on the sides listed and concrete closing its back and ends. """
+    m.box( ( e0, n0, -6 ), ( e1, n1, 5 ),
+           { "+z": "rw_paving", "-z": None, "default": "rw_concrete", **{ k: "ashlar_grey" for k in kerbs } }, STONE )
 
 
 ALLEY_WALL = ( QUAY_SHED[1], SQUARE[1], -1050.0, -1050.0 + T, 132.0 )   # e0, e1, n0, n1, height
@@ -1378,32 +1479,16 @@ def street_bridge( m, n0, n1, collide=True ):
 
 
 def bridge_lamp( m, e, n, z0 ):
-    """ A cast-iron lamp standard: a fluted post, a collar, and a four-sided lantern with opal panes under a little roof. """
-    m.cylinder( ( e, n ), 5.0, z0, z0 + 14, { "side": "iron_green", "top": "iron_green", "bottom": None }, sides=8 )
-    m.cylinder( ( e, n ), 2.6, z0 + 14, z0 + 120, { "side": "iron_green", "top": None, "bottom": None }, sides=8 )
-    m.cylinder( ( e, n ), 4.0, z0 + 116, z0 + 122, { "side": "iron_green", "top": "iron_green", "bottom": "iron_green" }, sides=8 )
-    m.box( ( e - 6, n - 6, z0 + 122 ), ( e + 6, n + 6, z0 + 124 ), "iron_green" )
-    for k in range( 4 ):
-        t = math.pi / 2 * k
-        out = np.array( ( math.cos( t ), math.sin( t ), 0.0 ) )
-        side = np.array( ( -math.sin( t ), math.cos( t ), 0.0 ) )
-        c = np.array( ( e, n, 0.0 ) ) + out * 6.0
-        pts = [ c + side * -6 + ( 0, 0, z0 + 124 ), c + side * 6 + ( 0, 0, z0 + 124 ), c + side * 8 + ( 0, 0, z0 + 146 ),
-                c + side * -8 + ( 0, 0, z0 + 146 ) ]
-        card( m, "rw_opal_glass", pts, out + ( 0, 0, 0.1 ) )
-    for k in range( 4 ):
-        t = math.pi / 2 * k + math.pi / 4
-        p = np.array( ( e + 8.5 * math.cos( t ), n + 8.5 * math.sin( t ) ) )
-        q = np.array( ( e + 11.3 * math.cos( t ), n + 11.3 * math.sin( t ) ) )
-        rod( m, ( *( ( p + np.array( ( e, n ) ) ) / 2 ), z0 + 124 ), ( *q, z0 + 146 ), 0.7, "iron_green", sides=4 )
-    m.box( ( e - 10, n - 10, z0 + 146 ), ( e + 10, n + 10, z0 + 149 ), "iron_green" )
-    spire( m, ( e, n ), z0 + 149, 9.0, 12.0, "iron_green", sides=4 )
+    """Glazed cast-iron lantern; its matching point light is supplied by lights()."""
+    return LANTERNS.build( m, e, n, z0 )
 
 
 def footbridge( m ):
     """ The footbridge over the Fleet's mouth: a timber deck between two Warren trusses of painted steel. """
     n0, n1 = FOOTBRIDGE
-    m.box( ( -FLEET, n0 + 6, -14 ), ( FLEET, n1 - 6, 0 ), { "+z": "planks", "-z": "lt_steel", "default": "lt_steel" }, WOOD )
+    first_steel = len( m.polygons["lt_steel"] )
+    m.box( ( -FLEET, n0 + 6, -14 ), ( FLEET, n1 - 6, 0 ), { "+z": None, "-z": "lt_steel", "default": "lt_steel" }, WOOD )
+    DECK.deck_surface( m, -FLEET, FLEET, n0 + 6, n1 - 6 )
     m.grain_paints.add( "planks" )
     # Its sides are Warren trusses at handrail height (a pony truss), so the view over the Fleet stays open.
     for a, b in ( ( n0, n0 + 6 ), ( n1 - 6, n1 ) ):
@@ -1423,6 +1508,7 @@ def footbridge( m ):
         for e in np.arange( -FLEET + 15, FLEET, 30 ):
             m.box( ( e - 0.4, a + 2, 2 ), ( e + 0.4, b - 2, 37 ), "lt_steel" )      # the mesh's uprights inside it
         m.collision_box( ( -FLEET, a, 0 ), ( FLEET, b, 43 ), METAL )
+    RAILS.finish_bridge( m, first_steel )
 
 
 def barge( m ):
@@ -1465,11 +1551,11 @@ def barge( m ):
 
 
 def sacks( m, e, n, z0, rows=2, cols=3, layers=3, along="e", pallet=True ):
-    """ Jute sacks stacked on a pallet: each a softened box, laid in alternating courses. """
+    """ Filled jute sacks stacked on a pallet, laid in alternating courses. """
     sw, sl, sh = 22.0, 34.0, 11.0
     if pallet:
         width, depth = cols * sw if along == "e" else rows * sl, rows * sl if along == "e" else cols * sw
-        m.box( ( e - 2, n - 2, z0 ), ( e + width + 2, n + depth + 2, z0 + 5.5 ), { "default": "lt_timber", "+z": "planks" }, WOOD )
+        PALLETS.build( m, ( e - 2, n - 2, z0 ), ( width + 4, depth + 4, 5.5 ) )
         z0 += 5.5
     for layer in range( layers ):
         flip = layer % 2
@@ -1482,9 +1568,7 @@ def sacks( m, e, n, z0, rows=2, cols=3, layers=3, along="e", pallet=True ):
                     a = ( e + j * sl, n + i * sw + ( 1 if flip else 0 ) )
                     size = ( sl - 1, sw - 1 )
                 z = z0 + layer * sh
-                bulge = 1.2
-                m.box( ( a[0], a[1], z ), ( a[0] + size[0], a[1] + size[1], z + sh - bulge ), "lt_jute" )
-                m.box( ( a[0] + bulge, a[1] + bulge, z + sh - bulge ), ( a[0] + size[0] - bulge, a[1] + size[1] - bulge, z + sh ), "lt_jute" )
+                SACKS.sack( m, ( a[0], a[1], z ), ( size[0], size[1], sh ) )
     if along == "e":
         lo, hi = ( e, n, z0 - 5.5 ), ( e + cols * sw, n + rows * sl, z0 + layers * sh )
     else:
@@ -1508,6 +1592,76 @@ def tyre( m, e, n, z, r=14.0, w=8.0 ):
     m.cylinder( ( e, n ), r * 0.55, z + w + 0.05, z + w + 0.1, { "top": "rw_black", "side": None, "bottom": None }, sides=10 )
 
 
+# Along each wall: clear of the ladders (-1450, -560, 1020), the footbridge, the quay stair and the bays' landings.
+MOORING_RINGS = ( -1520, -1370, -1110, -700, -450, 150, 400, 650 )
+RING_STONE = ( 10.0, -52.0, -35.0, 1.2 )    # half its width, its foot and head, and how far it stands proud
+RING_STONE_PX = ( 280, 498, 514, 612 )      # a joint-free block of ashlar_grey's 1024 picture (x0, x1, y0, y1)
+
+
+def mooring_ring( m, s, n0 ):
+    """ A Fleet wall's mooring ring at n0 on the wall at e s*FLEET: a granite ring stone set in the brick, an eye bolt
+    leaded into it and a wrought iron ring hanging from the eye, resting against the stone. Drawn only. """
+    half, z0, z1, proud = RING_STONE
+    bevel = 0.3
+
+    def at( d, n, z ):
+        """ The wall's own frame: d out from the brick into the Fleet, n along it, z up. """
+        return ( s * ( FLEET - d ), n0 + n, z )
+
+    def out( d, n, z ):
+        return ( -s * d, n, z )
+
+    # The stone, unrolled onto one granite block: its sides and bevels run on from the face, so the grain carries
+    # round its edges. A ring's own part of the block, and which way round, come from where it is.
+    x0, x1, y0, y1 = RING_STONE_PX
+    span_n, span_z = 2 * ( half + proud ), z1 - z0 + 2 * proud
+    px = min( ( x1 - x0 ) / span_n, ( y1 - y0 ) / span_z )
+    wide = span_n * px
+    left = x0 + ( keyed( "ring stone", s, n0 ) % 1000 ) / 1000.0 * ( x1 - x0 - wide )
+    flip = chance( 0.5, "ring stone flip", s, n0 )
+
+    def uv( d, n, z, sn, sz ):
+        n, z = n + sn * ( proud - d ), z + sz * ( proud - d )
+        a = ( n + half + proud ) / span_n
+        a = 1 - a if flip else a
+        b = ( z - z0 + proud ) / span_z
+        return ( ( left + a * wide ) / 1024.0, 1 - ( y1 - b * span_z * px ) / 1024.0 )
+
+    face = [ ( -half + bevel, z0 + bevel ), ( half - bevel, z0 + bevel ), ( half - bevel, z1 - bevel ), ( -half + bevel, z1 - bevel ) ]
+    rim = [ ( -half, z0 ), ( half, z0 ), ( half, z1 ), ( -half, z1 ) ]
+    card( m, "ashlar_grey", [ at( proud, n, z ) for n, z in face ], out( 1, 0, 0 ),
+          uv=[ uv( proud, n, z, 0, 0 ) for n, z in face ] )
+    for k, ( sn, sz ) in enumerate( ( ( 0, -1 ), ( 1, 0 ), ( 0, 1 ), ( -1, 0 ) ) ):
+        a, b = rim[k], rim[( k + 1 ) % 4]
+        fa, fb = face[k], face[( k + 1 ) % 4]
+        bevel_pts = [ ( proud - bevel, *a ), ( proud - bevel, *b ), ( proud, *fb ), ( proud, *fa ) ]
+        card( m, "ashlar_grey", [ at( *p ) for p in bevel_pts ], out( 1, sn, sz ),
+              uv=[ uv( *p, sn, sz ) for p in bevel_pts ] )
+        side_pts = [ ( -0.5, *a ), ( -0.5, *b ), ( proud - bevel, *b ), ( proud - bevel, *a ) ]
+        card( m, "ashlar_grey", [ at( *p ) for p in side_pts ], out( 0, sn, sz ),
+              uv=[ uv( *p, sn, sz ) for p in side_pts ] )
+
+    # The eye bolt: a washer on the stone, the shank, and the eye with its hole along the wall.
+    z_eye, d_eye, r_eye = -38.0, 3.6, 1.3
+    bar( m, at( proud - 0.2, 0, z_eye ), at( proud + 0.3, 0, z_eye ), 1.4, "lt_hold_rust", sides=10 )
+    bar( m, at( proud + 0.3, 0, z_eye ), at( d_eye - r_eye + 0.2, 0, z_eye ), 0.45, "lt_hold_rust", sides=6 )
+    torus( m, at( d_eye, 0, z_eye ), out( 1, 0, 0 ), out( 0, 0, 1 ), r_eye, 0.4, "lt_hold_rust", segments=12, sides=6 )
+
+    # The ring: hung through the eye, its bar resting on the eye's bottom, its foot against the stone, and swung a
+    # little to one side or the other.
+    R, r = 5.5, 0.7
+    top = np.array( ( d_eye, 0.0, z_eye - ( r_eye - 0.4 - r ) ) )
+    foot_d = proud + r
+    tilt = math.asin( min( 1.0, ( top[0] - foot_d ) / ( 2 * R ) ) )
+    down = np.array( ( -math.sin( tilt ), 0.0, -math.cos( tilt ) ) )
+    along = np.array( ( 0.0, 1.0, 0.0 ) )
+    swing = math.radians( ( ( keyed( "ring swing", s, n0 ) % 1001 ) / 1000.0 - 0.5 ) * 10.0 )
+    v = down * math.cos( swing ) + along * math.sin( swing )
+    u = along * math.cos( swing ) - down * math.sin( swing )
+    centre = top + R * v
+    torus( m, at( *centre ), out( *u ), out( *v ), R, r, "lt_hold_rust", segments=24, sides=8 )
+
+
 def fleet():
     """ The Fleet in the play: the bed, the bridges, the barge, the dolphins and what the tide left. """
     m = Model()
@@ -1522,12 +1676,10 @@ def fleet():
     for e0, n0, e1, n1 in ( ( -200, -300, -160, -230 ), ( 150, 820, 190, 900 ), ( -60, -980, 30, -1000 ) ):
         z = float( mud_z( ( e0 + e1 ) / 2, ( n0 + n1 ) / 2 ) )
         m.beam( ( e0, n0, z + 3 ), ( e1, n1, z + 4 ), ( 9.0, 8.0 ), "lt_timber" )
-    # Mooring rings along both walls.
-    for n in np.arange( -1500, 1100, 230 ):
+    # Mooring rings along both walls, clear of the ladders, the stairs and the footbridge.
+    for n in MOORING_RINGS:
         for s in ( -1, 1 ):
-            e = s * ( FLEET - 1.5 )
-            m.box( ( e - 1.5, n - 5, -44 ), ( e + 1.5, n + 5, -40 ), "iron_black" )
-            m.box( ( e - 1.5, n - 1, -52 ), ( e + 1.5, n + 1, -40 ), "iron_black" )
+            mooring_ring( m, s, n )
     return m
 
 
@@ -1585,6 +1737,8 @@ def use( name, m, *args, **kw ):
     """Lowtide's forklift, or shared Railhead props through its checked builder."""
     if name == "forklift":
         return FORKLIFT.build( m, *args, **kw )
+    if name == "lamp_post":
+        return LAMPS.build( m, *args, **kw )
     return R.use( name, m, *args, **kw )
 
 
@@ -1602,55 +1756,12 @@ def crates( m, s, e, n, z0, layout, along="n", seed=0 ):
 
 
 def quay_crane( m, s, e ):
-    """ A level-luffing quay crane on its rails: a portal you can walk under (200 clear), the machinery house and cab,
-    and the lattice jib reaching out over the harbour. Collision on the legs and their bogies. """
-    e = s * e
-    n0, n1 = -1565.0, -1385.0
-    paint = "lt_crane_red"
-    for de in ( -70.0, 70.0 ):
-        for n in ( n0, n1 ):
-            m.box( ( e + de - 30, n - 9, 0.0 ), ( e + de + 30, n + 9, 22.0 ), "lt_steel", METAL )
-            m.box( ( e + de - 8, n - 8, 22.0 ), ( e + de + 8, n + 8, 200.0 ), paint, METAL )
-            for k in range( 1, 5 ):
-                z = 22 + 178 * k / 5
-                m.box( ( e + de - 9, n - 9, z - 1.5 ), ( e + de + 9, n + 9, z + 1.5 ), paint )
-    for n in ( n0, n1 ):
-        m.box( ( e - 82, n - 10, 200 ), ( e + 82, n + 10, 228 ), paint )
-        m.beam( ( e - 70, n, 30 ), ( e + 70, n, 190 ), ( 4.0, 4.0 ), paint )
-    for de in ( -70.0, 70.0 ):
-        m.box( ( e + de - 10, n0 - 10, 200 ), ( e + de + 10, n1 + 10, 228 ), paint )
-        m.beam( ( e + de, n0, 40 ), ( e + de, n1, 190 ), ( 4.0, 4.0 ), paint )
-    m.collision_box( ( e - 82, n0 - 10, 200 ), ( e + 82, n1 + 10, 228 ), METAL )
-    # The slewing house with its cab looking out over the water, and the A-frame.
-    m.cylinder( ( e, ( n0 + n1 ) / 2 ), 60, 228, 240, { "side": "lt_steel", "top": "lt_steel" }, sides=16 )
-    m.box( ( e - 60, n0 + 10, 240 ), ( e + 60, n1 - 10, 340 ), { "default": paint, "+z": "lt_steel" } )
-    m.box( ( e - 30, n0 - 30, 250 ), ( e + 30, n0 + 10, 320 ), { "default": paint, "-n": "rw_window_dark", "-e": "rw_window_dark",
-                                                                "+e": "rw_window_dark" } )
-    for de in ( -40.0, 40.0 ):
-        m.beam( ( e + de, n0 + 40, 340 ), ( e + de * 0.3, ( n0 + n1 ) / 2, 560 ), ( 8.0, 8.0 ), paint )
-        m.beam( ( e + de, n1 - 20, 340 ), ( e + de * 0.3, ( n0 + n1 ) / 2, 560 ), ( 8.0, 8.0 ), paint )
-    # The jib: two lattice chords out to the south and up, then its nose.
-    root, tip = np.array( ( e, n0 + 30, 340.0 ) ), np.array( ( e, n0 - 1050, 860.0 ) )
-    for de in ( -14.0, 14.0 ):
-        m.beam( root + ( de, 0, 0 ), tip + ( de * 0.4, 0, 0 ), ( 5.0, 5.0 ), paint )
-        m.beam( root + ( de, 0, -26 ), tip + ( de * 0.4, 0, -10 ), ( 5.0, 5.0 ), paint )
-    for k in range( 12 ):
-        a = root + ( tip - root ) * k / 12
-        b = root + ( tip - root ) * ( k + 1 ) / 12
-        drop = lambda p, f: p + np.array( ( 0, 0, -26 + 16 * f ) )
-        m.beam( a, drop( b, ( k + 1 ) / 12 ), ( 2.5, 2.5 ), paint )
-    m.beam( np.array( ( e, ( n0 + n1 ) / 2, 560.0 ) ), tip + ( 0, 0, 10 ), ( 3.0, 3.0 ), "lt_steel" )
-    m.box( tip - ( 8, 20, 30 ), tip + ( 8, 20, 6 ), paint )
-    rod( m, tip - ( 0, 10, 30 ), ( e, n0 - 1040, HARBOUR_Z + 120 ), 0.8, "lt_steel", sides=4 )
-    # The counterweight, on a beam back from the A-frame's head.
-    head = np.array( ( e, ( n0 + n1 ) / 2, 560.0 ) )
-    for de in ( -10.0, 10.0 ):
-        m.beam( head + ( de, 0, 0 ), ( e + de, n1 + 40, 520.0 ), ( 6.0, 6.0 ), paint )
-    m.box( ( e - 30, n1 + 10, 470 ), ( e + 30, n1 + 70, 530 ), "rw_concrete_dark" )
+    """Blender-authored rail crane; retains the original placement and portal collision."""
+    CRANE.build( m, s * e )
 
 
 def skip_bin( m, s, e, n, along="n" ):
-    """Reference-detailed yellow steel skip, with an open interior and the original cover collider."""
+    """Reference-detailed yellow steel skip, with collision around its open interior."""
     SKIP.build( m, ( s * e, n, 0.0 ), along )
 
 
@@ -1749,6 +1860,7 @@ def lights():
             out.append( ( f"{side} Mezzanine {k + 1}", ( s * e, n, 320 ), WARM, 320, False ) )
     out.append( ( "Under the Bridge", ( 0, 1300, -70 ), COOL, 360, False ) )
     out.append( ( "Under the Footbridge", ( 0, -1240, -80 ), COOL, 260, False ) )
+    out.extend( LANTERNS.lights() )
     return out
 
 
@@ -2044,7 +2156,8 @@ def write_scene( written, light_list, props ):
         for name, title, collide, shadows in SCENE_MODELS if name in written ] )
     light_objects = [
         K.game_object( ids, name, f"light/{name}", K.to_world( position ), tags="light_point,light", components=[
-            K.component( ids, "Sandbox.PointLight", f"light/{name}/light", Attenuation=1, FogMode="Enabled", FogStrength=1,
+            K.component( ids, "Sandbox.PointLight", f"light/{name}/light", Attenuation=1, FogMode="Enabled",
+                         FogStrength=0.15 if name.startswith( "Bridge Lantern " ) else 1,
                          LightColor=color, Radius=radius, Shadows=shadows ) ] )
         for name, position, color, radius, shadows in light_list ]
 
@@ -2230,6 +2343,8 @@ def write_map_art( models ):
         PV._colours[paint] = PV.paint_colour( source.split( "/" )[1] ) * np.array( tint )
     for paint, ( colour, _, _ ) in LT_PAINTED.items():
         PV._colours[paint] = np.array( colour ) / 255.0
+    PV._colours[DECK.PAINT] = np.asarray( Image.open( DECK.SOURCE ).convert( "RGB" ), float ).mean( axis=( 0, 1 ) ) / 255.0
+    PV._colours[RAILS.PAINT] = np.asarray( Image.open( RAILS.SOURCE ).convert( "RGB" ), float ).mean( axis=( 0, 1 ) ) / 255.0
     skip_colour = np.asarray( Image.open( MAT_DIR / "lt_skip_color.png" ).convert( "RGB" ), float ).mean( axis=( 0, 1 ) ) / 255.0
     for paint, ( tint, _ ) in SKIP.PAINTS.items():
         PV._colours[paint] = skip_colour * np.array( tint )

@@ -1,0 +1,87 @@
+{
+  "RootObject": {
+    "__guid": "6ec4bbcb-0051-5c5b-8b17-a1cc7ce10099",
+    "Flags": 0,
+    "Name": "charm_pocket_scout",
+    "Enabled": true,
+    "Components": [
+      {
+        "__type": "Facepunch.Gunsmith.GunsmithAttachment",
+        "__guid": "a7bc9b61-d4fd-5c89-ba7a-eef76a350797"
+      }
+    ],
+    "Children": [
+      {
+        "__guid": "a5ffc41a-1e2f-5419-974f-e522ae6054e6",
+        "Flags": 0,
+        "Name": "Pocket Scout Pendant",
+        "Position": "0.3063636,-0.7476881,1.935409",
+        "Rotation": "0.03170605,-0.06722632,0.6443369,0.7611209",
+        "Enabled": true,
+        "Components": [
+          {
+            "__type": "Sandbox.ModelRenderer",
+            "__guid": "28122dc3-f6b8-5457-8ec6-9c49c4f3d170",
+            "BodyGroups": 18446744073709551615,
+            "Model": "models/weapon_charms/pocket_scout/pocket_scout.vmdl",
+            "RenderOptions": {
+              "GameLayer": true,
+              "OverlayLayer": true,
+              "BloomLayer": false,
+              "AfterUILayer": false
+            },
+            "RenderType": "On",
+            "Tint": "1,1,1,1"
+          },
+          {
+            "__type": "JiggleBone",
+            "__guid": "301b62fb-3947-53e5-b1ff-8de9692cca7e",
+            "EndPoint": "0,0,-0.8",
+            "StartPoint": "0,0,0",
+            "Damping": 0.25,
+            "Mass": 0.9,
+            "PitchLimits": "-360 360",
+            "Radius": 40,
+            "RollLimits": "5 35",
+            "Speed": 1,
+            "Stiffness": 0.3,
+            "YawLimits": "-360 360"
+          }
+        ]
+      },
+      {
+        "__guid": "0f6be010-c671-5cdd-b127-3b4fd9602bc9",
+        "Flags": 0,
+        "Name": "Base",
+        "Position": "0.5664529,-0.712163,1.838088",
+        "Rotation": "-0.0000001245606,0.0000001245606,0.7071067,0.7071068",
+        "Enabled": true,
+        "Components": [
+          {
+            "__type": "Sandbox.ModelRenderer",
+            "__guid": "75c3a635-d838-5d3d-a13b-ac9430635566",
+            "BodyGroups": 18446744073709551615,
+            "Model": "models/weapon_charms/charm_anchor.vmdl",
+            "RenderOptions": {
+              "GameLayer": true,
+              "OverlayLayer": true,
+              "BloomLayer": false,
+              "AfterUILayer": false
+            },
+            "RenderType": "On",
+            "Tint": "1,1,1,1"
+          }
+        ]
+      }
+    ],
+    "__variables": []
+  },
+  "ShowInMenu": false,
+  "MenuPath": null,
+  "MenuIcon": null,
+  "DontBreakAsTemplate": false,
+  "ResourceVersion": 1,
+  "__references": [],
+  "IsValid": true,
+  "__version": 1
+}

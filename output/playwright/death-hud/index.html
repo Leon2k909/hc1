@@ -1,0 +1,27 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Death HUD source preview</title>
+  <style>
+    @font-face { font-family: Dinish; src: url("file:///D:/Documents/s&box%20projects/hc1/forked-shooter-main/Assets/fonts/Dinish-Regular.ttf"); font-weight: 400; }
+    @font-face { font-family: Dinish; src: url("file:///D:/Documents/s&box%20projects/hc1/forked-shooter-main/Assets/fonts/Dinish-Bold.ttf"); font-weight: 700; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; }
+    body { background: linear-gradient(rgba(45,8,10,.5), rgba(35,4,7,.62)), url("file:///C:/Users/leon2/AppData/Local/Temp/codex-clipboard-c429d58b-cc8f-4c25-a1e5-61e5f8ac8590.png") center/cover; }
+    body.spectator { background: linear-gradient(rgba(0,0,0,.15), rgba(0,0,0,.2)), url("file:///C:/Users/leon2/AppData/Local/Temp/codex-clipboard-c429d58b-cc8f-4c25-a1e5-61e5f8ac8590.png") center/cover; }
+    .canvas { display: flex; position: relative; justify-content: center; align-items: center; width: 100%; height: 100%; }
+    div, deathcam, spectating, inputhint { display: flex; }
+    label { display: block; }
+    inputhint { align-items: center; justify-content: center; }
+    inputhint img { display: block; }
+    .with-deadzone { margin: 25px; }
+    .preview-note { position: absolute; left: 20px; top: 16px; color: #fff; font: 12px Dinish; opacity: .55; }
+  </style>
+  <link rel="stylesheet" href="Deathcam.css"><link rel="stylesheet" href="Spectating.css">
+  </head><body><div class="canvas"><label class="preview-note">SOURCE LAYOUT PREVIEW · NOT AN IN-GAME CAPTURE</label>
+  
+  <deathcam class="hud with-deadzone">
+    <div class="killer-summary"><div class="killer-identity"><label class="section-title">KILLED BY</label><label class="killer-name">Echo BOT</label></div></div>
+    <div class="damage-summary"><div class="damage-section"><label class="section-title">DAMAGE TAKEN</label>
+      <div class="damage-row"><label class="damage-source">Echo BOT</label><label class="damage-value">107 damage in 5 hits</label></div>
+    </div></div>
+    <div class="spectate-prompt"><label>Press</label><inputhint data-action="Attack1"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%3Crect%20x%3D%226%22%20y%3D%222%22%20width%3D%2212%22%20height%3D%2220%22%20rx%3D%226%22%20fill%3D%22%23f4f4f0%22%2F%3E%3Cpath%20d%3D%22M12%203v7M7%2010h10%22%20stroke%3D%22%23141414%22%20stroke-width%3D%221.5%22%2F%3E%3C%2Fsvg%3E"></inputhint><label>or</label><inputhint data-action="Attack2"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%3Crect%20x%3D%226%22%20y%3D%222%22%20width%3D%2212%22%20height%3D%2220%22%20rx%3D%226%22%20fill%3D%22%23f4f4f0%22%2F%3E%3Cpath%20d%3D%22M12%203v7M7%2010h10%22%20stroke%3D%22%23141414%22%20stroke-width%3D%221.5%22%2F%3E%3C%2Fsvg%3E"></inputhint><label>to start spectating</label></div>
+  </deathcam>
+  </div></body></html>

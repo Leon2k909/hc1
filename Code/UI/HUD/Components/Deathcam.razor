@@ -13,31 +13,65 @@
     var killerName = killerPlayer.IsValid()
         ? killerPlayer.DisplayName
         : killerDescription?.DisplayName ?? Tr( IsZombiesMode ? "Zombie" : "Unknown" );
+    var damageEntries = DamageEntries;
+    var inflictedDamageEntries = InflictedDamageEntries;
 }
 
-<root class="hud with-deadzone flex column gap-xs">
-    <div class="flex row">
+<root class="hud with-deadzone">
+    <div class="killer-summary">
         @if ( killerPlayer.IsValid() )
         {
-            <img class="image" src="avatar:@killerPlayer.SteamId" />
+            <img class="killer-avatar" src="avatar:@killerPlayer.SteamId" />
         }
-        <div class="flex column with-background with-padding h-full align-left justify-center" style="min-width: 275px;">
-            <label class="text small upper">@Tr( "KILLED BY" )</label>
-            <label>@killerName</label>
+        <div class="killer-identity">
+            <label class="section-title">@Tr( "KILLED BY" )</label>
+            <label class="killer-name">@killerName</label>
         </div>
     </div>
 
-    <div class="flex row layout with-background with-padding align-center">
+    @if ( (damageEntries?.Count ?? 0) > 0 || (inflictedDamageEntries?.Count ?? 0) > 0 )
+    {
+        <div class="damage-summary">
+            @if ( (damageEntries?.Count ?? 0) > 0 )
+            {
+                <div class="damage-section">
+                    <label class="section-title">@Tr( "DAMAGE TAKEN" )</label>
+                    @foreach ( var entry in damageEntries )
+                    {
+                        <div class="damage-row">
+                            <label class="damage-source">@GetName( entry.Attacker )</label>
+                            <label class="damage-value">@Tr( "{0} damage in {1} hits", entry.Damage.CeilToInt(), entry.Count )</label>
+                        </div>
+                    }
+                </div>
+            }
+
+            @if ( (inflictedDamageEntries?.Count ?? 0) > 0 )
+            {
+                <div class="damage-section">
+                    <label class="section-title">@Tr( "INFLICTED DAMAGE" )</label>
+                    @foreach ( var entry in inflictedDamageEntries )
+                    {
+                        <div class="damage-row inflicted-row">
+                            <label class="damage-value">@Tr( "{0} damage in {1} hits", entry.Damage.CeilToInt(), entry.Count )</label>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+
+    <div class="spectate-prompt">
         @* The words go around the two buttons in the translation's order: {0} and {1} mark where the buttons sit. *@
         @foreach ( var piece in System.Text.RegularExpressions.Regex.Split( Tr( "Press {0} or {1} to start spectating" ), "(\\{\\d\\})" ) )
         {
             @if ( piece == "{0}" )
             {
-                <InputHint class="small" Action="Attack1" />
+                <InputHint class="small" Action="Attack1" Size="@InputGlyphSize.Small" />
             }
             else if ( piece == "{1}" )
             {
-                <InputHint class="small" Action="Attack2" />
+                <InputHint class="small" Action="Attack2" Size="@InputGlyphSize.Small" />
             }
             else if ( !string.IsNullOrWhiteSpace( piece ) )
             {
@@ -46,32 +80,6 @@
         }
     </div>
 
-    @if ( DamageEntries is not null && DamageEntries.Count > 0 )
-    {
-        <div class="flex column layout with-background with-padding">
-            <label class="small slight">@Tr( "DAMAGE TAKEN" )</label>
-            @foreach ( var entry in DamageEntries )
-            {
-                <div class="flex row gap-xs">
-                    <label>@Tr( "{0} damage in {1} hits", entry.Damage.CeilToInt(), entry.Count ) - </label>
-                    <label>@GetName( entry.Attacker )</label>
-                </div>
-            }
-        </div>
-    }
-
-    @if ( InflictedDamageEntries is not null && InflictedDamageEntries.Count > 0 )
-    {
-        <div class="flex column layout with-background with-padding">
-            <label class="small slight">@Tr( "INFLICTED DAMAGE" )</label>
-            @foreach ( var entry in InflictedDamageEntries )
-            {
-                <div class="flex row gap-xs">
-                    <label>@Tr( "{0} damage in {1} hits", entry.Damage.CeilToInt(), entry.Count )</label>
-                </div>
-            }
-        </div>
-    }
 </root>
 
 @code

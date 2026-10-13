@@ -32,6 +32,7 @@ public partial class PlayerPawn
 
 		IsFallKnockedDown = false;
 		IsProne = false;
+		StopPipeClimb( Vector3.Zero );
 		var client = Client;
 
 		if ( Networking.IsHost )

@@ -617,7 +617,7 @@ public partial class Shootable : WeaponInputAction,
 		if ( !Equipment.Owner.IsValid() ) return false;
 
 		// Player
-		if ( Equipment.Owner.IsFrozen )
+		if ( Equipment.Owner.IsFrozen || Equipment.Owner.IsPipeClimbing )
 			return false;
 
 		// Weapon

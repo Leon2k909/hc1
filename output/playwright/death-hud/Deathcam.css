@@ -1,0 +1,98 @@
+Deathcam {
+  position: absolute;
+  bottom: 96px;
+  width: 440px;
+  max-width: 80%;
+  flex-direction: column;
+  z-index: 50;
+}
+Deathcam label {
+  font-family: Dinish;
+  font-weight: normal;
+  color: #F4F4F0;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.9);
+}
+Deathcam .killer-summary {
+  align-items: center;
+  gap: 14px;
+}
+Deathcam .killer-avatar {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  background-size: cover;
+  border-radius: 2px;
+}
+Deathcam .killer-identity {
+  flex-direction: column;
+  flex-grow: 1;
+  min-width: 0;
+  gap: 3px;
+}
+Deathcam .section-title {
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(244, 244, 240, 0.64);
+}
+Deathcam .killer-name {
+  font-size: 32px;
+  line-height: 36px;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+Deathcam .damage-summary {
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(244, 244, 240, 0.18);
+}
+Deathcam .damage-section {
+  flex-direction: column;
+  gap: 5px;
+}
+Deathcam .damage-row {
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+Deathcam .damage-row label {
+  font-size: 16px;
+}
+Deathcam .damage-source {
+  flex-shrink: 1;
+  min-width: 0;
+  color: rgba(244, 244, 240, 0.76);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+Deathcam .damage-value {
+  flex-shrink: 0;
+  text-align: right;
+}
+Deathcam .inflicted-row {
+  justify-content: flex-start;
+}
+Deathcam .spectate-prompt {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 18px;
+}
+Deathcam .spectate-prompt label {
+  font-size: 14px;
+  color: rgba(244, 244, 240, 0.72);
+}
+Deathcam .spectate-prompt InputHint {
+  flex-shrink: 0;
+}
+Deathcam .spectate-prompt InputHint img {
+  width: 24px;
+  height: 24px;
+  background-tint: #F4F4F0;
+  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.8));
+}

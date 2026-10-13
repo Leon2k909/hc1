@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <SandboxManaged Condition="'$(SandboxManaged)' == ''">D:/SteamLibrary/steamapps/common/sbox/bin/managed</SandboxManaged>
+  </PropertyGroup>
+  <ItemGroup>
+    <Using Include="Sandbox" />
+    <Using Include="Sandbox.Internal.GlobalGameNamespace" Static="true" />
+    <Reference Include="Sandbox.System" HintPath="$(SandboxManaged)/Sandbox.System.dll" />
+    <Reference Include="Sandbox.Engine" HintPath="$(SandboxManaged)/Sandbox.Engine.dll" />
+    <Reference Include="Sandbox.Filesystem" HintPath="$(SandboxManaged)/Sandbox.Filesystem.dll" />
+    <Compile Include="../../Code/GameLoop/Bots/BotPronePose.cs" Link="BotPronePose.cs" />
+  </ItemGroup>
+</Project>

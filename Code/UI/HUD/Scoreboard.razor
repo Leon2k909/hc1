@@ -53,7 +53,7 @@
 
             @foreach ( var player in ZombiesPlayers )
             {
-                <ScoreboardRow Client="@player" />
+                <ScoreboardRow Client="@player" OnInspectPlayer=@InspectPlayer />
             }
         }
         else
@@ -65,9 +65,13 @@
 
             @if ( group.Team == Team.Unassigned )
             {
-                <div class="flex gap-sm align-center">
+                <div class="flex gap-sm align-center spectator-list">
                     <Icon file="/ui/teams/spectator.png" size="16" />
-                    <label class="small grey">@(string.Join( ", ", group.Entries.Select( x => x.DisplayName ) ))</label>
+                    @foreach ( var entry in group.Entries )
+                    {
+                        var spectator = entry.Client;
+                        <button class="spectator-name small grey" onclick=@(() => InspectPlayer( spectator ))>@entry.DisplayName</button>
+                    }
                 </div>
             }
             else
@@ -114,7 +118,7 @@
 
                 @foreach ( var player in group.Entries )
                 {
-                    <ScoreboardRow Client="@player.Client" Bot="@player.Bot" />
+                    <ScoreboardRow Client="@player.Client" Bot="@player.Bot" OnInspectPlayer=@InspectPlayer />
                 }
 
                 @if ( i == 0 )
@@ -125,7 +129,12 @@
         }
         }
         </div>
+        <label class="sharing-hint small grey">@Tr( "Click a player to copy their gun builds or crosshair." )</label>
     </table>
+    @if ( InspectedPlayer.IsValid() )
+    {
+        <ScoreboardPlayerDetails Client=@InspectedPlayer OnClosed=@ClosePlayerDetails />
+    }
 </root>
 
 @code
@@ -214,6 +223,20 @@
     }
 
     public bool IsActive { get; set; }
+    private Client InspectedPlayer { get; set; }
+
+    private void InspectPlayer( Client player )
+    {
+        if ( !player.IsValid() || player.IsBot ) return;
+        InspectedPlayer = player;
+        StateHasChanged();
+    }
+
+    private void ClosePlayerDetails()
+    {
+        InspectedPlayer = null;
+        StateHasChanged();
+    }
 
     protected override int BuildHash()
     {
@@ -222,6 +245,7 @@
         var hash = new HashCode();
 
         hash.Add( IsActive );
+        hash.Add( InspectedPlayer );
         hash.Add( Status );
         hash.Add( Time?.TotalSeconds );
         hash.Add( RoundNumber );
@@ -263,6 +287,7 @@
     public override void Tick()
     {
         IsActive = Input.Down( "Score" );
+        if ( !IsActive || !InspectedPlayer.IsValid() ) InspectedPlayer = null;
         SetClass( "visible", IsActive );
     }
 

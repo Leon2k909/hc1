@@ -1,0 +1,27 @@
+@import "/UI/Styles/Hints.scss";
+
+PipeClimbHints
+{
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 22%;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    .pipe-climb-hints
+    {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        padding: 10px 16px;
+        background-color: rgba( 10, 12, 15, 0.82 );
+        border-top: 2px solid #ff7a1a;
+    }
+    .hint { flex-direction: row; align-items: center; gap: 5px; }
+    label { color: white; font-family: Chakra Petch; font-size: 16px; }
+    InputHint { width: 24px; height: 24px; }
+    InputHint img { width: 100%; height: 100%; }
+}

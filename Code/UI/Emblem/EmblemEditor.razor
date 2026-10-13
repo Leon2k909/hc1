@@ -65,7 +65,18 @@
                         var layer = Data.Layers[i];
                         <div class="ee-layer-row @(SelectedLayerIndex == index ? "active" : "")" @onclick=@(() => SelectedLayerIndex = index)>
                             <div class="ee-layer-icon">
-                                <i style="color: @layer.Color.Hex; font-size: 18px;">@layer.Icon</i>
+                                @if ( layer.IconType == EmblemIconType.MaterialIcon )
+                                {
+                                    <i style="color: @layer.Color.Hex; font-size: 18px;">@layer.Icon</i>
+                                }
+                                else if ( layer.IconType == EmblemIconType.Letter )
+                                {
+                                    <label class="ee-letter" style="color: @layer.Color.Hex; font-size: 18px;">@layer.Icon</label>
+                                }
+                                else
+                                {
+                                    <label style="font-size: 18px;">@layer.Icon</label>
+                                }
                             </div>
                             <label class="ee-layer-name">@Tr( "Layer {0}", index + 1 )</label>
                             <div class="ee-layer-btns">
@@ -82,10 +93,11 @@
             @if ( SelectedLayer != null )
             {
                 <div class="ee-shapes">
-                    @* Tab bar: SHAPES | EMOJI *@
+                    @* Tab bar: SHAPES | EMOJI | LETTERS *@
                     <div class="ee-picker-tabs">
                         <div class="ee-picker-tab @(PickerTab == 0 ? "active" : "")" @onclick=@(() => PickerTab = 0)>@Tr( "SHAPES" )</div>
                         <div class="ee-picker-tab @(PickerTab == 1 ? "active" : "")" @onclick=@(() => PickerTab = 1)>@Tr( "EMOJI" )</div>
+                        <div class="ee-picker-tab @(PickerTab == 2 ? "active" : "")" @onclick=@(() => PickerTab = 2)>@Tr( "LETTERS" )</div>
                     </div>
 
                     @if ( PickerTab == 0 )
@@ -101,7 +113,7 @@
                             }
                         </div>
                     }
-                    else
+                    else if ( PickerTab == 1 )
                     {
                         @* Emoji organised by category, in one list that scrolls as a whole *@
                         <div class="ee-emoji-list">
@@ -115,6 +127,25 @@
                                         var active = SelectedLayer.Icon == em && SelectedLayer.IconType == EmblemIconType.Emoji;
                                         <div class="ee-shape-cell @(active ? "active" : "")" @onclick=@(() => SetIcon( em, EmblemIconType.Emoji ))>
                                             <label style="font-size: 20px;">@em</label>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="ee-letter-list">
+                            @foreach ( var (name, letters) in LetterCategories )
+                            {
+                                <label class="ee-letter-cat-label">@name</label>
+                                <div class="ee-shape-grid ee-letter-grid">
+                                    @foreach ( var character in letters )
+                                    {
+                                        var letter = character.ToString();
+                                        var active = SelectedLayer.Icon == letter && SelectedLayer.IconType == EmblemIconType.Letter;
+                                        <div class="ee-shape-cell @(active ? "active" : "")" @onclick=@(() => SetIcon( letter, EmblemIconType.Letter ))>
+                                            <label class="ee-letter">@letter</label>
                                         </div>
                                     }
                                 </div>
@@ -158,6 +189,13 @@
         SelectedLayer.IconType = type;
         StateHasChanged();
     }
+
+    private static readonly (string Name, string Letters)[] LetterCategories =
+    {
+        ( "A–Z", "ABCDEFGHIJKLMNOPQRSTUVWXYZ" ),
+        ( "a–z", "abcdefghijklmnopqrstuvwxyz" ),
+        ( "0–9", "0123456789" ),
+    };
 
     private static readonly (string Name, string[] Emojis)[] EmojiCategories =
     {
@@ -208,6 +246,12 @@
         Data = EmblemData.FromJson( json );
         if ( Data.Layers == null ) Data.Layers = new();
         SelectedLayerIndex = Data.Layers.Count > 0 ? Data.Layers.Count - 1 : -1;
+        PickerTab = SelectedLayer?.IconType switch
+        {
+            EmblemIconType.Emoji => 1,
+            EmblemIconType.Letter => 2,
+            _ => 0
+        };
         StateHasChanged();
     }
 
@@ -229,7 +273,13 @@
     private void AddLayer()
     {
         if ( Data.Layers.Count >= 32 ) return;
-        Data.Layers.Add( new EmblemLayer { Icon = "circle" } );
+        var (icon, type) = PickerTab switch
+        {
+            1 => ("😀", EmblemIconType.Emoji),
+            2 => ("A", EmblemIconType.Letter),
+            _ => ("circle", EmblemIconType.MaterialIcon)
+        };
+        Data.Layers.Add( new EmblemLayer { Icon = icon, IconType = type } );
         SelectedLayerIndex = Data.Layers.Count - 1;
         StateHasChanged();
     }
@@ -272,5 +322,6 @@
 
     protected override int BuildHash()
         => HashCode.Combine( Data?.Layers?.Count ?? 0, SelectedLayerIndex,
-            SelectedLayer?.Icon, SelectedLayer?.Color, SelectedLayer?.Scale );
+            SelectedLayer?.Icon, SelectedLayer?.Color, SelectedLayer?.Scale,
+            SelectedLayer?.IconType, PickerTab );
 }

@@ -52,7 +52,7 @@
     private float _startDistance, _startScale;
 
     /// <summary>
-    /// A layer's box in UI pixels: EmblemViewer draws an emoji in a 28 px box and a Material Icon at 32 px, times its
+    /// A layer's box in UI pixels: EmblemViewer draws an emoji in a 28 px box and an icon or letter at 32 px, times its
     /// scale.
     /// </summary>
     private static float BoxSize( EmblemLayer layer ) => layer.Scale * (layer.IconType == EmblemIconType.Emoji ? 28f : 32f);

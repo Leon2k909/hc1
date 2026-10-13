@@ -94,6 +94,77 @@ CareerLanding
     }
     .prestige-name { font-size: 22px; font-weight: 700; text-align: center; }
     .prestige-status { font-size: 20px; font-weight: 500; color: $career-muted; text-align: center; }
+    .weapon-record { width: 100%; flex-direction: column; gap: 18px; }
+    .weapon-record-heading { align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .weapon-record-count { color: $career-muted; font-size: 20px; font-weight: 600; letter-spacing: 1px; }
+    .weapon-categories { flex-direction: row; flex-wrap: wrap; gap: 8px; }
+    .weapon-category
+    {
+        @include menu-action;
+        min-height: 46px;
+        padding: 0 16px;
+        font-size: 18px;
+        letter-spacing: 1px;
+        .category-count { font-size: 16px; color: $career-muted; }
+        &.active { background-color: rgba( 255, 122, 26, 0.12 ); border-color: $menu-accent; color: #ffa568; }
+        &.active .category-count { color: #ffa568; }
+    }
+    .weapon-record-tools { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 12px; }
+    .weapon-search
+    {
+        @include menu-panel;
+        flex-grow: 1;
+        min-width: 220px;
+        height: 48px;
+        align-items: center;
+        padding: 0 14px;
+        gap: 10px;
+        pointer-events: all;
+        i { color: $career-muted; font-size: 24px; flex-shrink: 0; }
+        &:hover { border-color: rgba( 255, 122, 26, 0.45 ); }
+    }
+    .weapon-search-entry
+    {
+        flex-grow: 1;
+        min-width: 0;
+        height: 100%;
+        align-items: center;
+        font-family: Chakra Petch;
+        font-size: 20px;
+        font-weight: 500;
+        color: white;
+        border-bottom: 1px solid transparent;
+        &:focus { border-bottom-color: $menu-accent; }
+        .content-label { font-family: Chakra Petch; }
+        .placeholder { opacity: 1; color: $career-muted; }
+    }
+    .weapon-sort { flex-direction: row; align-items: center; flex-wrap: wrap; gap: 6px; }
+    .weapon-sort-label { color: $career-muted; font-size: 16px; font-weight: 600; letter-spacing: 1px; margin-right: 6px; }
+    .weapon-sort-option
+    {
+        @include menu-action;
+        min-height: 48px;
+        padding: 0 14px;
+        font-size: 18px;
+        letter-spacing: 1px;
+        &.active { border-color: $menu-accent; color: #ffa568; background-color: rgba( 255, 122, 26, 0.12 ); }
+    }
+    .weapon-clear { @include menu-action; min-height: 48px; padding: 0 14px; font-size: 16px; letter-spacing: 1px; }
+    .weapon-record-empty
+    {
+        @include menu-panel;
+        width: 100%;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 24px;
+        gap: 12px;
+        color: $career-muted;
+        font-size: 20px;
+        text-align: center;
+        i { font-size: 36px; }
+        .weapon-empty-title { color: white; font-size: 24px; font-weight: 600; }
+    }
     .weapon-stats-grid { width: 100%; flex-direction: row; flex-wrap: wrap; gap: 12px; }
     CareerWeapon
     {
@@ -144,6 +215,9 @@ CareerLanding
 {
     .prestige-card { width: 46%; }
     CareerWeapon { width: 100%; }
+    .weapon-search { width: 100%; min-width: 0; flex-shrink: 0; }
+    .weapon-sort { flex-grow: 1; }
+    .weapon-sort-option { padding: 0 12px; }
     .career-title { font-size: 34px; }
     .rank-title { gap: 8px; label { font-size: 24px; } }
     .rank-badge { width: 72px; height: 72px; font-size: 36px; }

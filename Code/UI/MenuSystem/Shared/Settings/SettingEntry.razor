@@ -22,7 +22,24 @@
                     <label class="setting-hint">@Tr( "Language changes apply immediately and are saved automatically." )</label>
                 </div>
                 <div class="grow" />
-                <LanguagePicker />
+                <div class="language-controls">
+                    <div class="choice-options english-variants">
+                        @foreach ( var language in EnglishVariants )
+                        {
+                            <button class="choice-option @(GameText.Current == language ? "selected" : "")" onclick=@(() => PickEnglish( language ))>
+                                <div class="language-variant-text">
+                                    <label>@GameText.NativeName( language )</label>
+                                    <label class="language-spelling">@(language == GameLanguage.EnglishUK ? "Customise / Colour" : "Customize / Color")</label>
+                                </div>
+                                @if ( GameText.Current == language )
+                                {
+                                    <i>check</i>
+                                }
+                            </button>
+                        }
+                    </div>
+                    <LanguagePicker />
+                </div>
             </div>
         }
         else if ( Description.PropertyType == typeof( VoiceChatMode ) )
@@ -119,6 +136,15 @@
 
     // The English name stays beside the translation, so the setting can be found in a language you can't read.
     private static string LanguageTitle => GameText.IsEnglish ? Tr( "Language" ) : $"{Tr( "Language" )} / Language";
+
+    private static readonly GameLanguage[] EnglishVariants = { GameLanguage.EnglishUK, GameLanguage.EnglishUS };
+
+    private static void PickEnglish( GameLanguage language )
+    {
+        LanguageMenu.CloseAny();
+        Sound.Play( "ui_button_press" );
+        if ( GameText.Current != language ) GameText.SetLanguage( language );
+    }
 
     private static string VoiceModeTitle( VoiceChatMode mode ) => mode switch
     {

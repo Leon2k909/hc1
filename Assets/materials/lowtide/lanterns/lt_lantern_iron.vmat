@@ -1,0 +1,14 @@
+// Tools/lowtide_lanterns.py: aged green enamel over cast iron
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "0.68"
+    g_flMetalness "0.00"
+    TextureColor "materials/buildings/iron_green_color.png"
+    TextureNormal "materials/buildings/iron_normal.png"
+    TextureRoughness "materials/buildings/iron_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.62 0.78 0.66 1.0]"
+    g_flModelTintAmount "1.0"
+}

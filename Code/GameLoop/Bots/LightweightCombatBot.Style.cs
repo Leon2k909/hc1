@@ -190,7 +190,7 @@ public sealed partial class LightweightCombatBot
 	/// <summary> What the bot's doing in its fight, for dev_bot_styles. </summary>
 	public string CurrentMove => _move.ToString();
 
-	private enum Move { None, Strafe, Plant, Push, BackOff, Relocate }
+	private enum Move { None, Strafe, Plant, Push, BackOff, Relocate, Prone }
 
 	private Move _move;
 	private TimeUntil _moveEnds;
@@ -221,6 +221,7 @@ public sealed partial class LightweightCombatBot
 	/// <summary> A new fight: the next move is picked at once, from here. </summary>
 	private void StartFight( bool sameEnemy )
 	{
+		StandFromProne();
 		_move = Move.None;
 		_moveEnds = 0f;
 		_timeSinceAcquired = 0f;
@@ -237,6 +238,8 @@ public sealed partial class LightweightCombatBot
 	/// <summary> In range of the enemy it's fighting: carry on with the move it's on, or pick the next. </summary>
 	private void Manoeuvre( Vector3 toTarget, float distance, float wanted )
 	{
+		if ( ContinueProne( distance ) ) return;
+
 		if ( _anchor.DistanceSquared( WorldPosition ) > 600f * 600f )
 			_anchor = WorldPosition;
 
@@ -251,6 +254,7 @@ public sealed partial class LightweightCombatBot
 
 	private void NextMove( Vector3 away, float distance, float wanted )
 	{
+		StandFromProne();
 		var habits = Habits;
 		var hurt = _hurt;
 		_hurt = false;
@@ -295,7 +299,7 @@ public sealed partial class LightweightCombatBot
 
 		// A recruit freezes more often than a veteran. Never two plants in a row, and no push when it's close enough.
 		var strafe = habits.StrafeWeight;
-		var plant = _move == Move.Plant ? 0f : habits.PlantWeight * MathX.Lerp( 1.4f, 0.8f, Skill );
+		var plant = _move is Move.Plant or Move.Prone ? 0f : habits.PlantWeight * MathX.Lerp( 1.4f, 0.8f, Skill );
 		var push = distance > wanted * 0.8f ? habits.PushWeight : 0f;
 		var roll = Game.Random.Float( 0f, strafe + plant + push );
 		if ( roll < plant )
@@ -343,7 +347,8 @@ public sealed partial class LightweightCombatBot
 	{
 		var habits = Habits;
 		HoldPosition();
-		IsCrouching = Game.Random.Float() < habits.CrouchPlant && (distance > 350f || habits.Style != BotStyle.Rifleman);
+		if ( TryPlantProne( distance ) ) return;
+		IsCrouching = _proneBlend <= 0f && Game.Random.Float() < habits.CrouchPlant && (distance > 350f || habits.Style != BotStyle.Rifleman);
 		_move = Move.Plant;
 		_moveEnds = habits.Plant * Game.Random.Float( 0.6f, 1.25f );
 	}

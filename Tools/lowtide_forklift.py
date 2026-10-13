@@ -11,7 +11,7 @@ import math
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 from scipy import ndimage
 
 import map_kit as K
@@ -33,7 +33,8 @@ AMBER = "lt_fl_amber"
 RED = "lt_fl_red"
 WHITE = "lt_fl_white"
 GLASS = "lt_fl_glass"
-PAINTS = (PAINT, STEEL, HUB, SILVER, CHROME, RUBBER, VINYL, BLACK, AMBER, RED, WHITE, GLASS)
+WARNING = "lt_fl_warning"
+PAINTS = (PAINT, STEEL, HUB, SILVER, CHROME, RUBBER, VINYL, BLACK, AMBER, RED, WHITE, GLASS, WARNING)
 
 
 def unit(v):
@@ -87,22 +88,136 @@ def _surface(name, colour, seed, silver=False):
             path.write_bytes(payload)
 
 
+def _generated_steel():
+    """Use the ImageGen enamel scan as albedo and derive its shallow surface response."""
+    source = Path(__file__).with_name("lowtide_forklift_steel_source.png")
+    with Image.open(source) as image:
+        colour = image.convert("RGB").resize((2048, 2048), Image.Resampling.LANCZOS)
+    rgb = np.asarray(colour, np.float32) / 255
+    luminance = rgb @ np.array((.2126, .7152, .0722), np.float32)
+    saturation = rgb.max(axis=2) - rgb.min(axis=2)
+    chips = np.clip((luminance - .24) * 4, 0, .85) * np.clip(1 - saturation * 4, 0, 1)
+    rust = np.clip((rgb[..., 0] - rgb[..., 2] - .025) * 5, 0, 1)
+    grain = ndimage.gaussian_filter(luminance, .65, mode="wrap") - ndimage.gaussian_filter(luminance, 4, mode="wrap")
+    rough = np.clip(.66 + grain * .35 - chips * .20 + rust * .24, .38, .94)
+    metal = np.clip(.02 + chips * .82 - rust * .6, 0, .90)
+    height = grain * .26 - chips * .025 + rust * .018
+    dy, dx = np.gradient(ndimage.gaussian_filter(height, .55, mode="wrap"))
+    normal = np.dstack((-dx * 4, dy * 4, np.ones_like(dx)))
+    normal /= np.linalg.norm(normal, axis=2, keepdims=True)
+    for channel, data in (("color", rgb * 255), ("normal", (normal * .5 + .5) * 255),
+                          ("rough", rough * 255), ("metal", metal * 255)):
+        stream = io.BytesIO()
+        Image.fromarray(np.clip(np.rint(data), 0, 255).astype(np.uint8)).save(stream, format="PNG", optimize=True)
+        path, payload = OUT / f"steel_imagegen_{channel}.png", stream.getvalue()
+        if not path.exists() or path.read_bytes() != payload:
+            path.write_bytes(payload)
+
+
+def _generated_silver():
+    """ImageGen's satin aluminium, with shallow machining grain and oxidised flecks."""
+    source = Path(__file__).with_name("lowtide_forklift_canister_source.png")
+    with Image.open(source) as image:
+        colour = image.convert("RGB").resize((2048, 2048), Image.Resampling.LANCZOS)
+    rgb = np.asarray(colour, np.float32) / 255
+    luminance = rgb @ np.array((.2126, .7152, .0722), np.float32)
+    grain = ndimage.gaussian_filter(luminance, .7, mode="wrap") - ndimage.gaussian_filter(luminance, 5, mode="wrap")
+    grime = np.clip((.55 - luminance) * 2.5, 0, .65)
+    rough = np.clip(.50 + grime * .38 + np.abs(grain) * .3, .46, .86)
+    metal = np.clip(.88 - grime * .72, .38, .92)
+    height = grain * .06 - grime * .004
+    dy, dx = np.gradient(ndimage.gaussian_filter(height, .65, mode="wrap"))
+    normal = np.dstack((-dx * 4, dy * 4, np.ones_like(dx)))
+    normal /= np.linalg.norm(normal, axis=2, keepdims=True)
+    for channel, data in (("color", rgb * 255), ("normal", (normal * .5 + .5) * 255),
+                          ("rough", rough * 255), ("metal", metal * 255)):
+        stream = io.BytesIO()
+        Image.fromarray(np.clip(np.rint(data), 0, 255).astype(np.uint8)).save(stream, format="PNG", optimize=True)
+        path, payload = OUT / f"canister_imagegen_{channel}.png", stream.getvalue()
+        if not path.exists() or path.read_bytes() != payload:
+            path.write_bytes(payload)
+
+
+def _warning_label():
+    """Printed vinyl artwork, with restrained edge grime and scuffed ink."""
+    w, h = 384, 960
+    paper, ink = (218, 211, 189), (32, 32, 28)
+    canvas = Image.new("RGB", (w, h), paper)
+    draw = ImageDraw.Draw(canvas)
+
+    def text(y, value, size, bold=True):
+        font = ImageFont.truetype(str(K.ASSETS / "fonts" / f"Dinish-{'Bold' if bold else 'Regular'}.ttf"), size)
+        draw.text((w / 2, y), value, font=font, fill=ink, anchor="mt")
+
+    draw.rounded_rectangle((7, 7, w - 8, h - 8), radius=10, outline=ink, width=4)
+    draw.rectangle((12, 12, w - 13, 139), fill=(205, 126, 42))
+    text(46, "WARNING", 53)
+    draw.line((12, 140, w - 13, 140), fill=ink, width=5)
+    draw.polygon(((192, 173), (52, 411), (332, 411)), fill=ink)
+    draw.polygon(((192, 202), (83, 391), (301, 391)), fill=(224, 183, 64))
+    draw.polygon(((176, 260), (208, 260), (204, 333), (180, 333)), fill=ink)
+    draw.ellipse((179, 348, 205, 374), fill=ink)
+    text(450, "TIP-OVER", 43)
+    text(503, "HAZARD", 43)
+    draw.line((35, 576, w - 36, 576), fill=ink, width=3)
+    text(606, "STAY WITH TRUCK", 31)
+    for y, value in ((667, "HOLD ON"), (718, "BRACE FEET"), (769, "LEAN AWAY")):
+        text(y, value, 29)
+    draw.line((35, 838, w - 36, 838), fill=ink, width=2)
+    text(866, "READ OPERATOR MANUAL", 22, False)
+    text(910, "FL-07   /   SAFETY", 18, False)
+
+    rng = np.random.default_rng(7404)
+    noise = rng.normal(size=(h, w)).astype(np.float32)
+    coarse = ndimage.gaussian_filter(noise, 13)
+    coarse /= max(coarse.std(), 1e-6)
+    yy, xx = np.indices((h, w))
+    edge = np.minimum.reduce((xx, w - 1 - xx, yy, h - 1 - yy))
+    grime = np.clip((coarse + .7) * .012 + np.exp(-edge / 19) * .15, 0, .23)
+    rgb = np.asarray(canvas, float) * (1 - grime[..., None]) + np.array((91, 77, 55)) * grime[..., None]
+    rgb += noise[..., None] * 1.1
+    # Fine scratches fade the ink instead of punching conspicuous holes in the label.
+    scuffs = Image.new("L", (w, h))
+    marks = ImageDraw.Draw(scuffs)
+    for _ in range(145):
+        x, y = rng.integers(0, w), rng.integers(0, h)
+        marks.line((int(x), int(y), int(x + rng.integers(-3, 4)), int(y + rng.integers(2, 13))),
+                   fill=int(rng.integers(30, 105)), width=1)
+    wear = np.asarray(scuffs, float)[..., None] / 255
+    rgb = rgb * (1 - wear) + np.array(paper) * wear
+    rough = np.clip(.77 + grime * .55 + noise * .012, .70, .94) * 255
+    for channel, data in (("color", rgb), ("rough", rough)):
+        stream = io.BytesIO()
+        # The model UVs restore the printed aspect; texture dimensions suit the compiler's mip chain.
+        texture = Image.fromarray(np.clip(np.rint(data), 0, 255).astype(np.uint8))
+        texture.resize((512, 1024), Image.Resampling.LANCZOS).save(stream, format="PNG", optimize=True)
+        path, payload = OUT / f"warning_{channel}.png", stream.getvalue()
+        if not path.exists() or path.read_bytes() != payload:
+            path.write_bytes(payload)
+
+
 def write_materials():
     OUT.mkdir(parents=True, exist_ok=True)
-    _surface("steel", (47, 49, 50), 7402)
-    _surface("silver", (153, 150, 138), 7403, silver=True)
+    _generated_steel()
+    _generated_silver()
+    _warning_label()
     for paint in PAINTS:
         tint = (1, 1, 1)
         metal, rough, colour = 0, .6, None
         texture = None
+        roughness = "materials/default/default_rough.tga"
         if paint == PAINT:
             texture = "materials/lowtide/lt_skip"
             tint = (1.04, 1.20, 1.02)
         elif paint in (STEEL, HUB):
-            texture = f"{RESOURCE}/steel"
+            texture = f"{RESOURCE}/steel_imagegen"
             tint = (1.03, .88, .73) if paint == HUB else (1, 1, 1)
         elif paint == SILVER:
-            texture = f"{RESOURCE}/silver"
+            texture = f"{RESOURCE}/canister_imagegen"
+        elif paint == WARNING:
+            colour = f"{RESOURCE}/warning_color.png"
+            roughness = f"{RESOURCE}/warning_rough.png"
+            rough = 1
         elif paint in (RUBBER, VINYL):
             colour = "materials/railhead/rw_rubber_color.png"
             tint = (.90, .90, .90) if paint == RUBBER else (1.1, 1.14, 1.18)
@@ -128,9 +243,9 @@ def write_materials():
         else:
             lines += [f'    g_flMetalness "{metal}"', f'    g_flRoughnessScaleFactor "{rough}"',
                       f'    TextureColor "{colour or "materials/default/default_color.tga"}"',
-                      '    TextureNormal "materials/railhead/rubber_normal.png"' if colour else
+                      '    TextureNormal "materials/railhead/rubber_normal.png"' if paint in (RUBBER, VINYL) else
                       '    TextureNormal "materials/default/default_normal.tga"',
-                      '    TextureRoughness "materials/default/default_rough.tga"']
+                      f'    TextureRoughness "{roughness}"']
         K.write_text(OUT / f"{paint}.vmat", "\n".join(lines + ["}", ""]))
 
 
@@ -534,6 +649,20 @@ class Forklift:
             for z in (-1, 0, 1):
                 self.box((x, y - 1 + z, 29.85), (w - .4, .22, .12), BLACK, .02)
 
+    def guard_label(self, front, sign):
+        # A thin sheet on the post's flat side, with its long edge following the rake.
+        a, b = np.asarray(front[:2], float)
+        up, normal = unit(b - a), np.array((sign, 0, 0))
+        right = np.cross(up, normal)
+        centre = a + (b - a) * ((58.5 - a[2]) / (b[2] - a[2]))
+        centre += normal * (2.65 / 2 + .02)
+        w, h, corner = .95, 2.375, .045
+        outline = ((-w, -h + corner), (-w + corner, -h), (w - corner, -h), (w, -h + corner),
+                   (w, h - corner), (w - corner, h), (-w + corner, h), (-w, h - corner))
+        # Frame's across/forward axes are reflected; reverse U so the print reads correctly.
+        self.poly(WARNING, [centre + right * u + up * v for u, v in outline], normal,
+                  uv=[((w - u) / (2 * w), (v + h) / (2 * h)) for u, v in outline])
+
     def guard(self):
         for s in (-1, 1):
             x = s * 20.8
@@ -553,7 +682,7 @@ class Forklift:
             self.box((x + s * 4.1, 7.02, 69.2), (3.1, .15, 5.3), GLASS, .35)
             self.box((x, 8.8, 75.4), (5.0, 3.3, 5.4), BLACK, .55)
             self.box((x, 10.55, 75.4), (4.1, .25, 4.25), WHITE, .45)
-            self.box((x + s * 1.55, 13.2, 58.5), (.24, 2.3, 5.7), AMBER, .08)
+            self.guard_label(front, s)
         for y in (-32.5, 11.5):
             self.box((0, y, 82.7), (43.4, 2.5, 2.5), STEEL, .28)
         for x in (-14, -7, 0, 7, 14):

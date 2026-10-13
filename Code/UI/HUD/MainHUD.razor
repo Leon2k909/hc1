@@ -16,6 +16,8 @@
     var isValidPlayer = hasPawn && !winBanner && !piloting;
     var hideCombatMouse = isValidPlayer && GameUtils.ShouldHideCombatMouse();
     var rootClass = IsHudEnabled ? (hideCombatMouse ? "combat-cursor-hidden" : "") : "hidden";
+    var isZombies = Scene.GetAllComponents<ZombiesGameMode>().Any();
+    var isBattleRoyale = GameUtils.IsBattleRoyale;
 }
 
 <root class="@rootClass">
@@ -34,19 +36,6 @@
 
     <canvas>
         <Toast />
-
-        @{
-            var isZombies = Scene.GetAllComponents<ZombiesGameMode>().Any();
-            var isBattleRoyale = GameUtils.IsBattleRoyale;
-        }
-
-        @* The round's strip (scores, clock, mode), top centre. *@
-        @if ( !isBattleRoyale && !isZombies && !winBanner && !piloting )
-        {
-            <div class="hud top-middle round-top">
-                <RoundStateDisplay />
-            </div>
-        }
 
         <div class="hud with-deadzone bottom-left gap-sm flex column">
             @if ( isValidPlayer )
@@ -77,6 +66,7 @@
         @if ( isValidPlayer )
         {   
             <EquipmentOverlay />
+            <PipeClimbHints />
             <DefuseObjectiveHud />
             <Spectating />
             <Deathcam />
@@ -151,6 +141,15 @@
     <ClassSelect />
     <ZombiesWorkbenchPanel />
     <Scoreboard />
+    @* Keep the round strip above the scoreboard's backdrop blur, with the same canvas bounds and intro fade. *@
+    @if ( !isBattleRoyale && !isZombies && !winBanner && !piloting )
+    {
+        <canvas class="round-layer">
+            <div class="hud top-middle round-top">
+                <RoundStateDisplay />
+            </div>
+        </canvas>
+    }
     <EndOfMatchScreen />
 </root>
 

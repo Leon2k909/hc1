@@ -1,0 +1,63 @@
+Frame property Texture: Sandbox.Texture
+Frame property BroadcastMessages: System.Collections.Generic.List`1[Sandbox.Sprite+BroadcastEvent]
+textures/particles/glow_simple_01.vtex: error=False, loaded=True, size=256x256, sprite={
+  "Animations": [
+    {
+      "Name": "Default",
+      "FrameRate": 15,
+      "Origin": "0.5,0.5",
+      "LoopMode": "Loop",
+      "LoopStart": -1,
+      "LoopEnd": -1,
+      "Frames": [
+        {
+          "Texture": "textures/particles/glow_simple_01.vtex",
+          "BroadcastMessages": []
+        }
+      ]
+    }
+  ],
+  "__references": [],
+  "__version": 2
+}
+textures/particles/smoke/smoke_static_a.vtex: error=False, loaded=True, size=512x512, sprite={
+  "Animations": [
+    {
+      "Name": "Default",
+      "FrameRate": 15,
+      "Origin": "0.5,0.5",
+      "LoopMode": "Loop",
+      "LoopStart": -1,
+      "LoopEnd": -1,
+      "Frames": [
+        {
+          "Texture": "textures/particles/smoke/smoke_static_a.vtex",
+          "BroadcastMessages": []
+        }
+      ]
+    }
+  ],
+  "__references": [],
+  "__version": 2
+}
+textures/particles/smoke/smoke_static_b.vtex: error=False, loaded=True, size=1024x2048, sprite={
+  "Animations": [
+    {
+      "Name": "Default",
+      "FrameRate": 15,
+      "Origin": "0.5,0.5",
+      "LoopMode": "Loop",
+      "LoopStart": -1,
+      "LoopEnd": -1,
+      "Frames": [
+        {
+          "Texture": "textures/particles/smoke/smoke_static_b.vtex",
+          "BroadcastMessages": []
+        }
+      ]
+    }
+  ],
+  "__references": [],
+  "__version": 2
+}
+textures/particles/smoke/smokeloop_i_0.vtex: null

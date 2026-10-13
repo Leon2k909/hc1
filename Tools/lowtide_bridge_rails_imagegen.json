@@ -1,0 +1,27 @@
+{
+  "tool": "built-in image_gen",
+  "prompt": "Use case: photorealistic-natural. Asset type: seamless PBR base-color texture for the painted steel bridge railings of an old industrial harbour, to match weathered grey-brown timber decking. Produce a square 2048 x 2048 orthographic surface scan, completely filled edge to edge with dark charcoal slate-grey painted steel, with a restrained blue-green undertone. Real photographic material detail: weathered matte industrial enamel, very fine paint microtexture, hairline scratches, small irregular chips exposing dull silver-grey steel, restrained pinprick brown corrosion and a few diffuse rust blooms. Keep at least eighty-five percent intact dark-grey paint; only sparse subtle corrosion and exposed metal. Irregular natural distribution, no dominant rust patches. Detail scale represents a 24-inch square steel surface, with millimetre-sized chips and fine scratches, rather than large flaking scales. Neutral uniform diffuse albedo lighting, no baked directional light or specular shine. Seamless tileable on all four edges, soft broad low-frequency variation, no distinct central motif or obvious repeat. Flat texture only: no rails, objects, planks, panel borders, bevels, seams, rivets, bolts, joints, text, logos, watermark, perspective or scene. No glossy plastic, brushed decorative stainless steel, full orange rust, dramatic holes, stylised painted patterns or gritty concrete.",
+  "generated_source": "C:/Users/leon2/.codex/generated_images/01a118c3-728b-7dd0-91f4-5910a22332a0/exec-3ac8a1af-36c6-4013-bfd3-156fcba42f89.png",
+  "source": "Tools/lowtide_bridge_steel_source.png",
+  "material": "Assets/materials/lowtide/lt_bridge_steel.vmat",
+  "shader": "Assets/shaders/hc1_bridge_steel.shader",
+  "maps": [
+    "Assets/materials/lowtide/lt_bridge_steel_color.png",
+    "Assets/materials/lowtide/lt_bridge_steel_normal.png",
+    "Assets/materials/lowtide/lt_bridge_steel_rough.png",
+    "Assets/materials/lowtide/lt_bridge_steel_metal.png",
+    "Assets/materials/lowtide/lt_bridge_steel_ao.png"
+  ],
+  "packing": "The generated source and original albedo pixels are preserved unchanged in a 2K POT atlas.",
+  "scope": "617 existing bridge steel faces; normalized face UVs, 24-inch surface detail and 0.11-inch edge-wear width. Existing steel elsewhere, geometry and collision volumes retained.",
+  "validation": {
+    "native_shader_forward_and_depth": "passed",
+    "native_material_compile": "passed",
+    "native_fleet_model_compile": "passed",
+    "live_game_visuals": "not checked; no editor or MCP used",
+    "map_rebuild": "dedicated bridge steel material retained",
+    "surface_maps": "2K POT, exact source pixels, aligned unit normals and roughness/metalness/AO",
+    "preview": "output/lowtide-bridge/bridge-railings-preview.png",
+    "visual_review": "close-up of actual bridge geometry with equivalent surface and edge-wear settings rendered in headless Blender and inspected"
+  }
+}

@@ -1,14 +1,16 @@
-// Tools/lowtide_map.py
+// Tools/lowtide_crane.py: weathered enamel on smooth fabricated steel.
 "Layer0"
 {
     shader "shaders/complex.shader"
     F_SPECULAR "1"
+    F_METALNESS_TEXTURE "1"
     g_flRoughnessScaleFactor "1"
-    g_flMetalness "0.20"
-    TextureColor "materials/default/default_color.tga"
-    TextureNormal "materials/default/default_normal.tga"
-    TextureRoughness "[0.450000 0.450000 0.450000 0.000000]"
+    g_flMetalness "0"
+    TextureColor "materials/lowtide/lt_crane_red_color.png"
+    TextureNormal "materials/lowtide/lt_crane_red_normal.png"
+    TextureRoughness "materials/lowtide/lt_crane_red_rough.png"
+    TextureMetalness "materials/lowtide/lt_crane_red_metal.png"
     TextureAmbientOcclusion "materials/default/default_ao.tga"
-    g_vColorTint "[0.588235 0.203922 0.149020 1.000000]"
-    g_flModelTintAmount "1.0"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1"
 }

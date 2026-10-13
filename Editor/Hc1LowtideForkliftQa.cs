@@ -93,7 +93,11 @@ public static class Hc1LowtideForkliftQa
 			File.WriteAllBytes( Path.Combine( Folder, name + ".png" ), bitmap.ToPng() );
 			var report = new StringBuilder( $"view={name}; eye={ee},{en},{ez}; target={te},{tn},{tz}; fov={fov}; exposure={exposure}; map={map}; raised={raised}\n" );
 			foreach ( var renderer in scene.GetAllComponents<ModelRenderer>().Where( r => r.Model?.ResourcePath is { } path && (path.Contains( "forklift" ) || path.Contains( "lowtide_dress" )) ) )
-				report.AppendLine( $"{renderer.Model.ResourcePath}: error={renderer.Model.IsError}; bounds={renderer.Model.Bounds}" );
+			{
+				var missing = renderer.Model.Materials.Where( m => m is null || m.IsError ).ToArray();
+				report.AppendLine( $"{renderer.Model.ResourcePath}: error={renderer.Model.IsError}; materialErrors={missing.Length}; bounds={renderer.Model.Bounds}" );
+				foreach ( var material in missing ) report.AppendLine( $"Missing mesh material: {material?.ResourcePath ?? "null"}" );
+			}
 			foreach ( var paint in new[] { "yellow", "steel", "silver", "rubber", "vinyl", "chrome" } )
 			{
 				var material = Material.Load( $"materials/lowtide/forklift/lt_fl_{paint}.vmat" );

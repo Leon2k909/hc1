@@ -1,0 +1,48 @@
+PASS: fine tracking stays in the pupil
+PASS: fast horizontal turns produce a strong directional offset
+PASS: fast vertical turns produce a strong directional offset
+PASS: opposite turns have symmetric shadows
+PASS: same 90-degree turn at 30 fps: 0.602,0
+PASS: same 90-degree turn at 60 fps: 0.602,0
+PASS: same 90-degree turn at 144 fps: 0.602,0
+PASS: same 90-degree turn at 240 fps: 0.602,0
+PASS: shadow clears within half a second after stopping
+PASS: a frame hitch cannot leave a false shadow
+PASS: a hitch also resets the rotation sample
+PASS: crossing yaw 180 is a two-degree turn
+PASS: looking almost vertically does not amplify a yaw wrap
+PASS: production turn sample excludes the viewmodel's aim-in camera animation
+PASS: unfinished ADS bone pose 0 cannot set a bottom shadow
+PASS: unfinished ADS bone pose 1 cannot set a bottom shadow
+PASS: unfinished ADS bone pose 2 cannot set a bottom shadow
+PASS: unfinished ADS bone pose 3 cannot set a bottom shadow
+PASS: unfinished ADS bone pose 4 cannot set a bottom shadow
+PASS: unfinished ADS bone pose 5 cannot set a bottom shadow
+PASS: unfinished ADS bone pose 6 cannot set a bottom shadow
+PASS: unfinished ADS bone pose 7 cannot set a bottom shadow
+PASS: unfinished ADS bone pose 8 cannot set a bottom shadow
+PASS: unfinished ADS bone pose 9 cannot set a bottom shadow
+PASS: unfinished ADS bone pose 10 cannot set a bottom shadow
+PASS: unfinished ADS bone pose 11 cannot set a bottom shadow
+PASS: unfinished ADS bone pose 12 cannot set a bottom shadow
+PASS: unfinished ADS bone pose 13 cannot set a bottom shadow
+PASS: unfinished ADS bone pose 14 cannot set a bottom shadow
+PASS: stationary final ADS pose calibrates
+PASS: settled eye is clear despite the model's static eyepiece offset
+PASS: recoil still leaves the calibrated pupil
+PASS: returning from recoil restores neutral alignment
+PASS: re-aim keeps the sight line and suppresses transient pose shading
+PASS: aiming while turning cannot calibrate a moving eye
+PASS: repeated ADS settles clear without a retained bottom crescent
+PASS: neutral alignment is unchanged at view angles Pitch = 60.00, Yaw = 135.00, Roll = 0.00
+PASS: neutral alignment is unchanged at view angles Pitch = -60.00, Yaw = -135.00, Roll = 0.00
+PASS: changing the fitted optic clears its calibration
+settled: ScopeEyeBox { Offset = 0,0, Radius = 1, Blackout = 0 }
+slow tracking: ScopeEyeBox { Offset = 0,0, Radius = 1, Blackout = 0 }
+fast right: ScopeEyeBox { Offset = 1.021,0, Radius = 0.8115506, Blackout = 0 }
+fast left: ScopeEyeBox { Offset = -1.021,0, Radius = 0.8115506, Blackout = 0 }
+fast down: ScopeEyeBox { Offset = 0,1.021, Radius = 0.8115506, Blackout = 0 }
+fast up: ScopeEyeBox { Offset = 0,-1.021, Radius = 0.8115506, Blackout = 0 }
+PASS: settled centre and lower lens stay clear
+PASS: fast right turn paints an opaque left crescent
+PASS: fast left turn paints an opaque right crescent

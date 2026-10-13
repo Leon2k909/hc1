@@ -36,7 +36,7 @@ public partial class ViewModel
 			|| Input.Suppressed || Input.EscapePressed || !GameUtils.ShouldHideCombatMouse( Owner )
 			|| Equipment.HasTag( "aiming" ) || Equipment.HasTag( "scoped" )
 			|| Equipment.HasTag( "reloading" ) || Equipment.HasTag( "lowered" ) || Equipment.HasTag( "no_shooting" )
-			|| Owner.IsSprinting || Owner.IsMantling || Input.Down( "attack1" ) || Input.Down( "attack2" )
+			|| Owner.IsSprinting || Owner.IsMantling || Owner.IsPipeClimbing || Input.Down( "attack1" ) || Input.Down( "attack2" )
 			|| Input.Down( "reload" ) || Input.Down( "use" )
 			|| (Input.Down( "Run" ) && Owner.WishMove.Length > 0f);
 

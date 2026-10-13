@@ -10,6 +10,7 @@ namespace Facepunch.Gunsmith;
 public static class GunsmithLoadoutManager
 {
 	private const string WeaponBuildCodePrefix = "HC1W1-";
+	public const int MaxSharedBuildCodeLength = 16384;
 
 	public static int GetActiveClassIndex() => Game.Cookies.Get<int>( "hc1.loadout.active_class", 0 );
 	public static void SetActiveClassIndex( int index ) => Game.Cookies.Set( "hc1.loadout.active_class", index );
@@ -624,6 +625,26 @@ public static class GunsmithLoadoutManager
 		return true;
 	}
 
+	/// <summary> Resolves an incoming scoreboard build without applying it or consulting local loadout cookies. </summary>
+	public static bool TryGetSharedBuildWeapon( string code, out EquipmentResource resource )
+	{
+		resource = null;
+		if ( string.IsNullOrWhiteSpace( code ) || code.Length > MaxSharedBuildCodeLength
+			|| !TryDecodeWeaponBuildCode( code, out var payload, out _ ) || payload.Version != 1
+			|| string.IsNullOrWhiteSpace( payload.Weapon ) || payload.Weapon.Length > 256
+			|| !float.IsFinite( payload.CustomCamoOpacity ) || !float.IsFinite( payload.CustomAnimatedSpeedX )
+			|| !float.IsFinite( payload.CustomAnimatedSpeedY ) || !float.IsFinite( payload.ReticleScale )
+			|| !float.IsFinite( payload.ReticleRotation ) || !float.IsFinite( payload.ReticleOffsetX ) || !float.IsFinite( payload.ReticleOffsetY )
+			|| payload.Attachments?.Any( x => !Enum.TryParse<GunsmithPartType>( x.Key, out var category )
+				|| !Enum.IsDefined( category ) || string.IsNullOrWhiteSpace( x.Value ) || x.Value.Length > 256 ) == true )
+			return false;
+
+		resource = ResourceLibrary.GetAll<EquipmentResource>().FirstOrDefault( x =>
+			x.IsValid() && x.ResourcePath.Equals( payload.Weapon, StringComparison.OrdinalIgnoreCase )
+			&& x.Slot is EquipmentSlot.Primary or EquipmentSlot.Secondary && !IsMergedWeaponResource( x ) );
+		return resource.IsValid();
+	}
+
 	private static bool TryDecodeWeaponBuildCode( string code, out SharedWeaponBuild payload, out GunsmithMessage error )
 	{
 		payload = null;
@@ -947,42 +968,51 @@ public static class GunsmithLoadoutManager
 			var matsNullable = renderer.Model?.Materials;
 			if ( !matsNullable.HasValue )
 			{
-				renderer.Tint = hasCamo ? camoTint : Color.White;
+				renderer.Tint = hasCamo && !isOptic ? camoTint : Color.White;
 				continue;
 			}
 			var mats = matsNullable.Value;
 
-			if ( camoMat is not null )
+			// Every camo type goes through the same protection pass, including custom colour and no-camo resets.
+			for ( int i = 0; i < mats.Length; i++ )
 			{
-				// Material camo: preserve lenses and reticles while painting the housing.
-				for ( int i = 0; i < mats.Length; i++ )
+				var original = mats[i];
+				if ( original is null )
 				{
-					var matName = GetMaterialFileName( mats[i] );
-					
-					// Reticle Customization (and skipping glass/lens)
-					if ( matName.Contains( "lens" ) || matName.Contains( "glass" ) || IsReticleMaterial( matName ) )
-					{
-						if ( IsReticleMaterial( matName ) )
-						{
-							var reticleCopy = mats[i].CreateCopy();
-							reticleCopy.Set( "g_vSightLightColor", customReticleColor );
-							ApplyReticleShape( reticleCopy, matName, reticleShape, customReticleScale, customReticleRotation, customReticleOffset );
-							renderer.Materials.SetOverride( i, reticleCopy );
-						}
-						else
-						{
-							renderer.Materials.SetOverride( i, mats[i] );
-						}
-						continue;
-					}
+					renderer.Materials.SetOverride( i, null );
+					continue;
+				}
 
-					// Conditionally skip sight/optic body
-					if ( !camoOnOptics && (isOptic || IsOpticMaterial( mats[i] )) )
+				var opticMaterial = isOptic || IsOpticMaterial( original );
+				var surface = CamoMaterialRules.Classify( original.Name, original.ShaderName, opticMaterial, false );
+				if ( surface == CamoMaterialRules.Surface.Paintable && opticMaterial
+					&& (original.GetFeature( "F_TRANSLUCENT" ) == 1 || original.GetFeature( "F_ALPHA_TEST" ) == 1) )
+					surface = CamoMaterialRules.Surface.Lens;
+				if ( surface != CamoMaterialRules.Surface.Paintable )
+				{
+					if ( surface == CamoMaterialRules.Surface.Reticle )
 					{
-						renderer.Materials.SetOverride( i, mats[i] );
-						continue;
+						var reticleCopy = original.CreateCopy();
+						reticleCopy.Set( "g_vSightLightColor", customReticleColor );
+						ApplyReticleShape( reticleCopy, GetMaterialFileName( original ), reticleShape, customReticleScale, customReticleRotation, customReticleOffset );
+						renderer.Materials.SetOverride( i, reticleCopy );
 					}
+					else
+					{
+						renderer.Materials.SetOverride( i, original );
+					}
+					continue;
+				}
 
+				// Camo on Optics paints the housing, never the sight's optical surfaces or light-blocking masks.
+				if ( !camoOnOptics && opticMaterial )
+				{
+					renderer.Materials.SetOverride( i, original );
+					continue;
+				}
+
+				if ( camoMat is not null )
+				{
 					// The animated shader replaces the material outright, which would drop this material's
 					// normal / roughness / AO maps and leave the gun completely unshaded — bright camos
 					// then blow out and dark ones read flat. Carry the source maps across so it still
@@ -991,7 +1021,7 @@ public static class GunsmithLoadoutManager
 
 					foreach ( var mapName in SurfaceMapNames )
 					{
-						var srcMap = mats[i].GetTexture( mapName );
+						var srcMap = original.GetTexture( mapName );
 						if ( srcMap is not null )
 							animCopy.Set( mapName, srcMap );
 					}
@@ -1003,42 +1033,10 @@ public static class GunsmithLoadoutManager
 
 					renderer.Materials.SetOverride( i, animCopy );
 				}
-
-				renderer.Tint = Color.White;
-			}
-			else if ( camoTex is not null )
-			{
-				// Texture camo: copy each material, swap ONLY its colour for the camo pattern,
-				// keep everything else (normal, roughness, AO) so lighting stays correct.
-				for ( int i = 0; i < mats.Length; i++ )
+				else if ( camoTex is not null )
 				{
-					var matName = GetMaterialFileName( mats[i] );
-					
-					// Reticle Customization (and skipping glass/lens)
-					if ( matName.Contains( "lens" ) || matName.Contains( "glass" ) || IsReticleMaterial( matName ) )
-					{
-						if ( IsReticleMaterial( matName ) )
-						{
-							var reticleCopy = mats[i].CreateCopy();
-							reticleCopy.Set( "g_vSightLightColor", customReticleColor );
-							ApplyReticleShape( reticleCopy, matName, reticleShape, customReticleScale, customReticleRotation, customReticleOffset );
-							renderer.Materials.SetOverride( i, reticleCopy );
-						}
-						else
-						{
-							renderer.Materials.SetOverride( i, mats[i] );
-						}
-						continue;
-					}
-
-					// Conditionally skip sight/optic body
-					if ( !camoOnOptics && (isOptic || IsOpticMaterial( mats[i] )) )
-					{
-						renderer.Materials.SetOverride( i, mats[i] );
-						continue;
-					}
-
-					var copy = mats[i].CreateCopy();
+					// Swap only the colour map, keeping the source material's normals, roughness and AO.
+					var copy = original.CreateCopy();
 					// TextureColor is the albedo slot these shaders actually expose (see any .vmat).
 					// "Color" / "g_tColor" are no-ops and leave the copy on its default white albedo.
 					copy.Set( "g_flUseFactoryFinish", 0f );
@@ -1058,79 +1056,43 @@ public static class GunsmithLoadoutManager
 					}
 					renderer.Materials.SetOverride( i, copy );
 				}
-
-				renderer.Tint = Color.White;
-			}
-			else
-			{
-				for ( int i = 0; i < mats.Length; i++ )
+				else if ( hasCustomCamo )
 				{
-					var matName = GetMaterialFileName( mats[i] );
-
-					// Reticle Customization (and skipping glass/lens)
-					if ( matName.Contains( "lens" ) || matName.Contains( "glass" ) || IsReticleMaterial( matName ) )
-					{
-						if ( IsReticleMaterial( matName ) )
-						{
-							var reticleCopy = mats[i].CreateCopy();
-							reticleCopy.Set( "g_vSightLightColor", customReticleColor );
-							ApplyReticleShape( reticleCopy, matName, reticleShape, customReticleScale, customReticleRotation, customReticleOffset );
-							renderer.Materials.SetOverride( i, reticleCopy );
-						}
-						else
-						{
-							renderer.Materials.SetOverride( i, mats[i] );
-						}
-						continue;
-					}
-
-					// Conditionally skip sight/optic body
-					if ( !camoOnOptics && (isOptic || IsOpticMaterial( mats[i] )) )
-					{
-						renderer.Materials.SetOverride( i, mats[i] );
-						continue;
-					}
-
-					if ( hasCustomCamo )
-					{
-						// A custom colour is paint too, as a solid colour is: it replaces the gun's colour, over its
-						// normal and AO, in the finish picked. Below full opacity the gun's own colour shows through.
-						// As a tint it multiplied the gun's dark colour, as the solid colours did.
-						var copy = mats[i].CreateCopy();
-						var paint = CustomPaintTexture( mats[i], customCamoColor );
-						copy.Set( "g_flUseFactoryFinish", 0f );
-						copy.Set( "TextureColor", paint );
-						copy.Set( "Color", paint );
-						copy.Set( "g_tColor", paint );
-						ApplyCustomFinish( copy, GetCustomCamoFinish( resource ) );
-						renderer.Materials.SetOverride( i, copy );
-					}
-					else if ( hasCamo )
-					{
-						var copy = mats[i].CreateCopy();
-						copy.Set( "g_vColorTint", camoTint );
-						copy.Set( "Color", camoTint );
-						if ( !useCustomCamo && camoPart.IsValid() && camoPart.Category == GunsmithPartType.Camoflague )
-							ApplyPaintFinish( copy );
-
-						if ( camoPart.IsValid() && camoPart.Category == GunsmithPartType.GlowingCamo )
-						{
-							copy.Set( "g_bUseSelfIllum", true );
-							copy.Set( "g_flSelfIllumScale", 5.0f );
-							copy.Set( "SelfIllumMask", Texture.White );
-							copy.Set( "g_vSelfIllumTint", camoTint );
-						}
-
-						renderer.Materials.SetOverride( i, copy );
-					}
-					else
-					{
-						renderer.Materials.SetOverride( i, mats[i] );
-					}
+					// Below full opacity the gun's own colour shows through the paint.
+					var copy = original.CreateCopy();
+					var paint = CustomPaintTexture( original, customCamoColor );
+					copy.Set( "g_flUseFactoryFinish", 0f );
+					copy.Set( "TextureColor", paint );
+					copy.Set( "Color", paint );
+					copy.Set( "g_tColor", paint );
+					ApplyCustomFinish( copy, GetCustomCamoFinish( resource ) );
+					renderer.Materials.SetOverride( i, copy );
 				}
+				else if ( hasCamo )
+				{
+					var copy = original.CreateCopy();
+					copy.Set( "g_vColorTint", camoTint );
+					copy.Set( "Color", camoTint );
+					if ( !useCustomCamo && camoPart.IsValid() && camoPart.Category == GunsmithPartType.Camoflague )
+						ApplyPaintFinish( copy );
 
-				renderer.Tint = Color.White;
+					if ( camoPart.IsValid() && camoPart.Category == GunsmithPartType.GlowingCamo )
+					{
+						copy.Set( "g_bUseSelfIllum", true );
+						copy.Set( "g_flSelfIllumScale", 5.0f );
+						copy.Set( "SelfIllumMask", Texture.White );
+						copy.Set( "g_vSelfIllumTint", camoTint );
+					}
+
+					renderer.Materials.SetOverride( i, copy );
+				}
+				else
+				{
+					renderer.Materials.SetOverride( i, original );
+				}
 			}
+
+			renderer.Tint = Color.White;
 		}
 
 		// Hide replaced geometry after painting, so every camo branch preserves
@@ -1198,15 +1160,6 @@ public static class GunsmithLoadoutManager
 			reticle.Set( "g_tRedDot", shape );
 			reticle.Set( "g_flUseReticleTexture", 1f );
 		}
-	}
-
-	private static bool IsReticleMaterial( string fileName )
-	{
-		// "reddot_rmr" is the housing's folder, not a reticle. Match the material
-		// filename so v_rmr.vmat gets painted while v_rmr_red_dot.vmat stays clear.
-		return fileName.Contains( "reticle" ) || fileName.Contains( "hologram" )
-			|| fileName.Contains( "_dot." ) || fileName.Contains( "_reddot." )
-			|| fileName.StartsWith( "dot." ) || fileName.StartsWith( "red_dot." );
 	}
 
 	private static bool IsOpticMaterial( Material material )

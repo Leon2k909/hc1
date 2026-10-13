@@ -661,6 +661,189 @@
       ]
     },
     {
+      "__guid": "5d3e7305-1017-52ba-be16-1dcc658110cc",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Climbable Pipes",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [],
+      "Children": [
+        {
+          "__guid": "6a8a5729-f7ac-5d00-8edd-11b82b16213e",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Filter 1 climbable pipe -1",
+          "Position": "1518,502,90",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "climbable_pipe",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.ClimbablePipe",
+              "__guid": "742d6b26-a035-543e-98b0-f8cb3eb46be7",
+              "__enabled": true,
+              "Flags": 0,
+              "Height": 350.0,
+              "Radius": 15.0,
+              "ClimbSpeed": 90.0,
+              "CollarScale": 1.32
+            },
+            {
+              "__type": "Sandbox.CapsuleCollider",
+              "__guid": "87b75011-6d2b-5f8d-a192-1db3e0a11ccc",
+              "__enabled": true,
+              "Flags": 0,
+              "Start": "0,0,15",
+              "End": "0,0,335",
+              "Radius": 15.0,
+              "Static": true,
+              "IsTrigger": false,
+              "Surface": "surfaces/metal.surface"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "03fcfd9f-419a-5eeb-9a75-377f3d7d50a1",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Filter 1 climbable pipe 1",
+          "Position": "1518,258,90",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "climbable_pipe",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.ClimbablePipe",
+              "__guid": "78e872bc-a774-5c00-96b1-da2a1dab0e44",
+              "__enabled": true,
+              "Flags": 0,
+              "Height": 350.0,
+              "Radius": 15.0,
+              "ClimbSpeed": 90.0,
+              "CollarScale": 1.32
+            },
+            {
+              "__type": "Sandbox.CapsuleCollider",
+              "__guid": "cdd30659-eb75-5d21-aebe-ca21e3e1ad5d",
+              "__enabled": true,
+              "Flags": 0,
+              "Start": "0,0,15",
+              "End": "0,0,335",
+              "Radius": 15.0,
+              "Static": true,
+              "IsTrigger": false,
+              "Surface": "surfaces/metal.surface"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "7e51a8c5-d89d-5682-ba5c-41bd6717ced3",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Filter 2 climbable pipe -1",
+          "Position": "1518,-258,90",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "climbable_pipe",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.ClimbablePipe",
+              "__guid": "33bfd279-d589-568f-befd-3d5a870f5e5c",
+              "__enabled": true,
+              "Flags": 0,
+              "Height": 350.0,
+              "Radius": 15.0,
+              "ClimbSpeed": 90.0,
+              "CollarScale": 1.32
+            },
+            {
+              "__type": "Sandbox.CapsuleCollider",
+              "__guid": "9746b5d3-c693-5b9f-8d1b-66992afa3cbc",
+              "__enabled": true,
+              "Flags": 0,
+              "Start": "0,0,15",
+              "End": "0,0,335",
+              "Radius": 15.0,
+              "Static": true,
+              "IsTrigger": false,
+              "Surface": "surfaces/metal.surface"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "13e10689-a489-54ae-8ab6-2c999cccdffb",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Filter 2 climbable pipe 1",
+          "Position": "1518,-502,90",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "climbable_pipe",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Facepunch.ClimbablePipe",
+              "__guid": "6f44f926-9a6b-52dd-9d77-ae18cce54a1c",
+              "__enabled": true,
+              "Flags": 0,
+              "Height": 350.0,
+              "Radius": 15.0,
+              "ClimbSpeed": 90.0,
+              "CollarScale": 1.32
+            },
+            {
+              "__type": "Sandbox.CapsuleCollider",
+              "__guid": "154ab4c2-5ba4-56cb-b12e-0b0d23670aa2",
+              "__enabled": true,
+              "Flags": 0,
+              "Start": "0,0,15",
+              "End": "0,0,335",
+              "Radius": 15.0,
+              "Static": true,
+              "IsTrigger": false,
+              "Surface": "surfaces/metal.surface"
+            }
+          ],
+          "Children": []
+        }
+      ]
+    },
+    {
       "__guid": "d4673d42-44e9-5ab9-9628-c68704610baa",
       "__version": 2,
       "Flags": 0,

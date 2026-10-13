@@ -1178,8 +1178,8 @@ class Prefabs:
     sticker: tuple[tuple[float, float, float], tuple[float, float, float], tuple[float, float]] | None = None
     # The viewmodel bone object the sticker rides (one of `bones`): a pistol's slide, so it moves with the slide.
     sticker_bone: str = "tag_sling"
-    # What hasn't been checked in-game yet, shown by the gun's name in the gunsmith to the developer only
-    # (EquipmentResource.ReviewNote). Empty once it's all been checked.
+    # What hasn't been checked in-game yet, retained as development metadata (EquipmentResource.ReviewNote).
+    # The gunsmith does not display it. Empty once it's all been checked.
     review_note: str = ""
     # Per optic, where the eye moves and how the gun turns ("x,y,z", "pitch,yaw,roll") to co-witness the optic's dot
     # with iron sights it leaves up (ManualOffset.OpticSightLines): (optic resource path, position, angles).

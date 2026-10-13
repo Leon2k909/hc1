@@ -20,6 +20,13 @@ MainHUD
         pointer-events: none;
     }
 
+    // Scoreboard is at 2000; its backdrop blur must stay behind the score and clock.
+    .round-layer
+    {
+        position: absolute;
+        z-index: 2010;
+    }
+
     // The round's strip, top centre (RoundStateDisplay).
     .round-top
     {

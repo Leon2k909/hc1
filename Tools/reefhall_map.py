@@ -2133,6 +2133,24 @@ def control_room( model, inside, lights, rng ):
 FILTER = ( -1150.0, 1150.0, 1100.0, 1850.0 )
 FILTER_TOP = 440.0
 FILTER_COLUMNS = ( ( -380.0, 1420.0 ), ( 380.0, 1420.0 ) )
+
+
+def climbable_pipe_objects():
+    """ Physical/use volumes for the four decorative risers beside the glass filters. """
+    objects = []
+    for column, ( e, n ) in enumerate( FILTER_COLUMNS ):
+        for side in ( -1, 1 ):
+            key = f"pipe/filter/{column}/{side}"
+            height, radius = FILTER_TOP - 90.0, 15.0
+            objects.append( K.game_object( ids, f"Filter {column + 1} climbable pipe {side}", key,
+                K.to_world( ( e + side * 122.0, n + 98.0, 90.0 ) ), tags="climbable_pipe", components=[
+                    K.component( ids, "Facepunch.ClimbablePipe", f"{key}/climb", Height=height, Radius=radius,
+                                 ClimbSpeed=90.0, CollarScale=1.32 ),
+                    K.component( ids, "Sandbox.CapsuleCollider", f"{key}/collider", Start=K.vec( ( 0, 0, radius ) ),
+                                 End=K.vec( ( 0, 0, height - radius ) ), Radius=radius, Static=True, IsTrigger=False,
+                                 Surface="surfaces/metal.surface" ),
+                ] ) )
+    return K.game_object( ids, "Climbable Pipes", "climbable-pipes", children=objects )
 CATWALK = ( -1150.0, 1150.0, 1670.0, 1850.0 )
 EAST_WALK = ( 970.0, 1150.0, 1300.0, 1670.0 )
 MEZZANINE = ( 586.0, 1150.0, 1100.0, 1300.0 )
@@ -3273,6 +3291,7 @@ def write_scene( rooms, lights ):
                          EndDistance=9000, FalloffExponent=1.4, Height=1200, VerticalFalloffExponent=1.0 ),
         ] ),
         building,
+        climbable_pipe_objects(),
         K.game_object( ids, "Fauna", "fauna", children=fauna_objects( rooms ) ),
         K.game_object( ids, "Lights", "lights", children=light_objects ),
         K.game_object( ids, "Reflection Probes", "probes", children=[ probe_object( *p ) for p in PROBES ] ),

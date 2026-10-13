@@ -1,14 +1,14 @@
-// Tools/lowtide_map.py, from materials/buildings/canvas_plain.vmat
+// Tools/lowtide_sacks.py: built-in ImageGen photographic jute
 "Layer0"
 {
     shader "shaders/complex.shader"
     F_SPECULAR "1"
     g_flRoughnessScaleFactor "1"
-    g_flMetalness "0.00"
-    TextureColor "materials/buildings/canvas_plain_color.png"
-    TextureNormal "materials/buildings/canvas_normal.png"
-    TextureRoughness "materials/buildings/canvas_rough.png"
+    g_flMetalness "0.0"
+    TextureColor "materials/lowtide/sacks/lt_jute_color.png"
+    TextureNormal "materials/lowtide/sacks/lt_jute_normal.png"
+    TextureRoughness "materials/lowtide/sacks/lt_jute_roughness.png"
     TextureAmbientOcclusion "materials/default/default_ao.tga"
-    g_vColorTint "[0.840 0.700 0.500 1.0]"
+    g_vColorTint "[1.0 1.0 1.0 1.0]"
     g_flModelTintAmount "1.0"
 }

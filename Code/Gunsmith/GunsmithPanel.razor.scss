@@ -564,19 +564,6 @@ GunsmithPanel
         border-radius: 2px;
     }
 
-    // A gun that still needs checking in-game (EquipmentResource.ReviewNote), shown to the developer only.
-    .review-tag
-    {
-        flex-shrink: 0;
-        padding: 0 5px;
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: 1.5px;
-        color: $caution;
-        border: 1px solid rgba( 255, 200, 61, 0.7 );
-        border-radius: 2px;
-    }
-
     // Beside the cards' growing XP bar a label shrank to one letter's width, so "LV" wrapped to "L" over "V". Both keep
     // their width, and translations as long as "Stufe" or "Poz." stay on one line.
     .gs-lv-key
@@ -1343,12 +1330,6 @@ GunsmithPanel
             padding: 3px 10px;
             font-size: 14px;
         }
-
-        .review-tag
-        {
-            padding: 2px 9px;
-            font-size: 14px;
-        }
     }
 
     .gs-hero-name
@@ -1465,38 +1446,6 @@ GunsmithPanel
         letter-spacing: 2.5px;
         line-height: 20px;
         color: rgba( 255, 255, 255, 0.6 );
-    }
-
-    // What still needs checking in-game, under the description (the developer's only, like the review tag).
-    .gs-review-note
-    {
-        max-width: 560px;
-        margin-top: 12px;
-        flex-direction: row;
-        align-items: flex-start;
-        gap: 8px;
-        padding: 8px 12px;
-        border-left: 2px solid $caution;
-        background-color: rgba( 255, 200, 61, 0.08 );
-
-        i
-        {
-            flex-shrink: 0;
-            font-family: "Material Icons";
-            font-size: 16px;
-            color: $caution;
-        }
-
-        label
-        {
-            flex-shrink: 1;
-            min-width: 0;
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            line-height: 18px;
-            color: rgba( 255, 226, 150, 0.9 );
-        }
     }
 
     .gs-tags
@@ -2267,6 +2216,7 @@ GunsmithPanel
     {
         align-items: center;
         gap: 8px;
+        pointer-events: all;
 
         .gnav-round-btn
         {

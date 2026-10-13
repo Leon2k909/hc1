@@ -82,5 +82,78 @@ public static class Hc1LowtideSkipQa
 		finally { scene.Destroy(); rendering = false; }
 	}
 
+	[ConCmd( "hc1_lowtide_skip_collision_qa" )]
+	public static void Collision( string name = "collision" )
+	{
+		var folder = Path.Combine( Project.Current.GetRootPath(), "output/lowtide/skip-pass" );
+		Directory.CreateDirectory( folder );
+		var scene = new Scene();
+		var report = new System.Text.StringBuilder();
+		var checks = 0;
+		var failures = 0;
+		void Check( string label, bool passed, SceneTraceResult trace )
+		{
+			checks++;
+			if ( !passed ) failures++;
+			report.AppendLine( $"{(passed ? "PASS" : "FAIL")} {label}: hit={trace.Hit}, solid={trace.StartedSolid}, end={trace.EndPosition}, normal={trace.Normal}" );
+		}
+		try
+		{
+			using ( scene.Push() )
+			{
+				foreach ( var side in new[] { "east", "west" } )
+				{
+					var model = Model.Load( $"models/maps/lowtide/lowtide_dress_{side}.vmdl" );
+					if ( model.IsError ) throw new InvalidOperationException( $"{side} model failed to load" );
+					var holder = new GameObject( false, side );
+					var collider = holder.Components.Create<ModelCollider>();
+					collider.Model = model;
+					collider.Static = true;
+					holder.Enabled = true;
+				}
+				scene.EditorTick( .016f, .016f );
+				// Match the player's 32 x 32 x 64 movement box, with its origin at the feet.
+				var player = new BBox( new Vector3( -16, -16, 0 ), new Vector3( 16, 16, 64 ) );
+				foreach ( var side in new[] { -1, 1 } )
+				{
+					var origin = World( new( side * 860, -560, 0 ) );
+					Vector3 At( float length, float width, float z ) => origin + new Vector3( length, -width, z );
+					foreach ( var length in new[] { -24f, 0f, 24f } )
+					foreach ( var width in new[] { -10f, 0f, 10f } )
+					{
+						var ray = scene.Trace.Ray( At( length, width, 80 ), At( length, width, -8 ) ).Run();
+						Check( $"{side} floor {length},{width}", ray.Hit && MathF.Abs( ray.EndPosition.z - 4.4f ) < .2f, ray );
+						var drop = scene.Trace.Ray( At( length, width, 80 ), At( length, width, -8 ) ).Size( player ).Run();
+						Check( $"{side} player drop {length},{width}", drop.Hit && !drop.StartedSolid && MathF.Abs( drop.EndPosition.z - 4.4f ) < .2f && drop.Normal.z > .99f, drop );
+					}
+					foreach ( var rim in new[] { new Vector2( -72, 0 ), new Vector2( 72, 0 ), new Vector2( 0, -38 ), new Vector2( 0, 38 ) } )
+					{
+						var trace = scene.Trace.Ray( At( rim.x, rim.y, 80 ), At( rim.x, rim.y, 30 ) ).Run();
+						Check( $"{side} rim {rim}", trace.Hit && MathF.Abs( trace.EndPosition.z - 39.95f ) < .2f, trace );
+					}
+					foreach ( var z in new[] { 12f, 28f } )
+					foreach ( var sign in new[] { -1f, 1f } )
+					foreach ( var end in new[] { false, true } )
+					{
+						var target = end ? At( sign * 90, 0, z ) : At( 0, sign * 50, z );
+						var trace = scene.Trace.Ray( At( 0, 0, z ), target ).Run();
+						var expected = end ? 52 + (z - 4) * 20 / 34 - .37f : 34 + (z - 4) * 4 / 34 - .35f;
+						Check( $"{side} wall end={end} sign={sign} z={z}", trace.Hit && !trace.StartedSolid && MathF.Abs( trace.Distance - expected ) < .3f, trace );
+					}
+					var opening = scene.Trace.Ray( At( 0, 0, 6 ), At( 0, 0, 80 ) ).Size( player ).Run();
+					Check( $"{side} player can leave opening", !opening.Hit && !opening.StartedSolid, opening );
+				}
+			}
+			report.AppendLine( $"checks={checks}, failures={failures}" );
+			Log.Info( $"Lowtide skip collision QA: {checks} checks, {failures} failures" );
+		}
+		catch ( Exception e ) { report.AppendLine( $"ERROR: {e}" ); Log.Warning( e ); }
+		finally
+		{
+			scene.Destroy();
+			File.WriteAllText( Path.Combine( folder, name + ".txt" ), report.ToString() );
+		}
+	}
+
 	private static Vector3 World( Vector3 p ) => new( p.y, -p.x, p.z );
 }

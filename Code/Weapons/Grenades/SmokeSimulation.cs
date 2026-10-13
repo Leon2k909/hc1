@@ -20,6 +20,7 @@ public sealed class SmokeSimulation : ParticleController
 	private TimeUntil NextExposureCheck;
 	private float ExposureTarget = 1f;
 	private float Age;
+	private Vector3 AirOffset;
 
 	/// <summary>
 	/// What smoke goes through: people, triggers, the grenades, its own puffs, player clips (an open window's) and bots'
@@ -28,13 +29,17 @@ public sealed class SmokeSimulation : ParticleController
 	private static readonly string[] PassThrough = { "trigger", "player", "grenade", "particles", "playerclip", "movement" };
 
 	// Immutable snapshot: no scene/component access from OnParticleStep, which the engine runs in parallel.
-	private sealed record Flow( Vector3 Velocity, float Time, float Phase, float Turbulence, float Buoyancy, float Response );
-	private Flow Current = new( Vector3.Zero, 0, 0, 12, 18, 1.4f );
+	private sealed record Flow( Vector3 Velocity, Vector3 Offset, float Time, float Phase, float Turbulence,
+		float Buoyancy, float Response, float Seconds );
+	private Flow Current = new( Vector3.Zero, Vector3.Zero, 0, 0, 12, 18, 1.4f, 0 );
+
+	// The volume renderer (SmokeRendering, hc1_smoke.shader) drew nothing in the engine (2026-10-12: 200 puffs queued
+	// for the camera, nothing on screen), so the smoke is drawn by the prefab's sprite renderer until it's fixed.
+	// protected override void OnStart() => SmokeRendering.Ensure( Scene );
 
 	protected override void OnUpdate()
 	{
 		if ( !Wind.IsValid() ) Wind = Scene.GetAllComponents<WorldWind>().FirstOrDefault();
-		Age += Time.Delta;
 		var wind = Wind.IsValid() && Wind.Active ? Wind.Sample( WorldPosition ) : Vector3.Zero;
 		if ( NextExposureCheck )
 		{
@@ -54,44 +59,30 @@ public sealed class SmokeSimulation : ParticleController
 		}
 		Exposure += (ExposureTarget - Exposure) * (1 - MathF.Exp( -Time.Delta * 5f ));
 		AirVelocity = wind * Exposure;
-		Current = new Flow( AirVelocity, Age, (Seed & 0xffff) * 0.001f, Turbulence, Buoyancy, AirResponse );
 	}
 
-	protected override void OnParticleStep( Particle particle, float delta )
+	protected override void OnBeforeStep( float delta )
+	{
+		Age += delta;
+		// Integrate the air's displacement. Multiplying a changing gust by the effect's total age made the field jump.
+		AirOffset += AirVelocity * delta;
+		Current = new Flow( AirVelocity, AirOffset, Age, (Seed & 0xffff) * 0.001f,
+			Turbulence, Buoyancy, AirResponse, delta );
+	}
+
+	protected override void OnParticleStep( Particle particle, float lifeDelta )
 	{
 		var flow = Current;
-		// Eddies are a continuous spatial field: neighbouring puffs roll together instead of jittering independently.
-		var p = particle.Position - flow.Velocity * flow.Time;
-		var eddies = Eddy( p / 80f, flow.Time * 0.4f, flow.Phase )
-			+ Eddy( p / 29f, flow.Time * 0.7f, flow.Phase + 7.3f ) * 0.35f;
-		// Newly emitted warm smoke rises, then cools and is carried mostly by the surrounding air. Vertical
-		// eddies fade with that lift: full-strength eddies outlasted it and made cooled puffs bob up and down.
-		var lift = flow.Buoyancy * MathF.Exp( -particle.Age / 3.5f );
-		var drift = eddies * flow.Turbulence;
-		drift.z = eddies.z * MathF.Min( flow.Turbulence * 0.2f, lift * 0.2f );
-		var target = flow.Velocity + drift + Vector3.Up * lift;
-		particle.Velocity += (target - particle.Velocity) * (1 - MathF.Exp( -delta * flow.Response ));
+		// OnParticleStep receives normalized life progress, NOT elapsed seconds. Only OnBeforeStep supplies the timestep.
+		particle.Velocity = SmokeMath.Advect( particle.Velocity, particle.Position, flow.Offset, flow.Velocity,
+			flow.Time, particle.Age, flow.Phase, flow.Turbulence, flow.Buoyancy, flow.Response,
+			flow.Seconds * particle.TimeScale );
 	}
 
-	private static Vector3 Eddy( Vector3 p, float t, float phase ) => new Vector3(
-		MathF.Sin( p.z + t + phase ) + MathF.Cos( p.y - t * 0.7f ),
-		MathF.Sin( p.x + t * 0.8f + phase ) + MathF.Cos( p.z + t * 0.6f ),
-		MathF.Sin( p.y - t * 0.5f + phase ) + MathF.Cos( p.x + t * 0.9f ) ) * 0.5f;
-
 	// ── Walls ───────────────────────────────────────────────────────────────────
-	// A puff is a sprite facing the camera, up to 167 units across. The effect's collision keeps its centre out of walls,
-	// but the sprite reached past them: from the other side of a wall, or past a pillar's edge, the part on your side
-	// showed (the user's report, 2026-10-01). So each puff keeps to the room round its centre. It shrinks until it reaches
-	// no further than the nearest surface, and gets denser by the area it lost, so a corridor or a corner still holds its
-	// smoke, in smaller puffs.
-
-	/// <summary>
-	/// How far a puff reaches from its centre, as a share of the sprite's width. <c>Particle.Size</c> is the full width:
-	/// the renderer passes the shader half of it, which scales a quad of ±10 by a tenth. smoke1.vtex's alpha falls under
-	/// 0.05 at 0.43-0.47 of the width out from the centre.
-	/// </summary>
-	private const float PuffReach = 0.47f;
-	/// <summary>How far past a surface a puff may reach: well inside the renderer's DepthFeather (24), which fades it there.</summary>
+	// Centre collisions alone cannot keep a wide puff from reaching through a wall. Keep its volume within the room,
+	// increasing density as it loses area so tight corridors still hold their smoke.
+	/// <summary>A small overlap at boundaries; the renderer clips the visible volume at the surface depth.</summary>
 	private const float WallOverlap = 6f;
 	/// <summary>
 	/// Room a floor gives on top of that. A puff sunk into the floor it's over looks like smoke lying on it: from the same
@@ -143,6 +134,7 @@ public sealed class SmokeSimulation : ParticleController
 		public float Reach = 1e6f;
 		/// <summary>Turns its probes, so neighbouring puffs don't all miss the same edge.</summary>
 		public float Spin;
+		public readonly List<SmokeMath.Surface> Surfaces = new();
 	}
 
 	private readonly Dictionary<Particle, Room> Rooms = new();
@@ -187,7 +179,7 @@ public sealed class SmokeSimulation : ParticleController
 				if ( !due ) continue;
 
 				room.At = p.Position;
-				room.Clearance = Probe( p.Position, room.Spin );
+				room.Clearance = Probe( p.Position, room.Spin, room.Surfaces );
 				room.ProbedAt = now;
 				room.Probed = true;
 				budget--;
@@ -198,14 +190,19 @@ public sealed class SmokeSimulation : ParticleController
 		foreach ( var p in particles )
 		{
 			var room = RoomOf( p );
-			// The nearest surface is no nearer than it was at the probe, less how far the puff has drifted since.
-			var clearance = room.Probed
-				? room.Clearance - p.Position.Distance( room.At )
-				: VentClearance - p.Position.Distance( VentAt );
+			// Track distance along surface normals. The old distance-from-probe bound shrank puffs even when they moved
+			// parallel to a flat floor or wall, then let them grow at the next probe: a repeating visual bob/pop.
+			var clearance = VentClearance - p.Position.Distance( VentAt );
+			if ( room.Probed )
+			{
+				clearance = room.Clearance <= 0f ? 0f : ProbeLength;
+				foreach ( var surface in room.Surfaces )
+					clearance = MathF.Min( clearance, surface.Clearance( p.Position ) );
+			}
 			var allowed = MathF.Max( clearance, 0f ) + WallOverlap;
 			room.Reach = MathF.Min( allowed, room.Reach + RegrowRate * delta );
 
-			var reach = MathF.Max( p.Size.x, p.Size.y ) * PuffReach;
+			var reach = MathF.Max( p.Size.x, p.Size.y ) * SmokeMath.PuffReach;
 			if ( reach <= room.Reach ) continue;
 
 			var shrink = room.Reach / reach;
@@ -234,19 +231,25 @@ public sealed class SmokeSimulation : ParticleController
 
 	/// <summary>How far the nearest surface is from <paramref name="at"/>, up to ProbeLength: the nearest point any of
 	/// the probes' rays meets, turned by <paramref name="spin"/> degrees. Floors count FloorAllowance further off.</summary>
-	private float Probe( Vector3 at, float spin )
+	private float Probe( Vector3 at, float spin, List<SmokeMath.Surface> surfaces = null )
 	{
+		surfaces?.Clear();
 		var turn = Rotation.FromYaw( spin );
 		var nearest = ProbeLength;
 		foreach ( var direction in ProbeDirections )
 		{
 			var length = MathF.Min( nearest, ProbeLength );
 			var tr = Scene.Trace.Ray( at, at + turn * direction * length ).WithoutTags( PassThrough ).Run();
-			if ( tr.StartedSolid ) return 0f;
+			if ( tr.StartedSolid )
+			{
+				surfaces?.Clear();
+				return 0f;
+			}
 			if ( !tr.Hit ) continue;
 
-			var distance = tr.HitPosition.Distance( at );
-			if ( tr.Normal.z > 0.7f ) distance += FloorAllowance;
+			var surface = new SmokeMath.Surface( tr.HitPosition, tr.Normal, tr.Normal.z > 0.7f ? FloorAllowance : 0f );
+			surfaces?.Add( surface );
+			var distance = surface.Clearance( at );
 			nearest = MathF.Min( nearest, distance );
 		}
 		return nearest;

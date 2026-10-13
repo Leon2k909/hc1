@@ -1,0 +1,22 @@
+{
+  "mode": "built-in ImageGen",
+  "applied_material": "materials/lowtide/lt_jute.vmat",
+  "generated_source": "Tools/lowtide_sack_jute_source.png",
+  "runtime_textures": [
+    "Assets/materials/lowtide/sacks/lt_jute_color.png",
+    "Assets/materials/lowtide/sacks/lt_jute_normal.png",
+    "Assets/materials/lowtide/sacks/lt_jute_roughness.png"
+  ],
+  "texture_size": [
+    1024,
+    1024
+  ],
+  "sacks_updated": 264,
+  "triangles_per_sack": 120,
+  "material_and_model_errors": 0,
+  "native_verification": "materialError=False; shader=shaders/complex.shader; normal=Texture:;\nmodels/maps/lowtide/lowtide_fleet.vmdl: modelError=False; materialErrors=0\nmodels/maps/lowtide/lowtide_dress_east.vmdl: modelError=False; materialErrors=0\nmodels/maps/lowtide/lowtide_dress_west.vmdl: modelError=False; materialErrors=0\n",
+  "validation": "PASS lowtide_dress_east: all non-sack geometry, UVs and normals preserved\nPASS lowtide_dress_east: repeated patch does not change the upgraded mesh\nPASS lowtide_dress_west: all non-sack geometry, UVs and normals preserved\nPASS lowtide_dress_west: repeated patch does not change the upgraded mesh\nPASS lowtide_fleet: all non-sack geometry, UVs and normals preserved\nPASS lowtide_fleet: repeated patch does not change the upgraded mesh\nPASS all VMDL collision resources unchanged\n",
+  "editor_build_errors": 0,
+  "editor_cleanup_build": "passed: 0 errors, 3 warnings",
+  "editor_compile_repair": "SortedDictionary.TryGetValue in Editor/Hc1BotGripQa.cs; preserves the previous default-zero behavior"
+}

@@ -33,6 +33,22 @@ Scoreboard {
         gap: 2px;
         color: white;
 
+        .sharing-hint {
+            padding-top: 10px;
+            flex-shrink: 0;
+            text-align: center;
+            justify-content: center;
+        }
+
+        .spectator-name {
+            cursor: pointer;
+            padding: 4px;
+
+            &:hover { color: white; }
+        }
+
+        .spectator-list { flex-wrap: wrap; }
+
         // The title and voice bar stay put; the teams scroll when there are more rows than fit.
         .teams {
             flex-direction: column;
@@ -137,6 +153,17 @@ Scoreboard {
                 flex-basis: 350px;
                 flex-grow: 1;
                 gap: 8px;
+
+                &.inspectable {
+                    cursor: pointer;
+
+                    &:hover { background-color: rgba( white, 0.1 ); }
+                }
+
+                .sharing-arrow {
+                    font-size: 18px;
+                    opacity: 0.45;
+                }
             }
 
             // The prestige icons have wide transparent margins, so they're drawn the row's full height, over its

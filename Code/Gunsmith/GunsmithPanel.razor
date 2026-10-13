@@ -189,7 +189,6 @@
                                     <div class="gs-choice-name-row">
                                         <label class="gs-choice-name">@w.Name.ToUpper()</label>
                                         @if ( w.IsWip ) { <label class="wip-tag">@Tr( "WIP" )</label> }
-                                        @if ( ShowReviewNote( w ) ) { <label class="review-tag">CHECK</label> }
                                     </div>
                                     <div class="gs-choice-meta">
                                         <label class="gs-lv-key">@Tr( "LV" )</label>
@@ -391,7 +390,6 @@
                     <div class="gs-hero-name-row">
                         <label class="gs-hero-name">@GetEquipmentName().ToUpper()</label>
                         @if ( equip?.IsWip == true ) { <label class="wip-tag">@Tr( "WIP" )</label> }
-                        @if ( ShowReviewNote( equip ) ) { <label class="review-tag">NEEDS CHECKING</label> }
                     </div>
                     @if ( equip is not null )
                     {
@@ -415,14 +413,6 @@
                         @if ( !string.IsNullOrWhiteSpace( equip.Description ) )
                         {
                             <label class="gs-hero-desc">@Tr( equip.Description.ToUpper() )</label>
-                        }
-                        @if ( ShowReviewNote( equip ) )
-                        {
-                            @* What still needs checking in-game (EquipmentResource.ReviewNote), for the developer only. *@
-                            <div class="gs-review-note">
-                                <i>fact_check</i>
-                                <label>@equip.ReviewNote</label>
-                            </div>
                         }
                     }
                 </div>
@@ -1283,13 +1273,6 @@
         }
         return null;
     }
-
-    /// <summary>
-    /// Whether to show a gun's <see cref="EquipmentResource.ReviewNote"/>: only in the editor and on the developer's
-    /// account, like UNLOCK ALL. Players never see it.
-    /// </summary>
-    private static bool ShowReviewNote( EquipmentResource equipment ) =>
-        !string.IsNullOrWhiteSpace( equipment?.ReviewNote ) && ( Game.IsEditor || AttachmentUnlocks.IsDeveloper );
 
     private void ToggleUnlockAll()
     {

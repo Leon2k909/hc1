@@ -1,0 +1,16 @@
+// Tools/lowtide_forklift.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_vColorTint "[1.04 1.2 1.02 1]"
+    g_flModelTintAmount "1"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    F_METALNESS_TEXTURE "1"
+    g_flMetalness "0"
+    g_flRoughnessScaleFactor "1"
+    TextureColor "materials/lowtide/lt_skip_color.png"
+    TextureNormal "materials/lowtide/lt_skip_normal.png"
+    TextureRoughness "materials/lowtide/lt_skip_rough.png"
+    TextureMetalness "materials/lowtide/lt_skip_metal.png"
+}

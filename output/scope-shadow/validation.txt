@@ -1,0 +1,11 @@
+aligned: offset=0,0, aperture=1.000, blackout=0.000
+turn-right: offset=0.509,0, aperture=0.906, blackout=0.000
+turn-left: offset=-0.509,0, aperture=0.906, blackout=0.000
+recoil: offset=0.085,-0.407, aperture=0.887, blackout=0.000
+eye-relief: offset=0,0, aperture=0.790, blackout=0.000
+off-axis: offset=1.58,0.253, aperture=0.604, blackout=1.000
+PASS: aligned centre stays clear
+PASS: turn right produces an opaque left crescent
+PASS: turn left produces an opaque right crescent
+PASS: leaving the exit pupil blacks out the centre and reticle
+PASS: higher magnification has a smaller eye box

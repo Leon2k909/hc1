@@ -1,0 +1,18 @@
+// Tools/lowtide_plaster.py: generated lime plaster, matching grain, ground-floor damp wear.
+"Layer0"
+{
+    shader "shaders/hc1_lowtide_plaster.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.00"
+    TextureColor "materials/lowtide/lt_plaster_color.png"
+    TextureNormal "materials/lowtide/lt_plaster_normal.png"
+    TextureRoughness "materials/lowtide/lt_plaster_rough.png"
+    TextureAmbientOcclusion "materials/lowtide/lt_plaster_ao.png"
+    g_vPlasterRegion "[0.00024414 0.00024414 0.61181641 0.61181641]"
+    g_flDampHeight "28"
+    g_flDampStrength "0.40"
+    g_vDampColor "[0.53 0.49 0.43]"
+    g_vColorTint "[1.0 1.0 1.0 1.0]"
+    g_flModelTintAmount "1.0"
+}

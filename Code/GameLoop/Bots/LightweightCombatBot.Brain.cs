@@ -267,6 +267,7 @@ public sealed partial class LightweightCombatBot
 		_callout = null;
 		_huntDestination = null;
 		_huntTarget = null;
+		StandFromProne();
 		IsCrouching = false;
 		IsAimingIn = false;
 		HoldPosition();
@@ -573,6 +574,7 @@ public sealed partial class LightweightCombatBot
 		{
 			PlayerPawn { IsProne: true } => 24f,
 			PlayerPawn { IsCrouching: true } => 48f,
+			LightweightCombatBot { IsProne: true } => 24f,
 			LightweightCombatBot { IsCrouching: true } => 44f,
 			_ => 64f
 		};
@@ -860,7 +862,7 @@ public sealed partial class LightweightCombatBot
 	private static bool IsLowProfile( Component target ) => target switch
 	{
 		PlayerPawn player => player.IsCrouching || player.IsProne,
-		LightweightCombatBot bot => bot.IsCrouching,
+		LightweightCombatBot bot => bot.IsCrouching || bot.IsProne,
 		_ => false
 	};
 
@@ -954,7 +956,9 @@ public sealed partial class LightweightCombatBot
 		// Shooting on the move is harder, a veteran less so: so the holders stop for their aimed shots.
 		var speed = Agent.IsValid() ? Agent.Velocity.WithZ( 0f ).Length : 0f;
 		error *= 1f + MathX.Lerp( 0.9f, 0.55f, Skill ) * (speed / MathF.Max( MoveSpeed, 1f )).Clamp( 0f, 1f );
-		if ( IsCrouching )
+		if ( IsProne )
+			error *= 0.75f;
+		else if ( IsCrouching )
 			error *= 0.85f;
 
 		error += _targetAngularSpeed * TrackingLag;
@@ -997,6 +1001,7 @@ public sealed partial class LightweightCombatBot
 			return;
 		}
 
+		StandFromProne();
 		IsCrouching = false;
 
 		if ( _target.IsValid() )
@@ -1570,6 +1575,9 @@ public sealed partial class LightweightCombatBot
 	/// <remarks> A few metres' step in a fight skips the route check (<paramref name="checkPath"/> false). </remarks>
 	private bool GoTo( Vector3 position, float speed, bool checkPath = true )
 	{
+		StandFromProne();
+		// Finish getting off the floor before moving at full pace.
+		if ( _proneBlend > 0.1f ) speed = MathF.Min( speed, 85f );
 		// Hardcore: a shot leg or foot. And never on the heels of a teammate.
 		Agent.MaxSpeed = KeepInterval( speed ) * (HealthComponent.IsValid() ? HealthComponent.WoundSpeedScale : 1f);
 		// Each new destination is a navmesh search or two. The route to a far one hardly changes as it moves a little,
@@ -1827,7 +1835,8 @@ public sealed partial class LightweightCombatBot
 	{
 		// Not at a sprint, or for a moment after while the gun comes up, as for a player (SprintOutTime).
 		if ( IsReloading || !_targetVisible || !IsEnemyAlive( _target )
-			|| _reactionEnds.Relative > 0f || _nextShot.Relative > 0f || _timeSinceSprinting < SprintOutTime )
+			|| _reactionEnds.Relative > 0f || _nextShot.Relative > 0f || _timeSinceSprinting < SprintOutTime
+			|| _stanceShotWait.Relative > 0f )
 			return;
 
 		var toPoint = LiveTargetPoint - EyePosition;

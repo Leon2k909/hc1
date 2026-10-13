@@ -2,15 +2,87 @@
 {
     position: absolute;
     top: 128px;
-
+    max-width: 80%;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
     z-index: 50;
 
-    span
+    label
     {
+        font-family: Dinish;
+        font-weight: normal;
+        color: #F4F4F0;
+        text-shadow: 0 0 4px rgba( black, 0.9 );
+    }
+
+    .spectator-target
+    {
+        align-items: center;
+        gap: 18px;
+        max-width: 100%;
+    }
+
+    .spectator-identity
+    {
+        flex-direction: column;
+        align-items: center;
+        min-width: 220px;
+        max-width: 420px;
+        gap: 3px;
+    }
+
+    .spectator-title
+    {
+        font-size: 12px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: rgba( 244, 244, 240, 0.64 );
+    }
+
+    .spectator-name
+    {
+        max-width: 100%;
+        font-size: 24px;
+        line-height: 28px;
+        font-weight: bold;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    InputHint
+    {
+        flex-shrink: 0;
+
+        img
+        {
+            width: 24px;
+            height: 24px;
+            background-tint: #F4F4F0;
+            filter: drop-shadow( 0 0 3px rgba( black, 0.8 ) );
+        }
+    }
+
+    .cycle-hint { opacity: 0.72; }
+
+    .spectator-controls
+    {
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 22px;
+    }
+
+    .spectator-action
+    {
+        align-items: center;
+        gap: 4px;
+
         label
-        {            
-            align-self: center;
-            font-size: 20px;
+        {
+            font-size: 14px;
+            color: rgba( 244, 244, 240, 0.72 );
         }
     }
 }

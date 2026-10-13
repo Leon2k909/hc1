@@ -17,4 +17,6 @@
 	    AddDestination( "/", typeof( PausePage ) );
 	    AddDestination( "/settings", typeof( SettingsPage ) );
     }
+
+    public bool CloseSocialPopup() => Descendants.OfType<PausePage>().Any( page => page.CloseSocialPopup() );
 }

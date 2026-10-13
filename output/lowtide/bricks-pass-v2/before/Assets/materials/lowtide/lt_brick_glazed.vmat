@@ -1,0 +1,16 @@
+// Tools/lowtide_brick.py: generated albedo, matching mortar relief, original world brick scale.
+"Layer0"
+{
+    shader "shaders/hc1_brick.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.00"
+    TextureColor "materials/lowtide/lt_brick_color.png"
+    TextureNormal "materials/lowtide/lt_brick_normal.png"
+    TextureRoughness "[0.320000 0.320000 0.320000 0.000000]"
+    TextureAmbientOcclusion "materials/lowtide/lt_brick_ao.png"
+    g_vBrickScale "[1.333333 0.925450]"
+    g_vBrickRegion "[0.089844 0.021484 0.430664 0.569824]"
+    g_vColorTint "[0.340 0.280 0.270 1.0]"
+    g_flModelTintAmount "1.0"
+}

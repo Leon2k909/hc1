@@ -1,0 +1,25 @@
+{
+  "tool": "built-in image_gen",
+  "prompt": "Use case: photorealistic-natural. Asset type: PBR base-color texture atlas for the timber deck of an old industrial harbour pedestrian bridge in a realistic first-person game. Create a square 2048 x 2048 image completely filled edge to edge with SIXTEEN straight horizontal rows of weathered unpainted timber boards, each single board running continuously from the left edge to the right edge. All sixteen boards are equal height and parallel. No staggered end joints anywhere: each row is one uninterrupted long plank. Perfect orthographic top-down surface scan, absolutely no perspective or lens distortion. Photographic wood detail: fine longitudinal silver-grey and subdued brown grain, naturally different grain and tone on each board, a few restrained knots, light checking and shallow splits, darker damp wear near some seams, scuffed pedestrian wear. Weathered harbour timber, grey-brown oak/larch rather than pale new pine. Narrow dark 2-3 millimetre joints between boards, not thick black stripes. Only subtle small dark fixing marks near both outer ends, no repeated bright metal nail pattern. Keep all grain strictly horizontal. Moderately dark, matte diffuse albedo with neutral even illumination, no cast shadows, no baked directional highlights or specular glare, no visible lighting gradient, no border. Credible natural material texture, not an illustration, painted wood, glossy laminate, graphic pattern, sawdust, large broken holes, overly dramatic damage, or orange varnish. No objects, labels, text, watermark, people, weapons, railings, or scene. Highest fine surface detail.",
+  "generated_source": "C:/Users/leon2/.codex/generated_images/01a118c3-728b-7dd0-91f4-5910a22332a0/exec-86747cb6-9237-4fba-b696-067bed64015f.png",
+  "source": "Tools/lowtide_bridge_source.png",
+  "material": "Assets/materials/lowtide/lt_bridge_deck.vmat",
+  "maps": [
+    "Assets/materials/lowtide/lt_bridge_deck_color.png",
+    "Assets/materials/lowtide/lt_bridge_deck_normal.png",
+    "Assets/materials/lowtide/lt_bridge_deck_rough.png",
+    "Assets/materials/lowtide/lt_bridge_deck_ao.png"
+  ],
+  "packing": "Generated source and every albedo pixel preserved unchanged; packed into a 2048-square power-of-two atlas with edge padding.",
+  "deck": "80 six-inch full-width boards, selecting and mirroring 12 scanned board rows, no repeated end-joint tiles",
+  "gameplay": "Existing floor height, width, steel structure and collision volumes retained.",
+  "validation": {
+    "native_material_compile": "passed",
+    "native_fleet_model_compile": "passed",
+    "surface_maps": "2K POT, exact albedo pixels preserved, aligned normal/roughness/AO maps",
+    "deck_mesh": "80 contiguous six-inch boards, original collision volumes retained",
+    "visual_review": "actual bridge geometry and deck UVs rendered in headless Blender and inspected",
+    "preview": "output/lowtide-bridge/bridge-deck-preview.png",
+    "live_game_visual_check": "not run; no editor or MCP used"
+  }
+}

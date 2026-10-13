@@ -1,0 +1,13 @@
+// Tools/lowtide_brick.py: seamless generated albedo, matching mortar relief, physical brick scale.
+"Layer0"
+{
+    shader "shaders/hc1_brick.shader"
+    TextureColor "materials/lowtide/lt_brick_v2_color.png"
+    TextureNormal "materials/lowtide/lt_brick_v2_normal.png"
+    TextureRoughness "materials/lowtide/lt_brick_v2_rough.png"
+    TextureMetalness "materials/default/default_black_mask.tga"
+    TextureAmbientOcclusion "materials/lowtide/lt_brick_v2_ao.png"
+    TextureBlendMask "materials/default/default_black_mask.tga"
+    g_vBrickScale "[1.337853 1.000927 0.0 0.0]"
+    g_flTintColor "[1.000 1.000 1.000]"
+}

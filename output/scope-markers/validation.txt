@@ -1,0 +1,14 @@
+Scene=game_setup, hud=True, viewer=False, editor type=package.verarp.razedtest, Version=0.0.211.0, Culture=neutral, PublicKeyToken=null
+Panels: 
+Live match checks skipped: player is viewing the gunsmith/menu.
+Projection centre: 0.5,0.5, expected 0.5,0.5
+PASS Square scope render-target projection: centre
+Projection right: 0.75,0.5, expected 0.75,0.5
+PASS Square scope render-target projection: right
+Projection above: 0.5,0.25, expected 0.5,0.25
+PASS Square scope render-target projection: above
+PASS Points behind the scope are rejected
+PASS Viewmodel marker mask shader loads
+Engine checks completed; isolated QA scene destroyed.
+PASS Actual rendered world target matches scope marker projection at pixel (384, 128).
+PASS GPU marker mask blocks the unzoomed marker inside the lens and preserves markers outside.

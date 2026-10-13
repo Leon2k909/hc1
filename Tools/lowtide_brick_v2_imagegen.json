@@ -1,0 +1,19 @@
+{
+  "mode": "built-in ImageGen",
+  "source": "Tools/lowtide_brick_v2_source.png",
+  "colour_asset": "Assets/materials/lowtide/lt_brick_v2_color.png",
+  "reference_role": "Previous texture was used as a palette and bond reference.",
+  "prompt": "Use case: photorealistic-natural.\nAsset type: seamless square PBR albedo / base-color texture for the brick facades of a late-19th-century harbour warehouse in a realistic first-person game.\nInput image 1: reference for the red/brown clay palette and running-bond structure only; generate a new, more photographic and materially convincing texture.\nSubject: aged handmade fired-clay bricks with subtly irregular edges, fine mineral pores, chipped corners, little grit inclusions and worn gritty faces; narrow, slightly recessed neutral grey-beige lime mortar with its own fine sandy texture. Restrained charcoal and weathering ingrained in a few bricks, some muted rusty reds, burnt sienna and warm umber; mostly cohesive red-brown masonry, not bright orange. Small natural differences between individual bricks. Gentle local age variation without big blotches or recognisable stains that would repeat conspicuously.\nComposition: square, straight-on orthographic scan of ONLY the brick surface. About eight full brick widths across and twenty-four horizontal courses vertically; brick width about three times its height, alternating courses staggered by half a brick. Continuous running bond, consistent horizontal beds, thin realistic joints. Seamless across left/right and top/bottom; start and finish vertically within a mortar bed, preserve the alternating course phase across the wrap. Bricks meet neighbouring tiles naturally, no frame or edge vignette.\nLighting: very even cross-polarised diffuse lighting, true base colour. The texture will receive real lighting and normal-map relief in the game. No directional lighting, glossy highlights, baked drop shadows, large black outlines or dramatic occlusion. Rich fine surface detail instead of flat painted rectangles. High-resolution 2048x2048 photographic fidelity.\nAvoid: whole building, windows, arches, vegetation, people, text, logos, border, perspective, exaggerated cracks, perfectly identical computer-generated bricks, modern smooth pavers, plastic, artificial shine, painterly or cartoon appearance.",
+  "surface_maps": [
+    "Assets/materials/lowtide/lt_brick_v2_normal.png",
+    "Assets/materials/lowtide/lt_brick_v2_rough.png",
+    "Assets/materials/lowtide/lt_brick_v2_ao.png"
+  ],
+  "applied_materials": [
+    "Assets/materials/lowtide/lt_brick.vmat",
+    "Assets/materials/lowtide/lt_brick_soot.vmat",
+    "Assets/materials/lowtide/lt_brick_glazed.vmat",
+    "Assets/materials/lowtide/lt_brick_slime.vmat"
+  ],
+  "packing": "Mortar-bounded crop resized to 2048 square; original generated source retained unchanged."
+}

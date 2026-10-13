@@ -2056,13 +2056,9 @@
   So it isn't a modal like COMPARE: the parts list on the right stays usable. The build's figures, and their rows,
   are green or red where they beat or fall short of the factory's. Escape closes it after a slot's parts list, before
   the picker. Compiled offline; the editor closed before it hotloaded, so it hasn't been seen in-game.
-- A gun still to be checked in a match carries a review note (`EquipmentResource.ReviewNote`, written from
-  `kastov_prefabs.Prefabs.review_note`). The user asked for it so a new gun gets a careful look before it's trusted.
-  Only the developer sees it (`ShowReviewNote`: in the editor, or on `AttachmentUnlocks.IsDeveloper`'s account): CHECK
-  on the gun's row, NEEDS CHECKING by its name in the hero, and the note under its description, in `$caution` amber. The
-  AUG, the FAL, the M18, the MCX, the L85A2, the HK416, the AK-12, the AK-15, the AK-74M, the MCX-SPEAR, the M16A2 and the RPK-16 have one. Once a gun has been checked in a match, empty its `review_note` and rerun
-  `kastov_prefabs.py` for it: the .equip's `ReviewNote` comes from there. The note is plain English with no `Tr`, since
-  only the developer reads it.
+- The user removed the gunsmith's CHECK / NEEDS CHECKING badges and review-note box on 2026-10-12, including in the
+  editor and on the developer's account. Existing `EquipmentResource.ReviewNote` / `kastov_prefabs.Prefabs.review_note`
+  metadata stays in the assets for development reference; the gunsmith does not display it.
 - Parts are what the real gun takes (the user: "as close to real as possible"; optics are left alone). On 2026-09-29
   the FAMAS F1's 50- and 60-round magazines (the F1 only feeds from its own 25-round one) and the MP5's 10mm 30-round
   magazine (the MP5/10 is another gun) came out. Their files are in `Backups/disabled_gunsmith_parts/` under their
@@ -2851,6 +2847,9 @@ simulate_input.
     (`RunningWhileDeployed`), so the gun wouldn't shoot, but the raw button still stopped every sprint.
   - The user found they had to shoot before they could sprint (2026-10-02).
   - A click in the class menu doesn't count either.
+  - Aim is the exception (`Aimable.TakesInputHeldThroughDeploy`): right-click held through a weapon switch aims the gun
+    switched to (the user, 2026-10-12). Not in toggle-aim mode, where the held press would toggle it. So aim held
+    through a respawn aims the new gun too.
 - A new pawn's gun can be deployed before the pawn is possessed (`OnClientRespawn`'s RPC comes after), so the deploy
   event never noted the held button. `WeaponInputAction` now works it out on its first update as the owner's
   (`_heldInputChecked`).
@@ -3400,6 +3399,16 @@ simulate_input.
       seen in-game.
   - Six stairs go down into the Fleet: one from each warehouse ground bay, and a public one from each quay. Iron
     ladders on its walls are dressing only.
+  - Mooring rings (2026-10-13, the user: "what is this trash on lowtide", of a black T on the Fleet's wall). Each was
+    two black boxes, every 230 along both walls. Now it's a ring as on Hamburg's Fleet walls (`mooring_ring`,
+    `MOORING_RINGS`):
+    - a granite ring stone set into the brick, 20 wide and 17 high, proud by 1.2 with bevelled edges. Its UVs map one
+      joint-free block of ashlar_grey's picture (`RING_STONE_PX`), so it reads as one stone;
+    - an eye bolt leaded into it, and a rusted wrought-iron ring (`lt_hold_rust`, 11 across) hanging from the eye,
+      its foot resting against the stone.
+    - Eight to a wall, clear of the ladders, the footbridge, the quay stairs and the bays' landings. Drawn only, with no
+      collision, about 570 triangles each.
+    - Only `lowtide_fleet` was rebuilt. Checked in an offline render of the generated mesh, not yet in the engine.
 - Modes:
   - The scene lists TDM and Defuse, and the map is in `GameUtils`' three lists.
   - It has deathmatch spawns and Retakes spawns for each site.
@@ -4215,6 +4224,11 @@ simulate_input.
     (`CollisionIgnore`) and the probes.
   - Compiled offline on 2026-10-01, not yet seen in-game. Things to check: smoke near a wall and a pillar from the
     other side, a doorway, the cloud's base on open ground, and the frame time with several smokes out.
+- A volume renderer was tried on 2026-10-12 (`SmokeRendering`, `shaders/hc1_smoke.shader`, started by
+  `SmokeSimulation.OnStart`, with the prefab's sprite renderer off). It drew nothing in the engine: 200 puffs were
+  queued for the camera and none showed. The user saw a grenade on the floor with no smoke. So the sprite renderer is on
+  again and `OnStart` is commented out, until the volume renderer works. Its files are still there. Not yet seen in a
+  match: the prefab needs recompiling after the hotload.
 
 ## Deaths (`DyingBody`, `DeathPlan`, `Code/PawnSystem/DyingBody.cs`)
 - The user asked for "more variance in the way people die", some "slowly" dropping, with "hyper realism". Every death

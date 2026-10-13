@@ -20,7 +20,7 @@ public sealed partial class PlayerPawnBridge : Component, IPlayerBase
 	bool IPlayerBase.IsCrouching => Player?.IsCrouching ?? false;
 	bool IPlayerBase.IsRunning => Player?.IsSprinting ?? false;
 	bool IPlayerBase.IsOnGround => Player?.IsGrounded ?? false;
-	bool IPlayerBase.IsClimbingLadder => false;
+	bool IPlayerBase.IsClimbingLadder => Player.IsValid() && Player.IsPipeClimbing;
 	bool IPlayerBase.IsAlive => (Player?.HealthComponent?.State == Facepunch.LifeState.Alive);
 	[Sync] public bool IsBot { get; set; }
 	Angles IPlayerBase.EyeAngles => Player?.EyeAngles ?? Angles.Zero;

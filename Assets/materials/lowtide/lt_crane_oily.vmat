@@ -1,0 +1,14 @@
+// Tools/lowtide_crane.py: distinct crane mechanical finish.
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.7"
+    TextureColor "materials/default/default_color.tga"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureRoughness "[0.44 0.44 0.44 0]"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.105 0.12 0.13 1]"
+    g_flModelTintAmount "1"
+}

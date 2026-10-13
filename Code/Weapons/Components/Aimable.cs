@@ -51,6 +51,12 @@ public partial class Aimable : WeaponInputAction
 		IsAiming = false;
 	}
 
+	/// <summary>
+	/// Aim held through a weapon switch aims the gun switched to. In toggle mode a press held through it would toggle
+	/// the new gun's aim, so that waits for a new press.
+	/// </summary>
+	protected override bool TakesInputHeldThroughDeploy => !GameSettingsSystem.Current.ToggleAim;
+
 	protected override void OnInputDown()
 	{
 		if ( GameSettingsSystem.Current.ToggleAim )
@@ -69,6 +75,7 @@ public partial class Aimable : WeaponInputAction
 
 	protected virtual bool CanAim()
 	{
+		if ( Player.IsValid() && Player.IsPipeClimbing ) return false;
 		if ( IsDown() && Equipment.HasTag( "lowered" ) )
 		{
 			Equipment.SetTag( "lowered", false );
@@ -97,6 +104,10 @@ public partial class Aimable : WeaponInputAction
 			return;
 
 		if ( !Player.IsLocallyControlled )
+			return;
+
+		// Holstering cancelled the aim, and a holstered gun's input is left as it was when it went away.
+		if ( !Equipment.IsValid() || !Equipment.IsDeployed )
 			return;
 
 		if ( !CanAim() )

@@ -258,7 +258,7 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 
 		// Mantling: the support hand goes onto the ledge, so the firing hand swings the gun down and to the right, canted,
 		// out of the way (PlayerPawn.Mantle.cs).
-		var mantle = Owner.IsValid() ? Owner.MantleBlend : 0f;
+		var mantle = Owner.IsValid() ? MathF.Max( Owner.MantleBlend, Owner.PipeClimbBlend ) : 0f;
 		if ( mantle > 0f )
 		{
 			targetPositionOffset += MantlePosition * mantle;
@@ -402,7 +402,7 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 		var reloadDuration = Equipment.GetComponentInChildren<Reloadable>()?.DurationMultiplier ?? 1f;
 		ModelRenderer.Set( "reload_speed", ReloadSpeed / reloadDuration );
 
-		ModelRenderer.SetBool( "b_grab", Owner.Hovered.IsValid() );
+		ModelRenderer.SetBool( "b_grab", Owner.Hovered.IsValid() || Owner.IsPipeClimbing );
 
 		ModelRenderer.SetBool( "b_lower_weapon", Equipment.HasTag( "lowered" ) );
 
