@@ -65,24 +65,27 @@ WeaponComparePanel
     }
 
     // The kinds of gun, which narrow the weapon chips under them: the gunsmith picker's category chips.
+    // Bigger than the gun chips, over a rule, so they read as the list's tabs.
     .wc-filters
     {
         flex-direction: row;
         flex-wrap: wrap;
-        gap: 6px;
-        margin-bottom: 8px;
+        gap: 8px;
+        padding-bottom: 12px;
+        margin-bottom: 12px;
+        border-bottom: 1px solid rgba( 255, 255, 255, 0.12 );
     }
 
     .wc-filter
     {
-        height: 28px;
-        padding: 0 12px;
+        height: 40px;
+        padding: 0 20px;
         align-items: center;
-        border: 1px solid rgba( 255, 255, 255, 0.14 );
-        background-color: rgba( 255, 255, 255, 0.03 );
+        border: 1px solid rgba( 255, 255, 255, 0.2 );
+        background-color: rgba( 255, 255, 255, 0.05 );
         cursor: pointer;
 
-        label { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; color: $text-mid; }
+        label { font-size: 16px; font-weight: 700; letter-spacing: 2px; color: $text-mid; }
 
         &:hover
         {
