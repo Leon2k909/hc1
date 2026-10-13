@@ -2947,22 +2947,36 @@ simulate_input.
 ## Sliding (`PlayerPawn.Slide.cs`)
 - The user asked for sliding (2026-10-13), after the Cold War speeds (see Movement speeds). Press Duck while sprinting
   on the ground: you drop onto a hip and slide on. A tap is enough; letting go of Duck doesn't end it.
-- It needs 200 u/s over the ground (`SlideMinStartSpeed`). The drop adds 60 (`SlideBoost`), up to 360, so a rifle's
-  ~285 sprint slides off at ~345.
-- Friction 1.05 (`SlideFriction`; a crouch's is 4) and almost no steering (`SlideAcceleration` 1.5). From 345 it's down
-  to 140 (`SlideEndSpeed`) in ~0.86 s, ~195 units on. It lasts 1.1 s at most (`SlideMaxTime`).
+- Retuned the same day to feel like Modern Warfare III (2023)'s (the user: "not fast enough", "fast to initiate,
+  longer", "doesnt feel fluid yet"):
+  - The drop: the eyes go down at 24/s (`SlideDropRate`; a stance change's 10), most of the way in ~0.1 s, and the gun
+    and camera ease in at 16/s (`SlideBlend`, out at 7/s).
+  - The push: the sprint's speed plus 115 (`SlideBoost`), at least 340 (`SlideStartFloor`) and at most 430
+    (`SlideMaxSpeed`). It needs 180 u/s over the ground (`SlideMinStartSpeed`).
+  - Friction (`SlideFriction`, a crouch's is 4) starts at 0.12, holds for 0.4 s, then eases up to 1.4 over 0.8 s, so
+    the slide keeps its speed early and bleeds it late. It ends under 180 (`SlideEndSpeed`, about where a sprint
+    picks up) or at 1.5 s (`SlideMaxTime`). Almost no steering (`SlideAcceleration` 1.5).
+  - Simulated (50 Hz, flat ground): a rifle's ~285 sprint slides off at 400, is at ~375 half a second in, and goes
+    1.32 s and ~430 units (11 m). From 200: 340, 1.2 s, ~350 units. With no gun penalty (~304): 419, 1.34 s, ~455
+    units. The first version went 345 u/s, 0.86 s and 195 units.
+  - Duck pressed again 0.15 s or more into it (`SlideCancelDelay`) cancels it: you stand straight up (the press doesn't
+    crouch until Duck is let go, `_slideCancelHeld`) and, holding Run, sprint on.
+  - Duck pressed at a sprint up to 0.25 s before landing slides as you land, if it's still held (`SlideLandingBuffer`).
+  - A toggled sprint the slide stopped picks up again within 0.5 s of it ending (`ResumeSprintAfterSlide`, in
+    `GetWantsToSprint`); Run pressed during the slide takes that back.
+  - Another can start 0.4 s after one ends (`SlideCooldown`; it was 0.8).
 - Slopes: on the ground it gets half of gravity's pull along the slope (`ApplySlideSlope`, `SlideSlopeHelp`), so
   downhill carries it further and uphill stops it sooner.
 - What ends it:
-  - Jump: a jump that keeps the speed. Prone: down flat.
-  - Leaving the ground, slowing under 140, or the time running out.
+  - Jump: a jump that keeps the speed. Prone: down flat. Duck again: the cancel above.
+  - Leaving the ground, slowing under 180, or the time running out.
   - Death, a knockdown, mantling, the drone's tablet, planting, being downed.
-  It comes up crouched while Duck is held, else standing. Another can't start for 0.8 s (`SlideCooldown`).
+  It comes up crouched while Duck is held, else standing.
 - While sliding:
   - The eye is at -24 (`SlideEyeOffset`; a crouch's -16), and `IsCrouching` holds, so the body crouches on every
     machine, footsteps are silent and the hitboxes are a crouch's.
   - The gun cants 14 degrees left, muzzle a little down (`ViewModel.SlidePosition` / `SlideAngles`), less as it's aimed,
-    with no walk bob. The first-person camera rolls 4 degrees left (`CameraController.ApplySlideTilt`). Both ease by
+    with no walk bob. The first-person camera rolls 5 degrees left (`CameraController.ApplySlideTilt`). Both ease by
     `SlideBlend`. No inspect.
   - It ends the sprint, so the gun can fire 0.25 s after the slide starts (the sprint-out time), or at once aimed.
 - A crouch now stops a sprint (`!IsCrouching` in `CanSprint`). Before, crouch and sprint could be held together.

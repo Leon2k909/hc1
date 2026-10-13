@@ -427,7 +427,7 @@ public sealed class CameraController : PawnCameraController, IGameEventHandler<D
 
 		var blend = Player.SlideBlend;
 		if ( blend > 0f )
-			Camera.LocalRotation *= Rotation.From( 0f, 0f, -4f * blend );
+			Camera.LocalRotation *= Rotation.From( 0f, 0f, -5f * blend );
 	}
 
 	void OnModeChanged()

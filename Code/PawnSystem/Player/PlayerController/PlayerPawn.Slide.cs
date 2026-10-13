@@ -1,38 +1,60 @@
 namespace Facepunch;
 
 /// <summary>
-/// Sliding. Press Duck while sprinting on the ground and you drop onto a hip and slide on, faster than the sprint for a
-/// moment, then slowing until you come up in a crouch (or standing, if Duck isn't held). A tap is enough: letting go of
-/// Duck doesn't stop it. Jump ends it in a jump that keeps the speed, Prone ends it on the floor. Downhill keeps it
-/// going and uphill stops it sooner. Only the owner moves the pawn; everyone else sees it crouched
-/// (<see cref="IsSliding"/> holds the crouch) and hears it go down.
+/// Sliding. Press Duck while sprinting on the ground and you drop onto a hip and slide on, faster than the sprint, holding
+/// most of that speed for the first half of the slide and then slowing until you come up in a crouch (or standing, if
+/// Duck isn't held). A tap is enough: letting go of Duck doesn't stop it. Press Duck again to cancel it and stand straight
+/// back into the sprint. Jump ends it in a jump that keeps the speed, Prone ends it on the floor. Duck pressed just before
+/// landing from a sprint slides as you land. Downhill keeps it going and uphill stops it sooner. Only the owner moves the
+/// pawn; everyone else sees it crouched (<see cref="IsSliding"/> holds the crouch) and hears it go down.
 /// </summary>
 public partial class PlayerPawn
 {
 	/// <summary>The eye's offset in a slide: lower than a crouch (-16), sat back on one hip.</summary>
 	private const float SlideEyeOffset = -24f;
 
-	/// <summary>How fast a slide bleeds speed (a crouch's is 4): from 345 u/s it's down to <see cref="SlideEndSpeed"/> in ~0.86 s, ~195 units on.</summary>
-	private const float SlideFriction = 1.05f;
+	/// <summary>How fast the eyes drop into a slide, as a lerp rate per second (a stance change's is 10): most of the way in ~0.1 s.</summary>
+	private const float SlideDropRate = 24f;
+
+	/// <summary>
+	/// How fast a slide bleeds speed (a crouch's is 4). It starts almost free (<see cref="SlideFrictionStart"/>), holds
+	/// that for <see cref="SlideHoldTime"/>, then rises to <see cref="SlideFrictionEnd"/> over <see cref="SlideFrictionRamp"/>.
+	/// A rifle's 285 u/s sprint slides off at 400 and is still at ~375 half a second in; the slide lasts ~1.3 s and goes
+	/// ~430 units (11 m).
+	/// </summary>
+	private const float SlideFrictionStart = 0.12f;
+	private const float SlideFrictionEnd = 1.4f;
+	private const float SlideHoldTime = 0.4f;
+	private const float SlideFrictionRamp = 0.8f;
 
 	/// <summary>How much the keys steer a slide: barely.</summary>
 	private const float SlideAcceleration = 1.5f;
 
-	/// <summary>The push the drop gives, on top of the sprint's speed, up to <see cref="SlideMaxSpeed"/>.</summary>
-	private const float SlideBoost = 60f;
-	private const float SlideMaxSpeed = 360f;
+	/// <summary>The push the drop gives on top of the sprint's speed, at least to <see cref="SlideStartFloor"/> and at most <see cref="SlideMaxSpeed"/>.</summary>
+	private const float SlideBoost = 115f;
+	private const float SlideStartFloor = 340f;
+	private const float SlideMaxSpeed = 430f;
 
 	/// <summary>Slower than this over the ground and Duck only crouches.</summary>
-	private const float SlideMinStartSpeed = 200f;
+	private const float SlideMinStartSpeed = 180f;
 
-	/// <summary>The slide ends below this speed (the friction's stop speed, under which it would halt in a few ticks).</summary>
-	private const float SlideEndSpeed = 140f;
+	/// <summary>The slide ends below this speed: about where a sprint picks up again.</summary>
+	private const float SlideEndSpeed = 180f;
 
 	/// <summary>The longest a slide lasts, even downhill.</summary>
-	private const float SlideMaxTime = 1.1f;
+	private const float SlideMaxTime = 1.5f;
 
 	/// <summary>How long after a slide ends before another can start.</summary>
-	private const float SlideCooldown = 0.8f;
+	private const float SlideCooldown = 0.4f;
+
+	/// <summary>How soon into a slide a second Duck press cancels it (so the press that started it doesn't).</summary>
+	private const float SlideCancelDelay = 0.15f;
+
+	/// <summary>How long before landing a Duck press at a sprint still slides as you land.</summary>
+	private const float SlideLandingBuffer = 0.25f;
+
+	/// <summary>How long after a slide a toggled sprint waits to pick up again (you're getting up, or still crouched).</summary>
+	private const float SlideSprintResumeWindow = 0.5f;
 
 	/// <summary>The share of the slope's pull a slide gets: downhill keeps it going, uphill stops it sooner.</summary>
 	private const float SlideSlopeHelp = 0.5f;
@@ -45,26 +67,70 @@ public partial class PlayerPawn
 
 	private TimeSince _slideTime;
 	private TimeUntil _slideCooldown;
+	private TimeUntil _slideBuffered;
+
+	/// <summary>A cancelled slide's Duck press: it doesn't crouch until Duck is let go.</summary>
+	private bool _slideCancelHeld;
+
+	/// <summary>A toggled sprint the slide stopped, to pick up again when it ends (see <see cref="GetWantsToSprint"/>).</summary>
+	private bool _resumeSprintAfterSlide;
+	private TimeSince _slideEnded;
+
+	/// <summary>The slide's friction now: almost none at first, rising once it's under way.</summary>
+	private float SlideFriction
+	{
+		get
+		{
+			var t = ((_slideTime - SlideHoldTime) / SlideFrictionRamp).Clamp( 0f, 1f );
+			t = t * t * (3f - 2f * t);
+			return SlideFrictionStart + (SlideFrictionEnd - SlideFrictionStart) * t;
+		}
+	}
 
 	private void UpdateSlideBlend()
 	{
-		SlideBlend = SlideBlend.Approach( IsSliding ? 1f : 0f, Time.Delta * (IsSliding ? 8f : 4f) );
+		// Quick into the hip, a little slower back up.
+		var target = IsSliding ? 1f : 0f;
+		SlideBlend = SlideBlend.LerpTo( target, Time.Delta * (IsSliding ? 16f : 7f) );
+		if ( MathF.Abs( SlideBlend - target ) < 0.002f ) SlideBlend = target;
 	}
 
 	/// <summary>
 	/// Start a slide on a Duck press while sprinting, or keep one going until it's slowed down, timed out, left the ground,
-	/// or been jumped or dropped out of. Runs from <see cref="BuildInput"/>, before the crouch is read.
+	/// or been cancelled, jumped or dropped out of. Runs from <see cref="BuildInput"/>, before the crouch is read.
 	/// </summary>
 	private void UpdateSlide( bool wasSprinting )
 	{
+		var cc = CharacterController;
+
+		if ( _slideCancelHeld && !Input.Down( "Duck" ) )
+			_slideCancelHeld = false;
+
 		if ( !IsSliding )
 		{
-			if ( Input.Pressed( "Duck" ) && (wasSprinting || IsSprinting) )
+			var sprinting = wasSprinting || IsSprinting;
+			if ( Input.Pressed( "Duck" ) && sprinting )
+			{
+				// In the air, the press waits for the landing.
+				if ( !cc.IsOnGround ) _slideBuffered = SlideLandingBuffer;
+				else TryStartSlide();
+			}
+			else if ( _slideBuffered.Relative > 0f && cc.IsOnGround && Input.Down( "Duck" ) )
+			{
+				_slideBuffered = 0;
 				TryStartSlide();
+			}
 			return;
 		}
 
-		var cc = CharacterController;
+		// A second Duck press stands you up out of it, back into the sprint.
+		if ( Input.Pressed( "Duck" ) && _slideTime > SlideCancelDelay )
+		{
+			_slideCancelHeld = true;
+			StopSlide();
+			return;
+		}
+
 		if ( CanSlide( ignoreInput: true ) is not null || !cc.IsOnGround || Input.Pressed( "Jump" )
 			|| cc.Velocity.WithZ( 0 ).Length < SlideEndSpeed || _slideTime > SlideMaxTime )
 			StopSlide();
@@ -87,14 +153,17 @@ public partial class PlayerPawn
 			return false;
 		}
 
-		var speed = MathF.Min( flat.Length + SlideBoost, SlideMaxSpeed );
+		var speed = MathF.Min( MathF.Max( flat.Length + SlideBoost, SlideStartFloor ), SlideMaxSpeed );
 		cc.Velocity = flat.Normal * speed;
 		if ( log ) Log.Info( $"Slide: from {flat.Length:F0} to {speed:F0} u/s" );
 
 		IsSliding = true;
 		_slideTime = 0;
+		_slideBuffered = 0;
+		_slideCancelHeld = false;
 
-		// Out of the sprint: the gun comes up as it does when a sprint stops.
+		// Out of the sprint: the gun comes up as it does when a sprint stops. A toggled sprint picks up again afterwards.
+		_resumeSprintAfterSlide = WantsToggleSprint;
 		WantsToggleSprint = false;
 		if ( IsSprinting )
 		{
@@ -123,6 +192,32 @@ public partial class PlayerPawn
 		if ( !IsSliding ) return;
 		IsSliding = false;
 		_slideCooldown = SlideCooldown;
+		_slideEnded = 0;
+	}
+
+	/// <summary>
+	/// For a toggled sprint: whether to pick up the sprint a slide stopped, now that it's ended and you can sprint again.
+	/// Run pressed during the slide asks for it too (or takes it back). Gives up once the window's gone (you stayed
+	/// crouched).
+	/// </summary>
+	private bool ResumeSprintAfterSlide()
+	{
+		if ( IsSliding )
+		{
+			if ( Input.Pressed( "Run" ) ) _resumeSprintAfterSlide = !_resumeSprintAfterSlide;
+			return false;
+		}
+
+		if ( !_resumeSprintAfterSlide ) return false;
+		if ( _slideEnded > SlideSprintResumeWindow )
+		{
+			_resumeSprintAfterSlide = false;
+			return false;
+		}
+		if ( !CanSprint ) return false;
+
+		_resumeSprintAfterSlide = false;
+		return true;
 	}
 
 	/// <summary>

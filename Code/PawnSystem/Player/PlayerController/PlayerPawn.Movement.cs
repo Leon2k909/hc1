@@ -341,6 +341,12 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 				WantsToggleSprint = !WantsToggleSprint;
 			}
 
+			// A toggled sprint a slide stopped picks up again as you come out of it.
+			if ( ResumeSprintAfterSlide() )
+			{
+				WantsToggleSprint = true;
+			}
+
 			if ( !CanSprint )
 			{
 				WantsToggleSprint = false;
@@ -449,6 +455,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 
 		IsCrouching = Input.Down( "Duck" ) && !IsNoclipping;
 		if ( IsSliding ) IsCrouching = true;
+		if ( _slideCancelHeld ) IsCrouching = false;
 		IsUsing = Input.Down( "Use" );
 		
 		if ( Input.Pressed( "Scorestreak" ) )
@@ -569,6 +576,8 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	/// </summary>
 	private float StanceChangeRate( bool rising )
 	{
+		if ( IsSliding && !rising ) return SlideDropRate;
+
 		var tired = ((ProneFatigue - ProneFatigueFree) / (1f - ProneFatigueFree)).Clamp( 0f, 1f );
 		return 10f * (1f - tired * (rising ? ProneRiseSlowdown : ProneDropSlowdown));
 	}
