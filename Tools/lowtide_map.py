@@ -1081,12 +1081,83 @@ def landing( m, n0, n1, way ):
     for n in ( n0 + 10, n1 - 10 ):
         m.beam( ( e0 + 4, n, -8 ), ( e1, n, -48 ), ( 3.0, 3.0 ), "iron_black" )
     top = n1 if way > 0 else n0
-    foot = top + way * ( -BED_Z / 0.6 )
-    stairs( m, e0, e1, top, foot, 0.0, BED_Z, tread="lt_grating", riser="lt_steel", side="lt_steel", surface=METAL )
+    first, last_nosing, z_last = steel_stair( m, e0, e1, top, way, 0.0, BED_Z )
     back = n0 if way > 0 else n1
-    railing( m, ( e0 + 1, back ), ( e0 + 1, top ), 0.0, height=40.0, paint="iron_black", posts=40.0 )
+    railing( m, ( e0 + 1, back ), ( e0 + 1, first ), 0.0, height=40.0, paint="iron_black", posts=40.0 )
     railing( m, ( e0, back + way * -1 ), ( e1, back + way * -1 ), 0.0, height=40.0, paint="iron_black", posts=40.0 )
-    sloped_rail( m, ( e0 + 1, top, 0.0 ), ( e0 + 1, foot - way * 12, BED_Z ) )
+    # Its handrail on the stringer's top flange, 38 over the nosings.
+    sloped_rail( m, ( e0 + 1, first, 1.5 ), ( e0 + 1, last_nosing, z_last + 1.5 ), height=36.5 )
+
+
+def steel_stair( m, e0, e1, n_top, way, z_top, z_foot ):
+    """ An open steel stair along the Fleet's wall (at e1), from a landing's edge at n_top down to the mud, way 1
+    northwards or -1 southwards: two channel stringers and open grating treads, each with a steel nosing, every face
+    drawn, so it looks right from under the landing and behind it. The steps are stairs()'s (the first a tread at the
+    landing's level) at the 0.6 slope the bays have always had. Its collision is only the ramp along the nosings and
+    the stringers' depth under it, so there's headroom under its upper half. Returns the first and last nosings' n and
+    the last one's height. """
+    rise = z_top - z_foot
+    count = max( 1, int( math.ceil( rise / 7.4 ) ) )
+    step_z = rise / count
+    step_n = rise / 0.6 / count
+    slope = step_z / step_n
+
+    def at( u, z, e ):
+        return ( e, n_top + way * u, z )
+
+    def nosing( u ):
+        """ The line through the nosings (also the walking surface), at u along the stair from n_top. """
+        return z_top + step_z - slope * u
+
+    def face( paint, points, outward ):
+        normal = np.zeros( 3 )
+        pts = [ np.asarray( p, float ) for p in points ]
+        for k in range( 1, len( pts ) - 1 ):
+            normal += np.cross( pts[k] - pts[0], pts[k + 1] - pts[0] )
+        if np.dot( normal, outward ) < 0:
+            pts = pts[::-1]
+        m.polygon( paint, pts )
+
+    # The stringers: 10-inch channels (11.7 deep measured plumb at this slope), their top flange 1.5 over the nosings
+    # and level over the landing's tread, cut plumb against the landing and level on the mud. The wall's stringer
+    # shows no face against the wall.
+    over, depth = 1.5, 10.0 * math.sqrt( 1.0 + slope * slope )
+    under = depth - over
+    foot_z = z_foot - 3.0
+    heel = ( nosing( 0.0 ) - under - foot_z ) / slope
+    toe = max( count * step_n + 3.0, heel + 4.0 )
+    outline = [ ( 0.0, z_top + over ), ( step_n, z_top + over ), ( toe, nosing( toe ) + over ), ( toe, foot_z ),
+                ( heel, foot_z ), ( 0.0, nosing( 0.0 ) - under ) ]
+    centre_u = sum( u for u, _ in outline ) / len( outline )
+    centre_z = sum( z for _, z in outline ) / len( outline )
+    for ea, eb, against_wall in ( ( e0, e0 + 3.0, False ), ( e1 - 3.0, e1, True ) ):
+        face( "lt_steel", [ at( u, z, ea ) for u, z in outline ], np.array( ( -1.0, 0.0, 0.0 ) ) )
+        if not against_wall:
+            face( "lt_steel", [ at( u, z, eb ) for u, z in outline ], np.array( ( 1.0, 0.0, 0.0 ) ) )
+        for k in range( len( outline ) ):
+            ( ua, za ), ( ub, zb ) = outline[k], outline[( k + 1 ) % len( outline )]
+            mid_u, mid_z = ( ua + ub ) / 2 - centre_u, ( za + zb ) / 2 - centre_z
+            face( "lt_steel", [ at( ua, za, ea ), at( ub, zb, ea ), at( ub, zb, eb ), at( ua, za, eb ) ],
+                  np.array( ( 0.0, way * mid_u, mid_z ) ) )
+
+    # The treads: 1.25 bar grating between the stringers, each reaching an inch back under the one above, with a
+    # steel nosing bar along its front. Open risers.
+    ta, tb, thick, bar = e0 + 3.0, e1 - 3.0, 1.25, 1.5
+    for k in range( count ):
+        top = z_top - step_z * k
+        front = ( k + 1 ) * step_n
+        back = k * step_n - ( 1.0 if k else 0.0 )
+        for u0, u1, paint in ( ( back, front - bar, "lt_grating" ), ( front - bar, front, "lt_steel" ) ):
+            na, nb = n_top + way * u0, n_top + way * u1
+            m.box( ( ta, min( na, nb ), top - thick ), ( tb, max( na, nb ), top ),
+                   { "+z": paint, "-z": paint, "default": "lt_steel", "+e": None, "-e": None } )
+
+    # Collision: the ramp, from the landing's tread down the nosings to the mud, about as deep as the stringers.
+    end = ( count + 1 ) * step_n
+    profile = [ ( 0.0, z_top ), ( step_n, z_top ), ( end, z_foot ), ( end, z_foot - 4.0 ),
+                ( 0.0, nosing( 0.0 ) - under ) ]
+    m.hull( [ at( u, z, e ) for e in ( e0, e1 ) for u, z in profile ], METAL )
+    return n_top + way * step_n, n_top + way * count * step_n, z_foot + step_z
 
 
 def turret( m, style, centre, z0, z1, radius=46.0, sides=14 ):

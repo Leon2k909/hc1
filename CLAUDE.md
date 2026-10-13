@@ -3499,6 +3499,16 @@ simulate_input.
       seen in-game.
   - Six stairs go down into the Fleet: one from each warehouse ground bay, and a public one from each quay. Iron
     ladders on its walls are dressing only.
+  - Those stairs are open steel stairs (`steel_stair`, 2026-10-13; the user's screenshot from the Fleet's bed: "issue
+    behind stairs on lowtide").
+    - They were boxes with no back or bottom faces, so from behind or below only the treads' tops showed, floating.
+      Their hull was solid down to the mud, an invisible wall behind and under them.
+    - Now each has two channel stringers from the landing to the mud, and grating treads with steel nosings. Every
+      face is drawn, and the handrail runs on the outer stringer.
+    - The collision is only the ramp under the nosings, so you can walk under a stair.
+    - Only `lowtide_east` and `lowtide_west` were rebuilt: only the stairs' grating, steel and rails changed. The spot,
+      reach and Retakes sight checks passed. Checked in offline renders of the OBJ from behind, below and the side,
+      not yet seen in-game.
   - Mooring rings (2026-10-13, the user: "what is this trash on lowtide", of a black T on the Fleet's wall). Each was
     two black boxes, every 230 along both walls. Now it's a ring as on Hamburg's Fleet walls (`mooring_ring`,
     `MOORING_RINGS`):
