@@ -77,6 +77,9 @@ public static class Hc1ViewModelClothingQa
 				uniform.Pieces = source.Pieces.ToList();
 				uniform.FieldPieces = source.FieldPieces.ToList();
 				uniform.TacticalPieces = source.TacticalPieces.ToList();
+				// By reflection, so this tool doesn't depend on the property being in the loaded game code.
+				if ( typeof( MilitaryUniform ).GetProperty( "MilitiaPieces" ) is { } militia )
+					militia.SetValue( uniform, ((System.Collections.Generic.List<Clothing>)militia.GetValue( source )).ToList() );
 			}
 
 			root.Enabled = true;

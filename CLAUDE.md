@@ -1631,9 +1631,10 @@
   colour.
 
 ## Operator outfits (`OperatorOutfits`, `MilitaryUniform`, the Operators page)
-- Each team has two outfits. Blue Team: the Military Operator (the army kit it always wore) and the Tactical Operator,
-  which the user asked for on 2026-10-05 ("we only have british military operator one"). Red Team: the Field Operator
-  and the Desert Operator, asked for next ("add another red team outfit too").
+- Blue Team has two outfits: the Military Operator (the army kit it always wore) and the Tactical Operator, which the
+  user asked for on 2026-10-05 ("we only have british military operator one"). Red Team has three: the Field Operator
+  and the Desert Operator, asked for next ("add another red team outfit too"), and the Militia Fighter (2026-10-13,
+  "we only have british army ones atm").
 - The Tactical Operator (`MilitaryUniformStyle.Tactical`) is a counter-terror team's dark kit: the same army garments
   dyed by `MilitaryUniform.TacticalTint`, plus the engine's balaclava under the helmet. A black helmet and plate carrier,
   dark grey camouflage, and black boots and fingerless gloves.
@@ -1650,6 +1651,16 @@
   `FieldPieces`) dyed by `MilitaryUniform.DesertTint`, worked out the same way: brown camouflage (65,50,36 on the
   sleeves), a tan helmet (66,56,43) and vest (76,62,45) and brown boots (70,55,40). Its gloves stay the brown leather
   they are. Every dye is at most 1, since a tint over 1 brightens and may not hold.
+- The Militia Fighter (`MilitaryUniformStyle.Militia`) is the one outfit that isn't army kit: s&box's citizen clothing
+  in its own colours (`MilitiaClothingPaths` / `MilitiaPieces`). A green beanie, a bandana over the face, a flannel
+  shirt, a black tactical vest, brown cargo trousers, black boots and fingerless gloves, with no tints.
+  - The citizen vest's back patch reads POLICE. `Tools/militia_vest.py` copies its material with the lettering filled
+    from the patch round it (`materials/operators/militia_vest.vmat`), and `MilitaryUniform.Refresh` gives that
+    style's vest it (`MilitiaVestMaterial`). s&box ships the vest's colour map only compiled, so the script takes it as
+    read out from the editor (its docstring has the snippet).
+  - It has no portrait yet, so its card shows the Field Operator's.
+  - Checked in offscreen renders of the body on 2026-10-13, the patch blank on the model. Not yet seen in first person
+    (its sleeves and gloves through `ViewModelClothing`), on the Operators page or in a match.
 - Who wears what:
   - A player wears the outfit they equipped for their team: EQUIP over the 3D preview on the Operators page (cookie
     `hc1.operator.<Team>`), else the team's first in `OperatorOutfits.All`. Their client sends its picks to the host

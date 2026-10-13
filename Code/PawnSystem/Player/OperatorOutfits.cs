@@ -6,7 +6,8 @@ public sealed record OperatorOutfit( string Id, string Name, Team Team, string D
 {
 	/// <summary>
 	/// The outfit's picture. The Tactical and Desert Operators' are drawn by Tools/operator_portraits.py and couldn't be
-	/// committed from where they were made, so until they're there the card shows its team's first outfit's.
+	/// committed from where they were made, and the Militia Fighter has none yet, so until they're there the card shows
+	/// its team's first outfit's.
 	/// </summary>
 	public string Portrait
 	{
@@ -38,7 +39,10 @@ public static class OperatorOutfits
 			MilitaryUniform.HumanModelPath, MilitaryUniformStyle.Field ),
 		new( "desert", "Desert Operator", Team.Terrorist,
 			"Brown camouflage fatigues, tan tactical vest, combat helmet, gloves and boots.",
-			MilitaryUniform.HumanModelPath, MilitaryUniformStyle.Desert )
+			MilitaryUniform.HumanModelPath, MilitaryUniformStyle.Desert ),
+		new( "militia", "Militia Fighter", Team.Terrorist,
+			"Flannel shirt, black chest rig, cargo trousers, beanie, bandana mask, gloves and boots.",
+			MilitaryUniform.HumanModelPath, MilitaryUniformStyle.Militia )
 	};
 
 	private const string EquippedCookie = "hc1.operator.";

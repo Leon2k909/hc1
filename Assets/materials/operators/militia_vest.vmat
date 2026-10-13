@@ -1,0 +1,14 @@
+// Tools/militia_vest.py: s&box's tactical vest (models/citizen_clothes/vest/tactical_vest) with a blank back patch.
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.00"
+    TextureColor "materials/operators/militia_vest_color.png"
+    TextureNormal "materials/operators/militia_vest_normal.png"
+    TextureRoughness "materials/operators/militia_vest_rough.png"
+    TextureAmbientOcclusion "materials/operators/militia_vest_ao.png"
+    g_vColorTint "[1.0 1.0 1.0 1.0]"
+    g_flModelTintAmount "1.0"
+}

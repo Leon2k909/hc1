@@ -1,7 +1,7 @@
 namespace Facepunch;
 
 /// <summary>Which outfit a soldier wears (<see cref="OperatorOutfits"/>). Saved in prefabs by number: add new ones last.</summary>
-public enum MilitaryUniformStyle { Standard, Field, Tactical, Desert }
+public enum MilitaryUniformStyle { Standard, Field, Tactical, Desert, Militia }
 
 /// <summary>Team military uniforms using the realistic human clothing variants.</summary>
 public sealed class MilitaryUniform : Component
@@ -25,10 +25,27 @@ public sealed class MilitaryUniform : Component
 	/// </summary>
 	public static readonly string[] TacticalClothingPaths = FieldClothingPaths.Append(
 		"models/citizen_clothes/hat/balaclava/balaclava.clothing" ).ToArray();
+	/// <summary>
+	/// An irregular fighter's kit, the one outfit not made from the army garments: a flannel shirt under a black chest rig,
+	/// brown cargo trousers, black boots, fingerless gloves, a green beanie and a bandana over the face. They keep their
+	/// own colours.
+	/// </summary>
+	public static readonly string[] MilitiaClothingPaths =
+	{
+		"models/citizen_clothes/hat/beanie/beanie_green.clothing",
+		"models/citizen_clothes/hat/bandana_mask/bandana_mask.clothing",
+		"models/citizen_clothes/shirt/flannel_shirt/flannel_shirt.clothing",
+		"models/citizen_clothes/vest/tactical_vest/models/tactical_vest.clothing",
+		"models/citizen_clothes/trousers/cargopants/brown_cargo_pants.clothing",
+		"models/citizen_clothes/shoes/boots/black_boots.clothing",
+		"models/citizen_clothes/gloves/fingerless_gloves/fingerless_gloves.clothing"
+	};
+	public const string MilitiaVestMaterial = "materials/operators/militia_vest.vmat";
 	[Property] public MilitaryUniformStyle Style { get; set; }
 	[Property] public List<Clothing> Pieces { get; set; } = new();
 	[Property] public List<Clothing> FieldPieces { get; set; } = new();
 	[Property] public List<Clothing> TacticalPieces { get; set; } = new();
+	[Property] public List<Clothing> MilitiaPieces { get; set; } = new();
 	private Model dressedModel;
 	private MilitaryUniformStyle dressedStyle;
 	private bool dressed;
@@ -86,12 +103,14 @@ public sealed class MilitaryUniform : Component
 		{
 			MilitaryUniformStyle.Field or MilitaryUniformStyle.Desert => FieldClothingPaths,
 			MilitaryUniformStyle.Tactical => TacticalClothingPaths,
+			MilitaryUniformStyle.Militia => MilitiaClothingPaths,
 			_ => ClothingPaths
 		};
 		var assigned = Style switch
 		{
 			MilitaryUniformStyle.Field or MilitaryUniformStyle.Desert => FieldPieces,
 			MilitaryUniformStyle.Tactical => TacticalPieces,
+			MilitaryUniformStyle.Militia => MilitiaPieces,
 			_ => Pieces
 		};
 		var pieces = assigned.Count > 0 ? assigned : paths.Select( ResourceLibrary.Get<Clothing> ).ToList();
@@ -119,6 +138,11 @@ public sealed class MilitaryUniform : Component
 			else if ( Style == MilitaryUniformStyle.Desert )
 			{
 				garment.Tint = DesertTint( garment.Model?.Name ?? "" );
+			}
+			else if ( Style == MilitaryUniformStyle.Militia && (garment.Model?.Name ?? "").Contains( "tactical_vest" ) )
+			{
+				// s&box's citizen vest reads POLICE across the back: Tools/militia_vest.py's copy leaves its patch blank.
+				garment.MaterialOverride = Material.Load( MilitiaVestMaterial );
 			}
 		}
 		dressed = true;

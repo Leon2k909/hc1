@@ -128,6 +128,7 @@ public sealed class ViewModelClothing : Component, ICameraSetup
 		uniform.Pieces = from.Pieces.ToList();
 		uniform.FieldPieces = from.FieldPieces.ToList();
 		uniform.TacticalPieces = from.TacticalPieces.ToList();
+		uniform.MilitiaPieces = from.MilitiaPieces.ToList();
 		uniform.Refresh();
 
 		foreach ( var name in HiddenParts )
