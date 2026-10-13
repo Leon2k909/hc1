@@ -1,0 +1,29 @@
+{
+  "mode": "built-in image_gen",
+  "purpose": "Lowtide blue, red and grey container finishes",
+  "albedo_handling": "Original generated images preserved in Tools; material albedos resampled to 2048x2048 for native power-of-two texture baking, without recolouring.",
+  "tile_inches": 48,
+  "assets": [
+    {
+      "colour": "blue",
+      "original_generated_path": "C:/Users/leon2/.codex/generated_images/01a1324c-7c63-74f3-8610-87760f6a994e/exec-4b2083ad-5298-48af-8453-2c4a71876f94.png",
+      "source_asset": "Tools/lowtide_container_blue_source.png",
+      "material_albedo": "Assets/materials/lowtide/containers/lt_container_blue_color.png",
+      "prompt": "Use case: photorealistic-natural\nAsset type: square seamless PBR BASE COLOUR image for an aged blue shipping container in a British dock game.\nSubject: A flat 1.22 metre square patch of industrial painted steel, not the container object. Convincing medium deep dock blue enamel, lightly faded towards desaturated navy-blue. 93 percent still intact paint. Crisp small edge-chipped scrapes exposing charcoal steel and tiny dark orange-brown rust pits, a few thin intersecting scratches, very faint dusty salt streaks and extremely subtle uneven fading. Natural irregular wear of several scales; small patches rather than dense pepper noise. Restrained neutral realism, clear high-frequency detail, a readable confident BLUE paint colour.\nComposition: edge-to-edge orthographic texture scan, straight on. Uniform diffuse shadow-free neutral lighting. Truly seamless left/right and top/bottom. No highlights, no directional shading, no vignetting. Opaque square, aim for 2048x2048.\nConstraints: This is ONLY albedo for a flat surface. Corrugations will come from a separate normal map: do not draw ribs, bands, metal sheets, seams, joints, bolts or hardware. No lighting gradients, no obvious repeated pattern, no blurry cloud mottling, no giant scratches, no white salt blooms, no large rust areas. No writing, labels, logos, watermark, borders or surrounding scene."
+    },
+    {
+      "colour": "red",
+      "original_generated_path": "C:/Users/leon2/.codex/generated_images/01a1324c-7c63-74f3-8610-87760f6a994e/exec-4b198b1d-75b7-4086-bb22-fb5cb7f57904.png",
+      "source_asset": "Tools/lowtide_container_red_source.png",
+      "material_albedo": "Assets/materials/lowtide/containers/lt_container_red_color.png",
+      "prompt": "Use case: photorealistic-natural\nAsset type: seamless square production PBR BASE COLOUR texture for a faded oxide-red steel shipping container in a British dock game.\nSubject: Flat 1.22 metre square painted steel surface. Deep muted oxblood / oxide red enamel, with lightly faded brick-red paint retaining 94 percent coverage. Small crisp irregular chipped edges exposing charcoal-grey steel and modest dark brown rusty pits, a few shallow thin worn scratches, sparse salt-spray speckling. Coherent red colour with very subtle irregular fading, minimal broad value variation. Excellent material detail without looking sandblasted or crusty. Naturally aged industrial container paint.\nComposition: edge-to-edge straight-on orthographic material scan, no scene. Flat diffuse neutral shadow-free lighting for albedo, no reflections or ambient occlusion. Seamless edges in both axes. Opaque square, aim for 2048x2048.\nConstraints: Only surface colour. A separate normal map provides the corrugated shape; no drawn ribs, stripes, panels, seams, bolts, welds or hardware. No regular streaks, no blurred bands, no large cloudy patches or giant scars, no bright orange rust, no white salt bloom, no central focal mark. No labels, writing, logos or watermark."
+    },
+    {
+      "colour": "grey",
+      "original_generated_path": "C:/Users/leon2/.codex/generated_images/01a1324c-7c63-74f3-8610-87760f6a994e/exec-73814e63-1c08-4983-8193-5bf7c87ae3d7.png",
+      "source_asset": "Tools/lowtide_container_grey_source.png",
+      "material_albedo": "Assets/materials/lowtide/containers/lt_container_grey_color.png",
+      "prompt": "Use case: photorealistic-natural\nAsset type: square seamless PBR BASE COLOUR texture for a light-grey painted steel shipping container in a British harbour game.\nSubject: A flat 1.22 metre square patch of aged pale warm-grey industrial enamel on steel. 94 percent intact grey paint. Cohesive neutral grey with restrained pale stone-grey fading. Crisp small irregular paint chips revealing darker charcoal grey metal, a few tiny dark brown rust spots, thin shallow hairline scratches, faint dusty vertical rain traces and fine grain. Slight weathering from salt air. Believable scanned material with clear fine detail; clean overall colour readability instead of noisy blotches.\nComposition: continuous edge-to-edge orthographic texture scan, flat uniform diffuse neutral lighting with no shadows or specular highlights. Seamless left/right and top/bottom. Opaque square, aim for 2048x2048.\nConstraints: Only surface colour, no object render or surroundings. A separate normal map supplies corrugation, so do not draw corrugated ribs, stripes, bands, metal sheets, seams, bolts, rivets or hardware. No strong vertical striping, no large blurry clouds, no huge rust patches, no white crust, no dramatic scratches, no vignetting. No text, marks, labels, logos, borders or watermark."
+    }
+  ]
+}
