@@ -20,13 +20,21 @@
     </div>
 
     <label class="wc-label">@Tr( "COMPARE WITH" )</label>
+    <div class="wc-filters">
+        <div class="wc-filter @(Filter is null ? "on" : "")" onclick=@(() => SetFilter( null ))><label>@Tr( "ALL" )</label></div>
+        @foreach ( var category in Categories )
+        {
+            var c = category;
+            <div class="wc-filter @(Filter == c ? "on" : "")" onclick=@(() => SetFilter( c ))><label>@Tr( CategoryLabel( c ) )</label></div>
+        }
+    </div>
     <div class="wc-chips">
         <div class="wc-chip @(Other is null && !VsFactory ? "on" : "")" onclick=@(() => Pick( null ))><label>@Tr( "NONE" )</label></div>
         @if ( !Factory )
         {
             <div class="wc-chip factory @(VsFactory ? "on" : "")" onclick=@PickFactory><label>@Tr( "FACTORY" )</label></div>
         }
-        @foreach ( var weapon in Candidates )
+        @foreach ( var weapon in Candidates.Where( x => Filter is null || x.Category == Filter ) )
         {
             <div class="wc-chip @(weapon == Other ? "on" : "")" onclick=@(() => Pick( weapon ))><label>@weapon.Name.ToUpperInvariant()</label></div>
         }
@@ -108,6 +116,9 @@
     /// <summary> The last weapon compared with, so reopening the panel keeps it. </summary>
     private static string _lastOtherPath;
 
+    /// <summary> The kind of gun the COMPARE WITH list shows; null for all of them. </summary>
+    private WeaponCategory? Filter { get; set; }
+
     private GunsmithStats _mine = new();
     private GunsmithStats _theirs = new();
     private EquipmentResource _statsFor;
@@ -129,6 +140,29 @@
         .OrderBy( x => x.Slot ).ThenBy( x => x.Category ).ThenBy( x => x.Name )
         .ToList();
 
+    /// <summary> The filter chips: each kind of gun the list has, primaries first. </summary>
+    private List<WeaponCategory> Categories => _categories ??= Candidates.Select( x => x.Category ).Distinct().ToList();
+    private List<WeaponCategory> _categories;
+
+    private static string CategoryLabel( WeaponCategory category ) => category switch
+    {
+        WeaponCategory.AssaultRifle => "ASSAULT RIFLES",
+        WeaponCategory.SMG => "SMGS",
+        WeaponCategory.LMG => "LMGS",
+        WeaponCategory.Sniper => "SNIPER RIFLES",
+        WeaponCategory.Marksman => "MARKSMAN RIFLES",
+        WeaponCategory.Shotgun => "SHOTGUNS",
+        WeaponCategory.Pistol => "PISTOLS",
+        WeaponCategory.Launcher => "LAUNCHERS",
+        _ => category.ToString().ToUpperInvariant(),
+    };
+
+    private void SetFilter( WeaponCategory? category )
+    {
+        Filter = category;
+        StateHasChanged();
+    }
+
     public override void Tick()
     {
         base.Tick();
@@ -146,6 +180,8 @@
             _statsFor = Weapon;
             VsFactory = false;
             Other = PickDefault();
+            // The list opens on the compared gun's kind (else this one's), so its chip is in view.
+            Filter = (Other ?? Weapon)?.Category;
             _sinceStats = 10f;
         }
 
@@ -297,5 +333,5 @@
 
     private static string SpeedText( float unitsPerSecond ) => $"{unitsPerSecond * MetersPerUnit:0.00} M/S";
 
-    protected override int BuildHash() => HashCode.Combine( Weapon, Other, Factory, VsFactory, Live, _mine, _theirs );
+    protected override int BuildHash() => HashCode.Combine( Weapon, Other, Factory, VsFactory, Live, Filter, _mine, _theirs );
 }

@@ -64,6 +64,42 @@ WeaponComparePanel
         margin-bottom: 6px;
     }
 
+    // The kinds of gun, which narrow the weapon chips under them: the gunsmith picker's category chips.
+    .wc-filters
+    {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 8px;
+    }
+
+    .wc-filter
+    {
+        height: 28px;
+        padding: 0 12px;
+        align-items: center;
+        border: 1px solid rgba( 255, 255, 255, 0.14 );
+        background-color: rgba( 255, 255, 255, 0.03 );
+        cursor: pointer;
+
+        label { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; color: $text-mid; }
+
+        &:hover
+        {
+            border-color: rgba( 255, 255, 255, 0.35 );
+
+            label { color: white; }
+        }
+
+        &.on
+        {
+            background-color: $accent;
+            border-color: $accent;
+
+            label { color: $accent-ink; }
+        }
+    }
+
     .wc-chips
     {
         flex-direction: row;
