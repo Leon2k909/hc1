@@ -58,7 +58,7 @@
         @if ( BuildsTab )
         {
             @* Every gun's saved builds, this one's too, so two builds of the same gun can go side by side. *@
-            <div class="wc-chip build @(Other == Weapon && OtherBuild is null ? "on" : "")" onclick=@PickCurrent>
+            <div class="wc-chip build @(Other == Weapon && OtherBuild is null ? "on" : "")" onclick=@(() => PickCurrent( Weapon ))>
                 <label class="wc-chip-build">@Tr( "CURRENT BUILD" )</label>
                 <label class="wc-chip-gun">@Weapon?.Name.ToUpperInvariant()</label>
             </div>
@@ -73,12 +73,42 @@
         }
         else
         {
+            @* A gun's chip says how many saved builds it has; picking it lists them below. *@
             @foreach ( var weapon in Candidates.Where( x => Filter is null || x.Category == Filter ) )
             {
-                <div class="wc-chip @(weapon == Other && weapon != Weapon && OtherBuild is null ? "on" : "")" onclick=@(() => Pick( weapon ))><label>@weapon.Name.ToUpperInvariant()</label></div>
+                var w = weapon;
+                var count = BuildCount( w );
+                <div class="wc-chip gun @(w == Other && !VsFactory ? "on" : "")" onclick=@(() => Pick( w ))>
+                    <label>@w.Name.ToUpperInvariant()</label>
+                    @if ( count > 0 )
+                    {
+                        <label class="wc-chip-count">@count</label>
+                    }
+                </div>
             }
         }
     </div>
+
+    @* The compared gun's builds: the one on it in the active class, then its saved ones. *@
+    @if ( !BuildsTab && !VsFactory && Other is not null )
+    {
+        <div class="wc-builds-head">
+            <label class="wc-label">@Tr( "BUILDS" )</label>
+            <label class="wc-builds-gun">@Other.Name.ToUpperInvariant()</label>
+        </div>
+        <div class="wc-chips">
+            <div class="wc-chip @(OtherBuild is null ? "on" : "")" onclick=@(() => PickCurrent( Other ))><label>@Tr( "CURRENT BUILD" )</label></div>
+            @foreach ( var build in _builds.Where( x => x.Weapon == Other ) )
+            {
+                var b = build;
+                <div class="wc-chip @(b == OtherBuild ? "on" : "")" onclick=@(() => PickBuild( b ))><label>@b.Name</label></div>
+            }
+        </div>
+        @if ( BuildCount( Other ) == 0 )
+        {
+            <label class="wc-builds-hint">@Tr( "No builds saved for this weapon yet." )</label>
+        }
+    }
 
     @if ( VsFactory )
     {
@@ -269,8 +299,11 @@
     /// </summary>
     private string BuildLine( Build build ) =>
         build is not null ? build.Name
-        : MyBuild is not null || OtherBuild is not null || Other == Weapon ? Tr( "CURRENT BUILD" )
+        : MyBuild is not null || OtherBuild is not null || Other == Weapon
+            || _builds.Any( x => x.Weapon == Weapon || x.Weapon == Other ) ? Tr( "CURRENT BUILD" )
         : null;
+
+    private int BuildCount( EquipmentResource weapon ) => _builds.Count( x => x.Weapon == weapon );
 
     public override void Tick()
     {
@@ -292,9 +325,9 @@
             OtherBuild = null;
             RefreshBuilds();
             (Other, OtherBuild) = PickDefault();
-            // The list opens on the compared build, or the compared gun's kind (else this one's), so its chip is in view.
-            BuildsTab = OtherBuild is not null;
-            Filter = BuildsTab ? null : (Other ?? Weapon)?.Category;
+            // The list opens on the compared gun's kind (else this one's), so its chip and its builds are in view.
+            BuildsTab = false;
+            Filter = (Other ?? Weapon)?.Category;
             _sinceStats = 10f;
         }
 
@@ -329,11 +362,16 @@
             ?? others.FirstOrDefault( x => x.Slot == Weapon?.Slot ), null);
     }
 
+    /// <summary>
+    /// The right column: <paramref name="weapon"/>'s build in the active class, whose saved builds then show below. This
+    /// weapon starts on one of its saved builds other than the left column's, since its current build beside itself
+    /// would show nothing.
+    /// </summary>
     private void Pick( EquipmentResource weapon )
     {
         VsFactory = false;
-        Other = weapon == Weapon ? null : weapon;
-        OtherBuild = null;
+        Other = weapon;
+        OtherBuild = weapon is not null && weapon == Weapon ? MyBuilds.FirstOrDefault( x => x != MyBuild ) : null;
         Remember();
         _sinceStats = 10f;
         StateHasChanged();
@@ -350,11 +388,11 @@
         StateHasChanged();
     }
 
-    /// <summary> The right column: this weapon's build in the active class, to set beside one of its saved builds. </summary>
-    private void PickCurrent()
+    /// <summary> The right column: <paramref name="weapon"/>'s build in the active class, not one of its saved builds. </summary>
+    private void PickCurrent( EquipmentResource weapon )
     {
         VsFactory = false;
-        Other = Weapon;
+        Other = weapon;
         OtherBuild = null;
         Remember();
         _sinceStats = 10f;

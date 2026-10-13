@@ -145,7 +145,41 @@ WeaponComparePanel
             .wc-chip-build { font-size: 12px; font-weight: 700; letter-spacing: 1px; color: rgba( 255, 255, 255, 0.85 ); }
             .wc-chip-gun { font-size: 10px; font-weight: 600; letter-spacing: 1px; color: $text-dim; margin-top: 2px; }
         }
+
+        // A gun, with how many saved builds it has.
+        &.gun
+        {
+            flex-direction: row;
+            align-items: center;
+
+            .wc-chip-count
+            {
+                flex-shrink: 0;
+                white-space: nowrap;
+                margin-left: 6px;
+                padding: 0 5px;
+                font-size: 10px;
+                font-weight: 700;
+                letter-spacing: 0;
+                color: $text-mid;
+                background-color: rgba( 255, 255, 255, 0.1 );
+            }
+
+            &.on .wc-chip-count { color: white; background-color: rgba( 90, 180, 255, 0.35 ); }
+        }
     }
+
+    // Over the compared gun's builds: BUILDS and the gun's name.
+    .wc-builds-head
+    {
+        flex-direction: row;
+        align-items: baseline;
+        gap: 8px;
+
+        .wc-builds-gun { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: $theirs; }
+    }
+
+    .wc-builds-hint { font-size: 12px; color: $text-dim; margin: -8px 0 12px 0; }
 
     .wc-table
     {

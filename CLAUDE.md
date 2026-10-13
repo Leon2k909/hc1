@@ -2097,6 +2097,10 @@
     (2026-10-13, the user: "if i have 2 ak 74us, i wanna be able to compare them too").
     - Over the left column, YOUR BUILD chips: CURRENT BUILD and this gun's builds.
     - COMPARE WITH has a SAVED BUILDS tab after the categories: every gun's builds, and this gun's CURRENT BUILD.
+    - Any gun's builds from its chip (2026-10-13, the user: "i need to be able to compare other guns builds for other
+      weapons"). Each gun chip shows how many saved builds it has. Picking a gun lists a BUILDS row under the chips:
+      CURRENT BUILD (that gun in the active class) and its saved builds. Picking your own gun starts on one of its
+      other saved builds. The list opens on the compared gun's kind.
     - A build's figures come from `GunsmithStats.Compute( resource, buildCode )`, through
       `GunsmithLoadoutManager.TryReadWithBuild`, with any part the player hasn't unlocked left off.
     - Picks are kept by the build's Id, so renaming one keeps it picked. The column heads show each build's name under
