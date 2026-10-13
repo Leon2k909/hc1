@@ -24,9 +24,9 @@
         </div>
 
         <div class="squad-member">
-            @if ( Progression.GetPrestige() > 0 )
+            @if ( Progression.GetPrestigeEmblem() > 0 )
             {
-                <img class="squad-emblem" src="/ui/prestige/prestige_@(Progression.GetPrestige())_readable.png" />
+                <img class="squad-emblem" src="/ui/prestige/prestige_@(Progression.GetPrestigeEmblem())_readable.png" />
             }
             else
             {
@@ -427,7 +427,7 @@
         h.Add( DailyChallenges.Today );
         h.Add( ResetIn );
         h.Add( Progression.GetXP() );
-        h.Add( Progression.GetPrestige() );
+        h.Add( Progression.GetPrestigeEmblem() );
         h.Add( LocalName );
         h.Add( InParty );
         h.Add( _leaderIsMe );

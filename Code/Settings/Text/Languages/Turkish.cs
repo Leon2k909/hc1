@@ -463,6 +463,7 @@ public static partial class GameText
 		["SERVICE MILESTONES"] = "Hizmet kilometre taşları",
 		["Each prestige resets your player level and weapon attachment unlocks. You keep your camos. Reach Prestige 10 for Master Prestige status."] =
 			"Her prestij oyuncu seviyeni ve açtığın silah eklentilerini sıfırlar. Kamuflajların sende kalır. Usta Prestij statüsü için Prestij 10'a ulaş.",
+		["Pick any prestige you've reached to show its emblem."] = "Amblemini göstermek için ulaştığın herhangi bir prestiji seç.",
 		["REACHED"] = "Ulaşıldı",
 		["WEAPON RECORD"] = "Silah kaydı",
 		["ALL WEAPONS"] = "Tüm silahlar",

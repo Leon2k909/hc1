@@ -453,6 +453,7 @@ public static partial class GameText
 		["SERVICE MILESTONES"] = "服役里程碑",
 		["Each prestige resets your player level and weapon attachment unlocks. You keep your camos. Reach Prestige 10 for Master Prestige status."] =
 			"每次进入威望都会重置你的玩家等级和已解锁的武器配件。你的迷彩将会保留。达到威望10即可获得大师威望身份。",
+		["Pick any prestige you've reached to show its emblem."] = "选择任一已达成的威望，以显示其徽章。",
 		["REACHED"] = "已达成",
 		["WEAPON RECORD"] = "武器战绩",
 		["ALL WEAPONS"] = "所有武器",

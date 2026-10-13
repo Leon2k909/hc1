@@ -1176,6 +1176,7 @@ public static partial class GameText
 		["SERVICE MILESTONES"] = "Kamienie milowe służby",
 		["Each prestige resets your player level and weapon attachment unlocks. You keep your camos. Reach Prestige 10 for Master Prestige status."] =
 			"Każdy prestiż resetuje twój poziom gracza i odblokowane dodatki do broni. Kamuflaże zostają. Osiągnij prestiż 10, by zdobyć status mistrzowskiego prestiżu.",
+		["Pick any prestige you've reached to show its emblem."] = "Wybierz dowolny osiągnięty prestiż, aby pokazać jego emblemat.",
 		["REACHED"] = "Osiągnięto",
 		["WEAPON RECORD"] = "Statystyki broni",
 		["ALL WEAPONS"] = "Wszystkie bronie",

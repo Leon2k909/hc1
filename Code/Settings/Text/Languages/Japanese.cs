@@ -1168,6 +1168,7 @@ public static partial class GameText
 		["SERVICE MILESTONES"] = "軍歴マイルストーン",
 		["Each prestige resets your player level and weapon attachment unlocks. You keep your camos. Reach Prestige 10 for Master Prestige status."] =
 			"プレステージするたびに、プレイヤーレベルと武器アタッチメントのアンロックがリセットされます。迷彩はそのまま残ります。プレステージ10に到達すると、マスタープレステージになります。",
+		["Pick any prestige you've reached to show its emblem."] = "到達したプレステージを選ぶと、そのエンブレムが表示されます。",
 		["REACHED"] = "到達済み",
 		["WEAPON RECORD"] = "武器の戦績",
 		["ALL WEAPONS"] = "すべての武器",

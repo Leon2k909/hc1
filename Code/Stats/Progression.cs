@@ -8,10 +8,32 @@ public static class Progression
 	public const int MaxLevel = 55;
 	private const string XpCookie = "hc1.progress.xp";
 	private const string PrestigeCookie = "hc1.progress.prestige";
+	private const string EmblemCookie = "hc1.progress.prestige_emblem";
 	public static int GetPrestige()
 	{
 		if ( Game.SteamId == 76561198271608270ul ) return 10;
 		return Game.Cookies.Get( PrestigeCookie, 0 );
+	}
+
+	/// <summary>
+	/// The prestige emblem the player shows (the menus' header, the squad card, the scoreboard): the one they picked,
+	/// if they've reached it, else their highest. 0 = none.
+	/// </summary>
+	public static int GetPrestigeEmblem()
+	{
+		var reached = GetPrestige();
+		var picked = Game.Cookies.Get( EmblemCookie, 0 );
+		return picked >= 1 && picked <= reached ? picked : reached;
+	}
+
+	public static void SetPrestigeEmblem( int prestige )
+	{
+		if ( prestige < 1 || prestige > GetPrestige() ) return;
+		Game.Cookies.Set( EmblemCookie, prestige );
+
+		// Over a match, the scoreboard shows it too.
+		if ( Client.Local.IsValid() )
+			Client.Local.RpcUpdatePrestige( prestige );
 	}
 
 	public static void EnterPrestigeMode()
@@ -24,6 +46,8 @@ public static class Progression
 
 		Game.Cookies.Set( PrestigeCookie, prestige + 1 );
 		Game.Cookies.Set( XpCookie, 0 );
+		// The new prestige's emblem shows until another is picked.
+		Game.Cookies.Set( EmblemCookie, 0 );
 
 		// Reset all weapon XP (attachment unlocks reset)
 		var weapons = ResourceLibrary.GetAll<EquipmentResource>();

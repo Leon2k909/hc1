@@ -387,6 +387,7 @@ public static partial class GameText
 			"Jedes Prestige setzt deine Spielerstufe und die freigeschalteten Waffenaufsätze zurück. Deine Tarnungen behältst du. Erreiche Prestige 10 für den Status Meister-Prestige.",
 			"Cada prestigio restablece tu nivel de jugador y los accesorios de armas desbloqueados. Conservas tus camuflajes. Alcanza el Prestigio 10 para obtener el estatus de Prestigio maestro.",
 			"Cada prestígio redefine seu nível de jogador e os acessórios de armas desbloqueados. Você mantém suas camuflagens. Alcance o Prestígio 10 para obter o status de Prestígio Mestre." ),
+		["Pick any prestige you've reached to show its emblem."] = ("Choisissez un prestige atteint pour afficher son emblème.", "Wähle ein erreichtes Prestige, um sein Emblem zu zeigen.", "Elige cualquier prestigio alcanzado para mostrar su emblema.", "Escolha qualquer prestígio alcançado para exibir seu emblema."),
 		["REACHED"] = ("Atteint", "Erreicht", "Alcanzado", "Alcançado"),
 		["WEAPON RECORD"] = ("Bilan des armes", "Waffenbilanz", "Historial de armas", "Histórico de armas"),
 		["ALL WEAPONS"] = ("Toutes les armes", "Alle Waffen", "Todas las armas", "Todas as armas"),

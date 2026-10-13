@@ -1167,6 +1167,7 @@ public static partial class GameText
 		["SERVICE MILESTONES"] = "복무 이정표",
 		["Each prestige resets your player level and weapon attachment unlocks. You keep your camos. Reach Prestige 10 for Master Prestige status."] =
 			"프레스티지할 때마다 플레이어 레벨과 무기 부착물 잠금 해제가 초기화됩니다. 위장은 유지됩니다. 프레스티지 10에 도달하면 마스터 프레스티지가 됩니다.",
+		["Pick any prestige you've reached to show its emblem."] = "달성한 프레스티지를 골라 그 엠블럼을 표시하세요.",
 		["REACHED"] = "달성",
 		["WEAPON RECORD"] = "무기 기록",
 		["ALL WEAPONS"] = "모든 무기",

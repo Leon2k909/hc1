@@ -1181,6 +1181,7 @@ public static partial class GameText
 		["SERVICE MILESTONES"] = "Traguardi di servizio",
 		["Each prestige resets your player level and weapon attachment unlocks. You keep your camos. Reach Prestige 10 for Master Prestige status."] =
 			"Ogni prestigio azzera il tuo livello giocatore e gli accessori sbloccati per le armi. Le mimetiche restano. Raggiungi il Prestigio 10 per ottenere lo status di Prestigio Maestro.",
+		["Pick any prestige you've reached to show its emblem."] = "Scegli un prestigio raggiunto per mostrarne l'emblema.",
 		["REACHED"] = "Raggiunto",
 		["WEAPON RECORD"] = "Registro armi",
 		["ALL WEAPONS"] = "Tutte le armi",

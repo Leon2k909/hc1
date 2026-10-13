@@ -54,9 +54,9 @@
             </div>
 
                 <div class="gnav-profile" @onclick=@(() => GoToMenu( "/barracks" ))>
-                @if ( Progression.GetPrestige() > 0 )
+                @if ( Progression.GetPrestigeEmblem() > 0 )
                 {
-                    <img class="gnav-prestige" src="/ui/prestige/prestige_@(Progression.GetPrestige())_readable.png" />
+                    <img class="gnav-prestige" src="/ui/prestige/prestige_@(Progression.GetPrestigeEmblem())_readable.png" />
                 }
                 <div class="gnav-profile-info">
                     <label class="gnav-profile-name">@LocalName</label>
@@ -2520,7 +2520,7 @@
         hash.Add( IsAttachmentDrawerOpen ? BrowserRef.SelectedPoint : null );
         hash.Add( IsAttachmentDrawerOpen && BrowserRef.IsTuning );
         hash.Add( Progression.GetLevel() );
-        hash.Add( Progression.GetPrestige() );
+        hash.Add( Progression.GetPrestigeEmblem() );
         hash.Add( LocalName );
         return hash.ToHashCode();
     }

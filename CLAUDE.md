@@ -1981,6 +1981,16 @@
 - The emblems are `Assets/ui/ranked/<tier>.png`, drawn by `Tools/rank_emblems.py` (numpy + PIL): a metal shield in the
   tier colour, with more trim for each tier. Keep its colours in step with `Rank.TierColors`.
 
+## Prestige emblem (`Progression.GetPrestigeEmblem`)
+- The user asked to show any prestige they've reached, not just their highest (2026-10-13). On Career Record's SERVICE
+  MILESTONES, clicking a reached card picks it (EQUIPPED); a locked card does nothing.
+- The pick is the cookie `hc1.progress.prestige_emblem` (`Progression.SetPrestigeEmblem`). `GetPrestigeEmblem` returns it
+  while it's reached, else the highest prestige, and a new prestige clears it.
+- The emblem shows in the menus' header, the squad card, the gunsmith's header, the rank card and the scoreboard. Over
+  a match, a pick goes out at once (`Client.Local.RpcUpdatePrestige`). Unlocks and the rank label still go by
+  `GetPrestige()`.
+- Compiled with dotnet, not yet seen in-game.
+
 ## Gunsmith (`Code/Gunsmith/GunsmithPanel.razor`)
 - Laid out like the main menu, after the user's CoD-style mockup: MainMenuRoot's header, a breadcrumb bar, then
   LOADOUT (left), the gun in `.gs-stage` (centre) and BUILD / CUSTOMIZE (right). The header's styles are copied into

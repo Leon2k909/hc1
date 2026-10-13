@@ -120,9 +120,9 @@
             </div>
 
             <a class="gnav-profile" href="/barracks">
-                @if ( Progression.GetPrestige() > 0 )
+                @if ( Progression.GetPrestigeEmblem() > 0 )
                 {
-                    <img class="gnav-prestige" src="/ui/prestige/prestige_@(Progression.GetPrestige())_readable.png" />
+                    <img class="gnav-prestige" src="/ui/prestige/prestige_@(Progression.GetPrestigeEmblem())_readable.png" />
                 }
                 <div class="gnav-profile-info">
                     <label class="gnav-profile-name">@LocalName</label>
@@ -370,5 +370,5 @@
     }
 
     protected override int BuildHash()
-        => HashCode.Combine( ActiveRoute, LocalName, PlayerLevel, Progression.GetPrestige(), LocalSteamId, Input.UsingController, _openMenu );
+        => HashCode.Combine( ActiveRoute, LocalName, PlayerLevel, Progression.GetPrestigeEmblem(), LocalSteamId, Input.UsingController, _openMenu );
 }

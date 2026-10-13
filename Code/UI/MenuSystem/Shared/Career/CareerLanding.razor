@@ -28,7 +28,7 @@
                     <div class="rank-title">
                         @if ( Progression.GetPrestige() > 0 )
                         {
-                            <img class="rank-prestige" src="/ui/prestige/prestige_@(Progression.GetPrestige())_readable.png" />
+                            <img class="rank-prestige" src="/ui/prestige/prestige_@(Progression.GetPrestigeEmblem())_readable.png" />
                             <label>@Tr( "PRESTIGE {0}", Progression.GetPrestige() )</label>
                             <label class="rank-separator">/</label>
                         }
@@ -48,15 +48,21 @@
             <div class="milestone-heading">
                 <label class="section-title">@Tr( "SERVICE MILESTONES" )</label>
                 <label class="milestone-description">@Tr( "Each prestige resets your player level and weapon attachment unlocks. You keep your camos. Reach Prestige 10 for Master Prestige status." )</label>
+                @if ( Progression.GetPrestige() > 1 )
+                {
+                    <label class="milestone-description">@Tr( "Pick any prestige you've reached to show its emblem." )</label>
+                }
             </div>
             <div class="prestige-grid">
                 @for ( int i = 1; i <= 10; i++ )
                 {
-                    var isUnlocked = Progression.GetPrestige() >= i;
-                    <div class="prestige-card @(isUnlocked ? "unlocked" : "locked")">
-                        <img src="/ui/prestige/prestige_@(i)_readable.png" />
-                        <label class="prestige-name">@Tr( "PRESTIGE {0}", i )</label>
-                        <label class="prestige-status">@Tr( isUnlocked ? "REACHED" : "LOCKED" )</label>
+                    var prestige = i;
+                    var isUnlocked = Progression.GetPrestige() >= prestige;
+                    var isEquipped = isUnlocked && Progression.GetPrestigeEmblem() == prestige;
+                    <div class="prestige-card @(isUnlocked ? "unlocked" : "locked") @(isEquipped ? "equipped" : "")" onclick=@(() => PickEmblem( prestige ))>
+                        <img src="/ui/prestige/prestige_@(prestige)_readable.png" />
+                        <label class="prestige-name">@Tr( "PRESTIGE {0}", prestige )</label>
+                        <label class="prestige-status">@Tr( isEquipped ? "EQUIPPED" : isUnlocked ? "REACHED" : "LOCKED" )</label>
                     </div>
                 }
             </div>
@@ -226,12 +232,21 @@
         StateHasChanged();
     }
 
+    /// <summary>A reached prestige's card shows its emblem in the menus and on the scoreboard; a locked one does nothing.</summary>
+    void PickEmblem( int prestige )
+    {
+        if ( prestige > Progression.GetPrestige() ) return;
+        Progression.SetPrestigeEmblem( prestige );
+        StateHasChanged();
+    }
+
     protected override int BuildHash()
     {
         var hash = new HashCode();
         hash.Add( Progression.GetXP() );
         hash.Add( Progression.GetLevel() );
         hash.Add( Progression.GetPrestige() );
+        hash.Add( Progression.GetPrestigeEmblem() );
         hash.Add( GameText.Current );
         hash.Add( SelectedCategory );
         hash.Add( WeaponSearch );

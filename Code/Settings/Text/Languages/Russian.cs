@@ -1176,6 +1176,7 @@ public static partial class GameText
 		["SERVICE MILESTONES"] = "Вехи службы",
 		["Each prestige resets your player level and weapon attachment unlocks. You keep your camos. Reach Prestige 10 for Master Prestige status."] =
 			"Каждый престиж сбрасывает ваш уровень и открытые модули оружия. Камуфляжи сохраняются. Достигните 10-го престижа, чтобы получить статус мастера престижа.",
+		["Pick any prestige you've reached to show its emblem."] = "Выберите любой достигнутый престиж, чтобы показывать его эмблему.",
 		["REACHED"] = "Достигнуто",
 		["WEAPON RECORD"] = "Статистика оружия",
 		["ALL WEAPONS"] = "Всё оружие",
