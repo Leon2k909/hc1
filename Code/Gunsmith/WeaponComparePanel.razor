@@ -11,6 +11,8 @@
        the build beside the factory gun, with no controls. *@
     @if ( !Live )
     {
+    @* The YOUR BUILDS / FACTORY toggle is off for now (the user: your build is enough to compare), so Factory stays
+       false. Put back with the factory toggle:
     <div class="wc-controls">
         <div class="wc-toggle">
             <div class="wc-toggle-opt @(Factory ? "" : "on")" onclick=@(() => SetFactory( false ))><label>@Tr( "YOUR BUILDS" )</label></div>
@@ -18,6 +20,7 @@
         </div>
         <label class="wc-controls-hint">@Tr( Factory ? "No attachments, no tuning" : "Attachments as saved for each weapon, with tuning" )</label>
     </div>
+    *@
 
     <label class="wc-label">@Tr( "COMPARE WITH" )</label>
     <div class="wc-filters">

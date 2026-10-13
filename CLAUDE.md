@@ -2050,6 +2050,11 @@
     control's scale, out of `NoControlKick`), walk/sprint/crouch/prone speeds in m/s and ammo.
   It reads `GunsmithStats`, whose raw fields follow the game's own rules (`PlayerPawn.GetWishSpeed`,
   `Reloadable.GetReloadTime`, `WeaponAmmo.GetMaxReserve`, `HealthComponent.HardcoreBullet`), so change them together.
+  - The COMPARE WITH list has category chips over it (2026-10-13, the user: "need filters for assault rifles etc"):
+    ALL, then each kind of gun it has. They're bigger than the gun chips and sit over a rule, so they read as its tabs.
+    It opens on the compared gun's kind.
+  - The YOUR BUILDS / FACTORY toggle is commented out (2026-10-13, the user: "just your build is enough to compare";
+    they may want it back), so both columns are the saved builds. The FACTORY chip in COMPARE WITH stays.
 - DETAILS (the stats card's `.gs-stats-details`, `ShowDetails`): the same figures in the loadout column, as the build
   beside the factory gun (`WeaponComparePanel.Live`, fed GunsmithPanel's `_stats` / `_baseStats`, so they change when
   the bars do). The user asked for more than the bars (2026-09-29), then to watch those figures while changing parts.
