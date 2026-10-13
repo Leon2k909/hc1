@@ -263,6 +263,7 @@ public sealed class CameraController : PawnCameraController, IGameEventHandler<D
 		ScreenShaker?.Apply( Camera );
 		ApplyFlashRoll();
 		ApplyMantleTilt();
+		ApplySlideTilt();
 		UpdateMouseVisibility();
 
 		TargetFieldOfView = TargetFieldOfView.LerpTo( baseFov + FieldOfViewOffset, Time.Delta * 5f );
@@ -416,6 +417,17 @@ public sealed class CameraController : PawnCameraController, IGameEventHandler<D
 		var blend = Player.MantleBlend;
 		if ( blend > 0f )
 			Camera.LocalRotation *= Rotation.From( 6f * blend, 0f, -3f * blend );
+	}
+
+	/// <summary> Down on one hip in a slide, the head leans a little to the left (PlayerPawn.Slide.cs). </summary>
+	void ApplySlideTilt()
+	{
+		if ( Mode != CameraMode.FirstPerson )
+			return;
+
+		var blend = Player.SlideBlend;
+		if ( blend > 0f )
+			Camera.LocalRotation *= Rotation.From( 0f, 0f, -4f * blend );
 	}
 
 	void OnModeChanged()

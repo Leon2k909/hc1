@@ -2944,6 +2944,33 @@ simulate_input.
 - Compiled offline on 2026-10-01, not yet checked in-game. To try it: walk at a crate or a low wall and press Jump, or
   look at one and run `dev_mantle`.
 
+## Sliding (`PlayerPawn.Slide.cs`)
+- The user asked for sliding (2026-10-13), after the Cold War speeds (see Movement speeds). Press Duck while sprinting
+  on the ground: you drop onto a hip and slide on. A tap is enough; letting go of Duck doesn't end it.
+- It needs 200 u/s over the ground (`SlideMinStartSpeed`). The drop adds 60 (`SlideBoost`), up to 360, so a rifle's
+  ~285 sprint slides off at ~345.
+- Friction 1.05 (`SlideFriction`; a crouch's is 4) and almost no steering (`SlideAcceleration` 1.5). From 345 it's down
+  to 140 (`SlideEndSpeed`) in ~0.86 s, ~195 units on. It lasts 1.1 s at most (`SlideMaxTime`).
+- Slopes: on the ground it gets half of gravity's pull along the slope (`ApplySlideSlope`, `SlideSlopeHelp`), so
+  downhill carries it further and uphill stops it sooner.
+- What ends it:
+  - Jump: a jump that keeps the speed. Prone: down flat.
+  - Leaving the ground, slowing under 140, or the time running out.
+  - Death, a knockdown, mantling, the drone's tablet, planting, being downed.
+  It comes up crouched while Duck is held, else standing. Another can't start for 0.8 s (`SlideCooldown`).
+- While sliding:
+  - The eye is at -24 (`SlideEyeOffset`; a crouch's -16), and `IsCrouching` holds, so the body crouches on every
+    machine, footsteps are silent and the hitboxes are a crouch's.
+  - The gun cants 14 degrees left, muzzle a little down (`ViewModel.SlidePosition` / `SlideAngles`), less as it's aimed,
+    with no walk bob. The first-person camera rolls 4 degrees left (`CameraController.ApplySlideTilt`). Both ease by
+    `SlideBlend`. No inspect.
+  - It ends the sprint, so the gun can fire 0.25 s after the slide starts (the sprint-out time), or at once aimed.
+- A crouch now stops a sprint (`!IsCrouching` in `CanSprint`). Before, crouch and sprint could be held together.
+- Not done: a third-person slide clip (the body crouches) and a scrape sound. The drop plays the floor's landing
+  sound at 0.7 (`PlaySlideSound`, broadcast).
+- `dev_slide` sets your speed to a rifle's sprint where you're looking and slides, logging the speed or why not.
+- Compiled with dotnet, not yet checked in-game.
+
 ## Battle royale (Warzone, `Code/GameLoop/Rules/BattleRoyale/`)
 - Solos on Flatgrass (the user's first pick, for its size) or Ridgeback (below), picked on the hub's Battle Royale
   screen (`br_map`, `BattleRoyaleMatch.GetMaps`: Flatgrass, then every scene whose GameModes list the mode): players and

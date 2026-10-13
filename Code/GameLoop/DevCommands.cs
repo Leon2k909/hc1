@@ -83,6 +83,17 @@ public static class DevCommands
 		pawn?.TryStartMantle( !pawn.CharacterController.IsOnGround, ignoreInput: true, log: true );
 	}
 
+	/// <summary> Slides where you're looking, as if you'd pressed Duck at a rifle's sprint, and logs the speed or why not. </summary>
+	[ConCmd( "dev_slide" )]
+	public static void Slide()
+	{
+		var pawn = Client.Local?.PlayerPawn;
+		if ( !pawn.IsValid() ) return;
+
+		pawn.CharacterController.Velocity = pawn.EyeAngles.WithPitch( 0 ).Forward * 285f;
+		pawn.TryStartSlide( ignoreInput: true, log: true );
+	}
+
 	/// <summary>Jump the local player again the moment they land, for testing jump stamina through the editor bridge.</summary>
 	[ConCmd( "dev_jumps" )]
 	public static async void Jumps( int count = 6 )

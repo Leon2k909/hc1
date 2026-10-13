@@ -194,6 +194,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	{
 		UpdateFallKnockdown();
 		UpdateMantleBlend();
+		UpdateSlideBlend();
 		UpdatePipeAnimation();
 
 		var cc = CharacterController;
@@ -309,6 +310,9 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 			cc.Velocity += Vector3.Up * vertical * NoclipSpeed;
 		}
 
+		// A slide has only friction to hold it on a slope (PlayerPawn.Slide.cs).
+		if ( IsSliding && cc.IsOnGround ) ApplySlideSlope();
+
 		// The standing stop-speed floor can erase an entire slow crawl each tick.
 		if ( IsProne ) cc.ApplyFriction( GetFriction(), MathF.Max( GetWishSpeed(), 1f ) );
 		else cc.ApplyFriction( GetFriction() );
@@ -318,7 +322,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	private bool WantsToggleSprint { get; set; }
 
 	private bool HasSprintMovement => WishMove.x > 0.2f || (MathF.Abs( WishMove.y ) > 0.2f && WishMove.x >= 0f);
-	private bool CanSprint => !IsMantling && !IsPipeClimbing && !IsFallKnockedDown && !IsSlowWalking && !IsProne && !IsGettingUp && !HasEquipmentTag( "no_sprint" );
+	private bool CanSprint => !IsMantling && !IsPipeClimbing && !IsFallKnockedDown && !IsSlowWalking && !IsProne && !IsCrouching && !IsSliding && !IsGettingUp && !HasEquipmentTag( "no_sprint" );
 
 	private bool GetWantsToSprint()
 	{
@@ -392,6 +396,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 			WantsToggleSprint = false;
 			IsSlowWalking = false;
 			IsUsing = false;
+			if ( IsSliding ) StopSlide();
 			if ( wasSprinting ) OnSprintChanged( true, false );
 			if ( CharacterController.IsOnGround )
 				JumpFatigue = MathF.Max( 0f, JumpFatigue - JumpFatigueRecovery * Time.Delta );
@@ -413,6 +418,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 			IsProne = true;
 			IsCrouching = false;
 			IsUsing = false;
+			StopSlide();
 			return;
 		}
 
@@ -438,7 +444,11 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 		}
 		_wasDowned = downed;
 
+		// Duck pressed at a sprint slides (PlayerPawn.Slide.cs), and the slide holds the crouch until it ends.
+		UpdateSlide( wasSprinting );
+
 		IsCrouching = Input.Down( "Duck" ) && !IsNoclipping;
+		if ( IsSliding ) IsCrouching = true;
 		IsUsing = Input.Down( "Use" );
 		
 		if ( Input.Pressed( "Scorestreak" ) )
@@ -823,6 +833,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	private float GetFriction()
 	{
 		if ( !CharacterController.IsOnGround ) return 0.1f;
+		if ( IsSliding ) return SlideFriction;
 		if ( IsProne ) return Global.CrouchingFriction;
 		if ( IsSlowWalking ) return Global.SlowWalkFriction;
 		if ( IsCrouching ) return Global.CrouchingFriction;
@@ -833,6 +844,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	private float GetAcceleration()
 	{
 		if ( !CharacterController.IsOnGround ) return Global.AirAcceleration;
+		else if ( IsSliding ) return SlideAcceleration;
 		else if ( IsProne ) return Global.CrouchingAcceleration;
 		else if ( IsSlowWalking ) return Global.SlowWalkAcceleration;
 		else if ( IsCrouching ) return Global.CrouchingAcceleration;
@@ -845,6 +857,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	{
 		// Tucked going over a ledge (PlayerPawn.Mantle.cs).
 		if ( IsMantling && HealthComponent.State == LifeState.Alive ) return MantleEyeOffset;
+		if ( IsSliding && HealthComponent.State == LifeState.Alive ) return SlideEyeOffset;
 		if ( IsProne ) return -40f;
 		if ( IsCrouching ) return -16f;
 		if ( HealthComponent.State == LifeState.Dead ) return -48f;

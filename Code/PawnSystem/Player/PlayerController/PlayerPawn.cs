@@ -198,6 +198,7 @@ public sealed partial class PlayerPawn : Pawn, IDescription, IAreaDamageReceiver
 			if ( IsPipeClimbing && IsLocallyControlled ) StopPipeClimb( Vector3.Zero );
 			if ( IsMantling && IsLocallyControlled )
 				StopMantle( Vector3.Zero );
+			if ( IsSliding && IsLocallyControlled ) StopSlide();
 
 			return;
 		}
