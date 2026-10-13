@@ -2026,8 +2026,12 @@
     `hc1.gunsmith.presets.<weapon>`. Presets saved before Ids get one when they're loaded.
   - Each class links one build per gun by its Id (`hc1.gunsmith.class<n>.<weapon>.build`).
     The gun is "modified" when its fitted build's code differs from the linked build's (`GetCurrent`).
-  - The BUILDS card opens the list: name a build and SAVE AS NEW, the pencil renames, the bin deletes, APPLY puts a
-    build on the gun in this class, and a modified one offers UPDATE (save over it) or REVERT.
+  - The BUILDS card opens the list: name a build and SAVE AS NEW, the bin deletes, APPLY puts a build on the gun in
+    this class, and a modified one offers UPDATE (save over it) or REVERT.
+  - The pencil, or a click on a build's name, renames it (the equipped one too). The box takes the keyboard at once
+    (`FocusRenameEntry`), Enter saves, and Escape leaves the rename before it closes the list. The user didn't find the
+    pencil at first (2026-10-13): another session's firing range code had stopped the game compiling, so their editor
+    still ran a build without it.
   - The weapon cards carry the build's name under the gun's ("*" when modified). In the weapon picker each gun lists
     its builds, and a click puts that gun in the class wearing that build (`PickBuild`). The panel reads the states
     twice a second (`RefreshBuildStates`).

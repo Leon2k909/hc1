@@ -877,13 +877,13 @@
                             <i class="gs-preset-icon">@(current ? "check_circle" : "description")</i>
                             @if ( renaming )
                             {
-                                <TextEntry class="gs-input grow gs-preset-rename" Value:bind=@RenameText />
+                                <TextEntry @ref=RenameEntry class="gs-input grow gs-preset-rename" Value:bind=@RenameText onsubmit=@(() => ConfirmRename( entry )) />
                                 <div class="gs-square-btn small" @onclick=@(() => ConfirmRename( entry ))><i>check</i></div>
                                 <div class="gs-square-btn small" @onclick=@CancelRename><i>close</i></div>
                             }
                             else
                             {
-                                <label class="gs-preset-name">@entry.Name</label>
+                                <label class="gs-preset-name" @onclick=@(() => StartRename( entry ))>@entry.Name</label>
                                 @if ( current && currentModified )
                                 {
                                     <label class="gs-preset-state modified">@Tr( "MODIFIED" )</label>
@@ -1040,6 +1040,7 @@
         if ( Panel is null )
             return;
 
+        FocusRenameEntry();
         ResponsiveLayout.Update( Panel );
         // The header's full-size tabs need about 1900 units, as in the main menu (MainMenuRoot).
         Panel.SetClass( "tight-nav", Panel.Box.Rect.Size.x * Panel.ScaleFromScreen < 1900 );
@@ -1151,6 +1152,7 @@
     {
         if ( ShowTuning ) ShowTuning = false;
         else if ( ShowCompare ) ShowCompare = false;
+        else if ( IsPresetsOpen && RenamingId is not null ) RenamingId = null;
         else if ( IsPresetsOpen ) ClosePresets();
         else if ( IsShareBuildOpen ) CloseShareBuild();
         else if ( IsFirstPerson ) ToggleFirstPerson();
@@ -1518,11 +1520,25 @@
         SetPresetMessage( new GunsmithMessage( "{0} deleted.", preset.Name ), false );
     }
 
+    private TextEntry RenameEntry { get; set; }
+    private bool _focusRename;
+
     private void StartRename( GunsmithPresets.Preset preset )
     {
         RenamingId = preset.Id;
         RenameText = preset.Name;
+        _focusRename = true;
         StateHasChanged();
+    }
+
+    /// <summary> The rename box takes the keyboard once it's drawn, so the name can be typed and Enter saves it. </summary>
+    private void FocusRenameEntry()
+    {
+        if ( !_focusRename || RenamingId is null || !RenameEntry.IsValid() )
+            return;
+
+        _focusRename = false;
+        RenameEntry.Focus();
     }
 
     private void CancelRename()

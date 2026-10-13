@@ -2609,6 +2609,9 @@ GunsmithPanel
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        cursor: text;
+
+        &:hover { color: $accent; }
     }
 
     .gs-preset-state
