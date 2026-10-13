@@ -198,6 +198,18 @@
                                 </div>
                                 <i class="gs-fav @(favourite ? "on" : "")" @onclick=@(( PanelEvent e ) => ClickInside( e, () => ToggleFavourite( w.ResourcePath ) ))>@(favourite ? "star" : "star_border")</i>
                             </div>
+                            @foreach ( var build in BuildsOf( w ) )
+                            {
+                                var b = build;
+                                var state = BuildStateOf( w );
+                                var onGun = inClass && state.Name == b.Name;
+                                <div class="gs-choice-build @(onGun ? "current" : "") @(onGun && state.Modified ? "modified" : "")" @onclick=@(() => PickBuild( w, b ))>
+                                    <i class="gs-choice-build-icon">subdirectory_arrow_right</i>
+                                    <label class="gs-choice-build-name">@b.Name</label>
+                                    @if ( onGun && state.Modified ) { <label class="gs-choice-build-state">@Tr( "MODIFIED" )</label> }
+                                    else if ( onGun ) { <i class="gs-choice-check">check</i> }
+                                </div>
+                            }
                         }
                     }
                     else
@@ -301,6 +313,10 @@
                                 <div class="gs-card-img"><div class="gs-img-square" style="background-image: url( '@primary.Icon' )" /></div>
                             }
                             <label class="gs-card-name">@(primary?.Name.ToUpper() ?? Tr( "EMPTY" ))</label>
+                            @if ( BuildCaption( primary ) is { } primaryBuild )
+                            {
+                                <label class="gs-card-build @(BuildStateOf( primary ).Modified ? "modified" : "")">@primaryBuild</label>
+                            }
                             @if ( primary is not null )
                             {
                                 <div class="gs-card-level">
@@ -328,6 +344,10 @@
                         </div>
                         <div class="gs-card-copy">
                             <label class="gs-card-name">@(secondary?.Name.ToUpper() ?? Tr( "EMPTY" ))</label>
+                            @if ( BuildCaption( secondary ) is { } secondaryBuild )
+                            {
+                                <label class="gs-card-build @(BuildStateOf( secondary ).Modified ? "modified" : "")">@secondaryBuild</label>
+                            }
                             @if ( secondary is not null )
                             {
                                 <div class="gs-card-level">
@@ -373,11 +393,6 @@
                             </div>
                         }
                     </div>
-                </div>
-
-                <div class="gs-wide-btn" @onclick=@SaveLoadout>
-                    <i>save</i>
-                    <label>@Tr( "SAVE LOADOUT" )</label>
                 </div>
             }
         </div>
@@ -524,8 +539,16 @@
                 <div class="gs-presets-card" @onclick=@OpenPresets>
                     <i class="gs-presets-icon">description</i>
                     <div class="gs-presets-copy">
-                        <label class="gs-presets-title">@Tr( "PRESETS" )</label>
-                        <label class="gs-presets-sub">@Tr( "SAVE & MANAGE" )</label>
+                        <label class="gs-presets-title">@Tr( "BUILDS" )</label>
+                        @{ var shownBuild = BuildStateOf( equip ); }
+                        @if ( !string.IsNullOrEmpty( shownBuild.Name ) )
+                        {
+                            <label class="gs-presets-sub @(shownBuild.Modified ? "modified" : "")">@(shownBuild.Modified ? Tr( "{0} (MODIFIED)", shownBuild.Name ) : shownBuild.Name)</label>
+                        }
+                        else
+                        {
+                            <label class="gs-presets-sub">@Tr( "SAVE & RENAME" )</label>
+                        }
                     </div>
                     <i class="gs-presets-chevron">chevron_right</i>
                 </div>
@@ -819,25 +842,25 @@
         </div>
     }
 
-    @* ===================== PRESETS ===================== *@
+    @* ===================== BUILDS ===================== *@
     @if ( IsPresetsOpen )
     {
         var presets = GunsmithPresets.Get( equip );
-        var currentCode = equip is not null ? GunsmithLoadoutManager.ExportWeaponBuildCode( equip ) : null;
+        var (currentBuild, currentModified) = GunsmithPresets.GetCurrent( equip, presets );
         <div class="gs-modal-backdrop" @onclick=@(( PanelEvent e ) => ClickBackdrop( e, ClosePresets ))>
             <div class="gs-modal">
                 <div class="gs-modal-head">
                     <div class="gs-modal-title">
-                        <label class="gs-modal-caption">@Tr( "PRESETS" )</label>
+                        <label class="gs-modal-caption">@Tr( "BUILDS" )</label>
                         <label class="gs-modal-name">@GetEquipmentName().ToUpper()</label>
                     </div>
                     <div class="gs-square-btn" @onclick=@ClosePresets><i>close</i></div>
                 </div>
 
-                <label class="gs-modal-text">@Tr( "Save this weapon's build (attachments, camo and reticle) under a name, and put it back on any class." )</label>
+                <label class="gs-modal-text">@Tr( "Keep several builds of this weapon (attachments, camo and reticle), each under its own name, and put any of them on it in any class." )</label>
                 <div class="gs-modal-row">
-                    <TextEntry class="gs-input grow" Value:bind=@PresetName Placeholder=@(Tr( "NAME THIS BUILD" )) />
-                    <div class="gs-btn primary" @onclick=@SavePreset><i>save</i><label>@Tr( "SAVE" )</label></div>
+                    <TextEntry class="gs-input grow" Value:bind=@PresetName Placeholder=@(Tr( "NAME A NEW BUILD" )) />
+                    <div class="gs-btn primary" @onclick=@SavePreset><i>add</i><label>@Tr( "SAVE AS NEW" )</label></div>
                 </div>
                 @if ( !string.IsNullOrWhiteSpace( PresetMessage?.English ) )
                 {
@@ -848,27 +871,44 @@
                     @foreach ( var preset in presets )
                     {
                         var entry = preset;
-                        var current = entry.Code == currentCode;
-                        <div class="gs-preset @(current ? "current" : "")">
-                            <i class="gs-preset-icon">description</i>
-                            <label class="gs-preset-name">@entry.Name</label>
-                            @if ( current )
+                        var current = currentBuild is not null && currentBuild.Id == entry.Id;
+                        var renaming = RenamingId == entry.Id;
+                        <div class="gs-preset @(current ? "current" : "") @(current && currentModified ? "modified" : "")">
+                            <i class="gs-preset-icon">@(current ? "check_circle" : "description")</i>
+                            @if ( renaming )
                             {
-                                <label class="gs-preset-state">@Tr( "EQUIPPED" )</label>
+                                <TextEntry class="gs-input grow gs-preset-rename" Value:bind=@RenameText />
+                                <div class="gs-square-btn small" @onclick=@(() => ConfirmRename( entry ))><i>check</i></div>
+                                <div class="gs-square-btn small" @onclick=@CancelRename><i>close</i></div>
                             }
                             else
                             {
-                                <div class="gs-btn small" @onclick=@(() => ApplyPreset( entry ))><label>@Tr( "APPLY" )</label></div>
+                                <label class="gs-preset-name">@entry.Name</label>
+                                @if ( current && currentModified )
+                                {
+                                    <label class="gs-preset-state modified">@Tr( "MODIFIED" )</label>
+                                    <div class="gs-btn small" @onclick=@(() => UpdatePreset( entry ))><label>@Tr( "UPDATE" )</label></div>
+                                    <div class="gs-btn small" @onclick=@(() => ApplyPreset( entry ))><label>@Tr( "REVERT" )</label></div>
+                                }
+                                else if ( current )
+                                {
+                                    <label class="gs-preset-state">@Tr( "EQUIPPED" )</label>
+                                }
+                                else
+                                {
+                                    <div class="gs-btn small" @onclick=@(() => ApplyPreset( entry ))><label>@Tr( "APPLY" )</label></div>
+                                }
+                                <div class="gs-square-btn small" @onclick=@(() => StartRename( entry ))><i>edit</i></div>
+                                <div class="gs-square-btn small danger" @onclick=@(() => DeletePreset( entry ))><i>delete</i></div>
                             }
-                            <div class="gs-square-btn small danger" @onclick=@(() => DeletePreset( entry ))><i>delete</i></div>
                         </div>
                     }
                     @if ( !presets.Any() )
                     {
-                        <label class="gs-modal-empty">@Tr( "No presets saved for this weapon yet." )</label>
+                        <label class="gs-modal-empty">@Tr( "No builds saved for this weapon yet." )</label>
                     }
                 </div>
-                <label class="gs-modal-foot">@Tr( "{0} / {1} PRESETS", presets.Count, GunsmithPresets.MaxPerWeapon )</label>
+                <label class="gs-modal-foot">@Tr( "{0} / {1} BUILDS", presets.Count, GunsmithPresets.MaxPerWeapon )</label>
             </div>
         </div>
     }
@@ -984,6 +1024,8 @@
         base.OnUpdate();
         ApplyDevPickerRequest();
         UpdateStats();
+        if ( _sinceBuildStates > 0.5f )
+            RefreshBuildStates();
 
         if ( _notice is not null && _sinceNotice > NoticeTime )
             _notice = null;
@@ -1180,17 +1222,7 @@
         StateHasChanged();
     }
 
-    // ── Save loadout ───────────────────────────────────────────────────────
-
-    /// <summary>
-    /// Every pick is saved as it's made (and PlayerLoadout keeps the host's copy in step), so SAVE LOADOUT confirms the
-    /// class. Over a match it also picks the class, as the class menu does, which swaps it in straight after a spawn.
-    /// </summary>
-    private void SaveLoadout()
-    {
-        Sound.Play( "ui_button_press" );
-        Notify( new GunsmithMessage( "{0} SAVED", ActiveClassName ), InMatch ? SendClassToMatch() : "Ready for your next match" );
-    }
+    // ── Picking a class over a match ───────────────────────────────────────
 
     /// <summary>
     /// Over a match: sends the active class to the host (PlayerLoadout.SendActiveClass), which gives it now if you've only
@@ -1404,19 +1436,22 @@
         _sinceStats = 1f;
     }
 
-    // ── Presets ────────────────────────────────────────────────────────────
+    // ── Builds ─────────────────────────────────────────────────────────────
 
     private bool IsPresetsOpen { get; set; }
     private string PresetName { get; set; } = "";
     private GunsmithMessage PresetMessage { get; set; }
     private bool PresetMessageIsError { get; set; }
     private int _presetsVersion;
+    private string RenamingId { get; set; }
+    private string RenameText { get; set; } = "";
 
     private void OpenPresets()
     {
         PresetName = "";
         PresetMessage = null;
         PresetMessageIsError = false;
+        RenamingId = null;
         IsPresetsOpen = true;
         StateHasChanged();
     }
@@ -1424,6 +1459,7 @@
     private void ClosePresets()
     {
         IsPresetsOpen = false;
+        RenamingId = null;
         StateHasChanged();
     }
 
@@ -1432,20 +1468,30 @@
         PresetMessage = message;
         PresetMessageIsError = isError;
         _presetsVersion++;
+        RefreshBuildStates();
         StateHasChanged();
     }
 
     private void SavePreset()
     {
         var equip = GetEquipment();
-        if ( !GunsmithPresets.Save( equip, PresetName, out var error ) )
+        if ( !GunsmithPresets.Save( equip, PresetName, out var saved, out var error ) )
         {
             SetPresetMessage( error, true );
             return;
         }
 
         PresetName = "";
-        SetPresetMessage( "Preset saved.", false );
+        SetPresetMessage( new GunsmithMessage( "{0} saved.", saved.Name ), false );
+    }
+
+    /// <summary> Saves the gun as it is now over the build it was put on from. </summary>
+    private void UpdatePreset( GunsmithPresets.Preset preset )
+    {
+        if ( !GunsmithPresets.Update( GetEquipment(), preset ) )
+            return;
+
+        SetPresetMessage( new GunsmithMessage( "{0} updated.", preset.Name ), false );
     }
 
     private void ApplyPreset( GunsmithPresets.Preset preset )
@@ -1467,7 +1513,123 @@
     private void DeletePreset( GunsmithPresets.Preset preset )
     {
         GunsmithPresets.Delete( GetEquipment(), preset );
+        if ( RenamingId == preset.Id )
+            RenamingId = null;
         SetPresetMessage( new GunsmithMessage( "{0} deleted.", preset.Name ), false );
+    }
+
+    private void StartRename( GunsmithPresets.Preset preset )
+    {
+        RenamingId = preset.Id;
+        RenameText = preset.Name;
+        StateHasChanged();
+    }
+
+    private void CancelRename()
+    {
+        RenamingId = null;
+        StateHasChanged();
+    }
+
+    private void ConfirmRename( GunsmithPresets.Preset preset )
+    {
+        var old = preset.Name;
+        if ( !GunsmithPresets.Rename( GetEquipment(), preset, RenameText, out var error ) )
+        {
+            if ( error is not null )
+                SetPresetMessage( error, true );
+            return;
+        }
+
+        RenamingId = null;
+        var renamed = GunsmithPresets.Get( GetEquipment() ).FirstOrDefault( x => x.Id == preset.Id );
+        SetPresetMessage( new GunsmithMessage( "{0} renamed {1}.", old, renamed?.Name ?? RenameText ), false );
+    }
+
+    /// <summary> A build from the weapon picker: puts that weapon in the class with the build on it. </summary>
+    private void PickBuild( EquipmentResource resource, GunsmithPresets.Preset preset )
+    {
+        if ( !System.IsValid() || !resource.IsValid() )
+            return;
+
+        // The build goes on first, so the gun loads onto the stand wearing it.
+        if ( !GunsmithPresets.Apply( resource, preset, out var error ) )
+        {
+            Notify( error, null, "error" );
+            return;
+        }
+
+        SelectWeapon( resource );
+        RefreshAfterBuildChanged( resource );
+        RefreshBuildStates();
+
+        var locked = LockedParts( resource );
+        if ( locked.Count > 0 )
+            Notify( new GunsmithMessage( "{0} put on {1}. Left off until unlocked: {2}.", preset.Name, ActiveClassName, locked ) );
+    }
+
+    /// <summary> Which build each weapon on the screen carries, read twice a second (a build is a whole build code). </summary>
+    private readonly Dictionary<string, (string Name, bool Modified)> _buildStates = new( StringComparer.OrdinalIgnoreCase );
+    private readonly Dictionary<string, List<GunsmithPresets.Preset>> _buildLists = new( StringComparer.OrdinalIgnoreCase );
+    private int _buildStateHash;
+    private RealTimeSince _sinceBuildStates = 10f;
+
+    private void RefreshBuildStates()
+    {
+        _sinceBuildStates = 0f;
+        _buildStates.Clear();
+        _buildLists.Clear();
+
+        var weapons = new List<EquipmentResource>
+        {
+            GetDisplayedSlotResource( EquipmentSlot.Primary ),
+            GetDisplayedSlotResource( EquipmentSlot.Secondary ),
+            GetEquipment()
+        };
+        if ( IsPickerOpen && SelectedSlot is EquipmentSlot.Primary or EquipmentSlot.Secondary )
+            weapons.AddRange( GetWeaponsForSlot( SelectedSlot ) );
+
+        var hash = new HashCode();
+        foreach ( var weapon in weapons )
+        {
+            if ( weapon is null || _buildLists.ContainsKey( weapon.ResourcePath ) )
+                continue;
+
+            var builds = GunsmithPresets.Get( weapon );
+            _buildLists[weapon.ResourcePath] = builds;
+            hash.Add( weapon.ResourcePath );
+            foreach ( var build in builds )
+            {
+                hash.Add( build.Id );
+                hash.Add( build.Name );
+            }
+
+            if ( builds.Count == 0 )
+                continue;
+
+            var (current, modified) = GunsmithPresets.GetCurrent( weapon, builds );
+            if ( current is null )
+                continue;
+
+            _buildStates[weapon.ResourcePath] = (current.Name, modified);
+            hash.Add( current.Id );
+            hash.Add( modified );
+        }
+
+        _buildStateHash = hash.ToHashCode();
+    }
+
+    private (string Name, bool Modified) BuildStateOf( EquipmentResource resource ) =>
+        resource is not null && _buildStates.TryGetValue( resource.ResourcePath, out var state ) ? state : default;
+
+    private List<GunsmithPresets.Preset> BuildsOf( EquipmentResource resource ) =>
+        resource is not null && _buildLists.TryGetValue( resource.ResourcePath, out var builds ) ? builds : new();
+
+    /// <summary> The current build's name for a weapon card's caption, with a star when the gun's been changed since. </summary>
+    private string BuildCaption( EquipmentResource resource )
+    {
+        var (name, modified) = BuildStateOf( resource );
+        return string.IsNullOrEmpty( name ) ? null : modified ? $"{name}*" : name;
     }
 
     // ── Weapon on show ─────────────────────────────────────────────────────
@@ -1752,10 +1914,17 @@
         _ => "No primary weapon.",
     };
 
+    /// <summary>
+    /// Every pick is saved as it's made, and PlayerLoadout keeps the host's copy in step. Over a match, picking a class
+    /// also picks it as the class menu does, which swaps it in straight after a spawn.
+    /// </summary>
     private void SelectClass( int index )
     {
         GunsmithLoadoutManager.SetActiveClassIndex( index );
         RefreshAfterActiveClassChanged();
+
+        if ( InMatch && SendClassToMatch() is { } sent )
+            Notify( ActiveClassName, sent );
     }
 
     /// <summary> CREATE CLASS: makes it the active class and keeps the list open, so it can be named straight away. </summary>
@@ -2341,6 +2510,8 @@
         hash.Add( IsPresetsOpen );
         hash.Add( PresetMessage );
         hash.Add( _presetsVersion );
+        hash.Add( RenamingId );
+        hash.Add( _buildStateHash );
 
         hash.Add( _stats );
         hash.Add( _baseStats );

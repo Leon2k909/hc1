@@ -2006,10 +2006,23 @@
   the change from the factory gun in green or red. HANDLING (ADS time) stands where CoD has accuracy, since the game has
   no spread or bloom. FIRING RANGE is a locked "coming soon" card.
 - Every pick saves as it's made, and `PlayerLoadout` sends the saved class to the host every second, so there's no
-  apply step (the user had the mockup's APPLY BUILD removed). SAVE LOADOUT only confirms; over a match it also picks the
-  class like the class menu, which swaps it in straight after a spawn. PRESETS are named build codes, 8 per weapon
-  (`GunsmithPresets`).
-- Escape and the back button close one layer at a time (tuning, compare, presets, share, first person, a slot's parts,
+  apply step (the user had the mockup's APPLY BUILD removed). SAVE LOADOUT, which only confirmed, was removed too at
+  the user's ask (2026-10-13). Over a match, picking a class (`SelectClass`) picks it as the class menu does, which swaps
+  it in straight after a spawn.
+- BUILDS (`GunsmithPresets`, 2026-10-13, the user: "i might want different attachments on the same gun, as a separate
+  build"): named builds of a gun (its parts, camo, finish, reticle and optic tune), 8 a gun, shared by every class.
+  - Each is a build code (`ExportWeaponBuildCode( resource, withLockedParts: true )`, so a part not yet unlocked stays
+    in it and comes back once it is) with an Id and a name (24 letters at most, "BUILD n" if left blank), in the cookie
+    `hc1.gunsmith.presets.<weapon>`. Presets saved before Ids get one when they're loaded.
+  - Each class links one build per gun by its Id (`hc1.gunsmith.class<n>.<weapon>.build`).
+    The gun is "modified" when its fitted build's code differs from the linked build's (`GetCurrent`).
+  - The BUILDS card opens the list: name a build and SAVE AS NEW, the pencil renames, the bin deletes, APPLY puts a
+    build on the gun in this class, and a modified one offers UPDATE (save over it) or REVERT.
+  - The weapon cards carry the build's name under the gun's ("*" when modified). In the weapon picker each gun lists
+    its builds, and a click puts that gun in the class wearing that build (`PickBuild`). The panel reads the states
+    twice a second (`RefreshBuildStates`).
+  - Compiled with dotnet, not yet seen in-game.
+- Escape and the back button close one layer at a time (tuning, compare, builds, share, first person, a slot's parts,
   the picker, the class list), then leave. MainHUD and PauseMenuPanel ask `GunsmithPanel.HandleEscapeAny()` first.
 - Clicks bubble to every parent's handler and `@onclick:stopPropagation` does nothing here. A control inside a clickable
   row uses `ClickInside` (`e.StopPropagation()`), and a modal's backdrop closes only when `e.Target == e.This`

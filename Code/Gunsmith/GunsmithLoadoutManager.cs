@@ -474,7 +474,12 @@ public static class GunsmithLoadoutManager
 		TryGetAttachment( resource, GunsmithPartType.Ammunition, out var ammo )
 		&& ammo.IsValid() && ammo.UsesTracerRounds;
 
-	public static string ExportWeaponBuildCode( EquipmentResource resource )
+	/// <summary>
+	/// The weapon's build in the active class as a build code. A shared code leaves out the parts its level hasn't
+	/// unlocked, as they're not on the gun; <paramref name="withLockedParts"/> keeps them, for a saved build
+	/// (<see cref="GunsmithPresets"/>), which should come back whole once they unlock.
+	/// </summary>
+	public static string ExportWeaponBuildCode( EquipmentResource resource, bool withLockedParts = false )
 	{
 		if ( !resource.IsValid() )
 			return "";
@@ -500,13 +505,17 @@ public static class GunsmithLoadoutManager
 			ReticleOffsetY = GetCustomReticleOffset( resource ).y,
 		};
 
+		var saved = withLockedParts && _fitting is null;
+		bool Fitted( GunsmithPartType category, out GunsmithPart part ) =>
+			saved ? TryGetSavedAttachment( resource, category, out part ) : TryGetAttachment( resource, category, out part );
+
 		foreach ( var category in Enum.GetValues<GunsmithPartType>() )
 		{
-			if ( TryGetAttachment( resource, category, out var part ) && part.IsValid() )
+			if ( Fitted( category, out var part ) && part.IsValid() )
 				payload.Attachments[category.ToString()] = part.ResourcePath;
 		}
 
-		if ( TryGetAttachment( resource, GunsmithPartType.Optic, out var optic ) && optic.IsValid() )
+		if ( Fitted( GunsmithPartType.Optic, out var optic ) && optic.IsValid() )
 		{
 			payload.OpticEye = GetOpticEyePosition( resource, optic );
 			payload.OpticZero = GetOpticZero( resource, optic );

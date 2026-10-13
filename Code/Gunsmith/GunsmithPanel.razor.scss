@@ -766,6 +766,20 @@ GunsmithPanel
         text-overflow: ellipsis;
     }
 
+    // The build the class's gun carries, from the BUILDS list.
+    .gs-card-build
+    {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: $accent;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &.modified { color: $caution; }
+    }
+
     .gs-card-level
     {
         flex-direction: row;
@@ -1228,6 +1242,66 @@ GunsmithPanel
     {
         font-size: 22px;
         color: $accent;
+    }
+
+    // A saved build under its weapon in the picker.
+    .gs-choice-build
+    {
+        flex-shrink: 0;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        height: 34px;
+        margin-left: 28px;
+        padding: 0 12px 0 8px;
+        background-color: rgba( 255, 255, 255, 0.02 );
+        border: 1px solid $line;
+        border-left: 3px solid transparent;
+        cursor: pointer;
+        transition: border-color 0.15s ease, background-color 0.15s ease;
+
+        &:hover
+        {
+            background-color: $card-hover;
+            border-color: rgba( 255, 255, 255, 0.18 );
+        }
+
+        &.current
+        {
+            border-left-color: $accent;
+            background-color: rgba( 255, 122, 26, 0.07 );
+        }
+
+        &.modified { border-left-color: $caution; }
+
+        .gs-choice-check { font-size: 18px; }
+    }
+
+    .gs-choice-build-icon
+    {
+        font-size: 16px;
+        color: $text-dim;
+    }
+
+    .gs-choice-build-name
+    {
+        flex-grow: 1;
+        min-width: 0;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        color: $text-mid;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .gs-choice-build-state
+    {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        color: $caution;
     }
 
     .gs-choice-num
@@ -1865,6 +1939,11 @@ GunsmithPanel
         font-weight: 600;
         letter-spacing: 2px;
         color: $text-dim;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &.modified { color: $caution; }
     }
 
     .gs-presets-chevron
@@ -2238,7 +2317,7 @@ GunsmithPanel
     }
 
     /* =================================================================
-       NOTICE (SAVE LOADOUT, locked features)
+       NOTICE (picking a class over a match, locked features)
        ================================================================= */
 
     .gs-notice
@@ -2493,6 +2572,24 @@ GunsmithPanel
             border-left-color: $accent;
             background-color: rgba( 255, 122, 26, 0.07 );
         }
+
+        &.modified
+        {
+            border-left-color: $caution;
+
+            .gs-preset-icon { color: $caution; }
+        }
+
+        .gs-btn.small, .gs-square-btn.small { flex-shrink: 0; }
+    }
+
+    .gs-preset-rename
+    {
+        min-height: 36px;
+        padding: 4px 10px;
+        font-size: 14px;
+
+        label { font-size: 14px; }
     }
 
     .gs-preset-icon
@@ -2516,10 +2613,13 @@ GunsmithPanel
 
     .gs-preset-state
     {
+        flex-shrink: 0;
         font-size: 11px;
         font-weight: 700;
         letter-spacing: 1.5px;
         color: $accent;
+
+        &.modified { color: $caution; }
     }
 
     .gs-modal.tuning WeaponTuningPanel
