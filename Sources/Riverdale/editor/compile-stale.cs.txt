@@ -1,0 +1,35 @@
+// Recompiles Riverdale's assets whose sources are newer than their compiled files: materials (the vmat or its maps),
+// then models (the vmdl or its OBJs), then the scene. The editor's file watcher misses some of a burst of rewritten
+// files, and CompileIfNeeded doesn't look at a model's OBJs. Run with the native MCP's run_csharp.
+var projectRoot = Sandbox.Project.Current.GetRootPath();
+var assets = System.IO.Path.Combine(projectRoot, "Assets");
+System.DateTime Newest(params string[] files) => files.Where(System.IO.File.Exists).Select(System.IO.File.GetLastWriteTimeUtc).DefaultIfEmpty(System.DateTime.MinValue).Max();
+System.DateTime Compiled(string file) => System.IO.File.Exists(file + "_c") ? System.IO.File.GetLastWriteTimeUtc(file + "_c") : System.DateTime.MinValue;
+var stale = new System.Collections.Generic.List<string>();
+foreach (var vmat in System.IO.Directory.GetFiles(System.IO.Path.Combine(assets, "materials/riverdale"), "*.vmat", System.IO.SearchOption.AllDirectories).OrderBy(x => x))
+{
+    var stem = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(vmat), System.IO.Path.GetFileNameWithoutExtension(vmat));
+    var maps = System.IO.Directory.GetFiles(System.IO.Path.GetDirectoryName(vmat), System.IO.Path.GetFileNameWithoutExtension(vmat) + "*.*")
+        .Where(f => f.EndsWith(".png") || f.EndsWith(".jpg") || f.EndsWith(".exr")).ToArray();
+    if (Newest(maps.Append(vmat).ToArray()) > Compiled(vmat)) stale.Add(vmat);
+}
+foreach (var vmdl in System.IO.Directory.GetFiles(System.IO.Path.Combine(assets, "models/maps/riverdale"), "*.vmdl").OrderBy(x => x))
+{
+    var stem = System.IO.Path.GetFileNameWithoutExtension(vmdl);
+    var objs = System.IO.Directory.GetFiles(System.IO.Path.GetDirectoryName(vmdl), stem + "*.obj");
+    if (Newest(objs.Append(vmdl).ToArray()) > Compiled(vmdl)) stale.Add(vmdl);
+}
+var scenePath = System.IO.Path.Combine(assets, "scenes/maps/Riverdale/riverdale.scene");
+if (Newest(scenePath) > Compiled(scenePath)) stale.Add(scenePath);
+var results = new System.Collections.Generic.List<object>();
+foreach (var file in stale)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var asset = Editor.AssetSystem.FindByPath(file) ?? Editor.AssetSystem.RegisterFile(file);
+    if (asset is null) { results.Add(new { File = System.IO.Path.GetFileName(file), Registered = false }); continue; }
+    var ok = false; string error = null;
+    try { ok = asset.Compile(true); } catch (Exception e) { error = e.Message; }
+    await Task.Delay(1, cancellationToken);
+    results.Add(new { File = System.IO.Path.GetFileName(file), Ok = ok, asset.IsCompiled, asset.IsCompileFailed, Fresh = Compiled(file) >= Newest(file), Error = error });
+}
+return new { Stale = stale.Count, Results = results };

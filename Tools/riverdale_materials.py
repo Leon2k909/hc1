@@ -644,12 +644,12 @@ PAINTED = {
     "rv_beacon": ( ( 255, 40, 30 ), 0.0, 0.3, 12 ),
     "rv_window_lit": ( ( 255, 220, 170 ), 0.0, 0.2, 3 ),
     "rv_window_dark": ( ( 30, 38, 46 ), 0.6, 0.12, 0 ),
-    "rv_cyan_glow": ( ( 70, 220, 255 ), 0.0, 0.3, 5 ),
+    "rv_cyan_glow": ( ( 70, 220, 255 ), 0.0, 0.3, 6 ),
     "rv_canvas": ( ( 62, 70, 52 ), 0.0, 0.85, 0 ),
-    "rv_desk": ( ( 54, 58, 64 ), 0.1, 0.4, 0 ),
-    "rv_chair": ( ( 30, 32, 36 ), 0.0, 0.6, 0 ),
+    "rv_desk": ( ( 88, 94, 102 ), 0.1, 0.4, 0 ),
+    "rv_chair": ( ( 44, 46, 52 ), 0.0, 0.6, 0 ),
     "rv_forest": ( ( 24, 36, 26 ), 0.0, 0.9, 0 ),
-    "rv_pine": ( ( 28, 44, 30 ), 0.0, 0.85, 0 ),
+    "rv_pine": ( ( 38, 58, 40 ), 0.0, 0.85, 0 ),
     "rv_pine_far": ( ( 46, 60, 58 ), 0.0, 0.9, 0 ),
     "rv_rock": ( ( 104, 100, 98 ), 0.0, 0.9, 0 ),
     "rv_rock_far": ( ( 128, 136, 150 ), 0.0, 0.9, 0 ),
@@ -715,8 +715,8 @@ def water_vmat():
              '    shader "shaders/hc1_tank_glass.shader"\n'
              '    g_vWaterAbsorb "[0.004200 0.000900 0.000420 0.000000]"\n'
              '    g_flTurbidity "0.0004"\n'
-             '    g_vWaterScatter "[0.080000 0.560000 0.820000 0.000000]"\n'
-             '    g_vWaterDeep "[0.012000 0.140000 0.280000 0.000000]"\n'
+             '    g_vWaterScatter "[0.100000 0.950000 1.350000 0.000000]"\n'
+             '    g_vWaterDeep "[0.020000 0.300000 0.550000 0.000000]"\n'
              f'    g_flSurfaceZ "{WATER_Z:.1f}"\n'
              '    g_flDeepRange "340.0"\n'
              '    g_flMaxWater "900.0"\n'
@@ -795,7 +795,7 @@ def build( name, out ):
         done[name] = write_surface( out, name, c, r, h, ppi, METALNESS.get( name, 0.0 ) )
     elif name == "rv_rack":
         c, r, h, ppi, illum = rack()
-        done[name] = write_surface( out, name, c, r, h, ppi, 0.5, illum=illum, illum_brightness=5.0, illum_tint=( 0.35, 0.9, 1.0 ) )
+        done[name] = write_surface( out, name, c, r, h, ppi, 0.5, illum=illum, illum_brightness=8.0, illum_tint=( 0.35, 0.9, 1.0 ) )
     elif name == "rv_hazard":
         c, r, h, ppi = hazard()
         done[name] = write_surface( out, name, c, r, h, ppi )
@@ -805,7 +805,7 @@ def build( name, out ):
     elif name == "letters":
         a = letters_atlas()
         save_grey( out / "rv_letters_trans.png", a )
-        for tone, tint, rough in ( ( "dark", ( 0.030, 0.032, 0.034 ), 0.7 ), ( "light", ( 0.62, 0.63, 0.62 ), 0.6 ) ):
+        for tone, tint, rough in ( ( "dark", ( 0.030, 0.032, 0.034 ), 0.7 ), ( "light", ( 0.86, 0.87, 0.86 ), 0.6 ) ):
             text = vmat( "[1.000000 1.000000 1.000000 0.000000]", "materials/default/default_normal.tga",
                          f"[{rough:.6f} {rough:.6f} {rough:.6f} 0.000000]", 0.0, f"{RESOURCE_DIR}/rv_letters_trans.png", tint=tint )
             write_text( out / f"rv_letters_{tone}.vmat", text )

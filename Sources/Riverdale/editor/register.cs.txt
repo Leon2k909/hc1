@@ -1,0 +1,26 @@
+// Registers and compiles Riverdale's materials, models and scene with the editor's asset system (its file watcher can
+// miss a burst of new files), materials first, then models, then the scene. Run with the native MCP's run_csharp.
+var projectRoot = Sandbox.Project.Current.GetRootPath();
+var assets = System.IO.Path.Combine(projectRoot, "Assets");
+var groups = new[] {
+    System.IO.Directory.GetFiles(System.IO.Path.Combine(assets, "materials/riverdale"), "*.vmat", System.IO.SearchOption.AllDirectories),
+    System.IO.Directory.GetFiles(System.IO.Path.Combine(assets, "models/maps/riverdale"), "*.vmdl"),
+    new[] { System.IO.Path.Combine(assets, "scenes/maps/Riverdale/riverdale.scene") },
+};
+var results = new System.Collections.Generic.List<object>();
+foreach (var files in groups)
+{
+    foreach (var file in files.OrderBy(x => x))
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var asset = Editor.AssetSystem.FindByPath(file) ?? Editor.AssetSystem.RegisterFile(file);
+        if (asset is null) { results.Add(new { File = file, Registered = false }); continue; }
+        var ok = false;
+        string error = null;
+        try { ok = await asset.CompileIfNeededAsync(); }
+        catch (Exception e) { error = e.Message; }
+        if (!ok || error is not null || !asset.IsCompiled)
+            results.Add(new { File = System.IO.Path.GetFileName(file), Ok = ok, asset.IsCompiled, asset.IsCompileFailed, Error = error });
+    }
+}
+return new { Problems = results, Count = groups.Sum(g => g.Length) };

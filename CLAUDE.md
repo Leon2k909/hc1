@@ -2645,7 +2645,7 @@
 
 ## Maps
 - Match maps (map picker, Quick Play, end-of-match vote) are `GameUtils.IsMatchReadyMap`: Flatgrass, Innocent Hotel,
-  Belltower, Reef Hall, Railhead, Lowtide, Boxyard, Cerro Blanco and Ares (see their sections below).
+  Belltower, Reef Hall, Railhead, Lowtide, Boxyard, Cerro Blanco, Riverdale and Ares (see their sections below).
 - The hub (`HubPage`) is one featured screen for the tab picked on its left rail (`HubModeRail`, `HubPage.Operation`:
   Multiplayer, Battle Royale or Zombies; Campaign is locked), like the user's CoD-style mockup. Its art is
   `ui/modes/<mode>_wide.png`, a 1024x720 cut of the 2:3 card art. Battle Royale has no wide cut or blurred backdrop, so
@@ -4031,6 +4031,75 @@ simulate_input.
       hasn't been seen in a match.
   - Not yet checked: a Retakes, Domination, Hot Zone or Cash Grab match played on it.
 - To play it: `dev_mode team_deathmatch cerroblanco` (or `dev_mode bomb_defusal cerroblanco`).
+
+## Riverdale (multiplayer map, `Tools/riverdale_map.py`)
+- The user asked for a new AAA nuclear reactor map "as close as possible" to two reference pictures (2026-10-14): a
+  reactor hall round a glowing cyan fuel pool (crane with "RIVERDALE NUCLEAR" and "SWL 125 T", mast in the pool,
+  glass control room upper left with a stair, B1/B2 blocks, slogans and the logo on the far wall, water purification
+  tanks, cases with the logo), and a wet plant yard at sunrise (A1 with "> REACTOR HALL", B1 with a stair up to a
+  double door, the UNIT 1 containment dome, two cooling towers, a red container "02", barriers, a forklift, pipes,
+  snowy mountains and pines). Riverdale Nuclear, its "A" logo (a triangle with an orbit swoosh, drawn by
+  `riverdale_materials.logo`) and every marking are the map's own.
+- Scripts, run in this order:
+  - `Tools/riverdale_materials.py`: the rv_ materials in `Assets/materials/riverdale/` (numpy, Boxyard's helpers):
+    formwork concrete, the hall floor, the wet yard with puddles, grating, yellow and grey steel, pipe jacketing, the
+    pool liner, glowing fuel racks, hazard stripes, cases, and three atlases: lettering (`LETTERS`, white on alpha,
+    tinted by `rv_letters_dark` / `_light`), signs (`PLATES`: the caution sign, UNIT banners, placards) and the control
+    room's screens (`SCREENS`, self-lit). `rv_pool_water` is Reef Hall's `hc1_tank_glass.shader` looking down.
+  - `Tools/riverdale_sky.py`: a golden morning on belltower_sky's code, the sun 16 degrees up 33 degrees north of east
+    (riverdale_map's SUN_PITCH, SUN_YAW), warm at the horizon, more cumulus near the sun. ~2 min.
+  - `Tools/riverdale_map.py [--preview <dir>] [--views ...] [--no-scene] [--no-models] [--art]`: everything else, with
+    `riverdale_parts.py` (pipes with bends, railings that add player clips, stairs on one wedge hull, tanks, jersey
+    barriers, cases, atlas quads, lamps that add point lights), `riverdale_hall.py` (the hall) and
+    `riverdale_backdrop.py` (domes, towers, terrain, pines, the tower crane, outer blocks; drawn only). The scene is
+    rewritten whole on every run.
+- Layout (plan e, n, z inches; mirrored across e 0; play e -2300..2300, n -1750..2450): Red spawns west, Blue east.
+  - The hall (e -1000..1000, n -200..2000, roof 1000): deeper than wide so its south end frames the reference. Pool R
+    520 round (0, 900), water at -30, liner to -520, racks and a lit mast in it; railing round it clipped to the roof.
+    Upper level at 288: a control room on each side wall (n 660..1200, glass on its pool and south sides) on columns,
+    a stair from the south deck (n 160..580) to a landing, walkways along the side and north walls, the B1/B2 blocks
+    (n 1300..1640) flush with it. Crane girders at n 840/960, z 836. Doors: west/east (annexes), south (yard apron),
+    two north (lane). Tanks south-east, logo cases south-west.
+  - Annexes on the hall's sides: A1 east (the reference's), A2 west, south faces with the sign, louvre, hazard jambs.
+  - Yard: C1 in the middle (core with an upper room, wings and stairs both sides, a pipe bridge to the hall), the
+    turbine annex south of it with generators either side breaking the south lane's sightline, a turbine block with
+    its sign on each yard's south edge, containers (east red 02, west blue 04), barriers, the forklift
+    (`lowtide_forklift`), cases, light masts.
+  - Spawn buildings B1 (east) / B2 (west): a stencilled wing, a stair up to a double door into an upper room, against
+    the boundary building. The hero yard view is from C1's east stair looking east (VIEWS "yard_reference").
+  - North lane between the hall and the perimeter wall, under a pipe rack; courts north of the annexes.
+  - Sites: A on the hall's east deck under the east control room, B in the east yard round the red container.
+- Backdrop (`riverdale_backdrop.py`): UNIT 1 dome at (4400, -1150) and UNIT 2 at (-4400, -1150), over each yard's far
+  end and clear of the B1/B2 spawn building, with the logo, name, red banner (17 degrees round from the logo) and
+  beacons on the face towards their yard, vent stacks, auxiliary blocks and pipe bridges; cooling towers at
+  (±10300, 4160) and (±14240, 2150), placed so the east yard's view finds them over A1; a heightfield ring of forested
+  hills and snowy massifs (the ridge field blurred round the ring, snow painted per quad: per triangle it made rows of
+  white teeth); 2600 pines from 6000 out (nearer, they stood over the roofline as black spikes). Domes and towers cast
+  no shadows (the low sun would put the yards in their shade).
+  - Its gravel ground is a ring round the play area (whose own ground runs 400 past its edges). It used to be one slab
+    over the whole map at z -30..-24, which capped the fuel pool (water at -30): from the deck the pool read as an
+    opaque teal sheet, the cyan lamps lighting the slab's top.
+- The look (`look_object`, `HAZE`): AO, a warm grade, a vignette, bloom (0.32 over 1.15), screen-space reflections and
+  ACES with auto exposure 1-2.5; volumetric haze in the hall (0.35) and a light one over the yards (0.06). The pool's
+  water scatter (0.1, 0.95, 1.35), the racks' glow (8) and the exposure were set together: at exposure 4 with the old
+  scatter (2.9 blue) the pool blew out to white.
+- Checks (`check_spots`, `check_reach`, `check_retakes_sight`) pass for all 95 spots.
+- `Sources/Riverdale/editor/` (run each with the native MCP's run_csharp, `{"path": ...}`):
+  - `compile-stale.cs.txt` force-compiles every riverdale material, model and the scene whose sources are newer than
+    their compiled files. The file watcher misses some of a run's rewrites (the backdrop's 35 MB OBJ, the flat paints),
+    and `CompileIfNeeded` doesn't look at a model's OBJs.
+  - `capture.cs.txt` renders the views offscreen into `output/riverdale/captures/` without touching the open scene,
+    as `config.json` there says (`views`, `width`, `height`, `settle_frames`, `stream_frames`, and `hide`: objects
+    to leave out by name). It marks every texture used at full size and waits ~3 s first: straight after loading the
+    lettering sampled low mips and read as black blobs. A capture that overlaps an asset reload can show a green sky;
+    run it again. Long captures (1920x1080, several views) can outlast the CLI's timeout.
+- The menus' picture, `ui/maps/riverdale.png`, is the capture's `map_art_hall` view (1920x1080): the hall from the
+  south deck, the crane, the far wall and the glowing pool. `--art` would overwrite it with the old flat-shaded stand-in.
+- Checked in those renders on 2026-10-14 against the references: the hall (crane lettering, the logo and slogans in
+  the bays between the far wall's pilasters, the glowing pool with its racks), both yards (A1/A2, the domes' faces,
+  TURBINE BUILDING, the containers), the control rooms, the north lane, the court and the aerial. Not yet played: no
+  match, bots, navmesh or modes have run on it.
+- To play it: `dev_mode team_deathmatch riverdale`.
 
 ## Ares (multiplayer map, `Tools/ares_map.py`)
 - The user asked for a map on Mars "as close to this img as possible" (2026-10-14), from a reference picture of an

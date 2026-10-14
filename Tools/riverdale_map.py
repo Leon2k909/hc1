@@ -16,7 +16,7 @@ marking are the map's own. Writes:
   the editor);
 - the radar picture, ui/minimaps/minimap_riverdale.png, and with --art a stand-in menu picture, ui/maps/riverdale.png.
 
-Plan coordinates: e east, n north, z up, inches. The play area is e -2300..2300, n -1750..2050, the ground at z 0.
+Plan coordinates: e east, n north, z up, inches. The play area is e -2300..2300, n -1750..2450, the ground at z 0.
 The layout is mirrored across e 0: Red Team spawns at the west end, Blue Team at the east. Three lanes:
 - North: the north lane between the reactor hall and the perimeter wall, under a pipe rack, with the west and east
   courts leading into it.
@@ -64,7 +64,7 @@ SKY_EXPOSURE = 1.6
 FOG_COLOUR = "1.02,0.86,0.70"
 CATCH_FLOOR_Z = -3000
 
-PLAY = ( -2300.0, 2300.0, -1750.0, 2050.0 )
+PLAY = ( -2300.0, 2300.0, -1750.0, 2450.0 )
 NAV_TOP = 400.0
 
 # The west annex (A1; A2 is its mirror) and the yard's buildings (west coordinates; the east is e -> -e).
@@ -87,11 +87,11 @@ TURBINE_SIDE = ( -1700.0, -1300.0, -1750.0, -1250.0 )
 SPAWN_TALL = ( -2300.0, -2060.0, -1160.0, -690.0 )
 SPAWN_WING = ( -2060.0, -1880.0, -840.0, -690.0 )
 SPAWN_LANDING = ( -2060.0, -2020.0, -960.0, -840.0 )
-SPAWN_STAIR = ( -1790.0, -2020.0, -960.0, -884.0 )       # foot e, head e, n0, n1
+SPAWN_STAIR = ( -1750.0, -2020.0, -960.0, -884.0 )       # foot e, head e, n0, n1
 SPAWN_ROOM_Z = 200.0
 SPAWN_TOP = 380.0
 BOUNDARY_TOP = 360.0
-NORTH_WALL_N = 2050.0
+NORTH_WALL_N = 2450.0
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -240,10 +240,10 @@ def court( m, sx ):
     P.railing( m, mirror_pts( [ ( -1520, 560 ), ( -1320, 560 ), ( -1320, 720 ), ( -1520, 720 ) ], f ), 0, "rv_yellow", height=40,
                closed=True, clip_to=40, name="transformer fence" )
     # A pair of tanks against the hall wall.
-    for n in ( 1150.0, 1290.0 ):
+    for n in ( 1350.0, 1490.0 ):
         P.tank( m, ( f * -1110, n ), 56, 280, "rv_white", facing=( -f, 0 ) )
     # Pipe rack across the court at 260, from the hall's wall to the annex roof.
-    for n in ( 980.0, 1450.0 ):
+    for n in ( 980.0, 1700.0 ):
         for e in ( -1640.0, -1360.0, -1080.0 ):
             box( m, *sorted( ( f * ( e - 5 ), f * ( e + 5 ) ) ), n - 5, n + 5, 0, 270, "rv_steel", METAL )
         P.i_beam( m, ( f * -1650, n, 270 ), ( f * -1040, n, 270 ), 12, 8, "rv_steel" )
@@ -251,15 +251,17 @@ def court( m, sx ):
         n = 990 + k * 30 if k < 2 else 1380 + k * 20
         P.pipe( m, mirror_pts( [ ( -1700, 1000 + k * 26, 288 ), ( -1040, 1000 + k * 26, 288 ) ], f ), r, "rv_pipe", 12, caps=False )
     for k, r in enumerate( ( 8.0, 5.0 ) ):
-        P.pipe( m, mirror_pts( [ ( -1660, 1000 + k * 26, 288 ), ( -1660, 1430 + k * 0, 288 ), ( -1660, 1660, 288 ) ], f ), r, "rv_pipe", 12, caps=False )
+        P.pipe( m, mirror_pts( [ ( -1660, 1000 + k * 26, 288 ), ( -1660, 1700, 288 ), ( -1660, 2060, 288 ) ], f ), r, "rv_pipe", 12, caps=False )
     # Cover: barriers and cases.
     P.jersey( m, ( f * -1250, 900 ), ( 1, 0 ) )
     P.jersey( m, ( f * -1500, 1080 ), ( 0, 1 ) )
-    P.jersey( m, ( f * -1350, 1500 ), ( 1, 0.2 ) )
-    for k, ( e, n ) in enumerate( ( ( -1620, 840 ), ( -1180, 420 ), ( -1600, 1560 ), ( -1200, 1580 ) ) ):
+    P.jersey( m, ( f * -1350, 1560 ), ( 1, 0.2 ) )
+    P.jersey( m, ( f * -1250, 1880 ), ( 0, 1 ) )
+    for k, ( e, n ) in enumerate( ( ( -1620, 840 ), ( -1180, 420 ), ( -1600, 1560 ), ( -1200, 1980 ), ( -1560, 1940 ) ) ):
         P.case_stack( m, ( f * e, n ), ( 1, 0 ), "olive", seed=60 + k + ( 0 if sx < 0 else 50 ) )
     P.wall_light( m, f"Court lamp {sx} a", ( f * ( H.E0 - H.WT ), 900, 260 ), v( -f, 0, 0 ), "warm", 420 )
     P.wall_light( m, f"Court lamp {sx} b", ( f * ( H.E0 - H.WT ), 1450, 260 ), v( -f, 0, 0 ), "warm", 420 )
+    P.wall_light( m, f"Court lamp {sx} c", ( f * ( H.E0 - H.WT ), 1900, 260 ), v( -f, 0, 0 ), "warm", 420 )
 
 
 def yard_side( m, sx ):
@@ -304,14 +306,18 @@ def yard_side( m, sx ):
     P.louvre( m, ( f * -1500, nface, 300 ), nright, 220, 140 )
     P.door( m, ( f * -1500, nface, 0 ), nright, 80, 96, double=False )
     P.wall_light( m, f"Turbine block door lamp {sx}", ( f * -1500, nface, 122 ), nout, "warm", 300 )
-    # Big pipes from the block up over the yard to the annex, on a truss: the reference's pipe gantry.
-    for e in ( -1640.0, -1360.0 ):
-        P.truss( m, ( f * e, TURBINE_SIDE[3], 330 ), ( f * e, ANNEX[2], 330 ), 44, "rv_steel", panel=70 )
-    for n in np.arange( TURBINE_SIDE[3] + 20, ANNEX[2], 90.0 ):
-        a, b = sorted( ( f * -1660, f * -1340 ) )
-        box( m, a, b, n - 2, n + 2, 372, 376, "rv_steel" )
-    for k, ( e, r ) in enumerate( ( ( -1610, 16.0 ), ( -1560, 12.0 ), ( -1515, 12.0 ), ( -1470, 8.0 ), ( -1430, 8.0 ) ) ):
-        P.pipe( m, [ ( f * e, TURBINE_SIDE[3] - 60, 376 + r ), ( f * e, ANNEX[2] + 10, 376 + r ) ], r, "rv_pipe", 14, caps=False )
+    # Big pipes from the block's roof east into the spawn building on a gantry, high over the yard's edge: the
+    # reference's pipes overhead on its right.
+    g0, g1 = TURBINE_SIDE[3] - 20, TURBINE_SIDE[3] + 90
+    for e in ( -1880.0, -2040.0 ):
+        for nn in ( g0, g1 ):
+            box( m, *sorted( ( f * ( e - 6 ), f * ( e + 6 ) ) ), nn - 6, nn + 6, 0, 380, "rv_steel", METAL )
+    for nn in ( g0, g1 ):
+        P.i_beam( m, ( f * TURBINE_SIDE[0], nn, 380 ), ( f * SPAWN_TALL[1], nn, 380 ), 14, 8, "rv_steel" )
+    for k, ( dn, r ) in enumerate( ( ( 0, 18.0 ), ( 40, 13.0 ), ( 72, 9.0 ) ) ):
+        n_ = g0 + 12 + dn
+        P.pipe( m, [ ( f * ( TURBINE_SIDE[1] + 40 ), n_, 470 ), ( f * TURBINE_SIDE[0], n_, 470 ), ( f * TURBINE_SIDE[0] - f * 60, n_, 394 + r ),
+                     ( f * SPAWN_TALL[1] - f * 30, n_, 394 + r ), ( f * SPAWN_TALL[1] - f * 30, n_, 300 ) ], r, "rv_pipe", 14, caps=False )
     # Barriers.
     for e, n, along in ( ( -1300, -1000, ( 0, 1 ) ), ( -1150, -800, ( 1, 0 ) ), ( -820, -1180, ( 0, 1 ) ), ( -1640, -1350, ( 1, 0 ) ),
                          ( -980, -1460, ( 1, 0.1 ) ), ( -640, -1140, ( 0, 1 ) ), ( -1060, -760, ( 1, -0.3 ) ), ( -1400, -880, ( 1, 0.3 ) ) ):
@@ -373,7 +379,7 @@ def spawn_side( m, sx ):
     H.wall( m, "e", *E( t0, t1 ), tn0, tn0 + w, 0, SPAWN_TOP )
     H.wall( m, "e", *E( t0, t1 ), tn1 - w, tn1, 0, SPAWN_TOP )
     box( m, *E( t0, t1 - w ), tn0 + w, tn1 - w, 0, SPAWN_ROOM_Z - 16, "rv_wall", STONE )
-    box( m, *E( t0, t1 - w ), tn0 + w, tn1 - w, SPAWN_ROOM_Z - 16, SPAWN_ROOM_Z, { "default": None, "+z": "rv_floor" } )
+    box( m, *E( t0, t1 - w ), tn0 + w, tn1 - w, SPAWN_ROOM_Z - 16, SPAWN_ROOM_Z, { "default": None, "+z": "rv_floor" }, STONE )
     box( m, *E( t0, t1 ), tn0, tn1, SPAWN_TOP - 18, SPAWN_TOP, { "default": "rv_wall", "-z": "rv_steel" }, STONE )
     for a_, b_, c_, d_ in ( ( t0, t1, tn0, tn0 + 10 ), ( t0, t1, tn1 - 10, tn1 ), ( t1 - 10, t1, tn0, tn1 ) ):
         box( m, *E( a_, b_ ), c_, d_, SPAWN_TOP, SPAWN_TOP + 26, "rv_wall", STONE )
@@ -416,7 +422,6 @@ def spawn_side( m, sx ):
     P.wall_light( m, f"Spawn upper lamp {sx}", ( dface, -770, SPAWN_ROOM_Z + 112 ), wout, "warm", 280 )
     P.beacon( m, f"Spawn beacon {sx}", ( f * t1 + f * 4, tn1 - 10, SPAWN_TOP + 26 ) )
     # Crates and cases on the deck, as the reference's along its walkway.
-    P.case_stack( m, ( f * -1960, -720 ), ( 1, 0 ), "olive", seed=160 + sx )
     # Guard hut and barriers.
     he = f * -2120
     box( m, he - 50, he + 50, -1500, -1400, 0, 110, { "default": "rv_white", "+z": "rv_steel" }, METAL )
@@ -503,7 +508,21 @@ def b1( m, glass ):
     P.case_stack( m, ( 100, -760 ), ( 1, 0 ), "olive", seed=202 )
 
 
+def generator( m, e0, e1, n0, n1 ):
+    """ A diesel generator set on its skid: a housing with louvres, an exhaust stack, a fuel tank under. """
+    box( m, e0 - 6, e1 + 6, n0 - 6, n1 + 6, 0, 14, "rv_steel", METAL )
+    box( m, e0, e1, n0, n1, 14, 96, { "default": "rv_yellow", "+z": "rv_steel" }, METAL )
+    for k in range( int( ( e1 - e0 - 20 ) / 12 ) ):
+        e = e0 + 16 + k * 12
+        for nn, sn in ( ( n0, -1 ), ( n1, 1 ) ):
+            P.quad( m, "rv_louvre", ( e, nn, 70 ), v( sn, 0, 0 ) * -1 if sn < 0 else v( -1, 0, 0 ), UP, 8, 40, off=0.3 )
+    P.pipe( m, [ ( e1 - 24, ( n0 + n1 ) / 2, 96 ), ( e1 - 24, ( n0 + n1 ) / 2, 150 ), ( e1 - 4, ( n0 + n1 ) / 2, 168 ) ], 4.0, "rv_steel", 8 )
+    P.letters( m, "logo_wordmark", ( ( e0 + e1 ) / 2, n0 - 0.3, 56 ), ( 1, 0, 0 ), 18, "dark" )
+
+
 def turbine_annex( m ):
+    for sx in ( -1, 1 ):
+        generator( m, *sorted( ( sx * 130, sx * 320 ) ), -1165, -1065 )
     e0, e1, n0, n1 = TURBINE
     box( m, e0, e1, n0, n1, 0, TURBINE_TOP, "rv_wall", STONE )
     for a, b, c, d in ( ( e0, e1, n1 - 10, n1 ), ( e0, e0 + 10, n0, n1 ), ( e1 - 10, e1, n0, n1 ) ):
@@ -594,14 +613,13 @@ def north_lane( m ):
         P.pipe( m, [ ( -1700, nn, 266 + r ), ( 1700, nn, 266 + r ) ], r, "rv_pipe", 12, caps=False )
     P.cable_tray( m, ( -1700, r1 + 30, 300 ), ( 1700, r1 + 30, 300 ) )
     # Cover: concrete blocks, a generator, cases, barriers.
-    for e, nn in ( ( -720, 1880 ), ( 720, 1880 ), ( -240, 1760 ), ( 240, 1760 ), ( 0, 1960 ) ):
+    mid = ( r1 + n ) / 2
+    for e, nn in ( ( -720, mid + 40 ), ( 720, mid + 40 ), ( -240, r1 + 60 ), ( 240, r1 + 60 ), ( 0, n - 90 ) ):
         box( m, e - 30, e + 30, nn - 30, nn + 30, 0, 44, "rv_plinth", STONE )
-    box( m, -140, 140, 1890, 1960, 0, 84, { "default": "rv_steel", "+z": "rv_steel" }, METAL )
-    P.letters( m, "logo_wordmark", ( 0, 1889.6, 50 ), ( 1, 0, 0 ), 20, "light" )
-    P.pipe( m, [ ( 110, 1940, 84 ), ( 110, 1940, 150 ) ], 4, "rv_steel", 8 )
-    for k, ( e, nn ) in enumerate( ( ( -1260, 1880 ), ( 1260, 1880 ), ( -500, 1990 ), ( 500, 1990 ), ( -1900, 1950 ), ( 1900, 1950 ) ) ):
+    generator( m, -140, 140, n - 160 - 70, n - 160 )
+    for k, ( e, nn ) in enumerate( ( ( -1260, mid + 30 ), ( 1260, mid + 30 ), ( -500, n - 60 ), ( 500, n - 60 ), ( -1900, n - 100 ), ( 1900, n - 100 ) ) ):
         P.case_stack( m, ( e, nn ), ( 1, 0 ), "olive" if k % 2 else "dark", seed=400 + k )
-    for e, nn, along in ( ( -1000, 1780, ( 1, 0 ) ), ( 1000, 1780, ( 1, 0 ) ), ( -1700, 1820, ( 0, 1 ) ), ( 1700, 1820, ( 0, 1 ) ) ):
+    for e, nn, along in ( ( -1000, r1 + 40, ( 1, 0 ) ), ( 1000, r1 + 40, ( 1, 0 ) ), ( -1700, mid, ( 0, 1 ) ), ( 1700, mid, ( 0, 1 ) ) ):
         P.jersey( m, ( e, nn ), along )
     for e in ( -1500.0, -500.0, 500.0, 1500.0 ):
         P.wall_light( m, f"Perimeter lamp {e}", ( e, n, 200 ), v( 0, -1, 0 ), "warm", 420 )
@@ -643,15 +661,15 @@ def turbine_hall( m ):
 
 def probes():
     return [
-        ( "Hall", ( 0, 700, 400 ), ( H.E0, H.E1, H.N0, H.N1, -40, H.TOP ) ),
-        ( "Pool", ( 0, 700, -200 ), ( -500, 500, 200, 1200, H.POOL_FLOOR, 0 ) ),
+        ( "Hall", ( 0, 900, 400 ), ( H.E0, H.E1, H.N0, H.N1, -40, H.TOP ) ),
+        ( "Pool", ( 0, 900, -200 ), ( -520, 520, 380, 1420, H.POOL_FLOOR, 0 ) ),
         ( "A1", ( -1370, -190, 150 ), ( -1670, -1070, -590, 210, 0, ANNEX_TOP - 20 ) ),
         ( "A2", ( 1370, -190, 150 ), ( 1070, 1670, -590, 210, 0, ANNEX_TOP - 20 ) ),
         ( "B1 Room", ( 0, -870, 280 ), ( -136, 136, -1016, -724, ROOM_Z, CORE_TOP - 20 ) ),
-        ( "West Control", ( -890, 0, 360 ), ( -1000, -780, -200, 200, H.UPPER, 440 ) ),
-        ( "East Control", ( 890, 0, 360 ), ( 780, 1000, -200, 200, H.UPPER, 440 ) ),
+        ( "West Control", ( -780, 930, 370 ), ( -1000, -560, 660, 1200, H.UPPER, H.CONTROL_TOP ) ),
+        ( "East Control", ( 780, 930, 370 ), ( 560, 1000, 660, 1200, H.UPPER, H.CONTROL_TOP ) ),
         ( "Yard", ( 0, -1000, 200 ), ( PLAY[0], PLAY[1], PLAY[2], H.N0 - H.WT, -20, 900 ) ),
-        ( "North", ( 0, 1850, 200 ), ( PLAY[0], PLAY[1], H.N1 + H.WT, PLAY[3], -20, 700 ) ),
+        ( "North", ( 0, 2250, 200 ), ( PLAY[0], PLAY[1], H.N1 + H.WT, PLAY[3], -20, 700 ) ),
     ]
 
 
@@ -663,23 +681,23 @@ RED_SPAWNS = [ ( -2050, -500, 0 ), ( -2050, -250, 0 ), ( -2050, 0, 0 ), ( -2050,
 BLUE_SPAWNS = [ ( -e, n, z ) for e, n, z in RED_SPAWNS ]
 BUY_ZONE = ( 1720, 2300, -900, 500, -10, 260 )        # Blue Team's; Red Team's is its mirror
 
-DM_SPAWNS = [ ( 0, 0, 0 ), ( 0, 1400, 0 ), ( -560, 1200, 0 ), ( 560, 1200, 0 ), ( -800, 200, 0 ), ( 590, 760, 0 ),
-              ( -930, 900, H.UPPER ), ( 930, 500, H.UPPER ), ( 0, 1530, H.UPPER ), ( -890, -100, H.UPPER ), ( 890, 100, H.UPPER ),
-              ( -1370, -100, 0 ), ( 1370, -100, 0 ), ( -1370, 1300, 0 ), ( 1370, 800, 0 ), ( -600, 1850, 0 ), ( 600, 1850, 0 ),
-              ( -1800, 1850, 0 ), ( 1800, 1850, 0 ), ( 0, -870, ROOM_Z ), ( -300, -770, ROOM_Z ), ( 300, -770, ROOM_Z ),
+DM_SPAWNS = [ ( 0, 0, 0 ), ( 0, 1700, 0 ), ( -470, 1700, 0 ), ( 470, 1700, 0 ), ( -820, 300, 0 ), ( 640, 930, 0 ),
+              ( -930, 1500, H.UPPER ), ( 930, 1260, H.UPPER ), ( 0, 1930, H.UPPER ), ( -780, 930, H.UPPER ), ( 780, 930, H.UPPER ),
+              ( -1370, -100, 0 ), ( 1370, -100, 0 ), ( -1370, 1300, 0 ), ( 1370, 800, 0 ), ( -600, 2250, 0 ), ( 600, 2250, 0 ),
+              ( -1800, 2250, 0 ), ( 1800, 2250, 0 ), ( 0, -870, ROOM_Z ), ( -300, -770, ROOM_Z ), ( 300, -770, ROOM_Z ),
               ( 0, -500, 0 ), ( -860, -1060, 0 ), ( 860, -1060, 0 ), ( -1380, -1100, 0 ), ( 1380, -1100, 0 ), ( 0, -1150, 0 ),
               ( -1100, -1600, 0 ), ( 1100, -1600, 0 ), ( -1950, -1550, 0 ), ( 1950, -1550, 0 ), ( -2130, -950, SPAWN_ROOM_Z ),
               ( 2130, -950, SPAWN_ROOM_Z ) ]
 
 # ( name, display name, e0, e1, n0, n1, floor )
-BOMB_SITES = [ ( "bombsite_a", "Bomb Site A", 460, 1000, 300, 1100, 0 ),
+BOMB_SITES = [ ( "bombsite_a", "Bomb Site A", 520, 1000, 300, 1000, 0 ),
                ( "bombsite_b", "Bomb Site B", 760, 1300, -1620, -960, 0 ) ]
 
-_HALL_ATTACK = [ ( -1400, 800, 0 ), ( -1500, 1000, 0 ), ( -1300, 1100, 0 ), ( -1400, -400, 0 ), ( -1550, -300, 0 ), ( -1250, -100, 0 ) ]
-_YARD_ATTACK = [ ( -1100, -1560, 0 ), ( -1000, -1640, 0 ), ( -1500, -1440, 0 ), ( -1300, -720, 0 ), ( -1700, -900, 0 ), ( -1560, -1300, 0 ) ]
+_HALL_ATTACK = [ ( -1400, 800, 0 ), ( -1500, 1000, 0 ), ( -1300, 1150, 0 ), ( -1400, -400, 0 ), ( -1550, -300, 0 ), ( -1250, -300, 0 ) ]
+_YARD_ATTACK = [ ( -1100, -1440, 0 ), ( -1150, -1660, 0 ), ( -1300, -720, 0 ), ( -1640, -760, 0 ), ( -1200, -980, 0 ), ( -1400, -1210, 0 ) ]
 RETAKES = {
-    "bombsite_a": { "planter": [ ( 840, 470, 0 ), ( 560, 1060, 0 ) ],
-                    "defender": [ ( 900, 1250, 0 ), ( 470, 1320, 0 ), ( 850, 150, 0 ) ],
+    "bombsite_a": { "planter": [ ( 800, 760, 0 ), ( 680, 400, 0 ) ],
+                    "defender": [ ( 820, 1760, 0 ), ( 470, 1600, 0 ), ( 860, 260, 0 ) ],
                     "attacker": list( _HALL_ATTACK ) },
     "bombsite_b": { "planter": [ ( 1000, -1290, 0 ), ( 1150, -1500, 0 ) ],
                     "defender": [ ( 1250, -1080, 0 ), ( 860, -1640, 0 ), ( 1160, -1680, 0 ) ],
@@ -687,8 +705,8 @@ RETAKES = {
 }
 
 DOMINATION = [ ( "A", ( -1370, -120, 0 ) ), ( "B", ( 0, -500, 0 ) ), ( "C", ( 1370, -120, 0 ) ) ]
-HOT_ZONES = [ ( "Pool South", ( 0, 0, 0 ) ), ( "Pool North", ( 0, 1400, 0 ) ), ( "C1", ( 0, -870, ROOM_Z ) ),
-              ( "North Lane", ( 0, 1850, 0 ) ), ( "West Court", ( -1370, 900, 0 ) ), ( "East Court", ( 1370, 900, 0 ) ) ]
+HOT_ZONES = [ ( "Pool South", ( 0, 0, 0 ) ), ( "Pool North", ( 0, 1700, 0 ) ), ( "C1", ( 0, -870, ROOM_Z ) ),
+              ( "North Lane", ( -370, 2320, 0 ) ), ( "West Court", ( -1370, 900, 0 ) ), ( "East Court", ( 1370, 900, 0 ) ) ]
 CASH_POINTS = [ ( "Pool South", ( 0, 0, 0 ), ( 0, -870, ROOM_Z ) ), ( "West Court", ( -1370, 900, 0 ), ( 1370, 900, 0 ) ),
                 ( "East Court", ( 1370, 900, 0 ), ( -1370, 900, 0 ) ) ]
 
@@ -696,13 +714,13 @@ CASH_POINTS = [ ( "Pool South", ( 0, 0, 0 ), ( 0, -870, ROOM_Z ) ), ( "West Cour
 def callouts():
     out = [ ( "RED SPAWN", PLAY[0], -1700, PLAY[2], PLAY[3], -10, 600 ), ( "BLUE SPAWN", 1700, PLAY[1], PLAY[2], PLAY[3], -10, 600 ),
             ( "A1", -1700, -1040, -620, 240, -10, 380 ), ( "A2", 1040, 1700, -620, 240, -10, 380 ),
-            ( "WEST COURT", -1700, -1040, 240, 1640, -10, 600 ), ( "EAST COURT", 1040, 1700, 240, 1640, -10, 600 ),
-            ( "NORTH LANE", -1700, 1700, 1640, PLAY[3], -10, 600 ),
-            ( "WEST CONTROL", -1000, -700, -200, 200, 270, 460 ), ( "EAST CONTROL", 700, 1000, -200, 200, 270, 460 ),
-            ( "WEST WALKWAY", -1000, -640, 200, 1460, 270, 460 ), ( "EAST WALKWAY", 640, 1000, 200, 1460, 270, 460 ),
-            ( "NORTH WALKWAY", -1000, 1000, 1460, 1600, 270, 460 ),
-            ( "POOL SOUTH", -1000, 1000, -200, 450, -40, 270 ), ( "POOL WEST", -1000, -300, 450, 1600, -40, 270 ),
-            ( "A SITE", 300, 1000, 300, 1600, -40, 270 ), ( "POOL NORTH", -300, 300, 1100, 1600, -40, 270 ),
+            ( "WEST COURT", -1700, -1040, 240, 2040, -10, 600 ), ( "EAST COURT", 1040, 1700, 240, 2040, -10, 600 ),
+            ( "NORTH LANE", -1700, 1700, 2040, PLAY[3], -10, 600 ),
+            ( "WEST CONTROL", -1000, -560, 580, 1200, 270, 470 ), ( "EAST CONTROL", 560, 1000, 580, 1200, 270, 470 ),
+            ( "WEST WALKWAY", -1000, -640, 1200, 1860, 270, 470 ), ( "EAST WALKWAY", 640, 1000, 1200, 1860, 270, 470 ),
+            ( "NORTH WALKWAY", -1000, 1000, 1860, 2000, 270, 470 ),
+            ( "POOL SOUTH", -1000, 1000, -200, 380, -40, 270 ), ( "POOL WEST", -1000, -300, 380, 2000, -40, 270 ),
+            ( "A SITE", 300, 1000, 380, 1200, -40, 270 ), ( "POOL NORTH", -300, 1000, 1200, 2000, -40, 270 ),
             ( "HALL APRON", -1040, 1040, -700, -240, -10, 500 ), ( "C1", -470, 470, -1040, -700, -10, 190 ),
             ( "C1 ROOM", -160, 160, -1040, -700, 190, 440 ), ( "WEST YARD", -1700, -470, -1750, -620, -10, 600 ),
             ( "B SITE", 470, 1700, -1750, -620, -10, 600 ), ( "TURBINE", -520, 520, -1240, -1040, -10, 600 ),
@@ -726,8 +744,8 @@ def all_spots():
 # ---------------------------------------------------------------------------------------------------------------------
 # The radar picture
 
-MINIMAP_CENTRE = ( 0.0, 150.0 )
-MINIMAP_SIZE = 4900.0
+MINIMAP_CENTRE = ( 0.0, 350.0 )
+MINIMAP_SIZE = 5000.0
 MINIMAP_PIXELS = 1024
 
 
@@ -890,10 +908,30 @@ def look_object():
                      BlendFactor=0.4, ColorSpace="None", LookupTexture=None ),
         K.component( ids, "Sandbox.Vignette", "look/vignette", Center="0.5,0.5", Color="0,0,0,1", Intensity=0.26, Roundness=1,
                      Smoothness=1 ),
+        # Bloom for the lamps, the pool and the low sun's glare; screen-space reflections for the wet yard and floors.
+        K.component( ids, "Sandbox.Bloom", "look/bloom", **{ "__version": 1 }, Mode="Additive", Strength=0.32, Threshold=1.15,
+                     Tint="1,0.96,0.9,1" ),
+        K.component( ids, "Sandbox.ScreenSpaceReflections", "look/ssr" ),
         K.component( ids, "Sandbox.Tonemapping", "look/tonemap", **{ "__version": 3 }, AutoExposureEnabled=True,
-                     ExposureCompensation=0, ExposureMethod="RGB", MinimumExposure=1.0, MaximumExposure=4,
+                     ExposureCompensation=0, ExposureMethod="RGB", MinimumExposure=1.0, MaximumExposure=2.5,
                      Mode="ACES", Rate=1 ),
     ] )
+
+
+# Volumetric haze: ( name, ( e0, e1, n0, n1, z0, z1 ), strength, colour ). The hall's is the reference's blue-grey air
+# the lamps and the pool light up; the yard's a light morning haze the low sun shines through.
+HAZE = [ ( "Hall Haze", ( H.E0, H.E1, H.N0, H.N1, -40, H.TOP ), 0.35, "0.78,0.88,1,1" ),
+         ( "Yard Haze", ( PLAY[0], PLAY[1], PLAY[2], H.N0 - H.WT, 0, 900 ), 0.06, "1,0.86,0.7,1" ) ]
+
+
+def haze_object( name, box_, strength, colour ):
+    e0, e1, n0, n1, z0, z1 = box_
+    at = K.to_world( ( ( e0 + e1 ) / 2, ( n0 + n1 ) / 2, ( z0 + z1 ) / 2 ) )
+    half = ( ( n1 - n0 ) / 2, ( e1 - e0 ) / 2, ( z1 - z0 ) / 2 )
+    key = f"haze/{name}"
+    return K.game_object( ids, name, key, at, components=[
+        K.component( ids, "Sandbox.VolumetricFogVolume", f"{key}/volume", Bounds={ "Mins": K.vec( tuple( -h for h in half ) ), "Maxs": K.vec( half ) },
+                     FalloffExponent=1, Strength=strength, Color=colour ) ] )
 
 
 def write_scene( written, light_list, probe_list ):
@@ -1001,6 +1039,7 @@ def write_scene( written, light_list, probe_list ):
         world,
         K.game_object( ids, "Lights", "lights", children=light_objects ),
         K.game_object( ids, "Reflection Probes", "probes", children=[ probe_object( *p ) for p in probe_list ] ),
+        K.game_object( ids, "Volumetric Fog", "haze", children=[ haze_object( *h ) for h in HAZE ] ),
         mode_group( "Team Spawns", "spawns", ( "Deathmatch", "Gun Game" ), team_spawns, inverse=True ),
         mode_group( "Deathmatch Spawns", "spawns/dm", ( "Deathmatch", "Gun Game" ), dm_spawns ),
         mode_group( "Retakes Spawns", "spawns/retakes", ( "Retakes", ), retakes_spawns ),
@@ -1063,4 +1102,157 @@ def roof_clips():
                 out.append( ( f"Container {sx} {ce}", ( f * ce - 49, f * ce + 49, cn - hl, cn + hl, 102, 1500 ) ) )
             else:
                 a, b = sorted( ( f * ce - hl, f * ce + hl ) )
-                out.append( ( f"
+                out.append( ( f"Container {sx} {ce}", ( a, b, cn - 49, cn + 49, 102, 1500 ) ) )
+        a, b = sorted( ( f * PLAY[0], f * ( PLAY[0] - 300 ) ) )
+        out.append( ( f"Boundary {sx}", ( a, b, PLAY[2], PLAY[3], BOUNDARY_TOP, 1500 ) ) )
+        a, b = sorted( ( f * SPAWN_TALL[0], f * SPAWN_TALL[1] ) )
+        out.append( ( f"Spawn building {sx}", ( a, b, SPAWN_TALL[2], SPAWN_TALL[3], SPAWN_TOP, 1500 ) ) )
+        a, b = sorted( ( f * TURBINE_SIDE[0], f * TURBINE_SIDE[1] ) )
+        out.append( ( f"Turbine block {sx}", ( a, b, TURBINE_SIDE[2], TURBINE_SIDE[3], 420, 1500 ) ) )
+    out.append( ( "B1 Core", ( CORE[0], CORE[1], CORE[2], CORE[3], CORE_TOP, 1500 ) ) )
+    out.append( ( "Turbine Annex", ( TURBINE[0], TURBINE[1], TURBINE[2], TURBINE[3], TURBINE_TOP, 1500 ) ) )
+    out.append( ( "Hall", ( H.E0 - H.WT, H.E1 + H.WT, H.N0 - H.WT, H.N1 + H.WT, H.ROOF, 1500 ) ) )
+    out.append( ( "Perimeter", ( PLAY[0] - 400, PLAY[1] + 400, NORTH_WALL_N, NORTH_WALL_N + 30, 220, 1500 ) ) )
+    out.append( ( "Turbine Hall", ( PLAY[0] - 400, PLAY[1] + 400, PLAY[2] - 1000, PLAY[2], 960, 1500 ) ) )
+    return out
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+
+def build():
+    """ Every model by name. """
+    P.reset()
+    hall, hall_dress, pool, water, glass = H.build()
+    middle, west, east, north, boundary = K.Model(), K.Model(), K.Model(), K.Model(), K.Model()
+    b1( middle, glass )
+    turbine_annex( middle )
+    middle_yard( middle )
+    for sx, m in ( ( -1, west ), ( 1, east ) ):
+        annex( m, sx )
+        court( m, sx )
+        yard_side( m, sx )
+        spawn_side( m, sx )
+    north_lane( north )
+    turbine_hall( boundary )
+    models = {
+        "riverdale_ground": ground(), "riverdale_hall": hall, "riverdale_hall_dress": hall_dress, "riverdale_pool": pool,
+        "riverdale_water": water, "riverdale_glass": glass, "riverdale_middle": middle, "riverdale_west": west,
+        "riverdale_east": east, "riverdale_north": north, "riverdale_boundary": boundary,
+    }
+    try:
+        import riverdale_backdrop as BD
+        far, near = BD.build()
+        models["riverdale_backdrop"] = far
+        models["riverdale_backdrop_near"] = near
+    except ImportError:
+        pass
+    for model in models.values():
+        configure( model )
+    ROOF_CLIPS[:] = roof_clips()
+    return models
+
+
+def preview_setup():
+    """ The flat preview's colours, sun, sky and fog. """
+    for paint in RM.all_paints():
+        if paint in RM.PAINTED:
+            PV._colours[paint] = np.array( RM.PAINTED[paint][0] ) / 255.0
+            continue
+        for ext in ( "jpg", "png" ):
+            path = RM.OUT_DIR / f"{paint}_color.{ext}"
+            if path.exists():
+                small = Image.open( path ).convert( "RGB" ).resize( ( 64, 32 ) )
+                PV._colours[paint] = np.asarray( small, float ).reshape( -1, 3 ).mean( axis=0 ) / 255.0
+                break
+    PV._colours["rv_letters_dark"] = np.array( ( 0.12, 0.12, 0.13 ) )
+    PV._colours["rv_letters_light"] = np.array( ( 0.75, 0.75, 0.74 ) )
+    PV._colours["rv_pool_water"] = np.array( ( 0.2, 0.75, 0.9 ) )
+    p, y = math.radians( SUN_PITCH ), math.radians( SUN_YAW )
+    world = np.array( ( math.cos( p ) * math.cos( y ), math.cos( p ) * math.sin( y ), -math.sin( p ) ) )
+    PV.SUN = -np.array( ( -world[1], world[0], world[2] ) )
+    PV.SKY = ( np.array( ( 0.95, 0.86, 0.76 ) ), np.array( ( 0.45, 0.58, 0.80 ) ) )
+    PV.FOG = np.array( ( 0.92, 0.82, 0.72 ) )
+
+
+VIEWS = ( ( "yard_reference", ( 560, -1010, 170 ), ( 2000, -880, 300 ), 84 ),
+          ( "hall_reference", ( -260, -150, 180 ), ( -40, 1400, 470 ), 88 ),
+          ( "aerial", ( -2600, -3600, 3400 ), ( 0, 200, 0 ), 60 ),
+          ( "north_lane", ( -1900, 2250, 70 ), ( 1000, 2200, 60 ), 75 ),
+          ( "upper", ( -930, 1500, 350 ), ( 600, 900, 250 ), 80 ),
+          ( "west_yard", ( -560, -1010, 170 ), ( -2000, -880, 300 ), 84 ) )
+
+
+def write_map_art( models ):
+    preview_setup()
+    opaque, glass = PV.triangles( models ), PV.triangles( models, glass=True )
+    _, eye, target, fov = VIEWS[0]
+    image = PV.perspective( opaque, glass, eye, target, size=( 960, 540 ), fov=fov )
+    MAP_ART_FILE.parent.mkdir( parents=True, exist_ok=True )
+    image.resize( ( 1920, 1080 ), Image.LANCZOS ).convert( "RGB" ).save( MAP_ART_FILE )
+    print( f"wrote {MAP_ART_FILE.relative_to( K.ROOT )}" )
+
+
+def main():
+    parser = argparse.ArgumentParser( description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter )
+    parser.add_argument( "--preview", metavar="DIR", help="also write flat views and the reach grid's picture here" )
+    parser.add_argument( "--views", nargs="*", help="only these views" )
+    parser.add_argument( "--no-scene", action="store_true", help="write the models only, not the scene or the radar picture" )
+    parser.add_argument( "--no-models", action="store_true", help="don't write the models (checks and previews only)" )
+    parser.add_argument( "--art", action="store_true", help="write the menus' stand-in picture" )
+    args = parser.parse_args()
+
+    missing = [ p for p in RM.all_paints() if not ( RM.OUT_DIR / f"{p}.vmat" ).exists() ]
+    if missing:
+        print( f"run Tools/riverdale_materials.py first: no material for {', '.join( missing )}" )
+    models = build()
+    written = set()
+    for name, model in models.items():
+        if K.is_empty( model ):
+            print( f"{name}: empty, not written" )
+            continue
+        written.add( name )
+        if args.no_models:
+            continue
+        count = K.write_model( OUT_DIR, RESOURCE_DIR, name, model )
+        print( f"{name}: {count} triangles, {len( model.boxes )} boxes, {len( model.hulls )} hulls" )
+    if R.MISSING:
+        print( "from railhead_props, left out:" )
+        for name, why in sorted( R.MISSING.items() ):
+            print( f"  {name}: {why}" )
+    if R.UNKNOWN_PAINTS:
+        print( f"paints with no material: {', '.join( sorted( R.UNKNOWN_PAINTS ) )}" )
+    light_list = H.lights() + list( P.LIGHTS )
+    probe_list = probes()
+    print( f"{len( light_list )} lights ({sum( 1 for l in light_list if l[4] )} shadowed), {len( probe_list )} probes, "
+           f"{len( P.CLIPS ) + len( ROOF_CLIPS )} clips" )
+
+    solid = [ models[name] for name, _, collide, _ in SCENE_MODELS if collide and name in models ]
+    print( "checking spots:" )
+    problems = R.check_spots( R.collision_aabbs( solid ), all_spots() )
+    print( f"  {problems} problem(s) in {len( all_spots() )} spots" )
+    out = Path( args.preview ) if args.preview else None
+    if out:
+        out.mkdir( parents=True, exist_ok=True )
+    bounds = ( PLAY[0], PLAY[1], PLAY[2], PLAY[3] )
+    cut_off = R.check_reach( solid, all_spots(), out / "reach.png" if out else None, bounds=bounds )
+    print( f"  {cut_off} spot(s) cut off from the spawns" )
+    seen = R.check_retakes_sight( R.Blockers( solid ), RETAKES )
+    print( f"  {seen} Retakes pair(s) in sight of each other" )
+
+    if not args.no_scene:
+        write_minimap( solid )
+        write_scene( written, light_list, probe_list )
+    if args.art:
+        write_map_art( list( models.values() ) )
+    if out:
+        preview_setup()
+        opaque, glass = PV.triangles( list( models.values() ) ), PV.triangles( list( models.values() ), glass=True )
+        for name, eye, target, fov in VIEWS:
+            if args.views and name not in args.views:
+                continue
+            PV.perspective( opaque, glass, eye, target, size=( 960, 540 ), fov=fov ).convert( "RGB" ).save( out / f"{name}.png" )
+            print( f"wrote {out / f'{name}.png'}" )
+
+
+if __name__ == "__main__":
+    main()

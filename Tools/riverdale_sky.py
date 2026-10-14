@@ -7,8 +7,9 @@ Belltower's sky code (Tools/belltower_sky.py) into its own panorama.
 - The reference the map is dressed after looks into a low sun: warm cream and peach at the horizon, a clear blue
   overhead, and heaped cumulus with gold edges round the sun. So the sky's colours by height run warm low and blue
   high (SKY_KEYS), the sun's light is golden (LIGHT, also riverdale_map's Sun LightColor), and there are more heaps,
-  allowed nearer the sun (SUN_GAP), so some catch its rim light.
-- The sun is riverdale_map's (SUN_PITCH, SUN_YAW): 12 degrees up in the east-north-east, so from the west yard the
+  allowed nearer the sun (SUN_GAP), so some catch its rim light. Their sunlight is dimmer than the scene's (CLOUD_SUN),
+  so the tonemap leaves them gold rather than white.
+- The sun is riverdale_map's (SUN_PITCH, SUN_YAW): 16 degrees up, 33 degrees north of east, so from the east yard the
   light comes from behind the towers, as in the reference.
 - Writes Assets/materials/riverdale/sky/riverdale_sky.exr and riverdale_sky.vmat.
 """
@@ -22,7 +23,7 @@ OUT_DIR = ROOT / "Assets/materials/riverdale/sky"
 RESOURCE_DIR = "materials/riverdale/sky"
 NAME = "riverdale_sky"
 
-SUN_PITCH, SUN_YAW = 12.0, 125.0      # riverdale_map's
+SUN_PITCH, SUN_YAW = 16.0, 123.0      # riverdale_map's
 LIGHT = np.array( ( 1.55, 1.02, 0.58 ) )
 
 SKY_KEYS = ( ( 0.0, ( 240, 214, 182 ) ), ( 5.0, ( 226, 208, 190 ) ), ( 12.0, ( 196, 200, 208 ) ),
@@ -36,14 +37,14 @@ def main():
     S.OUT_DIR, S.RESOURCE_DIR, S.NAME = OUT_DIR, RESOURCE_DIR, NAME
     S.SKY_KEYS = SKY_KEYS
     S.LIGHT = LIGHT
-    S.CLOUD_SUN = LIGHT * 1.25
+    S.CLOUD_SUN = LIGHT * 0.82
     S.HALO_WHITE = np.array( ( 1.16, 1.0, 0.76 ) )
     S.GROUND = np.array( ( 0.20, 0.18, 0.15 ) )
-    S.AMB_HIGH = np.array( ( 0.17, 0.28, 0.58 ) )
+    S.AMB_HIGH = np.array( ( 0.14, 0.22, 0.44 ) )
     S.AMB_LOW = np.array( ( 0.34, 0.28, 0.24 ) )
-    S.HEAPS = 0.16
+    S.HEAPS = 0.12
     S.SUN_GAP = 700.0
-    S.NEAR_SIZE = ( 900.0, 0.35, 550.0, 1400.0 )
+    S.NEAR_SIZE = ( 1150.0, 0.35, 700.0, 1700.0 )
     sys.argv[0] = __file__
     S.main()
 
