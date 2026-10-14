@@ -1,0 +1,4 @@
+return new { Scene=Game.ActiveScene.Name,
+    TemporaryQaObjects=Game.ActiveScene.GetAllObjects(true).Where(x=>x.Name.StartsWith("Temporary bot",StringComparison.Ordinal)).Select(x=>x.Name).ToArray(),
+    AliveBots=Game.ActiveScene.GetAllComponents<Facepunch.LightweightCombatBot>().Count(x=>x.IsAlive),
+    SlidingBots=Game.ActiveScene.GetAllComponents<Facepunch.LightweightCombatBot>().Count(x=>x.IsAlive && x.IsSliding) };

@@ -75,6 +75,8 @@ PS
     float4 g_vCloudWind < Default4(7.8, -10.4, 0, 0); UiGroup("Clouds,20/50"); >;
     float g_flCloudRadiance < Default(0.7); Range(0.1, 4); UiGroup("Clouds,20/60"); >;
     float g_flSkyCloudTime < Default(0); >;
+    float g_flCloudDensity < Default(1); >;
+    float g_flWeatherOvercast < Default(0); >;
     // QA can compare fixed times using a copied material; the map leaves this zero.
     float g_flCloudTimeOffset < Default(0); UiGroup("Clouds,20/70"); >;
 
@@ -98,9 +100,14 @@ PS
         // Align the source's upper-left illumination with Lowtide's south-west sun.
         float2 uv = float2(0.5 * plane.x - 0.8660254 * plane.y, 0.8660254 * plane.x + 0.5 * plane.y) + float2(0.37, 0.61);
         float high = g_tHighClouds.Sample(g_sClouds, layer * 0.34 - drift * 0.65).r;
-        sky = lerp(sky, float3(0.62, 0.69, 0.78), high * horizon * 0.24);
+        sky = lerp(sky, float3(0.62, 0.69, 0.78), saturate(high * g_flCloudDensity) * horizon * 0.24);
         float4 cloud = g_tClouds.Sample(g_sClouds, uv);
-        sky = lerp(sky, cloud.rgb * g_flCloudRadiance, cloud.a * horizon);
+        sky = lerp(sky, cloud.rgb * g_flCloudRadiance, saturate(cloud.a * g_flCloudDensity) * horizon);
+        // A front thickens into a softly textured grey deck over minutes, without
+        // replacing the moving sky at a threshold halfway through the transition.
+        float3 overcast = lerp(float3(0.224, 0.231, 0.244), float3(0.375, 0.391, 0.417), saturate(ray.z));
+        overcast *= 1 + (high - 0.5) * 0.03 + (cloud.a - 0.5) * 0.06;
+        sky = lerp(sky, overcast, saturate(g_flWeatherOvercast));
         // Keep the sky compatible with the map's volumetric atmosphere.
         float3 farPosition = g_vCameraPositionWs.xyz + ray * g_flFarPlane;
         return float4(ApplyVolumetricFog(sky, farPosition, i.vPositionSs.xy), 1);

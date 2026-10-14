@@ -1,0 +1,16 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+Warnings:
+  CS1723(6462,14) warning: XML comment has cref attribute 'T' that refers to a type parameter
+  CS1723(6462,21) warning: XML comment has cref attribute 'T' that refers to a type parameter
+  SB3000(6550,4) warning: Static members in generic types won't be processed during hotloads, so should be explicitly marked with [SkipHotload]
+  CS1570(4644,18) warning: XML comment has badly formed XML -- 'End tag 'summary' does not match the start tag 'PlayerGlobals'.'
+  CS1570(4644,742) warning: XML comment has badly formed XML -- 'Reference to undefined entity 'box'.'
+  CS1570(4644,19) warning: XML comment has badly formed XML -- 'Expected an end tag for element 'summary'.'
+  RZ10012(4644,122) warning: Found markup element with unexpected name 'TextEntry'. If this is intended to be a component, add a @using directive for its namespace.
+  RZ10012(4644,80) warning: Found markup element with unexpected name 'Image'. If this is intended to be a component, add a @using directive for its namespace.
+  RZ10012(4644,112) warning: Found markup element with unexpected name 'Image'. If this is intended to be a component, add a @using directive for its namespace.
+  RZ10012(4644,42) warning: Found markup element with unexpected name 'TextEntry'. If this is intended to be a component, add a @using directive for its namespace.
+  … +103 more warnings
+  [see remaining: tail -n +11 ~/AppData\Local\rtk\tee\1791925315_dotnet-build-warnings.log]
+
+ok dotnet build: 16 projects, 0 errors, 113 warnings (00:00:56.03)

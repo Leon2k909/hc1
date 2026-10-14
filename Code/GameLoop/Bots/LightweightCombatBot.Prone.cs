@@ -18,8 +18,13 @@ public sealed partial class LightweightCombatBot
 		if ( !IsAlive ) return;
 		var step = Time.Delta / 0.45f;
 		_proneBlend = IsProne ? MathF.Min( 1f, _proneBlend + step ) : MathF.Max( 0f, _proneBlend - step );
+		SlideBlend = MathX.Lerp( SlideBlend, IsSliding ? 1f : 0f, (Time.Delta * (IsSliding ? 16f : 7f)).Clamp( 0f, 1f ) );
+		if ( SlideBlend < .001f ) SlideBlend = 0f;
 		if ( !_movementBox.IsValid() ) return;
 		var bounds = BotPronePose.MovementBounds( IsCrouching, _proneBlend );
+		if ( SlideBlend > 0f && _proneBlend <= 0f )
+			bounds = BBox.FromPositionAndSize( new Vector3( 0f, 0f, MathX.Lerp( bounds.Size.z, 40f, SlideBlend ) * .5f ),
+				new Vector3( 32f, 32f, MathX.Lerp( bounds.Size.z, 40f, SlideBlend ) ) );
 		_movementBox.Center = bounds.Center;
 		_movementBox.Scale = bounds.Size;
 	}
@@ -36,7 +41,7 @@ public sealed partial class LightweightCombatBot
 	/// <summary>Occasionally settle into a ranged firing position, more often for holders and marksmen.</summary>
 	private bool TryPlantProne( float distance )
 	{
-		if ( _nextProne.Relative > 0f || _proneBlend > 0f || distance < 650f || distance > EngageRange
+		if ( IsSliding || SlideBlend > .05f || _nextProne.Relative > 0f || _proneBlend > 0f || distance < 650f || distance > EngageRange
 			|| !_targetVisible || !IsEnemyAlive( _target ) || IsReloading || _timeSinceAcquired < 0.6f )
 			return false;
 

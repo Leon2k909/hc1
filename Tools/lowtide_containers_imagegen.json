@@ -25,5 +25,25 @@
       "material_albedo": "Assets/materials/lowtide/containers/lt_container_grey_color.png",
       "prompt": "Use case: photorealistic-natural\nAsset type: square seamless PBR BASE COLOUR texture for a light-grey painted steel shipping container in a British harbour game.\nSubject: A flat 1.22 metre square patch of aged pale warm-grey industrial enamel on steel. 94 percent intact grey paint. Cohesive neutral grey with restrained pale stone-grey fading. Crisp small irregular paint chips revealing darker charcoal grey metal, a few tiny dark brown rust spots, thin shallow hairline scratches, faint dusty vertical rain traces and fine grain. Slight weathering from salt air. Believable scanned material with clear fine detail; clean overall colour readability instead of noisy blotches.\nComposition: continuous edge-to-edge orthographic texture scan, flat uniform diffuse neutral lighting with no shadows or specular highlights. Seamless left/right and top/bottom. Opaque square, aim for 2048x2048.\nConstraints: Only surface colour, no object render or surroundings. A separate normal map supplies corrugation, so do not draw corrugated ribs, stripes, bands, metal sheets, seams, bolts, rivets or hardware. No strong vertical striping, no large blurry clouds, no huge rust patches, no white crust, no dramatic scratches, no vignetting. No text, marks, labels, logos, borders or watermark."
     }
-  ]
+  ],
+  "surface_maps": "2048x2048 OpenGL micro paint normals, gentler frame normals, roughness and exposed-steel metalness. Corrugated walls and roofs are physical mesh sheets; frame geometry remains smooth.",
+  "geometry": {
+    "rib_pitch_inches": 12,
+    "wall_depth_inches": 1.25,
+    "roof_depth_inches": 0.625,
+    "scope": "Four containers, isolated face replacement in current Lowtide east/west dressing meshes; existing door hardware and all collision data retained.",
+    "added_triangles_total": 2264
+  },
+  "validation": {
+    "native_materials": "All six materials compiled, loaded error=False; 2048x2048 colour and normal with 10 mips; specular and metalness texture enabled.",
+    "native_models": "Both dressing models compiled and loaded model-error=False with zero material errors.",
+    "mesh_audit": "Original vertex/UV/normal buffers, all unrelated faces and existing model/collision data preserved; replacement sheets verified; repeated patch is a no-op.",
+    "native_report": "output/lowtide/containers/native-material.txt",
+    "mesh_report": "output/lowtide/containers/verification.json",
+    "renders": [
+      "output/lowtide/containers/east-after.png",
+      "output/lowtide/containers/west-after.png",
+      "output/lowtide/containers/doors-after.png"
+    ]
+  }
 }

@@ -807,7 +807,7 @@ class Forklift:
             points = [self.p((x, y, z)) for x in (lo[0], hi[0]) for y in (lo[1], hi[1]) for z in (lo[2], hi[2])]
             self.m.collision_box(np.min(points, axis=0), np.max(points, axis=0), "metal")
 
-    def build(self):
+    def build(self, reactive_canister=False):
         self.chassis()
         for s in (-1, 1):
             self.wheel(s, 26, 13.2, 8.2, 20.0)
@@ -815,14 +815,15 @@ class Forklift:
         self.seat()
         self.controls()
         self.guard()
-        self.gas_tank()
+        if not reactive_canister:
+            self.gas_tank()
         self.mast()
         self.collision()
         configure(self.m)
 
 
-def build(model, e, n, facing="+n", z0=0, lift=0):
-    Forklift(model, e, n, facing, z0, lift).build()
+def build(model, e, n, facing="+n", z0=0, lift=0, reactive_canister=False):
+    Forklift(model, e, n, facing, z0, lift).build(reactive_canister=reactive_canister)
 
 
 def validate(model):

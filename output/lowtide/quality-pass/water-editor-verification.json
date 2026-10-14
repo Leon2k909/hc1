@@ -1,0 +1,40 @@
+{
+  "scope": "Editor rendering route; no shader, material, geometry or scene edit",
+  "engine": "26.10.13",
+  "lifecycle": {
+    "checks": [
+      "one editor reflection command on main camera",
+      "looking away releases command and water exclusion",
+      "returning reacquires exactly one command",
+      "disable restores ordinary water",
+      "preexisting intentional exclusion is respected",
+      "shared editor views retain fallback without duplicate draws",
+      "single viewport reflection recovers",
+      "scene remains saved"
+    ],
+    "HasUnsavedChanges": false,
+    "restored": {
+      "Position": "-1533.12781,-199.585312,214.872894",
+      "Angles": "9.80004215,11.1022186,0",
+      "FieldOfView": 80
+    }
+  },
+  "compile": {
+    "success": true,
+    "errors": 0,
+    "water_diagnostics": []
+  },
+  "global_errors_since_cursor_667": [],
+  "final_console_cursor": 681,
+  "gameplay_tested_this_pass": false,
+  "performance_claim": null,
+  "sha256": {
+    "Code\\Map\\LowtideWaterReflections.cs": "58ac31fede431086379c8283887ceaa094a2652cb97f5868b411054f9bb23c18",
+    "Assets\\scenes\\maps\\lowtide\\lowtide.scene": "e775149b4d99c1b5ed740efd11ad5ebf60396933e9ef31ed98f5f35eba6551a2",
+    "Assets\\shaders\\hc1_lowtide_water.shader": "2481e03183edfdc8145872daa1319c2a111d35b2eb44a5eccd64caa77c997d74",
+    "Assets\\materials\\lowtide\\lt_water.vmat": "c7afb0e3f6d877ab3c422613bb1e0be707a2dec8a1edc997c26d406e67bcb60a",
+    "output\\lowtide\\quality-pass\\water-editor-fixed.png": "959d987a367f9c3c428ac02ccc80c043980aff54af9e65d983816bab407b46e4",
+    "output\\lowtide\\quality-pass\\water-bank-fixed.png": "7fb0134485b95dee3c5e9607f85c9d836c44488838cb811c1fd22a0bae37ccca",
+    "output\\lowtide\\quality-pass\\water-quay-fixed.png": "688b3b74af5da87f36661cfc8cde9fe47ce688bfecbaa36f01fcd5996ad8f682"
+  }
+}

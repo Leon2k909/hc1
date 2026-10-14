@@ -31,7 +31,8 @@ public partial class Equipment
 	internal void RefreshAmmunitionLoadout()
 	{
 		// Cookies belong to this client. Never apply them to another player's weapon or a bot.
-		if ( IsProxy || !Owner.IsValid() || !Owner.IsLocallyControlled ) return;
+		// Spawn ammo is filled before the new pawn is possessed, so check ownership rather than possession.
+		if ( IsProxy || !Owner.IsValid() || Owner.Client is not { IsLocalPlayer: true } ) return;
 		UsesTracerRounds = ApplySavedAttachments && GunsmithLoadoutManager.UsesTracerRounds( Resource );
 		var oldCapacity = AttachmentMagazineCapacity;
 		GunsmithPart magazine = null;

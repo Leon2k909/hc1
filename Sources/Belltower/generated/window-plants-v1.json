@@ -1,0 +1,41 @@
+{
+  "generator": "Built-in image_gen.imagegen",
+  "use_case": "photorealistic-natural",
+  "purpose": "Belltower window-box and balcony foliage texture atlas",
+  "prompt": "Use case: photorealistic-natural. Asset type: a production game foliage texture atlas for window boxes and balconies in a Mediterranean hill-town map. Generate one square 2048x2048 RGBA image with a truly transparent background, arranged as four strictly separated equal square cells in a 2-by-2 layout. No visible grid, borders, labels or text. Top-left cell: one compact red zonal geranium plant (Pelargonium), with several natural red flower heads above rich but moderately desaturated rounded scalloped leaves and delicate branching green stems. Top-right cell: a different compact soft rose-pink zonal geranium plant with rounded scalloped leaves and natural asymmetry. Bottom-left cell: a short hanging sprig of real small-leaved ivy, a few branching stems start near the top center and trail downward, irregular gaps between leaves, no flowers. Bottom-right cell: a loose natural bougainvillea sprig with small dusty magenta papery bracts, olive-green leaves, fine woody branches, irregular cascading silhouette. Each specimen is isolated entirely inside its own cell with at least 6 percent transparent padding on every side. Upright geraniums stand on a common baseline 90 percent down their cell; visible stems end there naturally, no pot, roots or soil; leaves and blooms occupy most of the cell. Front-facing botanical photography with orthographic-like perspective, all leaves and petals in sharp focus, microscopic veins and soft petal folds, realistic leaf-scale diversity, some curled and edge-on leaves, subtle imperfections and restrained natural colors. Neutral diffuse overcast illumination, soft local self-shading only, no strong directional highlights or baked cast shadow. True alpha cutout through the gaps between stems and leaves and around all silhouettes. Avoid a background of any kind, checkerboards, green rectangles, fringing, glow, outline, plastic or painted look, excessive flower density, perfect symmetry, butterflies, props, logos and watermarks.",
+  "source_image": "C:/Users/leon2/.codex/generated_images/01a137a3-a1f4-7cf1-a3b1-54c0f0bbf6db/exec-1d2c45c2-0bad-46c0-adcf-b89ec2004902.png",
+  "file": "window-plants-v1.png",
+  "sha256": "1fd0686d8801039bccde26dcb8b7dd2b80557604ad4f1e4d16a31eb00da89b2d",
+  "pixels": "1254x1254 RGBA",
+  "pixel_edits": "None; original RGBA output is preserved",
+  "status": "Imported through native editor; shader, material and models compile; cafe and West Street captures visually reviewed",
+  "cells": {
+    "red": [
+      0,
+      0,
+      0.5,
+      0.5
+    ],
+    "pink": [
+      0.5,
+      0,
+      1,
+      0.5
+    ],
+    "ivy": [
+      0,
+      0.5,
+      0.5,
+      1
+    ],
+    "bougainvillea": [
+      0.5,
+      0.5,
+      1,
+      1
+    ]
+  },
+  "verification": "output/belltower/quality/foliage-v1",
+  "gameplay_spots_checked": 94,
+  "collision_unchanged": true
+}

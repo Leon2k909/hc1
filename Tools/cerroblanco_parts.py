@@ -4,8 +4,8 @@ above), the glazing, stairs, railings and curved walls, and the props (the round
 piano, the red sculptures, the bronze sphere, benches, cafe furniture, banners, the sign).
 
 Everything is in plan coordinates (map_kit's: e east, n north, z up, inches) and goes into map_kit Models. Collision is
-given with each piece: boxes and hulls with a surface. Glass panes go into a separate model (the map's glass, tagged
-navskip), so callers pass it as `glass`.
+given with each piece: boxes and hulls with a surface. Glass panes are collected separately for previews and for the
+individual breakable scene objects (tagged glass,navskip), so callers pass their GlassModel as `glass`.
 """
 import math
 import zlib
@@ -206,7 +206,8 @@ def glaze( m, glass, axis, d, r0, r1, z0, z1, pitch=60.0, transoms=(), frame=FRA
     for z in zs:
         put( r0, r1, max( z0, z - width / 2 ), min( z1, z + width / 2 ), depth, frame )
     for ra, rb in zip( rs, rs[1:] ):
-        put( ra, rb, z0, z1, 1.5, pane, GLASS )
+        for za, zb in zip( zs, zs[1:] ):
+            put( ra, rb, za, zb, 1.5, pane, GLASS )
 
 
 def door_frame( m, axis, d, centre, width, z1, thickness, frame=FRAME ):
@@ -357,8 +358,9 @@ def curved_glazing( m, glass, centre, r, a0, a1, z0, z1, step=7.5, transoms=(), 
         along = K.normalise( np.array( ( eb - ea, nb - na, 0.0 ) ) )
         out = K.normalise( mid )
         length = math.hypot( eb - ea, nb - na )
-        glass.oriented_box( ( ( ea + eb ) / 2, ( na + nb ) / 2, ( z0 + z1 ) / 2 ), ( along, -out, ( 0, 0, 1 ) ),
-                            ( length, 1.5, z1 - z0 ), GLAZE, GLASS )
+        for za, zb in zip( zs, zs[1:] ):
+            glass.oriented_box( ( ( ea + eb ) / 2, ( na + nb ) / 2, ( za + zb ) / 2 ), ( along, -out, ( 0, 0, 1 ) ),
+                                ( length, 1.5, zb - za ), GLAZE, GLASS )
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -412,11 +414,17 @@ def balustrade( m, glass, p0, p1, z0, height=42.0, rail=STEEL, posts=48.0, surfa
     centre = ( ( p0 + p1 ) / 2 )
     if solid:
         m.oriented_box( ( centre[0], centre[1], z0 + 3 ), ( np.append( along, 0 ), side, ( 0, 0, 1 ) ), ( length, 2.0, 6.0 ), solid )
-    glass.oriented_box( ( centre[0], centre[1], z0 + 3 + ( height - 6 ) / 2 ), ( np.append( along, 0 ), side, ( 0, 0, 1 ) ),
-                        ( length, 0.8, height - 6 ), GLAZE )
+    for k in range( count ):
+        mid = p0 + along * length * ( k + 0.5 ) / count
+        glass.oriented_box( ( mid[0], mid[1], z0 + height / 2 ), ( np.append( along, 0 ), side, ( 0, 0, 1 ) ),
+                            ( length / count, 0.8, height - 6 ), GLAZE )
     if surface:
-        m.oriented_box( ( centre[0], centre[1], z0 + height / 2 ), ( np.append( along, 0 ), side, ( 0, 0, 1 ) ),
-                        ( length, 2.0, height ), None, surface )
+        guard_centre = ( centre[0], centre[1], z0 + height / 2 )
+        guard_axes = ( np.append( along, 0 ), side, ( 0, 0, 1 ) )
+        if hasattr( glass, "guard_clip" ):
+            glass.guard_clip( guard_centre, guard_axes, ( length, 2.0, height ) )
+        else:
+            m.oriented_box( guard_centre, guard_axes, ( length, 2.0, height ), None, surface )
 
 
 def rail_along( m, points, z, height=38.0, paint=WHITE, posts=54.0, surface=METAL, bars=True ):

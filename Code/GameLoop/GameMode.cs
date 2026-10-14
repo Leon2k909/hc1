@@ -19,7 +19,7 @@ public sealed partial class GameMode : SingletonComponent<GameMode>, Component.I
 
 	/// <summary>
 	/// Whether the next game session should use hardcore rules. Core modes are switched off for now, so every
-	/// multiplayer match is hardcore; only Zombies turns it off.
+	/// multiplayer match is hardcore unless its preset uses standard health (Tactical Defuse and Zombies).
 	/// </summary>
 	public static bool ActiveHardcore { get; private set; } = true;
 	// Put back when Core modes return:
@@ -143,7 +143,7 @@ public sealed partial class GameMode : SingletonComponent<GameMode>, Component.I
 	{
 		if ( Networking.IsHost )
 		{
-			Hardcore = ActiveHardcore;
+			Hardcore = !UsesStandardHealth && ActiveHardcore;
 			InitializeRankedMatch();
 			GameObject.Components.GetOrCreate<ScorestreakManager>();
 			// A custom game's time, score and respawn rules go into the mode's own components before play starts.
@@ -152,7 +152,7 @@ public sealed partial class GameMode : SingletonComponent<GameMode>, Component.I
 			Weather.Ensure( Scene );
 		}
 
-		Scene.Dispatch( new GamemodeInitializedEvent( Title ) );
+		Scene.Dispatch( new GamemodeInitializedEvent( string.IsNullOrWhiteSpace( MapObjectMode ) ? Title : MapObjectMode ) );
 
 		base.OnStart();
 

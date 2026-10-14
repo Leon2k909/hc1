@@ -12,6 +12,9 @@ public partial class ArmorComponent : Component, IGameEventHandler<ModifyDamageT
 
 	public float MaxArmor => GetGlobal<PlayerGlobals>().MaxArmor;
 
+	public bool ArmorEnabled => GameMode.Instance?.ArmorEnabled is true;
+	public bool HelmetsEnabled => ArmorEnabled && GameMode.Instance?.HelmetsEnabled is true;
+
 	[Property, ReadOnly, Sync( SyncFlags.FromHost ), Change( nameof( OnHasHelmetChanged ) )]
 	public bool HasHelmet { get; set; }
 
@@ -24,9 +27,9 @@ public partial class ArmorComponent : Component, IGameEventHandler<ModifyDamageT
 	private static void Dev_ToggleKevlarAndHelmet()
 	{
 		var player = Client.Local.PlayerPawn;
-		if ( player is null ) return;
+		if ( player is null || !player.ArmorComponent.ArmorEnabled ) return;
 
-		if ( player.ArmorComponent.HasHelmet )
+		if ( player.ArmorComponent.Armor > 0f || player.ArmorComponent.HasHelmet )
 		{
 			player.ArmorComponent.Armor = 0;
 			player.ArmorComponent.HasHelmet = false;
@@ -34,15 +37,28 @@ public partial class ArmorComponent : Component, IGameEventHandler<ModifyDamageT
 		else
 		{
 			player.ArmorComponent.Armor = player.ArmorComponent.MaxArmor;
-			player.ArmorComponent.HasHelmet = true;
+			player.ArmorComponent.HasHelmet = player.ArmorComponent.HelmetsEnabled;
 		}
+	}
+
+	protected override void OnUpdate()
+	{
+		if ( !Networking.IsHost ) return;
+		if ( !ArmorEnabled && Armor != 0f ) Armor = 0f;
+		if ( !HelmetsEnabled && HasHelmet ) HasHelmet = false;
 	}
 
 	[Early]
 	void IGameEventHandler<ModifyDamageTakenEvent>.OnGameEvent( ModifyDamageTakenEvent eventArgs )
 	{
-		if ( Armor > 0f ) eventArgs.AddFlag( DamageFlags.Armor );
-		if ( HasHelmet ) eventArgs.AddFlag( DamageFlags.Helmet );
+		// Ignore stale prefab values and disable protection as well as its HUD.
+		eventArgs.DamageInfo = eventArgs.DamageInfo with
+		{
+			Flags = eventArgs.DamageInfo.Flags & ~(DamageFlags.Armor | DamageFlags.Helmet)
+		};
+		if ( !ArmorEnabled || Armor <= 0f ) return;
+		eventArgs.AddFlag( DamageFlags.Armor );
+		if ( HelmetsEnabled && HasHelmet ) eventArgs.AddFlag( DamageFlags.Helmet );
 	}
 }
 

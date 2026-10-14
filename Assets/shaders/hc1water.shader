@@ -144,8 +144,8 @@ PS
 		//
 		// Gather everything we need
 		//
-		float depth = Depth::GetNormalized( i.vPositionSs );		
-		float2 vScreenUv = CalculateViewportUv( i.vPositionSs );
+		float depth = Depth::GetNormalized( i.vPositionSs.xy );		
+		float2 vScreenUv = CalculateViewportUv( i.vPositionSs.xy );
 		float invCameraToDepth = -abs( dot( i.vPositionWithOffsetWs, -g_vCameraDirWs ) ) + ( 1 / depth );
         float2 vTextureCoords = i.vTextureCoords.xy / float2( g_flScale, g_flScale );
 		float flTranslucency = 1.0 - saturate( g_flOpacity );
@@ -179,7 +179,7 @@ PS
 		//
 		if ( g_bPlanarReflections )
 		{
-			m.Albedo += g_tPlanarReflectionTexture.SampleLevel( g_sSampler, ( vRefractionUv * float2( -1, 1 ) ), 0 );
+			m.Albedo += g_tPlanarReflectionTexture.SampleLevel( g_sSampler, ( vRefractionUv * float2( -1, 1 ) ), 0 ).xyz;
 		}
 
 		//

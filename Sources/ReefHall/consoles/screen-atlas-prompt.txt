@@ -1,0 +1,14 @@
+Built-in image_gen tool. Generated 2026-10-14.
+Source: exec-58770afe-b109-48a9-a834-416ae312efb9.png
+Final: Assets/materials/reefhall/consoles/rh_console_screen_atlas.png
+Usage: quadrants sampled directly by Tools/reefhall_consoles.py; no pixel edits.
+
+Use case: ui-mockup
+Asset type: production game texture atlas for four different aquarium control-room monitor screens.
+Create one flat 2048 by 1152 pixel image divided into an EXACT seamless 2 by 2 grid: each quadrant is one full 16:9 monitor interface. Screen content only, full bleed, no photographed monitors, no hardware bezel, no perspective, no margins between quadrants. This is a direct usable texture, not a presentation board.
+Style: credible modern public aquarium life-support supervisory software, calm and finely designed. Very dark charcoal blue background, restrained muted sea-glass teal linework, soft grey typography, tiny amber warnings. 80 percent of pixels remain dark. Compact readable technical typography, intentional hierarchy, generous breathing room. No blue glowing outlines, no bloom, no white panels, no neon, no sci-fi hexagons, no enormous sine waves.
+Top left screen: title "REEF HALL / LIFE SUPPORT", a clean water recirculation process diagram connecting reef tank, mechanical filter, biofilter, UV and return pumps; small live readings "24.8 C", "8.12 pH", "35.0 ppt". Diagram as muted grey vessels and teal pipes with sparse amber status points.
+Top right screen: title "WATER QUALITY / 24 HOURS", three carefully plotted narrow trend charts with axes, fine restrained teal and muted amber lines, and a compact right hand column of water readings. Do not fill the whole screen with graphs; leave structured dark space.
+Bottom left screen: title "CIRCULATION / PUMP STATUS", four horizontal equipment rows "P-01", "P-02", "P-03", "P-04" with small equipment symbols, operating state, pressure and flow readouts; bottom third an uncluttered pipe-loop diagram.
+Bottom right screen: title "HABITAT OVERVIEW", a precise top-down simplified aquarium floorplan with central circular tank and side galleries outlined in desaturated teal, one small highlighted amber zone, compact right hand readings and a small lower alarm history.
+Each quadrant must be a different fully composed screen, each with its own thin top header and bottom status strip. Flat digital UI artwork, precise sharp lines, professional believable instrumentation. Neutral contrast suitable for dim physical LCDs in a dark room.

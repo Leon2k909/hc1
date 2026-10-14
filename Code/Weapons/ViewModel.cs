@@ -64,6 +64,8 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 	private float lastYaw;
 	private float YawInertia;
 	private float PitchInertia;
+	private TimeSince _timeSinceHandMotion = 0f;
+	private float _previousHandAimProgress;
 
 	private bool _wasReloading = false;
 	private float _lastTimeSinceShoot = 0f;
@@ -378,8 +380,22 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 		if ( UseMovementInertia )
 			YawInertia += lerpedWishMove.y * 10f;
 
-		ModelRenderer?.Set( "aim_yaw_inertia", YawInertia * YawInertiaScale );
-		ModelRenderer?.Set( "aim_pitch_inertia", PitchInertia * PitchInertiaScale );
+		var yaw = YawInertia * YawInertiaScale;
+		var pitch = PitchInertia * PitchInertiaScale;
+		ModelRenderer?.Set( "aim_yaw_inertia", yaw );
+		ModelRenderer?.Set( "aim_pitch_inertia", pitch );
+
+		// The settled ported poses already put each hand on its grip. Re-solving an unchanged pose introduces
+		// rapid IK jumps. Blended clips still need IK, as does look/strafe sway while its springs return.
+		var reloadable = Equipment.GetComponentInChildren<Reloadable>();
+		var shootable = Equipment.GetComponentInChildren<Shootable>();
+		var handMotion = MathF.Abs( yaw ) > 0.001f || MathF.Abs( pitch ) > 0.001f
+			|| _aimProgress != _previousHandAimProgress || isMoving || Owner.IsSprinting || !Owner.IsGrounded
+			|| Equipment.HasTag( "lowered" ) || (reloadable.IsValid() && reloadable.IsReloading)
+			|| (shootable.IsValid() && shootable.TimeSinceShoot < 0.25f);
+		if ( handMotion ) _timeSinceHandMotion = 0;
+		_previousHandAimProgress = _aimProgress;
+		ModelRenderer?.Set( "hand_ik_weight", _timeSinceHandMotion < 2f ? 1f : 0f );
 	}
 
 	private float FieldOfViewOffset = 0f;

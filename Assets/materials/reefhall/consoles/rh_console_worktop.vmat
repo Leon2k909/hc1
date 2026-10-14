@@ -1,0 +1,13 @@
+// Tools/reefhall_consoles.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "[0.6900 0.7100 0.7000 1.0]"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureRoughness "[0.47 0.47 0.47 1.0]"
+    TextureAmbientOcclusion "[1.0 1.0 1.0 1.0]"
+    g_flMetalness "0.0"
+    g_flRoughnessScaleFactor "1"
+    g_vColorTint "[1.0 1.0 1.0 1.0]"
+}

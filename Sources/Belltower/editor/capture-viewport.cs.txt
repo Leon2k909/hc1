@@ -1,0 +1,63 @@
+// Capture the existing Belltower editor scene. No temporary scene or frame callbacks.
+// Apply its post-process volumes to the actual viewport camera explicitly:
+// a hidden editor tab can have no Scene.Camera while another map is playing.
+var root = Sandbox.Project.Current.GetRootPath();
+var config = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/belltower/quality/viewport-capture.json")));
+var folder = config["directory"].GetValue<string>();
+var name = config["name"].GetValue<string>();
+if (!System.Text.RegularExpressions.Regex.IsMatch(folder,"^[a-z0-9-]+$") || !System.Text.RegularExpressions.Regex.IsMatch(name,"^[a-z0-9-]+$"))
+    throw new InvalidOperationException("Invalid capture name");
+var destination = System.IO.Path.Combine(root,"output/belltower/quality",folder);
+System.IO.Directory.CreateDirectory(destination);
+var previous = Editor.SceneEditorSession.Active;
+var gameId = Game.ActiveScene?.Id;
+var playing = Game.IsPlaying;
+var session = Editor.SceneEditorSession.All.Single(s => s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase)==true);
+var scene = session.Scene;
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+Editor.SceneViewportWidget.ViewportState state = null;
+Vector3 oldPosition = default;
+Rotation oldRotation = default;
+CameraComponent camera = null;
+float oldFov = 80;
+try
+{
+    session.MakeActive(false);
+    await Task.Delay(100,cancellationToken);
+    state = Editor.SceneViewWidget.Current.LastSelectedViewportWidget.State;
+    oldPosition = state.CameraPosition;
+    oldRotation = state.CameraRotation;
+    state.CameraPosition = Vector3.Parse(config["position"].GetValue<string>());
+    state.CameraRotation = Rotation.From(Angles.Parse(config["angles"].GetValue<string>()));
+    camera = Sandbox.Application.Editor.Camera;
+    if (camera.Scene != scene) throw new InvalidOperationException("Wrong viewport camera");
+    oldFov = camera.FieldOfView;
+    object captureResult;
+    using (scene.Push())
+    {
+        camera.WorldPosition = state.CameraPosition;
+        camera.WorldRotation = state.CameraRotation;
+        camera.FieldOfView = config["fov"]?.GetValue<float>() ?? 80;
+        typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+        typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+        var post = scene.GetSystem<PostProcessSystem>();
+        typeof(PostProcessSystem).GetMethod("UpdateCamera",flags).Invoke(post,new object[]{camera});
+        if (!camera.AutoExposure.Enabled || MathF.Abs(camera.AutoExposure.MinimumExposure-1.05f)>.001f || MathF.Abs(camera.AutoExposure.MaximumExposure-2.2f)>.001f)
+            throw new InvalidOperationException("Belltower's saved tone mapping did not reach the viewport camera");
+        using var bitmap = new Bitmap(config["width"]?.GetValue<int>() ?? 1920,config["height"]?.GetValue<int>() ?? 1080);
+        camera.RenderToBitmap(bitmap,false);
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(destination,name+".png"),bitmap.ToPng());
+        captureResult = new { Scene=scene.Name, CameraScene=camera.Scene.Name, Position=camera.WorldPosition.ToString(), Angles=camera.WorldRotation.Angles().ToString(), camera.FieldOfView,
+            camera.EnablePostProcessing, camera.AutoExposure.Enabled, camera.AutoExposure.MinimumExposure, camera.AutoExposure.MaximumExposure,
+            camera.AutoExposure.Compensation, camera.AutoExposure.Rate };
+    }
+    var result = new { Capture=captureResult, GamePreserved=Game.ActiveScene?.Id==gameId && Game.IsPlaying==playing };
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination,name+"-camera.json"),System.Text.Json.JsonSerializer.Serialize(result));
+    return result;
+}
+finally
+{
+    if (state is not null) { state.CameraPosition=oldPosition; state.CameraRotation=oldRotation; }
+    if (camera.IsValid()) { camera.WorldPosition=oldPosition; camera.WorldRotation=oldRotation; camera.FieldOfView=oldFov; }
+    if (previous?.Scene.IsValid()==true) previous.MakeActive(false);
+}

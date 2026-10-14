@@ -49,6 +49,8 @@ public partial class PlayerInventory : Component
 		if ( !Networking.IsHost )
 			return;
 
+		HasDefuseKit = false;
+
 		foreach ( var wpn in Equipment )
 		{
 			wpn.GameObject.Destroy();
@@ -122,6 +124,9 @@ public partial class PlayerInventory : Component
 	protected override void OnUpdate()
 	{
 		if ( !Player.IsLocallyControlled )
+			return;
+
+		if ( UI.TacticalBuyMenu.IsAnyOpen )
 			return;
 
 		// Flying the recon octocopter, the wheel zooms its camera and the tablet stays in hand.
@@ -348,7 +353,15 @@ public partial class PlayerInventory : Component
 
 		// A fresh weapon comes with a full basic load. Picked-up weapons overwrite this with what the dropper had.
 		if ( gameObject.GetComponentInChildren<WeaponAmmo>( true ) is { } freshAmmo )
-			freshAmmo.ReserveAmmo = freshAmmo.GetMaxReserve();
+		{
+			if ( droppedState.IsValid() )
+				freshAmmo.ReserveAmmo = freshAmmo.GetMaxReserve();
+			else
+			{
+				component.RefreshAmmunitionLoadout();
+				freshAmmo.RefillAll();
+			}
+		}
 		if ( droppedState.IsValid() )
 		{
 			foreach ( var state in component.GetComponentsInChildren<IDroppedWeaponState>( true ) )

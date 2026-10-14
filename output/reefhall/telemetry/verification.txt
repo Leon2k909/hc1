@@ -1,0 +1,31 @@
+Reef Hall telemetry screen refresh - 2026-10-14
+
+Texture: Assets/materials/reefhall/rh_screen_telemetry_color.png
+Material: Assets/materials/reefhall/rh_screen_data.vmat
+Prompt: Sources/ReefHall/screens/water-quality-prompt.txt
+
+Generated with the built-in image_gen tool, copied byte-for-byte into Assets
+through native s&box run_csharp. 1536 x 1024 RGB PNG. No pixel edits.
+The material's self-illumination was reduced from 2.20 to 0.85.
+Tools/reefhall_materials.py uses AUTHORED_COLOR to retain the new texture reference
+when rebuilding materials. The old rh_screen_data_color.png remains available.
+This shared material serves the lobby reception monitors and control-room office
+monitors; the separate console screen atlas is unchanged.
+
+Validation:
+- Native asset_compile succeeded; asset_info reported compiled and up to date.
+- Compiled material references the new telemetry texture.
+- Source PNG and imported PNG SHA-256 hashes match.
+- Saved material exactly matches the material generator's output.
+- Python source syntax check passed.
+- Engine renders inspected: before, after, context, angled-monitor,
+  office-west and office-east. Text is upright and readable on both office desks
+  and the straight/angled reception screens.
+- These are offscreen engine renders with fixed exposure, not a full gameplay
+  postprocessing capture.
+- No new error-level console entries during final validation.
+- This task did not stop play or switch scenes; no scene edits were saved.
+  The editor was playing Reefhall during visual QA and reported Boxyard at the
+  final status check. Final compile state succeeded with zero errors.
+
+The previous material is retained in rh_screen_data.before.vmat.

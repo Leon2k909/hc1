@@ -1,0 +1,15 @@
+// Tools/lowtide_windows.py: sealed building windows only.
+"Layer0"
+{
+    shader "shaders/hc1_lowtide_window_interior.shader"
+    TextureColor "[0.015 0.021 0.020 0]"
+    TextureNormal "materials/railhead/window_dark_normal.png"
+    TextureRoughness "materials/railhead/window_dark_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    TextureMetalness "materials/default/default_black_mask.tga"
+    TextureRoomBack "materials/lowtide/windows/warehouse_rooms.png"
+    TextureRoomWall "materials/lowtide/lt_plaster_color.png"
+    TextureRoomWood "materials/lowtide/interior/ceiling_color.png"
+    g_flInteriorBrightness "0.16"
+    g_flRoomDepth "32"
+}

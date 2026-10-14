@@ -4,8 +4,8 @@ namespace Facepunch;
 /// The rain as one machine sees and hears it, round its own camera: the drops (<see cref="RainDropParticles"/>), their
 /// splashes on open ground (<see cref="RainSplashParticles"/>), the puddles (<see cref="RainPuddles"/>) and the rings
 /// the drops make on them (<see cref="RainRippleParticles"/>), the rain's sound, the overcast look of the sky, sun and fog (<see cref="RainLook"/>), and the lightning's flashes and thunder
-/// (<see cref="Weather.Schedule.Strikes"/>). Made by <see cref="Weather"/> while it rains, and it goes once the weather
-/// has cleared and the look has eased back. Nothing here is networked.
+/// (<see cref="Weather.Schedule.Strikes"/>). Made by <see cref="Weather"/> on outdoor maps. Between fronts it gently
+/// varies the fair-weather daylight without allocating rain effects. Nothing here is networked.
 /// </summary>
 public sealed class RainView : Component
 {
@@ -20,7 +20,7 @@ public sealed class RainView : Component
 	private const float SquareUnitsPerSquareMetre = WorldWind.UnitsPerMetre * WorldWind.UnitsPerMetre;
 
 	/// <summary> How long the sky, sun and fog take to come in or go back (seconds). </summary>
-	private const float LookTime = 20f;
+	private const float LookTime = 90f;
 
 	private const string LightLoop = "sounds/weather/rain_light.sound";
 	private const string HeavyLoop = "sounds/weather/rain_heavy.sound";
@@ -54,8 +54,6 @@ public sealed class RainView : Component
 	private float _lightBase, _heavyBase, _roofBase;
 	private float _outdoorGain = 1f, _underGain;
 
-	protected override void OnStart() => EnsureEffects();
-
 	/// <summary> Makes any of the three effects that's missing, as after a hotload into a rain made before it. </summary>
 	private void EnsureEffects()
 	{
@@ -82,6 +80,18 @@ public sealed class RainView : Component
 		}
 	}
 
+	private void ReleaseEffects()
+	{
+		if ( _drops.IsValid() ) _drops.GameObject.Destroy();
+		if ( _splashes.IsValid() ) _splashes.GameObject.Destroy();
+		if ( _ripples.IsValid() ) _ripples.GameObject.Destroy();
+		_drops = _splashes = _ripples = null;
+		_dropController = null;
+		_splashController = null;
+		_rippleController = null;
+		_splashCarry = _rippleCarry = 0f;
+	}
+
 	protected override void OnDisabled()
 	{
 		_look.Restore();
@@ -98,16 +108,21 @@ public sealed class RainView : Component
 
 	protected override void OnUpdate()
 	{
-		var raining = Weather.IsValid() && Weather.IsRaining;
-		var rate = raining ? Weather.RainRate : 0f;
-
-		_k = Math.Clamp( _k + (raining ? 1f : -1f) * Time.Delta / LookTime, 0f, 1f );
-		if ( !raining && _k <= 0f )
+		if ( !Weather.IsValid() )
 		{
-			_look.Restore();
-			_puddles.Dispose();
-			StopSounds( 1f );
 			GameObject.Destroy();
+			return;
+		}
+		var rate = Weather.RainRate;
+
+		var target = Weather.OvercastAmount;
+		_k = target > _k ? MathF.Min( target, _k + Time.Delta / LookTime ) : MathF.Max( target, _k - Time.Delta / LookTime );
+		if ( rate <= 0f && _k <= 0f )
+		{
+			_look.Apply( Scene, 0f, 0f, 0f, Weather.CloudCover );
+			_puddles.Dispose();
+			ReleaseEffects();
+			StopSounds( 1f );
 			return;
 		}
 
@@ -118,7 +133,7 @@ public sealed class RainView : Component
 		var eye = camera.IsValid() ? camera.WorldPosition : WorldPosition;
 		// Indoors the flash comes in through the windows and doors, so it shows less.
 		var flash = UpdateLightning( eye ) * look * (0.25f + 0.75f * _outdoorGain);
-		_look.Apply( Scene, look, rate, flash );
+		_look.Apply( Scene, look, rate, flash, Weather.CloudCover );
 
 		if ( !camera.IsValid() ) return;
 		WorldPosition = eye;
@@ -1028,7 +1043,7 @@ public sealed class RainView : Component
 	/// </summary>
 	private sealed class RainLook
 	{
-		private readonly record struct SkyState( Color Tint, Material Material );
+		private readonly record struct SkyState( Color Tint, Material Material, Material Coastal );
 		private readonly record struct SunState( Color Light, Color Sky );
 		private readonly record struct FogState( Color Color, float Height, float Start, float End, float Falloff );
 
@@ -1048,7 +1063,7 @@ public sealed class RainView : Component
 		/// <paramref name="flash"/> is the lightning's light now (<see cref="Weather.Schedule.FlashAt"/>): it lights the
 		/// cloud, the sky's light and the rain's haze a bluish white, and the scene a little from the sun's side.
 		/// </summary>
-		public void Apply( Scene scene, float k, float rate, float flash )
+		public void Apply( Scene scene, float k, float rate, float flash, float cloudCover )
 		{
 			if ( _sinceScan > 1f )
 			{
@@ -1061,7 +1076,13 @@ public sealed class RainView : Component
 			foreach ( var (sky, was) in _skies )
 			{
 				if ( !sky.IsValid() ) continue;
-				var material = k > 0.5f && Overcast is not null ? Overcast : was.Material;
+				var material = was.Coastal ?? (k > 0.5f && Overcast is not null ? Overcast : was.Material);
+				if ( was.Coastal is not null )
+				{
+					// Runtime copy: every match has its own weather uniforms; the saved sky asset stays intact.
+					was.Coastal.Set( "g_flCloudDensity", MathX.Lerp( 0.6f, 1.35f, cloudCover ) );
+					was.Coastal.Set( "g_flWeatherOvercast", k );
+				}
 				if ( sky.SkyMaterial != material ) sky.SkyMaterial = material;
 				sky.Tint = Lit( Lerp( was.Tint, new Color( dark, dark, dark, was.Tint.a ), k ), flash * 3f );
 			}
@@ -1072,7 +1093,9 @@ public sealed class RainView : Component
 			{
 				if ( !sun.IsValid() ) continue;
 				var lum = Luminance( was.Light ) * sunShare;
-				sun.LightColor = Lit( Lerp( was.Light, new Color( 0.93f * lum, 0.96f * lum, lum, was.Light.a ), k ), flash * 0.8f );
+				var fairShare = 1f - 0.15f * cloudCover;
+				var fairLight = new Color( was.Light.r * fairShare, was.Light.g * fairShare, was.Light.b * fairShare, was.Light.a );
+				sun.LightColor = Lit( Lerp( fairLight, new Color( 0.93f * lum, 0.96f * lum, lum, was.Light.a ), k ), flash * 0.8f );
 				var sky = Luminance( was.Sky ) * dark;
 				sun.SkyColor = Lit( Lerp( was.Sky, new Color( sky, sky, sky, was.Sky.a ), k ), flash * 4f );
 			}
@@ -1131,7 +1154,12 @@ public sealed class RainView : Component
 		private void Scan( Scene scene )
 		{
 			foreach ( var sky in scene.GetAllComponents<SkyBox2D>() )
-				if ( !_skies.ContainsKey( sky ) ) _skies[sky] = new SkyState( sky.Tint, sky.SkyMaterial );
+				if ( !_skies.ContainsKey( sky ) )
+				{
+					var material = sky.SkyMaterial;
+					var coastal = material?.ShaderName == "shaders/hc1_coastal_sky.shader" ? material.CreateCopy( $"Coastal weather sky {sky.Id}" ) : null;
+					_skies[sky] = new SkyState( sky.Tint, material, coastal );
+				}
 			foreach ( var sun in scene.GetAllComponents<DirectionalLight>() )
 				if ( !_suns.ContainsKey( sun ) ) _suns[sun] = new SunState( sun.LightColor, sun.SkyColor );
 			foreach ( var fog in scene.GetAllComponents<GradientFog>() )

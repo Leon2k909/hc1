@@ -6,16 +6,27 @@ public sealed class BotWeaponPose
 	private Model _gunModel, _bodyModel;
 	private ulong _groups;
 	private Vector3 _stockBack, _stockFront;
+	private Vector3 _stockContact;
+	private bool _stockContactCached;
 	private int _pelvis = -1, _neck = -1, _leftShoulder = -1, _rightShoulder = -1;
 
 	public Vector3 Fit( SkinnedModelRenderer body, WorldModel gun, BotSupportHand support, BotSupportHand grip,
-		Vector3 wrist, float supportWeight )
+		Vector3 wrist, float supportWeight, float? chestFront = null, bool preferSideways = false )
 	{
 		if ( !body.IsValid() || !body.SceneModel.IsValid() || !gun.IsValid() || !gun.ModelRenderer.IsValid() || gun.ModelRenderer.Model is null ) return Vector3.Zero;
 		CacheStock( gun );
 		if ( _bodyModel != body.Model ) CacheBody( body.Model );
 		var hasTorso = Torso( body, out var torso, out var bounds );
-		var back = gun.WorldTransform.PointToWorld( _stockBack );
+		if ( hasTorso && chestFront is { } frontPlane )
+		{
+			// A chest carry contacts the plate carrier at the shoulder line. Use that contact plane for its
+			// transition clearance; the normal hold retains its more conservative eight-unit torso bounds.
+			var shoulders = (body.SceneModel.GetBoneWorldTransform( _leftShoulder ).Position + body.SceneModel.GetBoneWorldTransform( _rightShoulder ).Position) * .5f;
+			bounds = new BBox( bounds.Mins, new Vector3( torso.PointToLocal( shoulders ).x + frontPlane, bounds.Maxs.y, bounds.Maxs.z ) );
+		}
+		// The combined-mesh estimate follows the bore for a normal hold. A chest carry has an actual pad
+		// contact, so its clearance segment must start at that pad rather than above it.
+		var back = gun.WorldTransform.PointToWorld( chestFront.HasValue ? _stockContact : _stockBack );
 		var front = gun.WorldTransform.PointToWorld( _stockFront );
 		var target = gun.IkLeftHand;
 		var shift = Vector3.Zero;
@@ -30,7 +41,7 @@ public sealed class BotWeaponPose
 			var right = wrist + shift;
 			shift += grip.Reachable( body, right ) - right;
 			if ( hasTorso )
-				shift += Clearance( torso, bounds, back + shift, front + shift );
+				shift += Clearance( torso, bounds, back + shift, front + shift, preferSideways );
 			if ( (shift - previous).LengthSquared < .000001f ) break;
 		}
 		return shift;
@@ -39,7 +50,7 @@ public sealed class BotWeaponPose
 	private void CacheStock( WorldModel gun )
 	{
 		var renderer = gun.ModelRenderer;
-		if ( _gunModel == renderer.Model && _groups == renderer.BodyGroups ) return;
+		if ( _gunModel == renderer.Model && _groups == renderer.BodyGroups && _stockContactCached ) return;
 		_gunModel = renderer.Model;
 		_groups = renderer.BodyGroups;
 		var mins = new Vector3( float.MaxValue );
@@ -64,6 +75,17 @@ public sealed class BotWeaponPose
 		var toGun = gun.WorldTransform.ToLocal( renderer.WorldTransform );
 		_stockBack = toGun.PointToWorld( new Vector3( mins.x, center.y, center.z ) );
 		_stockFront = toGun.PointToWorld( new Vector3( maxs.x, center.y, center.z ) );
+		// Older combined meshes have no separate stock. Its pad lies below the bore, whereas the clearance
+		// segment above follows the bore to conservatively protect the whole stock.
+		_stockContact = toGun.PointToWorld( new Vector3( mins.x, center.y, center.z - (found ? 0f : 1.5f) ) );
+		_stockContactCached = true;
+	}
+
+	/// <summary>The fitted stock's rear contact point, in weapon space; hidden gunsmith stocks are excluded.</summary>
+	public Vector3 ButtstockContact( WorldModel gun )
+	{
+		CacheStock( gun );
+		return _stockContact;
 	}
 
 	private void CacheBody( Model model )
@@ -98,10 +120,13 @@ public sealed class BotWeaponPose
 		return true;
 	}
 
-	private static Vector3 Clearance( Transform torso, BBox bounds, Vector3 back, Vector3 front )
+	private static Vector3 Clearance( Transform torso, BBox bounds, Vector3 back, Vector3 front, bool preferSideways )
 	{
 		var a = torso.PointToLocal( back );
 		var b = torso.PointToLocal( front );
+		// A pad resting on the front plane is contact, not penetration. Roundoff at that plane must not
+		// send a settled carry to the side of the torso.
+		if ( a.x >= bounds.Maxs.x - .001f && b.x >= bounds.Maxs.x - .001f ) return Vector3.Zero;
 		var delta = b - a;
 		var enter = 0f;
 		var exit = 1f;
@@ -116,14 +141,14 @@ public sealed class BotWeaponPose
 			var t1 = (bounds.Maxs[axis] - a[axis]) / delta[axis];
 			enter = MathF.Max( enter, MathF.Min( t0, t1 ) );
 			exit = MathF.Min( exit, MathF.Max( t0, t1 ) );
-			if ( enter >= exit ) return Vector3.Zero;
+			if ( enter >= exit - .00001f ) return Vector3.Zero;
 		}
 		// Slide towards the front or the nearest side of the torso; never resolve a collision by putting the gun behind it.
 		var forward = bounds.Maxs.x - MathF.Min( a.x, b.x ) + .05f;
 		var right = bounds.Mins.y - MathF.Max( a.y, b.y ) - .05f;
 		var left = bounds.Maxs.y - MathF.Min( a.y, b.y ) + .05f;
 		var sideways = MathF.Abs( right ) <= MathF.Abs( left ) ? right : left;
-		var correction = forward <= MathF.Abs( sideways ) ? new Vector3( forward, 0f, 0f ) : new Vector3( 0f, sideways, 0f );
+		var correction = !preferSideways && forward <= MathF.Abs( sideways ) ? new Vector3( forward, 0f, 0f ) : new Vector3( 0f, sideways, 0f );
 		return torso.Rotation * correction;
 	}
 }

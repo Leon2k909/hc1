@@ -1,0 +1,7 @@
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor&&s.Scene.Source?.ResourcePath?.Equals("scenes/maps/lowtide/lowtide.scene",StringComparison.OrdinalIgnoreCase)==true);
+var scene=session.Scene;
+var qa=AppDomain.CurrentDomain.GetAssemblies().Select(a=>a.GetType("Hc1LowtideFinishQa")).First(t=>t!=null);
+var capture=qa.GetField("captureScene",System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Static).GetValue(null) as Scene;
+var report=new {editor=new {points=scene.GetAllComponents<PointLight>().Count(p=>p.Enabled), spots=scene.GetAllComponents<SpotLight>().Count(p=>p.Enabled), volumes=scene.GetAllComponents<IndirectLightVolume>().Select(v=>new {name=v.GameObject.Name,v.ProbeCounts,v.RuntimeIntensity,v.RuntimeContrast,irradianceError=v.IrradianceTexture?.IsError,distanceError=v.DistanceTexture?.IsError,relocationError=v.RelocationTexture?.IsError}).ToArray()},runtimeScene=Game.ActiveScene?.Name,captureActive=capture.IsValid(),session.HasUnsavedChanges,temporaryScenes=Scene.All.Where(s=>s.IsValid()&&(s.Name.Contains("bake preview")||s.Name.Contains("serialization preview"))).Select(s=>s.Name).ToArray()};
+System.IO.File.WriteAllText(System.IO.Path.Combine(Project.Current.GetRootPath(),"output/lowtide/quality-pass/warehouse-lighting-engine-checks.json"),System.Text.Json.JsonSerializer.Serialize(report,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return report;

@@ -165,7 +165,7 @@ public class PlayerGlobals : GlobalComponent, IGameEventHandler<ModifyDamageGlob
 
 		var resource = (eventArgs.DamageInfo.Inflictor as Equipment)?.Resource;
 		resource ??= GameUtils.GetLightweightBotFromComponent( eventArgs.DamageInfo.Inflictor )?.WeaponResource;
-		var hardcoreBullet = (GameMode.ActiveHardcore || (GameMode.Instance.IsValid() && GameMode.Instance.Hardcore))
+		var hardcoreBullet = GameMode.IsHardcore
 			&& !eventArgs.DamageInfo.WasFallDamage && !eventArgs.DamageInfo.WasExplosion && !eventArgs.DamageInfo.WasMelee
 			&& !eventArgs.DamageInfo.Flags.HasFlag( DamageFlags.Burn ) && !eventArgs.DamageInfo.Flags.HasFlag( DamageFlags.Zone );
 		// The current vest represents soft torso armor, not a rifle-rated plate.

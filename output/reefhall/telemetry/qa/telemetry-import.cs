@@ -1,0 +1,14 @@
+var root = Project.Current.GetRootPath();
+var assets = System.IO.Path.Combine( root, "Assets/materials/reefhall" );
+var review = System.IO.Path.Combine( root, "output/reefhall/telemetry" );
+var material = System.IO.Path.Combine( assets, "rh_screen_data.vmat" );
+var backup = System.IO.Path.Combine( review, "rh_screen_data.before.vmat" );
+if ( !System.IO.File.Exists( backup ) ) System.IO.File.Copy( material, backup );
+var image = System.IO.Path.Combine( assets, "rh_screen_telemetry_color.png" );
+if ( System.IO.File.Exists( image ) ) throw new Exception( "New telemetry texture already exists; inspect before importing again." );
+System.IO.File.Copy( @"C:\Users\leon2\.codex\generated_images\01a13c04-8580-7793-ab31-4fd377b96cf0\exec-e12eb409-14ea-4e45-81c1-5d2787c3064d.png", image );
+Editor.AssetSystem.RegisterFile( image );
+System.IO.File.Copy( System.IO.Path.Combine( review, "staging/rh_screen_data.vmat" ), material, true );
+var asset = Editor.AssetSystem.RegisterFile( material );
+if ( asset is null ) throw new Exception( "Could not register telemetry material." );
+return new { Texture = image, Material = material, Backup = backup };

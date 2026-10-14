@@ -1,0 +1,303 @@
+Thread (0x3E08):
+  [Native Frames]
+  System.Private.CoreLib.il!System.IO.Strategies.OSFileStreamStrategy..ctor(class System.String,value class System.IO.FileMode,value class System.IO.FileAccess,value class System.IO.FileShare,value class System.IO.FileOptions,int64,value class System.Nullable`1<value class System.IO.UnixFileMode>)
+  Zio!Zio.FileSystems.PhysicalFileSystem.OpenFileImpl(value class Zio.UPath,value class System.IO.FileMode,value class System.IO.FileAccess,value class System.IO.FileShare)
+  Sandbox.GameInstance!Sandbox.GameInstanceDll.AddNetworkFile(class Sandbox.BaseFileSystem,class Sandbox.BaseFileSystem,class System.String,class Sandbox.SmallNetworkFiles,class Sandbox.LargeNetworkFiles)
+  Sandbox.GameInstance!Sandbox.GameInstanceDll.BuildNetworkedFiles()
+  Sandbox.GameInstance!Sandbox.GameInstanceDll.CreateGameNetworking(class Sandbox.Network.NetworkSystem)
+  Sandbox.Engine!Sandbox.Network.NetworkSystem.InitializeGameSystem()
+  Sandbox.Engine!Sandbox.Network.NetworkSystem.InitializeHost()
+  Sandbox.Engine!Sandbox.Networking+<CreateLobbyAsync>d__130.MoveNext()
+  System.Private.CoreLib.il!System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start(!!0&)
+  System.Private.CoreLib.il!System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1[System.Boolean].Start(!!0&)
+  Sandbox.Engine!Sandbox.Networking.CreateLobbyAsync(value class Sandbox.Network.LobbyConfig,value class System.Threading.CancellationToken)
+  Sandbox.Engine!Sandbox.Networking.CreateLobby(value class Sandbox.Network.LobbyConfig)
+  package.verarp.razedtest!Facepunch.GameNetworkManager.OnStart()
+  Sandbox.Engine!Sandbox.Component.InternalOnStart()
+  Sandbox.Engine!Sandbox.Scene.RunPendingStarts()
+  Sandbox.Engine!Sandbox.Scene+<WaitForLoading>d__139.MoveNext()
+  System.Private.CoreLib.il!System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.Threading.Tasks.VoidTaskResult,Sandbox.Scene+<WaitForLoading>d__139].ExecutionContextCallback(class System.Object)
+  System.Private.CoreLib.il!System.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)
+  System.Private.CoreLib.il!System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.Threading.Tasks.VoidTaskResult,Sandbox.Scene+<WaitForLoading>d__139].MoveNext(class System.Threading.Thread)
+  System.Private.CoreLib.il!System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.Threading.Tasks.VoidTaskResult,Sandbox.Scene+<WaitForLoading>d__139].MoveNext()
+  System.Private.CoreLib.il!System.Threading.Tasks.AwaitTaskContinuation.RunCallback(class System.Threading.ContextCallback,class System.Object,class System.Threading.Tasks.Task&)
+  System.Private.CoreLib.il!System.Threading.Tasks.Task.RunContinuations(class System.Object)
+  System.Private.CoreLib.il!System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1[System.Boolean].SetResult(!0)
+  Sandbox.Engine!Sandbox.Navigation.NavMesh+<Load>d__112.MoveNext()
+  System.Private.CoreLib.il!System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.Boolean,Sandbox.Navigation.NavMesh+<Load>d__112].ExecutionContextCallback(class System.Object)
+  System.Private.CoreLib.il!System.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)
+  System.Private.CoreLib.il!System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.Boolean,Sandbox.Navigation.NavMesh+<Load>d__112].MoveNext(class System.Threading.Thread)
+  System.Private.CoreLib.il!System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.Boolean,Sandbox.Navigation.NavMesh+<Load>d__112].MoveNext()
+  System.Private.CoreLib.il!System.Threading.Tasks.AwaitTaskContinuation.RunCallback(class System.Threading.ContextCallback,class System.Object,class System.Threading.Tasks.Task&)
+  System.Private.CoreLib.il!System.Threading.Tasks.Task.RunContinuations(class System.Object)
+  System.Private.CoreLib.il!System.Runtime.CompilerServices.AsyncTaskMethodBuilder.SetResult()
+  Sandbox.Engine!Sandbox.Navigation.NavMesh+<GenerateTiles>d__160.MoveNext()
+  System.Private.CoreLib.il!System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.Threading.Tasks.VoidTaskResult,Sandbox.Navigation.NavMesh+<GenerateTiles>d__160].ExecutionContextCallback(class System.Object)
+  System.Private.CoreLib.il!System.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)
+  System.Private.CoreLib.il!System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.Threading.Tasks.VoidTaskResult,Sandbox.Navigation.NavMesh+<GenerateTiles>d__160].MoveNext(class System.Threading.Thread)
+  System.Private.CoreLib.il!System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.Threading.Tasks.VoidTaskResult,Sandbox.Navigation.NavMesh+<GenerateTiles>d__160].MoveNext()
+  Sandbox.Engine!Sandbox.Tasks.ExpirableSynchronizationContext.ProcessQueue()
+  Sandbox.Engine!Sandbox.EngineLoop.RunAsyncTasks()
+  Sandbox.Tools!Editor.ManagedTools.RunFrame()
+  Sandbox.Tools!Managed.SourceTools.Exports.Editor_ManagedTools_RunFrame()
+  Sandbox.Engine!Sandbox.EngineLoop.RunFrame(value class CMaterialSystem2AppSystemDict,bool&)
+  Sandbox.AppSystem!Sandbox.AppSystem.Run()
+  sbox-dev!Sandbox.Launcher.Main()
+  sbox-dev!Sandbox.Program.Launch()
+  sbox-dev!Sandbox.Program.Main()
+
+Thread (0x78D0):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+GateThread.GateThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x66D8):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.TimerQueue.TimerThread()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x77D0):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitAnyMultiple(value class System.ReadOnlySpan`1<class Microsoft.Win32.SafeHandles.SafeWaitHandle>,int32)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WaitThread.WaitThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x3A1C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+IOCompletionPoller.Poll()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0xF04):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+IOCompletionPoller.Poll()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x70A0):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Monitor.Wait(class System.Object,int32)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitUntilCountOrTimeout(int64,int64,value class System.Threading.CancellationToken)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitCore(int64,value class System.Threading.CancellationToken)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1[System.__Canon].TryTakeWithNoTimeValidation(!0&,int32,value class System.Threading.CancellationToken,class System.Threading.CancellationTokenSource)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1+<GetConsumingEnumerable>d__68[System.__Canon].MoveNext()
+  Zio!Zio.FileSystems.FileSystemEventDispatcher`1[System.__Canon].DispatchWorker()
+  System.Private.CoreLib.il!System.Threading.Thread+StartHelper.Callback(class System.Object)
+  System.Private.CoreLib.il!System.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)
+
+Thread (0x3EC8):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)
+  System.Private.CoreLib.il!System.Threading.Lock.TryEnterSlow(int32,value class ThreadId)
+  System.Private.CoreLib.il!System.Threading.Lock.EnterAndGetCurrentThreadId()
+  Sandbox.Engine!Sandbox.Networking.RunThread()
+  System.Private.CoreLib.il!System.Threading.Thread+StartHelper.Callback(class System.Object)
+  System.Private.CoreLib.il!System.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)
+
+Thread (0x82CC):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Monitor.Wait(class System.Object,int32)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitUntilCountOrTimeout(int64,int64,value class System.Threading.CancellationToken)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitCore(int64,value class System.Threading.CancellationToken)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1[System.__Canon].TryTakeWithNoTimeValidation(!0&,int32,value class System.Threading.CancellationToken,class System.Threading.CancellationTokenSource)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1+<GetConsumingEnumerable>d__68[System.__Canon].MoveNext()
+  Zio!Zio.FileSystems.FileSystemEventDispatcher`1[System.__Canon].DispatchWorker()
+  System.Private.CoreLib.il!System.Threading.Thread+StartHelper.Callback(class System.Object)
+  System.Private.CoreLib.il!System.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)
+
+Thread (0x18F4):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Monitor.Wait(class System.Object,int32)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitUntilCountOrTimeout(int64,int64,value class System.Threading.CancellationToken)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitCore(int64,value class System.Threading.CancellationToken)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1[System.__Canon].TryTakeWithNoTimeValidation(!0&,int32,value class System.Threading.CancellationToken,class System.Threading.CancellationTokenSource)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1+<GetConsumingEnumerable>d__68[System.__Canon].MoveNext()
+  Zio!Zio.FileSystems.FileSystemEventDispatcher`1[System.__Canon].DispatchWorker()
+  System.Private.CoreLib.il!System.Threading.Thread+StartHelper.Callback(class System.Object)
+  System.Private.CoreLib.il!System.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)
+
+Thread (0x659C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Monitor.Wait(class System.Object,int32)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitUntilCountOrTimeout(int64,int64,value class System.Threading.CancellationToken)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitCore(int64,value class System.Threading.CancellationToken)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1[System.__Canon].TryTakeWithNoTimeValidation(!0&,int32,value class System.Threading.CancellationToken,class System.Threading.CancellationTokenSource)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1+<GetConsumingEnumerable>d__68[System.__Canon].MoveNext()
+  Zio!Zio.FileSystems.FileSystemEventDispatcher`1[System.__Canon].DispatchWorker()
+  System.Private.CoreLib.il!System.Threading.Thread+StartHelper.Callback(class System.Object)
+  System.Private.CoreLib.il!System.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)
+
+Thread (0x82F4):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Monitor.Wait(class System.Object,int32)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitUntilCountOrTimeout(int64,int64,value class System.Threading.CancellationToken)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitCore(int64,value class System.Threading.CancellationToken)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1[System.__Canon].TryTakeWithNoTimeValidation(!0&,int32,value class System.Threading.CancellationToken,class System.Threading.CancellationTokenSource)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1+<GetConsumingEnumerable>d__68[System.__Canon].MoveNext()
+  Zio!Zio.FileSystems.FileSystemEventDispatcher`1[System.__Canon].DispatchWorker()
+  System.Private.CoreLib.il!System.Threading.Thread+StartHelper.Callback(class System.Object)
+  System.Private.CoreLib.il!System.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)
+
+Thread (0x4328):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Monitor.Wait(class System.Object,int32)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitUntilCountOrTimeout(int64,int64,value class System.Threading.CancellationToken)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitCore(int64,value class System.Threading.CancellationToken)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1[System.__Canon].TryTakeWithNoTimeValidation(!0&,int32,value class System.Threading.CancellationToken,class System.Threading.CancellationTokenSource)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1+<GetConsumingEnumerable>d__68[System.__Canon].MoveNext()
+  Zio!Zio.FileSystems.FileSystemEventDispatcher`1[System.__Canon].DispatchWorker()
+  System.Private.CoreLib.il!System.Threading.Thread+StartHelper.Callback(class System.Object)
+  System.Private.CoreLib.il!System.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)
+
+Thread (0x7398):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Monitor.Wait(class System.Object,int32)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitUntilCountOrTimeout(int64,int64,value class System.Threading.CancellationToken)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitCore(int64,value class System.Threading.CancellationToken)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1[System.__Canon].TryTakeWithNoTimeValidation(!0&,int32,value class System.Threading.CancellationToken,class System.Threading.CancellationTokenSource)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1+<GetConsumingEnumerable>d__68[System.__Canon].MoveNext()
+  Zio!Zio.FileSystems.FileSystemEventDispatcher`1[System.__Canon].DispatchWorker()
+  System.Private.CoreLib.il!System.Threading.Thread+StartHelper.Callback(class System.Object)
+  System.Private.CoreLib.il!System.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)
+
+Thread (0x8258):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Monitor.Wait(class System.Object,int32)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitUntilCountOrTimeout(int64,int64,value class System.Threading.CancellationToken)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitCore(int64,value class System.Threading.CancellationToken)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1[System.__Canon].TryTakeWithNoTimeValidation(!0&,int32,value class System.Threading.CancellationToken,class System.Threading.CancellationTokenSource)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1+<GetConsumingEnumerable>d__68[System.__Canon].MoveNext()
+  Zio!Zio.FileSystems.FileSystemEventDispatcher`1[System.__Canon].DispatchWorker()
+  System.Private.CoreLib.il!System.Threading.Thread+StartHelper.Callback(class System.Object)
+  System.Private.CoreLib.il!System.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)
+
+Thread (0x5FF0):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Monitor.Wait(class System.Object,int32)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitUntilCountOrTimeout(int64,int64,value class System.Threading.CancellationToken)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitCore(int64,value class System.Threading.CancellationToken)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1[System.__Canon].TryTakeWithNoTimeValidation(!0&,int32,value class System.Threading.CancellationToken,class System.Threading.CancellationTokenSource)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1+<GetConsumingEnumerable>d__68[System.__Canon].MoveNext()
+  Zio!Zio.FileSystems.FileSystemEventDispatcher`1[System.__Canon].DispatchWorker()
+  System.Private.CoreLib.il!System.Threading.Thread+StartHelper.Callback(class System.Object)
+  System.Private.CoreLib.il!System.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)
+
+Thread (0x5640):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Monitor.Wait(class System.Object,int32)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitUntilCountOrTimeout(int64,int64,value class System.Threading.CancellationToken)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitCore(int64,value class System.Threading.CancellationToken)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1[System.__Canon].TryTakeWithNoTimeValidation(!0&,int32,value class System.Threading.CancellationToken,class System.Threading.CancellationTokenSource)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1+<GetConsumingEnumerable>d__68[System.__Canon].MoveNext()
+  Zio!Zio.FileSystems.FileSystemEventDispatcher`1[System.__Canon].DispatchWorker()
+  System.Private.CoreLib.il!System.Threading.Thread+StartHelper.Callback(class System.Object)
+  System.Private.CoreLib.il!System.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)
+
+Thread (0x3E38):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Monitor.Wait(class System.Object,int32)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitUntilCountOrTimeout(int64,int64,value class System.Threading.CancellationToken)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitCore(int64,value class System.Threading.CancellationToken)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1[System.__Canon].TryTakeWithNoTimeValidation(!0&,int32,value class System.Threading.CancellationToken,class System.Threading.CancellationTokenSource)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1+<GetConsumingEnumerable>d__68[System.__Canon].MoveNext()
+  Zio!Zio.FileSystems.FileSystemEventDispatcher`1[System.__Canon].DispatchWorker()
+  System.Private.CoreLib.il!System.Threading.Thread+StartHelper.Callback(class System.Object)
+  System.Private.CoreLib.il!System.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)
+
+Thread (0x4CF4):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Monitor.Wait(class System.Object,int32)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitUntilCountOrTimeout(int64,int64,value class System.Threading.CancellationToken)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitCore(int64,value class System.Threading.CancellationToken)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1[System.__Canon].TryTakeWithNoTimeValidation(!0&,int32,value class System.Threading.CancellationToken,class System.Threading.CancellationTokenSource)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1+<GetConsumingEnumerable>d__68[System.__Canon].MoveNext()
+  Zio!Zio.FileSystems.FileSystemEventDispatcher`1[System.__Canon].DispatchWorker()
+  System.Private.CoreLib.il!System.Threading.Thread+StartHelper.Callback(class System.Object)
+  System.Private.CoreLib.il!System.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)
+
+Thread (0x7D58):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Monitor.Wait(class System.Object,int32)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitUntilCountOrTimeout(int64,int64,value class System.Threading.CancellationToken)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitCore(int64,value class System.Threading.CancellationToken)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1[System.__Canon].TryTakeWithNoTimeValidation(!0&,int32,value class System.Threading.CancellationToken,class System.Threading.CancellationTokenSource)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1+<GetConsumingEnumerable>d__68[System.__Canon].MoveNext()
+  Zio!Zio.FileSystems.FileSystemEventDispatcher`1[System.__Canon].DispatchWorker()
+  System.Private.CoreLib.il!System.Threading.Thread+StartHelper.Callback(class System.Object)
+  System.Private.CoreLib.il!System.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)
+
+Thread (0x610C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.Monitor.Wait(class System.Object,int32)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitUntilCountOrTimeout(int64,int64,value class System.Threading.CancellationToken)
+  System.Private.CoreLib.il!System.Threading.SemaphoreSlim.WaitCore(int64,value class System.Threading.CancellationToken)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1[System.__Canon].TryTakeWithNoTimeValidation(!0&,int32,value class System.Threading.CancellationToken,class System.Threading.CancellationTokenSource)
+  System.Collections.Concurrent.il!System.Collections.Concurrent.BlockingCollection`1+<GetConsumingEnumerable>d__68[System.__Canon].MoveNext()
+  Zio!Zio.FileSystems.FileSystemEventDispatcher`1[System.__Canon].DispatchWorker()
+  System.Private.CoreLib.il!System.Threading.Thread+StartHelper.Callback(class System.Object)
+  System.Private.CoreLib.il!System.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)
+
+Thread (0x83FC):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x6B08):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x7DE4):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x4420):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0xAA8):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x820C):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x5B54):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x6AE8):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+Thread (0x7788):
+  [Native Frames]
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)
+  System.Private.CoreLib.il!System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)
+  System.Private.CoreLib.il!System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()
+  System.Private.CoreLib.il!System.Threading.Thread.StartCallback()
+
+

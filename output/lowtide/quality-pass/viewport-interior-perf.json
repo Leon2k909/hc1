@@ -1,0 +1,153 @@
+{
+  "Window": {
+    "Frames": 181,
+    "Seconds": 2.01
+  },
+  "Fps": 90,
+  "TargetFps": 90,
+  "TargetSource": "fps_max_inactive",
+  "LimitedBy": "fps_max_inactive",
+  "MeetingTarget": true,
+  "Rating": "Good",
+  "Frame": {
+    "AvgMs": 11.11,
+    "P50Ms": 11.11,
+    "P99Ms": 11.28,
+    "MaxMs": 11.32
+  },
+  "CpuWork": {
+    "AvgMs": 5.7,
+    "P50Ms": 5.65,
+    "P99Ms": 8.51,
+    "MaxMs": 9.3
+  },
+  "Gpu": null,
+  "CapWait": {
+    "AvgMs": 5.41,
+    "P50Ms": 5.46,
+    "P99Ms": 6.73,
+    "MaxMs": 6.74
+  },
+  "PerfHubWindow": null,
+  "Hitches": {
+    "Count": 0,
+    "OverMs": 22.2,
+    "WorstMs": 0
+  },
+  "Issues": [
+    {
+      "Severity": "Warning",
+      "Title": "GC pauses",
+      "Detail": "3.3 ms in the last second",
+      "MoreIn": "perf_memory"
+    }
+  ],
+  "MainThread": [
+    {
+      "Name": "Render",
+      "AvgMs": 4.75,
+      "MaxMs": 6.69
+    },
+    {
+      "Name": "Editor",
+      "AvgMs": 0.58,
+      "MaxMs": 1.06
+    },
+    {
+      "Name": "UI",
+      "AvgMs": 0.32,
+      "MaxMs": 0.6
+    },
+    {
+      "Name": "Async",
+      "AvgMs": 0.06,
+      "MaxMs": 3.63
+    },
+    {
+      "Name": "Input",
+      "AvgMs": 0.05,
+      "MaxMs": 0.17
+    },
+    {
+      "Name": "GcPause",
+      "AvgMs": 0.05,
+      "MaxMs": 1.96
+    },
+    {
+      "Name": "Update",
+      "AvgMs": 0.05,
+      "MaxMs": 0.25
+    },
+    {
+      "Name": "Audio",
+      "AvgMs": 0.04,
+      "MaxMs": 0.15
+    }
+  ],
+  "GpuPasses": [
+    {
+      "Name": "Static Opaque Forward",
+      "AvgMs": 0.8,
+      "MaxMs": 1.03,
+      "Path": "RenderToSwapChain / Static Opaque Forward"
+    },
+    {
+      "Name": "Depth Normal Prepass (Large)",
+      "AvgMs": 0.19,
+      "MaxMs": 0.41,
+      "Path": "RenderToSwapChain / Depth Normal Prepass (Large)"
+    },
+    {
+      "Name": "DrawDepthOpaque",
+      "AvgMs": 0.17,
+      "MaxMs": 0.19,
+      "Path": "CSM Cascade 2 / DrawDepthOpaque"
+    },
+    {
+      "Name": "DrawDepthOpaque",
+      "AvgMs": 0.13,
+      "MaxMs": 0.14,
+      "Path": "CSM Cascade 1 / DrawDepthOpaque"
+    },
+    {
+      "Name": "Dynamic Opaque Forward",
+      "AvgMs": 0.13,
+      "MaxMs": 0.33,
+      "Path": "RenderToSwapChain / Dynamic Opaque Forward"
+    },
+    {
+      "Name": "DrawDepthOpaque",
+      "AvgMs": 0.12,
+      "MaxMs": 0.12,
+      "Path": "CSM Cascade 3 / DrawDepthOpaque"
+    },
+    {
+      "Name": "DrawDepthOpaque",
+      "AvgMs": 0.11,
+      "MaxMs": 0.12,
+      "Path": "CSM Cascade 0 / DrawDepthOpaque"
+    },
+    {
+      "Name": "Translucent Forward",
+      "AvgMs": 0.09,
+      "MaxMs": 0.09,
+      "Path": "RenderToSwapChain / Translucent Forward"
+    }
+  ],
+  "Memory": {
+    "ProcessMiB": 9781.9,
+    "VideoMemory": {
+      "UsedMiB": 2577.3,
+      "BudgetMiB": 11174
+    },
+    "AllocatedMiBPerSecond": 15,
+    "GcPauseMsLastSecond": 3.26,
+    "GcLastSecond": {
+      "Gen0": 2,
+      "Gen1": 0,
+      "Gen2": 0
+    }
+  },
+  "DrawCalls": 1447,
+  "Triangles": 8392171
+}

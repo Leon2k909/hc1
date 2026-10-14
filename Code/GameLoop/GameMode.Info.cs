@@ -64,6 +64,10 @@ partial class GameMode
 			}
 		}
 
+		// Tactical Defuse shares the authored Defuse sites and spawns.
+		if ( list.Any( x => x.Ident == "defuse" ) )
+			AddGameMode( list, "prefabs/game_modes/tactical_defuse.prefab" );
+
 		return list;
 	}
 
@@ -92,6 +96,7 @@ partial class GameMode
 		return gameMode.Ident switch
 		{
 			"defuse" => "prefabs/game_modes/bomb_defusal.prefab",
+			"tactical_defuse" => "prefabs/game_modes/tactical_defuse.prefab",
 			"cashgrab" => "prefabs/game_modes/cash_grab.prefab",
 			"dm" => "prefabs/game_modes/deathmatch.prefab",
 			"retakes" => "prefabs/game_modes/retakes.prefab",

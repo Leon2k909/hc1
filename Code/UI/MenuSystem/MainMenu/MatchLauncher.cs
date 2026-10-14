@@ -13,11 +13,11 @@ public static class MatchLauncher
 	{
 		if ( mode is null || map is null ) return;
 
-		// Core modes are off for now, every match is hardcore, except Zombies, which has its own rules. Put back with
+		// Ordinary multiplayer stays hardcore; tactical presets and Zombies use their own health rules. Put back with
 		// Core: GameMode.SetHardcore( the player's Core / Hardcore choice ), which the removed Multiplayer page
 		// (LandingPage) had a commented-out toggle for.
 		GameMode.SetCurrent( mode );
-		GameMode.SetHardcore( !IsZombies( mode ) );
+		GameMode.SetHardcore( !mode.UsesStandardHealth && !IsZombies( mode ) );
 		GameUtils.LoadMap( map );
 	}
 

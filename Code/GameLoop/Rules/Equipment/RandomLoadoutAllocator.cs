@@ -84,8 +84,8 @@ public sealed class RandomLoadoutAllocator : Component,
 
 			player.Inventory.HasDefuseKit = DefuseKit && player.Team == Team.CounterTerrorist;
 
-			player.ArmorComponent.HasHelmet = Helmet;
-			player.ArmorComponent.Armor = Armor;
+			player.ArmorComponent.HasHelmet = player.ArmorComponent.HelmetsEnabled && Helmet;
+			player.ArmorComponent.Armor = player.ArmorComponent.ArmorEnabled ? Armor : 0f;
 
 			foreach ( var equipment in Equipment )
 			{

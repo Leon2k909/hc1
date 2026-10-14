@@ -71,7 +71,8 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 	[Property, Group( "Effects" )] public string ShootSound { get; set; } = "sounds/weapons/m4a1/m4_shot.sound";
 
 	public bool IsAlive => HealthComponent.IsValid() && HealthComponent.State == LifeState.Alive;
-	public Vector3 EyePosition => WorldTransform.PointToWorld( BotPronePose.EyeOffset( IsCrouching, _proneBlend ) );
+	public Vector3 EyePosition => WorldTransform.PointToWorld( Vector3.Lerp(
+		BotPronePose.EyeOffset( IsCrouching, _proneBlend ), SlideEye, SlideBlend ) );
 
 	[Sync( SyncFlags.FromHost ), Property, ReadOnly] public int Kills { get; private set; }
 	[Sync( SyncFlags.FromHost ), Property, ReadOnly] public int Deaths { get; private set; }
@@ -113,6 +114,7 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 
 		if ( RandomizePersonality && !IsProxy )
 			RollPersonality();
+		_nextSlide = Game.Random.Float( 4f, 9f );
 	}
 
 	protected override void OnUpdate()
@@ -431,7 +433,7 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 
 		if ( Renderer.TryGetBoneTransform( _handBone, out var hand ) )
 		{
-			if ( _proneBlend > 0f && Renderer.SceneModel.IsValid() )
+			if ( (_proneBlend > 0f || SlideBlend > 0f || _strideScale > 1.001f) && Renderer.SceneModel.IsValid() )
 				hand = Renderer.SceneModel.GetBoneWorldTransform( _handBone.Index );
 			if ( _handBone.Name is "hand_R" or "r_hand" )
 				_handOffset = MilitaryUniform.WeaponHandOffset( Renderer.Model );
@@ -444,21 +446,31 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 	private readonly BotWeaponPose _weaponPose = new();
 	private readonly BotHeadCant _headCant = new();
 	private float _supportGripWeight;
+	private readonly BotStridePose _stridePose = new();
+	private float _strideScale = 1f;
+	private readonly ThirdPersonSprintPose _sprintPose = new();
+	private float _sprintPoseBlend;
 
 	/// <summary>Finish the gun and support arm together, using the pose the renderer will draw this frame.</summary>
 	internal void FinishWeaponPose()
 	{
-		if ( IsAlive ) _pronePose.Apply( Renderer, _proneBlend );
+		if ( IsAlive )
+		{
+			if ( _proneBlend > 0f ) _pronePose.Apply( Renderer, _proneBlend );
+			else if ( SlideBlend > 0f ) _slidePose.Apply( Renderer, SlideBlend, updateBoneObjects: !BotSystem.LodEnabled );
+			else if ( BotSystem.ShouldShowEffect( WorldPosition, 16f, 1200f ) ) _stridePose.Apply( Renderer, _moveVelocity, _strideScale );
+		}
 		if ( _weaponModel.IsValid() ) _weaponModel.LocalTransform = global::Transform.Zero;
 		FollowHand();
 		var gun = GetWeaponWorldModel();
 		if ( !IsAlive || !Renderer.IsValid() || !gun.IsValid() )
 		{
 			_supportGripWeight = 0f;
+			_sprintPose.Reset();
 			return;
 		}
 
-		if ( _proneBlend > 0f && IsAimingIn && !IsReloadClipPlaying
+		if ( (_proneBlend > 0f || SlideBlend > 0f) && IsAimingIn && !IsReloadClipPlaying
 			&& ShoulderedHandIk( Renderer, gun, EyeOnGun( gun ), AimDirection, EyePosition ) is { } sightedHand )
 		{
 			_gripHand.Apply( Renderer, Renderer.WorldTransform.ToWorld( sightedHand ) );
@@ -468,6 +480,7 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 		var target = gun.IkLeftHand;
 		var supportActive = !IsReloadClipPlaying && target.IsValid() && target.Active;
 		_supportGripWeight = supportActive ? MathF.Min( 1f, _supportGripWeight + Time.Delta / .2f ) : 0f;
+		if ( _sprintPose.Apply( Renderer, gun, _sprintPoseBlend, _supportGripWeight, updateBoneObjects: !BotSystem.LodEnabled ) ) return;
 		// Long handguards can fall beyond the support arm during a low carry or a turn. Bring the whole gun
 		// and its gripping hand within both arms' reach before fitting the support arm; never stretch a wrist.
 		var rightBone = Renderer.Model.Bones.GetBone( "hand_R" ) ?? Renderer.Model.Bones.GetBone( "r_hand" );
@@ -599,25 +612,30 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 		if ( !IsAlive )
 			return;
 
-		var velocity = UpdateMoveVelocity();
+		var movement = UpdateMoveVelocity();
+		var desiredStride = !IsCrouching && !IsProne && _proneBlend <= 0f && SlideBlend <= 0f
+			? 1f + .5f * ((movement.WithZ( 0f ).Length - 90f) / 180f).Clamp( 0f, 1f ) : 1f;
+		_strideScale = MathX.Lerp( _strideScale, desiredStride, (Time.Delta * 12f).Clamp( 0f, 1f ) );
+		// A slide holds the hips and boots in the procedural pose; fade the underlying locomotion out.
+		var velocity = movement * (1f - SlideBlend);
 		var forward = WorldRotation.Forward.Dot( velocity );
 		var sideward = WorldRotation.Right.Dot( velocity );
 
-		// Past the blend's ring of clips no clip steps far enough: hold the ring's clips and play the legs faster. A runner
-		// goes faster mostly by taking longer strides, which the clips can't, and legs sped up the whole way (a strafe's jog
-		// at 1.36x, the hunting sprint at 1.29x: 220-260 steps a minute) looked like running faster than the bot moved. So
-		// the legs speed up by the square root of what's missing, and the feet slide the rest (~14% on a strafe).
+		// Bound the legacy graph's cadence; the pose applied after animation supplies the longer steps.
 		var speed = MathF.Sqrt( forward * forward + sideward * sideward );
 		var rate = 1f;
 		// The human body's graph (citizen_human) has walk, run and sprint clips and picks between them by speed, as for a
 		// player, so it takes the true velocity. The ring is rigged_human's: clamped to it, a sprinting bot's legs jogged.
 		var humanGraph = MilitaryUniform.UsesHumanSkeleton( Renderer.Model );
+		if ( humanGraph )
+			UpdateHumanGaitRates( speed );
+
 		if ( speed > 1f && !humanGraph )
 		{
 			var reach = RingReach( IsCrouching ? CrouchedClipRing : StoodClipRing, new Vector2( sideward / speed, forward / speed ) );
 			if ( speed > reach )
 			{
-				rate = MathF.Min( MathF.Sqrt( speed / reach ), MaxMoveRate );
+				rate = MathF.Min( MathF.Sqrt( speed / reach ), GaitRateLimit( speed ) );
 				forward *= reach / speed;
 				sideward *= reach / speed;
 			}
@@ -656,6 +674,9 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 		// In a fight the gun comes up to the shoulder, the chest squares up behind it and the head drops onto the stock,
 		// eyes still on the target. Not at a run: a runner carries it.
 		var shouldered = IsAimingIn && !IsReloadClipPlaying && speed < MaxShoulderedSpeed;
+		// Use the smoothed, replicated movement rather than NavMeshAgent.Velocity, which is zero on clients.
+		var canCarry = !IsReloading && !IsReloadClipPlaying && !IsCrouching && !IsProne && _proneBlend <= 0f && SlideBlend <= 0f;
+		_sprintPoseBlend = canCarry ? ThirdPersonSprintPose.UpdateBlend( _sprintPoseBlend, speed > MaxShoulderedSpeed, Time.Delta ) : 0f;
 		_aimBodyWeight = MathX.Lerp( _aimBodyWeight, shouldered ? 1f : 0.75f, Time.Delta * 8f );
 		_headDrop = MathX.Lerp( _headDrop, shouldered ? ShoulderedHeadDrop : 0f, Time.Delta * 8f );
 		Renderer.SetLookDirection( "aim_eyes", aim, 1f );
@@ -685,8 +706,52 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 		new( 0f, -39f ), new( -26f, -29f ), new( -32f, 0f ), new( -26f, 29f ),
 	};
 
-	/// <summary> The fastest the legs play (the graph's move_rate), however fast the bot is moved: any faster is no runner's cadence. </summary>
-	private const float MaxMoveRate = 1.25f;
+	/// <summary> Limit gait playback on both body graphs; weapon and look animations keep their own timing. </summary>
+	private const float MaxMoveRate = 1.1f;
+	private static float GaitRateLimit( float speed ) =>
+		MaxMoveRate + .15f * ((speed - MaxShoulderedSpeed) / 100f).Clamp( 0f, 1f );
+	private const string HumanBotAnimationGraph = "animgraphs/human_bot.vanmgrph";
+
+	private static readonly string[] HumanGaitRateParameters =
+	{
+		"_human_walk_rate_per_inch", "_human_run_rate_per_inch",
+		"_human_crouch_rate_per_inch", "_human_sprint_rate_per_inch"
+	};
+
+	private AnimationGraph _humanGaitGraph;
+	private readonly float[] _humanGaitRates = new float[HumanGaitRateParameters.Length];
+
+	private void UpdateHumanGaitRates( float speed )
+	{
+		// The engine graph fixes the gait controls' min and max to the same value. This copy opens their ranges,
+		// retaining the engine's locomotion, weapon layers and calibration defaults.
+		if ( Renderer.AnimationGraph?.Name != HumanBotAnimationGraph )
+			Renderer.AnimationGraph = AnimationGraph.Load( HumanBotAnimationGraph );
+
+		var graph = Renderer.SceneModel.IsValid() ? Renderer.SceneModel.AnimationGraph : null;
+		if ( graph is null || graph.IsError )
+			return;
+
+		if ( graph != _humanGaitGraph )
+		{
+			_humanGaitGraph = graph;
+			for ( var i = 0; i < HumanGaitRateParameters.Length; i++ )
+			{
+				var name = HumanGaitRateParameters[i];
+				_humanGaitRates[i] = graph.GetParameterType( name ) == typeof( float )
+					? graph.GetParameter<float>( name ).DefaultValue : 0f;
+			}
+		}
+
+		// The human graph multiplies each gait's reference rate by move_groundspeed. At combat speed that made its
+		// run clip play at almost 2x. Keep combat cadence bounded, allowing a little more at the faster sprint.
+		var maximumRatePerInch = GaitRateLimit( speed ) / MathF.Max( speed, 1f );
+		for ( var i = 0; i < HumanGaitRateParameters.Length; i++ )
+		{
+			if ( _humanGaitRates[i] > 0f )
+				Renderer.Set( HumanGaitRateParameters[i], MathF.Min( _humanGaitRates[i], maximumRatePerInch ) );
+		}
+	}
 
 	private Vector3 _lastAnimPosition;
 	private Vector3 _moveVelocity;
@@ -712,9 +777,9 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 
 		// Faster than anyone runs: a teleport, not a step.
 		if ( moved.WithZ( 0f ).Length > 1000f )
-			return _moveVelocity;
+			return _moveVelocity = Vector3.Zero;
 
-		_moveVelocity = _moveVelocity.LerpTo( moved, Time.Delta * 12f );
+		_moveVelocity = _moveVelocity.LerpTo( moved, (Time.Delta * 20f).Clamp( 0f, 1f ) );
 		return _moveVelocity;
 	}
 
@@ -749,7 +814,7 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 	private void UpdateLeftHandIk()
 	{
 		var target = GetWeaponWorldModel()?.IkLeftHand;
-		if ( _proneBlend > 0f || IsReloadClipPlaying || !target.IsValid() || !target.Active )
+		if ( _proneBlend > 0f || SlideBlend > 0f || IsReloadClipPlaying || !target.IsValid() || !target.Active )
 		{
 			Renderer.SetBool( "ik.hand_left.enabled", false );
 			return;
@@ -811,7 +876,7 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 	/// </summary>
 	private void UpdateRightHandIk( Vector3 aim, bool shouldered )
 	{
-		var gun = shouldered && _proneBlend <= 0f ? GetWeaponWorldModel() : null;
+		var gun = shouldered && _proneBlend <= 0f && SlideBlend <= 0f ? GetWeaponWorldModel() : null;
 		if ( gun.IsValid() && gun != _sightedGun )
 		{
 			_sightedGun = gun;
@@ -913,6 +978,7 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 			return;
 
 		_dying = true;
+		if ( !IsProxy ) StopSlide( resume: false );
 		GameObject.Tags.Remove( "player" );
 		GameObject.Tags.Add( "dead" );
 		// Players walk through bodies (their movement ignores "ragdoll", like player bodies), and footsteps look
@@ -954,7 +1020,7 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 
 			// Most go down over a second or two as their muscles let go; only some drop on the spot (DeathPlan).
 			DyingBody.Begin( physics, DeathPlan.Choose( damageInfo, GameObject.Id, WorldPosition, WorldRotation,
-				_moveVelocity, IsCrouching, down: IsProne || _proneBlend > 0.25f ) );
+				_moveVelocity, IsCrouching, down: IsProne || _proneBlend > 0.25f || SlideBlend > 0.25f ) );
 		}
 
 		GameObject.DestroyAsync( CorpseLifetime );
@@ -1147,6 +1213,10 @@ public sealed partial class LightweightBotManager : SingletonComponent<Lightweig
 		public int Kills;
 		public int Deaths;
 		public int Score;
+		public int TacticalCash = 800;
+		public float TacticalArmor;
+		public bool TacticalHelmet;
+		public bool TacticalEquipmentCleared;
 	}
 
 	private int _nextBotIndex;
@@ -1324,7 +1394,11 @@ public sealed partial class LightweightBotManager : SingletonComponent<Lightweig
 			bot.BotName = identity.Name;
 			bot.Skill = identity.Skill;
 			// Issued on the soldier's first life, and set before networking so clients spawn it with the same gun.
-			if ( identity.Weapon is null )
+			if ( TacticalEconomy.Current.IsValid() )
+			{
+				PrepareTacticalLoadout( bot, identity );
+			}
+			else if ( identity.Weapon is null )
 			{
 				identity.Weapon = LightweightCombatBot.RollWeapon();
 				identity.Muzzle = LightweightCombatBot.RollMuzzle( identity.Weapon );
@@ -1469,7 +1543,7 @@ public sealed partial class LightweightBotManager : SingletonComponent<Lightweig
 	/// Round modes place everyone at the round's start, at that round's spawns (<see cref="BotFillRule"/>, Skirmish's
 	/// own rounds), so the spawns aren't camped and mustn't move.
 	/// </summary>
-	private static bool IsRoundMode => GameMode.Instance?.Ident is "defuse" or "retakes" or "gunfight_1v1" or "gunfight_2v2";
+	private static bool IsRoundMode => GameMode.Instance?.Ident is "defuse" or "retakes" or "tactical_defuse" or "gunfight_1v1" or "gunfight_2v2";
 
 	/// <summary>
 	/// The team's spawns, kept from an enemy camping them: one no living enemy is near (<see cref="CampedRadius"/>) or

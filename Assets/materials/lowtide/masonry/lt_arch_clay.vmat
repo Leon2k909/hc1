@@ -1,0 +1,12 @@
+// Individual radial bricks share the facade's clay scan.
+"Layer0"
+{
+    shader "shaders/hc1_brick.shader"
+    TextureColor "materials/lowtide/lt_brick_v2_color.png"
+    TextureNormal "materials/lowtide/lt_brick_v2_normal.png"
+    TextureRoughness "[0.52 0.52 0.52 0]"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    TextureMetalness "materials/default/default_black_mask.tga"
+    g_vBrickScale "[1 1 0 0]"
+    g_flTintColor "[0.67 0.60 0.55]"
+}

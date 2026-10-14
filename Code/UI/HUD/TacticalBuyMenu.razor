@@ -1,0 +1,178 @@
+@namespace Facepunch.UI
+@inherits Panel
+@attribute [StyleSheet]
+
+<root>
+    @if ( IsOpen && Pawn.IsValid() )
+    {
+        <div class="window">
+            <div class="head">
+                <div class="titles">
+                    <label class="heading">@Tr( "BUY PHASE" )</label>
+                    <label class="subheading">@Tr( "Survive to keep your weapons next round." )</label>
+                </div>
+                <label class="balance">$@Balance.ToString( "N0" )</label>
+                <label class="timer">@Tr( "{0}s LEFT", SecondsLeft )</label>
+                <div class="close" onclick=@Close><InputHint Action="ChooseClass" Size="@InputGlyphSize.Small" /><label>@Tr( "CLOSE" )</label></div>
+            </div>
+            <div class="body">
+                <div class="categories">
+                    @foreach ( var tab in Categories )
+                    {
+                        var category = tab;
+                        <div class="category @(SelectedCategory == category ? "selected" : "")" onclick=@(() => SelectedCategory = category)>
+                            <label>@Tr( category )</label>
+                        </div>
+                    }
+                </div>
+                <div class="items">
+                    @if ( SelectedCategory == "GEAR" )
+                    {
+                        @foreach ( var option in Enum.GetValues<TacticalGear>() )
+                        {
+                            var gear = option;
+                            if ( gear == TacticalGear.DefuseKit && Pawn.Team != Team.CounterTerrorist ) continue;
+                            var price = TacticalEconomy.GearPrice( Pawn, gear );
+                            <div class="item @(price is null || Balance < price.Value ? "unavailable" : "")" onclick=@(() => BuyGear( gear ))>
+                                <Icon File=@GearIcon( gear ) Size="@(32)" />
+                                <label class="name">@Tr( GearName( gear ) )</label>
+                                <label class="price">@(price is null ? Tr( "OWNED" ) : $"${price.Value:N0}")</label>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        @foreach ( var entry in TacticalEconomy.Catalog( Pawn.Team ).Where( x => CategoryFor( x ) == SelectedCategory ) )
+                        {
+                            var resource = entry;
+                            var owned = Pawn.Inventory.Has( resource );
+                            <div class="item @(owned || Balance < resource.Price ? "unavailable" : "")" onclick=@(() => BuyWeapon( resource ))>
+                                @if ( !string.IsNullOrEmpty( resource.Icon ) )
+                                {
+                                    <div class="weapon-icon" style="background-image: url( @resource.Icon );" />
+                                }
+                                <label class="name">@resource.Name</label>
+                                <label class="price">@(owned ? Tr( "OWNED" ) : $"${resource.Price:N0}")</label>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+            <div class="foot">
+                <label>@Tr( "One life per round. Weapons replace the item in that slot." )</label>
+                @if ( !string.IsNullOrEmpty( _feedback ) )
+                {
+                    <label class="feedback @(_purchaseFailed ? "failed" : "")">@(_purchaseFailed ? Tr( "PURCHASE UNAVAILABLE" ) : Tr( "PURCHASED {0}", Tr( _feedback ) ))</label>
+                }
+            </div>
+        </div>
+    }
+</root>
+
+@code
+{
+    public static TacticalBuyMenu Instance { get; private set; }
+    public static bool IsAnyOpen => Instance is { IsValid: true, IsOpen: true };
+    public bool IsOpen { get; private set; }
+    public string SelectedCategory { get; set; } = "PISTOLS";
+    private static readonly string[] Categories = { "PISTOLS", "RIFLES", "SMGS", "HEAVY", "PRECISION", "UTILITY", "GEAR" };
+    private string _feedback;
+    private bool _purchaseFailed;
+    private bool _couldBuy;
+
+    private static PlayerPawn Pawn => Client.Local.IsValid() ? Client.Local.PlayerPawn : null;
+    private int Balance => Pawn?.Client?.Balance ?? 0;
+    private int SecondsLeft => Math.Max( 0, (int)Math.Ceiling( GameMode.Instance?.DisplayedTime?.TotalSeconds ?? 0 ) );
+
+    public TacticalBuyMenu() { Instance = this; }
+
+    public static string GearName( TacticalGear gear ) => gear switch
+    {
+        TacticalGear.Armor => "ARMOUR",
+        TacticalGear.ArmorAndHelmet => "ARMOUR + HELMET",
+        TacticalGear.DefuseKit => "DEFUSE KIT",
+        _ => "GEAR"
+    };
+
+    private static string GearIcon( TacticalGear gear ) => gear == TacticalGear.DefuseKit ? "/ui/defusekit.png" : "/ui/armor.png";
+
+    private static string CategoryFor( EquipmentResource resource ) => resource.Slot is not (EquipmentSlot.Primary or EquipmentSlot.Secondary)
+        ? "UTILITY" : resource.Category switch
+        {
+            WeaponCategory.Pistol => "PISTOLS",
+            WeaponCategory.AssaultRifle => "RIFLES",
+            WeaponCategory.SMG => "SMGS",
+            WeaponCategory.LMG or WeaponCategory.Shotgun or WeaponCategory.Launcher => "HEAVY",
+            _ => "PRECISION"
+        };
+
+    public void Open()
+    {
+        if ( !TacticalEconomy.CanBuy( Pawn ) ) return;
+        _feedback = null;
+        IsOpen = true;
+        SetClass( "visible", true );
+    }
+
+    public void Close()
+    {
+        IsOpen = false;
+        SetClass( "visible", false );
+    }
+
+    private void BuyWeapon( EquipmentResource resource )
+    {
+        if ( !TacticalEconomy.CanBuy( Pawn ) || Balance < resource.Price || Pawn.Inventory.Has( resource ) ) return;
+        Client.Local.BuyTacticalEquipment( resource.ResourcePath );
+    }
+
+    private void BuyGear( TacticalGear gear )
+    {
+        if ( !TacticalEconomy.CanBuy( Pawn ) || TacticalEconomy.GearPrice( Pawn, gear ) is not { } price || Balance < price ) return;
+        Client.Local.BuyTacticalGear( gear );
+    }
+
+    public void PurchaseFinished( bool success, string item )
+    {
+        _purchaseFailed = !success;
+        _feedback = success ? item : "unavailable";
+    }
+
+    public override void Tick()
+    {
+        base.Tick();
+        var canBuy = TacticalEconomy.CanBuy( Pawn );
+        var enteredBuyPhase = canBuy && !_couldBuy;
+        _couldBuy = canBuy;
+        if ( !canBuy || PauseMenuPanel.IsAnyOpen || Chat.IsAnyOpen || Input.Down( "Score" ) || Toast.IsWinShowing )
+        {
+            Close();
+            return;
+        }
+        if ( IsOpen && Input.EscapePressed )
+        {
+            Input.EscapePressed = false;
+            Close();
+            return;
+        }
+        if ( Input.Pressed( "ChooseClass" ) )
+        {
+            if ( IsOpen ) Close();
+            else Open();
+        }
+        else if ( enteredBuyPhase )
+        {
+            Open();
+        }
+    }
+
+    public override void OnDeleted()
+    {
+        if ( Instance == this ) Instance = null;
+        base.OnDeleted();
+    }
+
+    protected override int BuildHash() => HashCode.Combine( IsOpen, SelectedCategory, Balance, SecondsLeft, _feedback,
+        Pawn?.ArmorComponent?.Armor, Pawn?.ArmorComponent?.HasHelmet,
+        HashCode.Combine( Pawn?.Inventory?.HasDefuseKit, Pawn?.Inventory?.Equipment.Count() ) );
+}

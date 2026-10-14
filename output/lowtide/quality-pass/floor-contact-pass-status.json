@@ -1,0 +1,15 @@
+{
+  "status": "applied_and_visually_checked",
+  "scope": "Warehouse floor static ambient contact only",
+  "overall_quality_target_met": false,
+  "new_geometry": false,
+  "new_lights": false,
+  "scene_modified": false,
+  "sun_and_lamp_previews_applied": false,
+  "indirect_light_preview_applied": false,
+  "validation": "floor-contact-checks.json",
+  "visual_benefit": "Subtle darkening immediately around column bases and static cargo",
+  "remaining": ["Room-wide indirect illumination and lamp shadowing", "Architectural repetition", "Controlled performance benchmark"],
+  "rejected_previews": ["live-floor-contact-original-lights", "live-floor-contact-registered", "live-floor-contact-column-debug", "live-floor-contact-column-before"],
+  "rejected_reason": "First three used a stale texture binding; column-before used an ineffective material override. Use disabled/bound and disabled/final comparisons instead."
+}

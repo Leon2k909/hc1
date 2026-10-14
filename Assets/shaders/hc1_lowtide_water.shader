@@ -48,11 +48,16 @@ PS
 
     float3 g_vWaterColor < UiType( Color ); Default3( .10, .16, .14 ); UiGroup( "Water" ); >;
     float2 g_vWaterFlow < Default2( -3.4, .9 ); UiGroup( "Water" ); >;
-    float g_flRippleTile < Default( 512 ); Range( 64, 2048 ); UiGroup( "Water" ); >;
-    float g_flRippleStrength < Default( .7 ); Range( 0, 2 ); UiGroup( "Water" ); >;
-    float g_flWaterRoughness < Default( .20 ); Range( .04, .5 ); UiGroup( "Water" ); >;
+    float g_flRippleTile < Default( 48 ); Range( 16, 2048 ); UiGroup( "Water" ); >;
+    float g_flRippleStrength < Default( .8 ); Range( 0, 2 ); UiGroup( "Water" ); >;
+    float g_flWaterRoughness < Default( .10 ); Range( .04, .5 ); UiGroup( "Water" ); >;
     float g_flAbsorptionDistance < Default( 42 ); Range( 4, 256 ); UiGroup( "Water" ); >;
     float g_flBankFade < Default( .3 ); Range( .1, 4 ); UiGroup( "Water" ); >;
+    Texture2D g_tWaterReflection < Attribute( "LowtideReflection" ); SrgbRead( false ); >;
+    SamplerState WaterReflectionSampler < Filter( MIN_MAG_MIP_LINEAR ); AddressU( CLAMP ); AddressV( CLAMP ); >;
+    bool g_bWaterReflection < Attribute( "LowtideReflectionEnabled" ); >;
+    bool g_bWaterReflectionFlip < Attribute( "LowtideReflectionFlip" ); >;
+    float g_flWaterReflectionPlane < Attribute( "LowtideReflectionPlane" ); >;
 
     float3 FilteredRipple( float2 position, float2 pixelDx, float2 pixelDy, float2 direction,
                           float wavelength, float slope, float phase, float speed )
@@ -71,6 +76,9 @@ PS
 
     float4 MainPs( PixelInput input ) : SV_Target0
     {
+        // Explicit water draws also run in child views. The reflected camera is
+        // behind this plane, so it must never sample its own render target.
+        if ( g_bWaterReflection && g_vCameraPositionWs.z < g_flWaterReflectionPlane ) discard;
         Material water = Material::Init( input );
         float3 world = water.WorldPosition;
         // Continuous wave gradients have no source texels, compression blocks or repeating noise tiles.
@@ -100,11 +108,15 @@ PS
         float transmission = exp( -path / g_flAbsorptionDistance );
         float3 view = g_matViewToProjection[3].w != 0 ? -g_vCameraDirWs : normalize( g_vCameraPositionWs - world );
         float ndotv = saturate( abs( dot( view, water.Normal ) ) );
-        float fresnel = saturate( CalcBRDFReflectionFactor( ndotv, water.Roughness, .04 ).x );
+        // Air/water IOR 1.333 gives F0 ~0.02037; the default dielectric .04
+        // overstates reflectance when looking down at the shallow channel.
+        const float waterF0 = .02037;
+        float fresnel = saturate( CalcBRDFReflectionFactor( ndotv, water.Roughness, waterF0 ).x );
         water.Opacity = 1 - ( 1 - fresnel ) * transmission;
         water.Albedo = g_vWaterColor * ( 1 - transmission );
 
         CombinerInput lightingInput = ShadingModelStandard::MaterialToCombinerInput( water );
+        lightingInput.vSpecularColor = float3( waterF0, waterF0, waterF0 );
         // Wave variance is already filtered per pixel. Replacing it with quad derivatives makes 2x2 roughness blocks.
         lightingInput.vRoughness = water.Roughness.xx;
         LightingTerms_t lighting = InitLightingTerms();
@@ -114,6 +126,25 @@ PS
         // Use filtered sky/local cubemaps for water, with the standard direct lighting and shadows.
         float3 reflection = EnvMap::From( world, input.vPositionSs, water.Normal, water.Roughness.xx )
                             * CalcBRDFReflectionFactor( ndotv, water.Roughness, lightingInput.vSpecularColor );
+        // The harbour and the small bank pools are at different elevations.
+        // Retain their local cubemaps instead of projecting the canal mirror
+        // onto a surface that does not lie in its reflection plane.
+        if ( g_bWaterReflection && abs( world.z - g_flWaterReflectionPlane ) < .5 )
+        {
+            float2 uv = input.vPositionSs.xy * g_vInvViewportSize;
+            // A world-X wave must not always shift the image horizontally.
+            // Project the perturbed reflection direction through this camera,
+            // mirrored back over the flat capture plane, before offsetting UVs.
+            float3 reflectionDelta = reflect( -view, water.Normal )
+                                   - reflect( -view, normalize( input.vNormalWs ) );
+            reflectionDelta.z = -reflectionDelta.z;
+            float2 viewDelta = mul( g_matWorldToView, float4( reflectionDelta, 0 ) ).xy;
+            float aspect = g_vInvViewportSize.x / g_vInvViewportSize.y;
+            uv += float2( viewDelta.x * aspect, -viewDelta.y ) * .014;
+            if ( g_bWaterReflectionFlip ) uv.y = 1 - uv.y;
+            reflection = g_tWaterReflection.SampleLevel( WaterReflectionSampler, saturate( uv ), 0 ).rgb
+                * CalcBRDFReflectionFactor( ndotv, water.Roughness, lightingInput.vSpecularColor );
+        }
         float3 lit = ( lighting.vDiffuse.rgb + ambient ) * lightingInput.vDiffuseColor.rgb
                      + lighting.vSpecular.rgb + reflection;
         float4 color = DoAtmospherics( world, input.vPositionSs.xy, float4( lit, water.Opacity ) );

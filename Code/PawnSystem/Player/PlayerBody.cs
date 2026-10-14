@@ -79,6 +79,51 @@ public partial class PlayerBody : Component
 	}
 
 	private MilitaryUniform _firstPersonUniform;
+	private readonly ThirdPersonTabletPose _tabletPose = new();
+
+	internal void ApplyTabletPose()
+	{
+		var station = Player?.CurrentEquipment?.WorldModel;
+		if ( !Player.IsValid() || !Player.HealthComponent.IsValid() || Player.HealthComponent.State != LifeState.Alive
+			|| !Renderer.IsValid() || !Renderer.UseAnimGraph || (Physics.IsValid() && Physics.Enabled)
+			|| !station.IsValid() || !station.Active || !station.UseTabletPose ) return;
+		_tabletPose.Apply( Renderer, station );
+	}
+
+	private readonly ThirdPersonSlidePose _slidePose = new();
+	private readonly ThirdPersonSprintPose _sprintPose = new();
+	private float _sprintPoseBlend;
+
+	internal void ApplySprintPose()
+	{
+		var equipment = Player?.CurrentEquipment;
+		var gun = equipment?.WorldModel;
+		if ( !Player.IsValid() || !Player.HealthComponent.IsValid() || Player.HealthComponent.State != LifeState.Alive
+			|| !Renderer.IsValid() || !Renderer.UseAnimGraph || (Physics.IsValid() && Physics.Enabled)
+			|| !equipment.IsValid() || !gun.IsValid() || !gun.Active || gun.UseTabletPose
+			|| equipment.GetHoldType() is not (AnimationHelper.HoldTypes.Rifle or AnimationHelper.HoldTypes.Shotgun)
+			|| Player.IsProne || Player.IsCrouching || Player.IsFallKnockedDown || Player.IsMantling || Player.IsPipeClimbing || Player.SlideBlend > 0f
+			|| equipment.Components.Get<Reloadable>( FindMode.EnabledInSelfAndDescendants )?.IsReloading == true )
+		{
+			_sprintPoseBlend = 0f;
+			_sprintPose.Reset();
+			return;
+		}
+		_sprintPoseBlend = ThirdPersonSprintPose.UpdateBlend( _sprintPoseBlend, Player.IsSprinting && !Player.HasEquipmentTag( "aiming" ), Time.Delta );
+		// Migrated player prefabs keep their authored hand socket; using a bot's offset would leave an offset
+		// on the weapon when the carry ends, and make it jump as the normal hand animation takes over.
+		Transform? mount = MilitaryUniform.UsesHumanSkeleton( Renderer.Model ) && Player.HoldGameObject.IsValid()
+			? Player.HoldGameObject.LocalTransform : null;
+		_sprintPose.Apply( Renderer, gun, _sprintPoseBlend, handToWeaponOverride: mount );
+	}
+
+	internal void ApplySlidePose()
+	{
+		if ( !Player.IsValid() || Player.SlideBlend <= 0f || !Player.HealthComponent.IsValid() || Player.HealthComponent.State != LifeState.Alive
+			|| !Renderer.IsValid() || !Renderer.UseAnimGraph || (Physics.IsValid() && Physics.Enabled)
+			|| Player.IsProne || Player.IsMantling || Player.IsPipeClimbing ) return;
+		_slidePose.Apply( Renderer, Player.SlideBlend );
+	}
 
 	protected override void OnUpdate()
 	{

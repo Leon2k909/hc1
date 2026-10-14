@@ -1,0 +1,11 @@
+var session=Editor.SceneEditorSession.Active;
+if(Game.IsPlaying || session?.Scene.Source?.ResourcePath!="scenes/maps/lowtide/lowtide.scene")throw new Exception("Expected Lowtide edit viewport");
+var material=Material.Load("materials/lowtide/roofs/lt_slate.vmat");
+var scale=material.GetVector4("g_vSlateScale");
+var textures=new[]{"g_tColor","g_tNormal","g_tRma"}.Select(name=>new{name,width=material.GetTexture(name)?.Width,height=material.GetTexture(name)?.Height}).ToArray();
+if(material.IsError || Math.Abs(scale.x-1.2192f)>.001f || textures.Any(x=>x.width!=2048||x.height!=2048))throw new Exception("Slate binding verification failed");
+var renderers=session.Scene.GetAllComponents<ModelRenderer>().Where(r=>r.GameObject.Name=="East"||r.GameObject.Name=="West").Select(r=>new{name=r.GameObject.Name,modelError=r.Model.IsError,slateSlots=Enumerable.Range(0,r.Materials.Count).Where(i=>r.Materials.GetOriginal(i)?.ResourcePath==material.ResourcePath).Select(i=>new{index=i,hasOverride=r.Materials.GetOverride(i)!=null}).ToArray()}).ToArray();
+if(renderers.Length!=2 || renderers.Any(r=>r.modelError||r.slateSlots.Length!=1||r.slateSlots.Any(s=>s.hasOverride)))throw new Exception("Roof renderer verification failed");
+var result=new{shader=true,compiled=true,material.IsError,tint=material.GetVector4("g_flTintColor"),scale,textures,renderers,session.HasUnsavedChanges,Game.IsPlaying};
+System.IO.File.WriteAllText(System.IO.Path.Combine(Project.Current.GetRootPath(),"output/lowtide/quality-pass/roof-response-native-compile.json"),System.Text.Json.JsonSerializer.Serialize(result,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return result;

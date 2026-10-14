@@ -1,14 +1,12 @@
-// Tools/lowtide_map.py
+// Tools/lowtide_frames.py: generated enamel with physical surface scale.
 "Layer0"
 {
-    shader "shaders/complex.shader"
-    F_SPECULAR "1"
-    g_flRoughnessScaleFactor "1"
-    g_flMetalness "0.00"
-    TextureColor "materials/default/default_color.tga"
-    TextureNormal "materials/default/default_normal.tga"
-    TextureRoughness "[0.450000 0.450000 0.450000 0.000000]"
+    shader "shaders/hc1_lowtide_enamel.shader"
+    TextureColor "materials/lowtide/frames/enamel_color.png"
+    TextureNormal "materials/lowtide/frames/enamel_normal.png"
+    TextureRoughness "materials/lowtide/frames/enamel_rough.png"
     TextureAmbientOcclusion "materials/default/default_ao.tga"
-    g_vColorTint "[0.133333 0.243137 0.196078 1.000000]"
-    g_flModelTintAmount "1.0"
+    TextureMetalness "materials/default/default_black_mask.tga"
+    g_vEnamelTint "[.065 .115 .082]"
+    g_flEnamelScale "5.08"
 }

@@ -1,0 +1,19 @@
+// Lowtide's thin, slightly wavy warehouse glazing.
+"Layer0"
+{
+    shader "shaders/glass.shader"
+    F_GLASS_QUALITY "2"
+    g_bFogEnabled "1"
+    g_flBlurAmount "0.12"
+    g_flRefractionStrength "1.0015"
+    AlbedoAbsorption "0.08"
+    g_flTintColor "[1 1 1]"
+    TextureColor "[0.97 0.985 0.98 0]"
+    TextureNormal "materials/railhead/window_dark_normal.png"
+    TextureRoughness "[0.10 0.10 0.10 0]"
+    TextureMetalness "[0 0 0 0]"
+    TextureAmbientOcclusion "[1 1 1 0]"
+    TextureBlendMask "materials/default/default_blend.tga"
+    TextureTintMask "materials/default/default.tga"
+    TextureTranslucency "materials/default/default_trans.tga"
+}

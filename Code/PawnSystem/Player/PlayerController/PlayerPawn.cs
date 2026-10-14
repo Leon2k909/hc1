@@ -128,6 +128,7 @@ public sealed partial class PlayerPawn : Pawn, IDescription, IAreaDamageReceiver
 
 		if ( IsLocallyControlled )
 		{
+			UpdateAimInputAfterRespawn();
 			DebugUpdate();
 		}
 	}

@@ -1,0 +1,48 @@
+if (Game.IsPlaying && Game.ActiveScene.GetAllComponents<ModelRenderer>().Any(x => x.Model?.ResourcePath?.Contains("maps/belltower/",StringComparison.OrdinalIgnoreCase) == true))
+    throw new InvalidOperationException("Do not import Belltower assets during a live Belltower match.");
+var project = Sandbox.Project.Current.GetRootPath();
+var assets = System.IO.Path.GetFullPath(System.IO.Path.Combine(project, "Assets"));
+foreach(var imageName in new[]{"shop-shelves-v1.png","window-plants-v1.png"})
+{
+    var imageSource = System.IO.Path.Combine(project,"Sources/Belltower/generated",imageName);
+    var imageTarget = System.IO.Path.Combine(assets,"materials/belltower/generated",imageName);
+    if(!System.IO.File.Exists(imageSource) || System.IO.File.Exists(imageTarget)) continue;
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(imageTarget));
+    System.IO.File.Copy(imageSource,imageTarget);
+    Editor.AssetSystem.RegisterFile(imageTarget);
+}
+foreach(var shaderName in new[]{"belltower_window.shader","belltower_plants.shader"})
+{
+    var shaderSource = System.IO.Path.Combine(project,"Sources/Belltower/shaders",shaderName);
+    var shaderTarget = System.IO.Path.Combine(assets,"shaders",shaderName);
+    if(!System.IO.File.Exists(shaderSource) || (System.IO.File.Exists(shaderTarget) && System.IO.File.ReadAllText(shaderSource) == System.IO.File.ReadAllText(shaderTarget))) continue;
+    System.IO.File.Copy(shaderSource,shaderTarget,true);
+    Editor.AssetSystem.RegisterFile(shaderTarget);
+}
+var source = System.IO.Path.Combine(project, "output/belltower/quality/material-import.json");
+using var document = System.Text.Json.JsonDocument.Parse(System.IO.File.ReadAllText(source));
+var imported = new System.Collections.Generic.List<string>();
+foreach (var item in document.RootElement.EnumerateArray())
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var path = item.GetProperty("path").GetString();
+    if (!path.StartsWith("materials/belltower/", StringComparison.Ordinal) || !path.EndsWith(".vmat")) throw new InvalidOperationException("Unexpected asset path.");
+    var full = System.IO.Path.GetFullPath(System.IO.Path.Combine(assets, path));
+    if (!full.StartsWith(assets + System.IO.Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)) throw new InvalidOperationException("Path escaped project assets.");
+    if (System.IO.File.Exists(full) && System.IO.File.ReadAllText(full) == item.GetProperty("text").GetString()) continue;
+    var backup = System.IO.Path.Combine(project, "output/belltower/quality/before/assets", path);
+    if (System.IO.File.Exists(full) && !System.IO.File.Exists(backup))
+    {
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+        System.IO.File.Copy(full, backup);
+    }
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(full));
+    // The compiler can keep a memory mapping on the old source. Publish a new
+    // file atomically instead of truncating that mapped source in place.
+    var temporary = full + ".belltower-import";
+    System.IO.File.WriteAllText(temporary, item.GetProperty("text").GetString());
+    System.IO.File.Move(temporary,full,true);
+    Editor.AssetSystem.RegisterFile(full);
+    imported.Add(path);
+}
+return new { Imported = imported, Next = "Verify these assets through asset_compile and compare the same native camera views." };

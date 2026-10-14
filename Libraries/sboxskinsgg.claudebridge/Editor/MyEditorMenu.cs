@@ -21,7 +21,7 @@ public interface IBridgeHandler
 /// <summary>
 /// Claude Bridge — file-based IPC server for MCP integration.
 /// </summary>
-public static class ClaudeBridge
+public static partial class ClaudeBridge
 {
 	private static readonly Dictionary<string, IBridgeHandler> _handlers = new();
 	private static bool _running;

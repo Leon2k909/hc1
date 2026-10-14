@@ -28,6 +28,15 @@ public static class Explosion
 
 		foreach ( var obj in objectsInArea )
 		{
+			if ( obj.GetComponentInParent<LpgCanister>() is { } canister )
+			{
+				if ( !damagedRoots.Add( canister.GameObject ) ) continue;
+				var hit = trace.Ray( point, canister.WorldPosition ).Run();
+				if ( hit.Hit && hit.GameObject != canister.GameObject ) continue;
+				var amount = baseDamage * falloff.Evaluate( Math.Min( point.Distance( canister.WorldPosition ) / radius, 1f ) );
+				canister.TakeDamage( new DamageInfo( attacker, amount, inflictor, point, canister.WorldPosition - point, Flags: DamageFlags.Explosion ) );
+				continue;
+			}
 			var hc = obj.Root.GetComponentInChildren<HealthComponent>();
 			var prop = obj.Root.GetComponentInChildren<Prop>();
 

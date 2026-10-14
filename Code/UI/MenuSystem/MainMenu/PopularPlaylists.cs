@@ -13,7 +13,7 @@ public static class PopularPlaylists
 	/// <summary>The usual order, with the core team modes first.</summary>
 	private static readonly string[] Curated =
 	{
-		"tdm", "domination", "hardpoint", "defuse", "gunfight_2v2", "dm", "gun_game", "retakes", "cashgrab", "gunfight_1v1"
+		"tdm", "domination", "hardpoint", "defuse", "tactical_defuse", "gunfight_2v2", "dm", "gun_game", "retakes", "cashgrab", "gunfight_1v1"
 	};
 
 	/// <summary>The card's subtitle: players a side, then the mode in a few words (from its description). A mode that
@@ -24,6 +24,7 @@ public static class PopularPlaylists
 		["domination"] = "5V5 | CAPTURE AND HOLD",
 		["hardpoint"] = "5V5 | ROTATING ZONE",
 		["defuse"] = "5V5 | NO RESPAWNS",
+		["tactical_defuse"] = "5V5 | BUY WEAPONS EACH ROUND",
 		["retakes"] = "5V5 | AFTER-PLANT ROUNDS",
 		["cashgrab"] = "5V5 | CAPTURE THE CASH",
 		["gunfight_1v1"] = "1V1 | INSTANT RESPAWNS",

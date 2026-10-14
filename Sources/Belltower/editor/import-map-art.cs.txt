@@ -1,0 +1,18 @@
+var root = Sandbox.Project.Current.GetRootPath();
+var source = System.IO.Path.Combine(root,"output/belltower/quality/saved-relief-v1/map_art.png");
+var bytes = System.IO.File.ReadAllBytes(source);
+var width = System.Buffers.Binary.BinaryPrimitives.ReadInt32BigEndian(bytes.AsSpan(16,4));
+var height = System.Buffers.Binary.BinaryPrimitives.ReadInt32BigEndian(bytes.AsSpan(20,4));
+if(width!=1920 || height!=1080) throw new InvalidOperationException("Map artwork must be the reviewed 1920x1080 native capture.");
+var destination = System.IO.Path.Combine(root,"Assets/ui/maps/belltower.png");
+var backup = System.IO.Path.Combine(root,"output/belltower/quality/before/assets/ui/maps/belltower.png");
+if(System.IO.File.Exists(destination) && !System.IO.File.Exists(backup))
+{
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+    System.IO.File.Copy(destination,backup);
+}
+var pending = destination+".belltower-import";
+System.IO.File.WriteAllBytes(pending,bytes);
+System.IO.File.Move(pending,destination,true);
+Editor.AssetSystem.RegisterFile(destination);
+return new {Saved="ui/maps/belltower.png",width,height,Source="Native scene capture"};

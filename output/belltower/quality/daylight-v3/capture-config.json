@@ -1,0 +1,56 @@
+{
+  "directory": "daylight-v3",
+  "reflections": false,
+  "sky_yaw": 90,
+  "views": [
+    "west_street",
+    "map_art",
+    "cafe",
+    "out_south",
+    "council_hall",
+    "market",
+    "terrace"
+  ],
+  "overrides": {
+    "Sun": {
+      "Sandbox.DirectionalLight": {
+        "LightColor": "3.5,3.15,2.65,1",
+        "SkyColor": "0.14,0.18,0.24,1"
+      }
+    },
+    "Sky": {
+      "Sandbox.SkyBox2D": {
+        "Tint": "1.3,1.45,1.65,1"
+      }
+    },
+    "Look": {
+      "Sandbox.Tonemapping": {
+        "AutoExposureEnabled": true,
+        "MinimumExposure": 1.25,
+        "MaximumExposure": 2.5,
+        "ExposureCompensation": 0,
+        "Rate": 1.5
+      }
+    }
+  },
+  "bake_indirect": true,
+  "indirect_strength": 2,
+  "bake_name": "Town Indirect Light",
+  "bake_bounds": [
+    [
+      -1480,
+      -2400,
+      -80
+    ],
+    [
+      1880,
+      2400,
+      600
+    ]
+  ],
+  "bake_density": 4,
+  "staged_landscape": false,
+  "bake_reflections": true,
+  "width": 1920,
+  "height": 1080
+}

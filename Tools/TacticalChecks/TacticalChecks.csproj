@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../Code/GameLoop/Rules/Equipment/TacticalEconomy.cs" Link="TacticalEconomy.cs" />
+    <Compile Include="../../Code/GameLoop/GameMode.Settings.cs" Link="GameMode.Settings.cs" />
+    <Compile Include="../../Code/PawnSystem/Client.TacticalBuying.cs" Link="Client.TacticalBuying.cs" />
+    <Compile Include="../../Code/PawnSystem/Player/Damage/ArmorComponent.cs" Link="ArmorComponent.cs" />
+    <Compile Include="../../Code/GameLoop/Rules/Scoring/Rewards.cs" Link="Rewards.cs" />
+  </ItemGroup>
+</Project>

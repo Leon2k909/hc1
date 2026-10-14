@@ -36,6 +36,18 @@ PS
     float4 g_vPavingRegion < Default4( 0, 0, 1, 1 ); UiGroup( "Paving" ); >;
     float2 g_vPavingScale < Default2( 1, 1 ); UiGroup( "Paving" ); >;
 
+    float PavingNoise( float2 p )
+    {
+        float2 cell = floor( p ), f = frac( p );
+        f = f * f * ( 3 - 2 * f );
+        float4 h = float4( dot( cell, float2( 127.1, 311.7 ) ),
+            dot( cell + float2( 1, 0 ), float2( 127.1, 311.7 ) ),
+            dot( cell + float2( 0, 1 ), float2( 127.1, 311.7 ) ),
+            dot( cell + 1, float2( 127.1, 311.7 ) ) );
+        h = frac( sin( h ) * 43758.5453 );
+        return lerp( lerp( h.x, h.y, f.x ), lerp( h.z, h.w, f.x ), f.y );
+    }
+
     float4 MainPs( PixelInput input ) : SV_Target0
     {
         float2 repeat = input.vTextureCoords.xy * g_vPavingScale;
@@ -51,6 +63,15 @@ PS
         material.Albedo = color.rgb * g_flTintColor * input.vVertexColor.rgb;
         material.Normal = TransformNormal( DecodeNormal( normal.xyz ), input.vNormalWs, input.vTangentUWs, input.vTangentVWs );
         material.Roughness = rma.r;
+        float2 ground = material.WorldPosition.xy;
+        float broad = PavingNoise( ground / 230 );
+        float patches = broad * .65 + PavingNoise( ground / 61 + 10.3 ) * .35;
+        float wet = smoothstep( .44, .72, patches );
+        // Damp granite darkens and catches the sky without turning the whole
+        // street into a mirror. Fine joints retain their roughness and normals.
+        material.Albedo *= lerp( .91, 1.02, PavingNoise( ground / 390 + 9 ) );
+        material.Albedo *= lerp( 1, .52, wet );
+        material.Roughness = lerp( rma.r, max( .23, rma.r * .38 ), wet );
         material.Metalness = 0.0;
         material.AmbientOcclusion = rma.b;
         material.Opacity = 1.0;

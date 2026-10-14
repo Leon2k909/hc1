@@ -1,0 +1,12 @@
+var project = Project.Current.GetRootPath();
+var asset = Editor.AssetSystem.FindByPath("models/maps/lowtide/lowtide_glass.vmdl");
+if (asset == null) throw new Exception("Missing Lowtide glass model");
+var source = System.IO.File.ReadAllText(asset.AbsolutePath);
+const string original = "materials/railhead/rw_glass.vmat";
+const string replacement = "materials/lowtide/lt_glass.vmat";
+if (!source.Contains(original) && !source.Contains(replacement)) throw new Exception("Unexpected glazing source");
+var backup = System.IO.Path.Combine(project, "output/lowtide/quality-pass/glass-before.vmdl");
+if (!System.IO.File.Exists(backup)) System.IO.File.WriteAllText(backup,source);
+var updated = source.Replace(original,replacement);
+if (updated != source) System.IO.File.WriteAllText(asset.AbsolutePath,updated);
+return new { success=asset.Compile(false), material=replacement };

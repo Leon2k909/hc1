@@ -21,6 +21,7 @@ public sealed class DefaultEquipment : Component,
 	[Property] public bool DefuseKit { get; set; }
 	[Property] public bool RefillAmmo { get; set; } = true;
 	[Property] public bool LoadoutsEnabled { get; set; } = true;
+	[Property] public bool ApplySavedAttachments { get; set; } = true;
 
 	public Loadout GetLoadout( Team team )
 	{
@@ -69,13 +70,15 @@ public sealed class DefaultEquipment : Component,
 		foreach ( var weapon in loadout.Equipment )
 		{
 			if ( !player.Inventory.HasInSlot( weapon.Slot ) )
-				player.Inventory.Give( weapon, false );
+				player.Inventory.Give( weapon, false, ApplySavedAttachments );
 		}
 
 		player.Inventory.SwitchToBest();
 
-		player.ArmorComponent.Armor = Math.Max( player.ArmorComponent.Armor, Armor );
-		player.ArmorComponent.HasHelmet |= Helmet;
+		player.ArmorComponent.Armor = player.ArmorComponent.ArmorEnabled
+			? Math.Max( player.ArmorComponent.Armor, Armor ) : 0f;
+		player.ArmorComponent.HasHelmet = player.ArmorComponent.HelmetsEnabled
+			&& (player.ArmorComponent.HasHelmet || Helmet);
 
 		if ( DefuseKit && player.Team == Team.CounterTerrorist )
 		{
@@ -95,11 +98,19 @@ public sealed class DefaultEquipment : Component,
 public sealed class ClearEquipment : Component,
 	IGameEventHandler<EnterStateEvent>
 {
+	[Property] public bool ClearProtection { get; set; }
+
 	void IGameEventHandler<EnterStateEvent>.OnGameEvent( EnterStateEvent eventArgs )
 	{
+		LightweightBotManager.Instance?.ClearTacticalEquipment( ClearProtection );
 		foreach ( var player in GameUtils.PlayerPawns )
 		{
 			player.Inventory.Clear();
+			if ( ClearProtection )
+			{
+				player.ArmorComponent.Armor = 0f;
+				player.ArmorComponent.HasHelmet = false;
+			}
 		}
 	}
 }

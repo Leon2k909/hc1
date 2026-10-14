@@ -1,0 +1,41 @@
+if (Game.IsPlaying && Game.ActiveScene.GetAllComponents<ModelRenderer>().Any(x => x.Model?.ResourcePath?.Contains("maps/belltower/",StringComparison.OrdinalIgnoreCase) == true))
+    throw new InvalidOperationException("Do not import Belltower assets during a live Belltower match.");
+var project = Sandbox.Project.Current.GetRootPath();
+var assets = System.IO.Path.GetFullPath(System.IO.Path.Combine(project,"Assets"));
+var staging = System.IO.Path.GetFullPath(System.IO.Path.Combine(project,"output/belltower/quality"));
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(staging,"landscape-import.json"))).AsArray();
+var pending = new System.Collections.Generic.List<(string Relative,string Target,byte[] Bytes)>();
+string Hash(byte[] data) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(data)).ToLowerInvariant();
+// Validate the complete batch before touching any registered source.
+foreach(var item in manifest)
+{
+    var relative = item["path"].GetValue<string>();
+    if(!relative.StartsWith("materials/belltower/vista/",StringComparison.Ordinal) || relative.Contains(".."))
+        throw new InvalidOperationException("Unexpected landscape asset path.");
+    var full = System.IO.Path.GetFullPath(System.IO.Path.Combine(assets,relative));
+    var source = System.IO.Path.GetFullPath(System.IO.Path.Combine(project,item["source"].GetValue<string>()));
+    if(!full.StartsWith(assets+System.IO.Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase)
+       || !source.StartsWith(staging+System.IO.Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase))
+        throw new InvalidOperationException("Import path escaped its staging directory.");
+    var bytes = System.IO.File.ReadAllBytes(source);
+    if(Hash(bytes)!=item["sha256"].GetValue<string>()) throw new InvalidOperationException("Staged landscape changed.");
+    var current = System.IO.File.Exists(full) ? Hash(System.IO.File.ReadAllBytes(full)) : null;
+    if(current!=item["expected_sha256"]?.GetValue<string>()) throw new InvalidOperationException("Landscape asset changed since staging.");
+    pending.Add((relative,full,bytes));
+}
+foreach(var item in pending)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var backup = System.IO.Path.Combine(staging,"before-landscape-v2/Assets",item.Relative);
+    if(System.IO.File.Exists(item.Target) && !System.IO.File.Exists(backup))
+    {
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+        System.IO.File.Copy(item.Target,backup);
+    }
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(item.Target));
+    var temp = item.Target+".belltower-import";
+    System.IO.File.WriteAllBytes(temp,item.Bytes);
+    System.IO.File.Move(temp,item.Target,true);
+    Editor.AssetSystem.RegisterFile(item.Target);
+}
+return new { Imported=pending.Select(x=>x.Relative).ToArray(), Next="Compile the material and review native captures." };

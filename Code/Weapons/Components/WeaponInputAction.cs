@@ -35,7 +35,7 @@ public abstract class WeaponInputAction : EquipmentComponent,
 	/// <summary>
 	/// Whether a button held since before the equipment was deployed counts as held. Fire doesn't, so a click held
 	/// through a switch or a respawn isn't a new pull. Aiming does (<see cref="Aimable"/>): aim held through a switch
-	/// aims the gun switched to.
+	/// aims the gun switched to once the new life's aim-release check has passed.
 	/// </summary>
 	protected virtual bool TakesInputHeldThroughDeploy => false;
 
@@ -47,6 +47,8 @@ public abstract class WeaponInputAction : EquipmentComponent,
 
 	void OnWeaponDeployed( EquipmentDeployedEvent eventArgs )
 	{
+		if ( eventArgs.Equipment != Equipment ) return;
+		ResetInputState();
 		_heldInputChecked = Equipment?.Owner?.IsLocallyControlled ?? false;
 		if ( _heldInputChecked )
 		{
@@ -56,7 +58,15 @@ public abstract class WeaponInputAction : EquipmentComponent,
 
 	bool isDown = false;
 
-	protected bool IsDown() => isDown;
+	protected bool IsDown() => IsTakingInput;
+
+	/// <summary>Discard the previous life/deploy's press; held input is checked when the owner is controlled locally.</summary>
+	internal void ResetInputState()
+	{
+		isDown = false;
+		RunningWhileDeployed = false;
+		_heldInputChecked = false;
+	}
 
 	/// <summary>
 	/// Whether the equipment takes this action's input: it's held, and wasn't held since before the equipment was
@@ -127,7 +137,7 @@ public abstract class WeaponInputAction : EquipmentComponent,
 		bool matched = false;
 
 		// Clicking a class in the class menu, or anything at the Zombies workbench, isn't weapon input.
-		var menuOpen = UI.ClassSelect.IsAnyOpen || UI.ZombiesWorkbenchPanel.IsAnyOpen || Equipment.Owner.IsPipeClimbing;
+		var menuOpen = UI.ClassSelect.IsAnyOpen || UI.TacticalBuyMenu.IsAnyOpen || UI.ZombiesWorkbenchPanel.IsAnyOpen || Equipment.Owner.IsPipeClimbing;
 
 		foreach ( var action in InputActions )
 		{

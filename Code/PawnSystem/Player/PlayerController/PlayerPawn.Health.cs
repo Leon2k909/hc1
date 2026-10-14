@@ -13,7 +13,7 @@ public partial class PlayerPawn : IGameEventHandler<DamageGivenEvent>, IGameEven
 	{
 		if ( !Networking.IsHost ) return;
 		var mode = GameMode.Instance;
-		if ( !mode.IsValid() ) return;
+		if ( !mode.IsValid() || !mode.HealthRegenerationEnabled ) return;
 		if ( HealthComponent.State != LifeState.Alive ) return;
 		if ( HealthComponent.Health >= HealthComponent.MaxHealth ) return;
 

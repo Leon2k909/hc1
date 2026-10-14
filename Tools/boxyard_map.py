@@ -84,7 +84,7 @@ def bx_tile( paint ):
 
 
 def configure( model ):
-    """ Points the bx_ paints at Boxyard's materials, and the rw_ paints (railhead_props' crates, pallets and forklift)
+    """ Points the bx_ paints at Boxyard's materials, and the rw_ paints (railhead_props' crates and pallets)
     at Railhead's, as railhead_map.configure does but without its masonry alignment. """
     known = {}
     if R.RM is not None and hasattr( R.RM, "paints" ):
@@ -717,10 +717,9 @@ def wheelie_bin( m, e, n, heading, paint ):
 
 def props():
     m = Model()
-    # The north-west corner: a forklift with a pallet and a crate on its forks, and a skip.
-    R.use( "forklift", m, -640.0, 560.0, facing="+e", lift=6.0 )
-    deck = R.use( "pallet_stack", m, -571.2, 560.0, z0=7.8, layers=1, along="e" )
-    R.use( "crate", m, -571.2, 560.0, z0=deck if deck is not None else 13.5, along="e" )
+    # The north-west corner: a crate on a grounded pallet, and a skip.
+    deck = R.use( "pallet_stack", m, -571.2, 560.0, z0=0.0, layers=1, along="e" )
+    R.use( "crate", m, -571.2, 560.0, z0=deck if deck is not None else 5.7, along="e" )
     skip( m, -555.0, 675.0, 0.0 )
     # A site: crates by the angled container, cones.
     R.use( "crate", m, 640.0, 544.0, along="n" )

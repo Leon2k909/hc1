@@ -18,7 +18,7 @@ public partial class TeamVoiceChatFilter : Component, IVoiceFilter
 				return mode;
 
 			var ident = GameMode.Instance?.Ident;
-			return ident == "defuse" || ident == "retakes" ? VoiceChatMode.TeamOnly : VoiceChatMode.Global;
+			return ident is "defuse" or "tactical_defuse" or "retakes" ? VoiceChatMode.TeamOnly : VoiceChatMode.Global;
 		}
 	}
 

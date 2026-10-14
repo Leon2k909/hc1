@@ -26,7 +26,7 @@ namespace Facepunch;
 /// defuse kit's, the throwables' grip).</item>
 /// </list>
 /// </remarks>
-public sealed class ViewModelClothing : Component, ICameraSetup
+public sealed partial class ViewModelClothing : Component, ICameraSetup
 {
 	/// <summary>The first-person arms the outfit follows.</summary>
 	[Property] public SkinnedModelRenderer Arms { get; set; }
@@ -96,6 +96,7 @@ public sealed class ViewModelClothing : Component, ICameraSetup
 			var wearsUniform = uniform.IsValid() && Body.Model?.Name == MilitaryUniform.HumanModelPath;
 			if ( !wearsUniform ) Undress();
 			else if ( !_root.IsValid() || _dressedModel != Body.Model || _dressedStyle != uniform.Style ) Dress( uniform );
+			foreach ( var layer in _layers ) ApplyDetailedMaterials( layer.Renderer );
 		}
 
 		// The tablet hides the arms while it flies the drone.
@@ -151,6 +152,7 @@ public sealed class ViewModelClothing : Component, ICameraSetup
 			garment.UseAnimGraph = false;
 			garment.GameObject.LocalTransform = global::Transform.Zero;
 			Overlay( garment );
+			ApplyDetailedMaterials( garment );
 			_layers.Add( new Layer { Renderer = garment } );
 		}
 
@@ -214,10 +216,19 @@ public sealed class ViewModelClothing : Component, ICameraSetup
 
 		// Work in the body's model space (GetBoneLocalTransform is parent space, so go through world space).
 		var rig = _rig;
-		var space = to.Transform;
+		// The camera places the viewmodel during PreRender, before the renderers have necessarily copied their new
+		// GameObject transforms to their SceneModels. Pose in this frame's space: using the cached render transform
+		// for the eye adds the player's movement to the torso again when the renderer catches up (visible on jumps).
+		var space = _skin.WorldTransform;
+		var armsSpace = Arms.WorldTransform;
+		var sourceSpace = from.Transform;
 		var armsBones = _rigArms.BoneCount;
 		if ( _source?.Length != armsBones ) _source = new Transform[armsBones];
-		for ( int i = 0; i < armsBones; i++ ) _source[i] = space.ToLocal( from.GetBoneWorldTransform( i ) );
+		for ( int i = 0; i < armsBones; i++ )
+		{
+			var pose = sourceSpace.ToLocal( from.GetBoneWorldTransform( i ) );
+			_source[i] = space.ToLocal( armsSpace.ToWorld( pose ) );
+		}
 
 		Solve( rig, space.ToLocal( eye ) );
 
@@ -234,7 +245,8 @@ public sealed class ViewModelClothing : Component, ICameraSetup
 			var model = layer.Renderer.SceneModel;
 			if ( !model.IsValid() ) continue;
 			if ( layer.Map is null ) Map( layer, _rigBody );
-			var local = model.Transform;
+			var local = layer.Renderer.WorldTransform;
+			model.Transform = local;
 			for ( int i = 0; i < layer.Map.Length; i++ )
 			{
 				// A bone the body doesn't have keeps its bind pose relative to the torso.

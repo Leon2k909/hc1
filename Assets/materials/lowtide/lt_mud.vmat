@@ -1,14 +1,13 @@
-// Tools/lowtide_map.py, from materials/buildings/soil.vmat
+// Tools/lowtide_finish.py: one continuous estuary surface.
 "Layer0"
 {
-    shader "shaders/complex.shader"
+    shader "shaders/hc1_lowtide_silt.shader"
     F_SPECULAR "1"
-    g_flRoughnessScaleFactor "1"
-    g_flMetalness "0.00"
-    TextureColor "materials/buildings/soil_color.png"
-    TextureNormal "materials/buildings/soil_normal.png"
-    TextureRoughness "[0.420000 0.420000 0.420000 0.000000]"
+    TextureColor "materials/lowtide/finish/silt_color.png"
+    TextureNormal "materials/lowtide/finish/silt_normal.png"
+    TextureRoughness "materials/lowtide/finish/silt_rough.png"
+    TextureWetColor "materials/lowtide/finish/wet_silt_color.png"
+    TextureWetNormal "materials/lowtide/finish/wet_silt_normal.png"
     TextureAmbientOcclusion "materials/default/default_ao.tga"
-    g_vColorTint "[0.260 0.400 0.620 1.0]"
-    g_flModelTintAmount "1.0"
+    TextureMetalness "materials/default/default_black_mask.tga"
 }

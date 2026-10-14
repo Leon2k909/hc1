@@ -1,0 +1,4 @@
+var path = "shaders/belltower_plants.shader";
+await Editor.EditorUtility.CompileShader(path,new(),cancellationToken);
+var compiled = System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"Assets",path+"_c");
+return new { Shader = path, CompiledFileExists = System.IO.File.Exists(compiled) };

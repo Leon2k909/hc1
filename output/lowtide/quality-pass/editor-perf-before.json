@@ -1,0 +1,170 @@
+{
+  "Window": {
+    "Frames": 43,
+    "Seconds": 2.03
+  },
+  "Fps": 21.2,
+  "TargetFps": 90,
+  "TargetSource": "fps_max_inactive",
+  "LimitedBy": "CPU",
+  "MeetingTarget": false,
+  "Rating": "Bad",
+  "Frame": {
+    "AvgMs": 47.11,
+    "P50Ms": 22.44,
+    "P99Ms": 733.79,
+    "MaxMs": 733.79
+  },
+  "CpuWork": {
+    "AvgMs": 47.11,
+    "P50Ms": 22.44,
+    "P99Ms": 733.79,
+    "MaxMs": 733.79
+  },
+  "Gpu": {
+    "AvgMs": 30.19,
+    "P50Ms": 21.84,
+    "P99Ms": 531.56,
+    "MaxMs": 531.56
+  },
+  "CapWait": {
+    "AvgMs": 0,
+    "P50Ms": 0,
+    "P99Ms": 0,
+    "MaxMs": 0
+  },
+  "PerfHubWindow": null,
+  "Hitches": {
+    "Count": 2,
+    "OverMs": 44.9,
+    "WorstMs": 733.8
+  },
+  "Issues": [
+    {
+      "Severity": "Bad",
+      "Title": "2 hitches",
+      "Detail": "over 45 ms in 2.0 s, worst 734 ms",
+      "MoreIn": "perf_cpu"
+    },
+    {
+      "Severity": "Bad",
+      "Title": "GC pauses",
+      "Detail": "205.4 ms in the last second",
+      "MoreIn": "perf_memory"
+    },
+    {
+      "Severity": "Bad",
+      "Title": "Allocations",
+      "Detail": "178 MiB/s managed",
+      "MoreIn": "perf_memory"
+    }
+  ],
+  "MainThread": [
+    {
+      "Name": "Async",
+      "AvgMs": 11.62,
+      "MaxMs": 508.61
+    },
+    {
+      "Name": "Render",
+      "AvgMs": 7.28,
+      "MaxMs": 14.95
+    },
+    {
+      "Name": "GcPause",
+      "AvgMs": 1.78,
+      "MaxMs": 193.43
+    },
+    {
+      "Name": "Update",
+      "AvgMs": 1.35,
+      "MaxMs": 4.01
+    },
+    {
+      "Name": "UI",
+      "AvgMs": 1.27,
+      "MaxMs": 2.11
+    },
+    {
+      "Name": "Animation",
+      "AvgMs": 1.11,
+      "MaxMs": 1.71
+    },
+    {
+      "Name": "Editor",
+      "AvgMs": 0.96,
+      "MaxMs": 19.17
+    },
+    {
+      "Name": "Physics",
+      "AvgMs": 0.57,
+      "MaxMs": 2.45
+    }
+  ],
+  "GpuPasses": [
+    {
+      "Name": "DrawDepthOpaque",
+      "AvgMs": 2.57,
+      "MaxMs": 2.63,
+      "Path": "Sandbox.ScenePointLight_Shadow / DrawDepthOpaque"
+    },
+    {
+      "Name": "Dynamic Opaque Forward",
+      "AvgMs": 1.27,
+      "MaxMs": 1.28,
+      "Path": "RenderToSwapChain / Dynamic Opaque Forward"
+    },
+    {
+      "Name": "UI Root: GameRootPanel",
+      "AvgMs": 0.56,
+      "MaxMs": 0.58,
+      "Path": "Managed: UI / UI Root: GameRootPanel"
+    },
+    {
+      "Name": "Dynamic Opaque Forward",
+      "AvgMs": 0.48,
+      "MaxMs": 0.65,
+      "Path": "Camera.RenderToTexture / Dynamic Opaque Forward"
+    },
+    {
+      "Name": "Dynamic Opaque Forward",
+      "AvgMs": 0.38,
+      "MaxMs": 0.38,
+      "Path": "RenderToBitmap / Dynamic Opaque Forward"
+    },
+    {
+      "Name": "Depth Normal Prepass (Large)",
+      "AvgMs": 0.36,
+      "MaxMs": 0.5,
+      "Path": "RenderToSwapChain / Depth Normal Prepass (Large)"
+    },
+    {
+      "Name": "DrawDepthOpaque",
+      "AvgMs": 0.33,
+      "MaxMs": 0.38,
+      "Path": "CSM Cascade 2 / DrawDepthOpaque"
+    },
+    {
+      "Name": "Depth Normal Prepass (Small)",
+      "AvgMs": 0.25,
+      "MaxMs": 0.26,
+      "Path": "RenderToSwapChain / Depth Normal Prepass (Small)"
+    }
+  ],
+  "Memory": {
+    "ProcessMiB": 11200.5,
+    "VideoMemory": {
+      "UsedMiB": 3228,
+      "BudgetMiB": 11174
+    },
+    "AllocatedMiBPerSecond": 178.2,
+    "GcPauseMsLastSecond": 205.45,
+    "GcLastSecond": {
+      "Gen0": 14,
+      "Gen1": 5,
+      "Gen2": 0
+    }
+  },
+  "DrawCalls": 5992,
+  "Triangles": 32100533
+}

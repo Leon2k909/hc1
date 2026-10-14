@@ -1,0 +1,36 @@
+if (Game.IsPlaying && Game.ActiveScene.GetAllComponents<ModelRenderer>().Any(x => x.Model?.ResourcePath?.Contains("maps/belltower/",StringComparison.OrdinalIgnoreCase) == true))
+    throw new InvalidOperationException("Do not import Belltower assets during a live Belltower match.");
+var project = Sandbox.Project.Current.GetRootPath();
+var assets = System.IO.Path.Combine(project,"Assets");
+var shader = "shaders/belltower_relief.shader";
+var shaderSource = System.IO.Path.Combine(project,"Sources/Belltower",shader);
+var shaderTarget = System.IO.Path.Combine(assets,shader);
+var height = "materials/belltower/scans/medieval_blocks_05_displacement_4k.png";
+var heightTarget = System.IO.Path.Combine(assets,height);
+var heightSource = System.IO.Path.Combine(project,"output/belltower/quality/relief-v1-sources",System.IO.Path.GetFileName(height));
+var heightBytes = System.IO.File.ReadAllBytes(System.IO.File.Exists(heightSource) ? heightSource : heightTarget);
+if (Convert.ToHexString(System.Security.Cryptography.MD5.HashData(heightBytes)).ToLowerInvariant() != "4440b76316a5e49b173756cb1b533830")
+    throw new InvalidOperationException("Rubble height source differs from its recorded Poly Haven original.");
+if (System.IO.File.Exists(heightTarget) && !System.IO.File.ReadAllBytes(heightTarget).SequenceEqual(heightBytes))
+    throw new InvalidOperationException("A different rubble height texture already exists.");
+if (!System.IO.File.Exists(heightTarget))
+{
+    System.IO.File.WriteAllBytes(heightTarget,heightBytes);
+    Editor.AssetSystem.RegisterFile(heightTarget);
+}
+var shaderText = System.IO.File.ReadAllText(shaderSource);
+if (!System.IO.File.Exists(shaderTarget) || System.IO.File.ReadAllText(shaderTarget) != shaderText)
+{
+    var temporary = shaderTarget + ".belltower-import";
+    System.IO.File.WriteAllText(temporary,shaderText);
+    System.IO.File.Move(temporary,shaderTarget,true);
+    Editor.AssetSystem.RegisterFile(shaderTarget);
+}
+cancellationToken.ThrowIfCancellationRequested();
+await Editor.EditorUtility.CompileShader(shader,new(),cancellationToken);
+var compiled = shaderTarget + "_c";
+if (!System.IO.File.Exists(compiled) || System.IO.File.GetLastWriteTimeUtc(compiled) < System.IO.File.GetLastWriteTimeUtc(shaderTarget))
+    throw new InvalidOperationException("Relief shader did not compile; inspect the native console before importing its materials.");
+return new { Shader=shader, CompiledFileExists=System.IO.File.Exists(compiled),
+    CompiledWriteUtc=System.IO.File.Exists(compiled) ? System.IO.File.GetLastWriteTimeUtc(compiled) : (DateTime?)null,
+    Height=height, HeightBytes=heightBytes.Length };

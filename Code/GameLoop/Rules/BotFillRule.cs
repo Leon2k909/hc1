@@ -119,6 +119,10 @@ public sealed class BotFillRule : Component,
 		var mode = GameMode.Instance;
 		if ( IsRoundMode && (mode.Get<BombPlantedEventComponent>() is not null || mode.Get<BombDefusedEventHandler>() is not null) )
 			return;
+		// Tactical replacements wait for the next buy phase, when their cash can fund this round's equipment.
+		if ( mode?.Ident == "tactical_defuse" && !mode.Get<WaitForPlayers>().IsValid()
+			&& mode.Get<EnableBuyMenu>()?.BuyMenuMode != BuyMenuMode.EnabledEverywhere )
+			return;
 
 		var customGame = CustomGameSettings.Current;
 		if ( customGame is { FillWithBots: false } )
@@ -156,7 +160,7 @@ public sealed class BotFillRule : Component,
 	/// Defuse and Retakes, whose every round starts afresh. Their bots are cleared and placed again at each round's
 	/// spawns with the players (<see cref="RestartRound"/>).
 	/// </summary>
-	private static bool IsRoundMode => GameMode.Instance?.Ident is "defuse" or "retakes";
+	private static bool IsRoundMode => GameMode.Instance?.Ident is "defuse" or "retakes" or "tactical_defuse";
 
 	/// <summary>
 	/// A round mode's new round: the last round's bots go, and the full roster comes back at this round's spawns once
@@ -166,7 +170,12 @@ public sealed class BotFillRule : Component,
 	internal void RestartRound()
 	{
 		if ( !HasHostAuthority || !IsRoundMode ) return;
-		if ( UseLightweightNpcBots ) GetLightweightBotManager()?.ClearBots();
+		if ( UseLightweightNpcBots )
+		{
+			var manager = GetLightweightBotManager();
+			manager?.SaveTacticalLoadouts();
+			manager?.ClearBots();
+		}
 		// Let the previous pawns and bots finish destroying before counting the new roster.
 		_timeSinceDefuseReset = 0;
 		_defuseRoundFillPending = true;

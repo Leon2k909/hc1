@@ -1,0 +1,18 @@
+// Tools/reefhall_consoles.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "[0.1500 0.4200 0.3100 1.0]"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureRoughness "[0.45 0.45 0.45 1.0]"
+    TextureAmbientOcclusion "[1.0 1.0 1.0 1.0]"
+    g_flMetalness "0.0"
+    g_flRoughnessScaleFactor "1"
+    g_vColorTint "[1.0 1.0 1.0 1.0]"
+    F_SELF_ILLUM "1"
+    TextureSelfIllumMask "[1.0 1.0 1.0 1.0]"
+    g_flSelfIllumBrightness "0.35"
+    g_flSelfIllumAlbedoFactor "1.0"
+    g_vSelfIllumTint "[1.0 1.0 1.0 1.0]"
+}

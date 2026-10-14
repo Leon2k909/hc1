@@ -23,10 +23,14 @@ public sealed class KillRewards : Component, IGameEventHandler<KillEvent>
 		if ( GameUtils.GetPlayerFromComponent( damageInfo.Attacker ) is not { } killerPlayer )
 			return;
 
-		if ( GameUtils.GetPlayerFromComponent( damageInfo.Victim ) is not { } victimPlayer )
+		var victimPlayer = GameUtils.GetPlayerFromComponent( damageInfo.Victim );
+		var victimBot = TacticalEconomy.Current.IsValid() ? GameUtils.GetLightweightBotFromComponent( damageInfo.Victim ) : null;
+		if ( !victimPlayer.IsValid() && !victimBot.IsValid() )
 			return;
 
-		if ( !AllowFriendlyFire && killerPlayer.IsFriendly( victimPlayer ) )
+		var friendly = victimPlayer.IsValid() ? killerPlayer.IsFriendly( victimPlayer )
+			: killerPlayer.Team != Team.Unassigned && killerPlayer.Team == victimBot.Team;
+		if ( !AllowFriendlyFire && friendly )
 		{
 			killerPlayer.Client.GiveCash( -FriendlyFirePenalty );
 		}

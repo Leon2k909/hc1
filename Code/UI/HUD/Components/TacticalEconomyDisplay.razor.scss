@@ -1,0 +1,12 @@
+@import "/UI/Styles/Theme.scss";
+
+TacticalEconomyDisplay {
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    font-family: $hud-font;
+    margin-bottom: 8px;
+
+    .cash { color: $main-color; font-size: 24px; font-weight: 700; text-shadow: $hud-halo; }
+    .buy-hint { align-items: center; gap: 6px; color: $hud-text; font-size: 12px; text-shadow: $hud-halo; }
+}

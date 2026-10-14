@@ -1,0 +1,13 @@
+// Tools/lowtide_interior.py: two-metre concrete scan.
+"Layer0"
+{
+    shader "shaders/hc1_lowtide_concrete.shader"
+    TextureColor "materials/lowtide/interior/concrete_color.png"
+    TextureNormal "materials/lowtide/interior/concrete_normal.png"
+    TextureRoughness "materials/lowtide/interior/concrete_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    TextureMetalness "materials/default/default_black_mask.tga"
+    TextureFloorContact "materials/lowtide/interior/floor_contact.png"
+    g_flFloorContact "1"
+    g_flConcreteScale "3.2512"
+}

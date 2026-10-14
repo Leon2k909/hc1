@@ -45,6 +45,7 @@ from PIL import Image
 import building_textures as BT
 import map_kit as K
 import reefhall_materials as RM
+import reefhall_consoles as RC
 from map_kit import Model, normalise
 
 TITLE = "Reef Hall"
@@ -1916,23 +1917,8 @@ PANORAMA_DEPTH = 580.0
 
 
 def console( model, centre, length, yaw=0.0, z=0.0 ):
-    """ An operator's console: a gunmetal desk with a sloping lit panel, and a row of screens on stands behind it,
-    facing +w ( the operator stands on the -w side ). """
-    fr = Frame( centre[:2], ( math.cos( math.radians( yaw ) ), math.sin( math.radians( yaw ) ) ) )
-    h = length / 2
-    fbox( model, fr, -h, h, -16, 16, z, z + 30, { "default": "rh_steel", "top": "rh_black" }, METAL )
-    fbox( model, fr, -h - 2, h + 2, -18, -16, z + 2, z + 26, "rh_black" )
-    facing( model, "rh_led_cool", [ fr.p( -h, -18.05, z + 3 ), fr.p( h, -18.05, z + 3 ), fr.p( h, -18.05, z + 5 ), fr.p( -h, -18.05, z + 5 ) ],
-            fr.vec( 0, -1, 0 ) )
-    panel = [ fr.p( -h + 4, -15, z + 30.2 ), fr.p( h - 4, -15, z + 30.2 ), fr.p( h - 4, 4, z + 36 ), fr.p( -h + 4, 4, z + 36 ) ]
-    facing( model, "rh_screen_data", panel, fr.vec( 0, -0.3, 1 ) )
-    fbox( model, fr, -h, h, 4, 16, z + 30, z + 36, "rh_gunmetal" )
-    count = max( 1, int( length / 44 ) )
-    for k in range( count ):
-        u = -h + length * ( k + 0.5 ) / count
-        fbox( model, fr, u - 2, u + 2, 8, 11, z + 36, z + 44, "rh_gunmetal" )
-        fbox( model, fr, u - 19, u + 19, 9, 11, z + 44, z + 66, { "default": "rh_steel", "back": "rh_screen_map" if k % 2 else "rh_screen_data" } )
-    model.boxes.append( ( fr.p( 0, 0, z + 33 ), ( ( *fr.d, 0.0 ), ( *fr.f, 0.0 ), ( 0.0, 0.0, 1.0 ) ), np.array( ( length + 4, 36, 66 ) ), METAL ) )
+    """ Physical operator furniture; screens face the operator on the -w side. """
+    RC.build( model, centre, length, yaw, z )
 
 
 def server_rack( model, fr, u0, u1, z=0.0, height=84.0, depth=30.0 ):
@@ -3377,7 +3363,7 @@ def main():
 
     rooms, lights = build_rooms()
     write_tank_materials()
-    known = set( RM.paints() ) | { tank_paint( t ) for t in TANKS }
+    known = set( RM.paints() ) | set( RC.FINISHES ) | { RC.SCREEN } | { tank_paint( t ) for t in TANKS }
     missing = sorted( { p for _, m, i in rooms for model in ( m, i ) for p in model.polygons } - known )
     if missing:
         print( f"paints with no material: {', '.join( missing )}" )

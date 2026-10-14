@@ -231,6 +231,10 @@ public sealed class ReconOctocopter : Component, Component.IDamageable, ICustomM
 		if ( Operator.HealthComponent.State != LifeState.Alive ) return;
 		if ( Piloted.IsValid() && Piloted != this ) Piloted.Unlink();
 
+		var station = Operator.Inventory.Equipment.FirstOrDefault( e => string.Equals(
+			e.Resource?.ResourcePath, StationResourcePath, StringComparison.OrdinalIgnoreCase ) );
+		if ( station.IsValid() && Operator.CurrentEquipment != station ) Operator.Inventory.Switch( station );
+
 		IsLinked = true;
 		Piloted = this;
 		_sinceLinked = 0;

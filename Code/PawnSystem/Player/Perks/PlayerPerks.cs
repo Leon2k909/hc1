@@ -25,6 +25,8 @@ public partial class PlayerPerks : Component
 
 	public void LoadFromCookies()
 	{
+		if ( TacticalEconomy.Current.IsValid() ) return;
+
 		Perk1 = GetPerkResource( GunsmithLoadoutManager.GetPerk( 1 ) );
 		Perk2 = GetPerkResource( GunsmithLoadoutManager.GetPerk( 2 ) );
 		Perk3 = GetPerkResource( GunsmithLoadoutManager.GetPerk( 3 ) );

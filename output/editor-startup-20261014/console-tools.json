@@ -1,0 +1,225 @@
+{
+  "tools": [
+    {
+      "name": "asset_compile",
+      "title": "Asset Compile",
+      "toolset": "asset",
+      "description": "Recompile an asset from its source file. Compile errors and warnings land in the console - check read_console after a failure.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Asset path, as returned by asset_search."
+          },
+          "full": {
+            "type": "boolean",
+            "description": "Force a full recompile instead of an incremental one.",
+            "default": false
+          }
+        },
+        "required": [
+          "path"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Success": {
+            "type": "boolean"
+          },
+          "Path": {
+            "type": "string"
+          },
+          "CompiledFile": {
+            "type": "string"
+          },
+          "Hint": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "console_command",
+      "title": "Console Command",
+      "toolset": "editor",
+      "description": "Run a console command - anything the editor console accepts, including setting convars. Output, if any, lands in the console - read_console shows it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "command": {
+            "type": "string",
+            "description": "The command line to run, e.g. 'stat fps' or 'sv_cheats 1'."
+          }
+        },
+        "required": [
+          "command"
+        ]
+      }
+    },
+    {
+      "name": "editor_status",
+      "title": "Get Editor Status",
+      "toolset": "editor",
+      "description": "Get the current state of the editor - engine version, which project is open, the active scene and whether it has unsaved changes, whether play mode is running or paused, how many tools are registered, the directory paths that matter (logs, project code and assets), and the state of the code compiler. Check IsCompiling/LastCompileSucceeded here after editing code instead of relying on read_console - a successful compile can scroll out of view or be mistaken for the last failure you saw.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "EngineVersion": {
+            "type": "string"
+          },
+          "Project": {
+            "type": "string"
+          },
+          "ProjectTitle": {
+            "type": "string"
+          },
+          "ActiveScene": {
+            "type": "string"
+          },
+          "ActiveScenePath": {
+            "type": "string"
+          },
+          "SceneHasUnsavedChanges": {
+            "type": "boolean"
+          },
+          "IsPlaying": {
+            "type": "boolean"
+          },
+          "IsPaused": {
+            "type": "boolean"
+          },
+          "ToolCount": {
+            "type": "integer"
+          },
+          "IsCompiling": {
+            "type": "boolean"
+          },
+          "LastCompileSucceeded": {
+            "type": "boolean"
+          },
+          "LastCompileErrors": {
+            "type": "integer"
+          },
+          "Paths": {
+            "type": "object",
+            "properties": {
+              "Engine": {
+                "type": "string"
+              },
+              "Logs": {
+                "type": "string"
+              },
+              "ProjectRoot": {
+                "type": "string"
+              },
+              "ProjectSettings": {
+                "type": "string"
+              }
+            },
+            "required": []
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "instance_console_command",
+      "title": "Console Command",
+      "toolset": "instance",
+      "description": "Run a local engine console command. Read the result with read_console. This can change engine state or quit the instance.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "command": {
+            "type": "string",
+            "description": "One console command, including its arguments."
+          }
+        },
+        "required": [
+          "command"
+        ]
+      }
+    },
+    {
+      "name": "play_start",
+      "title": "Play Start",
+      "toolset": "play",
+      "description": "Start playing the current scene, like pressing the editor's play button. Startup errors land in the console - check read_console if things look wrong.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "IsPlaying": {
+            "type": "boolean"
+          },
+          "IsPaused": {
+            "type": "boolean"
+          },
+          "Scene": {
+            "type": "string",
+            "description": "The scene being played. Null when not playing."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "read_console",
+      "title": "Read Console",
+      "toolset": "instance",
+      "description": "Read recent console output, oldest first - what the editor and game logged: prints, warnings, errors, exceptions, compile results. This is how you see the effect of what you just did. Errors come with the top of their stack trace. Every read ends with a cursor - pass it back as 'since' next time to get only what was logged after it, instead of re-reading the same output.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "How many of the most recent matching entries to return.",
+            "minimum": 1,
+            "maximum": 500,
+            "default": 50
+          },
+          "minimumLevel": {
+            "type": "string",
+            "enum": [
+              "Trace",
+              "Info",
+              "Warn",
+              "Error"
+            ],
+            "description": "Lowest severity to include.",
+            "default": "Trace"
+          },
+          "filter": {
+            "type": "string",
+            "description": "Only entries whose message or logger name contains this, case insensitive."
+          },
+          "since": {
+            "type": "integer",
+            "description": "Cursor from a previous read - only entries logged after it come back. 0 reads the most recent.",
+            "default": 0
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    }
+  ],
+  "total": 128
+}

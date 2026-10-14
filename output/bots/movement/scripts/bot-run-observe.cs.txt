@@ -1,0 +1,60 @@
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic;
+var type=typeof(Facepunch.LightweightCombatBot);
+var previous=new System.Collections.Generic.Dictionary<Guid,(float Time,float Raw,float Final,Vector3 Direction)>();
+var rawSpeeds=new System.Collections.Generic.List<float>(); var finalSpeeds=new System.Collections.Generic.List<float>();
+var mountError=0f; var sampleCount=0; var captured=false;
+GameObject cameraObject=null;
+try {
+    using(Game.ActiveScene.Push()) cameraObject=new GameObject(false,"Temporary bot run QA camera");
+    cameraObject.Flags|=GameObjectFlags.NotSaved|GameObjectFlags.NotNetworked;
+    var camera=cameraObject.AddComponent<CameraComponent>(); camera.FieldOfView=50f; camera.ZNear=1f;
+    for(var i=0;i<250;i++) {
+        cancellationToken.ThrowIfCancellationRequested();
+        foreach(var bot in Game.ActiveScene.GetAllComponents<Facepunch.LightweightCombatBot>()) {
+            if(!bot.IsAlive || bot.IsSliding || bot.SlideBlend>.01f || bot.IsProne || bot.IsCrouching || !bot.Agent.IsValid()) continue;
+            var velocity=bot.Agent.Velocity.WithZ(0f); var speed=velocity.Length;
+            if(speed<270f || speed>350f || velocity.Normal.Dot(bot.WorldRotation.Forward)<.97f) continue;
+            var body=bot.Renderer; var foot=body.Model.Bones.GetBone("ankle_L");
+            if(foot is null || !body.TryGetBoneTransformAnimation(foot,out var raw)) continue;
+            var final=body.SceneModel.GetBoneWorldTransform(foot.Index);
+            var direction=velocity.Normal;
+            var rp=(raw.Position-bot.WorldPosition).Dot(direction); var fp=(final.Position-bot.WorldPosition).Dot(direction);
+            var now=Time.Now;
+            if(previous.TryGetValue(bot.Id,out var p) && now-p.Time>0f && now-p.Time<.07f && p.Direction.Dot(direction)>.999f
+                && raw.Position.z-bot.WorldPosition.z<6f && rp<p.Raw) {
+                var rs=(p.Raw-rp)/(now-p.Time); var fs=(p.Final-fp)/(now-p.Time);
+                if(rs>10f && rs<600f && fs>0f && fs<700f) { rawSpeeds.Add(rs); finalSpeeds.Add(fs); sampleCount++; }
+            }
+            previous[bot.Id]=(now,rp,fp,direction);
+            var gun=bot.GameObject.GetComponentInChildren<Facepunch.WorldModel>();
+            var handBone=body.Model.Bones.GetBone("hand_R");
+            if(gun is not null && handBone is not null) {
+                var hand=body.SceneModel.GetBoneWorldTransform(handBone.Index);
+                mountError=MathF.Max(mountError,gun.WorldPosition.Distance(hand.ToWorld(Facepunch.MilitaryUniform.WeaponHandOffset(body.Model)).Position));
+            }
+            if(!captured && (float)type.GetField("_strideScale",flags).GetValue(bot)>1.45f && (final.Position-raw.Position).Length>1f) {
+                var center=bot.WorldPosition+Vector3.Up*33f;
+                var views=new[]{bot.WorldRotation.Right,-bot.WorldRotation.Right,bot.WorldRotation.Backward,
+                    (bot.WorldRotation.Right-bot.WorldRotation.Forward).Normal,(-bot.WorldRotation.Right-bot.WorldRotation.Forward).Normal};
+                Vector3? safeView=null;
+                foreach(var side in views) {
+                    var candidate=bot.WorldPosition+side*135f+Vector3.Up*43f;
+                    var trace=bot.Scene.Trace.Ray(center,candidate).Size(new Vector3(-4f),new Vector3(4f))
+                        .IgnoreGameObjectHierarchy(bot.GameObject).WithoutTags("trigger","corpse","ragdoll","player","movement").Run();
+                    if(!trace.Hit) { safeView=candidate; break; }
+                }
+                if(!safeView.HasValue) continue;
+                camera.WorldPosition=safeView.Value;
+                camera.WorldRotation=Rotation.LookAt(bot.WorldPosition+Vector3.Up*33f-camera.WorldPosition);
+                using var bitmap=new Bitmap(1280,720); camera.RenderToBitmap(bitmap,false);
+                System.IO.File.WriteAllBytes("D:/Documents/s&box projects/hc1/forked-shooter-main/output/bots/movement/live-run.png",bitmap.ToPng());
+                captured=true;
+            }
+        }
+        await Task.Delay(20,cancellationToken);
+    }
+    var result=new {sampleCount,RawPlantSpeed=rawSpeeds.Count>0?rawSpeeds.Average():0f,
+        AdjustedPlantSpeed=finalSpeeds.Count>0?finalSpeeds.Average():0f,MaxWeaponMountError=mountError,captured};
+    System.IO.File.WriteAllText("D:/Documents/s&box projects/hc1/forked-shooter-main/output/bots/movement/live-run-results.json",Json.Serialize(result));
+    return result;
+} finally {cameraObject?.Destroy();}

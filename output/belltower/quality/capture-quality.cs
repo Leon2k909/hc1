@@ -1,0 +1,390 @@
+var projectRoot = Sandbox.Project.Current.GetRootPath();
+var configuration = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(projectRoot, "output/belltower/quality/capture-config.json"))).AsObject();
+var destination = System.IO.Path.Combine(projectRoot, "output/belltower/quality", configuration["directory"].GetValue<string>());
+System.IO.Directory.CreateDirectory(destination);
+var source = Editor.SceneEditorSession.Active.Scene;
+var before = new { Game.IsPlaying, Scene = source.Name, SceneId = source.Id, GameSceneId = Game.ActiveScene?.Id };
+var visual = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase) {
+    "Sun", "Sky", "Fog", "Town", "Trees and planting", "Landscape trees", "Lights", "Street Detail", "Ambient", "Reflections", "Indirect Light", "Look", "Volumetric Fog"
+};
+if(configuration["exclude_roots"] is System.Text.Json.Nodes.JsonArray excluded)
+    foreach(var name in excluded) visual.Remove(name.GetValue<string>());
+var root = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(projectRoot, "Assets/scenes/maps/Belltower/belltower.scene"))).AsObject();
+var objects = new System.Text.Json.Nodes.JsonArray();
+foreach (var item in root["GameObjects"].AsArray())
+    if (visual.Contains(item["Name"]?.GetValue<string>() ?? "")) objects.Add(item.DeepClone());
+root["GameObjects"] = objects;
+root["SceneProperties"]["NavMesh"]["Enabled"] = false;
+root["SceneProperties"]["WantsSystemScene"] = false;
+if(configuration["bake_indirect"]?.GetValue<bool>() == true)
+{
+    // A fresh bake must not sample the previous bake as an extra source of light.
+    foreach(var old in objects.Where(x=>x["Name"]?.GetValue<string>()=="Indirect Light").ToArray()) objects.Remove(old);
+}
+if(configuration["staged_landscape"]?.GetValue<bool>() == true)
+{
+    var existing = objects.FirstOrDefault(x=>x["Name"]?.GetValue<string>()=="Landscape trees");
+    if(existing is not null) objects.Remove(existing);
+    objects.Add(System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(
+        System.IO.Path.Combine(projectRoot,configuration["landscape_resource"]?.GetValue<string>() ?? "Sources/Belltower/landscape/trees.json"))));
+}
+if(configuration["indirect_resource"] is not null)
+{
+    foreach(var old in objects.Where(x=>x["Name"]?.GetValue<string>()=="Indirect Light").ToArray()) objects.Remove(old);
+    var cached = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(projectRoot,
+        "output/belltower/quality",configuration["indirect_resource"].GetValue<string>(),"indirect-light.json"))).AsObject();
+    cached["Components"][0]["RuntimeIntensity"] = configuration["indirect_strength"]?.GetValue<float>() ?? 1f;
+    objects.Add(cached);
+}
+if(configuration["reflection_resource"] is not null)
+{
+    foreach(var old in objects.Where(x=>x["Name"]?.GetValue<string>()=="Reflections").ToArray()) objects.Remove(old);
+    objects.Add(System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(projectRoot,
+        "output/belltower/quality",configuration["reflection_resource"].GetValue<string>(),"reflections-baked.json"))));
+}
+if(configuration["additional_indirect_resource"] is not null)
+{
+    var cached = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(projectRoot,
+        "output/belltower/quality",configuration["additional_indirect_resource"].GetValue<string>(),"indirect-light.json"))).AsObject();
+    objects.Add(cached);
+}
+if (configuration["overrides"] is System.Text.Json.Nodes.JsonObject overrides)
+{
+    void ApplyOverrides(System.Text.Json.Nodes.JsonNode item)
+    {
+        if (overrides[item["Name"]?.GetValue<string>() ?? ""] is System.Text.Json.Nodes.JsonObject change)
+            foreach(var component in item["Components"].AsArray())
+                if(change[component["__type"].GetValue<string>()] is System.Text.Json.Nodes.JsonObject properties)
+                    foreach(var property in properties) component[property.Key] = property.Value?.DeepClone();
+        if(item["Children"] is System.Text.Json.Nodes.JsonArray children)
+            foreach(var child in children) ApplyOverrides(child);
+    }
+    foreach(var item in objects) ApplyOverrides(item);
+}
+System.IO.File.WriteAllText(System.IO.Path.Combine(destination, "visual-scene.json"), root.ToJsonString());
+var scene = Scene.CreateEditorScene();
+var dispatchFlags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var preRender = typeof(Scene).GetMethod("PreRender", dispatchFlags, null, Type.EmptyTypes, null)
+    ?? throw new MissingMethodException("Scene.PreRender");
+var preCameraRender = typeof(Scene).GetMethod("PreCameraRender", dispatchFlags, null, Type.EmptyTypes, null)
+    ?? throw new MissingMethodException("Scene.PreCameraRender");
+void UpdateIndirect()
+{
+    var systemType = typeof(Scene).Assembly.GetType("Sandbox.DDGIVolumeSystem");
+    var getter = typeof(Scene).GetMethods().First(m=>m.Name=="GetSystem" && m.IsGenericMethodDefinition && m.GetParameters().Length==0);
+    var system = getter.MakeGenericMethod(systemType).Invoke(scene,null);
+    systemType.GetMethod("MarkDirty",dispatchFlags).Invoke(system,null);
+    systemType.GetMethod("UpdateVolumes",dispatchFlags).Invoke(system,null);
+}
+async Task RelocateOnMainThread(IndirectLightVolume volume)
+{
+    // Engine 26.10.13's parallel mesh traces can race ResourceSystem.RegisterWeak.
+    // Reuse its tracing and offset calculations on the main thread, with the
+    // same grid, 128 directions, 12 iterations and deactivation rules.
+    var type = typeof(IndirectLightVolume);
+    var counts = volume.ProbeCounts;
+    var spacing = (Vector3)type.GetMethod("ComputeSpacing",dispatchFlags).Invoke(volume,new object[]{counts}) * volume.WorldScale.Abs();
+    var directions = (Vector3[])type.GetMethod("GenerateSphericalDirections",dispatchFlags | System.Reflection.BindingFlags.Static).Invoke(null,new object[]{128});
+    var trace = type.GetMethod("TraceProbeRays",dispatchFlags);
+    var relocate = type.GetMethod("ComputeRelocationOffset",dispatchFlags);
+    var position = type.GetMethod("GetProbeWorldPosition",dispatchFlags);
+    var ratio = trace.ReturnType.GetProperty("BackfaceRatio",dispatchFlags);
+    var minSpacing = MathF.Min(spacing.x,MathF.Min(spacing.y,spacing.z));
+    var probes = new IndirectLightVolume.Probe[counts.x*counts.y*counts.z];
+    for(var index=0;index<probes.Length;index++) probes[index] = new IndirectLightVolume.Probe();
+    type.GetProperty("Probes",dispatchFlags).SetValue(volume,probes);
+    for(var z=0;z<counts.z;z++)
+    for(var y=0;y<counts.y;y++)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if(!ThreadSafe.IsMainThread) throw new InvalidOperationException("Probe relocation left the main thread.");
+        using(scene.Push())
+        for(var x=0;x<counts.x;x++)
+        {
+            var world = (Vector3)position.Invoke(volume,new object[]{new Vector3Int(x,y,z)});
+            var offset = Vector3.Zero;
+            var active = true;
+            for(var iteration=0;iteration<12 && active;iteration++)
+            {
+                var hit = trace.Invoke(volume,new object[]{world+offset,spacing.Length,directions});
+                var move = ((Vector3,bool))relocate.Invoke(volume,new object[]{offset,hit,spacing,minSpacing,minSpacing*.2f,directions});
+                if(move.Item2) { active=false; break; }
+                offset = move.Item1;
+            }
+            if(active && volume.InsideGeometry.ToString()=="Relocate")
+                active = (float)ratio.GetValue(trace.Invoke(volume,new object[]{world+offset,spacing.Length,directions})) < .25f;
+            probes[x+y*counts.x+z*counts.x*counts.y] = new IndirectLightVolume.Probe { Offset=offset, Active=active };
+        }
+        System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"bake-status.txt"),$"Relocating on main thread {z*counts.y+y+1}/{counts.z*counts.y} rows");
+        await Task.Yield();
+    }
+    type.GetMethod("UpdateRelocationTexture",dispatchFlags).Invoke(volume,null);
+    type.GetMethod("MarkDirty",dispatchFlags).Invoke(volume,null);
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"relocation-status.json"),System.Text.Json.JsonSerializer.Serialize(
+        new { Mode="Main thread; native trace and relocation functions", Grid=counts.ToString(), Active=probes.Count(p=>p.Active), Total=probes.Length }));
+}
+try {
+    CameraComponent camera;
+    using (scene.Push()) {
+        scene.Deserialize(root);
+        if(configuration["bake_reflections"]?.GetValue<bool>() == true)
+            foreach(var probe in scene.GetAllComponents<EnvmapProbe>()) probe.Mode = EnvmapProbe.EnvmapProbeMode.Realtime;
+        if (configuration["sky_yaw"] is not null)
+            scene.GetAllComponents<SkyBox2D>().First().WorldRotation = Rotation.FromYaw(configuration["sky_yaw"].GetValue<float>());
+        if (configuration["reflections"]?.GetValue<bool>() == true && !scene.GetAllComponents<EnvmapProbe>().Any())
+        {
+            var probes = new[] {
+                (Name:"Square reflection", Position:new Vector3(50,0,110), Mins:new Vector3(-700,-730,-160), Maxs:new Vector3(700,730,650)),
+                (Name:"West street reflection", Position:new Vector3(125,1260,115), Mins:new Vector3(-1300,-800,-170), Maxs:new Vector3(1800,900,800)),
+                (Name:"East street reflection", Position:new Vector3(125,-1260,115), Mins:new Vector3(-1300,-900,-170), Maxs:new Vector3(1800,800,800))
+            };
+            var group = new GameObject(true,"Reflections");
+            foreach(var setup in probes)
+            {
+                var go = new GameObject(false,setup.Name);
+                go.Parent = group;
+                go.WorldPosition = setup.Position;
+                var probe = go.Components.Create<EnvmapProbe>();
+                foreach(var setting in new[]{("Mode","Realtime"),("Projection","Box"),("Resolution","Medium"),("UpdateStrategy","OnEnabled")})
+                {
+                    var property = typeof(EnvmapProbe).GetProperty(setting.Item1);
+                    property.SetValue(probe,Enum.Parse(property.PropertyType,setting.Item2));
+                }
+                probe.Bounds = new BBox(setup.Mins,setup.Maxs);
+                probe.ZNear=8;probe.ZFar=12000;probe.Feathering=.14f;probe.MaxDistance=10000;probe.MultiBounce=false;
+                go.Enabled = true;
+            }
+            System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"reflections.json"),group.Serialize().ToJsonString());
+        }
+        var holder = new GameObject(false, "Belltower quality camera");
+        camera = holder.Components.Create<CameraComponent>();
+        camera.ZNear = 4; camera.ZFar = 100000;
+        // Keep the scene volume in charge of exposure, as in the game. Apply
+        // explicit diagnostic exposure to that volume, whose priority otherwise
+        // wins over camera-local effects. Compensation is ignored with auto off.
+        if(configuration["fixed_exposure"] is not null)
+        {
+            foreach(var tonemap in scene.GetAllComponents<Tonemapping>())
+            {
+                tonemap.AutoExposureEnabled = true;
+                tonemap.MinimumExposure = tonemap.MaximumExposure = configuration["fixed_exposure"].GetValue<float>();
+                tonemap.ExposureCompensation = 0;
+                tonemap.Rate = 10;
+            }
+        }
+        holder.Enabled = true;
+        scene.EditorTick(.016f, .016f);
+        preRender.Invoke(scene,null);
+        preCameraRender.Invoke(scene,null);
+        UpdateIndirect();
+    }
+    if (scene.GetAllComponents<EnvmapProbe>().Any())
+    {
+        var captureProbe = typeof(EnvmapProbe).GetMethod("RenderCubemap", dispatchFlags, null, Type.EmptyTypes, null)
+            ?? throw new MissingMethodException("EnvmapProbe.RenderCubemap");
+        foreach(var probe in scene.GetAllComponents<EnvmapProbe>().Where(p=>p.Mode==EnvmapProbe.EnvmapProbeMode.Realtime))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            using(scene.Push()) captureProbe.Invoke(probe,null);
+            await Task.Delay(16,cancellationToken);
+        }
+    }
+    if (configuration["bake_indirect"]?.GetValue<bool>() == true)
+    {
+        // Use the engine's own probe capture and relocation, in this isolated
+        // scene. Publish its textures through the editor without borrowing the
+        // user's current editor session or switching their running game.
+        var bakeDirectory = "lighting/belltower/"+configuration["directory"].GetValue<string>();
+        var nativeDirectory = System.IO.Path.Combine(projectRoot,"Assets",bakeDirectory);
+        System.IO.Directory.CreateDirectory(nativeDirectory);
+        void BakeStatus(string value) => System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"bake-status.txt"),value);
+        BakeStatus("Preparing volume");
+        GameObject indirectObject;
+        IndirectLightVolume indirect;
+        using(scene.Push())
+        {
+            indirectObject = new GameObject(true,configuration["bake_name"]?.GetValue<string>() ?? "West Street Indirect Light");
+            indirect = indirectObject.Components.Create<IndirectLightVolume>();
+            Vector3 ReadVector(System.Text.Json.Nodes.JsonNode node) => new(node[0].GetValue<float>(),node[1].GetValue<float>(),node[2].GetValue<float>());
+            indirect.Bounds = configuration["bake_bounds"] is null ? new BBox(new Vector3(-80,500,-20),new Vector3(370,2050,380))
+                : new BBox(ReadVector(configuration["bake_bounds"][0]),ReadVector(configuration["bake_bounds"][1]));
+            indirect.ProbeDensity = configuration["bake_density"]?.GetValue<int>() ?? 6;
+            indirect.NormalBias = configuration["bake_normal_bias"]?.GetValue<float>() ?? 5;
+            indirect.ViewBias = configuration["bake_view_bias"]?.GetValue<float>() ?? 2;
+            indirect.RuntimeIntensity = configuration["indirect_strength"]?.GetValue<float>() ?? 1;
+            indirect.RuntimeContrast = 1;
+            indirect.RuntimeSaturation = 1;
+            indirect.BlendDistance = configuration["bake_blend_distance"]?.GetValue<float>() ?? 120;
+            scene.EditorTick(.016f,.016f);
+            preRender.Invoke(scene,null);
+            preCameraRender.Invoke(scene,null);
+            cancellationToken.ThrowIfCancellationRequested();
+            BakeStatus("Relocating "+indirect.ProbeCounts);
+            await RelocateOnMainThread(indirect);
+            BakeStatus("Relocated "+indirect.ProbeCounts);
+        }
+        if(configuration["relocation_only"]?.GetValue<bool>() == true)
+        {
+            var generated = typeof(IndirectLightVolume).GetProperty("GeneratedRelocationTexture",dispatchFlags);
+            ((Texture)generated.GetValue(indirect))?.Dispose();
+            generated.SetValue(indirect,null);
+            return new { Relocated=indirect.ProbeCounts.ToString(), SourceUnchanged=Editor.SceneEditorSession.Active.Scene.Id==before.SceneId && Game.ActiveScene?.Id==before.GameSceneId };
+        }
+        var updaterType = typeof(IndirectLightVolume).Assembly.GetType("Sandbox.DDGIProbeUpdaterCubemapper")
+            ?? throw new MissingMemberException("DDGIProbeUpdaterCubemapper");
+        object updater;
+        using(scene.Push()) updater = Activator.CreateInstance(updaterType,new object[]{indirect});
+        var previewField = typeof(IndirectLightVolume).GetField("_bakePreview",dispatchFlags);
+        var dirty = typeof(IndirectLightVolume).GetMethod("MarkDirty",dispatchFlags);
+        var relocation = (Texture)typeof(IndirectLightVolume).GetProperty("GeneratedRelocationTexture",dispatchFlags).GetValue(indirect);
+        using var bakeCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        bakeCancellation.CancelAfter(TimeSpan.FromSeconds(configuration["bake_timeout_seconds"]?.GetValue<int>() ?? 180));
+        try
+        {
+            var irradiance = (Texture)updaterType.GetProperty("GeneratedIrradianceTexture").GetValue(updater);
+            var distance = (Texture)updaterType.GetProperty("GeneratedDistanceTexture").GetValue(updater);
+            previewField.SetValue(indirect,(irradiance,distance,relocation));
+            dirty.Invoke(indirect,null);
+            System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"bake-status.txt"),"Baking "+indirect.ProbeCounts);
+            bool success;
+            var passField = updaterType.GetField("_pass",dispatchFlags);
+            var indexField = updaterType.GetField("_renderedIndex",dispatchFlags);
+            using(scene.Push())
+            {
+                var captureTask = (Task<bool>)updaterType.GetMethod("RunAsync").Invoke(updater,new object[]{bakeCancellation.Token});
+                while(!captureTask.IsCompleted)
+                {
+                    await Task.WhenAny(captureTask,Task.Delay(1000));
+                    if(!captureTask.IsCompleted && passField is not null && indexField is not null)
+                        BakeStatus($"Baking pass {(int)passField.GetValue(updater)+1}/2; probe {indexField.GetValue(updater)}; grid {indirect.ProbeCounts}");
+                }
+                success = await captureTask;
+            }
+            if(!success) throw new InvalidOperationException("Indirect-light capture did not complete.");
+            // RunAsync replaces the irradiance texture for the second bounce.
+            // Save its completed output, as the engine's BakeProbes does.
+            var firstPassIrradiance = irradiance;
+            irradiance = (Texture)updaterType.GetProperty("GeneratedIrradianceTexture").GetValue(updater);
+            distance = (Texture)updaterType.GetProperty("GeneratedDistanceTexture").GetValue(updater);
+            bakeCancellation.Token.ThrowIfCancellationRequested();
+            Graphics.FlushGPU();
+            Texture Save(Texture texture,string name,ImageFormat? format=null)
+            {
+                if(texture==null || texture.IsError) throw new InvalidOperationException("Invalid "+name+" capture.");
+                var absolute = System.IO.Path.Combine(nativeDirectory,name+".vtex_c");
+                System.IO.File.WriteAllBytes(absolute,texture.SaveToVtex(format));
+                var saved = Texture.Load(bakeDirectory+"/"+name+".vtex",false);
+                if(saved is null || saved.IsError) throw new InvalidOperationException("Could not reload "+name+" capture.");
+                return saved;
+            }
+            indirect.IrradianceTexture = Save(irradiance,"irradiance");
+            indirect.DistanceTexture = Save(distance,"distance",(ImageFormat)85);
+            indirect.RelocationTexture = Save(relocation,"relocation",(ImageFormat)24);
+            indirect.BakeVersion = 1;
+            previewField.SetValue(indirect,null);
+            dirty.Invoke(indirect,null);
+            System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"indirect-light.json"),indirectObject.Serialize().ToJsonString());
+            System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"bake-result.json"),System.Text.Json.JsonSerializer.Serialize(
+                new { Passes=2, SavedFinalIrradiance=true, IrradianceReplacedAfterFirstPass=!ReferenceEquals(firstPassIrradiance,irradiance),
+                    Grid=indirect.ProbeCounts.ToString() }));
+            System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"bake-status.txt"),"Complete "+indirect.ProbeCounts);
+        }
+        finally
+        {
+            previewField.SetValue(indirect,null);
+            (updater as IDisposable)?.Dispose();
+            relocation?.Dispose();
+            typeof(IndirectLightVolume).GetProperty("GeneratedRelocationTexture",dispatchFlags).SetValue(indirect,null);
+            dirty.Invoke(indirect,null);
+        }
+    }
+    if(configuration["bake_reflections"]?.GetValue<bool>() == true)
+    {
+        var nativeDirectory = System.IO.Path.Combine(projectRoot,"Assets/lighting/belltower",configuration["directory"].GetValue<string>());
+        System.IO.Directory.CreateDirectory(nativeDirectory);
+        var render = typeof(EnvmapProbe).GetMethod("RenderCubemap",dispatchFlags,null,Type.EmptyTypes,null);
+        var textureField = typeof(EnvmapProbe).GetField("_dynamicTexture",dispatchFlags);
+        var probes = scene.GetAllComponents<EnvmapProbe>().ToArray();
+        foreach(var probe in probes)
+        {
+            using(scene.Push())
+            {
+                scene.EditorTick(.016f,.016f);
+                preRender.Invoke(scene,null);preCameraRender.Invoke(scene,null);UpdateIndirect();
+                render.Invoke(probe,null);
+                Graphics.FlushGPU();
+                var texture = (Texture)textureField.GetValue(probe);
+                if(texture is null || texture.IsError) throw new InvalidOperationException("Reflection capture failed: "+probe.GameObject.Name);
+                var file = "reflection-"+probe.GameObject.Name.Split(' ')[0].ToLowerInvariant()+".vtex";
+                System.IO.File.WriteAllBytes(System.IO.Path.Combine(nativeDirectory,file+"_c"),texture.SaveToVtex((ImageFormat)85));
+                probe.BakedTexture = Texture.Load("lighting/belltower/"+configuration["directory"].GetValue<string>()+"/"+file,false);
+                probe.Mode = EnvmapProbe.EnvmapProbeMode.Baked;
+            }
+        }
+        System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"reflections-baked.json"),probes.First().GameObject.Parent.Serialize().ToJsonString());
+    }
+    Vector3 World(Vector3 plan) => new(plan.y, -plan.x, plan.z);
+    var views = new[] {
+        (Name: "square", Eye: new Vector3(-560,-320,64), Target: new Vector3(0,700,330), Fov: 85f),
+        (Name: "square_clear", Eye: new Vector3(-440,200,64), Target: new Vector3(0,700,360), Fov: 85f),
+        (Name: "market", Eye: new Vector3(-1760,1275,64), Target: new Vector3(0,1240,170), Fov: 80f),
+        (Name: "west_street", Eye: new Vector3(-1800,125,64), Target: new Vector3(-400,160,130), Fov: 80f),
+        (Name: "terrace", Eye: new Vector3(-1760,-950,64), Target: new Vector3(0,-950,110), Fov: 80f),
+        (Name: "market_tower", Eye: new Vector3(-1150,1170,64), Target: new Vector3(0,825,640), Fov: 80f),
+        (Name: "gardens", Eye: new Vector3(-1560,-1380,16), Target: new Vector3(0,-1000,120), Fov: 80f),
+        (Name: "out_south", Eye: new Vector3(-1600,-1430,40), Target: new Vector3(-1600,-9000,-1400), Fov: 80f)
+        ,(Name: "council_hall", Eye: new Vector3(-240,1030,240), Target: new Vector3(180,650,235), Fov: 85f)
+        ,(Name: "hall_office", Eye: new Vector3(-260,930,64), Target: new Vector3(-245,680,70), Fov: 85f)
+        ,(Name: "church", Eye: new Vector3(0,-570,64), Target: new Vector3(0,-820,110), Fov: 85f)
+        ,(Name: "cafe", Eye: new Vector3(-330,-370,64), Target: new Vector3(-550,-210,82), Fov: 75f)
+        ,(Name: "shop_close", Eye: new Vector3(-1760,180,64), Target: new Vector3(-1760,350,77), Fov: 70f)
+        ,(Name: "map_art", Eye: new Vector3(-470,-390,160), Target: new Vector3(-50,600,350), Fov: 100f)
+    };
+    var names = configuration["views"].AsArray().Select(x => x.GetValue<string>()).ToHashSet();
+    using var bitmap = new Bitmap(configuration["width"]?.GetValue<int>() ?? 1600, configuration["height"]?.GetValue<int>() ?? 900);
+    foreach(var view in views.Where(x => names.Contains(x.Name))) {
+        cancellationToken.ThrowIfCancellationRequested();
+        using(scene.Push()) {
+            camera.WorldPosition = World(view.Eye);
+            camera.WorldRotation = Rotation.LookAt(World(view.Target)-World(view.Eye));
+            camera.FieldOfView = view.Fov;
+            scene.EditorTick(.016f,.016f);
+            // RenderToBitmap alone does not dispatch scene render hooks. Run
+            // the same hooks as the app so fog and lighting actually update.
+            preRender.Invoke(scene,null);
+            preCameraRender.Invoke(scene,null);
+            UpdateIndirect();
+            camera.RenderToBitmap(bitmap);
+        }
+        // Temporal exposure only advances while this camera renders. Waiting
+        // between two frames leaves it dependent on the previous view.
+        for(var frame=0;frame<(configuration["settle_frames"]?.GetValue<int>() ?? 24);frame++)
+        {
+            await Task.Delay(16,cancellationToken);
+            using(scene.Push()) {
+                scene.EditorTick(.016f,.016f);
+                preRender.Invoke(scene,null);
+                preCameraRender.Invoke(scene,null);
+                UpdateIndirect();
+                camera.RenderToBitmap(bitmap);
+            }
+        }
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(destination, view.Name+".png"),bitmap.ToPng());
+        System.IO.File.WriteAllText(System.IO.Path.Combine(destination, view.Name+"-camera.json"),System.Text.Json.JsonSerializer.Serialize(
+            new { camera.EnablePostProcessing, camera.AutoExposure.Enabled, camera.AutoExposure.MinimumExposure,
+                camera.AutoExposure.MaximumExposure, camera.AutoExposure.Compensation, camera.AutoExposure.Rate }));
+    }
+    var fog = scene.SceneWorld.GradientFog;
+    return new { Before = before, Game.IsPlaying,
+        SourceUnchanged = Editor.SceneEditorSession.Active.Scene.Id == before.SceneId && Game.ActiveScene?.Id == before.GameSceneId,
+        Directory = destination, VisualRoots = objects.Count,
+        Vista = scene.GetAllComponents<ModelRenderer>().Where(x=>x.GameObject.Name=="Vista").Select(x=>new {
+            Material = x.MaterialOverride?.ResourcePath, Model = x.Model?.ResourcePath }).ToArray(),
+        Indirect = scene.GetAllComponents<IndirectLightVolume>().Select(x=>new { x.GameObject.Name, x.RuntimeIntensity, x.ProbeCounts, x.BakeVersion }).ToArray(),
+        Fog = new { fog.Enabled, fog.StartDistance, fog.EndDistance, fog.EndHeight, fog.MaximumOpacity } };
+} catch(Exception error) {
+    // Keep inner exceptions and native trace locations; the MCP error summary
+    // alone can omit the failing operation inside parallel probe relocation.
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"capture-error.txt"),error.ToString());
+    throw;
+} finally { scene.Destroy(); }

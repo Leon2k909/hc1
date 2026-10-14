@@ -25,7 +25,7 @@
           "Title": "Lowtide",
           "Author": null,
           "Changes": "",
-          "Description": "A port's old warehouse quarter at low tide: red-brick warehouses either side of a tidal canal whose bed is mud and a channel of water, a bridge at its north end, a footbridge over its mouth and the harbour quay with its cranes.",
+          "Description": "A port\u0027s old warehouse quarter at low tide: red-brick warehouses either side of a tidal canal whose bed is mud and a channel of water, a bridge at its north end, a footbridge over its mouth and the harbour quay with its cranes.",
           "Group": null,
           "SceneTags": "",
           "Version": null
@@ -101,11 +101,11 @@
           "ContactShadows": true,
           "FogMode": "Enabled",
           "FogStrength": 1,
-          "LightColor": "1.32,1.08,0.82,1",
+          "LightColor": "1.45,1.26,1.02,1",
           "ShadowBias": 0.0005,
           "ShadowCascadeCount": 4,
           "ShadowCascadeSplitRatio": 0.91,
-          "ShadowHardness": 0,
+          "ShadowHardness": 0.35,
           "Shadows": true,
           "SkyColor": "0.42,0.48,0.58,1"
         }
@@ -167,10 +167,10 @@
           "__guid": "43006fab-e4c2-522f-b2fa-5acb9c4b1ad0",
           "__enabled": true,
           "Flags": 0,
-          "Color": "0.351,0.594,1.048,0.75",
-          "StartDistance": 3000,
-          "EndDistance": 60000,
-          "FalloffExponent": 1.5,
+          "Color": "0.42,0.49,0.57,0.55",
+          "StartDistance": 2200,
+          "EndDistance": 34000,
+          "FalloffExponent": 1.3,
           "Height": 9000,
           "VerticalFalloffExponent": 1.2
         }
@@ -226,9 +226,9 @@
           "Flags": 0,
           "__version": 1,
           "FalloffRange": 1,
-          "Intensity": 0.6,
-          "Radius": 96,
-          "ThinCompensation": 5
+          "Intensity": 0.8,
+          "Radius": 28,
+          "ThinCompensation": 1.5
         },
         {
           "__type": "Sandbox.ColorGrading",
@@ -236,8 +236,8 @@
           "__enabled": true,
           "Flags": 0,
           "GradingMethod": "TemperatureControl",
-          "ColorTempK": 5900,
-          "BlendFactor": 0.45,
+          "ColorTempK": 6400,
+          "BlendFactor": 0.22,
           "ColorSpace": "None",
           "LookupTexture": null
         },
@@ -248,7 +248,7 @@
           "Flags": 0,
           "Center": "0.5,0.5",
           "Color": "0,0,0,1",
-          "Intensity": 0.22,
+          "Intensity": 0.1,
           "Roundness": 1,
           "Smoothness": 1
         },
@@ -262,9 +262,9 @@
           "ExposureCompensation": 0,
           "ExposureMethod": "RGB",
           "MinimumExposure": 2.0,
-          "MaximumExposure": 3,
+          "MaximumExposure": 3.0,
           "Mode": "ACES",
-          "Rate": 1
+          "Rate": 1.3
         }
       ],
       "Children": []
@@ -289,7 +289,7 @@
         {
           "__guid": "20715399-d813-5a65-8d79-1e66c2926685",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "Fleet",
           "Position": "0,0,0",
           "Rotation": "0,0,0,1",
@@ -327,7 +327,7 @@
         {
           "__guid": "ac28272b-8e0c-5f9d-8033-467296a4c4f7",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "East",
           "Position": "0,0,0",
           "Rotation": "0,0,0,1",
@@ -365,7 +365,7 @@
         {
           "__guid": "c9e91fbf-ea4b-5ab1-a04b-4acbddcfa4fe",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "West",
           "Position": "0,0,0",
           "Rotation": "0,0,0,1",
@@ -403,7 +403,7 @@
         {
           "__guid": "7599845a-1170-5f52-9cdb-3a10b2848c85",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "Dressing East",
           "Position": "0,0,0",
           "Rotation": "0,0,0,1",
@@ -441,7 +441,7 @@
         {
           "__guid": "44bda15e-f089-54d3-9d5e-facaebc8e7ee",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "Dressing West",
           "Position": "0,0,0",
           "Rotation": "0,0,0,1",
@@ -539,6 +539,14 @@
               "Model": "models/maps/lowtide/lowtide_water.vmdl",
               "RenderType": "Off",
               "Tint": "1,1,1,1"
+            },
+            {
+              "__type": "Facepunch.LowtideWaterReflections",
+              "__guid": "44fa24ed-e5dd-54fc-847d-d8a2898fd285",
+              "__enabled": true,
+              "Flags": 0,
+              "WaterHeight": -137,
+              "MaximumWidth": 960
             }
           ],
           "Children": []
@@ -546,7 +554,7 @@
         {
           "__guid": "d7e69993-de2c-5ed3-9049-7f60616aa09f",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "Backdrop",
           "Position": "0,0,0",
           "Rotation": "0,0,0,1",
@@ -566,6 +574,93 @@
               "Flags": 0,
               "BodyGroups": 18446744073709551615,
               "Model": "models/maps/lowtide/lowtide_backdrop.vmdl",
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "d98e8fc2-592d-5aed-a04c-2e2975e0d951",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "Masonry Details",
+          "Position": "0,0,0",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "a2e182a2-559e-556b-b255-9f93185c3171",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "Model": "models/maps/lowtide/lowtide_masonry.vmdl",
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "9f99e538-adf1-5585-984e-6d12dc79f39d",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "Tidal Details",
+          "Position": "0,0,0",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "aec8113b-6067-52e8-9358-7feeacc5bd8c",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "Model": "models/maps/lowtide/lowtide_marine.vmdl",
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "9bdacabe-51e8-54d6-8767-a9f000b5ed8b",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "Harbour Details",
+          "Position": "0,0,0",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "34f7a6d0-7056-5296-87ea-43bdeaa831e3",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "Model": "models/maps/lowtide/lowtide_finish.vmdl",
               "RenderType": "On",
               "Tint": "1,1,1,1"
             }
@@ -725,10 +820,10 @@
         {
           "__guid": "32e5b0b5-f103-5429-84c1-4b103583baa7",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "West Warehouse Hall 1",
           "Position": "-200,620,320",
-          "Rotation": "0,0,0,1",
+          "Rotation": "-0.5,0.5,0.5,0.5",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
           "Enabled": true,
@@ -741,13 +836,37 @@
             {
               "__type": "Sandbox.PointLight",
               "__guid": "563ab226-4743-5adc-83f7-c1b69183e6ae",
-              "__enabled": true,
+              "__enabled": false,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
               "FogStrength": 1,
               "LightColor": "1.6,1.3,0.95,1",
               "Radius": 520,
+              "Shadows": true
+            },
+            {
+              "__type": "Sandbox.SpotLight",
+              "__guid": "8dc82c51-0a6c-4583-b6f3-c76ea567757a",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "ConeInner": 30,
+              "ConeOuter": 55,
+              "Contribution": "Diffuse, Specular, Transmissive",
+              "Cookie": null,
+              "FogMode": "Enabled",
+              "FogStrength": 1,
+              "LightColor": "1.36,1.105,0.8075,0.85",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "Radius": 520,
+              "ShadowBias": 0,
+              "ShadowHardness": 0.25,
               "Shadows": true
             }
           ],
@@ -756,10 +875,10 @@
         {
           "__guid": "675ed41d-5498-5fe8-bff0-e819c5f7f6ab",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "West Warehouse Hall 2",
           "Position": "160,620,320",
-          "Rotation": "0,0,0,1",
+          "Rotation": "-0.5,0.5,0.5,0.5",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
           "Enabled": true,
@@ -772,7 +891,7 @@
             {
               "__type": "Sandbox.PointLight",
               "__guid": "86cdef92-6b50-5121-9477-e8f1571032f2",
-              "__enabled": true,
+              "__enabled": false,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
@@ -780,6 +899,30 @@
               "LightColor": "1.6,1.3,0.95,1",
               "Radius": 520,
               "Shadows": false
+            },
+            {
+              "__type": "Sandbox.SpotLight",
+              "__guid": "f73c4dbd-b5b0-4719-ad2b-aeb0d185df34",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "ConeInner": 30,
+              "ConeOuter": 55,
+              "Contribution": "Diffuse, Specular, Transmissive",
+              "Cookie": null,
+              "FogMode": "Enabled",
+              "FogStrength": 1,
+              "LightColor": "1.36,1.105,0.8075,0.85",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "Radius": 520,
+              "ShadowBias": 0,
+              "ShadowHardness": 0.25,
+              "Shadows": true
             }
           ],
           "Children": []
@@ -787,10 +930,10 @@
         {
           "__guid": "da9df12d-9aea-52cb-b90f-e8ad1597e12d",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "West Warehouse Ground 1",
           "Position": "560,420,140",
-          "Rotation": "0,0,0,1",
+          "Rotation": "-0.5,0.5,0.5,0.5",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
           "Enabled": true,
@@ -803,7 +946,7 @@
             {
               "__type": "Sandbox.PointLight",
               "__guid": "9732645a-1d02-5591-8af9-438deca3e82a",
-              "__enabled": true,
+              "__enabled": false,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
@@ -811,6 +954,30 @@
               "LightColor": "1.6,1.3,0.95,1",
               "Radius": 340,
               "Shadows": false
+            },
+            {
+              "__type": "Sandbox.SpotLight",
+              "__guid": "a2bf3ba5-7c25-42ce-812f-3eae00c402f7",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "ConeInner": 30,
+              "ConeOuter": 55,
+              "Contribution": "Diffuse, Specular, Transmissive",
+              "Cookie": null,
+              "FogMode": "Enabled",
+              "FogStrength": 1,
+              "LightColor": "1.36,1.105,0.8075,0.85",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "Radius": 340,
+              "ShadowBias": 0,
+              "ShadowHardness": 0.25,
+              "Shadows": true
             }
           ],
           "Children": []
@@ -818,10 +985,10 @@
         {
           "__guid": "f3ec30a4-96dc-53d5-87c8-7b5a0675d650",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "West Warehouse Ground 2",
           "Position": "560,820,140",
-          "Rotation": "0,0,0,1",
+          "Rotation": "-0.5,0.5,0.5,0.5",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
           "Enabled": true,
@@ -834,7 +1001,7 @@
             {
               "__type": "Sandbox.PointLight",
               "__guid": "24abb8e0-c18e-518b-8621-9f7642d8fd96",
-              "__enabled": true,
+              "__enabled": false,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
@@ -842,6 +1009,30 @@
               "LightColor": "1.6,1.3,0.95,1",
               "Radius": 340,
               "Shadows": false
+            },
+            {
+              "__type": "Sandbox.SpotLight",
+              "__guid": "e72e3e6e-dfa3-4668-9676-359ef045e6a4",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "ConeInner": 30,
+              "ConeOuter": 55,
+              "Contribution": "Diffuse, Specular, Transmissive",
+              "Cookie": null,
+              "FogMode": "Enabled",
+              "FogStrength": 1,
+              "LightColor": "1.36,1.105,0.8075,0.85",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "Radius": 340,
+              "ShadowBias": 0,
+              "ShadowHardness": 0.25,
+              "Shadows": true
             }
           ],
           "Children": []
@@ -849,10 +1040,10 @@
         {
           "__guid": "51cafa18-c731-5cab-b942-1c348bde923d",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "West Warehouse Ground 3",
           "Position": "960,420,140",
-          "Rotation": "0,0,0,1",
+          "Rotation": "-0.5,0.5,0.5,0.5",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
           "Enabled": true,
@@ -865,7 +1056,7 @@
             {
               "__type": "Sandbox.PointLight",
               "__guid": "0edb7538-0c91-5d7d-8d10-58dc37f47114",
-              "__enabled": true,
+              "__enabled": false,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
@@ -873,6 +1064,30 @@
               "LightColor": "1.6,1.3,0.95,1",
               "Radius": 340,
               "Shadows": false
+            },
+            {
+              "__type": "Sandbox.SpotLight",
+              "__guid": "1c39f2a7-423d-440c-9750-3ef93d5cfb14",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "ConeInner": 30,
+              "ConeOuter": 55,
+              "Contribution": "Diffuse, Specular, Transmissive",
+              "Cookie": null,
+              "FogMode": "Enabled",
+              "FogStrength": 1,
+              "LightColor": "1.36,1.105,0.8075,0.85",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "Radius": 340,
+              "ShadowBias": 0,
+              "ShadowHardness": 0.25,
+              "Shadows": true
             }
           ],
           "Children": []
@@ -880,10 +1095,10 @@
         {
           "__guid": "351658aa-5458-5db3-9a65-e4083018da3a",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "West Warehouse Ground 4",
           "Position": "960,820,140",
-          "Rotation": "0,0,0,1",
+          "Rotation": "-0.5,0.5,0.5,0.5",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
           "Enabled": true,
@@ -896,7 +1111,7 @@
             {
               "__type": "Sandbox.PointLight",
               "__guid": "5b7927ae-ff76-584c-8605-1772bb0b7776",
-              "__enabled": true,
+              "__enabled": false,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
@@ -904,6 +1119,30 @@
               "LightColor": "1.6,1.3,0.95,1",
               "Radius": 340,
               "Shadows": false
+            },
+            {
+              "__type": "Sandbox.SpotLight",
+              "__guid": "a0e02bca-87a5-4f75-a583-f32ca15f604b",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "ConeInner": 30,
+              "ConeOuter": 55,
+              "Contribution": "Diffuse, Specular, Transmissive",
+              "Cookie": null,
+              "FogMode": "Enabled",
+              "FogStrength": 1,
+              "LightColor": "1.36,1.105,0.8075,0.85",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "Radius": 340,
+              "ShadowBias": 0,
+              "ShadowHardness": 0.25,
+              "Shadows": true
             }
           ],
           "Children": []
@@ -911,10 +1150,10 @@
         {
           "__guid": "185aa74f-95a5-523e-b68e-601f1e19fe33",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "West Mezzanine 1",
           "Position": "760,420,320",
-          "Rotation": "0,0,0,1",
+          "Rotation": "-0.5,0.5,0.5,0.5",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
           "Enabled": true,
@@ -927,7 +1166,7 @@
             {
               "__type": "Sandbox.PointLight",
               "__guid": "6be683f9-03ce-5c80-8258-181f46c1d40b",
-              "__enabled": true,
+              "__enabled": false,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
@@ -935,6 +1174,30 @@
               "LightColor": "1.6,1.3,0.95,1",
               "Radius": 320,
               "Shadows": false
+            },
+            {
+              "__type": "Sandbox.SpotLight",
+              "__guid": "59bbf15a-2480-41a4-bee8-4ae4472c0988",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "ConeInner": 30,
+              "ConeOuter": 55,
+              "Contribution": "Diffuse, Specular, Transmissive",
+              "Cookie": null,
+              "FogMode": "Enabled",
+              "FogStrength": 1,
+              "LightColor": "1.36,1.105,0.8075,0.85",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "Radius": 320,
+              "ShadowBias": 0,
+              "ShadowHardness": 0.25,
+              "Shadows": true
             }
           ],
           "Children": []
@@ -942,10 +1205,10 @@
         {
           "__guid": "0f531ed5-b5ae-5c38-b806-02c3f94095e6",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "West Mezzanine 2",
           "Position": "760,820,320",
-          "Rotation": "0,0,0,1",
+          "Rotation": "-0.5,0.5,0.5,0.5",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
           "Enabled": true,
@@ -958,7 +1221,7 @@
             {
               "__type": "Sandbox.PointLight",
               "__guid": "4af8aa15-df04-5885-8e7f-d6666dc7ae09",
-              "__enabled": true,
+              "__enabled": false,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
@@ -966,6 +1229,30 @@
               "LightColor": "1.6,1.3,0.95,1",
               "Radius": 320,
               "Shadows": false
+            },
+            {
+              "__type": "Sandbox.SpotLight",
+              "__guid": "30819ad9-1c48-4ece-8c45-5c03a0c4d726",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "ConeInner": 30,
+              "ConeOuter": 55,
+              "Contribution": "Diffuse, Specular, Transmissive",
+              "Cookie": null,
+              "FogMode": "Enabled",
+              "FogStrength": 1,
+              "LightColor": "1.36,1.105,0.8075,0.85",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "Radius": 320,
+              "ShadowBias": 0,
+              "ShadowHardness": 0.25,
+              "Shadows": true
             }
           ],
           "Children": []
@@ -973,10 +1260,10 @@
         {
           "__guid": "4b588246-6065-5822-bc44-ed8a5fe5ae4e",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "West Mezzanine 3",
           "Position": "1060,620,320",
-          "Rotation": "0,0,0,1",
+          "Rotation": "-0.5,0.5,0.5,0.5",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
           "Enabled": true,
@@ -989,7 +1276,7 @@
             {
               "__type": "Sandbox.PointLight",
               "__guid": "99310d37-8fe4-54d5-848f-4b65d4cd4e1e",
-              "__enabled": true,
+              "__enabled": false,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
@@ -997,6 +1284,30 @@
               "LightColor": "1.6,1.3,0.95,1",
               "Radius": 320,
               "Shadows": false
+            },
+            {
+              "__type": "Sandbox.SpotLight",
+              "__guid": "e51b9554-00d6-4998-ab9b-29920b06a0e4",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "ConeInner": 30,
+              "ConeOuter": 55,
+              "Contribution": "Diffuse, Specular, Transmissive",
+              "Cookie": null,
+              "FogMode": "Enabled",
+              "FogStrength": 1,
+              "LightColor": "1.36,1.105,0.8075,0.85",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "Radius": 320,
+              "ShadowBias": 0,
+              "ShadowHardness": 0.25,
+              "Shadows": true
             }
           ],
           "Children": []
@@ -1004,10 +1315,10 @@
         {
           "__guid": "b3386780-feb4-56cd-91f0-3a41ea916de0",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "East Warehouse Hall 1",
           "Position": "-200,-620,320",
-          "Rotation": "0,0,0,1",
+          "Rotation": "-0.5,0.5,0.5,0.5",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
           "Enabled": true,
@@ -1020,13 +1331,37 @@
             {
               "__type": "Sandbox.PointLight",
               "__guid": "6ac16831-6d3c-50ec-a6ec-031afad5f685",
-              "__enabled": true,
+              "__enabled": false,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
               "FogStrength": 1,
               "LightColor": "1.6,1.3,0.95,1",
               "Radius": 520,
+              "Shadows": true
+            },
+            {
+              "__type": "Sandbox.SpotLight",
+              "__guid": "f6788838-4b69-42a0-a8e9-ecb081540473",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "ConeInner": 30,
+              "ConeOuter": 55,
+              "Contribution": "Diffuse, Specular, Transmissive",
+              "Cookie": null,
+              "FogMode": "Enabled",
+              "FogStrength": 1,
+              "LightColor": "1.36,1.105,0.8075,0.85",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "Radius": 520,
+              "ShadowBias": 0,
+              "ShadowHardness": 0.25,
               "Shadows": true
             }
           ],
@@ -1035,10 +1370,10 @@
         {
           "__guid": "38820dcc-ff6e-56b4-83f4-60ac27559ae2",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "East Warehouse Hall 2",
           "Position": "160,-620,320",
-          "Rotation": "0,0,0,1",
+          "Rotation": "-0.5,0.5,0.5,0.5",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
           "Enabled": true,
@@ -1051,7 +1386,7 @@
             {
               "__type": "Sandbox.PointLight",
               "__guid": "b24d90ef-59eb-5c54-91ec-64e0f9cc4332",
-              "__enabled": true,
+              "__enabled": false,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
@@ -1059,6 +1394,30 @@
               "LightColor": "1.6,1.3,0.95,1",
               "Radius": 520,
               "Shadows": false
+            },
+            {
+              "__type": "Sandbox.SpotLight",
+              "__guid": "c1a89cae-f8cf-425e-950d-90e417e28d3a",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "ConeInner": 30,
+              "ConeOuter": 55,
+              "Contribution": "Diffuse, Specular, Transmissive",
+              "Cookie": null,
+              "FogMode": "Enabled",
+              "FogStrength": 1,
+              "LightColor": "1.36,1.105,0.8075,0.85",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "Radius": 520,
+              "ShadowBias": 0,
+              "ShadowHardness": 0.25,
+              "Shadows": true
             }
           ],
           "Children": []
@@ -1066,10 +1425,10 @@
         {
           "__guid": "5f075ebc-1c33-5fca-bb31-6a8e434babc6",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "East Warehouse Ground 1",
           "Position": "560,-420,140",
-          "Rotation": "0,0,0,1",
+          "Rotation": "-0.5,0.5,0.5,0.5",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
           "Enabled": true,
@@ -1082,7 +1441,7 @@
             {
               "__type": "Sandbox.PointLight",
               "__guid": "cb2133ae-2827-5601-8ee3-5b8f0cf57acd",
-              "__enabled": true,
+              "__enabled": false,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
@@ -1090,6 +1449,30 @@
               "LightColor": "1.6,1.3,0.95,1",
               "Radius": 340,
               "Shadows": false
+            },
+            {
+              "__type": "Sandbox.SpotLight",
+              "__guid": "abd6e281-893f-4b9a-88b7-7c01be803600",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "ConeInner": 30,
+              "ConeOuter": 55,
+              "Contribution": "Diffuse, Specular, Transmissive",
+              "Cookie": null,
+              "FogMode": "Enabled",
+              "FogStrength": 1,
+              "LightColor": "1.36,1.105,0.8075,0.85",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "Radius": 340,
+              "ShadowBias": 0,
+              "ShadowHardness": 0.25,
+              "Shadows": true
             }
           ],
           "Children": []
@@ -1097,10 +1480,10 @@
         {
           "__guid": "6cc86f9c-8bc0-5317-b3dd-29ebea8aac2c",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "East Warehouse Ground 2",
           "Position": "560,-820,140",
-          "Rotation": "0,0,0,1",
+          "Rotation": "-0.5,0.5,0.5,0.5",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
           "Enabled": true,
@@ -1113,7 +1496,7 @@
             {
               "__type": "Sandbox.PointLight",
               "__guid": "7b23d415-7f38-55ab-9816-2be7d38ff72c",
-              "__enabled": true,
+              "__enabled": false,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
@@ -1121,6 +1504,30 @@
               "LightColor": "1.6,1.3,0.95,1",
               "Radius": 340,
               "Shadows": false
+            },
+            {
+              "__type": "Sandbox.SpotLight",
+              "__guid": "c106d81d-6497-460a-8ca8-e4d592ef65d7",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "ConeInner": 30,
+              "ConeOuter": 55,
+              "Contribution": "Diffuse, Specular, Transmissive",
+              "Cookie": null,
+              "FogMode": "Enabled",
+              "FogStrength": 1,
+              "LightColor": "1.36,1.105,0.8075,0.85",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "Radius": 340,
+              "ShadowBias": 0,
+              "ShadowHardness": 0.25,
+              "Shadows": true
             }
           ],
           "Children": []
@@ -1128,10 +1535,10 @@
         {
           "__guid": "7bbbfc74-f417-58ef-98b3-8e1e03232d6f",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "East Warehouse Ground 3",
           "Position": "960,-420,140",
-          "Rotation": "0,0,0,1",
+          "Rotation": "-0.5,0.5,0.5,0.5",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
           "Enabled": true,
@@ -1144,7 +1551,7 @@
             {
               "__type": "Sandbox.PointLight",
               "__guid": "5e4fa8b3-990f-5164-b742-2ff5659b6be8",
-              "__enabled": true,
+              "__enabled": false,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
@@ -1152,6 +1559,30 @@
               "LightColor": "1.6,1.3,0.95,1",
               "Radius": 340,
               "Shadows": false
+            },
+            {
+              "__type": "Sandbox.SpotLight",
+              "__guid": "40a7ecb8-a459-4cfa-b504-0c7d751de889",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "ConeInner": 30,
+              "ConeOuter": 55,
+              "Contribution": "Diffuse, Specular, Transmissive",
+              "Cookie": null,
+              "FogMode": "Enabled",
+              "FogStrength": 1,
+              "LightColor": "1.36,1.105,0.8075,0.85",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "Radius": 340,
+              "ShadowBias": 0,
+              "ShadowHardness": 0.25,
+              "Shadows": true
             }
           ],
           "Children": []
@@ -1159,10 +1590,10 @@
         {
           "__guid": "ea0db507-7b36-548f-a496-49a3722e4b28",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "East Warehouse Ground 4",
           "Position": "960,-820,140",
-          "Rotation": "0,0,0,1",
+          "Rotation": "-0.5,0.5,0.5,0.5",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
           "Enabled": true,
@@ -1175,7 +1606,7 @@
             {
               "__type": "Sandbox.PointLight",
               "__guid": "1f745c9c-d60a-5b26-b66f-67f1644e15b7",
-              "__enabled": true,
+              "__enabled": false,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
@@ -1183,6 +1614,30 @@
               "LightColor": "1.6,1.3,0.95,1",
               "Radius": 340,
               "Shadows": false
+            },
+            {
+              "__type": "Sandbox.SpotLight",
+              "__guid": "5651abbf-342a-4ed2-aaf7-0f439917d672",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "ConeInner": 30,
+              "ConeOuter": 55,
+              "Contribution": "Diffuse, Specular, Transmissive",
+              "Cookie": null,
+              "FogMode": "Enabled",
+              "FogStrength": 1,
+              "LightColor": "1.36,1.105,0.8075,0.85",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "Radius": 340,
+              "ShadowBias": 0,
+              "ShadowHardness": 0.25,
+              "Shadows": true
             }
           ],
           "Children": []
@@ -1190,10 +1645,10 @@
         {
           "__guid": "080d8e06-78a8-5e9f-b6ff-779c23a20c06",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "East Mezzanine 1",
           "Position": "760,-420,320",
-          "Rotation": "0,0,0,1",
+          "Rotation": "-0.5,0.5,0.5,0.5",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
           "Enabled": true,
@@ -1206,7 +1661,7 @@
             {
               "__type": "Sandbox.PointLight",
               "__guid": "328b18aa-bf0c-5066-a39c-e7861c37706b",
-              "__enabled": true,
+              "__enabled": false,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
@@ -1214,6 +1669,30 @@
               "LightColor": "1.6,1.3,0.95,1",
               "Radius": 320,
               "Shadows": false
+            },
+            {
+              "__type": "Sandbox.SpotLight",
+              "__guid": "d805cb39-071e-4cce-9899-f951a6d037cf",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "ConeInner": 30,
+              "ConeOuter": 55,
+              "Contribution": "Diffuse, Specular, Transmissive",
+              "Cookie": null,
+              "FogMode": "Enabled",
+              "FogStrength": 1,
+              "LightColor": "1.36,1.105,0.8075,0.85",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "Radius": 320,
+              "ShadowBias": 0,
+              "ShadowHardness": 0.25,
+              "Shadows": true
             }
           ],
           "Children": []
@@ -1221,10 +1700,10 @@
         {
           "__guid": "f9f27595-37c1-5ac6-b9f9-a4c498896d65",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "East Mezzanine 2",
           "Position": "760,-820,320",
-          "Rotation": "0,0,0,1",
+          "Rotation": "-0.5,0.5,0.5,0.5",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
           "Enabled": true,
@@ -1237,7 +1716,7 @@
             {
               "__type": "Sandbox.PointLight",
               "__guid": "6215c1f3-1392-58ad-a49a-ccfb99911deb",
-              "__enabled": true,
+              "__enabled": false,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
@@ -1245,6 +1724,30 @@
               "LightColor": "1.6,1.3,0.95,1",
               "Radius": 320,
               "Shadows": false
+            },
+            {
+              "__type": "Sandbox.SpotLight",
+              "__guid": "60e99f5e-d2e2-4125-b022-bf1671bb493e",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "ConeInner": 30,
+              "ConeOuter": 55,
+              "Contribution": "Diffuse, Specular, Transmissive",
+              "Cookie": null,
+              "FogMode": "Enabled",
+              "FogStrength": 1,
+              "LightColor": "1.36,1.105,0.8075,0.85",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "Radius": 320,
+              "ShadowBias": 0,
+              "ShadowHardness": 0.25,
+              "Shadows": true
             }
           ],
           "Children": []
@@ -1252,10 +1755,10 @@
         {
           "__guid": "0df1a983-249d-50a6-b3ec-9a9b9789438a",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "East Mezzanine 3",
           "Position": "1060,-620,320",
-          "Rotation": "0,0,0,1",
+          "Rotation": "-0.5,0.5,0.5,0.5",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
           "Enabled": true,
@@ -1268,7 +1771,7 @@
             {
               "__type": "Sandbox.PointLight",
               "__guid": "15adceb2-18da-5611-abe2-0b0d1af4a6bb",
-              "__enabled": true,
+              "__enabled": false,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
@@ -1276,6 +1779,30 @@
               "LightColor": "1.6,1.3,0.95,1",
               "Radius": 320,
               "Shadows": false
+            },
+            {
+              "__type": "Sandbox.SpotLight",
+              "__guid": "07669524-9a90-4e96-86bf-45500d7be501",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "ConeInner": 30,
+              "ConeOuter": 55,
+              "Contribution": "Diffuse, Specular, Transmissive",
+              "Cookie": null,
+              "FogMode": "Enabled",
+              "FogStrength": 1,
+              "LightColor": "1.36,1.105,0.8075,0.85",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "Radius": 320,
+              "ShadowBias": 0,
+              "ShadowHardness": 0.25,
+              "Shadows": true
             }
           ],
           "Children": []
@@ -1283,7 +1810,7 @@
         {
           "__guid": "76373988-0895-5f9e-9d33-cf3db6d23ac9",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "Under the Bridge",
           "Position": "1300,0,-70",
           "Rotation": "0,0,0,1",
@@ -1314,7 +1841,7 @@
         {
           "__guid": "ec79325a-8309-5efd-8a7c-de6684d41de0",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "Under the Footbridge",
           "Position": "-1240,0,-80",
           "Rotation": "0,0,0,1",
@@ -1345,7 +1872,7 @@
         {
           "__guid": "36febc0b-2653-5c56-9049-ddd2bdb233ae",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "Bridge Lantern West South",
           "Position": "1159,240,188",
           "Rotation": "0,0,0,1",
@@ -1376,7 +1903,7 @@
         {
           "__guid": "10b54148-3036-5947-a7e3-215a86c53fac",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "Bridge Lantern West North",
           "Position": "1441,240,188",
           "Rotation": "0,0,0,1",
@@ -1407,7 +1934,7 @@
         {
           "__guid": "698a3b5c-ffd3-539a-bbe7-f60667c0ab89",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "Bridge Lantern East South",
           "Position": "1159,-240,188",
           "Rotation": "0,0,0,1",
@@ -1438,7 +1965,7 @@
         {
           "__guid": "ee8532de-a7e8-51f3-936e-d14e2585f8d8",
           "__version": 2,
-          "Flags": 0,
+          "Flags": 32768,
           "Name": "Bridge Lantern East North",
           "Position": "1441,-240,188",
           "Rotation": "0,0,0,1",
@@ -1462,6 +1989,106 @@
               "LightColor": "3.4,2.30,1.25,1",
               "Radius": 330.0,
               "Shadows": true
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "7b21c7eb-55e5-4de5-91e6-8353b5a6bf0c",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Warehouse East Bounced Light",
+          "Position": "0,0,0",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.IndirectLightVolume",
+              "__guid": "a55a7c89-2f8c-407e-93ed-d2a8a2e47a8f",
+              "__enabled": true,
+              "Flags": 0,
+              "__version": 2,
+              "BakeVersion": 1,
+              "BlendDistance": 24,
+              "Bounds": {
+                "Mins": "-402,-1002,-8",
+                "Maxs": "1152,-238,360"
+              },
+              "DistanceTexture": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-east-v3/east_distancetexture_9e1819e296ef442caf69ede6d41c1963.vtex",
+              "InsideGeometry": "Relocate",
+              "IrradianceTexture": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-east-v3/east_irradiancetexture_9e1819e296ef442caf69ede6d41c1963.vtex",
+              "NormalBias": 3,
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "ProbeDensity": 12,
+              "RelocationTexture": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-east-v3/east_relocationtexture_9e1819e296ef442caf69ede6d41c1963.vtex",
+              "RenderExcludeTags": "water",
+              "RuntimeContrast": 0.85,
+              "RuntimeIntensity": 4,
+              "RuntimeSaturation": 1,
+              "RuntimeTint": "1,1,1,1",
+              "ViewBias": 4
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "01c189c2-02c8-4dcb-b038-d7cc52fc337b",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Warehouse West Bounced Light",
+          "Position": "0,0,0",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.IndirectLightVolume",
+              "__guid": "7aad1539-5d64-4d1e-9496-709b842779cd",
+              "__enabled": true,
+              "Flags": 0,
+              "__version": 2,
+              "BakeVersion": 1,
+              "BlendDistance": 24,
+              "Bounds": {
+                "Mins": "-402,238,-8",
+                "Maxs": "1152,1002,360"
+              },
+              "DistanceTexture": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-west-v3/west_distancetexture_4ff91e59bc504094b089da8450699294.vtex",
+              "InsideGeometry": "Relocate",
+              "IrradianceTexture": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-west-v3/west_irradiancetexture_4ff91e59bc504094b089da8450699294.vtex",
+              "NormalBias": 3,
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "ProbeDensity": 12,
+              "RelocationTexture": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-west-v3/west_relocationtexture_4ff91e59bc504094b089da8450699294.vtex",
+              "RenderExcludeTags": "water",
+              "RuntimeContrast": 0.85,
+              "RuntimeIntensity": 4,
+              "RuntimeSaturation": 1,
+              "RuntimeTint": "1,1,1,1",
+              "ViewBias": 4
             }
           ],
           "Children": []
@@ -1513,13 +2140,15 @@
               "DelayBetweenUpdates": 0.1,
               "Feathering": 0.04,
               "FrameInterval": 5,
-              "MaxDistance": 512,
+              "MaxDistance": 4096,
               "Projection": "Box",
               "RenderDynamically": true,
               "TintColor": "1,1,1,1",
               "UpdateStrategy": "OnEnabled",
-              "ZFar": 4096,
-              "ZNear": 8
+              "ZFar": 6000,
+              "ZNear": 8,
+              "Mode": "Realtime",
+              "Resolution": "Medium"
             }
           ],
           "Children": []
@@ -1552,13 +2181,15 @@
               "DelayBetweenUpdates": 0.1,
               "Feathering": 0.04,
               "FrameInterval": 5,
-              "MaxDistance": 512,
+              "MaxDistance": 4096,
               "Projection": "Box",
               "RenderDynamically": true,
               "TintColor": "1,1,1,1",
               "UpdateStrategy": "OnEnabled",
-              "ZFar": 4096,
-              "ZNear": 8
+              "ZFar": 6000,
+              "ZNear": 8,
+              "Mode": "Realtime",
+              "Resolution": "Medium"
             }
           ],
           "Children": []
@@ -1591,13 +2222,15 @@
               "DelayBetweenUpdates": 0.1,
               "Feathering": 0.04,
               "FrameInterval": 5,
-              "MaxDistance": 512,
+              "MaxDistance": 4096,
               "Projection": "Box",
               "RenderDynamically": true,
               "TintColor": "1,1,1,1",
               "UpdateStrategy": "OnEnabled",
-              "ZFar": 4096,
-              "ZNear": 8
+              "ZFar": 6000,
+              "ZNear": 8,
+              "Mode": "Realtime",
+              "Resolution": "Medium"
             }
           ],
           "Children": []
@@ -1630,13 +2263,15 @@
               "DelayBetweenUpdates": 0.1,
               "Feathering": 0.04,
               "FrameInterval": 5,
-              "MaxDistance": 512,
+              "MaxDistance": 4096,
               "Projection": "Box",
               "RenderDynamically": true,
               "TintColor": "1,1,1,1",
               "UpdateStrategy": "OnEnabled",
-              "ZFar": 4096,
-              "ZNear": 8
+              "ZFar": 6000,
+              "ZNear": 8,
+              "Mode": "Realtime",
+              "Resolution": "Medium"
             }
           ],
           "Children": []
@@ -1669,13 +2304,15 @@
               "DelayBetweenUpdates": 0.1,
               "Feathering": 0.04,
               "FrameInterval": 5,
-              "MaxDistance": 512,
+              "MaxDistance": 4096,
               "Projection": "Box",
               "RenderDynamically": true,
               "TintColor": "1,1,1,1",
               "UpdateStrategy": "OnEnabled",
-              "ZFar": 4096,
-              "ZNear": 8
+              "ZFar": 6000,
+              "ZNear": 8,
+              "Mode": "Realtime",
+              "Resolution": "Medium"
             }
           ],
           "Children": []
@@ -1708,13 +2345,15 @@
               "DelayBetweenUpdates": 0.1,
               "Feathering": 0.04,
               "FrameInterval": 5,
-              "MaxDistance": 512,
+              "MaxDistance": 4096,
               "Projection": "Box",
               "RenderDynamically": true,
               "TintColor": "1,1,1,1",
               "UpdateStrategy": "OnEnabled",
-              "ZFar": 4096,
-              "ZNear": 8
+              "ZFar": 6000,
+              "ZNear": 8,
+              "Mode": "Realtime",
+              "Resolution": "Medium"
             }
           ],
           "Children": []
@@ -1747,13 +2386,15 @@
               "DelayBetweenUpdates": 0.1,
               "Feathering": 0.04,
               "FrameInterval": 5,
-              "MaxDistance": 512,
+              "MaxDistance": 4096,
               "Projection": "Box",
               "RenderDynamically": true,
               "TintColor": "1,1,1,1",
               "UpdateStrategy": "OnEnabled",
-              "ZFar": 4096,
-              "ZNear": 8
+              "ZFar": 6000,
+              "ZNear": 8,
+              "Mode": "Realtime",
+              "Resolution": "Medium"
             }
           ],
           "Children": []
@@ -1786,13 +2427,15 @@
               "DelayBetweenUpdates": 0.1,
               "Feathering": 0.04,
               "FrameInterval": 5,
-              "MaxDistance": 512,
+              "MaxDistance": 4096,
               "Projection": "Box",
               "RenderDynamically": true,
               "TintColor": "1,1,1,1",
               "UpdateStrategy": "OnEnabled",
-              "ZFar": 4096,
-              "ZNear": 8
+              "ZFar": 6000,
+              "ZNear": 8,
+              "Mode": "Realtime",
+              "Resolution": "Medium"
             }
           ],
           "Children": []
@@ -1825,13 +2468,97 @@
               "DelayBetweenUpdates": 0.1,
               "Feathering": 0.04,
               "FrameInterval": 5,
-              "MaxDistance": 512,
+              "MaxDistance": 4096,
               "Projection": "Box",
               "RenderDynamically": true,
               "TintColor": "1,1,1,1",
               "UpdateStrategy": "OnEnabled",
-              "ZFar": 4096,
-              "ZNear": 8
+              "ZFar": 6000,
+              "ZNear": 8,
+              "Mode": "Realtime",
+              "Resolution": "Medium"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "15200414-d15f-5478-bc39-6b047815f702",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Probe West Quay",
+          "Position": "-1360,1120,90",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.EnvmapProbe",
+              "__guid": "c666ab9c-d6dc-582a-9d7d-c937ef7fe636",
+              "__enabled": true,
+              "Flags": 0,
+              "Bounds": {
+                "Mins": "-250,-875,-120",
+                "Maxs": "340,1090,360"
+              },
+              "DelayBetweenUpdates": 0.1,
+              "Feathering": 0.04,
+              "FrameInterval": 5,
+              "MaxDistance": 4096,
+              "Projection": "Box",
+              "RenderDynamically": true,
+              "TintColor": "1,1,1,1",
+              "UpdateStrategy": "OnEnabled",
+              "ZFar": 6000,
+              "ZNear": 8,
+              "Mode": "Realtime",
+              "Resolution": "Medium"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "d889b1b3-978f-58da-970c-33ec0eca85a6",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Probe East Quay",
+          "Position": "-1360,-1120,90",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.EnvmapProbe",
+              "__guid": "c91be42e-2a9e-5568-84f8-c9a1cb6a9e7d",
+              "__enabled": true,
+              "Flags": 0,
+              "Bounds": {
+                "Mins": "-250,-1090,-120",
+                "Maxs": "340,875,360"
+              },
+              "DelayBetweenUpdates": 0.1,
+              "Feathering": 0.04,
+              "FrameInterval": 5,
+              "MaxDistance": 4096,
+              "Projection": "Box",
+              "RenderDynamically": true,
+              "TintColor": "1,1,1,1",
+              "UpdateStrategy": "OnEnabled",
+              "ZFar": 6000,
+              "ZNear": 8,
+              "Mode": "Realtime",
+              "Resolution": "Medium"
             }
           ],
           "Children": []
@@ -7087,6 +7814,250 @@
         "d0c8d522-0524-4dbb-92a9-04b45bf7d1c7": "a8ff17d2-9c72-5171-8924-7236113f212b",
         "d5595acd-b863-410f-8172-dd5551b1e049": "5e0b4123-aad4-5eaa-adc7-279b795597a4"
       }
+    },
+    {
+      "__guid": "78f96597-820a-50be-8201-e924f5127eeb",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Forklift LPG (east warehouse)",
+      "Position": "560,-682.2,49.8",
+      "Rotation": "0,0,0.7071068,0.7071068",
+      "Scale": "1,1,1",
+      "Tags": "lpg_canister",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "3e7bf1d1-914c-5ea6-a789-d7032b1e6da0",
+          "__enabled": true,
+          "Flags": 0,
+          "Model": "models/props/lowtide/lpg_canister.vmdl",
+          "RenderType": "On",
+          "Tint": "1,1,1,1"
+        },
+        {
+          "__type": "Sandbox.ModelCollider",
+          "__guid": "4b5391c9-3238-5c6e-aea5-7c0af0c4959f",
+          "__enabled": true,
+          "Flags": 0,
+          "Model": "models/props/lowtide/lpg_canister.vmdl",
+          "IsTrigger": false,
+          "Static": true
+        },
+        {
+          "__type": "Sandbox.SphereCollider",
+          "__guid": "7ff2515b-d1d2-54ac-9f54-b4c1efd9251b",
+          "__enabled": true,
+          "Flags": 0,
+          "Center": "0,17.8,0",
+          "Radius": 1.5,
+          "IsTrigger": false,
+          "Static": true,
+          "Surface": "surfaces/metal.surface"
+        },
+        {
+          "__type": "Facepunch.LpgCanister",
+          "__guid": "e0324147-627d-5725-a695-922ac4ae301b",
+          "__enabled": true,
+          "Flags": 0,
+          "IntactModel": "models/props/lowtide/lpg_canister.vmdl",
+          "RupturedModel": "models/props/lowtide/lpg_canister_ruptured.vmdl",
+          "LeakSound": "sounds/world/lpg/leak.sound",
+          "FireSound": "sounds/world/lpg/jet.sound",
+          "RuptureSound": "sounds/weapons/grenade/he_grenade_explode.sound",
+          "BlastRadius": 240,
+          "BlastDamage": 120
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "fa342b93-3ec7-5834-84a2-86ad8b4e0695",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Forklift LPG (east quay)",
+      "Position": "-1180,-1057.8,49.8",
+      "Rotation": "0,0,-0.7071068,0.7071068",
+      "Scale": "1,1,1",
+      "Tags": "lpg_canister",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "e9622deb-b80f-5701-a962-d42c71fc8548",
+          "__enabled": true,
+          "Flags": 0,
+          "Model": "models/props/lowtide/lpg_canister.vmdl",
+          "RenderType": "On",
+          "Tint": "1,1,1,1"
+        },
+        {
+          "__type": "Sandbox.ModelCollider",
+          "__guid": "5b23b02c-5361-5362-bdb0-e5f20f8d8b7f",
+          "__enabled": true,
+          "Flags": 0,
+          "Model": "models/props/lowtide/lpg_canister.vmdl",
+          "IsTrigger": false,
+          "Static": true
+        },
+        {
+          "__type": "Sandbox.SphereCollider",
+          "__guid": "69fcdf8c-c480-5a25-9414-8d099cce4600",
+          "__enabled": true,
+          "Flags": 0,
+          "Center": "0,17.8,0",
+          "Radius": 1.5,
+          "IsTrigger": false,
+          "Static": true,
+          "Surface": "surfaces/metal.surface"
+        },
+        {
+          "__type": "Facepunch.LpgCanister",
+          "__guid": "276c6118-2670-56c5-a5a5-6750e4bcc9f4",
+          "__enabled": true,
+          "Flags": 0,
+          "IntactModel": "models/props/lowtide/lpg_canister.vmdl",
+          "RupturedModel": "models/props/lowtide/lpg_canister_ruptured.vmdl",
+          "LeakSound": "sounds/world/lpg/leak.sound",
+          "FireSound": "sounds/world/lpg/jet.sound",
+          "RuptureSound": "sounds/weapons/grenade/he_grenade_explode.sound",
+          "BlastRadius": 240,
+          "BlastDamage": 120
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "af7a4da7-7b9a-5c4c-a19d-d3cbf0f5398f",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Forklift LPG (west warehouse)",
+      "Position": "560,682.2,49.8",
+      "Rotation": "0,0,-0.7071068,0.7071068",
+      "Scale": "1,1,1",
+      "Tags": "lpg_canister",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "08389dee-26fd-516a-8528-62d77c8dc4f3",
+          "__enabled": true,
+          "Flags": 0,
+          "Model": "models/props/lowtide/lpg_canister.vmdl",
+          "RenderType": "On",
+          "Tint": "1,1,1,1"
+        },
+        {
+          "__type": "Sandbox.ModelCollider",
+          "__guid": "b0cc88db-10c5-59a3-8fed-0efa0c4722fd",
+          "__enabled": true,
+          "Flags": 0,
+          "Model": "models/props/lowtide/lpg_canister.vmdl",
+          "IsTrigger": false,
+          "Static": true
+        },
+        {
+          "__type": "Sandbox.SphereCollider",
+          "__guid": "06d5bd3a-b096-5c92-8da1-d54fe4f6ecb3",
+          "__enabled": true,
+          "Flags": 0,
+          "Center": "0,17.8,0",
+          "Radius": 1.5,
+          "IsTrigger": false,
+          "Static": true,
+          "Surface": "surfaces/metal.surface"
+        },
+        {
+          "__type": "Facepunch.LpgCanister",
+          "__guid": "d8e84ea2-cd56-555b-bbe6-652034fb2b6d",
+          "__enabled": true,
+          "Flags": 0,
+          "IntactModel": "models/props/lowtide/lpg_canister.vmdl",
+          "RupturedModel": "models/props/lowtide/lpg_canister_ruptured.vmdl",
+          "LeakSound": "sounds/world/lpg/leak.sound",
+          "FireSound": "sounds/world/lpg/jet.sound",
+          "RuptureSound": "sounds/weapons/grenade/he_grenade_explode.sound",
+          "BlastRadius": 240,
+          "BlastDamage": 120
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "27db95d1-62d4-5a3f-a4da-2f267b0d3e83",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Forklift LPG (west quay)",
+      "Position": "-1180,1057.8,49.8",
+      "Rotation": "0,0,0.7071068,0.7071068",
+      "Scale": "1,1,1",
+      "Tags": "lpg_canister",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "da00b012-1d6d-51b4-b6a4-ca8a58342926",
+          "__enabled": true,
+          "Flags": 0,
+          "Model": "models/props/lowtide/lpg_canister.vmdl",
+          "RenderType": "On",
+          "Tint": "1,1,1,1"
+        },
+        {
+          "__type": "Sandbox.ModelCollider",
+          "__guid": "3ba4b56d-9c25-5b3b-a07e-9535b677817d",
+          "__enabled": true,
+          "Flags": 0,
+          "Model": "models/props/lowtide/lpg_canister.vmdl",
+          "IsTrigger": false,
+          "Static": true
+        },
+        {
+          "__type": "Sandbox.SphereCollider",
+          "__guid": "7f358867-53e3-5219-aef4-173f3901a5a1",
+          "__enabled": true,
+          "Flags": 0,
+          "Center": "0,17.8,0",
+          "Radius": 1.5,
+          "IsTrigger": false,
+          "Static": true,
+          "Surface": "surfaces/metal.surface"
+        },
+        {
+          "__type": "Facepunch.LpgCanister",
+          "__guid": "5d98a6c8-ab55-57a3-9c0e-706e621b2412",
+          "__enabled": true,
+          "Flags": 0,
+          "IntactModel": "models/props/lowtide/lpg_canister.vmdl",
+          "RupturedModel": "models/props/lowtide/lpg_canister_ruptured.vmdl",
+          "LeakSound": "sounds/world/lpg/leak.sound",
+          "FireSound": "sounds/world/lpg/jet.sound",
+          "RuptureSound": "sounds/weapons/grenade/he_grenade_explode.sound",
+          "BlastRadius": 240,
+          "BlastDamage": 120
+        }
+      ],
+      "Children": []
     }
   ],
   "SceneProperties": {

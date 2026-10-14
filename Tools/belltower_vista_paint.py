@@ -14,8 +14,8 @@ is painted.
 The land's shape is belltower_vista's. Painted on it:
 - Patterns are laid out where the forced perspective plays them (belltower_vista.apparent), at their real sizes there.
   The farmland is districts a few kilometres across (DISTRICT), each with its own heading, field size and taste for
-  hedges, and a mix of crops by the land at its middle (REGION_CROPS). Their fields lie in staggered rows like a brick
-  wall's, bent by noise, some split in two. A field's crop comes from its district and the land at its middle: steep
+  hedges, and a mix of crops by the land at its middle (REGION_CROPS). Fields are irregular, elongated Voronoi parcels,
+  with curved boundaries from the district's warped coordinates. A field's crop comes from the land at its fixed site: steep
   ones are woods or pasture, the floodplain grows maize, meadow and poplars, vineyards and olives like sunny slopes.
   Wheat and barley have tramlines, stubble its swaths, hay its windrows, ploughed clay its furrows, vineyards their rows
   and the rows' shadows.
@@ -102,12 +102,12 @@ def srgb8( lin ):
 WHEAT, BARLEY, STUBBLE, HAY, MEADOW, PASTURE, PLOUGH, FALLOW, SUNFLOWER, MAIZE, VINEYARD, OLIVES, WOOD, POPLARS = range( 14 )
 CROP_COLOURS = linear( [
     ( 176, 164, 92 ),       # wheat (its ripeness mixes WHEAT_GREEN and WHEAT_GOLD)
-    ( 204, 186, 124 ),      # barley
-    ( 196, 178, 130 ),      # stubble
-    ( 166, 164, 98 ),       # hay, cut
-    ( 108, 124, 56 ),       # meadow
-    ( 98, 118, 52 ),        # pasture
-    ( 150, 118, 86 ),       # ploughed clay
+    ( 180, 169, 115 ),      # barley
+    ( 176, 163, 119 ),      # stubble
+    ( 145, 146, 94 ),       # hay, cut
+    ( 112, 124, 72 ),       # meadow
+    ( 106, 120, 68 ),       # pasture
+    ( 137, 119, 91 ),       # ploughed clay
     ( 140, 132, 80 ),       # fallow
     ( 84, 110, 46 ),        # sunflowers, a month up
     ( 70, 102, 40 ),        # maize
@@ -117,8 +117,8 @@ CROP_COLOURS = linear( [
     ( 106, 116, 58 ),       # a poplar plantation's grass
 ] )
 WHEAT_GREEN = linear( ( 128, 144, 70 ) )
-WHEAT_GOLD = linear( ( 198, 176, 102 ) )
-STRAW = linear( ( 214, 196, 140 ) )
+WHEAT_GOLD = linear( ( 182, 166, 108 ) )
+STRAW = linear( ( 192, 177, 130 ) )
 HAY_ROW = linear( ( 122, 128, 64 ) )
 SOIL_COLOUR = linear( ( 152, 122, 90 ) )
 DRY_SOIL = linear( ( 176, 150, 116 ) )
@@ -201,8 +201,7 @@ EDGE_PLAIN, EDGE_TRACK, EDGE_HEDGE, EDGE_DITCH, EDGE_TREES = range( 5 )
 EDGE_HALF = np.array( ( 0.8, 1.5, 1.6, 1.0, 1.4 ) ) * M
 
 DISTRICT = 110000.0         # the districts' size where they're played (2.8 km)
-ROW = 4600.0                # a row of fields' depth where it's played (117 m), times its district's scale
-ROW_RUN = 21000.0           # how far along a row its boundary keeps to one kind
+PARCEL = 6200.0             # mean short axis of a field where played (157 m), scaled by district
 TERRACE_STEP = 1.8 * M      # the olive terraces' rise
 TERRACE_REACH = 3000.0      # how far out from the walls they go
 FOOT = 160.0                # the grass strip along the walls' foot
@@ -329,8 +328,8 @@ def _frame( E, N, dh, de, dn, grads ):
     ca, sa = math.cos( a ), math.sin( a )
     x, y = E - de, N - dn
     seed = np.int64( dh & 1023 )
-    u = x * ca + y * sa + 2200.0 * V._fbm( E, N, 46000.0, 2, 0.5, 800 + seed, 1.0, grads )
-    v = -x * sa + y * ca + 1600.0 * V._fbm( E, N, 38000.0, 2, 0.5, 1900 + seed, 1.0, grads )
+    u = x * ca + y * sa + 3400.0 * V._fbm( E, N, 27000.0, 3, 0.5, 800 + seed, 1.0, grads )
+    v = -x * sa + y * ca + 2800.0 * V._fbm( E, N, 23000.0, 3, 0.5, 1900 + seed, 1.0, grads )
     return u, v, a
 
 
@@ -352,48 +351,42 @@ def _edge_kind( h, dh ):
 
 @numba.njit( cache=True, fastmath=True )
 def _cell( u, v, dh ):
-    """ The field at ( u, v ) in its district's frame: its hash, where in it ( fu, fv ), and its edges' distances and
-    kinds ( left, right, bottom, top ). Rows are ROW deep (times the district's scale), and each row's fields its own
-    length, offset from the next row's like bricks. A third of the fields are split in two. """
-    H = ROW * ( 0.65 + 0.8 * _u( dh, 4 ) )
-    j = np.int64( math.floor( v / H ) )
-    hj = _h( dh, j, 31 )
-    L = H * ( 1.15 + 2.4 * _u( hj, 1 ) )
-    phase = L * _u( hj, 2 )
-    i = np.int64( math.floor( ( u + phase ) / L ) )
-    fid = _h( hj, i, 37 )
-    fu = u + phase - i * L
-    fv = v - j * H
-    kl = _edge_kind( _h( hj, i, 41 ), dh )
-    kr = _edge_kind( _h( hj, i + 1, 41 ), dh )
-    run = np.int64( math.floor( u / ROW_RUN ) )
-    kb = _edge_kind( _h( _h( dh, j, 43 ), run, 47 ), dh )
-    kt = _edge_kind( _h( _h( dh, j + 1, 43 ), run, 47 ), dh )
-    dl, dr, db, dt = fu, L - fu, fv, H - fv
-    split = _u( fid, 5 )
-    if split < 0.22:
-        t = ( 0.3 + 0.4 * _u( fid, 6 ) ) * L
-        k = _edge_kind( _h( fid, 0, 53 ), dh )
-        if fu < t:
-            fid = _h( fid, 1, 59 )
-            dr = t - fu
-            kr = k
-        else:
-            fid = _h( fid, 2, 59 )
-            dl = fu - t
-            kl = k
-    elif split < 0.34:
-        t = ( 0.35 + 0.3 * _u( fid, 6 ) ) * H
-        k = _edge_kind( _h( fid, 0, 61 ), dh )
-        if fv < t:
-            fid = _h( fid, 3, 59 )
-            dt = t - fv
-            kt = k
-        else:
-            fid = _h( fid, 4, 59 )
-            db = fv - t
-            kb = k
-    return fid, fu, fv, dl, dr, db, dt, kl, kr, kb, kt
+    """ Irregular parcels in a stretched metric; shared edges get the same hedge or track on both sides.
+
+    The final two values are the fixed parcel site. Crop selection must use that site, not a moving midpoint of
+    edge distances: the latter changes a parcel's crop between scanlines and between texture zones.
+    """
+    H = PARCEL * ( 0.75 + 0.75 * _u( dh, 4 ) )
+    L = H * ( 1.15 + 0.8 * _u( dh, 5 ) )
+    x, y = u / L, v / H
+    i, j = np.int64( math.floor( x ) ), np.int64( math.floor( y ) )
+    best, bx, by = 1e300, 0.0, 0.0
+    bi, bj, fid = i, j, np.int64( 0 )
+    for di in range( -2, 3 ):
+        for dj in range( -2, 3 ):
+            h = _h( _h( dh, i + di, 31 ), j + dj, 37 )
+            sx = i + di + 0.15 + 0.7 * _u( h, 1 )
+            sy = j + dj + 0.15 + 0.7 * _u( h, 2 )
+            dist = ( x - sx ) ** 2 + ( y - sy ) ** 2
+            if dist < best:
+                best, bx, by, bi, bj, fid = dist, sx, sy, i + di, j + dj, h
+    edge, edge_kind = 1e300, EDGE_PLAIN
+    # A 5x5 neighborhood of the winning site contains every bordering parcel.
+    for di in range( -2, 3 ):
+        for dj in range( -2, 3 ):
+            if di == 0 and dj == 0:
+                continue
+            h = _h( _h( dh, bi + di, 31 ), bj + dj, 37 )
+            sx = bi + di + 0.15 + 0.7 * _u( h, 1 )
+            sy = bj + dj + 0.15 + 0.7 * _u( h, 2 )
+            dist = ( x - sx ) ** 2 + ( y - sy ) ** 2
+            gap = ( dist - best ) / ( 2.0 * math.hypot( ( sx - bx ) / L, ( sy - by ) / H ) )
+            if gap < edge:
+                edge = max( gap, 0.0 )
+                edge_kind = _edge_kind( _h( min( fid, h ), max( fid, h ), 41 ), dh )
+    cu, cv = bx * L, by * H
+    # Existing planting uses conservative clearance to the nearest boundary.
+    return fid, u - cu, v - cv, edge, edge, edge, edge, edge_kind, edge_kind, edge_kind, edge_kind, cu, cv
 
 
 @numba.njit( cache=True, fastmath=True )
@@ -485,7 +478,7 @@ def _use( e, n, E, N, s, w, wP, z, gx, gy, d, crop, ang, fid, fu, fv, dl, dr, db
     q1 = V._fbm( E, N, 2600.0, 3, 0.5, 3000 + seed, wP, grads )
     q2 = V._fbm( E, N, 420.0, 3, 0.5, 5000 + seed, wP, grads )
     q3 = V._fbm( E, N, 70.0, 2, 0.5, 7001, wP, grads )
-    tone = ( 0.92 + 0.16 * _u( fid, 11 ) ) * ( 1.0 + 0.09 * q1 + 0.06 * q2 + 0.05 * q3 )
+    tone = ( 0.95 + 0.1 * _u( fid, 11 ) ) * ( 1.0 + 0.22 * q1 + 0.14 * q2 + 0.07 * q3 )
     hue = _u( fid, 13 ) - 0.5
     r, g, b = CROP_COLOURS[crop, 0], CROP_COLOURS[crop, 1], CROP_COLOURS[crop, 2]
     kind = GRASS
@@ -642,16 +635,19 @@ def _use( e, n, E, N, s, w, wP, z, gx, gy, d, crop, ang, fid, fu, fv, dl, dr, db
     wv += 0.6 * V._smooth( 0.18, 0.55, slope ) + 0.35 * V._smooth( -1500.0, 3500.0, z )
     wv += 0.5 * V._smooth( 42000.0, 62000.0, d ) - 0.8 * ( 1.0 - V._smooth( 2500.0, 9000.0, d ) )
     wv += 0.2 * V._fbm( E, N, 21000.0, 3, 0.55, 502, wP, grads )
-    woods = wv > 0.42 or crop == WOOD
+    forest_mix = 1.0 if crop == WOOD else V._smooth( 0.24, 0.62, wv )
+    woods = forest_mix > 0.01
     if woods:
         species = HOLM if V._fbm( E, N, 30000.0, 2, 0.5, 503, wP, grads ) + 0.6 * south - 0.5 * V._smooth( 0.0, 4000.0, z ) > 0.15 else OAK
         if d > 42000.0 and z > 3000.0:
             species = BEECH
-        cover = min( max( 0.86 + 0.12 * q2 - 0.25 * V._smooth( 0.7, 1.3, slope ), 0.55 ), 0.96 )
+        cover = forest_mix * min( max( 0.78 + 0.18 * q1 + 0.13 * q2 - 0.25 * V._smooth( 0.7, 1.3, slope ), 0.35 ), 0.94 )
         t0, n0 = species, -math.log( 1.0 - cover ) / ( math.pi * TREES[species, 0] * TREES[species, 0] )
-        t1, n1, a1, t2, n2 = -1, 0.0, 0.0, -1, 0.0
-        wt = 1.0 + 0.1 * q2 + 0.08 * q3
-        r, g, b = WOOD_FLOOR[0] * wt, WOOD_FLOOR[1] * wt, WOOD_FLOOR[2] * wt
+        n1 *= 1.0 - forest_mix
+        a1 *= 1.0 - forest_mix
+        t2, n2 = SHRUB, 24.0 / HECTARE * forest_mix
+        wt = 1.0 + 0.25 * q1 + 0.15 * q2 + 0.08 * q3
+        r, g, b = _mix( r, WOOD_FLOOR[0] * wt, forest_mix ), _mix( g, WOOD_FLOOR[1] * wt, forest_mix ), _mix( b, WOOD_FLOOR[2] * wt, forest_mix )
         kind = GRASS
 
     # Too steep for fields: scrub, then rock. Woods hold on to steep slopes until the rock comes through.
@@ -691,16 +687,10 @@ def _use( e, n, E, N, s, w, wP, z, gx, gy, d, crop, ang, fid, fu, fv, dl, dr, db
             micro += sharp * TERRACE_STEP * ( profile - f )
             hl = _h( level, 0, 8101 )
             pick = _u( hl, 1 )
-            if pick < 0.6:
-                tr, tg, tb = DRY_GRASS[0], DRY_GRASS[1], DRY_GRASS[2]
-                kind = GRASS
-            elif pick < 0.85:
-                tr, tg, tb = SOIL_COLOUR[0], SOIL_COLOUR[1], SOIL_COLOUR[2]
-                kind = SOIL
-            else:
-                tr, tg, tb = GREEN_GRASS[0], GREEN_GRASS[1], GREEN_GRASS[2]
-                kind = GRASS
-            tt = 1.0 + 0.08 * q2 + 0.07 * q3
+            green = min( max( 0.25 + 0.18 * pick + 0.22 * q1 + 0.15 * q2, 0.0 ), 1.0 )
+            tr, tg, tb = _mix( DRY_GRASS[0], GREEN_GRASS[0], green ), _mix( DRY_GRASS[1], GREEN_GRASS[1], green ), _mix( DRY_GRASS[2], GREEN_GRASS[2], green )
+            kind = GRASS
+            tt = 1.0 + 0.14 * q2 + 0.1 * q3
             r, g, b = tr * tt, tg * tt, tb * tt
             if kind == GRASS:
                 r, g, b = _flowers( e, n, w, 0.03, MEADOW_FLOWERS, r, g, b )
@@ -771,11 +761,10 @@ def _site( e, n, grads ):
 
 
 @numba.njit( cache=True, fastmath=True )
-def _field_crop( E, N, ang, fid, dl, dr, db, dt, region, grads ):
-    """ A field's crop, by the land at its middle. """
-    du, dv = 0.5 * ( dr - dl ), 0.5 * ( dt - db )
+def _field_crop( cu, cv, de, dn, ang, fid, region, grads ):
+    """ A field's crop from its fixed site, independent of the current texel or sampling resolution. """
     ca, sa = math.cos( ang ), math.sin( ang )
-    ec, nc = _real_place( E + du * ca - dv * sa, N + du * sa + dv * ca )
+    ec, nc = _real_place( de + cu * ca - cv * sa, dn + cu * sa + cv * ca )
     zc = V._height( ec, nc, 800.0, grads )
     gxc = ( V._height( ec + 400.0, nc, 800.0, grads ) - zc ) / 400.0
     gyc = ( V._height( ec, nc + 400.0, 800.0, grads ) - zc ) / 400.0
@@ -829,9 +818,9 @@ def _paint( es, ns, Z, GX, GY, w, grads, ground, kind, micro, over, alpha, shade
                 region = _region( dh, de, dn, grads )
                 last_dh = dh
             u, v, ang = _frame( E, N, dh, de, dn, grads )
-            fid, fu, fv, dl, dr, db, dt, kl, kr, kb, kt = _cell( u, v, dh )
+            fid, fu, fv, dl, dr, db, dt, kl, kr, kb, kt, cu, cv = _cell( u, v, dh )
             if fid != last_fid:
-                crop = _field_crop( E, N, ang, fid, dl, dr, db, dt, region, grads )
+                crop = _field_crop( cu, cv, de, dn, ang, fid, region, grads )
                 last_fid = fid
             res = _use( e, n, E, N, s, w, wP, Z[row, col], GX[row, col], GY[row, col], d, crop, ang, fid, fu, fv,
                         dl, dr, db, dt, kl, kr, kb, kt, grads )
@@ -877,8 +866,8 @@ def _decide( e, n, grads ):
     dh, de, dn = _district( E, N )
     region = _region( dh, de, dn, grads )
     u, v, ang = _frame( E, N, dh, de, dn, grads )
-    fid, fu, fv, dl, dr, db, dt, kl, kr, kb, kt = _cell( u, v, dh )
-    crop = _field_crop( E, N, ang, fid, dl, dr, db, dt, region, grads )
+    fid, fu, fv, dl, dr, db, dt, kl, kr, kb, kt, cu, cv = _cell( u, v, dh )
+    crop = _field_crop( cu, cv, de, dn, ang, fid, region, grads )
     res = _use( e, n, E, N, s, DECIDE_W, DECIDE_W * sigma, z, gx, gy, d, crop, ang, fid, fu, fv, dl, dr, db, dt,
                 kl, kr, kb, kt, grads )
     return s, z, res
@@ -914,9 +903,9 @@ def _candidates( layer, g, i0, j0, out, dmin, dmax, Z, e0, n0, we, wn, w, grads 
                 region = _region( dh, de, dn, grads )
                 last_dh = dh
             u, v, ang = _frame( E, N, dh, de, dn, grads )
-            fid, fu, fv, dl, dr, db, dt, kl, kr, kb, kt = _cell( u, v, dh )
+            fid, fu, fv, dl, dr, db, dt, kl, kr, kb, kt, cu, cv = _cell( u, v, dh )
             if fid != last_fid:
-                crop = _field_crop( E, N, ang, fid, dl, dr, db, dt, region, grads )
+                crop = _field_crop( cu, cv, de, dn, ang, fid, region, grads )
                 last_fid = fid
             res = _use( e, n, E, N, s, DECIDE_W, DECIDE_W * sigma, z, gx, gy, d, crop, ang, fid, fu, fv, dl, dr, db, dt,
                         kl, kr, kb, kt, grads )
@@ -1541,7 +1530,7 @@ def write_details( out_dir ):
         Image.fromarray( detail( name, seed=seed ), "RGB" ).save( out_dir / f"detail_{name}.png", optimize=True )
 
 
-def vmat_text():
+def vmat_text( resource_dir=RESOURCE_DIR ):
     """ The material. A texture's key is its CreateInputTexture2D's name in hc1_vista.shader, as it stands (ColorA, not
     TextureColorA): a key the shader has no input for is dropped, and the material compiles with the input's default
     texture. Until 2026-10-04 the keys had a Texture prefix, so the land drew plain white in the engine. """
@@ -1555,11 +1544,11 @@ def vmat_text():
               '    g_flDetailNormal "0.800"', '    g_flDetailAlbedo "0.700"' ]
     for zone, _ in ZONES:
         z = zone.upper()
-        lines += [ f'    Color{z} "{RESOURCE_DIR}/vista_{zone}_color.jpg"',
-                   f'    Kind{z} "{RESOURCE_DIR}/vista_{zone}_kind.png"',
-                   f'    Normal{z} "{RESOURCE_DIR}/vista_{zone}_normal.jpg"' ]
+        lines += [ f'    Color{z} "{resource_dir}/vista_{zone}_color.jpg"',
+                   f'    Kind{z} "{resource_dir}/vista_{zone}_kind.png"',
+                   f'    Normal{z} "{resource_dir}/vista_{zone}_normal.jpg"' ]
     for name in ( "Grass", "Soil", "Stone" ):
-        lines.append( f'    Detail{name} "{RESOURCE_DIR}/detail_{name.lower()}.png"' )
+        lines.append( f'    Detail{name} "{resource_dir}/detail_{name.lower()}.png"' )
     text = "\n".join( lines + [ "}", "" ] )
     inputs = set( re.findall( r"CreateInputTexture2D\(\s*(\w+)", SHADER.read_text( encoding="utf-8" ) ) )
     keys = set( re.findall( r'^    (\w+) "[^"]+\.(?:jpg|png)"$', text, re.M ) )
@@ -1683,12 +1672,14 @@ def main():
     parser.add_argument( "--size", type=int, default=COLOUR_SIZE )
     parser.add_argument( "--zones" )
     parser.add_argument( "--out", type=Path, default=OUT_DIR )
+    parser.add_argument( "--resource-dir", default=RESOURCE_DIR, help="Engine asset directory for a staged material" )
     parser.add_argument( "--sheet", type=Path )
     parser.add_argument( "--preview", type=Path )
     parser.add_argument( "--views", nargs="*" )
     parser.add_argument( "--no-props", action="store_true",
                          help="leave the vista's buildings and trees out: their ground, their shadows and --preview" )
     args = parser.parse_args()
+    numba.set_num_threads( min( 4, numba.get_num_threads() ) )
     if args.zones is None:
         args.zones = "" if args.preview else "abcd"
     args.out.mkdir( parents=True, exist_ok=True )
@@ -1700,7 +1691,7 @@ def main():
         inner = margin * ( 1.0 - ZONE_BLEND )
     write_details( args.out )
     vmat = args.out / f"{MATERIAL}.vmat"
-    text = vmat_text()
+    text = vmat_text( args.resource_dir )
     if not vmat.exists() or vmat.read_text( encoding="utf-8" ) != text:
         vmat.write_text( text, encoding="utf-8", newline="\n" )
     if args.sheet:

@@ -28,6 +28,7 @@ public sealed class ResetBalance : Component,
 
 	void IGameEventHandler<EnterStateEvent>.OnGameEvent( EnterStateEvent eventArgs )
 	{
+		LightweightBotManager.Instance?.ResetTacticalCash( Value );
 		foreach ( var player in GameUtils.PlayerPawns )
 		{
 			player.Client.SetCash( Value );
@@ -62,6 +63,7 @@ public sealed class GiveTeamIncome : Component,
 
 		Scene.Dispatch( incomeEventArgs );
 
+		LightweightBotManager.Instance?.GiveTacticalTeamIncome( Team, incomeEventArgs.Value );
 		foreach ( var player in GameUtils.GetPlayers( Team ) )
 		{
 			player.GiveCash( incomeEventArgs.Value );

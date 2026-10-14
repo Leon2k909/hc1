@@ -1,0 +1,9 @@
+// Tools/belltower_quality_materials.py; sources: Sources/Belltower/scans/manifest.json
+"Layer0"
+{
+    shader "shaders/belltower_plants.shader"
+    TexturePlants "materials/belltower/generated/window-plants-v1.png"
+    F_ALPHA_TEST "1"
+    g_flAlphaTestReference "0.5"
+    g_flAntiAliasedEdgeStrength "1"
+}

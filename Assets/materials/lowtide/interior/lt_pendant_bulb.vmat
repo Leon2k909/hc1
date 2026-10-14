@@ -1,0 +1,19 @@
+// A warm opal bulb inside the enamel shade.
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    F_SELF_ILLUM "1"
+    TextureSelfIllumMask "[1 1 1 0]"
+    g_flSelfIllumBrightness "1.7"
+    g_flSelfIllumAlbedoFactor "1.0"
+    g_vSelfIllumTint "[1 0.94 0.83 0]"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0"
+    TextureColor "materials/railhead/rw_lamp_warm_color.png"
+    TextureNormal "materials/railhead/lamps_normal.png"
+    TextureRoughness "materials/railhead/lamps_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1"
+}

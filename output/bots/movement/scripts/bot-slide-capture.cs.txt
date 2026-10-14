@@ -1,0 +1,28 @@
+var folder="D:/Documents/s&box projects/hc1/forked-shooter-main/output/bots/movement";
+var cameraBefore=Game.ActiveScene.Camera;
+GameObject cameraObject=null;
+try {
+    using(Game.ActiveScene.Push()) cameraObject=new GameObject(false,"Temporary bot QA camera");
+    cameraObject.Flags|=GameObjectFlags.NotSaved|GameObjectFlags.NotNetworked;
+    var camera=cameraObject.AddComponent<CameraComponent>();
+    camera.FieldOfView=50f; camera.ZNear=1f;
+    for(var i=0;i<200;i++) {
+        cancellationToken.ThrowIfCancellationRequested();
+        var bot=Game.ActiveScene.GetAllComponents<Facepunch.LightweightCombatBot>().FirstOrDefault(x=>x.IsAlive && x.IsSliding && x.SlideBlend>.9f);
+        if(bot is not null) {
+            camera.WorldPosition=bot.WorldPosition+bot.WorldRotation.Right*120f+Vector3.Up*42f;
+            camera.WorldRotation=Rotation.LookAt(bot.WorldPosition+Vector3.Up*27f+bot.WorldRotation.Forward*5f-camera.WorldPosition);
+            using var bitmap=new Bitmap(1280,720); camera.RenderToBitmap(bitmap);
+            var file=System.IO.Path.Combine(folder,"live-slide.png"); System.IO.File.WriteAllBytes(file,bitmap.ToPng());
+            var body=bot.Renderer;
+            var hand=body.SceneModel.GetBoneWorldTransform(body.Model.Bones.GetBone("hand_R").Index);
+            var gun=bot.GameObject.GetComponentInChildren<Facepunch.WorldModel>();
+            return new { bot.BotName,bot.SlideBlend,Speed=bot.Agent.Velocity.WithZ(0f).Length,Image=file,
+                Pelvis=body.SceneModel.GetBoneWorldTransform(body.Model.Bones.GetBone("pelvis").Index).Position-bot.WorldPosition,
+                WeaponMountError=gun is null?-1f:gun.WorldPosition.Distance(hand.ToWorld(Facepunch.MilitaryUniform.WeaponHandOffset(body.Model)).Position),
+                MainCameraUnchanged=Game.ActiveScene.Camera==cameraBefore };
+        }
+        await Task.Delay(100,cancellationToken);
+    }
+    return new {SlideSeen=false,MainCameraUnchanged=Game.ActiveScene.Camera==cameraBefore};
+} finally {cameraObject?.Destroy();}

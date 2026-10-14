@@ -5,7 +5,7 @@ public enum WeatherKind
 	Clear,
 	/// <summary> Drizzle: fine drops under 0.5 mm, 0.2-0.8 mm/h. </summary>
 	Drizzle,
-	/// <summary> Steady rain from a stratiform deck: 2-6 mm/h for the whole match. </summary>
+	/// <summary> Steady rain from a passing stratiform deck: 2-6 mm/h. </summary>
 	Steady,
 	/// <summary> Showers from convective cells: dry gaps, then a few minutes of up to 40 mm/h. </summary>
 	Showers,
@@ -27,8 +27,30 @@ public sealed class Weather : Component
 	/// <summary> A rain rate (mm/h) that dev_weather set in place of the schedule, or below 0 for none. </summary>
 	[Sync( SyncFlags.FromHost )] public float ForcedRate { get; set; } = -1f;
 
-	/// <summary> The share of matches that have rain. </summary>
+	/// <summary> The share of outdoor matches that have rain, distributed across each map's matches. </summary>
 	public const float RainChance = 0.25f;
+
+	private static readonly Dictionary<string, RainCycle> MatchRain = new( StringComparer.OrdinalIgnoreCase );
+
+	// Sample without replacement: keep the same rain share without arbitrarily long clear streaks.
+	private sealed class RainCycle
+	{
+		private int _remaining;
+		private bool _rainRemaining;
+
+		public bool Next( System.Random random )
+		{
+			if ( _remaining == 0 )
+			{
+				_remaining = (int)(1f / RainChance);
+				_rainRemaining = true;
+			}
+			var rain = _rainRemaining && random.Next( _remaining ) == 0;
+			_remaining--;
+			if ( rain ) _rainRemaining = false;
+			return rain;
+		}
+	}
 
 	/// <summary> If the map hasn't loaded by then, the weather is rolled anyway. </summary>
 	private const float MapLoadTimeout = 60f;
@@ -44,6 +66,12 @@ public sealed class Weather : Component
 
 	public bool IsRaining => Kind != WeatherKind.Clear;
 
+	/// <summary> The cloud front's progress, including its approach before the first rain and its clearing afterwards. </summary>
+	public float OvercastAmount => Kind == WeatherKind.Clear ? 0f : ForcedRate >= 0f ? 1f : Schedule.OvercastAt( Kind, Seed, Elapsed );
+
+	/// <summary> Slow changes in fair-weather cloud cover, shared by every client. </summary>
+	public float CloudCover => Schedule.CloudCoverAt( Seed, Elapsed );
+
 	private bool _rolled;
 	private TimeSince _sinceStart;
 	private RainView _view;
@@ -53,6 +81,7 @@ public sealed class Weather : Component
 
 	private Vector3? _calmWind;
 	private float _calmGust;
+	private WeatherKind? _windKind;
 
 	protected override void OnStart()
 	{
@@ -68,10 +97,17 @@ public sealed class Weather : Component
 
 	protected override void OnUpdate()
 	{
-		if ( !IsProxy && !_rolled && (MapsLoaded() || _sinceStart > MapLoadTimeout) )
+		if ( !IsProxy && !_rolled && ((_sinceStart > 1f && MapsLoaded()) || _sinceStart > MapLoadTimeout) )
 			Roll();
 
-		if ( !Application.IsDedicatedServer && !_view.IsValid() && IsRaining )
+		if ( !IsProxy && _rolled )
+		{
+			var windKind = OvercastAmount > 0.1f ? Kind : WeatherKind.Clear;
+			if ( _windKind != windKind ) SetWind( windKind );
+		}
+
+		// A clear match still has slowly changing cloud cover and daylight. Rain effects are created only when needed.
+		if ( !Application.IsDedicatedServer && !_view.IsValid() && (IsRaining || HasSky()) )
 		{
 			var go = new GameObject( Scene, true, "Rain" );
 			go.Flags |= GameObjectFlags.NotSaved | GameObjectFlags.NotNetworked;
@@ -93,7 +129,7 @@ public sealed class Weather : Component
 	private bool MapsLoaded() => Scene.GetAllComponents<MapInstance>().All( m => !m.Active || m.IsLoaded );
 
 	/// <summary> Somewhere with no sky (Reef Hall) never rains. </summary>
-	private bool HasSky() => Scene.GetAllComponents<SkyBox2D>().Any()
+	private bool HasSky() => Scene.GetAllComponents<SkyBox2D>().Any( sky => sky.Active )
 		|| Scene.SceneWorld.SceneObjects.OfType<SceneSkyBox>().Any();
 
 	private void Roll()
@@ -101,9 +137,13 @@ public sealed class Weather : Component
 		_rolled = true;
 		Seed = Random.Shared.Next();
 		Elapsed = 0;
-		if ( !HasSky() || Random.Shared.NextSingle() >= RainChance )
+		var hasSky = HasSky();
+		var map = Scene.Source?.ResourcePath ?? Scene.Name;
+		if ( !MatchRain.TryGetValue( map, out var cycle ) ) MatchRain[map] = cycle = new RainCycle();
+		if ( !hasSky || !cycle.Next( Random.Shared ) )
 		{
-			Kind = WeatherKind.Clear;
+			Set( WeatherKind.Clear, -1f );
+			Log.Info( $"Weather: Clear ({map})" );
 			return;
 		}
 
@@ -138,6 +178,7 @@ public sealed class Weather : Component
 	{
 		var wind = WorldWind.Ensure( Scene );
 		if ( !wind.IsValid() ) return;
+		_windKind = kind;
 
 		if ( kind == WeatherKind.Clear )
 		{
@@ -183,23 +224,48 @@ public sealed class Weather : Component
 
 		/// <summary>
 		/// The rate at <paramref name="time"/> seconds into the match. It's rained before the match too (negative times),
-		/// so the ground is as wet as that left it (<see cref="RainPuddles"/>): drizzle and steady rain set in 10 minutes
-		/// to 2 hours before, and showers have often had one in the last hour.
+		/// so the ground is as wet as that left it (<see cref="RainPuddles"/>). Half the drizzle and steady fronts are
+		/// already present; the others arrive during play. Showers have often had one in the last hour.
 		/// </summary>
 		public static float RateAt( WeatherKind kind, int seed, float time ) => kind switch
 		{
 			// Drizzle and stratiform rain come and go slowly, with the deck's own lumps.
-			WeatherKind.Drizzle => MathX.Lerp( 0.2f, 0.8f, Hash01( seed, 1 ) ) * Wander( seed, time, 0.3f ) * SetIn( seed, time ),
-			WeatherKind.Steady => MathX.Lerp( 2f, 6f, Hash01( seed, 2 ) ) * Wander( seed, time, 0.35f ) * SetIn( seed, time ),
+			WeatherKind.Drizzle => MathX.Lerp( 0.2f, 0.8f, Hash01( seed, 1 ) ) * Wander( seed, time, 0.3f ) * FrontAt( seed, time ),
+			WeatherKind.Steady => MathX.Lerp( 2f, 6f, Hash01( seed, 2 ) ) * Wander( seed, time, 0.35f ) * FrontAt( seed, time ),
 			WeatherKind.Showers => ShowerRate( seed, time ),
 			_ => 0f,
 		};
 
-		/// <summary> When a front's rain set in, before the match: 10 minutes to 2 hours. </summary>
-		public static float RainStart( int seed ) => -MathX.Lerp( 600f, 7200f, Hash01( seed, 6 ) );
+		/// <summary> Half of fronts are already here; the others arrive 1.5-5 minutes into the match. </summary>
+		public static float RainStart( int seed ) => Hash01( seed, 11 ) < 0.5f
+			? -MathX.Lerp( 600f, 7200f, Hash01( seed, 6 ) )
+			: MathX.Lerp( 90f, 300f, Hash01( seed, 12 ) );
 
-		/// <summary> 0 before the rain set in, coming in over its first five minutes. </summary>
-		private static float SetIn( int seed, float time ) => RainView.SmoothStep( RainStart( seed ), RainStart( seed ) + 300f, time );
+		private static float RainEnd( int seed ) => MathX.Lerp( 480f, 840f, Hash01( seed, 13 ) );
+
+		/// <summary> Rain builds over two minutes and eases off over three, after 8-14 minutes of match time. </summary>
+		private static float FrontAt( int seed, float time ) =>
+			RainView.SmoothStep( RainStart( seed ), RainStart( seed ) + 120f, time )
+			* (1f - RainView.SmoothStep( RainEnd( seed ), RainEnd( seed ) + 180f, time ));
+
+		public static float OvercastAt( WeatherKind kind, int seed, float time ) => kind switch
+		{
+			WeatherKind.Drizzle or WeatherKind.Steady =>
+				RainView.SmoothStep( RainStart( seed ) - 120f, RainStart( seed ) + 30f, time )
+				* (1f - RainView.SmoothStep( RainEnd( seed ) + 180f, RainEnd( seed ) + 300f, time )),
+			WeatherKind.Showers => 1f,
+			_ => 0f,
+		};
+
+		/// <summary> A smooth change between cloud banks over 5-8 minutes, with no steps at interval boundaries. </summary>
+		public static float CloudCoverAt( int seed, float time )
+		{
+			var period = MathX.Lerp( 300f, 480f, Hash01( seed, 14 ) );
+			var phase = time / period;
+			var interval = (int)MathF.Floor( phase );
+			var k = RainView.SmoothStep( 0f, 1f, phase - interval );
+			return MathX.Lerp( 0.15f, 0.75f, MathX.Lerp( Hash01( seed, 100 + interval ), Hash01( seed, 101 + interval ), k ) );
+		}
 
 		/// <summary> 1 give or take <paramref name="amount"/>, wandering over ten minutes, three and under one. </summary>
 		private static float Wander( int seed, float time, float amount )
@@ -331,6 +397,7 @@ public sealed class Weather : Component
 				{
 					for ( var t = 60f + 120f * random.NextSingle(); t < 4 * 3600f; t += 180f + 180f * random.NextSingle() )
 					{
+						if ( FrontAt( seed, t ) <= 0f ) continue;
 						var bearing = steering + (random.NextSingle() - 0.5f) * 2f;
 						strikes.Add( new Strike( t, 6000f + 9000f * random.NextSingle(), bearing, random.NextSingle() < 0.8f, random.Next() ) );
 					}

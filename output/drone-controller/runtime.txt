@@ -1,0 +1,9 @@
+Player 818d353d-2fbd-4c98-945f-5d84fbb9c299 local=True piloting=False position=328.5863,-1345.479,0.0313 eye=Pitch = 5.53, Yaw = 618.59, Roll = 0.00 model=models/citizen_human/citizen_human_male.vmdl
+Hold active=True position=322.107,-1355.708,39.444 local=pos 5.8086,-4.2727,-2.6322, rot 0.6063,-0.08007,0.07168,-0.78794, scale 1,1,1 parent=hand_R
+Equipment weapons/m18/m18.equip current=False deployed=False wm=False active= position= local= parent=
+Equipment weapons/throwable/molotov_cocktail/molotov_grenade.equip current=False deployed=False wm=False active= position= local= parent=
+Equipment weapons/knife/knife.equip current=False deployed=False wm=False active= position= local= parent=
+Equipment weapons/rpk16/rpk16.equip current=True deployed=True wm=True active=True position=322.107,-1355.708,39.444 local=pos 0,0,0, rot 0,0,0,1, scale 1,1,1 parent=WeaponHold
+Renderer active=True model=weapons/rpk16/w_rpk16.vmdl game=True render=On tags=viewer, player, noblockaudio
+hand_R pos 320.2466,-1349.35,43.3218, rot -0.47602,0.59554,0.51176,-0.39602, scale 1,1,1
+hand_L pos 322.6619,-1362.87,41.063, rot -0.1442,0.00792,0.98892,-0.03436, scale 1,1,1

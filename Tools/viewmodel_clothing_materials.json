@@ -1,0 +1,24 @@
+{
+  "generated_with": "built-in image_gen",
+  "date": "2026-10-14",
+  "assets": [
+    {
+      "path": "Assets/materials/operators/first_person/fp_army_shirt_color.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "prompt": "Use case: precise-object-edit.\nAsset type: square UV albedo texture atlas for a real-time first-person military shirt, not a picture of a shirt.\nInput image 1 is the edit target: an existing 1024x1024 UV atlas. Restore it at 2048x2048 with much clearer material detail. Keep the exact normalized UV layout, every island boundary, seam, pocket, cuff, button and patch at its existing position; do not move, resize, rearrange or recompose anything. Preserve all existing camouflage blobs and their shapes, the subdued green/tan/brown palette, the folds, and the existing small text/patch designs. Restore sharp continuous seam stitching, realistic tightly woven cotton/ripstop cloth, and crisp cuff/button edges. Add subtle fine woven fibre detail that reads at a first-person close-up; restrained realistic wear, no noisy grunge or oversharpening halos. This is a flat texture scan in uniform diffuse light: no perspective, no environment, no new objects, no dramatic reflections or lighting, no labels or watermark. Avoid changing the outfit design or turning the atlas into a rendered garment. Output the full square atlas edge-to-edge at 2048x2048, opaque."
+    },
+    {
+      "path": "Assets/materials/operators/first_person/fp_fingerless_gloves_color.png",
+      "runtime_albedo": "Assets/materials/operators/first_person/fp_fingerless_gloves_albedo.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "prompt": "Use case: precise-object-edit.\nAsset type: square UV albedo texture atlas for first-person brown fingerless leather gloves in a real-time game. Input image 1 is the edit target: an existing 512x512 RGBA UV atlas, not a reference for a rendered glove.\nReconstruct a sharper high-detail version of this exact atlas. Preserve the normalized positions and contours of ALL UV islands, every cutout, hole, cuff strap, stitch line, leather panel and edge. Preserve the original transparency mask including the round finger openings and narrow gaps; keep all transparent areas genuinely transparent. Do not rearrange, move, rotate or crop the texture pieces. Retain the existing subdued dark brown colour, panel design and diffuse shading. Improve material fidelity with fine natural leather grain, clean sharp stitching and realistic restrained wear; replace the muddy smeared grunge with coherent close-up leather detail. Keep the grain fine and the stitching at exactly its existing locations. Flat diffuse albedo only: no perspective, no added scene or objects, no metallic highlights, no new decoration, no text or watermark. The output must remain a usable UV atlas that fits the existing mesh and normal map. Full square edge-to-edge RGBA output, ideally 2048x2048.",
+      "runtime_alpha": "Original 512x512 garment opacity resampled in the native editor to preserve finger openings and UV gutters."
+    }
+  ]
+}

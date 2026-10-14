@@ -124,7 +124,9 @@ def deck_surface(model, e0, e1, n0, n1, z=0):
     for k in range(count):
         a, b = rows[order[k]]
         u0, u1 = .5 / atlas, (image.shape[1] - .5) / atlas
-        v0, v1 = (a + .5) / atlas, (b + .5) / atlas
+        # OBJ import flips V. Compensate here so every board samples its actual
+        # scanned row rather than the edge-padded bottom half of the atlas.
+        v0, v1 = 1 - (a + .5) / atlas, 1 - (b + .5) / atlas
         if rng.random() < .5:
             u0, u1 = u1, u0
         if rng.random() < .5:

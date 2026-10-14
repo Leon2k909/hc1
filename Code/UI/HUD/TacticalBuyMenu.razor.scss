@@ -1,0 +1,74 @@
+@import "/UI/Styles/Theme.scss";
+
+TacticalBuyMenu {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 105;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    font-family: $main-font;
+    color: white;
+
+    &.visible {
+        pointer-events: all;
+        cursor: default;
+        background-color: rgba( black, 0.55 );
+        backdrop-filter: blur( 6px );
+    }
+
+    .window {
+        width: 1080px;
+        height: 650px;
+        flex-direction: column;
+        background-color: rgba( 12, 12, 14, 0.96 );
+        border: 1px solid rgba( white, 0.14 );
+        border-radius: $rounding;
+    }
+
+    .head {
+        align-items: center;
+        gap: 24px;
+        padding: 22px 26px;
+        border-bottom: 1px solid rgba( white, 0.12 );
+    }
+
+    .titles { flex-direction: column; flex-grow: 1; gap: 4px; }
+    .heading { font-size: 30px; font-weight: 700; letter-spacing: 2px; }
+    .subheading { font-size: 14px; color: rgba( white, 0.6 ); }
+    .balance { color: $main-color; font-size: 30px; font-weight: 700; }
+    .timer { font-size: 16px; }
+    .close { align-items: center; gap: 8px; padding: 10px; cursor: pointer; font-size: 12px; }
+    .close:hover { background-color: rgba( white, 0.1 ); }
+
+    .body { flex-grow: 1; min-height: 0; }
+    .categories { width: 190px; padding: 20px 0; flex-direction: column; border-right: 1px solid rgba( white, 0.12 ); }
+    .category { padding: 16px 24px; font-size: 18px; font-weight: 600; border-left: 3px solid transparent; cursor: pointer; }
+    .category:hover { background-color: rgba( white, 0.06 ); }
+    .category.selected { border-left-color: $main-color; color: $main-color; background-color: rgba( white, 0.06 ); }
+
+    .items { flex-grow: 1; flex-wrap: wrap; align-content: flex-start; gap: 12px; padding: 24px; overflow-y: scroll; }
+    .item {
+        width: 264px;
+        height: 128px;
+        flex-shrink: 0;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 16px;
+        gap: 5px;
+        background-color: rgba( white, 0.045 );
+        border: 1px solid rgba( white, 0.1 );
+        cursor: pointer;
+    }
+    .item:hover { background-color: rgba( white, 0.09 ); border-color: rgba( $main-color, 0.5 ); }
+    .item.unavailable { opacity: 0.45; cursor: default; }
+    .weapon-icon { height: 46px; width: 100%; background-size: contain; background-position: left center; background-repeat: no-repeat; }
+    .name { font-size: 19px; font-weight: 600; }
+    .price { font-size: 16px; color: $main-color; }
+    .foot { justify-content: space-between; padding: 18px 26px; font-size: 14px; color: rgba( white, 0.6 ); border-top: 1px solid rgba( white, 0.12 ); }
+    .feedback { color: $main-color; }
+    .feedback.failed { color: #ff5a4f; }
+}

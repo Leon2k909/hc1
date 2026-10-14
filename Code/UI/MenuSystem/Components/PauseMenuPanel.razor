@@ -72,6 +72,11 @@
         if ( Input.EscapePressed )
         {
             Input.EscapePressed = false;
+            if ( TacticalBuyMenu.IsAnyOpen )
+            {
+                TacticalBuyMenu.Instance.Close();
+                return;
+            }
             if ( !LanguageMenu.CloseAny() && !GunsmithPanel.HandleEscapeAny()
                 && !(IsOpen && MenuRoot?.CloseSocialPopup() == true) )
                 SetOpen( !IsOpen );

@@ -6,7 +6,7 @@ namespace Facepunch;
 /// Duck isn't held). A tap is enough: letting go of Duck doesn't stop it. Press Duck again to cancel it and stand straight
 /// back into the sprint. Jump ends it in a jump that keeps the speed, Prone ends it on the floor. Duck pressed just before
 /// landing from a sprint slides as you land. Downhill keeps it going and uphill stops it sooner. Only the owner moves the
-/// pawn; everyone else sees it crouched (<see cref="IsSliding"/> holds the crouch) and hears it go down.
+/// pawn; everyone else sees the third-person hip slide and hears it go down.
 /// </summary>
 public partial class PlayerPawn
 {
@@ -59,10 +59,10 @@ public partial class PlayerPawn
 	/// <summary>The share of the slope's pull a slide gets: downhill keeps it going, uphill stops it sooner.</summary>
 	private const float SlideSlopeHelp = 0.5f;
 
-	/// <summary>Down on one hip, sliding. The body is crouched, footsteps are silent and the gun dips a little.</summary>
+	/// <summary>Down on one hip, sliding. Holds crouched movement, silences footsteps and drives the third-person pose.</summary>
 	[Sync] public bool IsSliding { get; private set; }
 
-	/// <summary>0 to 1, eased in and out with <see cref="IsSliding"/> on every machine: the viewmodel follows it.</summary>
+	/// <summary>0 to 1, eased in and out with <see cref="IsSliding"/> on every machine: the viewmodel and third-person pose follow it.</summary>
 	public float SlideBlend { get; private set; }
 
 	private TimeSince _slideTime;

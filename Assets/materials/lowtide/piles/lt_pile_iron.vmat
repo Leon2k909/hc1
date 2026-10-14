@@ -1,0 +1,12 @@
+// Formed iron retaining straps.
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "materials/lowtide/marine/paint_color.png"
+    TextureNormal "materials/lowtide/marine/paint_normal.png"
+    TextureRoughness "[0.67 0.67 0.67 0]"
+    TextureMetalness "[0.5 0.5 0.5 0]"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.50 0.48 0.43 1]"
+}

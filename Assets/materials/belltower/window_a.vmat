@@ -1,14 +1,10 @@
-// Tools/belltower_fronts.py
+// Tools/belltower_quality_materials.py; sources: Sources/Belltower/scans/manifest.json
 "Layer0"
 {
-    shader "shaders/complex.shader"
-    F_SPECULAR "1"
-    g_flRoughnessScaleFactor "1"
-    g_flMetalness "0.00"
-    TextureColor "materials/belltower/window_a_color.png"
-    TextureNormal "materials/belltower/window_a_normal.png"
-    TextureRoughness "materials/belltower/window_a_rough.png"
-    TextureAmbientOcclusion "materials/belltower/window_a_ao.png"
-    g_vColorTint "[1.0 1.0 1.0 1.0]"
-    g_flModelTintAmount "1.0"
+    shader "shaders/belltower_window.shader"
+    TextureRoomBack "materials/belltower/window_a_color.png"
+    TextureRoomWall "materials/belltower/scans/white_plaster_rough_01_diffuse_4k.png"
+    g_flRoomDepth "34"
+    g_flInteriorBrightness "0.13"
+    g_flRoughness "0.16"
 }

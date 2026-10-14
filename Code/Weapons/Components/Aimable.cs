@@ -53,9 +53,10 @@ public partial class Aimable : WeaponInputAction
 
 	/// <summary>
 	/// Aim held through a weapon switch aims the gun switched to. In toggle mode a press held through it would toggle
-	/// the new gun's aim, so that waits for a new press.
+	/// the new gun's aim, so that waits for a new press. A new life also waits for release.
 	/// </summary>
-	protected override bool TakesInputHeldThroughDeploy => !GameSettingsSystem.Current.ToggleAim;
+	protected override bool TakesInputHeldThroughDeploy => !GameSettingsSystem.Current.ToggleAim
+		&& Player.IsValid() && Player.HasReleasedAimSinceRespawn;
 
 	protected override void OnInputDown()
 	{
@@ -75,7 +76,9 @@ public partial class Aimable : WeaponInputAction
 
 	protected virtual bool CanAim()
 	{
-		if ( Player.IsValid() && Player.IsPipeClimbing ) return false;
+		if ( !Player.IsValid() || !Player.HealthComponent.IsValid()
+			|| Player.HealthComponent.State != LifeState.Alive || !Player.HasReleasedAimSinceRespawn ) return false;
+		if ( Player.IsPipeClimbing ) return false;
 		if ( IsDown() && Equipment.HasTag( "lowered" ) )
 		{
 			Equipment.SetTag( "lowered", false );
@@ -88,9 +91,6 @@ public partial class Aimable : WeaponInputAction
 		if ( !IsAiming && Tags.Has( "no_aiming" ) ) return false;
 		if ( GameUtils.IsGunsmithStudioOpen() ) return false;
 		// if ( Tags.Has( "reloading" ) ) return false;
-
-		if ( !Player.IsValid() )
-			return false;
 
 		// Player controller
 		if ( !IsAiming && Player.Tags.Has( "no_aiming" ) ) return false;

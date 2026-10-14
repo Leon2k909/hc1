@@ -1,0 +1,46 @@
+{
+  "status": "applied_and_visually_checked",
+  "scope": "Six mooring clusters and four discarded Fleet tyres",
+  "generated_sources": [
+    "Sources/Lowtide/visual-target/pile-timber-source.png",
+    "Sources/Lowtide/visual-target/pile-end-source.png"
+  ],
+  "prompt_records": [
+    "Sources/Lowtide/visual-target/pile-timber-imagegen.json",
+    "Sources/Lowtide/visual-target/pile-end-imagegen.json"
+  ],
+  "generation_mode": "built-in image_gen",
+  "validation": [
+    "pile-scope-checks.json",
+    "pile-render-checks.json",
+    "tyre-scope-checks.json",
+    "tyre-render-checks.json",
+    "current-scope-checks.txt"
+  ],
+  "net_added_triangles": 41748,
+  "controlled_performance_benchmark": false,
+  "remaining_qa_scenes": [],
+  "latest_console_cursor": 698,
+  "editor": {
+    "project": "razedtest",
+    "active_scene": "belltower",
+    "playing": false,
+    "unsaved_scene_changes": false,
+    "compile_errors": 0
+  },
+  "captures": [
+    "live-piles-final.png",
+    "live-piles-end.png",
+    "live-tyres-final.png",
+    "live-tyres-low.png",
+    "live-canal-timber-tyres-final.png"
+  ],
+  "audit_note": "The pile report records the pre-tyre Fleet snapshot. The tyre report verifies that snapshot's hashes and the subsequent scoped replacement. Do not rerun the initial staging scripts against applied assets: their original hash guards intentionally reject changed inputs.",
+  "remaining_priorities": [
+    "Stone surface texture stretching visible in live-tyres-low: investigate spherical UV pole compression and excessive apparent grain scale",
+    "Contact lighting and broader indirect illumination",
+    "Coarse quay fender piles outside the six Fleet mooring clusters",
+    "Architectural variation and controlled performance validation"
+  ],
+  "overall_quality_target_met": false
+}

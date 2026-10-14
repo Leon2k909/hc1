@@ -19,6 +19,12 @@ public static partial class GameObjectExtensions
 		}
 		
 		var damaged = false;
+		// A canister has its own hit volume even when its forklift is part of a merged map mesh.
+		if ( go.GetComponentInParent<LpgCanister>() is { } canister )
+		{
+			canister.TakeDamage( damageInfo );
+			return true;
+		}
 		var healthComponent = go.Root.GetComponentInChildren<HealthComponent>();
 		var prop = go.Root.GetComponentInChildren<Prop>();
 

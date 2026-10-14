@@ -12,6 +12,8 @@
 !Tools/BotStanceChecks/BotStanceChecks.csproj
 !Tools/PipeClimbChecks/PipeClimbChecks.csproj
 !Tools/SmokeChecks/SmokeChecks.csproj
+!Tools/SlideChecks/SlideChecks.csproj
+!Tools/TacticalChecks/TacticalChecks.csproj
 obj
 bin
 Properties/*
@@ -27,6 +29,14 @@ Exports/*
 *.generated.*
 *.*_c
 !*.shader_c
+# Engine-baked warehouse probes have no uncompiled texture equivalent.
+!Assets/scenes/maps/[Ll]owtide/lowtide_scene_data/ddgi/warehouse-*-v3/*.vtex_c
+# Engine lighting bakes have no uncompiled texture source.
+!Assets/lighting/belltower/town-bake-v2/*.vtex_c
+!Assets/lighting/belltower/daylight-v3/*.vtex_c
+!Assets/lighting/belltower/daylight-v5/*.vtex_c
+!Assets/lighting/belltower/daylight-v6/*.vtex_c
+!Assets/lighting/belltower/daylight-v7/*.vtex_c
 *.los
 
 *launchSettings.json
@@ -47,3 +57,5 @@ __pycache__/
 /output/lowtide-brick/
 /output/lowtide-water/
 /output/lowtide-bridge/
+/output/slide-validation/
+/output/slide-build.log

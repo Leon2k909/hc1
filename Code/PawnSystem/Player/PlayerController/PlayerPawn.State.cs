@@ -25,6 +25,26 @@ public partial class PlayerPawn
 	/// </summary>
 	[Sync( SyncFlags.FromHost )] public TimeSince TimeSinceLastRespawn { get; private set; }
 
+	/// <summary>Owner input: an aim held through death must be released before the new life can aim.</summary>
+	public bool HasReleasedAimSinceRespawn { get; private set; }
+
+	private void UpdateAimInputAfterRespawn()
+	{
+		if ( !Input.Down( "Attack2" ) ) HasReleasedAimSinceRespawn = true;
+	}
+
+	private void ResetAimInputForRespawn()
+	{
+		HasReleasedAimSinceRespawn = !Input.Down( "Attack2" );
+		if ( !Inventory.IsValid() ) return;
+		foreach ( var equipment in Inventory.Equipment )
+		{
+			equipment.ClearTransientState();
+			foreach ( var action in equipment.GetComponentsInChildren<WeaponInputAction>( true ) )
+				action.ResetInputState();
+		}
+	}
+
 	public override void OnKill( DamageInfo damageInfo )
 	{
 		// How they go down depends on how they stood, so it's worked out before prone and the knockdown are cleared.
@@ -129,8 +149,9 @@ public partial class PlayerPawn
 		if ( Client.IsBot )
 			return;
 
+		ResetAimInputForRespawn();
 		Possess();
-		UsageStats.CountLife();
+		if ( !Facepunch.Gunsmith.FiringRangeSystem.IsActive ) UsageStats.CountLife();
 	}
 
 	public void Teleport( Transform transform )

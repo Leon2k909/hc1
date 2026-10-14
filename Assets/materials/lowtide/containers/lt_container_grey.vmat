@@ -1,0 +1,16 @@
+// Tools/lowtide_container.py: built-in ImageGen, corrugated sheets
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    F_METALNESS_TEXTURE "1"
+    g_flRoughnessScaleFactor "1.0"
+    g_flMetalness "0"
+    TextureColor "materials/lowtide/containers/lt_container_grey_color.png"
+    TextureNormal "materials/lowtide/containers/lt_container_grey_normal.png"
+    TextureRoughness "materials/lowtide/containers/lt_container_grey_roughness.png"
+    TextureMetalness "materials/lowtide/containers/lt_container_grey_metalness.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1.0 1.0 1.0 1.0]"
+    g_flModelTintAmount "1.0"
+}

@@ -84,6 +84,8 @@ def vmat( color, normal, rough, ao ):
 
 
 def write_vmat( name, text ):
+    import belltower_quality_materials
+    text = belltower_quality_materials.material_text( name ) or text
     path = OUT_DIR / f"{name}.vmat"
     if path.exists() and path.read_text( encoding="utf-8" ) == text:
         return

@@ -383,8 +383,8 @@ HubSidebar
     border-top: 2px solid $hub-accent;
     border-radius: 2px;
 
-    // Two columns of modes; the longest, "2V2 SKIRMISH", fits a 164 cell.
-    &.modes { width: 364px; }
+    // Two columns with room for "TACTICAL DEFUSE", its check box and side padding.
+    &.modes { width: 412px; }
 
     &.maps
     {
@@ -456,7 +456,7 @@ HubSidebar
 
 .filter-option
 {
-    width: 164px;
+    width: 188px;
     height: 28px;
     flex-shrink: 0;
     flex-direction: row;
@@ -470,11 +470,15 @@ HubSidebar
 
     label
     {
+        min-width: 0;
+        flex-shrink: 1;
         font-size: 12px;
         font-weight: 700;
         letter-spacing: 2px;
         color: rgba( 255, 255, 255, 0.5 );
         white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
         text-shadow: none;
     }
 

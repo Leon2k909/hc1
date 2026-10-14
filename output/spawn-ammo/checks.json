@@ -1,0 +1,80 @@
+{
+  "Checks": [
+    {
+      "label": "spawn owner has not been possessed",
+      "passed": true,
+      "values": {
+        "IsLocallyControlled": false,
+        "IsLocalPlayer": true
+      }
+    },
+    {
+      "label": "fresh issue uses saved extended magazine without a later refill",
+      "passed": true,
+      "values": {
+        "Ammo": 45,
+        "capacity": 45
+      }
+    },
+    {
+      "label": "fresh issue carries matching reserve magazines",
+      "passed": true,
+      "values": {
+        "ReserveAmmo": 270,
+        "MaxReserve": 270
+      }
+    },
+    {
+      "label": "refreshing a used weapon preserves its ammo",
+      "passed": true,
+      "values": {
+        "Ammo": 7,
+        "ReserveAmmo": 11
+      }
+    },
+    {
+      "label": "increasing magazine capacity does not refill",
+      "passed": true,
+      "values": {
+        "Ammo": 7,
+        "ReserveAmmo": 11
+      }
+    },
+    {
+      "label": "smaller magazine clamps loaded rounds including the chamber",
+      "passed": true,
+      "values": {
+        "Ammo": 31,
+        "Maximum": 31
+      }
+    },
+    {
+      "label": "factory issue starts with factory capacity",
+      "passed": true,
+      "values": {
+        "Ammo": 30,
+        "MaxAmmo": 30
+      }
+    },
+    {
+      "label": "picked-up weapon keeps dropped magazine and reserve ammo",
+      "passed": true,
+      "values": {
+        "Ammo": 7,
+        "ReserveAmmo": 11
+      }
+    },
+    {
+      "label": "another owner's weapon ignores this client's saved attachments",
+      "passed": true,
+      "values": {
+        "IsLocalPlayer": false,
+        "AttachmentMagazineCapacity": 45,
+        "Ammo": 7
+      }
+    }
+  ],
+  "Failures": 0,
+  "ActiveScenePreserved": true,
+  "IsPlaying": true
+}

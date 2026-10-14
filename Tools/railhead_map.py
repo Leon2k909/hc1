@@ -126,7 +126,7 @@ VEHICLES = { "emu": ( 113.4, 182.3, None ), "loco": ( 118.0, 169.0, 772.0 ), "co
 FURNITURE = { "bench": ( 70, 20, 34, "rw_wood", WOOD ), "bin": ( 16, 16, 36, "rw_steel_grey", METAL ),
               "ticket_machine": ( 30, 24, 72, "rw_steel_grey", METAL ), "vending_machine": ( 40, 32, 74, "rw_steel_dark", METAL ),
               "info_pillar": ( 20, 20, 90, "rw_steel_dark", METAL ), "timetable_case": ( 50, 8, 80, "rw_steel_dark", METAL ),
-              "forklift": ( 48, 90, 85, "rw_yellow_paint", METAL ), "car": ( 70, 180, 58, "rw_train_grey", METAL ),
+              "car": ( 70, 180, 58, "rw_train_grey", METAL ),
               "suv": ( 71, 176, 63, "rw_car_grey", METAL ),
               "van": ( 81, 236, 93, "rw_car_white", METAL ), "crate": ( 40, 40, 40, "rw_wood", WOOD ),
               "bollard": ( 8, 8, 36, "rw_steel_dark", METAL ), "luggage_cart": ( 40, 80, 36, "rw_steel", METAL ),
@@ -551,7 +551,7 @@ def trains( m, s ):
 
 def yard( m, s ):
     """ The goods yard: a siding embedded in the paving along the loading bank with a wagon on it, containers, a
-    forklift and pallets. Bomb site B is the east yard's south-east corner, among the containers. """
+    pallets and crates. Bomb site B is the east yard's south-east corner, among the containers. """
     e_siding = s * S.SIDING_E
     use( "track", m, e_siding, -2400.0, -1480.0, 0.0, None, True )
     use( "buffer_stop", m, e_siding, -1620.0, -1, 0.0 )
@@ -564,7 +564,6 @@ def yard( m, s ):
     for k, paint in enumerate( paints ):
         container( m, s * 2138.0, -2140.0, 102.0 * k, "40", "n", paint )
     container( m, s * 2019.0, -1712.0, 0.0, "20", "e", "rw_container_orange" )
-    put( "forklift", m, s * 1950.0, -2050.0, "+n" if s > 0 else "-n" )
     for e, n, layers in ( ( 1890.0, -2300.0, 3 ), ( 1960.0, -1560.0, 2 ) ):
         use( "pallet_stack", m, s * e, n, 0.0, layers, stand_in=furniture_stand_in( "pallet_stack", s * e, n ) )
     for e, n in ( ( 2160.0, -1460.0 ), ( 2160.0, -1418.0 ) ):

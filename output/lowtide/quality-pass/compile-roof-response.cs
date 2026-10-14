@@ -1,0 +1,10 @@
+var session=Editor.SceneEditorSession.Active;
+if(Game.IsPlaying || session?.Scene.Source?.ResourcePath!="scenes/maps/lowtide/lowtide.scene")throw new Exception("Expected Lowtide edit viewport");
+var shader=await Editor.EditorUtility.CompileShader("shaders/hc1_slate.shader",new Sandbox.Engine.Shaders.ShaderCompileOptions(),cancellationToken);
+if(!shader.Success)return new{shader.Success,shader};
+var compiled=Editor.AssetSystem.FindByPath("materials/lowtide/roofs/lt_slate.vmat").Compile(true);
+await Task.Yield();
+var material=Material.Load("materials/lowtide/roofs/lt_slate.vmat");
+var result=new {shader=shader.Success,compiled,material.IsError,tint=material.GetVector4("g_flTintColor"),scale=material.GetVector4("g_vSlateScale"),textures=new[]{"g_tColor","g_tNormal","g_tRma"}.Select(name=>new{name,width=material.GetTexture(name)?.Width,height=material.GetTexture(name)?.Height}).ToArray(),session.HasUnsavedChanges};
+System.IO.File.WriteAllText(System.IO.Path.Combine(Project.Current.GetRootPath(),"output/lowtide/quality-pass/roof-response-native-compile.json"),System.Text.Json.JsonSerializer.Serialize(result,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return result;

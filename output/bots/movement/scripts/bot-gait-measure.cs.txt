@@ -1,0 +1,26 @@
+var scene = new Scene();
+try {
+    using (scene.Push()) {
+        var body = new GameObject(true, "Bot gait measurement").AddComponent<SkinnedModelRenderer>();
+        Facepunch.MilitaryUniform.SetModel(body, Model.Load(Facepunch.MilitaryUniform.HumanModelPath));
+        body.AnimationGraph = AnimationGraph.Load("animgraphs/human_bot.vanmgrph");
+        var results = new System.Collections.Generic.List<object>();
+        foreach (var speed in new[] { 180f, 310f }) foreach (var cap in new[] { 1.1f, 1.25f }) {
+            body.Set("holdtype", (int)Facepunch.AnimationHelper.HoldTypes.Rifle); Facepunch.AnimBools.SetBool(body, "b_grounded", true); body.Set("move_style", 2);
+            body.Set("move_groundspeed", speed); body.Set("move_speed", speed); body.Set("move_x", speed); body.Set("move_y", 0f);
+            body.Set("move_direction", 0f); body.Set("wish_groundspeed", speed); body.Set("wish_speed", speed);
+            body.Set("wish_x", speed); body.Set("wish_y", 0f); body.Set("wish_direction", 0f); body.Set("duck", 0f);
+            foreach (var name in new[] { "_human_walk_rate_per_inch", "_human_run_rate_per_inch", "_human_crouch_rate_per_inch", "_human_sprint_rate_per_inch" })
+                body.Set(name, MathF.Min(body.SceneModel.AnimationGraph.GetParameter<float>(name).DefaultValue, cap / speed));
+            var positions = new System.Collections.Generic.List<Vector3>();
+            var foot = body.Model.Bones.GetBone("ankle_L");
+            for(var i=0; i<300; i++) { body.SceneModel.Update(.02f); positions.Add(body.SceneModel.GetBoneWorldTransform(foot.Index).Position); }
+            var planted = Enumerable.Range(51,249).Where(i => positions[i].z < 6f && positions[i].x < positions[i-1].x)
+                .Select(i => (positions[i-1].x-positions[i].x)/.02f).ToArray();
+            results.Add(new { speed, cap, Rate = body.GetFloat("_human_sprint_rate_per_inch") * speed,
+                FootMin = positions.Skip(50).Min(x=>x.x), FootMax=positions.Skip(50).Max(x=>x.x), HeightMin=positions.Skip(50).Min(x=>x.z),
+                PlantSpeed = planted.Length > 0 ? planted.Average() : 0, Samples=planted.Length });
+        }
+        return results;
+    }
+} finally { scene.Destroy(); }

@@ -1,3 +1,4 @@
+// Biofilm binding compiled after shader schema update.
 // Tools/lowtide_brick.py: seamless generated albedo, matching mortar relief, physical brick scale.
 "Layer0"
 {
@@ -10,4 +11,7 @@
     TextureBlendMask "materials/default/default_black_mask.tga"
     g_vBrickScale "[1.337853 1.000927 0.0 0.0]"
     g_flTintColor "[0.360 0.420 0.300]"
+    TextureCanalBiofilm "materials/lowtide/masonry/canal_biofilm_color.png"
+    g_flCanalBiofilm "0.8"
+    g_flTidalClay "1"
 }

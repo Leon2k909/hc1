@@ -1,0 +1,157 @@
+{
+  "tools": [
+    {
+      "name": "perf_cpu",
+      "title": "Cpu",
+      "toolset": "perf",
+      "description": "Main thread detail: frame pacing, what caps the frame rate (fps_max, vsync, display mode), time by category, and every named timing scope. Scopes nest, so they overlap - a category includes the scopes inside it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "How many scopes to return, biggest first. Default 30, max 200.",
+            "default": 30
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "perf_frames",
+      "title": "Frames",
+      "toolset": "perf",
+      "description": "Per-frame timings, newest first: the whole frame, the engine's work on it (frame minus cap wait and the performance hub's own cost), the GPU frame time, and the cap wait. Use it to find hitches and pacing problems the averages in perf_overview hide. GPU times arrive a few frames late.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer",
+            "description": "How many frames, newest first. Default 120, max 512.",
+            "default": 120
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "perf_gpu",
+      "title": "Gpu",
+      "toolset": "perf",
+      "description": "GPU detail: GPU frame time, video memory, the leaf passes by their own time, and the full pass tree in submission order (Depth is nesting under the parent; grouping scopes that aren't timed themselves have null times). Scopes overlap, so a parent's time isn't the sum of its children's. Takes about a second the first time, while GPU timings warm up.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "How many tree rows to return, in submission order. Passes under 0.01 ms are left out. Default 80, max 500.",
+            "default": 80
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "perf_memory",
+      "title": "Memory",
+      "toolset": "perf",
+      "description": "Memory detail: process and managed heap, allocation rate, GC pauses and collections, video memory, the texture pool and streaming, and what the resource caches hold by type. Pass allocationSeconds to also track which types allocate the most over that many seconds - the call waits that long.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "allocationSeconds": {
+            "type": "number",
+            "description": "Seconds to track managed allocations by type before returning, 2 to 60. 0 (the default) skips it.",
+            "default": 0
+          },
+          "limit": {
+            "type": "integer",
+            "description": "How many rows each list returns, biggest first. Default 20, max 100.",
+            "default": 20
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "perf_network",
+      "title": "Network",
+      "toolset": "perf",
+      "description": "Network detail: whether this is a host or client, connections with ping, quality and bandwidth, and what the host reports. Pass seconds to also measure which RPCs, sync vars and message types use the bandwidth over that many seconds - the call waits that long.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "seconds": {
+            "type": "number",
+            "description": "Seconds to record network messages before returning, 1 to 60. 0 (the default) skips it.",
+            "default": 0
+          },
+          "limit": {
+            "type": "integer",
+            "description": "How many rows each message list returns, biggest first. Default 20, max 100.",
+            "default": 20
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "perf_overview",
+      "title": "Overview",
+      "toolset": "perf",
+      "description": "Start here. Frame rate and frame time stats over the last ~2 seconds (avg/p50/p99/max for the frame, CPU work, GPU and cap wait), what's limiting the frame rate, hitches, the issues the performance hub flags, the top main thread and GPU costs, and memory/GC headlines. Each issue names the perf_* tool with the detail. Takes about a second the first time, while GPU timings warm up.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "perf_rendering",
+      "title": "Rendering",
+      "toolset": "perf",
+      "description": "Rendering detail for the last frame: which renderer drew it, resolution and AA, the rendering issues the performance hub flags (draw calls, batching, texture pool), every scene system counter (draws, triangles, batches, material changes, culling, lights and shadows, texture pool, device report), the managed renderer's phases and draws when it rendered, and the active camera's post-processing layers.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "perf_ui",
+      "title": "Ui",
+      "toolset": "perf",
+      "description": "UI cost for the last frame: every root panel that rendered (game and menu, not the performance hub's own) with its panel count, layout, command build and submit time, and draw calls, plus the totals.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    }
+  ],
+  "total": 128
+}

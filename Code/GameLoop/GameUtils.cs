@@ -78,7 +78,9 @@ public static partial class GameUtils
 
 	public static bool IsInteractiveMouseUiOpen() =>
 		Facepunch.UI.PauseMenuPanel.IsAnyOpen
+		|| Facepunch.Gunsmith.FiringRangeSystem.IsMenuVisible
 		|| Facepunch.UI.ClassSelect.IsAnyOpen
+		|| Facepunch.UI.TacticalBuyMenu.IsAnyOpen
 		|| Facepunch.UI.ZombiesWorkbenchPanel.IsAnyOpen
 		|| Facepunch.UI.Chat.IsAnyOpen
 		|| Input.Down( "Score" )
@@ -138,11 +140,17 @@ public static partial class GameUtils
 		if ( IsGunsmithStudioOpen() )
 			return "gunsmith open";
 
+		if ( Facepunch.Gunsmith.FiringRangeSystem.IsMenuVisible )
+			return "firing range menu open";
+
 		if ( Facepunch.UI.PauseMenuPanel.IsAnyOpen )
 			return "pause menu open";
 
 		if ( Facepunch.UI.ClassSelect.IsAnyOpen )
 			return "class select open";
+
+		if ( Facepunch.UI.TacticalBuyMenu.IsAnyOpen )
+			return "buy menu open";
 
 		if ( Facepunch.UI.ZombiesWorkbenchPanel.IsAnyOpen )
 			return "workbench open";

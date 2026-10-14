@@ -395,7 +395,7 @@ public partial class Equipment : Component, Component.INetworkListener, IDescrip
 		GameObject.Root.Dispatch( new EquipmentHolsteredEvent( this ) );
 	}
 
-	private void ClearTransientState()
+	internal void ClearTransientState()
 	{
 		SetTag( "aiming", false );
 		SetTag( "scoped", false );
@@ -433,7 +433,7 @@ public partial class Equipment : Component, Component.INetworkListener, IDescrip
 		if ( !Owner.IsValid() || !Owner.Body.IsValid() ) return;
 
 		var reloading = Components.Get<Reloadable>( FindMode.EnabledInSelfAndDescendants )?.IsReloading ?? false;
-		var ikTarget = WorldModel.IsValid() && !reloading ? WorldModel.IkLeftHand : null;
+		var ikTarget = WorldModel.IsValid() && !WorldModel.UseTabletPose && !reloading ? WorldModel.IkLeftHand : null;
 		foreach ( var helper in Owner.Body.AnimationHelpers )
 		{
 			if ( helper.IsValid() )

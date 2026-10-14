@@ -1,0 +1,16 @@
+materials/lowtide/containers/lt_container_blue.vmat: error=False, shader=shaders/complex.shader, colour=2048x2048, colour-mips=10, normal=2048x2048, normal-mips=10, specular=1, metalness-texture=1
+materials/lowtide/containers/lt_container_blue_frame.vmat: error=False, shader=shaders/complex.shader, colour=2048x2048, colour-mips=10, normal=2048x2048, normal-mips=10, specular=1, metalness-texture=1
+materials/lowtide/containers/lt_container_red.vmat: error=False, shader=shaders/complex.shader, colour=2048x2048, colour-mips=10, normal=2048x2048, normal-mips=10, specular=1, metalness-texture=1
+materials/lowtide/containers/lt_container_red_frame.vmat: error=False, shader=shaders/complex.shader, colour=2048x2048, colour-mips=10, normal=2048x2048, normal-mips=10, specular=1, metalness-texture=1
+materials/lowtide/containers/lt_container_grey.vmat: error=False, shader=shaders/complex.shader, colour=2048x2048, colour-mips=10, normal=2048x2048, normal-mips=10, specular=1, metalness-texture=1
+materials/lowtide/containers/lt_container_grey_frame.vmat: error=False, shader=shaders/complex.shader, colour=2048x2048, colour-mips=10, normal=2048x2048, normal-mips=10, specular=1, metalness-texture=1
+east: model-error=False, material-errors=0
+east: container-material=materials/lowtide/containers/lt_container_blue.vmat
+east: container-material=materials/lowtide/containers/lt_container_blue_frame.vmat
+east: container-material=materials/lowtide/containers/lt_container_grey.vmat
+east: container-material=materials/lowtide/containers/lt_container_grey_frame.vmat
+west: model-error=False, material-errors=0
+west: container-material=materials/lowtide/containers/lt_container_grey.vmat
+west: container-material=materials/lowtide/containers/lt_container_grey_frame.vmat
+west: container-material=materials/lowtide/containers/lt_container_red.vmat
+west: container-material=materials/lowtide/containers/lt_container_red_frame.vmat

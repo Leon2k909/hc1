@@ -1,0 +1,22 @@
+var root = Sandbox.Project.Current.GetRootPath();
+var gameSceneId = Game.ActiveScene?.Id;
+var materialNames = new[] { "wood_planks", "wood_planks_dark", "furniture_wood", "furniture_wood_dark", "lantern_glass", "lamp_bulb", "lamp_reflector" };
+var materials = materialNames.Select(name => {
+    var material = Material.Load("materials/belltower/" + name + ".vmat");
+    return new {
+        Name = name, material.IsError, material.ShaderName,
+        Textures = new[] { "g_tColor", "g_tNormal", "g_tRoughness", "g_tAmbientOcclusion" }.Select(key => {
+            var texture = material.GetTexture(key);
+            return new { Key = key, Path = texture?.ResourcePath, Error = texture?.IsError, Width = texture?.Width, Height = texture?.Height };
+        }).ToArray()
+    };
+}).ToArray();
+var models = new[] { "centre", "west", "east" }.Select(name => {
+    var model = Model.Load("models/maps/belltower/belltower_" + name + ".vmdl");
+    return new { Name = name, model.IsError, model.ResourcePath };
+}).ToArray();
+var gameSessions = Editor.SceneEditorSession.All.Where(s => s.Scene.Id == gameSceneId && !s.Scene.IsEditor).ToArray();
+if (gameSessions.Length == 1) gameSessions[0].MakeActive(false);
+var result = new { Materials = materials, Models = models, Game.IsPlaying, GameScene = Game.ActiveScene?.Name, GameScenePreserved = Game.ActiveScene?.Id == gameSceneId, RestoredGameTab = gameSessions.Length == 1 };
+System.IO.File.WriteAllText(System.IO.Path.Combine(root, "output/belltower/quality/props-v1-native-resources.json"), System.Text.Json.JsonSerializer.Serialize(result, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+return result;

@@ -64,7 +64,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 
 	/// <summary>Downed in Zombies last update, so a revive stands them up.</summary>
 	private bool _wasDowned;
-	[Sync] private bool IsFallKnockedDown { get; set; }
+	[Sync] internal bool IsFallKnockedDown { get; private set; }
 	[Sync] private TimeSince TimeSinceFallKnockdown { get; set; }
 
 	/// <summary>
@@ -239,8 +239,11 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 			{
 				if ( !helper.IsValid() ) continue;
 
-				helper.WithVelocity( velocityForAnimation );
-				helper.WithWishVelocity( WishVelocity );
+				// A slide holds its legs instead of playing a crouch run underneath the hip pose.
+				var slideWeight = helper.Target == Body.Renderer && !IsProne && !IsFallKnockedDown && !IsMantling && !IsPipeClimbing
+					? SlideBlend : 0f;
+				helper.WithVelocity( velocityForAnimation * (1f - slideWeight) );
+				helper.WithWishVelocity( WishVelocity * (1f - slideWeight) );
 				helper.IsGrounded = isGroundedForAnimation;
 				helper.WithLook( EyeAngles.Forward );
 				helper.MoveStyle = AnimationHelper.MoveStyles.Run;

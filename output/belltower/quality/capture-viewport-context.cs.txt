@@ -1,0 +1,29 @@
+var previous = Editor.SceneEditorSession.Active;
+var session = Editor.SceneEditorSession.All.Single(s => s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase)==true);
+var beforeGame = Game.ActiveScene?.Id;
+var destination = System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(), "output/belltower/quality/viewport-context-check");
+System.IO.Directory.CreateDirectory(destination);
+try
+{
+    session.MakeActive(false);
+    await Task.Delay(100,cancellationToken);
+    var camera = Sandbox.Application.Editor.Camera;
+    if (camera.Scene != session.Scene) throw new InvalidOperationException("Wrong viewport camera");
+    var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+    var before = new { camera.AutoExposure.Enabled, camera.AutoExposure.MinimumExposure, camera.AutoExposure.MaximumExposure };
+    using (session.Scene.Push())
+    {
+        session.Scene.EditorTick(RealTime.Now, .016f);
+        typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null).Invoke(session.Scene,null);
+        typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null).Invoke(session.Scene,null);
+        var post = session.Scene.GetSystem<PostProcessSystem>();
+        typeof(PostProcessSystem).GetMethod("UpdateCamera",flags).Invoke(post,new object[]{camera});
+        using var bitmap = new Bitmap(1920,1080);
+        camera.RenderToBitmap(bitmap,false);
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(destination,"west-street.png"),bitmap.ToPng());
+    }
+    var result = new { Before = before, After = new { camera.AutoExposure.Enabled, camera.AutoExposure.MinimumExposure, camera.AutoExposure.MaximumExposure }, GamePreserved = Game.ActiveScene?.Id == beforeGame };
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"result.json"),System.Text.Json.JsonSerializer.Serialize(result));
+    return result;
+}
+finally { previous.MakeActive(false); }

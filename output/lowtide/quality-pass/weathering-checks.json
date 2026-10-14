@@ -1,0 +1,38 @@
+{
+  "sourceScope": "PASS",
+  "protectedSceneAndGeometryFiles": 31,
+  "materialsWithBiofilm": 6,
+  "generatedAlbedoUnmodified": true,
+  "interiorSurfaceExclusionSamples": "PASS",
+  "initialWeatheringViews": "PASS",
+  "finalTideBlendExteriorEngineValidation": "PASS: overview and both canal sides visually reviewed",
+  "finalExteriorImageChecks": {
+    "canal-biofilm-final": {
+      "nonblank": true,
+      "meanRGB": [
+        94.80827049509583,
+        76.56982734950603,
+        69.96225892235177
+      ]
+    },
+    "biofilm-close-final": {
+      "nonblank": true,
+      "meanRGB": [
+        88.08052489207755,
+        71.23682176652142,
+        60.017044501166936
+      ]
+    },
+    "biofilm-west-final": {
+      "nonblank": true,
+      "meanRGB": [
+        60.5730389639445,
+        49.923028667456485,
+        45.92468754607996
+      ]
+    }
+  },
+  "interiorRenderedRegression": "PASS: normal editor viewport visually reviewed; no fresh global console errors",
+  "subsequentGeometryRepair": "Three OBJs match the separately validated tidal-seam manifest",
+  "controlledPerformance": "PENDING: offscreen benchmark aborted; no FPS result"
+}

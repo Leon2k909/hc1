@@ -1,0 +1,12 @@
+// Tools/lowtide_roofs.py: generated slate at physical scale.
+"Layer0"
+{
+    shader "shaders/hc1_brick.shader"
+    TextureColor "materials/lowtide/roofs/slate_color.png"
+    TextureNormal "materials/lowtide/roofs/slate_normal.png"
+    TextureRoughness "materials/lowtide/roofs/slate_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    TextureMetalness "materials/default/default_black_mask.tga"
+    g_vBrickScale "[1.2192 1.2192 0 0]"
+    g_flTintColor "[0.9 0.92 0.94]"
+}

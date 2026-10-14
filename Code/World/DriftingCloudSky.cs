@@ -5,11 +5,13 @@ namespace Facepunch;
 public sealed class DriftingCloudSky : Component, Component.ExecuteInEditor
 {
     private SkyBox2D _sky;
+    private Weather _weather;
 
     protected override void OnUpdate()
     {
         if ( !_sky.IsValid() ) _sky = GetComponent<SkyBox2D>();
         if ( !_sky.IsValid() ) return;
+        if ( Game.IsPlaying && !_weather.IsValid() ) _weather = Scene.GetAllComponents<Weather>().FirstOrDefault();
 
         var material = _sky.SkyMaterial;
         if ( material is null || material.IsError || material.ShaderName != "shaders/hc1_coastal_sky.shader" ) return;
@@ -17,6 +19,6 @@ public sealed class DriftingCloudSky : Component, Component.ExecuteInEditor
         // One scalar uniform: no particles, physics or sky/lighting rebuild. Every
         // view uses the same clock, including editor, scope and reflection cameras.
         // Keep the serialized SkyMaterial reference intact so saving a scene is safe.
-        material.Set( "g_flSkyCloudTime", (float)RealTime.Now );
+        material.Set( "g_flSkyCloudTime", _weather.IsValid() ? (float)_weather.Elapsed : (float)RealTime.Now );
     }
 }

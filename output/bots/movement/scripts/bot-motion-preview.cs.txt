@@ -1,0 +1,89 @@
+var folder = "D:/Documents/s&box projects/hc1/forked-shooter-main/output/bots/movement";
+System.IO.Directory.CreateDirectory(folder);
+var scene = new Scene();
+try {
+    using(scene.Push()) {
+        var body = new GameObject(true,"Bot movement preview").AddComponent<SkinnedModelRenderer>();
+        Facepunch.MilitaryUniform.SetModel(body, Model.Load(Facepunch.MilitaryUniform.HumanModelPath));
+        body.GetComponent<Facepunch.MilitaryUniform>().Enabled=false;
+        body.CreateBoneObjects = false;
+        body.AnimationGraph = AnimationGraph.Load("animgraphs/human_bot.vanmgrph");
+        var camera = new GameObject(true,"Preview camera").AddComponent<CameraComponent>();
+        camera.BackgroundColor = new Color(.10f,.12f,.15f); camera.FieldOfView=48f; camera.ZNear=1f;
+        var light=new GameObject(true,"Preview light").AddComponent<DirectionalLight>();
+        light.WorldRotation=Rotation.From(40f,150f,0f); light.LightColor=Color.White*2f; light.SkyColor=Color.White*.6f;
+        var stride = new Facepunch.BotStridePose(); var slide = new Facepunch.ThirdPersonSlidePose();
+        var report = new System.Collections.Generic.List<object>();
+        using var sheet = new Bitmap(480*6,480*3); using var tile=new Bitmap(480,480);
+        var foot=body.Model.Bones.GetBone("ankle_L");
+        var legNames = new[] { "leg_upper_L","leg_lower_L","ankle_L","leg_upper_R","leg_lower_R","ankle_R" };
+        var legBones=legNames.Select(n=>body.Model.Bones.GetBone(n)).ToArray();
+        var maximumLengthError=0f; var maximumHeightError=0f;
+        var samples = new System.Collections.Generic.List<Vector3[]>();
+        var previewTime = 0f;
+        void Tick(float delta) {
+            previewTime += delta; scene.EditorTick(previewTime,delta);
+            body.SceneModel.Update(delta);
+            foreach(var garment in body.GetComponentsInChildren<SkinnedModelRenderer>(true))
+                if(garment!=body && garment.BoneMergeTarget==body) { garment.SceneModel?.Update(delta); garment.SceneModel?.MergeBones(body.SceneModel); }
+        }
+        var speed=310f;
+        body.Set("holdtype",(int)Facepunch.AnimationHelper.HoldTypes.Rifle); Facepunch.AnimBools.SetBool(body,"b_grounded",true);
+        Facepunch.AnimBools.SetBool(body,"b_twohanded",true); body.Set("move_style",2);
+        body.Set("move_speed",speed); body.Set("move_groundspeed",speed); body.Set("move_x",speed); body.Set("move_y",0f);
+        body.Set("move_direction",0f); body.Set("wish_speed",speed); body.Set("wish_groundspeed",speed); body.Set("wish_x",speed); body.Set("wish_y",0f);
+        body.Set("wish_direction",0f); body.Set("duck",0f);
+        foreach(var name in new[] {"_human_walk_rate_per_inch","_human_run_rate_per_inch","_human_crouch_rate_per_inch","_human_sprint_rate_per_inch"})
+            body.Set(name,MathF.Min(body.SceneModel.AnimationGraph.GetParameter<float>(name).DefaultValue,1.25f/speed));
+        for(var i=0;i<300;i++) {
+            cancellationToken.ThrowIfCancellationRequested();
+            Tick(.02f);
+            var before=legBones.Select(b=>body.SceneModel.GetBoneWorldTransform(b.Index).Position).ToArray();
+            var footBefore=body.SceneModel.GetBoneWorldTransform(foot.Index).Position;
+            stride.Apply(body,Vector3.Forward*speed,1.5f);
+            var after=legBones.Select(b=>body.SceneModel.GetBoneWorldTransform(b.Index).Position).ToArray();
+            var footAfter=body.SceneModel.GetBoneWorldTransform(foot.Index).Position;
+            if(i>50) samples.Add(new[]{footBefore,footAfter});
+            for(var leg=0;leg<2;leg++) {
+                for(var seg=0;seg<2;seg++) {
+                    var a=leg*3+seg; var b=a+1;
+                    maximumLengthError=MathF.Max(maximumLengthError,MathF.Abs(before[a].Distance(before[b])-after[a].Distance(after[b])));
+                }
+                maximumHeightError=MathF.Max(maximumHeightError,MathF.Abs(before[leg*3+2].z-after[leg*3+2].z));
+            }
+        }
+        if(maximumLengthError > .01f || maximumHeightError>.02f) throw new Exception($"Stride changed length {maximumLengthError} or ankle height {maximumHeightError}");
+        report.Add(new { RendererGraph=body.AnimationGraph?.Name, ModelGraph=body.SceneModel.AnimationGraph?.Name,
+            Speed=body.GetFloat("move_groundspeed"), Style=body.GetInt("move_style"), Rate=body.GetFloat("_human_sprint_rate_per_inch"),
+            UniformEnabled=body.GetComponent<Facepunch.MilitaryUniform>(true)?.Enabled });
+        for(var mode=0;mode<2;mode++) {
+            var positions=samples.Select(x=>x[mode]).ToArray();
+            var plant=Enumerable.Range(1,positions.Length-1).Where(i=>positions[i].z<6f && positions[i].x<positions[i-1].x)
+                .Select(i=>(positions[i-1].x-positions[i].x)/.02f).ToArray();
+            report.Add(new {Mode=mode==0?"Original stride":"Adjusted stride",Speed=speed,PlantSpeed=plant.Average(),
+                Span=positions.Max(x=>x.x)-positions.Min(x=>x.x),maximumLengthError,maximumHeightError});
+        }
+        // Sample six phases with the same unmodified animation on both rows.
+        for(var p=0;p<6;p++) {
+            Tick(.065f);
+            camera.WorldPosition=new Vector3(0f,115f,35f); camera.WorldRotation=Rotation.LookAt(new Vector3(0f,0f,33f)-camera.WorldPosition);
+            foreach(var garment in body.GetComponentsInChildren<SkinnedModelRenderer>(true)) if(garment!=body && garment.BoneMergeTarget==body) garment.SceneModel?.MergeBones(body.SceneModel);
+            camera.RenderToBitmap(tile); sheet.DrawBitmap(tile,new Rect(p*480,0,480,480));
+            stride.Apply(body,Vector3.Forward*speed,1.5f); camera.RenderToBitmap(tile); sheet.DrawBitmap(tile,new Rect(p*480,480,480,480));
+        }
+        body.Set("move_speed",0f); body.Set("move_groundspeed",0f); body.Set("move_x",0f);
+        body.Set("wish_speed",0f); body.Set("wish_groundspeed",0f); body.Set("wish_x",0f); body.Set("duck",1f);
+        for(var i=0;i<50;i++) Tick(.02f);
+        var blends=new[]{0f,.33f,.66f,1f,.66f,.33f};
+        for(var p=0;p<blends.Length;p++) {
+            Tick(.001f); slide.Apply(body,blends[p],updateBoneObjects:false);
+            report.Add(new { Blend=blends[p], Pelvis=body.SceneModel.GetBoneWorldTransform(body.Model.Bones.GetBone("pelvis").Index).Position,
+                RightFoot=body.SceneModel.GetBoneWorldTransform(body.Model.Bones.GetBone("ankle_R").Index).Position });
+            camera.WorldPosition=new Vector3(70f,90f,36f); camera.WorldRotation=Rotation.LookAt(new Vector3(7f,0f,27f)-camera.WorldPosition);
+            camera.RenderToBitmap(tile); sheet.DrawBitmap(tile,new Rect(p*480,960,480,480));
+        }
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(folder,"motion-preview.png"),sheet.ToPng());
+        System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"stride-results.json"),Json.Serialize(report));
+        return new {report,Image=System.IO.Path.Combine(folder,"motion-preview.png"),CreateBoneObjects=body.CreateBoneObjects};
+    }
+} finally {scene.Destroy();}

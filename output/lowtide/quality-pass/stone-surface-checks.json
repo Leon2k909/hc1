@@ -1,0 +1,78 @@
+{
+  "unchanged_geometry_and_scene_files": 42,
+  "added_triangles": 0,
+  "materials": {
+    "materials/lowtide/marine/lt_tidal_granite.vmat": {
+      "compiled_texture_references": [
+        "materials/lowtide/marine/stone_granite_color_png_7aae6fd0.generated.vtex",
+        "materials/lowtide/marine/stone_granite_normal_png_31596bdc.generated.vtex"
+      ],
+      "all_resolved": true
+    },
+    "materials/lowtide/marine/lt_tidal_brick.vmat": {
+      "compiled_texture_references": [
+        "materials/lowtide/marine/lt_tidal_brick_vmat_g_trma_2b3c18c1.generated.vtex",
+        "materials/lowtide/marine/stone_clay_color_png_35b5cbce.generated.vtex",
+        "materials/lowtide/marine/stone_clay_normal_png_4831b0c8.generated.vtex"
+      ],
+      "all_resolved": true
+    }
+  },
+  "maps": {
+    "materials/lowtide/marine/stone_granite_color.png": {
+      "size": [
+        2048,
+        2048
+      ],
+      "physical_tile_metres": 0.5
+    },
+    "materials/lowtide/marine/stone_granite_normal.png": {
+      "size": [
+        2048,
+        2048
+      ],
+      "physical_tile_metres": 0.5,
+      "minimum_normal_z": 0.9294117647058824,
+      "first_percentile_normal_z": 0.9764705882352942
+    },
+    "materials/lowtide/marine/stone_clay_color.png": {
+      "size": [
+        2048,
+        2048
+      ],
+      "physical_tile_metres": 0.3
+    },
+    "materials/lowtide/marine/stone_clay_normal.png": {
+      "size": [
+        2048,
+        2048
+      ],
+      "physical_tile_metres": 0.3,
+      "minimum_normal_z": 0.7882352941176471,
+      "first_percentile_normal_z": 0.9450980392156862
+    }
+  },
+  "captures": {
+    "live-stone-surfaces-final-low": {
+      "renderers": 15,
+      "model_errors": 0,
+      "material_errors": 0,
+      "clear_emitters": 18
+    },
+    "live-stone-surfaces-final-player": {
+      "renderers": 15,
+      "model_errors": 0,
+      "material_errors": 0,
+      "clear_emitters": 18
+    },
+    "live-canal-stone-surfaces-final": {
+      "renderers": 15,
+      "model_errors": 0,
+      "material_errors": 0,
+      "clear_emitters": 18
+    }
+  },
+  "remaining_qa_scenes": [],
+  "projection": "World-space triplanar color and shallow normal slopes; no spherical UV sampling",
+  "performance": "Six surface texture samples; no controlled benchmark performed"
+}

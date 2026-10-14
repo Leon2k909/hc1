@@ -1,0 +1,22 @@
+@namespace Facepunch.UI
+@inherits Panel
+@attribute [StyleSheet]
+
+@if ( !TacticalEconomy.Current.IsValid() || !Client.Local.IsValid() ) return;
+
+<root>
+    <label class="cash">$@Client.Local.Balance.ToString( "N0" )</label>
+    @if ( TacticalEconomy.CanBuy( Client.Local.PlayerPawn ) )
+    {
+        <div class="buy-hint" onclick=@(() => TacticalBuyMenu.Instance?.Open())>
+            <InputHint Action="ChooseClass" Size="@InputGlyphSize.Small" />
+            <label>@Tr( "BUY WEAPONS" )</label>
+        </div>
+    }
+</root>
+
+@code
+{
+    protected override int BuildHash() => HashCode.Combine( TacticalEconomy.Current.IsValid(), Client.Local?.Balance,
+        TacticalEconomy.CanBuy( Client.Local?.PlayerPawn ) );
+}

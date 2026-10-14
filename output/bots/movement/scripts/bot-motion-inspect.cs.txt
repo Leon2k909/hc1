@@ -1,0 +1,8 @@
+var bots = Game.ActiveScene.GetAllComponents<Facepunch.LightweightCombatBot>().Where(x => x.IsAlive).ToArray();
+return new {
+    Scene = Game.ActiveScene.Name,
+    Bots = bots.Select(x => new { x.BotName, x.Team, x.WorldPosition, Speed = x.Agent?.Velocity.WithZ(0).Length,
+        MaxSpeed = x.Agent?.MaxSpeed, x.IsCrouching, x.IsProne, x.IsReloading, x.IsAimingIn,
+        Model = x.Renderer?.Model?.ResourcePath, Graph = x.Renderer?.AnimationGraph?.Name,
+        Move = x.Renderer?.GetFloat("move_groundspeed"), SprintRate = x.Renderer?.GetFloat("_human_sprint_rate_per_inch") }).ToArray()
+};

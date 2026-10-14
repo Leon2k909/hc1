@@ -55,6 +55,7 @@ from PIL import Image, ImageDraw
 import building_textures as BT
 import map_kit as K
 import belltower_detail as Detail
+import belltower_architecture as Architecture
 import belltower_fountain as Fountain
 import belltower_vista as Vista
 import belltower_vista_props as VistaProps
@@ -309,9 +310,15 @@ def gable_roof( model, e0, e1, n0, n1, eave, ridge_axis, tiles, gable, over=14.0
             z_axis = -z_axis
         centre = ( low + high ) / 2 - z_axis * thick / 2
         model.oriented_box( centre, ( x_axis, y_axis, z_axis ), ( length, np.linalg.norm( high - low ), thick ),
-                            { "+z": tiles, "-z": soffit, "default": trim }, slab_surface )
+                            { "+z": None if tiles == "roof_tiles" else tiles, "-z": soffit,
+                              "default": "planks_dark" if tiles == "roof_tiles" else trim }, slab_surface )
+        if tiles == "roof_tiles":
+            Architecture.roof_surface(model, low, high, along, length)
     if cap:
-        model.beam( point( a0 - ends_over[0], mid, ridge + 1.5 ), point( a1 + ends_over[1], mid, ridge + 1.5 ), ( 9, 6 ), tiles )
+        if tiles == "roof_tiles":
+            Architecture.roof_ridge(model, point(a0-ends_over[0],mid,ridge), point(a1+ends_over[1],mid,ridge))
+        else:
+            model.beam( point( a0 - ends_over[0], mid, ridge + 1.5 ), point( a1 + ends_over[1], mid, ridge + 1.5 ), ( 9, 6 ), tiles )
     for a, towards, draw in ( ( a0, -along, gables[0] ), ( a1, along, gables[1] ) ):
         if gable and draw:
             facing( model, gable, [ point( a, c0, eave ), point( a, c1, eave ), point( a, mid, ridge ) ], towards )
@@ -376,11 +383,11 @@ def frame( model, wall, o, paint, depth, bar=3.0, thick=3.0, mullion=True, head=
         slab_at( model, wall, o.r0 + bar, o.r1 - bar, d0 + 0.5, d1 - 0.5, zt - bar / 2, zt + bar / 2, paint )
 
 
-def room_beside( wall, r0, r1 ):
+def room_beside( wall, r0, r1, but=None ):
     """ Is the wall clear of other openings from r0 to r1, and within its run? """
     if r0 < wall.run[0] + 4 or r1 > wall.run[1] - 4:
         return False
-    return not any( o.r0 < r1 + 4 and o.r1 > r0 - 4 for o in wall.openings if not ( o.r0 >= r0 and o.r1 <= r1 ) )
+    return not any( o.r0 < r1 + 4 and o.r1 > r0 - 4 for o in wall.openings if o is not but and not ( o.r0 >= r0 and o.r1 <= r1 ) )
 
 
 def keyed( *key ):
@@ -441,13 +448,13 @@ def shutters_open( model, wall, o, paint ):
     a side, or a wide window's leaves folded side by side. """
     width = ( o.r1 - o.r0 ) / 2
     left, right = ( o.r0 - 2 - width, o.r0 - 2 ), ( o.r1 + 2, o.r1 + 2 + width )
-    if not ( room_beside( wall, *left ) and room_beside( wall, *right ) ):
+    if not ( room_beside( wall, *left, but=o ) and room_beside( wall, *right, but=o ) ):
         return False
     louvre = LOUVRES.get( paint )
     leaves = max( 1, round( width / 24 ) )
     for r0, r1 in ( left, right ):
         if louvre and leaves == 1:
-            slab_at( model, wall, r0, r1, 0.0, 2.0, o.z0, o.z1, { wall.outward: f"louvre_{louvre}", "default": paint } )
+            Architecture.shutter(model,wall,r0,r1,o.z0,o.z1,2.2,paint)
             continue
         slab_at( model, wall, r0, r1, 0.0, 2.0, o.z0, o.z1, { "default": paint } )
         if louvre:
@@ -474,12 +481,15 @@ def dress( model, wall, style, rng ):
         if kind in ( "glass", "glass_arch" ):
             closed = solid and shutter and not o.arched and rng.random() < 0.22
             if closed:
-                slab_at( model, wall, o.r0, o.r1, -5.0, -3.0, o.z0, o.z1,
-                         { wall.outward: f"louvre_pair_{louvre}", "default": shutter } if louvre else shutter )
+                if louvre:
+                    for r0,r1 in ((o.r0,rc-.15),(rc+.15,o.r1)):
+                        Architecture.shutter(model,wall,r0,r1,o.z0,o.z1,-5,shutter)
+                else:
+                    slab_at(model,wall,o.r0,o.r1,-5,-3,o.z0,o.z1,shutter)
             else:
                 room = solid and not o.arched and not style.get( "glass_surface" )
-                pane( model, wall, o, f"window_{pick( 'abcd', *key )}" if room else "glass", 5.0 )
-                frame( model, wall, o, trim, 4.0 )
+                pane( model, wall, o, f"window_{pick( 'abcd', *key )}" if room else "glass", 10.5 if room else 5.0 )
+                frame( model, wall, o, trim, 8.5 if room else 4.0, bar=2.0 )
                 if style.get( "glass_surface" ):
                     # In a building people go into, the pane stops shots too.
                     slab_at( model, wall, o.r0, o.r1, -6.0, -4.0, o.z0, o.z1, None, style["glass_surface"] )
@@ -500,7 +510,8 @@ def dress( model, wall, style, rng ):
             frame( model, wall, o, trim, 5.0, mullion=False, foot=False )
             if solid and 40 <= width <= 60:
                 # A pair of panelled street doors inside the frame, over a stone step.
-                picture( model, wall, o.r0 + 3, o.r1 - 3, o.z0, o.z1 - 3, -5.95, f"door_{pick( 'abcde', 'door', *key )}" )
+                Architecture.street_door( model, wall, o.r0 + 3, o.r1 - 3, o.z0, o.z1 - 3,
+                                          f"door_{pick( 'abcde', 'door', *key )}" )
                 slab_at( model, wall, o.r0 - 3, o.r1 + 3, -6.0, 4.0, 0.0, 1.5, "ashlar" )
                 if chance( 0.6, "lantern", *key ):
                     # A lantern on a bracket beside it, on whichever side has room, else over it.
@@ -593,9 +604,35 @@ def door_pot( model, wall, r, key ):
     return True
 
 
+def plant_card( model, wall, centre, width, height, depth, bottom, kind, yaw=0.0, bow=0.0 ):
+    """A small folded atlas card; original RGBA pixels are sampled in the shader.
+
+    Crossing these at plant scale gives the box depth without a broad flat
+    flower strip. All planting is visual and never changes collision.
+    """
+    d, sign, out = wall_out( wall )
+    model.material_overrides["window_plants"] = "materials/belltower/window_plants.vmat"
+    model.tile_overrides["window_plants"] = 64.0
+    # OBJ V is bottom-up. The generated atlas is red/pink above ivy/bougainvillea.
+    column, row = {"red": (0, 1), "pink": (1, 1), "ivy": (0, 0), "bougainvillea": (1, 0)}[kind]
+    u0, u1 = column * .5 + .002, (column + 1) * .5 - .002
+    v0, v1 = row * .5 + .002, (row + 1) * .5 - .002
+    if r_right( wall ) < 0:
+        u0, u1 = u1, u0
+    angle = math.radians( yaw )
+    for side in (-1, 1):
+        a, b = (-.5, 0.0) if side < 0 else (0.0, .5)
+        def point(t, z):
+            offset = t * width
+            return wall.point(centre + offset * math.cos(angle),
+                d + sign * (depth + offset * math.sin(angle) + bow * (1 - abs(t) * 2)), z)
+        points = [point(a, bottom), point(b, bottom), point(b, bottom + height), point(a, bottom + height)]
+        ua, ub = u0 + (u1-u0)*(a+.5), u0 + (u1-u0)*(b+.5)
+        card( model, "window_plants", points, out, [(ua,v0),(ub,v0),(ub,v1),(ua,v1)] )
+
+
 def window_box( model, wall, o, key ):
-    """ A window box of geraniums on two iron brackets under an upper window, some of it trailing over the front. Cards
-    of belltower_fronts' planting, no collision. """
+    """Geranium clusters and hanging ivy on a bracketed timber box, no collision."""
     d, sign, _ = wall_out( wall )
     rc = ( o.r0 + o.r1 ) / 2
     r0, r1, z0 = rc - 20, rc + 20, o.z0
@@ -604,10 +641,15 @@ def window_box( model, wall, o, key ):
         slab_at( model, wall, r, r + 1, 0.0, 9.0, z0 - 9, z0 - 8, "iron_black" )
         model.beam( wall.point( r + 0.5, d + sign * 0.5, z0 - 18 ), wall.point( r + 0.5, d + sign * 8.5, z0 - 8.5 ), ( 1, 1 ),
                     "iron_black" )
-    back, front = pick( ( ( "red", "pink" ), ( "pink", "red" ), ( "red", "red" ) ), "flowers", *key )
-    picture( model, wall, r0 + 1, r1 - 1, z0 + 1, z0 + 17, 5.5, f"geranium_{back}" )
-    picture( model, wall, r0 + 1, r1 - 1, z0 - 1, z0 + 15, 8.0, f"geranium_{front}" )
-    picture( model, wall, r0 + 1, r1 - 1, z0 - 17.5, z0 + 2.5, 10.3, "trailing" )
+    for index, offset in enumerate((-12, 0, 12)):
+        kind = pick(("red", "red", "pink"), "flower_cluster", index, *key)
+        height = 17 + keyed("flower_height", index, *key) % 5
+        yaw = (keyed("flower_yaw", index, *key) % 13) - 6
+        for turn in (-48, 0, 48):
+            plant_card(model, wall, rc + offset, 15, height, 6.6, z0 + 1, kind, yaw + turn, .6)
+    for index, offset in enumerate((-10, 9)):
+        height = 20 + keyed("ivy_height", index, *key) % 6
+        plant_card(model, wall, rc + offset, 16, height, 10.7, z0 + 4 - height, "ivy", bow=1.4)
 
 
 def awning( model, wall, r0, r1, z, reach, paint, name=None ):
@@ -670,7 +712,7 @@ def balcony( model, wall, r0, r1, z, reach=30.0, rail="iron_black", slab="ashlar
         slab_at( model, wall, r - 0.75, r + 0.75, f - 0.75, f + 0.75, z, z + 34.5, rail )
     if key is not None and chance( 0.3, "bougainvillea", *key ):
         lo, hi = ( a, a + 44 ) if chance( 0.5, "side", *key ) else ( b - 44, b )
-        picture( model, wall, lo, hi, z - 14, z + 34, f + 1.2, "bougainvillea" )
+        plant_card(model, wall, (lo+hi)/2, hi-lo, 48, f+1.2, z-14, "bougainvillea", bow=5)
 
 
 def downpipe( model, wall, r, eave, paint, over=14.0 ):
@@ -939,7 +981,9 @@ def solid_house( model, e0, e1, n0, n1, eave, render, faces, ridge, rng, blocks,
             r = max( r, c1 )
 
     def cornice_along( wall ):
-        slab_at( model, wall, *returned( wall.outward, *wall.run, eave - 12, 7.0 ), 0.0, 7.0, eave - 12, eave, trim )
+        # The roof slopes down across its overhang. Keep the projecting cornice
+        # under the timber substrate instead of cutting a white band through tiles.
+        slab_at( model, wall, *returned( wall.outward, *wall.run, eave - 24, 7.0 ), 0.0, 7.0, eave - 24, eave - 12, trim )
 
     fronts, front_walls = {}, {}
     for face, ( ground, run ) in faces.items():
@@ -1159,7 +1203,7 @@ def town_hall( model, lights ):
         dress( model, wall, style, rng )
         courses( model, wall, 0, 30, 3.0, "ashlar" )
         courses( model, wall, GF, FL, 4.0, "ashlar" )
-        slab_at( model, wall, wall.run[0], wall.run[1], 0.0, 9.0, HALL_EAVE - 16, HALL_EAVE, "ashlar" )
+        slab_at( model, wall, wall.run[0], wall.run[1], 0.0, 9.0, HALL_EAVE - 30, HALL_EAVE - 14, "ashlar" )
         if face in ( "+n", "-n" ):
             quoins( model, wall, 30, HALL_EAVE - 16, "ashlar" )
             for o in wall.openings:
@@ -1193,7 +1237,7 @@ def town_hall( model, lights ):
             ea, eb = sorted( ( se * 66, se * 110 ) )
             model.box( ( ea, pn[0], 0 ), ( eb, pn[1], GF ), { "default": "ashlar", "+z": None, "-z": None }, STONE )
             ea, eb = sorted( ( se * 70, se * 110 ) )
-            model.box( ( ea, pn[0], FL ), ( eb, pn[1], CEIL ), { "default": "ashlar", "+z": None, "-z": None }, STONE )
+            Architecture.stone_pier(model,(ea,pn[0],FL),(eb,pn[1],CEIL),STONE)
     holes = []
     for side in ( -1, 1 ):
         ea, eb = sorted( ( side * ( e1 - T ), side * ( e1 - T - 60 ) ) )
@@ -1292,7 +1336,7 @@ def church( model, lights ):
     for face, wall in walls.items():
         dress( model, wall, style, rng )
         courses( model, wall, 0, 24, 4.0, "ashlar_grey" )
-        slab_at( model, wall, wall.run[0], wall.run[1], 0.0, 8.0, EAVE - 12, EAVE, "ashlar_grey" )
+        slab_at( model, wall, wall.run[0], wall.run[1], 0.0, 8.0, EAVE - 25, EAVE - 13, "ashlar_grey" )
         if face in ( "-e", "+e" ):
             # Buttresses between the windows.
             for n in ( -440, -520, -600, -700, -780, -860 ):
@@ -1423,18 +1467,11 @@ def sacks( model, centre, yaw, count, z=0.0 ):
 def cart( model, centre, yaw, z=0.0, load="sacks" ):
     """ A two-wheeled hand cart, 120 long, its shafts on the ground ahead. """
     p = Place( ( centre[0], centre[1], z ), yaw )
-    p.box( model, ( -60, -32, 26 ), ( 60, 32, 32 ), "planks" )
-    for s in ( -1, 1 ):
-        p.box( model, ( -60, s * 32 - 3, 32 ), ( 60, s * 32, 48 ), "planks_dark" )
-    p.box( model, ( -60, -32, 32 ), ( -57, 32, 48 ), "planks_dark" )
-    p.box( model, ( 57, -32, 32 ), ( 60, 32, 48 ), "planks_dark" )
-    for s in ( -1, 1 ):
-        Detail.wheel( model, p, s, axle )
-        p.beam( model, ( 50, s * 22, 28 ), ( 140, s * 22, 4 ), ( 4, 4 ), "planks_dark" )
+    Detail.Furniture.cart( model, p )
     p.box( model, ( -60, -41, 0 ), ( 60, 41, 48 ), None, WOOD )
     if load == "sacks":
         for k, ( x, y ) in enumerate( ( ( -30, -12 ), ( 0, -12 ), ( 30, -12 ), ( -15, 12 ), ( 15, 12 ) ) ):
-            p.box( model, ( x - 14, y - 11, 32 ), ( x + 14, y + 11, 46 ), "canvas_plain" )
+            Detail.Furniture.sack( model, p, (x,y,39), seed=k )
     elif load == "crates":
         crate( model, p.at( ( -25, 0, 0 ) ), 36, yaw + 5, z + 32 )
         crate( model, p.at( ( 22, 2, 0 ) ), 32, yaw - 7, z + 32 )
@@ -1540,10 +1577,7 @@ def lamp_post( model, centre, z=0.0 ):
 def bench( model, centre, yaw, length=84.0, z=0.0 ):
     p = Place( ( centre[0], centre[1], z ), yaw )
     l = length / 2
-    p.box( model, ( -l, -9, 14 ), ( l, 9, 18 ), "planks" )
-    p.box( model, ( -l, 7, 18 ), ( l, 9, 34 ), "planks" )
-    for x in ( -l + 6, l - 6 ):
-        p.box( model, ( x - 2, -8, 0 ), ( x + 2, 8, 14 ), "iron_black" )
+    Detail.Furniture.bench( model, p, length )
     p.box( model, ( -l, -9, 0 ), ( l, 9, 18 ), None, WOOD )
 
 
@@ -1738,7 +1772,7 @@ def bakery( model, lights, rng ):
             continue
         dress( model, wall, style, rng )
         courses( model, wall, 0, 20, 2.5, "ashlar_grey" )
-        slab_at( model, wall, wall.run[0], wall.run[1], 0.0, 7.0, EAVE - 12, EAVE, "trim_white" )
+        slab_at( model, wall, wall.run[0], wall.run[1], 0.0, 7.0, EAVE - 24, EAVE - 12, "trim_white" )
     # An old sign for the bread and pasta between the upper windows over the yard, seen over its wall from West Street.
     ghost_sign( model, walls["-n"], -1106, -994, 201, "ghost_1" )
     climb_ivy( model, walls["-n"], 1.3, ( "bakery", "-n" ) )
@@ -1802,7 +1836,7 @@ def inn( model, lights, rng ):
         dress( model, wall, style, rng )
         courses( model, wall, 0, 20, 2.5, "ashlar_grey" )
         courses( model, wall, GF, FL, 2.0, "trim_white" )
-        slab_at( model, wall, wall.run[0], wall.run[1], 0.0, 7.0, EAVE - 12, EAVE, "trim_white" )
+        slab_at( model, wall, wall.run[0], wall.run[1], 0.0, 7.0, EAVE - 24, EAVE - 12, "trim_white" )
     floor( model, e0, e1, n0, n1, "floorboards" )
     # Upstairs, over the taproom, reached by a stair along the east wall.
     stair_lo, stair_hi = ( e1 - T - 60, -395 ), ( e1 - T, -186 )
@@ -2830,12 +2864,13 @@ def model_object( name, key, model_name, collide=True, shadows=True ):
 # The sun (write_scene), and towards it in plan for the previews' shading (SUN).
 SUN_PITCH, SUN_YAW = 34.0, -63.0
 
-# The sky (Tools/belltower_sky.py) and the exposure it's made for (its DESIGN_EXPOSURE). The fog is drawn over the sky
-# too (sky.shader takes the gradient fog), so its colour is the sky's 2 degrees up (belltower_sky.reference_sky), which
-# hazes the vista's hills into the horizon instead of greying the sky.
-SKY_MATERIAL = "materials/belltower/sky/belltower_sky.vmat"
-SKY_EXPOSURE = 2
-FOG_COLOUR = "0.351,0.594,1.048"
+# Photographed afternoon sky. Fog and exposure were checked in the native renderer.
+SKY_MATERIAL = "materials/belltower/sky/afternoon_scan.vmat"
+SKY_EXPOSURE = 1.05
+SUN_COLOUR = "3.5,3.15,2.65,1"
+SKY_AMBIENT = "0.14,0.18,0.24,1"
+SKY_TINT = "1.3,1.45,1.65,1"
+FOG_COLOUR = "0.32,0.45,0.61"
 
 
 def look_object():
@@ -2843,25 +2878,51 @@ def look_object():
     doesn't use for gameplay go in it (a volume's effect replaces the camera's of the same type): ambient occlusion for
     the contact shadow in corners, under eaves and round the cobbles, a warm white balance, and a light vignette.
 
-    And the exposure. The player camera's auto exposure runs from 1 to 2, and in a sunlit street it sits at 1, where the
-    sunlit plaster comes out a dull mid-grey and the sky dark. The materials and the sky (belltower_sky.DESIGN_EXPOSURE)
-    are made for 2, a bright summer day's: the town's auto exposure runs from 2 to 3, so the shade of the church and the
-    houses can open up a little. """
+    Exposure adapts modestly when entering a building, preserving the sky and pale stone in sunlight. """
     return K.game_object( ids, "Look", "look", components=[
         K.component( ids, "Sandbox.PostProcessVolume", "look/volume", BlendDistance=50, BlendWeight=1, EditorPreview=True,
                      Priority=0, SceneVolume={ "Type": "Infinite", "Sphere": { "Center": "0,0,0", "Radius": 10 },
                                                "Box": { "Mins": "-50,-50,-50", "Maxs": "50,50,50" },
                                                "Capsule": { "CenterA": "0,0,10", "CenterB": "0,0,90", "Radius": 10 } } ),
-        K.component( ids, "Sandbox.AmbientOcclusion", "look/ao", **{ "__version": 1 }, FalloffRange=1, Intensity=0.6, Radius=96,
-                     ThinCompensation=5 ),
-        K.component( ids, "Sandbox.ColorGrading", "look/grade", GradingMethod="TemperatureControl", ColorTempK=5900,
-                     BlendFactor=0.45, ColorSpace="None", LookupTexture=None ),
-        K.component( ids, "Sandbox.Vignette", "look/vignette", Center="0.5,0.5", Color="0,0,0,1", Intensity=0.22, Roundness=1,
+        K.component( ids, "Sandbox.AmbientOcclusion", "look/ao", **{ "__version": 1 }, FalloffRange=1, Intensity=0.75, Radius=60,
+                     ThinCompensation=1.5 ),
+        K.component( ids, "Sandbox.ColorGrading", "look/grade", GradingMethod="TemperatureControl", ColorTempK=6200,
+                     BlendFactor=0.25, ColorSpace="None", LookupTexture=None ),
+        K.component( ids, "Sandbox.Vignette", "look/vignette", Center="0.5,0.5", Color="0,0,0,1", Intensity=0.1, Roundness=1,
                      Smoothness=1 ),
         K.component( ids, "Sandbox.Tonemapping", "look/tonemap", **{ "__version": 3 }, AutoExposureEnabled=True,
-                     ExposureCompensation=0, ExposureMethod="RGB", MinimumExposure=SKY_EXPOSURE, MaximumExposure=3,
-                     Mode="ACES", Rate=1 ),
+                     ExposureCompensation=0, ExposureMethod="RGB", MinimumExposure=SKY_EXPOSURE, MaximumExposure=2.2,
+                     Mode="ACES", Rate=1.5 ),
     ] )
+
+
+def reflections_object():
+    path = Path(__file__).resolve().parents[1] / "Sources/Belltower/lighting/reflections.json"
+    if path.is_file():
+        return json.loads(path.read_text())
+    setups = (
+        ("Square reflection",(50,0,110),(-700,-730,-160),(700,730,650)),
+        ("West street reflection",(125,1260,115),(-1300,-800,-170),(1800,900,800)),
+        ("East street reflection",(125,-1260,115),(-1300,-900,-170),(1800,800,800)),
+    )
+    children = []
+    for i,(name,position,minimum,maximum) in enumerate(setups):
+        key = f"reflections/{i}"
+        component = K.component(ids,"Sandbox.EnvmapProbe",key+"/probe",Mode="Realtime",Projection="Box",
+            Bounds={"Mins":K.vec(minimum),"Maxs":K.vec(maximum)},Resolution="Medium",UpdateStrategy="OnEnabled",
+            ZNear=8,ZFar=12000,Feathering=.14,MaxDistance=10000,MultiBounce=False,TintColor="1,1,1,1")
+        children.append(K.game_object(ids,name,key,position,components=[component]))
+    return K.game_object(ids,"Reflections","reflections",children=children)
+
+
+def indirect_light_object():
+    path = Path(__file__).resolve().parents[1] / "Sources/Belltower/lighting/indirect.json"
+    return json.loads(path.read_text()) if path.is_file() else None
+
+
+def landscape_tree_object():
+    path = Path(__file__).resolve().parents[1] / "Sources/Belltower/landscape/trees.json"
+    return json.loads(path.read_text()) if path.is_file() else None
 
 
 # Under the lowest land, so nothing thrown over the walls falls for ever.
@@ -2968,17 +3029,18 @@ def write_scene( lights, models ):
         K.game_object( ids, "Sun", "sun", ( 0, 0, 3000 ), K.angles_rotation( SUN_PITCH, SUN_YAW ), tags="light_directional,light",
                        components=[
             K.component( ids, "Sandbox.DirectionalLight", "sun/light", ContactShadows=True, FogMode="Enabled", FogStrength=1,
-                         LightColor="1.32,1.06,0.76,1", ShadowBias=0.0005, ShadowCascadeCount=4, ShadowCascadeSplitRatio=0.91,
-                         ShadowHardness=0, Shadows=True, SkyColor="0.42,0.48,0.58,1" ),
+                         LightColor=SUN_COLOUR, ShadowBias=0.0005, ShadowCascadeCount=4, ShadowCascadeSplitRatio=0.91,
+                         ShadowHardness=.2, Shadows=True, SkyColor=SKY_AMBIENT ),
         ] ),
-        K.game_object( ids, "Sky", "sky", tags="skybox", components=[
-            K.component( ids, "Sandbox.SkyBox2D", "sky/box", SkyIndirectLighting=True, SkyMaterial=SKY_MATERIAL, Tint="1,1,1,1" ),
+        K.game_object( ids, "Sky", "sky", rotation=K.angles_rotation(0,90), tags="skybox", components=[
+            K.component( ids, "Sandbox.SkyBox2D", "sky/box", SkyIndirectLighting=True, SkyMaterial=SKY_MATERIAL, Tint=SKY_TINT ),
         ] ),
         K.game_object( ids, "Fog", "fog", components=[
-            K.component( ids, "Sandbox.GradientFog", "fog/gradient", Color=f"{FOG_COLOUR},0.75", StartDistance=3000,
-                         EndDistance=95000, FalloffExponent=1.5, Height=9000, VerticalFalloffExponent=1.2 ),
+            K.component( ids, "Sandbox.GradientFog", "fog/gradient", Color=f"{FOG_COLOUR},0.6", StartDistance=2000,
+                         EndDistance=70000, FalloffExponent=.75, Height=25000, VerticalFalloffExponent=1.2 ),
         ] ),
         look_object(),
+        reflections_object(),
         town,
         K.game_object( ids, "Trees and planting", "foliage", children=foliage ),
         K.game_object( ids, "Lights", "lights", children=light_objects ),
@@ -2999,6 +3061,12 @@ def write_scene( lights, models ):
         K.prefab_instance( ids, "scenes/maps/defusemap_01/game_setup.prefab" ),
     ]
 
+    indirect = indirect_light_object()
+    if indirect:
+        objects.append(indirect)
+    landscape = landscape_tree_object()
+    if landscape:
+        objects.append(landscape)
     scene = {
         "__guid": ids( "scene" ),
         "GameObjects": objects,
@@ -3023,7 +3091,7 @@ def write_scene( lights, models ):
         "Title": TITLE,
         "Description": None,
         "__references": [ "facepunch.beech_bush_small#145429", "facepunch.tree_oak_medium_a#288916",
-                          "facepunch.tree_oak_small_a#288917" ],
+                          "facepunch.tree_oak_small_a#288917", "facepunch.treeoakdrymediuma#289352" ],
         "__version": 3,
     }
     SCENE_FILE.parent.mkdir( parents=True, exist_ok=True )

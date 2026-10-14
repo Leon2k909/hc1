@@ -17,7 +17,7 @@ Conventions
 - Paints are the design doc's rw_* paints, plus building_textures' copper_brown for the overhead wires.
 - Collision: trains, wagons, containers and buffer stops are "metal" boxes from rail_z - 7 up to their roofs; rails,
   sleepers, wires and small detail have none; furniture and yard clutter get a box or a few, and thin things lying on
-  the floor (fence feet, a forklift's forks) none. Atlas faces get explicit UVs from railhead_materials.rect_uv() (the
+  the floor (fence feet) none. Atlas faces get explicit UVs from railhead_materials.rect_uv() (the
   whole texture until that exists).
 - Sizes are real ones: UIC 60 rail on B70 sleepers at standard gauge, UIC buffers 1060 mm over the rail 1750 mm apart,
   Re 200 overhead line, ISO containers, Euro pallets, welded mesh and palisade fencing and mobile fence panels to their
@@ -3236,68 +3236,6 @@ def crate( model, e, n, z0=0.0, size=( 47.2, 31.5, 31.5 ), along="n", paint="rw_
     return z0 + h
 
 
-def forklift( model, e, n, facing="+n", z0=0.0, lift=0.0 ):
-    """ A generic 2.5 t counterbalance forklift (2.5 m to the fork face, 1.15 m wide, overhead guard 2.1 m, 1.65 m
-    wheelbase, 7.00-12 and 6.00-9 tyres), forks forward along facing, raised by lift. From (e, n) it runs 51 back to
-    the counterweight's back and 48 forward to the forks' faces, and the 1070 mm forks reach 42 beyond that.
-    Collision: the body to 46, the mast, and the guard's posts and roof (metal); none on the forks. """
-    F = frame_for( e, n, z0, facing )
-    Y, cw = "rw_yellow_paint", DARK
-    F.box( model, -15.0, 15.0, -30.0, 38.0, 6.0, 30.0, Y )
-    for xs in ( -1, 1 ):
-        x0, x1 = sorted( ( xs * 15.0, xs * 22.6 ) )
-        F.box( model, x0, x1, -27.5, 11.5, 9.0, 30.0, Y )
-        x0, x1 = sorted( ( xs * 15.0, xs * 23.8 ) )
-        F.box( model, x0, x1, 11.5, 40.5, 28.0, 30.5, Y )
-    _side_prism( model, F, [ ( -30.0, 22.0 ), ( -30.0, 46.0 ), ( -44.0, 46.0 ), ( -50.5, 40.0 ), ( -51.0, 26.0 ),
-                             ( -48.5, 22.0 ) ], -22.6, 22.6, lambda k: cw, cw )
-    F.box( model, -12.5, 12.5, -48.0, -30.0, 6.0, 22.0, cw, skip=( "top", ) )
-    F.box( model, -20.0, 20.0, -30.0, -8.0, 30.0, 42.0, Y, skip=( "bottom", ) )
-    _side_prism( model, F, [ ( 10.0, 30.0 ), ( 24.0, 30.0 ), ( 24.0, 44.0 ), ( 17.0, 50.0 ), ( 10.0, 50.0 ) ],
-                 -20.0, 20.0, lambda k: None if k == 0 else Y, Y )
-    F.box( model, -9.0, 9.0, -27.0, -11.0, 42.0, 46.0, "rw_black", skip=( "bottom", ) )
-    _obox( model, F, ( 0.0, -27.5, 54.0 ), ( 1, 0, 0 ), ( 0, 1, 0.12 ), ( 18.0, 3.0, 16.0 ), "rw_black" )
-    rod( model, F.p( 0.0, 17.0, 49.5 ), F.p( 0.0, 10.0, 57.5 ), 1.2, cw, 4 )
-    wheel_n = _unit( _world( F, ( 0.0, -0.6, 1.0 ) ) )
-    for s in ( 1.0, -1.0 ):
-        disc( model, "rw_black", F.p( 0.0, 9.6, 58.0 ) + s * wheel_n * 0.3, s * wheel_n, 6.5, sides=10,
-              up=_world( F, ( 0, 1, 0 ) ) )
-    for x in ( -20.0, 20.0 ):                                       # the overhead guard
-        _fbeam( model, F, ( x, -29.0, 42.0 ), ( x, -29.0, 82.0 ), ( 2.2, 2.2 ), "rw_black" )
-        _fbeam( model, F, ( x, 24.0, 30.5 ), ( x, 20.0, 82.0 ), ( 2.2, 2.2 ), "rw_black" )
-        F.box( model, x - 1.1, x + 1.1, -30.1, 21.1, 82.0, 84.0, "rw_black" )
-        F.box( model, x - 1.6, x + 1.6, 21.6, 23.8, 64.5, 67.5, { "default": DARK, "front": "rw_white_paint" } )
-    for y in ( -29.0, -12.0, 3.0, 20.0 ):
-        F.box( model, -18.9, 18.9, y - 1.1, y + 1.1, 82.4, 83.6, "rw_black", skip=() )
-    rod( model, F.p( 0.0, -27.0, 84.0 ), F.p( 0.0, -27.0, 87.0 ), 1.6, "rw_yellow_paint", 8, caps=( False, True ) )
-    for xs in ( -1, 1 ):                                            # the mast
-        x0, x1 = sorted( ( xs * 13.0, xs * 16.5 ) )
-        F.box( model, x0, x1, 39.5, 43.5, 4.0, 80.0, cw )
-        rod( model, F.p( xs * 14.5, 30.0, 26.0 ), F.p( xs * 14.5, 39.5, 40.0 ), 1.2, cw, 4 )
-        x0, x1 = sorted( ( xs * 10.0, xs * 12.8 ) )
-        F.box( model, x0, x1, 40.5, 43.0, 4.0 + max( 0.0, lift - 6.0 ), 78.0 + max( 0.0, lift - 6.0 ), cw )
-    F.box( model, -16.5, 16.5, 39.5, 43.5, 76.0, 80.0, cw )
-    F.box( model, -16.5, 16.5, 39.5, 43.5, 36.0, 39.0, cw )
-    zc = lift
-    F.box( model, -20.0, 20.0, 43.5, 46.0, zc + 4.0, zc + 18.0, cw )
-    for x0, x1 in ( ( -20.0, -18.0 ), ( -7.5, -5.5 ), ( 5.5, 7.5 ), ( 18.0, 20.0 ) ):
-        F.box( model, x0, x1, 44.0, 46.0, zc + 18.0, zc + 46.0, cw, skip=( "bottom", ) )
-    F.box( model, -20.0, 20.0, 44.0, 46.0, zc + 46.0, zc + 48.0, cw )
-    for x in ( -11.0, 11.0 ):
-        F.box( model, x - 1.95, x + 1.95, 46.0, 47.8, zc, zc + 19.0, cw, skip=( "bottom", ) )
-        F.box( model, x - 1.95, x + 1.95, 47.8, 89.8, zc, zc + 1.8, cw, skip=( "back", ) )
-    for y, r, x0, x1 in ( ( 26.0, 13.2, 16.3, 23.4 ), ( -39.0, 10.6, 13.5, 19.0 ) ):
-        for xs in ( -1, 1 ):
-            rod( model, F.p( xs * x0, y, r ), F.p( xs * x1, y, r ), r, "rw_rubber", 10, caps=( True, True ) )
-            disc( model, "rw_steel_grey", F.p( xs * ( x1 + 0.05 ), y, r ), xs * F.x, r * 0.6, sides=8 )
-    F.collide( model, -22.6, 22.6, -51.0, 39.5, 0.0, 46.0, "metal" )
-    F.collide( model, -16.5, 16.5, 39.5, 46.0, 0.0, 80.0, "metal" )
-    for x in ( -20.0, 20.0 ):
-        F.collide( model, x - 1.1, x + 1.1, -30.1, -27.9, 46.0, 82.0, "metal" )
-        F.collide( model, x - 1.1, x + 1.1, 19.0, 23.5, 46.0, 82.0, "metal" )
-    F.collide( model, -21.1, 21.1, -30.1, 21.1, 82.0, 84.0, "metal" )
-
-
 # Road vehicles: half profiles ( a, W, zb, zm, wb, zbelt, wr, zrs, wi, zri, zt ) at depth a behind the front: the
 # body's side (W) from its bottom zb to the shoulder zm, the belt line (wb, zbelt) under the side windows, their tops
 # (wr, zrs), the roof's edge (wi, zri) and its crown zt. In front of the windscreen the "windows" close up and the
@@ -4511,8 +4449,6 @@ def showcase():
         ( "pallet stack (2)", lambda m: pallet_stack( m, -1480.0, -1300.0, layers=2, along="e" ) ),
         ( "crate", lambda m: crate( m, -1350.0, -1400.0 ) ),
         ( "crate", lambda m: crate( m, -1350.0, -1400.0, 31.5, size=( 31.5, 23.6, 23.6 ) ) ),
-        ( "forklift", lambda m: forklift( m, -1250.0, -1220.0, "-e" ) ),
-        ( "forklift (forks up)", lambda m: forklift( m, -1150.0, -1450.0, "+n", lift=40.0 ) ),
         ( "car hatchback", lambda m: car( m, -1000.0, -80.0, "+n", "rw_train_red" ) ),
         ( "car estate", lambda m: car( m, -1090.0, -80.0, "-n", "rw_train_grey", kind="estate" ) ),
         ( "car hatchback", lambda m: car( m, -1180.0, -80.0, "+n", "rw_train_blue" ) ),

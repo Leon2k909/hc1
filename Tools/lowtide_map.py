@@ -69,6 +69,16 @@ import lowtide_lamps as LAMPS
 import lowtide_lanterns as LANTERNS
 import lowtide_paving as PAVING
 import lowtide_container as CONTAINER
+import lowtide_finish as FINISH
+import lowtide_marine as MARINE
+import lowtide_masonry as MASONRY
+import lowtide_frames as FRAMES
+import lowtide_roofs as ROOFS
+import lowtide_interior as INTERIOR
+import lowtide_windows as WINDOWS
+import lowtide_facade as FACADE
+import lowtide_piles as PILES
+import lowtide_tyres as TYRES
 
 TITLE = "Lowtide"
 OUT_DIR = K.ASSETS / "models/maps/lowtide"
@@ -213,6 +223,15 @@ def write_materials():
     PALLETS.write_materials()
     SHIPYARD.write_materials()
     CONTAINER.write_materials()
+    FINISH.write_materials()
+    MARINE.write_materials()
+    MASONRY.write_materials()
+    FRAMES.write_materials()
+    ROOFS.write_materials()
+    INTERIOR.write_materials()
+    WINDOWS.write_materials()
+    PILES.write_materials()
+    TYRES.write_materials()
 
 
 def configure( model ):
@@ -236,6 +255,14 @@ def configure( model ):
     PLASTER.configure( model )
     LAMPS.configure( model )
     LANTERNS.configure( model )
+    FINISH.configure( model )
+    MARINE.configure( model )
+    MASONRY.configure( model )
+    FRAMES.configure( model )
+    ROOFS.configure( model )
+    INTERIOR.configure( model )
+    PILES.configure( model )
+    TYRES.configure( model )
     model.grain_paints |= { p for p in model.polygons if p in GRAIN }
     return model
 
@@ -1273,12 +1300,12 @@ def block( m, e0, e1, n0, n1, eaves, faces, style, z0=0.0, roof_along="n" ):
 
 
 def fleet_wall( m, style, n0, n1 ):
-    """ The Fleet's wall under the quay, its face at e 240 from below the mud to the quay: brick, slimed green under the
-    tide line, a dark line where the tide stands longest. """
+    """Continuous brick plane; the shader supplies the irregular tidal weathering."""
     card( m, style.brick, [ ( FLEET, n0, -54 ), ( FLEET, n1, -54 ), ( FLEET, n1, 0 ), ( FLEET, n0, 0 ) ], ( -1, 0, 0 ) )
-    card( m, "lt_brick_slime", [ ( FLEET, n0, BED_Z - 12 ), ( FLEET, n1, BED_Z - 12 ), ( FLEET, n1, -58 ), ( FLEET, n0, -58 ) ],
+    card( m, "lt_brick_slime", [ ( FLEET, n0, BED_Z - 12 ), ( FLEET, n1, BED_Z - 12 ), ( FLEET, n1, -60 ), ( FLEET, n0, -60 ) ],
           ( -1, 0, 0 ) )
-    m.box( ( FLEET - 0.6, n0, -60 ), ( FLEET, n1, -54 ), { "-e": "lt_brick_glazed", "default": None } )
+    card( m, "lt_brick_glazed", [ ( FLEET, n1, -60 ), ( FLEET, n0, -60 ), ( FLEET, n0, -54 ), ( FLEET, n1, -54 ) ],
+          ( -1, 0, 0 ) )
 
 
 def quay_ladder( m, n ):
@@ -1650,17 +1677,12 @@ def sacks( m, e, n, z0, rows=2, cols=3, layers=3, along="e", pallet=True ):
 
 def piles( m, e, n, top=-8.0 ):
     """ A dolphin (Dalben): three tarred timber piles driven into the mud, bound with an iron band. """
-    for k in range( 3 ):
-        t = 2 * math.pi * k / 3 + 0.4
-        c = ( e + 8 * math.cos( t ), n + 8 * math.sin( t ) )
-        m.cylinder( c, 6.5, BED_Z - 20, top - k * 3, { "side": "lt_timber", "top": "lt_timber", "bottom": None }, sides=8 )
-    m.cylinder( ( e, n ), 15.5, top - 24, top - 20, { "side": "iron_black", "top": "iron_black", "bottom": "iron_black" }, sides=10 )
+    PILES.cluster( m, e, n, BED_Z - 20, top )
     m.collision_box( ( e - 15, n - 15, BED_Z - 20 ), ( e + 15, n + 15, top ), WOOD )
 
 
 def tyre( m, e, n, z, r=14.0, w=8.0 ):
-    m.cylinder( ( e, n ), r, z, z + w, { "side": "lt_rubber", "top": "lt_rubber", "bottom": None }, sides=12 )
-    m.cylinder( ( e, n ), r * 0.55, z + w + 0.05, z + w + 0.1, { "top": "rw_black", "side": None, "bottom": None }, sides=10 )
+    TYRES.tyre( m, e, n, z, r, w )
 
 
 # Along each wall: clear of the ladders (-1450, -560, 1020), the footbridge, the quay stair and the bays' landings.
@@ -1742,7 +1764,7 @@ def fleet():
     barge( m )
     for e, n in ( ( 205, -720 ), ( -205, -690 ), ( 208, 360 ), ( -206, 1000 ), ( 204, -1440 ), ( -204, -1460 ) ):
         piles( m, e, n )
-    for e, n, r in ( ( 168, -460, 14 ), ( 176, -440, 13 ), ( -190, 120, 14 ), ( -150, 1240, 13 ) ):
+    for e, n, r in TYRES.POSITIONS:
         tyre( m, e, n, float( mud_z( e, n ) ) - 1.5, r )
     for e0, n0, e1, n1 in ( ( -200, -300, -160, -230 ), ( 150, 820, 190, 900 ), ( -60, -980, 30, -1000 ) ):
         z = float( mud_z( ( e0 + e1 ) / 2, ( n0 + n1 ) / 2 ) )
@@ -1805,9 +1827,11 @@ def far_shore( m ):
 # Dressing, built for each side in place (so number plates read the right way round): s is +1 east, -1 west
 
 def use( name, m, *args, **kw ):
-    """Lowtide's forklift, or shared Railhead props through its checked builder."""
+    """Lowtide-specific props, or shared Railhead props through its checked builder."""
     if name == "forklift":
-        return FORKLIFT.build( m, *args, **kw )
+        return FORKLIFT.build( m, *args, reactive_canister=True, **kw )
+    if name == "container":
+        return CONTAINER.build( m, *args, **kw )
     if name == "lamp_post":
         return LAMPS.build( m, *args, **kw )
     return R.use( name, m, *args, **kw )
@@ -2168,6 +2192,9 @@ SCENE_MODELS = [
     ( "lowtide_dress_east", "Dressing East", True, True ), ( "lowtide_dress_west", "Dressing West", True, True ),
     ( "lowtide_glass", "Glass", True, False ), ( "lowtide_water", "Water", False, False ),
     ( "lowtide_backdrop", "Backdrop", False, True ),
+    ( "lowtide_finish", "Harbour Details", False, True ),
+    ( "lowtide_marine", "Tidal Details", False, True ),
+    ( "lowtide_masonry", "Masonry Details", False, True ),
 ]
 NAV_SKIP = { "lowtide_glass" }
 PROP_PACKAGES = R.PROP_PACKAGES
@@ -2180,6 +2207,8 @@ def model_object( name, key, model_name, collide=True, shadows=True ):
                                 RenderType="On" if shadows else "Off", Tint="1,1,1,1" ) ]
     if collide:
         components.append( K.component( ids, "Sandbox.ModelCollider", f"{key}/collider", IsTrigger=False, Model=path, Static=True ) )
+    if model_name == "lowtide_water":
+        components.append( WATER.reflection_component( ids, key ) )
     return K.game_object( ids, name, key, components=components, tags=tags )
 
 
@@ -2215,6 +2244,7 @@ def look_object():
 
 
 def write_scene( written, light_list, props ):
+    from lowtide_canisters import scene_objects as canister_objects
     foliage = []
     for index, prop in enumerate( props ):
         key = f"foliage/{index}"
@@ -2333,6 +2363,7 @@ def write_scene( written, light_list, props ):
         ] ),
         look_object(),
         world,
+        *canister_objects(),
         K.game_object( ids, "Trees", "foliage", children=foliage ),
         K.game_object( ids, "Lights", "lights", children=light_objects ),
         K.game_object( ids, "Reflection Probes", "probes", children=[ probe_object( *p ) for p in PROBES ] ),
@@ -2378,6 +2409,8 @@ def write_scene( written, light_list, props ):
         "__references": references,
         "__version": 3,
     }
+    import sys
+    FINISH.apply_scene( scene, sys.modules[__name__] )
     SCENE_FILE.parent.mkdir( parents=True, exist_ok=True )
     K.write_text( SCENE_FILE, json.dumps( scene, indent=2 ), newline=None )
     print( f"wrote {SCENE_FILE.relative_to( K.ROOT )}" )
@@ -2398,8 +2431,15 @@ def build():
         "lowtide_water": water_model(),
         "lowtide_backdrop": backdrop(),
     }
+    import sys
+    models["lowtide_finish"] = FINISH.build( sys.modules[__name__] )
+    MARINE.strip_model( models["lowtide_fleet"] )
+    models["lowtide_marine"] = MARINE.build( sys.modules[__name__] )
+    models["lowtide_masonry"] = MASONRY.build( sys.modules[__name__] )
     for model in models.values():
         configure( model )
+    for name in WINDOWS.NAMES:
+        WINDOWS.configure( models[name] )
     return models
 
 
@@ -2433,6 +2473,8 @@ def main():
     parser.add_argument( "--art", action="store_true", help="write the menus' stand-in picture" )
     args = parser.parse_args()
 
+    import sys
+    FACADE.bake( sys.modules[__name__] )
     write_materials()
     models = build()
     written = set()

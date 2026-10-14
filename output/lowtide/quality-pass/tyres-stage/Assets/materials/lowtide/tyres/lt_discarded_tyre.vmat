@@ -1,0 +1,13 @@
+// Tools/lowtide_tyres.py: worn rubber, using existing project surface maps.
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "materials/railhead/rw_rubber_color.png"
+    TextureNormal "materials/railhead/rubber_normal.png"
+    TextureRoughness "materials/railhead/rubber_rough.png"
+    TextureMetalness "[0 0 0 0]"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1.18 1.13 1.05 1]"
+    g_flRoughnessScaleFactor "0.90"
+}

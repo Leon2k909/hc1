@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Write a Kastov viewmodel's animgraph (e.g. Assets/Weapons/Kastov/v_kastov.vanmgrph).
 
-    root = hand IK(((state machine + ADS layer) + walk layer) + sway layer)
+    root = authored pose -> hand IK, by hand_ik_weight, after ADS, walk and sway
 
 State machine: idle (start), sprint, lowered, deploy, fire, reload, reload_empty.
   - b_attack / b_deploy are one-shot triggers (auto-reset) taken from any state.
@@ -22,8 +22,9 @@ Sway layer: the M4's look sway (kastov_sway.py). Like v_m4a1's graph, it blends 
   the M4's springs: turn, roll, then vertical and sideways shift, added up. The poses are the M4's hip half already,
   and ironsights_weight cuts the sum to kastov_sway.ADS of it in ADS.
 Hand IK: both arms solved onto their IK targets (bones on the gun that hold each hand's pose in every clip), the hands
-  turned to match, as the M4's are. On a clip's own frames it changes nothing; it keeps the hands on the gun while
-  the gun sways, in every state.
+  turned to match, as the M4's are. ViewModel sets hand_ik_weight to zero once sway and animated pose transitions
+  have settled: the held poses already have the right hands, and solving them again caused rapid numerical jitter
+  in the support hand. Blended clips and sway still use IK. The weight defaults to one for standalone previews.
 
 Run: python Tools/kastov_animgraph.py [--weapon kastov762|kastov74u|vityaz|rpk|bizon|ak105|vepr12|m16|p90|mp7|aug|uzi|fal|famas|m18|mcx|l85a2|hk416]
 """
@@ -329,6 +330,7 @@ def build(weapon: Weapon) -> Graph:
     graph.float_param("reload_speed", 1.0, 0.0, 5.0)
     graph.float_param("aim_yaw_inertia", 0.0, -180.0, 180.0)
     graph.float_param("aim_pitch_inertia", 0.0, -180.0, 180.0)
+    graph.float_param("hand_ik_weight", 1.0, 0.0, 1.0)
     if weapon.reload_variants:
         graph.enum_param("reload_variant", ["factory"] + [suffix.lstrip("_") for suffix in weapon.reload_variants])
 
@@ -432,7 +434,11 @@ def build(weapon: Weapon) -> Graph:
     hands = with_sway
     for index, (chain, _, target) in enumerate(kastov_sway.IK_CHAINS):
         hands = graph.two_bone_ik(f"ik_{chain}", hands, chain, target, (384.0 + 64.0 * index, 96.0))
-    graph.root(hands)
+    hand_pose = graph.blend("hands_on_sway", [(with_sway, "authored pose", 0.0), (hands, "sway IK", 1.0)],
+                            "hand_ik_weight", (512.0, 128.0), damping=NO_DAMPING)
+    # Both branches share the same state machine; switching IK must not seek or restart its clips.
+    graph.nodes[-1]["value"]["m_bSyncCycles"] = False
+    graph.root(hand_pose)
     return graph
 
 

@@ -80,8 +80,7 @@ public partial class HealthComponent : Component, IRespawnable//, Component.IDam
 		// In hardcore mode, explosions and knives to or from a bot kill outright, regardless of armor.
 		// Use the same component-owner lookup as kill scoring so child health components
 		// are still recognized as part of a lightweight bot.
-		var isHardcore = GameMode.ActiveHardcore ||
-			             (GameMode.Instance.IsValid() && GameMode.Instance.Hardcore);
+		var isHardcore = GameMode.IsHardcore;
 		var isHcBot = isHardcore &&
 			          GameUtils.GetLightweightBotFromComponent( this ) is not null;
 		var isHcBotAttackOnPlayer = isHardcore &&
@@ -114,14 +113,18 @@ public partial class HealthComponent : Component, IRespawnable//, Component.IDam
 			return;
 		}
 
-		if ( bullet && damageInfo.ArmorDamage > 0f && !damageInfo.Hitbox.HasFlag( HitboxTags.Head )
-			&& GameUtils.GetPlayerFromComponent( this )?.ArmorComponent is { } armor )
+		var armor = GameUtils.GetPlayerFromComponent( this )?.ArmorComponent;
+		if ( armor is { ArmorEnabled: true } && damageInfo.ArmorDamage > 0f
+			&& (!bullet || !damageInfo.Hitbox.HasFlag( HitboxTags.Head )) )
 		{
 			// Protection cannot absorb more than the vest's remaining condition.
 			var absorbed = Math.Min( armor.Armor, damageInfo.ArmorDamage );
 			armor.Armor = Math.Max( 0f, armor.Armor - absorbed );
 			damageInfo = damageInfo with { Damage = damageInfo.Damage + damageInfo.ArmorDamage - absorbed, ArmorDamage = absorbed };
 		}
+
+		if ( damageInfo.RemoveHelmet && armor is { HelmetsEnabled: true } )
+			armor.HasHelmet = false;
 
 		BroadcastDamage( damageInfo );
 

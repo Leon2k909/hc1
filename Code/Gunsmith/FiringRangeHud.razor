@@ -1,0 +1,102 @@
+@namespace Facepunch.UI
+@using Facepunch.Gunsmith
+@using Sandbox
+@attribute [StyleSheet]
+@inherits PanelComponent
+
+@{
+    var range = FiringRangeSystem.Current;
+    var player = range?.Player;
+    var weapon = player?.CurrentEquipment?.Resource;
+    var ammo = player?.CurrentEquipment?.GetComponentInChildren<WeaponAmmo>();
+}
+
+<root class="@(range?.MenuOpen == true ? "menu-open" : "")">
+    @if ( range.IsValid() )
+    {
+        @if ( !range.MenuOpen )
+        {
+            <ScopeOverlay />
+            <CrosshairHud />
+        }
+
+        <div class="range-heading">
+            <label class="range-caption">FIRING RANGE</label>
+            <label class="range-weapon">@(weapon?.Name?.ToUpperInvariant() ?? "PREPARING LOADOUT")</label>
+            <label class="range-distances">10 / 25 / 50 / 100 M</label>
+        </div>
+        <div class="range-stats">
+            <div><label class="range-number">@range.Shots</label><label>SHOTS</label></div>
+            <div><label class="range-number">@range.Hits</label><label>IMPACTS</label></div>
+            <div><label class="range-number">@range.Knockdowns</label><label>DOWN</label></div>
+        </div>
+        @if ( range.SinceHit < 3 )
+        {
+            <div class="range-impact">
+                <label class="range-damage">@range.LastDamage.ToString( "0.#" )</label>
+                <label>IMPACT DAMAGE</label>
+                <label class="range-hit-kind">@(range.LastHeadshot ? "HEAD" : "BODY") · @range.LastDistance.ToString( "0" ) M</label>
+            </div>
+        }
+        <div class="range-help">
+            <div><label class="range-key">ESC</label><label>RANGE MENU</label></div>
+            <div><InputHint Action="Reload" Size=@InputGlyphSize.Small /><label>RELOAD</label></div>
+            <label class="range-reserve">UNLIMITED RESERVE AMMO</label>
+        </div>
+        @if ( ammo is not null && !range.MenuOpen )
+        {
+            <div class="range-ammo">
+                <div><label class="range-ammo-count">@ammo.Ammo</label><label class="range-ammo-reserve">/ ∞</label></div>
+                <label>@ammo.GetEffectiveMaxAmmo() ROUND MAGAZINE</label>
+            </div>
+        }
+
+        @if ( range.MenuOpen )
+        {
+            <div class="range-menu-backdrop">
+                <div class="range-menu">
+                    <label class="range-caption">FIRING RANGE</label>
+                    <label class="range-menu-title">TEST YOUR BUILD</label>
+                    <label class="range-menu-copy">Targets reset after a knockdown. Edit your build in Gunsmith and come straight back.</label>
+                    <div class="range-button primary" @onclick=@range.Resume><i>play_arrow</i><label>RESUME</label></div>
+                    <div class="range-button" @onclick=@range.ToggleMovingTargets><i>swap_horiz</i><label>@(range.MovingTargets ? "MOVING TARGETS: ON" : "MOVING TARGETS: OFF")</label></div>
+                    <div class="range-button" @onclick=@range.RefillLoadout><i>inventory_2</i><label>REFILL LOADOUT</label></div>
+                    <div class="range-button" @onclick=@range.ResetTargets><i>restart_alt</i><label>RESET TARGETS & STATS</label></div>
+                    <div class="range-button back" @onclick=@GunsmithRangeSession.ReturnToGunsmith><i>build</i><label>BACK TO GUNSMITH</label></div>
+                </div>
+            </div>
+        }
+    }
+</root>
+
+@code
+{
+    protected override void OnUpdate()
+    {
+        var range = FiringRangeSystem.Current;
+        if ( !range.IsValid() ) return;
+        if ( Input.EscapePressed )
+        {
+            Input.EscapePressed = false;
+            range.ToggleMenu();
+            StateHasChanged();
+        }
+        GameUtils.UpdateCombatMouseVisibility( range.Player );
+        if ( range.MenuOpen ) Input.Suppressed = true;
+    }
+
+    protected override void OnPreRender() => GameUtils.UpdateCombatMouseVisibility( FiringRangeSystem.Current?.Player );
+
+    protected override int BuildHash()
+    {
+        var r = FiringRangeSystem.Current;
+        if ( !r.IsValid() ) return 0;
+        var ammo = r.Player?.CurrentEquipment?.GetComponentInChildren<WeaponAmmo>();
+        var hash = new HashCode();
+        hash.Add( r.MenuOpen ); hash.Add( r.MovingTargets ); hash.Add( r.Shots ); hash.Add( r.Hits );
+        hash.Add( r.Knockdowns ); hash.Add( r.SinceHit < 3 ); hash.Add( r.LastDamage );
+        hash.Add( r.Player?.CurrentEquipment?.Resource ); hash.Add( ammo?.Ammo );
+        hash.Add( ammo?.GetEffectiveMaxAmmo() );
+        return hash.ToHashCode();
+    }
+}

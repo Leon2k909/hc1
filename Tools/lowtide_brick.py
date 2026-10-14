@@ -155,10 +155,18 @@ def bake_surface_maps():
     return scale
 
 
-def material_text(tint=(1.0, 1.0, 1.0), roughness=None):
+def material_text(tint=(1.0, 1.0, 1.0), roughness=None, facade=False, biofilm=None, tidal_clay=False):
     rgb, clay = read_surface()
     (u, v), _ = layout(clay, rgb)
     rough = f'"{RESOURCE}_rough.png"' if roughness is None else f'"[{roughness:.6f} {roughness:.6f} {roughness:.6f} 0.000000]"'
+    wear = ('    TextureFacadeWear "materials/lowtide/masonry/facade_wear.png"\n'
+            '    g_flFacadeWear "1"\n') if facade else ''
+    if facade:
+        from lowtide_shed_weathering import material_inputs as shed_inputs
+        wear += shed_inputs(.9)
+    if biofilm is not None:
+        from lowtide_weathering import material_inputs
+        wear += material_inputs(biofilm, tidal_clay)
     return f'''// Tools/lowtide_brick.py: seamless generated albedo, matching mortar relief, physical brick scale.
 "Layer0"
 {{
@@ -171,7 +179,7 @@ def material_text(tint=(1.0, 1.0, 1.0), roughness=None):
     TextureBlendMask "materials/default/default_black_mask.tga"
     g_vBrickScale "[{u:.6f} {v:.6f} 0.0 0.0]"
     g_flTintColor "[{tint[0]:.3f} {tint[1]:.3f} {tint[2]:.3f}]"
-}}
+{wear}}}
 '''
 
 
@@ -180,7 +188,8 @@ def write_materials():
         raise FileNotFoundError(f"Generated Lowtide brick source/tile is missing: {SOURCE}")
     for name, (tint, roughness) in VARIANTS.items():
         path = DIRECTORY / f"{name}.vmat"
-        K.write_text(path, material_text(tint, roughness))
+        K.write_text(path, material_text(tint, roughness, facade=name in ("lt_brick", "lt_brick_soot"),
+            biofilm=.8, tidal_clay=name in ("lt_brick_glazed", "lt_brick_slime")))
         metadata(path)
 
 

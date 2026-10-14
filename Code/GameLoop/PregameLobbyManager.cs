@@ -47,7 +47,7 @@ public sealed class PregameLobbyManager : Component
         GameMode.SetCurrent( mode );
         // Core modes are off for now, every match is hardcore. Put back with Core:
         // GameMode.SetHardcore( IsHardcore );
-        GameMode.SetHardcore( true );
+        GameMode.SetHardcore( !mode.UsesStandardHealth );
 
         GameUtils.LoadMap( map );
     }

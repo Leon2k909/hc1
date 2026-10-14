@@ -1,0 +1,228 @@
+{
+  "vents": [
+    {
+      "centre": [
+        -1300.0,
+        -825.0,
+        346.875
+      ],
+      "normal": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "radius": 28.0,
+      "radialBricks": 50,
+      "blades": 10
+    },
+    {
+      "centre": [
+        -1950.0,
+        -825.0,
+        346.875
+      ],
+      "normal": [
+        -1.0,
+        0.0,
+        0.0
+      ],
+      "radius": 28.0,
+      "radialBricks": 50,
+      "blades": 10
+    },
+    {
+      "centre": [
+        -300.0,
+        -840.0,
+        280.1
+      ],
+      "normal": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "radius": 17.0,
+      "radialBricks": 33,
+      "blades": 6
+    },
+    {
+      "centre": [
+        -620.0,
+        -840.0,
+        280.1
+      ],
+      "normal": [
+        -1.0,
+        0.0,
+        0.0
+      ],
+      "radius": 17.0,
+      "radialBricks": 33,
+      "blades": 6
+    },
+    {
+      "centre": [
+        1300.0,
+        -825.0,
+        346.875
+      ],
+      "normal": [
+        -1.0,
+        0.0,
+        0.0
+      ],
+      "radius": 28.0,
+      "radialBricks": 50,
+      "blades": 10
+    },
+    {
+      "centre": [
+        1950.0,
+        -825.0,
+        346.875
+      ],
+      "normal": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "radius": 28.0,
+      "radialBricks": 50,
+      "blades": 10
+    },
+    {
+      "centre": [
+        300.0,
+        -840.0,
+        280.1
+      ],
+      "normal": [
+        -1.0,
+        0.0,
+        0.0
+      ],
+      "radius": 17.0,
+      "radialBricks": 33,
+      "blades": 6
+    },
+    {
+      "centre": [
+        620.0,
+        -840.0,
+        280.1
+      ],
+      "normal": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "radius": 17.0,
+      "radialBricks": 33,
+      "blades": 6
+    }
+  ],
+  "ridges": [
+    {
+      "bounds": [
+        1300.0,
+        1950.0,
+        -1050.0,
+        -600.0
+      ],
+      "side": -1,
+      "height": 444.75,
+      "seams": 13
+    },
+    {
+      "bounds": [
+        300.0,
+        620.0,
+        -980.0,
+        -700.0
+      ],
+      "side": -1,
+      "height": 341.0,
+      "seams": 6
+    },
+    {
+      "bounds": [
+        1300.0,
+        1950.0,
+        -1050.0,
+        -600.0
+      ],
+      "side": 1,
+      "height": 444.75,
+      "seams": 13
+    },
+    {
+      "bounds": [
+        300.0,
+        620.0,
+        -980.0,
+        -700.0
+      ],
+      "side": 1,
+      "height": 341.0,
+      "seams": 6
+    }
+  ],
+  "collisionAdded": false,
+  "addedTriangles": 14784,
+  "changes": {
+    "Assets/models/maps/lowtide/lowtide_finish.obj": {
+      "before": "cdb59f68500dd6f14f583c8e87bfce0eafbcad3a27e96b56abd24d06d93e27d2",
+      "after": "726f59989bc47c812ce2e5243f7ca40756f95539233dc80478a0883dc134cdca"
+    },
+    "Assets/models/maps/lowtide/lowtide_finish.mtl": {
+      "before": "8387262ffc804289557c51950b5b83b1579bbb2e9c5950f96e31632e824fc6e2",
+      "after": "413dfea2f6359afe443dc1081bd7f86595013b063908bd65c0de319abcfb3b9a"
+    },
+    "Assets/models/maps/lowtide/lowtide_finish.vmdl": {
+      "before": "4f7487f3d0ebacbfbc154fe0e9f520380a1f77da2d9fcf196064b3f1a8de6bf5",
+      "after": "6533f2cb1a8c30fd3ed60d83610add79d8b8d3717030df3f6d64ac3e16786a62"
+    }
+  },
+  "newMaterialRemaps": [
+    "\t\t\t\t\t\t\t{ from = \"lt_hull_black.vmat\" to = \"materials/lowtide/lt_hull_black.vmat\" },"
+  ],
+  "protectedBefore": {
+    "Assets/scenes/maps/Lowtide/lowtide.scene": "e775149b4d99c1b5ed740efd11ad5ebf60396933e9ef31ed98f5f35eba6551a2",
+    "Assets/models/maps/lowtide/lowtide_backdrop.obj": "704e13681ef286c8ad4ee8aa96137de1fd946ca67c0f30ed99780d42c53246f9",
+    "Assets/models/maps/lowtide/lowtide_backdrop.vmdl": "02bb03f812130c3dcb3c98131a4fd961d883b9e4cfb1dca81e0cb8a97be56009",
+    "Assets/models/maps/lowtide/lowtide_dress_east.obj": "7537185e7f1477271771d97e13cb71d2e102b42791cd25f1fdfef93e9af3eb5c",
+    "Assets/models/maps/lowtide/lowtide_dress_east.vmdl": "26b4d9aa380d84273a2e9555e2ed63293a5f8ba53f767ae39730bb8811a3f950",
+    "Assets/models/maps/lowtide/lowtide_dress_east_hulls_metal.obj": "463c6bc6ee32905e47631ee9f03d14fe28705043faa1e98f3a06a247b1d8219f",
+    "Assets/models/maps/lowtide/lowtide_dress_west.obj": "8028f39b90a04b8d461579cc560a9868295f53ad44b35725bb77085ecd1181a3",
+    "Assets/models/maps/lowtide/lowtide_dress_west.vmdl": "f28047e7dcad48fe388338fd9568a5ae15bc26315c96f8ebdfc6a10861303a59",
+    "Assets/models/maps/lowtide/lowtide_dress_west_hulls_metal.obj": "19b6a4f0e8174ff578aa20b704319e82b72a0bd43bbe34054a2950610680ad54",
+    "Assets/models/maps/lowtide/lowtide_east.obj": "93ebb998d60470730012874327da91bcb35380b6a3b429e5e7fd831e9dbd07c6",
+    "Assets/models/maps/lowtide/lowtide_east.vmdl": "ac1c06af99bb96a89c3cf0141d6f837245700ac8e720d580eaf0f28217dcb74c",
+    "Assets/models/maps/lowtide/lowtide_east_hulls_metal.obj": "e1d5dee51f5157ad7a8a64e8999be3df6043bdb87efb15f40b4a40e81a042be6",
+    "Assets/models/maps/lowtide/lowtide_east_hulls_wood.obj": "969e501eaa399a80510669242504f89edbd4719b8f683d8caee801d6cf960761",
+    "Assets/models/maps/lowtide/lowtide_finish.obj": "cdb59f68500dd6f14f583c8e87bfce0eafbcad3a27e96b56abd24d06d93e27d2",
+    "Assets/models/maps/lowtide/lowtide_finish.vmdl": "4f7487f3d0ebacbfbc154fe0e9f520380a1f77da2d9fcf196064b3f1a8de6bf5",
+    "Assets/models/maps/lowtide/lowtide_fleet.obj": "928b50e08b47e45dc98df72b882774d96a639e083b0b323f2348c48530e41e48",
+    "Assets/models/maps/lowtide/lowtide_fleet.vmdl": "906d45bb12a13b34606d9922c4f7b987587b0941340b6a9b95859cc709413b8d",
+    "Assets/models/maps/lowtide/lowtide_fleet_hulls_dirt.obj": "6fe79fcb0077a75c9bd60fb4c9b06b695054442f5add872db78fd2e2d5929a61",
+    "Assets/models/maps/lowtide/lowtide_fleet_hulls_metal.obj": "9a8ac48f49e9632caec7c93a9f491d940a5ea6e8b1c111ef09ada5571e90d6e2",
+    "Assets/models/maps/lowtide/lowtide_glass.obj": "dc31d0ece8afdb83f896fdb0b523401102ead85f8c979a06d24d6115e45bff4a",
+    "Assets/models/maps/lowtide/lowtide_glass.vmdl": "1443a394798a1d871040a6d55231ddd461d8c2052ef0d1b0973c6fe5628aa669",
+    "Assets/models/maps/lowtide/lowtide_marine.obj": "fa2fe7bccd5da79262c2091d86694ea282ac8c97d3db4b4e331a926c85d93eff",
+    "Assets/models/maps/lowtide/lowtide_marine.vmdl": "168db2393238f6dfd05a1ab9e52544cfdb3e6d1f48d17eb5be54ff1c66f6d9e6",
+    "Assets/models/maps/lowtide/lowtide_masonry.obj": "c2195d03afa3e139909da02f8ebfec6c04fb2ae463fb7390ff920cb706286db5",
+    "Assets/models/maps/lowtide/lowtide_masonry.vmdl": "a436e21ea4863fa94808fbc2bf81ec826690ce04114ce49b29c68b77f2ed8511",
+    "Assets/models/maps/lowtide/lowtide_water.obj": "f83ffa370439054225a8c2d635d656bb591c9234a4412b939f5f75da3412a47e",
+    "Assets/models/maps/lowtide/lowtide_water.vmdl": "b649925ca76ffa9c2e2f8153931287ca45223fff99695dfc010cd61237e020db",
+    "Assets/models/maps/lowtide/lowtide_west.obj": "142c28ea5f805892bb50995c372473fea142ec9a6297724fd167cfff54545454",
+    "Assets/models/maps/lowtide/lowtide_west.vmdl": "25443251b40b7619d8f9e6ccdbd7cc19420b2c4fd5d547b0727e7eec112d592a",
+    "Assets/models/maps/lowtide/lowtide_west_hulls_metal.obj": "738f176e959c3a9dc778d67b38afb1f71b89778bad3895ed0315af9942df09ea",
+    "Assets/models/maps/lowtide/lowtide_west_hulls_wood.obj": "b67902099c6c8449cd9da7a43307d63d086ee79ba1be359599ed111af8e458a8",
+    "Assets/materials/lowtide/finish/lt_drain_iron.vmat": "065912f4ea405d1556b2bd3253979bef5c904325ea5c24fa0f813aa54ad9cd61",
+    "Assets/materials/lowtide/finish/lt_drain_edge.vmat": "ee94b3a3ccaafff0004bb16e0547c475503bf0b0377eeb3697c746c8707059ac",
+    "Assets/materials/lowtide/lt_hull_black.vmat": "7c6b93f654d478737b05214971ffbbca966f06da1a1d6a333abf7190fe6dc6a7",
+    "Assets/materials/lowtide/lt_frame_green.vmat": "a8c8d2871917677ba53ac4925b2e86ed851cf364e35112adfef112fbf37399f6",
+    "Assets/materials/lowtide/lt_frame_cream.vmat": "562018c297cd7901b483a3138c8aac8c5c8d5c9556710f90b1e4503a077d83e3",
+    "Assets/materials/lowtide/masonry/lt_arch_clay.vmat": "0200a7ebc974295f2e902e46443b47be3df003804205b6254f2482b77f4ef5bf"
+  }
+}

@@ -490,13 +490,13 @@
                 }
 
                 <div class="gs-actions">
-                    <div class="gs-action range locked" @onclick=@(() => Notify( "FIRING RANGE", "Coming in a later update", "lock" ))>
+                    <div class="gs-action range @(OpeningRange ? "loading" : "")" @onclick=@OpenFiringRange>
                         <i class="gs-action-icon">gps_fixed</i>
                         <div class="gs-action-copy">
                             <label class="gs-action-title">@Tr( "FIRING RANGE" )</label>
-                            <label class="gs-action-sub">@Tr( "COMING SOON" )</label>
+                            <label class="gs-action-sub">@Tr( OpeningRange ? "LOADING" : InMatch ? "LEAVE MATCH & TEST BUILD" : "TEST CURRENT BUILD" )</label>
                         </div>
-                        <i class="gs-action-lock">lock</i>
+                        <i class="gs-action-lock">arrow_forward</i>
                     </div>
                     @* Weapon tuning is off (see WeaponTuningManager). Put back with tuning:
                     <div class="gs-action tuning @(ShowTuning ? "open" : "")" @onclick=@ToggleTuning>
@@ -788,10 +788,6 @@
                 <i>ios_share</i>
                 <label class="gnav-tip">@Tr( "SHARE BUILD" )</label>
             </div>
-            <div class="gnav-round-btn @(IsFirstPerson ? "open" : "")" @onclick=@ToggleFirstPerson>
-                <i>visibility</i>
-                <label class="gnav-tip">@Tr( "FIRST-PERSON VIEW" )</label>
-            </div>
         </div>
     </div>
 
@@ -1022,6 +1018,11 @@
     protected override void OnUpdate()
     {
         base.OnUpdate();
+        if ( !InitialSlotApplied && GetEquipment() is { } initialEquipment )
+        {
+            SelectedSlot = initialEquipment.Slot;
+            InitialSlotApplied = true;
+        }
         ApplyDevPickerRequest();
         UpdateStats();
         if ( _sinceBuildStates > 0.5f )
@@ -1196,6 +1197,21 @@
             return;
 
         System.Toggle();
+    }
+
+    private bool OpeningRange { get; set; }
+    private bool InitialSlotApplied { get; set; }
+
+    private async System.Threading.Tasks.Task OpenFiringRange()
+    {
+        if ( OpeningRange || GetEquipment() is not { } equipment ) return;
+        OpeningRange = true;
+        StateHasChanged();
+        var entered = await GunsmithRangeSession.Enter( equipment );
+        if ( !this.IsValid() ) return;
+        OpeningRange = false;
+        if ( !entered ) Notify( "FIRING RANGE", "Unable to enter the firing range. Please try again.", "error_outline" );
+        StateHasChanged();
     }
 
     private void OpenFriendsList()
@@ -2505,6 +2521,7 @@
         hash.Add( ActiveCustomizeTab );
         hash.Add( CamoPage );
         hash.Add( PreviewCamoPart );
+        hash.Add( OpeningRange );
         hash.Add( CamoOnOptics );
         hash.Add( CustomCamoColor );
         hash.Add( IsCustomCamoColorEquipped );

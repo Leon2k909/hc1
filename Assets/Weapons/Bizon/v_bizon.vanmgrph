@@ -2734,6 +2734,76 @@
 			{
 				key = 
 				{
+					m_id = 1485640369
+				}
+				value = 
+				{
+					_class = "CBlendAnimNode"
+					m_sName = "hands_on_sway"
+					m_vecPosition = [ 512.0, 128.0 ]
+					m_nNodeID = 
+					{
+						m_id = 1485640369
+					}
+					m_sNote = ""
+					m_children = 
+					[
+						{
+							m_inputConnection = 
+							{
+								m_nodeID = 
+								{
+									m_id = 28254176
+								}
+								m_outputID = 
+								{
+									m_id = 4294967295
+								}
+							}
+							m_name = "authored pose"
+							m_blendValue = 0.0
+						},
+						{
+							m_inputConnection = 
+							{
+								m_nodeID = 
+								{
+									m_id = 327320305
+								}
+								m_outputID = 
+								{
+									m_id = 4294967295
+								}
+							}
+							m_name = "sway IK"
+							m_blendValue = 1.0
+						},
+					]
+					m_blendValueSource = "Parameter"
+					m_param = 
+					{
+						m_id = 2128192226
+					}
+					m_blendKeyType = "BlendKey_UserValue"
+					m_bLockBlendOnReset = false
+					m_bSyncCycles = false
+					m_bLoop = true
+					m_bLockWhenWaning = false
+					m_damping = 
+					{
+						_class = "CAnimInputDamping"
+						m_speedFunction = "NoDamping"
+						m_fSpeedScale = 1.0
+						m_fMinSpeed = 0.0
+						m_fMaxTension = 1000.0
+						m_fTension = 100.0
+						m_fDamping = 5.0
+					}
+				}
+			},
+			{
+				key = 
+				{
 					m_id = 606814416
 				}
 				value = 
@@ -2750,7 +2820,7 @@
 					{
 						m_nodeID = 
 						{
-							m_id = 327320305
+							m_id = 1485640369
 						}
 						m_outputID = 
 						{
@@ -2937,6 +3007,20 @@
 				m_fDefaultValue = 0.0
 				m_fMinValue = -180.0
 				m_fMaxValue = 180.0
+			},
+			{
+				_class = "CFloatAnimParameter"
+				m_name = "hand_ik_weight"
+				m_id = 
+				{
+					m_id = 2128192226
+				}
+				m_previewButton = "ANIMPARAM_BUTTON_NONE"
+				m_bUseMostRecentValue = false
+				m_bAutoReset = false
+				m_fDefaultValue = 1.0
+				m_fMinValue = 0.0
+				m_fMaxValue = 1.0
 			},
 		]
 	}

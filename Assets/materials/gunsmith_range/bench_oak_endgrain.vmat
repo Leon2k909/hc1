@@ -1,0 +1,14 @@
+// Generated oak albedo; Tools/gunsmith_range_bench.py bakes the restrained PBR derivatives.
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flMetalness "0"
+    g_flRoughnessScaleFactor "1"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1"
+    TextureColor "materials/gunsmith_range/bench_oak_endgrain_color.png"
+    TextureNormal "materials/gunsmith_range/bench_oak_endgrain_normal.png"
+    TextureRoughness "materials/gunsmith_range/bench_oak_endgrain_roughness.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+}

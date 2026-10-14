@@ -1,0 +1,54 @@
+{
+  "unchanged_geometry_and_scene_files": 42,
+  "added_triangles": 0,
+  "added_lights": 0,
+  "mask_resolution": [
+    768,
+    768
+  ],
+  "ray_count": 56623104,
+  "compiled_texture_references": [
+    "materials/lowtide/interior/concrete_color_png_8f5edec2.generated.vtex",
+    "materials/lowtide/interior/concrete_normal_png_c9c86808.generated.vtex",
+    "materials/lowtide/interior/concrete_rough_png_5e92e06f.generated.vtex",
+    "materials/lowtide/interior/floor_contact_png_3a961eab.generated.vtex"
+  ],
+  "texture_bound_in_engine": true,
+  "compiled_mask_mean_error": 0.003565705298684865,
+  "captures": {
+    "live-floor-contact-column-bound": {
+      "valid_renderers": 15,
+      "clear_emitters": 18,
+      "model_and_material_errors": 0
+    },
+    "live-floor-contact-hall-bound": {
+      "valid_renderers": 15,
+      "clear_emitters": 18,
+      "model_and_material_errors": 0
+    },
+    "live-floor-contact-cargo-final": {
+      "valid_renderers": 15,
+      "clear_emitters": 18,
+      "model_and_material_errors": 0
+    },
+    "live-floor-contact-west-final": {
+      "valid_renderers": 15,
+      "clear_emitters": 18,
+      "model_and_material_errors": 0
+    }
+  },
+  "before_after_pixel_changes": {
+    "column": {
+      "mean_pixel_change": -0.26831535473307944,
+      "mean_absolute_change": 0.2718263300265929,
+      "maximum_absolute_change": 52.0
+    },
+    "cargo": {
+      "mean_pixel_change": -0.1045370012559173,
+      "mean_absolute_change": 0.23185116871494746,
+      "maximum_absolute_change": 53.0
+    }
+  },
+  "remaining_qa_scenes": [],
+  "performance": "One conditional floor texture sample; no controlled benchmark"
+}

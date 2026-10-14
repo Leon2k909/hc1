@@ -1,0 +1,18 @@
+var report = new System.Collections.Generic.List<object>();
+var seen = new System.Collections.Generic.HashSet<Guid>();
+var sliding = new System.Collections.Generic.HashSet<Guid>();
+var starts = 0;
+for (var i=0; i<200; i++) {
+    cancellationToken.ThrowIfCancellationRequested();
+    var bots = Game.ActiveScene.GetAllComponents<Facepunch.LightweightCombatBot>().Where(x=>x.IsAlive).ToArray();
+    foreach (var bot in bots) {
+        if(bot.IsSliding && !sliding.Contains(bot.Id)) {
+            starts++; seen.Add(bot.Id);
+            report.Add(new { bot.BotName, Start=true, bot.WorldPosition, Speed=bot.Agent.Velocity.WithZ(0).Length, bot.SlideBlend });
+        }
+        if(!bot.IsSliding && sliding.Contains(bot.Id)) report.Add(new { bot.BotName, Start=false, bot.WorldPosition, Speed=bot.Agent.Velocity.WithZ(0).Length, bot.SlideBlend });
+    }
+    sliding.Clear(); foreach(var bot in bots.Where(x=>x.IsSliding)) sliding.Add(bot.Id);
+    await Task.Delay(100, cancellationToken);
+}
+return new { starts, BotsThatSlid=seen.Count, Events=report };

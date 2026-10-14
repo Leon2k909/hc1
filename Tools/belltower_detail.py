@@ -1,7 +1,7 @@
 """Belltower's visible props and material choices. Gameplay collision remains in belltower_map.py.
 
 Foliage uses the engine's oak/beech assets, with individual renderers for instancing and distance LOD.
-Wood uses Poly Haven's CC0 brown_planks_03 (mounted by hc1.sbproj). The cobbles and flagstones are the project's scans
+Wood uses original 4K maps from Poly Haven's CC0 brown_planks_03. The cobbles and flagstones are the project's scans
 with dry roughness, and the walling stone, the parasols' canvas and the market's produce are drawn by
 Tools/belltower_materials.py (materials/belltower/).
 
@@ -10,8 +10,8 @@ facets. A crate of produce is a low mound under a picture of the heaped fruit (b
 few whole fruit loose on top, drawn with their kind's skin alone (produce_skin): the pile's picture carries each
 fruit's roundness in its normals, which on a round fruit would count it twice.
 
-The lamps are lit, as a town's are on a bright day: a lantern's panes, a dish lamp's bulb and the enamel inside its
-shade are belltower_fronts' self-lit lamp pictures. Lanterns hang from wall brackets or stand on the street lamps' posts;
+The lanterns have transparent glass around a separate warm bulb. Enamel shades reflect daylight without emitting it.
+Lanterns hang from wall brackets or stand on the street lamps' posts;
 dish lamps hang from wires strung across the streets.
 """
 import math
@@ -22,6 +22,7 @@ from pathlib import Path
 import belltower_materials as Materials
 import belltower_finishes as Finishes
 import belltower_fronts as Fronts
+import belltower_furniture as Furniture
 
 OAK = "models/sbox_props/trees/oak/tree_oak_small_a.vmdl"
 OAK_BIG = "models/sbox_props/trees/oak/tree_oak_medium_a.vmdl"
@@ -32,22 +33,27 @@ OWN = Materials.RESOURCE_DIR
 
 # Paint: the material it's drawn with, where that isn't building_textures' own.
 MATERIALS = {
-    "planks": "materials/wood/brown_planks_03.vmat",
-    "planks_dark": "materials/wood/brown_planks_03.vmat",
+    "planks": f"{OWN}/wood_planks.vmat",
+    "planks_dark": f"{OWN}/wood_planks_dark.vmat",
+    "furniture_wood": f"{OWN}/furniture_wood.vmat",
+    "furniture_wood_dark": f"{OWN}/furniture_wood_dark.vmat",
+    "door_brass": f"{OWN}/fountain_bronze.vmat",
     "setts": f"{OWN}/street_cobbles.vmat",
     "rubble": f"{OWN}/rubble.vmat",
     "ashlar": f"{OWN}/ashlar.vmat",
     "ashlar_grey": f"{OWN}/ashlar_grey.vmat",
     "flagstones": f"{OWN}/flagstones.vmat",
-    "roof_tiles": "materials/stone/red_roof_tile.vmat",
+    "roof_tiles": f"{OWN}/roof_tiles.vmat",
+    "whitewash": f"{OWN}/plaster_interior.vmat",
+    **{f"roof_clay_{k}": f"{OWN}/roof_clay_{k}.vmat" for k in range(3)},
     "parasol_red": f"{OWN}/parasol_red.vmat",
     "parasol_cream": f"{OWN}/parasol_cream.vmat",
     "parasol_blue": f"{OWN}/parasol_blue.vmat",
     **{f"produce_{kind}": f"{OWN}/produce_{kind}.vmat" for kind in Materials.PRODUCE},
     "produce_skin": f"{OWN}/produce_skin.vmat",
 }
-# The houses' lime render (belltower_finishes.PLASTERS). "whitewash" stays building_textures' flat whitewash for the
-# rooms inside; an outside wall in whitewash is "render_white".
+# Outside walls use the anchored plaster UVs. Interior whitewash keeps its
+# original 128-unit UV tile, with its own correctly scaled photographed material.
 PLASTERS = {paint: f"{OWN}/{Finishes.plaster_paint(paint)}.vmat" for paint in Finishes.PLASTERS if paint != "whitewash"}
 PLASTERS["render_white"] = f"{OWN}/plaster_whitewash.vmat"
 MATERIALS.update(PLASTERS)
@@ -71,6 +77,10 @@ TILES = {"planks": 48, "planks_dark": 48, "setts": 64, "rubble": Materials.RUBBL
          "parasol_cream": Materials.PARASOL_TILE, "parasol_blue": Materials.PARASOL_TILE,
          **{f"produce_{kind}": Materials.produce_tile(kind) for kind in Materials.PRODUCE}, "produce_skin": 12.0}
 TILES["setts"] = Finishes.COBBLE_TILE
+TILES.update({f"roof_clay_{k}": 32 for k in range(3)})
+TILES["roof_tiles"] = 4000 / 25.4
+TILES.update({paint: Furniture.TILE for paint in (Furniture.WOOD, Furniture.DARK)})
+TILES["door_brass"] = 16
 TILES.update({paint: Finishes.PLASTER_TILE for paint in PLASTERS})
 # Decals are drawn once across their polygon whatever the tile; the rest are given their UVs.
 TILES.update({paint: 64.0 for paint in FRONT_DECALS})
@@ -80,7 +90,7 @@ TILES.update({paint: 48.0 for paint in FRONT_TILED})
 def configure(model, render=True):
     """ render: the render paints in lime plaster, its picture standing on z 0 (map_kit's anchored paints). The vista's
     farms keep building_textures' flat renders: they stand far below z 0, where the plaster's damp would float. """
-    model.grain_paints.update(("planks", "planks_dark"))
+    model.grain_paints.update(("planks", "planks_dark", Furniture.WOOD, Furniture.DARK))
     materials = MATERIALS if render else {p: m for p, m in MATERIALS.items() if p not in PLASTERS or p == "render_white"}
     model.material_overrides.update(materials)
     model.tile_overrides.update({p: t for p, t in TILES.items() if p in materials or p not in MATERIALS})
@@ -151,45 +161,11 @@ def band_ring(model, centre, z, radius, height, lip, sides):
 
 
 def wheel(model, p, side, axle):
-    centre = p.at((-6, side*38, 24))
-    # Open spokes and a 48-segment iron tyre. No broad plank-textured disk.
-    def at(k, radius, offset):
-        a = 2*math.pi*k/48
-        return centre + p.x*(math.cos(a)*radius) + p.z*(math.sin(a)*radius) + p.y*offset
-    def face(paint, points, outward):
-        n = np.cross(points[1]-points[0], points[2]-points[0])
-        model.polygon(paint, points if np.dot(n, outward) > 0 else points[::-1])
-    for k in range(48):
-        radial = at(k+.5, 1, 0) - centre
-        for offset in (-2.5, 2.5):
-            points = [at(k,20,offset), at(k+1,20,offset), at(k+1,24,offset), at(k,24,offset)]
-            face("planks_dark", points, p.y*offset)
-        face("iron_black", [at(k,24,-2.5), at(k+1,24,-2.5), at(k+1,24,2.5), at(k,24,2.5)], radial)
-        face("planks_dark", [at(k,20,2.5), at(k+1,20,2.5), at(k+1,20,-2.5), at(k,20,-2.5)], -radial)
-    for k in range(10):
-        a = 2*math.pi*k/10
-        end = centre + (p.x*math.cos(a) + p.z*math.sin(a))*21
-        model.beam(centre, end, (2.2, 2.8), "planks_dark", up=p.y)
-    axle(model, centre, p.y, 4.5, 9, {"side": "planks_dark", "end": "iron_black"}, sides=24)
+    Furniture.wheel(model, p, side)
 
 
 def crate(model, p, size, paint):
-    h = size/2
-    # Boards have actual seams and thickness; battens cast shadows across them.
-    rows = max(4, round(size/6))
-    for row in range(rows):
-        za, zb = row*size/rows+.12, (row+1)*size/rows-.12
-        for side in (-1, 1):
-            y = side*(h-.65)
-            p.box(model, (-h, y-.65, za), (h, y+.65, zb), paint)
-            x = side*(h-.65)
-            p.box(model, (x-.65, -h+1.3, za), (x+.65, h-1.3, zb), paint)
-    for k in range(rows):
-        x0, x1 = -h+k*size/rows+.12, -h+(k+1)*size/rows-.12
-        p.box(model, (x0,-h,size-1.3), (x1,h,size), paint)
-    for s in (-1,1):
-        for y in (-h-.6,h+.6):
-            p.box(model, (s*h*.7-1.8,y-.6,0), (s*h*.7+1.8,y+.6,size), "planks_dark")
+    Furniture.crate(model, p, size)
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -302,7 +278,7 @@ def parasol(model, centre, z_rim, z_top, radius, colours=("parasol_red", "paraso
     rise = z_top - z_rim
     tile = Materials.PARASOL_TILE
     crown = 2.5
-    steps = (0.0, 0.3, 0.62, 1.0)
+    steps = np.linspace(0, 1, 9)
     sag = radius*0.035
 
     def radial(a):
@@ -312,10 +288,16 @@ def parasol(model, centre, z_rim, z_top, radius, colours=("parasol_red", "paraso
         r = crown + (radius - crown)*t
         return np.array((*(c + r*radial(a)[:2]), z_top - rise*t**1.25))
 
-    def on_mid(a0, a1, t):
-        # Half way between two ribs, pulled in to the chord and down by the canvas's sag, most at the edge.
-        p = (on_rib(a0, t) + on_rib(a1, t))/2
-        return p - np.array((0, 0, sag*t**1.2))
+    def canvas(a0, a1, s, t):
+        p = (1-s)*on_rib(a0,t) + s*on_rib(a1,t)
+        return p - np.array((0,0,4*s*(1-s)*sag*t**1.2))
+
+    def canvas_normal(a0, a1, s, t):
+        ds = on_rib(a1,t)-on_rib(a0,t) - np.array((0,0,4*(1-2*s)*sag*t**1.2))
+        dt = (radius-crown)*((1-s)*radial(a0)+s*radial(a1))
+        dt[2] = -1.25*rise*t**.25 - 4*s*(1-s)*sag*1.2*t**.2
+        normal = np.cross(ds,dt)
+        return normal*(1 if normal[2] >= 0 else -1)/np.linalg.norm(normal)
 
     up = np.array((0, 0, 1.0))
     for g in range(gores):
@@ -324,33 +306,33 @@ def parasol(model, centre, z_rim, z_top, radius, colours=("parasol_red", "paraso
         paint = colours[g % len(colours)]
         width = 2*math.pi*radius/gores
         for t0, t1 in zip(steps, steps[1:]):
-            for side, a in ((-1, a0), (1, a1)):
-                quad = [on_mid(a0, a1, t0), on_rib(a, t0), on_rib(a, t1), on_mid(a0, a1, t1)]
-                # UVs across the gore from its middle and down it, at the canvas's own scale.
-                uv = []
-                for k, q in enumerate(quad):
-                    t = (t0, t0, t1, t1)[k]
-                    across = side*(k in (1, 2))*width*(crown + (radius - crown)*t)/radius/2
-                    uv.append((across/tile, -(t*math.hypot(radius, rise))/tile))
+            for k in range(6):
+                s0,s1 = k/6,(k+1)/6
+                st = ((s0,t0),(s1,t0),(s1,t1),(s0,t1))
+                quad = [canvas(a0,a1,s,t) for s,t in st]
+                uv = [((s-.5)*width*(crown+(radius-crown)*t)/radius/tile,
+                       -t*math.hypot(radius,rise)/tile) for s,t in st]
+                normals = [canvas_normal(a0,a1,s,t) for s,t in st]
                 out = up + 0.3*radial((a0 + a1)/2)
-                outward(model, paint, quad, out, uv=uv)
-                outward(model, paint, quad, -out, uv=uv)
+                outward(model, paint, quad, out, uv=uv, normals=normals)
+                outward(model, paint, quad, -out, uv=uv, normals=[-n for n in normals])
         # The valance: a flap hanging from the edge, scalloped along its hem.
-        rim0, rim_mid, rim1 = on_rib(a0, 1.0), on_mid(a0, a1, 1.0), on_rib(a1, 1.0)
         hem = []
-        for k in range(5):
-            s = k/4
-            p = rim0 + (rim_mid - rim0)*2*s if s <= 0.5 else rim_mid + (rim1 - rim_mid)*(2*s - 1)
+        for k in range(13):
+            s = k/12
+            p = canvas(a0,a1,s,1.0)
             hem.append((p, p - np.array((0, 0, 5.0 + 1.6*math.sin(math.pi*s)))))
-        for k in range(4):
+        for k in range(12):
             quad = [hem[k][0], hem[k+1][0], hem[k+1][1], hem[k][1]]
             mid = (a0 + a1)/2
-            uv = [(((k + (i in (1, 2)))/4)*width/tile, (-5.0 if i in (2, 3) else 0.0)/tile) for i in range(4)]
+            uv = [(((k + (i in (1, 2)))/12)*width/tile, (-5.0 if i in (2, 3) else 0.0)/tile) for i in range(4)]
             outward(model, paint, quad, radial(mid), uv=uv)
             outward(model, paint, quad, -radial(mid), uv=uv)
         # The rib under the canvas, and its stretcher from the runner.
-        model.beam(on_rib(a0, 0.02) - (0, 0, 0.6), on_rib(a0, 1.0) - (0, 0, 0.5), (0.7, 0.7), rib)
-        runner = np.array((*c, z_top - 20))
+        for t0,t1 in zip(steps,steps[1:]):
+            model.beam(on_rib(a0,max(t0,.02))-(0,0,.75),on_rib(a0,t1)-(0,0,.75),(.6,.6),rib)
+        runner_z = z_top - max(20,rise*.75)
+        runner = np.array((*c, runner_z))
         model.beam(runner + radial(a0)*1.3, on_rib(a0, 0.5) - (0, 0, 0.7), (0.5, 0.5), rib)
     # The crown's cap, the finial and the pole with its runner.
     cap = [np.array((*(c + 3.2*radial(turn + 2*math.pi*k/12)[:2]), z_top + 0.6)) for k in range(12)]
@@ -362,7 +344,7 @@ def parasol(model, centre, z_rim, z_top, radius, colours=("parasol_red", "paraso
     rod(model, (*c, z_top + 4.5), (*c, z_top + 6.0), 1.1, pole, sides=8)
     base = z0 if pole_from is None else pole_from
     rod(model, (*c, base), (*c, z_top), 1.0, pole, sides=10)
-    rod(model, (*c, z_top - 22), (*c, z_top - 18), 1.8, pole, sides=10)
+    rod(model, (*c, runner_z - 2), (*c, runner_z + 2), 1.8, pole, sides=10)
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -528,7 +510,7 @@ def frustum(model, P, h0, z0, h1, z1, paint, caps=(True, True)):
 
 
 def lantern(model, origin, yaw=0.0, scale=1.0, hanging=True, iron="iron_black", glass="lantern_glass"):
-    """ A lantern: four tapered panes of lit glass (belltower_fronts' lantern_glass) between iron corner posts, on a
+    """ A lantern: four tapered glass panes and a separate bulb between iron corner posts, on a
     tray over an inverted pyramid, under a band, an eaved hipped cap and a chimney. 10.6 wide at its eave and 24 tall
     hanging, at scale 1. origin: the tray's underside. hanging: a ring on top to hang it by (LANTERN_HANG over origin)
     and a drop finial under it; else a ball finial on top, to stand on a post. No collision. Returns its top. """
@@ -547,6 +529,15 @@ def lantern(model, origin, yaw=0.0, scale=1.0, hanging=True, iron="iron_black", 
         outward(model, glass, pts, P(*d, 0) - P(0, 0, 0), uv=[(0, 0), (1, 0), (1, 1), (0, 1)])
         c = np.array((math.cos(a + math.pi/4), math.sin(a + math.pi/4)))*math.sqrt(2)
         model.beam(P(*(c*b), z0), P(*(c*t), z1), (0.7*s, 0.7*s), iron)
+        # Real transoms, a recessed pane and a small glazed-door latch.
+        h = b+(t-b)*.78
+        model.beam(P(*(d*h-r*h),8.8),P(*(d*h+r*h),8.8),(.22*s,.22*s),iron)
+        if k == 0:
+            rod(model,P(h+.13,1.8,4.4),P(h+.13,1.8,5.6),.13*s,iron,sides=6)
+    # A ceramic socket and a warm, rounded bulb inside the clear glass.
+    rod(model,P(0,0,1),P(0,0,3.3),.72*s,iron,sides=12)
+    rod(model,P(0,0,3.1),P(0,0,4.0),.78*s,"lamp_reflector",sides=12)
+    ball(model,P(0,0,5.4),1.35*s,"lamp_bulb",rings=8,segments=16)
     frustum(model, P, 4.45, 11.0, 4.45, 12.0, iron)
     frustum(model, P, 5.3, 12.0, 5.3, 12.45, iron)
     frustum(model, P, 5.0, 12.45, 1.3, 15.4, iron, caps=(False, True))

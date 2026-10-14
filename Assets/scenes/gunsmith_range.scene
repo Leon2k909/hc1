@@ -1,0 +1,485 @@
+{
+  "__guid": "1d355a85-3e51-59fe-96fc-67539c45de12",
+  "GameObjects": [
+    {
+      "__guid": "a3eabee4-6a63-596e-8b27-ae3099e701e2",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Scene Information",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.SceneInformation",
+          "__guid": "9644446e-38bb-5ef4-99aa-c8eaf1781b1d",
+          "__enabled": true,
+          "Flags": 0,
+          "Title": "Firing Range",
+          "Description": "Private Gunsmith practice range: 10, 25, 50 and 100 metre steel targets.",
+          "SceneTags": "firing_range"
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "c6dd4049-604d-5720-8425-094a607feebf",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Practice Session",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Facepunch.Gunsmith.FiringRangeSystem",
+          "__guid": "049a5790-1d64-5b26-be88-d87e504b24dd",
+          "__enabled": true,
+          "Flags": 0
+        },
+        {
+          "__type": "Facepunch.GameNetworkManager",
+          "__guid": "10423593-39b8-5800-9231-23e98236ce7c",
+          "__enabled": true,
+          "Flags": 0,
+          "IsMultiplayer": false,
+          "ClientPrefab": {
+            "_type": "gameobject",
+            "prefab": "prefabs/player/client.prefab"
+          }
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "952570fe-b8a5-5662-9895-a086d7db01c3",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Range",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "8cdce5ab-0b34-5bfd-9abc-2a800fbdfc11",
+          "__enabled": true,
+          "Flags": 0,
+          "Model": "models/gunsmith_range/gunsmith_range.vmdl",
+          "BodyGroups": 18446744073709551615,
+          "Tint": "1,1,1,1"
+        },
+        {
+          "__type": "Sandbox.ModelCollider",
+          "__guid": "28cf6500-dde6-577c-92b8-19081bb43785",
+          "__enabled": true,
+          "Flags": 0,
+          "Model": "models/gunsmith_range/gunsmith_range.vmdl",
+          "Static": true
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "300616b8-8513-5395-9bd0-c3e6ab283865",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Firing Line Spawn",
+      "Position": "-100,-450,2",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "spawnpoint",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Facepunch.TeamSpawnPoint",
+          "__guid": "cc94444a-5aae-5f6b-b46a-3eac30ed2be8",
+          "__enabled": true,
+          "Flags": 0,
+          "Team": "CounterTerrorist"
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "7f45d619-f69e-59b6-9427-42bd371aa00f",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Sun",
+      "Position": "0,0,0",
+      "Rotation": "0.258819,0.369644,0.099046,0.886415",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.DirectionalLight",
+          "__guid": "be991e0e-3a83-5d6c-a9b7-c153442501d6",
+          "__enabled": true,
+          "Flags": 0,
+          "LightColor": "1.3,1.21,1.08,1",
+          "SkyColor": ".55,.64,.76,1",
+          "Shadows": true,
+          "ContactShadows": true,
+          "ShadowCascadeCount": 4
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "8024597f-0cf7-525c-af8c-6948c3baaa3d",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Sky",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.SkyBox2D",
+          "__guid": "e0032b1d-c252-509a-a0de-b2f913f61f94",
+          "__enabled": true,
+          "Flags": 0,
+          "SkyMaterial": "materials/lowtide/sky/lowtide_sky.vmat",
+          "SkyIndirectLighting": true,
+          "Tint": "1,1,1,1"
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "40f66d7c-5f2d-57c5-beaf-9e68b5c88b8d",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Range HUD",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ScreenPanel",
+          "__guid": "57e754a8-c82d-5c79-af18-3d6e4ab4f781",
+          "__enabled": true,
+          "Flags": 0,
+          "ZIndex": 100,
+          "ScaleStrategy": "ConsistentHeight",
+          "AutoScreenScale": true
+        },
+        {
+          "__type": "Facepunch.UI.FiringRangeHud",
+          "__guid": "98227e38-94e6-5a65-b2dc-2105eaf39824",
+          "__enabled": true,
+          "Flags": 0
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "a7abdaad-1271-5092-aa1f-d1b96d741e4f",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Overview Camera",
+      "Position": "-238,-480,80",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.CameraComponent",
+          "__guid": "6995ede9-2f7e-53ce-95af-e99d88273718",
+          "__enabled": true,
+          "Flags": 0,
+          "IsMainCamera": true,
+          "Priority": -100,
+          "FieldOfView": 85,
+          "ZNear": 1,
+          "ZFar": 14000,
+          "EnablePostProcessing": true
+        },
+        {
+          "__type": "Sandbox.Tonemapping",
+          "__guid": "f136c260-f327-519e-9c0d-deb4328ce0bc",
+          "__enabled": true,
+          "Flags": 0,
+          "Mode": "ACES",
+          "AutoExposureEnabled": false,
+          "ExposureCompensation": 0
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "b443f290-e898-557f-bf74-dc6be7744a71",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Firing Platform Light",
+      "Position": "-145,0,142",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.PointLight",
+          "__guid": "3301c732-9c39-5d4b-9945-784b4705bef4",
+          "__enabled": true,
+          "Flags": 0,
+          "LightColor": "1.15,1.25,1.4,1",
+          "Radius": 900,
+          "Shadows": false
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "6d8b9e6d-e74d-5b02-be2d-9239830085c9",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "10 m Target",
+      "Position": "393.701,-450,4",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "range_target",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "a8d4268d-dda4-56b1-9c7a-283165473406",
+          "__enabled": true,
+          "Flags": 0,
+          "Model": "models/gunsmith_range/range_target.vmdl",
+          "Tint": "1,1,1,1"
+        },
+        {
+          "__type": "Sandbox.ModelCollider",
+          "__guid": "569628c9-c637-5172-9111-7d90607b45e0",
+          "__enabled": true,
+          "Flags": 0,
+          "Model": "models/gunsmith_range/range_target.vmdl",
+          "Static": false
+        },
+        {
+          "__type": "Facepunch.Gunsmith.FiringRangeTarget",
+          "__guid": "506cfcc0-6508-58f2-b2af-4e6983155276",
+          "__enabled": true,
+          "Flags": 0,
+          "DistanceMetres": 10,
+          "MaxHealth": 100,
+          "Travel": 70
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "2434f02b-2d8d-5864-9b12-678b758a037b",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "25 m Target",
+      "Position": "984.252,-150,4",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "range_target",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "0f5afc02-6518-5637-a7b0-f5bc0aff14a0",
+          "__enabled": true,
+          "Flags": 0,
+          "Model": "models/gunsmith_range/range_target.vmdl",
+          "Tint": "1,1,1,1"
+        },
+        {
+          "__type": "Sandbox.ModelCollider",
+          "__guid": "5a045746-4418-55bf-a3d0-58fb677ebcac",
+          "__enabled": true,
+          "Flags": 0,
+          "Model": "models/gunsmith_range/range_target.vmdl",
+          "Static": false
+        },
+        {
+          "__type": "Facepunch.Gunsmith.FiringRangeTarget",
+          "__guid": "9e5d2fd2-4e0f-53d6-bcdf-e2e6e65567a2",
+          "__enabled": true,
+          "Flags": 0,
+          "DistanceMetres": 25,
+          "MaxHealth": 100,
+          "Travel": 70
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "9e15f42d-f9e5-56d7-a5e9-5b1f0e653b13",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "50 m Target",
+      "Position": "1968.5,150,4",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "range_target",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "39596b45-0d52-5ff2-87a0-388f4705eb8d",
+          "__enabled": true,
+          "Flags": 0,
+          "Model": "models/gunsmith_range/range_target.vmdl",
+          "Tint": "1,1,1,1"
+        },
+        {
+          "__type": "Sandbox.ModelCollider",
+          "__guid": "08f381ac-74ea-537c-b722-4c780200ad48",
+          "__enabled": true,
+          "Flags": 0,
+          "Model": "models/gunsmith_range/range_target.vmdl",
+          "Static": false
+        },
+        {
+          "__type": "Facepunch.Gunsmith.FiringRangeTarget",
+          "__guid": "f8f297c7-39a6-517d-bcfb-0aef3504a234",
+          "__enabled": true,
+          "Flags": 0,
+          "DistanceMetres": 50,
+          "MaxHealth": 100,
+          "Travel": 70
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "72c46881-7a50-5a13-a35f-b9d33fccb3ce",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "100 m Target",
+      "Position": "3937.01,450,4",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "range_target",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "e50727eb-ce10-50d5-ac88-9a7a62668861",
+          "__enabled": true,
+          "Flags": 0,
+          "Model": "models/gunsmith_range/range_target.vmdl",
+          "Tint": "1,1,1,1"
+        },
+        {
+          "__type": "Sandbox.ModelCollider",
+          "__guid": "4b8a15e5-cd68-55ba-920c-013f5159e504",
+          "__enabled": true,
+          "Flags": 0,
+          "Model": "models/gunsmith_range/range_target.vmdl",
+          "Static": false
+        },
+        {
+          "__type": "Facepunch.Gunsmith.FiringRangeTarget",
+          "__guid": "8cef2397-5ffb-5136-b33d-31b740c25e22",
+          "__enabled": true,
+          "Flags": 0,
+          "DistanceMetres": 100,
+          "MaxHealth": 100,
+          "Travel": 70
+        }
+      ],
+      "Children": []
+    }
+  ],
+  "SceneProperties": {
+    "FixedUpdateFrequency": 60,
+    "MaxFixedUpdates": 5,
+    "NetworkFrequency": 60,
+    "NetworkInterpolation": true,
+    "ThreadedAnimation": true,
+    "TimeScale": 1,
+    "UseFixedUpdate": true,
+    "PhysicsMode": "Physics3D",
+    "WantsSystemScene": true,
+    "Metadata": {
+      "Title": "Firing Range"
+    },
+    "NavMesh": {
+      "Enabled": false,
+      "EditorAutoUpdate": false
+    }
+  }
+}

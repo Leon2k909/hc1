@@ -176,6 +176,7 @@ origin = tuple(-v for v in rotate_pitch(grip_r, TILT))
 wm = obj('Recon Octocopter World Model', [
     renderer('world', 'recon_tablet', skinned=True),
     component('world-model', 'Facepunch.WorldModel',
+              UseTabletPose=True,
               ModelRenderer=ref('world', 'SkinnedModelRenderer', 'Recon Octocopter World Model'),
               IkLeftHand={'_type': 'gameobject', 'go': guid('Left hand grip')}),
 ], [obj('Left hand grip', Position=vec(grip_l))], Position=vec(origin), Rotation=vec(rot))

@@ -1,0 +1,14 @@
+// Tools/lowtide_banks.py: worn stone with elevation-dependent moisture.
+"Layer0"
+{
+    shader "shaders/hc1_lowtide_stone.shader"
+    TextureColor "materials/lowtide/marine/stone_granite_color.png"
+    TextureNormal "materials/lowtide/marine/stone_granite_normal.png"
+    TextureRoughness "[0.70 0.70 0.70 0]"
+    TextureMetalness "materials/default/default_black_mask.tga"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_flTintColor "[.30 .32 .30]"
+    g_flStoneTileInches "19.685"
+    g_flStoneNormalStrength "0.6"
+    g_vStoneRoughness "[0.82 0.52]"
+}

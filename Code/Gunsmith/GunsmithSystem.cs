@@ -112,7 +112,8 @@ public partial class GunsmithSystem : Component
 
 	private EquipmentResource GetInitialEquipment()
 	{
-		return GunsmithLoadoutManager.GetPrimaryResource()
+		return GunsmithRangeSession.TakeReturnWeapon()
+		       ?? GunsmithLoadoutManager.GetPrimaryResource()
 		       ?? GunsmithLoadoutManager.GetSecondaryResource()
 		       ?? Equipment;
 	}

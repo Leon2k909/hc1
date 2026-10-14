@@ -143,7 +143,7 @@ public partial class Melee : WeaponInputAction
 	public bool CanSwing()
 	{
 		// Player
-		if ( Equipment.Owner.IsFrozen )
+		if ( !Equipment.IsValid() || !Equipment.Owner.IsValid() || Equipment.Owner.IsFrozen || IsThrowingKnife )
 			return false;
 
 		// Delay checks
@@ -152,6 +152,12 @@ public partial class Melee : WeaponInputAction
 
 	protected override void OnInput()
 	{
+		if ( Equipment.Resource?.Slot == EquipmentSlot.Melee && Input.Down( "Attack2" ) )
+		{
+			TryThrowKnife();
+			return;
+		}
+
 		if ( CanSwing() )
 		{
 			Swing();

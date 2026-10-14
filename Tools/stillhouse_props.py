@@ -1059,12 +1059,6 @@ def van( model, e, n, along="+n", paint="sh_paint_white", z0=0.0 ):
                   { **RW_TO_SH, "rw_train_white": paint } )
 
 
-def forklift( model, e, n, facing="+n", z0=0.0, lift=0.0 ):
-    """ railhead_props.forklift (a 2.5 t counterbalance forklift, forks towards facing, raised by lift) in sh_
-    paints: yellow, black and steel. Collision: metal boxes (none on the forks). """
-    return _wrap( model, lambda m: RP.forklift( m, e, n, facing, z0, lift ), RW_TO_SH )
-
-
 def _superellipse( a, b, p, sides ):
     """ Points ( x, z ) round | x / a |^p + | z / b |^p = 1, from the bottom middle round by +x, and their outward
     normals. """
@@ -4397,7 +4391,7 @@ def showcase():
     """ [ ( name, model ) ]: every prop on a sketch of the distillery at the design doc's levels. North of the yard
     (z 0, n -900..300): the tun room (the mash tun, two washbacks and a pipe run), the still house (the wash and spirit
     stills, their condensers on stands with the tails falling to the spirit safe) and the warehouse (three dunnage
-    stows, loose casks in the aisles). In the yard: the tanker, two cars and the van, the forklift among the goods,
+    stows, loose casks in the aisles). In the yard: the tanker, two cars and the van, stacks of goods,
     peat, a cask pyramid and a rank, a lamp post and a harled wall with its bench, lantern, trough and barrow. The shore
     walk (z -50): the creel boats ashore, creels, fish boxes, a rope and buoys. The beach: two dinghies. The pier
     (e -150..150 out to n -1950): bollards, the crane, a lamp, the ladder and gear. Afloat (z -195): the puffer across
@@ -4476,7 +4470,6 @@ def showcase():
     van( prop( "van" ), -350.0, -80.0, "+n", "sh_paint_white" )
     car( prop( "car" ), -230.0, -80.0, "+n", "sh_paint_blue" )
     car( prop( "car" ), -110.0, -80.0, "-n", "sh_paint_red", kind="estate" )
-    forklift( prop( "forklift" ), 250.0, -250.0, "+e", lift=12.0 )
     sack_stack( prop( "sack_stack" ), 470.0, -250.0, 0.0, 4, "n" )
     sack_stack( prop( "sack_stack" ), 470.0, -130.0, 0.0, 3, "e" )
     pallet_stack( prop( "pallet_stack" ), 600.0, -250.0, 0.0, 6 )

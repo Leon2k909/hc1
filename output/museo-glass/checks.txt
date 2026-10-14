@@ -1,0 +1,15 @@
+PASS 392 independently breakable panes loaded
+PASS all intact meshes load
+PASS glass sound and shard prefabs load
+PASS shard positions use unscaled pane objects
+PASS each pane is hittable from both sides (392/392 of 392)
+PASS bullet trace reaches the selected pane
+PASS a shot breaks only its pane
+PASS broken pane disappears and stops colliding
+PASS window frames and building colliders remain intact
+PASS fast thrown object shatters glass
+PASS blast shatters reachable glass
+PASS all pane shapes can shatter
+PASS round cleanup restores every pane and collider
+PASS balustrade safety clips retained
+0 failure(s)

@@ -1,0 +1,35 @@
+var scene=new Scene(); var checks=new System.Collections.Generic.List<string>();
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic;
+var type=typeof(Facepunch.LightweightCombatBot);
+void Check(bool ok,string name) { if(!ok) throw new Exception(name); checks.Add(name); }
+try {
+    using(scene.Push()) {
+        var obj=new GameObject(false,"Isolated bot slide checks");
+        obj.Flags|=GameObjectFlags.NotSaved|GameObjectFlags.NotNetworked;
+        var bot=obj.AddComponent<Facepunch.LightweightCombatBot>(); bot.Enabled=false;
+        bot.Agent=obj.AddComponent<NavMeshAgent>(); bot.Agent.Enabled=false;
+        bot.HealthComponent=obj.AddComponent<Facepunch.HealthComponent>(); bot.HealthComponent.Enabled=false;
+        bot.Agent.Acceleration=800f; bot.Agent.MaxSpeed=310f;
+        void Call(string name,params object[] args)=>type.GetMethod(name,flags).Invoke(bot,args);
+        Call("AttachMovementBox");
+        var box=(BoxCollider)type.GetField("_movementBox",flags).GetValue(bot);
+        Call("StartSlide",new Vector3(450f,0f,0f));
+        Check(bot.IsSliding && bot.IsCrouching,"Slide enters a low stance");
+        Check(bot.Agent.MaxSpeed>=340f && bot.Agent.MaxSpeed<=430f,"Slide push stays within the player's speed range");
+        Check(!(bool)type.GetProperty("IsSprinting",flags).GetValue(bot),"Sliding ends sprint restrictions");
+        for(var i=0;i<60;i++) Call("UpdateStance");
+        Check(bot.SlideBlend>.99f && MathF.Abs(bot.EyePosition.z-40f)<.1f,"Slide lowers the eyes smoothly");
+        Check(MathF.Abs(box.Scale.z-40f)<.1f,"Slide lowers the movement collider with the pose");
+        Call("StopSlide",false);
+        Check(!bot.IsSliding && !bot.IsCrouching,"Slide ends without leaving a forced crouch");
+        Check(MathF.Abs(bot.Agent.Acceleration-800f)<.01f && MathF.Abs(bot.Agent.MaxSpeed-310f)<.01f,"Slide restores navigation acceleration and speed");
+        Check(((TimeUntil)type.GetField("_nextSlide",flags).GetValue(bot)).Relative>=7.9f,"Recovery prevents immediate repeat slides");
+        for(var i=0;i<100;i++) Call("UpdateStance");
+        Check(bot.SlideBlend==0f && MathF.Abs(box.Scale.z-64f)<.01f,"Recovery returns to the standing collider and pose");
+        Call("StartSlide",new Vector3(450f,0f,0f)); Call("ResetCombatState");
+        Check(!bot.IsSliding && bot.Agent.TargetPosition is null,"Combat freeze cancels the slide and stops navigation");
+        var result=new {Passed=checks.Count,Checks=checks};
+        System.IO.File.WriteAllText("D:/Documents/s&box projects/hc1/forked-shooter-main/output/bots/movement/slide-state-checks.json",Json.Serialize(result));
+        return result;
+    }
+} finally {scene.Destroy();}

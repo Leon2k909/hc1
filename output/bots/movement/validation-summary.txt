@@ -1,0 +1,25 @@
+Bot running and occasional slides — 2026-10-14
+
+Saved changes:
+- Bounded stride adjustment with unchanged limb lengths and ankle heights.
+- Faster response to movement, plus a modest sprint cadence allowance.
+- Occasional host-controlled slides on supported, clear, straight routes.
+- Entry/recovery pose, eyes, collider, weapon mount, navigation restoration and cooldown.
+
+Validation:
+- Native project and editor compilation succeeded with zero errors before the final connection timeout.
+- Latest saved code also built successfully with dotnet: 7 projects, zero errors (existing warnings).
+- 10 native slide state checks passed.
+- 45,816 existing third-person slide geometry checks passed.
+- Native stride samples preserved limb lengths within 0.001 units and ankle heights within 0.001 units.
+- Live Lowtide bot: slide started around 413 u/s and travelled about 350 units before recovery.
+- Live CerroBlanco bot: complete hip slide, weapon mount error about 0.00003 units.
+- Live running samples showed about 40% more planted-foot travel; stride reach remains bounded by the rig.
+- Live screenshots: live-run.png and live-slide.png.
+- No multiplayer client was attached for these checks.
+
+Cleanup:
+- Temporary scenes and cameras were destroyed by script finally blocks.
+- Task exchange scripts were archived as text in scripts/ and removed from the exchange directory.
+- Build servers were shut down.
+- The editor became unresponsive during the final status query; its process was preserved.

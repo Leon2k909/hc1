@@ -1,0 +1,9 @@
+PASS: original OBJ and MTL files byte-identical except the three replaced barge material groups
+PASS: all non-barge Fleet faces and indexed vertex/UV/normal buffers preserved exactly
+PASS: four existing VMDLs differ only in the scoped stone material path
+PASS: all original model collider declarations preserved
+PASS: original world model scene objects unchanged except the canal reflection component
+PASS: spawns, objectives, navigation settings and gameplay objects unchanged
+PASS: drainage and marine detail meshes have no collision boxes or hulls
+PASS: masonry details have no physics declarations
+PASS: scene application is idempotent and retains one renderer for each new mesh

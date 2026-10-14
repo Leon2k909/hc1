@@ -1,0 +1,77 @@
+System.AggregateException: One or more errors occurred. (Index was outside the bounds of the array.) (Index was outside the bounds of the array.) (Index was outside the bounds of the array.) (Index was outside the bounds of the array.) (Index was outside the bounds of the array.) (Index was outside the bounds of the array.) (Index was outside the bounds of the array.)
+ ---> System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at Sandbox.ResourceSystem.RegisterWeak(Resource resource)
+   at Sandbox.Engine.Utility.RayTrace.MeshTraceRequest.Result.From(MeshTraceRequest& input, MeshTraceOutput& result)
+   at Sandbox.IndirectLightVolume.TraceProbeRays(Vector3 probePosition, Single maxDistance, Vector3[] directions)
+   at Sandbox.IndirectLightVolume.<>c__DisplayClass109_0.<ComputeProbeRelocation>b__0(Int32 z)
+   at System.Threading.Tasks.Parallel.<>c__DisplayClass19_0`2.<ForWorker>b__1(RangeWorker& currentWorker, Int64 timeout, Boolean& replicationDelegateYieldedBeforeCompletion)
+--- End of stack trace from previous location ---
+   at System.Threading.Tasks.Parallel.<>c__DisplayClass19_0`2.<ForWorker>b__1(RangeWorker& currentWorker, Int64 timeout, Boolean& replicationDelegateYieldedBeforeCompletion)
+   at System.Threading.Tasks.TaskReplicator.Replica.Execute()
+   --- End of inner exception stack trace ---
+   at System.Threading.Tasks.TaskReplicator.Run[TState](ReplicatableUserAction`1 action, ParallelOptions options, Boolean stopOnFirstFailure)
+   at System.Threading.Tasks.Parallel.ForWorker[TLocal,TInt](TInt fromInclusive, TInt toExclusive, ParallelOptions parallelOptions, Action`1 body, Action`2 bodyWithState, Func`4 bodyWithLocal, Func`1 localInit, Action`1 localFinally)
+--- End of stack trace from previous location ---
+   at System.Threading.Tasks.Parallel.ForWorker[TLocal,TInt](TInt fromInclusive, TInt toExclusive, ParallelOptions parallelOptions, Action`1 body, Action`2 bodyWithState, Func`4 bodyWithLocal, Func`1 localInit, Action`1 localFinally)
+   at System.Threading.Tasks.Parallel.For(Int32 fromInclusive, Int32 toExclusive, Action`1 body)
+   at Sandbox.IndirectLightVolume.ComputeProbeRelocation()
+   at McpScript.Run(String exchangeDirectory, CancellationToken cancellationToken)
+ ---> (Inner Exception #1) System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at Sandbox.ResourceSystem.RegisterWeak(Resource resource)
+   at Sandbox.Engine.Utility.RayTrace.MeshTraceRequest.Result.From(MeshTraceRequest& input, MeshTraceOutput& result)
+   at Sandbox.IndirectLightVolume.TraceProbeRays(Vector3 probePosition, Single maxDistance, Vector3[] directions)
+   at Sandbox.IndirectLightVolume.<>c__DisplayClass109_0.<ComputeProbeRelocation>b__0(Int32 z)
+   at System.Threading.Tasks.Parallel.<>c__DisplayClass19_0`2.<ForWorker>b__1(RangeWorker& currentWorker, Int64 timeout, Boolean& replicationDelegateYieldedBeforeCompletion)
+--- End of stack trace from previous location ---
+   at System.Threading.Tasks.Parallel.<>c__DisplayClass19_0`2.<ForWorker>b__1(RangeWorker& currentWorker, Int64 timeout, Boolean& replicationDelegateYieldedBeforeCompletion)
+   at System.Threading.Tasks.TaskReplicator.Replica.Execute()<---
+
+ ---> (Inner Exception #2) System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at Sandbox.ResourceSystem.RegisterWeak(Resource resource)
+   at Sandbox.Engine.Utility.RayTrace.MeshTraceRequest.Result.From(MeshTraceRequest& input, MeshTraceOutput& result)
+   at Sandbox.IndirectLightVolume.TraceProbeRays(Vector3 probePosition, Single maxDistance, Vector3[] directions)
+   at Sandbox.IndirectLightVolume.<>c__DisplayClass109_0.<ComputeProbeRelocation>b__0(Int32 z)
+   at System.Threading.Tasks.Parallel.<>c__DisplayClass19_0`2.<ForWorker>b__1(RangeWorker& currentWorker, Int64 timeout, Boolean& replicationDelegateYieldedBeforeCompletion)
+--- End of stack trace from previous location ---
+   at System.Threading.Tasks.Parallel.<>c__DisplayClass19_0`2.<ForWorker>b__1(RangeWorker& currentWorker, Int64 timeout, Boolean& replicationDelegateYieldedBeforeCompletion)
+   at System.Threading.Tasks.TaskReplicator.Replica.Execute()<---
+
+ ---> (Inner Exception #3) System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at Sandbox.ResourceSystem.RegisterWeak(Resource resource)
+   at Sandbox.Engine.Utility.RayTrace.MeshTraceRequest.Result.From(MeshTraceRequest& input, MeshTraceOutput& result)
+   at Sandbox.IndirectLightVolume.TraceProbeRays(Vector3 probePosition, Single maxDistance, Vector3[] directions)
+   at Sandbox.IndirectLightVolume.<>c__DisplayClass109_0.<ComputeProbeRelocation>b__0(Int32 z)
+   at System.Threading.Tasks.Parallel.<>c__DisplayClass19_0`2.<ForWorker>b__1(RangeWorker& currentWorker, Int64 timeout, Boolean& replicationDelegateYieldedBeforeCompletion)
+--- End of stack trace from previous location ---
+   at System.Threading.Tasks.Parallel.<>c__DisplayClass19_0`2.<ForWorker>b__1(RangeWorker& currentWorker, Int64 timeout, Boolean& replicationDelegateYieldedBeforeCompletion)
+   at System.Threading.Tasks.TaskReplicator.Replica.Execute()<---
+
+ ---> (Inner Exception #4) System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at Sandbox.ResourceSystem.RegisterWeak(Resource resource)
+   at Sandbox.Engine.Utility.RayTrace.MeshTraceRequest.Result.From(MeshTraceRequest& input, MeshTraceOutput& result)
+   at Sandbox.IndirectLightVolume.TraceProbeRays(Vector3 probePosition, Single maxDistance, Vector3[] directions)
+   at Sandbox.IndirectLightVolume.<>c__DisplayClass109_0.<ComputeProbeRelocation>b__0(Int32 z)
+   at System.Threading.Tasks.Parallel.<>c__DisplayClass19_0`2.<ForWorker>b__1(RangeWorker& currentWorker, Int64 timeout, Boolean& replicationDelegateYieldedBeforeCompletion)
+--- End of stack trace from previous location ---
+   at System.Threading.Tasks.Parallel.<>c__DisplayClass19_0`2.<ForWorker>b__1(RangeWorker& currentWorker, Int64 timeout, Boolean& replicationDelegateYieldedBeforeCompletion)
+   at System.Threading.Tasks.TaskReplicator.Replica.Execute()<---
+
+ ---> (Inner Exception #5) System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at Sandbox.ResourceSystem.RegisterWeak(Resource resource)
+   at Sandbox.Engine.Utility.RayTrace.MeshTraceRequest.Result.From(MeshTraceRequest& input, MeshTraceOutput& result)
+   at Sandbox.IndirectLightVolume.TraceProbeRays(Vector3 probePosition, Single maxDistance, Vector3[] directions)
+   at Sandbox.IndirectLightVolume.<>c__DisplayClass109_0.<ComputeProbeRelocation>b__0(Int32 z)
+   at System.Threading.Tasks.Parallel.<>c__DisplayClass19_0`2.<ForWorker>b__1(RangeWorker& currentWorker, Int64 timeout, Boolean& replicationDelegateYieldedBeforeCompletion)
+--- End of stack trace from previous location ---
+   at System.Threading.Tasks.Parallel.<>c__DisplayClass19_0`2.<ForWorker>b__1(RangeWorker& currentWorker, Int64 timeout, Boolean& replicationDelegateYieldedBeforeCompletion)
+   at System.Threading.Tasks.TaskReplicator.Replica.Execute()<---
+
+ ---> (Inner Exception #6) System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at Sandbox.ResourceSystem.RegisterWeak(Resource resource)
+   at Sandbox.Engine.Utility.RayTrace.MeshTraceRequest.Result.From(MeshTraceRequest& input, MeshTraceOutput& result)
+   at Sandbox.IndirectLightVolume.TraceProbeRays(Vector3 probePosition, Single maxDistance, Vector3[] directions)
+   at Sandbox.IndirectLightVolume.<>c__DisplayClass109_0.<ComputeProbeRelocation>b__0(Int32 z)
+   at System.Threading.Tasks.Parallel.<>c__DisplayClass19_0`2.<ForWorker>b__1(RangeWorker& currentWorker, Int64 timeout, Boolean& replicationDelegateYieldedBeforeCompletion)
+--- End of stack trace from previous location ---
+   at System.Threading.Tasks.Parallel.<>c__DisplayClass19_0`2.<ForWorker>b__1(RangeWorker& currentWorker, Int64 timeout, Boolean& replicationDelegateYieldedBeforeCompletion)
+   at System.Threading.Tasks.TaskReplicator.Replica.Execute()<---

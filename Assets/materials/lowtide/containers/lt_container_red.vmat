@@ -1,10 +1,10 @@
-// Tools/lowtide_container.py: built-in ImageGen weathered red steel
+// Tools/lowtide_container.py: built-in ImageGen, corrugated sheets
 "Layer0"
 {
     shader "shaders/complex.shader"
     F_SPECULAR "1"
     F_METALNESS_TEXTURE "1"
-    g_flRoughnessScaleFactor "1"
+    g_flRoughnessScaleFactor "1.0"
     g_flMetalness "0"
     TextureColor "materials/lowtide/containers/lt_container_red_color.png"
     TextureNormal "materials/lowtide/containers/lt_container_red_normal.png"

@@ -1,0 +1,134 @@
+{
+  "saved_capture": "saved-relief-v1",
+  "bake": "daylight-v7",
+  "views": [
+    "west_street",
+    "map_art",
+    "cafe",
+    "out_south",
+    "council_hall",
+    "market",
+    "terrace",
+    "hall_office",
+    "street_surface",
+    "wall_stone",
+    "street_grazing",
+    "east_surface",
+    "east_wall"
+  ],
+  "gameplay_roots_preserved": true,
+  "scene_properties_preserved": true,
+  "town_geometry_preserved": true,
+  "landscape_trees_preserved": 1600,
+  "native_capture_source_unchanged": true,
+  "before_editor": {
+    "IsPlaying": false,
+    "Scene": "lowtide",
+    "SceneId": "2e37cfac-7a31-5f80-aa5e-dba7a0dc03b1",
+    "GameSceneId": "e3c6deb2-3081-421f-a98c-fa5f85660bdb"
+  },
+  "source_hashes_verified": 652,
+  "map_art_matches_native_capture": true,
+  "native_bake": {
+    "Passes": 2,
+    "SavedFinalIrradiance": true,
+    "IrradianceReplacedAfterFirstPass": true,
+    "Grid": "28,39,5"
+  },
+  "image_sha256": {
+    "west_street.png": "418e3d01f5e6951cc64c7dbe448336cb7b6437dae1d10a5a916e47411925a7fc",
+    "map_art.png": "fe546c1a95984c41cb85fca9f48f8288cf4edb33e5ed2e157bbfcbfb9cf37e20",
+    "cafe.png": "3fdef9cd28696e44a213d63bb2759494e9c73d0936f9a450e529d25c227fce1a",
+    "out_south.png": "756da83344538a8b20483a5094d73931698f47d1564114331959b3649fa72b8f",
+    "council_hall.png": "fcc8cb64aeca31d8cf2d6edcf34417423685354138d04ddc89e406fa053935e4",
+    "market.png": "c1dfe00e0ab64f6e36242a2c2c8e2da6ea0b1957e0a0dac094cb128f06ec3288",
+    "terrace.png": "c9834107119529a6702b22979fa571afe39dfcd185779f9d211d2eb5a2c8b354",
+    "hall_office.png": "5078c70f64d99ffce7cd8ea8bcc2fc568a684604048da8cceeff3c3645a0730a",
+    "street_surface.png": "b7d8e51bee3705f60661b3c4f5e734469a96c4019bb10b0126131380d8e02aab",
+    "wall_stone.png": "35111f91a4744461493204c33ec09561ee5929232041b423f883704a418a5f5e",
+    "street_grazing.png": "ace0506565728dbbacb8faaee9a82107374d6bf6fda70f9b7d1c898834c5d342",
+    "east_surface.png": "018843e888e556f89c71d1c8f3ef4bf931ace0ba097c3af0c2b8b51b129038c2",
+    "east_wall.png": "d36af477f9b3ccfbc819e81e67b94d5959a4e189bfb9862757de65756a0672ec"
+  },
+  "materials": {
+    "street_cobbles": {
+      "shader": "shaders/belltower_relief.shader",
+      "TextureColor": "materials/stone/cobble_stones_tight_basecolor.png",
+      "TextureNormal": "materials/stone/cobble_stones_tight_normal.png",
+      "TextureRoughness": "materials/stone/cobble_stones_tight_roughness.png",
+      "TextureAmbientOcclusion": "materials/stone/cobble_stones_tight_ambientocclusion.png",
+      "TextureHeight": "materials/stone/cobble_stones_tight_height.png",
+      "g_vStoneUvScale": "[3.2512 3.2512]",
+      "g_flTintColor": "[0.92 0.93 0.92]",
+      "g_flReliefDepth": 0.6,
+      "g_flStoneRoughness": 0.85,
+      "g_flStoneRoughnessMin": 0.7
+    },
+    "rubble": {
+      "TextureColor": "materials/belltower/scans/medieval_blocks_05_diffuse_4k.png",
+      "TextureNormal": "materials/belltower/scans/medieval_blocks_05_nor_gl_4k.png",
+      "TextureRoughness": "materials/belltower/scans/medieval_blocks_05_rough_4k.png",
+      "TextureAmbientOcclusion": "materials/belltower/scans/medieval_blocks_05_ao_4k.png",
+      "shader": "shaders/belltower_relief.shader",
+      "TextureHeight": "materials/belltower/scans/medieval_blocks_05_displacement_4k.png",
+      "g_vStoneUvScale": "[2.03200 2.03200]",
+      "g_flTintColor": "[1.12 1.1 1.04]",
+      "g_flReliefDepth": 1.5,
+      "g_flStoneRoughness": 1
+    }
+  },
+  "render_timings": {
+    "scope": "Native RenderToBitmap including GPU readback; not game FPS",
+    "samples_per_view": 16,
+    "views": {
+      "west_street": {
+        "before_median_ms": 7.5234,
+        "after_median_ms": 10.6673
+      },
+      "street_surface": {
+        "before_median_ms": 7.5349,
+        "after_median_ms": 10.8799
+      },
+      "wall_stone": {
+        "before_median_ms": 7.9285,
+        "after_median_ms": 10.4966
+      },
+      "terrace": {
+        "before_median_ms": 7.8102,
+        "after_median_ms": 10.2256
+      },
+      "council_hall": {
+        "before_median_ms": 7.4505,
+        "after_median_ms": 10.0966
+      }
+    }
+  },
+  "limitations": [
+    "Parallax does not alter silhouettes or collision.",
+    "No new full-game FPS measurement.",
+    "The overall AAA visual goal remains open; distant canopy, facade repetition, lamps and furniture still need work."
+  ],
+  "controlled_relief_comparison": {
+    "scope": "Alternating relief off/on/on/off with isolated material copies; RenderToBitmap including readback, not game FPS",
+    "views": {
+      "council_hall": {
+        "off_median_ms": 10.03945,
+        "on_median_ms": 10.0793,
+        "difference_ms": 0.0398499999999995,
+        "samples_per_mode": 32
+      },
+      "street_surface": {
+        "off_median_ms": 10.450050000000001,
+        "on_median_ms": 10.6349,
+        "difference_ms": 0.18484999999999907,
+        "samples_per_mode": 32
+      },
+      "west_street": {
+        "off_median_ms": 10.02025,
+        "on_median_ms": 10.376850000000001,
+        "difference_ms": 0.35660000000000025,
+        "samples_per_mode": 32
+      }
+    }
+  }
+}

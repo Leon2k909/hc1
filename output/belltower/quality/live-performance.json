@@ -1,0 +1,161 @@
+{
+  "context": "Live Belltower match, editor in background. A single two-second view, with model source generation running on CPU. This is not a full-map performance benchmark. Landscape trees were still staged and are not included in this sample.",
+  "sample": {
+    "Window": {
+      "Frames": 147,
+      "Seconds": 2.01
+    },
+    "Fps": 73,
+    "TargetFps": 90,
+    "TargetSource": "fps_max_inactive",
+    "LimitedBy": "CPU",
+    "MeetingTarget": false,
+    "Rating": "Warning",
+    "Frame": {
+      "AvgMs": 13.69,
+      "P50Ms": 13.4,
+      "P99Ms": 22.13,
+      "MaxMs": 23.63
+    },
+    "CpuWork": {
+      "AvgMs": 13.68,
+      "P50Ms": 13.4,
+      "P99Ms": 22.13,
+      "MaxMs": 23.63
+    },
+    "Gpu": {
+      "AvgMs": 6.11,
+      "P50Ms": 6.1,
+      "P99Ms": 6.88,
+      "MaxMs": 7.44
+    },
+    "CapWait": {
+      "AvgMs": 0.01,
+      "P50Ms": 0,
+      "P99Ms": 0.74,
+      "MaxMs": 0.84
+    },
+    "PerfHubWindow": null,
+    "Hitches": {
+      "Count": 0,
+      "OverMs": 26.8,
+      "WorstMs": 0
+    },
+    "Issues": [
+      {
+        "Severity": "Bad",
+        "Title": "GC pauses",
+        "Detail": "8.6 ms in the last second",
+        "MoreIn": "perf_memory"
+      }
+    ],
+    "MainThread": [
+      {
+        "Name": "Render",
+        "AvgMs": 5.84,
+        "MaxMs": 10.63
+      },
+      {
+        "Name": "Update",
+        "AvgMs": 1.72,
+        "MaxMs": 3.53
+      },
+      {
+        "Name": "UI",
+        "AvgMs": 1.49,
+        "MaxMs": 2.63
+      },
+      {
+        "Name": "Animation",
+        "AvgMs": 1.19,
+        "MaxMs": 1.8
+      },
+      {
+        "Name": "Particles",
+        "AvgMs": 0.75,
+        "MaxMs": 1.59
+      },
+      {
+        "Name": "Editor",
+        "AvgMs": 0.62,
+        "MaxMs": 2.91
+      },
+      {
+        "Name": "Physics",
+        "AvgMs": 0.53,
+        "MaxMs": 1.27
+      },
+      {
+        "Name": "Audio",
+        "AvgMs": 0.23,
+        "MaxMs": 0.83
+      }
+    ],
+    "GpuPasses": [
+      {
+        "Name": "Dynamic Opaque Forward",
+        "AvgMs": 1.12,
+        "MaxMs": 1.61,
+        "Path": "RenderToSwapChain / Dynamic Opaque Forward"
+      },
+      {
+        "Name": "UI Root: GameRootPanel",
+        "AvgMs": 0.85,
+        "MaxMs": 1.01,
+        "Path": "Managed: UI / UI Root: GameRootPanel"
+      },
+      {
+        "Name": "Depth Normal Prepass (Large)",
+        "AvgMs": 0.47,
+        "MaxMs": 0.49,
+        "Path": "RenderToSwapChain / Depth Normal Prepass (Large)"
+      },
+      {
+        "Name": "GameOverlay",
+        "AvgMs": 0.41,
+        "MaxMs": 0.55,
+        "Path": "RenderToSwapChain / GameOverlay"
+      },
+      {
+        "Name": "DrawDepthOpaque",
+        "AvgMs": 0.3,
+        "MaxMs": 0.32,
+        "Path": "CSM Cascade 2 / DrawDepthOpaque"
+      },
+      {
+        "Name": "DrawDepthOpaque",
+        "AvgMs": 0.29,
+        "MaxMs": 0.48,
+        "Path": "CSM Cascade 3 / DrawDepthOpaque"
+      },
+      {
+        "Name": "Bloom",
+        "AvgMs": 0.22,
+        "MaxMs": 0.43,
+        "Path": "Managed: BeforePostProcessing / Bloom"
+      },
+      {
+        "Name": "DrawDepthOpaque",
+        "AvgMs": 0.18,
+        "MaxMs": 0.19,
+        "Path": "CSM Cascade 1 / DrawDepthOpaque"
+      }
+    ],
+    "Memory": {
+      "ProcessMiB": 7086.7,
+      "VideoMemory": {
+        "UsedMiB": 5418.4,
+        "BudgetMiB": 10199.5
+      },
+      "AllocatedMiBPerSecond": 13.8,
+      "GcPauseMsLastSecond": 8.61,
+      "GcLastSecond": {
+        "Gen0": 2,
+        "Gen1": 1,
+        "Gen2": 0
+      }
+    },
+    "DrawCalls": 3377,
+    "Triangles": 18427845
+  }
+}

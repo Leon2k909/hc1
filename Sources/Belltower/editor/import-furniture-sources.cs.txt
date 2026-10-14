@@ -1,0 +1,41 @@
+if (Game.IsPlaying && Game.ActiveScene.GetAllComponents<ModelRenderer>().Any(x => x.Model?.ResourcePath?.Contains("maps/belltower/",StringComparison.OrdinalIgnoreCase) == true))
+    throw new InvalidOperationException("Do not import Belltower assets during a live Belltower match.");
+var project = Sandbox.Project.Current.GetRootPath();
+var staged = System.IO.Path.Combine(project,"output/belltower/quality/props-v1-sources");
+var provenance = System.IO.Path.Combine(project,"Sources/Belltower/scans/manifest.json");
+var source = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(staged,"manifest.json")));
+var wood = source["assets"].AsArray().Single(x => x["id"].GetValue<string>() == "brown_planks_03");
+var originals = new System.Collections.Generic.List<(string Path, byte[] Bytes)>();
+foreach(var entry in wood["files"].AsObject())
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var relative = entry.Value["path"].GetValue<string>();
+    if (!relative.StartsWith("materials/belltower/scans/brown_planks_03_",StringComparison.Ordinal) || !relative.EndsWith("_4k.png") || relative.Contains(".."))
+        throw new InvalidOperationException("Unexpected wood scan path.");
+    var bytes = System.IO.File.ReadAllBytes(System.IO.Path.Combine(staged,System.IO.Path.GetFileName(relative)));
+    if (Convert.ToHexString(System.Security.Cryptography.MD5.HashData(bytes)).ToLowerInvariant() != entry.Value["md5"].GetValue<string>())
+        throw new InvalidOperationException("Wood source differs from the recorded Poly Haven original.");
+    var target = System.IO.Path.Combine(project,"Assets",relative);
+    if (System.IO.File.Exists(target) && !System.IO.File.ReadAllBytes(target).SequenceEqual(bytes))
+        throw new InvalidOperationException("A different wood texture already exists: "+relative);
+    originals.Add((target,bytes));
+}
+if (originals.Count != 4) throw new InvalidOperationException("Expected four original scan maps.");
+foreach(var entry in originals)
+{
+    if (!System.IO.File.Exists(entry.Path)) System.IO.File.WriteAllBytes(entry.Path,entry.Bytes);
+    Editor.AssetSystem.RegisterFile(entry.Path);
+}
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(provenance));
+var accepted = manifest["assets"].AsArray();
+var previous = accepted.FirstOrDefault(x => x["id"].GetValue<string>() == "brown_planks_03");
+if (previous is not null) accepted.Remove(previous);
+accepted.Add(wood.DeepClone());
+var backup = System.IO.Path.Combine(project,"output/belltower/quality/before-props-v1/Sources/Belltower/scans/manifest.json");
+if (!System.IO.File.Exists(backup))
+{
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+    System.IO.File.Copy(provenance,backup);
+}
+System.IO.File.WriteAllText(provenance,manifest.ToJsonString(new System.Text.Json.JsonSerializerOptions{WriteIndented=true})+"\n");
+return new { Imported=originals.Select(x=>x.Path).ToArray(), OriginalPixels=true, Source="https://polyhaven.com/a/brown_planks_03" };

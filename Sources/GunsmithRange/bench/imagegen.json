@@ -1,0 +1,23 @@
+{
+  "mode": "built-in image_gen",
+  "generated_on": "2026-10-13",
+  "assets": [
+    {
+      "source": "Sources/GunsmithRange/bench/oak_longgrain_source.png",
+      "material": "Assets/materials/gunsmith_range/bench_oak.vmat",
+      "prompt": "Use case: texture-material\nAsset type: game-ready wood base color / albedo texture for realistic firing range workbench timbers.\nCreate one seamless, edge-to-edge tileable photograph-like scan of mature European oak timber, planed and lightly sanded, seasoned outdoors but maintained. Square image, orthographic straight down, tightly filled with WOOD ONLY.\nThe grain runs vertically from top to bottom. Dense fine straight and slightly wavy oak fibers and subtle elongated pores; a few very small understated natural knots. Muted warm medium brown with gently gray weathered undertones, restrained natural tonal variation. Smooth worn workbench surface with faint localized scuffs, lightly oiled matte finish, not glossy. Fine detail appropriate to a 60 cm wide by 120 cm long patch of real wood; tiny pores, no oversized cracks.\nPerfectly uniform flat diffuse lighting, base color only: no directional shadows, specular highlights, depth shading, vignette or ambient occlusion. All four edges join seamlessly. No plank outlines, no board seams, no grooves, no nails, screws, text, markings, borders or surrounding objects. No furniture, perspective, wood flooring layout, repeated stripe pattern, coarse shredded fibers, or orange varnish. The result should look like an authentic high quality scanned woodworking timber texture, not painted or procedural. 2048 x 2048."
+    },
+    {
+      "source": "Sources/GunsmithRange/bench/oak_endgrain_source.png",
+      "material": "Assets/materials/gunsmith_range/bench_oak_endgrain.vmat",
+      "reference": "Sources/GunsmithRange/bench/oak_longgrain_source.png",
+      "prompt": "Use case: photorealistic-natural\nAsset type: realistic game timber END GRAIN base color / albedo texture.\nInput image 1 is a COLOR AND SPECIES REFERENCE ONLY: the long grain oak texture of the workbench timbers. Create a new matching END GRAIN texture showing the smooth, freshly sanded cross section cut across this same seasoned medium brown oak. Match its muted warm brown and gently gray weathered color. Fill the square canvas edge to edge with a uniform macro scan of end grain: fine curved, near parallel annual growth rings passing across the image and realistic microscopic oak pores and radial rays. A small 30 cm square patch cut from a large timber, not a whole tree trunk; no centered concentric circular log outline, bark, or cracks. No planks or seams. Restrained contrast, lightly oiled matte surface.\nFlat orthographic close scan under perfectly even diffuse lighting. No perspective, shadow, lighting gradient, gloss, surrounding objects, text or borders. Tileable texture. Wood grain is perpendicular to the long fibers in the reference, showing curved growth rings across the cut face. Do not simply rotate or copy the reference's long grain. 2048 x 2048."
+    }
+  ],
+  "processing": {
+    "albedo": "Original generated RGB, resized to a 2048x2048 power-of-two image for the s&box texture compiler.",
+    "pbr": "Approximate fine-pore normal and matte roughness derivatives baked by Tools/gunsmith_range_bench.py. These are generated assets, not measured photogrammetry.",
+    "uv": "Separate lengthwise fibers and cut-end material. Each board samples within the image borders to avoid repeating seams.",
+    "geometry": "Four timber boards with 3.6 mm eased edges per bench; original bounds and wood collision retained."
+  }
+}

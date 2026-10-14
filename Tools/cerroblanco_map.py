@@ -45,6 +45,7 @@ import railhead_map as R
 import railhead_preview as PV
 import cerroblanco_parts as P
 import cerroblanco_materials as CM
+from cerroblanco_glass import GlassModel
 
 TITLE = "Cerro Blanco"
 OUT_DIR = K.ASSETS / "models/maps/cerroblanco"
@@ -380,7 +381,8 @@ def rotunda( m, g, d ):
                 sides=48, surface=STONE )
     # The oculus' light in the clerestory's ceiling, a lantern over it, and a ring of downlights in the hall's ceiling.
     P.disc( m, LAMP, ( c[0], c[1] ), 70, cap - 0.5, facing=-1.0, sides=32 )
-    m.cylinder( c, 76, ROT_UP_TOP, ROT_UP_TOP + 14, { "side": FRAME, "top": P.GLAZE, "bottom": None }, sides=32 )
+    m.cylinder( c, 76, ROT_UP_TOP, ROT_UP_TOP + 14, { "side": FRAME, "top": None, "bottom": None }, sides=32 )
+    g.add_roof_disc( c, 76, ROT_UP_TOP + 12.5, ROT_UP_TOP + 14 )
     for k in range( 16 ):
         a = 2 * math.pi * ( k + 0.5 ) / 16
         P.disc( m, LAMP, ( c[0] + 316 * math.cos( a ), c[1] + 316 * math.sin( a ) ), 5, ROT_TOP - 16.5, facing=-1.0,
@@ -426,7 +428,11 @@ def cafe_upper( m, g, d ):
     for lo, hi in ( ( ( s0 - 5, s2 - 5 ), ( s1 + 5, s2 ) ), ( ( s0 - 5, s3 ), ( s1 + 5, s3 + 5 ) ),
                     ( ( s0 - 5, s2 ), ( s0, s3 ) ), ( ( s1, s2 ), ( s1 + 5, s3 ) ) ):
         m.box( ( lo[0], lo[1], ROOF ), ( hi[0], hi[1], ROOF + 12 ), { "default": WHITE, "-z": None }, STONE )
-    g.box( ( s0, s2, ROOF + 10 ), ( s1, s3, ROOF + 11.5 ), P.GLAZE, GLASS )
+    for column in range( 4 ):
+        for row in range( 2 ):
+            g.box( ( s0 + ( s1 - s0 ) * column / 4, s2 + ( s3 - s2 ) * row / 2, ROOF + 10 ),
+                   ( s0 + ( s1 - s0 ) * ( column + 1 ) / 4, s2 + ( s3 - s2 ) * ( row + 1 ) / 2, ROOF + 11.5 ),
+                   P.GLAZE, GLASS )
     for k in range( 1, 4 ):
         e = s0 + ( s1 - s0 ) * k / 4
         m.box( ( e - 1.25, s2, ROOF + 9 ), ( e + 1.25, s3, ROOF + 12.5 ), FRAME )
@@ -1239,7 +1245,7 @@ def look_object():
     ] )
 
 
-def write_scene( written, light_list, props ):
+def write_scene( written, light_list, props, glazing=None ):
     foliage = []
     for index, prop in enumerate( props ):
         key = f"foliage/{index}"
@@ -1247,8 +1253,12 @@ def write_scene( written, light_list, props ):
                                        K.yaw_rotation( prop.get( "yaw", 0.0 ) ), scale=K.vec( prop.get( "scale", ( 1, 1, 1 ) ) ),
                                        components=[ K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", Model=prop["path"],
                                                                  RenderType="On", Tint="1,1,1,1" ) ] ) )
+    if glazing is None:
+        from cerroblanco_glass import build_glazing
+        glazing, _ = build_glazing()
+    glazing.write_models()
     world = K.game_object( ids, "Cerro Blanco", "world", children=[
-        model_object( title, f"world/{name}", name, collide, shadows )
+        glazing.scene_group( ids ) if name == "cerroblanco_glass" else model_object( title, f"world/{name}", name, collide, shadows )
         for name, title, collide, shadows in SCENE_MODELS if name in written ] )
     light_objects = [
         K.game_object( ids, name, f"light/{name}", K.to_world( position ), tags="light_point,light", components=[
@@ -1416,7 +1426,7 @@ def banners( m ):
 
 def build():
     """ Every model by name. """
-    buildings, glass_, dressing, canopies, ground = Model(), Model(), Model(), Model(), Model()
+    buildings, glass_, dressing, canopies, ground = Model(), GlassModel(), Model(), Model(), Model()
     west_gallery( buildings, glass_, dressing )
     rotunda( buildings, glass_, dressing )
     east_block( buildings, glass_, dressing )
@@ -1498,6 +1508,7 @@ def main():
 
     write_materials()
     models = build()
+    models["cerroblanco_glass"].write_models()
     written = set()
     for name, model in models.items():
         if K.is_empty( model ):
@@ -1523,7 +1534,7 @@ def main():
     out = Path( args.preview ) if args.preview else None
     if out:
         out.mkdir( parents=True, exist_ok=True )
-    walked = [ models[name] for name in solid_names if name not in NAV_SKIP ]
+    walked = [ models[name] for name in solid_names if name not in NAV_SKIP ] + [ models["cerroblanco_glass"].guard_colliders() ]
     bounds = ( PLAY[0], PLAY[1], PLAY[2], PLAY[3] + 8 )
     cut_off = R.check_reach( walked, all_spots(), out / "reach.png" if out else None, bounds=bounds )
     print( f"  {cut_off} spot(s) cut off from the spawns" )
@@ -1533,7 +1544,7 @@ def main():
     props = [ prop for model in models.values() for prop in model.props ]
     if not args.no_scene:
         write_minimap( solid )
-        write_scene( written, light_list, props )
+        write_scene( written, light_list, props, glazing=models["cerroblanco_glass"] )
     if args.art:
         write_map_art( list( models.values() ) )
     if args.views:

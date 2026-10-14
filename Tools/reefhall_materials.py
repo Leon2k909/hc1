@@ -32,6 +32,8 @@ ROOT = Path( __file__ ).resolve().parent.parent
 OUT_DIR = ROOT / "Assets/materials/reefhall"
 RESOURCE_DIR = "materials/reefhall"
 DEFAULT_AO = "materials/default/default_ao.tga"
+# Authored ImageGen screens live beside the procedural maps and survive rebuilds.
+AUTHORED_COLOR = { "rh_screen_data": "rh_screen_telemetry_color.png" }
 
 spectral, smoothstep, paint, gl_normals = T.spectral, T.smoothstep, BT.paint, BT.gl_normals
 
@@ -646,7 +648,7 @@ TEXTURES = {
 DECALS = { "rh_emblem", "rh_emblem_ray", "rh_banner_manta", "rh_banner_jelly", "rh_screen_map", "rh_screen_sonar",
            "rh_screen_data" }
 # Self-lit paints: ( brightness ). Their colour is the light they give.
-ILLUM = { "rh_film": 0.12, "rh_frosted_lit": 0.4, "rh_led_warm": 6.0, "rh_led_cool": 5.0, "rh_screen_map": 2.2, "rh_screen_sonar": 2.2, "rh_screen_data": 2.2 }
+ILLUM = { "rh_film": 0.12, "rh_frosted_lit": 0.4, "rh_led_warm": 6.0, "rh_led_cool": 5.0, "rh_screen_map": 2.2, "rh_screen_sonar": 2.2, "rh_screen_data": 0.85 }
 # Metalness per paint where it differs from its texture's.
 METALNESS = { "rh_laminate": 0.0, "rh_rubber": 0.0, "rh_black": 0.0, "rh_soil": 0.0, "rh_steel_blue": 0.15,
               "rh_stainless": 0.85, "rh_anodised": 0.3 }
@@ -691,6 +693,7 @@ def save_rgb( path, a ):
 
 
 def vmat( paint_name, texture, metalness, extra ):
+    colour_file = AUTHORED_COLOR.get( paint_name, f"{paint_name}_color.png" )
     lines_ = [ "// Tools/reefhall_materials.py", '"Layer0"', "{", '    shader "shaders/complex.shader"', '    F_SPECULAR "1"' ]
     if paint_name in ALPHA_TESTED:
         lines_ += [ '    F_ALPHA_TEST "1"', '    F_RENDER_BACKFACES "1"', f'    TextureTranslucency "{RESOURCE_DIR}/{texture}_trans.png"',
@@ -700,7 +703,7 @@ def vmat( paint_name, texture, metalness, extra ):
                     f'    g_flSelfIllumBrightness "{ILLUM[paint_name]:.2f}"', '    g_flSelfIllumAlbedoFactor "1.0"',
                     '    g_vSelfIllumTint "[1.000000 1.000000 1.000000 0.000000]"' ]
     lines_ += [ '    g_flRoughnessScaleFactor "1"', f'    g_flMetalness "{METALNESS.get( paint_name, metalness ):.2f}"',
-                f'    TextureColor "{RESOURCE_DIR}/{paint_name}_color.png"',
+                f'    TextureColor "{RESOURCE_DIR}/{colour_file}"',
                 f'    TextureNormal "{RESOURCE_DIR}/{texture}_normal.png"',
                 f'    TextureRoughness "{RESOURCE_DIR}/{texture}_rough.png"',
                 f'    TextureAmbientOcclusion "{DEFAULT_AO}"', '    g_vColorTint "[1.0 1.0 1.0 1.0]"',

@@ -1,0 +1,17 @@
+var previous = Editor.SceneEditorSession.Active;
+var target = Editor.SceneEditorSession.All.Single(s => s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase)==true);
+try
+{
+    target.MakeActive(false);
+    await Task.Delay(100, cancellationToken);
+    var camera = Sandbox.Application.Editor.Camera;
+    return new {
+        Scene = target.Scene.Name, CameraScene = camera.Scene.Name,
+        camera.EnablePostProcessing, camera.AutoExposure.Enabled,
+        camera.AutoExposure.MinimumExposure, camera.AutoExposure.MaximumExposure,
+        camera.AutoExposure.Compensation, camera.AutoExposure.Rate,
+        Volumes = target.Scene.GetAllComponents<Tonemapping>().Select(t=>new { t.GameObject.Name, t.Enabled, t.AutoExposureEnabled, t.MinimumExposure, t.MaximumExposure }).ToArray(),
+        GameScene = Game.ActiveScene?.Name, Game.IsPlaying
+    };
+}
+finally { previous.MakeActive(false); }

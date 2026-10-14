@@ -124,7 +124,7 @@ public sealed partial class LightweightCombatBot
 	private float TrackingLag => MathX.Lerp( 0.14f, 0.05f, Skill );
 	private float TurnSpeed => MathX.Lerp( 220f, 480f, Skill );
 
-	private static bool IsHardcore => GameMode.ActiveHardcore || (GameMode.Instance.IsValid() && GameMode.Instance.Hardcore);
+	private static bool IsHardcore => GameMode.IsHardcore;
 	private static bool IsObjectiveMode => GameMode.Instance?.Ident is "domination" or "hardpoint";
 
 	private Component _target;
@@ -258,10 +258,12 @@ public sealed partial class LightweightCombatBot
 	/// Host: moving faster than a walk, which only a sprint is. The gun is carried (<see cref="MaxShoulderedSpeed"/>) and
 	/// can't fire until <see cref="SprintOutTime"/> after, and the bot sees and hears less round it.
 	/// </summary>
-	private bool IsSprinting => Agent.IsValid() && Agent.Velocity.WithZ( 0f ).Length > MaxShoulderedSpeed;
+	private bool IsSprinting => !IsSliding && Agent.IsValid() && Agent.Velocity.WithZ( 0f ).Length > MaxShoulderedSpeed;
 
 	private void ResetCombatState()
 	{
+		StopSlide( resume: false );
+		ClearPlayerDetour();
 		ForgetTarget();
 		_contact = null;
 		_callout = null;
@@ -899,7 +901,7 @@ public sealed partial class LightweightCombatBot
 
 		AimDirection = _aimDirection;
 
-		var flat = _aimDirection.WithZ( 0f );
+		var flat = IsSliding ? _slideDirection : _aimDirection.WithZ( 0f );
 		if ( !flat.IsNearZeroLength )
 			WorldRotation = Rotation.Lerp( WorldRotation, Rotation.LookAt( flat.Normal, Vector3.Up ), Time.Delta * 10f );
 	}
@@ -982,6 +984,12 @@ public sealed partial class LightweightCombatBot
 		if ( !Agent.IsValid() )
 			return;
 
+		if ( IsSliding )
+		{
+			ContinueSlide();
+			return;
+		}
+
 		CheckStuck();
 
 		if ( WaitForDoor() || WaitForPlayer() )
@@ -993,6 +1001,9 @@ public sealed partial class LightweightCombatBot
 
 		// Battle royale: getting into the zone comes first, shooting on the way.
 		if ( HeadForZone() )
+			return;
+
+		if ( TryStartSlide() )
 			return;
 
 		if ( _targetVisible && _target.IsValid() )
@@ -1674,6 +1685,7 @@ public sealed partial class LightweightCombatBot
 
 	private void HoldPosition()
 	{
+		ClearPlayerDetour();
 		if ( !_moveTarget.HasValue )
 			return;
 
@@ -1727,40 +1739,6 @@ public sealed partial class LightweightCombatBot
 	}
 
 	/// <summary>
-	/// A player in the way. The navmesh doesn't know about players, so a bot would walk into one, and its movement box
-	/// (<see cref="AttachMovementBox"/>) would shove them about. Wait a moment instead, like a person.
-	/// </summary>
-	private bool WaitForPlayer()
-	{
-		if ( _playerInTheWay.Relative > 0f )
-			return true;
-
-		var velocity = Agent.Velocity.WithZ( 0f );
-		if ( velocity.Length < 10f )
-			return false;
-
-		var ahead = velocity.Normal;
-		foreach ( var player in LivingPawns )
-		{
-			var offset = player.WorldPosition - WorldPosition;
-			if ( MathF.Abs( offset.z ) > 64f )
-				continue;
-
-			// Both boxes are 32 wide: stop a step short of theirs, for anyone the next stride would clip.
-			var along = Vector3.Dot( offset.WithZ( 0f ), ahead );
-			if ( along < 0f || along > 56f || (offset.WithZ( 0f ) - ahead * along).Length > 36f )
-				continue;
-
-			_playerInTheWay = 0.5f;
-			_moveTarget = null;
-			Agent.Stop();
-			return true;
-		}
-
-		return false;
-	}
-
-	/// <summary>
 	/// Soldiers on the move keep an interval. Coming up behind a teammate who's going the same way, the bot eases off
 	/// until the gap opens again, so a team heading down one corridor strings out into a spaced file instead of walking
 	/// in a bunch. A teammate standing still or coming the other way is just passed.
@@ -1808,6 +1786,9 @@ public sealed partial class LightweightCombatBot
 	/// <summary> Wedged on something: drop the plan and pick another. </summary>
 	private void CheckStuck()
 	{
+		if ( _playerDetour.HasValue )
+			return;
+
 		if ( _timeSinceStuckCheck < 2f )
 			return;
 
@@ -1960,7 +1941,7 @@ public sealed partial class LightweightCombatBot
 			hitbox = HitboxTags.Chest;
 
 		var roundDamage = RoundDamage( trace.Distance );
-		var hardcore = GameMode.ActiveHardcore || (GameMode.Instance.IsValid() && GameMode.Instance.Hardcore);
+		var hardcore = GameMode.IsHardcore;
 		var damage = !hardcore && victim is PlayerPawn ? roundDamage * RealPlayerDamageScale : roundDamage;
 		var damageInfo = new DamageInfo( this, damage, this, trace.EndPosition, direction * damage, hitbox );
 

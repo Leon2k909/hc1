@@ -1,0 +1,12 @@
+// Tools/lowtide_interior.py: long pine boards at 24 cm width.
+"Layer0"
+{
+    shader "shaders/hc1_lowtide_timber.shader"
+    TextureColor "materials/lowtide/interior/ceiling_color.png"
+    TextureNormal "materials/lowtide/interior/ceiling_normal.png"
+    TextureRoughness "materials/lowtide/interior/ceiling_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    TextureMetalness "materials/default/default_black_mask.tga"
+    g_vTimberScale "[1.1288889 1.016]"
+    g_vTimberTint "[.72 .67 .60]"
+}

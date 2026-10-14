@@ -28,6 +28,13 @@ public sealed class BotSupportHand
 	}
 
 	public bool Apply( SkinnedModelRenderer body, Transform target, float weight = 1f )
+		=> ApplyCore( body, target, weight, null, 0f );
+
+	/// <summary>Use an anatomical elbow direction while fading from the animated arm's bend.</summary>
+	public bool ApplyWithPole( SkinnedModelRenderer body, Transform target, Vector3 pole, float weight = 1f, float poleWeight = 1f )
+		=> ApplyCore( body, target, weight, pole, poleWeight );
+
+	private bool ApplyCore( SkinnedModelRenderer body, Transform target, float weight, Vector3? elbowPole, float poleWeight )
 	{
 		if ( !body.IsValid() || !body.SceneModel.IsValid() || body.Model is null || weight <= 0f ) return false;
 		if ( _model != body.Model || _body != body ) Build( body );
@@ -49,6 +56,7 @@ public sealed class BotSupportHand
 		var distance = to.Length.Clamp( MathF.Abs( a - b ) + .001f, a + b - .001f );
 		wrist = upper.Position + direction * distance;
 		var pole = lower.Position - upper.Position;
+		if ( elbowPole is { } preferred ) pole = Vector3.Lerp( pole, preferred, poleWeight.Clamp( 0f, 1f ) );
 		var bend = pole - direction * pole.Dot( direction );
 		if ( bend.Length < .001f ) bend = upper.Rotation.Up - direction * upper.Rotation.Up.Dot( direction );
 		if ( bend.Length < .001f ) bend = upper.Rotation.Right - direction * upper.Rotation.Right.Dot( direction );

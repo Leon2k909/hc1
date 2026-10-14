@@ -4,9 +4,7 @@
 
 @if ( !Pawn.IsValid() || !HealthComponent.IsValid() ) return;
 
-@* Bottom left, straight on the world with no plate: health's number on the left and armour's on the right, over one
-   bar for health with armour's thin bar under it. The bar has ticks at each quarter, and a ghost of what a hit took
-   off that drains after it. Tick sets health's state. *@
+@* Health is always shown. Armour and helmets are retained for modes that explicitly enable protection. *@
 <root>
     <div class="numbers">
         <div class="health">
@@ -14,7 +12,7 @@
             <label class="value">@Health</label>
         </div>
 
-        @if ( ArmorComponent.IsValid() )
+        @if ( ShowArmor )
         {
             <div class="armor">
                 @if ( HasHelmet )
@@ -35,7 +33,7 @@
         <div class="tick" style="left: 75%;" />
     </div>
 
-    @if ( ArmorComponent.IsValid() )
+    @if ( ShowArmor )
     {
         <div class="armor-bar"><div class="fill" style="width: @(ArmorPercent)%;" /></div>
     }
@@ -48,7 +46,9 @@
     public ArmorComponent ArmorComponent => Pawn.GetComponent<ArmorComponent>();
     public int Health => HealthComponent?.Health.CeilToInt() ?? 0;
     public int Armor => ArmorComponent?.Armor.CeilToInt() ?? 0;
-    public bool HasHelmet => ArmorComponent?.HasHelmet ?? false;
+    public bool ShowArmor => ArmorComponent.IsValid() && ArmorComponent.ArmorEnabled
+        && GameMode.Instance?.Get<HudOptions>()?.ShowArmorVitals is true;
+    public bool HasHelmet => ShowArmor && ArmorComponent.HelmetsEnabled && ArmorComponent.HasHelmet;
 
     private float HealthFraction => HealthComponent.IsValid() && HealthComponent.MaxHealth > 0
         ? Math.Clamp( HealthComponent.Health / HealthComponent.MaxHealth, 0f, 1f ) : 0f;
@@ -66,7 +66,7 @@
 
     protected override int BuildHash()
     {
-        return !Pawn.IsValid() ? 0 : HashCode.Combine( Health, Armor, HasHelmet, ArmorPercent, HealthPercent, Pawn.HealthComponent?.State );
+        return !Pawn.IsValid() ? 0 : HashCode.Combine( Health, Armor, HasHelmet, ArmorPercent, HealthPercent, Pawn.HealthComponent?.State, ShowArmor );
     }
 
     // The state's classes are set here: a <root class="@(...)"> adds a class but doesn't take it off again.

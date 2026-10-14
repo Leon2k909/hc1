@@ -1,0 +1,13 @@
+// Tools/belltower_quality_materials.py; sources: Sources/Belltower/scans/manifest.json
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "materials/buildings/clay_pot_color.png"
+    TextureNormal "materials/belltower/scans/white_plaster_rough_01_nor_gl_4k.png"
+    TextureRoughness "materials/belltower/scans/white_plaster_rough_01_rough_4k.png"
+    g_vColorTint "[0.74 0.71 0.64 1]"
+    g_flRoughnessScaleFactor "0.7"
+    g_flMetalness "0"
+    g_flModelTintAmount "1"
+}

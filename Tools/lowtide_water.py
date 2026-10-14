@@ -11,6 +11,18 @@ MATERIAL = DIRECTORY / "lt_water.vmat"
 SHADER = K.ASSETS / "shaders/hc1_lowtide_water.shader"
 
 
+def reflection_component(ids, key):
+    return K.component(ids, "Facepunch.LowtideWaterReflections", f"{key}/reflections",
+                       WaterHeight=-137, MaximumWidth=960)
+
+
+def apply_scene(scene, L):
+    water = next(o for o in next(o for o in scene["GameObjects"] if o.get("Name") == "Lowtide")["Children"]
+                 if o.get("Name") == "Water")
+    water["Components"][:] = [c for c in water["Components"] if c["__type"] != "Facepunch.LowtideWaterReflections"]
+    water["Components"].append(reflection_component(L.ids, "world/lowtide_water"))
+
+
 def metadata(path):
     sidecar = Path(str(path) + ".meta")
     if not sidecar.exists():
@@ -23,12 +35,12 @@ def write_materials():
 "Layer0"
 {
     shader "shaders/hc1_lowtide_water.shader"
-    g_vWaterColor "[0.100 0.160 0.140]"
-    g_vWaterFlow "[-3.4 0.9]"
-    g_flRippleTile "512"
-    g_flRippleStrength "0.7"
-    g_flWaterRoughness "0.20"
-    g_flAbsorptionDistance "42"
+    g_vWaterColor "[0.014 0.022 0.018]"
+    g_vWaterFlow "[-2.1 0.65]"
+    g_flRippleTile "48"
+    g_flRippleStrength "0.8"
+    g_flWaterRoughness "0.10"
+    g_flAbsorptionDistance "18"
     g_flBankFade "0.3"
 }
 ''')

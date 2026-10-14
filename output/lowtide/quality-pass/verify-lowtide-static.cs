@@ -1,0 +1,18 @@
+var folder=System.IO.Path.Combine(Project.Current.GetRootPath(),"output/lowtide/quality-pass");
+var userScene=Game.ActiveScene;
+var userSession=Editor.SceneEditorSession.Active;
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor&&s.Scene.Source?.ResourcePath?.Equals("scenes/maps/lowtide/lowtide.scene",StringComparison.OrdinalIgnoreCase)==true);
+if(session.HasUnsavedChanges)throw new Exception("Lowtide has unsaved changes; cannot reload");
+if(session==userSession)throw new Exception("Lowtide is the active edit session; inspect before reloading");
+session.Reload();
+var scene=session.Scene;
+scene.EditorTick(1,.016f);
+var models=scene.GetAllComponents<ModelRenderer>().Where(r=>r.GameObject.Parent?.Name=="Lowtide").Select(r=>new{name=r.GameObject.Name,r.GameObject.IsStatic,nativeStatic=r.SceneObject?.Flags.IsStatic}).ToArray();
+var lights=scene.GetAllComponents<Light>().Where(l=>l is PointLight||l is SpotLight).Select(l=>new{l.GameObject.Name,l.GameObject.IsStatic,l.Enabled}).ToArray();
+if(models.Count(m=>m.IsStatic&&m.nativeStatic==true)!=9)throw new Exception("Expected nine static native world renderers");
+if(lights.Any(l=>!l.IsStatic))throw new Exception("Local lamp missing static flag");
+if(models.Any(m=>(m.name=="Glass"||m.name=="Water")&&m.IsStatic))throw new Exception("Glass or water incorrectly made static");
+if(userScene!=Game.ActiveScene||userSession!=Editor.SceneEditorSession.Active)throw new Exception("User session changed");
+var report=new{models,lights,userScenePreserved=true,userScene=userScene?.Name,session.HasUnsavedChanges,points=scene.GetAllComponents<PointLight>().Count(l=>l.Enabled),spots=scene.GetAllComponents<SpotLight>().Count(l=>l.Enabled),volumes=scene.GetAllComponents<IndirectLightVolume>().Count()};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"static-shadow-engine-checks.json"),System.Text.Json.JsonSerializer.Serialize(report,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return report;
