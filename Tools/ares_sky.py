@@ -8,9 +8,10 @@ where the hall's window looks. Written as a panorama with belltower_sky's EXR wr
 - Mars's dust lifts the haze's colour to butterscotch and rust low down; above about 20 degrees the evening sky is
   dark. The values are linear radiance at the hall's exposure (ares_map's Look: auto exposure between SKY_EXPOSURE and
   3): the haze at the horizon about a third of the sunlit ground's brightness, the zenith nearly nothing.
-- The moons are the picture's: two cratered moons, the larger 8 degrees across at 33 degrees up and 22 degrees east of
-  north, the smaller 3.4 degrees across lower and further east. Phobos and Deimos are far smaller from the ground
-  (0.2 and 0.04 degrees), but the picture draws them big, and so does this. They're lit from the sun behind the viewer
+- The moons are the picture's: two cratered moons over the window, the larger 3 degrees across, 13 degrees up and 10
+  degrees west of north, the smaller 1.7 degrees across, lower and to its right (4 west of north), so from the south-east
+  gallery (ares_map.ART_VIEW) they hang in the top right of the window as in the picture. Phobos and Deimos are far
+  smaller from the ground (0.2 and 0.04 degrees), but the picture draws them big, and so does this. They're lit from the sun behind the viewer
   (SUN_PITCH, SUN_YAW), so they show nearly full.
 - The sun (low in the south-east, behind the hall) has the small blue halo of a Martian sunset round it.
 - Writes Assets/materials/ares/sky/ares_sky.exr and ares_sky.vmat.
@@ -36,12 +37,12 @@ SKY_MATERIAL = f"{RESOURCE_DIR}/{NAME}.vmat"
 SUN_PITCH, SUN_YAW = 20.0, 42.0
 
 # The sky's linear colour by degrees above the horizon.
-SKY_KEYS = ( ( -10.0, ( 0.040, 0.020, 0.012 ) ), ( 0.0, ( 0.30, 0.135, 0.062 ) ), ( 3.0, ( 0.22, 0.098, 0.046 ) ),
+SKY_KEYS = ( ( -10.0, ( 0.040, 0.020, 0.012 ) ), ( 0.0, ( 0.24, 0.11, 0.052 ) ), ( 3.0, ( 0.17, 0.077, 0.037 ) ),
              ( 10.0, ( 0.095, 0.044, 0.024 ) ), ( 22.0, ( 0.030, 0.016, 0.011 ) ), ( 40.0, ( 0.010, 0.0065, 0.0055 ) ),
              ( 90.0, ( 0.0045, 0.0035, 0.0035 ) ) )
 
 # The moons: degrees east of north, degrees up, angular diameter, albedo, seed.
-MOONS = ( ( 22.0, 33.0, 8.0, 0.30, 5 ), ( 34.0, 25.5, 3.4, 0.24, 6 ) )
+MOONS = ( ( -10.0, 13.0, 3.0, 0.30, 5 ), ( -4.0, 9.5, 1.7, 0.24, 6 ) )
 MOON_LIGHT = 1.6         # the sunlight's radiance on them
 
 

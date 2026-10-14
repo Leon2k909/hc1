@@ -90,7 +90,8 @@ SIGN = { "poster_ares": ( 0, 0, 1536, 1920 ), "band_atmos": ( 1536, 0, 2048, 102
          "poster_mars": ( 2304, 1920, 1280, 1024 ), "plate_cargo": ( 1280, 2944, 1536, 384 ),
          "plate_rover": ( 1280, 3328, 1536, 384 ), "plate_core": ( 2816, 2944, 1280, 384 ),
          "plate_observation": ( 2816, 3328, 1280, 384 ), "stripe_warning": ( 1280, 3712, 2816, 384 ),
-         "band_atmos_back": ( 3584, 0, 512, 1024 ) }
+         "band_atmos_back": ( 3584, 0, 512, 1024 ), "zone_03": ( 3584, 1024, 512, 448 ),
+         "zone_b": ( 3584, 1472, 512, 448 ) }
 
 LIT_ATLAS = ( 2048, 1024 )
 LIT = { "sector03": ( 0, 0, 1024, 256 ), "habitatb": ( 1024, 0, 1024, 256 ), "observation": ( 0, 256, 1024, 256 ),
@@ -269,7 +270,7 @@ def wall_panels( n=None ):
     big = noise( rng, ( n, n ), ( ppi, ppi ), 2.6, 96, 6 )
     fine = noise( rng, ( n, n ), ( ppi, ppi ), 1.0, 1.0, 0.1 )
     streak = noise( rng, ( n, n ), ( ppi, ppi * 0.05 ), 1.6, 8.0, 0.5 )
-    base = lin( ( 50, 50, 53 ) )
+    base = lin( ( 70, 70, 74 ) )
     colour = base[None, None, :] * ( 0.85 + 0.25 * tone + 0.07 * big + 0.02 * fine )[..., None]
     grime = np.clip( seam + 0.5 * smoothstep( 0.5, 2.2, streak ) * ( 1 - fy / ph ) + 0.3 * smoothstep( 1.0, 2.5, -big ), 0, 1 )
     colour = mix( colour, lin( ( 34, 31, 28 ) ), grime * 0.6 )
@@ -337,7 +338,7 @@ def brushed_brass( n=None ):
 
 def bar_grating( n=None ):
     """ Welded bar grating: bearing bars 1 3/16 in apart, cross bars every 4 in, dark gaps between. """
-    n = n or px( 768 )
+    n = n or px( 1024 )                 # a power of two: the engine can't mip a 768 normal map with its roughness
     tile = TILES["ar_grating"]
     ppi = n / tile
     rng = np.random.default_rng( 306 )
@@ -431,8 +432,8 @@ def tower_cladding( n=None ):
     wx, wy = 16.0, 24.0
     ix, iy = np.floor( x / wx ).astype( int ), np.floor( y / wy ).astype( int )
     fx, fy = x - ix * wx, y - iy * wy
-    window = ( np.abs( fx - wx / 2 ) < 4.5 ) & ( np.abs( fy - wy / 2 ) < 6.5 )
-    lit = periodic_hash( ix % 16, iy % 10, 13 ) < 0.38
+    window = ( np.abs( fx - wx / 2 ) < 2.5 ) & ( np.abs( fy - wy / 2 ) < 4.0 )
+    lit = periodic_hash( ix % 16, iy % 10, 13 ) < 0.3
     rib = np.abs( fx - 0.0 ) < 1.0
     big = noise( rng, ( n, n ), ( ppi, ppi ), 2.6, 128, 8 )
     colour = lin( ( 52, 48, 46 ) )[None, None, :] * ( 0.9 + 0.08 * big )[..., None] * np.ones( ( n, n, 3 ), np.float32 )
@@ -642,6 +643,19 @@ def sign_atlas():
         c = mix( c, lin( ( 214, 160, 28 ) ), words )
         put( name, c, 0.6 )
 
+    # The wings' zone markers: the sector's number painted big on a dark plate, its name over it.
+    for name, small, big in ( ( "zone_03", "SECTOR", "03" ), ( "zone_b", "HABITAT", "B" ) ):
+        h, w = size( name )
+        c, _ = grimy_panel( rng, ( h, w ), ( 46, 46, 48 ), 6.0, 0.3 )
+        words = text_layer( ( h, w ), [ ( small, FONT_BOLD, h * 0.09, w * 0.5, h * 0.1, "m", 0.12, w * 0.8 ),
+                                        ( big, FONT_BOLD, h * 0.56, w * 0.5, h * 0.28, "m", 0.02, w * 0.86 ) ] )
+        words *= 1.0 - wear( rng, ( h, w ), 0.45, 4.0, 3.0 ) * 0.7
+        c = mix( c, white, words * 0.9 )
+        bar = np.zeros( ( h, w ), np.float32 )
+        bar[int( h * 0.9 ):int( h * 0.94 ), int( w * 0.1 ):int( w * 0.9 )] = 1
+        c = mix( c, lin( ( 214, 160, 28 ) ), bar )
+        put( name, c, 0.65 )
+
     # A warning stripe with text.
     h, w = size( "stripe_warning" )
     yy, xx = np.mgrid[0:h, 0:w].astype( np.float32 )
@@ -771,14 +785,16 @@ def dome_lattice():
     frame = strut | ring
     cell_i = np.floor( xx * bays + yy * rows ).astype( int ) % 64
     cell_j = np.floor( xx * bays - yy * rows ).astype( int ) % 64
-    lit = ( periodic_hash( cell_i, cell_j, 21 ) < 0.18 ) & ( yy > 0.45 )
-    glass = lin( ( 26, 28, 32 ) )[None, None, :] * np.ones( ( n, n, 3 ), np.float32 )
-    c = np.where( lit[..., None], lin( ( 255, 186, 110 ) ), glass )
+    lit = ( periodic_hash( cell_i, cell_j, 21 ) < 0.22 ) & ( yy > 0.7 )
+    shade = noise( rng, ( n, n ), ( 1.0, 1.0 ), 2.0, 200, 8 )
+    panel = lin( ( 168, 162, 154 ) )[None, None, :] * ( 0.92 + 0.08 * shade )[..., None] * np.ones( ( n, n, 3 ), np.float32 )
+    panel = mix( panel, lin( ( 120, 112, 104 ) ), smoothstep( 0.0, 0.25, 1 - yy ) * 0.0 + ( periodic_hash( cell_i, cell_j, 23 ) < 0.12 ) * 0.5 )
+    c = np.where( lit[..., None], lin( ( 255, 196, 128 ) ), panel )
     c = np.where( frame[..., None], lin( ( 214, 208, 198 ) ), c )
     dust = smoothstep( 0.6, 1.0, yy ) * 0.0 + smoothstep( 0.0, 0.3, 1 - yy ) * 0.3
     c = mix( c, lin( ( 170, 100, 64 ) ), dust * frame )
     illum = ( lit & ~frame ).astype( np.float32 )
-    rough = np.where( frame, 0.5, 0.12 ).astype( np.float32 )
+    rough = np.where( frame, 0.5, 0.3 ).astype( np.float32 )
     return T.linear_to_srgb( c ), illum, rough
 
 
@@ -815,8 +831,8 @@ EMISSIVE = {
     "ar_led_amber": ( ( 255, 150, 50 ), 5.0 ),
     "ar_led_red": ( ( 255, 60, 40 ), 4.0 ),
     "ar_led_cyan": ( ( 120, 220, 255 ), 4.0 ),
-    "ar_core": ( ( 255, 200, 120 ), 14.0 ),
-    "ar_far_light": ( ( 255, 196, 120 ), 10.0 ),
+    "ar_core": ( ( 255, 190, 110 ), 3.2 ),
+    "ar_far_light": ( ( 255, 196, 120 ), 3.5 ),
 }
 
 # Glass: tint (sRGB, for TextureColor), roughness, AlbedoAbsorption.
@@ -948,7 +964,7 @@ def build( name, out ):
         BX.save_rgb( out / "ar_plasma_color.png", c )
         BX.save_grey( out / "ar_plasma_illum.png", illum )
         write_text( out / "ar_plasma.vmat", vmat( name, f"{RESOURCE_DIR}/ar_plasma_color.png", rough_value=0.4,
-                                                  illum=f"{RESOURCE_DIR}/ar_plasma_illum.png", brightness=12.0 ) )
+                                                  illum=f"{RESOURCE_DIR}/ar_plasma_illum.png", brightness=2.4 ) )
         done[name] = ( c, np.dstack( [ np.zeros_like( illum ), np.zeros_like( illum ), np.ones_like( illum ) ] ) )
         print( f"wrote {name}" )
     elif name == "ar_dome":

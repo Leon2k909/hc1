@@ -1,0 +1,19 @@
+// Tools/ares_materials.py
+"Layer0"
+{
+    shader "shaders/glass.shader"
+    F_GLASS_QUALITY "2"
+    g_bFogEnabled "1"
+    g_flBlurAmount "0.02"
+    g_flRefractionStrength "1.006"
+    AlbedoAbsorption "0.100"
+    g_flTintColor "[1.000000 1.000000 1.000000 0.000000]"
+    TextureColor "[1.000000 0.878431 0.737255 0.000000]"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureRoughness "[0.050000 0.050000 0.050000 0.000000]"
+    TextureMetalness "[0.000000 0.000000 0.000000 0.000000]"
+    TextureAmbientOcclusion "[1.000000 1.000000 1.000000 0.000000]"
+    TextureBlendMask "materials/default/default_blend.tga"
+    TextureTintMask "materials/default/default.tga"
+    TextureTranslucency "materials/default/default_trans.tga"
+}

@@ -2645,7 +2645,7 @@
 
 ## Maps
 - Match maps (map picker, Quick Play, end-of-match vote) are `GameUtils.IsMatchReadyMap`: Flatgrass, Innocent Hotel,
-  Belltower, Reef Hall, Railhead, Lowtide, Boxyard and Cerro Blanco (see their sections below).
+  Belltower, Reef Hall, Railhead, Lowtide, Boxyard, Cerro Blanco and Ares (see their sections below).
 - The hub (`HubPage`) is one featured screen for the tab picked on its left rail (`HubModeRail`, `HubPage.Operation`:
   Multiplayer, Battle Royale or Zombies; Campaign is locked), like the user's CoD-style mockup. Its art is
   `ui/modes/<mode>_wide.png`, a 1024x720 cut of the 2:3 card art. Battle Royale has no wide cut or blurred backdrop, so
@@ -4031,6 +4031,70 @@ simulate_input.
       hasn't been seen in a match.
   - Not yet checked: a Retakes, Domination, Hot Zone or Cash Grab match played on it.
 - To play it: `dev_mode team_deathmatch cerroblanco` (or `dev_mode bomb_defusal cerroblanco`).
+
+## Ares (multiplayer map, `Tools/ares_map.py`)
+- The user asked for a map on Mars "as close to this img as possible" (2026-10-14), from a reference picture of an
+  atmosphere-processing plant:
+  - the ATMOS PROCESSING column glowing orange through its glass, in a dark steel hall ringed with galleries;
+  - a leaning window wall onto the red plain with habitat domes, spired towers and two moons;
+  - the facility's posters and banners (ARES FACILITY, HUMANITY FURTHER, HABITAT B, RED PLANET REAL PROGRESS) and
+    black hard cases stencilled MARS / BIGGER / CLEANER / BRIGHTER.
+  It's indoors and pressurised, so it has the game's normal gravity (the user said so). Nothing in the scene changes
+  gravity. ARES FACILITY and its red triangle mark are the picture's made-up company.
+- Built by script like Boxyard, from three scripts (each docstring has the details):
+  - `Tools/ares_materials.py`: the ar_ materials drawn with numpy into `Assets/materials/ares/`, its atlases (cases,
+    signs, lit door signs, screens, plasma, domes) and flat paints. Run it first. `names` redraws only those.
+  - `Tools/ares_sky.py`: a Martian evening (near black overhead, a rust haze at the horizon, stars, a sun with the
+    blue halo of a Martian sunset). Written with belltower_sky's EXR writer and wrapping.
+    - The moons are drawn far bigger than Phobos and Deimos really look (3 and 1.7 degrees across), as in the picture.
+    - They sit low in the north-north-west, so from the menu picture's view they hang in the window's top right.
+  - `Tools/ares_map.py`: the models (`ares_hall`, `ares_reactor`, `ares_dressing`, `ares_glass` and `ares_backdrop`;
+    the last two are drawn only), the scene (`Assets/scenes/maps/Ares/ares.scene`, rewritten whole on every run) and
+    the radar picture.
+- Layout (plan e, n; mirrored across e 0; floors at z 0 and galleries at G 208):
+  - The Atmos Hall, e -1100..1100 and n -720..720, 720 high. The column stands in its middle on a 16 high plinth.
+    - A ring catwalk runs round the column at G, with a bridge from it to each side gallery.
+    - Galleries run round all four sides. The north one, the observation deck, runs along the window and is bomb
+      site A at its east end.
+    - A stair in the void beside each side gallery, and a glass-fronted control room under each side gallery.
+  - The window wall leans out 14 degrees (`LEAN`): mullions every 200, a glass collision slab, cheeks against the
+    side walls. Outside, the land falls away from a cliff under the window.
+  - The wings: SECTOR 03 in the west (Red Team spawns there) and HABITAT B in the east (Blue Team).
+    - Each is double height, with an L of mezzanine along its north and inner walls and a stair up its outer wall.
+    - Three doors lead into the hall: the floor's middle door, the side gallery's SECTOR 03 / HABITAT B door, and
+      the north door onto the observation deck.
+    - A blast screen inside each middle door stops a sightline from site A through the door into the spawn.
+  - The cargo concourse runs along the whole south side (n -1400..-752, 320 high), with a rover in its middle. Bomb
+    site B is the cargo bay at its east end.
+- Lanes: north is the observation deck and the wings' north mezzanines; middle is the hall floor past the column, with
+  the ring and bridges over it; south is the concourse.
+- Modes: the scene lists TDM and Defuse. It has 32+4 deathmatch spawns and Retakes spawns per site. Domination is A in
+  the west wing, B by the column and C in the east wing. Hot Zone and Cash Grab spots are `ObjectiveSpot`s.
+  `GameUtils` lists it (menus, Quick Play, vote, Ranked).
+- Every run checks all 93 spots, as Boxyard's checks do. All pass: room and floor, reach, and no Retakes pair in sight.
+- Checked offscreen in the editor on 2026-10-14, in an isolated scene (the editor's own was left alone):
+  - A navmesh generated with the scene's agent and bounds: 186 of 186 paths complete from both spawns to every spot.
+    The only islands are roofs, case tops and points inside the column.
+  - Traces: the column is solid at radius 170 at every height. The window, wing windows and control-room glass
+    block. A railing's top rail blocks players, and you can shoot between its rails.
+  - Renders: `Sources/Ares/editor/capture.cs.txt`, with views in `capture-config.json`, writes to `output/ares/`. Its
+    `art` view writes the menu picture, `ui/maps/ares.png`, from `ares_map.ART_VIEW` on the south-east gallery,
+    framed like the reference picture.
+  - Offline, `railhead_render.py` renders it in Cycles with `SCENE` pointed at ares.scene (a scratch wrapper).
+- Learned making it:
+  - The editor's file watcher missed the new folders: assets reported "no source file". Register them with
+    `Editor.AssetSystem.RegisterFile` in a run_csharp script, then compile vmats, then vmdls, then the scene.
+  - A 768 px normal map failed to compile ("GenerateMips HemiOctIsoRoughness_RG_B"), and every model using its
+    material failed with it. Keep normal maps a power of two.
+  - The engine ignores a mesh with a point 90000 out ("ignoring mesh"), so the land stops 60000 out (`WORLD_EDGE`)
+    and rises there so its rim never shows.
+  - `map_kit.Model.oriented_box` needs right-handed axes. Left-handed ones draw the box inside out, and its collision
+    fails map_kit's angle assert.
+  - The plasma's self-illumination at 12 blew the whole view out under bloom. It's 2.4 now, with bloom 0.2 over 2.2
+    and auto exposure 1.5-4.
+  - Point lights in the engine are far dimmer than Cycles shows them: the lights here are 2.5-3.2 times white.
+- Not yet checked: a match played on it (bots, every mode's objects, spawns), its frame time with 102 point lights (10
+  with shadows), and any sound (it has no ambience).
 
 ## Ridgeback (battle royale map, `Assets/scenes/maps/Ridgeback/`)
 - The second battle royale map, a base to build on: a valley about 1.2 km across in a ring of mountains, on an s&box
