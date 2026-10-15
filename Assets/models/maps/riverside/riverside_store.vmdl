@@ -1,0 +1,384 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc29:version{3cec427c-1b0e-4d48-a90a-0436f33a6041} -->
+{
+	rootNode =
+	{
+		_class = "RootNode"
+		children =
+		[
+			{
+				_class = "MaterialGroupList"
+				children =
+				[
+					{
+						_class = "DefaultMaterialGroup"
+						remaps =
+						[
+							{ from = "rs_boards_dark.vmat" to = "materials/riverside/rs_boards_dark.vmat" },
+							{ from = "rs_concrete.vmat" to = "materials/riverside/rs_concrete.vmat" },
+							{ from = "rs_crate.vmat" to = "materials/riverside/rs_crate.vmat" },
+							{ from = "rs_dark.vmat" to = "materials/riverside/rs_dark.vmat" },
+							{ from = "rs_drum_inside.vmat" to = "materials/riverside/rs_drum_inside.vmat" },
+							{ from = "rs_ember.vmat" to = "materials/riverside/rs_ember.vmat" },
+							{ from = "rs_fridge.vmat" to = "materials/riverside/rs_fridge.vmat" },
+							{ from = "rs_lamp_cool.vmat" to = "materials/riverside/rs_lamp_cool.vmat" },
+							{ from = "rs_lamp_sodium.vmat" to = "materials/riverside/rs_lamp_sodium.vmat" },
+							{ from = "rs_lamp_warm.vmat" to = "materials/riverside/rs_lamp_warm.vmat" },
+							{ from = "rs_lit.vmat" to = "materials/riverside/rs_lit.vmat" },
+							{ from = "rs_paint_red.vmat" to = "materials/riverside/rs_paint_red.vmat" },
+							{ from = "rs_paint_white.vmat" to = "materials/riverside/rs_paint_white.vmat" },
+							{ from = "rs_plywood.vmat" to = "materials/riverside/rs_plywood.vmat" },
+							{ from = "rs_porch_light.vmat" to = "materials/riverside/rs_porch_light.vmat" },
+							{ from = "rs_roof.vmat" to = "materials/riverside/rs_roof.vmat" },
+							{ from = "rs_rust.vmat" to = "materials/riverside/rs_rust.vmat" },
+							{ from = "rs_sandbag.vmat" to = "materials/riverside/rs_sandbag.vmat" },
+							{ from = "rs_signs.vmat" to = "materials/riverside/rs_signs.vmat" },
+							{ from = "rs_steel.vmat" to = "materials/riverside/rs_steel.vmat" },
+							{ from = "rs_wood.vmat" to = "materials/riverside/rs_wood.vmat" }
+						]
+						use_global_default = false
+						global_default_material = ""
+					},
+				]
+			},
+			{
+				_class = "RenderMeshList"
+				children =
+				[
+					{
+						_class = "RenderMeshFile"
+						name = "riverside_store"
+						filename = "models/maps/riverside/riverside_store.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+				]
+			},
+			{
+				_class = "PhysicsShapeList"
+				children =
+				[
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 820.0000, -220.0000, 10.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 300.0000, 360.0000, 20.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 643.0000, -135.0000, 85.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 130.0000, 6.0000, 130.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 643.0000, -320.0000, 85.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 100.0000, 6.0000, 130.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 643.0000, -235.0000, 123.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 70.0000, 6.0000, 54.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 820.0000, -73.0000, 85.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 6.0000, 360.0000, 130.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 997.0000, -220.0000, 85.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 300.0000, 6.0000, 130.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 820.0000, -367.0000, 85.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 6.0000, 360.0000, 130.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 638.0000, -220.0000, 167.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 316.0000, 4.0000, 34.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 580.0000, -220.0000, 10.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 320.0000, 120.0000, 20.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 524.5000, -64.0000, 85.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 5.0000, 5.0000, 130.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 524.5000, -168.0000, 85.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 5.0000, 5.0000, 130.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 524.5000, -272.0000, 85.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 5.0000, 5.0000, 130.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 524.5000, -376.0000, 85.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 5.0000, 5.0000, 130.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ 514.0000, -220.0000, 200.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 168.0000, 8.0000, 48.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 765.0000, -140.0000, 48.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 36.0000, 70.0000, 56.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 875.0000, -140.0000, 48.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 36.0000, 70.0000, 56.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 765.0000, -270.0000, 48.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 36.0000, 70.0000, 56.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 875.0000, -270.0000, 48.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 36.0000, 70.0000, 56.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 935.0000, -135.0000, 40.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 110.0000, 30.0000, 40.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ 760.0000, -348.0000, 56.0000 ]
+						angles = [ -0.0000, -180.0000, -0.0000 ]
+						dimensions = [ 30.0000, 28.0000, 72.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ 794.0000, -348.0000, 56.0000 ]
+						angles = [ -0.0000, -180.0000, -0.0000 ]
+						dimensions = [ 30.0000, 28.0000, 72.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ 828.0000, -348.0000, 56.0000 ]
+						angles = [ -0.0000, -180.0000, -0.0000 ]
+						dimensions = [ 30.0000, 28.0000, 72.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ 622.0000, -160.0000, 50.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 38.0000, 30.0000, 60.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ 560.0000, -96.0000, 56.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 30.0000, 28.0000, 72.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "fabric"
+						collision_tags = "solid"
+						origin = [ 530.0000, -339.0000, 33.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 78.0000, 14.0000, 26.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "fabric"
+						collision_tags = "solid"
+						origin = [ 540.0000, -400.0000, 10.4000 ]
+						angles = [ -0.0000, -0.0000, 0.0000 ]
+						dimensions = [ 100.0000, 14.0000, 20.8000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 490.0000, -30.0000, 10.0000 ]
+						angles = [ -0.0000, -78.6901, 0.0000 ]
+						dimensions = [ 30.0000, 22.0000, 20.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 490.0000, -30.0000, 29.0000 ]
+						angles = [ -0.0000, -95.7106, -0.0000 ]
+						dimensions = [ 26.0000, 20.0000, 18.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 550.0000, -310.0000, 30.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 30.0000, 22.0000, 20.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 750.0000, -505.0000, 66.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 270.0000, 500.0000, 132.0000 ]
+					},
+					{
+						_class = "PhysicsHullFile"
+						name = "riverside_store_hulls_metal"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						recenter_on_parent_bone = false
+						offset_origin = [ 0.0, 0.0, 0.0 ]
+						offset_angles = [ 0.0, 0.0, 0.0 ]
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						filename = "models/maps/riverside/riverside_store_hulls_metal.obj"
+						import_scale = 1.0
+						faceMergeAngle = 10.0
+						maxHullVertices = 0
+						import_mode = "HullPerElement"
+						optimization_algorithm = "QEM"
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "PhysicsHullFile"
+						name = "riverside_store_hulls_wood"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						recenter_on_parent_bone = false
+						offset_origin = [ 0.0, 0.0, 0.0 ]
+						offset_angles = [ 0.0, 0.0, 0.0 ]
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						filename = "models/maps/riverside/riverside_store_hulls_wood.obj"
+						import_scale = 1.0
+						faceMergeAngle = 10.0
+						maxHullVertices = 0
+						import_mode = "HullPerElement"
+						optimization_algorithm = "QEM"
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+				]
+			},
+		]
+		model_archetype = ""
+		primary_associated_entity = ""
+		anim_graph_name = ""
+		base_model_name = ""
+	}
+}

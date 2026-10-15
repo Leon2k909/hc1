@@ -4101,6 +4101,62 @@ simulate_input.
   match, bots, navmesh or modes have run on it.
 - To play it: `dev_mode team_deathmatch riverdale`.
 
+## Riverside (Zombies map, `Tools/riverside_map.py`)
+- The user asked for a Zombies trailer park map "as close to this img as possible" (2026-10-15). The picture is a night
+  view down the muddy lane of a Florida trailer park:
+  - the RIVERSIDE TRAILER PARK sign with GOOD TIMES / BIGGER TOMORROW under it and STILL HERE sprayed below, and a porch
+    trailer strung with lights;
+  - SPEED LIMIT 15, a chain-link dog run with TRAILER PARK PEOPLE TOO, an open cooler (SOME THINGS SHOULD STAY
+    FORGOTTEN) and a teddy;
+  - burning drums, the LUCKY STOP (BEER • SNACKS • FUEL • SURVIVAL) and its shed's FUEL FOOD GUNS A BETTER TOMORROW?,
+    NO PLACE BETTER in red neon, a wrecked pickup;
+  - a guard tower's searchlight, a raised trailer with SAFE HIGHER STRONGER and a ladder, a boarded camper with a
+    bloody handprint, a water tower (RIVERSIDE STICKS TOGETHER), pines and palms, a full moon in broken cloud.
+  Every name and slogan is the picture's own made-up one. Its game HUD and weapon name aren't copied.
+- Scripts, run in this order (each docstring has the details):
+  - `Tools/riverside_materials.py [names] [--scale 0.25] [--out <dir>]`: the rs_ materials in
+    `Assets/materials/riverside/` (surfaces at real size, siding and board tints, chain-link, tree cards, flat paints)
+    and three atlases: `rs_lit` (self-lit signs and windows), `rs_signs` and `rs_paint_*` / `rs_blood`. The spray paint,
+    brush lettering and the neon script are drawn from strokes (`STROKES`, `SCRIPT`), not a font.
+  - `Tools/riverside_sky.py`: a moonlit cloudy night (the moon 3 degrees west of north, 15 up, drawn big as in the
+    picture, in a gap in the clouds).
+  - `Tools/riverside_map.py [--preview <dir>] [--views ...] [--no-models] [--art]` with `Tools/riverside_parts.py` (the
+    trailers, porches, store pieces, poles and wires, fences, props, vehicles, signs, towers and trees). It writes the
+    models to `Assets/models/maps/riverside/`, the scene `Assets/scenes/maps/Riverside/riverside.scene` (rewritten
+    whole) and the radar picture. `--preview` renders flat night views from the picture's camera.
+- Levels (plan e, n, z): the pad (z 96, spawns, the office, the dog run, the camper), the terrace (z 96, the porch
+  trailer and the sign), the flats (z 0, the park), and the levee (z 96, along the river on the east, the stilted
+  trailer). The south ramp, the north ramp and the stairs by the store join them in a loop to run zombies round.
+- The picture's camera is `REF_EYE` (60, -420, pad + 125), 1.5 degrees east of north and 7 down, 80 across. Things were
+  placed from their bearing and distance in the picture. It sees over the camper's roof, so it's about twice a
+  player's eye height; the `player` capture view is from a standing eye.
+- Zombies only: the scene lists only `zombies.prefab` and sets `MapInformation.ZombiesOnly` (the Sewage map's flag),
+  which `MatchLauncher.ZombiesMaps` reads. It isn't in `GameUtils`' match maps, so Quick Play, Ranked, the playlists
+  and the map vote don't offer it.
+  - `ZombieSpawnPoint` (`Code/Maps/`): `ZombiesRoundSystem.TryFindSpawnPosition` takes a map's own points first, 600-3200
+    from the nearest player, unseen ones first. Riverside has 16, inside the gaps in the perimeter fence (the gaps are
+    clipped for players).
+  - `ZombiesStationSpot` (`Kind`, `Order`): `PlaceBuyStations` stands each kind at the map's spots, lowest Order first:
+    the weapon crate in the store, the workbench by the office, wall weapons on the office, the shed and a levee
+    trailer, ammo boxes on the pad and the levee.
+- `MapFire` (`Code/Maps/MapFire.cs`): dressing fires (the drums, the burning trailer, a far fire across the river) with
+  `FireParticles`' flames, smoke and embers and a flickering light. Each machine draws its own; it doesn't spread or
+  hurt. It runs in the editor too (`ExecuteInEditor`), so the scene view and captures show it.
+- `WorldWind.Velocity` is in metres per second: "18,-30" blew every flame sideways. The scene's is 0.45,-0.75.
+- The signs read in the engine after tuning: the `rs_lit` atlas's self-illumination is 4.5, the Lucky Stop board's
+  mask is low (the lamps over it light it), and the bulbs and lamps are 5-7 bright. Brighter, they bloomed over the
+  lettering close up.
+- Checked:
+  - all 28 spawn and station spots (room, floor, reach) with railhead_map's checks;
+  - offscreen in the editor (`Sources/Riverside/editor/navmesh-check.cs.txt`): a generated navmesh has complete paths
+    from the first player spawn to all 16 zombie spawns, 7 station spots and 8 player spawns. The isolated scene used
+    the default bounds, not the scene's custom ones;
+  - offscreen captures (`capture.cs.txt`, views in `output/riverside/captures/config.json`), compared with the
+    picture. The menu picture `ui/maps/riverside.png` is the `map_art` capture. `compile-stale.cs.txt` compiles what the
+    file watcher missed.
+- Not yet played: no Zombies match has run on it (zombies' pathing in play, the stations, the rounds), and the frame
+  time with 97 point lights (8 shadowed) and 15 fires is unmeasured.
+
 ## Ares (multiplayer map, `Tools/ares_map.py`)
 - The user asked for a map on Mars "as close to this img as possible" (2026-10-14), from a reference picture of an
   atmosphere-processing plant:

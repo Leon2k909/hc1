@@ -355,6 +355,34 @@ public sealed class ZombiesRoundSystem : Component
 		float NearestPlayer( Vector3 pos ) => targets.Min( p => p.WorldPosition.Distance( pos ) );
 		bool CanReachAnyone( Vector3 pos ) => targets.Any( p => CanWalk( pos, p.WorldPosition, 3000f ) );
 
+		// A Zombies map's own spawn points come first (ZombieSpawnPoint): a fence gap or the woods' edge, out of sight
+		// and neither in the players' faces nor across the map. One in sight is only a fallback.
+		var zombiePoints = Scene.GetAllComponents<ZombieSpawnPoint>()
+			.Select( x => x.WorldPosition )
+			.Where( p => { var d = NearestPlayer( p ); return d > 600f && d < 3200f; } )
+			.OrderBy( _ => Game.Random.Float() )
+			.Take( 6 )
+			.ToList();
+		Vector3? seenPoint = null;
+		foreach ( var p in zombiePoints )
+		{
+			if ( !CanReachAnyone( p ) ) continue;
+			if ( targets.Any( x => CanSee( x, p ) ) )
+			{
+				seenPoint ??= p;
+				continue;
+			}
+
+			position = p;
+			return true;
+		}
+
+		if ( seenPoint.HasValue )
+		{
+			position = seenPoint.Value;
+			return true;
+		}
+
 		// Prefer map spawn points that are out of the players' faces but not miles away.
 		if ( MapSpawnSettings.MapSpawnPointsAllowed )
 		{
@@ -615,9 +643,27 @@ public sealed class ZombiesRoundSystem : Component
 			?? center;
 		var placed = new List<Vector3>();
 
+		// A map's own spots (ZombiesStationSpot), by kind, lowest Order first.
+		var spots = Scene.GetAllComponents<ZombiesStationSpot>()
+			.GroupBy( x => x.Kind )
+			.ToDictionary( g => g.Key, g => new Queue<ZombiesStationSpot>( g.OrderBy( x => x.Order ) ) );
+
 		for ( int i = 0; i < entries.Count; i++ )
 		{
 			var (kind, setup) = entries[i];
+
+			if ( spots.TryGetValue( kind, out var queue ) && queue.Count > 0 )
+			{
+				var spot = queue.Dequeue();
+				var at = spot.WorldPosition;
+				var floor = Scene.Trace.Ray( at + Vector3.Up * 40f, at + Vector3.Down * 120f ).WithoutTags( "player", "enemy", "trigger" ).Run();
+				if ( floor.Hit ) at = floor.EndPosition;
+				var facing = spot.WorldRotation.Forward.WithZ( 0 );
+				placed.Add( at );
+				CreateStation( at, Rotation.LookAt( facing.LengthSquared > 0.01f ? facing.Normal : Vector3.Forward ), setup );
+				continue;
+			}
+
 			var size = StationSize( kind );
 			var ring = center + Rotation.FromYaw( 360f / entries.Count * i ).Forward * 420f;
 			Vector3 pos;

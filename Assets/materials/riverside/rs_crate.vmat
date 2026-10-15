@@ -1,0 +1,14 @@
+// Tools/riverside_materials.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.00"
+    TextureColor "materials/default/default_color.tga"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureRoughness "[0.850000 0.850000 0.850000 0.000000]"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.501961 0.400000 0.274510 1.000000]"
+    g_flModelTintAmount "1.0"
+}

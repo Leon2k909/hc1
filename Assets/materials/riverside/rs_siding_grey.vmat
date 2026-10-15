@@ -1,0 +1,14 @@
+// Tools/riverside_materials.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.35"
+    TextureColor "materials/riverside/rs_siding_color.jpg"
+    TextureNormal "materials/riverside/rs_siding_normal.jpg"
+    TextureRoughness "materials/riverside/rs_siding_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.768627 0.776471 0.784314 1.000000]"
+    g_flModelTintAmount "1.0"
+}

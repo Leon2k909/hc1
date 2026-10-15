@@ -1,0 +1,51 @@
+// Riverside's navmesh check: run with the native s&box MCP's run_csharp. Loads the scene's models (their colliders), its
+// spawns and station spots into an isolated editor scene with the scene's navmesh settings, generates the navmesh, and
+// finds a path from the first player spawn to every zombie spawn, station spot and player spawn: zombies have to reach
+// the players from every gap in the fence, and players every buy station. Writes output/riverside/navmesh-check.json.
+// The user's open scene and play state are never touched.
+var projectRoot = Sandbox.Project.Current.GetRootPath();
+var destination = System.IO.Path.Combine(projectRoot, "output/riverside");
+System.IO.Directory.CreateDirectory(destination);
+var source = Editor.SceneEditorSession.Active?.Scene;
+var before = new { Game.IsPlaying, SceneId = source?.Id, GameSceneId = Game.ActiveScene?.Id };
+var keep = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Riverside", "Player Spawns", "Zombie Spawns", "Station Spots" };
+var root = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(projectRoot, "Assets/scenes/maps/Riverside/riverside.scene"))).AsObject();
+var objects = new System.Text.Json.Nodes.JsonArray();
+foreach (var item in root["GameObjects"].AsArray())
+    if (keep.Contains(item["Name"]?.GetValue<string>() ?? "")) objects.Add(item.DeepClone());
+root["GameObjects"] = objects;
+root["SceneProperties"]["WantsSystemScene"] = false;
+var scene = Scene.CreateEditorScene();
+try {
+    using (scene.Push()) scene.Deserialize(root);
+    var nav = scene.NavMesh;
+    var settings = new { nav.IsEnabled, nav.AgentRadius, nav.AgentHeight, nav.AgentStepSize, nav.AgentMaxSlope, nav.CustomBounds, Bounds = nav.CustomBounds ? nav.Bounds.ToString() : null };
+    var watch = System.Diagnostics.Stopwatch.StartNew();
+    bool generated;
+    using (scene.Push()) generated = await nav.Generate(scene.PhysicsWorld);
+    var seconds = watch.Elapsed.TotalSeconds;
+    Vector3? Snap(Vector3 p) => nav.GetClosestPoint(p, 120);
+    var players = scene.GetAllComponents<TeamSpawnPoint>().OrderBy(x => x.GameObject.Name).ToArray();
+    var start = Snap(players.First().WorldPosition);
+    var targets = scene.GetAllComponents<Facepunch.ZombieSpawnPoint>().Select(x => (Kind: "zombie", x.GameObject.Name, x.WorldPosition))
+        .Concat(scene.GetAllComponents<Facepunch.ZombiesStationSpot>().Select(x => (Kind: "station", x.GameObject.Name, x.WorldPosition)))
+        .Concat(players.Select(x => (Kind: "player", x.GameObject.Name, x.WorldPosition))).ToArray();
+    var results = targets.Select(t => {
+        var end = Snap(t.WorldPosition);
+        var status = "NoNavMeshNear";
+        var length = 0f;
+        if (start is not null && end is not null)
+        {
+            var path = nav.CalculatePath(new Sandbox.Navigation.CalculatePathRequest { Start = start.Value, Target = end.Value });
+            status = path.Status.ToString();
+            var pts = path.Points?.Select(p => p.Position).ToArray() ?? Array.Empty<Vector3>();
+            for (var i = 1; i < pts.Length; i++) length += pts[i].Distance(pts[i - 1]);
+        }
+        return new { t.Kind, t.Name, At = t.WorldPosition.ToString(), Snapped = end?.ToString(), SnapOff = end is null ? -1 : end.Value.Distance(t.WorldPosition), Status = status, Length = MathF.Round(length) };
+    }).ToArray();
+    var data = new { Before = before, Settings = settings, Generated = generated, Seconds = Math.Round(seconds, 1), Start = start?.ToString(),
+        Complete = results.Count(r => r.Status == "Complete"), Total = results.Length, Problems = results.Where(r => r.Status != "Complete" || r.SnapOff > 60).ToArray(), All = results };
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination, "navmesh-check.json"), System.Text.Json.JsonSerializer.Serialize(data, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+    return new { data.Generated, data.Seconds, data.Start, data.Complete, data.Total, data.Problems, data.Settings,
+        SourceUnchanged = Editor.SceneEditorSession.Active?.Scene?.Id == before.SceneId && Game.ActiveScene?.Id == before.GameSceneId };
+} finally { scene.Destroy(); }

@@ -1,0 +1,139 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc29:version{3cec427c-1b0e-4d48-a90a-0436f33a6041} -->
+{
+	rootNode =
+	{
+		_class = "RootNode"
+		children =
+		[
+			{
+				_class = "MaterialGroupList"
+				children =
+				[
+					{
+						_class = "DefaultMaterialGroup"
+						remaps =
+						[
+							{ from = "rs_palm_dead.vmat" to = "materials/riverside/rs_palm_dead.vmat" },
+							{ from = "rs_palm_frond.vmat" to = "materials/riverside/rs_palm_frond.vmat" },
+							{ from = "rs_palm_trunk.vmat" to = "materials/riverside/rs_palm_trunk.vmat" },
+							{ from = "rs_pine_bark.vmat" to = "materials/riverside/rs_pine_bark.vmat" },
+							{ from = "rs_pine_needles.vmat" to = "materials/riverside/rs_pine_needles.vmat" }
+						]
+						use_global_default = false
+						global_default_material = ""
+					},
+				]
+			},
+			{
+				_class = "RenderMeshList"
+				children =
+				[
+					{
+						_class = "RenderMeshFile"
+						name = "riverside_trees"
+						filename = "models/maps/riverside/riverside_trees.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+				]
+			},
+			{
+				_class = "PhysicsShapeList"
+				children =
+				[
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 1700.0000, 1700.0000, 100.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 16.0000, 16.0000, 200.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 3000.0000, 1350.0000, 100.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 16.0000, 16.0000, 200.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 560.0000, 1500.0000, 100.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 16.0000, 16.0000, 200.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 3250.0000, 1800.0000, 150.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 20.0000, 20.0000, 300.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 1500.0000, -1300.0000, 196.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 16.0000, 16.0000, 200.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 2300.0000, -1350.0000, 196.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 16.0000, 16.0000, 200.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 3200.0000, -900.0000, 196.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 16.0000, 16.0000, 200.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 2950.0000, 720.0000, 100.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 16.0000, 16.0000, 200.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ 3060.0000, -60.0000, 100.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 16.0000, 16.0000, 200.0000 ]
+					},
+				]
+			},
+		]
+		model_archetype = ""
+		primary_associated_entity = ""
+		anim_graph_name = ""
+		base_model_name = ""
+	}
+}
