@@ -384,11 +384,13 @@ def trailers( low, terrace, high ):
             add_trailer_lights( name, ( c[0], c[1], z ), yaw, info )
     # The burning trailer: charred, smeared, a fire in it and a smoke column.
     name, c, yaw, L, W = BURNT
-    part, info = P.trailer( L, W, "rs_siding_grey", seed=41, door_side=-1, porch_light=False, lit_share=0.0, boarded_share=0.0,
+    part, info = P.trailer( L, W, "rs_siding_burnt", seed=41, door_side=-1, porch_light=False, lit_share=0.0, boarded_share=0.0,
                             antenna=False, ac=False )
-    for k in range( 6 ):
-        x = -L / 2 + 40 + k * ( L - 80 ) / 5
-        P.blood( part, "smear", v( x, -W / 2, P.FLOOR + 60 ), v( 1, 0, 0 ), 40, off=0.8 )
+    # Soot blown up the walls from its windows.
+    for sy in ( -1, 1 ):
+        for k in range( 4 ):
+            x = -L / 2 + 50 + k * ( L - 100 ) / 3
+            P.paint( part, "smear", v( x, sy * ( W / 2 ), P.FLOOR + 74 ), v( -sy, 0, 0 ), 34, tone="dark", off=0.8 )
     place_into( low, part, ( c[0], c[1], 0.0 ), yaw )
     P.FIRES.append( ( "burning trailer", ( c[0] - 60, c[1], P.FLOOR + P.WALL - 10 ), "big" ) )
     P.FIRES.append( ( "burning trailer 2", ( c[0] + 120, c[1] + 20, P.FLOOR + 30 ), "medium" ) )

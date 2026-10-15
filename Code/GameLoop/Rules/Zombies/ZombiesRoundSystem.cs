@@ -656,8 +656,9 @@ public sealed class ZombiesRoundSystem : Component
 			{
 				var spot = queue.Dequeue();
 				var at = spot.WorldPosition;
+				// A wall spot can start the trace inside its wall (Riverside's office), so then it keeps its own height.
 				var floor = Scene.Trace.Ray( at + Vector3.Up * 40f, at + Vector3.Down * 120f ).WithoutTags( "player", "enemy", "trigger" ).Run();
-				if ( floor.Hit ) at = floor.EndPosition;
+				if ( floor.Hit && !floor.StartedSolid ) at = floor.EndPosition;
 				var facing = spot.WorldRotation.Forward.WithZ( 0 );
 				placed.Add( at );
 				CreateStation( at, Rotation.LookAt( facing.LengthSquared > 0.01f ? facing.Normal : Vector3.Forward ), setup );

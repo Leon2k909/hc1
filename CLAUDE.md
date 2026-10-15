@@ -4162,8 +4162,15 @@ simulate_input.
   - offscreen captures (`capture.cs.txt`, views in `output/riverside/captures/config.json`), compared with the
     picture. The menu picture `ui/maps/riverside.png` is the `map_art` capture. `compile-stale.cs.txt` compiles what the
     file watcher missed.
-- Not yet played: no Zombies match has run on it (zombies' pathing in play, the stations, the rounds), and the frame
-  time with 97 point lights (8 shadowed) and 15 fires is unmeasured.
+- The burning trailer is charred (`rs_siding_burnt`), with soot blown up its walls from the windows.
+- Played once in the editor (2026-10-15, round 1 only):
+  - The Zombies match started on it, the 8 zombies of round 1 came at the player along the lanes, and the stations
+    stood at their spots. No Riverside errors in the log. A player standing on the watch deck sees the picture's view.
+  - The office's wall weapon floated 40 over the pad: its spot is against the office's wall, so the floor trace
+    started inside it and took its start for the floor. `PlaceBuyStations` now keeps a spot's own height when the
+    trace starts solid. Compiled with dotnet, not seen in a match.
+  - Not yet checked: later rounds, downs and revives, buying at the stations, and the frame time with 97 point lights
+    (8 shadowed) and 15 fires.
 
 ## Ares (multiplayer map, `Tools/ares_map.py`)
 - The user asked for a map on Mars "as close to this img as possible" (2026-10-14), from a reference picture of an

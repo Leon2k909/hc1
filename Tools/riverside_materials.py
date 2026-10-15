@@ -1429,7 +1429,8 @@ def write_surface( out, name, colour, rough, height, ppi, metalness=0.0, alpha=N
 # Trailer siding tints (each trailer one of them): sun-chalked white, cream, faded turquoise, tan, pale green, salmon.
 SIDING_TINTS = { "rs_siding_white": ( 255, 255, 255 ), "rs_siding_cream": ( 250, 236, 200 ), "rs_siding_teal": ( 168, 214, 206 ),
                  "rs_siding_tan": ( 222, 196, 160 ), "rs_siding_green": ( 196, 214, 176 ), "rs_siding_salmon": ( 240, 196, 176 ),
-                 "rs_siding_grey": ( 196, 198, 200 ), "rs_siding_blue": ( 176, 196, 222 ) }
+                 "rs_siding_grey": ( 196, 198, 200 ), "rs_siding_blue": ( 176, 196, 222 ),
+                 "rs_siding_burnt": ( 58, 52, 48 ) }
 BOARD_TINTS = { "rs_boards_blue": ( 170, 196, 214 ), "rs_boards_yellow": ( 240, 220, 160 ), "rs_boards_dark": ( 128, 132, 130 ) }
 
 
