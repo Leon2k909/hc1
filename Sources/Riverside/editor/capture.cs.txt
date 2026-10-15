@@ -64,8 +64,8 @@ try {
         }
     // Plan ( e, n, z ) to world ( n, -e, z ). "reference" is the user's picture's view (Tools/riverside_map.py REF_*).
     Vector3 World(Vector3 plan) => new(plan.y, -plan.x, plan.z);
-    var refEye = new Vector3(60, -420, 221);
-    var refTarget = new Vector3(60 + 1000 * MathF.Sin(1.5f * MathF.PI / 180), -420 + 1000 * MathF.Cos(1.5f * MathF.PI / 180), 221 - 1000 * MathF.Tan(7f * MathF.PI / 180));
+    var refEye = new Vector3(60, -420, 220);
+    var refTarget = new Vector3(60 + 1000 * MathF.Sin(1.5f * MathF.PI / 180), -420 + 1000 * MathF.Cos(1.5f * MathF.PI / 180), 220 - 1000 * MathF.Tan(7f * MathF.PI / 180));
     var views = new[] {
         (Name: "reference", Eye: refEye, Target: refTarget, Fov: 80f),
         (Name: "player", Eye: new Vector3(60, -420, 160), Target: new Vector3(80, 600, 60), Fov: 85f),

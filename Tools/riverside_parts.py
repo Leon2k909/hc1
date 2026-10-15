@@ -1032,6 +1032,26 @@ def guard_tower( m, base, facing=( 0, -1 ), deck=520.0 ):
     return head
 
 
+def beam_cone( m, apex, target, half_angle=6.0, sides=20, start=10.0 ):
+    """ A searchlight's beam as a cone from apex towards target, drawn in rs_beam (hc1_light_beam.shader: additive, its
+    texture's v 0 at the lamp and 1 at the far end). Drawn only: put it in a model with no shadows or collision. """
+    a, t = v( *apex ), v( *target )
+    axis = t - a
+    length = float( np.linalg.norm( axis ) )
+    d = axis / length
+    u, w = RP.perp( d )
+    r0 = start * math.tan( math.radians( half_angle ) ) + 4.0
+    r1 = length * math.tan( math.radians( half_angle ) )
+    p0, p1 = a + d * start, t
+    for k in range( sides ):
+        a0, a1 = 2 * math.pi * k / sides, 2 * math.pi * ( k + 1 ) / sides
+        e0 = u * math.cos( a0 ) + w * math.sin( a0 )
+        e1 = u * math.cos( a1 ) + w * math.sin( a1 )
+        pts = [ p0 + e0 * r0, p0 + e1 * r0, p1 + e1 * r1, p1 + e0 * r1 ]
+        uv = [ ( k / sides, 0.0 ), ( ( k + 1 ) / sides, 0.0 ), ( ( k + 1 ) / sides, 1.0 ), ( k / sides, 1.0 ) ]
+        m.polygon( "rs_beam", pts, normal=e0 + e1, uv=uv, normals=[ e0, e1, e1, e0 ] )
+
+
 # ---------------------------------------------------------------------------------------------------------------------
 # Trees
 

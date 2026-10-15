@@ -4127,9 +4127,17 @@ simulate_input.
 - Levels (plan e, n, z): the pad (z 96, spawns, the office, the dog run, the camper), the terrace (z 96, the porch
   trailer and the sign), the flats (z 0, the park), and the levee (z 96, along the river on the east, the stilted
   trailer). The south ramp, the north ramp and the stairs by the store join them in a loop to run zombies round.
-- The picture's camera is `REF_EYE` (60, -420, pad + 125), 1.5 degrees east of north and 7 down, 80 across. Things were
-  placed from their bearing and distance in the picture. It sees over the camper's roof, so it's about twice a
-  player's eye height; the `player` capture view is from a standing eye.
+- The picture's camera is `REF_EYE` (60, -420, pad + 124), 1.5 degrees east of north and 7 down, 80 across. Things were
+  placed from their bearing and distance in the picture. Its eye is about twice a standing player's over the ground (it
+  sees over the camper's roof), so a timber watch deck stands there (`watch_deck`, `DECK`: 5 ft up, rails on three
+  sides, sandbags along its front, steps up its back): a player standing on it sees the picture's view. The `player`
+  capture view is from the pad.
+- The guard tower's searchlight throws a visible beam (`riverside_parts.beam_cone`, `rs_beam`,
+  `shaders/hc1_light_beam.shader`: an additive cone, fading along its length, at its silhouette's edges and where it
+  meets the ground), drawn in the patches model so it casts no shadow. A new shader needs
+  `EditorUtility.CompileShader` before its vmat compiles.
+- The sky's cloud bodies are lighter than the clear sky behind them (moonlit grey-blue), as in the picture; drawn darker,
+  they vanished. The scene's sky tint is 3.4.
 - Zombies only: the scene lists only `zombies.prefab` and sets `MapInformation.ZombiesOnly` (the Sewage map's flag),
   which `MatchLauncher.ZombiesMaps` reads. It isn't in `GameUtils`' match maps, so Quick Play, Ranked, the playlists
   and the map vote don't offer it.

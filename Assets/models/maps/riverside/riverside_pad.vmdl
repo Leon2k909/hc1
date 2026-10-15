@@ -35,6 +35,7 @@
 							{ from = "rs_roof.vmat" to = "materials/riverside/rs_roof.vmat" },
 							{ from = "rs_rubber.vmat" to = "materials/riverside/rs_rubber.vmat" },
 							{ from = "rs_rust.vmat" to = "materials/riverside/rs_rust.vmat" },
+							{ from = "rs_sandbag.vmat" to = "materials/riverside/rs_sandbag.vmat" },
 							{ from = "rs_siding_cream.vmat" to = "materials/riverside/rs_siding_cream.vmat" },
 							{ from = "rs_siding_white.vmat" to = "materials/riverside/rs_siding_white.vmat" },
 							{ from = "rs_signs.vmat" to = "materials/riverside/rs_signs.vmat" },
@@ -181,6 +182,24 @@
 						origin = [ -30.0000, 85.0000, 151.0000 ]
 						angles = [ -0.0000, -68.1986, 0.0000 ]
 						dimensions = [ 2.5000, 2.5000, 110.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ -445.0000, -60.0000, 126.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 96.0000, 96.0000, 60.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "fabric"
+						collision_tags = "solid"
+						origin = [ -404.0000, -60.0000, 161.2000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 88.0000, 14.0000, 10.4000 ]
 					},
 					{
 						_class = "PhysicsShapeBox"

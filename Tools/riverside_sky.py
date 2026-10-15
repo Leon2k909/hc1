@@ -49,7 +49,7 @@ MOON_RADIANCE = 4.0
 
 # The clear sky's linear colour by degrees above the horizon.
 SKY_KEYS = ( ( -10.0, ( 0.010, 0.012, 0.016 ) ), ( 0.0, ( 0.040, 0.046, 0.060 ) ), ( 4.0, ( 0.030, 0.036, 0.052 ) ),
-             ( 12.0, ( 0.018, 0.024, 0.038 ) ), ( 30.0, ( 0.009, 0.013, 0.024 ) ), ( 90.0, ( 0.0045, 0.0065, 0.013 ) ) )
+             ( 12.0, ( 0.016, 0.021, 0.034 ) ), ( 30.0, ( 0.007, 0.010, 0.019 ) ), ( 90.0, ( 0.0035, 0.005, 0.010 ) ) )
 
 CLOUD_HEIGHT = 2000.0       # metres
 CLOUD_EXTENT = 48000.0      # metres across the noise field
@@ -183,9 +183,11 @@ def render( width ):
     puff = puff * ( 1 - far ) + 0.5 * far
     forward = np.exp( -angle_m / 9.0 ) * 3.0 + np.exp( -angle_m / 35.0 ) * 0.5 + 0.12
     edge = density * ( 1 - density ) * 4 * ( 1 - far )
-    lit = forward * ( 0.06 * ( 1 - density ) + 0.32 * edge + 0.05 * puff * density )
-    body = np.array( ( 0.0055, 0.0068, 0.0100 ) )[None, None, :] * ( 1.0 + 0.6 * puff - 0.35 * density )[..., None]
-    cloud_col = body + lit[..., None] * np.array( ( 0.060, 0.065, 0.075 ) )[None, None, :]
+    lit = forward * ( 0.08 * ( 1 - density ) + 0.45 * edge + 0.10 * puff * density )
+    # The bodies catch the moonlight from above and the sky's light all round: grey-blue, lighter than the clear sky,
+    # darker where they're thickest.
+    body = np.array( ( 0.016, 0.019, 0.027 ) )[None, None, :] * ( 1.0 + 0.8 * puff - 0.4 * density )[..., None]
+    cloud_col = body + lit[..., None] * np.array( ( 0.070, 0.075, 0.085 ) )[None, None, :]
     # Low down, the horizon's glows light the cloud bases a little.
     cloud_col += rgb * 0.35 * np.exp( -np.clip( el, 0, 90 ) / 6.0 )[..., None]
     alpha = np.clip( density * 1.05, 0, 1 )[..., None]

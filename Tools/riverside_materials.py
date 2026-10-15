@@ -1547,9 +1547,22 @@ METALNESS = { "rs_siding": 0.35, "rs_roof": 0.6, "rs_skirt": 0.3, "rs_rust": 0.2
 NAMES = list( SURFACES ) + [ "rs_chainlink", "lit", "signs", "paint", "trees", "painted" ]
 
 
+# The searchlight's beam (riverside_parts.beam_cone): additive light through the haze, hc1_light_beam.shader.
+BEAM_VMAT = """// Tools/riverside_materials.py
+"Layer0"
+{
+    shader "shaders/hc1_light_beam.shader"
+    g_vBeamColour "[0.780000 0.840000 1.000000 0.000000]"
+    g_flBeamIntensity "0.9"
+    g_flBeamReach "1.0"
+    g_flSoftDepth "60"
+}
+"""
+
+
 def all_paints():
     return ( list( SURFACES ) + list( SIDING_TINTS ) + list( BOARD_TINTS ) +
-             [ "rs_chainlink", "rs_lit", "rs_signs", "rs_paint_red", "rs_paint_white", "rs_paint_dark", "rs_blood" ] +
+             [ "rs_chainlink", "rs_lit", "rs_signs", "rs_paint_red", "rs_paint_white", "rs_paint_dark", "rs_blood", "rs_beam" ] +
              list( TREES ) + [ "rs_palm_dead" ] + list( PAINTED ) )
 
 
@@ -1606,6 +1619,7 @@ def build( name, out ):
                                                      tint=( 1.25, 0.85, 0.5 ), alpha_ref=0.4 ) )
         print( "wrote tree cards" )
     elif name == "painted":
+        write_text( out / "rs_beam.vmat", BEAM_VMAT )
         for p, ( rgb, metal, rough, glow ) in PAINTED.items():
             write_text( out / f"{p}.vmat", painted_vmat( rgb, metal, rough, glow ) )
         print( f"wrote {len( PAINTED )} flat paints" )

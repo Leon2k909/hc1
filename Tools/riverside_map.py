@@ -95,10 +95,11 @@ SHED_TOP = 132.0
 STORE_DOOR = ( 200.0, 270.0 )                       # e0, e1 in the front wall
 STORE_DOOR_TOP = 96.0
 
-# The reference picture's camera: on the pad by the dog run's gate, looking 1.5 degrees east of north and 7 down, 80
-# degrees across. It's 125 over the gravel, twice a standing player's eye, as the picture's is: it sees over the
-# camper's roof (as from the crates stacked by the drums).
-REF_EYE = ( 60.0, -420.0, HIGH + 125.0 )
+# The reference picture's camera: a player standing on the watch deck by the dog run's gate, looking 1.5 degrees east
+# of north and 7 down, 80 degrees across. The picture's eye is about twice a standing player's over the ground (it sees
+# over the camper's roof), so the deck lifts the player 60: their eye is 124 over the pad, where the picture's is.
+DECK = ( 12.0, 108.0, -493.0, -397.0, 60.0 )      # the watch deck on the pad: e0, e1, n0, n1, its floor over the pad
+REF_EYE = ( 60.0, -420.0, HIGH + DECK[4] + 64.0 )
 REF_YAW, REF_PITCH, REF_FOV = 1.5, -7.0, 80.0
 REF_TARGET = ( REF_EYE[0] + 1000 * math.sin( math.radians( REF_YAW ) ), REF_EYE[1] + 1000 * math.cos( math.radians( REF_YAW ) ),
                REF_EYE[2] + 1000 * math.tan( math.radians( REF_PITCH ) ) )
@@ -524,6 +525,35 @@ def store( m ):
 # ---------------------------------------------------------------------------------------------------------------------
 # The pad: the office, the gate, the dog run, the camper
 
+def watch_deck( m, gz ):
+    """ A timber deck the survivors built on the pad to watch the lane from: 6x6 posts, joists and boards 5 ft up, a rail
+    round its sides and back, sandbags along its front, steps up its back. A player standing on it sees the park as the
+    picture does (REF_EYE). """
+    e0, e1, n0, n1, h = DECK
+    top = gz + h
+    for e in ( e0 + 3, e1 - 3 ):
+        for n in ( n0 + 3, n1 - 3 ):
+            box( m, e - 2.75, e + 2.75, n - 2.75, n + 2.75, gz, top - 4, "rs_wood" )
+            box( m, e - 7, e + 7, n - 7, n + 7, gz, gz + 2, "rs_concrete" )
+    for e in np.linspace( e0 + 2, e1 - 2, 5 ):
+        box( m, e - 0.75, e + 0.75, n0, n1, top - 10, top - 4, "rs_wood" )
+    for k, n in enumerate( np.arange( n0, n1, 5.6 ) ):
+        box( m, e0 - 1, e1 + 1 + ( 1.5 if k % 3 == 0 else 0 ), n + 0.2, n + 5.4, top - 4, top, "rs_wood" )
+    m.collision_box( v( e0, n0, gz ), v( e1, n1, top ), "wood" )
+    # X braces under it on its sides.
+    for e in ( e0 + 3, e1 - 3 ):
+        m.beam( v( e, n0 + 4, gz + 6 ), v( e, n1 - 4, top - 12 ), ( 1.5, 5.5 ), "rs_wood", up=( 1, 0, 0 ) )
+        m.beam( v( e, n1 - 4, gz + 6 ), v( e, n0 + 4, top - 12 ), ( 1.5, 5.5 ), "rs_wood", up=( 1, 0, 0 ) )
+    # Rails on the two sides and the back, open over the steps; the front has sandbags, below the view.
+    RP.railing( m, [ ( e0 + 2, n1 - 2 ), ( e0 + 2, n0 + 2 ), ( ( e0 + e1 ) / 2 - 20, n0 + 2 ) ], top, "rs_wood", height=38,
+                post_every=46, kick=False, clip_to=48, name="deck rail" )
+    RP.railing( m, [ ( ( e0 + e1 ) / 2 + 20, n0 + 2 ), ( e1 - 2, n0 + 2 ), ( e1 - 2, n1 - 2 ) ], top, "rs_wood", height=38,
+                post_every=46, kick=False, clip_to=48, name="deck rail" )
+    P.sandbag_wall( m, ( e0 + 4, n1 - 7 ), ( e1 - 4, n1 - 7 ), rows=2, z0=top, seed=21 )
+    RP.stairs( m, ( ( e0 + e1 ) / 2, n0 - 80 ), ( ( e0 + e1 ) / 2, n0 ), 38, gz, top, tread="rs_wood", side="rs_wood",
+               rails=( True, True ), rail_paint="rs_wood", surface="wood", name="deck stair" )
+
+
 def lantern( m, at ):
     """ A battery camping lantern left on the ground, lit: a dark base, a frosted globe, a cap and a wire handle. """
     c = v( *at )
@@ -569,6 +599,7 @@ def pad( m ):
     leaf = hinge + np.array( ( -0.85, 0.53 ) ) * ( DOG_GATE[2] - DOG_GATE[1] - 4 )
     P.chainlink( m, [ tuple( hinge ), tuple( leaf ) ], 42, 60, z=gz, top_rail=True, collide=False, name="dog gate" )
     P.speed_sign( m, ( -85, -30, gz ), ( 0.4, -1 ) )
+    watch_deck( m, gz )
     # The camper on the pad's east side, its front to the store, its west side (the handprints) to the camera.
     place_into( m, P.rv(), ( 276, -298, gz ), 100.0 )
     # Junk round the pad: a trash pile, propane bottles, the burning drum in front of the camera, more drums.
@@ -600,6 +631,8 @@ SIGN = ( ( -393, 415, HIGH ), ( 0.5, -0.866 ) )
 NO_PLACE = ( ( -60, 1150, 0 ), ( 0.05, -1.0 ) )
 PICKUP = ( ( -300, 1000, 0 ), -15.0 )
 TOWER = ( ( -530, 1600, 0 ), ( 0.3, -1.0 ) )
+SEARCH_TARGET = ( -1100, 900, 0 )
+SEARCH_HEAD = []
 WATER_TOWER = ( ( 1688, 3600, HIGH ), ( -0.4, -1.0 ) )
 
 
@@ -641,7 +674,8 @@ def dressing( m ):
     # The guard tower's searchlight, aimed down the lane towards the entrance.
     head = P.guard_tower( m, TOWER[0], TOWER[1] )
     P.light( "guard tower cab", ( TOWER[0][0], TOWER[0][1], 520 + 70 ), P.WARM, 200, scale=1.4 )
-    P.SPOTLIGHTS.append( ( "searchlight", tuple( float( x ) for x in head ), ( -1100, 900, 0 ), "1.6,1.6,1.7,1", 3200, 6.0 ) )
+    P.SPOTLIGHTS.append( ( "searchlight", tuple( float( x ) for x in head ), SEARCH_TARGET, "1.6,1.6,1.7,1", 3200, 6.0 ) )
+    SEARCH_HEAD[:] = [ float( x ) for x in head ]
     # Wrecks of the night: lawn chairs, junk, blood on the mud.
     P.lawn_chair( m, ( -420, 1060 ), ( 0.7, 0.7 ) )
     P.junk_pile( m, ( -1380, 860 ), seed=8 )
@@ -693,7 +727,7 @@ ZOMBIE_SPAWNS = [
     ( 1380, -1150, HIGH ), ( -880, -1180, HIGH ), ( -2100, 260, 0 ), ( -1100, 300, 0 ), ( 520, 260, 0 ),
 ]
 PLAYER_SPAWNS = [ ( -360, -900, HIGH ), ( -200, -980, HIGH ), ( -40, -940, HIGH ), ( 120, -980, HIGH ), ( -300, -760, HIGH ),
-                  ( -120, -800, HIGH ), ( 60, -760, HIGH ), ( 260, -820, HIGH ) ]
+                  ( -120, -800, HIGH ), ( 60, -700, HIGH ), ( 260, -820, HIGH ) ]
 # ( kind, order, position, facing ): where the buy stations stand.
 STATION_SPOTS = [
     ( "WeaponCrate", 0, ( 250, STORE[3] - 30, STORE_FLOOR ), ( 0, -1 ) ),
@@ -1066,6 +1100,7 @@ def build():
     store( store_m )
     pad( pad_m )
     dressing( dress )
+    P.beam_cone( patch_m, SEARCH_HEAD, SEARCH_TARGET, half_angle=4.5 )
     perimeter( fence )
     trees( near, far )
     backdrop( back )
