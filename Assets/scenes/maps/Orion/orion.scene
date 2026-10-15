@@ -1983,7 +1983,7 @@
               "Attenuation": 1,
               "FogMode": "Enabled",
               "FogStrength": 0.5,
-              "LightColor": "0.72,0.82,0.95,1",
+              "LightColor": "1.00,0.74,0.46,1",
               "Radius": 480,
               "Shadows": false
             }
@@ -3168,7 +3168,7 @@
               "RenderExcludeTags": "",
               "Resolution": "Small",
               "Texture": "lighting/orion/reflection_sky_cc5b55d2.vtex",
-              "TintColor": "18,18,18,1",
+              "TintColor": "13,13,13,1",
               "UpdateStrategy": "OnEnabled",
               "ZFar": 4096,
               "ZNear": 16
@@ -3214,7 +3214,7 @@
               "RenderExcludeTags": "",
               "Resolution": "Small",
               "Texture": "lighting/orion/reflection_sky_cc5b55d2.vtex",
-              "TintColor": "18,18,18,1",
+              "TintColor": "13,13,13,1",
               "UpdateStrategy": "OnEnabled",
               "ZFar": 4096,
               "ZNear": 16
@@ -3260,7 +3260,53 @@
               "RenderExcludeTags": "",
               "Resolution": "Small",
               "Texture": "lighting/orion/reflection_sky_cc5b55d2.vtex",
-              "TintColor": "18,18,18,1",
+              "TintColor": "13,13,13,1",
+              "UpdateStrategy": "OnEnabled",
+              "ZFar": 4096,
+              "ZNear": 16
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "736974f1-6f6f-5830-99d4-ccbc3f35d8c9",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Terrace Reflection",
+          "Position": "40,218,62.5",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.EnvmapProbe",
+              "__guid": "6fffc894-67ba-5675-ab20-28fb29631cf4",
+              "__enabled": true,
+              "Flags": 0,
+              "__version": 1,
+              "BakedTexture": null,
+              "Bounds": {
+                "Mins": "-290,-98,-4.5",
+                "Maxs": "290,98,4.5"
+              },
+              "DelayBetweenUpdates": 0.1,
+              "Feathering": 2,
+              "FrameInterval": 5,
+              "MaxDistance": 512,
+              "Mode": "CustomTexture",
+              "MultiBounce": false,
+              "Priority": 1,
+              "Projection": "Sphere",
+              "RenderExcludeTags": "",
+              "Resolution": "Small",
+              "Texture": "lighting/orion/reflection_sky_cc5b55d2.vtex",
+              "TintColor": "14,14,14,1",
               "UpdateStrategy": "OnEnabled",
               "ZFar": 4096,
               "ZNear": 16

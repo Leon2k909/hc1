@@ -823,7 +823,7 @@ PAINTED = {
     "oa_window_lit": ( ( 255, 214, 160 ), 0.0, 0.2, 2.0 ),
     "oa_window_cool": ( ( 200, 220, 240 ), 0.0, 0.2, 2.5 ),
     "oa_window_dark": ( ( 26, 32, 40 ), 0.6, 0.1, 0 ),
-    "oa_interior": ( ( 150, 142, 128 ), 0.0, 0.7, 0 ),
+    "oa_interior": ( ( 128, 108, 82 ), 0.0, 0.7, 0 ),
     "oa_interior_dark": ( ( 70, 70, 68 ), 0.0, 0.7, 0 ),
     "oa_desk": ( ( 84, 88, 94 ), 0.1, 0.4, 0 ),
     "oa_chair": ( ( 40, 42, 48 ), 0.0, 0.6, 0 ),
@@ -857,6 +857,7 @@ PAINTED = {
     "oa_red_wall": ( ( 110, 26, 22 ), 0.0, 0.6, 0.18 ),
     "oa_cable": ( ( 24, 24, 26 ), 0.0, 0.6, 0 ),
     "oa_brass": ( ( 170, 130, 60 ), 0.85, 0.35, 0 ),
+    "oa_pallet": ( ( 150, 128, 98 ), 0.0, 0.82, 0 ),
 }
 
 
@@ -905,7 +906,7 @@ def write_surface( out, name, colour, rough, height, ppi, metalness=0.0, alpha=N
 SURFACES = {
     "oa_wall": lambda: concrete(),
     "oa_wall_dark": lambda: concrete( seed=12, base=( 128, 128, 124 ), grime=0.85 ),
-    "oa_yard": lambda: slabs( 31, "oa_yard", slab=96.0, wet=1.3, puddles=1.05, base=( 130, 126, 120 ) ),
+    "oa_yard": lambda: slabs( 31, "oa_yard", slab=96.0, wet=1.75, puddles=0.85, base=( 124, 120, 114 ) ),
     "oa_deck": lambda: slabs( 32, "oa_deck", slab=128.0, wet=0.8, puddles=0.6, base=( 132, 130, 126 ) ),
     "oa_yellow": lambda: painted( 41, ( 222, 168, 24 ), TILES["oa_yellow"], chips=0.55, rough=0.42 ),
     "oa_steel": lambda: painted( 42, ( 72, 76, 80 ), TILES["oa_steel"], chips=0.3, rough=0.5 ),
@@ -962,7 +963,7 @@ def build( name, out ):
         save_rgb( out / "oa_screens_color.png", c )
         write_text( out / "oa_screens.vmat", vmat( f"{RESOURCE_DIR}/oa_screens_color.png", "materials/default/default_normal.tga",
                                                     "[0.200000 0.200000 0.200000 0.000000]", illum="[1.000000 1.000000 1.000000 0.000000]",
-                                                    illum_brightness=3.0 ) )
+                                                    illum_brightness=1.4 ) )
         done[name] = c
         print( "wrote oa_screens" )
     elif name == "painted":

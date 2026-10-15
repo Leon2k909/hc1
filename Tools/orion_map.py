@@ -276,10 +276,10 @@ def launch_control( m, glass ):
     e0, e1, n0, n1 = LC
     # The tower's lower storeys (to the balcony): a hall at the terrace's level behind thick walls.
     h0, h1, hn0, hn1 = LC_HALL
-    wall( m, "e", e0, e1, n0, hn0, 0, OVER_Z - 16, [ ( -560, -480, TERRACE_Z + 100, TERRACE_Z + 10 ) ] )
+    wall( m, "e", e0, e1, n0, hn0, 0, OVER_Z - 16, [ ( -560, -480, TERRACE_Z + 100, TERRACE_Z + 10 ) ], paint="oa_wall_dark" )
     wall( m, "e", e0, e1, hn1, n1, 0, OVER_Z - 16 )
     wall( m, "n", hn0, hn1, e0, h0, 0, OVER_Z - 16, [ ( 70, 150, TERRACE_Z + 104, TERRACE_Z ) ] )
-    wall( m, "n", hn0, hn1, h1, e1, 0, OVER_Z - 16, [ ( 60, 140, TERRACE_Z + 104, TERRACE_Z ) ] )
+    wall( m, "n", hn0, hn1, h1, e1, 0, OVER_Z - 16, [ ( 60, 140, TERRACE_Z + 104, TERRACE_Z ) ], paint="oa_wall_dark" )
     slab( m, h0, h1, hn0, hn1, 0, TERRACE_Z, top="oa_deck" )
     slab( m, e0, LC_UPPER_E1, n0, n1, OVER_Z - 16, OVER_Z, top="oa_deck", side="oa_wall" )
     OP.tube_light( m, "LC hall lamp 1", ( -700, hn1, 250 ), ( 0, -1 ), 48, "cool", 420 )
@@ -340,8 +340,8 @@ def launch_control( m, glass ):
     right = v( 1, 0, 0 )
     OP.letters( m, "launch_control", ( -293, face - 0.6, 466 ), right, 44, "dark" )
     OP.letters( m, "n01", ( -294, face - 0.6, 406 ), right, 56, "dark" )
-    box( m, LC_BAY[1], -346, face - 2.5, face, OVER_Z, 524, "oa_dark" )
-    box( m, LC_BAY[0], -346, face - 2.5, face, 506, 524, "oa_dark" )
+    box( m, LC_BAY[1], -346, face - 2.5, face, OVER_Z, 524, "oa_steel" )
+    box( m, LC_BAY[0], -346, face - 2.5, face, 506, 524, "oa_steel" )
     for k, ( e, z ) in enumerate( ( ( -322.0, 250.0 ), ( -381.0, 181.0 ) ) ):
         OP.tube_light( m, f"LC face lamp {k}", ( e, face, z ), ( 0, -1 ), 52, "cool", 320 )
     OP.plate( m, "fire", ( -340, face - 0.4, 163 ), right, 16 )
@@ -370,7 +370,9 @@ def launch_control( m, glass ):
     rail = [ ( e0, n0 - 2 * orad + 3 ) ] + [ ( oc[0] + ( orad - 3 ) * math.cos( a ), oc[1] + ( orad - 3 ) * math.sin( a ) )
                                               for a in np.linspace( -math.pi / 2, math.pi / 2, 7 ) ] + [ ( oc[0], n0 - 1 ) ]
     P.railing( m, rail, oz1, "oa_yellow", height=40, post_every=50, clip_to=None, name="LC top" )
-    box( m, e0 + 20, -320, n0 - 6, n0, 560, 620, "oa_window_lit" )
+    box( m, e0 + 20, -320, n0 - 6, n0, 560, 620, "oa_window_dark" )
+    for e in np.arange( -840, -340, 140 ):
+        box( m, e, e + 60, n0 - 6.2, n0 - 6, 566, 614, "oa_window_lit" )
     for e in np.arange( -880, -330, 70 ):
         box( m, e - 2, e + 2, n0 - 7, n0 - 5, 560, 620, "oa_glass_frame" )
     # The terrace: a raised slab east of the tower, its east edge a parapet with a railing; steps down to the yard.
@@ -697,12 +699,12 @@ def fuel( m, glass ):
     OP.plate( m, "whiteboard", ( 900, on1 - 17.5, G + 130 ), v( 1, 0, 0 ), 60, off=0.0 )
     OP.plate( m, "poster_launch", ( 800, on1 - 17.5, G + 140 ), v( 1, 0, 0 ), 54, off=0.0 )
     OP.plate( m, "poster_mission", ( 760, on1 - 17.5, G + 140 ), v( 1, 0, 0 ), 54, off=0.0 )
-    OP.screen( m, "orbit", ( o1 - 17.5, 782, G + 140 ), v( 0, -1, 0 ), 40, off=0.0 )
+    OP.screen( m, "orbit", ( o1 - 17.5, 782, G + 130 ), v( 0, -1, 0 ), 26, off=0.0 )
     for k, e in enumerate( ( 800, 900 ) ):
         OP.desk( m, ( e, 796 ), ( 1, 0 ), 84, 30, 30, 2, ( "telemetry", "status" ) )
         OP.chair( m, ( e, 768 ), ( 0, 1 ) )
     P.ceiling_light( m, "OPS lamp 1", ( 820, 790, OPS_TOP - 20 ), ( 1, 0 ), "warm", 560 )
-    P.ceiling_light( m, "OPS lamp 2", ( 900, 770, OPS_TOP - 20 ), ( 1, 0 ), "cool", 480 )
+    P.ceiling_light( m, "OPS lamp 2", ( 900, 770, OPS_TOP - 20 ), ( 1, 0 ), "warm", 480 )
     for e in np.arange( 820, 970, 37 ):
         box( m, e - 1.5, e + 1.5, on0 + 6, on0 + 9, 268, 432, "oa_glass_frame" )
     box( m, 820, 968, on0 + 6, on0 + 9, 349, 352, "oa_glass_frame" )
@@ -720,15 +722,15 @@ def yard_props( m ):
     import lowtide_container as LCN
     import lowtide_forklift as LF
     # Cases, under a tarp and bare, and red crates, where the reference shows them.
-    OP.case_block( m, ( -190, 285 ), ( 1, 0.06 ), 4, 2, ( 52, 32, 30 ), 2, "rv_olive", tarp=True, seed=1 )
-    OP.case_block( m, ( 115, 630 ), ( 1, 0 ), 2, 2, ( 52, 32, 30 ), 2, "rv_case", seed=2 )
-    OP.case_block( m, ( 370, 545 ), ( 0, 1 ), 2, 1, ( 52, 32, 30 ), 2, "rv_olive", seed=3 )
-    OP.case_block( m, ( -120, 520 ), ( 1, 0 ), 2, 1, ( 48, 30, 28 ), 2, "rv_case", seed=4 )
-    OP.case_block( m, ( 345, 405 ), ( 0, 1 ), 1, 1, ( 52, 32, 30 ), 2, "rv_olive", seed=5 )
-    OP.case_block( m, ( 95, 180 ), ( 1, 0.15 ), 2, 1, ( 60, 38, 34 ), 2, "rv_olive", seed=6 )
-    OP.case_block( m, ( -195, -30 ), ( 1, 0.0 ), 3, 1, ( 52, 32, 30 ), 1, "rv_case", seed=7 )
-    OP.case_block( m, ( 30, 770 ), ( 1, 0 ), 2, 1, ( 48, 30, 28 ), 1, "rv_olive", seed=8 )
-    OP.case_block( m, ( 230, 760 ), ( 1, 0.1 ), 1, 2, ( 48, 30, 28 ), 1, "rv_case", seed=9 )
+    OP.case_block( m, ( -190, 285 ), ( 1, 0.06 ), 4, 2, ( 52, 32, 30 ), 2, "rv_olive", tarp=True, seed=1, pallets=True )
+    OP.case_block( m, ( 115, 630 ), ( 1, 0 ), 2, 2, ( 52, 32, 30 ), 2, "rv_case", seed=2, pallets=True )
+    OP.case_block( m, ( 370, 545 ), ( 0, 1 ), 2, 1, ( 52, 32, 30 ), 2, "rv_olive", seed=3, pallets=True )
+    OP.case_block( m, ( -120, 520 ), ( 1, 0 ), 2, 1, ( 48, 30, 28 ), 2, "rv_case", seed=4, pallets=True )
+    OP.case_block( m, ( 345, 405 ), ( 0, 1 ), 1, 1, ( 52, 32, 30 ), 2, "rv_olive", seed=5, pallets=True )
+    OP.case_block( m, ( 95, 180 ), ( 1, 0.15 ), 2, 1, ( 60, 38, 34 ), 2, "rv_olive", seed=6, pallets=True )
+    OP.case_block( m, ( -195, -30 ), ( 1, 0.0 ), 3, 1, ( 52, 32, 30 ), 1, "rv_case", seed=7, pallets=True )
+    OP.case_block( m, ( 30, 770 ), ( 1, 0 ), 2, 1, ( 48, 30, 28 ), 1, "rv_olive", seed=8, pallets=True )
+    OP.case_block( m, ( 230, 760 ), ( 1, 0.1 ), 1, 2, ( 48, 30, 28 ), 1, "rv_case", seed=9, pallets=True )
     OP.red_crate( m, ( 88, 400 ), ( 1, 0.15 ), ( 40, 30, 36 ) )
     OP.red_crate( m, ( 126, 412 ), ( 1, 0.1 ), ( 40, 30, 36 ) )
     OP.red_crate( m, ( 400, 690 ), ( 0, 1 ), ( 44, 34, 40 ) )
@@ -1217,8 +1219,8 @@ def probe_objects():
                "NetworkMode": 2 } ] + [ yard_probe( name, b, k ) for name, b, k in WET_FLOORS ]
 
 
-WET_FLOORS = [ ( "Yard", ( -230.0, 560.0, -540.0, 700.0, -20.0, 3.0 ), 18 ), ( "B3 Strip", ( 560.0, 1150.0, -540.0, 157.0, -20.0, 3.0 ), 18 ),
-               ( "Tunnel Mouth", ( 160.0, 560.0, 700.0, 900.0, -20.0, 3.0 ), 18 ), ( "Deck", ( -560.0, 600.0, 900.0, 1400.0, 220.0, 243.0 ), 7 ),
+WET_FLOORS = [ ( "Yard", ( -230.0, 560.0, -540.0, 700.0, -20.0, 3.0 ), 13 ), ( "B3 Strip", ( 560.0, 1150.0, -540.0, 157.0, -20.0, 3.0 ), 13 ),
+               ( "Tunnel Mouth", ( 160.0, 560.0, 700.0, 900.0, -20.0, 3.0 ), 13 ), ( "Terrace", ( -316.0, -120.0, -250.0, 330.0, 58.0, 67.0 ), 14 ), ( "Deck", ( -560.0, 600.0, 900.0, 1400.0, 220.0, 243.0 ), 7 ),
                ( "East Roof", ( 560.0, 1150.0, 157.0, 1400.0, 220.0, 243.0 ), 7 ), ( "B3 Roof", ( 243.0, 1150.0, -210.0, 157.0, 262.0, 283.0 ), 7 ) ]
 
 

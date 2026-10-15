@@ -377,16 +377,39 @@ def case( m, c, size, along=( 1, 0 ), paint="rv_olive", z0=0.0, surface=PLASTIC 
     P.case( m, c, size, along, paint, z0, surface )
 
 
+PALLET_H = 5.7      # a Euro pallet's height (144 mm)
+
+
+def pallet( m, centre, along, L, W, z0=0.0, paint="oa_pallet" ):
+    """ A wooden pallet under a load, L along `along` by W: five top boards, three rows of blocks, three bottom boards. """
+    a = unit( ( along[0], along[1], 0 ) )
+    s = np.cross( UP, a )
+    c = v( centre[0], centre[1], z0 )
+    for k in range( 5 ):
+        m.oriented_box( c + s * ( ( k - 2 ) * ( W - W * 0.14 ) / 4 ) + UP * ( PALLET_H - 0.45 ), ( a, s, UP ), ( L, W * 0.14, 0.9 ), paint )
+    for i in ( -1, 0, 1 ):
+        for j in ( -1, 0, 1 ):
+            m.oriented_box( c + a * ( i * ( L - L * 0.12 ) / 2 ) + s * ( j * ( W - W * 0.14 ) / 2 ) + UP * ( PALLET_H / 2 ), ( a, s, UP ),
+                            ( L * 0.12, W * 0.14, PALLET_H - 1.8 ), paint )
+    for j in ( -1, 0, 1 ):
+        m.oriented_box( c + s * ( j * ( W - W * 0.14 ) / 2 ) + UP * 0.45, ( a, s, UP ), ( L, W * 0.14, 0.9 ), paint )
+
+
 def case_block( m, origin, along, cols, rows, size=( 52, 32, 30 ), layers=1, paint="rv_olive", gap=2.0, tarp=False,
-                surface=PLASTIC, seed=0, z0=0.0 ):
+                surface=PLASTIC, seed=0, z0=0.0, pallets=False ):
     """ A block of equal cases, cols along `along` and rows across it, layers high, from origin (its corner, plan),
-    optionally under a draped tarp. Returns ( length, width, height ). Collision: one box for the block. """
+    optionally under a draped tarp and on pallets. Returns ( length, width, height ). Collision: one box for the
+    block. """
     rng = np.random.default_rng( seed )
     a = unit( ( along[0], along[1], 0 ) )
     s = np.cross( UP, a )
     L, W, H = size
     o = v( origin[0], origin[1], 0 )
     total_l, total_w, total_h = cols * ( L + gap ) - gap, rows * ( W + gap ) - gap, layers * H
+    if pallets:
+        mid = o + a * ( total_l / 2 ) + s * ( total_w / 2 )
+        pallet( m, ( mid[0], mid[1] ), a, total_l + 2, total_w + 2, z0 )
+        z0 += PALLET_H
     for layer in range( layers ):
         for i in range( cols ):
             for j in range( rows ):
@@ -396,9 +419,11 @@ def case_block( m, origin, along, cols, rows, size=( 52, 32, 30 ), layers=1, pai
                 P.case( m, ( c[0], c[1] ), ( L, W, H ), a, paint, z0 + layer * H, None )
     if tarp:
         drape( m, o + UP * z0, a, total_l, total_w, total_h, seed=seed )
-    centre = o + a * ( total_l / 2 ) + s * ( total_w / 2 ) + UP * ( z0 + total_h / 2 )
-    m.oriented_box( centre, ( a, s, UP ), ( total_l, total_w, total_h ), { "default": None }, surface )
-    return total_l, total_w, total_h
+    base = z0 - ( PALLET_H if pallets else 0.0 )
+    tall = total_h + ( PALLET_H if pallets else 0.0 )
+    centre = o + a * ( total_l / 2 ) + s * ( total_w / 2 ) + UP * ( base + tall / 2 )
+    m.oriented_box( centre, ( a, s, UP ), ( total_l, total_w, tall ), { "default": None }, surface )
+    return total_l, total_w, tall
 
 
 def drape( m, origin, along, L, W, H, sag=4.0, hang=0.62, seed=0, paint="oa_tarp" ):
