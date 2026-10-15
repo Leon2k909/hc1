@@ -4197,8 +4197,8 @@ simulate_input.
     - Three doors lead into the hall: the floor's middle door, the side gallery's SECTOR 03 / HABITAT B door, and
       the north door onto the observation deck.
     - A blast screen inside each middle door stops a sightline from site A through the door into the spawn.
-  - The cargo concourse runs along the whole south side (n -1400..-752, 320 high), with a rover in its middle. Bomb
-    site B is the cargo bay at its east end.
+  - The cargo concourse runs along the whole south side (n -1400..-752, 320 high). Its middle is clear; the rover and
+    its collision were removed on 2026-10-15. Bomb site B is the cargo bay at its east end.
 - Lanes: north is the observation deck and the wings' north mezzanines; middle is the hall floor past the column, with
   the ring and bridges over it; south is the concourse.
 - Modes: the scene lists TDM and Defuse. It has 32+4 deathmatch spawns and Retakes spawns per site. Domination is A in
@@ -4217,6 +4217,9 @@ simulate_input.
 - Learned making it:
   - The editor's file watcher missed the new folders: assets reported "no source file". Register them with
     `Editor.AssetSystem.RegisterFile` in a run_csharp script, then compile vmats, then vmdls, then the scene.
+  - OBJs rewritten while the editor was stalled compiled into a fresh `_c` identical to the old one (same hash), so
+    renders showed the old mesh. Register the .obj and .mtl again with `RegisterFile`, then `Compile( true )` the vmdl,
+    and compare the `_c`'s hash before and after.
   - A 768 px normal map failed to compile ("GenerateMips HemiOctIsoRoughness_RG_B"), and every model using its
     material failed with it. Keep normal maps a power of two.
   - The engine ignores a mesh with a point 90000 out ("ignoring mesh"), so the land stops 60000 out (`WORLD_EDGE`)

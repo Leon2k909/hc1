@@ -30,7 +30,7 @@ z 208 (G), decks 16 thick.
   SECTOR 03 / HABITAT B door onto the side gallery, and the north door onto the observation deck. The team spawns are
   in the wings' south-west (south-east) corner.
 - The cargo concourse: n -1400..-752 across the whole width, 320 high, joined to the hall by two doors and to each
-  wing by a wide opening. A pressurised rover stands in its middle.
+  wing by a wide opening. Its middle is kept clear.
 
 The three lanes: north, the observation deck along the window and the wings' north mezzanines; middle, the hall floor
 past the column (and the ring and bridges over it); south, the cargo concourse. Bomb site A is the observation deck's
@@ -561,7 +561,7 @@ def hall_walls( m ):
     # The roof: a slab, and trusses spanning north-south under it.
     roof_n1 = HALL_N1 + LEAN * HALL_TOP + 40
     m.box( ( -HALL_E - WALL, HALL_N0 - WALL, HALL_TOP ), ( HALL_E + WALL, roof_n1, HALL_TOP + 32 ),
-           { "-z": "ar_wall", "+z": "ar_concrete_dark", "default": "ar_steel" }, STONE )
+           { "-z": "ar_concrete_dark", "+z": "ar_concrete_dark", "default": "ar_steel" }, STONE )
     for e in ( -900.0, -600.0, -300.0, 300.0, 600.0, 900.0 ):
         truss( m, e, HALL_N0, HALL_N1 + LEAN * 640 - 20 )
     # Purlins across the trusses.
@@ -585,7 +585,7 @@ def truss( m, e, n0, n1, bottom=626.0, top=HALL_TOP ):
     for k in range( panels ):
         if k % 2 == 1:
             nn = n0 + step * ( k + 0.5 )
-            light_bar( m, e - 5, e + 5, nn - 44, nn + 44, bottom - 3 )
+            light_bar( m, e - 5, e + 5, nn - 44, nn + 44, bottom - 3, "ar_led_warm" )
 
 
 def galleries( m ):
@@ -779,14 +779,14 @@ def reactor( m, glass ):
     band( 470.0, 486.0, 160.0, "ar_steel", brass=True )
     chamber( 486.0, 560.0, r_glass=128.0, r_core=104.0, posts=10 )
     # The flared lamp ring.
-    lathe_uv( m, o, [ ( 150.0, 560.0 ), ( 300.0, 572.0 ), ( 300.0, 588.0 ), ( 150.0, 604.0 ) ], "ar_steel", sides=48, u_repeat=12 )
+    lathe_uv( m, o, [ ( 150.0, 560.0 ), ( 224.0, 568.0 ), ( 224.0, 584.0 ), ( 150.0, 600.0 ) ], "ar_steel", sides=48, u_repeat=12 )
     ring_surface( m, o, 0.0, 150.0, 560.0, "ar_steel", sides=40, facing=-1.0 )
     for k in range( 24 ):
         a = 2 * math.pi * k / 24
-        p = np.array( ( 280 * math.cos( a ), 280 * math.sin( a ), 570.0 ) )
-        m.box( p - np.array( ( 5, 5, 1.2 ) ), p + np.array( ( 5, 5, 0.6 ) ), "ar_led" )
-    cylinder_hull( m, o, 300.0, 560.0, 604.0, METAL, sides=20 )
-    # The stack into the roof, and four big pipes from the flare to the roof.
+        p = np.array( ( 208 * math.cos( a ), 208 * math.sin( a ), 566.0 ) )
+        m.box( p - np.array( ( 4, 4, 1.2 ) ), p + np.array( ( 4, 4, 0.6 ) ), "ar_led_warm" )
+    cylinder_hull( m, o, 224.0, 560.0, 600.0, METAL, sides=20 )
+    # The stack into the roof, and four big pipes from the lamp ring to the roof.
     lathe_uv( m, o, [ ( 110.0, 604.0 ), ( 110.0, HALL_TOP ) ], "ar_wall", sides=24, u_repeat=3 )
     for k in range( 4 ):
         a = math.pi / 4 + k * math.pi / 2
@@ -965,45 +965,6 @@ def concourse( m, glass ):
     sign_panel( m, "poster_mars", ( 900.0, CON_N0 + 1.0, 150.0 ), ( 0, 1 ), 120.0, 96.0 )
 
 
-def rover( m, e, n, heading ):
-    """ A six-wheeled pressurised rover: a white body on an orange chassis, a windscreen at the front, a hatch and a
-    rack on the roof, big wire-spoked tyres. 360 long, 132 wide, 128 high. """
-    F = Frame( e, n, heading )
-    hl, hw = 180.0, 66.0
-    F.box( m, -hl, hl, -hw + 10, hw - 10, 26, 44, "ar_rover_orange" )
-    # The cabin: a box with a sloped front.
-    body = [ ( -hl + 4, 44 ), ( hl - 50, 44 ), ( hl - 4, 70 ), ( hl - 30, 118 ), ( -hl + 10, 118 ), ( -hl + 4, 110 ) ]
-    for y, towards in ( ( -hw + 6, -1 ), ( hw - 6, 1 ) ):
-        card( m, "ar_rover_white", [ F.p( x, y, z ) for x, z in body ], F.v( 0, towards, 0 ) )
-    for k in range( len( body ) ):
-        ( x0, z0 ), ( x1, z1 ) = body[k], body[( k + 1 ) % len( body )]
-        out = F.v( z1 - z0, 0, -( x1 - x0 ) )
-        if np.dot( out, F.v( 0, 0, 1 ) ) < 0 and z0 == 44 and z1 == 44:
-            continue
-        paint = "ar_glass" if ( x0, z0 ) == ( hl - 4, 70 ) else "ar_rover_white"
-        pts = [ F.p( x0, -hw + 6, z0 ), F.p( x1, -hw + 6, z1 ), F.p( x1, hw - 6, z1 ), F.p( x0, hw - 6, z0 ) ]
-        card( m, "ar_dark" if paint == "ar_glass" else paint, pts, out )
-    # Side windows and a stripe.
-    for y, towards in ( ( -hw + 5.8, -1 ), ( hw - 5.8, 1 ) ):
-        for x0, x1 in ( ( 40.0, 110.0 ), ( -60.0, 20.0 ) ):
-            F.quad( m, "ar_dark", [ ( x0, y, 80 ), ( x1, y, 80 ), ( x1, y, 108 ), ( x0, y, 108 ) ], ( 0, towards, 0 ) )
-        F.quad( m, "ar_rover_orange", [ ( -hl + 6, y, 60 ), ( hl - 34, y, 60 ), ( hl - 30, y, 66 ), ( -hl + 6, y, 66 ) ], ( 0, towards, 0 ) )
-    # Roof rack, hatch, antenna, lamps.
-    F.box( m, -120, 60, -40, 40, 118, 122, "ar_gunmetal" )
-    F.box( m, -40, 0, -24, 24, 118, 128, "ar_steel" )
-    F.rod( m, ( -150, 30, 118 ), ( -150, 30, 170 ), 0.8, "ar_gunmetal" )
-    for y in ( -40.0, 40.0 ):
-        F.box( m, hl - 8, hl - 2, y - 8, y + 8, 50, 58, "ar_led" )
-        F.box( m, -hl + 2, -hl + 6, y - 8, y + 8, 50, 58, "ar_led_red" )
-    # Wheels: three a side.
-    for x in ( -120.0, 0.0, 120.0 ):
-        for y in ( -hw + 8, hw - 8 ):
-            centre = F.p( x, y, 26 )
-            BY.lathe( m, centre, F.y * ( 1 if y > 0 else -1 ), [ ( 26.0, -8.0 ), ( 26.0, 8.0 ) ], "ar_tyre", sides=14, cap="ar_gunmetal" )
-            BY.lathe( m, centre, F.y * ( -1 if y > 0 else 1 ), [ ( 26.0, 8.0 ), ( 26.0, 8.0 ) ], "ar_tyre", sides=14, cap="ar_tyre" )
-    F.box( m, -hl, hl, -hw, hw, 0, 122, surface=METAL )
-
-
 # ---------------------------------------------------------------------------------------------------------------------
 # Dressing: cases, consoles, signs, banners, lamps
 
@@ -1046,7 +1007,7 @@ def dressing( m ):
         case_stack( m, s * 1600, -960, 0, [ 2, 1 ], seed=35 )
         case_stack( m, s * 1250, -900, s * 12, [ 1 ], seed=36 )
         case_stack( m, s * 1800, -1320, 0, [ 1, 1 ], seed=37 )
-    rover( m, 0.0, -1080.0, 0.0 )
+    # Keep the centre of the concourse clear.
     # The yellow lines on the hall floor: round the column, and along the arcades.
     BY.rectangle_lines( m, "bx_line_yellow", -VOID_E + 30, VOID_E - 30, VOID_N0 + 30, VOID_N1 - 30, 4.0, 0.05 )
     for k in range( 24 ):
@@ -1058,9 +1019,8 @@ def dressing( m ):
     sign_panel( m, "poster_redplanet", ( HALL_E - 1.0, -330.0, 120.0 ), ( -1, 0 ), 150.0, 56.0 )
     sign_panel( m, "poster_redplanet", ( -HALL_E + 1.0, 330.0, 130.0 ), ( 1, 0 ), 150.0, 56.0 )
     sign_panel( m, "poster_mars", ( 0.0, HALL_N0 + 1.0, G + 200 ), ( 0, 1 ), 200.0, 160.0 )
-    banner( m, "banner_humanity", ( 450.0, 600.0, 690.0 ), ( 0, -1 ), 80.0, 240.0 )
-    banner( m, "banner_humanity", ( -450.0, 600.0, 690.0 ), ( 0, -1 ), 80.0, 240.0 )
-    banner( m, "banner_habitat", ( HALL_E - 60.0, 120.0, 690.0 ), ( -1, 0 ), 90.0, 270.0 )
+    banner( m, "banner_humanity", ( -150.0, 620.0, 690.0 ), ( 0, -1 ), 80.0, 240.0 )
+    banner( m, "banner_habitat", ( 900.0, 640.0, 690.0 ), ( 0, -1 ), 90.0, 270.0 )
     banner( m, "banner_humanity", ( -HALL_E + 60.0, 120.0, 690.0 ), ( 1, 0 ), 90.0, 270.0 )
     sign_panel( m, "stripe_warning", ( 0.0, -RING_R1 - 4.0, G - DT - 6 ), ( 0, -1 ), 140.0, 19.0, back=None )
     lit_sign( m, "observation", ( 0.0, 600.0, 420.0 ), ( 0, -1 ), 192.0, 48.0 )
@@ -1807,7 +1767,7 @@ def build():
 
 # The menu picture's view: on the south-east gallery, looking north-west past the column to the window, as the
 # reference picture is framed. ( eye, target ) in plan, and the horizontal field of view.
-ART_VIEW = ( ( 860.0, -640.0, G + 66 ), ( -260.0, 640.0, G + 40 ), 92.0 )
+ART_VIEW = ( ( 800.0, -680.0, G + 66 ), ( -200.0, 640.0, G + 40 ), 92.0 )
 
 
 def main():
