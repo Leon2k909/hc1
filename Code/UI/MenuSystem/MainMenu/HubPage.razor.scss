@@ -383,15 +383,9 @@ HubSidebar
     border-top: 2px solid $hub-accent;
     border-radius: 2px;
 
-    // Two columns with room for "TACTICAL DEFUSE", its check box and side padding.
-    &.modes { width: 412px; }
-
-    &.maps
-    {
-        width: 212px;
-
-        .filter-grid { flex-direction: column; }
-    }
+    // Two columns with room for "TACTICAL DEFUSE" (or "INNOCENT HOTEL"), its check box and side padding. The maps were
+    // one column, which wrapped past the panel's edge once there were more than nine: the hover's max-height capped it.
+    &.modes, &.maps { width: 412px; }
 }
 
 .filter-head
@@ -526,7 +520,6 @@ HubSidebar
     }
 }
 
-.filter-group.maps .filter-option { width: auto; }
 
 // ============================================================
 //  The featured screen shares its column with Multiplayer playlists or Zombies maps.
