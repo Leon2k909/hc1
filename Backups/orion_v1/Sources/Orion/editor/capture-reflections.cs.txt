@@ -1,0 +1,70 @@
+// Capture ordinary camera faces; never call EnvmapProbe.Bake or CubemapRendering.
+// Those paths fault envmap_filtering_cs on this workstation's Vulkan driver.
+if(Game.IsPlaying) throw new InvalidOperationException("Stop play before capturing reflections");
+var root=Sandbox.Project.Current.GetRootPath();
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.Source?.ResourcePath?.Equals("scenes/maps/orion/orion.scene",StringComparison.OrdinalIgnoreCase)==true);
+var scene=session.Scene;
+var camera=scene.GetAllComponents<CameraComponent>().Single(c=>c.GameObject.Name=="editor_camera" && c.GameObject.Flags.HasFlag(GameObjectFlags.EditorOnly));
+var oldPosition=camera.WorldPosition; var oldRotation=camera.WorldRotation; var oldFov=camera.FieldOfView;
+var oldSize=camera.CustomSize;var oldAxis=camera.FovAxis;var oldOrtho=camera.Orthographic;
+var tone=scene.GetAllComponents<Tonemapping>().Single();
+var oldTone=(tone.Mode,tone.AutoExposureEnabled,tone.MinimumExposure,tone.MaximumExposure,tone.ExposureCompensation);
+var grading=scene.GetAllComponents<ColorGrading>().Select(c=>(Component:c,Enabled:c.Enabled)).ToArray();
+var vignette=scene.GetAllComponents<Vignette>().Select(c=>(Component:c,Enabled:c.Enabled)).ToArray();
+var bloom=scene.GetAllComponents<Bloom>().Select(c=>(Component:c,Enabled:c.Enabled)).ToArray();
+var config=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/orion/reflection-config.json")));
+var label=config["label"].GetValue<string>();
+if(!new[]{"Yard","Control","Service"}.Contains(label)) throw new InvalidOperationException("Unexpected probe");
+var position=Vector3.Parse(config["position"].GetValue<string>());
+var directory=System.IO.Path.Combine(root,"output/orion/reflections",label);
+System.IO.Directory.CreateDirectory(directory);
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Public;
+var compose=typeof(CameraComponent).GetMethod("ComposeView",flags,null,Type.EmptyTypes,null);
+var post=scene.GetSystem<PostProcessSystem>();
+var updatePost=typeof(PostProcessSystem).GetMethod("UpdateCamera",flags);
+void RefreshPost(){foreach(var other in scene.GetAllComponents<CameraComponent>())updatePost.Invoke(post,new object[]{other});}
+var rotations=new[]{new Angles(0,0,0),new Angles(0,90,0),new Angles(0,180,0),new Angles(0,-90,0),new Angles(-90,0,0),new Angles(90,0,0)};
+try
+{
+    tone.Mode=Tonemapping.TonemappingMode.ACES;tone.AutoExposureEnabled=true;
+    tone.MinimumExposure=1;tone.MaximumExposure=1;tone.ExposureCompensation=0;
+    foreach(var entry in grading)entry.Component.Enabled=false;
+    foreach(var entry in vignette)entry.Component.Enabled=false;
+    foreach(var entry in bloom)entry.Component.Enabled=false;
+    using(scene.Push())
+    using(var bitmap=new Bitmap(512,512))
+    for(var face=0;face<rotations.Length;face++)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+        typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+        for(var warmup=0;warmup<3;warmup++)
+        {
+            camera.WorldPosition=position;camera.WorldRotation=Rotation.From(rotations[face]);camera.FieldOfView=90;
+            camera.CustomSize=new Vector2(512,512);camera.FovAxis=CameraComponent.Axis.Horizontal;camera.Orthographic=false;
+            compose.Invoke(camera,null);RefreshPost();
+            if(Math.Abs(camera.View.FieldOfView-90)>.01f)throw new InvalidOperationException("The reflection view lost its 90-degree projection");
+            camera.RenderToBitmap(bitmap,false);
+        }
+        var nativeCamera=typeof(CameraComponent).GetField("sceneCamera",flags).GetValue(camera);
+        var nativeTone=nativeCamera.GetType().GetProperty("Tonemap",flags).GetValue(nativeCamera);
+        var min=Convert.ToSingle(nativeTone.GetType().GetProperty("MinExposure",flags).GetValue(nativeTone));
+        var max=Convert.ToSingle(nativeTone.GetType().GetProperty("MaxExposure",flags).GetValue(nativeTone));
+        if(Math.Abs(min-1)>.01f || Math.Abs(max-1)>.01f)throw new InvalidOperationException("The native reflection exposure was overwritten");
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(directory,face+".png"),bitmap.ToPng());
+        var data=new {Position=position.ToString(),Encoding="ACES at exposure 1",MinExposure=min,MaxExposure=max,
+            Faces=new[]{new {File=face+".png",Forward=camera.WorldRotation.Forward.ToString(),Right=camera.WorldRotation.Right.ToString(),Up=camera.WorldRotation.Up.ToString()}}};
+        System.IO.File.WriteAllText(System.IO.Path.Combine(directory,"face-"+face+".json"),System.Text.Json.JsonSerializer.Serialize(data));
+    }
+}
+finally
+{
+    camera.WorldPosition=oldPosition;camera.WorldRotation=oldRotation;camera.FieldOfView=oldFov;
+    camera.CustomSize=oldSize;camera.FovAxis=oldAxis;camera.Orthographic=oldOrtho;
+    tone.Mode=oldTone.Item1;tone.AutoExposureEnabled=oldTone.Item2;tone.MinimumExposure=oldTone.Item3;tone.MaximumExposure=oldTone.Item4;tone.ExposureCompensation=oldTone.Item5;
+    foreach(var entry in grading)entry.Component.Enabled=entry.Enabled;
+    foreach(var entry in vignette)entry.Component.Enabled=entry.Enabled;
+    foreach(var entry in bloom)entry.Component.Enabled=entry.Enabled;
+    using(scene.Push()){compose.Invoke(camera,null);RefreshPost();}
+}
+return new {Probe=label,Position=position.ToString(),Faces=6,Directory=directory};

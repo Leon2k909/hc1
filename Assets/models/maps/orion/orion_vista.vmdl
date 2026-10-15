@@ -1,0 +1,71 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc29:version{3cec427c-1b0e-4d48-a90a-0436f33a6041} -->
+{
+	rootNode =
+	{
+		_class = "RootNode"
+		children =
+		[
+			{
+				_class = "MaterialGroupList"
+				children =
+				[
+					{
+						_class = "DefaultMaterialGroup"
+						remaps =
+						[
+							{ from = "oa_asphalt.vmat" to = "materials/orion/oa_asphalt.vmat" },
+							{ from = "oa_beacon.vmat" to = "materials/orion/oa_beacon.vmat" },
+							{ from = "oa_dark.vmat" to = "materials/orion/oa_dark.vmat" },
+							{ from = "oa_grass_far.vmat" to = "materials/orion/oa_grass_far.vmat" },
+							{ from = "oa_grating.vmat" to = "materials/orion/oa_grating.vmat" },
+							{ from = "oa_hill.vmat" to = "materials/orion/oa_hill.vmat" },
+							{ from = "oa_lamp_warm.vmat" to = "materials/orion/oa_lamp_warm.vmat" },
+							{ from = "oa_mountain.vmat" to = "materials/orion/oa_mountain.vmat" },
+							{ from = "oa_pine.vmat" to = "materials/orion/oa_pine.vmat" },
+							{ from = "oa_radome.vmat" to = "materials/orion/oa_radome.vmat" },
+							{ from = "oa_render.vmat" to = "materials/orion/oa_render.vmat" },
+							{ from = "oa_render_grey.vmat" to = "materials/orion/oa_render_grey.vmat" },
+							{ from = "oa_render_ochre.vmat" to = "materials/orion/oa_render_ochre.vmat" },
+							{ from = "oa_render_pink.vmat" to = "materials/orion/oa_render_pink.vmat" },
+							{ from = "oa_roof_dark.vmat" to = "materials/orion/oa_roof_dark.vmat" },
+							{ from = "oa_roof_tile.vmat" to = "materials/orion/oa_roof_tile.vmat" },
+							{ from = "oa_scrub.vmat" to = "materials/orion/oa_scrub.vmat" },
+							{ from = "oa_steel.vmat" to = "materials/orion/oa_steel.vmat" },
+							{ from = "oa_stone.vmat" to = "materials/orion/oa_stone.vmat" },
+							{ from = "oa_tree.vmat" to = "materials/orion/oa_tree.vmat" },
+							{ from = "oa_tree_far.vmat" to = "materials/orion/oa_tree_far.vmat" },
+							{ from = "oa_wall_dark.vmat" to = "materials/orion/oa_wall_dark.vmat" },
+							{ from = "oa_window_dark.vmat" to = "materials/orion/oa_window_dark.vmat" },
+							{ from = "oa_window_lit.vmat" to = "materials/orion/oa_window_lit.vmat" }
+						]
+						use_global_default = false
+						global_default_material = ""
+					},
+				]
+			},
+			{
+				_class = "RenderMeshList"
+				children =
+				[
+					{
+						_class = "RenderMeshFile"
+						name = "orion_vista"
+						filename = "models/maps/orion/orion_vista.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+				]
+			},
+		]
+		model_archetype = ""
+		primary_associated_entity = ""
+		anim_graph_name = ""
+		base_model_name = ""
+	}
+}

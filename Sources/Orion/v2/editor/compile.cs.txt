@@ -1,0 +1,52 @@
+// Registers and compiles Orion's assets whose sources are newer than their compiled files, or that were never compiled:
+// the oa_ materials (the vmat or its maps) and the sky, then the v2 models (the vmdl or its OBJs), then the scene. The editor's file
+// watcher misses some of a burst of new files, and CompileIfNeeded doesn't look at a model's OBJs. Run with the native
+// MCP's run_csharp (sbox-cli --call run_csharp '{"path":"<this file>"}'). It compiles at most "limit" assets a call so a
+// call returns before the CLI's timeout; run it again until Stale is 0.
+var projectRoot = Sandbox.Project.Current.GetRootPath();
+var assets = System.IO.Path.Combine(projectRoot, "Assets");
+System.DateTime Newest(params string[] files) => files.Where(System.IO.File.Exists).Select(System.IO.File.GetLastWriteTimeUtc).DefaultIfEmpty(System.DateTime.MinValue).Max();
+System.DateTime Compiled(string file) => System.IO.File.Exists(file + "_c") ? System.IO.File.GetLastWriteTimeUtc(file + "_c") : System.DateTime.MinValue;
+var stale = new System.Collections.Generic.List<string>();
+var materialDir = System.IO.Path.Combine(assets, "materials/orion");
+var vmats = System.IO.Directory.GetFiles(materialDir, "oa_*.vmat").Concat(System.IO.Directory.GetFiles(System.IO.Path.Combine(materialDir, "sky"), "oa_*.vmat"));
+foreach (var vmat in vmats.OrderBy(x => x))
+{
+    var text = System.IO.File.ReadAllText(vmat);
+    var maps = System.Text.RegularExpressions.Regex.Matches(text, @"""(materials/orion/[^""]+[.](?:png|jpg|exr))""")
+        .Select(m => System.IO.Path.Combine(assets, m.Groups[1].Value)).ToArray();
+    if (Newest(maps.Append(vmat).ToArray()) > Compiled(vmat)) stale.Add(vmat);
+}
+var names = new[] { "orion_ground", "orion_overlook", "orion_launch_control", "orion_launch_deck", "orion_fuel", "orion_props", "orion_courts", "orion_glass", "orion_pad", "orion_vista" };
+foreach (var name in names)
+{
+    var vmdl = System.IO.Path.Combine(assets, "models/maps/orion", name + ".vmdl");
+    if (!System.IO.File.Exists(vmdl)) continue;
+    var objs = System.IO.Directory.GetFiles(System.IO.Path.GetDirectoryName(vmdl), name + "*.obj");
+    if (Newest(objs.Append(vmdl).ToArray()) > Compiled(vmdl)) stale.Add(vmdl);
+}
+foreach (var extra in new[] { "scenes/maps/Orion/orion.scene" })
+{
+    var file = System.IO.Path.Combine(assets, extra);
+    if (System.IO.File.Exists(file) && Newest(file) > Compiled(file)) stale.Add(file);
+}
+var limit = 30;
+var results = new System.Collections.Generic.List<object>();
+var done = 0;
+foreach (var file in stale.Take(limit))
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    foreach (var map in System.IO.Path.GetExtension(file) == ".vmat"
+        ? System.Text.RegularExpressions.Regex.Matches(System.IO.File.ReadAllText(file), @"""(materials/orion/[^""]+[.](?:png|jpg|exr))""").Select(m => System.IO.Path.Combine(assets, m.Groups[1].Value))
+        : System.Linq.Enumerable.Empty<string>())
+        if (System.IO.File.Exists(map) && Editor.AssetSystem.FindByPath(map) is null) Editor.AssetSystem.RegisterFile(map);
+    var asset = Editor.AssetSystem.FindByPath(file) ?? Editor.AssetSystem.RegisterFile(file);
+    if (asset is null) { results.Add(new { File = System.IO.Path.GetFileName(file), Registered = false }); continue; }
+    var ok = false; string error = null;
+    try { ok = asset.Compile(true); } catch (Exception e) { error = e.Message; }
+    done++;
+    await Task.Delay(1, cancellationToken);
+    if (!ok || error is not null || asset.IsCompileFailed)
+        results.Add(new { File = System.IO.Path.GetFileName(file), Ok = ok, asset.IsCompiled, asset.IsCompileFailed, Error = error });
+}
+return new { Stale = stale.Count, Compiled = done, Problems = results };

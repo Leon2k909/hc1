@@ -1,0 +1,56 @@
+// Read-only host/client snapshot. Run in each process through its native MCP endpoint.
+var scene=Game.ActiveScene;
+var mapPath="scenes/maps/orion/orion.scene";
+var expectedModels=new[]{"west","east","yard","detail","rocket","backdrop"}.Select(part=>"models/maps/orion/orion_"+part+".vmdl").ToArray();
+var models=scene?.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.ResourcePath?.StartsWith("models/maps/orion/",StringComparison.OrdinalIgnoreCase)==true).ToArray()??Array.Empty<ModelRenderer>();
+var mapModelsMatch=models.Length==6 && expectedModels.All(path=>models.Count(r=>r.Model.ResourcePath.Equals(path,StringComparison.OrdinalIgnoreCase))==1);
+var sourcePath=scene?.Source?.ResourcePath;
+// Network-created scenes may have no Source; require every unique Orion model.
+if(!Game.IsPlaying || !mapModelsMatch || (!string.IsNullOrEmpty(sourcePath) && !sourcePath.Equals(mapPath,StringComparison.OrdinalIgnoreCase)))
+    throw new InvalidOperationException("An Orion match must be running");
+var connections=Connection.All.Select(c=>new {c.Id,c.IsHost,IsLocal=c==Connection.Local,c.IsActive,c.IsConnecting,c.Ping}).ToArray();
+var players=scene.GetAllComponents<Facepunch.Client>().Where(c=>!c.IsBot).Select(c=>new {
+    Id=c.GameObject.Id,Connection=c.Connection?.Id,c.IsConnected,c.IsLocalPlayer,Team=c.Team.ToString(),
+    Pawn=c.PlayerPawn.IsValid()?c.PlayerPawn.GameObject.Id:(Guid?)null,
+    PawnOwner=c.PlayerPawn.IsValid()?c.PlayerPawn.Network.Owner?.Id:null,
+    Position=c.PlayerPawn.IsValid()?c.PlayerPawn.WorldPosition.ToString():null,
+    Health=c.PlayerPawn.IsValid()?c.PlayerPawn.HealthComponent?.Health:null,
+    OwnerMatches=c.PlayerPawn.IsValid() && c.PlayerPawn.Network.Owner==c.Connection
+}).ToArray();
+var badMaterials=new System.Collections.Generic.List<string>();
+foreach(var model in models)
+for(var slot=0;slot<model.Materials.Count;slot++)
+{
+    var material=model.Materials.GetOverride(slot)??model.Materials.GetOriginal(slot);
+    if(material is null || material.IsError) badMaterials.Add(model.GameObject.Name+":"+slot);
+}
+var local=Facepunch.Client.Local;
+var pawn=local?.PlayerPawn;
+var cameraMatches=pawn.IsValid() && scene.Camera==pawn.CameraController?.Camera;
+var connectedPlayers=players.Where(p=>p.IsConnected && p.Pawn.HasValue && p.OwnerMatches).ToArray();
+bool ValidTexture(Texture texture)=>texture is not null && !texture.IsError;
+var lighting=scene.GetAllComponents<IndirectLightVolume>().Select(v=>new {
+    v.GameObject.Name,Valid=ValidTexture(v.IrradianceTexture)&&ValidTexture(v.DistanceTexture)&&ValidTexture(v.RelocationTexture),
+    Irradiance=v.IrradianceTexture?.ResourcePath,Distance=v.DistanceTexture?.ResourcePath,Relocation=v.RelocationTexture?.ResourcePath
+}).ToArray();
+var reflections=scene.GetAllComponents<EnvmapProbe>().Select(p=>new {
+    p.GameObject.Name,Mode=p.Mode.ToString(),Valid=ValidTexture(p.Texture),Texture=p.Texture?.ResourcePath
+}).ToArray();
+var skies=scene.GetAllComponents<SkyBox2D>().Select(s=>new {Material=s.SkyMaterial?.ResourcePath,Valid=s.SkyMaterial is not null && !s.SkyMaterial.IsError}).ToArray();
+var woodland=scene.GetAllComponents<ModelRenderer>().Where(r=>r.GameObject.Name=="Range oak").ToArray();
+var steam=scene.GetAllComponents<ParticleEffect>().Where(p=>p.GameObject.Name.StartsWith("Orion cryogenic vent")).ToArray();
+var success=Networking.IsActive && connections.Count(c=>c.IsActive||c.IsHost)>=2 && connectedPlayers.Length>=2 &&
+    connectedPlayers.Select(p=>p.Connection).Distinct().Count()>=2 && connectedPlayers.Select(p=>p.Pawn).Distinct().Count()>=2 &&
+    cameraMatches && models.Length==6 && models.All(r=>!r.Model.IsError) && badMaterials.Count==0 &&
+    lighting.Length==1 && lighting.All(v=>v.Valid) && reflections.Length==3 && reflections.All(p=>p.Valid&&p.Mode=="CustomTexture") &&
+    skies.Length==1 && skies.All(s=>s.Valid) && woodland.Length==320 && woodland.All(r=>r.Model is not null && !r.Model.IsError) && steam.Length==4;
+var result=new {Success=success,CheckedAt=DateTime.UtcNow,Pid=System.Environment.ProcessId,
+    Scene=mapPath,SceneSource=sourcePath,MapIdentityMethod=string.IsNullOrEmpty(sourcePath)?"Six unique Orion model resources":"Scene source and six unique Orion model resources",
+    Networking.IsActive,Networking.IsHost,Networking.IsClient,
+    LocalConnection=Connection.Local?.Id,Connections=connections,Players=players,PlayerCameraSelected=cameraMatches,
+    Models=models.Select(r=>new {Id=r.GameObject.Id,Path=r.Model.ResourcePath,r.Model.IsError}).ToArray(),MissingMaterials=badMaterials,
+    Lighting=lighting,Reflections=reflections,Skies=skies,Woodland=woodland.Length,SteamEmitters=steam.Length,
+    NavEnabled=scene.NavMesh.IsEnabled,NavGenerating=scene.NavMesh.IsGenerating};
+var output=System.IO.Path.Combine(exchangeDirectory,"orion-network-"+System.Environment.ProcessId+"-"+DateTime.UtcNow.Ticks+".json");
+System.IO.File.WriteAllText(output,System.Text.Json.JsonSerializer.Serialize(result,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return new {Snapshot=output,Result=result};

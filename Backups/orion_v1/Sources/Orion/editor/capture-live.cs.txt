@@ -1,0 +1,34 @@
+if(!Game.IsPlaying || Game.ActiveScene?.Source?.ResourcePath?.Equals("scenes/maps/orion/orion.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Orion must be running");
+var scene=Game.ActiveScene;GameObject review=null;
+try
+{
+    CameraComponent camera;
+    using(scene.Push())
+    {
+        review=new GameObject(true,"Orion temporary review camera");review.NetworkMode=NetworkMode.Never;
+        camera=review.Components.Create<CameraComponent>();camera.IsMainCamera=false;
+        camera.WorldPosition=new Vector3(-1720,760,620);
+        camera.WorldRotation=Rotation.LookAt(new Vector3(650,200,420)-camera.WorldPosition);
+        camera.FieldOfView=100;camera.ZNear=2;camera.ZFar=80000;
+        camera.CustomSize=new Vector2(1536,1024);camera.FovAxis=CameraComponent.Axis.Horizontal;
+    }
+    await Task.Delay(600,cancellationToken);
+    var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+    using(scene.Push())using(var bitmap=new Bitmap(1536,1024))
+    {
+        typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+        typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+        typeof(PostProcessSystem).GetMethod("UpdateCamera",flags).Invoke(scene.GetSystem<PostProcessSystem>(),new object[]{camera});
+        if(scene.Camera.IsValid())typeof(PostProcessSystem).GetMethod("UpdateCamera",flags).Invoke(scene.GetSystem<PostProcessSystem>(),new object[]{scene.Camera});
+        for(var i=0;i<3;i++)
+        {
+            typeof(CameraComponent).GetMethod("ComposeView",flags,null,Type.EmptyTypes,null).Invoke(camera,null);
+            camera.RenderToBitmap(bitmap,false);
+        }
+        var path=System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/orion/captures/live.png");
+        System.IO.File.WriteAllBytes(path,bitmap.ToPng());
+        return new{Path=path,NativeLiveCapture=true,SteamEmitters=scene.GetAllComponents<ParticleEffect>().Count(p=>p.GameObject.Name.StartsWith("Orion cryogenic vent"))};
+    }
+}
+finally{review?.Destroy();}

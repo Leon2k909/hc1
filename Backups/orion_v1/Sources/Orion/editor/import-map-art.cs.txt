@@ -1,0 +1,10 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var source=System.IO.Path.Combine(root,"output/orion/captures/art.png");
+if(!System.IO.File.Exists(source))throw new InvalidOperationException("Capture the native scene first");
+var target=System.IO.Path.Combine(root,"Assets/ui/maps/orion.png");
+System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+System.IO.File.Copy(source,target,true);
+var asset=Editor.AssetSystem.RegisterFile(target);
+var texture=Texture.Load("ui/maps/orion.png");
+return new{Path="ui/maps/orion.png",FromNativeCamera=true,Bytes=new System.IO.FileInfo(target).Length,
+    Loaded=texture is not null&&!texture.IsError,Width=texture?.Width,Height=texture?.Height};

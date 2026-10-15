@@ -1,0 +1,20 @@
+// Import source assets through the live editor. Never touches another map or a scene document.
+var root=Sandbox.Project.Current.GetRootPath();
+var stage=System.IO.Path.Combine(root,"output/orion/stage");
+var imported=new System.Collections.Generic.List<string>();
+foreach(var folder in new[]{"materials/orion","models/maps/orion","ui/minimaps"})
+foreach(var source in System.IO.Directory.GetFiles(System.IO.Path.Combine(stage,folder),"*",System.IO.SearchOption.AllDirectories).OrderBy(f=>f.EndsWith(".vmdl")?1:0))
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var relative=System.IO.Path.GetRelativePath(stage,source).Replace('\\','/');
+    if(folder=="ui/minimaps" && !relative.EndsWith("minimap_orion.png"))continue;
+    var target=System.IO.Path.Combine(root,"Assets",relative);
+    var bytes=System.IO.File.ReadAllBytes(source);
+    if(System.IO.File.Exists(target)&&System.IO.File.ReadAllBytes(target).SequenceEqual(bytes))continue;
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    System.IO.File.WriteAllBytes(target+".orion-import",bytes);
+    System.IO.File.Move(target+".orion-import",target,true);
+    Editor.AssetSystem.RegisterFile(target);
+    imported.Add(relative);
+}
+return new { Imported=imported, Count=imported.Count };

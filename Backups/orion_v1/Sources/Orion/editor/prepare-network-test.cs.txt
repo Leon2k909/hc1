@@ -1,0 +1,29 @@
+if(Game.IsPlaying || Networking.IsActive) throw new InvalidOperationException("A test is already running");
+if(Editor.SceneEditorSession.Active?.Scene.Source?.ResourcePath?.Contains("/orion/")!=true)
+    throw new InvalidOperationException("Select Orion before the multiplayer test");
+var path=System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/orion/network-test-state.json");
+if(System.IO.File.Exists(path))
+{
+    var pending=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(path));
+    if(pending["RestoredAt"] is null) throw new InvalidOperationException("An earlier test still needs its settings restored");
+}
+var mode=GameObject.GetPrefab("prefabs/game_modes/team_deathmatch.prefab")?.GetComponent<Facepunch.GameMode>();
+if(!mode.IsValid()) throw new InvalidOperationException("TDM prefab is unavailable");
+var previous=new {RunId=Guid.NewGuid(),StartedAt=DateTime.UtcNow,NoDamage=Facepunch.DevCommands.NoDamage,Mode=Facepunch.GameMode.ActivePath,
+    Hardcore=Facepunch.GameMode.ActiveHardcore,Ranked=Facepunch.GameMode.ActiveRanked,
+    Privacy=Editor.EditorUtility.Network.HostPrivacy.ToString(),
+    Custom=Facepunch.CustomGameSettings.Current,
+    CustomPrivacy=Facepunch.CustomGameSettings.Current?.Privacy.ToString(),
+    CustomInput=Facepunch.CustomGameSettings.Current?.Input.ToString(),
+    InstanceArguments=Editor.EditorPreferences.NewInstanceCommandLineArgs};
+System.IO.File.WriteAllText(path,System.Text.Json.JsonSerializer.Serialize(previous));
+Facepunch.GameMode.SetCurrent(mode);
+Facepunch.CustomGameSettings.Configure(10,true,Sandbox.Network.LobbyPrivacy.Private,
+    new Facepunch.CustomGameRules {TimeLimit=0,ScoreLimit=0});
+Facepunch.DevCommands.NoDamage=true;
+Editor.EditorUtility.Network.HostPrivacy=Sandbox.Network.LobbyPrivacy.Private;
+var args=previous.InstanceArguments??"";
+if(!args.Split(' ',StringSplitOptions.RemoveEmptyEntries).Contains("-mcp"))
+    Editor.EditorPreferences.NewInstanceCommandLineArgs=(args+" -mcp").Trim();
+return new {previous.RunId,Mode=Facepunch.GameMode.ActiveIdent,Privacy=Editor.EditorUtility.Network.HostPrivacy.ToString(),
+    ClientMcpEnabled=true,TimeAndScoreLimitsDisabled=true};

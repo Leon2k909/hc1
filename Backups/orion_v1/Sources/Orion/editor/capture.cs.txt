@@ -1,0 +1,60 @@
+// Native captures of Orion using its editor camera; restore all camera state afterwards.
+var root=Sandbox.Project.Current.GetRootPath();
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/orion/orion.scene",StringComparison.OrdinalIgnoreCase)==true);
+var scene=session.Scene;
+var config=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/orion/capture-config.json")));
+var output=System.IO.Path.Combine(root,"output/orion/captures");System.IO.Directory.CreateDirectory(output);
+var camera=scene.GetAllComponents<CameraComponent>().Single(c=>c.GameObject.Name=="editor_camera"&&c.GameObject.Flags.HasFlag(GameObjectFlags.EditorOnly));
+var oldPosition=camera.WorldPosition;var oldRotation=camera.WorldRotation;var oldFov=camera.FieldOfView;
+var oldSize=camera.CustomSize;var oldAxis=camera.FovAxis;var oldOrtho=camera.Orthographic;
+var models=scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.ResourcePath?.StartsWith("models/maps/orion/")==true).ToArray();
+if(models.Length!=6||models.Any(r=>r.Model.IsError))throw new InvalidOperationException("Orion models are missing or failed compilation");
+using(scene.Push())foreach(var renderer in models)for(var i=0;i<renderer.Materials.Count;i++)
+{
+    var material=renderer.Materials.GetOverride(i)??renderer.Materials.GetOriginal(i);
+    if(material is null||material.IsError)throw new InvalidOperationException("Missing material");
+    foreach(var key in new[]{"g_tColor","g_tNormal","g_tRma"})material.GetTexture(key)?.MarkUsed(2048);
+}
+await Task.Delay(750,cancellationToken);
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var compose=typeof(CameraComponent).GetMethod("ComposeView",flags,null,Type.EmptyTypes,null);
+var post=scene.GetSystem<PostProcessSystem>();
+var updatePost=typeof(PostProcessSystem).GetMethod("UpdateCamera",flags);
+Vector3 World(System.Text.Json.Nodes.JsonNode p)=>new(p[1].GetValue<float>(),-p[0].GetValue<float>(),p[2].GetValue<float>());
+var results=new System.Collections.Generic.List<object>();
+try
+{
+    using(scene.Push())using(var bitmap=new Bitmap(config["width"].GetValue<int>(),config["height"].GetValue<int>()))
+    foreach(var view in config["views"].AsArray())
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+        typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+        for(var i=0;i<3;i++)
+        {
+            camera.WorldPosition=World(view["eye"]);camera.WorldRotation=Rotation.LookAt(World(view["target"])-camera.WorldPosition);
+            camera.FieldOfView=view["fov"].GetValue<float>();
+            camera.CustomSize=new Vector2(config["width"].GetValue<int>(),config["height"].GetValue<int>());
+            camera.FovAxis=CameraComponent.Axis.Horizontal;camera.Orthographic=false;
+            compose.Invoke(camera,null);
+            foreach(var other in scene.GetAllComponents<CameraComponent>())updatePost.Invoke(post,new object[]{other});
+            camera.RenderToBitmap(bitmap,false);
+        }
+        var name=view["name"].GetValue<string>();System.IO.File.WriteAllBytes(System.IO.Path.Combine(output,name+".png"),bitmap.ToPng());
+        var nativeCamera=typeof(CameraComponent).GetField("sceneCamera",flags).GetValue(camera);
+        var nativeTone=nativeCamera.GetType().GetProperty("Tonemap",flags).GetValue(nativeCamera);
+        object NativeTone(string propertyName)=>nativeTone.GetType().GetProperty(propertyName,flags).GetValue(nativeTone);
+        results.Add(new{Name=name,Position=camera.WorldPosition.ToString(),Angles=camera.WorldRotation.Angles().ToString(),camera.FieldOfView,
+            ViewFieldOfView=camera.View.FieldOfView,NativeMinExposure=NativeTone("MinExposure"),NativeMaxExposure=NativeTone("MaxExposure"),
+            NativeAutoExposure=NativeTone("Enabled")});
+    }
+}
+finally
+{
+    camera.WorldPosition=oldPosition;camera.WorldRotation=oldRotation;camera.FieldOfView=oldFov;
+    camera.CustomSize=oldSize;camera.FovAxis=oldAxis;camera.Orthographic=oldOrtho;
+    using(scene.Push()){compose.Invoke(camera,null);foreach(var other in scene.GetAllComponents<CameraComponent>())updatePost.Invoke(post,new object[]{other});}
+}
+var result=new{NativeEngineCapture=true,Captures=results};
+System.IO.File.WriteAllText(System.IO.Path.Combine(output,"metadata.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

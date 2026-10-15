@@ -1,0 +1,48 @@
+if(Game.IsPlaying) throw new InvalidOperationException("Stop play before assigning reflections");
+var root=Sandbox.Project.Current.GetRootPath();
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.Source?.ResourcePath?.Equals("scenes/maps/orion/orion.scene",StringComparison.OrdinalIgnoreCase)==true);
+var directory=System.IO.Path.Combine(root,"Assets/materials/orion/reflections");
+var destination=System.IO.Path.Combine(root,"Assets/lighting/orion");
+var config=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/orion/reflection-config.json")));
+var revision=config["revision"]?.GetValue<string>()??"v1";
+if(!System.Text.RegularExpressions.Regex.IsMatch(revision,"^v[0-9]+$"))throw new InvalidOperationException("Invalid reflection revision");
+System.IO.Directory.CreateDirectory(destination);
+var result=new System.Collections.Generic.List<object>();
+foreach(var label in new[]{"Yard","Control","Service"})
+{
+    var files=System.IO.Directory.GetFiles(directory,$"reflection_{label}_exr_*.generated.vtex_c");
+    if(files.Length!=1) throw new InvalidOperationException("Expected one compiled cube: "+label);
+    var path="lighting/orion/reflection_"+label.ToLowerInvariant()+"_"+revision+".vtex";
+    System.IO.File.Copy(files[0],System.IO.Path.Combine(root,"Assets",path+"_c"),true);
+    var texture=Texture.Load(path,false);
+    if(texture is null || texture.IsError) throw new InvalidOperationException("Reflection texture did not load: "+path);
+    var probe=session.Scene.GetAllComponents<EnvmapProbe>().SingleOrDefault(p=>p.GameObject.Name==label);
+    var meta=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/orion/reflections",label,"face-0.json")));
+    var position=Vector3.Parse(meta["Position"].GetValue<string>());
+    if(probe is null)
+    {
+        using(session.Scene.Push())
+        {
+            var go=new GameObject(false,label);go.NetworkMode=NetworkMode.Snapshot;
+            probe=go.Components.Create<EnvmapProbe>();
+        }
+    }
+    probe.Bounds=label switch
+    {
+        "Yard"=>new BBox(new Vector3(-1170,-1100,-100),new Vector3(1950,1100,1100)),
+        "Control"=>new BBox(new Vector3(-1100,-350,-330),new Vector3(2000,350,270)),
+        _=>new BBox(new Vector3(-420,-900,-100),new Vector3(700,1300,116))
+    };
+    probe.GameObject.NetworkMode=NetworkMode.Snapshot;
+    probe.WorldPosition=position;
+    probe.Texture=texture;
+    var mode=typeof(EnvmapProbe).GetProperty("Mode");
+    mode.SetValue(probe,Enum.Parse(mode.PropertyType,"CustomTexture"));
+    probe.Priority=label=="Yard"?0:2;
+    probe.Feathering=64;
+    probe.GameObject.Enabled=true;
+    result.Add(new {Label=label,Texture=texture.ResourcePath,texture.Width,texture.Height,texture.Mips,Mode=probe.Mode.ToString()});
+}
+typeof(Editor.SceneEditorSession).GetProperty("HasUnsavedChanges").SetValue(session,true);
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/orion/reflections/validation.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

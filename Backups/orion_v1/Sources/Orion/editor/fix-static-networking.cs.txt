@@ -1,0 +1,11 @@
+// Static map visuals must be included in the scene snapshot sent to clients.
+// Never is appropriate for runtime-only review cameras, not authored map objects.
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/orion/orion.scene",StringComparison.OrdinalIgnoreCase)==true);
+var objects=session.Scene.GetAllObjects(false).Where(g=>g.NetworkMode==NetworkMode.Never &&
+    (g.Name=="Orion vista woodland" || g.Name=="Range oak" || g.Name.StartsWith("Orion cryogenic vent") || g.Components.Get<EnvmapProbe>().IsValid())).ToArray();
+using(session.Scene.Push())
+using(session.UndoScope("Replicate Orion static visuals").WithGameObjectChanges(objects,GameObjectUndoFlags.Properties).Push())
+    foreach(var go in objects)go.NetworkMode=NetworkMode.Snapshot;
+typeof(Editor.SceneEditorSession).GetProperty("HasUnsavedChanges").SetValue(session,true);
+session.Save(false);
+return new{Updated=objects.Length,Mode=NetworkMode.Snapshot.ToString(),Saved=!session.HasUnsavedChanges,Names=objects.Select(g=>g.Name).Distinct().ToArray()};

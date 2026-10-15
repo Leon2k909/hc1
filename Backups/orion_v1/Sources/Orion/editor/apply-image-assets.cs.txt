@@ -1,0 +1,11 @@
+// Select the imported v2 sky through the editor; the concrete material hotloads.
+if(Game.IsPlaying || Networking.IsActive)throw new InvalidOperationException("Stop the test before editing Orion");
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/orion/orion.scene",StringComparison.OrdinalIgnoreCase)==true);
+var sky=Material.Load("materials/orion/sky/orion_sky_v2.vmat");
+var concrete=Material.Load("materials/orion/or_concrete.vmat");
+if(sky is null || sky.IsError || concrete is null || concrete.IsError)throw new InvalidOperationException("Import and compile both materials first");
+var component=session.Scene.GetAllComponents<SkyBox2D>().Single();
+var previous=component.SkyMaterial?.ResourcePath;
+component.SkyMaterial=sky;
+typeof(Editor.SceneEditorSession).GetProperty("HasUnsavedChanges").SetValue(session,true);
+return new {PreviousSky=previous,Sky=sky.ResourcePath,Concrete=concrete.ResourcePath,SavedScene=false};

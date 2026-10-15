@@ -1,0 +1,15 @@
+if(!Game.IsPlaying || Game.ActiveScene?.Source?.ResourcePath?.Equals("scenes/maps/orion/orion.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Orion must be running");
+var scene=Game.ActiveScene;
+var clients=scene.GetAllComponents<Facepunch.Client>().Select(c=>new{
+    Name=c.GameObject.Name,Connection=c.Connection?.Id,Connected=c.IsConnected,Team=c.Team.ToString(),HasPawn=c.PlayerPawn is not null,
+    Position=c.PlayerPawn?.WorldPosition.ToString(),Health=c.PlayerPawn?.HealthComponent?.Health}).ToArray();
+var connections=Networking.Connections.Select(c=>new{c.Id,c.Name,c.IsHost,c.IsActive,c.IsConnecting,c.Ping}).ToArray();
+var result=new{Scene=scene.Source.ResourcePath,CheckedAt=DateTime.UtcNow,Networking.IsActive,Networking.IsHost,
+    Connections=connections,Clients=clients,NavEnabled=scene.NavMesh.IsEnabled,NavGenerating=scene.NavMesh.IsGenerating,
+    MissingModels=scene.GetAllComponents<ModelRenderer>().Where(m=>m.Model is null||m.Model.IsError).Select(m=>m.GameObject.Name).ToArray(),
+    MainMenuListed=Facepunch.GameUtils.GetAvailableMaps().Any(m=>m.ResourcePath.Equals(scene.Source.ResourcePath,StringComparison.OrdinalIgnoreCase)),
+    MatchListed=Facepunch.GameUtils.GetMatchMaps().Any(m=>m.ResourcePath.Equals(scene.Source.ResourcePath,StringComparison.OrdinalIgnoreCase))};
+System.IO.File.WriteAllText(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/orion/network-validation.json"),
+    System.Text.Json.JsonSerializer.Serialize(result,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return result;

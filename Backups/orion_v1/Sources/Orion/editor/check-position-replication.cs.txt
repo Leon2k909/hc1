@@ -1,0 +1,25 @@
+// Exercise the project's existing owner RPC on the connected test client's pawn.
+// Run only between the before/after snapshots; this does not change map assets.
+var scene=Game.ActiveScene;
+if(!Game.IsPlaying || !Networking.IsHost || scene?.Source?.ResourcePath?.Equals("scenes/maps/orion/orion.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("The Orion test host must be running");
+var remote=scene.GetAllComponents<Facepunch.Client>().Single(c=>!c.IsBot && c.IsConnected && c.Connection!=Connection.Local);
+var pawn=remote.PlayerPawn;
+if(!pawn.IsValid() || pawn.Network.Owner!=remote.Connection) throw new InvalidOperationException("The remote pawn is not ready");
+var before=pawn.WorldPosition;
+Vector3? selected=null;
+foreach(var offset in new[]{new Vector3(64,0,0),new Vector3(-64,0,0),new Vector3(0,64,0),new Vector3(0,-64,0)})
+{
+    var candidate=scene.NavMesh.GetClosestPoint(before+offset,32);
+    if(candidate is null || (candidate.Value-before).Length<32)continue;
+    var p=candidate.Value+Vector3.Up;
+    var floor=scene.Trace.Ray(p+Vector3.Up*8,p+Vector3.Down*32).WithoutTags("zone").Run();
+    var box=scene.Trace.Box(new BBox(new Vector3(-16,-16,2),new Vector3(16,16,64)),p,p).WithoutTags("zone").Run();
+    if(floor.Hit && !box.Hit && !box.StartedSolid){selected=p;break;}
+}
+if(selected is null)throw new InvalidOperationException("No clear supported position near the remote pawn");
+pawn.Teleport(selected.Value,pawn.WorldRotation);
+var result=new{Method="PlayerPawn.Teleport owner RPC",Connection=remote.Connection.Id,Pawn=pawn.GameObject.Id,
+    Before=before.ToString(),Requested=selected.Value.ToString()};
+System.IO.File.WriteAllText(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/orion/position-replication-command.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

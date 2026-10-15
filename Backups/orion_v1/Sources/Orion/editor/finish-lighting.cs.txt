@@ -1,0 +1,35 @@
+if(Game.IsPlaying)throw new InvalidOperationException("Stop play before the finishing pass");
+var root=Sandbox.Project.Current.GetRootPath();
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.Source?.ResourcePath?.Equals("scenes/maps/orion/orion.scene",StringComparison.OrdinalIgnoreCase)==true);
+var scene=session.Scene;
+var data=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/orion/final-lights.json"))).AsArray();
+foreach(var item in data)
+{
+    var name=item["name"].GetValue<string>();
+    var light=scene.GetAllComponents<PointLight>().Single(l=>l.GameObject.Name==name);
+    light.WorldPosition=Vector3.Parse(item["position"].GetValue<string>());
+    light.LightColor=Color.Parse(item["color"].GetValue<string>()).Value;
+    light.Radius=item["radius"].GetValue<float>();
+    light.Shadows=item["shadows"].GetValue<bool>();
+}
+var treeData=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/orion/forest.json"))).AsArray();
+var models=new[]{Model.Load("models/vista/trees/3d/vista_oak_a.vmdl"),Model.Load("models/vista/trees/3d/vista_oak_b.vmdl")};
+if(models.Any(m=>m is null||m.IsError))throw new InvalidOperationException("Vista tree model missing");
+using(scene.Push())
+{
+    var forest=scene.GetAllObjects(true).SingleOrDefault(g=>g.Name=="Orion vista woodland");
+    if(forest is not null)forest.Destroy();
+    forest=new GameObject(true,"Orion vista woodland");
+    forest.NetworkMode=NetworkMode.Snapshot;
+    foreach(var item in treeData)
+    {
+        var tree=new GameObject(true,"Range oak");tree.Parent=forest;tree.NetworkMode=NetworkMode.Snapshot;
+        var model=models[item["variant"].GetValue<int>()];
+        tree.WorldPosition=Vector3.Parse(item["position"].GetValue<string>());
+        tree.WorldRotation=Rotation.FromYaw(item["yaw"].GetValue<float>());
+        tree.WorldScale=Vector3.One*(item["height"].GetValue<float>()/model.Bounds.Size.z);
+        tree.Components.Create<ModelRenderer>().Model=model;
+    }
+}
+typeof(Editor.SceneEditorSession).GetProperty("HasUnsavedChanges").SetValue(session,true);
+return new{Lights=data.Count,Trees=treeData.Count,TreeBounds=models.Select(m=>new{m.ResourcePath,Size=m.Bounds.Size.ToString()})};

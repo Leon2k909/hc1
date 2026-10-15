@@ -436,7 +436,7 @@ public static partial class GameUtils
 		return Team.Unassigned;
 	}
 
-	private static readonly string[] MainMenuMapOrder = { "Refinery", "Flatgrass", "Depot", "Innocent Hotel", "Belltower", "Reef Hall", "Railhead", "Lowtide", "Boxyard", "Cerro Blanco", "Riverdale", "Ares", "Aesthetic Mall" };
+	private static readonly string[] MainMenuMapOrder = { "Refinery", "Flatgrass", "Depot", "Innocent Hotel", "Belltower", "Reef Hall", "Railhead", "Lowtide", "Boxyard", "Cerro Blanco", "Riverdale", "Ares", "Aesthetic Mall", "Orion" };
 
 	/// <summary>Maps currently excluded from quick play / lobby selection (work in progress).</summary>
 	private static readonly HashSet<string> DisabledMaps = new( StringComparer.OrdinalIgnoreCase )
@@ -472,7 +472,8 @@ public static partial class GameUtils
 			|| path.Contains( "scenes/maps/boxyard/boxyard.scene", StringComparison.OrdinalIgnoreCase )
 			|| path.Contains( "scenes/maps/cerroblanco/cerroblanco.scene", StringComparison.OrdinalIgnoreCase )
 			|| path.Contains( "scenes/maps/riverdale/riverdale.scene", StringComparison.OrdinalIgnoreCase )
-			|| path.Contains( "scenes/maps/ares/ares.scene", StringComparison.OrdinalIgnoreCase );
+			|| path.Contains( "scenes/maps/ares/ares.scene", StringComparison.OrdinalIgnoreCase )
+			|| path.Contains( "scenes/maps/orion/orion.scene", StringComparison.OrdinalIgnoreCase );
 	}
 
 	/// <summary>
@@ -492,7 +493,8 @@ public static partial class GameUtils
 			|| path.Contains( "scenes/maps/boxyard/boxyard.scene", StringComparison.OrdinalIgnoreCase )
 			|| path.Contains( "scenes/maps/cerroblanco/cerroblanco.scene", StringComparison.OrdinalIgnoreCase )
 			|| path.Contains( "scenes/maps/riverdale/riverdale.scene", StringComparison.OrdinalIgnoreCase )
-			|| path.Contains( "scenes/maps/ares/ares.scene", StringComparison.OrdinalIgnoreCase );
+			|| path.Contains( "scenes/maps/ares/ares.scene", StringComparison.OrdinalIgnoreCase )
+			|| path.Contains( "scenes/maps/orion/orion.scene", StringComparison.OrdinalIgnoreCase );
 	}
 
 	private static int GetMainMenuMapOrder( SceneFile map )

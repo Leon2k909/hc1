@@ -1,0 +1,38 @@
+if(Game.IsPlaying)throw new InvalidOperationException("Stop play before editing atmosphere");
+var root=Sandbox.Project.Current.GetRootPath();
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.Source?.ResourcePath?.Equals("scenes/maps/orion/orion.scene",StringComparison.OrdinalIgnoreCase)==true);
+var scene=session.Scene;
+var fog=scene.GetAllComponents<GradientFog>().Single();
+fog.StartDistance=2600;fog.EndDistance=10500;fog.Color=new Color(.39f,.45f,.51f,.85f);
+var source=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Assets/prefabs/weapon_effects/gun_smoke.prefab")));
+var template=source["RootObject"]["Children"][0].AsObject();
+var positions=new[]{new Vector3(1100,-150,330),new Vector3(1300,-570,670),new Vector3(-300,1040,190),new Vector3(500,-1040,190)};
+using(scene.Push())for(var i=0;i<positions.Length;i++)
+{
+    var name="Orion cryogenic vent "+(i+1);
+    scene.GetAllObjects(true).SingleOrDefault(g=>g.Name==name)?.Destroy();
+    var node=template.DeepClone().AsObject();node["__guid"]=Guid.NewGuid().ToString();node["Name"]=name;node["Position"]=positions[i].ToString();
+    foreach(var c in node["Components"].AsArray())
+    {
+        c["__guid"]=Guid.NewGuid().ToString();
+        switch(c["__type"].GetValue<string>())
+        {
+            case "Sandbox.ParticleEffect":
+                c["Lifetime"]=4;c["MaxParticles"]=32;c["PreWarm"]=3;c["Damping"]=0;c["Force"]=false;
+                c["ConstantMovement"]=System.Text.Json.Nodes.JsonNode.Parse("{\"X\":8,\"Y\":3,\"Z\":42}");
+                c["Tint"]=".88,.91,.95,1";c["Brightness"]=1.25;
+                c["Scale"]=System.Text.Json.Nodes.JsonNode.Parse("{\"Type\":\"Curve\",\"Evaluation\":\"Life\",\"CurveA\":[{\"x\":0,\"y\":18,\"in\":0,\"out\":0,\"mode\":\"Linear\"},{\"x\":1,\"y\":105,\"in\":0,\"out\":0,\"mode\":\"Linear\"}]}");
+                c["Alpha"]["CurveA"][1]["y"]=.24;c["Alpha"]["CurveA"][2]["y"]=.12;
+                break;
+            case "Sandbox.ParticleBoxEmitter":
+                c["Burst"]=0;c["DestroyOnEnd"]=false;c["Duration"]=10;c["Loop"]=true;c["Rate"]=6;c["Size"]="12,12,8";
+                break;
+            case "Sandbox.ParticleSpriteRenderer":c["DepthFeather"]=24;c["FogStrength"]=1;break;
+        }
+    }
+    var go=new GameObject(false,name);
+    try {go.Deserialize(System.Text.Json.Nodes.JsonNode.Parse(node.ToJsonString()).AsObject());go.NetworkMode=NetworkMode.Snapshot;go.Enabled=true;}
+    catch {go.Destroy();throw;}
+}
+typeof(Editor.SceneEditorSession).GetProperty("HasUnsavedChanges").SetValue(session,true);
+return new{Vents=positions.Length,MaximumParticles=128,FogEnd=fog.EndDistance};

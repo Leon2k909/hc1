@@ -4239,6 +4239,45 @@ simulate_input.
 - Not yet checked: a match played on it (bots, every mode's objects, spawns), its frame time with 102 point lights (10
   with shadows), and any sound (it has no ambience).
 
+## Orion (multiplayer map, `Tools/orion_map.py`)
+- The user asked for a map as close as possible to their picture of a rocket launch facility at golden hour after rain
+  (2026-10-15; kept as `Sources/Orion/v2/reference.png`). Orion Aerospace, its planet-and-orbit mark, ORN and every
+  marking are the map's own. `Sources/Orion/README.md` has the build steps and the look's settings.
+- v2 (2026-10-15) replaced a first build. v1's tools and editor scripts are in `Backups/orion_v1/`; its models,
+  materials and DDGI bake were moved out of `Assets` to `output/orion/v1_assets/` on the building machine (never
+  committed, and not needed: nothing references them).
+- The picture's view is a shifted lens (its verticals are parallel): a level camera at plan `0,-560,400` looking due
+  north, 75 degrees across, rendered 1536 x 1356 and cropped to 1536 x 1024 with the horizon 346 down.
+  `Sources/Orion/v2/compare.py` renders it and prints matched patches against the picture. A pitched camera doesn't
+  frame it the same way.
+- Scripts, in order: `Tools/orion_textures.py` (the `oa_` materials; the concrete's grain is
+  `Sources/Orion/v2/concrete-grain.png`), `Tools/orion_sky.py` (Belltower's sky code with a glow round the low sun and
+  the picture's thin clouds painted in as a 2D layer: the ray-marched heaps read as cartoon puffs, so they're off),
+  `Tools/orion_map.py --stage` (with `Tools/orion_parts.py` and `Tools/orion_backdrop.py`). Each runs offline into
+  `output/orion/v2/` (ignored), then the files are copied into `Assets` and compiled with
+  `Sources/Orion/v2/editor/compile.cs.txt` until Stale is 0.
+- Layout: Red Team spawns in the west court behind Launch Control 01, Blue Team in the east court behind Fuel
+  Processing. Bomb site A is the launch deck, B the wet cargo yard. Every run checks all 93 spots (room, floor, reach,
+  no Retakes pair in sight).
+  - Launch Control's upper east side stops on the line of sight from the overlook through its front corner (a wedge
+    fills the corner), so nothing of the tower shows past the corner and the sun glows beside it as in the picture.
+  - B3 has a wedge on its south-west whose west face runs at 144 degrees (`B3_FACE_BEARING`): the picture sees B3's
+    face at an angle, its lettering and joints sloping down to the right. The fuel lines run along that face, then
+    south to the overlook's north wall; the low ones are a kerb you step over or mantle.
+  - The skyline of the hills is the picture's, measured by bearing (`orion_backdrop.SKYLINE`): past 15000 the land
+    climbs to it at the far edge. No cone trees: at that size they read as a picket fence.
+- Light: no baked indirect light. Flat ambient 0.12, exposure auto 1.0-1.6, sky tint 2.2, ColorGrading 4900 K at 0.5,
+  ColorAdjustments saturation 1.1 (its Contrast works in linear HDR space: 1.1 crushed every shadow to black).
+  Reflections: the sky's compiled cube as a static CustomTexture probe (tint 1.8) plus much stronger, only inches
+  deep copies over the wet floors open to the sky (`WET_FLOORS`), with SSR on. The cube is copied to
+  `Assets/lighting/orion/reflection_sky_<hash>.vtex_c`, named by its content so a running editor loads a new one.
+- Steam (copies of the gun smoke prefab) is unlit, so it glows against the low sun instead of going dark.
+- Don't move or delete assets a running match uses. When v1's textures were moved out from under the user's Orion
+  match (2026-10-15), the renderer reloaded them every second until the editor ran out of video memory and stalled.
+- Checked: the offline spot checks, every asset compiling, the reference view against the picture patch by patch, and
+  the user playing a match on v2 in the editor (all ten models loaded, no error models). Not yet checked: the
+  in-editor navmesh check (`Sources/Orion/v2/editor/navmesh-check.cs.txt`), a second client, and the frame time.
+
 ## Ridgeback (battle royale map, `Assets/scenes/maps/Ridgeback/`)
 - The second battle royale map, a base to build on: a valley about 1.2 km across in a ring of mountains, on an s&box
   Terrain (61440 units square, 2048 samples, 30 units apart; heights -2000 to 11000). North is +X, as on the radar.
