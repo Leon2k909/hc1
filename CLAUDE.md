@@ -4274,9 +4274,14 @@ simulate_input.
 - Steam (copies of the gun smoke prefab) is unlit, so it glows against the low sun instead of going dark.
 - Don't move or delete assets a running match uses. When v1's textures were moved out from under the user's Orion
   match (2026-10-15), the renderer reloaded them every second until the editor ran out of video memory and stalled.
-- Checked: the offline spot checks, every asset compiling, the reference view against the picture patch by patch, and
-  the user playing a match on v2 in the editor (all ten models loaded, no error models). Not yet checked: the
-  in-editor navmesh check (`Sources/Orion/v2/editor/navmesh-check.cs.txt`), a second client, and the frame time.
+- Player clips: `write_scene` sizes each railing clip ( length, thickness, height ) under its rail's heading turned
+  90 degrees. The ( size[1], size[0], size[2] ) it first copied from Riverdale laid every clip across its rail: each
+  stair's rail walled the stair off at its middle, and only the in-editor navmesh check caught it (the offline reach
+  check ignores clips).
+- Checked: the offline spot checks, every asset compiling, the reference view against the picture patch by patch, the
+  user playing a match on v2 in the editor (all ten models loaded, no error models), and the in-editor navmesh check
+  (`Sources/Orion/v2/editor/navmesh-check.cs.txt`: complete paths from both team spawns to all 95 spots). Not yet
+  checked: a second client and the frame time.
 
 ## Ridgeback (battle royale map, `Assets/scenes/maps/Ridgeback/`)
 - The second battle royale map, a base to build on: a valley about 1.2 km across in a ring of mountains, on an s&box

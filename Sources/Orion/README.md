@@ -68,5 +68,10 @@ spot. Neither touches the open scene or play state.
 
 Checked on 2026-10-15: all 93 spots pass the offline checks; every model, material, the sky and the scene compiled with
 no errors; captures of the reference view compared with the picture patch by patch; the user played a match on it in
-the editor (all ten models loaded, no error models). Not yet checked: the navmesh check in the editor, a second
-client, and the frame time.
+the editor (all ten models loaded, no error models); the navmesh check in the editor finds complete paths from both
+team spawns to all 95 spots. Not yet checked: a second client and the frame time.
+
+The offline reach check missed one thing the navmesh found: player clips. A railing's clip is a box along its rail
+(`riverdale_parts.clip`), and the scene must size it ( length, thickness, height ) under the rail's heading turned 90
+degrees (`write_scene`). Sized the other way round, as Riverdale's and Riverside's are, every clip lay across its
+rail: each stair's rail put a wall across the stair at its middle, and nothing above the terrace was reachable.

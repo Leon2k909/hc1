@@ -446,12 +446,13 @@ def launch_deck( m ):
     box( m, t1, d1, dn0, dn1, 0, G, { "default": "oa_wall", "-y": "oa_wall_dark", "+z": "oa_deck" }, STONE )
     box( m, -900, d0, 700, dn1, 0, G, { "default": "oa_wall", "-y": "oa_wall_dark", "+z": "oa_deck" }, STONE )
     s0, s1, sn0, sn1 = DECK_STAIR
-    slab( m, t0, t1, dn0, dn1, TUNNEL_TOP, G, top="oa_deck", side="oa_wall", under="oa_wall_dark", surface=None )
-    for e0_, e1_, n0_, n1_ in ( ( t0, s0 - 8, dn0, dn1 ), ( s1 + 8, t1, dn0, dn1 ), ( s0 - 8, s1 + 8, dn0, 1190 ), ( s0 - 8, s1 + 8, sn1 + 4, dn1 ) ):
+    # The slab over the tunnel, open over the deck stair from where it needs headroom.
+    for e0_, e1_, n0_, n1_ in ( ( t0, s0 - 8, dn0, dn1 ), ( s1 + 8, t1, dn0, dn1 ), ( s0 - 8, s1 + 8, dn0, 1120 ), ( s0 - 8, s1 + 8, sn1 + 4, dn1 ) ):
         if e1_ > e0_ and n1_ > n0_:
+            slab( m, e0_, e1_, n0_, n1_, TUNNEL_TOP, G, top="oa_deck", side="oa_wall", under="oa_wall_dark", surface=None )
             m.collision_box( ( e0_, n0_, TUNNEL_TOP ), ( e1_, n1_, G ), STONE )
-    railing_n( m, 1190, sn1 + 4, s0 - 6, G, name="stairwell west" )
-    railing_e( m, s0 - 8, s1 + 8, 1190, G, name="stairwell south" )
+    railing_n( m, 1120, sn1 + 4, s0 - 6, G, name="stairwell west" )
+    railing_e( m, s0 - 8, s1 + 8, 1120, G, name="stairwell south" )
     # Tunnel walls, floor, ceiling dressing.
     slab( m, t0, t1, tn0, dn1, 0, 0.2, top="oa_deck", side=None, under=None, surface=None )
     box( m, t0, t0 + 1, tn0, dn1, 0, TUNNEL_TOP, "oa_wall_dark" )
@@ -1294,7 +1295,7 @@ def write_scene( written, light_list, path ):
     for k, ( name, centre, yaw, size ) in enumerate( P.CLIPS ):
         key = f"clip/{k}"
         clip_objects.append( K.game_object( ids, f"Player Clip {name} {k}", key, K.to_world( centre ), K.yaw_rotation( yaw - 90.0 ),
-                                            tags="playerclip", components=[ box_collider( f"{key}/box", ( size[1], size[0], size[2] ), trigger=False ) ] ) )
+                                            tags="playerclip", components=[ box_collider( f"{key}/box", ( size[0], size[1], size[2] ), trigger=False ) ] ) )
     for name, b in ROOF_CLIPS:
         centre, scale = plan_box( *b )
         clip_objects.append( K.game_object( ids, f"Player Clip {name}", f"clip/{name}", centre, tags="playerclip", components=[
