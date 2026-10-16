@@ -2,7 +2,7 @@
 Riverside: a Florida trailer park on a river at night, overrun. A Zombies map built by script like Riverdale and the
 other maps (map_kit's boxes and polygons), dressed after the user's reference picture: from the entrance pad you look
 down a muddy lane past the RIVERSIDE TRAILER PARK sign and a trailer strung with lights to the LUCKY STOP, with burning
-drums, a wrecked pickup, a boarded-up camper, a guard tower's searchlight, a water tower and a full moon over the pines.
+drums, a boarded-up camper, a guard tower's searchlight, a water tower and a full moon over the pines.
 
     python Tools/riverside_map.py [--preview <dir>] [--views name ...] [--no-scene] [--no-models] [--art]
 
@@ -10,7 +10,7 @@ Run Tools/riverside_materials.py and Tools/riverside_sky.py first. Riverside Tra
 sign and slogan are the map's own. Writes:
 - the models, to Assets/models/maps/riverside/: the ground (the pad, the terrace, the park's flats, the levee, the
   ramps, the retaining walls of railroad ties, the river and the woods' floor), the lowland's trailers, the levee's
-  trailers, the store, the pad's dressing, the park's dressing (signs, poles and wires, drums, vehicles, props), the
+  trailers, the store, the pad's dressing, the park's dressing (signs, poles and wires, drums, props), the
   fence, the trees, and the backdrop (the far woods and the water tower; drawn only);
 - the scene, Assets/scenes/maps/Riverside/riverside.scene, rewritten whole on every run (change the layout here, not in
   the editor). It lists only the Zombies mode and is marked ZombiesOnly (MapInformation), so the Zombies picker offers
@@ -631,18 +631,32 @@ DRUMS = [ ( ( 20, 600, 0 ), "rs_drum_blue" ), ( ( -260, 1020, 0 ), "rs_rust" ), 
           ( ( -1720, 2560, 0 ), "rs_rust" ), ( ( -230, 3040, 0 ), "rs_drum_blue" ), ( ( -600, 520, HIGH ), "rs_rust" ) ]
 SIGN = ( ( -393, 415, HIGH ), ( 0.5, -0.866 ) )
 NO_PLACE = ( ( -60, 1150, 0 ), ( 0.05, -1.0 ) )
-PICKUP = ( ( -300, 1000, 0 ), -15.0 )
 TOWER = ( ( -530, 1600, 0 ), ( 0.3, -1.0 ) )
-SEARCH_TARGET = ( -1100, 900, 0 )
+SEARCH_TARGET = ( -410, 730, 0 )   # down the lane towards the entrance, clear of every trailer (the old aim went through one)
+BEAM_ANGLE, BEAM_OUTER = 2.5, 4.5      # the beam's half angle (to 1/e^2) and its proxy's, degrees: a searchlight's, near collimated
 SEARCH_HEAD = []
+BEAM = []           # the searchlight's cone for its material: ( apex, axis, start, end ), from riverside_parts.beam_cone
 WATER_TOWER = ( ( 1688, 3600, HIGH ), ( -0.4, -1.0 ) )
+
+
+def searchlight_lens():
+    """ The searchlight's lens centre, LAMP_LENS[0] from its head along the aim. """
+    head = np.asarray( SEARCH_HEAD, float )
+    return head + RP.unit( np.asarray( SEARCH_TARGET, float ) - head ) * P.LAMP_LENS[0]
+
+
+def write_beam_material():
+    """ rs_beam.vmat carries the cone's world-space geometry for hc1_light_beam.shader, so it's written with the models. """
+    apex, axis, start, end = BEAM
+    world_apex = K.to_world( apex )
+    world_axis = K.to_world( axis )
+    RM.write_text( RM.OUT_DIR / "rs_beam.vmat", RM.beam_vmat( world_apex, world_axis, start, end, BEAM_ANGLE, BEAM_OUTER ) )
 
 
 def dressing( m ):
     # The park's sign on the terrace behind the porch trailer, facing the entrance; the neon on its pole down the lane.
     P.park_sign( m, SIGN[0], SIGN[1], scale=0.7, height=370 )
     P.neon_sign( m, NO_PLACE[0], NO_PLACE[1] )
-    place_into( m, P.pickup( seed=3, wrecked=True ), PICKUP[0], PICKUP[1] )
     for k, ( c, paint_name ) in enumerate( DRUMS ):
         P.drum( m, c[:2], paint_name, z0=c[2], name=f"drum {k}" )
     # Utility poles along the lane and wires between them.
@@ -674,10 +688,12 @@ def dressing( m ):
     P.wire( m, taps_w[3][1], ( -620, 1480, 115 ) )
     P.wire( m, taps_e[1][1], ( 60, 1320, 115 ) )
     # The guard tower's searchlight, aimed down the lane towards the entrance.
-    head = P.guard_tower( m, TOWER[0], TOWER[1] )
+    head = P.guard_tower( m, TOWER[0], TOWER[1], aim=SEARCH_TARGET )
     P.light( "guard tower cab", ( TOWER[0][0], TOWER[0][1], 520 + 70 ), P.WARM, 200, scale=1.4 )
-    P.SPOTLIGHTS.append( ( "searchlight", tuple( float( x ) for x in head ), SEARCH_TARGET, "1.6,1.6,1.7,1", 3200, 6.0 ) )
     SEARCH_HEAD[:] = [ float( x ) for x in head ]
+    # No SpotLight for it: one as narrow as the beam lights nothing in s&box (a 3.5 degree cone lit nothing even 200
+    # from the ground, where 10 degrees did), and its falloff has died out 25 m away. hc1_light_beam.shader lights the
+    # pool where the beam lands. (Before, the light sat inside the lamp housing, which shadowed it, too.)
     # Wrecks of the night: lawn chairs, junk, blood on the mud.
     P.lawn_chair( m, ( -420, 1060 ), ( 0.7, 0.7 ) )
     P.junk_pile( m, ( -1380, 860 ), seed=8 )
@@ -1102,7 +1118,8 @@ def build():
     store( store_m )
     pad( pad_m )
     dressing( dress )
-    P.beam_cone( patch_m, SEARCH_HEAD, SEARCH_TARGET, half_angle=4.5 )
+    BEAM[:] = P.beam_cone( patch_m, searchlight_lens(), SEARCH_TARGET, lens_radius=P.LAMP_LENS[1], half_angle=BEAM_ANGLE,
+                           outer_angle=BEAM_OUTER )
     perimeter( fence )
     trees( near, far )
     backdrop( back )
@@ -1200,6 +1217,8 @@ def main():
             continue
         count = K.write_model( OUT_DIR, RESOURCE_DIR, name, model )
         print( f"{name}: {count} triangles, {len( model.boxes )} boxes, {len( model.hulls )} hulls" )
+    if not args.no_models:
+        write_beam_material()
     if R.UNKNOWN_PAINTS:
         print( f"paints with no material: {', '.join( sorted( R.UNKNOWN_PAINTS ) )}" )
 

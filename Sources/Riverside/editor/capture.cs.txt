@@ -43,12 +43,13 @@ try {
         preRender.Invoke(scene, null);
         preCameraRender.Invoke(scene, null);
     }
-    // Textures stream in: a render straight after loading samples low mips, so the lettering reads as blobs.
+    // Textures stream in: a render straight after loading samples low mips, so the lettering reads as blobs. 2048 at
+    // most: the editor is shared, and a whole map forced to 4096 ran another session's out of video memory (2026-10-15).
     var marked = 0;
     var textureNames = new[] { "g_tColor", "g_tNormal", "g_tRoughness", "g_tSelfIllumMask", "g_tAmbientOcclusion", "g_tTransmissiveColor" };
     foreach (var material in scene.GetAllComponents<ModelRenderer>().Where(r => r.Model is not null).SelectMany(r => r.Model.Materials).Distinct())
         foreach (var texture in textureNames.Select(material.GetTexture).Append(material.FirstTexture).Where(t => t is not null).Distinct())
-        { texture.MarkUsed(4096); marked++; }
+        { texture.MarkUsed(2048); marked++; }
     for (var wait = 0; wait < (configuration["stream_frames"]?.GetValue<int>() ?? 90); wait++)
     {
         using (scene.Push()) { scene.EditorTick(.016f, .016f); preRender.Invoke(scene, null); }
@@ -77,6 +78,12 @@ try {
         (Name: "burning", Eye: new Vector3(-300, 2200, 80), Target: new Vector3(140, 2650, 120), Fov: 80f),
         (Name: "aerial", Eye: new Vector3(-3200, -3200, 3800), Target: new Vector3(-300, 1200, 0), Fov: 60f),
         (Name: "map_art", Eye: refEye, Target: refTarget, Fov: 80f),
+        // The searchlight's beam (lens ~(-521,1544,572), landing at (-410,730,0)): side on, from under it, up it, and down the lane.
+        (Name: "beam_side", Eye: new Vector3(80, 1150, 70), Target: new Vector3(-470, 1150, 260), Fov: 80f),
+        (Name: "beam_under", Eye: new Vector3(-380, 780, 64), Target: new Vector3(-521, 1544, 572), Fov: 85f),
+        (Name: "beam_tower", Eye: new Vector3(-80, 650, 64), Target: new Vector3(-520, 1560, 480), Fov: 85f),
+        (Name: "beam_lane", Eye: new Vector3(-300, 1300, 64), Target: new Vector3(-410, 600, 40), Fov: 85f),
+        (Name: "beam_pool", Eye: new Vector3(-60, 980, 64), Target: new Vector3(-420, 720, 20), Fov: 85f),
     };
     var wanted = configuration["views"] is System.Text.Json.Nodes.JsonArray list
         ? list.Select(x => x.GetValue<string>()).ToHashSet() : views.Select(x => x.Name).ToHashSet();

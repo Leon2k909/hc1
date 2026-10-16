@@ -1,9 +1,19 @@
-// Tools/riverside_materials.py
+// Tools/riverside_map.py (riverside_materials.beam_vmat)
 "Layer0"
 {
     shader "shaders/hc1_light_beam.shader"
     g_vBeamColour "[0.780000 0.840000 1.000000 0.000000]"
-    g_flBeamIntensity "0.9"
-    g_flBeamReach "1.0"
-    g_flSoftDepth "60"
+    g_flBeamIntensity "0.25"
+    g_flPhaseG "0.45"
+    g_flHazeDetail "0.35"
+    g_flHazeScale "140"
+    g_flHazeDrift "6"
+    g_flPoolIntensity "150"
+    g_vPoolAlbedo "[0.320000 0.250000 0.180000 0.000000]"
+    g_vBeamApex "[1690.8621 533.0761 677.1312 0.000000]"
+    g_vBeamAxis "[-0.8130 -0.1041 -0.5729 0.000000]"
+    g_flBeamStart "183.230"
+    g_flBeamEnd "1681.249"
+    g_flBeamHalfAngle "2.500"
+    g_flBeamOuterAngle "4.500"
 }

@@ -4133,9 +4133,36 @@ simulate_input.
   sides, sandbags along its front, steps up its back): a player standing on it sees the picture's view. The `player`
   capture view is from the pad.
 - The guard tower's searchlight throws a visible beam (`riverside_parts.beam_cone`, `rs_beam`,
-  `shaders/hc1_light_beam.shader`: an additive cone, fading along its length, at its silhouette's edges and where it
-  meets the ground), drawn in the patches model so it casts no shadow. A new shader needs
+  `shaders/hc1_light_beam.shader`), drawn in the patches model so it casts no shadow. A new shader needs
   `EditorUtility.CompileShader` before its vmat compiles.
+  - Redone on 2026-10-15 (the user: "this light needs work its awful"). It was a textured additive cone at intensity
+    0.9: at night's exposure it blew out to a solid milky cone with hard edges, cut through the trailer it was aimed
+    past, and pointed down while the lamp housing pointed level.
+  - Now the cone is only a closed proxy (a truncated cone, outward normals) to shade inside. The shader takes each
+    pixel's ray once (on the proxy's far side: its normal facing away from the eye), works out where the ray is inside
+    the cone analytically, clips that at the opaque scene's depth (no depth test), and marches 24 steps of single
+    scattering through it:
+    - the light spreads from a virtual source behind the 8" lens (`LAMP_LENS`), 2.5 degrees to 1/e^2 (`BEAM_ANGLE`, a
+      searchlight's near-collimated beam; at 4.5 it faded out before the ground), with a flat-topped soft profile,
+      falling as one over the distance squared;
+    - Henyey-Greenstein forward scattering (g 0.45), so it's brighter looking up the beam; looking into the lamp is
+      capped (`min( sum, 6 )`) but still dazzles;
+    - slowly drifting lumpy haze (value noise), and the scene's fog between the eye and the beam dims it.
+  - The pool where it lands is lit by the same shader: any surface the eye sees inside the cone gets Lambert light
+    (normal from the neighbouring pixels' depth) over an assumed muddy albedo (`g_flPoolIntensity` 150,
+    `g_vPoolAlbedo`). It lights a zombie in the beam too, but casts no shadows.
+  - There's no SpotLight for it any more. In s&box a spot as narrow as the beam lights nothing (offscreen tests: 3.5
+    degrees lit nothing even 200 from the ground, 10 degrees did), and its quadratic falloff had died out 25 m away
+    even at 75 times the brightness. The old one also sat inside the lamp housing with shadows on.
+  - The cone's world-space geometry is in its material, so `riverside_map.py` writes `rs_beam.vmat`
+    (`riverside_materials.beam_vmat`) with the models; the materials script no longer does.
+  - The lamp housing points at the target (`guard_tower(..., aim=)`). The target is `(-410, 730, 0)`, down the lane
+    towards the entrance: every ray of the old one at `(-1100, 900)`, centre included, went through a lowland trailer's
+    roof. A scratch check (rays inside 6 degrees against the solid models' collision) found the new one clear.
+  - Checked in offscreen captures (`capture.cs.txt`'s `beam_side`, `beam_under`, `beam_tower`, `beam_lane`,
+    `beam_pool` and `reference`), not yet in a match.
+- The wrecked pickup in the lane came out on 2026-10-15 (the user: "remove this car its trash"). `riverside_parts.pickup`
+  is still there, unused.
 - The sky's cloud bodies are lighter than the clear sky behind them (moonlit grey-blue), as in the picture; drawn darker,
   they vanished. The scene's sky tint is 3.4.
 - Zombies only: the scene lists only `zombies.prefab` and sets `MapInformation.ZombiesOnly` (the Sewage map's flag),

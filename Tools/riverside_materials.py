@@ -1548,16 +1548,30 @@ METALNESS = { "rs_siding": 0.35, "rs_roof": 0.6, "rs_skirt": 0.3, "rs_rust": 0.2
 NAMES = list( SURFACES ) + [ "rs_chainlink", "lit", "signs", "paint", "trees", "painted" ]
 
 
-# The searchlight's beam (riverside_parts.beam_cone): additive light through the haze, hc1_light_beam.shader.
-BEAM_VMAT = """// Tools/riverside_materials.py
+# The searchlight's beam (riverside_parts.beam_cone): single scattering off the haze in its cone, hc1_light_beam.shader.
+# The cone's geometry is the map's, so riverside_map.py writes it with the models.
+def beam_vmat( apex, axis, start, end, half_angle, outer_angle ):
+    """ apex and axis in world space, start and end along the axis from the apex (inches), the angles in degrees. """
+    vec = lambda p: "[" + " ".join( f"{float( x ):.4f}" for x in p ) + " 0.000000]"
+    return f"""// Tools/riverside_map.py (riverside_materials.beam_vmat)
 "Layer0"
-{
+{{
     shader "shaders/hc1_light_beam.shader"
     g_vBeamColour "[0.780000 0.840000 1.000000 0.000000]"
-    g_flBeamIntensity "0.9"
-    g_flBeamReach "1.0"
-    g_flSoftDepth "60"
-}
+    g_flBeamIntensity "0.25"
+    g_flPhaseG "0.45"
+    g_flHazeDetail "0.35"
+    g_flHazeScale "140"
+    g_flHazeDrift "6"
+    g_flPoolIntensity "150"
+    g_vPoolAlbedo "[0.320000 0.250000 0.180000 0.000000]"
+    g_vBeamApex "{vec( apex )}"
+    g_vBeamAxis "{vec( axis )}"
+    g_flBeamStart "{start:.3f}"
+    g_flBeamEnd "{end:.3f}"
+    g_flBeamHalfAngle "{half_angle:.3f}"
+    g_flBeamOuterAngle "{outer_angle:.3f}"
+}}
 """
 
 
@@ -1620,7 +1634,6 @@ def build( name, out ):
                                                      tint=( 1.25, 0.85, 0.5 ), alpha_ref=0.4 ) )
         print( "wrote tree cards" )
     elif name == "painted":
-        write_text( out / "rs_beam.vmat", BEAM_VMAT )
         for p, ( rgb, metal, rough, glow ) in PAINTED.items():
             write_text( out / f"{p}.vmat", painted_vmat( rgb, metal, rough, glow ) )
         print( f"wrote {len( PAINTED )} flat paints" )

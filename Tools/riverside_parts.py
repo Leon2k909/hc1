@@ -707,7 +707,7 @@ def junk_pile( m, c, seed=0, z0=0.0 ):
 
 def pickup( seed=3, wrecked=True ):
     """ A 1980s full-size pickup in its own frame (x forward, nose at +x), rusted out, flat tyres, windows smashed.
-    About 210 long, 78 wide. """
+    About 210 long, 78 wide. Unused: the user had it taken out of Riverside (2026-10-15). """
     m = K.Model()
     rng = np.random.default_rng( seed )
     paint_ = "rs_truck_blue" if seed % 2 else "rs_truck"
@@ -977,9 +977,13 @@ def water_tower( m, base, facing=( -1, -1 ) ):
     m.collision_box( b - v( 20, 20, 0 ), b + v( 20, 20, z0 ), METAL )
 
 
-def guard_tower( m, base, facing=( 0, -1 ), deck=520.0 ):
+LAMP_LENS = ( 10.2, 8.0 )      # the searchlight's lens: how far along its aim from the head, its radius
+
+
+def guard_tower( m, base, facing=( 0, -1 ), deck=520.0, aim=None ):
     """ A timber watchtower somebody put up after it started: four poles, X bracing, a plywood cab with a corrugated
-    roof, a ladder, and a searchlight sweeping the park. """
+    roof, a ladder, and a searchlight sweeping the park, pointed at aim (else straight out along facing). Returns the lamp
+    head's centre; its lens is LAMP_LENS[0] along the aim from there, LAMP_LENS[1] in radius. """
     b = v( base[0], base[1], base[2] if len( base ) > 2 else 0.0 )
     f = unit( ( facing[0], facing[1], 0 ) )
     side = np.cross( UP, f )
@@ -1026,30 +1030,45 @@ def guard_tower( m, base, facing=( 0, -1 ), deck=520.0 ):
     sl = deck_c + f * ( hw - 6 ) + UP * 52
     cylinder( m, sl, 2.5, sl[2] - 10, sl[2], "rs_steel", 8 )
     head = sl + UP * 6
-    rod( m, head - f * 8, head + f * 10, 9, "rs_dark", 12, caps=True )
-    card( m, "rs_lamp_search", [ head + f * 10.2 + ( side * math.cos( 2 * math.pi * k / 12 ) + UP * math.sin( 2 * math.pi * k / 12 ) ) * 8 for k in range( 12 ) ], f )
+    a = unit( v( *aim ) - head ) if aim is not None else f
+    a_side, a_up = RP.perp( a )
+    rod( m, sl + UP * 2, head, 1.5, "rs_steel", 6 )
+    rod( m, head - a * 8, head + a * 10, 9, "rs_dark", 12, caps=True )
+    card( m, "rs_lamp_search", [ head + a * LAMP_LENS[0] + ( a_side * math.cos( 2 * math.pi * k / 12 ) + a_up * math.sin( 2 * math.pi * k / 12 ) ) * LAMP_LENS[1]
+                                 for k in range( 12 ) ], a )
     m.collision_box( b - v( half_foot, half_foot, 0 ), b + v( half_foot, half_foot, 40 ), WOOD )
     return head
 
 
-def beam_cone( m, apex, target, half_angle=6.0, sides=20, start=10.0 ):
-    """ A searchlight's beam as a cone from apex towards target, drawn in rs_beam (hc1_light_beam.shader: additive, its
-    texture's v 0 at the lamp and 1 at the far end). Drawn only: put it in a model with no shadows or collision. """
-    a, t = v( *apex ), v( *target )
-    axis = t - a
-    length = float( np.linalg.norm( axis ) )
-    d = axis / length
+def beam_cone( m, lens, target, lens_radius=8.0, half_angle=4.5, outer_angle=7.5, overshoot=1.5, sides=24 ):
+    """ A searchlight's beam from a lens of lens_radius at lens towards target, as the closed proxy hc1_light_beam.shader
+    marches through (rs_beam): a truncated cone with outward normals, from the lens to overshoot times the way to the
+    target (the scene's depth ends the light where it lands). The light spreads at half_angle (where it falls to 1/e^2)
+    from a virtual source behind the lens, so it leaves the lens lens_radius wide; the proxy is outer_angle wide, past
+    where any light shows. Drawn only: put it in a model with no shadows or collision. Returns the cone for the material:
+    ( apex, axis, start, end ) in plan space, start and end along the axis from the apex. """
+    lens, t = v( *lens ), v( *target )
+    d = unit( t - lens )
+    start = lens_radius / math.tan( math.radians( half_angle ) )
+    apex = lens - d * start
+    end = start + overshoot * float( np.linalg.norm( t - lens ) )
     u, w = RP.perp( d )
-    r0 = start * math.tan( math.radians( half_angle ) ) + 4.0
-    r1 = length * math.tan( math.radians( half_angle ) )
-    p0, p1 = a + d * start, t
+    r0 = start * math.tan( math.radians( outer_angle ) )
+    r1 = end * math.tan( math.radians( outer_angle ) )
+    p0, p1 = apex + d * start, apex + d * end
+    rims = []
     for k in range( sides ):
-        a0, a1 = 2 * math.pi * k / sides, 2 * math.pi * ( k + 1 ) / sides
-        e0 = u * math.cos( a0 ) + w * math.sin( a0 )
-        e1 = u * math.cos( a1 ) + w * math.sin( a1 )
-        pts = [ p0 + e0 * r0, p0 + e1 * r0, p1 + e1 * r1, p1 + e0 * r1 ]
-        uv = [ ( k / sides, 0.0 ), ( ( k + 1 ) / sides, 0.0 ), ( ( k + 1 ) / sides, 1.0 ), ( k / sides, 1.0 ) ]
-        m.polygon( "rs_beam", pts, normal=e0 + e1, uv=uv, normals=[ e0, e1, e1, e0 ] )
+        a = 2 * math.pi * k / sides
+        e = u * math.cos( a ) + w * math.sin( a )
+        # The side's outward normal leans back towards the apex by the cone's angle.
+        n = unit( e * math.cos( math.radians( outer_angle ) ) - d * math.sin( math.radians( outer_angle ) ) )
+        rims.append( ( p0 + e * r0, p1 + e * r1, n ) )
+    for k in range( sides ):
+        ( a0, b0, n0 ), ( a1, b1, n1 ) = rims[k], rims[( k + 1 ) % sides]
+        m.polygon( "rs_beam", [ a0, a1, b1, b0 ], normal=n0 + n1, uv=[ ( 0, 0 ), ( 1, 0 ), ( 1, 1 ), ( 0, 1 ) ], normals=[ n0, n1, n1, n0 ] )
+    m.polygon( "rs_beam", [ r[0] for r in reversed( rims ) ], normal=-d )
+    m.polygon( "rs_beam", [ r[1] for r in rims ], normal=d )
+    return apex, d, start, end
 
 
 # ---------------------------------------------------------------------------------------------------------------------
