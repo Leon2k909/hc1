@@ -84,7 +84,7 @@ def height( E, N ):
     be = np.degrees( np.arctan2( E - EYE[0], N - EYE[1] ) )
     rise = np.clip( ( R - 15000.0 ) / 17000.0, 0.0, 1.0 )
     rise = rise * rise * ( 3 - 2 * rise )
-    ridge = 0.78 + 0.22 * vridged( E, N, 7000.0, 3, 91 ) + 0.06 * vfbm( E, N, 2600.0, 3, 77 )
+    ridge = 0.9 + 0.14 * vridged( E, N, 7000.0, 3, 91 ) + 0.06 * vfbm( E, N, 2600.0, 3, 77 )
     target = EYE_Z + De * np.tan( np.radians( skyline( be ) ) )
     z = np.maximum( z, rise * target * ridge )
     # Small-scale relief on the hills.
@@ -130,8 +130,8 @@ def terrain( m ):
                 qn = unit( sum( normals ) )
                 rc = ( radii[i] + radii[i + 1] ) / 2
                 zc = sum( Z[c] for c in corners ) / 4
-                if rc > 22000:
-                    paint = "oa_mountain"
+                if rc > 12000:
+                    paint = "oa_hill_far" if qn[2] >= 0.7 or rc > 22000 else "oa_rock_far"
                 elif qn[2] < 0.7:
                     paint = "oa_rock" if rc < 12000 else "oa_rock_far"
                 elif rc < 12000:

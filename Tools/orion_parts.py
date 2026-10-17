@@ -263,10 +263,13 @@ def launch_mount( m, centre, top_z, w=520.0, d=520.0, hole=220.0, name="mount" )
                 r_, "oa_pipe", 10 )
 
 
-def service_tower( m, base, w, d, h, floor=96.0, paint="oa_orange", name="gantry", lights=6, arms_to=None, cap=None ):
+def service_tower( m, base, w, d, h, floor=96.0, paint="oa_orange", name="gantry", lights=6, arms_to=None, cap=None, ledges=(),
+                   lamp_radius=340 ):
     """ A launch service tower: a rectangular lattice of steel columns and girders, a floor every floor inches with grating
     and rails, X bracing, small work lamps on the floors (lights of them cast light), swing arms reaching towards
-    arms_to (plan point) at a few floors. Drawn only. """
+    arms_to (plan point) at a few floors. ledges: ( floor, side 0-3 for -y +y -x +x, depth, width share ) work platforms
+    cantilevered off the faces, each with a rail, a lamp casting light on the steel and a brace under it, so the tower's
+    outline steps as the picture's do. Drawn only. """
     c = v( *base )
     cols_w = max( 2, int( round( w / 62 ) ) + 1 )
     cols_d = max( 2, int( round( d / 62 ) ) + 1 )
@@ -279,9 +282,10 @@ def service_tower( m, base, w, d, h, floor=96.0, paint="oa_orange", name="gantry
             if 0 < list( xs ).index( x ) < cols_w - 1 and 0 < list( ys ).index( y ) < cols_d - 1:
                 continue
             beam( m, c + v( x, y, 0 ), c + v( x, y, h ), t * 1.4, paint )
-    # The enclosed lift shaft and stairwell every fixed service structure has, so sky doesn't show through every bay.
-    cw, cd = w * 0.4, d * 0.4
-    box( m, c[0] - cw / 2, c[0] + cw / 2, c[1] - cd / 2, c[1] + cd / 2, c[2], c[2] + h - floor, { "default": paint, "+z": "oa_grating" } )
+    # The lift shaft every fixed service structure has: slim and dark, so the sky still shows through most bays, as in
+    # the picture (a wide core read as a solid block).
+    cw, cd = w * 0.2, d * 0.2
+    box( m, c[0] - cw / 2, c[0] + cw / 2, c[1] - cd / 2, c[1] + cd / 2, c[2], c[2] + h - floor, { "default": "oa_dark", "+z": "oa_grating" } )
     rng = np.random.default_rng( int( abs( c[0] ) + abs( c[1] ) ) )
     lit = 0
     for k in range( 1, floors + 1 ):
@@ -290,16 +294,16 @@ def service_tower( m, base, w, d, h, floor=96.0, paint="oa_orange", name="gantry
         for x0, x1 in zip( xs, xs[1:] ):
             for y in ( ys[0], ys[-1] ):
                 beam( m, c + v( x0, y, z ), c + v( x1, y, z ), t, rim )
-                beam( m, c + v( x0, y, z - floor ), c + v( x1, y, z ), t * 0.5, paint )
-                beam( m, c + v( x1, y, z - floor ), c + v( x0, y, z ), t * 0.5, paint )
+                beam( m, c + v( x0, y, z - floor ), c + v( x1, y, z ), t * 0.6, paint )
+                beam( m, c + v( x1, y, z - floor ), c + v( x0, y, z ), t * 0.6, paint )
         for y0, y1 in zip( ys, ys[1:] ):
             for x in ( xs[0], xs[-1] ):
                 beam( m, c + v( x, y0, z ), c + v( x, y1, z ), t, rim )
-                beam( m, c + v( x, y0, z - floor ), c + v( x, y1, z ), t * 0.5, paint )
-                beam( m, c + v( x, y1, z - floor ), c + v( x, y0, z ), t * 0.5, paint )
+                beam( m, c + v( x, y0, z - floor ), c + v( x, y1, z ), t * 0.6, paint )
+                beam( m, c + v( x, y1, z - floor ), c + v( x, y0, z ), t * 0.6, paint )
         box( m, c[0] - w / 2, c[0] + w / 2, c[1] - d / 2, c[1] + d / 2, c[2] + z - 2, c[2] + z, "oa_grating" )
         # Work lamps: a handful on each floor's edge (the picture's towers glitter with them), the odd one casting light.
-        for j in range( 4 ):
+        for j in range( 7 ):
             side = rng.integers( 4 )
             f = rng.uniform( -0.45, 0.45 )
             if side == 0:
@@ -310,8 +314,8 @@ def service_tower( m, base, w, d, h, floor=96.0, paint="oa_orange", name="gantry
                 q = c + v( -w / 2 - 3, f * d, z + 30 )
             else:
                 q = c + v( w / 2 + 3, f * d, z + 30 )
-            cast = lit < lights and rng.random() < 0.12
-            work_lamp( m, q, f"{name} lamp {k}.{j}" if cast else None, 240 )
+            cast = lit < lights and rng.random() < 0.2
+            work_lamp( m, q, f"{name} lamp {k}.{j}" if cast else None, lamp_radius )
             lit += int( cast )
     if arms_to is not None:
         target = v( arms_to[0], arms_to[1], 0 )
@@ -326,6 +330,23 @@ def service_tower( m, base, w, d, h, floor=96.0, paint="oa_orange", name="gantry
                 beam( m, start + s * 14 * sg, end + s * 14 * sg, 5, paint )
                 beam( m, start + s * 14 * sg - UP * 30, end + s * 14 * sg - UP * 10, 4, paint )
             box( m, min( start[0], end[0] ) - 2, max( start[0], end[0] ) + 2, min( start[1], end[1] ) - 2, max( start[1], end[1] ) + 2, z - 2, z, "oa_grating" )
+    rim = "oa_orange" if paint == "oa_gantry" else paint
+    for k, side, depth, share in ledges:
+        z = c[2] + k * floor
+        half = ( w if side < 2 else d ) * share / 2
+        out = ( v( 0, -1, 0 ), v( 0, 1, 0 ), v( -1, 0, 0 ), v( 1, 0, 0 ) )[side]
+        along = np.cross( UP, out )
+        face = c + out * ( ( d if side < 2 else w ) / 2 ) + UP * ( z - c[2] )
+        corners = [ face - along * half, face + along * half, face + along * half + out * depth, face - along * half + out * depth ]
+        lo, hi = np.min( corners, 0 ), np.max( corners, 0 )
+        box( m, lo[0], hi[0], lo[1], hi[1], z - 2, z, "oa_grating" )
+        for sg in ( -1, 1 ):
+            beam( m, face + along * half * sg, face + along * half * sg + out * depth, t * 0.8, rim )
+            beam( m, face + along * half * sg - UP * floor * 0.6, face + along * half * sg + out * depth * 0.9, t * 0.5, paint )
+        beam( m, corners[2], corners[3], t * 0.8, rim )
+        rail = [ ( p[0], p[1] ) for p in ( corners[0], corners[3], corners[2], corners[1] ) ]
+        P.railing( m, rail, z, "oa_yellow", height=40, post_every=48, kick=False )
+        work_lamp( m, face + out * depth * 0.6 + UP * 44, f"{name} ledge lamp {k}.{side}", lamp_radius )
     if cap:
         cap( m, c + UP * h )
 

@@ -3,11 +3,16 @@ Orion against its reference picture: renders the reference view of a scene (the 
 variant) through the editor and prints matched patches of the picture and the capture.
 
     python Sources/Orion/v2/compare.py [name] [--scene <project-relative .scene>] [--disable <ComponentType> ...]
+                                       [--exposure <fixed>] [--settle <frames>]
 
 The view is the picture's: a level camera at the overlook (Tools/orion_map.py REF_EYE, 0,-560,400) looking due north,
 75 degrees across, rendered 1536 x 1356 and cropped to the picture's 1536 x 1024 with its horizon 346 down. The
 picture has a shifted lens (its verticals are parallel), which a level render cropped low reproduces; a pitched camera
 doesn't. Writes output/orion/v2/captures/<name>.png (the crop) and prints each patch's mean colour and median.
+
+The scene's exposure is automatic and adapts over real time, so a capture taken after a few frames is darker than a
+match, where it has settled. 160 frames (several seconds) is enough for it to settle, as it does in play. Before
+2026-10-17 captures took 40 frames and stopped part-way (near 1.2, with the maximum then 1.6).
 """
 import argparse
 import json
@@ -41,12 +46,17 @@ def main():
     parser.add_argument( "name", nargs="?", default="reference" )
     parser.add_argument( "--scene", default="Assets/scenes/maps/Orion/orion.scene" )
     parser.add_argument( "--disable", nargs="*", default=[] )
+    parser.add_argument( "--exposure", type=float, help="a fixed exposure instead of the scene's automatic one" )
+    parser.add_argument( "--settle", type=int, default=160, help="frames rendered before the capture (default 160)" )
     args = parser.parse_args()
     view = { "name": args.name, "eye": [ 0, -560, 400 ], "target": [ 0, 440, 400 ], "fov": 75.0, "width": 1536, "height": 1356 }
     if args.disable:
         view["disable"] = args.disable
+    if args.exposure:
+        view["exposure"] = args.exposure
     CAPTURES.mkdir( parents=True, exist_ok=True )
-    ( CAPTURES / "config.json" ).write_text( json.dumps( { "scene": args.scene, "views": [ view ], "settle_frames": 40, "stream_frames": 100 }, indent=1 ) )
+    ( CAPTURES / "config.json" ).write_text( json.dumps( { "scene": args.scene, "views": [ view ], "settle_frames": args.settle,
+                                                           "stream_frames": 100 }, indent=1 ) )
     script = ( ROOT / "Sources/Orion/v2/editor/capture.cs.txt" ).as_posix()
     result = subprocess.run( [ str( CLI ), "--request-timeout", "590", "--call", "run_csharp", json.dumps( { "path": script } ) ],
                              cwd=str( CLI.parent ), capture_output=True, text=True, timeout=620 )

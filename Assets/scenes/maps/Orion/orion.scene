@@ -161,7 +161,7 @@
           "__guid": "ef0670e5-89c7-5a53-8488-c0eecf4d0fa1",
           "__enabled": true,
           "Flags": 0,
-          "Color": "0.52,0.5,0.52,0.82",
+          "Color": "0.47,0.45,0.47,0.82",
           "StartDistance": 1400,
           "EndDistance": 34000,
           "FalloffExponent": 0.85,
@@ -283,7 +283,7 @@
           "ExposureCompensation": 0.0,
           "ExposureMethod": "RGB",
           "MinimumExposure": 1.0,
-          "MaximumExposure": 1.6,
+          "MaximumExposure": 1.2,
           "Mode": "ACES",
           "Rate": 1
         }
@@ -1146,7 +1146,7 @@
               "Attenuation": 1,
               "FogMode": "Enabled",
               "FogStrength": 0.12,
-              "LightColor": "4.4,4.3,5.6,1",
+              "LightColor": "3.7,3.6,4.7,1",
               "Radius": 1000,
               "Shadows": false
             }
@@ -1425,8 +1425,8 @@
               "Attenuation": 1,
               "FogMode": "Enabled",
               "FogStrength": 0.5,
-              "LightColor": "7.5,7.4,9.2,1",
-              "Radius": 800,
+              "LightColor": "11.2,11,13.6,1",
+              "Radius": 700,
               "Shadows": false
             }
           ],
@@ -1458,6 +1458,68 @@
               "FogStrength": 0.5,
               "LightColor": "1.00,0.74,0.46,1",
               "Radius": 160,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "41332a29-e64b-5e5e-b6ef-004d2c174269",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "Arcade lamp 0",
+          "Position": "756,470,94",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "26059a44-c8fd-5288-844f-0cb64571f593",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.5,
+              "LightColor": "1.00,0.74,0.46,1",
+              "Radius": 300,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "c2819bb8-5a4a-5e4f-af3b-12104bb78243",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "Arcade lamp 2",
+          "Position": "756,190,94",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "620e7701-761a-527c-9c72-297fc4463970",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.5,
+              "LightColor": "1.00,0.74,0.46,1",
+              "Radius": 300,
               "Shadows": false
             }
           ],
@@ -1612,7 +1674,7 @@
               "FogMode": "Enabled",
               "FogStrength": 0.5,
               "LightColor": "1.00,0.74,0.46,1",
-              "Radius": 260,
+              "Radius": 150,
               "Shadows": false
             }
           ],
@@ -2394,11 +2456,11 @@
           "Children": []
         },
         {
-          "__guid": "b0949a42-0ad6-5aeb-a92c-cd034af5fdec",
+          "__guid": "e1e9c1e5-8332-597f-a08d-c35b2a1db6ea",
           "__version": 2,
           "Flags": 32768,
-          "Name": "West tower lamp 2.1",
-          "Position": "2899.76,-406,294",
+          "Name": "West tower lamp 1.3",
+          "Position": "2807.91,-406,222",
           "Rotation": "0,0,0,1",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
@@ -2411,25 +2473,25 @@
           "Components": [
             {
               "__type": "Sandbox.PointLight",
-              "__guid": "9510b936-95cc-573e-8b3f-7b3738aa75e1",
+              "__guid": "803232a3-848e-5169-8c2f-67d6777b5d28",
               "__enabled": true,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
               "FogStrength": 0.5,
               "LightColor": "1.00,0.70,0.40,1",
-              "Radius": 240,
+              "Radius": 340,
               "Shadows": false
             }
           ],
           "Children": []
         },
         {
-          "__guid": "a58afc07-cce2-5c54-aad8-64e8fe3859fe",
+          "__guid": "f21feacc-c81a-56d1-9941-07b89992c139",
           "__version": 2,
           "Flags": 32768,
-          "Name": "West tower lamp 4.0",
-          "Position": "2928,-586.498,438",
+          "Name": "West tower lamp 1.5",
+          "Position": "2899.76,-406,222",
           "Rotation": "0,0,0,1",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
@@ -2442,14 +2504,138 @@
           "Components": [
             {
               "__type": "Sandbox.PointLight",
-              "__guid": "f65b634e-0b13-519f-8c63-d722bdd9f2e0",
+              "__guid": "5c664a96-7265-58bc-b5a0-a337ae2f43e8",
               "__enabled": true,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
               "FogStrength": 0.5,
               "LightColor": "1.00,0.70,0.40,1",
-              "Radius": 240,
+              "Radius": 340,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "400fc080-e2b9-5d2e-9d8f-4f654c338c94",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "West tower lamp 2.2",
+          "Position": "2845.45,-406,294",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "6673effb-8cce-5733-bc34-49e82f67c701",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.5,
+              "LightColor": "1.00,0.70,0.40,1",
+              "Radius": 340,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "ef208847-1531-56e9-98e9-86224c5d4b35",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "West tower lamp 2.3",
+          "Position": "2852.63,-602,294",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "2fee6415-6970-56e6-8c7d-844bb50b0a94",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.5,
+              "LightColor": "1.00,0.70,0.40,1",
+              "Radius": 340,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "35349874-262c-5cba-8231-e2752be4e4da",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "West tower lamp 2.5",
+          "Position": "2928,-586.498,294",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "ef642494-2f0e-5af7-9f36-ba3bddac2aac",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.5,
+              "LightColor": "1.00,0.70,0.40,1",
+              "Radius": 340,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "a6550afb-32ad-536d-bf9c-0538d69006c1",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "West tower lamp 3.1",
+          "Position": "2838.12,-406,366",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "8d63cf1e-1f6c-5c61-ae98-11f092e02234",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.5,
+              "LightColor": "1.00,0.70,0.40,1",
+              "Radius": 340,
               "Shadows": false
             }
           ],
@@ -2460,7 +2646,7 @@
           "__version": 2,
           "Flags": 32768,
           "Name": "West tower lamp 4.3",
-          "Position": "2838.12,-406,438",
+          "Position": "2888.5,-602,438",
           "Rotation": "0,0,0,1",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
@@ -2480,18 +2666,18 @@
               "FogMode": "Enabled",
               "FogStrength": 0.5,
               "LightColor": "1.00,0.70,0.40,1",
-              "Radius": 240,
+              "Radius": 340,
               "Shadows": false
             }
           ],
           "Children": []
         },
         {
-          "__guid": "090de5d9-870b-5bfe-a354-371fd60d9b79",
+          "__guid": "84ce817a-5efa-5b25-be78-bf281c19a14e",
           "__version": 2,
           "Flags": 32768,
-          "Name": "West tower lamp 11.1",
-          "Position": "2759.97,-602,942",
+          "Name": "West tower lamp 6.6",
+          "Position": "2759.97,-602,582",
           "Rotation": "0,0,0,1",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
@@ -2504,25 +2690,25 @@
           "Components": [
             {
               "__type": "Sandbox.PointLight",
-              "__guid": "ee3bb047-cb44-55fe-8a72-41e8ae003175",
+              "__guid": "f183ef2b-ec16-59c6-a490-5f099b38e152",
               "__enabled": true,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
               "FogStrength": 0.5,
               "LightColor": "1.00,0.70,0.40,1",
-              "Radius": 240,
+              "Radius": 340,
               "Shadows": false
             }
           ],
           "Children": []
         },
         {
-          "__guid": "3ebd6a3a-2630-5c9c-8be3-de89da2257ed",
+          "__guid": "1794ff0a-f47e-5c06-abc6-50151a77c0dd",
           "__version": 2,
           "Flags": 32768,
-          "Name": "West tower lamp 14.3",
-          "Position": "2866.65,-602,1158",
+          "Name": "West tower lamp 7.0",
+          "Position": "2928,-498.763,654",
           "Rotation": "0,0,0,1",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
@@ -2535,25 +2721,25 @@
           "Components": [
             {
               "__type": "Sandbox.PointLight",
-              "__guid": "c2f87ddd-af55-5b98-8a41-a4516f0ab38e",
+              "__guid": "56953bce-86c5-5fd8-935c-bf92a6502c63",
               "__enabled": true,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
               "FogStrength": 0.5,
               "LightColor": "1.00,0.70,0.40,1",
-              "Radius": 240,
+              "Radius": 340,
               "Shadows": false
             }
           ],
           "Children": []
         },
         {
-          "__guid": "9b006489-bc2c-5274-aa17-9dc9824bbd6b",
+          "__guid": "46e1e9ed-88ff-5095-ac36-79f70a056a72",
           "__version": 2,
           "Flags": 32768,
-          "Name": "West tower lamp 17.3",
-          "Position": "2928,-482.907,1374",
+          "Name": "West tower lamp 8.1",
+          "Position": "2837.2,-406,726",
           "Rotation": "0,0,0,1",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
@@ -2566,14 +2752,262 @@
           "Components": [
             {
               "__type": "Sandbox.PointLight",
-              "__guid": "aae33ce9-0e9a-574d-9fe8-5034e68be53f",
+              "__guid": "3debe401-af59-57e3-af3f-3c51ee4a058e",
               "__enabled": true,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
               "FogStrength": 0.5,
               "LightColor": "1.00,0.70,0.40,1",
-              "Radius": 240,
+              "Radius": 340,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "f0dc1713-ac3c-544b-9432-a52b1c1d6918",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "West tower lamp 8.6",
+          "Position": "2866.65,-602,726",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "61037394-fa34-55ae-b5d3-a10a82c5ca76",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.5,
+              "LightColor": "1.00,0.70,0.40,1",
+              "Radius": 340,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "cba6d6fc-b013-5a5c-a096-f76340dd86c2",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "West tower lamp 10.4",
+          "Position": "2928,-482.907,870",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "d89eab03-5539-571b-b74f-fe8ea59718d1",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.5,
+              "LightColor": "1.00,0.70,0.40,1",
+              "Radius": 340,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "153083e0-5bbd-59f5-8d22-1504e0ded17f",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "West tower ledge lamp 3.2",
+          "Position": "2830,-373,380",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "571d9f48-1b34-5d54-865d-27c55caa6307",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.5,
+              "LightColor": "1.00,0.70,0.40,1",
+              "Radius": 340,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "6b22b452-001d-51ac-963a-91904676aff1",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "West tower ledge lamp 4.0",
+          "Position": "2711,-504,452",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "5e45e053-fc72-5675-81d5-5c6d53a97257",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.5,
+              "LightColor": "1.00,0.70,0.40,1",
+              "Radius": 340,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "fd16e6ed-e53e-5030-89ea-9671661edebc",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "West tower ledge lamp 7.2",
+          "Position": "2830,-382.6,668",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "7d0c2f26-e83d-5965-be31-99e76615c8a8",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.5,
+              "LightColor": "1.00,0.70,0.40,1",
+              "Radius": 340,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "3470262d-7b22-5b52-a1dd-e39beea3165f",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "West tower ledge lamp 9.0",
+          "Position": "2713.4,-504,812",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "4df72195-7e3a-50c5-b68f-f6f42da67849",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.5,
+              "LightColor": "1.00,0.70,0.40,1",
+              "Radius": 340,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "6050dc8a-333c-5c8a-a768-b80a276408cc",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "West tower ledge lamp 12.2",
+          "Position": "2830,-379,1028",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "f85b5f12-39c4-570f-aa91-f6af4f66bef0",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.5,
+              "LightColor": "1.00,0.70,0.40,1",
+              "Radius": 340,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "52fcb01c-d972-5e7b-8383-895921ce8bbe",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "West tower ledge lamp 15.0",
+          "Position": "2711,-504,1244",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "e3194545-c2d2-56de-b5f1-9fe39b071208",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.5,
+              "LightColor": "1.00,0.70,0.40,1",
+              "Radius": 340,
               "Shadows": false
             }
           ],
@@ -2604,18 +3038,18 @@
               "FogMode": "Enabled",
               "FogStrength": 0.5,
               "LightColor": "1.00,0.70,0.40,1",
-              "Radius": 240,
+              "Radius": 340,
               "Shadows": false
             }
           ],
           "Children": []
         },
         {
-          "__guid": "dc774af1-9b5e-5166-8a1d-06bcf0df35c9",
+          "__guid": "7ee25d02-19ca-5a2c-a079-02c41fe3d439",
           "__version": 2,
           "Flags": 32768,
-          "Name": "East tower lamp 2.2",
-          "Position": "2978,-891.313,294",
+          "Name": "East tower lamp 1.2",
+          "Position": "2770.88,-771,222",
           "Rotation": "0,0,0,1",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
@@ -2628,25 +3062,25 @@
           "Components": [
             {
               "__type": "Sandbox.PointLight",
-              "__guid": "d64bf501-7add-56fb-991d-7941450fa6f0",
+              "__guid": "15946458-bf51-5054-b396-a9fa6902d9d7",
               "__enabled": true,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
               "FogStrength": 0.5,
               "LightColor": "1.00,0.70,0.40,1",
-              "Radius": 240,
+              "Radius": 340,
               "Shadows": false
             }
           ],
           "Children": []
         },
         {
-          "__guid": "7a282043-d08d-560a-8d01-501e240c0c62",
+          "__guid": "26c82295-f8f6-52a2-8e71-ae821f5c2637",
           "__version": 2,
           "Flags": 32768,
-          "Name": "East tower lamp 4.2",
-          "Position": "2819.68,-1037,438",
+          "Name": "East tower lamp 1.6",
+          "Position": "2978,-891.313,222",
           "Rotation": "0,0,0,1",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
@@ -2659,14 +3093,293 @@
           "Components": [
             {
               "__type": "Sandbox.PointLight",
-              "__guid": "5c7a7645-ff83-5607-8871-e6433f9a28dd",
+              "__guid": "d7642fd8-ccca-5184-9363-a4c8fa03427a",
               "__enabled": true,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
               "FogStrength": 0.5,
               "LightColor": "1.00,0.70,0.40,1",
-              "Radius": 240,
+              "Radius": 340,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "c091b89d-b2d0-5d29-a3ef-100471606ea5",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "East tower lamp 3.0",
+          "Position": "2819.68,-1037,366",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "fcb970a9-4489-5bf3-a34c-5fb195b6cc8f",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.5,
+              "LightColor": "1.00,0.70,0.40,1",
+              "Radius": 340,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "e2d2d95c-f6dd-5636-80f5-4dffe3921450",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "East tower lamp 3.1",
+          "Position": "2864.07,-1037,366",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "865beef6-a2bb-5c75-8700-201137c3cc03",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.5,
+              "LightColor": "1.00,0.70,0.40,1",
+              "Radius": 340,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "29275eed-0c0d-55ac-821e-a3deb595c7c3",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "East tower lamp 3.4",
+          "Position": "2776.08,-1037,366",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "29fb8a6a-c7e5-5fac-8f1c-b31e6889389e",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.5,
+              "LightColor": "1.00,0.70,0.40,1",
+              "Radius": 340,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "da43801e-1f2d-520c-aef3-923ad3caf3df",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "East tower lamp 4.4",
+          "Position": "2742,-909.104,438",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "b581ee54-276e-56f5-b2f4-e7036aa17267",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.5,
+              "LightColor": "1.00,0.70,0.40,1",
+              "Radius": 340,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "1ea41afb-c7dc-5d3f-aa79-419b66b25f7f",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "East tower lamp 4.6",
+          "Position": "2978,-925.744,438",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "7f524869-8bce-5a9b-aaff-32bc4f8d4475",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.5,
+              "LightColor": "1.00,0.70,0.40,1",
+              "Radius": 340,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "808c19d9-e8dd-56f3-8f50-f8626233aa8e",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "East tower lamp 5.2",
+          "Position": "2764,-1037,510",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "0bb7c442-5477-5e10-a5a0-fdb6b9de9d7f",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.5,
+              "LightColor": "1.00,0.70,0.40,1",
+              "Radius": 340,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "70b832cd-276d-5861-8207-77a10502fc7b",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "East tower lamp 5.5",
+          "Position": "2742,-939.853,510",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "9499e96b-2a1e-5ea2-b860-3d3217ac7e44",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.5,
+              "LightColor": "1.00,0.70,0.40,1",
+              "Radius": 340,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "cd6668e3-951a-5934-b0cf-b335e134f276",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "East tower lamp 5.6",
+          "Position": "2942.09,-1037,510",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "b6068683-6746-50f1-a658-d018c00c70d4",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.5,
+              "LightColor": "1.00,0.70,0.40,1",
+              "Radius": 340,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "22159a8b-cf16-5bf9-a858-b14446ee48b9",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "East tower lamp 7.0",
+          "Position": "2878.73,-771,654",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "79070d11-2a29-529e-8dbc-a1f77a0765cb",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.5,
+              "LightColor": "1.00,0.70,0.40,1",
+              "Radius": 340,
               "Shadows": false
             }
           ],
@@ -2677,7 +3390,7 @@
           "__version": 2,
           "Flags": 32768,
           "Name": "East tower lamp 8.2",
-          "Position": "2764,-1037,726",
+          "Position": "2891.94,-771,726",
           "Rotation": "0,0,0,1",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
@@ -2697,18 +3410,18 @@
               "FogMode": "Enabled",
               "FogStrength": 0.5,
               "LightColor": "1.00,0.70,0.40,1",
-              "Radius": 240,
+              "Radius": 340,
               "Shadows": false
             }
           ],
           "Children": []
         },
         {
-          "__guid": "3a4c2634-4878-59c6-8b9d-5fc329c8c53a",
+          "__guid": "1f604d46-962a-51a4-9ec4-e173924a1a7e",
           "__version": 2,
           "Flags": 32768,
-          "Name": "East tower lamp 9.1",
-          "Position": "2742,-939.853,798",
+          "Name": "East tower lamp 8.4",
+          "Position": "2978,-906.583,726",
           "Rotation": "0,0,0,1",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
@@ -2721,25 +3434,25 @@
           "Components": [
             {
               "__type": "Sandbox.PointLight",
-              "__guid": "7e75aa93-2c12-5f24-a96d-8ce4125cb97b",
+              "__guid": "6a251242-26c6-5893-8802-f17b1e4ddc0b",
               "__enabled": true,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
               "FogStrength": 0.5,
               "LightColor": "1.00,0.70,0.40,1",
-              "Radius": 240,
+              "Radius": 340,
               "Shadows": false
             }
           ],
           "Children": []
         },
         {
-          "__guid": "aa32bfe0-5f6e-5f17-b4b8-1b0e7e652c5e",
+          "__guid": "adc882b2-04d8-5a2e-bbf1-53dcb0e3e55d",
           "__version": 2,
           "Flags": 32768,
-          "Name": "East tower lamp 9.2",
-          "Position": "2942.09,-1037,798",
+          "Name": "East tower ledge lamp 2.3",
+          "Position": "2860,-1076,308",
           "Rotation": "0,0,0,1",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
@@ -2752,25 +3465,25 @@
           "Components": [
             {
               "__type": "Sandbox.PointLight",
-              "__guid": "9a04670a-8f82-554c-a645-ddb635b02fec",
+              "__guid": "9cf687e2-47f8-5b51-bb20-1efc940baad3",
               "__enabled": true,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
               "FogStrength": 0.5,
               "LightColor": "1.00,0.70,0.40,1",
-              "Radius": 240,
+              "Radius": 340,
               "Shadows": false
             }
           ],
           "Children": []
         },
         {
-          "__guid": "7eed4519-8ca8-5a8b-aeb4-39d5d214c808",
+          "__guid": "f3b52e79-54cf-59aa-9ea9-9bef98544e28",
           "__version": 2,
           "Flags": 32768,
-          "Name": "East tower lamp 13.3",
-          "Position": "2891.94,-771,1086",
+          "Name": "East tower ledge lamp 5.0",
+          "Position": "2718.6,-904,524",
           "Rotation": "0,0,0,1",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
@@ -2783,25 +3496,25 @@
           "Components": [
             {
               "__type": "Sandbox.PointLight",
-              "__guid": "e3ccf5b8-56a4-5772-b3f6-c37f046cb237",
+              "__guid": "561a3d1f-1805-5e06-910d-2f5989b9abf7",
               "__enabled": true,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
               "FogStrength": 0.5,
               "LightColor": "1.00,0.70,0.40,1",
-              "Radius": 240,
+              "Radius": 340,
               "Shadows": false
             }
           ],
           "Children": []
         },
         {
-          "__guid": "012a6456-6294-5cb6-b30d-a42772ebc5a3",
+          "__guid": "cae06fa1-142a-57ea-88a4-0130f8fb6c7e",
           "__version": 2,
           "Flags": 32768,
-          "Name": "East tower lamp 15.2",
-          "Position": "2809.83,-1037,1230",
+          "Name": "East tower ledge lamp 6.3",
+          "Position": "2860,-1064,596",
           "Rotation": "0,0,0,1",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
@@ -2814,14 +3527,107 @@
           "Components": [
             {
               "__type": "Sandbox.PointLight",
-              "__guid": "255bc472-04ea-50c4-aabe-240ffadf4752",
+              "__guid": "f08d8682-bc2a-5a9c-8222-e59b0ae37b67",
               "__enabled": true,
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
               "FogStrength": 0.5,
               "LightColor": "1.00,0.70,0.40,1",
-              "Radius": 240,
+              "Radius": 340,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "5771f026-e4f9-5f13-8299-c933b14a13e7",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "East tower ledge lamp 10.0",
+          "Position": "2721,-904,884",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "db390294-f8a1-50b7-9ab1-57d1927b805a",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.5,
+              "LightColor": "1.00,0.70,0.40,1",
+              "Radius": 340,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "b6339bf2-e49e-5e88-a63f-0c2cbef98d83",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "East tower ledge lamp 11.3",
+          "Position": "2860,-1070,956",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "d020addd-9802-5ee0-aae9-47899f3a5b6c",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.5,
+              "LightColor": "1.00,0.70,0.40,1",
+              "Radius": 340,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "ad719573-f070-58c5-8248-60cb0b7b7471",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "East tower ledge lamp 14.3",
+          "Position": "2860,-1060.4,1172",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "d6a53070-b308-59dd-bfc1-2d01d5eab6a3",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.5,
+              "LightColor": "1.00,0.70,0.40,1",
+              "Radius": 340,
               "Shadows": false
             }
           ],
@@ -3183,7 +3989,7 @@
               "Projection": "Sphere",
               "RenderExcludeTags": "",
               "Resolution": "Small",
-              "Texture": "lighting/orion/reflection_sky_2330c73f.vtex",
+              "Texture": "lighting/orion/reflection_sky_77b5fc66.vtex",
               "TintColor": "1.8,1.8,1.8,1",
               "UpdateStrategy": "OnEnabled",
               "ZFar": 4096,
@@ -3229,8 +4035,8 @@
               "Projection": "Sphere",
               "RenderExcludeTags": "",
               "Resolution": "Small",
-              "Texture": "lighting/orion/reflection_sky_2330c73f.vtex",
-              "TintColor": "11,11,11,1",
+              "Texture": "lighting/orion/reflection_wet_cbdc113c.vtex",
+              "TintColor": "4.5,4.5,4.5,1",
               "UpdateStrategy": "OnEnabled",
               "ZFar": 4096,
               "ZNear": 16
@@ -3275,8 +4081,8 @@
               "Projection": "Sphere",
               "RenderExcludeTags": "",
               "Resolution": "Small",
-              "Texture": "lighting/orion/reflection_sky_2330c73f.vtex",
-              "TintColor": "5,5,5,1",
+              "Texture": "lighting/orion/reflection_wet_cbdc113c.vtex",
+              "TintColor": "3.8,3.8,3.8,1",
               "UpdateStrategy": "OnEnabled",
               "ZFar": 4096,
               "ZNear": 16
@@ -3321,8 +4127,8 @@
               "Projection": "Sphere",
               "RenderExcludeTags": "",
               "Resolution": "Small",
-              "Texture": "lighting/orion/reflection_sky_2330c73f.vtex",
-              "TintColor": "3,3,3,1",
+              "Texture": "lighting/orion/reflection_wet_cbdc113c.vtex",
+              "TintColor": "2.5,2.5,2.5,1",
               "UpdateStrategy": "OnEnabled",
               "ZFar": 4096,
               "ZNear": 16
@@ -3367,8 +4173,8 @@
               "Projection": "Sphere",
               "RenderExcludeTags": "",
               "Resolution": "Small",
-              "Texture": "lighting/orion/reflection_sky_2330c73f.vtex",
-              "TintColor": "13,13,13,1",
+              "Texture": "lighting/orion/reflection_wet_cbdc113c.vtex",
+              "TintColor": "5.5,5.5,5.5,1",
               "UpdateStrategy": "OnEnabled",
               "ZFar": 4096,
               "ZNear": 16
@@ -3413,8 +4219,8 @@
               "Projection": "Sphere",
               "RenderExcludeTags": "",
               "Resolution": "Small",
-              "Texture": "lighting/orion/reflection_sky_2330c73f.vtex",
-              "TintColor": "3,3,3,1",
+              "Texture": "lighting/orion/reflection_wet_cbdc113c.vtex",
+              "TintColor": "1.3,1.3,1.3,1",
               "UpdateStrategy": "OnEnabled",
               "ZFar": 4096,
               "ZNear": 16
@@ -3459,8 +4265,8 @@
               "Projection": "Sphere",
               "RenderExcludeTags": "",
               "Resolution": "Small",
-              "Texture": "lighting/orion/reflection_sky_2330c73f.vtex",
-              "TintColor": "5,5,5,1",
+              "Texture": "lighting/orion/reflection_wet_cbdc113c.vtex",
+              "TintColor": "6,6,6,1",
               "UpdateStrategy": "OnEnabled",
               "ZFar": 4096,
               "ZNear": 16
@@ -3505,8 +4311,8 @@
               "Projection": "Sphere",
               "RenderExcludeTags": "",
               "Resolution": "Small",
-              "Texture": "lighting/orion/reflection_sky_2330c73f.vtex",
-              "TintColor": "7,7,7,1",
+              "Texture": "lighting/orion/reflection_wet_cbdc113c.vtex",
+              "TintColor": "3,3,3,1",
               "UpdateStrategy": "OnEnabled",
               "ZFar": 4096,
               "ZNear": 16
@@ -3551,8 +4357,8 @@
               "Projection": "Sphere",
               "RenderExcludeTags": "",
               "Resolution": "Small",
-              "Texture": "lighting/orion/reflection_sky_2330c73f.vtex",
-              "TintColor": "7,7,7,1",
+              "Texture": "lighting/orion/reflection_wet_cbdc113c.vtex",
+              "TintColor": "3,3,3,1",
               "UpdateStrategy": "OnEnabled",
               "ZFar": 4096,
               "ZNear": 16
@@ -3597,8 +4403,8 @@
               "Projection": "Sphere",
               "RenderExcludeTags": "",
               "Resolution": "Small",
-              "Texture": "lighting/orion/reflection_sky_2330c73f.vtex",
-              "TintColor": "7,7,7,1",
+              "Texture": "lighting/orion/reflection_wet_cbdc113c.vtex",
+              "TintColor": "3,3,3,1",
               "UpdateStrategy": "OnEnabled",
               "ZFar": 4096,
               "ZNear": 16
@@ -3643,8 +4449,8 @@
               "Projection": "Sphere",
               "RenderExcludeTags": "",
               "Resolution": "Small",
-              "Texture": "lighting/orion/reflection_sky_2330c73f.vtex",
-              "TintColor": "8,8,8,1",
+              "Texture": "lighting/orion/reflection_wet_cbdc113c.vtex",
+              "TintColor": "3.5,3.5,3.5,1",
               "UpdateStrategy": "OnEnabled",
               "ZFar": 4096,
               "ZNear": 16
@@ -10405,7 +11211,7 @@
           "__version": 2,
           "Flags": 0,
           "Name": "Player Clip mezzanine west 22",
-          "Position": "703,451,170",
+          "Position": "703,451,208",
           "Rotation": "0,0,-0.7071068,0.7071068",
           "Scale": "1,1,1",
           "Tags": "playerclip",
@@ -10427,7 +11233,7 @@
               "Friction": null,
               "IsTrigger": false,
               "RollingResistance": null,
-              "Scale": "218,4,52",
+              "Scale": "218,4,48",
               "Static": true,
               "Surface": null,
               "SurfaceVelocity": "0,0,0"
@@ -10440,7 +11246,7 @@
           "__version": 2,
           "Flags": 0,
           "Name": "Player Clip mezzanine east 23",
-          "Position": "703,166.5,170",
+          "Position": "703,166.5,208",
           "Rotation": "0,0,-0.7071068,0.7071068",
           "Scale": "1,1,1",
           "Tags": "playerclip",
@@ -10462,7 +11268,7 @@
               "Friction": null,
               "IsTrigger": false,
               "RollingResistance": null,
-              "Scale": "183,4,52",
+              "Scale": "183,4,48",
               "Static": true,
               "Surface": null,
               "SurfaceVelocity": "0,0,0"

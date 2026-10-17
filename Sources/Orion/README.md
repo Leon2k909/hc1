@@ -20,8 +20,10 @@ the big fuel lines along it, the OPS box and its flag, the rocket between its ga
 skyline of the hills (`Tools/orion_backdrop.py` `SKYLINE`, measured from the picture) and the clouds
 (`Tools/orion_sky.py` `STREAKS`).
 
-`v2/compare.py [name] [--scene ...] [--disable Type ...]` renders that view through the editor and prints matched
-patches of the picture and the capture (shaded faces, the wet yard, the sky by the sun and overhead, the hills).
+`v2/compare.py [name] [--scene ...] [--disable Type ...] [--exposure <fixed>] [--settle <frames>]` renders that view
+through the editor and prints matched patches of the picture and the capture (shaded faces, the wet yard, the sky by
+the sun and overhead, the hills). It renders 160 frames first by default, so the automatic exposure has settled as it
+does in a match: captures of a few frames stop short of it and come out darker.
 
 ## Building it
 
@@ -34,15 +36,17 @@ Run in this order; `--stage` writes under `output/orion/v2/` so a running editor
 2. `python Tools/orion_sky.py --out output/orion/v2/Assets/materials/orion/sky [--preview <dir>]`: the panorama on
    Belltower's sky code with a glow round the low sun, and the picture's thin clouds painted in as a 2D layer
    (`paint_streaks`; the ray-marched heaps read as cartoon puffs and are off). `--preview` also writes
-   `reference_level.png`, the sky as the reference view frames it.
+   `reference_level.png`, the sky as the reference view frames it. `--wet` writes the wet floors' cube from it
+   (`oa_sky_wet`: the sky with the low sun's glitter laid in as a band, `WET_BAND`).
 3. `python Tools/orion_map.py --stage`: the models (`Tools/orion_parts.py`, `Tools/orion_backdrop.py`), the scene and
    the radar picture. Every run checks every spawn, objective and cash spot (room, floor, a walk from the spawns, no
    Retakes pair in sight). `--preview <dir> --views aerial ...` writes flat views.
 4. Copy the staged files into `Assets` (the oa_ materials, the sky, the ten `orion_*` models, and the scene and
    minimap), then compile with `v2/editor/compile.cs.txt` through the native MCP's `run_csharp`, repeated until
-   `Stale` is 0. After a new sky has compiled, run `orion_map.py --stage --no-models` again and copy the scene again:
-   it copies the compiled sky cube to `lighting/orion/reflection_sky_<hash>.vtex_c` (named by its content, so a running
-   editor loads the new cube rather than one cached under the old name) and points the probes at it.
+   `Stale` is 0. After a new sky (or wet cube) has compiled, run `orion_map.py --stage --no-models` again and copy the
+   scene again: it copies the compiled cubes to `lighting/orion/reflection_sky_<hash>.vtex_c` and
+   `reflection_wet_<hash>.vtex_c` (named by their content, so a running editor loads a new cube rather than one cached
+   under the old name) and points the probes at them. Both are compiled files that `.gitignore` lets in.
 5. Don't move or delete assets a running match is using: when v1's textures were moved out from under a match, the
    renderer reloaded them every second until the editor ran out of video memory (2026-10-15).
 
@@ -55,26 +59,36 @@ spot. Neither touches the open scene or play state.
 
 - The sun 8.3 degrees up, 25 degrees west of north (the sky's sun is the same), half behind Launch Control.
 - No baked indirect light. A small flat ambient (`SkyColor` 0.15: its alpha is 1, so it is the whole indirect diffuse
-  light; the sky's tint and the probes only change specular), point lights, and a lower exposure (auto 1.0 to 1.6)
-  under a sky tinted 2.6, so shaded faces sit dark under a bright sky as in the picture.
+  light; the sky's tint and the probes only change specular), point lights, and a lower exposure (auto 1.0 to 1.2)
+  under a sky tinted 2.6, so shaded faces sit dark under a bright sky as in the picture. The exposure settles at its
+  cap. The cap was 1.6, but the captures it was tuned with had stopped at about 1.2 before settling, so a match would
+  have been a third brighter than the tuned look; it's 1.2 now, and the captures settle (`compare.py --settle`).
 - The flat ambient has no occlusion, so recesses and walls under overhangs came out as bright as open faces. Screen-
   space AO is strong (intensity 1, radius 220) and the shaded lower walls use the darker concrete (`oa_wall_dark`,
   base 104): that brought Launch Control's wall under the balcony from 52 to 36 (the picture's 36).
 - The shaded faces get soft fills standing for the south sky: `LC face fill` and `ORION face fill`, high, broad and
   lavender (they read neutral after the grade), and a warm `B3 face wash`. Launch Control's two wall battens are dim
   (`tube_light( ..., colour=... )`) and shadowed, so the balcony slab stops their light.
-- Reflections: the sky's compiled cube as a static `CustomTexture` probe over the play area (tint 1.8), and stronger
-  copies over the wet floors open to the sky (`WET_FLOORS`), each only a few inches deep so crates and walls don't
-  pick them up. The yard steps down northwards where its mirror image meets buildings instead of sky (11 near, 5 from
-  the slab joint at n 246, 3 from n 342 and at the tunnel mouth); the terrace 5, the yard tarp's top 8, the roofs 7.
-  The yard's slabs are satin (roughness ~0.3-0.55) with glassy puddles over about a fifth of them, and the deck's
-  puddles are few: glassy puddles everywhere mirrored the bright cube as white blotches.
+- Reflections: the sky's compiled cube as a static `CustomTexture` probe over the play area (tint 1.8), and probes
+  over the wet floors open to the sky (`WET_FLOORS`), each only a few inches deep so crates and walls don't pick them
+  up. The wet floors' probes use their own cube (`oa_sky_wet`, above), so the floors show warm streaks towards the
+  sun's side. Their strengths step down northwards where the yard's mirror image meets buildings instead of sky: the
+  near yard 4.5, the band from the slab joint at n 244 3.8, the far yard 2.5, the tunnel mouth 1.3; the strip along B3
+  5.5, the terrace 6, the yard tarp's top 3.5, the deck and the roofs 3. The yard's slabs are satin with a thin wet
+  film (`slabs( film= )`) and glassy puddles over about a fifth of them, and the deck's puddles are few: glassy puddles
+  everywhere mirrored the bright cube as white blotches.
   Screen-space reflections are off: the engine's SSR traces a lobe wider than the material's and keeps hits on the
   floor itself, which swapped much of the near yard's sky for the slabs' own dark colour, and its `RoughnessCutoff`
   can't be set. The runtime probe baker faults `envmap_filtering_cs` on this workstation's driver, so nothing is
   baked at load.
-- The fog is a darker grey (0.52,0.5,0.52 at 0.82) and the far ridges a forested dark (`oa_mountain` 56,62,62): the
-  ridges were painted blue to fake the haze that the fog then added again.
+- The fog is a darker grey (0.47,0.45,0.47 at 0.82) and the far ridges a forested dark (`oa_mountain` 56,62,62): the
+  ridges were painted blue to fake the haze that the fog then added again. Past 12000 out, the gentle slopes and
+  everything past 22000 wear `oa_hill_far` (dark woods, dry grass and earth at a 9000 tile) instead of rock, and the far
+  ridges are a little higher (`orion_backdrop.height`).
+- The gantries are dark steel (`oa_gantry`, with a faint warm self-illumination, `orion_textures.GLOW`) round a slim
+  dark core, with seven lamps a floor and ledges (`orion_parts.service_tower`), so they read as a lit lattice. The
+  deck front's fascia and parapet are the shaded concrete (`oa_wall_dark`), with rows of cases along the deck wall and
+  a lamp over the mezzanine door.
 - The sky's low keys are row means over the whole panorama (they had been taken from the picture's sun half, which
   brightened that side twice), with a tighter glow and `SUN_HALO` 0.4.
 - ColorGrading 5300 K at 0.5 and ColorAdjustments saturation 1.1. Keep its contrast at 1.0: it works in linear HDR
@@ -91,22 +105,34 @@ no errors; the user played a match on it in the editor (all ten models loaded, n
 On 2026-10-16/17, after the second round (the rocket's nose and taller, enclosed gantries, the yard's tarp block,
 crates and lane lattice to the picture's places, B3's west side receding behind the line of sight, weathered yellow
 paint, the tunnel a warm arcade with a red doorway, and the light and reflection changes above), everything compiled
-and the navmesh check found complete paths from both team spawns to all 95 spots. The reference view (capture
-`v3f`) against the picture, median of each patch (`v2/compare.py`; capture / picture):
+and the navmesh check found complete paths from both team spawns to all 95 spots.
+
+On 2026-10-17, after the third round (the exposure cap, the wet floors' cube, the lit gantries, the far hills, the
+deck front's parapet, fascia and cases), everything compiled again and the navmesh check again found complete paths to
+all 95 spots. The reference view (capture `v4f`, settled exposure) against the picture, median of each patch
+(`v2/compare.py`; capture / picture):
 
 | patch | capture | picture | | patch | capture | picture |
 |---|---|---|---|---|---|---|
-| Launch Control face | 50 | 52 | | sky by the sun | 241 | 241 |
-| ORION face | 42 | 45 | | blue sky | 130 | 129 |
+| Launch Control face | 54 | 52 | | sky by the sun | 241 | 241 |
+| ORION face | 42 | 45 | | blue sky | 132 | 129 |
 | B3 face | 55 | 53 | | hills | 124 | 122 |
-| yard, far | 39 | 40 | | deck front | 44 | 37 |
-| yard, near | 64 | 64 | | LC wall under the balcony | 37 | 36 |
-| yard, middle band | 51 | 47 | | foreground terrace | 49 | 42 |
+| yard, far | 39 | 40 | | deck front | 39 | 37 |
+| yard, near | 66 | 64 | | LC wall under the balcony | 39 | 36 |
+| yard, middle band | 48 | 47 | | foreground terrace | 40 | 42 |
 
-What the medians don't show, and is still unlike the picture: the wet floors' puddles read as pale blotches rather
-than mirrors with the sun's streaks (the terrace's brightest tenth is 81 against 165), the gantries are dark cages
-where the picture's are lit gold, the deck front and its lit arcade are a different build, and the hills have no town
-on them. Not yet checked: a second client and the frame time.
+Every patch is within 4 levels of the picture's. What the medians don't show, and is still unlike the picture:
+
+- The picture's floors are mirror-wet, with long warm streaks of the sun and the lamps; here they're satin with a
+  sheen and a few glassy puddles (the terrace's brightest tenth is 105 against 165). The deck front's brightest tenth
+  is 179 against 118: its puddles are too bright where the picture's floor there is dark and even.
+- The hills are dark silhouettes with woods and fields. The picture's are a lit hill town, with houses and lights.
+- The gantries are an evenly lit orange lattice. The picture's are dark steel picked out by many small lamps, and
+  the steam round the rocket's foot is much thicker.
+- Launch Control, the deck front's arcade and B3's fuel lines are simpler builds than the picture's: its Launch
+  Control is a taller block with its lit control room at the top left, and B3 has a bank of big pipes.
+
+Not yet checked: a second client and the frame time.
 
 The offline reach check missed one thing the navmesh found: player clips. A railing's clip is a box along its rail
 (`riverdale_parts.clip`), and the scene must size it ( length, thickness, height ) under the rail's heading turned 90

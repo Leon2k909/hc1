@@ -54,7 +54,7 @@ SCALE = 1.0
 
 TILES = { "oa_wall": 236.0, "oa_wall_dark": 236.0, "oa_yard": 768.0, "oa_deck": 384.0, "oa_yellow": 48.0, "oa_steel": 48.0,
           "oa_orange": 64.0, "oa_gantry": 64.0, "oa_red": 48.0, "oa_white_steel": 96.0, "oa_pipe": 64.0, "oa_olive": 48.0, "oa_case": 48.0,
-          "oa_tarp": 96.0, "oa_tarp_grey": 96.0, "oa_hazard": 32.0, "oa_grating": 24.0, "oa_rocket": 120.0, "oa_radome": 240.0, "oa_hill": 1600.0 }
+          "oa_tarp": 96.0, "oa_tarp_grey": 96.0, "oa_hazard": 32.0, "oa_grating": 24.0, "oa_rocket": 120.0, "oa_radome": 240.0, "oa_hill": 1600.0, "oa_hill_far": 9000.0 }
 
 
 def px( n ):
@@ -171,9 +171,11 @@ def concrete( seed=11, base=( 150, 150, 147 ), grime=0.35, n=None ):
     return colour, rough, height, ppi
 
 
-def slabs( seed, tile_key, slab=192.0, wet=1.0, puddles=1.0, base=( 120, 118, 114 ), n=None, rough_add=0.0 ):
+def slabs( seed, tile_key, slab=192.0, wet=1.0, puddles=1.0, base=( 120, 118, 114 ), n=None, rough_add=0.0, film=0.0 ):
     """ Slabs after rain: sawn joints with dark sealant, cracks, damp darkening, oil, tyre marks and standing water in
-    the dips (glassy and dark, the texture flat under it). """
+    the dips (glassy and dark, the texture flat under it). film is the share of the slabs still under a thin water film
+    (glossy, darker), in drifts that follow the slabs' falls; the rest has dried to a damp satin. The puddles' edges are
+    broken and soft: water creeps into the texture's lows, so the gloss fades out over the last of the dip. """
     n = n or px( 4096 if tile_key == "oa_yard" else 2048 )
     tile = TILES[tile_key]
     rng = np.random.default_rng( seed )
@@ -200,6 +202,13 @@ def slabs( seed, tile_key, slab=192.0, wet=1.0, puddles=1.0, base=( 120, 118, 11
     damp = ( 0.55 + 0.45 * smoothstep( -1.2, 1.0, nz( 2.4, 200, 20 ) ) ) * wet
     colour = colour * ( 1.0 - 0.45 * damp / max( wet, 1.0 ) )[..., None] * ( 1.0 - 0.3 * seam )[..., None]
     rough = np.clip( 0.62 + rough_add - 0.32 * damp + 0.05 * mid - 0.15 * seam, 0.08, 1.0 )
+    if film > 0:
+        # The film: drifts of glossy water across the slabs, thinning to a sheen at their edges.
+        t = -0.25 - 1.2 * ( film - 0.5 )
+        drift = nz( 2.2, 180, 6 ) + 0.45 * nz( 1.6, 30, 1.5 )
+        fl = smoothstep( t - 0.35, t + 0.35, drift )
+        colour = mix( colour, colour * 0.72, fl[..., None] )
+        rough = mix( rough, 0.07 + 0.05 * smoothstep( -1.0, 1.0, mid ), fl )
     oil = smoothstep( 1.5, 2.7, nz( 2.0, 40, 3 ) )
     colour = mix( colour, lin( ( 20, 18, 16 ) ), oil[..., None] * 0.6 )
     cv = BM.Canvas( ( n, n ), ( ppi, ppi ), ( 0.0, 0.0 ), tile, ss=1 )
@@ -218,9 +227,9 @@ def slabs( seed, tile_key, slab=192.0, wet=1.0, puddles=1.0, base=( 120, 118, 11
     tyres = ndimage.gaussian_filter( cv.result(), 1.5, mode="wrap" )
     colour = mix( colour, colour * 0.55, tyres[..., None] * 0.7 )
     # Puddles: where the slab dips, shallow and glassy; damp darker halos round them.
-    dip = nz( 2.4, 260, 20 ) + 0.4 * nz( 1.8, 40, 4 ) + 0.3 * groove
+    dip = nz( 2.4, 260, 20 ) + 0.4 * nz( 1.8, 40, 4 ) + 0.3 * groove + 0.3 * nz( 1.2, 10, 0.6 )
     lo = 1.35 - 0.45 * puddles
-    puddle = smoothstep( lo, lo + 0.22, dip )
+    puddle = smoothstep( lo, lo + 0.34, dip )
     halo = smoothstep( lo - 0.5, lo, dip ) * ( 1 - puddle )
     colour = mix( colour, colour * 0.75, halo[..., None] * 0.5 * wet )
     rough = mix( rough, rough * 0.6, halo * wet )
@@ -364,6 +373,29 @@ def hill( seed=91, n=None ):
     r = 0.9 - 0.05 * bush
     h = 0.6 * bush + 0.1 * nz( 1.2, 3, 0.5 )
     return c, np.clip( r, 0.3, 1 ), h, ppi
+
+
+def hill_far( seed=93, n=None ):
+    """ The far hills seen from a kilometre and more: a mottle of holm oak and pine canopy, darker in its hollows, with
+    clearings of dry grass and earth, as the picture's hills read through the haze (a flat paint made smooth
+    silhouettes). Its mean is about the old flat paint's, so the fog leaves the hills where they were. """
+    n = n or px( 2048 )
+    tile = TILES["oa_hill_far"]
+    rng = np.random.default_rng( seed )
+    nz, x, z, ppi = field( rng, n, tile )
+    shade = lin( ( 38, 46, 36 ) )
+    canopy = lin( ( 62, 72, 50 ) )
+    grass = lin( ( 128, 114, 80 ) )
+    earth = lin( ( 104, 88, 70 ) )
+    clump = nz( 1.4, 60, 6 ) + 0.6 * nz( 2.4, 400, 30 )
+    c = mix( shade[None, None, :] * np.ones( ( n, n, 1 ), np.float32 ), canopy, smoothstep( -0.6, 0.9, clump )[..., None] )
+    clearing = smoothstep( 1.0, 1.5, nz( 2.2, 900, 40 ) + 0.4 * nz( 1.6, 120, 10 ) )
+    c = mix( c, grass * ( 1.0 + 0.1 * nz( 1.0, 30, 3 ) )[..., None], clearing[..., None] * 0.85 )
+    bare = smoothstep( 1.5, 1.9, nz( 2.0, 300, 20 ) ) * clearing
+    c = mix( c, earth, bare[..., None] * 0.7 )
+    c *= ( 1.0 + 0.1 * nz( 1.2, 12, 1 ) )[..., None]
+    h = 0.5 * smoothstep( -0.6, 0.9, clump ) + 0.1 * nz( 1.2, 12, 1 )
+    return c, np.full( ( n, n ), 0.92, np.float32 ), h, ppi
 
 
 def hazard( seed=95 ):
@@ -906,12 +938,12 @@ def write_surface( out, name, colour, rough, height, ppi, metalness=0.0, alpha=N
 SURFACES = {
     "oa_wall": lambda: concrete(),
     "oa_wall_dark": lambda: concrete( seed=12, base=( 104, 104, 100 ), grime=1.0 ),
-    "oa_yard": lambda: slabs( 31, "oa_yard", slab=96.0, wet=1.0, puddles=1.3, rough_add=0.12, base=( 124, 120, 114 ) ),
-    "oa_deck": lambda: slabs( 32, "oa_deck", slab=128.0, wet=0.6, puddles=0.25, base=( 132, 130, 126 ) ),
+    "oa_yard": lambda: slabs( 31, "oa_yard", slab=96.0, wet=1.0, puddles=1.1, rough_add=0.12, base=( 112, 108, 102 ), film=0.55 ),
+    "oa_deck": lambda: slabs( 32, "oa_deck", slab=128.0, wet=0.6, puddles=0.25, base=( 128, 126, 122 ), film=0.3 ),
     "oa_yellow": lambda: painted( 41, ( 196, 150, 66 ), TILES["oa_yellow"], chips=0.55, rough=0.38, grime=0.5 ),
     "oa_steel": lambda: painted( 42, ( 72, 76, 80 ), TILES["oa_steel"], chips=0.3, rough=0.5 ),
     "oa_orange": lambda: painted( 43, ( 186, 96, 40 ), TILES["oa_orange"], chips=0.6, rough=0.55, grime=0.5, rust=0.45, bare=( 70, 50, 40 ) ),
-    "oa_gantry": lambda: painted( 47, ( 66, 54, 46 ), TILES["oa_gantry"], chips=0.5, rough=0.5, grime=0.6, rust=0.55, bare=( 44, 36, 30 ) ),
+    "oa_gantry": lambda: painted( 47, ( 74, 62, 52 ), TILES["oa_gantry"], chips=0.5, rough=0.45, grime=0.5, rust=0.4, bare=( 48, 40, 34 ) ),
     "oa_red": lambda: painted( 44, ( 150, 38, 30 ), TILES["oa_red"], chips=0.45, rough=0.5, grime=0.5, rust=0.2 ),
     "oa_white_steel": lambda: painted( 45, ( 214, 214, 208 ), TILES["oa_white_steel"], chips=0.2, rough=0.5, grime=0.55 ),
     "oa_olive": lambda: painted( 46, ( 80, 88, 66 ), TILES["oa_olive"], chips=0.25, rough=0.5, bare=( 60, 62, 54 ), grime=0.45 ),
@@ -922,8 +954,12 @@ SURFACES = {
     "oa_rocket": lambda: rocket_skin(),
     "oa_radome": lambda: radome(),
     "oa_hill": lambda: hill(),
+    "oa_hill_far": lambda: hill_far(),
 }
 METALNESS = { "oa_pipe": 0.9 }
+# A little self-light where a paint stands in for light the scene can't afford: the service towers' steel, lit gold
+# all over by the hundreds of work lamps the picture's towers carry (the towers cast a few dozen). ( brightness, tint )
+GLOW = { "oa_gantry": ( 0.04, ( 1.0, 0.82, 0.6 ) ) }
 NAMES = list( SURFACES ) + [ "oa_hazard", "oa_grating", "letters", "oa_plates", "oa_screens", "painted" ]
 
 
@@ -935,7 +971,9 @@ def build( name, out ):
     done = {}
     if name in SURFACES:
         c, r, h, ppi = SURFACES[name]()
-        done[name] = write_surface( out, name, c, r, h, ppi, METALNESS.get( name, 0.0 ) )
+        glow, tint = GLOW.get( name, ( 0.0, ( 1, 1, 1 ) ) )
+        done[name] = write_surface( out, name, c, r, h, ppi, METALNESS.get( name, 0.0 ),
+                                    illum=np.ones( c.shape[:2], np.float32 ) if glow else None, illum_brightness=glow, illum_tint=tint )
     elif name == "oa_hazard":
         c, r, h, ppi = hazard()
         done[name] = write_surface( out, name, c, r, h, ppi )

@@ -152,9 +152,87 @@ def reference_view( S, rgb ):
     return rgb[np.clip( ( v * h ).astype( int ), 0, h - 1 ), np.clip( ( u * w ).astype( int ), 0, w - 1 )]
 
 
+def read_exr( path ):
+    """ The panorama belltower_sky.write_exr wrote: half-float B, G, R scanlines, zip-compressed 16 lines a block (or
+    stored raw where that came out smaller). Returns linear RGB, ( h, w, 3 ). """
+    import struct
+    import zlib
+    data = Path( path ).read_bytes()
+    assert struct.unpack( "<i", data[:4] )[0] == 20000630, f"{path} isn't an EXR"
+    p, attrs = 8, {}
+    while data[p] != 0:
+        end = data.index( b"\0", p )
+        name = data[p:end].decode()
+        p = data.index( b"\0", end + 1 ) + 1
+        size = struct.unpack( "<i", data[p:p + 4] )[0]
+        attrs[name] = data[p + 4:p + 4 + size]
+        p += 4 + size
+    p += 1
+    x0, y0, x1, y1 = struct.unpack( "<iiii", attrs["dataWindow"] )
+    w, h = x1 - x0 + 1, y1 - y0 + 1
+    blocks = ( h + 15 ) // 16
+    offsets = struct.unpack( f"<{blocks}Q", data[p:p + 8 * blocks] )
+    out = np.zeros( ( h, w, 3 ), np.float32 )
+    for at in offsets:
+        y, size = struct.unpack( "<ii", data[at:at + 8] )
+        block = data[at + 8:at + 8 + size]
+        lines = min( 16, h - y )
+        if size < lines * w * 6:
+            mixed = np.frombuffer( zlib.decompress( block ), np.uint8 ).astype( np.int64 )
+            mixed[1:] = mixed[1:] - 128
+            mixed = ( np.cumsum( mixed ) & 255 ).astype( np.uint8 )
+            half = ( len( mixed ) + 1 ) // 2
+            raw = np.empty_like( mixed )
+            raw[0::2], raw[1::2] = mixed[:half], mixed[half:]
+        else:
+            raw = np.frombuffer( block, np.uint8 )
+        a = np.frombuffer( raw.tobytes(), np.float16 ).reshape( lines, 3, w ).astype( np.float32 )
+        out[y:y + lines, :, 0], out[y:y + lines, :, 1], out[y:y + lines, :, 2] = a[:, 2], a[:, 1], a[:, 0]
+    return out
+
+
+# The wet floors' reflection (--wet): the sky with the low sun's glitter added as a band, narrow in bearing and tall in
+# elevation. A wet floor's roughness stretches a low sun's reflection into a streak that runs towards the viewer (on
+# water it's the glitter path); a flat floor's mirror direction keeps the view's bearing and takes its depression as
+# elevation, so a band in the cube lands on the floor as streaks towards the sun's side, brightest where the floor is
+# glassiest. Only the WET_FLOORS probes (orion_map.py) use it; the sky the camera sees is unchanged.
+# ( bearing east of north, its spread, the elevation it peaks at, its spread up and down, linear brightness ).
+WET_BAND = ( ( -25.0, 14.5, 14.0, 9.0, 4.7 ), ( -33.0, 4.0, 13.0, 8.0, 1.6 ), ( -19.0, 3.0, 13.0, 8.0, 1.4 ),
+             ( -12.0, 2.5, 11.0, 7.0, 0.9 ) )
+WET_COLOUR = np.array( ( 1.0, 0.80, 0.56 ) )
+WET_NAME = "oa_sky_wet"
+
+
+def wet_reflection( out_dir ):
+    """ Writes oa_sky_wet.exr and its sky material from oa_sky.exr in out_dir: the cube the editor compiles from it is
+    the wet floors' reflection (orion_map.install_reflection_texture). """
+    import belltower_sky as S
+    S.SUN_PITCH, S.SUN_YAW = SUN_PITCH, SUN_YAW
+    rgb = read_exr( out_dir / f"{NAME}.exr" )
+    h, w = rgb.shape[:2]
+    d = S.panorama_directions( w, h )
+    B = np.degrees( np.arctan2( -d[..., 1], d[..., 0] ) )
+    E = np.degrees( np.arcsin( np.clip( d[..., 2], -1, 1 ) ) )
+    glitter = np.zeros( ( h, w ), np.float32 )
+    for b0, sb, e0, se, a in WET_BAND:
+        db = ( ( B - b0 + 180.0 ) % 360.0 ) - 180.0
+        glitter += a * np.exp( -( db / sb ) ** 2 - ( ( E - e0 ) / se ) ** 2 )
+    glitter *= S.smoothstep( -1.0, 4.0, E )
+    out = rgb + glitter[..., None] * WET_COLOUR
+    S.write_exr( out_dir / f"{WET_NAME}.exr", out )
+    text = ( Path( out_dir ) / f"{NAME}.vmat" ).read_text( encoding="utf-8" ).replace( f"{NAME}.exr", f"{WET_NAME}.exr" )
+    ( Path( out_dir ) / f"{WET_NAME}.vmat" ).write_text( "// Tools/orion_sky.py --wet: the wet floors' reflection, not drawn\n" + text,
+                                                         encoding="utf-8" )
+    print( f"wrote {WET_NAME}.exr and .vmat: glitter up to {glitter.max():.2f}" )
+
+
 def main():
     global PREVIEW_DIR
     import belltower_sky as S
+    if "--wet" in sys.argv:
+        out = Path( sys.argv[sys.argv.index( "--out" ) + 1] ) if "--out" in sys.argv else OUT_DIR
+        wet_reflection( out )
+        return
     if "--preview" in sys.argv:
         PREVIEW_DIR = Path( sys.argv[sys.argv.index( "--preview" ) + 1] )
 

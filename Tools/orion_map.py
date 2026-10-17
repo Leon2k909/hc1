@@ -69,7 +69,7 @@ REF_SIZE = ( 1536, 1024 )
 SUN_PITCH, SUN_YAW = 8.3, -155.0         # 8.3 degrees up, towards 25 degrees west of north: half behind Launch Control
 SUN_COLOUR = "2.1,1.42,0.80,1"
 SKY_MATERIAL = "materials/orion/sky/oa_sky.vmat"
-FOG_COLOUR = "0.52,0.5,0.52"
+FOG_COLOUR = "0.47,0.45,0.47"
 CATCH_FLOOR_Z = -3000
 
 PLAY = ( -1350.0, 1450.0, -1150.0, 1420.0 )
@@ -79,6 +79,8 @@ G = 240.0           # the deck, the east block's roof, the ORION block's top
 B3_TOP = 280.0
 OVER_Z = 336.0      # the overlook's roof and Launch Control's balcony
 WALK_Z = 144.0      # the west walkway and the mezzanine along the deck's front
+FASCIA_Z = 88.0     # the mezzanine's fascia comes down to here (the arcade's head)
+PARAPET_Z = 180.0   # the mezzanine's solid parapet (the picture's deck wall) stands to here
 TERRACE_Z = 64.0
 LC_TOP = 640.0
 
@@ -347,7 +349,7 @@ def launch_control( m, glass ):
     OP.plate( m, "fire", ( -340, face - 0.4, 163 ), right, 16 )
     # The south sky on the face (the blue anti-solar sky and the sunlit east half of the overlook's north wall): high,
     # broad and lavender, so it reads neutral after the 5300 K grade.
-    P.LIGHTS.append( ( "LC face fill", ( -420, face - 390, 470 ), "4.4,4.3,5.6,1", 1000, False ) )
+    P.LIGHTS.append( ( "LC face fill", ( -420, face - 390, 470 ), "3.7,3.6,4.7,1", 1000, False ) )
     OP.plate( m, "warning", ( -470, face - 0.4, 200 ), right, 20 )
     # The balcony: a slab on columns, a railing round it, the stair down to the west court.
     bx0, bx1, bn0, bn1 = LC_BALCONY
@@ -380,7 +382,7 @@ def launch_control( m, glass ):
         box( m, e - 2, e + 2, n0 - 7, n0 - 5, 560, 620, "oa_glass_frame" )
     # The terrace: a raised slab east of the tower, its east edge a parapet with a railing; steps down to the yard.
     pts = TERRACE
-    m.prism( pts, 0, TERRACE_Z, { "side": "oa_wall_dark", "top": "oa_deck" }, STONE )
+    m.prism( pts, 0, TERRACE_Z, { "side": "oa_wall_dark", "top": "oa_yard" }, STONE )
     a, b = v( *pts[1], 0 ), v( *pts[2], 0 )
     d = unit( b - a )
     out = np.cross( d, UP )
@@ -483,7 +485,7 @@ def launch_deck( m ):
         P.LIGHTS.append( ( f"Red room lamp {k}", ( e, rn1 - 30, 120 ), OP.RED_ROOM, 160, k == 0 ) )
         box( m, e - 30, e + 30, rn1 - 6, rn1 - 2, 140, 146, "oa_red_glow" )
     # The south sky on the ORION block's shaded face, as on Launch Control's: high and lavender, out over the yard.
-    P.LIGHTS.append( ( "ORION face fill", ( ( ORION[0] + ORION[1] ) / 2, ORION[2] - 370, 520 ), "7.5,7.4,9.2,1", 800, False ) )
+    P.LIGHTS.append( ( "ORION face fill", ( ( ORION[0] + ORION[1] ) / 2, ORION[2] - 370, 520 ), "11.2,11,13.6,1", 700, False ) )
     OP.red_crate( m, ( 230, 1290 ), ( 1, 0 ), ( 60, 40, 50 ) )
     OP.red_crate( m, ( 300, 1300 ), ( 1, 0.05 ), ( 44, 34, 40 ) )
     OP.red_crate( m, ( 330, 1215 ), ( 0, 1 ), ( 60, 40, 50 ) )
@@ -496,18 +498,28 @@ def launch_deck( m ):
     P.door( m, ( o0 + 40, on0, 0 ), ( 1, 0, 0 ), 40, 88, "rv_door", window=False, double=False )
     P.wall_light( m, "ORION lamp", ( o0 + 40, on0, 110 ), ( 0, -1 ), "warm", 160 )
     OP.plate( m, "hazmat", ( o1 - 30, on0 - 0.4, 70 ), v( 1, 0, 0 ), 18 )
-    # The mezzanine along the deck's front at 144, the undercroft under it.
+    # The mezzanine along the deck's front at 144, the undercroft under it. Its front is the picture's deck wall: a deep
+    # concrete fascia and a solid parapet reading as one face from the arcade's head to the coping, a low rail on top,
+    # a big pipe run along its foot turning up the ORION block's west edge. The walkway comes up through a gap in the
+    # parapet. The parapet stands 36 in over the walkway (cover to shoot over), and from the overlook its top hides the
+    # mezzanine's floor, as the picture's wall does.
     m0, m1, mn0, mn1 = MEZZ
     slab( m, m0, m1, mn0, mn1, WALK_Z - 12, WALK_Z, top="oa_deck", side="oa_wall", under="oa_wall_dark" )
-    box( m, m0, m1, mn0 - 2, mn0 + 10, WALK_Z - 44, WALK_Z - 12, "oa_wall", STONE )
+    box( m, m0, m1, mn0 - 2, mn0 + 10, FASCIA_Z, WALK_Z - 12, "oa_wall_dark", STONE )
+    for k, ( a, b ) in enumerate( ( ( m0, WALKWAY[0] ), ( WALKWAY[1], m1 ) ) ):
+        box( m, a, b, mn0 - 2, mn0 + 8, WALK_Z, PARAPET_Z, "oa_wall_dark", STONE )
+        box( m, a, b, mn0 - 4, mn0 + 10, PARAPET_Z, PARAPET_Z + 4, "oa_wall_dark", STONE )
+        railing_e( m, a, b, mn0 + 3, PARAPET_Z + 4, height=18, post_every=72, kick=False, clip_to=48,
+                   name=( "mezzanine west", "mezzanine east" )[k] )
     for e in ( -540, -420, -180, -95 ):
-        column( m, e, mn0 + 16, 0, WALK_Z - 44, 22 )
-    railing_e( m, m0, WALKWAY[0], mn0 + 3, WALK_Z, name="mezzanine west" )
-    railing_e( m, WALKWAY[1], m1, mn0 + 3, WALK_Z, name="mezzanine east" )
-    # Pipes along the mezzanine's fascia, turning up the ORION block's west edge.
-    for k, ( r_, dz ) in enumerate( ( ( 6.0, 0 ), ( 4.5, 14 ), ( 4.5, 26 ) ) ):
-        z = WALK_Z - 40 + dz
-        P.pipe( m, [ ( m0, mn0 - 6 - k * 3, z ), ( m1 - 10, mn0 - 6 - k * 3, z ), ( m1 - 10, mn0 - 6 - k * 3, G - 30 ) ], r_, "rv_pipe", 10 )
+        column( m, e, mn0 + 16, 0, FASCIA_Z, 22 )
+    for k, ( r_, z, off ) in enumerate( ( ( 9.0, FASCIA_Z + 12, 13 ), ( 5.0, FASCIA_Z + 30, 9 ) ) ):
+        P.pipe( m, [ ( m0, mn0 - off, z ), ( m1 - 26 - k * 12, mn0 - off, z ), ( m1 - 26 - k * 12, mn0 - off, G - 30 ) ], r_, "rv_pipe", 12 )
+    for e in np.arange( m0 + 60, m1 - 40, 120 ):
+        box( m, e - 2, e + 2, mn0 - 24, mn0 - 2, FASCIA_Z + 2, FASCIA_Z + 5, "oa_steel" )
+    # The arcade's lamps: warm battens under the mezzanine, lighting its head and the yard in front of it.
+    for k, e in enumerate( ( -470, -330, -190 ) ):
+        P.ceiling_light( m, f"Arcade lamp {k}", ( e, mn0 + 56, WALK_Z - 20 ), ( 1, 0 ), "warm", 300, light=k != 1, hang=6 )
     # The undercroft's back wall is the deck's south face: doors, lit alcoves, lamps, a poster.
     for k, e in enumerate( ( -500, -380, -250, -130 ) ):
         box( m, e - 30, e + 30, dn0 - 0.1, dn0, 10, 96, "oa_window_lit" if k % 2 else "oa_door" )
@@ -517,12 +529,15 @@ def launch_deck( m ):
     # The deck's face over the mezzanine: a lit doorway, cabinets, a pipe run along it, cases stacked against it.
     box( m, -478, -422, dn0 - 0.2, dn0, WALK_Z, WALK_Z + 86, "oa_window_lit" )
     box( m, -484, -416, dn0 - 3, dn0, WALK_Z + 86, WALK_Z + 92, "oa_dark" )
-    P.wall_light( m, "Mezzanine door lamp", ( -450, dn0, WALK_Z + 100 ), ( 0, -1 ), "warm", 260 )
+    P.wall_light( m, "Mezzanine door lamp", ( -450, dn0, WALK_Z + 100 ), ( 0, -1 ), "warm", 150 )
     for e in ( -360, -150 ):
         box( m, e - 22, e + 22, dn0 - 16, dn0, WALK_Z, WALK_Z + 72, { "default": "oa_steel", "-y": "oa_dark" }, METAL )
     for k, ( r_, dz ) in enumerate( ( ( 7.0, 0 ), ( 5.0, 18 ) ) ):
         P.pipe( m, [ ( m0, dn0 - 10 - k * 2, WALK_Z + 76 + dz ), ( m1, dn0 - 10 - k * 2, WALK_Z + 76 + dz ) ], r_, "rv_pipe", 10 )
     OP.case_block( m, ( -300, 858 ), ( 1, 0 ), 2, 1, ( 52, 32, 30 ), 2, "rv_case", seed=430, z0=WALK_Z )
+    # More stacks along the deck wall, as the picture's row of dark cases there.
+    OP.case_block( m, ( -210, 862 ), ( 1, 0 ), 2, 1, ( 50, 32, 30 ), 2, "rv_case", seed=431, z0=WALK_Z )
+    OP.case_block( m, ( -112, 866 ), ( 1, 0 ), 1, 1, ( 50, 30, 30 ), 2, "rv_case", seed=432, z0=WALK_Z )
     # Stair from the mezzanine up to the deck, at its west end.
     P.stairs( m, ( -525, mn0 + 50 ), ( -525, dn0 ), 64, WALK_Z, G, name="mezzanine stair" )
     # The deck's south edge railings, and the ORION block's top.
@@ -822,7 +837,7 @@ def spawn_courts( m ):
 ROCKET = ( 694.0, 2800.0 )
 ROCKET_Z = 240.0
 ROCKET_H = 1300.0
-ROCKET_R = 74.0
+ROCKET_R = 66.0
 
 
 def pad( m ):
@@ -837,9 +852,13 @@ def pad( m ):
     OP.launch_mount( m, rc, ROCKET_Z - 10, 420, 420, 200, "Mount" )
     OP.rocket( m, ( rc[0], rc[1], ROCKET_Z ), ROCKET_H, ROCKET_R, 32, ( -0.25, -1 ) )
     # The service towers: the orange one on the west, a taller and wider one on the east with a striped top.
-    OP.service_tower( m, ( rc[0] - 190, rc[1] + 30, 120 ), 190, 190, 1320, 72, "oa_gantry", "West tower", 6, arms_to=rc )
-    OP.service_tower( m, ( rc[0] + 210, rc[1] + 60, 120 ), 260, 230, 1290, 72, "oa_gantry", "East tower", 8, arms_to=rc,
-                      cap=lambda mm, top: OP.striped_tank( mm, ( top[0] + 40, top[1] + 30, top[2] ), 32, 120 ) )
+    # Their steel is lit gold in the picture: orange paint (oa_gantry), many work lamps casting light on it, and work
+    # platforms stepping out of the faces (most on the outer sides and the south, towards the yard).
+    OP.service_tower( m, ( rc[0] - 190, rc[1] + 30, 120 ), 190, 190, 1320, 72, "oa_gantry", "West tower", 12, arms_to=rc,
+                      ledges=( ( 3, 2, 60, 0.9 ), ( 4, 0, 40, 0.6 ), ( 7, 2, 44, 0.7 ), ( 9, 0, 36, 0.5 ), ( 12, 2, 50, 0.8 ), ( 15, 0, 40, 0.6 ) ) )
+    OP.service_tower( m, ( rc[0] + 210, rc[1] + 60, 120 ), 260, 230, 1290, 72, "oa_gantry", "East tower", 14, arms_to=rc,
+                      cap=lambda mm, top: OP.striped_tank( mm, ( top[0] + 40, top[1] + 30, top[2] ), 32, 120 ),
+                      ledges=( ( 2, 3, 70, 0.8 ), ( 5, 0, 44, 0.5 ), ( 6, 3, 50, 0.6 ), ( 10, 0, 40, 0.6 ), ( 11, 3, 60, 0.7 ), ( 14, 3, 44, 0.5 ) ) )
     P.cylinder( m, ( rc[0] - 70, rc[1] + 330 ), 60, 120, 1500, "oa_steel", 16 )
     P.lathe( m, ( rc[0] - 70, rc[1] + 330 ), [ ( 60, 1500 ), ( 40, 1530 ), ( 0, 1545 ) ], "oa_steel", 16 )
     # Lightning masts round the pad.
@@ -1133,7 +1152,7 @@ def look_object():
                      Tint="1,0.95,0.88,1" ),
         K.component( ids, "Sandbox.ScreenSpaceReflections", "look/ssr", **{ "__enabled": False } ),
         K.component( ids, "Sandbox.Tonemapping", "look/tonemap", **{ "__version": 3 }, AutoExposureEnabled=True,
-                     ExposureCompensation=0.0, ExposureMethod="RGB", MinimumExposure=1.0, MaximumExposure=1.6,
+                     ExposureCompensation=0.0, ExposureMethod="RGB", MinimumExposure=1.0, MaximumExposure=1.2,
                      Mode="ACES", Rate=1 ),
     ] )
 
@@ -1208,31 +1227,46 @@ def steam_objects():
 # through it. Screen-space reflections are off (look_object), so where a wet floor's mirror image meets the ORION
 # block, the deck front or the tunnel rather than sky, its probe is weaker (WET_FLOORS).
 REFLECTION_TEXTURE = "lighting/orion/reflection_sky_v3.vtex"
+# The wet floors' own cube: the sky with the low sun's glitter as a band (Tools/orion_sky.py --wet, WET_BAND), so the
+# puddles and the wet film show streaks of warm light towards the sun's side, as the picture's floors do.
+WET_TEXTURE = None
 
 
 def install_reflection_texture():
     """ Copies the editor's compiled sky cube (materials/orion/sky/oa_sky_exr_*.generated.vtex_c) to a path named after
     its content (lighting/orion/reflection_sky_<hash>.vtex_c), so a running editor loads a new sky's cube rather than
-    the one it has cached under an old name, and points the probes at it. Older copies are removed. Returns whether
-    there was one to copy. """
-    global REFLECTION_TEXTURE
+    the one it has cached under an old name, and points the probes at it; the same for the wet floors' cube
+    (oa_sky_wet_exr_*, lighting/orion/reflection_wet_<hash>.vtex_c). Older copies are removed. Returns whether there was
+    a sky cube to copy. """
+    global REFLECTION_TEXTURE, WET_TEXTURE
     import hashlib
-    sky = sorted( ( ASSETS / "materials/orion/sky" ).glob( "oa_sky_exr_*.generated.vtex_c" ), key=lambda p: p.stat().st_mtime )
-    if not sky:
+
+    def install( pattern, prefix ):
+        cubes = sorted( ( ASSETS / "materials/orion/sky" ).glob( pattern ), key=lambda p: p.stat().st_mtime )
+        if not cubes:
+            return None
+        data = cubes[-1].read_bytes()
+        resource = f"lighting/orion/{prefix}_{hashlib.sha1( data ).hexdigest()[:8]}.vtex"
+        target = ASSETS / f"{resource}_c"
+        target.parent.mkdir( parents=True, exist_ok=True )
+        if not target.exists():
+            target.write_bytes( data )
+            print( f"copied {cubes[-1].name} to {target.relative_to( K.ROOT )}" )
+        for old in target.parent.glob( f"{prefix}_*.vtex_c" ):
+            if old != target:
+                try:
+                    old.unlink()
+                except OSError as error:
+                    print( f"left {old.name}: {error}" )
+        return resource
+
+    sky = install( "oa_sky_exr_*.generated.vtex_c", "reflection_sky" )
+    if sky is None:
         return False
-    data = sky[-1].read_bytes()
-    REFLECTION_TEXTURE = f"lighting/orion/reflection_sky_{hashlib.sha1( data ).hexdigest()[:8]}.vtex"
-    target = ASSETS / f"{REFLECTION_TEXTURE}_c"
-    target.parent.mkdir( parents=True, exist_ok=True )
-    if not target.exists():
-        target.write_bytes( data )
-        print( f"copied {sky[-1].name} to {target.relative_to( K.ROOT )}" )
-    for old in target.parent.glob( "reflection_sky_*.vtex_c" ):
-        if old != target:
-            try:
-                old.unlink()
-            except OSError as error:
-                print( f"left {old.name}: {error}" )
+    REFLECTION_TEXTURE = sky
+    WET_TEXTURE = install( "oa_sky_wet_exr_*.generated.vtex_c", "reflection_wet" )
+    if WET_TEXTURE is None:
+        print( "no compiled wet cube yet (materials/orion/sky/oa_sky_wet.vmat): the wet floors use the sky's" )
     return True
 
 
@@ -1256,11 +1290,11 @@ def probe_objects():
 # those parts get weaker copies (screen-space reflections are off). The boxes overlap 4 in at the joints so no strip
 # falls back to the dim global probe. The tunnel mouth mirrors the deck front. The yard tarp's wet top mirrors the
 # bright sky towards the sun.
-WET_FLOORS = [ ( "Yard", ( -230.0, 560.0, -540.0, 248.0, -20.0, 3.0 ), 11 ), ( "Yard Mid", ( -230.0, 560.0, 244.0, 344.0, -20.0, 3.0 ), 5 ),
-               ( "Yard Far", ( -230.0, 560.0, 340.0, 700.0, -20.0, 3.0 ), 3 ), ( "B3 Strip", ( 560.0, 1150.0, -540.0, 157.0, -20.0, 3.0 ), 13 ),
-               ( "Tunnel Mouth", ( 160.0, 560.0, 700.0, 900.0, -20.0, 3.0 ), 3 ), ( "Terrace", ( -316.0, -120.0, -250.0, 330.0, 58.0, 67.0 ), 5 ),
-               ( "Deck", ( -560.0, 600.0, 900.0, 1400.0, 220.0, 243.0 ), 7 ), ( "East Roof", ( 560.0, 1150.0, 157.0, 1400.0, 220.0, 243.0 ), 7 ),
-               ( "B3 Roof", ( 243.0, 1150.0, -210.0, 157.0, 262.0, 283.0 ), 7 ), ( "Yard Tarp", ( -200.0, -30.0, 310.0, 455.0, 46.0, 57.0 ), 8 ) ]
+WET_FLOORS = [ ( "Yard", ( -230.0, 560.0, -540.0, 248.0, -20.0, 3.0 ), 4.5 ), ( "Yard Mid", ( -230.0, 560.0, 244.0, 344.0, -20.0, 3.0 ), 3.8 ),
+               ( "Yard Far", ( -230.0, 560.0, 340.0, 700.0, -20.0, 3.0 ), 2.5 ), ( "B3 Strip", ( 560.0, 1150.0, -540.0, 157.0, -20.0, 3.0 ), 5.5 ),
+               ( "Tunnel Mouth", ( 160.0, 560.0, 700.0, 900.0, -20.0, 3.0 ), 1.3 ), ( "Terrace", ( -316.0, -120.0, -250.0, 330.0, 58.0, 67.0 ), 6 ),
+               ( "Deck", ( -560.0, 600.0, 900.0, 1400.0, 220.0, 243.0 ), 3 ), ( "East Roof", ( 560.0, 1150.0, 157.0, 1400.0, 220.0, 243.0 ), 3 ),
+               ( "B3 Roof", ( 243.0, 1150.0, -210.0, 157.0, 262.0, 283.0 ), 3 ), ( "Yard Tarp", ( -200.0, -30.0, 310.0, 455.0, 46.0, 57.0 ), 3.5 ) ]
 
 
 def yard_probe( name="Yard", box_=WET_FLOORS[0][1], strength=18 ):
@@ -1277,7 +1311,8 @@ def yard_probe( name="Yard", box_=WET_FLOORS[0][1], strength=18 ):
                      Bounds={ "Mins": K.vec( np.minimum( lo, hi ) ), "Maxs": K.vec( np.maximum( lo, hi ) ) },
                      DelayBetweenUpdates=0.1, Feathering=2, FrameInterval=5, MaxDistance=512, Mode="CustomTexture",
                      MultiBounce=False, Priority=1, Projection="Sphere", RenderExcludeTags="", Resolution="Small",
-                     Texture=REFLECTION_TEXTURE, TintColor=f"{strength},{strength},{strength},1", UpdateStrategy="OnEnabled", ZFar=4096, ZNear=16 ) ] ),
+                     Texture=WET_TEXTURE or REFLECTION_TEXTURE, TintColor=f"{strength},{strength},{strength},1", UpdateStrategy="OnEnabled",
+                     ZFar=4096, ZNear=16 ) ] ),
              "NetworkMode": 2 }
 
 
