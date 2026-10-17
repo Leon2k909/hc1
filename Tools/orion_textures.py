@@ -54,7 +54,7 @@ SCALE = 1.0
 
 TILES = { "oa_wall": 236.0, "oa_wall_dark": 236.0, "oa_yard": 768.0, "oa_deck": 384.0, "oa_yellow": 48.0, "oa_steel": 48.0,
           "oa_orange": 64.0, "oa_gantry": 64.0, "oa_red": 48.0, "oa_white_steel": 96.0, "oa_pipe": 64.0, "oa_olive": 48.0, "oa_case": 48.0,
-          "oa_tarp": 96.0, "oa_hazard": 32.0, "oa_grating": 24.0, "oa_rocket": 120.0, "oa_radome": 240.0, "oa_hill": 1600.0 }
+          "oa_tarp": 96.0, "oa_tarp_grey": 96.0, "oa_hazard": 32.0, "oa_grating": 24.0, "oa_rocket": 120.0, "oa_radome": 240.0, "oa_hill": 1600.0 }
 
 
 def px( n ):
@@ -171,7 +171,7 @@ def concrete( seed=11, base=( 150, 150, 147 ), grime=0.35, n=None ):
     return colour, rough, height, ppi
 
 
-def slabs( seed, tile_key, slab=192.0, wet=1.0, puddles=1.0, base=( 120, 118, 114 ), n=None ):
+def slabs( seed, tile_key, slab=192.0, wet=1.0, puddles=1.0, base=( 120, 118, 114 ), n=None, rough_add=0.0 ):
     """ Slabs after rain: sawn joints with dark sealant, cracks, damp darkening, oil, tyre marks and standing water in
     the dips (glassy and dark, the texture flat under it). """
     n = n or px( 4096 if tile_key == "oa_yard" else 2048 )
@@ -198,8 +198,8 @@ def slabs( seed, tile_key, slab=192.0, wet=1.0, puddles=1.0, base=( 120, 118, 11
     patch = smoothstep( 1.2, 1.6, nz( 2.4, 90, 8 ) )
     colour = mix( colour, colour * 0.8 + lin( ( 12, 12, 12 ) ), patch[..., None] * 0.5 )
     damp = ( 0.55 + 0.45 * smoothstep( -1.2, 1.0, nz( 2.4, 200, 20 ) ) ) * wet
-    colour = colour * ( 1.0 - 0.45 * damp )[..., None] * ( 1.0 - 0.3 * seam )[..., None]
-    rough = np.clip( 0.62 - 0.32 * damp + 0.05 * mid - 0.15 * seam, 0.08, 1.0 )
+    colour = colour * ( 1.0 - 0.45 * damp / max( wet, 1.0 ) )[..., None] * ( 1.0 - 0.3 * seam )[..., None]
+    rough = np.clip( 0.62 + rough_add - 0.32 * damp + 0.05 * mid - 0.15 * seam, 0.08, 1.0 )
     oil = smoothstep( 1.5, 2.7, nz( 2.0, 40, 3 ) )
     colour = mix( colour, lin( ( 20, 18, 16 ) ), oil[..., None] * 0.6 )
     cv = BM.Canvas( ( n, n ), ( ppi, ppi ), ( 0.0, 0.0 ), tile, ss=1 )
@@ -277,7 +277,7 @@ def pipe_jacket( seed=51, n=None ):
     return c, np.clip( r, 0.08, 1 ), h, ppi
 
 
-def tarp( seed=61, n=None ):
+def tarp( seed=61, n=None, base=( 96, 104, 84 ) ):
     """ An olive PVC tarpaulin pulled over a load: creases and sags, the weave, wet and glossy where water sits. """
     n = n or px( 1024 )
     tile = TILES["oa_tarp"]
@@ -285,11 +285,11 @@ def tarp( seed=61, n=None ):
     nz, x, z, ppi = field( rng, n, tile )
     folds = nz( 2.2, 30, 2 ) + 0.6 * np.abs( nz( 1.8, 12, 1 ) )
     weave = 0.5 + 0.5 * np.sin( x * 2 * math.pi / 0.12 ) * np.sin( z * 2 * math.pi / 0.12 )
-    c = lin( ( 58, 66, 48 ) )[None, None, :] * ( 1.0 + 0.1 * folds + 0.03 * weave )[..., None]
+    c = lin( base )[None, None, :] * ( 1.0 + 0.1 * folds + 0.03 * weave )[..., None]
     wetness = smoothstep( 0.4, 1.6, nz( 2.4, 40, 4 ) )
     c = mix( c, c * 0.7, wetness[..., None] * 0.5 )
     c = mix( c, BM.GRIME, smoothstep( 0.8, 2.2, nz( 2.4, 20, 2 ) )[..., None] * 0.25 )
-    r = 0.55 - 0.35 * wetness + 0.05 * weave
+    r = 0.45 - 0.33 * wetness + 0.05 * weave
     h = 0.25 * folds + 0.01 * weave
     return c, np.clip( r, 0.08, 1 ), h, ppi
 
@@ -831,7 +831,7 @@ PAINTED = {
     "oa_rocket_dark": ( ( 40, 40, 44 ), 0.3, 0.45, 0 ),
     "oa_nozzle": ( ( 70, 66, 62 ), 0.8, 0.4, 0 ),
     "oa_zinc": ( ( 150, 156, 160 ), 0.6, 0.45, 0 ),
-    "oa_line_yellow": ( ( 200, 154, 32 ), 0.0, 0.35, 0 ),
+    "oa_line_yellow": ( ( 186, 146, 72 ), 0.0, 0.3, 0 ),
     "oa_line_white": ( ( 200, 200, 196 ), 0.0, 0.35, 0 ),
     "oa_flag_pole": ( ( 160, 164, 168 ), 0.8, 0.3, 0 ),
     "oa_pine": ( ( 52, 66, 50 ), 0.0, 0.9, 0 ),
@@ -841,7 +841,7 @@ PAINTED = {
     "oa_grass_far": ( ( 150, 136, 96 ), 0.0, 0.95, 0 ),
     "oa_rock": ( ( 128, 118, 104 ), 0.0, 0.9, 0 ),
     "oa_rock_far": ( ( 120, 124, 136 ), 0.0, 0.92, 0 ),
-    "oa_mountain": ( ( 132, 140, 156 ), 0.0, 0.95, 0 ),
+    "oa_mountain": ( ( 56, 62, 62 ), 0.0, 0.95, 0 ),
     "oa_earth": ( ( 120, 98, 76 ), 0.0, 0.92, 0 ),
     "oa_render": ( ( 214, 204, 184 ), 0.0, 0.8, 0 ),
     "oa_render_ochre": ( ( 206, 168, 112 ), 0.0, 0.8, 0 ),
@@ -905,19 +905,20 @@ def write_surface( out, name, colour, rough, height, ppi, metalness=0.0, alpha=N
 
 SURFACES = {
     "oa_wall": lambda: concrete(),
-    "oa_wall_dark": lambda: concrete( seed=12, base=( 128, 128, 124 ), grime=0.85 ),
-    "oa_yard": lambda: slabs( 31, "oa_yard", slab=96.0, wet=1.75, puddles=0.85, base=( 124, 120, 114 ) ),
-    "oa_deck": lambda: slabs( 32, "oa_deck", slab=128.0, wet=0.8, puddles=0.6, base=( 132, 130, 126 ) ),
-    "oa_yellow": lambda: painted( 41, ( 222, 168, 24 ), TILES["oa_yellow"], chips=0.55, rough=0.42 ),
+    "oa_wall_dark": lambda: concrete( seed=12, base=( 104, 104, 100 ), grime=1.0 ),
+    "oa_yard": lambda: slabs( 31, "oa_yard", slab=96.0, wet=1.0, puddles=1.3, rough_add=0.12, base=( 124, 120, 114 ) ),
+    "oa_deck": lambda: slabs( 32, "oa_deck", slab=128.0, wet=0.6, puddles=0.25, base=( 132, 130, 126 ) ),
+    "oa_yellow": lambda: painted( 41, ( 196, 150, 66 ), TILES["oa_yellow"], chips=0.55, rough=0.38, grime=0.5 ),
     "oa_steel": lambda: painted( 42, ( 72, 76, 80 ), TILES["oa_steel"], chips=0.3, rough=0.5 ),
     "oa_orange": lambda: painted( 43, ( 186, 96, 40 ), TILES["oa_orange"], chips=0.6, rough=0.55, grime=0.5, rust=0.45, bare=( 70, 50, 40 ) ),
     "oa_gantry": lambda: painted( 47, ( 66, 54, 46 ), TILES["oa_gantry"], chips=0.5, rough=0.5, grime=0.6, rust=0.55, bare=( 44, 36, 30 ) ),
     "oa_red": lambda: painted( 44, ( 150, 38, 30 ), TILES["oa_red"], chips=0.45, rough=0.5, grime=0.5, rust=0.2 ),
     "oa_white_steel": lambda: painted( 45, ( 214, 214, 208 ), TILES["oa_white_steel"], chips=0.2, rough=0.5, grime=0.55 ),
-    "oa_olive": lambda: painted( 46, ( 60, 68, 50 ), TILES["oa_olive"], chips=0.25, rough=0.6, bare=( 46, 48, 42 ), grime=0.5 ),
-    "oa_case": lambda: painted( 47, ( 40, 44, 44 ), TILES["oa_case"], chips=0.25, rough=0.58, bare=( 70, 72, 74 ), grime=0.4 ),
+    "oa_olive": lambda: painted( 46, ( 80, 88, 66 ), TILES["oa_olive"], chips=0.25, rough=0.5, bare=( 60, 62, 54 ), grime=0.45 ),
+    "oa_case": lambda: painted( 47, ( 56, 60, 60 ), TILES["oa_case"], chips=0.25, rough=0.5, bare=( 80, 82, 84 ), grime=0.4 ),
     "oa_pipe": lambda: pipe_jacket(),
     "oa_tarp": lambda: tarp(),
+    "oa_tarp_grey": lambda: tarp( seed=62, base=( 132, 117, 101 ) ),
     "oa_rocket": lambda: rocket_skin(),
     "oa_radome": lambda: radome(),
     "oa_hill": lambda: hill(),

@@ -153,7 +153,7 @@ def floodlight_pole( m, name, base, h, facing, heads=4, light=True, radius=1800,
     return top
 
 
-def tube_light( m, name, at, out, length=48.0, kind="cool", radius=300, light=True, shadows=False ):
+def tube_light( m, name, at, out, length=48.0, kind="cool", radius=300, light=True, shadows=False, colour=None ):
     """ A fluorescent batten on a wall facing out: a slim housing and its lit diffuser. """
     out = unit( ( out[0], out[1], 0 ) )
     right = np.cross( UP, out )
@@ -167,7 +167,7 @@ def tube_light( m, name, at, out, length=48.0, kind="cool", radius=300, light=Tr
     card( m, lens, [ q - right * ( length / 2 - 1.5 ) - out * 2, q + right * ( length / 2 - 1.5 ) - out * 2, q + right * ( length / 2 - 1.5 ) + out * 2,
                      q - right * ( length / 2 - 1.5 ) + out * 2 ], -UP )
     if light:
-        P.LIGHTS.append( ( name, tuple( c + out * 24 - UP * 8 ), COOL if kind == "cool" else WARM, radius, shadows ) )
+        P.LIGHTS.append( ( name, tuple( c + out * 24 - UP * 8 ), colour or ( COOL if kind == "cool" else WARM ), radius, shadows ) )
 
 
 def work_lamp( m, at, light_name=None, radius=160 ):
@@ -188,14 +188,15 @@ def rocket( m, base, height=1226.0, r=78.0, sides=28, logo_facing=( 0, -1 ) ):
     c = v( *base )
     z0 = c[2]
     H = height
-    # The picture's: a long white first stage, a thin dark interstage under a gold band at seven tenths of its height,
-    # the white second stage and the fairing above, its tip out of the picture.
-    skirt, s1, inter, band, fairing = 0.05, 0.70, 0.712, 0.738, 0.86
+    # The picture's: a long white first stage, a thin dark interstage band, a white ring, a narrow gold band, the white
+    # second stage, then a blunt ogive fairing whose tip just reaches the picture's top edge.
+    skirt, s1, inter, gold0, band, fairing = 0.05, 0.719, 0.729, 0.770, 0.788, 0.901
     prof = [ ( r * 1.06, z0 ), ( r * 1.06, z0 + H * 0.02 ), ( r, z0 + H * skirt ) ]
     P.lathe( m, ( c[0], c[1] ), prof, "oa_rocket_dark", sides )
     P.lathe( m, ( c[0], c[1] ), [ ( r, z0 + H * skirt ), ( r, z0 + H * s1 ) ], "oa_rocket", sides )
     P.lathe( m, ( c[0], c[1] ), [ ( r, z0 + H * s1 ), ( r, z0 + H * inter ) ], "oa_rocket_dark", sides )
-    P.lathe( m, ( c[0], c[1] ), [ ( r, z0 + H * inter ), ( r, z0 + H * band ) ], "oa_gold", sides )
+    P.lathe( m, ( c[0], c[1] ), [ ( r, z0 + H * inter ), ( r, z0 + H * gold0 ) ], "oa_rocket", sides )
+    P.lathe( m, ( c[0], c[1] ), [ ( r, z0 + H * gold0 ), ( r, z0 + H * band ) ], "oa_gold", sides )
     P.lathe( m, ( c[0], c[1] ), [ ( r * 0.98, z0 + H * band ), ( r * 0.98, z0 + H * fairing ) ], "oa_rocket", sides )
     # The fairing: an ogive to a rounded tip.
     ogive = []
@@ -225,8 +226,8 @@ def rocket( m, base, height=1226.0, r=78.0, sides=28, logo_facing=( 0, -1 ) ):
     # The mark and ORN down the side.
     f = unit( ( logo_facing[0], logo_facing[1], 0 ) )
     right = np.cross( UP, f )
-    letters( m, "mark", c + f * ( r + 0.6 ) + UP * ( z0 - c[2] + H * 0.42 ), right, r * 1.2, "dark", off=0.0 )
-    letters( m, "orn", c + f * ( r + 0.6 ) + UP * ( z0 - c[2] + H * 0.30 ), right, r * 2.6, "dark", off=0.0 )
+    letters( m, "mark", c + f * ( r + 0.6 ) + UP * ( z0 - c[2] + H * 0.478 ), right, r * 1.2, "dark", off=0.0 )
+    letters( m, "orn", c + f * ( r + 0.6 ) + UP * ( z0 - c[2] + H * 0.342 ), right, r * 2.6, "dark", off=0.0 )
     return c + UP * H
 
 
@@ -278,6 +279,9 @@ def service_tower( m, base, w, d, h, floor=96.0, paint="oa_orange", name="gantry
             if 0 < list( xs ).index( x ) < cols_w - 1 and 0 < list( ys ).index( y ) < cols_d - 1:
                 continue
             beam( m, c + v( x, y, 0 ), c + v( x, y, h ), t * 1.4, paint )
+    # The enclosed lift shaft and stairwell every fixed service structure has, so sky doesn't show through every bay.
+    cw, cd = w * 0.4, d * 0.4
+    box( m, c[0] - cw / 2, c[0] + cw / 2, c[1] - cd / 2, c[1] + cd / 2, c[2], c[2] + h - floor, { "default": paint, "+z": "oa_grating" } )
     rng = np.random.default_rng( int( abs( c[0] ) + abs( c[1] ) ) )
     lit = 0
     for k in range( 1, floors + 1 ):
@@ -286,19 +290,14 @@ def service_tower( m, base, w, d, h, floor=96.0, paint="oa_orange", name="gantry
         for x0, x1 in zip( xs, xs[1:] ):
             for y in ( ys[0], ys[-1] ):
                 beam( m, c + v( x0, y, z ), c + v( x1, y, z ), t, rim )
-                if k % 2:
-                    beam( m, c + v( x0, y, z - floor ), c + v( x1, y, z ), t * 0.5, paint )
-                else:
-                    beam( m, c + v( x1, y, z - floor ), c + v( x0, y, z ), t * 0.5, paint )
+                beam( m, c + v( x0, y, z - floor ), c + v( x1, y, z ), t * 0.5, paint )
+                beam( m, c + v( x1, y, z - floor ), c + v( x0, y, z ), t * 0.5, paint )
         for y0, y1 in zip( ys, ys[1:] ):
             for x in ( xs[0], xs[-1] ):
                 beam( m, c + v( x, y0, z ), c + v( x, y1, z ), t, rim )
-                if k % 2:
-                    beam( m, c + v( x, y0, z - floor ), c + v( x, y1, z ), t * 0.5, paint )
-                else:
-                    beam( m, c + v( x, y1, z - floor ), c + v( x, y0, z ), t * 0.5, paint )
-        if k % 2 == 0 or k == floors:
-            box( m, c[0] - w / 2, c[0] + w / 2, c[1] - d / 2, c[1] + d / 2, c[2] + z - 2, c[2] + z, "oa_grating" )
+                beam( m, c + v( x, y0, z - floor ), c + v( x, y1, z ), t * 0.5, paint )
+                beam( m, c + v( x, y1, z - floor ), c + v( x, y0, z ), t * 0.5, paint )
+        box( m, c[0] - w / 2, c[0] + w / 2, c[1] - d / 2, c[1] + d / 2, c[2] + z - 2, c[2] + z, "oa_grating" )
         # Work lamps: a handful on each floor's edge (the picture's towers glitter with them), the odd one casting light.
         for j in range( 4 ):
             side = rng.integers( 4 )
@@ -396,7 +395,7 @@ def pallet( m, centre, along, L, W, z0=0.0, paint="oa_pallet" ):
 
 
 def case_block( m, origin, along, cols, rows, size=( 52, 32, 30 ), layers=1, paint="rv_olive", gap=2.0, tarp=False,
-                surface=PLASTIC, seed=0, z0=0.0, pallets=False ):
+                surface=PLASTIC, seed=0, z0=0.0, pallets=False, tarp_paint="oa_tarp" ):
     """ A block of equal cases, cols along `along` and rows across it, layers high, from origin (its corner, plan),
     optionally under a draped tarp and on pallets. Returns ( length, width, height ). Collision: one box for the
     block. """
@@ -418,7 +417,7 @@ def case_block( m, origin, along, cols, rows, size=( 52, 32, 30 ), layers=1, pai
                     continue
                 P.case( m, ( c[0], c[1] ), ( L, W, H ), a, paint, z0 + layer * H, None )
     if tarp:
-        drape( m, o + UP * z0, a, total_l, total_w, total_h, seed=seed )
+        drape( m, o + UP * z0, a, total_l, total_w, total_h, seed=seed, paint=tarp_paint )
     base = z0 - ( PALLET_H if pallets else 0.0 )
     tall = total_h + ( PALLET_H if pallets else 0.0 )
     centre = o + a * ( total_l / 2 ) + s * ( total_w / 2 ) + UP * ( base + tall / 2 )

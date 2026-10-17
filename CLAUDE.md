@@ -4293,11 +4293,17 @@ simulate_input.
     south to the overlook's north wall; the low ones are a kerb you step over or mantle.
   - The skyline of the hills is the picture's, measured by bearing (`orion_backdrop.SKYLINE`): past 15000 the land
     climbs to it at the far edge. No cone trees: at that size they read as a picket fence.
-- Light: no baked indirect light. Flat ambient 0.12, exposure auto 1.0-1.6, sky tint 2.2, ColorGrading 4900 K at 0.5,
-  ColorAdjustments saturation 1.1 (its Contrast works in linear HDR space: 1.1 crushed every shadow to black).
-  Reflections: the sky's compiled cube as a static CustomTexture probe (tint 1.8) plus much stronger, only inches
-  deep copies over the wet floors open to the sky (`WET_FLOORS`), with SSR on. The cube is copied to
+- Light: no baked indirect light. Flat ambient (`SkyColor` 0.15), which has no occlusion, so screen-space AO is
+  strong (intensity 1, radius 220) and walls in shade use the darker concrete (`oa_wall_dark`). Soft lavender fills
+  stand for the south sky on the shaded faces (`LC face fill`, `ORION face fill`, the warm `B3 face wash`).
+  Exposure auto 1.0-1.6, sky tint 2.6, ColorGrading 5300 K at 0.5, ColorAdjustments saturation 1.1 (its Contrast works
+  in linear HDR space: 1.1 crushed every shadow to black).
+  Reflections: the sky's compiled cube as a static CustomTexture probe (tint 1.8) plus stronger, only inches deep
+  copies over the wet floors open to the sky (`WET_FLOORS`, stepped down where the floor's mirror image meets
+  buildings). SSR is off: the engine's SSR swapped the near yard's sky for the slabs' own colour. The cube is copied to
   `Assets/lighting/orion/reflection_sky_<hash>.vtex_c`, named by its content so a running editor loads a new one.
+- The captures render with the scene's ACES tonemapper; since 2026-10-17 the player camera picks AgX (see Shared camera
+  look), so a match is tone-mapped differently. Not compared yet.
 - Steam (copies of the gun smoke prefab) is unlit, so it glows against the low sun instead of going dark.
 - Don't move or delete assets a running match uses. When v1's textures were moved out from under the user's Orion
   match (2026-10-15), the renderer reloaded them every second until the editor ran out of video memory and stalled.
@@ -4305,10 +4311,15 @@ simulate_input.
   90 degrees. The ( size[1], size[0], size[2] ) it first copied from Riverdale laid every clip across its rail: each
   stair's rail walled the stair off at its middle, and only the in-editor navmesh check caught it (the offline reach
   check ignores clips).
-- Checked: the offline spot checks, every asset compiling, the reference view against the picture patch by patch, the
-  user playing a match on v2 in the editor (all ten models loaded, no error models), and the in-editor navmesh check
-  (`Sources/Orion/v2/editor/navmesh-check.cs.txt`: complete paths from both team spawns to all 95 spots). Not yet
-  checked: a second client and the frame time.
+- Checked: the offline spot checks, every asset compiling, the user playing a match on v2 in the editor (all ten models
+  loaded, no error models), and the in-editor navmesh check (`Sources/Orion/v2/editor/navmesh-check.cs.txt`: complete
+  paths from both team spawns to all 95 spots, again after the 2026-10-16 round).
+- Against the picture (2026-10-17, capture `v3f`, `Sources/Orion/v2/compare.py`; README's State has the table): the
+  shaded faces, the yard, the sky and the hills are within 4 levels of the picture's patch medians; the deck front
+  (44 vs 37) and the foreground terrace (49 vs 42) are brighter. Still unlike it: the puddles read as pale blotches
+  rather than mirrors with the sun's streaks, the gantries are dark cages where the picture's are lit gold, the deck
+  front and its arcade are a different build, and the hills have no town. Not yet checked: a second client and the
+  frame time.
 
 ## Ridgeback (battle royale map, `Assets/scenes/maps/Ridgeback/`)
 - The second battle royale map, a base to build on: a valley about 1.2 km across in a ring of mountains, on an s&box

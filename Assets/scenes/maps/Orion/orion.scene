@@ -107,7 +107,7 @@
           "ShadowCascadeSplitRatio": 0.91,
           "ShadowHardness": 0,
           "Shadows": true,
-          "SkyColor": "0.12,0.115,0.115,1"
+          "SkyColor": "0.15,0.145,0.145,1"
         }
       ],
       "Children": []
@@ -135,7 +135,7 @@
           "Flags": 0,
           "SkyIndirectLighting": true,
           "SkyMaterial": "materials/orion/sky/oa_sky.vmat",
-          "Tint": "2.2,2.2,2.2,1"
+          "Tint": "2.6,2.6,2.6,1"
         }
       ],
       "Children": []
@@ -161,7 +161,7 @@
           "__guid": "ef0670e5-89c7-5a53-8488-c0eecf4d0fa1",
           "__enabled": true,
           "Flags": 0,
-          "Color": "0.6,0.58,0.6,0.88",
+          "Color": "0.52,0.5,0.52,0.82",
           "StartDistance": 1400,
           "EndDistance": 34000,
           "FalloffExponent": 0.85,
@@ -220,8 +220,8 @@
           "Flags": 0,
           "__version": 1,
           "FalloffRange": 1,
-          "Intensity": 0.8,
-          "Radius": 110,
+          "Intensity": 1.0,
+          "Radius": 220,
           "ThinCompensation": 5
         },
         {
@@ -230,7 +230,7 @@
           "__enabled": true,
           "Flags": 0,
           "GradingMethod": "TemperatureControl",
-          "ColorTempK": 4900,
+          "ColorTempK": 5300,
           "BlendFactor": 0.5,
           "ColorSpace": "None",
           "LookupTexture": null
@@ -270,7 +270,7 @@
         {
           "__type": "Sandbox.ScreenSpaceReflections",
           "__guid": "12996ee1-c5ec-5c8f-b7bc-3116e24c8226",
-          "__enabled": true,
+          "__enabled": false,
           "Flags": 0
         },
         {
@@ -1084,9 +1084,9 @@
               "Attenuation": 1,
               "FogMode": "Enabled",
               "FogStrength": 0.5,
-              "LightColor": "0.72,0.82,0.95,1",
+              "LightColor": "0.3,0.34,0.4,1",
               "Radius": 320,
-              "Shadows": false
+              "Shadows": true
             }
           ],
           "Children": []
@@ -1115,8 +1115,39 @@
               "Attenuation": 1,
               "FogMode": "Enabled",
               "FogStrength": 0.5,
-              "LightColor": "0.72,0.82,0.95,1",
+              "LightColor": "0.3,0.34,0.4,1",
               "Radius": 320,
+              "Shadows": true
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "edea7a84-f789-5de2-b74a-8bafca2526fe",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "LC face fill",
+          "Position": "-400,420,470",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "46d9c6c4-7b09-5558-9579-0e7718093814",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.12,
+              "LightColor": "4.4,4.3,5.6,1",
+              "Radius": 1000,
               "Shadows": false
             }
           ],
@@ -1270,7 +1301,7 @@
               "Attenuation": 1,
               "FogMode": "Enabled",
               "FogStrength": 0.5,
-              "LightColor": "0.72,0.82,0.95,1",
+              "LightColor": "1.00,0.74,0.46,1",
               "Radius": 240,
               "Shadows": false
             }
@@ -1301,7 +1332,7 @@
               "Attenuation": 1,
               "FogMode": "Enabled",
               "FogStrength": 0.5,
-              "LightColor": "0.72,0.82,0.95,1",
+              "LightColor": "1.00,0.74,0.46,1",
               "Radius": 240,
               "Shadows": false
             }
@@ -1313,7 +1344,7 @@
           "__version": 2,
           "Flags": 32768,
           "Name": "Red room lamp 0",
-          "Position": "1340,-260,150",
+          "Position": "1370,-260,120",
           "Rotation": "0,0,0,1",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
@@ -1333,7 +1364,7 @@
               "FogMode": "Enabled",
               "FogStrength": 0.5,
               "LightColor": "1.00,0.16,0.10,1",
-              "Radius": 230,
+              "Radius": 160,
               "Shadows": true
             }
           ],
@@ -1344,7 +1375,7 @@
           "__version": 2,
           "Flags": 32768,
           "Name": "Red room lamp 1",
-          "Position": "1340,-360,150",
+          "Position": "1370,-360,120",
           "Rotation": "0,0,0,1",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
@@ -1364,7 +1395,38 @@
               "FogMode": "Enabled",
               "FogStrength": 0.5,
               "LightColor": "1.00,0.16,0.10,1",
-              "Radius": 230,
+              "Radius": 160,
+              "Shadows": false
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "dcb78fe2-c801-556e-8a85-538845eeac30",
+          "__version": 2,
+          "Flags": 32768,
+          "Name": "ORION face fill",
+          "Position": "330,-42.5,520",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_point,light",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "c2823c31-c187-56bc-8607-5c5fc6f7d1e7",
+              "__enabled": true,
+              "Flags": 0,
+              "Attenuation": 1,
+              "FogMode": "Enabled",
+              "FogStrength": 0.5,
+              "LightColor": "7.5,7.4,9.2,1",
+              "Radius": 800,
               "Shadows": false
             }
           ],
@@ -1716,7 +1778,7 @@
           "__version": 2,
           "Flags": 32768,
           "Name": "B3 face wash",
-          "Position": "-102.461,-74.5596,150",
+          "Position": "-128.185,-56.167,230",
           "Rotation": "0,0,0,1",
           "Scale": "1,1,1",
           "Tags": "light_point,light",
@@ -1734,9 +1796,9 @@
               "Flags": 0,
               "Attenuation": 1,
               "FogMode": "Enabled",
-              "FogStrength": 0.5,
-              "LightColor": "2.2,1.55,0.95,1",
-              "Radius": 760,
+              "FogStrength": 0.12,
+              "LightColor": "2.0,1.7,1.3,1",
+              "Radius": 1000,
               "Shadows": false
             }
           ],
@@ -3121,7 +3183,7 @@
               "Projection": "Sphere",
               "RenderExcludeTags": "",
               "Resolution": "Small",
-              "Texture": "lighting/orion/reflection_sky_cc5b55d2.vtex",
+              "Texture": "lighting/orion/reflection_sky_2330c73f.vtex",
               "TintColor": "1.8,1.8,1.8,1",
               "UpdateStrategy": "OnEnabled",
               "ZFar": 4096,
@@ -3135,7 +3197,7 @@
           "__version": 2,
           "Flags": 0,
           "Name": "Yard Reflection",
-          "Position": "80,-165,-8.5",
+          "Position": "-146,-165,-8.5",
           "Rotation": "0,0,0,1",
           "Scale": "1,1,1",
           "Tags": "",
@@ -3154,8 +3216,8 @@
               "__version": 1,
               "BakedTexture": null,
               "Bounds": {
-                "Mins": "-620,-395,-11.5",
-                "Maxs": "620,395,11.5"
+                "Mins": "-394,-395,-11.5",
+                "Maxs": "394,395,11.5"
               },
               "DelayBetweenUpdates": 0.1,
               "Feathering": 2,
@@ -3167,8 +3229,100 @@
               "Projection": "Sphere",
               "RenderExcludeTags": "",
               "Resolution": "Small",
-              "Texture": "lighting/orion/reflection_sky_cc5b55d2.vtex",
-              "TintColor": "13,13,13,1",
+              "Texture": "lighting/orion/reflection_sky_2330c73f.vtex",
+              "TintColor": "11,11,11,1",
+              "UpdateStrategy": "OnEnabled",
+              "ZFar": 4096,
+              "ZNear": 16
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "84766ac4-1312-5178-a8a6-76f5f1c9b874",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Yard Mid Reflection",
+          "Position": "294,-165,-8.5",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.EnvmapProbe",
+              "__guid": "d32d602b-af39-5cf1-8f58-a138e3691acf",
+              "__enabled": true,
+              "Flags": 0,
+              "__version": 1,
+              "BakedTexture": null,
+              "Bounds": {
+                "Mins": "-50,-395,-11.5",
+                "Maxs": "50,395,11.5"
+              },
+              "DelayBetweenUpdates": 0.1,
+              "Feathering": 2,
+              "FrameInterval": 5,
+              "MaxDistance": 512,
+              "Mode": "CustomTexture",
+              "MultiBounce": false,
+              "Priority": 1,
+              "Projection": "Sphere",
+              "RenderExcludeTags": "",
+              "Resolution": "Small",
+              "Texture": "lighting/orion/reflection_sky_2330c73f.vtex",
+              "TintColor": "5,5,5,1",
+              "UpdateStrategy": "OnEnabled",
+              "ZFar": 4096,
+              "ZNear": 16
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "e8d58330-8fc2-5187-9466-046c743be76a",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Yard Far Reflection",
+          "Position": "520,-165,-8.5",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.EnvmapProbe",
+              "__guid": "d4cea32d-f962-5f36-88e3-0282b88dbc45",
+              "__enabled": true,
+              "Flags": 0,
+              "__version": 1,
+              "BakedTexture": null,
+              "Bounds": {
+                "Mins": "-180,-395,-11.5",
+                "Maxs": "180,395,11.5"
+              },
+              "DelayBetweenUpdates": 0.1,
+              "Feathering": 2,
+              "FrameInterval": 5,
+              "MaxDistance": 512,
+              "Mode": "CustomTexture",
+              "MultiBounce": false,
+              "Priority": 1,
+              "Projection": "Sphere",
+              "RenderExcludeTags": "",
+              "Resolution": "Small",
+              "Texture": "lighting/orion/reflection_sky_2330c73f.vtex",
+              "TintColor": "3,3,3,1",
               "UpdateStrategy": "OnEnabled",
               "ZFar": 4096,
               "ZNear": 16
@@ -3213,7 +3367,7 @@
               "Projection": "Sphere",
               "RenderExcludeTags": "",
               "Resolution": "Small",
-              "Texture": "lighting/orion/reflection_sky_cc5b55d2.vtex",
+              "Texture": "lighting/orion/reflection_sky_2330c73f.vtex",
               "TintColor": "13,13,13,1",
               "UpdateStrategy": "OnEnabled",
               "ZFar": 4096,
@@ -3259,8 +3413,8 @@
               "Projection": "Sphere",
               "RenderExcludeTags": "",
               "Resolution": "Small",
-              "Texture": "lighting/orion/reflection_sky_cc5b55d2.vtex",
-              "TintColor": "13,13,13,1",
+              "Texture": "lighting/orion/reflection_sky_2330c73f.vtex",
+              "TintColor": "3,3,3,1",
               "UpdateStrategy": "OnEnabled",
               "ZFar": 4096,
               "ZNear": 16
@@ -3305,8 +3459,8 @@
               "Projection": "Sphere",
               "RenderExcludeTags": "",
               "Resolution": "Small",
-              "Texture": "lighting/orion/reflection_sky_cc5b55d2.vtex",
-              "TintColor": "14,14,14,1",
+              "Texture": "lighting/orion/reflection_sky_2330c73f.vtex",
+              "TintColor": "5,5,5,1",
               "UpdateStrategy": "OnEnabled",
               "ZFar": 4096,
               "ZNear": 16
@@ -3351,7 +3505,7 @@
               "Projection": "Sphere",
               "RenderExcludeTags": "",
               "Resolution": "Small",
-              "Texture": "lighting/orion/reflection_sky_cc5b55d2.vtex",
+              "Texture": "lighting/orion/reflection_sky_2330c73f.vtex",
               "TintColor": "7,7,7,1",
               "UpdateStrategy": "OnEnabled",
               "ZFar": 4096,
@@ -3397,7 +3551,7 @@
               "Projection": "Sphere",
               "RenderExcludeTags": "",
               "Resolution": "Small",
-              "Texture": "lighting/orion/reflection_sky_cc5b55d2.vtex",
+              "Texture": "lighting/orion/reflection_sky_2330c73f.vtex",
               "TintColor": "7,7,7,1",
               "UpdateStrategy": "OnEnabled",
               "ZFar": 4096,
@@ -3443,8 +3597,54 @@
               "Projection": "Sphere",
               "RenderExcludeTags": "",
               "Resolution": "Small",
-              "Texture": "lighting/orion/reflection_sky_cc5b55d2.vtex",
+              "Texture": "lighting/orion/reflection_sky_2330c73f.vtex",
               "TintColor": "7,7,7,1",
+              "UpdateStrategy": "OnEnabled",
+              "ZFar": 4096,
+              "ZNear": 16
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "85afa582-caf0-54e0-8fc6-85d0173df7cb",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Yard Tarp Reflection",
+          "Position": "382.5,115,51.5",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.EnvmapProbe",
+              "__guid": "f834e512-dbc0-58b6-8e8f-9d8f70ae679b",
+              "__enabled": true,
+              "Flags": 0,
+              "__version": 1,
+              "BakedTexture": null,
+              "Bounds": {
+                "Mins": "-72.5,-85,-5.5",
+                "Maxs": "72.5,85,5.5"
+              },
+              "DelayBetweenUpdates": 0.1,
+              "Feathering": 2,
+              "FrameInterval": 5,
+              "MaxDistance": 512,
+              "Mode": "CustomTexture",
+              "MultiBounce": false,
+              "Priority": 1,
+              "Projection": "Sphere",
+              "RenderExcludeTags": "",
+              "Resolution": "Small",
+              "Texture": "lighting/orion/reflection_sky_2330c73f.vtex",
+              "TintColor": "8,8,8,1",
               "UpdateStrategy": "OnEnabled",
               "ZFar": 4096,
               "ZNear": 16
@@ -10590,8 +10790,8 @@
           "__version": 2,
           "Flags": 0,
           "Name": "Player Clip B3 roof 33",
-          "Position": "107.5,-246,580",
-          "Rotation": "0,0,-1.0000000,0.0000000",
+          "Position": "107.5,-266.692,580",
+          "Rotation": "0,0,-0.9804674,-0.1966818",
           "Scale": "1,1,1",
           "Tags": "playerclip",
           "Enabled": true,
@@ -10612,7 +10812,7 @@
               "Friction": null,
               "IsTrigger": false,
               "RollingResistance": null,
-              "Scale": "99,4,600",
+              "Scale": "107.302,4,600",
               "Static": true,
               "Surface": null,
               "SurfaceVelocity": "0,0,0"

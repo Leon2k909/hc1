@@ -32,13 +32,16 @@
 							{ from = "oa_olive.vmat" to = "materials/orion/oa_olive.vmat" },
 							{ from = "oa_pipe.vmat" to = "materials/orion/oa_pipe.vmat" },
 							{ from = "oa_plates.vmat" to = "materials/orion/oa_plates.vmat" },
+							{ from = "oa_red.vmat" to = "materials/orion/oa_red.vmat" },
+							{ from = "oa_roof_dark.vmat" to = "materials/orion/oa_roof_dark.vmat" },
 							{ from = "oa_screens.vmat" to = "materials/orion/oa_screens.vmat" },
 							{ from = "oa_steel.vmat" to = "materials/orion/oa_steel.vmat" },
 							{ from = "oa_tarp.vmat" to = "materials/orion/oa_tarp.vmat" },
 							{ from = "oa_wall.vmat" to = "materials/orion/oa_wall.vmat" },
 							{ from = "oa_wall_dark.vmat" to = "materials/orion/oa_wall_dark.vmat" },
 							{ from = "oa_white_steel.vmat" to = "materials/orion/oa_white_steel.vmat" },
-							{ from = "oa_yellow.vmat" to = "materials/orion/oa_yellow.vmat" }
+							{ from = "oa_yellow.vmat" to = "materials/orion/oa_yellow.vmat" },
+							{ from = "oa_zinc.vmat" to = "materials/orion/oa_zinc.vmat" }
 						]
 						use_global_default = false
 						global_default_material = ""
@@ -68,15 +71,6 @@
 				_class = "PhysicsShapeList"
 				children =
 				[
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "default"
-						collision_tags = "solid"
-						origin = [ 107.0000, -696.5000, 140.0000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 907.0000, 100.0000, 280.0000 ]
-					},
 					{
 						_class = "PhysicsShapeBox"
 						parent_bone = ""

@@ -54,22 +54,59 @@ spot. Neither touches the open scene or play state.
 ## Light and look
 
 - The sun 8.3 degrees up, 25 degrees west of north (the sky's sun is the same), half behind Launch Control.
-- No baked indirect light. A small flat ambient (`SkyColor` 0.12), the sky's own indirect light, point lights, and a
-  lower exposure (auto 1.0 to 1.6) under a sky tinted 2.2, so shaded faces sit dark under a bright sky as in the picture.
-- Reflections: the sky's compiled cube as a static `CustomTexture` probe over the play area (tint 1.8), and much
-  stronger copies over the wet floors open to the sky (`WET_FLOORS`: the yard 18, the roofs 7), each only a few inches
-  deep so crates and walls don't pick them up. Screen-space reflections stay on. The runtime probe baker faults
-  `envmap_filtering_cs` on this workstation's driver, so nothing is baked at load.
-- ColorGrading 4900 K at 0.5 and ColorAdjustments saturation 1.1. Keep its contrast at 1.0: it works in linear HDR
+- No baked indirect light. A small flat ambient (`SkyColor` 0.15: its alpha is 1, so it is the whole indirect diffuse
+  light; the sky's tint and the probes only change specular), point lights, and a lower exposure (auto 1.0 to 1.6)
+  under a sky tinted 2.6, so shaded faces sit dark under a bright sky as in the picture.
+- The flat ambient has no occlusion, so recesses and walls under overhangs came out as bright as open faces. Screen-
+  space AO is strong (intensity 1, radius 220) and the shaded lower walls use the darker concrete (`oa_wall_dark`,
+  base 104): that brought Launch Control's wall under the balcony from 52 to 36 (the picture's 36).
+- The shaded faces get soft fills standing for the south sky: `LC face fill` and `ORION face fill`, high, broad and
+  lavender (they read neutral after the grade), and a warm `B3 face wash`. Launch Control's two wall battens are dim
+  (`tube_light( ..., colour=... )`) and shadowed, so the balcony slab stops their light.
+- Reflections: the sky's compiled cube as a static `CustomTexture` probe over the play area (tint 1.8), and stronger
+  copies over the wet floors open to the sky (`WET_FLOORS`), each only a few inches deep so crates and walls don't
+  pick them up. The yard steps down northwards where its mirror image meets buildings instead of sky (11 near, 5 from
+  the slab joint at n 246, 3 from n 342 and at the tunnel mouth); the terrace 5, the yard tarp's top 8, the roofs 7.
+  The yard's slabs are satin (roughness ~0.3-0.55) with glassy puddles over about a fifth of them, and the deck's
+  puddles are few: glassy puddles everywhere mirrored the bright cube as white blotches.
+  Screen-space reflections are off: the engine's SSR traces a lobe wider than the material's and keeps hits on the
+  floor itself, which swapped much of the near yard's sky for the slabs' own dark colour, and its `RoughnessCutoff`
+  can't be set. The runtime probe baker faults `envmap_filtering_cs` on this workstation's driver, so nothing is
+  baked at load.
+- The fog is a darker grey (0.52,0.5,0.52 at 0.82) and the far ridges a forested dark (`oa_mountain` 56,62,62): the
+  ridges were painted blue to fake the haze that the fog then added again.
+- The sky's low keys are row means over the whole panorama (they had been taken from the picture's sun half, which
+  brightened that side twice), with a tighter glow and `SUN_HALO` 0.4.
+- ColorGrading 5300 K at 0.5 and ColorAdjustments saturation 1.1. Keep its contrast at 1.0: it works in linear HDR
   space, and 1.1 crushed every shadow to black.
 - Steam is unlit (its sprites glow against the low sun instead of going dark).
+- The capture renders with the scene's own ACES tonemapper. Since 2026-10-17 the player camera picks AgX (see the
+  shared camera look in CLAUDE.md), so in a match the picture is tone-mapped differently. That hasn't been compared.
 
 ## State
 
 Checked on 2026-10-15: all 93 spots pass the offline checks; every model, material, the sky and the scene compiled with
-no errors; captures of the reference view compared with the picture patch by patch; the user played a match on it in
-the editor (all ten models loaded, no error models); the navmesh check in the editor finds complete paths from both
-team spawns to all 95 spots. Not yet checked: a second client and the frame time.
+no errors; the user played a match on it in the editor (all ten models loaded, no error models).
+
+On 2026-10-16/17, after the second round (the rocket's nose and taller, enclosed gantries, the yard's tarp block,
+crates and lane lattice to the picture's places, B3's west side receding behind the line of sight, weathered yellow
+paint, the tunnel a warm arcade with a red doorway, and the light and reflection changes above), everything compiled
+and the navmesh check found complete paths from both team spawns to all 95 spots. The reference view (capture
+`v3f`) against the picture, median of each patch (`v2/compare.py`; capture / picture):
+
+| patch | capture | picture | | patch | capture | picture |
+|---|---|---|---|---|---|---|
+| Launch Control face | 50 | 52 | | sky by the sun | 241 | 241 |
+| ORION face | 42 | 45 | | blue sky | 130 | 129 |
+| B3 face | 55 | 53 | | hills | 124 | 122 |
+| yard, far | 39 | 40 | | deck front | 44 | 37 |
+| yard, near | 64 | 64 | | LC wall under the balcony | 37 | 36 |
+| yard, middle band | 51 | 47 | | foreground terrace | 49 | 42 |
+
+What the medians don't show, and is still unlike the picture: the wet floors' puddles read as pale blotches rather
+than mirrors with the sun's streaks (the terrace's brightest tenth is 81 against 165), the gantries are dark cages
+where the picture's are lit gold, the deck front and its lit arcade are a different build, and the hills have no town
+on them. Not yet checked: a second client and the frame time.
 
 The offline reach check missed one thing the navmesh found: player clips. A railing's clip is a box along its rail
 (`riverdale_parts.clip`), and the scene must size it ( length, thickness, height ) under the rail's heading turned 90

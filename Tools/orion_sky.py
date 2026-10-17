@@ -29,12 +29,12 @@ SUN_PITCH, SUN_YAW = 8.3, -155.0      # orion_map's: 8.3 degrees up, towards 25 
 LIGHT = np.array( ( 1.75, 1.20, 0.70 ) )
 
 # The clear sky's displayed colours (sRGB) by degrees above the horizon, from the picture's clear patches.
-SKY_KEYS = ( ( 0.0, ( 205, 200, 198 ) ), ( 3.0, ( 195, 192, 192 ) ), ( 6.0, ( 172, 177, 188 ) ), ( 9.0, ( 142, 156, 180 ) ),
+SKY_KEYS = ( ( 0.0, ( 148, 144, 146 ) ), ( 3.0, ( 146, 145, 150 ) ), ( 6.0, ( 144, 149, 162 ) ), ( 9.0, ( 130, 144, 169 ) ),
              ( 12.0, ( 115, 138, 174 ) ), ( 17.0, ( 92, 120, 163 ) ), ( 25.0, ( 80, 108, 156 ) ), ( 40.0, ( 70, 98, 148 ) ),
              ( 90.0, ( 62, 88, 140 ) ) )
 
 # The glow round the sun, added to the clear sky: ( angular radius in degrees, linear brightness, colour ).
-GLOW = ( ( 2.6, 1.6, ( 1.0, 0.97, 0.92 ) ), ( 8.0, 0.55, ( 1.0, 0.9, 0.76 ) ), ( 22.0, 0.16, ( 1.0, 0.86, 0.7 ) ) )
+GLOW = ( ( 2.6, 2.4, ( 1.0, 0.97, 0.92 ) ), ( 8.0, 0.41, ( 1.0, 0.9, 0.76 ) ), ( 22.0, 0.064, ( 1.0, 0.86, 0.7 ) ) )
 
 # The cloud layer, metres above the facility: higher and thinner than Belltower's.
 BASE, TOP = 2400.0, 3300.0
@@ -49,7 +49,7 @@ BASE, TOP = 2400.0, 3300.0
 # and in the top right the sky stays clear, as in the picture.
 STREAKS = ( ( "lump", -19.0, 13.8, 4.6, 2.2, 1.0 ), ( "streak", -17.0, 10.2, 6.0, 1.6, 0.9 ),
             ( "streak", -12.0, 11.6, 4.0, 1.1, 0.7 ), ( "patch", -7.5, 11.8, 6.0, 1.6, 0.85 ),
-            ( "streak", -1.0, 9.6, 6.5, 0.8, 0.75 ), ( "lump", 20.5, 14.4, 3.2, 1.6, 0.95 ),
+            ( "streak", -1.0, 9.6, 6.5, 0.8, 0.75 ), ( "lump", 20.5, 13.4, 3.2, 1.1, 0.95 ),
             ( "lump", 25.5, 10.8, 4.5, 1.4, 0.85 ), ( "patch", 24.0, 12.5, 4.0, 1.2, 0.6 ),
             ( "streak", 18.5, 7.6, 2.6, 0.6, 0.6 ), ( "lump", -25.5, 15.5, 4.0, 2.0, 0.9 ) )
 CLEAR = ( ( 4.0, 20.0, 9.0, 6.0 ), ( 33.0, 21.0, 8.0, 6.0 ) )      # ( bearing, elevation, spread across, spread up )
@@ -164,7 +164,7 @@ def main():
     S.LIGHT = LIGHT
     S.CLOUD_SUN = LIGHT * 1.05
     S.HALO_WHITE = np.array( ( 1.22, 1.0, 0.72 ) )
-    S.SUN_HALO = 1.15
+    S.SUN_HALO = 0.4
     S.GROUND = np.array( ( 0.20, 0.18, 0.15 ) )
     S.AMB_HIGH = np.array( ( 0.15, 0.25, 0.50 ) )
     S.AMB_LOW = np.array( ( 0.34, 0.29, 0.25 ) )

@@ -41,7 +41,10 @@
 							{ from = "oa_red.vmat" to = "materials/orion/oa_red.vmat" },
 							{ from = "oa_steel.vmat" to = "materials/orion/oa_steel.vmat" },
 							{ from = "oa_tarp.vmat" to = "materials/orion/oa_tarp.vmat" },
+							{ from = "oa_tarp_grey.vmat" to = "materials/orion/oa_tarp_grey.vmat" },
+							{ from = "oa_white_steel.vmat" to = "materials/orion/oa_white_steel.vmat" },
 							{ from = "oa_yellow.vmat" to = "materials/orion/oa_yellow.vmat" },
+							{ from = "oa_zinc.vmat" to = "materials/orion/oa_zinc.vmat" },
 							{ from = "rw_black.vmat" to = "materials/railhead/rw_black.vmat" },
 							{ from = "rw_steel_dark.vmat" to = "materials/railhead/rw_steel_dark.vmat" },
 							{ from = "rw_steel_grey.vmat" to = "materials/railhead/rw_steel_grey.vmat" },
@@ -80,9 +83,9 @@
 						parent_bone = ""
 						surface_prop = "plastic"
 						collision_tags = "solid"
-						origin = [ 324.3492, 85.1685, 32.8500 ]
-						angles = [ -0.0000, -86.5664, 0.0000 ]
-						dimensions = [ 214.0000, 66.0000, 65.7000 ]
+						origin = [ 382.2874, 115.2920, 25.8500 ]
+						angles = [ -0.0000, -122.8220, -0.0000 ]
+						dimensions = [ 151.0000, 60.0000, 51.7000 ]
 					},
 					{
 						_class = "PhysicsShapeBox"
@@ -107,9 +110,9 @@
 						parent_bone = ""
 						surface_prop = "plastic"
 						collision_tags = "solid"
-						origin = [ 535.0000, 71.0000, 30.8500 ]
+						origin = [ 560.0000, 106.0000, 25.8500 ]
 						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 98.0000, 30.0000, 61.7000 ]
+						dimensions = [ 82.0000, 30.0000, 51.7000 ]
 					},
 					{
 						_class = "PhysicsShapeBox"
@@ -161,18 +164,27 @@
 						parent_bone = ""
 						surface_prop = "metal"
 						collision_tags = "solid"
-						origin = [ 400.0000, -88.0000, 18.0000 ]
-						angles = [ -0.0000, -81.4692, 0.0000 ]
-						dimensions = [ 40.0000, 30.0000, 36.0000 ]
+						origin = [ 451.0000, -83.0000, 23.0000 ]
+						angles = [ -0.0000, -6.8428, 0.0000 ]
+						dimensions = [ 40.0000, 30.0000, 46.0000 ]
 					},
 					{
 						_class = "PhysicsShapeBox"
 						parent_bone = ""
 						surface_prop = "metal"
 						collision_tags = "solid"
-						origin = [ 412.0000, -126.0000, 18.0000 ]
-						angles = [ -0.0000, -84.2894, 0.0000 ]
-						dimensions = [ 40.0000, 30.0000, 36.0000 ]
+						origin = [ 449.0000, -117.0000, 23.0000 ]
+						angles = [ -0.0000, -2.8624, 0.0000 ]
+						dimensions = [ 40.0000, 30.0000, 46.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "plastic"
+						collision_tags = "solid"
+						origin = [ 601.0000, -18.0000, 25.8500 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 70.0000, 40.0000, 51.7000 ]
 					},
 					{
 						_class = "PhysicsShapeBox"
