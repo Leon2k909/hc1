@@ -1,0 +1,18 @@
+// Tools/riverdale_materials.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    F_ALPHA_TEST "1"
+    TextureTranslucency "materials/riverdale/rv_puddle_trans.png"
+    g_flAlphaTestReference "0.5"
+    g_flAntiAliasedEdgeStrength "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.00"
+    TextureColor "materials/riverdale/rv_puddle_color.jpg"
+    TextureNormal "materials/riverdale/rv_puddle_normal.png"
+    TextureRoughness "materials/riverdale/rv_puddle_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1.000000 1.000000 1.000000 1.000000]"
+    g_flModelTintAmount "1.0"
+}

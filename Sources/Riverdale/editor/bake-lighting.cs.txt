@@ -1,0 +1,252 @@
+// Riverdale: bakes the next unbaked indirect-light (DDGI) volume of Sources/Riverdale/lighting/config.json's revision
+// into the open, saved Riverdale editor document, saves its textures to Assets/lighting/riverdale/<revision>/ and saves
+// the scene. Run with the native MCP's run_csharp once per volume, in the config's order (the yard, the hall, the pool),
+// until it returns AllBaked = true. Each later volume sees the earlier ones' light. Results go to
+// output/riverdale/lighting/<revision>/<volume>-<utc>/; Sources/Riverdale/lighting/riverdale_lighting.py preserve keeps
+// them for scene regeneration.
+// Mirrors Collider's and Cerro Blanco's accepted bakes:
+// - Bake into the persistent editor scene. Never create or destroy an isolated world.
+// - Relocation stays serial, on the main thread: engine 26.10.13's parallel ComputeProbeRelocation can race
+//   ResourceSystem.RegisterWeak and break rendering in the whole process. Never call it.
+// - The native cubemapper owns both lighting passes. It replaces GeneratedIrradianceTexture for its second pass, so the
+//   texture is fetched again after RunAsync before it's saved.
+// - Scene.Push changes the process-wide Game.ActiveScene: no Push scope is held across an await.
+// - Reflections are left alone: the GPU Quality GGX bake faulted envmap_filtering_cs on this workstation.
+// - It refuses to start during play, and cancels (adopting nothing) if play starts or the document changes meanwhile.
+if(Game.IsPlaying) throw new InvalidOperationException("Stop play before baking Riverdale lighting.");
+var root = Sandbox.Project.Current.GetRootPath();
+var config = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Sources/Riverdale/lighting/config.json")));
+var revision = config["revision"].GetValue<string>();
+if(!System.Text.RegularExpressions.Regex.IsMatch(revision,"^daylight-v[0-9]+$")) throw new InvalidOperationException("Invalid lighting revision.");
+var resourceDirectory = "lighting/riverdale/"+revision;
+var nativeDirectory = System.IO.Path.Combine(root,"Assets",resourceDirectory);
+var session = Editor.SceneEditorSession.All.SingleOrDefault(s => s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/riverdale/riverdale.scene",StringComparison.OrdinalIgnoreCase)==true)
+    ?? throw new InvalidOperationException("Open Riverdale in the editor first.");
+if(Editor.SceneEditorSession.Active!=session) throw new InvalidOperationException("Riverdale must own the editor window.");
+if(session.HasUnsavedChanges) throw new InvalidOperationException("Riverdale has unsaved edits; inspect them before baking.");
+var scene = session.Scene;
+
+// Every configured volume must be in the scene as configured (prepare-lighting.cs.txt or the generator puts them there),
+// and nothing else: an unplanned volume would change what the others capture.
+var entries = config["volumes"].AsArray().Select(n => n.AsObject()).ToArray();
+var volumes = scene.GetAllComponents<IndirectLightVolume>().ToArray();
+if(volumes.Length != entries.Length) throw new InvalidOperationException($"Expected {entries.Length} indirect-light volumes, found {volumes.Length}; run prepare-lighting.cs.txt.");
+var planned = new System.Collections.Generic.List<(string Key, IndirectLightVolume Volume, System.Text.Json.Nodes.JsonObject Entry)>();
+foreach(var entry in entries)
+{
+    var key = entry["key"].GetValue<string>();
+    if(!System.Text.RegularExpressions.Regex.IsMatch(key,"^[a-z][a-z0-9]*$")) throw new InvalidOperationException("Invalid volume key.");
+    var name = entry["name"].GetValue<string>();
+    var volume = volumes.SingleOrDefault(v => v.GameObject.Name==name) ?? throw new InvalidOperationException("Missing volume: "+name);
+    var bounds = new BBox(Vector3.Parse(entry["bounds_min"].GetValue<string>()),Vector3.Parse(entry["bounds_max"].GetValue<string>()));
+    if((volume.Bounds.Mins-bounds.Mins).Length>0.5f || (volume.Bounds.Maxs-bounds.Maxs).Length>0.5f || volume.WorldPosition.Length>0.5f
+        || volume.WorldRotation!=Rotation.Identity || (volume.WorldScale-Vector3.One).Length>0.001f)
+        throw new InvalidOperationException("Volume moved or resized since the plan: "+name);
+    if(volume.ProbeDensity != entry["probe_density"].GetValue<int>() || volume.ProbeCounts.ToString() != entry["expected_counts"].GetValue<string>())
+        throw new InvalidOperationException($"Unexpected probe grid for {name}: {volume.ProbeCounts}");
+    if(volume.InsideGeometry.ToString()!="Relocate") throw new InvalidOperationException("Inside-geometry probes must relocate: "+name);
+    planned.Add((key,volume,entry));
+}
+string TexturePath(string key,string kind) => $"{resourceDirectory}/{key}_{kind}.vtex";
+bool IsBaked((string Key, IndirectLightVolume Volume, System.Text.Json.Nodes.JsonObject Entry) p) =>
+    p.Volume.BakeVersion==1 && p.Volume.IrradianceTexture?.ResourcePath==TexturePath(p.Key,"irradiance")
+    && p.Volume.DistanceTexture?.ResourcePath==TexturePath(p.Key,"distance") && p.Volume.RelocationTexture?.ResourcePath==TexturePath(p.Key,"relocation");
+var next = planned.FirstOrDefault(p => !IsBaked(p));
+if(next.Volume is null) return new { AllBaked=true, Revision=revision, Volumes=planned.Select(p => new { p.Key, Grid=p.Volume.ProbeCounts.ToString() }).ToArray() };
+var bakeKey = next.Key;
+var indirect = next.Volume;
+foreach(var kind in new[]{"irradiance","distance","relocation"})
+    if(System.IO.File.Exists(System.IO.Path.Combine(nativeDirectory,$"{bakeKey}_{kind}.vtex_c")))
+        throw new InvalidOperationException($"{bakeKey} already has {kind} output in {resourceDirectory}; inspect it instead of overwriting it, or start a new revision.");
+var reflections = scene.GetAllComponents<EnvmapProbe>().ToArray();
+if(reflections.Any(p => p.Mode.ToString()!="CustomTexture"))
+    throw new InvalidOperationException("Every reflection probe must be static (CustomTexture) before a bake: realtime probes run envmap filtering.");
+
+var beforeGameId = Game.ActiveScene?.Id;
+var beforePlaying = Game.IsPlaying;
+// Another tab being selected meanwhile doesn't change this scene (the updater renders its own world), so only play, the
+// game scene and edits to this document stop the bake, as in Collider's.
+bool ContextUnchanged() => Game.ActiveScene?.Id==beforeGameId && Game.IsPlaying==beforePlaying && !session.HasUnsavedChanges;
+void RequireContext()
+{
+    if(!ContextUnchanged()) throw new InvalidOperationException("Editor or game state changed during the bake; its result must not be adopted.");
+}
+string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var scenePath = System.IO.Path.Combine(root,"Assets/scenes/maps/Riverdale/riverdale.scene");
+var inputs = System.IO.Directory.EnumerateFiles(System.IO.Path.Combine(root,"Assets/models/maps/riverdale"))
+    .Concat(System.IO.Directory.EnumerateFiles(System.IO.Path.Combine(root,"Assets/materials/riverdale")))
+    .Concat(System.IO.Directory.EnumerateFiles(System.IO.Path.Combine(root,"Assets/materials/riverdale/sky")))
+    .Where(p => !p.EndsWith("_c") && !p.EndsWith(".meta") && !p.Contains(".riverdale-"))
+    .Append(scenePath)
+    .ToDictionary(p => p, p => Hash(p));
+var attempt = DateTime.UtcNow.ToString("yyyyMMdd'T'HHmmss'Z'");
+var destination = System.IO.Path.Combine(root,"output/riverdale/lighting",revision,bakeKey+"-"+attempt);
+System.IO.Directory.CreateDirectory(destination);
+System.IO.Directory.CreateDirectory(nativeDirectory);
+System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"input-assets.json"),System.Text.Json.JsonSerializer.Serialize(
+    inputs.ToDictionary(p => System.IO.Path.GetRelativePath(root,p.Key).Replace('\\','/'), p => p.Value)));
+System.IO.File.Copy(scenePath,System.IO.Path.Combine(destination,"visual-scene.json"),false);
+void Status(string value) => System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"bake-status.txt"),value);
+
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var type = typeof(IndirectLightVolume);
+var probesProperty = type.GetProperty("Probes",flags) ?? throw new MissingMemberException("IndirectLightVolume.Probes");
+var generatedProperty = type.GetProperty("GeneratedRelocationTexture",flags) ?? throw new MissingMemberException("IndirectLightVolume.GeneratedRelocationTexture");
+var previewField = type.GetField("_bakePreview",flags) ?? throw new MissingMemberException("IndirectLightVolume._bakePreview");
+var dirty = type.GetMethod("MarkDirty",flags) ?? throw new MissingMemberException("IndirectLightVolume.MarkDirty");
+var originalProbes = probesProperty.GetValue(indirect);
+var originalGenerated = (Texture)generatedProperty.GetValue(indirect);
+var originalTextures = (indirect.IrradianceTexture,indirect.DistanceTexture,indirect.RelocationTexture,indirect.BakeVersion);
+using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+timeout.CancelAfter(TimeSpan.FromSeconds(next.Entry["timeout_seconds"]?.GetValue<int>() ?? config["timeout_seconds"]?.GetValue<int>() ?? 900));
+var token = timeout.Token;
+object updater = null;
+Texture relocation = null;
+bool completed = false;
+bool appliedTextures = false;
+var started = DateTime.UtcNow;
+try
+{
+    var counts = indirect.ProbeCounts;
+    var spacing = (Vector3)type.GetMethod("ComputeSpacing",flags).Invoke(indirect,new object[]{counts}) * indirect.WorldScale.Abs();
+    var directions = (Vector3[])type.GetMethod("GenerateSphericalDirections",flags | System.Reflection.BindingFlags.Static).Invoke(null,new object[]{128});
+    var trace = type.GetMethod("TraceProbeRays",flags);
+    var relocate = type.GetMethod("ComputeRelocationOffset",flags);
+    var position = type.GetMethod("GetProbeWorldPosition",flags);
+    var ratio = trace.ReturnType.GetProperty("BackfaceRatio",flags);
+    var minSpacing = MathF.Min(spacing.x,MathF.Min(spacing.y,spacing.z));
+    var probes = new IndirectLightVolume.Probe[counts.x*counts.y*counts.z];
+    for(var index=0;index<probes.Length;index++) probes[index] = new IndirectLightVolume.Probe();
+    probesProperty.SetValue(indirect,probes);
+    for(var z=0;z<counts.z;z++)
+    for(var y=0;y<counts.y;y++)
+    {
+        token.ThrowIfCancellationRequested();
+        RequireContext();
+        if(!ThreadSafe.IsMainThread) throw new InvalidOperationException("Relocation left the main thread.");
+        using(scene.Push())
+        for(var x=0;x<counts.x;x++)
+        {
+            var world = (Vector3)position.Invoke(indirect,new object[]{new Vector3Int(x,y,z)});
+            var offset = Vector3.Zero;
+            var active = true;
+            for(var iteration=0;iteration<12 && active;iteration++)
+            {
+                var hit = trace.Invoke(indirect,new object[]{world+offset,spacing.Length,directions});
+                var move = ((Vector3,bool))relocate.Invoke(indirect,new object[]{offset,hit,spacing,minSpacing,minSpacing*.2f,directions});
+                if(move.Item2) { active=false; break; }
+                offset = move.Item1;
+            }
+            if(active && indirect.InsideGeometry.ToString()=="Relocate")
+                active = (float)ratio.GetValue(trace.Invoke(indirect,new object[]{world+offset,spacing.Length,directions})) < .25f;
+            probes[x+y*counts.x+z*counts.x*counts.y] = new IndirectLightVolume.Probe { Offset=offset, Active=active };
+        }
+        Status($"{bakeKey}: relocating on the main thread, row {z*counts.y+y+1}/{counts.z*counts.y}");
+        await Task.Yield();
+    }
+    using(scene.Push())
+    {
+        type.GetMethod("UpdateRelocationTexture",flags).Invoke(indirect,null);
+        dirty.Invoke(indirect,null);
+    }
+    relocation = (Texture)generatedProperty.GetValue(indirect);
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"relocation-status.json"),System.Text.Json.JsonSerializer.Serialize(
+        new { Volume=bakeKey, Mode="Main thread; native trace and relocation functions", Grid=counts.ToString(), Active=probes.Count(p => p.Active), Total=probes.Length,
+              Seconds=(DateTime.UtcNow-started).TotalSeconds }));
+    var updaterType = type.Assembly.GetType("Sandbox.DDGIProbeUpdaterCubemapper") ?? throw new MissingMemberException("Sandbox.DDGIProbeUpdaterCubemapper");
+    using(scene.Push()) updater = Activator.CreateInstance(updaterType,new object[]{indirect});
+    var irradiance = (Texture)updaterType.GetProperty("GeneratedIrradianceTexture").GetValue(updater);
+    var distance = (Texture)updaterType.GetProperty("GeneratedDistanceTexture").GetValue(updater);
+    previewField.SetValue(indirect,(irradiance,distance,relocation));
+    dirty.Invoke(indirect,null);
+    var passField = updaterType.GetField("_pass",flags);
+    var indexField = updaterType.GetField("_renderedIndex",flags);
+    // The updater keeps its own world: only starting it needs the scene pushed, never the awaits after.
+    Task<bool> task;
+    using(scene.Push()) task = (Task<bool>)updaterType.GetMethod("RunAsync").Invoke(updater,new object[]{token});
+    while(!task.IsCompleted)
+    {
+        await Task.WhenAny(task,Task.Delay(1000));
+        // Cancel, then let the updater drain before its GPU textures are disposed. A timed-out observation or a changed
+        // scene is never a reason to start it again.
+        if(!ContextUnchanged()) timeout.Cancel();
+        if(!task.IsCompleted) Status($"{bakeKey}: baking pass {(int)passField.GetValue(updater)+1}/2, probe {indexField.GetValue(updater)}, grid {counts}");
+    }
+    if(!await task) throw new InvalidOperationException("The native lighting bake did not complete.");
+    RequireContext();
+    if(inputs.Any(p => !System.IO.File.Exists(p.Key) || Hash(p.Key)!=p.Value))
+        throw new InvalidOperationException("Riverdale's source assets changed during the bake; its result must not be adopted.");
+    var firstPass = irradiance;
+    irradiance = (Texture)updaterType.GetProperty("GeneratedIrradianceTexture").GetValue(updater);
+    distance = (Texture)updaterType.GetProperty("GeneratedDistanceTexture").GetValue(updater);
+    token.ThrowIfCancellationRequested();
+    Graphics.FlushGPU();
+    Texture Save(Texture texture,string kind,ImageFormat? format=null)
+    {
+        if(texture is null || texture.IsError) throw new InvalidOperationException("Invalid capture: "+kind);
+        var target = System.IO.Path.Combine(nativeDirectory,$"{bakeKey}_{kind}.vtex_c");
+        var pending = target+".riverdale-pending";
+        // Written whole, then moved into place: the file watcher never sees half a texture.
+        System.IO.File.WriteAllBytes(pending,texture.SaveToVtex(format));
+        System.IO.File.Move(pending,target,false);
+        var saved = Texture.Load(TexturePath(bakeKey,kind),false);
+        if(saved is null || saved.IsError) throw new InvalidOperationException("Could not reload capture: "+kind);
+        return saved;
+    }
+    appliedTextures = true;
+    indirect.IrradianceTexture = Save(irradiance,"irradiance");
+    indirect.DistanceTexture = Save(distance,"distance",(ImageFormat)85);
+    indirect.RelocationTexture = Save(relocation,"relocation",(ImageFormat)24);
+    indirect.BakeVersion = 1;
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"indirect-result.json"),System.Text.Json.JsonSerializer.Serialize(
+        new { Volume=bakeKey, Passes=2, SavedFinalIrradiance=true, IrradianceReplacedAfterFirstPass=!ReferenceEquals(firstPass,irradiance), Grid=counts.ToString() }));
+    previewField.SetValue(indirect,null);
+    dirty.Invoke(indirect,null);
+    using(scene.Push())
+    {
+        var systemType = typeof(Scene).Assembly.GetType("Sandbox.DDGIVolumeSystem");
+        var getter = typeof(Scene).GetMethods().Single(m => m.Name=="GetSystem" && m.IsGenericMethodDefinition && m.GetParameters().Length==0);
+        var system = getter.MakeGenericMethod(systemType).Invoke(scene,null);
+        systemType.GetMethod("MarkDirty",flags).Invoke(system,null);
+        systemType.GetMethod("UpdateVolumes",flags).Invoke(system,null);
+    }
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"indirect-light.json"),indirect.GameObject.Serialize().ToJsonString());
+    typeof(Editor.SceneEditorSession).GetProperty("HasUnsavedChanges").SetValue(session,true);
+    session.Save(false);
+    if(session.HasUnsavedChanges) throw new InvalidOperationException("Riverdale's lighting was not saved.");
+    var remaining = planned.Where(p => !IsBaked(p)).Select(p => p.Key).ToArray();
+    var result = new { Volume=bakeKey, Revision=revision, Passes=2, SavedFinalIrradiance=true, IrradianceReplacedAfterFirstPass=!ReferenceEquals(firstPass,irradiance),
+        Grid=counts.ToString(), ActiveProbes=probes.Count(p => p.Active), TotalProbes=probes.Length, Seconds=(DateTime.UtcNow-started).TotalSeconds,
+        PersistentEditorScene=true, SceneId=scene.Id, SavedScene=true, InputAssetsUnchanged=true,
+        Textures=new[]{TexturePath(bakeKey,"irradiance"),TexturePath(bakeKey,"distance"),TexturePath(bakeKey,"relocation")},
+        StaticReflections=reflections.Length, Remaining=remaining, AllBaked=remaining.Length==0,
+        GamePreserved=Game.ActiveScene?.Id==beforeGameId && Game.IsPlaying==beforePlaying };
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"bake-result.json"),System.Text.Json.JsonSerializer.Serialize(result));
+    completed = true;
+    Status("Complete "+counts);
+    return result;
+}
+catch(Exception error)
+{
+    Status("Failed: "+error);
+    throw;
+}
+finally
+{
+    previewField.SetValue(indirect,null);
+    if(!completed)
+    {
+        if(appliedTextures)
+        {
+            indirect.IrradianceTexture=originalTextures.Item1;
+            indirect.DistanceTexture=originalTextures.Item2;
+            indirect.RelocationTexture=originalTextures.Item3;
+            indirect.BakeVersion=originalTextures.Item4;
+        }
+        probesProperty.SetValue(indirect,originalProbes);
+    }
+    (updater as IDisposable)?.Dispose();
+    if(relocation is not null && !ReferenceEquals(relocation,originalGenerated)) relocation.Dispose();
+    generatedProperty.SetValue(indirect,originalGenerated);
+    dirty.Invoke(indirect,null);
+}

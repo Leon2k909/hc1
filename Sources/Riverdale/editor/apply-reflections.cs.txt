@@ -1,0 +1,80 @@
+// Riverdale: gives each planned reflection probe its captured cube and saves the scene. Run with the native MCP's
+// run_csharp after import-reflections.cs.txt. Each compiled cube (materials/riverdale/reflections/<revision>/
+// reflection_<key>_exr_*.generated.vtex_c) is copied to lighting/riverdale/<revision>/reflection_<key>.vtex_c, a name
+// that stays put when the panorama is recompiled. The probe moves to where its faces were captured (the cube's origin,
+// for box projection) with its world box kept, and stays static (CustomTexture). Then
+// Sources/Riverdale/lighting/riverdale_lighting.py preserve keeps the probes and the indirect light for regeneration.
+if(Game.IsPlaying) throw new InvalidOperationException("Stop play before assigning reflections.");
+var root = Sandbox.Project.Current.GetRootPath();
+var config = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Sources/Riverdale/lighting/config.json")));
+var revision = config["revision"].GetValue<string>();
+if(!System.Text.RegularExpressions.Regex.IsMatch(revision,"^daylight-v[0-9]+$")) throw new InvalidOperationException("Invalid lighting revision.");
+var session = Editor.SceneEditorSession.Active;
+if(session?.Scene?.Source?.ResourcePath?.Equals("scenes/maps/riverdale/riverdale.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Riverdale must own the editor window.");
+if(session.HasUnsavedChanges) throw new InvalidOperationException("Riverdale has unsaved edits; inspect them before assigning reflections.");
+var scene = session.Scene;
+var beforeGameId = Game.ActiveScene?.Id;
+var source = System.IO.Path.Combine(root,"Assets/materials/riverdale/reflections",revision);
+var probeRoot = scene.Children.Single(g => g.Name=="Reflection Probes");
+string Hash(byte[] data) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(data)).ToLowerInvariant();
+var prepared = new System.Collections.Generic.List<(EnvmapProbe Probe, Texture Texture, Vector3 Position, BBox World, System.Text.Json.Nodes.JsonObject Entry)>();
+var result = new System.Collections.Generic.List<object>();
+// Everything is checked and loaded before the first probe changes, so a failure leaves the scene as it was.
+foreach(var entry in config["reflections"].AsArray().Select(n => n.AsObject()))
+{
+    var key = entry["key"].GetValue<string>();
+    var cubes = System.IO.Directory.GetFiles(source,$"reflection_{key}_exr_*.generated.vtex_c");
+    if(cubes.Length!=1) throw new InvalidOperationException("Expected one compiled reflection cube for "+key);
+    var path = $"lighting/riverdale/{revision}/reflection_{key}.vtex";
+    var target = System.IO.Path.Combine(root,"Assets",path+"_c");
+    var bytes = System.IO.File.ReadAllBytes(cubes[0]);
+    if(System.IO.File.Exists(target))
+    {
+        if(Hash(System.IO.File.ReadAllBytes(target))!=Hash(bytes))
+            throw new InvalidOperationException($"{path} already holds another cube; a running editor keeps the old one under that name. Start a new revision.");
+    }
+    else
+    {
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+        System.IO.File.WriteAllBytes(target+".riverdale-pending",bytes);
+        System.IO.File.Move(target+".riverdale-pending",target,false);
+    }
+    var texture = Texture.Load(path,false);
+    if(texture is null || texture.IsError) throw new InvalidOperationException("The reflection cube did not load: "+path);
+    var faces = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/riverdale/lighting/reflections",revision,key,"faces.json")));
+    var position = Vector3.Parse(faces["Position"].GetValue<string>());
+    if((position-Vector3.Parse(entry["capture_world"].GetValue<string>())).Length>0.5f) throw new InvalidOperationException("Captured somewhere else than the plan: "+key);
+    var holder = probeRoot.Children.SingleOrDefault(g => g.Name==entry["name"].GetValue<string>()) ?? throw new InvalidOperationException("Run prepare-lighting.cs.txt first: no "+entry["name"]);
+    var probe = holder.Components.Get<EnvmapProbe>() ?? throw new InvalidOperationException("No probe on "+holder.Name);
+    var world = new BBox(Vector3.Parse(entry["bounds_min"].GetValue<string>()),Vector3.Parse(entry["bounds_max"].GetValue<string>()));
+    prepared.Add((probe,texture,position,world,entry));
+    result.Add(new { Key=key, Probe=holder.Name, Texture=texture.ResourcePath, texture.Width, texture.Height, texture.Mips });
+}
+void SetEnum(object target,string property,string value)
+{
+    var info = target.GetType().GetProperty(property) ?? throw new MissingMemberException(target.GetType().Name+"."+property);
+    info.SetValue(target,Enum.Parse(info.PropertyType,value));
+}
+foreach(var item in prepared)
+{
+    item.Probe.GameObject.WorldPosition = item.Position;
+    item.Probe.GameObject.WorldRotation = Rotation.Identity;
+    item.Probe.GameObject.NetworkMode = NetworkMode.Snapshot;
+    item.Probe.Bounds = new BBox(item.World.Mins-item.Position,item.World.Maxs-item.Position);
+    item.Probe.Priority = item.Entry["priority"].GetValue<int>();
+    item.Probe.Feathering = item.Entry["feathering"].GetValue<float>();
+    var tint = item.Entry["tint"].GetValue<float>();
+    item.Probe.TintColor = new Color(tint,tint,tint,1);
+    SetEnum(item.Probe,"Projection","Box");
+    item.Probe.Texture = item.Texture;
+    SetEnum(item.Probe,"Mode","CustomTexture");
+}
+typeof(Editor.SceneEditorSession).GetProperty("HasUnsavedChanges").SetValue(session,true);
+session.Save(false);
+if(session.HasUnsavedChanges) throw new InvalidOperationException("Riverdale's reflections were not saved.");
+var output = System.IO.Path.Combine(root,"output/riverdale/lighting/reflections",revision);
+System.IO.File.WriteAllText(System.IO.Path.Combine(output,"reflections-applied.json"),probeRoot.Serialize().ToJsonString());
+var report = new { Revision=revision, Applied=result, SavedScene=true, GamePreserved=!Game.IsPlaying && Game.ActiveScene?.Id==beforeGameId };
+System.IO.File.WriteAllText(System.IO.Path.Combine(output,"applied.json"),System.Text.Json.JsonSerializer.Serialize(report));
+return report;

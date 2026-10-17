@@ -63,3 +63,6 @@ __pycache__/
 !Assets/lighting/orion/reflection_sky_*.vtex_c
 # Orion's staging (and v1's retired assets on the machine that built v2).
 /output/orion/
+# Riverdale's baked indirect lighting and static camera-captured reflection cubes have no
+# uncompiled texture equivalents; include them so every checkout gets the same lighting.
+!Assets/lighting/riverdale/daylight-v1/*.vtex_c

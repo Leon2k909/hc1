@@ -1,0 +1,43 @@
+// Compile Riverdale's already-published forest sectors before switching the saved scene over.
+// Engine MCP: run_csharp {"path":"<project>/Sources/Riverdale/editor/compile-spatial.cs.txt"}.
+// These are separate render meshes only: no collision, materials or lighting source is altered.
+// This deliberately does not edit or save any scene. Works while any scene tab is active.
+if (Game.IsPlaying)
+    throw new InvalidOperationException("Stop play before compiling Riverdale's forest sectors.");
+var root = Sandbox.Project.Current.GetRootPath();
+var directory = System.IO.Path.Combine(root, "Assets/models/maps/riverdale_sectors");
+if (!System.IO.Directory.Exists(directory))
+    throw new InvalidOperationException("Publish the staged forest sector assets first.");
+var models = System.IO.Directory.GetFiles(directory, "*.vmdl").OrderBy(x => x).ToArray();
+if (models.Length != 16)
+    throw new InvalidOperationException($"Expected 16 forest sector models, found {models.Length}.");
+var results = new System.Collections.Generic.List<object>();
+foreach (var model in models)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var stem = System.IO.Path.ChangeExtension(model, null);
+    foreach (var extension in new[] { ".obj", ".mtl" })
+    {
+        var source = stem + extension;
+        if (!System.IO.File.Exists(source))
+            throw new System.IO.FileNotFoundException("Missing spatial mesh source", source);
+        // Registering a source OBJ is important after creating a new folder while the editor
+        // was open: the asset watcher can miss newly added directories.
+        Editor.AssetSystem.RegisterFile(source);
+    }
+    var asset = Editor.AssetSystem.FindByPath(model) ?? Editor.AssetSystem.RegisterFile(model);
+    if (asset is null)
+        throw new InvalidOperationException("Could not register spatial model: " + model);
+    var ok = false;
+    string error = null;
+    try { ok = asset.Compile(true); } catch (Exception e) { error = e.ToString(); }
+    await Task.Delay(1, cancellationToken);
+    var compiled = System.IO.File.Exists(model + "_c") && asset.IsCompiled && !asset.IsCompileFailed;
+    results.Add(new { Name = System.IO.Path.GetFileName(model), Ok = ok, Compiled = compiled,
+        asset.IsCompileFailed, Error = error });
+}
+var failed = results.Where(r => !(bool)r.GetType().GetProperty("Compiled").GetValue(r)).Count();
+var report = new { Models = models.Length, Compiled = models.Length - failed, Failed = failed, Results = results };
+var output = System.IO.Path.Combine(root, "output/riverdale/aaa/spatial-compile.json");
+System.IO.File.WriteAllText(output, System.Text.Json.JsonSerializer.Serialize(report));
+return report;

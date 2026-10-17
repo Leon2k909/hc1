@@ -1,0 +1,78 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc29:version{3cec427c-1b0e-4d48-a90a-0436f33a6041} -->
+{
+	rootNode =
+	{
+		_class = "RootNode"
+		children =
+		[
+			{
+				_class = "MaterialGroupList"
+				children =
+				[
+					{
+						_class = "DefaultMaterialGroup"
+						remaps =
+						[
+							{ from = "rv_beacon.vmat" to = "materials/riverdale/rv_beacon.vmat" },
+							{ from = "rv_black.vmat" to = "materials/riverdale/rv_black.vmat" },
+							{ from = "rv_dark.vmat" to = "materials/riverdale/rv_dark.vmat" },
+							{ from = "rv_door_yellow.vmat" to = "materials/riverdale/rv_door_yellow.vmat" },
+							{ from = "rv_frame.vmat" to = "materials/riverdale/rv_frame.vmat" },
+							{ from = "rv_galv.vmat" to = "materials/riverdale/rv_galv.vmat" },
+							{ from = "rv_grating.vmat" to = "materials/riverdale/rv_grating.vmat" },
+							{ from = "rv_hall_bezel.vmat" to = "materials/riverdale/rv_hall_bezel.vmat" },
+							{ from = "rv_hall_blue.vmat" to = "materials/riverdale/rv_hall_blue.vmat" },
+							{ from = "rv_hall_ceiling.vmat" to = "materials/riverdale/rv_hall_ceiling.vmat" },
+							{ from = "rv_hall_chrome.vmat" to = "materials/riverdale/rv_hall_chrome.vmat" },
+							{ from = "rv_hall_console.vmat" to = "materials/riverdale/rv_hall_console.vmat" },
+							{ from = "rv_hall_console_dark.vmat" to = "materials/riverdale/rv_hall_console_dark.vmat" },
+							{ from = "rv_hall_equipment.vmat" to = "materials/riverdale/rv_hall_equipment.vmat" },
+							{ from = "rv_hall_fabric.vmat" to = "materials/riverdale/rv_hall_fabric.vmat" },
+							{ from = "rv_hall_green.vmat" to = "materials/riverdale/rv_hall_green.vmat" },
+							{ from = "rv_hall_plastic.vmat" to = "materials/riverdale/rv_hall_plastic.vmat" },
+							{ from = "rv_hall_red.vmat" to = "materials/riverdale/rv_hall_red.vmat" },
+							{ from = "rv_hall_rope.vmat" to = "materials/riverdale/rv_hall_rope.vmat" },
+							{ from = "rv_hall_worktop.vmat" to = "materials/riverdale/rv_hall_worktop.vmat" },
+							{ from = "rv_letters_dark.vmat" to = "materials/riverdale/rv_letters_dark.vmat" },
+							{ from = "rv_pipe.vmat" to = "materials/riverdale/rv_pipe.vmat" },
+							{ from = "rv_plinth.vmat" to = "materials/riverdale/rv_plinth.vmat" },
+							{ from = "rv_ring_white.vmat" to = "materials/riverdale/rv_ring_white.vmat" },
+							{ from = "rv_rubber.vmat" to = "materials/riverdale/rv_rubber.vmat" },
+							{ from = "rv_stainless.vmat" to = "materials/riverdale/rv_stainless.vmat" },
+							{ from = "rv_steel.vmat" to = "materials/riverdale/rv_steel.vmat" },
+							{ from = "rv_wall_clean.vmat" to = "materials/riverdale/rv_wall_clean.vmat" },
+							{ from = "rv_white.vmat" to = "materials/riverdale/rv_white.vmat" },
+							{ from = "rv_yellow.vmat" to = "materials/riverdale/rv_yellow.vmat" },
+							{ from = "rv_zinc.vmat" to = "materials/riverdale/rv_zinc.vmat" }
+						]
+						use_global_default = false
+						global_default_material = ""
+					},
+				]
+			},
+			{
+				_class = "RenderMeshList"
+				children =
+				[
+					{
+						_class = "RenderMeshFile"
+						name = "riverdale_hall_detail"
+						filename = "models/maps/riverdale/riverdale_hall_detail.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+				]
+			},
+		]
+		model_archetype = ""
+		primary_associated_entity = ""
+		anim_graph_name = ""
+		base_model_name = ""
+	}
+}

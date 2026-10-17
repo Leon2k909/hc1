@@ -1,0 +1,22 @@
+// Tools/riverdale_materials.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    F_TRANSLUCENT "1"
+    TextureTranslucency "materials/riverdale/rv_bd_vapor_trans.png"
+    F_RENDER_BACKFACES "1"
+    F_SELF_ILLUM "1"
+    TextureSelfIllumMask "materials/riverdale/rv_bd_vapor_illum.png"
+    g_flSelfIllumBrightness "0.85"
+    g_flSelfIllumAlbedoFactor "1.0"
+    g_vSelfIllumTint "[0.860000 0.890000 0.940000 0.000000]"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.00"
+    TextureColor "materials/riverdale/rv_bd_vapor_color.jpg"
+    TextureNormal "materials/riverdale/rv_bd_vapor_normal.png"
+    TextureRoughness "materials/riverdale/rv_bd_vapor_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1.000000 1.000000 1.000000 1.000000]"
+    g_flModelTintAmount "1.0"
+}

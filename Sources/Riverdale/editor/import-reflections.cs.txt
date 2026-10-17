@@ -1,0 +1,54 @@
+// Riverdale: imports the reflection panoramas Sources/Riverdale/lighting/riverdale_reflections.py staged under
+// output/riverdale/lighting/stage/ (EXRs and their sky.shader vmats, listed with their hashes in
+// output/riverdale/lighting/reflection-manifest.json) into Assets/materials/riverdale/reflections/<revision>/, and
+// compiles each vmat. The sky asset compiler turns each panorama into a cube
+// (reflection_<key>_exr_<hash>.generated.vtex_c) without the runtime GGX filter that faulted envmap_filtering_cs here.
+// Then run apply-reflections.cs.txt. Run with the native MCP's run_csharp; it refuses during play (compiling stalls the
+// editor's frame, and a match with it).
+if(Game.IsPlaying) throw new InvalidOperationException("Stop play before importing reflections.");
+var root = Sandbox.Project.Current.GetRootPath();
+var config = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Sources/Riverdale/lighting/config.json")));
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/riverdale/lighting/reflection-manifest.json")));
+var revision = manifest["revision"].GetValue<string>();
+if(revision!=config["revision"].GetValue<string>() || !System.Text.RegularExpressions.Regex.IsMatch(revision,"^daylight-v[0-9]+$"))
+    throw new InvalidOperationException("The staged reflections are for another revision.");
+var keys = config["reflections"].AsArray().Select(n => n["key"].GetValue<string>()).ToArray();
+var files = manifest["files"].AsArray();
+if(manifest["capture_encoding"]?.GetValue<string>()!="ACES inverse with sky calibration" || files.Count!=keys.Length*2)
+    throw new InvalidOperationException("Convert every planned probe's capture (an EXR and a vmat each) before importing.");
+string Hash(byte[] data) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(data)).ToLowerInvariant();
+var stage = System.IO.Path.Combine(root,"output/riverdale/lighting/stage");
+var imported = new System.Collections.Generic.List<string>();
+var pattern = "^materials/riverdale/reflections/"+revision+"/reflection_([a-z][a-z0-9_]*)\\.(exr|vmat)$";
+foreach(var item in files.OrderBy(i => i["path"].GetValue<string>().EndsWith(".vmat") ? 1 : 0))
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var relative = item["path"].GetValue<string>();
+    var match = System.Text.RegularExpressions.Regex.Match(relative,pattern);
+    if(!match.Success || !keys.Contains(match.Groups[1].Value)) throw new InvalidOperationException("Unexpected reflection file: "+relative);
+    var bytes = System.IO.File.ReadAllBytes(System.IO.Path.Combine(stage,relative));
+    if(Hash(bytes)!=item["sha256"].GetValue<string>().ToLowerInvariant()) throw new InvalidOperationException("Staged file changed since conversion: "+relative);
+    var target = System.IO.Path.Combine(root,"Assets",relative);
+    if(System.IO.File.Exists(target) && System.IO.File.ReadAllBytes(target).SequenceEqual(bytes)) continue;
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    System.IO.File.WriteAllBytes(target+".riverdale-import",bytes);
+    System.IO.File.Move(target+".riverdale-import",target,true);
+    Editor.AssetSystem.RegisterFile(target);
+    imported.Add(relative);
+}
+var results = new System.Collections.Generic.List<object>();
+var failed = new System.Collections.Generic.List<string>();
+foreach(var key in keys)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var file = System.IO.Path.Combine(root,"Assets/materials/riverdale/reflections",revision,$"reflection_{key}.vmat");
+    var asset = Editor.AssetSystem.FindByPath(file) ?? Editor.AssetSystem.RegisterFile(file);
+    if(asset is null) { failed.Add(key); continue; }
+    var ok = false; string error = null;
+    try { ok = asset.Compile(true); } catch(Exception e) { error = e.Message; }
+    await Task.Delay(1,cancellationToken);
+    var cubes = System.IO.Directory.GetFiles(System.IO.Path.GetDirectoryName(file),$"reflection_{key}_exr_*.generated.vtex_c");
+    if(!ok || asset.IsCompileFailed || cubes.Length!=1) failed.Add(key);
+    results.Add(new { Key=key, Ok=ok, asset.IsCompiled, asset.IsCompileFailed, Cubes=cubes.Length, Error=error });
+}
+return new { Revision=revision, Imported=imported, Failed=failed, Results=results };

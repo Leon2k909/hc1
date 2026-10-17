@@ -1,0 +1,402 @@
+{
+  "revision": "daylight-v1",
+  "engine": "26.10.13",
+  "scene": "scenes/maps/riverdale/riverdale.scene",
+  "note": "Written by Sources/Riverdale/lighting/riverdale_lighting.py config; world = ( n, -e, z ).",
+  "timeout_seconds": 900,
+  "reflection_capture_size": 512,
+  "volumes": [
+    {
+      "key": "yard",
+      "name": "Plant Yard Indirect Light",
+      "order": 0,
+      "plan_box": [
+        -2316.0,
+        2316.0,
+        -1766.0,
+        2466.0,
+        2.0,
+        578.0
+      ],
+      "bounds_min": "-1766,-2316,2",
+      "bounds_max": "2466,2316,578",
+      "expected_counts": "35,38,6",
+      "probes": 7980,
+      "spacing": "124.5,125.2,115.2",
+      "probe_density": 8,
+      "normal_bias": 20.0,
+      "view_bias": 30.0,
+      "blend_distance": 120.0,
+      "runtime_intensity": 1.6,
+      "runtime_contrast": 1.0,
+      "runtime_saturation": 1.0,
+      "timeout_seconds": 1800
+    },
+    {
+      "key": "hall",
+      "name": "Reactor Hall Indirect Light",
+      "order": 1,
+      "plan_box": [
+        -1016.0,
+        1016.0,
+        -216.0,
+        2016.0,
+        2.0,
+        1016.0
+      ],
+      "bounds_min": "-216,-1016,2",
+      "bounds_max": "2016,1016,1016",
+      "expected_counts": "19,17,9",
+      "probes": 2907,
+      "spacing": "124,127,126.8",
+      "probe_density": 8,
+      "normal_bias": 20.0,
+      "view_bias": 30.0,
+      "blend_distance": 24.0,
+      "runtime_intensity": 1.8,
+      "runtime_contrast": 1.0,
+      "runtime_saturation": 1.0,
+      "timeout_seconds": 1200
+    },
+    {
+      "key": "pool",
+      "name": "Fuel Pool Indirect Light",
+      "order": 2,
+      "plan_box": [
+        -528.0,
+        528.0,
+        372.0,
+        1428.0,
+        -528.0,
+        8.0
+      ],
+      "bounds_min": "372,-528,-528",
+      "bounds_max": "1428,528,8",
+      "expected_counts": "10,10,6",
+      "probes": 600,
+      "spacing": "117.3,117.3,107.2",
+      "probe_density": 8,
+      "normal_bias": 20.0,
+      "view_bias": 30.0,
+      "blend_distance": 24.0,
+      "runtime_intensity": 1.2,
+      "runtime_contrast": 1.0,
+      "runtime_saturation": 1.0,
+      "timeout_seconds": 900
+    }
+  ],
+  "reflections": [
+    {
+      "key": "hall",
+      "name": "Probe Hall",
+      "capture_plan": [
+        -260.0,
+        560.0,
+        330.0
+      ],
+      "capture_world": "560,260,330",
+      "plan_box": [
+        -1000.0,
+        1000.0,
+        -200.0,
+        2000.0,
+        -40.0,
+        1000.0
+      ],
+      "bounds_min": "-200,-1000,-40",
+      "bounds_max": "2000,1000,1000",
+      "priority": 1,
+      "exposure": 2.5,
+      "fallback_tint": 0.15,
+      "tint": 1.0,
+      "feathering": 0.04,
+      "calibration": false
+    },
+    {
+      "key": "pool",
+      "name": "Probe Pool",
+      "capture_plan": [
+        -260.0,
+        900.0,
+        -220.0
+      ],
+      "capture_world": "900,260,-220",
+      "plan_box": [
+        -520.0,
+        520.0,
+        380.0,
+        1420.0,
+        -520.0,
+        0.0
+      ],
+      "bounds_min": "380,-520,-520",
+      "bounds_max": "1420,520,0",
+      "priority": 2,
+      "exposure": 2.5,
+      "fallback_tint": 0.1,
+      "tint": 1.0,
+      "feathering": 0.04,
+      "calibration": false
+    },
+    {
+      "key": "a1",
+      "name": "Probe A1",
+      "capture_plan": [
+        -1370.0,
+        -190.0,
+        150.0
+      ],
+      "capture_world": "-190,1370,150",
+      "plan_box": [
+        -1670.0,
+        -1070.0,
+        -590.0,
+        210.0,
+        0.0,
+        320.0
+      ],
+      "bounds_min": "-590,1070,0",
+      "bounds_max": "210,1670,320",
+      "priority": 1,
+      "exposure": 2.5,
+      "fallback_tint": 0.15,
+      "tint": 1.0,
+      "feathering": 0.04,
+      "calibration": false
+    },
+    {
+      "key": "a2",
+      "name": "Probe A2",
+      "capture_plan": [
+        1370.0,
+        -190.0,
+        150.0
+      ],
+      "capture_world": "-190,-1370,150",
+      "plan_box": [
+        1070.0,
+        1670.0,
+        -590.0,
+        210.0,
+        0.0,
+        320.0
+      ],
+      "bounds_min": "-590,-1670,0",
+      "bounds_max": "210,-1070,320",
+      "priority": 1,
+      "exposure": 2.5,
+      "fallback_tint": 0.15,
+      "tint": 1.0,
+      "feathering": 0.04,
+      "calibration": false
+    },
+    {
+      "key": "b1_room",
+      "name": "Probe B1 Room",
+      "capture_plan": [
+        0.0,
+        -870.0,
+        280.0
+      ],
+      "capture_world": "-870,0,280",
+      "plan_box": [
+        -136.0,
+        136.0,
+        -1016.0,
+        -724.0,
+        192.0,
+        420.0
+      ],
+      "bounds_min": "-1016,-136,192",
+      "bounds_max": "-724,136,420",
+      "priority": 1,
+      "exposure": 2.5,
+      "fallback_tint": 0.15,
+      "tint": 1.0,
+      "feathering": 0.04,
+      "calibration": false
+    },
+    {
+      "key": "west_control",
+      "name": "Probe West Control",
+      "capture_plan": [
+        -780.0,
+        930.0,
+        370.0
+      ],
+      "capture_world": "930,780,370",
+      "plan_box": [
+        -1000.0,
+        -560.0,
+        660.0,
+        1200.0,
+        288.0,
+        468.0
+      ],
+      "bounds_min": "660,560,288",
+      "bounds_max": "1200,1000,468",
+      "priority": 2,
+      "exposure": 2.5,
+      "fallback_tint": 0.15,
+      "tint": 1.0,
+      "feathering": 0.04,
+      "calibration": false
+    },
+    {
+      "key": "east_control",
+      "name": "Probe East Control",
+      "capture_plan": [
+        780.0,
+        930.0,
+        370.0
+      ],
+      "capture_world": "930,-780,370",
+      "plan_box": [
+        560.0,
+        1000.0,
+        660.0,
+        1200.0,
+        288.0,
+        468.0
+      ],
+      "bounds_min": "660,-1000,288",
+      "bounds_max": "1200,-560,468",
+      "priority": 2,
+      "exposure": 2.5,
+      "fallback_tint": 0.15,
+      "tint": 1.0,
+      "feathering": 0.04,
+      "calibration": false
+    },
+    {
+      "key": "west_yard",
+      "name": "Probe West Yard",
+      "capture_plan": [
+        -1250.0,
+        -880.0,
+        170.0
+      ],
+      "capture_world": "-880,1250,170",
+      "plan_box": [
+        -2300.0,
+        0.0,
+        -1750.0,
+        -240.0,
+        -20.0,
+        900.0
+      ],
+      "bounds_min": "-1750,0,-20",
+      "bounds_max": "-240,2300,900",
+      "priority": 0,
+      "exposure": 1.5,
+      "fallback_tint": 1.0,
+      "tint": 1.0,
+      "feathering": 0.04,
+      "calibration": true
+    },
+    {
+      "key": "east_yard",
+      "name": "Probe East Yard",
+      "capture_plan": [
+        1250.0,
+        -880.0,
+        170.0
+      ],
+      "capture_world": "-880,-1250,170",
+      "plan_box": [
+        0.0,
+        2300.0,
+        -1750.0,
+        -240.0,
+        -20.0,
+        900.0
+      ],
+      "bounds_min": "-1750,-2300,-20",
+      "bounds_max": "-240,0,900",
+      "priority": 0,
+      "exposure": 1.5,
+      "fallback_tint": 1.0,
+      "tint": 1.0,
+      "feathering": 0.04,
+      "calibration": false
+    },
+    {
+      "key": "west_court",
+      "name": "Probe West Court",
+      "capture_plan": [
+        -1370.0,
+        1100.0,
+        170.0
+      ],
+      "capture_world": "1100,1370,170",
+      "plan_box": [
+        -2300.0,
+        -1040.0,
+        -240.0,
+        2040.0,
+        -20.0,
+        800.0
+      ],
+      "bounds_min": "-240,1040,-20",
+      "bounds_max": "2040,2300,800",
+      "priority": 0,
+      "exposure": 1.5,
+      "fallback_tint": 1.0,
+      "tint": 1.0,
+      "feathering": 0.04,
+      "calibration": false
+    },
+    {
+      "key": "east_court",
+      "name": "Probe East Court",
+      "capture_plan": [
+        1370.0,
+        1100.0,
+        170.0
+      ],
+      "capture_world": "1100,-1370,170",
+      "plan_box": [
+        1040.0,
+        2300.0,
+        -240.0,
+        2040.0,
+        -20.0,
+        800.0
+      ],
+      "bounds_min": "-240,-2300,-20",
+      "bounds_max": "2040,-1040,800",
+      "priority": 0,
+      "exposure": 1.5,
+      "fallback_tint": 1.0,
+      "tint": 1.0,
+      "feathering": 0.04,
+      "calibration": false
+    },
+    {
+      "key": "north",
+      "name": "Probe North",
+      "capture_plan": [
+        -370.0,
+        2330.0,
+        170.0
+      ],
+      "capture_world": "2330,370,170",
+      "plan_box": [
+        -2300.0,
+        2300.0,
+        2040.0,
+        2450.0,
+        -20.0,
+        700.0
+      ],
+      "bounds_min": "2040,-2300,-20",
+      "bounds_max": "2450,2300,700",
+      "priority": 0,
+      "exposure": 1.5,
+      "fallback_tint": 1.0,
+      "tint": 1.0,
+      "feathering": 0.04,
+      "calibration": false
+    }
+  ]
+}

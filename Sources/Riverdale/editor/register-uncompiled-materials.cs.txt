@@ -1,0 +1,12 @@
+// Register newly published Riverdale material source files with the editor.
+// This does not compile or mutate any source materials.
+var root = Sandbox.Project.Current.GetRootPath();
+var dir = System.IO.Path.Combine(root, "Assets/materials/riverdale");
+var registered = new System.Collections.Generic.List<string>();
+foreach (var source in System.IO.Directory.GetFiles(dir, "*.vmat"))
+{
+    if (System.IO.File.Exists(source + "_c")) continue;
+    var asset = Editor.AssetSystem.FindByPath(source) ?? Editor.AssetSystem.RegisterFile(source);
+    if (asset is not null) registered.Add(System.IO.Path.GetFileName(source));
+}
+return new { Registered = registered.Count, Files = registered };

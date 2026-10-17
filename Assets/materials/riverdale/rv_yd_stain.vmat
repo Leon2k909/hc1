@@ -1,0 +1,14 @@
+// Tools/riverdale_materials.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.00"
+    TextureColor "materials/riverdale/rv_yd_stain_color.jpg"
+    TextureNormal "materials/riverdale/rv_yd_stain_normal.png"
+    TextureRoughness "materials/riverdale/rv_yd_stain_rough.png"
+    TextureAmbientOcclusion "materials/riverdale/rv_yd_stain_ao.png"
+    g_vColorTint "[1.000000 1.000000 1.000000 1.000000]"
+    g_flModelTintAmount "1.0"
+}

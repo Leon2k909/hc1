@@ -1,0 +1,161 @@
+// Riverdale: puts the lighting plan of Sources/Riverdale/lighting/config.json into the open, saved Riverdale editor
+// document and saves it. Run with the native MCP's run_csharp before bake-lighting.cs.txt. Safe to run again: it only
+// adds what's missing and refuses when something differs from the plan.
+// - Indirect light: an "Indirect Light" group with one IndirectLightVolume per configured volume (bounds in world space,
+//   probe density, biases, blend distance, runtime strength). A volume that already exists must match the plan's
+//   bounds and density, so a bake is never silently resized.
+// - Reflections: every probe under "Reflection Probes" becomes static (CustomTexture). Realtime probes run the
+//   engine's envmap filtering at load, which faulted envmap_filtering_cs on this workstation. Until
+//   capture-reflections.cs.txt and apply-reflections.cs.txt give a probe its own cube, it shows a copy of the sky's
+//   compiled cube (lighting/riverdale/<revision>/sky_fallback_<hash>.vtex), dimmed indoors by its fallback tint. Each
+//   probe moves to its capture position with its world box kept; probes the plan no longer has (the old single
+//   "Probe Yard") are removed.
+// It never bakes, never captures and never runs envmap filtering.
+if(Game.IsPlaying) throw new InvalidOperationException("Stop play before preparing Riverdale lighting.");
+var root = Sandbox.Project.Current.GetRootPath();
+var config = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Sources/Riverdale/lighting/config.json")));
+var revision = config["revision"].GetValue<string>();
+if(!System.Text.RegularExpressions.Regex.IsMatch(revision,"^daylight-v[0-9]+$")) throw new InvalidOperationException("Invalid lighting revision.");
+var session = Editor.SceneEditorSession.Active;
+if(session?.Scene?.Source?.ResourcePath?.Equals("scenes/maps/riverdale/riverdale.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Riverdale must own the editor window.");
+if(session.HasUnsavedChanges) throw new InvalidOperationException("Riverdale has unsaved edits; inspect them before preparing its lighting.");
+var scene = session.Scene;
+var beforeGameId = Game.ActiveScene?.Id;
+var resourceDirectory = "lighting/riverdale/"+revision;
+var nativeDirectory = System.IO.Path.Combine(root,"Assets",resourceDirectory);
+string Hash(byte[] data) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(data)).ToLowerInvariant();
+
+// The sky's compiled cube, copied under a name taken from its content, so a running editor never shows a cached older
+// cube under the same name (Orion's lesson).
+var skyCubes = new System.IO.DirectoryInfo(System.IO.Path.Combine(root,"Assets/materials/riverdale/sky"))
+    .GetFiles("riverdale_sky_exr_*.generated.vtex_c").OrderBy(f => f.LastWriteTimeUtc).ToArray();
+if(skyCubes.Length==0) throw new InvalidOperationException("Compile materials/riverdale/sky/riverdale_sky.vmat first: its cube is the probes' fallback.");
+var skyBytes = System.IO.File.ReadAllBytes(skyCubes[^1].FullName);
+var fallbackPath = $"{resourceDirectory}/sky_fallback_{Hash(skyBytes)[..8]}.vtex";
+var fallbackFile = System.IO.Path.Combine(root,"Assets",fallbackPath+"_c");
+if(!System.IO.File.Exists(fallbackFile))
+{
+    System.IO.Directory.CreateDirectory(nativeDirectory);
+    System.IO.File.WriteAllBytes(fallbackFile+".riverdale-pending",skyBytes);
+    System.IO.File.Move(fallbackFile+".riverdale-pending",fallbackFile,false);
+}
+var fallback = Texture.Load(fallbackPath,false);
+if(fallback is null || fallback.IsError) throw new InvalidOperationException("The fallback sky cube did not load: "+fallbackPath);
+
+GameObject Group(string name)
+{
+    var found = scene.Children.Where(g => g.Name==name).ToArray();
+    if(found.Length>1) throw new InvalidOperationException("More than one group named "+name);
+    if(found.Length==1) return found[0];
+    return new GameObject(scene){ Name=name };
+}
+void SetEnum(object target,string property,string value)
+{
+    var info = target.GetType().GetProperty(property) ?? throw new MissingMemberException(target.GetType().Name+"."+property);
+    info.SetValue(target,Enum.Parse(info.PropertyType,value));
+}
+var report = new System.Collections.Generic.List<object>();
+var changed = false;
+using(scene.Push())
+{
+    // Indirect light.
+    var indirectRoot = Group("Indirect Light");
+    var entries = config["volumes"].AsArray().Select(n => n.AsObject()).ToArray();
+    var names = entries.Select(e => e["name"].GetValue<string>()).ToHashSet();
+    var strays = scene.GetAllComponents<IndirectLightVolume>().Where(v => !names.Contains(v.GameObject.Name)).ToArray();
+    if(strays.Length>0) throw new InvalidOperationException("Unplanned indirect-light volume: "+strays[0].GameObject.Name+"; inspect it first.");
+    foreach(var entry in entries)
+    {
+        var name = entry["name"].GetValue<string>();
+        var bounds = new BBox(Vector3.Parse(entry["bounds_min"].GetValue<string>()),Vector3.Parse(entry["bounds_max"].GetValue<string>()));
+        var volume = scene.GetAllComponents<IndirectLightVolume>().SingleOrDefault(v => v.GameObject.Name==name);
+        var created = volume is null;
+        if(created)
+        {
+            var holder = new GameObject(indirectRoot){ Name=name };
+            holder.NetworkMode = NetworkMode.Snapshot;
+            holder.WorldPosition = Vector3.Zero;
+            holder.WorldRotation = Rotation.Identity;
+            volume = holder.Components.Create<IndirectLightVolume>();
+            volume.Bounds = bounds;
+            volume.ProbeDensity = entry["probe_density"].GetValue<int>();
+            SetEnum(volume,"InsideGeometry","Relocate");
+            changed = true;
+        }
+        else if((volume.Bounds.Mins-bounds.Mins).Length>0.5f || (volume.Bounds.Maxs-bounds.Maxs).Length>0.5f
+                || volume.ProbeDensity!=entry["probe_density"].GetValue<int>() || volume.WorldPosition.Length>0.5f)
+            throw new InvalidOperationException($"{name} differs from the plan; inspect it (and its bake) before changing either.");
+        // Shading-time settings: none of them is captured by a bake, so they're always taken from the plan.
+        volume.NormalBias = entry["normal_bias"].GetValue<float>();
+        volume.ViewBias = entry["view_bias"].GetValue<float>();
+        volume.BlendDistance = entry["blend_distance"].GetValue<float>();
+        volume.RuntimeIntensity = entry["runtime_intensity"].GetValue<float>();
+        volume.RuntimeContrast = entry["runtime_contrast"].GetValue<float>();
+        volume.RuntimeSaturation = entry["runtime_saturation"].GetValue<float>();
+        if(volume.ProbeCounts.ToString()!=entry["expected_counts"].GetValue<string>())
+            throw new InvalidOperationException($"{name}: the engine makes a {volume.ProbeCounts} grid, the plan {entry["expected_counts"]}.");
+        report.Add(new { Volume=name, Created=created, Grid=volume.ProbeCounts.ToString(), Baked=volume.BakeVersion==1 && volume.IrradianceTexture is not null });
+    }
+
+    // Reflections.
+    var probeRoot = Group("Reflection Probes");
+    var planned = config["reflections"].AsArray().Select(n => n.AsObject()).ToArray();
+    var plannedNames = planned.Select(p => p["name"].GetValue<string>()).ToHashSet();
+    // Destroy is deferred until the next scene tick. Exclude exactly these retired probes from the
+    // final mode check; otherwise the first preparation aborts with "Probe Yard" still enumerated.
+    var removedProbes = new System.Collections.Generic.HashSet<EnvmapProbe>();
+    foreach(var stale in probeRoot.Children.Where(g => g.Components.Get<EnvmapProbe>() is not null && !plannedNames.Contains(g.Name)).ToArray())
+    {
+        removedProbes.Add(stale.Components.Get<EnvmapProbe>());
+        report.Add(new { Removed=stale.Name });
+        stale.Destroy();
+        changed = true;
+    }
+    foreach(var entry in planned)
+    {
+        var name = entry["name"].GetValue<string>();
+        var holder = probeRoot.Children.SingleOrDefault(g => g.Name==name);
+        var created = holder is null;
+        if(created) { holder = new GameObject(probeRoot){ Name=name }; holder.NetworkMode = NetworkMode.Snapshot; changed = true; }
+        var probe = holder.Components.Get<EnvmapProbe>() ?? holder.Components.Create<EnvmapProbe>();
+        var capture = Vector3.Parse(entry["capture_world"].GetValue<string>());
+        var box = new BBox(Vector3.Parse(entry["bounds_min"].GetValue<string>()),Vector3.Parse(entry["bounds_max"].GetValue<string>()));
+        var captured = probe.Texture?.ResourcePath?.StartsWith(resourceDirectory+"/reflection_",StringComparison.OrdinalIgnoreCase)==true;
+        if(!captured)
+        {
+            // The world box stays where the plan puts it; only the cube's origin moves to where it'll be captured.
+            holder.WorldPosition = capture;
+            holder.WorldRotation = Rotation.Identity;
+            probe.Bounds = new BBox(box.Mins-capture,box.Maxs-capture);
+            probe.Priority = entry["priority"].GetValue<int>();
+            probe.Feathering = entry["feathering"].GetValue<float>();
+            SetEnum(probe,"Projection","Box");
+            probe.Texture = fallback;
+            var tint = entry["fallback_tint"].GetValue<float>();
+            probe.TintColor = new Color(tint,tint,tint,1);
+            SetEnum(probe,"Mode","CustomTexture");
+            changed = true;
+        }
+        else if(probe.Mode.ToString()!="CustomTexture")
+        {
+            SetEnum(probe,"Mode","CustomTexture");
+            changed = true;
+        }
+        report.Add(new { Probe=name, Created=created, Captured=captured, Texture=probe.Texture?.ResourcePath, Mode=probe.Mode.ToString() });
+    }
+    var realtime = scene.GetAllComponents<EnvmapProbe>().Where(p => p.Mode.ToString()!="CustomTexture" && !removedProbes.Contains(p))
+        .Select(p => p.GameObject.Name).ToArray();
+    if(realtime.Length>0) throw new InvalidOperationException("Probes outside Reflection Probes are still not static: "+string.Join(", ",realtime));
+}
+if(changed)
+{
+    typeof(Editor.SceneEditorSession).GetProperty("HasUnsavedChanges").SetValue(session,true);
+    session.Save(false);
+    if(session.HasUnsavedChanges) throw new InvalidOperationException("Riverdale was not saved.");
+}
+var output = System.IO.Path.Combine(root,"output/riverdale/lighting",revision);
+System.IO.Directory.CreateDirectory(output);
+var result = new { Revision=revision, Changed=changed, Saved=changed, Fallback=fallbackPath, Items=report, GamePreserved=!Game.IsPlaying && Game.ActiveScene?.Id==beforeGameId };
+System.IO.File.WriteAllText(System.IO.Path.Combine(output,"prepared.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

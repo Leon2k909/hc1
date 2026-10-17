@@ -1,0 +1,9 @@
+// Tools/riverdale_materials.py: a room behind glass (Belltower's window shader); its quad needs UVs 0-1
+"Layer0"
+{
+    shader "shaders/belltower_window.shader"
+    TextureRoomBack "materials/riverdale/rv_room_plant_color.png"
+    TextureRoomWall "materials/riverdale/rv_room_wall_color.png"
+    g_flRoomDepth "90"
+    g_flInteriorBrightness "0.42"
+}

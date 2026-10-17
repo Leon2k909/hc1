@@ -4080,9 +4080,19 @@ simulate_input.
     over the whole map at z -30..-24, which capped the fuel pool (water at -30): from the deck the pool read as an
     opaque teal sheet, the cyan lamps lighting the slab's top.
 - The look (`look_object`, `HAZE`): AO, a warm grade, a vignette, bloom (0.32 over 1.15), screen-space reflections and
-  ACES with auto exposure 1-2.5; volumetric haze in the hall (0.35) and a light one over the yards (0.06). The pool's
-  water scatter (0.1, 0.95, 1.35), the racks' glow (8) and the exposure were set together: at exposure 4 with the old
-  scatter (2.9 blue) the pool blew out to white.
+  ACES with auto exposure 1-2.5; volumetric haze in the hall (0.35) and a light one over the yards (0.06).
+- The pool's light (2026-10-15, the user in a match: "riverdale pool lighting is mad bright"). It read as a white
+  sheet with glare blobs round its rim. Now:
+  - water scatter 0.03/0.32/0.46 and deep 0.006/0.10/0.20, shafts 0.35, caustics 0.9 (were 0.1/0.95/1.35,
+    0.02/0.3/0.55, 0.7 and 1.4). The shafts add up to 2.1 times the scatter, so they were most of the white;
+    the scatter was already down from 2.9 blue;
+  - the 24 lamp strips at the waterline (`rv_lamp_cyan`) glow 3 (was 14: those were the blobs), the racks 2.5 (8),
+    the mast's core (`rv_cyan_glow`) 2 (6);
+  - the 8 pool lamps under the water 0.10,0.42,0.52 and the 6 glow lights over it 0.05,0.27,0.38, about half, as they
+    light the haze over the water.
+  - Checked in the offscreen captures (`pool_close`, `hall_reference`): deep teal water with the racks and mast seen
+    through it. Not yet seen in a match: the materials recompiled into the user's running one, the lights only come
+    with the next load of the map.
 - Checks (`check_spots`, `check_reach`, `check_retakes_sight`) pass for all 95 spots.
 - `Sources/Riverdale/editor/` (run each with the native MCP's run_csharp, `{"path": ...}`):
   - `compile-stale.cs.txt` force-compiles every riverdale material, model and the scene whose sources are newer than
@@ -4099,6 +4109,47 @@ simulate_input.
   the bays between the far wall's pilasters, the glowing pool with its racks), both yards (A1/A2, the domes' faces,
   TURBINE BUILDING, the containers), the control rooms, the north lane, the court and the aerial. Not yet played: no
   match, bots, navmesh or modes have run on it.
+- The AAA pass (2026-10-16 and 17, the user: "get riverdale AAA with a workflow"). A first round's agents wrote
+  `riverdale_facades.py` (the yard buildings' faces), `riverdale_yard.py` (ground detail and clutter, drawn only) and
+  `Sources/Riverdale/lighting/` (its README has the bake). An overnight pass whose session isn't on record then published
+  it all and added:
+  - the baked light, revision `daylight-v1`: three indirect volumes (yard, hall, pool) and twelve static reflection
+    cubes, kept in `Sources/Riverdale/lighting/*.json` for regeneration (`.gitignore` lets their `.vtex_c` in);
+  - box colliders for the big pipes and the yard props ("Pipe Solids", "Yard Prop Solids": `riverdale_parts.PIPE_SOLIDS`,
+    `riverdale_collision_scene.py`, `riverdale_merge_collision.py`);
+  - `RiverdaleGratingStabilizer` (`Code/Map/`): an opaque, mip-filtered grating in place of the shimmering alpha-tested
+    one (`riverdale_grating_stable.py`);
+  - cooling-tower vapor (`riverdale_vapor.py`). Its report says gameplay routes from both spawns reach both sites.
+  - The backdrop's trees split into 16 render-only sectors (`riverdale_spatial_verify.py`): the sector models are in
+    `models/maps/riverdale_sectors/`, but the saved scene still draws the unsplit tree models.
+- Round 2 (2026-10-17), from fresh offscreen captures:
+  - The hall's walls were blotched light and dark: the hall volume's probes are ~10 ft apart on 80 ft walls. Rendering
+    with the fog, then the indirect light hidden showed it was the light, not the haze. The hall volume's NormalBias
+    70, ViewBias 100 and RuntimeIntensity 2.1 (were 20, 30 and 1.8) smooth it with no re-bake, and keep the floors
+    neutral (at 90/120 a red lamp tinted the walkway pink). Set in the saved scene and `indirect.json`.
+  - The turbine buildings' three steam lines left the wall 28 in out, so each elbow met the next and every line read as
+    a closed loop. They now leave at one height as a bank 46 in out, on a channel bracketed off the wall with clamp
+    bands (`yard_side`), and their colliders moved with them. The jacketing (`jacketing`) is duller: roughness 0.54
+    (was 0.38), softer oxidation and grime. It read as chrome.
+  - The court's transformer (`transformer`): a lid flange, skids and stiffeners, two banks of 14 panel radiators a side
+    on headers, three shedded HV and four LV porcelain bushings (`rv_porcelain`), an oil bund with gravel. Plinth and
+    tank collision unchanged.
+  - The control rooms' back walls on the upper walkway (`riverdale_hall.control_back`): a supply duct, a cable tray, a
+    distribution board, a notice board, an extinguisher, the door's frame and plate, a camera.
+  - The blurry console buttons in captures are the capture's 1024 texture cap, not the atlas.
+- How to change it now:
+  - `riverdale_map.py` builds on Railhead's prop and container code (`railhead_props`, `lowtide_container`, ...), which
+    other sessions change. So a fresh build differs from the published yards in places nobody meant to touch (on
+    2026-10-17, ~13k triangles of `rw_steel_dark`). Don't publish a whole rebuild over them. `Tools/riverdale_splice.py`
+    takes the change as the difference between two builds (without and with it, `--baseline` / `--current`) and
+    applies just that to the published OBJs, refusing if any face it removes isn't there.
+    `Tools/riverdale_build_models.py` builds the models with the backdrop stubbed out (~5 min), from a source
+    dir ahead of Tools for the baseline. It imports that dir's modules first: `riverdale_materials` puts Tools back at
+    the front of `sys.path`.
+  - `Tools/riverdale_merge_pipe_solids.py` carries a staged scene's "Pipe Solids" into the saved scene and checks that
+    nothing else changes. The saved scene round-trips through `json.dumps( indent=2 )` byte for byte (CRLF kept).
+  - `Sources/Riverdale/editor/editor_call.py` is a short native connection (`--direct-call --script <cs.txt>`).
+    `capture.cs.txt` takes `"set": [{ "object", "property", "value" }]` to try a component's value on its copy.
 - To play it: `dev_mode team_deathmatch riverdale`.
 
 ## Riverside (Zombies map, `Tools/riverside_map.py`)

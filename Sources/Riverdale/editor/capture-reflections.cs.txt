@@ -1,0 +1,134 @@
+// Riverdale: captures the six faces of each planned reflection probe (Sources/Riverdale/lighting/config.json's
+// "reflections") as ordinary camera views of the open Riverdale document, to
+// output/riverdale/lighting/reflections/<revision>/<key>/face-0..5.png with faces.json. Run with the native MCP's
+// run_csharp after the indirect light is baked (so the cubes hold the bounced light). A probe whose faces.json exists is
+// skipped: delete its folder to capture it again. Sources/Riverdale/lighting/riverdale_reflections.py turns the faces
+// into linear panoramas, and import-reflections.cs.txt and apply-reflections.cs.txt give them to the probes.
+// Cerro Blanco's accepted method:
+// - Ordinary camera faces, never EnvmapProbe.Bake, RenderCubemap or CubemapRendering.Filter: those run the GPU GGX
+//   filter that faulted envmap_filtering_cs on this workstation's driver.
+// - ACES at a fixed exposure (the probe's "exposure", 1 outdoors, more indoors so dark rooms keep their levels in 8 bits);
+//   the converter inverts the curve and calibrates against the sky. The bitmap path rejects float readback.
+// - Colour grading, vignette, bloom, screen-space AO and SSR are off while it captures: they're display effects or
+//   differ from face to face, and would leave seams. The haze stays: it's part of the room.
+// - The viewport overwrites the editor camera between frames, so the whole view is set again right before each render.
+// - Scene.Push is never held across an await. Everything it changes is put back.
+if(Game.IsPlaying) throw new InvalidOperationException("Stop play before capturing reflections.");
+var session = Editor.SceneEditorSession.Active;
+var scene = session?.Scene;
+if(scene?.Source?.ResourcePath?.Equals("scenes/maps/riverdale/riverdale.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Riverdale must own the editor window.");
+var root = Sandbox.Project.Current.GetRootPath();
+var config = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Sources/Riverdale/lighting/config.json")));
+var revision = config["revision"].GetValue<string>();
+if(!System.Text.RegularExpressions.Regex.IsMatch(revision,"^daylight-v[0-9]+$")) throw new InvalidOperationException("Invalid lighting revision.");
+var size = config["reflection_capture_size"]?.GetValue<int>() ?? 512;
+if(size!=512 && size!=256) throw new InvalidOperationException("Capture faces at 512 or 256.");
+var beforeGameId = Game.ActiveScene?.Id;
+var beforeDirty = session.HasUnsavedChanges;
+var camera = scene.GetAllComponents<CameraComponent>().Single(c => c.GameObject.Name=="editor_camera" && c.GameObject.Flags.HasFlag(GameObjectFlags.EditorOnly));
+var oldPosition = camera.WorldPosition; var oldRotation = camera.WorldRotation; var oldFov = camera.FieldOfView;
+var oldSize = camera.CustomSize; var oldAxis = camera.FovAxis; var oldOrtho = camera.Orthographic;
+var tone = scene.GetAllComponents<Tonemapping>().Single();
+var oldTone = (tone.Mode,tone.AutoExposureEnabled,tone.MinimumExposure,tone.MaximumExposure,tone.ExposureCompensation);
+var displayEffects = new System.Collections.Generic.HashSet<string>{ "ColorGrading","ColorAdjustments","Vignette","Bloom","AmbientOcclusion","ScreenSpaceReflections",
+    "ChromaticAberration","FilmGrain","Sharpen","DepthOfField","MotionBlur","Highlight" };
+var switched = scene.GetAllObjects(true).SelectMany(g => g.Components.GetAll()).Where(c => displayEffects.Contains(c.GetType().Name))
+    .Select(c => (Component:c,Enabled:c.Enabled)).ToArray();
+var skyTint = scene.GetAllComponents<SkyBox2D>().FirstOrDefault()?.Tint ?? Color.White;
+var flags = System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Public;
+var post = scene.GetSystem<PostProcessSystem>();
+var updatePost = typeof(PostProcessSystem).GetMethod("UpdateCamera",flags);
+var composeView = typeof(CameraComponent).GetMethod("ComposeView",flags,null,Type.EmptyTypes,null);
+var preRender = typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null);
+var preCameraRender = typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null);
+void RefreshPostProcessing()
+{
+    // RenderToBitmap starts editor captures from the map's main camera: refresh both so the fixed exposure reaches the view.
+    foreach(var other in scene.GetAllComponents<CameraComponent>().Where(c => c!=camera)) updatePost.Invoke(post,new object[]{other});
+    updatePost.Invoke(post,new object[]{camera});
+}
+// Ask for useful mips before rendering (1024 is plenty for 512 faces; 4096 across a whole map ran the editor out of video
+// memory once), and bring the baked indirect light up to date. No scope is held over the wait.
+var marked = 0;
+using(scene.Push())
+{
+    var keys = new[]{ "g_tColor","g_tNormal","g_tRoughness","g_tSelfIllumMask","g_tAmbientOcclusion","g_tTransmissiveColor" };
+    foreach(var material in scene.GetAllComponents<ModelRenderer>().Where(r => r.Model is not null && !r.Model.IsError).SelectMany(r => r.Model.Materials).Where(m => m is not null).Distinct())
+    foreach(var texture in keys.Select(material.GetTexture).Append(material.FirstTexture).Where(t => t is not null && !t.IsError).Distinct())
+    { texture.MarkUsed(1024); marked++; }
+    foreach(var volume in scene.GetAllComponents<IndirectLightVolume>())
+    foreach(var texture in new[]{volume.IrradianceTexture,volume.DistanceTexture,volume.RelocationTexture})
+        if(texture is not null && !texture.IsError) texture.MarkUsed(Math.Max(texture.Width,texture.Height));
+    var ddgiType = typeof(Scene).Assembly.GetType("Sandbox.DDGIVolumeSystem");
+    var getter = typeof(Scene).GetMethods().Single(m => m.Name=="GetSystem" && m.IsGenericMethodDefinition && m.GetParameters().Length==0);
+    var ddgi = getter.MakeGenericMethod(ddgiType).Invoke(scene,null);
+    ddgiType.GetMethod("MarkDirty",flags).Invoke(ddgi,null);
+    ddgiType.GetMethod("UpdateVolumes",flags).Invoke(ddgi,null);
+}
+await Task.Delay(2000,cancellationToken);
+var rotations = new[]{ new Angles(0,0,0),new Angles(0,90,0),new Angles(0,180,0),new Angles(0,-90,0),new Angles(-90,0,0),new Angles(90,0,0) };
+var captured = new System.Collections.Generic.List<object>();
+var skipped = new System.Collections.Generic.List<string>();
+try
+{
+    tone.Mode = Tonemapping.TonemappingMode.ACES; tone.AutoExposureEnabled = true; tone.ExposureCompensation = 0;
+    foreach(var entry in switched) entry.Component.Enabled = false;
+    foreach(var item in config["reflections"].AsArray())
+    {
+        var key = item["key"].GetValue<string>();
+        if(!System.Text.RegularExpressions.Regex.IsMatch(key,"^[a-z][a-z0-9_]*$")) throw new InvalidOperationException("Invalid probe key.");
+        var directory = System.IO.Path.Combine(root,"output/riverdale/lighting/reflections",revision,key);
+        if(System.IO.File.Exists(System.IO.Path.Combine(directory,"faces.json"))) { skipped.Add(key); continue; }
+        System.IO.Directory.CreateDirectory(directory);
+        var position = Vector3.Parse(item["capture_world"].GetValue<string>());
+        var exposure = item["exposure"]?.GetValue<float>() ?? 1f;
+        var faces = new System.Collections.Generic.List<object>();
+        for(var face=0;face<rotations.Length;face++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if(Game.IsPlaying || Editor.SceneEditorSession.Active!=session) throw new InvalidOperationException("Play started or the document changed during the capture.");
+            using(scene.Push())
+            {
+                tone.MinimumExposure = exposure; tone.MaximumExposure = exposure;
+                preRender.Invoke(scene,null);
+                preCameraRender.Invoke(scene,null);
+                using var bitmap = new Bitmap(size,size);
+                float renderedFov = 0; string renderedSize = null; Vector3 renderedPosition = default; Rotation renderedRotation = default;
+                for(var warmup=0;warmup<3;warmup++)
+                {
+                    camera.WorldPosition = position;
+                    camera.WorldRotation = Rotation.From(rotations[face]);
+                    camera.FieldOfView = 90; camera.CustomSize = new Vector2(size,size);
+                    camera.FovAxis = CameraComponent.Axis.Horizontal; camera.Orthographic = false;
+                    composeView.Invoke(camera,null);
+                    RefreshPostProcessing();
+                    if(Math.Abs(camera.View.FieldOfView-90)>0.01f) throw new InvalidOperationException("The reflection camera lost its 90-degree projection.");
+                    renderedFov = camera.View.FieldOfView; renderedSize = camera.CustomSize.Value.ToString();
+                    renderedPosition = camera.WorldPosition; renderedRotation = camera.WorldRotation;
+                    camera.RenderToBitmap(bitmap,false);
+                }
+                var file = $"face-{face}.png";
+                System.IO.File.WriteAllBytes(System.IO.Path.Combine(directory,file),bitmap.ToPng());
+                faces.Add(new { File=file, Face=face, FieldOfView=renderedFov, Position=renderedPosition.ToString(), CaptureSize=renderedSize,
+                                Forward=renderedRotation.Forward.ToString(), Right=renderedRotation.Right.ToString(), Up=renderedRotation.Up.ToString() });
+            }
+            await Task.Yield();
+        }
+        var report = new { Key=key, Name=item["name"].GetValue<string>(), Revision=revision, Position=position.ToString(), Exposure=exposure,
+            Encoding="sRGB; ACES tonemapper; native bitmap capture", ScreenSpaceOcclusion=false, DisplayEffects=false,
+            SkyTint=$"{skyTint.r},{skyTint.g},{skyTint.b}", CaptureSize=$"{size},{size}", Faces=faces };
+        System.IO.File.WriteAllText(System.IO.Path.Combine(directory,"faces.json"),System.Text.Json.JsonSerializer.Serialize(report));
+        captured.Add(new { Key=key, Faces=faces.Count });
+    }
+}
+finally
+{
+    camera.WorldPosition = oldPosition; camera.WorldRotation = oldRotation; camera.FieldOfView = oldFov;
+    camera.CustomSize = oldSize; camera.FovAxis = oldAxis; camera.Orthographic = oldOrtho;
+    tone.Mode = oldTone.Item1; tone.AutoExposureEnabled = oldTone.Item2; tone.MinimumExposure = oldTone.Item3; tone.MaximumExposure = oldTone.Item4; tone.ExposureCompensation = oldTone.Item5;
+    foreach(var entry in switched) entry.Component.Enabled = entry.Enabled;
+    using(scene.Push()) { composeView.Invoke(camera,null); RefreshPostProcessing(); }
+}
+return new { Revision=revision, Captured=captured, Skipped=skipped, MarkedTextures=marked,
+    GamePreserved=!Game.IsPlaying && Game.ActiveScene?.Id==beforeGameId, DirtyStatePreserved=beforeDirty==session.HasUnsavedChanges };

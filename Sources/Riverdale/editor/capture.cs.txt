@@ -12,13 +12,35 @@ var configuration = System.IO.File.Exists(configPath)
 var source = Editor.SceneEditorSession.Active?.Scene;
 var before = new { Game.IsPlaying, Scene = source?.Name, SceneId = source?.Id, GameSceneId = Game.ActiveScene?.Id };
 var visual = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase) {
-    "Sun", "Sky", "Fog", "Look", "Riverdale", "Lights", "Reflection Probes", "Volumetric Fog"
+    "Sun", "Sky", "Fog", "Look", "Riverdale", "Lights", "Reflection Probes", "Volumetric Fog", "Indirect Light"
 };
 var root = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(projectRoot, "Assets/scenes/maps/Riverdale/riverdale.scene"))).AsObject();
 var objects = new System.Text.Json.Nodes.JsonArray();
 foreach (var item in root["GameObjects"].AsArray())
     if (visual.Contains(item["Name"]?.GetValue<string>() ?? "")) objects.Add(item.DeepClone());
 root["GameObjects"] = objects;
+// "set": [{ "object": name, "property": p, "value": v }]: try a component value on a copy (the saved scene is untouched).
+var overrides = new System.Collections.Generic.List<string>();
+if (configuration["set"] is System.Text.Json.Nodes.JsonArray settings)
+{
+    void Walk(System.Text.Json.Nodes.JsonArray list)
+    {
+        foreach (var node in list)
+        {
+            var go = node.AsObject();
+            foreach (var setting in settings.Select(s => s.AsObject()))
+                if (go["Name"]?.GetValue<string>() == setting["object"].GetValue<string>())
+                    foreach (var component in go["Components"].AsArray().Select(c => c.AsObject()))
+                        if (component.ContainsKey(setting["property"].GetValue<string>()))
+                        {
+                            component[setting["property"].GetValue<string>()] = setting["value"].DeepClone();
+                            overrides.Add(go["Name"] + "." + setting["property"] + "=" + setting["value"].ToJsonString());
+                        }
+            if (go["Children"] is System.Text.Json.Nodes.JsonArray children) Walk(children);
+        }
+    }
+    Walk(objects);
+}
 root["SceneProperties"]["NavMesh"]["Enabled"] = false;
 root["SceneProperties"]["WantsSystemScene"] = false;
 var scene = Scene.CreateEditorScene();
@@ -30,7 +52,7 @@ try {
     var hidden = new System.Collections.Generic.List<string>();
     using (scene.Push()) {
         scene.Deserialize(root);
-        foreach (var probe in scene.GetAllComponents<EnvmapProbe>()) probe.Mode = EnvmapProbe.EnvmapProbeMode.Realtime;
+        // Retain the baked static cubes. Realtime envmap filtering can crash the workstation's GPU.
         // "hide": objects to leave out of the views, by name (to see through the pool's water, say).
         if (configuration["hide"] is System.Text.Json.Nodes.JsonArray hide)
             foreach (var name in hide.Select(x => x.GetValue<string>()))
@@ -49,26 +71,21 @@ try {
     var textureNames = new[] { "g_tColor", "g_tNormal", "g_tRoughness", "g_tSelfIllumMask", "g_tTransmissiveColor", "g_tAmbientOcclusion" };
     foreach (var material in scene.GetAllComponents<ModelRenderer>().Where(r => r.Model is not null).SelectMany(r => r.Model.Materials).Distinct())
         foreach (var texture in textureNames.Select(material.GetTexture).Append(material.FirstTexture).Where(t => t is not null).Distinct())
-        { texture.MarkUsed(4096); marked++; }
+        { texture.MarkUsed(1024); marked++; }
     for (var wait = 0; wait < (configuration["stream_frames"]?.GetValue<int>() ?? 90); wait++)
     {
         using (scene.Push()) { scene.EditorTick(.016f, .016f); preRender.Invoke(scene, null); }
         await Task.Delay(33, cancellationToken);
     }
-    var renderProbe = typeof(EnvmapProbe).GetMethod("RenderCubemap", flags, null, Type.EmptyTypes, null);
-    if (renderProbe is not null)
-        foreach (var probe in scene.GetAllComponents<EnvmapProbe>())
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            using (scene.Push()) renderProbe.Invoke(probe, null);
-            await Task.Delay(16, cancellationToken);
-        }
+    // Static box-projected probes already carry captured reflection cubes. Rendering or filtering
+    // envmaps here would unnecessarily destroy that calibration and can lose the GPU device.
     // Plan ( e, n, z ) to world ( n, -e, z ).
     Vector3 World(Vector3 plan) => new(plan.y, -plan.x, plan.z);
     var views = new[] {
         (Name: "yard_reference", Eye: new Vector3(560,-1010,170), Target: new Vector3(2000,-880,300), Fov: 84f),
         (Name: "yard_ground", Eye: new Vector3(520,-1060,64), Target: new Vector3(2000,-880,200), Fov: 84f),
         (Name: "hall_reference", Eye: new Vector3(-260,-150,180), Target: new Vector3(-40,1400,470), Fov: 88f),
+        (Name: "grating_close", Eye: new Vector3(170,150,100), Target: new Vector3(0,315,1), Fov: 64f),
         (Name: "dome", Eye: new Vector3(560,-1010,200), Target: new Vector3(4400,-1700,1050), Fov: 32f),
         (Name: "spawn_b1", Eye: new Vector3(1300,-1000,90), Target: new Vector3(2000,-860,150), Fov: 80f),
         (Name: "pool_close", Eye: new Vector3(-200,250,120), Target: new Vector3(40,900,-120), Fov: 80f),
@@ -108,7 +125,7 @@ try {
     return new { Before = before, Game.IsPlaying,
         SourceUnchanged = Editor.SceneEditorSession.Active?.Scene?.Id == before.SceneId && Game.ActiveScene?.Id == before.GameSceneId,
         Directory = destination, Renderers = scene.GetAllComponents<ModelRenderer>().Count(), ErrorModels = missing,
-        Lights = scene.GetAllComponents<PointLight>().Count(), Probes = scene.GetAllComponents<EnvmapProbe>().Count(), MarkedTextures = marked, Hidden = hidden, Objects = scene.GetAllObjects(false).Where(g => g.Parent is not null && g.Parent.Name == "Riverdale").Select(g => g.Name + (g.Enabled ? "" : " (off)")).ToArray() };
+        Lights = scene.GetAllComponents<PointLight>().Count(), Probes = scene.GetAllComponents<EnvmapProbe>().Count(), MarkedTextures = marked, Hidden = hidden, Overrides = overrides, Objects = scene.GetAllObjects(false).Where(g => g.Parent is not null && g.Parent.Name == "Riverdale").Select(g => g.Name + (g.Enabled ? "" : " (off)")).ToArray() };
 } catch (Exception error) {
     System.IO.File.WriteAllText(System.IO.Path.Combine(destination, "capture-error.txt"), error.ToString());
     throw;

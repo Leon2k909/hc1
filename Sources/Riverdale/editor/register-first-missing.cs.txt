@@ -1,0 +1,14 @@
+// Register Riverdale's newly generated models after their sources are published.
+// Compilation is deliberately separate, so each costly compile is individually observable.
+var root = Sandbox.Project.Current.GetRootPath();
+var names = new [] { "riverdale_backdrop_land_east", "riverdale_backdrop_land_west",
+    "riverdale_backdrop_trees", "riverdale_backdrop_trees_near", "riverdale_hall_detail",
+    "riverdale_hall_fine", "riverdale_yard_ground", "riverdale_yard_props" };
+var results = new System.Collections.Generic.List<object>();
+foreach (var name in names)
+{
+    var source = System.IO.Path.Combine(root, "Assets/models/maps/riverdale/" + name + ".vmdl");
+    var asset = Editor.AssetSystem.FindByPath(source) ?? Editor.AssetSystem.RegisterFile(source);
+    results.Add(new { Name = name, Registered = asset is not null, IsCompiled = asset?.IsCompiled, IsCompileFailed = asset?.IsCompileFailed });
+}
+return results;
