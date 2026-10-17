@@ -115,6 +115,65 @@ def dressed_detail(colours, rough, normal):
     return colours, rough, normal
 
 
+# Block interiors of old_sandstone_02 (fractions of the scan: y0, y1, x0, x1), clear of its joints and big spalls.
+SANDSTONE_REGIONS = ((.065, .185, .31, .79), (.26, .385, .24, .79), (.645, .745, .02, .96), (.445, .545, .33, .70))
+
+
+@lru_cache(maxsize=1)
+def _sandstone_high_pass(step):
+    """The sandstone scan's pores and grains: its brightness over a local mean (about 1), its normal's fine detail and
+    its roughness, at the scan's resolution."""
+    source, detail, packed = scan('old_sandstone_02')
+    lum = source.mean(axis=-1)
+    grain = np.clip(lum / np.maximum(ndimage.gaussian_filter(lum, 14 * step), 1e-3), .7, 1.3).astype(np.float32)
+    xy = detail[..., :2] * 2 - 1
+    xy = xy - np.dstack([ndimage.gaussian_filter(xy[..., k], 10 * step) for k in range(2)])
+    return grain, xy.astype(np.float32), packed[..., 1].astype(np.float32)
+
+
+def sandstone_grain(block, u, v, length, rowh, count, rng, step=1.25, amount=.1):
+    """The scan's fine pores, grains and flakes for railhead_materials' ashlar: each block (block, u, v, length, rowh
+    in tile px, as building_textures.coursed gives them) reads its own place in one of the scan's block interiors
+    (SANDSTONE_REGIONS), flipped or not, step scan px to a tile px; a block taller or longer than its region mirrors
+    back into it at the edge, which the joint hides. Returns the grain (lum, about 1 +- amount), a detail normal (0..1,
+    OpenGL) and the scan's roughness."""
+    grain_src, xy_src, rough_src = _sandstone_high_pass(step)
+    H, W = grain_src.shape
+    regions = np.array([(y0 * H, y1 * H, x0 * W, x1 * W) for y0, y1, x0, x1 in SANDSTONE_REGIONS])
+    pick = rng.integers(0, len(regions), count)
+    flip = rng.random(count) < .5
+    ry0, ry1, rx0, rx1 = (regions[pick, k] for k in range(4))
+    rh, rw = ry1 - ry0, rx1 - rx0
+    blk_h = np.zeros(count)
+    blk_w = np.zeros(count)
+    np.maximum.at(blk_h, block.ravel(), rowh.ravel() * step)
+    np.maximum.at(blk_w, block.ravel(), length.ravel() * step)
+    oy = rng.uniform(0, 1, count) * np.maximum(rh - blk_h, 0)
+    ox = rng.uniform(0, 1, count) * np.maximum(rw - blk_w, 0)
+
+    def fold(t, size):
+        # Mirror t into [0, size).
+        t = np.mod(t, 2 * size)
+        return np.where(t < size, t, 2 * size - t - 1e-3)
+
+    b = block
+    sy = ry0[b] + fold(v * step + oy[b], rh[b])
+    su = np.where(flip[b], length - u, u)
+    sx = rx0[b] + fold(su * step + ox[b], rw[b])
+    coordinates = np.stack([sy.astype(np.float32), sx.astype(np.float32)])
+    del sy, sx, su
+    grain = ndimage.map_coordinates(grain_src, coordinates, order=1, mode='nearest')
+    grain = 1 + np.clip((grain - 1) / .18, -1, 1) * amount
+    nx = ndimage.map_coordinates(xy_src[..., 0], coordinates, order=1, mode='nearest')
+    ny = ndimage.map_coordinates(xy_src[..., 1], coordinates, order=1, mode='nearest')
+    nx = np.where(flip[b], -nx, nx)
+    rough = ndimage.map_coordinates(rough_src, coordinates, order=1, mode='nearest')
+    del coordinates
+    nz = np.sqrt(np.clip(1 - nx * nx - ny * ny, .05, 1))
+    normal = np.dstack((nx, ny, nz)) * .5 + .5
+    return grain.astype(np.float64), normal, rough
+
+
 def paint_detail(shape):
     colour, normal, packed = scan('blue_metal_plate')
     # Remove the scan's perimeter welds. The buffer has its own bevels and fixings.
@@ -142,7 +201,9 @@ def contact_detail(shape):
 
 def write_surface(name, out_dir):
     """Return the usual material-generator result, or None for procedural surfaces."""
-    assets = {'sandstone': 'old_sandstone_02', 'wood': 'brown_planks_03', 'sleeper': 'rough_concrete'}
+    # The sandstone is railhead_materials' procedural ashlar now, with this scan's grain (sandstone_grain); the
+    # sleeper is railhead_materials' own, with oil and rust where the rails sit.
+    assets = {'wood': 'brown_planks_03'}
     if name not in assets:
         return None
     colour, normal, packed = scan(assets[name])

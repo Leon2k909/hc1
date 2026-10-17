@@ -34,6 +34,7 @@ and provenance are recorded in railhead_scanned_sources.json.
 import argparse
 import functools
 import math
+import time
 from pathlib import Path
 
 import numpy as np
@@ -287,78 +288,136 @@ def rotated( points, angle, cx=0.0, cy=0.0, scale=1.0 ):
 # ---------------------------------------------------------------------------------------------------------------------
 # Tiling textures. Each returns ( { paint: sRGB colour }, roughness, height (inches), normal strength[, extra maps] ).
 
+PAVING_TILE = 240.0                                 # inches a paving tile: 10 x 15 slabs, so a 60 m platform doesn't repeat
+
+
 def paving( rng, n ):
-    """ Concrete paving slabs on the platforms and the forecourt: 7 x 10 to a 160 in tile, each 22.9 x 16 in (58 x 40.6 cm,
-    a 60 x 40 slab with its joint), in running bond. Fine grey with sand-sized aggregate specks, each slab a shade of
-    its own, a few newer ones, lipped and tilted a hair, the arrises chamfered and chipped. The 6 mm joints hold dark
-    sand and dirt. Walked patches darker and smoother, stains, flattened chewing gum (pale where it's old) and the odd
-    crack. Paints: rw_paving grey, rw_paving_warm buff, rw_paving_dark anthracite. """
-    p = n / 160.0
+    """ Concrete paving slabs (Betonwerkstein) on the platforms and the forecourt: 10 x 15 to a 240 in tile, each 24 x 16 in
+    (61 x 40.6 cm: a 60 x 40 slab with its 5 mm joint), laid in third bond so the odd row count still wraps. Mid grey
+    with fine aggregate, each slab a shade of its own (6 %), one in ten a little cooler or warmer from another batch,
+    a few newer ones, lipped and tilted a hair. The arrises carry a 0.3 in chamfer, so the joints read as a dark line
+    a long way off; they hold dark sand, and stains spread out of them. Walking lanes a metre or so wide, darker and
+    smoother from shoes, flattened chewing gum (black where it's newer, pale and crazed when years old), two or three
+    cracked slabs and a cut-in replacement. Paints: rw_paving grey, rw_paving_warm buff, rw_paving_dark anthracite. """
+    tile = PAVING_TILE
+    p = n / tile
     x, y = coords( n )
-    cols, rows = 7, 10
+    cols, rows = 10, 15
     sw, sh = n / cols, n / rows
     row = np.minimum( ( y // sh ).astype( int ), rows - 1 )
-    xo = ( x + ( row % 2 ) * sw / 2 ) % n
+    xo = ( x + ( row % 3 ) * sw / 3 ) % n
     col = np.minimum( ( xo // sw ).astype( int ), cols - 1 )
     slab = row * cols + col
     u, v = xo - col * sw, y - row * sh
     edge = np.minimum( np.minimum( u, sw - u ), np.minimum( v, sh - v ) ) / p          # inches to the slab's edge
     count = rows * cols
-    tone = rng.normal( 1.0, 0.035, count )
-    newer = rng.random( count ) < 0.08
-    tone[newer] *= 1.08
+    # Round 2: in the engine every slab read the same and the joints were hairlines. 10 % spread, and one in eight
+    # clearly newer (lighter) or older (darker and stained).
+    tone = rng.normal( 1.0, 0.10, count )
+    age_roll = rng.random( count )
+    newer = age_roll < 0.0625
+    older = ( age_roll >= 0.0625 ) & ( age_roll < 0.125 )
+    tone[newer] *= 1.12
+    tone[older] *= 0.88
+    # One slab in ten from another batch: a cooler or a warmer cement.
+    hue = np.ones( ( count, 3 ) )
+    batch = rng.random( count )
+    hue[batch < 0.05] = ( 0.975, 0.995, 1.03 )
+    hue[( batch >= 0.05 ) & ( batch < 0.10 )] = ( 1.035, 1.0, 0.95 )
+    # Two or three cracked slabs, and one cut in later (sharper, cleaner, a shade off).
+    cracked = np.zeros( count, bool )
+    cracked[rng.choice( count, 3, replace=False )] = True
+    replaced = np.zeros( count, bool )
+    replaced[rng.choice( np.flatnonzero( ~cracked ), 2, replace=False )] = True
+    tone[replaced] = rng.uniform( 1.04, 1.1, replaced.sum() )
+    hue[replaced] = ( 1.0, 1.0, 0.98 )
     lip = rng.normal( 0.0, 0.03, count )
+    lip[cracked] += 0.03
     gx, gy = rng.normal( 0.0, 0.0015, ( 2, count ) )                                  # inches an inch
     fine = noise( rng, n, 1.0, n / 6 )
-    mottle = noise( rng, n, 2.4, 6, 140 )
-    speck = noise( rng, n, 0.0, n / 3 )
-    wear = noise( rng, n, 3.0, 1, 10 )
-    grime = smoothstep( -0.4, 1.8, wear ) * ( 1.0 - 0.6 * newer[slab] )
-    joint = 0.12                                                                      # half a 6 mm joint
-    bevel = smoothstep( joint, joint + 0.2, edge )
-    chipn = noise( rng, n, 1.5, 40, 400 )
-    chip = smoothstep( 2.1, 2.6, chipn ) * ( edge < 0.7 ) * ( edge > joint )
+    mottle = noise( rng, n, 2.4, 6, 160 )
+    speck = noise( rng, n, 0.6, n / 4 )
+    joint = 0.1                                                                       # half a 5 mm joint
+    chamfer = smoothstep( joint, joint + 0.5, edge )
+    chipn = noise( rng, n, 1.5, 40, 500 )
+    chip = smoothstep( 2.1, 2.6, chipn ) * ( edge < 0.8 ) * ( edge > joint ) * ( 1.0 - replaced[slab] )
     surface = lip[slab] + gx[slab] * ( u - sw / 2 ) / p + gy[slab] * ( v - sh / 2 ) / p
     on_slab = edge > joint
-    height = np.where( on_slab, surface + 0.012 * fine + 0.006 * mottle - 0.12 * ( 1.0 - bevel ) - 0.14 * chip,
-                       -0.2 + 0.03 * fine )
+
+    # A crack across each cracked slab: a wandering line from one side to the other, one half a hair lower.
+    crack = np.zeros( ( n, n ) )
+    split = np.zeros( ( n, n ) )
+    for s in np.flatnonzero( cracked ):
+        r_, c_ = divmod( s, cols )
+        x0 = ( c_ * sw - ( r_ % 3 ) * sw / 3 ) % n
+        y0 = r_ * sh
+        across = rng.random() < 0.5
+        canvas = Canvas( n, 2, int( sw ) + 8 )
+        pts = []
+        t0, t1 = rng.uniform( 0.2, 0.8, 2 )
+        for k in range( 13 ):
+            t = k / 12.0
+            jitter = rng.normal( 0, 0.03 )
+            if across:
+                pts.append( ( x0 + sw * t, y0 + sh * ( t0 + ( t1 - t0 ) * t + jitter ) ) )
+            else:
+                pts.append( ( x0 + sw * ( t0 + ( t1 - t0 ) * t + jitter ), y0 + sh * t ) )
+        canvas.line( pts, 0.9 * n / 2048, 1.0 )
+        line = canvas.result() * ( slab == s )
+        crack = np.maximum( crack, line )
+        # Which side of the crack is lower: the side away from the slab's first corner.
+        side = ( ( v / sh if across else u / sw ) > ( t0 + t1 ) / 2 ) & ( slab == s )
+        split = np.maximum( split, side * 1.0 )
+    height = np.where( on_slab, surface + 0.012 * fine + 0.006 * mottle - 0.15 * ( 1.0 - chamfer ) - 0.14 * chip
+                       - 0.035 * split - 0.08 * crack, -0.2 + 0.03 * fine )
 
     # Chewing gum, trodden flat: black when new-ish (it collects dirt), pale grey and crazed when years old.
     gum = np.zeros( ( n, n ) )
     gum_age = np.zeros( ( n, n ) )
     gum_h = np.zeros( ( n, n ) )
-    for _ in range( int( 170 * ( n / 2048 ) ** 2 ) ):
+    for _ in range( int( 170 * ( n / 2048 ) ** 2 * ( tile / 160.0 ) ** 2 ) ):
         gx_, gy_ = rng.uniform( 0, n, 2 )
         r = rng.uniform( 0.22, 0.5 ) * p
         aspect = rng.uniform( 0.75, 1.0 )
         age = rng.uniform() ** 0.7
-        stamp( gum, gx_, gy_, r, r * aspect, 1.0, rng.uniform( 0, 3.2 ), soft=0.8 )
-        stamp( gum_age, gx_, gy_, r, r * aspect, age, rng.uniform( 0, 3.2 ), soft=0.8 )
-        stamp( gum_h, gx_, gy_, r, r * aspect, 0.04, profile="dome" )
+        stamp( gum, gx_, gy_, r, r * aspect, 1.0, rng.uniform( 0, 3.2 ), soft=0.6 )
+        stamp( gum_age, gx_, gy_, r, r * aspect, age, rng.uniform( 0, 3.2 ), soft=0.6 )
+        stamp( gum_h, gx_, gy_, r, r * aspect, 0.03, profile="dome" )
     height = height + gum_h * on_slab
-    cracks = crack_lines( rng, n, 5, ( 60 * n / 2048, 280 * n / 2048 ), 0.8 * n / 2048 )
-    height -= 0.06 * cracks
-    stains = T.warp( rng, n, blotches( rng, n, 2.6, 3, 50, 0.04, 0.6 ), 0.8 * p )
+    hair = crack_lines( rng, n, 4, ( 40 * n / 2048, 160 * n / 2048 ), 0.7 * n / 2048 ) * on_slab
+    height -= 0.04 * hair
+    # Stains: spreading out of the joints (dirty water standing in them) and a few spills on the slabs.
+    near_joint = 1.0 - smoothstep( 0.2, 3.5, edge + 1.2 * noise( rng, n, 1.6, 20, 300 ) )
+    seep = near_joint * smoothstep( -0.6, 1.4, noise( rng, n, 2.2, 3, 80 ) )
+    stains = np.maximum( T.warp( rng, n, blotches( rng, n, 2.6, 3, 60, 0.035, 0.6 ), 0.8 * p ), 0.6 * seep )
+    # Walking lanes: one big beta-3 field a tile, darker and smoother where the crowds walk.
+    lanes = smoothstep( -0.2, 1.6, noise( rng, n, 3.0, 1, 6 ) )
+    broad = noise( rng, n, 3.0, 1.5, 3 )                                          # a 2-4 m dirt cloud, +-6 %
+    stains = np.maximum( stains, 0.5 * older[slab] * smoothstep( -0.8, 1.2, noise( rng, n, 2.2, 6, 60 ) ) )
     ao = T.cavity_ao( height, ( ( 1.5, 3.0 ), ( 5.0, 1.2 ) ), 1.0 )
 
-    lum = tone[slab] * ( 1.0 + 0.035 * mottle + 0.045 * fine ) * ( 1.0 - 0.1 * grime ) * ( 1.0 - 0.14 * stains )
-    lum *= 1.0 - 0.22 * smoothstep( 2.0, 2.7, speck ) + 0.14 * smoothstep( 2.1, 2.8, -speck )
-    lum *= 1.0 - 0.3 * cracks
-    joint_mix = 1.0 - smoothstep( joint - 0.03, joint + 0.05, edge )
-    dirt = lum_paint( ( 78, 72, 64 ), 1.0 + 0.12 * fine )
-    gum_colour = mix( np.array( ( 52, 52, 52 ), float ), np.array( ( 150, 150, 145 ), float ), gum_age )
+    lum = ( tone[slab] * ( 1.0 + 0.03 * mottle + 0.035 * fine ) * ( 1.0 - 0.15 * lanes ) * ( 1.0 - 0.14 * stains )
+            * ( 1.0 + 0.06 * broad ) )
+    lum *= 1.0 - 0.16 * smoothstep( 1.9, 2.7, speck ) + 0.1 * smoothstep( 2.0, 2.8, -speck )
+    lum *= ( 1.0 - 0.45 * crack ) * ( 1.0 - 0.2 * hair )
+    # The joint and its shadowed chamfer: dark sand in the gap, the arris darkening over its 0.35 in.
+    joint_mix = 1.0 - smoothstep( joint - 0.03, joint + 0.04, edge )
+    arris = ( 1.0 - smoothstep( joint, joint + 0.55, edge ) ) * ( 1.0 - joint_mix )
+    dirt = lum_paint( ( 50, 46, 42 ), 1.0 + 0.12 * fine )
+    gum_colour = mix( np.array( ( 50, 50, 50 ), float ), np.array( ( 146, 146, 141 ), float ), gum_age )
     colours = {}
-    for name, base in ( ( "rw_paving", ( 164, 164, 160 ) ), ( "rw_paving_warm", ( 184, 166, 136 ) ),
-                        ( "rw_paving_dark", ( 80, 82, 84 ) ) ):
-        c = lum_paint( base, lum )
-        c = mix( c, srgb( lin( c ) * 0.75 + lin( ( 86, 74, 60 ) ) * 0.25 ), 0.35 * stains )
+    for name, base in ( ( "rw_paving", ( 138, 140, 136 ) ), ( "rw_paving_warm", ( 146, 134, 110 ) ),
+                        ( "rw_paving_dark", ( 72, 74, 76 ) ) ):
+        c = srgb( lin( lum_paint( base, lum ) ) * hue[slab] )
+        c = mix( c, srgb( lin( c ) * 0.72 + lin( ( 82, 72, 58 ) ) * 0.28 ), 0.4 * stains )
+        c = darken( c, 1.0 - 0.4 * arris )
         c = mix( c, dirt, joint_mix )
         c = mix( c, gum_colour * ( 1.0 + 0.06 * fine )[..., None], gum * on_slab )
         colours[name] = T.shaded( c, ao, 0.5 )
-    rough = np.clip( 0.86 + 0.03 * fine - 0.08 * grime + 0.03 * newer[slab], 0, 1 )
+    rough = np.clip( 0.88 + 0.03 * fine - 0.12 * lanes + 0.03 * newer[slab] - 0.04 * replaced[slab], 0, 1 )
     rough = np.where( joint_mix > 0.5, 0.95, rough )
     rough = rough + ( 0.5 - rough ) * gum * on_slab
-    return colours, rough, height, 1024 / 160.0
+    return colours, rough, height, 1024 / tile
 
 
 def tactile( rng, n ):
@@ -451,8 +510,8 @@ def lines( rng, n ):
     mottle = noise( rng, n, 2.4, 3, 60 )
     patches = noise( rng, n, 2.6, 2, 40 )
     speck = noise( rng, n, 0.6, n / 6 )
-    worn = smoothstep( 1.4, 2.0, 0.75 * patches + 0.55 * speck )
-    worn = np.maximum( worn, smoothstep( 2.6, 3.0, speck ) )
+    worn = smoothstep( 1.25, 1.85, 0.75 * patches + 0.55 * speck )
+    worn = np.maximum( worn, smoothstep( 2.4, 2.8, speck ) )
     paint_ = 1.0 - worn
     concrete = lum_paint( ( 138, 138, 134 ), ( 1.0 + 0.05 * mottle + 0.05 * fine ) )
     dirt = 1.0 - 0.08 * smoothstep( -0.5, 2.0, noise( rng, n, 2.6, 2, 30 ) )
@@ -477,37 +536,41 @@ def ballast( rng, n ):
     its stones mossy. """
     p = n / 160.0
     fines = noise( rng, n, 1.0, n / 8 )
-    colour = lum_paint( ( 74, 70, 64 ), 1.0 + 0.12 * fines )
-    ground = T.Ground( colour, -1.2 + 0.1 * fines, 0.95 + 0.0 * fines, noise( rng, n, 1.2, 40, n / 2 ) )
-    palette = [ ( 6, ( 126, 124, 120 ) ), ( 4, ( 104, 104, 103 ) ), ( 3, ( 146, 142, 136 ) ), ( 2, ( 88, 90, 92 ) ),
-                ( 2, ( 150, 136, 126 ) ), ( 3, ( 116, 112, 106 ) ), ( 2, ( 134, 134, 132 ) ), ( 1, ( 96, 92, 88 ) ) ]
+    colour = lum_paint( ( 30, 30, 30 ), 1.0 + 0.12 * fines )      # the shadowed voids and grit between the stones
+    ground = T.Ground( colour, -1.6 + 0.1 * fines, 0.95 + 0.0 * fines, noise( rng, n, 1.2, 40, n / 2 ) )
+    # Dark grey basalt and granite (sRGB 95-115), a quarter of the stones pale, pinkish or darker.
+    palette = [ ( 8, ( 98, 100, 102 ) ), ( 6, ( 90, 92, 94 ) ), ( 5, ( 106, 106, 106 ) ), ( 2, ( 134, 132, 128 ) ),
+                ( 2, ( 126, 110, 102 ) ), ( 2, ( 72, 74, 76 ) ), ( 1, ( 144, 140, 134 ) ), ( 1, ( 114, 98, 90 ) ) ]
     count = int( 76000 * ( n / 2048 ) ** 2 )
     radii = T.sizes( rng, count, 0.7 * p, 1.35 * p, 1.4 )
+    # Round 2: in the engine's sun the bed read pale and flat; real ballast is dark (sRGB 70-100) with deep shadows.
+    palette = [ ( w, tuple( c * 0.85 for c in rgb ) ) for w, rgb in palette ]
     stones = T.stone_colours( rng, count, palette, 0.08 )
     for k in np.argsort( -radii ):                    # big ones first, small ones settle between
         r = radii[k]
         x_, y_ = rng.uniform( 0, n, 2 )
-        ground.press( rng, x_, y_, r, stones[k], rng.uniform( 0.72, 0.9 ), top=r / p * rng.uniform( 0.55, 0.95 ),
-                      sink=r / p * rng.uniform( 0.0, 0.9 ), aspect=rng.uniform( 1.0, 1.6 ), angular=True, tilt=0.25 )
+        ground.press( rng, x_, y_, r, stones[k], rng.uniform( 0.72, 0.9 ), top=r / p * rng.uniform( 0.85, 1.3 ),
+                      sink=r / p * rng.uniform( 0.0, 0.6 ), aspect=rng.uniform( 1.0, 1.6 ), angular=True, tilt=0.3 )
     height = T.blur( ground.height, 0.6 * p / 12.8 )
     grain = noise( rng, n, 0.3, n / 4 )
     on_stone = ground.stone
     base = ground.colour * ( 1.0 + 0.07 * grain * on_stone )[..., None]
-    ao = T.cavity_ao( height, ( ( 2.5 * p / 12.8, 0.5 ), ( 8.0 * p / 12.8, 0.35 ) ), 1.0 )
+    ao = T.cavity_ao( height, ( ( 2.5 * p / 12.8, 0.8 ), ( 8.0 * p / 12.8, 0.75 ) ), 1.0 )
     tops = smoothstep( -0.3, 0.5, height ) * on_stone
     dust = blotches( rng, n, 2.2, 2, 60, 0.6, 1.0 )
     colours = {}
-    c = mix( base, np.array( ( 156, 152, 146 ), float ), 0.14 * tops * dust )
-    colours["rw_ballast"] = T.shaded( c, ao, 0.55 )
-    rust = np.clip( 0.25 + 0.16 * noise( rng, n, 2.4, 2, 40 ), 0.0, 0.65 )
-    c = darken( tinted( base, ( 116, 72, 46 ), rust ), 0.92 + 0.0 * rust )
-    colours["rw_ballast_rusty"] = T.shaded( c, ao, 0.55 )
+    c = mix( base, np.array( ( 138, 136, 132 ), float ), 0.06 * tops * dust )
+    colours["rw_ballast"] = T.shaded( c, ao, 0.75 )
+    # Between and beside the rails: brake dust and rust on the stones' tops, the voids darker with it.
+    rust = np.clip( 0.45 + 0.2 * noise( rng, n, 2.4, 2, 40 ), 0.0, 0.8 ) * ( 0.35 + 0.65 * tops ) * 0.75
+    c = darken( tinted( base, ( 100, 72, 52 ), rust ), 0.8 )
+    colours["rw_ballast_rusty"] = T.shaded( c, ao, 0.75 )
     soil = 1.0 - smoothstep( -0.95, -0.25, height + 0.25 * noise( rng, n, 2.0, 8, 200 ) )
     moss = blotches( rng, n, 2.4, 3, 80, 0.25, 0.8 ) * smoothstep( -0.4, 0.2, height ) * on_stone
     c = darken( base, 0.9 + 0.0 * soil )
     c = mix( c, lum_paint( ( 90, 78, 60 ), 1.0 + 0.15 * fines ), 0.9 * soil )
     c = mix( c, lum_paint( ( 78, 92, 50 ), 1.0 + 0.2 * grain ), 0.55 * moss )
-    colours["rw_ballast_old"] = T.shaded( c, ao, 0.55 )
+    colours["rw_ballast_old"] = T.shaded( c, ao, 0.7 )
     return colours, ground.rough, height, 1024 / 160.0, { "ao": ao }
 
 
@@ -521,14 +584,28 @@ def sleeper( rng, n ):
     for _ in range( int( 700 * ( n / 1024 ) ** 2 ) ):
         r = rng.uniform( 0.03, 0.11 ) * p
         stamp( pits, rng.uniform( 0, n ), rng.uniform( 0, n ), r, r * rng.uniform( 0.7, 1 ), 1.0, profile="dome" )
-    dust = blotches( rng, n, 2.8, 1, 24, 0.5, 2.0 )
-    grease = T.warp( rng, n, blotches( rng, n, 2.6, 2, 40, 0.05, 1.2 ), 0.6 * p )
+    dust = blotches( rng, n, 2.8, 1, 24, 0.55, 2.0 )
+    # Oil and grease dripped from standing trains: big soaked patches with darker cores and drips round them.
+    # Capped at 0.45 darker: the tops stay a concrete grey (sRGB 145-150), only the soak darkens them, and the oil
+    # proper lies in the four-foot's ballast (rw_ballast_rusty). The sleepers' UVs are planar in world space, so the
+    # soak can't be held to their middles: it's kept to scattered patches.
+    soak = T.warp( rng, n, blotches( rng, n, 2.6, 1, 16, 0.14, 1.0 ), 1.2 * p )
+    grease = np.maximum( soak * ( 0.55 + 0.45 * blotches( rng, n, 2.2, 4, 60, 0.4, 0.8 ) ),
+                         T.warp( rng, n, blotches( rng, n, 2.6, 2, 40, 0.05, 1.0 ), 0.6 * p ) )
+    grease = 0.45 / 0.7 * grease
+    rust = np.zeros( ( n, n ) )
+    for _ in range( int( 40 * ( n / 1024 ) ** 2 ) ):                 # rust stains round the fastenings' steel
+        r = rng.uniform( 0.6, 2.2 ) * p
+        stamp( rust, rng.uniform( 0, n ), rng.uniform( 0, n ), r, r * rng.uniform( 0.5, 1.0 ), rng.uniform( 0.4, 0.9 ),
+               rng.uniform( 0, 3.2 ), soft=0.6 * p )
+    rust = rust * smoothstep( -1.0, 1.0, noise( rng, n, 1.4, 20, 300 ) )
     lum = ( 1.0 + 0.04 * mottle + 0.04 * fine ) * ( 1.0 - 0.45 * pits )
     colour = lum_paint( ( 150, 148, 142 ), lum )
-    colour = tinted( colour, ( 120, 90, 66 ), 0.3 * dust )
-    colour = darken( colour, 1.0 - 0.45 * grease )
+    colour = tinted( colour, ( 120, 90, 66 ), 0.25 * dust )
+    colour = tinted( colour, ( 122, 70, 40 ), 0.6 * rust )
+    colour = darken( colour, 1.0 - 0.7 * grease )
     height = 0.01 * fine + 0.004 * mottle - 0.08 * pits
-    rough = np.clip( 0.84 + 0.04 * fine - 0.4 * grease, 0, 1 )
+    rough = np.clip( 0.84 + 0.04 * fine - 0.5 * grease, 0, 1 )
     return { "rw_sleeper": colour }, rough, height, 1024 / 48.0
 
 
@@ -599,10 +676,21 @@ def _rect_wrap( x, y, x0, y0, w, h, n ):
     return inside, edge
 
 
+SEALED_CRACKS = 0
+
+
+ASPHALT_WHEEL_PATHS = ( 38.0, 99.0 )                 # inches across a 192 in tile: one car's two wheel paths, 61 in apart
+
+
 def asphalt( rng, n ):
-    """ The cab roads and yards: asphalt concrete, dark grey binder with pale chippings showing where the traffic has
-    worn it, aged lighter in patches. A few rectangular repairs in fresher black, their joints sealed with bitumen tape;
-    cracks sealed in glossy black; oil drips. """
+    """ Weathered stone mastic asphalt, 2048 px over a 192 in tile (u across the road, v along it, as map_kit lays a
+    floor out): a dark binder (about sRGB 80) oxidised lighter and greyer where no tyre runs, its 8-11 mm chippings
+    showing through, and two faint straight wheel paths 0.7 m wide down the tile 1.55 m apart (a car's track), where the
+    binder is worn off the chippings: at most 4 % darker with a slight sheen (round 2: the wandering 15 % darker paths
+    read as 4-6 smears across the cab road in sun). The lanes' own wear follows the lanes in the dressing's overlays
+    (railhead_map), one owner, so a lane never gets four tracks.
+    Fine crazing in the oxidised binder. Large repairs, sealed cracks, gutters and oil are placed by the dressing
+    (railhead_map.road_wear): baked into a 4.9 m tile they repeat as a pattern down the road. """
     p = n / 192.0
     x, y = coords( n )
     fine = noise( rng, n, 0.0, n / 3 )
@@ -610,57 +698,138 @@ def asphalt( rng, n ):
     chips = smoothstep( 0.9, 1.6, chipn + 0.35 * fine )
     age = smoothstep( -1.0, 1.6, noise( rng, n, 2.6, 1, 16 ) )
     tone = noise( rng, n, 1.4, 8, n / 4 )
-    binder = mix( lum_paint( ( 66, 66, 64 ), 1.0 + 0.06 * tone ), lum_paint( ( 104, 102, 98 ), 1.0 + 0.06 * tone ), 0.55 * age )
-    stone = lum_paint( ( 150, 148, 142 ), 1.0 + 0.12 * noise( rng, n, 0.2, n / 5 ) )
-    colour = mix( binder, stone, 0.75 * chips )
-    height = 0.05 * chips + 0.012 * fine
-    rough = np.clip( 0.88 + 0.04 * fine - 0.05 * chips, 0, 1 )
-    patch = np.zeros( ( n, n ) )
-    seal = np.zeros( ( n, n ) )
-    for k in range( 3 ):
-        x0, y0 = ( k / 3.0 + rng.uniform( 0.0, 0.15 ) ) * n, rng.uniform( 0, n )
-        w, h = rng.uniform( 30, 52 ) * p, rng.uniform( 24, 70 ) * p
-        inside, edge = _rect_wrap( x, y, x0, y0, w, h, n )
-        patch = np.maximum( patch, inside * 1.0 )
-        seal = np.maximum( seal, 1.0 - smoothstep( 0.7 * p, 1.0 * p, np.abs( edge - 0.2 * p ) ) )
-    fresh = mix( lum_paint( ( 54, 54, 53 ), 1.0 + 0.05 * tone ), stone, 0.4 * chips )
-    colour = mix( colour, fresh, patch )
-    cracks = T.blur( crack_lines( rng, n, 7, ( 12 * p, 40 * p ), 1.0 * p, 0.25 ), 0.25 * p )
-    sealed = np.clip( np.maximum( seal, cracks * 1.6 ), 0, 1 )
-    colour = mix( colour, lum_paint( ( 26, 26, 26 ), 1.0 + 0.04 * fine ), 0.95 * sealed )
-    oil = blotches( rng, n, 2.4, 3, 80, 0.04, 0.6 )
-    colour = darken( colour, 1.0 - 0.55 * oil )
-    height = height * ( 1.0 - 0.6 * patch ) + 0.02 * sealed
-    rough = rough - 0.1 * patch
+    broad = noise( rng, n, 3.0, 1, 2 )                              # one cycle a tile: +-6 %
+    # The wheel paths: bands along v, their edges wandering 3-4 in, their wear stronger in some stretches.
+    wander = 0.0
+    strength = 1.0
+    wheel = np.zeros( ( n, n ) )
+    for k, u0 in enumerate( ASPHALT_WHEEL_PATHS ):
+        d = np.abs( ( ( x - u0 * p - wander * ( 1 if k else 0.8 ) + n / 2 ) % n ) - n / 2 ) / p
+        wheel = np.maximum( wheel, 1.0 - smoothstep( 6.0, 19.0, d + 0.6 * noise( rng, n, 2.4, 2, 12 ) ) )
+    wheel *= strength
+    # Oxidised binder between the wheel paths, darker worn binder and bared chippings in them.
+    binder = mix( lum_paint( ( 76, 77, 76 ), 1.0 + 0.04 * tone ), lum_paint( ( 94, 94, 91 ), 1.0 + 0.04 * tone ),
+                  ( 0.35 + 0.65 * age ) * ( 1.0 - 0.15 * wheel ) )
+    stone = lum_paint( ( 140, 138, 132 ), 1.0 + 0.16 * noise( rng, n, 0.2, n / 5 ) )
+    colour = mix( binder, stone, ( 0.5 + 0.03 * wheel ) * chips )
+    colour = darken( colour, ( 1.0 + 0.06 * broad ) * ( 1.0 - 0.01 * wheel ) )
+    # Crazing in the oxidised binder, not in the wheel paths, where the traffic kneads it shut.
+    craze = crack_lines( rng, n, 34, ( 4 * p, 14 * p ), 0.6 * n / 2048, 0.6 ) * ( 1.0 - 0.8 * wheel ) * ( 0.4 + 0.6 * age )
+    canvas = Canvas( n, 2, int( 120 * p ) )
+    for _ in range( SEALED_CRACKS ):
+        x_, y_ = rng.uniform( 0, n, 2 )
+        angle = rng.uniform( 0, 2 * math.pi )
+        pts = [ ( x_, y_ ) ]
+        for _k in range( int( rng.uniform( 50, 110 ) / 2.5 ) ):
+            angle += rng.normal( 0, 0.09 )
+            pts.append( ( pts[-1][0] + math.cos( angle ) * 2.5 * p, pts[-1][1] + math.sin( angle ) * 2.5 * p ) )
+        canvas.line( pts, 1.5 * p * rng.uniform( 0.8, 1.2 ) )
+    sealed = smoothstep( 0.15, 0.6, T.blur( canvas.result(), 0.25 * p ) )
+    colour = darken( colour, 1.0 - 0.3 * craze )
+    colour = mix( colour, lum_paint( ( 30, 30, 30 ), 1.0 + 0.05 * fine ), 0.92 * sealed )
+    height = 0.1 * chips + 0.02 * fine - 0.04 * craze + 0.02 * sealed
+    rough = np.clip( 0.88 + 0.04 * fine - 0.07 * chips, 0, 1 )
+    rough = rough - 0.04 * age * ( 1.0 - wheel ) - 0.05 * wheel
     rough = rough + ( 0.35 - rough ) * sealed
-    rough = rough + ( 0.5 - rough ) * oil
     ao = T.cavity_ao( height, ( ( 1.5, 4.0 ), ), 1.0 )
-    return { "rw_asphalt": T.shaded( colour, ao, 0.4 ) }, np.clip( rough, 0, 1 ), height, 1024 / 192.0
+    return { "rw_asphalt": T.shaded( colour, ao, 0.5 ) }, np.clip( rough, 0, 1 ), height, 1024 / 192.0
+
+
+KERB_TILE = 96.0
 
 
 def kerb( rng, n ):
     """ Granite kerbs (GRAIN: v along the kerb), one 1.22 m stone to a 48 in tile with its mortar joint at the tile's top
     and bottom: grey salt-and-pepper granite, black mica and pale feldspar in grey quartz, flamed rough, scuffed dark by
     tyres along its length. """
-    p = n / 48.0
+    p = n / KERB_TILE
     x, y = coords( n )
-    dj = np.minimum( y, n - y ) / p
+    half = n / 2.0                                                   # two 1.22 m stones to a tile
+    stone_ = ( y // half ).astype( int ) % 2
+    dj = np.minimum( y % half, half - y % half ) / p
     a = noise( rng, n, 0.0, n / 3 )
     b = noise( rng, n, 0.4, n / 6 )
     c = noise( rng, n, 1.6, 20, n / 4 )
     mica = smoothstep( 1.2, 1.8, a )
     feldspar = smoothstep( 1.0, 1.7, b ) * ( 1.0 - mica )
-    colour = lum_paint( ( 150, 148, 146 ), 1.0 + 0.05 * c )
+    tone = 1.0 + rng.normal( 0, 0.06, 2 )
+    colour = lum_paint( ( 132, 131, 129 ), tone[stone_] * ( 1.0 + 0.05 * c ) )
     colour = mix( colour, np.array( ( 44, 44, 46 ), float ), 0.85 * mica )
-    colour = mix( colour, lum_paint( ( 206, 200, 194 ), 1.0 + 0.03 * c ), 0.75 * feldspar )
-    scuff = smoothstep( 0.3, 2.2, streaks( rng, n, 1.4, 2, 120, 50, 0.6 ) ) * blotches( rng, n, 2.0, 2, 30, 0.5, 1.0 )
-    colour = darken( colour, 1.0 - 0.4 * scuff )
-    joint = 1.0 - smoothstep( 0.25, 0.35, dj )
-    colour = mix( colour, lum_paint( ( 118, 114, 108 ), 1.0 + 0.05 * c ), joint )
-    bevel = smoothstep( 0.3, 0.8, dj )
-    height = 0.008 * a + 0.012 * c - 0.12 * ( 1.0 - bevel ) - 0.05 * joint
-    rough = np.clip( 0.7 + 0.02 * a - 0.1 * scuff + 0.15 * joint, 0, 1 )
-    return { "rw_kerb": colour }, rough, height, 1024 / 48.0
+    colour = mix( colour, lum_paint( ( 186, 182, 176 ), 1.0 + 0.03 * c ), 0.6 * feldspar )
+    # Tyre scuffs: black rubber smeared along the kerb, heavy in places.
+    scuff = smoothstep( 0.1, 2.0, streaks( rng, n, 1.4, 2, 120, 60, 0.6 ) ) * blotches( rng, n, 2.0, 2, 30, 0.55, 1.0 )
+    # Black rubber smeared along the kerb by tyres (u is across the kerb's face): heavy bands on some stretches.
+    rubber = smoothstep( 0.6, 1.6, streaks( rng, n, 1.0, 3, 60, 200, 0.4 ) ) * blotches( rng, n, 2.4, 1, 6, 0.4, 0.8 )
+    colour = darken( colour, ( 1.0 - 0.55 * scuff ) * ( 1.0 - 0.3 * rubber ) )
+    colour = tinted( colour, ( 60, 58, 56 ), 0.25 * rubber )
+    grime = smoothstep( -0.5, 2.0, noise( rng, n, 2.6, 1, 8 ) )
+    colour = darken( colour, 1.0 - 0.12 * grime )
+    joint = 1.0 - smoothstep( 0.18, 0.24, dj )                        # a 1 cm mortar joint, dark with dirt
+    colour = mix( colour, lum_paint( ( 70, 66, 60 ), 1.0 + 0.08 * c ), joint )
+    bevel = smoothstep( 0.2, 1.0, dj )                                # a 2 cm chamfer at the stones' ends
+    colour = darken( colour, 1.0 - 0.15 * ( 1.0 - bevel ) * ( 1.0 - joint ) )
+    height = 0.008 * a + 0.012 * c - 0.3 * ( 1.0 - bevel ) - 0.1 * joint
+    rough = np.clip( 0.72 + 0.02 * a - 0.12 * scuff + 0.15 * joint, 0, 1 )
+    rough = rough + ( 0.4 - rough ) * 0.8 * rubber
+    return { "rw_kerb": colour }, rough, height, 1024 / KERB_TILE
+
+
+SETTS_TILE = 128.0
+
+
+def setts( rng, n ):
+    """ Granite setts (Kleinpflaster laid in rows, as in old goods yards and station forecourts), 2048 px over a 128 in
+    tile: tops about 8 x 4 in (20 x 10 cm) in rows 4.3 in apart, each stone its own granite from near-black to pale
+    pink-grey (a tenth red-grey), the tops flamed and worn flat-crowned by a century of iron tyres, 0.7 in (1.8 cm)
+    joints of dark grit sunk 0.5 in, oil and rust stains, and two or three broad darker, smoother wheel tracks. Round 2:
+    the old 0.18 in dome rim-lit every edge and the 1 cm joints vanished in the mips, a grid of bathroom tiles. """
+    p = n / SETTS_TILE
+    block, u, v, length, rowh, row, count = BT.coursed( rng, n, ( 4.4 * p, 5.2 * p ), ( 5.2 * p, 7.8 * p ) )
+    # Hand-set stones aren't sawn bricks: rounded, knocked corners, wobbling edges and joints of their own width.
+    du = np.minimum( u, length - u ) / p
+    dv = np.minimum( v, rowh - v ) / p
+    r = rng.uniform( 0.5, 1.3, count )[block]
+    d = np.where( ( du < r ) & ( dv < r ), r - np.hypot( r - du, r - dv ), np.minimum( du, dv ) )
+    d = d + 0.15 * noise( rng, n, 2.4, 8, 70 ) + 0.025 * noise( rng, n, 1.2, 60, 400 )
+    joint = rng.uniform( 0.26, 0.5, count )[block]
+    pu, pv = ( u / length - 0.5 ) * 2.0, ( v / rowh - 0.5 ) * 2.0
+    dome = np.clip( 1.0 - np.maximum( np.abs( pu ) ** 3, np.abs( pv ) ** 3 ), 0.0, 1.0 )
+    lift = rng.normal( 0, 0.06, count )
+    tilt_u, tilt_v = rng.normal( 0, 0.01, ( 2, count ) )
+    fine = noise( rng, n, 0.2, n / 3 )
+    flame = noise( rng, n, 1.2, 30, n / 3 )
+    on = d > joint
+    face = lift[block] + tilt_u[block] * ( u - length / 2 ) / p + tilt_v[block] * ( v - rowh / 2 ) / p + 0.08 * dome
+    height = np.where( on, face + 0.06 * flame + 0.012 * fine - 0.12 * ( 1.0 - smoothstep( joint, joint + 0.5, d ) ),
+                       -0.5 + 0.05 * fine )
+    height = T.blur( height, 0.6 )
+    tone = BT.tones( rng, [ ( 84, 84, 86 ), ( 104, 103, 102 ), ( 124, 122, 120 ), ( 138, 134, 128 ), ( 150, 144, 136 ),
+                            ( 160, 152, 142 ), ( 116, 114, 112 ) ], count, 0.14 )
+    red = rng.random( count ) < 0.08                                   # a few red-grey granite
+    tone[red] = np.array( ( 132, 114, 104 ), float ) * rng.uniform( 0.88, 1.08, ( red.sum(), 1 ) )
+    mica = smoothstep( 1.3, 1.9, noise( rng, n, 0.0, n / 3 ) )
+    felds = smoothstep( 1.2, 1.8, noise( rng, n, 0.3, n / 5 ) ) * ( 1.0 - mica )
+    lum = 1.0 + 0.04 * flame + 0.03 * fine
+    colour = BT.shade( tone[block], lum )
+    colour = mix( colour, np.array( ( 52, 52, 54 ), float ), 0.6 * mica )
+    colour = mix( colour, lum_paint( ( 190, 184, 176 ), 1.0 + 0.02 * fine ), 0.5 * felds )
+    x_, y_ = coords( n )
+    lanes = 0.0
+    for k, u0 in enumerate( rng.uniform( 0, n, 3 ) ):                  # two or three broad wheel tracks down the tile
+        dl = np.abs( ( ( x_ - u0 - 0.03 * n * noise( rng, n, 2.6, 1, 3 ) + n / 2 ) % n ) - n / 2 ) / p
+        lanes = np.maximum( lanes, ( 1.0 - smoothstep( 6.0, 16.0, dl ) ) * ( 0.6 + 0.4 * ( k < 2 ) ) )
+    track = np.clip( lanes * ( 0.7 + 0.3 * smoothstep( -1.0, 1.0, noise( rng, n, 2.4, 2, 10 ) ) ), 0, 1 )
+    oil = blotches( rng, n, 2.4, 2, 40, 0.06, 0.8 )
+    rust = blotches( rng, n, 2.6, 3, 60, 0.04, 0.8 )
+    colour = darken( colour, ( 1.0 - 0.35 * oil ) * ( 1.0 - 0.15 * track ) )
+    colour = tinted( colour, ( 120, 80, 54 ), 0.4 * rust )
+    in_joint = 1.0 - smoothstep( joint - 0.05, joint + 0.08, d )
+    grit = mix( lum_paint( ( 60, 56, 50 ), 1.0 + 0.15 * fine ), lum_paint( ( 104, 96, 82 ), 1.0 + 0.1 * fine ),
+                0.45 * smoothstep( -0.4, 1.4, noise( rng, n, 1.8, 10, 200 ) ) )
+    colour = mix( colour, grit, in_joint )
+    ao = T.cavity_ao( height, ( ( 0.6 * p, 0.6 ), ( 2.0 * p, 0.3 ) ), 1.0 )
+    rough = np.clip( 0.78 + 0.05 * flame - 0.2 * track * dome - 0.25 * oil + 0.12 * in_joint, 0.4, 0.97 )
+    return { "rw_setts": T.shaded( colour, ao, 0.6 ) }, rough, height, 1024 / SETTS_TILE
 
 
 def concrete( rng, n ):
@@ -734,31 +903,41 @@ def _chips( rng, n, spacing, gap, matrix_share ):
     return chip, cell, count
 
 
-TERRAZZO_CHIPS = [ ( 5, ( 232, 228, 220 ) ), ( 4, ( 214, 200, 176 ) ), ( 4, ( 170, 168, 164 ) ), ( 3, ( 88, 88, 90 ) ),
-                   ( 2, ( 44, 44, 46 ) ), ( 2, ( 150, 84, 62 ) ), ( 2, ( 200, 170, 120 ) ), ( 1, ( 112, 128, 104 ) ) ]
+# Round 3: in the engine the round 2 mix (a quarter dark chips at full colour on a darker matrix) read as gravel from
+# 3 m on, in the concourse and the booking hall. A station's terrazzo is mostly light marble, the dark and red chips a
+# scattering, and grinding leaves the chips little brighter than the matrix round them (TERRAZZO_GROUND).
+TERRAZZO_CHIPS = [ ( 6, ( 226, 224, 218 ) ), ( 5, ( 204, 200, 192 ) ), ( 4, ( 176, 174, 170 ) ), ( 3, ( 214, 202, 182 ) ),
+                   ( 1.2, ( 118, 116, 114 ) ), ( 0.5, ( 70, 70, 72 ) ), ( 1.0, ( 162, 120, 100 ) ), ( 1, ( 192, 172, 136 ) ) ]
+TERRAZZO_MATRIX = ( 174, 168, 154 )
+TERRAZZO_GROUND = ( 0.3, 0.38 )                     # how far the big and small chips' colours sit towards the matrix
+TERRAZZO_BRASS = ( 150, 120, 70 )
 
 
 def terrazzo( rng, n ):
-    """ The concourse's terrazzo: cast marble chips in a cement matrix, ground and polished, laid as 16 in slabs (twelve
-    each way to a 192 in tile) with fine joints. Chips 6-15 mm of white, cream, grey, black, red-brown and ochre marble,
-    the odd green. Polished glossy, dulled and scratched where the crowds walk. rw_terrazzo has a warm light matrix;
+    """ The concourse's terrazzo as laid about 1900 (Venetian): marble chips 8-20 mm at full colour with finer 4-8 mm
+    ones between, three in four white or grey and a quarter dark grey, black or red, in a slightly darker grey-beige
+    cement matrix (round 2: the 0.36 in chips mipped to a salt-and-pepper speckle, like vinyl tile), 4096 px over the
+    192 in tile since the hall is walked at 1-3 m; cast in panels 48 in
+    wide and 38.4 in deep (four by five to a 192 in tile) divided by 0.25 in brass strips. Ground flat and polished
+    (roughness 0.24-0.3), dulled matte in broad walking lanes and scratched. rw_terrazzo has the warm grey matrix;
     rw_terrazzo_border an anthracite one, for the bands and borders. """
     p = n / 192.0
     x, y = coords( n )
-    big, big_cell, big_count = _chips( rng, n, 0.62 * p, 0.09 * p, 0.22 )
-    small, small_cell, small_count = _chips( rng, n, 0.26 * p, 0.05 * p, 0.35 )
+    big, big_cell, big_count = _chips( rng, n, 0.8 * p, 0.08 * p, 0.2 )
+    small, small_cell, small_count = _chips( rng, n, 0.35 * p, 0.04 * p, 0.45 )
     small = small * ( 1.0 - big )
-    big_colour = T.stone_colours( rng, big_count, TERRAZZO_CHIPS, 0.07 )
-    small_colour = T.stone_colours( rng, small_count, TERRAZZO_CHIPS, 0.07 )
+    big_colour = T.stone_colours( rng, big_count, TERRAZZO_CHIPS, 0.06 )
+    small_colour = T.stone_colours( rng, small_count, TERRAZZO_CHIPS, 0.06 )
     vein = noise( rng, n, 1.2, 30, n / 3 )
     fine = noise( rng, n, 0.6, n / 6 )
     chips = big_colour[big_cell] * ( 1.0 + 0.05 * vein )[..., None]
     chips_s = small_colour[small_cell] * ( 1.0 + 0.04 * fine )[..., None]
-    sw = n / 12.0
-    su, sv = x % sw, y % sw
-    de = np.minimum( np.minimum( su, sw - su ), np.minimum( sv, sw - sv ) ) / p
-    joint = 1.0 - smoothstep( 0.03, 0.07, de )
-    walked = smoothstep( -0.3, 1.8, noise( rng, n, 3.0, 1, 10 ) )
+    pw, ph = n / 4.0, n / 5.0
+    su, sv = x % pw, y % ph
+    de = np.minimum( np.minimum( su, pw - su ), np.minimum( sv, ph - sv ) ) / p
+    joint = 1.0 - smoothstep( 0.105, 0.155, de )                                    # the brass strip, 0.25 in
+    lane = smoothstep( -0.8, 1.4, noise( rng, n, 2.6, 1, 4 ) )
+    walked = np.clip( lane * ( 0.7 + 0.3 * smoothstep( -1.0, 1.0, noise( rng, n, 2.0, 6, 40 ) ) ), 0, 1 )
     canvas = Canvas( n, 2, int( 8 * p ) )
     for _ in range( int( 500 * ( n / 2048 ) ** 2 ) ):
         x_, y_ = rng.uniform( 0, n, 2 )
@@ -770,22 +949,135 @@ def terrazzo( rng, n ):
         canvas.line( pts, rng.uniform( 0.3, 0.7 ), rng.uniform( 0.4, 1.0 ) )
     scratches = canvas.result()
     stone = big + small
+    tarnish = smoothstep( -1.0, 1.5, noise( rng, n, 2.0, 4, 80 ) )
+    brass = lum_paint( TERRAZZO_BRASS, 1.0 + 0.08 * fine - 0.25 * tarnish )
     colours = {}
-    for name, matrix in ( ( "rw_terrazzo", ( 196, 190, 178 ) ), ( "rw_terrazzo_border", ( 70, 72, 74 ) ) ):
-        c = lum_paint( matrix, 1.0 + 0.03 * fine + 0.02 * vein )
-        c = mix( c, chips, big )
-        c = mix( c, chips_s, small )
-        c = mix( c, lum_paint( ( 96, 92, 86 ), 1.0 + 0.0 * fine ), 0.8 * joint )
-        haze = 0.06 * walked + 0.1 * scratches
-        c = srgb( lin( c ) * ( 1.0 - haze[..., None] ) + lin( ( 182, 178, 170 ) ) * haze[..., None] )
+    for name, matrix in ( ( "rw_terrazzo", TERRAZZO_MATRIX ), ( "rw_terrazzo_border", ( 70, 72, 74 ) ) ):
+        m = lum_paint( matrix, 1.0 + 0.03 * fine + 0.02 * vein )
+        # Ground flat, the chips' colours sit part of the way to the matrix's.
+        c = mix( m, mix( chips, m, TERRAZZO_GROUND[0] ), big )
+        c = mix( c, mix( chips_s, m, TERRAZZO_GROUND[1] ), small )
+        c = darken( c, 1.0 - 0.05 * walked )
+        haze = 0.05 * walked + 0.08 * scratches
+        c = srgb( lin( c ) * ( 1.0 - haze[..., None] ) + lin( ( 170, 166, 158 ) ) * haze[..., None] )
+        c = mix( c, brass, joint )
         colours[name] = c
-    rough = 0.22 - 0.09 * stone + 0.004 * fine
-    rough = rough + 0.17 * walked + 0.3 * scratches + 0.5 * joint
-    height = 0.004 * stone + 0.002 * fine - 0.04 * joint - 0.004 * scratches
-    return colours, np.clip( rough, 0, 1 ), height, 1024 / 192.0
+    rough = 0.28 - 0.04 * stone + 0.008 * fine
+    rough = rough + 0.2 * walked + 0.22 * scratches
+    rough = rough + ( 0.35 - rough ) * joint
+    height = 0.003 * stone + 0.002 * fine + 0.01 * joint - 0.004 * scratches
+    return colours, np.clip( rough, 0.1, 1 ), height, 1024 / 192.0
 
 
 SANDSTONE = [ ( 198, 176, 138 ), ( 190, 168, 128 ), ( 204, 184, 150 ), ( 182, 160, 124 ), ( 196, 170, 140 ), ( 176, 166, 140 ) ]
+# Main sandstone ashlar in the sun, warm yellow-grey: the blocks' colours, the odd greyer or yellower one from another
+# bed of the quarry, and the lime mortar of the flush joints.
+ASHLAR = [ ( 188, 172, 138 ), ( 182, 166, 132 ), ( 193, 177, 143 ), ( 179, 167, 140 ), ( 190, 171, 133 ), ( 185, 169, 142 ),
+           ( 176, 162, 131 ) ]
+ASHLAR_ODD = [ ( 176, 168, 150 ), ( 194, 175, 134 ), ( 186, 166, 140 ) ]
+ASHLAR_MORTAR = ( 180, 172, 154 )
+SANDSTONE_TILE = 192.0
+
+
+def ashlar( rng, n ):
+    """ The station's walls, outside and in the shed: Main sandstone ashlar of about 1900, 4096 px over a 192 in tile
+    (21 px an inch). Courses 14-20 in (35-50 cm), blocks 24-40 in, each block dressed with a smooth drafted margin an
+    inch wide round a finely tooled (scharriert) field, its face a hair out of plane with its neighbours', so each
+    catches the light its own way. Flush lime joints 0.2 in wide, set back 0.1 in, their arrises softly rounded and
+    chipped here and there. Warm yellow-grey, each block a shade of its own and the odd one from another bed, with
+    bedding laminations, iron spots and the odd brown Liesegang band; the scan's pores and grains (railhead_scanned's
+    sandstone_grain) inside each block, from its own place in the scan. rw_sandstone is the lower walls, grimy in the
+    joints and faintly washed; rw_sandstone_soot the upper courses, under a century's black gypsum crust (0.6) except
+    where the rain washes it in pale streaks. """
+    import railhead_scanned
+    tile = SANDSTONE_TILE
+    p = n / tile
+    x, y = coords( n )
+    block, u, v, length, rowh, row, count = BT.coursed( rng, n, ( 14 * p, 20 * p ), ( 24 * p, 40 * p ) )
+    d = np.minimum( np.minimum( u, length - u ), np.minimum( v, rowh - v ) ) / p          # inches to the block's edge
+    joint = 0.1                                                                         # half a 0.2 in joint
+    arris = smoothstep( joint, joint + 0.28, d )
+    margin = smoothstep( 0.85, 1.15, d )                                                # the drafted margin's inner edge
+    # The tooled field: fine parallel strokes 0.18 in apart, upright or slanting a little, block by block.
+    slant = rng.uniform( -0.25, 0.25, count )
+    phase = rng.uniform( 0, 2 * math.pi, count )
+    tool = np.sin( 2 * math.pi * ( u + slant[block] * v ) / ( 0.18 * p ) + phase[block]
+                   + 0.8 * noise( rng, n, 2.0, 16, 400 ) )
+    tool *= 0.5 + 0.5 * smoothstep( -1.0, 1.0, noise( rng, n, 1.6, 20, 300 ) )
+    # Each face a little out of plane: a tilt and a faint pillow.
+    tu, tv = rng.normal( 0, 0.0012, ( 2, count ) )                                      # inches an inch
+    plane = rng.normal( 0, 0.02, count )
+    pu, pv = ( u / length - 0.5 ) * 2.0, ( v / rowh - 0.5 ) * 2.0
+    pillow = ( 1.0 - pu ** 4 ) * ( 1.0 - pv ** 4 )
+    # Chipped arrises: small spalls along the edges, more at the corners.
+    chipn = noise( rng, n, 1.4, 30, 600 )
+    corner = np.minimum( np.minimum( u, length - u ), 9 * p ) + np.minimum( np.minimum( v, rowh - v ), 9 * p )
+    chip = smoothstep( 2.15, 2.55, chipn + 0.9 * ( 1.0 - smoothstep( 0, 10 * p, corner ) ) ) * ( d < 1.0 ) * ( d > joint )
+    on_block = d > joint
+    face = ( plane[block] + tu[block] * ( u - length / 2 ) / p + tv[block] * ( v - rowh / 2 ) / p + 0.02 * pillow
+             + 0.008 * tool * margin )
+    height = np.where( on_block, face - 0.05 * ( 1.0 - arris ) - 0.06 * chip, -0.1 )
+    grain, detail, grain_rough = railhead_scanned.sandstone_grain( block, u, v, length, rowh, count, rng, amount=0.2 )
+    height = height + 0.006 * ( grain - 1.0 ) * on_block
+    height = T.blur( height, 0.5 )
+
+    # Colour: the block's tone, its bedding, iron and the scan's grain.
+    # Round 2: at 30 m a 6 % spread block to block read as a light/dark checkerboard; 4 %, with the hues kept, and the
+    # blocks grouped into washed and crusted zones by a 3-5 m patina cloud (zone, below).
+    tone = BT.tones( rng, ASHLAR, count, 0.04, 1.0 )
+    odd = rng.random( count ) < 0.05
+    tone[odd] = np.array( ASHLAR_ODD, float )[rng.integers( 0, len( ASHLAR_ODD ), odd.sum() )]
+    lam = BT.stretched( rng, n, 1.6, 6, 400, ( 1.0, 60.0 ) )
+    lam2 = BT.stretched( rng, n, 1.4, 10, 600, ( 0.6, 24.0 ) )
+    bedded = rng.uniform( 0.3, 1.0, count )
+    mottle = noise( rng, n, 2.6, 4, 160 )
+    fine = noise( rng, n, 0.6, n / 4 )
+    # Each block weathers on its own: a cloud of darker and paler patina, water held along its upper bed joint and
+    # drying out paler towards its foot.
+    patina = noise( rng, n, 2.2, 3, 40 )
+    wet = 1.0 - smoothstep( 0.0, 0.35, v / rowh + 0.08 * noise( rng, n, 1.6, 10, 200 ) )
+    lum = ( ( 1.0 + bedded[block] * ( 0.05 * lam + 0.02 * lam2 ) + 0.05 * mottle + 0.035 * patina + 0.012 * fine )
+            * ( 1.0 - 0.06 * wet ) * grain )
+    colour = BT.shade( tone[block], lum )
+    # Iron: freckles in some blocks, a brown Liesegang band in a few.
+    freckled = rng.random( count ) < 0.35
+    spots = np.zeros( ( n, n ) )
+    for _ in range( int( 2600 * ( n / 4096 ) ** 2 ) ):
+        r = rng.uniform( 0.03, 0.12 ) * p
+        stamp( spots, rng.uniform( 0, n ), rng.uniform( 0, n ), r, r * rng.uniform( 0.6, 1.0 ), rng.uniform( 0.4, 1.0 ),
+               rng.uniform( 0, 3.2 ), soft=0.8 )
+    spots *= freckled[block]
+    banded = rng.random( count ) < 0.05
+    band_phase = rng.uniform( 0, 2 * math.pi, count )
+    band = smoothstep( 0.82, 0.97, np.sin( 2 * math.pi * ( v + 0.3 * u ) / ( 3.4 * p ) + band_phase[block]
+                                          + 1.4 * noise( rng, n, 2.4, 3, 60 ) ) ) * banded[block]
+    colour = tinted( colour, ( 150, 98, 58 ), np.clip( 0.5 * spots + 0.2 * band, 0, 1 ) )
+    mortar = 1.0 - smoothstep( joint - 0.02, joint + 0.03, d )
+    colour = mix( colour, lum_paint( ASHLAR_MORTAR, 1.0 + 0.06 * fine + 0.03 * mottle ), mortar )
+    ao = T.cavity_ao( height, ( ( 0.6 * p, 0.5 ), ( 2.5 * p, 0.25 ) ), 1.0 )
+
+    # Weathering.
+    joint_dirt = ( 1.0 - smoothstep( joint, joint + 0.6, d ) ) * smoothstep( -0.8, 1.2, noise( rng, n, 2.0, 6, 200 ) )
+    washed = smoothstep( 0.6, 2.2, streaks( rng, n, 2.0, 3, 64, 700, 3.0 ) )
+    grime = smoothstep( -0.5, 2.2, 0.6 * noise( rng, n, 3.0, 1, 8 ) + 0.6 * streaks( rng, n, 1.6, 2, 80, 100, 2.0 ) )
+    colours = {}
+    broad = noise( rng, n, 3.0, 1, 3 )                                                # +-8 % across the wall
+    zone = smoothstep( -1.2, 1.2, noise( rng, n, 3.4, 1, 1.6 ) )                        # washed (1) and crusted (0) zones
+    c = darken( colour, ( 1.0 - 0.22 * joint_dirt ) * ( 1.0 - 0.1 * grime ) * ( 1.0 + 0.04 * washed ) * ( 1.0 + 0.08 * broad )
+                * ( 0.94 + 0.08 * zone ) )
+    c = tinted( c, ( 120, 114, 104 ), 0.12 * ( 1.0 - zone ) )
+    colours["rw_sandstone"] = T.shaded( c, ao, 0.5 )
+    per_block = rng.uniform( 0.0, 1.0, count ) ** 0.8
+    crust = np.clip( 0.55 + 0.18 * per_block[block] + 0.15 * smoothstep( -1.0, 1.6, noise( rng, n, 3.0, 1, 8 ) )
+                     + 0.05 * noise( rng, n, 2.2, 6, 120 ) - 0.05, 0.0, 1.0 )
+    crust = crust * ( 1.0 - 0.65 * washed )
+    crust = np.clip( crust + 0.4 * ( 1.0 - arris ) + 0.25 * joint_dirt, 0.0, 1.0 )
+    soot = lum_paint( ( 62, 58, 52 ), 1.0 + 0.12 * fine + 0.06 * mottle ) * grain[..., None] ** 0.5
+    c = mix( colour, soot, 0.82 * smoothstep( 0.05, 0.9, crust ) )
+    c = srgb( lin( c ) * ( 1.0 + 0.1 * washed * ( 1.0 - crust ) )[..., None] )
+    colours["rw_sandstone_soot"] = T.shaded( c, ao, 0.5 )
+    rough = np.clip( 0.86 + 0.04 * fine + 0.06 * ( grain_rough - 0.5 ) - 0.03 * crust + 0.06 * mortar, 0.72, 0.97 )
+    return colours, rough, height, 1024 / tile, { "detail_normal": ( detail, 0.45 ) }
 
 
 def sandstone( rng, n ):
@@ -824,48 +1116,106 @@ def sandstone( rng, n ):
     return { "rw_sandstone": T.shaded( colour, ao, 0.5 ) }, rough, height, 1024 / 192.0
 
 
+DRESSED_BEDS = [ ( 180, 160, 120 ), ( 168, 158, 136 ), ( 184, 156, 110 ), ( 192, 178, 148 ), ( 172, 154, 122 ),
+                 ( 176, 164, 132 ) ]
+DRESSED_RED_BEDS = [ ( 148, 98, 82 ), ( 138, 96, 84 ), ( 156, 106, 84 ), ( 132, 88, 76 ), ( 152, 112, 94 ), ( 142, 94, 76 ) ]
+DRESSED_MORTAR = ( 138, 130, 116 )
+
+
 def dressed( rng, n ):
-    """ Dressed stone for plinths, quoins, sills and the yard walls: smooth tooled blocks in courses 20-28 in high, 36-64 in
-    long, with flush lime joints a fifth of an inch wide and fine vertical tool marks (droving). rw_dressed is buff
-    sandstone, rw_dressed_red the red Main sandstone. """
+    """ Dressed stone for the booking hall's piers, pilasters, arches, cornices and balustrade, the plinths, quoins and
+    sills: smooth tooled blocks in courses 20-28 in high, 36-64 in long. Main sandstone of about 1900: each block a bed
+    of its own (DRESSED_BEDS: yellow-buff, grey-buff, ochre, pale, a 12 % spread), one in twelve crossed by a red-brown
+    Liesegang band, bedding laminations, iron blotches over 1-2 % of the face, and the scan's pores and grains from each
+    block's own place in it (railhead_scanned.sandstone_grain). The faces are droved (parallel chisel strokes 0.22 in
+    apart, 0.02 in deep) so raking lamp light shows the tooling at 2-5 m. Lime joints 0.3 in wide set back 0.25 in in a
+    darker mortar, dirt held at the arrises and in streaks below them, so the courses read at 10 m. It sits darker than
+    the painted plaster, as the stone frame of a real hall does. rw_dressed_red is the red Main sandstone. """
+    import railhead_scanned
     p = n / 96.0
     x, y = coords( n )
     block, u, v, length, rowh, row, count = BT.coursed( rng, n, ( 20 * p, 28 * p ), ( 36 * p, 64 * p ) )
     d = np.minimum( np.minimum( u, length - u ), np.minimum( v, rowh - v ) ) / p
     phase = rng.uniform( 0, 2 * math.pi, count )
+    slant = rng.uniform( -0.12, 0.12, count )
     pitch = 0.22 * p
-    drove = np.sin( 2 * math.pi * x / pitch + phase[block] + 0.6 * noise( rng, n, 2.0, 8, 200 ) )
-    drove *= 0.6 + 0.4 * noise( rng, n, 1.6, 10, 200 )
+    drove = np.sin( 2 * math.pi * ( x + slant[block] * y ) / pitch + phase[block] + 0.6 * noise( rng, n, 2.0, 8, 200 ) )
+    drove *= 0.55 + 0.45 * noise( rng, n, 1.6, 10, 200 )
     fine = noise( rng, n, 0.6, n / 4 )
     mottle = noise( rng, n, 2.6, 3, 80 )
-    bevel = smoothstep( 0.1, 0.3, d )
-    height = -0.08 * ( 1.0 - bevel ) + 0.012 * drove * bevel + 0.004 * fine
-    mortar = 1.0 - smoothstep( 0.08, 0.13, d )
+    bedding = BT.stretched( rng, n, 1.6, 6, 300, ( 1.0, 40.0 ) )
+    bedding2 = BT.stretched( rng, n, 1.4, 10, 500, ( 0.6, 18.0 ) )
+    bedded = rng.uniform( 0.3, 1.0, count )
+    joint = 0.15                                                        # half a 0.3 in joint
+    bevel = smoothstep( joint, joint + 0.35, d )
+    chipn = noise( rng, n, 1.4, 30, 600 )
+    corner = np.minimum( np.minimum( u, length - u ), 6 * p ) + np.minimum( np.minimum( v, rowh - v ), 6 * p )
+    chip = smoothstep( 2.1, 2.5, chipn + 0.7 * ( 1.0 - smoothstep( 0, 7 * p, corner ) ) ) * ( d < 0.9 ) * ( d > joint )
+    grain, detail, grain_rough = railhead_scanned.sandstone_grain( block, u, v, length, rowh, count, rng, amount=0.08 )
+    tu, tv = rng.normal( 0, 0.0008, ( 2, count ) )                      # each face a hair out of plane
+    face = tu[block] * ( u - length / 2 ) / p + tv[block] * ( v - rowh / 2 ) / p
+    height = np.where( d > joint, face - 0.2 * ( 1.0 - bevel ) + 0.02 * drove * bevel - 0.1 * chip, -0.25 )
+    height = height + 0.002 * fine + 0.004 * ( grain - 1.0 ) / 0.08
+    height = T.blur( height, 0.5 )
+    mortar = 1.0 - smoothstep( joint - 0.02, joint + 0.04, d )
+    arris = ( 1.0 - bevel ) * ( 1.0 - mortar )
+    near_joint = 1.0 - smoothstep( joint, joint + 1.2, d )
+    # Dirt: held at the arrises and in the joints, and in streaks running down from the bed joints (rain on the
+    # outside, cleaners' water and dust inside), with a broad cloud across the wall.
+    bed_top = ( 1.0 - smoothstep( 0.0, 1.5, v / p ) ) * ( d > joint )
+    held = run_down( bed_top, 6 * p, fall=0.8 ) * smoothstep( -0.6, 1.4, streaks( rng, n, 1.6, 3, 90, 60, 1.6 ) )
     dirt = smoothstep( 0.0, 2.0, streaks( rng, n, 1.8, 2, 80, 60, 2.0 ) + 0.5 * noise( rng, n, 2.8, 1, 12 ) )
+    broad = noise( rng, n, 3.0, 1, 4 )
+    iron = blotches( rng, n, 1.6, 30, 400, 0.015, 0.6 )
+    banded = rng.random( count ) < 1.0 / 12.0
+    band_phase = rng.uniform( 0, 2 * math.pi, count )
+    # Liesegang bands: soft, broad wavy rings of iron, not lines.
+    band = smoothstep( 0.35, 0.95, np.sin( 2 * math.pi * ( v + 0.3 * u ) / ( 7.0 * p ) + band_phase[block]
+                                          + 1.8 * noise( rng, n, 3.0, 2, 16 ) ) ) * banded[block]
+    band = T.blur( band, 0.3 * p )
+    freckled = rng.random( count ) < 0.3
+    spots = np.zeros( ( n, n ) )
+    for _ in range( int( 900 * ( n / 2048 ) ** 2 ) ):
+        r = rng.uniform( 0.03, 0.1 ) * p
+        stamp( spots, rng.uniform( 0, n ), rng.uniform( 0, n ), r, r * rng.uniform( 0.6, 1.0 ), rng.uniform( 0.4, 1.0 ),
+               rng.uniform( 0, 3.2 ), soft=0.8 )
+    spots *= freckled[block]
+    ao = T.cavity_ao( height, ( ( 0.5 * p, 0.7 ), ( 2.0 * p, 0.3 ) ), 1.0 )
     colours = {}
-    for name, base, spread in ( ( "rw_dressed", ( 200, 180, 144 ), 0.05 ), ( "rw_dressed_red", ( 160, 92, 74 ), 0.06 ) ):
-        tone = BT.tones( rng, [ base, tuple( np.array( base ) * ( 0.94, 0.95, 0.97 ) ), tuple( np.array( base ) * ( 1.04, 1.03, 1.0 ) ) ],
-                         count, spread )
-        c = BT.shade( tone[block], 1.0 + 0.03 * drove + 0.04 * mottle + 0.03 * fine )
-        c = mix( c, lum_paint( ( 172, 166, 154 ), 1.0 + 0.04 * fine ), mortar )
-        c = darken( c, 1.0 - 0.3 * dirt )
-        colours[name] = c
-    rough = np.clip( 0.8 + 0.04 * fine + 0.04 * drove + 0.1 * mortar, 0, 1 )
-    return colours, rough, height, 1024 / 96.0
+    for name, beds in ( ( "rw_dressed", DRESSED_BEDS ), ( "rw_dressed_red", DRESSED_RED_BEDS ) ):
+        tone = BT.tones( rng, beds, count, 0.12, 0.85 )
+        lum = ( 1.0 + bedded[block] * ( 0.05 * bedding + 0.02 * bedding2 ) + 0.02 * drove * bevel + 0.03 * mottle
+                + 0.01 * fine + 0.05 * broad ) * grain
+        c = BT.shade( tone[block], lum )
+        c = tinted( c, ( 156, 104, 62 ), np.clip( 0.5 * iron + 0.45 * spots + 0.3 * band, 0, 1 ) )
+        c = darken( c, ( 1.0 - 0.2 * arris - 0.12 * chip ) * ( 1.0 - 0.1 * near_joint ) * ( 1.0 - 0.12 * held ) )
+        c = mix( c, lum_paint( DRESSED_MORTAR, 1.0 + 0.05 * fine + 0.03 * mottle ), mortar )
+        c = darken( c, 1.0 - 0.1 * dirt )
+        colours[name] = T.shaded( c, ao, 0.55 )
+    rough = np.clip( 0.8 + 0.03 * fine + 0.05 * drove * bevel + 0.1 * mortar + 0.06 * ( grain_rough - 0.5 ), 0.7, 0.98 )
+    return colours, rough, height, 1024 / 96.0, { "detail_normal": ( detail, 0.3 ) }
 
 
-STEEL_GREEN = ( 106, 118, 106 )
+STEEL_GREEN = ( 70, 80, 75 )
 
 
-def _old_paint( rng, n, p, base, height, hot ):
+def _old_paint( rng, n, p, base, height, hot, wear=None, drips=False ):
     """ Old paint on riveted iron: base, chipped down to red lead and then rust where hot (0..1, the rivets' and edges'
-    nearness) says it wears first, rust bleeding out and running down, soot over it. Returns colour and roughness. """
+    nearness) says it wears first, rust bleeding out and running down, soot over it. wear (per px, about -1..1) moves
+    the chipping up or down by area; drips adds the runs and sags of many hand-brushed coats. Returns colour and
+    roughness. """
     fine = noise( rng, n, 0.8, n / 6 )
     mottle = noise( rng, n, 2.4, 3, 80 )
     chipn = noise( rng, n, 1.4, 12, n / 3 )
+    if wear is not None:
+        chipn = chipn + 0.45 * wear
     chip = smoothstep( 2.05, 2.25, chipn + 1.1 * hot )
     deep = smoothstep( 2.45, 2.65, chipn + 1.1 * hot )
     colour = lum_paint( base, ( 1.0 + 0.05 * mottle + 0.025 * fine ) )
+    if drips:
+        # Sags under the rivet rows and edges where the coats ran: a hair darker and glossier.
+        runs = run_down( np.clip( hot * smoothstep( 0.8, 2.2, noise( rng, n, 1.0, 40, n / 3 ) ), 0, 1 ), 3.0 * p, 0.8 )
+        colour = darken( colour, 1.0 - 0.06 * runs )
     colour = mix( colour, lum_paint( ( 156, 72, 48 ), 1.0 + 0.08 * fine ), chip )
     colour = mix( colour, lum_paint( ( 104, 58, 38 ), 1.0 + 0.12 * fine ), deep )
     bleed = run_down( np.clip( 0.6 * deep + 0.35 * smoothstep( 0.4, 0.9, hot ) * smoothstep( 0.5, 2.0, chipn ), 0, 1 ),
@@ -877,59 +1227,163 @@ def _old_paint( rng, n, p, base, height, hot ):
     return colour, rough
 
 
-def steel( rng, n ):
-    """ The train shed's riveted wrought iron, the footbridge and the old girders: plates painted grey-green, with a row
-    of rivet heads across the plate every 32 in (3.2 in apart, 1.16 in heads) and a butt strap down the middle of the
-    tile with its own two rows. Chipped to red lead and rust round the rivets and edges, rust bleeding from them and
-    running down, sooted from the steam years. """
-    p = n / 64.0
-    x, y = coords( n )
-    sx = np.abs( x - n / 2 )
-    strap = smoothstep( 1.6 * p, 1.45 * p, sx )
-    rivets = np.zeros( ( n, n ) )
-    for ry in ( n / 4, 3 * n / 4 ):
-        for k in range( 20 ):
-            rx = ( k + 0.5 ) * n / 20
-            if abs( rx - n / 2 ) > 2.2 * p:
-                stamp( rivets, rx, ry, 0.58 * p, 0.58 * p, 0.38, profile="dome" )
-    for cx in ( n / 2 - 0.9 * p, n / 2 + 0.9 * p ):
-        for k in range( 20 ):
-            stamp( rivets, cx, ( k + 0.25 ) * n / 20, 0.5 * p, 0.5 * p, 0.34, profile="dome" )
+def _weather_iron( rng, n, p, colour, rivets, bleed_in=( 2.0, 4.0 ) ):
+    """ The wear old riveted ironwork shows in diffuse light, in its colour: the top coat chalked paler in broad blotches,
+    rust bleeding 2-4 in down from about a third of the rivet heads (where the paint cracked round them), soot darkening
+    some areas by a fifth, and darker drip tracks where the coats ran. rivets is the rivets' height field. """
     fine = noise( rng, n, 0.8, n / 6 )
-    height = 0.35 * strap + rivets + 0.004 * fine
+    chalk = smoothstep( -0.8, 1.8, noise( rng, n, 3.0, 1, 10 ) + 0.25 * noise( rng, n, 1.8, 10, 60 ) )
+    c = srgb( lin( colour ) * ( 1.0 + 0.16 * chalk )[..., None] )
+    c = tinted( c, ( 132, 138, 130 ), 0.15 * chalk )
+    heads = smoothstep( 0.02, 0.15, rivets )
+    which = blotches( rng, n, 1.0, n / ( 14 * p ), n / ( 5 * p ), 0.3, 0.15 )   # about a third of the heads
+    src = T.blur( heads * which, 0.35 * p )
+    bleed = np.clip( run_down( src, bleed_in[1] * p, 0.7, rng ) * 1.6, 0, 1 )
+    bleed = bleed * ( 0.6 + 0.4 * smoothstep( -1.0, 1.0, noise( rng, n, 1.4, 20, n / 4 ) ) )
+    c = mix( c, lum_paint( ( 120, 70, 40 ), 1.0 + 0.12 * fine ), 0.85 * bleed )
+    soot = blotches( rng, n, 2.8, 1, 5, 0.4, 0.9 ) * ( 0.7 + 0.3 * smoothstep( -1.0, 2.0, streaks( rng, n, 1.6, 2, 60, 80, 1.5 ) ) )
+    c = darken( c, 1.0 - 0.22 * soot )
+    drips = smoothstep( 0.8, 2.4, streaks( rng, n, 1.2, 6, 200, 60, 0.5 ) ) * blotches( rng, n, 2.0, 2, 20, 0.5, 0.8 )
+    c = darken( c, 1.0 - 0.12 * drips )
+    return c, bleed, soot
+
+
+STEEL_TILE = 128.0
+
+
+def steel( rng, n ):
+    """ The train shed's riveted wrought iron, the footbridge and the old girders, 2048 px over a 128 in tile (16 px an
+    inch): plates painted dark grey-green, a lap seam along u at the tile's edge with two staggered rows of 28 mm snap
+    heads on each side (3.5 in pitch), and one cover strap 5 in wide down the tile off its centre with its own two rows.
+    Many coats of brushed lead paint, brush marks along v and sags under the rivets, chipped to red lead and rust round
+    the rivets and edges (more in some parts of the tile than others), rust bleeding and running down, dulled with
+    soot. rw_steel is the iron within reach; rw_steel_soot the ironwork high in the shed, under a crust of soot. """
+    p = n / STEEL_TILE
+    x, y = coords( n )
+    pitch = 3.5 * p
+    head = 0.55 * p                                              # 28 mm heads
+    # The lap seam along u at the tile's edge (y = 0): the upper plate 0.3 in proud above it.
+    dy = np.minimum( y, n - y )
+    # One cover strap down the tile, off its centre.
+    sx0 = 0.37 * n
+    sxd = np.abs( x - sx0 )
+    strap = smoothstep( 2.6 * p, 2.45 * p, sxd )
+    rivets = np.zeros( ( n, n ) )
+    count = int( round( n / pitch ) )
+    step = n / count
+    for k in range( count ):
+        for ry, shift in ( ( 1.6 * p, 0.0 ), ( 3.6 * p, 0.5 ), ( n - 1.6 * p, 0.0 ), ( n - 3.6 * p, 0.5 ) ):
+            rx = ( k + 0.25 + shift ) * step
+            if abs( rx - sx0 ) > 3.0 * p:
+                stamp( rivets, rx, ry, head, head, 0.4, profile="dome" )
+        for cx, shift in ( ( sx0 - 1.2 * p, 0.0 ), ( sx0 + 1.2 * p, 0.5 ) ):
+            ry = ( k + 0.6 + shift ) * step
+            if min( ry, n - ry ) > 5.0 * p:
+                stamp( rivets, cx, ry, head, head, 0.4, profile="dome" )
+    fine = noise( rng, n, 0.8, n / 6 )
+    brush = streaks( rng, n, 0.6, 30, n / 2, 40, 0.4 )            # brush marks along v
+    # The plates' butt joint along u at the tile's edge, under a cover plate 5.4 in wide (0.3 in proud) carrying the
+    # two staggered rows each side.
+    cover = smoothstep( 5.4 * p, 5.2 * p, dy )
+    height = 0.3 * np.maximum( strap, cover ) + rivets + 0.004 * fine + 0.0025 * brush
+    height = T.blur( height, 0.6 )
     rim = ndimage.maximum_filter( ( rivets > 0.02 ).astype( float ), size=int( 0.5 * p ) * 2 + 1, mode="wrap" )
-    edge = smoothstep( 1.75 * p, 1.6 * p, sx ) * ( 1.0 - smoothstep( 1.45 * p, 1.3 * p, sx ) )
+    edge = np.maximum( smoothstep( 2.8 * p, 2.6 * p, sxd ) * ( 1.0 - smoothstep( 2.4 * p, 2.2 * p, sxd ) ),
+                       smoothstep( 0.4 * p, 0.0, np.abs( dy - 5.3 * p ) ) )
     hot = T.blur( np.maximum( rim * 0.8, edge ), 0.6 * p )
-    colour, rough = _old_paint( rng, n, p, STEEL_GREEN, height, hot )
-    ao = T.cavity_ao( height, ( ( 0.4 * p, 0.6 ), ), 1.0 )
-    return { "rw_steel": T.shaded( colour, ao, 0.4 ) }, rough, height, 1024 / 64.0
+    # Chipping varies by area: one quarter of the tile worn more, one less.
+    qx, qy = ( x // ( n / 2 ) ).astype( int ), ( y // ( n / 2 ) ).astype( int )
+    quad = rng.uniform( -1.0, 1.0, ( 2, 2 ) )
+    wear = T.blur( quad[qy, qx], 6 * p ) + 0.5 * noise( rng, n, 2.4, 1, 6 )
+    colour, rough = _old_paint( rng, n, p, STEEL_GREEN, height, hot, wear=wear, drips=True )
+    colour, bleed, soot_w = _weather_iron( rng, n, p, colour, rivets )
+    rough = np.clip( 0.45 + 0.25 * ( rough - 0.55 ) / 0.45 + 0.12 * bleed + 0.08 * soot_w, 0.42, 0.78 )
+    ao = T.cavity_ao( height, ( ( 0.4 * p, 0.6 ), ( 1.5 * p, 0.3 ) ), 1.0 )
+    colours = { "rw_steel": T.shaded( colour, ao, 0.45 ) }
+    # High up: a soot crust half covering it, a third darker, matt.
+    crust = np.clip( 0.5 + 0.3 * noise( rng, n, 2.6, 1, 10 ) + 0.25 * streaks( rng, n, 1.6, 2, 60, 80, 1.5 )
+                     + 0.25 * ( 1.0 - smoothstep( 0.0, 0.6, hot ) ) - 0.2, 0, 1 )
+    soot = lum_paint( ( 40, 40, 38 ), 1.0 + 0.1 * fine )
+    c = darken( colour, 0.7 )
+    c = mix( c, soot, 0.55 * crust )
+    colours["rw_steel_soot"] = T.shaded( c, ao, 0.5 )
+    return colours, rough, height, 1024 / STEEL_TILE
+
+
+STEEL_MODERN_TILE = 128.0
 
 
 def steel_modern( rng, n ):
-    """ Modern painted steel (the platform canopies' columns, railings, signal posts, cabinets): smooth satin paint with a
-    faint orange peel, a few scratches and scuffs. rw_steel_dark is anthracite, rw_steel_grey light grey. """
-    p = n / 64.0
-    peel = noise( rng, n, 1.0, n / 10 )
+    """ Modern powder-coated steel (the platform canopies' columns, the footbridge's posts and railings, signal posts,
+    cabinets), 2048 px over a 128 in tile: satin (roughness about 0.4) with a fine orange peel, chalked a little, worn
+    glossier and grimy where hands go, scratched lighter through the coat, the ghosts of two or three peeled-off
+    stickers (a cleaner, glossier rectangle with a ring of glue grime). Round 2 (it read as an even fine-speckle
+    hammer finish with round rust blobs): the orange peel is faint, the sheen shifts broadly over 1-3 m (roughness
+    +-0.1), dust settles in a soft gradient down the tile, and the rust gathers along a plate seam and its bolt row and
+    runs down from them. rw_steel_dark is RAL 7016 anthracite, rw_steel_grey RAL 7035 light grey. """
+    p = n / STEEL_MODERN_TILE
+    x, y = coords( n )
+    peel = noise( rng, n, 1.0, n / 14 )
     mottle = noise( rng, n, 2.6, 2, 40 )
+    chalk = smoothstep( -0.6, 1.8, noise( rng, n, 2.8, 1, 8 ) )
     canvas = Canvas( n, 2, int( 10 * p ) )
-    for _ in range( 70 ):
+    for _ in range( 140 ):
         x_, y_ = rng.uniform( 0, n, 2 )
         a = rng.uniform( 0, 2 * math.pi )
-        length = rng.uniform( 0.5, 6.0 ) * p
-        canvas.line( [ ( x_, y_ ), ( x_ + math.cos( a ) * length, y_ + math.sin( a ) * length ) ], rng.uniform( 0.4, 1.0 ),
-                     rng.uniform( 0.3, 0.9 ) )
+        length = rng.uniform( 0.4, 5.0 ) * p
+        bend = rng.normal( 0, 0.1 )
+        pts = [ ( x_ + math.cos( a + bend * t ) * length * t, y_ + math.sin( a + bend * t ) * length * t ) for t in np.linspace( 0, 1, 5 ) ]
+        canvas.line( pts, rng.uniform( 0.5, 1.4 ), rng.uniform( 0.3, 1.0 ) )
     scratches = canvas.result()
     scuff = blotches( rng, n, 2.2, 3, 60, 0.08, 0.8 )
     grime = smoothstep( 0.0, 2.2, streaks( rng, n, 1.6, 2, 60, 50, 1.5 ) )
+    hands = smoothstep( -0.2, 1.8, noise( rng, n, 2.6, 1, 6 ) )
+    # Sticker ghosts: rectangles 3-8 in, cleaner and glossier, with a grey ring of old glue.
+    ghost = np.zeros( ( n, n ) )
+    ring = np.zeros( ( n, n ) )
+    for _ in range( 3 ):
+        x0, y0 = rng.uniform( 0, n, 2 )
+        w, h = rng.uniform( 3, 8 ) * p, rng.uniform( 2, 6 ) * p
+        inside, edge = _rect_wrap( x, y, x0, y0, w, h, n )
+        ghost = np.maximum( ghost, inside * smoothstep( 0.0, 0.3 * p, edge ) * rng.uniform( 0.5, 1.0 ) )
+        ring = np.maximum( ring, ( 1.0 - smoothstep( 0.0, 0.25 * p, np.abs( edge ) ) ) * rng.uniform( 0.5, 1.0 ) )
+    ghost = ghost * smoothstep( -1.0, 0.8, noise( rng, n, 1.6, 8, 80 ) )
+    # A plate seam across the tile with its row of bolts (every 4 in), and a short upright one: the rust gathers
+    # there (water stands in a seam) and at a few of the bolts, and runs down.
+    bolts = np.zeros( ( n, n ) )
+    rusty = np.zeros( ( n, n ) )
+    seam_y = rng.uniform( 0.2, 0.8 ) * n
+    seam = 1.0 - smoothstep( 0.04 * p, 0.12 * p, np.abs( ( ( y - seam_y + n / 2 ) % n ) - n / 2 ) )
+    seam_x = rng.uniform( 0, n )
+    vseam = ( 1.0 - smoothstep( 0.04 * p, 0.12 * p, np.abs( ( ( x - seam_x + n / 2 ) % n ) - n / 2 ) ) ) \
+        * ( ( ( y - seam_y ) % n ) < 0.45 * n )
+    seam = np.maximum( seam, vseam )
+    for k in range( int( STEEL_MODERN_TILE / 4 ) ):
+        bx, by = ( k + 0.5 ) * 4 * p, seam_y - 1.2 * p
+        stamp( bolts, bx, by, 0.35 * p, 0.35 * p, 0.1, profile="dome" )
+        if rng.random() < 0.12:
+            stamp( rusty, bx, by + 0.25 * p, 0.4 * p, 0.4 * p, rng.uniform( 0.4, 0.9 ), soft=0.3 * p )
+    along = smoothstep( 0.8, 2.0, noise( rng, n, 2.2, 2, 30 ) )
+    rusty = np.maximum( rusty, seam * along * 0.6 )
+    bleed = run_down( rusty, 22 * p, 0.55, rng )
+    sheen = noise( rng, n, 3.0, 1, 3 )                                  # broad 1-3 m shifts in the coat's sheen
+    dust = np.clip( 0.5 + 0.5 * smoothstep( -1.5, 1.5, streaks( rng, n, 2.6, 1, 4, 200, 3.0 ) ) * ( y / n ), 0, 1 )
     colours = {}
-    for name, base in ( ( "rw_steel_dark", ( 56, 62, 68 ) ), ( "rw_steel_grey", ( 170, 172, 170 ) ) ):
-        c = lum_paint( base, 1.0 + 0.03 * mottle + 0.01 * peel )
-        c = mix( c, lum_paint( ( 150, 150, 148 ), np.ones( ( n, n ) ) ), 0.5 * scratches )
-        c = darken( c, 1.0 - 0.12 * scuff - 0.15 * grime )
+    for name, base, rust_amount in ( ( "rw_steel_dark", ( 66, 70, 74 ), 0.35 ), ( "rw_steel_grey", ( 172, 174, 172 ), 0.6 ) ):
+        c = lum_paint( base, 1.0 + 0.03 * mottle + 0.004 * peel + 0.03 * sheen )
+        c = mix( c, lum_paint( ( 150, 144, 132 ), np.ones( ( n, n ) ) ), ( 0.08 if base[0] < 100 else 0.04 ) * dust )
+        c = mix( c, lum_paint( ( 196, 196, 192 ), np.ones( ( n, n ) ) ), 0.07 * chalk if base[0] < 100 else 0.04 * chalk )
+        c = mix( c, lum_paint( ( 188, 190, 188 ) if base[0] < 100 else ( 120, 120, 118 ), 1.0 + 0.05 * peel ), 0.7 * scratches )
+        c = darken( c, ( 1.0 - 0.06 * scuff - 0.08 * grime - ( 0.1 if base[0] > 100 else 0.03 ) * hands )
+                    * ( 1.0 + 0.06 * ghost ) * ( 1.0 - 0.2 * ring ) )
+        c = mix( c, lum_paint( ( 110, 62, 36 ), 1.0 + 0.1 * mottle ), rust_amount * np.clip( bleed, 0, 1 ) )
+        c = darken( c, 1.0 - 0.25 * seam )
+        c = mix( c, lum_paint( ( 120, 122, 124 ), 1.0 + 0.0 * peel ), smoothstep( 0.02, 0.06, bolts ) * 0.5 )
         colours[name] = c
-    rough = np.clip( 0.42 + 0.03 * peel + 0.15 * scuff + 0.2 * scratches + 0.1 * grime, 0, 1 )
-    height = 0.003 * peel - 0.006 * scratches
-    return colours, rough, height, 1024 / 64.0
+    rough = np.clip( 0.42 + 0.012 * peel + 0.1 * sheen + 0.08 * chalk + 0.1 * scuff + 0.18 * scratches + 0.1 * grime
+                     - 0.06 * hands - 0.07 * ghost + 0.15 * ring + 0.25 * bleed + 0.06 * dust, 0.28, 0.72 )
+    height = 0.0015 * peel - 0.008 * scratches + bolts + 0.004 * ghost - 0.03 * seam
+    return colours, rough, height, 1024 / STEEL_MODERN_TILE
 
 
 def lattice( rng, n ):
@@ -951,9 +1405,9 @@ def lattice( rng, n ):
     gusset = np.clip( 0.5 + ( ( 0.16 - 0.9 * np.maximum( tt - 0.065, 0.0 ) ) - sw ) * n, 0.0, 1.0 )
     rivets = np.zeros( ( n, n ) )
     r = 0.016 * n
-    for k in range( 8 ):
+    for k in range( 10 ):                              # 3.6 in pitch on a 36 in panel, as the plates' rivets
         for cy in ( 0.032 * n, ( 1 - 0.032 ) * n ):
-            stamp( rivets, ( k + 0.5 ) * n / 8, cy, r, r, 0.3 * p / p, profile="dome" )
+            stamp( rivets, ( k + 0.5 ) * n / 10, cy, r, r, 0.3, profile="dome" )
     for tv in ( 0.1, 0.15 ):
         for cy, sign in ( ( tv, 1 ), ( 1 - tv, -1 ) ):
             for cx in ( tv, -tv ):
@@ -967,7 +1421,10 @@ def lattice( rng, n ):
     height = 0.375 * np.maximum( bar1, gusset ) + 0.375 * bar2 + 0.5 * chord + rivets
     height = T.blur( height, 0.6 )
     hot = T.blur( np.maximum( ( rivets > 0.02 ) * 1.0, 1.0 - smoothstep( 0.0, 3.0, np.minimum( np.abs( d1 - hw ), np.abs( d2 - hw ) ) ) ), 4.0 )
-    colour, rough = _old_paint( rng, n, p, STEEL_GREEN, height, hot )
+    wear = noise( rng, n, 2.4, 1, 4 )
+    colour, rough = _old_paint( rng, n, p, STEEL_GREEN, height, hot, wear=wear, drips=True )
+    colour, bleed, soot_w = _weather_iron( rng, n, p, colour, rivets, bleed_in=( 1.5, 3.0 ) )
+    rough = np.clip( 0.45 + 0.25 * ( rough - 0.55 ) / 0.45 + 0.12 * bleed + 0.08 * soot_w, 0.42, 0.78 )
     ao = T.cavity_ao( height, ( ( 0.4 * p, 0.6 ), ), 1.0 )
     return { "rw_lattice": T.shaded( colour, ao, 0.45 ) }, rough, height, 1024 / 36.0, { "trans": solid }
 
@@ -983,24 +1440,80 @@ def window_dark( rng, n ):
     return { "rw_window_dark": colour }, rough, height, 1024 / 96.0
 
 
+GLASS_ROOF_TILE = 192.0
+
+
 def glass_roof( rng, n ):
-    """ The train shed's roof glazing: wired cast glass (a 0.5 in square mesh of 0.6 mm wire), its colour the light it
-    lets through: pale grey-green where it's clean, brown-grey where a century of soot and pigeons have dirtied it,
-    in blotches and streaks down the slope. On shaders/glass.shader. """
-    p = n / 48.0
+    """ The train shed's roof glazing, 2048 px over a 192 in tile: cast (rolled, wired) glass panes 24 x 64 in, eight
+    across and three up the slope (v), each with its own film of soot and pigeon dirt (0.2-0.8 of the way to a brown
+    grey) thickest at its lower end and streaked down the slope; one in twenty limewashed near opaque against the summer
+    sun, one in twenty a newer, cleaner replacement. Its colour is the light it lets through, milky white-grey where
+    clean (rolled glass diffuses), so the sky reads grey through it; the roughness (0.5-0.85) is how much it blurs what's
+    behind. The wire mesh is left out: at this scale it would only alias. On shaders/glass.shader. """
+    p = n / GLASS_ROOF_TILE
     x, y = coords( n )
-    mesh = n / 96.0
-    wx = np.minimum( x % mesh, mesh - x % mesh )
-    wy = np.minimum( y % mesh, mesh - y % mesh )
-    wire = np.clip( 1.0 - np.minimum( wx, wy ) / 0.7, 0.0, 1.0 )
-    dirt = np.clip( 0.32 + 0.1 * noise( rng, n, 2.6, 1, 16 ) + 0.1 * noise( rng, n, 1.6, 8, 120 )
-                    + 0.35 * smoothstep( -0.5, 2.2, streaks( rng, n, 1.6, 2, 80, 70, 2.0 ) ), 0.0, 1.0 )
-    colour = mix( lum_paint( ( 196, 204, 198 ), 1.0 + 0.03 * noise( rng, n, 1.0, 20, n / 4 ) ),
-                  lum_paint( ( 112, 104, 90 ), 1.0 + 0.1 * noise( rng, n, 1.0, 20, n / 4 ) ), dirt )
-    colour = mix( colour, np.array( ( 60, 62, 60 ), float ), 0.85 * wire )
-    rough = np.clip( 0.25 + 0.6 * dirt, 0, 1 )
-    height = 0.015 * noise( rng, n, 2.6, 4, 80 )
-    return { "rw_glass_roof": colour }, rough, height, 1024 / 48.0
+    cols, rows = 8, 3
+    pw, ph = n / cols, n / rows
+    col = np.minimum( ( x // pw ).astype( int ), cols - 1 )
+    row = np.minimum( ( y // ph ).astype( int ), rows - 1 )
+    pane = row * cols + col
+    count = cols * rows
+    u, v = x - col * pw, y - row * ph
+    edge = np.minimum( np.minimum( u, pw - u ), np.minimum( v, ph - v ) ) / p
+    film = rng.uniform( 0.2, 0.8, count )
+    kind = rng.random( count )
+    lime = kind < 0.05
+    clean = ( kind >= 0.05 ) & ( kind < 0.10 )
+    if not lime.any():
+        lime[rng.integers( count )] = True
+    film[clean] = rng.uniform( 0.03, 0.12, clean.sum() )
+    low = v / ph                                                   # 0 at the pane's top, 1 at its lower lap
+    # Round 2: every pane's dark patch sat at the same spot, a stamp along a span. Each pane's film now centres on its
+    # own place (a soft patch of its own size), and one in six has a run off to one side.
+    cu, cv = rng.uniform( 0.2, 0.8, count ), rng.uniform( 0.45, 0.95, count )
+    ru, rv = rng.uniform( 0.25, 0.6, count ), rng.uniform( 0.25, 0.55, count )
+    blob = np.exp( -( ( u / pw - cu[pane] ) / ru[pane] ) ** 2 - ( ( v / ph - cv[pane] ) / rv[pane] ) ** 2 )
+    lean = rng.uniform( 0.4, 1.0, count )                          # how much the film thickens towards the lap
+    dirt = film[pane] * ( 0.6 + 0.3 * lean[pane] * low + 0.45 * blob ) + 0.12 * noise( rng, n, 2.4, 2, 24 ) \
+        + 0.08 * noise( rng, n, 1.6, 8, 160 )
+    side = rng.random( count ) < 1.0 / 6.0
+    su = rng.choice( ( 0.12, 0.25, 0.75, 0.88 ), count )
+    sw = rng.uniform( 0.05, 0.1, count )
+    side_run = side[pane] * np.exp( -( ( u / pw - su[pane] ) / sw[pane] ) ** 2 ) * smoothstep( 0.1, 0.9, low )
+    side_run = side_run * ( 0.7 + 0.3 * smoothstep( -1.0, 1.0, noise( rng, n, 1.6, 8, 120 ) ) )
+    dirt = dirt + 0.35 * side_run
+    dirt = dirt + 0.3 * smoothstep( -0.2, 2.2, streaks( rng, n, 1.6, 2, 80, 90, 2.0 ) ) * film[pane]
+    # Soot gathered along the putty and the glazing bars' edges.
+    dirt = dirt + 0.35 * ( 1.0 - smoothstep( 0.2, 1.5, edge ) )
+    # Two scales within each pane, so a row of panes isn't a row of even stripes: a broad drift across the roof (the
+    # wind's lee, the smoke's track) and patches a pane wide where rain did or didn't wash.
+    drift = noise( rng, n, 3.0, 1, 3 )
+    patches = noise( rng, n, 2.2, 6, 24 )
+    dirt = dirt * ( 1.0 + 0.3 * drift + 0.22 * patches ) * ( 1.0 - 0.6 * clean[pane] )
+    # Soot run down the slope from the laps and the purlins' drips: a few heavy brown tracks a tile.
+    runs_src = np.zeros( ( n, n ) )
+    for _ in range( int( rng.integers( 2, 4 ) ) ):
+        x0 = rng.uniform( 0, n )
+        y0 = rng.uniform( 0, n )
+        w = rng.uniform( 2.5, 6.0 ) * p
+        stamp( runs_src, x0, y0, w, 2.0 * p, 1.0, soft=1.5 * p )
+    runs = np.clip( run_down( runs_src, rng.uniform( 40, 64 ) * p, 0.2, rng ) * 1.3, 0, 1 )
+    runs = T.warp( rng, n, runs, 1.0 * p )
+    dirt = np.clip( dirt + 0.35 * runs, 0.0, 1.0 )
+    clear = lum_paint( ( 214, 216, 210 ), 1.0 + 0.025 * noise( rng, n, 1.0, 20, n / 4 ) )
+    dirty = lum_paint( ( 150, 142, 126 ), 1.0 + 0.08 * noise( rng, n, 1.0, 20, n / 4 ) )
+    colour = mix( clear, dirty, dirt )
+    colour = mix( colour, lum_paint( ( 120, 110, 95 ), 1.0 + 0.08 * noise( rng, n, 1.0, 20, n / 4 ) ), 0.5 * runs )
+    wash = lime[pane] * smoothstep( -1.2, 0.6, noise( rng, n, 1.8, 6, 120 ) + 1.2 )
+    colour = mix( colour, lum_paint( ( 205, 205, 195 ), 1.0 + 0.04 * noise( rng, n, 1.2, 30, n / 3 ) ), 0.9 * wash )
+    putty = 1.0 - smoothstep( 0.1, 0.25, edge )
+    colour = mix( colour, np.array( ( 96, 92, 84 ), float ), 0.3 * putty )
+    # Rolled glass diffuses even when clean; dirt makes it a milky film (glass.shader: roughness x absorption is the
+    # share lit as a film, the rest the view through).
+    rough = np.clip( 0.5 + 0.35 * dirt, 0.5, 0.85 )
+    rough = rough + ( 0.9 - rough ) * wash
+    height = 0.012 * noise( rng, n, 2.6, 4, 80 ) + 0.004 * noise( rng, n, 1.0, 40, n / 3 ) - 0.03 * putty
+    return { "rw_glass_roof": colour }, rough, height, 1024 / GLASS_ROOF_TILE
 
 
 def train( rng, n ):
@@ -1086,43 +1599,87 @@ def wagon( rng, n ):
     return colours, rough, height, 1024 / 96.0
 
 
+CONTAINER_COLOURS = ( ( "blue", ( 34, 74, 130 ) ), ( "red", ( 148, 44, 36 ) ), ( "green", ( 42, 92, 62 ) ),
+                      ( "orange", ( 206, 110, 42 ) ), ( "grey", ( 140, 144, 146 ) ) )
+CONTAINER_HEIGHT = 102.0                    # inches up a tile: a standard box's height, so each wall gets one band set
+CONTAINER_WIDTH = 48.0                      # inches across a tile (the models' UVs)
+
+
 def container( rng, n ):
-    """ Shipping containers' corrugated steel sides: trapezoidal corrugations every 12 in (four to a 48 in tile) 1.4 in
-    deep, running up the side along v. Painted, faded, dented, scraped along their length with rust in the scrapes,
-    rain-streaked. Five plain colours, with no owner's marks. """
-    p = n / 48.0
+    """ A working 20 or 40 ft box's painted steel (railhead_props builds the corrugation as geometry, 278 mm pitch, so
+    no ribs here). The picture is 48 in across by 102 in up (a box's height): the vmat scales v by 48/102
+    (TEXCOORD_SCALE) and the wall paints are ANCHORED, so its bottom rows are z 0, the box's bottom rail, as they stand
+    in the yards (one stacked on another lines up too). A grime band over the bottom 6 in rail and splashed up the
+    lowest foot, rust running down from the top rail's weld, the upper half sun-faded and chalky, broad grime runs,
+    bare-metal scrapes with rust halos, dents. Roughness: fresh paint 0.45, faded 0.75, rust 0.8. rw_container_<colour>
+    is the walls; rw_container_<colour>_roof the same paint without the height bands, for the roofs (where the bands
+    would lie in stripes across). Five plain colours, with no owner's marks. """
+    pu = n / CONTAINER_WIDTH                                            # px an inch across
+    pv = n / CONTAINER_HEIGHT                                           # px an inch up
     x, y = coords( n )
-    t = ( x / ( n / 4.0 ) ) % 1.0
-    prof = np.select( [ t < 0.3, t < 0.5, t < 0.8 ], [ np.ones_like( t ), 1.0 - ( t - 0.3 ) / 0.2, np.zeros_like( t ) ],
-                      ( t - 0.8 ) / 0.2 )
-    prof = T.blur( prof, 0.08 * p )
+    z = ( n - y ) / pv                                                  # inches up from the box's foot
     dents = noise( rng, n, 3.0, 1, 8 )
-    height = 1.42 * prof + 0.12 * dents
-    canvas = Canvas( n, 2, int( 32 * p ) )
-    for _ in range( 9 ):
-        x_, y_ = rng.uniform( 0, n, 2 )
-        length = rng.uniform( 6, 26 ) * p
-        pts = [ ( x_ + length * k / 8, y_ + rng.normal( 0, 0.1 * p ) ) for k in range( 9 ) ]
-        canvas.line( pts, rng.uniform( 0.06, 0.25 ) * p, rng.uniform( 0.3, 0.8 ) )
-    scrape = canvas.result()
     fine = noise( rng, n, 0.8, n / 6 )
-    rust = np.maximum( 0.7 * smoothstep( 0.3, 0.8, scrape ), blotches( rng, n, 1.6, 12, 240, 0.02, 0.4 ) )
-    bleed = run_down( rust, 24 * p, 0.5, rng )
-    fade = smoothstep( -1.6, 2.4, 0.35 * noise( rng, n, 2.8, 1, 6 ) + 0.9 * streaks( rng, n, 1.6, 2, 60, 90, 1.5 ) )
-    grime = smoothstep( 0.5, 2.5, streaks( rng, n, 1.6, 2, 80, 80, 1.5 ) )
+    height = 0.12 * dents + 0.004 * noise( rng, n, 0.6, n / 6 )
+    canvas = Canvas( n, 2, int( 32 * pu ) )
+    cores = Canvas( n, 2, int( 32 * pu ) )
+    for _ in range( 12 ):
+        x_ = rng.uniform( 0, n )
+        z_ = rng.uniform( 8, 70 ) if rng.random() < 0.8 else rng.uniform( 70, 92 )
+        y_ = n - z_ * pv
+        length = rng.uniform( 6, 30 ) * pu
+        slope = rng.normal( 0, 0.06 )
+        pts = [ ( x_ + length * k / 8, y_ + length * k / 8 * slope + rng.normal( 0, 0.08 * pv ) ) for k in range( 9 ) ]
+        w = rng.uniform( 0.08, 0.3 ) * pv
+        canvas.line( pts, w * 2.2, rng.uniform( 0.4, 0.8 ) )
+        cores.line( pts, w * 0.8, rng.uniform( 0.6, 1.0 ) )
+    halo = np.clip( canvas.result(), 0, 1 )
+    core = np.clip( cores.result(), 0, 1 )
+    scrape = np.maximum( halo, core )
+    height = height - 0.03 * scrape
+    # Rust: along the top rail's weld (z 92-100), at the scrapes' halos and in a few pitted patches; it runs down.
+    weld = ( smoothstep( 92.0, 95.0, z ) * ( 1.0 - smoothstep( 99.5, 101.5, z ) )
+             * smoothstep( 0.4, 1.6, noise( rng, n, 1.6, 6, 120 ) ) )
+    pits = blotches( rng, n, 1.6, 12, 240, 0.025, 0.4 ) * blotches( rng, n, 2.6, 1, 6, 0.25, 0.6 ) * ( z > 10 )
+    rust = np.clip( np.maximum( np.maximum( 0.75 * weld, 0.6 * halo * ( 1.0 - core ) ), pits ), 0, 1 )
+    bleed = run_down( rust * ( z > 12 ), 40 * pv, 0.45, rng )
+    bleed = T.blur( bleed, 0.8 * pu ) * ( z > 4 )
+    # Sun fade and chalk on the upper half, grime washed down and splashed up from the yard.
+    upper = smoothstep( 30.0, 90.0, z + 8.0 * noise( rng, n, 2.2, 2, 12 ) )
+    fade = np.clip( upper * ( 0.6 + 0.4 * smoothstep( -1.6, 1.6, noise( rng, n, 2.8, 1, 6 ) ) ), 0, 1 )
+    chalky = noise( rng, n, 0.6, n / 8 )
+    chalk = smoothstep( 0.4, 2.0, chalky + 0.8 * upper ) * ( 0.3 + 0.7 * fade )
+    runs = streaks( rng, n, 2.2, 2, 24, 160, 4.0 )
+    grime = smoothstep( 0.6, 2.4, runs ) * ( 0.5 + 0.5 * ( 1.0 - upper ) )
+    foot = 1.0 - smoothstep( 6.0, 16.0, z + 3.0 * noise( rng, n, 1.8, 6, 80 ) )
+    rail = 1.0 - smoothstep( 5.4, 6.2, z )                             # the bottom rail, its 6 in band
+    roof_fade = 0.6 + 0.4 * smoothstep( -1.6, 1.6, noise( rng, n, 2.8, 1, 6 ) )
+    roof_chalk = smoothstep( 0.4, 2.0, chalky + 0.8 )
     colours = {}
-    for name, base in ( ( "rw_container_blue", ( 34, 74, 130 ) ), ( "rw_container_red", ( 148, 44, 36 ) ),
-                        ( "rw_container_green", ( 42, 92, 62 ) ), ( "rw_container_orange", ( 206, 110, 42 ) ),
-                        ( "rw_container_grey", ( 140, 144, 146 ) ) ):
-        faded = srgb( lin( base ) * 0.75 + lin( ( 180, 178, 172 ) ) * 0.25 )
-        c = mix( lum_paint( base, 1.0 + 0.03 * fine ), lum_paint( faded, 1.0 + 0.03 * fine ), 0.2 + 0.3 * fade )
-        c = mix( c, lum_paint( ( 140, 136, 128 ), 1.0 + 0.1 * fine ), 0.4 * scrape * ( 1.0 - rust ) )
-        c = mix( c, lum_paint( ( 112, 62, 38 ), 1.0 + 0.12 * fine ), 0.7 * rust )
+    roofs = {}
+    for name, base in CONTAINER_COLOURS:
+        faded = srgb( lin( base ) * 0.62 + lin( ( 182, 180, 174 ) ) * 0.38 )
+        c = mix( lum_paint( base, 1.0 + 0.03 * fine ), lum_paint( faded, 1.0 + 0.03 * fine ), 0.05 + 0.4 * fade )
+        c = mix( c, lum_paint( ( 140, 136, 128 ), 1.0 + 0.1 * fine ), 0.5 * halo * ( 1.0 - core ) )
+        c = mix( c, lum_paint( ( 160, 156, 150 ), 1.0 + 0.1 * fine ), 0.75 * core )
+        c = mix( c, lum_paint( ( 112, 62, 38 ), 1.0 + 0.12 * fine ), 0.7 * rust * ( 1.0 - core ) )
         c = mix( c, lum_paint( ( 118, 74, 46 ), 1.0 + 0.1 * fine ), 0.35 * bleed * ( 1.0 - rust ) )
-        c = darken( c, 1.0 - 0.18 * grime )
-        colours[name] = c
-    rough = np.clip( 0.58 + 0.15 * fade + 0.2 * rust + 0.04 * fine, 0, 1 )
-    return colours, rough, height, 1024 / 48.0
+        c = darken( c, 1.0 - 0.3 * grime )
+        c = mix( c, lum_paint( ( 204, 200, 192 ), 1.0 + 0.0 * fine ), 0.22 * chalk )
+        c = darken( c, ( 1.0 - 0.4 * rail ) * ( 1.0 - 0.25 * foot ) )
+        c = tinted( c, ( 90, 76, 60 ), 0.3 * foot + 0.2 * rail )
+        colours[f"rw_container_{name}"] = c
+        # The roof: no height bands, the upper half's weather all over, pitted rust and grime runs.
+        r = mix( lum_paint( base, 1.0 + 0.03 * fine ), lum_paint( faded, 1.0 + 0.03 * fine ), 0.1 + 0.4 * roof_fade )
+        r = mix( r, lum_paint( ( 112, 62, 38 ), 1.0 + 0.12 * fine ), 0.7 * pits )
+        r = darken( r, 1.0 - 0.25 * grime )
+        r = mix( r, lum_paint( ( 204, 200, 192 ), 1.0 + 0.0 * fine ), 0.2 * roof_chalk )
+        roofs[f"rw_container_{name}_roof"] = r
+    colours.update( roofs )
+    rough = 0.45 + 0.3 * fade + 0.04 * fine
+    rough = rough + ( 0.8 - rough ) * np.clip( rust + 0.6 * bleed, 0, 1 )
+    rough = rough + ( 0.35 - rough ) * 0.6 * core + 0.06 * chalk + 0.1 * rail
+    return colours, np.clip( rough, 0.3, 0.95 ), height, 1024 / CONTAINER_WIDTH
 
 
 def plain( rng, n ):
@@ -1248,7 +1805,7 @@ def facade( rng, n ):
         under = np.clip( 1.0 - np.abs( lz - zb ) * p / 1.5, 0, 1 ) * np.clip( 0.5 + ( hw - ax ) * p, 0, 1 )
         drip_src = np.maximum( drip_src, under )
     drip_src *= smoothstep( 0.2, 1.6, noise( rng, n, 1.2, 30, 400 ) )
-    drips = run_down( drip_src, 46 * p, 0.6, rng )
+    drips = np.clip( run_down( drip_src, 30 * p, 0.5, rng ) * 1.3, 0, 1 )
     drips = T.blur( drips, 0.8 * p ) * ( 1.0 - opening )
     grime = smoothstep( -0.5, 2.5, streaks( rng, n, 1.6, 2, 60, 90, 2.0 ) )
     ao = T.cavity_ao( height, ( ( 1.5 * p, 1.0 ), ( 5.0 * p, 0.8 ) ), 1.0 )
@@ -1281,11 +1838,30 @@ def facade( rng, n ):
     glass_c = mix( behind, sky, 0.1 + 0.2 * gz )
     frame_c = lum_paint( ( 234, 232, 226 ), 1.0 + 0.02 * fine )
 
+    # Two patched repairs a tile: newer render, a shade off the old, with a crisp edge that catches the light.
+    repair = np.zeros( ( n, n ) )
+    repair_edge = np.zeros( ( n, n ) )
+    for _ in range( 2 ):
+        x0, y0 = rng.uniform( 0, n, 2 )
+        w, h = rng.uniform( 20, 60 ) * p, rng.uniform( 14, 40 ) * p
+        inside, edge = _rect_wrap( x, y, x0, y0, w, h, n )
+        wob = T.warp( rng, n, inside * 1.0, 2.0 * p )
+        repair = np.maximum( repair, smoothstep( 0.4, 0.6, wob ) )
+        repair_edge = np.maximum( repair_edge, 1.0 - smoothstep( 0.0, 0.18, np.abs( wob - 0.5 ) ) )
+    repair *= 1.0 - opening
+    repair_edge *= 1.0 - opening
+    height = height + 0.06 * repair + 0.03 * repair_edge
+    # Splash and grime at the foot of each storey's wall (heaviest over the string course), and soot in the
+    # render's texture over the whole front.
+    foot = ( 1.0 - smoothstep( 9.0, 40.0, lz + 6.0 * noise( rng, n, 1.8, 8, 120 ) ) ) * ( 1.0 - trim ) * ( 1.0 - opening )
+    broad = noise( rng, n, 4.0, 1, 1.5 )                          # one gentle shift a tile, so a front isn't one flat colour
     colours = {}
     for name, ( wall_rgb, trim_rgb ) in FACADES.items():
-        lum = ( 1.0 + 0.035 * mottle + 0.02 * fine + 0.02 * plaster ) * ( 1.0 + 0.04 * patch )
+        lum = ( 1.0 + 0.035 * mottle + 0.02 * fine + 0.02 * plaster ) * ( 1.0 + 0.04 * patch ) * ( 1.0 + 0.12 * broad )
         c = mix( lum_paint( wall_rgb, lum ), lum_paint( trim_rgb, lum ), trim )
-        c = mix( c, lum_paint( ( 96, 88, 76 ), 1.0 + 0.1 * fine ), 0.45 * drips + 0.1 * grime )
+        c = mix( c, lum_paint( tuple( min( 255, k * 1.06 ) for k in wall_rgb ), 1.0 + 0.02 * fine ), 0.85 * repair * ( 1.0 - trim ) )
+        c = darken( c, ( 1.0 - 0.14 * repair_edge ) * ( 1.0 - 0.22 * foot ) )
+        c = mix( c, lum_paint( ( 96, 88, 76 ), 1.0 + 0.1 * fine ), 0.8 * drips + 0.15 * grime )
         c = mix( c, frame_c, frame )
         c = mix( c, glass_c, glass )
         c = darken( c, 1.0 - 0.3 * ( 1.0 - lit ) * ( 1.0 - glass ) )
@@ -3452,7 +4028,7 @@ def vending( rng, n ):
 # name: ( draw, size, seed, metalness, tile units ). The atlases, the clock and the lattice are placed by explicit UVs
 # (rect_uv(), the clock's 0..1, the lattice's one panel per 1.0 of u), so their tile units are 1.
 TEXTURES = {
-    "paving": ( paving, 2048, 1, 0.0, 160.0 ),
+    "paving": ( paving, 2048, 1, 0.0, PAVING_TILE ),
     "tactile": ( tactile, 1024, 2, 0.0, 24.0 ),
     "tactile_dots": ( tactile_dots, 1024, 3, 0.0, 24.0 ),
     "coping": ( coping, 1024, 4, 0.0, 39.37 ),
@@ -3463,16 +4039,17 @@ TEXTURES = {
     "rail": ( rail, 512, 9, 0.1, 32.0 ),
     "rail_head": ( rail_head, 512, 10, 1.0, 32.0 ),
     "asphalt": ( asphalt, 2048, 11, 0.0, 192.0 ),
-    "kerb": ( kerb, 1024, 12, 0.0, 48.0 ),
+    "kerb": ( kerb, 1024, 12, 0.0, KERB_TILE ),
+    "setts": ( setts, 2048, 41, 0.0, SETTS_TILE ),
     "concrete": ( concrete, 2048, 13, 0.0, 256.0 ),
-    "terrazzo": ( terrazzo, 2048, 14, 0.0, 192.0 ),
-    "sandstone": ( sandstone, 4096, 15, 0.0, 96.0 ),
+    "terrazzo": ( terrazzo, 4096, 14, 0.0, 192.0 ),
+    "sandstone": ( ashlar, 4096, 15, 0.0, SANDSTONE_TILE ),
     "dressed": ( dressed, 2048, 16, 0.0, 96.0 ),
-    "steel": ( steel, 1024, 17, 0.0, 64.0 ),
-    "steel_modern": ( steel_modern, 1024, 18, 0.0, 64.0 ),
+    "steel": ( steel, 2048, 17, 0.0, STEEL_TILE ),
+    "steel_modern": ( steel_modern, 2048, 18, 0.0, STEEL_MODERN_TILE ),
     "lattice": ( lattice, 1024, 19, 0.0, 1.0 ),
     "window_dark": ( window_dark, 512, 20, 0.0, 96.0 ),
-    "glass_roof": ( glass_roof, 1024, 21, 0.0, 48.0 ),
+    "glass_roof": ( glass_roof, 2048, 21, 0.0, GLASS_ROOF_TILE ),
     "train": ( train, 1024, 22, 0.0, 96.0 ),
     "bogie": ( bogie, 1024, 23, 0.05, 64.0 ),
     "rubber": ( rubber, 512, 24, 0.0, 32.0 ),
@@ -3499,15 +4076,16 @@ TEXTURE_PAINTS = {
     "lines": [ "rw_line_white", "rw_line_yellow", "rw_hazard" ],
     "ballast": [ "rw_ballast", "rw_ballast_rusty", "rw_ballast_old" ], "sleeper": [ "rw_sleeper" ],
     "sleeper_wood": [ "rw_sleeper_wood" ], "rail": [ "rw_rail" ], "rail_head": [ "rw_rail_head" ],
-    "asphalt": [ "rw_asphalt" ], "kerb": [ "rw_kerb" ], "concrete": [ "rw_concrete", "rw_concrete_dark" ],
-    "terrazzo": [ "rw_terrazzo", "rw_terrazzo_border" ], "sandstone": [ "rw_sandstone" ],
-    "dressed": [ "rw_dressed", "rw_dressed_red" ], "steel": [ "rw_steel" ],
+    "asphalt": [ "rw_asphalt" ], "kerb": [ "rw_kerb" ], "setts": [ "rw_setts" ], "concrete": [ "rw_concrete", "rw_concrete_dark" ],
+    "terrazzo": [ "rw_terrazzo", "rw_terrazzo_border" ], "sandstone": [ "rw_sandstone", "rw_sandstone_soot" ],
+    "dressed": [ "rw_dressed", "rw_dressed_red" ], "steel": [ "rw_steel", "rw_steel_soot" ],
     "steel_modern": [ "rw_steel_dark", "rw_steel_grey" ], "lattice": [ "rw_lattice" ],
     "window_dark": [ "rw_window_dark" ], "glass_roof": [ "rw_glass_roof" ],
     "train": [ "rw_train_red", "rw_train_blue", "rw_train_white", "rw_train_grey", "rw_train_dark", "rw_train_yellow" ],
     "bogie": [ "rw_bogie" ], "rubber": [ "rw_rubber" ], "wagon": [ "rw_wagon_rust", "rw_wagon_grey" ],
     "container": [ "rw_container_blue", "rw_container_red", "rw_container_green", "rw_container_orange",
-                   "rw_container_grey" ],
+                   "rw_container_grey", "rw_container_blue_roof", "rw_container_red_roof", "rw_container_green_roof",
+                   "rw_container_orange_roof", "rw_container_grey_roof" ],
     "plain": [ "rw_black", "rw_white_paint", "rw_yellow_paint", "rw_red_paint" ],
     "lamps": [ "rw_lamp_warm", "rw_lamp_cool", "rw_signal_red", "rw_signal_green", "rw_signal_yellow" ],
     "wood": [ "rw_wood" ], "facade": [ "rw_facade_cream", "rw_facade_ochre", "rw_facade_grey", "rw_facade_rose" ],
@@ -3524,9 +4102,14 @@ ILLUM = { "rw_signs": 1.4, "rw_displays": 2.4, "rw_shopsigns": 1.6, "rw_vending"
           "rw_signal_red": 8.0, "rw_signal_green": 8.0, "rw_signal_yellow": 8.0 }
 # Metalness per paint where it differs from its texture's.
 METALNESS = { "rw_rail_head": 1.0, "rw_lettering": 0.5 }
+# A paint sharing its texture's roughness but rougher or glossier: g_flRoughnessScaleFactor is an exponent on it
+# (under 1 rougher), so a soot crust can be matt on the same map as the clean paint.
+ROUGH_EXP = { "rw_steel_soot": 0.5, "rw_sandstone_soot": 0.8 }
 ALPHA_TESTED = { "rw_lattice", "rw_graffiti", "rw_lettering" }
 # Clear glass on shaders/glass.shader: ( tint, absorption ).
-GLASS = { "rw_glass": ( ( 0.92, 0.95, 0.94 ), 0.15 ) }
+GLASS = { "rw_glass": ( ( 0.92, 0.95, 0.94 ), 0.15 ),
+          # The platform canopies' laminated safety glass (railhead_canopy), faintly green at its edges, a little dusty.
+          "rw_canopy_glass": ( ( 0.86, 0.91, 0.89 ), 0.25 ) }
 # Car paint, with no texture of its own: white (materials/default/default_color.tga) tinted to the colour through
 # g_vColorTint, flat normals and one roughness all over, a clear coat's. paint: ( sRGB colour, metalness, roughness ).
 # The trains' paints have their grime and panel seams, and every other texture its dirt, which read wrong on a car.
@@ -3535,6 +4118,7 @@ PAINTED = { "rw_car_grey": ( ( 74, 78, 83 ), 0.4, 0.3 ),            # a metallic
             "rw_car_silver": ( ( 160, 164, 168 ), 0.6, 0.3 ),
             "rw_car_white": ( ( 226, 228, 228 ), 0.0, 0.28 ),
             "rw_car_black": ( ( 20, 21, 23 ), 0.2, 0.25 ),
+            "rw_car_ivory": ( ( 228, 214, 172 ), 0.0, 0.28 ),         # taxi light ivory, RAL 1015
             "rw_car_red": ( ( 140, 16, 22 ), 0.3, 0.28 ),
             "rw_car_blue": ( ( 22, 44, 90 ), 0.4, 0.28 ),
             # A traffic signal's lenses while they're dark: tinted glass over a black reflector, glossy.
@@ -3566,9 +4150,21 @@ PAINTED = { "rw_car_grey": ( ( 74, 78, 83 ), 0.4, 0.3 ),            # a metallic
             "rw_rotunda_panel": ( ( 80, 88, 94 ), 0.25, 0.5 ),
             "rw_zinc": ( ( 150, 155, 158 ), 0.35, 0.42 ) }
 # Textured glass on shaders/glass.shader (its texture's colour, normal and roughness): paint: absorption.
-TEXTURED_GLASS = { "rw_glass_roof": 0.45 }
+TEXTURED_GLASS = { "rw_glass_roof": 0.85 }
+# How much each textured glass blurs what is behind it (glass.shader's g_flBlurAmount): rolled glass diffuses.
+GLASS_BLUR = { "rw_glass_roof": 0.5 }
 # Paints whose picture's bottom edge stands at z 0 (two storeys a tile).
-ANCHORED = { "rw_facade_cream", "rw_facade_ochre", "rw_facade_grey", "rw_facade_rose" }
+ANCHORED = { "rw_facade_cream", "rw_facade_ochre", "rw_facade_grey", "rw_facade_rose", "rw_lime_dado",
+             "rw_container_blue", "rw_container_red", "rw_container_green", "rw_container_orange", "rw_container_grey" }
+# Textures whose files go in a folder of their own under materials/railhead: Railhead's containers are anchored and
+# 48 x 102 in (round 2), and Lowtide's dressing still points at the old square materials/railhead/rw_container_*.vmat,
+# so Railhead's live in materials/railhead/containers and the old ones stay as they are for Lowtide.
+TEXTURE_SUBDIR = { "container": "containers" }
+# Paints whose picture isn't square in the world: g_vTexCoordScale ( u, v ). The containers' walls are 48 in across by
+# 102 in (a box's height) up the picture.
+TEXCOORD_SCALE = { f"rw_container_{c}": ( 1.0, CONTAINER_WIDTH / CONTAINER_HEIGHT ) for c, _ in CONTAINER_COLOURS }
+# railhead_finish's paints, under materials/railhead/finish.
+FINISH_PAINTS = { "rw_lime", "rw_lime_dark", "rw_lime_dado", "rw_brick", "rw_brick_dark" }
 # Paints whose picture's v runs along the polygon's longest edge.
 GRAIN = { "rw_sleeper_wood", "rw_wood", "rw_rail", "rw_rail_head", "rw_coping", "rw_kerb" }
 # Atlases: paint: ( width, height, { name: ( x0, y0, x1, y1 ) } ), px with the origin at the top left.
@@ -3608,6 +4204,9 @@ def paints():
         out[p] = ( "painted", 96.0 )
     for p in OWN_SCRIPT:
         out[p] = ( p, 1.0 )
+    # railhead_finish's lime plaster and brick (materials/railhead/finish, material_path()).
+    import railhead_finish
+    out.update( railhead_finish.PAINTS )
     return out
 
 
@@ -3618,6 +4217,11 @@ def tile_units( paint_name ):
 def material_path( paint_name ):
     if paint_name in ("rw_luggage_body", "rw_luggage_markings"):
         return f"{RESOURCE_DIR}/luggage/{paint_name}.vmat"
+    if paint_name in FINISH_PAINTS:
+        return f"{RESOURCE_DIR}/finish/{paint_name}.vmat"
+    for texture, sub in TEXTURE_SUBDIR.items():
+        if paint_name in TEXTURE_PAINTS.get( texture, () ):
+            return f"{RESOURCE_DIR}/{sub}/{paint_name}.vmat"
     return f"{RESOURCE_DIR}/{paint_name}.vmat"
 
 
@@ -3631,30 +4235,55 @@ def rect_uv( atlas, name ):
 # ---------------------------------------------------------------------------------------------------------------------
 # Writing
 
+def save_image( image, path ):
+    """ Saves through a temporary file beside the picture, renamed over it once complete (map_kit.write_text's way): the
+    open editor compiles a changed picture straight away and holds it while it does, so writing it in place can fail
+    (OSError 22) or leave the editor half a file. A failed rename is tried again for up to 10 s. """
+    path = Path( path )
+    # Not named as a picture, so the editor's asset system doesn't take the temporary file up (it gave one a .meta).
+    temp = path.with_name( path.name + ".writing" )
+    image.save( temp, format={ ".jpg": "JPEG", ".jpeg": "JPEG" }.get( path.suffix.lower(), "PNG" ), optimize=True )
+    for attempt in range( 20 ):
+        try:
+            temp.replace( path )
+            return
+        except OSError:
+            if attempt == 19:
+                raise
+            time.sleep( 0.5 )
+
+
 def save_grey( path, a ):
-    Image.fromarray( np.clip( np.rint( np.asarray( a, float ) * 255 ), 0, 255 ).astype( np.uint8 ), "L" ).save( path, optimize=True )
+    save_image( Image.fromarray( np.clip( np.rint( np.asarray( a, float ) * 255 ), 0, 255 ).astype( np.uint8 ), "L" ), path )
 
 
 def save_rgb( path, a ):
-    Image.fromarray( np.clip( np.rint( a ), 0, 255 ).astype( np.uint8 ), "RGB" ).save( path, optimize=True )
+    save_image( Image.fromarray( np.clip( np.rint( a ), 0, 255 ).astype( np.uint8 ), "RGB" ), path )
 
 
-def vmat( paint_name, texture, metalness, extra ):
-    ao_path = f"{RESOURCE_DIR}/{texture}_ao.png" if "ao" in extra else DEFAULT_AO
+def vmat( paint_name, texture, metalness, extra, resource=RESOURCE_DIR ):
+    ao_path = f"{resource}/{texture}_ao.png" if "ao" in extra else DEFAULT_AO
     lines_ = [ "// Tools/railhead_materials.py", '"Layer0"', "{", '    shader "shaders/complex.shader"', '    F_SPECULAR "1"' ]
     if paint_name in ALPHA_TESTED:
         lines_ += [ '    F_ALPHA_TEST "1"', '    F_RENDER_BACKFACES "1"',
-                    f'    TextureTranslucency "{RESOURCE_DIR}/{texture}_trans.png"',
+                    f'    TextureTranslucency "{resource}/{texture}_trans.png"',
                     '    g_flAlphaTestReference "0.5"', '    g_flAntiAliasedEdgeStrength "1"' ]
     if paint_name in ILLUM:
-        mask = f"{RESOURCE_DIR}/{texture}_illum.png" if "illum" in extra else "[1.000000 1.000000 1.000000 0.000000]"
+        mask = f"{resource}/{texture}_illum.png" if "illum" in extra else "[1.000000 1.000000 1.000000 0.000000]"
         lines_ += [ '    F_SELF_ILLUM "1"', f'    TextureSelfIllumMask "{mask}"',
                     f'    g_flSelfIllumBrightness "{ILLUM[paint_name]:.2f}"', '    g_flSelfIllumAlbedoFactor "1.0"',
                     '    g_vSelfIllumTint "[1.000000 1.000000 1.000000 0.000000]"' ]
-    lines_ += [ '    g_flRoughnessScaleFactor "1"', f'    g_flMetalness "{METALNESS.get( paint_name, metalness ):.2f}"',
-                f'    TextureColor "{RESOURCE_DIR}/{paint_name}_color.png"',
-                f'    TextureNormal "{RESOURCE_DIR}/{texture}_normal.png"',
-                f'    TextureRoughness "{RESOURCE_DIR}/{texture}_rough.png"',
+    if paint_name in TEXCOORD_SCALE:
+        su, sv = TEXCOORD_SCALE[paint_name]
+        lines_.append( f'    g_vTexCoordScale "[{su:.7f} {sv:.7f}]"' )
+        if paint_name in ANCHORED and abs( sv - 1.0 ) > 1e-6:
+            # The engine flips v on import (1 - v) before the scale, so an anchored picture scaled by sv starts sv up
+            # its height instead of at its foot: the containers showed their rail band at z 48. This puts it back.
+            lines_.append( f'    g_vTexCoordOffset "[0.0000000 {-sv:.7f}]"' )
+    lines_ += [ f'    g_flRoughnessScaleFactor "{ROUGH_EXP.get( paint_name, 1.0 ):g}"', f'    g_flMetalness "{METALNESS.get( paint_name, metalness ):.2f}"',
+                f'    TextureColor "{resource}/{paint_name}_color.png"',
+                f'    TextureNormal "{resource}/{texture}_normal.png"',
+                f'    TextureRoughness "{resource}/{texture}_rough.png"',
                 f'    TextureAmbientOcclusion "{ao_path}"',
                 '    g_vColorTint "[1.0 1.0 1.0 1.0]"',
                 '    g_flModelTintAmount "1.0"', "}" ]
@@ -3713,7 +4342,7 @@ def textured_glass_vmat( paint_name, texture, absorption ):
              '    shader "shaders/glass.shader"\n'
              '    F_GLASS_QUALITY "2"\n'
              '    g_bFogEnabled "1"\n'
-             '    g_flBlurAmount "0.12"\n'
+             f'    g_flBlurAmount "{GLASS_BLUR.get( paint_name, 0.12 ):.2f}"\n'
              '    g_flRefractionStrength "1.004"\n'
              f'    AlbedoAbsorption "{absorption:.2f}"\n'
              '    g_flTintColor "[1.000000 1.000000 1.000000 0.000000]"\n'
@@ -3744,8 +4373,16 @@ def write_texture( name, out_dir ):
     normal = gl_normals( height, strength * size / 1024.0 )
     if name == "concrete":
         colours, rough, normal = railhead_scanned.concrete_detail( colours, rough, normal )
-    elif name == "dressed":
-        colours, rough, normal = railhead_scanned.dressed_detail( colours, rough, normal )
+    # dressed() takes the scan's grain block by block itself (railhead_scanned.sandstone_grain): dressed_detail's one
+    # stretched patch faded out at every tile edge, a grid on long cornices.
+    if "detail_normal" in extra:
+        # A finer detail normal (0..1, OpenGL) over the drawn relief, at its strength.
+        detail, amount = extra.pop( "detail_normal" )
+        normal = railhead_scanned.combine_normals( normal * 0.5 + 0.5, detail, amount ) * 2 - 1
+    resource = RESOURCE_DIR
+    if name in TEXTURE_SUBDIR:
+        out_dir = Path( out_dir ) / TEXTURE_SUBDIR[name]
+        resource = f"{RESOURCE_DIR}/{TEXTURE_SUBDIR[name]}"
     out_dir.mkdir( parents=True, exist_ok=True )
     save_rgb( out_dir / f"{name}_normal.png", ( normal * 0.5 + 0.5 ) * 255 )
     save_grey( out_dir / f"{name}_rough.png", np.clip( rough, 0, 1 ) )
@@ -3760,7 +4397,7 @@ def write_texture( name, out_dir ):
         if paint_name in TEXTURED_GLASS:
             text = textured_glass_vmat( paint_name, name, TEXTURED_GLASS[paint_name] )
         else:
-            text = vmat( paint_name, name, metalness, extra )
+            text = vmat( paint_name, name, metalness, extra, resource )
         ( out_dir / f"{paint_name}.vmat" ).write_text( text, encoding="utf-8", newline="\n" )
     scale = f"{units:g} units a tile, {size / units:.1f} px an inch" if units > 1 else "explicit UVs"
     print( f"wrote {name}: {', '.join( colours )} ({size} px, {scale})", flush=True )

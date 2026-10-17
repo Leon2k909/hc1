@@ -1,0 +1,14 @@
+// Tools/railhead_dress_detail.py (rw_asphalt, tinted)
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1.1"
+    g_flMetalness "0.00"
+    TextureColor "materials/railhead/rw_asphalt_color.png"
+    TextureNormal "materials/railhead/asphalt_normal.png"
+    TextureRoughness "materials/railhead/asphalt_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.860 0.850 0.840 1.0]"
+    g_flModelTintAmount "1.0"
+}

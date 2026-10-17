@@ -3586,7 +3586,97 @@ simulate_input.
   - The log's one Railhead error, `Error loading resource file "prefabs/game_modes/team_deathmatch.prefab,
     prefabs/game_modes/bomb_defusal.prefab_c"`, is harmless. The engine's dependency scan reads the scene's
     `GameModes` metadata (`MapInformation`'s ", "-joined list) as a path, and every scene with two modes gets it.
-  - None of it has been checked in the engine: the lighting, the navmesh, bots and the modes' objects.
+  - None of it was checked in the engine then. The AAA pass (below) checked the navmesh and the look.
+- The AAA pass (2026-10-16/17, the user's goal "get railhead AAA with a workflow"). Round 1 was a workflow of five
+  areas (materials, structure, props, dressing, backdrop), each building into its own stage
+  (`output/railhead/stage/<area>`, `railhead_map.py --stage DIR`) and judged from Cycles renders
+  (`railhead_render.py`), then merged into Assets and judged again from engine captures. The user then asked for no
+  more subagents, for the usage, so round 2 was done directly. What each area added:
+  - Materials (`railhead_materials.py`, `railhead_finish.py`, `railhead_scanned.py`):
+    - milky, sooty rolled roof glass;
+    - a light marble terrazzo in panels with brass strips and matte walking lanes, and a coursed sandstone ashlar.
+      Round 1's small chips mipped to a vinyl-like speckle; round 2's large Venetian chips, a quarter of them dark at
+      full colour on a darker matrix, read as gravel from 3 m in the engine. Round 3 (`TERRAZZO_CHIPS`,
+      `TERRAZZO_MATRIX`, `TERRAZZO_GROUND`): mostly light chips, the dark and red ones a scattering, ground part of the
+      way to a lighter matrix, so it's calm at a distance and still terrazzo close up;
+    - dressed stone in beds with iron blotches and chisel marks (round 2: it read as painted MDF);
+    - lime plaster (plain, sooted and dado) and a Reichsformat brick in cross bond (`railhead_finish.py`);
+    - riveted iron with rivet rows and chipping, and powder-coated steel;
+    - basalt ballast with dark voids, oil-soaked sleepers, paired granite kerbs and granite setts;
+    - the asphalt. Round 2 took its baked wheel paths back to two faint ones (`ASPHALT_WHEEL_PATHS`): with the
+      dressing's they read as four black scribbles a lane. Its sealed cracks are off (`SEALED_CRACKS` 0), as they
+      repeated down the road every tile.
+    - Tile sizes changed (paving 240, sandstone 192, steel 128, glass roof 192, kerb 96): rebuild the models after a
+      material change, since their UVs come from `paints()`.
+  - Structure (all drawn only: every station box and hull is as it was, east and west 322/38, centre 193/134, roof
+    0/142):
+    - `railhead_architecture.py`: one-casting shed columns with bases, capitals and spandrel brackets, the valley
+      girder's flanges and rivets, the canopies' structure, and the booking hall's pilasters, entablature, dado,
+      archivolts and doors. Its shapes come from `railhead_profiles.py`.
+    - `railhead_structure_detail.py` (round 2), after the engine captures showed a flat dark footbridge, blank white
+      stair parapets and plain punched wing fronts: the footbridge's riveted plate-girder sides, precast parapets
+      with V joints, the goods sheds' braced sliding doors on roller hangers, the wings' cab-road fronts (archivolts,
+      Lisenen, window surrounds, a dentilled cornice), and soot run-off on the shed's arcade.
+    - `railhead_ironwork.py` (bridge and column details) and `railhead_structure_paints.py` (parapets, roof sarking,
+      the footbridge's panels, the goods shed's doors).
+  - Props:
+    - `railhead_running_gear.py`: wheelsets and bogies for every rail vehicle.
+    - `railhead_roof_kit.py`: the EMU's roof equipment and cab doors.
+    - `railhead_vehicle_kit.py`: the road vehicles' set-in glazing, cab interiors and lamps.
+    - `railhead_ohl.py`: DB Re 200 overhead line and the Ks signals' fittings.
+    - `railhead_furniture.py`: street, platform and yard furniture.
+    - `railhead_prop_materials.py`: their materials, with the buffer stops', train's, ticket machine's and
+      luggage's own scripts.
+  - Dressing (`railhead_dress_detail.py`, `railhead_map.py`):
+    - a working station's wall kit: conduits, City-Light posters, a help point, signs and notice boards;
+    - gullies and manholes, more lights (168), and the cab rank with taxis, bollards and a taxi post.
+    - Two Retakes spawns at site A moved, so `check_retakes_sight` is 0 (it was 2).
+    - Small props collide, as everything drawn on the map does: benches, 1 m bins, bollards, lamp posts, a skip,
+      tyres, drums, the info pillars, and the bins beside the footbridge's stair openings.
+  - Backdrop (`railhead_backdrop.py`, `railhead_backdrop_art.py`): the tenements' balconies, awnings and fascias,
+    the near shops, and a far city in place of grey boxes. The Rotunde card is rebaked in Cycles by
+    `railhead_rotunda_rebake.py` (one GPU render at a time, `output/railhead/stage/.gpu-lock`).
+- Rebuilding into Assets, in this order (A = the absolute path of Assets):
+  1. The materials: `railhead_materials.py [names]`, `railhead_finish.py --stage Assets --only`,
+     `railhead_structure_paints.py <A>`, `railhead_prop_materials.py --out <A>`, `railhead_buffer.py --out <A>`,
+     `railhead_train.py --out <A>`, the ticket machine's and luggage's scripts, `railhead_backdrop_art.py <A> --force`,
+     `railhead_sky.py` and `railhead_rotunda_rebake.py <A> --samples 128`. Run `railhead_finish` after
+     `railhead_ironwork`, which writes the old scanned brick.
+  2. `python Tools/railhead_map.py` (~10 min).
+  3. In the editor, `Sources/Railhead/editor/compile-stale.cs.txt` (run_csharp; `output/railhead/compile.json` picks
+     `only`, `limit` and `force`): the materials (in batches of ~80 under the CLI's timeout), then the models, then the
+     scene. The open editor's file watcher compiles each model and the scene as the build writes them.
+     - Don't force-compile the models. On 2026-10-17 that held the editor's main thread for over two minutes ("Stall
+       detected") on the 2.5 million triangles, and the editor closed and was reopened.
+     - Check them instead with `model-check.cs.txt`, which only loads the compiled models. It writes each one's
+       collision hulls (a box is a hull) and materials to `output/railhead/model-check.json`, to compare with the
+       build's counts and the vmdls' remaps. A remap whose `usemtl` group has no faces isn't in the compiled model
+       (the roof's `rw_steel`).
+     - The file watcher can compile a model from its new OBJ before its new vmdl is written. The check catches that.
+  4. `capture.cs.txt` (views in `output/railhead/captures/config.json`, textures at 1024) and `navmesh-check.cs.txt`.
+- An anchored paint (`ANCHORED`: its picture's foot at z 0) with a v scale (`TEXCOORD_SCALE`: the containers' 48 x
+  102 in walls) also needs a v offset of minus the scale (`g_vTexCoordOffset`, written by `vmat()`). The engine flips
+  v on import (1 - v) before `uv * g_vTexCoordScale + g_vTexCoordOffset`, so without it the picture started 48/102 up
+  the wall, and the bomb B container wore its rail's dark band and rust across its middle (z 48). Containers stand
+  only at z 0 and 102 (stacked), where the anchor holds.
+- An alpha-tested picture must be a power of two on both sides: the engine can't make the alpha-weighted mips of
+  `bd_vinyl`'s 256 x 384 ("Cannot filter non-power-of-two texture"), and the material fails. It's 256 x 512 now.
+- The open editor compiles a changed picture as it lands and holds it while it does, so writing one in place failed
+  (OSError 22). `railhead_materials.save_image` writes through a temporary file renamed over the picture, retried for
+  up to 10 s.
+- The indirect light (`Sources/Railhead/lighting`, `Assets/lighting/railhead/daylight-v3`: grid 30,21,8, intensity
+  2.4) was baked on 2026-10-14, before the AAA pass. To rebake: open Railhead in the editor (ask first: it's shared),
+  run `bake-lighting.cs.txt` (`output/railhead/quality/bake-config.json` names the folder), then
+  `python Tools/railhead_quality_lighting.py <folder>` and rebuild the scene.
+- Checked in the editor on 2026-10-17, after rounds 2 and 3:
+  - every compiled model matches the build (`model-check.cs.txt`);
+  - 37 views captured (`output/railhead/captures/round2`, the round 3 fixes in `round3`);
+  - the navmesh check found complete paths from both teams' first spawns to all 99 spawns, sites, objectives and cash
+    spots.
+  Not checked yet:
+  - a match played on it, its bots, and the modes' objects in play;
+  - the indirect light rebake.
+  Still open from the critique: the road vehicles' plain bodies, the EMU's flat red paint, and the yard's skip.
 
 ## Lowtide (multiplayer map, `Tools/lowtide_map.py`)
 - Footbridge UV repair (2026-10-14): `Tools/lowtide_bridge.py` now compensates for the OBJ import's

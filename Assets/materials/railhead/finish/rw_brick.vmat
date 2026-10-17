@@ -1,0 +1,15 @@
+// Tools/railhead_finish.py: Reichsformat brick, cross bond, 133.3 in tile over the models' 64 in UVs.
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flMetalness "0"
+    g_flRoughnessScaleFactor "1"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1"
+    g_vTexCoordScale "[0.4800005 0.4800005]"
+    TextureColor "materials/railhead/finish/brick_color.png"
+    TextureNormal "materials/railhead/finish/brick_normal.png"
+    TextureRoughness "materials/railhead/finish/brick_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+}

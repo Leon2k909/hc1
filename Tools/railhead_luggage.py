@@ -8,6 +8,7 @@ All sizes below are inches. The cart's long axis is local Y, with its drawbar at
 
 from contextlib import contextmanager
 import math
+from pathlib import Path
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
@@ -674,7 +675,11 @@ def materials():
     markings()
 
 
-def markings():
+def markings(out=None):
+    """The trolley's stencilled markings (an alpha-tested atlas). out: the folder to write them to (default Assets'
+    materials/railhead/luggage; a stage's for staged builds: write_markings(root))."""
+    out = MATERIALS if out is None else Path(out)
+    out.mkdir(parents=True, exist_ok=True)
     image = Image.new("RGBA", (2048, 1024))
     d = ImageDraw.Draw(image)
     font = K.ASSETS / "fonts/Dinish-Bold.ttf"
@@ -691,7 +696,8 @@ def markings():
                 break
 
     d.rounded_rectangle((26, 26, 230, 198), radius=22, outline=white, width=10)
-    fit("DB", (40, 40, 216, 184), white)
+    # The fleet owner's mark: the made-up regional operator the trains carry (railhead_train), not a real one.
+    fit("rhv", (40, 40, 216, 184), white)
     fit("L-312", MARK_RECTS["number"], white)
     fit("Zul. Gesamtgew. 2000 kg", MARK_RECTS["weight"], white, False)
     # Upright and fragile pictograms, matching the shipping crates in the photo.
@@ -728,11 +734,11 @@ def markings():
     mask[250:640, :420] = True
     rgba[:, :, 3][mask & (dirt < .022)] = 0
     image = Image.fromarray(rgba)
-    image.save(MATERIALS / "luggage_markings_color.png")
-    image.getchannel("A").save(MATERIALS / "luggage_markings_alpha.png")
-    Image.new("RGB", image.size, (128, 128, 255)).save(MATERIALS / "luggage_markings_normal.png")
-    Image.new("L", image.size, 195).save(MATERIALS / "luggage_markings_roughness.png")
-    K.write_text(MATERIALS / f"{INK}.vmat", f'''"Layer0"
+    image.save(out / "luggage_markings_color.png")
+    image.getchannel("A").save(out / "luggage_markings_alpha.png")
+    Image.new("RGB", image.size, (128, 128, 255)).save(out / "luggage_markings_normal.png")
+    Image.new("L", image.size, 195).save(out / "luggage_markings_roughness.png")
+    K.write_text(out / f"{INK}.vmat", f'''"Layer0"
 {{
     shader "shaders/complex.shader"
     F_SPECULAR "1"
@@ -804,6 +810,11 @@ def emit(model, e, n, along="n", z0=0, loaded=True):
         model.hulls.append(([transform(p) for p in pts], surface))
     model.material_overrides.update(source.material_overrides)
     model.tile_overrides.update(source.tile_overrides)
+
+
+def write_markings(root):
+    """Only the markings atlas, into root (laid out as Assets): the integration step's way in for the new mark."""
+    markings(Path(root) / TEX)
 
 
 def missing():

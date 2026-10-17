@@ -21,6 +21,10 @@ import numpy as np
 
 import map_kit as K
 import railhead_masonry as M
+import railhead_architecture as A
+import railhead_structure_detail as D
+import railhead_profiles as P
+import railhead_structure_paints as SP
 
 STONE, METAL, SHEET, GLASS, WOOD, DIRT, TILE = "default", "metal", "metal.sheet", "glass", "wood", "dirt", "ceramic"
 
@@ -50,6 +54,7 @@ SOUTH_N = -2400.0       # the play area's south edge
 TRACKS = { "A": 236.0, "B": 416.0, "C": 848.0 }        # track centres, east side (Gleis 4, 5, 6; west 3, 2, 1)
 PLATFORMS = ( ( 0.0, 170.0, ( "+e", ) ), ( 482.0, 782.0, ( "-e", "+e" ) ), ( 914.0, SHED_E, ( "-e", ) ) )
 COPING, RECESS = 20.0, 8.0
+CRIB_DROP = 2.5         # the crib ballast under the sleepers' tops (visual only)
 
 # The head building
 HEAD_N0, HEAD_N1 = 1300.0, 1820.0
@@ -419,9 +424,10 @@ def platform( model, e0, e1, edges ):
         e_back = e_edge - out * COPING
         # The coping: a block on the face, overhanging it.
         c_lo, c_hi = min( e_edge, e_back ), max( e_edge, e_back )
-        model.box( ( c_lo, FLAT_N0, -6 ), ( c_hi, PLATFORM_N1, 0 ),
-                   { "default": "rw_coping", "-z": "rw_concrete_dark", "+n": None,
-                     ( "-e" if edge == "+e" else "+e" ): None } )
+        # Precast slabs about 1 m long with their joints.
+        A.coping( model, c_lo, c_hi, FLAT_N0, PLATFORM_N1, e_back )
+        # The ramp's kerb and handrail on its track side.
+        A.ramp_rail( model, e_edge, RAMP_N0, FLAT_N0, BED_Z, 0.0, out )
         r_lo, r_hi = min( e_edge, e_face ), max( e_edge, e_face )
         model.collision_box( ( r_lo, FLAT_N0, -6 ), ( r_hi, PLATFORM_N1, 0 ), STONE )
         facing( model, "rw_concrete_dark", [ ( e_face, FLAT_N0, BED_Z ), ( e_face, PLATFORM_N1, BED_Z ),
@@ -461,9 +467,16 @@ def ballast( model, e0, e1, n0, n1 ):
             model.polygon( "rw_ballast_old", [ ( a, n0, BED_Z ), ( b, n0, BED_Z ), ( b, n1, BED_Z ), ( a, n1, BED_Z ) ] )
             continue
         cuts = [ n0, n1 ] if n1 <= 640 or n0 >= 640 else [ n0, 640.0, n1 ]
+        # The crib ballast lies 2.5 under the shoulders (and the sleepers' tops), sloping up to them past the
+        # sleepers' ends: visual only, the collision stays at BED_Z.
+        c = ( a + b ) / 2
+        low = BED_Z - CRIB_DROP
+        prof = [ ( a, BED_Z ), ( max( a, c - 52.0 ), low ), ( min( b, c + 52.0 ), low ), ( b, BED_Z ) ]
         for na, nb in zip( cuts, cuts[1:] ):
             paint = "rw_ballast_rusty" if na >= 640 else "rw_ballast"
-            model.polygon( paint, [ ( a, na, BED_Z ), ( b, na, BED_Z ), ( b, nb, BED_Z ), ( a, nb, BED_Z ) ] )
+            for ( ea, za ), ( eb, zb ) in zip( prof, prof[1:] ):
+                if eb - ea > 1e-6:
+                    model.polygon( paint, [ ( ea, na, za ), ( eb, na, zb ), ( eb, nb, zb ), ( ea, nb, za ) ] )
 
 
 def track_bed( model ):
@@ -471,8 +484,8 @@ def track_bed( model ):
     # The trenches between the platforms, then the station throat south of the platforms' ramps.
     for e0, e1 in ( ( 170.0, 482.0 ), ( 782.0, 914.0 ) ):
         ballast( model, e0, e1, RAMP_N0, PLATFORM_N1 )
-        facing( model, "rw_concrete_dark", [ ( e0, PLATFORM_N1, BED_Z ), ( e1, PLATFORM_N1, BED_Z ), ( e1, PLATFORM_N1, 0 ),
-                                             ( e0, PLATFORM_N1, 0 ) ], ( 0, -1, 0 ) )
+        facing( model, "rw_concrete_dark", [ ( e0, PLATFORM_N1, BED_Z - CRIB_DROP ), ( e1, PLATFORM_N1, BED_Z - CRIB_DROP ),
+                                             ( e1, PLATFORM_N1, 0 ), ( e0, PLATFORM_N1, 0 ) ], ( 0, -1, 0 ) )
     ballast( model, 0.0, SHED_E, SOUTH_N, RAMP_N0 )
 
 
@@ -518,8 +531,6 @@ def outer_wall( model, glass ):
         pane( glass, model, "n", ( WALL_IN + SHED_E ) / 2, n - 60, n + 60, 140, 290, "rw_glass_roof", arched=True )
         glazing_bars( model, "n", ( WALL_IN + SHED_E ) / 2, n - 60, n + 60, 140, 288, "rw_steel", across=2, spring=230 )
         glazing_bars( model, "n", ( WALL_IN + SHED_E ) / 2, n - 60, n + 60, 140, 230, "rw_steel", across=0, spring=185 )
-        # Sills.
-        model.box( ( WALL_IN - 4, n - 66, 132 ), ( SHED_E + 4, n + 66, 140 ), "rw_dressed" )
     # The plinth outside and in, the pilasters at the ribs, the cornice and the parapet.
     doors = sorted( [ ( n - 80, n + 80 ) for n in SHED_PORTALS ] + [ ( n - 60, n + 60 ) for n in SHED_ARCHES ] )
     runs, at = [], SHED_N0
@@ -527,22 +538,16 @@ def outer_wall( model, glass ):
         runs.append( ( at, a ) )
         at = b
     runs.append( ( at, SHED_N1 ) )
-    for a, b in runs:
-        model.box( ( SHED_E, a, 0 ), ( SHED_E + 3, b, 36 ), { "default": "rw_dressed_red", "-e": None, "-z": None } )
-        model.box( ( WALL_IN - 3, a, 0 ), ( WALL_IN, b, 30 ), { "default": "rw_dressed_red", "+e": None, "-z": None } )
     for n in RIBS[:-1]:
-        model.box( ( SHED_E, n - 16, 36 ), ( SHED_E + 10, n + 16, 340 ), { "default": "rw_dressed", "-e": None } )
-        model.box( ( WALL_IN - 10, n - 16, 30 ), ( WALL_IN, n + 16, 300 ), { "default": "rw_dressed", "+e": None } )
-        model.box( ( WALL_IN - 22, n - 18, 300 ), ( WALL_IN, n + 18, 316 ), { "default": "rw_dressed", "+e": None } )
+        model.box( ( SHED_E, n - 16, 0 ), ( SHED_E + 10, n + 16, 340 ), { "default": "rw_dressed", "-e": None, "-z": None } )
+        model.box( ( WALL_IN - 10, n - 16, 0 ), ( WALL_IN, n + 16, 300 ), { "default": "rw_dressed", "+e": None, "-z": None } )
+    # Plinth courses, archivolts, imposts, keystones, sills, the inside cornice and the rib corbels' shoes.
+    A.arcade( model, WALL_IN, SHED_E, SHED_ARCHES, SHED_PORTALS, SHED_WINDOWS, RIBS, SHED_N0, SHED_N1 )
     model.box( ( SHED_E, SHED_N0, 340 ), ( SHED_E + 14, SHED_N1, 360 ), { "default": "rw_dressed", "-e": None } )
     model.box( ( SHED_E, SHED_N0, 360 ), ( SHED_E + 6, SHED_N1, 364 ), { "default": "rw_dressed", "-e": None } )
     model.box( ( SHED_E - 14, SHED_N0, WALL_TOP ), ( SHED_E, SHED_N1, WALL_TOP + 40 ),
                { "default": "rw_sandstone", "+z": "rw_dressed" }, STONE )
     model.box( ( SHED_E - 16, SHED_N0, WALL_TOP + 40 ), ( SHED_E + 2, SHED_N1, WALL_TOP + 46 ), "rw_dressed" )
-    # Keystones over the arches, outside.
-    for n in list( SHED_PORTALS ) + list( SHED_ARCHES ):
-        crown = 260.0 if n in SHED_PORTALS else 210.0
-        model.box( ( SHED_E, n - 8, crown - 6 ), ( SHED_E + 4, n + 8, crown + 18 ), "rw_dressed" )
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -575,9 +580,9 @@ def footbridge( model, glass ):
             if b - a < 1:
                 continue
             # The trim owns the exposed joint from 248..252; keep the panel below it.
-            model.box( ( a, wall_lo, DECK_Z ), ( b, wall_hi, 248 ), "rw_steel_dark" )
+            model.box( ( a, wall_lo, DECK_Z ), ( b, wall_hi, 248 ), D.PANEL )
             model.collision_box( ( a, wall_lo, DECK_Z ), ( b, wall_hi, 250 ), SHEET )
-            model.box( ( a, wall_lo - 0.5, 248 ), ( b, wall_hi + 0.5, 252 ), "rw_steel_grey" )
+            model.box( ( a, wall_lo - 0.5, 248 ), ( b, wall_hi + 0.5, 252 ), "rw_steel_dark" )
             pane( glass, model, "e", ( wall_lo + wall_hi ) / 2, a, b, 252, BRIDGE_ROOF - 2, "rw_glass" )
             # Mullions every 60, seated on the cap. Starting below its top made their
             # side faces coincide with the grey trim and flicker at the stair posts.
@@ -585,27 +590,27 @@ def footbridge( model, glass ):
                 e = min( a + 60 * k, b - 1.5 )
                 model.box( ( e, wall_lo - 0.5, 252 ), ( e + 3, wall_hi + 0.5, BRIDGE_ROOF ),
                            { "default": "rw_steel_dark", "-z": None } )
-        # The handrail inside, at the stairs' handrail height. It stops at each stair's opening, turning into the
-        # stair's own handrails (bridge_stair), which come up onto the deck to meet it.
-        rail_n, rail_z = side_n + inward * 6, DECK_Z + 36
-        ends = [ 0.0 ]
-        for a, b in sorted( ( a, b ) for a, b, d in BRIDGE_STAIRS if ( d > 0 ) == ( side_n == n1 ) ):
-            ends += [ a + 1.5 + 1.0, b - 1.5 - 1.0 ]
-        ends.append( WALL_IN )
-        for a, b in zip( ends[::2], ends[1::2] ):
-            model.beam( ( a, rail_n, rail_z ), ( b, rail_n, rail_z ), ( 2.0, 2.0 ), "rw_steel_grey" )
+        # The handrail inside is railhead_architecture.footbridge's: it stops at each stair's opening, turning into
+        # the stair's own handrails (bridge_stair), which come up onto the deck to meet it.
+        # Outside: the girder as a riveted plate girder, and the panels' cover strips, drip and run-off.
+        out = -inward
+        D.bridge_girder_outer( model, side_n, out, WALL_IN, [ ( a - 8, b + 8 ) for a, b in gaps[side_n] ], DECK_Z - 32, DECK_Z )
+        D.bridge_panel_outer( model, side_n, out, runs, DECK_Z, 248.0, seed=int( abs( side_n ) ) )
     model.box( ( 0, n0 - 6, BRIDGE_ROOF ), ( WALL_IN, n1 + 6, BRIDGE_ROOF + 6 ),
-               { "+z": "corrugated", "-z": "rw_steel_grey", "default": "rw_steel_dark", "-e": None }, SHEET )
+               { "+z": "corrugated", "-z": "corrugated", "default": "rw_steel_dark", "-e": None }, SHEET )
     for k in range( int( WALL_IN // 120 ) ):
-        luminaire( model, ( 60.0 + 120.0 * k, ( n0 + n1 ) / 2, BRIDGE_ROOF ), "e" )
+        luminaire( model, ( 60.0 + 120.0 * k, ( n0 + n1 ) / 2, BRIDGE_ROOF ), "n" )
+    A.footbridge( model, n0, n1, BRIDGE_ROOF, DECK_Z, WALL_IN, ( 510.0, 755.0, 935.0 ), BRIDGE_STAIRS, DECK_Z + 36 )
     for e0, e1, down in BRIDGE_STAIRS:
         bridge_stair( model, e0, e1, down )
 
 
 def bridge_column_pair( model, e ):
     for n in ( BRIDGE_N0 + 4, BRIDGE_N1 - 4 ):
-        model.box( ( e - 5, n - 5, 0 ), ( e + 5, n + 5, DECK_Z - 32 ), { "default": "rw_steel_dark", "-z": None }, METAL )
+        model.collision_box( ( e - 5, n - 5, 0 ), ( e + 5, n + 5, DECK_Z - 32 ), METAL )
         model.box( ( e - 9, n - 9, 0 ), ( e + 9, n + 9, 3 ), "rw_steel_dark" )
+        # A round steel column under the girder's bearing shoe (railhead_ironwork).
+        A.round_column( model, e, n, 3.0, 174.0, 5.0, "rw_steel_dark", sides=20 )
 
 
 def bridge_columns_centre( model ):
@@ -622,31 +627,44 @@ def bridge_stair( model, e0, e1, down ):
     length = 16 * tread + 48 + 15 * tread
     bottom_n = top_n + down * length
     climb = -down
-    n = flight( model, "n", bottom_n, climb, e0, e1, 0.0, 16, rise, tread, "rw_paving_dark", "rw_concrete" )
+    n = flight( model, "n", bottom_n, climb, e0, e1, 0.0, 16, rise, tread, "rw_paving_dark", "rw_concrete", nosing=None )
+    A.stair( model, e0, e1, bottom_n, climb, rise, tread, 0.0, 16, first=True )
     landing_z = 16 * rise
     la, lb = min( n, n + climb * 48 ), max( n, n + climb * 48 )
     model.box( ( e0, la, 0 ), ( e1, lb, landing_z ), { "+z": "rw_paving_dark", "default": None }, STONE )
     n2 = n + climb * 48
-    flight( model, "n", n2, climb, e0, e1, landing_z, 15, rise, tread, "rw_paving_dark", "rw_concrete" )
+    flight( model, "n", n2, climb, e0, e1, landing_z, 15, rise, tread, "rw_paving_dark", "rw_concrete", nosing=None )
+    A.stair( model, e0, e1, n2, climb, rise, tread, landing_z, 15, first=False, last=True )
     # The space under the upper flight is solid concrete, closed at the deck end under the girder: open, it was a
     # hollow you could walk into from under the bridge, seen through the flight's undrawn underside.
     na, nb = sorted( ( n2, top_n ) )
     model.collision_box( ( e0, na, 0.0 ), ( e1, nb, landing_z ), STONE )
-    facing( model, "rw_concrete", [ ( e0, top_n, 0.0 ), ( e1, top_n, 0.0 ), ( e1, top_n, DECK_Z - 32 ),
+    facing( model, D.PRECAST, [ ( e0, top_n, 0.0 ), ( e1, top_n, 0.0 ), ( e1, top_n, DECK_Z - 32 ),
                                     ( e0, top_n, DECK_Z - 32 ) ], ( 0, -down, 0 ) )
-    # Concrete parapets on both sides, 40 over the nosings, with a steel handrail.
+    # Precast parapets on both sides, 40 over the nosings, with two steel handrails inside.
+    proud = 1.0
     for w0, w1 in ( ( e0 - 6, e0 ), ( e1, e1 + 6 ) ):
-        sloped_wall( model, w0, w1, bottom_n, n, 0.0, 40.0 + rise, landing_z + 40, "rw_concrete", "rw_concrete_dark", STONE )
-        sloped_wall( model, w0, w1, n, n2, 0.0, landing_z + 40, landing_z + 40, "rw_concrete", "rw_concrete_dark", STONE,
+        sloped_wall( model, w0, w1, bottom_n, n, 0.0, 40.0 + rise, landing_z + 40, D.PRECAST, D.PRECAST, STONE )
+        sloped_wall( model, w0, w1, n, n2, 0.0, landing_z + 40, landing_z + 40, D.PRECAST, D.PRECAST, STONE,
                      ends=False )
-        sloped_wall( model, w0, w1, n2, top_n, 0.0, landing_z + 40, DECK_Z + 40, "rw_concrete", "rw_concrete_dark", STONE )
-        e_rail = w1 + 1.5 if w0 < e0 else w0 - 1.5
-        for a, za, b, zb in ( ( bottom_n, 36.0, n, landing_z + 36 ), ( n, landing_z + 36, n2, landing_z + 36 ),
-                              ( n2, landing_z + 36, top_n, DECK_Z + 36 ) ):
-            tube( model, ( e_rail, a, za ), ( e_rail, b, zb ), 1.0, "rw_steel_grey", sides=8 )
-        # On over the deck's edge to the bridge's handrail (footbridge), which ends at this one.
-        tube( model, ( e_rail, top_n, DECK_Z + 36 ), ( e_rail, top_n - down * 6, DECK_Z + 36 ), 1.0, "rw_steel_grey",
-              sides=8 )
+        sloped_wall( model, w0, w1, n2, top_n, 0.0, landing_z + 40, DECK_Z + 40, D.PRECAST, D.PRECAST, STONE )
+        face = w1 if w0 < e0 else w0
+        side = 1.0 if w0 < e0 else -1.0
+        e_rail = face + side * ( proud + 2.6 )
+        segments = ( ( bottom_n, n, 40.0 + rise, landing_z + 40 ), ( n, n2, landing_z + 40, landing_z + 40 ),
+                     ( n2, top_n, landing_z + 40, DECK_Z + 40 ) )
+        # Two round handrails ( 900 and 700 mm ), on over the deck's edge to the bridge's handrail, which ends at this
+        # one; grime streaks run down the panels from their brackets.
+        A.stair_rails( model, e_rail, face + side * proud, [ ( bottom_n, 0.0 ), ( n, landing_z ), ( n2, landing_z ),
+                                                              ( top_n, DECK_Z ), ( top_n - down * 6.8, DECK_Z ) ],
+                       streak=side )
+        # 2.4 m precast panels with V joints on both faces (a kick plinth outside), and a chamfered cap.
+        out = -side
+        face_out = w0 if w0 < e0 else w1
+        for na, nb, ta, tb in segments:
+            D.precast_panels( model, face_out, out, na, nb, ta, tb, proud=proud, plinth=8.0 )
+            D.precast_panels( model, face, side, na, nb, ta, tb, proud=proud )
+            D.parapet_cap( model, w0, w1, na, nb, ta, tb, overhang=proud + 1.2 )
     # Its bottom: a yellow line on the platform where the stair starts.
     na, nb = sorted( ( bottom_n, bottom_n - climb * 12 ) )
     model.polygon( "rw_line_yellow", [ ( e0, na, 0.05 ), ( e1, na, 0.05 ), ( e1, nb, 0.05 ), ( e0, nb, 0.05 ) ] )
@@ -661,20 +679,14 @@ def canopies( model ):
         model.box( ( e0, n0, CANOPY_Z ), ( e1, n1, CANOPY_Z + 6 ),
                    { "+z": "corrugated", "-z": "rw_steel_grey", "default": "rw_steel_dark", "-e": None if e0 == 0 else "rw_steel_dark" },
                    SHEET )
-        model.box( ( e0, n0, CANOPY_Z + 6 ), ( e1, n0 + 2, CANOPY_Z + 14 ), "rw_steel_dark" )
-        # Cross beams every 120, and a spine on the column line.
+        # The structure under the sheeting: cantilevers off a spine on the column line, purlins, fascias and gutters.
         spine = col if col is not None else 0.0
-        n = n0 + 20
-        while n < n1:
-            model.box( ( e0 + ( 0 if e0 == 0 else 2 ), n - 3, CANOPY_Z - 8 ), ( e1 - 2, n + 3, CANOPY_Z ), "rw_steel_dark" )
-            n += 120
+        A.canopy_roof( model, e0, e1, spine, CANOPY_Z, n0, n1, [ e1 ] if col is None else [ e0, e1 ] )
         if col is not None:
-            model.box( ( col - 5, n0, CANOPY_Z - 12 ), ( col + 5, n1, CANOPY_Z ), "rw_steel_dark" )
+            A.canopy_spine( model, col, CANOPY_Z, n0, n1 )
             for cn in CANOPY_COLUMNS_N:
-                model.box( ( col - 5, cn - 5, 0 ), ( col + 5, cn + 5, CANOPY_Z - 12 ), { "default": "rw_steel_dark", "-z": None }, METAL )
-                model.box( ( col - 10, cn - 10, 0 ), ( col + 10, cn + 10, 4 ), "rw_steel_dark" )
-                for s in ( -1, 1 ):      # knee braces
-                    model.beam( ( col, cn, CANOPY_Z - 50 ), ( col + s * 50, cn, CANOPY_Z - 10 ), ( 3.0, 3.0 ), "rw_steel_dark" )
+                model.collision_box( ( col - 5, cn - 5, 0 ), ( col + 5, cn + 5, CANOPY_Z - 12 ), METAL )
+                A.canopy_column( model, col, cn, CANOPY_Z )
         # Lamps under it, in lines along it.
         for le in ( ( e0 + e1 ) / 2 - 70, ( e0 + e1 ) / 2 + 70 ) if e1 - e0 > 200 else ( ( e0 + e1 ) / 2 + 20, ):
             n = n0 + 50
@@ -838,10 +850,14 @@ def goods_shed( model, glass ):
         for n in GOODS_DOORS:
             a, b = sorted( ( face, face + sgn * 3 ) )
             model.box( ( a, n - 70, 180 ), ( b, n + 70, 190 ), "rw_steel_dark" )
-            # The sliding door, pushed open beside the opening.
+            # The sliding door, pushed open beside the opening: framed, ledged and braced boards hung from the track.
             a2, b2 = sorted( ( face + sgn * 3, face + sgn * 6 ) )
-            model.box( ( a2, n + 62, floor + 2 ), ( b2, n + 182, 178 ), { "default": "planks", "-z": None } )
+            D.sliding_door( model, face, sgn, n + 62, n + 182, floor + 2, 178 )
             model.collision_box( ( a2, n + 62, floor + 2 ), ( b2, n + 182, 178 ), WOOD )
+        # The doors' top track over the lintels, on brackets at the lintels' ends and between them.
+        brackets = [ m + k for m in GOODS_DOORS for k in ( -60.0, 60.0 ) ] + [ GOODS_DOORS[-1] + 150.0 ]
+        D.door_track( model, face, sgn, GOODS_DOORS[0] - 66.0, min( GOODS_DOORS[-1] + 190.0, n1 + 20.0 ), 187.0,
+                      [ b for b in brackets if b < n1 - 4 ] )
     for wall_n, out in ( ( n1 - t, "+n" ), ( n0, "-n" ) ):
         w = M.Wall( "e", ( e0 + t, e1 - t ), ( wall_n, wall_n + t ), ( floor, eave_z ), out )
         if out == "+n":
@@ -878,6 +894,8 @@ def goods_shed( model, glass ):
         for s in ( -1, 1 ):
             model.beam( ( ridge_e + s * ( ridge_e - e0 - t ), n, eave_z ), ( ridge_e, n, ridge_z - 2 ), ( 6.0, 7.0 ), "planks_dark" )
         n += 120
+    # Rafter feet, gutters and downpipes, bargeboards and a plinth course.
+    A.goods_shed( model, e0, e1, n0, n1, floor, eave_z, ridge_z, over, GOODS_DOORS, t=t )
     # Skylights in the roof's west slope, between the trusses.
     for n in ( -2080.0, -1840.0 ):
         a = e0 + 50
@@ -929,12 +947,9 @@ def head_wing( model, glass ):
     for n in ( 1380.0, 1600.0, 1720.0 ):
         pane( glass, model, "n", ( WALL_IN + SHED_E ) / 2, n - 35, n + 35, 50, 180, "rw_glass", arched=True )
         glazing_bars( model, "n", ( WALL_IN + SHED_E ) / 2, n - 35, n + 35, 50, 178, "rw_steel_dark", across=1, spring=145 )
-    for n in ( 1400.0, 1520.0, 1640.0, 1740.0 ):
-        blind_window( model, "n", SHED_E, 1.0, n - 30, n + 30, 260, 380 )
     model.box( ( SHED_E, HEAD_N0, 0 ), ( SHED_E + 3, 1430.0, 36 ), { "default": "rw_dressed_red", "-e": None } )
     model.box( ( SHED_E, 1530.0, 0 ), ( SHED_E + 3, HEAD_N1, 36 ), { "default": "rw_dressed_red", "-e": None } )
-    model.box( ( SHED_E, HEAD_N0, 210 ), ( SHED_E + 6, HEAD_N1, 222 ), { "default": "rw_dressed", "-e": None } )
-    model.box( ( SHED_E, HEAD_N0, 440 ), ( SHED_E + 10, HEAD_N1, 456 ), { "default": "rw_dressed", "-e": None } )
+    wing_front( model )
     # The room's ceiling, its columns, and the upper floor's slab; the flat roof.
     model.box( ( e0, HALL_N0, WING_CEILING ), ( WALL_IN, HALL_N1, WING_CEILING + 12 ), { "-z": "render_cream", "default": None }, STONE )
     for n in ( 1480.0, 1640.0 ):
@@ -974,6 +989,47 @@ def head_wing( model, glass ):
     model.box( ( cx - 2, cy - 2, apex - 4 ), ( cx + 2, cy + 2, apex + 40 ), "copper" )
 
 
+WING_DOOR = ( 1480.0, 100.0, 200.0 )                         # centre, width, crown
+WING_LIGHTS = ( 1380.0, 1600.0, 1720.0 )                    # the travel centre's windows: 70 wide, 50..180
+WING_UPPER = ( 262.0, 378.0 )                                # the upper storey's windows (60 wide), over the ones below
+
+
+def wing_front( model ):
+    """ The wing's face to the cab road (e SHED_E, facing +e), dressed like the south front: archivolts with imposts
+    and keystones on the ground floor's arches, a moulded string course, the upper storey's windows on the ground
+    floor's axes in moulded surrounds with hoods and sills, Lisenen between the bays and at the corners, and a
+    dentilled main cornice. """
+    at = SHED_E
+    c, width, crown = WING_DOOR
+    A.arch_trim( model, "n", at, 1.0, c, crown - width / 2, width / 2, key=( 16.0, 26.0 ), band=7.0, proud=4.5,
+                 impost_w=8.0 )
+    for n in WING_LIGHTS:
+        A.arch_trim( model, "n", at, 1.0, n, 145.0, 35.0, key=( 10.0, 17.0 ), band=5.0 if n < c else 6.0, proud=4.0,
+                     impost_w=8.0, impost=n > c )
+    # The string course between the storeys.
+    string = [ ( 0.0, 0.0 ), ( 3.5, 0.0 ), ( 3.5, 1.0 ), ( 5.6, 2.6 ), ( 5.6, 8.0 ), ( 4.6, 9.0 ), ( 4.6, 11.0 ), ( 0.0, 12.0 ) ]
+    P.straight( model, "n", at, HEAD_N0, HEAD_N1, 210.0, 1.0, string, "rw_dressed" )
+    # The upper storey's windows: dark glass behind casement frames, in moulded surrounds.
+    z0, z1 = WING_UPPER
+    for n in ( WING_LIGHTS[0], c ) + WING_LIGHTS[1:]:
+        r0, r1 = n - 30.0, n + 30.0
+        facing( model, "rw_window_dark", [ ( at + 0.2, r0, z0 ), ( at + 0.2, r1, z0 ), ( at + 0.2, r1, z1 ), ( at + 0.2, r0, z1 ) ], ( 1, 0, 0 ) )
+        transom = z0 + ( z1 - z0 ) * 0.72
+        for lo, hi in ( ( ( at + 0.2, n - 1.2, z0 ), ( at + 2.0, n + 1.2, z1 ) ), ( ( at + 0.2, r0, transom - 1.2 ), ( at + 2.0, r1, transom + 1.2 ) ),
+                        ( ( at + 0.2, r0, z0 ), ( at + 1.6, r0 + 2.0, z1 ) ), ( ( at + 0.2, r1 - 2.0, z0 ), ( at + 1.6, r1, z1 ) ),
+                        ( ( at + 0.2, r0, z0 ), ( at + 1.6, r1, z0 + 2.4 ) ), ( ( at + 0.2, r0, z1 - 2.0 ), ( at + 1.6, r1, z1 ) ) ):
+            model.box( lo, hi, "rw_steel_dark" )
+        D.window_surround( model, "n", at, 1.0, r0, r1, z0, z1 )
+    # Lisenen: at the corners from the plinth, and between the upper storey's bays from the string course.
+    for r, width, za in ( ( 1320.0, 28.0, 36.0 ), ( 1795.0, 28.0, 36.0 ), ( 1430.0, 18.0, 222.0 ), ( 1540.0, 24.0, 222.0 ),
+                          ( 1660.0, 24.0, 222.0 ) ):
+        A.pilaster( model, "n", at, 1.0, r, za, 428.0, width=width, proud=5.0 )
+    # The main cornice (the south front's profile) with its dentils, under the parapet.
+    P.straight( model, "n", at, HEAD_N0, HEAD_N1, 430.0, 1.0, A.SOUTH_CORNICE, "rw_dressed" )
+    D.dentils( model, "n", at, 1.0, HEAD_N0 + 2.0, HEAD_N1 - 2.0, 444.5 )
+    model.box( ( at, HEAD_N0, 456.0 ), ( at + 3.0, HEAD_N1, 470.0 ), { "default": "rw_dressed", "-e": None } )
+
+
 def hall_side( model, glass ):
     """ The hall's east side wall, its stair up to the gallery, and a kiosk. """
     w = M.Wall( "n", ( HALL_N0, HALL_N1 ), ( HALL_E, SIDE_E ), ( 0.0, 560.0 ), "+e" )
@@ -981,16 +1037,32 @@ def hall_side( model, glass ):
     for n in ( 1420.0, 1560.0, 1700.0 ):
         w.add( n, 70, 460, 532, "glass_arch" )
     w.build( model, "render_cream", "render_cream", "rw_dressed", end=None )
-    for n in ( 1420.0, 1560.0, 1700.0 ):
-        pane( glass, model, "n", ( HALL_E + SIDE_E ) / 2, n - 35, n + 35, 460, 532, "rw_glass_roof", arched=True )
-        glazing_bars( model, "n", ( HALL_E + SIDE_E ) / 2, n - 35, n + 35, 460, 530, "rw_steel", across=1, spring=497 )
-    # Over the wing's roof the wall's outside is sandstone.
-    facing( model, "rw_sandstone", [ ( SIDE_E + 0.2, HALL_N0, WING_ROOF + 12 ), ( SIDE_E + 0.2, HALL_N1, WING_ROOF + 12 ),
-                                     ( SIDE_E + 0.2, HALL_N1, 560 ), ( SIDE_E + 0.2, HALL_N0, 560 ) ], ( 1, 0, 0 ) )
-    # Inside: a dado of dressed stone, and the cornice the vault springs from.
-    for a, b in ( ( HALL_N0, 1675.0 ), ( 1765.0, HALL_N1 ) ):
-        model.box( ( HALL_E - 1.5, a, 0 ), ( HALL_E, b, 100 ), { "default": "rw_dressed", "+e": None } )
-    model.box( ( HALL_E - 10, HALL_N0, 520 ), ( HALL_E, HALL_N1, 540 ), { "default": "rw_dressed", "+e": None } )
+    lunettes = ( 1420.0, 1560.0, 1700.0 )
+    glass_e = ( HALL_E + SIDE_E ) / 2
+    for n in lunettes:
+        pane( glass, model, "n", glass_e, n - 35, n + 35, 460, 532, "rw_glass_roof", arched=True )
+        glazing_bars( model, "n", glass_e, n - 35, n + 35, 460, 530, "rw_steel", across=1, spring=497 )
+        # The head's fan of glazing bars, from a small hub on the transom.
+        D.radial_bars( model, "n", glass_e, n, 497.0, 34.5, angles=( 30.0, 60.0, 120.0, 150.0 ), paint="rw_steel", hub=4.0 )
+        P.arch_band( model, "n", glass_e, 1.0, n, 497.0, 4.0, [ ( -1.0, 0.0 ), ( 1.0, 0.0 ), ( 1.0, 1.5 ), ( -1.0, 1.5 ), ( -1.0, 0.0 ) ],
+                     "rw_steel", steps=8 )
+    # Over the wing's roof the wall's outside is sandstone, with the lunettes cut through it and a plain archivolt and
+    # sill round each.
+    face_e, z_lo, z_hi = SIDE_E + 0.2, WING_ROOF + 12, 560.0
+    runs = A.run_breaks( HALL_N0, HALL_N1, [ ( n - 35.0, n + 35.0 ) for n in lunettes ] )
+    for a, b in runs:
+        facing( model, "rw_sandstone", [ ( face_e, a, z_lo ), ( face_e, b, z_lo ), ( face_e, b, z_hi ), ( face_e, a, z_hi ) ], ( 1, 0, 0 ) )
+    for n in lunettes:
+        facing( model, "rw_sandstone", [ ( face_e, n - 35, z_lo ), ( face_e, n + 35, z_lo ), ( face_e, n + 35, 460.0 ),
+                                         ( face_e, n - 35, 460.0 ) ], ( 1, 0, 0 ) )
+        arc = K.arc( n, 497.0, 35.0, 16, 180.0, 0.0 )
+        for ( r0, z0 ), ( r1, z1 ) in zip( arc, arc[1:] ):
+            facing( model, "rw_sandstone", [ ( face_e, r0, z0 ), ( face_e, r1, z1 ), ( face_e, r1, z_hi ), ( face_e, r0, z_hi ) ], ( 1, 0, 0 ) )
+        A.arch_trim( model, "n", face_e, 1.0, n, 497.0, 35.0, key=( 9.0, 14.0 ), band=6.0, proud=3.0, impost=False,
+                     keystone=False )
+        P.straight( model, "n", face_e, n - 42.0, n + 42.0, 460.0, 1.0,
+                    [ ( 0.0, -3.0 ), ( 3.2, -3.0 ), ( 3.2, -2.2 ), ( 4.0, -2.2 ), ( 4.0, 0.0 ), ( 0.0, 1.5 ) ], "rw_dressed" )
+    # Inside, the dado, pilasters and entablature are railhead_architecture.hall's (drawn whole in the centre).
     # The stair up to the gallery's corner: six steps east along the south wall to a landing in the corner, then the
     # main flight north along the side wall. The space under the main flight is walled in.
     s0, s1 = HALL_E - 60, HALL_E
@@ -1012,12 +1084,22 @@ def hall_side( model, glass ):
     model.box( ( foot - 8, m1 - 5, 40 + rise + 12 ), ( foot + 10, m1 + 13, 40 + rise + 16 ), "rw_dressed" )
     tube( model, ( foot + 8, m1 + 4, 44 + rise ), ( s0 - 4, m1 + 4, 44 + low ), 1.4, "copper", sides=8 )
     tube( model, ( s0 - 4, m1 + 4, 44 + low ), ( s0 - 4, GALLERY_N0, GALLERY_Z + 44 ), 1.4, "copper", sides=8 )
-    # A kiosk (newspapers) in the hall.
+    # Preserve the hall kiosks' established cover volumes. Their finished visuals
+    # are added after mirroring, so the western kiosk's lettering reads correctly.
     k0, k1, m0, m1 = 260.0, 340.0, 1480.0, 1560.0
-    model.box( ( k0, m0, 0 ), ( k1, m1, 100 ), { "default": "planks", "-z": None, "+z": None }, WOOD )
-    model.box( ( k0 - 10, m0 - 10, 100 ), ( k1 + 10, m1 + 10, 114 ), { "default": "copper", "-z": "planks_dark" }, SHEET )
-    model.box( ( k0 - 0.3, m0 + 10, 40 ), ( k0, m1 - 10, 90 ), { "default": "rw_window_dark" } )
-    model.box( ( k0 - 6, m0 + 6, 38 ), ( k0, m1 - 6, 42 ), "planks_dark" )
+    model.collision_box( ( k0, m0, 0 ), ( k1, m1, 100 ), WOOD )
+    model.collision_box( ( k0 - 10, m0 - 10, 100 ), ( k1 + 10, m1 + 10, 114 ), SHEET )
+
+
+def hall_kiosk(side):
+    """Finished hall booth, without changing the existing cover collision."""
+    import railhead_props as P
+    model = K.Model()
+    e0, e1 = (260., 340.) if side > 0 else (-340., -260.)
+    P.kiosk(model, e0, e1, 1480., 1560., "-e" if side > 0 else "+e")
+    model.boxes.clear()
+    model.hulls.clear()
+    return model
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -1091,8 +1173,7 @@ def south_facade( model, glass ):
             angle = math.radians( 45 * k )
             tube( model, ( c, mid, spring ), ( c + math.cos( angle ) * width / 2, mid, spring + math.sin( angle ) * width / 2 ),
                   1.0, "rw_steel", sides=6 )
-        # Keystone and an archivolt band outside.
-        model.box( ( c - 10, n_out - 4, crown - 8 ), ( c + 10, n_out, crown + 22 ), "rw_dressed" )
+        # Its archivolt, imposts and keystone outside are railhead_architecture.south_front's.
     for c in FACADE_WING_WINDOWS:
         pane( glass, model, "e", mid, c - 45, c + 45, 50, WING_WINDOW_CROWN, "rw_glass", arched=True )
         glazing_bars( model, "e", mid, c - 45, c + 45, 50, WING_WINDOW_CROWN - 2, "rw_steel_dark", across=1,
@@ -1105,11 +1186,12 @@ def south_facade( model, glass ):
     for a, b in ( ( -SHED_E, -1105.0 ), ( -1015.0, -960.0 ), ( -840.0, -785.0 ), ( -695.0, -400.0 ), ( -240.0, -100.0 ),
                   ( 100.0, 240.0 ), ( 400.0, 695.0 ), ( 785.0, 840.0 ), ( 960.0, 1015.0 ), ( 1105.0, SHED_E ) ):
         model.box( ( a, n_out - 3, 0 ), ( b, n_out, 30 ), { "default": "rw_dressed_red", "+n": None, "-z": None } )
-    for c in ( -988.0, -812.0, -620.0, -470.0, -170.0, 170.0, 470.0, 620.0, 812.0, 988.0 ):
-        half = 15.0 if abs( c ) in ( 620.0, 470.0, 170.0 ) else 12.0
-        model.box( ( c - half, n_out - 8, 30 ), ( c + half, n_out, 340 ), { "default": "rw_dressed", "+n": None } )
-    model.box( ( -WALL_IN, n_out - 12, 340 ), ( WALL_IN, n_out, 360 ), { "default": "rw_dressed", "+n": None } )
-    model.box( ( -WALL_IN, n_out - 16, 360 ), ( WALL_IN, n_out, 366 ), { "default": "rw_dressed", "+n": None } )
+    # Pilasters with bases and capitals, the doors' and windows' archivolts and keystones, and the moulded cornice
+    # (340..366, 17 proud, with dentils): railhead_architecture.south_front.
+    pilasters = [ ( c, 15.0 if abs( c ) in ( 620.0, 470.0, 170.0 ) else 12.0 )
+                  for c in ( -988.0, -812.0, -620.0, -470.0, -170.0, 170.0, 470.0, 620.0, 812.0, 988.0 ) ]
+    A.south_front( model, n_out, pilasters, FACADE_DOORS, FACADE_WING_DOORS, FACADE_WING_WINDOWS, WING_DOOR_CROWN,
+                   WING_WINDOW_CROWN, WALL_IN )
     model.box( ( -580.0, n_out - 3, 372 ), ( 580.0, n_out, 424 ), { "default": "rw_dressed", "+n": None } )
     # The gable over the cornice.
     gable_infill( model, n_out, n_in, 366.0, -SHED_E, SHED_E, gable_top, "rw_sandstone", "render_cream", step=40.0,
@@ -1144,8 +1226,7 @@ def north_facade( model, glass ):
     mid = ( n_in + n_out ) / 2
     for c, width, top in doors:
         pane( glass, model, "e", mid, c - width / 2, c + width / 2, 0, top, "rw_glass" )
-        glazing_bars( model, "e", mid, c - width / 2, c + width / 2, 0, top, "rw_steel_dark", across=1, spring=120 )
-        model.box( ( c - width / 2, mid - 2, 0 ), ( c + width / 2, mid + 2, 8 ), "rw_steel_dark" )
+    A.north_doors( model, mid, n_in )
     for c, width, z0, z1 in windows:
         pane( glass, model, "e", mid, c - width / 2, c + width / 2, z0, z1, "rw_glass", arched=True )
         glazing_bars( model, "e", mid, c - width / 2, c + width / 2, z0, z1 - 2, "rw_steel", across=3, spring=z1 - width / 2 )
@@ -1171,13 +1252,8 @@ def hall_vault( model ):
         facing( model, "copper", [ ( a, HEAD_N0, za ), ( b, HEAD_N0, zb ), ( b, HEAD_N1, zb ), ( a, HEAD_N1, za ) ], ( 0, 0, 1 ) )
         ia, ib = vault_z( min( abs( a ), HALL_E ) ), vault_z( min( abs( b ), HALL_E ) )
         model.hull( [ ( e, n, z ) for n in ( n0, n1 ) for e, z in ( ( a, ia ), ( b, ib ), ( a, za ), ( b, zb ) ) ], STONE )
-    # Transverse ribs every 110, and a band along the crown.
-    n = n0 + 55
-    while n < n1:
-        for a, b in zip( es, es[1:] ):
-            za, zb = vault_z( a ) - 6, vault_z( b ) - 6
-            model.beam( ( a, n, za ), ( b, n, zb ), ( 12.0, 12.0 ), "rw_dressed", up=( 0, 0, 1 ) )
-        n += 110
+    # Moulded transverse ribs every 110, framed panels between them, and a bead along the crown.
+    A.vault( model, vault_z, VAULT_CZ, [ n0 + 55.0 + 110.0 * k for k in range( 4 ) ] )
 
 
 def gallery( model ):
@@ -1186,41 +1262,35 @@ def gallery( model ):
     model.box( ( -HALL_E, n0, z - 12 ), ( HALL_E, n1, z ),
                { "+z": "rw_terrazzo", "-z": "render_cream", "-n": "rw_dressed", "default": None }, STONE )
     for c in ( -420.0, -180.0, 180.0, 420.0 ):
-        column( model, c, n0 + 8, 0.0, z - 12, 10.0, "rw_dressed", STONE, base=( 14, 14, "rw_dressed_red" ),
-                capital=( 16, 12, "rw_dressed" ) )
+        model.collision_box( ( c - 14, n0 + 8 - 14, 0 ), ( c + 14, n0 + 8 + 14, 14 ), STONE )
+        model.collision_box( ( c - 16, n0 + 8 - 16, z - 24 ), ( c + 16, n0 + 8 + 16, z - 12 ), STONE )
+        model.cylinder( ( c, n0 + 8 ), 10.0, 14.0, z - 24, { "side": None, "top": None, "bottom": None }, sides=16, surface=STONE )
     b0, b1 = n0, n0 + 8
     e0, e1 = -HALL_E + 60, HALL_E - 60
-    model.box( ( e0, b0, z ), ( e1, b1, z + 6 ), "rw_dressed" )
-    model.box( ( e0 - 2, b0 - 1, z + 34 ), ( e1 + 2, b1 + 1, z + 42 ), "rw_dressed" )
-    e = e0 + 6
-    while e < e1 - 4:
-        model.box( ( e - 2, b0 + 1, z + 6 ), ( e + 2, b1 - 1, z + 34 ), "rw_dressed" )
-        e += 10
     model.collision_box( ( e0, b0, z ), ( e1, b1, z + 42 ), STONE )
-    for c in ( -HALL_E + 60, HALL_E - 60 ):
-        model.box( ( c - 6, b0 - 2, z ), ( c + 6, b1 + 2, z + 48 ), "rw_dressed" )
+    # Columns, beam, coffers and the balustrade: railhead_architecture's.
+    A.gallery( model )
 
 
 def shed_columns( model ):
     """ The cast-iron columns down the shed's middle, under the valley gutter the two spans spring from. """
     for n in RIBS[:-1]:
-        column( model, 0.0, n, 0.0, 238.0, 8.0, "rw_steel", METAL, base=( 14, 18, "rw_steel" ), capital=( 16, 12, "rw_steel" ) )
-        model.box( ( -6, n - 2, 30 ), ( 6, n + 2, 200 ), "rw_steel" )
-        model.box( ( -40, n - 6, 238 ), ( 40, n + 6, 250 ), "rw_steel" )
+        # The collision as it always was: a square base, the shaft and a square capital.
+        model.collision_box( ( -14, n - 14, 0 ), ( 14, n + 14, 18 ), METAL )
+        model.collision_box( ( -16, n - 16, 226 ), ( 16, n + 16, 238 ), METAL )
+        model.cylinder( ( 0.0, n ), 8.0, 18.0, 226.0, { "side": None, "top": None, "bottom": None }, sides=16, surface=METAL )
+        A.shed_column( model, n )
     model.box( ( -14, SHED_N0, GUTTER_Z[0] ), ( 14, SHED_N1, GUTTER_Z[1] ), { "default": "rw_steel", "+z": None } )
-    for n in RIBS[:-1]:
-        model.box( ( -10, n - 5, 250 ), ( 10, n + 5, GUTTER_Z[0] ), "rw_steel" )
+    A.valley_girder( model, SHED_N0, SHED_N1, RIBS[:-1] )
 
 
 def canopy_spines( model ):
     """ The centre platform canopy's column line, on the centre line. """
     n0, n1 = FLAT_N0, SHED_N0
-    model.box( ( -5, n0, CANOPY_Z - 12 ), ( 5, n1, CANOPY_Z ), "rw_steel_dark" )
+    A.canopy_spine( model, 0.0, CANOPY_Z, n0, n1 )
     for cn in CANOPY_COLUMNS_N:
-        model.box( ( -5, cn - 5, 0 ), ( 5, cn + 5, CANOPY_Z - 12 ), { "default": "rw_steel_dark", "-z": None }, METAL )
-        model.box( ( -10, cn - 10, 0 ), ( 10, cn + 10, 4 ), "rw_steel_dark" )
-        for s in ( -1, 1 ):
-            model.beam( ( 0, cn, CANOPY_Z - 50 ), ( s * 50, cn, CANOPY_Z - 10 ), ( 3.0, 3.0 ), "rw_steel_dark" )
+        model.collision_box( ( -5, cn - 5, 0 ), ( 5, cn + 5, CANOPY_Z - 12 ), METAL )
+        A.canopy_column( model, 0.0, cn, CANOPY_Z )
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -1260,6 +1330,22 @@ def arc_point( theta, depth ):
     return 600.0 + r * math.cos( theta ), SHED_CZ + r * math.sin( theta )
 
 
+def sarking( a ):
+    """ The boarding's paint under a solid roof facet starting at e a: blackened by the smoke beside the lantern and
+    along the valley gutter, grey-brown elsewhere. """
+    return "rhs_sarking_soot" if a < 80.0 or 500.0 <= a < 700.0 else "rhs_sarking"
+
+
+def rafters( model, a, b, za, zb, paint, spacing=40.0, size=( 3.0, 6.0 ) ):
+    """ Rafters ( 3 x 7 in nominal ) under a solid facet's boarding, down the slope from e a to b every spacing along
+    the shed, clear of the ribs' top chords. """
+    n = SHED_N0 + spacing / 2
+    while n < SHED_N1 - 4:
+        if all( abs( n - r ) > 9.0 for r in RIBS ):
+            model.beam( ( a, n, za - size[1] / 2 - 0.05 ), ( b, n, zb - size[1] / 2 - 0.05 ), size, paint, up=( 0, 0, 1 ) )
+        n += spacing
+
+
 def roof( ):
     """ The east span: the skin (slate on boarding, glass bands, a smoke lantern along the crown), purlins, glazing bars,
     the lattice ribs, the south end's glazed screen and the overhead conductor rails hung from the ribs. Returns
@@ -1270,8 +1356,9 @@ def roof( ):
         za, zb = shed_z( a ), shed_z( b )
         if kind == "solid":
             facing( model, "slate", [ ( a, n0, za + 3 ), ( b, n0, zb + 3 ), ( b, n1, zb + 3 ), ( a, n1, za + 3 ) ], ( 0, 0, 1 ) )
-            facing( model, "planks_dark", [ ( a, n0, za ), ( b, n0, zb ), ( b, n1, zb ), ( a, n1, za ) ], ( 0, 0, -1 ) )
+            facing( model, sarking( a ), [ ( a, n0, za ), ( b, n0, zb ), ( b, n1, zb ), ( a, n1, za ) ], ( 0, 0, -1 ) )
             model.hull( [ ( e, n, z ) for n in ( n0, n1 ) for e, z in ( ( a, za ), ( b, zb ), ( a, za + 4 ), ( b, zb + 4 ) ) ], SHEET )
+            rafters( model, a, b, za, zb, "rhs_sarking" )
         elif kind == "glass":
             pts = [ ( a, n0, za + 1.5 ), ( b, n0, zb + 1.5 ), ( b, n1, zb + 1.5 ), ( a, n1, za + 1.5 ) ]
             facing( glass, "rw_glass_roof", pts, ( 0, 0, 1 ) )
@@ -1285,7 +1372,8 @@ def roof( ):
         else:
             za2, zb2 = za + LANTERN_RISE, zb + LANTERN_RISE
             facing( model, "slate", [ ( a, n0, za2 + 3 ), ( b, n0, zb2 + 3 ), ( b, n1, zb2 + 3 ), ( a, n1, za2 + 3 ) ], ( 0, 0, 1 ) )
-            facing( model, "planks_dark", [ ( a, n0, za2 ), ( b, n0, zb2 ), ( b, n1, zb2 ), ( a, n1, za2 ) ], ( 0, 0, -1 ) )
+            facing( model, "rhs_sarking_soot", [ ( a, n0, za2 ), ( b, n0, zb2 ), ( b, n1, zb2 ), ( a, n1, za2 ) ], ( 0, 0, -1 ) )
+            rafters( model, a, b, za2, zb2, "rhs_sarking" )
             model.hull( [ ( e, n, z ) for n in ( n0, n1 ) for e, z in ( ( a, za2 ), ( b, zb2 ), ( a, za2 + 4 ), ( b, zb2 + 4 ) ) ], SHEET )
             for nn, out in ( ( n0, -1.0 ), ( n1, 1.0 ) ):
                 facing( model, "rw_steel_dark", [ ( a, nn, za ), ( b, nn, zb ), ( b, nn, zb2 ), ( a, nn, za2 ) ], ( 0, out, 0 ) )
@@ -1322,13 +1410,11 @@ def roof( ):
                 if eb <= ea:
                     continue
                 model.beam( ( qa[0], n, qa[1] ), ( qb[0], n, qb[1] ), ( 10.0, d1 - d0 ), "rw_steel" )
-            length = math.hypot( pb_bot[0] - pa_bot[0], pb_bot[1] - pa_bot[1] )
-            du = length / 26.0
-            web = [ ( pa_bot[0], n, pa_bot[1] ), ( pb_bot[0], n, pb_bot[1] ), ( pb_top[0], n, pb_top[1] ), ( pa_top[0], n, pa_top[1] ) ]
-            uv = [ ( u, 0.0 ), ( u + du, 0.0 ), ( u + du, 1.0 ), ( u, 1.0 ) ]
-            facing( model, "rw_lattice", web, ( 0, 1, 0 ), uv=uv )
-            facing( model, "rw_lattice", web, ( 0, -1, 0 ), uv=uv )
-            u += du
+        # The web: real flat lattice bars in an X on both faces (they were a flat texture).
+        A.lattice( model, n, thetas, arc_point, ( RIB_TOP[0] + RIB_TOP[1] ) / 2, ( RIB_BOTTOM[0] + RIB_BOTTOM[1] ) / 2,
+                   14.0, WALL_IN + 1, gussets=BRIDGE_N1 - 20.0 < n < BUFFER_N + 30.0 )
+        if n == SHED_N0:
+            A.gable_fascia( model, n, arc_point, th0, th1, -2.0, 12.0 )
         # Hangers from the rib to the conductor rails.
         if n > SHED_N0:
             for c in TRACKS.values():
@@ -1397,6 +1483,7 @@ def centre():
     north_facade( model, glass )
     hall_vault( model )
     gallery( model )
+    A.hall( model )
     shed_columns( model )
     bridge_columns_centre( model )
     canopy_spines( model )
@@ -1407,13 +1494,21 @@ def centre():
 def build():
     """ The structure's models by name: east, west, centre, roof and glass. """
     east, east_glass = east_half()
+    west = east.mirrored()
+    east.extend(hall_kiosk(1))
+    west.extend(hall_kiosk(-1))
     mid, mid_glass = centre()
     span, span_glass = roof()
     roof_model = K.Model().extend( span ).extend( span.mirrored() )
     glass = K.Model().extend( east_glass ).extend( east_glass.mirrored() ).extend( mid_glass ) \
         .extend( span_glass ).extend( span_glass.mirrored() )
-    return M.clean_joins( { "railhead_east": east, "railhead_west": east.mirrored(), "railhead_centre": mid,
-                           "railhead_roof": roof_model, "railhead_glass": glass } )
+    models = M.clean_joins( { "railhead_east": east, "railhead_west": west, "railhead_centre": mid,
+                              "railhead_roof": roof_model, "railhead_glass": glass } )
+    # Soot and wear zones (the materials' rw_sandstone_soot, rw_steel_soot, rw_lime_dark and rw_brick_dark).
+    A.weather( models )
+    # The structure's own paints (rhs_*: precast, sarking, the footbridge's panels, the goods shed's doors).
+    SP.apply( models )
+    return models
 
 
 if __name__ == "__main__":

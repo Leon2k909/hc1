@@ -1,0 +1,17 @@
+// Tools/railhead_backdrop_art.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_ALPHA_TEST "1"
+    F_SELF_ILLUM "1"
+    TextureColor "materials/railhead/rotunda_impostor.png"
+    TextureTranslucency "materials/railhead/rotunda_impostor_alpha.png"
+    TextureSelfIllumMask "[1.000000 1.000000 1.000000 0.000000]"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureRoughness "[0.850000 0.850000 0.850000 0.000000]"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_flAlphaTestReference "0.7"
+    g_flSelfIllumBrightness "1.0"
+    g_flSelfIllumAlbedoFactor "1"
+    g_vColorTint "[1.000000 0.960000 0.900000 1.0]"
+}

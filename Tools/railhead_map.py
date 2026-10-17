@@ -87,8 +87,9 @@ RB = optional( "railhead_backdrop" )
 # The sky (Tools/railhead_sky.py) and the light: 14:03 summer time on 3 October at 48 N, 11 E.
 SUN_PITCH, SUN_YAW = 38.0, -15.0
 SKY_MATERIAL = "materials/railhead/sky/railhead_sky.vmat"
-SKY_EXPOSURE = 2.0
-FOG_COLOUR = "0.351,0.594,1.048"
+SKY_EXPOSURE = 1.6
+FOG_COLOUR = "0.351,0.594,1.048"         # boxyard_map uses this too: keep it
+DISTANCE_FOG = "0.62,0.72,0.9"             # Railhead's own: a paler blue-grey for the far hills (backdrop's request)
 CATCH_FLOOR_Z = -3000
 
 PLAY = ( -2200.0, 2200.0, -2400.0, 1820.0 )         # e0, e1, n0, n1
@@ -227,10 +228,11 @@ def board( model, atlas, entries, e, n, bottom, height, along, z_top=None, frame
     model.collision_box( lo - ( 0, 0, height / 2 + 2 ), hi + ( 0, 0, height / 2 + 2 ), METAL )
     for side in ( 1.0, -1.0 ):
         at = -total / 2
+        # Seen from in front of this face (its normal normal * side), right is ( -normal * side ) x up: so each face
+        # looks out of the board and reads the right way round, its entries in reading order.
+        right = np.cross( -normal * side, ( 0.0, 0.0, 1.0 ) )
         for name, w in zip( entries, widths ):
-            # Seen from this side, right is across turned the way the face looks.
-            right = across * side if along == "n" else -across * side
-            atlas_quad( model, atlas, name, c + across * ( at + w / 2 ) + normal * side * ( depth / 2 + 0.05 ),
+            atlas_quad( model, atlas, name, c + right * ( at + w / 2 ) + normal * side * ( depth / 2 + 0.05 ),
                         right, ( 0, 0, 1 ), w, height )
             at += w + 2.0
     if z_top is not None and z_top > bottom + height + 4:
@@ -274,7 +276,7 @@ def clock( model, e, n, z, along="n" ):
 # ---------------------------------------------------------------------------------------------------------------------
 # Paints
 
-GLASS_PAINTS = ( "rw_glass", "rw_glass_roof", "rw_emu_glass", "rw_signal_box_glass" )
+GLASS_PAINTS = ( "rw_glass", "rw_glass_roof", "rw_emu_glass", "rw_signal_box_glass", "rw_case_glass" )
 
 def configure( model ):
     """ Points every rw_ paint at its material with its tile size (railhead_materials' paints(), else the backdrop's
@@ -288,7 +290,11 @@ def configure( model ):
             print( f"railhead_materials.paints() failed: {error}" )
     tiles = getattr( RB, "RW_TILES", {} ) if RB is not None else {}
     for paint in list( model.polygons ):
-        if paint.startswith( "rw_" ):
+        if paint == "render_cream":
+            model.material_overrides[paint] = "materials/railhead/finish/rw_lime.vmat"
+        elif paint == "brick":
+            model.material_overrides[paint] = "materials/railhead/finish/rw_brick.vmat"
+        elif paint.startswith( "rw_" ):
             try:
                 path = RM.material_path( paint )
             except Exception:
@@ -506,7 +512,8 @@ def catenary( m, s ):
         use( "roof_drop", m, e, SUPPORTS[0], S.shed_z( abs( e ) ) - 46, RAIL_Z, wire_height=WIRE_HEIGHT )
     # Portals over the throat, their masts clear of the platforms' ends and the signal box.
     for n in SUPPORTS[1:3]:
-        use( "portal", m, s * 130, s * 990, n, RAIL_Z, [ a, b, c ], wire_height=WIRE_HEIGHT )
+        # The first portal past the shed carries the tension weights where the wires' runs end.
+        use( "portal", m, s * 130, s * 990, n, RAIL_Z, [ a, b, c ], wire_height=WIRE_HEIGHT, anchor=n == SUPPORTS[1] )
     for n in SUPPORTS[3:]:
         # Past n -5000 the cutting's walls close in to 700: the outer mast stands just inside them.
         reach = min( c_track_e( n ) + 142, corridor_half( n ) - 16 )
@@ -571,6 +578,103 @@ def yard( m, s ):
     # Bollards either side of the road gate.
     for e in ( S.GATE_ROAD[0] - 14, S.GATE_ROAD[1] + 14 ):
         use( "bollard", m, s * e, S.YARD_N1 - 20, stand_in=furniture_stand_in( "bollard", s * e, S.YARD_N1 - 20 ) )
+    yard_ground( m, s )
+    yard_clutter( m, s )
+    # Drums against the bank, and a pallet truck left by the pallets.
+    for e, n, paint in ( ( 1874.0, -1882.0, "rw_drum_blue" ), ( 1874.0, -1856.0, "rw_drum_blue" ),
+                         ( 1897.0, -1869.0, "rw_drum_grey" ) ):
+        use( "drum", m, s * e, n, 0.3, paint, stand_in=furniture_stand_in( "bin", s * e, n ) )
+    visual( "pallet_jack", m, s * 1935.0, -2290.0, "n" )
+
+
+# The goods shed's yard side (railhead_station.GOODS: e 1520..1800, n -2200..-1600, its doors at n -2050, -1900 and
+# -1750, and its yard-side loading bank out to e 1860): a 2.5 m concrete apron along the bank with a slot drain at its
+# edge, bays painted across the yard, and a hatched box kept clear in front of the road gate.
+BANK_FACE = 1860.0
+APRON = ( BANK_FACE, BANK_FACE + 98.0, -2230.0, -1570.0 )
+
+
+def yard_ground( m, s ):
+    def span( a, b ):
+        return tuple( sorted( ( s * a, s * b ) ) )
+    e0, e1, n0, n1 = APRON
+    a0, a1 = span( e0, e1 )
+    top = detail( "apron", m, a0, a1, n0, n1, 0.0 ) or 0.0
+    detail( "drain_channel", m, s * ( e1 + 5.0 ), n0, n1, 0.0 )
+    # Loading bays: white lines out from the apron at each door's middle, 118 apart, years old: worn grey and broken
+    # into lengths where the lorries' and forklifts' wheels have scrubbed them off the setts.
+    rng = np.random.default_rng( 7401 if s > 0 else 7402 )
+    if D is not None:
+        D.register( m, "dress_line_worn" )
+
+    def worn_line( a, b ):
+        a, b = np.asarray( a, float ), np.asarray( b, float )
+        length = float( np.linalg.norm( b - a ) )
+        t = rng.uniform( 0.0, 20.0 )
+        while t < length - 10.0:
+            t1 = min( t + rng.uniform( 60.0, 110.0 ), length )
+            detail( "line", m, "dress_line_worn", a + ( b - a ) * t / length, a + ( b - a ) * t1 / length,
+                    4.7 * rng.uniform( 0.85, 1.0 ), 0.25 )
+            t = t1 + rng.uniform( 8.0, 30.0 )
+    for n in ( -2140.0, -2020.0, -1900.0, -1780.0 ):
+        worn_line( ( s * ( e1 + 14.0 ), n ), ( s * 2080.0, n ) )
+    worn_line( ( s * 2080.0, -2142.35 ), ( s * 2080.0, -1777.65 ) )
+    # Grime along the loading bank's foot, where water runs off it and the yard brush leaves the dust.
+    if D is not None:
+        D.register( m, "dress_grime_concrete" )
+        g0, g1 = span( BANK_FACE + 0.2, BANK_FACE + 10.0 )
+        n = n0 + 4.0
+        while n < n1 - 4.0:
+            nb = min( n + rng.uniform( 90.0, 220.0 ), n1 - 4.0 )
+            w = rng.uniform( 0.6, 1.0 )
+            a, b = ( g0, g0 + ( g1 - g0 ) * w ) if s > 0 else ( g1 - ( g1 - g0 ) * w, g1 )
+            m.polygon( "dress_grime_concrete", [ ( a, n, top + 0.02 ), ( b, n, top + 0.02 ), ( b, nb, top + 0.02 ),
+                                                 ( a, nb, top + 0.02 ) ], normal=( 0, 0, 1 ) )
+            n = nb
+    # Kept clear in front of the road gate.
+    g0, g1 = span( S.GATE_ROAD[0] + 30.0, S.GATE_ROAD[1] - 30.0 )
+    detail( "hatched_box", m, g0, g1, S.YARD_N1 - 110.0, S.YARD_N1 - 22.0, 0.25 )
+    # A yellow-and-black band along the apron's outer edge, where the forklifts turn.
+    detail( "hazard_band", m, ( s * ( e1 - 3.0 ), n0 + 6.0 ), ( s * ( e1 - 3.0 ), n1 - 6.0 ), top + 0.04 )
+    # Old oil and coolant stains soaked into the apron in front of the doors, where forklifts and lorries stand, and
+    # one on the setts.
+    for n in ( -2020.0, -1900.0, -1780.0 ):
+        detail( "oil_stain", m, rng, s * 1905.0, n + rng.normal( 0, 12 ), top + 0.03, ( 16.0, 26.0 ), 2, "concrete" )
+    detail( "oil_stain", m, rng, s * 2030.0, -2080.0, 0.08, ( 12.0, 20.0 ), 2, "setts" )
+    # Each bay's number chalked on the loading bank's face, at its middle, as the yard's foremen do.
+    right = ( 0.0, float( s ), 0.0 )
+    for k, n in enumerate( ( -2080.0, -1960.0, -1840.0 ) ):
+        D.register( m, "dress_chalk" ) if D is not None else None
+        detail( "stroke_text", m, "dress_chalk", str( k + 1 ), ( s * ( BANK_FACE + 0.15 ), n - s * 4.0, 14.0 ), right,
+                ( 0, 0, 1 ), 15.0, 8.0, 1.3, rng=rng )
+
+
+def yard_clutter( m, s ):
+    """ What a working goods yard has standing about, all of it against the goods shed's wall, the yard's back fence
+    or out of the way at its corners, so bomb site B's lanes and sightlines stay as they were. """
+    # The yard's lamp towers: at the shed's south-east corner and by the bank's north end.
+    use( "lamp_post", m, s * 1822.0, -2368.0, 300.0,
+         stand_in=lambda m_: m_.cylinder( ( s * 1822.0, -2368.0 ), 3.0, 0, 300, "rw_steel_dark", sides=8, surface=METAL ) )
+    use( "lamp_post", m, s * 1540.0, -1480.0, 300.0,
+         stand_in=lambda m_: m_.cylinder( ( s * 1540.0, -1480.0 ), 3.0, 0, 300, "rw_steel_dark", sides=8, surface=METAL ) )
+    # Against the shed's wall: worn tyres at its south end, cable drums and a pallet of bricks at its north end.
+    face = s * BANK_FACE
+    detail( "tyre_stack", m, face + s * 16.0, -2160.0, 0.3, 4 )
+    detail( "tyre_stack", m, face + s * 17.0, -2128.0, 0.3, 2 )
+    # The south half of the bank, the yard's hero view: more tyres, and empty pallets stacked knee high.
+    detail( "tyre_stack", m, face + s * 18.0, -2060.0, 0.3, 3, 0.4 )
+    use( "pallet_stack", m, face + s * 24.0, -1990.0, 0.3, 6,
+         stand_in=furniture_stand_in( "pallet_stack", face + s * 24.0, -1990.0 ) )
+    detail( "cable_drum", m, face + s * 18.0, -1632.0, 0.3, "e" )
+    detail( "brick_pallet", m, face + s * 24.0, -1580.0, 0.3, "n" )
+    # A skip against the back fence, north of the containers, and a road works pit in the open with cones round it.
+    detail( "skip_bin", m, s * 2158.0, -1575.0, "+n" )
+    detail( "open_chamber", m, s * 1900.0, -1520.0, 0.0, "e" )
+    # The road works round it read from the yard: two more cones on its yard side, one knocked over, and a red-and-white
+    # barrier across its south side.
+    detail( "cone", m, s * 1868.0, -1566.0, 0.0 )
+    detail( "cone", m, s * 1872.0, -1528.0, 0.0, tipped=True, heading=( 2.4 if s > 0 else 0.7 ) )
+    detail( "road_barrier", m, s * 1905.0, -1556.0, "e" )
 
 
 def container( m, e, n, z0, size, axis, paint ):
@@ -624,10 +728,40 @@ def concourse( m, s ):
     # Ausgang over the portals to the cab road.
     hanging_sign( m, s * 1080.0, 1060.0, S.shed_z( 1080.0 ) - 46, [ "ausgang_ost" if s > 0 else "ausgang_west" ], "e",
                   bottom=180.0 )
+    # City-Light cases on the head building's front, in the bays between its pilasters, doors and windows wide enough
+    # for one (e 485..605 between the hall's side door and the wing's window, and 1105..1160 by the shed's corner).
+    face_n = S.HEAD_N0 - 0.5
+    for e, poster in ( ( 545.0, "poster_sea" if s > 0 else "poster_city" ), ( 1132.0, "poster_bike" if s > 0 else "poster_alps" ) ):
+        detail( "city_light", m, s * e, face_n, "-n", poster, bottom=34.0 )
+    # A double-faced clock under the rib over the island's head, readable along the concourse; its housing only.
+    overhead( "clock", m, s * 632.0, S.RIBS[-2], 238.0, "e", z_top=S.shed_rib_z( 632.0 ) )
+    # Bins by the head building's benches.
+    put( "bin", m, s * 1036.0, 1284.0, "-n" )
+    # The island platform's head: its timetable case (departures one side, arrivals the other), beside the guidance
+    # strip down its middle, where every Hauptbahnhof stands one.
+    put( "timetable_case", m, s * 560.0, 860.0, "+n", two_sided=True )
+    # DIN A1 notice frames on the head building's front, in the bays clear of its doors, pilasters and windows: the
+    # network map, notices, and the station's rules.
+    face_n = S.HEAD_N0 - 0.5
+    for e, entry in ( ( 427.0, "notice_a4" ), ( 651.0, "network_map" ), ( 680.0, "notice_a4" ) ):
+        detail( "notice_board", m, s * e, face_n, "-n", entry, bottom=50.0 )
+
+
+# The platforms' smoking areas ( e0, e1, n0, n1, the ash column's corner ( e, n ) ), east; mirrored west. The island's is
+# 80 wide between its walking lines (e 575..689) and 120 long, between its benches at n -1000 and the footbridge
+# stair's foot (n -719), clear of the trolley at n -1250; the outer's against the wall, between the pilasters
+# at n -1100 and -860 (the pilaster at -860 is clear of its e 1140), clear of the bench and City-Light further north.
+SMOKING_ZONES = [ ( 592.0, 672.0, -900.0, -780.0, ( -1, -1 ) ), ( 1050.0, 1140.0, -900.0, -820.0, ( 1, -1 ) ) ]
+
+
+# Cable troughs along every platform wall's foot in the track bed, a lid's width out from the face.
+TROUGHS = ( 178.0, 474.0, 790.0, 906.0 )
 
 
 def platforms( m, s ):
     island = s * 632.0
+    for e in TROUGHS:
+        visual( "cable_trough", m, s * e, S.SHED_N0, 700.0, BED_Z )
     outer = s * 1057.0
     a_gleis, b_gleis, c_gleis = ( GLEIS[( s, k )] for k in "ABC" )
     for n in ( 700.0, 100.0, -1000.0 ):
@@ -650,7 +784,13 @@ def platforms( m, s ):
         hanging_sign( m, e, -1550.0, S.CANOPY_Z - 12, [ "sector_f" ], "n", bottom=150.0 )
     put( "vending_machine", m, s * 1138.0, 300.0, "-e" if s > 0 else "+e" )
     put( "ticket_machine", m, s * 1145.0, 700.0, "-e" if s > 0 else "+e" )
-    use( "shelter", m, *sorted( ( s * 540.0, s * 600.0 ) ), -1590.0, -1450.0,
+    # Smoking areas (Raucherbereiche), yellow-framed on the paving with an ash column, as on every DB platform: one in
+    # the island's middle between its walking lines, one against the outer wall between its pilasters.
+    for e0, e1, n0, n1, corner in SMOKING_ZONES:
+        a, b = sorted( ( s * e0, s * e1 ) )
+        detail( "smoking_zone", m, a, b, n0, n1, 0.0, corner=( corner[0] * s, corner[1] ) )
+    outer_wall( m, s )
+    use( "shelter", m, *sorted( ( s * 540.0, s * 600.0 ) ), -1590.0, -1450.0, poster="poster_city" if s > 0 else "poster_sea",
          stand_in=lambda m_: m_.box( ( min( s * 540, s * 600 ), -1590.0, 0 ), ( max( s * 540, s * 600 ), -1450.0, 96 ), "rw_steel_dark", GLASS ) )
     # The station's name under the canopies, facing the tracks.
     for e in ( island, s * 1080.0 ):
@@ -661,12 +801,325 @@ def platforms( m, s ):
     # The platform trolley uses the same reusable asset as the concourse carts.
 
 
+# The outer platforms' wall (the shed's sandstone wall's inside face at WALL_IN): its bays between the pilasters (every
+# 240 from n -1340, 32 wide) and the arches to the cab road are 208 wide at n -1220, -740, -260, 220 and 700.
+# ( n of a City-Light case, its poster ), ( n of a bench, n of its bin ) or None, an extinguisher's n or None.
+OUTER_WALL_BAYS = [ ( ( -1290.0, "poster_alps" ), ( -1220.0, -1150.0 ), None ),
+                    ( ( -815.0, "poster_city" ), ( -720.0, -658.0 ), -778.0 ),
+                    ( ( -190.0, "poster_sea" ), ( -315.0, -250.0 ), None ),     # the bench clear of the stair (n -230 up)
+                    ( ( 160.0, "poster_bike" ), None, 228.0 ),                  # the vending machine at 300
+                    ( ( 630.0, "poster_alps" ), ( 762.0, None ), None ) ]       # the ticket machine at 700
+
+
+def outer_wall( m, s ):
+    """ The outer platform's wall, dressed as a DB platform's is: City-Light cases, benches with their backs to the
+    wall and a bin beside each, an extinguisher, and a bracket clock on a pilaster. """
+    face = s * ( S.WALL_IN - 0.5 )
+    inward = "-e" if s > 0 else "+e"
+    for ( poster_n, poster ), bench, extinguisher_n in OUTER_WALL_BAYS:
+        detail( "city_light", m, face, poster_n, inward, poster, bottom=36.0 )
+        if bench is not None:
+            bench_n, bin_n = bench
+            put( "bench", m, s * ( S.WALL_IN - 15.0 ), bench_n, inward )
+            if bin_n is not None:
+                put( "bin", m, s * ( S.WALL_IN - 10.0 ), bin_n, inward )
+        if extinguisher_n is not None:
+            detail( "extinguisher", m, face, extinguisher_n, inward )
+    wall_services( m, s )
+    # The help point (Notruf / Info) against the wall between the pilaster at n 340 and the arch at 400.
+    use( "sos_pillar", m, s * ( S.WALL_IN - 6.0 ), 378.0, inward,
+         stand_in=lambda m_: m_.box( ( min( s * ( S.WALL_IN - 10 ), s * ( S.WALL_IN - 2 ) ), 374.0, 0 ),
+                                      ( max( s * ( S.WALL_IN - 10 ), s * ( S.WALL_IN - 2 ) ), 382.0, 63 ), "rw_steel_grey", METAL ) )
+    # The bracket clock: on an arm from the pilaster at n -140, its dials looking up and down the platform.
+    clock_e, clock_n, clock_z = s * ( S.WALL_IN - 40.0 ), -140.0, 252.0
+    overhead( "clock", m, clock_e, clock_n, clock_z, "n", z_top=clock_z + 16.0 )
+    arm_e0, arm_e1 = sorted( ( s * ( S.WALL_IN - 10.0 ), clock_e ) )
+    m.box( ( arm_e0, clock_n - 0.8, clock_z + 15.0 ), ( arm_e1, clock_n + 0.8, clock_z + 17.0 ), "rw_steel_dark" )
+    plate = s * ( S.WALL_IN - 10.0 )
+    m.box( ( min( plate, plate - s * 1.0 ), clock_n - 4.0, clock_z + 9.0 ), ( max( plate, plate - s * 1.0 ), clock_n + 4.0, clock_z + 23.0 ),
+           "rw_steel_dark" )
+
+
+# The outer platform wall's power: a galvanised conduit along the wall's face under the windows, from pilaster to
+# pilaster (a junction box on each pilaster's side), stopping at the arches to the cab road, with drops down to the
+# City-Light cases, the vending machine, the ticket machine and the help point.
+CONDUIT_Z = 118.0
+WALL_OPENINGS = sorted( [ ( n - 60.0, n + 60.0 ) for n in S.SHED_ARCHES ] + [ ( n - 80.0, n + 80.0 ) for n in S.SHED_PORTALS ] )
+# ( n, the drop's foot z ): what the conduit feeds.
+CONDUIT_DROPS = [ ( poster_n, 36.0 + 68.9 + 2.6 ) for ( poster_n, _ ), _, _ in OUTER_WALL_BAYS ] +                 [ ( 300.0, 76.0 ), ( 700.0, 74.0 ), ( 378.0, 64.0 ) ]
+
+
+def wall_services( m, s ):
+    if D is None:
+        return
+    face = S.WALL_IN - 2.2               # the conduit's axis, on spacer saddles 2.2 off the wall
+    out = ( -float( s ), 0.0, 0.0 )
+    inward = "-e" if s > 0 else "+e"
+    ribs = [ n for n in S.RIBS[:-1] ]
+    # The wall's runs between openings, each split at the pilasters (n +-16, 10 deep).
+    runs, at = [], S.SHED_N0 + 20.0
+    for a, b in WALL_OPENINGS:
+        if a > at:
+            runs.append( ( at, a - 8.0 ) )
+        at = b + 8.0
+    runs.append( ( at, S.PLATFORM_N1 - 20.0 if hasattr( S, "PLATFORM_N1" ) else 860.0 ) )
+    for a, b in runs:
+        cuts = [ a ] + [ x for n in ribs for x in ( n - 16.0, n + 16.0 ) if a < n - 16.0 and n + 16.0 < b ] + [ b ]
+        for k in range( 0, len( cuts ) - 1, 2 ):
+            na, nb = cuts[k], cuts[k + 1]
+            if nb - na < 12.0:
+                continue
+            D.conduit( m, [ ( s * face, na + 3.5, CONDUIT_Z ), ( s * face, nb - 3.5, CONDUIT_Z ) ], r=1.0, out=out )
+            for n_box in ( na, nb ):
+                # A box on the pilaster's side face (or at the run's open end, on the wall).
+                at_rib = any( abs( n_box - ( n + side * 16.0 ) ) < 0.5 for n in ribs for side in ( -1, 1 ) )
+                if at_rib:
+                    side = 1.0 if any( abs( n_box - ( n + 16.0 ) ) < 0.5 for n in ribs ) else -1.0
+                    D.junction_box( m, s * ( S.WALL_IN - 3.0 ), n_box, CONDUIT_Z, "+n" if side > 0 else "-n",
+                                    size=( 4.7, 4.7, 2.6 ) )
+                else:
+                    D.junction_box( m, s * ( S.WALL_IN - 0.5 ), n_box + ( 3.5 if n_box == na else -3.5 ), CONDUIT_Z, inward )
+            for n_drop, z_foot in CONDUIT_DROPS:
+                if na + 6.0 < n_drop < nb - 6.0:
+                    D.conduit( m, [ ( s * face, n_drop, CONDUIT_Z ), ( s * face, n_drop, z_foot ) ], r=0.8, out=out )
+                    D.junction_box( m, s * ( S.WALL_IN - 0.5 ), n_drop, CONDUIT_Z, inward, size=( 4.3, 4.3, 3.0 ) )
+
+
 def warn_plate( m, e, n ):
     m.cylinder( ( e, n ), 1.2, 0, 66, "rw_steel_grey", sides=6 )
     atlas_quad( m, "rw_signs", "warn_gleise", ( e, n - 1.4, 56 ), ( 1, 0, 0 ), ( 0, 0, 1 ), 30.0, 10.0 )
     m.box( ( e - 15.5, n - 1.3, 50.5 ), ( e + 15.5, n - 0.3, 61.5 ), "rw_white_paint" )
     m.collision_box( ( e - 1.2, n - 1.2, 0 ), ( e + 1.2, n + 1.2, 66 ), METAL )
     m.collision_box( ( e - 15.5, n - 1.4, 50.5 ), ( e + 15.5, n - 0.3, 61.5 ), METAL )
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Light fittings: where each lamp hangs, shared by the dressing (its fixture) and lights() (its light).
+
+D = optional( "railhead_dress_detail" )
+
+# The booking hall's enamelled pendants, hung on 40 mm tubes from the vault (the south row from its soffit, the north
+# row from the transverse rib at n 1615) to rims 300 up, 7.6 m over the terrazzo, as Leipzig's and Frankfurt's hang:
+# ( e, n, z_top, rim ). Their shades are 840 mm across (HALL_PENDANT_SCALE times railhead_props' 560 mm one).
+HALL_PENDANT_Z = 300.0
+HALL_PENDANT_SCALE = 1.5
+HALL_PENDANTS = [ ( e, n, S.vault_z( e ) - ( 12.0 if n == 1615.0 else 0.0 ), HALL_PENDANT_Z )
+                  for n in ( 1450.0, 1615.0 ) for e in ( -300.0, 0.0, 300.0 ) ]
+# The gallery is lit from bracket lamps on its back wall (the hall's north wall), on the piers between its windows
+# (e -100..100 and +-250..390): ( e, n, globe z, facing ).
+GALLERY_BRACKETS = [ ( e, S.HALL_N1 - 0.5, S.GALLERY_Z + 112.0, "-n" ) for e in ( -470.0, -175.0, 175.0, 470.0 ) ]
+GALLERY_PENDANTS = []
+# Bracket lamps at door height, 3.2 m, on the piers flanking the hall's three south doors; and on its north wall,
+# under the gallery, at 2.8 m, 30 in off the side doors' jambs (e +-260..380), so their arms read against the piers
+# and the middle door (and the info pillar's sign before it) is left clear: ( e, n, z, facing ).
+HALL_BRACKETS = [ ( e, S.HALL_N0 + 0.5, 125.0, "+n" ) for e in ( -500.0, -170.0, 170.0, 500.0 ) ] +                 [ ( e, S.HALL_N1 - 0.5, 110.0, "-n" ) for e in ( -410.0, -230.0, 230.0, 410.0 ) ]
+# The hall's clock: double-faced, 900 mm dials, hung from the vault between the pendants' rows, its dials looking along
+# n to both the concourse doors and the street doors, 8.4 m up to their bottom: ( e, n, dial centre z, radius ).
+HALL_CLOCK = ( 0.0, 1560.0, 330.0 + 17.7, 17.7 )
+# The wings' rooms: one pendant over each quarter, rims 172 under their 208 ceilings (east; mirrored west).
+WING_LAMPS = [ ( e, n ) for e in ( 780.0, 1020.0 ) for n in ( 1420.0, 1700.0 ) ]
+WING_LAMP_Z = 172.0
+# The canopies' LED battens (railhead_station.canopies draws them): a light just under two of each canopy's,
+# ( e, n ) east, mirrored west; the centre canopy's are on both sides of its middle.
+CANOPY_LAMPS = { "Island": ( ( 562.0, -1506.0 ), ( 702.0, -1626.0 ) ), "Outer": ( ( 994.5, -1506.0 ), ( 1134.5, -1626.0 ) ) }
+CENTRE_CANOPY_LAMPS = ( ( 95.0, -1506.0 ), ( -95.0, -1626.0 ) )
+CANOPY_LAMP_Z = S.CANOPY_Z - 4.0
+# The footbridge's ceiling battens are every 120 from e 60 (railhead_station.footbridge): a light under every other,
+# small enough that the deck has pools between them.
+FOOTBRIDGE_LAMPS = ( 60.0, 300.0, 540.0, 780.0, 1020.0 )
+FOOTBRIDGE_LAMP_Z = S.BRIDGE_ROOF - 34.0       # under the battens' lenses, far enough down not to burn the ceiling white
+FOOTBRIDGE_COLOUR = "1.6,1.75,1.95,1"          # the batten's cool white, brighter than a fill: the deck is the light's job
+FOOTBRIDGE_LAMP_RADIUS = 195.0
+
+
+# LED battens under the footbridge's deck slab over each platform, between the slab's cross ribs (every 60 from e 30):
+# e (east and west), their light 8 under the slab's underside (DECK_Z - 12).
+UNDER_BRIDGE_BATTENS = ( -1037.0, -600.0, 0.0, 600.0, 1037.0 )
+UNDER_BRIDGE_N = ( S.BRIDGE_N0 + S.BRIDGE_N1 ) / 2
+UNDER_BRIDGE_LAMP_Z = S.DECK_Z - 20.0
+
+
+def under_bridge_battens( m, es ):
+    """ A 1.2 m surface-mounted LED batten under the deck slab at each e in es, running across the bridge. """
+    for e in es:
+        S.luminaire( m, ( e, UNDER_BRIDGE_N, S.DECK_Z - 12.0 ), "n", length=47.2 )
+
+
+def footbridge_kit( m, s ):
+    """ What a DB footbridge carries, all off the walking line and with no collision but the bins': at each stair head a
+    platform plate (the stair's Gleis over an Ausgang arrow pointing at the opening) on the glazing beside the opening,
+    a bin on the opening's other side, DIN A1 frames on every second panel along the parapets, alternating sides, and
+    an extinguisher on the end wall. East half; s mirrors it. """
+    if D is None:
+        return
+    n0, n1 = S.BRIDGE_N0, S.BRIDGE_N1
+    faces = { n1: ( n1 - 4.0, "-n", -1.0 ), n0: ( n0 + 4.0, "+n", 1.0 ) }       # side: ( inner face n, facing, inward )
+    gleis = { 24.0: "gleis_3_4", 596.0: "gleis_5_6" if s > 0 else "gleis_1_2", 1000.0: "gleis_6" if s > 0 else "gleis_1" }
+    taken = []                                                                  # ( side, e0, e1 ) kept clear
+    row_h = 9.0
+    for e0, e1, down in S.BRIDGE_STAIRS:
+        side = n1 if down > 0 else n0
+        face, facing, inward = faces[side]
+        # The plate on the side walkers from the bridge's middle reach first; the centre stairs' on their outer side.
+        plate_side = 1.0 if e0 < 100 else -1.0
+        names = [ gleis[e0] ]
+        e_plate = ( e1 + 10.0 + 26.0 ) if plate_side > 0 else ( e0 - 10.0 - 26.0 )
+        opening = ( e0 + e1 ) / 2
+        F = D.Frame( s * e_plate, face, 0.0, facing )
+        # Which way the opening lies for someone reading the plate: along the frame's x (their right) or not.
+        right = ( s * opening - s * e_plate ) * F.x[0] > 0
+        arrow = "ausgang_right" if right else "ausgang_left"
+        w_arrow = row_h * atlas_aspect( "rw_signs", arrow )
+        at = ( s * e_plate, face + inward * 0.6 )
+        # Two plates of one width, stacked with a hand's gap: the Gleis (taller, as its plate is shorter) over the
+        # Ausgang arrow.
+        aspect = max( atlas_aspect( "rw_signs", names[0] ), 0.1 )
+        gleis_h = min( w_arrow / aspect, 12.0 )             # a single platform's square plate stays 300 mm
+        detail( "wall_sign", m, at[0], at[1], facing, names, [ gleis_h * aspect ], S.DECK_Z + 41.0 + row_h + 2.5, gleis_h )
+        detail( "wall_sign", m, at[0], at[1], facing, [ arrow ], [ w_arrow ], S.DECK_Z + 41.0, row_h )
+        taken.append( ( side, e_plate - 28.0, e_plate + 28.0 ) )
+        # The bin on the opening's other side, 4 in off the panel, clear of the handrail.
+        e_bin = ( e0 - 16.0 ) if plate_side > 0 else ( e1 + 16.0 )
+        put( "bin", m, s * e_bin, face + inward * 12.0, facing, S.DECK_Z )
+        taken.append( ( side, e_bin - 14.0, e_bin + 14.0 ) )
+        taken.append( ( side, e0 - 8.0, e1 + 8.0 ) )
+    # A1 frames, centred between the panels' stiffeners (every 60 from 31.5), every 120, alternating sides.
+    entries = ( "poster_city", "network_map", "poster_sea", "notice_a4", "poster_bike", "poster_alps" )
+    k = 0
+    e = 121.5
+    while e < S.WALL_IN - 40.0:
+        side = n1 if k % 2 == 0 else n0
+        if not any( sd == side and a - 14.0 < e < b + 14.0 for sd, a, b in taken ):
+            face, facing, inward = faces[side]
+            detail( "notice_board", m, s * e, face + inward * 0.6, facing, entries[k % len( entries )],
+                    bottom=S.DECK_Z + 22.0 )
+        k += 1
+        e += 120.0
+    # The extinguisher on the bridge's end, against the shed wall's inside face.
+    detail( "extinguisher", m, s * ( S.WALL_IN - 0.5 ), -262.0, "-e" if s > 0 else "+e", z0=S.DECK_Z )
+
+
+def bridge_stair_runs():
+    """ Each footbridge stair (east; mirrored west) as ( e0, e1, foot n, landing's near n, landing's far n, top n,
+    climb ): railhead_station.bridge_stair's figures (16 steps, a 48 landing, 15 more). """
+    out = []
+    rise, tread = S.STAIR_RISE, S.STAIR_TREAD
+    for e0, e1, down in S.BRIDGE_STAIRS:
+        top_n = S.BRIDGE_N1 if down > 0 else S.BRIDGE_N0
+        foot = top_n + down * ( 31 * tread + 48 )
+        climb = -down
+        land0 = foot + climb * 16 * tread
+        land1 = land0 + climb * 48
+        out.append( ( e0, e1, foot, land0, land1, top_n, climb ) )
+    return out
+
+
+def footbridge_stair_lamps():
+    """ The lights for each stair: one over each flight's middle (from the LED lines under its handrails) and one at
+    its foot, ( e, n, z ) east. """
+    out = []
+    rise = S.STAIR_RISE
+    for e0, e1, foot, land0, land1, top_n, climb in bridge_stair_runs():
+        e = ( e0 + e1 ) / 2
+        out.append( ( e, ( foot + land0 ) / 2, 8 * rise + 40.0 ) )
+        out.append( ( e, ( land1 + top_n ) / 2, 16 * rise + 7.5 * rise + 40.0 ) )
+        out.append( ( e, foot - climb * 40.0, 110.0 ) )
+    return out
+
+
+def stair_leds( m, s ):
+    """ LED lines under both handrails of every footbridge flight, 880 mm over the nosings. """
+    if D is None:
+        return
+    rise, tread = S.STAIR_RISE, S.STAIR_TREAD
+    for e0, e1, foot, land0, land1, top_n, climb in bridge_stair_runs():
+        for e_rail in ( e0 + 2.6, e1 - 2.6 ):
+            e = s * e_rail
+            for n_a, z_a, n_b, z_b in ( ( foot + climb * tread * 0.5, rise, land0 - climb * tread * 0.5, 16 * rise ),
+                                        ( land1 + climb * tread * 0.5, 17 * rise, top_n - climb * tread * 0.5, 31 * rise ) ):
+                D.handrail_led( m, ( e, n_a, z_a + 34.0 ), ( e, n_b, z_b + 34.0 ) )
+
+
+def pendant( m, e, n, z_top, z, scale=1.0, tube=None ):
+    """ railhead_props' pendant lamp (a light fitting, with no collision of its own: it hangs out of reach), scaled
+    about its rim (scale 1.5 makes its 560 mm shade the hall's 840), or a plain rod and shade while it isn't there.
+    tube: the suspension tube's radius, over the lamp's own rod, from the shade's top to a ceiling rose. """
+    fn = getattr( P, "pendant_lamp", None ) if P is not None else None
+    if fn is not None:
+        temp = Model()
+        try:
+            # Drawn with a short rod, so scaling it doesn't move its top: the tube carries it on to the ceiling.
+            fn( temp, e, n, z + 14.0 if scale != 1.0 else z_top, z )
+        except Exception as error:
+            MISSING.setdefault( "pendant_lamp", f"{type( error ).__name__}: {error}" )
+        else:
+            temp.boxes, temp.hulls = [], []
+            if scale != 1.0 and D is not None:
+                D.scaled_into( m, temp, ( e, n, z ), scale )
+                top = z + 14.0 * scale
+            else:
+                m.extend( temp )
+                top = z_top if scale == 1.0 else z + 14.0
+            if tube or top < z_top - 0.5:
+                if D is not None:
+                    r = tube or 0.8
+                    D.rod( m, ( e, n, top - 1.0 ), ( e, n, z_top - 2.0 ), r, "rw_steel_dark", 10 )
+                    # A ceiling rose, and a coupling half way.
+                    D.rod( m, ( e, n, z_top - 2.0 ), ( e, n, z_top ), r * 3.2, "rw_steel_dark", 14, caps=( True, False ) )
+                    mid = ( top + z_top ) / 2
+                    D.rod( m, ( e, n, mid - 1.0 ), ( e, n, mid + 1.0 ), r * 1.35, "rw_steel_dark", 10, caps=( True, True ) )
+            return
+    m.box( ( e - 0.4, n - 0.4, z + 10 ), ( e + 0.4, n + 0.4, z_top ), "rw_steel_dark" )
+    m.cylinder( ( e, n ), 10.0, z, z + 10, { "side": "rw_steel_dark", "bottom": "rw_lamp_warm" }, sides=16, collide=None )
+
+
+def overhead( name, m, *args, floor_clear=110.0, **kw ):
+    """ railhead_props' name( ... ) as a fitting hung out of reach: any collision box it makes that comes down
+    within floor_clear of the floor is left out (a clock's makes a 2.5 m column under it). """
+    fn = getattr( P, name, None ) if P is not None else None
+    if fn is None:
+        MISSING.setdefault( name, "not in railhead_props" )
+        return None
+    temp = Model()
+    try:
+        result = fn( temp, *args, **kw )
+    except Exception as error:
+        MISSING.setdefault( name, f"{type( error ).__name__}: {error}" )
+        return None
+    temp.boxes = [ b for b in temp.boxes if b[0][2] - b[2][2] / 2 > floor_clear ]
+    temp.hulls = []
+    m.extend( temp )
+    return result
+
+
+def visual( name, m, *args, **kw ):
+    """ railhead_props' name( m, ... ) for a piece with no collision of its own (a cable trough, a pallet jack), which
+    use() won't take. """
+    fn = getattr( P, name, None ) if P is not None else None
+    if fn is None:
+        MISSING.setdefault( name, "not in railhead_props" )
+        return None
+    temp = Model()
+    try:
+        result = fn( temp, *args, **kw )
+    except Exception as error:
+        MISSING.setdefault( name, f"{type( error ).__name__}: {error}" )
+        return None
+    m.extend( temp )
+    return result
+
+
+def detail( name, *args, **kw ):
+    """ railhead_dress_detail's name( ... ), if that module is there. """
+    fn = getattr( D, name, None ) if D is not None else None
+    if fn is None:
+        MISSING.setdefault( f"railhead_dress_detail.{name}", "not there" )
+        return None
+    try:
+        return fn( *args, **kw )
+    except Exception as error:
+        MISSING.setdefault( f"railhead_dress_detail.{name}", f"{type( error ).__name__}: {error}" )
+        return None
 
 
 def head_building( m, s ):
@@ -686,29 +1139,179 @@ def head_building( m, s ):
         hanging_sign( m, 1000.0, 1660.0, S.WING_CEILING, [ "schliessfaecher" ], "e", bottom=110.0 )
     # Well inside the wing's door, so its rod runs up out of sight behind the arch's head.
     hanging_sign( m, s * 900.0, 1420.0, S.WING_CEILING, [ "info" ], "n", bottom=120.0 )
+    # The wings' pendants, one over each quarter of the room.
+    for e, n in WING_LAMPS:
+        pendant( m, s * e, n, S.WING_CEILING, WING_LAMP_Z )
+    # Posters and an extinguisher on the wing's free walls: by the travel centre's queue west, the lockers east.
+    wall_e = s * ( S.WALL_IN - 0.5 )
+    inward = "-e" if s > 0 else "+e"
+    detail( "city_light", m, wall_e, 1480.0, inward, "poster_alps" if s > 0 else "poster_bike", bottom=36.0 )
+    detail( "extinguisher", m, wall_e, 1390.0, inward )
 
 
-ROAD_VEHICLES_ENABLED = False  # Keep the placements and models for future restoration.
+ROAD_VEHICLES_ENABLED = True
+# German taxis are RAL 1015 light ivory: railhead_materials' rw_car_ivory once it's registered, white until then.
+TAXI_PAINT = "rw_car_ivory" if RM is not None and "rw_car_ivory" in getattr( RM, "PAINTED", {} ) else "rw_car_white"
 
 
 def cab_road_vehicles( m, s ):
-    """ Taxis waiting at the head building's end of the cab road, nose to the station, cars parked further down, and
-    street lamps along the far pavement. """
+    """ Taxis waiting at the head building's end of the cab road, nose to the station, tight to the station's kerb in
+    the taxi lane (e 1500..1607), a car and a van parked further down. None of them stands in the spawn rows (e 1640
+    and 1860, n -450..450) or on the Retakes attackers' points. """
     for n in ( 600.0, 820.0, 1040.0 ):
-        use( "car", m, s * 1555.0, n, "+n", "rw_train_white", ROAD_Z, "estate",
-             stand_in=furniture_stand_in( "car", s * 1555.0, n, z0=ROAD_Z ) )
-    use( "suv", m, s * 1555.0, -900.0, "+n", "rw_car_grey", ROAD_Z,
-         stand_in=furniture_stand_in( "suv", s * 1555.0, -900.0, z0=ROAD_Z ) )
-    use( "car", m, s * 1555.0, 1300.0, "+n", "rw_car_blue" if s > 0 else "rw_car_red", ROAD_Z, "estate",
-         stand_in=furniture_stand_in( "car", s * 1555.0, 1300.0, z0=ROAD_Z ) )
+        use( "car", m, s * 1553.0, n, "+n", TAXI_PAINT, ROAD_Z, "estate", taxi=True,
+             stand_in=furniture_stand_in( "car", s * 1553.0, n, z0=ROAD_Z ) )
+    use( "suv", m, s * 1553.0, -900.0, "+n", "rw_car_grey", ROAD_Z,
+         stand_in=furniture_stand_in( "suv", s * 1553.0, -900.0, z0=ROAD_Z ) )
+    use( "car", m, s * 1553.0, 1300.0, "+n", "rw_car_blue" if s > 0 else "rw_car_red", ROAD_Z, "estate",
+         stand_in=furniture_stand_in( "car", s * 1553.0, 1300.0, z0=ROAD_Z ) )
     use( "van", m, s * 1940.0, -900.0, "-n", "rw_car_white", ROAD_Z,
          stand_in=furniture_stand_in( "van", s * 1940.0, -900.0, z0=ROAD_Z ) )
+
+
+# The cab road's street furniture on the station's pavement (e 1200..1500): steel bollards along the kerb opposite
+# the spawns and in front of the two portals, bins and lamp posts, and the taxi rank's sign at the rank's head.
+# The kerb's bollards: a run by the middle arches, and along the taxi rank from its tail (the second taxi post at n
+# 760) to its head, so the rank reads as one from the road.
+CAB_BOLLARDS = [ n for n in range( -180, 181, 120 ) ] + [ 640.0, 700.0, 880.0, 1000.0, 1120.0, 1240.0 ]
+CAB_LAMPS = ( -700.0, -100.0, 500.0, 1060.0 )
+CAB_BINS = ( 1010.0, -520.0 )
+
+
 def cab_road( m, s ):
     if ROAD_VEHICLES_ENABLED:
         cab_road_vehicles( m, s )
     for n in ( -1000.0, -400.0, 200.0, 800.0, 1400.0 ):
         use( "lamp_post", m, s * 2100.0, n, 236.0,
              stand_in=lambda m_, n=n: m_.cylinder( ( s * 2100.0, n ), 2.5, 0, 236, "rw_steel_dark", sides=8, surface=METAL ) )
+    kerb = S.PAVEMENT_E1
+    for n in CAB_LAMPS:
+        use( "lamp_post", m, s * ( kerb - 30.0 ), n, 236.0,
+             stand_in=lambda m_, n=n: m_.cylinder( ( s * ( kerb - 30.0 ), n ), 2.5, 0, 236, "rw_steel_dark", sides=8, surface=METAL ) )
+    for n in CAB_BOLLARDS:
+        use( "bollard", m, s * ( kerb - 12.0 ), float( n ), stand_in=furniture_stand_in( "bollard", s * ( kerb - 12.0 ), float( n ) ) )
+    for n in CAB_BINS:
+        put( "bin", m, s * ( kerb - 22.0 ), n, "+e" if s > 0 else "-e" )
+    # The rank's head and tail, and a help point column by the head, in front of the wall's pier between the portals.
+    detail( "taxi_post", m, s * ( kerb - 12.0 ), 1180.0, "+n" )
+    detail( "taxi_post", m, s * ( kerb - 12.0 ), 760.0, "+n" )
+    put( "info_pillar", m, s * 1440.0, 1060.0, "-e" if s > 0 else "+e" )
+    # A Litfass column at the pavement's north end, by the head building's corner, clear of the portal's lane.
+    detail( "litfass_column", m, s * 1446.0, 1290.0, ( "poster_city", "poster_alps", "poster_bike" ) if s > 0 else
+            ( "poster_sea", "poster_bike", "poster_city" ) )
+    # Cycle stands in a row north of the portals, by the head building's corner.
+    for e in ( 1290.0, 1330.0, 1370.0, 1410.0 ):
+        detail( "cycle_stand", m, s * e, 1335.0, "+e" )
+    # Gullies in the gutters every 20 m, and manhole covers down the lanes.
+    for n in ( -1180.0, -390.0, 400.0, 1190.0 ):
+        detail( "gully", m, s * ( kerb + 7.0 ), n, ROAD_Z )
+        detail( "gully", m, s * ( S.ROAD_E1 - 7.0 ), n + 200.0, ROAD_Z )
+    for e, n in ( ( 1700.0, -760.0 ), ( 1900.0, 640.0 ), ( 1700.0, 1120.0 ), ( 1900.0, -1220.0 ) ):
+        detail( "manhole", m, s * e, n, ROAD_Z )
+    road_wear( m, s )
+
+
+def road_wear( m, s ):
+    """ The carriageway's wear, drawn on its asphalt: a few nearly straight settlement cracks sealed with bitumen along
+    the kerbs and across the lanes, two patch repairs over old trenches, oil under the taxis, and grime in the gutters.
+    The lanes' wheel paths are rw_asphalt's own (railhead_materials.ASPHALT_WHEEL_PATHS, baked into its tile), so none
+    are drawn here: a lane would get four tracks. Everything is low in contrast: dark grey, never black. """
+    if D is None:
+        return
+    rng = np.random.default_rng( 7101 if s > 0 else 7102 )
+    z = ROAD_Z + 0.06
+    kerb, far = S.PAVEMENT_E1, S.ROAD_E1
+    up = math.pi / 2
+    # Along both kerbs, where the gutter's edge works loose: sparse straight runs with long gaps between them.
+    for e0 in ( kerb + 14.0, far - 16.0 ):
+        n = -1250.0 + rng.uniform( 0.0, 300.0 )
+        while n < 1700.0:
+            length = rng.uniform( 200.0, 500.0 )
+            detail( "sealed_crack", m, rng, ( s * ( e0 + rng.normal( 0, 2 ) ), n ), up, length, z )
+            n += length + rng.uniform( 300.0, 700.0 )
+    # Across the lanes, where the road's base has settled over a culvert: two, nearly straight.
+    for n in ( -330.0, 930.0 ):
+        start = ( s * ( kerb + 20.0 ), n + rng.normal( 0, 20 ) )
+        heading = 0.0 if s > 0 else math.pi
+        detail( "sealed_crack", m, rng, start, heading + rng.normal( 0, 0.04 ), rng.uniform( 260.0, 470.0 ), z )
+    # Patches over trenches dug for a cable and a water main: long narrow rectangles along the lanes, saw-cut straight.
+    for e0, e1, n0, n1 in ( ( 1640.0, 1690.0, -640.0, -380.0 ), ( 1815.0, 1870.0, 520.0, 760.0 ) ):
+        a, b = sorted( ( s * e0, s * e1 ) )
+        detail( "patch_repair", m, rng, a, b, n0, n1, z + 0.02 )
+    # Gutter grime along both kerbs: road dust, leaf litter and oil washed to the kerb, darkest against it.
+    D.register( m, "dress_asphalt_track", "dress_gutter" )
+    for kerb_e, inward in ( ( kerb, 1.0 ), ( far, -1.0 ) ):
+        for paint, width, lift in ( ( "dress_asphalt_track", 18.0, 0.015 ), ( "dress_gutter", 8.0, 0.02 ) ):
+            a, b = sorted( ( s * kerb_e, s * ( kerb_e + inward * width ) ) )
+            n = S.SHED_N0 + 42.0
+            while n < S.HEAD_N1 - 12.0:
+                nb = min( n + rng.uniform( 150.0, 320.0 ), S.HEAD_N1 - 12.0 )
+                w = rng.uniform( 0.75, 1.0 )
+                a2, b2 = ( a, a + ( b - a ) * w ) if ( s * inward ) > 0 else ( b - ( b - a ) * w, b )
+                m.polygon( paint, [ ( a2, n, ROAD_Z + lift ), ( b2, n, ROAD_Z + lift ), ( b2, nb, ROAD_Z + lift ),
+                                    ( a2, nb, ROAD_Z + lift ) ], normal=( 0, 0, 1 ) )
+                n = nb
+    # Oil where the taxis wait and the car stands.
+    for n in ( 600.0, 820.0, 1040.0, 1300.0, -900.0 ):
+        detail( "oil_drips", m, rng, s * 1553.0, n + 40.0, z + 0.04 )
+    # The centre line's dashes worn grey where wheels cross them.
+    worn = ROAD_Z + 0.07
+    n = S.SHED_N0 + 40 + 80
+    while n + 118 < S.HEAD_N1:
+        a, b = sorted( ( s * 1797.6, s * 1802.4 ) )
+        detail( "worn_marking", m, rng, a, b, n, n + 118, worn, count=3 )
+        n += 354
+    # TAXI on the rank's lane, read by a driver coming up it (north), and its lane line's start.
+    taxi_lettering( m, s )
+
+
+# The carriageway's lanes' middles (east): the taxi lane by the station's kerb, then the lanes either side of the
+# dashed centre line (railhead_station.cab_road's markings).
+ROAD_LANES = ( 1553.0, 1705.0, 1901.0 )
+
+
+def taxi_lettering( m, s ):
+    """ TAXI in 1.6 m road letters across the taxi lane south of the rank, in worn white paint. """
+    if D is None:
+        return
+    D.register( m, "dress_line_worn" )
+    lane0, lane1 = S.PAVEMENT_E1 + 12.0, 1600.0
+    lo, hi = sorted( ( s * lane0, s * lane1 ) )
+    width, gap, stroke = 17.0, 6.0, 4.7
+    text_w = 4 * width + 3 * gap
+    e0 = ( lo + hi ) / 2 - text_w / 2
+    rng = np.random.default_rng( 7301 if s > 0 else 7302 )
+    D.stroke_text( m, "dress_line_worn", "TAXI", ( e0, 430.0, ROAD_Z + 0.06 ), ( 1, 0, 0 ), ( 0, 1, 0 ), 63.0, width,
+                   stroke, gap=gap, rng=rng )
+
+
+# Where feet have polished the platforms' and the footbridge's stone (east; the west is mirrored): ( base paint,
+# e0, e1, n0, n1, z ), each clear of the platform edges' safety strips, the stairs and the furniture lines.
+WALKING_LINES = [ ( "rw_paving", 960.0, 994.0, -1300.0, 860.0, 0.0 ),            # the outer platform, by the stair
+                  ( "rw_paving", 545.0, 575.0, -1300.0, 840.0, 0.0 ),            # the island's two
+                  ( "rw_paving", 689.0, 719.0, -1300.0, 860.0, 0.0 ),
+                  ( "rw_paving", 104.0, 124.0, -1300.0, 860.0, 0.0 ) ]           # the centre platform's east side
+# (The footbridge's deck is left alone: its stone's speckle is strong already, and a glossier band only sharpens it.)
+# Where gum gathers: round the benches, kiosks, machines and the platforms' heads ( e0, e1, n0, n1, z, count ).
+GUM_ZONES = [ ( 930.0, 1150.0, -1300.0, 860.0, 0.0, 140 ), ( 530.0, 735.0, -1300.0, 860.0, 0.0, 160 ),
+              ( 20.0, 125.0, -1300.0, 860.0, 0.0, 70 ), ( 200.0, 1150.0, 890.0, 1290.0, 0.0, 150 ),
+              ( 30.0, 1150.0, -320.0, -240.0, S.DECK_Z, 60 ) ]
+
+
+def floor_wear( m, s ):
+    """ Polished walking lines and trodden gum on the platforms, the concourse and the footbridge. """
+    if D is None or not hasattr( D, "polished_band" ):
+        return
+    name = "railhead_east" if s > 0 else "railhead_west"
+    for base, e0, e1, n0, n1, z in WALKING_LINES:
+        a, b = sorted( ( s * e0, s * e1 ) )
+        detail( "polished_band", m, base, a, b, n0, n1, z, name )
+    rng = np.random.default_rng( 7501 if s > 0 else 7502 )
+    stairs = [ ( *sorted( ( s * ( e0 - 6 ), s * ( e1 + 6 ) ) ), *sorted( ( foot, top ) ) )
+               for e0, e1, foot, _, _, top, _ in bridge_stair_runs() ]
+    for e0, e1, n0, n1, z, count in GUM_ZONES:
+        a, b = sorted( ( s * e0, s * e1 ) )
+        detail( "gum_spots", m, rng, a, b, n0, n1, z, count, avoid=stairs if z == 0.0 else () )
 
 
 def dress_side( s ):
@@ -720,20 +1323,84 @@ def dress_side( s ):
     throat( m, s )
     concourse( m, s )
     platforms( m, s )
+    stair_leds( m, s )
+    footbridge_kit( m, s )
+    under_bridge_battens( m, ( s * 600.0, s * 1037.0 ) )
+    floor_wear( m, s )
     head_building( m, s )
     cab_road( m, s )
     return m
 
 
+def tactile_strip( m, a, b, z=0.0, width=11.8, paint="rw_tactile" ):
+    """ A guidance strip of white tactile plates (DIN 32984) from plan point a to b, along e or n, its ribs running the
+    way you walk: UVs along the strip (the plates' texture is 24 in a tile, ribs along v). 0.2 proud. """
+    ( e0, n0 ), ( e1, n1 ) = a, b
+    z = z + 0.2
+    if abs( e1 - e0 ) < 1e-6:                       # along n
+        lo, hi = sorted( ( n0, n1 ) )
+        pts = [ ( e0 - width / 2, lo, z ), ( e0 + width / 2, lo, z ), ( e0 + width / 2, hi, z ), ( e0 - width / 2, hi, z ) ]
+        uv = [ ( 0.0, lo / 24.0 ), ( width / 24.0, lo / 24.0 ), ( width / 24.0, hi / 24.0 ), ( 0.0, hi / 24.0 ) ]
+    else:                                           # along e: the texture turned a quarter
+        lo, hi = sorted( ( e0, e1 ) )
+        pts = [ ( lo, n0 - width / 2, z ), ( hi, n0 - width / 2, z ), ( hi, n0 + width / 2, z ), ( lo, n0 + width / 2, z ) ]
+        uv = [ ( width / 24.0, lo / 24.0 ), ( width / 24.0, hi / 24.0 ), ( 0.0, hi / 24.0 ), ( 0.0, lo / 24.0 ) ]
+    m.polygon( paint, pts, normal=( 0, 0, 1 ), uv=uv )
+    # The plates' edges, a hair proud of the paving round them.
+    for p, q in zip( pts, pts[1:] + pts[:1] ):
+        m.polygon( "rw_concrete", [ ( p[0], p[1], z - 0.2 ), ( q[0], q[1], z - 0.2 ), ( q[0], q[1], z ), ( p[0], p[1], z ) ] )
+
+
+def attention_field( m, e, n, z=0.0, size=35.4 ):
+    """ An attention field (Aufmerksamkeitsfeld) of studded plates, 900 mm square, where guidance strips meet or end. """
+    h = size / 2
+    z1 = z + 0.2
+    m.polygon( "rw_tactile_dots", [ ( e - h, n - h, z1 ), ( e + h, n - h, z1 ), ( e + h, n + h, z1 ), ( e - h, n + h, z1 ) ],
+               normal=( 0, 0, 1 ), uv=[ ( 0, 0 ), ( size / 24.0, 0 ), ( size / 24.0, size / 24.0 ), ( 0, size / 24.0 ) ] )
+    m.box( ( e - h, n - h, z ), ( e + h, n + h, z1 ), { "default": "rw_concrete", "+z": None, "-z": None } )
+
+
+# The concourse's tactile guidance: from the booking hall's middle door along e 60 (clear of the shed's middle
+# columns and the info pillar on the centre line) to a strip along the concourse past every platform's head, with an
+# attention field and a branch down to each.
+GUIDE_N = 905.0
+GUIDE_E = 60.0
+
+
+def tactile_guidance( m ):
+    tactile_strip( m, ( GUIDE_E, 1296.0 ), ( GUIDE_E, GUIDE_N + 18.0 ) )
+    heads = ( -1037.0, -632.0, GUIDE_E, 632.0, 1037.0 )
+    for a, b in zip( heads, heads[1:] ):
+        tactile_strip( m, ( a + 18.0, GUIDE_N ), ( b - 18.0, GUIDE_N ) )
+    for e in heads:
+        attention_field( m, e, GUIDE_N )
+        tactile_strip( m, ( e, GUIDE_N - 18.0 ), ( e, 880.5 ) )
+
+
 def dress_centre():
     m = Model()
+    tactile_guidance( m )
+    under_bridge_battens( m, ( 0.0, ) )
+    # The centre platform's cast-iron columns: PA loudspeakers under the sign band on every other one, facing both
+    # platform edges, each fed by a conduit up the shaft from its junction box.
+    for k, n in enumerate( S.RIBS[1:-2] ):
+        if k % 2 == 0:
+            detail( "column_kit", m, 0.0, n, cable_side="+n" if k % 4 == 0 else "-n" )
     use( "info_pillar", m, 0.0, 940.0, stand_in=furniture_stand_in( "info_pillar", 0.0, 940.0 ) )
     hanging_sign( m, 0.0, 900.0, S.GUTTER_Z[0], [ "gleis_3_4" ], "n", bottom=150.0 )
     clock( m, 0.0, 1110.0, 240.0, "n" )
     kiosk( m, KIOSKS[2] )
-    for n in ( 460.0, -500.0 ):
+    for n in ( 460.0, -500.0, -1220.0 ):
         put( "bench", m, -12.0, n, "-e" )
         put( "bench", m, 12.0, n, "+e" )
+        put( "bin", m, 0.0, n - 60.0 )
+    # The booking hall's lamps: enamelled pendants from the vault and over the gallery, bracket lamps on the piers.
+    for e, n, z_top, z in HALL_PENDANTS:
+        pendant( m, e, n, z_top, z, scale=HALL_PENDANT_SCALE, tube=0.8 )
+    for e, n, z, facing in HALL_BRACKETS + GALLERY_BRACKETS:
+        detail( "bracket_lamp", m, e, n, z, facing )
+    e, n, z, r = HALL_CLOCK
+    overhead( "clock", m, e, n, z, "n", z_top=S.vault_z( e ), radius=r, floor_clear=10000.0 )
     for letter, n in zip( "abcde", ( 940.0, 460.0, -20.0, -500.0, -980.0 ) ):
         hanging_sign( m, 0.0, n, S.GUTTER_Z[0], [ f"sector_{letter}" ], "n", bottom=170.0 )
     board( m, "rw_signs", [ "station_name" ], 0.0, -1520.0, 150.0, 20.0, "e", z_top=S.CANOPY_Z - 12 )
@@ -760,28 +1427,59 @@ def dress_centre():
 
 WARM = "1.6,1.3,0.95,1"
 COOL = "1.1,1.2,1.35,1"
+VITRINE = "0.7,0.56,0.4,1"         # a kiosk's lit end vitrine
+BRACKET = "0.9,0.7,0.48,1"         # a bracket lamp's opal globe: small, warm and dim beside the pendants
+
+
+def is_fill_light(name):
+    """ The broad fills that stand in for daylight and unseen fittings: diffuse only, at 0.42. Every light with a
+    fitting of its own (pendants, battens, kiosks) shines at full strength, specular included. """
+    return name.startswith(("Platform ", "Concourse ", "Booking Hall "))
 
 
 def lights():
     out = []
     for k, e in enumerate( ( -1000, -600, -200, 200, 600, 1000 ) ):
         out.append( ( f"Concourse {k + 1}", ( e, 1090, 300 ), WARM, 500, False ) )
-    for k, ( e, n ) in enumerate( ( e, n ) for e in ( -400, 0, 400 ) for n in ( 1440, 1620 ) ):
-        out.append( ( f"Booking Hall {k + 1}", ( e, n, 380 ), WARM, 520, k == 2 ) )
-    for e in ( -300, 300 ):
-        out.append( ( f"Gallery {'West' if e < 0 else 'East'}", ( e, 1720, 330 ), WARM, 300, False ) )
+    # The booking hall: its six pendants carry the light, with a soft fill at each end.
+    for k, e in enumerate( ( -400, 400 ) ):
+        out.append( ( f"Booking Hall {k + 1}", ( e, 1540, 380 ), WARM, 520, False ) )
+    for k, ( e, n, _, z ) in enumerate( HALL_PENDANTS ):
+        # Shadows from the south row only: three shadowed lights light the whole floor's pools, at half the cost.
+        out.append( ( f"Hall Pendant {k + 1}", ( e, n, z - 3.0 ), WARM, 560, n == 1450.0 ) )
+    for k, ( e, n, z, facing ) in enumerate( GALLERY_BRACKETS ):
+        # The two nearer the middle cast shadows (the balustrade's on the floor), the outer two don't.
+        out.append( ( f"Gallery {k + 1}", ( e, n + NORMALS[facing][1] * 16.0, z - 0.6 ), WARM, 260, abs( e ) < 300 ) )
+    for k, ( e, n, z, facing ) in enumerate( HALL_BRACKETS ):
+        out.append( ( f"Hall Bracket {k + 1}", ( e, n + NORMALS[facing][1] * 16.0, z - 0.6 ), BRACKET, 220, False ) )
     for s, side in ( ( -1, "West" ), ( 1, "East" ) ):
-        for k, ( e, n ) in enumerate( ( e, n ) for e in ( 780, 1020 ) for n in ( 1420, 1700 ) ):
-            out.append( ( f"{side} Wing {k + 1}", ( s * e, n, 190 ), WARM, 320, False ) )
+        # The wings' pendants: each room's light, one of them casting shadows.
+        for k, ( e, n ) in enumerate( WING_LAMPS ):
+            out.append( ( f"{side} Wing Lamp {k + 1}", ( s * e, n, WING_LAMP_Z - 2.0 ), WARM, 320,
+                          ( e, n ) in ( ( 780.0, 1420.0 ), ( 1020.0, 1700.0 ) ) ) )
         for k, n in enumerate( ( -2050, -1900, -1750 ) ):
             out.append( ( f"{side} Goods Shed {k + 1}", ( s * 1660, n, 200 ), WARM, 300, False ) )
-        for k, n in enumerate( ( -1450, -1600 ) ):
-            for e, name in ( ( 75, "Centre" ), ( 632, "Island" ), ( 1064, "Outer" ) ):
-                if e == 75 and s < 0:
-                    continue
-                out.append( ( f"{side} {name} Canopy {k + 1}", ( 0 if e == 75 else s * e, n, 190 ), WARM, 300, False ) )
+        # The canopies' LED battens.
+        for name, spots in CANOPY_LAMPS.items():
+            for k, ( e, n ) in enumerate( spots ):
+                out.append( ( f"{side} {name} Canopy {k + 1}", ( s * e, n, CANOPY_LAMP_Z ), COOL, 300,
+                              name == "Island" and k == 0 ) )
+        if s > 0:
+            for k, ( e, n ) in enumerate( CENTRE_CANOPY_LAMPS ):
+                out.append( ( f"Centre Canopy {k + 1}", ( e, n, CANOPY_LAMP_Z ), COOL, 300, False ) )
+        # The footbridge's deck, under its ceiling battens.
+        for e in FOOTBRIDGE_LAMPS:
+            out.append( ( f"Footbridge {side} {e:g}", ( s * e, ( S.BRIDGE_N0 + S.BRIDGE_N1 ) / 2, FOOTBRIDGE_LAMP_Z ),
+                          FOOTBRIDGE_COLOUR, FOOTBRIDGE_LAMP_RADIUS, False ) )
+        # The stairs: the LED lines under their handrails, and a light at each foot.
+        for k, ( e, n, z ) in enumerate( footbridge_stair_lamps() ):
+            out.append( ( f"Footbridge Stair {side} {k + 1}", ( s * e, n, z ), COOL, 150 if k % 3 < 2 else 200, False ) )
     for k, ( e, n ) in enumerate( ( e, n ) for e in ( -1037, -632, 0, 632, 1037 ) for n in ( 820, 340, -140, -620, -1100 ) ):
         out.append( ( f"Platform {k + 1}", ( e, n, 260 ), WARM, 360, False ) )
+    # Under the footbridge's deck, where the shed's light doesn't reach the platforms: under each LED batten there
+    # (UNDER_BRIDGE_BATTENS), 8 under the slab, so they wash the soffit and the floor. Not fills: full strength.
+    for k, e in enumerate( UNDER_BRIDGE_BATTENS ):
+        out.append( ( f"Under Bridge {k + 1}", ( e, UNDER_BRIDGE_N, UNDER_BRIDGE_LAMP_Z ), COOL, 300, False ) )
     import railhead_signal_box as SIGNAL_BOX
     out.extend( SIGNAL_BOX.lights() )
     for e in ( -TRACK_C, -TRACK_B, -TRACK_A, TRACK_A, TRACK_B, TRACK_C ):
@@ -790,8 +1488,21 @@ def lights():
         out.append( ( f"Buffer Siding {s}", ( s * S.SIDING_E, -1613.5, 63.5 ), "1.1,0.009,0.003,1", 32, False ) )
     if P is not None and hasattr( P, "kiosk_lights" ):
         for name, *spec in KIOSKS:
-            for k, ( position, radius ) in enumerate( P.kiosk_lights( *spec ) ):
-                out.append( ( f"Kiosk {name}{' Counter' if k else ''}", position, WARM, radius, False ) )
+            try:
+                kiosk_spots = P.kiosk_lights( *spec, fascia=True )
+            except TypeError:
+                kiosk_spots = P.kiosk_lights( *spec )
+            for k, ( position, radius ) in enumerate( kiosk_spots ):
+                out.append( ( f"Kiosk {name} {k + 1}", position, WARM, radius, False ) )
+        # Weak warm light out from each kiosk's lit end vitrines.
+        for name, e0, e1, n0, n1, facing in KIOSKS:
+            for k, e in enumerate( ( e0 - 30.0, e1 + 30.0 ) ):
+                out.append( ( f"Kiosk {name} Vitrine {k + 1}", ( e, ( n0 + n1 ) / 2, 60.0 ), VITRINE, 80, False ) )
+        for s_, side in ( ( 1, "East" ), ( -1, "West" ) ):
+            out.append( ( f"Vending {side}", ( s_ * 1102.0, 300.0, 45.0 ), "0.55,0.62,0.7,1", 60, False ) )
+        for side, e0, e1, facing in (("East", 260., 340., "-e"), ("West", -340., -260., "+e")):
+            for k, (position, radius) in enumerate(P.kiosk_lights(e0, e1, 1480., 1560., facing)):
+                out.append((f"Hall Kiosk {side} {k + 1}", position, WARM, radius, False))
     if P is not None:
         import railhead_ticket_machine as TM
         for sign, side in ((-1, "West"), (1, "East")):
@@ -806,7 +1517,10 @@ def lights():
                     continue
                 for name, position, color, radius in EMU.lights(sign * e, 720, 1, RAIL_Z, platform_side):
                     out.append((f"Train {side} {track} {name}", position, color, radius, False))
-    return out
+    # Broad artificial fill supplements the native daylight bake. It contributes
+    # diffuse light only, so it cannot put floating specular spots on the bridge.
+    return [(name, position, ",".join(f"{float(v) * .42:g}" for v in color.split(",")) if is_fill_light(name) else color,
+             radius, shadows) for name, position, color, radius, shadows in out]
 
 
 # Reflection probes: ( name, centre, the box they cover e0, e1, n0, n1, z0, z1 ).
@@ -822,7 +1536,34 @@ PROBES = [
     ( "West Goods Shed", ( -1660, -1900, 120 ), ( -1800, -1520, -2200, -1600, 44, 300 ) ),
     ( "East Goods Shed", ( 1660, -1900, 120 ), ( 1520, 1800, -2200, -1600, 44, 300 ) ),
     ( "Signal Box", ( 0, -2040, 200 ), ( -130, 130, -2180, -1900, 130, 300 ) ),
+    # The footbridge's deck, so its dark floor and glass don't mirror the bright shed, and the cab roads players start
+    # in (the shopfronts' glass, the cars).
+    ( "Footbridge", ( 0, -280, 252 ), ( -1200, 1200, -330, -230, 212, 292 ) ),
+    ( "Cab Road East", ( 1600, 200, 120 ), ( 1200, 2000, -1340, 1820, -6, 420 ) ),
+    ( "Cab Road West", ( -1600, 200, 120 ), ( -2000, -1200, -1340, 1820, -6, 420 ) ),
 ]
+# The goods yards' probes are left out: each probe here renders in real time, and the engine's envmap filtering has
+# faulted the GPU on maps with 14 of them (CLAUDE.md, play-start stalls); the yards' setts and containers are rough
+# enough for the sky's own reflection. ( "East Yard", ( 1950, -1900, 120 ), ( 1800, 2200, -2400, -1340, 0, 300 ) )
+
+# Haze in the train shed's two spans, so the sun through the glass draws its lattice as shafts in the soot-laden air:
+# ( name, ( e0, e1, n0, n1, z0, z1 ), strength, colour ).
+# Each box keeps a few inches off every face near it (the outer walls' inside faces at e +-1160, the south gable screen
+# at n -1339, the head building's front at n 1300, the track bed at -37): a volume's face coplanar with a wall's lets
+# a renderer's ray pass the wall (structure's report: the shed walls rendered see-through).
+HAZE = [ ( "Shed Haze West", ( -1150, -6, -1330, 1290, -30, 690 ), 0.045, "0.95,0.92,0.86,1" ),
+         ( "Shed Haze East", ( 6, 1150, -1330, 1290, -30, 690 ), 0.045, "0.95,0.92,0.86,1" ) ]
+
+
+def haze_object( name, box_, strength, colour ):
+    e0, e1, n0, n1, z0, z1 = box_
+    at = K.to_world( ( ( e0 + e1 ) / 2, ( n0 + n1 ) / 2, ( z0 + z1 ) / 2 ) )
+    half = ( ( n1 - n0 ) / 2, ( e1 - e0 ) / 2, ( z1 - z0 ) / 2 )
+    key = f"haze/{name}"
+    return K.game_object( ids, name, key, at, components=[
+        K.component( ids, "Sandbox.VolumetricFogVolume", f"{key}/volume",
+                     Bounds={ "Mins": K.vec( tuple( -h for h in half ) ), "Maxs": K.vec( half ) },
+                     FalloffExponent=1, Strength=strength, Color=colour ) ] )
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -845,8 +1586,10 @@ BOMB_SITES = [ ( "bombsite_a", "Bomb Site A", 760, 1150, 900, 1280, 0 ),
 # Retakes: the planter and the defenders are Red Team (Terrorist), the attackers Blue Team (CounterTerrorist).
 RETAKES = {
     "bombsite_a": { "planter": [ ( 950, 1100, 0 ), ( 1000, 960, 0 ) ],
-                    "defender": [ ( 180, 1600, 0 ), ( 820, 1560, 0 ), ( 480, 960, 0 ), ( 1080, 600, 0 ) ],
-                    "attacker": [ ( -1037, -600, 0 ), ( -632, -900, 0 ), ( 1750, -1100, ROAD_Z ), ( 632, -850, 0 ),
+                    # The first defender waits behind the booking hall's east kiosk, the fourth attacker at the foot
+                    # of the island's footbridge stair: from where they were, each saw a Red spawn down the platforms.
+                    "defender": [ ( 300, 1640, 0 ), ( 820, 1560, 0 ), ( 480, 960, 0 ), ( 1080, 600, 0 ) ],
+                    "attacker": [ ( -1037, -600, 0 ), ( -632, -900, 0 ), ( 1750, -1100, ROAD_Z ), ( 632, -790, 0 ),
                                   ( -1750, -600, ROAD_Z ) ] },
     "bombsite_b": { "planter": [ ( 2000, -1900, 0 ), ( 2050, -2200, 0 ) ],
                     "defender": [ ( 2050, -1500, 0 ), ( 1580, -1740, S.BANK[4] ), ( 1500, -2140, S.BANK[4] ),
@@ -1374,26 +2117,25 @@ def probe_object( name, centre, box ):
         K.component( ids, "Sandbox.EnvmapProbe", f"{key}/probe", Bounds={ "Mins": K.vec( lo ), "Maxs": K.vec( hi ) },
                      DelayBetweenUpdates=0.1, Feathering=0.04, FrameInterval=5,
                      MaxDistance=1024 if name.startswith( "Track Ends" ) else 512,
-                     Priority=2 if name.startswith( "Track Ends" ) else 0, Projection="Box",
+                     Priority=2 if name.startswith( ( "Track Ends", "Footbridge" ) ) else 0, Projection="Box",
                      RenderDynamically=True, TintColor="1,1,1,1", UpdateStrategy="OnEnabled", ZFar=4096, ZNear=8 ) ] )
 
 
 def look_object():
-    """ The grade, as Belltower's: ambient occlusion, a warm white balance, a light vignette, and the outdoor
-    exposure the materials and the sky are made for (2 to 3). """
+    """Daylight exposure with restrained grading and contact-scale occlusion."""
     return K.game_object( ids, "Look", "look", components=[
         K.component( ids, "Sandbox.PostProcessVolume", "look/volume", BlendDistance=50, BlendWeight=1, EditorPreview=True,
                      Priority=0, SceneVolume={ "Type": "Infinite", "Sphere": { "Center": "0,0,0", "Radius": 10 },
                                                "Box": { "Mins": "-50,-50,-50", "Maxs": "50,50,50" },
                                                "Capsule": { "CenterA": "0,0,10", "CenterB": "0,0,90", "Radius": 10 } } ),
-        K.component( ids, "Sandbox.AmbientOcclusion", "look/ao", **{ "__version": 1 }, FalloffRange=1, Intensity=0.6, Radius=96,
-                     ThinCompensation=5 ),
+        K.component( ids, "Sandbox.AmbientOcclusion", "look/ao", **{ "__version": 1 }, FalloffRange=1, Intensity=0.8, Radius=28,
+                     ThinCompensation=1 ),
         K.component( ids, "Sandbox.ColorGrading", "look/grade", GradingMethod="TemperatureControl", ColorTempK=5900,
-                     BlendFactor=0.45, ColorSpace="None", LookupTexture=None ),
-        K.component( ids, "Sandbox.Vignette", "look/vignette", Center="0.5,0.5", Color="0,0,0,1", Intensity=0.22, Roundness=1,
+                     BlendFactor=0.25, ColorSpace="None", LookupTexture=None ),
+        K.component( ids, "Sandbox.Vignette", "look/vignette", Center="0.5,0.5", Color="0,0,0,1", Intensity=0.12, Roundness=1,
                      Smoothness=1 ),
         K.component( ids, "Sandbox.Tonemapping", "look/tonemap", **{ "__version": 3 }, AutoExposureEnabled=True,
-                     ExposureCompensation=0, ExposureMethod="RGB", MinimumExposure=SKY_EXPOSURE, MaximumExposure=3,
+                     ExposureCompensation=-0.2, ExposureMethod="RGB", MinimumExposure=SKY_EXPOSURE, MaximumExposure=2.2,
                      Mode="ACES", Rate=1 ),
     ] )
 
@@ -1408,7 +2150,12 @@ SCENE_MODELS = [
     ( "railhead_edge_east", "City East", True, True ), ( "railhead_edge_west", "City West", True, True ),
     ( "railhead_north", "City North", False, True ), ( "railhead_south", "Railway South", False, False ),
     ( "railhead_skyline", "Skyline", False, False ),
+    ( "railhead_ironwork", "Ironwork Details", False, True ),
 ]
+
+
+# Drawn through instances (railhead_canopy.scene_group()), not as models of their own.
+INSTANCED_MODELS = { "railhead_canopy_pane" }
 
 
 def write_scene( written, light_list, props ):
@@ -1422,6 +2169,12 @@ def write_scene( written, light_list, props ):
     station = K.game_object( ids, "Station", "station", children=[
         model_object( title, f"station/{name}", name, collide, shadows )
         for name, title, collide, shadows in SCENE_MODELS if name in written ] )
+    # Any other model a helper module adds (railhead_station.build(), railhead_backdrop.models()) is visual detail:
+    # drawn and casting shadows, with no collision. Collision goes in the listed models.
+    listed = { name for name, *_ in SCENE_MODELS } | INSTANCED_MODELS
+    for name in sorted( written - listed ):
+        title = " ".join( part.capitalize() for part in name.removeprefix( "railhead_" ).split( "_" ) )
+        station["Children"].append( model_object( title, f"station/{name}", name, False, True ) )
     import railhead_canopy
     station["Children"].append( railhead_canopy.scene_group() )
     import railhead_luggage
@@ -1431,8 +2184,9 @@ def write_scene( written, light_list, props ):
     light_objects = [
         K.game_object( ids, name, f"light/{name}", K.to_world( position ), tags="light_point,light", components=[
             K.component( ids, "Sandbox.PointLight", f"light/{name}/light", Attenuation=1,
+                         Contribution="Diffuse" if is_fill_light(name) else "Diffuse, Specular, Transmissive",
                          FogMode="Disabled" if name.startswith(("Ticket ", "Train ", "Buffer ", "Signal Box ")) else "Enabled",
-                         FogStrength=0 if name.startswith(("Ticket ", "Train ", "Buffer ", "Signal Box ")) else 1,
+                         FogStrength=0 if name.startswith(("Ticket ", "Train ", "Buffer ", "Signal Box ", "Hall Kiosk ")) else 1,
                          LightColor=color, Radius=radius, Shadows=shadows ) ] )
         for name, position, color, radius, shadows in light_list ]
 
@@ -1520,21 +2274,24 @@ def write_scene( written, light_list, props ):
         K.game_object( ids, "Sun", "sun", ( 0, 0, 3000 ), K.angles_rotation( SUN_PITCH, SUN_YAW ), tags="light_directional,light",
                        components=[
             K.component( ids, "Sandbox.DirectionalLight", "sun/light", ContactShadows=True, FogMode="Enabled", FogStrength=1,
-                         LightColor="1.32,1.08,0.82,1", ShadowBias=0.0005, ShadowCascadeCount=4, ShadowCascadeSplitRatio=0.91,
-                         ShadowHardness=0, Shadows=True, SkyColor="0.42,0.48,0.58,1" ),
+                         LightColor="1.55,1.35,1.10,1", ShadowBias=0.0005, ShadowCascadeCount=4, ShadowCascadeSplitRatio=0.91,
+                         ShadowHardness=0, Shadows=True, SkyColor="0.25,0.31,0.40,1" ),
         ] ),
         K.game_object( ids, "Sky", "sky", tags="skybox", components=[
             K.component( ids, "Sandbox.SkyBox2D", "sky/box", SkyIndirectLighting=True, SkyMaterial=SKY_MATERIAL, Tint="1,1,1,1" ),
         ] ),
         K.game_object( ids, "Fog", "fog", components=[
-            K.component( ids, "Sandbox.GradientFog", "fog/gradient", Color=f"{FOG_COLOUR},0.75", StartDistance=3000,
-                         EndDistance=60000, FalloffExponent=1.5, Height=9000, VerticalFalloffExponent=1.2 ),
+            # Aerial perspective past the city (backdrop's request): nothing inside the play area, ~35% by 30000 so
+            # the hills and their woods recede, in a paler blue-grey than the sky's horizon.
+            K.component( ids, "Sandbox.GradientFog", "fog/gradient", Color=f"{DISTANCE_FOG},0.95", StartDistance=4000,
+                         EndDistance=60000, FalloffExponent=1.3, Height=9000, VerticalFalloffExponent=1.2 ),
         ] ),
         look_object(),
         station,
         K.game_object( ids, "Trees", "foliage", children=foliage ),
         K.game_object( ids, "Lights", "lights", children=light_objects ),
         K.game_object( ids, "Reflection Probes", "probes", children=[ probe_object( *p ) for p in PROBES ] ),
+        K.game_object( ids, "Volumetric Haze", "haze", children=[ haze_object( *h ) for h in HAZE ] ),
         # Free-for-all modes spawn at every active spawn point, so the team spawns are left out of them.
         mode_group( "Team Spawns", "spawns", ( "Deathmatch", "Gun Game" ), team_spawns, inverse=True ),
         mode_group( "Deathmatch Spawns", "spawns/dm", ( "Deathmatch", "Gun Game" ), dm_spawns ),
@@ -1551,6 +2308,10 @@ def write_scene( written, light_list, props ):
         K.prefab_instance( ids, "prefabs/game_modes/bomb_defusal.prefab" ),
         K.prefab_instance( ids, "scenes/maps/defusemap_01/game_setup.prefab" ),
     ]
+    import railhead_quality_lighting
+    indirect = railhead_quality_lighting.load_object()
+    if indirect is not None:
+        objects.append(indirect)
     references = sorted( { reference for prop in props for reference in PROP_PACKAGES.get( prop["path"], () ) } )
     scene = {
         "__guid": ids( "scene" ),
@@ -1580,7 +2341,7 @@ def write_scene( written, light_list, props ):
     }
     SCENE_FILE.parent.mkdir( parents=True, exist_ok=True )
     K.write_text( SCENE_FILE, json.dumps( scene, indent=2 ), newline=None )
-    print( f"wrote {SCENE_FILE.relative_to( K.ROOT )}" )
+    print( f"wrote {SCENE_FILE}" )
 
 
 # The cloud packages the backdrop's trees come from (Belltower's), for the scene's references.
@@ -1599,6 +2360,8 @@ def build():
     import railhead_canopy
     station["railhead_canopy_pane"] = railhead_canopy.pane_model()
     models = dict( station )
+    import railhead_ironwork
+    models["railhead_ironwork"] = railhead_ironwork.build()
     models["railhead_track"] = track_model()
     import railhead_buffer
     railhead_buffer.ballast_detail( models["railhead_track"] )
@@ -1645,7 +2408,14 @@ def main():
     parser.add_argument( "--no-scene", action="store_true", help="write the models only, not the scene or the radar picture" )
     parser.add_argument( "--backdrop", action="store_true", help="put the city in the previews too (slow)" )
     parser.add_argument( "--art", action="store_true", help="write the menus' stand-in picture from the preview" )
+    parser.add_argument( "--stage", metavar="DIR", help="write the models and scene under DIR (laid out as Assets) instead "
+                         "of Assets, and no radar picture: for trying changes without the editor compiling them. "
+                         "Tools/railhead_render.py --stage DIR renders it." )
     args = parser.parse_args()
+    global OUT_DIR, SCENE_FILE
+    if args.stage:
+        OUT_DIR = Path( args.stage ).resolve() / "models/maps/railhead"
+        SCENE_FILE = Path( args.stage ).resolve() / "scenes/maps/Railhead/railhead.scene"
 
     kiosk_art = optional( "railhead_kiosk_art" )
     if kiosk_art is not None and kiosk_art.missing():
@@ -1662,6 +2432,8 @@ def main():
     import railhead_signal_box
     if railhead_signal_box.missing():
         railhead_signal_box.write_materials()
+    import railhead_finish
+    railhead_finish.ensure_materials( Path( args.stage ).resolve() if args.stage else None )
     import railhead_buffer
     if railhead_buffer.missing():
         railhead_buffer.write()
@@ -1673,6 +2445,12 @@ def main():
         railhead_signal_frame.write()
     if RM is not None and RM.vending_missing():
         RM.write_texture( "vending", RM.OUT_DIR )
+    # The dressing's own tinted materials (railhead_dress_detail): into the stage while staged, Assets otherwise.
+    if D is not None and hasattr( D, "ensure_materials" ):
+        try:
+            D.ensure_materials( Path( args.stage ).resolve() if args.stage else K.ASSETS )
+        except Exception as error:
+            print( f"railhead_dress_detail.ensure_materials() failed: {type( error ).__name__}: {error}" )
     models = build()
     written = set()
     for name, model in models.items():
@@ -1713,7 +2491,8 @@ def main():
 
     props = [ prop for model in models.values() for prop in model.props ]
     if not args.no_scene:
-        write_minimap( solid )
+        if not args.stage:
+            write_minimap( solid )
         write_scene( written, light_list, props )
     preview_names = [ n for n in models if n not in ( "railhead_north", "railhead_south", "railhead_skyline" ) or args.backdrop ]
     if out:

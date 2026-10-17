@@ -1,0 +1,14 @@
+// Tools/railhead_finish.py: lime plaster under soot (vault, above the gallery).
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flMetalness "0"
+    g_flRoughnessScaleFactor "0.9"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1"
+    TextureColor "materials/railhead/finish/lime_dark_color.png"
+    TextureNormal "materials/railhead/finish/lime_normal.png"
+    TextureRoughness "materials/railhead/finish/lime_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+}

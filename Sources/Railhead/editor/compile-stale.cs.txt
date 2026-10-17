@@ -1,0 +1,50 @@
+// Recompiles Railhead's assets whose sources are newer than their compiled files: materials (the vmat or any map it
+// names), then models (the vmdl or its OBJs), then the scene. The editor's file watcher misses some of a burst of
+// rewritten files, and CompileIfNeeded doesn't look at a model's OBJs. Run with the native MCP's run_csharp.
+// Optional config output/railhead/compile.json: { "only": "materials" | "models" | "scene", "limit": N, "force": true,
+// "files": [ ... ] }
+// compiles one kind, at most N files (a long burst can outlast the CLI's timeout; run it again for the rest); "force"
+// compiles every file of the kind, stale or not. The file watcher can compile a model from its new OBJ before its new
+// vmdl (and its material remaps) is written, within the same second, which the staleness check can't see.
+var projectRoot = Sandbox.Project.Current.GetRootPath();
+var assets = System.IO.Path.Combine(projectRoot, "Assets");
+var configPath = System.IO.Path.Combine(projectRoot, "output/railhead/compile.json");
+var config = System.IO.File.Exists(configPath) ? System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(configPath)).AsObject() : new System.Text.Json.Nodes.JsonObject();
+var only = config["only"]?.GetValue<string>();
+var limit = config["limit"]?.GetValue<int>() ?? int.MaxValue;
+var force = config["force"]?.GetValue<bool>() ?? false;
+System.DateTime Newest(System.Collections.Generic.IEnumerable<string> files) => files.Where(System.IO.File.Exists).Select(System.IO.File.GetLastWriteTimeUtc).DefaultIfEmpty(System.DateTime.MinValue).Max();
+System.DateTime Compiled(string file) => System.IO.File.Exists(file + "_c") ? System.IO.File.GetLastWriteTimeUtc(file + "_c") : System.DateTime.MinValue;
+var mapPattern = new System.Text.RegularExpressions.Regex("\"((?:materials|models)/[^\"]+\\.(?:png|jpg|jpeg|tga|exr))\"", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+var stale = new System.Collections.Generic.List<string>();
+// "files": [ "materials/railhead/x.vmat", ... ] compiles just those (paths under Assets), stale or not.
+var files = config["files"]?.AsArray().Select(f => System.IO.Path.Combine(assets, f.GetValue<string>())).ToList();
+if (files is not null) { stale.AddRange(files); only = "none"; }
+if (only is null || only == "materials")
+    foreach (var vmat in System.IO.Directory.GetFiles(System.IO.Path.Combine(assets, "materials/railhead"), "*.vmat", System.IO.SearchOption.AllDirectories).OrderBy(x => x))
+    {
+        var maps = mapPattern.Matches(System.IO.File.ReadAllText(vmat)).Select(m => System.IO.Path.Combine(assets, m.Groups[1].Value)).ToList();
+        maps.Add(vmat);
+        if (force || Newest(maps) > Compiled(vmat)) stale.Add(vmat);
+    }
+if (only is null || only == "models")
+    foreach (var vmdl in System.IO.Directory.GetFiles(System.IO.Path.Combine(assets, "models/maps/railhead"), "*.vmdl").OrderBy(x => x))
+    {
+        var stem = System.IO.Path.GetFileNameWithoutExtension(vmdl);
+        var sources = System.IO.Directory.GetFiles(System.IO.Path.GetDirectoryName(vmdl), stem + "*.obj").Append(vmdl);
+        if (force || Newest(sources) > Compiled(vmdl)) stale.Add(vmdl);
+    }
+var scenePath = System.IO.Path.Combine(assets, "scenes/maps/Railhead/railhead.scene");
+if ((only is null || only == "scene") && (force || Newest(new[] { scenePath }) > Compiled(scenePath))) stale.Add(scenePath);
+var results = new System.Collections.Generic.List<object>();
+foreach (var file in stale.Take(limit))
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var asset = Editor.AssetSystem.FindByPath(file) ?? Editor.AssetSystem.RegisterFile(file);
+    if (asset is null) { results.Add(new { File = System.IO.Path.GetFileName(file), Registered = false }); continue; }
+    var ok = false; string error = null;
+    try { ok = asset.Compile(true); } catch (Exception e) { error = e.Message; }
+    await Task.Delay(1, cancellationToken);
+    results.Add(new { File = System.IO.Path.GetFileName(file), Ok = ok, asset.IsCompiled, asset.IsCompileFailed, Fresh = Compiled(file) >= Newest(new[] { file }), Error = error });
+}
+return new { Stale = stale.Count, Compiled = results.Count, Failed = results.Count(r => r.ToString().Contains("Ok = False")), Results = results };

@@ -150,7 +150,13 @@ def disc( model, paint, centre, normal, r, sides=12, round_uv=False, up=( 0.0, 0
     """ A flat round face; round_uv maps a decal 0..1 across it, upright (its v along up). """
     c, nrm = np.asarray( centre, float ), _unit( normal )
     upv = np.asarray( up, float )
-    upv = _unit( upv - nrm * np.dot( upv, nrm ) )
+    upv = upv - nrm * np.dot( upv, nrm )
+    if np.linalg.norm( upv ) < 1e-8:
+        # A horizontal disc's normal is parallel to the default up vector.
+        # Pick a perpendicular axis or every cap vertex collapses to its centre.
+        ref = np.array( ( 0.0, 1.0, 0.0 ) ) if abs( nrm[1] ) < 0.9 else np.array( ( 1.0, 0.0, 0.0 ) )
+        upv = ref - nrm * np.dot( ref, nrm )
+    upv = _unit( upv )
     right = np.cross( upv, nrm )
     angles = [ 2 * math.pi * k / sides for k in range( sides ) ]
     pts = [ c + r * ( math.cos( t ) * right + math.sin( t ) * upv ) for t in angles ]
@@ -280,8 +286,16 @@ def sleeper( model, e0, e1, n, rail_z, kind="concrete", rails=() ):
         detail.bevel_box( model, Frame( ( 0, 0, 0 ), ( 0, 1 ) ),
                           ( -e1, n - width / 2, top - height ), ( -e0, n + width / 2, top ), paint, 0.45 )
         detail.track_fittings( model, e0, e1, n, rail_z, rails )
+        detail.sleeper_shoulders( model, e0, e1, n, width, top )
     else:
         model.box( ( e0, n - width / 2, top - height ), ( e1, n + width / 2, top ), paint, skip=( "-z", ) )
+        if kind == "concrete" and rail_z == -30 and -1340 < n <= 310 and rails:
+            try:
+                import railhead_buffer as detail
+                detail.track_fittings_lod( model, n, rail_z, rails )
+                detail.sleeper_shoulders( model, e0, e1, n, width, top )
+            except Exception:
+                pass
     if kind == "wood":
         for x in rails:
             model.box( ( x - 7.1, n - 3.15, top ), ( x + 7.1, n + 3.15, top + 0.6 ), "rw_rail", skip=( "-z", ) )
@@ -306,6 +320,12 @@ def track( model, e, n0, n1, rail_z=-30.0, sleepers="concrete", embedded=False )
         return
     for side in ( -1, 1 ):
         rail( model, [ ( e + side * GAUGE_HALF, lo ), ( e + side * GAUGE_HALF, hi ) ], rail_z )
+    if sleepers == "concrete" and rail_z == -30.0:
+        try:
+            import railhead_buffer as detail
+            detail.crib_band( model, e, lo, hi, rail_z )
+        except Exception as error:
+            print( f"railhead_buffer.crib_band failed: {error}" )
     if sleepers:
         length, width, height, spacing, paint = SLEEPERS[sleepers]
         count = max( 1, int( ( hi - lo ) // spacing ) )
@@ -488,8 +508,8 @@ def ks_signal( model, e, n, rail_z, facing, side=+1, aspect="red", offset=94.0, 
     f = Frame( ( em, n, 0.0 ), ( 0, toward ) )
     model.box( ( em - 11, n - 11, ground - 2 ), ( em + 11, n + 11, ground + 5 ), "rw_concrete", skip=( "-z", ) )
     top = rail_z + height + 21.5
-    model.cylinder( ( em, n ), 3.5, ground + 5, top - 1, { "side": "rw_steel_grey", "top": "rw_steel_grey" },
-                    sides=10 )
+    model.cylinder( ( em, n ), 2.76, ground + 5, top - 1, { "side": "rw_steel_grey", "top": "rw_steel_grey" },
+                    sides=16 )
     zc = rail_z + height
     f.box( model, -11.5, 11.5, 3.0, 6.5, zc - 19.5, zc + 19.5,
            { "default": "rw_steel_dark", "front": "rw_white_paint" } )
@@ -506,6 +526,13 @@ def ks_signal( model, e, n, rail_z, facing, side=+1, aspect="red", offset=94.0, 
     for k in range( 5 ):
         f.quad( model, "rw_red_paint" if k % 2 else "rw_white_paint", 0.0, 3.6, rail_z + 69 + 4.72 * ( k + 0.5 ),
                 7.9, 4.72 )
+    # The mast plate's bracket, behind the plate.
+    f.box( model, -4.4, 4.4, 2.8, 3.55, rail_z + 69, rail_z + 69 + 23.6, "rw_steel_dark" )
+    try:
+        import railhead_ohl as OHL
+        OHL.signal_dressing( model, f, rail_z, ground, top, zc )
+    except Exception as error:
+        print( f"railhead_ohl.signal_dressing failed: {error}" )
     model.collision_box( ( em - 4, n - 4, ground ), ( em + 4, n + 4, top ), "metal" )
 
 
@@ -560,8 +587,15 @@ def contact_line( model, e, n0, n1, rail_z, supports, wire_height=WIRE_HEIGHT, s
     return [ ( s, o, wz, mz ) for s, o in held ]
 
 
-def _h_mast( model, e, n, ground, top ):
-    """ An HEB 200 mast (200 x 200 mm), its web across the track, on a concrete foundation. """
+def _h_mast( model, e, n, ground, top, toward=None, plate=0 ):
+    """ An HEB 200 mast (200 x 200 mm), its web across the track, on a concrete foundation (railhead_ohl's, with its
+    number plate and warning triangle facing toward, the sign of e towards the track; this plain one stands in). """
+    try:
+        import railhead_ohl as OHL
+        OHL.h_mast( model, e, n, ground, top, toward, plate )
+        return
+    except Exception as error:
+        print( f"railhead_ohl.h_mast failed: {error}" )
     model.box( ( e - 12, n - 12, ground - 2 ), ( e + 12, n + 12, ground + 6 ), "rw_concrete", skip=( "-z", ) )
     paint = "rw_steel_grey"
     for side in ( -1, 1 ):
@@ -571,7 +605,13 @@ def _h_mast( model, e, n, ground, top ):
 
 
 def _insulator( model, a, b ):
-    """ A composite insulator along a..b: a rod with its sheds. """
+    """ A composite insulator along a..b: a rod with its sheds (railhead_ohl's; this one stands in). """
+    try:
+        import railhead_ohl as OHL
+        OHL.insulator( model, a, b )
+        return
+    except Exception as error:
+        print( f"railhead_ohl.insulator failed: {error}" )
     a, b = np.asarray( a, float ), np.asarray( b, float )
     axis = _unit( b - a )
     rod( model, a, b, 1.0, "rw_rubber", 6 )
@@ -601,7 +641,7 @@ def cantilever_mast( model, e_mast, n, e_track, rail_z, stagger=STAGGER, wire_he
     ground = rail_z - 7.0
     wz, mz = rail_z + wire_height, rail_z + wire_height + system_height
     top = mz + 34.0
-    _h_mast( model, e_mast, n, ground, top )
+    _h_mast( model, e_mast, n, ground, top, toward, int( abs( n ) // 500 ) )
     face = e_mast + toward * 4.25
     ew = e_track + stagger
     h1, h2 = np.array( ( face, n, mz + 16.0 ) ), np.array( ( face, n, wz - 4.0 ) )
@@ -641,18 +681,30 @@ def _drop( model, e_track, n, z_from, wz, mz, stagger ):
     if abs( ew - e_track ) > 0.5:
         rod( model, ( e_track, n, mz ), ( ew, n, mz ), 0.8, "rw_steel_grey", 6, caps=( False, True ) )
     model.box( ( ew - 1.5, n - 1.5, mz - 1.0 ), ( ew + 1.5, n + 1.5, mz + 1.0 ), "rw_steel_dark" )
+    try:
+        import railhead_ohl as OHL
+        OHL.y_hanger( model, ew, n, mz )
+    except Exception:
+        pass
     _registration( model, e_track, n, bottom, ew, wz, toward )
 
 
-def portal( model, e0, e1, n, rail_z, tracks, wire_height=WIRE_HEIGHT, system_height=SYSTEM_HEIGHT ):
+def portal( model, e0, e1, n, rail_z, tracks, wire_height=WIRE_HEIGHT, system_height=SYSTEM_HEIGHT, anchor=False ):
     """ A portal across several tracks: HEB masts at e0 and e1 and a 600 mm lattice girder between them over the
-    wires, with a drop tube over each track. tracks: e of each track, or ( e, stagger ). Metal collision on the
-    masts. """
+    wires, with a drop tube over each track. tracks: e of each track, or ( e, stagger ). anchor: the wires' runs end
+    here, so both masts carry tension weights on their outer sides. Metal collision on the masts. """
     ground = rail_z - 7.0
     wz, mz = rail_z + wire_height, rail_z + wire_height + system_height
     zb, zt = mz + 20.0, mz + 44.0
-    for e in ( e0, e1 ):
-        _h_mast( model, e, n, ground, zt )
+    for e, other in ( ( e0, e1 ), ( e1, e0 ) ):
+        toward = 1.0 if other > e else -1.0
+        _h_mast( model, e, n, ground, zt, toward, int( abs( n ) // 500 ) )
+        if anchor:
+            try:
+                import railhead_ohl as OHL
+                OHL.tension_weights( model, e, n, ground, zt, toward )
+            except Exception as error:
+                print( f"railhead_ohl.tension_weights failed: {error}" )
         model.collision_box( ( e - 4.5, n - 4.5, ground ), ( e + 4.5, n + 4.5, zt ), "metal" )
     lo, hi = min( e0, e1 ) + 4.0, max( e0, e1 ) - 4.0
     lattice_box( model, ( lo, n - 6.0, zb ), ( hi, n + 6.0, zt ), axis="e" )
@@ -666,7 +718,12 @@ def roof_drop( model, e_track, n, z_top, rail_z, stagger=STAGGER, wire_height=WI
     """ The overhead line's support under a roof: a drop tube hung from the roof's steel at z_top, with its messenger
     clamp and registration arm. No collision. """
     wz, mz = rail_z + wire_height, rail_z + wire_height + system_height
+    # The clamp plate on the roof's steel, its four bolts, and the drop under it.
     model.box( ( e_track - 4, n - 3, z_top - 1.0 ), ( e_track + 4, n + 3, z_top ), "rw_steel_dark" )
+    for dx in ( -3.0, 3.0 ):
+        for dy in ( -2.0, 2.0 ):
+            rod( model, ( e_track + dx, n + dy, z_top - 1.0 ), ( e_track + dx, n + dy, z_top - 1.6 ), 0.45, "rw_steel_grey",
+                 6, caps=( False, True ) )
     _drop( model, e_track, n, z_top - 1.0, wz, mz, stagger )
 
 
@@ -817,7 +874,14 @@ def _section( model, F, prof, a, facing_y, paint, bottom=None ):
 
 
 def _wheelset( model, F, a, r ):
-    """ A wheelset at depth a: wheels of radius r (their treads on the rails, flanges inside) on their axle. """
+    """ A wheelset at depth a: wheels of radius r (their treads on the rails, flanges inside) on their axle
+    (railhead_running_gear's, with this simpler one as its stand-in). """
+    try:
+        import railhead_running_gear as RG
+        RG.wheelset( model, F, a, r, discs=False )
+        return
+    except Exception as error:
+        print( f"railhead_running_gear.wheelset failed: {error}" )
     for xs in ( 1.0, -1.0 ):
         rod( model, F.p( xs * 27.8, -a, r ), F.p( xs * 32.1, -a, r ), r, "rw_bogie", 12,
              caps=( False, True ) )
@@ -828,7 +892,14 @@ def _wheelset( model, F, a, r ):
 
 def _bogie( model, F, a, wheelbase, r, motor=False ):
     """ A two-axle bogie centred at depth a: its wheelsets, side frames with axle boxes and springs outside the wheels,
-    and the transom; a traction motor between the axles if motor. """
+    and the transom; a traction motor between the axles if motor (railhead_running_gear's H-frame bogie, with this
+    simpler one as its stand-in). """
+    try:
+        import railhead_running_gear as RG
+        RG.bogie( model, F, a, wheelbase, r, motor )
+        return
+    except Exception as error:
+        print( f"railhead_running_gear.bogie failed: {error}" )
     paint = "rw_bogie"
     for k in ( -1, 1 ):
         _wheelset( model, F, a + k * wheelbase / 2, r )
@@ -955,7 +1026,10 @@ EMU_ARC_STEPS = 6
 EMU_SCREEN = ( 100.0, 152.0 )               # the windscreen's foot and top
 EMU_VISOR = 166.0
 EMU_BULGE = 3.0             # the face bows forward this much at its middle, in plan
-EMU_SCREEN_WRAP = 5                         # the windscreen wraps this many arc steps (of 15 degrees) round the corners
+EMU_SCREEN_WRAP = 4                         # the glazing wraps this many arc steps (of 15 degrees) round the corners
+EMU_ROOF_PAINT = "rw_emu_roof"              # the roof's light grey, sooted from the wire (railhead_prop_materials)
+EMU_SCREEN_GLASS = "rw_emu_screen"          # the windscreen's and display's glossy black glass (railhead_prop_materials)
+EMU_CAB_GLASS = "rw_emu_cab_glass"          # the windscreen's tinted glass, the cab behind it (railhead_prop_materials)
 
 
 def _emu_width( z ):
@@ -1160,13 +1234,17 @@ def _emu_cab( car, body, destination ):
         z = ( zs[k] + zs[k + 1] ) / 2
         front = i < n_face - 1 + EMU_SCREEN_WRAP
         if z > EMU_VISOR or ( z > EMU_ROOF_LINE and i >= n_face - 1 ):
-            return "rw_train_grey" if z > EMU_ROOF_LINE else body
+            return EMU_ROOF_PAINT if z > EMU_ROOF_LINE else body
+        pillar = i in ( n_face, n_face + 1 )             # the A-pillar: the corner's first 30 degrees, in body colour
         if front and EMU_SCREEN[1] < z <= EMU_VISOR:
-            return "rw_black"
+            # The display's glass over the flat of the face only; the pillars carry on up to the roof.
+            return body if pillar or i >= n_face + 2 else EMU_SCREEN_GLASS
         if front and EMU_SCREEN[0] < z <= EMU_SCREEN[1]:
-            return "rw_window_dark"
-        if front and 97.0 < z <= EMU_SCREEN[0]:
-            return "rw_black"
+            # The windscreen across the flat of the face, a body-colour A-pillar on the corner's first 30 degrees,
+            # then the quarter light round to 45 degrees. Glossy black glass, so it reflects the shed.
+            if pillar:
+                return body
+            return EMU_CAB_GLASS
         if EMU_STRIPE[0] <= z <= EMU_STRIPE[1]:
             return "rw_train_white"
         return body
@@ -1204,58 +1282,105 @@ def _emu_cab( car, body, destination ):
                 car.poly( paint, [ on_face( xa, za, off ), on_face( xb, za, off ), on_face( xb, zb, off ),
                                    on_face( xa, zb, off ) ], ( nx if xm >= 0 else -nx, nd, 0 ) )
 
-    # Grey windscreen gasket follows the curved cab, framing the glass like the reference unit.
-    patch( "rw_steel_dark", -38.0, 38.0, EMU_SCREEN[0], EMU_SCREEN[0] + 2.0, 0.22 )
-    patch( "rw_steel_dark", -38.0, 38.0, EMU_SCREEN[1] - 2.0, EMU_SCREEN[1], 0.22 )
-    for xs in ( 1.0, -1.0 ):
-        patch( "rw_steel_dark", xs * 36.0, xs * 38.0, EMU_SCREEN[0], EMU_SCREEN[1], 0.22 )
+    # The black rubber gaskets round the glass: a 3 in (80 mm) surround under the windscreen and over it, and up both
+    # its edges, round the quarter lights, all following the cab's curve (the corners' angle, not a fixed x).
+    def x_at( z, where ):
+        """ where: ( "flat", inches back from the corner's start ) or ( "arc", degrees round the corner ). """
+        W = _emu_width( z )
+        f_, rc_ = _emu_face_at( z )
+        kind, v = where
+        return W - rc_ - v if kind == "flat" else W - rc_ + rc_ * math.sin( math.radians( v ) )
 
-    # The windscreen's wiper, the top headlight behind the glass's head and the destination display.
-    car.rod( on_face( 3.0, 101.5, 0.5 ), on_face( -25.0, 131.0, 0.5 ), 0.45, "rw_black", 4 )
+    def strip( paint, wa, wb, z0, z1, off=0.24 ):
+        zs_ = sorted( { z0, z1, *[ r[0] for r in EMU_FACE if z0 < r[0] < z1 ] } )
+        for xs in ( 1.0, -1.0 ):
+            for za, zb in zip( zs_, zs_[1:] ):
+                pa = [ ( x_at( za, wa ), za ), ( x_at( za, wb ), za ), ( x_at( zb, wb ), zb ), ( x_at( zb, wa ), zb ) ]
+                xm = sum( q[0] for q in pa ) / 4
+                _, ( nx, nd ) = _emu_surface( xm, ( za + zb ) / 2 )
+                pts = [ on_face( xs * x, z_, off ) for x, z_ in pa ]
+                car.poly( paint, pts, ( xs * nx, nd, 0 ) )
+
+    S0, S1 = EMU_SCREEN
+    patch( "rw_rubber", -34.6, 34.6, S0 - 1.4, S0 + 1.6, 0.22 )
+    patch( "rw_rubber", -31.0, 31.0, S1 - 1.6, S1 + 0.6, 0.22 )
+    strip( "rw_rubber", ( "flat", 1.6 ), ( "arc", 2.0 ), S0 - 1.4, S1 + 0.6 )
+    strip( "rw_rubber", ( "arc", 28.0 ), ( "arc", 31.0 ), S0 - 1.4, S1 + 0.6 )
+    strip( "rw_rubber", ( "arc", 43.5 ), ( "arc", 46.5 ), S0 - 1.4, S1 + 0.6 )
+    strip( "rw_rubber", ( "arc", 28.0 ), ( "arc", 46.5 ), S0 - 1.4, S0 + 1.4 )
+    strip( "rw_rubber", ( "arc", 28.0 ), ( "arc", 46.5 ), S1 - 1.4, S1 + 0.6 )
+    # The display's glass under the visor gets its own thin frame where it meets the pillars.
+    strip( "rw_rubber", ( "flat", 1.2 ), ( "arc", 1.5 ), S1, EMU_VISOR - 0.5 )
+
+    # The windscreen's wiper, parked along the glass's foot, its arm's pivot and motor cover.
+    car.rod( on_face( 3.0, 101.6, 0.5 ), on_face( -27.0, 102.0, 0.5 ), 0.42, "rw_black", 4 )
+    car.rod( on_face( 3.0, 101.6, 0.4 ), on_face( -6.0, 101.8, 0.95 ), 0.55, "rw_black", 4 )
     car.rod( on_face( 3.0, 101.5, 0.3 ), on_face( 3.0, 100.0, 1.6 ), 1.0, "rw_black", 6, caps=( True, True ) )
-    f, _ = _emu_surface( 0.0, 147.5 )
-    car.disc( "rw_lamp_cool", ( 0.0, f - 0.2, 147.5 ), ( 0, -1, 0.35 ), 2.0, 12 )
     _emu_display( car, destination, 159.0 )
-    # One round projector and one rectangular lamp per cluster, as on the
-    # reference cab. All surfaces follow the nose so lenses cannot intersect it.
-    def lamp_outline( paint, xs, points, off ):
-        for a, b in zip( points, points[1:] + points[:1] ):
-            cx = sum( p[0] for p in points ) / len( points )
-            cz = sum( p[1] for p in points ) / len( points )
-            xm = xs * (cx + a[0] + b[0]) / 3
-            _, (nx, nd) = _emu_surface( abs( xm ), cz )
-            car.poly( paint, [ on_face( xs * cx, cz, off ),
-                              on_face( xs * a[0], a[1], off ),
-                              on_face( xs * b[0], b[1], off ) ],
-                      ( nx if xm >= 0 else -nx, nd, 0 ) )
+    import railhead_vehicle_kit as VK
 
-    def rounded_lamp( paint, xs, x0, x1, z0, z1, radius, off ):
-        points = []
-        for cx, cz, start in ((x1-radius,z1-radius,0), (x0+radius,z1-radius,90),
-                              (x0+radius,z0+radius,180), (x1-radius,z0+radius,270)):
-            for k in range( 5 ):
-                a = math.radians( start + k * 22.5 )
-                points.append( (cx + radius * math.cos(a), cz + radius * math.sin(a)) )
-        lamp_outline( paint, xs, points, off )
+    def face_frame( x, z, off ):
+        """ The world point on the face at ( x, z ) off out of it, and the face's outward normal there. """
+        _, ( nx, nd ) = _emu_surface( abs( x ), z )
+        p = np.asarray( car.p( *on_face( x, z, off ) ), float )
+        normal = car.F.x * ( nx if x >= 0 else -nx ) - car.F.y * car.s * nd
+        return p, _unit( normal )
 
+    def face_lamp( x, z, r, emitter, depth=1.1, proud=1.3 ):
+        """ A lamp standing proud of the cluster's field: its satin barrel, a 16-sided chrome reflector bowl sunk in
+        it, the emitter at its foot and a clear lens over it. """
+        base, n = face_frame( x, z, 0.25 )
+        rim = base + n * proud
+        rod( car.model, base, rim, r + 0.3, "rw_lamp_field", 16 )
+        VK.bowl_lamp( car.model, rim, n, r, depth=depth, sides=16, emitter=emitter, rim_paint="rw_steel_dark",
+                      rim=0.3 )
+
+    # The top headlight behind the glass's head, in its own housing on the cab's ceiling.
+    f147, _ = _emu_surface( 0.0, 147.5 )
+    car.box( -5.2, 5.2, f147 + 2.9, f147 + 7.0, 143.0, 151.0, "rw_lamp_field" )
+    tl = np.asarray( car.p( 0.0, f147 + 2.85, 147.5 ), float )
+    VK.bowl_lamp( car.model, tl, car.F.y * car.s, 3.0, depth=1.2, emitter="rw_train_headlamp",
+                  rim_paint="rw_steel_dark", rim=0.5 )
+    # The clusters as on a current double-deck unit: a satin grey field 55 x 30 cm in a body-colour bezel, two
+    # 170 mm headlights side by side, a 120 mm marker light over the outer one and the red tail light under it.
     for xs in ( 1.0, -1.0 ):
-        # Subdivide the wide housing to follow the cab's curvature closely.
-        patch( "rw_steel_dark", xs * 24.0, xs * 49.0, 79.0, 90.0, 0.18, step=0.6 )
-        patch( "rw_black", xs * 24.6, xs * 48.4, 79.6, 89.4, 0.26, step=0.6 )
-        # Inner rectangular reflector: a slim metallic rim around opal glass.
-        rounded_lamp( "rw_steel_grey", xs, 27.0, 37.2, 81.1, 87.9, 0.9, 0.32 )
-        rounded_lamp( "rw_train_headlamp", xs, 27.7, 36.5, 81.8, 87.2, 0.6, 0.40 )
-        # Outer round projector; use a smooth circular lens, not a square over a disc.
-        for radius, paint, off in ((3.85, "rw_steel_grey", 0.32),
-                                   (3.35, "rw_black", 0.38),
-                                   (2.85, "rw_train_headlamp", 0.44)):
-            points = [(42.6 + radius * math.cos(k * math.tau / 32),
-                       84.5 + radius * math.sin(k * math.tau / 32)) for k in range(32)]
-            lamp_outline( paint, xs, points, off )
-        # Tail markers remain unlit while the white headlights are on.
-        points = [(47.0 + 0.7 * math.cos(k * math.tau / 16),
-                   84.5 + 0.7 * math.sin(k * math.tau / 16)) for k in range(16)]
-        lamp_outline( "rw_train_red", xs, points, 0.42 )
+        patch( body, xs * 24.0, xs * 48.6, 77.8, 91.4, 0.18, step=0.6 )
+        patch( "rw_rubber", xs * 24.4, xs * 48.2, 78.2, 91.0, 0.22, step=0.6 )
+        patch( "rw_lamp_field", xs * 24.8, xs * 47.8, 78.6, 90.6, 0.26, step=0.6 )
+        for x in ( 29.6, 37.4 ):
+            face_lamp( xs * x, 83.6, 3.35, "rw_train_headlamp" )
+        face_lamp( xs * 43.9, 87.3, 2.36, "rw_train_headlamp", depth=0.8, proud=1.0 )
+        face_lamp( xs * 43.9, 81.3, 1.3, "rw_train_red", depth=0.5, proud=0.8 )
+        # The UIC jumper socket's hinged cover beside the coupler pocket, and its cable gland.
+        p0 = on_face( xs * 20.5, 58.0, 0.0 )
+        car.box( min( xs * 17.5, xs * 23.5 ), max( xs * 17.5, xs * 23.5 ), p0[1] - 1.6, p0[1] - 0.2, 55.0, 61.5,
+                 "rw_steel_dark" )
+        car.rod( ( xs * 17.6, p0[1] - 1.5, 61.6 ), ( xs * 23.4, p0[1] - 1.5, 61.6 ), 0.35, "rw_steel_grey", 6 )
+    # Grime: road and brake dust thrown up the face over the coupler, and dirty water run down from the
+    # windscreen's foot, ragged streaks on the paint (alpha tested).
+    def grime( x0, x1, z0, z1, off, down ):
+        n_ = max( 1, int( math.ceil( ( x1 - x0 ) / 2.5 ) ) )
+        xs_ = [ x0 + ( x1 - x0 ) * j / n_ for j in range( n_ + 1 ) ]
+        zs_ = sorted( { z0, z1, *[ r[0] for r in EMU_FACE if z0 < r[0] < z1 ] } )
+        for za, zb in zip( zs_, zs_[1:] ):
+            for xa, xb in zip( xs_, xs_[1:] ):
+                xm = ( xa + xb ) / 2
+                _, ( nx, nd ) = _emu_surface( abs( xm ), ( za + zb ) / 2 )
+                uv = []
+                pts = []
+                for x_, z_ in ( ( xa, za ), ( xb, za ), ( xb, zb ), ( xa, zb ) ):
+                    px, pd, pz = on_face( x_, z_, off )
+                    pts.append( ( px, -car.a( pd ), pz ) )
+                    v = ( z_ - z0 ) / ( z1 - z0 )
+                    uv.append( ( ( x_ - x0 ) / ( x1 - x0 ) * 2.2, v if down else 1.0 - v ) )
+                n_local = car.local( ( nx if xm >= 0 else -nx, nd, 0 ) )
+                _fpoly( car.model, car.F, "rw_emu_grime", pts, n_local, uv=uv )
+
+    grime( -33.0, 33.0, 88.0, 98.4, 0.2, True )
+    grime( -36.0, 36.0, 52.0, 70.0, 0.2, False )
+    for xs in ( 1.0, -1.0 ):
+        grime( xs * 33.0, xs * 50.0, 30.5, 46.0, 0.21, False )
+    _emu_cab_interior( car )
     # Grilles either side of the coupler pocket, the pocket and the automatic coupler in it.
     for xs in ( 1.0, -1.0 ):
         patch( "rw_black", xs * 13.0, xs * 31.0, 31.0, 51.0 )
@@ -1301,14 +1426,76 @@ def _emu_cab( car, body, destination ):
         car.rod(hose[0],hose[2],1.0,"rw_coupler_cast",12,caps=(True,True))
         car.rod(hose[-3],hose[-1],1.0,"rw_coupler_cast",12,caps=(True,True))
     # The obstacle deflector under the nose, raked back, and the cab's underframe behind it.
-    car.poly( "rw_train_dark", [ ( -44.0, 18.0, 19.0 ), ( 44.0, 18.0, 19.0 ), ( 40.0, 13.0, 5.0 ),
+    car.poly( "rw_train_grey", [ ( -44.0, 18.0, 19.0 ), ( 44.0, 18.0, 19.0 ), ( 40.0, 13.0, 5.0 ),
                                  ( -40.0, 13.0, 5.0 ) ], ( 0, -1, 0.3 ) )
+    for x in ( -30.0, -10.0, 10.0, 30.0 ):         # its stiffening ribs
+        car.poly( "rw_steel_dark", [ ( x - 0.6, 17.85, 18.4 ), ( x + 0.6, 17.85, 18.4 ), ( x + 0.6, 12.85, 5.6 ),
+                                     ( x - 0.6, 12.85, 5.6 ) ], ( 0, -1, 0.3 ) )
     car.poly( "rw_train_dark", [ ( -40.0, 13.0, 5.0 ), ( 40.0, 13.0, 5.0 ), ( 40.0, 30.0, 5.0 ),
                                  ( -40.0, 30.0, 5.0 ) ], ( 0, 0, -1 ) )
     for xs in ( 1.0, -1.0 ):
         car.poly( "rw_train_dark", [ ( xs * 44.0, 18.0, 19.0 ), ( xs * 40.0, 13.0, 5.0 ), ( xs * 40.0, 30.0, 5.0 ),
                                      ( xs * 44.0, 30.0, 19.0 ) ], ( xs, 0, 0 ) )
     car.box( -44.0, 44.0, 30.0, EMU_NOSE, 10.0, 19.0, "rw_bogie", skip=( "top", ) )
+
+
+def _emu_cab_interior( car ):
+    """ The driver's cab behind the tinted windscreen, as it reads from the platform: a full-width dark grey desk with
+    two display housings, the driver's seat with its headrest left of centre, a pale grey rear bulkhead with its door,
+    pale side walls, a dim ceiling and a dark floor. Visual only; it closes the nose so nothing else shows through. """
+    import railhead_buffer as B
+    face = lambda z: _emu_face_at( z )[0]
+    xw = EMU_W - 4.5
+    zf, zc, db = 87.0, 150.5, 98.0
+    # Floor, ceiling and the rear bulkhead.
+    front = lambda z: [ ( -xw, face( z ) + 15.0 ), ( -30.0, face( z ) + 4.0 ), ( 30.0, face( z ) + 4.0 ),
+                        ( xw, face( z ) + 15.0 ), ( xw, db ), ( -xw, db ) ]
+    car.poly( "rw_cab_desk", [ ( x, d, zf ) for x, d in front( zf ) ], ( 0, 0, 1 ) )
+    car.poly( "rw_cab_ceiling", [ ( x, d, zc ) for x, d in front( zc ) ], ( 0, 0, -1 ) )
+    for x0 in ( -32.0, 32.0 ):      # the ceiling's two light panels
+        car.poly( "rw_cab_screen", [ ( x0 - 7.0, 62.0, zc - 0.1 ), ( x0 + 7.0, 62.0, zc - 0.1 ), ( x0 + 7.0, 86.0, zc - 0.1 ),
+                                     ( x0 - 7.0, 86.0, zc - 0.1 ) ], ( 0, 0, -1 ) )
+    car.poly( "rw_cab_wall", [ ( -xw, db, zf ), ( xw, db, zf ), ( xw, db, zc ), ( -xw, db, zc ) ], ( 0, -1, 0 ) )
+    car.poly( "rw_steel_grey", [ ( 4.0, db - 0.1, zf ), ( 26.0, db - 0.1, zf ), ( 26.0, db - 0.1, 146.0 ),
+                                 ( 4.0, db - 0.1, 146.0 ) ], ( 0, -1, 0 ) )
+    car.poly( "rw_emu_screen", [ ( 8.0, db - 0.2, 122.0 ), ( 22.0, db - 0.2, 122.0 ), ( 22.0, db - 0.2, 140.0 ),
+                                 ( 8.0, db - 0.2, 140.0 ) ], ( 0, -1, 0 ) )
+    car.rod( ( 23.5, db - 0.4, 112.0 ), ( 23.5, db - 2.2, 112.0 ), 0.5, "rw_steel_dark", 6 )
+    car.rod( ( 23.5, db - 2.2, 112.0 ), ( 19.5, db - 2.2, 112.0 ), 0.45, "rw_steel_dark", 6 )
+    # The side walls, their front edges kept behind the curved nose.
+    for xs in ( 1.0, -1.0 ):
+        edge = [ ( face( z ) + 15.0, z ) for z in ( zf, 100.0, 112.0, 126.0, 140.0, zc ) ]
+        car.poly( "rw_cab_wall", [ ( xs * xw, d, z ) for d, z in edge ] + [ ( xs * xw, db, zc ), ( xs * xw, db, zf ) ],
+                  ( -xs, 0, 0 ) )
+    # The desk: a full-width console under the windscreen's foot, its top sloping to the driver.
+    d0 = face( 112.0 ) + 7.0
+    prof = [ ( d0, 96.0 ), ( d0, 108.0 ), ( d0 + 6.0, 111.5 ), ( d0 + 22.0, 108.5 ), ( d0 + 24.0, 104.0 ),
+             ( d0 + 21.0, 96.0 ) ]
+    xd = EMU_W - 13.0
+    for ( pd, pz ), ( qd, qz ) in zip( prof, prof[1:] ):
+        car.poly( "rw_cab_desk", [ ( -xd, pd, pz ), ( xd, pd, pz ), ( xd, qd, qz ), ( -xd, qd, qz ) ],
+                  ( 0, -( qz - pz ), qd - pd ) )
+    for xs in ( 1.0, -1.0 ):
+        car.poly( "rw_cab_desk", [ ( xs * xd, d, z ) for d, z in prof ], ( xs, 0, 0 ) )
+    # Two display housings on the desk, leaning back towards the driver, their screens lit dimly.
+    for xc in ( -22.0, 2.0 ):
+        lo = ( xc - 8.0, -car.a( d0 + 9.0 ), 109.5 )
+        hi = ( xc + 8.0, -car.a( d0 + 6.0 ), 119.5 )
+        B.bevel_box( car.model, car.F, ( lo[0], min( lo[1], hi[1] ), lo[2] ), ( hi[0], max( lo[1], hi[1] ), hi[2] ),
+                     "rw_cab_desk", bevel=0.6 )
+        car.poly( "rw_cab_screen", [ ( xc - 7.0, d0 + 9.1, 110.5 ), ( xc + 7.0, d0 + 9.1, 110.5 ),
+                                     ( xc + 7.0, d0 + 9.1, 118.5 ), ( xc - 7.0, d0 + 9.1, 118.5 ) ], ( 0, 1, 0 ) )
+    # The driver's seat: a pedestal, the cushion, the high back and its headrest, the armrests.
+    sx, sd = -20.0, d0 + 38.0
+    car.rod( ( sx, sd, zf ), ( sx, sd, 101.0 ), 2.2, "rw_steel_dark", 10 )
+    for lo, hi, bev in ( ( ( sx - 10.0, sd - 9.0, 101.0 ), ( sx + 10.0, sd + 9.0, 106.0 ), 1.6 ),
+                         ( ( sx - 10.0, sd + 8.0, 105.0 ), ( sx + 10.0, sd + 12.0, 131.0 ), 1.6 ),
+                         ( ( sx - 5.0, sd + 8.4, 132.0 ), ( sx + 5.0, sd + 11.6, 139.0 ), 1.2 ),
+                         ( ( sx - 12.0, sd - 4.0, 109.0 ), ( sx - 10.2, sd + 8.0, 111.0 ), 0.5 ),
+                         ( ( sx + 10.2, sd - 4.0, 109.0 ), ( sx + 12.0, sd + 8.0, 111.0 ), 0.5 ) ):
+        a_lo, a_hi = -car.a( lo[1] ), -car.a( hi[1] )
+        B.bevel_box( car.model, car.F, ( lo[0], min( a_lo, a_hi ), lo[2] ), ( hi[0], max( a_lo, a_hi ), hi[2] ),
+                     "rw_cab_seat", bevel=bev )
 
 
 def _emu_car( car, body, platform_xs, doors_open, cab, destination, roof="ac" ):
@@ -1366,30 +1553,62 @@ def _emu_car( car, body, platform_xs, doors_open, cab, destination, roof="ac" ):
             car.poly( "rw_window_dark", [ ( xs * ( EMU_W + 0.16 ), d, z ) for d, z in
                                           ( ( 65.0, 106.0 ), ( 105.0, 106.0 ), ( 105.0, 144.0 ), ( 82.0, 144.0 ) ) ],
                       ( xs, 0, 0 ) )
+            # The driver's drop window in the rear half: its aluminium frame, the sash's top rail half way down (it's
+            # dropped a hand's width), the grab handle beside it and the rear-view camera's arm over it.
+            xw = xs * ( EMU_W + 0.3 )
+            for p_, q_ in ( ( ( 86.0, 106.4 ), ( 104.6, 106.4 ) ), ( ( 104.6, 106.4 ), ( 104.6, 143.6 ) ),
+                            ( ( 104.6, 143.6 ), ( 86.0, 143.6 ) ), ( ( 86.0, 143.6 ), ( 86.0, 106.4 ) ),
+                            ( ( 86.0, 136.0 ), ( 104.6, 136.0 ) ) ):
+                car.rod( ( xw, p_[0], p_[1] ), ( xw, q_[0], q_[1] ), 0.32, "rw_alu_brushed", 6 )
+            car.rod( ( xs * ( EMU_W + 0.9 ), 108.8, 112.0 ), ( xs * ( EMU_W + 0.9 ), 108.8, 136.0 ), 0.45, "rw_steel_grey", 8 )
+            for z_ in ( 112.0, 136.0 ):
+                car.rod( ( xs * ( EMU_W + 0.1 ), 108.8, z_ ), ( xs * ( EMU_W + 0.9 ), 108.8, z_ ), 0.35, "rw_steel_grey", 6 )
+            car.rod( ( xs * ( EMU_W + 0.2 ), 92.0, 147.5 ), ( xs * ( EMU_W + 5.5 ), 88.0, 147.5 ), 0.6, "rw_black", 8,
+                     caps=( False, True ) )
+            car.box( min( xs * ( EMU_W + 4.6 ), xs * ( EMU_W + 7.4 ) ), max( xs * ( EMU_W + 4.6 ), xs * ( EMU_W + 7.4 ) ),
+                     85.5, 90.0, 145.6, 149.4, "rw_black" )
         T.markings(car, xs, doors)
     T.interior(car)
     T.underframe(car)
     # The roof and the side walls' curve into it, the underside and its steps, the inner end.
     a0, a1 = car.span( start, end )
-    _extrude( model, F, EMU_UPPER, a0, a1, lambda k: body if EMU_UPPER[k][1] < EMU_ROOF_LINE else "rw_train_grey",
+    _extrude( model, F, EMU_UPPER, a0, a1, lambda k: body if EMU_UPPER[k][1] < EMU_ROOF_LINE else EMU_ROOF_PAINT,
               smooth_from=0 )
+    # The underside and the bogie cut-outs' ceilings and end walls: dusty underframe steel, not black, so the cut-outs
+    # read as recesses with the bogie in them rather than holes.
     for d0, d1, zb in pieces:
-        car.poly( "rw_bogie", [ ( EMU_W, d0, zb ), ( -EMU_W, d0, zb ), ( -EMU_W, d1, zb ), ( EMU_W, d1, zb ) ],
+        car.poly( "rw_bogie_brake", [ ( EMU_W, d0, zb ), ( -EMU_W, d0, zb ), ( -EMU_W, d1, zb ), ( EMU_W, d1, zb ) ],
                   ( 0, 0, -1 ) )
     for ( _, d, za ), ( _, _, zb ) in zip( pieces, pieces[1:] ):
         if abs( za - zb ) > 1e-6:
-            car.poly( "rw_bogie", [ ( EMU_W, d, za ), ( -EMU_W, d, za ), ( -EMU_W, d, zb ), ( EMU_W, d, zb ) ],
+            car.poly( "rw_bogie_brake", [ ( EMU_W, d, za ), ( -EMU_W, d, za ), ( -EMU_W, d, zb ), ( EMU_W, d, zb ) ],
                       ( 0, 1 if za < zb else -1, 0 ) )
     prof = [ ( EMU_W, EMU_SKIRT ) ] + EMU_UPPER
     _section( model, F, prof, car.a( end ), -car.s, body )
     if not cab:
         _section( model, F, prof, car.a( 0.0 ), car.s, body )
-    # Air conditioning on the roof over the inner end.
-    if roof == "ac":
-        car.box( -24.0, 24.0, 640.0, 735.0, EMU_ROOF - 2.0, EMU_ROOF + 7.0, "rw_train_grey", skip=( "bottom", ) )
-        for g in range( 6 ):
-            car.box( -20.0, 20.0, 648.0 + 14.0 * g, 652.0 + 14.0 * g, EMU_ROOF + 7.0, EMU_ROOF + 7.6, "rw_steel_dark",
-                     skip=( "bottom", ) )
+    # Air conditioning on the roof: a pod over each mid-level end (the rear car's inner one clear of its pantograph),
+    # and a cable duct along the roof between them.
+    try:
+        import railhead_roof_kit as RK
+        pods = ( 160.0, 645.0 ) if roof == "ac" else ( 160.0, 560.0 )
+        for d0 in pods:
+            RK.ac_pod( car, d0, d0 + 78.7 )
+        RK.cable_duct( car, 112.0 if cab else 8.0, 755.0, ( pods[0], pods[0] + 78.7 ), ( pods[1], pods[1] + 78.7 ),
+                       pantograph=roof != "ac" )
+        avoid = [ ( d, d + 78.7 ) for d in pods ] + ( [] if roof == "ac" else [ ( 590.0, 763.0 ) ] )
+        RK.roof_details( car, start, end, cab, avoid )
+    except Exception as error:
+        print( f"railhead_roof_kit failed: {error}" )
+        if roof == "ac":
+            car.box( -24.0, 24.0, 640.0, 735.0, EMU_ROOF - 2.0, EMU_ROOF + 7.0, "rw_train_grey", skip=( "bottom", ) )
+    if cab:
+        try:
+            import railhead_roof_kit as RK
+            for xs in ( 1.0, -1.0 ):
+                RK.cab_door( car, xs )
+        except Exception as error:
+            print( f"railhead_roof_kit.cab_door failed: {error}" )
     # Collision: the cab stepped back with its windscreen, the body solid, hollowed at the open vestibules.
     W, top = EMU_W, EMU_ROOF
     if cab:
@@ -1820,23 +2039,79 @@ def container( model, e, n, z0, size="20", axis="n", paint="rw_container_blue", 
     F = Frame( ( e, n, z0 ), ( door_end, 0 ) if axis == "e" else ( 0, door_end ) )
     post, rail_h = 6.0, 6.0
     out_x = { 1.0: "right", -1.0: "left" }
-    for xs in ( 1.0, -1.0 ):                                                     # the side walls, set in 0.75
-        F.box( model, xs * ( hw - 0.75 ), xs * ( hw - 2.0 ), hl - post, -( hl - post ), rail_h, height - rail_h,
-               { "default": None, out_x[xs]: paint, out_x[-xs]: paint if doors_open else None } )
-    F.box( model, -( hw - post ), hw - post, -( hl - 0.75 ), -( hl - 2.0 ), rail_h, height - rail_h,
-           { "default": None, "back": paint, "front": paint if doors_open else None } )
+    try:                                                                         # corrugated side and end walls
+        import railhead_furniture as FU
+        for xs in ( 1.0, -1.0 ):
+            FU.corrugated( model, F, "x", xs * ( hw - 0.75 ), xs, -( hl - post ), hl - post, rail_h, height - rail_h,
+                           paint, inside=paint if doors_open else None )
+        FU.corrugated( model, F, "y", -( hl - 0.75 ), -1.0, -( hw - post ), hw - post, rail_h, height - rail_h, paint,
+                       inside=paint if doors_open else None, pitch=9.0 )
+    except Exception as error:
+        print( f"railhead_furniture.corrugated failed: {error}" )
+        for xs in ( 1.0, -1.0 ):                                                 # the side walls, set in 0.75
+            F.box( model, xs * ( hw - 0.75 ), xs * ( hw - 2.0 ), hl - post, -( hl - post ), rail_h, height - rail_h,
+                   { "default": None, out_x[xs]: paint, out_x[-xs]: paint if doors_open else None } )
+        F.box( model, -( hw - post ), hw - post, -( hl - 0.75 ), -( hl - 2.0 ), rail_h, height - rail_h,
+               { "default": None, "back": paint, "front": paint if doors_open else None } )
     F.box( model, -hw, hw, -hl, hl, height - 1.5, height, { "default": None, "top": paint,
                                                               "bottom": paint if doors_open else None } )
+    import railhead_buffer as B
+
+    def oval( centre, normal, w, h, paint="rw_black", sides=12 ):
+        """ A corner fitting's slotted hole: an oval w x h on a face, normal its outward axis ( local ). """
+        c = np.asarray( centre, float )
+        n = np.asarray( normal, float )
+        u = np.array( ( 0.0, 0.0, 1.0 ) ) if abs( n[2] ) < 0.5 else np.array( ( 1.0, 0.0, 0.0 ) )
+        v = np.cross( n, u )
+        pts = [ tuple( c + n * 0.03 + u * ( h / 2 ) * math.sin( 2 * math.pi * k / sides )
+                       + v * ( w / 2 ) * math.cos( 2 * math.pi * k / sides ) ) for k in range( sides ) ]
+        _fpoly( model, F, paint, pts, tuple( n ) )
+
     for xs in ( 1.0, -1.0 ):                                                     # the frame
         for ys in ( 1.0, -1.0 ):
+            # The corner posts: pressed channels standing 0.16 proud of the walls' outer flats, a weld down each edge.
             F.box( model, xs * hw, xs * ( hw - post ), ys * hl, ys * ( hl - post ), 4.6, height - 4.6, paint,
                    skip=( "bottom", "top" ) )
-            for c0, c1 in ( ( -0.05, 4.6 ), ( height - 4.6, height + 0.05 ) ):
-                F.box( model, xs * ( hw + 0.05 ), xs * ( hw - 7.0 ), ys * ( hl + 0.05 ), ys * ( hl - 6.4 ), c0, c1,
-                       "rw_steel_dark" )
+            F.box( model, xs * ( hw + 0.16 ), xs * ( hw - 0.6 ), ys * ( hl - 1.2 ), ys * ( hl - 4.8 ), 4.6, height - 4.6,
+                   paint, skip=( "bottom", "top" ) )
+            for y_ in ( ys * ( hl - post ), ):
+                rod( model, F.p( xs * ( hw - 0.75 ), y_, 4.8 ), F.p( xs * ( hw - 0.75 ), y_, height - 4.8 ), 0.14,
+                     "rw_steel_dark", 4 )
+            # The cast corner fittings, 178 x 162 x 118 mm, 10 mm proud of the posts and rails, a slotted oval hole
+            # in each outer face and the top or bottom.
+            for c0, c1, vert in ( ( -0.05, 4.65, -1.0 ), ( height - 4.65, height + 0.4, 1.0 ) ):
+                x0, x1 = sorted( ( xs * ( hw + 0.4 ), xs * ( hw - 6.4 ) ) )
+                y0, y1 = sorted( ( ys * ( hl + 0.4 ), ys * ( hl - 7.0 ) ) )
+                B.bevel_box( model, F, ( x0, y0, c0 ), ( x1, y1, c1 ), paint, 0.35, "rw_steel_dark" )
+                zc_ = ( c0 + c1 ) / 2
+                oval( ( xs * ( hw + 0.4 ), ys * ( hl - 3.3 ), zc_ ), ( xs, 0, 0 ), 4.9, 2.5 )
+                oval( ( xs * ( hw - 3.0 ), ys * ( hl + 0.4 ), zc_ ), ( 0, ys, 0 ), 2.5, 2.2 )
+                oval( ( xs * ( hw - 3.0 ), ys * ( hl - 3.3 ), c1 if vert > 0 else c0 ), ( 0, 0, vert ), 4.9, 2.5 )
+        # The bottom side rail, and the top side rail: a 60 mm square hollow section 6 mm proud of the roof's edge.
         F.box( model, xs * hw, xs * ( hw - 3.0 ), hl - post, -( hl - post ), 0.0, rail_h, paint )
-        F.box( model, xs * hw, xs * ( hw - 3.0 ), hl - post, -( hl - post ), height - rail_h, height, paint,
-               skip=( "top", ) )
+        F.box( model, xs * hw, xs * ( hw - 3.0 ), hl - post, -( hl - post ), height - rail_h, height - 2.36, paint )
+        x0, x1 = sorted( ( xs * ( hw + 0.24 ), xs * ( hw - 2.12 ) ) )
+        B.bevel_box( model, F, ( x0, -( hl - post ), height - 2.36 ), ( x1, hl - post, height + 0.24 ), paint, 0.2,
+                     "rw_steel_dark" )
+        # Forklift pockets through the bottom rail of a 20 ft box, 900 mm either side of its middle, and the lashing
+        # rings along the rail.
+        if str( size ) == "20":
+            for yc in ( -35.4, 35.4 ):
+                F.box( model, min( xs * ( hw + 0.02 ), xs * ( hw + 0.3 ) ), max( xs * ( hw + 0.02 ), xs * ( hw + 0.3 ) ),
+                       yc - 7.6, yc + 7.6, 0.2, 5.6, "rw_steel_dark" )
+                F.box( model, min( xs * ( hw + 0.3 ), xs * ( hw + 0.34 ) ), max( xs * ( hw + 0.3 ), xs * ( hw + 0.34 ) ),
+                       yc - 7.1, yc + 7.1, 0.5, 5.0, "rw_black" )
+        import railhead_vehicle_kit as VK
+        for k in range( 4 ):
+            yr = -hl + post + 10.0 + k * ( 2 * ( hl - post ) - 20.0 ) / 3
+            VK.torus( model, "rw_steel_dark", F.p( xs * ( hw + 0.45 ), yr, rail_h - 1.4 ), F.x, 1.1, 0.2, sides=10,
+                      tube=4 )
+            F.box( model, min( xs * hw, xs * ( hw + 0.4 ) ), max( xs * hw, xs * ( hw + 0.4 ) ), yr - 0.6, yr + 0.6,
+                   rail_h - 0.6, rail_h + 0.2, "rw_steel_dark" )
+        # The owner code high on each side at the door end, painted over the corrugation's outer flats.
+        yc = door_end * 0 + ( hl - post - 16.0 )
+        F.quad( model, "rw_container_code", xs * ( hw - 0.68 ), yc, height - 12.0, 22.0, 3.2, out_x[xs],
+                uv=_code_uv( "owner", flip=xs < 0 ) )
     for ys in ( 1.0, -1.0 ):
         F.box( model, -( hw - post ), hw - post, ys * hl, ys * ( hl - 3.0 ), 0.0, rail_h, paint )
         F.box( model, -( hw - post ), hw - post, ys * hl, ys * ( hl - 3.0 ), height - 8.0, height, paint,
@@ -1862,15 +2137,254 @@ def container( model, e, n, z0, size="20", axis="n", paint="rw_container_blue", 
         return
     F.box( model, -( hw - post ), hw - post, hl - 0.9, hl - 0.2, rail_h, height - 8.0,
            { "default": None, "front": paint } )
+    for xs in ( 1.0, -1.0 ):
+        for k in range( 4 ):
+            x = xs * ( 5.0 + 9.5 * k )
+            F.box( model, x - 2.6, x + 2.6, hl - 0.2, hl + 0.5, rail_h + 6.0, height - 14.0, paint, skip=( "back", ) )
+        for z in ( 14.0, 40.0, 66.0, 92.0 ):
+            F.box( model, xs * ( hw - post - 1.5 ), xs * ( hw - post + 0.5 ), hl - 0.2, hl + 1.0, z - 2.0, z + 2.0,
+                   "rw_steel_dark", skip=( "back", ) )
     F.quad( model, "rw_black", 0.0, hl - 0.15, height / 2 - 1.0, 0.6, height - 14.0 )
     for x in ( -36.0, -12.0, 12.0, 36.0 ):
-        rod( model, F.p( x, hl + 1.2, 3.0 ), F.p( x, hl + 1.2, height - 3.0 ), 0.95, "rw_steel_grey", 4 )
+        rod( model, F.p( x, hl + 1.2, 3.0 ), F.p( x, hl + 1.2, height - 3.0 ), 0.95, "rw_steel_grey", 6 )
+        # Four keepers on each bar: the cam keepers top and bottom, two guides between.
         for z in ( 4.0, height - 4.0 ):
             F.box( model, x - 1.6, x + 1.6, hl - 0.2, hl + 2.4, z - 1.5, z + 1.5, "rw_steel_grey", skip=( "back", ) )
-        F.box( model, x, x + ( 7.0 if x > 0 else -7.0 ), hl + 1.0, hl + 2.4, 44.0, 46.0, "rw_steel_grey",
-               skip=( "back", ) )
-    F.quad( model, "rw_white_paint", 22.0, hl - 0.1, height - 26.0, 8.0, 4.0 )
+        for z in ( 26.0, height - 30.0 ):
+            F.box( model, x - 1.4, x + 1.4, hl + 0.5, hl + 2.3, z - 0.8, z + 0.8, "rw_steel_grey", skip=( "back", ) )
+        # The cam handle, its retainer and (on the right door's inner bar) the customs seal's hasp.
+        hx = x + ( 7.0 if x > 0 else -7.0 )
+        F.box( model, min( x, hx ), max( x, hx ), hl + 1.0, hl + 2.4, 44.0, 46.0, "rw_steel_grey", skip=( "back", ) )
+        F.box( model, hx - 0.9, hx + 0.9, hl + 0.5, hl + 2.8, 41.5, 48.5, "rw_steel_dark", skip=( "back", ) )
+        if x == 12.0:
+            F.box( model, hx + 0.9, hx + 2.6, hl + 1.4, hl + 2.0, 43.6, 46.4, "rw_steel_grey", skip=( "back", ) )
+            rod( model, F.p( hx + 2.2, hl + 2.3, 43.0 ), F.p( hx + 2.2, hl + 2.3, 41.0 ), 0.12, "rw_yellow_paint", 4 )
+    # The doors' markings: the owner code across the top, the size-type code under it, the CSC plate and the
+    # weights panel.
+    F.quad( model, "rw_container_code", 12.0, hl + 0.06, height - 4.2, 22.0, 3.2, "front", uv=_code_uv( "owner" ) )
+    F.quad( model, "rw_container_code", 26.0, hl + 0.56, height - 19.0, 8.6, 3.1, "front", uv=_code_uv( "type" ) )
+    F.quad( model, "rw_container_code", -24.0, hl + 0.56, 62.0, 6.2, 6.2, "front", uv=_code_uv( "csc" ) )
+    F.quad( model, "rw_container_code", 26.0, hl + 0.56, 70.0, 9.2, 9.2, "front", uv=_code_uv( "tare" ) )
     F.collide( model, -hw, hw, -hl, hl, 0.0, height, "metal" )
+
+
+def _code_uv( name, flip=False ):
+    """ The container markings' atlas entry, bottom-left, bottom-right, top-right, top-left (flip mirrors it). """
+    try:
+        import railhead_prop_materials as PM
+        uv = PM.code_uv( name )
+    except Exception:
+        uv = [ ( 0, 0 ), ( 1, 0 ), ( 1, 1 ), ( 0, 1 ) ]
+    return [ uv[1], uv[0], uv[3], uv[2] ] if flip else uv
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Yard clutter the dressing places (the same signatures and the same collision as railhead_dress_detail's).
+
+def skip_bin( model, e, n, facing, z0=0.0, paint="rw_skip_yellow", fill="rw_ballast_old" ):
+    """ A builder's set-down skip (Absetzmulde): a tapered box of 5 mm plate, 3.4 m long at its rim and 2.6 m at its
+    floor, 1.7 m wide and 1.2 m deep, as railhead_dress_detail's (whose collision box it keeps), with a rolled 60 mm lip
+    all round, three pressed U-channel ribs down each long side, the two lifting trunnions (60 mm pins with collars)
+    on each side, a drop end hinged at its foot with its chain hooks, small dents, faded RAL 1021 paint rusted at the
+    lip and dirty at the foot, and a mound of rubble in it. facing is the way its long side runs. One box of
+    collision. """
+    import railhead_buffer as B
+    if paint in ( "rw_yellow_paint", None ):
+        paint = "rw_skip_yellow"
+    F = frame_for( e, n, z0, facing )
+    top_l, bot_l, w, h = 66.9, 51.2, 33.5, 47.2
+    rng = np.random.default_rng( int( abs( e ) * 7 + abs( n ) * 3 ) % 100003 )
+    centre = F.p( 0.0, 0.0, h / 2 )
+
+    def wall_pt( side, u, v, inset=0.0 ):
+        """ A point on the long wall side (+1/-1) at u (-1..1 along) and v (0..1 up), dented a little. """
+        y = u * ( bot_l + ( top_l - bot_l ) * v )
+        return ( side * ( w - inset ), y, 2.0 + ( h - 2.0 ) * v )
+
+    # The long walls, a 6 x 4 grid each so they can take dents, outside and in.
+    nu, nv = 8, 4
+    dents = { ( side, i, j ): rng.normal( 0, 0.22 ) if 0 < i < nu and 0 < j < nv else 0.0
+              for side in ( -1, 1 ) for i in range( nu + 1 ) for j in range( nv + 1 ) }
+    for side in ( -1, 1 ):
+        for i in range( nu ):
+            for j in range( nv ):
+                corners = [ ( i, j ), ( i + 1, j ), ( i + 1, j + 1 ), ( i, j + 1 ) ]
+                outer, inner = [], []
+                for ci, cj in corners:
+                    x, y, z = wall_pt( side, -1 + 2 * ci / nu, cj / nv )
+                    d = dents[( side, ci, cj )]
+                    outer.append( F.p( x - side * d, y, z ) )
+                    inner.append( F.p( x - side * ( d + 0.2 ), y * 0.997, z ) )
+                _fpoly_world( model, paint, outer, F.x * side )
+                _fpoly_world( model, paint, inner, -F.x * side )
+    # The two ends: sloping plates; the +y one is the drop end, its hinge along its foot.
+    for ys in ( -1, 1 ):
+        pts = [ F.p( -w, ys * bot_l, 2.0 ), F.p( w, ys * bot_l, 2.0 ), F.p( w, ys * top_l, h ), F.p( -w, ys * top_l, h ) ]
+        out = F.y * ys * ( h - 2.0 ) + F.z * ( -( top_l - bot_l ) )
+        _fpoly_world( model, paint, pts, out )
+        _fpoly_world( model, paint, [ p - ( p - centre ) * 0.02 for p in pts ], -out )
+    for z in ( 2.0, ):
+        _fpoly_world( model, "rw_steel_dark", [ F.p( -w, -bot_l, z ), F.p( w, -bot_l, z ), F.p( w, bot_l, z ),
+                                                F.p( -w, bot_l, z ) ], -F.z )
+    # The drop end: its hinge pins along the foot, its shut seams, the two chain hooks at its top corners.
+    t = ( top_l - bot_l ) / ( h - 2.0 )
+    end_pt = lambda x, z, lift=0.0: F.p( x, bot_l + t * ( z - 2.0 ) + lift, z + lift * -t )
+    for x0 in ( -w + 3.0, -6.0, w - 9.0 ):
+        rod( model, end_pt( x0, 5.0, 1.2 ), end_pt( x0 + 6.0, 5.0, 1.2 ), 1.1, "rw_steel_dark", 10, caps=( True, True ) )
+    for x0, x1, z0_, z1_ in ( ( -w + 1.5, -w + 1.8, 7.0, h - 3.0 ), ( w - 1.8, w - 1.5, 7.0, h - 3.0 ),
+                              ( -w + 1.5, w - 1.5, 7.0, 7.3 ) ):
+        _fpoly_world( model, "rw_black", [ end_pt( x0, z0_, 0.05 ), end_pt( x1, z0_, 0.05 ), end_pt( x1, z1_, 0.05 ),
+                                           end_pt( x0, z1_, 0.05 ) ], F.y + F.z * -t )
+    for sx in ( -1, 1 ):
+        c = end_pt( sx * ( w - 5.0 ), h - 6.0, 1.5 )
+        rod( model, c - F.z * 1.6, c + F.z * 1.6, 0.6, "rw_steel_dark", 6, caps=( True, True ) )
+        rod( model, c + F.z * 1.6, c + F.z * 1.6 + F.y * 1.6, 0.6, "rw_steel_dark", 6, caps=( False, True ) )
+    # The rolled lip all round the rim: a 60 mm box section, chamfered, its top rubbed to rust.
+    lip = 2.36
+    for x0, x1, y0, y1 in ( ( -w - 0.6, -w - 0.6 + lip, -top_l - 0.6, top_l + 0.6 ),
+                            ( w + 0.6 - lip, w + 0.6, -top_l - 0.6, top_l + 0.6 ),
+                            ( -w - 0.6 + lip, w + 0.6 - lip, -top_l - 0.6, -top_l - 0.6 + lip ),
+                            ( -w - 0.6 + lip, w + 0.6 - lip, top_l + 0.6 - lip, top_l + 0.6 ) ):
+        B.bevel_box( model, F, ( x0, y0, h - lip ), ( x1, y1, h ), paint, 0.5, "rw_wagon_rust" )
+    # Three pressed U-channel ribs down each long side, following the wall's taper; the floor's two skids.
+    for side in ( -1, 1 ):
+        for u in ( -0.5, 0.0, 0.5 ):
+            yb, yt = u * bot_l, u * top_l
+            for dy0, dy1, paint_ in ( ( -1.7, -1.2, paint ), ( 1.2, 1.7, paint ) ):
+                _fpoly_world( model, paint_, [ F.p( side * w, yb + dy0, 2.5 ), F.p( side * w, yb + dy1, 2.5 ),
+                                               F.p( side * w, yt + dy1, h - lip ), F.p( side * w, yt + dy0, h - lip ) ],
+                              F.x * side )
+            _fpoly_world( model, paint, [ F.p( side * ( w + 1.3 ), yb - 1.7, 2.5 ), F.p( side * ( w + 1.3 ), yb + 1.7, 2.5 ),
+                                          F.p( side * ( w + 1.3 ), yt + 1.7, h - lip ), F.p( side * ( w + 1.3 ), yt - 1.7, h - lip ) ],
+                          F.x * side )
+            for dy in ( -1.7, 1.7 ):
+                _fpoly_world( model, paint, [ F.p( side * w, yb + dy, 2.5 ), F.p( side * ( w + 1.3 ), yb + dy, 2.5 ),
+                                              F.p( side * ( w + 1.3 ), yt + dy, h - lip ), F.p( side * w, yt + dy, h - lip ) ],
+                              F.y * ( 1 if dy > 0 else -1 ) )
+        # The trunnions: two 60 mm pins with collars each side near the middle, where the skip lorry's chains go.
+        for yc in ( -14.0, 14.0 ):
+            c = F.p( side * w, yc, h - 15.0 )
+            rod( model, c, c + F.x * side * 5.9, 1.18, "rw_steel_dark", 12, caps=( False, True ) )
+            rod( model, c + F.x * side * 4.6, c + F.x * side * 5.3, 1.9, "rw_steel_dark", 12, caps=( True, True ) )
+            B.bevel_box( model, F, ( min( side * w, side * ( w + 1.0 ) ), yc - 3.5, h - 19.5 ),
+                         ( max( side * w, side * ( w + 1.0 ) ), yc + 3.5, h - 10.5 ), paint, 0.3 )
+    for x in ( -w + 6.0, w - 6.0 ):
+        F.box( model, x - 2.0, x + 2.0, -bot_l, bot_l, 0.0, 2.0, "rw_steel_dark" )
+    # The rubble: a mound over the floor, highest off the middle, with broken concrete and brick in it.
+    fill_z = h * 0.55
+    nx_, ny_ = 6, 10
+    hgt = {}
+    for i in range( nx_ + 1 ):
+        for j in range( ny_ + 1 ):
+            u, v = -1 + 2 * i / nx_, -1 + 2 * j / ny_
+            mound = 9.0 * ( 1 - u * u ) * ( 1 - 0.6 * v * v ) * ( 0.7 + 0.3 * math.sin( 3.1 * v + 1.3 ) )
+            hgt[( i, j )] = fill_z + mound + rng.uniform( -1.2, 1.2 )
+    def fill_pt( i, j ):
+        z = hgt[( i, j )]
+        v = ( z - 2.0 ) / ( h - 2.0 )
+        half_l = bot_l + ( top_l - bot_l ) * v - 0.5
+        return F.p( ( -1 + 2 * i / nx_ ) * ( w - 0.6 ), ( -1 + 2 * j / ny_ ) * half_l, min( z, h - 1.0 ) )
+    for i in range( nx_ ):
+        for j in range( ny_ ):
+            _fpoly_world( model, fill, [ fill_pt( i, j ), fill_pt( i + 1, j ), fill_pt( i + 1, j + 1 ), fill_pt( i, j + 1 ) ],
+                          F.z )
+    for k in range( 14 ):
+        i, j = rng.integers( 1, nx_ ), rng.integers( 1, ny_ )
+        c = fill_pt( i, j ) + F.x * rng.uniform( -3, 3 ) + F.y * rng.uniform( -3, 3 )
+        size = rng.uniform( 2.5, 6.0, 3 ) * ( 1.0, 1.0, 0.6 )
+        _rubble_chunk( model, c, size, rng, "rw_concrete" if k % 3 else "rw_brick" )
+    lo = np.minimum( F.p( -w - 1.2, -top_l - 1, 0 ), F.p( w + 1.2, top_l + 1, h ) )
+    hi = np.maximum( F.p( -w - 1.2, -top_l - 1, 0 ), F.p( w + 1.2, top_l + 1, h ) )
+    model.collision_box( lo, hi, "metal" )
+
+
+def _fpoly_world( model, paint, pts, towards ):
+    outward( model, paint, [ np.asarray( p, float ) for p in pts ], np.asarray( towards, float ) )
+
+
+def _rubble_chunk( model, c, size, rng, paint ):
+    """ A broken lump: a box with its corners pulled about, tilted. """
+    a = rng.uniform( 0, 2 * math.pi )
+    ux = np.array( ( math.cos( a ), math.sin( a ), 0.0 ) )
+    uy = np.array( ( -math.sin( a ), math.cos( a ), 0.0 ) )
+    uz = _unit( np.array( ( rng.uniform( -0.3, 0.3 ), rng.uniform( -0.3, 0.3 ), 1.0 ) ) )
+    corners = {}
+    for sx in ( -1, 1 ):
+        for sy in ( -1, 1 ):
+            for sz in ( -1, 1 ):
+                j = rng.uniform( 0.7, 1.15, 3 )
+                corners[( sx, sy, sz )] = c + ux * sx * size[0] / 2 * j[0] + uy * sy * size[1] / 2 * j[1] \
+                    + uz * sz * size[2] / 2 * j[2]
+    for axis in range( 3 ):
+        for s_ in ( -1, 1 ):
+            quad_ = []
+            for a_, b_ in ( ( -1, -1 ), ( 1, -1 ), ( 1, 1 ), ( -1, 1 ) ):
+                key = [ 0, 0, 0 ]
+                key[axis] = s_
+                key[( axis + 1 ) % 3], key[( axis + 2 ) % 3] = a_, b_
+                quad_.append( corners[tuple( key )] )
+            outward( model, paint, quad_, ( ux, uy, uz )[axis] * s_ )
+
+
+def bicycle( model, e, n, heading, z0=0.0, kind="city", paint="rw_train_blue" ):
+    """ A bicycle leaning on a stand (railhead_vehicle_kit.bicycle): kind "city" or "trekking", heading in degrees
+    from +e or "+e"/"-e"/"+n"/"-n". Visual only, no collision. """
+    import railhead_vehicle_kit as VK
+    VK.bicycle( model, e, n, heading, z0, kind, paint )
+
+
+def tyre_stack( model, e, n, z0=0.0, count=4, lean=0.0 ):
+    """ Old car tyres stacked flat, as railhead_dress_detail's (the same collision box): each about 650 mm across and
+    205 mm tall, a lathed tyre with rounded shoulders, its tread cut by two circumferential grooves and 24 sipes, a ring
+    of raised lettering on its sidewall, each turned and sized a little differently, the top one dusty and the top one
+    of a tall stack lying askew. One box of collision. """
+    R0, r_in, h = 12.8, 8.2, 8.07
+    rng = np.random.default_rng( int( abs( e ) * 13 + abs( n ) * 7 ) % 100003 )
+    sides = 24
+    for k in range( count ):
+        de = math.sin( k * 2.1 ) * 1.4 + lean * k
+        dn = math.cos( k * 1.7 ) * 1.2
+        R = R0 * rng.uniform( 0.95, 1.0 )
+        za = z0 + k * h
+        c = np.array( ( e + de, n + dn, za ) )
+        tilt = math.radians( 7.0 ) if ( k == count - 1 and count >= 3 ) else 0.0
+        turn = rng.uniform( 0, 2 * math.pi )
+        axis_up = np.array( ( math.sin( tilt ) * math.cos( turn ), math.sin( tilt ) * math.sin( turn ), math.cos( tilt ) ) )
+        u = _unit( np.cross( axis_up, ( 0.0, 0.0, 1.0 ) ) ) if tilt else np.array( ( 1.0, 0.0, 0.0 ) )
+        v = np.cross( axis_up, u )
+        base = c + np.array( ( 0.0, 0.0, R * math.sin( tilt ) * 0.5 ) )
+        top_paint = "rw_tyre_dust" if k == count - 1 else "rw_tyre"
+        # The tyre's half section ( r, z ), outside from the bottom bead round to the top bead, then the hole.
+        prof = [ ( r_in + 1.0, 0.0 ), ( R - 2.6, 0.15 ), ( R - 0.9, 0.9 ), ( R - 0.1, h * 0.28 ), ( R, h * 0.5 ),
+                 ( R - 0.1, h * 0.72 ), ( R - 0.9, h - 0.9 ), ( R - 2.6, h - 0.15 ), ( r_in + 1.0, h ), ( r_in, h - 1.0 ),
+                 ( r_in, 1.0 ) ]
+        def P_( r, z, t ):
+            return base + ( math.cos( t ) * u + math.sin( t ) * v ) * r + axis_up * z
+        for i in range( sides ):
+            t0, t1 = turn + 2 * math.pi * i / sides, turn + 2 * math.pi * ( i + 1 ) / sides
+            for j in range( len( prof ) ):
+                ( ra, za_ ), ( rb, zb_ ) = prof[j], prof[( j + 1 ) % len( prof )]
+                mid_z = ( za_ + zb_ ) / 2
+                paint = top_paint if mid_z > h * 0.8 else "rw_tyre"
+                rad = ( math.cos( ( t0 + t1 ) / 2 ) * u + math.sin( ( t0 + t1 ) / 2 ) * v )
+                towards = rad * ( zb_ - za_ ) - axis_up * ( rb - ra )
+                outward( model, paint, [ P_( ra, za_, t0 ), P_( rb, zb_, t0 ), P_( rb, zb_, t1 ), P_( ra, za_, t1 ) ],
+                         towards )
+            # The tread's sipes and two grooves, and the lettering ring on the top sidewall.
+            rad = math.cos( t0 ) * u + math.sin( t0 ) * v
+            q = P_( R + 0.02, h * 0.5, t0 + 0.5 * ( t1 - t0 ) )
+            tang = _unit( -math.sin( t0 ) * u + math.cos( t0 ) * v )
+            outward( model, "rw_black", [ q - axis_up * h * 0.26 - tang * 0.14, q - axis_up * h * 0.26 + tang * 0.14,
+                                          q + axis_up * h * 0.26 + tang * 0.14, q + axis_up * h * 0.26 - tang * 0.14 ], rad )
+            for gz in ( h * 0.38, h * 0.62 ):
+                outward( model, "rw_black", [ P_( R + 0.02, gz - 0.13, t0 ), P_( R + 0.02, gz - 0.13, t1 ),
+                                              P_( R + 0.02, gz + 0.13, t1 ), P_( R + 0.02, gz + 0.13, t0 ) ], rad )
+            if i % 2 == 0:
+                for f0, f1 in ( ( 0.1, 0.4 ), ( 0.55, 0.85 ) ):
+                    ta, tb = t0 + ( t1 - t0 ) * f0, t0 + ( t1 - t0 ) * f1
+                    outward( model, "rw_tyre_mark", [ P_( R - 5.6, h + 0.04, ta ), P_( R - 4.4, h + 0.04, ta ),
+                                                      P_( R - 4.4, h + 0.04, tb ), P_( R - 5.6, h + 0.04, tb ) ], axis_up )
+    model.collision_box( ( e - R0 - 1.5, n - R0 - 1.5, z0 ), ( e + R0 + 1.5, n + R0 + 1.5, z0 + count * h ), "rubber" )
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -1979,7 +2493,11 @@ def bench( model, e, n, z0=0.0, facing="+e", length=78.7, slats="rw_wood", frame
     width = ( 16.5 - 3 * 0.5 ) / 4
     for k in range( 4 ):
         y0 = -8.0 + c + k * ( width + 0.5 )
-        F.box( model, -hl, hl, y0, y0 + width, BENCH_SEAT - 1.3, BENCH_SEAT, slats )
+        try:
+            import railhead_buffer as B
+            B.bevel_box( model, F, ( -hl, y0, BENCH_SEAT - 1.3 ), ( hl, y0 + width, BENCH_SEAT ), slats, 0.55 )
+        except Exception:
+            F.box( model, -hl, hl, y0, y0 + width, BENCH_SEAT - 1.3, BENCH_SEAT, slats )
     t = math.radians( 14.0 )
     up, nrm = np.array( ( 0.0, -math.sin( t ), math.cos( t ) ) ), np.array( ( 0.0, math.cos( t ), math.sin( t ) ) )
     base = np.array( ( 0.0, -8.6 + c, 19.0 ) )
@@ -1988,12 +2506,24 @@ def bench( model, e, n, z0=0.0, facing="+e", length=78.7, slats="rw_wood", frame
         _obox( model, F, centre, ( 1, 0, 0 ), nrm, ( length, 1.2, 3.5 ), slats )
     posts = [ -hl + 7.0, hl - 7.0 ] + ( [ 0.0 ] if length > 70.0 else [] )
     back0, back1 = base - nrm * 2.0 - up * 3.0, base - nrm * 2.0 + up * 11.0
-    for x in posts:
+    try:
+        import railhead_furniture as FU
+        cast = FU.bench_frames
+    except Exception:
+        cast = None
+    for x in ( posts if cast is None else () ):
         _fbeam( model, F, ( x, 6.8 + c, 0.0 ), ( x, 6.8 + c, BENCH_SEAT - 1.3 ), ( 1.6, 1.6 ), frame )
         _fbeam( model, F, ( x, back0[1] + 0.4, BENCH_SEAT - 2.1 ), ( x, 8.4 + c, BENCH_SEAT - 2.1 ), ( 1.4, 1.6 ),
                 frame )
         _fbeam( model, F, ( x, -8.4 + c, 0.0 ), ( x, back0[1], back0[2] ), ( 1.6, 1.6 ), frame )
         _fbeam( model, F, ( x, back0[1], back0[2] ), ( x, back1[1], back1[2] ), ( 1.6, 1.6 ), frame )
+    try:
+        import railhead_furniture as FU
+        if cast is not None:
+            cast( model, F, posts, c, BENCH_SEAT, frame, ( back0[1], back0[2] ), ( back1[1], back1[2] ) )
+        FU.bench_details( model, F, posts, c, BENCH_SEAT, frame )
+    except Exception as error:
+        print( f"railhead_furniture.bench_details failed: {error}" )
     F.collide( model, -hl, hl, -9.4 + c, 8.5 + c, 0.0, BENCH_SEAT, "wood" )
     F.collide( model, -hl, hl, back1[1] - 0.8, -9.4 + c, 0.0, back1[2] + 1.0, "wood" )
 
@@ -2003,6 +2533,13 @@ def bin( model, e, n, z0=0.0, facing="+e" ):
     its front under a sloping rain hood, a pictogram plate under each. One metal box. """
     F = frame_for( e, n, z0, facing )
     w, d = 11.8, 5.9
+    try:
+        import railhead_furniture as FU
+        FU.bin( model, F )
+        F.collide( model, -w - 0.4, w + 0.4, -d - 0.4, d + 0.9, 0.0, 39.4, "metal" )
+        return
+    except Exception as error:
+        print( f"railhead_furniture.bin failed: {error}" )
     F.box( model, -w + 0.8, w - 0.8, -d + 0.8, d - 0.8, 0.0, 2.0, DARK, skip=( "bottom", ) )
     F.box( model, -w, w, -d, d, 2.0, 35.0, "rw_steel_grey", skip=( "bottom", "top" ) )
     _side_prism( model, F, [ ( -d - 0.4, 35.0 ), ( d + 0.9, 35.0 ), ( d + 0.9, 36.4 ), ( -d - 0.4, 39.4 ) ],
@@ -2022,7 +2559,7 @@ def ticket_machine( model, e, n, z0=0.0, facing="+e" ):
 
 
 VENDING = "rw_vending"
-BLACK = "rw_satin_black"         # the cabinet's powder coat (railhead_materials.PAINTED)
+BLACK = "rw_vend_cabinet"        # the cabinet's silver-grey powder coat (railhead_prop_materials)
 # The machine's goods, a row of four a shelf from the top (rw_vending's entries): crisps, chocolate, biscuits and
 # sweets in pillow packs, then 500 ml cans, then more packs and a bottle of water.
 VENDING_SLOTS = ( ( "snack_solbite", "snack_cloudos", "snack_zestix", "snack_ridgerun" ),
@@ -2187,7 +2724,7 @@ def vending_machine( model, e, n, z0=0.0, facing="+e" ):
     w, back, front, top = 19.5, -16.0, 17.5, 72.0
     yd = front + 0.4                                     # the door's and the control column's faces
     split = 8.45                                         # between the door and the control column
-    wx0, wx1, wz0, wz1 = -16.9, 6.8, 20.3, 69.4          # the window (the glass)
+    wx0, wx1, wz0, wz1 = -16.9, 6.8, 20.3, 62.6          # the window (the glass), under the lit name band
     bx0, bx1, bz0, bz1 = -14.6, 5.0, 8.2, 16.7           # the pick-up bay's opening
     frame = 0.6                                          # the bevelled rims round the window and the bay
     yg = yd - 0.9                                        # the glass
@@ -2195,7 +2732,35 @@ def vending_machine( model, e, n, z0=0.0, facing="+e" ):
 
     # The cabinet, its plinth and the two slabs on its front: the door and the control column.
     F.box( model, -w + 1.0, w - 1.0, back + 1.0, front - 1.0, 0.0, 2.2, "rw_black", skip=( "bottom", ) )
-    F.box( model, -w, w, back, front, 2.2, top, BLACK, skip=( "bottom", "front" ) )
+    F.box( model, -w, w, back, front, 2.2, top, { "default": "rw_vending_body", "top": BLACK },
+           skip=( "bottom", "front" ) )
+    # Its sides and back: two horizontal panel seams, six vent louvres low on the left side, the rear cable gland, a
+    # 20 mm chamfered drip edge along the top all round, and four adjustable feet under the plinth's corners.
+    for xs in ( -1.0, 1.0 ):
+        for z in ( 24.0, 50.0 ):
+            _fpoly( model, F, "rw_black", [ ( xs * ( w + 0.02 ), back + 0.6, z - 0.08 ), ( xs * ( w + 0.02 ), front - 0.6, z - 0.08 ),
+                                            ( xs * ( w + 0.02 ), front - 0.6, z + 0.08 ), ( xs * ( w + 0.02 ), back + 0.6, z + 0.08 ) ],
+                    ( xs, 0, 0 ) )
+        _obox( model, F, ( xs * ( w - 0.2 ), ( back + front ) / 2, top - 0.2 ), ( 0, 1, 0 ), ( xs, 0, 1 ),
+               ( front - back - 0.4, 0.12, 1.1 ), "rw_steel_grey" )
+    _obox( model, F, ( 0.0, back + 0.2, top - 0.2 ), ( 1, 0, 0 ), ( 0, -1, 1 ), ( 2 * w - 0.4, 0.12, 1.1 ), "rw_steel_grey" )
+    for k in range( 6 ):
+        z = 11.0 + 2.5 * k
+        _fpoly( model, F, "rw_black", [ ( -w - 0.02, -8.0, z ), ( -w - 0.02, 7.7, z ), ( -w - 0.02, 7.7, z + 1.2 ),
+                                        ( -w - 0.02, -8.0, z + 1.2 ) ], ( -1, 0, 0 ) )
+        _obox( model, F, ( -w - 0.25, -0.15, z + 1.15 ), ( 0, 1, 0 ), ( -1, 0, -0.6 ), ( 15.7, 0.5, 0.08 ),
+               "rw_vending_body" )
+    rod( model, F.p( 12.0, back, 6.0 ), F.p( 12.0, back - 1.0, 6.0 ), 0.75, "rw_black", 8, caps=( False, True ) )
+    rod( model, F.p( 12.0, back - 1.0, 6.0 ), F.p( 12.0, back - 1.6, 1.0 ), 0.3, "rw_black", 6 )
+    for fx in ( -w + 0.5, w - 0.5 ):
+        for fy in ( back + 0.5, front - 0.5 ):
+            rod( model, F.p( fx, fy, 0.0 ), F.p( fx, fy, 0.3 ), 0.48, "rw_steel_dark", 10, caps=( False, True ) )
+            rod( model, F.p( fx, fy, 0.3 ), F.p( fx, fy, 2.2 ), 0.22, "rw_steel_grey", 6 )
+    # Chamfer strips down the cabinet's front corners and along its top front edge: 20 mm, catching the hall's light.
+    for x, sx in ( ( -w, -1.0 ), ( w, 1.0 ) ):
+        _obox( model, F, ( x - sx * 0.2, front - 0.2, ( 2.2 + top ) / 2 ), ( sx, 1, 0 ), ( -1, sx, 0 ),
+               ( 0.12, 1.1, top - 2.2 ), "rw_steel_grey" )
+    _obox( model, F, ( 0.0, front - 0.2, top - 0.2 ), ( 1, 0, 0 ), ( 0, 1, 1 ), ( 2 * w, 0.12, 1.1 ), "rw_steel_grey" )
     for x0, x1, z0_, z1_ in ( ( -w, -w + 0.2, 2.2, top ), ( w - 0.2, w, 2.2, top ), ( -w + 0.2, w - 0.2, 2.2, 2.4 ),
                               ( -w + 0.2, w - 0.2, top - 0.4, top ), ( split - 0.1, split + 0.1, 2.4, top - 0.4 ) ):
         _frect( model, F, BLACK, x0, x1, front, z0_, z1_ )         # the cabinet's front round the slabs
@@ -2209,9 +2774,10 @@ def vending_machine( model, e, n, z0=0.0, facing="+e" ):
 
     # The window: a bevelled rim down to the glass, and behind it the lit cavity.
     _bevel( model, F, BLACK, wx0 - frame, wx1 + frame, wz0 - frame, wz1 + frame, yd, yg, frame )
-    _frect( model, F, "rw_glass", wx0, wx1, yg, wz0, wz1 )
+    _frect( model, F, "rw_case_glass", wx0, wx1, yg, wz0, wz1 )
     cx0, cx1, cz0, cz1 = wx0 - 0.3, wx1 + 0.3, wz0 - 0.6, wz1 + 0.6
-    _vface( model, F, "cavity_back", cx0, cx1, cz0, cz1, yb )
+    # The back of the goods' cavity is a white LED panel the window's full height, so the goods glow in daylight.
+    _frect( model, F, "rw_vend_backlight", cx0, cx1, yb, cz0, cz1 )
     for x, s in ( ( cx0, 1.0 ), ( cx1, -1.0 ) ):
         u0, v0, u1, v1 = _vuv( "cavity_side" )
         _fpoly( model, F, VENDING, [ ( x, yb, cz0 ), ( x, yg, cz0 ), ( x, yg, cz1 ), ( x, yb, cz1 ) ], ( s, 0, 0 ),
@@ -2228,7 +2794,7 @@ def vending_machine( model, e, n, z0=0.0, facing="+e" ):
     # The shelves, their label rails and the goods in their spirals.
     width = wx1 - wx0
     for row, names in enumerate( VENDING_SLOTS ):
-        zs = 58.4 - 9.2 * row
+        zs = 54.6 - 8.2 * row
         F.box( model, cx0, cx1, yb, yg - 0.9, zs - 0.15, zs, BLACK, skip=( "front", "bottom" ) )
         _vface( model, F, f"rail_{'abcde'[row]}", wx0, wx1, zs - 1.2, zs, yg - 0.85 )
         F.box( model, wx0, wx1, yg - 0.9, yg - 0.85, zs - 1.2, zs, "rw_steel_grey", skip=( "front", ) )
@@ -2251,6 +2817,24 @@ def vending_machine( model, e, n, z0=0.0, facing="+e" ):
                 bh = bw / aspect( VENDING, name )
                 _pillow( model, F, name, xc, yg - 2.9, zs, bw, bh, 0.85 )
                 _vface( model, F, name, xc - bw / 2 + 0.2, xc + bw / 2 - 0.2, zs, zs + bh - 0.3, yg - 4.9 )
+
+    # The backlit name band across the top of the face (a made-up vending firm's), in a brushed aluminium frame, and
+    # a 60 mm aluminium frame round the door's glass.
+    nz0, nz1 = 63.8, 71.0
+    F.box( model, -w + 0.7, w - 0.7, yd, yd + 0.35, nz0 - 0.5, nz1 + 0.4, "rw_alu_brushed", skip=( "back", ) )
+    try:
+        import railhead_prop_materials as PM
+        u0, v0, u1, v1 = PM.rect_uv( "vend_band" )
+        band_uv = [ ( u0, v0 ), ( u1, v0 ), ( u1, v1 ), ( u0, v1 ) ]
+    except Exception:
+        band_uv = None
+    _frect( model, F, "rw_vend_band", -w + 1.0, w - 1.0, yd + 0.37, nz0, nz1, uv=band_uv )
+    fa = 2.0
+    for x0, x1, z0_, z1_ in ( ( wx0 - frame - fa, wx1 + frame + 0.9, wz1 + frame, wz1 + frame + fa ),
+                              ( wx0 - frame - fa, wx1 + frame + 0.9, wz0 - frame - fa, wz0 - frame ),
+                              ( wx0 - frame - fa, wx0 - frame, wz0 - frame, wz1 + frame ),
+                              ( wx1 + frame, wx1 + frame + 0.9, wz0 - frame, wz1 + frame ) ):
+        F.box( model, x0, x1, yd, yd + 0.25, z0_, z1_, "rw_alu_brushed", skip=( "back", ) )
 
     # The control column's brushed steel panel: the screen in its bezel, the keypad, the card reader and the slot.
     yp = yd + 0.15
@@ -2301,6 +2885,13 @@ def timetable_case( model, e, n, z0=0.0, facing="+e", two_sided=False ):
     """ A timetable case on two posts: the yellow departures and white arrivals timetables (A1, 594 x 841 mm) side by
     side behind glass, their bottom edges 900 mm up; two_sided shows them on the back too. One metal box. """
     F = frame_for( e, n, z0, facing )
+    try:
+        import railhead_furniture as FU
+        x0, x1, y0, y1, z1 = FU.timetable_case( model, F, two_sided )
+        F.collide( model, x0, x1, y0, y1, 0.0, z1, "metal" )
+        return
+    except Exception as error:
+        print( f"railhead_furniture.timetable_case failed: {error}" )
     pw, ph, gap, border = 23.4, 33.1, 1.6, 1.6
     hw, d = pw + gap / 2 + border, 1.4
     zb = 33.8
@@ -2329,7 +2920,12 @@ def info_pillar( model, e, n, z0=0.0, facing="+e" ):
     grille. One metal box. """
     F = frame_for( e, n, z0, facing )
     F.box( model, -6.9, 6.9, -4.9, 4.9, 0.0, 84.0, DARK, skip=( "bottom", "top" ) )
-    F.box( model, -8.3, 8.3, -5.9, 5.9, 84.0, 100.4, DARK )
+    try:
+        import railhead_furniture as FU
+        FU.info_pillar_head( model, F )
+    except Exception as error:
+        print( f"railhead_furniture.info_pillar_head failed: {error}" )
+        F.box( model, -8.3, 8.3, -5.9, 5.9, 84.0, 100.4, DARK )
     F.atlas( model, "rw_signs", "info", 0.0, 5.93, 92.2, 14.0, 14.0, "front" )
     F.atlas( model, "rw_signs", "info", 0.0, -5.93, 92.2, 14.0, 14.0, "back" )
     F.atlas( model, "rw_signs", "info", 8.33, 0.0, 92.2, 10.0, 10.0, "right" )
@@ -2340,6 +2936,69 @@ def info_pillar( model, e, n, z0=0.0, facing="+e" ):
         disc( model, paint, F.p( x, 5.45, 50.0 ), F.y, 1.3, sides=10 )
         F.quad( model, "rw_white_paint", x, 5.42, 47.4, 3.0, 0.8 )
     F.collide( model, -8.3, 8.3, -5.9, 5.9, 0.0, 100.4, "metal" )
+
+
+def platform_batten( model, e, n, z_top, along="n", length=59.0, floor_z=0.0 ):
+    """ A surface-mounted LED batten hung under a canopy or a ceiling at z_top, length long along along ("n" or "e"):
+    an extruded aluminium body 75 mm wide and 60 mm deep with chamfered edges and end caps, its opal lens along the
+    underside, on two suspension wires with their canopies. Returns the light's position (just under the lens) for
+    railhead_map's lights. A collision box round it, out of reach. """
+    import railhead_furniture as FU
+    return FU.platform_batten( model, e, n, z_top, along, length )
+
+
+def sos_pillar( model, e, n, facing="+e", z0=0.0 ):
+    """ A help point column (Notruf / Info, 1.6 m): a slim blue column on a base plate, its head with the "i" and the
+    SOS plate, the intercom's speaker grille, a blue information and a red emergency button, the camera dome on top.
+    One box of metal collision. """
+    import railhead_furniture as FU
+    FU.sos_pillar( model, frame_for( e, n, z0, facing ) )
+
+
+def cable_trough( model, e, n0, n1, z0 ):
+    """ A precast concrete cable trough (300 x 200 mm, 1 m lids) along n from n0 to n1 at e, its lids' tops 200 mm
+    over z0: run it along a platform wall's foot in the track bed. Visual only (railhead_furniture). """
+    import railhead_furniture as FU
+    FU.cable_trough( model, e, n0, n1, z0 )
+
+
+def drain_grate( model, e, n, z0 ):
+    """ A cast-iron gully grate (500 x 300 mm) flush at z0: every 20 m in the track bed's cess or a floor. Visual
+    only (railhead_furniture). """
+    import railhead_furniture as FU
+    FU.drain_grate( model, e, n, z0 )
+
+
+def drum( model, e, n, z0=0.0, paint="rw_drum_blue" ):
+    """ A 200 l steel drum (585 x 880 mm) with rolling hoops and bungs; paint rw_drum_blue, _red or _grey. Metal
+    collision (railhead_furniture). """
+    import railhead_furniture as FU
+    FU.drum( model, e, n, z0, paint )
+
+
+def pallet_jack( model, e, n, along="n", z0=0.0 ):
+    """ A hand pallet truck, its forks along along ("n", "e", or signed). Visual only (railhead_furniture). """
+    import railhead_furniture as FU
+    FU.pallet_jack( model, e, n, along, z0 )
+
+
+def cable_reel( model, e, n, z0=0.0, d=55.1 ):
+    """ A wooden cable reel d across (1.4 m), on its rim, its axis along e. Wood collision (railhead_furniture). """
+    import railhead_furniture as FU
+    FU.cable_reel( model, e, n, z0, d )
+
+
+def cone( model, e, n, z0=0.0 ):
+    """ A 750 mm traffic cone with white bands. Visual only (railhead_furniture). """
+    import railhead_furniture as FU
+    FU.cone( model, e, n, z0 )
+
+
+def bike_rack( model, e, n, along="n", z0=0.0, bays=4 ):
+    """ A row of galvanised Sheffield stands, bays of them a metre apart along along from ( e, n ). Visual only
+    (railhead_furniture). """
+    import railhead_furniture as FU
+    FU.bike_rack( model, e, n, along, z0, bays )
 
 
 SHELTER_HEIGHT = 98.4           # 2.5 m to the roof's top
@@ -2708,6 +3367,67 @@ def _candy_tray( model, F, x0, x1, y, z, names ):
             _frect_place( model, F, place, bx0, bx1, 0.56, zb, zb + 1.65, name, a )
 
 
+def _kiosk_vitrine( model, F, side, hx, y0, y1, z0, z1, name ):
+    """ A lit vitrine on the kiosk's end at x = side * hx, from y0 to y1 and z0 to z1: a brushed aluminium frame
+    standing 1.2 proud, a white light box recessed in it and the atlas's picture (name) on it, backlit. """
+    face = "right" if side > 0 else "left"
+    x = side * hx
+    fw = 1.4
+    for a, b, c, d in ( ( y0, y1, z0, z0 + fw ), ( y0, y1, z1 - fw, z1 ), ( y0, y0 + fw, z0, z1 ), ( y1 - fw, y1, z0, z1 ) ):
+        F.box( model, x, x + side * 1.2, a, b, c, d, "rw_alu_brushed", skip=( "left" if side > 0 else "right", ) )
+    _xrect( model, F, "rw_kiosk_fascia", x + side * 0.5, y0 + fw, y1 - fw, z0 + fw, z1 - fw, side )
+    w, h = y1 - y0 - 2 * fw - 2.0, z1 - z0 - 2 * fw - 2.0
+    aspect = _kiosk_aspect( name )
+    if w / h > aspect:
+        w = h * aspect
+    else:
+        h = w / aspect
+    F.quad( model, "rw_kiosk_backlit", x + side * 0.56, ( y0 + y1 ) / 2, ( z0 + z1 ) / 2, w, h, face, uv=_kiosk_uv( name ) )
+    # Two screw caps in the frame's top rail: it lifts off to change the poster.
+    for y in ( y0 + ( y1 - y0 ) * 0.25, y0 + ( y1 - y0 ) * 0.75 ):
+        disc( model, "rw_steel_grey", F.p( x + side * 1.22, y, z1 - fw / 2 ), F.x * side, 0.3, sides=8 )
+
+
+def _kiosk_roof( model, F, x0, x1, y0, y1, z ):
+    """ What's on the kiosk's flat roof, seen from the booking hall's gallery: a 60 mm aluminium upstand round the grey
+    membrane, its welded seams, a scupper, an air-conditioning condenser (0.9 x 0.6 x 0.5 m) on rubber feet with its fan
+    grille and fins, and the galvanised cable tray from it to a roof gland. Visual only. """
+    up, t = 2.4, 1.2
+    for a, b, c, d in ( ( x0, x1, y0, y0 + t ), ( x0, x1, y1 - t, y1 ), ( x0, x0 + t, y0, y1 ), ( x1 - t, x1, y0, y1 ) ):
+        F.box( model, a, b, c, d, z, z + up, "rw_alu_brushed", skip=( "bottom", ) )
+    for k in range( 1, 4 ):                             # the membrane's welded seams, 1 m apart
+        y = y0 + ( y1 - y0 ) * k / 4
+        F.box( model, x0 + t, x1 - t, y - 0.6, y + 0.6, z, z + 0.08, "rw_kiosk_membrane", skip=( "bottom", ) )
+    F.box( model, x0 - 1.6, x0, y0 + 6.0, y0 + 9.0, z - 0.5, z + 0.9, "rw_alu_brushed" )        # the scupper
+    # The condenser at the back corner, on two rubber-footed rails.
+    cx0, cx1, cy0, cy1 = x0 + 6.0, x0 + 41.0, y0 + 4.0, y0 + 28.0
+    for yy in ( cy0 + 3.0, cy1 - 3.0 ):
+        F.box( model, cx0 - 1.0, cx1 + 1.0, yy - 1.0, yy + 1.0, z, z + 1.6, "rw_rubber", skip=( "bottom", ) )
+    zc0, zc1 = z + 1.6, z + 21.3
+    F.box( model, cx0, cx1, cy0, cy1, zc0, zc1, { "default": "rw_vend_cabinet", "top": "rw_kiosk_white" },
+           skip=( "bottom", ) )
+    for k in range( 9 ):                                # the coil's fins behind a grille on the back face
+        x = cx0 + 2.0 + ( cx1 - cx0 - 4.0 ) * k / 8
+        F.box( model, x - 0.15, x + 0.15, cy0 - 0.3, cy0, zc0 + 2.0, zc1 - 2.0, "rw_steel_dark", skip=( "back", ) )
+    xc, zm = cx0 + 13.0, ( zc0 + zc1 ) / 2              # the fan on the front face: a dark throat, rings and a hub
+    face = cy1 + 0.02
+    disc( model, "rw_black", F.p( xc, face, zm ), F.y, 8.2, sides=24 )
+    for r in ( 2.6, 5.0, 7.4, 8.4 ):
+        ring = [ F.p( xc + r * math.cos( a_ ), face + 0.3, zm + r * math.sin( a_ ) ) for a_ in np.linspace( 0, math.tau, 25 ) ]
+        for p_, q_ in zip( ring, ring[1:] ):
+            rod( model, p_, q_, 0.12, "rw_steel_grey", 4 )
+    for a_ in np.linspace( 0, math.tau, 9 )[:-1]:
+        rod( model, F.p( xc, face + 0.3, zm ), F.p( xc + 8.4 * math.cos( a_ ), face + 0.3, zm + 8.4 * math.sin( a_ ) ),
+             0.1, "rw_steel_grey", 4 )
+    disc( model, "rw_steel_grey", F.p( xc, face + 0.35, zm ), F.y, 1.4, sides=12 )
+    F.box( model, cx1 - 8.0, cx1 - 2.0, cy1, cy1 + 0.4, zc0 + 4.0, zc0 + 12.0, "rw_kiosk_white" )   # its service plate
+    # The cable tray from the condenser across the roof to the gland at its middle.
+    gx, gy = ( x0 + x1 ) / 2, ( y0 + y1 ) / 2
+    F.box( model, cx1, gx + 1.5, cy0 + 9.0, cy0 + 13.0, z + 0.4, z + 2.0, "rw_galvanised", skip=( "bottom", ) )
+    F.box( model, gx - 1.5, gx + 1.5, cy0 + 9.0, gy, z + 0.4, z + 2.0, "rw_galvanised", skip=( "bottom", ) )
+    rod( model, F.p( gx, gy, z ), F.p( gx, gy, z + 4.0 ), 1.6, "rw_steel_grey", 10, caps=( False, True ) )
+
+
 def kiosk( model, e0, e1, n0, n1, facing, z0=0.0 ):
     """ A modern station kiosk 2.76 m tall over e0..e1, n0..n1, after the user's reference picture: anthracite steel
     cladding with shadow gaps on a recessed black plinth, a flat roof slab overhanging with warm LED strips under it,
@@ -2716,15 +3436,19 @@ def kiosk( model, e0, e1, n0, n1, facing, z0=0.0 ):
     corner pier; the window has a light stone counter on vertical oak slats lit from under it, and behind it lit
     shelves of magazines, sweets, crisps and bottled drinks. On the counter: a trailing pothos in a white pot, a card
     terminal and a pen cup. Its right end (from the front) has a menu board and a framed poster, its left the staff
-    door, its back a louvred vent. Collision: the kiosk, its counter, fascia
-    and roof slab (metal). """
+    door, its back a louvred vent.
+    Since 2026-10: a backlit opal fascia (a white light box with the lettering printed dark), a lighter brushed graphite
+    cladding, a wider serving window between slimmer piers with a roller shutter's box and guide rails at its head, a
+    stainless nosing on the counter, white reveals and ceiling so the shelf lights bounce, and lit poster vitrines on
+    both ends. Collision: the kiosk, its counter, fascia and roof slab (metal), unchanged. """
+    CLAD, WHITE, STEEL = "rw_kiosk_clad", "rw_kiosk_white", "rw_stainless"
     F = frame_for( ( e0 + e1 ) / 2, ( n0 + n1 ) / 2, z0, facing )
     along_e = abs( F.x[0] ) > 0.5
     hx = abs( e1 - e0 ) / 2 if along_e else abs( n1 - n0 ) / 2
     hy = abs( n1 - n0 ) / 2 if along_e else abs( e1 - e0 ) / 2
     PL, ZC, ZO, ZF, ZR = KIOSK_PLINTH, KIOSK_COUNTER, KIOSK_OPEN, KIOSK_FASCIA, KIOSK_ROOF
     CL, GAP = 0.4, 0.45                                 # the cladding panels' thickness and the shadow gaps
-    xl, xr = -hx + 15.0, hx - 17.0                      # the serving window between the piers
+    xl, xr = -hx + 11.0, hx - 11.0                      # the serving window between the piers
     yb = hy - 30.0                                      # the shelves' back panel
     fp = 1.2                                            # the fascia stands this far proud of the walls
 
@@ -2744,21 +3468,31 @@ def kiosk( model, e0, e1, n0, n1, facing, z0=0.0 ):
         for a, b in panels( -hy, hy - CL, 24.0 ):
             for z_0, z_1 in rows:
                 xa, xb = ( hx - CL, hx ) if s > 0 else ( -hx, -hx + CL )
-                F.box( model, xa, xb, a, b, z_0, z_1, DARK, skip=( "top", ) if z_1 >= ZO else () )
+                F.box( model, xa, xb, a, b, z_0, z_1, CLAD, skip=( "top", ) if z_1 >= ZO else () )
     for a, b in panels( -hx + CL, hx - CL, 24.0 ):      # the back's, between the ends
         for z_0, z_1 in rows:
-            F.box( model, a, b, -hy, -hy + CL, z_0, z_1, DARK, skip=( "top", ) if z_1 >= ZO else () )
-    for a, b in ( ( -hx, xl ), ( xr, hx ) ):            # the piers, one panel each
-        F.box( model, a, b, hy - CL, hy, PL, ZO, DARK, skip=( "top", ) )
+            F.box( model, a, b, -hy, -hy + CL, z_0, z_1, CLAD, skip=( "top", ) if z_1 >= ZO else () )
+    for a, b in ( ( -hx, xl ), ( xr, hx ) ):            # the piers: 600 mm panels with 12 mm shadow gaps between
+        F.box( model, a + 0.2, b - 0.2, hy - CL - 0.3, hy - CL, PL, ZO, "rw_black", skip=( "top", "bottom" ) )
+        for z_0, z_1 in panels( PL, ZO, 24.0 ):
+            F.box( model, a, b, hy - CL, hy, z_0, z_1, CLAD, skip=( "top", ) if z_1 >= ZO else () )
 
     # The pier's icons.
-    iw = 9.6
-    F.atlas( model, "rw_kiosk", "icons", ( -hx + xl ) / 2, hy + 0.04, 63.0, iw, iw / _kiosk_aspect( "icons" ), "front" )
+    iw = 7.4
+    F.atlas( model, "rw_kiosk", "icons", ( -hx + xl ) / 2, hy + 0.04, 60.0, iw, iw / _kiosk_aspect( "icons" ), "front" )
 
     # The fascia, the roof slab and its LED strips.
-    F.box( model, -hx - fp, hx + fp, -hy - fp, hy + fp, ZO, ZF, { "default": DARK, "bottom": "rw_black" } )
-    F.box( model, -hx - 7.0, hx + 7.0, -hy - 5.0, hy + 9.0, ZF, ZR, { "default": DARK, "bottom": "rw_black",
-                                                                       "top": "rw_concrete_dark" } )
+    # The fascia: a white opal light box in a graphite frame.
+    F.box( model, -hx - fp, hx + fp, -hy - fp, hy + fp, ZO, ZF, { "default": "rw_kiosk_fascia", "bottom": CLAD,
+                                                                  "back": CLAD } )
+    for z_a, z_b in ( ( ZO - 0.3, ZO + 1.1 ), ( ZF - 1.1, ZF ) ):
+        F.box( model, -hx - fp - 0.35, hx + fp + 0.35, -hy - fp - 0.35, hy + fp + 0.35, z_a, z_b, CLAD )
+    for xx in ( -hx - fp - 0.35, hx + fp + 0.35 ):
+        for yy in ( -hy - fp - 0.35, hy + fp + 0.35 ):
+            F.box( model, xx - 0.9, xx + 0.9, yy - 0.9, yy + 0.9, ZO - 0.3, ZF, CLAD )
+    F.box( model, -hx - 7.0, hx + 7.0, -hy - 5.0, hy + 9.0, ZF, ZR, { "default": CLAD, "bottom": WHITE,
+                                                                       "top": "rw_kiosk_membrane" } )
+    _kiosk_roof( model, F, -hx - 7.0, hx + 7.0, -hy - 5.0, hy + 9.0, ZR )
     for x0_, x1_, y0_, y1_ in ( ( -hx - 4.0, hx + 4.0, hy + 4.4, hy + 5.4 ), ( hx + 3.6, hx + 4.6, -hy - 2.0, hy + 5.4 ),
                                 ( -hx - 4.6, -hx - 3.6, -hy - 2.0, hy + 5.4 ) ):
         F.box( model, x0_, x1_, y0_, y1_, ZF - 0.5, ZF, { "default": "rw_steel_grey", "bottom": "rw_lamp_warm" },
@@ -2767,25 +3501,37 @@ def kiosk( model, e0, e1, n0, n1, facing, z0=0.0 ):
     ww, sw = 30.5, 48.0
     wh, sh = ww / _kiosk_aspect( "kiosk_word" ), sw / _kiosk_aspect( "kiosk_sub" )
     for face, x, y in ( ( "front", 0.0, hy + fp + 0.04 ), ( "right", hx + fp + 0.04, 0.0 ), ( "left", -hx - fp - 0.04, 0.0 ) ):
-        F.atlas( model, "rw_kiosk", "kiosk_word", x, y, 97.8, ww, wh, face )
-        F.atlas( model, "rw_kiosk", "kiosk_sub", x, y, 89.3, sw, sh, face )
+        for name, z, w, h in ( ( "kiosk_word", 97.8, ww, wh ), ( "kiosk_sub", 89.3, sw, sh ) ):
+            F.quad( model, "rw_kiosk_ink", x, y, z, w, h, face, uv=_kiosk_uv( name ) )
 
     # The serving window: its reveals, ceiling (an LED line along its front, downlights over the shelves) and the
     # space behind the counter.
-    _xrect( model, F, DARK, xl, yb, hy, PL, ZO, 1.0 )
-    _xrect( model, F, DARK, xr, yb, hy, PL, ZO, -1.0 )
-    _fpoly( model, F, "rw_black", [ ( xl, yb, ZO ), ( xr, yb, ZO ), ( xr, hy, ZO ), ( xl, hy, ZO ) ], ( 0, 0, -1 ) )
-    F.box( model, xl, xr, hy - 2.6, hy - 1.4, ZO - 0.5, ZO, { "default": "rw_steel_grey", "bottom": "rw_lamp_warm" },
-           skip=( "top", ) )
+    _xrect( model, F, WHITE, xl, yb, hy, PL, ZO, 1.0 )
+    _xrect( model, F, WHITE, xr, yb, hy, PL, ZO, -1.0 )
+    _fpoly( model, F, WHITE, [ ( xl, yb, ZO ), ( xr, yb, ZO ), ( xr, hy, ZO ), ( xl, hy, ZO ) ], ( 0, 0, -1 ) )
+    # The roller shutter's box across the window's head (the shutter rolled up in it), its bottom bar and pull
+    # handles, an LED line under the box, and the guide rails down both reveals.
+    F.box( model, xl, xr, hy - 11.0, hy - 1.2, ZO - 6.5, ZO, CLAD, skip=( "top", ) )
+    F.box( model, xl, xr, hy - 4.4, hy - 2.0, ZO - 7.4, ZO - 6.5, STEEL, skip=( "top", ) )
+    for xh in ( xl + 9.0, xr - 9.0 ):
+        F.box( model, xh - 2.0, xh + 2.0, hy - 2.0, hy - 1.4, ZO - 7.3, ZO - 6.7, STEEL )
+    F.box( model, xl + 0.6, xr - 0.6, hy - 9.0, hy - 7.8, ZO - 6.9, ZO - 6.5, { "default": "rw_steel_grey",
+                                                                               "bottom": "rw_lamp_warm" }, skip=( "top", ) )
+    for xg, sg in ( ( xl, 1.0 ), ( xr, -1.0 ) ):
+        F.box( model, xg, xg + sg * 1.1, hy - 4.6, hy - 1.8, ZC, ZO - 6.5, STEEL )
+        F.box( model, xg + sg * 1.1, xg + sg * 1.25, hy - 3.6, hy - 2.8, ZC, ZO - 6.5, "rw_black", skip=( "top", ) )
     for k in range( 3 ):
         x = xl + ( xr - xl ) * ( k + 0.5 ) / 3
         disc( model, "rw_steel_grey", F.p( x, yb + 13.0, ZO - 0.03 ), -F.z, 1.6, sides=12 )
         disc( model, "rw_lamp_warm", F.p( x, yb + 13.0, ZO - 0.06 ), -F.z, 1.05, sides=12 )
     _fpoly( model, F, "rw_black", [ ( xl, yb, PL ), ( xr, yb, PL ), ( xr, hy - 14.0, PL ), ( xl, hy - 14.0, PL ) ], ( 0, 0, 1 ) )
-    _frect( model, F, DARK, xl, xr, hy - 14.0, PL, ZC - 2.0, -1.0 )
+    _frect( model, F, WHITE, xl, xr, hy - 14.0, PL, ZC - 2.0, -1.0 )
 
     # The counter: a light stone top on oak slats, an LED strip under its front edge.
     F.box( model, xl - 2.0, xr + 2.0, hy - 14.0, hy + 4.5, ZC - 2.0, ZC, "rw_kiosk_stone" )
+    F.box( model, xl - 2.2, xr + 2.2, hy + 4.5, hy + 5.0, ZC - 2.25, ZC + 0.08, STEEL )         # the nosing
+    for xe in ( xl - 2.2, xr + 2.0 ):
+        F.box( model, xe, xe + 0.2, hy - 14.0, hy + 5.0, ZC - 2.25, ZC + 0.08, STEEL )
     F.box( model, xl, xr, hy + 2.5, hy + 3.5, ZC - 2.4, ZC - 2.0, { "default": "rw_steel_grey", "bottom": "rw_lamp_warm" },
            skip=( "top", ) )
     _frect( model, F, "rw_black", xl, xr, hy - 0.4, PL, ZC - 2.0 )
@@ -2796,7 +3542,7 @@ def kiosk( model, e0, e1, n0, n1, facing, z0=0.0 ):
         F.box( model, x - 0.9, x + 0.9, hy - 0.4, hy + 0.6, PL + 0.5, ZC - 2.0, "rw_wood", skip=( "back", "top" ) )
 
     # The shelves: a base cabinet, three bays of wood shelves with an LED strip under each front edge.
-    F.box( model, xl, xr, yb, yb + 10.0, PL, KIOSK_SHELVES[0], { "default": DARK, "top": "rw_wood", "back": None } )
+    F.box( model, xl, xr, yb, yb + 10.0, PL, KIOSK_SHELVES[0], { "default": CLAD, "top": "rw_wood", "back": None } )
     _frect( model, F, "rw_kiosk_shelf", xl, xr, yb, KIOSK_SHELVES[0], ZO )
     bays = [ ( xl + ( xr - xl ) * k / 3, xl + ( xr - xl ) * ( k + 1 ) / 3 ) for k in range( 3 ) ]
     for k, ( a, b ) in enumerate( bays ):
@@ -2841,39 +3587,26 @@ def kiosk( model, e0, e1, n0, n1, facing, z0=0.0 ):
     _card_terminal( model, F, xr - 15.0, hy + 0.2, ZC )
     _pen_cup( model, F, xr - 7.5, hy - 1.5, ZC )
 
-    # The right end: the menu board and a framed poster.
-    mw = 20.0
-    mh = mw / _kiosk_aspect( "menu" )
-    ym = hy - 20.0
-    F.box( model, hx, hx + 0.8, ym - mw / 2 - 0.5, ym + mw / 2 + 0.5, 60.0 - mh / 2 - 0.5, 60.0 + mh / 2 + 0.5,
-           "rw_steel_grey", skip=( "left", ) )
-    F.atlas( model, "rw_kiosk", "menu", hx + 0.84, ym, 60.0, mw, mh, "right" )
-    pw = 21.0
-    ph = pw / _kiosk_aspect( "poster" )
-    yp = ym - mw / 2 - 6.0 - pw / 2 - 1.4
-    if yp - pw / 2 - 1.4 > -hy + 4.0:
-        for y0_, y1_, z0_, z1_ in ( ( yp - pw / 2 - 1.4, yp + pw / 2 + 1.4, 60.0 + ph / 2, 60.0 + ph / 2 + 1.4 ),
-                                    ( yp - pw / 2 - 1.4, yp + pw / 2 + 1.4, 60.0 - ph / 2 - 1.4, 60.0 - ph / 2 ),
-                                    ( yp - pw / 2 - 1.4, yp - pw / 2, 60.0 - ph / 2, 60.0 + ph / 2 ),
-                                    ( yp + pw / 2, yp + pw / 2 + 1.4, 60.0 - ph / 2, 60.0 + ph / 2 ) ):
-            F.box( model, hx, hx + 1.1, y0_, y1_, z0_, z1_, "rw_wood", skip=( "left", ) )
-        _xrect( model, F, "rw_kiosk_shelf", hx + 0.5, yp - pw / 2, yp + pw / 2, 60.0 - ph / 2, 60.0 + ph / 2, 1.0 )
-        F.atlas( model, "rw_kiosk", "poster", hx + 0.56, yp, 60.0, pw - 3.0, ( pw - 3.0 ) / _kiosk_aspect( "poster" ), "right" )
+    # The ends: a lit poster vitrine on each (the right one's beside a lit menu board, the left one's beside the staff
+    # door).
+    _kiosk_vitrine( model, F, 1.0, hx, -hy + 26.0, hy - 5.0, 18.0, 80.0, "poster" )
+    _kiosk_vitrine( model, F, 1.0, hx, -hy + 4.0, -hy + 22.0, 46.0, 70.0, "menu" )
+    _kiosk_vitrine( model, F, -1.0, hx, -hy + 40.0, hy - 5.0, 18.0, 80.0, "poster" )
 
     # The left end: the staff door. The back: a louvred vent.
     yd = -hy + 21.0
     F.box( model, -hx - 0.12, -hx + 0.1, yd - 15.5, yd + 15.5, PL + 0.8, 82.5, "rw_black", skip=( "right", ) )
-    F.box( model, -hx - 0.3, -hx, yd - 15.0, yd + 15.0, PL + 1.3, 82.0, DARK, skip=( "right", ) )
+    F.box( model, -hx - 0.3, -hx, yd - 15.0, yd + 15.0, PL + 1.3, 82.0, CLAD, skip=( "right", ) )
     rod( model, F.p( -hx - 0.3, yd + 11.5, 41.0 ), F.p( -hx - 2.2, yd + 11.5, 41.0 ), 0.35, "rw_steel_grey", 8 )
     rod( model, F.p( -hx - 2.2, yd + 11.5, 41.0 ), F.p( -hx - 2.2, yd + 6.5, 41.0 ), 0.35, "rw_steel_grey", 8,
          caps=( False, True ) )
     disc( model, "rw_steel_grey", F.p( -hx - 0.33, yd + 11.5, 37.0 ), -F.x, 0.55, sides=10 )
     for k in range( 7 ):
         z = 70.0 + 1.6 * k
-        _obox( model, F, ( 0.0, -hy - 0.5, z ), ( 1, 0, 0 ), ( 0, 1, -0.7 ), ( 18.0, 1.2, 0.15 ), DARK )
+        _obox( model, F, ( 0.0, -hy - 0.5, z ), ( 1, 0, 0 ), ( 0, 1, -0.7 ), ( 18.0, 1.2, 0.15 ), CLAD )
     for x0_, x1_, z0_, z1_ in ( ( -9.8, 9.8, 68.8, 69.4 ), ( -9.8, 9.8, 80.2, 80.8 ), ( -9.8, -9.2, 68.8, 80.8 ),
                                 ( 9.2, 9.8, 68.8, 80.8 ) ):
-        F.box( model, x0_, x1_, -hy - 0.9, -hy, z0_, z1_, DARK, skip=( "front", ) )
+        F.box( model, x0_, x1_, -hy - 0.9, -hy, z0_, z1_, CLAD, skip=( "front", ) )
     _frect( model, F, "rw_black", -9.2, 9.2, -hy - 0.02, 69.4, 80.2, -1.0 )
 
     # Collision.
@@ -2883,14 +3616,19 @@ def kiosk( model, e0, e1, n0, n1, facing, z0=0.0 ):
     F.collide( model, -hx - 7.0, hx + 7.0, -hy - 5.0, hy + 9.0, ZF, ZR, "metal" )
 
 
-def kiosk_lights( e0, e1, n0, n1, facing, z0=0.0 ):
+def kiosk_lights( e0, e1, n0, n1, facing, z0=0.0, fascia=False ):
     """ The kiosk's own lights for railhead_map: ( position, radius ) of one in its serving window's ceiling over the
-    shelves, and a small one under the counter's front edge washing the oak slats, as its LED strip would. """
+    shelves, and a small one under the counter's front edge washing the oak slats, as its LED strip would. fascia: a
+    third, warm one just under the fascia's middle, out in front, so the window's head and the counter glow as the
+    light box over them would light them. """
     F = frame_for( ( e0 + e1 ) / 2, ( n0 + n1 ) / 2, z0, facing )
     along_e = abs( F.x[0] ) > 0.5
     hy = abs( n1 - n0 ) / 2 if along_e else abs( e1 - e0 ) / 2
-    return [ ( tuple( float( v ) for v in F.p( 0.0, hy - 12.0, KIOSK_OPEN - 4.0 ) ), 110.0 ),
-             ( tuple( float( v ) for v in F.p( -1.0, hy + 3.0, KIOSK_COUNTER - 3.0 ) ), 42.0 ) ]
+    out = [ ( tuple( float( v ) for v in F.p( 0.0, hy - 14.0, KIOSK_OPEN - 9.0 ) ), 150.0 ),
+            ( tuple( float( v ) for v in F.p( -1.0, hy + 3.0, KIOSK_COUNTER - 3.0 ) ), 60.0 ) ]
+    if fascia:
+        out.append( ( tuple( float( v ) for v in F.p( 0.0, hy + 10.0, KIOSK_OPEN - 4.0 ) ), 90.0 ) )
+    return out
 
 
 def hanging_display( model, e, n, z_top, name, along="n", floor_z=0.0, width=118.1, ceiling=None ):
@@ -2958,16 +3696,20 @@ def clock( model, e, n, z, along="n", z_top=None, radius=12.4 ):
     _rods( model, F, ( 0.0, ), top + 2.0, z_top )
 
 
-def pendant_lamp( model, e, n, z_top, z ):
-    """ A hall pendant: a 560 mm enamelled reflector shade (grey-green outside, white inside) on a rod from z_top, the
-    opal globe in its mouth; z is the shade's rim. Returns the light's position, just under the rim. """
-    rod( model, ( e, n, z + 12.5 ), ( e, n, z_top - 0.4 ), 0.45, DARK, 6 )
-    model.box( ( e - 2.4, n - 2.4, z_top - 0.4 ), ( e + 2.4, n + 2.4, z_top ), DARK, skip=( "+z", ) )
-    rod( model, ( e, n, z + 10.5 ), ( e, n, z + 12.5 ), 1.4, DARK, 8, caps=( False, True ) )
-    _frustum( model, ( e, n, z + 10.5 ), ( e, n, z ), 2.2, 11.0, "rw_steel", sides=12, inside="rw_white_paint" )
-    disc( model, "rw_steel", ( e, n, z + 10.5 ), ( 0, 0, 1 ), 2.2, sides=12 )
-    _frustum( model, ( e, n, z + 7.0 ), ( e, n, z + 1.5 ), 3.0, 4.8, "rw_lamp_warm", sides=10 )
-    disc( model, "rw_lamp_warm", ( e, n, z + 1.5 ), ( 0, 0, -1 ), 4.8, sides=10 )
+def pendant_lamp( model, e, n, z_top, z, shade_r=11.0, rod_r=0.45 ):
+    """ A hall pendant: an enamelled reflector shade shade_r across its mouth (560 mm by default; the booking hall's are
+    800-900 mm), grey-green outside and white inside, on a rod_r tube from z_top with its ceiling rose, the opal globe in
+    its mouth; z is the shade's rim. Returns the light's position, just under the rim. """
+    k = shade_r / 11.0
+    rod( model, ( e, n, z + 12.5 * k ), ( e, n, z_top - 0.4 ), rod_r, DARK, 6 if rod_r < 0.8 else 10 )
+    rose = max( 2.4, rod_r * 3.0 )
+    model.box( ( e - rose, n - rose, z_top - 0.4 ), ( e + rose, n + rose, z_top ), DARK, skip=( "+z", ) )
+    rod( model, ( e, n, z + 10.5 * k ), ( e, n, z + 12.5 * k ), 1.4 * k, DARK, 8, caps=( False, True ) )
+    _frustum( model, ( e, n, z + 10.5 * k ), ( e, n, z ), 2.2 * k, shade_r, "rw_steel", sides=16 if k > 1.2 else 12,
+              inside="rw_white_paint" )
+    disc( model, "rw_steel", ( e, n, z + 10.5 * k ), ( 0, 0, 1 ), 2.2 * k, sides=12 )
+    _frustum( model, ( e, n, z + 7.0 * k ), ( e, n, z + 1.5 * k ), 3.0 * k, 4.8 * k, "rw_lamp_warm", sides=12 )
+    disc( model, "rw_lamp_warm", ( e, n, z + 1.5 * k ), ( 0, 0, -1 ), 4.8 * k, sides=12 )
     return ( e, n, z - 2.0 )
 
 
@@ -3387,101 +4129,128 @@ def _vehicle_frame( e, n, along, length, z0 ):
     return Frame( ( e + fwd[0] * length / 2, n + fwd[1] * length / 2, z0 ), fwd )
 
 
-def car( model, e, n, along="+n", paint="rw_train_grey", z0=0.0, kind="hatch" ):
+def car( model, e, n, along="+n", paint="rw_train_grey", z0=0.0, kind="hatch", taxi=False, plate=None ):
     """ A parked generic modern compact car, kind "hatch" (4.28 m) or "estate" (4.63 m), 1.79 m wide and 1.46 m tall on
     205/55 R16 tyres, its nose towards along ("+n", "-n", "+e", "-e") and (e, n) its footprint's centre. Body paint
-    (the rw_train_* colours suit it), dark glass, black trim, white number plates. One metal box. """
+    (the rw_train_* or rw_car_* colours), real tinted glazing set 12 mm into the body with rubber surrounds and
+    body-colour pillars, an interior behind it, flush door grips, stalk mirrors, flared arches, clear-lensed light
+    units, a mesh lower grille and made-up number plates (plate, or one hashed from where it stands). One metal box. """
+    import railhead_vehicle_kit as VK
     keys = ESTATE if kind == "estate" else HATCH
     # Smooth automotive paint instead of the train's streaked panel texture.
-    if kind == "estate" and paint == "rw_train_white":
+    if paint == "rw_train_white":
         paint = "rw_car_white"
+    plate = plate or VK.plate_for( e, n )
     L = keys[-1][0]
     F = _vehicle_frame( e, n, along, L, z0 )
+    profile_at = lambda a: _profile_at( keys, a )
     rear_axle = 34.6 + ( 105.7 if kind == "estate" else 103.8 )
-    glass = [ ( 4, 46.0, 72.0 ) ]
-    sides = [ ( 46.0, 92.0 ), ( 97.0, 128.0 ) ]
+    # ( first segment, last segment, a0, a1 ) of each pane: the windscreen, the side glass, the rear glass.
+    panes = [ ( 4, 4, 46.0, 72.0 ), ( 2, 2, 46.0, 92.0 ) ]
     if kind == "estate":
-        glass.extend( ( (3, 172.0, 178.5), (4, 172.0, 178.5) ) )
-        sides.append( ( 134.0, 165.0 ) )
+        panes += [ ( 2, 2, 97.0, 128.0 ), ( 2, 2, 134.0, 165.0 ), ( 3, 4, 172.0, 178.5 ) ]
     else:
-        glass.append( ( 4, 150.0, 162.0 ) )
-        sides[1] = ( 97.0, 134.0 )
+        panes += [ ( 2, 2, 97.0, 134.0 ), ( 4, 4, 150.0, 162.0 ) ]
 
     def paint_at( k, a0, a1 ):
         mid = ( a0 + a1 ) / 2
-        if k == 2:
-            if any( s0 <= mid <= s1 for s0, s1 in sides ):
-                return "rw_window_dark"
-            return "rw_black" if 92.0 <= mid <= 97.0 else paint
-        if any( k == g and g0 <= mid <= g1 for g, g0, g1 in glass ):
-            return "rw_window_dark"
+        if any( k0 <= k <= k1 and g0 <= mid <= g1 for k0, k1, g0, g1 in panes ):
+            return None
         return paint
 
-    splits = [ 92.0, 97.0 ] + ( [ 132.0, 134.0, 165.0, 172.0, 178.5 ] if kind == "estate" else [ 134.0 ] )
+    splits = [ 92.0, 97.0 ] + ( [ 128.0, 132.0, 134.0, 165.0, 172.0, 178.5 ] if kind == "estate" else [ 134.0 ] )
     _road_vehicle( model, F, keys, ( 34.6, rear_axle ), ( SUV_TYRE, SUV_TYRE_W, SUV_RIM ), 15.6,
                    paint_at, splits, detailed_wheels=True )
-    # Door cuts, handles and bright lower window trim break up the long estate body.
+    stations = [ k[0] for k in keys ]
+    for k0, k1, g0, g1 in panes:
+        VK.window( model, F, profile_at, k0, k1, g0, g1, stations=stations )
+    VK.car_interior( model, F, 47.0, 72.0, L - 6.0, 54.0, 39.0, 33.6, driver=1.0,
+                     boot=( 132.0, 22.0 ) if kind == "estate" else ( 140.0, 24.0 ) )
+    # Panel gaps: the doors' cuts, the bonnet's shut lines (across at the cowl and along each wing), the tailgate's.
     for xs in ( -1, 1 ):
         for a in ( 48.0, 95.0, 132.0 ):
-            _seam( model, F, keys, a, xs, 13.0, 42.0 )
-        for a in ( 86.0, 122.0 ):
-            F.box( model, min(xs * 34.9, xs * 35.6), max(xs * 34.9, xs * 35.6), -a - 3.5, -a + 3.5,
-                   35.8, 37.0, "rw_steel_dark" )
-        F.box( model, min(xs * 34.2, xs * 35.0), max(xs * 34.2, xs * 35.0), -L + 15.0, -48.0,
-               40.0, 40.6, "rw_steel_grey" )
-        F.box( model, min(xs * 34.8, xs * 35.4), max(xs * 34.8, xs * 35.4), -rear_axle + 15.8, -50.4,
+            _seam( model, F, keys, a, xs, 13.0, 40.0, width=0.16, lift=0.06 )
+        for a0_, a1_ in ( ( 3.0, 12.0 ), ( 12.0, 30.0 ), ( 30.0, 45.0 ) ):
+            p0, p1 = profile_at( a0_ )[3], profile_at( a1_ )[3]
+            _fpoly( model, F, "rw_black", [ ( xs * ( p0[0] - 0.4 ), -a0_, p0[1] + 0.07 ), ( xs * ( p1[0] - 0.4 ), -a1_, p1[1] + 0.07 ),
+                                            ( xs * ( p1[0] - 0.56 ), -a1_, p1[1] + 0.09 ), ( xs * ( p0[0] - 0.56 ), -a0_, p0[1] + 0.09 ) ],
+                    ( 0, 0, 1 ) )
+        # Flush pull grips, the stalk mirrors, the sill's black step trim.
+        for a in ( 84.0, 122.0 ):
+            VK.door_grip( model, F, profile_at, a, 36.4, paint )
+        VK.stalk_mirror( model, F, xs, 52.0, 41.6, paint, base_x=VK.skin_x( profile_at, 52.0, 39.0 ) - 0.2 )
+        F.box( model, min( xs * 34.8, xs * 35.4 ), max( xs * 34.8, xs * 35.4 ), -rear_axle + 15.8, -50.4,
                9.8, 11.4, "rw_black" )
-    for xs in ( -1, 1 ):                                            # lamps, mirrors
-        F.quad( model, "rw_black", xs * 23.0, 0.05, 28.0, 15.0, 4.5 )
-        F.quad( model, "rw_lamp_cool", xs * 23.0, 0.08, 28.2, 13.5, 1.4 )
-        if kind != "estate":
-            F.quad( model, "rw_red_paint", xs * 26.0, -L - 0.04, 29.5, 7.0, 3.6, "back" )
-        x0, x1 = sorted( ( xs * 33.8, xs * 39.8 ) )
-        F.box( model, x0, x1, -53.5, -50.0, 39.0, 43.5, { "default": paint, "back": "rw_black" } )
+    prof = profile_at( 45.0 )
+    _fpoly( model, F, "rw_black", [ ( -prof[4][0] + 1, -45.0, prof[4][1] + 0.1 ), ( prof[4][0] - 1, -45.0, prof[4][1] + 0.1 ),
+                                    ( prof[4][0] - 1, -45.4, prof[4][1] + 0.12 ), ( -prof[4][0] + 1, -45.4, prof[4][1] + 0.12 ) ],
+            ( 0, 0, 1 ) )
+    for ac in ( 34.6, rear_axle ):
+        VK.arch_lip( model, F, profile_at, ac, SUV_TYRE, 15.6, paint )
+    # A satin chrome strip along the belt, under the side glass.
+    belt = [ a for a in sorted( set( stations + [ 50.0, 92.0, 97.0, 128.0, 134.0, 165.0 ] ) ) if 50.0 <= a <= L - 17.0 ]
+    for xs in ( -1, 1 ):
+        pts = [ F.p( xs * ( profile_at( a )[2][0] + 0.12 ), -a, profile_at( a )[2][1] - 0.3 ) for a in belt ]
+        polyline( model, pts, 0.16, "rw_car_chrome", 4 )
+    # The nose: clear-lensed light units, the upper grille with its bars, the mesh lower grille.
+    for xs in ( -1, 1 ):
+        VK.head_cluster( model, F, xs, 16.5, 28.6, 26.0, 29.8, 0.0 )
     F.quad( model, "rw_black", 0.0, 0.04, 23.2, 26.0, 4.0 )
     for z in ( 21.8, 23.2, 24.6 ):
-        F.quad( model, "rw_steel_dark", 0.0, 0.08, z, 27.0, 0.5 )
-    F.quad( model, "rw_black", 0.0, 0.04, 12.0, 34.0, 3.0 )
-    _plate( model, F, ( 0.0, 0.12, 17.0 ), ( 1, 0, 0 ), ( 0, 0, 1 ), ( 0, 1, 0 ), "HW X 731" )
-    _plate( model, F, ( 0.0, -L - 0.12, 20.0 ), ( -1, 0, 0 ), ( 0, 0, 1 ), ( 0, -1, 0 ), "HW X 731" )
+        rod( model, F.p( -13.0, 0.3, z ), F.p( 13.0, 0.3, z ), 0.22, "rw_car_trim", 4 )
+    VK.mesh_grille( model, F, -15.0, 15.0, 10.0, 15.2, 0.75, frame="rw_car_trim" )
+    _plate( model, F, ( 0.0, 0.85, 17.4 ), ( 1, 0, 0 ), ( 0, 0, 1 ), ( 0, 1, 0 ), plate )
+    _plate( model, F, ( 0.0, -L - 0.12, 20.0 ), ( -1, 0, 0 ), ( 0, 0, 1 ), ( 0, -1, 0 ), plate )
     F.quad( model, "rw_black", 0.0, -L - 0.04, 11.8, 40.0, 2.6, "back" )
+    # The tail: sealed lamp assemblies with bevelled covers, the tailgate's gaps round them.
+    zt = 40.0 if kind == "estate" else 37.0
+
+    def rear_panel( material, x0, x1, z0_, z1_, lift=0.15 ):
+        _fpoly( model, F, material, [ ( x0, -L - lift, z0_ ), ( x1, -L - lift, z0_ ), ( x1, -L - lift, z1_ ),
+                                      ( x0, -L - lift, z1_ ) ], ( 0, -1, 0.2 ) )
+
+    def cover( material, xa, xb, za, zb, depth, bevel ):
+        back = [ ( xa, -L - 0.12, za ), ( xb, -L - 0.12, za ), ( xb, -L - 0.12, zb ), ( xa, -L - 0.12, zb ) ]
+        face = [ ( xa + bevel, -L - depth, za + bevel ), ( xb - bevel, -L - depth, za + bevel ),
+                 ( xb - bevel, -L - depth, zb - bevel ), ( xa + bevel, -L - depth, zb - bevel ) ]
+        _fpoly( model, F, material, face, ( 0, -1, 0 ) )
+        for k in range( 4 ):
+            j = ( k + 1 ) % 4
+            _fpoly( model, F, material, [ back[k], back[j], face[j], face[k] ],
+                    ( ( -1, 0, 0 ), ( 0, 0, 1 ), ( 1, 0, 0 ), ( 0, 0, -1 ) )[k] )
+
+    wl = 26.0 if kind == "estate" else 23.5
+    for xs in ( -1, 1 ):
+        x0, x1 = sorted( ( xs * wl, xs * ( wl + 5.8 ) ) )
+        cover( "rw_rubber", x0, x1, zt - 13.0, zt, 0.55, 0.28 )
+        cover( "rw_estate_lens_red", x0 + 0.22, x1 - 0.22, zt - 12.7, zt - 0.3, 0.95, 0.35 )
+        rear_panel( "rw_estate_lens_dark", x0 + 1.05, x1 - 1.05, zt - 10.7, zt - 2.2, 1.0 )
+        for z in ( 30.0, 31.1, 32.2, 34.8, 35.9, 37.0 ):
+            rear_panel( "rw_estate_lens_red", x0 + 1.12, x1 - 1.12, z - 40.0 + zt, z - 40.0 + zt + 0.18, 1.05 )
+        cover( "rw_estate_lens_red", x0 + 0.8, x1 - 0.8, zt - 7.0, zt - 5.8, 1.12, 0.12 )
+        cover( "rw_estate_lens_clear", x0 + 0.8, x1 - 0.8, zt - 11.9, zt - 11.0, 1.13, 0.10 )
+        if kind == "estate":
+            _seam( model, F, keys, 170.5, xs, 12.0, 42.0, width=0.18 )
+        # the tailgate's side gaps, inboard of the lamps
+        xg = xs * ( wl - 0.6 )
+        rear_panel( "rw_black", min( xg, xg + xs * 0.18 ), max( xg, xg + xs * 0.18 ), 22.5, zt + 1.0, 0.04 )
+    rear_panel( "rw_black", -wl + 0.4, wl - 0.4, 22.4, 22.6, 0.04 )
+    rear_panel( "rw_black", -9.0, 9.0, 28.0, 32.0, 0.35 )
+    rear_panel( "rw_steel_grey", -1.4, 1.4, 34.0, 35.8, 0.35 )
     if kind == "estate":
-        # Tall corner lights with the rectangular perimeter seen in the reference.
-        # Mount the lights on the end face below the sloping hatch glass.
-        def rear_panel( material, x0, x1, z0_, z1_, lift=0.15 ):
-            def depth(z):
-                return L + lift
-            _fpoly(model, F, material, [(x0,-depth(z0_),z0_), (x1,-depth(z0_),z0_),
-                                       (x1,-depth(z1_),z1_), (x0,-depth(z1_),z1_)], (0,-1,0.2))
-        for xs in (-1,1):
-            x0,x1=sorted((xs*26.0,xs*31.8))
-            # A sealed lamp assembly with a bevelled cover, rather than decals.
-            def cover(material, xa, xb, za, zb, depth, bevel):
-                back=[(xa,-L-0.12,za),(xb,-L-0.12,za),
-                      (xb,-L-0.12,zb),(xa,-L-0.12,zb)]
-                face=[(xa+bevel,-L-depth,za+bevel),(xb-bevel,-L-depth,za+bevel),
-                      (xb-bevel,-L-depth,zb-bevel),(xa+bevel,-L-depth,zb-bevel)]
-                _fpoly(model,F,material,face,(0,-1,0))
-                for k in range(4):
-                    j=(k+1)%4
-                    _fpoly(model,F,material,[back[k],back[j],face[j],face[k]],
-                           ((-1,0,0),(0,0,1),(1,0,0),(0,0,-1))[k])
-            cover("rw_rubber",x0,x1,27.0,40.0,0.55,0.28)
-            cover("rw_estate_lens_red",x0+0.22,x1-0.22,27.3,39.7,0.95,0.35)
-            # Dark red optical chambers remain visible behind the raised rim.
-            rear_panel("rw_estate_lens_dark",x0+1.05,x1-1.05,29.3,37.8,1.0)
-            for z in (30.0,31.1,32.2,34.8,35.9,37.0):
-                rear_panel("rw_estate_lens_red",x0+1.12,x1-1.12,z,z+0.18,1.05)
-            cover("rw_estate_lens_red",x0+0.8,x1-0.8,33.0,34.2,1.12,0.12)
-            cover("rw_estate_lens_clear",x0+0.8,x1-0.8,28.1,29.0,1.13,0.10)
-            _seam(model,F,keys,170.5,xs,12.0,42.0,width=0.18)
-        rear_panel("rw_black",-9.0,9.0,28.0,32.0,0.35)
-        rear_panel("rw_steel_grey",-1.4,1.4,34.0,35.8,0.35)
-        # Hatch glazing, wiper, roof spoiler and high brake light.
-        rod(model,F.p(0,-179.0,45.0),F.p(12,-179.0,45.5),0.28,"rw_black",6)
-        F.box(model,-27.0,27.0,-173.5,-169.0,55.8,57.2,paint)
-        F.quad(model,"rw_red_paint",0,-173.6,56.0,13.0,0.6,"back")
-        rear_panel("rw_black",-25.0,25.0,11.0,15.0,0.30)
+        # Wiper, roof spoiler and high brake light.
+        rod( model, F.p( 0, -179.0, 45.0 ), F.p( 12, -179.0, 45.5 ), 0.28, "rw_black", 6 )
+        F.box( model, -27.0, 27.0, -173.5, -169.0, 55.8, 57.2, paint )
+        F.quad( model, "rw_red_paint", 0, -173.6, 56.0, 13.0, 0.6, "back" )
+    rear_panel( "rw_black", -25.0, 25.0, 11.0, 15.0, 0.30 )
+    if taxi:
+        # The roof sign: a yellow light box 400 x 120 mm on the roof's middle, "TAXI" on both faces, on its
+        # magnetic feet.
+        try:
+            import railhead_furniture as FU
+            FU.taxi_sign( model, F, -L * 0.55, max( k[-1] for k in keys ) )
+        except Exception as error:
+            print( f"railhead_furniture.taxi_sign failed: {error}" )
     F.collide( model, -35.2, 35.2, -L, 0.0, 0.0, 57.3, "metal" )
 
 
@@ -3520,6 +4289,18 @@ PLATE_FONT = {
     "8": ".###.|#...#|#...#|.###.|#...#|#...#|.###.", "4": "...#.|..##.|.#.#.|#..#.|#####|...#.|...#.",
     "L": "#....|#....|#....|#....|#....|#....|#####", "-": ".....|.....|.....|.###.|.....|.....|.....",
     " ": ".....|.....|.....|.....|.....|.....|.....",
+    "A": ".###.|#...#|#...#|#####|#...#|#...#|#...#", "B": "####.|#...#|#...#|####.|#...#|#...#|####.",
+    "C": ".###.|#...#|#....|#....|#....|#...#|.###.", "E": "#####|#....|#....|####.|#....|#....|#####",
+    "F": "#####|#....|#....|####.|#....|#....|#....", "G": ".###.|#...#|#....|#.###|#...#|#...#|.####",
+    "J": "..###|...#.|...#.|...#.|...#.|#..#.|.##..", "M": "#...#|##.##|#.#.#|#.#.#|#...#|#...#|#...#",
+    "N": "#...#|##..#|#.#.#|#..##|#...#|#...#|#...#", "P": "####.|#...#|#...#|####.|#....|#....|#....",
+    "R": "####.|#...#|#...#|####.|#.#..|#..#.|#...#", "S": ".####|#....|#....|.###.|....#|....#|####.",
+    "T": "#####|..#..|..#..|..#..|..#..|..#..|..#..", "U": "#...#|#...#|#...#|#...#|#...#|#...#|.###.",
+    "V": "#...#|#...#|#...#|#...#|#...#|.#.#.|..#..", "X": "#...#|#...#|.#.#.|..#..|.#.#.|#...#|#...#",
+    "Y": "#...#|#...#|.#.#.|..#..|..#..|..#..|..#..", "Z": "#####|....#|...#.|..#..|.#...|#....|#####",
+    "0": ".###.|#...#|#..##|#.#.#|##..#|#...#|.###.", "2": ".###.|#...#|....#|...#.|..#..|.#...|#####",
+    "5": "#####|#....|####.|....#|....#|#...#|.###.", "6": "..##.|.#...|#....|####.|#...#|#...#|.###.",
+    "7": "#####|....#|...#.|..#..|.#...|.#...|.#...", "9": ".###.|#...#|#...#|.####|....#|...#.|.##..",
 }
 
 
@@ -3719,41 +4500,65 @@ def _road_body( model, F, profile, side_x, base_stations, axles, tyre, arch, inn
 
 
 def _suv_wheel( model, F, ac, xs ):
-    """ A wheel at depth ac on side xs: a 235/50 R19 tyre with rounded shoulders on a dark ten-spoke alloy (five pairs),
-    the brake disc behind it. """
+    """ A wheel at depth ac on side xs: a tyre with rounded shoulders, its matte sidewall carrying a ring of raised
+    lettering and brown road dust over its lowest third, on a satin ten-spoke alloy (five twin spokes) with a
+    chamfered lip, a centre cap and five lug recesses; the ventilated brake disc and its caliper show between the
+    spokes. """
+    import railhead_vehicle_kit as VK
     r, w, rim = SUV_TYRE, SUV_TYRE_W, SUV_RIM
     xo, xi = SUV_TRACK + w / 2, SUV_TRACK - w / 2
 
     def p( x, rad, t ):         # x across, at radius rad and angle t round the hub, in the frame's own coordinates
         return ( xs * x, -( ac + rad * math.cos( t ) ), r + rad * math.sin( t ) )
 
-    rod( model, F.p( xs * ( xi + 0.9 ), -ac, r ), F.p( xs * ( xo - 0.9 ), -ac, r ), r, "rw_rubber", 28 )
+    rod( model, F.p( xs * ( xi + 0.9 ), -ac, r ), F.p( xs * ( xo - 0.9 ), -ac, r ), r, "rw_tyre", 28 )
     for x0, x1, r1 in ( ( xo - 0.9, xo, r - 1.1 ), ( xi + 0.9, xi, r - 1.1 ) ):
-        _frustum( model, F.p( xs * x0, -ac, r ), F.p( xs * x1, -ac, r ), r, r1, "rw_rubber", 28 )
+        _frustum( model, F.p( xs * x0, -ac, r ), F.p( xs * x1, -ac, r ), r, r1, "rw_tyre", 28 )
+    # The tread's four circumferential grooves.
+    for f in ( 0.22, 0.42, 0.58, 0.78 ):
+        x = xi + 0.9 + ( w - 1.8 ) * f
+        rod( model, F.p( xs * ( x - 0.12 ), -ac, r ), F.p( xs * ( x + 0.12 ), -ac, r ), r + 0.015, "rw_black", 28 )
+    VK.tyre_sidewall( model, F, ac, xs, xo, rim + 0.6, r - 1.1, r, outward=1.0 )
     n = 28
-    for k in range( n ):            # the sidewalls, the rim's lip and the barrel's back
+    for k in range( n ):            # the rim's chamfered lip and the inner sidewall
         t0, t1 = 2 * math.pi * k / n, 2 * math.pi * ( k + 1 ) / n
-        for x, r0, r1, paint, out in ( ( xo, rim + 0.6, r - 1.1, "rw_rubber", 1 ), ( xo + 0.02, rim, rim + 0.6,
-                                                                                    "rw_steel_dark", 1 ),
-                                       ( xi, 0.0, r - 1.1, "rw_rubber", -1 ) ):
-            _fpoly( model, F, paint, [ p( x, r0, t0 ), p( x, r1, t0 ), p( x, r1, t1 ), p( x, r0, t1 ) ],
-                    ( out * xs, 0, 0 ) )
+        _fpoly( model, F, "rw_wheel_alloy", [ p( xo + 0.02, rim - 0.05, t0 ), p( xo - 0.25, rim + 0.6, t0 ),
+                                              p( xo - 0.25, rim + 0.6, t1 ), p( xo + 0.02, rim - 0.05, t1 ) ],
+                ( xs, 0, 0 ) )
+        _fpoly( model, F, "rw_tyre", [ p( xi, 0.0, t0 ), p( xi, r - 1.1, t0 ), p( xi, r - 1.1, t1 ), p( xi, 0.0, t1 ) ],
+                ( -xs, 0, 0 ) )
     disc( model, "rw_black", F.p( xs * ( xo - 3.2 ), -ac, r ), ( xs * F.x ), rim, sides=24 )
-    disc( model, "rw_steel_grey", F.p( xs * ( xo - 2.9 ), -ac, r ), ( xs * F.x ), 6.9, sides=24 )
-    disc( model, "rw_bogie", F.p( xs * ( xo - 2.85 ), -ac, r ), ( xs * F.x ), 3.4, sides=12 )
+    disc( model, "rw_brake_disc", F.p( xs * ( xo - 2.9 ), -ac, r ), ( xs * F.x ), 6.9, sides=24 )
+    VK.ring( model, "rw_steel_dark", F.p( xs * ( xo - 2.87 ), -ac, r ), xs * F.x, 3.2, 4.0, sides=16 )
+    disc( model, "rw_bogie", F.p( xs * ( xo - 2.85 ), -ac, r ), ( xs * F.x ), 3.2, sides=12 )
+    # The caliper, a cast block over the disc's rear top quarter.
+    ta, tb = math.radians( 110 ), math.radians( 150 )
+    for x0, x1 in ( ( xo - 3.05, xo - 1.75 ), ):
+        pts_o = [ p( x1, 5.2, ta ), p( x1, 7.6, ta ), p( x1, 7.6, tb ), p( x1, 5.2, tb ) ]
+        _fpoly( model, F, "rw_caliper", pts_o, ( xs, 0, 0 ) )
+        for ( ra, tA ), ( rb, tB ) in ( ( ( 7.6, ta ), ( 7.6, tb ) ), ( ( 5.2, ta ), ( 7.6, ta ) ), ( ( 5.2, tb ), ( 7.6, tb ) ) ):
+            _fpoly( model, F, "rw_caliper", [ p( x0, ra, tA ), p( x1, ra, tA ), p( x1, rb, tB ), p( x0, rb, tB ) ],
+                    ( 0, -math.cos( ( tA + tB ) / 2 ), math.sin( ( tA + tB ) / 2 ) ) )
     for pair in range( 5 ):         # five pairs of spokes, from the hub out to the lip, the hub sunk 0.9
         for side in ( -1, 1 ):
             t = 2 * math.pi * pair / 5 + side * math.radians( 9.0 )
             rh, rl = 2.9, rim - 0.1
             dh, dl = math.radians( 8.0 ), math.radians( 3.4 )
-            pts = [ p( xo - 0.9, rh, t - dh ), p( xo - 0.15, rl, t - dl ), p( xo - 0.15, rl, t + dl ),
-                    p( xo - 0.9, rh, t + dh ) ]
-            _fpoly( model, F, "rw_steel_dark", pts, ( xs, 0, 0 ) )
-    disc( model, "rw_steel_dark", F.p( xs * ( xo - 0.88 ), -ac, r ), ( xs * F.x ), 3.0, sides=16 )
-    disc( model, "rw_steel_grey", F.p( xs * ( xo - 0.8 ), -ac, r ), ( xs * F.x ), 1.2, sides=12 )
+            face = [ p( xo - 0.9, rh, t - dh ), p( xo - 0.15, rl, t - dl ), p( xo - 0.15, rl, t + dl ),
+                     p( xo - 0.9, rh, t + dh ) ]
+            _fpoly( model, F, "rw_wheel_alloy", face, ( xs, 0, 0 ) )
+            for e0, e1 in ( ( 0, 1 ), ( 3, 2 ) ):       # the spokes' sides, back to the barrel
+                a_, b_ = face[e0], face[e1]
+                c_ = ( a_[0] - xs * 1.4, a_[1], a_[2] )
+                d_ = ( b_[0] - xs * 1.4, b_[1], b_[2] )
+                _fpoly( model, F, "rw_wheel_alloy_dark", [ a_, b_, d_, c_ ], ( 0, ( a_[1] + b_[1] ) / 2 + ac,
+                                                                                 ( a_[2] + b_[2] ) / 2 - r ) )
+    disc( model, "rw_wheel_alloy", F.p( xs * ( xo - 0.88 ), -ac, r ), ( xs * F.x ), 3.0, sides=16 )
+    disc( model, "rw_car_trim", F.p( xs * ( xo - 0.78 ), -ac, r ), ( xs * F.x ), 1.25, sides=16 )
     for k in range( 5 ):
         t = 2 * math.pi * ( k + 0.5 ) / 5
-        disc( model, "rw_steel_grey", F.p( *p( xo - 0.82, 2.1, t ) ), ( xs * F.x ), 0.38, sides=6 )
+        disc( model, "rw_black", F.p( *p( xo - 0.84, 2.1, t ) ), ( xs * F.x ), 0.42, sides=8 )
+        disc( model, "rw_steel_grey", F.p( *p( xo - 0.9, 2.1, t ) ), ( xs * F.x ), 0.3, sides=6 )
 
 
 def _plate( model, F, centre, right, up, facing, text ):
@@ -3800,12 +4605,14 @@ def _plate( model, F, centre, right, up, facing, text ):
     write( text, x0, 7 * py / 2, px, py, "rw_black", 0.1 )
 
 
-def suv( model, e, n, along="+n", paint="rw_car_grey", z0=0.0, plate="HW K 318" ):
+def suv( model, e, n, along="+n", paint="rw_car_silver", z0=0.0, plate=None ):
     """ A parked compact crossover SUV (SUV_*), its nose towards along ("+n", "-n", "+e", "-e"), (e, n) its footprint's
     centre. Body paint (the rw_car_* paints), black cladding round the sills and arches, tinted glass in black frames,
     a black honeycomb grille, a slim LED light bar across the nose, boomerang air intakes at its corners lit along
     their edges, wrap-round tail lights joined by a light bar, roof rails, a roof spoiler, dark ten-spoke alloys and
     the town's number plates. Two metal boxes: the body to the belt and the cabin. """
+    import railhead_vehicle_kit as VK
+    plate = plate or VK.plate_for( e, n )
     L = SUV_L
     F = _vehicle_frame( e, n, along, L, z0 )
     loc = lambda x, a, z: ( x, -a, z )
@@ -3818,7 +4625,7 @@ def suv( model, e, n, along="+n", paint="rw_car_grey", z0=0.0, plate="HW K 318" 
         if k == 4:
             if SUV_COWL < mid < SUV_ROOF1 + 0.5:
                 if any( w0 <= mid <= w1 for w0, w1 in SUV_WINDOWS ):
-                    return "rw_window_dark", "glass"
+                    return "rw_car_glass", "glass"
                 if mid > SUV_WINDOWS[0][0]:
                     return "rw_black", "frame"
             return paint, "body"
@@ -3829,7 +4636,7 @@ def suv( model, e, n, along="+n", paint="rw_car_grey", z0=0.0, plate="HW K 318" 
         if SUV_COWL < mid < SUV_COWL + 1.5:
             return "rw_black", "frame"
         if SUV_COWL + 1.5 <= mid < SUV_ROOF0 or SUV_ROOF1 + 1.0 < mid < SUV_GLASS1 - 0.5:
-            return "rw_window_dark", "glass"
+            return "rw_car_glass", "glass"
         if k == 6 and SUV_ROOF1 <= mid <= SUV_ROOF1 + 1.0:
             return "rw_black", "frame"
         return paint, "body"
@@ -3850,6 +4657,15 @@ def suv( model, e, n, along="+n", paint="rw_car_grey", z0=0.0, plate="HW K 318" 
                                           ( a0 + na, z0_ + nz ) ], 0.05 )
 
     belt = lambda a: _suv_profile( a )[4][1]
+    # The cabin behind the glass, and the satin chrome round the side glass's daylight opening and along its foot.
+    VK.car_interior( model, F, SUV_COWL + 1.0, SUV_ROOF0, L - 10.0, 58.5, 42.0, 33.6, floor_z=15.0, driver=1.0,
+                     boot=( 140.0, 26.0 ) )
+    dlo = [ a for a in np.linspace( SUV_WINDOWS[0][0] - 0.6, SUV_WINDOWS[-1][1] + 0.6, 30 ) ]
+    for xs in ( 1.0, -1.0 ):
+        foot = [ F.p( xs * ( _suv_profile( a )[4][0] + 0.14 ), -a, _suv_profile( a )[4][1] - 0.25 ) for a in dlo ]
+        head = [ F.p( xs * ( _suv_profile( a )[5][0] + 0.1 ), -a, _suv_profile( a )[5][1] + 0.2 ) for a in dlo ]
+        polyline( model, foot, 0.24, "rw_car_chrome", 4 )
+        polyline( model, head, 0.2, "rw_car_chrome", 4 )
     for xs in ( 1.0, -1.0 ):
         # Door gaps: the front door's front edge behind the front arch, the B pillar's, the rear door's rear edge
         # round the rear arch; the fuel filler on the right.
@@ -3879,7 +4695,7 @@ def suv( model, e, n, along="+n", paint="rw_car_grey", z0=0.0, plate="HW K 318" 
         xr = 23.6
         pts = [ ( a, _suv_top_z( a, xr ) + 2.0 ) for a in np.linspace( 86.0, 150.0, 9 ) ]
         for ( a0, z0_ ), ( a1, z1_ ) in zip( pts, pts[1:] ):
-            rod( model, F.p( xs * xr, -a0, z0_ ), F.p( xs * xr, -a1, z1_ ), 0.75, "rw_black", 6 )
+            rod( model, F.p( xs * xr, -a0, z0_ ), F.p( xs * xr, -a1, z1_ ), 0.6, "rw_alu_brushed", 8 )
         for a in ( 87.0, 118.0, 149.0 ):
             z = _suv_top_z( a, xr )
             F.box( model, xs * ( xr - 0.7 ), xs * ( xr + 0.7 ), -( a - 1.6 ), -( a + 1.6 ), z - 0.2, z + 2.2,
@@ -4112,9 +4928,11 @@ def _van_wheel( model, F, ac, xs ):
     def p( x, rad, t ):
         return ( xs * x, -( ac + rad * math.cos( t ) ), r + rad * math.sin( t ) )
 
-    rod( model, F.p( xs * ( xi + 0.9 ), -ac, r ), F.p( xs * ( xo - 0.9 ), -ac, r ), r, "rw_rubber", 28 )
+    import railhead_vehicle_kit as VK
+    rod( model, F.p( xs * ( xi + 0.9 ), -ac, r ), F.p( xs * ( xo - 0.9 ), -ac, r ), r, "rw_tyre", 28 )
     for x0, x1 in ( ( xo - 0.9, xo ), ( xi + 0.9, xi ) ):
-        _frustum( model, F.p( xs * x0, -ac, r ), F.p( xs * x1, -ac, r ), r, r - 1.2, "rw_rubber", 28 )
+        _frustum( model, F.p( xs * x0, -ac, r ), F.p( xs * x1, -ac, r ), r, r - 1.2, "rw_tyre", 28 )
+    VK.tyre_sidewall( model, F, ac, xs, xo + 0.01, rim + 0.5, r - 1.2, r, outward=1.0 )
     n = 28
     for k in range( n ):
         t0, t1 = 2 * math.pi * k / n, 2 * math.pi * ( k + 1 ) / n
@@ -4134,12 +4952,14 @@ def _van_wheel( model, F, ac, xs ):
     disc( model, "rw_black", F.p( xs * ( xo - 1.55 ), -ac, r ), ( xs * F.x ), 1.9, sides=14 )
 
 
-def van( model, e, n, along="+n", paint="rw_car_white", z0=0.0, plate="HW L 418" ):
+def van( model, e, n, along="+n", paint="rw_car_white", z0=0.0, plate=None ):
     """ A parked large panel van (VAN_*), its nose towards along ("+n", "-n", "+e", "-e"), (e, n) its footprint's
     centre: body paint (the rw_car_* paints), a black bumper and sill band with a silver sill strip, black arch trims,
     the grille's four bars in a dark frame, slim headlights with their running-light strips, fog lamps, black mirrors
     with indicators, a cab door, a sliding door with its rail, glazed rear doors, vertical tail lights, steel wheels and
     the town's number plates. Two metal boxes: the body to the bonnet, and the box behind the windscreen. """
+    import railhead_vehicle_kit as VK
+    plate = plate or VK.plate_for( e, n )
     L = VAN_L
     F = _vehicle_frame( e, n, along, L, z0 )
     loc = lambda x, a, z: ( x, -a, z )
@@ -4152,7 +4972,7 @@ def van( model, e, n, along="+n", paint="rw_car_white", z0=0.0, plate="HW L 418"
         if k == 3:
             if VAN_COWL + 2.0 < mid < VAN_ROOF0 + 32.0:
                 if any( w0 <= mid <= w1 for w0, w1 in VAN_WINDOWS ):
-                    return "rw_window_dark", "glass"
+                    return "rw_car_glass", "glass"
                 if VAN_WINDOWS[0][0] - 1.0 < mid < VAN_WINDOWS[1][1] + 1.2:
                     return "rw_black", "frame"
             return paint, "body"
@@ -4160,7 +4980,7 @@ def van( model, e, n, along="+n", paint="rw_car_white", z0=0.0, plate="HW L 418"
             return "rw_black", "frame"                  # the scuttle under the windscreen
         if VAN_COWL + 1.6 <= mid < VAN_ROOF0 - 0.6:
             if k >= 6:
-                return "rw_window_dark", "glass"
+                return "rw_car_glass", "glass"
             if k == 5:
                 return "rw_black", "frame"              # the windscreen's black border
         if VAN_ROOF0 - 0.6 <= mid < VAN_ROOF0 + 0.8 and k >= 5:
@@ -4183,6 +5003,34 @@ def van( model, e, n, along="+n", paint="rw_car_white", z0=0.0, plate="HW L 418"
 
     belt = lambda a: _van_profile( a )[3][1]
     top_side = 84.6                             # where the doors end under the roof's rounded edge
+    # The cab behind the glass: dash, wheel, two seats, the bulkhead behind them.
+    VK.cab_interior( model, F, VAN_COWL + 1.5, 103.0, 22.0, 54.0, 90.0, 38.4, driver=1.0 )
+    for xs in ( 1.0, -1.0 ):
+        # Two swage lines 15 mm deep along the load space: a shadowed step under a raised band.
+        for z in ( 28.0, 48.0 ):
+            for a0, a1 in ( ( 106.8, 157.2 ), ( 158.4, 229.0 ) ):
+                side_patch( paint, xs, [ ( a0, z ), ( a1, z ), ( a1, z + 1.1 ), ( a0, z + 1.1 ) ], 0.6 )
+                side_patch( "rw_black", xs, [ ( a0, z - 0.25 ), ( a1, z - 0.25 ), ( a1, z ), ( a0, z ) ], 0.08 )
+                for a in ( a0, a1 ):
+                    _fpoly( model, F, paint, [ loc( xs * ( _van_side_x( a, z ) + 0.06 ), a, z ),
+                                               loc( xs * ( _van_side_x( a, z ) + 0.6 ), a, z ),
+                                               loc( xs * ( _van_side_x( a, z ) + 0.6 ), a, z + 1.1 ),
+                                               loc( xs * ( _van_side_x( a, z ) + 0.06 ), a, z + 1.1 ) ],
+                            ( 0, 1 if a == a0 else -1, 0 ) )
+                _fpoly( model, F, paint, [ loc( xs * ( _van_side_x( a0, z + 1.1 ) + 0.06 ), a0, z + 1.1 ),
+                                           loc( xs * ( _van_side_x( a1, z + 1.1 ) + 0.06 ), a1, z + 1.1 ),
+                                           loc( xs * ( _van_side_x( a1, z + 1.1 ) + 0.6 ), a1, z + 1.1 ),
+                                           loc( xs * ( _van_side_x( a0, z + 1.1 ) + 0.6 ), a0, z + 1.1 ) ], ( 0, 0, 1 ) )
+        # The sliding door's track: a recessed channel along the rail's line, its shadow under it.
+        side_patch( "rw_steel_dark", xs, [ ( 158.6, 62.0 ), ( 226.0, 62.0 ), ( 226.0, 62.5 ), ( 158.6, 62.5 ) ], 0.12 )
+        # Black mud flaps behind the rear wheels.
+        xf0, xf1 = sorted( ( xs * ( VAN_TRACK - VAN_TYRE_W / 2 ), xs * ( VAN_TRACK + VAN_TYRE_W / 2 + 0.4 ) ) )
+        ar = VAN_AXLES[1] + VAN_ARCH + 0.6
+        F.box( model, xf0, xf1, -ar - 0.25, -ar, 3.0, 15.0, "rw_rubber" )
+    # Roof ribs: 40 mm pressed beads across the load space's roof.
+    for a in np.arange( 112.0, 226.0, 14.0 ):
+        pts = [ F.p( x, -a, _van_top_z( a, x ) + 0.18 ) for x in np.linspace( -30.0, 30.0, 9 ) ]
+        polyline( model, pts, 0.55, paint, 6 )
     for xs in ( 1.0, -1.0 ):
         # The cab door, the sliding door and its rail behind it, the handles, the silver sill strip.
         seam( xs, [ ( 66.6, 26.2 ), ( 65.6, belt( 65.6 ) - 0.2 ) ] )
@@ -4200,7 +5048,8 @@ def van( model, e, n, along="+n", paint="rw_car_white", z0=0.0, plate="HW L 418"
         xm = _van_side_x( 69.0, 57.0 )
         F.box( model, xs * ( xm - 0.6 ), xs * ( xm + 3.0 ), -66.8, -70.8, 55.0, 58.2, "rw_black" )
         F.box( model, xs * ( xm + 2.4 ), xs * ( xm + 9.2 ), -66.2, -71.6, 55.6, 70.4, "rw_black" )
-        F.box( model, xs * ( xm + 2.8 ), xs * ( xm + 8.8 ), -71.6, -71.75, 56.4, 69.6, "rw_steel_grey" )
+        F.box( model, xs * ( xm + 2.8 ), xs * ( xm + 8.8 ), -71.6, -71.75, 60.4, 69.6, "rw_steel_grey" )
+        F.box( model, xs * ( xm + 2.8 ), xs * ( xm + 8.8 ), -71.6, -71.75, 56.4, 59.9, "rw_window_dark" )
         F.box( model, xs * ( xm + 9.2 ), xs * ( xm + 9.3 ), -69.0, -71.4, 56.8, 58.8, "rw_yellow_paint" )
         # The tail lights' ends round the rear corners.
         for a0, a1 in ( ( 233.4, 234.3 ), ( 234.3, 235.0 ), ( 235.0, 235.4 ) ):
@@ -4319,10 +5168,15 @@ def bollard( model, e, n, z0=0.0, kind="steel" ):
         disc( model, "rw_concrete", ( e, n, z0 + 27.56 ), ( 0, 0, 1 ), 5.9, sides=12 )
         model.collision_box( ( e - 7.87, n - 7.87, z0 ), ( e + 7.87, n + 7.87, z0 + 27.56 ), "default" )
         return
-    for z0_, z1_, paint in ( ( 0.0, 31.5, DARK ), ( 31.5, 34.5, "rw_white_paint" ), ( 34.5, 38.6, DARK ) ):
-        model.cylinder( ( e, n ), 2.0, z0 + z0_, z0 + z1_, { "side": paint }, sides=10 )
-    _frustum( model, ( e, n, z0 + 38.6 ), ( e, n, z0 + 39.4 ), 2.0, 1.2, DARK, sides=10 )
-    disc( model, DARK, ( e, n, z0 + 39.4 ), ( 0, 0, 1 ), 1.2, sides=10 )
+    # Smooth-shaded continuous tube, with the reflective band at the same height.
+    # A shallow rounded shoulder and a solid top close the hollow-looking end.
+    sides = 32
+    for za, zb, paint in ( ( -0.7, 31.5, DARK ), ( 31.5, 34.5, "rw_white_paint" ), ( 34.5, 38.2, DARK ) ):
+        rod( model, ( e, n, z0 + za ), ( e, n, z0 + zb ), 2.0, paint, sides=sides )
+    for za, zb, ra, rb in ( ( 38.2, 38.65, 2.0, 1.88 ), ( 38.65, 39.0, 1.88, 1.58 ),
+                            ( 39.0, 39.28, 1.58, 1.12 ), ( 39.28, 39.4, 1.12, 0.58 ) ):
+        _frustum( model, ( e, n, z0 + za ), ( e, n, z0 + zb ), ra, rb, DARK, sides=sides )
+    disc( model, DARK, ( e, n, z0 + 39.4 ), ( 0, 0, 1 ), 0.58, sides=sides )
     model.collision_box( ( e - 2.0, n - 2.0, z0 ), ( e + 2.0, n + 2.0, z0 + 39.4 ), "metal" )
 
 

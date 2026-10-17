@@ -1,0 +1,16 @@
+// Tools/railhead_buffer.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    F_METALNESS_TEXTURE "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.060"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1"
+    TextureColor "materials/railhead/rw_buffer_beam_b_color.png"
+    TextureNormal "materials/railhead/rw_buffer_beam_b_normal.png"
+    TextureRoughness "materials/railhead/rw_buffer_beam_b_rough.png"
+    TextureMetalness "materials/railhead/rw_buffer_beam_b_metal.png"
+    TextureAmbientOcclusion "materials/railhead/rw_buffer_beam_b_ao.png"
+}

@@ -53,6 +53,16 @@ ROOT = Path( __file__ ).resolve().parent.parent
 ASSETS = ROOT / "Assets"
 CLOUD = ROOT / ".sbox" / "cloud"
 SCENE = ASSETS / "scenes/maps/Railhead/railhead.scene"
+# --stage DIR: a folder laid out as Assets (railhead_map.py --stage, railhead_materials.py --out DIR/materials/railhead)
+# whose files are read before Assets' own.
+STAGE = None
+
+
+def asset( path ):
+    """ An Assets path's file: the staged one when there is one. """
+    if STAGE is not None and ( STAGE / path ).is_file():
+        return STAGE / path
+    return ASSETS / path
 TEMP = Path( tempfile.gettempdir() ) / "hc1_railhead_render"
 CACHE = TEMP / "cache"
 # Belltower's renderer exports the same cloud trees; their glbs and textures are reused from there.
@@ -238,7 +248,7 @@ def image( path, data=False ):
         return None
     p = Path( path )
     if not p.is_absolute():
-        p = ASSETS / path
+        p = asset( path )
     if not p.is_file():
         return None
     key = ( str( p ), data )
@@ -250,7 +260,7 @@ def image( path, data=False ):
 
 
 def parse_vmat( path ):
-    text = ( ASSETS / path ).read_text( encoding="utf-8", errors="replace" )
+    text = asset( path ).read_text( encoding="utf-8", errors="replace" )
     shader = re.search( r'shader\s+"([^"]+)"', text ).group( 1 )
     keys = dict( re.findall( r'^\s*(\w+)\s+"([^"]*)"', text, re.M ) )
     flags = { k: int( v ) for k, v in re.findall( r'^\s*(F_\w+)\s+(\d+)', text, re.M ) }
@@ -272,6 +282,19 @@ class Graph:
         self.links = self.mat.node_tree.links
         self.nodes.clear()
         self.out = self.node( "ShaderNodeOutputMaterial" )
+        # The UVs every texture reads, when the vmat scales or offsets them (g_vTexCoordScale / g_vTexCoordOffset).
+        self.uv = None
+
+    def tex_coords( self, keys ):
+        scale = floats( keys.get( "g_vTexCoordScale", "[1 1]" ) )[:2]
+        offset = floats( keys.get( "g_vTexCoordOffset", "[0 0]" ) )[:2]
+        if len( scale ) < 2 or len( offset ) < 2:
+            return
+        if max( abs( scale[0] - 1 ), abs( scale[1] - 1 ), abs( offset[0] ), abs( offset[1] ) ) < 1e-6:
+            return
+        uv = self.node( "ShaderNodeTexCoord" ).outputs["UV"]
+        uv = self.vmath( "MULTIPLY", uv, ( scale[0], scale[1], 1.0 ) )
+        self.uv = self.vmath( "ADD", uv, ( offset[0], offset[1], 0.0 ) )
 
     def node( self, kind, **props ):
         n = self.nodes.new( kind )
@@ -284,6 +307,8 @@ class Graph:
 
     def tex( self, img, vector=None, extension="REPEAT" ):
         n = self.node( "ShaderNodeTexImage", image=img, extension=extension )
+        if vector is None:
+            vector = self.uv
         if vector is not None:
             self.link( vector, n.inputs["Vector"] )
         return n
@@ -352,6 +377,7 @@ def scalar_texture( g, keys, name, default ):
 def standard_material( name, keys ):
     """ complex.shader. """
     g = Graph( name )
+    g.tex_coords( keys )
     p = g.node( "ShaderNodeBsdfPrincipled" )
     tint = floats( keys.get( "g_vColorTint", "[1 1 1 1]" ) )[:3]
     colour_img = image( keys.get( "TextureColor", "" ) )
@@ -536,7 +562,7 @@ def material( path ):
     if path in MATERIALS:
         return MATERIALS[path]
     try:
-        if ( ASSETS / path ).is_file():
+        if asset( path ).is_file():
             shader, keys = parse_vmat( path )
             if "glass" in shader:
                 mat = glass_material( path, keys )
@@ -560,8 +586,8 @@ def material( path ):
 
 def map_model( path ):
     """ A map vmdl: its OBJ imported unturned, with the remapped materials. Place it with world @ OBJ_TO_MODEL. """
-    text = ( ASSETS / path ).read_text( encoding="utf-8" )
-    obj = ASSETS / re.search( r'filename = "([^"]+\.obj)"', text ).group( 1 )
+    text = asset( path ).read_text( encoding="utf-8" )
+    obj = asset( re.search( r'filename = "([^"]+\.obj)"', text ).group( 1 ) )
     remaps = dict( re.findall( r'\{ from = "([^"]+)" to = "([^"]+)" \}', text ) )
     before = set( bpy.data.objects )
     bpy.ops.wm.obj_import( filepath=str( obj ), forward_axis="Y", up_axis="Z" )
@@ -577,6 +603,13 @@ def map_model( path ):
             else:
                 print( f"  {path}: no remap for {mtl}" )
     return objects
+
+
+def local_obj_model( path ):
+    """ Whether a vmdl is one of the project's own, built from an OBJ (the map's props: the luggage trolleys, the signal
+    frame), so it's imported as the map's models are rather than looked for in the cloud cache. """
+    p = asset( path )
+    return p.is_file() and re.search( r'filename = "[^"]+\.obj"', p.read_text( encoding="utf-8", errors="replace" ) ) is not None
 
 
 def gltf_meshes( glb ):
@@ -729,6 +762,11 @@ def add_fog_volume( world, c ):
     bounds = c.get( "Bounds", {} )
     lo = Vector( floats( bounds.get( "Mins", "-50,-50,-50" ) ) )
     hi = Vector( floats( bounds.get( "Maxs", "50,50,50" ) ) )
+    # Inset a little: a face of the box lying on a wall's face (the shed's haze ends at its walls) lets Cycles pass
+    # the ray through the transparent boundary and skip the wall at the same distance, so the wall shows see-through.
+    # The engine's fog volume has no surface, so it doesn't matter there.
+    inset = Vector( ( 2.0, 2.0, 2.0 ) )
+    lo, hi = lo + inset, hi - inset
     bpy.ops.mesh.primitive_cube_add( size=1.0 )
     cube = bpy.context.active_object
     cube.name = "FogVolume"
@@ -900,6 +938,7 @@ def parse_args():
     argv = sys.argv[sys.argv.index( "--" ) + 1:] if "--" in sys.argv else []
     ap = argparse.ArgumentParser( prog="railhead_render.py" )
     ap.add_argument( "--views", default="reference" )
+    ap.add_argument( "--stage", help="read a staged build (laid out as Assets) before Assets: railhead_map.py --stage" )
     ap.add_argument( "--view", action="append", default=[], help="name,e,n,z,te,tn,tz,fov" )
     ap.add_argument( "--size", default="1280x720" )
     ap.add_argument( "--samples", type=int, default=64 )
@@ -918,6 +957,12 @@ def parse_args():
 
 def main():
     args = parse_args()
+    global STAGE, SCENE
+    if args.stage:
+        STAGE = Path( args.stage ).resolve()
+        if ( STAGE / "scenes/maps/Railhead/railhead.scene" ).is_file():
+            SCENE = STAGE / "scenes/maps/Railhead/railhead.scene"
+        print( f"staged build: {STAGE}" )
     started = time.time()
     views = { v[0]: v for v in literal( ROOT / "Tools/railhead_preview.py", "VIEWS" ) + REFERENCE_VIEWS }
     wanted = [ views[name] for name in args.views.split( "," ) if name ] if args.views != "all" else list( views.values() )
@@ -941,7 +986,7 @@ def main():
 
     placed = {}
     for path, world, tint in found["models"]:
-        if path.startswith( "models/maps/" ):
+        if path.startswith( "models/maps/" ) or local_obj_model( path ):
             if path in placed:
                 # Placed again: more objects on the same meshes.
                 copies = [ o.copy() for o in placed[path] ]

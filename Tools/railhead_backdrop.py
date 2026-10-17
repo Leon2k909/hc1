@@ -52,6 +52,12 @@ import numpy as np
 
 import map_kit as K
 
+try:
+    import railhead_backdrop_art as ART         # the backdrop's own textures (bd_ paints)
+except Exception as _error:                     # pragma: no cover - keep the module importable whatever happens
+    ART = None
+    print( f"railhead_backdrop_art isn't usable ({_error}); the bd_ paints fall back" )
+
 # belltower_detail's cloud foliage (Facepunch's): heights 391.9 and 703.7, the bush 75.
 OAK = "models/sbox_props/trees/oak/tree_oak_small_a.vmdl"
 OAK_BIG = "models/sbox_props/trees/oak/tree_oak_medium_a.vmdl"
@@ -287,13 +293,35 @@ def reveal( model, face, paint, r0, r1, z0, z1, depth, d=0.0, top=True, bottom=T
         face.level( model, paint, r0, r1, d - depth, d, z0, 1.0 )
 
 
-def window( model, face, r0, r1, z0, z1, frame="trim_white", glass="rw_window_dark", reveal_paint="render_pale",
-            depth=6.0, d=0.0, panes="t" ):
+def window( model, face, r0, r1, z0, z1, frame="bd_paint_white", glass="rw_window_dark", reveal_paint="render_pale",
+            depth=6.0, d=0.0, panes="t", uv=None, tilt=False ):
     """ A casement window in a hole: its reveal, the glass at the back and the frame's bars just in front of it.
-    panes 't' is a mullion and a transom (the usual T), '+' a cross, '|' a mullion, '' none. """
+    panes 't' is a mullion and a transom (the usual T), '+' a cross, '|' a mullion, '' none. uv maps the glass (an
+    atlas cell); tilt has the right-hand casement tipped in 10 degrees at its top (Kipp), the room dark behind it. """
     reveal( model, face, reveal_paint, r0, r1, z0, z1, depth, d )
     back = d - depth
-    face.quad( model, glass, r0, r1, z0, z1, back )
+    if tilt and panes in ( "t", "|", "+" ):
+        rc = ( r0 + r1 ) / 2
+        lean = ( z1 - z0 ) * math.sin( math.radians( 10 ) )
+        if uv is not None:
+            ( u0, v0 ), ( u1, _ ), ( _, v1 ), _ = uv
+            um = ( u0 + u1 ) / 2
+            face.quad( model, glass, r0, rc, z0, z1, back, uv=[ ( u0, v0 ), ( um, v0 ), ( um, v1 ), ( u0, v1 ) ] )
+            luv = [ ( um, v0 ), ( u1, v0 ), ( u1, v1 ), ( um, v1 ) ]
+        else:
+            face.quad( model, glass, r0, rc, z0, z1, back )
+            luv = None
+        face.quad( model, "rw_black", rc, r1, z0, z1, back - lean - 4 )
+        leaf = [ face.p( rc + 1.5, back - 0.2, z0 + 3 ), face.p( r1 - 3, back - 0.2, z0 + 3 ), face.p( r1 - 3, back - lean, z1 - 3 ),
+                 face.p( rc + 1.5, back - lean, z1 - 3 ) ]
+        facing( model, glass, leaf, face.D + face.Z * 0.17, uv=luv )
+        for a, b in ( ( leaf[0], leaf[3] ), ( leaf[1], leaf[2] ), ( leaf[3], leaf[2] ) ):
+            rod( model, a + face.D * 0.8, b + face.D * 0.8, 2.4, frame )
+        for zz, towards in ( ( z1 - 3, -1.0 ), ):
+            facing( model, "rw_black", [ face.p( rc, back, zz ), face.p( r1, back, zz ), face.p( r1, back - lean, zz ),
+                                         face.p( rc, back - lean, zz ) ], face.Z * towards )
+    else:
+        face.quad( model, glass, r0, r1, z0, z1, back, uv=uv )
     f, bar = back + 0.6, 3.0
     face.quad( model, frame, r0, r0 + bar, z0, z1, f )
     face.quad( model, frame, r1 - bar, r1, z0, z1, f )
@@ -373,7 +401,7 @@ def atlas_quad( model, face, atlas, name, r0, r1, z0, z1, d ):
 # ---------------------------------------------------------------------------------------------------------------------
 # Tenements
 
-WALLS = ( "render_cream", "render_ochre", "render_pale", "render_rose", "render_sage", "render_blue", "render_terracotta",
+WALLS = ( "render_cream", "render_ochre", "render_pale", "bd_render_rose", "render_sage", "render_blue", "bd_render_terracotta",
           "render_cream", "render_ochre", "render_pale" )
 SIGNS = ( "baeckerei", "apotheke", "imbiss", "reisebuero", "cafe", "friseur", "kiosk", "buchhandlung", "blumen", "optik",
           "pension", "metzgerei", "pizzeria", "schuhmacher", "schluesseldienst", "getraenke", "tabak" )
@@ -387,16 +415,16 @@ class Look:
         brick = chance( 0.15, key, "brick" ) and not grand
         self.wall = "brick" if brick else pick( WALLS, key, "wall" )
         self.dressing = "rw_dressed" if brick or grand else \
-            pick( ( "rw_dressed", "rw_dressed", "render_pale", "trim_white", "rw_sandstone" ), key, "dress" )
+            pick( ( "rw_dressed", "rw_dressed", "render_pale", "rw_dressed", "rw_sandstone" ), key, "dress" )
         if self.dressing == self.wall:
             self.dressing = "rw_dressed"
         self.ground_paint = pick( ( "rw_sandstone", "rw_dressed", "rw_sandstone", self.wall ), key, "ground" )
         self.plinth = pick( ( "ashlar_grey", "rw_sandstone", "ashlar_grey" ), key, "plinth" )
         self.reveal = self.dressing if chance( 0.5, key, "reveal" ) or brick else self.wall
-        self.frame = pick( ( "trim_white", "trim_white", "trim_white", "trim_brown", "trim_green" ), key, "frame" )
-        self.door = pick( ( "planks_dark", "trim_brown", "trim_green", "planks_dark" ), key, "door" )
+        self.frame = pick( ( "bd_paint_white", "bd_paint_white", "bd_paint_white", "bd_paint_brown", "bd_paint_green" ), key, "frame" )
+        self.door = pick( ( "bd_paint_brown", "bd_paint_green", "rw_satin_black", "bd_paint_brown", "bd_paint_blue" ), key, "door" )
         self.roof_kind = pick( ( "mansard", "mansard", "pitched" ), key, "roof" )
-        self.roof = "slate" if self.roof_kind == "mansard" else pick( ( "roof_tiles", "slate", "roof_tiles" ), key, "tiles" )
+        self.roof = "slate" if self.roof_kind == "mansard" else pick( ( "bd_tile_aged", "slate", "bd_tile_aged" ), key, "tiles" )
         self.ground = between( 186.0, 204.0, key, "g" )
         self.storeys = 4
         self.storey = between( 132.0, 144.0, key, "s" )
@@ -445,7 +473,7 @@ def ground_units( width, look, key, special="door", at=None, shops=True ):
             p0, p1 = r + 12, r + w - 12
             r += w
             if shops and p1 - p0 >= 120 and not chance( 0.15, key, "flat", a, k ):
-                units.append( Unit( "shop", p0, p1, pick( SIGNS, key, "sign", a, k ), chance( 0.22, key, "shut", a, k ) ) )
+                units.append( Unit( "shop", p0, p1, pick( SIGNS, key, "sign", a, k ), chance( 0.12, key, "shut", a, k ) ) )
             elif p1 - p0 >= 120:
                 c = ( p0 + p1 ) / 2
                 for cc in ( c - 0.25 * ( p1 - p0 ), c + 0.25 * ( p1 - p0 ) ):
@@ -508,6 +536,634 @@ def house_door( model, face, u, g, look, detail ):
     face.box( model, r1, r1 + 9, 0, 3, 0, top + 9, look.dressing )
     face.box( model, r0 - 9, r1 + 9, 0, 3, top, top + 9, look.dressing )
     face.box( model, r0 - 13, r1 + 13, 0, 5, top + 9, top + 14, look.dressing )
+    if detail == "near":
+        # The house number in blue enamel over the door's right, the bell panel and its letter plate at the left
+        number = int( unit( look.key, "number" ) * 32 )
+        face.box( model, r1 + 13, r1 + 21, 0, 0.4, top - 30, top - 20, "rw_steel" )
+        face.quad( model, "bd_plaques", r1 + 13.5, r1 + 20.5, top - 29.5, top - 20.5, 0.45, uv=bd_uv( "PLAQUES", number ) )
+        face.box( model, r0 - 19, r0 - 13, 0, 0.8, 44, 60, "rw_steel" )
+        for j in range( 6 ):
+            z = 46.5 + j * 2.3
+            face.box( model, r0 - 17.6, r0 - 16.2, 0.8, 1.2, z, z + 1.2, "rw_satin_black" )
+            face.box( model, r0 - 15.6, r0 - 13.8, 0.8, 0.9, z, z + 1.2, "bd_paint_white" )
+        face.box( model, r0 - 18, r0 - 14, 0.8, 1.6, 40, 43, "rw_satin_black" )        # the intercom's grille
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Shopfronts c. 1900 as they're used in 2026: a stall riser, a framed window with its transom lights, the door in a
+# splayed lobby, a fascia with the sign, an awning box (and on a sunny day the canvas out), and a lit shop behind it
+
+SHOP_KIND = { "baeckerei": "bakery", "apotheke": "pharmacy", "imbiss": "cafe", "reisebuero": "books", "cafe": "cafe",
+              "friseur": "clothes", "kiosk": "drinks", "buchhandlung": "books", "blumen": "flowers", "optik": "optician",
+              "pension": "cafe", "metzgerei": "bakery", "pizzeria": "cafe", "schuhmacher": "clothes",
+              "schluesseldienst": "pharmacy", "getraenke": "drinks", "tabak": "drinks" }
+SHOP_FASCIA = { "hotel": "bd_paint_green", "cafe": "bd_paint_brown", "friseur": "rw_satin_black", "buchhandlung": "bd_paint_blue",
+                "pizzeria": "rw_satin_black", "blumen": "bd_paint_green", "baeckerei": "bd_paint_brown" }
+SHOP_FRAMES = ( "rw_satin_black", "bd_paint_green", "rw_steel_dark", "bd_burgundy", "bd_paint_brown", "bd_paint_white" )
+SHOP_RISERS = ( "bd_granite", "bd_dressed_dark", "bd_tile_green", "bd_granite", "rw_satin_black" )
+LOBBY = 34.0            # the door's recess behind the glass line
+GLASS_D = -8.0          # the shop windows' glass line
+ROOM = 132.0            # the shop's depth behind its glass
+
+
+def shop_door( u ):
+    """ ( a, b ) of a shop's door in its window, or None (a shutter's down, or it's too narrow). """
+    if u.shutter or u.r1 - u.r0 < 140:
+        return None
+    w = 40.0
+    if ( int( u.r0 ) // 7 ) % 3 == 0:
+        a = ( u.r0 + u.r1 ) / 2 - w / 2
+    elif ( int( u.r0 ) // 7 ) % 3 == 1:
+        a = u.r1 - 22 - w
+    else:
+        a = u.r0 + 22
+    return ( a, a + w )
+
+
+def bd_uv( atlas, k ):
+    """ An atlas cell's quad uv ( BL, BR, TR, TL ) from railhead_backdrop_art. """
+    if ART is None:
+        return None
+    u0, v0, u1, v1 = ART.cell_uv( getattr( ART, atlas ), k )
+    return [ ( u0, v0 ), ( u1, v0 ), ( u1, v1 ), ( u0, v1 ) ]
+
+
+def shopfront( model, face, u, g, look, detail ):
+    """ The shopfront in its opening r0..r1, z 16..top (the pier's stone round it, front() cut the hole). """
+    r0, r1, top = u.r0, u.r1, g - 52
+    key = ( look.key, "shop", round( r0 ) )
+    near = detail == "near"
+    # Neighbouring shops never share a frame or a stall riser: they're dealt round from where the house starts its deal
+    j = getattr( u, "index", 0 ) + int( unit( look.key, "deal" ) * 16 )
+    frame = SHOP_FRAMES[j % len( SHOP_FRAMES )]
+    door = shop_door( u )
+    # The reveal: the pier's stone 8 deep to the glass line
+    reveal( model, face, look.ground_paint, r0, r1, 16, top, -GLASS_D, bottom=False )
+    # The fascia over it, a moulded cap, and the sign: printed on the board, or a lightbox standing 6 proud
+    fascia = SHOP_FASCIA.get( u.sign, pick( ( "rw_satin_black", "rw_steel_dark", "bd_paint_green", "rw_satin_black" ), *key, "fa" ) )
+    face.box( model, r0, r1, 0, 5, top + 2, top + 30, fascia )
+    face.box( model, r0 - 1, r1 + 1, 0, 7.5, top + 30, top + 34, look.dressing )
+    face.box( model, r0, r1, 0, 6, top + 34, top + 35.5, "rw_zinc", skip=( "-d", "-z" ) )
+    sign_h = min( 24.0, ( r1 - r0 - 18 ) / 5 )
+    sign_w = sign_h * 5
+    c = ( r0 + r1 ) / 2
+    if chance( 0.3, *key, "lightbox" ):
+        face.box( model, c - sign_w / 2 - 2, c + sign_w / 2 + 2, 5, 11, top + 16 - sign_h / 2 - 2, top + 16 + sign_h / 2 + 2,
+                  "rw_steel_dark" )
+        atlas_quad( model, face, "rw_shopsigns", u.sign, c - sign_w / 2, c + sign_w / 2, top + 16 - sign_h / 2,
+                    top + 16 + sign_h / 2, 11.05 )
+    else:
+        atlas_quad( model, face, "rw_shopsigns", u.sign, c - sign_w / 2, c + sign_w / 2, top + 16 - sign_h / 2,
+                    top + 16 + sign_h / 2, 5.05 )
+    # Two spotlights on short arms under the fascia, lighting the window
+    if near:
+        for t in ( 0.25, 0.75 ):
+            r = r0 + ( r1 - r0 ) * t
+            p = face.p( r, 10, top + 1 )
+            rod( model, face.p( r, 5, top + 2 ), p, 0.8, "rw_steel_dark" )
+            lathe( model, ( p[0], p[1] ), [ ( 1.2, top - 4 ), ( 1.8, top - 3.2 ), ( 1.8, top + 0.5 ), ( 0.0, top + 1.0 ) ],
+                   "rw_satin_black", sides=8, cap=False )
+            lathe( model, ( p[0], p[1] ), [ ( 0.0, top - 4.05 ), ( 1.1, top - 4.05 ) ], "bd_light", sides=8, cap=False )
+    if u.shutter:
+        # The shutter's roll box under the fascia, 8 in square, powder-coated as the shutter
+        face.box( model, r0 + 1, r1 - 1, -2, 6, top - 8, top + 2, { "default": "bd_steel_white", "-z": "rw_steel_grey" } )
+        face.box( model, r0 + 1, r1 - 1, 6, 6.5, top - 8, top - 6, "rw_steel_grey", skip=( "-d", ) )
+        roller_shutter( model, face, r0, r1, 16, top - 8, -2.0, key )
+        return
+    # The awning's box under the fascia, and its canvas out on a sunny day
+    face.box( model, r0 + 1, r1 - 1, 0, 7, top - 7, top + 2, { "default": "rw_steel_grey", "-z": "rw_steel_dark" } )
+    face.box( model, r0 + 1, r1 - 1, 7, 7.6, top - 6, top - 4, "rw_steel_dark", skip=( "-d", ) )     # its lip
+    if near and chance( 0.55, *key, "awning" ):
+        canvas_awning( model, face, r0 + 2, r1 - 2, top - 5, key )
+    if near and chance( 0.3, *key, "bracket" ):
+        bracket_sign( model, face, r1 + 6 if chance( 0.5, *key, "bside" ) else r0 - 6, g, u.sign )
+    # The stall riser under the glass: polished stone, a bronze-capped sill
+    riser = SHOP_RISERS[( j * 3 + 1 ) % len( SHOP_RISERS )]
+    spans = [ ( r0, r1 ) ] if door is None else [ ( r0, door[0] - 8 ), ( door[1] + 8, r1 ) ]
+    for a, b in spans:
+        if b - a < 4:
+            continue
+        face.box( model, a, b, GLASS_D - 2, GLASS_D + 3, 16, 32, riser, skip=( "-d", ) )
+        face.box( model, a, b, GLASS_D - 1, GLASS_D + 4, 32, 34, frame, skip=( "-d", ) )
+        face.box( model, a - 0.5, b + 0.5, GLASS_D - 1, GLASS_D + 6, 34, 34.6, "rw_zinc", skip=( "-d", ) )   # its sill
+    # The glass: the windows on the glass line, the door's lobby splayed back to it; a frosted band 2 in high along the
+    # panes' feet, and the opening hours in white vinyl at eye height by the door
+    transom = top - 30
+    for a, b in spans:
+        if b - a > 4:
+            face.quad( model, "bd_frost", a + 3, b - 3, 34.6, 36.6, GLASS_D + 0.12 )
+    if near and door is not None:
+        hx = door[0] - 8 - 16 if door[0] - 8 - r0 > 30 else door[1] + 8 + 6
+        face.quad( model, "bd_vinyl", hx, hx + 10, 56, 70, GLASS_D + 0.12 )
+    if door is None:
+        face.quad( model, "bd_shop_glass", r0, r1, 34, top - 7, GLASS_D )
+    else:
+        a, b = door
+        face.quad( model, "bd_shop_glass", r0, a - 8, 34, top - 7, GLASS_D )
+        face.quad( model, "bd_shop_glass", b + 8, r1, 34, top - 7, GLASS_D )
+        face.quad( model, "bd_shop_glass", a - 8, b + 8, transom, top - 7, GLASS_D )
+        dl = GLASS_D - LOBBY
+        for x0, x1, towards in ( ( a - 8, a, 1.0 ), ( b + 8, b, -1.0 ) ):
+            pts = [ face.p( x0, GLASS_D, 34 ), face.p( x1, dl, 34 ), face.p( x1, dl, transom ), face.p( x0, GLASS_D, transom ) ]
+            facing( model, "bd_shop_glass", pts, face.R * towards + face.D * 0.4 )
+            # Its stall riser, splayed as the glass
+            for zz0, zz1, paint in ( ( 16, 32, riser ), ( 32, 34, frame ) ):
+                pts = [ face.p( x0, GLASS_D, zz0 ), face.p( x1, dl, zz0 ), face.p( x1, dl, zz1 ), face.p( x0, GLASS_D, zz1 ) ]
+                facing( model, paint, pts, face.R * towards + face.D * 0.4 )
+            for zz in ( 32.0, transom - 1.5 ):
+                rod( model, face.p( x0, GLASS_D + 0.4, zz + 1 ), face.p( x1, dl + 0.4, zz + 1 ), 2.0, frame )
+        # The lobby: a terrazzo floor a step up from the pavement, a coir mat, its soffit, the door at the back
+        face.box( model, a - 8, b + 8, GLASS_D, 0, 0, 8, { "default": "ashlar_grey", "+z": "rw_terrazzo" }, skip=( "-d", "-z" ) )
+        lob = [ face.p( a - 8, GLASS_D, 8 ), face.p( b + 8, GLASS_D, 8 ), face.p( b, dl, 8 ), face.p( a, dl, 8 ) ]
+        facing( model, "rw_terrazzo", lob, face.Z )
+        face.level( model, "rw_rubber", a + 4, b - 4, dl + 4, dl + 20, 8.4 )
+        soffit = [ face.p( a - 8, GLASS_D, transom ), face.p( b + 8, GLASS_D, transom ), face.p( b, dl, transom ),
+                   face.p( a, dl, transom ) ]
+        facing( model, "render_pale", soffit, -face.Z )
+        face.quad( model, frame, a, b, 8, transom, dl )
+        face.quad( model, "bd_shop_glass", a + 4, b - 4, 40, transom - 6, dl + 0.3 )
+        face.quad( model, "bd_windows", a + 4, b - 4, 40, transom - 6, dl - 1.0, uv=bd_uv( "WINDOWS", 4 ) )
+        face.box( model, a + 4, b - 4, dl, dl + 1.2, 12, 38, frame, skip=( "-d", ) )
+        face.box( model, b - 9, b - 7.5, dl, dl + 3.5, 46, 64, "rw_steel", skip=( "-d", ) )          # the door's bar handle
+    # The frame: posts at the ends and between the lights, the transom bar, the head
+    f = GLASS_D + 0.3
+    face.box( model, r0, r0 + 3, f, f + 2.5, 34, top - 7, frame, skip=( "-d", ) )
+    face.box( model, r1 - 3, r1, f, f + 2.5, 34, top - 7, frame, skip=( "-d", ) )
+    face.box( model, r0, r1, f, f + 2.5, transom - 1.5, transom + 1.5, frame, skip=( "-d", ) )
+    if near:
+        lights = [ s for s in spans if s[1] - s[0] > 4 ]
+        for a, b in lights:
+            count = max( 1, int( ( b - a ) / 72 ) )
+            for k in range( 1, count ):
+                r = a + ( b - a ) * k / count
+                face.box( model, r - 1.2, r + 1.2, f, f + 2.2, 34, transom, frame, skip=( "-d", ) )
+        count = max( 2, int( ( r1 - r0 ) / 36 ) )
+        for k in range( 1, count ):
+            r = r0 + ( r1 - r0 ) * k / count
+            if door is None or not door[0] - 10 < r < door[1] + 10:
+                face.box( model, r - 0.8, r + 0.8, f, f + 1.6, transom, top - 7, frame, skip=( "-d", ) )
+    shop_room( model, face, u, top, door, key, near )
+
+
+def shop_room( model, face, u, top, door, key, near ):
+    """ The shop behind its glass (inside the house's collision): a terrazzo floor, pale walls, opal panels in the
+    ceiling. Near, its trade's own fittings: a wall of shelves 10 deep with the goods on them and price tickets on their
+    edges, a glass-fronted counter, a clock and a board on the side wall; far, the back wall as a picture. """
+    r0, r1 = u.r0 + 2, u.r1 - 2
+    back = GLASS_D - ROOM
+    ceil = top + 6
+    dfront = GLASS_D - 0.5
+    kind = SHOP_KIND.get( u.sign, "pharmacy" )
+    wall = { "bakery": "bd_room_cream", "cafe": "bd_room_ochre", "books": "bd_room_cream", "flowers": "bd_room_sage" }.get( kind, "bd_room_pale" )
+    face.level( model, "rw_terrazzo", r0, r1, back, dfront, 16 )
+    face.level( model, "bd_room_ceiling", r0, r1, back, dfront, ceil, -1.0 )
+    face.side( model, wall, r0, back, dfront, 16, ceil, 1.0 )
+    face.side( model, wall, r1, back, dfront, 16, ceil, -1.0 )
+    if near:
+        # The back wall: its own self-light bright under the lamps and gone 30 in over the floor (one tile of v)
+        face.quad( model, f"{wall}_back", r0, r1, 16, ceil, back,
+                   uv=[ ( 0.0, 0.0 ), ( ( r1 - r0 ) / 128.0, 0.0 ), ( ( r1 - r0 ) / 128.0, 1.0 ), ( 0.0, 1.0 ) ] )
+        shop_fitting( model, face, r0, r1, back, ceil, kind, key )
+    else:
+        k = ART.INTERIOR_KINDS.index( kind ) if ART is not None and kind in ART.INTERIOR_KINDS else 0
+        panels = max( 1, int( math.ceil( ( r1 - r0 ) / 150.0 ) ) )
+        for j in range( panels ):
+            a = r0 + ( r1 - r0 ) * j / panels
+            b = r0 + ( r1 - r0 ) * ( j + 1 ) / panels
+            face.quad( model, "bd_interiors", a, b, 16, ceil, back, uv=bd_uv( "INTERIORS", k ) )
+    face.box( model, r0, r1, back, back + 4, 16, 20, "rw_steel_dark", skip=( "-d", ) )     # the skirting
+    # Ceiling lights: near, pendant lamps on 24 in drops (an enamel cone 14 in across, its opal underside lit) with
+    # their warm pool on the ceiling; far, soft opal panels
+    count = max( 2, int( ( r1 - r0 ) / 80 ) )
+    for j in range( count ):
+        r = r0 + ( r1 - r0 ) * ( j + 0.5 ) / count
+        if near:
+            pendant( model, face, r, back + ROOM * 0.55, ceil )
+            continue
+        for dd in ( back + ROOM * 0.3, back + ROOM * 0.75 ):
+            face.box( model, r - 10, r + 10, dd - 10, dd + 10, ceil - 1.5, ceil, { "default": "rw_steel", "-z": "bd_light_soft" },
+                      skip=( "+z", ) )
+    if not near:
+        return
+    # The counter on the door's far side, a glass-fronted display case; a clock and a board on the side wall
+    side = 1.0 if door is None or ( door[0] + door[1] ) / 2 < ( r0 + r1 ) / 2 else -1.0
+    ca, cb = ( r1 - 96, r1 - 18 ) if side > 0 else ( r0 + 18, r0 + 96 )
+    counter( model, face, ca, cb, back + 34, back + 58, kind, key )
+    wall_r, towards = ( r1 - 0.3, -1.0 ) if side > 0 else ( r0 + 0.3, 1.0 )
+    disc( model, face, wall_r, back + 92, top - 26, 6.0, towards, "bd_clock", ( 0.0, 0.0, 1.0, 1.0 ) )
+    board = [ face.p( wall_r, back + 60, top - 70 ), face.p( wall_r, back + 90, top - 70 ), face.p( wall_r, back + 90, top - 50 ),
+              face.p( wall_r, back + 60, top - 50 ) ]
+    facing( model, "bd_menu", board, face.R * towards, uv=[ ( 0, 0 ), ( 1, 0 ), ( 1, 0.67 ), ( 0, 0.67 ) ] )
+    if r1 - r0 > 170 and kind not in ( "clothes", ):
+        m = ( r0 + r1 ) / 2 + side * -30          # a low table of goods by the window
+        face.box( model, m - 20, m + 20, GLASS_D - 34, GLASS_D - 12, 16, 40, { "default": "planks_dark", "+z": "planks" } )
+        goods_row( model, face, m - 18, m + 18, GLASS_D - 26, 40, kind, ( *key, "table" ), depth=8 )
+
+
+def pendant( model, face, r, d, ceil ):
+    """ A shop's pendant lamp at ( r, d ) under the ceiling: a ceiling rose, a 24 in cord, a conical enamel shade 14 in
+    across with its lit opal inside and bulb, and the warm pool it throws on the ceiling round it (bd_light_halo). """
+    p = face.p( r, d, 0 )
+    c = ( p[0], p[1] )
+    lathe( model, c, [ ( 2.6, ceil ), ( 2.6, ceil - 0.8 ), ( 0.0, ceil - 1.0 ) ], "rw_satin_black", sides=8, cap=False )
+    zt = ceil - 24.0
+    rod( model, ( *c, ceil - 0.8 ), ( *c, zt + 9.0 ), 0.35, "rw_satin_black" )
+    zb = zt
+    lathe( model, c, [ ( 7.0, zb ), ( 6.7, zb + 1.2 ), ( 4.2, zb + 5.0 ), ( 1.6, zb + 8.0 ), ( 0.9, zb + 9.0 ), ( 0.0, zb + 9.3 ) ],
+           "bd_enamel_dark", sides=12, cap=False )
+    lathe( model, c, [ ( 1.4, zb + 7.6 ), ( 4.0, zb + 4.6 ), ( 6.6, zb + 0.6 ) ], "bd_lamp", sides=12, cap=False )   # its inside
+    lathe( model, c, [ ( 0.0, zb + 4.6 ), ( 1.6, zb + 3.6 ), ( 1.9, zb + 2.6 ), ( 1.2, zb + 1.3 ), ( 0.0, zb + 1.0 ) ], "bd_lamp",
+           sides=8, cap=False )                                                                   # the bulb, opal
+    lathe( model, c, [ ( 7.0, zb ), ( 7.2, zb - 0.2 ), ( 6.6, zb + 0.6 ) ], "rw_steel", sides=12, cap=False )   # its rolled rim
+    rim = [ face.p( r + 40.0 * math.cos( 2 * math.pi * k / 16 ), d + 40.0 * math.sin( 2 * math.pi * k / 16 ), ceil - 0.25 )
+            for k in range( 16 ) ]
+    uv = [ ( 0.5 + 0.5 * math.cos( 2 * math.pi * k / 16 ), 0.5 + 0.5 * math.sin( 2 * math.pi * k / 16 ) ) for k in range( 16 ) ]
+    facing( model, "bd_light_halo", rim, -face.Z, uv=uv )
+
+
+def dome( model, paint, centre, axes, half, rings=4, segs=10, base=0.92 ):
+    """ A smooth half-ellipsoid (a loaf, a roll) standing on centre: axes ( x, y, up ) unit vectors, half its sizes
+    ( a, b, h ) along them; its foot pulled in to base of its width, as a loaf sits. """
+    centre = np.asarray( centre, float )
+    x, y, z = ( np.asarray( v, float ) for v in axes )
+    a, b, h = half
+
+    def point( i, j ):
+        th = 2 * math.pi * i / segs
+        ph = 0.5 * math.pi * j / rings
+        sq = base + ( 1 - base ) * min( j, 1 )
+        lx, ly, lz = a * math.cos( ph ) * math.cos( th ) * sq, b * math.cos( ph ) * math.sin( th ) * sq, h * math.sin( ph )
+        n = K.normalise( x * ( lx / ( a * a ) ) + y * ( ly / ( b * b ) ) + z * ( lz / ( h * h ) ) + z * ( 0.6 if j == 0 else 0.0 ) )
+        return centre + x * lx + y * ly + z * lz, n
+
+    for j in range( rings ):
+        for i in range( segs ):
+            corners = [ point( i, j ), point( i + 1, j ), point( i + 1, j + 1 ), point( i, j + 1 ) ]
+            if j == rings - 1:
+                corners = corners[:3]
+            pts = [ q for q, _ in corners ]
+            nrm = [ n for _, n in corners ]
+            out = sum( nrm ) / len( nrm )
+            nrm_face = np.cross( pts[1] - pts[0], pts[2] - pts[0] )
+            if np.dot( nrm_face, out ) < 0:
+                pts, nrm = pts[:1] + pts[:0:-1], nrm[:1] + nrm[:0:-1]
+            model.polygon( paint, pts, normals=nrm )
+
+
+BAKERY_LOAVES = ( "round", "long", "mixed", "round", "long" )
+
+
+def bakery_item( model, face, r, b, d, z, depth, key, k ):
+    """ One loaf on a bakery's shelf at r (its front at d), or a gap; the shelf's kind of loaf and how full it is come
+    from the shelf's key: round Landbrot 10 in across, long Mischbrot 14 x 5 in laid along the shelf, or both. Returns
+    the width it took (None when no more fit). """
+    kk = ( *key, k )
+    row = pick( BAKERY_LOAVES, *key, "loaf" )
+    fill = between( 0.55, 1.0, *key, "fill" )                   # 3-6 a shelf: some sold, a gap or two
+    long = row == "long" or ( row == "mixed" and ( k + int( unit( *key, "m" ) * 2 ) ) % 2 == 0 )
+    w = ( between( 13.0, 15.0, *kk ) if long else between( 9.0, 10.8, *kk ) )
+    if r + w > b:
+        return None
+    if not chance( fill, *kk, "there" ):
+        return w * 0.8
+    yaw = between( -0.12, 0.12, *kk, "yaw" )
+    x = face.R * math.cos( yaw ) + face.D * math.sin( yaw )
+    y = np.cross( face.Z, x )
+    c = face.p( r + w / 2, d - depth / 2 - ( 0.0 if long else between( -0.5, 0.5, *kk, "d" ) ), z )
+    if long:
+        dome( model, "bd_crust", c, ( x, y, face.Z ), ( w / 2, between( 2.4, 2.8, *kk, "b" ), between( 3.4, 4.2, *kk, "h" ) ),
+              rings=4, segs=12, base=0.85 )
+    else:
+        rr = w / 2
+        dome( model, "bd_crust", c, ( x, y, face.Z ), ( rr, rr * between( 0.92, 1.0, *kk, "e" ), between( 3.6, 4.6, *kk, "h" ) ),
+              rings=4, segs=10, base=0.9 )
+    return w
+
+
+def bakery_baskets( model, face, x0, x1, d, z, key ):
+    """ The top shelf: wicker baskets of rolls 16 x 12 in, tipped 15 degrees forwards to show them, one or two a bay. """
+    n = 2 if x1 - x0 > 36 and chance( 0.6, *key, "two" ) else 1
+    for m in range( n ):
+        kk = ( *key, "basket", m )
+        span = ( x1 - x0 ) / n
+        cx = x0 + span * ( m + 0.5 ) + between( -2, 2, *kk )
+        tilt = math.radians( 15.0 )
+        x = face.R
+        y = face.D * math.cos( tilt ) - face.Z * math.sin( tilt )        # tipped forwards, its rim to the shop
+        up = np.cross( x, y )
+        if up[2] < 0:
+            up = -up
+        y = np.cross( up, x )
+        base = face.p( cx, d - 6.0, z + 1.6 )
+        W, D, H, t = 15.0, 11.0, 4.5, 0.6
+
+        def at( lx, ly, lz ):
+            return base + x * lx + y * ly + up * lz
+
+        model.oriented_box( at( 0, 0, t / 2 ), ( x, y, up ), ( W, D, t ), "bd_wicker" )
+        for sx, sy, sz in ( ( W / 2 - t / 2, 0, None ), ( -W / 2 + t / 2, 0, None ), ( 0, D / 2 - t / 2, "d" ), ( 0, -D / 2 + t / 2, "d" ) ):
+            size = ( t, D, H ) if sz is None else ( W, t, H )
+            model.oriented_box( at( sx, sy, H / 2 ), ( x, y, up ), size, "bd_wicker" )
+        count = int( between( 6, 10, *kk, "rolls" ) )
+        for q in range( count ):
+            lx = between( -W / 2 + 2.2, W / 2 - 2.2, *kk, q, "x" )
+            ly = between( -D / 2 + 2.0, D / 2 - 2.0, *kk, q, "y" )
+            lz = t + ( 1.6 if q >= count * 0.6 else 0.0 )
+            dome( model, "bd_crust", at( lx, ly, lz ), ( x, y, up ), ( 1.6, 1.5, 1.5 ), rings=3, segs=8, base=0.95 )
+
+
+def pretzel_tray( model, face, r, d, z, key ):
+    """ A steel tray of pretzels on a bakery's counter: lye-brown rings with their knot across. """
+    face.box( model, r, r + 18, d - 12, d, z, z + 0.8, "rw_steel", skip=() )
+    for q in range( 5 ):
+        cr = r + 3.2 + ( q % 3 ) * 5.6 + ( 2.8 if q >= 3 else 0.0 )
+        cd = d - 3.4 - ( 5.0 if q >= 3 else 0.0 )
+        p = face.p( cr, cd, z + 0.8 )
+        prof = [ ( 2.2 + 0.75 * math.cos( t ), z + 0.8 + 0.75 + 0.75 * math.sin( t ) )
+                 for t in ( -math.pi / 2, -math.pi / 6, math.pi / 6, math.pi / 2, 5 * math.pi / 6, 7 * math.pi / 6, 3 * math.pi / 2 ) ]
+        lathe( model, ( p[0], p[1] ), prof, "bd_crust", sides=9, turn=q, cap=False )
+        a = face.p( cr - 2.2, cd + between( -0.8, 0.8, *key, "pz", q ), z + 1.6 )
+        b = face.p( cr + 2.2, cd - between( -0.8, 0.8, *key, "pz", q, "b" ), z + 1.6 )
+        rod( model, a, b, 1.0, "bd_crust" )
+
+
+def disc( model, face, r, d, z, radius, towards, paint, uv_rect, sides=16 ):
+    """ A round plate on a side wall (r fixed), facing +R ( towards 1 ) or -R, its picture uv_rect ( u0, v0, u1, v1 ). """
+    u0, v0, u1, v1 = uv_rect
+    pts, uv = [], []
+    for k in range( sides ):
+        a = 2 * math.pi * k / sides
+        pts.append( face.p( r, d + radius * math.cos( a ) * -towards, z + radius * math.sin( a ) ) )
+        uv.append( ( u0 + ( u1 - u0 ) * ( 0.5 + 0.5 * math.cos( a ) ), v0 + ( v1 - v0 ) * ( 0.5 + 0.5 * math.sin( a ) ) ) )
+    facing( model, paint, pts, face.R * towards, uv=uv )
+
+
+def goods_uv( kind, *key ):
+    """ A packaging front from bd_goods ( BL, BR, TR, TL ). """
+    if ART is None:
+        return None
+    cells = ART.GOODS_KINDS[kind]
+    return bd_uv( "GOODS", cells[int( unit( *key ) * len( cells ) ) % len( cells )] )
+
+
+def goods_row( model, face, a, b, d, z, kind, key, depth=8.0 ):
+    """ A shelf's goods from r a to b, standing on z with their fronts at d (their backs depth behind it). """
+    r, k = a + 0.6, 0
+    while r < b - 1.5:
+        kk = ( *key, k )
+        if kind == "bakery":
+            w = bakery_item( model, face, r, b, d, z, depth, key, k )
+            if w is None:
+                break
+        elif kind == "drinks" or ( kind == "cafe" and k % 3 == 0 ):
+            w = 3.0
+            c = face.p( r + 1.5, d - 2.0, z )
+            paint = pick( ( "rw_bottle_cola", "rw_bottle_water", "rw_bottle_orange", "rw_bottle_apple", "rw_bottle_lemon",
+                            "rw_bottle_tea" ), *kk )
+            if chance( 0.35, *kk, "can" ):
+                face.box( model, r, r + 2.6, d - 2.6, d, z, z + 4.8, "rw_steel_grey" )
+                face.quad( model, "bd_goods", r, r + 2.6, z, z + 4.8, d + 0.05, uv=goods_uv( "can", *kk ) )
+            else:
+                lathe( model, ( c[0], c[1] ), [ ( 1.4, z ), ( 1.4, z + 6.0 ), ( 0.55, z + 8.0 ), ( 0.5, z + 9.4 ) ], paint, sides=6,
+                       turn=k )
+        elif kind == "books":
+            w = between( 1.0, 2.2, *kk )
+            h = between( 7.0, 10.5, *kk, "h" )
+            lean = chance( 0.06, *kk, "gap" )
+            if lean:
+                w = 3.0
+            else:
+                face.box( model, r, r + w, d - 6.5, d, z, z + h, pick( ( "bd_paint_red", "bd_paint_blue", "bd_paint_green",
+                                                                         "bd_paint_brown", "bd_paint_white" ), *kk, "c" ) )
+                g = goods_uv( "spine", *kk )
+                if g:                    # the spine's picture turned upright
+                    face.quad( model, "bd_goods", r, r + w, z, z + h, d + 0.05, uv=[ g[1], g[2], g[3], g[0] ] )
+        elif kind == "flowers":
+            w = 9.0
+            if r + w > b:
+                break
+            c = face.p( r + 4.5, d - 4.5, z )
+            lathe( model, ( c[0], c[1] ), [ ( 3.2, z ), ( 3.8, z + 7 ), ( 3.9, z + 7.5 ) ], "rw_steel_grey", sides=8, cap=False )
+            h = between( 9, 16, *kk )
+            lathe( model, ( c[0], c[1] ), [ ( 3.0, z + 7 ), ( 5.0, z + h * 0.7 ), ( 3.5, z + h ), ( 0.0, z + h + 1.5 ) ],
+                   pick( ( "hedge", "bd_tree" ), *kk, "g" ), sides=7, turn=k )
+            for f in range( 5 ):
+                q = face.p( r + 4.5 + between( -3, 3, *kk, f ), d - 4.5 + between( -3, 3, *kk, f, "d" ), z + h * 0.85 )
+                lathe( model, ( q[0], q[1] ), [ ( 1.2, z + h * 0.85 ), ( 1.6, z + h * 0.85 + 1.2 ), ( 0.0, z + h * 0.85 + 2.2 ) ],
+                       pick( ( "canvas_red", "bd_paint_white", "rw_yellow_paint", "canvas_red", "bd_burgundy" ), *kk, "f", f ),
+                       sides=5 )
+        elif kind == "clothes":
+            w = between( 2.0, 3.2, *kk )
+            face.box( model, r, r + w, d - 14, d - 1, z - between( 22, 34, *kk, "l" ), z,
+                      pick( ( "canvas_blue", "canvas_plain", "canvas_red", "canvas_green", "rw_satin_black", "bd_paint_white" ), *kk ) )
+        else:                            # pharmacy, optician, cafe: printed boxes and jars
+            jar = kind in ( "cafe", "optician" ) and chance( 0.5, *kk, "jar" )
+            w = between( 2.4, 4.6, *kk ) if not jar else 3.4
+            h = between( 3.0, 6.5, *kk, "h" ) if not jar else 4.4
+            if r + w > b:
+                break
+            face.box( model, r, r + w, d - between( 2.5, 5.5, *kk, "d" ), d, z, z + h,
+                      "rw_steel_grey" if jar else pick( ( "bd_paint_white", "bd_steel_white", "canvas_plain" ), *kk, "b" ) )
+            face.quad( model, "bd_goods", r, r + w, z, z + h, d + 0.05, uv=goods_uv( "jar" if jar else "box", *kk ) )
+        r += w + between( 0.15, 0.9, *kk, "gap" )
+        k += 1
+
+
+def shop_fitting( model, face, r0, r1, back, ceil, kind, key ):
+    """ The back wall's fitting: uprights every ~40 in, shelves 10 deep with their goods and price tickets on their
+    edges, a cornice board over it all; a clothes shop's rails instead. """
+    wood = { "bakery": "bd_shelf_oak", "books": "bd_shelf_oak", "cafe": "bd_shelf_dark", "flowers": "bd_shelf_oak" }.get( kind, "bd_shelf_white" )
+    a, b = r0 + 4, r1 - 4
+    top = min( ceil - 14, 136.0 )
+    if kind == "clothes":
+        for z in ( 110.0, 66.0 ):
+            rod( model, face.p( a, back + 10, z ), face.p( b, back + 10, z ), 1.0, "rw_steel" )
+            goods_row( model, face, a + 2, b - 2, back + 18, z - 1, kind, ( *key, "rail", z ) )
+        return
+    bays = max( 1, int( round( ( b - a ) / 40.0 ) ) )
+    for j in range( bays + 1 ):
+        r = a + ( b - a ) * j / bays
+        face.box( model, r - 0.75, r + 0.75, back, back + 11, 16, top, wood, skip=( "-d", ) )
+    levels = ( 22.0, 46.0, 70.0, 94.0, 118.0 ) if top > 128 else ( 22.0, 46.0, 70.0, 94.0 )
+    for z in levels:
+        face.box( model, a, b, back, back + 10, z - 1.2, z, wood, skip=( "-d", ) )
+        if z < 30 and kind in ( "bakery", "flowers" ):
+            continue
+        for j in range( bays ):
+            x0 = a + ( b - a ) * j / bays + 1.0
+            x1 = a + ( b - a ) * ( j + 1 ) / bays - 1.0
+            if kind == "bakery" and z == levels[-1]:
+                bakery_baskets( model, face, x0, x1, back + 9.5, z, ( *key, "shelf", z, j ) )
+                continue
+            goods_row( model, face, x0, x1, back + 9.5, z, kind, ( *key, "shelf", z, j ) )
+            for t in range( 2 ):                # price tickets on the shelf's edge
+                x = x0 + ( x1 - x0 ) * ( 0.25 + 0.5 * t ) + between( -3, 3, *key, z, j, t )
+                face.quad( model, "bd_paint_white", x, x + 2.2, z - 2.4, z - 0.9, back + 10.06 )
+    face.box( model, a - 1, b + 1, back, back + 12, top, top + 3, wood, skip=( "-d", ) )
+    if kind in ( "bakery", "flowers" ):        # baskets of rolls or buckets on the floor in front of the fitting
+        goods_row( model, face, a + 4, b - 4, back + 22, 16, kind, ( *key, "floor" ), depth=10 )
+
+
+def counter( model, face, ca, cb, d0, d1, kind, key ):
+    """ A shop counter 36 high: a plinth, a display case with a glass front 2 in behind its white frame and a few goods
+    in it, a steel top, and a till on it. """
+    face.box( model, ca, cb, d0 + 2, d1, 16, 21, "rw_satin_black" )
+    face.box( model, ca, cb, d0, d1, 21, 26, "bd_steel_white", skip=( "-d", ) )
+    for x in ( ca, cb ):
+        face.box( model, x - ( 0 if x == ca else 2 ), x + ( 2 if x == ca else 0 ), d0, d1, 26, 50, "bd_steel_white", skip=( "-d", ) )
+    face.box( model, ca, cb, d0, d1, 26, 26.3, "bd_paint_white", skip=( "-d", ) )                 # the case's floor
+    face.quad( model, "bd_paint_white", ca + 2, cb - 2, 26, 50, d0 + 6 )                            # its back
+    goods_row( model, face, ca + 3, cb - 3, d1 - 3, 26.3, kind if kind != "clothes" else "pharmacy", ( *key, "case" ), depth=6 )
+    face.quad( model, "bd_shop_glass", ca + 2, cb - 2, 26, 49, d1 - 2 )
+    face.box( model, ca, cb, d1 - 2.4, d1, 48.5, 50, "bd_steel_white", skip=( "-d", ) )
+    face.box( model, ca - 1, cb + 1, d0 - 1, d1 + 1.5, 50, 52, "rw_steel" )
+    face.box( model, ca + 50 if cb - ca > 70 else ca + 10, ( ca + 64 ) if cb - ca > 70 else ca + 24, d0 + 6, d0 + 16, 52, 58,
+              "rw_satin_black" )                                                                   # the till
+    if kind == "bakery" and cb - ca > 60:
+        pretzel_tray( model, face, ca + 6, d1 - 4, 52, key )
+
+
+def shifted_out( face, d ):
+    """ The same face moved d out. """
+    f = Face( ( 0, 0 ), ( face.D[0], face.D[1] ) )
+    f.o = face.o + face.D * d
+    return f
+
+
+def dish( model, p, face, key, radius=8.0 ):
+    """ A satellite dish on a balcony's railing, aimed up and south-ish: an offset paraboloid of 12 facets on a
+    bracket, its feed arm and LNB. """
+    p = np.asarray( p, float )
+    out = face.D * 0.55 + np.array( ( 0.0, -0.45, 0.0 ) ) + np.array( ( 0.0, 0.0, 0.55 ) )
+    out = out / np.linalg.norm( out )
+    side = np.cross( out, ( 0.0, 0.0, 1.0 ) )
+    side /= max( np.linalg.norm( side ), 1e-6 )
+    up = np.cross( side, out )
+    rim = [ p + radius * ( math.cos( 2 * math.pi * k / 12 ) * side + math.sin( 2 * math.pi * k / 12 ) * up * 1.08 )
+            for k in range( 12 ) ]
+    hub = p - out * 2.6
+    for a, b in zip( rim, rim[1:] + rim[:1] ):
+        facing( model, "rw_white_paint", [ a, b, hub ], out )
+        facing( model, "rw_steel_grey", [ hub, b, a ], -out )
+    rod( model, hub, p - face.D * 10 - up * 4, 1.0, "rw_steel_grey" )
+    lnb = p + out * 9 - up * 5
+    rod( model, p - up * radius * 0.95, lnb, 0.6, "rw_steel_grey" )
+    model.box( lnb - 1.2, lnb + 1.2, "rw_satin_black" )
+
+
+def sooted( wall ):
+    """ A render's sooted version for the top storeys (bd_soot_*), or the wall itself. """
+    if wall.startswith( "bd_render_" ):
+        wall = wall[3:]
+    if ART is not None and wall.startswith( "render_" ) and wall in ART.SOOTED:
+        return f"bd_soot_{wall[7:]}"
+    return wall
+
+
+def window_box( model, face, a, b, z, key ):
+    """ A flower box on two iron brackets on the sill: geraniums or ivy over its rim. """
+    face.box( model, a - 2, b + 2, 3, 11, z - 3, z + 5, pick( ( "planks_dark", "iron_green", "rw_steel_dark", "iron_green" ), *key, "bx" ) )
+    for r in ( a + 4, b - 6 ):
+        face.box( model, r, r + 1.2, 0, 10, z - 6, z - 3, "iron_black" )
+    face.level( model, "soil", a - 1, b + 1, 4, 10, z + 5.15 )
+    n = max( 3, int( ( b - a ) / 9 ) )
+    for k in range( n ):
+        r = a + ( b - a ) * ( k + 0.5 ) / n + between( -2, 2, *key, k )
+        h = between( 7, 13, *key, "h", k )
+        p = face.p( r, 7, z + 5 )
+        lathe( model, ( p[0], p[1] ), [ ( 4.2, z + 3 ), ( 6.0, z + 4 + h * 0.45 ), ( 3.0, z + 4 + h ), ( 0.0, z + 5 + h ) ],
+               pick( ( "hedge", "bd_tree", "hedge", "lawn" ), *key, "pl", k ), sides=6, turn=k )
+        if chance( 0.55, *key, "fl", k ):
+            q = face.p( r + 1.5, 10.5, z + 3 + h )
+            lathe( model, ( q[0], q[1] ), [ ( 1.5, z + 2 + h ), ( 1.8, z + 3.5 + h ), ( 0.0, z + 4.5 + h ) ],
+                   pick( ( "canvas_red", "rw_red_paint", "bd_paint_white", "canvas_red" ), *key ), sides=5 )
+
+
+def shop_piers( model, face, width, units, g, look, key ):
+    """ The piers between the ground floor's openings: a pilaster 2 proud with a moulded base and a capital under the
+    string course; a fly-posted bill on some. """
+    edges = sorted( ( u.r0, u.r1, u.kind ) for u in units )
+    shops = [ ( a, b ) for a, b, kind in edges if kind == "shop" ]
+    for k, ( a, b ) in enumerate( shops ):
+        for x0, x1 in ( ( a - 12, a ), ( b, b + 12 ) ):
+            if x0 < 1 or x1 > width - 1:
+                continue
+            face.box( model, x0, x1, 0, 2, 16, g - 26, look.ground_paint )
+            face.box( model, x0 - 1, x1 + 1, 0, 3.5, 16, 22, look.plinth )
+            face.box( model, x0 - 1.5, x1 + 1.5, 0, 4, g - 26, g - 20, look.dressing )
+            face.box( model, x0 - 0.5, x1 + 0.5, 0, 3, g - 20, g - 14, look.dressing )
+        if chance( 0.25, key, "poster", k ) and ART is not None:
+            x = b if b + 24 < width else a - 24
+            atlas_quad( model, face, "rw_posters", pick( POSTERS, key, "pname", k ), x + 2.5, x + 21.5, 54, 81, 2.05 )
+
+
+def canvas_awning( model, face, r0, r1, z, key ):
+    """ A folding-arm canvas awning out 2 m from its box at z, its hem at 2.35 m with a valance. """
+    out, drop = 78.0, 28.0
+    way = pick( ( "green", "red", "blue", "grey", "green" ), *key, "way" )
+    v0, v1 = ART.awning_v( way ) if ART is not None else ( 0.0, 1.0 )
+    u1 = ( r1 - r0 ) / 64.0
+    hem = z - drop
+    pts = [ face.p( r0, 7, z ), face.p( r1, 7, z ), face.p( r1, out, hem ), face.p( r0, out, hem ) ]
+    uv = [ ( 0.0, v1 ), ( u1, v1 ), ( u1, v0 + ( v1 - v0 ) * 0.25 ), ( 0.0, v0 + ( v1 - v0 ) * 0.25 ) ]
+    facing( model, "bd_awning", pts, face.D * drop + face.Z * out, uv=uv )
+    facing( model, "bd_awning", pts[::-1], -( face.D * drop + face.Z * out ), uv=uv[::-1] )
+    # The valance, scalloped: a curve dipping 3 in under each 8 in (a stripe pair)
+    vz = hem - 7
+    va, vb = v0, v0 + ( v1 - v0 ) * 0.25
+    count = max( 1, int( round( ( r1 - r0 ) / 8.0 ) ) )
+    for k in range( count ):
+        a, b = r0 + ( r1 - r0 ) * k / count, r0 + ( r1 - r0 ) * ( k + 1 ) / count
+        rz = [ ( a, hem ), ( a, vz ), ( a + ( b - a ) * 0.25, vz - 2.2 ), ( ( a + b ) / 2, vz - 3.0 ), ( a + ( b - a ) * 0.75, vz - 2.2 ),
+               ( b, vz ), ( b, hem ) ]
+        uv = [ ( ( r - r0 ) / 64.0, va + ( vb - va ) * ( z - ( vz - 3 ) ) / ( hem - vz + 3 ) ) for r, z in rz ]
+        facing( model, "bd_awning", [ face.p( r, out, z ) for r, z in rz ], face.D, uv=uv )
+        facing( model, "bd_awning", [ face.p( r, out - 0.3, z ) for r, z in rz ], -face.D, uv=uv )
+    # The front bar and the two folding arms down to the box
+    rod( model, face.p( r0, out + 0.6, hem + 0.5 ), face.p( r1, out + 0.6, hem + 0.5 ), 1.6, "rw_steel_grey" )
+    for r in ( r0 + 10, r1 - 10 ):
+        knee = face.p( r, out * 0.5, z - drop * 0.5 - 4 )
+        rod( model, face.p( r, 6, z - 4 ), knee, 1.2, "rw_steel_grey" )
+        rod( model, knee, face.p( r, out - 1, hem + 1.5 ), 1.2, "rw_steel_grey" )
+
+
+def bracket_sign( model, face, r, g, sign ):
+    """ A double-sided hanging sign out on a bracket at 3 m: the shop's mark on a 24 x 16 plate. """
+    z = g - 2
+    rod( model, face.p( r, 0, z + 2 ), face.p( r, 30, z + 2 ), 1.0, "iron_black" )
+    rod( model, face.p( r, 0, z - 12 ), face.p( r, 14, z + 2 ), 0.8, "iron_black" )
+    face.box( model, r - 1.5, r + 1.5, -0.5, 2, z - 6, z + 6, "iron_black" )
+    u0, v0, u1, v1 = rect_uv( "rw_shopsigns", sign )
+    u1 = u0 + ( u1 - u0 ) * 0.3
+    for towards, uv in ( ( 1.0, [ ( u0, v0 ), ( u1, v0 ), ( u1, v1 ), ( u0, v1 ) ] ),
+                         ( -1.0, [ ( u1, v0 ), ( u0, v0 ), ( u0, v1 ), ( u1, v1 ) ] ) ):
+        rr = r + towards * 0.8
+        pts = [ face.p( rr, 6, z - 16 ), face.p( rr, 30, z - 16 ), face.p( rr, 30, z ), face.p( rr, 6, z ) ]
+        if towards < 0:
+            pts = [ face.p( rr, 30, z - 16 ), face.p( rr, 6, z - 16 ), face.p( rr, 6, z ), face.p( rr, 30, z ) ]
+        facing( model, "rw_shopsigns", pts, face.R * towards, uv=uv )
+    face.box( model, r - 0.8, r + 0.8, 5.5, 30.5, z - 16.5, z + 0.5, { "default": "rw_steel_dark", "+r": None, "-r": None } )
+
+
+def roller_shutter( model, face, r0, r1, z0, z1, d, key=None ):
+    """ A roller shutter down: its perforated slats (bd_shutter, 64 x 128 in a tile), guide rails 3 in deep, the bottom
+    rail with its lock, and (keyed) a poster taped on at eye height. """
+    uv = [ ( 0.0, 0.0 ), ( ( r1 - r0 ) / 64.0, 0.0 ), ( ( r1 - r0 ) / 64.0, ( z1 - z0 ) / 128.0 ), ( 0.0, ( z1 - z0 ) / 128.0 ) ]
+    face.quad( model, "bd_shutter", r0 + 3, r1 - 3, z0, z1, d, uv=uv )
+    for a, b in ( ( r0, r0 + 3.0 ), ( r1 - 3.0, r1 ) ):
+        face.box( model, a, b, d - 1.5, d + 2.0, z0, z1, "rw_steel_grey", skip=( "-d", ) )
+    if key is not None and r1 - r0 > 60:
+        left = chance( 0.5, *key, "poster" )
+        x = r0 + between( 14, max( 15, r1 - r0 - 40 ), *key, "poster", "x" )
+        z = 58 + between( -4, 6, *key, "poster", "z" )
+        face.quad( model, "bd_poster", x, x + 17, z, z + 25.5, d + 0.15,
+                   uv=[ ( 0.0, 0.0 ), ( 0.5, 0.0 ), ( 0.5, 1.0 ), ( 0.0, 1.0 ) ] if left else
+                   [ ( 0.5, 0.0 ), ( 1.0, 0.0 ), ( 1.0, 1.0 ), ( 0.5, 1.0 ) ] )
+        for tx, tz in ( ( x - 0.5, z + 23.5 ), ( x + 15.5, z + 23.5 ), ( x - 0.5, z - 0.5 ), ( x + 15.5, z - 0.5 ) ):
+            face.quad( model, "bd_frost", tx, tx + 2.0, tz, tz + 2.5, d + 0.2 )   # the tape
+    face.box( model, r0 + 2, r1 - 2, d - 0.5, d + 1.2, z0, z0 + 3, "rw_steel_dark", skip=( "-d", ) )
+    c = ( r0 + r1 ) / 2
+    face.box( model, c - 2, c + 2, d + 1.2, d + 2.2, z0 + 0.5, z0 + 2.5, "rw_steel" )
 
 
 def carriage_arch( model, face, u, g, look ):
@@ -542,6 +1198,24 @@ def shifted( face, r0 ):
     return f
 
 
+def scroll_console( model, face, r0, r1, z_top, paint ):
+    """ A cast-stone console under a balcony: an S-scroll in profile, 30 deep at the slab and 34 high, chamfered. """
+    prof = [ ( 0.0, -34.0 ), ( 6.0, -34.0 ), ( 12.0, -30.0 ), ( 17.0, -24.0 ), ( 20.0, -18.0 ), ( 26.0, -14.0 ), ( 30.0, -10.0 ),
+             ( 30.0, -2.0 ), ( 28.0, 0.0 ), ( 0.0, 0.0 ) ]
+    pts = [ ( d, z_top + z ) for d, z in prof ]
+    for r, towards in ( ( r0, -1.0 ), ( r1, 1.0 ) ):
+        facing( model, paint, [ face.p( r, d, z ) for d, z in pts ], face.R * towards )
+    for ( da, za ), ( db, zb ) in zip( pts[:-1], pts[1:] ):
+        if da == 0.0 and db == 0.0:
+            continue
+        n = face.D * ( zb - za ) - face.Z * ( db - da )
+        if np.linalg.norm( n ) < 1e-6:
+            continue
+        cham = 0.0
+        facing( model, paint, [ face.p( r0 + cham, da, za ), face.p( r1 - cham, da, za ), face.p( r1 - cham, db, zb ),
+                                face.p( r0 + cham, db, zb ) ], -n if np.dot( n, face.D ) < 0 and False else n )
+
+
 def bay_centres( width, look ):
     n = max( 2, int( round( ( width - 2 * look.margin ) / look.bay ) ) )
     bay = ( width - 2 * look.margin ) / n
@@ -558,9 +1232,14 @@ def front( model, face, width, look, key, units, detail="near", balconies=(), or
     near = detail == "near"
     # The ground floor
     holes, arches = [], []
+    lobbies = []
     for u in units:
         if u.kind == "shop":
             holes.append( ( u.r0, u.r1, 16, g - 52 ) )
+            door = shop_door( u ) if near else None
+            if door is not None:
+                holes.append( ( door[0] - 8, door[1] + 8, 0, 16 ) )
+                lobbies.append( ( door[0] - 8, door[1] + 8 ) )
         elif u.kind == "door":
             holes.append( ( u.r0, u.r1, 0, g - 36 ) )
         elif u.kind == "arch":
@@ -568,9 +1247,14 @@ def front( model, face, width, look, key, units, detail="near", balconies=(), or
         else:
             holes.append( ( u.r0, u.r1, 60, g - 60 ) )
     holed_wall( model, face, look.ground_paint, 0, width, 0, g - 12, holes, arches=arches )
+    for j, u in enumerate( v for v in units if v.kind == "shop" ):
+        u.index = j
     for u in units:
         if u.kind == "shop":
-            shop( model, face, u, g, look, detail )
+            if near:
+                shopfront( model, face, u, g, look, detail )
+            else:
+                shop( model, face, u, g, look, detail )
         elif u.kind == "door":
             house_door( model, face, u, g, look, detail )
         elif u.kind == "arch":
@@ -580,12 +1264,17 @@ def front( model, face, width, look, key, units, detail="near", balconies=(), or
                     panes="+" if near else "" )
             face.box( model, u.r0 - 4, u.r1 + 4, 0, 4, 55, 60, look.dressing )
     r = 0.0
-    for a, b in sorted( ( u.r0 - 9, u.r1 + 9 ) for u in units if u.kind in ( "door", "arch" ) ) + [ ( width, width ) ]:
+    gaps = [ ( u.r0 - 9, u.r1 + 9 ) for u in units if u.kind in ( "door", "arch" ) ] + list( lobbies )
+    for a, b in sorted( gaps ) + [ ( width, width ) ]:
         if a > r:
             face.box( model, r, a, 0, 2.5, 0, 16, look.plinth )
+            if near:            # the splash from the pavement, darker up to 1 m
+                face.box( model, r, a, 2.5, 2.7, 0, 9, "bd_plinth_grime", skip=( "-d", "-z", "+z" ) )
         r = max( r, b )
     ra, rb = ( -6.0 if ext[0] else 0.0 ), ( width + 6.0 if ext[1] else width )
     face.box( model, ra, rb, 0, 6, g - 12, g, look.dressing )
+    if near:
+        shop_piers( model, face, width, units, g, look, key )
     # The upper storeys
     centres, bay = bay_centres( width, look )
     hw = min( look.window, bay - 34 ) / 2
@@ -605,10 +1294,27 @@ def front( model, face, width, look, key, units, detail="near", balconies=(), or
             if k not in skip_bays:
                 holes.append( ( c - hw * 0.7, c + hw * 0.7, top_upper + 12, top_upper + 40 ) )
                 wins.append( ( c - hw * 0.7, c + hw * 0.7, top_upper + 12, top_upper + 40, 4, False ) )
-    holed_wall( model, face, look.wall, 0, width, g, eave, holes )
+    # A century of soot on the top storey and the attic: the render darker over a band at the top storey's floor
+    zs = g + ( look.storeys - 1 ) * st - 2
+    soot = sooted( look.wall )
+    if soot != look.wall:
+        holed_wall( model, face, look.wall, 0, width, g, zs, holes )
+        holed_wall( model, face, soot, 0, width, zs, eave, holes )
+        face.box( model, -4.0 if ext[0] else 0.0, width + ( 4.0 if ext[1] else 0.0 ), 0, 3.5, zs - 5, zs + 3,
+                  { "default": look.dressing, "+z": soot } )
+    else:
+        holed_wall( model, face, look.wall, 0, width, g, eave, holes )
     for a, b, z0, z1, s, french in wins:
         panes = ( "|" if french or s == 4 else "t" ) if near else ""
-        window( model, face, a, b, z0, z1, look.frame, reveal_paint=look.reveal, panes=panes )
+        wk = ( look.key, "win", round( a ), s )
+        variant = int( unit( *wk ) * 16 ) % 16
+        tilt = near and not french and s < 4 and chance( 0.125, *wk, "kipp" )
+        if tilt and ART is not None:
+            variant = getattr( ART, "WINDOW_BRIGHT", variant )      # the tipped sash catches the sky: a net behind it
+        window( model, face, a, b, z0, z1, look.frame, glass="bd_windows", reveal_paint=look.reveal, panes=panes,
+                uv=bd_uv( "WINDOWS", variant ), tilt=tilt )
+        if near and not french and s < 3 and chance( 0.16, *wk, "box" ):
+            window_box( model, face, a, b, z0 - 5, wk )
         hood = look.hoods[s] if s < 4 else None
         if not near and hood == "pediment":
             hood = "cornice"
@@ -633,13 +1339,24 @@ def front( model, face, width, look, key, units, detail="near", balconies=(), or
             continue
         c, floor = centres[k], g + s * st
         b0, b1 = c - hw - 22, c + hw + 22
-        face.box( model, b0, b1, 0, 26, floor - 8, floor + 2, look.dressing )
-        for rr in ( b0 + 6, b1 - 12 ):
-            face.box( model, rr, rr + 6, 0, 20, floor - 34, floor - 8, look.dressing )
+        bd = 38.0                       # 0.97 m deep: a slab on two consoles, a drip under its edge
+        soffit = look.wall if look.wall.startswith( ( "render", "bd_render" ) ) else "render_pale"
+        face.box( model, b0, b1, 0, bd - 2, floor - 5, floor + 2, { "default": soffit, "+z": "rw_terrazzo" } )
+        face.box( model, b0 - 1, b1 + 1, bd - 2, bd + 1, floor - 8, floor + 2, { "default": look.dressing, "+z": "rw_terrazzo" } )
+        face.box( model, b0 - 1, b1 + 1, bd - 1.5, bd + 1, floor - 9.5, floor - 8, "rw_zinc", skip=( "-d", "+z" ) )   # its drip
+        for rr in ( b0 + 8, b1 - 16 ):
+            scroll_console( model, face, rr, rr + 8, floor - 5, look.dressing )
         spacing = 5.0 if near else 12.0
-        railing( model, face.p( b0 + 1, 25, floor + 2 ), face.p( b1 - 1, 25, floor + 2 ), spacing=spacing )
-        railing( model, face.p( b0 + 1, 1, floor + 2 ), face.p( b0 + 1, 24, floor + 2 ), spacing=spacing )
-        railing( model, face.p( b1 - 1, 1, floor + 2 ), face.p( b1 - 1, 24, floor + 2 ), spacing=spacing )
+        railing( model, face.p( b0 + 1, bd - 1, floor + 2 ), face.p( b1 - 1, bd - 1, floor + 2 ), spacing=spacing )
+        railing( model, face.p( b0 + 1, 1, floor + 2 ), face.p( b0 + 1, bd - 2, floor + 2 ), spacing=spacing )
+        railing( model, face.p( b1 - 1, 1, floor + 2 ), face.p( b1 - 1, bd - 2, floor + 2 ), spacing=spacing )
+        if near:
+            bkey = ( look.key, "bal", k, s )
+            if chance( 0.35, *bkey, "box" ):
+                window_box( model, shifted_out( face, bd - 2 ),
+                            c - 30, c + 30, floor + 34, bkey )
+            if chance( 0.2, *bkey, "dish" ):
+                dish( model, face.p( b1 - 14, bd + 2, floor + 30 ), face, bkey )
     if oriel:
         bay_oriel( model, face, centres, bay, hw, look, oriel, detail )
     # The main cornice: a frieze band, consoles and the corona, zinc-capped
@@ -757,14 +1474,34 @@ def house_roof( model, face, width, depth, eave, look, key, detail, hips=( False
         face.box( model, a - 3, b + 3, dback, dfront + 3, ztop, ztop + 6, "metal", skip=( "-z", "-d" ) )
     if chimneys:
         ridge = prof[-1][1]
-        for t in ( 0.28, 0.72 ):
-            r = width * t + between( -30, 30, key, "chim", t )
+        spots = [ width * t + between( -30, 30, key, "chim", t ) for t in ( 0.28, 0.72 ) ]
+        if detail == "near" and not hips[0]:
+            spots.append( 0.0 )                 # the stacks on the party walls, shared with the neighbour
+        for j, r in enumerate( spots ):
             if hips[0] and r < depth / 2 + 20 or hips[1] and r > width - depth / 2 - 20:
                 continue
-            face.box( model, r - 12, r + 12, -depth / 2 - 16, -depth / 2 + 16, ridge - 40, ridge + 48, "brick",
-                      skip=( "-z", ) )
-            face.box( model, r - 14, r + 14, -depth / 2 - 18, -depth / 2 + 18, ridge + 48, ridge + 53,
-                      "rw_concrete", skip=() )
+            dc = -depth / 2 + ( 0.0 if r == 0.0 else between( -60, 60, key, "chimd", j ) )
+            rise = 48 + between( 0, 16, key, "rise", j )
+            face.box( model, r - 12, r + 12, dc - 18, dc + 18, ridge - 60, ridge + rise, "brick", skip=( "-z", ) )
+            face.box( model, r - 14, r + 14, dc - 20, dc + 20, ridge + rise, ridge + rise + 5, "rw_concrete", skip=() )
+            face.box( model, r - 13, r + 13, dc - 19, dc + 19, ridge + rise - 12, ridge + rise - 9, "brick", skip=() )
+            if detail == "near":
+                for q in ( -9.0, 0.0, 9.0 )[: 2 + int( unit( key, "pots", j ) * 2 )]:
+                    c = face.p( r, dc + q, 0 )
+                    lathe( model, ( c[0], c[1] ), [ ( 4.2, ridge + rise + 5 ), ( 3.4, ridge + rise + 15 ), ( 3.8, ridge + rise + 17 ),
+                                                    ( 3.8, ridge + rise + 18 ) ], "clay_pot", sides=8, cap=False )
+        if detail == "near":
+            dr = -depth / 2
+            a, b = ( depth / 2 if hips[0] else 0.0 ), ( width - depth / 2 if hips[1] else width )
+            if b > a:
+                rod( model, face.p( a, dr, ridge + 1.2 ), face.p( b, dr, ridge + 1.2 ), 3.0, "rw_zinc" )
+            if chance( 0.4, key, "aerial" ):
+                r = width * between( 0.35, 0.65, key, "ar" )
+                rod( model, face.p( r, dr, ridge ), face.p( r, dr, ridge + 84 ), 1.0, "rw_steel_grey" )
+                for z, half in ( ( ridge + 70, 22.0 ), ( ridge + 80, 16.0 ) ):
+                    rod( model, face.p( r - 1, dr - half, z ), face.p( r - 1, dr + half, z ), 0.6, "rw_steel_grey" )
+                    for q in range( -int( half ), int( half ) + 1, 7 ):
+                        rod( model, face.p( r - 6, dr + q, z ), face.p( r + 6, dr + q, z ), 0.4, "rw_steel_grey" )
 
 
 def back_wall( model, face, width, depth, eave, look, detail ):
@@ -830,6 +1567,46 @@ def decorations( width, look, key ):
     return balconies, oriel
 
 
+def half_round( model, face, r0, r1, d, z, radius, paint="rw_zinc", segments=5 ):
+    """ A half-round gutter along r at ( d, z ): its outside, open to the sky, with a rolled bead on its front lip. """
+    pts = [ ( d + radius * math.cos( math.pi * k / segments ), z - radius * math.sin( math.pi * k / segments ) )
+            for k in range( segments + 1 ) ]
+    for ( da, za ), ( db, zb ) in zip( pts, pts[1:] ):
+        mid = ( ( da + db ) / 2 - d, ( za + zb ) / 2 - z )
+        facing( model, paint, [ face.p( r0, da, za ), face.p( r1, da, za ), face.p( r1, db, zb ), face.p( r0, db, zb ) ],
+                face.D * mid[0] + face.Z * mid[1] )
+        facing( model, paint, [ face.p( r0, da, za ), face.p( r1, da, za ), face.p( r1, db, zb ), face.p( r0, db, zb ) ],
+                -( face.D * mid[0] + face.Z * mid[1] ) )
+    rod( model, face.p( r0, d + radius + 0.4, z + 0.3 ), face.p( r1, d + radius + 0.4, z + 0.3 ), 1.0, paint )
+
+
+def rainwater( model, face, width, look, eave, key, pipe_at=True ):
+    """ The eaves gutter on its brackets along the cornice, and at the party wall the downpipe: a swan neck through the
+    cornice, a 100 mm zinc pipe on holderbats down to 2 m, a cast-iron shoe pipe into the gutter at the kerb. """
+    cd = look.cornice
+    gd, gz, gr = cd + 3.5, eave + 2.0, 3.0
+    half_round( model, face, 0.0, width, gd, gz, gr )
+    r = 2.0
+    while r < width - 1:
+        rod( model, face.p( r, cd - 2, eave + 0.4 ), face.p( r, gd + gr + 0.4, gz + 0.6 ), 0.5, "rw_steel_dark" )
+        r += 24.0
+    if not pipe_at:
+        return
+    r, dp = 7.0, 8.0
+    c = face.p( r, dp, 0 )
+    rod( model, face.p( r, gd - 1, gz - 2 ), face.p( r, gd - 1, eave - 18 ), 3.0, "rw_zinc" )
+    rod( model, face.p( r, gd - 1, eave - 18 ), face.p( r, dp, eave - 34 ), 3.2, "rw_zinc" )
+    lathe( model, ( c[0], c[1] ), [ ( 1.8, 78.0 ), ( 1.8, eave - 34 ) ], "rw_zinc", sides=8, cap=False )
+    lathe( model, ( c[0], c[1] ), [ ( 2.4, 0.0 ), ( 2.4, 74.0 ), ( 2.9, 74.0 ), ( 2.9, 80.0 ), ( 0.0, 80.0 ) ],
+           "iron_black", sides=8, cap=False )
+    model.box( face.p( r - 2.6, dp - 0.5, 0.0 ), face.p( r + 2.6, dp + 4.5, 2.5 ), "iron_black" )   # the shoe
+    z = 110.0
+    while z < eave - 40:
+        face.box( model, r - 2.2, r + 2.2, 0, dp - 1.2, z, z + 1.4, "rw_steel_dark" )
+        lathe( model, ( c[0], c[1] ), [ ( 2.3, z - 0.6 ), ( 2.3, z + 1.6 ) ], "rw_steel_dark", sides=8, cap=False )
+        z += 96.0
+
+
 def plain_side( model, face, width, look, eave, detail ):
     """ A side wall onto a lane: render, a stair window between each pair of storeys, the cornice carried round. """
     g, st = look.ground, look.storey
@@ -867,6 +1644,8 @@ def row( model, face, length, key, detail="near", start=None, end=None, arch_at=
         hips = ( first and start == "corner", last and end == "corner" )
         balconies, oriel = decorations( w, look, hkey )
         eave = front( model, sub, w, look, hkey, units, detail, balconies, oriel, hips )
+        if detail == "near":
+            rainwater( model, sub, w, look, eave, hkey, pipe_at=not hips[0] )
         ends = [ 0.0, 0.0 ]
         if first and start == "lane":
             ends[0] = eave
@@ -962,8 +1741,18 @@ def configure( model ):
     stand the facade pictures on z 0. Building_textures' paints need nothing. """
     RM = materials()
     for paint in list( model.polygons ):
+        if paint.startswith( "bd_" ):
+            if ART is not None and paint in ART.PAINTS:
+                model.material_overrides[paint] = ART.material_path( paint )
+                model.tile_overrides[paint] = float( ART.PAINTS[paint] )
+            else:
+                model.material_overrides[paint] = "materials/railhead/rw_window_dark.vmat"
+                model.tile_overrides[paint] = 64.0
+            continue
         if not paint.startswith( "rw_" ):
             continue
+        if model.material_overrides.get( paint, "" ).startswith( "materials/railhead/backdrop/" ):
+            continue                        # one of the backdrop's own (the Rotunde's card)
         model.material_overrides[paint] = f"materials/railhead/{paint}.vmat"
         tile = None
         if RM is not None:
@@ -1034,12 +1823,37 @@ def mark( model, paint, e0, e1, n0, n1 ):
 def street_lamp( model, e, n, out, z=0.0 ):
     """ A street lamp: an 8 m steel mast at the kerb, its arm reaching 1.5 m out over the road, the lantern under it,
     its opal diffuser dark by day. """
-    post( model, ( e, n ), 5.0, z, z + 36, "rw_steel_grey", sides=6 )
-    post( model, ( e, n ), 3.0, z + 36, z + 312, "rw_steel_grey", sides=6 )
-    tip = np.array( ( e + out[0] * 60, n + out[1] * 60, z + 318 ) )
-    rod( model, ( e, n, z + 306 ), tip, 3.0, "rw_steel_grey" )
-    lo, hi = tip - ( 11, 11, 8 ), tip + ( 11, 11, 0 )
-    model.box( lo, hi, { "default": "rw_steel_grey", "-z": "rw_opal_glass" } )
+    # A conical galvanised mast, 150 mm at its foot tapering to 60 mm, on a base plate with its cable cover, the access
+    # door at 0.6 m; the arm curving out 1.5 m to a flat LED luminaire with its glass underside
+    o = np.array( ( out[0], out[1], 0.0 ) )
+    side = np.array( ( -out[1], out[0], 0.0 ) )
+    lathe( model, ( e, n ), [ ( 5.6, z ), ( 5.6, z + 1.2 ), ( 3.2, z + 1.4 ), ( 3.0, z + 30 ), ( 2.6, z + 120 ),
+                              ( 1.6, z + 312 ), ( 1.4, z + 318 ) ], "rw_steel_grey", sides=10, cap=True )
+    c = np.array( ( e, n, z ) )
+    door = [ c + o * 3.05 + side * 1.4 + ( 0, 0, 20 ), c + o * 3.05 - side * 1.4 + ( 0, 0, 20 ),
+             c + o * 2.95 - side * 1.4 + ( 0, 0, 34 ), c + o * 2.95 + side * 1.4 + ( 0, 0, 34 ) ]
+    facing( model, "rw_steel", door, o )
+    model.box( c - o * 4.5 - side * 1.6, c - o * 3.0 + side * 1.6 + ( 0, 0, 14 ), "rw_steel_dark" )
+    bend = c + ( 0, 0, 318 ) + o * 14
+    rod( model, c + ( 0, 0, 300 ), c + ( 0, 0, 316 ), 2.4, "rw_steel_grey" )
+    rod( model, c + ( 0, 0, 315 ), bend + ( 0, 0, 4 ), 2.2, "rw_steel_grey" )
+    tip = c + ( 0, 0, 323 ) + o * 60
+    rod( model, bend + ( 0, 0, 4 ), tip, 2.0, "rw_steel_grey" )
+    # The luminaire: 24 x 12 x 5, its nose rounded, slightly tilted up
+    body = tip + o * 10
+    lo = body - o * 12 - side * 6
+    pts_top = [ lo + ( 0, 0, 5 ), lo + o * 22 + ( 0, 0, 5 ), lo + o * 24 + side * 3 + ( 0, 0, 4 ), lo + o * 24 + side * 9 + ( 0, 0, 4 ),
+                lo + o * 22 + side * 12 + ( 0, 0, 5 ), lo + side * 12 + ( 0, 0, 5 ) ]
+    pts_bot = [ p - ( 0, 0, 5 ) + ( 0, 0, 0.0 ) for p in pts_top ]
+    pts_bot = [ np.array( ( p[0], p[1], body[2] - 2.5 ) ) for p in pts_top ]
+    facing( model, "rw_steel_grey", pts_top, ( 0, 0, 1 ) )
+    for a, b, a2, b2 in zip( pts_top, pts_top[1:] + pts_top[:1], pts_bot, pts_bot[1:] + pts_bot[:1] ):
+        mid = ( a + b ) / 2 - body
+        facing( model, "rw_steel_grey", [ a, b, b2, a2 ], ( mid[0], mid[1], 0.0 ) )
+    glass = [ p + ( 0, 0, -0.2 ) for p in pts_bot ]
+    facing( model, "rw_steel_dark", pts_bot, ( 0, 0, -1 ) )
+    inset = [ body + ( p - body ) * 0.8 + ( 0, 0, -0.3 ) for p in glass ]
+    facing( model, "rw_opal_glass", inset, ( 0, 0, -1 ) )
 
 
 def lantern( model, a ):
@@ -1076,7 +1890,7 @@ def platz_lamp( model, e, n ):
 def litfass( model, e, n, key ):
     """ An advertising column (Litfasssaeule): 1.3 m across, posters to 3 m, a cornice and a domed cap. """
     r, sides = 26.0, 10
-    post( model, ( e, n ), r + 3, 0, 14, "trim_green", sides=sides )
+    post( model, ( e, n ), r + 3, 0, 14, "bd_paint_green", sides=sides )
     for k in range( sides ):
         a0, a1 = 2 * math.pi * k / sides, 2 * math.pi * ( k + 1 ) / sides
         p0 = ( e + r * math.cos( a0 ), n + r * math.sin( a0 ) )
@@ -1088,7 +1902,7 @@ def litfass( model, e, n, key ):
         facing( model, "rw_posters", [ ( *p0, 14.0 ), ( *p1, 14.0 ), ( *p1, 118.0 ), ( *p0, 118.0 ) ], mid,
                 uv=[ ( ua, v0 ), ( ub, v0 ), ( ub, v1 ), ( ua, v1 ) ] )
     lathe( model, ( e, n ), [ ( r, 118.0 ), ( r + 4, 120.0 ), ( r + 4, 128.0 ), ( r - 2, 132.0 ), ( r * 0.8, 146.0 ),
-                              ( r * 0.4, 156.0 ), ( 3.0, 160.0 ), ( 3.0, 170.0 ), ( 0.0, 176.0 ) ], "trim_green", sides=sides )
+                              ( r * 0.4, 156.0 ), ( 3.0, 160.0 ), ( 3.0, 170.0 ), ( 0.0, 176.0 ) ], "bd_paint_green", sides=sides )
 
 
 def traffic_light( model, e, n, facing_n, lit="red" ):
@@ -1219,16 +2033,21 @@ def tram_platform( model, e0, e1, n0, n1, edge ):
         a, b = c, c + 200
         for e in ( a, ( a + b ) / 2, b ):
             for nn in ( back, front ):
-                model.box( ( e - 1.5, nn - 1.5, 4 ), ( e + 1.5, nn + 1.5, 98 ), "rw_steel_dark", skip=( "-z", ) )
+                model.box( ( e - 1.5, nn - 1.5, 4 ), ( e + 1.5, nn + 1.5, 98 ), "rw_steel_grey", skip=( "-z", ) )
         model.box( ( a - 6, min( back, front ) - 6, 98 ), ( b + 6, max( back, front ) + 6, 103 ),
-                   { "default": "rw_steel_dark", "+z": "rw_glass" } )
+                   { "default": "rw_steel_grey", "+z": "rw_glass", "-z": "bd_paint_white" } )
+        # the LED strip under the roof's front edge, and a rail along the glass's foot
+        lit = front - out * 3
+        model.box( ( a + 4, min( lit, lit - out * 2 ), 96.6 ), ( b - 4, max( lit, lit - out * 2 ), 98 ),
+                   { "default": "rw_steel_grey", "-z": "bd_light_soft" }, skip=( "+z", ) )
+        model.box( ( a, back - 1.2, 10 ), ( b, back + 1.2, 14 ), "rw_steel_grey" )
         model.polygon( "rw_glass", [ ( a, back, 14 ), ( b, back, 14 ), ( b, back, 92 ), ( a, back, 92 ) ], both_sides=True )
         model.polygon( "rw_glass", [ ( a, back, 14 ), ( a, front - out * 18, 14 ), ( a, front - out * 18, 92 ),
                                      ( a, back, 92 ) ], both_sides=True )
         # an advertising panel at its far end, and the bench
         u0, v0, u1, v1 = rect_uv( "rw_posters", pick( POSTERS, c, "shelter" ) )
         pts = [ ( b, back, 14 ), ( b, front - out * 6, 14 ), ( b, front - out * 6, 90 ), ( b, back, 90 ) ]
-        model.box( ( b - 3, min( back, front - out * 6 ), 12 ), ( b + 3, max( back, front - out * 6 ), 92 ), "rw_steel_dark" )
+        model.box( ( b - 3, min( back, front - out * 6 ), 12 ), ( b + 3, max( back, front - out * 6 ), 92 ), "rw_steel_grey" )
         facing( model, "rw_posters", [ ( b + 3.2, p[1], p[2] ) for p in pts ], ( 1, 0, 0 ),
                 uv=[ ( u0, v0 ), ( u1, v0 ), ( u1, v1 ), ( u0, v1 ) ] if out > 0 else [ ( u1, v0 ), ( u0, v0 ), ( u0, v1 ), ( u1, v1 ) ] )
         bench( model, a + 20, a + 120, back + out * 12, out )
@@ -1408,7 +2227,7 @@ def hotel( model ):
     cross gable over the entrance and its marquee, a domed corner pavilion, and its name on the roof. """
     e0, e1, n0, n1 = HOTEL
     look = grand_look( "hotel", wall="render_cream", dressing="rw_sandstone", ground_paint="rw_sandstone",
-                       plinth="ashlar_grey", reveal="rw_sandstone", frame="trim_white", roof_kind="mansard", roof="slate",
+                       plinth="ashlar_grey", reveal="rw_sandstone", frame="bd_paint_white", roof_kind="mansard", roof="slate",
                        ground=230.0, storeys=5, storey=150.0, attic=16.0, window=52.0, bay=120.0, margin=40.0,
                        surrounds=True, hoods=[ "pediment", "cornice", "cornice", "arch" ], cornice=30.0,
                        party="render_pale", lisenes=True, bands=False, cap=1020.0 )
@@ -1478,7 +2297,7 @@ def kontor_face( model, face, width, z0, floors, top, ground, key, detail ):
             holes.append( ( k * bay + pier / 2, ( k + 1 ) * bay - pier / 2, 14, g - 54 ) )
     holed_wall( model, face, "brick", 0, width, z0, top, holes, d=-6 )
     for a, b, wz0, wz1 in wins:
-        window( model, face, a, b, wz0, wz1, "trim_white", reveal_paint="rw_dressed_red", depth=4, d=-6,
+        window( model, face, a, b, wz0, wz1, "bd_paint_white", reveal_paint="rw_dressed_red", depth=4, d=-6,
                 panes="+" if detail == "near" else "|" if detail == "mid" else "" )
     for k in range( bays + 1 ):
         r = k * bay
@@ -1610,7 +2429,7 @@ def _plan_box( points ):
     return min( e ), max( e ), min( n ), max( n )
 
 
-def mass( model, e0, e1, n0, n1, base, eave, wall, roof_paint="roof_tiles", kind="gable", along=None, pitch=40.0,
+def mass( model, e0, e1, n0, n1, base, eave, wall, roof_paint="bd_tile_aged", kind="gable", along=None, pitch=40.0,
           walls=None, upper=None ):
     """ A low-poly building: walls from base (sunk into the ground below it) to eave, under roof(). walls overrides a
     side's paint ( '+e', '-e', '+n', '-n'; None leaves it out). Returns the ridge's height. """
@@ -1666,7 +2485,8 @@ CUT_N0 = -4400.0            # the land beside the line starts rising here...
 PORTAL_N = -8000.0          # ...to the tunnel portal
 PORTAL_Z = 640.0            # the land over the portal
 ROTUNDA = ( 0.0, -10400.0 )             # the Rotunde's centre: on the line's axis, over the tunnel
-ROTUNDA_R = 2100.0                      # its drum's radius: 107 m across, as Vienna's Rotunde of 1873 (108 m)
+ROTUNDA_R = 1700.0                      # its drum's radius: 86 m across, a Vienna-class exhibition rotunda (108 m),
+                                        # so from the cab roads it closes the vista (~16 degrees) instead of walling it
 ROTUNDA_BASE = PORTAL_Z + 60.0          # the park it stands in, level over the tunnel
 WALL_MAX = 250.0            # the cutting's walls stand this high, with a 1:1.25 grass slope above them...
 WALL_FULL_N = ( -7000.0, -7800.0 )      # ...until the portal's approach, walled to the top
@@ -1819,8 +2639,8 @@ def south_ground( e, n, z ):
         return "lawn"                                                       # the Rotunde's park
     if n < PORTAL_N - 1 or a > 20000:
         if z > 900 or unit( "hill", int( e // 2600 ), int( n // 2100 ) ) < 0.45:
-            return "hedge"                                                  # woods
-        return pick( ( "lawn", "lawn", "soil", "lawn" ), "field", int( e // 3100 ), int( n // 2300 ) )
+            return "bd_woods_dark"                                          # woods
+        return pick( FIELDS, "field", int( e // 3100 ), int( n // 2300 ) )
     if n < CUT_N0 + 150:
         top, crest, h = crest_of( n, corridor_half( n ), 1.0 if e > 0 else -1.0 )
         if a < crest + 40:
@@ -2000,8 +2820,8 @@ def overbridge( model ):
                 facing( model, "rw_dressed", [ ( e, n + out * 0.3, z ) for e, z in ring ], ( 0, out, 0 ) )
                 facing( model, "rw_window_dark", [ ( e, n + out * 0.6, z ) for e, z in hole ], ( 0, out, 0 ) )
                 c0, c1 = sorted( ( n + out * 0.6, n + out * 1.4 ) )
-                model.box( ( s * c - 98, c0, 96 ), ( s * c + 98, c1, 102 ), "trim_green" )
-                model.box( ( s * c - 3, c0, 0 ), ( s * c + 3, c1, 96 ), "trim_green" )
+                model.box( ( s * c - 98, c0, 96 ), ( s * c + 98, c1, 102 ), "bd_paint_green" )
+                model.box( ( s * c - 3, c0, 0 ), ( s * c + 3, c1, 96 ), "bd_paint_green" )
     # The road: pavements 6 in over the carriageway, kerbs between
     es = [ -RAMP_E, -ABUT_E, ABUT_E, RAMP_E ]
     for ea, eb in zip( es, es[1:] ):
@@ -2043,7 +2863,7 @@ def lineside_east( model ):
     embedded_siding( model, SIDING_E_SOUTH, -2840.0, PLAY_N0 - 10 )
     buffer_stop( model, SIDING_E_SOUTH, -2780.0, 1.0 )
     # The Bahnmeisterei: the permanent-way gang's brick workshop, roller doors onto the siding's side
-    mass( model, 1560, 1960, -2800, -2480, -10, 230, "brick", "roof_tiles", "gable", along="n", pitch=35.0 )
+    mass( model, 1560, 1960, -2800, -2480, -10, 230, "brick", "bd_tile_aged", "gable", along="n", pitch=35.0 )
     for n_a, n_b in ( ( -2560.0, -2680.0 ), ( -2720.0, -2780.0 ) ):
         facing( model, "roller_grey", [ ( 1559.5, n_a, 0 ), ( 1559.5, n_b, 0 ), ( 1559.5, n_b, 170 ), ( 1559.5, n_a, 170 ) ], ( -1, 0, 0 ) )
     for e in ( 1620.0, 1760.0, 1900.0 ):
@@ -2079,7 +2899,7 @@ def lineside_west( model ):
     for k, ( na, nb ) in enumerate( zip( walls, walls[1:] ) ):
         roof( model, e0 + 16, e1 - 30, nb + 8, na - 8, -6, "rw_black", "hip", along="e", pitch=34.0 + 4 * k )
     # The office and its weighbridge
-    mass( model, -2340, -2080, -2610, -2440, -10, 200, "brick", "roof_tiles", "hip", pitch=32.0 )
+    mass( model, -2340, -2080, -2610, -2440, -10, 200, "brick", "bd_tile_aged", "hip", pitch=32.0 )
     for e in ( -2300.0, -2180.0 ):
         facing( model, "rw_window_dark", [ ( e, -2439.5, 80 ), ( e + 60, -2439.5, 80 ), ( e + 60, -2439.5, 160 ), ( e, -2439.5, 160 ) ],
                 ( 0, 1, 0 ) )
@@ -2104,8 +2924,8 @@ def allotment( model, e0, e1, n0, n1, key ):
     back = chance( 0.5, *key, "corner" )
     sn = ( n0 + 40, n0 + 150 ) if back else ( n1 - 150, n1 - 40 )
     se = ( far + 30, far + 190 ) if e0 > e1 else ( far - 174, far - 14 )
-    paint = pick( ( "planks", "planks_dark", "trim_green", "trim_brown" ), *key, "house" )
-    mass( model, se[0], se[1], sn[0], sn[1], -4, 86, paint, pick( ( "roof_tiles", "corrugated", "slate" ), *key, "roof" ),
+    paint = pick( ( "planks", "planks_dark", "bd_paint_green", "bd_paint_brown" ), *key, "house" )
+    mass( model, se[0], se[1], sn[0], sn[1], -4, 86, paint, pick( ( "bd_tile_aged", "corrugated", "slate" ), *key, "roof" ),
           "gable", along="e", pitch=24.0 )
     # Beds of vegetables, dug soil between grass paths
     beds = int( between( 3, 5.99, *key, "beds" ) )
@@ -2128,7 +2948,7 @@ def allotments_south( model ):
             e0 = -1150.0 - 620 * k
             allotment( model, e0, e0 - 600, n0, n1, ( "colony", row, k ) )
     # The colony's clubhouse
-    mass( model, -4300, -3960, -4330, -4250, -6, 140, "planks_dark", "roof_tiles", "gable", along="e", pitch=30.0 )
+    mass( model, -4300, -3960, -4330, -4250, -6, 140, "planks_dark", "bd_tile_aged", "gable", along="e", pitch=30.0 )
     fence( model, [ ( -corridor_half( n ) - 30, n, 0 ) for n in ( BRIDGE[0] - 10, CUT_N0 + 30 ) ] )
 
 
@@ -2168,29 +2988,139 @@ def ground_range( base_of, e0, e1, n0, n1 ):
 RENDERS = ( "render_cream", "render_ochre", "render_pale", "render_rose", "render_sage", "render_cream", "render_pale" )
 
 
-def city_house( model, e0, e1, n0, n1, along, key, walls, base_of, storeys=None, corner=False ):
+def roof_paint_of( *key ):
+    """ A city roof's covering: slate on three in five, weathered tile on a quarter, dark old tile on the rest. """
+    u = unit( *key, "roof paint" )
+    return "slate" if u < 0.6 else "bd_tile_aged" if u < 0.85 else "bd_tile_dark"
+
+
+def stacks( model, e0, e1, n0, n1, along, top, key, step=400.0 ):
+    """ Brick chimney stacks along a ridge at top: 24 x 36, rising 60 over it, one every step, with a dark pot. """
+    length = ( e1 - e0 ) if along == "e" else ( n1 - n0 )
+    count = max( 1, int( ( length - 200 ) / step ) )
+    for k in range( count ):
+        t = ( k + 0.5 ) / count + between( -0.08, 0.08, *key, "stack", k )
+        if along == "e":
+            x, y = e0 + ( e1 - e0 ) * t, ( n0 + n1 ) / 2 + between( -40, 40, *key, "sy", k )
+            lo, hi = ( x - 18, y - 12 ), ( x + 18, y + 12 )
+        else:
+            x, y = ( e0 + e1 ) / 2 + between( -40, 40, *key, "sy", k ), n0 + ( n1 - n0 ) * t
+            lo, hi = ( x - 12, y - 18 ), ( x + 12, y + 18 )
+        model.box( ( *lo, top - 70 ), ( *hi, top + 60 ), { "default": "brick", "-z": None } )
+        model.box( ( lo[0] - 3, lo[1] - 3, top + 52 ), ( hi[0] + 3, hi[1] + 3, top + 60 ), { "default": "rw_dressed", "-z": None } )
+        model.box( ( x - 4, y - 4, top + 60 ), ( x + 4, y + 4, top + 72 ), { "default": "rw_signal_box_clay", "-z": None } )
+
+
+def city_house( model, e0, e1, n0, n1, along, key, walls, base_of, storeys=None, corner=False, details=True ):
     lo, hi = ground_range( base_of, e0, e1, n0, n1 )
-    storeys = storeys or pick( ( 4, 5, 5, 5, 6 ), *key, "storeys" )
+    storeys = storeys or pick( ( 4, 5, 5, 5, 6, 4 ), *key, "storeys" )
     paint = pick( FACADES if walls == "facade" else RENDERS, *key, "wall" )
-    eave = hi + storeys * STOREY + 30 if walls != "facade" else ( math.ceil( hi / STOREY ) + storeys ) * STOREY + 24
-    kind = "hip" if corner else pick( ( "mansard", "gable", "gable", "mansard" ), *key, "roof" )
-    roof_paint = pick( ( "slate", "roof_tiles", "slate" ), *key, "roof paint" ) if kind != "mansard" else "slate"
-    mass( model, e0, e1, n0, n1, lo - 40, eave, paint, roof_paint, kind, along, pitch=40.0 if kind != "hip" else 35.0,
-          upper="roof_tiles" if chance( 0.3, *key, "upper" ) else "slate" )
+    eave = hi + storeys * STOREY + 30 + between( -60, 60, *key, "eave" ) if walls != "facade" else \
+        ( math.ceil( hi / STOREY ) + storeys ) * STOREY + 24 + pick( ( 0.0, 0.0, 30.0, -20.0 ), *key, "attic" )
+    kind = "hip" if corner else pick( ( "mansard", "gable", "gable", "mansard", "hip" ), *key, "roof" )
+    covering = roof_paint_of( *key )
+    roof_paint = covering if kind != "mansard" else ( "slate" if covering == "slate" or chance( 0.5, *key, "m" ) else covering )
+    top = mass( model, e0, e1, n0, n1, lo - 40, eave, paint, roof_paint, kind, along, pitch=40.0 if kind != "hip" else 35.0,
+                upper="bd_tile_aged" if chance( 0.3, *key, "upper" ) else roof_paint )
+    if details:
+        way = along or ( "e" if e1 - e0 >= n1 - n0 else "n" )
+        stacks( model, e0, e1, n0, n1, way, top, key )
+        if kind == "mansard":
+            dormers( model, e0, e1, n0, n1, way, eave, key )
     return eave
+
+
+def dormers( model, e0, e1, n0, n1, along, eave, key ):
+    """ Dormers on a mansard's steep lower slopes (as roof() draws them, 72 degrees, inset 0.3 of the half depth): a
+    zinc-clad box with its window, one every ~170 in along both long sides. """
+    length, depth, P, X, Y = _frame( e0, e1, n0, n1, along )
+    inset = min( depth / 2, length / 2 ) * 0.3
+    rise = inset * math.tan( math.radians( 72 ) )
+    if inset < 30 or length < 300:
+        return
+    count = int( ( length - 160 ) / 170 )
+    for side, y0, sgn in ( ( 0, 0.0, 1.0 ), ( 1, depth, -1.0 ) ):
+        for k in range( count ):
+            if chance( 0.25, *key, "dormer", side, k ):
+                continue
+            x = 80 + ( length - 160 ) * ( k + 0.5 ) / count
+            yf, yb = y0 + sgn * inset * 0.3, y0 + sgn * inset * 0.95
+            z0, z1 = eave + rise * 0.28, eave + rise * 0.7
+            a, b = P( x - 22, min( yf, yb ), z0 ), P( x + 22, max( yf, yb ), z1 )
+            out = "-n" if ( along == "e" and side == 0 ) else "+n" if along == "e" else "+e" if side == 0 else "-e"
+            model.box( tuple( min( p, q ) for p, q in zip( a, b ) ), tuple( max( p, q ) for p, q in zip( a, b ) ),
+                       { "default": "rw_zinc", out: "rw_window_dark", "-z": None } )
+
+
+def city_ranges( model, e0, e1, n0, n1, key, walls, base_of, depth, trees=( 2, 4 ) ):
+    """ A perimeter block seen from afar: one range a side, each its own height, roof and covering, with stacks on its
+    ridge; a rear wing off one side into the courtyard; the courtyard's trees. """
+    d = min( depth, ( e1 - e0 ) / 3, ( n1 - n0 ) / 3 )
+    for k, ( a0, a1, b0, b1, along ) in enumerate( ( ( e0, e1, n0, n0 + d, "e" ), ( e0, e1, n1 - d, n1, "e" ),
+                                                     ( e0, e0 + d, n0 + d, n1 - d, "n" ), ( e1 - d, e1, n0 + d, n1 - d, "n" ) ) ):
+        city_house( model, a0, a1, b0, b1, along, ( *key, k ), walls, base_of )
+    i0, i1, j0, j1 = e0 + d, e1 - d, n0 + d, n1 - d
+    if i1 - i0 < 500 or j1 - j0 < 500:
+        return
+    # A rear house (Hinterhaus) or a side wing into the courtyard, lower than the street ranges
+    if chance( 0.8, *key, "wing" ):
+        w = between( 260.0, 360.0, *key, "ww" )
+        deep = min( 400.0, ( j1 - j0 ) * 0.45 )
+        c = between( i0 + w, i1 - w, *key, "wc" )
+        from_south = chance( 0.5, *key, "wside" )
+        b0, b1 = ( j0, j0 + deep ) if from_south else ( j1 - deep, j1 )
+        city_house( model, c - w / 2, c + w / 2, b0, b1, "n", ( *key, "wing" ), walls, base_of,
+                    storeys=pick( ( 3, 3, 4 ), *key, "ws" ) )
+        wing = ( c - w / 2 - 60, c + w / 2 + 60, b0 - 60, b1 + 60 )
+    else:
+        wing = ( 0, 0, 0, 0 )
+    lo, _ = ground_range( base_of, i0, i1, j0, j1 )
+    count = trees[0] + int( unit( *key, "trees" ) * ( trees[1] - trees[0] + 1 ) )
+    placed = 0
+    for t in range( count * 3 ):
+        if placed >= count:
+            break
+        x, y = between( i0 + 180, i1 - 180, *key, "tx", t ), between( j0 + 180, j1 - 180, *key, "ty", t )
+        if wing[0] < x < wing[1] and wing[2] < y < wing[3]:
+            continue
+        r = between( 170.0, 260.0, *key, "tr", t )
+        crown( model, x, y, lo + r * 0.5, r, r * 1.5, ( *key, "tree", t ), paint="bd_tree", sides=8 )
+        post( model, ( x, y ), 9.0, lo - 4, lo + r * 0.6, "planks_dark", sides=5, top=False )
+        placed += 1
 
 
 def city_block( model, e0, e1, n0, n1, key, detail="near", walls="facade", base_of=lambda e, n: 0.0, depth=480.0 ):
     """ A perimeter block of five-storey houses round a courtyard. detail 'near': each house its own height and roof,
     the corners square houses under hipped roofs; 'far': one range of houses a side; 'slab': the whole block as one mass
     under a mansard ring. """
-    if detail == "slab":
+    if detail in ( "far", "slab" ):
+        city_ranges( model, e0, e1, n0, n1, key, walls, base_of, depth, trees=( 2, 4 ) if detail == "far" else ( 1, 3 ) )
+        return
+    if detail == "slab_ring":
         lo, hi = ground_range( base_of, e0, e1, n0, n1 )
         storeys = pick( ( 4, 5, 5, 6 ), *key, "storeys" )
         eave = hi + storeys * STOREY + 30
-        model.box( ( e0, n0, lo - 40 ), ( e1, n1, eave ), { "default": pick( FACADES if walls == "facade" else RENDERS, *key ),
-                                                            "+z": None, "-z": None } )
-        ring_roof( model, e0, e1, n0, n1, eave, "slate", 110.0, 300.0, "rw_concrete_dark" )
+        wall = pick( FACADES if walls == "facade" else RENDERS, *key )
+        roof = pick( ( "slate", "bd_tile_aged", "slate", "bd_tile_aged", "slate" ), *key, "roof" )
+        d = min( depth, ( e1 - e0 ) / 3, ( n1 - n0 ) / 3 )
+        model.box( ( e0, n0, lo - 40 ), ( e1, n1, eave ), { "default": wall, "+z": None, "-z": None } )
+        # The courtyard's walls, facing in, and a hipped ring of roof over the ranges round it
+        i0, i1, j0, j1 = e0 + d, e1 - d, n0 + d, n1 - d
+        inner = [ ( i0, j0 ), ( i1, j0 ), ( i1, j1 ), ( i0, j1 ) ]
+        outer = [ ( e0, n0 ), ( e1, n0 ), ( e1, n1 ), ( e0, n1 ) ]
+        rise = d / 2 * math.tan( math.radians( 40 ) )
+        mid = [ ( ( a[0] + b[0] ) / 2, ( a[1] + b[1] ) / 2 ) for a, b in zip( outer, inner ) ]
+        c = ( ( e0 + e1 ) / 2, ( n0 + n1 ) / 2 )
+        for k in range( 4 ):
+            a, b = inner[k], inner[( k + 1 ) % 4]
+            out = np.array( ( ( a[0] + b[0] ) / 2 - c[0], ( a[1] + b[1] ) / 2 - c[1], 0.0 ) )
+            facing( model, pick( RENDERS, *key, "court" ), [ ( *a, 0.0 ), ( *b, 0.0 ), ( *b, eave ), ( *a, eave ) ], -out )
+            for ring in ( outer, inner ):
+                p0, p1 = ring[k], ring[( k + 1 ) % 4]
+                m0, m1 = mid[k], mid[( k + 1 ) % 4]
+                towards = out * ( 1.0 if ring is outer else -1.0 )
+                facing( model, roof, [ ( *p0, eave ), ( *p1, eave ), ( *m1, eave + rise ), ( *m0, eave + rise ) ],
+                        towards * rise + np.array( ( 0.0, 0.0, d / 2 ) ) )
         return
     d = min( depth, ( e1 - e0 ) / 3, ( n1 - n0 ) / 3 )
     if detail == "far":
@@ -2240,7 +3170,7 @@ def depot( model ):
     track( model, [ ( 1420.0, n1 - 20 ), ( 1420.0, -4020.0 ), ( 1205.0, -3820.0 ) ], BED + 0.45 )
     # A fuel tank and the staff's hut
     model.cylinder( ( 1640, -4700 ), 46.0, BED, BED + 150, { "side": "rw_steel_grey", "top": "rw_steel_grey", "bottom": None }, sides=10 )
-    mass( model, 1560, 1720, -4280, -4120, BED - 4, BED + 130, "brick", "roof_tiles", "gable", along="n", pitch=30.0 )
+    mass( model, 1560, 1720, -4280, -4120, BED - 4, BED + 130, "brick", "bd_tile_aged", "gable", along="n", pitch=30.0 )
 
 
 def works( model ):
@@ -2252,7 +3182,7 @@ def works( model ):
         for z in ( 70.0, 70.0 + STOREY, 70.0 + 2 * STOREY ):
             facing( model, "rw_window_dark", [ ( e, -3399.5, z ), ( e + 50, -3399.5, z ), ( e + 50, -3399.5, z + 85 ), ( e, -3399.5, z + 85 ) ],
                     ( 0, 1, 0 ) )
-    mass( model, 3520, 3690, -4420, -4240, -10, 330, "brick", "roof_tiles", "gable", along="n", pitch=35.0 )
+    mass( model, 3520, 3690, -4420, -4240, -10, 330, "brick", "bd_tile_aged", "gable", along="n", pitch=35.0 )
     chimney( model, 3605, -4120, -10, 1500 )
     for e in np.arange( 2140, 3460, 120.0 ):
         facing( model, "rw_window_dark", [ ( e, -4300.5, 90 ), ( e + 70, -4300.5, 90 ), ( e + 70, -4300.5, 220 ), ( e, -4300.5, 220 ) ],
@@ -2276,7 +3206,7 @@ def gasholder( model ):
                 for k in range( 13 ) ]
         for a, b in zip( pts, pts[1:] ):
             rod( model, a, b, 10.0, "rw_steel" )
-    mass( model, -4400, -4180, -3700, -3540, -10, 160, "brick", "roof_tiles", "hip", pitch=30.0 )
+    mass( model, -4400, -4180, -3700, -3540, -10, 160, "brick", "bd_tile_aged", "hip", pitch=30.0 )
 
 
 # The old village on the hillside east of the line, now a suburb: its streets ( n, e0, e1 ) and the lane up the hill
@@ -2316,7 +3246,7 @@ def village( model ):
                     storeys = 2 if chance( 0.7, "village", k, side, j, "s" ) else 3
                     eave = hi + storeys * 120 + 40
                     mass( model, e, e + w, b0, b1, lo - 30, eave, pick( RENDERS, "village", k, side, j ),
-                          "roof_tiles" if chance( 0.75, "village", k, side, j, "r" ) else "slate",
+                          "bd_tile_aged" if chance( 0.75, "village", k, side, j, "r" ) else "slate",
                           "hip" if chance( 0.25, "village", k, side, j, "h" ) else "gable", along="e", pitch=42.0 )
                     gardens.append( ( e + w / 2, n_near + side * ( depth + 160 ) ) )
                 e += w + between( 60, 220, "village", k, side, j, "gap" )
@@ -2330,7 +3260,7 @@ def village( model ):
                 continue
             a0, a1 = sorted( ( le + side * 110, le + side * 380 ) )
             lo, hi = ground_range( land_z, a0, a1, n, n + 300 )
-            mass( model, a0, a1, n, n + 300, lo - 30, hi + 2 * 120 + 40, pick( RENDERS, "lane", side, j ), "roof_tiles", "gable",
+            mass( model, a0, a1, n, n + 300, lo - 30, hi + 2 * 120 + 40, pick( RENDERS, "lane", side, j ), "bd_tile_aged", "gable",
                   along="n", pitch=42.0 )
     # The church: nave, chancel and the tower at its west end
     e0, e1, n0, n1 = CHURCH
@@ -2370,13 +3300,20 @@ def portal( model ):
 # The Rotunde: the trade fair's exhibition rotunda of 1880 on the hill over the tunnel, an iron drum glazed all round,
 # in its park. Levels over ROTUNDA_BASE: the sandstone plinth, the arcade of tall arched windows, an entablature, the
 # clerestory, the iron frieze and the zinc cornice; a low zinc roof with a glazed ring and a lantern over it.
-ROTUNDA_BAYS = 36                       # pilasters round the drum (a bay 9.3 m wide)...
+ROTUNDA_BAYS = 30                       # pilasters round the drum (a bay 9 m wide)...
 ROTUNDA_LIGHTS = 2                      # ...each of two arched lights under two clerestory windows
-ROTUNDA_LEVELS = { "plinth": ( -60.0, 140.0 ), "arcade": ( 140.0, 1250.0 ), "band": ( 1250.0, 1330.0 ),
-                   "clerestory": ( 1330.0, 1650.0 ), "frieze": ( 1650.0, 1920.0 ), "cornice": ( 1920.0, 1990.0 ) }
-ROTUNDA_ARCH = ( 180.0, 1100.0 )        # the arched lights' sills and springing: 3.8 m wide and 25 m tall
-ROTUNDA_LIGHT_W = 150.0
-GLAZING, IRON, IRON_PANEL, ZINC = "rw_rotunda_glass", "rw_rotunda_iron", "rw_rotunda_panel", "rw_zinc"
+ROTUNDA_V = 0.85                        # the drum's storeys: 43 m to the cornice, a hall's proportions, not a gasholder's
+ROTUNDA_FOOT = -51.0                    # the plinth's foot over the base: ROTUNDA_LEVELS' plinth (railhead_rotunda_bake reads it)
+ROTUNDA_LEVELS = { k: ( a * ROTUNDA_V, b * ROTUNDA_V ) for k, ( a, b ) in {
+    "plinth": ( -60.0, 140.0 ), "arcade": ( 140.0, 1250.0 ), "band": ( 1250.0, 1330.0 ), "clerestory": ( 1330.0, 1650.0 ),
+    "frieze": ( 1650.0, 1920.0 ), "cornice": ( 1920.0, 1990.0 ) }.items() }
+assert abs( ROTUNDA_LEVELS["plinth"][0] - ROTUNDA_FOOT ) < 1e-6
+ROTUNDA_ARCH = ( 470.0 * ROTUNDA_V, 1100.0 * ROTUNDA_V )   # the arched lights' sills and springing, over the masonry arcade
+ROTUNDA_ROOF = 22.0                     # the cone's pitch: it rises ~16 m over the cornice to the lantern, as Vienna's did
+ROTUNDA_PODIUM = 300.0 * ROTUNDA_V      # the arcade's masonry storey: dressed stone, its round-arched doorways
+ROTUNDA_LIGHT_W = 110.0                 # the glass's width in a 183-in light: the stone piers 40% of the drum
+ROTUNDA_GLASS_D = -12.0                 # the glass set back from the piers' face
+GLAZING, IRON, IRON_PANEL, ZINC = "bd_rotunda_glass", "rw_rotunda_iron", "rw_rotunda_panel", "bd_zinc"
 
 
 def curved( model, paint, points, centre, towards ):
@@ -2417,33 +3354,70 @@ def rotunda_light( model, c, p0, along, out, width, z0 ):
     thirds = ( w0 + ( w1 - w0 ) / 3, w0 + 2 * ( w1 - w0 ) / 3 )
     sill, spring = ROTUNDA_ARCH
     a0, a1 = ROTUNDA_LEVELS["arcade"]
-    quad( IRON, 0.0, w0, a0, a1 )
-    quad( IRON, w1, width, a0, a1 )
-    quad( IRON, w0, w1, a0, sill )
+    # The masonry arcade round the foot of the drum: a round-arched opening in each light, dark under its arch
+    pz = a0 + ROTUNDA_PODIUM
+    o0, o1 = mid - 50.0, mid + 50.0
+    ospring = a0 + 170.0
+    quad( "rw_dressed", 0.0, o0, a0, pz, 6.0 )
+    quad( "rw_dressed", o1, width, a0, pz, 6.0 )
+    head = [ ( mid + 50.0 * math.cos( math.pi * k / 8 ), ospring + 50.0 * math.sin( math.pi * k / 8 ) ) for k in range( 9 ) ]
+    for ( sa, za ), ( sb, zb ) in zip( head, head[1:] ):
+        curved( model, "rw_dressed", [ P( sa, za, 6.0 ), P( sb, zb, 6.0 ), P( sb, pz, 6.0 ), P( sa, pz, 6.0 ) ], c, out )
+    curved( model, "rw_black", [ P( o0, a0, -10.0 ), P( o1, a0, -10.0 ) ] + [ P( s, z, -10.0 ) for s, z in head ], c, out )
+    for sa, za, sb, zb in ( ( o0, a0, o0, ospring ), ( o1, a0, o1, ospring ) ):
+        curved( model, "rw_dressed", [ P( sa, za, 6.0 ), P( sb, zb, 6.0 ), P( sb, zb, -10.0 ), P( sa, za, -10.0 ) ], c,
+                np.array( along ) * ( 1.0 if sa == o0 else -1.0 ) )
+    quad( "rw_dressed", 0.0, width, pz, pz + 18.0, 14.0 )                 # the arcade's cornice
+    quad( "rw_dressed", mid - 10.0, mid + 10.0, ospring + 40.0, min( ospring + 62.0, pz ), 9.0 )   # its keystone
+    gd = ROTUNDA_GLASS_D
+    quad( "rw_dressed", 0.0, w0, pz, a1 )                               # the stone piers between the lights
+    quad( "rw_dressed", w1, width, pz, a1 )
+    quad( "rw_dressed", w0, w1, pz, sill )
     arch = [ ( mid + r * math.cos( math.pi * k / 10 ), spring + r * math.sin( math.pi * k / 10 ) ) for k in range( 11 ) ]
     for ( sa, za ), ( sb, zb ) in zip( arch, arch[1:] ):                # the spandrels over the round head
-        curved( model, IRON, [ P( sa, za ), P( sb, zb ), P( sb, a1 ), P( sa, a1 ) ], c, out )
-    curved( model, GLAZING, [ P( w0, sill ), P( w1, sill ) ] + [ P( s, z ) for s, z in arch ], c, out )
+        curved( model, "rw_dressed", [ P( sa, za ), P( sb, zb ), P( sb, a1 ), P( sa, a1 ) ], c, out )
+    # The reveals: the jambs and the sill 12 deep, the arch's soffit
+    for sx, sgn in ( ( w0, 1.0 ), ( w1, -1.0 ) ):
+        curved( model, "rw_dressed", [ P( sx, sill, 0.0 ), P( sx, spring, 0.0 ), P( sx, spring, gd ), P( sx, sill, gd ) ], c,
+                np.array( along ) * sgn )
+    curved( model, "rw_dressed", [ P( w0, sill, 0.0 ), P( w1, sill, 0.0 ), P( w1, sill, gd ), P( w0, sill, gd ) ], c, ( 0, 0, 1 ) )
+    for ( sa, za ), ( sb, zb ) in zip( arch, arch[1:] ):
+        curved( model, "rw_dressed", [ P( sa, za, 0.0 ), P( sb, zb, 0.0 ), P( sb, zb, gd ), P( sa, za, gd ) ], c, ( 0, 0, -1 ) )
+    curved( model, GLAZING, [ P( w0, sill, gd ), P( w1, sill, gd ) ] + [ P( s, z, gd ) for s, z in arch ], c, out )
+    # Its iron: a 7 in frame round the glass, 8 in mullions, 7 in transoms and a radiating head, 2 proud of the glass
+    for sx in ( w0 + 3.5, w1 - 3.5 ):
+        bar( IRON, ( sx, sill ), ( sx, spring ), 3.5, gd + 2.0 )
+    bar( IRON, ( w0, sill + 3.5 ), ( w1, sill + 3.5 ), 3.5, gd + 2.0 )
+    ring = [ ( mid + ( r - 3.5 ) * math.cos( math.pi * k / 10 ), spring + ( r - 3.5 ) * math.sin( math.pi * k / 10 ) )
+             for k in range( 11 ) ]
+    for a, b in zip( ring, ring[1:] ):
+        bar( IRON, a, b, 3.5, gd + 2.0 )
     for s in thirds:                                                    # its tracery: mullions, transoms, a radiating head
-        bar( IRON, ( s, sill ), ( s, spring ), 3.0 )
+        bar( IRON, ( s, sill ), ( s, spring ), 4.0, gd + 2.0 )
     for z in np.linspace( sill, spring, 6 )[1:]:
-        bar( IRON, ( w0, z ), ( w1, z ), 2.5 )
+        bar( IRON, ( w0, z ), ( w1, z ), 3.5, gd + 2.0 )
     for s in thirds:
         top = spring + math.sqrt( max( r * r - ( s - mid ) ** 2, 0.0 ) )
-        bar( IRON, ( s, spring ), ( mid + ( s - mid ) * 0.4, top - 2.0 ), 2.5 )
+        bar( IRON, ( s, spring ), ( mid + ( s - mid ) * 0.4, top - 2.0 ), 3.5, gd + 2.0 )
+    quad( "rw_dressed", 0.0, w0, spring - 14.0, spring, 5.0 )           # the impost band at the arches' springing
+    quad( "rw_dressed", w1, width, spring - 14.0, spring, 5.0 )
+    quad( "rw_dressed", 0.0, width, sill - 10.0, sill, 6.0 )            # the sill course
     b0, b1 = ROTUNDA_LEVELS["band"]
     quad( IRON, 0.0, width, b0, b1 )
     quad( "rw_dressed", 0.0, width, b0 + 45.0, b0 + 60.0, 1.0 )
     k0, k1 = ROTUNDA_LEVELS["clerestory"]
     g0, g1 = k0 + 30.0, k1 - 30.0
-    quad( IRON, 0.0, w0, k0, k1 )
-    quad( IRON, w1, width, k0, k1 )
-    quad( IRON, w0, w1, k0, g0 )
-    quad( IRON, w0, w1, g1, k1 )
-    quad( GLAZING, w0, w1, g0, g1 )
+    quad( "rw_dressed", 0.0, w0, k0, k1 )
+    quad( "rw_dressed", w1, width, k0, k1 )
+    quad( "rw_dressed", w0, w1, k0, g0 )
+    quad( "rw_dressed", w0, w1, g1, k1 )
+    for sx, sgn in ( ( w0, 1.0 ), ( w1, -1.0 ) ):
+        curved( model, "rw_dressed", [ P( sx, g0, 0.0 ), P( sx, g1, 0.0 ), P( sx, g1, -8.0 ), P( sx, g0, -8.0 ) ], c,
+                np.array( along ) * sgn )
+    quad( GLAZING, w0, w1, g0, g1, -8.0 )
     for s in thirds:
-        bar( IRON, ( s, g0 ), ( s, g1 ), 3.0 )
-    bar( IRON, ( w0, ( g0 + g1 ) / 2 ), ( w1, ( g0 + g1 ) / 2 ), 2.5 )
+        bar( IRON, ( s, g0 ), ( s, g1 ), 4.0, -6.0 )
+    bar( IRON, ( w0, ( g0 + g1 ) / 2 ), ( w1, ( g0 + g1 ) / 2 ), 3.5, -6.0 )
     f0, f1 = ROTUNDA_LEVELS["frieze"]
     quad( IRON, 0.0, width, f0, f1 )
     i0, i1, j0, j1 = 14.0, width - 14.0, f0 + 28.0, f1 - 28.0          # a panel with its lattice
@@ -2481,40 +3455,117 @@ def rotunda_geometry( model ):
             tangent = np.array( ( -math.sin( a0 ), math.cos( a0 ), 0.0 ) )
             zp0, zp1 = ROTUNDA_LEVELS["arcade"][0], ROTUNDA_LEVELS["frieze"][1]
             model.oriented_box( ( *mid, B + ( zp0 + zp1 ) / 2 ), ( radial, tangent, ( 0.0, 0.0, 1.0 ) ),
-                                ( 20.0, 40.0, zp1 - zp0 ), { "default": IRON, "-x": None } )
-    # The roof: a low zinc cone from the cornice and a glazed ring round its middle, under 10 degrees, so from the
-    # streets the drum's rim is its skyline (it's 13-16 degrees up from the cab roads).
+                                ( 20.0, 40.0, zp1 - zp0 ), { "default": "rw_dressed", "-x": None } )
+    # The roof: a zinc cone at 22 degrees from an eaves gallery 60 wide round the cornice, its standing seams on the
+    # bays' centres; a glazed ring round its middle; a glazed lantern on top (a fifth of the drum across, two storeys
+    # of iron lights, its own gallery), a small cone over it and a 3 m finial with its crown
     top = B + ROTUNDA_LEVELS["cornice"][1]
-    rise = math.tan( math.radians( 9.0 ) )
-    r1, r2 = 0.62 * R, 0.3 * R
-    z1 = top + ( R + 30 - r1 ) * rise
+    rise = math.tan( math.radians( ROTUNDA_ROOF ) )
+    zg = top + 6.0
+    re, r1, r2, rl = R - 26.0, 0.52 * R, 0.3 * R, 0.1 * R
+    z1 = zg + ( re - r1 ) * rise
     z2 = z1 + ( r1 - r2 ) * rise
-    lathe( model, ROTUNDA, [ ( R + 30, top ), ( r1, z1 ) ], ZINC, sides=count, cap=False )
-    lathe( model, ROTUNDA, [ ( r1, z1 ), ( r2, z2 ) ], GLAZING, sides=count, cap=False )
-    lathe( model, ROTUNDA, [ ( r2, z2 ), ( 0.0, z2 + r2 * rise ) ], ZINC, sides=count // 2 )
+    z3 = z2 + ( r2 - rl ) * rise * 1.25
+    lathe( model, ROTUNDA, [ ( R + 34, top ), ( R + 34, zg ), ( re, zg ) ], ZINC, sides=count, cap=False )   # the gallery
+    lathe( model, ROTUNDA, [ ( re, zg ), ( r1, z1 ) ], ZINC, sides=count, cap=False )
+    lathe( model, ROTUNDA, [ ( r1, z1 ), ( r1 - 8, z1 + 8 * rise ), ( r2 + 8, z2 - 8 * rise ), ( r2, z2 ) ], GLAZING,
+           sides=count, cap=False )
+    lathe( model, ROTUNDA, [ ( r2, z2 ), ( rl + 30, z3 - 30 * rise * 1.25 ), ( rl + 30, z3 ) ], ZINC, sides=count, cap=False )
+    # The gallery's railing: posts at every light, a top rail and a middle rail
+    for ( ra, za, h ) in ( ( R + 33, zg + 39.0, 3.0 ), ( R + 33, zg + 20.0, 2.0 ) ):
+        lathe( model, ROTUNDA, [ ( ra, za ), ( ra, za + h ), ( ra - 3, za + h ), ( ra - 3, za ) ], IRON, sides=count, cap=False )
+    for k in range( count ):
+        a = 2 * math.pi * k / count
+        u = np.array( ( math.cos( a ), math.sin( a ) ) )
+        rod( model, ( *( c + u * ( R + 31.5 ) ), zg ), ( *( c + u * ( R + 31.5 ) ), zg + 42.0 ), 2.5, IRON )
+    # Standing seams: zinc ribs 10 high on the bays' centres (9 m apart at the eaves), and the glazing's iron bars
+    for k in range( ROTUNDA_BAYS ):
+        a = 2 * math.pi * ( k + 0.5 ) / ROTUNDA_BAYS
+        u = np.array( ( math.cos( a ), math.sin( a ) ) )
+        t = np.array( ( -u[1], u[0], 0.0 ) )
+        for ( ra, za ), ( rb, zb ), paint, size in ( ( ( re, zg ), ( r1, z1 ), ZINC, ( 6.0, 10.0 ) ),
+                                                     ( ( r2, z2 ), ( rl + 30, z3 - 30 * rise * 1.25 ), ZINC, ( 6.0, 10.0 ) ),
+                                                     ( ( r1, z1 ), ( r2, z2 ), IRON, ( 5.0, 4.0 ) ) ):
+            p0, p1 = np.array( ( *( c + u * ra ), za ) ), np.array( ( *( c + u * rb ), zb ) )
+            x = ( p1 - p0 ) / np.linalg.norm( p1 - p0 )
+            z = np.cross( x, t )
+            if z[2] < 0:
+                t = -t
+                z = np.cross( x, t )
+            model.oriented_box( ( p0 + p1 ) / 2 + z * size[1] / 2, ( x, t, z ), ( np.linalg.norm( p1 - p0 ), size[0], size[1] ),
+                                { "default": paint, "+x": None, "-x": None, "-z": None } )
+    lathe( model, ROTUNDA, [ ( r1 + 12, z1 - 12 * rise ), ( r1 + 12, z1 + 10 ), ( r1 - 4, z1 + 10 + 4 * rise ) ], IRON,
+           sides=count, cap=False )
+    lathe( model, ROTUNDA, [ ( r2 - 4, z2 - 4 * rise ), ( r2 - 4, z2 + 10 ), ( r2 + 10, z2 + 10 - 10 * rise ) ], IRON,
+           sides=count, cap=False )
+    # The lantern: a plinth, its gallery and railing, 24 lights in two storeys between iron posts and bands
+    lz0 = z3 + 30.0
+    lz1 = lz0 + 480.0
+    lathe( model, ROTUNDA, [ ( rl + 30, z3 ), ( rl + 54, z3 ), ( rl + 54, z3 + 4 ), ( rl + 10, z3 + 4 ), ( rl + 10, lz0 ) ],
+           ZINC, sides=48, cap=False )
+    for za, h in ( ( z3 + 38.0, 2.5 ), ( z3 + 20.0, 2.0 ) ):
+        lathe( model, ROTUNDA, [ ( rl + 53, za ), ( rl + 53, za + h ), ( rl + 50, za + h ), ( rl + 50, za ) ], IRON, sides=48,
+               cap=False )
+    for k in range( 24 ):
+        a = 2 * math.pi * k / 24
+        u = np.array( ( math.cos( a ), math.sin( a ) ) )
+        rod( model, ( *( c + u * ( rl + 51.5 ) ), z3 + 4 ), ( *( c + u * ( rl + 51.5 ) ), z3 + 41 ), 2.0, IRON )
+    for k in range( 24 ):
+        a0, a1 = 2 * math.pi * k / 24, 2 * math.pi * ( k + 1 ) / 24
+        q0, q1 = c + rl * np.array( ( math.cos( a0 ), math.sin( a0 ) ) ), c + rl * np.array( ( math.cos( a1 ), math.sin( a1 ) ) )
+        o = np.array( ( math.cos( ( a0 + a1 ) / 2 ), math.sin( ( a0 + a1 ) / 2 ), 0.0 ) )
+        facing( model, GLAZING, [ ( *q0, lz0 ), ( *q1, lz0 ), ( *q1, lz1 ), ( *q0, lz1 ) ], o )
+        e0, e1 = q0 + o[:2] * 3, q1 + o[:2] * 3
+        for za, zb in ( ( lz0, lz0 + 16 ), ( ( lz0 + lz1 ) / 2 - 10, ( lz0 + lz1 ) / 2 + 10 ), ( lz1 - 22, lz1 ),
+                        ( lz0 + 120, lz0 + 126 ), ( lz1 - 120, lz1 - 114 ) ):
+            facing( model, IRON, [ ( *e0, za ), ( *e1, za ), ( *e1, zb ), ( *e0, zb ) ], o )
+        g = q0 + o[:2] * 4
+        model.box( ( g[0] - 4, g[1] - 4, lz0 ), ( g[0] + 4, g[1] + 4, lz1 ), IRON )
+    # Its cornice, its cone, and the finial: a ball, a collar and a spike with a gilt crown, 3 m over the cone
+    lc = lz1 + ( rl + 6 ) * 0.7
+    lathe( model, ROTUNDA, [ ( rl + 4, lz1 ), ( rl + 16, lz1 + 6 ), ( rl + 16, lz1 + 16 ), ( rl + 6, lz1 + 16 ), ( 14.0, lc ) ],
+           ZINC, sides=24, cap=False )
+    lathe( model, ROTUNDA, [ ( 14.0, lc ), ( 10.0, lc + 12 ), ( 16.0, lc + 22 ), ( 22.0, lc + 38 ), ( 16.0, lc + 54 ),
+                             ( 6.0, lc + 62 ), ( 4.0, lc + 92 ), ( 9.0, lc + 98 ), ( 4.0, lc + 104 ), ( 0.0, lc + 118 ) ],
+           IRON, sides=16 )
+
+
+ROTUNDA_CARD_SCALE = 6600.0             # the impostor bake's orthographic width (railhead_rotunda_bake reads these)
+ROTUNDA_CARD_MID = 1590.0               # its frame's centre over the base, less 90
+ROTUNDA_CARD_N = -7800.0                # where the card stands (inside the playable cameras' far clip)
+ROTUNDA_EYE_Z = 52.0                    # a player's eye on the cab roads, which the card is drawn for
 
 
 def rotunda( model ):
     """Two-triangle distant Rotunde, with its park retained as independent 3D trees."""
     # Keep every corner inside the playable cameras' distant clip. The slightly
     # smaller card compensates for moving the baked silhouette closer.
-    n = -7800.0
+    n = ROTUNDA_CARD_N
     # Texture has a 1/32 transparent border on every edge to prevent mip wrap.
-    # Enlarge the card around its centre so the visible building stays in place.
-    half_width, height = 2300.0 / 0.9375, 2300.0 / 0.9375
-    low = ROTUNDA_BASE - 90.0 - (height - 2300.0) / 2
-    model.polygon( "rw_rotunda_impostor", [ (-half_width, n, low), (-half_width, n, low + height),
+    # The bake's orthographic frame is ROTUNDA_CARD_SCALE wide (2:1), centred ROTUNDA_CARD_MID - 90 over the base; the
+    # card keeps the frame's size (0.981) and sits 100 under the frame's centre. It stands nearer than the drum it
+    # shows, so it's drawn smaller by the distances' ratio, towards the eye of someone on the cab roads (round n 0),
+    # so the drum subtends what it would at its own distance.
+    k = ROTUNDA_CARD_N / ROTUNDA[1]
+    half_width = height = 0.981 * ROTUNDA_CARD_SCALE / 2 * k
+    centre = ROTUNDA_EYE_Z + ( ROTUNDA_BASE - 90.0 + ROTUNDA_CARD_MID - 100.0 - ROTUNDA_EYE_Z ) * k
+    low = centre - height / 2
+    # bd_rotunda_card (railhead_backdrop_art): the bake shown mostly self-lit; the map's configure() repoints every rw_
+    # paint, so the card has a bd_ paint of its own
+    card = "bd_rotunda_card" if ART is not None else "rw_rotunda_impostor"
+    model.polygon( card, [ (-half_width, n, low), (-half_width, n, low + height),
                    (half_width, n, low + height), (half_width, n, low) ], normal=(0, 1, 0),
                    uv=[ (1, 0), (1, 1), (0, 1), (0, 0) ] )
-    model.material_overrides["rw_rotunda_impostor"] = "materials/railhead/rw_rotunda_impostor.vmat"
+    if ART is None:
+        model.material_overrides["rw_rotunda_impostor"] = "materials/railhead/rw_rotunda_impostor.vmat"
     # The park's oaks round it, thicker on the side towards the station.
     c, R = np.array( ROTUNDA, float ), ROTUNDA_R
     for k in range( 48 ):
         a = 2 * math.pi * ( k + between( -0.3, 0.3, "rotunda", k ) ) / 48
         north = max( 0.0, math.sin( a ) )
-        if not chance( 0.55 + 0.4 * north, "rotunda", k, "keep" ):
+        if not chance( 0.35 + 0.25 * north, "rotunda", k, "keep" ):
             continue
-        d = R + between( 420.0, 900.0, "rotunda", k, "d" ) + 380.0 * north * unit( "rotunda", k, "row" )
+        d = R + 300.0 + between( 420.0, 900.0, "rotunda", k, "d" ) + 380.0 * north * unit( "rotunda", k, "row" )
         e, n = c[0] + d * math.cos( a ), c[1] + d * math.sin( a )
         if n > PORTAL_N - 250:
             continue
@@ -2525,21 +3576,26 @@ def rotunda( model ):
 def ramp_trees( model ):
     """ Big trees at the foot of the overbridge's west ramp, by the line's fence and the allotment colony: from the
     west cab road they stand either side of the Rotunde's lower half, over the goods shed. """
-    for k, e in enumerate( ( -1135.0, -1960.0, -2260.0 ) ):             # between the ramp and the gardens' hedges
+    # (round 2: the one at -1135 stood on the west cab road's sight line to the smaller drum, which crosses this row
+    # at -1800..-470, and hid its lower half; the two left frame it from the west)
+    for k, e in ( ( 1, -1960.0 ), ( 2, -2260.0 ) ):                     # between the ramp and the gardens' hedges
         n = -3340.0 + between( -8.0, 8.0, "ramp_tree", k )
         tree( model, OAK_BIG, e + between( -20.0, 20.0, "ramp_tree", k, "e" ), n, land_z( e, n ) - 8, ( "ramp_tree", k ),
               between( 1.3, 1.45, "ramp_tree", k, "s" ) )
 
 
 def south_blocks( model ):
-    """Only retain city blocks within the immediate playable-area backdrop."""
+    """ The city's blocks beside the slope south of the ramp: in detail near the play area, beyond it as perimeter
+    ranges (their roofs, stacks, wings and yard trees), so from the bridge, the throat and above the south city isn't a
+    bare plain of asphalt. """
     for s in ( 1.0, -1.0 ):
         for row, ( n0, n1 ) in enumerate( ( ( -5500.0, -3300.0 ), ( -7900.0, -5900.0 ) ) ):
             for k, ( a0, a1 ) in enumerate( grid_blocks( CITY_E, WORLD ) ):
                 lo_e, hi_e = sorted( ( s * a0, s * a1 ) )
                 if near_play( lo_e, hi_e, n0, n1 ) > 1600.0:
-                    continue
-                detail = "near" if a0 < 9000 else "far" if a0 < 14000 else "slab"
+                    detail = "far" if a0 < 14000 else "slab"
+                else:
+                    detail = "near" if a0 < 9000 else "far" if a0 < 14000 else "slab"
                 city_block( model, lo_e, hi_e, n0 + 20, n1 - 20, ( "south", s, row, k ), detail, "render", land_z )
 
 
@@ -2673,11 +3729,16 @@ def sky_cell( e0, e1, n0, n1 ):
     return ( "island", block ) if in_city( *block ) else ( "hills", None )
 
 
+FIELDS = ( "bd_field_dry", "bd_field_stubble", "bd_field_dry", "lawn", "bd_field_stubble" )     # on 3 October: stubble,
+# dry pasture, a few green meadows
+
+
 def hill_paint( e, n, z ):
-    """ The country round the city, as south_ground paints its far hills: woods on the heights and in patches, fields. """
+    """ The country round the city, as south_ground paints its far hills: woods on the heights and in patches (the
+    canopy's own picture on the ground between the crowns), fields. """
     if z > 900 or unit( "hill", int( e // 2600 ), int( n // 2100 ) ) < 0.45:
-        return "hedge"
-    return pick( ( "lawn", "lawn", "soil", "lawn" ), "field", int( e // 3100 ), int( n // 2300 ) )
+        return "bd_woods_dark"
+    return pick( FIELDS, "field", int( e // 3100 ), int( n // 2300 ) )
 
 
 def kerb_face( model, a, b, za, zb, towards ):
@@ -2728,7 +3789,7 @@ def sky_ground( model ):
             k = 10.0 if near else 0.0
             a0, a1 = e0 + ( k if "-e" in kerbs else 0 ), e1 - ( k if "+e" in kerbs else 0 )
             b0, b1 = n0 + ( k if "-n" in kerbs else 0 ), n1 - ( k if "+n" in kerbs else 0 )
-            flat( model, "rw_paving", a0, a1, b0, b1, 0.0 )
+            island_ground( model, a0, a1, b0, b1, block )
             for side, di, dj in SIDES:
                 if side not in kerbs:
                     continue
@@ -2746,7 +3807,95 @@ def sky_ground( model ):
 
     for a, b in zip( rows, rows[1:] ):
         zip_rows( model, a, b, paint_of )
+    woods( model, lambda e, n: kind( int( np.searchsorted( es, e ) ) - 1, int( np.searchsorted( ns, n ) ) - 1 ) == "hills" )
     return blocks
+
+
+def crown( model, e, n, z, radius, height, key, paint=None, sides=9 ):
+    """ A far tree's crown: a lumpy ellipsoid of sides facets and three noisy rings, its foot sunk in the ground, shaded
+    smooth (normals from the crown's middle) so neighbouring crowns run together into a canopy. """
+    paint = paint or pick( ( "bd_woods", "bd_woods_dark", "bd_woods" ), *key, "leaf" )
+    turn = between( 0, 2 * math.pi, *key, "t" )
+    centre = np.array( ( e, n, z + height * 0.45 ) )
+    rings = []
+    for j, ( rr, hh ) in enumerate( ( ( 0.62, -0.08 ), ( 0.97, 0.3 ), ( 0.92, 0.62 ), ( 0.58, 0.86 ) ) ):
+        ring = []
+        for k in range( sides ):
+            a = turn + 2 * math.pi * k / sides
+            jitter = 1.0 + 0.2 * ( unit( *key, "r", j, k ) - 0.5 ) * 2
+            lift = height * 0.06 * ( unit( *key, "z", j, k ) - 0.5 )
+            ring.append( np.array( ( e + radius * rr * jitter * math.cos( a ), n + radius * rr * jitter * math.sin( a ),
+                                     z + height * hh + lift ) ) )
+        rings.append( ring )
+    apex = np.array( ( e + radius * 0.1 * ( unit( *key, "ax" ) - 0.5 ), n, z + height ) )
+
+    def nrm( p ):
+        v = ( p - centre ) * np.array( ( 1.0 / radius, 1.0 / radius, 1.6 / height ) )
+        return K.normalise( v )
+
+    for lo, hi in zip( rings, rings[1:] ):
+        for k in range( sides ):
+            pts = [ lo[k], lo[( k + 1 ) % sides], hi[( k + 1 ) % sides], hi[k] ]
+            out = ( pts[0] + pts[1] + pts[2] + pts[3] ) / 4 - centre
+            facing_smooth( model, paint, pts, out, [ nrm( q ) for q in pts ] )
+    top = rings[-1]
+    for k in range( sides ):
+        pts = [ top[k], top[( k + 1 ) % sides], apex ]
+        facing_smooth( model, paint, pts, ( pts[0] + pts[1] + apex ) / 3 - centre, [ nrm( q ) for q in pts ] )
+
+
+def facing_smooth( model, paint, pts, towards, normals ):
+    """ facing() with per-point normals. """
+    pts = [ np.asarray( q, float ) for q in pts ]
+    normal = np.cross( pts[1] - pts[0], pts[2] - pts[0] )
+    if np.linalg.norm( normal ) < 1e-9:
+        return
+    if np.dot( normal, towards ) < 0:
+        pts, normals = pts[:1] + pts[:0:-1], normals[:1] + normals[:0:-1]
+    model.polygon( paint, pts, normals=normals )
+
+
+def woods( model, is_hills ):
+    """ Woods on the hills round the city where hill_paint paints them: clumps of crowns, two or three a 1600-inch cell,
+    out to 34000 (past that the haze has them). """
+    step = 1600.0
+    for e in np.arange( -34000.0, 34000.0, step ):
+        for n in np.arange( -2400.0, 35000.0, step ):
+            em, nm = e + step / 2, n + step / 2
+            if not is_hills( em, nm ) or hill_paint( em, nm, land_z( em, nm ) ) != "bd_woods_dark":
+                continue
+            # A clump of crowns of mixed sizes, overlapping, round a centre that wanders in the cell
+            cx = e + between( 300, step - 300, "wcx", e, n )
+            cy = n + between( 300, step - 300, "wcy", e, n )
+            for k in range( 6 + int( unit( "wood", e, n ) * 5 ) ):
+                a = between( 0, 2 * math.pi, "wa", e, n, k )
+                d = 300.0 * math.sqrt( unit( "wd", e, n, k ) ) + 160.0 * ( k > 3 )
+                x, y = cx + d * math.cos( a ), cy + d * math.sin( a )
+                if not is_hills( x, y ):
+                    continue
+                r = between( 280.0, 420.0, "wr", e, n, k )
+                crown( model, x, y, land_z( x, y ), r, r * between( 1.0, 1.35, "wh", e, n, k ), ( "wood", e, n, k ) )
+
+
+PAVEMENT = 240.0            # a city block's pavement round it; inside the house line its yards and gardens
+
+
+def island_ground( model, a0, a1, b0, b1, block ):
+    """ A block's ground in a cell a0..a1, b0..b1: the pavement within PAVEMENT of the block's edge, and inside it the
+    courtyards' lawns, beaten earth and gravel (under the houses where they stand, open to the sky between them). """
+    e0, e1, n0, n1 = block
+    i0, i1, j0, j1 = e0 + PAVEMENT, e1 - PAVEMENT, n0 + PAVEMENT, n1 - PAVEMENT
+    if i1 - i0 < 200 or j1 - j0 < 200 or block in ( DOMPLATZ, KIRCHPLATZ ):
+        flat( model, "rw_paving", a0, a1, b0, b1, 0.0 )
+        return
+    c0, c1, d0, d1 = max( a0, i0 ), min( a1, i1 ), max( b0, j0 ), min( b1, j1 )
+    if c1 <= c0 or d1 <= d0:
+        flat( model, "rw_paving", a0, a1, b0, b1, 0.0 )
+        return
+    for r in ( ( a0, a1, b0, d0 ), ( a0, a1, d1, b1 ), ( a0, c0, d0, d1 ), ( c1, a1, d0, d1 ) ):
+        flat( model, "rw_paving", *r, 0.0 )
+    yard = pick( ( "lawn", "lawn", "soil", "gravel", "lawn", "setts" ), "yard", round( e0 ), round( n0 ) )
+    flat( model, yard, c0, c1, d0, d1, 0.0 )
 
 
 def sky_house( model, e0, e1, n0, n1, along, key, storeys=None, corner=False, walls="facade" ):
@@ -2977,8 +4126,8 @@ def _legacy_church_geometry( model ):
     hw, n0, n1, eave = 420.0, tn + th, 7650.0, 700.0
     ridge = eave + hw * math.tan( math.radians( 55 ) )
     model.box( ( ax - hw, n0, -20 ), ( ax + hw, n1, eave ), { "default": "brick", "+z": None, "-z": None, "+n": None } )
-    roof( model, ax - hw, ax + hw, n0, n1, eave, "roof_tiles", "gable", along="n", pitch=55.0, end_paint="brick" )
-    apse( model, ax, n1, hw, eave, ridge, "brick", "roof_tiles" )
+    roof( model, ax - hw, ax + hw, n0, n1, eave, "bd_tile_aged", "gable", along="n", pitch=55.0, end_paint="brick" )
+    apse( model, ax, n1, hw, eave, ridge, "brick", "bd_tile_aged" )
     for s in ( -1.0, 1.0 ):
         wall = ax + s * hw
         bays = np.arange( n0 + 140, n1 - 60, 270.0 )
@@ -3023,7 +4172,7 @@ def baroque_church( model ):
     onion dome and cross 48 m up. """
     e0, e1, n0, n1 = BAROQUE
     onion_tower( model, 9900.0, 13600.0, 0.0, 320.0, 1300.0 )
-    mass( model, 9570.0, 10230.0, 13760.0, 14900.0, -20, 750, "render_cream", "roof_tiles", "gable", along="n", pitch=50.0 )
+    mass( model, 9570.0, 10230.0, 13760.0, 14900.0, -20, 750, "render_cream", "bd_tile_aged", "gable", along="n", pitch=50.0 )
     for s in ( -1.0, 1.0 ):
         windows_on( model, face_e=9900.0 + s * 330.5, span=( 13800.0, 14860.0 ), z=( 260, 560 ), step=190, width=90, out=s, point=30 )
     for k, ( a0, a1 ) in enumerate( ( ( e0 + 80, e0 + 560 ), ( e1 - 560, e1 - 80 ) ) ):
@@ -3125,7 +4274,7 @@ def chapel( model, block, key ):
     c, n = ( e0 + e1 ) / 2, ( n0 + n1 ) / 2 - 350
     model.box( ( c - 120, n - 120, -20 ), ( c + 120, n + 120, 900 ), { "default": "render_pale", "-z": None } )
     lathe( model, ( c, n ), [ ( 120 * math.sqrt( 2 ), 900.0 ), ( 0.0, 1420.0 ) ], "slate", sides=4, turn=math.pi / 4 )
-    mass( model, c - 200, c + 200, n + 120, n + 800, -20, 520, "render_pale", "roof_tiles", "gable", along="n", pitch=50.0 )
+    mass( model, c - 200, c + 200, n + 120, n + 800, -20, 520, "render_pale", "bd_tile_aged", "gable", along="n", pitch=50.0 )
 
 
 def sky_blocks( model, blocks ):
@@ -3137,8 +4286,7 @@ def sky_blocks( model, blocks ):
         # hidden outer grid adds no detail from the playable streets or bridge.
         near = near_play( e0, e1, n0, n1 ) <= 1600.0
         cab_view = e0 >= -4000.0 and e1 <= 4000.0 and n0 < 8500.0
-        if not ( near or cab_view or block == DOMPLATZ ):
-            continue
+        seen = near or cab_view or block == DOMPLATZ
         s = 1.0 if e0 + e1 > 0 else -1.0
         a0 = min( abs( e0 ), abs( e1 ) )
         if a0 == ROAD_E1 and n1 == CROSS_N0:
@@ -3166,7 +4314,9 @@ def sky_blocks( model, blocks ):
             b0 = n0 + ( 60 if n0 == CROSS_N1 else 80 )
             b1 = n1 - ( 60 if n1 == CROSS_N0 else 80 )
             d = near_play( c0, c1, b0, b1 )
-            detail = "near" if d < 4500 else "far" if d < 10000 else "slab"
+            # The blocks seen down the streets from play in detail; the rest of the city as perimeter blocks of single
+            # ranges, then (past 7000) as slabs under a mansard ring, so from the bridge and above it reads as a city
+            detail = "near" if seen and d < 4500 else "far" if d < 7000 else "slab"
             city_block( model, c0, c1, b0, b1, ( "sky", round( e0 ), round( n0 ) ), detail )
             if detail == "near" and c1 - c0 > 1500 and b1 - b0 > 1500:
                 tree( model, OAK_BIG, ( c0 + c1 ) / 2, ( b0 + b1 ) / 2, 0.0, ( "court", round( e0 ), round( n0 ) ), 1.1 )

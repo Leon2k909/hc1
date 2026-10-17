@@ -13,11 +13,12 @@
 						_class = "DefaultMaterialGroup"
 						remaps =
 						[
+							{ from = "bd_rotunda_glass.vmat" to = "materials/railhead/backdrop/bd_rotunda_glass.vmat" },
+							{ from = "bd_zinc.vmat" to = "materials/railhead/backdrop/bd_zinc.vmat" },
+							{ from = "rw_black.vmat" to = "materials/railhead/rw_black.vmat" },
 							{ from = "rw_dressed.vmat" to = "materials/railhead/rw_dressed.vmat" },
-							{ from = "rw_rotunda_glass.vmat" to = "materials/railhead/rw_rotunda_glass.vmat" },
 							{ from = "rw_rotunda_iron.vmat" to = "materials/railhead/rw_rotunda_iron.vmat" },
-							{ from = "rw_rotunda_panel.vmat" to = "materials/railhead/rw_rotunda_panel.vmat" },
-							{ from = "rw_zinc.vmat" to = "materials/railhead/rw_zinc.vmat" }
+							{ from = "rw_rotunda_panel.vmat" to = "materials/railhead/rw_rotunda_panel.vmat" }
 						]
 						use_global_default = false
 						global_default_material = ""

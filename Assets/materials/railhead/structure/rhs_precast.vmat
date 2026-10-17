@@ -1,0 +1,14 @@
+// Tools/railhead_structure_paints.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1.05"
+    g_flMetalness "0.00"
+    TextureColor "materials/railhead/structure/rhs_precast_color.png"
+    TextureNormal "materials/railhead/concrete_normal.png"
+    TextureRoughness "materials/railhead/concrete_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1.0 1.0 1.0 1.0]"
+    g_flModelTintAmount "1.0"
+}

@@ -1,0 +1,14 @@
+// Tools/railhead_dress_detail.py (rw_paving_dark, tinted)
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1.6"
+    g_flMetalness "0.00"
+    TextureColor "materials/railhead/rw_paving_dark_color.png"
+    TextureNormal "materials/railhead/paving_normal.png"
+    TextureRoughness "materials/railhead/paving_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1.000 1.000 1.000 1.0]"
+    g_flModelTintAmount "1.0"
+}

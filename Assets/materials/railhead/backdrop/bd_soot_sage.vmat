@@ -1,0 +1,14 @@
+// Tools/railhead_backdrop_art.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.00"
+    TextureColor "materials/buildings/render_sage_color.png"
+    TextureNormal "materials/buildings/render_normal.png"
+    TextureRoughness "materials/buildings/render_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.620 0.600 0.580 1.0]"
+    g_flModelTintAmount "1.0"
+}

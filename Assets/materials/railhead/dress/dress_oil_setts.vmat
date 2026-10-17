@@ -1,0 +1,14 @@
+// Tools/railhead_dress_detail.py (rw_setts, tinted)
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1.4"
+    g_flMetalness "0.00"
+    TextureColor "materials/railhead/rw_setts_color.png"
+    TextureNormal "materials/railhead/setts_normal.png"
+    TextureRoughness "materials/railhead/setts_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.600 0.580 0.560 1.0]"
+    g_flModelTintAmount "1.0"
+}

@@ -1,0 +1,14 @@
+// Tools/railhead_backdrop_art.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_ALPHA_TEST "1"
+    TextureTranslucency "materials/railhead/backdrop/bd_vinyl_trans.png"
+    g_flAlphaTestReference "0.5"
+    TextureColor "materials/railhead/backdrop/bd_vinyl_color.png"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureRoughness "[0.600000 0.600000 0.600000 0.000000]"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_flMetalness "0.00"
+    g_vColorTint "[1.000000 1.000000 1.000000 1.0]"
+}

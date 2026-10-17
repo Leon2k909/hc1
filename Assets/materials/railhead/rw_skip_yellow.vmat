@@ -1,0 +1,14 @@
+// Tools/railhead_prop_materials.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.15"
+    TextureColor "materials/railhead/rw_skip_yellow_color.png"
+    TextureNormal "materials/railhead/rw_skip_yellow_normal.png"
+    TextureRoughness "materials/railhead/rw_skip_yellow_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1.0"
+}

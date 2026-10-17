@@ -1,0 +1,87 @@
+// Railhead's navmesh check: run with the native s&box MCP's run_csharp. Loads the scene's models (their colliders),
+// player clips, spawns, bomb sites, objective spots and cash points into an isolated editor scene with the scene's
+// navmesh settings, generates the navmesh, and finds a path from the first Red Team spawn and the first Blue Team spawn
+// to every spawn, site, objective and cash spot. Writes output/railhead/navmesh-check.json. The user's open scene and
+// play state are never touched.
+var projectRoot = Sandbox.Project.Current.GetRootPath();
+var destination = System.IO.Path.Combine(projectRoot, "output/railhead");
+System.IO.Directory.CreateDirectory(destination);
+var source = Editor.SceneEditorSession.Active?.Scene;
+var before = new { Game.IsPlaying, SceneId = source?.Id, GameSceneId = Game.ActiveScene?.Id };
+var keep = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase) {
+    "Station", "Player Clips", "Team Spawns", "Deathmatch Spawns", "Retakes Spawns", "Bomb Sites", "Objective Spots", "Cash Grab" };
+var root = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(projectRoot, "Assets/scenes/maps/Railhead/railhead.scene"))).AsObject();
+var objects = new System.Text.Json.Nodes.JsonArray();
+foreach (var item in root["GameObjects"].AsArray())
+    if (keep.Contains(item["Name"]?.GetValue<string>() ?? "")) objects.Add(item.DeepClone());
+root["GameObjects"] = objects;
+root["SceneProperties"]["WantsSystemScene"] = false;
+var scene = Scene.CreateEditorScene();
+try {
+    using (scene.Push()) scene.Deserialize(root);
+    // Mode groups switch their children off outside their modes: here every spawn should count.
+    foreach (var go in scene.GetAllObjects(false)) go.Enabled = true;
+    var nav = scene.NavMesh;
+    // Scene.Deserialize doesn't apply the file's navmesh settings: take them from it.
+    var navJson = root["SceneProperties"]["NavMesh"];
+    Vector3 V(string text) { var p = text.Split(','); return new Vector3(float.Parse(p[0]), float.Parse(p[1]), float.Parse(p[2])); }
+    nav.IsEnabled = true;
+    nav.AgentRadius = navJson["AgentRadius"].GetValue<float>();
+    nav.AgentHeight = navJson["AgentHeight"].GetValue<float>();
+    nav.AgentStepSize = navJson["AgentStepSize"].GetValue<float>();
+    nav.AgentMaxSlope = navJson["AgentMaxSlope"].GetValue<float>();
+    nav.IncludeStaticBodies = true;
+    nav.CustomBounds = true;
+    nav.Bounds = new BBox(V(navJson["Bounds"]["Mins"].GetValue<string>()), V(navJson["Bounds"]["Maxs"].GetValue<string>()));
+    nav.ExcludedBodies = new TagSet();
+    nav.ExcludedBodies.Add("zone");
+    nav.ExcludedBodies.Add("navskip");
+    var settings = new { nav.IsEnabled, nav.AgentRadius, nav.AgentHeight, nav.AgentStepSize, nav.AgentMaxSlope, nav.CustomBounds, Bounds = nav.CustomBounds ? nav.Bounds.ToString() : null };
+    // Let the colliders build their physics bodies before the navmesh reads them.
+    for (var tick = 0; tick < 10; tick++)
+    {
+        using (scene.Push()) scene.EditorTick(.016f, .016f);
+        await Task.Delay(16, cancellationToken);
+    }
+    var colliders = scene.GetAllComponents<Collider>().Count();
+    var bodies = scene.PhysicsWorld.Bodies.Count();
+    var watch = System.Diagnostics.Stopwatch.StartNew();
+    bool generated;
+    using (scene.Push()) generated = await nav.Generate(scene.PhysicsWorld);
+    var seconds = watch.Elapsed.TotalSeconds;
+    Vector3? Snap(Vector3 p) => nav.GetClosestPoint(p, 120);
+    var spawns = scene.GetAllComponents<TeamSpawnPoint>().OrderBy(x => x.GameObject.Name).ToArray();
+    var red = spawns.First(x => x.GameObject.Name.StartsWith("Red Spawn"));
+    var blue = spawns.First(x => x.GameObject.Name.StartsWith("Blue Spawn"));
+    var targets = spawns.Select(x => (Kind: "spawn", Name: x.GameObject.Name, At: x.WorldPosition))
+        .Concat(scene.GetAllComponents<Facepunch.ObjectiveSpot>().Select(x => (Kind: "objective", Name: x.GameObject.Name, At: x.WorldPosition)))
+        .Concat(scene.GetAllComponents<BombSite>().Select(x => (Kind: "site", Name: x.GameObject.Name, At: x.WorldPosition)))
+        .Concat(scene.GetAllComponents<Facepunch.CashPoint>().Select(x => (Kind: "cash", Name: x.GameObject.Name, At: x.WorldPosition)))
+        .Concat(scene.GetAllComponents<Facepunch.ExtractionPoint>().Select(x => (Kind: "extract", Name: x.GameObject.Name, At: x.WorldPosition - Vector3.Up * 32)))
+        .ToArray();
+    (string Status, float Length, string End) PathTo(Vector3? start, Vector3? end)
+    {
+        if (start is null || end is null) return ("NoNavMeshNear", 0f, null);
+        var path = nav.CalculatePath(new Sandbox.Navigation.CalculatePathRequest { Start = start.Value, Target = end.Value });
+        var pts = path.Points?.Select(p => p.Position).ToArray() ?? Array.Empty<Vector3>();
+        var length = 0f;
+        for (var i = 1; i < pts.Length; i++) length += pts[i].Distance(pts[i - 1]);
+        var last = pts.Length > 0 ? pts[^1] : Vector3.Zero;
+        return (path.Status.ToString(), MathF.Round(length), $"plan {-last.y:0},{last.x:0},{last.z:0}");
+    }
+    var fromRed = Snap(red.WorldPosition);
+    var fromBlue = Snap(blue.WorldPosition);
+    var results = targets.Select(t => {
+        var end = Snap(t.At);
+        var r = PathTo(fromRed, end);
+        var b = PathTo(fromBlue, end);
+        return new { t.Kind, t.Name, At = t.At.ToString(), SnapOff = end is null ? -1 : end.Value.Distance(t.At),
+                     Red = r.Status, RedLength = r.Length, RedEnd = r.End, Blue = b.Status, BlueLength = b.Length, BlueEnd = b.End };
+    }).ToArray();
+    var problems = results.Where(r => r.Red != "Complete" || r.Blue != "Complete" || r.SnapOff > 60 || r.SnapOff < 0).ToArray();
+    var data = new { Before = before, Settings = settings, Generated = generated, Seconds = Math.Round(seconds, 1),
+        Complete = results.Count(r => r.Red == "Complete" && r.Blue == "Complete"), Total = results.Length, Problems = problems, All = results };
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination, "navmesh-check.json"), System.Text.Json.JsonSerializer.Serialize(data, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+    return new { Colliders = colliders, Bodies = bodies, data.Generated, data.Seconds, data.Complete, data.Total, Problems = problems.Length, First = problems.Take(12).ToArray(), data.Settings,
+        SourceUnchanged = Editor.SceneEditorSession.Active?.Scene?.Id == before.SceneId && Game.ActiveScene?.Id == before.GameSceneId };
+} finally { scene.Destroy(); }

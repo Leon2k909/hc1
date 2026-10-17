@@ -1,0 +1,19 @@
+// Tools/railhead_backdrop_art.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    F_SELF_ILLUM "1"
+    TextureSelfIllumMask "[1.000000 1.000000 1.000000 0.000000]"
+    g_flSelfIllumBrightness "0.20"
+    g_flSelfIllumAlbedoFactor "1.0"
+    g_vSelfIllumTint "[1.000000 1.000000 1.000000 0.000000]"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.00"
+    TextureColor "materials/buildings/render_pale_color.png"
+    TextureNormal "materials/buildings/render_normal.png"
+    TextureRoughness "materials/buildings/render_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.800 0.780 0.720 1.0]"
+    g_flModelTintAmount "1.0"
+}

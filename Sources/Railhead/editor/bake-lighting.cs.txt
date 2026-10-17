@@ -1,0 +1,173 @@
+// Railhead's indirect-light bake: Sources/Belltower/editor/bake-editor-lighting.cs.txt with Railhead's paths and setup
+// (grid 30,21,8; 14 realtime reflection probes, which are left alone). Needs Railhead open as an editor tab with no
+// unsaved edits; output/railhead/quality/bake-config.json names the revision ({"directory":"daylight-vN","timeout_seconds":900}).
+// Then python Tools/railhead_quality_lighting.py imports the result for map regeneration.
+// Bake into the persistent editor scene. Never create/destroy an isolated world.
+// Relocation remains serial: engine 26.10.13's parallel mesh traces can race
+// ResourceSystem.RegisterWeak. The native cubemapper owns both lighting passes.
+var root = Sandbox.Project.Current.GetRootPath();
+var config = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/railhead/quality/bake-config.json")));
+var revision = config["directory"].GetValue<string>();
+if (!System.Text.RegularExpressions.Regex.IsMatch(revision,"^daylight-v[0-9]+$")) throw new InvalidOperationException("Invalid lighting revision");
+var destination = System.IO.Path.Combine(root,"output/railhead/quality",revision);
+var resourceDirectory = "lighting/railhead/"+revision;
+var nativeDirectory = System.IO.Path.Combine(root,"Assets",resourceDirectory);
+if (System.IO.Directory.Exists(nativeDirectory) && System.IO.Directory.EnumerateFiles(nativeDirectory).Any())
+    throw new InvalidOperationException("This lighting revision already has output; inspect it instead of overwriting it");
+var session = Editor.SceneEditorSession.All.Single(s => s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/railhead/railhead.scene",StringComparison.OrdinalIgnoreCase)==true);
+if (session.HasUnsavedChanges) throw new InvalidOperationException("Railhead has unsaved edits; inspect them before baking");
+var scene = session.Scene;
+var indirect = scene.GetAllComponents<IndirectLightVolume>().Single();
+var reflections = scene.GetAllComponents<EnvmapProbe>().ToArray();
+if (indirect.ProbeCounts.ToString() != "30,21,8" || reflections.Length != 14) throw new InvalidOperationException("Unexpected lighting setup: " + indirect.ProbeCounts + ", " + reflections.Length + " probes");
+var beforeGameId = Game.ActiveScene?.Id;
+var beforePlaying = Game.IsPlaying;
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var probesProperty = typeof(IndirectLightVolume).GetProperty("Probes",flags);
+var generatedProperty = typeof(IndirectLightVolume).GetProperty("GeneratedRelocationTexture",flags);
+var previewField = typeof(IndirectLightVolume).GetField("_bakePreview",flags);
+var dirty = typeof(IndirectLightVolume).GetMethod("MarkDirty",flags);
+var originalProbes = probesProperty.GetValue(indirect);
+var originalGenerated = (Texture)generatedProperty.GetValue(indirect);
+var originalTextures = (indirect.IrradianceTexture,indirect.DistanceTexture,indirect.RelocationTexture,indirect.BakeVersion);
+var originalReflections = reflections.Select(p => (Probe:p,Texture:p.BakedTexture,Mode:p.Mode)).ToArray();
+System.IO.Directory.CreateDirectory(destination);
+System.IO.Directory.CreateDirectory(nativeDirectory);
+var sourcePath = System.IO.Path.Combine(root,"Assets/scenes/maps/Railhead/railhead.scene");
+System.IO.File.Copy(sourcePath,System.IO.Path.Combine(destination,"visual-scene.json"),false);
+void Status(string value) => System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"bake-status.txt"),value);
+using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+timeout.CancelAfter(TimeSpan.FromSeconds(config["timeout_seconds"]?.GetValue<int>() ?? 600));
+var token = timeout.Token;
+object updater = null;
+Texture relocation = null;
+bool completed = false;
+try
+{
+    var type = typeof(IndirectLightVolume);
+    var counts = indirect.ProbeCounts;
+    var spacing = (Vector3)type.GetMethod("ComputeSpacing",flags).Invoke(indirect,new object[]{counts}) * indirect.WorldScale.Abs();
+    var directions = (Vector3[])type.GetMethod("GenerateSphericalDirections",flags | System.Reflection.BindingFlags.Static).Invoke(null,new object[]{128});
+    var trace = type.GetMethod("TraceProbeRays",flags);
+    var relocate = type.GetMethod("ComputeRelocationOffset",flags);
+    var position = type.GetMethod("GetProbeWorldPosition",flags);
+    var ratio = trace.ReturnType.GetProperty("BackfaceRatio",flags);
+    var minSpacing = MathF.Min(spacing.x,MathF.Min(spacing.y,spacing.z));
+    var probes = new IndirectLightVolume.Probe[counts.x*counts.y*counts.z];
+    for(var index=0;index<probes.Length;index++) probes[index] = new IndirectLightVolume.Probe();
+    probesProperty.SetValue(indirect,probes);
+    for(var z=0;z<counts.z;z++)
+    for(var y=0;y<counts.y;y++)
+    {
+        token.ThrowIfCancellationRequested();
+        if(!ThreadSafe.IsMainThread) throw new InvalidOperationException("Relocation left the main thread");
+        using(scene.Push())
+        for(var x=0;x<counts.x;x++)
+        {
+            var world = (Vector3)position.Invoke(indirect,new object[]{new Vector3Int(x,y,z)});
+            var offset = Vector3.Zero;
+            var active = true;
+            for(var iteration=0;iteration<12 && active;iteration++)
+            {
+                var hit = trace.Invoke(indirect,new object[]{world+offset,spacing.Length,directions});
+                var move = ((Vector3,bool))relocate.Invoke(indirect,new object[]{offset,hit,spacing,minSpacing,minSpacing*.2f,directions});
+                if(move.Item2) { active=false; break; }
+                offset = move.Item1;
+            }
+            if(active && indirect.InsideGeometry.ToString()=="Relocate")
+                active = (float)ratio.GetValue(trace.Invoke(indirect,new object[]{world+offset,spacing.Length,directions})) < .25f;
+            probes[x+y*counts.x+z*counts.x*counts.y] = new IndirectLightVolume.Probe { Offset=offset, Active=active };
+        }
+        Status($"Relocating on main thread {z*counts.y+y+1}/{counts.z*counts.y} rows");
+        await Task.Yield();
+    }
+    using(scene.Push())
+    {
+        type.GetMethod("UpdateRelocationTexture",flags).Invoke(indirect,null);
+        dirty.Invoke(indirect,null);
+    }
+    relocation = (Texture)generatedProperty.GetValue(indirect);
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"relocation-status.json"),System.Text.Json.JsonSerializer.Serialize(
+        new { Mode="Main thread; native trace and relocation functions", Grid=counts.ToString(), Active=probes.Count(p=>p.Active), Total=probes.Length }));
+    var updaterType = type.Assembly.GetType("Sandbox.DDGIProbeUpdaterCubemapper");
+    using(scene.Push()) updater = Activator.CreateInstance(updaterType,new object[]{indirect});
+    var irradiance = (Texture)updaterType.GetProperty("GeneratedIrradianceTexture").GetValue(updater);
+    var distance = (Texture)updaterType.GetProperty("GeneratedDistanceTexture").GetValue(updater);
+    previewField.SetValue(indirect,(irradiance,distance,relocation));
+    dirty.Invoke(indirect,null);
+    var passField = updaterType.GetField("_pass",flags);
+    var indexField = updaterType.GetField("_renderedIndex",flags);
+    // Scene.Push changes process-global Game.ActiveScene. Never retain it across
+    // an await while the user's match is running. The updater stores its own world.
+    Task<bool> task;
+    using(scene.Push()) task = (Task<bool>)updaterType.GetMethod("RunAsync").Invoke(updater,new object[]{token});
+    while(!task.IsCompleted)
+    {
+        await Task.WhenAny(task,Task.Delay(1000));
+        if(!task.IsCompleted) Status($"Baking pass {(int)passField.GetValue(updater)+1}/2; probe {indexField.GetValue(updater)}; grid {counts}");
+    }
+    if(!await task) throw new InvalidOperationException("Native lighting bake did not complete");
+    var firstPass = irradiance;
+    irradiance = (Texture)updaterType.GetProperty("GeneratedIrradianceTexture").GetValue(updater);
+    distance = (Texture)updaterType.GetProperty("GeneratedDistanceTexture").GetValue(updater);
+    token.ThrowIfCancellationRequested();
+    Graphics.FlushGPU();
+    Texture Save(Texture texture,string name,ImageFormat? format=null)
+    {
+        if(texture is null || texture.IsError) throw new InvalidOperationException("Invalid capture: "+name);
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(nativeDirectory,name+".vtex_c"),texture.SaveToVtex(format));
+        var saved = Texture.Load(resourceDirectory+"/"+name+".vtex",false);
+        if(saved is null || saved.IsError) throw new InvalidOperationException("Could not reload capture: "+name);
+        return saved;
+    }
+    indirect.IrradianceTexture = Save(irradiance,"irradiance");
+    indirect.DistanceTexture = Save(distance,"distance",(ImageFormat)85);
+    indirect.RelocationTexture = Save(relocation,"relocation",(ImageFormat)24);
+    indirect.BakeVersion = 1;
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"indirect-result.json"),System.Text.Json.JsonSerializer.Serialize(
+        new { Passes=2, SavedFinalIrradiance=true, IrradianceReplacedAfterFirstPass=!ReferenceEquals(firstPass,irradiance), Grid=counts.ToString() }));
+    previewField.SetValue(indirect,null);
+    dirty.Invoke(indirect,null);
+    using(scene.Push())
+    {
+        var systemType = typeof(Scene).Assembly.GetType("Sandbox.DDGIVolumeSystem");
+        var getter = typeof(Scene).GetMethods().Single(m=>m.Name=="GetSystem" && m.IsGenericMethodDefinition && m.GetParameters().Length==0);
+        var system = getter.MakeGenericMethod(systemType).Invoke(scene,null);
+        systemType.GetMethod("MarkDirty",flags).Invoke(system,null);
+        systemType.GetMethod("UpdateVolumes",flags).Invoke(system,null);
+    }
+    // Retain the accepted reflections. Engine 26.10.13's Quality GGX bake
+    // faulted in envmap_filtering_cs on this GPU; do not silently repeat it.
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"indirect-light.json"),indirect.GameObject.Serialize().ToJsonString());
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"reflections-baked.json"),reflections[0].GameObject.Parent.Serialize().ToJsonString());
+    var result = new { Passes=2, SavedFinalIrradiance=true, IrradianceReplacedAfterFirstPass=!ReferenceEquals(firstPass,irradiance), Grid=counts.ToString(),
+        PersistentEditorScene=true, SceneId=scene.Id, Reflections=reflections.Length, CapturedReflections=0,
+        RetainedReflectionTextures=reflections.Select(p=>p.BakedTexture?.ResourcePath).ToArray(), SavedScene=false,
+        GamePreserved=Game.ActiveScene?.Id==beforeGameId && Game.IsPlaying==beforePlaying };
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"bake-result.json"),System.Text.Json.JsonSerializer.Serialize(result));
+    completed = true;
+    Status("Complete "+counts);
+    return result;
+}
+catch(Exception error)
+{
+    Status("Failed: "+error);
+    throw;
+}
+finally
+{
+    previewField.SetValue(indirect,null);
+    if(!completed)
+    {
+        indirect.IrradianceTexture=originalTextures.Item1;
+        indirect.DistanceTexture=originalTextures.Item2;
+        indirect.RelocationTexture=originalTextures.Item3;
+        indirect.BakeVersion=originalTextures.Item4;
+        probesProperty.SetValue(indirect,originalProbes);
+        foreach(var original in originalReflections) { original.Probe.BakedTexture=original.Texture; original.Probe.Mode=original.Mode; }
+    }
+    (updater as IDisposable)?.Dispose();
+    if(relocation is not null && !ReferenceEquals(relocation,originalGenerated)) relocation.Dispose();
+    generatedProperty.SetValue(indirect,originalGenerated);
+    dirty.Invoke(indirect,null);
+}

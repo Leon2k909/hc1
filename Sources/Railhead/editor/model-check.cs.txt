@@ -1,0 +1,44 @@
+// Loads Railhead's compiled models (nothing is compiled) and reports, per model, its compiled file's time and size, and
+// its collision shapes and materials as the engine reads them, so a build can be checked against the compiled models
+// without a forced recompile (which stalls the editor for minutes). Run with the native MCP's run_csharp.
+var projectRoot = Sandbox.Project.Current.GetRootPath();
+var dir = System.IO.Path.Combine(projectRoot, "Assets/models/maps/railhead");
+int Count(object o) => o is System.Collections.ICollection c ? c.Count : o is System.Collections.IEnumerable e ? e.Cast<object>().Count() : 0;
+var results = new System.Collections.Generic.List<object>();
+foreach (var vmdl in System.IO.Directory.GetFiles(dir, "*.vmdl").OrderBy(x => x))
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var rel = "models/maps/railhead/" + System.IO.Path.GetFileName(vmdl);
+    var compiled = vmdl + "_c";
+    var model = Model.Load(rel);
+    var shapes = new System.Collections.Generic.Dictionary<string, int>();
+    var parts = 0;
+    if (model?.Physics is not null)
+        foreach (var part in model.Physics.Parts)
+        {
+            parts++;
+            foreach (var prop in part.GetType().GetProperties())
+            {
+                if (prop.GetIndexParameters().Length > 0 || prop.PropertyType == typeof(string)) continue;
+                if (!typeof(System.Collections.IEnumerable).IsAssignableFrom(prop.PropertyType)) continue;
+                var n = Count(prop.GetValue(part));
+                shapes[prop.Name] = (shapes.TryGetValue(prop.Name, out var k) ? k : 0) + n;
+            }
+        }
+    var materials = model?.Materials.Select(m => m?.ResourcePath).Where(p => p is not null).Distinct().OrderBy(p => p).ToList();
+    results.Add(new
+    {
+        Model = System.IO.Path.GetFileNameWithoutExtension(vmdl),
+        Error = model is null || model.IsError,
+        CompiledAt = System.IO.File.Exists(compiled) ? System.IO.File.GetLastWriteTime(compiled).ToString("MM-dd HH:mm:ss") : null,
+        SourceAt = System.IO.Directory.GetFiles(dir, System.IO.Path.GetFileNameWithoutExtension(vmdl) + "*.obj").Append(vmdl).Max(System.IO.File.GetLastWriteTime).ToString("MM-dd HH:mm:ss"),
+        Parts = parts,
+        Shapes = shapes,
+        Materials = materials?.Count ?? 0,
+        MaterialList = materials,
+    });
+    await Task.Delay(1, cancellationToken);
+}
+var outPath = System.IO.Path.Combine(projectRoot, "output/railhead/model-check.json");
+System.IO.File.WriteAllText(outPath, System.Text.Json.JsonSerializer.Serialize(results, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+return results.Select(r => r.GetType().GetProperty("Model").GetValue(r) + " " + System.Text.Json.JsonSerializer.Serialize(new { e = r.GetType().GetProperty("Error").GetValue(r), p = r.GetType().GetProperty("Parts").GetValue(r), s = r.GetType().GetProperty("Shapes").GetValue(r), m = r.GetType().GetProperty("Materials").GetValue(r) })).ToList();

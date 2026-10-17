@@ -13,6 +13,8 @@
 						_class = "DefaultMaterialGroup"
 						remaps =
 						[
+							{ from = "dress_globe.vmat" to = "materials/railhead/dress/dress_globe.vmat" },
+							{ from = "rw_alu_brushed.vmat" to = "materials/railhead/rw_alu_brushed.vmat" },
 							{ from = "rw_black.vmat" to = "materials/railhead/rw_black.vmat" },
 							{ from = "rw_bottle_apple.vmat" to = "materials/railhead/rw_bottle_apple.vmat" },
 							{ from = "rw_bottle_cola.vmat" to = "materials/railhead/rw_bottle_cola.vmat" },
@@ -24,22 +26,38 @@
 							{ from = "rw_card_reader_metal.vmat" to = "materials/railhead/rw_card_reader_metal.vmat" },
 							{ from = "rw_card_reader_screen.vmat" to = "materials/railhead/rw_card_reader_screen.vmat" },
 							{ from = "rw_clock.vmat" to = "materials/railhead/rw_clock.vmat" },
-							{ from = "rw_concrete_dark.vmat" to = "materials/railhead/rw_concrete_dark.vmat" },
-							{ from = "rw_container_green.vmat" to = "materials/railhead/rw_container_green.vmat" },
+							{ from = "rw_concrete.vmat" to = "materials/railhead/rw_concrete.vmat" },
+							{ from = "rw_container_green.vmat" to = "materials/railhead/containers/rw_container_green.vmat" },
+							{ from = "rw_galvanised.vmat" to = "materials/railhead/rw_galvanised.vmat" },
 							{ from = "rw_kiosk.vmat" to = "materials/railhead/rw_kiosk.vmat" },
+							{ from = "rw_kiosk_backlit.vmat" to = "materials/railhead/rw_kiosk_backlit.vmat" },
+							{ from = "rw_kiosk_clad.vmat" to = "materials/railhead/rw_kiosk_clad.vmat" },
+							{ from = "rw_kiosk_fascia.vmat" to = "materials/railhead/rw_kiosk_fascia.vmat" },
+							{ from = "rw_kiosk_ink.vmat" to = "materials/railhead/rw_kiosk_ink.vmat" },
+							{ from = "rw_kiosk_membrane.vmat" to = "materials/railhead/rw_kiosk_membrane.vmat" },
 							{ from = "rw_kiosk_shelf.vmat" to = "materials/railhead/rw_kiosk_shelf.vmat" },
 							{ from = "rw_kiosk_stone.vmat" to = "materials/railhead/rw_kiosk_stone.vmat" },
+							{ from = "rw_kiosk_white.vmat" to = "materials/railhead/rw_kiosk_white.vmat" },
+							{ from = "rw_lamp_cool.vmat" to = "materials/railhead/rw_lamp_cool.vmat" },
 							{ from = "rw_lamp_warm.vmat" to = "materials/railhead/rw_lamp_warm.vmat" },
 							{ from = "rw_leaf.vmat" to = "materials/railhead/rw_leaf.vmat" },
 							{ from = "rw_leaf_light.vmat" to = "materials/railhead/rw_leaf_light.vmat" },
 							{ from = "rw_lettering.vmat" to = "materials/railhead/rw_lettering.vmat" },
 							{ from = "rw_posters.vmat" to = "materials/railhead/rw_posters.vmat" },
 							{ from = "rw_pot.vmat" to = "materials/railhead/rw_pot.vmat" },
+							{ from = "rw_prop_signs.vmat" to = "materials/railhead/rw_prop_signs.vmat" },
 							{ from = "rw_red_paint.vmat" to = "materials/railhead/rw_red_paint.vmat" },
+							{ from = "rw_rubber.vmat" to = "materials/railhead/rw_rubber.vmat" },
 							{ from = "rw_signs.vmat" to = "materials/railhead/rw_signs.vmat" },
+							{ from = "rw_soil.vmat" to = "materials/railhead/rw_soil.vmat" },
+							{ from = "rw_stainless.vmat" to = "materials/railhead/rw_stainless.vmat" },
+							{ from = "rw_steel.vmat" to = "materials/railhead/rw_steel.vmat" },
 							{ from = "rw_steel_dark.vmat" to = "materials/railhead/rw_steel_dark.vmat" },
 							{ from = "rw_steel_grey.vmat" to = "materials/railhead/rw_steel_grey.vmat" },
+							{ from = "rw_tactile.vmat" to = "materials/railhead/rw_tactile.vmat" },
+							{ from = "rw_tactile_dots.vmat" to = "materials/railhead/rw_tactile_dots.vmat" },
 							{ from = "rw_train_blue.vmat" to = "materials/railhead/rw_train_blue.vmat" },
+							{ from = "rw_vend_cabinet.vmat" to = "materials/railhead/rw_vend_cabinet.vmat" },
 							{ from = "rw_white_paint.vmat" to = "materials/railhead/rw_white_paint.vmat" },
 							{ from = "rw_wood.vmat" to = "materials/railhead/rw_wood.vmat" },
 							{ from = "rw_yellow_paint.vmat" to = "materials/railhead/rw_yellow_paint.vmat" }
@@ -113,9 +131,9 @@
 						parent_bone = ""
 						surface_prop = "metal"
 						collision_tags = "solid"
-						origin = [ 637.7500, 1.0000, 39.0000 ]
+						origin = [ 637.7500, -0.0000, 39.0000 ]
 						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 72.0000, 4.5000, 2.0000 ]
+						dimensions = [ 82.0000, 4.5000, 2.0000 ]
 					},
 					{
 						_class = "PhysicsShapeBox"
@@ -174,6 +192,15 @@
 					{
 						_class = "PhysicsShapeBox"
 						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ 400.2500, -0.0000, 19.7000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 24.4000, 13.1000, 39.4000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
 						surface_prop = "wood"
 						collision_tags = "solid"
 						origin = [ -500.0000, 14.1000, 8.8500 ]
@@ -206,6 +233,60 @@
 						origin = [ -500.0000, -2.8491, 15.0947 ]
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 4.6017, 78.7000, 30.1894 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -559.7500, -0.0000, 19.7000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 24.4000, 13.1000, 39.4000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ -1220.0000, 14.1000, 8.8500 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 17.9000, 78.7000, 17.7000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ -1220.0000, 2.8491, 15.0947 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 4.6017, 78.7000, 30.1894 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ -1220.0000, -14.1000, 8.8500 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 17.9000, 78.7000, 17.7000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "wood"
+						collision_tags = "solid"
+						origin = [ -1220.0000, -2.8491, 15.0947 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 4.6017, 78.7000, 30.1894 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -1279.7500, -0.0000, 19.7000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 24.4000, 13.1000, 39.4000 ]
 					},
 					{
 						_class = "PhysicsShapeBox"

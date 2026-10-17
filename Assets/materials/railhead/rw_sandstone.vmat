@@ -1,14 +1,14 @@
-// Tools/railhead_scanned.py; source and CC0 provenance in railhead_scanned_sources.json
+// Tools/railhead_materials.py
 "Layer0"
 {
     shader "shaders/complex.shader"
     F_SPECULAR "1"
-    g_flMetalness "0"
     g_flRoughnessScaleFactor "1"
-    g_vColorTint "[1 1 1 1]"
-    g_flModelTintAmount "1"
+    g_flMetalness "0.00"
     TextureColor "materials/railhead/rw_sandstone_color.png"
     TextureNormal "materials/railhead/sandstone_normal.png"
     TextureRoughness "materials/railhead/sandstone_rough.png"
-    TextureAmbientOcclusion "materials/railhead/sandstone_ao.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1.0 1.0 1.0 1.0]"
+    g_flModelTintAmount "1.0"
 }

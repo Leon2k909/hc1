@@ -326,30 +326,33 @@ def _screen():
     w, h = 768, 992
     yy, xx = np.mgrid[:h, :w]
     glow = np.exp(-((xx - 615) / 530) ** 2 - ((yy - 520) / 450) ** 2)
-    rgb = np.array((27, 50, 82)) + glow[..., None] * np.array((16, 37, 61))
+    rgb = np.array((40, 78, 126)) + glow[..., None] * np.array((22, 44, 66))
     image = Image.fromarray(np.uint8(rgb))
     d = ImageDraw.Draw(image)
     # Faint station-roof drawing, behind the controls like the reference welcome page.
-    roof = (61, 94, 130)
+    roof = (78, 116, 158)
     for j in range(9):
         d.arc((-950 + j * 112, 99 + j * 32, 850 + j * 75, 1280 - j * 32), 259, 354, fill=roof, width=2)
     for j in range(15):
         d.line((135 + j * 62, 163, 900 - j * 57, 966), fill=roof, width=1)
     for j in range(10):
         d.line((0, 530 + j * 48, 768, 321 + j * 67), fill=roof, width=1)
-    d.rectangle((0, 0, w, 107), fill=(30, 56, 92))
-    d.rounded_rectangle((40, 29, 117, 86), radius=5, outline=(247, 251, 255), width=4)
-    _text(d, (79, 59), "DB", 43, (247, 251, 255), bold=True)
-    _text(d, (732, 59), "14:32", 34, (248, 250, 255), anchor="rm")
+    d.rectangle((0, 0, w, 107), fill=(236, 240, 246))
+    # A generic ticket pictogram (no operator's mark) and the machine's name.
+    d.rounded_rectangle((40, 29, 117, 86), radius=8, fill=(30, 72, 140))
+    d.rectangle((54, 46, 103, 70), outline=(247, 251, 255), width=4)
+    d.line((88, 46, 88, 70), fill=(247, 251, 255), width=3)
+    _text(d, (140, 59), "Fahrkarten", 36, (24, 46, 86), bold=True, anchor="lm")
+    _text(d, (732, 59), "14:03", 34, (24, 46, 86), anchor="rm")
     _text(d, (40, 190), "Willkommen", 60, (248, 250, 255), bold=True, anchor="lm")
     _text(d, (40, 267), "Wohin soll es gehen?", 35, (244, 248, 253), anchor="lm")
     ink = (6, 20, 42)
     labels = (("location", "Ziel eingeben"), ("return", "Hin- und Rückfahrt"),
               ("clock", "Tageskarte"), ("group", "Gruppenkarte"),
-              ("card", "BahnCard"), ("more", "Weitere Optionen"))
+              ("card", "Rabattkarte"), ("more", "Weitere Optionen"))
     for k, (name, words) in enumerate(labels):
         x, y = 36 + (k % 2) * 370, 342 + (k // 2) * 156
-        d.rounded_rectangle((x, y, x + 355, y + 142), radius=9, fill=(188, 203, 224), outline=(221, 231, 245), width=2)
+        d.rounded_rectangle((x, y, x + 355, y + 142), radius=9, fill=(226, 234, 245), outline=(248, 251, 255), width=2)
         _icon(d, name, x + 64, y + 70, 64, ink)
         size = 30
         while _font(size, bold=True).getlength(words) > 226:
@@ -373,16 +376,22 @@ def _grain(w, h, entry, rng):
         rough = 160 + grain * 2
         height = grain * .015
     else:
-        value = 24 if entry in ("body", "tap", "receipt", "coins", "card") else 12
-        grain = noise * (1.5 if entry == "body" else .7)
-        rgb = np.stack((value + grain, value + grain + 1, value + grain + 2), axis=-1)
+        # The casing is a silver-grey powder coat (RAL 7035/7037 between), its panels dark grey.
+        value = 166 if entry == "body" else 30 if entry in ("tap", "receipt", "coins", "card") else 12
+        grain = noise * (2.2 if entry == "body" else .7)
+        if entry == "body":
+            broad = rng.normal(0, 1, (max(h // 32, 2), max(w // 32, 2)))
+            broad = np.asarray(Image.fromarray(np.uint8(np.clip(128 + broad * 20, 0, 255))).resize((w, h), Image.BICUBIC),
+                               float) - 128
+            grain = grain + broad * .25 - np.clip((yy / h - .82) * 60, 0, 12)     # grime along the foot
+        rgb = np.stack((value + grain, value + grain + 1.5, value + grain + 1), axis=-1)
         rough = 150 + noise * 4
         height = noise * .055
     tile = Image.fromarray(np.uint8(np.clip(rgb, 0, 255)))
     # Fine coating wear and sparse hairline scratches, without large high-contrast blotches.
     if entry in ("metal", "body", "dark_steel"):
         d = ImageDraw.Draw(tile)
-        base = 148 if entry == "metal" else 17 if entry == "body" else 63
+        base = 148 if entry == "metal" else 140 if entry == "body" else 63
         for _ in range(30):
             x, y = rng.integers(0, w), rng.integers(0, h)
             length = rng.integers(3, 25)
@@ -454,7 +463,7 @@ def vmat(metal=False, display=False):
     if display:
         lines += ['    F_SELF_ILLUM "1"',
                   '    TextureSelfIllumMask "materials/railhead/rw_ticket_machine_illum.png"',
-                  '    g_flSelfIllumBrightness "0.35"', '    g_flSelfIllumAlbedoFactor "1.0"',
+                  '    g_flSelfIllumBrightness "1.70"', '    g_flSelfIllumAlbedoFactor "1.0"',
                   '    g_vSelfIllumTint "[1 1 1 0]"']
     lines += ['    TextureColor "materials/railhead/rw_ticket_machine_color.png"',
               '    TextureNormal "materials/railhead/rw_ticket_machine_normal.png"',

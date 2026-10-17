@@ -1,10 +1,14 @@
-Layer0
+// Tools/railhead_prop_materials.py
+"Layer0"
 {
     shader "shaders/complex.shader"
     F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.40"
     TextureColor "materials/default/default_color.tga"
     TextureNormal "materials/default/default_normal.tga"
-    TextureRoughness "[0.12 0.12 0.12 0]"
-    g_vColorTint "[0.065 0.006 0.009 1]"
-    g_flMetalness "0.3"
+    TextureRoughness "[0.150000 0.150000 0.150000 0.000000]"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.156863 0.141176 0.141176 1.000000]"
+    g_flModelTintAmount "1.0"
 }

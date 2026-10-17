@@ -1,0 +1,14 @@
+// Tools/railhead_dress_detail.py (rw_line_white, tinted)
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "0.6"
+    g_flMetalness "0.00"
+    TextureColor "materials/railhead/rw_line_white_color.png"
+    TextureNormal "materials/railhead/lines_normal.png"
+    TextureRoughness "materials/railhead/lines_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.920 0.910 0.880 1.0]"
+    g_flModelTintAmount "1.0"
+}

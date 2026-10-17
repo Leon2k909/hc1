@@ -134,12 +134,15 @@ def window(car, xs, d0, d1, z0, z1, body):
     _rim(car, xs, ((xs * W, *outside, 4.7),
                    (xs * (W + .48), d0 - .95, d1 + .95, z0 - .95, z1 + .95, 4.0),
                    (xs * (W + .38), d0, d1, z0, z1, 3.5),
-                   (xs * (W - 1.05), d0, d1, z0, z1, 3.5)))
+                   (xs * (W - 1.85), d0, d1, z0, z1, 3.5)))
+    # A glossy black frame band just inside the gasket, 60 mm, then the glass 40 mm back from the body's skin.
+    _rim(car, xs, ((xs * (W + .40), d0 + .15, d1 - .15, z0 + .15, z1 - .15, 3.4),
+                   (xs * (W - 1.5), d0 + 2.0, d1 - 2.0, z0 + 2.0, z1 - 2.0, 2.0)), METAL, "dark")
     # Separate no-shadow glazing model: the saloon really exists behind it.
-    _face(car, xs, xs * (W - .35), d0, d1, z0, z1, "dark", GLASS, radius=3.5)
+    _face(car, xs, xs * (W - 1.6), d0 + 1.9, d1 - 1.9, z0 + 1.9, z1 - 1.9, "dark", GLASS, radius=2.0)
     # Thin interior gasket visible on oblique views.
-    _rim(car, -xs, ((xs * (W - 1.15), d0 - .45, d1 + .45, z0 - .45, z1 + .45, 3.9),
-                    (xs * (W - 1.2), d0, d1, z0, z1, 3.5)))
+    _rim(car, -xs, ((xs * (W - 1.95), d0 - .45, d1 + .45, z0 - .45, z1 + .45, 3.9),
+                    (xs * (W - 2.0), d0, d1, z0, z1, 3.5)))
 
 
 def rounded_solid(car, bounds, axis="d", radius=1.2, bevel=.35, entry="seat", paint=INSIDE):
@@ -229,33 +232,27 @@ def interior(car):
 
 
 def underframe(car):
-    """Recessed mechanical silhouettes behind each bogie opening."""
+    """What shows round each bogie in its cut-out: a dark bulkhead between the wheels (so the gap doesn't show the far
+    side), the body's sole bar along the cut-out's top, and a cable tray and brake pipe along under it. The bogie
+    itself (railhead_running_gear) stands in the open in front of the bulkhead."""
     import railhead_props as P
     portals = [(d - 1, d + 65) for d in P.EMU_DOORS]
-    def clipped_box(bounds):
+    def clipped_box(bounds, entry="dark", paint=DETAIL):
         x0, x1, d0, d1, z0, z1 = bounds
         for lo, hi in P._subtract((d0, d1), portals):
-            box(car, (x0, x1, lo, hi, z0, z1), "dark", DETAIL)
+            box(car, (x0, x1, lo, hi, z0, z1), entry, paint)
     for centre in P.EMU_BOGIES:
         for xs in (-1, 1):
-            a, b = sorted((xs * (P.EMU_W - 19), xs * (P.EMU_W - 17)))
-            clipped_box((a, b, centre - 63, centre + 63, 11, 41))
+            # The bulkhead in the bogie's dust tone (not black), so the side frame's fish belly shows against it.
+            a, b = sorted((xs * 19.0, xs * 20.0))
+            clipped_box((a, b, centre - 66, centre + 66, 8, P.EMU_CUT), "metal", "rw_bogie_dust")
             a, b = sorted((xs * (P.EMU_W - 14), xs * (P.EMU_W - 9)))
-            clipped_box((a, b, centre - 58, centre + 58, 34, 39))
-            for dd in (-49, 49):
-                if any(centre + dd + 8 > lo and centre + dd - 8 < hi for lo, hi in portals):
-                    continue
-                a, b = sorted((xs * (P.EMU_W - 13), xs * (P.EMU_W - 8)))
-                rounded_solid(car, (a, b, centre + dd - 8, centre + dd + 8, 13, 31),
-                              axis="x", radius=1.5, bevel=.5, entry="dark", paint=DETAIL)
-                for offset in (-4, 4):
-                    car.disc("rw_steel_grey", (xs * (P.EMU_W - 7.9), centre + dd + offset, 26), (xs, 0, 0), .75, 10)
-            for dd in (-25, 25):
-                # Smooth steel compression springs, distinct from the flat dark frame.
-                ps = [(xs * (P.EMU_W - 9) + 1.5 * math.cos(t), centre + dd + 1.5 * math.sin(t),
-                       14 + 18 * k / 48) for k, t in enumerate(np.linspace(0, math.tau * 4, 49))]
-                for p, q in zip(ps, ps[1:]):
-                    car.rod(p, q, .30, "rw_steel_dark", 6)
+            clipped_box((a, b, centre - 62, centre + 62, 37, P.EMU_CUT))
+            # The cable tray and the brake pipe running along under the sole bar.
+            a, b = sorted((xs * (P.EMU_W - 18), xs * (P.EMU_W - 15)))
+            clipped_box((a, b, centre - 62, centre + 62, 33.5, 36.5), "metal", METAL)
+            car.rod((xs * (P.EMU_W - 20.5), centre - 62, 35.0), (xs * (P.EMU_W - 20.5), centre + 62, 35.0), .55,
+                    "rw_steel_dark", 6)
 
 
 def _door_leaf(car, xs, d0, d1, right):
@@ -307,11 +304,19 @@ def doorway(car, xs, d0, d1, opened=False):
     x = xs * (W + .05)
     _rim(car, xs, ((x, d0 - 1.4, d1 + 1.4, 29.4, 131.4, 1.6),
                    (x + xs * .12, d0, d1, 30, 130, .6)))
+    # The step plate under the doorway, 40 mm out from the skin, chequered stainless with a yellow nosing line.
+    a, b = sorted((xs * (W - .2), xs * (W + 1.75)))
+    box(car, (a, b, d0 - 2.0, d1 + 2.0, 28.6, 29.5), "metal", METAL)
+    a, b = sorted((xs * (W + 1.55), xs * (W + 1.78)))
+    box(car, (a, b, d0 - 2.0, d1 + 2.0, 28.75, 29.35), "threshold", DETAIL, skip=("-z",))
     if not opened:
-        # Rubber meeting seal behind the leaves: the narrow centre joint must
-        # not leave a slit through to the opposite side of the train.
+        # Rubber meeting seals: black lips along both leaves' leading edges, proud of the leaves, and the narrow centre
+        # joint behind them, which must not leave a slit through to the opposite side of the train.
         a, b = sorted((xs * (W + 1.2), xs * (W + 1.56)))
         box(car, (a, b, mid - .21, mid + .21, 30.0, 130.0), "dark", DETAIL)
+        a, b = sorted((xs * (W + 1.5), xs * (W + 1.95)))
+        for lo_, hi_ in ((mid - .95, mid - .14), (mid + .14, mid + .95)):
+            box(car, (a, b, lo_, hi_, 30.6, 129.2), "dark", DETAIL, skip=("-z",))
         return
     # The reveal and ceiling point into the open passage, not out through the skin.
     # The back panel matches the existing centre-line collision boundary.
@@ -460,10 +465,12 @@ def _bike(draw, cx, cy, scale, fill, width=3):
         draw.line([p(*q) for q in points], fill=fill, width=width)
 
 
-def write():
-    """Draw surfaces and crisp markings from source, rather than baking a reference photograph onto the model."""
+def write(root=None):
+    """Draw surfaces and crisp markings from source, rather than baking a reference photograph onto the model. root: a
+    folder laid out as Assets (a stage) to write into; Assets with none."""
+    out = OUT if root is None else Path(root) / "materials/railhead"
     from scipy.ndimage import gaussian_filter
-    OUT.mkdir(parents=True, exist_ok=True)
+    out.mkdir(parents=True, exist_ok=True)
     rng = np.random.default_rng(41005)
     color = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 255))
     rough = Image.new("L", (SIZE, SIZE), 170)
@@ -531,14 +538,19 @@ def write():
     draw.line((a + 47, b + 589, a + 30, b + 565), fill=white, width=7)
     for x in (a + 88, a + 146):
         draw.ellipse((x - 12, b + 646, x + 12, b + 670), fill=white)
-    # Painted DB logo and vehicle number retain transparent surroundings.
+    # The (made-up) regional operator's mark and the vehicle number, with transparent surroundings: two white
+    # chevrons and "rhv" (Regionalverkehr Hohenwald-Vorland). No real operator's name or logo.
     a, b, c, d = RECTS["db"]
     draw.rectangle((a, b, c - 1, d - 1), fill=(0, 0, 0, 0))
-    draw.rounded_rectangle((a + 12, b + 16, c - 13, d - 17), 12, outline=white, width=12)
-    _label(draw, ((a + c) / 2, (b + d) / 2 + 1), "DB", 115, bold=True)
+    cy = (b + d) / 2
+    for k in range(2):
+        x = a + 14 + k * 24
+        draw.polygon(((x, b + 40), (x + 16, b + 40), (x + 40, cy), (x + 16, d - 40), (x, d - 40), (x + 24, cy)),
+                     fill=white)
+    _label(draw, (a + 146, cy - 4), "rhv", 78, bold=True)
     a, b, c, d = RECTS["number"]
     draw.rectangle((a, b, c - 1, d - 1), fill=(0, 0, 0, 0))
-    _label(draw, ((a + c) / 2, (b + d) / 2), "94 80 0462 314-8 D-DB", 49)
+    _label(draw, ((a + c) / 2, (b + d) / 2), "94 80 0462 314-8 D-RHV", 49)
     # Amber dot matrix. Text is rasterised through a regular LED grid, no glowing rectangle.
     a, b, c, d = RECTS["destination"]
     draw.rectangle((a, b, c - 1, d - 1), fill=(9, 13, 17, 255))
@@ -563,7 +575,7 @@ def write():
             _label(draw, ((a + c) / 2, b + 34), "Sicher reisen", 22, bold=True)
             for y in range(b + 90, d - 35, 21):
                 draw.line((a + 15, y, c - 16, y), fill=(63, 63, 59, 255), width=3)
-            _label(draw, ((a + c) / 2, d - 23), "DB REGIO", 22, (119, 28, 30, 255), True)
+            _label(draw, ((a + c) / 2, d - 23), "rhv Regio", 22, (119, 28, 30, 255), True)
         elif entry == "map":
             _label(draw, ((a + c) / 2, b + 24), "Liniennetz", 27, (48, 58, 60, 255), True)
             for row, tint in enumerate(((124, 39, 43, 255), (39, 87, 115, 255), (83, 108, 63, 255))):
@@ -607,7 +619,7 @@ def write():
     normal = Image.fromarray(np.clip((gl_normals(height, 1) * .5 + .5) * 255, 0, 255).astype(np.uint8), "RGB")
     for suffix, im in (("color", color), ("rough", rough), ("normal", normal), ("emission", emission),
                        ("trans", color.getchannel("A")), ("ambient", ambient)):
-        _save(OUT / f"rw_emu_{suffix}.png", im)
+        _save(out / f"rw_emu_{suffix}.png", im)
     for paint, metallic, self_illum, alpha in ((DETAIL, 0, 0, False), (METAL, .18, 0, False),
                                              (INSIDE, 0, .32, False), (DECAL, 0, 0, True), (LIT, .05, .8, True)):
         text = ["// Tools/railhead_train.py", '"Layer0"', "{", '    shader "shaders/complex.shader"',
@@ -626,9 +638,9 @@ def write():
             text += ['    F_ALPHA_TEST "1"', '    g_flAlphaTestReference "0.45"',
                      '    TextureTranslucency "materials/railhead/rw_emu_trans.png"',
                      '    g_flAntiAliasedEdgeStrength "1"']
-        (OUT / f"{paint}.vmat").write_text("\n".join(text + ["}", ""]), encoding="utf-8")
+        (out / f"{paint}.vmat").write_text("\n".join(text + ["}", ""]), encoding="utf-8")
     # Tinted train glass is clear enough to see seats, with restrained reflections.
-    (OUT / f"{GLASS}.vmat").write_text('''// Tools/railhead_train.py
+    (out / f"{GLASS}.vmat").write_text('''// Tools/railhead_train.py
 "Layer0"
 {
     shader "shaders/glass.shader"
@@ -655,11 +667,16 @@ def write():
     broad /= broad.std() + 1e-6
     vertical = gaussian_filter(fine, (65, 3), mode="wrap")
     vertical /= vertical.std() + 1e-6
-    dirt = np.maximum(vertical, 0) * .036 + np.maximum(broad, 0) * .025
-    for paint, base in ((RED, (201, 19, 27)), (BLUE, (19, 54, 126))):
-        arr = np.asarray(base)[None, None, :] * (1 - dirt[..., None]) + fine[..., None] * .7
-        _save(OUT / f"{paint}_color.png", Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8), "RGB"))
-        (OUT / f"{paint}.vmat").write_text('''// Tools/railhead_train.py
+    dirt = np.maximum(vertical, 0) * .02 + np.maximum(broad, 0) * .03
+    streaks = gaussian_filter(rng.normal(0, 1, (n, n)), (120, 6), mode="wrap")
+    streaks = np.maximum(streaks / (streaks.std() + 1e-6) - 1.4, 0) * .025
+    for paint, base in ((RED, (184, 26, 29)), (BLUE, (19, 54, 126))):
+        arr = np.asarray(base)[None, None, :] * (1 - dirt[..., None] - streaks[..., None]) + fine[..., None] * .9
+        arr += np.array((22, 20, 17))[None, None, :] * (dirt + streaks)[..., None]       # grey road and brake dust
+        _save(out / f"{paint}_color.png", Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8), "RGB"))
+        rough = np.clip(0.30 + 0.05 * broad + 0.5 * (dirt + streaks), 0.22, 0.6)
+        _save(out / f"{paint}_rough.png", Image.fromarray(np.clip(rough * 255, 0, 255).astype(np.uint8), "L"))
+        (out / f"{paint}.vmat").write_text('''// Tools/railhead_train.py
 "Layer0"
 {
     shader "shaders/complex.shader"
@@ -667,7 +684,7 @@ def write():
     g_flMetalness "0.06"
     TextureColor "materials/railhead/PAINT_color.png"
     TextureNormal "materials/default/default_normal.tga"
-    TextureRoughness "[0.34 0.34 0.34 1]"
+    TextureRoughness "materials/railhead/PAINT_rough.png"
     TextureAmbientOcclusion "materials/default/default_ao.tga"
     g_vColorTint "[1 1 1 1]"
     g_flModelTintAmount "1"
@@ -715,7 +732,8 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--build", action="store_true", help="also rebuild just the train-bearing dressing and lights")
+    parser.add_argument("--out", metavar="ROOT", help="a root laid out as Assets (a stage); default Assets")
     args = parser.parse_args()
-    write()
+    write(args.out)
     if args.build:
         rebuild_dressing()

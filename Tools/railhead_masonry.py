@@ -5,7 +5,7 @@ from collections import defaultdict
 import numpy as np
 import map_kit as K
 
-PAINTS = ('rw_dressed_red', 'rw_dressed', 'rw_sandstone')
+PAINTS = ('rw_dressed_red', 'rw_dressed', 'rw_sandstone', 'rw_sandstone_soot')
 
 
 def align_uvs(model):

@@ -1,0 +1,18 @@
+// Tools/railhead_prop_materials.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    F_ALPHA_TEST "1"
+    g_flAlphaTestReference "0.5"
+    g_flAntiAliasedEdgeStrength "1"
+    TextureTranslucency "materials/railhead/rw_kiosk_trans.png"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.00"
+    TextureColor "materials/railhead/rw_kiosk_color.png"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureRoughness "[0.400000 0.400000 0.400000 0.000000]"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.070000 0.075000 0.080000 1.000000]"
+    g_flModelTintAmount "1.0"
+}
