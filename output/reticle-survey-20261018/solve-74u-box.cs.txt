@@ -1,0 +1,77 @@
+// Solve the Box Collimator's sight line on the Kastov-74u: the gun's turn about the eye that puts the dot on the centre.
+const int W = 1920, H = 1080; const float Fov = 30f;
+var resource = ResourceLibrary.Get<EquipmentResource>( "weapons/kastov74u/kastov74u.equip" );
+var optic = ResourceLibrary.Get<Facepunch.Gunsmith.GunsmithPart>( "gunsmith/m4a1/mw2022/att_vm_reflex_02.gnsmth" );
+var manual = SceneUtility.GetPrefabScene( ResourceLibrary.Get<PrefabFile>( "weapons/kastov74u/weapon_kastov74u.prefab" ) )
+	.Components.GetAll<Facepunch.ManualOffset>( FindMode.EverythingInSelfAndDescendants ).First();
+
+(double Right, double Down, int Pixels) Measure( Angles extra )
+{
+	var position = optic.OpticAimOffset + manual.OpticAimCorrection;
+	var angles = optic.OpticAimAngles + extra;
+	var scene = new Scene();
+	try
+	{
+		using var scope = scene.Push();
+		var root = SceneUtility.GetPrefabScene( ResourceLibrary.Get<PrefabFile>( "weapons/kastov74u/vm_kastov74u.prefab" ) ).Clone( new CloneConfig { StartEnabled = false } );
+		root.Components.GetOrCreate<Facepunch.GunsmithWeapon>().Resource = resource;
+		foreach ( var c in root.Components.GetAll<Component>( FindMode.EverythingInSelfAndDescendants ) ) c.Enabled = c is ModelRenderer || c is Facepunch.Gunsmith.GunsmithAttachmentPoint;
+		var renderer = root.Components.Get<SkinnedModelRenderer>( FindMode.EverythingInSelf );
+		renderer.RenderOptions.Game = false; renderer.RenderOptions.Overlay = true;
+		renderer.UseAnimGraph = true; renderer.PlaybackRate = 1; renderer.PlayAnimationsInEditorScene = true;
+		Facepunch.AnimBools.SetBool( renderer, "b_grounded", true );
+		Facepunch.AnimBools.SetBool( renderer, "b_sprint", false );
+		renderer.Set( "ironsights", 1 ); renderer.Set( "ironsights_weight", 1f ); renderer.Set( "speed_ironsights", 1f ); renderer.Set( "hand_ik_weight", 0f );
+		var point = root.Components.GetAll<Facepunch.Gunsmith.GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants ).Single( p => p.Category == Facepunch.Gunsmith.GunsmithPartType.Optic );
+		point.SetPart( optic );
+		var turn = angles.ToRotation();
+		root.WorldRotation = turn; root.WorldPosition = turn * position;
+		root.Enabled = true; renderer.SceneModel.Transform = renderer.WorldTransform;
+		for ( int i = 0; i < 200; i++ ) { scene.EditorTick( .02f, .02f ); renderer.SceneModel.Transform = renderer.WorldTransform; renderer.SceneModel.Update( .02f ); }
+		foreach ( var mount in root.Components.GetAll<Facepunch.Gunsmith.GunsmithMw22Attachment>( FindMode.EverythingInSelfAndDescendants ) ) mount.RefreshMount();
+		var bone = renderer.SceneModel.GetBoneLocalTransform( "camera" );
+		var camera = new GameObject( true, "camera" ).Components.Create<CameraComponent>();
+		camera.WorldPosition = bone.Position; camera.WorldRotation = bone.Rotation;
+		camera.FieldOfView = Fov; camera.ZNear = 0.3f; camera.BackgroundColor = new Color( 0.18f, 0.18f, 0.2f );
+		var light = new GameObject( true, "light" ).Components.Create<DirectionalLight>();
+		light.WorldRotation = Rotation.From( new Angles( 40, 30, 0 ) ); light.LightColor = Color.White * 1.2f; light.SkyColor = Color.White * 0.4f;
+		scene.EditorTick( .01f, .01f );
+		using var bmp = new Bitmap( W, H );
+		camera.RenderToBitmap( bmp ); camera.RenderToBitmap( bmp );
+		double sx = 0, sy = 0, sw = 0; int count = 0;
+		for ( int y = H / 2 - 300; y < H / 2 + 300; y++ )
+			for ( int x = W / 2 - 300; x < W / 2 + 300; x++ )
+			{
+				var p = bmp.GetPixel( x, y );
+				var red = p.r - MathF.Max( p.g, p.b );
+				if ( p.r > 0.35f && red > 0.25f ) { sx += x * red; sy += y * red; sw += red; count++; }
+			}
+		if ( sw <= 0 ) return (double.NaN, double.NaN, 0);
+		var focal = W * 0.5 / Math.Tan( Fov * Math.PI / 360.0 );
+		return (Math.Atan( (sx / sw - (W - 1) / 2.0) / focal ) * 180 / Math.PI, Math.Atan( (sy / sw - (H - 1) / 2.0) / focal ) * 180 / Math.PI, count);
+	}
+	finally { scene.Destroy(); }
+}
+
+var log = new System.Collections.Generic.List<string>();
+var a0 = Angles.Zero;
+var m0 = Measure( a0 );
+log.Add( $"none: right {m0.Right:F4} down {m0.Down:F4} px {m0.Pixels}" );
+// The Jacobian: how the dot moves per degree of pitch and of yaw.
+var mp = Measure( new Angles( 0.3f, 0, 0 ) );
+var my = Measure( new Angles( 0, 0.3f, 0 ) );
+double jrp = (mp.Right - m0.Right) / 0.3, jdp = (mp.Down - m0.Down) / 0.3, jry = (my.Right - m0.Right) / 0.3, jdy = (my.Down - m0.Down) / 0.3;
+log.Add( $"per degree: pitch moves right {jrp:F3} down {jdp:F3}; yaw moves right {jry:F3} down {jdy:F3}" );
+double pitch = 0, yaw = 0, r = m0.Right, d = m0.Down;
+for ( int i = 0; i < 3; i++ )
+{
+	// Solve J * (dp, dy) = -(r, d)
+	var det = jrp * jdy - jry * jdp;
+	var dp = (-r * jdy + d * jry) / det;
+	var dy = (-d * jrp + r * jdp) / det;
+	pitch += dp; yaw += dy;
+	var m = Measure( new Angles( (float)pitch, (float)yaw, 0 ) );
+	r = m.Right; d = m.Down;
+	log.Add( $"pitch {pitch:F4} yaw {yaw:F4}: right {r:F4} down {d:F4} px {m.Pixels}" );
+}
+return log;

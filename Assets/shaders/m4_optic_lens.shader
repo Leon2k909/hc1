@@ -1,7 +1,7 @@
 HEADER
 {
     Description = "M4 coated optical glass and collimated reticle";
-    Version = 8;
+    Version = 9;
 }
 FEATURES
 {
@@ -25,13 +25,20 @@ struct VertexInput
 struct PixelInput
 {
     #include "common/pixelinput.hlsl"
+    // The optic model's own forward (x) and up (z) axes in world space: a red dot's reticle is collimated along them.
+    float3 vOpticForwardWs : TEXCOORD8;
+    float3 vOpticUpWs : TEXCOORD9;
 };
 VS
 {
     #include "common/vertex.hlsl"
     PixelInput MainVs( VertexInput i )
     {
-        return FinalizeVertex(ProcessVertex(i));
+        PixelInput o = ProcessVertex( i );
+        float3x4 m = GetTransformMatrix( i.nInstanceTransformID );
+        o.vOpticForwardWs = float3( m[0][0], m[1][0], m[2][0] );
+        o.vOpticUpWs = float3( m[0][2], m[1][2], m[2][2] );
+        return FinalizeVertex( o );
     }
 }
 PS
@@ -55,6 +62,9 @@ PS
     float g_flScopeReticle < Default(0.0); Range(0.0,1.0); UiGroup("Reticle,10/20"); >;
     float g_flUseReticleTexture < Default(0.0); Range(0.0,1.0); UiGroup("Reticle,10/30"); >;
     float g_flSightDistanceScale < Default(0.35); Range(0.0,20.0); UiGroup("Reticle,10/40"); >;
+    // A 1x sight's reticle in reticle units per radian off its axis: the dot (0.010 across its middle) is then 1.8 mrad
+    // in radius, about what the old projection drew from the aimed eye.
+    float g_flCollimationScale < Default(5.5); Range(1.0,40.0); UiGroup("Reticle,10/41"); >;
     // Opt-in: magnified sights still use their original clear reticle-only surface.
     // What a reflex or holographic window takes out of the view at normal incidence (its coatings' reflection and
     // absorption): ~0.06, so ~94% passes. It never writes depth.
@@ -70,10 +80,29 @@ PS
     {
         float3 viewRay = normalize(i.vPositionWithOffsetWs.xyz);
         float3 normal = normalize(i.vNormalWs);
-        float denominator = dot(viewRay,normal);
-        denominator = abs(denominator)<0.01 ? 0.01 : denominator;
-        float project = -g_flSightDistanceScale / denominator;
-        float2 uv = i.vTextureCoords.xy + project * 0.5 * float2(dot(viewRay,i.vTangentUWs),dot(viewRay,i.vTangentVWs));
+        float2 uv;
+        if ( g_flScopeReticle > 0.5 )
+        {
+            // The Scout 3x's crosshair, drawn a little behind its glass. The MWII magnified sights leave g_flScopeReticle
+            // at 0, so their glass is collimated too; once raised, ScopeOverlay's lens picture covers it.
+            float denominator = dot(viewRay,normal);
+            denominator = abs(denominator)<0.01 ? 0.01 : denominator;
+            float project = -g_flSightDistanceScale / denominator;
+            uv = i.vTextureCoords.xy + project * 0.5 * float2(dot(viewRay,i.vTangentUWs),dot(viewRay,i.vTangentVWs));
+        }
+        else
+        {
+            // A reflex or holographic sight collimates its reticle at infinity, so where the dot shows depends only on
+            // which way the eye looks through the window, against the way the sight points: never on where the eye is.
+            // Moving the head moves the window round the dot, and the dot stays on what the sight points at.
+            float3 forward = normalize(i.vOpticForwardWs);
+            float3 up = normalize(i.vOpticUpWs);
+            float3 side = cross(up, forward);
+            float along = abs(dot(viewRay, forward));
+            // The window's own texture axes say which way the reticle's art reads.
+            float2 axes = float2(dot(i.vTangentUWs, side) < 0.0 ? -1.0 : 1.0, dot(i.vTangentVWs, up) < 0.0 ? -1.0 : 1.0);
+            uv = 0.5 + g_flCollimationScale * axes * float2(dot(viewRay, side), dot(viewRay, up)) / max(along, 0.05);
+        }
         float2 centred = uv - 0.5 - g_vReticleOffset;
         float angle = g_flReticleRotation * 0.01745329252;
         float sine, cosine;

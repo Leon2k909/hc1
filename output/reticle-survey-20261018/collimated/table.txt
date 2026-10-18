@@ -1,0 +1,29 @@
+Collimated 1x reticles: each gun's 13 MWII 1x optics, aimed and settled, offscreen (FOV 30, 1920x1080).
+Degrees right and down of the screen's centre, from the rendered dot. "before": the collimated shader with no
+angle correction (the 74u and M16A4 still with their old sight lines). "after": ManualOffset.OpticAimAngleCorrection
+and the M16A4's new lines. The M4 is the mean of 8 samples per optic over its idle sway (+-0.13).
+
+gun           before right,down     after right,down after worst
+kastov74u      0.003,   -0.019     0.0000,  -0.0006      0.0007
+kastov762     -0.054,    0.001     0.0000,   0.0000      0.0000
+vityaz         0.049,   -0.004    -0.0001,  -0.0001      0.0005
+rpk            0.000,    0.000     0.0000,   0.0000      0.0000
+bizon         -0.002,    0.025    -0.0001,   0.0002      0.0006
+ak105          0.030,    0.000    -0.0000,   0.0000      0.0004
+vepr12        -0.005,    0.010    -0.0001,   0.0001      0.0004
+m16            0.004,    1.355    -0.0016,  -0.0009      0.0036
+p90            0.000,    0.000     0.0000,   0.0000      0.0000
+mp7           -0.010,    0.000     0.0000,   0.0000      0.0002
+aug            0.000,    0.000     0.0000,   0.0000      0.0000
+uzi            0.000,    0.000     0.0000,   0.0000      0.0000
+fal            0.000,    0.000     0.0000,   0.0000      0.0000
+famas          0.000,    0.000     0.0000,   0.0000      0.0000
+mcx            0.000,    0.034     0.0000,   0.0000      0.0000
+l85a2          0.000,    0.000     0.0000,   0.0000      0.0000
+hk416          0.000,    0.000     0.0000,   0.0000      0.0000
+ak12           0.033,    0.095     0.0000,  -0.0000      0.0002
+ak15           0.033,    0.095     0.0000,  -0.0000      0.0002
+ak74m          0.007,   -0.119     0.0000,   0.0000      0.0000
+spear          0.016,    0.045     0.0000,  -0.0000      0.0002
+rpk16          0.014,    0.297     0.0000,   0.0000      0.0000
+m4a1          -0.000,   -0.328     0.0000,   0.0001      0.1277

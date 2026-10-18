@@ -290,14 +290,14 @@ public static class Hc1M16OpticQa
 	private sealed class Sighting
 	{
 		public float DotUp, DotLeft, DotDistance, TipUp, TipLeft, TipDistance;
-		/// <summary> Degrees between the red drawn and the reticle's tag, or null if too little red drew. </summary>
+		/// <summary> Degrees between the red drawn and the sight's axis, or null if too little red drew. </summary>
 		public float? DotOffTag;
 		/// <summary> How far (inches) the post tip is under the dot, at the post: negative is over it. </summary>
 		public float TipDrop => (DotUp - TipUp) * TipDistance;
 
 		public override string ToString() =>
 			$"dot {DotUp.RadianToDegree():0.000} up {DotLeft.RadianToDegree():0.000} left "
-			+ (DotOffTag is { } tag ? $"(red drawn, {tag:0.000} off the tag)" : "(no red drawn: the tag)")
+			+ (DotOffTag is { } tag ? $"(red drawn, {tag:0.000} off the sight's axis)" : "(no red drawn: the axis)")
 			+ $", post tip {TipDrop:0.000}\" under it, {(TipLeft - DotLeft).RadianToDegree():0.000} left of it, {TipDistance:0.0}\" off";
 	}
 
@@ -312,6 +312,8 @@ public static class Hc1M16OpticQa
 		private readonly GameObject _root;
 		private readonly CameraComponent _camera;
 		private readonly Vector3 _correction;
+		/// <summary> ManualOffset.OpticAimAngleCorrection: the gun turned for a 1x sight's collimated dot. </summary>
+		private readonly Angles _turn;
 		private readonly List<SightLine> _sightLines = new();
 		private Model _reticleModel;
 		private Vector3 _reticleLocal;
@@ -324,6 +326,7 @@ public static class Hc1M16OpticQa
 			_correction = aim.OpticAimCorrection;
 			// By reflection, not through the sight line's type: a tool referencing a type new to the game's code keeps a
 			// hotload from loading while the game's old code is still loaded.
+			_turn = aim.GetType().GetProperty( "OpticAimAngleCorrection" )?.GetValue( aim ) is Angles turn ? turn : Angles.Zero;
 			if ( aim.GetType().GetProperty( "OpticSightLines" )?.GetValue( aim ) is System.Collections.IEnumerable lines )
 			{
 				foreach ( var line in lines )
@@ -406,7 +409,7 @@ public static class Hc1M16OpticQa
 		/// </summary>
 		public void Aim( GunsmithPart optic, Vector3 linePosition, Angles lineAngles )
 		{
-			EyeRotation = Rotation.From( optic.OpticAimAngles + lineAngles ).Inverse;
+			EyeRotation = Rotation.From( optic.OpticAimAngles + (optic.OpticMagnification <= 1f ? _turn : Angles.Zero) + lineAngles ).Inverse;
 			EyePosition = -(optic.OpticAimOffset + _correction + linePosition);
 		}
 
@@ -458,16 +461,26 @@ public static class Hc1M16OpticQa
 		}
 
 		/// <summary>
-		/// Where the dot and the post tip show from the aimed eye. The dot is the red drawn round the reticle's tag, close
-		/// up (the lens shader places it), or the tag if too little red drew. The tip is <see cref="PostTip"/> on its bone,
-		/// which the renders show on the post's tip: the optic can't be hidden to find the post in a render, as the scene
-		/// keeps drawing it.
+		/// The fitted optic's forward axis, which its collimated reticle is drawn along (m4_optic_lens.shader): the dot shows
+		/// where the sight points, whatever the eye's height.
+		/// </summary>
+		public Vector3 SightAxis()
+		{
+			var axis = OpticPoint.CurrentGameObject.Components.Get<ModelRenderer>( FindMode.EverythingInSelf ).WorldRotation.Forward;
+			return Vector3.Dot( axis, EyeRotation.Forward ) < 0f ? -axis : axis;
+		}
+
+		/// <summary>
+		/// Where the dot and the post tip show from the aimed eye. The dot is the red drawn round the sight's axis, close
+		/// up, far off (it's collimated), or the axis itself if too little red drew. The tip is <see cref="PostTip"/> on its
+		/// bone, which the renders show on the post's tip: the optic can't be hidden to find the post in a render, as the
+		/// scene keeps drawing it.
 		/// </summary>
 		public Sighting Measure()
 		{
 			var seen = new Sighting();
 
-			var reticle = ReticleTag();
+			var reticle = EyePosition + SightAxis() * 10000f;
 			var look = LookFromEye( reticle );
 			Vector2? red;
 			using ( var bitmap = Shoot( EyePosition, look, ZoomFov ) )

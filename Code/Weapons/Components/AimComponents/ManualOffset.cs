@@ -29,6 +29,17 @@ public partial class ManualOffset : Aimable, IViewModelOffset
 	[Property] public Vector3 OpticAimCorrection { get; set; }
 
 	/// <summary>
+	/// How far this weapon's ADS pose turns its optic rail off the line of sight. A 1x sight's reticle is collimated, so
+	/// its dot shows where the sight points, and the gun turns this much about the eye (pitch down, yaw left) to put the
+	/// dot on the screen's centre, where the shots go. Magnified sights learn their own alignment (OpticZoom) and don't
+	/// take it. Measured per weapon in output/reticle-survey-*; the ported guns' come from Tools/kastov_prefabs.py.
+	/// </summary>
+	[Property] public Angles OpticAimAngleCorrection { get; set; }
+
+	/// <summary> <see cref="OpticAimAngleCorrection"/> for a sight of this magnification. </summary>
+	public Angles OpticAngleCorrection( float magnification ) => magnification <= 1f ? OpticAimAngleCorrection : Angles.Zero;
+
+	/// <summary>
 	/// Per optic, on top of <see cref="OpticAimCorrection"/>, for a weapon whose front sight post stays up under an optic
 	/// (the M16A4's fixed front sight base). The eye moves and the gun turns a fraction of a degree, so the dot sits
 	/// against the post as a real sight's does (on its tip at absolute co-witness, above it at lower 1/3) and on the
@@ -64,7 +75,8 @@ public partial class ManualOffset : Aimable, IViewModelOffset
 		? optic ? rail.RailOpticAimCorrection : rail.RailIronAimCorrection : Vector3.Zero;
 	Angles IViewModelOffset.AngleOffset => IsAiming
 		? Equipment.IsValid() && Equipment.TryGetOpticAim( out var optic )
-			? Equipment.GetOpticAimAngles( optic ) + (SightLine( optic )?.Angles ?? Angles.Zero)
+			? Equipment.GetOpticAimAngles( optic ) + OpticAngleCorrection( Equipment.GetOpticMagnification( optic ) )
+				+ (SightLine( optic )?.Angles ?? Angles.Zero)
 			: AimAngleOffset
 		: Angles.Zero;
 

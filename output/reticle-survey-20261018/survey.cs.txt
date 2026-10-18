@@ -1,0 +1,90 @@
+// Survey: each gun's 1x optics, aimed and settled; how far each dot sits from the screen's centre.
+var guns = new[] { __GUNS__ };
+var outFile = @"C:\Users\leon2\AppData\Local\Temp\claude\C--sbox-projects-hc1-forked-shooter-main\aba2264e-688e-481c-bccb-037769f12b6a\scratchpad\survey\results.jsonl";
+const int W = 1920, H = 1080; const float Fov = 30f;
+var optics = ResourceLibrary.GetAll<Facepunch.Gunsmith.GunsmithPart>()
+	.Where( p => p.Category == Facepunch.Gunsmith.GunsmithPartType.Optic && p.ResourcePath.StartsWith( "gunsmith/m4a1/mw2022/" )
+		&& p.OpticMagnification <= 1f && !p.HasAlternateSight )
+	.OrderBy( p => p.ResourcePath ).ToArray();
+var lines = new System.Collections.Generic.List<string>();
+foreach ( var (name, folder) in guns )
+{
+	cancellationToken.ThrowIfCancellationRequested();
+	var resource = ResourceLibrary.Get<EquipmentResource>( $"{folder}/{name}.equip" );
+	var manual = SceneUtility.GetPrefabScene( ResourceLibrary.Get<PrefabFile>( $"{folder}/weapon_{name}.prefab" ) )
+		.Components.GetAll<Facepunch.ManualOffset>( FindMode.EverythingInSelfAndDescendants ).First();
+	var scene = new Scene();
+	try
+	{
+		using var scope = scene.Push();
+		var root = SceneUtility.GetPrefabScene( ResourceLibrary.Get<PrefabFile>( $"{folder}/vm_{name}.prefab" ) ).Clone( new CloneConfig { StartEnabled = false } );
+		root.Components.GetOrCreate<Facepunch.GunsmithWeapon>().Resource = resource;
+		foreach ( var c in root.Components.GetAll<Component>( FindMode.EverythingInSelfAndDescendants ) ) c.Enabled = c is ModelRenderer || c is Facepunch.Gunsmith.GunsmithAttachmentPoint;
+		var renderer = root.Components.Get<SkinnedModelRenderer>( FindMode.EverythingInSelf );
+		renderer.RenderOptions.Game = false; renderer.RenderOptions.Overlay = true;
+		renderer.UseAnimGraph = true; renderer.PlaybackRate = 1; renderer.PlayAnimationsInEditorScene = true;
+		Facepunch.AnimBools.SetBool( renderer, "b_grounded", true );
+		Facepunch.AnimBools.SetBool( renderer, "b_sprint", false );
+		renderer.Set( "ironsights", 1 ); renderer.Set( "ironsights_weight", 1f ); renderer.Set( "speed_ironsights", 1f ); renderer.Set( "hand_ik_weight", 0f );
+		var point = root.Components.GetAll<Facepunch.Gunsmith.GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants ).First( p => p.Category == Facepunch.Gunsmith.GunsmithPartType.Optic );
+		root.Enabled = true; renderer.SceneModel.Transform = renderer.WorldTransform;
+		for ( int i = 0; i < 200; i++ ) { scene.EditorTick( .02f, .02f ); renderer.SceneModel.Transform = renderer.WorldTransform; renderer.SceneModel.Update( .02f ); }
+		var bone = renderer.SceneModel.GetBoneLocalTransform( "camera" );
+		var camera = new GameObject( true, "camera" ).Components.Create<CameraComponent>();
+		camera.WorldPosition = bone.Position; camera.WorldRotation = bone.Rotation;
+		camera.FieldOfView = Fov; camera.ZNear = 0.3f; camera.BackgroundColor = new Color( 0.18f, 0.18f, 0.2f );
+		var light = new GameObject( true, "light" ).Components.Create<DirectionalLight>();
+		light.WorldRotation = Rotation.From( new Angles( 40, 30, 0 ) ); light.LightColor = Color.White * 1.2f; light.SkyColor = Color.White * 0.4f;
+		foreach ( var optic in optics )
+		{
+			if ( !optic.EligibleEquipment.Contains( resource ) && name != "m4a1" ) continue;
+			var previous = point.CurrentGameObject;
+			point.SetPart( optic ); previous?.DestroyImmediate();
+			var line = manual.OpticSightLines?.FirstOrDefault( l => l is not null && l.Optic == optic );
+			var position = optic.OpticAimOffset + manual.OpticAimCorrection + (line?.Position ?? Vector3.Zero);
+			var angles = optic.OpticAimAngles + (line?.Angles ?? Angles.Zero);
+			var turn = angles.ToRotation();
+			root.WorldRotation = turn; root.WorldPosition = turn * position;
+			for ( int i = 0; i < 10; i++ ) { scene.EditorTick( .02f, .02f ); renderer.SceneModel.Transform = renderer.WorldTransform; renderer.SceneModel.Update( .02f ); }
+			foreach ( var mount in root.Components.GetAll<Facepunch.Gunsmith.GunsmithMw22Attachment>( FindMode.EverythingInSelfAndDescendants ) ) mount.RefreshMount();
+			scene.EditorTick( .01f, .01f );
+			using var bmp = new Bitmap( W, H );
+			camera.RenderToBitmap( bmp ); camera.RenderToBitmap( bmp );
+			// The reticle: the red blob nearest the centre, re-centred on itself so a holographic ring stays whole. Red parts
+			// of an optic's body sit degrees away, outside the window.
+			var focal = W * 0.5 / Math.Tan( Fov * Math.PI / 360.0 );
+			var reds = new System.Collections.Generic.List<(int X, int Y, float Weight)>();
+			var reach = (int)(focal * Math.Tan( 3.0 * Math.PI / 180 ));
+			for ( int y = Math.Max( 0, H / 2 - reach ); y < Math.Min( H, H / 2 + reach ); y++ )
+				for ( int x = Math.Max( 0, W / 2 - reach ); x < Math.Min( W, W / 2 + reach ); x++ )
+				{
+					var p = bmp.GetPixel( x, y );
+					var red = p.r - MathF.Max( p.g, p.b );
+					if ( p.r > 0.35f && red > 0.25f ) reds.Add( (x, y, red) );
+				}
+			double right = double.NaN, down = double.NaN; int count = 0;
+			if ( reds.Count > 0 )
+			{
+				var seed = reds.OrderBy( r => (r.X - W / 2.0) * (r.X - W / 2.0) + (r.Y - H / 2.0) * (r.Y - H / 2.0) ).First();
+				double cx = seed.X, cy = seed.Y;
+				var radius = focal * Math.Tan( 1.0 * Math.PI / 180 );
+				for ( int pass = 0; pass < 5; pass++ )
+				{
+					double sx = 0, sy = 0, sw = 0; count = 0;
+					foreach ( var r in reds )
+						if ( (r.X - cx) * (r.X - cx) + (r.Y - cy) * (r.Y - cy) < radius * radius ) { sx += r.X * r.Weight; sy += r.Y * r.Weight; sw += r.Weight; count++; }
+					cx = sx / sw; cy = sy / sw;
+				}
+				right = Math.Atan( (cx - (W - 1) / 2.0) / focal ) * 180 / Math.PI;
+				down = Math.Atan( (cy - (H - 1) / 2.0) / focal ) * 180 / Math.PI;
+			}
+			var json = Json.Serialize( new { gun = name, optic = System.IO.Path.GetFileNameWithoutExtension( optic.ResourcePath ), opticName = optic.Name,
+				right = Math.Round( right, 4 ), down = Math.Round( down, 4 ), pixels = count, line = line is not null,
+				bone = bone.Position.ToString(), boneAngles = bone.Rotation.Angles().ToString() } );
+			lines.Add( json );
+			await System.IO.File.AppendAllTextAsync( outFile, json + "\n" );
+		}
+	}
+	finally { scene.Destroy(); }
+}
+return lines.Count;

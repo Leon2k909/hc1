@@ -1184,6 +1184,10 @@ class Prefabs:
     # Per optic, where the eye moves and how the gun turns ("x,y,z", "pitch,yaw,roll") to co-witness the optic's dot
     # with iron sights it leaves up (ManualOffset.OpticSightLines): (optic resource path, position, angles).
     optic_sight_lines: list[tuple[str, str, str]] = field(default_factory=list)
+    # How far the gun turns about the eye ("pitch,yaw,roll": pitch down, yaw left) so its rail points along the line of
+    # sight while aiming (ManualOffset.OpticAimAngleCorrection): a 1x sight's collimated dot shows where the sight points,
+    # and the shots go to the screen's centre. Measured with the settled aimed view (output/reticle-survey-*), 1x only.
+    optic_aim_angles: str = "0,0,0"
     # The equipment resource's other fields over the M4's: a pistol's Slot and armour penetration.
     equip_fields: dict = field(default_factory=dict)
     # The share of the icon's width the gun spans: 0.9 like the M4's, less for a pistol (the USP's spans 0.35).
@@ -1245,6 +1249,8 @@ PREFABS = {
         # Measured in-game: puts the camera where it sits relative to a fitted optic on the M4 (dev_optic_correction
         # to retune).
         optic_aim_correction="4.084,0,-1.208",
+        # The 1x sights' collimated dots sat 0.054 degrees left (output/reticle-survey-20261018/collimated).
+        optic_aim_angles="-0.0014,-0.0544,0",
         gameplay=gameplay_762,
         parts=PARTS_AK47,
         part_slot_positions={"stock": (-6, 0, 3.5), "pistol_grip": (-2, 0, 1),
@@ -1280,6 +1286,8 @@ PREFABS = {
         # The 762's measured correction moved by how far the 74u's ADS pose puts its optic slot from the 762's
         # (port_kastov: Kastov.ads, the slot through tag_sling). Tune in-game with dev_optic_correction.
         optic_aim_correction="3.162,0,-1.226",
+        # The 1x sights' collimated dots sat 0.015 degrees low (output/reticle-survey-20261018/collimated).
+        optic_aim_angles="-0.0151,-0.0004,0",
         gameplay=None,
         guid_salt="kastov74u/",
         parts=PARTS_74U,
@@ -1316,6 +1324,8 @@ PREFABS = {
         # The 762's measured correction moved by how far the Vityaz's ADS pose puts its optic slot from the 762's,
         # like the 74u's. Tune in-game with dev_optic_correction.
         optic_aim_correction="1.728,0,-1.172",
+        # The 1x sights' collimated dots sat 0.050 degrees right (output/reticle-survey-20261018/collimated).
+        optic_aim_angles="0.0039,0.0495,0",
         gameplay=gameplay_vityaz,
         category="SMG",
         kill_reward=600,
@@ -1393,6 +1403,8 @@ PREFABS = {
         # The 762's measured correction moved by how far the Bizon's ADS pose puts its optic slot from the 762's, like
         # the 74u's. Tune in-game with dev_optic_correction.
         optic_aim_correction="2.554,0,-1.353",
+        # The 1x sights' collimated dots sat 0.025 degrees low (output/reticle-survey-20261018/collimated).
+        optic_aim_angles="-0.0247,-0.0023,0",
         gameplay=gameplay_bizon,
         category="SMG",
         kill_reward=600,
@@ -1430,6 +1442,8 @@ PREFABS = {
         # The 762's measured correction moved by how far the AK-105's ADS pose puts its optic slot from the 762's, like
         # the 74u's. Tune in-game with dev_optic_correction.
         optic_aim_correction="3.18,0,-1.269",
+        # The 1x sights' collimated dots sat 0.030 degrees right (output/reticle-survey-20261018/collimated).
+        optic_aim_angles="-0.0006,0.0297,0",
         gameplay=gameplay_ak105,
         guid_salt="ak105/",
         parts=PARTS_AK105,
@@ -1466,6 +1480,8 @@ PREFABS = {
         # The 762's measured correction moved by how far the Vepr-12's ADS pose puts its optic slot from the 762's, like
         # the 74u's. Tune in-game with dev_optic_correction.
         optic_aim_correction="3.396,0,-1.26",
+        # The 1x sights' collimated dots sat 0.010 degrees low and 0.005 left (output/reticle-survey-20261018/collimated).
+        optic_aim_angles="-0.0098,-0.005,0",
         gameplay=gameplay_vepr12,
         category="Shotgun",
         kill_reward=900,
@@ -1516,25 +1532,30 @@ PREFABS = {
         # 74u's. The irons sit high on the carry handle, 1.5 over the rail, hence the z. Tune in-game with
         # dev_optic_correction.
         optic_aim_correction="1.613,0,0.079",
-        # The front sight post stays up under an optic, so each 1x optic's dot co-witnesses with it, solved from renders
-        # of the aimed view (hc1_m16_cowitness, Editor/Hc1M16OpticQa.cs). Absolute, the post tip on the dot, for the
-        # sights that sit low on the rail, as a holographic sight does on a flat-top; lower 1/3, the tip 0.14" under
-        # the dot, for those on raised mounts or bases.
+        # The 1x sights' collimated dots sat 0.055 degrees low (output/reticle-survey-20261018/collimated).
+        optic_aim_angles="-0.0547,0.0031,0",
+        # The front sight post stays up under an optic, so each 1x optic's dot co-witnesses with it. The dot is
+        # collimated (it only shows where the sight points), so only the eye moves, here in the aimed gun's frame: up into
+        # the window (negative z) until the post's tip sits on the dot (absolute) or 0.14" under it at the post (lower
+        # 1/3). The eye stays within the middle 60% of the window's height, past which the dot would leave a small
+        # window, so on six optics the tip stays that much over its mark. Solved from the settled aimed view
+        # (2026-10-18). Absolute for the sights that sit low on the rail, as a holographic sight does on a flat-top;
+        # lower 1/3 for those on raised mounts or bases.
         optic_sight_lines=[
-            ("gunsmith/m4a1/mw2022/att_vm_holo_east01.gnsmth", "0,0.0055,0.1443", "1.3563,-0.0628,0"),
-            ("gunsmith/m4a1/mw2022/att_vm_holo_west01.gnsmth", "0,0.0013,0.0979", "0.6657,-0.0042,0"),
-            ("gunsmith/m4a1/mw2022/att_vm_reflex_02.gnsmth", "0,-0.0024,0.177", "0.8747,0.0057,0"),
-            ("gunsmith/m4a1/mw2022/att_vm_reflex_east01.gnsmth", "0,0.0014,0.2002", "1.0811,-0.0043,0"),
-            ("gunsmith/m4a1/mw2022/att_vm_reflex_west03.gnsmth", "0,-0.0001,0.0619", "0.5072,-0.0005,0"),
-            ("gunsmith/m4a1/mw2022/att_vm_reflex_west04.gnsmth", "0,0,0.1544", "0.8808,-0.0006,0"),
+            ("gunsmith/m4a1/mw2022/att_vm_holo_east01.gnsmth", "0,-0.019,-0.2432", "0,0,0"),  # window limit: tip 0.15" high
+            ("gunsmith/m4a1/mw2022/att_vm_holo_west01.gnsmth", "0,-0.001,-0.1749", "0,0,0"),
+            ("gunsmith/m4a1/mw2022/att_vm_reflex_02.gnsmth", "0,-0.001,-0.1749", "0,0,0"),
+            ("gunsmith/m4a1/mw2022/att_vm_reflex_east01.gnsmth", "0,-0.001,-0.2299", "0,0,0"),
+            ("gunsmith/m4a1/mw2022/att_vm_reflex_west03.gnsmth", "0,-0.001,-0.1509", "0,0,0"),
+            ("gunsmith/m4a1/mw2022/att_vm_reflex_west04.gnsmth", "0,-0.001,-0.1999", "0,0,0"),
             # Lower 1/3: the raised-base and enclosed holographics, and the sights on tall mounts.
-            ("gunsmith/m4a1/mw2022/att_vm_2x_west02_holo.gnsmth", "0,0.0009,0.1641", "1.2102,-0.003,0"),
-            ("gunsmith/m4a1/mw2022/att_vm_holo_west02.gnsmth", "0,-0.0012,0.185", "1.5213,0.0103,0"),
-            ("gunsmith/m4a1/mw2022/att_vm_minireddot01_tall.gnsmth", "0,-0.0036,0.2931", "2.1787,0.0167,0"),
-            ("gunsmith/m4a1/mw2022/att_vm_minireddot02_tall.gnsmth", "0,0.0005,0.2826", "2.1537,-0.0019,0"),
-            ("gunsmith/m4a1/mw2022/att_vm_minireddot03_tall.gnsmth", "0,-0.001,0.2993", "2.1317,0.0074,0"),
-            ("gunsmith/m4a1/mw2022/att_vm_reflex_east02_tall.gnsmth", "0,0.0001,0.1762", "1.0204,-0.0011,0"),
-            ("gunsmith/m4a1/mw2022/att_vm_reflex_west02_tall.gnsmth", "0,-0.0018,0.1484", "1.3325,0.0041,0"),
+            ("gunsmith/m4a1/mw2022/att_vm_2x_west02_holo.gnsmth", "0,-0.001,-0.3149", "0,0,0"),
+            ("gunsmith/m4a1/mw2022/att_vm_holo_west02.gnsmth", "0,0.002,-0.3533", "0,0,0"),  # window limit: tip 0.06" high
+            ("gunsmith/m4a1/mw2022/att_vm_minireddot01_tall.gnsmth", "0,0.002,-0.1879", "0,0,0"),  # window limit: tip 0.37" high
+            ("gunsmith/m4a1/mw2022/att_vm_minireddot02_tall.gnsmth", "0,-0.001,-0.1873", "0,0,0"),  # window limit: tip 0.37" high
+            ("gunsmith/m4a1/mw2022/att_vm_minireddot03_tall.gnsmth", "0,0.001,-0.1907", "0,0,0"),  # window limit: tip 0.34" high
+            ("gunsmith/m4a1/mw2022/att_vm_reflex_east02_tall.gnsmth", "0,-0.001,-0.2309", "0,0,0"),
+            ("gunsmith/m4a1/mw2022/att_vm_reflex_west02_tall.gnsmth", "0,-0.001,-0.2327", "0,0,0"),  # window limit: tip 0.14" high
         ],
         gameplay=gameplay_m16,
         guid_salt="m16/",
@@ -1619,6 +1640,8 @@ PREFABS = {
         # The 762's measured correction moved by how far the MP7's ADS pose puts its optic slot from the 762's, like the
         # 74u's. The irons stand on the top rail, hence the z. Tune in-game with dev_optic_correction.
         optic_aim_correction="1.375,0,-0.462",
+        # The 1x sights' collimated dots sat 0.010 degrees left (output/reticle-survey-20261018/collimated).
+        optic_aim_angles="-0.0001,-0.0099,0",
         gameplay=gameplay_mp7,
         category="SMG",
         kill_reward=600,
@@ -1929,6 +1952,8 @@ PREFABS = {
         # The 762's measured correction moved by how far the MCX's ADS pose puts its optic slot from the 762's, like the
         # 74u's. Tune in-game with dev_optic_correction.
         optic_aim_correction="3.118,0,-0.274",
+        # The 1x sights' collimated dots sat 0.035 degrees low (output/reticle-survey-20261018/collimated).
+        optic_aim_angles="-0.0346,0.0003,0",
         gameplay=gameplay_mcx,
         guid_salt="mcx/",
         # SIG's thin folding stock (the pack's light stock): a skeleton stock with a narrow buttplate, less to brace
@@ -2099,6 +2124,8 @@ PREFABS = {
         # the 74u's: the AK-105's but for its sights' aim, which sits the gun 0.23 lower. Tune in-game with
         # dev_optic_correction.
         optic_aim_correction="3.18,0,-1.032",
+        # The 1x sights' collimated dots sat 0.095 degrees low and 0.033 right (output/reticle-survey-20261018/collimated).
+        optic_aim_angles="-0.0947,0.0327,0",
         gameplay=gameplay_ak12,
         guid_salt="ak12/",
         parts=PARTS_AK12,
@@ -2146,6 +2173,8 @@ PREFABS = {
         sticker=((2.98, 0.697, 3.65), (0.0, 1.0, 0.0), (1.4, 0.7)),
         # The AK-12's: the same receiver, rail and sights' aim.
         optic_aim_correction="3.18,0,-1.032",
+        # The 1x sights' collimated dots sat 0.095 degrees low and 0.033 right (output/reticle-survey-20261018/collimated).
+        optic_aim_angles="-0.0947,0.0327,0",
         gameplay=gameplay_ak15,
         guid_salt="ak15/",
         parts=PARTS_AK15,
@@ -2196,6 +2225,8 @@ PREFABS = {
         # slot: the AK-12's x, and 0.34 lower, since the B-13 holds an optic higher over the bore. Tune in-game with
         # dev_optic_correction.
         optic_aim_correction="3.18,0,-1.371",
+        # The 1x sights' collimated dots sat 0.119 degrees high and 0.007 right (output/reticle-survey-20261018/collimated).
+        optic_aim_angles="0.1186,0.0074,0",
         gameplay=gameplay_ak74m,
         guid_salt="ak74m/",
         parts=PARTS_AK74M,
@@ -2248,6 +2279,8 @@ PREFABS = {
         # The 762's measured correction moved by how far the SPEAR's ADS pose puts its optic slot from the 762's, like
         # the MCX's. Tune in-game with dev_optic_correction.
         optic_aim_correction="3.118,0,0.052",
+        # The 1x sights' collimated dots sat 0.044 degrees low and 0.015 right (output/reticle-survey-20261018/collimated).
+        optic_aim_angles="-0.0444,0.0152,0",
         gameplay=gameplay_spear,
         guid_salt="spear/",
         # Lancer's L7 AWM 25 (the pack's), the longer of the two magazines SIG ships the SPEAR with in the US. It plays
@@ -2344,6 +2377,8 @@ PREFABS = {
         # The 762's measured correction moved by how far the RPK-16's ADS pose puts its optic slot from the 762's,
         # like the AK-12's. Tune in-game with dev_optic_correction.
         optic_aim_correction="3.328,0,-0.971",
+        # The 1x sights' collimated dots sat 0.297 degrees low and 0.014 right (output/reticle-survey-20261018/collimated).
+        optic_aim_angles="-0.2971,0.0137,0",
         gameplay=gameplay_rpk16,
         category="LMG",
         guid_salt="rpk16/",
@@ -2492,6 +2527,12 @@ def set_aim(functions: dict, prefabs: Prefabs) -> None:
     offset["AimOffset"] = "0,0,0"
     offset["AimAngleOffset"] = "0,0,0"
     offset["OpticAimCorrection"] = prefabs.optic_aim_correction
+    # Always right after OpticAimCorrection, so a rerun leaves the prefab as it was.
+    items = [(key, value) for key, value in offset.items() if key != "OpticAimAngleCorrection"]
+    at = next(i for i, (key, _) in enumerate(items) if key == "OpticAimCorrection") + 1
+    items.insert(at, ("OpticAimAngleCorrection", prefabs.optic_aim_angles))
+    offset.clear()
+    offset.update(items)
     if prefabs.optic_sight_lines:
         offset["OpticSightLines"] = [{"Optic": optic, "Position": position, "Angles": angles}
                                      for optic, position, angles in prefabs.optic_sight_lines]

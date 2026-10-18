@@ -404,7 +404,7 @@ public sealed class TheaterViewModel
 			var line = aim.OpticSightLines?.FirstOrDefault( x => x is not null && x.Optic == _optic );
 			var rail = _rail.IsValid() ? _rail.RailOpticAimCorrection : Vector3.Zero;
 			return (_optic.OpticAimOffset + aim.OpticAimCorrection + (line?.Position ?? Vector3.Zero) + rail,
-				_optic.OpticAimAngles + (line?.Angles ?? Angles.Zero));
+				_optic.OpticAimAngles + aim.OpticAngleCorrection( _optic.OpticMagnification ) + (line?.Angles ?? Angles.Zero));
 		}
 
 		var (iron, ironAngles) = _scar ? ViewModel.ScarHAimOffset( _scarOptic ) : (aim.AimOffset, aim.AimAngleOffset);

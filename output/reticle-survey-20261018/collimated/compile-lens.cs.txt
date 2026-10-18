@@ -1,0 +1,9 @@
+var root = Sandbox.Project.Current.GetRootPath();
+var source = System.IO.Path.Combine( root, "Assets/shaders/m4_optic_lens.shader" );
+var before = System.IO.File.GetLastWriteTimeUtc( source + "_c" );
+var pending = Editor.EditorUtility.CompileShader( "shaders/m4_optic_lens.shader", new(), cancellationToken );
+await pending;
+var reported = pending.GetType().GetProperty( "Result" )?.GetValue( pending );
+var success = reported is bool b ? b : reported?.GetType().GetProperty( "Success" )?.GetValue( reported ) as bool?;
+var after = System.IO.File.GetLastWriteTimeUtc( source + "_c" );
+return new { success, rewritten = after > before, after = after.ToString( "O" ), result = reported?.ToString() };
