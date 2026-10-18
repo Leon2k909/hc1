@@ -2340,6 +2340,63 @@
   the view, the slide on each gun (that the optic stays on its rail), the relief's shading through a scope, and a
   zero in Battle Royale.
 
+## Aiming lasers and reflex sight glass (`GunsmithLaserBeam`, `LaserOptics`, `m4_optic_lens.shader`)
+- The user aimed a Kastov-74u with the Box Collimator and a green laser (2026-10-18). The beam was drawn as a bright line
+  across the view, and the glass looked strongly blue. They asked whether you'd see the beam at all when aiming, and for
+  1:1 realism.
+- The laser parts (the M4's MWII Compact Green Laser and the Green and Red Laser Modules) are drawn as a real Class 3R
+  aiming laser:
+  - 5 mW, a 3 mm beam and 0.5 mrad divergence;
+  - green at 532 nm (603 lm/W) or red at 635 nm (148 lm/W), picked from `LaserColor`.
+- The spot is the beam's Gaussian irradiance on what it hits, reflected by an assumed 0.35 surface, and longer when it
+  strikes at a slant.
+  - Its core is drawn at least a pixel round, holding its light, and capped at 8 adapted greys, where ACES still keeps
+    its green. A brighter spot shows through the eye's glare round it (the CIE's veiling luminance, 10·E/θ²).
+  - Indoors it's a vivid green pinpoint at any range. On a sunlit wall it's a faint speck at 25 m and gone by 50 m.
+- The beam is only the light the air scatters toward the eye, so its brightness depends on what's in the air:
+  - clean air's aerosol and molecules;
+  - the maps' `VolumetricFogVolume`s, at the renderer's 0.0022 per inch per unit of strength (Riverdale's hall haze
+    lets you see ~190 m);
+  - smoke grenades' puffs, from their size and alpha;
+  - rain outdoors (Marshall and Palmer's drops).
+  - The particles scatter with a two-term Henyey-Greenstein phase function: a strong forward peak, and the ~0.02/sr
+    straight back that lidar measures.
+  - A beam under 1% contrast isn't drawn. Clean air leaves it invisible by day and in lit rooms, and faint at night.
+    Haze, mist, smoke and rain show it, most of all looking toward the laser. Looking down your own beam you see only
+    its weak backscatter.
+- Brightness is photometric (cd/m², lux) over the luminance the eye is adapted to (`LaserOptics.Adapted`):
+  - Nine view rays, five times a second, sort what's in view into sunlit, shade, indoors and night, by the map's
+    brightest sun, the weather's overcast and the sky.
+  - A map with no sky (Collider) is a 400 lux interior. Without that rule, Collider read as night and the spot came out
+    30-60 times too bright.
+  - That luminance is set against the camera's grey (0.25 over the geometric mean of its exposure range).
+- The zero:
+  - A laser is fixed to the gun and zeroed to its sights at 25 m (`GunsmithMw22Attachment.LaserZeroMetres`), so it
+    points wherever the gun does: sway, recoil, reloads, the hip. Nearer than 25 m the spot sits off the sights on the
+    laser's side, and past it on the other.
+  - The sights' line is learned in the laser's own frame once the gun is aimed and held still (`ScopeEyeAlignment`, as
+    the magnified optics learn their eye). It's cached per gun, laser and optic for the session (`LaserZeros`).
+  - Until then, and on world models, the laser points along its rail.
+  - This replaced an uncommitted bend toward the crosshair (2026-10-18).
+- `SceneLineObject` facts:
+  - It drops a point within 0.1 units of the one before, so the spot and glare discs are capsules at least
+    `MinimumSegment` long. Before this, the old spot's two points were 0.03 apart, so it never drew.
+  - Its width is a radius, and the line shader reads vertex colour as sRGB.
+- The glass (the Box Collimator and both holographic sights, the vmats with `g_flLensCoatingOpacity`):
+  - It blends premultiplied and passes the view in grey, ~94% (`g_flLensCoatingOpacity` is the loss).
+  - It adds only reflected scene light: the engine's reflection times the coatings' (0.035, 0.012, 0.014) at normal
+    incidence, the red band's being the dot mirror, rising to 1 at grazing.
+  - Within ~35 degrees of the line back to the eye, the reflection is cut to 0.08: that's the shooter's own face in
+    the hood's shade.
+  - The reticle's light adds to the view.
+  - The old glass laid a fixed (0.13, 0.28, 0.36) blue over the view at ~7% alpha. That wasn't relative to the scene,
+    so it flooded dim scenes.
+- Checked:
+  - Offscreen renders: a lit room at 7 m and 25 m, a sunlit wall at 25 m and 50 m, haze, and a misty night.
+  - The Box Collimator aimed on the M4 offscreen: through it the view is neutral, 94% of the view without the gun, dim
+    and bright.
+  - Live in the user's match on Collider and Orion: no beam indoors, the window neutral, and the zero learned.
+
 ## Weapon stickers (`GunsmithSticker`, `Tools/weapon_stickers.py`)
 - The user asked for a weapon sticker (2026-09-29) and left the design to Claude. Gunsmith → CUSTOMIZE → Stickers lists
   them (the tab was already there, with no parts), and clicking the fitted one takes it off. They have no gameplay

@@ -17,8 +17,24 @@ public sealed class GunsmithMw22Attachment : GunsmithAttachment, ICameraSetup
 	[Property] public bool IsLauncher { get; set; }
 	[Property] public Vector3 LaserEmitter { get; set; }
 	[Property] public Color LaserColor { get; set; } = new Color( .08f, 1f, .12f );
-	[Property] public float LaserWidth { get; set; } = .035f;
+	/// <summary> No longer read: the beam's width is the real one (<see cref="GunsmithLaserBeam"/>). Kept for the prefabs. </summary>
+	[Property, Hide] public float LaserWidth { get; set; } = .035f;
 	private GunsmithLaserBeam laser;
+	// Made on first use: a hotload leaves new fields of a live component unset.
+	private ScopeEyeAlignment laserSight;
+	private ScopeEyeMotion laserEyeMotion;
+
+	/// <summary>
+	/// Where a laser's beam crosses the sights' line: 25 m, the range soldiers zero an aiming laser at. Nearer, its spot
+	/// sits a little off the sights on the laser's side of the gun; further, across on the other side.
+	/// </summary>
+	public const float LaserZeroMetres = 25f;
+
+	/// <summary>
+	/// Each gun's line of sight in a laser's own frame, learned while it was aimed, by the gun, the laser and the optic:
+	/// a laser drawn again (a new life, the gun swapped back) is zeroed from its first frame.
+	/// </summary>
+	private static readonly Dictionary<string, (Vector3 Eye, Rotation Aim)> LaserZeros = new();
 	private SkinnedModelRenderer weapon;
 	private ModelRenderer mesh;
 	private GunsmithMw22Factory factory;
@@ -48,11 +64,13 @@ public sealed class GunsmithMw22Attachment : GunsmithAttachment, ICameraSetup
 	void ICameraSetup.PostSetup( CameraComponent cc )
 	{
 		FollowingCamera = true;
-		try { RefreshMount(); UpdateLaser(); }
+		try { RefreshMount(); }
 		finally { FollowingCamera = false; }
 	}
 
-	private void UpdateLaser()
+	void ICameraSetup.LateSetup( CameraComponent cc ) => UpdateLaser( cc );
+
+	private void UpdateLaser( CameraComponent camera = null )
 	{
 		if ( !AttachmentPoint.IsValid() || AttachmentPoint.Category != GunsmithPartType.Laser ) return;
 		var view = weapon?.Components.Get<ViewModel>( FindMode.EverythingInSelf );
@@ -66,10 +84,58 @@ public sealed class GunsmithMw22Attachment : GunsmithAttachment, ICameraSetup
 		{
 			laser?.Hide(); return;
 		}
+		// The first-person emitter and aim ray must both use the final camera setup. OnPreRender
+		// only handles world models, so its ordering cannot overwrite the viewmodel's finished beam.
+		if ( view.IsValid() )
+		{
+			if ( !camera.IsValid() || camera != owner.CameraController?.Camera ) return;
+		}
+		else if ( camera.IsValid() ) return;
+
+		// A laser is fixed to the gun and zeroed to its sights, so it points wherever the gun does: through sway, recoil,
+		// a reload or the hip. Only a viewmodel has the sights' line (the camera's, once it's aimed); a gun in someone's
+		// hands points its laser along its rail.
+		var emitter = WorldTransform.PointToWorld( LaserEmitter );
+		var direction = WorldRotation.Forward;
+		if ( view.IsValid() && LaserSightLine( view, equipment, camera ) is { } sight )
+		{
+			var zero = sight.Eye + sight.Forward * LaserZeroMetres * LaserOptics.UnitsPerMetre;
+			if ( Vector3.Dot( zero - emitter, direction ) > 0f ) direction = (zero - emitter).Normal;
+		}
+
 		// Mounting happens in OnUpdate / camera PostSetup; remounting here would read stale bone poses.
 		laser ??= Components.GetOrCreate<GunsmithLaserBeam>();
-		laser.BeamColor = LaserColor; laser.BeamWidth = LaserWidth;
-		laser.TraceBeam( WorldTransform.PointToWorld( LaserEmitter ), WorldRotation.Forward, owner.GameObject );
+		laser.BeamColor = LaserColor;
+		laser.TraceBeam( emitter, direction, owner.GameObject, view.IsValid() ? camera : null );
+	}
+
+	/// <summary>
+	/// The sights' line in the world now, from where it lies in this laser's frame: learned (as the magnified optics learn
+	/// their eye, <see cref="ScopeEyeAlignment"/>) once the gun has been aimed and held still, so it's the line the sights
+	/// really show, and carried with the gun from then on.
+	/// </summary>
+	private (Vector3 Eye, Vector3 Forward)? LaserSightLine( ViewModel view, Equipment equipment, CameraComponent camera )
+	{
+		laserSight ??= new ScopeEyeAlignment();
+		laserEyeMotion ??= new ScopeEyeMotion();
+		var part = WorldTransform;
+		var eye = camera.WorldTransform;
+		var motion = laserEyeMotion.Update( eye.Rotation, Time.Delta );
+		var aimed = view.IsAimSettled && !view.IsInspecting && !equipment.HasTag( "reloading" );
+		laserSight.Update( eye, part, Rotation.FromRoll( view.CornerRoll ), 0f, 1f, aimed,
+			laserEyeMotion.TurnSpeed < 15f && motion.Length < 0.015f, Time.Delta );
+
+		var key = LaserZeroKey();
+		if ( laserSight.Calibrated ) LaserZeros[key] = (laserSight.NeutralEyeLocal, laserSight.AimLocal);
+		if ( !LaserZeros.TryGetValue( key, out var learned ) ) return null;
+		return (part.PointToWorld( learned.Eye ), (part.Rotation * learned.Aim).Forward);
+	}
+
+	private string LaserZeroKey()
+	{
+		var optic = weapon.Components.GetAll<GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants )
+			.FirstOrDefault( p => p.Category == GunsmithPartType.Optic )?.CurrentPart;
+		return $"{weapon.Model?.ResourcePath}|{GameObject.Name}|{optic?.ResourcePath}";
 	}
 
 	protected override void OnDisabled() => laser?.Hide();
