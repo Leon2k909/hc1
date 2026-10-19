@@ -1,0 +1,18 @@
+// Tools/cerroblanco_trees.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    F_ALPHA_TEST "1"
+    TextureTranslucency "materials/cerroblanco/fitout/cbf_tree_trans.png"
+    g_flAlphaTestReference "0.40"
+    g_flAntiAliasedEdgeStrength "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.00"
+    TextureColor "materials/cerroblanco/fitout/cbf_tree_dark_color.png"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureRoughness "[0.900000 0.900000 0.900000 0.000000]"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1.000000 1.000000 1.000000 1.000000]"
+    g_flModelTintAmount "1.0"
+}

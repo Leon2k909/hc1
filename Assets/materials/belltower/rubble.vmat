@@ -1,14 +1,16 @@
-// Tools/belltower_quality_materials.py; sources: Sources/Belltower/scans/manifest.json
+// Tools/belltower_quality_materials.py; sources: Sources/Belltower/wall-v3/generation.json
 "Layer0"
 {
-    shader "shaders/belltower_relief.shader"
-    TextureColor "materials/belltower/scans/medieval_blocks_05_diffuse_4k.png"
-    TextureNormal "materials/belltower/scans/medieval_blocks_05_nor_gl_4k.png"
-    TextureRoughness "materials/belltower/scans/medieval_blocks_05_rough_4k.png"
-    TextureAmbientOcclusion "materials/belltower/scans/medieval_blocks_05_ao_4k.png"
-    TextureHeight "materials/belltower/scans/medieval_blocks_05_displacement_4k.png"
-    g_vStoneUvScale "[2.03200 2.03200]"
-    g_flTintColor "[1.12 1.1 1.04]"
-    g_flReliefDepth "1.5"
-    g_flStoneRoughness "1"
+    shader "shaders/belltower_masonry_v3.shader"
+    TextureStoneColor "materials/belltower/generated/wall-limestone-v3-color.png"
+    TextureStoneHeight "materials/belltower/generated/wall-limestone-v3-height.png"
+    TextureStoneSeams "materials/belltower/generated/wall-limestone-v3-quilt.png"
+    g_vMasonryUvScale "[.677333 .677333]"
+    g_vMasonryQuiltShift "[.37001595 .42982456]"
+    g_vMasonryTint "[.92 1.0 .84]"
+    g_flMasonryDepth "0.65"
+    g_flMasonryNormal "0.65"
+    g_flMasonrySaturation "0.72"
+    g_flMasonryContrast "0.86"
+    g_flMasonryWeather "0.28"
 }

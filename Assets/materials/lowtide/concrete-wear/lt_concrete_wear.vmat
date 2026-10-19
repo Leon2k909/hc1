@@ -1,0 +1,16 @@
+// Static floor contact input, compiled after shader schema update.
+// Tools/lowtide_interior.py: two-metre concrete scan.
+"Layer0"
+{
+    shader "shaders/hc1_lowtide_concrete_wear.shader"
+    TextureColor "materials/lowtide/interior/concrete_color.png"
+    TextureNormal "materials/lowtide/interior/concrete_normal.png"
+    TextureRoughness "materials/lowtide/interior/concrete_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    TextureMetalness "materials/default/default_black_mask.tga"
+    TextureFloorContact "materials/lowtide/interior/floor_contact.png"
+    g_flFloorContact "1"
+    TextureWarehouseUse "materials/lowtide/concrete-wear/warehouse_use.png"
+    g_flWarehouseUse "1"
+    g_flConcreteScale "3.2512"
+}

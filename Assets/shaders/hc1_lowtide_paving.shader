@@ -48,6 +48,19 @@ PS
         return lerp( lerp( h.x, h.y, f.x ), lerp( h.z, h.w, f.x ), f.y );
     }
 
+    float PavingWetness( float2 ground )
+    {
+        // Rotated octaves break up the axis-aligned interpolation cells that
+        // otherwise become visible as large square patches on the street.
+        float2 a = float2( ground.x * .80 - ground.y * .60, ground.x * .60 + ground.y * .80 );
+        float2 b = float2( ground.x * .36 + ground.y * .93, -ground.x * .93 + ground.y * .36 );
+        float broad = PavingNoise( a / 270 + 13.7 );
+        float medium = PavingNoise( b / 115 + 42.1 );
+        float fine = PavingNoise( ground / 48 + 7.4 );
+        float patches = broad * .48 + medium * .34 + fine * .18;
+        return smoothstep( .31, .73, patches );
+    }
+
     float4 MainPs( PixelInput input ) : SV_Target0
     {
         float2 repeat = input.vTextureCoords.xy * g_vPavingScale;
@@ -64,9 +77,7 @@ PS
         material.Normal = TransformNormal( DecodeNormal( normal.xyz ), input.vNormalWs, input.vTangentUWs, input.vTangentVWs );
         material.Roughness = rma.r;
         float2 ground = material.WorldPosition.xy;
-        float broad = PavingNoise( ground / 230 );
-        float patches = broad * .65 + PavingNoise( ground / 61 + 10.3 ) * .35;
-        float wet = smoothstep( .44, .72, patches );
+        float wet = PavingWetness( ground );
         // Damp granite darkens and catches the sky without turning the whole
         // street into a mirror. Fine joints retain their roughness and normals.
         material.Albedo *= lerp( .91, 1.02, PavingNoise( ground / 390 + 9 ) );

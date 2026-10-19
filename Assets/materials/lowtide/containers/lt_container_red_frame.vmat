@@ -1,16 +1,14 @@
-// Tools/lowtide_container.py: built-in ImageGen, smooth frame
+// Tools/lowtide_container_surface.py: enamel and seam weathering; original source pixels.
 "Layer0"
 {
-    shader "shaders/complex.shader"
-    F_SPECULAR "1"
-    F_METALNESS_TEXTURE "1"
-    g_flRoughnessScaleFactor "0.9"
-    g_flMetalness "0"
+    shader "shaders/hc1_lowtide_container.shader"
     TextureColor "materials/lowtide/containers/lt_container_red_color.png"
     TextureNormal "materials/lowtide/containers/lt_container_red_frame_normal.png"
     TextureRoughness "materials/lowtide/containers/lt_container_red_roughness.png"
     TextureMetalness "materials/lowtide/containers/lt_container_red_metalness.png"
     TextureAmbientOcclusion "materials/default/default_ao.tga"
-    g_vColorTint "[1.0 1.0 1.0 1.0]"
-    g_flModelTintAmount "1.0"
+    g_vContainerHeight "[0 102]"
+    g_flCoatRoughness ".74"
+    g_flWeathering ".85"
+    g_flIsRail "1"
 }

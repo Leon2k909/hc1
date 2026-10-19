@@ -1,0 +1,14 @@
+// Tools/riverdale_materials.py
+"Layer0"
+{
+    shader "shaders/hc1_spillway_mountain_v3.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.00"
+    TextureColor "materials/spillway/scans/seaside_rock_diff_2k.jpg"
+    TextureNormal "materials/spillway/scans/seaside_rock_nor_dx_2k.jpg"
+    TextureRoughness "materials/spillway/scans/seaside_rock_rough_2k.jpg"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_flTintColor "[0.400000 0.470000 0.380000 1.000000]"
+    g_flModelTintAmount "1.0"
+}

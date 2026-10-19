@@ -1,0 +1,12 @@
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flMetalness "0"
+    TextureColor "materials/sewage/floor_color.png"
+    TextureNormal "materials/sewage/floor_normal.png"
+    TextureRoughness "materials/sewage/floor_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1"
+}

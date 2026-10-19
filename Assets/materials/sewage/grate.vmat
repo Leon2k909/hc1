@@ -1,0 +1,12 @@
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flMetalness "0.55"
+    TextureColor "materials/sewage/grate_color.png"
+    TextureNormal "materials/sewage/grate_normal.png"
+    TextureRoughness "materials/sewage/grate_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1"
+}

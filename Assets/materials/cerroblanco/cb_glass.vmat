@@ -1,8 +1,9 @@
-// Tools/cerroblanco_map.py, from materials/railhead/rw_glass.vmat
+// Tools/cerroblanco_quality_glass.py; low-e coated museum glazing
 "Layer0"
 {
-    shader "shaders/glass.shader"
+    shader "shaders/cerroblanco_glass.shader"
     F_GLASS_QUALITY "2"
+    g_flCoatingReflection "0.100000"
     g_bFogEnabled "1"
     g_flBlurAmount "0.02"
     g_flRefractionStrength "1.006"

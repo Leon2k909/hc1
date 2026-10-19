@@ -1,0 +1,14 @@
+// Tools/lowtide_container_surface.py: enamel and seam weathering; original source pixels.
+"Layer0"
+{
+    shader "shaders/hc1_lowtide_container.shader"
+    TextureColor "materials/lowtide/containers/lt_container_red_color.png"
+    TextureNormal "materials/lowtide/containers/lt_container_red_frame_normal.png"
+    TextureRoughness "materials/lowtide/containers/lt_container_red_roughness.png"
+    TextureMetalness "materials/lowtide/containers/lt_container_red_metalness.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vContainerHeight "[0 102]"
+    g_flCoatRoughness ".74"
+    g_flWeathering ".85"
+    g_flIsRail "1"
+}

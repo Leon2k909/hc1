@@ -1,0 +1,9 @@
+// Tools/veridant_impostors.py
+"Layer0"
+{
+    shader "shaders/hc1_veridant_impostor.shader"
+    F_ALPHA_TEST "1"
+    TextureVista "materials/veridant/vista/headland.png"
+    g_flAlphaTestReference "0.55"
+    g_flVistaBrightness "1.0"
+}

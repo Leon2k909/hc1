@@ -1,0 +1,12 @@
+// Tools/veridant_materials.py: the sea (Lowtide's water shader: filtered waves, depth absorption)
+"Layer0"
+{
+    shader "shaders/hc1_lowtide_water.shader"
+    g_vWaterColor "[0.0120 0.0300 0.0420]"
+    g_vWaterFlow "[-5.00 1.50]"
+    g_flRippleTile "420.0"
+    g_flRippleStrength "0.85"
+    g_flWaterRoughness "0.070"
+    g_flAbsorptionDistance "80.0"
+    g_flBankFade "6.00"
+}

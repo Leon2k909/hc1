@@ -1,0 +1,12 @@
+"Layer0"
+{
+    shader "shaders/hc1_lowtide_structure_v2.shader"
+    TextureColor "materials/lowtide/structure/beam_timber_color.png"
+    TextureNormal "materials/lowtide/structure/beam_timber_normal.png"
+    TextureRoughness "materials/lowtide/structure/beam_timber_rough.png"
+    TextureMetalness "materials/default/default_black_mask.tga"
+    g_vStructureTint "[.72 .70 .66]"
+    g_vStructureUvScale "[1.354666667 .338666667]"
+    g_flStructureRoughnessScale "1"
+    g_flStructureRoughnessFloor "0.7"
+}

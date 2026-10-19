@@ -1,0 +1,14 @@
+// Tools/riverdale_materials.py
+"Layer0"
+{
+    shader "shaders/hc1_spillway_concrete.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.00"
+    TextureColor "materials/spillway/scans/concrete_layers_02_diff_2k.jpg"
+    TextureNormal "materials/spillway/scans/concrete_layers_02_nor_dx_2k.jpg"
+    TextureRoughness "[0.52 0.52 0.52 0]"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_flTintColor "[0.540000 0.570000 0.590000 1.000000]"
+    g_flModelTintAmount "1.0"
+}

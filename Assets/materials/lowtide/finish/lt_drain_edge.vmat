@@ -1,10 +1,13 @@
+// Offline candidate: repeat only the original steel scan region.
 "Layer0"
 {
-    shader "shaders/complex.shader"
+    shader "shaders/hc1_lowtide_finish_metal.shader"
     F_SPECULAR "1"
     TextureColor "materials/lowtide/lt_bridge_steel_color.png"
     TextureNormal "materials/lowtide/lt_bridge_steel_normal.png"
-    TextureRoughness "[0.48 0.48 0.48 0]"
-    g_vColorTint "[.72 .74 .70 1]"
-    g_flMetalness "0.6"
+    g_flTintColor "[.72 .74 .70]"
+    g_vFinishRegion "[0.000244140625 0.000244140625 0.611816406250 0.611816406250]"
+    g_flFinishScale "1.5"
+    g_flFinishRoughness "0.48"
+    g_flFinishMetalness "0.6"
 }

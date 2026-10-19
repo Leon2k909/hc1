@@ -1,0 +1,17 @@
+// Tools/belltower_quality_materials.py; sources: Sources/Belltower/scans/manifest.json
+"Layer0"
+{
+    shader "shaders/belltower_streetwear_trial.shader"
+    TextureColor "materials/stone/cobble_stones_tight_basecolor.png"
+    TextureNormal "materials/stone/cobble_stones_tight_normal.png"
+    TextureRoughness "materials/stone/cobble_stones_tight_roughness.png"
+    TextureAmbientOcclusion "materials/stone/cobble_stones_tight_ambientocclusion.png"
+    TextureHeight "materials/stone/cobble_stones_tight_height.png"
+    g_vStoneUvScale "[3.2512 3.2512]"
+    g_flTintColor "[0.92 0.93 0.92]"
+    g_flReliefDepth "0.6"
+    g_flStoneRoughness "0.85"
+    g_flStoneRoughnessMin "0.7"
+    g_flStreetWearStrength "0.22"
+    g_vStreetWearScale "[230 690]"
+}

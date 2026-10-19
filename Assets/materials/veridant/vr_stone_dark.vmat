@@ -1,0 +1,14 @@
+// Tools/veridant_materials.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.00"
+    TextureColor "materials/veridant/vr_stone_dark_color.jpg"
+    TextureNormal "materials/veridant/vr_stone_dark_normal.jpg"
+    TextureRoughness "materials/veridant/vr_stone_dark_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.880000 0.880000 0.900000 1.000000]"
+    g_flModelTintAmount "1.0"
+}

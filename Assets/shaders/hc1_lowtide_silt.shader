@@ -69,8 +69,11 @@ PS
                                            i.vNormalWs, i.vTangentUWs, i.vTangentVWs );
         m.Albedo = lerp( m.Albedo, wetColor * float3( .82, .85, .85 ), wetBlend );
         m.Normal = normalize( lerp( m.Normal, wetNormal, wetBlend ) );
-        m.Albedo *= float3( .74, .77, .73 ) * lerp( .65, .95, variation ) * lerp( 1, .50, moisture );
-        m.Roughness = lerp( .76, .22, moisture * ( .7 + hollows * .3 ) );
+        // A low-tide bank is damp sediment, not a continuous mirror. The old
+        // .22 roughness turned the entire ramp into blue, angular reflected sky.
+        // Keep small dark moist hollows but broaden the specular highlights.
+        m.Albedo *= float3( .78, .76, .70 ) * lerp( .72, .96, variation ) * lerp( 1, .69, moisture );
+        m.Roughness = lerp( .90, .62, moisture * ( .7 + hollows * .3 ) );
         m.Metalness = 0;
         m.Transmission = 0;
         return ShadingModelStandard::Shade( i, m );

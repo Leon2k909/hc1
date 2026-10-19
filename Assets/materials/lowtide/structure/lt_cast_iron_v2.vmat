@@ -1,0 +1,12 @@
+"Layer0"
+{
+    shader "shaders/hc1_lowtide_structure_v2.shader"
+    TextureColor "materials/lowtide/marine/paint_color.png"
+    TextureNormal "materials/lowtide/marine/paint_normal.png"
+    TextureRoughness "materials/lowtide/marine/paint_rough.png"
+    TextureMetalness "materials/default/default_black_mask.tga"
+    g_vStructureTint "[1.15 1.15 1.15]"
+    g_vStructureUvScale "[1.354666667 1.354666667]"
+    g_flStructureRoughnessScale "0.9"
+    g_flStructureRoughnessFloor "0.55"
+}

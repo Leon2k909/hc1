@@ -1,0 +1,15 @@
+"Layer0"
+{
+    shader "shaders/belltower_forest.shader"
+    TexturePlants "materials/belltower/forest/forest-trees-v1.png"
+    F_ALPHA_TEST "1"
+    g_flAlphaTestReference "0.35"
+    g_flAntiAliasedEdgeStrength "1"
+    g_flCanopyBrightness "1.0"
+    CanopyColorB "materials/belltower/vista/vista_b_color.jpg"
+    CanopyNormalB "materials/belltower/vista/vista_b_normal.jpg"
+    CanopyColorC "materials/belltower/vista/vista_c_color.jpg"
+    CanopyNormalC "materials/belltower/vista/vista_c_normal.jpg"
+    CanopyColorD "materials/belltower/vista/vista_d_color.jpg"
+    CanopyNormalD "materials/belltower/vista/vista_d_normal.jpg"
+}

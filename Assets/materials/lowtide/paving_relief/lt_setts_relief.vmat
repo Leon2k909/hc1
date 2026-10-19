@@ -1,0 +1,15 @@
+// Tools/lowtide_paving_relief.py: candidate; generated albedo is unchanged.
+"Layer0"
+{
+    shader "shaders/hc1_lowtide_paving_relief.shader"
+    TextureColor "materials/lowtide/lt_setts_color.png"
+    TextureNormal "materials/lowtide/paving_relief/lt_setts_normal.png"
+    TextureRoughness "materials/lowtide/lt_setts_rough.png"
+    TextureMetalness "[0 0 0 0]"
+    TextureAmbientOcclusion "materials/lowtide/paving_relief/lt_setts_ao.png"
+    TextureHeight "materials/lowtide/paving_relief/lt_setts_height.png"
+    g_vPavingScale "[1.98078975 1.50146056]"
+    g_vPavingRegion "[0.10351562 0.06103516 0.45751953 0.50146484]"
+    g_flReliefDepth "0.35433071"
+    g_vReliefFade "[300 850]"
+}

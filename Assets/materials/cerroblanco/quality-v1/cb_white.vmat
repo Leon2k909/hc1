@@ -1,0 +1,15 @@
+// Tools/cerroblanco_quality_materials.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flMetalness "0.12"
+    g_flRoughnessScaleFactor "1"
+    g_flModelTintAmount "1"
+    g_vColorTint "[1 1 1 1]"
+    TextureColor "materials/cerroblanco/quality-v1/white_color.png"
+    TextureNormal "materials/cerroblanco/quality-v1/white_normal.png"
+    TextureRoughness "materials/cerroblanco/quality-v1/white_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+
+}
