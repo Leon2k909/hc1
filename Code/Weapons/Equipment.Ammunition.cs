@@ -28,11 +28,27 @@ public partial class Equipment
 	public float AttachmentAimTimeScale { get; private set; } = 1f;
 	public float AttachmentWeightSlowdown { get; private set; }
 
+	/// <summary>
+	/// <see cref="GunsmithAttachmentEffects.For"/>'s last answer for this gun, and the loadout
+	/// (<see cref="GunsmithLoadoutManager.Version"/>) and stance it was worked out for.
+	/// </summary>
+	internal (int Version, bool Prone, GunsmithAttachmentEffects Effects)? FittedEffects { get; set; }
+
+	/// <summary>
+	/// The loadout <see cref="RefreshAmmunitionLoadout"/> last read, whether the saved parts applied then, and whether the
+	/// owner was possessed (the parts' weight only counts once it is: <see cref="GunsmithAttachmentEffects.For"/>).
+	/// </summary>
+	private (int Version, bool Saved, bool Controlled)? _ammunitionLoadout;
+
 	internal void RefreshAmmunitionLoadout()
 	{
 		// Cookies belong to this client. Never apply them to another player's weapon or a bot.
 		// Spawn ammo is filled before the new pawn is possessed, so check ownership rather than possession.
 		if ( IsProxy || !Owner.IsValid() || Owner.Client is not { IsLocalPlayer: true } ) return;
+		// Every shot calls this. What it reads only changes with the loadout (GunsmithLoadoutManager.Version).
+		var loadout = (GunsmithLoadoutManager.Version, ApplySavedAttachments, Owner.IsLocallyControlled);
+		if ( _ammunitionLoadout == loadout && !GunsmithLoadoutManager.IsFittingBuild ) return;
+		_ammunitionLoadout = loadout;
 		UsesTracerRounds = ApplySavedAttachments && GunsmithLoadoutManager.UsesTracerRounds( Resource );
 		var oldCapacity = AttachmentMagazineCapacity;
 		GunsmithPart magazine = null;

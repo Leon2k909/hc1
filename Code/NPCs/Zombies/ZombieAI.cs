@@ -163,7 +163,7 @@ public sealed class ZombieAI : Component, Component.IDamageable
 			if ( close || attacking && dist < AttackRange )
 				Agent.Stop();
 			else
-				Agent.MoveTo( _target.WorldPosition + GetSeparationOffset() );
+				MoveToward( _target.WorldPosition + GetSeparationOffset() );
 		}
 
 		if ( !attacking && _nextGroan <= 0f )
@@ -180,6 +180,29 @@ public sealed class ZombieAI : Component, Component.IDamageable
 			StartSwing();
 
 		UpdateStuck( dist );
+	}
+
+	/// <summary>The longest (s) the agent keeps going for a goal that has moved a little, before it's sent the new one.</summary>
+	private const float RepathInterval = 0.2f;
+	private TimeSince _timeSinceMoveTo;
+
+	/// <summary>
+	/// Send the agent after <paramref name="goal"/>. A new goal is a path search, and the player and the zombies round it
+	/// move every frame, so every zombie searched every frame. Now a goal that has only moved a little (a twentieth of the
+	/// way there, 2 to 32 units) waits up to <see cref="RepathInterval"/>. Close in, every few units still count. A stopped
+	/// or new agent has no goal, and gets this one at once.
+	/// </summary>
+	private void MoveToward( Vector3 goal )
+	{
+		if ( _timeSinceMoveTo < RepathInterval && Agent.TargetPosition is { } current )
+		{
+			var tolerance = (WorldPosition.Distance( goal ) * 0.05f).Clamp( 2f, 32f );
+			if ( current.DistanceSquared( goal ) < tolerance * tolerance )
+				return;
+		}
+
+		_timeSinceMoveTo = 0;
+		Agent.MoveTo( goal );
 	}
 
 	private void UpdateStuck( float dist )
@@ -307,7 +330,7 @@ public sealed class ZombieAI : Component, Component.IDamageable
 	/// up inside it.</summary>
 	private PlayerPawn PlayerInTheWay( Vector3 from, Vector3 to )
 	{
-		foreach ( var pawn in Scene.GetAllComponents<PlayerPawn>() )
+		foreach ( var pawn in LivingPawns() )
 		{
 			if ( !pawn.IsValid() || pawn.HealthComponent.State != LifeState.Alive )
 				continue;
@@ -363,11 +386,30 @@ public sealed class ZombieAI : Component, Component.IDamageable
 
 	private PlayerPawn FindTarget()
 	{
-		return Scene.GetAllComponents<PlayerPawn>()
-			.Where( IsValidTarget )
-			.OrderBy( p => WorldPosition.DistanceSquared( p.WorldPosition ) )
-			.FirstOrDefault();
+		PlayerPawn nearest = null;
+		var nearestDistance = float.MaxValue;
+		foreach ( var pawn in LivingPawns() )
+		{
+			if ( !IsValidTarget( pawn ) )
+				continue;
+
+			var distance = WorldPosition.DistanceSquared( pawn.WorldPosition );
+			if ( distance < nearestDistance )
+			{
+				nearest = pawn;
+				nearestDistance = distance;
+			}
+		}
+
+		return nearest;
 	}
+
+	/// <summary>
+	/// The living player pawns, from this frame's <see cref="BotSystem"/> list: every zombie searched the scene for them
+	/// several times a frame. Pawns whose state changed since are checked again by the callers.
+	/// </summary>
+	private List<PlayerPawn> LivingPawns() => Scene.GetSystem<BotSystem>()?.AlivePawns
+		?? Scene.GetAllComponents<PlayerPawn>().Where( x => x.HealthComponent.IsValid() ).ToList();
 
 	private void StartSwing()
 	{
@@ -526,7 +568,9 @@ public sealed class ZombieAI : Component, Component.IDamageable
 		var push = Vector3.Zero;
 		var myPos = WorldPosition;
 
-		foreach ( var other in Scene.GetAllComponents<ZombieAI>() )
+		// This frame's list of them (BotSystem): every zombie searching the scene for the rest, every frame, was n² finds.
+		var zombies = Scene.GetSystem<BotSystem>()?.Zombies ?? Scene.GetAllComponents<ZombieAI>().ToList();
+		foreach ( var other in zombies )
 		{
 			if ( other == this || !other.IsValid() || other.IsDead ) continue;
 
@@ -578,7 +622,10 @@ public sealed class ZombieAI : Component, Component.IDamageable
 		Health -= damage;
 
 		if ( damage > 0f && !burn && attacker.IsValid() )
+		{
 			ShowHitmarker( attacker, Health <= 0, headshot );
+			attacker.Client?.RecordZombieTrainingHit( info.Weapon?.GetComponentInParent<Equipment>(), headshot );
+		}
 
 		var eco = attacker?.GetComponent<ZombiesPlayerEconomy>();
 

@@ -5,6 +5,21 @@ public static partial class GameText
 	/// <summary> The menu pages: Ranked, Custom Game, Sessions, Store, Profile, Career Record, Theater and the pause menu. </summary>
 	private static TextTable PageText => new()
 	{
+		// Soldier training (Career Record and the stamina HUD).
+		["RECOVERING"] = ("Récup.", "Erholung", "Recuperando", "Recuperando"),
+		["SKILL IMPROVED"] = ("Compétence améliorée", "Fähigkeit verbessert", "Habilidad mejorada", "Habilidade melhorada"),
+		["ENDURANCE"] = ("Endurance", "Ausdauer", "Resistencia", "Resistência"),
+		["Sprint on the ground to build endurance."] = ("Sprintez au sol pour développer votre endurance.", "Sprinte am Boden, um deine Ausdauer zu steigern.", "Esprinta por el suelo para mejorar tu resistencia.", "Corra em disparada no chão para aumentar sua resistência."),
+		["Practice firing and land enemy hits to improve handling."] = ("Entraînez-vous au tir et touchez les ennemis pour mieux manier vos armes.", "Übe das Schießen und triff Gegner, um deine Waffenhandhabung zu verbessern.", "Practica el tiro y acierta a los enemigos para mejorar el manejo de armas.", "Pratique tiro e acerte inimigos para melhorar o manuseio de armas."),
+		["SPRINT DURATION"] = ("Durée du sprint", "Sprintdauer", "Duración del esprint", "Duração da corrida"),
+		["STAMINA RECOVERY"] = ("Récupération d'endurance", "Ausdauerregeneration", "Recuperación de resistencia", "Recuperação de resistência"),
+		["WEAPON SWAY"] = ("Oscillation de l'arme", "Waffenschwanken", "Oscilación del arma", "Oscilação da arma"),
+		["AIM / RELOAD TIME"] = ("Temps de mise en joue / rechargement", "Anlege- / Nachladezeit", "Tiempo de apuntado / recarga", "Tempo para mirar / recarregar"),
+		["Maximum: 20% longer sprints and 15% faster recovery."] = ("Maximum : sprints 20 % plus longs et récupération 15 % plus rapide.", "Maximum: 20 % längere Sprints und 15 % schnellere Regeneration.", "Máximo: esprints un 20 % más largos y recuperación un 15 % más rápida.", "Máximo: corridas 20% mais longas e recuperação 15% mais rápida."),
+		["Maximum: 12% less recoil, 15% less sway and 10% shorter aim and reload times."] = ("Maximum : recul réduit de 12 %, oscillation réduite de 15 % et temps de mise en joue et de rechargement réduits de 10 %.", "Maximum: 12 % weniger Rückstoß, 15 % weniger Waffenschwanken und 10 % kürzere Anlege- und Nachladezeiten.", "Máximo: un 12 % menos de retroceso, un 15 % menos de oscilación y tiempos de apuntado y recarga un 10 % más cortos.", "Máximo: 12% menos recuo, 15% menos oscilação e tempos para mirar e recarregar 10% menores."),
+		["SOLDIER TRAINING"] = ("Entraînement du soldat", "Soldatentraining", "Entrenamiento de soldado", "Treinamento do soldado"),
+		["Improve through practice. Training stays with you through every life and prestige."] = ("Progressez par la pratique. Les acquis de l'entraînement sont conservés à chaque nouvelle vie et à chaque passage de prestige.", "Verbessere dich durch Übung. Dein Trainingsfortschritt bleibt bei jedem Respawn und Prestige erhalten.", "Mejora con la práctica. El progreso del entrenamiento se conserva tras cada reaparición y cada prestigio.", "Evolua com a prática. O progresso do treinamento é mantido a cada vida e a cada prestígio."),
+
 		// Ranked (RankedPage). Tier names and Unranked are in Common; Rank.Translate keeps the division numeral.
 		["SEASON {0}"] = ("Saison {0}", "Saison {0}", "Temporada {0}", "Temporada {0}"),
 		["CURRENT RANK"] = ("Rang actuel", "Aktueller Rang", "Rango actual", "Ranque atual"),
@@ -119,6 +134,38 @@ public static partial class GameText
 			"Juega con quien se una o explora en solitario.",
 			"Jogue com quem entrar ou explore sozinho." ),
 		["WHO CAN JOIN"] = ("Qui peut rejoindre", "Wer beitreten kann", "Quién puede unirse", "Quem pode entrar"),
+		// Who can join by input: the custom game's INPUT, the session browser and the menu's notice (LobbyInputRules)
+		["Input"] = ("Périphérique", "Eingabe", "Entrada", "Entrada"),
+		["Anyone can join, whatever they play with."] = (
+			"Tout le monde peut rejoindre, quel que soit son périphérique.",
+			"Jeder kann beitreten, egal womit er spielt.",
+			"Cualquiera puede unirse, juegue con lo que juegue.",
+			"Qualquer um pode entrar, jogue com o que jogar."),
+		["Only players on a controller can join."] = (
+			"Seuls les joueurs à la manette peuvent rejoindre.",
+			"Nur Spieler mit Controller können beitreten.",
+			"Solo pueden unirse jugadores con mando.",
+			"Só jogadores no controle podem entrar."),
+		["Only players on mouse and keyboard can join."] = (
+			"Seuls les joueurs au clavier et à la souris peuvent rejoindre.",
+			"Nur Spieler mit Maus und Tastatur können beitreten.",
+			"Solo pueden unirse jugadores con ratón y teclado.",
+			"Só jogadores no mouse e teclado podem entrar."),
+		["This session is for another input. Lobby Input in Settings decides which sessions you can join."] = (
+			"Cette session est pour un autre périphérique. « Périphérique des salons » dans les paramètres décide des sessions que vous pouvez rejoindre.",
+			"Diese Sitzung ist für ein anderes Eingabegerät. „Lobby-Eingabegerät“ in den Einstellungen legt fest, welchen Sitzungen du beitreten kannst.",
+			"Esta sesión es para otro dispositivo. «Dispositivo de las salas» en Ajustes decide a qué sesiones puedes unirte.",
+			"Esta sessão é para outro dispositivo. “Dispositivo das salas” nas Configurações decide em quais sessões você pode entrar."),
+		["You were taken out of a controller-only lobby for playing with mouse and keyboard."] = (
+			"Vous avez été retiré d'un salon réservé à la manette pour avoir joué au clavier et à la souris.",
+			"Du wurdest aus einer Lobby nur für Controller entfernt, weil du mit Maus und Tastatur gespielt hast.",
+			"Se te sacó de una sala solo para mando por jugar con ratón y teclado.",
+			"Você foi retirado de uma sala só para controle por jogar com mouse e teclado."),
+		["You were taken out of a mouse and keyboard lobby for playing with a controller."] = (
+			"Vous avez été retiré d'un salon clavier et souris pour avoir joué à la manette.",
+			"Du wurdest aus einer Lobby für Maus und Tastatur entfernt, weil du mit Controller gespielt hast.",
+			"Se te sacó de una sala de ratón y teclado por jugar con mando.",
+			"Você foi retirado de uma sala de mouse e teclado por jogar com controle."),
 		["INVITE ONLY"] = ("Sur invitation", "Nur auf Einladung", "Solo con invitación", "Somente convidados"),
 		["PUBLIC"] = ("Public", "Öffentlich", "Público", "Público"),
 		["Only players you invite can join."] = (

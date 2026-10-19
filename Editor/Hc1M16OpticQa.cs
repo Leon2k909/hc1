@@ -28,8 +28,11 @@ public static class Hc1M16OpticQa
 	private static string Folder => Path.Combine( Project.Current.GetRootPath(), "output/m16-gunsmith" );
 
 	private const string M16 = "weapons/m16/m16.equip";
-	/// <summary> The top of the front sight post, on the view model's tag_barrel_attach (from the barrel's mesh). </summary>
-	private static readonly Vector3 PostTip = new( 13.872f, 0f, 1.522f );
+	/// <summary>
+	/// The middle of the front sight post's top, on the view model's tag_barrel_attach (from the barrel's mesh, with the
+	/// post screwed down to the iron sight line, 1.41 over the rail: kastov_weapons M16.part_moves).
+	/// </summary>
+	private static readonly Vector3 PostTip = new( 14.287f, 0f, 1.418f );
 	/// <summary>
 	/// Lower 1/3 co-witness: a real optic's line of sight sits 1.535-1.57" over the rail against 1.41" at absolute, so
 	/// the post tip shows about this far (inches) under the dot, at the post.

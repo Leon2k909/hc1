@@ -134,7 +134,9 @@
                 var armed = !unlocked && part == _armedPart;
                 var picture = Picture( part );
                 var state = StateText( part, equipped, unlocked, armed, unlockPoints );
-                <div class="ab-option @(equipped ? "equipped" : "") @(!unlocked ? "locked" : "") @(!unlocked && unlockPoints > 0 ? "buyable" : "") @(armed ? "armed" : "")" onclick=@(() => Equip( part ))>
+                @* pad-first: opening a slot on a controller puts the focus on the fitted part (PadNavigation). pad-target: a locked
+                   part has no pointer cursor, and the pad still has to reach it to scroll the list and say how it unlocks. *@
+                <div class="ab-option pad-target @(equipped ? "equipped pad-first" : "") @(!unlocked ? "locked" : "") @(!unlocked && unlockPoints > 0 ? "buyable" : "") @(armed ? "armed" : "")" onclick=@(() => Equip( part ))>
                     <div class="ab-icon @(picture is not null ? "pictured" : "")">
                         @if ( picture is not null )
                         {
@@ -159,7 +161,7 @@
                     </div>
                     @if ( equipped && OpticTuning.IsTunable( part ) )
                     {
-                        <div class="ab-tune-btn @(IsTuned( part ) ? "tuned" : "")" @onclick=@(( PanelEvent e ) => OpenTune( e, SelectedPoint ))><i>tune</i><label>@Tr( "TUNE" )</label></div>
+                        <div class="ab-tune-btn pad-target @(IsTuned( part ) ? "tuned" : "")" @onclick=@(( PanelEvent e ) => OpenTune( e, SelectedPoint ))><i>tune</i><label>@Tr( "TUNE" )</label></div>
                     }
                     <div class="ab-plus"><i>@(equipped ? "check" : unlocked ? "add" : armed ? "lock_open" : unlockPoints > 0 ? "key" : "lock")</i></div>
                 </div>
@@ -174,7 +176,8 @@
                 var current = point.CurrentPart;
                 var picture = current.IsValid() ? Picture( current ) : null;
                 var count = CountParts( point.Category );
-                <div class="ab-slot @(current.IsValid() ? "equipped" : "") @(count.Total == 0 && !current.IsValid() ? "empty" : "")" onclick=@(() => SelectPoint( point ))>
+                @* pad-first: back out of a slot's parts on a controller, the focus goes back to that slot (PadNavigation). *@
+                <div class="ab-slot @(current.IsValid() ? "equipped" : "") @(count.Total == 0 && !current.IsValid() ? "empty" : "") @(point.Category == _lastCategory ? "pad-first" : "")" onclick=@(() => SelectPoint( point ))>
                     <div class="ab-icon @(picture is not null ? "pictured" : "")">
                         @if ( picture is not null )
                         {
@@ -194,7 +197,7 @@
                     </div>
                     @if ( OpticTuning.IsTunable( current ) )
                     {
-                        <div class="ab-tune-btn @(IsTuned( current ) ? "tuned" : "")" @onclick=@(( PanelEvent e ) => OpenTune( e, point ))><i>tune</i><label>@Tr( "TUNE" )</label></div>
+                        <div class="ab-tune-btn pad-target @(IsTuned( current ) ? "tuned" : "")" @onclick=@(( PanelEvent e ) => OpenTune( e, point ))><i>tune</i><label>@Tr( "TUNE" )</label></div>
                     }
                     <div class="ab-plus"><i>@(current.IsValid() ? "swap_horiz" : "add")</i></div>
                 </div>
@@ -296,10 +299,14 @@
 
     private bool IsUnlocked( GunsmithPart part ) => Weapon.IsValid() && AttachmentUnlocks.IsUnlocked( Weapon.Resource, part );
 
+    /// <summary> The slot last opened, which the slot list marks for the pad to come back to. </summary>
+    private GunsmithPartType? _lastCategory;
+
     public void SelectPoint( GunsmithAttachmentPoint point )
     {
         SelectedPoint = point;
         selectedCategory = point.Category;
+        _lastCategory = point.Category;
         selectedWeaponPath = Weapon.Resource.ResourcePath;
         StateHasChanged();
     }

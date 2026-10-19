@@ -4,8 +4,8 @@ namespace Facepunch;
 /// Sliding. Press Duck while sprinting on the ground and you drop onto a hip and slide on, faster than the sprint, holding
 /// most of that speed for the first half of the slide and then slowing until you come up in a crouch (or standing, if
 /// Duck isn't held). A tap is enough: letting go of Duck doesn't stop it. Press Duck again to cancel it and stand straight
-/// back into the sprint. Jump ends it in a jump that keeps the speed, Prone ends it on the floor. Duck pressed just before
-/// landing from a sprint slides as you land. Downhill keeps it going and uphill stops it sooner. Only the owner moves the
+/// back into the sprint. Jump ends it in a jump that keeps the speed, Prone ends it on the floor. Duck pressed in the air
+/// with running momentum slides as you land, including Jump and Duck pressed together. Downhill keeps it going and uphill stops it sooner. Only the owner moves the
 /// pawn; everyone else sees the third-person hip slide and hears it go down.
 /// </summary>
 public partial class PlayerPawn
@@ -50,9 +50,6 @@ public partial class PlayerPawn
 	/// <summary>How soon into a slide a second Duck press cancels it (so the press that started it doesn't).</summary>
 	private const float SlideCancelDelay = 0.15f;
 
-	/// <summary>How long before landing a Duck press at a sprint still slides as you land.</summary>
-	private const float SlideLandingBuffer = 0.25f;
-
 	/// <summary>How long after a slide a toggled sprint waits to pick up again (you're getting up, or still crouched).</summary>
 	private const float SlideSprintResumeWindow = 0.5f;
 
@@ -67,7 +64,13 @@ public partial class PlayerPawn
 
 	private TimeSince _slideTime;
 	private TimeUntil _slideCooldown;
-	private TimeUntil _slideBuffered;
+
+	/// <summary>
+	/// Duck tapped or held during a moving jump: slide on landing, even if crouching or releasing Run ended the sprint.
+	/// Jump and Duck on the same tick queue this too. Further airborne presses keep the request instead of cancelling it.
+	/// </summary>
+	private bool _slideOnLanding;
+	private bool _landingSlideToggleSprint;
 
 	/// <summary>A cancelled slide's Duck press: it doesn't crouch until Duck is let go.</summary>
 	private bool _slideCancelHeld;
@@ -108,17 +111,36 @@ public partial class PlayerPawn
 
 		if ( !IsSliding )
 		{
-			var sprinting = wasSprinting || IsSprinting;
-			if ( Input.Pressed( "Duck" ) && sprinting )
+			if ( CanSlide( ignoreInput: false ) is not null )
 			{
-				// In the air, the press waits for the landing.
-				if ( !cc.IsOnGround ) _slideBuffered = SlideLandingBuffer;
-				else TryStartSlide();
+				ClearLandingSlide();
+				return;
 			}
-			else if ( _slideBuffered.Relative > 0f && cc.IsOnGround && Input.Down( "Duck" ) )
+
+			var sprinting = wasSprinting || IsSprinting;
+			var jumping = !cc.IsOnGround || Input.Pressed( "Jump" );
+			if ( jumping && Input.Down( "Duck" ) && !_slideCancelHeld
+				&& (sprinting || cc.Velocity.WithZ( 0f ).Length >= SlideMinStartSpeed) )
 			{
-				_slideBuffered = 0;
-				TryStartSlide();
+				// The sprint flag can disappear in the air while its momentum remains. Keep the press for this landing.
+				if ( !_slideOnLanding ) _landingSlideToggleSprint = WantsToggleSprint;
+				_slideOnLanding = true;
+			}
+
+			if ( _slideOnLanding ) TrySlideOnLanding();
+			else if ( Input.Pressed( "Duck" ) && sprinting && !jumping ) TryStartSlide();
+			return;
+		}
+
+		// Jump takes priority over cancelling with Duck. A tap on both can jump out of this slide into the next one.
+		if ( Input.Pressed( "Jump" ) )
+		{
+			var resumeSprint = _resumeSprintAfterSlide;
+			StopSlide();
+			if ( Input.Down( "Duck" ) && CanSlide( ignoreInput: false ) is null )
+			{
+				_slideOnLanding = true;
+				_landingSlideToggleSprint = resumeSprint;
 			}
 			return;
 		}
@@ -131,9 +153,38 @@ public partial class PlayerPawn
 			return;
 		}
 
-		if ( CanSlide( ignoreInput: true ) is not null || !cc.IsOnGround || Input.Pressed( "Jump" )
+		if ( CanSlide( ignoreInput: true ) is not null || !cc.IsOnGround
 			|| cc.Velocity.WithZ( 0 ).Length < SlideEndSpeed || _slideTime > SlideMaxTime )
 			StopSlide();
+	}
+
+	/// <summary>Consume the request at ground contact, before the next tick can apply crouch friction.</summary>
+	private void TrySlideOnLanding()
+	{
+		if ( !_slideOnLanding ) return;
+		if ( CanSlide( ignoreInput: false ) is not null )
+		{
+			ClearLandingSlide();
+			return;
+		}
+
+		var cc = CharacterController;
+		// BuildInput has not applied a Jump press yet: let that jump leave the ground first.
+		if ( !cc.IsOnGround || Input.Pressed( "Jump" ) ) return;
+		if ( cc.Velocity.WithZ( 0f ).Length < SlideMinStartSpeed )
+		{
+			ClearLandingSlide();
+			return;
+		}
+
+		// A short hop can land during the previous slide's cooldown. Keep the request until it clears.
+		TryStartSlide();
+	}
+
+	private void ClearLandingSlide()
+	{
+		_slideOnLanding = false;
+		_landingSlideToggleSprint = false;
 	}
 
 	internal bool TryStartSlide( bool ignoreInput = false, bool log = false )
@@ -158,12 +209,13 @@ public partial class PlayerPawn
 		if ( log ) Log.Info( $"Slide: from {flat.Length:F0} to {speed:F0} u/s" );
 
 		IsSliding = true;
+		IsCrouching = true;
 		_slideTime = 0;
-		_slideBuffered = 0;
 		_slideCancelHeld = false;
 
 		// Out of the sprint: the gun comes up as it does when a sprint stops. A toggled sprint picks up again afterwards.
-		_resumeSprintAfterSlide = WantsToggleSprint;
+		_resumeSprintAfterSlide = WantsToggleSprint || _landingSlideToggleSprint;
+		ClearLandingSlide();
 		WantsToggleSprint = false;
 		if ( IsSprinting )
 		{
@@ -189,6 +241,7 @@ public partial class PlayerPawn
 
 	private void StopSlide()
 	{
+		ClearLandingSlide();
 		if ( !IsSliding ) return;
 		IsSliding = false;
 		_slideCooldown = SlideCooldown;

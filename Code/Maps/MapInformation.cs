@@ -14,6 +14,10 @@ public sealed class MapInformation : Component, ISceneMetadata
 	[Property]
 	public bool IsVisibleInMenu { get; set; } = true;
 
+	/// <summary>Show a dedicated co-op map in the Zombies picker without enabling multiplayer playlists.</summary>
+	[Property]
+	public bool ZombiesOnly { get; set; }
+
 	/// <summary>
 	/// Gets all gameobjects, gets the gamemodes, saves their paths as meta
 	/// </summary>
@@ -37,6 +41,7 @@ public sealed class MapInformation : Component, ISceneMetadata
 		{
 			{ "Image", Image },
 			{ "IsVisibleInMenu", IsVisibleInMenu.ToString() },
+			{ "ZombiesOnly", ZombiesOnly.ToString() },
 			{ "GameModes", string.Join( ", ", GetGameModeList() ) }
 		};
 	}

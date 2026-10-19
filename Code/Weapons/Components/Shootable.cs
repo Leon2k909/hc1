@@ -151,9 +151,9 @@ public partial class Shootable : WeaponInputAction,
 	[Sync] public bool IsBurstFiring { get; set; }
 
 	/// <summary>
-	/// Accessor for the aim ray.
+	/// The sight ray before spread and ballistics, shared with aiming attachments.
 	/// </summary>
-	protected Ray WeaponRay
+	protected internal Ray WeaponRay
 	{
 		get
 		{
@@ -200,7 +200,25 @@ public partial class Shootable : WeaponInputAction,
 		BindTag( "no_ammo", () => AmmoComponent.IsValid() && !AmmoComponent.HasAmmo );
 	}
 
+	/// <summary> <see cref="FittedSuppressor"/>'s last answer, for the loadout (<see cref="GunsmithLoadoutManager.Version"/>) it read. </summary>
+	private (int Version, bool Saved, bool Suppressed)? _fittedSuppressor;
+
 	private bool UseSuppressedEffects()
+	{
+		if ( HasBuiltInSuppressor )
+			return true;
+
+		// Each shot asks twice (the report and the rate); the parts only change with the loadout.
+		var saved = Equipment.IsValid() && Equipment.ApplySavedAttachments;
+		if ( GunsmithLoadoutManager.IsFittingBuild )
+			return FittedSuppressor();
+		if ( _fittedSuppressor is not { } kept || kept.Version != GunsmithLoadoutManager.Version || kept.Saved != saved )
+			_fittedSuppressor = kept = (GunsmithLoadoutManager.Version, saved, FittedSuppressor());
+		return kept.Suppressed;
+	}
+
+	/// <summary> A suppressor among the saved parts: on the muzzle, a suppressed barrel, or <see cref="SuppressedAttachment"/>. </summary>
+	private bool FittedSuppressor()
 	{
 		if ( Equipment.IsValid() && Equipment.ApplySavedAttachments && Equipment.Resource.IsValid()
 			&& GunsmithLoadoutManager.TryGetAttachment( Equipment.Resource, GunsmithPartType.Muzzle, out var muzzle )

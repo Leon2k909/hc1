@@ -70,6 +70,7 @@ public sealed class OpticZoom : Component, ICameraSetup
 	private const float AnchorDistance = 4f;
 
 	private CameraComponent _lensCamera;
+	private ColorAdjustments _lensColorAdjustments;
 	private CameraComponent _main;
 	private ViewModel _viewModel;
 	private GameObject _optic;
@@ -160,6 +161,7 @@ public sealed class OpticZoom : Component, ICameraSetup
 		}
 
 		EnsureLensCamera( main );
+		CameraPostProcess.SyncColor( main.GetComponent<ColorAdjustments>( true ), _lensColorAdjustments );
 		_lensCamera.Enabled = true;
 		LensTexture = _lensCamera.RenderTarget;
 		LensCamera = _lensCamera;
@@ -309,16 +311,10 @@ public sealed class OpticZoom : Component, ICameraSetup
 		// The same grading as the eye's view. With none, the lens drew the scene untonemapped, so the picture read
 		// darker and flatter than the world round the housing.
 		_lensCamera.BackgroundColor = main.BackgroundColor;
-		CopyEffect<Tonemapping>( main.GameObject, go );
-		CopyEffect<ColorAdjustments>( main.GameObject, go );
-		CopyEffect<Bloom>( main.GameObject, go );
+		CameraPostProcess.Copy<Tonemapping>( main.GameObject, go );
+		_lensColorAdjustments = CameraPostProcess.Copy<ColorAdjustments>( main.GameObject, go );
+		CameraPostProcess.Copy<Bloom>( main.GameObject, go );
+		CameraPostProcess.Copy<Sharpen>( main.GameObject, go );
 		go.Enabled = true;
-	}
-
-	private static void CopyEffect<T>( GameObject source, GameObject target ) where T : Component, new()
-	{
-		var effect = source.GetComponent<T>();
-		if ( !effect.IsValid() ) return;
-		effect.CopyPropertiesTo( target.Components.Create<T>() );
 	}
 }

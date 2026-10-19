@@ -64,6 +64,7 @@ public partial class PlayerPawn : IGameEventHandler<DamageGivenEvent>, IGameEven
 	/// </summary>
 	void IGameEventHandler<DamageGivenEvent>.OnGameEvent( DamageGivenEvent eventArgs )
 	{
+		Client?.RecordTrainingHit( eventArgs.DamageInfo );
 		// Did we cause this damage?
 		if ( IsViewer )
 		{

@@ -39,10 +39,14 @@ public sealed class GunsmithMw22Attachment : GunsmithAttachment, ICameraSetup
 	private ModelRenderer mesh;
 	private GunsmithMw22Factory factory;
 	private bool unequipped;
+	private bool? followsCamera;
+	private Model partsModel;
+	private bool hasTip, hasSight;
 
 	protected override void OnInitialize()
 	{
 		unequipped = false;
+		followsCamera = null;
 		weapon = AttachmentPoint?.GetComponentInParent<SkinnedModelRenderer>( true );
 		mesh = Components.Get<ModelRenderer>( FindMode.EverythingInSelf );
 		if ( !weapon.IsValid() || !mesh.IsValid() ) return;
@@ -63,10 +67,18 @@ public sealed class GunsmithMw22Attachment : GunsmithAttachment, ICameraSetup
 	// The viewmodel is placed during camera setup, after OnUpdate/OnPreRender; follow it so parts don't trail a frame.
 	void ICameraSetup.PostSetup( CameraComponent cc )
 	{
+		if ( !(followsCamera ??= OnViewModel( weapon )) ) return;
 		FollowingCamera = true;
 		try { RefreshMount(); }
 		finally { FollowingCamera = false; }
 	}
+
+	/// <summary>
+	/// Whether <paramref name="weapon"/> is a viewmodel: camera setup moves only those, after the update. A world model's
+	/// parts are its children, so they move with it, and mounting them again then gives the place they already have.
+	/// </summary>
+	internal static bool OnViewModel( SkinnedModelRenderer weapon ) =>
+		weapon.IsValid() && weapon.GetComponentInParent<ViewModel>( true ).IsValid();
 
 	void ICameraSetup.LateSetup( CameraComponent cc ) => UpdateLaser( cc );
 
@@ -133,8 +145,7 @@ public sealed class GunsmithMw22Attachment : GunsmithAttachment, ICameraSetup
 
 	private string LaserZeroKey()
 	{
-		var optic = weapon.Components.GetAll<GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants )
-			.FirstOrDefault( p => p.Category == GunsmithPartType.Optic )?.CurrentPart;
+		var optic = GunsmithAttachmentPoint.First( weapon.GameObject, GunsmithPartType.Optic )?.CurrentPart;
 		return $"{weapon.Model?.ResourcePath}|{GameObject.Name}|{optic?.ResourcePath}";
 	}
 
@@ -157,8 +168,10 @@ public sealed class GunsmithMw22Attachment : GunsmithAttachment, ICameraSetup
 		if ( AttachmentPoint.Category == GunsmithPartType.Muzzle ) position += GunsmithAttachmentPoint.MuzzleShift( weapon.GameObject );
 		if ( AttachmentPoint.Category == GunsmithPartType.Optic )
 		{
-			position += weapon.GetComponentsInChildren<GunsmithAttachmentPoint>( true )
-				.Where( p => p.CurrentPart.IsValid() ).Aggregate( Vector3.Zero, (shift, p) => shift + p.CurrentPart.OpticMountShift );
+			var mountShift = Vector3.Zero;
+			foreach ( var point in GunsmithAttachmentPoint.On( weapon.GameObject ) )
+				if ( point.CurrentPart.IsValid() ) mountShift += point.CurrentPart.OpticMountShift;
+			position += mountShift;
 			// Its tuned Eye Position: a slide along the rail, which runs with the bore (+x in bind space).
 			position += Vector3.Forward * AttachmentPoint.OpticRailShift;
 		}
@@ -169,18 +182,28 @@ public sealed class GunsmithMw22Attachment : GunsmithAttachment, ICameraSetup
 		WorldScale = pose.Scale * PartScale;
 		if ( AttachmentPoint.Category == GunsmithPartType.Barrel )
 		{
-			var points = weapon.Components.GetAll<GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants );
-			var muzzle = points.Any( p => p.Category == GunsmithPartType.Muzzle && p.CurrentPart.IsValid() );
-			if ( mesh.Model.Parts.All.Any( p => p.Name == "tag_tip" ) ) mesh.SetBodyGroup( "tag_tip", muzzle ? 1 : 0 );
+			var muzzle = false;
+			var optic = false;
+			foreach ( var point in GunsmithAttachmentPoint.On( weapon.GameObject ) )
+			{
+				muzzle |= point.Category == GunsmithPartType.Muzzle && point.CurrentPart.IsValid();
+				optic |= point.Category == GunsmithPartType.Optic && point.CurrentPart.IsValid();
+			}
+			if ( partsModel != mesh.Model )
+			{
+				partsModel = mesh.Model;
+				hasTip = partsModel.Parts.All.Any( p => p.Name == "tag_tip" );
+				hasSight = partsModel.Parts.All.Any( p => p.Name == "sight" );
+			}
+			if ( hasTip ) mesh.SetBodyGroup( "tag_tip", muzzle ? 1 : 0 );
 			// Fold the front sight when an optic is fitted; use the authored off/blank choice.
-			var sight = mesh.Model.Parts.All.FirstOrDefault( p => p.Name == "sight" );
-			if ( sight is not null ) mesh.SetBodyGroup( "sight", points.Any( p => p.Category == GunsmithPartType.Optic && p.CurrentPart.IsValid() ) ? 1 : 0 );
+			if ( hasSight ) mesh.SetBodyGroup( "sight", optic ? 1 : 0 );
 		}
 	}
 
 	internal static GunsmithMw22Attachment Find( SkinnedModelRenderer weapon, GunsmithPartType category )
 	{
-		var point = weapon.Components.GetAll<GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants ).FirstOrDefault( p => p.Category == category );
+		var point = GunsmithAttachmentPoint.First( weapon.GameObject, category );
 		var mount = point?.CurrentGameObject?.Components.Get<GunsmithMw22Attachment>( FindMode.EverythingInSelf );
 		return mount.IsValid() && !mount.unequipped ? mount : null;
 	}
@@ -190,22 +213,26 @@ public sealed class GunsmithMw22Attachment : GunsmithAttachment, ICameraSetup
 	/// <summary>True while re-mounting after camera setup has moved the viewmodel; bone world transforms are stale then.</summary>
 	internal static bool FollowingCamera { get; set; }
 
+	/// <summary> Each model's bones by name: every part on every gun asks twice a frame, and a bone's name is a native call. </summary>
+	private static readonly Dictionary<(BoneCollection, string), BoneCollection.Bone> boneLookup = new();
+
 	internal static Transform BoneDelta( SkinnedModelRenderer weapon, string bone )
 	{
-		for ( int i = 0; i < weapon.Model.BoneCount; i++ )
+		var bones = weapon.Model.Bones;
+		if ( !boneLookup.TryGetValue( (bones, bone), out var found ) )
+			boneLookup[(bones, bone)] = found = bone is null ? null : bones.GetBone( bone );
+		if ( found is null || !weapon.TryGetBoneTransform( found, out var current ) )
+			return weapon.WorldTransform;
+
+		var key = (weapon, bone);
+		if ( !FollowingCamera )
 		{
-			if ( weapon.Model.GetBoneName( i ) != bone || !weapon.TryGetBoneTransform( bone, out var current ) ) continue;
-			var key = (weapon, bone);
-			if ( !FollowingCamera )
-			{
-				if ( boneOffsets.Count > 256 ) foreach ( var dead in boneOffsets.Keys.Where( k => !k.Item1.IsValid() ).ToList() ) boneOffsets.Remove( dead );
-				boneOffsets[key] = weapon.WorldTransform.ToLocal( current );
-			}
-			else if ( boneOffsets.TryGetValue( key, out var offset ) ) current = weapon.WorldTransform.ToWorld( offset );
-			var bind = weapon.Model.GetBoneTransform( i );
-			return new Transform( current.PointToWorld( bind.PointToLocal( Vector3.Zero ) ), current.Rotation * bind.Rotation.Inverse, current.Scale / bind.Scale );
+			if ( boneOffsets.Count > 256 ) foreach ( var dead in boneOffsets.Keys.Where( k => !k.Item1.IsValid() ).ToList() ) boneOffsets.Remove( dead );
+			boneOffsets[key] = weapon.WorldTransform.ToLocal( current );
 		}
-		return weapon.WorldTransform;
+		else if ( boneOffsets.TryGetValue( key, out var offset ) ) current = weapon.WorldTransform.ToWorld( offset );
+		var bind = weapon.Model.GetBoneTransform( found.Index );
+		return new Transform( current.PointToWorld( bind.PointToLocal( Vector3.Zero ) ), current.Rotation * bind.Rotation.Inverse, current.Scale / bind.Scale );
 	}
 
 	public override void Unequip()
@@ -235,23 +262,41 @@ public sealed class GunsmithMw22Factory : Component, ICameraSetup
 
 	void ICameraSetup.PostSetup( CameraComponent cc )
 	{
+		weapon ??= Components.Get<SkinnedModelRenderer>( FindMode.EverythingInSelf );
+		if ( !(followsCamera ??= GunsmithMw22Attachment.OnViewModel( weapon )) ) return;
 		GunsmithMw22Attachment.FollowingCamera = true;
 		try { Refresh(); }
 		finally { GunsmithMw22Attachment.FollowingCamera = false; }
 	}
+
+	private bool? followsCamera;
+	/// <summary> What Refresh looks up by name on the weapon's model and the pieces' models, found once per model. </summary>
+	private Model namedModel;
+	private readonly Dictionary<string, int> materialSlots = new();
+	private Model.BodyPart gasPart, magazinePart;
+	private readonly Dictionary<ModelRenderer, (Model Model, bool[] Groups)> pieceGroups = new();
+	private static readonly string[] PieceGroups = { "barrel", "stock", "reargrip", "flashhider" };
+	private (int Version, ModelRenderer[] Renderers) worldBase = (-1, null);
 
 	public void Refresh()
 	{
 		weapon ??= Components.Get<SkinnedModelRenderer>( FindMode.EverythingInSelf );
 		if ( !weapon.IsValid() || weapon.Model is null ) return;
 		hidden ??= Material.Load( "attachments/m4a1/materials/hidden.vmat" );
+		if ( namedModel != weapon.Model )
+		{
+			namedModel = weapon.Model;
+			materialSlots.Clear();
+			gasPart = namedModel.Parts.All.FirstOrDefault( p => p.Name == "gasblock" );
+			magazinePart = namedModel.Parts.All.FirstOrDefault( p => p.Name == "magazine" );
+		}
 		var barrel = GunsmithMw22Attachment.Find( weapon, GunsmithPartType.Barrel ).IsValid();
 		var stock = GunsmithMw22Attachment.Find( weapon, GunsmithPartType.Stock ).IsValid();
 		var grip = GunsmithMw22Attachment.Find( weapon, GunsmithPartType.RearGrip ).IsValid();
 		var muzzle = GunsmithMw22Attachment.Find( weapon, GunsmithPartType.Muzzle ).IsValid();
 		var magazine = GunsmithMw22Attachment.Find( weapon, GunsmithPartType.Magazine ).IsValid();
 		var world = weapon.Model.BoneCount == 0;
-		var points = weapon.Components.GetAll<GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants );
+		var points = GunsmithAttachmentPoint.On( weapon.GameObject );
 		// Other weapons fitting the M4's parts have none of its factory pieces to swap in.
 		var active = (barrel || stock || grip || muzzle) && !GunsmithMw22Attachment.IsRemounted( points );
 		// Any fitted muzzle device (including socket-mounted HC1 parts) replaces the factory flash hider.
@@ -278,15 +323,24 @@ public sealed class GunsmithMw22Factory : Component, ICameraSetup
 			renderer.RenderOptions.Overlay = weapon.RenderOptions.Overlay;
 			renderer.RenderType = weapon.RenderType;
 			renderer.Tint = weapon.Tint;
-			foreach ( var (name, hide) in new[] { ("barrel", barrel), ("stock", stock), ("reargrip", grip), ("flashhider", muzzle) } )
-				if ( renderer.Model.Parts.All.Any( p => p.Name == name ) ) renderer.SetBodyGroup( name, hide ? 1 : 0 );
+			if ( !pieceGroups.TryGetValue( renderer, out var groups ) || groups.Model != renderer.Model )
+				pieceGroups[renderer] = groups = (renderer.Model,
+					PieceGroups.Select( name => renderer.Model.Parts.All.Any( p => p.Name == name ) ).ToArray());
+			if ( groups.Groups[0] ) renderer.SetBodyGroup( "barrel", barrel ? 1 : 0 );
+			if ( groups.Groups[1] ) renderer.SetBodyGroup( "stock", stock ? 1 : 0 );
+			if ( groups.Groups[2] ) renderer.SetBodyGroup( "reargrip", grip ? 1 : 0 );
+			if ( groups.Groups[3] ) renderer.SetBodyGroup( "flashhider", muzzle ? 1 : 0 );
 		}
 		if ( world )
 		{
 			if ( active && !replacingWorld ) { originalBase = weapon.BodyGroups & 1UL; replacingWorld = true; }
 			if ( active ) weapon.BodyGroups &= ~1UL;
 			else if ( replacingWorld ) { weapon.BodyGroups = (weapon.BodyGroups & ~1UL) | originalBase; replacingWorld = false; }
-			foreach ( var renderer in weapon.Components.GetAll<ModelRenderer>( FindMode.EverythingInSelfAndDescendants ).Where( r => r.Model?.Name == "attachments/m4a1/world_base/world_base.vmdl" ) ) renderer.Enabled = !active;
+			// The world base meshes are parts' renderers, so the list only changes with the points.
+			if ( worldBase.Version != GunsmithAttachmentPoint.Version || worldBase.Renderers.Any( r => !r.IsValid() ) )
+				worldBase = (GunsmithAttachmentPoint.Version, weapon.Components.GetAll<ModelRenderer>( FindMode.EverythingInSelfAndDescendants )
+					.Where( r => r.Model?.Name == "attachments/m4a1/world_base/world_base.vmdl" ).ToArray());
+			foreach ( var renderer in worldBase.Renderers ) renderer.Enabled = !active;
 		}
 		else
 		{
@@ -294,7 +348,7 @@ public sealed class GunsmithMw22Factory : Component, ICameraSetup
 			SetHidden( "v_m4a1_handguard.vmat", barrel );
 			SetHidden( "v_m4a1_stock.vmat", stock );
 		}
-		var gas = weapon.Model.Parts.All.FirstOrDefault( p => p.Name == "gasblock" );
+		var gas = gasPart;
 		if ( gas is not null )
 		{
 			if ( barrel && !hidingGasblock ) { savedGasblock = weapon.BodyGroups & gas.Mask; hidingGasblock = true; }
@@ -303,7 +357,7 @@ public sealed class GunsmithMw22Factory : Component, ICameraSetup
 		}
 		if ( magazine )
 		{
-			var group = weapon.Model.Parts.All.FirstOrDefault( p => p.Name == "magazine" );
+			var group = magazinePart;
 			if ( group is not null ) weapon.BodyGroups &= ~group.Mask;
 		}
 		if ( barrel || muzzle )
@@ -313,7 +367,7 @@ public sealed class GunsmithMw22Factory : Component, ICameraSetup
 				MuzzleEffectPoint = new GameObject( GameObject, true, "MW22 muzzle effects" );
 				MuzzleEffectPoint.Flags |= GameObjectFlags.NotSaved | GameObjectFlags.NotNetworked;
 			}
-			var muzzlePoint = points.FirstOrDefault( p => p.Category == GunsmithPartType.Muzzle );
+			var muzzlePoint = GunsmithAttachmentPoint.First( weapon.GameObject, GunsmithPartType.Muzzle );
 			var muzzleMesh = muzzlePoint?.CurrentGameObject?.Components.Get<ModelRenderer>( FindMode.EverythingInSelf );
 			if ( muzzleMesh.IsValid() )
 			{
@@ -334,7 +388,8 @@ public sealed class GunsmithMw22Factory : Component, ICameraSetup
 
 	private void SetHidden( string suffix, bool hide )
 	{
-		var slot = weapon.Model.Materials.ToList().FindIndex( m => m.Name.EndsWith( "/" + suffix ) );
+		if ( !materialSlots.TryGetValue( suffix, out var slot ) )
+			materialSlots[suffix] = slot = weapon.Model.Materials.ToList().FindIndex( m => m.Name.EndsWith( "/" + suffix ) );
 		if ( slot < 0 ) return;
 		if ( hide )
 		{

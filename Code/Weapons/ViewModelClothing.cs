@@ -3,7 +3,7 @@ namespace Facepunch;
 /// <summary>
 /// The player's own outfit on their first-person arms: the shirt's sleeves, the gloves and the bare skin, as their body
 /// wears them in third person. The first-person arms' own mesh is hidden (its "arms" bodygroup), and in its place a copy
-/// of the body (<see cref="MilitaryUniform.HumanModelPath"/>), dressed by its own <see cref="MilitaryUniform"/> in the
+/// of the selected human body, dressed by its own <see cref="MilitaryUniform"/> in the
 /// body's outfit, is posed from the first-person arms' bones every frame.
 /// </summary>
 /// <remarks>
@@ -76,6 +76,8 @@ public sealed partial class ViewModelClothing : Component, ICameraSetup
 	GameObject _root;
 	SkinnedModelRenderer _skin;
 	readonly List<Layer> _layers = new();
+	// Posed with the layers but left their own materials: FirstPersonGrime's skins over them.
+	readonly List<Layer> _followers = new();
 	Model _dressedModel;
 	MilitaryUniformStyle _dressedStyle;
 	int? _armsChoice;
@@ -93,7 +95,7 @@ public sealed partial class ViewModelClothing : Component, ICameraSetup
 		{
 			_sinceChecked = 0;
 			var uniform = Body.GetComponent<MilitaryUniform>( true );
-			var wearsUniform = uniform.IsValid() && Body.Model?.Name == MilitaryUniform.HumanModelPath;
+				var wearsUniform = uniform.IsValid() && MilitaryUniform.UsesHumanSkeleton( Body.Model );
 			if ( !wearsUniform ) Undress();
 			else if ( !_root.IsValid() || _dressedModel != Body.Model || _dressedStyle != uniform.Style ) Dress( uniform );
 			foreach ( var layer in _layers ) ApplyDetailedMaterials( layer.Renderer );
@@ -168,6 +170,7 @@ public sealed partial class ViewModelClothing : Component, ICameraSetup
 		_root = null;
 		_skin = null;
 		_layers.Clear();
+		_followers.Clear();
 		_dressedModel = null;
 	}
 
@@ -210,6 +213,7 @@ public sealed partial class ViewModelClothing : Component, ICameraSetup
 			_rigBody = _skin.Model;
 			_rig = Build( _rigArms, _rigBody );
 			foreach ( var layer in _layers ) layer.Map = null;
+			foreach ( var layer in _followers ) layer.Map = null;
 			if ( _rig is null ) Log.Warning( $"ViewModelClothing: can't pose {_rigBody.Name} from {_rigArms.Name}" );
 		}
 		if ( _rig is null ) return;
@@ -239,23 +243,39 @@ public sealed partial class ViewModelClothing : Component, ICameraSetup
 		// The engine re-poses a model from its bind pose whenever the viewmodel moves, so the pose also goes in as bone
 		// overrides (model space), which that re-pose keeps.
 		var spine = rig.Pose[rig.Spine].ToWorld( rig.Bind[rig.Spine].ToLocal( global::Transform.Zero ) );
-		foreach ( var layer in _layers )
+		foreach ( var layer in _layers ) Pose( layer, space, spine );
+		foreach ( var layer in _followers ) Pose( layer, space, spine );
+	}
+
+	void Pose( Layer layer, Transform space, Transform spine )
+	{
+		if ( !layer.Renderer.IsValid() || layer.Renderer.Model is null ) return;
+		var model = layer.Renderer.SceneModel;
+		if ( !model.IsValid() ) return;
+		if ( layer.Map is null ) Map( layer, _rigBody );
+		var local = layer.Renderer.WorldTransform;
+		model.Transform = local;
+		for ( int i = 0; i < layer.Map.Length; i++ )
 		{
-			if ( !layer.Renderer.IsValid() || layer.Renderer.Model is null ) continue;
-			var model = layer.Renderer.SceneModel;
-			if ( !model.IsValid() ) continue;
-			if ( layer.Map is null ) Map( layer, _rigBody );
-			var local = layer.Renderer.WorldTransform;
-			model.Transform = local;
-			for ( int i = 0; i < layer.Map.Length; i++ )
-			{
-				// A bone the body doesn't have keeps its bind pose relative to the torso.
-				var world = layer.Map[i] >= 0 ? _poseWorld[layer.Map[i]] : space.ToWorld( spine.ToWorld( layer.Bind[i] ) );
-				var pose = local.ToLocal( world );
-				model.SetBoneOverride( i, pose );
-				model.SetBoneWorldTransform( i, world );
-			}
+			// A bone the body doesn't have keeps its bind pose relative to the torso.
+			var world = layer.Map[i] >= 0 ? _poseWorld[layer.Map[i]] : space.ToWorld( spine.ToWorld( layer.Bind[i] ) );
+			var pose = local.ToLocal( world );
+			model.SetBoneOverride( i, pose );
+			model.SetBoneWorldTransform( i, world );
 		}
+	}
+
+	/// <summary>Whether this is one of the outfit's own renderers, posed here every frame.</summary>
+	internal bool Poses( SkinnedModelRenderer renderer ) => _layers.Any( l => l.Renderer == renderer );
+
+	/// <summary>
+	/// Pose <paramref name="renderer"/> (a copy of one of the outfit's models) with the outfit, leaving its materials
+	/// alone: FirstPersonGrime's skin over a sleeve or glove. Dropped when the outfit changes.
+	/// </summary>
+	internal void Follow( SkinnedModelRenderer renderer )
+	{
+		_followers.RemoveAll( l => !l.Renderer.IsValid() || l.Renderer == renderer );
+		_followers.Add( new Layer { Renderer = renderer } );
 	}
 
 	/// <param name="eye">The camera in the body's model space.</param>

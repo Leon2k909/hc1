@@ -2,6 +2,7 @@
 @using Sandbox
 
 @inherits Panel
+@implements IPadAdjustable
 @namespace Facepunch.UI
 
 <style>
@@ -26,7 +27,7 @@
                     <div class="choice-options english-variants">
                         @foreach ( var language in EnglishVariants )
                         {
-                            <button class="choice-option @(GameText.Current == language ? "selected" : "")" onclick=@(() => PickEnglish( language ))>
+                            <button class="choice-option pad-target @(GameText.Current == language ? "selected" : "")" onclick=@(() => PickEnglish( language ))>
                                 <div class="language-variant-text">
                                     <label>@GameText.NativeName( language )</label>
                                     <label class="language-spelling">@(language == GameLanguage.EnglishUK ? "Customise / Colour" : "Customize / Color")</label>
@@ -54,6 +55,21 @@
                 </div>
             </div>
         }
+        else if ( Description.PropertyType == typeof( LobbyInput ) )
+        {
+            <div class="with-padding choice-setting">
+                <div class="setting-text">
+                    <label class="name">@SettingTitle</label>
+                    <label class="setting-hint">@Tr( "Controller Only or Mouse & Keyboard Only keeps you in lobbies for that input: the games you host take only those players, and you only join theirs." )</label>
+                </div>
+                <div class="choice-options">
+                    @foreach ( var input in Enum.GetValues<LobbyInput>() )
+                    {
+                        <button class="choice-option with-icon @(Equals( Value, input ) ? "selected" : "")" onclick=@(() => Value = input)><i>@LobbyInputRules.Icon( input )</i><label>@Tr( LobbyInputRules.Title( input ) )</label></button>
+                    }
+                </div>
+            </div>
+        }
         else if ( Description.PropertyType == typeof( float ) || Description.PropertyType == typeof( int ) )
         {
             <div class="with-padding">
@@ -65,6 +81,7 @@
                 @if ( Range is not null )
                 {
                     <CustomSlider style="width: 250px;" class="devslider" Value:bind=@Value Min=@Range.Min Max=@Range.Max Step=@Range.Step ShowTextEntry="@false" />
+                    <label class="slider-value">@SliderText</label>
                 }
                 else
                 {
@@ -120,6 +137,17 @@
     public PropertyDescription Description { get; set; }
 
     public RangeAttribute Range => Description.GetCustomAttribute<RangeAttribute>();
+
+    // The slider's value beside it, to its step's decimals: a sensitivity's 1.00, a field of view's 85.
+    private string SliderText
+    {
+        get
+        {
+            var value = Convert.ToSingle( Value );
+            var step = Range?.Step ?? 1f;
+            return value.ToString( step >= 1f ? "0" : step >= 0.1f ? "0.0" : "0.00" );
+        }
+    }
     public ChoicesAttribute Choices => Description.GetCustomAttribute<ChoicesAttribute>();
 
     // Other languages look these up by a fuller name: "Master" alone is also the top rank, which they name differently,
@@ -153,6 +181,84 @@
         VoiceChatMode.PartyOnly => "Party Only",
         _ => "Auto (GameMode Default)"
     };
+
+    // ── Pad (PadNavigation) ──────────────────────────────────────────────────────
+    // A row of a kind this draws is one pad target: up and down move between rows, left and right change the row, and
+    // A presses its control (PadPoint).
+
+    private bool IsPadRow => Description?.PropertyType is { } type && (type == typeof( bool ) || type == typeof( float )
+        || type == typeof( int ) || type == typeof( Color ) || type == typeof( GameLanguage ) || type == typeof( VoiceChatMode )
+        || type == typeof( LobbyInput ));
+
+    public override void Tick()
+    {
+        base.Tick();
+        SetClass( PadNavigation.TargetClass, IsPadRow );
+    }
+
+    /// <summary> Where A presses: the checkbox, the chosen option, the slider's thumb, the language field. </summary>
+    public Panel PadPoint
+    {
+        get
+        {
+            var type = Description?.PropertyType;
+            if ( type == typeof( GameLanguage ) ) return Descendants.OfType<LanguagePicker>().FirstOrDefault();
+            if ( type == typeof( float ) || type == typeof( int ) ) return Descendants.FirstOrDefault( x => x.HasClass( "thumb" ) );
+            if ( type == typeof( bool ) && Choices is null ) return Descendants.OfType<Checkbox>().FirstOrDefault();
+
+            // A colour's name: the picker beside it has nothing a press could set well.
+            if ( type == typeof( Color ) ) return Descendants.FirstOrDefault( x => x.HasClass( "name" ) );
+
+            return Descendants.FirstOrDefault( x => x.HasClass( "selected" ) );
+        }
+    }
+
+    /// <summary>
+    /// Left and right: a slider steps (PadNavMath.SliderStep), a switch or a checkbox goes to its left (off) or right
+    /// (on) side, and a row of choices to the next one. The language and a colour have nothing to step through.
+    /// </summary>
+    public bool PadAdjust( int direction, float heldFor )
+    {
+        var type = Description?.PropertyType;
+
+        if ( type == typeof( bool ) )
+        {
+            var on = direction > 0;
+            if ( !Equals( Value, on ) )
+            {
+                Value = on;
+                Sound.Play( "ui_button_hover" );
+            }
+            return true;
+        }
+
+        if ( type == typeof( float ) || type == typeof( int ) )
+        {
+            var current = Convert.ToSingle( Value );
+            var next = PadNavMath.SliderStep( current, Range?.Min ?? 0f, Range?.Max ?? 100f, Range?.Step ?? 1f, direction, heldFor );
+            if ( next != current )
+                Value = type == typeof( int ) ? (object)(int)MathF.Round( next ) : next;
+            return true;
+        }
+
+        if ( type == typeof( VoiceChatMode ) ) return Cycle<VoiceChatMode>( direction );
+        if ( type == typeof( LobbyInput ) ) return Cycle<LobbyInput>( direction );
+        return false;
+    }
+
+    /// <summary> The next choice that way, stopping at the ends. </summary>
+    private bool Cycle<T>( int direction ) where T : struct, Enum
+    {
+        var values = Enum.GetValues<T>();
+        var index = Array.IndexOf( values, (T)Value );
+        var next = Math.Clamp( index + direction, 0, values.Length - 1 );
+        if ( next != index )
+        {
+            Value = values[next];
+            Sound.Play( "ui_button_hover" );
+        }
+        return true;
+    }
 
     protected override int BuildHash() => HashCode.Combine( Description, Description?.GetValue( Target ), GameText.Current );
 }

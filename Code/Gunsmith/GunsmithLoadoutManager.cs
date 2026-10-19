@@ -12,8 +12,34 @@ public static class GunsmithLoadoutManager
 	private const string WeaponBuildCodePrefix = "HC1W1-";
 	public const int MaxSharedBuildCodeLength = 16384;
 
+	/// <summary>
+	/// Bumped by everything that can change which part <see cref="TryGetAttachment"/> returns: an attachment, the active
+	/// class or an optic's tune saved, a part unlocked (a weapon level, a point, a prestige, UNLOCK ALL) or a part loaded.
+	/// Every shot asks for most of the gun's slots, so the answers, and what the guns work out from them
+	/// (<see cref="GunsmithAttachmentEffects.For"/>, <see cref="Equipment.RefreshAmmunitionLoadout"/>), are kept until
+	/// it changes, and a shot reads no cookies.
+	/// </summary>
+	public static int Version { get; private set; }
+
+	/// <summary> Throws away every kept answer (<see cref="Version"/>). </summary>
+	public static void MarkChanged()
+	{
+		Version++;
+		Fitted.Clear();
+	}
+
+	/// <summary> A build is being fitted (<see cref="ApplyBuild"/>, <see cref="TryReadWithBuild{T}"/>): nothing read now is the saved loadout. </summary>
+	internal static bool IsFittingBuild => _fitting is not null;
+
+	/// <summary> <see cref="TryGetAttachment"/>'s answers since the last <see cref="MarkChanged"/>. </summary>
+	private static readonly Dictionary<(EquipmentResource, GunsmithPartType), (bool Found, GunsmithPart Part)> Fitted = new();
+
 	public static int GetActiveClassIndex() => Game.Cookies.Get<int>( "hc1.loadout.active_class", 0 );
-	public static void SetActiveClassIndex( int index ) => Game.Cookies.Set( "hc1.loadout.active_class", index );
+	public static void SetActiveClassIndex( int index )
+	{
+		Game.Cookies.Set( "hc1.loadout.active_class", index );
+		MarkChanged();
+	}
 
 	public static List<int> GetActiveClassIndices()
 	{
@@ -231,6 +257,7 @@ public static class GunsmithLoadoutManager
 	{
 		if ( !resource.IsValid() || !OpticTuning.IsTunable( optic ) ) return;
 		Game.Cookies.Set( OpticTuneKey( resource, optic, "eye" ), OpticTuning.ClampSlots( resource, slots ) );
+		MarkChanged();
 	}
 
 	/// <summary>
@@ -251,6 +278,7 @@ public static class GunsmithLoadoutManager
 	{
 		if ( !resource.IsValid() || !OpticTuning.IsTunable( optic ) ) return;
 		Game.Cookies.Set( OpticTuneKey( resource, optic, "zero" ), Math.Clamp( metres, 0, OpticTuning.Zeros[^1] ) );
+		MarkChanged();
 	}
 
 	/// <summary>
@@ -456,6 +484,7 @@ public static class GunsmithLoadoutManager
 			return;
 
 		Game.Cookies.Set( AttachmentCookieKey( resource.ResourcePath, category ), part?.ResourcePath ?? NoneAttachmentValue );
+		MarkChanged();
 	}
 
 	public static bool HasAttachment( EquipmentResource resource, GunsmithPart part )
@@ -845,6 +874,7 @@ public static class GunsmithLoadoutManager
 				// so TryGetAttachment returns false and the barrel logic stops firing.
 				Game.Cookies.Set( AttachmentCookieKey( resource.ResourcePath, GunsmithPartType.Barrel ), "" );
 				Game.Cookies.Set( AttachmentCookieKey( resource.ResourceName, GunsmithPartType.Barrel ), "" );
+				MarkChanged();
 			}
 		}
 
@@ -983,6 +1013,10 @@ public static class GunsmithLoadoutManager
 
 			// A sticker is vinyl over the paint, so the camo doesn't go on it.
 			if ( renderer.Components.Get<GunsmithSticker>( FindMode.EverythingInSelf ).IsValid() )
+				continue;
+
+			// Nor the blood and dirt over it (FirstPersonGrime), which picks its own slots.
+			if ( renderer.Components.Get<GrimeSkin>( FindMode.EverythingInSelf ).IsValid() )
 				continue;
 
 			// Separate optic meshes obey the same camo toggle as built-in optic bodygroups.
@@ -1147,7 +1181,7 @@ public static class GunsmithLoadoutManager
 			var nodraw = Material.Load( "attachments/m4a1/materials/hidden.vmat" );
 			foreach ( var renderer in root.Components.GetAll<SkinnedModelRenderer>( FindMode.EverythingInSelfAndDescendants ) )
 			{
-				if ( renderer.Model is null ) continue;
+				if ( renderer.Model is null || renderer.Components.Get<GrimeSkin>( FindMode.EverythingInSelf ).IsValid() ) continue;
 				for ( int i = 0; i < renderer.Model.Materials.Length; i++ )
 				{
 					var original = renderer.Model.Materials[i];
@@ -1161,7 +1195,7 @@ public static class GunsmithLoadoutManager
 			var nodraw = Material.Load( "attachments/m4a1/materials/hidden.vmat" );
 			foreach ( var renderer in root.Components.GetAll<ModelRenderer>( FindMode.EverythingInSelfAndDescendants ) )
 			{
-				if ( renderer.Model is null ) continue;
+				if ( renderer.Model is null || renderer.Components.Get<GrimeSkin>( FindMode.EverythingInSelf ).IsValid() ) continue;
 				// Barrel prefabs retain the original MP5 receiver as a separate
 				// clipped mesh. Hide only the native skinned copy of this material.
 				if ( renderer.Components.Get<GunsmithMp5NativeReceiver>() is not null ) continue;
@@ -1360,6 +1394,24 @@ public static class GunsmithLoadoutManager
 		if ( _fitting is { } build )
 			return TryGetBuildAttachment( build, resource, category, out part );
 
+		part = null;
+		if ( !resource.IsValid() )
+			return false;
+
+		// The saved part, worked out once until the loadout or the unlocks change (Version).
+		if ( Fitted.TryGetValue( (resource, category), out var fitted ) && (fitted.Part is null || fitted.Part.IsValid()) )
+		{
+			part = fitted.Part;
+			return fitted.Found;
+		}
+
+		var found = TryGetUnlockedAttachment( resource, category, out part );
+		Fitted[(resource, category)] = (found, part);
+		return found;
+	}
+
+	private static bool TryGetUnlockedAttachment( EquipmentResource resource, GunsmithPartType category, out GunsmithPart part )
+	{
 		if ( !TryGetSavedAttachment( resource, category, out part ) )
 			return false;
 
@@ -1389,13 +1441,45 @@ public static class GunsmithLoadoutManager
 			|| string.IsNullOrEmpty( value ) )
 			return false;
 
-		part = ResourceLibrary.GetAll<GunsmithPart>()
-			.FirstOrDefault( x => x.Category == category
-				&& (x.ResourcePath.Equals( value, StringComparison.OrdinalIgnoreCase )
-					|| x.ResourceName.Equals( value, StringComparison.OrdinalIgnoreCase )) );
+		part = PartsNamed( value ).FirstOrDefault( x => x.IsValid() && x.Category == category );
 
 		return part.IsValid();
 	}
+
+	private static Dictionary<string, List<GunsmithPart>> _partsByName;
+	private static int _partsByNameVersion = -1;
+
+	/// <summary>
+	/// The parts whose path or name is <paramref name="value"/>, in the library's order, as a search of every part would
+	/// find them. The index is made again when a part loads (<see cref="GunsmithPart.LibraryVersion"/>).
+	/// </summary>
+	private static List<GunsmithPart> PartsNamed( string value )
+	{
+		if ( _partsByName is null || _partsByNameVersion != GunsmithPart.LibraryVersion )
+		{
+			var index = new Dictionary<string, List<GunsmithPart>>( StringComparer.OrdinalIgnoreCase );
+			void Add( string key, GunsmithPart part )
+			{
+				if ( key is null ) return;
+				if ( !index.TryGetValue( key, out var list ) ) index[key] = list = new List<GunsmithPart>();
+				// A part whose path and name are the same is listed once.
+				if ( list.Count == 0 || list[^1] != part ) list.Add( part );
+			}
+
+			foreach ( var part in ResourceLibrary.GetAll<GunsmithPart>() )
+			{
+				Add( part.ResourcePath, part );
+				Add( part.ResourceName, part );
+			}
+
+			_partsByName = index;
+			_partsByNameVersion = GunsmithPart.LibraryVersion;
+		}
+
+		return value is not null && _partsByName.TryGetValue( value, out var parts ) ? parts : NoParts;
+	}
+
+	private static readonly List<GunsmithPart> NoParts = new();
 
 	/// <summary> The part saved in a slot, locked or not. </summary>
 	private static bool TryGetSavedAttachment( EquipmentResource resource, GunsmithPartType category, out GunsmithPart part )
@@ -1415,11 +1499,7 @@ public static class GunsmithLoadoutManager
 		if ( value.Equals( NoneAttachmentValue, StringComparison.OrdinalIgnoreCase ) )
 			return true;
 
-		part = ResourceLibrary.GetAll<GunsmithPart>()
-			.FirstOrDefault( x => (x.ResourcePath.Equals( value, StringComparison.OrdinalIgnoreCase )
-			                     || x.ResourceName.Equals( value, StringComparison.OrdinalIgnoreCase ))
-			                     && x.Category == category
-			                     && x.Supports( resource ) );
+		part = PartsNamed( value ).FirstOrDefault( x => x.IsValid() && x.Category == category && x.Supports( resource ) );
 
 		return part.IsValid();
 	}
@@ -1432,6 +1512,7 @@ public static class GunsmithLoadoutManager
 	{
 		Game.Cookies.Set( SecondaryCookieKey, UspResourceName );
 		Game.Cookies.Set( AttachmentCookieKey( UspResourceName, GunsmithPartType.Barrel ), UspSuppressorResourceName );
+		MarkChanged();
 	}
 
 	private static string AttachmentCookieKey( string weaponId, GunsmithPartType category ) =>

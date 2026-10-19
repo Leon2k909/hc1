@@ -38,7 +38,7 @@ public partial class ViewModel
 
 	private void UpdateCornerSlicing( CameraComponent cc )
 	{
-		var slicing = GameSettingsSystem.Current.CornerSlicing
+			var slicing = !Owner.IsWeaponMounted && GameSettingsSystem.Current.CornerSlicing
 			&& Equipment.IsValid() && Equipment.HasTag( "aiming" ) && !Equipment.HasTag( "scoped" )
 			&& Owner.CameraController.IsValid() && Owner.CameraController.Mode == CameraMode.FirstPerson;
 

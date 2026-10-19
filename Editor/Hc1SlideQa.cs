@@ -25,7 +25,9 @@ public static class Hc1SlideQa
 			{
 				body = new GameObject( true, "Slide preview" ).AddComponent<SkinnedModelRenderer>();
 				MilitaryUniform.SetModel( body, Model.Load( MilitaryUniform.HumanModelPath ) );
-				handObject = body.GetBoneObject( "hand_R" );
+					// A fresh isolated renderer does not expose the runtime hand bone GameObject.
+					// Mount the gun on a preview socket that we position from the posed hand.
+					handObject = new GameObject( body.GameObject, true, "Slide preview weapon hand" );
 				var weapon = ResourceLibrary.Get<EquipmentResource>( "weapons/m4a1/m4a1.equip" );
 				var weaponObject = weapon.WorldModelPrefab.Clone( new CloneConfig { Parent = handObject, StartEnabled = false,
 					Transform = MilitaryUniform.WeaponHandOffset( body.Model ) } );
@@ -52,7 +54,8 @@ public static class Hc1SlideQa
 				{
 					body.Set( "holdtype", (int)AnimationHelper.HoldTypes.Rifle );
 					body.SetBool( "b_grounded", true );
-					body.Set( "duck", .75f );
+						// SlideBlend fades the graph's crouch out so IK owns the legs at full slide.
+						body.Set( "duck", 0f );
 					body.SetLookDirection( "aim_body", Vector3.Forward );
 					time += .05f;
 					scene.EditorTick( time, .05f );
@@ -83,7 +86,7 @@ public static class Hc1SlideQa
 						foreach ( var garment in body.GetComponentsInChildren<SkinnedModelRenderer>( true ) )
 							if ( garment != body && garment.BoneMergeTarget == body ) garment.SceneModel?.MergeBones( body.SceneModel );
 						var hand = body.SceneModel.GetBoneWorldTransform( body.Model.Bones.GetBone( "hand_R" ).Index );
-						if ( poses[p] == 0f ) handObject.WorldTransform = hand;
+						handObject.WorldTransform = hand;
 						var mountError = gun.WorldPosition.Distance( hand.ToWorld( MilitaryUniform.WeaponHandOffset( body.Model ) ).Position );
 						if ( mountError > .01f ) throw new Exception( $"Weapon missed its hand by {mountError} at blend {poses[p]}" );
 						camera.RenderToBitmap( tile );

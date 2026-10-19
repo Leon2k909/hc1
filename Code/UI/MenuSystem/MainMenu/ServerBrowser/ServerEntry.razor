@@ -2,8 +2,13 @@
 @inherits Panel
 @attribute [StyleSheet]
 
-<root class="@(IsSelected ? "selected" : "") @(Lobby.IsFull ? "full" : "")">
+<root class="@(IsSelected ? "selected" : "") @(Lobby.IsFull ? "full" : "") @(Lobby.InputAllows ? "" : "other-input")">
     <label class="se-name">@Lobby.Name</label>
+
+    @if ( Lobby.Input != LobbyInput.Any )
+    {
+        <div class="se-input"><i>@LobbyInputRules.Icon( Lobby.Input )</i></div>
+    }
 
     @if ( Lobby.IsFull )
     {
@@ -27,4 +32,8 @@
     {
         OnSelected?.Invoke( Lobby );
     }
+
+    // What the player is playing with changes whether they can join a controller-only or mouse-only lobby.
+    protected override int BuildHash() => HashCode.Combine( IsSelected, Lobby.LobbyId, Lobby.Members, Lobby.MaxMembers,
+        Lobby.IsFull, Lobby.Input, Lobby.InputAllows );
 }

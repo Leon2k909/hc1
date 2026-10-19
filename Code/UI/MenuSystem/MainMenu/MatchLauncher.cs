@@ -55,7 +55,10 @@ public static class MatchLauncher
 		var mode = ZombiesMode();
 		if ( !mode.IsValid() ) return new();
 
-		return GameUtils.GetMatchMaps()
+		return ResourceLibrary.GetAll<SceneFile>()
+			.Where( m => !string.Equals( m.GetMetadata( "IsVisibleInMenu", "True" ), "False", StringComparison.OrdinalIgnoreCase ) )
+			.Where( m => GameUtils.IsMatchReadyMap( m )
+				|| string.Equals( m.GetMetadata( "ZombiesOnly", "" ), "True", StringComparison.OrdinalIgnoreCase ) )
 			.Where( m => GameMode.GetAll( m ).Any( x => x.Ident == mode.Ident ) )
 			.OrderByDescending( m => m.ResourcePath?.Contains( "flatgrass", StringComparison.OrdinalIgnoreCase ) ?? false )
 			.ToList();

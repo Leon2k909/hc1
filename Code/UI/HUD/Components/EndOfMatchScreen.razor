@@ -1,5 +1,6 @@
 @namespace Facepunch.UI
 @inherits Panel
+@implements IPadScope
 @attribute [StyleSheet]
 
 @if ( !IsVisible ) return;
@@ -110,13 +111,13 @@
             <div class="eom-leave-btn @(_starting ? "disabled" : "")" @onclick=@LeaveGame>
                 <label>@Tr( "LEAVE GAME" )</label>
             </div>
-            <div class="eom-continue-btn @(_starting ? "disabled" : "")" @onclick=@PlayAgain>
+            <div class="eom-continue-btn pad-first @(_starting ? "disabled" : "")" @onclick=@PlayAgain>
                 <label>@(_starting ? Tr( "STARTING…" ) : Tr( "PLAY AGAIN" ))</label>
             </div>
         }
         else
         {
-            <div class="eom-continue-btn" @onclick=@Dismiss>
+            <div class="eom-continue-btn pad-first" @onclick=@Dismiss>
                 <label>@Tr( "CONTINUE" )</label>
             </div>
         }
@@ -344,9 +345,25 @@
         GameUtils.ReturnToMainMenu();
     }
 
+    // ── Pad (PadNavigation) ──────────────────────────────────────
+    // The pad starts on CONTINUE or PLAY AGAIN; B continues, where there's nothing to start.
+    public Panel PadFirstFocus => null;
+
+    public bool PadBack()
+    {
+        if ( CanPlayAgain ) return false;
+
+        Sound.Play( "ui_button_press" );
+        Dismiss();
+        return true;
+    }
+
+    public bool PadTab( int direction ) => false;
+
     public override void Tick()
     {
         if ( !IsVisible ) return;
+        PadNavigation.Offer( this, this );
 
         // The map vote runs for the same 15s this screen does, so without this the two sit on top of
         // each other for the whole window and the vote can be neither read nor clicked.

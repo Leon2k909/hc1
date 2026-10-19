@@ -23,10 +23,12 @@ public sealed class GunsmithBoneAttachment : GunsmithAttachment, ICameraSetup
 	private ulong hiddenMask;
 	private ulong originalChoice;
 	private Transform? originalHiddenBoneTransform;
+	private bool? remountAfterCamera;
 
 	protected override void OnInitialize()
 	{
 		weaponRenderer = AttachmentPoint?.GetComponentInParent<SkinnedModelRenderer>( true );
+		remountAfterCamera = null;
 		if ( !weaponRenderer.IsValid() || weaponRenderer.Model is null ) return;
 		var model = weaponRenderer.Model;
 		if ( FitMp5MuzzleToBarrel )
@@ -58,6 +60,11 @@ public sealed class GunsmithBoneAttachment : GunsmithAttachment, ICameraSetup
 	// Viewmodels are repositioned by camera setup after the regular update.
 	void ICameraSetup.PostSetup( CameraComponent cc )
 	{
+		// A world model doesn't move in camera setup, and the part moves with it (GunsmithMw22Attachment.OnViewModel),
+		// unless it follows one of the model's own bones, read fresh here, or hides one.
+		remountAfterCamera ??= GunsmithMw22Attachment.OnViewModel( weaponRenderer )
+			|| (hasBone && !UseWeaponOrigin) || !string.IsNullOrEmpty( HiddenBone );
+		if ( remountAfterCamera == false ) return;
 		GunsmithMw22Attachment.FollowingCamera = true;
 		try { RefreshMount(); }
 		finally { GunsmithMw22Attachment.FollowingCamera = false; }

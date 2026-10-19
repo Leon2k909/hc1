@@ -5,6 +5,7 @@
 
 @inherits Panel
 @implements INavigatorPage
+@implements IPadScope
 @attribute [StyleSheet]
 @namespace Facepunch.UI
 
@@ -35,7 +36,7 @@
                         <label class="feature-sub">@Tr( "DROP IN. OUTRUN THE ZONE. BE THE LAST ONE STANDING." )</label>
 
                         <div class="feature-actions">
-                            <div class="feature-deploy" onclick=@PlayBattleRoyale onmouseover=@PlayHoverSound>
+                            <div class="feature-deploy pad-first" onclick=@PlayBattleRoyale onmouseover=@PlayHoverSound>
                                 <label>@Tr( "PLAY" )</label>
                                 <i>arrow_forward</i>
                             </div>
@@ -114,7 +115,7 @@
                         <label class="feature-sub">@Tr( "FIGHT TOGETHER. STAY HUMAN." )</label>
 
                         <div class="feature-actions">
-                            <div class="feature-deploy" onclick=@PlayZombies onmouseover=@PlayHoverSound>
+                            <div class="feature-deploy pad-first" onclick=@PlayZombies onmouseover=@PlayHoverSound>
                                 <label>@Tr( "PLAY" )</label>
                                 <i>arrow_forward</i>
                             </div>
@@ -214,7 +215,7 @@
                             </div>
 
                             <div class="feature-actions">
-                                <div class="feature-deploy" onclick=@StartQuickPlay onmouseover=@PlayHoverSound>
+                                <div class="feature-deploy pad-first" onclick=@StartQuickPlay onmouseover=@PlayHoverSound>
                                     <label>@Tr( "PLAY NOW" )</label>
                                     <i>arrow_forward</i>
                                 </div>
@@ -274,7 +275,7 @@
         </div>
 
         @* Power: asks whether to quit to s&box (QuitPrompt), like Escape does *@
-        <div class="gnav-round-btn hub-power" onclick=@(() => MainMenuRoot.Instance?.OpenQuitPrompt())>
+        <div class="gnav-round-btn hub-power pad-target" onclick=@(() => MainMenuRoot.Instance?.OpenQuitPrompt())>
             <i>power_settings_new</i>
             <label class="gnav-tip">@Tr( "QUIT GAME" )</label>
         </div>
@@ -284,8 +285,8 @@
     @if ( _showingAllPlaylists )
     {
         <div class="map-picker all-playlists">
-            <div class="map-picker-backdrop" onclick=@CloseAllPlaylists />
-            <div class="map-picker-panel">
+            <div class="map-picker-backdrop pad-skip" onclick=@CloseAllPlaylists />
+            <div class="map-picker-panel" @ref="OverlayPanel">
                 <div class="map-picker-header">
                     <div class="map-picker-heading">
                         <label class="kicker">@Tr( "MULTIPLAYER" )</label>
@@ -317,8 +318,8 @@
     @if ( _pickingZombiesMap )
     {
         <div class="map-picker">
-            <div class="map-picker-backdrop" onclick=@CloseMapPicker />
-            <div class="map-picker-panel">
+            <div class="map-picker-backdrop pad-skip" onclick=@CloseMapPicker />
+            <div class="map-picker-panel" @ref="OverlayPanel">
                 <div class="map-picker-header">
                     <div class="map-picker-heading">
                         <label class="kicker">@Tr( "CO-OP · ZOMBIES" )</label>
@@ -366,6 +367,34 @@
     public void OnNavigationClose() { }
 
     void PlayHoverSound() => Sound.Play( "ui_button_hover" );
+
+    // ── Pad (PadNavigation) ──────────────────────────────────────
+    // The hub is a page inside the menu's scope: the D-pad starts on the screen's PLAY button (pad-first), LT and RT step
+    // through the rail's tabs, and the playlists and the zombies map picker are popups over it that B closes.
+    private Panel OverlayPanel { get; set; }
+    private PadScope _overlayScope;
+
+    static readonly Operation[] RailOrder = { Operation.Multiplayer, Operation.BattleRoyale, Operation.Zombies };
+
+    public override void Tick()
+    {
+        base.Tick();
+        PadNavigation.Offer( this, this );
+        if ( (_showingAllPlaylists || _pickingZombiesMap) && OverlayPanel.IsValid() )
+            PadNavigation.Offer( OverlayPanel, _overlayScope ??= new PadScope { Back = CloseOverlay }, 40 );
+    }
+
+    public Panel PadFirstFocus => this;
+
+    public bool PadBack() => false;
+
+    public bool PadTab( int direction )
+    {
+        var index = Array.IndexOf( RailOrder, _operation );
+        Sound.Play( "ui_nav_tab" );
+        Select( RailOrder[(index + direction + RailOrder.Length) % RailOrder.Length] );
+        return true;
+    }
 
     void Select( Operation operation )
     {

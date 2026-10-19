@@ -21,19 +21,31 @@
             <label class="gnav-game-name">RAZED</label>
         </div>
 
-        <div class="gnav-items">
+        <div class="gnav-tabs-group">
             @* Over a match the tabs would leave it, so only the menu's gunsmith has them. *@
-            @if ( !inMatch )
+            @if ( !inMatch && Input.UsingController )
             {
-                @foreach ( var tab in NavTabs )
+                <div class="gnav-ctrl-btn" @onclick=@(() => NavStep( -1 ))>LB</div>
+            }
+
+            <div class="gnav-items">
+                @if ( !inMatch )
                 {
-                    var route = tab.Route;
-                    <div class="gnav-item @(route is null ? "active" : "")" @onclick=@(() => GoToMenu( route ))>
-                        <i>@tab.Icon</i>
-                        <label>@Tr( tab.Label )</label>
-                        <div class="gnav-item-bar" />
-                    </div>
+                    @foreach ( var tab in NavTabs )
+                    {
+                        var route = tab.Route;
+                        <div class="gnav-item @(route is null ? "active" : "")" @onclick=@(() => GoToMenu( route ))>
+                            <i>@tab.Icon</i>
+                            <label>@Tr( tab.Label )</label>
+                            <div class="gnav-item-bar" />
+                        </div>
+                    }
                 }
+            </div>
+
+            @if ( !inMatch && Input.UsingController )
+            {
+                <div class="gnav-ctrl-btn" @onclick=@(() => NavStep( 1 ))>RB</div>
             }
         </div>
 
@@ -160,7 +172,7 @@
                             var p = perk;
                             var perkEquipped = GunsmithLoadoutManager.GetPerk( SelectedPerkCategory ) is { } perkId
                                 && (perkId == p.ResourceName || perkId == p.ResourcePath);
-                            <div class="gs-choice perk @(perkEquipped ? "equipped" : "")" @onclick=@(() => SelectPerk( p ))>
+                            <div class="gs-choice perk @(perkEquipped ? "equipped pad-first" : "")" @onclick=@(() => SelectPerk( p ))>
                                 <div class="gs-choice-glyph"><i>@PerkGlyph( p )</i></div>
                                 <div class="gs-choice-copy">
                                     <label class="gs-choice-name">@Tr( p.Name.ToUpper() )</label>
@@ -178,7 +190,7 @@
                             var shown = equip == w;
                             var inClass = IsLoadoutSet( w );
                             var favourite = GunsmithLoadoutManager.IsFavorite( w.ResourcePath );
-                            <div class="gs-choice weapon @(shown ? "shown" : "") @(inClass ? "equipped" : "")" @onclick=@(() => SelectWeapon( w ))>
+                            <div class="gs-choice weapon @(shown ? "shown pad-first" : "") @(inClass ? "equipped" : "")" @onclick=@(() => SelectWeapon( w ))>
                                 <div class="gs-choice-img">
                                     @if ( !string.IsNullOrEmpty( w.Icon ) )
                                     {
@@ -196,7 +208,7 @@
                                         @if ( inClass ) { <label class="gs-choice-state">@Tr( "EQUIPPED" )</label> }
                                     </div>
                                 </div>
-                                <i class="gs-fav @(favourite ? "on" : "")" @onclick=@(( PanelEvent e ) => ClickInside( e, () => ToggleFavourite( w.ResourcePath ) ))>@(favourite ? "star" : "star_border")</i>
+                                <i class="gs-fav pad-target @(favourite ? "on" : "")" @onclick=@(( PanelEvent e ) => ClickInside( e, () => ToggleFavourite( w.ResourcePath ) ))>@(favourite ? "star" : "star_border")</i>
                             </div>
                             @foreach ( var build in BuildsOf( w ) )
                             {
@@ -218,7 +230,7 @@
                         {
                             var g = item;
                             var inClass = IsLoadoutSet( g );
-                            <div class="gs-choice gear @(inClass ? "equipped" : "")" @onclick=@(() => SelectGear( g ))>
+                            <div class="gs-choice gear @(inClass ? "equipped pad-first" : "")" @onclick=@(() => SelectGear( g ))>
                                 <div class="gs-choice-img gear">
                                     @if ( !string.IsNullOrEmpty( g.Icon ) )
                                     {
@@ -258,7 +270,7 @@
                         var idx = activeClassIndices[i];
                         var number = i + 1;
                         var isActive = activeClass == idx;
-                        <div class="gs-choice class @(isActive ? "equipped" : "")" @onclick=@(() => PickClass( idx ))>
+                        <div class="gs-choice class @(isActive ? "equipped pad-first" : "")" @onclick=@(() => PickClass( idx ))>
                             <label class="gs-choice-num">@number</label>
                             <div class="gs-choice-copy">
                                 <label class="gs-choice-name">@GunsmithLoadoutManager.GetClassName( idx )</label>
@@ -295,7 +307,8 @@
                 </div>
 
                 <div class="gs-loadout">
-                    <div class="gs-class-card" @onclick=@OpenClassList>
+                    @* PadReturn: the pad starts on the primary weapon, and comes back to whichever of these was opened. *@
+                    <div class="gs-class-card @(PadReturn( "class" ))" @onclick=@OpenClassList>
                         <div class="gs-class-icon"><i>gps_fixed</i></div>
                         <div class="gs-class-copy">
                             <label class="gs-class-name">@GunsmithLoadoutManager.GetClassName( activeClass )</label>
@@ -306,7 +319,7 @@
 
                     <label class="gs-section-label">@Tr( "PRIMARY WEAPON" )</label>
                     @{ var primary = GetDisplayedSlotResource( EquipmentSlot.Primary ); }
-                    <div class="gs-weapon-card big @(primary is not null && primary == equip ? "active" : "") @(primary is null ? "empty" : "")" @onclick=@(() => ClickWeaponCard( EquipmentSlot.Primary ))>
+                    <div class="gs-weapon-card big @(PadReturn( "Primary" )) @(primary is not null && primary == equip ? "active" : "") @(primary is null ? "empty" : "")" @onclick=@(() => ClickWeaponCard( EquipmentSlot.Primary ))>
                         <div class="gs-card-main">
                             @if ( !string.IsNullOrEmpty( primary?.Icon ) )
                             {
@@ -326,12 +339,12 @@
                                 </div>
                             }
                         </div>
-                        <div class="gs-card-chevron" @onclick=@(( PanelEvent e ) => ClickInside( e, () => SelectSlot( EquipmentSlot.Primary ) ))><i>chevron_right</i></div>
+                        <div class="gs-card-chevron pad-target" @onclick=@(( PanelEvent e ) => ClickInside( e, () => SelectSlot( EquipmentSlot.Primary ) ))><i>chevron_right</i></div>
                     </div>
 
                     <label class="gs-section-label">@Tr( "SECONDARY WEAPON" )</label>
                     @{ var secondary = GetDisplayedSlotResource( EquipmentSlot.Secondary ); }
-                    <div class="gs-weapon-card @(secondary is not null && secondary == equip ? "active" : "") @(secondary is null ? "empty" : "")" @onclick=@(() => ClickWeaponCard( EquipmentSlot.Secondary ))>
+                    <div class="gs-weapon-card @(PadReturn( "Secondary" )) @(secondary is not null && secondary == equip ? "active" : "") @(secondary is null ? "empty" : "")" @onclick=@(() => ClickWeaponCard( EquipmentSlot.Secondary ))>
                         <div class="gs-card-img side">
                             @if ( !string.IsNullOrEmpty( secondary?.Icon ) )
                             {
@@ -356,7 +369,7 @@
                                 </div>
                             }
                         </div>
-                        <div class="gs-card-chevron" @onclick=@(( PanelEvent e ) => ClickInside( e, () => SelectSlot( EquipmentSlot.Secondary ) ))><i>chevron_right</i></div>
+                        <div class="gs-card-chevron pad-target" @onclick=@(( PanelEvent e ) => ClickInside( e, () => SelectSlot( EquipmentSlot.Secondary ) ))><i>chevron_right</i></div>
                     </div>
 
                     @foreach ( var gearSlot in GearSlots )
@@ -364,7 +377,7 @@
                         var gs = gearSlot;
                         var gear = GetEquippedResource( gs );
                         <label class="gs-section-label">@Tr( SlotTitle( gs ) )</label>
-                        <div class="gs-gear-row @(gear is null ? "empty" : "")" @onclick=@(() => SelectSlot( gs ))>
+                        <div class="gs-gear-row @(PadReturn( gs.ToString() )) @(gear is null ? "empty" : "")" @onclick=@(() => SelectSlot( gs ))>
                             <div class="gs-gear-img">
                                 @if ( !string.IsNullOrEmpty( gear?.Icon ) )
                                 {
@@ -386,7 +399,7 @@
                         {
                             var pc = i;
                             var perk = GunsmithLoadoutManager.GetPerkResource( activeClass, pc );
-                            <div class="gs-perk @(perk is null ? "empty" : "")" @onclick=@(() => SelectPerkCategory( pc ))>
+                            <div class="gs-perk @(PadReturn( "perk" + pc )) @(perk is null ? "empty" : "")" @onclick=@(() => SelectPerkCategory( pc ))>
                                 <i class="gs-perk-glyph">@PerkGlyph( perk )</i>
                                 <label class="gs-perk-num">@Tr( "PERK {0}", pc )</label>
                                 <label class="gs-perk-name">@(perk is null ? Tr( "EMPTY" ) : Tr( perk.Name.ToUpper() ))</label>
@@ -601,7 +614,7 @@
                                                 <label>@Tr( "LV {0}", part.RequiredLevel )</label>
                                             </div>
                                         }
-                                        <i class="cust-fav @(favourite ? "on" : "")" @onclick=@(( PanelEvent e ) => ClickInside( e, () => ToggleFavourite( part.ResourcePath ) ))>@(favourite ? "star" : "star_border")</i>
+                                        <i class="cust-fav pad-target @(favourite ? "on" : "")" @onclick=@(( PanelEvent e ) => ClickInside( e, () => ToggleFavourite( part.ResourcePath ) ))>@(favourite ? "star" : "star_border")</i>
                                     </div>
                                 }
                                 @if ( !tabParts.Any() )
@@ -811,7 +824,7 @@
     @if ( IsShareBuildOpen )
     {
         <div class="gs-modal-backdrop" @onclick=@(( PanelEvent e ) => ClickBackdrop( e, CloseShareBuild ))>
-            <div class="gs-modal">
+            <div class="gs-modal" @ref="ModalPanel">
                 <div class="gs-modal-head">
                     <div class="gs-modal-title">
                         <label class="gs-modal-caption">@Tr( "SHARE BUILD" )</label>
@@ -844,7 +857,7 @@
         var presets = GunsmithPresets.Get( equip );
         var (currentBuild, currentModified) = GunsmithPresets.GetCurrent( equip, presets );
         <div class="gs-modal-backdrop" @onclick=@(( PanelEvent e ) => ClickBackdrop( e, ClosePresets ))>
-            <div class="gs-modal">
+            <div class="gs-modal" @ref="ModalPanel">
                 <div class="gs-modal-head">
                     <div class="gs-modal-title">
                         <label class="gs-modal-caption">@Tr( "BUILDS" )</label>
@@ -879,7 +892,7 @@
                             }
                             else
                             {
-                                <label class="gs-preset-name" @onclick=@(() => StartRename( entry ))>@entry.Name</label>
+                                <label class="gs-preset-name pad-target" @onclick=@(() => StartRename( entry ))>@entry.Name</label>
                                 @if ( current && currentModified )
                                 {
                                     <label class="gs-preset-state modified">@Tr( "MODIFIED" )</label>
@@ -914,7 +927,7 @@
     @if ( ShowTuning )
     {
         <div class="gs-modal-backdrop" @onclick=@(( PanelEvent e ) => ClickBackdrop( e, CloseTuning ))>
-            <div class="gs-modal tuning">
+            <div class="gs-modal tuning" @ref="ModalPanel">
                 <div class="gs-modal-head">
                     <div class="gs-modal-title">
                         <label class="gs-modal-caption">@Tr( "WEAPON TUNING" )</label>
@@ -932,7 +945,7 @@
     @if ( ShowCompare )
     {
         <div class="gs-modal-backdrop" @onclick=@(( PanelEvent e ) => ClickBackdrop( e, CloseCompare ))>
-            <div class="gs-modal compare">
+            <div class="gs-modal compare" @ref="ModalPanel">
                 <div class="gs-modal-head">
                     <div class="gs-modal-title">
                         <label class="gs-modal-caption">@Tr( "WEAPON STATS" )</label>
@@ -949,7 +962,44 @@
 @code
 {
     internal static GunsmithPanel Instance { get; set; }
-    public static bool IsAnyOpen => Game.ActiveScene.IsValid() && Game.ActiveScene.GetAllComponents<GunsmithPanel>().Any( x => x.IsValid() && x.Enabled );
+
+    public static bool IsAnyOpen
+    {
+        get
+        {
+            foreach ( var panel in ActivePanels )
+            {
+                if ( panel.IsValid() && panel.Active && panel.Scene == Game.ActiveScene )
+                    return true;
+            }
+
+            return false;
+        }
+    }
+
+    private static HashSet<GunsmithPanel> _activePanels;
+
+    /// <summary>
+    /// The gunsmiths up, kept as they're enabled and disabled rather than looked for through the scene: the cursor code
+    /// asks several times a frame. A hotload that adds this leaves it null, so it starts from the scene's.
+    /// </summary>
+    private static HashSet<GunsmithPanel> ActivePanels
+    {
+        get
+        {
+            if ( _activePanels is null )
+            {
+                _activePanels = new();
+                if ( Game.ActiveScene.IsValid() )
+                {
+                    foreach ( var panel in Game.ActiveScene.GetAllComponents<GunsmithPanel>() )
+                        _activePanels.Add( panel );
+                }
+            }
+
+            return _activePanels;
+        }
+    }
 
     public enum GunsmithViewMode
     {
@@ -1038,9 +1088,12 @@
             GoBackStep();
         }
 
+        UpdateBumpers();
+
         if ( Panel is null )
             return;
 
+        OfferToPad();
         FocusRenameEntry();
         ResponsiveLayout.Update( Panel );
         // The header's full-size tabs need about 1900 units, as in the main menu (MainMenuRoot).
@@ -1060,11 +1113,19 @@
     {
         base.OnEnabled();
         Instance = this;
+        ActivePanels.Add( this );
+    }
+
+    protected override void OnDisabled()
+    {
+        base.OnDisabled();
+        ActivePanels.Remove( this );
     }
 
     protected override void OnDestroy()
     {
         base.OnDestroy();
+        ActivePanels.Remove( this );
         if ( Instance == this )
         {
             Instance = null;
@@ -1112,6 +1173,31 @@
         Sound.Play( NavSound );
         MarkClosed();
         GameUtils.ReturnToMainMenu( route );
+    }
+
+    /// <summary> LB / RB: the tab before or after WEAPONS, as the main menu's bumpers step (MainMenuRoot.ControllerNavRoutes). </summary>
+    private void NavStep( int direction )
+    {
+        var here = Array.FindIndex( NavTabs, x => x.Route is null );
+        GoToMenu( NavTabs[(here + direction + NavTabs.Length) % NavTabs.Length].Route );
+    }
+
+    // Down at the start, so the RB that opened the gunsmith doesn't step straight back out if it's still held.
+    private bool _lbWasDown = true, _rbWasDown = true;
+
+    private void UpdateBumpers()
+    {
+        var lbDown = Input.Down( "PrevSlot" );
+        var rbDown = Input.Down( "NextSlot" );
+
+        if ( !InMatch && Input.UsingController )
+        {
+            if ( lbDown && !_lbWasDown ) NavStep( -1 );
+            else if ( rbDown && !_rbWasDown ) NavStep( 1 );
+        }
+
+        _lbWasDown = lbDown;
+        _rbWasDown = rbDown;
     }
 
     /// <summary> Leaves the gunsmith: back to the match it was opened over, or to the main menu. </summary>
@@ -1168,6 +1254,35 @@
         }
 
         StateHasChanged();
+    }
+
+    // ── Pad (PadNavigation) ──────────────────────────────────────
+    // The gunsmith is a page: the D-pad starts on the primary weapon, B steps back as Escape does, and LT and RT switch
+    // BUILD and CUSTOMIZE. An open modal (builds, share, compare) is a popup over it, which B closes.
+    private Panel ModalPanel { get; set; }
+    private PadScope _padScope, _modalScope;
+
+    private void OfferToPad()
+    {
+        _padScope ??= new PadScope { Back = PadBackStep, Tab = PadSwitchMode };
+        PadNavigation.Offer( Panel, _padScope );
+
+        if ( (ShowTuning || ShowCompare || IsPresetsOpen || IsShareBuildOpen) && ModalPanel.IsValid() )
+            PadNavigation.Offer( ModalPanel, _modalScope ??= new PadScope { Back = PadBackStep }, 50 );
+    }
+
+    private bool PadBackStep()
+    {
+        Sound.Play( "ui_button_press" );
+        GoBackStep();
+        return true;
+    }
+
+    private bool PadSwitchMode( int direction )
+    {
+        Sound.Play( NavSound );
+        SetMode( IsCustomizing ? GunsmithViewMode.Build : GunsmithViewMode.Customize );
+        return true;
     }
 
     /// <summary> Escape over a match: the gunsmith, when it's open, steps back before MainHUD or the pause menu take it. </summary>
@@ -1784,12 +1899,21 @@
         StateHasChanged();
     }
 
+    /// <summary>
+    /// The loadout row a picker or the class list was opened from ("Primary", "Lethal", "perk2", "class"), which the pad
+    /// goes back to when it closes (PadNavigation's pad-first). Before any, the primary weapon.
+    /// </summary>
+    private string _padReturn = "Primary";
+
+    private string PadReturn( string key ) => _padReturn == key ? "pad-first" : "";
+
     private void SelectSlot( EquipmentSlot slot )
     {
         IsPickerOpen = true;
         IsClassListOpen = false;
         SelectedSlot = slot;
         SelectedPerkCategory = 0;
+        _padReturn = slot.ToString();
 
         if ( slot is EquipmentSlot.Primary or EquipmentSlot.Secondary )
         {
@@ -1855,11 +1979,15 @@
         IsPickerOpen = true;
         IsClassListOpen = false;
         SelectedPerkCategory = pc;
+        _padReturn = $"perk{pc}";
         StateHasChanged();
     }
 
-    /// <summary> The perks all share one placeholder image (ui/icons/perk.png), so each gets its own icon here. </summary>
-    private static string PerkGlyph( PerkResource perk ) => perk?.ResourceName?.ToLowerInvariant() switch
+    /// <summary>
+    /// The perks all name one placeholder image (ui/icons/perk.png) that doesn't exist, so each gets its own icon here.
+    /// The class menu (<see cref="Facepunch.UI.ClassSelect"/>) uses it too.
+    /// </summary>
+    public static string PerkGlyph( PerkResource perk ) => perk?.ResourceName?.ToLowerInvariant() switch
     {
         null => "add",
         "flakjacket" => "shield",
@@ -1890,6 +2018,7 @@
     {
         IsPickerOpen = false;
         IsClassListOpen = true;
+        _padReturn = "class";
         StateHasChanged();
     }
 
@@ -2555,6 +2684,8 @@
         hash.Add( Progression.GetLevel() );
         hash.Add( Progression.GetPrestigeEmblem() );
         hash.Add( LocalName );
+        hash.Add( Input.UsingController );
+        hash.Add( _padReturn );
         return hash.ToHashCode();
     }
 }

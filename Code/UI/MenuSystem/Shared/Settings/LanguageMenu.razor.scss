@@ -101,3 +101,6 @@
 
     .lm-empty { padding: 12px; font-size: 15px; font-weight: 500; color: $menu-muted; }
 }
+
+// The D-pad's focus (PadNavigation): the pointer's row is highlighted already, and this rings it.
+LanguageMenu .pad-focus { outline-width: 2px; outline-color: $menu-accent; outline-offset: -2px; }

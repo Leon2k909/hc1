@@ -42,7 +42,13 @@ public static class OperatorOutfits
 			MilitaryUniform.HumanModelPath, MilitaryUniformStyle.Desert ),
 		new( "militia", "Militia Fighter", Team.Terrorist,
 			"Flannel shirt, black chest rig, cargo trousers, beanie, bandana mask, gloves and boots.",
-			MilitaryUniform.HumanModelPath, MilitaryUniformStyle.Militia )
+			MilitaryUniform.HumanModelPath, MilitaryUniformStyle.Militia ),
+		new( "military_female", "Female Military Operator", Team.CounterTerrorist,
+			"Female operator in camouflage fatigues, a tactical vest, combat helmet and boots.",
+			MilitaryUniform.FemaleHumanModelPath ),
+		new( "field_female", "Female Field Operator", Team.Terrorist,
+			"Female operator in camouflage fatigues, an olive tactical vest, combat helmet, gloves and boots.",
+			MilitaryUniform.FemaleHumanModelPath, MilitaryUniformStyle.Field )
 	};
 
 	private const string EquippedCookie = "hc1.operator.";

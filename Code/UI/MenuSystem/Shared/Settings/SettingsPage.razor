@@ -4,6 +4,7 @@
 
 @inherits Panel
 @implements INavigatorPage
+@implements IPadScope
 @namespace Facepunch.UI
 @attribute [StyleSheet]
 
@@ -17,9 +18,18 @@
                 <label class="set-title">@Tr( "CATEGORIES" )</label>
             </div>
 
+            <div class="set-search">
+                <i class="set-search-icon">search</i>
+                <TextEntry @ref="SearchEntry" class="set-search-entry" Placeholder=@(Tr( "Search settings" )) OnTextEdited=@SetQuery />
+                @if ( IsSearching )
+                {
+                    <i class="set-search-clear" onclick=@ClearSearch>close</i>
+                }
+            </div>
+
             @foreach ( var grouping in TypeLibrary.GetPropertyDescriptions( GameSettingsSystem.Current ).GroupBy( x => x.Group ) )
             {
-                <div class="set-cat @(SelectedGroup == grouping.Key ? "active" : "")" onclick=@(() => SetGroup( grouping.Key ) )>
+                <div class="set-cat pad-target @(!IsSearching && SelectedGroup == grouping.Key ? "active" : "")" onclick=@(() => SetGroup( grouping.Key ) )>
                     <label>@Tr( grouping.Key )</label>
                     <i>chevron_right</i>
                 </div>
@@ -27,10 +37,34 @@
         </div>
 
         <div class="set-content">
-            <label class="set-group-title">@Tr( SelectedGroup )</label>
+            <label class="set-group-title">@(IsSearching ? Tr( "Search results" ) : Tr( SelectedGroup ))</label>
 
-            <div class="set-list">
-                @if ( !string.IsNullOrEmpty( SelectedGroup ) )
+            <div class="set-list" @ref="ListPanel">
+                @if ( IsSearching )
+                {
+                    var results = SearchResults();
+                    var keybinds = InputSettings.Groups( Query ).Any();
+
+                    @if ( results.Count == 0 && !keybinds )
+                    {
+                        <label class="set-empty">@Tr( "No settings match your search." )</label>
+                    }
+
+                    @foreach ( var group in results )
+                    {
+                        <label class="set-result-group">@Tr( group.Key )</label>
+                        @foreach ( var property in group )
+                        {
+                            <SettingEntry Target=@GameSettingsSystem.Current Description=@property />
+                        }
+                    }
+
+                    @if ( keybinds )
+                    {
+                        <InputSettings Query=@Query />
+                    }
+                }
+                else if ( !string.IsNullOrEmpty( SelectedGroup ) )
                 {
                     @if ( SelectedGroup == "Crosshair" )
                     {
@@ -58,8 +92,9 @@
     </div>
 
     <div class="set-footer">
-        <div class="set-btn" onclick=@(() => ReportBug())><i>bug_report</i><label>@Tr( "Report a Bug" )</label></div>
-        <div class="set-btn primary" onclick=@(() => Save())><i>save</i><label>@Tr( "Save" )</label></div>
+        <PadHints class="set-hints" TabsLabel="CATEGORY" />
+        <div class="set-btn pad-target" onclick=@(() => ReportBug())><i>bug_report</i><label>@Tr( "Report a Bug" )</label></div>
+        <div class="set-btn pad-target primary" onclick=@(() => Save())><i>save</i><label>@Tr( "Save" )</label></div>
     </div>
 </root>
 
@@ -69,6 +104,43 @@
     {
         base.Tick();
         ResponsiveLayout.Update( this );
+        PadNavigation.Offer( this, this );
+    }
+
+    // ── Pad (PadNavigation) ──────────────────────────────────────────────────────
+    // The D-pad moves between the categories, the rows and the buttons; left and right change a row; LT and RT step
+    // through the categories; B leaves, saving.
+
+    private Panel ListPanel { get; set; }
+
+    /// <summary> The first row of the category (or of the search's results). </summary>
+    public Panel PadFirstFocus => ListPanel;
+
+    public bool PadBack()
+    {
+        // A search goes first, so B shows the category again.
+        if ( IsSearching )
+        {
+            ClearSearch();
+            return true;
+        }
+
+        Sound.Play( "ui_button_press" );
+        Save();
+        this.Navigate( "/" );
+        return true;
+    }
+
+    public bool PadTab( int direction )
+    {
+        var groups = TypeLibrary.GetPropertyDescriptions( GameSettingsSystem.Current ).Select( x => x.Group ).Distinct().ToList();
+        if ( groups.Count == 0 ) return false;
+
+        var index = IsSearching ? -1 : groups.IndexOf( SelectedGroup );
+        var next = index < 0 ? (direction > 0 ? 0 : groups.Count - 1) : (index + direction + groups.Count) % groups.Count;
+        Sound.Play( "ui_nav_tab" );
+        SetGroup( groups[next] );
+        return true;
     }
 
     private string SelectedGroup { get; set; } = null;
@@ -86,7 +158,45 @@
     private void SetGroup( string group )
     {
         SelectedGroup = group;
+        ClearSearch();
+    }
+
+    // ── Search ───────────────────────────────────────────────────────────────────
+
+    public TextEntry SearchEntry { get; set; }
+
+    private string Query { get; set; }
+
+    private bool IsSearching => !string.IsNullOrWhiteSpace( Query );
+
+    private void SetQuery( string text )
+    {
+        Query = text;
         StateHasChanged();
+    }
+
+    private void ClearSearch()
+    {
+        Query = null;
+        if ( SearchEntry.IsValid() ) SearchEntry.Text = "";
+        StateHasChanged();
+    }
+
+    // The kinds of setting SettingEntry can draw (the clan tag, a string, has its own place).
+    private static readonly HashSet<Type> Searchable = new()
+    {
+        typeof( bool ), typeof( float ), typeof( int ), typeof( Color ),
+        typeof( GameLanguage ), typeof( VoiceChatMode ), typeof( LobbyInput ),
+    };
+
+    /// <summary>Every setting the search matches, by category in the categories' order.</summary>
+    private List<IGrouping<string, PropertyDescription>> SearchResults()
+    {
+        var words = SettingsSearch.Words( Query );
+        return TypeLibrary.GetPropertyDescriptions( GameSettingsSystem.Current )
+            .Where( x => Searchable.Contains( x.PropertyType ) && SettingsSearch.Matches( words, x ) )
+            .GroupBy( x => x.Group )
+            .ToList();
     }
 
     void Save()

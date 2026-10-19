@@ -90,7 +90,16 @@ public sealed class RainView : Component
 		_splashController = null;
 		_rippleController = null;
 		_splashCarry = _rippleCarry = 0f;
+		_dropCover = 0f;
 	}
+
+	/// <summary>
+	/// How long the rain has been off (seconds). Between showers, and while a front comes in or clears, the sky stays
+	/// overcast with nothing falling: the drops, splashes and rings go once it's been dry for <see cref="DryRelease"/>,
+	/// and only the look, lightning, puddles and sound run.
+	/// </summary>
+	private float _dryFor;
+	private const float DryRelease = 2f;
 
 	protected override void OnDisabled()
 	{
@@ -137,7 +146,6 @@ public sealed class RainView : Component
 
 		if ( !camera.IsValid() ) return;
 		WorldPosition = eye;
-		EnsureEffects();
 
 		_grid.Update( Scene, eye );
 		_puddles.Update( Scene, Weather, _grid, eye, look );
@@ -145,9 +153,20 @@ public sealed class RainView : Component
 		// The rain comes in with the cloud, over the first few seconds of the look.
 		var opacity = SmoothStep( 0f, 0.2f, rate ) * Math.Clamp( _k / 0.3f, 0f, 1f );
 
-		UpdateDrops( camera, eye, rate, opacity, darkening, flash );
-		UpdateSplashes( camera, eye, rate, opacity, darkening, flash );
-		UpdateRipples( camera, eye, rate, opacity, darkening, flash );
+		// With no rain the opacity is 0, so nothing of the effects shows by the time they go.
+		_dryFor = rate > 0f ? 0f : _dryFor + Time.Delta;
+		if ( _dryFor < DryRelease )
+		{
+			if ( rate > 0f ) EnsureEffects();
+			UpdateDrops( camera, eye, rate, opacity, darkening, flash );
+			UpdateSplashes( camera, eye, rate, opacity, darkening, flash );
+			UpdateRipples( camera, eye, rate, opacity, darkening, flash );
+		}
+		else
+		{
+			ReleaseEffects();
+		}
+
 		UpdateSound( eye, rate, opacity );
 	}
 
@@ -189,19 +208,21 @@ public sealed class RainView : Component
 	{
 		if ( !_drops.IsValid() || !_dropController.IsValid() ) return;
 
-		// Top the drops up; each keeps its layer and size for life, and wraps round the camera.
-		while ( !_drops.IsFull )
+		// A drop shows while its number (StartPosition.x) is under the active share, so only those that can show are
+		// made: numbers spread evenly up to a little past the share, and more above those when the rain gets heavier. As
+		// many show as when all MaxDrops were made, from a few hundred in drizzle rather than ten thousand.
+		var active = rate > 0f ? ActiveShare( rate ) : 0f;
+		if ( active > _dropCover )
 		{
-			var layer = PickLayer( Random.Shared.NextSingle() );
-			var radius = Layers[layer].Radius;
-			var position = eye + new Vector3( Random.Shared.Float( -radius, radius ), Random.Shared.Float( -radius, radius ),
-				Random.Shared.Float( -250f, 150f + 0.6f * radius ) );
-			var p = _drops.Emit( position, Random.Shared.NextSingle() );
-			p.StartPosition = new Vector3( Random.Shared.NextSingle(), Random.Shared.NextSingle(), radius );
-			p.StartAngles = new Angles( 0f, Layers[layer].Weight, 0f );
-			p.Alpha = 0f;
-			p.Size = new Vector3( 0.1f, 1f, 1f );
+			var from = _dropCover;
+			_dropCover = MathF.Min( 1f, active * 1.25f + 0.02f );
+			EmitDrops( eye, (int)MathF.Ceiling( (_dropCover - from) * MaxDrops ), from, _dropCover );
 		}
+
+		// They live for a day, so this only tops up any lost.
+		var target = Math.Min( MaxDrops, (int)MathF.Ceiling( _dropCover * MaxDrops ) );
+		if ( _drops.ParticleCount < target )
+			EmitDrops( eye, target - _drops.ParticleCount, 0f, _dropCover );
 
 		if ( !_wind.IsValid() ) _wind = Scene.GetAllComponents<WorldWind>().FirstOrDefault();
 		var lambda = MarshallPalmerLambda( rate );
@@ -218,6 +239,26 @@ public sealed class RainView : Component
 			Tint: tint,
 			Opacity: opacity,
 			Grid: _grid );
+	}
+
+	/// <summary> The drops' numbers made so far run from 0 to this: at least the active share, and 0 with no drops. </summary>
+	private float _dropCover;
+
+	/// <summary> Makes drops anywhere round the camera, numbered evenly from <paramref name="from"/> to <paramref name="to"/>. Each keeps its layer and size for life, and wraps round the camera. </summary>
+	private void EmitDrops( Vector3 eye, int count, float from, float to )
+	{
+		for ( var i = 0; i < count && !_drops.IsFull; i++ )
+		{
+			var layer = PickLayer( Random.Shared.NextSingle() );
+			var radius = Layers[layer].Radius;
+			var position = eye + new Vector3( Random.Shared.Float( -radius, radius ), Random.Shared.Float( -radius, radius ),
+				Random.Shared.Float( -250f, 150f + 0.6f * radius ) );
+			var p = _drops.Emit( position, Random.Shared.NextSingle() );
+			p.StartPosition = new Vector3( from + (to - from) * Random.Shared.NextSingle(), Random.Shared.NextSingle(), radius );
+			p.StartAngles = new Angles( 0f, Layers[layer].Weight, 0f );
+			p.Alpha = 0f;
+			p.Size = new Vector3( 0.1f, 1f, 1f );
+		}
 	}
 
 	private static int PickLayer( float u )
@@ -1073,18 +1114,25 @@ public sealed class RainView : Component
 
 			var dark = MathX.Lerp( 1f, 0.62f, SmoothStep( 1f, 30f, rate ) );
 
+			// This runs every frame, mostly with the same values (clear weather leaves them as the map had them), so each
+			// is only written when it's changed.
+			var density = MathX.Lerp( 0.6f, 1.35f, cloudCover );
+			var coastalChanged = density != _coastalDensity || k != _coastalOvercast;
+			_coastalDensity = density;
+			_coastalOvercast = k;
 			foreach ( var (sky, was) in _skies )
 			{
 				if ( !sky.IsValid() ) continue;
 				var material = was.Coastal ?? (k > 0.5f && Overcast is not null ? Overcast : was.Material);
-				if ( was.Coastal is not null )
+				if ( was.Coastal is not null && coastalChanged )
 				{
 					// Runtime copy: every match has its own weather uniforms; the saved sky asset stays intact.
-					was.Coastal.Set( "g_flCloudDensity", MathX.Lerp( 0.6f, 1.35f, cloudCover ) );
+					was.Coastal.Set( "g_flCloudDensity", density );
 					was.Coastal.Set( "g_flWeatherOvercast", k );
 				}
 				if ( sky.SkyMaterial != material ) sky.SkyMaterial = material;
-				sky.Tint = Lit( Lerp( was.Tint, new Color( dark, dark, dark, was.Tint.a ), k ), flash * 3f );
+				var skyTint = Lit( Lerp( was.Tint, new Color( dark, dark, dark, was.Tint.a ), k ), flash * 3f );
+				if ( sky.Tint != skyTint ) sky.Tint = skyTint;
 			}
 
 			// Under a deck of cloud the sun is a pale disc at a seventh to a third of its light, and the sky's light grey.
@@ -1095,9 +1143,11 @@ public sealed class RainView : Component
 				var lum = Luminance( was.Light ) * sunShare;
 				var fairShare = 1f - 0.15f * cloudCover;
 				var fairLight = new Color( was.Light.r * fairShare, was.Light.g * fairShare, was.Light.b * fairShare, was.Light.a );
-				sun.LightColor = Lit( Lerp( fairLight, new Color( 0.93f * lum, 0.96f * lum, lum, was.Light.a ), k ), flash * 0.8f );
+				var light = Lit( Lerp( fairLight, new Color( 0.93f * lum, 0.96f * lum, lum, was.Light.a ), k ), flash * 0.8f );
+				if ( sun.LightColor != light ) sun.LightColor = light;
 				var sky = Luminance( was.Sky ) * dark;
-				sun.SkyColor = Lit( Lerp( was.Sky, new Color( sky, sky, sky, was.Sky.a ), k ), flash * 4f );
+				var skyLight = Lit( Lerp( was.Sky, new Color( sky, sky, sky, was.Sky.a ), k ), flash * 4f );
+				if ( sun.SkyColor != skyLight ) sun.SkyColor = skyLight;
 			}
 
 			// Rain's visibility (km): 1/V = 0.125 + 0.25 R^0.63 / 3.912, the haze's 8 km dry.
@@ -1108,11 +1158,16 @@ public sealed class RainView : Component
 			foreach ( var (fog, was) in _fogs )
 			{
 				if ( !fog.IsValid() ) continue;
-				fog.Color = Lerp( was.Color, grey, k );
-				fog.StartDistance = MathX.Lerp( was.Start, 0f, k );
-				fog.EndDistance = MathX.Lerp( was.End, end, k );
-				fog.FalloffExponent = MathX.Lerp( was.Falloff, 0.5f, k );
-				fog.Height = MathX.Lerp( was.Height, MathF.Max( was.Height, 40000f ), k );
+				var color = Lerp( was.Color, grey, k );
+				if ( fog.Color != color ) fog.Color = color;
+				var start = MathX.Lerp( was.Start, 0f, k );
+				if ( fog.StartDistance != start ) fog.StartDistance = start;
+				var stop = MathX.Lerp( was.End, end, k );
+				if ( fog.EndDistance != stop ) fog.EndDistance = stop;
+				var falloff = MathX.Lerp( was.Falloff, 0.5f, k );
+				if ( fog.FalloffExponent != falloff ) fog.FalloffExponent = falloff;
+				var height = MathX.Lerp( was.Height, MathF.Max( was.Height, 40000f ), k );
+				if ( fog.Height != height ) fog.Height = height;
 			}
 
 			// With no fog component, the world's own fog.
@@ -1122,6 +1177,7 @@ public sealed class RainView : Component
 				{
 					_world = world;
 					_worldFog = world.GradientFog;
+					_appliedWorldFog = null;
 				}
 
 				var was = _worldFog ?? default;
@@ -1139,7 +1195,11 @@ public sealed class RainView : Component
 					f.EndHeight = 60000f;
 					f.VerticalFalloffExponent = 1f;
 				}
-				world.GradientFog = f;
+				if ( _appliedWorldFog is not { } applied || !SameFog( applied, f ) )
+				{
+					world.GradientFog = f;
+					_appliedWorldFog = f;
+				}
 			}
 
 			// The probes' reflections hold the clear sky's blue: grey it, and darken it.
@@ -1147,9 +1207,20 @@ public sealed class RainView : Component
 			foreach ( var (probe, was) in _probes )
 			{
 				if ( !probe.IsValid() ) continue;
-				probe.TintColor = Lerp( was, new Color( was.r * tint.r, was.g * tint.g, was.b * tint.b, was.a ), k );
+				var probeTint = Lerp( was, new Color( was.r * tint.r, was.g * tint.g, was.b * tint.b, was.a ), k );
+				if ( probe.TintColor != probeTint ) probe.TintColor = probeTint;
 			}
 		}
+
+		/// <summary> The coastal skies' weather values and the world's fog as last written, so unchanged ones aren't written again. </summary>
+		private float _coastalDensity = float.NaN, _coastalOvercast = float.NaN;
+		private Sandbox.Rendering.GradientFogSetup? _appliedWorldFog;
+
+		private static bool SameFog( in Sandbox.Rendering.GradientFogSetup a, in Sandbox.Rendering.GradientFogSetup b ) =>
+			a.Enabled == b.Enabled && a.Color == b.Color && a.MaximumOpacity == b.MaximumOpacity
+			&& a.StartDistance == b.StartDistance && a.EndDistance == b.EndDistance
+			&& a.DistanceFalloffExponent == b.DistanceFalloffExponent && a.StartHeight == b.StartHeight
+			&& a.EndHeight == b.EndHeight && a.VerticalFalloffExponent == b.VerticalFalloffExponent;
 
 		private void Scan( Scene scene )
 		{
@@ -1159,6 +1230,8 @@ public sealed class RainView : Component
 					var material = sky.SkyMaterial;
 					var coastal = material?.ShaderName == "shaders/hc1_coastal_sky.shader" ? material.CreateCopy( $"Coastal weather sky {sky.Id}" ) : null;
 					_skies[sky] = new SkyState( sky.Tint, material, coastal );
+					// A new copy needs its weather values.
+					_coastalDensity = float.NaN;
 				}
 			foreach ( var sun in scene.GetAllComponents<DirectionalLight>() )
 				if ( !_suns.ContainsKey( sun ) ) _suns[sun] = new SunState( sun.LightColor, sun.SkyColor );
@@ -1174,6 +1247,7 @@ public sealed class RainView : Component
 				if ( _world.IsValid() && _worldFog is { } fog ) _world.GradientFog = fog;
 				_world = null;
 				_worldFog = null;
+				_appliedWorldFog = null;
 			}
 		}
 
@@ -1211,6 +1285,8 @@ public sealed class RainView : Component
 			_probes.Clear();
 			_world = null;
 			_worldFog = null;
+			_appliedWorldFog = null;
+			_coastalDensity = _coastalOvercast = float.NaN;
 			_sinceScan = 999f;
 		}
 

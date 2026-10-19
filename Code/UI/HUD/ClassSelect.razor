@@ -1,6 +1,7 @@
 @namespace Facepunch.UI
 @using Facepunch.Gunsmith
 @inherits Panel
+@implements IPadScope
 @attribute [StyleSheet]
 
 @*
@@ -30,7 +31,7 @@
                                 @foreach ( var tab in categories )
                                 {
                                     var category = tab;
-                                    <div class="category @(category == PickCategory ? "active" : "")" onclick=@(() => PickCategory = category)>
+                                    <div class="category pad-target @(category == PickCategory ? "active" : "")" onclick=@(() => PickCategory = category)>
                                         <label>@Tr( CategoryTab( category ) )</label>
                                     </div>
                                 }
@@ -40,7 +41,7 @@
                             @if ( pickSlot != EquipmentSlot.Primary )
                             {
                                 var noneCurrent = GunsmithLoadoutManager.GetSlotResource( EditingClass, pickSlot ) is null;
-                                <div class="choice @(noneCurrent ? "current" : "")" onclick=@(() => PickSlot( pickSlot, null ))>
+                                <div class="choice pad-target @(noneCurrent ? "current" : "")" onclick=@(() => PickSlot( pickSlot, null ))>
                                     <div class="choice-text">
                                         <label class="choice-name">@Tr( "None" )</label>
                                         <label class="choice-sub">@Tr( pickSlot == EquipmentSlot.Secondary ? "No secondary weapon" : "Use the mode's default" )</label>
@@ -52,7 +53,7 @@
                             {
                                 var resource = choice;
                                 var current = GunsmithLoadoutManager.GetSlotResource( EditingClass, pickSlot ) == resource;
-                                <div class="choice @(current ? "current" : "")" onclick=@(() => PickSlot( pickSlot, resource ))>
+                                <div class="choice pad-target @(current ? "current" : "")" onclick=@(() => PickSlot( pickSlot, resource ))>
                                     <div class="choice-text">
                                         <label class="choice-name">@resource.Name</label>
                                         <label class="choice-sub">@ChoiceDetail( resource )</label>
@@ -69,7 +70,7 @@
                     {
                         <label class="picker-title">@Tr( "PERK {0}", EditPerk )</label>
                         <div class="choices">
-                            <div class="choice @(GunsmithLoadoutManager.GetPerkResource( EditingClass, EditPerk ) is null ? "current" : "")" onclick=@(() => PickPerk( null ))>
+                            <div class="choice pad-target @(GunsmithLoadoutManager.GetPerkResource( EditingClass, EditPerk ) is null ? "current" : "")" onclick=@(() => PickPerk( null ))>
                                 <div class="choice-text">
                                     <label class="choice-name">@Tr( "None" )</label>
                                 </div>
@@ -79,7 +80,7 @@
                             {
                                 var perk = choice;
                                 var current = GunsmithLoadoutManager.GetPerkResource( EditingClass, EditPerk ) == perk;
-                                <div class="choice @(current ? "current" : "")" onclick=@(() => PickPerk( perk ))>
+                                <div class="choice pad-target @(current ? "current" : "")" onclick=@(() => PickPerk( perk ))>
                                     <div class="choice-text">
                                         <label class="choice-name">@Tr( perk.Name )</label>
                                         <label class="choice-sub">@Tr( perk.Description )</label>
@@ -103,7 +104,7 @@
                     @foreach ( var idx in GunsmithLoadoutManager.GetActiveClassIndices() )
                     {
                         var index = idx;
-                        <div class="class-button @(index == ShownClass ? "shown" : "") @(index == ActiveClass ? "equipped" : "")"
+                        <div class="class-button pad-target @(index == ShownClass ? "shown" : "") @(index == ActiveClass ? "equipped" : "")"
                              onmouseover=@(() => HoveredClass = index) onclick=@(() => Choose( index ))>
                             <label class="class-name">@GunsmithLoadoutManager.GetClassName( index )</label>
                             @if ( index == ActiveClass )
@@ -124,7 +125,7 @@
                     else
                     {
                         <label class="class-title">@GunsmithLoadoutManager.GetClassName( ShownClass )</label>
-                        <div class="edit-button" onclick=@(() => StartEditing( ShownClass ))>
+                        <div class="edit-button pad-target" onclick=@(() => StartEditing( ShownClass ))>
                             <i>edit</i>
                             <label>@Tr( "EDIT CLASS" )</label>
                         </div>
@@ -135,7 +136,7 @@
                 {
                     var slot = classSlot;
                     var resource = GunsmithLoadoutManager.GetSlotResource( ShownClass, slot );
-                    <div class="slot @slot.ToString().ToLowerInvariant() @(EditSlot == slot ? "selected" : "")" onclick=@(() => SelectSlot( slot ))>
+                    <div class="slot pad-target @slot.ToString().ToLowerInvariant() @(EditSlot == slot ? "selected" : "")" onclick=@(() => SelectSlot( slot ))>
                         <div class="slot-text">
                             <label class="slot-name">@Tr( slot.ToString().ToUpperInvariant() )</label>
                             <label class="item-name @(resource is null ? "empty" : "")">@(resource?.Name ?? Tr( "None" ))</label>
@@ -152,10 +153,10 @@
                     {
                         var category = i;
                         var perk = GunsmithLoadoutManager.GetPerkResource( ShownClass, category );
-                        <div class="perk @(EditPerk == category ? "selected" : "")" onclick=@(() => SelectPerk( category ))>
-                            @if ( !string.IsNullOrEmpty( perk?.Icon ) )
+                        <div class="perk pad-target @(EditPerk == category ? "selected" : "")" onclick=@(() => SelectPerk( category ))>
+                            @if ( perk is not null )
                             {
-                                <div class="perk-icon" style="background-image: url( @perk.Icon );"></div>
+                                <i class="perk-icon">@GunsmithPanel.PerkGlyph( perk )</i>
                             }
                             <label class="perk-name @(perk is null ? "empty" : "")">@(perk is null ? Tr( "Perk {0}", category ) : Tr( perk.Name ))</label>
                         </div>
@@ -167,11 +168,11 @@
         <div class="footer">
             @if ( IsEditing )
             {
-                <div class="footer-button" onclick=@(() => StopEditing())>
+                <div class="footer-button pad-target" onclick=@(() => StopEditing())>
                     <i>arrow_back</i>
                     <label>@Tr( "Back" )</label>
                 </div>
-                <div class="footer-button accent" onclick=@FinishEditing>
+                <div class="footer-button accent pad-target" onclick=@FinishEditing>
                     <i>check</i>
                     <label>@Tr( EditingClass == ActiveClass ? "Done" : "Equip class" )</label>
                 </div>
@@ -452,6 +453,32 @@
 
         if ( !IsOpen )
             HoveredClass = -1;
+        else
+            PadNavigation.Offer( this, this );
+    }
+
+    // ── Pad (PadNavigation) ──────────────────────────────────────
+    // B steps back as Escape does (a slot's choices, the editor, then closed); LT and RT change the primaries' category.
+    public Panel PadFirstFocus => null;
+
+    public bool PadBack()
+    {
+        Sound.Play( "ui_button_press" );
+        Back();
+        return true;
+    }
+
+    public bool PadTab( int direction )
+    {
+        if ( EditSlot is not { } slot ) return false;
+
+        var categories = SlotCategories( slot );
+        if ( categories.Count < 2 ) return false;
+
+        var index = Math.Max( 0, categories.IndexOf( PickCategory ) );
+        PickCategory = categories[(index + direction + categories.Count) % categories.Count];
+        Sound.Play( "ui_nav_tab" );
+        return true;
     }
 
     public override void OnDeleted()

@@ -10,7 +10,7 @@
     @* ── Invite popup (floats above party bar) ── *@
     @if ( _inviteOpen )
     {
-        <div class="party-invite-popup">
+        <div class="party-invite-popup" @ref="InvitePopup">
             <div class="party-popup-header">
                 <span class="party-popup-title">@Tr( "INVITE PLAYERS" )</span>
                 <button class="party-popup-close" @onclick=@(() => _inviteOpen = false)><i>close</i></button>
@@ -169,7 +169,7 @@
                 }
                 @if ( LocalIsPartyLeader && p.NetworkId != Guid.Empty )
                 {
-                    <button class="party-member-kick" @onclick=@(() => KickMember( p.NetworkId ))><i>close</i></button>
+                    <button class="party-member-kick pad-target" @onclick=@(() => KickMember( p.NetworkId ))><i>close</i></button>
                 }
                 <label class="gnav-tip">@(p.IsLeader ? Tr( "{0} · LEADER", p.Name.ToUpper() ) : p.Name.ToUpper())</label>
             </div>
@@ -193,7 +193,7 @@
                                 }
                                 @if ( LocalIsPartyLeader && p.NetworkId != Guid.Empty )
                                 {
-                                    <button class="party-member-kick" @onclick=@(() => KickMember( p.NetworkId ))><i>close</i></button>
+                                    <button class="party-member-kick pad-target" @onclick=@(() => KickMember( p.NetworkId ))><i>close</i></button>
                                 }
                             </div>
                         }
@@ -264,6 +264,17 @@
 
         SquadPrivacy.Set( mode );
         _privacyOpen = false;
+    }
+
+    // The pad (PadNavigation): the invite popup floats over the header or the pause menu, and B closes it.
+    private Panel InvitePopup { get; set; }
+    private PadScope _inviteScope;
+
+    public override void Tick()
+    {
+        base.Tick();
+        if ( _inviteOpen && InvitePopup.IsValid() )
+            PadNavigation.Offer( InvitePopup, _inviteScope ??= new PadScope { Back = ClosePopup }, 40 );
     }
 
     /// <summary>Escape closes the party's popups before resuming the match.</summary>

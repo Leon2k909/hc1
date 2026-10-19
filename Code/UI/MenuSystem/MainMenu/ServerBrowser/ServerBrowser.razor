@@ -82,6 +82,16 @@
                         <label class="sb-stat-key">@Tr( "Status" )</label>
                         <label class="sb-stat-value @(selected.IsFull ? "full" : "open")">@Tr( selected.IsFull ? "Full" : "Open" )</label>
                     </div>
+
+                    <div class="sb-stat">
+                        <label class="sb-stat-key">@Tr( "Input" )</label>
+                        <label class="sb-stat-value @(selected.InputAllows ? "" : "full")">@Tr( LobbyInputRules.Title( selected.Input ) )</label>
+                    </div>
+
+                    @if ( !selected.InputAllows )
+                    {
+                        <label class="sb-detail-hint">@Tr( "This session is for another input. Lobby Input in Settings decides which sessions you can join." )</label>
+                    }
                 </div>
             }
             else
@@ -151,9 +161,16 @@
         var lobbies = await Networking.QueryLobbies( Game.Ident );
 
         IsSearching = false;
-        FetchedLobbies = lobbies.Where( x => !IsEditorLobby( x ) ).ToList();
+        // Sessions this player can join by input first; the others stay listed, dimmed (LobbyInputRules).
+        FetchedLobbies = lobbies.Where( x => !IsEditorLobby( x ) )
+            .OrderByDescending( x => LobbyInputRules.CanJoin( LobbyInputRules.Of( x ) ) )
+            .ToList();
         StateHasChanged();
     }
+
+    // The details' Input row and hint follow what the player is playing with.
+    protected override int BuildHash() => HashCode.Combine( CurrentLobby?.LobbyId, CurrentLobby?.InputAllows, IsSearching,
+        FetchedLobbies.Count, ShowFakeLobbies, LobbyInputRules.Preference, Input.UsingController, GameText.Current );
 
     public void Refresh()
     {

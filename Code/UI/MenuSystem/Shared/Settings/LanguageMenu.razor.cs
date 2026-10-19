@@ -6,7 +6,7 @@ namespace Facepunch.UI;
 /// panel, so the settings list's scroll doesn't clip it, and s&amp;box closes it on a press anywhere outside it. Up and
 /// Down move through it and Enter picks; Escape closes it before anything under it (<see cref="CloseAny"/>).
 /// </summary>
-public partial class LanguageMenu
+public partial class LanguageMenu : IPadScope
 {
 	/// <summary> The list that's open, if any. </summary>
 	private static LanguageMenu Shown;
@@ -81,7 +81,15 @@ public partial class LanguageMenu
 		}
 
 		if ( _scrollPending ) ScrollToHighlight();
+		PadNavigation.Offer( this, this, 50 );
 	}
+
+	// The pad (PadNavigation): the D-pad moves the pointer down the rows, which moves the highlight, A picks, B closes.
+	public Panel PadFirstFocus => RowList?.Children.FirstOrDefault( x => x.HasClass( "highlight" ) ) ?? RowList;
+
+	public bool PadBack() => CloseAny();
+
+	public bool PadTab( int direction ) => false;
 
 	private void SetQuery( string text )
 	{
@@ -161,8 +169,8 @@ public partial class LanguageMenu
 		return words.All( word => names.Contains( word, StringComparison.Ordinal ) );
 	}
 
-	/// <summary> The text in lower case with its accents taken off. </summary>
-	private static string Fold( string text )
+	/// <summary> The text in lower case with its accents taken off. The settings page's search folds with it too. </summary>
+	internal static string Fold( string text )
 	{
 		var folded = new System.Text.StringBuilder( text.Length );
 		foreach ( var c in text.ToLowerInvariant() )

@@ -54,11 +54,11 @@
         @if ( range.MenuOpen )
         {
             <div class="range-menu-backdrop">
-                <div class="range-menu">
+                <div class="range-menu" @ref="MenuPanel">
                     <label class="range-caption">FIRING RANGE</label>
                     <label class="range-menu-title">TEST YOUR BUILD</label>
                     <label class="range-menu-copy">Targets reset after a knockdown. Edit your build in Gunsmith and come straight back.</label>
-                    <div class="range-button primary" @onclick=@range.Resume><i>play_arrow</i><label>RESUME</label></div>
+                    <div class="range-button primary pad-first" @onclick=@range.Resume><i>play_arrow</i><label>RESUME</label></div>
                     <div class="range-button" @onclick=@range.ToggleMovingTargets><i>swap_horiz</i><label>@(range.MovingTargets ? "MOVING TARGETS: ON" : "MOVING TARGETS: OFF")</label></div>
                     <div class="range-button" @onclick=@range.RefillLoadout><i>inventory_2</i><label>REFILL LOADOUT</label></div>
                     <div class="range-button" @onclick=@range.ResetTargets><i>restart_alt</i><label>RESET TARGETS & STATS</label></div>
@@ -82,7 +82,25 @@
             StateHasChanged();
         }
         GameUtils.UpdateCombatMouseVisibility( range.Player );
+
+        // The range menu on a controller: the D-pad moves between its buttons, and B resumes (PadNavigation).
+        if ( range.MenuOpen && MenuPanel.IsValid() )
+            PadNavigation.Offer( MenuPanel, _padScope ??= new PadScope { Back = PadResume } );
+
         if ( range.MenuOpen ) Input.Suppressed = true;
+    }
+
+    private Panel MenuPanel { get; set; }
+    private PadScope _padScope;
+
+    private bool PadResume()
+    {
+        var range = FiringRangeSystem.Current;
+        if ( !range.IsValid() || !range.MenuOpen ) return false;
+
+        range.Resume();
+        StateHasChanged();
+        return true;
     }
 
     protected override void OnPreRender() => GameUtils.UpdateCombatMouseVisibility( FiringRangeSystem.Current?.Player );

@@ -26,5 +26,17 @@
 @code
 {
     private PlayerPawn Pawn => Client.Viewer.IsValid() ? Client.Viewer.PlayerPawn : null;
-    public override void Tick() => StateHasChanged();
+
+    // Which hints show: none, the climb's, or the grab's.
+    protected override int BuildHash()
+    {
+        var pawn = Pawn;
+        if ( !pawn.IsValid() || !pawn.IsLocallyControlled || pawn.HealthComponent.State != LifeState.Alive || PauseMenuPanel.IsAnyOpen )
+            return 0;
+
+        if ( pawn.IsPipeClimbing )
+            return 1;
+
+        return pawn.Hovered is ClimbablePipe pipe && pipe.CanUse( pawn ).CanUse ? 2 : 0;
+    }
 }

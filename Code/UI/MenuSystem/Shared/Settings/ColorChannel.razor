@@ -1,0 +1,30 @@
+@namespace Facepunch.UI
+@inherits Panel
+@implements IPadAdjustable
+
+@* One of ColorPicker's red, green and blue boxes. The pad can't type, so left and right step it (PadNavigation). *@
+<root>
+    <label class="small slight">@Label</label>
+    <TextEntry Value:bind="@Value" />
+</root>
+
+@code
+{
+    public string Label { get; set; }
+
+    /// <summary> 0 to 255. </summary>
+    public int Value { get; set; }
+
+    public ColorChannel()
+    {
+        AddClass( PadNavigation.TargetClass );
+    }
+
+    public bool PadAdjust( int direction, float heldFor )
+    {
+        Value = (int)PadNavMath.SliderStep( Value, 0f, 255f, 1f, direction, heldFor );
+        return true;
+    }
+
+    public Panel PadPoint => null;
+}

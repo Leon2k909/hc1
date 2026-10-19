@@ -3,6 +3,7 @@
 
 @namespace Facepunch.UI
 @inherits Panel
+@implements IPadScope
 @attribute [StyleSheet]
 
 <root class="hc1 bug-report-root">
@@ -10,7 +11,7 @@
     {
         <div class="br-backdrop" onclick=@((e) => { e.StopPropagation(); Close(); }) />
 
-        <div class="br-modal">
+        <div class="br-modal" @ref="Modal">
             <div class="br-topbar" />
 
             <div class="br-head">
@@ -159,10 +160,29 @@
         StateHasChanged();
     }
 
+    // The pad (PadNavigation): the modal, starting on the report's categories (or the list's Close); B closes it.
+    private Panel Modal { get; set; }
+
+    public Panel PadFirstFocus => Modal?.Descendants.FirstOrDefault( x => x.HasClass( "br-categories" ) || x.HasClass( "br-foot" ) );
+
+    public bool PadBack()
+    {
+        Close();
+        return true;
+    }
+
+    public bool PadTab( int direction )
+    {
+        if ( !IsAdmin ) return false;
+        SetTab( CurrentTab == "report" ? "view" : "report" );
+        return true;
+    }
+
     public override void Tick()
     {
         base.Tick();
         if ( !IsOpen ) return;
+        if ( Modal.IsValid() ) PadNavigation.Offer( Modal, this, 50 );
 
         if ( _titleMissing && TitleEntry.IsValid() && !string.IsNullOrWhiteSpace( TitleEntry.Value ) )
         {

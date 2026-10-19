@@ -24,7 +24,6 @@
     @if ( isValidPlayer )
     {
         <ScopeOverlay />
-        <ScreenProtectionOverlay />
         <div class="center-layer">
             <MedalFeed @ref="MedalFeed" />
         </div>
@@ -41,6 +40,7 @@
             @if ( isValidPlayer )
             {
                 <Vitals />
+                <SoldierTrainingHud />
             }
 
             @if ( isBattleRoyale && !winBanner && !piloting )
@@ -137,6 +137,8 @@
     {
         <ReconOctocopterFeed />
         <CombatMouseLock />
+        <!-- Playing with the wrong input in a controller-only or mouse-only lobby (LobbyInputGuard). -->
+        <LobbyInputOverlay />
     }
 
     <ClassSelect />

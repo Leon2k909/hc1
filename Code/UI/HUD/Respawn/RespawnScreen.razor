@@ -71,6 +71,17 @@
 
     protected override int BuildHash()
     {
-        return System.HashCode.Combine( Time.Now );
+        var client = Client;
+        if ( Scene is null || !client.IsValid() )
+            return 0;
+
+        var respawner = Respawner;
+        if ( !respawner.IsValid() )
+            return 1;
+
+        // The countdown is in whole seconds, and only shows while waiting to deploy.
+        var waiting = !client.PlayerPawn.IsValid() && client.RespawnState != RespawnState.Immediate;
+        return System.HashCode.Combine( respawner, waiting, waiting ? respawner.GetRespawnTime() : -1,
+            respawner is PlayerInputRespawner input ? input.InputAction : null );
     }
 }

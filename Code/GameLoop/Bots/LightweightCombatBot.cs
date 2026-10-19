@@ -172,7 +172,10 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 
 		var style = Outfit?.Style ?? MilitaryUniform.StyleForTeam( Team );
 		if ( entry.Models is { Count: > 0 } )
-			MilitaryUniform.SetModel( Renderer, Game.Random.FromList( entry.Models ), style );
+		{
+			var model = Outfit is null ? Game.Random.FromList( entry.Models ) : Model.Load( Outfit.ModelPath );
+			MilitaryUniform.SetModel( Renderer, model, style );
+		}
 	}
 
 	private void ConfigureComponents()
@@ -450,6 +453,21 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 	private float _strideScale = 1f;
 	private readonly ThirdPersonSprintPose _sprintPose = new();
 	private float _sprintPoseBlend;
+	private Model _rightHandModel;
+	private int _rightHandBone = -1;
+
+	/// <summary> The body's right hand bone (hand_R, or the legacy skeleton's r_hand), or -1. A bone found by name is a search. </summary>
+	private int RightHandBone()
+	{
+		var model = Renderer.Model;
+		if ( model != _rightHandModel )
+		{
+			_rightHandModel = model;
+			_rightHandBone = (model?.Bones.GetBone( "hand_R" ) ?? model?.Bones.GetBone( "r_hand" ))?.Index ?? -1;
+		}
+
+		return _rightHandBone;
+	}
 
 	/// <summary>Finish the gun and support arm together, using the pose the renderer will draw this frame.</summary>
 	internal void FinishWeaponPose()
@@ -470,41 +488,68 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 			return;
 		}
 
-		if ( (_proneBlend > 0f || SlideBlend > 0f) && IsAimingIn && !IsReloadClipPlaying
-			&& ShoulderedHandIk( Renderer, gun, EyeOnGun( gun ), AimDirection, EyePosition ) is { } sightedHand )
-		{
-			_gripHand.Apply( Renderer, Renderer.WorldTransform.ToWorld( sightedHand ) );
-			FollowHand();
-		}
-
 		var target = gun.IkLeftHand;
 		var supportActive = !IsReloadClipPlaying && target.IsValid() && target.Active;
 		_supportGripWeight = supportActive ? MathF.Min( 1f, _supportGripWeight + Time.Delta / .2f ) : 0f;
+
+		// Off this screen, or a few pixels tall, nobody here could see the gun and arms fitted: the bot keeps its animated
+		// pose, with the gun in its hand (FollowHand). Each frame's fit starts from the animation, so one coming into view
+		// is fitted that frame, before it's drawn. The prone and slide poses above still run: they move the whole body.
+		if ( !BotSystem.ShouldPose( WorldPosition ) )
+		{
+			_sprintPose.Reset();
+			return;
+		}
+
+		var aim = LiveAimDirection;
+		// Sliding, the gun is sighted at the head the slide pose has put down on the hip, and comes up with the drop.
+		// At the logical eye (SlideEye, 40 up) it hung over and ahead of the face.
+		var sliding = _proneBlend <= 0f && SlideBlend > 0f;
+		if ( (_proneBlend > 0f || SlideBlend > 0f) && IsAimingIn && !IsReloadClipPlaying
+			&& ShoulderedHandIk( Renderer, gun, EyeOnGun( gun ), aim, sliding ? PosedEye() : EyePosition ) is { } sightedHand )
+		{
+			_gripHand.Apply( Renderer, Renderer.WorldTransform.ToWorld( sightedHand ), sliding ? SlideBlend : 1f );
+			FollowHand();
+		}
+
 		if ( _sprintPose.Apply( Renderer, gun, _sprintPoseBlend, _supportGripWeight, updateBoneObjects: !BotSystem.LodEnabled ) ) return;
 		// Long handguards can fall beyond the support arm during a low carry or a turn. Bring the whole gun
 		// and its gripping hand within both arms' reach before fitting the support arm; never stretch a wrist.
-		var rightBone = Renderer.Model.Bones.GetBone( "hand_R" ) ?? Renderer.Model.Bones.GetBone( "r_hand" );
-		if ( rightBone is not null && Renderer.SceneModel.IsValid() )
+		var rightBone = RightHandBone();
+		if ( rightBone >= 0 && Renderer.SceneModel.IsValid() )
 		{
-			var right = Renderer.SceneModel.GetBoneWorldTransform( rightBone.Index );
+			var right = Renderer.SceneModel.GetBoneWorldTransform( rightBone );
 			var shift = _weaponPose.Fit( Renderer, gun, _supportHand, _gripHand, right.Position, _supportGripWeight );
 			if ( shift.LengthSquared > .0001f )
 			{
 				_gripHand.Apply( Renderer, right.WithPosition( right.Position + shift ) );
-				_weaponModel.WorldPosition += Renderer.SceneModel.GetBoneWorldTransform( rightBone.Index ).Position - right.Position;
+				_weaponModel.WorldPosition += Renderer.SceneModel.GetBoneWorldTransform( rightBone ).Position - right.Position;
 			}
 		}
 		// The cheek weld, where the face is big enough on this screen to see it.
 		if ( _headDrop > .5f && (Renderer.GetAttachment( "eye_R_forward" ) ?? Renderer.GetAttachment( "eyes" )) is { } eye
 			&& BotSystem.ShouldShowEffect( eye.Position, 60f, 800f ) )
 		{
-			_headCant.Apply( Renderer, eye.Position, AimDirection.IsNearZeroLength ? WorldRotation.Forward : AimDirection,
+			_headCant.Apply( Renderer, eye.Position, aim.IsNearZeroLength ? WorldRotation.Forward : aim,
 				ShoulderedHeadCant * _headDrop / ShoulderedHeadDrop );
 		}
 		if ( !supportActive ) return;
 		var hand = Renderer.WorldTransform.ToLocal( target.WorldTransform );
 		hand = MilitaryUniform.HandIkTransform( Renderer.Model, "hand_left", hand );
 		_supportHand.Apply( Renderer, Renderer.WorldTransform.ToWorld( hand ), _supportGripWeight );
+	}
+
+	/// <summary>
+	/// The right eye where this frame's pose has put it (after <see cref="FinishWeaponPose"/>'s slide or prone pose), so a
+	/// shouldered gun meets the visible face. <see cref="EyePosition"/> is the bot's logical eye, which the poses only
+	/// approximate. Falls back to it on a body with no eye bone.
+	/// </summary>
+	private Vector3 PosedEye()
+	{
+		var eye = Renderer.Model?.Bones.GetBone( "eye_R" ) ?? Renderer.Model?.Bones.GetBone( "eye_r" );
+		return eye is not null && Renderer.SceneModel.IsValid()
+			? Renderer.SceneModel.GetBoneWorldTransform( eye.Index ).Position
+			: EyePosition;
 	}
 
 	[Rpc.Broadcast]
@@ -667,10 +712,12 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 			Renderer.Set( "wish_z", velocity.z );
 		}
 
-		Renderer.Set( "duck", IsCrouching && _proneBlend <= 0f ? 1f : 0f );
+			// The procedural slide controls the hips and knees; the graph's crouch
+			// pose otherwise keeps the bot balled up while moving along the floor.
+			Renderer.Set( "duck", IsCrouching && _proneBlend <= 0f ? 1f - SlideBlend : 0f );
 
 		// The host decides where the bot aims and syncs it, so every client sees it look at what it's shooting.
-		var aim = AimDirection.IsNearZeroLength ? WorldRotation.Forward : AimDirection;
+		var aim = LiveAimDirection.IsNearZeroLength ? WorldRotation.Forward : LiveAimDirection;
 		// In a fight the gun comes up to the shoulder, the chest squares up behind it and the head drops onto the stock,
 		// eyes still on the target. Not at a run: a runner carries it.
 		var shouldered = IsAimingIn && !IsReloadClipPlaying && speed < MaxShoulderedSpeed;
@@ -932,19 +979,41 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 			eyePosition = eye.Position;
 		}
 
-		var handBone = body.Model?.Bones.GetBone( "hand_R" ) ?? body.Model?.Bones.GetBone( "r_hand" );
-		if ( handBone is null )
+		if ( ShoulderGrip( body.Model ) is not { } grip )
 			return null;
 
-		// The gun still has last frame's transform here, while the bot may already have moved or turned.
-		// Measuring the mount from those two poses feeds that movement back into the next IK target.
-		var holdBone = MilitaryUniform.UsesHumanSkeleton( body.Model ) ? null
-			: body.Model.Bones.GetBone( "hold_r" ) ?? body.Model.Bones.GetBone( "hold_R" );
-		var grip = holdBone is null ? MilitaryUniform.WeaponHandOffset( body.Model )
-			: handBone.LocalTransform.ToLocal( holdBone.LocalTransform );
 		var rotation = Rotation.LookAt( aim.Normal, Vector3.Up );
 		var sighted = new Transform( eyePosition.Value - rotation * eyeOnGun, rotation );
 		return body.WorldTransform.ToLocal( sighted.ToWorld( grip.ToLocal( global::Transform.Zero ) ) );
+	}
+
+	private static readonly Dictionary<Model, Transform?> _shoulderGrips = new();
+
+	/// <summary>
+	/// Where the gun sits in the right hand of <paramref name="model"/>'s skeleton (its hold bone, or the hand and an
+	/// offset), or null with no hand. From the bind pose, not the live gun: the gun still has last frame's transform when
+	/// the IK target is worked out, while the bot may already have moved or turned, and measuring the mount from those
+	/// two poses fed that movement back into the next target. Kept per model: a bone found by name is a search.
+	/// </summary>
+	private static Transform? ShoulderGrip( Model model )
+	{
+		if ( model is null )
+			return null;
+		if ( _shoulderGrips.TryGetValue( model, out var cached ) )
+			return cached;
+
+		Transform? grip = null;
+		var handBone = model.Bones.GetBone( "hand_R" ) ?? model.Bones.GetBone( "r_hand" );
+		if ( handBone is not null )
+		{
+			var holdBone = MilitaryUniform.UsesHumanSkeleton( model ) ? null
+				: model.Bones.GetBone( "hold_r" ) ?? model.Bones.GetBone( "hold_R" );
+			grip = holdBone is null ? MilitaryUniform.WeaponHandOffset( model )
+				: handBone.LocalTransform.ToLocal( holdBone.LocalTransform );
+		}
+
+		_shoulderGrips[model] = grip;
+		return grip;
 	}
 
 	private bool IsEnemyAlive( Component target )
@@ -1707,7 +1776,7 @@ public sealed partial class LightweightBotManager : SingletonComponent<Lightweig
 		foreach ( var bot in Bots )
 		{
 			if ( bot.IsValid() && bot.IsAlive && IsEnemy( team, bot.Team ) )
-				watchers.Add( (bot.EyePosition, bot.AimDirection) );
+				watchers.Add( (bot.EyePosition, bot.LiveAimDirection) );
 		}
 
 		return watchers;

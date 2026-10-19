@@ -80,9 +80,9 @@
                             </div>
                             <label class="ee-layer-name">@Tr( "Layer {0}", index + 1 )</label>
                             <div class="ee-layer-btns">
-                                <div class="ee-icon-btn" @onclick:stopPropagation="true" @onclick=@(() => MoveLayerUp(index))><i>keyboard_arrow_up</i></div>
-                                <div class="ee-icon-btn" @onclick:stopPropagation="true" @onclick=@(() => MoveLayerDown(index))><i>keyboard_arrow_down</i></div>
-                                <div class="ee-icon-btn danger" @onclick:stopPropagation="true" @onclick=@(() => RemoveLayer(index))><i>delete</i></div>
+                                <div class="ee-icon-btn pad-target" @onclick:stopPropagation="true" @onclick=@(() => MoveLayerUp(index))><i>keyboard_arrow_up</i></div>
+                                <div class="ee-icon-btn pad-target" @onclick:stopPropagation="true" @onclick=@(() => MoveLayerDown(index))><i>keyboard_arrow_down</i></div>
+                                <div class="ee-icon-btn danger pad-target" @onclick:stopPropagation="true" @onclick=@(() => RemoveLayer(index))><i>delete</i></div>
                             </div>
                         </div>
                     }
@@ -172,6 +172,15 @@
         ? Data.Layers[SelectedLayerIndex] : null;
 
     private int PickerTab { get; set; } = 0;
+
+    /// <summary> The pad's LT and RT (BarracksPage): SHAPES, EMOJI, LETTERS. </summary>
+    public bool CyclePickerTab( int direction )
+    {
+        PickerTab = (PickerTab + direction + 3) % 3;
+        Sound.Play( "ui_nav_tab" );
+        StateHasChanged();
+        return true;
+    }
 
     private void SelectFromCanvas( int index )
     {

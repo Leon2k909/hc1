@@ -24,6 +24,12 @@ public partial struct Lobby
 
 	public bool HasData => _lobby?.Data is not null;
 
+	/// <summary>Who the lobby is for by input (<see cref="LobbyInputRules"/>). A fake lobby is open to all.</summary>
+	public LobbyInput Input => _lobby.HasValue ? LobbyInputRules.Of( _lobby.Value ) : LobbyInput.Any;
+
+	/// <summary>Whether this player's Lobby Input setting, and what they're playing with, let them in.</summary>
+	public bool InputAllows => LobbyInputRules.CanJoin( Input );
+
 	public Lobby( LobbyInformation lobby )
 	{
 		_lobby = lobby;

@@ -4,6 +4,7 @@
 
 @inherits Panel
 @implements INavigatorPage
+@implements IPadScope
 @attribute [StyleSheet]
 @namespace Facepunch.UI
 
@@ -45,6 +46,8 @@
                 </div>
             </div>
 
+            <SoldierTrainingPanel />
+
             <div class="milestone-heading">
                 <label class="section-title">@Tr( "SERVICE MILESTONES" )</label>
                 <label class="milestone-description">@Tr( "Each prestige resets your player level and weapon attachment unlocks. You keep your camos. Reach Prestige 10 for Master Prestige status." )</label>
@@ -59,7 +62,7 @@
                     var prestige = i;
                     var isUnlocked = Progression.GetPrestige() >= prestige;
                     var isEquipped = isUnlocked && Progression.GetPrestigeEmblem() == prestige;
-                    <div class="prestige-card @(isUnlocked ? "unlocked" : "locked") @(isEquipped ? "equipped" : "")" onclick=@(() => PickEmblem( prestige ))>
+                    <div class="prestige-card pad-target @(isUnlocked ? "unlocked" : "locked") @(isEquipped ? "equipped" : "")" onclick=@(() => PickEmblem( prestige ))>
                         <img src="/ui/prestige/prestige_@(prestige)_readable.png" />
                         <label class="prestige-name">@Tr( "PRESTIGE {0}", prestige )</label>
                         <label class="prestige-status">@Tr( isEquipped ? "EQUIPPED" : isUnlocked ? "REACHED" : "LOCKED" )</label>
@@ -210,6 +213,24 @@
         : Tr( "{0} XP TO LEVEL {1}", Math.Max( 0, Progression.GetXPForNextLevel() - Progression.GetXPIntoLevel() ).ToString( "N0" ), Progression.GetLevel() + 1 );
 
     private void BackToBarracks() => this.Navigate( "/barracks" );
+
+    // The pad (PadNavigation): a page inside the menu's scope, from which B goes back to PROFILE.
+    public override void Tick()
+    {
+        base.Tick();
+        PadNavigation.Offer( this, this );
+    }
+
+    public Panel PadFirstFocus => null;
+
+    public bool PadBack()
+    {
+        Sound.Play( "ui_button_press" );
+        BackToBarracks();
+        return true;
+    }
+
+    public bool PadTab( int direction ) => false;
        
     public void OnNavigationOpen()
     {

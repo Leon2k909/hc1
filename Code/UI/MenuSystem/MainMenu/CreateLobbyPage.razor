@@ -6,6 +6,7 @@
 
 @inherits Panel
 @implements INavigatorPage
+@implements IPadScope
 @attribute [StyleSheet]
 @namespace Facepunch.UI
 
@@ -103,6 +104,15 @@
                                 <div class="cl-option @(Privacy == LobbyPrivacy.Public ? "selected" : "")" onclick=@(() => SetPrivacy( LobbyPrivacy.Public ))><label>@Tr( "PUBLIC" )</label></div>
                             </div>
                             <label class="cl-help">@Tr( AccessHelp )</label>
+                        </div>
+                        <div class="cl-group">
+                            <label class="cl-label">@Tr( "INPUT" )</label>
+                            <div class="cl-options">
+                                <div class="cl-option @(Input == LobbyInput.Any ? "selected" : "")" onclick=@(() => SetInput( LobbyInput.Any ))><label>@Tr( "ANY INPUT" )</label></div>
+                                <div class="cl-option @(Input == LobbyInput.Controller ? "selected" : "")" onclick=@(() => SetInput( LobbyInput.Controller ))><label>@Tr( "CONTROLLER ONLY" )</label></div>
+                                <div class="cl-option @(Input == LobbyInput.MouseKeyboard ? "selected" : "")" onclick=@(() => SetInput( LobbyInput.MouseKeyboard ))><label>@Tr( "MOUSE & KEYBOARD ONLY" )</label></div>
+                            </div>
+                            <label class="cl-help">@Tr( LobbyInputRules.Help( Input ) )</label>
                         </div>
                     }
                     else if ( _tab == SetupTab.Rules )
@@ -223,6 +233,7 @@
                         <div class="cl-summary-row"><label>@Tr( "PLAYER LIMIT" )</label><label>@PlayerLimit</label></div>
                         <div class="cl-summary-row"><label>@Tr( "BOT FILL" )</label><label>@Tr( UseBotFill ? "ON" : "OFF" )</label></div>
                         <div class="cl-summary-row"><label>@Tr( "ACCESS" )</label><label>@Tr( AccessName )</label></div>
+                        <div class="cl-summary-row"><label>@Tr( "INPUT" )</label><label>@Tr( LobbyInputRules.Title( Input ).ToUpperInvariant() )</label></div>
                         @if ( HasRules )
                         {
                             <div class="cl-summary-rules">
@@ -297,6 +308,8 @@
     public int PlayerLimit { get; private set; } = 10;
     public bool FillWithBots { get; private set; } = true;
     public LobbyPrivacy Privacy { get; private set; } = LobbyPrivacy.Private;
+    // Who can join by input (LobbyInputRules). It starts at the player's own Lobby Input setting.
+    public LobbyInput Input { get; private set; } = LobbyInput.Any;
     private bool _starting;
     private bool _closed;
     private string _error;
@@ -497,10 +510,34 @@
     }
 
     private void SetTab( SetupTab tab ) { if ( !_starting ) { _tab = tab; StateHasChanged(); } }
+
+    // ── Pad (PadNavigation) ──────────────────────────────────────
+    // A page inside the menu's scope: LT and RT step through MATCH, RULES and PLAYER.
+    public override void Tick()
+    {
+        base.Tick();
+        PadNavigation.Offer( this, this );
+    }
+
+    public Panel PadFirstFocus => null;
+
+    public bool PadBack() => false;
+
+    public bool PadTab( int direction )
+    {
+        if ( !HasRules || _starting ) return false;
+
+        var tabs = Enum.GetValues<SetupTab>();
+        var next = tabs[(Array.IndexOf( tabs, _tab ) + direction + tabs.Length) % tabs.Length];
+        Sound.Play( "ui_nav_tab" );
+        SetTab( next );
+        return true;
+    }
     private void SetRule( Action set ) { if ( !_starting ) { set(); StateHasChanged(); } }
     private void SetPlayerLimit( int count ) { if ( !_starting && PlayerLimits.Contains( count ) ) { PlayerLimit = count; StateHasChanged(); } }
     private void SetBotFill( bool fill ) { if ( !_starting ) { FillWithBots = fill; StateHasChanged(); } }
     private void SetPrivacy( LobbyPrivacy privacy ) { if ( !_starting ) { Privacy = privacy; StateHasChanged(); } }
+    private void SetInput( LobbyInput input ) { if ( !_starting ) { Input = input; StateHasChanged(); } }
 
     private void ResetRules()
     {
@@ -552,7 +589,7 @@
             }
             if ( !IsValid || _closed ) return;
 
-            CustomGameSettings.Configure( PlayerLimit, UseBotFill, Privacy, BuildRules() );
+            CustomGameSettings.Configure( PlayerLimit, UseBotFill, Privacy, BuildRules(), Input );
             GameMode.SetCurrent( SelectedMode );
             GameMode.SetHardcore( !SelectedMode.UsesStandardHealth && !IsZombies );
             Sound.Play( "ui_button_press" );
@@ -570,6 +607,7 @@
     public void OnNavigationOpen()
     {
         _closed = false;
+        Input = LobbyInputRules.Preference;
         Maps = GameUtils.GetMatchMaps().ToList();
         SelectMap( Maps.FirstOrDefault() );
         MainMenuRoot.Instance?.SetActiveRoute( "/new" );

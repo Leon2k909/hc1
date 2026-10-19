@@ -172,20 +172,45 @@ public class GameSettings
 	public bool TheaterRecording { get => !noTheaterRecording; set => noTheaterRecording = !value; }
 	private bool noTheaterRecording;
 
-	// Stored inverted too, so it's on by default: the markers over teammates' heads are only their circles
-	// (PlayerMarkerPanel, LightweightBotMarkerPanel).
-	[Title( "Hide Teammate Names" ), Description( "Shows only the circle over your teammates' heads, without their names, health or weapons. A teammate carrying the bomb still has the bomb icon." ), Group( "Game" ), Icon( "label_off" )]
-	public bool HideTeammateNames { get => !showTeammateNames; set => showTeammateNames = !value; }
-	private bool showTeammateNames;
+		[Title( "Hide Teammate Names" ), Description( "Optionally show only circles over teammates. By default names and health appear when teammates are fully visible, while cover hides their details." ), Group( "Game" ), Icon( "label_off" )]
+		public bool HideTeammateNames { get; set; }
+
+	// LobbyInputRules: the lobbies you host take only players on this input, and you only join lobbies for it.
+	[Title( "Lobby Input" ), Description( "Controller Only or Mouse & Keyboard Only keeps you in lobbies for that input: the games you host take only those players, and you only join theirs." ), Group( "Game" ), Icon( "sports_esports" )]
+	public LobbyInput LobbyInput { get; set; } = LobbyInput.Any;
 
 	[Title( "Aim Assist" ), Description("Pulls your aim towards targets while using a controller"), Group( "Controls" )]
 	public bool AimAssist { get; set; } = true;
 
-	[Title( "Aim Input" ), Group( "Controls" )]
+	[Title( "Aim Input" ), Group( "Controls" ), Choices( "Hold", "Toggle" )]
 	public bool ToggleAim { get; set; } = false;
 
-	[Title( "Sprint Input" ), Group( "Controls" )]
+	[Title( "Sprint Input" ), Group( "Controls" ), Choices( "Hold", "Toggle" )]
 	public bool ToggleSprint { get; set; } = false;
+
+	// Look sensitivity (LookSensitivitySystem): multipliers on top of s&box's own mouse sensitivity and stick speeds. Each
+	// getter reads 0 as 1, since a settings file from before them, or a hotloaded settings object, has 0.
+	[Title( "Mouse Sensitivity" ), Description( "How fast the mouse turns your view, on top of s&box's own mouse sensitivity." ), Group( "Controls" ), Range( 0.1f, 5f, 0.01f )]
+	public float MouseSensitivity { get => Multiplier( mouseSensitivity ); set => mouseSensitivity = value; }
+	private float mouseSensitivity = 1f;
+
+	[Title( "Mouse ADS Sensitivity" ), Description( "The mouse's sensitivity while aiming down sights, as a share of Mouse Sensitivity." ), Group( "Controls" ), Range( 0.1f, 2f, 0.01f )]
+	public float MouseAdsSensitivity { get => Multiplier( mouseAdsSensitivity ); set => mouseAdsSensitivity = value; }
+	private float mouseAdsSensitivity = 1f;
+
+	[Title( "Controller Horizontal Sensitivity" ), Description( "How fast the right stick turns your view left and right." ), Group( "Controls" ), Range( 0.1f, 3f, 0.05f )]
+	public float ControllerHorizontalSensitivity { get => Multiplier( controllerHorizontal ); set => controllerHorizontal = value; }
+	private float controllerHorizontal = 1f;
+
+	[Title( "Controller Vertical Sensitivity" ), Description( "How fast the right stick turns your view up and down." ), Group( "Controls" ), Range( 0.1f, 3f, 0.05f )]
+	public float ControllerVerticalSensitivity { get => Multiplier( controllerVertical ); set => controllerVertical = value; }
+	private float controllerVertical = 1f;
+
+	[Title( "Controller ADS Sensitivity" ), Description( "The right stick's sensitivity while aiming down sights, as a share of the two above." ), Group( "Controls" ), Range( 0.1f, 2f, 0.05f )]
+	public float ControllerAdsSensitivity { get => Multiplier( controllerAds ); set => controllerAds = value; }
+	private float controllerAds = 1f;
+
+	private static float Multiplier( float value ) => value > 0f ? value : 1f;
 
 	[Title( "Streak Type" ), Description( "Kills: rewards come from kills in a row and reset on death. Score: rewards charge from score (kills + objectives) and carry across deaths." ), Group( "Game" ), Icon( "bolt" ), Choices( "Kills", "Score" )]
 	public bool UseScorestreaks { get; set; } = false;

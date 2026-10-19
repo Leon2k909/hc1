@@ -195,12 +195,25 @@ public abstract class MapMover : Component, IUse,
 			return null;
 
 		var heading = velocity.Normal;
-		foreach ( var door in scene.GetAllComponents<MapMover>() )
+		// This frame's doors (BotSystem): every bot and zombie went through every mover in the scene ten times a second.
+		var doors = scene.GetSystem<BotSystem>()?.Doors ?? scene.GetAllComponents<MapMover>().ToList();
+		foreach ( var door in doors )
 		{
-			if ( door.OpenAmount >= OpenEnough || !door.Tags.Has( DoorTag ) )
+			if ( !door.IsValid() || door.OpenAmount >= OpenEnough || !door.Tags.Has( DoorTag ) )
 				continue;
 
-			var center = door.GetComponent<ModelRenderer>()?.Bounds.Center ?? door.WorldPosition;
+			// The door's middle stays the same distance from its origin as it swings or slides, so one further than that
+			// past the reach below can't be it: skip it before asking the engine for its bounds.
+			if ( door._centreReach >= 0f )
+			{
+				var origin = door.WorldPosition;
+				var slack = door._centreReach + 1f;
+				if ( MathF.Abs( origin.z - position.z - 56f ) > 48f + slack
+					|| (origin - position).WithZ( 0f ).LengthSquared > (80f + slack) * (80f + slack) )
+					continue;
+			}
+
+			var center = door.BoundsCentre();
 			if ( MathF.Abs( center.z - position.z - 56f ) > 48f )
 				continue;
 
@@ -210,6 +223,23 @@ public abstract class MapMover : Component, IUse,
 		}
 
 		return null;
+	}
+
+	private ModelRenderer _boundsRenderer;
+	/// <summary> How far the middle of this door's bounds is from its origin, once measured (-1 until then). </summary>
+	private float _centreReach = -1f;
+
+	/// <summary> The middle of this door's model as it is now, or its origin with no model (<see cref="FindDoorAhead"/>). </summary>
+	private Vector3 BoundsCentre()
+	{
+		if ( !_boundsRenderer.IsValid() )
+			_boundsRenderer = GetComponent<ModelRenderer>();
+		if ( !_boundsRenderer.IsValid() )
+			return WorldPosition;
+
+		var centre = _boundsRenderer.Bounds.Center;
+		_centreReach = MathF.Max( _centreReach, centre.Distance( WorldPosition ) );
+		return centre;
 	}
 
 	/// <summary>

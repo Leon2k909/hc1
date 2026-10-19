@@ -83,8 +83,7 @@
         {
             <div class="dot" />
 
-            @* Hide Teammate Names leaves only the circle. The column stacks up from it, so it doesn't move. *@
-            @if ( !HideTeammateNames )
+            @if ( !HideTeammateNames && IsFullyVisible )
             {
                 <label class="name">@(Player.HealthComponent.Health.ToString( "0" ))%</label>
                 <label class="name">@Player.DisplayName</label>
@@ -156,6 +155,8 @@
 
     bool Friendly => Viewer.IsValid() && Viewer.IsFriendly( Player );
 
+    private bool IsFullyVisible => FullyVisible( Player.WorldPosition, Player.WorldPosition + Vector3.Up * 72f, Player.GameObject );
+
     private bool CanShowWeapon( Equipment equipment )
     {
         if ( equipment.Resource.Slot == EquipmentSlot.Melee ) return false;
@@ -179,7 +180,8 @@
             Marker?.IsOffScreen,
             Friendly,
             LookingAt,
-            HideTeammateNames
+            HideTeammateNames,
+            Friendly && IsFullyVisible
         );
     }
 }

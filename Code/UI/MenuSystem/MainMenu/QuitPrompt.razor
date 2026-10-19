@@ -3,6 +3,7 @@
 
 @namespace Facepunch.UI
 @inherits Panel
+@implements IPadScope
 @attribute [StyleSheet]
 
 @*
@@ -18,7 +19,7 @@
     {
         <div class="qp-backdrop" onclick=@((e) => { e.StopPropagation(); Close(); }) />
 
-        <div class="qp-modal">
+        <div class="qp-modal" @ref="Modal">
             <div class="qp-topbar" />
 
             <div class="qp-head">
@@ -44,7 +45,7 @@
             </div>
 
             <div class="qp-foot">
-                <div class="qp-btn" onclick=@Close><label>@Tr( "CANCEL" )</label></div>
+                <div class="qp-btn" @ref="CancelButton" onclick=@Close><label>@Tr( "CANCEL" )</label></div>
             </div>
         </div>
     }
@@ -53,6 +54,26 @@
 @code
 {
     public bool IsOpen { get; private set; }
+
+    // The pad (PadNavigation): over the menu, starting on CANCEL; B cancels.
+    private Panel Modal { get; set; }
+    private Panel CancelButton { get; set; }
+
+    public override void Tick()
+    {
+        base.Tick();
+        if ( IsOpen && Modal.IsValid() ) PadNavigation.Offer( Modal, this, 100 );
+    }
+
+    public Panel PadFirstFocus => CancelButton;
+
+    public bool PadBack()
+    {
+        Close();
+        return true;
+    }
+
+    public bool PadTab( int direction ) => false;
 
     public void Open()
     {

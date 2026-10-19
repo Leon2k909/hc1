@@ -117,6 +117,46 @@ public partial class PlayerBody : Component
 		_sprintPose.Apply( Renderer, gun, _sprintPoseBlend, handToWeaponOverride: mount );
 	}
 
+	/// <summary>A pistol is held out towards arm's length: its back 14 units in front of the eye (EyeOnGun's buttToEye).</summary>
+	private const float PistolEyeBehindGrip = -14f;
+
+	private readonly ThirdPersonPronePose _pronePose = new();
+	private readonly ThirdPersonPronePose _firstPersonPronePose = new();
+	private SkinnedModelRenderer _firstPersonRenderer;
+
+	/// <summary>
+	/// Lay the body out on the floor under the camera, and the first-person legs with it, so they can be seen lying
+	/// there (PlayerPawn.Prone.cs). Only living, animated bodies: a ragdoll has its own pose.
+	/// </summary>
+	internal void ApplyPronePose()
+	{
+		if ( !Player.IsValid() || Player.ProneBlend <= 0f || !Player.HealthComponent.IsValid()
+			|| Player.HealthComponent.State != LifeState.Alive ) return;
+
+		var eye = Player.ProneEyeTarget;
+		var ground = Player.WorldPosition.z;
+		if ( Renderer.IsValid() && Renderer.UseAnimGraph && !(Physics.IsValid() && Physics.Enabled) )
+		{
+			_pronePose.Apply( Renderer, Player.ProneBlend, Player.SupineBlend, Player.ProneYaw, eye, ground,
+				Player.ProneCrawlBlend, Player.ProneCrawlPhase );
+			// A gun comes up to the eye, as a prone shooter holds it; the reload keeps its own hands.
+			var equipment = Player.CurrentEquipment;
+			var gun = equipment?.WorldModel;
+			var hold = equipment.IsValid() ? equipment.GetHoldType() : AnimationHelper.HoldTypes.None;
+			if ( gun.IsValid() && gun.Active && !gun.UseTabletPose
+				&& hold is AnimationHelper.HoldTypes.Rifle or AnimationHelper.HoldTypes.Shotgun or AnimationHelper.HoldTypes.Pistol
+				&& equipment.Components.Get<Reloadable>( FindMode.EnabledInSelfAndDescendants )?.IsReloading != true )
+				_pronePose.ShoulderGun( Renderer, gun, eye, Player.EyeAngles.Forward, Player.ProneBlend,
+					hold == AnimationHelper.HoldTypes.Pistol ? PistolEyeBehindGrip : LightweightCombatBot.ButtToEye );
+		}
+
+		if ( !FirstPersonBody.IsValid() || !FirstPersonBody.Active ) return;
+		if ( !_firstPersonRenderer.IsValid() ) _firstPersonRenderer = FirstPersonBody.GetComponent<SkinnedModelRenderer>();
+		if ( _firstPersonRenderer.IsValid() && _firstPersonRenderer.UseAnimGraph )
+			_firstPersonPronePose.Apply( _firstPersonRenderer, Player.ProneBlend, Player.SupineBlend, Player.ProneYaw, eye, ground,
+				Player.ProneCrawlBlend, Player.ProneCrawlPhase );
+	}
+
 	internal void ApplySlidePose()
 	{
 		if ( !Player.IsValid() || Player.SlideBlend <= 0f || !Player.HealthComponent.IsValid() || Player.HealthComponent.State != LifeState.Alive

@@ -65,11 +65,16 @@ public static class WeaponProgression
 	public static void AddXP( EquipmentResource resource, int amount )
 	{
 		if ( amount <= 0 || resource is null ) return;
-		var next = Math.Min( GetXP( resource ) + amount, GetXPForLevel( MaxLevel ) );
+		var xp = GetXP( resource );
+		var next = Math.Min( xp + amount, GetXPForLevel( MaxLevel ) );
 		var nextMax = Math.Min( GetLifetimeXP( resource ) + amount, GetXPForLevel( MaxLevel ) );
 		
 		Game.Cookies.Set( CookieKey( resource ), next );
 		Game.Cookies.Set( MaxCookieKey( resource ), nextMax );
+
+		// A new level can unlock a saved part, which the gun then fits (Gunsmith.AttachmentUnlocks).
+		if ( GetLevelForXP( next ) != GetLevelForXP( xp ) )
+			Gunsmith.GunsmithLoadoutManager.MarkChanged();
 	}
 
 	private static string CookieKey( EquipmentResource resource )

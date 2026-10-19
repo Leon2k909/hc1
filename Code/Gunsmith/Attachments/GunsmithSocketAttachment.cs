@@ -22,6 +22,7 @@ public sealed class GunsmithSocketAttachment : GunsmithAttachment, ICameraSetup
 	private SkinnedModelRenderer weaponRenderer;
 	private WeaponModel weaponModel;
 	private Transform? socketOffset;
+	private bool? followsCamera;
 
 	protected override void OnInitialize()
 	{
@@ -30,6 +31,7 @@ public sealed class GunsmithSocketAttachment : GunsmithAttachment, ICameraSetup
 
 		// World-model prefabs receive their loadout before their root is enabled.
 		weaponRenderer = AttachmentPoint.GetComponentInParent<SkinnedModelRenderer>( true );
+		followsCamera = null;
 		weaponModel = AttachmentPoint.GetComponentInParent<WeaponModel>( true );
 		if ( weaponRenderer.IsValid() && weaponRenderer.Model is not null
 			&& ModelVariants is not null && ModelVariants.TryGetValue( weaponRenderer.Model.Name, out var variant ) && variant is not null )
@@ -48,6 +50,8 @@ public sealed class GunsmithSocketAttachment : GunsmithAttachment, ICameraSetup
 	// Follow the viewmodel after camera setup moves it this frame.
 	void ICameraSetup.PostSetup( CameraComponent cc )
 	{
+		// A world model doesn't move in camera setup, and its parts move with it (GunsmithMw22Attachment.OnViewModel).
+		if ( !(followsCamera ??= GunsmithMw22Attachment.OnViewModel( weaponRenderer )) ) return;
 		GunsmithMw22Attachment.FollowingCamera = true;
 		try { FollowSocket(); }
 		finally { GunsmithMw22Attachment.FollowingCamera = false; }

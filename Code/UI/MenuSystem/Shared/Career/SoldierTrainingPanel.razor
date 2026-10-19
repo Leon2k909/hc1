@@ -1,0 +1,51 @@
+@namespace Facepunch.UI
+@using System.Globalization
+@inherits Panel
+@attribute [StyleSheet]
+
+<root>
+    <div class="training-heading">
+        <label class="training-title">@Tr( "SOLDIER TRAINING" )</label>
+        <label class="training-description">@Tr( "Improve through practice. Training stays with you through every life and prestige." )</label>
+    </div>
+    <div class="training-cards">
+        @foreach ( var skill in Enum.GetValues<SoldierSkill>() )
+        {
+            var xp = SoldierTraining.GetXP( skill );
+            var level = SoldierTrainingRules.LevelForXP( xp );
+            var endurance = skill == SoldierSkill.Endurance;
+            <div class="training-card">
+                <div class="skill-heading">
+                    <i>@(endurance ? "directions_run" : "gps_fixed")</i>
+                    <label class="skill-name">@Tr( endurance ? "ENDURANCE" : "WEAPON HANDLING" )</label>
+                    <label class="skill-level">@Tr( "LEVEL {0}", level ) <span>/ @SoldierTrainingRules.MaxLevel</span></label>
+                </div>
+                <label class="skill-description">@Tr( endurance ? "Sprint on the ground to build endurance." : "Practice firing and land enemy hits to improve handling." )</label>
+                <div class="skill-progress"><div class="skill-progress-fill" style="width: @(Percent( SoldierTrainingRules.LevelProgress( xp ) ))%;" /></div>
+                <label class="skill-xp">@(level == SoldierTrainingRules.MaxLevel ? Tr( "MAXIMUM LEVEL REACHED" ) : Tr( "{0} XP TO LEVEL {1}", SoldierTrainingRules.XPToNextLevel( xp ).ToString( "N0" ), level + 1 ))</label>
+                <div class="skill-benefits">
+                    @if ( endurance )
+                    {
+                        <div class="benefit"><label>@Tr( "SPRINT DURATION" )</label><label class="benefit-value">+@(Percent( SoldierTrainingRules.SprintCapacityScale( xp ) - 1f ))%</label></div>
+                        <div class="benefit"><label>@Tr( "STAMINA RECOVERY" )</label><label class="benefit-value">+@(Percent( SoldierTrainingRules.RecoveryScale( xp ) - 1f ))%</label></div>
+                    }
+                    else
+                    {
+                        <div class="benefit"><label>@Tr( "RECOIL" )</label><label class="benefit-value">−@(Percent( 1f - SoldierTrainingRules.RecoilScale( xp ) ))%</label></div>
+                        <div class="benefit"><label>@Tr( "WEAPON SWAY" )</label><label class="benefit-value">−@(Percent( 1f - SoldierTrainingRules.SwayScale( xp ) ))%</label></div>
+                        <div class="benefit"><label>@Tr( "AIM / RELOAD TIME" )</label><label class="benefit-value">−@(Percent( 1f - SoldierTrainingRules.AimTimeScale( xp ) ))%</label></div>
+                    }
+                </div>
+                <label class="skill-cap">@Tr( endurance ? "Maximum: 20% longer sprints and 15% faster recovery." : "Maximum: 12% less recoil, 15% less sway and 10% shorter aim and reload times." )</label>
+            </div>
+        }
+    </div>
+</root>
+
+@code
+{
+    private static string Percent( float fraction ) => (fraction * 100f).ToString( "0.#", CultureInfo.InvariantCulture );
+
+    protected override int BuildHash() => HashCode.Combine(
+        SoldierTraining.GetXP( SoldierSkill.Endurance ), SoldierTraining.GetXP( SoldierSkill.Handling ), GameText.Current );
+}

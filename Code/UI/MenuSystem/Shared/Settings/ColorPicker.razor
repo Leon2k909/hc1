@@ -37,20 +37,9 @@
     <ColorSlider Value:bind="@Value" />
 
     <div class="channels layout padding gap align-center">
-        <div class="channel layout padding with-background flex center space-between">
-            <label class="small slight">@Tr( "Red" )</label>
-            <TextEntry Value:bind="@Red" />
-        </div>
-
-        <div class="channel layout padding with-background flex center space-between">
-            <label class="small slight">@Tr( "Green" )</label>
-            <TextEntry Value:bind="@Green" />
-        </div>
-
-        <div class="channel layout padding with-background flex center space-between">
-            <label class="small slight">@Tr( "Blue" )</label>
-            <TextEntry Value:bind="@Blue" />
-        </div>
+        <ColorChannel class="channel layout padding with-background flex center space-between" Label=@(Tr( "Red" )) Value:bind="@Red" />
+        <ColorChannel class="channel layout padding with-background flex center space-between" Label=@(Tr( "Green" )) Value:bind="@Green" />
+        <ColorChannel class="channel layout padding with-background flex center space-between" Label=@(Tr( "Blue" )) Value:bind="@Blue" />
     </div>
 
 </root>

@@ -91,7 +91,17 @@ public sealed class RainPuddles
 		public Decal Decal;
 		public RealTimeSince SinceShown;
 		public bool Shown;
+		/// <summary> The coverage and alpha last written to its decal. </summary>
+		public float Coverage, Alpha;
+		public bool Written;
 	}
+
+	/// <summary>
+	/// How far a puddle's fill or fade has to move before its decal is written again: a quarter of one of its height map's
+	/// 255 steps, and half a step of an 8-bit colour. Both drift a little every frame while it fills or drains.
+	/// </summary>
+	private const float CoverageStep = 1f / 1024f;
+	private const float AlphaStep = 1f / 512f;
 
 	private readonly Dictionary<(int X, int Y), Site> _cells = new();
 	private readonly List<Site> _sites = new();
@@ -423,8 +433,18 @@ public sealed class RainPuddles
 			var far = 1f - RainView.SmoothStep( FadeFrom, Range, distance );
 			var coverage = MathF.Min( fill, 0.97f );
 			var alpha = fadeIn * far * look;
-			site.Decal.CoverageAmount = coverage;
-			site.Decal.ColorTint = Color.White.WithAlpha( alpha );
+			if ( !site.Written || MathF.Abs( coverage - site.Coverage ) > CoverageStep || MathF.Abs( alpha - site.Alpha ) > AlphaStep )
+			{
+				site.Written = true;
+				site.Coverage = coverage;
+				site.Alpha = alpha;
+				site.Decal.CoverageAmount = coverage;
+				site.Decal.ColorTint = Color.White.WithAlpha( alpha );
+			}
+
+			// The rings go by the water as it's drawn.
+			coverage = site.Coverage;
+			alpha = site.Alpha;
 
 			// The decal's height test passes a texel once it's over 1 - CoverageAmount (Decals.hlsl).
 			var threshold = (int)MathF.Ceiling( (1f - coverage) * 255f );

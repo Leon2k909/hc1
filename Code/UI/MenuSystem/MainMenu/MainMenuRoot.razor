@@ -3,6 +3,7 @@
 @using Sandbox.UI.Navigation;
 
 @inherits NavigationHost
+@implements IPadScope
 @namespace Facepunch.UI
 
 <root class="main-menu-root">
@@ -74,7 +75,7 @@
         <PartyPanel />
 
         <div class="gnav-right">
-            <div class="gnav-round-btns">
+            <div class="gnav-round-btns" @ref="RoundButtons">
                 <div class="gnav-round-btn @(_openMenu == HeaderMenu.More ? "open" : "")" @onclick=@(() => ToggleMenu( HeaderMenu.More ))>
                     <i>grid_view</i>
                     <label class="gnav-tip">@Tr( "MORE" )</label>
@@ -90,7 +91,7 @@
 
                 @if ( _openMenu == HeaderMenu.More )
                 {
-                    <div class="gnav-dropdown">
+                    <div class="gnav-dropdown" @ref="Dropdown">
                         <div class="gnav-menu-item" @onclick=@OpenTheater>
                             <i>theaters</i>
                             <label>@Tr( "THEATER" )</label>
@@ -148,7 +149,7 @@
     @if ( _openMenu != HeaderMenu.None )
     {
         @* Clicking anywhere else closes the open menu. *@
-        <div class="gnav-dismiss" @onclick=@CloseMenu />
+        <div class="gnav-dismiss pad-skip" @onclick=@CloseMenu />
     }
 
     @* ── Pages render here ─────────────────────────────────────── *@
@@ -170,6 +171,12 @@
     /// </summary>
     public static string PendingRoute { get; set; }
 
+    /// <summary>
+    /// A message to show in a dialog as soon as the menu is up, in English (translated when it's shown): why a match sent
+    /// the player back here, e.g. <see cref="LobbyInputGuard"/>'s.
+    /// </summary>
+    public static string PendingNotice { get; set; }
+
     // Track the current page route so nav items can highlight correctly.
     public string ActiveRoute { get; private set; } = "/";
 
@@ -177,6 +184,7 @@
     {
         CustomGameSettings.Reset();
         Instance = this;
+        _menuScope = new PadScope { First = () => Dropdown, Back = () => { CloseMenu(); return true; } };
         DefaultUrl = "/";
         AddDestination( "/",            typeof( HubPage ) );
         AddDestination( "/ranked",      typeof( RankedPage ) );
@@ -203,11 +211,17 @@
         => routes.Any( r => ActiveRoute.Equals( r, System.StringComparison.OrdinalIgnoreCase ) );
 
     // ── Controller tab navigation ──────────────────────────────
-    // Ordered list of navigable top-level routes (Gunsmith skipped — it loads a separate scene).
+    // The header's tabs in order, for LB / RB. WEAPONS is the gunsmith, which loads its own scene; its LB / RB step back
+    // out to PLAY and OPERATORS (GunsmithPanel.NavTabs).
+    private const string GunsmithRoute = "gunsmith";
+
     private static readonly string[] ControllerNavRoutes =
     {
         "/",
+        GunsmithRoute,
         "/operators",
+        "/ranked",
+        "/new",
         "/barracks",
         "/lobbies",
         "/store",
@@ -220,19 +234,23 @@
         return 0;
     }
 
-    private void NavPrev()
+    private void NavPrev() => NavTo( (GetCurrentNavIndex() - 1 + ControllerNavRoutes.Length) % ControllerNavRoutes.Length );
+
+    private void NavNext() => NavTo( (GetCurrentNavIndex() + 1) % ControllerNavRoutes.Length );
+
+    private void NavTo( int index )
     {
-        var idx = (GetCurrentNavIndex() - 1 + ControllerNavRoutes.Length) % ControllerNavRoutes.Length;
-        this.Navigate( ControllerNavRoutes[idx] );
+        Sound.Play( "sounds/ui/menu/ui_nav_tab.sound" );
+
+        var route = ControllerNavRoutes[index];
+        if ( route == GunsmithRoute )
+            OpenGunsmith();
+        else
+            this.Navigate( route );
     }
 
-    private void NavNext()
-    {
-        var idx = (GetCurrentNavIndex() + 1) % ControllerNavRoutes.Length;
-        this.Navigate( ControllerNavRoutes[idx] );
-    }
-
-    private bool _lbWasDown, _rbWasDown;
+    // Down at the start, so a bumper still held from the gunsmith's LB / RB doesn't step on again as the menu comes up.
+    private bool _lbWasDown = true, _rbWasDown = true;
 
     public override void Tick()
     {
@@ -244,17 +262,30 @@
             if ( !CurrentUrlMatches( route ) )
                 this.Navigate( route );
         }
+        if ( PendingNotice is { } notice )
+        {
+            PendingNotice = null;
+            DialogModal.Show( Tr( notice ), Tr( "OK" ), null );
+        }
         ResponsiveLayout.Update( this );
+
+        // The pad (PadNavigation): the header and the page are one area, with the page's own scope inside this one.
+        PadNavigation.Offer( this, this );
+        if ( _openMenu != HeaderMenu.None && RoundButtons.IsValid() )
+            PadNavigation.Offer( RoundButtons, _menuScope, 40 );
+
         // The full-size header needs about 1900 units, so anything narrower than a 16:9 screen tightens it up.
         SetClass( "tight-nav", Box.Rect.Size.x * ScaleFromScreen < 1900 );
-        if ( !Input.UsingController ) return;
 
-        // Use raw shoulder button tracking so no action bindings are needed
+        // LB / RB are the weapon-switch actions. Tracked even off the controller, so the first press steps at once.
         var lbDown = Input.Down( "PrevSlot" );
         var rbDown = Input.Down( "NextSlot" );
 
-        if ( lbDown && !_lbWasDown ) NavPrev();
-        if ( rbDown && !_rbWasDown ) NavNext();
+        if ( Input.UsingController )
+        {
+            if ( lbDown && !_lbWasDown ) NavPrev();
+            if ( rbDown && !_rbWasDown ) NavNext();
+        }
 
         _lbWasDown = lbDown;
         _rbWasDown = rbDown;
@@ -271,6 +302,29 @@
     }
 
     private void CloseMenu() => _openMenu = HeaderMenu.None;
+
+    // ── Pad (PadNavigation) ────────────────────────────────────
+    // The page offers its own scope inside this one, so B, LT and RT ask the page first. Left to the root, B goes back to
+    // the hub, and on the hub it's Escape: the quit prompt.
+    private Panel RoundButtons { get; set; }
+    private Panel Dropdown { get; set; }
+
+    /// <summary> An open header menu: the round buttons and the menu under them, which B closes. </summary>
+    private PadScope _menuScope;
+
+    /// <summary> The page's first control, for a page that doesn't pick one. </summary>
+    public Panel PadFirstFocus => CurrentPanel;
+
+    public bool PadBack()
+    {
+        if ( IsActive( "/" ) ) return false;
+
+        Sound.Play( "ui_button_press" );
+        this.Navigate( "/" );
+        return true;
+    }
+
+    public bool PadTab( int direction ) => false;
 
     private void OpenTheater()
     {

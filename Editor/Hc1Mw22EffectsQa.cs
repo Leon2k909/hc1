@@ -48,12 +48,22 @@ public static class Hc1Mw22EffectsQa
 				scene.EditorTick(.02f,.02f);
 				var mount=point.CurrentGameObject.Components.Get<GunsmithMw22Attachment>();mount.RefreshMount();
 				var start=mount.WorldTransform.PointToWorld(mount.LaserEmitter);
-				beam.BeamColor=mount.LaserColor;beam.BeamWidth=mount.LaserWidth;
-				beam.TraceBeam(start,mount.WorldRotation.Forward,root);
+				beam.BeamColor=mount.LaserColor;
+				beam.TraceBeam(start,mount.WorldRotation.Forward,root,camera);
 				if(!beam.HasHit || MathF.Abs(beam.End.x-158)>.05f)throw new Exception($"laser {id} missed wall: {beam.End} hit={beam.HasHit}");
+				if(!beam.IsVisible)throw new Exception($"laser {id} drew no spot on the wall");
 				using var bmp=new Bitmap(1400,800);camera.RenderToBitmap(bmp);File.WriteAllBytes(Path.Combine(Folder,$"laser-{id}.png"),bmp.ToPng());
 				report.Add($"PASS laser {id}: emitter={start} colour={beam.BeamColor} wall hit={beam.End}");
-				beam.TraceBeam(start,Vector3.Backward,root);
+				// The laser is fixed to the gun: it goes where it's pointed, raised or lowered.
+				foreach ( var pitch in new[] { -1f, -5f, -15f, -45f, 15f, 45f } )
+				{
+					var forward = Rotation.FromPitch( pitch ).Forward;
+					beam.TraceBeam( start, forward, root, camera );
+					if ( (beam.End - start).Normal.Dot( forward ) < .99999f )
+						throw new Exception( $"laser {id} left its direction with the gun pitched {pitch} degrees" );
+				}
+				report.Add( $"PASS laser {id}: raised/lowered weapon directions" );
+				beam.TraceBeam(start,Vector3.Backward,root,camera);
 				if(beam.HasHit || MathF.Abs(beam.Start.Distance(beam.End)-beam.Range)>.05f)throw new Exception("no-hit range/dot");
 				beam.Hide();if(beam.IsVisible || beam.HasHit)throw new Exception("hide leaves beam/dot");
 			}

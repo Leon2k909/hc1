@@ -49,7 +49,7 @@
                 <label class="value @( drone.LowBattery ? "danger" : "" )">@((int)MathF.Ceiling( drone.Battery * 100f ))%</label>
             </div>
             <div class="battery @( drone.LowBattery ? "danger" : "" )">
-                <div class="fill" style="width: @Percent( drone.Battery );" />
+                <div class="fill" @ref="BatteryFill" />
             </div>
             <label class="value small">@Clock( drone.Battery * drone.BatterySeconds )</label>
         </div>
@@ -195,10 +195,20 @@
         }
     }
 
+    /// The battery's bar drains smoothly, so its width is set here rather than rebuilding the display for it.
+    private Panel BatteryFill { get; set; }
+    private float _batteryWidth = float.NaN;
+
     public override void Tick()
     {
         var drone = Drone;
         if ( !drone.IsValid() ) return;
+
+        if ( BatteryFill.IsValid() && drone.Battery * 100f != _batteryWidth )
+        {
+            _batteryWidth = drone.Battery * 100f;
+            BatteryFill.Style.Width = Length.Percent( _batteryWidth );
+        }
 
         // The rate of climb, smoothed: the altitude comes in a frame at a time.
         var altitude = drone.AltitudeMetres;
@@ -267,9 +277,64 @@
         return $"{whole / 60}:{whole % 60:00}";
     }
 
+    /// Values as the display rounds them, so a frame that would draw the same doesn't rebuild it.
+    private static int Tenths( float value ) => (int)MathF.Round( value * 10f, MidpointRounding.AwayFromZero );
+    private static int Whole( float value ) => (int)MathF.Round( value, MidpointRounding.AwayFromZero );
+    private static int Seconds( float seconds ) => Math.Max( 0, (int)MathF.Ceiling( seconds ) );
+
+    protected override void OnAfterTreeRender( bool firstTime ) => _batteryWidth = float.NaN;
+
     protected override int BuildHash()
     {
-        if ( Drone.IsValid() ) return HashCode.Combine( Time.Now );
+        if ( Drone is { } drone && drone.IsValid() )
+        {
+            // Everything the flight display shows, as it shows it. The tape and the boxes are what the last Tick laid
+            // out, which is also what the markup draws.
+            var hash = new HashCode();
+            hash.Add( drone );
+            hash.Add( SignalBars );
+            hash.Add( RecBlink );
+            hash.Add( Seconds( (1f - drone.Battery) * drone.BatterySeconds ) );
+            hash.Add( Seconds( drone.Battery * drone.BatterySeconds ) );
+            hash.Add( (int)MathF.Ceiling( drone.Battery * 100f ) );
+            hash.Add( drone.LowBattery );
+            hash.Add( (int)MathF.Round( Heading ) % 360 );
+
+            hash.Add( HeadingMarks.Count );
+            foreach ( var mark in HeadingMarks )
+            {
+                hash.Add( Tenths( mark.x ) );
+                hash.Add( mark.label );
+            }
+
+            hash.Add( Contacts.Count );
+            foreach ( var contact in Contacts )
+            {
+                hash.Add( (int)MathF.Round( contact.x * 100000f ) );
+                hash.Add( (int)MathF.Round( contact.y * 100000f ) );
+                hash.Add( Whole( contact.z ) );
+            }
+
+            hash.Add( Tenths( drone.AltitudeMetres ) );
+            hash.Add( VerticalSpeed >= 0f );
+            hash.Add( Tenths( MathF.Abs( VerticalSpeed ) ) );
+            hash.Add( Tenths( drone.SpeedMetres ) );
+            hash.Add( Whole( DistanceMetres ) );
+
+            foreach ( var step in drone.AvailableZoomSteps )
+            {
+                hash.Add( Whole( step ) );
+                hash.Add( MathF.Abs( step - drone.Zoom ) < 0.01f );
+            }
+
+            hash.Add( Whole( -drone.GimbalPitch ) );
+            hash.Add( Tenths( drone.HorizontalFieldOfView ) );
+            hash.Add( Warning );
+            hash.Add( WarningClass );
+            hash.Add( drone.State == ReconOctocopter.FlightState.Landed && drone.Battery > 0f );
+            return hash.ToHashCode();
+        }
+
         if ( !HoldingStation ) return 0;
         var own = ReconTabletLink.OwnDrone( Pawn, Pawn.CurrentEquipment?.Resource?.ResourcePath );
         return HashCode.Combine( own.IsValid(), own.IsValid() ? (int)(own.Battery * 100f) : 0, ReconTabletLink.SinceRefused < 2f );

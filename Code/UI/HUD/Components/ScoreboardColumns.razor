@@ -1,0 +1,26 @@
+@using System;
+@using Sandbox.UI;
+
+@namespace Facepunch.UI
+@inherits Panel
+
+<root class="scoreboard-columns">
+    <label class="col placement">#</label>
+    <label class="col playername">@Tr( "Player" )</label>
+    @foreach ( var column in Columns )
+    {
+        <label class="col stat @(column == "Points" ? "score-value" : column == "Balance" ? "balance-value" : "")" tooltip=@(Tr( column ))>@Tr( column )</label>
+    }
+</root>
+
+@code
+{
+    public IReadOnlyList<string> Columns { get; set; } = Array.Empty<string>();
+
+    protected override int BuildHash()
+    {
+        var hash = new HashCode();
+        foreach ( var column in Columns ) hash.Add( column );
+        return hash.ToHashCode();
+    }
+}

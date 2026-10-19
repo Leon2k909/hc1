@@ -40,7 +40,7 @@ public struct FlashExposure
 /// a child of the camera, which win over the camera's own), with the frame the flash lit screened over it as an
 /// afterimage and the flash's own spot burnt in if it was in view. The sharpness comes back last. With less of its
 /// light in the eyes (further off, looking away) the white is fainter and shorter, and there's less blur or none.</para>
-/// <para>Hearing: muffled (a DSP on the master mixer) and ringing. Balance: the blast upsets the inner ear, so the view
+/// <para>Hearing: deafened (<see cref="Deafness"/>: the world goes quiet and dull, then comes back) and ringing. Balance: the blast upsets the inner ear, so the view
 /// swims (<see cref="RollDegrees"/>), the aim wanders (<see cref="SwayDegrees"/>), the eyes don't focus (more blur) and
 /// every gait is slower (<see cref="MoveSpeedScale"/>).</para>
 /// </remarks>
@@ -200,9 +200,11 @@ public sealed class FlashbangEffect : Component
 	private static float WhiteFade( float strength ) => 0.4f + 2.2f * strength;
 	private static float BlurTime( float strength ) => 1f + 5f * strength;
 	private static float GlareTime( float strength ) => 1.5f + 4.5f * strength;
-	private static float DeafTime( float strength ) => 0.3f + 0.7f * strength;
-	private static float MuffleTime( float strength ) => 1.5f + 4f * strength;
-	private static float RingTime( float strength ) => 2f + 5f * strength;
+	// Hearing: next to nothing for 2 s at 6 ft, coming back over 8 s, the ringing over 10 s. A real threshold shift
+	// lasts minutes; this is its worst, when footsteps and gunfire nearby are lost.
+	private static float DeafTime( float strength ) => 0.4f + 1.6f * strength;
+	private static float MuffleTime( float strength ) => 2f + 6f * strength;
+	private static float RingTime( float strength ) => 2.5f + 7.5f * strength;
 	private static float DazeHold( float strength ) => 0.6f * strength;
 	private static float DazeTime( float strength ) => 1.5f + 3.5f * strength;
 
@@ -494,21 +496,7 @@ public sealed class FlashbangEffect : Component
 	private void UpdateHearing()
 	{
 		var muffle = Muffle;
-		if ( muffle > 0.005f )
-		{
-			if ( _muffle is null && Mixer.Master is not null )
-			{
-				_muffle = new DspProcessor( "weird.4" );
-				Mixer.Master.AddProcessor( _muffle );
-			}
-
-			if ( _muffle is not null )
-				_muffle.Mix = muffle;
-		}
-		else
-		{
-			RemoveMuffle();
-		}
+		Deafness.Set( muffle > 0.005f ? muffle : 0f );
 
 		if ( _ring.IsValid() )
 			_ring.Volume = RingVolume;
@@ -520,17 +508,22 @@ public sealed class FlashbangEffect : Component
 			_ring.Stop( 0.1f );
 
 		_ring = SoundEffect is null ? null : Sound.Play( SoundEffect );
-		if ( _ring.IsValid() )
-			_ring.Volume = RingVolume;
+		if ( !_ring.IsValid() )
+			return;
+
+		// The ringing is in the ears, so the deafness (on the Game mixer) mustn't muffle it.
+		if ( Mixer.Master is not null )
+			_ring.TargetMixer = Mixer.Master;
+		_ring.Volume = RingVolume;
 	}
 
 	private void RemoveMuffle()
 	{
-		if ( _muffle is null )
-			return;
-
-		Mixer.Master?.RemoveProcessor( _muffle );
+		// A hotload can leave the old stock DSP on the master mixer.
+		if ( _muffle is not null )
+			Mixer.Master?.RemoveProcessor( _muffle );
 		_muffle = null;
+		Deafness.Set( 0f );
 	}
 
 	protected override void OnDisabled()

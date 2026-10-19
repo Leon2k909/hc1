@@ -22,8 +22,11 @@ public sealed class ThirdPersonSlidePose
 	internal static Transform HipSpace( Transform root, Vector3 hips, float blend )
 	{
 		blend = blend.Clamp( 0f, 1f );
-		var position = Vector3.Lerp( root.PointToLocal( hips ), new Vector3( -5f, -2f, 13f ), blend );
-		return root.ToWorld( new Transform( position, Rotation.From( -10f * blend, 0f, -8f * blend ) ) );
+		var weight = blend * blend * (3f - 2f * blend);
+		// Sit onto the right hip, with the shoulders leaning back over the trailing arm.
+		// The old shallow tilt left the character looking like a crouch hovering above the ground.
+		var position = Vector3.Lerp( root.PointToLocal( hips ), new Vector3( -3f, -4f, 10f ), weight );
+		return root.ToWorld( new Transform( position, Rotation.From( -27f * weight, 0f, -15f * weight ) ) );
 	}
 
 	/// <summary>Solve a knee without changing either segment's length, even when a target is out of reach.</summary>
@@ -55,15 +58,18 @@ public sealed class ThirdPersonSlidePose
 		Transform root, float blend, bool tucked, out Transform solvedUpper, out Transform solvedLower, out Transform solvedFoot )
 	{
 		blend = blend.Clamp( 0f, 1f );
-		var ankle = root.PointToWorld( tucked ? new Vector3( 9f, 8f, 4f ) : new Vector3( 27f, -6f, 4f ) );
+		var weight = blend * blend * (3f - 2f * blend);
+		var ankle = root.PointToWorld( tucked ? new Vector3( 11f, 10f, 5f ) : new Vector3( 25f, -7f, 4f ) );
 		var animatedBend = lower.Position - upper.Position;
-		var pole = Vector3.Lerp( animatedBend, root.Rotation * (tucked ? new Vector3( 0f, 12f, 18f ) : new Vector3( 0f, 0f, 20f )), blend );
+		// Spread the tucked knee sideways while the straight leg stays low instead of popping up
+		// between the crouch and the full extension.
+		var pole = Vector3.Lerp( animatedBend, root.Rotation * (tucked ? new Vector3( 2f, 14f, 13f ) : new Vector3( 0f, -6f, 7f )), weight );
 		// Feet keep their rig's own axes; tip the extended boot's toe up and turn the tucked boot out.
-		var rotation = root.Rotation * Rotation.From( tucked ? 0f : -25f * blend, tucked ? 25f * blend : 0f, 0f )
+		var rotation = root.Rotation * Rotation.From( tucked ? 0f : -17f * weight, tucked ? 18f * weight : 0f, 0f )
 			* root.Rotation.Inverse * animatedFoot.Rotation;
 		// Anchor the transition to the animated ankle, rather than the ankle lowered with the torso.
 		// Otherwise the boots pass through the floor halfway into the slide.
-		SolveLeg( upper, lower, foot, Vector3.Lerp( animatedFoot.Position, ankle, blend ), pole, rotation,
+		SolveLeg( upper, lower, foot, Vector3.Lerp( animatedFoot.Position, ankle, weight ), pole, rotation,
 			out solvedUpper, out solvedLower, out solvedFoot );
 	}
 

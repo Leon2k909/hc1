@@ -28,9 +28,17 @@
 
     public Lobby? Lobby { get; set; }
 
-    private bool CanJoin => Lobby.HasValue && !Lobby.Value.IsFull;
+    // A controller-only or mouse-and-keyboard-only lobby takes only players on that input (LobbyInputRules).
+    private bool CanJoin => Lobby.HasValue && !Lobby.Value.IsFull && Lobby.Value.InputAllows;
 
-    private string JoinLabel => Tr( Lobby.HasValue && Lobby.Value.IsFull ? "Session Full" : "Join Session" );
+    private string JoinLabel
+    {
+        get
+        {
+            if ( Lobby.HasValue && !Lobby.Value.InputAllows ) return Tr( LobbyInputRules.Title( Lobby.Value.Input ) );
+            return Tr( Lobby.HasValue && Lobby.Value.IsFull ? "Session Full" : "Join Session" );
+        }
+    }
 
     private void Refresh()
     {
@@ -62,7 +70,7 @@
         if ( !Lobby.HasValue ) return;
 
         var lobby = Lobby.Value;
-        if ( lobby.IsFull ) return;
+        if ( lobby.IsFull || !lobby.InputAllows ) return;
 
         if ( await Networking.TryConnectSteamId( lobby.LobbyId ) )
 		{
@@ -86,5 +94,5 @@
     }
 
     // The selection arrives through the ServerBrowser binding, so rebuild the footer when it changes.
-    protected override int BuildHash() => HashCode.Combine( Lobby?.LobbyId, Lobby?.IsFull );
+    protected override int BuildHash() => HashCode.Combine( Lobby?.LobbyId, Lobby?.IsFull, Lobby?.InputAllows, GameText.Current );
 }

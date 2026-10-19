@@ -6,13 +6,14 @@
     view (OpticZoom.LensTexture) over the optic's glass, with the reticle, edge darkening and a thin rim.
 *@
 
-<root style="opacity: @(OpticZoom.ReflexSightVisible ? 1f : Alpha)">
+@* The opacity, the mount's place and the lens's size follow the sway every frame: Tick sets them, so only the dots rebuild this. *@
+<root>
     @if (OpticZoom.ReflexSightVisible)
     {
         <div class="reflex-dot dot"></div>
     }
-    <div class="mount" style="left: @(OffsetX)%; top: @(OffsetY)%; opacity: @(OpticZoom.ReflexSightVisible ? 0f : 1f);">
-        <div class="lens" @ref="Lens" style="width: @(LensWidthPercent)%; height: @(LensHeightPercent)%;">
+    <div class="mount" @ref="Mount">
+        <div class="lens" @ref="Lens">
             <MarkerSystem ScopeView="@(true)" />
             @if (OpticZoom.OverlayDotVisible)
             {
@@ -28,8 +29,13 @@
     /// <summary>Lens diameter as a fraction of screen height, matched to the optic's glass at the aim position.</summary>
     float Diameter => OpticZoom.LensDiameter;
 
+    Panel Mount { get; set; }
     Panel Lens { get; set; }
     Texture _bound;
+
+    // What was last set, so a steady scope doesn't restyle every frame.
+    float _opacity = float.NaN, _mountOpacity = float.NaN;
+    Vector2 _offset = new( float.NaN ), _size = new( float.NaN );
 
     // Fade only as the optic reaches/leaves the eye. Misalignment inside a raised scope is opaque black shadow.
     float Alpha => MathF.Round( OpticZoom.LensVisibility, 3 );
@@ -50,7 +56,52 @@
             _bound = texture;
             Lens.Style.SetBackgroundImage( texture );
         }
+
+        var reflex = OpticZoom.ReflexSightVisible;
+        var opacity = reflex ? 1f : Alpha;
+        if ( opacity != _opacity )
+        {
+            _opacity = opacity;
+            Style.Opacity = opacity;
+        }
+
+        if ( Mount is not null )
+        {
+            var offset = new Vector2( OffsetX, OffsetY );
+            if ( offset != _offset )
+            {
+                _offset = offset;
+                Mount.Style.Left = Length.Percent( offset.x );
+                Mount.Style.Top = Length.Percent( offset.y );
+            }
+
+            var mountOpacity = reflex ? 0f : 1f;
+            if ( mountOpacity != _mountOpacity )
+            {
+                _mountOpacity = mountOpacity;
+                Mount.Style.Opacity = mountOpacity;
+            }
+        }
+
+        if ( Lens is not null )
+        {
+            var size = new Vector2( LensWidthPercent, LensHeightPercent );
+            if ( size != _size )
+            {
+                _size = size;
+                Lens.Style.Width = Length.Percent( size.x );
+                Lens.Style.Height = Length.Percent( size.y );
+            }
+        }
     }
 
-    protected override int BuildHash() => HashCode.Combine( Alpha, LensWidthPercent, LensHeightPercent, OffsetX, OffsetY, OpticZoom.OverlayDotVisible, OpticZoom.ReflexSightVisible );
+    // A rebuild can make new panels (a hotload does), which start unstyled.
+    protected override void OnAfterTreeRender( bool firstTime )
+    {
+        _bound = null;
+        _opacity = _mountOpacity = float.NaN;
+        _offset = _size = new Vector2( float.NaN );
+    }
+
+    protected override int BuildHash() => HashCode.Combine( OpticZoom.OverlayDotVisible, OpticZoom.ReflexSightVisible );
 }

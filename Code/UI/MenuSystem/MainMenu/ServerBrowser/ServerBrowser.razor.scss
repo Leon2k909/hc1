@@ -190,6 +190,13 @@ ServerBrowser
 		&.full { color: $sb-warn; }
 	}
 
+	// Why a lobby for the other input can't be joined (LobbyInputRules).
+	.sb-detail-hint
+	{
+		font-size: 15px;
+		color: rgba( white, 0.6 );
+	}
+
 	// Capacity bar along the bottom edge of the Players stat.
 	.sb-bar
 	{

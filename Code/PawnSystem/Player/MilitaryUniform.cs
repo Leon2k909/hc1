@@ -7,6 +7,7 @@ public enum MilitaryUniformStyle { Standard, Field, Tactical, Desert, Militia }
 public sealed class MilitaryUniform : Component
 {
 	public const string HumanModelPath = "models/citizen_human/citizen_human_male.vmdl";
+	public const string FemaleHumanModelPath = "models/citizen_human/citizen_human_female.vmdl";
 	public const string LegacyPoliceModelPath = "models/player/ct_side/ct_side_player_01/ct_side_player_01_v2.vmdl";
 	public static readonly string[] ClothingPaths =
 	{
@@ -57,8 +58,8 @@ public sealed class MilitaryUniform : Component
 	public static bool IsLegacyModel( Model model ) => IsPoliceModel( model ) || IsFieldModel( model );
 	public static Model ResolveModel( Model model ) => IsLegacyModel( model ) ? Model.Load( HumanModelPath ) : model;
 	public static MilitaryUniformStyle StyleForTeam( Team team ) => team == Team.CounterTerrorist ? MilitaryUniformStyle.Standard : MilitaryUniformStyle.Field;
-	public static bool UsesHumanSkeleton( Model model ) => model?.Name == HumanModelPath;
-	private static Transform? humanWristAxesOffset;
+	public static bool UsesHumanSkeleton( Model model ) => model?.Name is HumanModelPath or FemaleHumanModelPath;
+	private static readonly Dictionary<Model, Transform> humanWristAxesOffsets = new();
 	public static Transform WeaponHandOffset( Model model )
 	{
 		var legacyOffset = LightweightCombatBot.HandHoldOffset;
@@ -66,22 +67,30 @@ public sealed class MilitaryUniform : Component
 		// World weapon prefabs were authored for the old hand socket, not the human rig's hold_R socket.
 		// Convert the wrist axes, not the bind-pose wrist positions: the two bodies have different arm lengths
 		// and rest poses. Their positional difference would push the grip out of the palm.
-		if ( humanWristAxesOffset is null )
+		if ( !humanWristAxesOffsets.TryGetValue( model, out var offset ) )
 		{
 			var oldHand = Model.Load( LegacyPoliceModelPath ).Bones.GetBone( "r_hand" ).LocalTransform;
 			var newHand = model.Bones.GetBone( "hand_R" ).LocalTransform;
-			humanWristAxesOffset = new Transform( Vector3.Zero, newHand.Rotation.Inverse * oldHand.Rotation ).ToWorld( legacyOffset );
+			offset = new Transform( Vector3.Zero, newHand.Rotation.Inverse * oldHand.Rotation ).ToWorld( legacyOffset );
+			humanWristAxesOffsets[model] = offset;
 		}
 		// The human rifle pose closes its fingers below the wrist. Seat the pistol grip in that palm.
-		return humanWristAxesOffset.Value.ToWorld( new Transform( new Vector3( 0f, 0f, 5f ) ) );
+		return offset.ToWorld( new Transform( new Vector3( 0f, 0f, 5f ) ) );
 	}
+	private static readonly Dictionary<Model, (Rotation Left, Rotation Right)> handIkAxesOffsets = new();
 	public static Transform HandIkTransform( Model model, string hand, Transform target )
 	{
 		if ( !UsesHumanSkeleton( model ) || (hand != "hand_left" && hand != "hand_right") ) return target;
-		var left = hand == "hand_left";
-		var oldBone = Model.Load( LegacyPoliceModelPath ).Bones.GetBone( left ? "l_hand" : "r_hand" );
-		var newBone = model.Bones.GetBone( left ? "hand_L" : "hand_R" );
-		return target.WithRotation( target.Rotation * oldBone.LocalTransform.Rotation.Inverse * newBone.LocalTransform.Rotation );
+		// Keep each body's offsets: mixed male/female matches must not repeat bone lookups every frame.
+		if ( !handIkAxesOffsets.TryGetValue( model, out var offsets ) )
+		{
+			var legacy = Model.Load( LegacyPoliceModelPath ).Bones;
+			offsets = (
+				legacy.GetBone( "l_hand" ).LocalTransform.Rotation.Inverse * model.Bones.GetBone( "hand_L" ).LocalTransform.Rotation,
+				legacy.GetBone( "r_hand" ).LocalTransform.Rotation.Inverse * model.Bones.GetBone( "hand_R" ).LocalTransform.Rotation );
+			handIkAxesOffsets[model] = offsets;
+		}
+		return target.WithRotation( target.Rotation * (hand == "hand_left" ? offsets.Left : offsets.Right) );
 	}
 
 	protected override void OnStart()
@@ -95,7 +104,7 @@ public sealed class MilitaryUniform : Component
 		var renderer = GetComponent<SkinnedModelRenderer>();
 		if ( !renderer.IsValid() || renderer.Model is null ) return;
 		if ( dressed && dressedModel == renderer.Model && dressedStyle == Style ) return;
-		if ( renderer.Model.Name != HumanModelPath ) return;
+		if ( !UsesHumanSkeleton( renderer.Model ) ) return;
 		if ( dressed ) new ClothingContainer().Reset( renderer );
 
 		var outfit = new ClothingContainer { PrefersHuman = true };

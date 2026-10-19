@@ -10,6 +10,8 @@ namespace Facepunch;
 /// </summary>
 public partial class HealthComponent : Component, IRespawnable//, Component.IDamageable
 {
+	private const float FriendlyBulletHealthFraction = 0.5f;
+
 	/// <summary>
 	/// Are we in god mode?
 	/// </summary>
@@ -100,10 +102,11 @@ public partial class HealthComponent : Component, IRespawnable//, Component.IDam
 		// kill outright. The battle royale's zone and burns only ever wear health down.
 		var hurt = damageInfo.Damage > 0f;
 		var bullet = isHardcore && hurt && IsBulletHit( damageInfo );
+		var friendlyBullet = hurt && IsFriendlySoldierBullet( damageInfo );
 		var lethal = hurt && damageInfo.WasExplosion && damageInfo.SeveredLimbs != BlastLimb.None;
-		if ( bullet )
+		if ( bullet && !friendlyBullet )
 			damageInfo = HardcoreBullet( damageInfo, gunDamage, out lethal );
-		else if ( isHardcore && hurt && (isHcBot || isHcBotAttackOnPlayer)
+		else if ( isHardcore && hurt && !friendlyBullet && (isHcBot || isHcBotAttackOnPlayer)
 			&& !damageInfo.Flags.HasFlag( DamageFlags.Zone ) && !damageInfo.Flags.HasFlag( DamageFlags.Burn ) )
 			lethal = true;
 
@@ -125,6 +128,16 @@ public partial class HealthComponent : Component, IRespawnable//, Component.IDam
 
 		if ( damageInfo.RemoveHelmet && armor is { HelmetsEnabled: true } )
 			armor.HasHelmet = false;
+
+		if ( friendlyBullet )
+		{
+			// Two unarmoured friendly bullet hits from full health, even to the head. Preserve the share blocked by armour,
+			// and never let the hardcore instant-kill roll turn an accidental first hit into a team kill.
+			lethal = false;
+			var totalDamage = damageInfo.Damage + damageInfo.ArmorDamage;
+			var unblocked = totalDamage > 0f ? Math.Clamp( damageInfo.Damage / totalDamage, 0f, 1f ) : 0f;
+			damageInfo = damageInfo with { Damage = MaxHealth * FriendlyBulletHealthFraction * unblocked };
+		}
 
 		BroadcastDamage( damageInfo );
 
@@ -151,6 +164,22 @@ public partial class HealthComponent : Component, IRespawnable//, Component.IDam
 		State = LifeState.Dead;
 
 		Kill( damageInfo );
+	}
+
+	/// <summary>Only bullets between different allied soldiers use the two-hit friendly-fire rule.</summary>
+	private bool IsFriendlySoldierBullet( DamageInfo damageInfo )
+	{
+		if ( !IsBulletHit( damageInfo ) || !damageInfo.Attacker.IsValid()
+			|| damageInfo.Attacker.GameObject.Root == GameObject.Root )
+			return false;
+
+		var team = GameUtils.GetTeamFromComponent( this );
+		if ( team == Team.Unassigned || team != GameUtils.GetTeamFromComponent( damageInfo.Attacker ) )
+			return false;
+
+		return (GameUtils.GetPlayerFromComponent( this ).IsValid() || GameUtils.GetLightweightBotFromComponent( this ).IsValid())
+			&& (GameUtils.GetPlayerFromComponent( damageInfo.Attacker ).IsValid()
+				|| GameUtils.GetLightweightBotFromComponent( damageInfo.Attacker ).IsValid());
 	}
 
 	/// <summary>

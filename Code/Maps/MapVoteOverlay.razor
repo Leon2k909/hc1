@@ -159,6 +159,15 @@
         StateHasChanged();
     }
 
+    // The pad (PadNavigation): the cards are the page. B is Escape (the pause menu), as on a keyboard.
+    private readonly PadScope _padScope = new();
+
+    protected override void OnUpdate()
+    {
+        base.OnUpdate();
+        if ( Panel is not null ) PadNavigation.Offer( Panel, _padScope );
+    }
+
     protected override int BuildHash()
     {
         var hash = new HashCode();

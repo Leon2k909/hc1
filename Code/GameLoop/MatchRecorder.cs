@@ -1,5 +1,6 @@
 using Sandbox.Diagnostics;
 using Sandbox.MovieMaker;
+using Sandbox.MovieMaker.Compiled;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,9 @@ namespace Facepunch;
 /// removed. The map isn't recorded: the sidecar names its MapInstance and playback loads it again. A living body
 /// records its anim graph's inputs, which playback runs through the same anim graph at full frame rate, and a dead one
 /// its ragdoll's key bones. Captures happen <see cref="SampleRate"/> times a second at the end of the frame, once its
-/// animation and physics are done, and the file is written on a worker thread after the match.
+/// animation and physics are done, and the file is written on a worker thread after the match, a life at a time
+/// (<see cref="TheaterReplays.WriteClip"/>). A soldier's first capture sets up its tracks, the costly part, so soldiers
+/// who spawn together are spread over a few captures (<see cref="AdmitWaiting"/>).
 /// </para>
 /// <para>
 /// What each soldier does with their guns goes in an actions file beside it (<see cref="TheaterReplays.Actions"/>), for
@@ -25,7 +28,7 @@ namespace Facepunch;
 /// anim graph's attack and reload triggers are spent by the end of the frame.
 /// </para>
 /// </summary>
-public sealed class MatchRecorder : Component, Component.ISceneStage
+public sealed partial class MatchRecorder : Component, Component.ISceneStage
 {
 	/// <summary> Settings → Game → Theater Recording, the player's own and on by default. </summary>
 	public static bool RecordingOff => GameSettingsSystem.Current is { } settings && !settings.TheaterRecording;
@@ -37,6 +40,10 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 	const float MinimumSeconds = 20f;
 
 	const float MaximumSeconds = 30f * 60f;
+
+		/// <summary> S&D's in-memory history, even when saving Theater matches is disabled. </summary>
+		const float ReplayBufferSeconds = 8f;
+		const float ReplayAfterKill = 0.35f;
 
 	/// <summary> How long recording carries on once the match is over. </summary>
 	const float EndDelay = 3f;
@@ -50,6 +57,12 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 	/// <summary> How often a body's anim graph is checked for parameters the game has started setting. </summary>
 	const float ParameterScanInterval = 2f;
 
+	/// <summary>
+	/// How long a capture can take before soldiers who've just spawned wait for the next one (one is always taken).
+	/// Setting up a soldier's tracks is the costly part of recording, and a round's respawn brings ten or more at once.
+	/// </summary>
+	const double AdmitBudgetMicroseconds = 3000;
+
 	/// <summary> Modes that aren't recorded: battle royale's map and field are too big, and zombies aren't soldiers. </summary>
 	static readonly string[] SkippedModes = { "battle_royale", "zombies" };
 
@@ -57,17 +70,34 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 	static MatchRecorder _active;
 
 	MovieRecorder _recorder;
+		MovieRecorder _replayRecorder;
+		RendererCapturer _rendererCapturer;
+		SkinnedCapturer _skinnedCapturer;
 	TheaterReplays.Info _info;
 	TheaterReplays.Actions _actions;
 
+		/// <summary> Only the current round's captured lives; the full Theater history stays separate. </summary>
+		readonly Dictionary<string, Soldier> _replaySoldiers = new();
+		float _replayRoundStart;
+		float _nextReplayTrim;
+
 	/// <summary> Each build code's index in the actions' <see cref="TheaterReplays.Actions.Builds"/>. </summary>
 	readonly Dictionary<string, int> _builds = new();
+
+	/// <summary>
+	/// The build index of each gun noted this capture: a respawn brings many soldiers holding the same guns, and a build
+	/// code reads dozens of cookies. Only for the capture, as nothing announces a build changing (a weapon level, a camo).
+	/// </summary>
+	readonly Dictionary<EquipmentResource, int> _buildsThisCapture = new();
+
 	double _startTime;
 	double _stopTime = -1;
 	int _frame = -1;
 	bool _restartPass;
-	bool _anyRestart;
 	bool _finished;
+
+	/// <summary> The soldier whose first capture this is (see <see cref="AdmitWaiting"/>), else null. </summary>
+	Soldier _admitting;
 
 	int _captures;
 	double _captureMicroseconds;
@@ -82,10 +112,23 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 	/// <summary> How many lives each name has had, for its tracks' names. </summary>
 	readonly Dictionary<string, int> _lives = new();
 
-	readonly Dictionary<Model, KeyBones> _keyBones = new();
-	readonly List<GameObject> _gone = new();
+	/// <summary> Soldiers found but not yet recorded, as <see cref="AdmitBudgetMicroseconds"/> allows, by their scope too. </summary>
+	readonly List<Soldier> _waiting = new();
+	readonly HashSet<GameObject> _waitingScopes = new();
 
-	public bool IsRecording => _recorder is not null && !_finished;
+	/// <summary> The soldiers whose blocks start again this capture (see <see cref="Restart"/>). </summary>
+	readonly List<Soldier> _restarting = new();
+
+	readonly Dictionary<Model, KeyBones> _keyBones = new();
+
+	/// <summary> Each anim graph's parameters of a type playback can set, found once: finding them throws for the rest. </summary>
+	readonly Dictionary<AnimationGraph, string[]> _graphParameters = new();
+
+	readonly List<GameObject> _gone = new();
+	readonly List<LightweightCombatBot> _bots = new();
+	readonly List<PlayerBody> _playerBodies = new();
+
+		public bool IsRecording => !_finished && (_recorder is not null || _replayRecorder is not null);
 
 	sealed class Soldier
 	{
@@ -100,17 +143,29 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 		public SkinnedModelRenderer Body;
 		public TheaterReplays.Soldier Entry;
 
+		/// <summary> What it's found as, for its <see cref="Entry"/>: "Bot" or "Player", its name, team and Steam ID. </summary>
+		public string Kind;
+		public string Name;
+		public Team Team;
+		public ulong SteamId;
+
 		public bool Named;
+			public bool ReplayNamed;
 		public bool Restart;
 		public GameObject LastParent;
 
 		public bool Settled;
 		public TimeUntil NextSettleCheck;
+
+		/// <summary> A dead body's key bones at this check and the last, swapped at each check. </summary>
+		public Vector3[] Pose;
 		public Vector3[] LastPose;
+		public bool HasLastPose;
 
 		public readonly List<string> Parameters = new();
 		public readonly HashSet<string> KnownParameters = new( StringComparer.OrdinalIgnoreCase );
 		public TimeUntil NextParameterScan;
+		public bool ScannedParameters;
 
 		public TheaterReplays.LifeActions Actions;
 
@@ -145,24 +200,22 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 
 	protected override void OnStart()
 	{
-		if ( !CanRecord( out var reason ) )
+			var theater = CanRecord( out var reason );
+			var mode = GetComponent<GameMode>();
+			var replay = mode?.Ident == "defuse" && !Application.IsHeadless;
+			if ( !theater && !replay )
 		{
 			Log.Info( $"Theater: not recording this match ({reason})." );
 			return;
 		}
 
-		var options = new MovieRecorderOptions( SampleRate )
-			.WithComponentCapturer( new RendererCapturer( this ) )
-			.WithComponentCapturer( new SkinnedCapturer( this ) )
-			.WithCaptureAction( CaptureSoldiers );
-
-		_recorder = new MovieRecorder( Scene, options );
+			_recorder = theater ? new MovieRecorder( Scene, CaptureOptions() ) : null;
+			_replayRecorder = replay ? new MovieRecorder( Scene, CaptureOptions( MovieTime.FromSeconds( ReplayBufferSeconds ) ) ) : null;
 		_startTime = Time.NowDouble;
 
-		var mode = GetComponent<GameMode>();
 		var sceneFile = Scene.Source as SceneFile;
 
-		_info = new TheaterReplays.Info
+			_info = theater ? new TheaterReplays.Info
 		{
 			Version = TheaterReplays.CurrentVersion,
 			Maps = Scene.GetAllComponents<MapInstance>()
@@ -180,13 +233,21 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 			Mode = mode?.Title,
 			ModeIdent = mode?.Ident,
 			RecordedBy = (ulong)Game.SteamId
-		};
+			} : null;
 
 		_actions = new TheaterReplays.Actions();
 		_active = this;
 
-		Log.Info( $"Theater: recording {_info.MapTitle} ({_info.Mode})." );
+			if ( theater )
+				Log.Info( $"Theater: recording {_info.MapTitle} ({_info.Mode})." );
+			else
+				Log.Info( "S&D: keeping an eight-second replay buffer; Theater saving is off." );
 	}
+
+		MovieRecorderOptions CaptureOptions( MovieTime? bufferDuration = null ) => new MovieRecorderOptions( SampleRate, bufferDuration )
+			.WithComponentCapturer( _rendererCapturer ??= new RendererCapturer( this ) )
+			.WithComponentCapturer( _skinnedCapturer ??= new SkinnedCapturer( this ) )
+			.WithCaptureAction( CaptureSoldiers );
 
 	bool CanRecord( out string reason )
 	{
@@ -211,7 +272,7 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 
 	void ISceneStage.End()
 	{
-		if ( _recorder is null || _finished )
+			if ( !IsRecording )
 			return;
 
 		var now = Time.NowDouble;
@@ -220,11 +281,22 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 		if ( _stopTime < 0 && (Facepunch.UI.EndOfMatchScreen.IsAnyVisible || MapVoteSystem.Instance.IsValid()) )
 			_stopTime = now + EndDelay;
 
-		if ( elapsed >= MaximumSeconds || (_stopTime >= 0 && now >= _stopTime) )
+			if ( _stopTime >= 0 && now >= _stopTime )
 		{
 			Finish();
 			return;
 		}
+
+			// Theater's file limit and preference must not turn off S&D's bounded in-match replays.
+			if ( _recorder is not null && (elapsed >= MaximumSeconds || RecordingOff) )
+			{
+				FinishTheaterRecording( save: !RecordingOff );
+				if ( _replayRecorder is null )
+				{
+					Finish();
+					return;
+				}
+			}
 
 		// Scene time can step back on a client while it syncs with the host: wait for it.
 		var frame = (int)(elapsed * SampleRate);
@@ -234,31 +306,53 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 		_frame = frame;
 
 		var timer = FastTimer.StartNew();
+		var time = frame / (float)SampleRate;
 
-		RefreshSoldiers( frame / (float)SampleRate );
+		_buildsThisCapture.Clear();
+		RefreshSoldiers( time );
 
-		_recorder.Advance( MovieTime.FromFrames( frame, SampleRate ) - _recorder.Time );
-		_recorder.Capture();
+			var movieTime = MovieTime.FromFrames( frame, SampleRate );
+			AdvanceAndCapture( _recorder, movieTime );
+			AdvanceAndCapture( _replayRecorder, movieTime );
 
 		// Soldiers whose blocks start again (see Restart) are left out of that capture and caught up a tick later: their
 		// recorders then see a capture they missed, finish their blocks and start new ones at the same frame.
-		if ( _anyRestart )
+		if ( _restarting.Count > 0 )
 		{
-			_recorder.Advance( MovieTime.Epsilon );
 			_restartPass = true;
-			_recorder.Capture();
+				AdvanceAndCapture( _recorder, movieTime + MovieTime.Epsilon );
+				AdvanceAndCapture( _replayRecorder, movieTime + MovieTime.Epsilon );
 			_restartPass = false;
-			_anyRestart = false;
 
-			foreach ( var soldier in _soldiers.Values )
+			foreach ( var soldier in _restarting )
 				soldier.Restart = false;
+
+			_restarting.Clear();
 		}
+
+		if ( _waiting.Count > 0 )
+			AdmitWaiting( time, timer );
+
+			if ( _recorder is null && time >= _nextReplayTrim )
+			{
+				_nextReplayTrim = time + 1f;
+				TrimReplayActions( MathF.Max( _replayRoundStart, time - ReplayBufferSeconds ) );
+			}
 
 		var micros = timer.ElapsedMicroSeconds;
 		_captures++;
 		_captureMicroseconds += micros;
 		_slowestCapture = Math.Max( _slowestCapture, micros );
 	}
+
+		static void AdvanceAndCapture( MovieRecorder recorder, MovieTime time )
+		{
+			if ( recorder is null )
+				return;
+
+			recorder.Advance( time - recorder.Time );
+			recorder.Capture();
+		}
 
 	/// <summary>
 	/// Starts a soldier's blocks again at this frame. Blocks blend between their samples, so this goes where the values
@@ -267,8 +361,11 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 	/// </summary>
 	void Restart( Soldier soldier )
 	{
+		if ( soldier.Restart )
+			return;
+
 		soldier.Restart = true;
-		_anyRestart = true;
+		_restarting.Add( soldier );
 	}
 
 	void RefreshSoldiers( float time )
@@ -292,19 +389,43 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 			_soldiers.Remove( scope );
 		}
 
-		foreach ( var bot in Scene.GetAllComponents<LightweightCombatBot>() )
-		{
-			var go = bot.GameObject;
-			if ( _soldiers.ContainsKey( go ) || !bot.IsAlive || go.Tags.Has( "dead" ) )
-				continue;
+		FindNewSoldiers();
 
-			AddSoldier( new Soldier { Root = go, Scope = go, Bot = bot }, "Bot", bot.BotName, bot.Team, 0, time );
+		foreach ( var soldier in _soldiers.Values )
+			UpdateSoldier( soldier, time );
+	}
+
+	/// <summary> Living bots and players' bodies that aren't recorded yet join <see cref="_waiting"/>. </summary>
+	void FindNewSoldiers()
+	{
+		// The bots' shared list of the living, else a search of the scene.
+		var bots = Scene.GetSystem<BotSystem>()?.AliveBots;
+		if ( bots is null )
+		{
+			_bots.Clear();
+			Scene.GetAll( _bots );
+			bots = _bots;
 		}
 
-		foreach ( var body in Scene.GetAllComponents<PlayerBody>() )
+		foreach ( var bot in bots )
+		{
+			if ( !bot.IsValid() )
+				continue;
+
+			var go = bot.GameObject;
+			if ( IsKnown( go ) || !bot.IsAlive || go.Tags.Has( "dead" ) )
+				continue;
+
+			Wait( new Soldier { Root = go, Scope = go, Bot = bot, Kind = "Bot", Name = bot.BotName, Team = bot.Team } );
+		}
+
+		_playerBodies.Clear();
+		Scene.GetAll( _playerBodies );
+
+		foreach ( var body in _playerBodies )
 		{
 			var go = body.GameObject;
-			if ( _soldiers.ContainsKey( go ) )
+			if ( IsKnown( go ) )
 				continue;
 
 			// Only bodies still on a living pawn: a ragdoll from before recording started isn't worth a track.
@@ -319,17 +440,66 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 			if ( client.IsBot && name.StartsWith( "BOT " ) )
 				name = name[4..];
 
-			AddSoldier( new Soldier { Root = pawn.GameObject, Scope = go, PlayerBody = body },
-				client.IsBot ? "Bot" : "Player", name, pawn.Team, client.IsBot ? 0 : client.SteamId, time );
+			Wait( new Soldier
+			{
+				Root = pawn.GameObject,
+				Scope = go,
+				PlayerBody = body,
+				Kind = client.IsBot ? "Bot" : "Player",
+				Name = name,
+				Team = pawn.Team,
+				SteamId = client.IsBot ? 0 : client.SteamId
+			} );
 		}
-
-		foreach ( var soldier in _soldiers.Values )
-			UpdateSoldier( soldier, time );
 	}
 
-	void AddSoldier( Soldier soldier, string kind, string name, Team team, ulong steamId, float time )
+	bool IsKnown( GameObject scope ) => _soldiers.ContainsKey( scope ) || _waitingScopes.Contains( scope );
+
+	void Wait( Soldier soldier )
 	{
-		name = string.IsNullOrWhiteSpace( name ) ? kind : name;
+		_waiting.Add( soldier );
+		_waitingScopes.Add( soldier.Scope );
+	}
+
+	/// <summary>
+	/// Records soldiers who've just spawned, players first (playback starts on the recording player's own), one capture of
+	/// their own each, for as long as this capture is within <see cref="AdmitBudgetMicroseconds"/>. The rest wait for the
+	/// next capture, and spawn that much later in the replay.
+	/// </summary>
+	void AdmitWaiting( float time, FastTimer timer )
+	{
+		var admitted = 0;
+
+		while ( _waiting.Count > 0 && (admitted == 0 || timer.ElapsedMicroSeconds < AdmitBudgetMicroseconds) )
+		{
+			var index = _waiting.FindIndex( x => x.Kind == "Player" );
+			var soldier = _waiting[Math.Max( index, 0 )];
+
+			_waiting.RemoveAt( Math.Max( index, 0 ) );
+			_waitingScopes.Remove( soldier.Scope );
+
+			// Gone or dead before its turn (rare: a few captures at most): its body may have left the objects its tracks
+			// would be named by.
+			if ( !soldier.Scope.IsValid() || !soldier.Root.IsValid() || soldier.IsDead() )
+				continue;
+
+			AddSoldier( soldier, time );
+			UpdateSoldier( soldier, time );
+
+			// Captures again at the same time: the soldiers already captured are skipped.
+			_admitting = soldier;
+				_recorder?.Capture();
+				_replayRecorder?.Capture();
+			_admitting = null;
+
+			admitted++;
+		}
+	}
+
+	void AddSoldier( Soldier soldier, float time )
+	{
+		var kind = soldier.Kind;
+		var name = string.IsNullOrWhiteSpace( soldier.Name ) ? kind : soldier.Name;
 
 		// "#n", not "(n)": the recorder treats "Name (2)" as another copy of "Name" and would reuse its track.
 		var key = $"{kind}: {name}";
@@ -341,9 +511,10 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 			Track = $"{key} #{life}",
 			Body = PathFrom( soldier.Root, soldier.FindBody()?.GameObject ),
 			Name = name,
-			Team = team,
+			Team = soldier.Team,
 			Bot = kind == "Bot",
-			SteamId = steamId,
+			SteamId = soldier.SteamId,
+				ObjectId = soldier.Root.Id,
 			Spawned = time
 		};
 
@@ -354,7 +525,7 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 		_actions.Lives[soldier.Entry.Track] = soldier.Actions;
 
 		_soldiers[soldier.Scope] = soldier;
-		_info.Soldiers.Add( soldier.Entry );
+			_info?.Soldiers.Add( soldier.Entry );
 	}
 
 	/// <summary> The names of the objects from <paramref name="root"/> down to <paramref name="go"/>, which are its tracks' names. </summary>
@@ -400,7 +571,7 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 		{
 			soldier.LastParent = parent;
 
-			if ( soldier.Named )
+				if ( soldier.Named || soldier.ReplayNamed )
 				Restart( soldier );
 		}
 
@@ -454,7 +625,7 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 			return;
 
 		var equipment = pawn.CurrentEquipment;
-		if ( equipment != soldier.Equipment || !actions.Held.Any() )
+		if ( equipment != soldier.Equipment || actions.Held.Count == 0 )
 		{
 			soldier.Equipment = equipment;
 			soldier.Reloadable = equipment.IsValid() ? equipment.GetComponentInChildren<Reloadable>() : null;
@@ -496,17 +667,20 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 
 	int BuildIndex( EquipmentResource resource )
 	{
+		if ( _buildsThisCapture.TryGetValue( resource, out var index ) )
+			return index;
+
 		var code = Facepunch.Gunsmith.GunsmithLoadoutManager.ExportWeaponBuildCode( resource );
 		if ( string.IsNullOrEmpty( code ) )
-			return -1;
-
-		if ( !_builds.TryGetValue( code, out var index ) )
+			index = -1;
+		else if ( !_builds.TryGetValue( code, out index ) )
 		{
 			index = _actions.Builds.Count;
 			_actions.Builds.Add( code );
 			_builds[code] = index;
 		}
 
+		_buildsThisCapture[resource] = index;
 		return index;
 	}
 
@@ -541,18 +715,27 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 
 		if ( bones is null || !sceneModel.IsValid() )
 		{
-			soldier.LastPose = null;
+			soldier.HasLastPose = false;
 			return;
 		}
 
-		var pose = new Vector3[bones.Indices.Length];
-		for ( var i = 0; i < pose.Length; i++ )
+		var count = bones.Indices.Length;
+		if ( soldier.Pose is null || soldier.Pose.Length != count )
+		{
+			soldier.Pose = new Vector3[count];
+			soldier.LastPose = new Vector3[count];
+			soldier.HasLastPose = false;
+		}
+
+		var pose = soldier.Pose;
+		for ( var i = 0; i < count; i++ )
 			pose[i] = sceneModel.GetBoneWorldTransform( bones.Indices[i] ).Position;
 
-		if ( soldier.LastPose is { } last && last.Length == pose.Length )
+		if ( soldier.HasLastPose )
 		{
+			var last = soldier.LastPose;
 			var moved = 0f;
-			for ( var i = 0; i < pose.Length; i++ )
+			for ( var i = 0; i < count; i++ )
 				moved = MathF.Max( moved, last[i].Distance( pose[i] ) );
 
 			if ( !soldier.Settled && moved <= SettleDistance )
@@ -566,7 +749,9 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 			}
 		}
 
+		soldier.Pose = soldier.LastPose;
 		soldier.LastPose = pose;
+		soldier.HasLastPose = true;
 	}
 
 	KeyBones GetKeyBones( Model model )
@@ -600,29 +785,93 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 		return keyBones;
 	}
 
-	/// <summary> The recorder's capture action: every soldier's renderers, and through them the objects above them. </summary>
+	/// <summary> The names of an anim graph's parameters playback can set, in the graph's order. </summary>
+	string[] GetGraphParameters( AnimationGraph graph )
+	{
+		if ( _graphParameters.TryGetValue( graph, out var names ) )
+			return names;
+
+		var supported = new List<string>();
+
+		for ( var i = 0; i < graph.ParamCount; i++ )
+		{
+			// Null (or out of the engine's table) for a type playback can't set.
+			Type type;
+			try { type = graph.GetParameterType( i ); }
+			catch ( IndexOutOfRangeException ) { type = null; }
+
+			if ( type is not null )
+				supported.Add( graph.GetParameterName( i ) );
+		}
+
+		names = supported.ToArray();
+		_graphParameters[graph] = names;
+
+		return names;
+	}
+
+	/// <summary>
+	/// The recorder's capture action: every soldier's renderers, and through them the objects above them. Only the
+	/// soldiers whose blocks restart in the restart pass, and only the one being admitted in its own capture.
+	/// </summary>
 	void CaptureSoldiers( MovieRecorder recorder )
 	{
+		if ( _admitting is not null )
+		{
+			CaptureSoldier( recorder, _admitting );
+			return;
+		}
+
+		if ( _restartPass )
+		{
+			foreach ( var soldier in _restarting )
+				CaptureSoldier( recorder, soldier );
+
+			return;
+		}
+
 		foreach ( var soldier in _soldiers.Values )
 		{
-			if ( soldier.Restart != _restartPass || !soldier.Scope.IsValid() )
-				continue;
-
-			if ( !soldier.Named )
-			{
-				// Makes the root's track first, under the soldier's name: its renderers' tracks go under it.
-				soldier.Named = true;
-				recorder.GetTrackRecorder( soldier.Root, soldier.Entry.Track );
-			}
-
-			CaptureRenderers( recorder, soldier.Scope );
-
-			// A bot's body once it has left the bot. Its tracks were made while it was the bot's, so they stay under the
-			// soldier's, and its Parent records the move.
-			var leaver = soldier.Leaver;
-			if ( leaver != soldier.Scope && !IsWithin( leaver, soldier.Scope ) )
-				CaptureRenderers( recorder, leaver );
+			if ( !soldier.Restart )
+				CaptureSoldier( recorder, soldier );
 		}
+	}
+
+		void CaptureSoldier( MovieRecorder recorder, Soldier soldier )
+	{
+		if ( !soldier.Scope.IsValid() )
+			return;
+
+			var replay = recorder == _replayRecorder;
+			if ( replay && soldier.Entry.Died >= 0f && soldier.Entry.Died < _replayRoundStart )
+				return;
+
+			if ( replay ? !soldier.ReplayNamed : !soldier.Named )
+		{
+				if ( !soldier.Root.IsValid() )
+					return;
+
+				// Each recorder must name the root explicitly before capturing any child. Sharing Named between them
+				// made the second recorder derive a different name from the live object.
+			recorder.GetTrackRecorder( soldier.Root, soldier.Entry.Track );
+				if ( replay )
+				{
+					soldier.ReplayNamed = true;
+					_replaySoldiers[soldier.Entry.Track] = soldier;
+				}
+				else
+				{
+					soldier.Named = true;
+				}
+		}
+
+		CaptureRenderers( recorder, soldier.Scope );
+
+		// A bot's body once it has left the bot. Its tracks were made while it was the bot's, so they stay under the
+		// soldier's, and its Parent records the move.
+		var leaver = soldier.Leaver;
+		if ( leaver != soldier.Scope && !IsWithin( leaver, soldier.Scope ) )
+			CaptureRenderers( recorder, leaver );
 	}
 
 	/// <summary>
@@ -654,7 +903,7 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 
 	void Finish()
 	{
-		if ( _recorder is null || _finished )
+			if ( _finished )
 			return;
 
 		_finished = true;
@@ -662,19 +911,39 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 		if ( _active == this )
 			_active = null;
 
-		var recorder = _recorder;
-		var info = _info;
-		var actions = _actions;
-		var seconds = (float)recorder.Time.TotalSeconds;
-
-		_recorder = null;
+			FinishTheaterRecording( save: !RecordingOff );
+			_replayRecorder = null;
+			_replaySoldiers.Clear();
 		_soldiers.Clear();
 		_bodies.Clear();
+		_waiting.Clear();
+		_waitingScopes.Clear();
+		_restarting.Clear();
+		}
+
+		void FinishTheaterRecording( bool save )
+		{
+			if ( _recorder is null )
+				return;
+
+			var recorder = _recorder;
+			var info = _info;
+			var actions = _actions;
+			var seconds = (float)recorder.Time.TotalSeconds;
+			_recorder = null;
+
+			// The worker owns the full recorder and sidecars from here. Continuing live replays get detached copies
+			// of only their recent state, so a later death or suppressed shot cannot mutate what is being saved.
+			if ( !_finished && _replayRecorder is not null )
+				DetachReplayMetadata( seconds );
 
 		var average = _captures > 0 ? _captureMicroseconds / _captures : 0;
 		Log.Info( $"Theater: stopped after {seconds:0}s. {_captures} captures, {average:0} us on average, {_slowestCapture:0} us at most." );
 
-		if ( seconds < MinimumSeconds )
+			if ( !save )
+				return;
+
+			if ( seconds < MinimumSeconds )
 		{
 			Log.Info( $"Theater: not saving a recording under {MinimumSeconds:0}s." );
 			return;
@@ -687,8 +956,9 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 	}
 
 	/// <summary>
-	/// Writes the recording, its actions, then its sidecar. Turning it into JSON takes the longest, so that and the writing
-	/// happen on a worker thread: nothing touches the recorder once recording has stopped.
+	/// Saves the replay on a worker thread (<see cref="Write"/>): nothing touches the recorder once recording has stopped.
+	/// None of it runs on the main thread, where a long match's recording, a hundred megabytes and more of JSON, would
+	/// stop the game for seconds.
 	/// </summary>
 	static async Task Save( MovieRecorder recorder, TheaterReplays.Info info, TheaterReplays.Actions actions )
 	{
@@ -696,42 +966,40 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 
 		try
 		{
-			FileSystem.Data.CreateDirectory( TheaterReplays.Folder );
-
-			string json;
-			try
-			{
-				json = await GameTask.RunInThreadAsync( () => Json.Serialize( recorder.ToClip() ) );
-			}
-			catch ( Exception e )
-			{
-				Log.Warning( $"Theater: couldn't save on a worker thread ({e.Message}), saving on the main thread." );
-				json = Json.Serialize( recorder.ToClip() );
-			}
-
-			await GameTask.RunInThreadAsync( () => FileSystem.Data.WriteAllText( TheaterReplays.MoviePath( id ), json ) );
-
-			// Without its actions a replay still plays, with an idle first-person gun.
-			try
-			{
-				var actionsJson = await GameTask.RunInThreadAsync( () => Json.Serialize( actions ) );
-				await GameTask.RunInThreadAsync( () => FileSystem.Data.WriteAllText( TheaterReplays.ActionsPath( id ), actionsJson ) );
-			}
-			catch ( Exception e )
-			{
-				Log.Warning( $"Theater: couldn't save the replay's actions: {e.Message}" );
-			}
-
-			FileSystem.Data.WriteJson( TheaterReplays.InfoPath( id ), info );
-
-			Log.Info( $"Theater: saved {id}: {info.Duration:0}s, {info.Soldiers.Count} lives, {json.Length / 1024} KB." );
-			TheaterReplays.Prune();
+			await GameTask.RunInThreadAsync( () => Write( id, recorder, info, actions ) );
+		}
+		catch ( TaskCanceledException )
+		{
+			// The game ended while it saved. The worker thread finished the job anyway: only waiting for it was cut short.
 		}
 		catch ( Exception e )
 		{
 			Log.Warning( $"Theater: couldn't save the replay: {e}" );
 			TheaterReplays.Delete( id );
 		}
+	}
+
+	/// <summary> Writes the recording, its actions, then its sidecar, and prunes the old replays. On a worker thread. </summary>
+	static void Write( string id, MovieRecorder recorder, TheaterReplays.Info info, TheaterReplays.Actions actions )
+	{
+		FileSystem.Data.CreateDirectory( TheaterReplays.Folder );
+
+		var bytes = TheaterReplays.WriteClip( TheaterReplays.MoviePath( id ), recorder.ToClip() );
+
+		// Without its actions a replay still plays, with an idle first-person gun.
+		try
+		{
+			FileSystem.Data.WriteAllText( TheaterReplays.ActionsPath( id ), Json.Serialize( actions ) );
+		}
+		catch ( Exception e )
+		{
+			Log.Warning( $"Theater: couldn't save the replay's actions: {e.Message}" );
+		}
+
+		FileSystem.Data.WriteJson( TheaterReplays.InfoPath( id ), info );
+
+		Log.Info( $"Theater: saved {id}: {info.Duration:0}s, {info.Soldiers.Count} lives, {bytes / 1024} KB." );
+		TheaterReplays.Prune();
 	}
 
 	/// <summary>
@@ -787,11 +1055,17 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 				CaptureBones( recorder, renderer );
 		}
 
-		static void CaptureParameters( IMovieTrackRecorder recorder, SkinnedModelRenderer renderer, Soldier soldier )
+		void CaptureParameters( IMovieTrackRecorder recorder, SkinnedModelRenderer renderer, Soldier soldier )
 		{
 			if ( soldier.NextParameterScan )
 			{
-				soldier.NextParameterScan = ParameterScanInterval;
+				// The first scan is at once. After it, each body keeps a phase of its own, so those that spawned together
+				// don't all scan in the same capture.
+				soldier.NextParameterScan = soldier.ScannedParameters
+					? ParameterScanInterval
+					: ParameterScanInterval * Game.Random.Float( 0.5f, 1.5f );
+
+				soldier.ScannedParameters = true;
 				ScanParameters( renderer, soldier );
 			}
 
@@ -805,22 +1079,13 @@ public sealed class MatchRecorder : Component, Component.ISceneStage
 		}
 
 		/// <summary> Only the parameters the game has set: the rest stay at the graph's defaults. </summary>
-		static void ScanParameters( SkinnedModelRenderer renderer, Soldier soldier )
+		void ScanParameters( SkinnedModelRenderer renderer, Soldier soldier )
 		{
 			if ( renderer.Parameters.Graph is not { } graph )
 				return;
 
-			for ( var i = 0; i < graph.ParamCount; i++ )
+			foreach ( var name in _owner.GetGraphParameters( graph ) )
 			{
-				// Null (or out of the engine's table) for a type playback can't set.
-				Type type;
-				try { type = graph.GetParameterType( i ); }
-				catch ( IndexOutOfRangeException ) { type = null; }
-
-				if ( type is null )
-					continue;
-
-				var name = graph.GetParameterName( i );
 				if ( soldier.KnownParameters.Contains( name ) || !renderer.Parameters.Contains( name ) )
 					continue;
 

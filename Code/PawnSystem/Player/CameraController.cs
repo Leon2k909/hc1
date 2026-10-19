@@ -28,7 +28,6 @@ public sealed class CameraController : PawnCameraController, IGameEventHandler<D
 	[Property] public PlayerPawn Player { get; set; }
 
 	[Property, Group( "Config" )] public bool ShouldViewBob { get; set; } = true;
-	[Property, Group( "Config" )] public float RespawnProtectionSaturation { get; set; } = 0.25f;
 
 	[Property] public float ThirdPersonDistance { get; set; } = 64f;
 	[Property] public float AimFovOffset { get; set; } = -5f;
@@ -207,8 +206,6 @@ public sealed class CameraController : PawnCameraController, IGameEventHandler<D
 		: GameSettingsSystem.Current.FieldOfView;
 
 	OpticZoom opticZoom;
-	bool fetchedInitial = false;
-	float defaultSaturation = 1f;
 
 	private void Update( float eyeHeight )
 	{
@@ -237,19 +234,6 @@ public sealed class CameraController : PawnCameraController, IGameEventHandler<D
 		if ( Player.HealthComponent.State == LifeState.Dead )
 		{
 			FieldOfViewOffset += AimFovOffset;
-		}
-
-		if ( ColorAdjustments.IsValid() )
-		{
-			if ( !fetchedInitial )
-			{
-				defaultSaturation = ColorAdjustments.Saturation;
-				fetchedInitial = true;
-			}
-
-			ColorAdjustments.Saturation = Player.HealthComponent.IsGodMode
-				? RespawnProtectionSaturation
-				: ColorAdjustments.Saturation.MoveToLinear( defaultSaturation, 1f );
 		}
 
 		ApplyRecoil();

@@ -58,6 +58,15 @@ canvas
     }
 }
 
+// The D-pad's focus (PadNavigation, Code/UI/Navigation): a ring round the control it's on. UIs that need another look
+// set their own .pad-focus.
+.pad-focus
+{
+    outline-width: 2px;
+    outline-color: #FF7A1A;
+    outline-offset: 2px;
+}
+
 .hidden {
     opacity: 0;
     pointer-events: none;

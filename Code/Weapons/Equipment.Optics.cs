@@ -48,18 +48,17 @@ public partial class Equipment
 	public bool TryGetOpticAim( out GunsmithPart optic )
 	{
 		optic = null;
+		// Asked several times a frame while aiming, so the weapon's points come from GunsmithAttachmentPoint's kept lists.
 		if ( ViewModel.IsValid() )
 		{
-			optic = ViewModel.Components.GetAll<GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants )
-				.FirstOrDefault( point => point.Category == GunsmithPartType.Optic )?.CurrentPart;
+			optic = GunsmithAttachmentPoint.First( ViewModel.GameObject, GunsmithPartType.Optic )?.CurrentPart;
 		}
 		else if ( Resource.IsValid() )
 		{
 			if ( ApplySavedAttachments )
 				GunsmithLoadoutManager.TryGetAttachment( Resource, GunsmithPartType.Optic, out optic );
 			else if ( Resource.ViewModelPrefab.IsValid() )
-				optic = Resource.ViewModelPrefab.Components.GetAll<GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants )
-					.FirstOrDefault( point => point.Category == GunsmithPartType.Optic )?.CurrentPart;
+				optic = GunsmithAttachmentPoint.First( Resource.ViewModelPrefab, GunsmithPartType.Optic )?.CurrentPart;
 		}
 
 		return optic.IsValid() && optic.OverrideAimOffset;
@@ -118,7 +117,17 @@ public partial class Equipment
 	{
 		if ( !ApplySavedAttachments || !Resource.IsValid() || !TryGetOpticAim( out var optic ) || !OpticTuning.IsTunable( optic ) )
 			return factory;
+		// Every pellet asks; the tune is a cookie, read again only when the loadout changes.
+		if ( GunsmithLoadoutManager.IsFittingBuild )
+			_sightZero = null;
+		else if ( _sightZero is { } kept && kept.Version == GunsmithLoadoutManager.Version && kept.Optic == optic )
+			return kept.Zero > 0 ? kept.Zero : factory;
 		var zero = GunsmithLoadoutManager.GetOpticZero( Resource, optic );
+		if ( !GunsmithLoadoutManager.IsFittingBuild )
+			_sightZero = (GunsmithLoadoutManager.Version, optic, zero);
 		return zero > 0 ? zero : factory;
 	}
+
+	/// <summary> <see cref="GetSightZero"/>'s tuned zero for the optic, and the loadout it was read for. </summary>
+	private (int Version, GunsmithPart Optic, int Zero)? _sightZero;
 }

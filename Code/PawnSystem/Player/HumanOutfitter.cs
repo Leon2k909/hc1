@@ -12,7 +12,16 @@ public sealed class HumanOutfitter : Component,
 
 	[Property] public PlayerPawn PlayerPawn { get; set; }
 	[Property] public SkinnedModelRenderer Renderer { get; set; }
+	// Retained for existing prefabs; playable character models now come from OperatorOutfits.
 	[Property, InlineEditor] public Dictionary<Team, TeamModelEntry> TeamBaseModels { get; set; } = new();
+
+	/// <summary>The host's selected character, retained in snapshots for players joining after the spawn.</summary>
+	[Sync( SyncFlags.FromHost ), Change( nameof( OnOutfitIdChanged ) )]
+	public string OutfitId { get; set; } = "";
+
+	protected override void OnStart() => ApplyOutfit();
+	protected override void OnEnabled() => ApplyOutfit();
+	private void OnOutfitIdChanged( string before, string after ) => ApplyOutfit();
 
 	void IGameEventHandler<TeamChangedEvent>.OnGameEvent( TeamChangedEvent eventArgs )
 	{
@@ -21,28 +30,29 @@ public sealed class HumanOutfitter : Component,
 
 	/// <summary>
 	/// Called to wear an outfit based off a team: the one the player equipped for it (<see cref="OperatorOutfits"/>).
-	/// The host picks it and every machine wears it. On a client it does nothing, as when this was itself the host-only
-	/// broadcast.
+		/// The host picks it and every machine wears the same model and uniform, including late joiners.
 	/// </summary>
 	public void UpdateFromTeam( Team team )
 	{
 		if ( !Networking.IsHost )
 			return;
 
-		Wear( team, OutfitFor( team ).Style );
+		OutfitId = OutfitFor( team ).Id;
+		// Respawning can reset the body without changing the equipped id.
+		ApplyOutfit();
 	}
 
-	[Rpc.Broadcast( NetFlags.HostOnly )]
-	private void Wear( Team team, MilitaryUniformStyle style )
+	private void ApplyOutfit()
 	{
-		if ( !TeamBaseModels.TryGetValue( team, out var model ) )
-		{
-			model = TeamBaseModels[Team.Terrorist];
-		}
+		if ( !Renderer.IsValid() ) return;
+		var outfit = OperatorOutfits.All.FirstOrDefault( x => x.Id == OutfitId );
+		if ( outfit is null ) return;
+		var model = Model.Load( outfit.ModelPath );
+		if ( model is null || model.IsError ) return;
 
-		MilitaryUniform.SetModel( Renderer, Game.Random.FromList( model.Models ), style );
+		MilitaryUniform.SetModel( Renderer, model, outfit.Style );
 		// A dead pawn's body has left it as a ragdoll.
-		if ( PlayerPawn.Body.IsValid() )
+		if ( PlayerPawn.IsValid() && PlayerPawn.Body.IsValid() && PlayerPawn.Body.Player.IsValid() )
 			PlayerPawn.Body.Refresh();
 	}
 

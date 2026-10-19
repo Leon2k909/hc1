@@ -1,6 +1,7 @@
 @namespace Facepunch.UI
 @using Facepunch.Gunsmith
 @inherits Panel
+@implements IPadScope
 @attribute [StyleSheet]
 
 @*
@@ -27,7 +28,7 @@
                     <label class="points-value">@points.ToString( "N0" )</label>
                     <label class="points-label">@Tr( "POINTS" )</label>
                 </div>
-                <div class="head-close" onclick=@Close><i>close</i></div>
+                <div class="head-close pad-target" onclick=@Close><i>close</i></div>
             </div>
 
             <div class="body">
@@ -37,7 +38,7 @@
                         @foreach ( var held in weapons )
                         {
                             var gun = held;
-                            <div class="weapon-tab @(gun == weapon ? "selected" : "")" onclick=@(() => SelectWeapon( gun ))>
+                            <div class="weapon-tab pad-target @(gun == weapon ? "selected" : "")" onclick=@(() => SelectWeapon( gun ))>
                                 <div class="tab-copy">
                                     <label class="tab-slot">@SlotAndLevel( gun.Resource )</label>
                                     <label class="tab-name">@gun.Resource.Name</label>
@@ -62,7 +63,7 @@
                     {
                         var current = CurrentPart( weapon.Resource, slot );
                         <div class="list-head">
-                            <div class="back" onclick=@Back><i>arrow_back</i></div>
+                            <div class="back pad-target" onclick=@Back><i>arrow_back</i></div>
                             <label class="list-title">@CategoryName( slot )</label>
                             <label class="list-count">@UnlockedLabel( weapon.Resource, slot )</label>
                         </div>
@@ -73,7 +74,7 @@
                                 var equipped = SamePart( part, current );
                                 var unlocked = part is null || AttachmentUnlocks.IsUnlocked( weapon.Resource, part );
                                 var picture = Picture( weapon, part );
-                                <div class="row part @(equipped ? "equipped" : "") @(!unlocked ? "locked" : "")" onclick=@(() => Fit( slot, part ))>
+                                <div class="row part pad-target @(equipped ? "equipped" : "") @(!unlocked ? "locked" : "")" onclick=@(() => Fit( slot, part ))>
                                     <div class="pic @(picture is not null ? "pictured" : "")">
                                         @if ( picture is not null )
                                         {
@@ -105,7 +106,7 @@
                                 var pick = category;
                                 var current = CurrentPart( weapon.Resource, pick );
                                 var picture = Picture( weapon, current );
-                                <div class="row slot @(current is not null ? "fitted" : "")" onclick=@(() => SelectSlot( pick ))>
+                                <div class="row slot pad-target @(current is not null ? "fitted" : "")" onclick=@(() => SelectSlot( pick ))>
                                     <div class="pic @(picture is not null ? "pictured" : "")">
                                         @if ( picture is not null )
                                         {
@@ -154,11 +155,11 @@
                         </div>
                         <label class="card-note">@Tr( "Plates take the hits before your health does." )</label>
                         <div class="buy-row">
-                            <div class="buy @(CanAfford( plateCost ) ? "" : "disabled")" onclick=@(() => Purchase( ZombiesWorkbenchItem.ArmorPlate, null, plateCost ))>
+                            <div class="buy pad-target @(CanAfford( plateCost ) ? "" : "disabled")" onclick=@(() => Purchase( ZombiesWorkbenchItem.ArmorPlate, null, plateCost ))>
                                 <label class="buy-label">@Tr( "+1 PLATE" )</label>
                                 <label class="buy-cost">@PriceText( plateCost )</label>
                             </div>
-                            <div class="buy @(CanAfford( fillCost ) ? "" : "disabled")" onclick=@(() => Purchase( ZombiesWorkbenchItem.ArmorFill, null, fillCost ))>
+                            <div class="buy pad-target @(CanAfford( fillCost ) ? "" : "disabled")" onclick=@(() => Purchase( ZombiesWorkbenchItem.ArmorFill, null, fillCost ))>
                                 <label class="buy-label">@Tr( "FILL VEST" )</label>
                                 <label class="buy-cost">@PriceText( fillCost )</label>
                             </div>
@@ -180,7 +181,7 @@
                                     <label class="item-name">@gun.Resource.Name</label>
                                     <label class="item-sub">@Tr( "{0} in the gun · {1} / {2} spare", ammo.Ammo, ammo.ReserveAmmo, ammo.GetMaxReserve() )</label>
                                 </div>
-                                <div class="buy small @(CanAfford( cost ) ? "" : "disabled")" onclick=@(() => Purchase( ZombiesWorkbenchItem.Ammo, gun, cost ))>
+                                <div class="buy small pad-target @(CanAfford( cost ) ? "" : "disabled")" onclick=@(() => Purchase( ZombiesWorkbenchItem.Ammo, gun, cost ))>
                                     <label class="buy-label">@Tr( "REFILL" )</label>
                                     <label class="buy-cost">@PriceText( cost )</label>
                                 </div>
@@ -189,7 +190,7 @@
                         @if ( weapons.Count > 1 )
                         {
                             var allCost = ZombiesBuyStation.AmmoAllCost( pawn );
-                            <div class="buy wide @(CanAfford( allCost ) ? "" : "disabled")" onclick=@(() => Purchase( ZombiesWorkbenchItem.AmmoAll, null, allCost ))>
+                            <div class="buy wide pad-target @(CanAfford( allCost ) ? "" : "disabled")" onclick=@(() => Purchase( ZombiesWorkbenchItem.AmmoAll, null, allCost ))>
                                 <label class="buy-label">@Tr( "REFILL ALL" )</label>
                                 <label class="buy-cost">@PriceText( allCost )</label>
                             </div>
@@ -215,7 +216,7 @@
                                 <label class="item-name">@(grenade?.Name ?? "HE Grenade")</label>
                                 <label class="item-sub">@Tr( blocked ?? "Throw it into a crowd" )</label>
                             </div>
-                            <div class="buy small @(CanAfford( grenadeCost ) ? "" : "disabled")" onclick=@(() => Purchase( ZombiesWorkbenchItem.Grenade, null, grenadeCost ))>
+                            <div class="buy small pad-target @(CanAfford( grenadeCost ) ? "" : "disabled")" onclick=@(() => Purchase( ZombiesWorkbenchItem.Grenade, null, grenadeCost ))>
                                 <label class="buy-label">@Tr( "BUY" )</label>
                                 <label class="buy-cost">@(blocked is null ? PriceText( ZombiesBuyStation.GrenadeCost ) : "—")</label>
                             </div>
@@ -327,6 +328,28 @@
         else Close();
     }
 
+    // ── Pad (PadNavigation) ──────────────────────────────────────
+    // B steps back (a slot's parts, then closed); LT and RT change the gun.
+    public Panel PadFirstFocus => null;
+
+    public bool PadBack()
+    {
+        Sound.Play( "ui_button_press" );
+        Back();
+        return true;
+    }
+
+    public bool PadTab( int direction )
+    {
+        var weapons = Weapons;
+        if ( weapons.Count < 2 ) return false;
+
+        var index = Math.Max( 0, weapons.IndexOf( SelectedWeapon ) );
+        SelectWeapon( weapons[(index + direction + weapons.Count) % weapons.Count] );
+        Sound.Play( "ui_nav_tab" );
+        return true;
+    }
+
     private void SelectWeapon( Equipment weapon )
     {
         if ( SelectedWeapon == weapon ) return;
@@ -377,6 +400,8 @@
                 SelectedWeapon = weapons.FirstOrDefault();
                 SelectedSlot = null;
             }
+
+            PadNavigation.Offer( this, this );
             return;
         }
 

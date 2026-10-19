@@ -63,7 +63,7 @@
                 <label class="th-time">@TimeLabel</label>
 
                 <div class="th-icon-btn" onclick=@(() => Controller.Skip( -10f ))><i>replay_10</i></div>
-                <div class="th-icon-btn play" onclick=@(() => Controller.TogglePause())><i>@PlayIcon</i></div>
+                <div class="th-icon-btn play pad-first" onclick=@(() => Controller.TogglePause())><i>@PlayIcon</i></div>
                 <div class="th-icon-btn" onclick=@(() => Controller.Skip( 10f ))><i>forward_10</i></div>
 
                 <div class="th-speeds">
@@ -176,12 +176,27 @@
             Instance = null;
     }
 
+    // The pad (PadNavigation): the D-pad starts on play and pause, LT and RT change the soldier followed, and B is Escape
+    // (back to the Theater page), as on a keyboard.
+    private PadScope _padScope;
+
     protected override void OnUpdate()
     {
         base.OnUpdate();
 
         // The key hints don't fit beside the controls on a narrow screen.
         Panel?.SetClass( "narrow", Screen.Width < 1500f );
+
+        if ( Panel is not null && Controller is not null )
+            PadNavigation.Offer( Panel, _padScope ??= new PadScope { Tab = PadNextPerson } );
+    }
+
+    private bool PadNextPerson( int direction )
+    {
+        if ( Controller is not { IsLoading: false, Error: null, IsFreecam: false } c ) return false;
+
+        c.NextPerson( direction );
+        return true;
     }
 
     protected override int BuildHash()

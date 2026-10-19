@@ -1,7 +1,7 @@
 namespace Facepunch;
 
 /// <summary>
-/// Cookie-based persistent player progression: level 1–100, XP that scales like CoD.
+/// Cookie-based persistent player progression: level 1–55, XP that scales like CoD.
 /// </summary>
 public static class Progression
 {
@@ -55,12 +55,13 @@ public static class Progression
 		{
 			Game.Cookies.Set( $"hc1.weapon.xp.{wep.ResourceName}", 0 );
 		}
+		Gunsmith.GunsmithLoadoutManager.MarkChanged();
 	}
 
 	/// <summary>Total accumulated XP stored in a cookie.</summary>
 	public static int GetXP() => Math.Max( 0, Game.Cookies.Get( XpCookie, 0 ) );
 
-	/// <summary>Current player level (1–100) derived from stored XP.</summary>
+	/// <summary>Current player level (1–55) derived from stored XP.</summary>
 	public static int GetLevel() => GetLevelForXP( GetXP() );
 
 	/// <summary>XP earned within the current level.</summary>
@@ -105,7 +106,7 @@ public static class Progression
 	public static void AddXP( int amount )
 	{
 		if ( amount <= 0 ) return;
-		var next = Math.Min( GetXP() + amount, GetXPForLevel( MaxLevel ) );
+		var next = (int)Math.Min( (long)GetXP() + amount, GetXPForLevel( MaxLevel ) );
 		Game.Cookies.Set( XpCookie, next );
 	}
 }

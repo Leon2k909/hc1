@@ -186,6 +186,10 @@ public static partial class GameUtils
 			return;
 		}
 
+		// A controller's left stick moves the pointer again and A clicks (s&box's virtual cursor). It's off in combat,
+		// where the stick moves the player, and nothing used to turn it back on: after the first match a controller
+		// couldn't move the pointer in any menu, the main menu's included.
+		Input.EnableVirtualCursor = true;
 		Mouse.Visible = true;
 		Mouse.CursorType = Input.Down( "Score" ) ? "default" : null;
 
@@ -436,7 +440,7 @@ public static partial class GameUtils
 		return Team.Unassigned;
 	}
 
-	private static readonly string[] MainMenuMapOrder = { "Refinery", "Flatgrass", "Depot", "Innocent Hotel", "Belltower", "Reef Hall", "Railhead", "Lowtide", "Boxyard", "Cerro Blanco", "Riverdale", "Ares", "Aesthetic Mall", "Orion" };
+	private static readonly string[] MainMenuMapOrder = { "Refinery", "Flatgrass", "Depot", "Innocent Hotel", "Belltower", "Reef Hall", "Railhead", "Lowtide", "Boxyard", "Cerro Blanco", "Riverdale", "Ares", "Collider", "Veridant", "Aesthetic Mall", "Orion" };
 
 	/// <summary>Maps currently excluded from quick play / lobby selection (work in progress).</summary>
 	private static readonly HashSet<string> DisabledMaps = new( StringComparer.OrdinalIgnoreCase )
@@ -472,7 +476,10 @@ public static partial class GameUtils
 			|| path.Contains( "scenes/maps/boxyard/boxyard.scene", StringComparison.OrdinalIgnoreCase )
 			|| path.Contains( "scenes/maps/cerroblanco/cerroblanco.scene", StringComparison.OrdinalIgnoreCase )
 			|| path.Contains( "scenes/maps/riverdale/riverdale.scene", StringComparison.OrdinalIgnoreCase )
+			|| path.Contains( "scenes/maps/spillway/spillway.scene", StringComparison.OrdinalIgnoreCase )
 			|| path.Contains( "scenes/maps/ares/ares.scene", StringComparison.OrdinalIgnoreCase )
+			|| path.Contains( "scenes/maps/collider/collider.scene", StringComparison.OrdinalIgnoreCase )
+			|| path.Contains( "scenes/maps/veridant/veridant.scene", StringComparison.OrdinalIgnoreCase )
 			|| path.Contains( "scenes/maps/orion/orion.scene", StringComparison.OrdinalIgnoreCase );
 	}
 
@@ -484,7 +491,8 @@ public static partial class GameUtils
 	public static bool IsMatchReadyMap( SceneFile map )
 	{
 		var path = map?.ResourcePath ?? "";
-		return path.Contains( "scenes/maps/flatgrass/flatgrass.scene", StringComparison.OrdinalIgnoreCase )
+		return path.Contains( "scenes/maps/spillway/spillway.scene", StringComparison.OrdinalIgnoreCase )
+			|| path.Contains( "scenes/maps/flatgrass/flatgrass.scene", StringComparison.OrdinalIgnoreCase )
 			|| path.Contains( "scenes/maps/innocenthotel/innocent_hotel.scene", StringComparison.OrdinalIgnoreCase )
 			|| path.Contains( "scenes/maps/belltower/belltower.scene", StringComparison.OrdinalIgnoreCase )
 			|| path.Contains( "scenes/maps/reefhall/reefhall.scene", StringComparison.OrdinalIgnoreCase )
@@ -494,6 +502,8 @@ public static partial class GameUtils
 			|| path.Contains( "scenes/maps/cerroblanco/cerroblanco.scene", StringComparison.OrdinalIgnoreCase )
 			|| path.Contains( "scenes/maps/riverdale/riverdale.scene", StringComparison.OrdinalIgnoreCase )
 			|| path.Contains( "scenes/maps/ares/ares.scene", StringComparison.OrdinalIgnoreCase )
+			|| path.Contains( "scenes/maps/collider/collider.scene", StringComparison.OrdinalIgnoreCase )
+			|| path.Contains( "scenes/maps/veridant/veridant.scene", StringComparison.OrdinalIgnoreCase )
 			|| path.Contains( "scenes/maps/orion/orion.scene", StringComparison.OrdinalIgnoreCase );
 	}
 

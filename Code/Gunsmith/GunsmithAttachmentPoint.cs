@@ -18,6 +18,75 @@ public partial class GunsmithAttachmentPoint : Component
 	public GunsmithPart CurrentPart { get; set; }
 
 	/// <summary>
+	/// Bumped when a point is made or destroyed, or given a part (<see cref="SetPart"/>, which ApplyAttachments also calls
+	/// on the points it makes once it has set their slot): the point lists <see cref="On"/> keeps, and what's worked out
+	/// from them, are good until then.
+	/// </summary>
+	public static int Version { get; private set; }
+
+	protected override void OnAwake() => Version++;
+
+	protected override void OnDestroy() => Version++;
+
+	private static readonly Dictionary<GameObject, (int Version, GunsmithAttachmentPoint[] Points)> Lists = new();
+
+	/// <summary>
+	/// Every point on <paramref name="root"/> and under it, disabled ones too, in the order
+	/// <c>Components.GetAll( FindMode.EverythingInSelfAndDescendants )</c> finds them. The list is kept until a point
+	/// changes (<see cref="Version"/>), so the per-frame mounting code doesn't walk the weapon's hierarchy every time.
+	/// </summary>
+	public static GunsmithAttachmentPoint[] On( GameObject root )
+	{
+		if ( !root.IsValid() ) return Array.Empty<GunsmithAttachmentPoint>();
+		if ( Lists.TryGetValue( root, out var kept ) && kept.Version == Version ) return kept.Points;
+		if ( Lists.Count > 256 )
+			foreach ( var dead in Lists.Keys.Where( x => !x.IsValid() ).ToList() ) Lists.Remove( dead );
+		var points = root.Components.GetAll<GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants ).ToArray();
+		Lists[root] = (Version, points);
+		return points;
+	}
+
+	/// <summary>
+	/// Whether <paramref name="root"/>'s optic slot, and its barrel or muzzle slot, hold a part that switches the weapon's
+	/// own bodygroups (<see cref="GunsmithPart.ModifyBodygroups"/>).
+	/// </summary>
+	public static (bool Optic, bool Muzzle) BodygroupParts( GameObject root )
+	{
+		var optic = false;
+		var muzzle = false;
+		foreach ( var point in On( root ) )
+		{
+			if ( !point.CurrentPart.IsValid() || !point.CurrentPart.ModifyBodygroups ) continue;
+			if ( point.Category == GunsmithPartType.Optic ) optic = true;
+			if ( point.Category is GunsmithPartType.Barrel or GunsmithPartType.Muzzle ) muzzle = true;
+		}
+		return (optic, muzzle);
+	}
+
+	private static readonly Dictionary<Model, bool> MuzzleGroups = new();
+
+	/// <summary>
+	/// Puts the weapon's factory "muzzle" bodygroup back, as the world model and the viewmodel do every frame while no
+	/// fitted part switches it. A model without the group is skipped: setting a group it hasn't got does nothing.
+	/// </summary>
+	internal static void ResetFactoryMuzzle( SkinnedModelRenderer renderer )
+	{
+		var model = renderer.Model;
+		if ( model is null ) return;
+		if ( !MuzzleGroups.TryGetValue( model, out var has ) )
+			MuzzleGroups[model] = has = model.Parts.Get( "muzzle" ) is not null;
+		if ( has ) renderer.SetBodyGroup( "muzzle", 0 );
+	}
+
+	/// <summary> The first point in <paramref name="category"/> on <paramref name="root"/> (<see cref="On"/>), or null. </summary>
+	public static GunsmithAttachmentPoint First( GameObject root, GunsmithPartType category )
+	{
+		foreach ( var point in On( root ) )
+			if ( point.Category == category ) return point;
+		return null;
+	}
+
+	/// <summary>
 	/// For weapons other than the M4 that take its MW22 parts: the bone the parts follow instead of the M4's
 	/// weapon_root. A weapon with this set has none of the M4's factory pieces to swap. A missing bone (e.g. on a
 	/// single-bone world model) mounts on the model itself.
@@ -63,10 +132,7 @@ public partial class GunsmithAttachmentPoint : Component
 	public float OpticRailShift { get; set; }
 
 	/// <summary>The fitted barrel's <see cref="GunsmithPart.MuzzleShift"/> on this weapon, zero for the factory barrel.</summary>
-	public static Vector3 MuzzleShift( GameObject weapon ) =>
-		weapon.Components.GetAll<GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants )
-			.FirstOrDefault( p => p.Category == GunsmithPartType.Barrel && p.CurrentPart.IsValid() )?.CurrentPart.MuzzleShift
-		?? Vector3.Zero;
+	public static Vector3 MuzzleShift( GameObject weapon ) => FittedBarrel( On( weapon ) )?.MuzzleShift ?? Vector3.Zero;
 
 	/// <summary>
 	/// Where the shots leave the fitted barrel, from the factory muzzle: its <see cref="GunsmithPart.MuzzleShift"/>, plus
@@ -74,11 +140,20 @@ public partial class GunsmithAttachmentPoint : Component
 	/// </summary>
 	public static Vector3 DischargeShift( GameObject weapon )
 	{
-		var points = weapon.Components.GetAll<GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants ).ToArray();
-		var barrel = points.FirstOrDefault( p => p.Category == GunsmithPartType.Barrel && p.CurrentPart.IsValid() )?.CurrentPart;
+		var points = On( weapon );
+		var barrel = FittedBarrel( points );
 		if ( !barrel.IsValid() ) return Vector3.Zero;
-		var device = points.Any( p => p.Category == GunsmithPartType.Muzzle && p.CurrentPart.IsValid() );
+		var device = false;
+		foreach ( var point in points )
+			device |= point.Category == GunsmithPartType.Muzzle && point.CurrentPart.IsValid();
 		return device ? barrel.MuzzleShift : barrel.MuzzleShift + barrel.TipShift;
+	}
+
+	private static GunsmithPart FittedBarrel( GunsmithAttachmentPoint[] points )
+	{
+		foreach ( var point in points )
+			if ( point.Category == GunsmithPartType.Barrel && point.CurrentPart.IsValid() ) return point.CurrentPart;
+		return null;
 	}
 
 	/// <summary>
@@ -87,6 +162,7 @@ public partial class GunsmithAttachmentPoint : Component
 	/// <param name="part"></param>
 	public void SetPart( GunsmithPart part )
 	{
+		Version++;
 		if ( CurrentGameObject.IsValid() )
 		{
 			CurrentGameObject.Components.Get<GunsmithAttachment>( FindMode.EverythingInSelf )?.Unequip();

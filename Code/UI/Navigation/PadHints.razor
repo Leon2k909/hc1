@@ -1,0 +1,54 @@
+@using Sandbox;
+@using Sandbox.UI;
+
+@namespace Facepunch.UI
+@inherits Panel
+@attribute [StyleSheet]
+
+@* The pad's buttons for a UI PadNavigation drives, shown while a controller is in use. *@
+
+<root class="pad-hints">
+    @if ( Input.UsingController )
+    {
+        <div class="ph-hint">
+            <InputHint Action=@PadNavigation.Up Size=@InputGlyphSize.Small />
+            <InputHint Action=@PadNavigation.Down Size=@InputGlyphSize.Small />
+            <label>@Tr( "MOVE" )</label>
+        </div>
+        @if ( Adjust )
+        {
+            <div class="ph-hint">
+                <InputHint Action=@PadNavigation.Left Size=@InputGlyphSize.Small />
+                <InputHint Action=@PadNavigation.Right Size=@InputGlyphSize.Small />
+                <label>@Tr( "ADJUST" )</label>
+            </div>
+        }
+        <div class="ph-hint">
+            <InputHint Action=@PadNavigation.Select Size=@InputGlyphSize.Small />
+            <label>@Tr( "SELECT" )</label>
+        </div>
+        @if ( !string.IsNullOrEmpty( TabsLabel ) )
+        {
+            <div class="ph-hint">
+                <InputHint Action=@PadNavigation.PrevTab Size=@InputGlyphSize.Small />
+                <InputHint Action=@PadNavigation.NextTab Size=@InputGlyphSize.Small />
+                <label>@Tr( TabsLabel )</label>
+            </div>
+        }
+        <div class="ph-hint">
+            <InputHint Action=@PadNavigation.Back Size=@InputGlyphSize.Small />
+            <label>@Tr( "BACK" )</label>
+        </div>
+    }
+</root>
+
+@code
+{
+    /// <summary> Whether left and right change settings here. </summary>
+    public bool Adjust { get; set; } = true;
+
+    /// <summary> What LT and RT step through, in English capitals ("CATEGORY"), or nothing for a UI without tabs. </summary>
+    public string TabsLabel { get; set; }
+
+    protected override int BuildHash() => HashCode.Combine( Input.UsingController, Adjust, TabsLabel, GameText.Current );
+}

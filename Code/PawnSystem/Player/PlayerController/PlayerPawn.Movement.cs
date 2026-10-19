@@ -137,8 +137,9 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 
 	private float _smoothEyeHeight;
 
-	// Keep the first-person body hidden until the camera clears it when standing up.
-	public bool HideFirstPersonBodyForStance => IsProne || _smoothEyeHeight < -18f;
+	// Keep the first-person body hidden until the camera clears it when standing up. Lying down it shows again, laid out
+	// under the camera, so the legs can be seen (PlayerPawn.Prone.cs).
+	public bool HideFirstPersonBodyForStance => (IsProne || _smoothEyeHeight < -18f) && ProneBlend < FirstPersonLegsBlend;
 	private Vector3 _previousVelocity;
 	private bool _isTouchingLadder;
 	private Vector3 _ladderNormal;
@@ -218,21 +219,28 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 			// Flying the recon octocopter, the mouse turns its camera and the head stays on the tablet.
 			if ( IsLocallyControlled && HealthComponent.State == LifeState.Alive && !IsPilotingDrone )
 			{
-				EyeAngles += Input.AnalogLook * AimDampening;
+					EyeAngles += Input.AnalogLook * AimDampening * (IsWeaponMounted ? 0.65f : 1f);
 				EyeAngles = EyeAngles.WithPitch( EyeAngles.pitch.Clamp( -90, 90 ) );
 			}
 
+			UpdateProneFacing();
 			CameraController.UpdateFromEyes( _smoothEyeHeight );
 		}
 
 		if ( Body.IsValid() )
 		{
 			WorldRotation = Rotation.From( 0, EyeAngles.yaw, 0 );
+			PlaceHeadForProne();
+			// Use synced movement for proxies, so a slide faces its actual travel direction
+			// even while the player is looking to the side or behind themselves.
+			var velocityForAnimation = (IsLocallyControlled && cc.IsValid()) ? cc.Velocity : SyncedVelocity;
 			var bodyRotation = IsPipeClimbing ? Rotation.LookAt( (PipeGripPosition - WorldPosition).WithZ( 0f ).Normal ) : Rotation.FromYaw( EyeAngles.yaw );
+			var slideDirection = velocityForAnimation.WithZ( 0f );
+			if ( SlideBlend > 0f && !IsProne && slideDirection.Length > 60f )
+				bodyRotation = Rotation.Lerp( bodyRotation, Rotation.LookAt( slideDirection.Normal ), SlideBlend );
 			Body.UpdateRotation( bodyRotation );
 
 			// Use synced data for remote players, local data for the owner
-			var velocityForAnimation = ( IsLocallyControlled && cc.IsValid() ) ? cc.Velocity : SyncedVelocity;
 			var isGroundedForAnimation = ( IsLocallyControlled && cc.IsValid() ) ? IsGrounded : SyncedIsGrounded;
 
 			foreach ( var helper in Body.AnimationHelpers )
@@ -242,12 +250,16 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 				// A slide holds its legs instead of playing a crouch run underneath the hip pose.
 				var slideWeight = helper.Target == Body.Renderer && !IsProne && !IsFallKnockedDown && !IsMantling && !IsPipeClimbing
 					? SlideBlend : 0f;
-				helper.WithVelocity( velocityForAnimation * (1f - slideWeight) );
-				helper.WithWishVelocity( WishVelocity * (1f - slideWeight) );
+				// Lying down (ThirdPersonPronePose) the legs lie straight out from a standing pose, not a crouch run.
+				var still = (1f - slideWeight) * (1f - ProneBlend);
+				helper.WithVelocity( velocityForAnimation * still );
+				helper.WithWishVelocity( WishVelocity * still );
 				helper.IsGrounded = isGroundedForAnimation;
 				helper.WithLook( EyeAngles.Forward );
 				helper.MoveStyle = AnimationHelper.MoveStyles.Run;
-				helper.DuckLevel = (MathF.Abs( _smoothEyeHeight ) / 32.0f).Clamp( 0f, 1f );
+					// The procedural slide bends the legs itself. Fading out the crouch clip
+					// prevents a crouch run from folding the torso underneath it.
+					helper.DuckLevel = (MathF.Abs( _smoothEyeHeight ) / 32.0f).Clamp( 0f, 1f ) * (1f - ProneBlend) * (1f - slideWeight);
 				helper.HoldType = CurrentHoldType;
 				helper.Handedness = CurrentEquipment.IsValid() ? CurrentEquipment.GetHandedness() : AnimationHelper.Hand.Both;
 			}
@@ -320,12 +332,13 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 		if ( IsProne ) cc.ApplyFriction( GetFriction(), MathF.Max( GetWishSpeed(), 1f ) );
 		else cc.ApplyFriction( GetFriction() );
 		cc.Move();
+		TrySlideOnLanding();
 	}
 
 	private bool WantsToggleSprint { get; set; }
 
 	private bool HasSprintMovement => WishMove.x > 0.2f || (MathF.Abs( WishMove.y ) > 0.2f && WishMove.x >= 0f);
-	private bool CanSprint => !IsMantling && !IsPipeClimbing && !IsFallKnockedDown && !IsSlowWalking && !IsProne && !IsCrouching && !IsSliding && !IsGettingUp && !HasEquipmentTag( "no_sprint" );
+	private bool CanSprint => !SprintExhausted && !IsMantling && !IsPipeClimbing && !IsFallKnockedDown && !IsSlowWalking && !IsProne && !IsCrouching && !IsSliding && !IsGettingUp && !HasEquipmentTag( "no_sprint" );
 
 	private bool GetWantsToSprint()
 	{
@@ -405,12 +418,12 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 			WantsToggleSprint = false;
 			IsSlowWalking = false;
 			IsUsing = false;
-			if ( IsSliding ) StopSlide();
+			StopSlide();
 			if ( wasSprinting ) OnSprintChanged( true, false );
 			if ( CharacterController.IsOnGround )
-				JumpFatigue = MathF.Max( 0f, JumpFatigue - JumpFatigueRecovery * Time.Delta );
+				JumpFatigue = MathF.Max( 0f, JumpFatigue - JumpFatigueRecovery * TrainingRecoveryScale * Time.Delta );
 			if ( ProneFatigue > 0f )
-				ProneFatigue = MathF.Max( 0f, ProneFatigue - ProneFatigueRecovery * Time.Delta );
+				ProneFatigue = MathF.Max( 0f, ProneFatigue - ProneFatigueRecovery * TrainingRecoveryScale * Time.Delta );
 			return;
 		}
 
@@ -490,10 +503,10 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 
 		// Jump fatigue only wears off with your feet on the ground.
 		if ( CharacterController.IsOnGround )
-			JumpFatigue = MathF.Max( 0f, JumpFatigue - JumpFatigueRecovery * Time.Delta );
+			JumpFatigue = MathF.Max( 0f, JumpFatigue - JumpFatigueRecovery * TrainingRecoveryScale * Time.Delta );
 
 		if ( ProneFatigue > 0f )
-			ProneFatigue = MathF.Max( 0f, ProneFatigue - ProneFatigueRecovery * Time.Delta );
+			ProneFatigue = MathF.Max( 0f, ProneFatigue - ProneFatigueRecovery * TrainingRecoveryScale * Time.Delta );
 
 		if ( CharacterController.IsOnGround && !IsFrozen && !gotUpWithJump )
 		{
@@ -870,7 +883,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 		// Tucked going over a ledge (PlayerPawn.Mantle.cs).
 		if ( IsMantling && HealthComponent.State == LifeState.Alive ) return MantleEyeOffset;
 		if ( IsSliding && HealthComponent.State == LifeState.Alive ) return SlideEyeOffset;
-		if ( IsProne ) return -40f;
+		if ( IsProne ) return ProneEyeOffset;
 		if ( IsCrouching ) return -16f;
 		if ( HealthComponent.State == LifeState.Dead ) return -48f;
 		return 0f;

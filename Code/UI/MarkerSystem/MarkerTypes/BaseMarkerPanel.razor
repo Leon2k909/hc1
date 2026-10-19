@@ -11,8 +11,38 @@
     public IMarkerObject Object => Marker.Object;
 
     /// <summary>
-    /// Settings → Game → Hide Teammate Names, on by default: a teammate's marker is only its circle, with no name,
-    /// health or weapons over it. Put it in BuildHash, so switching it redraws the markers.
+    /// Teammate names and details require an unobstructed view of the whole body.
+    /// The marker circle remains visible when any part of the teammate is behind cover.
     /// </summary>
     protected static bool HideTeammateNames => GameSettingsSystem.Current.HideTeammateNames;
+
+    private TimeSince _sinceVisibilityCheck = 1f;
+    private bool _fullyVisible;
+
+    protected bool FullyVisible( Vector3 feet, Vector3 head, GameObject target )
+    {
+        if ( _sinceVisibilityCheck < 0.1f ) return _fullyVisible;
+        _sinceVisibilityCheck = 0f;
+
+        var camera = (Parent as Marker)?.Parent as MarkerSystem;
+        var eye = camera?.ProjectionCamera;
+        var viewer = Client.Viewer?.PlayerPawn;
+        if ( !eye.IsValid() || !viewer.IsValid() || !target.IsValid() )
+            return _fullyVisible = false;
+
+        var height = head - feet;
+        // Requiring head, torso and legs prevents names appearing through partial cover.
+        foreach ( var t in new[] { 0.15f, 0.5f, 0.9f } )
+        {
+            var point = feet + height * t;
+            if ( Scene.Trace.Ray( eye.WorldPosition, point )
+                .IgnoreGameObjectHierarchy( viewer.GameObject )
+                .IgnoreGameObjectHierarchy( target )
+                .WithoutTags( "trigger", "playerclip", "movement", "player", LightweightBotManager.BotTag, BreakableGlass.Tag )
+                .Run().Hit )
+                return _fullyVisible = false;
+        }
+
+        return _fullyVisible = true;
+    }
 }

@@ -87,7 +87,7 @@
         @* The cog's menu: who can join. It drops down over the rows and cards below, so it comes last (siblings draw in order). *@
         @if ( _privacyOpen )
         {
-            <div class="squad-privacy">
+            <div class="squad-privacy" @ref="PrivacyMenu">
                 <label class="squad-privacy-title">@Tr( "SQUAD PRIVACY" )</label>
                 @foreach ( var mode in Enum.GetValues<SquadPrivacyMode>() )
                 {
@@ -251,9 +251,15 @@
         catch { }
     }
 
+    // The pad (PadNavigation): the cog's menu is a popup over the hub, which B closes.
+    private Panel PrivacyMenu { get; set; }
+    private PadScope _privacyScope;
+
     public override void Tick()
     {
         base.Tick();
+        if ( _privacyOpen && PrivacyMenu.IsValid() )
+            PadNavigation.Offer( PrivacyMenu, _privacyScope ??= new PadScope { Back = ClosePrivacyMenu }, 40 );
 
         // SquadSocialSystem does these in every scene too; here they take effect without a scene load.
         SquadPrivacy.Enforce();

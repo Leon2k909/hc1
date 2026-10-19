@@ -145,18 +145,9 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 
 		if ( ModelRenderer.IsValid() )
 		{
-			bool hasOptic = false;
-			bool hasMuzzle = false;
-			foreach ( var point in Components.GetAll<GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants ) )
-			{
-				if ( point.CurrentPart.IsValid() && point.CurrentPart.ModifyBodygroups )
-				{
-					if ( point.Category == GunsmithPartType.Optic ) hasOptic = true;
-					if ( point.Category is GunsmithPartType.Barrel or GunsmithPartType.Muzzle ) hasMuzzle = true;
-				}
-			}
+			var (hasOptic, hasMuzzle) = GunsmithAttachmentPoint.BodygroupParts( GameObject );
 
-			if ( !hasMuzzle ) ModelRenderer.SetBodyGroup( "muzzle", 0 );
+			if ( !hasMuzzle ) GunsmithAttachmentPoint.ResetFactoryMuzzle( ModelRenderer );
 
 			// Dynamic ADS alignment for SCAR-H based on optic attachment
 			if ( Equipment.IsValid() && Equipment.Resource.IsValid() && Equipment.Resource.ResourceName.Contains( "scarh", StringComparison.OrdinalIgnoreCase ) )
@@ -331,7 +322,7 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 		var isMoving = moveLen > 10f && !Owner.IsSliding; // Small threshold to determine if actually moving; a slide takes no steps
 		var isAiming = Equipment.HasTag( "aiming" );
 
-		var wishMove = Owner.WishMove.Normal * 1f;
+			var wishMove = Owner.IsWeaponMounted ? Vector3.Zero : Owner.WishMove.Normal * 1f;
 		if ( isAiming ) wishMove = 0;
 
 		if ( Owner.IsSlowWalking || Owner.IsCrouching ) moveLen *= 0.5f;
@@ -380,8 +371,8 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 		if ( UseMovementInertia )
 			YawInertia += lerpedWishMove.y * 10f;
 
-		var yaw = YawInertia * YawInertiaScale;
-		var pitch = PitchInertia * PitchInertiaScale;
+			var yaw = YawInertia * YawInertiaScale * (Owner.IsWeaponMounted ? 0.3f : 1f) * Owner.TrainingSwayScale;
+			var pitch = PitchInertia * PitchInertiaScale * (Owner.IsWeaponMounted ? 0.3f : 1f) * Owner.TrainingSwayScale;
 		ModelRenderer?.Set( "aim_yaw_inertia", yaw );
 		ModelRenderer?.Set( "aim_pitch_inertia", pitch );
 
@@ -417,6 +408,7 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 		// the gun to the sights first (an animgraph selector restarts its blend from the full old pose).
 		// The fitted parts' weight slows it (Equipment.AttachmentAimTimeScale).
 		var weight = Equipment.AttachmentAimTimeScale > 0f ? Equipment.AttachmentAimTimeScale : 1f;
+		weight *= Owner.TrainingAimTimeScale;
 		_aimProgress = _aimProgress.Approach( aiming ? 1f : 0f, Time.Delta / MathF.Max( AimTime * weight, 0.01f ) );
 		ModelRenderer.Set( "ironsights_weight", _aimProgress * _aimProgress * (3f - 2f * _aimProgress) );
 

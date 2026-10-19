@@ -4,6 +4,7 @@
 @namespace Facepunch.UI
 @inherits Panel
 @implements INavigatorPage
+@implements IPadScope
 @attribute [StyleSheet]
 
 <root class="hc1 barracks-page">
@@ -187,6 +188,29 @@
         ActiveSection = BarracksSection.Titles;
         StateHasChanged();
     }
+
+    // ── Pad (PadNavigation) ──────────────────────────────────────
+    // A page inside the menu's scope: B leaves a section for PROFILE, and in the emblem editor LT and RT change the
+    // picker's tab.
+    public override void Tick()
+    {
+        base.Tick();
+        PadNavigation.Offer( this, this );
+    }
+
+    public Panel PadFirstFocus => null;
+
+    public bool PadBack()
+    {
+        if ( ActiveSection == BarracksSection.None ) return false;
+
+        Sound.Play( "ui_button_press" );
+        ExitSection();
+        return true;
+    }
+
+    public bool PadTab( int direction ) =>
+        ActiveSection == BarracksSection.Emblems && EmblemEditorRef.IsValid() && EmblemEditorRef.CyclePickerTab( direction );
 
     private void ExitSection()
     {

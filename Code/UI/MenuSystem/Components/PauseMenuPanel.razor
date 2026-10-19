@@ -8,11 +8,48 @@
 
 @code
 {
-    public static bool IsAnyOpen =>
-        (Instance is not null && Instance.IsValid() && Instance.Enabled && Instance.IsOpen)
-        || (Game.ActiveScene.IsValid() && Game.ActiveScene.GetAllComponents<PauseMenuPanel>().Any( x => x.IsValid() && x.Enabled && x.IsOpen ));
+    public static bool IsAnyOpen
+    {
+        get
+        {
+            if ( Instance is not null && Instance.IsValid() && Instance.Enabled && Instance.IsOpen )
+                return true;
+
+            foreach ( var panel in OpenPanels )
+            {
+                if ( panel.IsValid() && panel.Active && panel.IsOpen && panel.Scene == Game.ActiveScene )
+                    return true;
+            }
+
+            return false;
+        }
+    }
 
     private static PauseMenuPanel Instance { get; set; }
+
+    private static HashSet<PauseMenuPanel> _openPanels;
+
+    /// <summary>
+    /// The open pause menus, kept as they open and close rather than looked for through the scene: the cursor code
+    /// asks several times a frame. A hotload that adds this leaves it null, so it starts from the scene's.
+    /// </summary>
+    private static HashSet<PauseMenuPanel> OpenPanels
+    {
+        get
+        {
+            if ( _openPanels is null )
+            {
+                _openPanels = new();
+                if ( Game.ActiveScene.IsValid() )
+                {
+                    foreach ( var panel in Game.ActiveScene.GetAllComponents<PauseMenuPanel>() )
+                        if ( panel.IsOpen ) _openPanels.Add( panel );
+                }
+            }
+
+            return _openPanels;
+        }
+    }
 
     /// <summary>
     /// The pause menu's screen panel draws over every other one, the map vote's (999, MapVoteSystem) included. The
@@ -57,6 +94,8 @@
         if ( IsOpen == open ) return;
 
         IsOpen = open;
+        if ( open && Active ) OpenPanels.Add( this );
+        else OpenPanels.Remove( this );
         ZombiesRoundSystem.Current?.SetPausedFromMenu( open );
         StateHasChanged();
     }
@@ -83,9 +122,16 @@
         }
     }
 
+    protected override void OnEnabled()
+    {
+        base.OnEnabled();
+        if ( IsOpen ) OpenPanels.Add( this );
+    }
+
     protected override void OnDisabled()
     {
         base.OnDisabled();
+        OpenPanels.Remove( this );
     }
 
     protected override void OnDestroy()
@@ -93,6 +139,7 @@
         if ( IsOpen )
             ZombiesRoundSystem.Current?.SetPausedFromMenu( false );
 
+        OpenPanels.Remove( this );
         base.OnDestroy();
         if ( Instance == this )
             Instance = null;

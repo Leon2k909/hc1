@@ -38,12 +38,13 @@ public class ViewPunch : EquipmentComponent, IGameEventHandler<WeaponShotEvent>
 			return;
 
 		var effects = GunsmithAttachmentEffects.For( Equipment );
-		var positionScale = (effects.VerticalRecoil + effects.HorizontalRecoil) * 0.5f;
+		var mountScale = (Player.IsWeaponMounted ? 0.55f : 1f) * Player.TrainingRecoilScale;
+		var positionScale = (effects.VerticalRecoil + effects.HorizontalRecoil) * 0.5f * mountScale;
 		var angles = GetBetween( AnglesOffset, MaxAnglesOffset );
 		var shake = new ScreenShake.Punch(
 			Lifetime,
 			GetBetween( PositionOffset, MaxPositionOffset ) * positionScale,
-			new Angles( angles.pitch * effects.VerticalRecoil, angles.yaw * effects.HorizontalRecoil,
+			new Angles( angles.pitch * effects.VerticalRecoil * mountScale, angles.yaw * effects.HorizontalRecoil * mountScale,
 				angles.roll * positionScale ),
 			Curve );
 

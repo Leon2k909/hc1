@@ -1,0 +1,30 @@
+@namespace Facepunch.UI
+@inherits Panel
+@attribute [StyleSheet]
+
+<root>
+    @if ( LobbyInputGuard.IsWarning )
+    {
+        <div class="warning">
+            <i>@LobbyInputRules.Icon( LobbyInputGuard.Rule )</i>
+            <label class="important">@Message</label>
+            @if ( !Networking.IsHost )
+            {
+                <label class="countdown">@Tr( "Leaving in {0}s", Seconds )</label>
+            }
+        </div>
+    }
+</root>
+
+@code
+{
+    // Shown by LobbyInputGuard while the player plays with the input the lobby doesn't take.
+    private static string Message => LobbyInputGuard.Rule == LobbyInput.Controller
+        ? Tr( "Controller-only lobby: switch back to your controller" )
+        : Tr( "Mouse and keyboard lobby: switch back to mouse and keyboard" );
+
+    private static int Seconds => (int)MathF.Ceiling( LobbyInputGuard.SecondsLeft );
+
+    protected override int BuildHash() =>
+        HashCode.Combine( LobbyInputGuard.IsWarning, LobbyInputGuard.Rule, Seconds, Networking.IsHost, GameText.Current );
+}

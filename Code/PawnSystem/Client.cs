@@ -141,6 +141,7 @@ public partial class Client : Component, ITeam, IGameEventHandler<KillEvent>
 			return;
 
 		Local = this;
+		InitializeTrainingOnOwner();
 		
 		// Send our local prestige to everyone else
 		RpcUpdatePrestige( Progression.GetPrestigeEmblem() );

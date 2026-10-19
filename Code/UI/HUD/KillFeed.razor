@@ -155,10 +155,11 @@
     public override void Tick()
     {
         // Limit entries so we don't get too busy
-        Entries = Entries.TakeLast( 5 ).ToList();
+        if ( Entries.Count > 5 )
+            Entries.RemoveRange( 0, Entries.Count - 5 );
 
-        // Did we remove something?
-        if ( Entries.RemoveAll( x => x.TimeSinceAdded > Lifetime ) > 0 )
+        // Did we remove something? Entries are oldest first, so only look when the oldest has gone.
+        if ( Entries.Count > 0 && Entries[0].TimeSinceAdded > Lifetime && Entries.RemoveAll( x => x.TimeSinceAdded > Lifetime ) > 0 )
         {
             StateHasChanged();
         }

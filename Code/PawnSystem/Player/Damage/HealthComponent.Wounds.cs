@@ -1,6 +1,9 @@
 namespace Facepunch;
 
-/// <summary>Deterministic regional trauma for hardcore. No bleeding or random fatal-hit rolls.</summary>
+/// <summary>
+/// Regional trauma for hardcore (<see cref="HardcoreTrauma"/>), with no bleeding. A head hit kills by its damage, a body
+/// hit can kill outright by chance and otherwise leaves you badly hurt, and limb hits wear you down and wound you.
+/// </summary>
 public partial class HealthComponent
 {
 	private const HitboxTags HeadOrNeck = HitboxTags.Head | HitboxTags.Neck;
@@ -68,7 +71,8 @@ public partial class HealthComponent
 			: (damageInfo.Hitbox & HitboxTags.Stomach) != 0 && (damageInfo.Hitbox & Chest) == 0
 				? TraumaRegion.Abdomen : TraumaRegion.Chest;
 		var trauma = HardcoreTrauma.Damage( gunDamage, region, MaxHealth );
-		lethal = false;
+		// A body hit can kill outright, more often the harder the round hits and less through armour.
+		lethal = Game.Random.Float() < HardcoreTrauma.KillChance( gunDamage, region, MaxHealth, transmission, CustomGameRules.DefaultMaxHealth );
 		return damageInfo with { Damage = trauma * transmission, ArmorDamage = trauma * (1f - transmission) };
 	}
 

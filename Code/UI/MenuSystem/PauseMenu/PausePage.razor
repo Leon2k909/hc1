@@ -4,6 +4,7 @@
 
 @inherits Panel
 @implements INavigatorPage
+@implements IPadScope
 @namespace Facepunch.UI
 @attribute [StyleSheet]
 
@@ -16,24 +17,24 @@
             <label class="pause-title">@Tr( "PAUSED" )</label>
         </div>
 
-        <div class="pause-items">
-            <div class="pause-item primary" onclick=@(()=>PauseMenuPanel.CloseAny())><i>play_arrow</i><label>@Tr( "Resume" )</label></div>
-            <div class="pause-item" onclick=@(()=>ChangeClass())><i>badge</i><label>@Tr( "Change Class" )</label></div>
-            <div class="pause-item" onclick=@(()=>OpenGunsmith())><i>build</i><label>@Tr( "Gunsmith" )</label></div>
-            <a class="pause-item" href="/settings" onclick=@ClosePartyPopups><i>settings</i><label>@Tr( "Settings" )</label></a>
-            <div class="pause-item" onclick=@(()=>ReportBug())><i>bug_report</i><label>@Tr( "Report a Bug" )</label></div>
+        <div class="pause-items" @ref="Items">
+            <div class="pause-item pad-target primary" onclick=@(()=>PauseMenuPanel.CloseAny())><i>play_arrow</i><label>@Tr( "Resume" )</label></div>
+            <div class="pause-item pad-target" onclick=@(()=>ChangeClass())><i>badge</i><label>@Tr( "Change Class" )</label></div>
+            <div class="pause-item pad-target" onclick=@(()=>OpenGunsmith())><i>build</i><label>@Tr( "Gunsmith" )</label></div>
+            <a class="pause-item pad-target" href="/settings" onclick=@ClosePartyPopups><i>settings</i><label>@Tr( "Settings" )</label></a>
+            <div class="pause-item pad-target" onclick=@(()=>ReportBug())><i>bug_report</i><label>@Tr( "Report a Bug" )</label></div>
 
             <div class="pause-sep"></div>
 
-            <div class="pause-item warn" onclick=@(()=>HandleDisconnect())><i>logout</i><label>@Tr( "Leave Match" )</label></div>
+            <div class="pause-item pad-target warn" onclick=@(()=>HandleDisconnect())><i>logout</i><label>@Tr( "Leave Match" )</label></div>
             @* A game can't close s&box, so Game.Close only goes back to s&box's menu, except in a standalone build (QuitPrompt). *@
             @if ( Application.IsStandalone )
             {
-                <div class="pause-item warn" onclick=@(()=>Quit())><i>power_settings_new</i><label>@Tr( "Quit to Desktop" )</label></div>
+                <div class="pause-item pad-target warn" onclick=@(()=>Quit())><i>power_settings_new</i><label>@Tr( "Quit to Desktop" )</label></div>
             }
             else
             {
-                <div class="pause-item warn" onclick=@(()=>Quit())><i>power_settings_new</i><label>@Tr( "Quit to s&box" )</label></div>
+                <div class="pause-item pad-target warn" onclick=@(()=>Quit())><i>power_settings_new</i><label>@Tr( "Quit to s&box" )</label></div>
             }
         </div>
     </div>
@@ -45,12 +46,12 @@
     @if ( showPartyModal )
     {
         <div class="pause-modal-overlay">
-            <div class="pause-modal">
+            <div class="pause-modal" @ref="PartyModal">
                 <label class="pause-modal-title">@Tr( "LEAVE MATCH" )</label>
                 <label class="pause-modal-text">@Tr( "Do you want to bring your party members with you?" )</label>
-                <div class="pause-item primary" @onclick=@BringParty><i>group</i><label>@Tr( "Bring Party" )</label></div>
-                <div class="pause-item" @onclick=@LeaveAlone><i>person</i><label>@Tr( "Leave Alone" )</label></div>
-                <div class="pause-item" @onclick=@(() => showPartyModal = false)><i>close</i><label>@Tr( "Cancel" )</label></div>
+                <div class="pause-item pad-target primary" @onclick=@BringParty><i>group</i><label>@Tr( "Bring Party" )</label></div>
+                <div class="pause-item pad-target" @onclick=@LeaveAlone><i>person</i><label>@Tr( "Leave Alone" )</label></div>
+                <div class="pause-item pad-target" @onclick=@(() => showPartyModal = false)><i>close</i><label>@Tr( "Cancel" )</label></div>
             </div>
         </div>
     }
@@ -59,6 +60,37 @@
 @code
 {
     bool showPartyModal = false;
+
+    // The pad (PadNavigation): the menu's items, or the leave-match question while it's up; B closes the pause menu,
+    // or the question.
+    private Panel Items { get; set; }
+    private Panel PartyModal { get; set; }
+
+    public override void Tick()
+    {
+        base.Tick();
+        PadNavigation.Offer( this, this );
+        if ( showPartyModal && PartyModal.IsValid() ) PadNavigation.Offer( PartyModal, this, 1 );
+    }
+
+    public Panel PadFirstFocus => showPartyModal && PartyModal.IsValid() ? PartyModal : Items;
+
+    public bool PadBack()
+    {
+        if ( showPartyModal )
+        {
+            showPartyModal = false;
+            StateHasChanged();
+            return true;
+        }
+
+        if ( CloseSocialPopup() ) return true;
+
+        PauseMenuPanel.CloseAny();
+        return true;
+    }
+
+    public bool PadTab( int direction ) => false;
 
     void HandleDisconnect()
     {

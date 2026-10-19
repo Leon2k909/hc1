@@ -102,6 +102,15 @@
 
     protected override int BuildHash()
     {
-        return !Player.IsValid() || !Player.HealthComponent.IsValid() ? 0 : HashCode.Combine( Player.HealthComponent.State, Player, Time.Now );
+        if ( !Player.IsValid() || !Player.HealthComponent.IsValid() )
+            return 0;
+
+        var state = Player.HealthComponent.State;
+        if ( state == LifeState.Alive )
+            return HashCode.Combine( state, Player );
+
+        // Dead, the summary is rebuilt a few times a second as well, for what changes under it (a killer's name once
+        // their body has gone, damage arriving after the killing hit).
+        return HashCode.Combine( state, Player, LastDamageInfo, (int)(RealTime.Now * 4f) );
     }
 }

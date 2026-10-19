@@ -46,6 +46,17 @@
     }
 }
 
+@if ( MainHUD.IsHudEnabled && Client.Viewer.PlayerPawn is { } pawn && pawn.IsValid() && pawn.CanMountWeapon )
+{
+    <div class="mount-indicator">
+        <span>@(pawn.IsWeaponMounted ? "MOUNTED" : "MOUNT")</span>
+        @if ( !pawn.IsWeaponMounted )
+        {
+            <InputHint class="small" Action="WeaponMount" />
+        }
+    </div>
+}
+
 @if ( CrosshairManager.HitFlash > 0 && cfg.HitStyle != "none" )
 {
     var hrgb = HexToRgb( cfg.HitColor );

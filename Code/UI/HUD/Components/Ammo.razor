@@ -80,7 +80,24 @@
     /// The player
     public PlayerPawn Player => Client.Viewer.PlayerPawn;
 
-    private WeaponAmmo HasAmmo => Player?.CurrentEquipment?.Components?.Get<WeaponAmmo>(FindMode.EverythingInSelfAndDescendants);
+    private Equipment _ammoOf;
+    private WeaponAmmo _ammo;
+
+    /// The weapon in hand's ammo, looked up once per weapon: Tick and BuildHash ask for it several times a frame.
+    private WeaponAmmo HasAmmo
+    {
+        get
+        {
+            var equipment = Player?.CurrentEquipment;
+            if ( equipment != _ammoOf || (_ammo is not null && !_ammo.IsValid()) )
+            {
+                _ammoOf = equipment;
+                _ammo = equipment?.Components?.Get<WeaponAmmo>( FindMode.EverythingInSelfAndDescendants );
+            }
+
+            return _ammo;
+        }
+    }
 
     // A class, not a record: s&box's codegen has failed on records.
     private sealed class GearItem
@@ -177,10 +194,26 @@
         if ( !Player.IsValid() || !Player.CurrentEquipment.IsValid() )
             return 0;
         var ammo = HasAmmo;
-        var gear = 0;
-        foreach ( var item in Carried )
-            gear = HashCode.Combine( gear, item.Resource, item.Count, item.InHand );
         return HashCode.Combine( Player, ammo?.Ammo, ammo?.ReserveAmmo, ammo?.GetEffectiveMaxAmmo(), Player?.CurrentEquipment,
-                                 FireModeFile, AmmoState, gear );
+                                 FireModeFile, AmmoState, GearHash() );
+    }
+
+    /// The lethal and tactical equipment carried, in order, and which kind is in hand: everything Carried groups,
+    /// without grouping it.
+    private int GearHash()
+    {
+        var hash = new HashCode();
+        if ( Inventory is null )
+            return 0;
+
+        var current = Player.CurrentEquipment;
+        hash.Add( current.IsValid() ? current.Resource : null );
+        foreach ( var equipment in Inventory.Equipment )
+        {
+            if ( equipment.IsValid() && equipment.Resource is { Slot: EquipmentSlot.Lethal or EquipmentSlot.Tactical } resource )
+                hash.Add( resource );
+        }
+
+        return hash.ToHashCode();
     }
 }

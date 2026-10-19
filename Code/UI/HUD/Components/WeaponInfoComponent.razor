@@ -70,7 +70,7 @@
         }
 
         var current = CurrentEquipment;
-        var count = Inventory?.Equipment.Count() ?? 0;
+        var count = EquipmentCount();
         if ( current != _lastEquipment || count != _lastCount || SwitchPressed() )
             _sinceSwitch = 0f;
 
@@ -91,17 +91,38 @@
         if ( Input.Pressed( "NextSlot" ) || Input.Pressed( "PrevSlot" ) )
             return true;
 
-        foreach ( var slot in Enum.GetValues<EquipmentSlot>() )
+        foreach ( var action in SlotActions )
         {
-            if ( slot != EquipmentSlot.Undefined && Input.Pressed( $"Slot{(int)slot}" ) )
+            if ( Input.Pressed( action ) )
                 return true;
         }
 
         return false;
     }
 
+    /// The slot keys' input actions ("Slot1", ...), made once rather than every frame.
+    private static readonly string[] SlotActions = Enum.GetValues<EquipmentSlot>()
+        .Where( x => x != EquipmentSlot.Undefined )
+        .Select( x => $"Slot{(int)x}" )
+        .ToArray();
+
+    private double _countedAt = double.NaN;
+    private int _count;
+
+    /// How many pieces of equipment are carried, counted once a frame for Tick and BuildHash (it walks the pawn's objects).
+    private int EquipmentCount()
+    {
+        if ( _countedAt != RealTime.NowDouble )
+        {
+            _countedAt = RealTime.NowDouble;
+            _count = Inventory?.Equipment.Count() ?? 0;
+        }
+
+        return _count;
+    }
+
     protected override int BuildHash()
     {
-        return !Player.IsValid() ? 0 : HashCode.Combine( Inventory.Equipment.Count(), CurrentEquipment );
+        return !Player.IsValid() ? 0 : HashCode.Combine( EquipmentCount(), CurrentEquipment );
     }
 }

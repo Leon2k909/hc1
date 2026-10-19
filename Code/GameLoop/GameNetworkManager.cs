@@ -18,6 +18,14 @@ public sealed class GameNetworkManager : SingletonComponent<GameNetworkManager>,
 	/// </summary>
 	[Property] public bool IsMultiplayer { get; set; } = true;
 
+	/// <summary>
+	/// Whether editor play hosts a lobby as a real game does. Off by default: making a lobby has the engine read and
+	/// checksum every file a joining client could download (BuildNetworkedFiles, ~3.6 GB), which froze the editor for
+	/// minutes on every play start. The editor's own Start Hosting and Join via new instance still host when this is off.
+	/// </summary>
+	[ConVar( "hc1_editor_lobby", Saved = true, Help = "1: editor play hosts a lobby (slow to start). 0: editor play is offline." )]
+	public static bool EditorLobby { get; set; }
+
 	protected override void OnStart()
 	{
 		if ( !IsMultiplayer )
@@ -29,10 +37,18 @@ public sealed class GameNetworkManager : SingletonComponent<GameNetworkManager>,
 		//
 		// Create a lobby if we're not connected
 		//
-		if ( !Networking.IsActive )
+		if ( Networking.IsActive ) return;
+
+		if ( Game.IsEditor && !EditorLobby )
 		{
-			Networking.CreateLobby( CustomGameSettings.Current?.CreateLobbyConfig() ?? new LobbyConfig() );
+			Log.Info( "Editor play: no lobby, so no network file scan. hc1_editor_lobby 1 hosts one from the next play start." );
+			OnActive( Connection.Local );
+			return;
 		}
+
+		// Who the lobby is for by input: the custom game page's pick, else the host's own Lobby Input setting.
+		LobbyInputRules.Stamp( CustomGameSettings.Current?.Input ?? LobbyInputRules.Preference );
+		Networking.CreateLobby( CustomGameSettings.Current?.CreateLobbyConfig() ?? new LobbyConfig() );
 	}
 
 	/// <summary>

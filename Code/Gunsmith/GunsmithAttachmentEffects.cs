@@ -72,11 +72,18 @@ public struct GunsmithAttachmentEffects
 			|| !equipment.Owner.IsValid() || !equipment.Owner.IsLocallyControlled )
 			return effects;
 
+		// A shot asks for these several times over; they only change with the loadout and, for a bipod, the stance.
 		var prone = equipment.Owner.IsProne;
+		var version = GunsmithLoadoutManager.Version;
+		var fitting = GunsmithLoadoutManager.IsFittingBuild;
+		if ( !fitting && equipment.FittedEffects is { } kept && kept.Version == version && kept.Prone == prone )
+			return kept.Effects;
+
 		foreach ( var slot in EffectSlots )
 			ApplySelected( ref effects, equipment.Resource, slot, prone );
 
 		effects.ApplyMass( equipment.LoadedMass );
+		if ( !fitting ) equipment.FittedEffects = (version, prone, effects);
 		return effects;
 	}
 

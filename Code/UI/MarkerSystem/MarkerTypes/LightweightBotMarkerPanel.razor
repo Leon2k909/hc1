@@ -38,8 +38,7 @@
 
     <div class="dot" />
 
-    @* Bots only have markers for their teammates (IMarkerObject.ShouldShow), so Hide Teammate Names covers them all. *@
-    @if ( !HideTeammateNames )
+    @if ( !HideTeammateNames && IsFullyVisible )
     {
         <label class="name">@(Bot.HealthComponent.Health.ToString( "0" ))%</label>
         <label class="name">BOT @Bot.BotName</label>
@@ -49,6 +48,7 @@
 @code
 {
     private LightweightCombatBot Bot => Object as LightweightCombatBot;
+    private bool IsFullyVisible => FullyVisible( Bot.WorldPosition, Bot.EyePosition + Vector3.Up * 14f, Bot.GameObject );
 
     protected override int BuildHash()
     {
@@ -59,7 +59,8 @@
             Bot?.HealthComponent?.State,
             Marker?.IsBehind,
             Marker?.IsOffScreen,
-            HideTeammateNames
+            HideTeammateNames,
+            IsFullyVisible
         );
     }
 }

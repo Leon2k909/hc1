@@ -1,268 +1,502 @@
 @import "/UI/Styles/Theme.scss";
 
 Scoreboard {
-    // Held open, it's over the rest of the HUD: the medals (MainHUD's .center-layer, 1700) and the crosshair and hit
-    // markers (1500). The Return to the AO countdown and the drone prompt (99999) still show over it.
+    // Keep medals and hit markers below this panel; the round strip and critical AO warnings stay above it.
+    // Razor's early return leaves the panel itself alive, so hide it until Score is held.
+    display: none;
+    position: absolute;
+    inset: 0;
     z-index: 2000;
-    border-radius: $rounding;
-    backdrop-filter: blur( 5px );
-    background-color: rgba( black, 0.5 );
+    align-items: center;
+    justify-content: center;
+    padding-top: 36px;
     pointer-events: none;
-
-    &.visible {
-        pointer-events: all;
-        cursor: default;
-    }
-
-    PlayerAvatar {
-        width: 24px;
-        height: 24px;
-    }
-
-    separator {
-        flex-grow: 1;
-        height: 1px;
-        background-color: red;
-        margin: 0 4px;
-    }
-
-    table {
-        width: 1100px;
-        max-height: 92%;
-        flex-direction: column;
-        gap: 2px;
-        color: white;
-
-        .sharing-hint {
-            padding-top: 10px;
-            flex-shrink: 0;
-            text-align: center;
-            justify-content: center;
-        }
-
-        .spectator-name {
-            cursor: pointer;
-            padding: 4px;
-
-            &:hover { color: white; }
-        }
-
-        .spectator-list { flex-wrap: wrap; }
-
-        // The title and voice bar stay put; the teams scroll when there are more rows than fit.
-        .teams {
-            flex-direction: column;
-            flex-shrink: 1;
-            gap: 2px;
-            overflow: scroll;
-
-            // Rows keep their height and the list scrolls, rather than squashing every row to fit.
-            > * {
-                flex-shrink: 0;
-            }
-        }
-
-        .add-bot {
-            padding: 4px 12px;
-            gap: 6px;
-            flex-shrink: 0;
-            font-size: 14px;
-
-            i {
-                font-size: 17px;
-            }
-        }
-
-        .title {
-            flex-direction: row;
-            text-shadow: 0 0 4px rgba( black, 0.5 );
-            justify-content: space-between;
-
-            label {
-                white-space: nowrap;
-                width: 33%;
-            }
-
-            .left {
-                text-align: left;
-            }
-
-            .center {
-                text-align: center;
-            }
-
-            .right {
-                text-align: right;
-            }
-        }
-
-        // Voice controls sit apart from the title above and the team lists below.
-        .row.voice-bar {
-            flex-direction: row;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 16px;
-            margin: 14px 0 18px 0;
-            border-radius: 4px;
-            background-color: rgba( black, 0.55 );
-
-            .voice-label {
-                margin-right: 10px;
-                opacity: 0.8;
-            }
-
-            .button {
-                padding: 6px 14px;
-                gap: 6px;
-            }
-        }
-
-        .row {
-            background-color: rgba( black, 0.75 );
-            width: 100%;
-            align-items: center;
-
-            &.dead {
-                .avatar {
-                    filter: saturate( 0.2 ) brightness(50%);
-                }
-            }
-
-            &.local {
-                background-color: rgba( white, 0.75 );
-
-                text, label {
-                    color: black;
-                }
-
-                Icon {
-                    background-image-tint: black;
-                }
-            }
-
-            // Bot rows, and their avatar and tags, take the bot's team colour (ScoreboardRow.BotRowStyle etc.).
-            &.bot-row {
-                border: 1px solid transparent;
-            }
-
-            .col {
-                align-items: center;
-            }
-
-            .playername {
-                flex-basis: 350px;
-                flex-grow: 1;
-                gap: 8px;
-
-                &.inspectable {
-                    cursor: pointer;
-
-                    &:hover { background-color: rgba( white, 0.1 ); }
-                }
-
-                .sharing-arrow {
-                    font-size: 18px;
-                    opacity: 0.45;
-                }
-            }
-
-            // The prestige icons have wide transparent margins, so they're drawn the row's full height, over its
-            // padding rather than making it taller.
-            .prestige {
-                width: 40px;
-                height: 40px;
-                margin: -8px 0px;
-                flex-shrink: 0;
-            }
-
-            .bot-avatar {
-                width: 24px;
-                height: 24px;
-                border-radius: 4px;
-                border: 1px solid transparent;
-                flex-shrink: 0;
-            }
-
-            .bot-prefix {
-                font-size: 11px;
-                font-weight: 800;
-                letter-spacing: 0.08em;
-                flex-shrink: 0;
-            }
-
-            .bot-ping {
-                font-weight: 800;
-            }
-
-            .stat {
-                flex-basis: 90px;
-                flex-shrink: 0;
-                flex-grow: 0;
-                text-align: center;
-                justify-content: center;
-                padding: 0 4px;
-            }
-
-            .stat-large {
-                flex-basis: 110px;
-                flex-shrink: 0;
-                align-items: center;
-                text-align: center;
-                justify-content: center;
-            }
-
-            .stat-small {
-                flex-basis: 50px;
-                flex-shrink: 0;
-                align-items: center;
-            }
-
-            .mute-header {
-                justify-content: center;
-
-                i {
-                    font-size: 17px;
-                    opacity: 0.6;
-                }
-            }
-
-            .mute-toggle {
-                width: 30px;
-                height: 26px;
-                margin: 0 10px;
-                justify-content: center;
-                align-items: center;
-                background-color: rgba( white, 0.08 );
-                border: 1px solid rgba( white, 0.14 );
-                border-radius: 4px;
-                color: rgba( white, 0.75 );
-                cursor: pointer;
-
-                i {
-                    font-size: 18px;
-                }
-
-                &:hover {
-                    background-color: rgba( white, 0.18 );
-                    color: white;
-                }
-
-                &.muted {
-                    background-color: rgba( #d45a5a, 0.22 );
-                    border-color: rgba( #ff8a8a, 0.45 );
-                    color: #ff9b9b;
-                }
-            }
-
-            .mute-placeholder {
-                margin: 0 10px;
-            }
-
-            .kick-bot:hover {
-                background-color: rgba( #d45a5a, 0.3 );
-                border-color: rgba( #ff8a8a, 0.55 );
-                color: #ff9b9b;
-            }
-        }
-    }
+    font-family: Chakra Petch;
+    color: #eef1f3;
 }
+
+Scoreboard.visible {
+    display: flex;
+    background-color: rgba(3, 6, 10, 0.72);
+    backdrop-filter: blur(5px);
+    pointer-events: all;
+    cursor: default;
+}
+
+Scoreboard label,
+Scoreboard button {
+    font-family: Chakra Petch;
+    text-shadow: none;
+}
+
+Scoreboard .scoreboard-panel {
+    width: 1520px;
+    max-width: 94%;
+    max-height: 82%;
+    flex-direction: column;
+    background-color: rgba(15, 20, 27, 0.97);
+    border: 1px solid rgba(197, 211, 224, 0.16);
+    border-radius: 3px;
+    box-shadow: 0 18px 70px rgba(0, 0, 0, 0.5);
+}
+
+Scoreboard .match-heading {
+    min-height: 104px;
+    padding: 22px 28px;
+    align-items: center;
+    gap: 24px;
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(197, 211, 224, 0.12);
+}
+
+Scoreboard .match-identity {
+    flex-direction: column;
+    flex-grow: 1;
+    min-width: 0;
+    gap: 3px;
+}
+
+Scoreboard .eyebrow {
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    color: #98a5b5;
+    font-weight: 600;
+}
+
+Scoreboard .match-title {
+    font-size: 30px;
+    font-weight: 700;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+Scoreboard .match-state {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+    max-width: 34%;
+    flex-shrink: 0;
+}
+
+Scoreboard .match-status { font-size: 15px; color: #c5cdd7; }
+Scoreboard .match-round { font-size: 13px; color: #8996a6; }
+
+Scoreboard .match-clock {
+    padding-left: 24px;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    border-left: 1px solid rgba(197, 211, 224, 0.18);
+}
+
+Scoreboard .match-clock i { font-size: 21px; color: #8996a6; }
+Scoreboard .match-clock label { font-size: 34px; font-weight: 600; min-width: 86px; }
+
+Scoreboard .scoreboard-body {
+    padding: 20px 24px;
+    min-height: 0;
+    flex-direction: column;
+    flex-shrink: 1;
+    gap: 16px;
+    overflow: scroll;
+}
+
+Scoreboard .scoreboard-body > * { flex-shrink: 0; }
+
+Scoreboard .rosters {
+    width: 100%;
+    align-items: stretch;
+    gap: 18px;
+}
+
+Scoreboard .team-roster {
+    width: 0;
+    flex-basis: 0;
+    flex-grow: 1;
+    min-width: 0;
+    min-height: 170px;
+    flex-direction: column;
+    border: 1px solid rgba(197, 211, 224, 0.1);
+    border-top: 2px solid #75879a;
+    background-color: rgba(6, 10, 15, 0.64);
+    overflow: hidden;
+}
+
+Scoreboard .single-roster,
+Scoreboard.compact .rosters {
+    flex-direction: column;
+}
+
+Scoreboard .single-roster .team-roster,
+Scoreboard.compact .team-roster {
+    width: 100%;
+    flex-basis: auto;
+    flex-shrink: 0;
+}
+
+Scoreboard .team-heading {
+    min-height: 96px;
+    padding: 16px 20px;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(197, 211, 224, 0.08);
+}
+
+Scoreboard .team-logo { flex-shrink: 0; }
+
+Scoreboard .team-identity {
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    flex-grow: 1;
+}
+
+Scoreboard .team-name {
+    font-size: 23px;
+    font-weight: 700;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+Scoreboard .team-count { font-size: 13px; color: #97a5b6; font-weight: 500; }
+
+Scoreboard .team-score {
+    font-size: 52px;
+    font-weight: 700;
+    flex-shrink: 0;
+    min-width: 65px;
+    text-align: right;
+    justify-content: flex-end;
+    color: #f4f6f8;
+}
+
+Scoreboard .coop-icon { font-size: 42px; color: #b8c8d5; }
+Scoreboard .coop-roster .team-heading { background-color: rgba(152, 177, 196, 0.06); }
+
+Scoreboard .add-bot {
+    padding: 7px 9px;
+    gap: 5px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #a6b4c4;
+    border: 1px solid rgba(197, 211, 224, 0.16);
+    border-radius: 2px;
+    background-color: rgba(7, 11, 16, 0.35);
+    cursor: pointer;
+}
+
+Scoreboard .add-bot label { font-size: 12px; white-space: nowrap; }
+Scoreboard .add-bot i { font-size: 16px; }
+Scoreboard .add-bot:hover { color: white; background-color: rgba(197, 211, 224, 0.12); }
+
+Scoreboard .scoreboard-columns,
+Scoreboard .scoreboard-row {
+    width: 100%;
+    padding: 6px 12px 6px 8px;
+    align-items: center;
+    flex-shrink: 0;
+    border-left: 2px solid transparent;
+}
+
+Scoreboard .scoreboard-columns {
+    min-height: 34px;
+    background-color: rgba(185, 202, 220, 0.035);
+    border-bottom: 1px solid rgba(197, 211, 224, 0.06);
+}
+
+Scoreboard .scoreboard-columns label {
+    font-size: 12px;
+    color: #98a5b5;
+    font-weight: 500;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+Scoreboard .scoreboard-row {
+    min-height: 60px;
+    border-bottom: 1px solid rgba(197, 211, 224, 0.055);
+    background-color: rgba(255, 255, 255, 0.012);
+}
+
+Scoreboard .scoreboard-row:hover { background-color: rgba(190, 206, 222, 0.065); }
+
+Scoreboard .scoreboard-row.local {
+    border-left-color: #e7edf3;
+    background-color: rgba(189, 207, 226, 0.12);
+}
+
+Scoreboard .scoreboard-row.local .placement,
+Scoreboard .scoreboard-row.local .player-label { color: #ffffff; }
+
+Scoreboard .col {
+    flex-shrink: 0;
+    align-items: center;
+}
+
+Scoreboard .placement {
+    width: 30px;
+    flex-basis: 30px;
+    justify-content: center;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 500;
+    color: #758498;
+}
+
+Scoreboard .playername {
+    min-width: 0;
+    width: 0;
+    flex-basis: 0;
+    flex-grow: 1;
+    flex-shrink: 1;
+    gap: 10px;
+    padding-right: 12px;
+}
+
+Scoreboard .portrait,
+Scoreboard .portrait PlayerAvatar,
+Scoreboard .bot-avatar {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+}
+
+Scoreboard .portrait { align-items: center; justify-content: center; }
+Scoreboard .bot-avatar { border: 1px solid transparent; border-radius: 2px; }
+Scoreboard .dead .portrait { filter: saturate(0.25) brightness(55%); }
+
+Scoreboard .player-identity {
+    flex-direction: column;
+    min-width: 0;
+    width: 0;
+    flex-grow: 1;
+    gap: 2px;
+}
+
+Scoreboard .name-line {
+    height: 24px;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+}
+
+Scoreboard .name-line.inspectable { cursor: pointer; }
+Scoreboard .name-line.inspectable:hover .player-label { color: white; }
+Scoreboard .name-line.inspectable:hover .sharing-arrow { opacity: 1; }
+
+Scoreboard .player-label {
+    min-width: 0;
+    flex-shrink: 1;
+    font-size: 17px;
+    font-weight: 600;
+    color: #dce3eb;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+Scoreboard .prestige {
+    width: 32px;
+    height: 32px;
+    margin: -4px 0;
+    flex-shrink: 0;
+}
+
+Scoreboard .sharing-arrow { font-size: 16px; opacity: 0.35; flex-shrink: 0; }
+
+Scoreboard .player-meta {
+    height: 22px;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+    color: #8190a2;
+}
+
+Scoreboard .latency { font-size: 12px; font-weight: 500; white-space: nowrap; }
+Scoreboard .connection-icon { font-size: 12px; color: #6c8297; }
+Scoreboard .connection-lost { background-image-tint: #e38484; }
+Scoreboard .local-marker { font-size: 14px; color: #e7edf3; }
+Scoreboard .bot-prefix { font-size: 11px; font-weight: 700; letter-spacing: 0.8px; }
+
+Scoreboard .row-actions {
+    margin-left: auto;
+    padding-left: 5px;
+    gap: 4px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+Scoreboard .mute-toggle {
+    width: 26px;
+    height: 22px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(176, 196, 216, 0.12);
+    border-radius: 2px;
+    background-color: rgba(176, 196, 216, 0.04);
+    color: #8fa0b4;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+Scoreboard .mute-toggle i { font-size: 14px; }
+
+Scoreboard .mute-toggle:hover {
+    background-color: rgba(176, 196, 216, 0.18);
+    border-color: rgba(176, 196, 216, 0.3);
+    color: white;
+}
+
+Scoreboard .mute-toggle.muted,
+Scoreboard .kick-bot:hover {
+    background-color: rgba(211, 78, 82, 0.16);
+    border-color: rgba(233, 113, 117, 0.35);
+    color: #ee999b;
+}
+
+Scoreboard .stat {
+    width: 66px;
+    flex-basis: 66px;
+    padding: 0 3px;
+    justify-content: center;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+Scoreboard .score-value {
+    width: 84px;
+    flex-basis: 84px;
+    color: #f5f7fa;
+    font-weight: 700;
+}
+
+Scoreboard .scoreboard-columns .score-value { color: #c6d2df; font-weight: 600; }
+
+Scoreboard .balance-value {
+    width: 92px;
+    flex-basis: 92px;
+    font-size: 16px;
+}
+
+Scoreboard .empty-team {
+    min-height: 144px;
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+    color: #738296;
+}
+
+Scoreboard .empty-team i { font-size: 30px; }
+Scoreboard .empty-team label { font-size: 13px; font-weight: 500; }
+
+Scoreboard .round-history {
+    justify-content: center;
+    padding: 0 8px 8px;
+}
+
+Scoreboard .round-history GameOverview { flex-wrap: wrap; }
+
+Scoreboard .spectator-list {
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 12px;
+    background-color: rgba(174, 191, 208, 0.035);
+}
+
+Scoreboard .spectator-heading { font-size: 12px; color: #8493a6; margin-right: 6px; }
+
+Scoreboard .spectator-name {
+    font-size: 13px;
+    color: #b7c3d1;
+    padding: 3px 6px;
+    cursor: pointer;
+}
+
+Scoreboard .spectator-name:hover { background-color: rgba(174, 191, 208, 0.1); color: white; }
+
+Scoreboard .communications {
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 13px 24px;
+    gap: 14px;
+    flex-shrink: 0;
+    border-top: 1px solid rgba(197, 211, 224, 0.12);
+    background-color: rgba(5, 9, 14, 0.24);
+}
+
+Scoreboard .voice-label { align-items: center; gap: 8px; color: #8999ac; flex-shrink: 0; }
+Scoreboard .voice-label i { font-size: 18px; }
+Scoreboard .voice-label label { font-size: 13px; font-weight: 500; }
+
+Scoreboard .voice-options {
+    padding: 3px;
+    gap: 3px;
+    border: 1px solid rgba(174, 191, 208, 0.1);
+    border-radius: 3px;
+    background-color: rgba(4, 7, 11, 0.65);
+    flex-shrink: 0;
+}
+
+Scoreboard .voice-option {
+    height: 28px;
+    padding: 4px 16px;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #8696a9;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+Scoreboard .voice-option:hover { color: white; background-color: rgba(174, 191, 208, 0.08); }
+Scoreboard .voice-option.selected { color: #f3f6f9; background-color: #354354; }
+
+Scoreboard .proximity-option {
+    margin-left: auto;
+    padding: 7px 11px;
+    gap: 7px;
+    align-items: center;
+    border: 1px solid rgba(174, 191, 208, 0.15);
+    border-radius: 2px;
+    color: #8b9aab;
+    cursor: pointer;
+}
+
+Scoreboard .proximity-option i { font-size: 17px; }
+Scoreboard .proximity-option label { font-size: 13px; font-weight: 500; }
+Scoreboard .proximity-option:hover { color: white; border-color: rgba(174, 191, 208, 0.4); }
+Scoreboard .proximity-option.selected { color: #d5e9e0; border-color: rgba(136, 187, 163, 0.5); background-color: rgba(103, 160, 133, 0.1); }
+
+Scoreboard .scoreboard-footer {
+    align-items: center;
+    gap: 18px;
+    padding: 10px 24px;
+    flex-shrink: 0;
+}
+
+Scoreboard .sharing-hint {
+    flex-grow: 1;
+    min-width: 0;
+    font-size: 13px;
+    color: #7f8ea1;
+    font-weight: 500;
+}
+
+Scoreboard .scoreboard-key { align-items: center; gap: 7px; flex-shrink: 0; }
+Scoreboard .scoreboard-key label { font-size: 11px; color: #8b9aac; font-weight: 500; }
+
+Scoreboard.compact .match-heading { gap: 16px; padding: 18px 24px; }
+Scoreboard.compact .match-title { font-size: 26px; }
+Scoreboard.compact .match-clock { padding-left: 16px; }
+Scoreboard.compact .scoreboard-body { padding: 16px 20px; }

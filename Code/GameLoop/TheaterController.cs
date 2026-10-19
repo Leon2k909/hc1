@@ -168,6 +168,11 @@ public sealed class TheaterController : Component, Component.ISceneStage
 		{
 			clip = await ReadClip( id );
 		}
+		catch ( TaskCanceledException )
+		{
+			// Play stopped while it was reading.
+			return;
+		}
 		catch ( Exception e )
 		{
 			Log.Warning( $"Theater: can't read replay {id}: {e}" );
@@ -214,21 +219,14 @@ public sealed class TheaterController : Component, Component.ISceneStage
 		}
 	}
 
-	/// <summary> The recording, read and parsed on a worker thread: a long match's is tens of megabytes. </summary>
-	static async Task<MovieClip> ReadClip( string id )
+	/// <summary>
+	/// The recording, read and parsed on a worker thread (<see cref="TheaterReplays.ReadClip"/>): a long match's is tens of
+	/// megabytes. Never on the main thread: the task is only cancelled once play has stopped, when nobody wants the clip.
+	/// </summary>
+	static Task<MovieClip> ReadClip( string id )
 	{
 		var path = TheaterReplays.MoviePath( id );
-		var json = await GameTask.RunInThreadAsync( () => FileSystem.Data.ReadAllText( path ) );
-
-		try
-		{
-			return await GameTask.RunInThreadAsync( () => Json.Deserialize<MovieClip>( json ) );
-		}
-		catch ( Exception e )
-		{
-			Log.Warning( $"Theater: couldn't read the replay on a worker thread ({e.Message}), reading it on the main thread." );
-			return Json.Deserialize<MovieClip>( json );
-		}
+		return GameTask.RunInThreadAsync( () => TheaterReplays.ReadClip( path ) );
 	}
 
 	void CreateMaps()
@@ -822,6 +820,7 @@ public sealed class TheaterController : Component, Component.ISceneStage
 
 	static void ShowCursor()
 	{
+		Input.EnableVirtualCursor = true;
 		Mouse.Visible = true;
 		Mouse.CursorType = null;
 		Mouse.Visibility = MouseVisibility.Visible;

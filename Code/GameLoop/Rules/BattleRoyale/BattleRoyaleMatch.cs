@@ -283,24 +283,37 @@ public sealed class BattleRoyaleMatch : Component, IGameEventHandler<KillEvent>
 			zone.StartClosing();
 	}
 
+	private readonly List<Client> _clientScratch = new();
+	private readonly List<PlayerPawn> _pawnScratch = new();
+	private readonly List<LightweightCombatBot> _botScratch = new();
+	private readonly HashSet<PlayerPawn> _countedPawns = new();
+
+	/// <summary>
+	/// Who's still in. It runs every fixed tick, so it searches the scene as <see cref="GameUtils.PlayerPawns"/> and
+	/// <see cref="GameUtils.LightweightBots"/> do (every client's pawn and every pawn in the scene, each once; every bot),
+	/// into lists kept for it rather than through their allocations. Not BotSystem's frame lists: bots dropped in this tick
+	/// have to count.
+	/// </summary>
 	private void CountAlive( out int alive, out int playersAlive, out Component last )
 	{
 		alive = 0;
 		playersAlive = 0;
 		last = null;
-		foreach ( var pawn in GameUtils.PlayerPawns )
-		{
-			if ( !pawn.HealthComponent.IsValid() || pawn.HealthComponent.State != LifeState.Alive )
-				continue;
-			if ( pawn.Client.IsValid() && pawn.Client.IsBot )
-				continue;
 
-			alive++;
-			playersAlive++;
-			last = pawn;
-		}
+		_countedPawns.Clear();
+		_clientScratch.Clear();
+		Scene.GetAll( _clientScratch );
+		foreach ( var client in _clientScratch )
+			CountPawn( client.PlayerPawn, ref alive, ref playersAlive, ref last );
 
-		foreach ( var bot in GameUtils.LightweightBots )
+		_pawnScratch.Clear();
+		Scene.GetAll( _pawnScratch );
+		foreach ( var pawn in _pawnScratch )
+			CountPawn( pawn, ref alive, ref playersAlive, ref last );
+
+		_botScratch.Clear();
+		Scene.GetAll( _botScratch );
+		foreach ( var bot in _botScratch )
 		{
 			if ( !bot.IsValid() || !bot.IsAlive )
 				continue;
@@ -308,6 +321,20 @@ public sealed class BattleRoyaleMatch : Component, IGameEventHandler<KillEvent>
 			alive++;
 			last = bot;
 		}
+	}
+
+	private void CountPawn( PlayerPawn pawn, ref int alive, ref int playersAlive, ref Component last )
+	{
+		if ( !pawn.IsValid() || !_countedPawns.Add( pawn ) )
+			return;
+		if ( !pawn.HealthComponent.IsValid() || pawn.HealthComponent.State != LifeState.Alive )
+			return;
+		if ( pawn.Client.IsValid() && pawn.Client.IsBot )
+			return;
+
+		alive++;
+		playersAlive++;
+		last = pawn;
 	}
 
 	protected override void OnFixedUpdate()

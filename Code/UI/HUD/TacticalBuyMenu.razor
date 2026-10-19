@@ -1,5 +1,6 @@
 @namespace Facepunch.UI
 @inherits Panel
+@implements IPadScope
 @attribute [StyleSheet]
 
 <root>
@@ -33,7 +34,7 @@
                             var gear = option;
                             if ( gear == TacticalGear.DefuseKit && Pawn.Team != Team.CounterTerrorist ) continue;
                             var price = TacticalEconomy.GearPrice( Pawn, gear );
-                            <div class="item @(price is null || Balance < price.Value ? "unavailable" : "")" onclick=@(() => BuyGear( gear ))>
+                            <div class="item pad-target @(price is null || Balance < price.Value ? "unavailable" : "")" onclick=@(() => BuyGear( gear ))>
                                 <Icon File=@GearIcon( gear ) Size="@(32)" />
                                 <label class="name">@Tr( GearName( gear ) )</label>
                                 <label class="price">@(price is null ? Tr( "OWNED" ) : $"${price.Value:N0}")</label>
@@ -46,7 +47,7 @@
                         {
                             var resource = entry;
                             var owned = Pawn.Inventory.Has( resource );
-                            <div class="item @(owned || Balance < resource.Price ? "unavailable" : "")" onclick=@(() => BuyWeapon( resource ))>
+                            <div class="item pad-target @(owned || Balance < resource.Price ? "unavailable" : "")" onclick=@(() => BuyWeapon( resource ))>
                                 @if ( !string.IsNullOrEmpty( resource.Icon ) )
                                 {
                                     <div class="weapon-icon" style="background-image: url( @resource.Icon );" />
@@ -164,6 +165,26 @@
         {
             Open();
         }
+
+        if ( IsOpen ) PadNavigation.Offer( this, this );
+    }
+
+    // ── Pad (PadNavigation) ──────────────────────────────────────
+    // B closes it; LT and RT step through the categories.
+    public Panel PadFirstFocus => null;
+
+    public bool PadBack()
+    {
+        Close();
+        return true;
+    }
+
+    public bool PadTab( int direction )
+    {
+        var index = Math.Max( 0, Array.IndexOf( Categories, SelectedCategory ) );
+        SelectedCategory = Categories[(index + direction + Categories.Length) % Categories.Length];
+        Sound.Play( "ui_nav_tab" );
+        return true;
     }
 
     public override void OnDeleted()

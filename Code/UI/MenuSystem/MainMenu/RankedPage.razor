@@ -321,6 +321,9 @@
                     continue;
                 if ( string.IsNullOrEmpty( lobby.Name ) || !lobby.Name.Contains( myTag ) )
                     continue;
+                // Controller-only and mouse-and-keyboard-only lobbies (Settings → Game → Lobby Input).
+                if ( !LobbyInputRules.CanJoin( LobbyInputRules.Of( info ) ) )
+                    continue;
 
                 if ( await Networking.TryConnectSteamId( lobby.LobbyId ) )
                     return; // joined — the host's scene follows.
@@ -351,6 +354,10 @@
 
         var pick = pool[Game.Random.Int( 0, pool.Count - 1 )];
 
+        // The engine keeps lobby data from the last lobby this machine was in, and copies it into a new one. A ranked
+        // match's end marks its lobby closed, so without this the next ranked lobby its players hosted was born closed.
+        Networking.SetData( "ranked_closed", "0" );
+        LobbyInputRules.Stamp( LobbyInputRules.Preference );
         Networking.CreateLobby( new LobbyConfig
         {
             Name = $"{tag} Razed Ranked",

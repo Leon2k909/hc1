@@ -2,9 +2,15 @@ namespace Facepunch.UI;
 
 /// <summary>
 /// A relatively simple color slider panel. thank you Alex for your instagib code from 2021
+/// <para>On a controller, left and right turn the hue (<see cref="IPadAdjustable"/>), and the RGB boxes under it step
+/// each channel (<see cref="ColorChannel"/>).</para>
 /// </summary>
-public partial class ColorSlider
+public partial class ColorSlider : IPadAdjustable
 {
+	public ColorSlider()
+	{
+		AddClass( PadNavigation.TargetClass );
+	}
 	public Image Image { get; set; }
 	public Panel Cursor { get; set; }
 
@@ -126,8 +132,50 @@ public partial class ColorSlider
 		{
 			Value = GetFromMouse();
 			UpdateCursor();
+			_cursorShows = Value;
+		}
+		else if ( Value != _cursorShows && Image.IsValid() && Image.Box.Rect.Width > 0f )
+		{
+			// Set some other way (the pad, the RGB boxes, a saved colour): the cursor goes where that colour is.
+			PlaceCursor();
 		}
 	}
+
+	/// <summary> The colour the cursor was last put on. </summary>
+	private Color? _cursorShows;
+
+	/// <summary> The cursor on <see cref="Value"/>: its hue across the field, its saturation down it (CreateTexture's rows). </summary>
+	private void PlaceCursor()
+	{
+		var hsv = Value.ToHsv();
+		var x = hsv.Hue / 360f;
+		// Row y's saturation is 1 less 0.000075 for each row above it, so about 1 - 0.0000375 y².
+		var y = MathF.Min( MathF.Sqrt( MathF.Max( 0f, 1f - hsv.Saturation ) / 0.0000375f ), height - 1 ) / height;
+
+		var image = Image.Box.Rect;
+		Cursor.Style.Left = (image.Left - Box.Rect.Left + x * image.Width) * ScaleFromScreen;
+		Cursor.Style.Top = (image.Top - Box.Rect.Top + y * image.Height) * ScaleFromScreen;
+		Cursor.Style.Set( $"background-image: radial-gradient( {Value.Hex}, {Value.Hex} 20%, black 75% );" );
+		_cursorShows = Value;
+	}
+
+	public bool PadAdjust( int direction, float heldFor )
+	{
+		var hsv = Value.ToHsv();
+
+		// A grey or black has no hue to turn, so it starts from the field's full colour.
+		if ( hsv.Saturation < 0.05f ) hsv.Saturation = 1f;
+		if ( hsv.Value < 0.05f ) hsv.Value = 1f;
+
+		var step = heldFor > 1.2f ? 12f : 3f;
+		hsv.Hue = ((hsv.Hue + direction * step) % 360f + 360f) % 360f;
+		Value = hsv.ToColor() with { a = Value.a };
+		PlaceCursor();
+		return true;
+	}
+
+	/// <summary> A presses the cursor, so it picks the colour already there. </summary>
+	public Panel PadPoint => Cursor;
 
 	protected override void OnAfterTreeRender( bool firstTime )
 	{

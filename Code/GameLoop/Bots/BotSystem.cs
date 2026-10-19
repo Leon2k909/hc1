@@ -5,8 +5,9 @@ namespace Facepunch;
 /// <summary>
 /// The bots' shared picture of the match, built once a frame: which bots and players are alive, which teams have a
 /// real player on them, and where this machine is looking from. Bots read these instead of each searching the scene,
-/// which with a hundred bots added up to thousands of scene walks (and allocations) a frame. It also moves the bots'
-/// guns onto their hands (see <see cref="FollowHands"/>) and times the bots for <c>dev_perf</c>.
+/// which with a hundred bots added up to thousands of scene walks (and allocations) a frame. Zombies and the doors NPCs
+/// open come from here too. It also moves the bots' guns onto their hands (see <see cref="FollowHands"/>) and times the
+/// bots for <c>dev_perf</c>.
 /// </summary>
 public sealed class BotSystem : GameObjectSystem<BotSystem>
 {
@@ -36,6 +37,12 @@ public sealed class BotSystem : GameObjectSystem<BotSystem>
 	/// <summary> The living pawns of real people (not bot clients): where the action is. </summary>
 	public List<PlayerPawn> AlivePlayers { get; } = new();
 
+	/// <summary> Every zombie in the scene, dead ones included (<see cref="ZombieAI"/> skips those itself). </summary>
+	public List<ZombieAI> Zombies { get; } = new();
+
+	/// <summary> The map's movers NPCs can open (tagged <see cref="TerrorTown.MapMover.DoorTag"/>). </summary>
+	public List<TerrorTown.MapMover> Doors { get; } = new();
+
 	/// <summary> Does <paramref name="team"/> have a connected real player on it, alive or not? </summary>
 	public bool TeamHasRealPlayer( Team team ) => _realPlayerTeams.Contains( team );
 
@@ -49,7 +56,7 @@ public sealed class BotSystem : GameObjectSystem<BotSystem>
 	/// <summary> Where this machine is looking from, for how big things look. </summary>
 	public Vector3 ViewPosition { get; private set; }
 
-	/// <summary> Is this machine drawing the scene at all? A server with no screen isn't. </summary>
+	/// <summary> Is this machine drawing the scene at all? A server with no screen isn't, whatever cameras its scene has. </summary>
 	public bool HasView => _views.Count > 0;
 
 	/// <summary>
@@ -69,7 +76,11 @@ public sealed class BotSystem : GameObjectSystem<BotSystem>
 	private readonly List<Client> _scratchClients = new();
 	private readonly List<CameraComponent> _scratchCameras = new();
 	private readonly HashSet<Team> _realPlayerTeams = new();
+	private readonly List<TerrorTown.MapMover> _scratchMovers = new();
 	private readonly List<Frustum> _views = new();
+	/// <summary> The main camera's view as a cone round its forward, for <see cref="ShouldPose"/>. </summary>
+	private Vector3 _viewForward = Vector3.Forward;
+	private float _viewHalfAngle = MathF.PI;
 
 	private void Refresh()
 	{
@@ -80,6 +91,18 @@ public sealed class BotSystem : GameObjectSystem<BotSystem>
 		{
 			if ( bot.IsValid() && bot.IsAlive )
 				AliveBots.Add( bot );
+		}
+
+		Zombies.Clear();
+		Scene.GetAll( Zombies );
+
+		_scratchMovers.Clear();
+		Scene.GetAll( _scratchMovers );
+		Doors.Clear();
+		foreach ( var mover in _scratchMovers )
+		{
+			if ( mover.IsValid() && mover.Tags.Has( TerrorTown.MapMover.DoorTag ) )
+				Doors.Add( mover );
 		}
 
 		_scratchClients.Clear();
@@ -115,13 +138,20 @@ public sealed class BotSystem : GameObjectSystem<BotSystem>
 	private void UpdateView()
 	{
 		_views.Clear();
+		// A dedicated server draws nothing, even if its scene has a camera.
+		if ( Application.IsDedicatedServer || Application.IsHeadless )
+			return;
+
 		var camera = Scene.Camera;
 		if ( !camera.IsValid() )
 			return;
 
 		ViewPosition = camera.WorldPosition;
-		var best = PixelsPerUnitFor( camera, Screen.Height, Screen.Width / MathF.Max( Screen.Height, 1f ) );
+		var aspect = Screen.Width / MathF.Max( Screen.Height, 1f );
+		var best = PixelsPerUnitFor( camera, Screen.Height, aspect );
 		_views.Add( camera.GetFrustum() );
+		_viewForward = camera.WorldRotation.Forward;
+		_viewHalfAngle = HalfDiagonal( camera, aspect );
 
 		// A magnified optic draws the world again through its own narrow camera: through the scope, things look as big
 		// as that camera makes them.
@@ -145,6 +175,18 @@ public sealed class BotSystem : GameObjectSystem<BotSystem>
 			? MathF.Tan( fov * 0.5f )
 			: MathF.Tan( fov * 0.5f ) / MathF.Max( aspect, 0.1f );
 		return screenHeight / (2f * MathF.Max( halfHeight, 0.001f ));
+	}
+
+	/// <summary> The angle (radians) from <paramref name="camera"/>'s forward to the corners of its picture. </summary>
+	private static float HalfDiagonal( CameraComponent camera, float aspect )
+	{
+		if ( camera.Orthographic )
+			return MathF.PI;
+
+		var tan = MathF.Tan( camera.FieldOfView.Clamp( 1f, 170f ).DegreeToRadian() * 0.5f );
+		aspect = MathF.Max( aspect, 0.1f );
+		var (tanX, tanY) = camera.FovAxis == CameraComponent.Axis.Vertical ? (tan * aspect, tan) : (tan, tan / aspect);
+		return MathF.Atan( MathF.Sqrt( tanX * tanX + tanY * tanY ) );
 	}
 
 	/// <summary>
@@ -180,6 +222,54 @@ public sealed class BotSystem : GameObjectSystem<BotSystem>
 			return true;
 
 		return system.ScreenHeightAt( distance ) >= minPixels && system.IsOnScreen( position, 64f );
+	}
+
+	/// <summary> Within this a bot is always posed in full: its shadow, or a reflection, can be in view when it isn't. </summary>
+	private const float PoseNearby = 1200f;
+	/// <summary> Smaller than this (pixels tall) the arms' and gun's fit is under a pixel. </summary>
+	private const float PoseMinPixels = 4f;
+	/// <summary> Round the chest: the whole body and gun, lying down too, and the near part of its shadow. </summary>
+	private const float PoseRadius = 128f;
+	/// <summary> The view can still turn a little after the bots are posed (recoil, sway, a flash's roll), before it's drawn. </summary>
+	private const float PoseViewMargin = 10f * MathF.PI / 180f;
+
+	/// <summary>
+	/// Should a bot standing at <paramref name="position"/> be posed in full on this machine this frame: its gun fitted
+	/// to both hands (<see cref="BotWeaponPose"/>), the arms solved onto it (<see cref="BotSupportHand"/>), the sprint
+	/// carry and the cheek weld? Close by always. Further off while any of it could be in the picture (with a margin) and
+	/// it's at least a few pixels tall, a scope's picture counted: through a scope a distant bot is posed as up close.
+	/// Otherwise nobody here could see the difference, and it keeps the animated pose with the gun in its hand. It looks
+	/// from <c>Scene.Camera</c>, which is the recon drone's feed while one is flown. Nothing is posed on a server
+	/// with no screen. Always true with <c>bot_lod_off</c>.
+	/// </summary>
+	public static bool ShouldPose( Vector3 position )
+	{
+		var system = Current;
+		if ( !LodEnabled || system is null )
+			return true;
+		if ( !system.HasView )
+			return false;
+
+		var distance = position.Distance( system.ViewPosition );
+		if ( distance < PoseNearby )
+			return true;
+
+		return system.ScreenHeightAt( distance ) >= PoseMinPixels && system.IsInView( position + Vector3.Up * 40f, PoseRadius );
+	}
+
+	/// <summary>
+	/// Could the main camera's picture show any of a sphere <paramref name="radius"/> across at <paramref name="centre"/>?
+	/// A cone round the view out to its corners, plus <see cref="PoseViewMargin"/>: looser than <see cref="IsOnScreen"/>.
+	/// </summary>
+	private bool IsInView( Vector3 centre, float radius )
+	{
+		var to = centre - ViewPosition;
+		var distance = to.Length;
+		if ( distance <= radius )
+			return true;
+
+		var angle = MathF.Acos( Vector3.Dot( to / distance, _viewForward ).Clamp( -1f, 1f ) );
+		return angle <= _viewHalfAngle + MathF.Asin( radius / distance ) + PoseViewMargin;
 	}
 
 	/// <summary>
@@ -218,10 +308,12 @@ public sealed class BotSystem : GameObjectSystem<BotSystem>
 
 	/// <summary>
 	/// Bots have no bone objects (a GameObject per bone, moved every frame: a hundred bots made ten thousand), so each
-	/// one's gun is moved onto its hand here, once the frame's animation is done.
+	/// one's gun is moved onto its hand here, once the frame's animation is done. The view is taken again first: the
+	/// camera has moved this frame since <see cref="Refresh"/>, and a bot coming into view is posed before it's drawn.
 	/// </summary>
 	private void FollowHands()
 	{
+		UpdateView();
 		foreach ( var bot in AliveBots )
 		{
 			if ( bot.IsValid() )

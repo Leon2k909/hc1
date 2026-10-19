@@ -1,5 +1,7 @@
+@using Facepunch.UI
 @namespace Facepunch
 @inherits Panel
+@implements IPadScope
 
 <root class="hc1">
     <div class="text">
@@ -7,13 +9,17 @@
     </div>
 
     <div class="options">
-        <a class="button standard" onclick="@(() => OnSubmitButton())">
+        <a class="button standard pad-target" @ref="SubmitButton" onclick="@(() => OnSubmitButton())">
             <label>@ButtonLabel( SubmitText, "OK" )</label>
         </a>
 
-        <a class="button standard" onclick="@(() => OnCancelButton())">
-            <label>@ButtonLabel( CancelText, "Cancel" )</label>
-        </a>
+        @* A notice passes no cancel text, and has only its OK. *@
+        @if ( !string.IsNullOrEmpty( CancelText ) )
+        {
+            <a class="button standard pad-target" onclick="@(() => OnCancelButton())">
+                <label>@ButtonLabel( CancelText, "Cancel" )</label>
+            </a>
+        }
     </div>
 </root>
 
@@ -43,6 +49,26 @@
         OnSubmit?.Invoke();
         Delete();
     }
+
+    // The pad (PadNavigation): over whatever it was opened on, starting on OK; B cancels, or dismisses a notice.
+    private Panel SubmitButton { get; set; }
+
+    public override void Tick()
+    {
+        base.Tick();
+        PadNavigation.Offer( this, this, 100 );
+    }
+
+    public Panel PadFirstFocus => SubmitButton;
+
+    public bool PadBack()
+    {
+        if ( string.IsNullOrEmpty( CancelText ) ) OnSubmitButton();
+        else OnCancelButton();
+        return true;
+    }
+
+    public bool PadTab( int direction ) => false;
 
     protected override int BuildHash()
     {

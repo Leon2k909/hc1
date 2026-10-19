@@ -5,37 +5,60 @@
 @attribute [StyleSheet]
 
 <root class="input-settings">
-    <div class="with-padding border-bottom grow">
-        <label class="name">@Tr( "AIM INPUT" )</label>
-        <div class="grow" />
-        <button class="button standard smaller no-anim extra-x-padding @(GameSettingsSystem.Current.ToggleAim ? "selected" : "")" onclick=@ToggleAimSetting>
-            @Tr( GameSettingsSystem.Current.ToggleAim ? "TOGGLE" : "HOLD" )
-        </button>
-    </div>
-
-    <div class="with-padding border-bottom grow">
-        <label class="name">@Tr( "SPRINT INPUT" )</label>
-        <div class="grow" />
-        <button class="button standard smaller no-anim extra-x-padding @(GameSettingsSystem.Current.ToggleSprint ? "selected" : "")" onclick=@ToggleSprintSetting>
-            @Tr( GameSettingsSystem.Current.ToggleSprint ? "TOGGLE" : "HOLD" )
-        </button>
-    </div>
-
-    <div class="kb-head">
-        <div class="kb-head-text">
-            <label class="kb-title">@Tr( "KEYBINDS" )</label>
-            <label class="kb-hint">@Tr( "Click any key to change it" )</label>
+    @if ( !IsSearching )
+    {
+        <div class="with-padding border-bottom grow">
+            <label class="name">@Tr( "AIM INPUT" )</label>
+            <div class="grow" />
+            <button class="button standard smaller no-anim extra-x-padding @(GameSettingsSystem.Current.ToggleAim ? "selected" : "")" onclick=@ToggleAimSetting>
+                @Tr( GameSettingsSystem.Current.ToggleAim ? "TOGGLE" : "HOLD" )
+            </button>
         </div>
-        <div class="grow" />
-        <div class="kb-edit" onclick=@EditBinds><i>keyboard</i><label>@Tr( "Change Keybinds" )</label></div>
-    </div>
 
-    @foreach ( var group in Groups() )
+        <div class="with-padding border-bottom grow">
+            <label class="name">@Tr( "SPRINT INPUT" )</label>
+            <div class="grow" />
+            <button class="button standard smaller no-anim extra-x-padding @(GameSettingsSystem.Current.ToggleSprint ? "selected" : "")" onclick=@ToggleSprintSetting>
+                @Tr( GameSettingsSystem.Current.ToggleSprint ? "TOGGLE" : "HOLD" )
+            </button>
+        </div>
+
+        @foreach ( var setting in Settings( "AimAssist" ) )
+        {
+            <SettingEntry Target=@GameSettingsSystem.Current Description=@setting />
+        }
+
+        <div class="kb-head">
+            <div class="kb-head-text">
+                <label class="kb-title">@Tr( "SENSITIVITY" )</label>
+                <label class="kb-hint">@Tr( "On top of s&box's own mouse sensitivity and controller look speed" )</label>
+            </div>
+        </div>
+
+        @foreach ( var setting in Settings( SensitivitySettings ) )
+        {
+            <SettingEntry Target=@GameSettingsSystem.Current Description=@setting />
+        }
+    }
+
+    @if ( !IsSearching || Groups( Query ).Any() )
+    {
+        <div class="kb-head">
+            <div class="kb-head-text">
+                <label class="kb-title">@Tr( "KEYBINDS" )</label>
+                <label class="kb-hint">@Tr( "Click a binding, then press a key or mouse button" )</label>
+            </div>
+            <div class="grow" />
+            <div class="kb-edit pad-target" onclick=@ResetBinds><i>restart_alt</i><label>@Tr( "Reset Keybinds" )</label></div>
+        </div>
+    }
+
+    @foreach ( var group in Groups( Query ) )
     {
         <label class="kb-group">@Tr( group.Key )</label>
         @foreach ( var action in group )
         {
-            <div class="kb-row" onclick=@EditBinds>
+            <div class="kb-row @(BindingAction == action.Name ? "listening" : "")" onclick=@(() => BeginBind( action.Name ))>
                 <label class="kb-name">@Tr( ActionTitle( action ) )</label>
                 <div class="grow" />
                 <div class="kb-keys">
@@ -64,16 +87,24 @@
             </div>
         }
     }
+    @if ( BindingAction is not null )
+    {
+        <div class="kb-capture">
+            <i>keyboard</i>
+            <label class="kb-capture-title">@Tr( ActionTitleForName( BindingAction ) )</label>
+            <label class="kb-capture-prompt">@Tr( "Press any key or mouse button" )</label>
+            <label class="kb-capture-help">@Tr( "ESC to cancel · BACKSPACE to unbind" )</label>
+        </div>
+    }
 </root>
 
 @code
 {
-    // s&box doesn't let game code change binds (only its own bind editor can), so the list shows every action's current
-    // key and any row opens that editor.
+    // The game's own keyboard binds are stored per player; controller mappings remain engine-managed.
     private static readonly string[] GroupOrder = { "Movement", "Weapon Handling", "Inventory", "Team", "Other", "Spectator" };
 
-    // Players never use these.
-    private static readonly HashSet<string> HiddenGroups = new( StringComparer.OrdinalIgnoreCase ) { "Development" };
+    // Players never use these, and the menus' pad buttons (PadNavigation) aren't keybinds.
+    private static readonly HashSet<string> HiddenGroups = new( StringComparer.OrdinalIgnoreCase ) { "Development", "Menus" };
 
     private static readonly Dictionary<string, string> Titles = new( StringComparer.OrdinalIgnoreCase )
     {
@@ -111,11 +142,60 @@
         ["SpectatorMode"] = "Change View",
     };
 
-    private static IEnumerable<IGrouping<string, InputAction>> Groups() => Input.GetActions()
-        .Where( x => !string.IsNullOrEmpty( x.Name ) && !HiddenGroups.Contains( x.GroupName ?? "" ) )
-        .DistinctBy( x => x.Name, StringComparer.OrdinalIgnoreCase )
-        .GroupBy( x => string.IsNullOrEmpty( x.GroupName ) ? "Other" : x.GroupName )
-        .OrderBy( g => GroupRank( g.Key ) );
+    /// <summary>
+    /// The settings page's search, when it's searching: only the keybinds that match are listed (the settings above
+    /// them are in its own results).
+    /// </summary>
+    public string Query { get; set; }
+
+    private bool IsSearching => !string.IsNullOrWhiteSpace( Query );
+
+    private string BindingAction { get; set; }
+
+    public InputSettings()
+    {
+        AcceptsFocus = true;
+    }
+
+    // GameSettings' Controls properties this page draws as ordinary settings rows (sliders), in this order.
+    private static readonly string[] SensitivitySettings =
+    {
+        nameof( GameSettings.MouseSensitivity ),
+        nameof( GameSettings.MouseAdsSensitivity ),
+        nameof( GameSettings.ControllerHorizontalSensitivity ),
+        nameof( GameSettings.ControllerVerticalSensitivity ),
+        nameof( GameSettings.ControllerAdsSensitivity ),
+    };
+
+    private static IEnumerable<PropertyDescription> Settings( params string[] names )
+    {
+        var all = TypeLibrary.GetPropertyDescriptions( GameSettingsSystem.Current );
+        foreach ( var name in names )
+        {
+            var setting = all.FirstOrDefault( x => x.Name == name );
+            if ( setting is not null ) yield return setting;
+        }
+    }
+
+    /// <summary>The keybinds by group; with a search, only those whose name, group or key has every word of it.</summary>
+    internal static IEnumerable<IGrouping<string, InputAction>> Groups( string query = null )
+    {
+        var words = SettingsSearch.Words( query );
+        return Input.GetActions()
+            .Where( x => !string.IsNullOrEmpty( x.Name ) && !HiddenGroups.Contains( x.GroupName ?? "" ) )
+            .DistinctBy( x => x.Name, StringComparer.OrdinalIgnoreCase )
+            .Where( x => words.Length == 0 || MatchesSearch( x, words ) )
+            .GroupBy( x => string.IsNullOrEmpty( x.GroupName ) ? "Other" : x.GroupName )
+            .OrderBy( g => GroupRank( g.Key ) );
+    }
+
+    private static bool MatchesSearch( InputAction action, string[] words )
+    {
+        var title = ActionTitle( action );
+        var group = string.IsNullOrEmpty( action.GroupName ) ? "Other" : action.GroupName;
+        return SettingsSearch.Matches( words, title, Tr( title ), group, Tr( group ), "Keybinds", Tr( "KEYBINDS" ),
+            string.Join( ' ', Keys( action ) ) );
+    }
 
     private static int GroupRank( string group )
     {
@@ -129,6 +209,12 @@
         return string.IsNullOrEmpty( action.Title ) ? action.Name : action.Title;
     }
 
+    private static string ActionTitleForName( string name )
+    {
+        var action = Input.GetActions().FirstOrDefault( x => x.Name == name );
+        return action is null ? name : ActionTitle( action );
+    }
+
     /// <summary>The keys bound to the action; a chord like "shift + w" comes back as several.</summary>
     private static IEnumerable<string> Keys( InputAction action )
     {
@@ -138,7 +224,65 @@
             yield return key;
     }
 
-    private void EditBinds() => Game.Overlay.ShowBinds();
+    private void BeginBind( string action )
+    {
+        BindingAction = action;
+        Focus();
+        StateHasChanged();
+    }
+
+    private void CancelBind()
+    {
+        BindingAction = null;
+        StateHasChanged();
+    }
+
+    private void ResetBinds()
+    {
+        ControlBindings.Reset();
+        CancelBind();
+    }
+
+    public override void OnButtonEvent( ButtonEvent e )
+    {
+        if ( BindingAction is null || !e.Pressed )
+        {
+            base.OnButtonEvent( e );
+            return;
+        }
+
+        e.StopPropagation = true;
+        var button = (e.Button ?? "").Trim().ToLowerInvariant();
+        if ( button is "escape" or "esc" )
+        {
+            CancelBind();
+            return;
+        }
+
+        if ( button is "backspace" or "delete" )
+        {
+            ControlBindings.Rebind( BindingAction, "" );
+            CancelBind();
+            return;
+        }
+
+        var binding = ControlBindings.MakeBinding( button, e.HasCtrl, e.HasShift, e.HasAlt );
+        if ( binding is null ) return;
+
+        ControlBindings.Rebind( BindingAction, binding );
+        CancelBind();
+    }
+
+    protected override void OnEscape( PanelEvent e )
+    {
+        if ( BindingAction is not null )
+        {
+            e.StopPropagation();
+            CancelBind();
+            return;
+        }
+        base.OnEscape( e );
+    }
 
     private void ToggleAimSetting()
     {
@@ -158,6 +302,9 @@
     protected override int BuildHash()
     {
         var hash = new HashCode();
+        hash.Add( Query );
+        hash.Add( BindingAction );
+        hash.Add( GameText.Current );
         hash.Add( GameSettingsSystem.Current.ToggleAim );
         hash.Add( GameSettingsSystem.Current.ToggleSprint );
         foreach ( var action in Input.GetActions() )

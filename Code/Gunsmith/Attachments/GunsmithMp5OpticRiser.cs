@@ -4,10 +4,12 @@ namespace Facepunch.Gunsmith;
 public sealed class GunsmithMp5OpticRiser : Component, ICameraSetup
 {
 	private SkinnedModelRenderer weapon;
+	private bool? followsCamera;
 
 	protected override void OnStart()
 	{
 		weapon = GetComponentInParent<SkinnedModelRenderer>( true );
+		followsCamera = null;
 		Refresh();
 	}
 
@@ -15,6 +17,8 @@ public sealed class GunsmithMp5OpticRiser : Component, ICameraSetup
 
 	void ICameraSetup.PostSetup( CameraComponent camera )
 	{
+		// A world model doesn't move in camera setup, and the riser moves with it (GunsmithMw22Attachment.OnViewModel).
+		if ( !weapon.IsValid() || !(followsCamera ??= GunsmithMw22Attachment.OnViewModel( weapon )) ) return;
 		GunsmithMw22Attachment.FollowingCamera = true;
 		try { Refresh(); }
 		finally { GunsmithMw22Attachment.FollowingCamera = false; }

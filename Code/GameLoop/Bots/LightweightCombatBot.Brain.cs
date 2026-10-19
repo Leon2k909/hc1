@@ -51,8 +51,24 @@ public sealed partial class LightweightCombatBot
 	/// </summary>
 	[Property, Group( "Movement" )] public float ActionRadius { get; set; } = 2500f;
 
-	/// <summary> Where the bot is aiming, for everyone's animation. </summary>
+	/// <summary>
+	/// Where the bot is aiming, for everyone's animation. Sent when it has turned <see cref="AimSyncDegrees"/>, and a
+	/// smaller turn <see cref="AimSyncSettle"/> later, not a little every frame (<see cref="UpdateAim"/>).
+	/// </summary>
 	[Sync( SyncFlags.FromHost )] public Vector3 AimDirection { get; private set; }
+
+	/// <summary>
+	/// Where the bot is aiming as this machine best knows it: on the host the aim itself, each frame, on clients what the
+	/// host last sent (<see cref="AimDirection"/>).
+	/// </summary>
+	public Vector3 LiveAimDirection => !IsProxy && !_aimDirection.IsNearZeroLength ? _aimDirection : AimDirection;
+
+	/// <summary> How far (degrees) the aim turns before it's sent again. </summary>
+	private const float AimSyncDegrees = 0.5f;
+	/// <summary> How long (s) a smaller turn waits before it's sent anyway. </summary>
+	private const float AimSyncSettle = 0.1f;
+	private static readonly float AimSyncCos = MathF.Cos( AimSyncDegrees.DegreeToRadian() );
+	private TimeSince _timeSinceAimSync;
 	[Sync( SyncFlags.FromHost )] public bool IsCrouching { get; private set; }
 	[Sync( SyncFlags.FromHost )] public bool IsReloading { get; private set; }
 	/// <summary>
@@ -154,6 +170,8 @@ public sealed partial class LightweightCombatBot
 	private Vector3 _watchRouteThreat;
 	private TimeSince _timeSinceWatchRoute;
 	private TimeSince _timeSincePerception;
+	/// <summary> The first look is done, and the bot looks at its own point in the interval from then on (<see cref="Perceive"/>). </summary>
+	private bool _perceptionPhased;
 	private TimeSince _timeSinceCallout;
 
 	private Vector3? _moveTarget;
@@ -163,6 +181,8 @@ public sealed partial class LightweightCombatBot
 	private Vector3 _engageSpotFor;
 	private Vector3? _huntDestination;
 	private TimeUntil _nextHuntPick;
+	/// <summary> After a hunt destination couldn't be walked to, when the bot tries picking another (<see cref="Hunt"/>). </summary>
+	private TimeUntil _huntRetry;
 	/// <summary> The enemy <see cref="_huntDestination"/> is a guess at; null while roaming. </summary>
 	private Component _huntTarget;
 	/// <summary> Where the guess put them, level from where they were, and how far out the guess could be then. </summary>
@@ -268,6 +288,7 @@ public sealed partial class LightweightCombatBot
 		_contact = null;
 		_callout = null;
 		_huntDestination = null;
+		_huntRetry = 0f;
 		_huntTarget = null;
 		StandFromProne();
 		IsCrouching = false;
@@ -357,7 +378,10 @@ public sealed partial class LightweightCombatBot
 		if ( _timeSincePerception < PerceptionIntervalNow )
 			return;
 
-		_timeSincePerception = 0f;
+		// A team spawns in one frame, so its bots all looked on the same frames. After the first look (straight away, as
+		// before) each takes its own phase: the next comes a little sooner, at a random point in the interval.
+		_timeSincePerception = _perceptionPhased ? 0f : Game.Random.Float( 0f, PerceptionInterval );
+		_perceptionPhased = true;
 
 		if ( _target.IsValid() && !IsEnemyAlive( _target ) )
 			ForgetTarget();
@@ -425,7 +449,13 @@ public sealed partial class LightweightCombatBot
 
 	/// <summary> Scratch lists for thinking: bots think one at a time on the main thread, so they can share them. </summary>
 	private static readonly List<Component> EnemyScratch = new();
-	private static readonly List<Vector3> SpotScratch = new();
+	// The hotloader can't copy a static List<Vector3> ("Destination array is too small", logged on every hotload), so
+	// it's skipped: a hotload leaves a fresh one, which loses nothing, since it's cleared before each use.
+	[SkipHotload] private static List<Vector3> _spotScratch;
+	private static List<Vector3> SpotScratch => _spotScratch ??= new();
+	/// <summary> For <see cref="PickHuntDestination"/> and <see cref="PickHuntTarget"/>, which pick between the others. </summary>
+	private static readonly List<Component> HuntScratch = new();
+	private static readonly List<Component> HuntPlayerScratch = new();
 	private static float[] _sortKeys = new float[64];
 	private static Component[] _sortItems = new Component[64];
 
@@ -899,7 +929,14 @@ public sealed partial class LightweightCombatBot
 		if ( !_targetVisible || Vector3.GetAngle( _aimDirection, wanted ) > 6f )
 			_timeSinceOnTarget = 0f;
 
-		AimDirection = _aimDirection;
+		// Every frame's little turn was a network update each tick for every bot. Send it once it's far enough to see, and
+		// a smaller one a moment later, so a client's view of the aim ends up exactly on it.
+		if ( AimDirection.IsNearZeroLength || Vector3.Dot( AimDirection, _aimDirection ) < AimSyncCos
+			|| (_timeSinceAimSync > AimSyncSettle && AimDirection != _aimDirection) )
+		{
+			AimDirection = _aimDirection;
+			_timeSinceAimSync = 0f;
+		}
 
 		var flat = IsSliding ? _slideDirection : _aimDirection.WithZ( 0f );
 		if ( !flat.IsNearZeroLength )
@@ -1265,6 +1302,10 @@ public sealed partial class LightweightCombatBot
 			return;
 		}
 
+		// The last pick couldn't be walked to: the bot stays as that attempt left it until it tries again.
+		if ( !_huntDestination.HasValue && _huntRetry.Relative > 0f )
+			return;
+
 		if ( !_huntDestination.HasValue || arrived || _nextHuntPick.Relative <= 0f )
 		{
 			_huntDestination = PickHuntDestination( arrived ? null : _huntDestination );
@@ -1273,7 +1314,12 @@ public sealed partial class LightweightCombatBot
 		}
 
 		if ( !GoTo( _huntDestination.Value, speed ) )
+		{
+			// A pick is a dozen navmesh searches, and it used to go again the next frame and fail the same way from the same
+			// spot (a bot on a navmesh island did, every frame). Wait a moment before picking again.
 			_huntDestination = null;
+			_huntRetry = Game.Random.Float( 1f, 2f );
+		}
 	}
 
 	/// <summary>
@@ -1287,9 +1333,15 @@ public sealed partial class LightweightCombatBot
 		if ( GameUtils.IsBattleRoyale )
 			return RoyaleHuntDestination( current );
 
-		var enemies = new List<Component>();
+		var enemies = HuntScratch;
+		enemies.Clear();
 		CollectEnemies( enemies );
-		enemies.RemoveAll( x => !IsRealPlayer( x ) && AwayFromAction( x.WorldPosition ) );
+		for ( var i = enemies.Count - 1; i >= 0; i-- )
+		{
+			if ( !IsRealPlayer( enemies[i] ) && AwayFromAction( enemies[i].WorldPosition ) )
+				enemies.RemoveAt( i );
+		}
+
 		while ( enemies.Count > 0 )
 		{
 			var chosen = PickHuntTarget( enemies );
@@ -1495,13 +1547,20 @@ public sealed partial class LightweightCombatBot
 	/// </summary>
 	private Component PickHuntTarget( List<Component> enemies )
 	{
-		var players = enemies.Where( IsRealPlayer ).ToList();
+		var players = HuntPlayerScratch;
+		players.Clear();
+		foreach ( var enemy in enemies )
+		{
+			if ( IsRealPlayer( enemy ) )
+				players.Add( enemy );
+		}
+
 		var candidates = players.Count > 0 ? players : enemies;
 		if ( _nextHuntTargetPick.Relative > 0f && candidates.Contains( _huntTarget ) )
 			return _huntTarget;
 
 		_nextHuntTargetPick = Game.Random.Float( 20f, 30f );
-		var action = LivingPlayers.Select( x => x.WorldPosition ).ToList();
+		var action = LivingPlayers;
 
 		var chosen = candidates[0];
 		var total = 0f;
@@ -1509,7 +1568,12 @@ public sealed partial class LightweightCombatBot
 		{
 			var weight = 1f / (enemy.WorldPosition.Distance( WorldPosition ) + 600f);
 			if ( enemy is LightweightCombatBot && action.Count > 0 )
-				weight /= action.Min( x => x.Distance( enemy.WorldPosition ) ) + 600f;
+			{
+				var nearest = float.MaxValue;
+				foreach ( var player in action )
+					nearest = MathF.Min( nearest, player.WorldPosition.Distance( enemy.WorldPosition ) );
+				weight /= nearest + 600f;
+			}
 
 			total += weight;
 			if ( Game.Random.Float( 0f, total ) < weight )
@@ -1772,12 +1836,18 @@ public sealed partial class LightweightCombatBot
 	/// <summary> How much to ease off for a teammate going our way just in front (1 for anyone else). </summary>
 	private float IntervalScale( Component mate, Vector3 ahead )
 	{
+		// Every bot asks this of every teammate each frame, so the cheap tests go first: within the interval ahead and 64
+		// to the side, they're under this far away. Their velocity is a call into the engine.
 		var offset = mate.WorldPosition - WorldPosition;
-		if ( MathF.Abs( offset.z ) > 64f || GetVelocity( mate ).WithZ( 0f ).Dot( ahead ) < 40f )
+		var flat = offset.WithZ( 0f );
+		if ( MathF.Abs( offset.z ) > 64f || flat.LengthSquared >= Interval * Interval + 64f * 64f )
 			return 1f;
 
-		var along = Vector3.Dot( offset.WithZ( 0f ), ahead );
-		if ( along <= 0f || along >= Interval || (offset.WithZ( 0f ) - ahead * along).Length > 64f )
+		var along = Vector3.Dot( flat, ahead );
+		if ( along <= 0f || along >= Interval || (flat - ahead * along).Length > 64f )
+			return 1f;
+
+		if ( GetVelocity( mate ).WithZ( 0f ).Dot( ahead ) < 40f )
 			return 1f;
 
 		return along / Interval;

@@ -323,7 +323,12 @@ public partial class Equipment : Component, Component.INetworkListener, IDescrip
 			viewModelGameObject.Flags |= GameObjectFlags.Absolute;
 
 			var viewModelComponent = viewModelGameObject.GetComponent<ViewModel>();
-			viewModelComponent.PlayDeployEffects = playDeployEffects;
+			// Skip the draw clip if we switch weapons mid-sprint so the new weapon can tuck immediately.
+			// Keep playDeployEffects for the equip sound below.
+			var equipWhileSprinting = player.IsSprinting && !viewModelComponent.IsThrowable;
+			viewModelComponent.PlayDeployEffects = playDeployEffects && !equipWhileSprinting;
+			if ( equipWhileSprinting )
+				viewModelComponent.ModelRenderer?.SetBool( "b_sprint", true );
 			if ( ApplySavedAttachments )
 				Facepunch.Gunsmith.GunsmithLoadoutManager.ApplyAttachments( resource, viewModelGameObject );
 
@@ -468,22 +473,24 @@ public partial class Equipment : Component, Component.INetworkListener, IDescrip
 
 		if ( WorldModel.IsValid() )
 		{
-			var wmRenderer = WorldModel.Components.Get<SkinnedModelRenderer>( FindMode.EverythingInSelfAndDescendants );
-			if ( wmRenderer.IsValid() )
-			{
-				bool hasOptic = false;
-				bool hasMuzzle = false;
-				foreach ( var point in WorldModel.Components.GetAll<GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants ) )
-				{
-					if ( point.CurrentPart.IsValid() && point.CurrentPart.ModifyBodygroups )
-					{
-						if ( point.Category == GunsmithPartType.Optic ) hasOptic = true;
-						if ( point.Category is GunsmithPartType.Barrel or GunsmithPartType.Muzzle ) hasMuzzle = true;
-					}
-				}
-
-				if ( !hasMuzzle ) wmRenderer.SetBodyGroup( "muzzle", 0 );
-			}
+			var wmRenderer = WorldModelRenderer();
+			if ( wmRenderer.IsValid() && !GunsmithAttachmentPoint.BodygroupParts( WorldModel.GameObject ).Muzzle )
+				GunsmithAttachmentPoint.ResetFactoryMuzzle( wmRenderer );
 		}
+	}
+
+	private (WorldModel Model, int Version, SkinnedModelRenderer Renderer) _worldModelRenderer;
+
+	/// <summary>
+	/// The world model's renderer, found again when the world model or its points change (every player's gun asks every
+	/// frame, so it doesn't walk the world model each time).
+	/// </summary>
+	private SkinnedModelRenderer WorldModelRenderer()
+	{
+		var kept = _worldModelRenderer;
+		if ( kept.Model != WorldModel || kept.Version != GunsmithAttachmentPoint.Version || !kept.Renderer.IsValid() )
+			_worldModelRenderer = kept = (WorldModel, GunsmithAttachmentPoint.Version,
+				WorldModel.Components.Get<SkinnedModelRenderer>( FindMode.EverythingInSelfAndDescendants ));
+		return kept.Renderer;
 	}
 }

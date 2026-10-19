@@ -359,3 +359,6 @@ BugReportPanel
         color: rgba( white, 0.72 );
     }
 }
+
+// The D-pad's focus (PadNavigation).
+BugReportPanel .pad-focus { outline-width: 2px; outline-color: $menu-accent; outline-offset: 2px; }

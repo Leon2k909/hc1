@@ -150,6 +150,7 @@ public partial class PlayerPawn
 			return;
 
 		ResetAimInputForRespawn();
+		ResetSprintStamina();
 		Possess();
 		if ( !Facepunch.Gunsmith.FiringRangeSystem.IsActive ) UsageStats.CountLife();
 	}

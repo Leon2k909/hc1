@@ -17,14 +17,19 @@ public sealed class CustomGameSettings
 	/// <summary>The match rules picked on the page's RULES and PLAYER tabs. They hold for every map the lobby plays.</summary>
 	public CustomGameRules Rules { get; private init; } = new();
 
-	public static void Configure( int playerLimit, bool fillWithBots, LobbyPrivacy privacy, CustomGameRules rules = null )
+	/// <summary>Who can join by what they play with (the page's INPUT, <see cref="LobbyInputRules"/>).</summary>
+	public LobbyInput Input { get; private init; }
+
+	public static void Configure( int playerLimit, bool fillWithBots, LobbyPrivacy privacy, CustomGameRules rules = null,
+		LobbyInput? input = null )
 	{
 		Current = new()
 		{
 			PlayerLimit = Math.Clamp( playerLimit, 2, 10 ),
 			FillWithBots = fillWithBots,
 			Privacy = privacy,
-			Rules = rules?.Clone() ?? new()
+			Rules = rules?.Clone() ?? new(),
+			Input = input ?? LobbyInputRules.Preference
 		};
 	}
 

@@ -1,0 +1,47 @@
+@namespace Facepunch.UI
+@inherits Panel
+@attribute [StyleSheet]
+
+@if ( !Show ) return;
+
+<root>
+    <div class="soldier-rank">
+        <label>@Tr( "LEVEL {0}", Progression.GetLevel() )</label>
+        <div class="rank-track"><div class="rank-fill" @ref="RankFill" /></div>
+    </div>
+    <div class="stamina-row">
+        <i>directions_run</i>
+        <div class="stamina-track"><div class="stamina-fill" @ref="StaminaFill" /></div>
+        <label class="stamina-value">@(Pawn.SprintExhausted ? Tr( "RECOVERING" ) : $"{StaminaPercent}%")</label>
+    </div>
+    @if ( SoldierTraining.TimeSinceLevelUp < 4f )
+    {
+        <div class="training-notice">
+            <label class="notice-title">@Tr( "SKILL IMPROVED" )</label>
+            <label>@Tr( SoldierTraining.LastImprovedSkill == SoldierSkill.Endurance ? "ENDURANCE" : "WEAPON HANDLING" ) · @Tr( "LEVEL {0}", SoldierTraining.GetLevel( SoldierTraining.LastImprovedSkill ) )</label>
+        </div>
+    }
+</root>
+
+@code
+{
+    private PlayerPawn Pawn => Client.Local.IsValid() ? Client.Local.PlayerPawn : null;
+    private bool Show => Pawn.IsValid() && Client.Viewer == Client.Local && Pawn.IsViewer
+        && Pawn.HealthComponent?.State == LifeState.Alive;
+    private int StaminaPercent => Pawn.IsValid() ? (int)MathF.Ceiling( Pawn.SprintStamina * 100f ) : 0;
+    private Panel RankFill { get; set; }
+    private Panel StaminaFill { get; set; }
+
+    protected override int BuildHash() => HashCode.Combine( Show, Pawn, StaminaPercent,
+        Pawn.IsValid() && Pawn.SprintExhausted, Progression.GetXP(), SoldierTraining.LevelUpRevision,
+        SoldierTraining.TimeSinceLevelUp < 4f, GameText.Current );
+
+    public override void Tick()
+    {
+        base.Tick();
+        if ( !Show ) return;
+        SetClass( "exhausted", Pawn.SprintExhausted );
+        if ( StaminaFill.IsValid() ) StaminaFill.Style.Width = Length.Percent( Pawn.SprintStamina * 100f );
+        if ( RankFill.IsValid() ) RankFill.Style.Width = Length.Percent( Progression.GetLevelProgress() * 100f );
+    }
+}

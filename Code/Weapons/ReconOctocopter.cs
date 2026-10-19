@@ -271,6 +271,8 @@ public sealed class ReconOctocopter : Component, Component.IDamageable, ICustomM
 		if ( IsPiloting( pawn ) ) Piloted.Unlink();
 	}
 
+	private ColorAdjustments _feedColorAdjustments;
+
 	private void CreateCamera()
 	{
 		_cameraObject = new GameObject( true, $"{DisplayName} Feed" );
@@ -297,23 +299,16 @@ public sealed class ReconOctocopter : Component, Component.IDamageable, ICustomM
 		if ( source.IsValid() )
 		{
 			camera.BackgroundColor = source.BackgroundColor;
-			CopyEffect<Bloom>( source.GameObject );
-			CopyEffect<Tonemapping>( source.GameObject );
-			CopyEffect<Sharpen>( source.GameObject );
-			CopyEffect<AmbientOcclusion>( source.GameObject );
-			CopyEffect<ColorAdjustments>( source.GameObject );
+			CameraPostProcess.Copy<Bloom>( source.GameObject, _cameraObject );
+			CameraPostProcess.Copy<Tonemapping>( source.GameObject, _cameraObject );
+			CameraPostProcess.Copy<Sharpen>( source.GameObject, _cameraObject );
+			CameraPostProcess.Copy<AmbientOcclusion>( source.GameObject, _cameraObject );
+			CameraPostProcess.Copy<Vignette>( source.GameObject, _cameraObject );
+			_feedColorAdjustments = CameraPostProcess.Copy<ColorAdjustments>( source.GameObject, _cameraObject );
 		}
 
 		camera.Enabled = true;
 		FeedCamera = camera;
-	}
-
-	private void CopyEffect<T>( GameObject source ) where T : Component, new()
-	{
-		var effect = source.GetComponent<T>();
-		if ( !effect.IsValid() ) return;
-		var copy = _cameraObject.Components.Create<T>();
-		effect.CopyPropertiesTo( copy );
 	}
 
 	/// <summary>The camera behind the lens: the gimbal holds it level whatever the airframe does.</summary>
@@ -346,6 +341,8 @@ public sealed class ReconOctocopter : Component, Component.IDamageable, ICustomM
 		{
 			_cameraObject.WorldTransform = FeedTransform();
 			FeedCamera.FieldOfView = HorizontalFieldOfView;
+			var source = _bodyCamera.IsValid() ? _bodyCamera.GetComponent<ColorAdjustments>( true ) : null;
+			CameraPostProcess.SyncColor( source, _feedColorAdjustments );
 		}
 	}
 

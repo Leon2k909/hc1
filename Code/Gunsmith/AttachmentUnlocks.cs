@@ -32,8 +32,9 @@ public static class AttachmentUnlocks
 		get => IsDeveloper && Game.Cookies.Get( UnlockAllCookie, false );
 		set
 		{
-			if ( IsDeveloper )
-				Game.Cookies.Set( UnlockAllCookie, value );
+			if ( !IsDeveloper ) return;
+			Game.Cookies.Set( UnlockAllCookie, value );
+			GunsmithLoadoutManager.MarkChanged();
 		}
 	}
 
@@ -174,6 +175,7 @@ public static class AttachmentUnlocks
 		var bought = Bought;
 		bought.Add( BoughtKey( weapon, part ) );
 		Game.Cookies.Set( _boughtCookie, string.Join( ";", bought ) );
+		GunsmithLoadoutManager.MarkChanged();
 		return true;
 	}
 
@@ -213,19 +215,23 @@ public static class AttachmentUnlocks
 		return weapon is not null && part is not null && !IsLevelUnlocked( weapon, part );
 	}
 
-	private sealed record Ladder( Dictionary<string, int> Levels, RealTimeSince Built );
+	private sealed record Ladder( Dictionary<string, int> Levels, int PartsVersion, Scene Scene );
 
 	private static readonly Dictionary<string, Ladder> _ladders = new( StringComparer.OrdinalIgnoreCase );
 
-	/// <summary> Part path to unlock level for <paramref name="weapon"/>, rebuilt now and then so new or changed parts show up. </summary>
+	/// <summary>
+	/// Part path to unlock level for <paramref name="weapon"/>. It's made again when a part loads or changes
+	/// (<see cref="GunsmithPart.LibraryVersion"/>), and once a scene, so a weapon prefab's new slots show up on the next map.
+	/// It used to be thrown away every 5 s, which held up the frame every 5 s of firing.
+	/// </summary>
 	private static Dictionary<string, int> GetLadder( EquipmentResource weapon )
 	{
 		var key = weapon.ResourcePath ?? "";
-		if ( _ladders.TryGetValue( key, out var cached ) && cached.Built < 5f )
+		if ( _ladders.TryGetValue( key, out var cached ) && cached.PartsVersion == GunsmithPart.LibraryVersion && cached.Scene == Game.ActiveScene )
 			return cached.Levels;
 
 		var levels = BuildLadder( weapon );
-		_ladders[key] = new Ladder( levels, 0f );
+		_ladders[key] = new Ladder( levels, GunsmithPart.LibraryVersion, Game.ActiveScene );
 		return levels;
 	}
 

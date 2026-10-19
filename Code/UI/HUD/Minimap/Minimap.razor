@@ -2,24 +2,26 @@
 @attribute [StyleSheet]
 @inherits Panel
 
+@* The engine doesn't ask for BuildHash before the first render, which needs what it gathers. *@
+@{ if ( !_gathered ) BuildHash(); }
+
 @if ( Scene is null || !Client.Viewer.IsValid() || !Client.Viewer.Pawn.IsValid() ) return;
 
+@* The markup only changes when what's on the radar does (BuildHash). What moves every frame, the map, its turn and the
+   markers, is placed in Tick and by the markers themselves (MinimapIconMarker, MinimapLabelMarker). *@
 <root class="radar @(HasBakedMap ? "has-baked-map" : "generic-map")" style="border: 1px solid rgba( black, 0.5 )">
     @if (Renderer.IsValid())
     {
-        <div class="mask" style="@MapRot()">
+        <div class="mask" @ref="Mask" style="@(FixedMode ? "" : "transform-origin: center center;")">
             @if ( HasBakedMap )
             {
                 <div class="map-parent">
-                    <div style="@MapTransform()">
+                    <div @ref="MapLayer" style="position: absolute; width: @CssPercent( Zoom ); height: @CssPercent( Zoom )">
                         <div class="minimap" style="background-image: url( @Renderer.CurrentMinimapPath )" />
                         <div class="overlay" style="background-image: url( @Renderer.CurrentMinimapPath )" />
 
-                        @foreach ( var volume in Scene.GetAllComponents<IMinimapVolume>() )
+                        @foreach ( var volume in Volumes )
                         {
-                            if (!volume.IsValid() || (Client.Viewer.Pawn is PlayerPawn player && !volume.IsVisible( player )))
-                                continue;
-
                             <div class="volume" style="@GetBox( volume ) @GetBoxStyles( volume )" >
                                 <div class="bg" style="@GetLineStyles( volume )" />
                             </div>
@@ -41,43 +43,31 @@
         </div>
 
         <div class="markers">
-            @if ( SkirmishArena.Active is { } arena && Renderer.Size > 0 )
+            @if ( _showArena )
             {
-                <div class="arena" style="@ArenaStyle( arena )" />
+                <div class="arena" @ref="ArenaRing" />
             }
 
-            @foreach ( var element in Scene.GetAllComponents<IMinimapElement>() )
+            @foreach ( var element in Elements )
             {
-                @if ( !element.IsValid() || ( Client.Viewer.Pawn is PlayerPawn player && !element.IsVisible( player ) ) )
-                    continue;
-
+                @* Keyed, so a marker keeps its element's tint rather than passing it on to another's. *@
                 @if ( element is IMinimapIcon icon && !string.IsNullOrEmpty( icon.IconPath ) )
                 {
-                    string style = WorldToMap( icon.WorldPosition );
-
-                    if ( icon is IDirectionalMinimapIcon { EnableDirectional: true } dir )
-                        style += RotationToMap( dir.Direction );
-                    else
-                        style += RotationToMap( FixedMode ? 0 : Client.Viewer.Pawn?.EyeAngles.yaw ?? 0 );
-
-                    if (icon is ICustomMinimapIcon custom)
-                        style += custom.CustomStyle;
-
-                    <div class="marker" style="background-image: url( @icon.IconPath ); @style z-index: @icon.IconOrder;" />
+                    <MinimapIconMarker @key="icon" class="marker" Icon=@icon Minimap=@this />
                 }
 
                 if ( element is IMinimapLabel label )
                 {
-                    <div class="label" style="@WorldToMap( label.WorldPosition ) @LabelStyles( label )">
+                    <MinimapLabelMarker class="label" style="@LabelStyles( label )" Label=@label Minimap=@this>
                         @label.Label
-                    </div>
+                    </MinimapLabelMarker>
                 }
             }
 
             <!-- POV Marker -->
-            @if ( Client.Viewer.Pawn is not PlayerPawn || Client.Viewer.Pawn?.HealthComponent?.State == LifeState.Alive )
+            @if ( _showViewer )
             {
-                <div class="marker @(SpectateSystem.Instance?.IsFreecam ?? false ? "" : "viewer")" style="@WorldToMap( ViewPos ) @RotationToMap( ViewYaw ) background-tint: @ViewerColor.Hex" />
+                <div class="marker @(_freecam ? "" : "viewer")" @ref="ViewerMarker" style="background-tint: @ViewerColor.Hex" />
             }
 
         </div>
@@ -86,7 +76,25 @@
 
 @code
 {
-    public MinimapRenderer Renderer => Scene?.GetAllComponents<MinimapRenderer>().FirstOrDefault();
+    private MinimapRenderer _renderer;
+    private RealTimeSince _sinceRendererSearch = 999f;
+
+    /// <summary> The map's minimap renderer, looked for again at most four times a second while there's none. </summary>
+    public MinimapRenderer Renderer
+    {
+        get
+        {
+            if ( _renderer.IsValid() && _renderer.Active )
+                return _renderer;
+
+            if ( _sinceRendererSearch < 0.25f )
+                return null;
+
+            _sinceRendererSearch = 0f;
+            _renderer = Scene?.GetAllComponents<MinimapRenderer>().FirstOrDefault();
+            return _renderer;
+        }
+    }
 
     public Color TeamColor => Client.Viewer.IsValid() ? Client.Viewer.Team.GetColor() : Color.White;
     private PlayerPawn Player => Client.Viewer.IsValid() ? Client.Viewer.PlayerPawn : null;
@@ -102,19 +110,82 @@
     // doesn't rotate the map with the player
     public bool FixedMode => false;
 
-    // generic
-    string WorldToMap( Vector3 worldPosition )
+    private Panel Mask { get; set; }
+    private Panel MapLayer { get; set; }
+    private Panel ArenaRing { get; set; }
+    private Panel ViewerMarker { get; set; }
+
+    // What's on the radar, gathered once a frame by BuildHash for the markup. Made when first wanted, since a hotload
+    // leaves a new field null on a radar that's already up.
+    private List<IMinimapVolume> _foundVolumes, _volumes;
+    private List<IMinimapElement> _foundElements, _elements;
+    private List<IMinimapVolume> Volumes => _volumes ??= new();
+    private List<IMinimapElement> Elements => _elements ??= new();
+    private bool _showArena, _showViewer, _freecam, _gathered;
+
+    // What was last placed, so a still radar doesn't restyle its panels every frame.
+    private float _maskYaw = float.NaN;
+    private Vector2 _mapAt = new( float.NaN );
+    private Vector4 _arenaBox = new( float.NaN );
+    private Placement _viewerPlacement;
+
+    /// <summary> Where a point in the world sits on the radar, as percentages across the markers' layer. </summary>
+    internal Vector2 MapPercent( Vector3 worldPosition )
     {
         var position = Renderer.FromWorldRadar( worldPosition, ViewPos, FixedMode ? 0 : ViewYaw, Zoom );
-        return $"left: {CssPercent( position.x )}; top: {CssPercent( position.y )};";
+        return new Vector2( Percent( position.x ), Percent( position.y ) );
+    }
+
+    /// <summary> How far a marker facing <paramref name="yaw"/> is turned on the radar (degrees). </summary>
+    internal float MapAngle( float yaw ) => -(yaw - (FixedMode ? 0 : ViewYaw));
+
+    /// <summary> Where a marker was last put, and how it was turned. </summary>
+    internal struct Placement
+    {
+        private Vector2 _at;
+        private float _angle;
+        private bool _placed;
+
+        /// <summary>
+        /// Centres <paramref name="marker"/> on a point on the radar, turned to <paramref name="angle"/>: the style the
+        /// markup used to write ("left; top; transform: translateX(-50%) translateY(-50%) rotate()"), set from code.
+        /// </summary>
+        public void Apply( Panel marker, Vector2 at, float? angle )
+        {
+            if ( !_placed || at != _at )
+            {
+                _at = at;
+                marker.Style.Left = Length.Percent( at.x );
+                marker.Style.Top = Length.Percent( at.y );
+            }
+
+            if ( angle is { } turn && (!_placed || turn != _angle) )
+            {
+                _angle = turn;
+                var transform = new PanelTransform();
+                transform.AddTranslateX( Length.Percent( -50f ) );
+                transform.AddTranslateY( Length.Percent( -50f ) );
+                transform.AddRotation( 0f, 0f, turn );
+                marker.Style.Transform = transform;
+            }
+
+            _placed = true;
+        }
     }
 
     // The Skirmish arena's edge: a ring round its middle, as far across as the radar's scale makes it.
-    string ArenaStyle( SkirmishArena arena )
+    private void PlaceArena( SkirmishArena arena )
     {
         var centre = Renderer.FromWorldRadar( arena.Centre, ViewPos, FixedMode ? 0 : ViewYaw, Zoom, clamp: false );
         var radius = arena.ActiveRadius / (Renderer.Size * 0.5f / Zoom);
-        return $"left: {CssPercent( centre.x - radius )}; top: {CssPercent( centre.y - radius )}; width: {CssPercent( radius * 2f )}; height: {CssPercent( radius * 2f )};";
+        var box = new Vector4( Percent( centre.x - radius ), Percent( centre.y - radius ), Percent( radius * 2f ), Percent( radius * 2f ) );
+        if ( box == _arenaBox ) return;
+
+        _arenaBox = box;
+        ArenaRing.Style.Left = Length.Percent( box.x );
+        ArenaRing.Style.Top = Length.Percent( box.y );
+        ArenaRing.Style.Width = Length.Percent( box.z );
+        ArenaRing.Style.Height = Length.Percent( box.w );
     }
 
     string LabelStyles( IMinimapLabel label )
@@ -148,7 +219,7 @@
         return $"background-color: {volume.LineColor.Rgba};";
     }
 
-    private static string CssPercent( float value )
+    private static float Percent( float value )
     {
         if ( float.IsNaN( value ) || float.IsInfinity( value ) )
             value = 0f;
@@ -156,33 +227,132 @@
         if ( MathF.Abs( value ) < 0.0001f )
             value = 0f;
 
-        return $"{(value * 100f).ToString( "0.###", System.Globalization.CultureInfo.InvariantCulture )}%";
+        return value * 100f;
     }
 
-    string RotationToMap( Angles rot )
-    {
-        return RotationToMap(rot.yaw);
-    }
+    private static string CssPercent( float value ) =>
+        $"{Percent( value ).ToString( "0.###", System.Globalization.CultureInfo.InvariantCulture )}%";
 
-    string RotationToMap( float yaw )
+    public override void Tick()
     {
-        return $"transform: translateX(-50%) translateY(-50%) rotate({-(yaw - (FixedMode ? 0 : ViewYaw))}deg);";
-    }
+        if ( Scene is null || !Client.Viewer.IsValid() || !Client.Viewer.Pawn.IsValid() || !Renderer.IsValid() )
+            return;
 
-    string MapTransform()
-    {
-        var position = -Renderer.FromWorld(ViewPos) * Zoom;
-        return $"position: absolute; left: {CssPercent( position.x )}; top: {CssPercent( position.y )}; width: {CssPercent( Zoom )}; height: {CssPercent( Zoom )}";
-    }
+        if ( Mask.IsValid() )
+        {
+            var yaw = FixedMode ? 0f : ViewYaw;
+            if ( yaw != _maskYaw )
+            {
+                _maskYaw = yaw;
+                var transform = new PanelTransform();
+                if ( !FixedMode ) transform.AddRotation( 0f, 0f, yaw );
+                Mask.Style.Transform = transform;
+            }
+        }
 
-    string MapRot()
-    {
-        if ( FixedMode ) return "transform: none;";
-        return $"transform-origin: center center; transform: rotate({(FixedMode ? 0 : ViewYaw)}deg); ";
+        if ( MapLayer.IsValid() )
+        {
+            var position = -Renderer.FromWorld( ViewPos ) * Zoom;
+            var at = new Vector2( Percent( position.x ), Percent( position.y ) );
+            if ( at != _mapAt )
+            {
+                _mapAt = at;
+                MapLayer.Style.Left = Length.Percent( at.x );
+                MapLayer.Style.Top = Length.Percent( at.y );
+            }
+        }
+
+        if ( ArenaRing.IsValid() && SkirmishArena.Active is { } arena && Renderer.Size > 0 )
+            PlaceArena( arena );
+
+        if ( ViewerMarker.IsValid() )
+            _viewerPlacement.Apply( ViewerMarker, MapPercent( ViewPos ), MapAngle( ViewYaw ) );
     }
 
     protected override int BuildHash()
     {
-        return HashCode.Combine( Time.Now );
+        _gathered = true;
+        _foundVolumes ??= new();
+        _foundElements ??= new();
+        _foundVolumes.Clear();
+        _foundElements.Clear();
+        Volumes.Clear();
+        Elements.Clear();
+
+        var viewer = Client.Viewer;
+        if ( Scene is null || !viewer.IsValid() || !viewer.Pawn.IsValid() )
+            return 0;
+
+        var pawn = viewer.Pawn;
+        var renderer = Renderer;
+        var hash = new HashCode();
+        hash.Add( pawn );
+        hash.Add( renderer );
+        if ( !renderer.IsValid() )
+            return hash.ToHashCode();
+
+        var player = pawn as PlayerPawn;
+        var baked = HasBakedMap;
+        hash.Add( baked );
+        hash.Add( renderer.CurrentMinimapPath );
+        hash.Add( renderer.Size );
+
+        if ( baked )
+        {
+            Scene.GetAll( _foundVolumes );
+            foreach ( var volume in _foundVolumes )
+            {
+                if ( !volume.IsValid() || (player is not null && !volume.IsVisible( player )) )
+                    continue;
+
+                Volumes.Add( volume );
+                hash.Add( volume );
+                hash.Add( volume.WorldPosition );
+                hash.Add( volume.Size );
+                hash.Add( volume.Color );
+                hash.Add( volume.LineColor );
+            }
+        }
+
+        _showArena = SkirmishArena.Active is not null && renderer.Size > 0;
+        hash.Add( _showArena );
+
+        // Only what draws: an icon with a picture, or a label. Each marker moves and restyles itself.
+        Scene.GetAll( _foundElements );
+        foreach ( var element in _foundElements )
+        {
+            if ( !element.IsValid() || (player is not null && !element.IsVisible( player )) )
+                continue;
+
+            var icon = element is IMinimapIcon i && !string.IsNullOrEmpty( i.IconPath );
+            var label = element as IMinimapLabel;
+            if ( !icon && label is null )
+                continue;
+
+            Elements.Add( element );
+            hash.Add( element );
+            hash.Add( icon );
+            if ( label is not null )
+            {
+                hash.Add( label.Label );
+                hash.Add( label.LabelColor );
+            }
+        }
+
+        _showViewer = pawn is not PlayerPawn || pawn.HealthComponent?.State == LifeState.Alive;
+        _freecam = SpectateSystem.Instance?.IsFreecam ?? false;
+        hash.Add( _showViewer );
+        hash.Add( _freecam );
+        hash.Add( ViewerColor );
+        return hash.ToHashCode();
+    }
+
+    protected override void OnAfterTreeRender( bool firstTime )
+    {
+        // New panels start unplaced.
+        _maskYaw = float.NaN;
+        _mapAt = new Vector2( float.NaN );
+        _arenaBox = new Vector4( float.NaN );
+        _viewerPlacement = default;
     }
 }

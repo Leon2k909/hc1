@@ -17,7 +17,7 @@
 
     @foreach ( var page in Pages )
     {
-        <div class="sbox-row" onclick=@(() => Open( page.Id ))>
+        <div class="sbox-row pad-target" onclick=@(() => Open( page.Id ))>
             <div class="sbox-text">
                 <label class="sbox-name">@Tr( page.Title )</label>
                 <label class="sbox-detail">@Tr( page.Detail )</label>

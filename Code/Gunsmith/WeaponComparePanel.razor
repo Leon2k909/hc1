@@ -442,8 +442,9 @@
 
         yield return Section( "HARDCORE HITS — UNARMORED / CLOSE RANGE" );
         yield return Compare( "HEAD HITS TO KILL", a, b, s => HeadHits( s ), s => HitsText( HeadHits( s ), s ), -1 );
-        yield return Compare( "BODY HITS TO KILL", a, b, s => BodyHits( s ), s => HitsText( BodyHits( s ), s ), -1 );
-        yield return Compare( "BODY TIME TO KILL", a, b, s => KillTime( BodyHits( s ), s ), s => KillTimeText( BodyHits( s ), s ), -1 );
+		yield return Compare( "BODY ONE-HIT CHANCE", a, b, s => BodyOneHitChance( s ), s => $"{BodyOneHitChance( s ) * 100f:0}%", 1 );
+        yield return Compare( "BODY HITS IF SURVIVED", a, b, s => BodyHits( s ), s => HitsText( BodyHits( s ), s ), -1 );
+        yield return Compare( "BODY TIME IF SURVIVED", a, b, s => KillTime( BodyHits( s ), s ), s => KillTimeText( BodyHits( s ), s ), -1 );
         yield return Compare( "LIMB HITS TO KILL", a, b, s => LimbHits( s ), s => HitsText( LimbHits( s ), s ), -1 );
         yield return Compare( "LIMB TIME TO KILL", a, b, s => KillTime( LimbHits( s ), s ), s => KillTimeText( LimbHits( s ), s ), -1 );
 
@@ -522,6 +523,8 @@
     // Unarmored, full-damage regional trauma; range and protection change these counts.
     private static int HeadHits( GunsmithStats s ) => ShotsFor( HardcoreTrauma.Damage( s.BulletDamage, TraumaRegion.Head, Health ) * s.Pellets );
     private static int BodyHits( GunsmithStats s ) => ShotsFor( HardcoreTrauma.Damage( s.BulletDamage, TraumaRegion.Chest, Health ) * s.Pellets );
+	private static float BodyOneHitChance( GunsmithStats s ) => s.Pellets == 1
+		? HardcoreTrauma.KillChance( s.BulletDamage, TraumaRegion.Chest, Health, 1f ) : 0f;
 
     /// <summary> Shots to kill with arm and leg hits: 1.7× the damage, each bullet at most half the health. </summary>
     private static int LimbHits( GunsmithStats s ) => ShotsFor( MathF.Min( s.BulletDamage * HealthComponent.LimbWoundScale, Health * 0.5f ) * s.Pellets );

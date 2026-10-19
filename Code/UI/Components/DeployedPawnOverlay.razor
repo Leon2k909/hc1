@@ -49,6 +49,10 @@
     {
         if ( !Player.IsValid() ) return 1;
 
-        return HashCode.Combine( Time.Now );
+        var handler = Player.GetComponent<DeployedPawnHandler>();
+        var pawn = handler.IsValid() ? handler.Pawn : null;
+        if ( !pawn.IsValid() ) return HashCode.Combine( handler.IsValid() );
+
+        return HashCode.Combine( pawn, Player.Pawn == pawn, pawn.NameType );
     }
 }

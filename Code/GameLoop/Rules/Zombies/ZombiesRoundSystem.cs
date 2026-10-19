@@ -114,8 +114,40 @@ public sealed class ZombiesRoundSystem : Component
 	{
 		var scene = Game.ActiveScene;
 		if ( scene is null ) return 0;
-		return HumanPawns( scene ).Count( p => p.HealthComponent.State == LifeState.Alive
-			&& ZombiesPlayerState.For( p ) is not { IsDowned: true, IsSelfReviving: false } );
+		return HumanPawns( scene ).Count( IsActivePlayer );
+	}
+
+	/// <summary><see cref="CountActivePlayers()"/> among <paramref name="humanPawns"/>, without searching the scene.</summary>
+	private static int CountActivePlayers( List<PlayerPawn> humanPawns )
+	{
+		var count = 0;
+		foreach ( var pawn in humanPawns )
+		{
+			if ( IsActivePlayer( pawn ) )
+				count++;
+		}
+
+		return count;
+	}
+
+	private static bool IsActivePlayer( PlayerPawn p ) => p.HealthComponent.State == LifeState.Alive
+		&& ZombiesPlayerState.For( p ) is not { IsDowned: true, IsSelfReviving: false };
+
+	/// <summary>The real players' pawns, taken once an update for the checks the host makes every frame.</summary>
+	private readonly List<PlayerPawn> _humanPawns = new();
+	private readonly List<PlayerPawn> _pawnScratch = new();
+	private readonly List<LightweightCombatBot> _botScratch = new();
+
+	private void RefreshHumanPawns()
+	{
+		_pawnScratch.Clear();
+		Scene.GetAll( _pawnScratch );
+		_humanPawns.Clear();
+		foreach ( var p in _pawnScratch )
+		{
+			if ( p.IsValid() && p.Client.IsValid() && !p.Client.IsBot )
+				_humanPawns.Add( p );
+		}
 	}
 
 	/// <summary>Real players in the game, whatever state they're in.</summary>
@@ -141,6 +173,7 @@ public sealed class ZombiesRoundSystem : Component
 			ApplyMenuPause( false );
 
 		RemoveCombatBots();
+		RefreshHumanPawns();
 		TrackDeadPlayers();
 
 		if ( IntroPlaying && TimeSinceIntro > IntroDuration + 1f )
@@ -159,7 +192,7 @@ public sealed class ZombiesRoundSystem : Component
 			return;
 		}
 
-		if ( _anyoneSpawned && CountActivePlayers() == 0 && GameUtils.AllPlayers.Any( c => c.IsConnected && !c.IsBot ) )
+		if ( _anyoneSpawned && CountActivePlayers( _humanPawns ) == 0 && GameUtils.AllPlayers.Any( c => c.IsConnected && !c.IsBot ) )
 		{
 			GameOver();
 			return;
@@ -171,7 +204,7 @@ public sealed class ZombiesRoundSystem : Component
 			return;
 		}
 
-		if ( ZombiesRemainingInRound > 0 && ZombiesAlive < GetMaxZombiesAllowed() && _lastSpawnTime > GetSpawnRate() )
+		if ( ZombiesRemainingInRound > 0 && ZombiesAlive < GetMaxZombiesAllowed( Math.Max( 1, _humanPawns.Count ) ) && _lastSpawnTime > GetSpawnRate() )
 			SpawnZombie();
 
 		if ( ZombiesRemainingInRound <= 0 && ZombiesAlive <= 0 )
@@ -199,7 +232,7 @@ public sealed class ZombiesRoundSystem : Component
 
 	private void TrackDeadPlayers()
 	{
-		foreach ( var pawn in HumanPawns( Scene ) )
+		foreach ( var pawn in _humanPawns )
 		{
 			_anyoneSpawned = true;
 			if ( pawn.HealthComponent.State == LifeState.Dead )
@@ -341,7 +374,7 @@ public sealed class ZombiesRoundSystem : Component
 		return ZombieSpeed.Walk;
 	}
 
-	private int GetMaxZombiesAllowed() => Math.Min( 24 + 6 * (PlayerCount - 1), 10 + CurrentRound * 2 );
+	private int GetMaxZombiesAllowed( int playerCount ) => Math.Min( 24 + 6 * (playerCount - 1), 10 + CurrentRound * 2 );
 
 	private float GetSpawnRate() => Math.Max( 0.4f, 2.0f - CurrentRound * 0.1f );
 
@@ -463,7 +496,9 @@ public sealed class ZombiesRoundSystem : Component
 	/// <summary>Zombies is co-op against zombies only: clear out any deathmatch combat bots.</summary>
 	private void RemoveCombatBots()
 	{
-		foreach ( var bot in Scene.GetAllComponents<LightweightCombatBot>().ToList() )
+		_botScratch.Clear();
+		Scene.GetAll( _botScratch );
+		foreach ( var bot in _botScratch )
 			bot.GameObject.Destroy();
 	}
 

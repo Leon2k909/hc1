@@ -107,7 +107,7 @@ public sealed class Weather : Component
 		}
 
 		// A clear match still has slowly changing cloud cover and daylight. Rain effects are created only when needed.
-		if ( !Application.IsDedicatedServer && !_view.IsValid() && (IsRaining || HasSky()) )
+		if ( !Application.IsDedicatedServer && !_view.IsValid() && (IsRaining || SkyFound()) )
 		{
 			var go = new GameObject( Scene, true, "Rain" );
 			go.Flags |= GameObjectFlags.NotSaved | GameObjectFlags.NotNetworked;
@@ -131,6 +131,20 @@ public sealed class Weather : Component
 	/// <summary> Somewhere with no sky (Reef Hall) never rains. </summary>
 	private bool HasSky() => Scene.GetAllComponents<SkyBox2D>().Any( sky => sky.Active )
 		|| Scene.SceneWorld.SceneObjects.OfType<SceneSkyBox>().Any();
+
+	private RealTimeSince _sinceSkyCheck = 999f;
+	private bool _skyFound;
+
+	/// <summary>
+	/// <see cref="HasSky"/>, looked at once a second while there's no view yet: it goes through every scene object, and on
+	/// a map with no sky it was asked every frame all match. A cloud map's sky that loads late is found within a second.
+	/// </summary>
+	private bool SkyFound()
+	{
+		if ( _sinceSkyCheck < 1f ) return _skyFound;
+		_sinceSkyCheck = 0f;
+		return _skyFound = HasSky();
+	}
 
 	private void Roll()
 	{

@@ -31,6 +31,8 @@ public partial class Reloadable : WeaponInputAction,
 
 	private TimeUntil TimeUntilReload { get; set; }
 	[Sync] public bool IsReloading { get; set; }
+	[Sync] private float _reloadDurationMultiplier { get; set; } = 1f;
+	private int _reloadSequence;
 
 	/// <summary>A shell-by-shell reload's last shell is in and the gun is coming back up (<see cref="ReloadExitTime"/>).</summary>
 	private bool _closing;
@@ -128,21 +130,15 @@ public partial class Reloadable : WeaponInputAction,
 		var time = !AmmoComponent.HasAmmo
 			? magazine?.EmptyReloadTime > 0 ? magazine.EmptyReloadTime : EmptyReloadTime
 			: magazine?.ReloadTime > 0 ? magazine.ReloadTime : ReloadTime;
-		return time * DurationMultiplier * ZombiesPlayerState.ReloadScale( Equipment?.Owner );
+		return time * DurationMultiplier;
 	}
 
-	public float DurationMultiplier
-	{
-		get
-		{
-			var multiplier = Equipment?.AttachmentReloadMultiplier ?? 1f;
-			return multiplier;
-			// Weapon tuning is off (see WeaponTuningManager). Put back with tuning:
-			// var weaponId = Equipment?.Resource?.ResourceName ?? string.Empty;
-			// if ( string.IsNullOrEmpty( weaponId ) ) return multiplier;
-			// return multiplier * (1f - WeaponTuningManager.GetTuning( weaponId ).Reload * 0.015f);
-		}
-	}
+	/// <summary>Capture once per reload, so a skill gain cannot change its timing halfway through.</summary>
+	public float DurationMultiplier => IsReloading && _reloadDurationMultiplier > 0f
+		? _reloadDurationMultiplier : GetDurationMultiplier();
+
+	private float GetDurationMultiplier() => MathF.Max( 0.1f, (Equipment?.AttachmentReloadMultiplier ?? 1f)
+		* (Equipment?.Owner?.TrainingReloadTimeScale ?? 1f) * ZombiesPlayerState.ReloadScale( Equipment?.Owner ) );
 
 	Dictionary<float, SoundEvent> GetReloadSounds()
 	{
@@ -167,6 +163,11 @@ public partial class Reloadable : WeaponInputAction,
 
 		if ( !IsProxy )
 		{
+			if ( !isContinuedReload )
+			{
+				_reloadDurationMultiplier = GetDurationMultiplier();
+				_reloadSequence++;
+			}
 			IsReloading = true;
 			TimeUntilReload = GetReloadTime();
 		}
@@ -186,10 +187,11 @@ public partial class Reloadable : WeaponInputAction,
 		}
 
 
+		var sequence = _reloadSequence;
 		foreach ( var kv in GetReloadSounds() )
 		{
 			// Play this sound after a certain time but only if we're reloading.
-			PlayAsyncSound( kv.Key * DurationMultiplier, kv.Value, () => IsReloading );
+			PlayAsyncSound( kv.Key * DurationMultiplier, kv.Value, () => IsReloading && _reloadSequence == sequence );
 		}
 
 		Equipment.Owner?.BodyRenderer?.SetBool( "b_reload", true );
@@ -237,7 +239,7 @@ public partial class Reloadable : WeaponInputAction,
 					if ( ReloadExitTime > 0f )
 					{
 						_closing = true;
-						TimeUntilReload = ReloadExitTime * DurationMultiplier * ZombiesPlayerState.ReloadScale( Equipment?.Owner );
+						TimeUntilReload = ReloadExitTime * DurationMultiplier;
 					}
 					else
 					{

@@ -1,6 +1,9 @@
+using Sandbox.MovieMaker.Compiled;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 
 namespace Facepunch;
 
@@ -76,6 +79,9 @@ public static class TheaterReplays
 
 		/// <summary> A player's Steam ID, 0 for bots. </summary>
 		public ulong SteamId { get; set; }
+
+			/// <summary> The live pawn or bot's network object ID, used by in-match replays; empty in older saved files. </summary>
+			public Guid ObjectId { get; set; }
 
 		/// <summary> Seconds into the recording. </summary>
 		public float Spawned { get; set; }
@@ -191,6 +197,128 @@ public static class TheaterReplays
 			unique = $"{id}_{i}";
 
 		return unique;
+	}
+
+	/// <summary>
+	/// Writes a recording to <paramref name="path"/> as <c>Json.Serialize( clip )</c> would, without all of it in memory at
+	/// once: a long match's is a hundred megabytes and more of JSON, which as one string (twice that, in UTF-16) made the
+	/// garbage collector stop the game. Each life (a root track and everything under it) is serialised as a clip of its own,
+	/// and <see cref="TheaterClipJson"/> lays its entry in the file's Tracks. Returns the file's size in bytes. It takes
+	/// seconds for a long match: call it on a worker thread.
+	/// </summary>
+	public static long WriteClip( string path, MovieClip clip )
+	{
+		try
+		{
+			return WriteClipByLife( path, clip );
+		}
+		catch ( TheaterClipJson.LayoutException e )
+		{
+			// The engine's clip JSON isn't laid out as expected (an s&box update?). Written whole, it's always right.
+			Log.Warning( $"Theater: writing the recording in one piece ({e.Message})." );
+			return WriteWholeClip( path, clip );
+		}
+	}
+
+	static long WriteClipByLife( string path, MovieClip clip )
+	{
+		// The lives in the clip's order, each with its tracks in the clip's order, which is the order its JSON nests them in.
+		var lives = new List<List<ICompiledTrack>>();
+		var byRoot = new Dictionary<Guid, List<ICompiledTrack>>();
+
+		foreach ( var track in clip.Tracks )
+		{
+			var root = track;
+			while ( root.Parent is { } parent )
+				root = parent;
+
+			if ( root is not ICompiledReferenceTrack reference )
+				throw new TheaterClipJson.LayoutException( $"the root track \"{root.Name}\" isn't an object's" );
+
+			if ( !byRoot.TryGetValue( reference.Id, out var life ) )
+			{
+				byRoot[reference.Id] = life = new List<ICompiledTrack>();
+				lives.Add( life );
+			}
+
+			life.Add( track );
+		}
+
+		if ( lives.Count == 0 )
+			return WriteWholeClip( path, clip );
+
+		using var serializer = new ClipSerializer();
+		using var file = new TheaterClipJson( FileSystem.Data.OpenWrite( path ) );
+
+		foreach ( var life in lives )
+			file.AddLife( serializer.Serialize( MovieClip.FromTracks( life ) ) );
+
+		file.Finish();
+		return file.Written;
+	}
+
+	static long WriteWholeClip( string path, MovieClip clip )
+	{
+		using var serializer = new ClipSerializer();
+		using var file = new TheaterClipJson( FileSystem.Data.OpenWrite( path ) );
+
+		file.WriteWhole( serializer.Serialize( clip ) );
+		return file.Written;
+	}
+
+	/// <summary>
+	/// Serialises clips through one writer and buffer, which keep their size between clips, so writing a match's lives
+	/// one by one allocates no more than its biggest life.
+	/// </summary>
+	sealed class ClipSerializer : IDisposable
+	{
+		readonly MemoryStream _buffer = new();
+		readonly Utf8JsonWriter _writer;
+
+		public ClipSerializer()
+		{
+			_writer = new Utf8JsonWriter( _buffer, TheaterClipJson.WriterOptions );
+		}
+
+		/// <summary> The clip's JSON, until the next call. </summary>
+		public ReadOnlySpan<byte> Serialize( MovieClip clip )
+		{
+			_buffer.SetLength( 0 );
+			_writer.Reset();
+
+			Json.Serialize( _writer, clip );
+			_writer.Flush();
+
+			return _buffer.GetBuffer().AsSpan( 0, (int)_buffer.Length );
+		}
+
+		public void Dispose()
+		{
+			_writer.Dispose();
+			_buffer.Dispose();
+		}
+	}
+
+	/// <summary>
+	/// Reads a recording (<see cref="WriteClip"/>) as <c>Json.Deserialize&lt;MovieClip&gt;( ReadAllText( path ) )</c> would,
+	/// straight from the file's bytes: read as text, a long match's tens of megabytes were a string of twice that, and
+	/// parsing it copied it back to UTF-8 first. It takes seconds for a long match: call it on a worker thread.
+	/// </summary>
+	public static MovieClip ReadClip( string path )
+	{
+		return ParseClip( FileSystem.Data.ReadAllBytes( path ) );
+	}
+
+	static MovieClip ParseClip( ReadOnlySpan<byte> json )
+	{
+		// ReadAllText left out a byte order mark, which the reader would take for the start of a value.
+		if ( json.Length >= 3 && json[0] == 0xEF && json[1] == 0xBB && json[2] == 0xBF )
+			json = json[3..];
+
+		// Json.Deserialize( string ) reads with the engine's comment handling and depth, which a reader of our own has to
+		// be given.
+		var reader = new Utf8JsonReader( json, new JsonReaderOptions { CommentHandling = JsonCommentHandling.Skip, MaxDepth = 512 } );
+		return Json.Deserialize<MovieClip>( ref reader );
 	}
 
 	/// <summary> The finished replays, newest first. </summary>

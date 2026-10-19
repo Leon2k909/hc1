@@ -40,6 +40,16 @@ ServerEntry
 		background-color: rgba( 255, 106, 90, 0.14 );
 	}
 
+	// A controller-only or mouse-and-keyboard-only lobby (LobbyInputRules).
+	.se-input
+	{
+		flex-shrink: 0;
+		padding: 2px 6px;
+		background-color: rgba( 255, 122, 26, 0.14 );
+
+		i { font-size: 18px; color: $sb-accent; }
+	}
+
 	.se-players
 	{
 		flex-direction: row;
@@ -73,4 +83,12 @@ ServerEntry
 	}
 
 	&.full .se-players label { color: $sb-warn; }
+
+	// A lobby for the other input: listed, but it can't be joined.
+	&.other-input
+	{
+		opacity: 0.45;
+
+		.se-input i { color: $sb-warn; }
+	}
 }

@@ -44,7 +44,8 @@
     {
         if ( !Player.IsValid() ) return 1;
 
-        return HashCode.Combine( Time.Now );
-        //return HashCode.Combine( Player.InPlayArea, Player.TimeUntilPlayAreaKill );
+        // The countdown only shows, to a tenth of a second, while the player is alive outside the area.
+        var warning = !Player.InPlayArea && Player.HealthComponent.State == LifeState.Alive;
+        return HashCode.Combine( Player, warning, warning ? Elapsed : null );
     }
 }

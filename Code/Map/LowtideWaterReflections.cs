@@ -46,6 +46,8 @@ public sealed class LowtideWaterReflections : Component, Component.DontExecuteOn
     private readonly Dictionary<CameraComponent, View> views = new();
     private readonly HashSet<CameraComponent> activeViews = new();
     private readonly TagSet excluded = new();
+    // Reused every frame. Made when first wanted, since a hotload leaves a new field null.
+    private List<CameraComponent> cameras, stale;
 
     protected override void OnEnabled()
     {
@@ -71,13 +73,22 @@ public sealed class LowtideWaterReflections : Component, Component.DontExecuteOn
         var bounds = new BBox(
             new Vector3( ChannelMinimum.x - 16, ChannelMinimum.y - 16, WaterHeight - 1 ),
             new Vector3( ChannelMaximum.x + 16, ChannelMaximum.y + 16, WaterHeight + 1 ) );
-        var cameras = Scene.GetAllComponents<CameraComponent>();
+        cameras ??= new();
+        cameras.Clear();
+        Scene.GetAll( cameras );
         // Editor viewport initialization copies Scene.Camera's render hooks.
         // Commands on the viewport camera itself are consequently never run.
         // Multiple editor views share that hook, so retain ordinary cubemap
         // water there instead of submitting a different mirror for each view.
         var editorCommandCamera = Scene.IsEditor ? Scene.Camera : null;
-        var sharedEditorViews = editorCommandCamera.IsValid() && cameras.Count( x => x.Active && !x.Orthographic ) > 1;
+        var sharedEditorViews = false;
+        if ( editorCommandCamera.IsValid() )
+        {
+            var perspective = 0;
+            foreach ( var camera in cameras )
+                if ( camera.Active && !camera.Orthographic ) perspective++;
+            sharedEditorViews = perspective > 1;
+        }
         foreach ( var camera in cameras )
         {
             if ( !camera.Active || camera.Orthographic || sharedEditorViews || camera.WorldPosition.z <= WaterHeight + 1 ) continue;
@@ -103,8 +114,12 @@ public sealed class LowtideWaterReflections : Component, Component.DontExecuteOn
             var size = camera.CustomSize ?? Screen.Size;
             var width = Math.Clamp( (int)size.x / 2, 256, Math.Clamp( MaximumWidth, 256, 1280 ) );
             var height = Math.Max( 1, (int)(width * size.y / Math.Max( size.x, 1 )) );
+            // A short linear-HDR pyramid supplies roughness and minification filtering.
+            var reflectionMips = 1;
+            for ( var extent = Math.Min( width, height ); extent > 1 && reflectionMips < 7; extent >>= 1 )
+                reflectionMips++;
             var target = commands.GetRenderTarget( "lowtide-reflection", width, height,
-                ImageFormat.RGBA16161616F, ImageFormat.D24S8, MultisampleAmount.MultisampleNone, 1 );
+                ImageFormat.RGBA16161616F, ImageFormat.D24S8, MultisampleAmount.MultisampleNone, reflectionMips );
             commands.DrawReflection( camera, new Plane( new Vector3( 0, 0, WaterHeight ), Vector3.Up ), in target,
                 new ReflectionSetup
                 {
@@ -117,6 +132,10 @@ public sealed class LowtideWaterReflections : Component, Component.DontExecuteOn
                         EnableDebugOverlays = false
                     }
                 } );
+            // Generate only after the reflected view is complete, before publishing its texture.
+            // Box filtering preserves linear HDR radiance; the engine Gaussian path applies a display-space transform.
+            if ( reflectionMips > 1 )
+                commands.GenerateMipMaps( target, Sandbox.Graphics.DownsampleMethod.Box );
             // Published after the nested view completes. DrawReflection guards
             // child views against recursion, and water is excluded from capture.
             commands.Attributes.Set( "LowtideReflection", target.ColorTexture );
@@ -129,7 +148,11 @@ public sealed class LowtideWaterReflections : Component, Component.DontExecuteOn
             commands.Attributes.Set( "LowtideReflectionEnabled", false );
             commands.ReleaseRenderTarget( target );
         }
-        foreach ( var camera in views.Keys.Where( x => !activeViews.Contains( x ) ).ToArray() )
+        stale ??= new();
+        stale.Clear();
+        foreach ( var camera in views.Keys )
+            if ( !activeViews.Contains( camera ) ) stale.Add( camera );
+        foreach ( var camera in stale )
         {
             views[camera].Detach( camera );
             views.Remove( camera );

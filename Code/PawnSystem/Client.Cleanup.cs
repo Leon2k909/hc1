@@ -26,6 +26,7 @@ public partial class Client : Component.INetworkListener
 	protected override void OnUpdate()
 	{
 		UpdateSharing();
+		UpdateTraining();
 		if ( IsLocalPlayer )
 		{
 			var currentTag = GameSettingsSystem.Current?.ClanTag;

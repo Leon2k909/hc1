@@ -11,126 +11,151 @@
     return;
 }
 
-<root class="hidden flex absolute inset-0 align-center justify-center background">
-    <table class="with-background with-padding-lg layout">
-        <div class="title">
-            <label class="important uppercase left">@(Status is null ? Tr( Name ) : $"{Tr( Name )} - {Tr( Status )}")</label>
-            <label class="important uppercase center">@(RoundNumber is { } roundNumber && RoundLimit is { } roundLimit ? Tr( "Round {0} of {1}", roundNumber, roundLimit ) : "")</label>
-            <label class="important uppercase right">@(Time?.ToString( @"m\:ss" ) ?? " ")</label>
-        </div>
+@{
+    var groups = GroupedPlayers;
+    var columns = IsZombies ? ZombiesColumns : IScore.Find( Client.Local ).Select( x => x.Attribute.Name ).ToArray();
+    var splitRosters = !IsZombies && groups.Count( x => x.Team != Team.Unassigned ) == 2 && columns.Length <= 5;
+    var teamScoring = GameMode.Instance.Get<TeamScoring>();
+}
 
-        <div class="row voice-bar hc1">
-            <label class="small emphasis voice-label">@Tr( "Voice Channel:" )</label>
-            <div class="button standard smaller no-anim @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.Auto ? "selected" : "")" onclick=@(() => SetVoiceMode(VoiceChatMode.Auto))>@Tr( "Auto" )</div>
-            <div class="button standard smaller no-anim @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.Global ? "selected" : "")" onclick=@(() => SetVoiceMode(VoiceChatMode.Global))>@Tr( "Lobby" )</div>
-            <div class="button standard smaller no-anim @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.TeamOnly ? "selected" : "")" onclick=@(() => SetVoiceMode(VoiceChatMode.TeamOnly))>@Tr( "Team" )</div>
-            <div class="button standard smaller no-anim @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.PartyOnly ? "selected" : "")" onclick=@(() => SetVoiceMode(VoiceChatMode.PartyOnly))>@Tr( "Party" )</div>
-
-            <div class="grow"></div>
-
-            <div class="button standard smaller no-anim @(GameSettingsSystem.Current.VoiceProximity ? "selected" : "")" onclick=@ToggleProximity>
-                <i>@(GameSettingsSystem.Current.VoiceProximity ? "spatial_audio_off" : "spatial_audio")</i>
-                @Tr( "Prox Chat" )
+<root class="hidden scoreboard-root">
+    <div class="scoreboard-panel">
+        <div class="match-heading">
+            <div class="match-identity">
+                <label class="eyebrow">@Tr( "SCOREBOARD" )</label>
+                <label class="match-title">@Tr( Name )</label>
             </div>
-        </div>
-
-        <div class="teams">
-        @if ( IsZombies )
-        {
-            @* Zombies is co-op: one list, no teams, with the mode's own points and zombie kills. *@
-            <div class="row header with-px-lg with-py-sm">
-                <label class="col stat-small small"></label>
-                <label class="col stat-small small"></label>
-                <label class="col playername small"></label>
-                <label class="col stat-small small mute-header"><i>chat</i></label>
-                <label class="col stat-small small mute-header"><i>mic</i></label>
-
-                @foreach ( var column in ZombiesColumns )
+            <div class="match-state">
+                @if ( !string.IsNullOrWhiteSpace( Status ) )
                 {
-                    <label class="col stat">@Tr( column )</label>
+                    <label class="match-status">@Tr( Status )</label>
+                }
+                @if ( RoundNumber is { } roundNumber && RoundLimit is { } roundLimit )
+                {
+                    <label class="match-round">@Tr( "Round {0} of {1}", roundNumber, roundLimit )</label>
                 }
             </div>
-
-            @foreach ( var player in ZombiesPlayers )
+            @if ( Time is { } matchTime )
             {
-                <ScoreboardRow Client="@player" OnInspectPlayer=@InspectPlayer />
-            }
-        }
-        else
-        {
-        var groups = GroupedPlayers;
-        @for ( int i = 0; i < groups.Count; i++ )
-        {
-             var group = groups[i];
-
-            @if ( group.Team == Team.Unassigned )
-            {
-                <div class="flex gap-sm align-center spectator-list">
-                    <Icon file="/ui/teams/spectator.png" size="16" />
-                    @foreach ( var entry in group.Entries )
-                    {
-                        var spectator = entry.Client;
-                        <button class="spectator-name small grey" onclick=@(() => InspectPlayer( spectator ))>@entry.DisplayName</button>
-                    }
+                <div class="match-clock">
+                    <i>schedule</i>
+                    <label>@matchTime.ToString( @"m\:ss" )</label>
                 </div>
             }
-            else
-            {
-                <span class="flex align-center space-between gap-sm" style="color: @group.Team.GetColor().Hex">
-                    <span class="flex align-center gap-sm">
-                        <Icon file="@group.Team.GetIconPath()" size="24" />
-                        <label class="emphasis with-py">@Tr( group.Team.GetName() )</label>
-                    </span>
+        </div>
 
-                    <separator style="background-color: @group.Team.GetColor().Hex" />
-
-                    @if ( LightweightBotManager.CanManageBots )
+        <div class="scoreboard-body">
+            <div class="rosters @(splitRosters ? "split-rosters" : "single-roster")">
+                @if ( IsZombies )
+                {
+                    var players = ZombiesPlayers;
+                    <div class="team-roster coop-roster">
+                        <div class="team-heading">
+                            <i class="coop-icon">groups</i>
+                            <div class="team-identity">
+                                <label class="team-name">@Tr( "SQUAD" )</label>
+                                <label class="team-count">@players.Count @Tr( "Players" )</label>
+                            </div>
+                        </div>
+                        <ScoreboardColumns Columns=@columns />
+                        @for ( int playerIndex = 0; playerIndex < players.Count; playerIndex++ )
+                        {
+                            var player = players[playerIndex];
+                            <ScoreboardRow @key="player.Id" Client=@player Position=@(playerIndex + 1) Columns=@columns OnInspectPlayer=@((Action<Client>)InspectPlayer) />
+                        }
+                    </div>
+                }
+                else
+                {
+                    @foreach ( var group in groups.Where( x => x.Team != Team.Unassigned ) )
                     {
                         var team = group.Team;
-                        <div class="button standard smaller no-anim add-bot" onclick=@(() => AddBot( team ))>
-                            <i>person_add</i>
-                            @Tr( "Add Bot" )
+                        <div class="team-roster" style="border-top-color: @team.GetColor().Hex">
+                            <div class="team-heading" style="background-color: @team.GetColor().WithAlpha( 0.08f ).Hex">
+                                <Icon class="team-logo" file="@team.GetIconPath()" size="54" />
+                                <div class="team-identity">
+                                    <label class="team-name">@Tr( team.GetName() )</label>
+                                    <label class="team-count">@group.Entries.Count @Tr( "Players" )</label>
+                                </div>
+                                @if ( LightweightBotManager.CanManageBots )
+                                {
+                                    <button class="add-bot" onclick=@(() => AddBot( team )) tooltip=@(Tr( "Add Bot" ))>
+                                        <i>person_add</i>
+                                        <label>@Tr( "Add Bot" )</label>
+                                    </button>
+                                }
+                                @if ( teamScoring is not null )
+                                {
+                                    <label class="team-score">@teamScoring.GetFormattedScore( team )</label>
+                                }
+                            </div>
+
+                            @if ( group.Entries.Count > 0 )
+                            {
+                                <ScoreboardColumns Columns=@columns />
+                                @for ( int playerIndex = 0; playerIndex < group.Entries.Count; playerIndex++ )
+                                {
+                                    var player = group.Entries[playerIndex];
+                                    <ScoreboardRow @key="player.Id" Client=@player.Client Bot=@player.Bot Position=@(playerIndex + 1) Columns=@columns OnInspectPlayer=@((Action<Client>)InspectPlayer) />
+                                }
+                            }
+                            else
+                            {
+                                <div class="empty-team">
+                                    <i>groups</i>
+                                    <label>0 @Tr( "Players" )</label>
+                                </div>
+                            }
                         </div>
                     }
-
-                    @if ( GameMode.Instance.IsValid() && GameMode.Instance.Get<TeamScoring>() is { } scoring )
-                    {
-                        <label class="emphasis">@scoring.GetFormattedScore(group.Team)</label>
-		            }
-                </span>
-
-                @* An empty team is only its heading: column names over no rows looked like a broken table. *@
-                @if ( group.Entries.Count > 0 )
-                {
-                <div class="row header with-px-lg with-py-sm">
-                    <label class="col stat-small small"></label>
-                    <label class="col stat-small small"></label>
-                    <label class="col playername small"></label>
-                    <label class="col stat-small small mute-header"><i>chat</i></label>
-                    <label class="col stat-small small mute-header"><i>mic</i></label>
-
-                    @foreach ( var x in IScore.Find( Client.Local ) )
-                    {
-                        <label class="col stat">@Tr( x.Attribute.Name )</label>
-                    }
-                </div>
                 }
+            </div>
 
-                @foreach ( var player in group.Entries )
-                {
-                    <ScoreboardRow Client="@player.Client" Bot="@player.Bot" OnInspectPlayer=@InspectPlayer />
-                }
+            @if ( !IsZombies && RoundLimit.HasValue && teamScoring is not null
+                && GameMode.Instance.Get<RoundBasedTeamScoring>() is not null
+                && GameMode.Instance.Get<TeamEarlyWinCondition>() is not null )
+            {
+                <div class="round-history"><GameOverview /></div>
+            }
 
-                @if ( i == 0 )
+            @if ( !IsZombies )
+            {
+                @foreach ( var group in groups.Where( x => x.Team == Team.Unassigned ) )
                 {
-                    <GameOverview />
+                    <div class="spectator-list">
+                        <Icon file="/ui/teams/spectator.png" size="18" />
+                        <label class="spectator-heading">@Tr( "Spectators" )</label>
+                        @foreach ( var entry in group.Entries )
+                        {
+                            var spectator = entry.Client;
+                            <button class="spectator-name" onclick=@(() => InspectPlayer( spectator ))>@entry.DisplayName</button>
+                        }
+                    </div>
                 }
             }
-        }
-        }
         </div>
-        <label class="sharing-hint small grey">@Tr( "Click a player to copy their gun builds or crosshair." )</label>
-    </table>
+
+        <div class="communications">
+            <div class="voice-label"><i>headset_mic</i><label>@Tr( "Voice Channel:" )</label></div>
+            <div class="voice-options">
+                <button class="voice-option @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.Auto ? "selected" : "")" onclick=@(() => SetVoiceMode( VoiceChatMode.Auto ))>@Tr( "Auto" )</button>
+                <button class="voice-option @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.Global ? "selected" : "")" onclick=@(() => SetVoiceMode( VoiceChatMode.Global ))>@Tr( "Lobby" )</button>
+                <button class="voice-option @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.TeamOnly ? "selected" : "")" onclick=@(() => SetVoiceMode( VoiceChatMode.TeamOnly ))>@Tr( "Team" )</button>
+                <button class="voice-option @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.PartyOnly ? "selected" : "")" onclick=@(() => SetVoiceMode( VoiceChatMode.PartyOnly ))>@Tr( "Party" )</button>
+            </div>
+            <button class="proximity-option @(GameSettingsSystem.Current.VoiceProximity ? "selected" : "")" onclick=@ToggleProximity>
+                <i>@(GameSettingsSystem.Current.VoiceProximity ? "spatial_audio_off" : "spatial_audio")</i>
+                <label>@Tr( "Prox Chat" )</label>
+            </button>
+        </div>
+        <div class="scoreboard-footer">
+            <label class="sharing-hint">@Tr( "Click a player to copy their gun builds or crosshair." )</label>
+            <div class="scoreboard-key">
+                <InputHint Action="Score" Size=@InputGlyphSize.Small />
+                <label>@Tr( "Scoreboard" )</label>
+            </div>
+        </div>
+    </div>
     @if ( InspectedPlayer.IsValid() )
     {
         <ScoreboardPlayerDetails Client=@InspectedPlayer OnClosed=@ClosePlayerDetails />
@@ -240,14 +265,16 @@
 
     protected override int BuildHash()
     {
-        if ( !IsActive ) return 0;
+        if ( !IsActive || !Client.Local.IsValid() || !GameMode.Instance.IsValid() ) return 0;
 
         var hash = new HashCode();
 
         hash.Add( IsActive );
         hash.Add( InspectedPlayer );
+        hash.Add( Name );
         hash.Add( Status );
-        hash.Add( Time?.TotalSeconds );
+        // Only rebuild when the displayed second changes, not on every frame while Score is held.
+        hash.Add( Time is { } displayedTime ? (long)displayedTime.TotalSeconds : -1L );
         hash.Add( RoundNumber );
         hash.Add( RoundLimit );
         hash.Add( CommunicationMuteState.Version );
@@ -255,6 +282,7 @@
         hash.Add( GameSettingsSystem.Current.VoiceProximity );
         hash.Add( LightweightBotManager.CanManageBots );
         hash.Add( IsZombies );
+        hash.Add( Client.Local.Team );
 
         if ( IsZombies )
         {
@@ -262,19 +290,25 @@
             foreach ( var player in ZombiesPlayers )
             {
                 hash.Add( player.Id );
+                hash.Add( player.DisplayName );
                 hash.Add( GetZombiesEconomy( player )?.Points );
             }
 
             return hash.ToHashCode();
         }
 
+        foreach ( var column in IScore.Find( Client.Local ) ) hash.Add( column.Attribute.Name );
+
+        var scoring = GameMode.Instance.Get<TeamScoring>();
         foreach ( var team in GroupedPlayers )
         {
             hash.Add( team.Team );
+            hash.Add( scoring?.GetFormattedScore( team.Team ) );
 
             foreach ( var player in team.Entries )
             {
                 hash.Add( player.Id );
+                hash.Add( player.DisplayName );
                 hash.Add( player.Score );
                 hash.Add( player.Kills );
                 hash.Add( player.Deaths );
@@ -289,6 +323,7 @@
         IsActive = Input.Down( "Score" );
         if ( !IsActive || !InspectedPlayer.IsValid() ) InspectedPlayer = null;
         SetClass( "visible", IsActive );
+        ResponsiveLayout.Update( this );
     }
 
     private void SetVoiceMode( VoiceChatMode mode )

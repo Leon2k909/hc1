@@ -54,6 +54,18 @@ public static partial class GameText
 		["Cash Point"] = ("Point d'argent", "Geldpunkt", "Punto de dinero", "Ponto de dinheiro"),
 		["Cash"] = ("Argent", "Geld", "Dinero", "Dinheiro"),
 		["Return to the AO"] = ("Retournez dans la zone de combat", "Kehre ins Kampfgebiet zurück", "Vuelve a la zona de combate", "Volte para a área de combate"),
+		// Playing with the other input in a controller-only or mouse-only lobby (LobbyInputOverlay)
+		["Controller-only lobby: switch back to your controller"] = (
+			"Salon réservé à la manette : reprenez votre manette",
+			"Lobby nur für Controller: Wechsle zurück zum Controller",
+			"Sala solo para mando: vuelve a tu mando",
+			"Sala só para controle: volte para o seu controle"),
+		["Mouse and keyboard lobby: switch back to mouse and keyboard"] = (
+			"Salon clavier et souris : reprenez le clavier et la souris",
+			"Lobby für Maus und Tastatur: Wechsle zurück zu Maus und Tastatur",
+			"Sala de ratón y teclado: vuelve al ratón y el teclado",
+			"Sala de mouse e teclado: volte para o mouse e o teclado"),
+		["Leaving in {0}s"] = ("Départ dans {0} s", "Verlassen in {0} s", "Saliendo en {0} s", "Saindo em {0} s"),
 		["Exit Drone"] = ("Quitter le drone", "Drohne verlassen", "Salir del dron", "Sair do drone"),
 		["Return to Drone"] = ("Retourner au drone", "Zurück zur Drohne", "Volver al dron", "Voltar ao drone"),
 

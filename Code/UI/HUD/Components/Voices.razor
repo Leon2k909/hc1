@@ -200,14 +200,51 @@
 
     private static Guid SampleKey( int n ) => new( n, 0, 0, new byte[8] );
 
+    // Made when first wanted: a hotload leaves a new field null on a list that's already up.
+    private List<PlayerVoiceComponent> _voices;
+
+    // The rows' fields as Rows would make them, without making them: this runs every frame, mostly with nobody talking.
     protected override int BuildHash()
     {
         var hash = new HashCode();
+        var local = ShowSample;
 
-        foreach ( var row in Rows )
-            hash.Add( row );
+        _voices ??= new();
+        _voices.Clear();
+        Scene.GetAll( _voices );
+        foreach ( var voice in _voices )
+        {
+            var client = voice.Client.IsValid() ? voice.Client : voice.GetComponent<Client>();
+            if ( !client.IsValid() || !client.IsConnected )
+                continue;
 
-        hash.Add( LocalScope );
+            var isLocal = client.IsLocalPlayer;
+            if ( !IsTalking( voice, client, isLocal ) )
+                continue;
+
+            hash.Add( client.Id );
+            hash.Add( client.DisplayName );
+            hash.Add( client.SteamId );
+            hash.Add( client.Team );
+            hash.Add( voice );
+            hash.Add( isLocal );
+            hash.Add( IsSpectator( client ) );
+            hash.Add( IsEnemy( client ) );
+            hash.Add( IsSquadmate( client ) );
+            hash.Add( IsDead( client ) );
+            local |= isLocal;
+        }
+
+        if ( ShowSample )
+        {
+            foreach ( var row in SampleRows() )
+                hash.Add( row );
+        }
+
+        // Only your own row says who hears you.
+        if ( local )
+            hash.Add( LocalScope );
+
         return hash.ToHashCode();
     }
 }

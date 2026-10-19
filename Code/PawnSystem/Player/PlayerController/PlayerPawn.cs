@@ -113,6 +113,8 @@ public sealed partial class PlayerPawn : Pawn, IDescription, IAreaDamageReceiver
 
 	public SceneTraceResult CachedEyeTrace { get; private set; }
 
+	private FirstPersonGrime _grime;
+
 	protected override void OnUpdate()
 	{
 		if ( HealthComponent.State == LifeState.Dead )
@@ -125,11 +127,18 @@ public sealed partial class PlayerPawn : Pawn, IDescription, IAreaDamageReceiver
 
 		_smoothEyeHeight = _smoothEyeHeight.LerpTo( _eyeHeightOffset, Time.Delta * StanceChangeRate( _eyeHeightOffset > _smoothEyeHeight ) );
 		CharacterController.Height = Height + _smoothEyeHeight;
+		UpdateProneBlend();
 
 		if ( IsLocallyControlled )
 		{
 			UpdateAimInputAfterRespawn();
 			DebugUpdate();
+			// Blood and dirt on the first-person gun and gloves: this machine's own, for its own player.
+			if ( !_grime.IsValid() )
+			{
+				_grime = Components.GetOrCreate<FirstPersonGrime>();
+				_grime.Flags |= ComponentFlags.NotSaved | ComponentFlags.NotNetworked;
+			}
 		}
 	}
 
@@ -199,7 +208,7 @@ public sealed partial class PlayerPawn : Pawn, IDescription, IAreaDamageReceiver
 			if ( IsPipeClimbing && IsLocallyControlled ) StopPipeClimb( Vector3.Zero );
 			if ( IsMantling && IsLocallyControlled )
 				StopMantle( Vector3.Zero );
-			if ( IsSliding && IsLocallyControlled ) StopSlide();
+			if ( IsLocallyControlled ) StopSlide();
 
 			return;
 		}
@@ -226,12 +235,14 @@ public sealed partial class PlayerPawn : Pawn, IDescription, IAreaDamageReceiver
 
 		_previousVelocity = cc.Velocity;
 
+		UpdateSprintStamina();
 		UpdateUse();
 		BuildWishInput();
 		BuildWishVelocity();
 
 		if ( IsPipeClimbing )
 		{
+			StopSlide();
 			UpdatePipeClimb();
 			UpdateRecoilAndSpread();
 			return;
@@ -240,12 +251,14 @@ public sealed partial class PlayerPawn : Pawn, IDescription, IAreaDamageReceiver
 		// Mid-climb the pawn follows the mantle's path, and the usual input and movement wait until it's over.
 		if ( IsMantling )
 		{
+			StopSlide();
 			UpdateMantle();
 			UpdateRecoilAndSpread();
 			return;
 		}
 
 		BuildInput();
+			UpdateWeaponMount();
 
 		UpdateRecoilAndSpread();
 		ApplyAcceleration();
