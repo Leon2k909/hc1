@@ -1,12 +1,73 @@
 # HC1 (Razed) — notes for Claude sessions
 
 ## Editor connection
+- Active checkout on this workstation: `C:\sbox-projects\hc1\forked-shooter-main` (user direction, 2026-10-17).
+  Confirm the native editor's `Paths.ProjectRoot` matches this checkout before editing.
 - Use native s&box MCP (`sbox-cli --connect`) as the primary connection; see `AGENTS.md` for the workflow.
 - Native `bridge_helpers` exposes every registered Claude Bridge helper in process, including
   read-only discovery and parameter inspection. Prefer the engine's dedicated tools for ordinary work.
 - `bridge_simulate_input` and `bridge_scatter_props` have explicit parameter schemas. Other helpers use
   `bridge_describe_handler`, then `bridge_read` / `bridge_call`; their existing play-mode guards still apply.
 - The old `sbox_claude_bridge` MCP adapter remains available as a fallback. Use one route per operation.
+
+## Shared camera look (2026-10-17)
+- The gameplay camera (`Assets/prefabs/player/cameras/default_player_camera.prefab`) and Theater's camera
+  (`Assets/scenes/theater_playback.scene`) use native ACES. The extra camera `ColorAdjustments` is disabled.
+  A same-position native camera comparison rejected AgX plus the added grade: it crushed shadow detail and
+  pushed the brick colour too far. Keep map-authored white balance and grading as the starting point.
+- Fallback bloom is additive, strength 0.1 and threshold 1.6. Fallback AO uses radius 48, intensity 0.45,
+  falloff 0.9 and thin compensation 1; its quality and spatial denoising remain as authored. Vignette is 0.08.
+- The engine groups native effects by type: the camera selects the tonemapping mode, and subsequent map volumes
+  blend the numeric controls. Keep each map's exposure, fog, white balance, reflections and lighting authored in
+  its own scene/generator. These camera defaults do not replace the map volumes' numeric settings.
+- `CameraPostProcess.Copy` preserves component enabled state with an explicit include-disabled lookup and the
+  existing identity-safe serialization helper. `OpticZoom` and `ReconOctocopter` synchronize colour values while
+  their views are active, so runtime colour adjustments reach both views. The scope
+  also receives the main camera's sharpening; the drone receives its fallback vignette.
+- Spawn protection no longer changes screen colour: the blue `ScreenProtectionOverlay` and the camera's
+  protection-only saturation override were removed. Invulnerability and the timed "Spawn Protected" toast remain.
+- Offline verification is in `output/camera-look-20261017/`: the native preset JSON is valid, component IDs and
+  all camera/gameplay/UI content outside the look are preserved, and player/Theater profiles match. The full
+  `Code/razedtest.csproj` build passed with 0 errors and 83 warnings; none are in the changed C# files.
+- The follow-up native compile passed with zero errors (69 game warnings and 4 project-editor warnings, none in
+  the changed camera/HUD sources). `lowtide-camera-aces-neutral.png` and `lowtide-camera-agx-current.png` in the
+  audit folder compare the accepted and rejected profiles under the same map lighting and fog. These use a
+  temporary game camera and the native post-process builder; an ordinary editor viewport is not equivalent.
+  The temporary camera was removed. Full-match exposure transitions, scope/drone behaviour and GPU frame times
+  remain unmeasured. The comparison does not establish photorealism across every map.
+
+## Map daylight profiles (2026-10-17)
+- The user wants different times of day across maps, with enough light for clear play. `Tools/map_daylight.py`
+  defines the saved environment profiles below. Each generator applies its profile after restoring its quality
+  state; Lowtide applies it at the end of `lowtide_finish.apply_scene`. Reapplication is idempotent.
+
+  | Map | Lighting mood |
+  | --- | --- |
+  | Belltower | Warm afternoon |
+  | Boxyard | Clear midday |
+  | Cerro Blanco | Clear late morning |
+  | Lowtide | Soft coastal daylight |
+  | Railhead | Early autumn afternoon |
+  | Riverdale | Golden morning |
+  | Orion | Bright golden hour |
+  | Veridant | Soft golden evening |
+  | Ares | Warm Martian light |
+
+- These are authored sky, fog and ambient-light settings. Baked maps retain the sun direction, direct light,
+  GI volumes and reflection resources that their bakes expect. Their existing interior exposure settings remain
+  in place. The profiles add no runtime component or per-frame work; the existing weather system uses them.
+- Boxyard has its own clear HDR sky, `materials/boxyard/sky/boxyard_midday.vmat`, with sun pitch 62/yaw -15.
+  `Tools/boxyard_sky.py` generates the matching 4096x2048 EXR and material into a staging directory; import the
+  reviewed files through the native editor. Regenerate this sky when its profile's sun direction or colour changes.
+- Orion's low sun and wet reflection cubes remain aligned. Ambient fill is slightly brighter, and map AO uses
+  intensity 0.65/radius 96 to retain tunnel and stair detail. Ares keeps its warm exterior and orange practical lights.
+- Native captures in `output/map-daylight-20261017/captures/` cover all nine profiles, with 14 views using the shared
+  player camera's ACES post-processing and settled exposure. `verification.json` compares the saved scenes to the
+  original C-drive documents and checks the generator hooks. Lowtide's independently added 56 downpipe colliders
+  are recorded separately and preserved; all earlier object identities and the lighting changes are retained.
+- `weather-restoration.json` verifies storm and fair-weather Apply/Restore against Lowtide's authored sky, sun,
+  fog and 11 reflection probes. Native compile status reports zero errors; all 11 changed Python sources compile.
+  These are scene and rendering checks, not a full multiplayer or GPU performance benchmark.
 
 ## Iron sights: do not change the M4's AimOffset
 - `Assets/Weapons/M4A1/weapon_m4a1.prefab` → `ManualOffset.AimOffset` must stay `0,0,0`.
@@ -1880,6 +1941,149 @@
 - The pause menu's quit button is `Game.Close` too, so it reads "Quit to s&box" (in a standalone build, "Quit to
   Desktop").
 
+## Controller in the menus (s&box's virtual cursor)
+- On a controller, s&box's virtual cursor stands in for the mouse (`Input.EnableVirtualCursor`): the left stick moves
+  the pointer, A clicks and the right stick scrolls. The header's LB / RB step through its tabs
+  (`MainMenuRoot.ControllerNavRoutes`), WEAPONS included since 2026-10-15 (the user: RB "skips past it"): it loads the
+  gunsmith's scene, whose header has LB / RB too (`GunsmithPanel.NavStep`), back out to PLAY and OPERATORS. Both start
+  with the bumpers counted as held, so one still held through the scene load doesn't step on again. The D-pad drives the
+  UIs that offer themselves to `PadNavigation` (below).
+- `GameUtils.UpdateCombatMouseVisibility` turns the virtual cursor off in combat, where the stick moves the player, and
+  since 2026-10-14 back on whenever the cursor shows (as does `TheaterController.ShowCursor`). Before, nothing turned it
+  back on, so after the first match the left stick couldn't move the pointer in any menu (the user's report). The
+  bumpers also skipped Ranked and Custom Game.
+- Compiled with dotnet, not yet tried with a controller in-game.
+- Jump is on the pad's A (2026-10-14, `ProjectSettings/Input.config`): it had no controller button. Only the project's
+  default changes; a player who rebound Jump in s&box's bind editor keeps theirs.
+
+### D-pad navigation (`PadNavigation`, `Code/UI/Navigation/`, 2026-10-14)
+- The user: "the settings menu isnt compatible on controller, all UIs should be really well supported".
+- `PadNavigation` is a GameObjectSystem (Stage.StartUpdate, before the game's components). It drives the UI that offers
+  itself every Tick (`PadNavigation.Offer( panel, IPadScope, layer )`), the topmost when several are up: a dialog at
+  100, a popup at 50, a page at 0.
+  - The D-pad moves a focus to the nearest target that way (`PadNavMath.Pick`: the nearest edge, with sideways distance
+    counted three times, so a move stays in its column). Held, it repeats after 0.35 s.
+  - The pointer follows the focus (`Mouse.Position`, every frame), so A, the virtual cursor's click, presses what has
+    the focus, and hover styles and sounds work as for a mouse. Moving the stick or the mouse hands the pointer back.
+  - Left and right change an `IPadAdjustable` (a settings row) or a `CustomSlider` instead of leaving it
+    (`PadNavMath.SliderStep`: about fifty presses end to end on the slider's own grid, four times as far once held
+    1.2 s). B is the scope's `PadBack` (else Escape), LT and RT its `PadTab`.
+  - Back from a popup or a dialog, the focus goes back where it was.
+  - When the focused control goes away (A swapped the list it was in), it waits two frames for the new one to be laid
+    out, then takes the target nearest where the old one was (`Replacement`, `PadNavMath.Distance`). If that target's
+    list (the nearest panel round it with other targets) has a `pad-first` one, that wins: the fitted part, the slot
+    just backed out of. Before 2026-10-15 it went to the page's first target: opening a gunsmith slot's parts on the
+    right put the focus on the primary weapon on the left (the user's report).
+  - Scopes on the same layer that sit inside each other are driven as one (`Chain`, innermost first): the outermost's
+    panel is where the targets are, and B, LT, RT and the first focus ask the innermost scope first. That's how the
+    main menu works: `MainMenuRoot` offers itself and each page offers itself inside it, so the D-pad reaches the
+    header from the page, and the page still gets B and the triggers first. Among equals on a layer, the one offered
+    first is under (a pause menu opened over the class menu wins).
+  - `PadScope` is an `IPadScope` made of delegates (`First`, `Back`, `Tab`), for a UI that offers more than one scope
+    (a page and the popups it opens). Keep it in a field.
+- Targets: panels with the `pad-target` class, checkboxes, sliders (`CustomSlider` and the engine's `SliderControl`),
+  or a `cursor: pointer` panel. The cursor style is inherited, so it's the first one down the tree; what's inside a
+  target isn't another, unless it's marked `pad-target` (`CollectMarked`: a row's TUNE button, a card's favourite
+  star). A cursor set only on `:hover` doesn't count: those need `pad-target`. `pad-skip` leaves a panel
+  and everything in it out, so never put it on a modal's backdrop that holds the modal. The focus starts on a
+  `pad-first` target, else the first that isn't inside a `pad-late` panel (`MenuTopbar`, a page's back button), else
+  the first. The focused one gets `pad-focus`: Theme.scss rings it (2 px, the accent orange), and a UI can restyle it.
+- The pad's menu buttons are actions in `Input.config`'s "Menus" group, hidden from the keybinds: MenuUp, MenuDown,
+  MenuLeft and MenuRight (the D-pad), MenuSelect (A, for hints), MenuBack (B), MenuPrevTab and MenuNextTab (LT, RT).
+  While a UI is driven with a controller, every action on those buttons is cleared each frame before the game reads it
+  (`Input.Clear`): in the pause menu the D-pad dropped the gun (Drop) and opened the class menu (ChooseClass).
+- What offers itself so far:
+  - The settings page. Each row (`SettingEntry`) is one target: up and down move between rows, and left and right
+    change it (a slider steps, a switch or a checkbox goes to its left, off, or right, on side, a row of choices to the
+    next). A presses the row's control (`PadPoint`: the checkbox, the chosen option, the slider's thumb, the language
+    field). LT and RT step through the categories. B clears a search, or saves and goes back ("/": the hub, or the
+    pause menu's page). `PadHints` in the footer shows the buttons while a controller is in use.
+  - The language list (B closes it), `DialogModal` (B cancels, or dismisses a notice), the bug report (B closes it, LT
+    and RT change its admin tabs), and the pause menu's page (B resumes; its leave-match question traps the focus; B
+    closes the party invite popup first).
+  - The main menu (2026-10-15), all as one area with the header:
+    - `MainMenuRoot`: B on any page but the hub goes back to the hub, and on the hub it's Escape, so the quit prompt.
+      An open header menu (the bell's notifications, the round MORE button's menu) is a popup (layer 40) that B closes.
+      `QuitPrompt` is a dialog (100) that starts on CANCEL.
+    - The hub: the focus starts on the featured screen's PLAY / PLAY NOW (`pad-first`), LT and RT step through the
+      rail's Multiplayer, Battle Royale and Zombies, and the playlists overlay and the zombies map picker are popups
+      that B closes. The squad card's privacy menu and the party's invite popup are popups too. The hub's power button
+      is a target.
+    - Custom game: LT and RT step through MATCH, RULES and PLAYER (not for Zombies, nor while starting).
+    - Profile (`BarracksPage`): B leaves a section for the profile page; in the emblem editor LT and RT change the
+      picker's SHAPES / EMOJI / LETTERS tab (`EmblemEditor.CyclePickerTab`). Career Record: B goes back to the profile,
+      and the service milestone cards are targets.
+    - Sessions, Ranked, Operators, Store and the Theater page needed nothing of their own: their controls already
+      have pointer cursors, and B goes back to the hub.
+  - The gunsmith: the focus starts on the primary weapon's card, B steps back one layer as Escape does (the last step
+    leaves), LT and RT switch BUILD and CUSTOMIZE. An open modal (builds, share, compare) is a popup (50) that
+    B steps out of, and a build's name is a target (A renames it).
+    - Opening a list puts the focus on its current choice (`pad-first`): a slot's fitted part, the weapon on the stand,
+      the equipped perk or gear, the active class. Backing out puts it on the row it was opened from (the browser's
+      `_lastCategory`, the panel's `_padReturn`).
+    - TUNE (in a slot row and on the fitted optic), the weapon cards' chevrons and the favourite stars on weapons and
+      camos are `pad-target` inside their rows.
+    - Every part row is `pad-target`: a locked one has no pointer cursor, so the D-pad skipped it and never scrolled
+      the list down to it. The tactical buy menu's owned and unaffordable items are `pad-target` for the same reason.
+  - Also `pad-target` inside their rows (2026-10-15, from an audit of every pad-driven UI): the emblem editor's layer
+    up, down and delete buttons, the squad bar's kick buttons, and the settings' English (UK) / (US) buttons.
+  - The firing range's pause menu (`FiringRangeHud`): the focus starts on RESUME, and B resumes.
+  - Colour pickers (`ColorPicker`: the gunsmith's custom paint and reticle colour, the settings, the emblem editor):
+    left and right turn the hue field's hue (`ColorSlider`, an `IPadAdjustable`; a grey starts from full colour), and
+    step each RGB box (`ColorChannel`, 0-255, five a press, twenty once held). The hue field's cursor now follows a
+    colour set any way, not only by dragging.
+  - In a match:
+    - The class menu (`ClassSelect`): B steps back as Escape does (a slot's choices, the editor, then closed), LT and RT
+      change the primaries' category. Its choices, slots, perks and buttons are `pad-target` (their pointer is
+      hover-only).
+    - The tactical buy menu: B closes it, LT and RT step through its categories.
+    - The Zombies workbench: B steps back (a slot's parts, then closed), LT and RT change the gun; its rows and buy
+      buttons are `pad-target`.
+    - The map vote: the map cards (`MapVoteCard`, `pad-target`), the other modes and Leave game. B is Escape (the
+      pause menu), which opens over it.
+    - The end-of-match screen: the focus starts on CONTINUE or PLAY AGAIN; B continues where there's nothing to start.
+  - The Theater's playback HUD: the focus starts on play/pause, LT and RT change the soldier followed (not in
+    freecam), and B is Escape (back to the Theater page). While it's driven, A doesn't pause any more (Jump is on A,
+    which is cleared for the HUD): press the play button.
+  - To add a UI: offer it every Tick (a PanelComponent in OnUpdate), implement `IPadScope` or keep a `PadScope`, give
+    targets without a steady pointer cursor `pad-target`, and mark where the focus should start `pad-first`.
+- Text boxes (`TextEntry`) are targets since 2026-10-15, never the first focus: A focuses one (a class or build name,
+  the import code, the bug report's title, the searches). Typing still needs a keyboard or the Steam on-screen keyboard:
+  the game has none of its own.
+- What the pad still can't do: drag (the gunsmith stage, the emblem canvas, the Theater timeline) or fly the Theater's
+  freecam. The virtual cursor and the sticks still do those.
+- The scoreboard isn't pad-driven. It shows while Score is held (the cursor and the virtual cursor come on then), and
+  driving it would take A, B, the D-pad and the triggers from the game while it's held: no jumping or shooting with it
+  up. On a pad, Score shares the left thumb with the D-pad, so it would want a press-to-toggle there. Left to the user.
+- `dotnet run --project Tools/PadNavChecks` checks `PadNavMath` on a settings-like layout, the sliders' steps and the
+  replacement for a focus that went away (30 checks, all passing). The settings part was compiled with dotnet and hotloaded into the user's match on 2026-10-14;
+  the hotload warned "Lambda signature has changed" for PausePage, so reopen the pause menu (or restart play) if its
+  buttons misbehave. The rest (2026-10-15) was compiled with dotnet only, with the editor shared with the user's match.
+  `PadNavigation` is a GameObjectSystem, so changes to it only run once play restarts. None of it has been tried with
+  a controller: every UI above, the header reached from a page, the popups' layers, and the triggers' tabs.
+  The user then tried the gunsmith with a controller (2026-10-15) and found RB skipping WEAPONS and the focus jumping
+  left on opening Muzzle. Those fixes, the nested targets, the text boxes, the colour pickers and the range menu
+  compiled with dotnet and hotloaded into the editor with no errors; none of them has been tried with a controller yet.
+
+## Look sensitivity and the settings search (2026-10-14)
+- Settings → Controls has a SENSITIVITY section (the user asked for controller and mouse sensitivity): Mouse, Mouse
+  ADS, Controller Horizontal, Controller Vertical and Controller ADS Sensitivity (`GameSettings`, multipliers, default
+  1; each getter reads 0 as 1 for old settings files and hotloaded objects). They multiply s&box's own mouse
+  sensitivity and stick look speed, which only s&box's menu can change.
+  - `LookSensitivitySystem` (Stage.StartUpdate, the active scene only) scales `Input.AnalogLook` once a frame before
+    anything reads it. s&box adds the mouse and the right stick into it, so a frame the mouse moved (`Input.MouseDelta`)
+    counts as the mouse's, any other as the stick's. ADS is the local pawn's `aiming` equipment tag. It's a new
+    GameObjectSystem, so after a hotload it starts only once play restarts.
+  - Aim Assist was in the Controls group but never drawn (InputSettings draws that group by hand); it's there now.
+  - Every slider in SettingEntry now shows its value beside it (`SliderText`, decimals from its step).
+- The settings page has a search box over its categories (`SettingsSearch`): every word must be in a setting's name or
+  category, in the player's language or English, case and accents ignored (`LanguageMenu.Fold`). Results are grouped
+  by category, and matching keybinds come after them through `InputSettings` with its `Query` set (a keybind's key
+  name counts too: "space" finds Jump). Picking a category clears the search. Aim and Sprint Input have
+  `[Choices( "Hold", "Toggle" )]` so they show as a switch in the results.
+- Compiled with dotnet and hotloaded into the user's match with no errors, with every text in all ten tables. Not yet
+  seen: the sliders' effect, the search, or A jumping.
+
 ## Main menu hub page (`HubPage`)
 - `.hub-container` is a row of three: `HubModeRail` (the "Play" tabs, 240 px), the featured screen (see Maps below),
   then `HubSidebar` (squad, then daily challenges). The featured screen is flex-grow, so it takes whatever the rail leaves.
@@ -1973,6 +2177,41 @@
 - Made without an s&box SDK, so it has been compiled nowhere. Watch the editor's log for errors after the hotload.
   Checked only in a browser mockup of the page's real SCSS. Nothing has been seen in-game.
 
+## Lobby input (controller / mouse-and-keyboard lobbies, `LobbyInputRules`, `LobbyInputGuard`)
+- The user asked for controller-only and mouse-only lobbies, for players who only want to play in those (2026-10-14).
+  Settings → Game → Lobby Input (`GameSettings.LobbyInput`): Any Input (the default), Controller Only or Mouse &
+  Keyboard Only. It's saved by number, so a new value goes last.
+- A lobby carries its rule in its lobby data, `input` = `pad`, `kbm` or `any` (`LobbyInputRules.Stamp`, called just
+  before `Networking.CreateLobby`, which copies `Networking.SetData`'s data into the new lobby):
+  - `GameNetworkManager` stamps every match a player hosts: the custom game page's INPUT (MATCH tab, starting at the
+    player's setting), else the host's setting. Ranked's `HostRankedMatch` stamps the setting.
+  - A lobby with no key (an older build's, or one from the editor's Start Hosting) is open to all.
+- Joining (`LobbyInputRules.CanJoin`): with a preference, only lobbies with that rule. With Any Input, open lobbies and
+  those for what the player is using now (`Input.UsingController`: the last button pressed; a pad's buttons and
+  triggers count, a key or a mouse button the other way, and moving a stick or the mouse alone neither).
+  - SESSIONS lists every lobby, the joinable ones first. A restricted one has a controller or mouse icon, and one the
+    player can't join is dimmed. Its details show INPUT and why, and Join Session reads the rule and does nothing.
+  - Ranked's matchmaking skips lobbies it can't join.
+- Invites and a squad following its leader skip both, so in a match `LobbyInputGuard` (a GameObjectSystem) holds every
+  machine's player to the rule:
+  - The host syncs it (`GameMode.LobbyInputRule`, FromHost) from its lobby data. Clients don't read their own: the
+    engine keeps lobby data after leaving a lobby (nothing in sbox-public's networking code clears it, and a new
+    lobby's handshake only overwrites the keys it has), so a key from an earlier lobby can linger.
+  - Only play counts: alive, with no pause menu, class or buy menu, chat, scoreboard, gunsmith or win banner open. A
+    button of the right input starts the count again.
+  - After 1 s with the other input, `LobbyInputOverlay` warns (in MainHUD while there's a pawn), with a countdown for
+    clients. After 15 s (`Grace`) a client disconnects to the menu, which says why (`MainMenuRoot.PendingNotice`: a
+    DialogModal with only OK, since DialogModal now hides Cancel when it's given no text for it).
+  - The host is only warned: taking it out would end the match or hand it to another player.
+- Ranked: `HostRankedMatch` sets `ranked_closed` to 0 before making its lobby. A finished ranked match sets it to 1,
+  every client gets it, and the engine copies a machine's leftover lobby data into the next lobby it makes, so the
+  next ranked lobby that host or any of its players made was closed to matchmaking from the start.
+- Compiled with dotnet on 2026-10-14 (0 errors), with its text in every language (`check_translations.py` at its 22
+  problems from before, none new). The open editor stalled at 21:55 that day, before the last of it, so it hasn't
+  compiled there. Nothing has been seen in-game: the setting, the browser's icons and details, the custom game's
+  INPUT, the warning and the leave, the menu's notice, a host migration keeping the rule, and two machines (one on a
+  controller, one on mouse and keyboard).
+
 ## Map changes with players connected (`GameUtils.LoadMap`)
 - The user hosted from the editor's network menu (Start Hosting) in the main menu, joined with Join via new instance,
   then started a TDM from the host. The second instance was left in freecam on Flatgrass (2026-09-30).
@@ -2022,6 +2261,41 @@
 - The emblems are `Assets/ui/ranked/<tier>.png`, drawn by `Tools/rank_emblems.py` (numpy + PIL): a metal shield in the
   tier colour, with more trim for each tier. Keep its colours in step with `Rank.TierColors`.
 
+## Soldier training (`SoldierTrainingRules`, `SoldierTraining`, `Client.Training`, `PlayerPawn.Training`)
+- Players improve the skills they use (2026-10-18). The existing career level stays 1–55; Endurance and Weapon Handling
+  each run from 1–50. Earned skill XP also adds to career XP. Skills survive deaths, map changes and prestige.
+- Endurance earns 1 XP per 10 metres of actual ground sprinting. The host samples movement every 0.25 s and rejects
+  stationary movement, teleport-sized/stale samples, other movement modes and the first sample after a pawn changes.
+  Handling earns 1 practice XP at most every 2 s from the existing synced discharge times, plus 2 XP for an enemy
+  bullet hit (3 for a headshot), at most once per 0.5 s across pellets/targets. Accepted zombie hits use the same cap.
+  Only living, active players earn it; downed/frozen players, noclip, drone control, developer movement/god modes and
+  the gunsmith firing range do not. The game mode must have an active PlayerStatsRule. Bots get baseline modifiers.
+- Curves and tuning are in `Code/Stats/SoldierTrainingRules.cs`. Benefits grow within each level. Maximum bonuses are
+  +20% sprint capacity, +15% stamina recovery, -12% recoil, -15% weapon sway, and -10% aim/reload duration. No damage,
+  health or movement-speed bonus. Attachments, mounting, wounds and Zombies perks keep their existing effects.
+- Sprinting now uses a normalized stamina pool: 12 s at baseline, 14.4 s at maximum Endurance. It recovers fully in
+  6 s at baseline after a 1.25 s delay; exhaustion holds sprint off until 25% is recovered. Actual ground movement
+  drains it, and respawn refills it. Endurance also speeds the existing jump/prone fatigue recovery. The owner drives
+  stamina as it does movement; the host owns earned training totals.
+- `Reloadable` captures its combined duration multiplier at the start of a reload, including shell continuations.
+  Reload completion, sound timing and the viewmodel's existing reload-speed parameter use that captured value, so a
+  skill gain midway through cannot move them apart. A cancelled reload's delayed sounds cannot bleed into a new one.
+- Progress uses the existing local-cookie trust model, not server-verified account storage. Versioned, account-scoped
+  keys are `hc1.training.v1.{Game.SteamId}.Endurance` and `.Handling`. The host imports capped values once per connection
+  and merges higher retained values on reconnect. Owner snapshots merge monotonically; they never undo newer saved
+  progress or award career XP for an import. Dirty profiles save every 5 s, immediately on a skill improvement, and
+  on Client teardown (including after its network owner is cleared). Account changes flush the old keys first.
+- `SoldierTrainingPanel` sits in Profile → Career Record between career rank and service milestones. It shows both
+  levels, XP remaining, current benefits and caps. `SoldierTrainingHud` puts career progress and stamina below Vitals;
+  its four-second skill notice sits to the right of the vitals column. It hides for spectators and drone control.
+  All new text is in the 13 translation languages as well as English; the translation checker adds no new findings.
+- Validation: `dotnet run --project Tools/SoldierTrainingChecks/SoldierTrainingChecks.csproj` passes 12 scenarios using
+  the actual rules/profile files (only account, cookies and clock are stubbed), covering every level threshold, caps,
+  several tick rates, recovery hysteresis, movement rejection and account/save/snapshot behavior. The C: project's
+  `Code/razedtest.csproj` builds against the installed engine with 0 errors (95 existing warnings on the final build).
+  sbox-cli reported no running editor with this project open, so live HUD rendering, RPC/host migration, respawn and
+  weapon feel still need an in-game playtest. No editor was launched or scene/prefab edited for this feature.
+
 ## Prestige emblem (`Progression.GetPrestigeEmblem`)
 - The user asked to show any prestige they've reached, not just their highest (2026-10-13). On Career Record's SERVICE
   MILESTONES, clicking a reached card picks it (EQUIPPED); a locked card does nothing.
@@ -2055,7 +2329,14 @@
     belongs on the stage. That also takes off the MP5 the gunsmith scene starts with.
 - The bars are `GunsmithStats`, read from the prefabs with the class's parts and tuning, on one scale for every gun, with
   the change from the factory gun in green or red. HANDLING (ADS time) stands where CoD has accuracy, since the game has
-  no spread or bloom. FIRING RANGE is a locked "coming soon" card.
+  no spread or bloom. FIRING RANGE opens `scenes/gunsmith_range.scene` through
+  `GunsmithRangeSession.Enter`, carrying the selected weapon into a private practice session.
+  From a match the card says LEAVE MATCH & TEST BUILD; entry disconnects the local player
+  before loading the range. `FiringRangeSystem` uses the regular pawn/weapons, replenishes
+  reserve ammunition, and provides target reset, moving targets and shot/damage feedback.
+  `Tools/gunsmith_range_bench.py` supplies generated long-grain/end-grain oak and beveled
+  bench timbers; the range model maps both oak materials. These are current source facts,
+  not a replacement for an end-to-end play test.
 - Every pick saves as it's made, and `PlayerLoadout` sends the saved class to the host every second, so there's no
   apply step (the user had the mockup's APPLY BUILD removed). SAVE LOADOUT, which only confirmed, was removed too at
   the user's ask (2026-10-13). Over a match, picking a class (`SelectClass`) picks it as the class menu does, which swaps
@@ -2179,6 +2460,52 @@
   chains that close the modal. The styles and the `Tr` keys are still there too.
 - COMPARE's captions still say "no tuning" / "with tuning". They weren't changed, because that needs new keys in all
   ten tables.
+
+## Gunsmith caches (what a shot and a frame no longer work out again, 2026-10-17)
+- A performance audit found every shot asking `GunsmithLoadoutManager.TryGetAttachment` about 84 times: 7 effect passes
+  over 11 slots (`GunsmithAttachmentEffects.For`, from Shootable, its effects, ShootRecoil and ViewPunch), plus
+  `RefreshAmmunitionLoadout` and the suppressor check. Each lookup read cookies and searched all ~900 parts. Measured
+  in a match on the Kastov-74u with 9 parts fitted, that took 3.56 ms a shot. It now takes 0.5 µs.
+- `GunsmithLoadoutManager.Version` / `MarkChanged()` decide when anything is worked out again. Everything that can
+  change a fitted part bumps it:
+  - SetAttachment, SetActiveClassIndex, the optic tune setters, ApplyAttachments' barrel clear and the USP-SD migration;
+  - UNLOCK ALL, spending a point, a weapon level-up (`WeaponProgression.AddXP`) and a prestige;
+  - a part loading or reloading (`GunsmithPart.PostLoad`/`PostReload`, which also bump `GunsmithPart.LibraryVersion`).
+  **A new cookie write that changes a part, its unlocking or its tune must call `MarkChanged()`**, or the guns keep the
+  old answer.
+- What it keeps:
+  - TryGetAttachment's answers, per resource and slot. Parts are found through an index by path and name
+    (`PartsNamed`), in the library's order.
+  - Per gun: the effects (`Equipment.FittedEffects`, also keyed by prone for the bipod), the ammunition loadout (also
+    keyed by possession: the first refresh runs before the pawn is possessed), the suppressor check and the tuned zero.
+  - While a build is being fitted (`IsFittingBuild`: Theater, COMPARE) nothing is kept.
+- The unlock ladder (`AttachmentUnlocks.GetLadder`) used to be made again every 5 s. Now it's made again when a part
+  loads or the scene changes, so a viewmodel prefab's new slot shows on the next map. A rebuild takes ~0.2 ms.
+- Per frame:
+  - `GunsmithAttachmentPoint.On( root )` keeps each weapon's point list until a point is made, destroyed or given a part
+    (`GunsmithAttachmentPoint.Version`; SetPart bumps it). Category and CurrentPart are still auto-properties, so
+    hotloads keep them, so code that assigns CurrentPart directly must go through SetPart. A point walk went from 1.6 µs
+    to 0.015 µs.
+  - `GunsmithMw22Attachment.BoneDelta` keeps each model's bones by name: 3.8 µs to 0.12 µs a call, with identical
+    transforms.
+  - The mounts' camera-setup remount (`ICameraSetup.PostSetup`) now only runs for viewmodels
+    (`GunsmithMw22Attachment.OnViewModel`). A world model's parts are its children and move with it. Bone attachments
+    that follow an animated bone or hide one still remount.
+- CameraScope (the M700's 3D scope) does its setup once instead of every frame (the texture clear, the material, the
+  render target and the parent). It puts the material back when the camo pass clears it. The audit thought the scope
+  camera rendered at the hip too. It doesn't: the lens is 9.7 from the eye at the hip and 3.7 aimed, so the `> 5` check
+  already only draws it while the scope is up. Gating it on the aim tag was tried and taken out: the lens went black
+  while the scope came down.
+- The scope's picture was a fixed 512 x 512, which the lens stretched more than twice over (the user: "it looks really
+  low res"). It's now the screen's height rounded up to 128, between 512 and 2048 (`CameraScope.PictureSize`: 1152 at
+  1080p). Aimed, the M700's glass is about 1.06 screen heights across. That's ~5x the pixels for the scope's camera
+  while scoped. A new size is made when the screen's changes, and the picture goes with its viewmodel (`OnDestroy`).
+  Live in the user's match (1152 x 1152), not yet looked at through the scope.
+- Checked in the editor on 2026-10-17:
+  - 1,800 lookups (45 weapons, 20 slots, fresh and kept) and 17,913 index checks against the old logic: no differences.
+  - In a Lowtide TDM: the kept loadout, effects and suppressor check match fresh ones, and 5 shots left the version
+    alone (so no cookie reads or part searches). The M700's scope ran through hip, aim and release.
+  - Not yet seen by eye: every gun's parts in first and third person, and the Theater's M700.
 
 ## Fire rate and fire modes in the gunsmith (the Action and Trigger slots)
 - The user (2026-09-30): a suppressor shouldn't change a gun's rate unless a real one would, every part should do what
@@ -2512,11 +2839,19 @@
 
 ## Hardcore hit locations (`HealthComponent.Wounds.cs`)
 - Hardcore bullets go by where they hit, the same for players and bots, PvP included. Everything scales with the
-  round's damage after falloff (`gunDamage` in `TakeDamage`; bots shooting real players do 0.75x their gun's, e.g. an M4 bot 15).
-  - Head or neck: dead.
-  - Body (chest, spine, clavicle; the belly and pelvis at 0.6x): a chance to kill outright of damage / 40 (M4 50%,
-    pistol 37%, shotgun pellet 20%, SCAR-H 90%, M700 95%), which the user asked for as real life. Otherwise a heavy
-    wound of 3x the damage (M4 60, so a second body hit kills unless you've healed; the SCAR-H's 108 kills outright).
+  round's damage after falloff (`gunDamage` in `TakeDamage`). Bots do their gun's full damage to players in hardcore
+  (`RealPlayerDamageScale` 0.75 is outside hardcore only). The table is `HardcoreTrauma`, and armour takes its share
+  first (`transmission`, from `ModifyDamage`'s split).
+  - Head or neck: 10x the damage, so dead (a helmet can save you).
+  - Body: a chance to kill outright of damage / 40, at most 95% (`HardcoreTrauma.KillChance`: M4 50%, 9 mm 30%, a
+    7.62x39 AK 65%, SCAR-H 90%, FAL and SPEAR 95%), 0.6x for the belly and pelvis, times the share armour lets
+    through, and rarer with a custom game's extra health. Otherwise 4.5x the damage to the chest (3x the belly), but
+    never more than 90% of your health (`SurvivedBodyHitHealth`), so a body hit that doesn't roll a kill always leaves
+    you alive: M4 90, so the second kills unless you've healed; 9 mm 54.
+  - History: the chance came in as the user's "real life" ask, then on 2026-10-07 commit b733fcbd made body hits
+    deterministic (chest 4.5x: 5.56 always two hits, 7.62 always one). On 2026-10-16 the user saw "2 body shots every
+    time", said one would kill in real life, and chose "whatever is realistic": the chance is back, and the heavy rounds
+    no longer kill every time. `dotnet run --project Tools/TraumaChecks` checks the table (25 checks).
   - Arms, hands, legs and feet: 1.7x the damage, at most half your health (M4 34, so three kill; pistols four, SMGs
     five). Only these, and falls, add wounds.
 - Explosions, knives and falls aren't bullets: they still kill bots (and players hit by bots) outright in hardcore,
@@ -2749,7 +3084,8 @@
 
 ## Maps
 - Match maps (map picker, Quick Play, end-of-match vote) are `GameUtils.IsMatchReadyMap`: Flatgrass, Innocent Hotel,
-  Belltower, Reef Hall, Railhead, Lowtide, Boxyard, Cerro Blanco, Riverdale and Ares (see their sections below).
+  Belltower, Reef Hall, Railhead, Lowtide, Boxyard, Cerro Blanco, Riverdale, Ares, Collider and Veridant (see their
+  sections below).
 - The hub (`HubPage`) is one featured screen for the tab picked on its left rail (`HubModeRail`, `HubPage.Operation`:
   Multiplayer, Battle Royale or Zombies; Campaign is locked), like the user's CoD-style mockup. Its art is
   `ui/modes/<mode>_wide.png`, a 1024x720 cut of the 2:3 card art. Battle Royale has no wide cut or blurred backdrop, so
@@ -2799,7 +3135,231 @@
   T Spawn 5 was in it, which slowly trapped the whole T bot team there, with the CTs piled up against the lobby wall.
   Every spawn must have a Complete navmesh path to the other team's spawns.
 
+## Collider (accelerator laboratory, `Tools/collider_map.py`)
+- Built from the user's blue particle-accelerator reference on 2026-10-15. The playable research hall has an open
+  two-level atrium, two main stairs, control/laboratory wings with their own stairs, and a ground-level service lane.
+  A large observation window separates the combat space from the accelerator chamber. The upper laboratory display
+  and accelerator machinery are scenery; the navmesh's custom bounds stop below that inaccessible upper display.
+- `Tools/collider_materials.py` and `Tools/collider_map.py` stage assets under `output/collider/stage/`. The scene is
+  `Assets/scenes/maps/Collider/collider.scene`; its title is in the map catalog in `Code/GameLoop/GameUtils.cs`.
+  The material source uses the existing Ares surface generators without changing Ares materials. Layout uses plan
+  coordinates east/north/up, mapped to world `(north,-east,up)`. Upper walkways are z256.
+- Offline revision 2 adds a four-panel telemetry atlas, control desks/chairs, a rounded observation surround,
+  wider steel/concrete columns, segmented ring housings, coolant risers and detailed flight cases. Ground spawn
+  doglegs remain; the upper doglegs were removed because they obscured the glazed control rooms. Machine panel
+  axes are right-handed so their outward faces render correctly. These assets are now imported and compiled natively.
+- Detail pass 2 (`Tools/collider_detail_geometry.py`) adds bevelled handrails, bolted mounting plates, open stairs
+  with thin collision decks, equipment-case lids/latches/handles, galvanized treads and worn floor stencils.
+  All four models/materials are imported; the structure has 70,700 visual triangles, the detail model 97,256,
+  the machine 165,594 and the glass 60. All four stair paths and their under-stair clearance passed native checks
+  in `output/collider/stair-validation.json`; all 68 gameplay positions were also rechecked after import.
+- Services pass 1 (`Tools/collider_services.py`) is imported and compiled. Two glazed openings beneath the
+  observation gallery reveal service-room instruments; the original solid player collision is retained exactly.
+  Open cable ladders, suspended cables, pipe offsets/flanges/valves and bolted gallery beams add reference detail.
+  Structure/detail/machine/glass now have 71,396 / 132,960 / 165,594 / 84 triangles. The collision arrays, compiled
+  model physics definitions, convex-hull source and minimap match the previous pass; all 68 offline layout checks pass.
+  `Sources/Collider/verify-services.py` also checks finite nondegenerate geometry and clear render rays through all
+  four window panes. Staged files and evidence are in `output/collider/services-v1/`; the primary stage now matches the saved build.
+  `import-services.cs.txt` checks source hashes and backs up replaced files. Eight native views in
+  `services-v1/native-review/` record the earlier geometry review. The accepted v4 bake includes the new openings;
+  eleven practical lights now have wider coverage, and GI runtime intensity is 1.6 with unchanged exposure.
+  Use a fresh revision for future bakes. The bake script fingerprints inputs, refuses play, cancels and drains
+  its updater if the game/editor state changes, and rejects changed inputs before adopting textures.
+- Authored setup: six team spawns per side, 20 Deathmatch/Gun Game spawns, two Defuse sites, 22 Retakes spawns,
+  three Domination flags, three Hot Zones, three Cash Grab/extraction pairs, buy zones, callouts and a minimap.
+  Team spawns are disabled during Deathmatch, Gun Game and Retakes. Retakes spawns use the matching site/role tags.
+  The minimap uses Collider's bounds and excludes the service ceiling from the upper-floor overlay.
+- `--check` checks all 68 player/objective positions for clearance, support and connectivity, plus standing/crouching
+  sight between opposing Retakes spawns. `Tools/collider_validate.py` checks IDs, references, resources, generated
+  model/material/texture dependencies and mode wiring.
+  Reports are `output/collider/layout-validation.json` and `scene-validation.json`; the latter also resolves the seven
+  compiled lighting textures, including native resource references serialized as `{Id, Path}` objects.
+- `Sources/Collider/editor/import-build.cs.txt` installs the staged build through the editor, refuses an open Collider
+  document, writes changed assets atomically and preserves the selected scene and play state. Copy it into the current
+  native MCP exchange directory before invoking `run_csharp`. `import-visual-assets.cs.txt` handles material/model/menu
+  changes without replacing an open document. `export-reviewed.cs.txt` exports the saved native scene and lighting cache.
+- Native validation (2026-10-15): all 68 authored positions passed engine floor support, player-box clearance and Complete
+  navmesh paths, with no missing model/material resources (`native-validation.json`). All four stairs also passed.
+  A fresh local TDM run on the saved services/v4 build selected the pawn camera and observed eight of nine bots moving
+  over four seconds (`live-round-validation.json`). A separate game process then joined the editor host: both processes
+  had the same four model identities, two correctly owned player pawns, valid materials and selected player cameras.
+  A host-owned QA teleport of approximately 100 units replicated to the client (`network-validation.json` and `network/`).
+  This verifies position replication, not manual keyboard traversal or an Internet latency test. The owned test client
+  was closed and temporary launch/game/network settings restored before releasing the editor.
+- Lighting: 82 point lights, six shadow casters. High hall/machine fills contribute diffuse/transmission only, preventing
+  large specular dots. Painted metal uses a dielectric coating instead of dark bare metal. The saved GI bake is
+  `Assets/lighting/collider/lighting-v4/` with 2205 probes and two passes; relocation is serial to avoid the engine's
+  `ResourceSystem.RegisterWeak` race. Never call default parallel `ComputeProbeRelocation` on this workstation.
+  Four custom reflection cubes (`reflection_*_v3.vtex_c`) come from ordinary camera faces and native sky texture
+  compilation (`collider_reflections.py`). Do not use the GPU Quality GGX bake that faults `envmap_filtering_cs`.
+  Seven compiled lighting textures are intentionally included in source control and the package. Regeneration retains
+  the accepted GI and reflection objects from `Sources/Collider/lighting/`.
+- The unaccepted v3 indirect bake had `GamePreserved=false` and predates the services pass; never adopt it.
+  V4 completed with unchanged input hashes and game state. The document was then closed by another editor action;
+  `adopt-completed-bake.cs.txt` revalidated every input hash and saved those completed textures into Collider.
+  `lighting-v4/adoption-result.json` and `lighting-review.json` record this. Future bakes save their own session
+  atomically after completion, avoiding dependence on whichever editor tab is selected in a later call.
+- `output/collider/captures/` contains eight current native views, including service windows and ceiling details.
+  They show the darker case finish, v4 GI and v3 reflections; the saved map-picker image uses the current art view.
+  `live-tdm.png` and `live-client.png` show the current local host and separate client. `capture.cs.txt` uses the open document's
+  persistent camera and restores it. It creates no isolated scene and performs no reflection bake. Historical
+  `offline-preview/` images are approximate software renders and are superseded by these captures. Camera position,
+  rotation, FOV, projection and size are reset before each render because SceneViewportWidget may overwrite them.
+- `Tools/collider_package_native.py` checks saved/staged scene identity, all seven lighting textures, native evidence,
+  menu-image freshness and archive CRC/SHA256. Its current default is `collider-native-v2.zip`; it requires current
+  saved-scene hashes in navigation, live-match, capture and lighting-review evidence. Separate-client and performance
+  status are recorded independently, so stale evidence cannot imply successful validation of a new scene.
+  `output/collider/current-build.json` points to the current native-v2 archive, which matches the saved scene and assets.
+  `collider-detail-v2-review.zip`, native-v1 and offline-v2 are historical snapshots; their pending-review notes are superseded.
+- Native performance samples are in `performance-validation.json`: the 300-frame host sample averaged 12.85 ms
+  (77.8 FPS; P99 19.93 ms); the lower-hall sample averaged 14.05 ms (71.2 FPS). These are short editor-hosted samples
+  with bots, not a full-match benchmark. The raw report retains startup/GC hitches and the missed 90 FPS target.
+- Network test helpers preserve launch mode, hardcore/ranked flags, no-damage, custom-game rules, lobby privacy and
+  local-instance arguments. Test time/score limits are disabled to prevent map rotation during asset downloads.
+  `check-network.cs.txt` records each process's player ownership, cameras and assets; `collider_verify_network.py`
+  compares before/after snapshots from both processes and requires replicated movement. `network-test-state.json`
+  must have `RestoredAt` after cleanup. Host startup may stall for several minutes while scanning shared assets;
+  inspect the running operation and logs rather than starting hosting again after an observation timeout.
+
 ## Belltower (multiplayer map, `Tools/belltower_map.py`)
+- Current checkout checkpoint (2026-10-18): work in `C:\sbox-projects\hc1\forked-shooter-main`.
+  The live town models include the `firewood-v2` integration, not just garden v3; its six model files and twelve
+  material/texture files match the staged sources. Native firewood views are in `firewood-production-v1-saved/`.
+  The installed landscape is `parcel-v4`, with 1,600 near trees and 88 compiled woodland sectors. Its 264 model
+  source files, 18 published files/backups, scene groups and regeneration caches have been checked in this checkout.
+  `Tools/belltower_finalize_parcel.py --check-only` checks these inputs without writing; its normal mode refreshes
+  metadata only after validation. It preserves the newer `map_daylight.apply_profile` sky/fog settings and rejects
+  other scene drift. `parcel-v4-production/verification.json` records the exact scene hash and validation scope.
+  The old v8 visual verification and old landscape hashes no longer describe parcel v4. Current fixed-exposure native
+  baselines are in `forest-coverage-v1-native-fixed-baseline/`; they expose noisy distant woodland. Gameplay performance and the
+  overall visual target remain unverified. Earlier milestones below are historical; do not restore
+  their models or landscape over these newer files. `oct18-current/current-installed-assets.json` records this check.
+- Offline ground-edge trial (2026-10-18): `Tools/belltower_ground_edges.py` stages a separate, unreferenced
+  `ground-edge-v1` model/material set. The original built-in ImageGen `ground-edge-v2.png` and edit prompt are in
+  `Sources/Belltower/generated/`; the broad first atlas, meshes and studio views remain in
+  `ground-edge-v1-first-atlas/`. The thinner atlas puts its dense back edge toward the wall. UV selection omits
+  isolated specks between atlas cells without editing source pixels or alpha. There are 58 pockets per half,
+  232 triangles total and one shared material, with no collision. Placement derives from the existing house
+  fronts and requires a whole quad on one flat paving rectangle, clear of plinths and 12-inch-expanded shop/door gaps.
+  `belltower_check_ground_edges.py` independently checks exported OBJ data, UV proportions, exact mirroring and
+  deliberately invalid doorway/wall fixtures. Its report is `ground-edge-v1/geometry-checks.json`.
+  Matched wide and close Blender views are in `ground-edge-v1-studio/`; they are construction renders, not engine
+  captures. The preview opt-in reads original RGBA alpha directly, and the studio paving accounts for the native
+  stone shader's UV scale. `Sources/Belltower/ground-edges/trial-v1.json` records the review and remaining work.
+  Nine versioned files have now passed the guarded native import; the shader, material and both models compiled.
+  They remain unreferenced by the saved scene. The clear native close comparison is in
+  `ground-edge-v1-native-visible-{baseline,candidate}/ground-edge-close.png`. Its thin shaded deposit follows the
+  plinth with broken alpha edges, and both temporary renderers were removed with original object identities restored.
+  The first wider shots were obstructed by a market stand and a wall; they remain invalid. The corrected contextual
+  pair is now in `ground-edge-v1-native-fixed-wide-{baseline,candidate}/`. Two further sunlit comparisons are in
+  `ground-edge-v1-native-fixed-sunlit-{baseline,candidate}/`. These temporarily fixed exposure at 2 and restored tone
+  and object identities. Reject the current ground mesh for saved-map use: the sunlit view exposes a flat tan gravel
+  strip bridging the cobble relief. Redesign contact before checking the 900-1600-unit fade and gameplay timing.
+  A map-generator source change triggered the placement guard. `belltower_revalidate_ground_edges.py` regenerated
+  all nine files separately and verified byte-identical assets and identical placements before refreshing provenance;
+  the original manifest/check/import records remain archived. Native revalidation wrote no assets. The play preview's
+  camera had moved, then the editor switched to Ares; no fair timing
+  comparison was completed. `runtime-cleanup-audit.json` confirms the old runtime scene is no longer active and
+  no temporary comparison objects remain in the Belltower editor scene. Ares was preserved.
+- Native ground-decal replacement (2026-10-18): `Tools/belltower_ground_decals.py` stages four private `.decal`
+  definitions under `ground-edge-v2/`, using the existing atlas and the validated 116 footprints. The engine's image
+  source selects the four original atlas rectangles; source pixels and alpha are unchanged. The decals use Multiply
+  albedo at a component mix of 0.5, with no normal, RMO, emission, height or parallax override. They inherit the
+  receiving stone's surface detail instead of adding a flat gravel mesh. Four definitions compiled natively and
+  remain unreferenced by the saved scene. `capture-ground-decals.cs.txt` uses the existing hidden Belltower document
+  and fixed ACES exposure 2; `belltower_capture_ground_decals.py` preserves shared play, selection, camera and tone.
+  Eight matched sunlit/shaded close/contextual views across both halves, plus zero-mix controls, are in
+  `ground-edge-v2-native-{dedup-baseline,all-control,all-half}/` and `ground-edge-v2-native-east-*`.
+  Every trial capture removed all 116 temporary decals.
+  Initial `native-*` and `native-warm-*` captures lost background texture detail and are invalid for visual review.
+  The corrected prewarm filters the established Belltower model set, keeps distinct material references across the
+  wait and requests all normal-map variants. It agrees with the established helper's sharp surface detail.
+  `check-ground-decal-bounds.cs.txt` checks native computed volume and actual world rotation against every validated
+  footprint; maximum planar error is 0.000123 inches, and all projectors contain the paving plane. The public
+  `Decal.WorldBounds` getter omits rotation in this engine, so its box cannot validate a downward projector; the
+  read-only API record includes that getter's IL. `belltower_review_ground_decals.py` verifies native compilation,
+  loaded crop dimensions/PBR inheritance, controls, source hashes and restoration. `ground-edge-v2/native-review.json`
+  and `Sources/Belltower/ground-edges/trial-v2.json` record scope. The restrained dirt stain preserves cobble relief in
+  these stills. Remaining-frontage walkthrough, gameplay motion, distance/culling and cost remain before promotion.
+- Offline forest-detail trial (2026-10-18): `Tools/belltower_forest_detail_trial.py` stages only a private shader
+  and material under `forest-detail-v1/`. The existing atlas, all landscape inputs and all 88 forest meshes remain
+  unchanged. The accepted response hard-clips 25-41% of visible base-level source texels in the three variants
+  actually used by the current 640,000-triangle forest. The trial uses a smooth mean-matched response and restrained
+  source colour, so branches can retain colour rather than receiving only the terrain green. Source colour is
+  normalized before fading uncertain-alpha fringes back to the terrain tint. The rejected fallback and tonal-only
+  studies are preserved in `colour-before-edge-fix/` and `tonal-only/` inside that trial folder.
+  `belltower_check_forest_detail.py` inspected the installed OBJ UV indices and verifies the numerical calibration,
+  the fringe regression, unchanged opacity/normal/lighting/fog code and unchanged texture-sample calls. The current
+  linear box-mip proxy stays below 2% channel-mean drift through levels 0-5 for used variants; levels 6-7 have larger
+  drift, up to about 5.5%. This is not the native BC7 result. Detail returns toward the accepted response with the
+  existing card fade, and blend zero returns the accepted response. Six matched unlit Blender albedo studies use
+  the original atlas and a canopy colour sampled near a real forest card. They isolate the transfer function and
+  do not show native lighting or prove forest realism. `Sources/Belltower/landscape/forest-detail-trial-v1.json`
+  records their review and scope. The two private assets are now imported and natively compiled, with loaded
+  calibration vectors checked. Four matched current parcel-v4 views and two blend-zero controls restored all 88
+  original material slots. The native colour improvement is subtle; distant woodland remains noisy. A separate
+  10000-22000-unit fade experiment reduced the far noise but exposed a conspicuous boundary on the near ridge,
+  so that setting is rejected. The trial remains unreferenced and the accepted shader is unchanged. Further coverage
+  work and consistent gameplay timing remain required; see `native-detail-review-oct18.json` for the exact scope.
+- Native comparison tooling (2026-10-18): matched parcel-v4 baselines, candidates, native exposure and restoration
+  records are in the `forest-detail-v1-native-*` and `ground-edge-v1-native-*` folders. Eleven versioned source assets
+  are installed for these comparisons; neither trial has been promoted. The current capture helper supports
+  `forest_detail_trial` on all 88 woodland material slots, validates loaded calibration vectors and uses a private
+  material copy for `forest_detail_blend` zero-to-one comparisons. It restores the original overrides and checks
+  renderer serialization. Optional fade overrides act only on that private copy. `ground_edge_trial` temporarily
+  inserts the two checked models with `RenderType: Off`
+  and no collider components, then verifies that the original scene object identities are restored. These trials
+  are compared separately. New wide/close ground views and a narrower ridge detail view are in `capture_views.py`.
+  The initial helper and guarded imports passed a separate engine-DLL compile; its exact source hashes are in
+  `forest-detail-v1-native/helper-static-compile.json`. Later helper changes also ran in the engine. The initial
+  colour-comparison helper is archived as `capture-helper-ca8b36.cs.txt`. Native shader compilation uses the guarded
+  `compile-detail-shader.cs.txt` and `EditorUtility.CompileShader`; the generic `asset_compile` tool rejects shader
+  sources. Both shader result records report success. `Tools/belltower_review_native_details.py` validates matched
+  camera/lighting/source hashes, native compile records and restoration, while recording rejected or incomplete
+  visual checks separately. `native-detail-comparisons-v1.json` records the session and remaining requirements.
+- Forest coverage experiment (2026-10-18): `Tools/belltower_forest_coverage_trial.py` stages a separate two-asset
+  `forest-coverage-v1` shader/material experiment. A read-only native query confirmed the accepted atlas is 1254 by
+  1254 with nine mip levels. `Tools/belltower_analyze_forest_projection.py` estimates minification from the actual
+  320,000 cached crowns and saved native cameras, without occlusion. Its valley frustum centres have a median
+  projected width of about 3.1 pixels; those counts are not visible-tree counts. At the rejected 22,000-unit distance
+  boundary, the closer ridge view still resolves many crowns at about 20 pixels or more, explaining why a fixed
+  distance cut removes useful detail. The installed engine's `vr_common.fxc` boosts alpha by `1 + .25 * mip` before
+  alpha testing. The source box-mip proxy shows substantial coverage expansion at levels six and seven, and atlas
+  cells become very coarse at the last mip. This is not native BC7/raster coverage proof. The staged shader cancels
+  only the requested share of that boost. Strength one takes the accepted path, and mip zero is unchanged; colour,
+  normals, lighting, textures, geometry and existing fade distances are preserved. No extra texture sample is added.
+  Source checks pass. The two private assets are installed and natively compiled, but remain unreferenced by the
+  saved scene. The guarded import/compiler and hidden Belltower document captures preserved Orion play and the
+  selected document; no shared-editor handoff was needed. The old static API binding proof predates removal of
+  unnecessary play guards in two helpers; current helpers also executed successfully in the engine.
+  Adaptive exposure made the initial strength-one control invalid despite identical settings. The replacement
+  `forest-coverage-v1-native-fixed-*` study uses temporary ACES exposure 2, restored after each image. All four native
+  strength-one controls pass in valley, ridge, ridge detail and terrace. Zero compensation reduces coarse grey grain
+  while retaining the closer crown shapes in these stills; the repeated crown pattern remains conspicuous.
+  `belltower_review_forest_coverage.py` checks the matched recorded inputs, compilation, controls and restoration of
+  all 88 material slots. `forest-coverage-v1/native-fixed-review.json` records the evidence and invalid adaptive
+  comparisons. `Sources/Belltower/landscape/forest-coverage-trial-v1.json` records current helper hashes and remaining
+  work. Motion, mip transitions and consistent Belltower gameplay performance remain required before promotion.
+  Neither alpha compensation nor a shorter fade alone meets the overall visual target.
+- Bounded forest-density study (2026-10-18): `belltower_forest_distribution_trial.py` stages eight west-facing
+  sectors, reducing their 52,986 cards to 41,137 with correlated retention. The kept cards retain exact positions,
+  heights, sizes, UVs and material. A smooth envelope returns retention to one at the study boundary. Eight private
+  control models have byte-identical OBJ geometry to the accepted models; the eight candidates are exact exported
+  subsets. `belltower_check_forest_distribution.py` checks actual OBJ data, topology, source hashes and all sixteen
+  native model compile records. Forty-eight versioned source files are installed, unreferenced by the saved map.
+  `capture-forest-distribution.cs.txt` derives from the verified viewport helper and restores eight model references,
+  original overrides and all 88 material slots. All variants hold the private alpha-coverage strength at zero and
+  use temporary ACES exposure 2. Two native views are in `forest-distribution-v1-native-{baseline,control,clumped}`.
+  The clumped candidate shows pale exposed terrain and is withheld. Its image controls also miss the strict 0.1
+  mean RGB8 gate (about 0.18 and 0.20); do not claim a clean isolated geometry acceptance comparison. A later
+  unchanged repeat after selecting Lowtide shifts brightness much more, despite matching recorded exposure bounds.
+  That repeat cannot calibrate the earlier active-tab batch. Resolve exposure consistency and investigate crown
+  shape/canopy-to-terrain continuity before another acceptance test; fewer cards alone have not met the visual goal.
+  `belltower_review_forest_distribution.py`, `forest-distribution-v1/native-review.json` and
+  `Sources/Belltower/landscape/forest-distribution-trial-v1.json` record the failed image gate and exact scope.
+  The other local chat was stopped and the editor idle before the brief foreground comparison. Lowtide was restored,
+  out of play and saved; all model/material/tone state restored. The saved Belltower scene and accepted shader remain
+  unchanged. Do not revive isolated-world capture loops to bypass document availability.
 - The user asked for a new multiplayer map. Belltower is a walled hill town's market square, built by script the way
   Ridgeback's buildings are (`Tools/map_kit.py`, with `Tools/building_textures.py`'s materials). The script's docstring
   has the layout, the conventions and the plan axes. It writes:
@@ -2833,9 +3393,92 @@
     In `relief-cost-check/`, pooled 32-sample medians added 0.18-0.36 ms in the street views and 0.04 ms in the hall
     control. The larger shift between separate capture runs remains visible with relief disabled, so it is not a
     measurement of the height-tracing cost. Full-game performance still needs a separate check.
+  - Wall material v3 (2026-10-18) supersedes the rubble scan/regular-block finish above with ImageGen limestone color
+    and height plus photographic climbing ivy. `Sources/Belltower/wall-v3/README.md` records the material workflow;
+    `generation.json` contains the exact built-in ImageGen prompts and saved source paths. The separate
+    `belltower_masonry_v3.shader` uses shared color/height UV selectors from `Tools/belltower_wall_quilt.py`, shallow
+    relief and height-derived normals. `belltower_quality_materials.py` owns both `rubble` and `ivy_climb`; older
+    material/front generators already delegate these definitions. Native captures are in `output/belltower/quality/wall-v3`.
+    The earlier wall-v2 buried-face cleanup remains in the map generator, with its existing collision and exterior foundations.
   - `belltower_architecture.py` adds roof relief from the photographed height map, closes its perimeter to the roof
     substrate, adds clay ridge caps, and builds shutter rails, tilted louvres and hinges. Cornices sit below the roof
     surface. Council Hall piers have small bevels. `belltower_detail.py` uses smooth parasol gores and scalloped hems.
+  - `belltower_furniture.py` builds separate cart and crate boards, wheel felloes/spokes/tyres, raked bench slats,
+    cast-iron arms and feet, and rounded sacks with seams. Wood uses original 4K `brown_planks_03` maps at their
+    photographed one-metre scale; board UVs avoid scan seams. Lanterns have transparent glass around separate bulbs.
+    `belltower_architecture.street_door` adds bevelled raised panels, rails, stiles and brass fittings to 38 closed
+    street doors. Neither pass changes playable doorways or collision. Both halves now have 939,001 visual triangles;
+    the centre has 246,560 after the hall joinery and deck pass. All 94 placement/reachability checks and native model compiles passed. Native material
+    resource checks are in `props-v1-native-resources.json`; reviewed door captures are in `doors-v1-viewport/`.
+  - Facade profiles v1 (2026-10-15) replaces box cornices and window heads with three profiled variants,
+    bevels the surrounds, slopes the sills, varies some upper shutter angles, and divides wall coping into
+    individual bevelled stones. Ground-floor shutters and original collision bounds are preserved.
+    The centre now has 247,036 authored triangles; each half has 969,171. All 94 spot/reachability checks,
+    35 detail-geometry cases, and convex-hull/physics comparisons passed. Only the three visible OBJ files changed.
+    `Sources/Belltower/facades/manifest.json` records the accepted sources, checksums, compiled resources and six
+    same-camera comparisons in `facades-v1-before/` and `facades-v1-saved/`. The scene file, v9 indirect lighting
+    and v7 reflections are unchanged. Runtime performance has not been measured for this pass.
+    `import-facades.cs.txt` verifies backups and hashes and can resume a checked partial import. A Git status scan
+    temporarily denied replacement of an OBJ; it cleared naturally. Inspect the current hashes and locking process
+    before retrying. `verify-facades.cs.txt` uses the off-editor `source-geometry.json` count report and validates
+    loaded resources: this running engine's GetIndexCountForLod reports the first material's indices, not the total.
+    The full source triangle totals are independently counted and tied to the imported OBJ hashes.
+  - Garden props v2 (2026-10-15) is imported, natively compiled and reviewed as an incremental quality pass.
+    `belltower_gardens.py` closes the shed roof gaps, builds individual boards and braced doors with hardware,
+    adds slatted compost bins and stacked split logs, and replaces the wheelbarrow box with an open basin,
+    frame, legs and rounded wheel. Cut log faces reuse the existing Gunsmith Range oak end-grain material.
+    Each town half now has 996,123 authored triangles, 457 collision boxes and 116 hulls. All 94 placement and
+    reachability checks and 11 prop geometry checks passed. Garden collision, shared RNG state and scene props
+    are unchanged. Both native model compiles and material-load checks passed; the scene and lighting are unchanged.
+    Seven native baseline views are in `garden-v1-before/`; offline construction previews are in
+    `garden-v1-studio/`. Seven matching native captures are now in `garden-v1-saved/`. The shed's corner stiles and
+    bottom rails shared the cladding plane and showed depth-buffer artifacts. Garden v2 recesses the boards by
+    0.25 inches and moves the backing farther inward, preserving collision and silhouette bounds. Its 11 geometry
+    checks and three cladding/trim overlap checks pass; the two town meshes are installed from `models/garden-v2/`
+    after all 94 gameplay checks and collision comparisons. `garden-v2-trim-regression.json` proves the check rejects
+    all three v1 sheds and accepts v2. Two offline construction views are in `garden-v2-studio/`; seven matching
+    native views are in `garden-v2-saved/`. `Sources/Belltower/gardens/manifest.json` and
+    `garden-v2-saved/verification.json` record the accepted sources, native compiles and unchanged scene/collision.
+    The shed edge artifacts are resolved. Firewood still needs less faceted profiles and convincing bark/cut faces.
+    The wheelbarrow chassis correction is accepted in v3 below.
+    `garden-v1-checkpoint.json` records the rejected overlap. Do not restore the older facade models over these
+    changes. `garden-import-request.json` selects
+    the checked garden revision. `import-gardens.cs.txt` supports checked partial imports and preserves an unrelated
+    known play session; inspect hashes and the locking process before resuming any interrupted publication.
+    Garden v3 is accepted after native comparison (2026-10-15): its wheelbarrow chassis stays below the basin,
+    with four mounts and lowered braces.
+    The old generator is preserved in `garden-v3-before/source/`. The basin regression check catches 138 intruding
+    samples in v2 and none in v3. All 11 geometry cases, three shed trim checks and 94 gameplay checks pass;
+    collision and shared RNG state are unchanged. Each staged half has 996,387 triangles, 264 more than v2.
+    `garden-v3-studio/wheelbarrow.png` is an offline construction render; it has been reviewed but is not an engine
+    screenshot. Both checked v3 OBJ files are now installed, natively compiled and loaded. The wheelbarrow and
+    terrace views in `garden-v3-saved/` match the v2 camera/lighting metadata; the frame is visibly below the basin.
+    `Sources/Belltower/gardens/manifest.json` and `garden-v3-saved/verification.json` record acceptance, unchanged
+    collision and scene, and restoration to saved Spillway with play stopped. The v2 backups remain preserved.
+    `garden-v3-native/partial-import-state.json` is historical evidence from the earlier interrupted import.
+    Git text-diff readers held the west OBJ during that work. `.gitattributes` now disables text diffs only for
+    the two generated town OBJ files; scoped numstat completes with binary entries. The import still checks hashes
+    and publishes atomically; inspect a timed-out or locked operation before retrying it.
+    A separate offline firewood trial is in `Tools/belltower_firewood_trial.py`; it does not replace that pinned
+    garden generator. The original built-in ImageGen bark, cut-face atlas and split-fibre albedos are preserved as
+    `Sources/Belltower/generated/firewood-{bark,cuts,split}-v1.png`, with prompts and provenance in matching JSON.
+    The trial has 34 irregular logs, 27 split, with rounded bark, growth rings and lengthwise fibres. It uses 8,024
+    triangles per pile versus 1,768 before. `firewood-v1-studio/geometry-checks.json` verifies closed outward surfaces,
+    bounds at both studio and garden placements, safe atlas UVs and unchanged shared RNG. The accepted assets,
+    production generator and collision are unchanged. `Sources/Belltower/gardens/firewood-trial-v1.json` records
+    the reviewed same-camera Blender comparison at exposure -1.2. These are construction renders, not engine
+    captures. Surface normal maps, whole-map integration and native visual/performance validation remain pending.
+  - `belltower_interiors.py` replaces the hall's box furniture with pegged trestles, separate eased boards,
+    breadboard table ends, drawer fronts, recessed archive doors, and bronze fittings. Its oak floor and ceiling
+    use staggered individual boards; the ceiling beams have softened edges. Both stair openings stay clear, and
+    the deck vertices remain inside the original slabs. The centre retains its 403 collision boxes and 56 hulls.
+    `hall-v2-deck-checks.json` records the bounds checks; `hall-plaster-native-results.json` records native imports
+    and successful compiles. `council-hall-target-v1.png` and `.json` preserve the ImageGen design reference.
+  - All eight exterior plaster colours now use `belltower_plaster.shader`. It blends the clean two-metre scan
+    with original 1.5-metre `rough_plaster_broken` photographs using continuous warped sampling, broad wear patches
+    and stronger weathering near the base. Coverage is 0.34; normal and roughness maps follow the same blend.
+    The production material generator owns these definitions. The earlier triangular sampling trial was rejected
+    for visible seams. `hall-plaster-streaming/` contains native captures with material and DDGI textures resident.
   - `belltower_window.shader` supplies reflected glass with a parallax room behind windows and shopfronts. The shop
     shelf image was generated with the built-in ImageGen tool; original output and prompt are preserved in
     `Sources/Belltower/generated/shop-shelves-v1.png` and `.json`. It is an asset texture, not a gameplay screenshot.
@@ -2850,12 +3493,57 @@
     roads, buildings, yards and existing trees, and places each tree on the rendered terrain. These have no colliders,
     use automatic LOD, and cast shadows only near town. The deterministic scene group is in
     `Sources/Belltower/landscape/trees.json`; its dry-oak package is `facepunch.treeoakdrymediuma#289352`.
+  - Distant woodland v8 (2026-10-15) adds 320,000 town-facing tree cards in 88 sector meshes, 640,000 triangles.
+    These are visual only, with no collision or shadow casting. The original generated RGBA tree atlas is preserved
+    in `Sources/Belltower/generated/forest-trees-v1.png` with its prompt/provenance. `belltower_forest.shader` uses
+    diffuse lighting and the landscape B/C/D palette and slope normals, averaged over a 128-unit crown footprint.
+    Generated leaf detail modulates that colour; distance fade is 30,000-52,000 units. Single cards avoid the bright
+    crossed-card seams. The v8 pass was reviewed against same-session baseline captures at the valley, west ridge
+    and terrace, then saved natively. It improves the nearby canopy; the far valley still needs refinement.
+    `Sources/Belltower/landscape/forest.json` is the accepted native group, and `forest-manifest.json` records its
+    source/asset hashes. `belltower_map.py` includes that cache when regenerating; staging trials are excluded.
+    `belltower_quality_forest.py` stages placement, models and materials. Import with `import-forest.cs.txt`, compile
+    the material and verify with `verify-forest.cs.txt`. `apply-forest.cs.txt` is only for the first reviewed save;
+    it refuses an existing group. Future replacements must update the existing group rather than adding another.
+    `forest-v8-saved/` contains fresh saved-scene captures and the scene comparison; `audit-forest-sources.py --saved`
+    verifies all 267 inputs, all 88 current compiled models, 640,000 triangles and the matching regeneration cache.
+    The native save also refreshed per-process resource IDs/two prefab child mappings and wrote the new false
+    ZombiesOnly default; town geometry/collision, transforms and other scene values were preserved. The v9 indirect
+    light and v7 reflection assets are unchanged. Editor performance was sampled with play stopped; gameplay
+    performance remains unverified and the overall AAA quality goal remains open.
   - The landscape pass replaces rectangular field rows with larger, warped Voronoi parcels, reduces crop-colour
     contrast and varies woodland coverage continuously at its edges. Crop choice is sampled at each parcel's fixed
     site, so the same parcel keeps its crop across scanlines and texture zones. All four colour/kind maps are 4096px;
     normal maps are 2048px. The tree plan follows the same revised parcels and retains the 1,600-tree budget.
-    `output/belltower/quality/landscape-v2-preview/` contains native comparisons; the distant canopy and near terrace
-    retaining walls still read as painted terrain and need further work for the overall quality goal.
+    `output/belltower/quality/landscape-v2-preview/` contains comparisons before the woodland addition. Distant
+    fields and the near retaining walls still need refinement for the overall quality goal.
+  - Offline canopy candidates (2026-10-15) have not changed the accepted landscape. `belltower_canopy_trial.py`
+    stages procedural variants; `belltower_photographic_canopy.py` uses the original built-in ImageGen RGBA atlas
+    `Sources/Belltower/generated/canopy-crowns-v2.png`. Its JSON preserves the edit prompt and provenance; the v1
+    original is also retained. The atlas alpha is unchanged, including occasional alpha=1 pixels in the gaps.
+    Natural oak/holm/beech/willow crowns use premultiplied linear filtering; planted trees keep the accepted painter.
+    The first photo trial had straight overlap cuts from intersecting analytic domes. V2 layers whole crowns by
+    summit height with world-coordinate tie breakers. `canopy-photo-v2-checks.json` verifies input-order invariance,
+    matching tile edges, unchanged planted trees and all four species; the check rejects the original painter.
+    `canopy-photo-v2-review.json` records the reviewed swatch, 2048px zone B and 1024px zone C comparisons. Coverage
+    in the matching grove is 79.87% versus the accepted 80.87%. Ellipsoid shadows remain approximate, and distant
+    texture detail/repetition still need full-resolution and native review. All candidates stay under quality output;
+    the accepted landscape generator, live textures, tree placement and scene are unchanged.
+    The complete 4096px candidate is now in `canopy-photo-v2-full/`. All four normal maps match the accepted files
+    exactly, and zone A's colour/kind maps are also identical. `offline-review.json` records the full-size review,
+    source checks and pixel comparisons; the broad far-field woodland patterns still need improvement.
+    `belltower_quality_canopy.py` stages eight colour/kind textures and two material copies under a separate
+    `materials/belltower/vista/canopy-photo-v2/` resource path. It preserves every other material setting and all
+    accepted inputs. `import-canopy-trial.cs.txt` validates sources, dependencies and the allowlist, imports only
+    missing or identical trial files, and supports inspected partial resumption. It has not run natively yet.
+    Compile both trial materials, then run `verify-canopy-trial.cs.txt` to check all loaded texture dimensions.
+    The capture helper's `--canopy-trial` temporarily overrides the vista and existing woodland materials together,
+    prewarms 4096px colour maps for both baseline and candidate, and restores exact renderer snapshots afterward.
+    Its import, resource verification and new material-override branch still require native validation. Review
+    matching valley, west-ridge and terrace views before changing any accepted landscape input or manifest.
+    `check-native-script-types.py` type-checks the six garden/canopy/camera method bodies against the installed
+    .NET 10 engine assemblies without executing them. `native-script-types/report.json` records the matching
+    script hashes and zero compiler diagnostics. This confirms API compatibility, not native rendering or restoration.
   - Stage landscape textures with `belltower_vista_paint.py --out <output directory>` (four CPU threads), then
     `belltower_quality_landscape.py --source <same directory>`. The latter checks the bundle and writes the native
     import manifest. `import-landscape.cs.txt` verifies all staged and destination hashes before writing; compile
@@ -2864,37 +3552,80 @@
     and landscape_resource settings before saving. `Sources/Belltower/landscape/textures.json` records the accepted
     source hashes; lighting manifests include these texture inputs as well as the tree group.
   - Lighting uses the photographed Kloppenheim sky, a warm sun at pitch 34/yaw -63, an ACES exposure range of
-    1.05-2.2, and native indirect lighting across a 28x39x5 grid (5,460 probes; 4,800 active). Three 256px reflection cubemaps use
+    1.05-2.2, and native indirect lighting across a 28x39x5 grid (5,460 probes; 4,806 active in v9). Three 256px reflection cubemaps use
     Baked mode. `Sources/Belltower/lighting/` preserves the volumes, probes, source hashes and bake light settings;
     `belltower_quality_lighting.py` imports a reviewed native bake into that cache for future scene regeneration.
-    The accepted daylight bake lives in `Assets/lighting/belltower/daylight-v7/`. Its six `.vtex_c` textures have no
-    uncompiled source; the narrow `.gitignore` exception is intentional. One town volume covers world bounds
+    The saved scene uses daylight-v9 indirect light and the three accepted daylight-v7 reflections. These
+    `.vtex_c` textures have no uncompiled source; the narrow `.gitignore` exceptions are intentional. One town volume covers world bounds
     (-1480,-2400,2) to (1880,2400,450), density 8, strength 2, normal bias 20 and view bias 30. The revised vertical
     spacing reaches the upper hall; no extra local hall volume is used. Fresh saved-scene views and the menu image
-    are in `output/belltower/quality/saved-relief-v1/`. This bake includes the revised landscape, matching trees and
-    stone relief materials; both lighting passes and all three reflections completed before publication. Its source
-    manifest also records the local shaders and textures referenced by the town materials, including the height maps.
-  - The isolated native capture script dispatches scene render hooks and updates the DDGI system, then destroys
-    the temporary scene. It renders settling frames for exposure and records the actual camera exposure settings.
-    The map's post-process volume takes priority over camera-local effects. Fixed exposure diagnostics must modify
-    that volume; ExposureCompensation has no effect with auto exposure disabled. Use saved-scene captures for final
-    verification, without staged lighting overrides or temporary duplicate indirect-light volumes.
+    are in `output/belltower/quality/hall-plaster-final/`. The v9 bake includes the revised hall joinery, timber decks
+    and worn plaster, and completed both lighting passes. It retains the v7 reflections. `daylight-v9-save/` verifies
+    that only the three indirect-light texture paths changed in the saved scene. The source manifest records local
+    geometry, shaders and textures, including the landscape and height maps.
+  - Use `Sources/Belltower/editor/capture-viewport.cs.txt` with the persistent Belltower editor document. It captures
+    one bitmap per call, dispatches render hooks, and explicitly applies the scene's post-process volume to the
+    viewport camera. A hidden tab can have no `Scene.Camera` while another map is playing. It records the requested
+    camera exposure settings and preserves the selected document and game state while restoring its camera transform.
+    It uses the persistent document's hidden `editor_camera` directly, without selecting its tab. Mark material
+    textures used at mip size 2048 and all three indirect-light textures at their full dimension before a short
+    streaming wait; then mark the DDGI system dirty and update its volume buffer synchronously. Hidden documents
+    do not tick normally: missing prewarm can produce black shadows or blurred textures in offscreen captures.
+    Do not disable global texture streaming for this capture. Use saved-scene captures for final
+    verification. Do not revive the older isolated-scene capture/benchmark loops. `scene.Push()` changes global
+    `Game.ActiveScene`: use only synchronous scopes and never keep one across `await`.
+    `look_trial` can temporarily compare the Tonemapping mode and exposure bounds, then restore the serialized
+    component and camera settings. Eleven native images in `look-v1-*` were reviewed: AgX visibly improves the pale
+    surfaces, but exposure bounds and compensation produced nearly identical pixels despite changed camera metadata.
+    `look-v1-review.json` records matched cameras, pixel differences, exact component restoration and the unchanged
+    saved scene. Effective rendered exposure remains unverified; do not treat metadata as proof. Local engine IL
+    shows editor rendering can copy post-processing from `Scene.Camera` again, and native tone-map parameters cross
+    into the renderer; the cause is not confirmed. Inspect both cameras/native settings and use a deliberately
+    separated fixed-exposure comparison in the next coordinated window. No look changes have been saved.
+    `capture-camera-state.json` confirms separate main and editor cameras with valid native tone-map systems.
+    The staged capture helper records `NativeExposureAfterRender`; `--sync-main-postprocess` is an opt-in diagnostic
+    that updates both cameras and restores the main camera's prior exposure values. This new branch has not run
+    natively yet. `aces-fixed-low` and `aces-fixed-high` use 0.35 and 2.0 bounds to make the next comparison decisive.
+    The latest helper also sets horizontal FOV and bitmap dimensions after its streaming wait and restores those
+    projection values afterward. The installed SceneViewportWidget resets projection each editor frame, as confirmed
+    independently by Cerro Blanco's capture work and the local source. This helper renders synchronously after setup;
+    the garden v3 native captures validate its `Projection` metadata and reported native exposure of 1.05-2.2.
+    The fixed-exposure/main-camera diagnostic and canopy override still await native validation. The read-only camera
+    probe reads `IsSceneEditorCamera` as a field, matching the installed engine IL. Its updated missing-document
+    branch compiled and ran natively without changing the active game or document. Belltower was closed; open it
+    in the next coordinated slot before capture. `direct-camera-read-unwrapped-final/` preserves that result.
+    Fresh CLI connections using direct `tools/call` succeeded where this chat's `call_tool` wrapper calls timed out.
+    `editor_check.py --direct-call --cleanup-exchange` selects that route and removes only its own script and empty
+    exchange directory. `capture_views.py` uses those options. `direct-route-status/` and `direct-route-console/`
+    confirm the correct project, successful C# compile and another chat's active Cerro Blanco game; they do not
+    grant an editor slot. Copy fresh helpers from source for the next coordinated window.
+    The helper and capture runner also accept `--pid` to pin the verified editor when test clients are running;
+    the connection checks that PID, editor kind and project before dispatch. PID 15884 was verified for the v3 slot.
+    `network-static-audit/report.json` inspects the saved scene against enum values read from the running engine.
+    Its three reflection probes, indirect light and static visual hierarchy use Snapshot mode without excluded
+    flags. The lighting/forest regeneration caches agree after normalizing texture references from Id/Path objects
+    to paths; no saved fields were changed. This is source-level evidence, not a two-client rendering check.
   - `Sources/Belltower/visual-target/west-street-target-v1.png` is an ImageGen design reference. Actual native captures
     are under `output/belltower/quality/`. The AAA quality goal remains open: distant painted fields, repeated facade
-    detail and some simple furniture still need work. The Council Hall's black column blotches, cafe plinth speckle
+    detail and interior dressing still need work. The Council Hall's black column blotches, cafe plinth speckle
     and terrace parapet artifacts were isolated to baked indirect light. The denser daylight-v5 town volume and
     completed second bounce resolve the large artifacts in fresh saved-scene captures; small residual speckles under
     furniture and awning edges remain. Local hall volume experiments were rejected after checking exterior views.
     Capture errors preserve inner stacks. Native parallel `ComputeProbeRelocation` can race the engine's unlocked
     `ResourceSystem.RegisterWeak` dictionaries, then break rendering throughout the process. Do not retry that path.
-    The capture script now calls the engine's trace and relocation methods sequentially on the main thread, yielding
-    between rows. Full two-pass hall and town bakes subsequently passed without new console errors and preserved
-    the user's Lowtide scene. `DDGIProbeUpdaterCubemapper.RunAsync` replaces GeneratedIrradianceTexture for its
+    `bake-editor-lighting.cs.txt` calls trace and relocation methods sequentially on the main thread, yielding
+    between rows. It uses the persistent editor scene and the updater's own scene world.
+    `DDGIProbeUpdaterCubemapper.RunAsync` replaces GeneratedIrradianceTexture for its
     second pass: fetch the current texture after the await before saving, or only the first bounce is preserved.
     The importer requires a completed two-pass `bake-result.json` before it updates the accepted cache. The dense
-    town bake uses a 360-second cancellation limit and a longer connection timeout (`editor_check.py --timeout 480`);
-    regular captures use 240 seconds. A cancelled bake must never be published. An apparent editor hang during this
-    recovery was a separate native asset compilation; inspect the running operation before terminating the editor.
+    town bake currently uses a 600-second cancellation limit and a longer connection timeout. A cancelled bake must
+    never be published. In the v8 recovery, Quality GGX reflection filtering faulted the GPU in
+    `envmap_filtering_cs.shader_cs`; preserve the accepted v7 reflections and do not repeat that capture path.
+    `daylight-v8-gpu-crash/` preserves the diagnostics and unaccepted reflection. Apparent hangs can also be native
+    asset compilation or resident-resource reloads; inspect progress before terminating an editor. A later lobby
+    startup stall in PID 16792 was `BuildNetworkedFiles` / `LargeNetworkFiles.AddFile` hashing multiplayer assets on
+    the main thread. Disk reads kept advancing; it recovered after about seven minutes without a restart. The
+    stack, asset inventory and recovery record are in `startup-recovery/editor-stall-16792*`.
 - The town is mirror-symmetric. Red Team spawns on the west road inside the town wall, Blue Team on the east. Three
   lanes join them:
   - North: Market Street, with the market cross in the middle. Bomb site A is at its east end.
@@ -3029,6 +3760,46 @@
 - Fixing the editor file alone doesn't bring the game code in: change any game file (touching it is enough) so the
   game assembly rebuilds.
 - A C# `record` in editor code failed after s&box's codegen ("type not found"). Use a class.
+
+## Play-start stalls in the editor (network file hashing, 2026-10-15)
+- The user saw the editor stall for 300+ seconds on most play starts. `GameNetworkManager.OnStart` creates a lobby on
+  every play start, and the engine then runs `BuildNetworkedFiles` on the main thread. It reads every file a joining
+  client could download and takes a CRC64 of each (`LargeNetworkFiles.AddFile`). A file counts if it's compiled (`_c`),
+  `.scss` or `.ttf`, or if it matches hc1.sbproj's `Resources` patterns. Those patterns are also what a publish uploads.
+  - `WildcardMatch` ignores case, and its `*` crosses folders. The game's file system mounts Code as well as Assets,
+    so `/UI/*` sent Code/UI's .razor and .cs files.
+  - `/weapons/*` took in every source file under Assets/Weapons: 1.26 GB of DMX, 790 MB of PNG, WAVs, .blend, FBX and
+    SMD files.
+  - With the old patterns it was 18,639 files and 5.84 GB a play start. The recorded stalls lasted about 6-7 minutes
+    (`output/belltower/quality/startup-recovery/editor-stall-16792*`).
+  - Since 2026-10-15 the patterns are `/ui/*.png|jpg|svg`, the fonts, and the swb icon PNGs the swb prefabs name by
+    path. That's 9,840 files and 3.64 GB, nearly all of it compiled assets clients need. Since 2026-10-17 only the
+    SCAR-H's (`weapons/swb/scarh/scarh.png`) is left: the other five swb guns (Colt, L96A1, Remington 870, Revolver,
+    Veresk) were unused and were removed. The SCAR-H still uses `weapons/swb/hands` (its viewmodel's gloves and
+    sleeves) and `sounds/swb/animations` and `clip`, and the game uses the swb code, muzzle effects and suppressed
+    shots, so those stay.
+  - The engine adds the patterns to its list on every play start and never clears it, so the old ones apply until
+    the editor restarts.
+  - Don't put a folder-wide pattern back. List the raw files that code loads by path.
+- Since 2026-10-15 editor play makes no lobby (the user asked for it): `GameNetworkManager` joins the local player
+  offline, as `IsMultiplayer` false does (the firing range's scene). So editor play skips the scan and the cloud
+  references below.
+  - `hc1_editor_lobby 1` (saved) makes editor play host again from the next play start, with the scan.
+  - The editor's Start Hosting still hosts. Start it in the main menu before a map loads, as for the second-instance
+    tests (see Map changes with players connected). Hosting partway through an offline match hasn't been tried.
+  - Ranked makes its own lobby, so it's unchanged. A custom game started in the editor plays offline unless the
+    ConVar is on.
+  - Only `Game.IsEditor` changes: a real game hosts as before.
+  - Compiled with dotnet, not yet tried in the editor.
+- After the lobby comes up, the engine adds the scenes' 51-52 cloud references to the ServerPackage table, which took
+  10-20 s each time.
+- Every map but Reef Hall builds its navmesh at load. The 23:28 stall's stack had the navmesh's load in its chain.
+- Two of the last eight GPU crashes (VK_ERROR_DEVICE_LOST, 2026-10-14 and 15) faulted in the engine's
+  `envmap_filtering_cs`. That's the reflection probes' filtering, which runs for every realtime probe as a map loads:
+  Reef Hall has 14, Lowtide, Railhead and Cerro Blanco 11, Riverdale 9, Boxyard 7 and Ares 4. Belltower's three are
+  baked. Earlier crashes faulted in the UI's `ui_cssbox_batched` (2) and `foliage` (1).
+- On 2026-10-14 sessions rewrote map OBJs while the user played. Loading those maps then recompiled the models on
+  demand: `lowtide_finish.vmdl` six times in an hour, each taking 4-15 minutes.
 
 ## Testing in-game without input
 Dev console commands (`Code/GameLoop/DevCommands.cs`): `dev_quickplay`, `dev_zombies [map]` (e.g. `innocent`),
@@ -3201,7 +3972,15 @@ simulate_input.
     with friction held 0.4 s, then up to 1.4 over 0.8 s.
   - Duck pressed again 0.15 s or more into it (`SlideCancelDelay`) cancels it: you stand straight up (the press doesn't
     crouch until Duck is let go, `_slideCancelHeld`) and, holding Run, sprint on.
-  - Duck pressed at a sprint up to 0.25 s before landing slides as you land, if it's still held (`SlideLandingBuffer`).
+  - Duck tapped or held during a moving jump slides as you land (`_slideOnLanding`, updated 2026-10-18 after the user
+    reported timing-dependent failures). Running momentum (at least 180 u/s) accepts the request even after Run is
+    released or crouching ends the sprint flag. Jump and Duck on the same tick queue a landing slide, including out
+    of an active slide; Jump takes priority over Duck cancelling that slide. More airborne Duck presses keep the
+    request. It has no airborne timeout; the old 0.25 s `SlideLandingBuffer` was already removed on 2026-10-15.
+    `TrySlideOnLanding` runs immediately after controller movement, so ground contact starts the slide before the next
+    tick's crouch friction. Landing during the 0.4 s cooldown keeps the request until it clears, provided enough
+    momentum remains. Toggle sprint intent survives the airborne crouch. Prone, climbing, death, movement restrictions
+    and slow walking clear the request; landing too slowly only crouches.
   - A toggled sprint the slide stopped picks up again within 0.5 s of it ending (`ResumeSprintAfterSlide`, in
     `GetWantsToSprint`); Run pressed during the slide takes that back.
   - Another can start 0.4 s after one ends (`SlideCooldown`; it was 0.8).
@@ -3233,6 +4012,12 @@ simulate_input.
 - Compiled with dotnet; `Tools/SlideChecks` checks the production pose's limb lengths, transition continuity and
   floor clearance across yaw, scale and stance, including unreachable IK targets. Not yet checked in-game: the
   editor stalled while this was added.
+- Jump/landing regression checks (2026-10-18): `Tools/SlideChecks/JumpLandingChecks.cs.txt` runs the production
+  `BuildInput`, acceleration and movement against collision in an isolated native-engine scene, restoring input,
+  time and sprint settings. All 189 jump/slide simulations and 7,287 assertions passed at 30/50/120 Hz, covering
+  takeoff/apex/landing timing, taps/holds/repeated presses, released Run, hold/toggle sprint, jump fatigue,
+  slide-jump-slide chains, cooldown retention, movement guards and grounded slide cancellation. Native compilation
+  passed with zero errors. Report: `output/jump-slide-validation/checks.json`. Match feel still needs the user's check.
 
 ## Bot slides (`LightweightCombatBot.Slide.cs`, 2026-10-14)
 - Bots occasionally slide after at least 0.3 s above 225 u/s, on a clear, straight route with at least 300 units ahead.
@@ -3247,6 +4032,12 @@ simulate_input.
   Native live matches on Lowtide and CerroBlanco showed natural slides around 350 units long and the gun still in hand.
   Ten native state checks covered entry, recovery, cooldown, collider/eye height, navigation restoration and combat
   freeze. The existing 45,816 slide geometry checks pass. No multiplayer client was attached for this validation.
+- The user: "bots look weird when they slide" (2026-10-16). Aiming while sliding, `FinishWeaponPose` shouldered the
+  gun at the logical eye (`EyePosition`, `SlideEye` 40 up), but the slide pose puts the hips 13 up and leans the body
+  back, so the visible head is several units lower and the gun would hang over and ahead of the face. It now sights at
+  the posed right eye (`PosedEye`, the `eye_R` bone after the pose) and blends the shouldered hand in by `SlideBlend`,
+  so the gun comes up with the drop instead of snapping. Prone keeps `EyePosition` and full weight. Compiled with dotnet
+  only (the editor was closed); not yet rendered or seen in a match, so whether this was what looked weird is unconfirmed.
 
 ## Battle royale (Warzone, `Code/GameLoop/Rules/BattleRoyale/`)
 - Solos on Flatgrass (the user's first pick, for its size) or Ridgeback (below), picked on the hub's Battle Royale
@@ -3361,12 +4152,23 @@ simulate_input.
   `Sources/ReefHall/consoles/screen-atlas-prompt.txt`; preserve the atlas when rebuilding materials.
   - `Tools/reefhall_console_refresh.py --out output/reefhall/consoles/staging` stages just the Control model and
     the console materials. Import through the editor when it is open; it does not rewrite the scene or other rooms.
-  - The whole Control model is 16,070 triangles; its original 122 collision boxes and 41 hulls are byte-for-byte
+  - The whole Control model is 130,726 triangles after the monitor-back pass below; its original 122 collision boxes and 41 hulls are byte-for-byte
     equivalent. All three banks keep their placement and cover height. The other rooms, tank model and lights
     are unchanged. Cabinet vent bands share a tessellated front plane instead of overlapping thin decal geometry.
   - Materials and model compiled through native MCP. Checked five offscreen engine views, including front/detail,
     rear and room overview, in `output/reefhall/consoles/`. These renders do not reproduce full gameplay postprocessing.
     The menu kept running and the existing Reef Hall scene tab was not edited.
+  - Monitor backs (2026-10-14): the user picked a mix of ImageGen concepts 1 and 2. `Tools/reefhall_monitors.py`
+    builds eight charcoal/slot-vent monitors and eight graphite/perforated monitors with aluminium stands, in
+    paired runs across the three banks. Their rounded shells, recessed vents/ports, VESA plates, tilt barrels,
+    rounded feet, service labels and curved cable pairs are actual geometry. Fine shared polymer and brushed-metal
+    normal/roughness maps are generated by `reefhall_console_refresh.py` alongside the six `rh_monitor_*` materials.
+    The LCD faces/UVs, desk surfaces, lights and collision are unchanged. Import staged materials/textures before
+    the Control OBJ/MTL/VMDL through the editor when open. The screen atlas is not regenerated.
+    All seven resources (six materials plus Control) compiled through native MCP; four offscreen engine captures
+    and the geometry/collision report are in `output/reefhall/consoles/monitor-backs/`. The captures use a temporary
+    visual scene, destroyed afterward, and do not reproduce a live match's full postprocessing. No editor scene
+    tab or play state was changed by this pass.
 - The lobby's west wall (Red Team's spawn side) has three pairs of glass entrance doors, as close as could be got to the
   user's picture of them (2026-10-08). They used to be self-lit frosted panels (`frosted_door`). Now:
   - Each pair (`door_pair`, `DOOR_PAIRS` n -197.5, 0 and 197.5) has dark grey anodised frames (`rh_anodised`) with
@@ -3783,12 +4585,313 @@ simulate_input.
   Still open from the critique: the road vehicles' plain bodies, the EMU's flat red paint, and the yard's skip.
 
 ## Lowtide (multiplayer map, `Tools/lowtide_map.py`)
+- Structural materials installed (2026-10-18): `Sources/Lowtide/structure/material-status.json`.
+  Both warehouse models use continuous generated timber with grain along each beam and
+  weathered painted cast iron. The original generated 1254px albedo is retained unchanged;
+  shallow numerical normals and dry roughness provide surface response. The uniformly
+  rusted iron trial was rejected after daylight review. Eighteen matched review captures,
+  six production views and six fresh-load views cover both banks, close beams/columns and
+  exterior ironwork. The four existing-slot remaps preserve geometry, collision and the
+  23 material slots per architecture model. `Tools/lowtide_structure.py` reproduces all
+  twelve resources; the canonical map writer applies it only to east/west architecture.
+  Column shaft normal checks pass on both banks. Warehouse indirect light was rebaked
+  as v5; only six saved texture references changed, and the saved scene reloads correctly.
+  Prior v4 provenance/textures are retained. Temporary review sources and raw bake outputs
+  are archived outside Assets. The Orion edit tab and Lowtide runtime map were restored.
+  Evidence is in `native-2026-10-18/structure-timber-v2`. Gameplay cost, temporal behavior,
+  broader cargo/foliage quality and overall AAA acceptance remain open.
+- Water reflection filter installed after static review (2026-10-18): read
+  `Sources/Lowtide/water/filter-status.json`. Nine native screenshots cover the
+  original one-mip capture and the current/filtered materials with the seven-mip
+  linear HDR pyramid. The selected filter scale is 0.08, keeping the waves and
+  shallow transparency while softening reflected architecture. Capture code
+  hotloaded with zero errors, and the unused review model/material loaded without
+  error. `lowtide_water.py` now preserves the selected shader/parameter; its writer
+  and capture transformation reproduce the installed files. Geometry, collision,
+  scene and original wave shader are unchanged. Ares stalled during loading after
+  the first review, then recovered. Native production readback confirms the selected
+  shader, and three fresh production captures were reviewed. Six editor checks pass:
+  visible, outside bounds, below plane, return, disable and reenable. The camera/tab
+  was restored and Ares play restarted. Six unused review files are archived outside
+  Assets. A fixed-view performance sample failed its camera-angle guard; do not use
+  its aggregate timings as Lowtide results. Gameplay cost, moving-camera temporal
+  behavior and multiple-view checks remain pending. Evidence and scripts are in
+  `native-2026-10-18/water-reflection`.
+- Warehouse floors installed (2026-10-18): read `Sources/Lowtide/floor/floor-status.json`
+  and `Sources/Lowtide/concrete/wear-status.json`. Both architecture models now select
+  the worn pine and concrete-use materials through four existing-slot remaps. Native
+  review covers 24 comparison images, six production views and six after the refreshed
+  lighting bake. The opaque timber shader uses ordinary RGB mips because the unchanged
+  1254px source atlas is incompatible with the engine's alpha-weighted mip filter.
+  `Tools/lowtide_floor_surfaces.py` preserves all 18 installed resources byte for byte;
+  map generation configures only the existing floorboards and concrete slots. Fresh
+  `lowtide_material_stage.py --current --output output/lowtide/quality-pass/<new-folder>`
+  reproduces all twenty installed files and verifies 286 collision footprints and twelve
+  mezzanine triangles. No render geometry, material-slot count or collision changes.
+  Both dressing models had corrupt compiled bounds; native full rebuilds restored finite
+  bounds and visible east cargo without changing their OBJ/VMDL sources. Warehouse DDGI
+  was then rebaked and saved as v4 (see lighting below). Evidence is under
+  `native-2026-10-18/warehouse-floor-current`; use `promotion.json` for installed hashes,
+  not the historical staging manifest. Orion play and the prior tab were restored.
+  Gameplay cost, temporal filtering, dark structural materials and broader cargo quality
+  remain open; these checks do not establish overall AAA quality.
+- Structural material diagnostic (2026-10-18): `Sources/Lowtide/structure/response-status.json`.
+  Nine lit comparisons tested a current standard shader with existing beam/iron textures,
+  first preserving their values, then increasing timber tint and roughness. This recovers
+  wood detail but exposes repeated plank seams on solid beams; columns still lose definition.
+  Neither trial is installed. Six unbound source/meta files were retired from Assets; staged
+  copies and evidence remain in `native-2026-10-18/structure-response`, with compiled caches
+  left alone. The first `review/` images used stale DDGI and are invalid material evidence;
+  use `review-lit/`. Individual long-grain beam faces and a close cast-iron audit are next.
+  When swapping DDGI texture paths, reactivate the existing volumes before viewport review:
+  valid loaded textures did not refresh the already-active editor volumes immediately.
+  Fresh loading of the saved Lowtide scene then confirmed the v4 bake on both banks without
+  reactivation; three loaded-scene views are in the floor pass's `lighting-persistence` folder.
+  Play-state status can report a runtime map different from the underlying edit tab. Record
+  both before stopping: this review restored the Orion tab and Riverdale runtime map separately.
+- Paving contact installed (2026-10-18): `Sources/Lowtide/paving/use-status.json`.
+  Native comparison covered close pipe outlets, a sunlit shed, both banks at player
+  height and a street-distance view. Ten matched images plus two fresh production
+  views are reviewed. Narrow settled grit and local moisture use the current 186
+  paving triangles, 1,616 wall-foot segments and 16 outlets; 216 interior samples
+  confirm that all 24 grate apertures remain clear in the data mask. Original stone
+  colour/PBR pixels and relief remain intact. All three production material slots
+  bind the new shader and 2048-square texture without overrides. No geometry,
+  collision, scene files, material slots or model remaps change; one texture lookup
+  is added. `lowtide_paving.py` preserves the extension on material regeneration.
+  After geometry changes, stage a fresh mask with `lowtide_paving_use.py --current
+  --output output/lowtide/quality-pass/<new-folder>`, then review/import through the
+  editor. Current-layout reproduction matches all five installed files. Temporary
+  review material is archived outside Assets. Belltower's edit tab was restored.
+  Gameplay cost and temporal stability remain unmeasured. Historical offline notes
+  below are superseded where this entry and the construction entry record installation.
+- Current construction composition (2026-10-18): read
+  `Sources/Lowtide/construction/recomposed-status.json`. The three window/door meshes
+  and the connected drainpipe/gutter mesh are recomposed against the installed grates
+  in `output/lowtide/quality-pass/native-2026-10-18/construction-recomposed`.
+  Each scoped component first reconstructs its pinned historical result, then matches
+  current corner positions, UVs and normals. All 12,336 grate triangles and both banks'
+  92 paving triangles remain exact. Current material libraries include the grate slots.
+  This composition is now installed: 20 matched native comparison images and five fresh
+  production views were reviewed. All four compiled meshes match the reviewed geometry,
+  indices and materials, and all 24 grates pass a fresh native readback. Canonical map/finish
+  generation calls `Tools/lowtide_construction.py`; component reproduction preserves
+  glass, thresholds and collision. The pass adds 287,048 source triangles and no material
+  slots. Temporary review assets are archived outside Assets. Scene/VMDL/collision files
+  are unchanged; Spillway's edit tab and the user's stopped play state were restored.
+  Controlled gameplay performance and temporal stability remain pending: mixed-scene
+  profiler samples are invalid. This does not establish overall AAA quality.
+- Street grates (2026-10-18): native checks have resumed at the user's request. Read
+  `Sources/Lowtide/drainage/grate-status.json`. All 24 flat-backed grates were replaced
+  with beveled cast frames, open bars, lower supports and ten-inch recessed wells.
+  Only eight original paving triangles were cut around the apertures; collision remains
+  intact. `Tools/lowtide_grates.py` supplies geometry, generated cast-iron PBR materials
+  and canonical paving cuts, called by `lowtide_finish.py` and `lowtide_map.py`.
+  The 15 imported files add 8,756 source triangles and two finish material slots.
+  Native model readback verifies all 24 slots, bars and cleared paving openings.
+  A full native compile was necessary for the west model: its incremental compile reported
+  success while retaining the old paving. The full compile finished after the CLI timeout;
+  inspect actual output/readback before retrying. Four native views now verify both sizes,
+  both banks, sun/shade and player height; all 24 native floor traces retain support at z=0.
+  Native code compilation has zero errors. Lowtide's camera was restored and Spillway play
+  started as requested; the Veridant tab was left open without edits by this pass. Gameplay cost is unmeasured.
+  See `native-2026-10-18/grates/review` for the reviewed captures. The existing
+  `native-2026-10-18/grate-before.png` shows Spillway and is not grate evidence.
+  Historical finish and east/west OBJ stages now predate these grates/holes: recompose
+  their scoped faces against current models; do not overwrite these changes with snapshots.
+- Current checkout/offline rebase (2026-10-18): use `C:\sbox-projects\hc1\forked-shooter-main`.
+  The former D: checkout is now a compatibility junction. Read
+  `Sources/Lowtide/construction/checkout-status.json` before using the historical candidates below.
+  Four candidate sets were rebuilt under `output/lowtide/quality-pass/rebase-2026-10-18`: the close
+  sacks, sack distance alternatives, paving contact and `water-filter-gentle`. All 264 sack shapes/placements match the reviewed
+  components, with 742,742 unrelated triangles retained in the current base models. Paving preserves
+  the current rotated wetness function; its mask, material and metadata reproduce the earlier layout.
+  Water preserves the newer wave/shoreline shader and allocation-saving capture changes. Its filter
+  scale is 0.08 at the current 0.22 base roughness; 0.35 blurred the synthetic fixture excessively.
+  The isolated capture build passes with no warnings/errors; all four water files reproduce exactly.
+  Six current CPU views per material pass were reviewed. 566 protected live files are unchanged.
+  The six distance meshes reuse the exact reviewed components with current material libraries. All
+  528 reduced bodies pass geometry checks, preserving 742,742 unrelated triangles per detail level.
+  The complete prop batches total 1,157,222 / 958,694 / 818,774 triangles across the three levels;
+  that is a 17.2% / 29.2% aggregate reduction, not a frame-time result. The original component previews
+  remain applicable to those identical shapes/pixels; native switching and grouping are not configured.
+  Sacks remain uninstalled. Water has since been installed after native static review,
+  with runtime verification pending as recorded above. Paving contact has been rebuilt and
+  accepted natively against the installed construction (see above). Native checks resumed
+  at the user's request; recheck current hashes before integrating stages. The other historical bundles
+  still need current-source integration checks; native appearance, temporal behavior,
+  gameplay cost and persistence remain unverified. The old master-check result is historical evidence.
+- Offline water reflection filtering (2026-10-15): `Sources/Lowtide/water/filter-status.json`
+  records a separate candidate for the one-mip, level-zero planar reflection path. A bounded
+  seven-mip linear HDR Box pyramid supplies roughness/UV-footprint filtering. The reviewed scale
+  is 0.35; the first full-strength trial blurred away too much reflected architecture. Existing
+  capture lifecycle, camera guards, waves and optics are preserved. Four staged files reproduce
+  byte for byte and 560 protected live files are unchanged. Isolated C# API compilation passes
+  with no warnings/errors; it is not a sandbox/native shader compile or an engine hotload.
+  Six synthetic CPU fixture views are reviewed, not screenshots or map-quality acceptance.
+  The 960x540 colour target gains 1,380,960 bytes and up to six downsample passes; actual GPU cost
+  is unmeasured. Native appearance, temporal stability, lifecycle, shader compilation and canonical
+  integration were pending in this historical stage; the current installed entry supersedes it. Stage keys include Assets/ and Code/; apply the
+  scoped capture diff after fresh before-hash checks, never overwrite later code from its snapshot.
+- Offline paving contact (2026-10-15): `Sources/Lowtide/paving/use-status.json` records
+  a separate material candidate with narrow settled grit at saved wall feet and local moisture
+  near 16 drain outlets. Original stone colour/PBR pixels and nine-millimetre relief are unchanged.
+  One numerical 2048-square RGB mask adds one texture lookup; no geometry, collision, model remaps
+  or material slots change. All five staged files reproduce byte for byte, 557 protected live files
+  are unchanged, and 12,000 atlas samples, 228 excluded-surface cases and 4,692 moisture texels pass.
+  Six matched CPU context views have been inspected. Native shader compilation, appearance,
+  filtering, cost, canonical integration and persistence were pending in this historical stage; see the current installed entry.
+  Use `output/lowtide/quality-pass/paving-use/stage` for later scoped review; its moisture positions
+  reference the composed drainage junction candidate. This does not establish overall AAA quality.
+  A separate 98-material / 41-PNG repeated-border audit found no further confirmed padding defect:
+  the bridge decking and distant shipyard have bounded UVs; the known drain fix is now installed.
+- Offline drainage junction repair (2026-10-15): `Sources/Lowtide/drainage/junction-status.json`
+  supersedes the isolated drain geometry stage below. Context views exposed warehouse hoppers
+  embedded in the cornice and shed gutters crossing hopper mouths. The composed candidate has
+  20 warehouse pipe offsets/scuppers, 16 lowered shed receivers, eight pierced gutters moved
+  beyond the coping, and folded roof aprons with supporting wall brackets. The shared material
+  mapping correction is unchanged. Only `lowtide_finish.obj` changes: +111,936 triangles against
+  live production, including +16,432 beyond the earlier drain candidate; no new material slots.
+  Geometry reconstruction/reproduction, checked closed shells, 488 exterior rain-path rays and
+  20,272 clearance samples against the saved east/west architecture pass. The sampled minimum
+  upper pipe/hopper clearance is 0.671 inches; the grid is not an exhaustive intersection proof.
+  Eight clipped CPU context views use neutral architecture and matching corrected metal on both
+  versions. All 556 protected live files remain unchanged. Native appearance, shader compilation,
+  geometry/shadow cost, canonical integration and persistence were pending at staging; see the current construction entry for installed checks.
+  Use `output/lowtide/quality-pass/drain-junctions/stage` for later native review; copying the older
+  drain-only OBJ over it restores the junction defects. No overall AAA acceptance is claimed.
+- Offline drainage construction and material mapping (2026-10-15): read
+  `Sources/Lowtide/drainage/construction-status.json`. The candidate replaces 36 capped/blocky
+  drains with curved hollow outlets, tapered open hoppers, socket profiles and wall fixings.
+  It adds 95,504 triangles to `lowtide_finish`; the other 71,642 triangles remain unchanged.
+  Close CPU previews exposed a separate material defect: the two drain materials sampled the
+  padded borders of the 2048-square steel atlas. The staged shader limits repeats to the original
+  1254-square source at its authored 24-inch scale, preserving all colour/normal pixels. It also
+  corrects those shared slots on gutters, grates and anchors, independently of the geometry.
+  Six comparison sheets separate the mapping fix from the shape change. Manifold, aperture,
+  source-pixel, reconstruction and reproduction checks pass; 556 protected live files are unchanged.
+  Native shader compilation, map roof/gutter connections, distance appearance and geometry/shadow
+  cost remain unverified. No canonical hook, live promotion or overall quality acceptance is applied.
+  Keep the user's offline restriction; use `Tools/lowtide_drain_construction.py` and
+  `Tools/lowtide_drain_review.py` for this separate candidate.
+- Offline sack detail candidates (2026-10-15): `Sources/Lowtide/sacks/lod-status.json` records
+  818- and 288-triangle alternatives to the unchanged 1,570-triangle close sack. They retain the
+  close body's positions, UVs and normals, with extra samples around its pinched corners. The
+  medium mesh retains simplified closed seam shells to preserve their visible lines.
+  All 528 exported reduced bodies are closed; nine CPU comparison sheets cover 320/160/80-pixel
+  features and approximate mip filtering. Six staged model alternatives include their unchanged
+  material libraries. These are geometry candidates, not configured native LODs or FPS results:
+  the dressing/fleet models aggregate many props, so grouping, transitions and budgets still need
+  native review. `Tools/lowtide_sack_lods.py` changes no live assets or canonical generator.
+- Offline sewn cargo sacks (2026-10-15): read `Sources/Lowtide/sacks/construction-status.json`.
+  The separate candidate in `Tools/lowtide_sack_construction.py` replaces 264 rounded-block sacks
+  with pinched sewn ends, a side hem, local gathers and finer continuous cloth UVs. Existing jute
+  pixels, cover bounds, collision, materials, placements and unrelated prop faces remain intact.
+  All exported bodies/thread shells are closed with valid normals/UVs; three components reproduce
+  byte for byte. Six matched CPU views are in `output/lowtide/quality-pass/sack-construction/final-preview`.
+  The preview's local shadow adapter fixes a half-pixel depth mismatch; sloped-plane checks verify it.
+  These three dressing/fleet OBJ copies do not overlap the other construction/material candidates.
+  They add 382,800 triangles: native appearance, textile filtering and measured gameplay cost remain
+  open, including whether distance reduction or instancing is required. No live import or canonical
+  generator change is applied. Native acceptance is still required before installation.
+- Offline warehouse concrete use (2026-10-15): read `Sources/Lowtide/concrete/wear-status.json`.
+  `Tools/lowtide_concrete_wear.py` stages collision-aware dust, short rubber deposits and traffic
+  polishing for both ground floors. Twelve layout routes avoid the saved cargo/column footprints;
+  colour images, geometry, collision and live resources remain unchanged. The v2 mask replaces
+  the first review's continuous tire lines. Checks cover 3,474 route samples, 8,192 atlas samples,
+  36 excluded-surface cases and 32 untouched floor cases. Eight files reproduce byte for byte,
+  with 561 protected live files unchanged. The six CPU material views and two layout diagrams
+  have been reviewed; this modest candidate still needs native shader, lighting, filtering and
+  performance checks. `Tools/lowtide_material_stage.py` combines it with the timber floor in
+  `output/lowtide/quality-pass/material-integration/manifest.json`: 20 files, four existing-slot
+  remaps across two models. Independent VMDL copies overwrite each other; apply only the four
+  remaps after native acceptance, preserving later model/LOD edits. Canonical generation and
+  a refreshed warehouse DDGI bake were pending at staging. The 2026-10-18 installed entry supersedes these limitations; gameplay cost and temporal checks remain open.
+- Offline warehouse floor (2026-10-15): read `Sources/Lowtide/floor/floor-status.json`.
+  `Tools/lowtide_warehouse_floor.py` stages a separate worn pine material for both mezzanines.
+  Eight generated board scans remain unchanged; 25.4 cm boards run across the joists, with
+  staggered ends and small nails on their 110-inch grid. Shallow grain normals, dry roughness,
+  filtered joints and a muted tint replace the domestic-looking floor finish. The candidate
+  remaps only the existing floorboards slot: no added triangles, collision or scene changes.
+  Six matched CPU views, 100,000 layout samples, UV-derivative/mirror checks and 14 byte-identical
+  regenerated files pass; 560 protected live files are unchanged. This is an offline candidate,
+  not a native compilation or performance result. The staged VMDLs are review snapshots; after
+  native acceptance apply only their material remap, preserving any later LOD/material changes.
+  The canonical interior generator and warehouse DDGI bake still need integration after acceptance.
+  The 2026-10-18 installed entry supersedes this historical staging state. The overall visual goal remains open.
+- Offline construction detail levels (2026-10-15): Tools/lowtide_construction_lods.py prepares
+  two geometry alternatives for the combined window/door candidate without altering the close
+  version or live resources. The three affected models total 500,413 triangles at close detail,
+  411,421 at level 1 and 381,861 at level 2 (17.8% and 23.7% less geometry). All unrelated triangle
+  attributes are retained. Six component reproductions, 7,155 coverage/joint/clearance rays and
+  556 protected live-file hashes pass. Eighteen matched CPU views cover 300/160/80-pixel features.
+  Read Sources/Lowtide/construction/lod-status.json: these are profiling candidates, not configured
+  native LODs. ModelDoc switches, temporal appearance and gameplay cost remain unverified. The
+  warehouse halves are large aggregate models, so per-feature review sizes cannot be translated
+  blindly into one distance threshold. Profile full detail before choosing switching/grouping.
+- Offline combined construction set (2026-10-15): read Sources/Lowtide/construction/offline-status.json.
+  Tools/lowtide_door_construction.py stages bevelled boards, tapered straps, fixed hinge brackets,
+  pull handles and an open hasp staple for twelve closed door pairs on the four nearby sheds.
+  Generated green/red colour pixels are unchanged; explicit UVs fit complete boards to the geometry.
+  The doors add 39,988 triangles and no material slots. Exported coverage/clearance rays (18,568),
+  two byte-identical regenerations and 556 protected live-file hashes pass. Exact face replacement
+  preserves all other attributes, upper doors, open passages, thresholds, collision and scene data.
+  CPU before/after views are offline construction previews; native compilation/visual/performance
+  checks have not run. Sources/Lowtide/doors/construction-status.json records the evidence.
+  The door and window candidates both change the east/west OBJ files. Do not copy both independent
+  stages over each other: Tools/lowtide_construction_stage.py composes them into one verified set
+  under output/lowtide/quality-pass/construction-integration (175,112 extra triangles overall).
+  No canonical writer hook or live promotion is applied. Keep the user's offline restriction;
+  native review and the separate foliage persistence work remain pending.
+- Rejected offline brick relief (2026-10-15): Sources/Lowtide/brick/relief-status.json records the
+  fitted-mortar-v4 experiment. Even with denser tracing, grazing views stretch bright mortar edges
+  and rare first intersections are missed by up to 7.65 mm. Do not import it. Production brick,
+  colour images and weathering remain intact; the research and comparisons are retained in output.
+- Offline window construction candidate (2026-10-15): Tools/lowtide_window_construction.py stages
+  bevelled cast frames for 380 lower windows and missing curved heads for 586 upper windows.
+  Three OBJ candidates add 135,124 visual triangles with no new material slots. Panes, room UVs,
+  masonry, model definitions, collision and scene remain unchanged; 556 protected files, 9,440
+  coverage/clearance rays and three byte-identical regenerations pass. CPU before/after views are
+  construction previews, not native engine captures. Blender stalled before the scripts ran; the
+  owned attempts were stopped. No production import or canonical map-writer hook is applied yet.
+  Read Sources/Lowtide/windows/construction-status.json before resuming. The user requested offline
+  work; native visual/performance review and foliage persistence are deferred, not completed.
+- Container surface (2026-10-14): the six production materials now use `hc1_lowtide_container.shader`
+  for enamel roughness, base dirt, seam runoff and sparse oxide. Existing generated paint textures,
+  UVs, geometry, collision, scene and lighting are unchanged. The canonical container generator
+  emits the shader/materials; all 22 generated shader/material/texture files match production byte
+  for byte. Six material compilations, eight loaded slots and four reviewed production views pass;
+  536 protected files match. Camera and prior tab are restored, with no new native errors.
+  Evidence: `output/lowtide/quality-pass/container-surface/verification.json` and
+  `Sources/Lowtide/containers/surface-status.json`. The candidate import completed after the stall;
+  do not rerun it. This is a modest finish improvement, not completion of the overall AAA target.
+- Container construction (2026-10-14): `Tools/lowtide_container_detail.py` is called by the canonical
+  container builder. Four containers now have rounded sheet folds, bevelled frame/locking brackets
+  and 32 hollow corner castings. Roof/underplate corners stop around all 96 lifting apertures.
+  Exact face replacement preserves 322,708 unrelated triangles per dressing half. The two meshes
+  add 41,024 visual triangles overall; current material sources, all collision/model definitions,
+  scene and 526 protected files are unchanged. Native compilation/loading and four viewport views
+  pass. Exported-geometry rays confirm all 96 apertures; canonical collision regeneration matches.
+  Evidence: `output/lowtide/quality-pass/container-detail/verification.json`. The before/after manifests
+  supersede older whole-dressing-file hashes intentionally. Broad paint response and gameplay
+  performance are still open; the scene is not at the full AAA target.
+  For tab-sensitive QA, `capture-container-final.cs` activates the existing Lowtide session, captures
+  with play/state guards, and restores the camera and prior tab within one native call. This avoids
+  a scene-tab change between separate calls. It creates no temporary scene or offscreen renderer.
+- Paving relief (2026-10-14): `Tools/lowtide_paving_relief.py` produces numerical height,
+  normals and joint AO at nine-millimetre depth, retaining the existing generated granite colour,
+  roughness and atlas mapping. The candidate shader limits parallax by distance and pixel footprint.
+  It is installed in the production `lt_setts.vmat`. Native compile and four loaded 2048px bindings
+  pass; four actual-material viewport views are accepted. The 54 protected sources are unchanged.
+  Evidence is `paving-relief-production-verification.json` in the quality-pass folder. Read
+  `output/lowtide/quality-pass/paving-relief-pending.json` before proceeding. The built-in generated
+  `Sources/Lowtide/visual-target/quay-target.png` and its prompt are art references only.
 - Footbridge UV repair (2026-10-14): `Tools/lowtide_bridge.py` now compensates for the OBJ import's
   V flip when selecting scanned board rows. The installed Fleet OBJ changes only 320 existing UV
   records across 80 boards; 198 previous coordinates sampled edge padding and stretched the wood.
   Vertices, normals, faces, other UVs, collision and generated texture images are retained. Native
-  model/material loading and compile passed during play without stopping it. Final visual review
-  is pending because the user reports the editor/game still loading or frozen. Evidence:
+  model/material loading and compile passed during play without stopping it. Final walk and wide
+  viewport views are accepted, with 47 protected files unchanged. Evidence:
   `output/lowtide/quality-pass/bridge-uv-*`; inspect the pending record before reapplying anything.
   `SceneViewWidget.Session` redirects to GameSession during play, so ordinary editor-camera tools
   can target the runtime camera. Keep existing-viewport capture guarded against play mode.
@@ -3867,14 +4970,20 @@ simulate_input.
   Glass, water, trees, gameplay objects and the weather-controlled sun remain dynamic. Native reload
   confirmed static render-object flags; an isolated moving-caster test confirmed shadows move while
   the same static cache is reused. Only 33 scene Flags fields changed; no measured game-FPS claim yet.
-- Warehouse lighting update (2026-10-14): `lowtide_finish.apply_scene` calls `Tools/lowtide_lighting.py` to
+- Warehouse lighting update (rebaked 2026-10-18): `lowtide_finish.apply_scene` calls `Tools/lowtide_lighting.py` to
   preserve the native bake in `Sources/Lowtide/lighting/warehouse-lighting.json`. Eighteen warehouse points
   remain disabled; downward shadowed spots use 55/30 degree cones and 85% original colour. Two DDGI volumes
   cover floor, walls and ceiling, with 1200 probes each, intensity4, contrast.85 and blend24. Keep their six
-  native `.vtex_c` files in `lowtide_scene_data/ddgi/warehouse-{east,west}-v3`; `.gitignore` narrowly exempts
-  these from the compiled-file rule and existing LFS rules cover them. Re-bake after static geometry,
-  fixture or daylight changes. Sun/sky/exposure/outdoor lights and gameplay are unchanged. Four saved-scene
-  views and scoped checks pass; controlled performance and the overall visual-quality goal remain open.
+  native `.vtex_c` files in `lowtide_scene_data/ddgi/warehouse-{east,west}-v5`; `.gitignore` narrowly exempts
+  these from the compiled-file rule and existing LFS rules cover them. The native public
+  `IndirectLightVolume.BakeProbes` method refreshed both volumes after the accepted floor/structure
+  materials and dressing cache repair; six fresh-load viewport views and stored-texture copies pass.
+  This v5 save changed only six texture references. The previous v4 save's collider/default and
+  resource/prefab serialization is retained. Generator lighting application
+  is idempotent against the saved scene. `bake-provenance.json` records the inputs and evidence;
+  v3/v4 provenance and textures remain available. Re-bake after static geometry, material, fixture or
+  daylight changes. Sun/sky/exposure/outdoor lights are unchanged. Controlled gameplay performance
+  and the overall visual-quality goal remain open.
 - The user asked for a new map and left the theme to Claude (2026-10-05). Lowtide is the warehouse quarter of a made-up
   North German port at low tide, after Hamburg's Speicherstadt. Six-storey red-brick warehouses stand straight up out of
   a tidal canal (a Fleet), with stepped gables, winch oriels under copper hoods, and loading doors up their fronts. The
@@ -4224,6 +5333,119 @@ simulate_input.
       the indicator off for the banner, and `Current` still pointed at the deleted panel. Fixed the same day; the fix
       hasn't been seen in a match.
   - Not yet checked: a Retakes, Domination, Hot Zone or Cash Grab match played on it.
+- Visual upgrade in progress (2026-10-15, `Sources/CerroBlanco/`):
+  - `Tools/cerroblanco_quality_materials.py` and `cerroblanco_quality_geometry.py` stage their outputs under
+    `output/cerroblanco/stage`. Import and apply with the native scripts in `Sources/CerroBlanco/editor`; copy these
+    scripts into the current sbox-cli exchange directory before `run_csharp`. They require Cerro Blanco to own the
+    editor window and play to be stopped.
+  - The retained imagegen travertine source and courtyard target, with their prompts, are under
+    `Sources/CerroBlanco/generated`. The material's relief/normal/roughness are artistic derivatives of that source,
+    not measured scans. `cerroblanco_stone.shader` varies each slab's cut and orientation, fades close relief with
+    distance, and attenuates its analytic bevel below a pixel to avoid dotted distant joints.
+  - Three render-only detail models add sills, thresholds, coping, drains, stair nosings and gallery fixtures. The
+    dressing renderer uses `quality-v1/cerroblanco_dressing_v2.vmdl`; its original collider stays. The corrected
+    picture UVs show 22 individual artworks, and the hedge core is recessed under the leaf silhouettes.
+  - The accepted first lighting pass has 28 gallery/soffit spotlights and a 34 x 27 x 6 indirect-light grid (5,508
+    probes). Both native bake passes completed. Irradiance, distance and relocation textures are saved under
+    `Assets/lighting/cerroblanco/daylight-v1/`; these compiled textures are explicitly tracked. Relocation is serial
+    on the main thread, and Scene.Push scopes must never cross an await.
+  - Eleven real room/courtyard static reflections are compiled, assigned and saved under
+    `Assets/lighting/cerroblanco/daylight-v1/reflection_*.vtex_c` (512-square cubes, eight mips). Retain these ready-to-load
+    copies and the panorama sources. Do not enable realtime probes or call EnvmapProbe.Bake/CubemapRendering.Filter
+    on this driver. Captures reapply position, rotation, FOV 90 and square CustomSize before every render; the editor
+    otherwise resets its camera between frames. AO is temporarily disabled during capture and restored afterward.
+    ACES inverse/sky calibration has 0.055% channel disagreement and less than 0.1% clipped pixels on every face.
+  - Native checks pass all 96 spawn/objective floor, clearance and connected-path checks, with no missing models or
+    materials. The extraction checks subtract the intentional 32-inch trigger-center offset. Offline comparisons
+    also confirm the six model collision descriptions and all 546 spawn/objective/collision components are unchanged.
+    A local TDM test spawned the player and nine moving bots, with nav ready and the player camera selected. Three
+    short 1920x1080, 8x MSAA samples ran at 77-88 FPS with no sample hitches; exterior draw counts reach 3,555 and
+    remain a performance caveat. Samples are editor measurements, not a standalone benchmark. Shared Aimable and
+    bot SpotScratch hotload errors appeared during the test; no Cerro asset errors or compile failures were reported.
+    Play/network are stopped and `output/cerroblanco/test-state.json` records restored settings.
+  - Twelve final native views are in `output/cerroblanco/final`; the courtyard is the saved menu preview. Exterior
+    glass still needs its coated-glass comparison. `Tools/cerroblanco_quality_glass.py` stages a candidate under
+    `output/cerroblanco/glass-stage`, retaining source under `Sources/CerroBlanco/glass-v1`; it is not published yet.
+    The candidate applies the same adjustable dielectric reflectance to lighting, transmission and depth shading.
+  - `Tools/cerroblanco_quality_state.py` exports the saved editor visual state into
+    `Sources/CerroBlanco/quality-state.json`; the base map generator reapplies it so regeneration retains these
+    materials, details and lighting. Export it again after accepting further editor changes. Its preservation check
+    is idempotent and leaves the base collision/gameplay components unchanged.
+- Fit-out, landscape and panels (2026-10-15, the user's "get blanco map AAA"), on top of the quality pass:
+  - `Tools/cerroblanco_art.py` draws the shows into `materials/cerroblanco/fitout/` (about 4 minutes; `--only text
+    signs letters` skips the paintings):
+    - 16 made-up works: portraits for ROSTROS, seascapes for MAREAS, plateau landscapes for TIERRA ROJA, charcoal
+      studies for FORMA Y VACÍO (a torso and a pierced reclining figure, under mats) and two colour fields. Each is
+      flat shapes painted over with brush dabs that follow its edges, bristle streaks and a canvas weave; its normal
+      and roughness come from the same strokes.
+    - Each show's wall text in Spanish, the works' labels, the room plates, the wayfinding panels, the cafe's menu,
+      the opening hours, the green SALIDA exit signs and the galleries' names for the façades.
+    - `layout.json` there holds every rectangle on the sheets, for the fit-out's UVs.
+  - `Tools/cerroblanco_fitout.py` dresses the rooms. `cerroblanco_map.build()` records the walls, stairs, plinths and
+    pictures as it builds them (`Log.recording`), and the fit-out works from those:
+    - It hangs works with frames and labels in the clear runs of the rooms' walls and down both sides of the
+      freestanding display walls. Each gets a warm spot on the ceiling aimed at it (`Art Lights` in the scene, 72
+      with the wall texts' own).
+    - On the ceilings: lighting tracks with spot heads, diffusers, detectors and cameras. By the doors: exit signs
+      over the ones out, room plates beside them. Each room also gets an extinguisher and a return grille.
+    - Benches and vitrines, with collision, kept clear of every spot, stair, plinth and the map's own collision.
+    - The lobby: banners hung in the rotunda, a mobile in its clerestory, queue stanchions, screens on the desk.
+    - The cafe: the espresso machine, grinder, pastry case, pendant lights, menu board, and cups on the tables.
+    - Outside:
+      - wall lights by the doors, the façade lettering, and blinds behind half the upper windows;
+      - wayfinding totems, agaves in pots and pole lights on the promenade (with collision);
+      - cameras, downpipes and the roofs' plant;
+      - bike hoops and three flags on the forecourt.
+    - Two models: `cerroblanco_fitout` (with collision) and `cerroblanco_fitout_fine` (drawn only).
+    - The façade banners (`banners()`) are drawn in the fine model. The glass install (`cerroblanco_glass.install`)
+      had rebuilt the buildings' model without them. The quality pass overrides the buildings' materials by slot, so
+      a new paint in that model would shift every override.
+  - `Tools/cerroblanco_landscape.py` replaces the backdrop:
+    - It keeps the old lie and adds detail on it: rolling ground, gullies, limestone outcrops, ridges and the sierra.
+    - It's a tensor grid 100 apart near the play. Every quad is one material, `cbf_land.vmat` on
+      `cerroblanco_land.shader`, which height-blends the terrain's dry meadow, meadow, dirt and rock by a painted
+      1024 splat (`land_splat.png`: R green, G dirt, B rock, A broad light and dark), so the ground has soft edges
+      instead of a paint per quad. The splat's texels follow the grid's three zones (`map_axis`, the shader's MapAxis).
+      Painting it adds ~25 s to a run; `--preview <dir>` writes it and its views.
+    - The woods are `Tools/cerroblanco_trees.py`'s alpha-tested cards cut from Belltower's generated tree atlas
+      (`forest-trees-v1.png`, three tints): ~6,000 trees and ~5,700 scrub, facing the play, in their own model, which
+      casts no shadows (`Backdrop Woods`), plus 300 cloud oaks. The old crown loop still draws its random numbers
+      (`BLOB_DRAWS`) into nothing, so the oaks stay where they were.
+  - `Sources/CerroBlanco/shaders/cerroblanco_panel.shader` draws the enamelled panels (`quality-v1/cb_panel.vmat`,
+    written by `cerroblanco_quality_materials.py`):
+    - each panel a little tilted and pillowed, so a façade reflects the sky unevenly, as real panels do;
+    - open joints box-filtered over the pixel's footprint (a fine tone from afar, not dotted lines), and faint rain
+      streaks under some of them.
+  - `cerroblanco_stone.shader` filters its joints the same way. The paving is warmer and darker (`0.93 0.91 0.86`),
+    with ±7.5% between slabs and one slab in twelve from a denser bed (`g_flSlabVariation`, `g_flOddSlabs`).
+  - The quality details' trims (`cerroblanco_quality_geometry.py`) are pale anodised (`cb_white`) or stone, at least
+    1.5 tall: copings, sills, heads and the cladding trim were sub-inch black lines that dashed and outlined every
+    roof. Thresholds are honed stone; the stair and threshold grooves are gone. The plinth and skirting follow the
+    floors (`floored()`), so none crosses the cafe or a two-storey façade.
+  - The forecourt's three flags hang from outrigger arms, facing north, with soft folds.
+  - Lighting (2026-10-17, after a critique of the captures): the rooms' fills at half (their patches in
+    `quality-state.json`), the indirect light at 1.1, the art spots 2.7x brighter and narrower (13/28), and the
+    exposure's range up to 4.5 so interiors adapt (it was 3: in-game the galleries were grey and evenly lit).
+  - How it's published:
+    - `cerroblanco_map.py --stage <dir>` writes everything under a folder laid out as Assets.
+    - `Tools/cerroblanco_publish.py` copies what differs into Assets, with `--scene` for the scene. It leaves out the
+      accepted glass and the unused base glass and dressing render models.
+    - It lists what it copied, in compile order, for `Sources/CerroBlanco/editor/compile-v2.cs.txt`.
+    - `capture-isolated.cs.txt` renders `output/cerroblanco/captures-v2/config.json`'s views into the config's
+      `folder`. It uses an isolated scene, so the open scene is untouched. The probes keep their saved textures, and
+      it updates the indirect light by hand.
+    - `navmesh-check-v2.cs.txt` paths both teams' first spawns to every spot in an isolated scene.
+    - `Tools/cerroblanco_compare.py <before> <after>` makes side-by-side sheets.
+  - Every run of the map script passes all 96 spots, the reach check and the Retakes sight check with the fit-out's
+    collision in.
+  - Another session reworked the hedges and bollards in place (the dressing_v2 OBJ, hedge fill objects in the
+    scene). Before a scene publish, run `cerroblanco_quality_state.py` so the staged scene keeps them, and diff the
+    staged scene against the saved one; the stage's `cb_panel.vmat` and panel shader must match Assets' newer ones.
+  - Status (2026-10-17): published and compiled with no failures; every model loads with valid materials. Isolated
+    captures (`captures-v2/after-v3`, `after-v4`) were reviewed, and the navmesh check passed 98 of 98 paths. Captures
+    pin exposure (4 outdoors, 5 indoors), above the game's; nothing of this pass has been seen in a match yet. The
+    critique's other findings are still open: doorways' black reveals, the art's look, sparse rooms and roofs, the
+    indirect light not covering the spawns or site B, the sierra's colour, and the perimeter wall.
 - To play it: `dev_mode team_deathmatch cerroblanco` (or `dev_mode bomb_defusal cerroblanco`).
 
 ## Riverdale (multiplayer map, `Tools/riverdale_map.py`)
@@ -4510,6 +5732,116 @@ simulate_input.
   - Point lights in the engine are far dimmer than Cycles shows them: the lights here are 2.5-3.2 times white.
 - Not yet checked: a match played on it (bots, every mode's objects, spawns), its frame time with 102 point lights (10
   with shadows), and any sound (it has no ambience).
+
+## Veridant (multiplayer map, `Tools/veridant_map.py`)
+- Distant bay image impostors (2026-10-18): `Tools/veridant_impostors.py` replaces the headland, castle/town and
+  anchored boats with two generated RGBA textures in `Assets/materials/veridant/vista/` (`headland.png`, `boats.png`).
+  The headland is a fixed curved strip (96 triangles); the yacht and nine sailboats have separate fixed quads at
+  their anchorages (20 triangles). The mainland, near shore and sea stay in 3D. The two backdrop models went from
+  346,103 to 164,312 triangles (52.5% fewer); no frame-rate benchmark was taken.
+  `veridant_backdrop.build()` applies the replacement by default; `build(impostors=False)` retains the old mesh
+  construction below. `veridant_materials.py impostors` writes the two materials. Their custom shader reads the
+  PNG alpha directly, uses diffuse lighting without flat-panel specular, and retains native fog/depth coverage.
+  For this scoped import, `--stage output/veridant/impostors/stage --source
+  output/veridant/impostors/before-assets/Assets/models/maps/veridant` used the actual original meshes so retained
+  geometry/UVs did not get regenerated. Native import/compile scripts and the built-in imagegen prompts are in
+  `Sources/Veridant/impostors/`. Compile the shader before its materials. Veridant's existing sea/pool materials
+  were recompiled against the current water shader to clear stale checkerboard rendering; their sources were not
+  edited. Four engine captures are in `output/veridant/impostors/after/`; the scene file and the user's active
+  Spillway scene/play state were preserved. Original assets are in `output/veridant/impostors/before-assets/`.
+- The user asked for a multiplayer map "as close to this img as possible" (2026-10-15). The picture is a Mediterranean
+  cliffside resort at sunset after rain:
+  - a wet courtyard round a dark reflecting pool with a boulder;
+  - on the left an operations building with a pergola, ivy and a SECURE / EXPLORE / CONTROL banner;
+  - behind the pool a gallery lounge and a colonnaded cafe with a roof terrace;
+  - on the right the VERIDANT RESORT pylon, an uplit olive in a planter, a grand stair with LED nosings, a furled
+    burgundy umbrella and a stone pine;
+  - black and olive military cases about the courtyard, a tarp over a railing in the foreground;
+  - the bay: the sun on the horizon, a superyacht, sailboats, and a cliffed headland with a castle on its summit.
+  Veridant Resort, its three-wave mark and every marking are the picture's made-up names.
+- Built by script like Belltower and Riverdale (`map_kit`). Run in this order:
+  - `Tools/veridant_materials.py [names] [--out <dir>]`: the vr_ materials, drawn with numpy (boxyard's and
+    riverdale's helpers) into `Assets/materials/veridant/`.
+    - `painted derived tints` rewrites only the text vmats: the flat paints (`PAINTED`), the tinted copies of another
+      surface's maps (`DERIVED`) and the surfaces' tints and roughness exponents (`SURFACE_TINT`, `ROUGH_EXP`), which
+      change a surface without redrawing its maps.
+    - `g_flRoughnessScaleFactor` is an exponent: the wet paving's 1.45 makes it glossier.
+  - `Tools/veridant_sky.py`: the sunset panorama, an 8192-wide EXR on belltower_sky's code. `--width 2048 --no-write
+    --preview <png>` shows it as the hero view sees it in about 20 s.
+    - The editor took about four minutes to compile the 18 MB EXR, during which the shared editor was frozen (it
+      happened once during the user's match). Rebake only when nobody is playing.
+  - `Tools/veridant_map.py [--preview <dir>] [--views ...] [--no-scene] [--no-models] [--no-backdrop] [--art]`, with:
+    - `Tools/veridant_parts.py`: the resort's pieces on riverdale_parts (stairs with LED nosings, glass and steel
+      railings, the tarp, lamps, olives, palms, the stone pine, cases, the pylon, furniture);
+    - `Tools/veridant_backdrop.py`: what's seen round the resort, drawn only, in two models: the land (179k triangles,
+      39 MB) and what stands on it (167k, 44 MB). map_kit writes each polygon's own vertices, so one model came to
+      100 MB: the land's cells are single quads and the clumps five-sided domes to keep both under GitHub's 50 MB
+      warning. They are:
+      - the sea, and the land as polar meshes;
+      - the headland as its own mesh along its crest. Its limestone bosses and crags come from point-sampled noise
+        (`vnoise`, `vridged`); its ledges are off (at the mesh's spacing they read as stripes from the promenade).
+        Its outcrops are sampled in 3D (`vfbm3`), so they're round in the view rather than
+        streaks down the flank. Its steep sea cliffs are bare grey rock, with ~5,300 maquis clumps and ~260 stone pines
+        on its skyline;
+      - the summit's castle and village, the town on the headland's north shore, the superyacht and sailboats;
+      - garden terraces with olive groves rising behind the resort's walls.
+    - The scene is rewritten whole on every run: change the layout in the script, not in the editor.
+- Layout (plan e, n, z inches; the play area e -1750..1900, n -1350..1000). Levels: the ground (0), 128 (the cafe's
+  roof, the garden terrace, the north terrace, the operations building's balcony and lobby, the lounge's gallery) and
+  192 (the east terrace). Red Team spawns on the seafront promenade (west), Blue Team in the entrance forecourt (east).
+  Three lanes:
+  - North: the promenade's stair to the garden terrace, the north terrace (bomb site A, with the stone pine, the bar and
+    the umbrella), the head of the grand stair, the east terrace, down to the forecourt.
+  - Middle: through the cafe (or over its roof) into the courtyard round the pool, then the colonnade under the east
+    terrace to the forecourt. The grand stair and the reception's inner stair climb to the north terrace.
+  - South: the gardens (bomb site B among the olive groves at their east end) to the east plaza, or through the
+    operations building's hall and up its stair to the lobby and the balcony.
+- Modes: the scene lists TDM and Defuse, and it's in `GameUtils`' three map lists (after Collider). It has 36
+  deathmatch spawns, Retakes spawns for each site, Domination flags (A the cafe, B the courtyard, C the east terrace),
+  Hot Zones and three Cash Grab points (`ObjectiveSpot`s).
+- The picture's camera is `HERO`: on the east terrace behind its glass, (801, -40, 256), looking west 9.6 degrees down,
+  74 degrees across.
+- Checks:
+  - Every run checks the 97 spots with railhead_map's `check_spots`, `check_reach` and `check_retakes_sight`: all pass.
+  - `Sources/Veridant/editor/navmesh-check.cs.txt` (run_csharp) generates the navmesh in an isolated editor scene and
+    paths from the first Red and Blue spawns to every spawn, site, objective and cash point: 99 of 99 Complete.
+    `Scene.Deserialize` doesn't apply the scene file's navmesh settings, so the script sets them from the JSON.
+- Garden hedges (2026-10-18, the user's "use the bushes from cerroblanco"):
+  - The eight low borders and five tall screens use Cerro Blanco's Facepunch
+    `models/sbox_props/shrubs/beech/beech_hedge_96x128.vmdl` instead of visible `vr_hedge` boxes. `garden_hedge`
+    in the map generator places 88 overlapping, opposed leaf sections under `Veridant/Beech Hedges`;
+    `write_scene` records `facepunch.beech_hedge_96x128#145491` so regeneration retains the cloud dependency.
+  - The original garden collision boxes, surfaces and all other dressing geometry stay. The live dressing OBJ
+    lost only its 156 hedge triangles; its VMDL and physics sources are unchanged. The model compiled, all 88
+    instances load with valid materials, and the generator's 97 spot, route and Retakes checks pass.
+  - `output/veridant/cerroblanco-bushes/` holds the pre-change sources, staging manifest and reviewed native
+    tall-hedge, low-border and garden overview captures. The scene was saved through the editor.
+- Player clips: a clip's BoxCollider turned to its rail's heading (`K.yaw_rotation( yaw - 90 )`) lies along its local
+  x, so its Scale is ( length, thickness, height ). Checked in the engine: with the length on y every path through the
+  terraces came back Partial. Riverdale and Riverside write ( size[1], size[0], size[2] ), which lays each of their
+  clips across its rail.
+- Light and exposure, matched to the picture region by region (its colours against offscreen renders):
+  - The engine's exposure runs at about twice belltower_sky's design scale: at a fixed exposure of 4.0 the sky showed
+    the colours it was designed for at 2.0. So the sky is baked for 1.1 and the tonemap holds 2.1-2.4.
+  - The sky still reads about a fifth darker in the engine than in its own preview (the fog over it), so the SkyBox2D's
+    Tint is 1.32.
+  - The lamps (`veridant_parts.WARM` and the rest) were first 1.75,1.10,0.58: the pylon and the grand stair read twice
+    the picture's brightness, and renders with the lamps off showed the lamps gave most of it. They're about 0.56 of
+    that now, so the light pools stay pools. The pylon is lit from its foot only, as in the picture. 108 point lights,
+    5 with shadows.
+  - The fog is a neutral mauve-grey (`FOG_COLOUR`): a pink one turned the headland brown.
+- `Sources/Veridant/editor/` (run each with the native MCP's run_csharp, `{"path": ...}`):
+  - `register.cs.txt` registers and compiles the materials, then the models, then the scene;
+  - `compile-stale.cs.txt` force-compiles anything whose source is newer than its compiled file;
+  - `capture.cs.txt` renders the views in `output/veridant/captures/config.json` offscreen, without touching the open
+    scene. A view with `"art": true` also writes the menu picture, `ui/maps/veridant.png`. `fixed_exposure` pins the
+    tonemap, and `disable` switches off components by type name (diagnostics: "PointLight", "DirectionalLight").
+    `config.main.json` has the hero, menu, sea and aerial views and `config.play.json` views from where players stand
+    (the Red spawn, the terraces, the gardens, the forecourt): copy one over `config.json`.
+    `compare_reference.png` there is the picture beside the hero view.
+- The user played a TDM on it in the editor for a couple of minutes on 2026-10-15 (Red Team, with bots); the log showed
+  no errors. Not yet checked: the other modes' objects in a match, a second client, and its frame time with the
+  backdrop and 108 point lights.
 
 ## Orion (multiplayer map, `Tools/orion_map.py`)
 - The user asked for a map as close as possible to their picture of a rocket launch facility at golden hour after rain
@@ -5082,7 +6414,7 @@ simulate_input.
     player clips and grenades.
 - `FlashbangEffect` (on the scene's camera, local only) plays it out. A flash that reaches a sense harder than what's
   left of the last one starts that sense over. At strength 1: white 4 s (1.4 s of it solid), sight 5 s (the M84's
-  "approximately five seconds"), blur and glare 6 s, deaf 1 s then muffled until 5.5 s, ringing 7 s, and dazed 5 s.
+  "approximately five seconds"), blur and glare 6 s, deaf 2 s then muffled until 8 s, ringing 10 s, and dazed 5 s.
   Closer, up to 1.3 times as long.
   - The white (`FlashbangOverlay`, a ScreenPanel at ZIndex 200, over the HUD) is flash blindness.
     - It's solid from strength 0.6 up (`FullWhite`): 4.6 m looking straight at it in the open, nearer looking away,
@@ -5101,8 +6433,16 @@ simulate_input.
     which win over the camera's own; the mode is the camera's own bloom's (Additive). The engine adds about Strength / 2
     times the blurred view (6 mips at Strength / 12), so the view is up to three times brighter. It comes up under the
     white and shows as the white thins.
-  - Hearing: the "weird.4" DSP on the master mixer, and the ringing (`sounds/player/ear_ringing.sound`, see Ordnance
-    and handling sounds).
+  - Hearing: temporary deafness (`Deafness`, `Code/GameLoop/Audio/Deafness.cs`), and the ringing
+    (`sounds/player/ear_ringing.sound`, see Ordnance and handling sounds).
+    - `DeafnessProcessor` on the Game mixer (as the acoustic reflex is): world sound up to 36 dB quieter and
+      low-passed down to 250 Hz at full deafness, easing back on a log scale as the level falls. Voice chat, music, UI
+      and radio aren't touched. The ringing plays on the master mixer, so it isn't muffled with the rest.
+    - It replaced the stock "weird.4" DSP on the master mixer (2026-10-16, the user: flash and stun grenades "should
+      do temporary deafness"), which was an effect preset rather than a hearing loss, and muffled the ringing and UI.
+    - The Flashbang is the only tactical that deafens: the M84 is the stun grenade, and the Decoy (in the
+      `M84_Stun_Grenade` folder) only plays gunfire. Blasts (HE, C4) don't deafen yet.
+    - Compiled with dotnet, not yet heard in-game.
   - Balance: the blast upsets the inner ear. It comes on over 0.15 s rather than jerking the view.
     - Every gait is up to 30% slower (`MoveSpeedScale`, in `PlayerPawn.GetWishSpeed`).
     - The aim wanders up to 2.5 degrees (`SwayDegrees`, `CameraController.ApplyFlashSway`). The owner moves their own
@@ -5465,6 +6805,27 @@ simulate_input.
   1920x1080) over the user's Cerro Blanco and Lowtide screenshots, in every state, and compiled with dotnet. Not yet seen
   in a match.
 
+## No per-frame rebuilds in the HUD (2026-10-17)
+- A Razor panel rebuilds when its `BuildHash` changes. Don't hash `Time.Now`, and don't call `StateHasChanged` from
+  `Tick`: either one rebuilds the panel every frame. Hash what the panel shows, rounded as it shows it. Set anything that
+  moves every frame (sway, radar positions, a draining bar) in `Tick` on an `@ref`'d panel's `Style`.
+- What the engine does (sbox-public's `Panel.TickInternal`): BuildHash, then the render, then the children's Tick, then
+  `OnAfterTreeRender`, then this panel's Tick, all before layout. A razor `style` attribute only sets the properties it
+  lists. So a style set from code survives a rebuild. A rebuild that makes new panels (a hotload) needs the "last set"
+  caches reset in `OnAfterTreeRender`.
+- The minimap only rebuilds when what's on the radar changes. Each icon and label is a `MinimapIconMarker` /
+  `MinimapLabelMarker` (`UI/HUD/Minimap/MinimapMarkers.cs`) that places itself every frame. The transform it builds is
+  the one the CSS parser made from the old style string.
+- `GunsmithPanel.IsAnyOpen` and `PauseMenuPanel.IsAnyOpen` read sets kept in OnEnabled/OnDisabled, so they don't search
+  the scene several times a frame for the cursor code. The cursor's 3-4 call sites a frame are left as they were.
+- Rain (`RainView`): the drops, splashes and rings exist only while rain falls, and go after 2 s dry. Only the active
+  share of drops is made (`_dropCover`). `RainLook.Apply` and the puddle decals only write values that changed.
+  `Weather` checks `HasSky` once a second while there's no view.
+- New fields reach a running match through a hotload as defaults: null lists, 0 instead of NaN. Make such lists lazily
+  (`??=`).
+- Compiled with dotnet, 0 errors. None of it has been seen in a match: the radar, the scope, the death cam, voices,
+  ammo, the kill feed, and rain starting and stopping (a Showers match).
+
 ## Damage indicator (`DamageIndicator`, `PlayerPawn.IndicatorSource`)
 - The user, shot in the back, saw the red bar for a hit from the front, from where nobody could stand (2026-10-05). The
   bar pointed from the camera at the damage's `Position`. For a bullet (players' and bots'), a blade or a zombie's
@@ -5481,6 +6842,9 @@ simulate_input.
 - Compiled nowhere (no s&box SDK in the session that wrote it), not yet seen in-game.
 
 ## Scoreboard over the HUD (`Scoreboard.razor.scss`)
+- The scoreboard's root panel survives Razor's early return while closed. Since 2026-10-18 it defaults to
+  `display: none`, and its full-screen background and backdrop blur apply only under `Scoreboard.visible`.
+  Keep those effects off the base selector: otherwise joining a game blurs and darkens the class picker and world.
 - The user saw the medals (double kill and the rest) drawn over the scoreboard. Held open, it's now over the rest of the
   HUD, at z-index 2000: over MainHUD's `.center-layer` (the medals, 1700) and `CrosshairHud` (the crosshair and hit
   markers, 1500). It was 100.
@@ -6161,6 +7525,58 @@ simulate_input.
   legs and feet), the trousers and boots on and the other garments off. A body dressed before the code hotloaded in had
   every garment off, since it had no record of what it wore; a respawn fixed it. Not yet seen from the camera.
 
+## Prone body and first-person legs (`PlayerPawn.Prone.cs`, `ThirdPersonPronePose`, 2026-10-16)
+- The user: "when i prone i should be able to see my legs like cod", with a picture of Black Ops 6's supine prone
+  (lying on the back, aiming over the legs). Players had no lying pose: prone was the crouch clip with the eyes at -40,
+  and the first-person body was hidden.
+- The body lies along `ProneYaw` (feet to head, `[Sync]`, owner-set). The view turns freely within `ProneFreeArc` (45)
+  of it; past that the body pivots after it at `ProneTurnRate` (90/s); a look further round than `RollOverAngle` (110,
+  a quick look behind) rolls it onto its back (`IsSupine`, `[Sync]`), looking along the body at the feet. Turning back
+  past 70 rolls it face down again. `ProneBlend` follows the eyes' stance rate and `SupineBlend` takes `RollTime` (0.4 s),
+  on every machine.
+- The camera stays at the lying head: `PlaceHeadForProne` moves the `Head` object (rest 9,0,60) along `ProneYaw`
+  instead of the view, so a roll leaves the head where it was. `ProneEyeTarget` is where the eyes end up.
+- `ThirdPersonPronePose` (applied in `PlayerSlideAnimationSystem`, to the body and the first-person body): pelvis and
+  legs tipped 87 degrees along the heading and spun about their length for the back; the chest propped up (bisected)
+  until, with the eyes at the camera, the pelvis is 5.5 over the floor; head and arms keep their animated aim, shifted
+  to the lying neck and shoulders; the legs laid out straight by two-bone IK, knees to the floor face down and up on the
+  back, face-down toes turned back. `ShoulderGun` then brings the third-person gun up to the eye with the bots' hand IK
+  (pistols held out, none while reloading). Locomotion and duck fade out by `ProneBlend`, so crawling has no leg motion.
+- The first-person legs show once `ProneBlend` reaches `FirstPersonLegsBlend` (0.9). On the back they lie ahead of the
+  camera at the bottom of the view.
+- The movement box is still the standing 32x32 square, so the lying legs can go into walls: behind you face down, ahead
+  of you on your back.
+- Checked offscreen on 2026-10-16 (an isolated scene in the editor): face down lies under the camera, the eyes within
+  1.2 of it, and looking back along the body the legs fill the bottom of the view. The on-the-back render isn't valid:
+  a turned root there kept its old animation frame, so render it with the root unturned and `proneYaw` 180. The leg IK
+  and `ShoulderGun` came after: compiled with dotnet only (the editor closed), not yet rendered or seen in a match, nor
+  on a second machine. In such a render, give the test body `CreateBoneObjects` or the gun won't follow the hand.
+
+## First-person grime: blood and dirt on the gun and gloves (`FirstPersonGrime`, 2026-10-16)
+- The user: "blood should go onto my gun when ive been shot and dirt when ive been prone in dirt etc".
+- `FirstPersonGrime` (on the local pawn, made by `PlayerPawn.OnUpdate`, not networked) keeps a `Grime` for the hands
+  (sleeves and gloves) and one per gun (`For( equipment )`), cleaned at each new life:
+  - Blood from `DamageTakenEvent`, by damage / 40 (0.4-1.5): arm or hand hits put most on (hands 0.45, gun 0.3), body
+    hits less (0.25, 0.18), leg hits little; a blast adds the ground's dirt. It dries over `BloodDryTime` (90 s): wet
+    glossy red to matte brown-black.
+  - Dirt from the ground under the hands while prone or sliding (`GroundOf`: soil, mud, sand, gravel, grass, concrete
+    dust, grease, by the surface's name, else `WorldSounds.Classify`): `DropDirt` going down, `CrawlRate` crawling,
+    `LyingRate` lying still, the gun half the hands' (`GunShare`). The colour follows what was added last.
+  - Rain outdoors (a trace up) rinses it (`RainWash` per mm/h) and wets it (mud, gloss); lying in water or snow
+    washes it fast.
+- It's drawn as a second skin over every renderer in the viewmodel (`GrimeSkin` marks it): the same model, bone-merged
+  to the gun's renderers, or for the sleeves and gloves posed by `ViewModelClothing` (`Follow`, kept out of its
+  cloth-material swap). Every slot wears `materials/effects/hc1_grime.vmat` (`shaders/hc1_grime.shader`) but lenses,
+  reticles, see-through and hidden pieces (`CamoMaterialRules`). The shader pushes the skin 0.012 out along its normals,
+  draws drops of three sizes, smears, dust patches and grains in the model's own space, and is see-through elsewhere.
+  The gunsmith's camo and hidden-piece passes skip `GrimeSkin` renderers.
+- `dev_grime [blood] [dirt] [ground] [dry]` sets it on the local hands and gun in hand.
+- Made with the editor closed: the C# builds with dotnet, but the shader and material have never compiled, and none of
+  it has been seen. To check: compile the shader (`EditorUtility.CompileShader`), then the vmat; `dev_grime 0.7 0.6
+  soil` and `dev_grime 0 0.8 mud` in a match, at the hip and aimed, on several guns (attachments, optics' lenses
+  clear), the sleeves and gloves following the hands, no z-fighting or lag when turning; the third-person gun stays
+  clean.
+
 ## First-person clothing (`ViewModelClothing`, `Code/Weapons/ViewModelClothing.cs`)
 - The user (2026-10-08): "when holding a gun i dont see my clothes on my arms". Every viewmodel's arms are
   `v_first_person_arms_human.vmdl`, bare skin whatever the outfit.
@@ -6392,9 +7808,27 @@ simulate_input.
     frame rate), and a dead one its ragdoll's key bones. The map isn't recorded: the sidecar names the MapInstances.
   - 15 captures a second (`SampleRate`), at the end of the frame (`ISceneStage.End`). A player's body leaving its pawn,
     and a corpse coming to rest, restart that soldier's blocks (`Restart`), so a corpse's remaining time is constants.
+  - A soldier's first capture sets up its tracks (reflection and generic recorders in the engine, the costly part), so
+    soldiers who spawn together wait (`AdmitWaiting`, 2026-10-17): each capture takes new ones, players first, each with
+    a capture of its own, while it's within 3 ms (`AdmitBudgetMicroseconds`), and always one. Those held back spawn a
+    capture or a few later in the replay, and one that dies first isn't recorded.
+  - Anim graph parameters playback can set are found once per graph (`GetGraphParameters`): finding them throws for the
+    rest, which every 2 s for every body was a source of spikes. Build codes are worked out once a capture per gun,
+    no longer, since nothing announces a build changing (a level-up, a camo colour).
   - It stops 3 s after the end-of-match screen or the map vote (30 minutes at most, or when the scene unloads), and
-    under 20 s isn't saved. The clip is serialised and written on a worker thread. The log line "Theater: stopped
-    after ..., N captures, X us on average, Y us at most" is the recorder's own cost.
+    under 20 s isn't saved. The log line "Theater: stopped after ..., N captures, X us on average, Y us at most" is the
+    recorder's own cost.
+  - Saving is one job on a worker thread (`MatchRecorder.Write`), never the main thread (it used to fall back to the
+    main thread when the worker task was cancelled, which also happens when play stops). `TheaterReplays.WriteClip`
+    serialises each life as a clip of its own through one reused `Utf8JsonWriter`, and `TheaterClipJson` lays its entry
+    into the file's Tracks, so the whole clip is never one string (a 141 MB file was 282 MB in UTF-16). It also puts back
+    what .NET's default encoder escapes and the engine's `Json.Serialize` doesn't ('+' in the base64 samples, quotes), so
+    the file is byte for byte what `Json.Serialize` wrote; names with letters outside ASCII stay escaped (the same JSON).
+    A clip not laid out as expected is written whole instead. Pruning runs on the worker too.
+    - `dotnet run --project Tools/TheaterJsonChecks` checks the splicing against .NET's serializer with the engine's
+      options (300 random clips byte for byte, Unicode, 600 lives, line feeds, bad layouts). In the editor,
+      `Sources/Theater/editor/check-writeclip.cs.txt` (run_csharp) compares `WriteClip` with `Json.Serialize` on a saved
+      replay, with times and allocations. Not run yet (2026-10-17).
   - Each living soldier's actions, for the first-person gun (`TheaterReplays.Actions`, `CaptureActions`), at each
     capture: what's in their hands (a player's `CurrentEquipment`, each time it changes, with its build code from
     `ExportWeaponBuildCode`; a bot's `WeaponResource`), and when they start and stop aiming (the "aiming" tag, a bot's
@@ -6413,6 +7847,13 @@ simulate_input.
   `razed` ident's data folder, not this project's (`razedtest`).
 - Playback (`TheaterController`) loads the MapInstances again (120 s timeout), parses the clip on a worker thread and
   drives the scene's MoviePlayer itself (`IsPlaying` false, `Position` set every frame).
+  - Reading is one job on a worker thread (`TheaterReplays.ReadClip`), never the main thread. It parses the file's bytes
+    with a `Utf8JsonReader` given the engine's comment handling and depth (512), skipping a byte order mark. It used
+    `ReadAllText`, a string twice the file's size, which `Json.Deserialize` copied back to UTF-8, and fell back to
+    parsing on the main thread when the worker task was cancelled (only once play has stopped). Every saved replay
+    (11, 3-30 MB) parsed to the same JSON from bytes as from text (2026-10-17, offline).
+    `Sources/Theater/editor/check-readclip.cs.txt` (run_csharp) compares the two in the engine, with times and
+    allocations. Not run yet. The `.actions` (under 150 KB) are still read as text.
   - Don't hand the MoviePlayer the MovieClip itself: MovieMaker evaluates every track of a clip every frame, and a long
     match has tens of thousands. `TheaterClip` (an `IMovieClip`) lists only the lives within 0.5 s of the current time
     (`SetTime`) and disables the objects of those it drops. `ListAllTracks` is on only while the player creates every
@@ -6463,8 +7904,11 @@ simulate_input.
   recorded matches on Flatgrass and watched a replay. From the log and the files:
   - a 15-minute TDM (182 lives) came to 36 MB, at 1.4 ms a capture on average and 57 ms at most;
   - a 20-minute Deathmatch (1,100 lives) came to 141 MB.
+  - Other logged matches had a capture at most of 160-410 ms (2026-09-30), and 286 ms on 2026-10-17.
 - Not yet checked: playback's frame time, and first person in-game (the first-person gun compiled on 2026-09-29, and
-  needs a new match recording to show fire, reloads and aiming).
+  needs a new match recording to show fire, reloads and aiming). The 2026-10-17 recording and loading changes compiled
+  with dotnet and hotloaded into the editor with no errors, but no match has been recorded with them and no replay
+  loaded: neither the log line's average and maximum nor a replay made or loaded with them has been seen.
 
 ## Recon drone (`Tools/build_recon_drone.py`, `Tools/build_recon_tactical.py`)
 - The user asked for an extremely realistic military recon drone, made in Blender and optimised for the game

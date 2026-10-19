@@ -17,3 +17,13 @@
 *.vpcf_c filter=lfs diff=lfs merge=lfs -text
 *.vmap_c filter=lfs diff=lfs merge=lfs -text
 *.generated.vtex_c filter=lfs diff=lfs merge=lfs -text
+
+# Generated town geometry, over GitHub's 100 MB limit: in LFS, which also avoids lengthy text comparisons that
+# lock native imports.
+Assets/models/maps/belltower/belltower_west.obj filter=lfs diff=lfs merge=lfs -text
+Assets/models/maps/belltower/belltower_east.obj filter=lfs diff=lfs merge=lfs -text
+
+# Generated Spillway scenery: inspect the Python sources and native captures.
+Assets/models/maps/spillway/spillway_mountains.obj -diff
+Assets/models/maps/spillway/spillway_forest.obj -diff
+Assets/models/maps/spillway/spillway_backdrop.obj -diff

@@ -1,3 +1,10 @@
+# Project location
+
+The canonical checkout is `C:\sbox-projects\hc1\forked-shooter-main`.
+Use that C: path for shell working directories, editor connections and project work.
+The former `D:\Documents\s&box projects\hc1\forked-shooter-main` path is a
+compatibility junction to the same files on C:, with no separate working copy.
+
 # Editor control
 
 Use the engine-provided `sbox` skill and native s&box MCP as the primary editor connection.

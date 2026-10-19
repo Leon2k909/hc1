@@ -31,12 +31,51 @@ Exports/*
 !*.shader_c
 # Engine-baked warehouse probes have no uncompiled texture equivalent.
 !Assets/scenes/maps/[Ll]owtide/lowtide_scene_data/ddgi/warehouse-*-v3/*.vtex_c
+!Assets/scenes/maps/[Ll]owtide/lowtide_scene_data/ddgi/warehouse-*-v4/*.vtex_c
+!Assets/scenes/maps/[Ll]owtide/lowtide_scene_data/ddgi/warehouse-*-v5/*.vtex_c
 # Engine lighting bakes have no uncompiled texture source.
+# Sewage's static cubes are compiled from native camera panoramas without the
+# driver's unstable runtime GGX filter; these ready-to-load copies ship with it.
+!Assets/lighting/sewage/*.vtex_c
+# Cerro Blanco's native indirect lighting has no uncompiled source equivalent.
+!Assets/lighting/cerroblanco/daylight-v1/irradiance.vtex_c
+!Assets/lighting/cerroblanco/daylight-v1/distance.vtex_c
+!Assets/lighting/cerroblanco/daylight-v1/relocation.vtex_c
+# Stable static cubes compiled from the retained native camera panoramas.
+!Assets/lighting/cerroblanco/daylight-v1/reflection_*.vtex_c
+# Riverdale's baked indirect lighting and static camera-captured reflection cubes have no
+# uncompiled texture equivalents; include them so every checkout gets the same lighting.
+!Assets/lighting/riverdale/daylight-v1/*.vtex_c
 !Assets/lighting/belltower/town-bake-v2/*.vtex_c
 !Assets/lighting/belltower/daylight-v3/*.vtex_c
 !Assets/lighting/belltower/daylight-v5/*.vtex_c
 !Assets/lighting/belltower/daylight-v6/*.vtex_c
 !Assets/lighting/belltower/daylight-v7/*.vtex_c
+!Assets/lighting/belltower/daylight-v8/irradiance.vtex_c
+!Assets/lighting/belltower/daylight-v8/distance.vtex_c
+!Assets/lighting/belltower/daylight-v8/relocation.vtex_c
+!Assets/lighting/belltower/daylight-v9/irradiance.vtex_c
+!Assets/lighting/belltower/daylight-v9/distance.vtex_c
+!Assets/lighting/belltower/daylight-v9/relocation.vtex_c
+# Railhead's native indirect-light bake has no uncompiled texture equivalent.
+!Assets/lighting/railhead/daylight-v3/irradiance.vtex_c
+!Assets/lighting/railhead/daylight-v3/distance.vtex_c
+!Assets/lighting/railhead/daylight-v3/relocation.vtex_c
+# Collider's native indirect-light textures have no uncompiled equivalent.
+!Assets/lighting/collider/lighting-v1/irradiance.vtex_c
+!Assets/lighting/collider/lighting-v1/distance.vtex_c
+!Assets/lighting/collider/lighting-v1/relocation.vtex_c
+!Assets/lighting/collider/lighting-v2/irradiance.vtex_c
+!Assets/lighting/collider/lighting-v2/distance.vtex_c
+!Assets/lighting/collider/lighting-v2/relocation.vtex_c
+!Assets/lighting/collider/reflection_*_v2.vtex_c
+!Assets/lighting/collider/lighting-v3/irradiance.vtex_c
+!Assets/lighting/collider/lighting-v3/distance.vtex_c
+!Assets/lighting/collider/lighting-v3/relocation.vtex_c
+!Assets/lighting/collider/reflection_*_v3.vtex_c
+!Assets/lighting/collider/lighting-v4/irradiance.vtex_c
+!Assets/lighting/collider/lighting-v4/distance.vtex_c
+!Assets/lighting/collider/lighting-v4/relocation.vtex_c
 *.los
 
 *launchSettings.json
@@ -59,11 +98,29 @@ __pycache__/
 /output/lowtide-bridge/
 /output/slide-validation/
 /output/slide-build.log
+
+# Spillway's static reflection cubes are compiled from native camera panoramas.
+!Assets/lighting/spillway/reflection_*.vtex_c
+!Assets/lighting/spillway/lighting-v1/irradiance.vtex_c
+!Assets/lighting/spillway/lighting-v1/distance.vtex_c
+!Assets/lighting/spillway/lighting-v1/relocation.vtex_c
+!Assets/lighting/spillway/lighting-v2/irradiance.vtex_c
+!Assets/lighting/spillway/lighting-v2/distance.vtex_c
+!Assets/lighting/spillway/lighting-v2/relocation.vtex_c
+!Assets/lighting/spillway/lighting-v3/irradiance.vtex_c
+!Assets/lighting/spillway/lighting-v3/distance.vtex_c
+!Assets/lighting/spillway/lighting-v3/relocation.vtex_c
+!Assets/lighting/spillway/lighting-v4/irradiance.vtex_c
+!Assets/lighting/spillway/lighting-v4/distance.vtex_c
+!Assets/lighting/spillway/lighting-v4/relocation.vtex_c
 # Orion: the sky's compiled cubes, copied for its static reflection probes (named by their content).
 !Assets/lighting/orion/reflection_sky_*.vtex_c
 !Assets/lighting/orion/reflection_wet_*.vtex_c
 # Orion's staging (and v1's retired assets on the machine that built v2).
 /output/orion/
-# Riverdale's baked indirect lighting and static camera-captured reflection cubes have no
-# uncompiled texture equivalents; include them so every checkout gets the same lighting.
-!Assets/lighting/riverdale/daylight-v1/*.vtex_c
+
+# Leftovers: the editor bridge's execute_csharp temp scripts, tool logs and crash dumps.
+/Editor/__Exec_*.cs
+/.playwright-cli/
+*.stackdump
+/exceptions.txt
