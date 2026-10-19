@@ -1,0 +1,36 @@
+wrote paving: rw_paving, rw_paving_warm, rw_paving_dark (2048 px, 240 units a tile, 8.5 px an inch)
+wrote tactile: rw_tactile (1024 px, 24 units a tile, 42.7 px an inch)
+wrote tactile_dots: rw_tactile_dots (1024 px, 24 units a tile, 42.7 px an inch)
+wrote coping: rw_coping (1024 px, 39.37 units a tile, 26.0 px an inch)
+wrote lines: rw_line_white, rw_line_yellow, rw_hazard (512 px, 32 units a tile, 16.0 px an inch)
+wrote ballast: rw_ballast, rw_ballast_rusty, rw_ballast_old (2048 px, 160 units a tile, 12.8 px an inch)
+wrote sleeper: rw_sleeper (1024 px, 48 units a tile, 21.3 px an inch)
+wrote sleeper_wood: rw_sleeper_wood (1024 px, 48 units a tile, 21.3 px an inch)
+wrote rail: rw_rail (512 px, 32 units a tile, 16.0 px an inch)
+wrote rail_head: rw_rail_head (512 px, 32 units a tile, 16.0 px an inch)
+wrote asphalt: rw_asphalt (2048 px, 192 units a tile, 10.7 px an inch)
+wrote kerb: rw_kerb (1024 px, 96 units a tile, 10.7 px an inch)
+wrote setts: rw_setts (2048 px, 128 units a tile, 16.0 px an inch)
+wrote concrete: rw_concrete, rw_concrete_dark (2048 px, 256 units a tile, 8.0 px an inch)
+wrote terrazzo: rw_terrazzo, rw_terrazzo_border (4096 px, 192 units a tile, 21.3 px an inch)
+Traceback (most recent call last):
+  File "D:\Documents\s&box projects\hc1\forked-shooter-main\Tools\railhead_materials.py", line 4445, in <module>
+    main()
+    ~~~~^^
+  File "D:\Documents\s&box projects\hc1\forked-shooter-main\Tools\railhead_materials.py", line 4437, in main
+    results = { name: write_texture( name, out_dir ) for name in names }
+                      ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "D:\Documents\s&box projects\hc1\forked-shooter-main\Tools\railhead_materials.py", line 4360, in write_texture
+    save_rgb( out_dir / f"{name}_normal.png", ( normal * 0.5 + 0.5 ) * 255 )
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Documents\s&box projects\hc1\forked-shooter-main\Tools\railhead_materials.py", line 4238, in save_rgb
+    Image.fromarray( np.clip( np.rint( a ), 0, 255 ).astype( np.uint8 ), "RGB" ).save( path, optimize=True )
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\leon2\AppData\Roaming\Python\Python313\site-packages\PIL\Image.py", line 2708, in save
+    fp = builtins.open(filename, "w+b")
+OSError: [Errno 22] Invalid argument: 'D:\\Documents\\s&box projects\\hc1\\forked-shooter-main\\Assets\\materials\\railhead\\sandstone_normal.png'
+
+real	8m2.439s
+user	0m0.000s
+sys	0m0.015s
+materials exit 1

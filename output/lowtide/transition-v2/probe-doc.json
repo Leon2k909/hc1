@@ -1,0 +1,195 @@
+﻿{
+  "ClassName": "EnvmapProbe",
+  "Namespace": "Sandbox",
+  "Title": "Envmap Probe",
+  "Description": "A cubemap probe that captures the environment around it.",
+  "Group": "Light",
+  "Icon": "radio_button_unchecked",
+  "BaseType": "Component",
+  "Properties": [
+    {
+      "Name": "Mode",
+      "Title": "Mode",
+      "Description": null,
+      "Type": "EnvmapProbeMode",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "Projection",
+      "Title": "Projection",
+      "Description": null,
+      "Type": "ProjectionMode",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "TintColor",
+      "Title": "Tint Color",
+      "Description": null,
+      "Type": "Color",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "Bounds",
+      "Title": "Bounds",
+      "Description": null,
+      "Type": "BBox",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "Feathering",
+      "Title": "Feathering",
+      "Description": null,
+      "Type": "Single",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "Priority",
+      "Title": "Priority",
+      "Description": "Gets or sets the priority level for the object.",
+      "Type": "Int32",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "Texture",
+      "Title": "Texture",
+      "Description": "If this is set, the EnvmapProbe will use a custom cubemap texture instead of rendering dynamically",
+      "Type": "Texture",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "BakedTexture",
+      "Title": "Baked Texture",
+      "Description": "The texture that was baked for this envmap probe",
+      "Type": "Texture",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "Resolution",
+      "Title": "Resolution",
+      "Description": "Resolution of the cubemap texture",
+      "Type": "CubemapResolution",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "ZNear",
+      "Title": "Znear",
+      "Description": null,
+      "Type": "Single",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "ZFar",
+      "Title": "Zfar",
+      "Description": null,
+      "Type": "Single",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "UpdateStrategy",
+      "Title": "Update Strategy",
+      "Description": null,
+      "Type": "CubemapDynamicUpdate",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "MaxDistance",
+      "Title": "Max Distance",
+      "Description": "Only update dynamically if we're this close to it",
+      "Type": "Single",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "DelayBetweenUpdates",
+      "Title": "Delay Between Updates",
+      "Description": null,
+      "Type": "Single",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "FrameInterval",
+      "Title": "Frame Interval",
+      "Description": null,
+      "Type": "Int32",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnComponentEnabled",
+      "Title": "On Component Enabled",
+      "Description": null,
+      "Type": "Action",
+      "Group": "Component",
+      "ReadOnly": false
+    },
+    {
+      "Name": "MultiBounce",
+      "Title": "Multi Bounce",
+      "Description": "Minimum amount of reflection bounces to render when first enabled before settling, at cost of extra performance on load Often times you don't need this",
+      "Type": "Boolean",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnComponentStart",
+      "Title": "On Component Start",
+      "Description": null,
+      "Type": "Action",
+      "Group": "Component",
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnComponentUpdate",
+      "Title": "On Component Update",
+      "Description": null,
+      "Type": "Action",
+      "Group": "Component",
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnComponentFixedUpdate",
+      "Title": "On Component Fixed Update",
+      "Description": null,
+      "Type": "Action",
+      "Group": "Component",
+      "ReadOnly": false
+    },
+    {
+      "Name": "RenderExcludeTags",
+      "Title": "Render Exclude Tags",
+      "Description": "Objects with any of these tags will be excluded when rendering this cubemap.",
+      "Type": "TagSet",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnComponentDisabled",
+      "Title": "On Component Disabled",
+      "Description": null,
+      "Type": "Action",
+      "Group": "Component",
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnComponentDestroy",
+      "Title": "On Component Destroy",
+      "Description": null,
+      "Type": "Action",
+      "Group": "Component",
+      "ReadOnly": false
+    }
+  ]
+}

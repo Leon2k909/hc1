@@ -1,0 +1,290 @@
+{
+  "status": "Native albedo-only decal candidate reviewed in eight stills across both halves; map unchanged.",
+  "manifest_sha256": "f0dacad2b8cf65c443ccf57ad284482d1f24dadb04137dae98145fd26a4f9576",
+  "compilation": [
+    {
+      "path": "decals/belltower/ground-edge-v2/ground_0.decal",
+      "source_sha256": "f31ae7c280dfd84797734c5179886ecb700b00851695a61765f20908a4fe3eaa",
+      "compiled_sha256": "4aa000df8380c7308f021a953604108f4a32f676005933906c7578f039c36276"
+    },
+    {
+      "path": "decals/belltower/ground-edge-v2/ground_1.decal",
+      "source_sha256": "02db42b6bba8cdb84ab61b5a06e2755be489c300484d9e0ec52053e282544c66",
+      "compiled_sha256": "3bf25ce7348d329c7f405c16891b134eb8ef73491117127cefbdb02bb4ac8028"
+    },
+    {
+      "path": "decals/belltower/ground-edge-v2/ground_2.decal",
+      "source_sha256": "367d020616d6559a5b082a38ca40231c937a8cfea480f91a152b4bad5b941b4f",
+      "compiled_sha256": "504787d02695565e8337c227735f3f9395ff88d1432d1c7dccf6c0e23f34f9d5"
+    },
+    {
+      "path": "decals/belltower/ground-edge-v2/ground_3.decal",
+      "source_sha256": "f5ec99aa720b9a982447366601ee2dfe1b9f0d5c08a43c08d0560ca521514598",
+      "compiled_sha256": "6c5b1cd8b871aded43d7970a15c8dc203e2b433e200e5d09a0489d68aa490ab6"
+    }
+  ],
+  "native_projection_audit": {
+    "Placements": 116,
+    "MaximumPlanarErrorInches": 0.00012207031,
+    "SurfacePlaneContained": 116,
+    "PublicUnrotatedBoundsMaximumErrorInches": 13.856354,
+    "Method": "Native GetDecalVolume with actual world rotation; public WorldBounds omits rotation in this engine.",
+    "Errors": [],
+    "OriginalObjectIdentitiesRestored": true,
+    "ManifestSha256": "f0dacad2b8cf65c443ccf57ad284482d1f24dadb04137dae98145fd26a4f9576",
+    "GamePreserved": true,
+    "SelectedDocumentPreserved": true,
+    "SceneHasUnsavedChanges": false
+  },
+  "views": [
+    {
+      "view": "ground-edge",
+      "images": {
+        "baseline": {
+          "path": "output/belltower/quality/ground-edge-v2-native-dedup-baseline/ground-edge.png",
+          "sha256": "6b0872a82b1019196f56c5730f7b17706b6e3e5fc58110ffbc819cd701463e02"
+        },
+        "control": {
+          "path": "output/belltower/quality/ground-edge-v2-native-all-control/ground-edge.png",
+          "sha256": "5078f9ae403bdf868e8aa2185d3cdd89c5fcc44fb4daca0cb66c8380ba720056"
+        },
+        "candidate": {
+          "path": "output/belltower/quality/ground-edge-v2-native-all-half/ground-edge.png",
+          "sha256": "1119b2254a630f342e632fa7497f8a5c1e6561afdd7ae83c1a9766af436688d9"
+        }
+      },
+      "control": {
+        "mean_abs_rgb_8bit": 0.00017425411522633744,
+        "changed_over_3_fraction": 2.8935185185185184e-06
+      },
+      "candidate": {
+        "mean_abs_rgb_8bit": 0.03647987397119341,
+        "changed_over_3_fraction": 0.0031129436728395063
+      },
+      "recorded_inputs_matched": true,
+      "decals_restored_per_trial_capture": 116,
+      "tone_restored": true
+    },
+    {
+      "view": "ground-edge-close",
+      "images": {
+        "baseline": {
+          "path": "output/belltower/quality/ground-edge-v2-native-dedup-baseline/ground-edge-close.png",
+          "sha256": "ffef1aa44ae19c5c3bfed3cc610c360fa0d769e68c6f0b99f139bde490601bef"
+        },
+        "control": {
+          "path": "output/belltower/quality/ground-edge-v2-native-all-control/ground-edge-close.png",
+          "sha256": "13e59ff0d814a98636204e4d016e6a11ca5973aac201d377e831f90f68dbb0cd"
+        },
+        "candidate": {
+          "path": "output/belltower/quality/ground-edge-v2-native-all-half/ground-edge-close.png",
+          "sha256": "8bd12e7bd0d8c8a6abbbdebabf6c835785bde0d1c55f86b3d48a02a839ac5196"
+        }
+      },
+      "control": {
+        "mean_abs_rgb_8bit": 8.809156378600823e-05,
+        "changed_over_3_fraction": 4.822530864197531e-07
+      },
+      "candidate": {
+        "mean_abs_rgb_8bit": 0.07263535236625514,
+        "changed_over_3_fraction": 0.005853105709876543
+      },
+      "recorded_inputs_matched": true,
+      "decals_restored_per_trial_capture": 116,
+      "tone_restored": true
+    },
+    {
+      "view": "ground-edge-sunlit",
+      "images": {
+        "baseline": {
+          "path": "output/belltower/quality/ground-edge-v2-native-dedup-baseline/ground-edge-sunlit.png",
+          "sha256": "d565bc08580c07d9fe639d80342c4bdac3ac3dbe3b7c32b849086b8dca2c622c"
+        },
+        "control": {
+          "path": "output/belltower/quality/ground-edge-v2-native-all-control/ground-edge-sunlit.png",
+          "sha256": "5a5cb4161fc6e94183c05f216ccd0a453b3c4645b1c9c19aff3fc68a6ba3bd68"
+        },
+        "candidate": {
+          "path": "output/belltower/quality/ground-edge-v2-native-all-half/ground-edge-sunlit.png",
+          "sha256": "29ffd4f2dbed229649c02ce9cf379d2d0fb7741c7d99e4724c8c0b25cce9e64e"
+        }
+      },
+      "control": {
+        "mean_abs_rgb_8bit": 0.003333815586419753,
+        "changed_over_3_fraction": 0.0001326195987654321
+      },
+      "candidate": {
+        "mean_abs_rgb_8bit": 0.17389789094650207,
+        "changed_over_3_fraction": 0.0067182677469135805
+      },
+      "recorded_inputs_matched": true,
+      "decals_restored_per_trial_capture": 116,
+      "tone_restored": true
+    },
+    {
+      "view": "ground-edge-sunlit-close",
+      "images": {
+        "baseline": {
+          "path": "output/belltower/quality/ground-edge-v2-native-dedup-baseline/ground-edge-sunlit-close.png",
+          "sha256": "0b94a4e10ba2d99617a1c436afa24b0da3826b8ff22f5054ba8c6c14114988c9"
+        },
+        "control": {
+          "path": "output/belltower/quality/ground-edge-v2-native-all-control/ground-edge-sunlit-close.png",
+          "sha256": "cc8b051bc3b16790f8177d2b9d28a82e2e4283f7204c6b5997652250286e4b41"
+        },
+        "candidate": {
+          "path": "output/belltower/quality/ground-edge-v2-native-all-half/ground-edge-sunlit-close.png",
+          "sha256": "bcb6a53ba99c4ed84a7aaabe2abd6ab0519f6faff63f5e73040092d3303e7f1b"
+        }
+      },
+      "control": {
+        "mean_abs_rgb_8bit": 0.00032632458847736624,
+        "changed_over_3_fraction": 1.736111111111111e-05
+      },
+      "candidate": {
+        "mean_abs_rgb_8bit": 0.16167325745884772,
+        "changed_over_3_fraction": 0.006558159722222222
+      },
+      "recorded_inputs_matched": true,
+      "decals_restored_per_trial_capture": 116,
+      "tone_restored": true
+    },
+    {
+      "view": "ground-edge-east-street",
+      "images": {
+        "baseline": {
+          "path": "output/belltower/quality/ground-edge-v2-native-east-baseline/ground-edge-east-street.png",
+          "sha256": "f361bc612951e9eaa4dc5b63f745e7ddada92ff2df23a7cb4367d74510a3e56a"
+        },
+        "control": {
+          "path": "output/belltower/quality/ground-edge-v2-native-east-control/ground-edge-east-street.png",
+          "sha256": "ba3a615d3523d1a2bab382857ddf29d83efe55e61e9a590a364725cf14105370"
+        },
+        "candidate": {
+          "path": "output/belltower/quality/ground-edge-v2-native-east-half/ground-edge-east-street.png",
+          "sha256": "31ed11be724ce19b8fe866511236a9cbee2117597b2e32690b413bcdfdbd064c"
+        }
+      },
+      "control": {
+        "mean_abs_rgb_8bit": 0.0025422775205761316,
+        "changed_over_3_fraction": 8.391203703703703e-05
+      },
+      "candidate": {
+        "mean_abs_rgb_8bit": 0.0857251478909465,
+        "changed_over_3_fraction": 0.003355516975308642
+      },
+      "recorded_inputs_matched": true,
+      "decals_restored_per_trial_capture": 116,
+      "tone_restored": true
+    },
+    {
+      "view": "ground-edge-east-street-close",
+      "images": {
+        "baseline": {
+          "path": "output/belltower/quality/ground-edge-v2-native-east-baseline/ground-edge-east-street-close.png",
+          "sha256": "68d3d53387b583f2620fbc818e9f4c624bb011a372f7fa30fa7bc991b00523bf"
+        },
+        "control": {
+          "path": "output/belltower/quality/ground-edge-v2-native-east-control/ground-edge-east-street-close.png",
+          "sha256": "0a1aabfecf434e1234f6f55a06ad56b67a71c79f6bbfe05c1467a19e48f9bac1"
+        },
+        "candidate": {
+          "path": "output/belltower/quality/ground-edge-v2-native-east-half/ground-edge-east-street-close.png",
+          "sha256": "183ab33e4f92db4d15e46e1a52ae1d9be73e14bc93b3fe178aa6126e30f45a11"
+        }
+      },
+      "control": {
+        "mean_abs_rgb_8bit": 1.511059670781893e-05,
+        "changed_over_3_fraction": 2.4112654320987654e-06
+      },
+      "candidate": {
+        "mean_abs_rgb_8bit": 0.14643856095679011,
+        "changed_over_3_fraction": 0.006140046296296296
+      },
+      "recorded_inputs_matched": true,
+      "decals_restored_per_trial_capture": 116,
+      "tone_restored": true
+    },
+    {
+      "view": "ground-edge-east-wall",
+      "images": {
+        "baseline": {
+          "path": "output/belltower/quality/ground-edge-v2-native-east-baseline/ground-edge-east-wall.png",
+          "sha256": "8d3b8dd7194990e2c276163a13677091862b91541bd44b63042068914c2b3a77"
+        },
+        "control": {
+          "path": "output/belltower/quality/ground-edge-v2-native-east-control/ground-edge-east-wall.png",
+          "sha256": "8d3b8dd7194990e2c276163a13677091862b91541bd44b63042068914c2b3a77"
+        },
+        "candidate": {
+          "path": "output/belltower/quality/ground-edge-v2-native-east-half/ground-edge-east-wall.png",
+          "sha256": "a0f20deff82ec0cbc6b30619657b655e13fb937804654c0503875a788d3bb664"
+        }
+      },
+      "control": {
+        "mean_abs_rgb_8bit": 0.0,
+        "changed_over_3_fraction": 0.0
+      },
+      "candidate": {
+        "mean_abs_rgb_8bit": 0.1264086612654321,
+        "changed_over_3_fraction": 0.006575038580246914
+      },
+      "recorded_inputs_matched": true,
+      "decals_restored_per_trial_capture": 116,
+      "tone_restored": true
+    },
+    {
+      "view": "ground-edge-east-wall-close",
+      "images": {
+        "baseline": {
+          "path": "output/belltower/quality/ground-edge-v2-native-east-baseline/ground-edge-east-wall-close.png",
+          "sha256": "7d4216ca2e2b7f3895a987b9c2928979b28c06851053ffdf376e77a27e1f50cf"
+        },
+        "control": {
+          "path": "output/belltower/quality/ground-edge-v2-native-east-control/ground-edge-east-wall-close.png",
+          "sha256": "7d4216ca2e2b7f3895a987b9c2928979b28c06851053ffdf376e77a27e1f50cf"
+        },
+        "candidate": {
+          "path": "output/belltower/quality/ground-edge-v2-native-east-half/ground-edge-east-wall-close.png",
+          "sha256": "4b15f468b82e2c6634ee6b79a4e172a96005a0c1204a11787483920f969d32b5"
+        }
+      },
+      "control": {
+        "mean_abs_rgb_8bit": 0.0,
+        "changed_over_3_fraction": 0.0
+      },
+      "candidate": {
+        "mean_abs_rgb_8bit": 0.1457327031893004,
+        "changed_over_3_fraction": 0.006735628858024692
+      },
+      "recorded_inputs_matched": true,
+      "decals_restored_per_trial_capture": 116,
+      "tone_restored": true
+    }
+  ],
+  "native_control_passed": true,
+  "candidate_color_mix": 0.5,
+  "method": "Native Multiply decal, no normal, roughness, metalness, AO, emission or parallax override.",
+  "original_source_pixels_and_alpha_preserved": true,
+  "visual_review": "The existing cobble relief remains visible through a restrained dirt stain in sun and shade. The earlier bright flat gravel strip is avoided. This is a local still-image improvement, not overall map acceptance.",
+  "invalid_captures": {
+    "directories": [
+      "ground-edge-v2-native-baseline",
+      "ground-edge-v2-native-control",
+      "ground-edge-v2-native-half",
+      "ground-edge-v2-native-warm-baseline",
+      "ground-edge-v2-native-warm-control",
+      "ground-edge-v2-native-warm-half"
+    ],
+    "reason": "Background stone/plaster textures lost detail with the initial material prewarm. The current helper uses the established filtered material set, keeps distinct materials through prewarm, and requests all normal-map variants."
+  },
+  "exposure_scope": "Temporary ACES exposure 2 for comparisons; original tone and camera restored after each image.",
+  "remaining": [
+    "Check representative gameplay motion, distance/culling and cost in Belltower when the shared editor is available.",
+    "Check the remaining frontages during that walkthrough before saving a permanent scene group."
+  ],
+  "accepted_scene_changed": false,
+  "trial_promoted": false,
+  "gameplay_performance_verified": false,
+  "overall_quality_goal_complete": false
+}

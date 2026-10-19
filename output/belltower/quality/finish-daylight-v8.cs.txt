@@ -1,0 +1,88 @@
+// One-time recovery: the initial bake saved final two-pass DDGI textures, then
+// failed at reflection-square because a baked probe has no realtime target.
+// The explicit Quality reflection path then GPU-faulted in envmap_filtering_cs.
+// Preserve both reports; reuse the accepted v7 reflections without recapturing.
+var root = Sandbox.Project.Current.GetRootPath();
+var destination = System.IO.Path.Combine(root,"output/belltower/quality/daylight-v8");
+var nativeDirectory = System.IO.Path.Combine(root,"Assets/lighting/belltower/daylight-v8");
+var failure = System.IO.File.ReadAllText(System.IO.Path.Combine(destination,"bake-status.txt"));
+if (!failure.StartsWith("Failed: System.InvalidOperationException: Invalid capture: reflection-square"))
+    throw new InvalidOperationException("Unexpected previous bake state; inspect it first");
+var nativeFiles=System.IO.Directory.EnumerateFiles(nativeDirectory).Select(System.IO.Path.GetFileName).ToArray();
+if (nativeFiles.Length<3 || nativeFiles.Any(x=>x!="irradiance.vtex_c" && x!="distance.vtex_c" && x!="relocation.vtex_c" && x!="reflection-square.vtex_c"))
+    throw new InvalidOperationException("Unexpected previous texture outputs; inspect them first");
+var source = System.IO.Path.Combine(root,"Assets/scenes/maps/Belltower/belltower.scene");
+string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path)));
+if (Hash(source)!=Hash(System.IO.Path.Combine(destination,"visual-scene.json")))
+    throw new InvalidOperationException("The saved scene changed after the bake");
+var session = Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase)==true);
+if (session.HasUnsavedChanges) throw new InvalidOperationException("Inspect unsaved scene edits first");
+var scene = session.Scene;
+var indirect = scene.GetAllComponents<IndirectLightVolume>().Single();
+var probes = scene.GetAllComponents<EnvmapProbe>().ToArray();
+if (indirect.ProbeCounts.ToString()!="28,39,5" || probes.Length!=3) throw new InvalidOperationException("Lighting setup changed");
+var original = (indirect.IrradianceTexture,indirect.DistanceTexture,indirect.RelocationTexture,indirect.BakeVersion);
+var originalReflections = probes.Select(p=>(Probe:p,Texture:p.BakedTexture,Mode:p.Mode)).ToArray();
+var gameId = Game.ActiveScene?.Id;
+var playing = Game.IsPlaying;
+var flags = System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var dirty = typeof(IndirectLightVolume).GetMethod("MarkDirty",flags);
+var updateProbe = typeof(EnvmapProbe).GetMethod("UpdateSceneObject",flags);
+Texture Load(string name)
+{
+    var file=System.IO.Path.Combine(nativeDirectory,name+".vtex_c");
+    if(!System.IO.File.Exists(file) || new System.IO.FileInfo(file).Length==0) throw new InvalidOperationException("Missing "+name);
+    var texture=Texture.Load("lighting/belltower/daylight-v8/"+name+".vtex",false);
+    if(texture is null || texture.IsError) throw new InvalidOperationException("Invalid "+name);
+    return texture;
+}
+void UpdateIndirect()
+{
+    dirty.Invoke(indirect,null);
+    var type=typeof(Scene).Assembly.GetType("Sandbox.DDGIVolumeSystem");
+    var getter=typeof(Scene).GetMethods().Single(m=>m.Name=="GetSystem" && m.IsGenericMethodDefinition && m.GetParameters().Length==0);
+    var system=getter.MakeGenericMethod(type).Invoke(scene,null);
+    type.GetMethod("MarkDirty",flags).Invoke(system,null);
+    type.GetMethod("UpdateVolumes",flags).Invoke(system,null);
+}
+bool complete=false;
+try
+{
+    // SaveToVtex wrote this during the device fault. It is not a valid accepted
+    // reflection; preserve it with the crash evidence outside the asset tree.
+    var failedReflection=System.IO.Path.Combine(nativeDirectory,"reflection-square.vtex_c");
+    if(System.IO.File.Exists(failedReflection))
+    {
+        var preserved=System.IO.Path.Combine(root,"output/belltower/quality/daylight-v8-gpu-crash/reflection-square-unaccepted.vtex_c");
+        if(System.IO.File.Exists(preserved)) throw new InvalidOperationException("An archived failed reflection already exists; inspect it before proceeding");
+        System.IO.File.Move(failedReflection,preserved);
+    }
+    indirect.IrradianceTexture=Load("irradiance");
+    indirect.DistanceTexture=Load("distance");
+    indirect.RelocationTexture=Load("relocation");
+    indirect.BakeVersion=1;
+    using(scene.Push()) UpdateIndirect();
+    if(probes.Any(p=>p.Mode!=EnvmapProbe.EnvmapProbeMode.Baked || p.BakedTexture is null || p.BakedTexture.IsError || !p.BakedTexture.ResourcePath.Contains("daylight-v7/")))
+        throw new InvalidOperationException("Expected the accepted v7 reflections");
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"indirect-light.json"),indirect.GameObject.Serialize().ToJsonString());
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"reflections-baked.json"),probes[0].GameObject.Parent.Serialize().ToJsonString());
+    var result=new { Passes=2, SavedFinalIrradiance=true, Grid="28,39,5", PersistentEditorScene=true, SceneId=scene.Id,
+        Reflections=3, CapturedReflections=0, RetainedReflectionTextures=probes.Select(p=>p.BakedTexture.ResourcePath).ToArray(),
+        SavedScene=false, RecoveredAfterReflectionFailure=true,
+        RecoveryEvidence="Initial script reached reflection-square only after RunAsync completed both passes and saved its final irradiance, distance and relocation textures.",
+        GamePreserved=Game.ActiveScene?.Id==gameId && Game.IsPlaying==playing };
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"initial-reflection-failure.txt"),failure);
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"bake-result.json"),System.Text.Json.JsonSerializer.Serialize(result));
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"bake-status.txt"),"Complete 28,39,5");
+    complete=true;
+    return result;
+}
+finally
+{
+    if(!complete)
+    {
+        indirect.IrradianceTexture=original.Item1;indirect.DistanceTexture=original.Item2;indirect.RelocationTexture=original.Item3;indirect.BakeVersion=original.Item4;
+        foreach(var item in originalReflections) { item.Probe.BakedTexture=item.Texture;item.Probe.Mode=item.Mode;updateProbe.Invoke(item.Probe,null); }
+        using(scene.Push()) UpdateIndirect();
+    }
+}

@@ -1,0 +1,69 @@
+{
+  "__guid": "0bd5a15b-20f6-5921-80b2-44ba7858f147",
+  "__version": 2,
+  "Flags": 0,
+  "Name": "Indirect Light",
+  "Position": "0,0,0",
+  "Rotation": "0,0,0,1",
+  "Scale": "1,1,1",
+  "Tags": "",
+  "Enabled": true,
+  "NetworkMode": 2,
+  "NetworkFlags": 0,
+  "NetworkOrphaned": 0,
+  "NetworkTransmit": true,
+  "OwnerTransfer": 1,
+  "Components": [],
+  "Children": [
+    {
+      "__guid": "69023496-4d0e-5d3f-ba52-5a039e931d7c",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Town Indirect Light",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.IndirectLightVolume",
+          "__guid": "8037b73f-4e97-55cf-85e8-3d843fbd7b98",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 2,
+          "BakeVersion": 1,
+          "BlendDistance": 120,
+          "Bounds": {
+            "Mins": "-1480,-2400,-80",
+            "Maxs": "1880,2400,600"
+          },
+          "DistanceTexture": "lighting/belltower/daylight-v3/distance.vtex",
+          "InsideGeometry": "Relocate",
+          "IrradianceTexture": "lighting/belltower/daylight-v3/irradiance.vtex",
+          "NormalBias": 5,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "ProbeDensity": 4,
+          "RelocationTexture": "lighting/belltower/daylight-v3/relocation.vtex",
+          "RenderExcludeTags": "",
+          "RuntimeContrast": 1,
+          "RuntimeIntensity": 2,
+          "RuntimeSaturation": 1,
+          "RuntimeTint": "1,1,1,1",
+          "ViewBias": 2
+        }
+      ],
+      "Children": []
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "kind": "Matched CPU construction views",
+  "native_engine_capture": false,
+  "generator_sha256": "034b18117112b68e7fa3e6a65b10eaecf64a4b3669664fb56f1dfbd4d843596f",
+  "reviewer_sha256": "972311b169a169ffd063aee6791371307c8d867a8fc9e88e987e60899d703b55",
+  "renderer_sha256": "75c516523262951f33bf2cdb602c0e1fa49a39d3fa1d8f84e274db53a49c73e3",
+  "source_colour_sha256": "cba4b53c48fddc6576badbfe4c0b35f6690be99fabfbcff5dac15cf579fc8025",
+  "source_colour_pixels_preserved": true,
+  "exported_meshes": {
+    "single-before.obj": "012e8b2af6d443b4243700833620c065a3cdb78623007125a1d88a381bfebc00",
+    "stack-before.obj": "643b8be5fbcd36fe346d50f0b09e90c5f179e0353763e854fd532db913f86b0a",
+    "single-candidate.obj": "6d4c08a73ab5f24a829df887d8b24049070a782c6215bfe386b62374ca4b36d5",
+    "stack-candidate.obj": "9c8dbfafde6db5c415bf2eac62e964e2e6dda5efcdb695527d946cd39dfcc09d"
+  },
+  "views": {
+    "single": {
+      "eye": [
+        1.1,
+        -1.5,
+        0.95
+      ],
+      "target": [
+        0.0,
+        0.0,
+        0.12
+      ],
+      "scale": 0.9,
+      "size": [
+        1050,
+        850
+      ]
+    },
+    "mouth": {
+      "eye": [
+        0.35,
+        -1.5,
+        0.45
+      ],
+      "target": [
+        0.0,
+        -0.37,
+        0.13
+      ],
+      "scale": 0.45,
+      "size": [
+        1050,
+        760
+      ]
+    },
+    "stack": {
+      "eye": [
+        1.55,
+        -2.1,
+        1.25
+      ],
+      "target": [
+        0.2,
+        0.25,
+        0.25
+      ],
+      "scale": 1.55,
+      "size": [
+        1100,
+        900
+      ]
+    }
+  },
+  "previews": {
+    "mouth-before.png": "29271a78f24b01cba54f8c9132fc86aa48f8647c9e6690576c7263411ce5f2d9",
+    "mouth-candidate.png": "3fbcdf3a1e78de94272a501fefc3a35598588e73a329309c34c95717a1e91a49",
+    "single-before.png": "d5258abbc0b4f7acc4f2a443760dc697c1e4323109ef5c8e0a15e7d77bdbeca6",
+    "single-candidate.png": "f4179d8d1de992e0005f737275aa9091babd332616e9e1c3bd5922c6e7e4e759",
+    "stack-before.png": "2d397479f617e23bd8d3d58a02736146a934f0dc19c3139b637c2ce51c902824",
+    "stack-candidate.png": "0250d63cf3602e671e65a1b2314608a7b9dcd24bec1959faf408567afa73300a"
+  },
+  "limitations": [
+    "No engine GI, fibre normal mapping, texture mip/compression or temporal rendering",
+    "Isolated sack examples; integration and gameplay cost remain unverified"
+  ]
+}

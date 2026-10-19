@@ -1,0 +1,167 @@
+{
+  "Context": "Gameplay camera in the lower hall; second local client still loading project packages.",
+  "Overview": {
+    "Window": {
+      "Frames": 143,
+      "Seconds": 2.01
+    },
+    "Fps": 71.2,
+    "TargetFps": 90,
+    "TargetSource": "fps_max_inactive",
+    "LimitedBy": "GPU",
+    "MeetingTarget": false,
+    "Rating": "Warning",
+    "Frame": {
+      "AvgMs": 14.05,
+      "P50Ms": 13.03,
+      "P99Ms": 31.48,
+      "MaxMs": 36.94
+    },
+    "CpuWork": {
+      "AvgMs": 14.02,
+      "P50Ms": 13.03,
+      "P99Ms": 31.48,
+      "MaxMs": 36.94
+    },
+    "Gpu": {
+      "AvgMs": 17.6,
+      "P50Ms": 17.5,
+      "P99Ms": 19.86,
+      "MaxMs": 20.51
+    },
+    "CapWait": {
+      "AvgMs": 0.02,
+      "P50Ms": 0,
+      "P99Ms": 0.99,
+      "MaxMs": 1.55
+    },
+    "PerfHubWindow": null,
+    "Hitches": {
+      "Count": 5,
+      "OverMs": 26.1,
+      "WorstMs": 36.9
+    },
+    "Issues": [
+      {
+        "Severity": "Bad",
+        "Title": "5 hitches",
+        "Detail": "over 26 ms in 2.0 s, worst 37 ms",
+        "MoreIn": "perf_cpu"
+      },
+      {
+        "Severity": "Warning",
+        "Title": "GC pauses",
+        "Detail": "7.1 ms in the last second",
+        "MoreIn": "perf_memory"
+      }
+    ],
+    "MainThread": [
+      {
+        "Name": "Render",
+        "AvgMs": 7.33,
+        "MaxMs": 16.38
+      },
+      {
+        "Name": "UI",
+        "AvgMs": 1.41,
+        "MaxMs": 3.51
+      },
+      {
+        "Name": "Update",
+        "AvgMs": 1.31,
+        "MaxMs": 3.51
+      },
+      {
+        "Name": "Editor",
+        "AvgMs": 1.05,
+        "MaxMs": 20.26
+      },
+      {
+        "Name": "Animation",
+        "AvgMs": 1.03,
+        "MaxMs": 2.46
+      },
+      {
+        "Name": "Audio",
+        "AvgMs": 0.38,
+        "MaxMs": 1.73
+      },
+      {
+        "Name": "Particles",
+        "AvgMs": 0.12,
+        "MaxMs": 0.34
+      },
+      {
+        "Name": "GcPause",
+        "AvgMs": 0.11,
+        "MaxMs": 5.5
+      }
+    ],
+    "GpuPasses": [
+      {
+        "Name": "Dynamic Opaque Forward",
+        "AvgMs": 2.34,
+        "MaxMs": 2.99,
+        "Path": "RenderToSwapChain / Dynamic Opaque Forward"
+      },
+      {
+        "Name": "DrawDepthOpaque",
+        "AvgMs": 0.85,
+        "MaxMs": 1.16,
+        "Path": "Sandbox.ScenePointLight_Shadow / DrawDepthOpaque"
+      },
+      {
+        "Name": "GameOverlay",
+        "AvgMs": 0.76,
+        "MaxMs": 0.94,
+        "Path": "RenderToSwapChain / GameOverlay"
+      },
+      {
+        "Name": "DrawDepthTranslucent",
+        "AvgMs": 0.45,
+        "MaxMs": 2.52,
+        "Path": "Sandbox.ScenePointLight_Shadow / DrawDepthTranslucent"
+      },
+      {
+        "Name": "UI Root: GameRootPanel",
+        "AvgMs": 0.41,
+        "MaxMs": 0.56,
+        "Path": "Managed: UI / UI Root: GameRootPanel"
+      },
+      {
+        "Name": "Bloom",
+        "AvgMs": 0.22,
+        "MaxMs": 0.42,
+        "Path": "Managed: BeforePostProcessing / Bloom"
+      },
+      {
+        "Name": "Depth Normal Prepass (Large)",
+        "AvgMs": 0.21,
+        "MaxMs": 0.39,
+        "Path": "RenderToSwapChain / Depth Normal Prepass (Large)"
+      },
+      {
+        "Name": "Marker Mask",
+        "AvgMs": 0.19,
+        "MaxMs": 0.44,
+        "Path": "Managed: AfterTransparent / Marker Mask"
+      }
+    ],
+    "Memory": {
+      "ProcessMiB": 4934.5,
+      "VideoMemory": {
+        "UsedMiB": 4569,
+        "BudgetMiB": 11174
+      },
+      "AllocatedMiBPerSecond": 15.5,
+      "GcPauseMsLastSecond": 7.13,
+      "GcLastSecond": {
+        "Gen0": 2,
+        "Gen1": 0,
+        "Gen2": 0
+      }
+    },
+    "DrawCalls": 2108,
+    "Triangles": 14795344
+  }
+}

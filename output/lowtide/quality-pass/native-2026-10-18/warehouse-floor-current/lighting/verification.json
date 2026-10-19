@@ -1,0 +1,72 @@
+{
+  "status": "native_bake_saved_and_static_views_reviewed",
+  "scene_sha256": "654c2998e269ee523b0e19e5392920b32d8e6131d8041634bd58a1fac6034f3b",
+  "native_api": "IndirectLightVolume.BakeProbes",
+  "volumes": 2,
+  "probes_each": 1200,
+  "compiled_textures": [
+    {
+      "Source": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse east bounced light_irradiance_a55a7c89-2f8c-407e-93ed-d2a8a2e47a8f_a28d8a47931b442aa3f6f78a7a57111b.vtex",
+      "Target": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-east-v4/irradiance.vtex",
+      "Hash": "7134374097cac44aa465a2cf265aa90e22af6d3fe745b7787a7b7f0e06c62861",
+      "Width": 160,
+      "Height": 80,
+      "Depth": 6
+    },
+    {
+      "Source": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse east bounced light_distance_a55a7c89-2f8c-407e-93ed-d2a8a2e47a8f_a28d8a47931b442aa3f6f78a7a57111b.vtex",
+      "Target": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-east-v4/distance.vtex",
+      "Hash": "18b76228b7ce7b5f67a384da76714a68a2a64bf1144cd2b83bdfc2762ea9d46a",
+      "Width": 320,
+      "Height": 160,
+      "Depth": 6
+    },
+    {
+      "Source": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse east bounced light_relocation_a55a7c89-2f8c-407e-93ed-d2a8a2e47a8f_a28d8a47931b442aa3f6f78a7a57111b.vtex",
+      "Target": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-east-v4/relocation.vtex",
+      "Hash": "bc7a837c89863104015e45b99a8155e1e0792578fc04e99fcd14cf6acf3a6b70",
+      "Width": 20,
+      "Height": 10,
+      "Depth": 6
+    },
+    {
+      "Source": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse west bounced light_irradiance_7aad1539-5d64-4d1e-9496-709b842779cd_0b3cf0c497324e188c91c39b63dce437.vtex",
+      "Target": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-west-v4/irradiance.vtex",
+      "Hash": "39212ddac53ef3fa20d366a57b10d694052c2a04518f0c2c36f6dcb78d1d1cc6",
+      "Width": 160,
+      "Height": 80,
+      "Depth": 6
+    },
+    {
+      "Source": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse west bounced light_distance_7aad1539-5d64-4d1e-9496-709b842779cd_0b3cf0c497324e188c91c39b63dce437.vtex",
+      "Target": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-west-v4/distance.vtex",
+      "Hash": "963b0566b689f8647f6657107f679b24f6b3e71a4738bc3c98664934d9bbe79d",
+      "Width": 320,
+      "Height": 160,
+      "Depth": 6
+    },
+    {
+      "Source": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse west bounced light_relocation_7aad1539-5d64-4d1e-9496-709b842779cd_0b3cf0c497324e188c91c39b63dce437.vtex",
+      "Target": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-west-v4/relocation.vtex",
+      "Hash": "259370cf9d566f176ff2f97fabc4064a15224b5c671ffb5b1c309aa4b1bf0a53",
+      "Width": 20,
+      "Height": 10,
+      "Depth": 6
+    }
+  ],
+  "intended_scene_edits": "Six baked texture references",
+  "native_serialization": {
+    "native_collider_default_or_float_serialization": 224,
+    "native_resource_identity_refresh": 4,
+    "baked_texture_path_or_identity": 12,
+    "native_prefab_identity_cache_refresh": 4
+  },
+  "resource_paths_and_prefab_overrides_preserved": true,
+  "canonical_lighting_idempotent": true,
+  "reviewed_captures": 6,
+  "visual_evidence": "output/lowtide/quality-pass/native-2026-10-18/warehouse-floor-current/lighting-review/capture.json",
+  "source_sha256": "176a8884c2babd6b12120030514b6fc61a86660a7b91ab79c5f79d15f7b24713",
+  "performance_verified": false,
+  "persistence_reload_verified": true,
+  "persistence_evidence": "output/lowtide/quality-pass/native-2026-10-18/warehouse-floor-current/lighting-persistence/verification.json"
+}

@@ -1,0 +1,6 @@
+var flags=System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Static;
+return new {
+    CubeBuilder=typeof(TextureCubeBuilder).GetFields(flags).Select(f=>f.FieldType+" "+f.Name).ToArray(),
+    TextureMethods=typeof(Texture).GetMethods(flags).Where(m=>m.Name.Contains("Create")||m.Name.Contains("Data")||m.Name.Contains("Mip")).Select(m=>m.ToString()).ToArray(),
+    EditorTextureTypes=typeof(Editor.Asset).Assembly.GetTypes().Where(t=>t.Name.Contains("Texture")&&t.Name.Contains("Asset")).Select(t=>new{Type=t.FullName,Properties=t.GetProperties(flags).Select(p=>p.PropertyType+" "+p.Name).ToArray()}).ToArray()
+};

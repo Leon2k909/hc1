@@ -1,0 +1,9 @@
+var scene=Game.ActiveScene;
+var path=scene?.Source?.ResourcePath;
+var expected=path=="scenes/maps/lowtide/lowtide.scene";
+var bindings=scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.ResourcePath=="models/maps/lowtide/lowtide_east.vmdl"||r.Model?.ResourcePath=="models/maps/lowtide/lowtide_west.vmdl").Select(r=>new{r.Model.ResourcePath,r.Model.IsError,Slots=Enumerable.Range(0,r.Materials.Count).Select(i=>new{Path=r.Materials.GetOriginal(i)?.ResourcePath,Error=r.Materials.GetOriginal(i)?.IsError,Override=r.Materials.GetOverride(i)?.ResourcePath}).Where(s=>s.Path?.StartsWith("materials/lowtide/structure/")==true).ToArray()}).ToArray();
+var volumes=scene.GetAllComponents<IndirectLightVolume>().Select(v=>new{v.GameObject.Name,v.Active,Path=v.IrradianceTexture?.ResourcePath,Error=v.IrradianceTexture?.IsError}).ToArray();
+if(expected&&(!Game.IsPlaying||bindings.Length!=2||bindings.Any(b=>b.IsError||b.Slots.Length!=2||b.Slots.Any(s=>s.Error!=false||s.Override!=null))||volumes.Length!=2||volumes.Any(v=>!v.Active||v.Error!=false||!v.Path.Contains("-v5/"))))throw new Exception("Runtime resources do not match the saved pass");
+var report=new{Project=Project.Current.GetRootPath(),Game.IsPlaying,Runtime=path,ExpectedMap=expected,bindings,volumes,EditedScenes=Editor.SceneEditorSession.All.Where(s=>s.Scene.IsEditor).Select(s=>new{Path=s.Scene.Source?.ResourcePath,s.HasUnsavedChanges}).ToArray(),TimeUtc=DateTime.UtcNow};
+System.IO.File.WriteAllText(System.IO.Path.Combine(Project.Current.GetRootPath(),"output/lowtide/quality-pass/native-2026-10-18/structure-timber-v2/final-readback.json"),System.Text.Json.JsonSerializer.Serialize(report,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return new{Game.IsPlaying,Runtime=path,ExpectedMap=expected,ArchitectureBindings=bindings.Sum(b=>b.Slots.Length),BakedVolumes=volumes.Length,AnyEditorUnsaved=Editor.SceneEditorSession.All.Any(s=>s.Scene.IsEditor&&s.HasUnsavedChanges)};

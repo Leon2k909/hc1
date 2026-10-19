@@ -1,0 +1,2 @@
+var types=new[]{typeof(SpotLight),typeof(VolumetricFogController),typeof(VolumetricFogVolume)};
+return types.Select(t=>new{Type=t.FullName,Properties=t.GetProperties().Where(p=>p.DeclaringType==t||p.Name.Contains("Fog")).Select(p=>new{p.Name,Type=p.PropertyType.ToString(),p.CanWrite}).ToArray()}).ToArray();

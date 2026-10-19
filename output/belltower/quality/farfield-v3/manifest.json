@@ -1,0 +1,50 @@
+{
+  "revision": "farfield-v3",
+  "state": "separate native comparison pending",
+  "resources": [
+    {
+      "path": "materials/belltower/vista/farfield-v3/vista_c_color.jpg",
+      "source": "output/belltower/quality/farfield-v3/vista_c_color.jpg",
+      "sha256": "d00adf089da6d1aae28ef86f05b9107a4483847c7d8a5f129c7a0b1383a6ee2e",
+      "expected_existing_sha256": null
+    },
+    {
+      "path": "materials/belltower/vista/farfield-v3/vista_d_color.jpg",
+      "source": "output/belltower/quality/farfield-v3/vista_d_color.jpg",
+      "sha256": "3af83470014d4cae8dfe19225734a1dbc3724606e15dbd36cc579f9bea9e1dd3",
+      "expected_existing_sha256": null
+    },
+    {
+      "path": "materials/belltower/vista/farfield-v3/vista_land.vmat",
+      "source": "output/belltower/quality/farfield-v3/vista_land.vmat",
+      "sha256": "0fa4db495f2fe389617f8b73765d357fb3a3eab7624555c58b30ce3298300101",
+      "expected_existing_sha256": null
+    },
+    {
+      "path": "materials/belltower/vista/farfield-v3/forest_trees.vmat",
+      "source": "output/belltower/quality/farfield-v3/forest_trees.vmat",
+      "sha256": "8b8cdcf1b693cccab01de9bb8e4a7f281c58413322306692d80ec35a399982f8",
+      "expected_existing_sha256": null
+    }
+  ],
+  "accepted_inputs": {
+    "Assets/materials/belltower/vista/vista_c_color.jpg": "001b04bbb8d7ea065d3ab9cbe568fad20be295e53a16415cf331d18180b9af08",
+    "Assets/materials/belltower/vista/vista_d_color.jpg": "0591b4cff69baebd970c8e2fd3afc37b5dd518f6e4a30b0d8b61b2b697124ad2",
+    "Assets/materials/belltower/vista/vista_land.vmat": "7d280c9b291d69668429b6f7fbbc74ca5722e902fb4c2a080ec54fefc7552b06",
+    "Assets/materials/belltower/forest/forest_trees.vmat": "a7908fc6d6ad5304f024777f3922813be3a1413587d904efc2150be679823553",
+    "Assets/materials/belltower/vista/vista_c_normal.jpg": "cd1493f474c950da9f8f5aff55fb8b3b63c6ada0fdde723501399729a05296b1",
+    "Assets/materials/belltower/vista/vista_d_normal.jpg": "291333422858af52779ff10580547b7120158ab1cc45e6a23442f85a2c7426ad",
+    "Assets/materials/belltower/vista/vista_c_kind.png": "b7b123a4837b050dbc0b26f7c1a222dcefb5044033ff68623557d1885ccbbc7f",
+    "Assets/materials/belltower/vista/vista_d_kind.png": "6be2047e7ce1a3902c438656eea9949de64d64ae3a6aebc7dfad94dd96da0dfb"
+  },
+  "unchanged_normals_and_kinds": true,
+  "modified_geometry_or_collision": false,
+  "material_overrides": {
+    "materials/belltower/vista/vista_land.vmat": "materials/belltower/vista/farfield-v3/vista_land.vmat",
+    "materials/belltower/forest/forest_trees.vmat": "materials/belltower/vista/farfield-v3/forest_trees.vmat"
+  },
+  "file_hashes_preserved": {
+    "Assets/materials/belltower/vista/vista_land.vmat": "7d280c9b291d69668429b6f7fbbc74ca5722e902fb4c2a080ec54fefc7552b06",
+    "Assets/materials/belltower/forest/forest_trees.vmat": "a7908fc6d6ad5304f024777f3922813be3a1413587d904efc2150be679823553"
+  }
+}

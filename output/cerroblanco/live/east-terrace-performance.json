@@ -1,0 +1,273 @@
+[
+  {
+    "Window": {
+      "Frames": 155,
+      "Seconds": 2.01
+    },
+    "Fps": 77,
+    "TargetFps": 90,
+    "TargetSource": "fps_max_inactive",
+    "LimitedBy": "GPU",
+    "MeetingTarget": false,
+    "Rating": "Warning",
+    "Frame": {
+      "AvgMs": 12.98,
+      "P50Ms": 12.73,
+      "P99Ms": 20.08,
+      "MaxMs": 21.22
+    },
+    "CpuWork": {
+      "AvgMs": 12.98,
+      "P50Ms": 12.73,
+      "P99Ms": 20.08,
+      "MaxMs": 21.22
+    },
+    "Gpu": {
+      "AvgMs": 23.87,
+      "P50Ms": 23.84,
+      "P99Ms": 24.98,
+      "MaxMs": 25.08
+    },
+    "CapWait": {
+      "AvgMs": 0.01,
+      "P50Ms": 0,
+      "P99Ms": 0,
+      "MaxMs": 0.82
+    },
+    "PerfHubWindow": null,
+    "Hitches": {
+      "Count": 0,
+      "OverMs": 25.5,
+      "WorstMs": 0
+    },
+    "Issues": [
+      {
+        "Severity": "Bad",
+        "Title": "GC pauses",
+        "Detail": "12.3 ms in the last second",
+        "MoreIn": "perf_memory"
+      }
+    ],
+    "MainThread": [
+      {
+        "Name": "Render",
+        "AvgMs": 7.18,
+        "MaxMs": 11.87
+      },
+      {
+        "Name": "UI",
+        "AvgMs": 1.31,
+        "MaxMs": 1.86
+      },
+      {
+        "Name": "Update",
+        "AvgMs": 1.05,
+        "MaxMs": 2.78
+      },
+      {
+        "Name": "Animation",
+        "AvgMs": 0.98,
+        "MaxMs": 2.06
+      },
+      {
+        "Name": "Editor",
+        "AvgMs": 0.75,
+        "MaxMs": 3.5
+      },
+      {
+        "Name": "Physics",
+        "AvgMs": 0.23,
+        "MaxMs": 1.05
+      },
+      {
+        "Name": "Audio",
+        "AvgMs": 0.23,
+        "MaxMs": 0.85
+      },
+      {
+        "Name": "Particles",
+        "AvgMs": 0.19,
+        "MaxMs": 0.4
+      }
+    ],
+    "GpuPasses": [
+      {
+        "Name": "Dynamic Opaque Forward",
+        "AvgMs": 1.62,
+        "MaxMs": 1.91,
+        "Path": "RenderToSwapChain / Dynamic Opaque Forward"
+      },
+      {
+        "Name": "DrawDepthOpaque",
+        "AvgMs": 0.58,
+        "MaxMs": 0.84,
+        "Path": "Sandbox.ScenePointLight_Shadow / DrawDepthOpaque"
+      },
+      {
+        "Name": "DrawDepthOpaque",
+        "AvgMs": 0.47,
+        "MaxMs": 0.47,
+        "Path": "CSM Cascade 0 / DrawDepthOpaque"
+      },
+      {
+        "Name": "DrawDepthOpaque",
+        "AvgMs": 0.41,
+        "MaxMs": 0.64,
+        "Path": "CSM Cascade 2 / DrawDepthOpaque"
+      },
+      {
+        "Name": "DrawDepthOpaque",
+        "AvgMs": 0.4,
+        "MaxMs": 0.4,
+        "Path": "CSM Cascade 3 / DrawDepthOpaque"
+      },
+      {
+        "Name": "DrawDepthOpaque",
+        "AvgMs": 0.34,
+        "MaxMs": 0.34,
+        "Path": "CSM Cascade 1 / DrawDepthOpaque"
+      },
+      {
+        "Name": "Depth Normal Prepass (Small)",
+        "AvgMs": 0.26,
+        "MaxMs": 0.5,
+        "Path": "RenderToSwapChain / Depth Normal Prepass (Small)"
+      },
+      {
+        "Name": "GameOverlay",
+        "AvgMs": 0.26,
+        "MaxMs": 0.27,
+        "Path": "RenderToSwapChain / GameOverlay"
+      }
+    ],
+    "Memory": {
+      "ProcessMiB": 4004.3,
+      "VideoMemory": {
+        "UsedMiB": 4838.5,
+        "BudgetMiB": 11174
+      },
+      "AllocatedMiBPerSecond": 17.5,
+      "GcPauseMsLastSecond": 12.33,
+      "GcLastSecond": {
+        "Gen0": 3,
+        "Gen1": 3,
+        "Gen2": 0
+      }
+    },
+    "DrawCalls": 3461,
+    "Triangles": 10080927
+  },
+  {
+    "Renderer": "native",
+    "Resolution": "1920x1080",
+    "AntiAliasing": "Multisample8x",
+    "Upscaling": "Off",
+    "Issues": [
+      {
+        "Severity": "Warning",
+        "Title": "Draw calls",
+        "Detail": "3,555, over 3,000. Merge meshes, instance repeats, use LODs",
+        "MoreIn": null
+      }
+    ],
+    "Counters": {
+      "ObjectsRendered": 1479,
+      "ObjectsPreCull": 16212,
+      "ObjectsTested": 30730,
+      "BaseObjectDraws": 3871,
+      "AnimatableObjectDraws": 794,
+      "AggregateObjectDraws": 0,
+      "AggregateObjectsFullyCulled": 0,
+      "AggregateObjectDrawCalls": 0,
+      "AggregateIndirectSubmits": 0,
+      "AggregateIndirectFragments": 0,
+      "RenderBatchDraws": 1174,
+      "TrianglesRendered": 10417054,
+      "DrawCalls": 3555,
+      "MaterialChanges": 517,
+      "ShadowMaterialChanges": 853,
+      "ShadowMaterialChangesAlphaTested": 0,
+      "InitialMaterialChanges": 1153,
+      "InitialShadowMaterialChanges": 772,
+      "CopyMaterialChanges": 13,
+      "MaterialComputes": 1314,
+      "FullMaterialSets": 1327,
+      "SimilarMaterialSets": 195,
+      "TextureOnlyMaterialSets": 0,
+      "VfxEvals": 0,
+      "VfxRuleChecks": 1329,
+      "ConstantBufferUpdates": 1361,
+      "ConstantBufferBytes": 272336,
+      "UnbatchableMaterialDraws": 0,
+      "UniqueMaterials": 0,
+      "DisplayLists": 309,
+      "SceneViewsRendered": 35,
+      "RenderTargetResolves": 2,
+      "PrimaryContexts": 389,
+      "SecondaryContexts": 0,
+      "ObjectsCulledByVis": 0,
+      "ObjectsCulledByScreenSize": 2,
+      "ObjectsCulledByFade": 0,
+      "ObjectsFading": 0,
+      "ShadowedLightsInView": 0,
+      "UnshadowedLightsInView": 33,
+      "ShadowMaps": 0,
+      "GpuStatsSummary": "Checked pending presents 518,277 times; waited 6 times; abandoned 0 times\nTexture memory: 3,910 / 8,963 MB; in 4,531 textures (465 MB non-evictable)\nTextures created overall: 26,379; textures evicted: 0\nCommand stream pools: 833,536 bytes in base, 0 bytes in medium, 0 bytes in large (0 extra data fallbacks)\nVulkan Total Mem: 5,890.85 MB; Fragmentation: 366.18 MB; PMB mem: 88.00 MB; command buffers: 8,871\nVulkan pipelines: 437; pipeline layouts: 929\n",
+      "PendingStreamingRequests": 0,
+      "TexturePoolUsedBytes": 4100468704,
+      "TexturePoolLimitBytes": 9398746112,
+      "TexturePoolNonEvictableBytes": 488386652
+    },
+    "ManagedRenderer": null,
+    "PostProcessing": [
+      {
+        "Name": "Ambient Occlusion",
+        "Stage": "AfterDepthPrepass",
+        "Order": 0,
+        "Async": false,
+        "AsyncCompute": true,
+        "NeedsDepthNormals": true
+      },
+      {
+        "Name": "Bloom",
+        "Stage": "BeforePostProcess",
+        "Order": 100,
+        "Async": false,
+        "AsyncCompute": false,
+        "NeedsDepthNormals": false
+      },
+      {
+        "Name": "Vignette",
+        "Stage": "BeforePostProcess",
+        "Order": 5000,
+        "Async": false,
+        "AsyncCompute": false,
+        "NeedsDepthNormals": false
+      },
+      {
+        "Name": "Tonemapping",
+        "Stage": "Tonemapping",
+        "Order": 0,
+        "Async": false,
+        "AsyncCompute": false,
+        "NeedsDepthNormals": false
+      },
+      {
+        "Name": "Sharpen",
+        "Stage": "AfterPostProcess",
+        "Order": 1,
+        "Async": false,
+        "AsyncCompute": false,
+        "NeedsDepthNormals": false
+      },
+      {
+        "Name": "ColorGrading",
+        "Stage": "AfterPostProcess",
+        "Order": 4000,
+        "Async": false,
+        "AsyncCompute": false,
+        "NeedsDepthNormals": false
+      }
+    ]
+  }
+]

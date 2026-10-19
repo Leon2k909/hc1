@@ -1,0 +1,171 @@
+{
+  "files": [
+    {
+      "path": "Assets/prefabs/player/cameras/default_player_camera.prefab",
+      "sha256": "12bd7fbbecaf17edc936d7531933cb0aa0e3be0ca7546b7f339149a6d9dcf010",
+      "unrelated_content_preserved": true,
+      "existing_component_ids_preserved": true,
+      "changes": {
+        "Sandbox.Bloom": {
+          "before": {
+            "__type": "Sandbox.Bloom",
+            "__enabled": true,
+            "__version": 1,
+            "Gamma": 2.2,
+            "Mode": "Additive",
+            "Strength": 0.15,
+            "Threshold": 1.33,
+            "Tint": "1,1,1,1"
+          },
+          "after": {
+            "__type": "Sandbox.Bloom",
+            "__enabled": true,
+            "__version": 1,
+            "Gamma": 2.2,
+            "Mode": "Additive",
+            "Strength": 0.1,
+            "Threshold": 1.6,
+            "Tint": "1,1,1,1"
+          }
+        },
+        "Sandbox.AmbientOcclusion": {
+          "before": {
+            "__type": "Sandbox.AmbientOcclusion",
+            "__enabled": true,
+            "__version": 1,
+            "DenoiseMode": "Spatial",
+            "FalloffRange": 0.75,
+            "Intensity": 0.15,
+            "Quality": "High",
+            "Radius": 128,
+            "ThinCompensation": 0
+          },
+          "after": {
+            "__type": "Sandbox.AmbientOcclusion",
+            "__enabled": true,
+            "__version": 1,
+            "DenoiseMode": "Spatial",
+            "FalloffRange": 0.9,
+            "Intensity": 0.45,
+            "Quality": "High",
+            "Radius": 48,
+            "ThinCompensation": 1
+          }
+        },
+        "Sandbox.ColorAdjustments": {
+          "before": {
+            "__type": "Sandbox.ColorAdjustments",
+            "__enabled": false,
+            "Brightness": 1.1,
+            "Contrast": 1.02,
+            "HueRotate": 0,
+            "Saturation": 1.05
+          },
+          "after": {
+            "__type": "Sandbox.ColorAdjustments",
+            "__enabled": false,
+            "Brightness": 1,
+            "Contrast": 1.035,
+            "HueRotate": 0,
+            "Saturation": 0.96
+          }
+        },
+        "Sandbox.Vignette": {
+          "before": null,
+          "after": {
+            "__type": "Sandbox.Vignette",
+            "__enabled": true,
+            "Center": "0.5,0.5",
+            "Color": "0,0,0,1",
+            "Intensity": 0.08,
+            "Roundness": 1,
+            "Smoothness": 1
+          }
+        }
+      }
+    },
+    {
+      "path": "Assets/scenes/theater_playback.scene",
+      "sha256": "028dd0c2834594513d15a1709fde64b0ee36ea1734ec11f01d51e040e91e4242",
+      "unrelated_content_preserved": true,
+      "existing_component_ids_preserved": true,
+      "changes": {
+        "Sandbox.Bloom": {
+          "before": {
+            "__type": "Sandbox.Bloom",
+            "__enabled": true,
+            "__version": 1,
+            "Gamma": 2.2,
+            "Mode": "Additive",
+            "Strength": 0.15,
+            "Threshold": 1.33,
+            "Tint": "1,1,1,1"
+          },
+          "after": {
+            "__type": "Sandbox.Bloom",
+            "__enabled": true,
+            "__version": 1,
+            "Gamma": 2.2,
+            "Mode": "Additive",
+            "Strength": 0.1,
+            "Threshold": 1.6,
+            "Tint": "1,1,1,1"
+          }
+        },
+        "Sandbox.AmbientOcclusion": {
+          "before": {
+            "__type": "Sandbox.AmbientOcclusion",
+            "__enabled": true,
+            "__version": 1,
+            "DenoiseMode": "Spatial",
+            "FalloffRange": 0.75,
+            "Intensity": 0.15,
+            "Quality": "High",
+            "Radius": 128,
+            "ThinCompensation": 0
+          },
+          "after": {
+            "__type": "Sandbox.AmbientOcclusion",
+            "__enabled": true,
+            "__version": 1,
+            "DenoiseMode": "Spatial",
+            "FalloffRange": 0.9,
+            "Intensity": 0.45,
+            "Quality": "High",
+            "Radius": 48,
+            "ThinCompensation": 1
+          }
+        },
+        "Sandbox.ColorAdjustments": {
+          "before": null,
+          "after": {
+            "__type": "Sandbox.ColorAdjustments",
+            "__enabled": false,
+            "Brightness": 1,
+            "Contrast": 1.035,
+            "HueRotate": 0,
+            "Saturation": 0.96
+          }
+        },
+        "Sandbox.Vignette": {
+          "before": null,
+          "after": {
+            "__type": "Sandbox.Vignette",
+            "__enabled": true,
+            "Center": "0.5,0.5",
+            "Color": "0,0,0,1",
+            "Intensity": 0.08,
+            "Roundness": 1,
+            "Smoothness": 1
+          }
+        }
+      }
+    }
+  ],
+  "native_runtime_verified": false,
+  "player_and_replay_profiles_match": true,
+  "notes": [
+    "Native map volumes still supply local exposure, grading, atmosphere, AO and bloom.",
+    "See visual-review.json for the native Lowtide camera comparison. Full-match temporal behaviour and GPU frame time remain unmeasured."
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "revision": "streetwear-v1",
+  "state": "staged for native comparison",
+  "original": {
+    "Assets/shaders/belltower_relief.shader": "bcb6afed77b7a7f60107713c83f7357824b730a1fd6078be43c0e2a2936c1640",
+    "Assets/materials/belltower/street_cobbles.vmat": "cf01b0a2a68795e944e2308617fd3cf5d8ca6371a535a0d7564ef3e2364b3662",
+    "Assets/materials/stone/cobble_stones_tight_basecolor.png": "ab727b78bec2534c483a1d7c5ae8e1dca0e921747ee71d38cf024ffdb9d4e111"
+  },
+  "trial": [
+    {
+      "resource": "shaders/belltower_streetwear_trial.shader",
+      "staged": "output/belltower/quality/streetwear-v1/belltower_streetwear_trial.shader",
+      "sha256": "b7b3c1cb95ce30e17a8291f828aa54b403994e543a42eb7e60947acb142057fa",
+      "installed_sha256": "b7b3c1cb95ce30e17a8291f828aa54b403994e543a42eb7e60947acb142057fa"
+    },
+    {
+      "resource": "materials/belltower/trials/street_cobbles_aaa.vmat",
+      "staged": "output/belltower/quality/streetwear-v1/street_cobbles_aaa.vmat",
+      "sha256": "0fa90672f1409a4fb21cd221d3f2f1f9b74ab30b394c28c0d0c42e31e836f55e",
+      "installed_sha256": "0fa90672f1409a4fb21cd221d3f2f1f9b74ab30b394c28c0d0c42e31e836f55e"
+    }
+  ],
+  "strength": 0.22,
+  "scales_in_inches": [
+    230.0,
+    690.0
+  ],
+  "preview": {
+    "wear_min": 0.0,
+    "wear_mean": 0.39564099158095617,
+    "wear_max": 1.0,
+    "max_linear_darkening": 0.22,
+    "res": [
+      880,
+      540
+    ]
+  },
+  "changes_to_live_model_or_collision": false,
+  "note": "New unreferenced trial resources only; native rendering, quality and perf unverified."
+}

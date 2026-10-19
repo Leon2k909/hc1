@@ -1,0 +1,11 @@
+{
+  "settle_frames": 20,
+  "stream_frames": 80,
+  "fixed_exposure": 2.2,
+  "views": [
+    { "name": "reference", "eye": [ 801, -40, 256 ], "target": [ -185, -40, 89 ], "fov": 74, "width": 1536, "height": 1024 },
+    { "name": "map_art", "art": true, "eye": [ 801, -60, 256 ], "target": [ -185, -20, 100 ], "fov": 80, "width": 1920, "height": 1080 },
+    { "name": "sea", "eye": [ -1650, 200, 100 ], "target": [ -6000, 1200, 40 ], "fov": 80, "width": 1280, "height": 720 },
+    { "name": "aerial", "eye": [ 2600, -3600, 3200 ], "target": [ -100, -100, 0 ], "fov": 60, "width": 1280, "height": 720 }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "kind": "Offline CPU construction rendering",
+  "native_engine_capture": false,
+  "image_generation": false,
+  "geometry": "Exact before/candidate OBJ exports",
+  "geometry_generator_sha256": "b49c58eb3d518da7190a6e05284cfeb0a629b1a6f462d12c29231bec4927684c",
+  "renderer_sha256": "75c516523262951f33bf2cdb602c0e1fa49a39d3fa1d8f84e274db53a49c73e3",
+  "exported_meshes": {
+    "before": "5e5344fe0001777e70e5e23f31779310dc915aeddf63c2a902c669a542d320d3",
+    "candidate": "50e1914a2def8f21c3126551c724773f92b7023b5647d59585c4ccf8c4dad5db"
+  },
+  "textures": "Current unmodified production albedo with the door shader atlas mapping and OBJ V flip",
+  "lighting": "Matched directional shadow maps and approximate diffuse/specular response",
+  "limitations": [
+    "No engine normal mapping, GI, material weathering or runtime performance validation"
+  ],
+  "views": {
+    "whole": {
+      "eye": [
+        3.8,
+        -8.0,
+        3.4
+      ],
+      "target": [
+        0.0,
+        0.0,
+        2.15
+      ],
+      "scale": 5.15,
+      "size": [
+        1100,
+        1100
+      ]
+    },
+    "hinge": {
+      "eye": [
+        -0.15,
+        -3.4,
+        1.4
+      ],
+      "target": [
+        -1.18,
+        0.1,
+        0.45
+      ],
+      "scale": 1.35,
+      "size": [
+        1100,
+        900
+      ]
+    },
+    "handles": {
+      "eye": [
+        1.2,
+        -3.4,
+        1.75
+      ],
+      "target": [
+        0.0,
+        0.12,
+        1.05
+      ],
+      "scale": 0.85,
+      "size": [
+        1100,
+        1000
+      ]
+    }
+  }
+}

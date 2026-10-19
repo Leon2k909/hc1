@@ -1,0 +1,129 @@
+{
+  "verified_at_utc": "2026-10-14T22:44:48.141069+00:00",
+  "installed_matches_validated_stage": true,
+  "models": [
+    {
+      "name": "belltower_centre",
+      "triangles": 246560,
+      "boxes": 403,
+      "hulls": 56
+    },
+    {
+      "name": "belltower_west",
+      "triangles": 939001,
+      "boxes": 457,
+      "hulls": 116
+    },
+    {
+      "name": "belltower_east",
+      "triangles": 939001,
+      "boxes": 457,
+      "hulls": 116
+    }
+  ],
+  "placement_and_reachability": {
+    "spots": 94,
+    "invalid": 0,
+    "unreachable": 0,
+    "evidence": "model-import.json"
+  },
+  "installed_sha256": {
+    "belltower_centre.obj": "c9da949fb9fe26a6d7b678526cfab4cfeb1757074cf7490e4965c77fd15140cc",
+    "belltower_centre.mtl": "dc0ca367ec6676ba671c0ae1bc2eb043c9d8d5b0f092cf7f0b2b495df459645a",
+    "belltower_centre.vmdl": "a6d2aacd66f207c307b7e965bf9f5b6bfde61630dc69f0678ed57c30ffa54ab6",
+    "belltower_west.obj": "842e541f61e2b4aac1346336cee2ce53fe62ddef0b291d86ccf18858f0702cf6",
+    "belltower_west.mtl": "6809b51b64ff8adf39fcd13bc518144691a34b7f6cc95a9b366e2cd7966fcac1",
+    "belltower_west.vmdl": "e83e39568c56e5753fde92777c4cab27057afe7f8df794411d1ea28bebbba8cd",
+    "belltower_east.obj": "b899464c1626c40a3c8ea2e8475470c171336721dcbd7daef2b9e186cc741981",
+    "belltower_east.mtl": "d9963beae1c24e9765ef4905dadc1894ebbd62f90f864f7cde5efb3d34e36b3b",
+    "belltower_east.vmdl": "da2be466a453bda616273a6561f145c411b217e97741f5266d25bf39eeb1b23d"
+  },
+  "collision_unchanged_sha256": {
+    "belltower_centre_hulls_default.obj": "9c243b0dcc5fef031de586fd050dffdf54acb31afae29226d4e04cc1ea6cf950",
+    "belltower_centre_hulls_wood.obj": "050163a6b69aba1dd9b0d9633cf0f745fc4c4e490926c0247780a4cda67f77ab",
+    "belltower_east_hulls_default.obj": "54a84215ab782c2ee40ad35103b1c95e5a934a211901a3517bedd97b54a434ae",
+    "belltower_east_hulls_metal.obj": "da8d6bba9b8e73cc61f8964e6169e116c637b60a0e5a44694d6ef67ded6815b0",
+    "belltower_east_hulls_wood.obj": "ce30cd2f1eb94c16339396eb4b689e2fa0d55ac7fba4d19a4c379c3e32933c79",
+    "belltower_west_hulls_default.obj": "9e705ead3ab587de48d1af86ec071ecc16e4721e476771100a09378aaa8b4b77",
+    "belltower_west_hulls_metal.obj": "8184b390f812f999de0af3c8e00a94c55d7716cb22f2def38177e087d1a4a322",
+    "belltower_west_hulls_wood.obj": "7203718fb1367217d8d3a24731814f2c11af7c0c41f22a62b7322e77b65c0cae"
+  },
+  "vmdl_physics_unchanged": true,
+  "original_maps_md5_verified": {
+    "brown_planks_03": 4,
+    "rough_plaster_broken": 5
+  },
+  "native_prop_materials_valid": 7,
+  "plaster_materials_installed_and_compiled": [
+    "materials/belltower/plaster_rose.vmat",
+    "materials/belltower/plaster_terracotta.vmat",
+    "materials/belltower/plaster_ochre.vmat",
+    "materials/belltower/plaster_cream.vmat",
+    "materials/belltower/plaster_blue.vmat",
+    "materials/belltower/plaster_sage.vmat",
+    "materials/belltower/plaster_pale.vmat",
+    "materials/belltower/plaster_whitewash.vmat"
+  ],
+  "hall_model_compiled": true,
+  "hall_deck_checks": [
+    {
+      "surface": "floor",
+      "triangles": 28600,
+      "finite": true,
+      "inside_original_slab": true,
+      "stairwells_clear": true,
+      "collision_added": false
+    },
+    {
+      "surface": "ceiling",
+      "triangles": 28468,
+      "finite": true,
+      "inside_original_slab": true,
+      "stairwells_clear": true,
+      "collision_added": false
+    }
+  ],
+  "native_capture_evidence": [
+    "hall-plaster-final\\clerk-desk-camera.json",
+    "hall-plaster-final\\council-hall-camera.json",
+    "hall-plaster-final\\council-table-camera.json",
+    "hall-plaster-final\\door-terrace-camera.json",
+    "hall-plaster-final\\hall-archive-camera.json",
+    "hall-plaster-final\\map-art-camera.json",
+    "hall-plaster-final\\west-street-camera.json"
+  ],
+  "saved_lighting_matches_cache": {
+    "IrradianceTexture": {
+      "path": "lighting/belltower/daylight-v9/irradiance.vtex",
+      "sha256": "4a118132eef022a849025976f6755d1199820930e15f8cb21f4b8e7442121439"
+    },
+    "DistanceTexture": {
+      "path": "lighting/belltower/daylight-v9/distance.vtex",
+      "sha256": "dc2fd6a097104927d31cd8afbbb624994eed59a588fa38f4583bbed354c75cbc"
+    },
+    "RelocationTexture": {
+      "path": "lighting/belltower/daylight-v9/relocation.vtex",
+      "sha256": "c15c7c9bafc5e7934c8527ccbe2d176446476adee24ba5d258d63a50cbc68c38"
+    }
+  },
+  "two_pass_lighting_bake": {
+    "Passes": 2,
+    "SavedFinalIrradiance": true,
+    "IrradianceReplacedAfterFirstPass": true,
+    "Grid": "28,39,5",
+    "PersistentEditorScene": true,
+    "SceneId": "0090e6b9-29ed-594e-899c-e6980544ec0e",
+    "Reflections": 3,
+    "CapturedReflections": 0,
+    "RetainedReflectionTextures": [
+      "lighting/belltower/daylight-v7/reflection-square.vtex",
+      "lighting/belltower/daylight-v7/reflection-west.vtex",
+      "lighting/belltower/daylight-v7/reflection-east.vtex"
+    ],
+    "SavedScene": false,
+    "GamePreserved": true
+  },
+  "saved_scene_gameplay_preserved": true,
+  "menu_image_matches_native_capture": true,
+  "remaining_validation": "Full runtime performance checks remain pending; the wider visual quality goal is still open."
+}

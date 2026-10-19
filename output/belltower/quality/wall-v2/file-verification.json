@@ -1,0 +1,22 @@
+{
+  "assets_match_staged_geometry": true,
+  "material_matches_generator": true,
+  "shader_matches_canonical_source": true,
+  "collision_and_model_definitions_unchanged": true,
+  "saved_scene_unchanged": true,
+  "hidden_area_removed_m2": 4444.647454773333,
+  "triangle_change": 16,
+  "note": "Following the ramp and floor boundaries adds 16 triangles across both halves; this is hidden-surface cleanup, not a measured FPS improvement.",
+  "visual_geometry_check": "passed: main wall, underfloor corner, west/east ramp joins and exterior captures",
+  "checked_at": "2026-10-18T19:15:36.005371+01:00",
+  "source_sha256": {
+    "Tools/belltower_wall_cleanup.py": "8045343ec4475cdb378ca386d15829799d9e8ccaf5415c48f6fa48ef4768ba33",
+    "Tools/belltower_stage_wall_cleanup.py": "72a54920d5a2a653592883d98b402e56fd80f5262ec36e16b3fadf790d68313f",
+    "Tools/belltower_map.py": "9f3d37dda2cff669282f13efa248c8cfbbb0253d44cf3fb99e5f8f6d18df0f37",
+    "Tools/belltower_quality_materials.py": "d22150c5747f1c84a18e111612763181b88ec450e80c66ff04e2d90a59e6b990",
+    "Sources/Belltower/shaders/belltower_relief.shader": "af5c63bd1df74f64d1fd072d075fe80b5a45812e1edbc8c0d53020d60efd017a"
+  },
+  "capture_state_preserved": true,
+  "above_floor_capture_mean_absolute_difference_255": 0.09970344603061676,
+  "exterior_capture_mean_absolute_difference_255": 0.00025540124624967575
+}

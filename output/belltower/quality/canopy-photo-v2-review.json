@@ -1,0 +1,107 @@
+{
+  "reviewed_utc": "2026-10-15T16:33:47.137115+00:00",
+  "state": "offline candidate retained for native comparison; no landscape assets published",
+  "images": [
+    {
+      "name": "overlap-before",
+      "path": "output/belltower/quality/canopy-photo-v1-swatch/photographic.png",
+      "sha256": "32f5870b76bc25ac4c439540d510ce8c78f1d4381edefc8a806cac2a83c99fc1"
+    },
+    {
+      "name": "overlap-after",
+      "path": "output/belltower/quality/canopy-photo-v2-zone-b/photographic.png",
+      "sha256": "43851f789fcc84b249d02e83068e9c604b90a1cb9b2209c949e290c488d56845"
+    },
+    {
+      "name": "near-town-before",
+      "path": "output/belltower/quality/canopy-v1-zone-b/accepted/vista_b_color.jpg",
+      "sha256": "428e5783318ab1b02fd7dad9d3f4547ae8dab7d72a02d17c06c0d30edd32625f"
+    },
+    {
+      "name": "near-town-after",
+      "path": "output/belltower/quality/canopy-photo-v2-zone-b/vista_b_color.jpg",
+      "sha256": "c2b8c68109b1ffba246a2f33e5bf52e900ba1948e78f1f83397b656cad69dab2"
+    },
+    {
+      "name": "distant-before",
+      "path": "output/belltower/quality/canopy-photo-v2-zone-c/accepted/vista_c_color.jpg",
+      "sha256": "a5b2199f63858c6b6dfb2b06537dff2c491107dec3118b2a4f42a99d83551e9d"
+    },
+    {
+      "name": "distant-after",
+      "path": "output/belltower/quality/canopy-photo-v2-zone-c/photographic/vista_c_color.jpg",
+      "sha256": "e73dd339be5549d8cf5895ec5e57c1c5f42b4c3a3dd50fa551848df80e5d3076"
+    }
+  ],
+  "findings": [
+    "The original trial cut whole photographic crowns along analytic dome intersections, making straight overlap edges. The unshadowed diagnostic reproduces those edges.",
+    "Layering natural broadleaf crowns by summit height removes those straight cuts in the matching construction view and retains the original alpha silhouettes.",
+    "The 2048px zone B comparison improves natural crown detail. The orchard trees and field layout are retained.",
+    "The 1024px zone C comparison retains the large woodland and field pattern. Detail at this reduced resolution is subtle and does not establish a native visual improvement."
+  ],
+  "checks": {
+    "state": "offline checks passed; engine validation pending",
+    "max_errors_rgb_top_coverage": {
+      "permutation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tiles": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "planted_trees": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "four_species": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "before_ordering_fix": [
+        0.045106058688190495,
+        0.0,
+        0.49489070680206626
+      ]
+    },
+    "original_atlas_sha256": "626406fbe52bdcb13581241206f9ae0632b7db704659bb614ee976f0e1214701",
+    "sources": {
+      "Tools/belltower_photographic_canopy.py": "a336111697f2920366746c53c3e1297e84e9595cc07c6010cbcaed5a86ba79da",
+      "Tools/belltower_canopy_trial.py": "280c16233dfa6dfa5f2ec6f30ce2214e7c20f5c1ebd7de80a6f9bbc011813678",
+      "Tools/belltower_vista_paint.py": "b63525d916f652838e85e9dc6ef06af144f8c4743c46fae2817447948ee8d763"
+    }
+  },
+  "swatch": {
+    "kind": "offline albedo construction swatch; not an engine capture",
+    "variants": [
+      {
+        "name": "accepted",
+        "coverage": 0.8086801217414072,
+        "crown_inputs_sha256": "ac3a1d9e70a7c085b911233b1d0a3d0a4571fc82abb8157db46b7000c0a29489"
+      },
+      {
+        "name": "photographic",
+        "coverage": 0.7986711531422512,
+        "crown_inputs_sha256": "ac3a1d9e70a7c085b911233b1d0a3d0a4571fc82abb8157db46b7000c0a29489"
+      }
+    ]
+  },
+  "trials": [
+    "canopy-photo-v2-zone-b/trial.json",
+    "canopy-photo-v2-zone-c/accepted/trial.json",
+    "canopy-photo-v2-zone-c/photographic/trial.json"
+  ],
+  "scene_sha256": "aef98ef9fc0c4e484f6456f31dccc58f27163eb339e4844ebfa251de0333154a",
+  "limitations": [
+    "These are texture construction views, not engine screenshots.",
+    "The summit ordering is a 2.5D approximation, and analytic ellipsoid shadows do not follow every leaf silhouette.",
+    "Only four generated natural crown variants are available; repetition still needs review at native scale.",
+    "Zone B uses 2048px and zone C uses 1024px here; the accepted landscape uses 4096px colour textures.",
+    "Full-resolution zone boundaries, native foliage colour matching, lighting and gameplay performance remain to be checked."
+  ],
+  "next_step": "Prepare full-resolution matching texture trials and review valley/ridge views in a later coordinated editor window. Do not overwrite the accepted landscape manifest from this offline review."
+}

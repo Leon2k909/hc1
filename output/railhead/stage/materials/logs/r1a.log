@@ -1,0 +1,56 @@
+TBBmalloc: skip allocation functions replacement in ucrtbase.dll: unknown prologue for function _aligned_free
+D:\Documents\s&box projects\hc1\forked-shooter-main\Tools\railhead_render.py:280: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  self.mat.use_nodes = True
+D:\Documents\s&box projects\hc1\forked-shooter-main\Tools\railhead_render.py:713: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world.use_nodes = True
+00:04.750  cycles           | WARNING HIPEW initialization failed: Error opening HIP dynamic library
+00:09.515  render           | Saved: 'D:\Documents\s&box projects\hc1\forked-shooter-main\output\railhead\stage\materials\renders\r1\reference.exr'
+00:14.609  render           | Saved: 'D:\Documents\s&box projects\hc1\forked-shooter-main\output\railhead\stage\materials\renders\r1\mat_paving_close.exr'
+00:19.781  render           | Saved: 'D:\Documents\s&box projects\hc1\forked-shooter-main\output\railhead\stage\materials\renders\r1\mat_sandstone_close.exr'
+00:24.844  render           | Saved: 'D:\Documents\s&box projects\hc1\forked-shooter-main\output\railhead\stage\materials\renders\r1\mat_plaster_close.exr'
+00:29.672  render           | Saved: 'D:\Documents\s&box projects\hc1\forked-shooter-main\output\railhead\stage\materials\renders\r1\mat_terrazzo_close.exr'
+staged build: D:\Documents\s&box projects\hc1\forked-shooter-main\output\railhead\stage\materials
+models/maps/railhead/railhead_centre.vmdl: 37858 faces
+models/maps/railhead/railhead_east.vmdl: 41506 faces
+models/maps/railhead/railhead_west.vmdl: 41506 faces
+models/maps/railhead/railhead_roof.vmdl: 58600 faces
+models/maps/railhead/railhead_glass.vmdl: 1724 faces
+models/maps/railhead/railhead_track.vmdl: 475034 faces
+models/maps/railhead/railhead_dress_centre.vmdl: 25774 faces
+  materials/railhead/rw_buffer_beam_b.vmat: FileNotFoundError: D:\Documents\s&box projects\hc1\forked-shooter-main\.sbox\cloud\materials\railhead\rw_buffer_beam_b.vmat_c
+  materials/railhead/rw_buffer_frame_dark.vmat: FileNotFoundError: D:\Documents\s&box projects\hc1\forked-shooter-main\.sbox\cloud\materials\railhead\rw_buffer_frame_dark.vmat_c
+  materials/railhead/rw_buffer_grime.vmat: FileNotFoundError: D:\Documents\s&box projects\hc1\forked-shooter-main\.sbox\cloud\materials\railhead\rw_buffer_grime.vmat_c
+  materials/railhead/rw_buffer_grime_dark.vmat: FileNotFoundError: D:\Documents\s&box projects\hc1\forked-shooter-main\.sbox\cloud\materials\railhead\rw_buffer_grime_dark.vmat_c
+  materials/railhead/rw_reflective.vmat: FileNotFoundError: D:\Documents\s&box projects\hc1\forked-shooter-main\.sbox\cloud\materials\railhead\rw_reflective.vmat_c
+models/maps/railhead/railhead_dress_east.vmdl: 108828 faces
+models/maps/railhead/railhead_dress_west.vmdl: 288034 faces
+models/maps/railhead/railhead_dress_glass.vmdl: 884 faces
+models/maps/railhead/railhead_ironwork.vmdl: 11168 faces
+models/maps/railhead/railhead_canopy_pane.vmdl: 2 faces
+models/props/railhead/luggage/luggage_trolley.vmdl: 43680 faces
+models/props/railhead/signal_frame/signal_frame.vmdl: 43482 faces
+scene built in 3 s
+rendering on OPTIX: NVIDIA GeForce RTX 5070
+reference: 5 s -> D:\Documents\s&box projects\hc1\forked-shooter-main\output\railhead\stage\materials\renders\r1\reference.png
+mat_paving_close: 5 s -> D:\Documents\s&box projects\hc1\forked-shooter-main\output\railhead\stage\materials\renders\r1\mat_paving_close.png
+mat_sandstone_close: 5 s -> D:\Documents\s&box projects\hc1\forked-shooter-main\output\railhead\stage\materials\renders\r1\mat_sandstone_close.png
+mat_plaster_close: 5 s -> D:\Documents\s&box projects\hc1\forked-shooter-main\output\railhead\stage\materials\renders\r1\mat_plaster_close.png
+mat_terrazzo_close: 5 s -> D:\Documents\s&box projects\hc1\forked-shooter-main\output\railhead\stage\materials\renders\r1\mat_terrazzo_close.png
+Blender 5.1.1 (hash b70da489d7f4 built 2026-04-14 01:37:22)
+OBJ import of 'railhead_centre.obj' took 56.55 ms
+OBJ import of 'railhead_east.obj' took 60.73 ms
+OBJ import of 'railhead_west.obj' took 56.99 ms
+OBJ import of 'railhead_roof.obj' took 71.12 ms
+OBJ import of 'railhead_glass.obj' took 18.46 ms
+OBJ import of 'railhead_track.obj' took 718.95 ms
+OBJ import of 'railhead_dress_centre.obj' took 46.26 ms
+OBJ import of 'railhead_dress_east.obj' took 139.02 ms
+OBJ import of 'railhead_dress_west.obj' took 338.01 ms
+OBJ import of 'railhead_dress_glass.obj' took 20.43 ms
+OBJ import of 'railhead_ironwork.obj' took 18.84 ms
+OBJ import of 'railhead_canopy_pane.obj' took 6.96 ms
+OBJ import of 'luggage_trolley.obj' took 49.21 ms
+OBJ import of 'signal_frame.obj' took 45.46 ms
+
+Blender quit
+waited 0 s for the GPU, rendered in 30 s

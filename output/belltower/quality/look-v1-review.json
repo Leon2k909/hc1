@@ -1,0 +1,259 @@
+{
+  "recorded_utc": "2026-10-15T15:51:53.186573+00:00",
+  "state": "native comparisons reviewed; exposure comparison inconclusive; no lighting publication",
+  "engine_version": "26.10.13",
+  "scene_sha256": "aef98ef9fc0c4e484f6456f31dccc58f27163eb339e4844ebfa251de0333154a",
+  "saved_look": {
+    "mode": "ACES",
+    "minimum_exposure": 1.05,
+    "maximum_exposure": 2.2,
+    "compensation": 0
+  },
+  "views_reviewed": 11,
+  "comparisons": [
+    {
+      "variant": "agx-saved",
+      "view": "west-street",
+      "baseline": "output/belltower/quality/look-v1-baseline/west-street.png",
+      "comparison": "output/belltower/quality/look-v1-agx-saved/west-street.png",
+      "baseline_sha256": "9f2c5733df124c23edae0543f391fbd00102608f5bf8d50e5b8e242bf942b119",
+      "comparison_sha256": "0d4244e10240981e826b80ffc8c94ba5c0e957dc805858d3f57c0e2e124b1f56",
+      "requested_look": {
+        "minimum_exposure": 1.05,
+        "maximum_exposure": 2.2,
+        "compensation": 0,
+        "mode": "AgX"
+      },
+      "reported_camera": {
+        "Scene": "belltower",
+        "CameraScene": "belltower",
+        "Position": "125,1800,64",
+        "Angles": "Pitch = -2.70, Yaw = -88.57, Roll = 0.00",
+        "FieldOfView": 80,
+        "EnablePostProcessing": true,
+        "Enabled": true,
+        "MinimumExposure": 1.05,
+        "MaximumExposure": 2.2,
+        "Compensation": 0,
+        "Rate": 1.5
+      },
+      "mean_absolute_rgb_difference_0_255": 12.90364631558642,
+      "fraction_pixels_with_any_channel_difference_over_2": 0.9618007330246914,
+      "exact_tone_component_restored": true
+    },
+    {
+      "variant": "agx-saved",
+      "view": "east-street",
+      "baseline": "output/belltower/quality/look-v1-baseline/east-street.png",
+      "comparison": "output/belltower/quality/look-v1-agx-saved/east-street.png",
+      "baseline_sha256": "858a684f82dde95dc105205b59290131320ea04eaf04ae94a873a91144176814",
+      "comparison_sha256": "0273548421089e40acb8f6f95da74dbd123ece99cb7d72b7e32f0e3c773a3676",
+      "requested_look": {
+        "minimum_exposure": 1.05,
+        "maximum_exposure": 2.2,
+        "compensation": 0,
+        "mode": "AgX"
+      },
+      "reported_camera": {
+        "Scene": "belltower",
+        "CameraScene": "belltower",
+        "Position": "125,-1800,64",
+        "Angles": "Pitch = -2.70, Yaw = 88.57, Roll = 0.00",
+        "FieldOfView": 80,
+        "EnablePostProcessing": true,
+        "Enabled": true,
+        "MinimumExposure": 1.05,
+        "MaximumExposure": 2.2,
+        "Compensation": 0,
+        "Rate": 1.5
+      },
+      "mean_absolute_rgb_difference_0_255": 12.362585198045268,
+      "fraction_pixels_with_any_channel_difference_over_2": 0.9738184799382716,
+      "exact_tone_component_restored": true
+    },
+    {
+      "variant": "agx-saved",
+      "view": "terrace",
+      "baseline": "output/belltower/quality/look-v1-baseline/terrace.png",
+      "comparison": "output/belltower/quality/look-v1-agx-saved/terrace.png",
+      "baseline_sha256": "d95236e64bc8bdc4ab735d381435923d5f02c56d4b538ead738ef75ff7ebb8bd",
+      "comparison_sha256": "e3267784367f9a8251ee43ab949d458c6abc6290f8d872f45d94a360ab797b4e",
+      "requested_look": {
+        "minimum_exposure": 1.05,
+        "maximum_exposure": 2.2,
+        "compensation": 0,
+        "mode": "AgX"
+      },
+      "reported_camera": {
+        "Scene": "belltower",
+        "CameraScene": "belltower",
+        "Position": "-950,1760,64",
+        "Angles": "Pitch = -1.50, Yaw = -90.00, Roll = 0.00",
+        "FieldOfView": 80,
+        "EnablePostProcessing": true,
+        "Enabled": true,
+        "MinimumExposure": 1.05,
+        "MaximumExposure": 2.2,
+        "Compensation": 0,
+        "Rate": 1.5
+      },
+      "mean_absolute_rgb_difference_0_255": 14.14673225308642,
+      "fraction_pixels_with_any_channel_difference_over_2": 0.9717105516975308,
+      "exact_tone_component_restored": true
+    },
+    {
+      "variant": "agx-saved",
+      "view": "council-hall",
+      "baseline": "output/belltower/quality/look-v1-baseline/council-hall.png",
+      "comparison": "output/belltower/quality/look-v1-agx-saved/council-hall.png",
+      "baseline_sha256": "5fe4ed63ac203301e2a75ea9de9d2d5e40db600caa36a04d3c2e1858e5a13702",
+      "comparison_sha256": "a9662627c0f96653964970ab3250a356b2ded6459014e636eaba8869b8532c4f",
+      "requested_look": {
+        "minimum_exposure": 1.05,
+        "maximum_exposure": 2.2,
+        "compensation": 0,
+        "mode": "AgX"
+      },
+      "reported_camera": {
+        "Scene": "belltower",
+        "CameraScene": "belltower",
+        "Position": "1030,240,240",
+        "Angles": "Pitch = 0.51, Yaw = -132.14, Roll = 0.00",
+        "FieldOfView": 85,
+        "EnablePostProcessing": true,
+        "Enabled": true,
+        "MinimumExposure": 1.05,
+        "MaximumExposure": 2.2,
+        "Compensation": 0,
+        "Rate": 1.5
+      },
+      "mean_absolute_rgb_difference_0_255": 8.472447273662551,
+      "fraction_pixels_with_any_channel_difference_over_2": 0.9682373649691358,
+      "exact_tone_component_restored": true
+    },
+    {
+      "variant": "aces-lower",
+      "view": "west-street",
+      "baseline": "output/belltower/quality/look-v1-baseline/west-street.png",
+      "comparison": "output/belltower/quality/look-v1-aces-lower/west-street.png",
+      "baseline_sha256": "9f2c5733df124c23edae0543f391fbd00102608f5bf8d50e5b8e242bf942b119",
+      "comparison_sha256": "5bd6b4ae8101567f25b3afb97ff0e3739fa194e3e44894d0bba548c2fb9b3401",
+      "requested_look": {
+        "minimum_exposure": 0.7,
+        "maximum_exposure": 1.5,
+        "compensation": 0,
+        "mode": "ACES"
+      },
+      "reported_camera": {
+        "Scene": "belltower",
+        "CameraScene": "belltower",
+        "Position": "125,1800,64",
+        "Angles": "Pitch = -2.70, Yaw = -88.57, Roll = 0.00",
+        "FieldOfView": 80,
+        "EnablePostProcessing": true,
+        "Enabled": true,
+        "MinimumExposure": 0.7,
+        "MaximumExposure": 1.5,
+        "Compensation": 0,
+        "Rate": 1.5
+      },
+      "mean_absolute_rgb_difference_0_255": 0.0769653420781893,
+      "fraction_pixels_with_any_channel_difference_over_2": 0.005607638888888889,
+      "exact_tone_component_restored": true
+    },
+    {
+      "variant": "agx-lower",
+      "view": "west-street",
+      "baseline": "output/belltower/quality/look-v1-baseline/west-street.png",
+      "comparison": "output/belltower/quality/look-v1-agx-lower/west-street.png",
+      "baseline_sha256": "9f2c5733df124c23edae0543f391fbd00102608f5bf8d50e5b8e242bf942b119",
+      "comparison_sha256": "d0c455eb6422191a04ed88c7455c5675adf8503ed759c7cb6965e31aade3d81e",
+      "requested_look": {
+        "minimum_exposure": 0.7,
+        "maximum_exposure": 1.5,
+        "compensation": 0,
+        "mode": "AgX"
+      },
+      "reported_camera": {
+        "Scene": "belltower",
+        "CameraScene": "belltower",
+        "Position": "125,1800,64",
+        "Angles": "Pitch = -2.70, Yaw = -88.57, Roll = 0.00",
+        "FieldOfView": 80,
+        "EnablePostProcessing": true,
+        "Enabled": true,
+        "MinimumExposure": 0.7,
+        "MaximumExposure": 1.5,
+        "Compensation": 0,
+        "Rate": 1.5
+      },
+      "mean_absolute_rgb_difference_0_255": 12.893118569958848,
+      "fraction_pixels_with_any_channel_difference_over_2": 0.9617578125,
+      "exact_tone_component_restored": true
+    },
+    {
+      "variant": "aces-comp",
+      "view": "west-street",
+      "baseline": "output/belltower/quality/look-v1-baseline/west-street.png",
+      "comparison": "output/belltower/quality/look-v1-aces-comp/west-street.png",
+      "baseline_sha256": "9f2c5733df124c23edae0543f391fbd00102608f5bf8d50e5b8e242bf942b119",
+      "comparison_sha256": "1b8419c152813630eea589620a3a4daa332daad2c56661dc9cc6cce75cfcb2f8",
+      "requested_look": {
+        "minimum_exposure": 0.7,
+        "maximum_exposure": 1.5,
+        "compensation": -0.7,
+        "mode": "ACES"
+      },
+      "reported_camera": {
+        "Scene": "belltower",
+        "CameraScene": "belltower",
+        "Position": "125,1800,64",
+        "Angles": "Pitch = -2.70, Yaw = -88.57, Roll = 0.00",
+        "FieldOfView": 80,
+        "EnablePostProcessing": true,
+        "Enabled": true,
+        "MinimumExposure": 0.7,
+        "MaximumExposure": 1.5,
+        "Compensation": -0.7,
+        "Rate": 1.5
+      },
+      "mean_absolute_rgb_difference_0_255": 0.06142682613168724,
+      "fraction_pixels_with_any_channel_difference_over_2": 0.004780092592592593,
+      "exact_tone_component_restored": true
+    }
+  ],
+  "visual_review": {
+    "agx": "More legible pale plaster and paving, richer warm timber in the hall. It is a useful candidate, but does not resolve the map's material and landscape limitations.",
+    "exposure": "Exposure bounds and compensation changed camera metadata but produced nearly identical RGB pixels. These images do not verify their effective rendered exposure."
+  },
+  "local_engine_inspection": {
+    "report": "output/belltower/quality/capture-render-il.txt",
+    "sha256": "e1c7e4eb17c9a91eb0e334ec4b6094e3896c420d0a083081ec1e5ee2b8f22111",
+    "observed": [
+      "CameraComponent.CopyPostProcessing applies AutoExposure to SceneCamera.Tonemap.",
+      "InitializeRendering additionally copies Scene.Camera post-processing onto an editor camera when Scene.Camera is present.",
+      "TonemapSystem setters forward parameters to a native ITonemapSystem when its handle is valid.",
+      "SceneCamera.RenderToBitmap crosses into the native renderer. The inspected managed code does not establish the effective native exposure used for its pixels."
+    ],
+    "root_cause": "unconfirmed"
+  },
+  "read_only_live_camera_check": {
+    "report": "output/belltower/quality/capture-camera-state.json",
+    "sha256": "57c398451d896cbdb8a9b098694a1b87877d65eec7b5e5f3e414a41b35317e13",
+    "main_camera_name": "GameObject",
+    "camera_names": [
+      "editor_camera",
+      "GameObject"
+    ],
+    "observation": "A separate main camera and editor_camera both have valid native tone-map systems. This makes main-camera overwrite a concrete hypothesis to test, not a confirmed root cause."
+  },
+  "next_probe": [
+    "In a coordinated editor window, compare the main camera, editor camera and native SceneCamera tone-map settings after rendering initialization.",
+    "Use two deliberately separated fixed exposure bounds to distinguish a genuine response from animation noise, then verify the same settings in the live viewport before evaluating lighting.",
+    "The staged capture helper now records NativeExposureAfterRender. Its opt-in sync_main_postprocess comparison updates both cameras and restores the main camera exposure values; this branch has not yet run natively."
+  ],
+  "limitations": [
+    "No gameplay readability or frame-time claim is made by this screenshot comparison.",
+    "The saved scene remains ACES with exposure bounds 1.05 to 2.2 and compensation 0."
+  ]
+}

@@ -1,0 +1,319 @@
+{
+  "state": "type check passed",
+  "reflection": "all reflected members found",
+  "passed": true,
+  "executed": false,
+  "native_validation_required": true,
+  "sdk": "10.0.202",
+  "reference_pack": "C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Ref\\10.0.6\\ref\\net10.0",
+  "engine_managed": "D:\\SteamLibrary\\steamapps\\common\\sbox\\bin\\managed",
+  "references": 255,
+  "scripts": {
+    "Sources/Riverdale/editor/prepare-lighting.cs.txt": "dad3c5249dd90e9198b7f764b2769ce40f4421b168aba77b0fcc240e650279a6",
+    "Sources/Riverdale/editor/bake-lighting.cs.txt": "a6d621878c767def37251b815b201d5f28baff2be1e445a7e7d0688d854386fb",
+    "Sources/Riverdale/editor/capture-reflections.cs.txt": "4719e21da4e607f6623a338bdbb9cb8d0f697f9a146e01ecc756d606056114df",
+    "Sources/Riverdale/editor/import-reflections.cs.txt": "52f45396ed9e4a15ab360b547129d73c83bd4cb75502443bdc6214485536bf88",
+    "Sources/Riverdale/editor/apply-reflections.cs.txt": "3b628c82db1bc1842e7298369b7655481102e8b2174a5f9a4595cec9f8c5251a"
+  },
+  "exit_code": 0,
+  "diagnostics": [],
+  "reflected_members": {
+    "Assembly": "Sandbox.Engine.dll",
+    "Missing": 0,
+    "Members": [
+      {
+        "Type": "Sandbox.IndirectLightVolume",
+        "Kind": "property",
+        "Member": "Probes",
+        "Parameters": null,
+        "Found": true,
+        "Detail": [
+          "property"
+        ]
+      },
+      {
+        "Type": "Sandbox.IndirectLightVolume",
+        "Kind": "property",
+        "Member": "GeneratedRelocationTexture",
+        "Parameters": null,
+        "Found": true,
+        "Detail": [
+          "property"
+        ]
+      },
+      {
+        "Type": "Sandbox.IndirectLightVolume",
+        "Kind": "property",
+        "Member": "InsideGeometry",
+        "Parameters": null,
+        "Found": true,
+        "Detail": [
+          "property"
+        ]
+      },
+      {
+        "Type": "Sandbox.IndirectLightVolume",
+        "Kind": "field",
+        "Member": "_bakePreview",
+        "Parameters": null,
+        "Found": true,
+        "Detail": [
+          "field"
+        ]
+      },
+      {
+        "Type": "Sandbox.IndirectLightVolume",
+        "Kind": "method",
+        "Member": "MarkDirty",
+        "Parameters": 0,
+        "Found": true,
+        "Detail": [
+          "0 parameter(s), Private, HideBySig"
+        ]
+      },
+      {
+        "Type": "Sandbox.IndirectLightVolume",
+        "Kind": "method",
+        "Member": "ComputeSpacing",
+        "Parameters": 1,
+        "Found": true,
+        "Detail": [
+          "1 parameter(s), Assembly, HideBySig"
+        ]
+      },
+      {
+        "Type": "Sandbox.IndirectLightVolume",
+        "Kind": "method",
+        "Member": "GenerateSphericalDirections",
+        "Parameters": 1,
+        "Found": true,
+        "Detail": [
+          "1 parameter(s), Private, Static, HideBySig"
+        ]
+      },
+      {
+        "Type": "Sandbox.IndirectLightVolume",
+        "Kind": "method",
+        "Member": "TraceProbeRays",
+        "Parameters": 3,
+        "Found": true,
+        "Detail": [
+          "3 parameter(s), Private, HideBySig"
+        ]
+      },
+      {
+        "Type": "Sandbox.IndirectLightVolume",
+        "Kind": "method",
+        "Member": "ComputeRelocationOffset",
+        "Parameters": 6,
+        "Found": true,
+        "Detail": [
+          "6 parameter(s), Private, HideBySig"
+        ]
+      },
+      {
+        "Type": "Sandbox.IndirectLightVolume",
+        "Kind": "method",
+        "Member": "GetProbeWorldPosition",
+        "Parameters": 1,
+        "Found": true,
+        "Detail": [
+          "1 parameter(s), Assembly, HideBySig"
+        ]
+      },
+      {
+        "Type": "Sandbox.IndirectLightVolume",
+        "Kind": "method",
+        "Member": "UpdateRelocationTexture",
+        "Parameters": 0,
+        "Found": true,
+        "Detail": [
+          "0 parameter(s), Private, HideBySig"
+        ]
+      },
+      {
+        "Type": "Sandbox.IndirectLightVolume+ProbeTraceResult",
+        "Kind": "property",
+        "Member": "BackfaceRatio",
+        "Parameters": null,
+        "Found": true,
+        "Detail": [
+          "property"
+        ]
+      },
+      {
+        "Type": "Sandbox.DDGIProbeUpdaterCubemapper",
+        "Kind": "method",
+        "Member": ".ctor",
+        "Parameters": 1,
+        "Found": true,
+        "Detail": [
+          "1 parameter(s), Public, HideBySig, SpecialName, RTSpecialName"
+        ]
+      },
+      {
+        "Type": "Sandbox.DDGIProbeUpdaterCubemapper",
+        "Kind": "method",
+        "Member": "RunAsync",
+        "Parameters": 1,
+        "Found": true,
+        "Detail": [
+          "1 parameter(s), Public, HideBySig"
+        ]
+      },
+      {
+        "Type": "Sandbox.DDGIProbeUpdaterCubemapper",
+        "Kind": "method",
+        "Member": "Dispose",
+        "Parameters": 0,
+        "Found": true,
+        "Detail": [
+          "0 parameter(s), Public, Final, Virtual, HideBySig, VtableLayoutMask"
+        ]
+      },
+      {
+        "Type": "Sandbox.DDGIProbeUpdaterCubemapper",
+        "Kind": "property",
+        "Member": "GeneratedIrradianceTexture",
+        "Parameters": null,
+        "Found": true,
+        "Detail": [
+          "property"
+        ]
+      },
+      {
+        "Type": "Sandbox.DDGIProbeUpdaterCubemapper",
+        "Kind": "property",
+        "Member": "GeneratedDistanceTexture",
+        "Parameters": null,
+        "Found": true,
+        "Detail": [
+          "property"
+        ]
+      },
+      {
+        "Type": "Sandbox.DDGIProbeUpdaterCubemapper",
+        "Kind": "field",
+        "Member": "_pass",
+        "Parameters": null,
+        "Found": true,
+        "Detail": [
+          "field"
+        ]
+      },
+      {
+        "Type": "Sandbox.DDGIProbeUpdaterCubemapper",
+        "Kind": "field",
+        "Member": "_renderedIndex",
+        "Parameters": null,
+        "Found": true,
+        "Detail": [
+          "field"
+        ]
+      },
+      {
+        "Type": "Sandbox.DDGIVolumeSystem",
+        "Kind": "method",
+        "Member": "MarkDirty",
+        "Parameters": 0,
+        "Found": true,
+        "Detail": [
+          "0 parameter(s), Assembly, HideBySig"
+        ]
+      },
+      {
+        "Type": "Sandbox.DDGIVolumeSystem",
+        "Kind": "method",
+        "Member": "UpdateVolumes",
+        "Parameters": 0,
+        "Found": true,
+        "Detail": [
+          "0 parameter(s), Private, HideBySig"
+        ]
+      },
+      {
+        "Type": "Sandbox.Scene",
+        "Kind": "method",
+        "Member": "PreRender",
+        "Parameters": 0,
+        "Found": true,
+        "Detail": [
+          "0 parameter(s), Assembly, HideBySig"
+        ]
+      },
+      {
+        "Type": "Sandbox.Scene",
+        "Kind": "method",
+        "Member": "PreCameraRender",
+        "Parameters": 0,
+        "Found": true,
+        "Detail": [
+          "0 parameter(s), Assembly, HideBySig"
+        ]
+      },
+      {
+        "Type": "Sandbox.Scene",
+        "Kind": "method",
+        "Member": "GetSystem",
+        "Parameters": 0,
+        "Found": true,
+        "Detail": [
+          "0 parameter(s), Public, HideBySig",
+          "1 parameter(s), Public, HideBySig"
+        ]
+      },
+      {
+        "Type": "Sandbox.PostProcessSystem",
+        "Kind": "method",
+        "Member": "UpdateCamera",
+        "Parameters": 1,
+        "Found": true,
+        "Detail": [
+          "1 parameter(s), Private, HideBySig"
+        ]
+      },
+      {
+        "Type": "Sandbox.CameraComponent",
+        "Kind": "method",
+        "Member": "ComposeView",
+        "Parameters": 0,
+        "Found": true,
+        "Detail": [
+          "0 parameter(s), Public, HideBySig",
+          "1 parameter(s), Assembly, HideBySig"
+        ]
+      },
+      {
+        "Type": "Sandbox.EnvmapProbe",
+        "Kind": "property",
+        "Member": "Projection",
+        "Parameters": null,
+        "Found": true,
+        "Detail": [
+          "property"
+        ]
+      },
+      {
+        "Type": "Sandbox.EnvmapProbe",
+        "Kind": "property",
+        "Member": "Mode",
+        "Parameters": null,
+        "Found": true,
+        "Detail": [
+          "property"
+        ]
+      },
+      {
+        "Type": "Sandbox.EnvmapProbe",
+        "Kind": "property",
+        "Member": "Texture",
+        "Parameters": null,
+        "Found": true,
+        "Detail": [
+          "property"
+        ]
+      }
+    ],
+    "state": "all reflected members found"
+  }
+}

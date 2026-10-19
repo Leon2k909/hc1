@@ -1,0 +1,48 @@
+{
+  "revision": "forest-coverage-v1",
+  "files": [
+    {
+      "path": "shaders/belltower_forest_coverage_trial.shader",
+      "source": "output/belltower/quality/forest-coverage-v1/Assets/shaders/belltower_forest_coverage_trial.shader",
+      "sha256": "d6104be7e252372dcf6a6bed8cde348ff3b8d0b42c2ac30d3661919f7dfe400b"
+    },
+    {
+      "path": "materials/belltower/forest/trials/forest_coverage_v1.vmat",
+      "source": "output/belltower/quality/forest-coverage-v1/Assets/materials/belltower/forest/trials/forest_coverage_v1.vmat",
+      "sha256": "997ac436daf0b0143dd2a33404c45019c092d199ee7894166b6234784b7bc5dd"
+    }
+  ],
+  "source_sha256": {
+    "Assets/shaders/belltower_forest.shader": "a8f77a1471ec0706491e383aef451b6eddccba03b18ef97915ffb92d19bb5aa0",
+    "Assets/materials/belltower/forest/forest_trees.vmat": "a7908fc6d6ad5304f024777f3922813be3a1413587d904efc2150be679823553",
+    "Sources/Belltower/generated/forest-trees-v1.png": "68ed17f8cf98b95c208448cb7527d97e01d4a3e8aa33244000c58c78fe8d8baa",
+    "Assets/materials/belltower/forest/forest-trees-v1.png": "68ed17f8cf98b95c208448cb7527d97e01d4a3e8aa33244000c58c78fe8d8baa",
+    "Assets/scenes/maps/Belltower/belltower.scene": "5ea26d816c6b752225a5bd4ea2d761ba2791543c1ab7c89682f98d54219b373d",
+    "Sources/Belltower/landscape/forest.json": "7114d9059d6f3773cb61106c9eff9d2945fca4d8a078881f2635ac559b0e1a0e",
+    "Tools/belltower_quality_forest.py": "9ab503111c1bf6da81f94d0cbe3f5372ae7e4cedc02a05893fb70e64cab0d7ca",
+    "Tools/belltower_forest_coverage_trial.py": "4382d7173e5e0000f4ce682ace9abc358b0aac19aa0cfceb2fd130aa234b6562",
+    "Assets/materials/belltower/vista/vista_b_color.jpg": "c865d136fb4f961359000b5a53ab8e23e9fbbfbd7ba5cc169eb7fcf37ba92af2",
+    "Assets/materials/belltower/vista/vista_c_color.jpg": "de49bdb78c938bf8cdefc334dd6ad902363bbd0cee7cbcdcb9343c00f18a411d",
+    "Assets/materials/belltower/vista/vista_d_color.jpg": "af7dcdfaf56b137082b672c175b1bc3e054bc21745546f7fc67b6fa1f25c8084",
+    "Assets/materials/belltower/vista/vista_b_normal.jpg": "76354cb00e0b9d72793614b5e17c33c12664f6d5d02e9984e42910d8129fe64c",
+    "Assets/materials/belltower/vista/vista_c_normal.jpg": "33248aed48f1097f7cddc7a9ffd611c7fe6c1cb90b3a302efacaca6ee45721e6",
+    "Assets/materials/belltower/vista/vista_d_normal.jpg": "4835b134f8188c72acdf545f5e79be9e1f7517e5c54c4611acc26b20dae321d8"
+  },
+  "engine_source_sha256": {
+    "core/shaders/vr_common.fxc": "685c6ed09dc050ff1c808014245f1f49cb85c678236b12cd0bdd7b129f55b168",
+    "core/shaders/common/shadingmodel.hlsl": "273dc97e513eddeb6dac7db15201748a532e56b36f8b0b97867d338ecd07100d"
+  },
+  "material_overrides": {
+    "materials/belltower/forest/forest_trees.vmat": "materials/belltower/forest/trials/forest_coverage_v1.vmat"
+  },
+  "comparison_strengths": [
+    1,
+    0.5,
+    0
+  ],
+  "accepted_response_strength": 1,
+  "geometry_changed": false,
+  "texture_inputs_changed": false,
+  "scene_changed": false,
+  "native_verified": false
+}

@@ -1,0 +1,32 @@
+{
+  "shader": "shaders/hc1_spillway_concrete_v2.shader",
+  "native_compile_success": true,
+  "native_compiled_bytes": 164929,
+  "shader_sha256": "43d809caba60450269fde374366b21994122537b4a2ad15777a6784928cc85e9",
+  "source_matches_live": true,
+  "regeneration_matches": true,
+  "matched_views": [
+    "terrace-glint",
+    "terrace-down",
+    "yard-glint",
+    "yard-down"
+  ],
+  "preservation": {
+    "GamePreserved": true,
+    "DirtyPreserved": true,
+    "AuthoredObjectsPreserved": true,
+    "TemporaryCameraRemoved": true,
+    "CamerasRestored": true
+  },
+  "visual_review": "Sharp square wet/dry transitions removed in matched terrace and yard captures",
+  "native_gpu_mask_continuity": {
+    "before": {
+      "maximum_adjacent_pixel_step": 255,
+      "steps_over_64": 5870
+    },
+    "after": {
+      "maximum_adjacent_pixel_step": 39,
+      "steps_over_64": 0
+    }
+  }
+}

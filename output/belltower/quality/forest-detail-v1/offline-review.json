@@ -1,0 +1,71 @@
+{
+  "revision": "forest-detail-v1",
+  "status": "offline shader-response studies reviewed; native validation pending",
+  "scope": "Unlit albedo studies and source calibration, not native game views, BC7 textures or frame-time evidence.",
+  "visual_review": "The smooth response retains variation in the formerly clipped tones. Source chroma adds restrained branch and leaf colour. The result remains a simplified unlit study and does not establish overall forest realism. The rejected blue edge fallback is archived separately.",
+  "manifest": "output/belltower/quality/forest-detail-v1/manifest.json",
+  "manifest_sha256": "bb34d072189015d350c82dff4c65c30da565e0c2f6ad2f6cc98b011ca460ae15",
+  "checks": {
+    "passed": true,
+    "scope": "Source shader/calibration checks, not native compilation, lighting, BC7 or performance.",
+    "manifest_sha256": "bb34d072189015d350c82dff4c65c30da565e0c2f6ad2f6cc98b011ca460ae15",
+    "checker_sha256": "094ee548b2d5404c5fa8900b3247beaefe9594c72ec7ce807e5c8e04c33b39e3",
+    "installed_forest_meshes_inspected": 88,
+    "triangles_by_atlas_variant": {
+      "3": 411438,
+      "0": 206772,
+      "1": 21790
+    },
+    "base_colour_mean_relative_error_max": 4.0575603099668456e-08,
+    "used_mip_0_to_5_rgb_drift_max": 0.018146571667723377,
+    "mip_proxy_limit": 0.02,
+    "alpha_normals_lighting_and_fog_preserved": true,
+    "texture_sample_calls_unchanged": true,
+    "rejected_fringe_fixture_detected": true,
+    "unreliable_colour_falls_back_to_neutral": true,
+    "texture_inputs_changed": false,
+    "geometry_changed": false,
+    "native_verified": false
+  },
+  "views": [
+    {
+      "variant": 0,
+      "baseline": "output/belltower/quality/forest-detail-v1/variant-0-baseline.png",
+      "candidate": "output/belltower/quality/forest-detail-v1/variant-0-candidate.png",
+      "matched_camera_geometry_alpha_and_background": true,
+      "changed_pixels_over_3_fraction": 0.32395,
+      "baseline_sha256": "77447eef2605d6803db6fee4c1e3b05d1c97e7acddbdc8206d9e09e7de479d9d",
+      "candidate_sha256": "dfbf10d4ed9ddc5ba29801524d4212e82bed9260e90956943f435b5112d2f2b0"
+    },
+    {
+      "variant": 1,
+      "baseline": "output/belltower/quality/forest-detail-v1/variant-1-baseline.png",
+      "candidate": "output/belltower/quality/forest-detail-v1/variant-1-candidate.png",
+      "matched_camera_geometry_alpha_and_background": true,
+      "changed_pixels_over_3_fraction": 0.3065484375,
+      "baseline_sha256": "791a987b9cf1c2bd0df3075bf9b63be2fc3e81618049adff4445d80a8946c6c0",
+      "candidate_sha256": "f648388f5c7b3932a3c3b21545930adad35796fc0cccf2e2a27a0761211fc88b"
+    },
+    {
+      "variant": 3,
+      "baseline": "output/belltower/quality/forest-detail-v1/variant-3-baseline.png",
+      "candidate": "output/belltower/quality/forest-detail-v1/variant-3-candidate.png",
+      "matched_camera_geometry_alpha_and_background": true,
+      "changed_pixels_over_3_fraction": 0.475909375,
+      "baseline_sha256": "d6cc21ddec7467ce8291a3de33768101755bd244190f48069f2da398f88e52b1",
+      "candidate_sha256": "2fe01f46ce8dc3d64b30b497d832611ed6bcc204cadd229bcbdeeb97d39d8d93"
+    }
+  ],
+  "geometry_changed": false,
+  "texture_inputs_changed": false,
+  "scene_changed": false,
+  "native_verified": false,
+  "native_assets_installed": [],
+  "import_helper": "Sources/Belltower/editor/import-forest-detail-trial.cs.txt",
+  "import_helper_sha256": "7184c56125468b648d86dc09c018b4c3030cffe2f4ac8c7999be2eefcc7e02db",
+  "remaining": [
+    "Native shader/material compilation and loaded-parameter verification.",
+    "Compare current parcel-v4 Belltower in valley, west-ridge and terrace views with a temporary forest-material override.",
+    "Verify mip colour, fade, preserved scene/play state and gameplay frame times before acceptance."
+  ]
+}

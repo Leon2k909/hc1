@@ -1,0 +1,75 @@
+{
+  "IsError": false,
+  "ShaderName": "shaders/hc1_lowtide_foliage_v2.shader",
+  "textures": [
+    {
+      "name": "g_tColor",
+      "width": 1254,
+      "height": 1254
+    },
+    {
+      "name": "g_tCoverage",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "g_tNormal",
+      "width": 2048,
+      "height": 2048
+    },
+    {
+      "name": "g_tRma",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "name": "g_tTransmissiveColor",
+      "width": 1024,
+      "height": 1024
+    }
+  ],
+  "features": [
+    {
+      "name": "F_ALPHA_TEST",
+      "value": 1
+    },
+    {
+      "name": "F_RENDER_BACKFACES",
+      "value": 1
+    },
+    {
+      "name": "F_FOLIAGE_ANIMATION",
+      "value": 1
+    },
+    {
+      "name": "F_TRANSMISSIVE",
+      "value": 1
+    },
+    {
+      "name": "F_GRAZING_FADE",
+      "value": 1
+    }
+  ],
+  "parameters": [
+    {
+      "name": "g_flTintColor",
+      "value": "1,1,1,0"
+    },
+    {
+      "name": "g_flTransmissionScale",
+      "value": "8,8,8,8"
+    },
+    {
+      "name": "g_flRimStrength",
+      "value": "0.193000004,0.193000004,0.193000004,0.193000004"
+    },
+    {
+      "name": "g_flSwayStrength",
+      "value": "25,25,25,25"
+    },
+    {
+      "name": "g_flAlphaTestReference",
+      "value": "0.349999994,0.349999994,0.349999994,0.349999994"
+    }
+  ]
+}

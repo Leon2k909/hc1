@@ -1,0 +1,11 @@
+var session = Editor.SceneEditorSession.All.Single(s=>s.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase)==true);
+var scene=session.Scene;
+var volume=scene.GetAllComponents<IndirectLightVolume>().Single();
+var probes=scene.GetAllComponents<EnvmapProbe>().ToArray();
+var result=new { Scene=scene.Name, SessionUnsaved=session.HasUnsavedChanges,
+    Irradiance=volume.IrradianceTexture?.ResourcePath, Distance=volume.DistanceTexture?.ResourcePath,
+    Relocation=volume.RelocationTexture?.ResourcePath, volume.BakeVersion, Grid=volume.ProbeCounts.ToString(),
+    Reflections=probes.Select(p=>new {p.GameObject.Name,Texture=p.BakedTexture?.ResourcePath,Mode=p.Mode.ToString()}).ToArray() };
+if(!result.Irradiance.Contains("daylight-v8/") || !result.Distance.Contains("daylight-v8/") || !result.Relocation.Contains("daylight-v8/"))
+    throw new InvalidOperationException("The recovered v8 lighting is no longer loaded");
+return result;

@@ -1,0 +1,39 @@
+{
+  "tool": "call_tools",
+  "arguments": {
+    "calls": [
+      {
+        "name": "asset_compile",
+        "arguments": {
+          "path": "models/maps/lowtide/construction_review/lowtide_west.vmdl",
+          "full": false
+        }
+      },
+      {
+        "name": "asset_compile",
+        "arguments": {
+          "path": "models/maps/lowtide/construction_review/lowtide_backdrop.vmdl",
+          "full": false
+        }
+      },
+      {
+        "name": "asset_compile",
+        "arguments": {
+          "path": "models/maps/lowtide/construction_review/lowtide_finish.vmdl",
+          "full": false
+        }
+      },
+      {
+        "name": "read_console",
+        "arguments": {
+          "limit": 10,
+          "minimumLevel": "Error",
+          "since": 1782
+        }
+      }
+    ]
+  },
+  "returncode": 0,
+  "stdout": "{\"Success\":true,\"Path\":\"models/maps/lowtide/construction_review/lowtide_west.vmdl\",\"CompiledFile\":\"\",\"Hint\":null}\n{\"Success\":true,\"Path\":\"models/maps/lowtide/construction_review/lowtide_backdrop.vmdl\",\"CompiledFile\":\"\",\"Hint\":null}\n{\"Success\":true,\"Path\":\"models/maps/lowtide/construction_review/lowtide_finish.vmdl\",\"CompiledFile\":\"\",\"Hint\":null}\nNo matching console output (1882 entries buffered). Cursor: 1882\n",
+  "stderr": ""
+}

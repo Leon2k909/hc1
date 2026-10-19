@@ -1,0 +1,87 @@
+{
+  "status": "Density-only candidate withheld: patchy appearance and native image control above threshold.",
+  "manifest_sha256": "1838f2ef191f0f8a98e7b4b02bab824b418d7f7c746a75565c8791e4598e3435",
+  "native_model_compilation_verified": true,
+  "native_control_passed": false,
+  "views": [
+    {
+      "view": "west-ridge",
+      "images": {
+        "baseline": {
+          "path": "output/belltower/quality/forest-distribution-v1-native-baseline/west-ridge.png",
+          "sha256": "6eafd9ff34f6ed4d1ed98439d0f485dade0bff00235c4164efc96da9377c4248"
+        },
+        "control": {
+          "path": "output/belltower/quality/forest-distribution-v1-native-control/west-ridge.png",
+          "sha256": "5827f026d8a38eeaf495a53029685d2a417aff679a32e14db6195abd9c7e8ad1"
+        },
+        "clumped": {
+          "path": "output/belltower/quality/forest-distribution-v1-native-clumped/west-ridge.png",
+          "sha256": "5327529cfcc8ae3baf07c950e271bdab32a6ac99dc8727048434bcd644bbfa3b"
+        }
+      },
+      "control_forest_mean_abs_rgb_8bit": 0.23904761904761904,
+      "candidate_forest_mean_abs_rgb_8bit": 2.3045238095238094,
+      "control_threshold_mean_abs_rgb_8bit": 0.1,
+      "control_passed": false,
+      "later_hidden_repeat_forest_mean_abs_rgb_8bit": 9.664761904761905,
+      "later_hidden_repeat_scope": "Captured after returning selection to Lowtide. The large brightness shift makes it unsuitable as a temporal noise calibration for the active-tab batch.",
+      "region": [
+        900,
+        410,
+        1100,
+        438
+      ],
+      "matched_recorded_inputs": true,
+      "original_models_and_materials_restored": true
+    },
+    {
+      "view": "west-ridge-detail",
+      "images": {
+        "baseline": {
+          "path": "output/belltower/quality/forest-distribution-v1-native-baseline/west-ridge-detail.png",
+          "sha256": "cc4483beccc5355258983746c436c4c916b2e92ea9404dde7335a1b322a3f86e"
+        },
+        "control": {
+          "path": "output/belltower/quality/forest-distribution-v1-native-control/west-ridge-detail.png",
+          "sha256": "7f63507e9d33d2ed98a13fa9769264edf78544fd5be01b65584d2b5a152f1437"
+        },
+        "clumped": {
+          "path": "output/belltower/quality/forest-distribution-v1-native-clumped/west-ridge-detail.png",
+          "sha256": "d548ae7332f86bb4ff303b8fcf48a3daad1fba5e945933208a6f08cd7df6761d"
+        }
+      },
+      "control_forest_mean_abs_rgb_8bit": 0.26881818181818184,
+      "candidate_forest_mean_abs_rgb_8bit": 2.522050505050505,
+      "control_threshold_mean_abs_rgb_8bit": 0.1,
+      "control_passed": false,
+      "later_hidden_repeat_forest_mean_abs_rgb_8bit": 8.737060606060606,
+      "later_hidden_repeat_scope": "Captured after returning selection to Lowtide. The large brightness shift makes it unsuitable as a temporal noise calibration for the active-tab batch.",
+      "region": [
+        1000,
+        150,
+        1300,
+        260
+      ],
+      "matched_recorded_inputs": true,
+      "original_models_and_materials_restored": true
+    }
+  ],
+  "source_original_cards": 52986,
+  "source_candidate_cards": 41137,
+  "source_removed_cards": 11849,
+  "unchanged_sectors": 80,
+  "trial_sectors": 8,
+  "material_scope": "All variants temporarily use the same private coverage material at strength zero, with unchanged distance fade.",
+  "exposure_scope": "Fixed ACES exposure 2 for all variants, restored after each image.",
+  "accepted": false,
+  "visual_review": "Provisional visual rejection: the new gaps show pale terrain between trees and read as patchy cutouts. The control exceeds the strict image gate, so these captures do not establish a fully isolated geometry comparison. Do not promote.",
+  "next_visual_work": "Resolve viewport exposure consistency before a new acceptance comparison. Investigate crown variation/shape and canopy-to-terrain continuity rather than adopting density-only thinning.",
+  "performance_scope": "Source triangle count is lower in the eight trial sectors. No gameplay timing or FPS improvement is established.",
+  "selected_scene_after_review": "scenes/maps/lowtide/lowtide.scene",
+  "playing_after_review": false,
+  "accepted_scene_changed": false,
+  "accepted_shader_changed": false,
+  "trial_promoted": false,
+  "overall_quality_goal_complete": false
+}

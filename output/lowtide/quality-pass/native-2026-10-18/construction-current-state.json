@@ -1,0 +1,24 @@
+{
+  "tool": "call_tools",
+  "arguments": {
+    "calls": [
+      {
+        "name": "editor_status"
+      },
+      {
+        "name": "list_scenes"
+      },
+      {
+        "name": "read_console",
+        "arguments": {
+          "limit": 8,
+          "minimumLevel": "Error",
+          "since": 2169
+        }
+      }
+    ]
+  },
+  "returncode": 0,
+  "stdout": "{\"EngineVersion\":\"26.10.13a\",\"Project\":\"razedtest\",\"ProjectTitle\":\"RazedTest\",\"ActiveScene\":\"spillway\",\"ActiveScenePath\":\"scenes/maps/spillway/spillway.scene\",\"SceneHasUnsavedChanges\":false,\"IsPlaying\":true,\"IsPaused\":false,\"ToolCount\":128,\"IsCompiling\":false,\"LastCompileSucceeded\":true,\"LastCompileErrors\":0,\"Paths\":{\"Engine\":\"D:\\\\SteamLibrary\\\\steamapps\\\\common\\\\sbox\",\"Logs\":\"D:\\\\SteamLibrary\\\\steamapps\\\\common\\\\sbox\\\\logs\",\"ProjectRoot\":\"C:\\\\sbox-projects\\\\hc1\\\\forked-shooter-main\",\"ProjectSettings\":\"C:\\\\sbox-projects\\\\hc1\\\\forked-shooter-main\\\\ProjectSettings\"}}\n{\"Scenes\":[{\"Name\":\"menu\",\"ResourcePath\":\"scenes/menu.scene\",\"Type\":\"Scene\",\"IsActive\":false,\"HasUnsavedChanges\":false,\"RootObjectCount\":10},{\"Name\":\"spillway\",\"ResourcePath\":\"scenes/maps/spillway/spillway.scene\",\"Type\":\"Scene\",\"IsActive\":false,\"HasUnsavedChanges\":false,\"RootObjectCount\":27},{\"Name\":\"lowtide\",\"ResourcePath\":\"scenes/maps/lowtide/lowtide.scene\",\"Type\":\"Scene\",\"IsActive\":false,\"HasUnsavedChanges\":false,\"RootObjectCount\":45},{\"Name\":\"veridant\",\"ResourcePath\":\"scenes/maps/veridant/veridant.scene\",\"Type\":\"Scene\",\"IsActive\":false,\"HasUnsavedChanges\":false,\"RootObjectCount\":25},{\"Name\":\"spillway\",\"ResourcePath\":\"scenes/maps/spillway/spillway.scene\",\"Type\":\"Game\",\"IsActive\":true,\"HasUnsavedChanges\":false,\"RootObjectCount\":43}]}\nNo matching console output (2000 entries buffered). Cursor: 2198\n",
+  "stderr": ""
+}

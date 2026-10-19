@@ -1,0 +1,109 @@
+{
+  "status": "scoped_components_recomposed_native_review_pending",
+  "project_root": "C:\\sbox-projects\\hc1\\forked-shooter-main",
+  "production_changed": false,
+  "native_accepted": false,
+  "models": {
+    "lowtide_east": {
+      "triangles": 246854,
+      "windows": {
+        "removed": 15910,
+        "added": 82668,
+        "retained": 144192
+      },
+      "doors": {
+        "removed": 432,
+        "added": 20426,
+        "retained": 226428
+      }
+    },
+    "lowtide_west": {
+      "triangles": 246854,
+      "windows": {
+        "removed": 15910,
+        "added": 82668,
+        "retained": 144192
+      },
+      "doors": {
+        "removed": 432,
+        "added": 20426,
+        "retained": 226428
+      }
+    },
+    "lowtide_backdrop": {
+      "triangles": 6869,
+      "windows": {
+        "removed": 320,
+        "added": 1928,
+        "retained": 4941
+      },
+      "doors": null
+    },
+    "lowtide_finish": {
+      "triangles": 207258,
+      "pipes": {
+        "removed": 15088,
+        "added": 110592,
+        "retained": 80234
+      },
+      "junctions": {
+        "removed": 113040,
+        "added": 129472,
+        "retained": 77786
+      },
+      "grate_triangles_preserved": 12336
+    }
+  },
+  "staged_files": {
+    "Assets/shaders/hc1_lowtide_finish_metal.shader": "a15c51b92ff632f8639f38d5398bca17933b9843bc274fe96b49f7a0d5805475",
+    "Assets/models/maps/lowtide/lowtide_backdrop.mtl": "72122bbc45e40a4e14615226312e2e7cb0e661c0d2c4046605f634a791a3cd4d",
+    "Assets/models/maps/lowtide/lowtide_backdrop.obj": "aa6339bb36a8d7ac2972ebdde6f01b6de814df3f3e06fd6a7329811507d7bde3",
+    "Assets/models/maps/lowtide/lowtide_east.mtl": "af7ec9997f4d5ef9de29f34ee163dfbe1d5baf33b85c7b5df4dce7c3f5bb09f7",
+    "Assets/models/maps/lowtide/lowtide_east.obj": "ed5203baf8e8d612cf636e0f8f4beb1ba06a2cc5235f16cfa616a54f89ef2135",
+    "Assets/models/maps/lowtide/lowtide_finish.mtl": "d2e70a095901b5e63a890f00c23e78cdc307fa8cfaf1987ed323d64f8c402247",
+    "Assets/models/maps/lowtide/lowtide_finish.obj": "b0065cb4cbbed1f8c64c68fc0adac7b98c019b9df52f6880433f17cbc6513f74",
+    "Assets/models/maps/lowtide/lowtide_west.mtl": "aa08510a4c2c66231993166f806d85b365e2076ce4332dd22e34dafacbda80ae",
+    "Assets/models/maps/lowtide/lowtide_west.obj": "031287a7e255db25ae84456ff4190983ebe1eb34e8c3fd1c1a5a8efdcae23cc1",
+    "Assets/materials/lowtide/finish/lt_drain_edge.vmat": "8844676ef03b0584ccc6ceca14381d6b74a68d0815bc58f4d8583857f5199447",
+    "Assets/materials/lowtide/finish/lt_drain_iron.vmat": "cf7d3afe0485b5ff3afc605e5017fcdd379ea44556b0719409f4d885b824a3b5"
+  },
+  "live_before": {
+    "Assets/shaders/hc1_lowtide_finish_metal.shader": null,
+    "Assets/models/maps/lowtide/lowtide_backdrop.mtl": "72122bbc45e40a4e14615226312e2e7cb0e661c0d2c4046605f634a791a3cd4d",
+    "Assets/models/maps/lowtide/lowtide_backdrop.obj": "704e13681ef286c8ad4ee8aa96137de1fd946ca67c0f30ed99780d42c53246f9",
+    "Assets/models/maps/lowtide/lowtide_east.mtl": "af7ec9997f4d5ef9de29f34ee163dfbe1d5baf33b85c7b5df4dce7c3f5bb09f7",
+    "Assets/models/maps/lowtide/lowtide_east.obj": "9c0a6928404b4c7967b00742a1f51b833829e3a679834bf04e1e343b49110112",
+    "Assets/models/maps/lowtide/lowtide_finish.mtl": "d2e70a095901b5e63a890f00c23e78cdc307fa8cfaf1987ed323d64f8c402247",
+    "Assets/models/maps/lowtide/lowtide_finish.obj": "e277aec268f226adc03d89ca400bcc90bc29950d00dd8fcd19350f526cbc38c4",
+    "Assets/models/maps/lowtide/lowtide_west.mtl": "aa08510a4c2c66231993166f806d85b365e2076ce4332dd22e34dafacbda80ae",
+    "Assets/models/maps/lowtide/lowtide_west.obj": "11c659821b9553071c7436392d5a3e1dfa754bcdf18f06310d7362a9a9737269",
+    "Assets/materials/lowtide/finish/lt_drain_edge.vmat": "ee94b3a3ccaafff0004bb16e0547c475503bf0b0377eeb3697c746c8707059ac",
+    "Assets/materials/lowtide/finish/lt_drain_iron.vmat": "065912f4ea405d1556b2bd3253979bef5c904325ea5c24fa0f813aa54ad9cd61"
+  },
+  "materials": {
+    "shaders/hc1_lowtide_finish_metal.shader": "a15c51b92ff632f8639f38d5398bca17933b9843bc274fe96b49f7a0d5805475",
+    "materials/lowtide/finish/lt_drain_iron.vmat": "cf7d3afe0485b5ff3afc605e5017fcdd379ea44556b0719409f4d885b824a3b5",
+    "materials/lowtide/finish/lt_drain_edge.vmat": "8844676ef03b0584ccc6ceca14381d6b74a68d0815bc58f4d8583857f5199447"
+  },
+  "source_manifests": {
+    "output\\lowtide\\quality-pass\\window-construction\\manifest.json": "ef4ada23da631aa964c44600d756093c245853d16522240f2108223ca3746141",
+    "output\\lowtide\\quality-pass\\door-construction\\manifest.json": "9e3fd69df539569b3f1b7c9424f23115383769e3a6c1beec81c0308a0166c4b9",
+    "output\\lowtide\\quality-pass\\drain-construction\\manifest.json": "b63d9e950faa003d37e4c3ba0014bb8bd2c62f7fa6e897ed1a4e26779e0a795d",
+    "output\\lowtide\\quality-pass\\drain-junctions\\manifest.json": "5bf54383003337f86ab7af64b669235e4b3f0da653b924424fe58b91c4cbbb05"
+  },
+  "protected_models": {
+    "Assets\\models\\maps\\lowtide\\lowtide_east.obj": "9c0a6928404b4c7967b00742a1f51b833829e3a679834bf04e1e343b49110112",
+    "Assets\\models\\maps\\lowtide\\lowtide_east.mtl": "af7ec9997f4d5ef9de29f34ee163dfbe1d5baf33b85c7b5df4dce7c3f5bb09f7",
+    "Assets\\models\\maps\\lowtide\\lowtide_east.vmdl": "ac1c06af99bb96a89c3cf0141d6f837245700ac8e720d580eaf0f28217dcb74c",
+    "Assets\\models\\maps\\lowtide\\lowtide_west.obj": "11c659821b9553071c7436392d5a3e1dfa754bcdf18f06310d7362a9a9737269",
+    "Assets\\models\\maps\\lowtide\\lowtide_west.mtl": "aa08510a4c2c66231993166f806d85b365e2076ce4332dd22e34dafacbda80ae",
+    "Assets\\models\\maps\\lowtide\\lowtide_west.vmdl": "25443251b40b7619d8f9e6ccdbd7cc19420b2c4fd5d547b0727e7eec112d592a",
+    "Assets\\models\\maps\\lowtide\\lowtide_backdrop.obj": "704e13681ef286c8ad4ee8aa96137de1fd946ca67c0f30ed99780d42c53246f9",
+    "Assets\\models\\maps\\lowtide\\lowtide_backdrop.mtl": "72122bbc45e40a4e14615226312e2e7cb0e661c0d2c4046605f634a791a3cd4d",
+    "Assets\\models\\maps\\lowtide\\lowtide_backdrop.vmdl": "02bb03f812130c3dcb3c98131a4fd961d883b9e4cfb1dca81e0cb8a97be56009",
+    "Assets\\models\\maps\\lowtide\\lowtide_finish.obj": "e277aec268f226adc03d89ca400bcc90bc29950d00dd8fcd19350f526cbc38c4",
+    "Assets\\models\\maps\\lowtide\\lowtide_finish.mtl": "d2e70a095901b5e63a890f00c23e78cdc307fa8cfaf1987ed323d64f8c402247",
+    "Assets\\models\\maps\\lowtide\\lowtide_finish.vmdl": "21814ef81e599d03a159d5f516eacd89114d99d0714bbf6b8e07d1333fbfbda0"
+  },
+  "preserved_grate_status": "Sources/Lowtide/drainage/grate-status.json"
+}

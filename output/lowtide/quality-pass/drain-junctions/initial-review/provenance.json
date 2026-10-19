@@ -1,0 +1,85 @@
+{
+  "native_capture": false,
+  "source_files": {
+    "Assets\\models\\maps\\lowtide\\lowtide_east.obj": "93ebb998d60470730012874327da91bcb35380b6a3b429e5e7fd831e9dbd07c6",
+    "Assets\\models\\maps\\lowtide\\lowtide_finish.obj": "726f59989bc47c812ce2e5243f7ca40756f95539233dc80478a0883dc134cdca",
+    "output\\lowtide\\quality-pass\\drain-construction\\stage\\models\\maps\\lowtide\\lowtide_finish.obj": "746a997170b19eb5f052904eac32d3ec61e58bf0d087b1ede464138a785e9f4c"
+  },
+  "reviewer_sha256": "b67a4656334cc8b779e25ccf8001e1b5a219fda9f525094c58d89f2b0b78583d",
+  "renderer_sha256": "75c516523262951f33bf2cdb602c0e1fa49a39d3fa1d8f84e274db53a49c73e3",
+  "cases": {
+    "shed": {
+      "origin": [
+        1314.0,
+        -1050.0,
+        276.0
+      ],
+      "out": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "architecture": "lowtide_east"
+    },
+    "warehouse": {
+      "origin": [
+        1000.0,
+        207.0,
+        942.0
+      ],
+      "out": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "architecture": "lowtide_east"
+    }
+  },
+  "views": {
+    "oblique": {
+      "eye": [
+        0.8,
+        1.1,
+        0.6
+      ],
+      "target": [
+        0.0,
+        0.05,
+        -0.03
+      ],
+      "scale": 1.15,
+      "size": [
+        1100,
+        850
+      ]
+    },
+    "side": {
+      "eye": [
+        1.2,
+        0.5,
+        0.13
+      ],
+      "target": [
+        0.0,
+        0.04,
+        -0.04
+      ],
+      "scale": 0.8,
+      "size": [
+        1100,
+        850
+      ]
+    }
+  },
+  "previews": {
+    "shed-oblique-before.png": "c58a5ec05d8341de1513b9dde2795409d087fc80b67af7f1f4dfa914d00686bf",
+    "shed-oblique-candidate.png": "f6551be7ef1d6e5a049d865a091022f8935e678e55681d9c63b4ee4b09bfc525",
+    "shed-side-before.png": "e9742d749d053b0f7eb66051bada25df7500732a5179c23e9e60c4a8fcd525a0",
+    "shed-side-candidate.png": "cf6f282b7a4575c3ab86aa04a0fc983731dc8116c7b1a39d05b5ac0ab55dc01e",
+    "warehouse-oblique-before.png": "f115d0667b664472eb50824114932c24558d75d4732b07cfb0b9aa0ea89fa0e8",
+    "warehouse-oblique-candidate.png": "d988190aabb5d29e6a913872f76a3911297ffdccab330c61369f8e228ba4a826",
+    "warehouse-side-before.png": "cf9b799318da2c48fa4d38e2242026d3342e566c3c42967c4347de57bcc1cc4f",
+    "warehouse-side-candidate.png": "3dd4984f3cfb9911844324951a189e05a9f0369bb84045897e70779e54ce8288"
+  },
+  "limitations": "Clipped construction context with neutral architecture; does not validate native lighting or material appearance."
+}

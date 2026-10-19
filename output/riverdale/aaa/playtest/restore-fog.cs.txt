@@ -1,0 +1,17 @@
+// Restore default Riverdale light fog contribution, including all nonhero utility lights.
+if (!Game.IsPlaying || Game.ActiveScene.Name != "riverdale")
+    throw new InvalidOperationException("Riverdale must be running.");
+var root = Game.ActiveScene.GetAllObjects(true).First(g => g.Name == "Lights");
+var restored = 0;
+foreach (var holder in root.Children)
+foreach (var component in holder.Components.GetAll())
+{
+    var property = component.GetType().GetProperty("FogMode");
+    if (property is null) continue;
+    if (property.GetValue(component)?.ToString() != "Disabled") continue;
+    property.SetValue(component, Enum.Parse(property.PropertyType, "Enabled"));
+    restored++;
+}
+return new { Restored=restored,
+    EnabledPoints=Game.ActiveScene.GetAllComponents<PointLight>().Count(c=>c.FogMode.ToString()=="Enabled"),
+    EnabledSpots=Game.ActiveScene.GetAllComponents<SpotLight>().Count(c=>c.FogMode.ToString()=="Enabled") };

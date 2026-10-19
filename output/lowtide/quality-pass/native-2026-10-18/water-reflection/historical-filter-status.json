@@ -1,0 +1,85 @@
+{
+  "date": "2026-10-15",
+  "status": "offline_candidate_ready_for_native_review",
+  "revision": "linear-hdr-planar-filter-v2",
+  "user_work_mode": "Continue offline for now",
+  "production_changed": false,
+  "native_accepted": false,
+  "canonical_generator_changed": false,
+  "generator": "Tools/lowtide_water_filter.py",
+  "reviewer": "Tools/lowtide_water_filter_review.py",
+  "shader_extension": "Sources/Lowtide/water/reflection-filter.hlsl",
+  "finding": "The current planar capture has one mip and always samples level zero, independent of roughness and distorted UV footprint.",
+  "changes": [
+    "Allocate up to seven mips on the existing half-resolution planar target.",
+    "Generate the installed linear HDR Box pyramid after the reflection view and before publishing the texture.",
+    "Select a continuous mip from roughness and the distorted UV footprint, with a conservative 0.35 roughness-filter scale.",
+    "Preserve reflection registration, release, camera guards, water exclusion, view projection, waves, Fresnel, absorption and lighting.",
+    "A one-level target clamps to level zero, permitting a safe shader-only fallback during later staged review."
+  ],
+  "scope": {
+    "staged_files": 4,
+    "max_mips": 7,
+    "roughness_filter_scale": 0.35,
+    "delta_triangles": 0,
+    "new_material_slots": 0,
+    "extra_water_texture_lookups": 0,
+    "max_downsample_passes": 6,
+    "additional_color_bytes_at_960x540": 1380960,
+    "memory_note": "Colour pyramid allocation only; excludes depth, alignment, pooling and driver overhead.",
+    "performance": "Additional mip generation and trilinear sampling costs are unmeasured."
+  },
+  "evidence": {
+    "manifest": "output/lowtide/quality-pass/water-filter/manifest.json",
+    "manifest_sha256": "6dfb0492f4800146c5b5b41ce37f863c3791d10deca63ab482a71be0ce834a1d",
+    "verification": "output/lowtide/quality-pass/water-filter/verification.json",
+    "reproduction": "output/lowtide/quality-pass/water-filter/reproduction-verification.json",
+    "compile": "output/lowtide/quality-pass/water-filter/compile-verification.json",
+    "views": "output/lowtide/quality-pass/water-filter/preview/provenance.json",
+    "protected_live_files_unchanged": 560,
+    "byte_identical_staged_files": 4,
+    "isolated_csharp_compile_warnings": 0,
+    "isolated_csharp_compile_errors": 0
+  },
+  "preview": {
+    "kind": "Six matched synthetic CPU canal views",
+    "native_engine_capture": false,
+    "actual_lowtide_scene": false,
+    "visual_review": "Reviewed before/candidate from the canal, bank and reverse direction. Scale 0.35 keeps nearby reflected window/masonry forms readable while reducing fine reflection detail; distance blur still needs engine review.",
+    "unchanged_before_images_verified": true,
+    "limitations": [
+      "Synthetic geometry and approximate optics; no map appearance acceptance",
+      "Box mip filtering approximates a projected roughness footprint; it is not a full GGX convolution or reflection-depth correction",
+      "Native shader, sandbox hotload, GPU barriers, real lighting, temporal AA and performance remain untested"
+    ]
+  },
+  "first_review": {
+    "directory": "output/lowtide/quality-pass/water-filter/first-review",
+    "roughness_filter_scale": 1,
+    "rejected": true,
+    "reason": "Full-strength box filtering removed too much reflected building detail in all three static fixtures."
+  },
+  "integration": {
+    "stage": "output/lowtide/quality-pass/water-filter/stage",
+    "path_convention": "Stage keys are project-relative, including Assets/ and Code/.",
+    "code_patch": "output/lowtide/quality-pass/water-filter/capture-change.diff",
+    "live_target_states": {
+      "Assets/materials/lowtide/lt_water.vmat": "c7afb0e3f6d877ab3c422613bb1e0be707a2dec8a1edc997c26d406e67bcb60a",
+      "Assets/shaders/hc1_lowtide_water_filtered.shader": null,
+      "Assets/shaders/hc1_lowtide_water_filtered.shader.meta": null,
+      "Code/Map/LowtideWaterReflections.cs": "58ac31fede431086379c8283887ceaa094a2652cb97f5868b411054f9bb23c18"
+    },
+    "native_followup": [
+      "Keep offline mode until the user resumes native work. Start with fresh editor/project/compile/scene/play/unsaved state.",
+      "Revalidate the manifest, all live-before hashes and absent targets. Compile the new shader and an unused review material through the editor.",
+      "Apply only the scoped capture diff after confirming current C# matches. Do not overwrite later lifecycle changes with the full staged snapshot. Wait for native sandbox compilation and check errors.",
+      "Compare in the existing normal viewport. Check single/multiple editor views, gameplay camera, camera changes, detach/reload, reflection exclusion, flip, capture bounds, and fallback water elevations.",
+      "Inspect near and distant reflection detail, HDR brightness, bank boundaries, movement stability and GPU cost. The offline images do not establish these results.",
+      "After native acceptance, promote only the listed shader/meta/material and code changes. Integrate the selected shader/parameter with Tools/lowtide_water.py without regenerating unrelated scene content.",
+      "Save, verify persistence, and retain the previous material/capture behavior if any native lifecycle or performance check fails."
+    ]
+  },
+  "overall_goal": "Open: map-wide native appearance and gameplay performance are not established",
+  "latest_checkout_revalidation": "Sources/Lowtide/construction/checkout-status.json",
+  "historical_evidence_note": "Other validation fields describe the dated candidate; use latest_checkout_revalidation for the current scoped rebase."
+}

@@ -1,0 +1,4 @@
+// Lists the editor's open scene documents (read-only).
+return Editor.SceneEditorSession.All.Select(s => new {
+    Name = s.Scene?.Name, Path = s.Scene?.Source?.ResourcePath, Unsaved = s.HasUnsavedChanges,
+    Active = s == Editor.SceneEditorSession.Active }).ToArray();

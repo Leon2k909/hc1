@@ -1,0 +1,51 @@
+{
+  "state": "accepted; natively compiled and visually reviewed",
+  "models": [
+    {
+      "name": "belltower_centre",
+      "triangles": 247036,
+      "boxes": 403,
+      "hulls": 56
+    },
+    {
+      "name": "belltower_west",
+      "triangles": 969171,
+      "boxes": 457,
+      "hulls": 116
+    },
+    {
+      "name": "belltower_east",
+      "triangles": 969171,
+      "boxes": 457,
+      "hulls": 116
+    }
+  ],
+  "gameplay_spots": 94,
+  "invalid_spots": 0,
+  "unreachable_spots": 0,
+  "geometry_checks": 35,
+  "collision_definitions_unchanged": true,
+  "native_meshes_replaced": true,
+  "editor_window": "Released to Sewage; saved Sewage tab restored, play stopped",
+  "source_sha256": {
+    "Tools/belltower_map.py": "f59f1429fb281ca148cb8354bec1f0a71ea29e3349d584f3b2b4e9f4761768b8",
+    "Tools/belltower_architecture.py": "1efa88784a36785c422f241701e90e9ffbe796cef8446d7343e88af23d563c73",
+    "Tools/belltower_furniture.py": "36c83d4883b3084b90b3ff46d9ef56e5aef7cd916f9e4c399058884105974a24",
+    "Tools/belltower_quality_models.py": "6a01a66a37fe714dd3c43b6017640a1890c7d1c2e42fb178376df902000d3709",
+    "Tools/map_kit.py": "00d860ffb0679c42efe962e6bb7e87da95c56c35e73b00923fa253dd5c95ecb7"
+  },
+  "capture_views": [
+    "west-street",
+    "east-street",
+    "facade-north",
+    "facade-south",
+    "coping",
+    "terrace"
+  ],
+  "native_import": "Sources/Belltower/editor/import-facades.cs.txt",
+  "native_verify": "Sources/Belltower/editor/verify-facades.cs.txt",
+  "next_steps": [
+    "Continue the broader visual quality work offline while Sewage uses the editor."
+  ],
+  "acceptance_manifest": "Sources/Belltower/facades/manifest.json"
+}

@@ -1,0 +1,228 @@
+{
+  "checks": 11,
+  "results": [
+    {
+      "name": "large-west",
+      "triangles": 7740,
+      "bounds": [
+        [
+          -1846.0,
+          -1447.989069008229,
+          -48.0
+        ],
+        [
+          -1714.0,
+          -1331.852431611092,
+          71.06987081958296
+        ]
+      ],
+      "collision_boxes": 1,
+      "collision_hulls": 0
+    },
+    {
+      "name": "large-west-mirrored",
+      "triangles": 7740,
+      "bounds": [
+        [
+          1714.0,
+          -1447.989069008229,
+          -48.0
+        ],
+        [
+          1846.0,
+          -1331.852431611092,
+          71.06987081958296
+        ]
+      ],
+      "collision_boxes": 1,
+      "collision_hulls": 0
+    },
+    {
+      "name": "large-east",
+      "triangles": 7476,
+      "bounds": [
+        [
+          -426.0,
+          -1447.9868480810155,
+          -48.0
+        ],
+        [
+          -294.0,
+          -1351.8224490937102,
+          71.06530543773871
+        ]
+      ],
+      "collision_boxes": 1,
+      "collision_hulls": 0
+    },
+    {
+      "name": "large-east-mirrored",
+      "triangles": 7476,
+      "bounds": [
+        [
+          294.0,
+          -1447.9868480810155,
+          -48.0
+        ],
+        [
+          426.0,
+          -1351.8224490937102,
+          71.06530543773871
+        ]
+      ],
+      "collision_boxes": 1,
+      "collision_hulls": 0
+    },
+    {
+      "name": "small-terrace",
+      "triangles": 5212,
+      "bounds": [
+        [
+          -1446.0,
+          -1097.9713750862695,
+          -48.0
+        ],
+        [
+          -1374.0,
+          -1021.7896527557127,
+          54.99914941036471
+        ]
+      ],
+      "collision_boxes": 1,
+      "collision_hulls": 0
+    },
+    {
+      "name": "small-terrace-mirrored",
+      "triangles": 5212,
+      "bounds": [
+        [
+          1374.0,
+          -1097.9713750862695,
+          -48.0
+        ],
+        [
+          1446.0,
+          -1021.7896527557127,
+          54.99914941036471
+        ]
+      ],
+      "collision_boxes": 1,
+      "collision_hulls": 0
+    },
+    {
+      "name": "compost--1700",
+      "triangles": 1452,
+      "bounds": [
+        [
+          -1700.0,
+          -1080.0,
+          -48.0
+        ],
+        [
+          -1650.0,
+          -1030.0,
+          -12.0
+        ]
+      ],
+      "collision_boxes": 0,
+      "collision_hulls": 0
+    },
+    {
+      "name": "compost--1640",
+      "triangles": 1452,
+      "bounds": [
+        [
+          -1640.0,
+          -1080.0,
+          -48.0
+        ],
+        [
+          -1590.0,
+          -1030.0,
+          -12.0
+        ]
+      ],
+      "collision_boxes": 0,
+      "collision_hulls": 0
+    },
+    {
+      "name": "firewood",
+      "triangles": 1768,
+      "bounds": [
+        [
+          -1839.743372285677,
+          -1169.8333198987314,
+          -47.96
+        ],
+        [
+          -1740.2252219974546,
+          -1140.257307441767,
+          -11.060915238072583
+        ]
+      ],
+      "collision_boxes": 0,
+      "collision_hulls": 0
+    },
+    {
+      "name": "wheelbarrow",
+      "triangles": 2360,
+      "bounds": [
+        [
+          -48.20645205424615,
+          -14.049999999999999,
+          0.0
+        ],
+        [
+          34.0,
+          14.049999999999999,
+          31.066083941328785
+        ]
+      ],
+      "collision_boxes": 0,
+      "collision_hulls": 0
+    },
+    {
+      "name": "wheelbarrow-mirrored",
+      "triangles": 2360,
+      "bounds": [
+        [
+          -34.0,
+          -14.049999999999999,
+          0.0
+        ],
+        [
+          48.20645205424615,
+          14.049999999999999,
+          31.066083941328785
+        ]
+      ],
+      "collision_boxes": 0,
+      "collision_hulls": 0
+    }
+  ],
+  "garden_collision_preserved": true,
+  "cladding_trim_separation": [
+    "large-west",
+    "large-east",
+    "small-terrace"
+  ],
+  "wheelbarrow_basin_clearance": {
+    "v2_intruding_samples": 138,
+    "v3_intruding_samples": 0,
+    "example_v2": {
+      "material": "iron_green",
+      "point": [
+        -2.05056535652486,
+        -8.101599633818024,
+        17.5
+      ]
+    },
+    "archived_v2_sha256": "97ecf15e63aeabee3ce49d03b7abb3fabcc2821699701c7c89732380da2d802f"
+  },
+  "shared_random_sequence_preserved": true,
+  "scene_props_preserved": true,
+  "sources": {
+    "Tools\\belltower_gardens.py": "5bbf7dc306f955e4cd81f6369b40275f4a3c7559d34e5624352a095d37a72b8b",
+    "Tools\\belltower_map.py": "5e6d9ecfc223d03445c83a009d2f411bc210626bfb72abaf6c3eca722dd6abb5"
+  }
+}

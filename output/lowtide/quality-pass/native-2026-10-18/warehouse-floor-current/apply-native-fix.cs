@@ -1,0 +1,13 @@
+var root=Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/lowtide/quality-pass/native-2026-10-18/warehouse-floor-current");
+var data=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"native-fix.json")));
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var target=System.IO.Path.Combine(root,data["target"].GetValue<string>());
+var source=System.IO.Path.Combine(folder,data["stage"].GetValue<string>());
+if(Hash(target)!=data["before"].GetValue<string>()||Hash(source)!=data["after"].GetValue<string>())throw new Exception("Native fix inputs changed");
+var backup=System.IO.Path.Combine(folder,"native-fix-before",data["target"].GetValue<string>());
+System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+System.IO.File.Copy(target,backup);
+System.IO.File.WriteAllBytes(target+".native-stage",System.IO.File.ReadAllBytes(source));
+System.IO.File.Move(target+".native-stage",target,true);
+return new{Target=data["target"].GetValue<string>(),Hash=Hash(target),Game.IsPlaying};

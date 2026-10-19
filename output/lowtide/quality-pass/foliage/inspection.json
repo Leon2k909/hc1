@@ -1,0 +1,200 @@
+{
+  "trees": [
+    {
+      "Name": "Tree",
+      "Id": "74fa5c94-6d5e-5ceb-a9e7-fe54710c71e2",
+      "position": "-430,-1450,0",
+      "scale": "1,1,1",
+      "model": "models/sbox_props/trees/oak/tree_oak_medium_a.vmdl",
+      "slots": 2
+    },
+    {
+      "Name": "Tree",
+      "Id": "4a167867-5a9d-5ad4-bdf6-30d608f874b4",
+      "position": "430,-1450,0",
+      "scale": "1,1,1",
+      "model": "models/sbox_props/trees/oak/tree_oak_medium_a.vmdl",
+      "slots": 2
+    },
+    {
+      "Name": "Tree",
+      "Id": "1dabb9ab-3af0-5e6f-93db-81164effc5a5",
+      "position": "-430,1450,0",
+      "scale": "1,1,1",
+      "model": "models/sbox_props/trees/oak/tree_oak_medium_a.vmdl",
+      "slots": 2
+    },
+    {
+      "Name": "Tree",
+      "Id": "d41eac19-50e1-572a-9749-4f4a60baf6ae",
+      "position": "430,1450,0",
+      "scale": "1,1,1",
+      "model": "models/sbox_props/trees/oak/tree_oak_medium_a.vmdl",
+      "slots": 2
+    }
+  ],
+  "materials": [
+    {
+      "path": "models/sbox_props/trees/oak/oak_bark.vmat",
+      "ShaderName": "shaders/bark.shader",
+      "IsError": false,
+      "features": [
+        {
+          "name": "F_ALPHA_TEST",
+          "value": 0
+        },
+        {
+          "name": "F_TRANSLUCENT",
+          "value": 0
+        },
+        {
+          "name": "F_RENDER_BACKFACES",
+          "value": 0
+        },
+        {
+          "name": "F_VERTEX_COLOR",
+          "value": 0
+        },
+        {
+          "name": "F_WIND",
+          "value": 0
+        }
+      ],
+      "parameters": [
+        {
+          "name": "g_flAlphaTestReference",
+          "value": "0,0,0,0"
+        },
+        {
+          "name": "g_flRoughnessScaleFactor",
+          "value": "0,0,0,0"
+        },
+        {
+          "name": "g_flTransmissionAmount",
+          "value": "0,0,0,0"
+        },
+        {
+          "name": "g_flModelTintAmount",
+          "value": "0,0,0,0"
+        },
+        {
+          "name": "g_vColorTint",
+          "value": "0,0,0,0"
+        }
+      ],
+      "textures": [
+        {
+          "name": "g_tColor",
+          "path": null,
+          "width": 1024,
+          "height": 4096
+        },
+        {
+          "name": "g_tNormal",
+          "path": null,
+          "width": 1024,
+          "height": 4096
+        },
+        {
+          "name": "g_tRma",
+          "path": null,
+          "width": 2048,
+          "height": 2048
+        },
+        {
+          "name": "g_tTintMask",
+          "path": null,
+          "width": null,
+          "height": null
+        },
+        {
+          "name": "g_tTranslucency",
+          "path": null,
+          "width": null,
+          "height": null
+        }
+      ]
+    },
+    {
+      "path": "models/sbox_props/trees/oak/oak_branch.vmat",
+      "ShaderName": "shaders/foliage.shader",
+      "IsError": false,
+      "features": [
+        {
+          "name": "F_ALPHA_TEST",
+          "value": 1
+        },
+        {
+          "name": "F_TRANSLUCENT",
+          "value": 0
+        },
+        {
+          "name": "F_RENDER_BACKFACES",
+          "value": 1
+        },
+        {
+          "name": "F_VERTEX_COLOR",
+          "value": 0
+        },
+        {
+          "name": "F_WIND",
+          "value": 0
+        }
+      ],
+      "parameters": [
+        {
+          "name": "g_flAlphaTestReference",
+          "value": "0.349999994,0.349999994,0.349999994,0.349999994"
+        },
+        {
+          "name": "g_flRoughnessScaleFactor",
+          "value": "0,0,0,0"
+        },
+        {
+          "name": "g_flTransmissionAmount",
+          "value": "0,0,0,0"
+        },
+        {
+          "name": "g_flModelTintAmount",
+          "value": "0,0,0,0"
+        },
+        {
+          "name": "g_vColorTint",
+          "value": "0,0,0,0"
+        }
+      ],
+      "textures": [
+        {
+          "name": "g_tColor",
+          "path": null,
+          "width": 1024,
+          "height": 1024
+        },
+        {
+          "name": "g_tNormal",
+          "path": null,
+          "width": 2048,
+          "height": 2048
+        },
+        {
+          "name": "g_tRma",
+          "path": null,
+          "width": 1024,
+          "height": 1024
+        },
+        {
+          "name": "g_tTintMask",
+          "path": null,
+          "width": null,
+          "height": null
+        },
+        {
+          "name": "g_tTranslucency",
+          "path": null,
+          "width": null,
+          "height": null
+        }
+      ]
+    }
+  ]
+}

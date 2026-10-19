@@ -1,0 +1,31 @@
+{
+  "tool": "call_tools",
+  "arguments": {
+    "calls": [
+      {
+        "name": "editor_status"
+      },
+      {
+        "name": "asset_info",
+        "arguments": {
+          "path": "models/maps/lowtide/lowtide_finish.vmdl"
+        }
+      },
+      {
+        "name": "asset_info",
+        "arguments": {
+          "path": "models/maps/lowtide/lowtide_east.vmdl"
+        }
+      },
+      {
+        "name": "asset_info",
+        "arguments": {
+          "path": "models/maps/lowtide/lowtide_west.vmdl"
+        }
+      }
+    ]
+  },
+  "returncode": 0,
+  "stdout": "{\"EngineVersion\":\"26.10.13a\",\"Project\":\"razedtest\",\"ProjectTitle\":\"RazedTest\",\"ActiveScene\":\"spillway\",\"ActiveScenePath\":\"scenes/maps/spillway/spillway.scene\",\"SceneHasUnsavedChanges\":false,\"IsPlaying\":true,\"IsPaused\":false,\"ToolCount\":128,\"IsCompiling\":false,\"LastCompileSucceeded\":true,\"LastCompileErrors\":0,\"Paths\":{\"Engine\":\"D:\\\\SteamLibrary\\\\steamapps\\\\common\\\\sbox\",\"Logs\":\"D:\\\\SteamLibrary\\\\steamapps\\\\common\\\\sbox\\\\logs\",\"ProjectRoot\":\"C:\\\\sbox-projects\\\\hc1\\\\forked-shooter-main\",\"ProjectSettings\":\"C:\\\\sbox-projects\\\\hc1\\\\forked-shooter-main\\\\ProjectSettings\"}}\n{\"Name\":\"lowtide_finish\",\"Path\":\"models/maps/lowtide/lowtide_finish.vmdl\",\"Type\":\"Model\",\"Extension\":\"vmdl\",\"IsGameResource\":false,\"SourceFile\":\"c:/sbox-projects/hc1/forked-shooter-main/assets/models/maps/lowtide/lowtide_finish.vmdl\",\"CompiledFile\":\"c:/sbox-projects/hc1/forked-shooter-main/assets/models/maps/lowtide/lowtide_finish.vmdl_c\",\"IsCompiled\":true,\"IsCompiledAndUpToDate\":true,\"IsCompileFailed\":false,\"CanRecompile\":true,\"IsCloud\":false,\"IsTransient\":false,\"IsProcedural\":false,\"IsTrivialChild\":false,\"Package\":null,\"Tags\":[],\"ReferenceCount\":17,\"DependantCount\":1,\"LastOpened\":null}\n{\"Name\":\"lowtide_east\",\"Path\":\"models/maps/lowtide/lowtide_east.vmdl\",\"Type\":\"Model\",\"Extension\":\"vmdl\",\"IsGameResource\":false,\"SourceFile\":\"c:/sbox-projects/hc1/forked-shooter-main/assets/models/maps/lowtide/lowtide_east.vmdl\",\"CompiledFile\":\"c:/sbox-projects/hc1/forked-shooter-main/assets/models/maps/lowtide/lowtide_east.vmdl_c\",\"IsCompiled\":true,\"IsCompiledAndUpToDate\":true,\"IsCompileFailed\":false,\"CanRecompile\":true,\"IsCloud\":false,\"IsTransient\":false,\"IsProcedural\":false,\"IsTrivialChild\":false,\"Package\":null,\"Tags\":[],\"ReferenceCount\":23,\"DependantCount\":1,\"LastOpened\":null}\n{\"Name\":\"lowtide_west\",\"Path\":\"models/maps/lowtide/lowtide_west.vmdl\",\"Type\":\"Model\",\"Extension\":\"vmdl\",\"IsGameResource\":false,\"SourceFile\":\"c:/sbox-projects/hc1/forked-shooter-main/assets/models/maps/lowtide/lowtide_west.vmdl\",\"CompiledFile\":\"c:/sbox-projects/hc1/forked-shooter-main/assets/models/maps/lowtide/lowtide_west.vmdl_c\",\"IsCompiled\":true,\"IsCompiledAndUpToDate\":true,\"IsCompileFailed\":false,\"CanRecompile\":true,\"IsCloud\":false,\"IsTransient\":false,\"IsProcedural\":false,\"IsTrivialChild\":false,\"Package\":null,\"Tags\":[],\"ReferenceCount\":23,\"DependantCount\":1,\"LastOpened\":null}\n",
+  "stderr": ""
+}

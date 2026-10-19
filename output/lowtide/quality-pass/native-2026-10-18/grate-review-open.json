@@ -1,0 +1,26 @@
+{
+  "tool": "call_tools",
+  "arguments": {
+    "calls": [
+      {
+        "name": "open_scene",
+        "arguments": {
+          "path": "scenes/maps/Lowtide/lowtide.scene"
+        }
+      },
+      {
+        "name": "get_editor_camera"
+      },
+      {
+        "name": "set_editor_camera",
+        "arguments": {
+          "position": "-1515,-1140,35",
+          "angles": "47.55,-141.34,0"
+        }
+      }
+    ]
+  },
+  "returncode": 0,
+  "stdout": "{\"Active\":\"lowtide\",\"ActivePath\":\"scenes/maps/lowtide/lowtide.scene\",\"Open\":[\"menu\",\"spillway\",\"lowtide\",\"veridant\"]}\n{\"Position\":\"-1530,-1125,56\",\"Angles\":\"45.8000031,-71.0999908,2.44927332E-06\",\"FieldOfView\":80}\n{\n  \"Position\": \"-1515,-1140,35\",\n  \"Angles\": \"47.5500031,-141.339996,1.26494979E-06\",\n  \"FieldOfView\": 80\n}\n",
+  "stderr": ""
+}

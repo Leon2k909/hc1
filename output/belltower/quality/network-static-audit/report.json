@@ -1,0 +1,188 @@
+{
+  "checked_utc": "2026-10-15T18:21:24.077309+00:00",
+  "scope": "saved scene and regeneration caches only; no live client validation",
+  "scene_sha256": "aef98ef9fc0c4e484f6456f31dccc58f27163eb339e4844ebfa251de0333154a",
+  "native_enums": {
+    "NetworkModes": {
+      "Never": 0,
+      "Object": 1,
+      "Snapshot": 2
+    },
+    "GameObjectFlags": {
+      "None": 0,
+      "Hidden": 1,
+      "NotSaved": 2,
+      "Bone": 4,
+      "Attachment": 8,
+      "Error": 16,
+      "Loading": 32,
+      "Deserializing": 64,
+      "DontDestroyOnLoad": 128,
+      "NotNetworked": 256,
+      "Refreshing": 512,
+      "ProceduralBone": 1024,
+      "EditorOnly": 2048,
+      "Absolute": 4096,
+      "PhysicsBone": 8192,
+      "NoInterpolation": 16384,
+      "Static": 32768
+    }
+  },
+  "saved_objects": 2212,
+  "object_network_modes": {
+    "2": 2203,
+    "1": 6,
+    "None": 3
+  },
+  "objects_without_explicit_network_mode": [
+    {
+      "name": null,
+      "guid": "943812af-c04a-53cc-b2d7-ff71c326ec61",
+      "components": []
+    },
+    {
+      "name": null,
+      "guid": "e462084f-7f75-50c7-a809-d74d6f4016f4",
+      "components": []
+    },
+    {
+      "name": null,
+      "guid": "3b9d8fbc-c410-53b6-827f-46c0eef05790",
+      "components": []
+    }
+  ],
+  "static_component_counts": {
+    "Sandbox.DirectionalLight": 1,
+    "Sandbox.SkyBox2D": 1,
+    "Sandbox.AmbientOcclusion": 1,
+    "Sandbox.Tonemapping": 1,
+    "Sandbox.ModelRenderer": 2031,
+    "Sandbox.PointLight": 15,
+    "Sandbox.EnvmapProbe": 3,
+    "Sandbox.IndirectLightVolume": 1
+  },
+  "lighting": [
+    {
+      "path": [
+        "Reflections",
+        "Square reflection"
+      ],
+      "network_modes": [
+        2,
+        2
+      ],
+      "flags": [
+        0,
+        0
+      ],
+      "type": "Sandbox.EnvmapProbe",
+      "mode": "Baked",
+      "textures": {
+        "BakedTexture": {
+          "Id": "f7f6310d-3b5a-4a5e-a3d6-2f55dce402d7",
+          "Path": "lighting/belltower/daylight-v7/reflection-square.vtex"
+        },
+        "Texture": null
+      }
+    },
+    {
+      "path": [
+        "Reflections",
+        "West street reflection"
+      ],
+      "network_modes": [
+        2,
+        2
+      ],
+      "flags": [
+        0,
+        0
+      ],
+      "type": "Sandbox.EnvmapProbe",
+      "mode": "Baked",
+      "textures": {
+        "BakedTexture": {
+          "Id": "8546a898-2160-437b-afc7-08b9e0c4b72a",
+          "Path": "lighting/belltower/daylight-v7/reflection-west.vtex"
+        },
+        "Texture": null
+      }
+    },
+    {
+      "path": [
+        "Reflections",
+        "East street reflection"
+      ],
+      "network_modes": [
+        2,
+        2
+      ],
+      "flags": [
+        0,
+        0
+      ],
+      "type": "Sandbox.EnvmapProbe",
+      "mode": "Baked",
+      "textures": {
+        "BakedTexture": {
+          "Id": "7f218d67-02cb-4bd4-8189-5606eb2d18e9",
+          "Path": "lighting/belltower/daylight-v7/reflection-east.vtex"
+        },
+        "Texture": null
+      }
+    },
+    {
+      "path": [
+        "Indirect Light",
+        "Town Indirect Light"
+      ],
+      "network_modes": [
+        2,
+        2
+      ],
+      "flags": [
+        0,
+        0
+      ],
+      "type": "Sandbox.IndirectLightVolume",
+      "mode": null,
+      "textures": {
+        "DistanceTexture": {
+          "Id": "abe505d3-903a-4b91-b3d7-5fc0613b39af",
+          "Path": "lighting/belltower/daylight-v9/distance.vtex"
+        },
+        "IrradianceTexture": {
+          "Id": "bc53d792-21f4-4f21-809e-a62624ae53e3",
+          "Path": "lighting/belltower/daylight-v9/irradiance.vtex"
+        },
+        "RelocationTexture": {
+          "Id": "a69e16a6-9f99-44b3-9b8b-b4baf26ac6c9",
+          "Path": "lighting/belltower/daylight-v9/relocation.vtex"
+        }
+      }
+    }
+  ],
+  "issues": [],
+  "regeneration_cache_checks": [
+    {
+      "path": "Sources/Belltower/lighting/reflections.json",
+      "present_in_scene": true,
+      "matches_saved_object": false,
+      "matches_after_texture_reference_normalization": true
+    },
+    {
+      "path": "Sources/Belltower/lighting/indirect.json",
+      "present_in_scene": true,
+      "matches_saved_object": false,
+      "matches_after_texture_reference_normalization": true
+    },
+    {
+      "path": "Sources/Belltower/landscape/forest.json",
+      "present_in_scene": true,
+      "matches_saved_object": true,
+      "matches_after_texture_reference_normalization": true
+    }
+  ],
+  "runtime_client_verified": false,
+  "editor_mutated": false
+}

@@ -1,0 +1,30 @@
+{
+  "status": "isolated_csharp_api_compile_passed",
+  "manifest_sha256": "6dfb0492f4800146c5b5b41ce37f863c3791d10deca63ab482a71be0ce834a1d",
+  "source_sha256": "d53723b43eb08184ea26c8554898795eb6d1f1c2ccf3dda1bc5b926d00dc7831",
+  "source": "Code/Map/LowtideWaterReflections.cs",
+  "files": {
+    "compile/WaterCheck.csproj": "a47b2c66ec6b5a2b5bb12656f652acfc7ff5dc97b2736211a51323428669801c",
+    "compile/NuGet.Config": "9508cae5f76364f56e80eb97cb16493977243cf38e5cca6284e3d74f83b20a2c",
+    "compile/build-output.txt": "24540010be83b212652131b6a9fb8c7e532de769279067a7198768776c556a77",
+    "compile/bin/Debug/net10.0/LowtideWaterOfflineCheck.dll": "d401e6db661d9a764843bf964b2a63303322f364fb42862cebd8fd2d0512965d"
+  },
+  "sdk": "10.0.202",
+  "reference_files": {
+    "D:/SteamLibrary/steamapps/common/sbox/bin/managed/Sandbox.System.dll": "5d4c56988dc3feceb45b81038d079e16fbfe050b3303ffd61d789c43ca484a2b",
+    "D:/SteamLibrary/steamapps/common/sbox/bin/managed/Sandbox.Engine.dll": "b1b6711437840917a59a168c615252a7f0d830dcb70284a02479f2e78f72917f",
+    "D:/SteamLibrary/steamapps/common/sbox/bin/managed/Sandbox.Filesystem.dll": "6512a3b065b1a68761854e09e1e0d69d79ccd346db93691b3706b8164574a961",
+    "D:/SteamLibrary/steamapps/common/sbox/bin/managed/Sandbox.Reflection.dll": "026c1ea6f74dc24d1fcdd680120743f6716a248e9c646662a07f416d45f6a701",
+    "D:/SteamLibrary/steamapps/common/sbox/bin/managed/Sandbox.Mounting.dll": "c9ce6dc9ed3aefab1993eca3a04b40d0f46b52e9fbfb1d95cdca0ea12ade5637"
+  },
+  "warnings": 0,
+  "errors": 0,
+  "loaded_into_engine": false,
+  "shader_compiled": false,
+  "capture_source_identical_to_first_review_compile": true,
+  "limitations": [
+    "Isolated net10.0 compilation against installed assemblies only",
+    "No s&box sandbox analyzers/source generators, native shader compilation or GPU execution",
+    "Subsequent review changed only shader/material filter strength; compiled C# bytes are identical"
+  ]
+}

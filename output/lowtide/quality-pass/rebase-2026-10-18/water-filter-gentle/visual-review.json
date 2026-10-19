@@ -1,0 +1,25 @@
+{
+  "status": "retained_for_native_review",
+  "manifest_sha256": "3c6069cec09657f4bce1e50b61faf9f9d688f888a8600264eeedff5bdaee1d92",
+  "selected_filter_strength": 0.08,
+  "current_material_base_roughness": 0.22,
+  "reviewed_preview_provenance_sha256": "aa8ba9c98fdbd9ce176755a4a0d5ddf7a6dc16b505a6c5299a7439d4fb5c21f6",
+  "reviewed_views": [
+    "canal-before",
+    "canal-candidate",
+    "bank-before",
+    "bank-candidate",
+    "reverse-before",
+    "reverse-candidate"
+  ],
+  "findings": [
+    "The 0.35 rebase obscured reflected window shapes with the current roughness input.",
+    "0.08 retains nearby window divisions while softening fine reflected texture in the synthetic fixture.",
+    "0.12 and 0.20 bank variants removed more architectural detail than the retained 0.08 setting."
+  ],
+  "native_accepted": false,
+  "limitations": [
+    "Synthetic geometry and fixed fixture ripples are not the Lowtide scene or its ocean normal maps.",
+    "Temporal behavior, GPU cost and actual map appearance require native review."
+  ]
+}

@@ -1,0 +1,5 @@
+// Read-only: which scene documents the editor has open, and whether each has unsaved changes.
+var all = typeof(Editor.SceneEditorSession).GetProperty("All", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)?.GetValue(null) as System.Collections.IEnumerable;
+var list = new System.Collections.Generic.List<object>();
+if (all != null) foreach (Editor.SceneEditorSession s in all) list.Add(new { Path = s.Scene?.Source?.ResourcePath, s.HasUnsavedChanges, Active = s == Editor.SceneEditorSession.Active });
+return new { Game.IsPlaying, Sessions = list };

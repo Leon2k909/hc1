@@ -1,0 +1,15 @@
+// Recompiles the models listed below (their OBJs changed without their vmdl) and loads them back.
+if (Game.IsPlaying) throw new InvalidOperationException("A game is playing.");
+var root = Sandbox.Project.Current.GetRootPath();
+var paths = new[] { "materials/cerroblanco/quality-v1/cb_paving.vmat", "materials/cerroblanco/quality-v1/cb_honed.vmat", "materials/cerroblanco/quality-v1/cb_travertine.vmat" };
+var results = new System.Collections.Generic.List<object>();
+foreach (var p in paths)
+{
+    var file = System.IO.Path.Combine(root, "Assets", p);
+    var asset = Editor.AssetSystem.FindByPath(file) ?? Editor.AssetSystem.RegisterFile(file);
+    var ok = asset.Compile(true);
+    await Task.Delay(1, cancellationToken);
+    var material = Material.Load(p);
+    results.Add(new { p, ok, asset.IsCompileFailed, Error = material is null || material.IsError, Shader = material?.ShaderName });
+}
+return results;

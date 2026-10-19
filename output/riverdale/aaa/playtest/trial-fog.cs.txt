@@ -1,0 +1,25 @@
+// Runtime-only A/B performance probe. Change only map utility lights; restore-fog.cs.txt reverts.
+if (!Game.IsPlaying || Game.ActiveScene.Name != "riverdale")
+    throw new InvalidOperationException("Riverdale must be running.");
+var root = Game.ActiveScene.GetAllObjects(true).First(g => g.Name == "Lights");
+var changed = new System.Collections.Generic.List<string>();
+foreach (var holder in root.Children)
+{
+    var name = holder.Name;
+    // Preserve the pool's blue shafts, high bays, control rooms, floodlights and red safety beacons.
+    if (name.StartsWith("Pool ") || name.StartsWith("High bay ") ||
+        name.StartsWith("Control room ") || name.StartsWith("Yard mast ") ||
+        name.StartsWith("Spawn mast ") || name.Contains("beacon", StringComparison.OrdinalIgnoreCase))
+        continue;
+    foreach (var component in holder.Components.GetAll())
+    {
+        var property = component.GetType().GetProperty("FogMode");
+        if (property is null) continue;
+        if (property.GetValue(component)?.ToString() != "Enabled") continue;
+        property.SetValue(component, Enum.Parse(property.PropertyType, "Disabled"));
+        changed.Add(name);
+    }
+}
+return new { Disabled=changed.Count, Sample=changed.Take(15).ToArray(),
+    RemainingPoints=Game.ActiveScene.GetAllComponents<PointLight>().Count(c=>c.FogMode.ToString()=="Enabled"),
+    RemainingSpots=Game.ActiveScene.GetAllComponents<SpotLight>().Count(c=>c.FogMode.ToString()=="Enabled") };

@@ -1,0 +1,1657 @@
+﻿System.Void Sandbox.CameraComponent::UpdateSceneCamera(Sandbox.SceneCamera,System.Boolean)
+IL_0000: ldarg.0
+IL_0001: call Sandbox.Scene Sandbox.Component::get_Scene()
+IL_0006: brtrue.s IL_0027
+IL_0008: call Sandbox.Diagnostics.Logger Sandbox.Internal.GlobalSystemNamespace::get_Log()
+IL_000d: ldstr "Trying to update camera from {0} but has no scene"
+IL_0012: ldc.i4.1
+IL_0013: newarr System.Object
+IL_0018: dup
+IL_0019: ldc.i4.0
+IL_001a: ldarg.0
+IL_001b: stelem.ref
+IL_001c: call System.FormattableString System.Runtime.CompilerServices.FormattableStringFactory::Create(System.String,System.Object[])
+IL_0021: callvirt System.Void Sandbox.Diagnostics.Logger::Warning(System.FormattableString)
+IL_0026: ret
+IL_0027: ldarg.0
+IL_0028: ldarg.1
+IL_0029: call System.Void Sandbox.CameraComponent::UpdateSceneCameraTransform(Sandbox.SceneCamera)
+IL_002e: ldarg.1
+IL_002f: ldarg.0
+IL_0030: call Sandbox.Scene Sandbox.Component::get_Scene()
+IL_0035: callvirt Sandbox.SceneWorld Sandbox.Scene::get_SceneWorld()
+IL_003a: callvirt System.Void Sandbox.SceneCamera::set_World(Sandbox.SceneWorld)
+IL_003f: ldarg.1
+IL_0040: ldarg.0
+IL_0041: call Sandbox.ClearFlags Sandbox.CameraComponent::get_ClearFlags()
+IL_0046: callvirt System.Void Sandbox.SceneCamera::set_ClearFlags(Sandbox.ClearFlags)
+IL_004b: ldarg.1
+IL_004c: callvirt System.Collections.Generic.HashSet`1<Sandbox.SceneWorld> Sandbox.SceneCamera::get_Worlds()
+IL_0051: callvirt System.Void System.Collections.Generic.HashSet`1<Sandbox.SceneWorld>::Clear()
+IL_0056: ldarg.1
+IL_0057: callvirt System.Collections.Generic.HashSet`1<Sandbox.SceneWorld> Sandbox.SceneCamera::get_Worlds()
+IL_005c: ldarg.0
+IL_005d: call Sandbox.Scene Sandbox.Component::get_Scene()
+IL_0062: callvirt Sandbox.SceneWorld Sandbox.Scene::get_DebugSceneWorld()
+IL_0067: callvirt System.Boolean System.Collections.Generic.HashSet`1<Sandbox.SceneWorld>::Add(!0)
+IL_006c: pop
+IL_006d: call Sandbox.Gizmo/Instance Sandbox.Gizmo::get_Active()
+IL_0072: brfalse.s IL_008a
+IL_0074: ldarg.1
+IL_0075: callvirt System.Collections.Generic.HashSet`1<Sandbox.SceneWorld> Sandbox.SceneCamera::get_Worlds()
+IL_007a: call Sandbox.Gizmo/Instance Sandbox.Gizmo::get_Active()
+IL_007f: callvirt Sandbox.SceneWorld Sandbox.Gizmo/Instance::get_World()
+IL_0084: callvirt System.Boolean System.Collections.Generic.HashSet`1<Sandbox.SceneWorld>::Add(!0)
+IL_0089: pop
+IL_008a: ldarg.0
+IL_008b: ldarg.1
+IL_008c: call System.Void Sandbox.CameraComponent::CopyPostProcessing(Sandbox.SceneCamera)
+IL_0091: ldarg.2
+IL_0092: brfalse.s IL_00b6
+IL_0094: ldarg.1
+IL_0095: callvirt Sandbox.ITagSet Sandbox.SceneCamera::get_RenderTags()
+IL_009a: ldarg.0
+IL_009b: call Sandbox.TagSet Sandbox.CameraComponent::get_RenderTags()
+IL_00a0: callvirt System.Void Sandbox.ITagSet::SetFrom(Sandbox.ITagSet)
+IL_00a5: ldarg.1
+IL_00a6: callvirt Sandbox.ITagSet Sandbox.SceneCamera::get_ExcludeTags()
+IL_00ab: ldarg.0
+IL_00ac: call Sandbox.TagSet Sandbox.CameraComponent::get_RenderExcludeTags()
+IL_00b1: callvirt System.Void Sandbox.ITagSet::SetFrom(Sandbox.ITagSet)
+IL_00b6: ldarg.0
+IL_00b7: call Sandbox.Scene Sandbox.Component::get_Scene()
+IL_00bc: callvirt Sandbox.RenderAttributes Sandbox.Scene::get_RenderAttributes()
+IL_00c1: ldarg.1
+IL_00c2: callvirt Sandbox.RenderAttributes Sandbox.SceneCamera::get_Attributes()
+IL_00c7: callvirt System.Void Sandbox.RenderAttributes::MergeTo(Sandbox.RenderAttributes)
+IL_00cc: ldarg.1
+IL_00cd: ldarg.0
+IL_00ce: call Sandbox.SceneCameraDebugMode Sandbox.CameraComponent::get_DebugMode()
+IL_00d3: callvirt System.Void Sandbox.SceneCamera::set_DebugMode(Sandbox.SceneCameraDebugMode)
+IL_00d8: ldarg.1
+IL_00d9: ldarg.0
+IL_00da: call System.Boolean Sandbox.CameraComponent::get_WireframeMode()
+IL_00df: callvirt System.Void Sandbox.SceneCamera::set_WireframeMode(System.Boolean)
+IL_00e4: ldarg.1
+IL_00e5: ldarg.0
+IL_00e6: call System.Boolean Sandbox.CameraComponent::get_EnablePostProcessing()
+IL_00eb: callvirt System.Void Sandbox.SceneCamera::set_EnablePostProcessing(System.Boolean)
+IL_00f0: ldarg.1
+IL_00f1: ldarg.0
+IL_00f2: call Sandbox.ClearFlags Sandbox.CameraComponent::get_ClearFlags()
+IL_00f7: ldc.i4 255
+IL_00fc: call System.Boolean Sandbox.SandboxSystemExtensions::Contains<Sandbox.ClearFlags>(!!0,!!0)
+IL_0101: brtrue.s IL_010a
+IL_0103: ldsfld Color Color::Transparent
+IL_0108: br.s IL_0110
+IL_010a: ldarg.0
+IL_010b: call Color Sandbox.CameraComponent::get_BackgroundColor()
+IL_0110: callvirt System.Void Sandbox.SceneCamera::set_BackgroundColor(Color)
+IL_0115: ret
+System.Void Sandbox.CameraComponent::CopyPostProcessing(Sandbox.SceneCamera)
+IL_0000: ldarg.0
+IL_0001: call Sandbox.Scene Sandbox.Component::get_Scene()
+IL_0006: brtrue.s IL_0027
+IL_0008: call Sandbox.Diagnostics.Logger Sandbox.Internal.GlobalSystemNamespace::get_Log()
+IL_000d: ldstr "Trying to update camera from {0} but has no scene"
+IL_0012: ldc.i4.1
+IL_0013: newarr System.Object
+IL_0018: dup
+IL_0019: ldc.i4.0
+IL_001a: ldarg.0
+IL_001b: stelem.ref
+IL_001c: call System.FormattableString System.Runtime.CompilerServices.FormattableStringFactory::Create(System.String,System.Object[])
+IL_0021: callvirt System.Void Sandbox.Diagnostics.Logger::Warning(System.FormattableString)
+IL_0026: ret
+IL_0027: ldarg.1
+IL_0028: callvirt Sandbox.CubemapFogController Sandbox.SceneCamera::get_CubemapFog()
+IL_002d: ldc.i4.0
+IL_002e: callvirt System.Void Sandbox.CubemapFogController::set_Enabled(System.Boolean)
+IL_0033: ldarg.1
+IL_0034: callvirt Sandbox.SceneCamera/BloomAccessor Sandbox.SceneCamera::get_Bloom()
+IL_0039: ldc.i4.0
+IL_003a: callvirt System.Void Sandbox.SceneCamera/BloomAccessor::set_Enabled(System.Boolean)
+IL_003f: ldarg.0
+IL_0040: call Sandbox.CameraComponent/AutoExposureSetup Sandbox.CameraComponent::get_AutoExposure()
+IL_0045: ldarg.1
+IL_0046: callvirt System.Void Sandbox.CameraComponent/AutoExposureSetup::Apply(Sandbox.SceneCamera)
+IL_004b: ldarg.0
+IL_004c: call Sandbox.ClearFlags Sandbox.CameraComponent::get_ClearFlags()
+IL_0051: ldc.i4 255
+IL_0056: call System.Boolean Sandbox.SandboxSystemExtensions::Contains<Sandbox.ClearFlags>(!!0,!!0)
+IL_005b: brfalse IL_00fe
+IL_0060: ldarg.1
+IL_0061: callvirt Sandbox.VolumetricFogParameters Sandbox.SceneCamera::get_VolumetricFog()
+IL_0066: ldarg.0
+IL_0067: call Sandbox.Scene Sandbox.Component::get_Scene()
+IL_006c: callvirt T Sandbox.Scene::Get<Sandbox.VolumetricFogVolume>()
+IL_0071: ldnull
+IL_0072: ceq
+IL_0074: ldc.i4.0
+IL_0075: ceq
+IL_0077: callvirt System.Void Sandbox.VolumetricFogParameters::set_Enabled(System.Boolean)
+IL_007c: ldarg.1
+IL_007d: callvirt Sandbox.VolumetricFogParameters Sandbox.SceneCamera::get_VolumetricFog()
+IL_0082: ldc.r4 4096
+IL_0087: callvirt System.Void Sandbox.VolumetricFogParameters::set_DrawDistance(System.Single)
+IL_008c: ldarg.1
+IL_008d: callvirt Sandbox.VolumetricFogParameters Sandbox.SceneCamera::get_VolumetricFog()
+IL_0092: ldc.r4 64
+IL_0097: callvirt System.Void Sandbox.VolumetricFogParameters::set_FadeInStart(System.Single)
+IL_009c: ldarg.1
+IL_009d: callvirt Sandbox.VolumetricFogParameters Sandbox.SceneCamera::get_VolumetricFog()
+IL_00a2: ldc.r4 256
+IL_00a7: callvirt System.Void Sandbox.VolumetricFogParameters::set_FadeInEnd(System.Single)
+IL_00ac: ldarg.1
+IL_00ad: callvirt Sandbox.VolumetricFogParameters Sandbox.SceneCamera::get_VolumetricFog()
+IL_00b2: ldc.r4 1
+IL_00b7: callvirt System.Void Sandbox.VolumetricFogParameters::set_IndirectStrength(System.Single)
+IL_00bc: ldarg.1
+IL_00bd: callvirt Sandbox.VolumetricFogParameters Sandbox.SceneCamera::get_VolumetricFog()
+IL_00c2: ldc.r4 1
+IL_00c7: callvirt System.Void Sandbox.VolumetricFogParameters::set_Anisotropy(System.Single)
+IL_00cc: ldarg.1
+IL_00cd: callvirt Sandbox.VolumetricFogParameters Sandbox.SceneCamera::get_VolumetricFog()
+IL_00d2: ldc.r4 1
+IL_00d7: callvirt System.Void Sandbox.VolumetricFogParameters::set_Scattering(System.Single)
+IL_00dc: ldarg.1
+IL_00dd: callvirt Sandbox.VolumetricFogParameters Sandbox.SceneCamera::get_VolumetricFog()
+IL_00e2: ldarg.0
+IL_00e3: call Sandbox.Scene Sandbox.Component::get_Scene()
+IL_00e8: callvirt T Sandbox.Scene::Get<Sandbox.VolumetricFogController>()
+IL_00ed: dup
+IL_00ee: brtrue.s IL_00f4
+IL_00f0: pop
+IL_00f1: ldnull
+IL_00f2: br.s IL_00f9
+IL_00f4: call Sandbox.Texture Sandbox.VolumetricFogController::get_BakedFogTexture()
+IL_00f9: callvirt System.Void Sandbox.VolumetricFogParameters::set_BakedIndirectTexture(Sandbox.Texture)
+IL_00fe: ldarg.1
+IL_00ff: ldarg.0
+IL_0100: ldfld System.Action`2<Sandbox.Rendering.Stage,Sandbox.SceneCamera> Sandbox.CameraComponent::executeCommandListsHook
+IL_0105: dup
+IL_0106: brtrue.s IL_011e
+IL_0108: pop
+IL_0109: ldarg.0
+IL_010a: ldarg.0
+IL_010b: ldftn System.Void Sandbox.CameraComponent::ExecuteCommandLists(Sandbox.Rendering.Stage,Sandbox.SceneCamera)
+IL_0111: newobj System.Void System.Action`2<Sandbox.Rendering.Stage,Sandbox.SceneCamera>::.ctor(System.Object,System.IntPtr)
+IL_0116: dup
+IL_0117: stloc.0
+IL_0118: stfld System.Action`2<Sandbox.Rendering.Stage,Sandbox.SceneCamera> Sandbox.CameraComponent::executeCommandListsHook
+IL_011d: ldloc.0
+IL_011e: stfld System.Action`2<Sandbox.Rendering.Stage,Sandbox.SceneCamera> Sandbox.SceneCamera::OnRenderStageHook
+IL_0123: ldarg.1
+IL_0124: ldarg.0
+IL_0125: ldfld System.Func`1<System.Boolean> Sandbox.CameraComponent::wantsDepthNormalsHook
+IL_012a: dup
+IL_012b: brtrue.s IL_0143
+IL_012d: pop
+IL_012e: ldarg.0
+IL_012f: ldarg.0
+IL_0130: ldftn System.Boolean Sandbox.CameraComponent::WantsDepthNormals()
+IL_0136: newobj System.Void System.Func`1<System.Boolean>::.ctor(System.Object,System.IntPtr)
+IL_013b: dup
+IL_013c: stloc.1
+IL_013d: stfld System.Func`1<System.Boolean> Sandbox.CameraComponent::wantsDepthNormalsHook
+IL_0142: ldloc.1
+IL_0143: stfld System.Func`1<System.Boolean> Sandbox.SceneCamera::WantsDepthNormalsHook
+IL_0148: ldarg.1
+IL_0149: ldarg.0
+IL_014a: ldfld System.Func`2<Sandbox.Rendering.Stage,System.Boolean> Sandbox.CameraComponent::hasAsyncComputeHook
+IL_014f: dup
+IL_0150: brtrue.s IL_0168
+IL_0152: pop
+IL_0153: ldarg.0
+IL_0154: ldarg.0
+IL_0155: ldftn System.Boolean Sandbox.CameraComponent::HasAsyncCompute(Sandbox.Rendering.Stage)
+IL_015b: newobj System.Void System.Func`2<Sandbox.Rendering.Stage,System.Boolean>::.ctor(System.Object,System.IntPtr)
+IL_0160: dup
+IL_0161: stloc.2
+IL_0162: stfld System.Func`2<Sandbox.Rendering.Stage,System.Boolean> Sandbox.CameraComponent::hasAsyncComputeHook
+IL_0167: ldloc.2
+IL_0168: stfld System.Func`2<Sandbox.Rendering.Stage,System.Boolean> Sandbox.SceneCamera::HasAsyncComputeHook
+IL_016d: ldarg.1
+IL_016e: ldarg.0
+IL_016f: ldfld System.Action`1<Sandbox.Rendering.Stage> Sandbox.CameraComponent::renderAsyncComputeHook
+IL_0174: dup
+IL_0175: brtrue.s IL_018d
+IL_0177: pop
+IL_0178: ldarg.0
+IL_0179: ldarg.0
+IL_017a: ldftn System.Void Sandbox.CameraComponent::RenderAsyncCompute(Sandbox.Rendering.Stage)
+IL_0180: newobj System.Void System.Action`1<Sandbox.Rendering.Stage>::.ctor(System.Object,System.IntPtr)
+IL_0185: dup
+IL_0186: stloc.3
+IL_0187: stfld System.Action`1<Sandbox.Rendering.Stage> Sandbox.CameraComponent::renderAsyncComputeHook
+IL_018c: ldloc.3
+IL_018d: stfld System.Action`1<Sandbox.Rendering.Stage> Sandbox.SceneCamera::RenderAsyncComputeHook
+IL_0192: ldarg.0
+IL_0193: call Sandbox.Scene Sandbox.Component::get_Scene()
+IL_0198: callvirt Sandbox.SceneObjectQuery`1<T> Sandbox.Scene::Query<Sandbox.CubemapFog>()
+IL_019d: stloc.s V_5
+IL_019f: ldloca.s V_5
+IL_01a1: call Sandbox.SceneObjectEnumerator`1<T> Sandbox.SceneObjectQuery`1<Sandbox.CubemapFog>::GetEnumerator()
+IL_01a6: stloc.s V_4
+IL_01a8: br.s IL_01d0
+IL_01aa: ldloca.s V_4
+IL_01ac: call T Sandbox.SceneObjectEnumerator`1<Sandbox.CubemapFog>::get_Current()
+IL_01b1: stloc.s V_6
+IL_01b3: ldloc.s V_6
+IL_01b5: callvirt Sandbox.ITagSet Sandbox.Component::get_Tags()
+IL_01ba: ldarg.0
+IL_01bb: call Sandbox.TagSet Sandbox.CameraComponent::get_RenderExcludeTags()
+IL_01c0: callvirt System.Boolean Sandbox.ITagSet::HasAny(Sandbox.ITagSet)
+IL_01c5: brtrue.s IL_01d0
+IL_01c7: ldloc.s V_6
+IL_01c9: ldarg.0
+IL_01ca: ldarg.1
+IL_01cb: callvirt System.Void Sandbox.CubemapFog::SetupCamera(Sandbox.CameraComponent,Sandbox.SceneCamera)
+IL_01d0: ldloca.s V_4
+IL_01d2: call System.Boolean Sandbox.SceneObjectEnumerator`1<Sandbox.CubemapFog>::MoveNext()
+IL_01d7: brtrue.s IL_01aa
+IL_01d9: leave.s IL_01e9
+IL_01db: ldloca.s V_4
+IL_01dd: constrained. Sandbox.SceneObjectEnumerator`1<Sandbox.CubemapFog>
+IL_01e3: callvirt System.Void System.IDisposable::Dispose()
+IL_01e8: endfinally
+IL_01e9: ret
+System.Void Sandbox.CameraComponent::InitializeRendering(System.Boolean)
+IL_0000: ldarg.0
+IL_0001: call Sandbox.Scene Sandbox.Component::get_Scene()
+IL_0006: callvirt Sandbox.ScenePushScope Sandbox.Scene::PushScope()
+IL_000b: stloc.0
+IL_000c: ldarg.0
+IL_000d: call System.Void Sandbox.CameraComponent::EnsureSceneCameraCreated()
+IL_0012: ldarg.0
+IL_0013: ldfld System.Boolean Sandbox.CameraComponent::IsSceneEditorCamera
+IL_0018: brfalse.s IL_0045
+IL_001a: ldarg.0
+IL_001b: ldarg.0
+IL_001c: ldfld Sandbox.SceneCamera Sandbox.CameraComponent::sceneCamera
+IL_0021: ldc.i4.1
+IL_0022: call System.Void Sandbox.CameraComponent::UpdateSceneCamera(Sandbox.SceneCamera,System.Boolean)
+IL_0027: ldarg.0
+IL_0028: call Sandbox.Scene Sandbox.Component::get_Scene()
+IL_002d: callvirt Sandbox.CameraComponent Sandbox.Scene::get_Camera()
+IL_0032: dup
+IL_0033: brtrue.s IL_0038
+IL_0035: pop
+IL_0036: br.s IL_0052
+IL_0038: ldarg.0
+IL_0039: ldfld Sandbox.SceneCamera Sandbox.CameraComponent::sceneCamera
+IL_003e: call System.Void Sandbox.CameraComponent::CopyPostProcessing(Sandbox.SceneCamera)
+IL_0043: br.s IL_0052
+IL_0045: ldarg.0
+IL_0046: ldarg.0
+IL_0047: ldfld Sandbox.SceneCamera Sandbox.CameraComponent::sceneCamera
+IL_004c: ldc.i4.1
+IL_004d: call System.Void Sandbox.CameraComponent::UpdateSceneCamera(Sandbox.SceneCamera,System.Boolean)
+IL_0052: ldarg.0
+IL_0053: ldarg.0
+IL_0054: ldfld Sandbox.SceneCamera Sandbox.CameraComponent::sceneCamera
+IL_0059: call System.Void Sandbox.CameraComponent::UpdateSceneCameraUI(Sandbox.SceneCamera)
+IL_005e: ldarg.0
+IL_005f: ldfld Sandbox.SceneCamera Sandbox.CameraComponent::sceneCamera
+IL_0064: ldarg.1
+IL_0065: callvirt System.Void Sandbox.SceneCamera::set_RenderUI(System.Boolean)
+IL_006a: ldarg.0
+IL_006b: ldfld Sandbox.SceneCamera Sandbox.CameraComponent::sceneCamera
+IL_0070: callvirt Sandbox.RenderAttributes Sandbox.SceneCamera::get_Attributes()
+IL_0075: ldstr "enableEarlyUI"
+IL_007a: ldc.i4 -975555232
+IL_007f: call Sandbox.StringToken Sandbox.StringToken::Literal(System.String,System.UInt32)
+IL_0084: stloc.1
+IL_0085: ldloca.s V_1
+IL_0087: ldarg.0
+IL_0088: call System.Boolean Sandbox.CameraComponent::HasEarlyUI()
+IL_008d: stloc.2
+IL_008e: ldloca.s V_2
+IL_0090: callvirt System.Void Sandbox.RenderAttributes::Set(Sandbox.StringToken&,System.Boolean&)
+IL_0095: ldarg.0
+IL_0096: ldarg.0
+IL_0097: ldfld Sandbox.SceneCamera Sandbox.CameraComponent::sceneCamera
+IL_009c: call System.Void Sandbox.CameraComponent::UpdateSceneCameraStereo(Sandbox.SceneCamera)
+IL_00a1: leave.s IL_00b1
+IL_00a3: ldloca.s V_0
+IL_00a5: constrained. Sandbox.ScenePushScope
+IL_00ab: callvirt System.Void System.IDisposable::Dispose()
+IL_00b0: endfinally
+IL_00b1: ret
+System.Boolean Sandbox.CameraComponent::RenderToTexture(Sandbox.Texture,Sandbox.Rendering.ViewSetup&)
+IL_0000: ldarg.1
+IL_0001: brfalse.s IL_0010
+IL_0003: ldarg.1
+IL_0004: ldflda NativeEngine.ITexture Sandbox.Texture::native
+IL_0009: call System.Boolean NativeEngine.ITexture::get_IsNull()
+IL_000e: brfalse.s IL_0012
+IL_0010: ldc.i4.0
+IL_0011: ret
+IL_0012: call System.Boolean Sandbox.Graphics::get_IsActive()
+IL_0017: brtrue.s IL_002b
+IL_0019: ldarg.0
+IL_001a: call Sandbox.Scene Sandbox.Component::get_Scene()
+IL_001f: callvirt System.Void Sandbox.Scene::PreCameraRender()
+IL_0024: ldarg.0
+IL_0025: ldc.i4.1
+IL_0026: call System.Void Sandbox.CameraComponent::InitializeRendering(System.Boolean)
+IL_002b: ldloca.s V_0
+IL_002d: ldarg.0
+IL_002e: call Sandbox.GameObject Sandbox.Component::get_GameObject()
+IL_0033: callvirt System.String Sandbox.GameObject::get_Name()
+IL_0038: ldstr ".RenderToTexture"
+IL_003d: call System.String System.String::Concat(System.String,System.String)
+IL_0042: ldarg.0
+IL_0043: ldfld Sandbox.SceneCamera Sandbox.CameraComponent::sceneCamera
+IL_0048: ldfld System.Int32 Sandbox.SceneCamera::_cameraId
+IL_004d: call System.Void Sandbox.CameraRenderer::.ctor(System.String,System.Int32)
+IL_0052: ldarg.0
+IL_0053: stloc.1
+IL_0054: ldc.i4.0
+IL_0055: stloc.2
+IL_0056: ldloc.1
+IL_0057: ldloca.s V_2
+IL_0059: call System.Void System.Threading.Monitor::Enter(System.Object,System.Boolean&)
+IL_005e: ldloca.s V_0
+IL_0060: ldarg.0
+IL_0061: ldfld Sandbox.SceneCamera Sandbox.CameraComponent::sceneCamera
+IL_0066: ldarg.2
+IL_0067: ldobj Sandbox.Rendering.ViewSetup
+IL_006c: call System.Void Sandbox.CameraRenderer::Configure(Sandbox.SceneCamera,Sandbox.Rendering.ViewSetup)
+IL_0071: leave.s IL_007d
+IL_0073: ldloc.2
+IL_0074: brfalse.s IL_007c
+IL_0076: ldloc.1
+IL_0077: call System.Void System.Threading.Monitor::Exit(System.Object)
+IL_007c: endfinally
+IL_007d: ldloca.s V_0
+IL_007f: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_0084: ldarg.1
+IL_0085: ldfld NativeEngine.ITexture Sandbox.Texture::native
+IL_008a: call NativeEngine.ISceneView Sandbox.Graphics::get_SceneView()
+IL_008f: call System.Void CCameraRenderer::RenderToTexture(NativeEngine.ITexture,NativeEngine.ISceneView)
+IL_0094: ldloca.s V_0
+IL_0096: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_009b: call System.Void CCameraRenderer::ClearSceneWorlds()
+IL_00a0: ldc.i4.1
+IL_00a1: stloc.2
+IL_00a2: leave.s IL_00ac
+IL_00a4: ldloca.s V_0
+IL_00a6: call System.Void Sandbox.CameraRenderer::Dispose()
+IL_00ab: endfinally
+IL_00ac: ldloc.2
+IL_00ad: ret
+System.Void Sandbox.CameraComponent::RenderToBitmap(Sandbox.Bitmap)
+IL_0000: ldarg.0
+IL_0001: ldarg.1
+IL_0002: ldc.i4.1
+IL_0003: call System.Void Sandbox.CameraComponent::RenderToBitmap(Sandbox.Bitmap,System.Boolean)
+IL_0008: ret
+System.Void Sandbox.CameraComponent::RenderToBitmap(Sandbox.Bitmap,System.Boolean)
+IL_0000: ldarg.1
+IL_0001: brfalse.s IL_0015
+IL_0003: ldarg.1
+IL_0004: callvirt System.Int32 Sandbox.Bitmap::get_Width()
+IL_0009: ldc.i4.1
+IL_000a: ble.s IL_0015
+IL_000c: ldarg.1
+IL_000d: callvirt System.Int32 Sandbox.Bitmap::get_Height()
+IL_0012: ldc.i4.1
+IL_0013: bgt.s IL_0016
+IL_0015: ret
+IL_0016: ldarg.0
+IL_0017: call System.Boolean Sandbox.SandboxSystemExtensions::IsValid(Sandbox.IValid)
+IL_001c: brtrue.s IL_001f
+IL_001e: ret
+IL_001f: ldarg.0
+IL_0020: call Sandbox.Scene Sandbox.Component::get_Scene()
+IL_0025: callvirt Sandbox.ScenePushScope Sandbox.Scene::PushScope()
+IL_002a: stloc.0
+IL_002b: ldarg.0
+IL_002c: call Sandbox.Scene Sandbox.Component::get_Scene()
+IL_0031: callvirt System.Void Sandbox.Scene::PreCameraRender()
+IL_0036: ldarg.0
+IL_0037: ldarg.2
+IL_0038: call System.Void Sandbox.CameraComponent::InitializeRendering(System.Boolean)
+IL_003d: ldarg.2
+IL_003e: brfalse.s IL_0051
+IL_0040: ldarg.0
+IL_0041: ldarg.1
+IL_0042: callvirt Vector2Int Sandbox.Bitmap::get_Size()
+IL_0047: call Vector2 Vector2Int::op_Implicit(Vector2Int)
+IL_004c: call System.Void Sandbox.CameraComponent::ResizeUI(Vector2)
+IL_0051: ldarg.0
+IL_0052: call Sandbox.SceneCamera Sandbox.CameraComponent::get_SceneCamera()
+IL_0057: ldarg.1
+IL_0058: callvirt Vector2Int Sandbox.Bitmap::get_Size()
+IL_005d: call Vector2 Vector2Int::op_Implicit(Vector2Int)
+IL_0062: callvirt System.Void Sandbox.SceneCamera::OnPreRender(Vector2)
+IL_0067: ldarg.0
+IL_0068: call Sandbox.SceneCamera Sandbox.CameraComponent::get_SceneCamera()
+IL_006d: ldarg.1
+IL_006e: ldloca.s V_1
+IL_0070: dup
+IL_0071: initobj Sandbox.Rendering.ViewSetup
+IL_0077: callvirt System.Void Sandbox.SceneCamera::RenderToBitmap(Sandbox.Bitmap,Sandbox.Rendering.ViewSetup&)
+IL_007c: ldarg.2
+IL_007d: brfalse.s IL_0094
+IL_007f: ldarg.0
+IL_0080: call System.Single Sandbox.Screen::get_Width()
+IL_0085: call System.Single Sandbox.Screen::get_Height()
+IL_008a: newobj System.Void Vector2::.ctor(System.Single,System.Single)
+IL_008f: call System.Void Sandbox.CameraComponent::ResizeUI(Vector2)
+IL_0094: leave.s IL_00a4
+IL_0096: ldloca.s V_0
+IL_0098: constrained. Sandbox.ScenePushScope
+IL_009e: callvirt System.Void System.IDisposable::Dispose()
+IL_00a3: endfinally
+IL_00a4: ret
+System.Void Sandbox.CameraRenderer::Configure(Sandbox.SceneCamera,Sandbox.Rendering.ViewSetup)
+IL_0000: ldarg.1
+IL_0001: callvirt Sandbox.SceneWorld Sandbox.SceneCamera::get_World()
+IL_0006: stloc.0
+IL_0007: newobj System.Void Sandbox.RenderAttributes::.ctor()
+IL_000c: stloc.1
+IL_000d: ldarg.1
+IL_000e: callvirt Sandbox.RenderAttributes Sandbox.SceneCamera::get_Attributes()
+IL_0013: ldloc.1
+IL_0014: callvirt System.Void Sandbox.RenderAttributes::MergeTo(Sandbox.RenderAttributes)
+IL_0019: ldloc.0
+IL_001a: call System.Boolean Sandbox.SandboxSystemExtensions::IsValid(Sandbox.IValid)
+IL_001f: brfalse.s IL_003a
+IL_0021: call System.Boolean Sandbox.Graphics::get_IsActive()
+IL_0026: brtrue.s IL_003a
+IL_0028: ldloc.0
+IL_0029: ldarg.1
+IL_002a: callvirt Vector3 Sandbox.SceneCamera::get_Position()
+IL_002f: ldarg.1
+IL_0030: callvirt System.Single Sandbox.SceneCamera::get_ZFar()
+IL_0035: callvirt System.Void Sandbox.SceneWorld::UpdateObjectsForRendering(Vector3,System.Single)
+IL_003a: ldarg.1
+IL_003b: callvirt Color Sandbox.SceneCamera::get_AmbientLightColor()
+IL_0040: stloc.2
+IL_0041: ldarg.1
+IL_0042: callvirt Sandbox.SceneWorld Sandbox.SceneCamera::get_World()
+IL_0047: brfalse.s IL_006d
+IL_0049: ldarg.1
+IL_004a: callvirt Sandbox.SceneWorld Sandbox.SceneCamera::get_World()
+IL_004f: ldflda Sandbox.Rendering.GradientFogSetup Sandbox.SceneWorld::GradientFog
+IL_0054: ldloc.1
+IL_0055: call System.Void Sandbox.Rendering.GradientFogSetup::Apply(Sandbox.RenderAttributes)
+IL_005a: ldloca.s V_2
+IL_005c: ldarg.1
+IL_005d: callvirt Sandbox.SceneWorld Sandbox.SceneCamera::get_World()
+IL_0062: ldflda Color Sandbox.SceneWorld::AmbientLightColor
+IL_0067: call Color Color::op_Addition(Color&,Color&)
+IL_006c: stloc.2
+IL_006d: ldarg.2
+IL_006e: ldfld System.Nullable`1<Color> Sandbox.Rendering.ViewSetup::AmbientLightTint
+IL_0073: stloc.s V_8
+IL_0075: ldloca.s V_8
+IL_0077: call System.Boolean System.Nullable`1<Color>::get_HasValue()
+IL_007c: brfalse.s IL_0090
+IL_007e: ldloca.s V_8
+IL_0080: call !0 System.Nullable`1<Color>::GetValueOrDefault()
+IL_0085: stloc.3
+IL_0086: ldloca.s V_2
+IL_0088: ldloca.s V_3
+IL_008a: call Color Color::op_Multiply(Color&,Color&)
+IL_008f: stloc.2
+IL_0090: ldarg.2
+IL_0091: ldfld System.Nullable`1<Color> Sandbox.Rendering.ViewSetup::AmbientLightAdd
+IL_0096: stloc.s V_8
+IL_0098: ldloca.s V_8
+IL_009a: call System.Boolean System.Nullable`1<Color>::get_HasValue()
+IL_009f: brfalse.s IL_00b4
+IL_00a1: ldloca.s V_8
+IL_00a3: call !0 System.Nullable`1<Color>::GetValueOrDefault()
+IL_00a8: stloc.s V_4
+IL_00aa: ldloca.s V_2
+IL_00ac: ldloca.s V_4
+IL_00ae: call Color Color::op_Addition(Color&,Color&)
+IL_00b3: stloc.2
+IL_00b4: ldarg.2
+IL_00b5: ldfld System.Nullable`1<Sandbox.Rendering.GradientFogSetup> Sandbox.Rendering.ViewSetup::GradientFog
+IL_00ba: stloc.s V_9
+IL_00bc: ldloca.s V_9
+IL_00be: call System.Boolean System.Nullable`1<Sandbox.Rendering.GradientFogSetup>::get_HasValue()
+IL_00c3: brfalse.s IL_00d6
+IL_00c5: ldloca.s V_9
+IL_00c7: call !0 System.Nullable`1<Sandbox.Rendering.GradientFogSetup>::GetValueOrDefault()
+IL_00cc: stloc.s V_5
+IL_00ce: ldloca.s V_5
+IL_00d0: ldloc.1
+IL_00d1: call System.Void Sandbox.Rendering.GradientFogSetup::Apply(Sandbox.RenderAttributes)
+IL_00d6: ldloca.s V_2
+IL_00d8: ldloc.2
+IL_00d9: ldfld System.Single Color::a
+IL_00de: ldc.r4 0
+IL_00e3: ldc.r4 1
+IL_00e8: call System.Single Sandbox.MathX::Clamp(System.Single,System.Single,System.Single)
+IL_00ed: stfld System.Single Color::a
+IL_00f2: ldloc.1
+IL_00f3: ldstr "ambientColor"
+IL_00f8: ldc.i4 -7289842
+IL_00fd: call Sandbox.StringToken Sandbox.StringToken::Literal(System.String,System.UInt32)
+IL_0102: stloc.s V_10
+IL_0104: ldloca.s V_10
+IL_0106: ldloca.s V_2
+IL_0108: call Vector4 Vector4::op_Implicit(Color&)
+IL_010d: stloc.s V_11
+IL_010f: ldloca.s V_11
+IL_0111: callvirt System.Void Sandbox.RenderAttributes::Set(Sandbox.StringToken&,Vector4&)
+IL_0116: ldloc.1
+IL_0117: ldstr "clearColor"
+IL_011c: ldc.i4 1003839490
+IL_0121: call Sandbox.StringToken Sandbox.StringToken::Literal(System.String,System.UInt32)
+IL_0126: stloc.s V_10
+IL_0128: ldloca.s V_10
+IL_012a: ldarg.2
+IL_012b: ldfld System.Nullable`1<Color> Sandbox.Rendering.ViewSetup::ClearColor
+IL_0130: stloc.s V_8
+IL_0132: ldloca.s V_8
+IL_0134: call System.Boolean System.Nullable`1<Color>::get_HasValue()
+IL_0139: brtrue.s IL_0143
+IL_013b: ldarg.1
+IL_013c: callvirt Color Sandbox.SceneCamera::get_BackgroundColor()
+IL_0141: br.s IL_014a
+IL_0143: ldloca.s V_8
+IL_0145: call !0 System.Nullable`1<Color>::GetValueOrDefault()
+IL_014a: stloc.s V_12
+IL_014c: ldloca.s V_12
+IL_014e: call Vector4 Vector4::op_Implicit(Color&)
+IL_0153: stloc.s V_11
+IL_0155: ldloca.s V_11
+IL_0157: callvirt System.Void Sandbox.RenderAttributes::Set(Sandbox.StringToken&,Vector4&)
+IL_015c: call Sandbox.SceneCameraDebugMode Sandbox.DebugOverlay/ToolsVisualization::get_mat_toolsvis()
+IL_0161: brfalse.s IL_0185
+IL_0163: ldloc.1
+IL_0164: ldstr "ToolsVisMode"
+IL_0169: ldc.i4 -965313757
+IL_016e: call Sandbox.StringToken Sandbox.StringToken::Literal(System.String,System.UInt32)
+IL_0173: stloc.s V_10
+IL_0175: ldloca.s V_10
+IL_0177: call Sandbox.SceneCameraDebugMode Sandbox.DebugOverlay/ToolsVisualization::get_mat_toolsvis()
+IL_017c: stloc.s V_13
+IL_017e: ldloca.s V_13
+IL_0180: callvirt System.Void Sandbox.RenderAttributes::Set(Sandbox.StringToken&,System.Int32&)
+IL_0185: ldarg.1
+IL_0186: ldloc.1
+IL_0187: callvirt System.Void Sandbox.SceneCamera::GatherVolumetricFog(Sandbox.RenderAttributes)
+IL_018c: ldarg.1
+IL_018d: ldloc.1
+IL_018e: callvirt System.Void Sandbox.SceneCamera::GatherTonemapper(Sandbox.RenderAttributes)
+IL_0193: ldarg.1
+IL_0194: callvirt Sandbox.CubemapFogController Sandbox.SceneCamera::get_CubemapFog()
+IL_0199: dup
+IL_019a: brtrue.s IL_019f
+IL_019c: pop
+IL_019d: br.s IL_01a5
+IL_019f: ldloc.1
+IL_01a0: call System.Void Sandbox.CubemapFogController::Write(Sandbox.RenderAttributes)
+IL_01a5: ldloc.1
+IL_01a6: ldstr "clearFlags"
+IL_01ab: ldc.i4 683099488
+IL_01b0: call Sandbox.StringToken Sandbox.StringToken::Literal(System.String,System.UInt32)
+IL_01b5: stloc.s V_10
+IL_01b7: ldloca.s V_10
+IL_01b9: ldarg.1
+IL_01ba: callvirt Sandbox.ClearFlags Sandbox.SceneCamera::get_ClearFlags()
+IL_01bf: stloc.s V_13
+IL_01c1: ldloca.s V_13
+IL_01c3: callvirt System.Void Sandbox.RenderAttributes::Set(Sandbox.StringToken&,System.Int32&)
+IL_01c8: ldarg.2
+IL_01c9: ldfld System.Nullable`1<System.Single> Sandbox.Rendering.ViewSetup::Time
+IL_01ce: stloc.s V_14
+IL_01d0: ldloca.s V_14
+IL_01d2: call System.Boolean System.Nullable`1<System.Single>::get_HasValue()
+IL_01d7: brfalse.s IL_01fd
+IL_01d9: ldloca.s V_14
+IL_01db: call !0 System.Nullable`1<System.Single>::GetValueOrDefault()
+IL_01e0: stloc.s V_6
+IL_01e2: ldloc.1
+IL_01e3: ldstr "RenderTime"
+IL_01e8: ldc.i4 -2070272959
+IL_01ed: call Sandbox.StringToken Sandbox.StringToken::Literal(System.String,System.UInt32)
+IL_01f2: stloc.s V_10
+IL_01f4: ldloca.s V_10
+IL_01f6: ldloca.s V_6
+IL_01f8: callvirt System.Void Sandbox.RenderAttributes::Set(Sandbox.StringToken&,System.Single&)
+IL_01fd: ldarg.0
+IL_01fe: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_0203: call System.Void CCameraRenderer::ClearSceneWorlds()
+IL_0208: ldarg.0
+IL_0209: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_020e: ldloc.1
+IL_020f: callvirt NativeEngine.CRenderAttributes Sandbox.RenderAttributes::Get()
+IL_0214: call System.Void CCameraRenderer::SetRenderAttributes(NativeEngine.CRenderAttributes)
+IL_0219: ldarg.0
+IL_021a: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_021f: call System.Void CCameraRenderer::ClearRenderTags()
+IL_0224: ldarg.0
+IL_0225: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_022a: call System.Void CCameraRenderer::ClearExcludeTags()
+IL_022f: ldarg.0
+IL_0230: ldarg.2
+IL_0231: ldfld Sandbox.TagSet Sandbox.Rendering.ViewSetup::RenderTags
+IL_0236: dup
+IL_0237: brtrue.s IL_0240
+IL_0239: pop
+IL_023a: ldarg.1
+IL_023b: callvirt Sandbox.ITagSet Sandbox.SceneCamera::get_RenderTags()
+IL_0240: ldc.i4.0
+IL_0241: call System.Void Sandbox.CameraRenderer::AddTags(Sandbox.ITagSet,System.Boolean)
+IL_0246: ldarg.0
+IL_0247: ldarg.1
+IL_0248: callvirt Sandbox.ITagSet Sandbox.SceneCamera::get_ExcludeTags()
+IL_024d: ldc.i4.1
+IL_024e: call System.Void Sandbox.CameraRenderer::AddTags(Sandbox.ITagSet,System.Boolean)
+IL_0253: ldarg.2
+IL_0254: ldfld Sandbox.TagSet Sandbox.Rendering.ViewSetup::ExcludeTags
+IL_0259: brfalse.s IL_0268
+IL_025b: ldarg.0
+IL_025c: ldarg.2
+IL_025d: ldfld Sandbox.TagSet Sandbox.Rendering.ViewSetup::ExcludeTags
+IL_0262: ldc.i4.1
+IL_0263: call System.Void Sandbox.CameraRenderer::AddTags(Sandbox.ITagSet,System.Boolean)
+IL_0268: ldarg.0
+IL_0269: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_026e: ldarg.0
+IL_026f: ldfld System.Int32 Sandbox.CameraRenderer::cameraId
+IL_0274: ldarg.2
+IL_0275: ldfld System.Int32 Sandbox.Rendering.ViewSetup::ViewHash
+IL_027a: call System.Int32 System.HashCode::Combine<System.Int32,System.Int32>(!!0,!!1)
+IL_027f: call System.Void CCameraRenderer::set_ViewUniqueId(System.Int32)
+IL_0284: ldarg.0
+IL_0285: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_028a: ldarga.s config
+IL_028c: ldflda System.Nullable`1<Transform> Sandbox.Rendering.ViewSetup::Transform
+IL_0291: dup
+IL_0292: call System.Boolean System.Nullable`1<Transform>::get_HasValue()
+IL_0297: brtrue.s IL_02a2
+IL_0299: pop
+IL_029a: ldarg.1
+IL_029b: callvirt Vector3 Sandbox.SceneCamera::get_Position()
+IL_02a0: br.s IL_02ac
+IL_02a2: call !0 System.Nullable`1<Transform>::GetValueOrDefault()
+IL_02a7: ldfld Vector3 Transform::Position
+IL_02ac: call System.Void CCameraRenderer::set_CameraPosition(Vector3)
+IL_02b1: ldarg.0
+IL_02b2: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_02b7: ldarga.s config
+IL_02b9: ldflda System.Nullable`1<Transform> Sandbox.Rendering.ViewSetup::Transform
+IL_02be: dup
+IL_02bf: call System.Boolean System.Nullable`1<Transform>::get_HasValue()
+IL_02c4: brtrue.s IL_02d8
+IL_02c6: pop
+IL_02c7: ldarg.1
+IL_02c8: callvirt Rotation Sandbox.SceneCamera::get_Rotation()
+IL_02cd: stloc.s V_15
+IL_02cf: ldloca.s V_15
+IL_02d1: call Angles Rotation::Angles()
+IL_02d6: br.s IL_02eb
+IL_02d8: call !0 System.Nullable`1<Transform>::GetValueOrDefault()
+IL_02dd: stloc.s V_16
+IL_02df: ldloca.s V_16
+IL_02e1: ldflda Rotation Transform::Rotation
+IL_02e6: call Angles Rotation::Angles()
+IL_02eb: call System.Void CCameraRenderer::set_CameraRotation(Angles)
+IL_02f0: ldarg.0
+IL_02f1: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_02f6: ldarg.2
+IL_02f7: ldfld System.Nullable`1<System.Single> Sandbox.Rendering.ViewSetup::ZNear
+IL_02fc: stloc.s V_14
+IL_02fe: ldloca.s V_14
+IL_0300: call System.Boolean System.Nullable`1<System.Single>::get_HasValue()
+IL_0305: brtrue.s IL_030f
+IL_0307: ldarg.1
+IL_0308: callvirt System.Single Sandbox.SceneCamera::get_ZNear()
+IL_030d: br.s IL_0316
+IL_030f: ldloca.s V_14
+IL_0311: call !0 System.Nullable`1<System.Single>::GetValueOrDefault()
+IL_0316: call System.Void CCameraRenderer::set_ZNear(System.Single)
+IL_031b: ldarg.0
+IL_031c: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_0321: ldarg.2
+IL_0322: ldfld System.Nullable`1<System.Single> Sandbox.Rendering.ViewSetup::ZFar
+IL_0327: stloc.s V_14
+IL_0329: ldloca.s V_14
+IL_032b: call System.Boolean System.Nullable`1<System.Single>::get_HasValue()
+IL_0330: brtrue.s IL_033a
+IL_0332: ldarg.1
+IL_0333: callvirt System.Single Sandbox.SceneCamera::get_ZFar()
+IL_0338: br.s IL_0341
+IL_033a: ldloca.s V_14
+IL_033c: call !0 System.Nullable`1<System.Single>::GetValueOrDefault()
+IL_0341: call System.Void CCameraRenderer::set_ZFar(System.Single)
+IL_0346: ldarg.0
+IL_0347: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_034c: ldarg.2
+IL_034d: ldfld System.Nullable`1<System.Single> Sandbox.Rendering.ViewSetup::FieldOfView
+IL_0352: stloc.s V_14
+IL_0354: ldloca.s V_14
+IL_0356: call System.Boolean System.Nullable`1<System.Single>::get_HasValue()
+IL_035b: brtrue.s IL_0365
+IL_035d: ldarg.1
+IL_035e: callvirt System.Single Sandbox.SceneCamera::get_FieldOfView()
+IL_0363: br.s IL_036c
+IL_0365: ldloca.s V_14
+IL_0367: call !0 System.Nullable`1<System.Single>::GetValueOrDefault()
+IL_036c: call System.Void CCameraRenderer::set_FieldOfView(System.Single)
+IL_0371: ldarg.0
+IL_0372: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_0377: ldc.r4 0
+IL_037c: stloc.s V_17
+IL_037e: ldloca.s V_17
+IL_0380: ldc.r4 0
+IL_0385: stloc.s V_18
+IL_0387: ldloca.s V_18
+IL_0389: ldarg.1
+IL_038a: callvirt Vector2 Sandbox.SceneCamera::get_Size()
+IL_038f: stloc.s V_19
+IL_0391: ldloca.s V_19
+IL_0393: call System.Single Vector2::get_x()
+IL_0398: stloc.s V_20
+IL_039a: ldloca.s V_20
+IL_039c: ldarg.1
+IL_039d: callvirt Vector2 Sandbox.SceneCamera::get_Size()
+IL_03a2: stloc.s V_19
+IL_03a4: ldloca.s V_19
+IL_03a6: call System.Single Vector2::get_y()
+IL_03ab: stloc.s V_21
+IL_03ad: ldloca.s V_21
+IL_03af: newobj System.Void Sandbox.Rect::.ctor(System.Single&,System.Single&,System.Single&,System.Single&)
+IL_03b4: stloc.s V_22
+IL_03b6: ldloca.s V_22
+IL_03b8: call NativeRect NativeRect::op_Implicit(Sandbox.Rect&)
+IL_03bd: call System.Void CCameraRenderer::set_Rect(NativeRect)
+IL_03c2: ldarg.0
+IL_03c3: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_03c8: ldarg.1
+IL_03c9: callvirt Sandbox.Rect Sandbox.SceneCamera::get_Rect()
+IL_03ce: stloc.s V_22
+IL_03d0: ldloca.s V_22
+IL_03d2: call System.Single Sandbox.Rect::get_Left()
+IL_03d7: ldarg.1
+IL_03d8: callvirt Sandbox.Rect Sandbox.SceneCamera::get_Rect()
+IL_03dd: stloc.s V_22
+IL_03df: ldloca.s V_22
+IL_03e1: call System.Single Sandbox.Rect::get_Top()
+IL_03e6: ldarg.1
+IL_03e7: callvirt Sandbox.Rect Sandbox.SceneCamera::get_Rect()
+IL_03ec: stloc.s V_22
+IL_03ee: ldloca.s V_22
+IL_03f0: call System.Single Sandbox.Rect::get_Width()
+IL_03f5: ldc.r4 1
+IL_03fa: ldarg.1
+IL_03fb: callvirt Sandbox.Rect Sandbox.SceneCamera::get_Rect()
+IL_0400: stloc.s V_22
+IL_0402: ldloca.s V_22
+IL_0404: call System.Single Sandbox.Rect::get_Left()
+IL_0409: sub
+IL_040a: call System.Single System.Math::Min(System.Single,System.Single)
+IL_040f: ldarg.1
+IL_0410: callvirt Sandbox.Rect Sandbox.SceneCamera::get_Rect()
+IL_0415: stloc.s V_22
+IL_0417: ldloca.s V_22
+IL_0419: call System.Single Sandbox.Rect::get_Height()
+IL_041e: ldc.r4 1
+IL_0423: ldarg.1
+IL_0424: callvirt Sandbox.Rect Sandbox.SceneCamera::get_Rect()
+IL_0429: stloc.s V_22
+IL_042b: ldloca.s V_22
+IL_042d: call System.Single Sandbox.Rect::get_Top()
+IL_0432: sub
+IL_0433: call System.Single System.Math::Min(System.Single,System.Single)
+IL_0438: newobj System.Void Vector4::.ctor(System.Single,System.Single,System.Single,System.Single)
+IL_043d: call System.Void CCameraRenderer::set_Viewport(Vector4)
+IL_0442: ldarg.0
+IL_0443: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_0448: ldarg.1
+IL_0449: callvirt System.Boolean Sandbox.SceneCamera::get_Ortho()
+IL_044e: call System.Void CCameraRenderer::set_Ortho(System.Boolean)
+IL_0453: ldarg.0
+IL_0454: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_0459: ldarg.2
+IL_045a: ldfld System.Nullable`1<Vector4> Sandbox.Rendering.ViewSetup::ClipSpaceBounds
+IL_045f: stloc.s V_23
+IL_0461: ldloca.s V_23
+IL_0463: call System.Boolean System.Nullable`1<Vector4>::get_HasValue()
+IL_0468: brtrue.s IL_0485
+IL_046a: ldc.r4 -1
+IL_046f: ldc.r4 -1
+IL_0474: ldc.r4 1
+IL_0479: ldc.r4 1
+IL_047e: newobj System.Void Vector4::.ctor(System.Single,System.Single,System.Single,System.Single)
+IL_0483: br.s IL_048c
+IL_0485: ldloca.s V_23
+IL_0487: call !0 System.Nullable`1<Vector4>::GetValueOrDefault()
+IL_048c: call System.Void CCameraRenderer::set_ClipSpaceBounds(Vector4)
+IL_0491: ldarg.0
+IL_0492: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_0497: ldarg.2
+IL_0498: ldfld System.Nullable`1<System.Boolean> Sandbox.Rendering.ViewSetup::EnablePostprocessing
+IL_049d: stloc.s V_24
+IL_049f: ldloca.s V_24
+IL_04a1: call System.Boolean System.Nullable`1<System.Boolean>::get_HasValue()
+IL_04a6: brtrue.s IL_04b0
+IL_04a8: ldarg.1
+IL_04a9: callvirt System.Boolean Sandbox.SceneCamera::get_EnablePostProcessing()
+IL_04ae: br.s IL_04b7
+IL_04b0: ldloca.s V_24
+IL_04b2: call !0 System.Nullable`1<System.Boolean>::GetValueOrDefault()
+IL_04b7: call System.Void CCameraRenderer::set_EnablePostprocessing(System.Boolean)
+IL_04bc: ldarg.0
+IL_04bd: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_04c2: ldarg.2
+IL_04c3: ldfld System.Nullable`1<System.Boolean> Sandbox.Rendering.ViewSetup::EnableDebugOverlays
+IL_04c8: stloc.s V_24
+IL_04ca: ldloca.s V_24
+IL_04cc: call System.Boolean System.Nullable`1<System.Boolean>::get_HasValue()
+IL_04d1: brtrue.s IL_04db
+IL_04d3: ldarg.1
+IL_04d4: callvirt System.Boolean Sandbox.SceneCamera::get_EnableEngineOverlays()
+IL_04d9: br.s IL_04e2
+IL_04db: ldloca.s V_24
+IL_04dd: call !0 System.Nullable`1<System.Boolean>::GetValueOrDefault()
+IL_04e2: call System.Void CCameraRenderer::set_EnableEngineOverlays(System.Boolean)
+IL_04e7: ldarg.0
+IL_04e8: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_04ed: ldarg.2
+IL_04ee: ldfld System.Nullable`1<System.Boolean> Sandbox.Rendering.ViewSetup::EnableUI
+IL_04f3: stloc.s V_24
+IL_04f5: ldloca.s V_24
+IL_04f7: call System.Boolean System.Nullable`1<System.Boolean>::get_HasValue()
+IL_04fc: brtrue.s IL_0506
+IL_04fe: ldarg.1
+IL_04ff: callvirt System.Boolean Sandbox.SceneCamera::get_RenderUI()
+IL_0504: br.s IL_050d
+IL_0506: ldloca.s V_24
+IL_0508: call !0 System.Nullable`1<System.Boolean>::GetValueOrDefault()
+IL_050d: call System.Void CCameraRenderer::set_EnableUI(System.Boolean)
+IL_0512: ldarg.0
+IL_0513: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_0518: ldarg.1
+IL_0519: callvirt System.Boolean Sandbox.SceneCamera::get_UIOnly()
+IL_051e: call System.Void CCameraRenderer::set_UIOnly(System.Boolean)
+IL_0523: ldarg.0
+IL_0524: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_0529: ldarga.s config
+IL_052b: ldflda System.Nullable`1<System.Boolean> Sandbox.Rendering.ViewSetup::FlipX
+IL_0530: call !0 System.Nullable`1<System.Boolean>::GetValueOrDefault()
+IL_0535: call System.Void CCameraRenderer::set_FlipX(System.Boolean)
+IL_053a: ldarg.0
+IL_053b: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_0540: ldarga.s config
+IL_0542: ldflda System.Nullable`1<System.Boolean> Sandbox.Rendering.ViewSetup::FlipY
+IL_0547: call !0 System.Nullable`1<System.Boolean>::GetValueOrDefault()
+IL_054c: call System.Void CCameraRenderer::set_FlipY(System.Boolean)
+IL_0551: ldarg.2
+IL_0552: ldfld System.Nullable`1<Matrix> Sandbox.Rendering.ViewSetup::ProjectionMatrix
+IL_0557: stloc.s V_25
+IL_0559: ldloca.s V_25
+IL_055b: call System.Boolean System.Nullable`1<Matrix>::get_HasValue()
+IL_0560: brtrue.s IL_056a
+IL_0562: ldarg.1
+IL_0563: callvirt System.Nullable`1<Matrix> Sandbox.SceneCamera::get_CustomProjectionMatrix()
+IL_0568: br.s IL_056c
+IL_056a: ldloc.s V_25
+IL_056c: stloc.s V_7
+IL_056e: ldloca.s V_7
+IL_0570: call System.Boolean System.Nullable`1<Matrix>::get_HasValue()
+IL_0575: brfalse.s IL_0597
+IL_0577: ldarg.0
+IL_0578: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_057d: ldc.i4.1
+IL_057e: call System.Void CCameraRenderer::set_HasOverrideProjection(System.Boolean)
+IL_0583: ldarg.0
+IL_0584: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_0589: ldloca.s V_7
+IL_058b: call !0 System.Nullable`1<Matrix>::get_Value()
+IL_0590: call System.Void CCameraRenderer::set_OverrideProjection(Matrix)
+IL_0595: br.s IL_05a3
+IL_0597: ldarg.0
+IL_0598: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_059d: ldc.i4.0
+IL_059e: call System.Void CCameraRenderer::set_HasOverrideProjection(System.Boolean)
+IL_05a3: ldarg.0
+IL_05a4: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_05a9: call System.Boolean CCameraRenderer::get_Ortho()
+IL_05ae: brfalse.s IL_05d1
+IL_05b0: ldarg.0
+IL_05b1: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_05b6: ldarg.1
+IL_05b7: callvirt System.Single Sandbox.SceneCamera::get_OrthoHeight()
+IL_05bc: ldarg.1
+IL_05bd: callvirt Vector2 Sandbox.SceneCamera::get_Size()
+IL_05c2: stloc.s V_19
+IL_05c4: ldloca.s V_19
+IL_05c6: call System.Single Vector2::get_y()
+IL_05cb: div
+IL_05cc: call System.Void CCameraRenderer::set_OrthoSize(System.Single)
+IL_05d1: ldarg.1
+IL_05d2: callvirt System.Boolean Sandbox.SceneCamera::get_ExcludeFromTextureStreaming()
+IL_05d7: brfalse.s IL_05ed
+IL_05d9: ldarg.0
+IL_05da: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_05df: dup
+IL_05e0: call NativeEngine.SceneViewFlags CCameraRenderer::get_SceneViewFlags()
+IL_05e5: ldc.i4.s 11
+IL_05e7: or
+IL_05e8: call System.Void CCameraRenderer::set_SceneViewFlags(NativeEngine.SceneViewFlags)
+IL_05ed: ldarg.1
+IL_05ee: callvirt System.Boolean Sandbox.SceneCamera::get_ToolsView()
+IL_05f3: brfalse.s IL_0608
+IL_05f5: ldarg.0
+IL_05f6: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_05fb: dup
+IL_05fc: call NativeEngine.SceneViewFlags CCameraRenderer::get_SceneViewFlags()
+IL_0601: ldc.i4.2
+IL_0602: or
+IL_0603: call System.Void CCameraRenderer::set_SceneViewFlags(NativeEngine.SceneViewFlags)
+IL_0608: ldloc.0
+IL_0609: brfalse.s IL_0617
+IL_060b: ldarg.0
+IL_060c: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_0611: ldloc.0
+IL_0612: call System.Void CCameraRenderer::AddSceneWorld(Sandbox.SceneWorld)
+IL_0617: ldarg.1
+IL_0618: callvirt System.Collections.Generic.HashSet`1<Sandbox.SceneWorld> Sandbox.SceneCamera::get_Worlds()
+IL_061d: callvirt System.Collections.Generic.HashSet`1/Enumerator<!0> System.Collections.Generic.HashSet`1<Sandbox.SceneWorld>::GetEnumerator()
+IL_0622: stloc.s V_26
+IL_0624: br.s IL_0645
+IL_0626: ldloca.s V_26
+IL_0628: call !0 System.Collections.Generic.HashSet`1/Enumerator<Sandbox.SceneWorld>::get_Current()
+IL_062d: stloc.s V_27
+IL_062f: ldloc.s V_27
+IL_0631: brfalse.s IL_0645
+IL_0633: ldloc.s V_27
+IL_0635: ldloc.0
+IL_0636: beq.s IL_0645
+IL_0638: ldarg.0
+IL_0639: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_063e: ldloc.s V_27
+IL_0640: call System.Void CCameraRenderer::AddSceneWorld(Sandbox.SceneWorld)
+IL_0645: ldloca.s V_26
+IL_0647: call System.Boolean System.Collections.Generic.HashSet`1/Enumerator<Sandbox.SceneWorld>::MoveNext()
+IL_064c: brtrue.s IL_0626
+IL_064e: leave.s IL_065e
+IL_0650: ldloca.s V_26
+IL_0652: constrained. System.Collections.Generic.HashSet`1/Enumerator<Sandbox.SceneWorld>
+IL_0658: callvirt System.Void System.IDisposable::Dispose()
+IL_065d: endfinally
+IL_065e: ret
+System.Void Sandbox.SceneCamera::OnPreRender(Vector2)
+IL_0000: ldarg.0
+IL_0001: ldarg.1
+IL_0002: call System.Void Sandbox.SceneCamera::set_Size(Vector2)
+IL_0007: ldarg.0
+IL_0008: ldloca.s V_0
+IL_000a: dup
+IL_000b: initobj Sandbox.Rendering.ViewSetup
+IL_0011: call System.Void Sandbox.SceneCamera::ConfigureView(Sandbox.Rendering.ViewSetup&)
+IL_0016: ret
+System.Void Sandbox.SceneCamera::GatherTonemapper(Sandbox.RenderAttributes)
+IL_0000: ldarg.1
+IL_0001: ldstr "ITonemapSystem"
+IL_0006: ldc.i4 1400077339
+IL_000b: call Sandbox.StringToken Sandbox.StringToken::Literal(System.String,System.UInt32)
+IL_0010: stloc.0
+IL_0011: ldloca.s V_0
+IL_0013: ldarg.0
+IL_0014: call Sandbox.TonemapSystem Sandbox.SceneCamera::get_Tonemap()
+IL_0019: callvirt System.Boolean Sandbox.TonemapSystem::get_Enabled()
+IL_001e: brtrue.s IL_0027
+IL_0020: ldsfld System.IntPtr System.IntPtr::Zero
+IL_0025: br.s IL_0037
+IL_0027: ldarg.0
+IL_0028: ldfld Sandbox.ToneMapping Sandbox.SceneCamera::ToneMapping
+IL_002d: callvirt ITonemapSystem Sandbox.ToneMapping::GetNative()
+IL_0032: call System.IntPtr ITonemapSystem::op_Implicit(ITonemapSystem)
+IL_0037: stloc.1
+IL_0038: ldloca.s V_1
+IL_003a: callvirt System.Void Sandbox.RenderAttributes::SetPointer(Sandbox.StringToken&,System.IntPtr&)
+IL_003f: ret
+System.Void Sandbox.SceneCamera::RenderToTexture(Sandbox.Texture,System.Nullable`1<Vector2>,Sandbox.Rendering.ViewSetup&)
+IL_0000: ldarg.1
+IL_0001: brfalse.s IL_0010
+IL_0003: ldarg.1
+IL_0004: ldflda NativeEngine.ITexture Sandbox.Texture::native
+IL_0009: call System.Boolean NativeEngine.ITexture::get_IsNull()
+IL_000e: brfalse.s IL_0011
+IL_0010: ret
+IL_0011: ldarg.2
+IL_0012: stloc.2
+IL_0013: ldloca.s V_2
+IL_0015: call System.Boolean System.Nullable`1<Vector2>::get_HasValue()
+IL_001a: brtrue.s IL_0024
+IL_001c: ldarg.1
+IL_001d: callvirt Vector2 Sandbox.Texture::get_Size()
+IL_0022: br.s IL_002b
+IL_0024: ldloca.s V_2
+IL_0026: call !0 System.Nullable`1<Vector2>::GetValueOrDefault()
+IL_002b: stloc.0
+IL_002c: ldloca.s V_0
+IL_002e: call System.Single Vector2::get_x()
+IL_0033: ldc.r4 0
+IL_0038: bgt.un.s IL_003b
+IL_003a: ret
+IL_003b: ldloca.s V_0
+IL_003d: call System.Single Vector2::get_y()
+IL_0042: ldc.r4 0
+IL_0047: bgt.un.s IL_004a
+IL_0049: ret
+IL_004a: ldarg.0
+IL_004b: ldarg.3
+IL_004c: call System.Void Sandbox.SceneCamera::ConfigureView(Sandbox.Rendering.ViewSetup&)
+IL_0051: ldloca.s V_1
+IL_0053: ldstr "RenderToTexture"
+IL_0058: ldarg.0
+IL_0059: ldfld System.Int32 Sandbox.SceneCamera::_cameraId
+IL_005e: call System.Void Sandbox.CameraRenderer::.ctor(System.String,System.Int32)
+IL_0063: ldloca.s V_1
+IL_0065: ldarg.0
+IL_0066: ldarg.3
+IL_0067: ldobj Sandbox.Rendering.ViewSetup
+IL_006c: call System.Void Sandbox.CameraRenderer::Configure(Sandbox.SceneCamera,Sandbox.Rendering.ViewSetup)
+IL_0071: ldloca.s V_1
+IL_0073: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_0078: ldarg.1
+IL_0079: ldfld NativeEngine.ITexture Sandbox.Texture::native
+IL_007e: call NativeEngine.ISceneView Sandbox.Graphics::get_SceneView()
+IL_0083: call System.Void CCameraRenderer::RenderToTexture(NativeEngine.ITexture,NativeEngine.ISceneView)
+IL_0088: leave.s IL_0092
+IL_008a: ldloca.s V_1
+IL_008c: call System.Void Sandbox.CameraRenderer::Dispose()
+IL_0091: endfinally
+IL_0092: ret
+System.Void Sandbox.SceneCamera::RenderToBitmap(Sandbox.Bitmap,Sandbox.Rendering.ViewSetup&)
+IL_0000: ldarg.1
+IL_0001: call System.Boolean Sandbox.SandboxSystemExtensions::IsValid(Sandbox.IValid)
+IL_0006: brtrue.s IL_0009
+IL_0008: ret
+IL_0009: ldarg.1
+IL_000a: callvirt Vector2Int Sandbox.Bitmap::get_Size()
+IL_000f: stloc.0
+IL_0010: ldloc.0
+IL_0011: ldfld System.Int32 Vector2Int::x
+IL_0016: ldc.i4.1
+IL_0017: bgt.s IL_001a
+IL_0019: ret
+IL_001a: ldloc.0
+IL_001b: ldfld System.Int32 Vector2Int::y
+IL_0020: ldc.i4.1
+IL_0021: bgt.s IL_0024
+IL_0023: ret
+IL_0024: ldarg.0
+IL_0025: ldloc.0
+IL_0026: call Vector2 Vector2Int::op_Implicit(Vector2Int)
+IL_002b: call System.Void Sandbox.SceneCamera::OnPreRender(Vector2)
+IL_0030: ldloca.s V_1
+IL_0032: ldstr "RenderToBitmap"
+IL_0037: ldarg.0
+IL_0038: ldfld System.Int32 Sandbox.SceneCamera::_cameraId
+IL_003d: call System.Void Sandbox.CameraRenderer::.ctor(System.String,System.Int32)
+IL_0042: ldloca.s V_1
+IL_0044: ldarg.0
+IL_0045: ldarg.2
+IL_0046: ldobj Sandbox.Rendering.ViewSetup
+IL_004b: call System.Void Sandbox.CameraRenderer::Configure(Sandbox.SceneCamera,Sandbox.Rendering.ViewSetup)
+IL_0050: ldloca.s V_1
+IL_0052: ldflda CCameraRenderer Sandbox.CameraRenderer::Native
+IL_0057: ldarg.1
+IL_0058: callvirt System.Void* Sandbox.Bitmap::GetPointer()
+IL_005d: ldarg.1
+IL_005e: callvirt System.Int32 Sandbox.Bitmap::get_Width()
+IL_0063: ldarg.1
+IL_0064: callvirt System.Int32 Sandbox.Bitmap::get_Height()
+IL_0069: ldarg.1
+IL_006a: callvirt System.Int32 Sandbox.Bitmap::get_BytesPerPixel()
+IL_006f: call System.Void CCameraRenderer::RenderToBitmap(System.IntPtr,System.Int32,System.Int32,System.Int32)
+IL_0074: leave.s IL_007e
+IL_0076: ldloca.s V_1
+IL_0078: call System.Void Sandbox.CameraRenderer::Dispose()
+IL_007d: endfinally
+IL_007e: ret
+System.Boolean Sandbox.CameraComponent/AutoExposureSetup::get_Enabled()
+IL_0000: ldarg.0
+IL_0001: ldfld System.Boolean Sandbox.CameraComponent/AutoExposureSetup::<Enabled>k__BackingField
+IL_0006: ret
+System.Void Sandbox.CameraComponent/AutoExposureSetup::set_Enabled(System.Boolean)
+IL_0000: ldarg.0
+IL_0001: ldarg.1
+IL_0002: stfld System.Boolean Sandbox.CameraComponent/AutoExposureSetup::<Enabled>k__BackingField
+IL_0007: ret
+System.Single Sandbox.CameraComponent/AutoExposureSetup::get_Compensation()
+IL_0000: ldarg.0
+IL_0001: ldfld System.Single Sandbox.CameraComponent/AutoExposureSetup::<Compensation>k__BackingField
+IL_0006: ret
+System.Void Sandbox.CameraComponent/AutoExposureSetup::set_Compensation(System.Single)
+IL_0000: ldarg.0
+IL_0001: ldarg.1
+IL_0002: stfld System.Single Sandbox.CameraComponent/AutoExposureSetup::<Compensation>k__BackingField
+IL_0007: ret
+System.Single Sandbox.CameraComponent/AutoExposureSetup::get_MinimumExposure()
+IL_0000: ldarg.0
+IL_0001: ldfld System.Single Sandbox.CameraComponent/AutoExposureSetup::<MinimumExposure>k__BackingField
+IL_0006: ret
+System.Void Sandbox.CameraComponent/AutoExposureSetup::set_MinimumExposure(System.Single)
+IL_0000: ldarg.0
+IL_0001: ldarg.1
+IL_0002: stfld System.Single Sandbox.CameraComponent/AutoExposureSetup::<MinimumExposure>k__BackingField
+IL_0007: ret
+System.Single Sandbox.CameraComponent/AutoExposureSetup::get_MaximumExposure()
+IL_0000: ldarg.0
+IL_0001: ldfld System.Single Sandbox.CameraComponent/AutoExposureSetup::<MaximumExposure>k__BackingField
+IL_0006: ret
+System.Void Sandbox.CameraComponent/AutoExposureSetup::set_MaximumExposure(System.Single)
+IL_0000: ldarg.0
+IL_0001: ldarg.1
+IL_0002: stfld System.Single Sandbox.CameraComponent/AutoExposureSetup::<MaximumExposure>k__BackingField
+IL_0007: ret
+System.Single Sandbox.CameraComponent/AutoExposureSetup::get_Rate()
+IL_0000: ldarg.0
+IL_0001: ldfld System.Single Sandbox.CameraComponent/AutoExposureSetup::<Rate>k__BackingField
+IL_0006: ret
+System.Void Sandbox.CameraComponent/AutoExposureSetup::set_Rate(System.Single)
+IL_0000: ldarg.0
+IL_0001: ldarg.1
+IL_0002: stfld System.Single Sandbox.CameraComponent/AutoExposureSetup::<Rate>k__BackingField
+IL_0007: ret
+System.Void Sandbox.CameraComponent/AutoExposureSetup::Apply(Sandbox.SceneCamera)
+IL_0000: ldarg.0
+IL_0001: call System.Boolean Sandbox.CameraComponent/AutoExposureSetup::get_Enabled()
+IL_0006: brtrue.s IL_0015
+IL_0008: ldarg.1
+IL_0009: callvirt Sandbox.TonemapSystem Sandbox.SceneCamera::get_Tonemap()
+IL_000e: ldc.i4.0
+IL_000f: callvirt System.Void Sandbox.TonemapSystem::set_Enabled(System.Boolean)
+IL_0014: ret
+IL_0015: ldarg.1
+IL_0016: callvirt Sandbox.TonemapSystem Sandbox.SceneCamera::get_Tonemap()
+IL_001b: ldc.i4.1
+IL_001c: callvirt System.Void Sandbox.TonemapSystem::set_Enabled(System.Boolean)
+IL_0021: ldarg.1
+IL_0022: callvirt Sandbox.TonemapSystem Sandbox.SceneCamera::get_Tonemap()
+IL_0027: ldarg.0
+IL_0028: call System.Single Sandbox.CameraComponent/AutoExposureSetup::get_Compensation()
+IL_002d: callvirt System.Void Sandbox.TonemapSystem::set_ExposureCompensation(System.Single)
+IL_0032: ldarg.1
+IL_0033: callvirt Sandbox.TonemapSystem Sandbox.SceneCamera::get_Tonemap()
+IL_0038: ldarg.0
+IL_0039: call System.Single Sandbox.CameraComponent/AutoExposureSetup::get_MinimumExposure()
+IL_003e: callvirt System.Void Sandbox.TonemapSystem::set_MinExposure(System.Single)
+IL_0043: ldarg.1
+IL_0044: callvirt Sandbox.TonemapSystem Sandbox.SceneCamera::get_Tonemap()
+IL_0049: ldarg.0
+IL_004a: call System.Single Sandbox.CameraComponent/AutoExposureSetup::get_MaximumExposure()
+IL_004f: callvirt System.Void Sandbox.TonemapSystem::set_MaxExposure(System.Single)
+IL_0054: ldarg.1
+IL_0055: callvirt Sandbox.TonemapSystem Sandbox.SceneCamera::get_Tonemap()
+IL_005a: ldarg.0
+IL_005b: call System.Single Sandbox.CameraComponent/AutoExposureSetup::get_Rate()
+IL_0060: callvirt System.Void Sandbox.TonemapSystem::set_Rate(System.Single)
+IL_0065: ldarg.1
+IL_0066: callvirt Sandbox.TonemapSystem Sandbox.SceneCamera::get_Tonemap()
+IL_006b: ldc.r4 1
+IL_0070: callvirt System.Void Sandbox.TonemapSystem::set_Fade(System.Single)
+IL_0075: ret
+System.Void Sandbox.CameraComponent/AutoExposureSetup::.ctor()
+IL_0000: ldarg.0
+IL_0001: ldc.r4 1
+IL_0006: stfld System.Single Sandbox.CameraComponent/AutoExposureSetup::<MinimumExposure>k__BackingField
+IL_000b: ldarg.0
+IL_000c: ldc.r4 3
+IL_0011: stfld System.Single Sandbox.CameraComponent/AutoExposureSetup::<MaximumExposure>k__BackingField
+IL_0016: ldarg.0
+IL_0017: ldc.r4 1
+IL_001c: stfld System.Single Sandbox.CameraComponent/AutoExposureSetup::<Rate>k__BackingField
+IL_0021: ldarg.0
+IL_0022: call System.Void System.Object::.ctor()
+IL_0027: ret
+Sandbox.Tonemapping/TonemappingMode Sandbox.Tonemapping::get_Mode()
+IL_0000: ldarg.0
+IL_0001: ldfld Sandbox.Tonemapping/TonemappingMode Sandbox.Tonemapping::<Mode>k__BackingField
+IL_0006: ret
+System.Void Sandbox.Tonemapping::set_Mode(Sandbox.Tonemapping/TonemappingMode)
+IL_0000: ldarg.0
+IL_0001: ldarg.1
+IL_0002: stfld Sandbox.Tonemapping/TonemappingMode Sandbox.Tonemapping::<Mode>k__BackingField
+IL_0007: ret
+Sandbox.Tonemapping/ExposureColorSpaceEnum Sandbox.Tonemapping::get_ExposureMethod()
+IL_0000: ldarg.0
+IL_0001: ldfld Sandbox.Tonemapping/ExposureColorSpaceEnum Sandbox.Tonemapping::<ExposureMethod>k__BackingField
+IL_0006: ret
+System.Void Sandbox.Tonemapping::set_ExposureMethod(Sandbox.Tonemapping/ExposureColorSpaceEnum)
+IL_0000: ldarg.0
+IL_0001: ldarg.1
+IL_0002: stfld Sandbox.Tonemapping/ExposureColorSpaceEnum Sandbox.Tonemapping::<ExposureMethod>k__BackingField
+IL_0007: ret
+System.Void Sandbox.Tonemapping::Render()
+IL_0000: ldarg.0
+IL_0001: ldarg.0
+IL_0002: call Sandbox.CameraComponent Sandbox.BasePostProcess::get_Camera()
+IL_0007: call System.Void Sandbox.Tonemapping::UpdateExposure(Sandbox.CameraComponent)
+IL_000c: ldarg.0
+IL_000d: ldfld Sandbox.RenderAttributes Sandbox.BasePostProcess::Attributes
+IL_0012: ldstr "D_TONEMAPPING"
+IL_0017: ldc.i4 692918451
+IL_001c: call Sandbox.StringToken Sandbox.StringToken::Literal(System.String,System.UInt32)
+IL_0021: stloc.1
+IL_0022: ldloca.s V_1
+IL_0024: ldarg.0
+IL_0025: call Sandbox.Tonemapping/TonemappingMode Sandbox.Tonemapping::get_Mode()
+IL_002a: stloc.2
+IL_002b: ldloca.s V_2
+IL_002d: callvirt System.Void Sandbox.RenderAttributes::SetComboEnum<Sandbox.Tonemapping/TonemappingMode>(Sandbox.StringToken&,T&)
+IL_0032: ldarg.0
+IL_0033: ldfld Sandbox.RenderAttributes Sandbox.BasePostProcess::Attributes
+IL_0038: ldstr "D_EXPOSUREMETHOD"
+IL_003d: ldc.i4 567346143
+IL_0042: call Sandbox.StringToken Sandbox.StringToken::Literal(System.String,System.UInt32)
+IL_0047: stloc.1
+IL_0048: ldloca.s V_1
+IL_004a: ldarg.0
+IL_004b: call Sandbox.Tonemapping/ExposureColorSpaceEnum Sandbox.Tonemapping::get_ExposureMethod()
+IL_0050: stloc.3
+IL_0051: ldloca.s V_3
+IL_0053: callvirt System.Void Sandbox.RenderAttributes::SetComboEnum<Sandbox.Tonemapping/ExposureColorSpaceEnum>(Sandbox.StringToken&,T&)
+IL_0058: ldsfld Sandbox.Material Sandbox.Tonemapping::Shader
+IL_005d: ldc.i4 6500
+IL_0062: ldc.i4.0
+IL_0063: ldc.i4.0
+IL_0064: call Sandbox.BasePostProcess/BlitMode Sandbox.BasePostProcess/BlitMode::WithBackbuffer(Sandbox.Material,Sandbox.Rendering.Stage,System.Int32,System.Boolean)
+IL_0069: stloc.0
+IL_006a: ldarg.0
+IL_006b: ldloc.0
+IL_006c: ldstr "Tonemapping"
+IL_0071: call System.Void Sandbox.BasePostProcess::Blit(Sandbox.BasePostProcess/BlitMode,System.String)
+IL_0076: ret
+System.Boolean Sandbox.Tonemapping::get_AutoExposureEnabled()
+IL_0000: ldarg.0
+IL_0001: ldfld System.Boolean Sandbox.Tonemapping::<AutoExposureEnabled>k__BackingField
+IL_0006: ret
+System.Void Sandbox.Tonemapping::set_AutoExposureEnabled(System.Boolean)
+IL_0000: ldarg.0
+IL_0001: ldarg.1
+IL_0002: stfld System.Boolean Sandbox.Tonemapping::<AutoExposureEnabled>k__BackingField
+IL_0007: ret
+System.Single Sandbox.Tonemapping::get_MinimumExposure()
+IL_0000: ldarg.0
+IL_0001: ldfld System.Single Sandbox.Tonemapping::<MinimumExposure>k__BackingField
+IL_0006: ret
+System.Void Sandbox.Tonemapping::set_MinimumExposure(System.Single)
+IL_0000: ldarg.0
+IL_0001: ldarg.1
+IL_0002: stfld System.Single Sandbox.Tonemapping::<MinimumExposure>k__BackingField
+IL_0007: ret
+System.Single Sandbox.Tonemapping::get_MaximumExposure()
+IL_0000: ldarg.0
+IL_0001: ldfld System.Single Sandbox.Tonemapping::<MaximumExposure>k__BackingField
+IL_0006: ret
+System.Void Sandbox.Tonemapping::set_MaximumExposure(System.Single)
+IL_0000: ldarg.0
+IL_0001: ldarg.1
+IL_0002: stfld System.Single Sandbox.Tonemapping::<MaximumExposure>k__BackingField
+IL_0007: ret
+System.Single Sandbox.Tonemapping::get_ExposureCompensation()
+IL_0000: ldarg.0
+IL_0001: ldfld System.Single Sandbox.Tonemapping::<ExposureCompensation>k__BackingField
+IL_0006: ret
+System.Void Sandbox.Tonemapping::set_ExposureCompensation(System.Single)
+IL_0000: ldarg.0
+IL_0001: ldarg.1
+IL_0002: stfld System.Single Sandbox.Tonemapping::<ExposureCompensation>k__BackingField
+IL_0007: ret
+System.Single Sandbox.Tonemapping::get_Rate()
+IL_0000: ldarg.0
+IL_0001: ldfld System.Single Sandbox.Tonemapping::<Rate>k__BackingField
+IL_0006: ret
+System.Void Sandbox.Tonemapping::set_Rate(System.Single)
+IL_0000: ldarg.0
+IL_0001: ldarg.1
+IL_0002: stfld System.Single Sandbox.Tonemapping::<Rate>k__BackingField
+IL_0007: ret
+System.Void Sandbox.Tonemapping::UpdateExposure(Sandbox.CameraComponent)
+IL_0000: ldarg.1
+IL_0001: call System.Boolean Sandbox.SandboxSystemExtensions::IsValid(Sandbox.IValid)
+IL_0006: brtrue.s IL_0009
+IL_0008: ret
+IL_0009: ldarg.1
+IL_000a: callvirt Sandbox.CameraComponent/AutoExposureSetup Sandbox.CameraComponent::get_AutoExposure()
+IL_000f: ldarg.0
+IL_0010: call System.Boolean Sandbox.Tonemapping::get_AutoExposureEnabled()
+IL_0015: callvirt System.Void Sandbox.CameraComponent/AutoExposureSetup::set_Enabled(System.Boolean)
+IL_001a: ldarg.1
+IL_001b: callvirt Sandbox.CameraComponent/AutoExposureSetup Sandbox.CameraComponent::get_AutoExposure()
+IL_0020: ldarg.0
+IL_0021: ldsfld System.Func`2<Sandbox.Tonemapping,System.Single> Sandbox.Tonemapping/<>c::<>9__32_0
+IL_0026: dup
+IL_0027: brtrue.s IL_0040
+IL_0029: pop
+IL_002a: ldsfld Sandbox.Tonemapping/<>c Sandbox.Tonemapping/<>c::<>9
+IL_002f: ldftn System.Single Sandbox.Tonemapping/<>c::<UpdateExposure>b__32_0(Sandbox.Tonemapping)
+IL_0035: newobj System.Void System.Func`2<Sandbox.Tonemapping,System.Single>::.ctor(System.Object,System.IntPtr)
+IL_003a: dup
+IL_003b: stsfld System.Func`2<Sandbox.Tonemapping,System.Single> Sandbox.Tonemapping/<>c::<>9__32_0
+IL_0040: ldc.r4 0
+IL_0045: ldc.i4.0
+IL_0046: call !!0 Sandbox.BasePostProcess`1<Sandbox.Tonemapping>::GetWeighted<System.Single>(System.Func`2<T,!!0>,!!0,System.Boolean)
+IL_004b: callvirt System.Void Sandbox.CameraComponent/AutoExposureSetup::set_Compensation(System.Single)
+IL_0050: ldarg.1
+IL_0051: callvirt Sandbox.CameraComponent/AutoExposureSetup Sandbox.CameraComponent::get_AutoExposure()
+IL_0056: ldarg.0
+IL_0057: ldsfld System.Func`2<Sandbox.Tonemapping,System.Single> Sandbox.Tonemapping/<>c::<>9__32_1
+IL_005c: dup
+IL_005d: brtrue.s IL_0076
+IL_005f: pop
+IL_0060: ldsfld Sandbox.Tonemapping/<>c Sandbox.Tonemapping/<>c::<>9
+IL_0065: ldftn System.Single Sandbox.Tonemapping/<>c::<UpdateExposure>b__32_1(Sandbox.Tonemapping)
+IL_006b: newobj System.Void System.Func`2<Sandbox.Tonemapping,System.Single>::.ctor(System.Object,System.IntPtr)
+IL_0070: dup
+IL_0071: stsfld System.Func`2<Sandbox.Tonemapping,System.Single> Sandbox.Tonemapping/<>c::<>9__32_1
+IL_0076: ldc.r4 1
+IL_007b: ldc.i4.0
+IL_007c: call !!0 Sandbox.BasePostProcess`1<Sandbox.Tonemapping>::GetWeighted<System.Single>(System.Func`2<T,!!0>,!!0,System.Boolean)
+IL_0081: callvirt System.Void Sandbox.CameraComponent/AutoExposureSetup::set_MinimumExposure(System.Single)
+IL_0086: ldarg.1
+IL_0087: callvirt Sandbox.CameraComponent/AutoExposureSetup Sandbox.CameraComponent::get_AutoExposure()
+IL_008c: ldarg.0
+IL_008d: ldsfld System.Func`2<Sandbox.Tonemapping,System.Single> Sandbox.Tonemapping/<>c::<>9__32_2
+IL_0092: dup
+IL_0093: brtrue.s IL_00ac
+IL_0095: pop
+IL_0096: ldsfld Sandbox.Tonemapping/<>c Sandbox.Tonemapping/<>c::<>9
+IL_009b: ldftn System.Single Sandbox.Tonemapping/<>c::<UpdateExposure>b__32_2(Sandbox.Tonemapping)
+IL_00a1: newobj System.Void System.Func`2<Sandbox.Tonemapping,System.Single>::.ctor(System.Object,System.IntPtr)
+IL_00a6: dup
+IL_00a7: stsfld System.Func`2<Sandbox.Tonemapping,System.Single> Sandbox.Tonemapping/<>c::<>9__32_2
+IL_00ac: ldc.r4 3
+IL_00b1: ldc.i4.0
+IL_00b2: call !!0 Sandbox.BasePostProcess`1<Sandbox.Tonemapping>::GetWeighted<System.Single>(System.Func`2<T,!!0>,!!0,System.Boolean)
+IL_00b7: callvirt System.Void Sandbox.CameraComponent/AutoExposureSetup::set_MaximumExposure(System.Single)
+IL_00bc: ldarg.1
+IL_00bd: callvirt Sandbox.CameraComponent/AutoExposureSetup Sandbox.CameraComponent::get_AutoExposure()
+IL_00c2: ldarg.0
+IL_00c3: ldsfld System.Func`2<Sandbox.Tonemapping,System.Single> Sandbox.Tonemapping/<>c::<>9__32_3
+IL_00c8: dup
+IL_00c9: brtrue.s IL_00e2
+IL_00cb: pop
+IL_00cc: ldsfld Sandbox.Tonemapping/<>c Sandbox.Tonemapping/<>c::<>9
+IL_00d1: ldftn System.Single Sandbox.Tonemapping/<>c::<UpdateExposure>b__32_3(Sandbox.Tonemapping)
+IL_00d7: newobj System.Void System.Func`2<Sandbox.Tonemapping,System.Single>::.ctor(System.Object,System.IntPtr)
+IL_00dc: dup
+IL_00dd: stsfld System.Func`2<Sandbox.Tonemapping,System.Single> Sandbox.Tonemapping/<>c::<>9__32_3
+IL_00e2: ldc.r4 1
+IL_00e7: ldc.i4.0
+IL_00e8: call !!0 Sandbox.BasePostProcess`1<Sandbox.Tonemapping>::GetWeighted<System.Single>(System.Func`2<T,!!0>,!!0,System.Boolean)
+IL_00ed: callvirt System.Void Sandbox.CameraComponent/AutoExposureSetup::set_Rate(System.Single)
+IL_00f2: ret
+System.Int32 Sandbox.Tonemapping::get_ComponentVersion()
+IL_0000: ldc.i4.3
+IL_0001: ret
+System.Void Sandbox.Tonemapping::Upgrader_v3(System.Text.Json.Nodes.JsonObject)
+IL_0000: ldarg.0
+IL_0001: ldstr "Mode"
+IL_0006: ldloca.s V_0
+IL_0008: callvirt System.Boolean System.Text.Json.Nodes.JsonObject::TryGetPropertyValue(System.String,System.Text.Json.Nodes.JsonNode&)
+IL_000d: brfalse.s IL_0022
+IL_000f: ldloc.0
+IL_0010: callvirt System.String System.Object::ToString()
+IL_0015: ldstr "HableFilmic"
+IL_001a: call System.Boolean System.String::op_Inequality(System.String,System.String)
+IL_001f: brfalse.s IL_0022
+IL_0021: ret
+IL_0022: ldarg.0
+IL_0023: ldstr "ExposureBias"
+IL_0028: ldloca.s V_1
+IL_002a: callvirt System.Boolean System.Text.Json.Nodes.JsonObject::TryGetPropertyValue(System.String,System.Text.Json.Nodes.JsonNode&)
+IL_002f: brfalse.s IL_0065
+IL_0031: ldarg.0
+IL_0032: ldstr "ExposureCompensation"
+IL_0037: ldloca.s V_2
+IL_0039: callvirt System.Boolean System.Text.Json.Nodes.JsonObject::TryGetPropertyValue(System.String,System.Text.Json.Nodes.JsonNode&)
+IL_003e: brfalse.s IL_0065
+IL_0040: ldarg.0
+IL_0041: ldstr "ExposureCompensation"
+IL_0046: ldloc.1
+IL_0047: call System.Single System.Text.Json.Nodes.JsonNode::op_Explicit(System.Text.Json.Nodes.JsonNode)
+IL_004c: conv.r4
+IL_004d: ldc.r4 0.5
+IL_0052: mul
+IL_0053: ldloc.2
+IL_0054: call System.Single System.Text.Json.Nodes.JsonNode::op_Explicit(System.Text.Json.Nodes.JsonNode)
+IL_0059: conv.r4
+IL_005a: add
+IL_005b: call System.Text.Json.Nodes.JsonNode System.Text.Json.Nodes.JsonNode::op_Implicit(System.Single)
+IL_0060: callvirt System.Void System.Text.Json.Nodes.JsonNode::set_Item(System.String,System.Text.Json.Nodes.JsonNode)
+IL_0065: ret
+System.Void Sandbox.Tonemapping::Upgrader_v2(System.Text.Json.Nodes.JsonObject)
+IL_0000: ldarg.0
+IL_0001: ldstr "Mode"
+IL_0006: ldloca.s V_0
+IL_0008: callvirt System.Boolean System.Text.Json.Nodes.JsonObject::TryGetPropertyValue(System.String,System.Text.Json.Nodes.JsonNode&)
+IL_000d: brfalse.s IL_0032
+IL_000f: ldloc.0
+IL_0010: callvirt System.String System.Object::ToString()
+IL_0015: ldstr "Legacy"
+IL_001a: call System.Boolean System.String::op_Equality(System.String,System.String)
+IL_001f: brfalse.s IL_0032
+IL_0021: ldarg.0
+IL_0022: ldstr "Mode"
+IL_0027: ldc.i4.1
+IL_0028: call System.Text.Json.Nodes.JsonNode System.Text.Json.Nodes.JsonNode::op_Implicit(System.Int32)
+IL_002d: callvirt System.Void System.Text.Json.Nodes.JsonNode::set_Item(System.String,System.Text.Json.Nodes.JsonNode)
+IL_0032: ret
+System.Void Sandbox.Tonemapping::.ctor()
+IL_0000: ldarg.0
+IL_0001: ldc.i4.1
+IL_0002: stfld Sandbox.Tonemapping/TonemappingMode Sandbox.Tonemapping::<Mode>k__BackingField
+IL_0007: ldarg.0
+IL_0008: ldc.i4.1
+IL_0009: stfld System.Boolean Sandbox.Tonemapping::<AutoExposureEnabled>k__BackingField
+IL_000e: ldarg.0
+IL_000f: ldc.r4 1
+IL_0014: stfld System.Single Sandbox.Tonemapping::<MinimumExposure>k__BackingField
+IL_0019: ldarg.0
+IL_001a: ldc.r4 3
+IL_001f: stfld System.Single Sandbox.Tonemapping::<MaximumExposure>k__BackingField
+IL_0024: ldarg.0
+IL_0025: ldc.r4 1
+IL_002a: stfld System.Single Sandbox.Tonemapping::<Rate>k__BackingField
+IL_002f: ldarg.0
+IL_0030: call System.Void Sandbox.BasePostProcess`1<Sandbox.Tonemapping>::.ctor()
+IL_0035: ret
+System.Void Sandbox.Tonemapping::.cctor()
+IL_0000: ldstr "shaders/tonemapping/tonemapping.shader"
+IL_0005: call Sandbox.Material Sandbox.Material::FromShader(System.String)
+IL_000a: stsfld Sandbox.Material Sandbox.Tonemapping::Shader
+IL_000f: ret
+System.Void Sandbox.ToneMapping::.ctor()
+IL_0000: ldarg.0
+IL_0001: call System.Void System.Object::.ctor()
+IL_0006: ldarg.0
+IL_0007: call ITonemapSystem g_pSceneUtils::CreateTonemapSystem()
+IL_000c: stfld ITonemapSystem Sandbox.ToneMapping::native
+IL_0011: ret
+System.Void Sandbox.ToneMapping::Finalize()
+IL_0000: ldarg.0
+IL_0001: ldfld ITonemapSystem Sandbox.ToneMapping::native
+IL_0006: call System.Void g_pSceneUtils::DestroyTonemapSystem(ITonemapSystem)
+IL_000b: leave.s IL_0014
+IL_000d: ldarg.0
+IL_000e: call System.Void System.Object::Finalize()
+IL_0013: endfinally
+IL_0014: ret
+ITonemapSystem Sandbox.ToneMapping::GetNative()
+IL_0000: ldarg.0
+IL_0001: ldfld ITonemapSystem Sandbox.ToneMapping::native
+IL_0006: ret
+System.Void Sandbox.TonemapSystem::.ctor(Sandbox.SceneCamera)
+IL_0000: ldarg.0
+IL_0001: newobj System.Void SceneTonemapParameters_t::.ctor()
+IL_0006: stfld SceneTonemapParameters_t Sandbox.TonemapSystem::Parameters
+IL_000b: ldarg.0
+IL_000c: call System.Void System.Object::.ctor()
+IL_0011: ldarg.0
+IL_0012: ldarg.1
+IL_0013: stfld Sandbox.SceneCamera Sandbox.TonemapSystem::Camera
+IL_0018: ldarg.0
+IL_0019: ldarg.0
+IL_001a: ldfld Sandbox.SceneCamera Sandbox.TonemapSystem::Camera
+IL_001f: ldfld Sandbox.ToneMapping Sandbox.SceneCamera::ToneMapping
+IL_0024: dup
+IL_0025: brtrue.s IL_0033
+IL_0027: pop
+IL_0028: ldloca.s V_0
+IL_002a: initobj ITonemapSystem
+IL_0030: ldloc.0
+IL_0031: br.s IL_0038
+IL_0033: call ITonemapSystem Sandbox.ToneMapping::GetNative()
+IL_0038: stfld ITonemapSystem Sandbox.TonemapSystem::System
+IL_003d: ldarg.0
+IL_003e: ldflda ITonemapSystem Sandbox.TonemapSystem::System
+IL_0043: call System.Boolean ITonemapSystem::get_IsValid()
+IL_0048: brfalse.s IL_005e
+IL_004a: ldloca.s V_1
+IL_004c: call System.Void SceneTonemapParameters_t::.ctor()
+IL_0051: ldarg.0
+IL_0052: ldflda ITonemapSystem Sandbox.TonemapSystem::System
+IL_0057: ldloca.s V_1
+IL_0059: call System.Void ITonemapSystem::SetTonemapParameters(SceneTonemapParameters_t&)
+IL_005e: ret
+System.Void Sandbox.TonemapSystem::SetTonemapParameters(SceneTonemapParameters_t)
+IL_0000: ldarg.0
+IL_0001: ldarg.1
+IL_0002: stfld SceneTonemapParameters_t Sandbox.TonemapSystem::Parameters
+IL_0007: ldarg.0
+IL_0008: call System.Void Sandbox.TonemapSystem::Update()
+IL_000d: ret
+System.Boolean Sandbox.TonemapSystem::get_Enabled()
+IL_0000: ldarg.0
+IL_0001: ldfld System.Boolean Sandbox.TonemapSystem::<Enabled>k__BackingField
+IL_0006: ret
+System.Void Sandbox.TonemapSystem::set_Enabled(System.Boolean)
+IL_0000: ldarg.0
+IL_0001: ldarg.1
+IL_0002: stfld System.Boolean Sandbox.TonemapSystem::<Enabled>k__BackingField
+IL_0007: ret
+System.Single Sandbox.TonemapSystem::get_Rate()
+IL_0000: ldarg.0
+IL_0001: ldflda SceneTonemapParameters_t Sandbox.TonemapSystem::Parameters
+IL_0006: ldfld System.Single SceneTonemapParameters_t::m_flRate
+IL_000b: ret
+System.Void Sandbox.TonemapSystem::set_Rate(System.Single)
+IL_0000: ldarg.0
+IL_0001: ldflda SceneTonemapParameters_t Sandbox.TonemapSystem::Parameters
+IL_0006: ldarg.1
+IL_0007: stfld System.Single SceneTonemapParameters_t::m_flRate
+IL_000c: ldarg.0
+IL_000d: call System.Void Sandbox.TonemapSystem::Update()
+IL_0012: ret
+System.Single Sandbox.TonemapSystem::get_Fade()
+IL_0000: ldarg.0
+IL_0001: ldflda SceneTonemapParameters_t Sandbox.TonemapSystem::Parameters
+IL_0006: ldfld System.Single SceneTonemapParameters_t::m_flAccelerateExposureDown
+IL_000b: ret
+System.Void Sandbox.TonemapSystem::set_Fade(System.Single)
+IL_0000: ldarg.0
+IL_0001: ldflda SceneTonemapParameters_t Sandbox.TonemapSystem::Parameters
+IL_0006: ldarg.1
+IL_0007: stfld System.Single SceneTonemapParameters_t::m_flAccelerateExposureDown
+IL_000c: ldarg.0
+IL_000d: call System.Void Sandbox.TonemapSystem::Update()
+IL_0012: ret
+System.Single Sandbox.TonemapSystem::get_MinExposure()
+IL_0000: ldarg.0
+IL_0001: ldflda SceneTonemapParameters_t Sandbox.TonemapSystem::Parameters
+IL_0006: ldfld System.Single SceneTonemapParameters_t::m_flAutoExposureMin
+IL_000b: ret
+System.Void Sandbox.TonemapSystem::set_MinExposure(System.Single)
+IL_0000: ldarg.0
+IL_0001: ldflda SceneTonemapParameters_t Sandbox.TonemapSystem::Parameters
+IL_0006: ldarg.1
+IL_0007: stfld System.Single SceneTonemapParameters_t::m_flAutoExposureMin
+IL_000c: ldarg.0
+IL_000d: call System.Void Sandbox.TonemapSystem::Update()
+IL_0012: ret
+System.Single Sandbox.TonemapSystem::get_MaxExposure()
+IL_0000: ldarg.0
+IL_0001: ldflda SceneTonemapParameters_t Sandbox.TonemapSystem::Parameters
+IL_0006: ldfld System.Single SceneTonemapParameters_t::m_flAutoExposureMax
+IL_000b: ret
+System.Void Sandbox.TonemapSystem::set_MaxExposure(System.Single)
+IL_0000: ldarg.0
+IL_0001: ldflda SceneTonemapParameters_t Sandbox.TonemapSystem::Parameters
+IL_0006: ldarg.1
+IL_0007: stfld System.Single SceneTonemapParameters_t::m_flAutoExposureMax
+IL_000c: ldarg.0
+IL_000d: call System.Void Sandbox.TonemapSystem::Update()
+IL_0012: ret
+System.Single Sandbox.TonemapSystem::get_ExposureCompensation()
+IL_0000: ldarg.0
+IL_0001: ldflda SceneTonemapParameters_t Sandbox.TonemapSystem::Parameters
+IL_0006: ldfld System.Single SceneTonemapParameters_t::m_flExposureCompensationScalar
+IL_000b: ldc.r4 2
+IL_0010: call System.Single System.MathF::Log(System.Single,System.Single)
+IL_0015: ret
+System.Void Sandbox.TonemapSystem::set_ExposureCompensation(System.Single)
+IL_0000: ldarg.0
+IL_0001: ldflda SceneTonemapParameters_t Sandbox.TonemapSystem::Parameters
+IL_0006: ldc.r4 2
+IL_000b: ldarg.1
+IL_000c: call System.Single System.MathF::Pow(System.Single,System.Single)
+IL_0011: stfld System.Single SceneTonemapParameters_t::m_flExposureCompensationScalar
+IL_0016: ldarg.0
+IL_0017: call System.Void Sandbox.TonemapSystem::Update()
+IL_001c: ret
+System.Single Sandbox.TonemapSystem::get_PercentTarget()
+IL_0000: ldarg.0
+IL_0001: ldflda SceneTonemapParameters_t Sandbox.TonemapSystem::Parameters
+IL_0006: ldfld System.Single SceneTonemapParameters_t::m_flTonemapPercentTarget
+IL_000b: ret
+System.Void Sandbox.TonemapSystem::set_PercentTarget(System.Single)
+IL_0000: ldarg.0
+IL_0001: ldflda SceneTonemapParameters_t Sandbox.TonemapSystem::Parameters
+IL_0006: ldarg.1
+IL_0007: stfld System.Single SceneTonemapParameters_t::m_flTonemapPercentTarget
+IL_000c: ldarg.0
+IL_000d: call System.Void Sandbox.TonemapSystem::Update()
+IL_0012: ret
+System.Single Sandbox.TonemapSystem::get_PercentBrightPixels()
+IL_0000: ldarg.0
+IL_0001: ldflda SceneTonemapParameters_t Sandbox.TonemapSystem::Parameters
+IL_0006: ldfld System.Single SceneTonemapParameters_t::m_flTonemapPercentBrightPixels
+IL_000b: ret
+System.Void Sandbox.TonemapSystem::set_PercentBrightPixels(System.Single)
+IL_0000: ldarg.0
+IL_0001: ldflda SceneTonemapParameters_t Sandbox.TonemapSystem::Parameters
+IL_0006: ldarg.1
+IL_0007: stfld System.Single SceneTonemapParameters_t::m_flTonemapPercentBrightPixels
+IL_000c: ldarg.0
+IL_000d: call System.Void Sandbox.TonemapSystem::Update()
+IL_0012: ret
+System.Single Sandbox.TonemapSystem::get_MinAverageLuminance()
+IL_0000: ldarg.0
+IL_0001: ldflda SceneTonemapParameters_t Sandbox.TonemapSystem::Parameters
+IL_0006: ldfld System.Single SceneTonemapParameters_t::m_flTonemapMinAvgLum
+IL_000b: ret
+System.Void Sandbox.TonemapSystem::set_MinAverageLuminance(System.Single)
+IL_0000: ldarg.0
+IL_0001: ldflda SceneTonemapParameters_t Sandbox.TonemapSystem::Parameters
+IL_0006: ldarg.1
+IL_0007: stfld System.Single SceneTonemapParameters_t::m_flTonemapMinAvgLum
+IL_000c: ldarg.0
+IL_000d: call System.Void Sandbox.TonemapSystem::Update()
+IL_0012: ret
+System.Void Sandbox.TonemapSystem::Update()
+IL_0000: ldarg.0
+IL_0001: ldflda ITonemapSystem Sandbox.TonemapSystem::System
+IL_0006: call System.Boolean ITonemapSystem::get_IsValid()
+IL_000b: brfalse.s IL_001e
+IL_000d: ldarg.0
+IL_000e: ldflda ITonemapSystem Sandbox.TonemapSystem::System
+IL_0013: ldarg.0
+IL_0014: ldflda SceneTonemapParameters_t Sandbox.TonemapSystem::Parameters
+IL_0019: call System.Void ITonemapSystem::SetTonemapParameters(SceneTonemapParameters_t&)
+IL_001e: ret

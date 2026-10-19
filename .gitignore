@@ -88,6 +88,40 @@ Exports/*
 __pycache__/
 *.pyc
 
+# output/ keeps its text records in git: reports, verification results, tool configs, scripts and logs, so
+# anyone can run the tools and see where each piece of work stands. Its models, textures, images, staging and
+# before/after copies and build files stay local; the tools on git regenerate them. Files already tracked there
+# are unaffected. Folders listed after this block stay out entirely.
+/output/**
+!/output/**/
+!/output/**/*.json
+!/output/**/*.jsonl
+!/output/**/*.txt
+!/output/**/*.md
+!/output/**/*.py
+!/output/**/*.cs
+!/output/**/*.csv
+!/output/**/*.log
+!/output/**/*.html
+!/output/**/*.xml
+!/output/**/*.yaml
+!/output/**/*.yml
+!/output/**/*.ps1
+!/output/**/*.sh
+!/output/**/*.bat
+!/output/**/*.toml
+!/output/**/*.ini
+!/output/**/*.cfg
+!/output/**/*.js
+!/output/**/*.ts
+!/output/**/*.mjs
+# Screenshots saved as base64 JSON.
+/output/**/editor_camera_screenshot.json
+# Test builds' compiler output.
+/output/**/bin/
+/output/**/obj/
+/output/**/build/
+
 # Generated sources and validation captures for split ragdoll clothing
 /output/blast-limbs/
 

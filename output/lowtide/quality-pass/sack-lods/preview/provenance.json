@@ -1,0 +1,79 @@
+{
+  "native_engine_capture": false,
+  "geometry_sources_sha256": {
+    "Tools/lowtide_sack_lods.py": "bf45bb04426f67c30c7c8939ecd23a284cacee8c0b4adb770e03d0e64897e210",
+    "Tools/lowtide_sack_construction.py": "f53616131ea32c35b17dddcf2f1867b1c9d9200495174f68adbbf400a4d2e4b6"
+  },
+  "renderer_sources_sha256": {
+    "Tools/lowtide_sack_lod_review.py": "0b0c69a7263cde3c968f368b076c20a65dfc78f9ca20abe38bd68bfad41c225b",
+    "Tools/lowtide_sack_preview.py": "fa92a668fdb4080b9c1d79c90327dec4c63fd6783dec8b25e0954b566448851b",
+    "Tools/lowtide_window_software.py": "75c516523262951f33bf2cdb602c0e1fa49a39d3fa1d8f84e274db53a49c73e3"
+  },
+  "exported_meshes": {
+    "sample-0-level-0.obj": "05aa5acbf90d3f7819069e7e110e200a15ddb31703730150c3b0cf36fcabfeb1",
+    "sample-0-level-1.obj": "4a12167bc1fc4481d7c746099ca7941041f0847e90aeb9b857670b87583306ef",
+    "sample-0-level-2.obj": "0530c39bfd7d2e52e9f14770aebfee2bd72ca928ccaa43ede24dba6ef007bb8a",
+    "sample-1-level-0.obj": "4fc885e32cf6122753b8ea1f3f29d0c0c1022f7af1edfcadae2e8fcbbbb687ac",
+    "sample-1-level-1.obj": "bf86996342e27bbb4d4cd988b858faf264be68e0c5e19159914f1b4a9433d64e",
+    "sample-1-level-2.obj": "ce587fc49bb7c1ca84eb4d040954b028ae5efcb805250f2da02defbab3888b2d"
+  },
+  "previews": {
+    "mouth-160.png": "1d7b51dabb2c8043bfd30a06b52578172b594105aabfb7b4efd30372370ae958",
+    "mouth-320.png": "80f6eaa2bfdd13ce3c1ba61be7b0ecdbfdb19fbac8bfb7f01400d5e3106ec97f",
+    "mouth-80.png": "9bac6007057cd6f2bdb53ec6372ebb9eee16631ee21093aaac862c6c0477e4f8",
+    "oblique-160.png": "478e29f061a59f3223700bfa8bd1c20fcde67625e7ff7dfd08c2a62a7e0aebca",
+    "oblique-320.png": "4cf757cd65210c9c59ea72e24002bf00a1177c2d79dc6f58bc563fe0645b80d0",
+    "oblique-80.png": "c82f38cf852e6ed2829c88a70960b620d60f4e3fc739760965d29e20a06216af",
+    "side-160.png": "736f410d80928a8d45c07aa52bdcfdfee84b2be22e0dd482856e1d350a667395",
+    "side-320.png": "f8ea828060505957cf2d619ad6b0394cfba84f193ef5699b26084a2296afbf9e",
+    "side-80.png": "4896ade2903afb3f415f24dff599dce924ce7f79e28d83511c1e6634feefe3f5"
+  },
+  "views": {
+    "oblique": {
+      "eye": [
+        1.1,
+        -1.5,
+        0.95
+      ],
+      "target": [
+        0.0,
+        0.0,
+        0.12
+      ]
+    },
+    "mouth": {
+      "eye": [
+        0.05,
+        -2,
+        0.4
+      ],
+      "target": [
+        0.0,
+        0.0,
+        0.14
+      ]
+    },
+    "side": {
+      "eye": [
+        2,
+        -0.05,
+        0.65
+      ],
+      "target": [
+        0.0,
+        0.0,
+        0.14
+      ]
+    }
+  },
+  "feature_pixels": [
+    320,
+    160,
+    80
+  ],
+  "limitations": [
+    "Nearest mip chosen per orthographic triangle; not native anisotropic/trilinear filtering",
+    "No engine GI, normal map shading, temporal LOD switching or performance measurement",
+    "Two representative seed variants; silhouette results are not an exhaustive visual proof"
+  ]
+}

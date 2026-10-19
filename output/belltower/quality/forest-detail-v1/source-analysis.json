@@ -1,0 +1,106 @@
+{
+  "source": "Sources\\Belltower\\generated\\forest-trees-v1.png",
+  "sha256": "68ed17f8cf98b95c208448cb7527d97e01d4a3e8aa33244000c58c78fe8d8baa",
+  "source_matches_live": true,
+  "rectangles": [
+    [
+      0.006,
+      0.004,
+      0.553,
+      0.532
+    ],
+    [
+      0.557,
+      0.004,
+      0.998,
+      0.532
+    ],
+    [
+      0.006,
+      0.546,
+      0.553,
+      0.987
+    ],
+    [
+      0.557,
+      0.546,
+      0.998,
+      0.987
+    ]
+  ],
+  "analysis": "Current shader detail clamp at base level, using visible source texels. Not native rendered or performance evidence.",
+  "variants": [
+    {
+      "variant": 0,
+      "used_by_current_forest": true,
+      "visible_texels": 234382,
+      "linear_luma_quantiles": [
+        0.0,
+        0.010818260243752535,
+        0.027958036332530495,
+        0.05466913150709657,
+        0.11320440967576488,
+        0.26345128753207336,
+        0.9698709758601929
+      ],
+      "high_detail_clipped_fraction": 0.14892781868914848,
+      "low_detail_clipped_fraction": 0.15109948716198343,
+      "mean_shader_multiplier": 0.943057760258956,
+      "alpha_weighted_mean_luma": 0.0865590873089189
+    },
+    {
+      "variant": 1,
+      "used_by_current_forest": true,
+      "visible_texels": 180798,
+      "linear_luma_quantiles": [
+        0.0,
+        0.017335352280900277,
+        0.04419494932988974,
+        0.0778039598713536,
+        0.1361350478001254,
+        0.26895222690514126,
+        0.9583609197355024
+      ],
+      "high_detail_clipped_fraction": 0.18727530171793935,
+      "low_detail_clipped_fraction": 0.0661235190654764,
+      "mean_shader_multiplier": 1.058743141922647,
+      "alpha_weighted_mean_luma": 0.10338813632027384
+    },
+    {
+      "variant": 2,
+      "used_by_current_forest": false,
+      "visible_texels": 199474,
+      "linear_luma_quantiles": [
+        0.0,
+        0.020478475122776358,
+        0.062060316675659574,
+        0.12098131995231318,
+        0.2146466508069594,
+        0.4322128265409992,
+        1.0
+      ],
+      "high_detail_clipped_fraction": 0.37855058804656244,
+      "low_detail_clipped_fraction": 0.048126572886692,
+      "mean_shader_multiplier": 1.2290561306495826,
+      "alpha_weighted_mean_luma": 0.15883914860458315
+    },
+    {
+      "variant": 3,
+      "used_by_current_forest": true,
+      "visible_texels": 202051,
+      "linear_luma_quantiles": [
+        0.0,
+        0.007121883725729777,
+        0.02271984087334611,
+        0.054183178816447713,
+        0.12945642786706854,
+        0.30390823637531417,
+        1.0
+      ],
+      "high_detail_clipped_fraction": 0.19086765222641808,
+      "low_detail_clipped_fraction": 0.21855868072912285,
+      "mean_shader_multiplier": 0.9554843242710122,
+      "alpha_weighted_mean_luma": 0.09328164293722713
+    }
+  ]
+}

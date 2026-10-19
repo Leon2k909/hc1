@@ -1,0 +1,14 @@
+var session = Editor.SceneEditorSession.All.Single(s => s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase)==true);
+var scene = session.Scene;
+object Describe(Texture t) => t is null ? null : new { t.ResourcePath, t.IsError, t.IsLoaded, t.Width, t.Height };
+var result = new {
+    Active = Editor.SceneEditorSession.Active?.Scene?.Name,
+    Scene = scene.Name,
+    Volumes = scene.GetAllComponents<IndirectLightVolume>().Select(v => new { v.Id, v.Enabled, v.Active, v.ProbeCounts, v.RuntimeIntensity, v.BakeVersion,
+        Irradiance=Describe(v.IrradianceTexture), Distance=Describe(v.DistanceTexture), Relocation=Describe(v.RelocationTexture), Data=v.Serialize().ToJsonString() }).ToArray(),
+    OtherLighting = scene.GetAllComponents<Component>().Where(c => c.GetType().Name is "EnvmapProbe" or "SkyBox2D" or "DirectionalLight").Select(c => new {Type=c.GetType().Name,Data=c.Serialize().ToJsonString()}).ToArray()
+};
+var folder=System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/belltower/quality/plaster-v1-lighting-check");
+System.IO.Directory.CreateDirectory(folder);
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"loaded-lighting.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

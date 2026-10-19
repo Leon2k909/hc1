@@ -1,0 +1,20 @@
+{
+  "status": "installed in production, compiled, loaded and visually verified",
+  "candidate_generator": "Tools/lowtide_paving_relief.py",
+  "stage": "output/lowtide/quality-pass/paving-relief-stage",
+  "manifest": "output/lowtide/quality-pass/paving-relief-manifest.json",
+  "data_checks": "output/lowtide/quality-pass/paving-relief-data-checks.json",
+  "import_script": "output/lowtide/quality-pass/import-paving-relief.cs",
+  "preview_script": "output/lowtide/quality-pass/preview-paving-relief.cs",
+  "native_compile": "paving-relief-native-compile.json",
+  "visual_comparisons": "paving-relief-preview.json; all four before/after views reviewed and accepted",
+  "production_manifest": "paving-relief-production-manifest.json",
+  "production_script": "apply-paving-relief-production.cs",
+  "next": "Paving pass complete. Do not reimport or replay the promotion script. Continue the broader Lowtide art pass and controlled gameplay performance review.",
+  "preserved": "Original granite colour, roughness and world scale; all model sources, collision and scene data. Three original material slots now load the new production material without overrides.",
+  "engine": "Native sbox connection recovered on PID 16792. Production material compile returned true; its immediate binding check ran before asynchronous resource reload completed. A later read confirmed all four 2048px bindings. The separate production verifier checked all 54 protected sources and captured four real viewport views. No errors since console cursor 4811 through 4843. Camera restored, scene clean, Railhead tab restored.",
+  "quality": "The overall AAA goal is still open. The generated quay reference is concept art, not an in-engine result. No gameplay performance result is claimed.",
+  "production_verification": "paving-relief-production-verification.json",
+  "do_not_reapply": true,
+  "visual_review": "All four production captures reviewed: coherent recessed joints and rough stone edges at player height on both sides, no atlas seams or shallow-angle stretching observed. Scene-wide art remains below the intended AAA target."
+}

@@ -1,0 +1,29 @@
+// Read-only: test Riverdale's newly installed pipe and bulky-prop physics in actual play mode.
+if(!Game.IsPlaying || Game.ActiveScene?.Name != "riverdale") throw new InvalidOperationException("Riverdale play required");
+var scene=Game.ActiveScene;
+var player=scene.GetAllComponents<Facepunch.PlayerPawn>().First();
+var pipe=scene.GetAllComponents<BoxCollider>().Where(c=>c.GameObject.Name.StartsWith("Pipe Solid ")).ToArray();
+var prop=scene.GetAllComponents<BoxCollider>().Where(c=>c.GameObject.Name.StartsWith("Prop Solid ")).ToArray();
+int ray=0, body=0, sampled=0, covered=0;
+var misses=new System.Collections.Generic.List<string>();
+foreach(var collider in pipe.Concat(prop))
+{
+    if (collider.GameObject.WorldPosition.z>300) continue;
+    var at=collider.GameObject.WorldPosition;
+    sampled++;
+    bool hitRay=false, hitBody=false;
+    foreach(var normal in new[]{Vector3.Forward,Vector3.Left})
+    {
+        var start=at+normal*100;
+        var end=at-normal*100;
+        var tr=scene.Trace.Ray(start,end).WithTag("solid").Run();
+        if(tr.Hit && tr.GameObject==collider.GameObject) hitRay=true;
+        var bt=player.CharacterController.TraceBox(player.CharacterController.BoundingBox,start.WithZ(at.z-24),end.WithZ(at.z-24));
+        if(bt.Hit && bt.GameObject==collider.GameObject) hitBody=true;
+    }
+    if(hitRay) ray++;
+    if(hitBody) body++;
+    if(hitRay && hitBody) covered++;
+    if(!hitRay && misses.Count<8) misses.Add(collider.GameObject.Name);
+}
+return new{PipeSolids=pipe.Length,PropSolids=prop.Length,AccessibleSample=sampled,RayHit=ray,PlayerShapeHit=body,Both=covered,ExamplesWithNoHit=misses};

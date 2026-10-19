@@ -1,0 +1,764 @@
+{
+  "map": "Collider",
+  "build": "detail-v2-review",
+  "verification": {
+    "stage": "detail-v2",
+    "native_import_pending": false,
+    "offline_checks": "68 of 68; no blocked, unsupported, disconnected or exposed Retakes pairs",
+    "changes": [
+      "Thin stair decks with accessible space beneath",
+      "Beveled guardrails and bolted foot plates",
+      "Transport case lids, latches, handles and corner hardware",
+      "Galvanized grating and fine coated-metal surfaces",
+      "Worn C1/A1/C2 floor direction stencils"
+    ],
+    "model_sha256": {
+      "collider_detail.mtl": "c65a5209cff92475b45e45a2518b65dd84eebfb3e4c03d36899589d2e28f8111",
+      "collider_detail.obj": "d3be11107281a7d1b24ffde8fde5e980c72db57c7b7faad9aa6a25471df5b65e",
+      "collider_detail.vmdl": "d3fb9d22b11024675eb0868e1551a86986f47daaf6f1ad744e5aa7873c33fd7c",
+      "collider_glass.mtl": "74d7a3e4c50e513c887cba15c4592f6289c7e90f1dc3559a3e08fefd92199a74",
+      "collider_glass.obj": "60574cff38f6d000f7d2331c7fcee9b1c03ba14e80e6d4e5cbe8513d3bca7137",
+      "collider_glass.vmdl": "b924e5913e91ea00382a0477397a440ae86d86dbeb7edca9703d5bde1bc30ef3",
+      "collider_machine.mtl": "1cd3baef308ac8955ac264e98fb44dcdc55ef81afdd613e9610ec933d88b6885",
+      "collider_machine.obj": "04622188a4d89ecec76bc9a410f3aeac630868ab3f10890446c7eb97449b9d9e",
+      "collider_machine.vmdl": "2c5144bf86db04d1b3a5cf28baf2026651dba2708f6bb816f4b763463b88dd6a",
+      "collider_structure.mtl": "498ef9ca9fa73d531d0f86c1b26f5a4b6d0224e825eb9c5a3fe8787ee5215831",
+      "collider_structure.obj": "c8ec6baa8602a69584dc8ea7057524eebbd79799100de920102f4e6be6c5fea5",
+      "collider_structure.vmdl": "9be39f52fd2bad5a2508a40d08a400c6ce7fcccbad82849a9cc09ac8cc79f523",
+      "collider_structure_hulls_metal.obj": "25ce86ff752cc120dfa1ca88a432d3c347d9332660fd10f09d2381501caece96"
+    },
+    "build": "detail-v2-review",
+    "checked_at": "2026-10-15T15:12:11.739655+00:00",
+    "offline_packaging_only": true,
+    "saved_scene_sha256": "2b4a50e149769322a8199efe6add03c3ab40a0629e060f01b6440dc440dbedfc",
+    "native_checked_positions": 68,
+    "native_stair_routes_passed": 4,
+    "accepted_lighting_revision": "lighting-v2 with reflection v2",
+    "accepted_lighting_textures": [
+      "lighting/collider/lighting-v2/irradiance.vtex",
+      "lighting/collider/lighting-v2/distance.vtex",
+      "lighting/collider/lighting-v2/relocation.vtex",
+      "lighting/collider/reflection_hall_v2.vtex",
+      "lighting/collider/reflection_beam_v2.vtex",
+      "lighting/collider/reflection_west_v2.vtex",
+      "lighting/collider/reflection_east_v2.vtex"
+    ],
+    "pending_lighting": {
+      "revision": "lighting-v3",
+      "scene_saved_with_bake": false,
+      "native_visual_review_passed": false,
+      "game_preserved_during_bake": false,
+      "archive_files": {
+        "Sources/Collider/pending-lighting-v3/distance.vtex_c": "927a6ab0d82ea8bc78ddf416b1928e965cb56320cab8cfb7b912d849d2147670",
+        "Sources/Collider/pending-lighting-v3/irradiance.vtex_c": "34341488a21b67877fa81024eea6ce356b42be615edc48e45422ea9a77f011b7",
+        "Sources/Collider/pending-lighting-v3/relocation.vtex_c": "0dc45aece7fccc0fc807c5d2fbd8651f6048f13722e52afb2030babc5807d50f"
+      },
+      "note": "Retained for inspection only. A different scene started play during the bake; inspect before adopting."
+    },
+    "capture_note": "Six native detail-pass views precede the final darker case color and the unreviewed v3 bake. The saved menu image is the earlier native-v1 view.",
+    "local_tdm_note": "The earlier local TDM test observed nine moving bots. It predates the new stair collision; native navigation was rechecked afterward.",
+    "current_build_local_tdm_verified": false,
+    "separate_client_multiplayer_verified": false,
+    "native_performance_profiled": false,
+    "remaining": [
+      "Review the final darker case finish in engine",
+      "Inspect lighting-v3 and refresh reflections before adopting it",
+      "Run a local match and a second-client multiplayer check",
+      "Measure full-match performance",
+      "Refresh the map picker image after the final native review"
+    ],
+    "asset_sha256": {
+      "Assets/lighting/collider/lighting-v2/distance.vtex_c": "0c728cb4060536129e2f86a03cbe835e8841363334f0da32d845c0417c05fd65",
+      "Assets/lighting/collider/lighting-v2/irradiance.vtex_c": "c049f7f713f530e9532acb469a30ef94b373c79284cc730ab2ca044b28a1a116",
+      "Assets/lighting/collider/lighting-v2/relocation.vtex_c": "7da8368f3dc1269358c909ccede86441c47ff7bb5f8969f5c1514c24ff876abf",
+      "Assets/lighting/collider/reflection_beam_v2.vtex_c": "9d627c3bcd1f799bf35d280e704d8d1565a4c70e45a02267a8728b2fb2d313fe",
+      "Assets/lighting/collider/reflection_east_v2.vtex_c": "1f4c5ca0f43aadfa7f49a5c9ee22de4339600935bee24328e7a111d7c24715cf",
+      "Assets/lighting/collider/reflection_hall_v2.vtex_c": "df7a36898c298b7cf52b2c4965d795042ac16f36d5b009dcc07d238ab6fcc1fd",
+      "Assets/lighting/collider/reflection_west_v2.vtex_c": "638c2e7efd40108b0e63c7a48326b80cbe32de5a3981dfb5975ecec7cee7181c",
+      "Assets/materials/collider/co_amber.vmat": "e11b3a478f17284be78d52668a82ab37d2685f01fd5d66e4f1a1953a5c1b3bdd",
+      "Assets/materials/collider/co_beam.vmat": "336effb000d9ae91cf4dc1e4db61224ead80af77b39ad18a3266a2df46755ddc",
+      "Assets/materials/collider/co_case.vmat": "f386444ea60e82d490e70a7df1542e799fc7722e92611db134dd5350ad029833",
+      "Assets/materials/collider/co_case_color.png": "4034de4369cb357a3dbcaefde442d7bf39180d69fa954ceee429c39c04394700",
+      "Assets/materials/collider/co_case_normal.png": "d54597e6d6cbcf904702e7fda8badce111a3e2bf39d78f082cc28031c971fc48",
+      "Assets/materials/collider/co_case_rough.png": "854b8d85a078f8a85a2b6af8f2f8c775ef78e55b168fd2aa46df3108b0c2ae8f",
+      "Assets/materials/collider/co_concrete.vmat": "66dd7b1f9b268884f565c487a24cb6ead0da66df162c24d2262de80134512558",
+      "Assets/materials/collider/co_concrete_color.jpg": "45f43c19eb90e894bf87b33ba4c6c69efaafad2cd8887c912d66a940eadfe00c",
+      "Assets/materials/collider/co_concrete_normal.png": "77ddc819077a7301a00edab0d5c88b769cc74d489ecfbbd65d27be25c24b5a43",
+      "Assets/materials/collider/co_concrete_rough.png": "958ce657f5d0319bd734514cc313723e0f286273704f1ed899d314cd8dd0b23e",
+      "Assets/materials/collider/co_floor.vmat": "8666747e5dc4bd0c419efacf2bf271bd39119281fa7039477cb82a737a13bb52",
+      "Assets/materials/collider/co_floor_color.jpg": "ae967ccb04fbc880d3f2184300092af013768de0311ce8264522de903c7d2192",
+      "Assets/materials/collider/co_floor_normal.png": "5bc4d1d7f610d002ca761a800119805bf7adaede98b9b2fd35671a3809b87bae",
+      "Assets/materials/collider/co_floor_rough.png": "4d3c77fe10b9b0be25aab7896b4cde727334bd2a4513fd71f41ab4fbc1b3f5ae",
+      "Assets/materials/collider/co_glass.vmat": "821bcb8a90bdfd4dfe13ec9da4b50c003a470a92677602e2c1925e2e1c5c6db8",
+      "Assets/materials/collider/co_grating.vmat": "3a5e287a10276c03efe74f6b23fcfab292d28eec5c7dfc2bcb8ab75b5a62f849",
+      "Assets/materials/collider/co_grating_color.png": "8c0640bccf5b20bb147ed1b0939f760587eae0763f340f1fa9dc916d6f3a1464",
+      "Assets/materials/collider/co_grating_normal.png": "020a9dc05f2d12213cc325d157b904e5134a3288ef77dafea02d4a31c24da066",
+      "Assets/materials/collider/co_grating_rough.png": "1d3c98cab09b50fe1a5eba79c323f04b5ee12000d2f14c514ff7282127676792",
+      "Assets/materials/collider/co_grating_trans.png": "cd94b5555c7a69d3b1a6e854b4ae355c871f105eee06ea4f10aa7a6c784c8191",
+      "Assets/materials/collider/co_markings.vmat": "0f63271d36b9b1af9c066abe68619d2a9cd4177e27f0a1ce3d66e60b76bebda7",
+      "Assets/materials/collider/co_markings_alpha.png": "54f6a47c0e019d367727db866255dd5bbdf99adc491fd259ef86bfeb2b70188d",
+      "Assets/materials/collider/co_red.vmat": "a1f29d2023a59fdb6465f0141b84148e4d909842ac294f6e31fd234d7087999d",
+      "Assets/materials/collider/co_rubber.vmat": "43edad43ab05c8ddff3813bb94bfa3651b51904c82a28bb9a85c9f48492fb13e",
+      "Assets/materials/collider/co_screens.vmat": "6ae86a2c0cc79cdb153542c9a6545c6385de54ff2e2cebe74441c2ddb03946ae",
+      "Assets/materials/collider/co_screens_color.png": "3a94d17311ef9698b8ccc7fe04cd42db8d1c154d3fb5a55affb2b19e436c0575",
+      "Assets/materials/collider/co_signs.vmat": "637e5f3a1472094786d9f74574ef0b41ca07be36e6de2223417d4615611fd4de",
+      "Assets/materials/collider/co_signs_color.png": "90374cf8d20feb1ee53f65e4182a30712a9912d28a777a9c76b7a11e1b4c46d0",
+      "Assets/materials/collider/co_silver.vmat": "b432ad8520c333db0010267da8d9896cd1bb43d90e3d3bc2d1eda197547549f2",
+      "Assets/materials/collider/co_steel.vmat": "8c85d54db233a9b1927166ac65db777c9199e02af09c85cfd65bdc26b0c42310",
+      "Assets/materials/collider/co_steel_color.jpg": "dc4fa67c4b4f1fc746a3d05a397fa1be15cd0a218ef37a59a37d05fda504a7a5",
+      "Assets/materials/collider/co_steel_normal.png": "de260ebaa8493930cb33affe95375041292c8858437cdb267183104ed1816fb2",
+      "Assets/materials/collider/co_steel_rough.png": "d2ee8b39ad7babf97f097b337ffcb9cc7e018873cc639aeaa63f95ea3d568208",
+      "Assets/materials/collider/co_trim.vmat": "3de8e88b00121baea7a7bc9b118dfb1ba2cbc51bf5da3f9ed8d4629bc648b7a8",
+      "Assets/materials/collider/co_wall.vmat": "eeea9576bf9076a34016bf6d4f63b31ac2d80dcf81ca78fc949128d7f71478ed",
+      "Assets/materials/collider/co_wall_color.jpg": "210958d56a23c51bf666106039d23fcadb00f7aa90230378110a5debdca0f743",
+      "Assets/materials/collider/co_wall_normal.png": "2ec3eb019b425fdc239f9bacb2038aa1cbe3d72344f21d970104528246351a06",
+      "Assets/materials/collider/co_wall_rough.png": "b0637455ff424e9620b3ad594329b888fefe0dd67790eab204b644950d50646b",
+      "Assets/materials/collider/co_white.vmat": "bf9d1a7b33566a689562a7f8da4852421099afcdf411afb0187f70cadefb30b8",
+      "Assets/materials/collider/reflections/reflection_Beam.exr": "b65ac239379d0c9b8e3bb8d0550d4eb072610b9106bb6a2c5cd527f061e0f561",
+      "Assets/materials/collider/reflections/reflection_Beam.vmat": "6986ef026340fb6145b8152be93f97ea49fb1700c68ddb79828359229a323e07",
+      "Assets/materials/collider/reflections/reflection_East.exr": "d588c95d394f780df732e0ccea99f1484027ec71bc83f414857ecbdffed70870",
+      "Assets/materials/collider/reflections/reflection_East.vmat": "64d9b8c65efe4c0a68ee8953d70961cd2247fe99afa5dcb5c1a90ad071991b53",
+      "Assets/materials/collider/reflections/reflection_Hall.exr": "2157566f7fc97ef87e1c2002fa4a7c1e564da32f7a503f4629d97aa95a7f3162",
+      "Assets/materials/collider/reflections/reflection_Hall.vmat": "f6c93e58be0dd285454e5bd95f8c4f9aeb37be745decf68b3d1360b7b032d158",
+      "Assets/materials/collider/reflections/reflection_West.exr": "5a3931d7265b91b9a6406365c47fd12c95f0d54cfa6cc0c25dcf91bccf76e7d5",
+      "Assets/materials/collider/reflections/reflection_West.vmat": "e7e84cd6f26b33f09e114f4d9dfdd609d68eef9c41beb7f1fc52c08c88a5f5d2",
+      "Assets/models/maps/collider/collider_detail.mtl": "c65a5209cff92475b45e45a2518b65dd84eebfb3e4c03d36899589d2e28f8111",
+      "Assets/models/maps/collider/collider_detail.obj": "d3be11107281a7d1b24ffde8fde5e980c72db57c7b7faad9aa6a25471df5b65e",
+      "Assets/models/maps/collider/collider_detail.vmdl": "d3fb9d22b11024675eb0868e1551a86986f47daaf6f1ad744e5aa7873c33fd7c",
+      "Assets/models/maps/collider/collider_glass.mtl": "74d7a3e4c50e513c887cba15c4592f6289c7e90f1dc3559a3e08fefd92199a74",
+      "Assets/models/maps/collider/collider_glass.obj": "60574cff38f6d000f7d2331c7fcee9b1c03ba14e80e6d4e5cbe8513d3bca7137",
+      "Assets/models/maps/collider/collider_glass.vmdl": "b924e5913e91ea00382a0477397a440ae86d86dbeb7edca9703d5bde1bc30ef3",
+      "Assets/models/maps/collider/collider_machine.mtl": "1cd3baef308ac8955ac264e98fb44dcdc55ef81afdd613e9610ec933d88b6885",
+      "Assets/models/maps/collider/collider_machine.obj": "04622188a4d89ecec76bc9a410f3aeac630868ab3f10890446c7eb97449b9d9e",
+      "Assets/models/maps/collider/collider_machine.vmdl": "2c5144bf86db04d1b3a5cf28baf2026651dba2708f6bb816f4b763463b88dd6a",
+      "Assets/models/maps/collider/collider_structure.mtl": "498ef9ca9fa73d531d0f86c1b26f5a4b6d0224e825eb9c5a3fe8787ee5215831",
+      "Assets/models/maps/collider/collider_structure.obj": "c8ec6baa8602a69584dc8ea7057524eebbd79799100de920102f4e6be6c5fea5",
+      "Assets/models/maps/collider/collider_structure.vmdl": "9be39f52fd2bad5a2508a40d08a400c6ce7fcccbad82849a9cc09ac8cc79f523",
+      "Assets/models/maps/collider/collider_structure_hulls_metal.obj": "25ce86ff752cc120dfa1ca88a432d3c347d9332660fd10f09d2381501caece96",
+      "Assets/scenes/maps/Collider/collider.scene": "2b4a50e149769322a8199efe6add03c3ab40a0629e060f01b6440dc440dbedfc",
+      "Assets/ui/maps/collider.png": "ea5b3f2cce12d971a69d7ee1891dae79067a57da38a9a12c088693fa05a657a6",
+      "Assets/ui/minimaps/minimap_collider.png": "b829ead1e27c329b27643e9be04cf10d528d725a1a226239016a79a9ce3d6f91"
+    },
+    "evidence_sha256": {
+      "layout-validation.json": "879a16320bd4be8bce45aaabf6de94b189087c966e9306def8b32dd306a75ec8",
+      "native-validation.json": "167457733936eb5a7fa1bd22187b284fcdfa4be10237d34d11d2c4d0e6daddec",
+      "stair-validation.json": "847fc3884fd30a30757746d2fec8f4acdcb369347c5d251ebc896d2a6d02357f",
+      "check-points.json": "44e10ddef6c02ed0095302b1625fe2232ddfa27191257c4ce84fa8fb845b95ce",
+      "live-round-validation.json": "6343d0d934bc39b9374f78f687e5a4270243f1fc7bc4e6a3b131362cb3c46a6c",
+      "captures/capture-report.json": "d72142c94e40a04c0995a83ca60f8192411f1a563e39d2edb53f77d3a5cc9e6d",
+      "detail-v2/scene-validation.json": "ca0e08b07297b29c4f7687ffcbd3aa1a109990c24aa9ccfc83daafc8016258c3"
+    }
+  },
+  "files": [
+    {
+      "path": "Assets/lighting/collider/lighting-v2/distance.vtex_c",
+      "size": 564548,
+      "sha256": "0c728cb4060536129e2f86a03cbe835e8841363334f0da32d845c0417c05fd65"
+    },
+    {
+      "path": "Assets/lighting/collider/lighting-v2/irradiance.vtex_c",
+      "size": 141188,
+      "sha256": "c049f7f713f530e9532acb469a30ef94b373c79284cc730ab2ca044b28a1a116"
+    },
+    {
+      "path": "Assets/lighting/collider/lighting-v2/relocation.vtex_c",
+      "size": 17708,
+      "sha256": "7da8368f3dc1269358c909ccede86441c47ff7bb5f8969f5c1514c24ff876abf"
+    },
+    {
+      "path": "Assets/lighting/collider/reflection_beam_v2.vtex_c",
+      "size": 525260,
+      "sha256": "9d627c3bcd1f799bf35d280e704d8d1565a4c70e45a02267a8728b2fb2d313fe"
+    },
+    {
+      "path": "Assets/lighting/collider/reflection_east_v2.vtex_c",
+      "size": 488451,
+      "sha256": "1f4c5ca0f43aadfa7f49a5c9ee22de4339600935bee24328e7a111d7c24715cf"
+    },
+    {
+      "path": "Assets/lighting/collider/reflection_hall_v2.vtex_c",
+      "size": 525260,
+      "sha256": "df7a36898c298b7cf52b2c4965d795042ac16f36d5b009dcc07d238ab6fcc1fd"
+    },
+    {
+      "path": "Assets/lighting/collider/reflection_west_v2.vtex_c",
+      "size": 492043,
+      "sha256": "638c2e7efd40108b0e63c7a48326b80cbe32de5a3981dfb5975ecec7cee7181c"
+    },
+    {
+      "path": "Assets/materials/collider/co_amber.vmat",
+      "size": 477,
+      "sha256": "e11b3a478f17284be78d52668a82ab37d2685f01fd5d66e4f1a1953a5c1b3bdd"
+    },
+    {
+      "path": "Assets/materials/collider/co_beam.vmat",
+      "size": 672,
+      "sha256": "336effb000d9ae91cf4dc1e4db61224ead80af77b39ad18a3266a2df46755ddc"
+    },
+    {
+      "path": "Assets/materials/collider/co_case.vmat",
+      "size": 495,
+      "sha256": "f386444ea60e82d490e70a7df1542e799fc7722e92611db134dd5350ad029833"
+    },
+    {
+      "path": "Assets/materials/collider/co_case_color.png",
+      "size": 914560,
+      "sha256": "4034de4369cb357a3dbcaefde442d7bf39180d69fa954ceee429c39c04394700"
+    },
+    {
+      "path": "Assets/materials/collider/co_case_normal.png",
+      "size": 1379629,
+      "sha256": "d54597e6d6cbcf904702e7fda8badce111a3e2bf39d78f082cc28031c971fc48"
+    },
+    {
+      "path": "Assets/materials/collider/co_case_rough.png",
+      "size": 653187,
+      "sha256": "854b8d85a078f8a85a2b6af8f2f8c775ef78e55b168fd2aa46df3108b0c2ae8f"
+    },
+    {
+      "path": "Assets/materials/collider/co_concrete.vmat",
+      "size": 507,
+      "sha256": "66dd7b1f9b268884f565c487a24cb6ead0da66df162c24d2262de80134512558"
+    },
+    {
+      "path": "Assets/materials/collider/co_concrete_color.jpg",
+      "size": 284866,
+      "sha256": "45f43c19eb90e894bf87b33ba4c6c69efaafad2cd8887c912d66a940eadfe00c"
+    },
+    {
+      "path": "Assets/materials/collider/co_concrete_normal.png",
+      "size": 1399491,
+      "sha256": "77ddc819077a7301a00edab0d5c88b769cc74d489ecfbbd65d27be25c24b5a43"
+    },
+    {
+      "path": "Assets/materials/collider/co_concrete_rough.png",
+      "size": 665768,
+      "sha256": "958ce657f5d0319bd734514cc313723e0f286273704f1ed899d314cd8dd0b23e"
+    },
+    {
+      "path": "Assets/materials/collider/co_floor.vmat",
+      "size": 498,
+      "sha256": "8666747e5dc4bd0c419efacf2bf271bd39119281fa7039477cb82a737a13bb52"
+    },
+    {
+      "path": "Assets/materials/collider/co_floor_color.jpg",
+      "size": 220630,
+      "sha256": "ae967ccb04fbc880d3f2184300092af013768de0311ce8264522de903c7d2192"
+    },
+    {
+      "path": "Assets/materials/collider/co_floor_normal.png",
+      "size": 1370656,
+      "sha256": "5bc4d1d7f610d002ca761a800119805bf7adaede98b9b2fd35671a3809b87bae"
+    },
+    {
+      "path": "Assets/materials/collider/co_floor_rough.png",
+      "size": 613280,
+      "sha256": "4d3c77fe10b9b0be25aab7896b4cde727334bd2a4513fd71f41ab4fbc1b3f5ae"
+    },
+    {
+      "path": "Assets/materials/collider/co_glass.vmat",
+      "size": 764,
+      "sha256": "821bcb8a90bdfd4dfe13ec9da4b50c003a470a92677602e2c1925e2e1c5c6db8"
+    },
+    {
+      "path": "Assets/materials/collider/co_grating.vmat",
+      "size": 664,
+      "sha256": "3a5e287a10276c03efe74f6b23fcfab292d28eec5c7dfc2bcb8ab75b5a62f849"
+    },
+    {
+      "path": "Assets/materials/collider/co_grating_color.png",
+      "size": 427088,
+      "sha256": "8c0640bccf5b20bb147ed1b0939f760587eae0763f340f1fa9dc916d6f3a1464"
+    },
+    {
+      "path": "Assets/materials/collider/co_grating_normal.png",
+      "size": 11010,
+      "sha256": "020a9dc05f2d12213cc325d157b904e5134a3288ef77dafea02d4a31c24da066"
+    },
+    {
+      "path": "Assets/materials/collider/co_grating_rough.png",
+      "size": 95357,
+      "sha256": "1d3c98cab09b50fe1a5eba79c323f04b5ee12000d2f14c514ff7282127676792"
+    },
+    {
+      "path": "Assets/materials/collider/co_grating_trans.png",
+      "size": 3447,
+      "sha256": "cd94b5555c7a69d3b1a6e854b4ae355c871f105eee06ea4f10aa7a6c784c8191"
+    },
+    {
+      "path": "Assets/materials/collider/co_markings.vmat",
+      "size": 638,
+      "sha256": "0f63271d36b9b1af9c066abe68619d2a9cd4177e27f0a1ce3d66e60b76bebda7"
+    },
+    {
+      "path": "Assets/materials/collider/co_markings_alpha.png",
+      "size": 292825,
+      "sha256": "54f6a47c0e019d367727db866255dd5bbdf99adc491fd259ef86bfeb2b70188d"
+    },
+    {
+      "path": "Assets/materials/collider/co_red.vmat",
+      "size": 673,
+      "sha256": "a1f29d2023a59fdb6465f0141b84148e4d909842ac294f6e31fd234d7087999d"
+    },
+    {
+      "path": "Assets/materials/collider/co_rubber.vmat",
+      "size": 479,
+      "sha256": "43edad43ab05c8ddff3813bb94bfa3651b51904c82a28bb9a85c9f48492fb13e"
+    },
+    {
+      "path": "Assets/materials/collider/co_screens.vmat",
+      "size": 694,
+      "sha256": "6ae86a2c0cc79cdb153542c9a6545c6385de54ff2e2cebe74441c2ddb03946ae"
+    },
+    {
+      "path": "Assets/materials/collider/co_screens_color.png",
+      "size": 81690,
+      "sha256": "3a94d17311ef9698b8ccc7fe04cd42db8d1c154d3fb5a55affb2b19e436c0575"
+    },
+    {
+      "path": "Assets/materials/collider/co_signs.vmat",
+      "size": 496,
+      "sha256": "637e5f3a1472094786d9f74574ef0b41ca07be36e6de2223417d4615611fd4de"
+    },
+    {
+      "path": "Assets/materials/collider/co_signs_color.png",
+      "size": 726936,
+      "sha256": "90374cf8d20feb1ee53f65e4182a30712a9912d28a777a9c76b7a11e1b4c46d0"
+    },
+    {
+      "path": "Assets/materials/collider/co_silver.vmat",
+      "size": 476,
+      "sha256": "b432ad8520c333db0010267da8d9896cd1bb43d90e3d3bc2d1eda197547549f2"
+    },
+    {
+      "path": "Assets/materials/collider/co_steel.vmat",
+      "size": 498,
+      "sha256": "8c85d54db233a9b1927166ac65db777c9199e02af09c85cfd65bdc26b0c42310"
+    },
+    {
+      "path": "Assets/materials/collider/co_steel_color.jpg",
+      "size": 274827,
+      "sha256": "dc4fa67c4b4f1fc746a3d05a397fa1be15cd0a218ef37a59a37d05fda504a7a5"
+    },
+    {
+      "path": "Assets/materials/collider/co_steel_normal.png",
+      "size": 1636027,
+      "sha256": "de260ebaa8493930cb33affe95375041292c8858437cdb267183104ed1816fb2"
+    },
+    {
+      "path": "Assets/materials/collider/co_steel_rough.png",
+      "size": 622106,
+      "sha256": "d2ee8b39ad7babf97f097b337ffcb9cc7e018873cc639aeaa63f95ea3d568208"
+    },
+    {
+      "path": "Assets/materials/collider/co_trim.vmat",
+      "size": 477,
+      "sha256": "3de8e88b00121baea7a7bc9b118dfb1ba2cbc51bf5da3f9ed8d4629bc648b7a8"
+    },
+    {
+      "path": "Assets/materials/collider/co_wall.vmat",
+      "size": 495,
+      "sha256": "eeea9576bf9076a34016bf6d4f63b31ac2d80dcf81ca78fc949128d7f71478ed"
+    },
+    {
+      "path": "Assets/materials/collider/co_wall_color.jpg",
+      "size": 124620,
+      "sha256": "210958d56a23c51bf666106039d23fcadb00f7aa90230378110a5debdca0f743"
+    },
+    {
+      "path": "Assets/materials/collider/co_wall_normal.png",
+      "size": 1278254,
+      "sha256": "2ec3eb019b425fdc239f9bacb2038aa1cbe3d72344f21d970104528246351a06"
+    },
+    {
+      "path": "Assets/materials/collider/co_wall_rough.png",
+      "size": 704606,
+      "sha256": "b0637455ff424e9620b3ad594329b888fefe0dd67790eab204b644950d50646b"
+    },
+    {
+      "path": "Assets/materials/collider/co_white.vmat",
+      "size": 673,
+      "sha256": "bf9d1a7b33566a689562a7f8da4852421099afcdf411afb0187f70cadefb30b8"
+    },
+    {
+      "path": "Assets/materials/collider/reflections/reflection_Beam.exr",
+      "size": 1948849,
+      "sha256": "b65ac239379d0c9b8e3bb8d0550d4eb072610b9106bb6a2c5cd527f061e0f561"
+    },
+    {
+      "path": "Assets/materials/collider/reflections/reflection_Beam.vmat",
+      "size": 202,
+      "sha256": "6986ef026340fb6145b8152be93f97ea49fb1700c68ddb79828359229a323e07"
+    },
+    {
+      "path": "Assets/materials/collider/reflections/reflection_East.exr",
+      "size": 1473998,
+      "sha256": "d588c95d394f780df732e0ccea99f1484027ec71bc83f414857ecbdffed70870"
+    },
+    {
+      "path": "Assets/materials/collider/reflections/reflection_East.vmat",
+      "size": 202,
+      "sha256": "64d9b8c65efe4c0a68ee8953d70961cd2247fe99afa5dcb5c1a90ad071991b53"
+    },
+    {
+      "path": "Assets/materials/collider/reflections/reflection_Hall.exr",
+      "size": 1898517,
+      "sha256": "2157566f7fc97ef87e1c2002fa4a7c1e564da32f7a503f4629d97aa95a7f3162"
+    },
+    {
+      "path": "Assets/materials/collider/reflections/reflection_Hall.vmat",
+      "size": 202,
+      "sha256": "f6c93e58be0dd285454e5bd95f8c4f9aeb37be745decf68b3d1360b7b032d158"
+    },
+    {
+      "path": "Assets/materials/collider/reflections/reflection_West.exr",
+      "size": 1540058,
+      "sha256": "5a3931d7265b91b9a6406365c47fd12c95f0d54cfa6cc0c25dcf91bccf76e7d5"
+    },
+    {
+      "path": "Assets/materials/collider/reflections/reflection_West.vmat",
+      "size": 202,
+      "sha256": "e7e84cd6f26b33f09e114f4d9dfdd609d68eef9c41beb7f1fc52c08c88a5f5d2"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_detail.mtl",
+      "size": 294,
+      "sha256": "c65a5209cff92475b45e45a2518b65dd84eebfb3e4c03d36899589d2e28f8111"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_detail.obj",
+      "size": 16898521,
+      "sha256": "d3be11107281a7d1b24ffde8fde5e980c72db57c7b7faad9aa6a25471df5b65e"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_detail.vmdl",
+      "size": 12354,
+      "sha256": "d3fb9d22b11024675eb0868e1551a86986f47daaf6f1ad744e5aa7873c33fd7c"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_glass.mtl",
+      "size": 29,
+      "sha256": "74d7a3e4c50e513c887cba15c4592f6289c7e90f1dc3559a3e08fefd92199a74"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_glass.obj",
+      "size": 8299,
+      "sha256": "60574cff38f6d000f7d2331c7fcee9b1c03ba14e80e6d4e5cbe8513d3bca7137"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_glass.vmdl",
+      "size": 1119,
+      "sha256": "b924e5913e91ea00382a0477397a440ae86d86dbeb7edca9703d5bde1bc30ef3"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_machine.mtl",
+      "size": 381,
+      "sha256": "1cd3baef308ac8955ac264e98fb44dcdc55ef81afdd613e9610ec933d88b6885"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_machine.obj",
+      "size": 31281973,
+      "sha256": "04622188a4d89ecec76bc9a410f3aeac630868ab3f10890446c7eb97449b9d9e"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_machine.vmdl",
+      "size": 2027,
+      "sha256": "2c5144bf86db04d1b3a5cf28baf2026651dba2708f6bb816f4b763463b88dd6a"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_structure.mtl",
+      "size": 438,
+      "sha256": "498ef9ca9fa73d531d0f86c1b26f5a4b6d0224e825eb9c5a3fe8787ee5215831"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_structure.obj",
+      "size": 12162547,
+      "sha256": "c8ec6baa8602a69584dc8ea7057524eebbd79799100de920102f4e6be6c5fea5"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_structure.vmdl",
+      "size": 40977,
+      "sha256": "9be39f52fd2bad5a2508a40d08a400c6ce7fcccbad82849a9cc09ac8cc79f523"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_structure_hulls_metal.obj",
+      "size": 1428,
+      "sha256": "25ce86ff752cc120dfa1ca88a432d3c347d9332660fd10f09d2381501caece96"
+    },
+    {
+      "path": "Assets/scenes/maps/Collider/collider.scene",
+      "size": 291547,
+      "sha256": "2b4a50e149769322a8199efe6add03c3ab40a0629e060f01b6440dc440dbedfc"
+    },
+    {
+      "path": "Assets/ui/maps/collider.png",
+      "size": 1711490,
+      "sha256": "ea5b3f2cce12d971a69d7ee1891dae79067a57da38a9a12c088693fa05a657a6"
+    },
+    {
+      "path": "Assets/ui/minimaps/minimap_collider.png",
+      "size": 6619,
+      "sha256": "b829ead1e27c329b27643e9be04cf10d528d725a1a226239016a79a9ce3d6f91"
+    },
+    {
+      "path": "Sources/Collider/editor/apply-reflections.cs.txt",
+      "size": 2203,
+      "sha256": "8632bebd0be26fe28d8d9a525995f4a1d42b921ec16c39a8eb025830bb43f28b"
+    },
+    {
+      "path": "Sources/Collider/editor/bake-lighting.cs.txt",
+      "size": 11367,
+      "sha256": "05debf42c8bdca27e347ca53b97e7a9b59d96125a17cdfd0c27d6c91485aaa60"
+    },
+    {
+      "path": "Sources/Collider/editor/capture-config.json",
+      "size": 1063,
+      "sha256": "2240c349c317cc459477738709da03193be9393a9abcd5b2c2e35bd054371f1a"
+    },
+    {
+      "path": "Sources/Collider/editor/capture-reflections.cs.txt",
+      "size": 3000,
+      "sha256": "f53fee2e8eb65b8855394c2ca8b7f8ca3b8ac1eddeafdc91b458ad2515069da3"
+    },
+    {
+      "path": "Sources/Collider/editor/capture.cs.txt",
+      "size": 5901,
+      "sha256": "bc9c4335025e5cdc3a4d6efba010bad69775ea0f0e32deec5f459533b53a5081"
+    },
+    {
+      "path": "Sources/Collider/editor/check-live-round.cs.txt",
+      "size": 1894,
+      "sha256": "d2723a3dbe57883b40bb7104bf12872a94fac83927d00c92621a96e48f7a70f6"
+    },
+    {
+      "path": "Sources/Collider/editor/export-reviewed.cs.txt",
+      "size": 2831,
+      "sha256": "e634a6a1a75c5c91c04b6f729b17a07788b918110ffa279c725f539ddf235ed9"
+    },
+    {
+      "path": "Sources/Collider/editor/import-build.cs.txt",
+      "size": 2856,
+      "sha256": "381b5735136b76cb1968c5cdec12bd71ddf95452f6d7c612de01b67186cf5be5"
+    },
+    {
+      "path": "Sources/Collider/editor/import-visual-assets.cs.txt",
+      "size": 1492,
+      "sha256": "56da7b4f1cfb54299d951c901e95a3fdcf3587a20153daadb80b82b0ad1b9ecd"
+    },
+    {
+      "path": "Sources/Collider/editor/prepare-live-round.cs.txt",
+      "size": 1091,
+      "sha256": "31cc143c715497d84794f906d8743c376e387c8aa7802cb7bd14758e0a847337"
+    },
+    {
+      "path": "Sources/Collider/editor/prepare-network-test.cs.txt",
+      "size": 1400,
+      "sha256": "b530b654e0aa497b15d0a8e39d868cf4069fe57b67c0fcf98a7606facc330d51"
+    },
+    {
+      "path": "Sources/Collider/editor/refine-lighting.cs.txt",
+      "size": 988,
+      "sha256": "9c0a640b08735bb7dd39fe0a903f5f9935b4986b96c011897c58b3c65d42e611"
+    },
+    {
+      "path": "Sources/Collider/editor/restore-network-settings.cs.txt",
+      "size": 1183,
+      "sha256": "481618355f2ae39aebc82ffb119f23e23c5bdd16ce1d8297eed775a098d9641d"
+    },
+    {
+      "path": "Sources/Collider/editor/restore-test-settings.cs.txt",
+      "size": 852,
+      "sha256": "275b2b1bc77f3d68290106b6f52a750ce7cd30d66108ecd6f1ddee4dfe98daaf"
+    },
+    {
+      "path": "Sources/Collider/editor/validate-map.cs.txt",
+      "size": 3206,
+      "sha256": "eb8c0f366ffc04ae8d6cd658fed161bcdf8f7cac191b69cf329a7212ec4d4ce7"
+    },
+    {
+      "path": "Sources/Collider/editor/validate-stairs.cs.txt",
+      "size": 2457,
+      "sha256": "f4fc37d522c883a5f670e7d3c8d27e8361b27b540a93dde7d1427e2a80ea8c0d"
+    },
+    {
+      "path": "Sources/Collider/lighting/bake-result.json",
+      "size": 306,
+      "sha256": "f5e15cec1dfa798e2deeee7f87a30eb2d7862a0998cbc8324976d1f50738764c"
+    },
+    {
+      "path": "Sources/Collider/lighting/indirect-light.json",
+      "size": 1242,
+      "sha256": "a080ef0c3b7d09176d2b035bf1f5c6ee47978eb7ba0c36913fd252bfeb6f806e"
+    },
+    {
+      "path": "Sources/Collider/lighting/reflections.json",
+      "size": 3922,
+      "sha256": "bd513bbf385ebc769e988c758956449da2034334d6cf92a7899e6c0e902cee24"
+    },
+    {
+      "path": "Sources/Collider/pending-lighting-v3/bake-result.json",
+      "size": 307,
+      "sha256": "44e141d67b72e7b3e50d5db5b379a0209840d4590f2da632558315898c882164"
+    },
+    {
+      "path": "Sources/Collider/pending-lighting-v3/distance.vtex_c",
+      "size": 564548,
+      "sha256": "927a6ab0d82ea8bc78ddf416b1928e965cb56320cab8cfb7b912d849d2147670"
+    },
+    {
+      "path": "Sources/Collider/pending-lighting-v3/indirect-light.json",
+      "size": 1083,
+      "sha256": "31225c7b95e41920a76375b281c7e756ed0a67817e9edb0b27e9270c99c81f9f"
+    },
+    {
+      "path": "Sources/Collider/pending-lighting-v3/irradiance.vtex_c",
+      "size": 141188,
+      "sha256": "34341488a21b67877fa81024eea6ce356b42be615edc48e45422ea9a77f011b7"
+    },
+    {
+      "path": "Sources/Collider/pending-lighting-v3/relocation-status.json",
+      "size": 105,
+      "sha256": "3d398f022a4a1c4d927994afa4110086d9a52e813b504ec0b0365eb1cd7408ed"
+    },
+    {
+      "path": "Sources/Collider/pending-lighting-v3/relocation.vtex_c",
+      "size": 17708,
+      "sha256": "0dc45aece7fccc0fc807c5d2fbd8651f6048f13722e52afb2030babc5807d50f"
+    },
+    {
+      "path": "Sources/Collider/preview.py",
+      "size": 543,
+      "sha256": "bdbb182a6e103677b5c165d5efc7eb41dd92b035eeae693cbfda13a972a5d32e"
+    },
+    {
+      "path": "Sources/Collider/review-notes.txt",
+      "size": 2753,
+      "sha256": "75f6ff6cccddfcdeffbdf19a962c712c4866b4ba1ee94ba118d251d68872ac73"
+    },
+    {
+      "path": "Tools/collider_detail_geometry.py",
+      "size": 6257,
+      "sha256": "e4a11788eaabecc2b43971a2a96a3aefa986e4434c1521a3cc920d8dbdf41f0a"
+    },
+    {
+      "path": "Tools/collider_map.py",
+      "size": 38508,
+      "sha256": "ec1e8c669399db8a2b6e65c2379ceaa4621f54d4ac5a89436ec1cc508b1ca0b1"
+    },
+    {
+      "path": "Tools/collider_materials.py",
+      "size": 11646,
+      "sha256": "f5423e53183818efbd8956bfafecbcd7b949c0613f2cd55b364ac49dfbdbb986"
+    },
+    {
+      "path": "Tools/collider_package.py",
+      "size": 4809,
+      "sha256": "9a65f93c19602d3e9bed9e025ae900be438b8bbaa15dab68d53cff29f993fea4"
+    },
+    {
+      "path": "Tools/collider_package_native.py",
+      "size": 6522,
+      "sha256": "56823da9d6945f923e476bdd330c43bfe6da0b0c5d37d13dd74529b233628b90"
+    },
+    {
+      "path": "Tools/collider_package_review.py",
+      "size": 8438,
+      "sha256": "a568f57d612914c10d85509e988364ea8bf45672a5dfceebcded820c19c97e8d"
+    },
+    {
+      "path": "Tools/collider_preview.py",
+      "size": 1753,
+      "sha256": "1f666a56e3bdea43161bc6f45d5bfff082c164d535d33ea6ae3738244853577d"
+    },
+    {
+      "path": "Tools/collider_preview_textured.py",
+      "size": 8106,
+      "sha256": "b23824ad2770532383567ce25eea20c7a0d3729e8de592b6cb0805a3fe4a6c96"
+    },
+    {
+      "path": "Tools/collider_reflections.py",
+      "size": 1635,
+      "sha256": "d097024438ab2f8f92bb85b91a419f2f1617504a592383c9c08a4e3d4f189a3a"
+    },
+    {
+      "path": "Tools/collider_validate.py",
+      "size": 5789,
+      "sha256": "855c28d609f23db4d1e4020f7505e46037a1a2380f3ae6499402f75913229970"
+    },
+    {
+      "path": "output/collider/captures/art.png",
+      "size": 1810036,
+      "sha256": "0247b8a4808ad125140a17762c4a9a57d008fcc9dbeeed51c64961dc54d136b2"
+    },
+    {
+      "path": "output/collider/captures/capture-report.json",
+      "size": 1363,
+      "sha256": "d72142c94e40a04c0995a83ca60f8192411f1a563e39d2edb53f77d3a5cc9e6d"
+    },
+    {
+      "path": "output/collider/captures/cases.png",
+      "size": 1676365,
+      "sha256": "da594dca21cd6bd8c47b392205910cd8f474a49ee674b0be60df8e5efc54fa8d"
+    },
+    {
+      "path": "output/collider/captures/control.png",
+      "size": 1092588,
+      "sha256": "b81570f66ed80b57ce1b7a50e4175af53da95efee25467058a1bd086581bc05a"
+    },
+    {
+      "path": "output/collider/captures/floor.png",
+      "size": 1651575,
+      "sha256": "27a334f99528d26fbec63b6bebf7f08e992a573cfc2105f7f6626038e2ddccb8"
+    },
+    {
+      "path": "output/collider/captures/live-tdm.png",
+      "size": 1863915,
+      "sha256": "942b2d6c09aeac1572862c75aa10df72feed2c319798ea4df06bf9411990dc3e"
+    },
+    {
+      "path": "output/collider/captures/observation.png",
+      "size": 1580178,
+      "sha256": "0d77a4e79e0a4349efed081f74aaa90350de1681c804c22e034ada2f3bad08c3"
+    },
+    {
+      "path": "output/collider/captures/stair.png",
+      "size": 1537397,
+      "sha256": "11ca7a873b66ede6c10dcd127387df05ddf4be19c616e6c042775d6907f2d091"
+    },
+    {
+      "path": "output/collider/check-points.json",
+      "size": 7184,
+      "sha256": "44e10ddef6c02ed0095302b1625fe2232ddfa27191257c4ce84fa8fb845b95ce"
+    },
+    {
+      "path": "output/collider/detail-v2/build-status.json",
+      "size": 13400,
+      "sha256": "9af94c5fbdf17e5ea18bf44cf0a5c9334a3c0220d3d86dbf9d0e471cf37fde2e"
+    },
+    {
+      "path": "output/collider/detail-v2/scene-validation.json",
+      "size": 5198,
+      "sha256": "ca0e08b07297b29c4f7687ffcbd3aa1a109990c24aa9ccfc83daafc8016258c3"
+    },
+    {
+      "path": "output/collider/layout-validation.json",
+      "size": 248,
+      "sha256": "879a16320bd4be8bce45aaabf6de94b189087c966e9306def8b32dd306a75ec8"
+    },
+    {
+      "path": "output/collider/live-round-validation.json",
+      "size": 2147,
+      "sha256": "6343d0d934bc39b9374f78f687e5a4270243f1fc7bc4e6a3b131362cb3c46a6c"
+    },
+    {
+      "path": "output/collider/native-validation.json",
+      "size": 20185,
+      "sha256": "167457733936eb5a7fa1bd22187b284fcdfa4be10237d34d11d2c4d0e6daddec"
+    },
+    {
+      "path": "output/collider/stair-validation.json",
+      "size": 1460,
+      "sha256": "847fc3884fd30a30757746d2fec8f4acdcb369347c5d251ebc896d2a6d02357f"
+    }
+  ]
+}

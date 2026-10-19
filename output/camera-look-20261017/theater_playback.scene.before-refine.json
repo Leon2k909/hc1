@@ -1,0 +1,241 @@
+{
+  "__guid": "8a8ef449-9ae1-421d-b754-49f414e52d74",
+  "GameObjects": [
+    {
+      "__guid": "8a0f8291-8bfc-4864-b8cc-c0daec1dd2b4",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Scene Information",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.SceneInformation",
+          "__guid": "8a8cb853-e0dd-483f-9711-67f7fae02556",
+          "__enabled": true,
+          "Title": "Theater Playback",
+          "Version": null
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "8f590321-7fa0-4089-8421-33cc01854ce0",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Camera",
+      "Position": "0,0,100",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "maincamera",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.CameraComponent",
+          "__guid": "8a8cb853-e0dd-483f-9711-67f7fae02557",
+          "__enabled": true,
+          "BackgroundColor": "0.75478,0.83828,0.87624,1",
+          "ClearFlags": "All",
+          "FieldOfView": 90,
+          "FovAxis": "Horizontal",
+          "IsMainCamera": true,
+          "Orthographic": false,
+          "OrthographicHeight": 1204,
+          "Priority": 8,
+          "RenderExcludeTags": "invis",
+          "RenderTags": "",
+          "TargetEye": "None",
+          "Viewport": "0,0,1,1",
+          "ZFar": 100000,
+          "ZNear": 1
+        },
+        {
+          "__type": "Sandbox.AudioListener",
+          "__guid": "4f3c1a52-8d6e-4b7a-9c21-6a5e0d7b3f10",
+          "__enabled": true,
+          "UseCameraDirection": true
+        },
+        {
+          "__type": "Sandbox.Bloom",
+          "__guid": "4f3c1a52-8d6e-4b7a-9c21-6a5e0d7b3f11",
+          "__enabled": true,
+          "__version": 1,
+          "Gamma": 2.2,
+          "Mode": "Additive",
+          "Strength": 0.1,
+          "Threshold": 1.6,
+          "Tint": "1,1,1,1"
+        },
+        {
+          "__type": "Sandbox.Tonemapping",
+          "__guid": "4f3c1a52-8d6e-4b7a-9c21-6a5e0d7b3f12",
+          "__enabled": true,
+          "__version": 3,
+          "AutoExposureEnabled": true,
+          "ExposureCompensation": 0,
+          "ExposureMethod": "RGB",
+          "MaximumExposure": 2,
+          "MinimumExposure": 1,
+          "Mode": "AgX",
+          "Rate": 1
+        },
+        {
+          "__type": "Sandbox.Sharpen",
+          "__guid": "4f3c1a52-8d6e-4b7a-9c21-6a5e0d7b3f13",
+          "__enabled": true,
+          "Scale": 0.1
+        },
+        {
+          "__type": "Sandbox.AmbientOcclusion",
+          "__guid": "4f3c1a52-8d6e-4b7a-9c21-6a5e0d7b3f14",
+          "__enabled": true,
+          "__version": 1,
+          "DenoiseMode": "Spatial",
+          "FalloffRange": 0.9,
+          "Intensity": 0.45,
+          "Quality": "High",
+          "Radius": 48,
+          "ThinCompensation": 1
+        },
+        {
+          "__type": "Sandbox.ColorAdjustments",
+          "__guid": "35b235d9-bfb0-4af9-8b80-bc266b349ec2",
+          "__enabled": true,
+          "Brightness": 1,
+          "Contrast": 1.035,
+          "HueRotate": 0,
+          "Saturation": 0.96
+        },
+        {
+          "__type": "Sandbox.Vignette",
+          "__guid": "1070e435-572f-486e-8c18-8223297671a8",
+          "__enabled": true,
+          "Center": "0.5,0.5",
+          "Color": "0,0,0,1",
+          "Intensity": 0.08,
+          "Roundness": 1,
+          "Smoothness": 1
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "8b590321-7fa0-4089-8421-33cc01854ce0",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Theater Managers",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.MovieMaker.MoviePlayer",
+          "__guid": "8a8cb853-e0dd-483f-9711-67f7fae02558",
+          "__enabled": true,
+          "CreateTargets": true,
+          "IsLooping": false,
+          "IsPlaying": false,
+          "TimeScale": 1
+        },
+        {
+          "__type": "Facepunch.TheaterController",
+          "__guid": "8a8cb853-e0dd-483f-9711-67f7fae02559",
+          "__enabled": true,
+          "Player": {
+            "_type": "component",
+            "component_id": "8a8cb853-e0dd-483f-9711-67f7fae02558",
+            "go": "8b590321-7fa0-4089-8421-33cc01854ce0",
+            "component_type": "MoviePlayer"
+          },
+          "ViewCamera": {
+            "_type": "component",
+            "component_id": "8a8cb853-e0dd-483f-9711-67f7fae02557",
+            "go": "8f590321-7fa0-4089-8421-33cc01854ce0",
+            "component_type": "CameraComponent"
+          }
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "8c590321-7fa0-4089-8421-33cc01854ce0",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "UI",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ScreenPanel",
+          "__guid": "8a8cb853-e0dd-483f-9711-67f7fae02560",
+          "__enabled": true,
+          "AutoScreenScale": true,
+          "ScaleStrategy": "FollowDesktopScaling",
+          "ZIndex": 100
+        },
+        {
+          "__type": "Facepunch.UI.TheaterOverlay",
+          "__guid": "8a8cb853-e0dd-483f-9711-67f7fae02561",
+          "__enabled": true
+        }
+      ],
+      "Children": []
+    }
+  ],
+  "SceneProperties": {
+    "NetworkInterpolation": true,
+    "PhysicsMode": "Physics3D",
+    "TimeScale": 1,
+    "WantsSystemScene": true,
+    "Metadata": {
+      "Title": "Theater Playback"
+    },
+    "NavMesh": {
+      "Enabled": false,
+      "IncludeStaticBodies": true,
+      "IncludeKeyframedBodies": true,
+      "EditorAutoUpdate": true,
+      "AgentHeight": 64,
+      "AgentRadius": 16,
+      "AgentStepSize": 18,
+      "AgentMaxSlope": 40,
+      "ExcludedBodies": "",
+      "IncludedBodies": "",
+      "DeferGeneration": false,
+      "CustomBounds": false
+    }
+  },
+  "ResourceVersion": 3,
+  "Title": "Theater Playback",
+  "Description": null,
+  "__references": [],
+  "__version": 3
+}

@@ -1,0 +1,34 @@
+{
+  "tool": "call_tools",
+  "arguments": {
+    "calls": [
+      {
+        "name": "asset_info",
+        "arguments": {
+          "path": "materials/lowtide/drainage/lt_grate_cast_iron.vmat"
+        }
+      },
+      {
+        "name": "asset_info",
+        "arguments": {
+          "path": "materials/lowtide/drainage/lt_grate_well.vmat"
+        }
+      },
+      {
+        "name": "asset_compile",
+        "arguments": {
+          "path": "models/maps/lowtide/lowtide_finish.vmdl"
+        }
+      },
+      {
+        "name": "asset_compile",
+        "arguments": {
+          "path": "models/maps/lowtide/lowtide_east.vmdl"
+        }
+      }
+    ]
+  },
+  "returncode": 0,
+  "stdout": "{\"Name\":\"lt_grate_cast_iron\",\"Path\":\"materials/lowtide/drainage/lt_grate_cast_iron.vmat\",\"Type\":\"Material\",\"Extension\":\"vmat\",\"IsGameResource\":false,\"SourceFile\":\"c:/sbox-projects/hc1/forked-shooter-main/assets/materials/lowtide/drainage/lt_grate_cast_iron.vmat\",\"CompiledFile\":\"c:/sbox-projects/hc1/forked-shooter-main/assets/materials/lowtide/drainage/lt_grate_cast_iron.vmat_c\",\"IsCompiled\":true,\"IsCompiledAndUpToDate\":true,\"IsCompileFailed\":false,\"CanRecompile\":true,\"IsCloud\":false,\"IsTransient\":false,\"IsProcedural\":false,\"IsTrivialChild\":false,\"Package\":null,\"Tags\":[\"@vmat_model\"],\"ReferenceCount\":6,\"DependantCount\":1,\"LastOpened\":null}\n{\"Name\":\"lt_grate_well\",\"Path\":\"materials/lowtide/drainage/lt_grate_well.vmat\",\"Type\":\"Material\",\"Extension\":\"vmat\",\"IsGameResource\":false,\"SourceFile\":\"c:/sbox-projects/hc1/forked-shooter-main/assets/materials/lowtide/drainage/lt_grate_well.vmat\",\"CompiledFile\":\"c:/sbox-projects/hc1/forked-shooter-main/assets/materials/lowtide/drainage/lt_grate_well.vmat_c\",\"IsCompiled\":true,\"IsCompiledAndUpToDate\":true,\"IsCompileFailed\":false,\"CanRecompile\":true,\"IsCloud\":false,\"IsTransient\":false,\"IsProcedural\":false,\"IsTrivialChild\":false,\"Package\":null,\"Tags\":[\"@vmat_model\"],\"ReferenceCount\":6,\"DependantCount\":1,\"LastOpened\":null}\n{\"Success\":true,\"Path\":\"models/maps/lowtide/lowtide_finish.vmdl\",\"CompiledFile\":\"c:/sbox-projects/hc1/forked-shooter-main/assets/models/maps/lowtide/lowtide_finish.vmdl_c\",\"Hint\":null}\n{\"Success\":true,\"Path\":\"models/maps/lowtide/lowtide_east.vmdl\",\"CompiledFile\":\"c:/sbox-projects/hc1/forked-shooter-main/assets/models/maps/lowtide/lowtide_east.vmdl_c\",\"Hint\":null}\n",
+  "stderr": ""
+}

@@ -1,0 +1,36 @@
+{
+  "mode": "built-in image_gen",
+  "purpose": "Lowtide granite street paving texture replacement",
+  "source_asset": "Tools/lowtide_paving_source.png",
+  "colour_asset": "Assets/materials/lowtide/lt_setts_color.png",
+  "shader": "Assets/shaders/hc1_lowtide_paving.shader",
+  "prompt": "Use case: photorealistic-natural\nAsset type: seamless tileable PBR base-colour texture for granite street paving in Lowtide, a historic brick warehouse harbour in a first-person game.\nPrimary request: generate one square 2048 x 2048 high-resolution albedo texture of old weathered granite setts, with beautifully resolved natural granite grain and convincing stone surfaces.\nSubject: tightly laid hand-cut rectangular granite setts in horizontal staggered courses. Approximately eight varied-length stones across and twelve courses down the full square, yielding realistic squat rectangular 20cm by 13cm stones, rather than thin wall bricks. Consistent course heights, slightly irregular chipped corners and worn subtly rounded edges; the tops remain mostly flat. Narrow gritty joints about 6mm wide, filled with neutral dark grey sand and compacted mineral grit, not black outlines. Muted mid-grey, warm grey and a little subdued sandy grey variation; occasional restrained cooler grey stones, all in a coherent grey harbour paving palette. Tiny quartz crystals, mineral mottling, granular pits, scuffs and fine age-worn chips. Sharp detailed rock texture that holds up close to the player's camera.\nComposition/framing: strictly orthographic top-down surface scan, uniform scale, texture fills every pixel. Exactly seamless wrapping on both axes; keep the same stagger phase when top joins bottom. Opposite edges join naturally; continue stones beyond frame. The top and bottom border should meet at the centre of a narrow horizontal grit joint. No border or extra canvas.\nLighting/mood: neutral evenly diffuse albedo capture, remove directional lighting, cast shadows, highlights, ambient shading and vignette. This is diffuse base colour, relief is supplied separately by the game engine.\nConstraints: one texture only, no labels, no text, no watermarks, no perspective, no surrounding scene, no foliage, no puddles, no painted markings, no decorative arrangement. Avoid blurry or airbrushed stones, exaggerated saturated blue or pink stones, repeating identical bricks, wide black grout, rounded inflated pillow-shaped cobbles and baked-in directional shadows.",
+  "packing": "Generated source copied unchanged; original pixels repeated without resampling into a power-of-two atlas, with an interior grit-bounded repeat region.",
+  "surface_maps": "Matching OpenGL tangent normals, roughness and ambient occlusion derived from the new scan, with shallow joints and restrained mineral grain.",
+  "world_scale": "Approximately 8 x 5.33 inch setts using the existing 64-inch mesh UVs.",
+  "scope": "Lowtide street, square, quay and bridge paving. Shared buildings textures and map geometry/collision are unchanged.",
+  "source_dimensions": [
+    1254,
+    1254
+  ],
+  "atlas_dimensions": [
+    2048,
+    2048
+  ],
+  "source_sha256": "f4a685fec9c339914a045322c83e0561aeaea5cc1929424cb7261366e9d1d6fa",
+  "repeat_scale": [
+    1.9807897545357525,
+    1.501460564751704
+  ],
+  "repeat_region_normalized": [
+    0.103515625,
+    0.06103515625,
+    0.45751953125,
+    0.50146484375
+  ],
+  "validation": "Native shader/material compilation passed. Generated source pixels preserved in the atlas, all four maps are 2048x2048, normal lengths checked, current model remaps match the generator configuration. Close-up and wide Lowtide renders inspected in an isolated native scene; live gameplay moved to another map during validation.",
+  "previews": [
+    "output/lowtide/paving-pass/close-up.png",
+    "output/lowtide/paving-pass/wide.png"
+  ]
+}

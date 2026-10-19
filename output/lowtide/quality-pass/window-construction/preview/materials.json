@@ -1,0 +1,116 @@
+{
+  "lt_brick_glazed": {
+    "resource": "materials/lowtide/lt_brick_glazed.vmat",
+    "inputs": {
+      "shader": "shaders/hc1_brick.shader",
+      "TextureColor": "materials/lowtide/lt_brick_v2_color.png",
+      "TextureNormal": "materials/lowtide/lt_brick_v2_normal.png",
+      "TextureRoughness": "[0.320000 0.320000 0.320000 0.000000]",
+      "TextureMetalness": "materials/default/default_black_mask.tga",
+      "TextureAmbientOcclusion": "materials/lowtide/lt_brick_v2_ao.png",
+      "TextureBlendMask": "materials/default/default_black_mask.tga",
+      "g_vBrickScale": "[1.337853 1.000927 0.0 0.0]",
+      "g_flTintColor": "[0.340 0.280 0.270]",
+      "TextureCanalBiofilm": "materials/lowtide/masonry/canal_biofilm_color.png",
+      "g_flCanalBiofilm": "0.8",
+      "g_flTidalClay": "1"
+    }
+  },
+  "lt_granite_trim": {
+    "resource": "materials/lowtide/masonry/lt_granite_trim.vmat",
+    "inputs": {
+      "shader": "shaders/hc1_brick.shader",
+      "F_SPECULAR": "1",
+      "TextureColor": "materials/lowtide/masonry/granite_color.png",
+      "TextureNormal": "materials/lowtide/masonry/granite_normal.png",
+      "TextureRoughness": "materials/lowtide/masonry/granite_rough.png",
+      "TextureAmbientOcclusion": "materials/default/default_ao.tga",
+      "TextureMetalness": "materials/default/default_black_mask.tga",
+      "g_vBrickScale": "[1.000000 1.000000 0 0]",
+      "g_flTintColor": "[0.94 0.96 0.93]",
+      "TextureCanalBiofilm": "materials/lowtide/masonry/canal_biofilm_color.png",
+      "g_flCanalBiofilm": "0.9",
+      "TextureShedWear": "materials/lowtide/masonry/shed_wear.png",
+      "g_flShedWear": "0.700"
+    }
+  },
+  "lt_arch_clay": {
+    "resource": "materials/lowtide/masonry/lt_arch_clay.vmat",
+    "inputs": {
+      "shader": "shaders/hc1_brick.shader",
+      "TextureColor": "materials/lowtide/lt_brick_v2_color.png",
+      "TextureNormal": "materials/lowtide/lt_brick_v2_normal.png",
+      "TextureRoughness": "[0.52 0.52 0.52 0]",
+      "TextureAmbientOcclusion": "materials/default/default_ao.tga",
+      "TextureMetalness": "materials/default/default_black_mask.tga",
+      "g_vBrickScale": "[1 1 0 0]",
+      "g_flTintColor": "[0.67 0.60 0.55]"
+    }
+  },
+  "lt_frame_green": {
+    "resource": "materials/lowtide/lt_frame_green.vmat",
+    "inputs": {
+      "shader": "shaders/hc1_lowtide_enamel.shader",
+      "TextureColor": "materials/lowtide/frames/enamel_color.png",
+      "TextureNormal": "materials/lowtide/frames/enamel_normal.png",
+      "TextureRoughness": "materials/lowtide/frames/enamel_rough.png",
+      "TextureAmbientOcclusion": "materials/default/default_ao.tga",
+      "TextureMetalness": "materials/default/default_black_mask.tga",
+      "g_vEnamelTint": "[.065 .115 .082]",
+      "g_flEnamelScale": "5.08"
+    }
+  },
+  "brick": {
+    "resource": "materials/lowtide/lt_brick.vmat",
+    "inputs": {
+      "shader": "shaders/hc1_brick.shader",
+      "TextureColor": "materials/lowtide/lt_brick_v2_color.png",
+      "TextureNormal": "materials/lowtide/lt_brick_v2_normal.png",
+      "TextureRoughness": "materials/lowtide/lt_brick_v2_rough.png",
+      "TextureMetalness": "materials/default/default_black_mask.tga",
+      "TextureAmbientOcclusion": "materials/lowtide/lt_brick_v2_ao.png",
+      "TextureBlendMask": "materials/default/default_black_mask.tga",
+      "g_vBrickScale": "[1.337853 1.000927 0.0 0.0]",
+      "g_flTintColor": "[1.000 1.000 1.000]",
+      "TextureFacadeWear": "materials/lowtide/masonry/facade_wear.png",
+      "g_flFacadeWear": "1",
+      "TextureCanalBiofilm": "materials/lowtide/masonry/canal_biofilm_color.png",
+      "g_flCanalBiofilm": "0.8",
+      "TextureShedWear": "materials/lowtide/masonry/shed_wear.png",
+      "g_flShedWear": "0.900"
+    }
+  },
+  "rw_window_dark": {
+    "resource": "materials/railhead/rw_window_dark.vmat",
+    "inputs": {
+      "shader": "shaders/complex.shader",
+      "F_SPECULAR": "1",
+      "g_flRoughnessScaleFactor": "1",
+      "g_flMetalness": "0.00",
+      "TextureColor": "materials/railhead/rw_window_dark_color.png",
+      "TextureNormal": "materials/railhead/window_dark_normal.png",
+      "TextureRoughness": "materials/railhead/window_dark_rough.png",
+      "TextureAmbientOcclusion": "materials/default/default_ao.tga",
+      "g_vColorTint": "[1.0 1.0 1.0 1.0]",
+      "g_flModelTintAmount": "1.0"
+    }
+  },
+  "ashlar_grey": {
+    "resource": "materials/lowtide/finish/lt_quay_stone.vmat",
+    "inputs": {
+      "shader": "shaders/hc1_brick.shader",
+      "F_SPECULAR": "1",
+      "TextureColor": "materials/lowtide/masonry/granite_color.png",
+      "TextureNormal": "materials/lowtide/masonry/granite_normal.png",
+      "TextureRoughness": "materials/lowtide/masonry/granite_rough.png",
+      "TextureAmbientOcclusion": "materials/default/default_ao.tga",
+      "TextureMetalness": "materials/default/default_black_mask.tga",
+      "g_vBrickScale": "[1.625599 1.625599 0 0]",
+      "g_flTintColor": "[0.94 0.96 0.93]",
+      "TextureCanalBiofilm": "materials/lowtide/masonry/canal_biofilm_color.png",
+      "g_flCanalBiofilm": "1",
+      "TextureShedWear": "materials/lowtide/masonry/shed_wear.png",
+      "g_flShedWear": "0.700"
+    }
+  }
+}

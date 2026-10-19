@@ -1,30 +1,10 @@
 [
   {
-    "path": "materials/belltower/wood_planks.vmat",
-    "text": "// Tools/belltower_quality_materials.py; sources: Sources/Belltower/scans/manifest.json\n\"Layer0\"\n{\n    shader \"shaders/complex.shader\"\n    F_SPECULAR \"1\"\n    TextureColor \"materials/belltower/scans/brown_planks_03_diffuse_4k.png\"\n    TextureNormal \"materials/belltower/scans/brown_planks_03_nor_gl_4k.png\"\n    TextureRoughness \"materials/belltower/scans/brown_planks_03_rough_4k.png\"\n    TextureAmbientOcclusion \"materials/belltower/scans/brown_planks_03_ao_4k.png\"\n    g_vTexCoordScale \"[1.21920 1.21920]\"\n    g_vColorTint \"[1.08 0.97 0.82 1]\"\n    g_flRoughnessScaleFactor \"0.8\"\n    g_flModelTintAmount \"1\"\n    g_flMetalness \"0\"\n}\n"
+    "path": "materials/belltower/rubble.vmat",
+    "text": "// Tools/belltower_quality_materials.py; sources: Sources/Belltower/wall-v3/generation.json\n\"Layer0\"\n{\n    shader \"shaders/belltower_masonry_v3.shader\"\n    TextureStoneColor \"materials/belltower/generated/wall-limestone-v3-color.png\"\n    TextureStoneHeight \"materials/belltower/generated/wall-limestone-v3-height.png\"\n    TextureStoneSeams \"materials/belltower/generated/wall-limestone-v3-quilt.png\"\n    g_vMasonryUvScale \"[.677333 .677333]\"\n    g_vMasonryQuiltShift \"[.37001595 .42982456]\"\n    g_vMasonryTint \"[.92 1.0 .84]\"\n    g_flMasonryDepth \"0.65\"\n    g_flMasonryNormal \"0.65\"\n    g_flMasonrySaturation \"0.72\"\n    g_flMasonryContrast \"0.86\"\n    g_flMasonryWeather \"0.28\"\n}\n"
   },
   {
-    "path": "materials/belltower/wood_planks_dark.vmat",
-    "text": "// Tools/belltower_quality_materials.py; sources: Sources/Belltower/scans/manifest.json\n\"Layer0\"\n{\n    shader \"shaders/complex.shader\"\n    F_SPECULAR \"1\"\n    TextureColor \"materials/belltower/scans/brown_planks_03_diffuse_4k.png\"\n    TextureNormal \"materials/belltower/scans/brown_planks_03_nor_gl_4k.png\"\n    TextureRoughness \"materials/belltower/scans/brown_planks_03_rough_4k.png\"\n    TextureAmbientOcclusion \"materials/belltower/scans/brown_planks_03_ao_4k.png\"\n    g_vTexCoordScale \"[1.21920 1.21920]\"\n    g_vColorTint \"[0.83 0.73 0.6 1]\"\n    g_flRoughnessScaleFactor \"0.8\"\n    g_flModelTintAmount \"1\"\n    g_flMetalness \"0\"\n}\n"
-  },
-  {
-    "path": "materials/belltower/furniture_wood.vmat",
-    "text": "// Tools/belltower_quality_materials.py; sources: Sources/Belltower/scans/manifest.json\n\"Layer0\"\n{\n    shader \"shaders/complex.shader\"\n    F_SPECULAR \"1\"\n    TextureColor \"materials/belltower/scans/brown_planks_03_diffuse_4k.png\"\n    TextureNormal \"materials/belltower/scans/brown_planks_03_nor_gl_4k.png\"\n    TextureRoughness \"materials/belltower/scans/brown_planks_03_rough_4k.png\"\n    TextureAmbientOcclusion \"materials/belltower/scans/brown_planks_03_ao_4k.png\"\n    g_vTexCoordScale \"[1.00000 1.00000]\"\n    g_vColorTint \"[1.08 0.97 0.82 1]\"\n    g_flRoughnessScaleFactor \"0.8\"\n    g_flModelTintAmount \"1\"\n    g_flMetalness \"0\"\n}\n"
-  },
-  {
-    "path": "materials/belltower/furniture_wood_dark.vmat",
-    "text": "// Tools/belltower_quality_materials.py; sources: Sources/Belltower/scans/manifest.json\n\"Layer0\"\n{\n    shader \"shaders/complex.shader\"\n    F_SPECULAR \"1\"\n    TextureColor \"materials/belltower/scans/brown_planks_03_diffuse_4k.png\"\n    TextureNormal \"materials/belltower/scans/brown_planks_03_nor_gl_4k.png\"\n    TextureRoughness \"materials/belltower/scans/brown_planks_03_rough_4k.png\"\n    TextureAmbientOcclusion \"materials/belltower/scans/brown_planks_03_ao_4k.png\"\n    g_vTexCoordScale \"[1.00000 1.00000]\"\n    g_vColorTint \"[0.83 0.73 0.6 1]\"\n    g_flRoughnessScaleFactor \"0.8\"\n    g_flModelTintAmount \"1\"\n    g_flMetalness \"0\"\n}\n"
-  },
-  {
-    "path": "materials/belltower/lantern_glass.vmat",
-    "text": "// Tools/belltower_quality_materials.py; sources: Sources/Belltower/scans/manifest.json\n\"Layer0\"\n{\n    shader \"shaders/glass.shader\"\n    F_GLASS_QUALITY \"2\"\n    F_RENDER_BACKFACES \"1\"\n    TextureColor \"materials/buildings/glass_clear_color.png\"\n    TextureNormal \"materials/belltower/lantern_glass_normal.png\"\n    TextureRoughness \"materials/buildings/glass_clear_rough.png\"\n    g_flTintColor \"[0.96 0.92 0.82]\"\n    g_flBlurAmount \"0.04\"\n    g_flRefractionStrength \"1.003\"\n    AlbedoAbsorption \"0.2\"\n}\n"
-  },
-  {
-    "path": "materials/belltower/lamp_bulb.vmat",
-    "text": "// Tools/belltower_quality_materials.py; sources: Sources/Belltower/scans/manifest.json\n\"Layer0\"\n{\n    shader \"shaders/complex.shader\"\n    F_SPECULAR \"1\"\n    TextureColor \"materials/belltower/lamp_bulb_color.png\"\n    TextureNormal \"materials/belltower/lamp_bulb_normal.png\"\n    TextureRoughness \"materials/belltower/lamp_bulb_rough.png\"\n    TextureAmbientOcclusion \"materials/belltower/lamp_bulb_ao.png\"\n    g_flRoughnessScaleFactor \"0.8\"\n    g_flMetalness \"0\"\n    g_vColorTint \"[1 .94 .80 1]\"\n    F_SELF_ILLUM \"1\"\n    TextureSelfIllumMask \"materials/belltower/lamp_bulb_illum.png\"\n    g_flSelfIllumBrightness \"1.4\"\n    g_flSelfIllumAlbedoFactor \"1\"\n    g_vSelfIllumTint \"[1 .82 .55 0]\"\n}\n"
-  },
-  {
-    "path": "materials/belltower/lamp_reflector.vmat",
-    "text": "// Tools/belltower_quality_materials.py; sources: Sources/Belltower/scans/manifest.json\n\"Layer0\"\n{\n    shader \"shaders/complex.shader\"\n    F_SPECULAR \"1\"\n    TextureColor \"materials/belltower/lamp_reflector_color.png\"\n    TextureNormal \"materials/belltower/lamp_reflector_normal.png\"\n    TextureRoughness \"materials/belltower/lamp_reflector_rough.png\"\n    TextureAmbientOcclusion \"materials/belltower/lamp_reflector_ao.png\"\n    g_flRoughnessScaleFactor \"0.8\"\n    g_flMetalness \"0\"\n    g_vColorTint \"[1 .94 .80 1]\"\n}\n"
+    "path": "materials/belltower/ivy_climb.vmat",
+    "text": "// Tools/belltower_quality_materials.py; sources: Sources/Belltower/wall-v3/generation.json\n\"Layer0\"\n{\n    shader \"shaders/belltower_plants.shader\"\n    TexturePlants \"materials/belltower/generated/ivy-climb-v3.png\"\n    F_ALPHA_TEST \"1\"\n    g_flAlphaTestReference \"0.4\"\n    g_flAntiAliasedEdgeStrength \"1\"\n}\n"
   }
 ]

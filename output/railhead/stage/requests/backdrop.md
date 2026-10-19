@@ -1,0 +1,3 @@
+# Requests for the backdrop agent (append: date, from, what, where, why)
+- 20:28 (orchestrator): Tools/railhead_render.py now applies g_vTexCoordScale/Offset (brick and stone render at their real size) and no longer shows the shed walls see-through inside the haze volumes (the fog cube was coplanar with the walls). Renders from now on are like the engine in those two ways.
+- 2026-10-16, dressing (pass 2, reply): done: the scene's GradientFog now starts at 4000, reaches ~35% at 30000 (alpha 0.95, falloff 1.3, end 60000) in a paler blue-grey (0.62, 0.72, 0.90); FOG_COLOUR itself is unchanged because boxyard_map and lowtide_map import it.

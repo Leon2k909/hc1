@@ -1,0 +1,56 @@
+{
+  "checked_utc": "2026-10-15T16:49:03.296711+00:00",
+  "state": "full-resolution offline candidate staged; native compilation and review pending",
+  "manifest_sha256": "ef29fce84609b070c31fd4a0f39773cd29f229772c39f1ff535eeeba89916965",
+  "zones": [
+    {
+      "zone": "a",
+      "colour_sha256": "7a337f4d0db4417256a60d3f1433ae732d1d0a2b2f98e4dea4af1a7d89eac938",
+      "mean_absolute_colour_difference_8bit": 0.0,
+      "changed_colour_pixel_fraction": 0.0,
+      "changed_kind_pixel_fraction": 0.0,
+      "terrain_normal_unchanged": true
+    },
+    {
+      "zone": "b",
+      "colour_sha256": "9f23003ff68e08f28713d024d3d682385daedb94b86ac629b67a2878968e2a68",
+      "mean_absolute_colour_difference_8bit": 1.0828298727671306,
+      "changed_colour_pixel_fraction": 0.08035826683044434,
+      "changed_kind_pixel_fraction": 9.179115295410156e-06,
+      "terrain_normal_unchanged": true
+    },
+    {
+      "zone": "c",
+      "colour_sha256": "5ca28fd76e75bccdf0d6c9e822cb67d67819201a3b62faa1ecfe065a187d2ceb",
+      "mean_absolute_colour_difference_8bit": 6.825302720069885,
+      "changed_colour_pixel_fraction": 0.6576792001724243,
+      "changed_kind_pixel_fraction": 0.0002225041389465332,
+      "terrain_normal_unchanged": true
+    },
+    {
+      "zone": "d",
+      "colour_sha256": "4b52cca9621eb60b00f052275c753b9725f83e45853f505631815f1d9bd673c8",
+      "mean_absolute_colour_difference_8bit": 0.9789986610412598,
+      "changed_colour_pixel_fraction": 0.15193551778793335,
+      "changed_kind_pixel_fraction": 2.872943878173828e-05,
+      "terrain_normal_unchanged": true
+    }
+  ],
+  "material_changes": "Texture references only; all other material text matches the accepted inputs.",
+  "resolved_texture_references": 22,
+  "trial_assets": 10,
+  "published_trial_assets": 0,
+  "review": [
+    "The full-resolution zone C candidate has finer, less circular natural woodland crowns than the accepted texture.",
+    "Zone B retains the orchard pattern and adds natural crown detail along woodland edges.",
+    "The far zone still shows broad procedural woodland bands and simplified fields. This canopy change does not finish the landscape quality goal.",
+    "Zone A is byte-identical to the accepted colour/kind maps. All four terrain normal maps are byte-identical."
+  ],
+  "native_sequence": [
+    "Run import-canopy-trial.cs.txt through the native editor in a coordinated window.",
+    "Compile the separate vista_land.vmat and forest_trees.vmat, then run verify-canopy-trial.cs.txt.",
+    "Capture matching saved and --canopy-trial views at valley, west-ridge and terrace, confirming exact material restoration.",
+    "Review native quality and performance before changing any accepted landscape input or manifest."
+  ],
+  "native_verified": false
+}

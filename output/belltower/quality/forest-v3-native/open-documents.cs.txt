@@ -1,0 +1,12 @@
+return new {
+    Active=Editor.SceneEditorSession.Active?.Scene.Source?.ResourcePath,
+    Playing=Game.IsPlaying,
+    GameScene=Game.ActiveScene?.Name,
+    Documents=Editor.SceneEditorSession.All.Select(s=>new {
+        Source=s.Scene.Source?.ResourcePath,
+        s.HasUnsavedChanges,
+        s.IsPlaying,
+        Roots=s.Scene.Children.Count,
+        Woodland=s.Scene.GetAllObjects(true).Count(o=>o.Name=="Distant woodland")
+    }).ToArray()
+};

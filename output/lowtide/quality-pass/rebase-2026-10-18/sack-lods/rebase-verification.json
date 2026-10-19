@@ -1,0 +1,42 @@
+{
+  "status": "reviewed_distance_geometry_rebased_with_current_material_libraries",
+  "project_root": "C:\\sbox-projects\\hc1\\forked-shooter-main",
+  "manifest_sha256": "f05e8f2b23ba6c492520bc151c87a1ccc6dcf885f6f5452f04ab2fe4577d23e0",
+  "verification_sha256": "bb2321957cde896e1114ad40265812233641436143031efed60bc505a7b6151a",
+  "prior_manifest": "output/lowtide/quality-pass/sack-lods/manifest.json",
+  "prior_manifest_sha256": "8f53b27df3a360d6e59a6852c3d4278f1f6f6bcccb087e2623aaf5778a9bf183",
+  "byte_identical_reviewed_components": 6,
+  "original_jute_pixels_unchanged": true,
+  "reused_preview_provenance": "output/lowtide/quality-pass/sack-lods/preview/provenance.json",
+  "reused_preview_provenance_sha256": "ad240bedc461aa1ac98355e7ddd981c3331d995db433588716c4748ce3fe4cff",
+  "prior_screen_comparisons_sha256": "6f7f9d98d0a24ae7cb7923d59eee8895820167b273d6187dcb91912526660916",
+  "newly_rendered_views": 0,
+  "inspected_existing_views": [
+    "mouth-160.png",
+    "side-80.png",
+    "oblique-320.png"
+  ],
+  "preserved_triangles_per_detail_level": 742742,
+  "full_aggregate_triangle_counts": {
+    "close": 1157222,
+    "level-1": 958694,
+    "level-2": 818774
+  },
+  "full_aggregate_reduction_fraction": {
+    "level-1": 0.17155567384650483,
+    "level-2": 0.2924659227010893
+  },
+  "current_material_libraries": 6,
+  "native_switching_configured": false,
+  "native_accepted": false,
+  "performance_verified": false,
+  "findings": [
+    "The medium candidate retains the sewn edge in the inspected mouth view.",
+    "The lowest candidate loses that seam at larger screen sizes; its side silhouette remains close at 80 pixels.",
+    "Six reviewed component files are byte-identical; new export checks cover current surrounding props and material libraries."
+  ],
+  "limitations": [
+    "Screen comparisons are reused evidence for unchanged components, not new native captures.",
+    "Aggregate triangle savings are not frame-time results; grouping, switching distances and temporal appearance remain unverified."
+  ]
+}

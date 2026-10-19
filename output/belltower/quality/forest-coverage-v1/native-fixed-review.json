@@ -1,0 +1,732 @@
+{
+  "status": "Four fixed-exposure native still comparisons reviewed; trial remains unreferenced.",
+  "manifest_sha256": "652b16e196dd678fa74dabeb5af4ea69166ed35754ea1973a016a4f68179aae1",
+  "native_shader_compilation_verified": true,
+  "native_material_compilation_verified": true,
+  "installed_unreferenced_assets": [
+    "shaders/belltower_forest_coverage_trial.shader",
+    "materials/belltower/forest/trials/forest_coverage_v1.vmat"
+  ],
+  "current_helper_sha256": {
+    "Sources/Belltower/editor/capture-viewport.cs.txt": "613d00218c3d9039e7fe46d7fa17cbe054322799e30de024e37158d37c1fff96",
+    "Sources/Belltower/editor/import-forest-coverage-trial.cs.txt": "bce164cb40d85dd569081e45d986792d7027e8b61768455301c9738cd2a501c1",
+    "Sources/Belltower/editor/compile-detail-shader.cs.txt": "3002285eddff966e4d2069ed1456bcd8507fa61e63b4261c97dd97e0e8031bf1"
+  },
+  "static_binding_proof": {
+    "path": "output/belltower/quality/forest-coverage-v1/helper-static-compile.json",
+    "current_source_matches": {
+      "Sources/Belltower/editor/capture-viewport.cs.txt": true,
+      "Sources/Belltower/editor/import-forest-coverage-trial.cs.txt": false,
+      "Sources/Belltower/editor/compile-detail-shader.cs.txt": false
+    },
+    "scope": "Historical static API binding proof. Current helpers also executed successfully in the engine."
+  },
+  "views": [
+    {
+      "view": "valley",
+      "baseline_image": "output/belltower/quality/forest-coverage-v1-native-fixed-baseline/valley.png",
+      "baseline_sha256": "1f5d37b2a6298b2f38ad8156da734bf80cf284f9e8161de31dbcf6dd9454cf81",
+      "variants": {
+        "control": {
+          "strength": 1,
+          "image": "output/belltower/quality/forest-coverage-v1-native-fixed-control/valley.png",
+          "sha256": "d9dda77086350b39fa787f70aa867de4069318ca97bfb41845e603b14eb4a331",
+          "matched_recorded_inputs": true,
+          "temporary_slots_restored": 88,
+          "tone_restored": true,
+          "regions": {
+            "sky": {
+              "rectangle": [
+                650,
+                40,
+                1400,
+                190
+              ],
+              "mean_abs_rgb_8bit": 0.0,
+              "changed_over_3_fraction": 0.0,
+              "before_mean_rgb": [
+                198.31356444444444,
+                209.2708888888889,
+                224.3072
+              ],
+              "after_mean_rgb": [
+                198.31356444444444,
+                209.2708888888889,
+                224.3072
+              ],
+              "edge_energy_proxy_before": 0.20452627480159974,
+              "edge_energy_proxy_after": 0.20452627480159974
+            },
+            "forest": {
+              "rectangle": [
+                750,
+                345,
+                1200,
+                450
+              ],
+              "mean_abs_rgb_8bit": 0.002257495590828924,
+              "changed_over_3_fraction": 0.00021164021164021165,
+              "before_mean_rgb": [
+                141.61856084656085,
+                152.1157037037037,
+                151.13056084656085
+              ],
+              "after_mean_rgb": [
+                141.61892063492064,
+                152.11616931216932,
+                151.13079365079366
+              ],
+              "edge_energy_proxy_before": 7.059076555229231,
+              "edge_energy_proxy_after": 7.062424145465027
+            }
+          }
+        },
+        "half": {
+          "strength": 0.5,
+          "image": "output/belltower/quality/forest-coverage-v1-native-fixed-half/valley.png",
+          "sha256": "b3cd20e365c221c633b34ff92104407e92163a7605084590c64abbca69097e19",
+          "matched_recorded_inputs": true,
+          "temporary_slots_restored": 88,
+          "tone_restored": true,
+          "regions": {
+            "sky": {
+              "rectangle": [
+                650,
+                40,
+                1400,
+                190
+              ],
+              "mean_abs_rgb_8bit": 0.0,
+              "changed_over_3_fraction": 0.0,
+              "before_mean_rgb": [
+                198.31356444444444,
+                209.2708888888889,
+                224.3072
+              ],
+              "after_mean_rgb": [
+                198.31356444444444,
+                209.2708888888889,
+                224.3072
+              ],
+              "edge_energy_proxy_before": 0.20452627480159974,
+              "edge_energy_proxy_after": 0.20452627480159974
+            },
+            "forest": {
+              "rectangle": [
+                750,
+                345,
+                1200,
+                450
+              ],
+              "mean_abs_rgb_8bit": 1.2578624338624338,
+              "changed_over_3_fraction": 0.1222010582010582,
+              "before_mean_rgb": [
+                141.61856084656085,
+                152.1157037037037,
+                151.13056084656085
+              ],
+              "after_mean_rgb": [
+                142.8935238095238,
+                153.34491005291005,
+                152.17280423280422
+              ],
+              "edge_energy_proxy_before": 7.059076555229231,
+              "edge_energy_proxy_after": 7.57016857800675
+            }
+          }
+        },
+        "zero": {
+          "strength": 0,
+          "image": "output/belltower/quality/forest-coverage-v1-native-fixed-zero/valley.png",
+          "sha256": "49092be7dba603bc9238cd1766336ce011aba3b299315550b5837383b8de68fa",
+          "matched_recorded_inputs": true,
+          "temporary_slots_restored": 88,
+          "tone_restored": true,
+          "regions": {
+            "sky": {
+              "rectangle": [
+                650,
+                40,
+                1400,
+                190
+              ],
+              "mean_abs_rgb_8bit": 0.0,
+              "changed_over_3_fraction": 0.0,
+              "before_mean_rgb": [
+                198.31356444444444,
+                209.2708888888889,
+                224.3072
+              ],
+              "after_mean_rgb": [
+                198.31356444444444,
+                209.2708888888889,
+                224.3072
+              ],
+              "edge_energy_proxy_before": 0.20452627480159974,
+              "edge_energy_proxy_after": 0.20452627480159974
+            },
+            "forest": {
+              "rectangle": [
+                750,
+                345,
+                1200,
+                450
+              ],
+              "mean_abs_rgb_8bit": 8.189312169312169,
+              "changed_over_3_fraction": 0.7297142857142858,
+              "before_mean_rgb": [
+                141.61856084656085,
+                152.1157037037037,
+                151.13056084656085
+              ],
+              "after_mean_rgb": [
+                150.4128888888889,
+                160.41155555555557,
+                158.30546031746033
+              ],
+              "edge_energy_proxy_before": 7.059076555229231,
+              "edge_energy_proxy_after": 7.854685528620106
+            }
+          }
+        }
+      }
+    },
+    {
+      "view": "west-ridge",
+      "baseline_image": "output/belltower/quality/forest-coverage-v1-native-fixed-baseline/west-ridge.png",
+      "baseline_sha256": "b645a10fa504178d831306f0432717a65c0ea2d87937e76e119468f903e76680",
+      "variants": {
+        "control": {
+          "strength": 1,
+          "image": "output/belltower/quality/forest-coverage-v1-native-fixed-control/west-ridge.png",
+          "sha256": "fab70ffaaad4561c6e5d7d7d66556f3bdeeadc8c3d61c382cd431400200e4f9c",
+          "matched_recorded_inputs": true,
+          "temporary_slots_restored": 88,
+          "tone_restored": true,
+          "regions": {
+            "sky": {
+              "rectangle": [
+                600,
+                30,
+                1250,
+                140
+              ],
+              "mean_abs_rgb_8bit": 0.0,
+              "changed_over_3_fraction": 0.0,
+              "before_mean_rgb": [
+                153.7612027972028,
+                174.28043356643357,
+                204.05211188811188
+              ],
+              "after_mean_rgb": [
+                153.7612027972028,
+                174.28043356643357,
+                204.05211188811188
+              ],
+              "edge_energy_proxy_before": 0.13795791402479424,
+              "edge_energy_proxy_after": 0.13795791402479424
+            },
+            "forest": {
+              "rectangle": [
+                900,
+                410,
+                1100,
+                438
+              ],
+              "mean_abs_rgb_8bit": 0.04886904761904762,
+              "changed_over_3_fraction": 0.007678571428571429,
+              "before_mean_rgb": [
+                95.16357142857143,
+                109.13910714285714,
+                102.71321428571429
+              ],
+              "after_mean_rgb": [
+                95.15482142857142,
+                109.12553571428572,
+                102.71035714285715
+              ],
+              "edge_energy_proxy_before": 11.589137191832176,
+              "edge_energy_proxy_after": 11.598978587434525
+            }
+          }
+        },
+        "half": {
+          "strength": 0.5,
+          "image": "output/belltower/quality/forest-coverage-v1-native-fixed-half/west-ridge.png",
+          "sha256": "603d5a02d8e510d84260b5d2ea64aaa81406e01baa8760815b9b1c2a6d33307c",
+          "matched_recorded_inputs": true,
+          "temporary_slots_restored": 88,
+          "tone_restored": true,
+          "regions": {
+            "sky": {
+              "rectangle": [
+                600,
+                30,
+                1250,
+                140
+              ],
+              "mean_abs_rgb_8bit": 0.0,
+              "changed_over_3_fraction": 0.0,
+              "before_mean_rgb": [
+                153.7612027972028,
+                174.28043356643357,
+                204.05211188811188
+              ],
+              "after_mean_rgb": [
+                153.7612027972028,
+                174.28043356643357,
+                204.05211188811188
+              ],
+              "edge_energy_proxy_before": 0.13795791402479424,
+              "edge_energy_proxy_after": 0.13795791402479424
+            },
+            "forest": {
+              "rectangle": [
+                900,
+                410,
+                1100,
+                438
+              ],
+              "mean_abs_rgb_8bit": 0.94875,
+              "changed_over_3_fraction": 0.13392857142857142,
+              "before_mean_rgb": [
+                95.16357142857143,
+                109.13910714285714,
+                102.71321428571429
+              ],
+              "after_mean_rgb": [
+                95.77928571428572,
+                109.97892857142857,
+                103.06321428571428
+              ],
+              "edge_energy_proxy_before": 11.589137191832176,
+              "edge_energy_proxy_after": 11.571956036664803
+            }
+          }
+        },
+        "zero": {
+          "strength": 0,
+          "image": "output/belltower/quality/forest-coverage-v1-native-fixed-zero/west-ridge.png",
+          "sha256": "435530128471436a68b5936300e63c1e27eec47107d00af179d953ec4552876d",
+          "matched_recorded_inputs": true,
+          "temporary_slots_restored": 88,
+          "tone_restored": true,
+          "regions": {
+            "sky": {
+              "rectangle": [
+                600,
+                30,
+                1250,
+                140
+              ],
+              "mean_abs_rgb_8bit": 0.0,
+              "changed_over_3_fraction": 0.0,
+              "before_mean_rgb": [
+                153.7612027972028,
+                174.28043356643357,
+                204.05211188811188
+              ],
+              "after_mean_rgb": [
+                153.7612027972028,
+                174.28043356643357,
+                204.05211188811188
+              ],
+              "edge_energy_proxy_before": 0.13795791402479424,
+              "edge_energy_proxy_after": 0.13795791402479424
+            },
+            "forest": {
+              "rectangle": [
+                900,
+                410,
+                1100,
+                438
+              ],
+              "mean_abs_rgb_8bit": 3.1436904761904763,
+              "changed_over_3_fraction": 0.41678571428571426,
+              "before_mean_rgb": [
+                95.16357142857143,
+                109.13910714285714,
+                102.71321428571429
+              ],
+              "after_mean_rgb": [
+                97.13142857142857,
+                111.75142857142858,
+                103.82482142857143
+              ],
+              "edge_energy_proxy_before": 11.589137191832176,
+              "edge_energy_proxy_after": 12.104172419478342
+            }
+          }
+        }
+      }
+    },
+    {
+      "view": "west-ridge-detail",
+      "baseline_image": "output/belltower/quality/forest-coverage-v1-native-fixed-baseline/west-ridge-detail.png",
+      "baseline_sha256": "1dee5067fd77513b47c2a11fd29fceeb130dbe9878b297c2f61517a69152ecf6",
+      "variants": {
+        "control": {
+          "strength": 1,
+          "image": "output/belltower/quality/forest-coverage-v1-native-fixed-control/west-ridge-detail.png",
+          "sha256": "40a0da37d81b63ebe31d86209a596e1509a634a724ff6caa8e0843f1fee7bc47",
+          "matched_recorded_inputs": true,
+          "temporary_slots_restored": 88,
+          "tone_restored": true,
+          "regions": {
+            "sky": {
+              "rectangle": [
+                530,
+                50,
+                800,
+                140
+              ],
+              "mean_abs_rgb_8bit": 0.0,
+              "changed_over_3_fraction": 0.0,
+              "before_mean_rgb": [
+                171.320329218107,
+                187.68905349794238,
+                210.5391769547325
+              ],
+              "after_mean_rgb": [
+                171.320329218107,
+                187.68905349794238,
+                210.5391769547325
+              ],
+              "edge_energy_proxy_before": 0.12875501388444116,
+              "edge_energy_proxy_after": 0.12875501388444116
+            },
+            "forest": {
+              "rectangle": [
+                1000,
+                150,
+                1300,
+                260
+              ],
+              "mean_abs_rgb_8bit": 0.007363636363636364,
+              "changed_over_3_fraction": 0.0011515151515151514,
+              "before_mean_rgb": [
+                87.29521212121212,
+                101.116,
+                94.60193939393939
+              ],
+              "after_mean_rgb": [
+                87.29536363636363,
+                101.11627272727273,
+                94.6020909090909
+              ],
+              "edge_energy_proxy_before": 7.37484113917302,
+              "edge_energy_proxy_after": 7.373357623629131
+            }
+          }
+        },
+        "half": {
+          "strength": 0.5,
+          "image": "output/belltower/quality/forest-coverage-v1-native-fixed-half/west-ridge-detail.png",
+          "sha256": "1c92202f2c9826ac14430f08b58d5d1a98d3a42c5194305409d264c88c592567",
+          "matched_recorded_inputs": true,
+          "temporary_slots_restored": 88,
+          "tone_restored": true,
+          "regions": {
+            "sky": {
+              "rectangle": [
+                530,
+                50,
+                800,
+                140
+              ],
+              "mean_abs_rgb_8bit": 0.0,
+              "changed_over_3_fraction": 0.0,
+              "before_mean_rgb": [
+                171.320329218107,
+                187.68905349794238,
+                210.5391769547325
+              ],
+              "after_mean_rgb": [
+                171.320329218107,
+                187.68905349794238,
+                210.5391769547325
+              ],
+              "edge_energy_proxy_before": 0.12875501388444116,
+              "edge_energy_proxy_after": 0.12875501388444116
+            },
+            "forest": {
+              "rectangle": [
+                1000,
+                150,
+                1300,
+                260
+              ],
+              "mean_abs_rgb_8bit": 0.43446464646464644,
+              "changed_over_3_fraction": 0.06239393939393939,
+              "before_mean_rgb": [
+                87.29521212121212,
+                101.116,
+                94.60193939393939
+              ],
+              "after_mean_rgb": [
+                87.46839393939393,
+                101.35142424242424,
+                94.7140606060606
+              ],
+              "edge_energy_proxy_before": 7.37484113917302,
+              "edge_energy_proxy_after": 7.453024392363386
+            }
+          }
+        },
+        "zero": {
+          "strength": 0,
+          "image": "output/belltower/quality/forest-coverage-v1-native-fixed-zero/west-ridge-detail.png",
+          "sha256": "b16053d80550a17435e9cf2a38911d6c2e8f3f66e1528e3c03a757d634fc93b9",
+          "matched_recorded_inputs": true,
+          "temporary_slots_restored": 88,
+          "tone_restored": true,
+          "regions": {
+            "sky": {
+              "rectangle": [
+                530,
+                50,
+                800,
+                140
+              ],
+              "mean_abs_rgb_8bit": 0.0,
+              "changed_over_3_fraction": 0.0,
+              "before_mean_rgb": [
+                171.320329218107,
+                187.68905349794238,
+                210.5391769547325
+              ],
+              "after_mean_rgb": [
+                171.320329218107,
+                187.68905349794238,
+                210.5391769547325
+              ],
+              "edge_energy_proxy_before": 0.12875501388444116,
+              "edge_energy_proxy_after": 0.12875501388444116
+            },
+            "forest": {
+              "rectangle": [
+                1000,
+                150,
+                1300,
+                260
+              ],
+              "mean_abs_rgb_8bit": 1.2399292929292929,
+              "changed_over_3_fraction": 0.17584848484848484,
+              "before_mean_rgb": [
+                87.29521212121212,
+                101.116,
+                94.60193939393939
+              ],
+              "after_mean_rgb": [
+                87.62851515151515,
+                101.55636363636364,
+                94.84321212121212
+              ],
+              "edge_energy_proxy_before": 7.37484113917302,
+              "edge_energy_proxy_after": 7.713006062512145
+            }
+          }
+        }
+      }
+    },
+    {
+      "view": "terrace",
+      "baseline_image": "output/belltower/quality/forest-coverage-v1-native-fixed-baseline/terrace.png",
+      "baseline_sha256": "dca7bd23666bd5ce391e8ea376277edcdf36cd049d7cda30673f3c0bce530e12",
+      "variants": {
+        "control": {
+          "strength": 1,
+          "image": "output/belltower/quality/forest-coverage-v1-native-fixed-control/terrace.png",
+          "sha256": "bd850b6543d509fc35ed8d09a7f237acb1e91ee5474deefc871079217df2a5d7",
+          "matched_recorded_inputs": true,
+          "temporary_slots_restored": 88,
+          "tone_restored": true,
+          "regions": {
+            "sky": {
+              "rectangle": [
+                1000,
+                30,
+                1500,
+                200
+              ],
+              "mean_abs_rgb_8bit": 0.0,
+              "changed_over_3_fraction": 0.0,
+              "before_mean_rgb": [
+                186.54214117647058,
+                201.0893294117647,
+                221.0195294117647
+              ],
+              "after_mean_rgb": [
+                186.54214117647058,
+                201.0893294117647,
+                221.0195294117647
+              ],
+              "edge_energy_proxy_before": 0.13798764229021923,
+              "edge_energy_proxy_after": 0.13798764229021923
+            },
+            "forest": {
+              "rectangle": [
+                963,
+                442,
+                1050,
+                495
+              ],
+              "mean_abs_rgb_8bit": 0.003903708523096942,
+              "changed_over_3_fraction": 0.00021687269572760788,
+              "before_mean_rgb": [
+                137.57709824333116,
+                158.13012361743657,
+                118.19388418998048
+              ],
+              "after_mean_rgb": [
+                137.57471264367817,
+                158.13055736282803,
+                118.18889611797874
+              ],
+              "edge_energy_proxy_before": 16.939585821976614,
+              "edge_energy_proxy_after": 16.93954886170932
+            }
+          }
+        },
+        "half": {
+          "strength": 0.5,
+          "image": "output/belltower/quality/forest-coverage-v1-native-fixed-half/terrace.png",
+          "sha256": "3bb070c71cf9f46eb43ade7cbbe977aa6e643ad4661b1faca71956bf1b7f58b3",
+          "matched_recorded_inputs": true,
+          "temporary_slots_restored": 88,
+          "tone_restored": true,
+          "regions": {
+            "sky": {
+              "rectangle": [
+                1000,
+                30,
+                1500,
+                200
+              ],
+              "mean_abs_rgb_8bit": 0.0,
+              "changed_over_3_fraction": 0.0,
+              "before_mean_rgb": [
+                186.54214117647058,
+                201.0893294117647,
+                221.0195294117647
+              ],
+              "after_mean_rgb": [
+                186.54214117647058,
+                201.0893294117647,
+                221.0195294117647
+              ],
+              "edge_energy_proxy_before": 0.13798764229021923,
+              "edge_energy_proxy_after": 0.13798764229021923
+            },
+            "forest": {
+              "rectangle": [
+                963,
+                442,
+                1050,
+                495
+              ],
+              "mean_abs_rgb_8bit": 1.0393262488252728,
+              "changed_over_3_fraction": 0.060941227499457816,
+              "before_mean_rgb": [
+                137.57709824333116,
+                158.13012361743657,
+                118.19388418998048
+              ],
+              "after_mean_rgb": [
+                138.58382129689872,
+                159.21622207764042,
+                118.75666883539363
+              ],
+              "edge_energy_proxy_before": 16.939585821976614,
+              "edge_energy_proxy_after": 15.245787036114539
+            }
+          }
+        },
+        "zero": {
+          "strength": 0,
+          "image": "output/belltower/quality/forest-coverage-v1-native-fixed-zero/terrace.png",
+          "sha256": "5e8cc71aa7dea8aeb8bb5b93ce42e814b0fe93553d587f55188b29bf743e0754",
+          "matched_recorded_inputs": true,
+          "temporary_slots_restored": 88,
+          "tone_restored": true,
+          "regions": {
+            "sky": {
+              "rectangle": [
+                1000,
+                30,
+                1500,
+                200
+              ],
+              "mean_abs_rgb_8bit": 0.0,
+              "changed_over_3_fraction": 0.0,
+              "before_mean_rgb": [
+                186.54214117647058,
+                201.0893294117647,
+                221.0195294117647
+              ],
+              "after_mean_rgb": [
+                186.54214117647058,
+                201.0893294117647,
+                221.0195294117647
+              ],
+              "edge_energy_proxy_before": 0.13798764229021923,
+              "edge_energy_proxy_after": 0.13798764229021923
+            },
+            "forest": {
+              "rectangle": [
+                963,
+                442,
+                1050,
+                495
+              ],
+              "mean_abs_rgb_8bit": 2.5190486517747415,
+              "changed_over_3_fraction": 0.1650401214487096,
+              "before_mean_rgb": [
+                137.57709824333116,
+                158.13012361743657,
+                118.19388418998048
+              ],
+              "after_mean_rgb": [
+                140.0134461071351,
+                160.7581869442637,
+                119.5601821730644
+              ],
+              "edge_energy_proxy_before": 16.939585821976614,
+              "edge_energy_proxy_after": 12.945038593679499
+            }
+          }
+        }
+      }
+    }
+  ],
+  "fixed_exposure_control_passed": true,
+  "exposure_scope": "Temporary native QA exposure of 2 with ACES, restored after each capture. Saved automatic exposure is unchanged.",
+  "invalid_adaptive_comparisons": {
+    "directories": [
+      "forest-coverage-v1-native-baseline",
+      "forest-coverage-v1-native-control",
+      "forest-coverage-v1-native-half",
+      "forest-coverage-v1-native-zero"
+    ],
+    "reason": "The strength-one control changed the sky and static scenery brightness. Matching exposure settings did not mean matching adapted exposure."
+  },
+  "visual_review": {
+    "preferred_experimental_strength": 0,
+    "valley": "Lower coarse grey grain; existing distance fade retained, with no new abrupt boundary in this still.",
+    "ridge": "Crown shapes remain visible in the detail view. The regular repeated crown pattern remains conspicuous.",
+    "terrace": "The distant slope is less stippled. The existing tree rows and terrain treatment remain visible.",
+    "half": "Less pronounced change; retains more of the distant coarse pattern.",
+    "scope": "Visual judgement of native fixed-camera stills only. Edge-energy values describe local image changes, not a quality score."
+  },
+  "remaining": [
+    "Representative native motion and mip-transition review.",
+    "Consistent Belltower gameplay performance before acceptance.",
+    "Further distribution/shape work: alpha compensation alone does not meet the broad visual target."
+  ],
+  "accepted_scene_changed": false,
+  "accepted_shader_changed": false,
+  "source_pixels_changed": false,
+  "trial_promoted": false,
+  "gameplay_performance_verified": false,
+  "overall_quality_goal_complete": false
+}

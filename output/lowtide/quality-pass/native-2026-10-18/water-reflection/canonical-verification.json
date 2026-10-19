@@ -1,0 +1,24 @@
+{
+  "capture_reproduced": true,
+  "capture_idempotent": true,
+  "shader_reproduced": true,
+  "canonical_writer_reproduced": true,
+  "material_idempotent": true,
+  "protected_unchanged": [
+    "Assets/shaders/hc1_lowtide_water.shader",
+    "Assets/models/maps/lowtide/lowtide_water.vmdl",
+    "Assets/models/maps/lowtide/lowtide_water.obj",
+    "Assets/scenes/maps/Lowtide/lowtide.scene"
+  ],
+  "assets_written": false,
+  "installed": {
+    "Code/Map/LowtideWaterReflections.cs": "cff7f27a27d531bc5d550f2bd81275bcc53ae8561c838049315cdaf81aeba230",
+    "Assets/materials/lowtide/lt_water.vmat": "1bdbfc0579ec69a9a835285814073c8b64faf0aa11dc950fa66509d57aab688f",
+    "Assets/shaders/hc1_lowtide_water_filtered.shader": "3ad98648ad3d15f5b7ca4f251a82e4936abf3657b25a46685eaa41733e7adc87",
+    "Assets/shaders/hc1_lowtide_water_filtered.shader.meta": "3a978cd321a66ea3e7c89d79bb1f5c80d74f2dd5019956df68c779ac01c36039"
+  },
+  "generators": {
+    "Tools/lowtide_water.py": "f072c9c84b309b16d554d56b3a447599a0c858350bd97b2488dd376849b3527a",
+    "Tools/lowtide_water_filter.py": "9c59e45a2d4686b97e0322578332e002f30eb830727f442bc7bbbc532cd186eb"
+  }
+}

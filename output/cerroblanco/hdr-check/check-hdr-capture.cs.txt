@@ -1,0 +1,42 @@
+if(Game.IsPlaying)throw new InvalidOperationException("Stop play before the HDR capture check.");
+var scene=Editor.SceneEditorSession.Active.Scene;
+if(scene.Source?.ResourcePath?.Equals("scenes/maps/cerroblanco/cerroblanco.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Cerro Blanco must be active.");
+var camera=scene.GetAllComponents<CameraComponent>().First(c=>c.GameObject.Name=="editor_camera");
+var sun=scene.GetAllComponents<DirectionalLight>().Single();
+var oldSun=sun.LightColor;
+var previous=(camera.WorldPosition,camera.WorldRotation,camera.FieldOfView);
+var previousPostProcessing=camera.EnablePostProcessing;
+var previousSize=camera.CustomSize;
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Public;
+var root=Sandbox.Project.Current.GetRootPath();
+var output=System.IO.Path.Combine(root,"output/cerroblanco/hdr-check");
+System.IO.Directory.CreateDirectory(output);
+try
+{
+    using(scene.Push())
+    {
+        camera.WorldPosition=new Vector3(0,80,150);camera.WorldRotation=Rotation.From(new Angles(0,0,0));camera.FieldOfView=90;camera.CustomSize=new Vector2(512,512);
+        typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+        typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+        camera.EnablePostProcessing=false;
+        using var texture=Texture.CreateRenderTarget("cerroblanco-hdr-check",ImageFormat.RGBA16161616F,new Vector2(512,512));
+        var setup=new Sandbox.Rendering.ViewSetup{EnablePostprocessing=false,EnableUI=false,EnableDebugOverlays=false};
+        camera.RenderToTexture(texture,in setup);Graphics.FlushGPU();
+        var pixels=new float[512*512*4];
+        texture.GetPixels<float>((0,0,512,512),0,0,pixels,ImageFormat.RGBA32323232F,(512,512));
+        var bytes=new byte[pixels.Length*4];Buffer.BlockCopy(pixels,0,bytes,0,bytes.Length);
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(output,"face.rgba32f"),bytes);
+        using var bitmap=new Bitmap(512,512);camera.RenderToBitmap(bitmap,false);
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(output,"comparison.png"),bitmap.ToPng());
+        var rgb=pixels.Where((p,i)=>i%4<3).ToArray();
+        sun.LightColor=oldSun*32;
+        typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+        typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+        camera.RenderToTexture(texture,in setup);Graphics.FlushGPU();
+        texture.GetPixels<float>((0,0,512,512),0,0,pixels,ImageFormat.RGBA32323232F,(512,512));
+        var boosted=pixels.Where((p,i)=>i%4<3).ToArray();
+        return new {Width=512,Height=512,Min=rgb.Min(),Max=rgb.Max(),Mean=rgb.Average(),Finite=rgb.All(float.IsFinite),NonZero=rgb.Count(p=>p>0),BoostedMax=boosted.Max(),BoostedMean=boosted.Average(),Directory=output};
+    }
+}
+finally{camera.WorldPosition=previous.Item1;camera.WorldRotation=previous.Item2;camera.FieldOfView=previous.Item3;camera.CustomSize=previousSize;camera.EnablePostProcessing=previousPostProcessing;sun.LightColor=oldSun;}

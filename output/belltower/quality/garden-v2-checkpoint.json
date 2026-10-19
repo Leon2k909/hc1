@@ -1,0 +1,61 @@
+{
+  "state": "accepted; natively compiled and visually reviewed",
+  "models": [
+    {
+      "name": "belltower_west",
+      "triangles": 996123,
+      "boxes": 457,
+      "hulls": 116,
+      "physics_sha256": "701d5de6e33415fb8689379345575195912ce41f274e57daf93ac744fd63ba61",
+      "first_material": "materials/belltower/ashlar.vmat",
+      "first_material_triangles": 10681,
+      "new_material": "materials/gunsmith_range/bench_oak_endgrain.vmat"
+    },
+    {
+      "name": "belltower_east",
+      "triangles": 996123,
+      "boxes": 457,
+      "hulls": 116,
+      "physics_sha256": "0096ac4ed787521a92e3c48f6a364da6b2092712d047371644dbc6c46bc15b67",
+      "first_material": "materials/belltower/ashlar.vmat",
+      "first_material_triangles": 10681,
+      "new_material": "materials/gunsmith_range/bench_oak_endgrain.vmat"
+    }
+  ],
+  "files": 2,
+  "gameplay_spots": 94,
+  "geometry_checks": 11,
+  "shared_random_sequence_preserved": true,
+  "native_assets_replaced": true,
+  "capture_views": [
+    "terrace",
+    "coping",
+    "garden-shed",
+    "small-shed",
+    "garden-store",
+    "firewood",
+    "wheelbarrow"
+  ],
+  "native_import": "Sources/Belltower/editor/import-gardens.cs.txt",
+  "native_verify": "Sources/Belltower/editor/verify-gardens.cs.txt",
+  "manifest_sha256": "d1ccb5bad21f18fc8f90f0280d440430cac8ce776af06d3c1a20350e6824538d",
+  "editor_window": "Restored scenes/maps/cerroblanco/cerroblanco.scene, play stopped",
+  "source_sha256": "97ecf15e63aeabee3ce49d03b7abb3fabcc2821699701c7c89732380da2d802f",
+  "original_source_sha256": "29666e6f186dd4851d7b51b6fb22def10921e55ce830efb711dd4291656f9c46",
+  "changes": [
+    "Recess shed cladding 0.25 inches behind trim",
+    "Move hidden backing 0.2 inches inward"
+  ],
+  "native_files": [
+    "models/maps/belltower/belltower_east.obj",
+    "models/maps/belltower/belltower_west.obj"
+  ],
+  "next_steps": [
+    "Wait for Cerro Blanco to finish its editor validation.",
+    "Import the two OBJ files through native s&box and compile west/east.",
+    "Capture and review all seven matching views before recording acceptance.",
+    "Run the prepared lighting comparisons afterward."
+  ],
+  "trim_regression": "output/belltower/quality/garden-v2-trim-regression.json",
+  "acceptance_manifest": "Sources/Belltower/gardens/manifest.json"
+}

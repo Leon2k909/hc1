@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-15",
+  "status": "rejected_offline_visual_quality",
+  "revision": "fitted-mortar-v4",
+  "production_changed": false,
+  "accepted_for_native_integration": false,
+  "user_work_mode": "Continue offline for now",
+  "reason": "The view-dependent mortar produces stretched bright edges and an overly regular cut-out appearance. Rare skipped first intersections remain even at up to 64 samples. Keep the current production brick material.",
+  "evidence": {
+    "directory": "output/lowtide/quality-pass/brick-relief",
+    "manifest": "output/lowtide/quality-pass/brick-relief/stage/manifest.json",
+    "numerical_report": "output/lowtide/quality-pass/brick-relief/offline-verification.json",
+    "worst_measured_intersection_error_mm": 7.64890312072318,
+    "rays_checked": 10240,
+    "preview_type": "CPU plane rendering, not an engine capture",
+    "generated_colour_pixels_modified": false
+  },
+  "retained_research": [
+    "Tools/lowtide_brick_relief.py",
+    "Tools/lowtide_brick_relief_preview.py",
+    "Sources/Lowtide/brick/lowtide_brick_relief.hlsl"
+  ],
+  "native_compilation": "not_run",
+  "native_performance": "not_measured",
+  "followup": "Do not import this candidate. A future revision needs convincing surface registration and grazing-angle continuity before native review."
+}

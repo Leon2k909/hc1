@@ -1,0 +1,126 @@
+{
+  "revision": "art-v3",
+  "stage": "output/collider/art-v3/stage",
+  "files": [
+    {
+      "path": "materials/collider/co_copper.vmat",
+      "before_sha256": null,
+      "sha256": "e3f797785570aacc3ec90c758348dd063f20e6bb65fc9ff260105f23739d4743",
+      "bytes": 478
+    },
+    {
+      "path": "materials/collider/co_enamel.vmat",
+      "before_sha256": null,
+      "sha256": "e32c1a98e657e84a0566d432fab12f08064ef9a58a0b675f83f80ab8d0386a12",
+      "bytes": 477
+    },
+    {
+      "path": "materials/collider/co_floor_color.jpg",
+      "before_sha256": "ae967ccb04fbc880d3f2184300092af013768de0311ce8264522de903c7d2192",
+      "sha256": "c791bb99a61edd4a5e2c67eb3c3684907ff5842c5b2f3a83ca0a7c2c0188d79f",
+      "bytes": 216695
+    },
+    {
+      "path": "materials/collider/co_floor_rough.png",
+      "before_sha256": "4d3c77fe10b9b0be25aab7896b4cde727334bd2a4513fd71f41ab4fbc1b3f5ae",
+      "sha256": "1efefec343f6175dcc15ba59af69e2e503c4a3029abea8c73335834c83d29384",
+      "bytes": 594644
+    },
+    {
+      "path": "models/maps/collider/collider_detail.mtl",
+      "before_sha256": "4e9fba2794343db51f99b004c90a3533d88b7be1dd8f6c0e52bddf6ffd285fcc",
+      "sha256": "d2a62b3ee255127ec72bfd33feb0c0f0eff33e07e248826de94421dd724e3f1c",
+      "bytes": 414
+    },
+    {
+      "path": "models/maps/collider/collider_detail.obj",
+      "before_sha256": "14b303198df6b8a8a6dc41ad167b387a951e2447d6ee13e6350fb3e903378e0f",
+      "sha256": "ba46c08be96720f873abf9ba5dac2c5b3354cb18e0a782e5e3479a56beeace90",
+      "bytes": 25140750
+    },
+    {
+      "path": "models/maps/collider/collider_detail.vmdl",
+      "before_sha256": "ae60c68b92df8555e15f84306a7428f32085edd5bbda85a4468152b3f5d69064",
+      "sha256": "e109a0c7ec6b66f6b2169ce43cd648aa7794af0d26da61ef6d96d17bf1740a74",
+      "bytes": 12662
+    },
+    {
+      "path": "models/maps/collider/collider_glass.obj",
+      "before_sha256": "77235fbd65d44896b218263bb5ab6e6e8f389babbc8792b90482d1636fdf85ba",
+      "sha256": "9fedd32272d20c073209723bcae50ecd4b04a61add6e271701361d76c633a360",
+      "bytes": 11589
+    },
+    {
+      "path": "models/maps/collider/collider_machine.mtl",
+      "before_sha256": "1cd3baef308ac8955ac264e98fb44dcdc55ef81afdd613e9610ec933d88b6885",
+      "sha256": "21fad314078856310fafc4999a798ffb1bd5d316ee45260d4f1ba67fb6452dc7",
+      "bytes": 471
+    },
+    {
+      "path": "models/maps/collider/collider_machine.obj",
+      "before_sha256": "04622188a4d89ecec76bc9a410f3aeac630868ab3f10890446c7eb97449b9d9e",
+      "sha256": "b8bcc6b988b2aafd76f331f431fd1f3e16606b976ace02cd64cbbc61e7a3cc32",
+      "bytes": 41656262
+    },
+    {
+      "path": "models/maps/collider/collider_machine.vmdl",
+      "before_sha256": "2c5144bf86db04d1b3a5cf28baf2026651dba2708f6bb816f4b763463b88dd6a",
+      "sha256": "957741f952ab609f512c76b497159dc7bbf9de3e45ea7abe1e1566e4929362af",
+      "bytes": 2258
+    },
+    {
+      "path": "models/maps/collider/collider_structure.obj",
+      "before_sha256": "eb32986e811c94423d60b8a9b008ab39581e4faf704d81d861a21b127414372e",
+      "sha256": "49813bbc31de1c75bacd54522bacc16eab27814d550a099e9485d261b8b33887",
+      "bytes": 12344619
+    }
+  ],
+  "triangles": {
+    "collider_structure": 71740,
+    "collider_detail": 138864,
+    "collider_machine": 214820,
+    "collider_glass": 84
+  },
+  "collision_identical": true,
+  "physics_definitions_identical": true,
+  "collision_sha256": "86767c8b2a7802d2deaf0ef49d407504210a50e740cddccb7abe365cae564964",
+  "offline_positions_passed": 68,
+  "geometry_finite_and_nondegenerate": true,
+  "window_render_rays": [
+    {
+      "pane_e": -335.0,
+      "opaque_hits": 0
+    },
+    {
+      "pane_e": -185.0,
+      "opaque_hits": 0
+    },
+    {
+      "pane_e": 185.0,
+      "opaque_hits": 0
+    },
+    {
+      "pane_e": 335.0,
+      "opaque_hits": 0
+    }
+  ],
+  "point_lights": 90,
+  "spot_lights": 3,
+  "shadow_lights": 8,
+  "baseline_scene_sha256": "b45ae8848a9d8581e87c4d2369ac4829d9f6afbc8956350dc1b8d2aed304b27c",
+  "source_sha256": {
+    "Tools/collider_detail_geometry.py": "af817eff50921871d8a9acf464327592639a869b219df865fe13bfd0749982fa",
+    "Tools/collider_machinery.py": "0ca78db577036670da19facb5f20a60f3ce20c469a26a31ce3cf843e42d4bc48",
+    "Tools/collider_map.py": "f7e414ad3e90bd56143f9d2ed833b5de6464f414146bb856dc2208f78d26617c",
+    "Tools/collider_materials.py": "57b41c0ee28539bc9478115a66b3656b3284879de5e6c8847523af019b734aa7",
+    "Tools/collider_package.py": "9a65f93c19602d3e9bed9e025ae900be438b8bbaa15dab68d53cff29f993fea4",
+    "Tools/collider_package_native.py": "938489f43a5b53ce1e9c0514014e21a9dd126a1f587ed9deb4df058df00e7aa0",
+    "Tools/collider_package_review.py": "a568f57d612914c10d85509e988364ea8bf45672a5dfceebcded820c19c97e8d",
+    "Tools/collider_preview.py": "1f666a56e3bdea43161bc6f45d5bfff082c164d535d33ea6ae3738244853577d",
+    "Tools/collider_preview_textured.py": "a2abca7f34755eb691704932bb3be68fa0bf5accefb1102e1c6e1363c8c18f90",
+    "Tools/collider_reflections.py": "d097024438ab2f8f92bb85b91a419f2f1617504a592383c9c08a4e3d4f189a3a",
+    "Tools/collider_services.py": "674144d4100a1724ae62f4d3e0f48fdfde5f33c16fe01414bbce1f3f9d4e0cf0",
+    "Tools/collider_validate.py": "855c28d609f23db4d1e4020f7505e46037a1a2380f3ae6499402f75913229970",
+    "Tools/collider_verify_network.py": "4bb41cb4ed92cd86cc341c78040cd17321025861fef9dba8ff47879554950d1e"
+  }
+}

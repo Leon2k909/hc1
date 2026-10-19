@@ -1,0 +1,168 @@
+{
+  "config_current": true,
+  "volumes": [
+    {
+      "key": "yard",
+      "grid": "35,38,6",
+      "engine_grid": "35,38,6",
+      "probes": 7980,
+      "inside_collision": 1144,
+      "inside_share": 0.143,
+      "spacing": "124.5,125.2,115.2"
+    },
+    {
+      "key": "hall",
+      "grid": "19,17,9",
+      "engine_grid": "19,17,9",
+      "probes": 2907,
+      "inside_collision": 889,
+      "inside_share": 0.306,
+      "spacing": "124,127,126.8"
+    },
+    {
+      "key": "pool",
+      "grid": "10,10,6",
+      "engine_grid": "10,10,6",
+      "probes": 600,
+      "inside_collision": 0,
+      "inside_share": 0.0,
+      "spacing": "117.3,117.3,107.2"
+    }
+  ],
+  "reflections": [
+    {
+      "key": "hall",
+      "capture_plan": [
+        -260.0,
+        560.0,
+        330.0
+      ],
+      "clearance": 299.4,
+      "inside_box": true,
+      "inside_collision": false
+    },
+    {
+      "key": "pool",
+      "capture_plan": [
+        -260.0,
+        900.0,
+        -220.0
+      ],
+      "clearance": 140.0,
+      "inside_box": true,
+      "inside_collision": false
+    },
+    {
+      "key": "a1",
+      "capture_plan": [
+        -1370.0,
+        -190.0,
+        150.0
+      ],
+      "clearance": 112.2,
+      "inside_box": true,
+      "inside_collision": false
+    },
+    {
+      "key": "a2",
+      "capture_plan": [
+        1370.0,
+        -190.0,
+        150.0
+      ],
+      "clearance": 99.1,
+      "inside_box": true,
+      "inside_collision": false
+    },
+    {
+      "key": "b1_room",
+      "capture_plan": [
+        0.0,
+        -870.0,
+        280.0
+      ],
+      "clearance": 76.6,
+      "inside_box": true,
+      "inside_collision": false
+    },
+    {
+      "key": "west_control",
+      "capture_plan": [
+        -780.0,
+        930.0,
+        370.0
+      ],
+      "clearance": 69.6,
+      "inside_box": true,
+      "inside_collision": false
+    },
+    {
+      "key": "east_control",
+      "capture_plan": [
+        780.0,
+        930.0,
+        370.0
+      ],
+      "clearance": 69.6,
+      "inside_box": true,
+      "inside_collision": false
+    },
+    {
+      "key": "west_yard",
+      "capture_plan": [
+        -1250.0,
+        -880.0,
+        170.0
+      ],
+      "clearance": 158.2,
+      "inside_box": true,
+      "inside_collision": false,
+      "sky_share_up": 0.982
+    },
+    {
+      "key": "east_yard",
+      "capture_plan": [
+        1250.0,
+        -880.0,
+        170.0
+      ],
+      "clearance": 158.2,
+      "inside_box": true,
+      "inside_collision": false
+    },
+    {
+      "key": "west_court",
+      "capture_plan": [
+        -1370.0,
+        1100.0,
+        170.0
+      ],
+      "clearance": 102.4,
+      "inside_box": true,
+      "inside_collision": false
+    },
+    {
+      "key": "east_court",
+      "capture_plan": [
+        1370.0,
+        1100.0,
+        170.0
+      ],
+      "clearance": 102.4,
+      "inside_box": true,
+      "inside_collision": false
+    },
+    {
+      "key": "north",
+      "capture_plan": [
+        -370.0,
+        2330.0,
+        170.0
+      ],
+      "clearance": 119.8,
+      "inside_box": true,
+      "inside_collision": false
+    }
+  ],
+  "problems": []
+}

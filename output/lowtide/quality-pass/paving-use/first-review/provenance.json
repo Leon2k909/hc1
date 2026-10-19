@@ -1,0 +1,86 @@
+{
+  "kind": "Matched CPU material/context views",
+  "native_engine_capture": false,
+  "manifest_sha256": "39e370111ea483f1946ec07d0a4e767c3d9fb1e5d01259d31399df9a5a616cb8",
+  "renderer_sha256": "4b17b7caa3354b7f709bd42783edef482560be8bfa5c8cfaf18490a6e428fe98",
+  "source_geometry": {
+    "Assets/models/maps/lowtide/lowtide_east.obj": "93ebb998d60470730012874327da91bcb35380b6a3b429e5e7fd831e9dbd07c6",
+    "output/lowtide/quality-pass/drain-junctions/stage/models/maps/lowtide/lowtide_finish.obj": "0de9b2e520ebff8712c8fc708e605936309278918b0cabfb96406a790b4ec12c"
+  },
+  "original_texture_inputs": {
+    "materials/lowtide/lt_setts_color.png": "6e522caa39c37ee649f0f565c3d1df7efedc1e1f592707be0b0fd4d3069072b6",
+    "materials/lowtide/paving_relief/lt_setts_normal.png": "847541c574f9154582db36284c673887a8a09eda2ad813a2ecadb97dece9ba3b",
+    "materials/lowtide/lt_setts_rough.png": "288e5bc7941331b813509d705c4fc41c919e7b2981380e6769554da7e20eadcf",
+    "materials/lowtide/paving_relief/lt_setts_ao.png": "4e498947e0a5e8ddda62de6244802e681ea09935a6a7f889f195d791a393ea7b",
+    "materials/lowtide/paving_relief/lt_setts_height.png": "24626484c30081d109be170eb37021b79906862dc47b721cd8a38af4954376a4"
+  },
+  "cases": {
+    "quay-shed": {
+      "origin": [
+        1314.0,
+        -1050.0,
+        0.0
+      ],
+      "outward": [
+        0.0,
+        -1.0,
+        0.0
+      ]
+    },
+    "warehouse-street": {
+      "origin": [
+        1000.0,
+        207.0,
+        0.0
+      ],
+      "outward": [
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    "shed-threshold": {
+      "origin": [
+        1590.0,
+        -1050.0,
+        0.0
+      ],
+      "outward": [
+        0.0,
+        -1.0,
+        0.0
+      ]
+    }
+  },
+  "view": {
+    "eye": [
+      1.4,
+      2.6,
+      2.0
+    ],
+    "target": [
+      0.0,
+      0.7,
+      0.2
+    ],
+    "scale": 2.8,
+    "size": [
+      1100,
+      820
+    ]
+  },
+  "same_staged_drains_in_both": true,
+  "architecture": "Exact clipped saved triangles with neutral materials",
+  "limitations": [
+    "Approximate CPU PBR, relief and mip filtering",
+    "Native lighting, shader compilation, compression, temporal filtering and performance untested"
+  ],
+  "files": {
+    "quay-shed-before.png": "34a8129362847a62eeb1c789c9742624962ecd6cbc2893a18fac02906c860e19",
+    "quay-shed-candidate.png": "194dfa91fd8c1891795495c36dc9b622b177ab39e789ce0659b2ad081ff23d0c",
+    "shed-threshold-before.png": "5e14a3571b92a967676caa8511808b425c75daa1705f52f7bf4b001a39f89df0",
+    "shed-threshold-candidate.png": "95408ca895664ae98b2e51fd1642080e14ecd6c475ab8cf03ca92c324677a562",
+    "warehouse-street-before.png": "5695ca6591fabb4290fe5200ac980fd5e3826737c199cb0bb3fa078dd53deef1",
+    "warehouse-street-candidate.png": "883712dbc408769f04293e4e439e07dbfd651990ad03b058580fbafe7288d6fd"
+  }
+}

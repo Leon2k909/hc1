@@ -1,0 +1,52 @@
+{
+  "state": "accepted; natively compiled and visually reviewed",
+  "models": [
+    {
+      "name": "belltower_west",
+      "triangles": 996387,
+      "boxes": 457,
+      "hulls": 116,
+      "physics_sha256": "701d5de6e33415fb8689379345575195912ce41f274e57daf93ac744fd63ba61",
+      "first_material": "materials/belltower/ashlar.vmat",
+      "first_material_triangles": 10681,
+      "new_material": "materials/gunsmith_range/bench_oak_endgrain.vmat"
+    },
+    {
+      "name": "belltower_east",
+      "triangles": 996387,
+      "boxes": 457,
+      "hulls": 116,
+      "physics_sha256": "0096ac4ed787521a92e3c48f6a364da6b2092712d047371644dbc6c46bc15b67",
+      "first_material": "materials/belltower/ashlar.vmat",
+      "first_material_triangles": 10681,
+      "new_material": "materials/gunsmith_range/bench_oak_endgrain.vmat"
+    }
+  ],
+  "files": 2,
+  "gameplay_spots": 94,
+  "geometry_checks": 11,
+  "shared_random_sequence_preserved": true,
+  "native_assets_replaced": true,
+  "capture_views": [
+    "wheelbarrow",
+    "terrace"
+  ],
+  "native_import": "Sources/Belltower/editor/import-gardens.cs.txt",
+  "native_verify": "Sources/Belltower/editor/verify-gardens.cs.txt",
+  "manifest_sha256": "942530babe9b7cdcd175bddcf0e225375f1fcaad4fe42b206a61c2fa603cee24",
+  "editor_window": "Restored scenes/maps/spillway/spillway.scene, play stopped",
+  "offline_review": {
+    "image": "output/belltower/quality/garden-v3-studio/wheelbarrow.png",
+    "sha256": "8b74aa3b7d40e6fa8a53c0809bf147d3dc744a24b8474c3d618ec6cea050cd6a",
+    "finding": "Clear basin, chassis below it, four underside mounts, rear supports and feet visually checked in the offline studio render.",
+    "native_review_complete": false
+  },
+  "native_import_complete": true,
+  "published_assets": [
+    "models/maps/belltower/belltower_east.obj",
+    "models/maps/belltower/belltower_west.obj"
+  ],
+  "pending_assets": [],
+  "partial_import_record": "output/belltower/quality/garden-v3-native/partial-import-state.json",
+  "acceptance_manifest": "Sources/Belltower/gardens/manifest.json"
+}

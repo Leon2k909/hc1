@@ -1,0 +1,237 @@
+{
+  "accepted_utc": "2026-10-15T01:22:14.520374+00:00",
+  "state": "accepted after native comparison",
+  "changes": [
+    "profiled cornices and window heads",
+    "bevelled window surrounds and sloped sills",
+    "varied upper shutter angles",
+    "individual bevelled coping stones within original cap bounds"
+  ],
+  "source_manifest_sha256": "d1c15d289f9aba7d2d4fa82101a35044e6663ff8d37a7eea31a9aec474f11252",
+  "source_hashes": {
+    "Tools/belltower_map.py": "f59f1429fb281ca148cb8354bec1f0a71ea29e3349d584f3b2b4e9f4761768b8",
+    "Tools/belltower_architecture.py": "1efa88784a36785c422f241701e90e9ffbe796cef8446d7343e88af23d563c73",
+    "Tools/belltower_furniture.py": "36c83d4883b3084b90b3ff46d9ef56e5aef7cd916f9e4c399058884105974a24",
+    "Tools/belltower_quality_models.py": "6a01a66a37fe714dd3c43b6017640a1890c7d1c2e42fb178376df902000d3709",
+    "Tools/map_kit.py": "00d860ffb0679c42efe962e6bb7e87da95c56c35e73b00923fa253dd5c95ecb7"
+  },
+  "models": [
+    {
+      "name": "belltower_centre",
+      "triangles": 247036,
+      "boxes": 403,
+      "hulls": 56
+    },
+    {
+      "name": "belltower_west",
+      "triangles": 969171,
+      "boxes": 457,
+      "hulls": 116
+    },
+    {
+      "name": "belltower_east",
+      "triangles": 969171,
+      "boxes": 457,
+      "hulls": 116
+    }
+  ],
+  "installed_files": [
+    {
+      "source": "output/belltower/quality/models/facades-v1/belltower_centre.obj",
+      "path": "models/maps/belltower/belltower_centre.obj",
+      "sha256": "3c5459627f3a3b26c89ec0e5bcec78f921321915105d6e5ed11580805d931437",
+      "expected_sha256": "c9da949fb9fe26a6d7b678526cfab4cfeb1757074cf7490e4965c77fd15140cc"
+    },
+    {
+      "source": "output/belltower/quality/models/facades-v1/belltower_west.obj",
+      "path": "models/maps/belltower/belltower_west.obj",
+      "sha256": "2dca68de6386bb455804f83b25a514e64965ba4afbd3713f334af6de614ad6fc",
+      "expected_sha256": "842e541f61e2b4aac1346336cee2ce53fe62ddef0b291d86ccf18858f0702cf6"
+    },
+    {
+      "source": "output/belltower/quality/models/facades-v1/belltower_east.obj",
+      "path": "models/maps/belltower/belltower_east.obj",
+      "sha256": "0993e6b3310381f871f395dd901832b080ca54304902483e0e08353a057ec1bc",
+      "expected_sha256": "b899464c1626c40a3c8ea2e8475470c171336721dcbd7daef2b9e186cc741981"
+    }
+  ],
+  "unchanged_collision_inputs": [
+    {
+      "path": "Assets/models/maps/belltower/belltower_centre.vmdl",
+      "sha256": "a6d2aacd66f207c307b7e965bf9f5b6bfde61630dc69f0678ed57c30ffa54ab6"
+    },
+    {
+      "path": "Assets/models/maps/belltower/belltower_centre_hulls_default.obj",
+      "sha256": "9c243b0dcc5fef031de586fd050dffdf54acb31afae29226d4e04cc1ea6cf950",
+      "equivalence": "same convex vertex sets; face triangulation may differ"
+    },
+    {
+      "path": "Assets/models/maps/belltower/belltower_centre_hulls_wood.obj",
+      "sha256": "050163a6b69aba1dd9b0d9633cf0f745fc4c4e490926c0247780a4cda67f77ab",
+      "equivalence": "same convex vertex sets; face triangulation may differ"
+    },
+    {
+      "path": "Assets/models/maps/belltower/belltower_west.vmdl",
+      "sha256": "e83e39568c56e5753fde92777c4cab27057afe7f8df794411d1ea28bebbba8cd"
+    },
+    {
+      "path": "Assets/models/maps/belltower/belltower_west_hulls_default.obj",
+      "sha256": "9e705ead3ab587de48d1af86ec071ecc16e4721e476771100a09378aaa8b4b77",
+      "equivalence": "same convex vertex sets; face triangulation may differ"
+    },
+    {
+      "path": "Assets/models/maps/belltower/belltower_west_hulls_metal.obj",
+      "sha256": "8184b390f812f999de0af3c8e00a94c55d7716cb22f2def38177e087d1a4a322",
+      "equivalence": "same convex vertex sets; face triangulation may differ"
+    },
+    {
+      "path": "Assets/models/maps/belltower/belltower_west_hulls_wood.obj",
+      "sha256": "7203718fb1367217d8d3a24731814f2c11af7c0c41f22a62b7322e77b65c0cae",
+      "equivalence": "same convex vertex sets; face triangulation may differ"
+    },
+    {
+      "path": "Assets/models/maps/belltower/belltower_east.vmdl",
+      "sha256": "da2be466a453bda616273a6561f145c411b217e97741f5266d25bf39eeb1b23d"
+    },
+    {
+      "path": "Assets/models/maps/belltower/belltower_east_hulls_default.obj",
+      "sha256": "54a84215ab782c2ee40ad35103b1c95e5a934a211901a3517bedd97b54a434ae",
+      "equivalence": "same convex vertex sets; face triangulation may differ"
+    },
+    {
+      "path": "Assets/models/maps/belltower/belltower_east_hulls_metal.obj",
+      "sha256": "da8d6bba9b8e73cc61f8964e6169e116c637b60a0e5a44694d6ef67ded6815b0",
+      "equivalence": "same convex vertex sets; face triangulation may differ"
+    },
+    {
+      "path": "Assets/models/maps/belltower/belltower_east_hulls_wood.obj",
+      "sha256": "ce30cd2f1eb94c16339396eb4b689e2fa0d55ac7fba4d19a4c379c3e32933c79",
+      "equivalence": "same convex vertex sets; face triangulation may differ"
+    }
+  ],
+  "gameplay_spots": 94,
+  "geometry_checks": 35,
+  "native_compiles": {
+    "centre": {
+      "Success": true,
+      "Path": "models/maps/belltower/belltower_centre.vmdl",
+      "CompiledFile": "d:/documents/s&box projects/hc1/forked-shooter-main/assets/models/maps/belltower/belltower_centre.vmdl_c",
+      "Hint": null
+    },
+    "west": {
+      "Success": true,
+      "Path": "models/maps/belltower/belltower_west.vmdl",
+      "CompiledFile": "d:/documents/s&box projects/hc1/forked-shooter-main/assets/models/maps/belltower/belltower_west.vmdl_c",
+      "Hint": null
+    },
+    "east": {
+      "Success": true,
+      "Path": "models/maps/belltower/belltower_east.vmdl",
+      "CompiledFile": "d:/documents/s&box projects/hc1/forked-shooter-main/assets/models/maps/belltower/belltower_east.vmdl_c",
+      "Hint": null
+    }
+  },
+  "native_resources": {
+    "ManifestSha256": "d1c15d289f9aba7d2d4fa82101a35044e6663ff8d37a7eea31a9aec474f11252",
+    "Models": [
+      {
+        "Model": "models/maps/belltower/belltower_centre.vmdl",
+        "SourceTriangles": 247036,
+        "NativeFirstMaterialTriangles": 3294,
+        "NativeTotalTrianglesVerified": false,
+        "MeshCount": 1,
+        "Materials": 31
+      },
+      {
+        "Model": "models/maps/belltower/belltower_west.vmdl",
+        "SourceTriangles": 969171,
+        "NativeFirstMaterialTriangles": 10681,
+        "NativeTotalTrianglesVerified": false,
+        "MeshCount": 1,
+        "Materials": 104
+      },
+      {
+        "Model": "models/maps/belltower/belltower_east.vmdl",
+        "SourceTriangles": 969171,
+        "NativeFirstMaterialTriangles": 10681,
+        "NativeTotalTrianglesVerified": false,
+        "MeshCount": 1,
+        "Materials": 101
+      }
+    ]
+  },
+  "scene_sha256": "aef98ef9fc0c4e484f6456f31dccc58f27163eb339e4844ebfa251de0333154a",
+  "scene_unchanged": true,
+  "captures": [
+    {
+      "view": "west-street",
+      "before": "output/belltower/quality/facades-v1-before/west-street.png",
+      "after": "output/belltower/quality/facades-v1-saved/west-street.png",
+      "sha256": "bc0b7916ad96e3c1ec295836de53ab84f5aca1c8fe6681d1482e56e352f4b36e"
+    },
+    {
+      "view": "east-street",
+      "before": "output/belltower/quality/facades-v1-before/east-street.png",
+      "after": "output/belltower/quality/facades-v1-saved/east-street.png",
+      "sha256": "a8bc94acdd2394d1e0a5edcc81677a4cac7849fa13ec03af19583aa152be58ae"
+    },
+    {
+      "view": "facade-north",
+      "before": "output/belltower/quality/facades-v1-before/facade-north.png",
+      "after": "output/belltower/quality/facades-v1-saved/facade-north.png",
+      "sha256": "22a3720d59db2cdd2c2e1dd10d59cd3fe941d1673b934db7f52873af55a3301f"
+    },
+    {
+      "view": "facade-south",
+      "before": "output/belltower/quality/facades-v1-before/facade-south.png",
+      "after": "output/belltower/quality/facades-v1-saved/facade-south.png",
+      "sha256": "bb39a5bdf63994b64605a8f0358eea6a77906feefa32d58123058f22379e45a7"
+    },
+    {
+      "view": "coping",
+      "before": "output/belltower/quality/facades-v1-before/coping.png",
+      "after": "output/belltower/quality/facades-v1-saved/coping.png",
+      "sha256": "f67e90bcfd26213a45bfb0e4d47f554e6f395ce5bec727b3db1587f5c6861e98"
+    },
+    {
+      "view": "terrace",
+      "before": "output/belltower/quality/facades-v1-before/terrace.png",
+      "after": "output/belltower/quality/facades-v1-saved/terrace.png",
+      "sha256": "ef34278ddad636347dad8520bcfeea45def136d24c6496d40f801e589732e409"
+    }
+  ],
+  "editor_restored": {
+    "Active": "scenes/maps/sewage/sewage.scene",
+    "Playing": false,
+    "GameScene": "Scene",
+    "Documents": [
+      {
+        "Source": "scenes/maps/lowtide/lowtide.scene",
+        "HasUnsavedChanges": false,
+        "IsPlaying": false,
+        "Roots": 29,
+        "Woodland": 0
+      },
+      {
+        "Source": "scenes/maps/sewage/sewage.scene",
+        "HasUnsavedChanges": false,
+        "IsPlaying": false,
+        "Roots": 21,
+        "Woodland": 0
+      },
+      {
+        "Source": "scenes/maps/belltower/belltower.scene",
+        "HasUnsavedChanges": false,
+        "IsPlaying": false,
+        "Roots": 28,
+        "Woodland": 1
+      }
+    ]
+  },
+  "review": "Window heads and cornices cast clearer profile shadows; coping joints are visible. No new visual defects were observed in the six matching views.",
+  "limitations": [
+    "This engine exposes only the first material index count through GetIndexCountForLod; full triangle totals are verified from the hashed source OBJ files.",
+    "Gameplay performance has not been measured for this pass.",
+    "The wider AAA quality goal remains open; distant woodland, repeated facades and box-like garden props still need refinement."
+  ]
+}

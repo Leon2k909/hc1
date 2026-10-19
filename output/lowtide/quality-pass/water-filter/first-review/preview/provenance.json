@@ -1,0 +1,111 @@
+{
+  "kind": "Synthetic CPU reflection fixture",
+  "native_engine_capture": false,
+  "actual_lowtide_scene": false,
+  "manifest_sha256": "dfc8cf1718ee72f51c14b8ad7d0c75dba362642e0e2862c0e79c3353814ed30f",
+  "renderer_sha256": "b84b7dcc219a94c7d197253098b4e68c6f0237d6d76de26e1941158ebe87c3be",
+  "source_brick_pixels_unchanged": true,
+  "source_image": {
+    "Assets/materials/lowtide/lt_brick_v2_color.png": "090661880fcdff12eee11291a4c5d7b885586c968a21ef6b86b6fe4f6451196a"
+  },
+  "cases": {
+    "canal": {
+      "eye": [
+        -7.0,
+        0.0,
+        4.7
+      ],
+      "target": [
+        28.0,
+        0.0,
+        0.3
+      ],
+      "fov": 55.0
+    },
+    "bank": {
+      "eye": [
+        2.0,
+        4.8,
+        2.1
+      ],
+      "target": [
+        18.0,
+        -0.2,
+        0.2
+      ],
+      "fov": 60.0
+    },
+    "reverse": {
+      "eye": [
+        45.0,
+        -4.7,
+        1.6
+      ],
+      "target": [
+        20.0,
+        0.0,
+        0.05
+      ],
+      "fov": 65.0
+    }
+  },
+  "resolution": [
+    1280,
+    720
+  ],
+  "metrics": {
+    "canal": {
+      "water_pixels": 136656,
+      "lod_range": [
+        2.7925641769315783,
+        3.6032113583975187
+      ],
+      "roughness_range": [
+        0.10009442257962463,
+        0.13256364509170682
+      ]
+    },
+    "bank": {
+      "water_pixels": 192285,
+      "lod_range": [
+        2.6404803106298083,
+        3.4538485126854317
+      ],
+      "roughness_range": [
+        0.1000000746420769,
+        0.13256364509170682
+      ]
+    },
+    "reverse": {
+      "water_pixels": 157861,
+      "lod_range": [
+        2.498472509135465,
+        3.311842864905368
+      ],
+      "roughness_range": [
+        0.1,
+        0.13256364509170682
+      ]
+    }
+  },
+  "reflected_image": "Analytic walls/windows/sky rendered from the mirrored fixture camera, with real source brick pixels",
+  "filter": "Native linear Box mip arithmetic plus shader LOD equation, using the actual half-resolution capture layout",
+  "unchanged_between_versions": [
+    "camera and reflected fixture",
+    "wave normals and filtered variance",
+    "Fresnel and absorption",
+    "lighting and exposure"
+  ],
+  "limitations": [
+    "Synthetic fixture geometry and approximate optics; no map appearance acceptance",
+    "No native shaders, sandbox hotload, GPU barriers, real lighting, temporal AA or performance tests"
+  ],
+  "files": {
+    "bank-before.png": "2bbef8852c93c21a7956d5ff17875f4007ffb0ec429e703e262288341e758c32",
+    "bank-candidate.png": "b4fb92eacd4b6cf79a6a4fdded5cf44a2b60087bfcdde5d318951370385816a9",
+    "canal-before.png": "edb63ac89ab693f8a4980f6a6931728e328999e52f23fc5d7ad80e62f6dc3de1",
+    "canal-candidate.png": "73d049aca8bd2709ff1ba1e4ce1fbdc5ea36f8b05bd5042c3ffb8c1bfa249a73",
+    "reverse-before.png": "a7074da0c9fd8393d71848853867f3c6c0a5590f9c072a7e8bf35ad51e0dbd09",
+    "reverse-candidate.png": "a725c70063221c7d44d58860c6820978b411f91a3f2c70f6f6fdbb61d1eab250"
+  }
+}

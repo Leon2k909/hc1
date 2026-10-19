@@ -1,0 +1,167 @@
+// Native hidden-document decal study. No scene save, temporary world or frame callback.
+var root=Sandbox.Project.Current.GetRootPath();
+var stage=System.IO.Path.Combine(root,"output/belltower/quality/ground-edge-v2");
+var config=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"capture.json")));
+var folder=config["directory"].GetValue<string>();
+var name=config["name"].GetValue<string>();
+if(!System.Text.RegularExpressions.Regex.IsMatch(folder,"^[a-z0-9-]+$") || !System.Text.RegularExpressions.Regex.IsMatch(name,"^[a-z0-9-]+$"))
+    throw new InvalidOperationException("Invalid study destination.");
+var destination=System.IO.Path.Combine(root,"output/belltower/quality",folder);
+System.IO.Directory.CreateDirectory(destination);
+string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var manifestPath=System.IO.Path.Combine(stage,"manifest.json");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(manifestPath));
+foreach(var input in manifest["source_sha256"].AsObject())
+    if(Hash(System.IO.Path.Combine(root,input.Key))!=input.Value.GetValue<string>()) throw new InvalidOperationException("A decal input changed: "+input.Key);
+foreach(var input in manifest["engine_source_sha256"].AsObject())
+    if(Hash(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Environment.ProcessPath),input.Key))!=input.Value.GetValue<string>())
+        throw new InvalidOperationException("The engine decal implementation changed.");
+foreach(var file in manifest["files"].AsArray())
+    if(Hash(System.IO.Path.Combine(root,"Assets",file["path"].GetValue<string>()))!=file["sha256"].GetValue<string>())
+        throw new InvalidOperationException("An installed decal definition changed.");
+var trial=config["trial"].GetValue<bool>();
+var mix=config["mix"].GetValue<float>();
+if(!float.IsFinite(mix) || mix<0 || mix>1) throw new InvalidOperationException("Mix must be between zero and one.");
+var all=config["all_placements"]?.GetValue<bool>()==true;
+var definitions=new System.Collections.Generic.Dictionary<string,DecalDefinition>();
+foreach(var region in manifest["regions"].AsArray())
+{
+    var path=region["definition"].GetValue<string>();
+    var definition=ResourceLibrary.Get<DecalDefinition>(path);
+    if(definition is null || definition.IsError || definition.ColorTexture is null || definition.ColorTexture.IsError
+        || definition.NormalTexture is not null || definition.RoughMetalOcclusionTexture is not null || definition.HeightTexture is not null
+        || definition.EmissiveTexture is not null || definition.BlendMode!=Sandbox.Rendering.DecalBlendMode.Multiply || definition.ColorMix!=1)
+        throw new InvalidOperationException("The loaded definition must modify albedo only: "+path);
+    definition.ColorTexture.MarkUsed(2048);
+    definitions.Add(path,definition);
+}
+var game=Game.ActiveScene?.Id;
+var playing=Game.IsPlaying;
+var selected=Editor.SceneEditorSession.Active;
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase)==true);
+if(session.HasUnsavedChanges) throw new InvalidOperationException("The Belltower editor document must be saved.");
+var scene=session.Scene;
+var originalIds=scene.GetAllObjects(true).Select(o=>o.Id).ToHashSet();
+var flags=System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance;
+var tone=scene.GetAllComponents<Tonemapping>().Single(c=>c.GameObject.Name=="Look");
+var oldTone=new {tone.MinimumExposure,tone.MaximumExposure,tone.ExposureCompensation,tone.Mode};
+var toneSnapshot=tone.Serialize().ToJsonString();
+var camera=scene.GetAllComponents<CameraComponent>().Single(c=>c.GameObject.Name=="editor_camera" && c.GameObject.Flags.HasFlag(GameObjectFlags.EditorOnly));
+var cameraPosition=camera.WorldPosition;
+var cameraRotation=camera.WorldRotation;
+var cameraFov=camera.FieldOfView;
+var cameraAxis=camera.FovAxis;
+var cameraSize=camera.CustomSize;
+var main=scene.Camera;
+var mainSnapshot=main.IsValid() ? new {main.AutoExposure.Enabled,main.AutoExposure.MinimumExposure,main.AutoExposure.MaximumExposure,main.AutoExposure.Compensation,main.AutoExposure.Rate} : null;
+var objects=new System.Collections.Generic.List<GameObject>();
+Vector3 Vector(System.Text.Json.Nodes.JsonNode node) => new Vector3(node[0].GetValue<float>(),node[1].GetValue<float>(),node[2].GetValue<float>());
+using(scene.Push())
+{
+    foreach(var renderer in scene.GetAllComponents<ModelRenderer>())
+    for(var slot=0;slot<renderer.Materials.Count;slot++)
+    {
+        var material=renderer.Materials.GetOverride(slot) ?? renderer.Materials.GetOriginal(slot);
+        if(material is null || material.IsError) continue;
+        foreach(var key in new[]{"g_tColor","g_tNormal","g_tRma","g_tHeight","g_tPlants","g_tColorA","g_tColorB","g_tColorC","g_tColorD"})
+            material.GetTexture(key)?.MarkUsed(4096);
+    }
+    foreach(var volume in scene.GetAllComponents<IndirectLightVolume>())
+    foreach(var texture in new[]{volume.IrradianceTexture,volume.DistanceTexture,volume.RelocationTexture})
+        texture?.MarkUsed(2048);
+}
+await Task.Delay(1000,cancellationToken); // No scene scope or scene mutation crosses this await.
+try
+{
+    if(game!=Game.ActiveScene?.Id || playing!=Game.IsPlaying || !ReferenceEquals(selected,Editor.SceneEditorSession.Active))
+        throw new InvalidOperationException("The shared session changed during prewarm; inspect before continuing.");
+    foreach(var region in manifest["regions"].AsArray())
+    {
+        var texture=definitions[region["definition"].GetValue<string>()].ColorTexture;
+        if(texture.Width!=region["dimensions"][0].GetValue<int>() || texture.Height!=region["dimensions"][1].GetValue<int>())
+            throw new InvalidOperationException("The native texture crop has unexpected dimensions.");
+    }
+    object exposure;
+    using(scene.Push())
+    {
+        if(trial)
+        {
+            var probes=manifest["probe_names"].AsArray().Select(n=>n.GetValue<string>()).ToHashSet();
+            foreach(var placement in manifest["placements"].AsArray())
+            {
+                if(!all && !probes.Contains(placement["name"].GetValue<string>())) continue;
+                var go=new GameObject(scene,false,"Belltower native ground decal comparison");
+                objects.Add(go);
+                go.Flags|=GameObjectFlags.EditorOnly|GameObjectFlags.NotSaved;
+                go.WorldPosition=Vector(placement["position"]);
+                go.WorldRotation=Rotation.LookAt(Vector(placement["forward"]),Vector(placement["up"]));
+                var decal=go.Components.Create<Decal>();
+                decal.Decals=new System.Collections.Generic.List<DecalDefinition>{definitions[placement["definition"].GetValue<string>()]};
+                decal.Size=new Vector2(placement["size"][0].GetValue<float>(),placement["size"][1].GetValue<float>());
+                decal.Depth=placement["projection_depth"].GetValue<float>();
+                decal.Scale=1; decal.Rotation=0; decal.Parallax=0; decal.ColorMix=mix; decal.LifeTime=0;
+                decal.Transient=false; decal.AttenuationAngle=1;
+                go.Enabled=true;
+            }
+            if(objects.Count!=(all ? 116 : 2)) throw new InvalidOperationException("The decal count differs from the checked placements.");
+        }
+        tone.MinimumExposure=2; tone.MaximumExposure=2; tone.ExposureCompensation=0; tone.Mode=Tonemapping.TonemappingMode.ACES;
+        camera.WorldPosition=Vector(config["position"]);
+        camera.WorldRotation=Rotation.From(Angles.Parse(config["angles"].GetValue<string>()));
+        camera.FieldOfView=config["fov"].GetValue<float>();
+        camera.FovAxis=CameraComponent.Axis.Horizontal;
+        camera.CustomSize=new Vector2(1920,1080);
+        typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+        typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+        typeof(PostProcessSystem).GetMethod("UpdateCamera",flags).Invoke(scene.GetSystem<PostProcessSystem>(),new object[]{camera});
+        if(main.IsValid() && !ReferenceEquals(main,camera))
+            typeof(PostProcessSystem).GetMethod("UpdateCamera",flags).Invoke(scene.GetSystem<PostProcessSystem>(),new object[]{main});
+        var ddgiType=typeof(Scene).Assembly.GetType("Sandbox.DDGIVolumeSystem");
+        var getter=typeof(Scene).GetMethods().Single(m=>m.Name=="GetSystem" && m.IsGenericMethodDefinition && m.GetParameters().Length==0);
+        var ddgi=getter.MakeGenericMethod(ddgiType).Invoke(scene,null);
+        ddgiType.GetMethod("MarkDirty",flags).Invoke(ddgi,null);
+        ddgiType.GetMethod("UpdateVolumes",flags).Invoke(ddgi,null);
+        using var bitmap=new Bitmap(1920,1080);
+        camera.RenderToBitmap(bitmap,false);
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(destination,name+".png"),bitmap.ToPng());
+        var nativeCamera=typeof(CameraComponent).GetField("sceneCamera",flags).GetValue(camera);
+        var nativeTone=nativeCamera.GetType().GetProperty("Tonemap",flags).GetValue(nativeCamera);
+        object Tone(string property) => nativeTone.GetType().GetProperty(property,flags).GetValue(nativeTone);
+        exposure=new {MinExposure=Tone("MinExposure"),MaxExposure=Tone("MaxExposure"),Compensation=Tone("ExposureCompensation")};
+    }
+    var result=new {
+        Camera=new {Position=camera.WorldPosition.ToString(),Angles=camera.WorldRotation.Angles().ToString(),camera.FieldOfView,Width=1920,Height=1080},
+        NativeExposure=exposure,TrialDecals=objects.Count,ColorMix=mix,AllPlacements=all,
+        LoadedDefinitions=definitions.Select(p=>new {p.Key,p.Value.BlendMode,Width=p.Value.ColorTexture.Width,Height=p.Value.ColorTexture.Height,
+            NormalOverride=p.Value.NormalTexture is not null,RmoOverride=p.Value.RoughMetalOcclusionTexture is not null}).ToArray(),
+        ManifestSha256=Hash(manifestPath),SourceSceneSha256=Hash(System.IO.Path.Combine(root,"Assets/scenes/maps/Belltower/belltower.scene")),
+        HelperSha256=Hash(System.IO.Path.Combine(root,"Sources/Belltower/editor/capture-ground-decals.cs.txt")),
+        GamePreserved=game==Game.ActiveScene?.Id && playing==Game.IsPlaying,SelectedDocumentPreserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active),
+        SceneHasUnsavedChanges=session.HasUnsavedChanges
+    };
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination,name+"-camera.json"),System.Text.Json.JsonSerializer.Serialize(result));
+    return result;
+}
+finally
+{
+    using(scene.Push())
+    {
+        foreach(var go in objects) if(go.IsValid()) go.Destroy();
+        scene.ProcessDeletes();
+        tone.MinimumExposure=oldTone.MinimumExposure; tone.MaximumExposure=oldTone.MaximumExposure;
+        tone.ExposureCompensation=oldTone.ExposureCompensation; tone.Mode=oldTone.Mode;
+        camera.WorldPosition=cameraPosition; camera.WorldRotation=cameraRotation; camera.FieldOfView=cameraFov;
+        camera.FovAxis=cameraAxis; camera.CustomSize=cameraSize;
+        typeof(PostProcessSystem).GetMethod("UpdateCamera",flags).Invoke(scene.GetSystem<PostProcessSystem>(),new object[]{camera});
+        if(main.IsValid() && !ReferenceEquals(main,camera))
+        {
+            typeof(PostProcessSystem).GetMethod("UpdateCamera",flags).Invoke(scene.GetSystem<PostProcessSystem>(),new object[]{main});
+            main.AutoExposure.Enabled=mainSnapshot.Enabled; main.AutoExposure.MinimumExposure=mainSnapshot.MinimumExposure;
+            main.AutoExposure.MaximumExposure=mainSnapshot.MaximumExposure; main.AutoExposure.Compensation=mainSnapshot.Compensation; main.AutoExposure.Rate=mainSnapshot.Rate;
+        }
+    }
+    var restored=scene.GetAllObjects(true).Select(o=>o.Id).ToHashSet().SetEquals(originalIds);
+    var toneRestored=tone.Serialize().ToJsonString()==toneSnapshot;
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination,name+"-restore.json"),System.Text.Json.JsonSerializer.Serialize(new {ObjectsRestored=restored,ToneRestored=toneRestored,DecalsRemoved=objects.Count}));
+    if(!restored || !toneRestored) throw new InvalidOperationException("Decal study restoration failed; inspect before further captures.");
+}

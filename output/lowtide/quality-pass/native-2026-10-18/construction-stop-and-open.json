@@ -1,0 +1,22 @@
+{
+  "tool": "call_tools",
+  "arguments": {
+    "calls": [
+      {
+        "name": "play_stop"
+      },
+      {
+        "name": "open_scene",
+        "arguments": {
+          "path": "scenes/maps/Lowtide/lowtide.scene"
+        }
+      },
+      {
+        "name": "editor_status"
+      }
+    ]
+  },
+  "returncode": 0,
+  "stdout": "{\"IsPlaying\":false,\"IsPaused\":false,\"Scene\":null}\n{\"Active\":\"lowtide\",\"ActivePath\":\"scenes/maps/lowtide/lowtide.scene\",\"Open\":[\"menu\",\"spillway\",\"lowtide\",\"veridant\"]}\n{\"EngineVersion\":\"26.10.13a\",\"Project\":\"razedtest\",\"ProjectTitle\":\"RazedTest\",\"ActiveScene\":\"lowtide\",\"ActiveScenePath\":\"scenes/maps/lowtide/lowtide.scene\",\"SceneHasUnsavedChanges\":false,\"IsPlaying\":false,\"IsPaused\":false,\"ToolCount\":128,\"IsCompiling\":false,\"LastCompileSucceeded\":true,\"LastCompileErrors\":0,\"Paths\":{\"Engine\":\"D:\\\\SteamLibrary\\\\steamapps\\\\common\\\\sbox\",\"Logs\":\"D:\\\\SteamLibrary\\\\steamapps\\\\common\\\\sbox\\\\logs\",\"ProjectRoot\":\"C:\\\\sbox-projects\\\\hc1\\\\forked-shooter-main\",\"ProjectSettings\":\"C:\\\\sbox-projects\\\\hc1\\\\forked-shooter-main\\\\ProjectSettings\"}}\n",
+  "stderr": ""
+}

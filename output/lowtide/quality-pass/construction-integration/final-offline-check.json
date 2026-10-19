@@ -1,0 +1,104 @@
+{
+  "status": "offline_handoff_integrity_passed",
+  "production_files_unchanged": 556,
+  "combined_models": 3,
+  "combined_delta_triangles": 175112,
+  "previews_match_current_sources": true,
+  "geometry_checks_bound_to_current_manifest": true,
+  "rejected_brick_excluded": true,
+  "active_owned_build_or_preview_processes": [],
+  "lingering_owned_process_queries": [],
+  "native_checks": "Deferred by user request",
+  "reduced_detail_levels_verified": {
+    "1": 411421,
+    "2": 381861
+  },
+  "native_lod_switching": "Not configured",
+  "warehouse_floor": {
+    "staged_files": 14,
+    "protected_files": 560,
+    "source_color_preserved": true,
+    "geometry_changes": 0,
+    "reproduced_files": 14,
+    "native_checks": "Deferred; offline material candidate"
+  },
+  "concrete_use": {
+    "staged_files": 8,
+    "protected_files": 561,
+    "route_samples": 3474,
+    "atlas_samples": 8192,
+    "reproduced_files": 8,
+    "native_checks": "Deferred; offline material candidate"
+  },
+  "combined_materials": {
+    "staged_files": 20,
+    "existing_slot_remaps": 4,
+    "model_snapshots": 2,
+    "native_checks": "Deferred; apply only scoped remaps after fresh validation"
+  },
+  "sewn_cargo_sacks": {
+    "sacks": 264,
+    "closed_mesh_triangles": 414480,
+    "protected_live_files": 556,
+    "delta_triangles": 382800,
+    "reproduced_components": 3,
+    "native_checks": "Deferred; visual acceptance and geometry cost unverified"
+  },
+  "sack_detail_candidates": {
+    "closed_meshes": 528,
+    "lower_sack_triangles": {
+      "1": 215952,
+      "2": 76032
+    },
+    "retained_vertex_attributes": 875952,
+    "native_switching_configured": false,
+    "native_checks": "Deferred; grouping, transitions and performance unverified"
+  },
+  "drainage": {
+    "pipes": 36,
+    "candidate_triangles": 110592,
+    "delta_triangles": 95504,
+    "aperture_ray_samples": 360,
+    "atlas_mapping_samples": 20004,
+    "source_pixels_preserved": true,
+    "reproduced_material_files": 3,
+    "native_checks": "Deferred; shader compilation, map connections, geometry and shadow cost unverified"
+  },
+  "drainage_junctions": {
+    "warehouse_heads": 20,
+    "shed_receivers": 16,
+    "gutters": 8,
+    "delta_from_live": 111936,
+    "clearance_rays": 20272,
+    "minimum_sampled_clearance_inches": 0.671031902323751,
+    "shed_flow_rays": 488,
+    "staged_files": 5,
+    "native_checks": "Deferred; full-map appearance, compilation, geometry/shadow cost and persistence unverified"
+  },
+  "exterior_paving_contact": {
+    "staged_files": 5,
+    "protected_live_files": 557,
+    "atlas_samples": 12000,
+    "excluded_surface_samples": 228,
+    "moisture_texels_checked": 4692,
+    "drain_outlets_over_setts": 16,
+    "delta_triangles": 0,
+    "new_material_slots": 0,
+    "extra_texture_lookups": 1,
+    "native_checks": "Deferred; shader compilation, appearance, filtering, performance and persistence unverified"
+  },
+  "water_reflection_filtering": {
+    "staged_files": 4,
+    "protected_live_files": 560,
+    "max_mips": 7,
+    "roughness_filter_scale": 0.35,
+    "isolated_csharp_compile": "0 warnings, 0 errors",
+    "constant_hdr_cases": 4,
+    "zero_lod_samples": 5000,
+    "roughness_projection_cases": 19216,
+    "single_mip_fallback_cases": 200,
+    "derivative_only_cases": 301,
+    "additional_960x540_color_bytes": 1380960,
+    "native_checks": "Deferred; shader/sandbox compile, GPU lifecycle, scene appearance, temporal response and performance unverified"
+  }
+}

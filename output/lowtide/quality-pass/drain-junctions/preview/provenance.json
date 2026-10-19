@@ -1,0 +1,92 @@
+{
+  "native_capture": false,
+  "source_files": {
+    "Assets/models/maps/lowtide/lowtide_east.obj": "93ebb998d60470730012874327da91bcb35380b6a3b429e5e7fd831e9dbd07c6",
+    "Assets/models/maps/lowtide/lowtide_finish.obj": "726f59989bc47c812ce2e5243f7ca40756f95539233dc80478a0883dc134cdca",
+    "output/lowtide/quality-pass/drain-junctions/stage/models/maps/lowtide/lowtide_finish.obj": "0de9b2e520ebff8712c8fc708e605936309278918b0cabfb96406a790b4ec12c"
+  },
+  "reviewer_sha256": "7d207f7b9371551f26ccd99a23f3a941fcfb4c267f82f8c9cf9c743a04d2912d",
+  "renderer_sha256": "75c516523262951f33bf2cdb602c0e1fa49a39d3fa1d8f84e274db53a49c73e3",
+  "shadow_adapter_sha256": "fa92a668fdb4080b9c1d79c90327dec4c63fd6783dec8b25e0954b566448851b",
+  "metal_inputs": {
+    "Assets/materials/lowtide/lt_bridge_steel_color.png": "9c20f81354bc0e9f396789316170c4da8e753507caf329bcd13986090129d740",
+    "output/lowtide/quality-pass/drain-construction/stage/materials/lowtide/finish/lt_drain_iron.vmat": "cf7d3afe0485b5ff3afc605e5017fcdd379ea44556b0719409f4d885b824a3b5",
+    "output/lowtide/quality-pass/drain-construction/stage/materials/lowtide/finish/lt_drain_edge.vmat": "8844676ef03b0584ccc6ceca14381d6b74a68d0815bc58f4d8583857f5199447"
+  },
+  "cases": {
+    "shed": {
+      "origin": [
+        1314.0,
+        -1050.0,
+        276.0
+      ],
+      "out": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "architecture": "lowtide_east"
+    },
+    "warehouse": {
+      "origin": [
+        1000.0,
+        207.0,
+        942.0
+      ],
+      "out": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "architecture": "lowtide_east"
+    }
+  },
+  "views": {
+    "oblique": {
+      "eye": [
+        0.9,
+        1.5,
+        0.6
+      ],
+      "target": [
+        0.0,
+        0.08,
+        -0.16
+      ],
+      "scale": 1.65,
+      "size": [
+        1100,
+        1000
+      ]
+    },
+    "side": {
+      "eye": [
+        1.2,
+        0.5,
+        0.13
+      ],
+      "target": [
+        0.0,
+        0.08,
+        -0.16
+      ],
+      "scale": 1.5,
+      "size": [
+        1100,
+        1000
+      ]
+    }
+  },
+  "previews": {
+    "shed-oblique-before.png": "40099acde9c42203131138087af191c7f5e54a29459392d1ffd53a7bc7955f69",
+    "shed-oblique-candidate.png": "3af829343c3a538216017a03231abae20d973a331abed32cfe234d3714cb693d",
+    "shed-side-before.png": "d089fa3a1fb0d19f9ff979e46346822256488514e8d74fcc2d9c460c6762b68b",
+    "shed-side-candidate.png": "aa6fd9a211207ab2cb7000a1cddde311bf1c0f58c3f80adb3b00a09cc2da7686",
+    "warehouse-oblique-before.png": "90dbb11b160c5d95a0bf384f68fb84edfb53ac56eb1234afaaca0506148ed27e",
+    "warehouse-oblique-candidate.png": "14cd7a7e61c9b6dc0eae2f6897887f06075ca9db066a0c15fee214c9769b9ca6",
+    "warehouse-side-before.png": "b2a1d9a427de1dbfb3f91c1cfd78fb1330a6fa605b10733ba5ec69f6feb893eb",
+    "warehouse-side-candidate.png": "c4972f680895889f5db7a8a34e8b607fab110525bf3ecb7534babeac6c61688e"
+  },
+  "materials": "Both versions share the staged metal mapping correction to isolate geometry changes.",
+  "limitations": "Clipped construction context with neutral architecture; does not validate native lighting or material appearance."
+}

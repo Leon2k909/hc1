@@ -1,0 +1,117 @@
+{
+  "kind": "Synthetic CPU reflection fixture",
+  "native_engine_capture": false,
+  "actual_lowtide_scene": false,
+  "manifest_sha256": "77c8f24c151f2fcb5c7bdab744e5aa5ee1e3b1a97fcd306308f30479ab9405fc",
+  "renderer_sha256": "b15987f40610a79e1e004744105ec8f2e5c7d7ea1e26a2c8acb25fbaf3e99541",
+  "source_brick_pixels_unchanged": true,
+  "source_image": {
+    "Assets/materials/lowtide/lt_brick_v2_color.png": "090661880fcdff12eee11291a4c5d7b885586c968a21ef6b86b6fe4f6451196a"
+  },
+  "cases": {
+    "canal": {
+      "eye": [
+        -7.0,
+        0.0,
+        4.7
+      ],
+      "target": [
+        28.0,
+        0.0,
+        0.3
+      ],
+      "fov": 55.0
+    },
+    "bank": {
+      "eye": [
+        2.0,
+        4.8,
+        2.1
+      ],
+      "target": [
+        18.0,
+        -0.2,
+        0.2
+      ],
+      "fov": 60.0
+    },
+    "reverse": {
+      "eye": [
+        45.0,
+        -4.7,
+        1.6
+      ],
+      "target": [
+        20.0,
+        0.0,
+        0.05
+      ],
+      "fov": 65.0
+    }
+  },
+  "resolution": [
+    1280,
+    720
+  ],
+  "metrics": {
+    "canal": {
+      "water_pixels": 136656,
+      "lod_range": [
+        3.5508379380677946,
+        3.7600019970968006
+      ],
+      "roughness_range": [
+        0.2200429354274944,
+        0.2365863901411068
+      ]
+    },
+    "bank": {
+      "water_pixels": 192285,
+      "lod_range": [
+        3.4009124765681924,
+        3.6106391513847136
+      ],
+      "roughness_range": [
+        0.2200000339282268,
+        0.2365863901411068
+      ]
+    },
+    "reverse": {
+      "water_pixels": 157861,
+      "lod_range": [
+        3.2589063838055763,
+        3.46863350360465
+      ],
+      "roughness_range": [
+        0.22,
+        0.2365863901411068
+      ]
+    }
+  },
+  "reflected_image": "Analytic walls/windows/sky rendered from the mirrored fixture camera, with real source brick pixels",
+  "filter": "Native linear Box mip arithmetic plus shader LOD equation, using the actual half-resolution capture layout",
+  "roughness_filter_scale": 0.35,
+  "base_roughness": 0.22,
+  "material_input": {
+    "Assets/materials/lowtide/lt_water.vmat": "fe46cb45a8aae39c36e65d330ec8d569edbabd35755cff2978911695bb26e3d9"
+  },
+  "wave_model": "Fixed analytic fixture ripples; does not reproduce the current ocean normal maps or shoreline shader",
+  "unchanged_between_versions": [
+    "camera and reflected fixture",
+    "wave normals and filtered variance",
+    "Fresnel and absorption",
+    "lighting and exposure"
+  ],
+  "limitations": [
+    "Synthetic fixture geometry and approximate optics; no map appearance acceptance",
+    "No native shaders, sandbox hotload, GPU barriers, real lighting, temporal AA or performance tests"
+  ],
+  "files": {
+    "bank-before.png": "2bbef8852c93c21a7956d5ff17875f4007ffb0ec429e703e262288341e758c32",
+    "bank-candidate.png": "132794ef19b6a7eb4c869ada16563742da2e658ea57858066d946c10af151c43",
+    "canal-before.png": "edb63ac89ab693f8a4980f6a6931728e328999e52f23fc5d7ad80e62f6dc3de1",
+    "canal-candidate.png": "862c8824f49a13c0f48cea62fca831aa76c9779c2626616f2a175faa9922bf35",
+    "reverse-before.png": "a7074da0c9fd8393d71848853867f3c6c0a5590f9c072a7e8bf35ad51e0dbd09",
+    "reverse-candidate.png": "907f2c876dff8041b070bc2297be406c3ff8fa7cbaa6846db8937fb69762ee84"
+  }
+}

@@ -1,0 +1,437 @@
+﻿System.Void Sandbox.Game::TakeScreenshot() public=True
+IL_0000: call System.String Sandbox.ScreenshotService::RequestCapture()
+IL_0005: pop
+IL_0006: ret
+System.Void Sandbox.Game::TakeHighResScreenshot(System.Int32,System.Int32) public=True
+IL_0000: call Sandbox.Scene Sandbox.Application::GetActiveScene()
+IL_0005: ldarg.0
+IL_0006: ldarg.1
+IL_0007: call System.Void Sandbox.ScreenshotService::TakeHighResScreenshot(Sandbox.Scene,System.Int32,System.Int32)
+IL_000c: ret
+System.Void Sandbox.ScreenCaptureUtility::CaptureFrame() public=False
+IL_0000: ldloca.s V_1
+IL_0002: call NativeEngine.ITexture Sandbox.Graphics::GetColorTarget(System.Boolean&)
+IL_0007: stloc.0
+IL_0008: ldloca.s V_0
+IL_000a: call System.Boolean NativeEngine.ITexture::get_IsNull()
+IL_000f: brfalse.s IL_0012
+IL_0011: ret
+IL_0012: nop
+IL_0013: ldloc.1
+IL_0014: brfalse.s IL_0024
+IL_0016: ldloca.s V_0
+IL_0018: call System.Boolean NativeEngine.ITexture::IsStrongHandleValid()
+IL_001d: brtrue.s IL_0024
+IL_001f: leave IL_00d6
+IL_0024: call System.Boolean Sandbox.ScreenRecorder::IsRecording()
+IL_0029: brfalse IL_00be
+IL_002e: call Sandbox.Rect Sandbox.Graphics::get_Viewport()
+IL_0033: stloc.s V_4
+IL_0035: ldloca.s V_4
+IL_0037: call System.Single Sandbox.Rect::get_Width()
+IL_003c: conv.i4
+IL_003d: call Sandbox.Rect Sandbox.Graphics::get_Viewport()
+IL_0042: stloc.s V_4
+IL_0044: ldloca.s V_4
+IL_0046: call System.Single Sandbox.Rect::get_Height()
+IL_004b: conv.i4
+IL_004c: stloc.2
+IL_004d: ldloc.2
+IL_004e: call Sandbox.ImageFormat Sandbox.Graphics::get_IdealColorFormat()
+IL_0053: ldc.i4.s -3
+IL_0055: ldc.i4.6
+IL_0056: ldc.i4.1
+IL_0057: ldstr ""
+IL_005c: call Sandbox.RenderTarget Sandbox.RenderTarget::GetTemporary(System.Int32,System.Int32,Sandbox.ImageFormat,Sandbox.ImageFormat,Sandbox.MultisampleAmount,System.Int32,System.String)
+IL_0061: stloc.3
+IL_0062: call NativeEngine.IRenderContext Sandbox.Graphics::get_Context()
+IL_0067: ldloc.0
+IL_0068: ldloc.3
+IL_0069: callvirt Sandbox.Texture Sandbox.RenderTarget::get_ColorTarget()
+IL_006e: ldfld NativeEngine.ITexture Sandbox.Texture::native
+IL_0073: ldloca.s V_5
+IL_0075: initobj NativeRect
+IL_007b: ldloc.s V_5
+IL_007d: ldc.i4.0
+IL_007e: ldc.i4.0
+IL_007f: ldc.i4.0
+IL_0080: ldc.i4.0
+IL_0081: ldc.i4.0
+IL_0082: ldc.i4.0
+IL_0083: call System.Void NativeEngine.RenderTools::CopyTexture(NativeEngine.IRenderContext,NativeEngine.ITexture,NativeEngine.ITexture,NativeRect,System.Int32,System.Int32,System.UInt32,System.UInt32,System.UInt32,System.UInt32)
+IL_0088: call NativeEngine.IRenderContext Sandbox.Graphics::get_Context()
+IL_008d: ldloc.3
+IL_008e: callvirt Sandbox.Texture Sandbox.RenderTarget::get_ColorTarget()
+IL_0093: ldfld NativeEngine.ITexture Sandbox.Texture::native
+IL_0098: call System.Void Sandbox.ScreenshotService::ProcessFrame(NativeEngine.IRenderContext,NativeEngine.ITexture)
+IL_009d: call NativeEngine.IRenderContext Sandbox.Graphics::get_Context()
+IL_00a2: ldloc.3
+IL_00a3: callvirt Sandbox.Texture Sandbox.RenderTarget::get_ColorTarget()
+IL_00a8: ldfld NativeEngine.ITexture Sandbox.Texture::native
+IL_00ad: call System.Void Sandbox.ScreenRecorder::RecordVideoFrame(NativeEngine.IRenderContext,NativeEngine.ITexture)
+IL_00b2: leave.s IL_00d6
+IL_00b4: ldloc.3
+IL_00b5: brfalse.s IL_00bd
+IL_00b7: ldloc.3
+IL_00b8: callvirt System.Void System.IDisposable::Dispose()
+IL_00bd: endfinally
+IL_00be: call NativeEngine.IRenderContext Sandbox.Graphics::get_Context()
+IL_00c3: ldloc.0
+IL_00c4: call System.Void Sandbox.ScreenshotService::ProcessFrame(NativeEngine.IRenderContext,NativeEngine.ITexture)
+IL_00c9: leave.s IL_00d6
+IL_00cb: ldloc.1
+IL_00cc: brfalse.s IL_00d5
+IL_00ce: ldloca.s V_0
+IL_00d0: call System.Void NativeEngine.ITexture::DestroyStrongHandle()
+IL_00d5: endfinally
+IL_00d6: ret
+System.String Sandbox.ScreenshotService::RequestCapture() public=False
+IL_0000: ldstr "png"
+IL_0005: ldstr "screenshots"
+IL_000a: call System.String Sandbox.ScreenCaptureUtility::GenerateScreenshotFilename(System.String,System.String)
+IL_000f: stloc.0
+IL_0010: ldsfld System.Collections.Concurrent.ConcurrentQueue`1<Sandbox.ScreenshotService/ScreenshotRequest> Sandbox.ScreenshotService::_pendingRequests
+IL_0015: ldloc.0
+IL_0016: newobj System.Void Sandbox.ScreenshotService/ScreenshotRequest::.ctor(System.String)
+IL_001b: callvirt System.Void System.Collections.Concurrent.ConcurrentQueue`1<Sandbox.ScreenshotService/ScreenshotRequest>::Enqueue(!0)
+IL_0020: ldloc.0
+IL_0021: ret
+System.Void Sandbox.ScreenshotService::CaptureRenderTexture(NativeEngine.IRenderContext,NativeEngine.ITexture,System.String) public=False
+IL_0000: newobj System.Void Sandbox.ScreenshotService/<>c__DisplayClass8_0::.ctor()
+IL_0005: stloc.0
+IL_0006: ldloc.0
+IL_0007: ldarg.2
+IL_0008: stfld System.String Sandbox.ScreenshotService/<>c__DisplayClass8_0::filePath
+IL_000d: ldloc.0
+IL_000e: ldnull
+IL_000f: stfld Sandbox.Bitmap Sandbox.ScreenshotService/<>c__DisplayClass8_0::bitmap
+IL_0014: ldarg.0
+IL_0015: ldarg.1
+IL_0016: ldloc.0
+IL_0017: ldftn System.Void Sandbox.ScreenshotService/<>c__DisplayClass8_0::<CaptureRenderTexture>b__0(System.Span`1<System.Byte>,Sandbox.ImageFormat,System.Int32,System.Int32,System.Int32,System.Action)
+IL_001d: newobj System.Void Sandbox.AsyncGPUReadback/TextureReadDelegate::.ctor(System.Object,System.IntPtr)
+IL_0022: ldc.i4.0
+IL_0023: ldc.i4.0
+IL_0024: ldloca.s V_1
+IL_0026: initobj System.ValueTuple`4<System.Int32,System.Int32,System.Int32,System.Int32>
+IL_002c: ldloc.1
+IL_002d: call System.Void Sandbox.AsyncGPUReadback::ReadTextureAsync(NativeEngine.IRenderContext,NativeEngine.ITexture,Sandbox.AsyncGPUReadback/TextureReadDelegate,System.Int32,System.Int32,System.ValueTuple`4<System.Int32,System.Int32,System.Int32,System.Int32>)
+IL_0032: call Sandbox.Diagnostics.Logger Sandbox.Internal.GlobalSystemNamespace::get_Log()
+IL_0037: ldstr "Screenshot saved to: {0}"
+IL_003c: ldc.i4.1
+IL_003d: newarr System.Object
+IL_0042: dup
+IL_0043: ldc.i4.0
+IL_0044: ldloc.0
+IL_0045: ldfld System.String Sandbox.ScreenshotService/<>c__DisplayClass8_0::filePath
+IL_004a: stelem.ref
+IL_004b: call System.FormattableString System.Runtime.CompilerServices.FormattableStringFactory::Create(System.String,System.Object[])
+IL_0050: callvirt System.Void Sandbox.Diagnostics.Logger::Info(System.FormattableString)
+IL_0055: leave.s IL_007d
+IL_0057: stloc.2
+IL_0058: call Sandbox.Diagnostics.Logger Sandbox.Internal.GlobalSystemNamespace::get_Log()
+IL_005d: ldstr "Error capturing screenshot: {0}"
+IL_0062: ldc.i4.1
+IL_0063: newarr System.Object
+IL_0068: dup
+IL_0069: ldc.i4.0
+IL_006a: ldloc.2
+IL_006b: callvirt System.String System.Exception::get_Message()
+IL_0070: stelem.ref
+IL_0071: call System.FormattableString System.Runtime.CompilerServices.FormattableStringFactory::Create(System.String,System.Object[])
+IL_0076: callvirt System.Void Sandbox.Diagnostics.Logger::Error(System.FormattableString)
+IL_007b: leave.s IL_007d
+IL_007d: ret
+System.Void Sandbox.ScreenshotService::TakeHighResScreenshot(Sandbox.Scene,System.Int32,System.Int32) public=True
+IL_0000: ldarg.0
+IL_0001: call System.Boolean Sandbox.SandboxSystemExtensions::IsValid(Sandbox.IValid)
+IL_0006: brtrue.s IL_0018
+IL_0008: call Sandbox.Diagnostics.Logger Sandbox.Internal.GlobalSystemNamespace::get_Log()
+IL_000d: ldstr "No valid scene available for high-res screenshot."
+IL_0012: callvirt System.Void Sandbox.Diagnostics.Logger::Warning(System.Object)
+IL_0017: ret
+IL_0018: ldloca.s V_0
+IL_001a: ldarg.1
+IL_001b: conv.r4
+IL_001c: ldarg.2
+IL_001d: conv.r4
+IL_001e: call System.Void Vector2::.ctor(System.Single,System.Single)
+IL_0023: ldarg.1
+IL_0024: ldc.i4.0
+IL_0025: ble.s IL_002b
+IL_0027: ldarg.2
+IL_0028: ldc.i4.0
+IL_0029: bgt.s IL_003b
+IL_002b: call Sandbox.Diagnostics.Logger Sandbox.Internal.GlobalSystemNamespace::get_Log()
+IL_0030: ldstr "screenshot_highres requires width and height greater than zero."
+IL_0035: callvirt System.Void Sandbox.Diagnostics.Logger::Warning(System.Object)
+IL_003a: ret
+IL_003b: ldarg.1
+IL_003c: ldc.i4 16384
+IL_0041: bgt.s IL_004b
+IL_0043: ldarg.2
+IL_0044: ldc.i4 16384
+IL_0049: ble.s IL_0073
+IL_004b: call Sandbox.Diagnostics.Logger Sandbox.Internal.GlobalSystemNamespace::get_Log()
+IL_0050: ldstr "screenshot_highres maximum dimension is {0}px."
+IL_0055: ldc.i4.1
+IL_0056: newarr System.Object
+IL_005b: dup
+IL_005c: ldc.i4.0
+IL_005d: ldc.i4 16384
+IL_0062: box System.Int32
+IL_0067: stelem.ref
+IL_0068: call System.FormattableString System.Runtime.CompilerServices.FormattableStringFactory::Create(System.String,System.Object[])
+IL_006d: callvirt System.Void Sandbox.Diagnostics.Logger::Warning(System.FormattableString)
+IL_0072: ret
+IL_0073: ldarg.0
+IL_0074: callvirt Sandbox.CameraComponent Sandbox.Scene::get_Camera()
+IL_0079: stloc.1
+IL_007a: ldloc.1
+IL_007b: brfalse.s IL_0085
+IL_007d: ldloc.1
+IL_007e: call System.Boolean Sandbox.SandboxSystemExtensions::IsValid(Sandbox.IValid)
+IL_0083: brtrue.s IL_0095
+IL_0085: call Sandbox.Diagnostics.Logger Sandbox.Internal.GlobalSystemNamespace::get_Log()
+IL_008a: ldstr "Active scene does not have a main camera to capture from."
+IL_008f: callvirt System.Void Sandbox.Diagnostics.Logger::Warning(System.Object)
+IL_0094: ret
+IL_0095: ldnull
+IL_0096: stloc.2
+IL_0097: ldnull
+IL_0098: stloc.3
+IL_0099: ldloc.1
+IL_009a: callvirt System.Nullable`1<Vector2> Sandbox.CameraComponent::get_CustomSize()
+IL_009f: stloc.s V_4
+IL_00a1: call Vector2 Sandbox.Screen::get_Size()
+IL_00a6: stloc.s V_5
+IL_00a8: ldloc.s V_5
+IL_00aa: ldloc.0
+IL_00ab: call System.Boolean Vector2::op_Inequality(Vector2,Vector2)
+IL_00b0: stloc.s V_6
+IL_00b2: ldloc.s V_6
+IL_00b4: brfalse.s IL_00bc
+IL_00b6: ldloc.0
+IL_00b7: call System.Void Sandbox.Screen::set_Size(Vector2)
+IL_00bc: ldloc.1
+IL_00bd: ldloc.0
+IL_00be: newobj System.Void System.Nullable`1<Vector2>::.ctor(!0)
+IL_00c3: callvirt System.Void Sandbox.CameraComponent::set_CustomSize(System.Nullable`1<Vector2>)
+IL_00c8: ldloc.1
+IL_00c9: ldloc.0
+IL_00ca: call System.Void Sandbox.ScreenshotService::ResizeUI(Sandbox.CameraComponent,Vector2)
+IL_00cf: ldarg.1
+IL_00d0: ldarg.2
+IL_00d1: ldc.i4.s -2
+IL_00d3: ldc.i4.s -2
+IL_00d5: ldsfld Sandbox.Engine.Settings.RenderSettings Sandbox.Engine.Settings.RenderSettings::Instance
+IL_00da: callvirt Sandbox.MultisampleAmount Sandbox.Engine.Settings.RenderSettings::get_AntiAliasQuality()
+IL_00df: ldc.i4.1
+IL_00e0: ldstr "HighResScreenshot"
+IL_00e5: call Sandbox.RenderTarget Sandbox.RenderTarget::GetTemporary(System.Int32,System.Int32,Sandbox.ImageFormat,Sandbox.ImageFormat,Sandbox.MultisampleAmount,System.Int32,System.String)
+IL_00ea: stloc.3
+IL_00eb: ldloc.3
+IL_00ec: brtrue.s IL_0102
+IL_00ee: call Sandbox.Diagnostics.Logger Sandbox.Internal.GlobalSystemNamespace::get_Log()
+IL_00f3: ldstr "Failed to create render target for high-res screenshot."
+IL_00f8: callvirt System.Void Sandbox.Diagnostics.Logger::Warning(System.Object)
+IL_00fd: leave IL_022d
+IL_0102: ldloc.1
+IL_0103: ldloc.3
+IL_0104: callvirt Sandbox.Texture Sandbox.RenderTarget::get_ColorTarget()
+IL_0109: ldloca.s V_10
+IL_010b: dup
+IL_010c: initobj Sandbox.Rendering.ViewSetup
+IL_0112: callvirt System.Boolean Sandbox.CameraComponent::RenderToTexture(Sandbox.Texture,Sandbox.Rendering.ViewSetup&)
+IL_0117: brtrue.s IL_012d
+IL_0119: call Sandbox.Diagnostics.Logger Sandbox.Internal.GlobalSystemNamespace::get_Log()
+IL_011e: ldstr "Camera failed to render to texture for high-res screenshot."
+IL_0123: callvirt System.Void Sandbox.Diagnostics.Logger::Warning(System.Object)
+IL_0128: leave IL_022d
+IL_012d: ldloc.3
+IL_012e: callvirt Sandbox.Texture Sandbox.RenderTarget::get_ColorTarget()
+IL_0133: ldc.i4.0
+IL_0134: callvirt Sandbox.Bitmap Sandbox.Texture::GetBitmap(System.Int32)
+IL_0139: stloc.2
+IL_013a: ldloc.2
+IL_013b: brfalse.s IL_0145
+IL_013d: ldloc.2
+IL_013e: callvirt System.Boolean Sandbox.Bitmap::get_IsValid()
+IL_0143: brtrue.s IL_0159
+IL_0145: call Sandbox.Diagnostics.Logger Sandbox.Internal.GlobalSystemNamespace::get_Log()
+IL_014a: ldstr "Failed to read pixels from render target for high-res screenshot."
+IL_014f: callvirt System.Void Sandbox.Diagnostics.Logger::Warning(System.Object)
+IL_0154: leave IL_022d
+IL_0159: ldstr "png"
+IL_015e: ldstr "screenshots"
+IL_0163: call System.String Sandbox.ScreenCaptureUtility::GenerateScreenshotFilename(System.String,System.String)
+IL_0168: stloc.s V_7
+IL_016a: ldloc.s V_7
+IL_016c: call System.String System.IO.Path::GetDirectoryName(System.String)
+IL_0171: stloc.s V_8
+IL_0173: ldloc.s V_8
+IL_0175: call System.Boolean System.String::IsNullOrEmpty(System.String)
+IL_017a: brtrue.s IL_0184
+IL_017c: ldloc.s V_8
+IL_017e: call System.IO.DirectoryInfo System.IO.Directory::CreateDirectory(System.String)
+IL_0183: pop
+IL_0184: ldloc.2
+IL_0185: callvirt System.Byte[] Sandbox.Bitmap::ToPng()
+IL_018a: stloc.s V_9
+IL_018c: ldloc.s V_7
+IL_018e: ldloc.s V_9
+IL_0190: call System.Void System.IO.File::WriteAllBytes(System.String,System.Byte[])
+IL_0195: call Sandbox.Diagnostics.Logger Sandbox.Internal.GlobalSystemNamespace::get_Log()
+IL_019a: ldstr "High-res screenshot saved to: {0} ({1}x{2})"
+IL_019f: ldc.i4.3
+IL_01a0: newarr System.Object
+IL_01a5: dup
+IL_01a6: ldc.i4.0
+IL_01a7: ldloc.s V_7
+IL_01a9: stelem.ref
+IL_01aa: dup
+IL_01ab: ldc.i4.1
+IL_01ac: ldarg.1
+IL_01ad: box System.Int32
+IL_01b2: stelem.ref
+IL_01b3: dup
+IL_01b4: ldc.i4.2
+IL_01b5: ldarg.2
+IL_01b6: box System.Int32
+IL_01bb: stelem.ref
+IL_01bc: call System.FormattableString System.Runtime.CompilerServices.FormattableStringFactory::Create(System.String,System.Object[])
+IL_01c1: callvirt System.Void Sandbox.Diagnostics.Logger::Info(System.FormattableString)
+IL_01c6: leave.s IL_022d
+IL_01c8: stloc.s V_11
+IL_01ca: call Sandbox.Diagnostics.Logger Sandbox.Internal.GlobalSystemNamespace::get_Log()
+IL_01cf: ldstr "Failed to capture high-res screenshot: {0}"
+IL_01d4: ldc.i4.1
+IL_01d5: newarr System.Object
+IL_01da: dup
+IL_01db: ldc.i4.0
+IL_01dc: ldloc.s V_11
+IL_01de: callvirt System.String System.Exception::get_Message()
+IL_01e3: stelem.ref
+IL_01e4: call System.FormattableString System.Runtime.CompilerServices.FormattableStringFactory::Create(System.String,System.Object[])
+IL_01e9: callvirt System.Void Sandbox.Diagnostics.Logger::Error(System.FormattableString)
+IL_01ee: leave.s IL_022d
+IL_01f0: ldloc.1
+IL_01f1: ldloc.s V_4
+IL_01f3: callvirt System.Void Sandbox.CameraComponent::set_CustomSize(System.Nullable`1<Vector2>)
+IL_01f8: ldloc.3
+IL_01f9: brfalse.s IL_0201
+IL_01fb: ldloc.3
+IL_01fc: call System.Void Sandbox.RenderTarget::Dispose()
+IL_0201: ldloc.2
+IL_0202: brfalse.s IL_020a
+IL_0204: ldloc.2
+IL_0205: call System.Void Sandbox.Bitmap::Dispose()
+IL_020a: ldloc.s V_6
+IL_020c: brfalse.s IL_021d
+IL_020e: ldloc.s V_5
+IL_0210: call System.Void Sandbox.Screen::set_Size(Vector2)
+IL_0215: ldloc.1
+IL_0216: ldloc.s V_5
+IL_0218: call System.Void Sandbox.ScreenshotService::ResizeUI(Sandbox.CameraComponent,Vector2)
+IL_021d: ldloc.1
+IL_021e: call System.Boolean Sandbox.SandboxSystemExtensions::IsValid(Sandbox.IValid)
+IL_0223: brfalse.s IL_022c
+IL_0225: ldloc.1
+IL_0226: ldc.i4.1
+IL_0227: callvirt System.Void Sandbox.CameraComponent::InitializeRendering(System.Boolean)
+IL_022c: endfinally
+IL_022d: ret
+System.Void Sandbox.SceneCamera::.ctor(System.String) public=True
+IL_0000: ldarg.0
+IL_0001: call System.Boolean Sandbox.Graphics::get_IsAvailable()
+IL_0006: brtrue.s IL_000b
+IL_0008: ldnull
+IL_0009: br.s IL_0010
+IL_000b: newobj System.Void Sandbox.ToneMapping::.ctor()
+IL_0010: stfld Sandbox.ToneMapping Sandbox.SceneCamera::ToneMapping
+IL_0015: ldarg.0
+IL_0016: newobj System.Void Sandbox.TokenBasedTagSet::.ctor()
+IL_001b: stfld Sandbox.ITagSet Sandbox.SceneCamera::<ExcludeTags>k__BackingField
+IL_0020: ldarg.0
+IL_0021: newobj System.Void Sandbox.TokenBasedTagSet::.ctor()
+IL_0026: stfld Sandbox.ITagSet Sandbox.SceneCamera::<RenderTags>k__BackingField
+IL_002b: ldarg.0
+IL_002c: ldc.r4 512
+IL_0031: ldc.r4 512
+IL_0036: newobj System.Void Vector2::.ctor(System.Single,System.Single)
+IL_003b: stfld Vector2 Sandbox.SceneCamera::_size
+IL_0040: ldarg.0
+IL_0041: newobj System.Void Sandbox.VolumetricFogParameters::.ctor()
+IL_0046: stfld Sandbox.VolumetricFogParameters Sandbox.SceneCamera::<VolumetricFog>k__BackingField
+IL_004b: ldarg.0
+IL_004c: newobj System.Void Sandbox.CubemapFogController::.ctor()
+IL_0051: stfld Sandbox.CubemapFogController Sandbox.SceneCamera::<CubemapFog>k__BackingField
+IL_0056: ldarg.0
+IL_0057: ldc.i4.1
+IL_0058: stfld System.Boolean Sandbox.SceneCamera::<FrustumDirty>k__BackingField
+IL_005d: ldarg.0
+IL_005e: newobj System.Void System.Collections.Generic.HashSet`1<Sandbox.SceneWorld>::.ctor()
+IL_0063: stfld System.Collections.Generic.HashSet`1<Sandbox.SceneWorld> Sandbox.SceneCamera::_worlds
+IL_0068: ldarg.0
+IL_0069: newobj System.Void Transform::.ctor()
+IL_006e: stfld Transform Sandbox.SceneCamera::_transform
+IL_0073: ldarg.0
+IL_0074: ldc.r4 90
+IL_0079: stfld System.Single Sandbox.SceneCamera::_fov
+IL_007e: ldarg.0
+IL_007f: ldc.r4 100000
+IL_0084: stfld System.Single Sandbox.SceneCamera::_zfar
+IL_0089: ldarg.0
+IL_008a: ldc.r4 1
+IL_008f: stfld System.Single Sandbox.SceneCamera::_znear
+IL_0094: ldarg.0
+IL_0095: ldc.i4 1023
+IL_009a: stfld Sandbox.ClearFlags Sandbox.SceneCamera::<ClearFlags>k__BackingField
+IL_009f: ldarg.0
+IL_00a0: call Vector2 Vector2::get_Zero()
+IL_00a5: stloc.0
+IL_00a6: ldloca.s V_0
+IL_00a8: call Vector2 Vector2::get_One()
+IL_00ad: stloc.1
+IL_00ae: ldloca.s V_1
+IL_00b0: newobj System.Void Sandbox.Rect::.ctor(Vector2&,Vector2&)
+IL_00b5: stfld Sandbox.Rect Sandbox.SceneCamera::rect
+IL_00ba: ldarg.0
+IL_00bb: ldsfld Color Color::Transparent
+IL_00c0: stfld Color Sandbox.SceneCamera::<AmbientLightColor>k__BackingField
+IL_00c5: ldarg.0
+IL_00c6: ldc.i4.1
+IL_00c7: stfld System.Boolean Sandbox.SceneCamera::<EnablePostProcessing>k__BackingField
+IL_00cc: ldarg.0
+IL_00cd: ldc.i4.1
+IL_00ce: stfld System.Boolean Sandbox.SceneCamera::<RenderUI>k__BackingField
+IL_00d3: ldarg.0
+IL_00d4: call System.Void System.Object::.ctor()
+IL_00d9: ldarg.0
+IL_00da: newobj System.Void Sandbox.RenderAttributes::.ctor()
+IL_00df: stfld Sandbox.RenderAttributes Sandbox.SceneCamera::<Attributes>k__BackingField
+IL_00e4: ldarg.0
+IL_00e5: ldarg.1
+IL_00e6: call System.Void Sandbox.SceneCamera::set_Name(System.String)
+IL_00eb: ldarg.0
+IL_00ec: call System.Void Sandbox.SceneCamera::InitCommon()
+IL_00f1: ret
+System.Void Sandbox.SceneCamera::ConfigureView(Sandbox.Rendering.ViewSetup&) public=False
+IL_0000: ldarg.0
+IL_0001: ldfld Sandbox.SceneWorld Sandbox.SceneCamera::_world
+IL_0006: call System.Boolean Sandbox.SandboxSystemExtensions::IsValid(Sandbox.IValid)
+IL_000b: brfalse.s IL_002b
+IL_000d: call System.Boolean Sandbox.Graphics::get_IsActive()
+IL_0012: brtrue.s IL_002b
+IL_0014: ldarg.0
+IL_0015: ldfld Sandbox.SceneWorld Sandbox.SceneCamera::_world
+IL_001a: ldarg.0
+IL_001b: call Vector3 Sandbox.SceneCamera::get_Position()
+IL_0020: ldarg.0
+IL_0021: call System.Single Sandbox.SceneCamera::get_ZFar()
+IL_0026: callvirt System.Void Sandbox.SceneWorld::UpdateObjectsForRendering(Vector3,System.Single)
+IL_002b: ret
+Sandbox.TonemapSystem Sandbox.SceneCamera::get_Tonemap() public=False
+IL_0000: ldarg.0
+IL_0001: ldfld Sandbox.TonemapSystem Sandbox.SceneCamera::<Tonemap>k__BackingField
+IL_0006: ret

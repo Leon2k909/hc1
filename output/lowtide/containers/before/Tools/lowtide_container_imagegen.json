@@ -1,0 +1,18 @@
+{
+  "mode": "built-in image_gen",
+  "purpose": "Lowtide red freight-container texture replacement",
+  "source_asset": "Assets/materials/lowtide/containers/lt_container_red_color.png",
+  "source_dimensions": [
+    1254,
+    1254
+  ],
+  "albedo_handling": "Generated PNG copied byte-for-byte; no painted edits or recolouring.",
+  "surface_maps": "2048x2048 OpenGL normal preserving existing corrugation; roughness and exposed-steel metalness derived from a power-of-two numerical sample of the generated colour. Original albedo PNG remains unchanged.",
+  "tile_inches": 48,
+  "scope": "Lowtide west dressing's red container material; generator retains the override.",
+  "prompt": "Use case: photorealistic-natural\nAsset type: production game PBR base-color texture, seamless square 2048x2048 tile.\nPrimary request: a convincing weathered oxblood / faded brick-red industrial painted steel surface for a freight shipping container on a British tidal dock.\nSubject: ONLY the material surface, representing a 1.22 metre square patch of flat painted steel. Red paint remains on about 85 percent of the surface. Its aged surface has irregular, crisp small paint chips exposing dark steel and dark orange-brown rust, a handful of medium scrapes with chipped edges, fine hairline scratches, scattered oxidized pits, salt-spray speckling and subtle downward rust bleeds. Weathering should feel naturally accumulated at a dock, with varied scales and clear close-range detail. Paint has slight desaturation and patchy fading, matte to satin finish. Restrained dark rusty marks rather than large orange patches. The detail must still read at a 512-pixel mip.\nStyle/medium: photorealistic texture scan, straight-on orthographic, physically believable surface.\nComposition/framing: continuous edge-to-edge surface; perfectly seamless repeat on left/right and top/bottom; fairly even distribution of wear, no large central focal patch.\nLighting/mood: flat neutral diffuse illumination suitable for albedo; no directional highlights, cast shadows, baked ambient occlusion or gradients.\nColor palette: muted deep industrial red, slight dusty pale red fading, dark brown-orange corrosion, dark grey exposed steel. No white salt crust or large white patches.\nConstraints: create a NEW texture, no scene, no container perspective, no surroundings, no ground, no doors, no borders, no corrugation or ribs or panel seams because geometry and a separate normal map supply those; no hinges, handles, rods, rivets, hardware, labels, writing, logos or watermark. No repeating regular procedural stripes. Opaque square image.",
+  "validation": "Native s&box material and model compilation passed. Loaded material-error=False; colour and normal textures are 2048x2048 with 10 mips; specular and metalness-texture features enabled. Front and side Lowtide renders inspected. Original generated image bytes, normal lengths, single material remap, retained model/collision content, generator mapping and 48-inch UV scale verified.",
+  "native_report": "output/lowtide/container-pass/native-material.txt",
+  "front_render": "output/lowtide/shipyard/container-after.png",
+  "side_render": "output/lowtide/shipyard/container-side.png"
+}

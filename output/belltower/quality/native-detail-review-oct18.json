@@ -1,0 +1,289 @@
+{
+  "status": "Native comparisons reviewed; neither trial promoted.",
+  "installed_unreferenced_assets": {
+    "forest-detail-v1": [
+      "shaders/belltower_forest_detail_trial.shader",
+      "materials/belltower/forest/trials/forest_detail_v1.vmat"
+    ],
+    "ground-edge-v1": [
+      "materials/belltower/ground-edge-v1/ground_edge.png",
+      "materials/belltower/ground-edge-v1/ground_edge.vmat",
+      "models/maps/belltower/ground-edge-v1/belltower_ground_edge_east.mtl",
+      "models/maps/belltower/ground-edge-v1/belltower_ground_edge_east.obj",
+      "models/maps/belltower/ground-edge-v1/belltower_ground_edge_east.vmdl",
+      "models/maps/belltower/ground-edge-v1/belltower_ground_edge_west.mtl",
+      "models/maps/belltower/ground-edge-v1/belltower_ground_edge_west.obj",
+      "models/maps/belltower/ground-edge-v1/belltower_ground_edge_west.vmdl",
+      "shaders/belltower_ground_edge_trial.shader"
+    ]
+  },
+  "native_shader_compilation_verified": true,
+  "loaded_forest_calibration_verified": true,
+  "forest_colour": {
+    "views": [
+      {
+        "view": "west-ridge",
+        "before": "output/belltower/quality/forest-detail-v1-native-baseline-current/west-ridge.png",
+        "after": "output/belltower/quality/forest-detail-v1-native-candidate/west-ridge.png",
+        "before_sha256": "ce9cec7af82cf17f034c5ad4e335e1b610f1b4558fcf123a27757d28d8ab323e",
+        "after_sha256": "e9ec4049b51cd03e75d1a7e87f8a026d7b6cfaa2bb7df01eb0db320dea829f0c",
+        "matched_inputs": true,
+        "source_scene_sha256": "5ea26d816c6b752225a5bd4ea2d761ba2791543c1ab7c89682f98d54219b373d",
+        "capture_helper_sha256": "ca8b36da7a2c26b051cdd3249092ba477588572e9871914357477a9bf7cdeec1",
+        "temporary_forest_slots": 88,
+        "temporary_ground_models": 0,
+        "restoration_verified": true
+      },
+      {
+        "view": "west-ridge-detail",
+        "before": "output/belltower/quality/forest-detail-v1-native-baseline-current/west-ridge-detail.png",
+        "after": "output/belltower/quality/forest-detail-v1-native-candidate/west-ridge-detail.png",
+        "before_sha256": "60e0829260463ae0421ecf065a97c751e1bed81a49c142aa23fb16afcded778f",
+        "after_sha256": "bd7449523f2371cd4787466e862788d33f4b19774865c676172829d53bbd15ea",
+        "matched_inputs": true,
+        "source_scene_sha256": "5ea26d816c6b752225a5bd4ea2d761ba2791543c1ab7c89682f98d54219b373d",
+        "capture_helper_sha256": "ca8b36da7a2c26b051cdd3249092ba477588572e9871914357477a9bf7cdeec1",
+        "temporary_forest_slots": 88,
+        "temporary_ground_models": 0,
+        "restoration_verified": true
+      },
+      {
+        "view": "valley",
+        "before": "output/belltower/quality/forest-detail-v1-native-baseline-current/valley.png",
+        "after": "output/belltower/quality/forest-detail-v1-native-candidate/valley.png",
+        "before_sha256": "793ec1b33e747b141d3489a5ab9e25bc8f7c0b1b54bda63aa9763292d8df9c7d",
+        "after_sha256": "14767f71f8a845afca6412c246bef341c4af76b008d5828f920516c657c6e612",
+        "matched_inputs": true,
+        "source_scene_sha256": "5ea26d816c6b752225a5bd4ea2d761ba2791543c1ab7c89682f98d54219b373d",
+        "capture_helper_sha256": "ca8b36da7a2c26b051cdd3249092ba477588572e9871914357477a9bf7cdeec1",
+        "temporary_forest_slots": 88,
+        "temporary_ground_models": 0,
+        "restoration_verified": true
+      },
+      {
+        "view": "terrace",
+        "before": "output/belltower/quality/forest-detail-v1-native-baseline-current/terrace.png",
+        "after": "output/belltower/quality/forest-detail-v1-native-candidate/terrace.png",
+        "before_sha256": "c6f5154e0701457b6b7b961ee3dbfc27fc70f565caa0963529a8d6677163a742",
+        "after_sha256": "4024825e880100eb2c27eaef4840c55ef253f9574634f8b18901e9fa6ddddf66",
+        "matched_inputs": true,
+        "source_scene_sha256": "5ea26d816c6b752225a5bd4ea2d761ba2791543c1ab7c89682f98d54219b373d",
+        "capture_helper_sha256": "ca8b36da7a2c26b051cdd3249092ba477588572e9871914357477a9bf7cdeec1",
+        "temporary_forest_slots": 88,
+        "temporary_ground_models": 0,
+        "restoration_verified": true
+      }
+    ],
+    "blend_zero_controls": [
+      {
+        "view": "west-ridge",
+        "before": "output/belltower/quality/forest-detail-v1-native-baseline-current/west-ridge.png",
+        "after": "output/belltower/quality/forest-detail-v1-native-null/west-ridge.png",
+        "before_sha256": "ce9cec7af82cf17f034c5ad4e335e1b610f1b4558fcf123a27757d28d8ab323e",
+        "after_sha256": "81c98c459f1cef6f8ed154d0dc826b857fcab3892e695adda53c95875feec73e",
+        "matched_inputs": true,
+        "source_scene_sha256": "5ea26d816c6b752225a5bd4ea2d761ba2791543c1ab7c89682f98d54219b373d",
+        "capture_helper_sha256": "ca8b36da7a2c26b051cdd3249092ba477588572e9871914357477a9bf7cdeec1",
+        "temporary_forest_slots": 88,
+        "temporary_ground_models": 0,
+        "restoration_verified": true
+      },
+      {
+        "view": "valley",
+        "before": "output/belltower/quality/forest-detail-v1-native-baseline-current/valley.png",
+        "after": "output/belltower/quality/forest-detail-v1-native-null/valley.png",
+        "before_sha256": "793ec1b33e747b141d3489a5ab9e25bc8f7c0b1b54bda63aa9763292d8df9c7d",
+        "after_sha256": "3f9706e5a31bd41d1ccca5b72f9b7cabe3f77942ccc5651e05fd64335b199a80",
+        "matched_inputs": true,
+        "source_scene_sha256": "5ea26d816c6b752225a5bd4ea2d761ba2791543c1ab7c89682f98d54219b373d",
+        "capture_helper_sha256": "ca8b36da7a2c26b051cdd3249092ba477588572e9871914357477a9bf7cdeec1",
+        "temporary_forest_slots": 88,
+        "temporary_ground_models": 0,
+        "restoration_verified": true
+      }
+    ],
+    "repeat_baseline_regions": {
+      "hill": {
+        "mean_abs_rgb_8bit": 0.08293659621802002,
+        "changed_over_3_fraction": 0.00424916573971079
+      },
+      "city": {
+        "mean_abs_rgb_8bit": 0.0519108843537415,
+        "changed_over_3_fraction": 0.0001163265306122449
+      },
+      "sky": {
+        "mean_abs_rgb_8bit": 0.050784615384615386,
+        "changed_over_3_fraction": 0.0
+      }
+    },
+    "blend_zero_regions": {
+      "hill": {
+        "mean_abs_rgb_8bit": 0.06266221727845754,
+        "changed_over_3_fraction": 0.0040489432703003335
+      },
+      "city": {
+        "mean_abs_rgb_8bit": 0.03252925170068027,
+        "changed_over_3_fraction": 0.00010204081632653062
+      },
+      "sky": {
+        "mean_abs_rgb_8bit": 0.025987179487179487,
+        "changed_over_3_fraction": 7.692307692307692e-06
+      }
+    },
+    "review": "Subtle additional crown colour/detail. Distant woodland still forms a noisy pattern; this does not meet the overall quality goal."
+  },
+  "forest_fade": {
+    "views": [
+      {
+        "view": "valley",
+        "before": "output/belltower/quality/forest-detail-v1-native-fade-default/valley.png",
+        "after": "output/belltower/quality/forest-detail-v1-native-fade-10k22k/valley.png",
+        "before_sha256": "6345ace2073e289c34ddcfe6577e38729fa1c59e4bb41c23e2eda2534f5b5d3c",
+        "after_sha256": "b5e99160f8c9053312fcc4d246c88bd162eba7e53fad2e683d8a22f691f54565",
+        "matched_inputs": true,
+        "source_scene_sha256": "5ea26d816c6b752225a5bd4ea2d761ba2791543c1ab7c89682f98d54219b373d",
+        "capture_helper_sha256": "94f3b7c3d279ba5e74e2736005f800591baf1711708a04e5f7836f22999a3925",
+        "temporary_forest_slots": 88,
+        "temporary_ground_models": 0,
+        "restoration_verified": true
+      },
+      {
+        "view": "west-ridge-detail",
+        "before": "output/belltower/quality/forest-detail-v1-native-fade-default/west-ridge-detail.png",
+        "after": "output/belltower/quality/forest-detail-v1-native-fade-10k22k/west-ridge-detail.png",
+        "before_sha256": "d44d1ffe2f3681f6672ace6a0475c76d5552beb4a21664d488bf7ec996f5fba2",
+        "after_sha256": "7e38cfba15028b35d15c0ae4fa75ce1f5094d6cb9839915758e25fe78fa88378",
+        "matched_inputs": true,
+        "source_scene_sha256": "5ea26d816c6b752225a5bd4ea2d761ba2791543c1ab7c89682f98d54219b373d",
+        "capture_helper_sha256": "94f3b7c3d279ba5e74e2736005f800591baf1711708a04e5f7836f22999a3925",
+        "temporary_forest_slots": 88,
+        "temporary_ground_models": 0,
+        "restoration_verified": true
+      }
+    ],
+    "tested_range": [
+      10000,
+      22000
+    ],
+    "accepted": false,
+    "review": "Reject: the near ridge exposes a conspicuous boundary between cards and the underlying landscape."
+  },
+  "ground_edges": {
+    "views": [
+      {
+        "view": "ground-edge-close",
+        "before": "output/belltower/quality/ground-edge-v1-native-visible-baseline/ground-edge-close.png",
+        "after": "output/belltower/quality/ground-edge-v1-native-visible-candidate/ground-edge-close.png",
+        "before_sha256": "3c4a2c609462e1fdc1ae56d8216933e813dce1c8e72bc0b5245fa463086e6c84",
+        "after_sha256": "206d045843ae23706dba966c2b47f6153a95e165d8e6006d93633ea3007c88bf",
+        "matched_inputs": true,
+        "source_scene_sha256": "5ea26d816c6b752225a5bd4ea2d761ba2791543c1ab7c89682f98d54219b373d",
+        "capture_helper_sha256": "94f3b7c3d279ba5e74e2736005f800591baf1711708a04e5f7836f22999a3925",
+        "temporary_forest_slots": 0,
+        "temporary_ground_models": 2,
+        "restoration_verified": true
+      },
+      {
+        "view": "ground-edge",
+        "before": "output/belltower/quality/ground-edge-v1-native-fixed-wide-baseline/ground-edge.png",
+        "after": "output/belltower/quality/ground-edge-v1-native-fixed-wide-candidate/ground-edge.png",
+        "before_sha256": "0ae7dfad3588a5f1bbcf2e22a4dbd094aaac5e54e66c89ab6491636f02a9aade",
+        "after_sha256": "950514ef81dec92c59a55543da75b5d5fac025644763636f11c1ac73accc7d03",
+        "matched_inputs": true,
+        "source_scene_sha256": "5ea26d816c6b752225a5bd4ea2d761ba2791543c1ab7c89682f98d54219b373d",
+        "capture_helper_sha256": "613d00218c3d9039e7fe46d7fa17cbe054322799e30de024e37158d37c1fff96",
+        "temporary_forest_slots": 0,
+        "temporary_ground_models": 2,
+        "restoration_verified": true
+      },
+      {
+        "view": "ground-edge-sunlit",
+        "before": "output/belltower/quality/ground-edge-v1-native-fixed-sunlit-baseline/ground-edge-sunlit.png",
+        "after": "output/belltower/quality/ground-edge-v1-native-fixed-sunlit-candidate/ground-edge-sunlit.png",
+        "before_sha256": "a6e60c48132f89c63b9c9a09509c0ce30ed3281728f4ce4f169f51124b04a2e0",
+        "after_sha256": "0776c6e680432bb9d47db084513e19f3baddba1326ca7436e7be6a163cb1e645",
+        "matched_inputs": true,
+        "source_scene_sha256": "5ea26d816c6b752225a5bd4ea2d761ba2791543c1ab7c89682f98d54219b373d",
+        "capture_helper_sha256": "613d00218c3d9039e7fe46d7fa17cbe054322799e30de024e37158d37c1fff96",
+        "temporary_forest_slots": 0,
+        "temporary_ground_models": 2,
+        "restoration_verified": true
+      },
+      {
+        "view": "ground-edge-sunlit-close",
+        "before": "output/belltower/quality/ground-edge-v1-native-fixed-sunlit-baseline/ground-edge-sunlit-close.png",
+        "after": "output/belltower/quality/ground-edge-v1-native-fixed-sunlit-candidate/ground-edge-sunlit-close.png",
+        "before_sha256": "543afef9493e5a3475c510104df7b20bd3d0543b2fe4db96617b522bfbe1c0af",
+        "after_sha256": "5554b76d9254d89d13e3f3a0ecd16ce761339f23e0e034d602151e099c6e720a",
+        "matched_inputs": true,
+        "source_scene_sha256": "5ea26d816c6b752225a5bd4ea2d761ba2791543c1ab7c89682f98d54219b373d",
+        "capture_helper_sha256": "613d00218c3d9039e7fe46d7fa17cbe054322799e30de024e37158d37c1fff96",
+        "temporary_forest_slots": 0,
+        "temporary_ground_models": 2,
+        "restoration_verified": true
+      }
+    ],
+    "accepted": false,
+    "review": "Reject for saved-map use: shaded close and contextual views are unobstructed, but the new sunlit pair exposes a flat tan gravel strip that bridges the cobble relief. Broken alpha edges alone do not establish convincing contact.",
+    "source_revalidation": {
+      "status": "Provenance refreshed after byte-identical regeneration.",
+      "previous_manifest_sha256": "e4b14ed144f0fa0798591a740bc84d3e2c5baeca719555c2373910ffd1cbb904",
+      "manifest_sha256": "246d059772e70f66426a9ad0144640e5550b924b5bff22550a550c83f139b33b",
+      "source_drift": {
+        "Tools/belltower_map.py": {
+          "before": "92816f7998f08a3ef5251ec5f5f2b030149bf46a8c508bb659581fe2b3fceacc",
+          "after": "9f3d37dda2cff669282f13efa248c8cfbbb0253d44cf3fb99e5f8f6d18df0f37"
+        }
+      },
+      "archived_provenance": [
+        "output/belltower/quality/ground-edge-v1/provenance-e4b14ed144f0/manifest.json",
+        "output/belltower/quality/ground-edge-v1/provenance-e4b14ed144f0/geometry-checks.json",
+        "output/belltower/quality/ground-edge-v1/provenance-e4b14ed144f0/native-import-result.json"
+      ],
+      "regenerated_trial_files_identical": 9,
+      "frontages_identical": true,
+      "placements_identical": true,
+      "accepted_assets_written": false,
+      "trial_assets_written": false,
+      "native_revalidation_required": true
+    },
+    "fixed_exposure_scope": "New contextual and sunlit comparisons temporarily use ACES exposure 2. Tone and original scene object identities were restored.",
+    "invalid_views": [
+      {
+        "before": "ground-edge-v1-native-baseline/ground-edge.png",
+        "after": "ground-edge-v1-native-candidate/ground-edge.png",
+        "reason": "Market stand obstructs the deposit."
+      },
+      {
+        "before": "ground-edge-v1-native-baseline/ground-edge-close.png",
+        "after": "ground-edge-v1-native-candidate/ground-edge-close.png",
+        "reason": "Review camera intersects the market stand."
+      },
+      {
+        "before": "ground-edge-v1-native-visible-baseline/ground-edge.png",
+        "after": "ground-edge-v1-native-visible-candidate/ground-edge.png",
+        "reason": "Wider eye point intersects a wall."
+      }
+    ],
+    "remaining": [
+      "Redesign the ground contact treatment before promotion; the current flat albedo mesh fails the sunlit review.",
+      "Recheck distance fade and gameplay performance after that redesign."
+    ]
+  },
+  "performance": {
+    "verified": false,
+    "reason": "The runtime player camera moved, then the shared editor switched from Belltower to Ares. No fair A/B timing was completed."
+  },
+  "cleanup": {
+    "OriginalRuntimeSceneStillActive": false,
+    "OwnedComparisonRootRemoved": false,
+    "EditorComparisonObjectsRemaining": 0,
+    "CurrentScene": "ares",
+    "GamePreserved": true,
+    "SelectedDocumentPreserved": true,
+    "SourceSceneWritten": false
+  },
+  "accepted_scene_changed": false,
+  "gameplay_performance_verified": false,
+  "overall_quality_goal_complete": false
+}

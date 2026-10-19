@@ -1,0 +1,10 @@
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor&&s.Scene.Source?.ResourcePath=="scenes/maps/lowtide/lowtide.scene");
+var reflection=session.Scene.GetAllComponents<Facepunch.LowtideWaterReflections>().Single();
+var water=reflection.GetComponent<ModelRenderer>();
+var materials=water.Model.Materials.Select(m=>new{m.ResourcePath,m.ShaderName,m.IsError}).ToArray();
+if(materials.Length!=1||materials[0].ShaderName!="shaders/hc1_lowtide_water_filtered.shader"||materials[0].IsError)throw new Exception("Production water shader is not loaded");
+if(water.Model.ResourcePath!="models/maps/lowtide/lowtide_water.vmdl")throw new Exception("Water still uses review model");
+var report=new{TimeUtc=DateTime.UtcNow,Model=water.Model.ResourcePath,Materials=materials,Game.IsPlaying,ActiveScene=Editor.SceneEditorSession.Active?.Scene.Source?.ResourcePath,session.HasUnsavedChanges};
+var folder=System.IO.Path.Combine(Project.Current.GetRootPath(),"output/lowtide/quality-pass/native-2026-10-18/water-reflection");
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"production-readback.json"),System.Text.Json.JsonSerializer.Serialize(report,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return report;

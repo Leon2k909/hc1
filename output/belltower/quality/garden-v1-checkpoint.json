@@ -1,0 +1,51 @@
+{
+  "state": "native comparisons captured; shed cladding overlap correction staged as garden-v2",
+  "models": [
+    {
+      "name": "belltower_west",
+      "triangles": 996123,
+      "boxes": 457,
+      "hulls": 116,
+      "physics_sha256": "701d5de6e33415fb8689379345575195912ce41f274e57daf93ac744fd63ba61",
+      "first_material": "materials/belltower/ashlar.vmat",
+      "first_material_triangles": 10681,
+      "new_material": "materials/gunsmith_range/bench_oak_endgrain.vmat"
+    },
+    {
+      "name": "belltower_east",
+      "triangles": 996123,
+      "boxes": 457,
+      "hulls": 116,
+      "physics_sha256": "0096ac4ed787521a92e3c48f6a364da6b2092712d047371644dbc6c46bc15b67",
+      "first_material": "materials/belltower/ashlar.vmat",
+      "first_material_triangles": 10681,
+      "new_material": "materials/gunsmith_range/bench_oak_endgrain.vmat"
+    }
+  ],
+  "files": 6,
+  "gameplay_spots": 94,
+  "geometry_checks": 11,
+  "shared_random_sequence_preserved": true,
+  "native_assets_replaced": true,
+  "capture_views": [
+    "terrace",
+    "coping",
+    "garden-shed",
+    "small-shed",
+    "garden-store",
+    "firewood",
+    "wheelbarrow"
+  ],
+  "native_import": "Sources/Belltower/editor/import-gardens.cs.txt",
+  "native_verify": "Sources/Belltower/editor/verify-gardens.cs.txt",
+  "manifest_sha256": "362378637b63f138fafd4b7a15f698659f7646d258ea81e353b328552f7ec2ff",
+  "editor_window": "Seven captures completed; saved Cerro Blanco restored with play stopped and compilation clean. Editor released.",
+  "native_resources": "output/belltower/quality/models/garden-v1/native-resources.json",
+  "baseline_complete": true,
+  "next_steps": [
+    "Build and import garden-v2 in the next coordinated editor window.",
+    "Compile both models and recapture matching native views.",
+    "Accept only after the surface overlap correction passes visual review."
+  ],
+  "review_defect": "Large shed cladding and corner/bottom trim have coplanar exterior faces; separate those planes before accepting."
+}

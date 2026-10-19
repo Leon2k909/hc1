@@ -1,0 +1,1 @@
+﻿var root=Sandbox.Project.Current.GetRootPath();var p=System.IO.Path.Combine(root,"Assets/scenes/maps/Riverdale/riverdale.scene");var a=Editor.AssetSystem.FindByPath(p)??Editor.AssetSystem.RegisterFile(p);return new {Ok=a?.Compile(true),Failed=a?.IsCompileFailed};

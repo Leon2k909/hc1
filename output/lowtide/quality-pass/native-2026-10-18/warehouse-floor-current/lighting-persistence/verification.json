@@ -1,0 +1,48 @@
+{
+  "status": "saved_v4_lighting_verified_after_scene_reload",
+  "scene_sha256": "654c2998e269ee523b0e19e5392920b32d8e6131d8041634bd58a1fac6034f3b",
+  "reviewed_loaded_views": [
+    {
+      "path": "output/lowtide/quality-pass/native-2026-10-18/warehouse-floor-current/lighting-persistence/east-upper.png",
+      "sha256": "7c92fab35dcd076f21777b56f223d82fb9f14f0dfb5783caa5464726e51e7c53",
+      "position": "440,-700,240",
+      "angles": "12,30,0"
+    },
+    {
+      "path": "output/lowtide/quality-pass/native-2026-10-18/warehouse-floor-current/lighting-persistence/east-ground.png",
+      "sha256": "1812014c080d95ec15084a8242c29c09a741b085101f1c66f9b5a8d51a3bb811",
+      "position": "-220,-700,64",
+      "angles": "12,18,0"
+    },
+    {
+      "path": "output/lowtide/quality-pass/native-2026-10-18/warehouse-floor-current/lighting-persistence/west-upper.png",
+      "sha256": "ec7a557ee9e791a931639d2cbec3ae6c986998b7b2398797e6d56183aa7f347d",
+      "position": "440,700,240",
+      "angles": "12,-30,0"
+    }
+  ],
+  "loaded_volumes": [
+    {
+      "Name": "Warehouse East Bounced Light",
+      "Enabled": true,
+      "Active": true,
+      "BakeVersion": 1,
+      "Path": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-east-v4/irradiance.vtex",
+      "Error": false
+    },
+    {
+      "Name": "Warehouse West Bounced Light",
+      "Enabled": true,
+      "Active": true,
+      "BakeVersion": 1,
+      "Path": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-west-v4/irradiance.vtex",
+      "Error": false
+    }
+  ],
+  "stale_editor_state": "After swapping baked texture paths the existing volumes needed reactivation. The saved scene then reloaded with both v4 volumes active and contributing, without reactivation.",
+  "diagnostic_evidence": "output/lowtide/quality-pass/native-2026-10-18/structure-response/lighting-diagnostic/readback.json",
+  "reload_evidence": "output/lowtide/quality-pass/native-2026-10-18/structure-response/lighting-reload/readback.json",
+  "retired_generated_files_remain_unneeded": true,
+  "scene_source_changed_during_diagnostic": false,
+  "gameplay_performance_verified": false
+}

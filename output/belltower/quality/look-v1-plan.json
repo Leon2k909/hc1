@@ -1,0 +1,38 @@
+{
+  "state": "native comparisons reviewed; exposure comparison inconclusive; no lighting publication",
+  "reference": "Sources/Belltower/visual-target/west-street-target-v1.png",
+  "current_capture": "output/belltower/quality/look-v1-baseline/west-street.png",
+  "observation": "Sunlit paving and plaster are pale compared with the target; evaluate tonal response before changing albedo textures. Distant woodland remains visibly repetitive.",
+  "saved_look": {
+    "mode": "ACES",
+    "minimum_exposure": 1.05,
+    "maximum_exposure": 2.2,
+    "compensation": 0
+  },
+  "variants": {
+    "aces-lower": {
+      "mode": "ACES",
+      "minimum_exposure": 0.7,
+      "maximum_exposure": 1.5
+    },
+    "agx-lower": {
+      "mode": "AgX",
+      "minimum_exposure": 0.7,
+      "maximum_exposure": 1.5
+    },
+    "agx-saved": {
+      "mode": "AgX",
+      "minimum_exposure": 1.05,
+      "maximum_exposure": 2.2
+    }
+  },
+  "views": [
+    "west-street",
+    "east-street",
+    "terrace",
+    "council-hall"
+  ],
+  "scene_sha256": "aef98ef9fc0c4e484f6456f31dccc58f27163eb339e4844ebfa251de0333154a",
+  "method": "Temporary Tonemapping changes within a synchronous scene scope; restore exact serialized component afterward. No publication until native review and gameplay readability check.",
+  "review": "output/belltower/quality/look-v1-review.json"
+}

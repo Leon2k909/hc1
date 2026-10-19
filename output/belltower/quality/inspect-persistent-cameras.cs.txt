@@ -1,0 +1,3 @@
+var scene=Editor.SceneEditorSession.All.Single(s=>s.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase)==true).Scene;
+return new { Cameras=scene.GetAllComponents<CameraComponent>().Select(c=>new {c.Id,c.GameObject.Name,c.GameObject.Flags,c.IsMainCamera,c.Enabled,Scene=c.Scene.Name}).ToArray(),
+SessionMembers=typeof(Editor.SceneEditorSession).GetMembers().Where(m=>m.Name.Contains("View") || m.Name.Contains("Window") || m.Name.Contains("Dock")).Select(m=>m.ToString()).ToArray() };

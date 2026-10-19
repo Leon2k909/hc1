@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-17",
+  "scene": "scenes/maps/lowtide/lowtide.scene",
+  "engine": "26.10.13a",
+  "comparison": {
+    "position": "-1360.79956,-236.104324,180.333176",
+    "angles": "17.800478,-31.4998188,0",
+    "fieldOfView": 80,
+    "method": "Temporary native game camera with the shared effects; native PostProcessSystem.UpdateCamera before RenderToBitmap. Same scene lighting and fog for both profiles.",
+    "accepted": {
+      "tonemapping": "ACES",
+      "extraCameraColorAdjustments": false,
+      "image": "lowtide-camera-aces-neutral.png"
+    },
+    "rejected": {
+      "tonemapping": "AgX",
+      "extraCameraColorAdjustments": true,
+      "contrast": 1.035,
+      "saturation": 0.96,
+      "image": "lowtide-camera-agx-current.png",
+      "reason": "Loss of dark shadow detail and overly strong brick colour in the combined profile."
+    }
+  },
+  "savedAssets": [
+    "Assets/prefabs/player/cameras/default_player_camera.prefab",
+    "Assets/scenes/theater_playback.scene"
+  ],
+  "spawnProtection": {
+    "screenOverlayRemoved": true,
+    "saturationOverrideRemoved": true,
+    "obsoletePrefabPropertyRemoved": true,
+    "invulnerabilityAndTimedToastPreserved": true,
+    "fullSpawnCycleVisuallyTested": false
+  },
+  "validation": {
+    "nativeGameCompilationErrors": 0,
+    "nativeEditorCompilationErrors": 0,
+    "playerAndReplayProfilesMatch": true,
+    "temporaryCameraRemaining": false,
+    "mapAssetEdited": false,
+    "playStartOrStopIssued": false
+  },
+  "limitations": [
+    "The camera comparison is a scene render, not a full gameplay/exposure-transition test.",
+    "The two compared profiles change both tonemapping and the additional colour adjustment; their contributions were not isolated.",
+    "Scope/drone temporal behavior and GPU frame times remain unmeasured.",
+    "The helper's immediate object-set cleanup assertion failed; subsequent native scene inspection confirmed no temporary comparison object remained."
+  ]
+}

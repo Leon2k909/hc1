@@ -1,0 +1,5594 @@
+[
+  {
+    "path": "Assets/scenes/maps/Ares/ares.scene",
+    "title": "Ares",
+    "lighting": [
+      {
+        "object": "Sun",
+        "object_id": "615d6f7a-b3ad-516f-b36b-9ef0f12e5983",
+        "rotation": "-0.0622299,0.1621145,0.3529235,0.9193972",
+        "component": {
+          "__type": "Sandbox.DirectionalLight",
+          "__guid": "0f32b399-9bdc-5128-9c81-3af5da1d9db7",
+          "__enabled": true,
+          "Flags": 0,
+          "ContactShadows": true,
+          "FogMode": "Enabled",
+          "FogStrength": 1,
+          "LightColor": "1.48,1.06,0.75,1",
+          "ShadowBias": 0.0005,
+          "ShadowCascadeCount": 4,
+          "ShadowCascadeSplitRatio": 0.91,
+          "ShadowHardness": 0,
+          "Shadows": true,
+          "SkyColor": "0.13,0.083,0.061,1"
+        }
+      },
+      {
+        "object": "Sky",
+        "object_id": "6a9c479b-b8e5-5481-8dbd-03842ed3bde3",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.SkyBox2D",
+          "__guid": "a9bcbcc6-d945-5fed-a765-916588ebd436",
+          "__enabled": true,
+          "Flags": 0,
+          "SkyIndirectLighting": true,
+          "SkyMaterial": "materials/ares/sky/ares_sky.vmat",
+          "Tint": "1,1,1,1"
+        }
+      },
+      {
+        "object": "Fog",
+        "object_id": "d438a846-e1bb-5ac2-9234-276f848e2024",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.GradientFog",
+          "__guid": "a8a4c48e-d94f-59d0-978a-cf886595a36a",
+          "__enabled": true,
+          "Flags": 0,
+          "Color": "0.59,0.31,0.18,0.68",
+          "StartDistance": 5200,
+          "EndDistance": 68000,
+          "FalloffExponent": 1.55,
+          "Height": 7000,
+          "VerticalFalloffExponent": 1.3
+        }
+      },
+      {
+        "object": "Look",
+        "object_id": "a8777728-11fb-567d-9740-011b946e1c7c",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.ColorGrading",
+          "__guid": "699d416a-70a6-53f8-83a5-cd3e4d8236a4",
+          "__enabled": true,
+          "Flags": 0,
+          "GradingMethod": "TemperatureControl",
+          "ColorTempK": 5800,
+          "BlendFactor": 0.33,
+          "ColorSpace": "None",
+          "LookupTexture": null
+        }
+      },
+      {
+        "object": "Look",
+        "object_id": "a8777728-11fb-567d-9740-011b946e1c7c",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.Tonemapping",
+          "__guid": "33bd5be5-afdb-5834-bb0a-8f58dd9b61da",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 3,
+          "AutoExposureEnabled": true,
+          "ExposureCompensation": 0,
+          "ExposureMethod": "RGB",
+          "MinimumExposure": 1.7,
+          "MaximumExposure": 3.35,
+          "Mode": "ACES",
+          "Rate": 1
+        }
+      },
+      {
+        "object": "Probe Hall",
+        "object_id": "945cf3d1-65f3-5a1b-83e8-5f803ecc06b9",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "f8b4d16c-8cbf-528a-b968-caafe48b7839",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-720,-1100,-300",
+            "Maxs": "900,1100,420"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 8192,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe West Wing",
+        "object_id": "56bdb382-ce60-5fd7-ad7a-a0ab663ab296",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "8012f79c-38e2-5b14-ac3d-87d13f865148",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-720,-434,-220",
+            "Maxs": "720,434,228"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 8192,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe East Wing",
+        "object_id": "0658d701-37ae-5ff5-a000-2e6f8be65338",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "60470648-a5bd-5ebc-921b-4a7121295782",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-720,-434,-220",
+            "Maxs": "720,434,228"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 8192,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe Concourse",
+        "object_id": "0051a57c-750c-5bf4-b64d-71a4782717a4",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "ae51c796-0622-5b53-a0aa-ee7797465c6e",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-324,-2000,-160",
+            "Maxs": "324,2000,160"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 8192,
+          "ZNear": 8
+        }
+      }
+    ]
+  },
+  {
+    "path": "Assets/scenes/maps/Belltower/belltower.scene",
+    "title": "Belltower",
+    "lighting": [
+      {
+        "object": "Sun",
+        "object_id": "6fb3cabd-9226-56a6-9ab4-76296bba626b",
+        "rotation": "0.152763799,0.249287903,-0.499667913,0.815383792",
+        "component": {
+          "__type": "Sandbox.DirectionalLight",
+          "__guid": "99aa3066-b8ee-51ba-b341-ea68056822ee",
+          "__enabled": true,
+          "Flags": 0,
+          "ContactShadows": true,
+          "Contribution": "Diffuse, Specular, Transmissive",
+          "FogMode": "Enabled",
+          "FogStrength": 1,
+          "LightColor": "3.5,3.15,2.65,1",
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "ShadowBias": 0.0005,
+          "ShadowCascadeCount": 4,
+          "ShadowCascadeSplitRatio": 0.91,
+          "ShadowHardness": 0.2,
+          "Shadows": true,
+          "SkyColor": "0.14,0.18,0.24,1",
+          "Visualizer": {}
+        }
+      },
+      {
+        "object": "Sky",
+        "object_id": "fe2737f6-669c-5809-bca7-284ebb840b09",
+        "rotation": "0,0,0.707106829,0.707106829",
+        "component": {
+          "__type": "Sandbox.SkyBox2D",
+          "__guid": "43c17647-0bb2-5a86-8a11-fd1983ffbaf6",
+          "__enabled": true,
+          "Flags": 0,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "SkyIndirectLighting": true,
+          "SkyMaterial": {
+            "Id": "38f77265-e301-4337-9d83-ffa0f5e23bec",
+            "Path": "materials/belltower/sky/afternoon_scan.vmat"
+          },
+          "Tint": "1.3,1.45,1.65,1"
+        }
+      },
+      {
+        "object": "Fog",
+        "object_id": "58b79584-811c-575e-9958-e9d25d1f17a7",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.GradientFog",
+          "__guid": "378a67c7-fb25-50b6-b831-51b91e43a27f",
+          "__enabled": true,
+          "Flags": 0,
+          "Color": "0.32,0.45,0.61,0.6",
+          "EndDistance": 70000,
+          "FalloffExponent": 0.75,
+          "Height": 25000,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "StartDistance": 2000,
+          "VerticalFalloffExponent": 1.2
+        }
+      },
+      {
+        "object": "Look",
+        "object_id": "63f990f2-871d-59f4-bfd6-1f9bd88ee8da",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.ColorGrading",
+          "__guid": "45f44c83-c88d-5336-8058-3f12f1def85e",
+          "__enabled": true,
+          "Flags": 0,
+          "BlendFactor": 0.25,
+          "BlueCurve": [
+            {
+              "x": 0,
+              "y": 0.5,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "ColorSpace": "None",
+          "ColorTempK": 6200,
+          "GradingMethod": "TemperatureControl",
+          "GreenCurve": [
+            {
+              "x": 0,
+              "y": 0.5,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "HueCurve": [
+            {
+              "x": 0,
+              "y": 0.5,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "LookupTexture": null,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "RedCurve": [
+            {
+              "x": 0,
+              "y": 0.5,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "SaturationCurve": [
+            {
+              "x": 0,
+              "y": 0.5,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "ValueCurve": [
+            {
+              "x": 0,
+              "y": 0.5,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ]
+        }
+      },
+      {
+        "object": "Look",
+        "object_id": "63f990f2-871d-59f4-bfd6-1f9bd88ee8da",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.Tonemapping",
+          "__guid": "387d7a11-dbc1-5271-a72b-8e91b2961179",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 3,
+          "AutoExposureEnabled": true,
+          "ExposureCompensation": 0,
+          "ExposureMethod": "RGB",
+          "MaximumExposure": 2.2,
+          "MinimumExposure": 1.05,
+          "Mode": "ACES",
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Rate": 1.5
+        }
+      },
+      {
+        "object": "Square reflection",
+        "object_id": "71ae53b0-e76a-5bca-afdf-1f211de5f344",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "c769e9a9-353c-53c3-bc47-a2e9910d33a6",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": {
+            "Id": "f7f6310d-3b5a-4a5e-a3d6-2f55dce402d7",
+            "Path": "lighting/belltower/daylight-v7/reflection-square.vtex"
+          },
+          "Bounds": {
+            "Mins": "-700,-730,-160",
+            "Maxs": "700,730,650"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.14,
+          "FrameInterval": 5,
+          "MaxDistance": 10000,
+          "Mode": "Baked",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Medium",
+          "Texture": null,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 12000,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "West street reflection",
+        "object_id": "77fcecc0-12b7-51c0-9501-0bbbb4e482dc",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "04b20db2-5c2b-5a89-8044-8c7781861e66",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": {
+            "Id": "8546a898-2160-437b-afc7-08b9e0c4b72a",
+            "Path": "lighting/belltower/daylight-v7/reflection-west.vtex"
+          },
+          "Bounds": {
+            "Mins": "-1300,-800,-170",
+            "Maxs": "1800,900,800"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.14,
+          "FrameInterval": 5,
+          "MaxDistance": 10000,
+          "Mode": "Baked",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Medium",
+          "Texture": null,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 12000,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "East street reflection",
+        "object_id": "0a3fd15c-de6b-5fad-b9f5-878306502200",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "e4375f7c-218a-58f8-b25d-1b74e7c60a41",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": {
+            "Id": "7f218d67-02cb-4bd4-8189-5606eb2d18e9",
+            "Path": "lighting/belltower/daylight-v7/reflection-east.vtex"
+          },
+          "Bounds": {
+            "Mins": "-1300,-900,-170",
+            "Maxs": "1800,800,800"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.14,
+          "FrameInterval": 5,
+          "MaxDistance": 10000,
+          "Mode": "Baked",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Medium",
+          "Texture": null,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 12000,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Town Indirect Light",
+        "object_id": "69023496-4d0e-5d3f-ba52-5a039e931d7c",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.IndirectLightVolume",
+          "__guid": "8037b73f-4e97-55cf-85e8-3d843fbd7b98",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 2,
+          "BakeVersion": 1,
+          "BlendDistance": 120,
+          "Bounds": {
+            "Mins": "-1480,-2400,2",
+            "Maxs": "1880,2400,450"
+          },
+          "DistanceTexture": {
+            "Id": "abe505d3-903a-4b91-b3d7-5fc0613b39af",
+            "Path": "lighting/belltower/daylight-v9/distance.vtex"
+          },
+          "InsideGeometry": "Relocate",
+          "IrradianceTexture": {
+            "Id": "bc53d792-21f4-4f21-809e-a62624ae53e3",
+            "Path": "lighting/belltower/daylight-v9/irradiance.vtex"
+          },
+          "NormalBias": 20,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "ProbeDensity": 8,
+          "RelocationTexture": {
+            "Id": "a69e16a6-9f99-44b3-9b8b-b4baf26ac6c9",
+            "Path": "lighting/belltower/daylight-v9/relocation.vtex"
+          },
+          "RenderExcludeTags": "",
+          "RuntimeContrast": 1,
+          "RuntimeIntensity": 2,
+          "RuntimeSaturation": 1,
+          "RuntimeTint": "1,1,1,1",
+          "ViewBias": 30
+        }
+      }
+    ]
+  },
+  {
+    "path": "Assets/scenes/maps/Boxyard/boxyard.scene",
+    "title": "Boxyard",
+    "lighting": [
+      {
+        "object": "Sun",
+        "object_id": "c591ebea-1873-51b1-a351-9b97dded63dc",
+        "rotation": "0.0424952,0.3227829,-0.1234149,0.9374295",
+        "component": {
+          "__type": "Sandbox.DirectionalLight",
+          "__guid": "30d6e488-dccf-5cef-ab78-0456cf527570",
+          "__enabled": true,
+          "Flags": 0,
+          "ContactShadows": true,
+          "FogMode": "Enabled",
+          "FogStrength": 1,
+          "LightColor": "1.32,1.08,0.82,1",
+          "ShadowBias": 0.0005,
+          "ShadowCascadeCount": 4,
+          "ShadowCascadeSplitRatio": 0.91,
+          "ShadowHardness": 0,
+          "Shadows": true,
+          "SkyColor": "0.42,0.48,0.58,1"
+        }
+      },
+      {
+        "object": "Sky",
+        "object_id": "17ef4407-65ea-548b-9675-f861345931cd",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.SkyBox2D",
+          "__guid": "2ad7c381-34b8-53b7-b48e-d857659e7c0b",
+          "__enabled": true,
+          "Flags": 0,
+          "SkyIndirectLighting": true,
+          "SkyMaterial": "materials/railhead/sky/railhead_sky.vmat",
+          "Tint": "1,1,1,1"
+        }
+      },
+      {
+        "object": "Fog",
+        "object_id": "cc64534c-e786-5c55-b9b7-566975771ffe",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.GradientFog",
+          "__guid": "45b00e0a-d317-57f2-badd-8b002f30ec30",
+          "__enabled": true,
+          "Flags": 0,
+          "Color": "0.351,0.594,1.048,0.75",
+          "StartDistance": 2500,
+          "EndDistance": 40000,
+          "FalloffExponent": 1.5,
+          "Height": 9000,
+          "VerticalFalloffExponent": 1.2
+        }
+      },
+      {
+        "object": "Look",
+        "object_id": "8d426413-1958-5f73-986e-88f1b1056bf7",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.ColorGrading",
+          "__guid": "9900ba29-c2ea-5693-8452-88a8e573f916",
+          "__enabled": true,
+          "Flags": 0,
+          "GradingMethod": "TemperatureControl",
+          "ColorTempK": 5900,
+          "BlendFactor": 0.45,
+          "ColorSpace": "None",
+          "LookupTexture": null
+        }
+      },
+      {
+        "object": "Look",
+        "object_id": "8d426413-1958-5f73-986e-88f1b1056bf7",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.Tonemapping",
+          "__guid": "36de39c9-44cc-5fbe-85dc-496718c2ce9e",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 3,
+          "AutoExposureEnabled": true,
+          "ExposureCompensation": 0,
+          "ExposureMethod": "RGB",
+          "MinimumExposure": 2.0,
+          "MaximumExposure": 3,
+          "Mode": "ACES",
+          "Rate": 1
+        }
+      },
+      {
+        "object": "Probe Yard",
+        "object_id": "d03ed993-ba06-5e0e-973a-5b5f2d90461b",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "a5febb7e-dfdc-576d-a312-0eeba53b7e22",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-832,-800,-120",
+            "Maxs": "832,800,300"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe North Row Open",
+        "object_id": "3f79db19-f25d-5ee5-8fd3-96cf9aea859a",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "184efadb-eba9-5d28-8ccb-2964c8609d8b",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-46,-115.8,-44",
+            "Maxs": "46,115.8,50"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe South Row Open",
+        "object_id": "47ecc871-6bb7-5a65-adcf-63f17bcff125",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "9d447029-6d3e-5567-bd63-58aeae71d0b4",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-46,-115.8,-44",
+            "Maxs": "46,115.8,50"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe South East Outer",
+        "object_id": "f9b7b0ce-d28e-50e1-bd1a-5810a026e5ab",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "08b3202f-0ced-5038-ab29-ba0128fd8ae2",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-115.8,-46,-44",
+            "Maxs": "115.8,46,50"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe South West Inner",
+        "object_id": "1e303dd3-dc48-569d-8414-0b44b3c1ddb9",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "ca749e60-f0fc-589e-ba52-c95ddeab119c",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-115.8,-46,-44",
+            "Maxs": "115.8,46,50"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe North West Outer",
+        "object_id": "cf636d0a-62f4-5672-aeb6-fe7c7f3eee20",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "f919f6cd-443f-51ef-824f-ad43cd70b52f",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-115.8,-46,-44",
+            "Maxs": "115.8,46,50"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe North East Inner",
+        "object_id": "96328aaf-5976-566f-b24a-2c798248816e",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "c09921df-f75f-51fe-9e07-08bcdb0d1bd1",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-115.8,-46,-44",
+            "Maxs": "115.8,46,50"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      }
+    ]
+  },
+  {
+    "path": "Assets/scenes/maps/CerroBlanco/cerroblanco.scene",
+    "title": "Cerro Blanco",
+    "lighting": [
+      {
+        "object": "Sun",
+        "object_id": "4f2d1c09-6394-5845-ae1b-b2970bfe0d73",
+        "rotation": "0.1527638,0.2492879,-0.4996679,0.8153838",
+        "component": {
+          "__type": "Sandbox.DirectionalLight",
+          "__guid": "dd08bc88-2127-5aca-9b2e-a78be92543ea",
+          "__enabled": true,
+          "Flags": 0,
+          "ContactShadows": true,
+          "FogMode": "Enabled",
+          "FogStrength": 1,
+          "LightColor": "1.45,1.27,1.03,1",
+          "ShadowBias": 0.0005,
+          "ShadowCascadeCount": 4,
+          "ShadowCascadeSplitRatio": 0.91,
+          "ShadowHardness": 0,
+          "Shadows": true,
+          "SkyColor": "0.22,0.28,0.36,1"
+        }
+      },
+      {
+        "object": "Sky",
+        "object_id": "aec5b8cc-b9ed-5a15-803e-51dc41cefd6f",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.SkyBox2D",
+          "__guid": "aa2ead2d-170a-5aff-bb12-f989bd22ee29",
+          "__enabled": true,
+          "Flags": 0,
+          "SkyIndirectLighting": true,
+          "SkyMaterial": "materials/cerroblanco/sky/cerroblanco_sky.vmat",
+          "Tint": "1,1,1,1"
+        }
+      },
+      {
+        "object": "Fog",
+        "object_id": "b0082b8b-2dac-5add-bd93-b7bcc6981cf0",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.GradientFog",
+          "__guid": "ad0dc6fe-d4bf-5a58-b819-a56e472af806",
+          "__enabled": true,
+          "Flags": 0,
+          "Color": "0.351,0.594,1.048,0.75",
+          "StartDistance": 3000,
+          "EndDistance": 60000,
+          "FalloffExponent": 1.5,
+          "Height": 9000,
+          "VerticalFalloffExponent": 1.2
+        }
+      },
+      {
+        "object": "Look",
+        "object_id": "794ad024-d925-55d5-ba89-137ac71b2c6d",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.ColorGrading",
+          "__guid": "af0610cb-17e3-5b0b-b9d3-f5193a39b557",
+          "__enabled": true,
+          "Flags": 0,
+          "GradingMethod": "TemperatureControl",
+          "ColorTempK": 6100,
+          "BlendFactor": 0.4,
+          "ColorSpace": "None",
+          "LookupTexture": null
+        }
+      },
+      {
+        "object": "Look",
+        "object_id": "794ad024-d925-55d5-ba89-137ac71b2c6d",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.Tonemapping",
+          "__guid": "46cfcf9c-fd4e-5bc0-81d5-7ab9d5d7f02d",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 3,
+          "AutoExposureEnabled": true,
+          "ExposureCompensation": 0,
+          "ExposureMethod": "RGB",
+          "MinimumExposure": 2,
+          "MaximumExposure": 4.5,
+          "Mode": "ACES",
+          "Rate": 1.5
+        }
+      },
+      {
+        "object": "Probe West Gallery",
+        "object_id": "ed5319f4-af6a-5973-a2e3-f21e999a5f45",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "9263c845-ccba-58b2-a554-f22e01c49d96",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-792,-212,-150",
+            "Maxs": "842,228,194"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 1,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": {
+            "Id": "153d9ca9-5da3-4335-abd7-3f18e973e4a7",
+            "Path": "lighting/cerroblanco/daylight-v1/reflection_0.vtex"
+          },
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe West Gallery North",
+        "object_id": "0a4efecb-8793-5ae8-853a-dd3c19041cb1",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "a7ebfd57-879b-584e-b07a-9f6544cfe2db",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-212,-212,-150",
+            "Maxs": "212,238,194"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 1,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": {
+            "Id": "d38663f7-24e5-4b90-b464-ad309726540a",
+            "Path": "lighting/cerroblanco/daylight-v1/reflection_1.vtex"
+          },
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe Rotunda",
+        "object_id": "cf978995-4103-59ca-8b78-beaf25b76eff",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "9796c610-0760-5677-9c21-a6ce02b647d7",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-375,-375,-150",
+            "Maxs": "375,375,186"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 1,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": {
+            "Id": "4cafafde-019c-46af-92b7-048527746c90",
+            "Path": "lighting/cerroblanco/daylight-v1/reflection_2.vtex"
+          },
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe Cafe",
+        "object_id": "ffc6f96f-ba18-5977-82e6-3b795533fdad",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "6c4a20df-1c98-546c-aae4-3ec095f194a5",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-350,-260,-80",
+            "Maxs": "347,242,84"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 1,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": {
+            "Id": "4dfec81f-0352-4ad9-b5f3-c2516e2eeddb",
+            "Path": "lighting/cerroblanco/daylight-v1/reflection_3.vtex"
+          },
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe Cafe Upper",
+        "object_id": "3d011096-0df2-5ef4-8714-ad147fe807fa",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "0994bd9e-318a-5f85-aafb-3fc75e7899aa",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-170,-250,-80",
+            "Maxs": "152,252,84"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 1,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": {
+            "Id": "51cf46ef-8667-4a0d-896b-465842772371",
+            "Path": "lighting/cerroblanco/daylight-v1/reflection_4.vtex"
+          },
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe North Gallery",
+        "object_id": "8047c43b-a3ea-5efd-a6d2-886fe8deabdf",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "73663286-1f13-54ef-b43f-06583617e279",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-350,-512,-150",
+            "Maxs": "347,512,194"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 1,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": {
+            "Id": "8a9a527f-77be-4a2c-82dc-f1eb1b05ef0f",
+            "Path": "lighting/cerroblanco/daylight-v1/reflection_5.vtex"
+          },
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe East Hall",
+        "object_id": "b8e4945f-0cac-550a-93ef-aca650da3dc7",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "5dd2bbf7-41cd-5dac-96e9-de508d2215e0",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-482,-442,-150",
+            "Maxs": "482,442,194"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 1,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": {
+            "Id": "1fe1176c-7b64-40b3-984d-f32b5c05dd33",
+            "Path": "lighting/cerroblanco/daylight-v1/reflection_6.vtex"
+          },
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe South Gallery",
+        "object_id": "49d1308e-4479-59c8-85c2-157cb05db8ca",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "772c1f48-1119-5f1f-bb1d-5bbb1a312586",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-557,-737,-150",
+            "Maxs": "557,737,164"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 1,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": {
+            "Id": "59a35286-9f2d-4666-ab65-63c38b017250",
+            "Path": "lighting/cerroblanco/daylight-v1/reflection_7.vtex"
+          },
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe Courtyard",
+        "object_id": "2b18f0f8-3712-5d27-9a88-1c954b112c7a",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "792d2dc5-9e68-5a22-af2c-45ed2aaa7595",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-1000,-576,-160",
+            "Maxs": "1050,570,350"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 1,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": {
+            "Id": "eb3b3a57-eac5-4540-80e4-63b797af10fb",
+            "Path": "lighting/cerroblanco/daylight-v1/reflection_8.vtex"
+          },
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe Portico",
+        "object_id": "692ce65f-8047-50ea-9973-5d27ad7381e3",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "45173ceb-8415-5d90-8e8b-aaf099ba66e2",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-135,-785,-130",
+            "Maxs": "135,785,152"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 1,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": {
+            "Id": "8bf02e4c-079c-4c67-83bf-f81175b212e6",
+            "Path": "lighting/cerroblanco/daylight-v1/reflection_9.vtex"
+          },
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe Grounds",
+        "object_id": "9352a87e-016a-5983-8b8f-8fe9a257a768",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "15297b68-7a6f-503e-b114-2870ef03461e",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-5250,-2207,-280",
+            "Maxs": "1080,2873,680"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 20000,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": {
+            "Id": "3689a261-16df-4f9a-b8cc-3c69e9c14029",
+            "Path": "lighting/cerroblanco/daylight-v1/reflection_10.vtex"
+          },
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 60000,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Museum indirect light",
+        "object_id": "d3ddc9a5-0899-44dd-ba54-59a4a950304d",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.IndirectLightVolume",
+          "__guid": "3bbd7946-d568-46d2-aad9-f6b92585c190",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 2,
+          "BakeVersion": 1,
+          "BlendDistance": 120,
+          "Bounds": {
+            "Mins": "-2440,-2100,2",
+            "Maxs": "1660,1160,550"
+          },
+          "DistanceTexture": {
+            "Id": "3e535eb1-4bf1-4a65-b59b-0e78bfcac24a",
+            "Path": "lighting/cerroblanco/daylight-v1/distance.vtex"
+          },
+          "InsideGeometry": "Relocate",
+          "IrradianceTexture": {
+            "Id": "f6ceb1fd-90cf-4a70-85ff-3a150136435d",
+            "Path": "lighting/cerroblanco/daylight-v1/irradiance.vtex"
+          },
+          "NormalBias": 20,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "ProbeDensity": 8,
+          "RelocationTexture": {
+            "Id": "b250dd43-65ce-4dca-bdb6-c55c45cd80b0",
+            "Path": "lighting/cerroblanco/daylight-v1/relocation.vtex"
+          },
+          "RenderExcludeTags": "",
+          "RuntimeContrast": 1,
+          "RuntimeIntensity": 1.1,
+          "RuntimeSaturation": 1,
+          "RuntimeTint": "1,1,1,1",
+          "ViewBias": 30
+        }
+      }
+    ]
+  },
+  {
+    "path": "Assets/scenes/maps/Collider/collider.scene",
+    "title": "Collider",
+    "lighting": [
+      {
+        "object": "Look",
+        "object_id": "51e7d926-ba24-5cc2-bde8-01457935c194",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.Tonemapping",
+          "__guid": "1f3ea723-1658-5397-92c4-90227f1a312e",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 3,
+          "AutoExposureEnabled": true,
+          "ExposureCompensation": 0,
+          "ExposureMethod": "RGB",
+          "MaximumExposure": 2.3,
+          "MinimumExposure": 1,
+          "Mode": "ACES",
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Rate": 1
+        }
+      },
+      {
+        "object": "Ambient",
+        "object_id": "48c85e3d-de76-5dfb-9cd3-045dd8e27b88",
+        "rotation": "-0.108219802,0.488148004,0.187442198,0.845497072",
+        "component": {
+          "__type": "Sandbox.DirectionalLight",
+          "__guid": "2b71e50c-b05b-50b7-997c-e3b579eb71a4",
+          "__enabled": true,
+          "Flags": 0,
+          "ContactShadows": true,
+          "Contribution": "Diffuse, Specular, Transmissive",
+          "FogMode": "Enabled",
+          "FogStrength": 1,
+          "LightColor": "0.05,0.06,0.08,1",
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "ShadowBias": 0,
+          "ShadowCascadeCount": 4,
+          "ShadowCascadeSplitRatio": 0.91,
+          "ShadowHardness": 0,
+          "Shadows": true,
+          "SkyColor": "0.14,0.18,0.24,1",
+          "Visualizer": {}
+        }
+      },
+      {
+        "object": "Hall",
+        "object_id": "48dc455d-f29a-5511-a7b4-6d072c615dd4",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "b8778f24-cc16-5a3f-9324-03065137d617",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-824,-1450,-310",
+            "Maxs": "774,1450,590"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.05,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/collider/reflection_hall_v3.vtex",
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 6000,
+          "ZNear": 4
+        }
+      },
+      {
+        "object": "Beam",
+        "object_id": "d19f6c76-f877-5b62-a1c9-c09355801970",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "85636368-f6b4-51b2-a843-53f0b34f2809",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-336,-1900,-540",
+            "Maxs": "890,1900,500"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.05,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/collider/reflection_beam_v3.vtex",
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 6000,
+          "ZNear": 4
+        }
+      },
+      {
+        "object": "West",
+        "object_id": "4e32c2ef-66fb-5d1f-8ccb-c5efb7f63fa8",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "c1f252fd-0eb8-54e5-8d2c-df7341a63b69",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-900,-236,-200",
+            "Maxs": "980,240,440"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.05,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/collider/reflection_west_v3.vtex",
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 6000,
+          "ZNear": 4
+        }
+      },
+      {
+        "object": "East",
+        "object_id": "ffce1f79-318d-5f77-83eb-516e6fad691e",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "d06ea7c7-2da0-5a77-970b-cf6a5b6be437",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-900,-240,-200",
+            "Maxs": "980,236,440"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.05,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/collider/reflection_east_v3.vtex",
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 6000,
+          "ZNear": 4
+        }
+      },
+      {
+        "object": "Collider indirect lighting",
+        "object_id": "56652c24-b319-4a8b-9b85-e643c944f9bb",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.IndirectLightVolume",
+          "__guid": "bb711a6d-e336-46f3-bb8a-7d63fb8c0231",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 2,
+          "BakeVersion": 1,
+          "BlendDistance": 120,
+          "Bounds": {
+            "Mins": "-930,-1950,-30",
+            "Maxs": "1930,1950,1060"
+          },
+          "DistanceTexture": {
+            "Id": "f5fd6e09-dc12-4f17-a44e-12743a03c6f5",
+            "Path": "lighting/collider/lighting-v4/distance.vtex"
+          },
+          "InsideGeometry": "Relocate",
+          "IrradianceTexture": {
+            "Id": "88e6e14b-eaf2-423b-86c4-543bab7309d3",
+            "Path": "lighting/collider/lighting-v4/irradiance.vtex"
+          },
+          "NormalBias": 16,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "ProbeDensity": 5,
+          "RelocationTexture": {
+            "Id": "bd59ba05-eadd-4b9b-ac09-1b4747a9a614",
+            "Path": "lighting/collider/lighting-v4/relocation.vtex"
+          },
+          "RenderExcludeTags": "",
+          "RuntimeContrast": 1,
+          "RuntimeIntensity": 1.6,
+          "RuntimeSaturation": 1,
+          "RuntimeTint": "1,1,1,1",
+          "ViewBias": 24
+        }
+      }
+    ]
+  },
+  {
+    "path": "Assets/scenes/maps/Depot/Depot.scene",
+    "title": "Depot",
+    "lighting": []
+  },
+  {
+    "path": "Assets/scenes/maps/Edinburgh/edinburgh.scene",
+    "title": "Edinburgh",
+    "lighting": []
+  },
+  {
+    "path": "Assets/scenes/maps/Flatgrass/Flatgrass.scene",
+    "title": "Flatgrass",
+    "lighting": []
+  },
+  {
+    "path": "Assets/scenes/maps/InnocentHotel/innocent_hotel.scene",
+    "title": "Innocent Hotel",
+    "lighting": []
+  },
+  {
+    "path": "Assets/scenes/maps/Lowtide/lowtide.scene",
+    "title": "Lowtide",
+    "lighting": [
+      {
+        "object": "Sun",
+        "object_id": "43659cae-6ef0-5c0a-b63a-75d0bffbefae",
+        "rotation": "0.0424951985,0.322782904,-0.123414896,0.937429488",
+        "component": {
+          "__type": "Sandbox.DirectionalLight",
+          "__guid": "4c3e6de3-fdf1-5a50-83a8-855d86dda0c0",
+          "__enabled": true,
+          "Flags": 0,
+          "ContactShadows": true,
+          "Contribution": "Diffuse, Specular, Transmissive",
+          "FogMode": "Enabled",
+          "FogStrength": 1,
+          "LightColor": "1.45,1.26,1.02,1",
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "ShadowBias": 0.0005,
+          "ShadowCascadeCount": 4,
+          "ShadowCascadeSplitRatio": 0.91,
+          "ShadowHardness": 0.35,
+          "Shadows": true,
+          "SkyColor": "0.42,0.48,0.58,1",
+          "Visualizer": {}
+        }
+      },
+      {
+        "object": "Sky",
+        "object_id": "3aa1a974-19d5-5ecf-9084-d4c8a0eb6fc6",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.SkyBox2D",
+          "__guid": "209d795f-83e1-5501-abea-19edf4a4d232",
+          "__enabled": true,
+          "Flags": 0,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "SkyIndirectLighting": true,
+          "SkyMaterial": {
+            "Id": "043a0af7-c02e-5fb4-8650-ceffbc4c8b69",
+            "Path": "materials/lowtide/sky/lowtide_sky.vmat"
+          },
+          "Tint": "1,1,1,1"
+        }
+      },
+      {
+        "object": "Fog",
+        "object_id": "fe08d5da-ca8c-5101-8e7f-52c0e45d9518",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.GradientFog",
+          "__guid": "43006fab-e4c2-522f-b2fa-5acb9c4b1ad0",
+          "__enabled": true,
+          "Flags": 0,
+          "Color": "0.42,0.49,0.57,0.55",
+          "EndDistance": 34000,
+          "FalloffExponent": 1.3,
+          "Height": 9000,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "StartDistance": 2200,
+          "VerticalFalloffExponent": 1.2
+        }
+      },
+      {
+        "object": "Look",
+        "object_id": "598d2191-02cb-58af-8747-4eca27eedfd7",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.ColorGrading",
+          "__guid": "9ac7006b-5906-5479-a330-951141e95f92",
+          "__enabled": true,
+          "Flags": 0,
+          "BlendFactor": 0.22,
+          "BlueCurve": [
+            {
+              "x": 0,
+              "y": 0.5,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "ColorSpace": "None",
+          "ColorTempK": 6400,
+          "GradingMethod": "TemperatureControl",
+          "GreenCurve": [
+            {
+              "x": 0,
+              "y": 0.5,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "HueCurve": [
+            {
+              "x": 0,
+              "y": 0.5,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "LookupTexture": null,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "RedCurve": [
+            {
+              "x": 0,
+              "y": 0.5,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "SaturationCurve": [
+            {
+              "x": 0,
+              "y": 0.5,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "ValueCurve": [
+            {
+              "x": 0,
+              "y": 0.5,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ]
+        }
+      },
+      {
+        "object": "Look",
+        "object_id": "598d2191-02cb-58af-8747-4eca27eedfd7",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.Tonemapping",
+          "__guid": "e7e158a1-59b3-5810-8c17-8549dbb7da89",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 3,
+          "AutoExposureEnabled": true,
+          "ExposureCompensation": 0,
+          "ExposureMethod": "RGB",
+          "MaximumExposure": 3,
+          "MinimumExposure": 2,
+          "Mode": "ACES",
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Rate": 1.3
+        }
+      },
+      {
+        "object": "Warehouse East Bounced Light",
+        "object_id": "7b21c7eb-55e5-4de5-91e6-8353b5a6bf0c",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.IndirectLightVolume",
+          "__guid": "a55a7c89-2f8c-407e-93ed-d2a8a2e47a8f",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 2,
+          "BakeVersion": 1,
+          "BlendDistance": 24,
+          "Bounds": {
+            "Mins": "-402,-1002,-8",
+            "Maxs": "1152,-238,360"
+          },
+          "DistanceTexture": {
+            "Id": "36768a81-8937-4fe3-98d2-b9875bc1b031",
+            "Path": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-east-v3/east_distancetexture_9e1819e296ef442caf69ede6d41c1963.vtex"
+          },
+          "InsideGeometry": "Relocate",
+          "IrradianceTexture": {
+            "Id": "413c6592-73eb-4b8d-8750-293471432ff6",
+            "Path": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-east-v3/east_irradiancetexture_9e1819e296ef442caf69ede6d41c1963.vtex"
+          },
+          "NormalBias": 3,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "ProbeDensity": 12,
+          "RelocationTexture": {
+            "Id": "b61a4561-8d13-475c-8efc-42e5eddad95f",
+            "Path": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-east-v3/east_relocationtexture_9e1819e296ef442caf69ede6d41c1963.vtex"
+          },
+          "RenderExcludeTags": "water",
+          "RuntimeContrast": 0.85,
+          "RuntimeIntensity": 4,
+          "RuntimeSaturation": 1,
+          "RuntimeTint": "1,1,1,1",
+          "ViewBias": 4
+        }
+      },
+      {
+        "object": "Warehouse West Bounced Light",
+        "object_id": "01c189c2-02c8-4dcb-b038-d7cc52fc337b",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.IndirectLightVolume",
+          "__guid": "7aad1539-5d64-4d1e-9496-709b842779cd",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 2,
+          "BakeVersion": 1,
+          "BlendDistance": 24,
+          "Bounds": {
+            "Mins": "-402,238,-8",
+            "Maxs": "1152,1002,360"
+          },
+          "DistanceTexture": {
+            "Id": "0f5a7ab7-ab16-4aa1-a7ad-045bda336ddc",
+            "Path": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-west-v3/west_distancetexture_4ff91e59bc504094b089da8450699294.vtex"
+          },
+          "InsideGeometry": "Relocate",
+          "IrradianceTexture": {
+            "Id": "ee0d9964-3088-4257-a350-d38fdfeda359",
+            "Path": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-west-v3/west_irradiancetexture_4ff91e59bc504094b089da8450699294.vtex"
+          },
+          "NormalBias": 3,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "ProbeDensity": 12,
+          "RelocationTexture": {
+            "Id": "216c0127-5542-4f84-b8d0-66326136182c",
+            "Path": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-west-v3/west_relocationtexture_4ff91e59bc504094b089da8450699294.vtex"
+          },
+          "RenderExcludeTags": "water",
+          "RuntimeContrast": 0.85,
+          "RuntimeIntensity": 4,
+          "RuntimeSaturation": 1,
+          "RuntimeTint": "1,1,1,1",
+          "ViewBias": 4
+        }
+      },
+      {
+        "object": "Probe Fleet North",
+        "object_id": "4275f02a-d9e6-5dd4-ba72-a2883c19344b",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "496a8f7d-847e-588c-994f-cfff3a55e5b5",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-600,-240,-90",
+            "Maxs": "550,240,460"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 4096,
+          "Mode": "Realtime",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Medium",
+          "Texture": null,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 6000,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe Fleet South",
+        "object_id": "1e8631e6-201a-5593-af28-56a56c44ba21",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "c50928ef-cda9-5c88-9ce1-02c52d161588",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-1800,-240,-90",
+            "Maxs": "800,240,460"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.3,
+          "FrameInterval": 5,
+          "MaxDistance": 4096,
+          "Mode": "Realtime",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Medium",
+          "Texture": null,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 6000,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe Bridge",
+        "object_id": "fa110229-0eae-5796-8913-f4aa14a0fced",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "edc4a4e4-3e96-574c-8846-29e83d961613",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-150,-600,-130",
+            "Maxs": "150,600,320"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 4096,
+          "Mode": "Realtime",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Medium",
+          "Texture": null,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 6000,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe West Warehouse Hall",
+        "object_id": "601fba57-de3e-5ad1-9494-08976f59d26e",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "6cf9ccac-3212-5518-b608-1daed206fbe3",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-380,-360,-160",
+            "Maxs": "380,360,192"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 4096,
+          "Mode": "Realtime",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Medium",
+          "Texture": null,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 6000,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe West Warehouse Ground",
+        "object_id": "38f6aded-b444-5feb-9bc0-4b7129a24641",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "ce4986c0-d2c1-5d99-bc9f-a4106b26f32b",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-380,-360,-80",
+            "Maxs": "370,360,80"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 4096,
+          "Mode": "Realtime",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Medium",
+          "Texture": null,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 6000,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe West Mezzanine",
+        "object_id": "9577c630-4785-510c-a4fc-da46a102475f",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "e7784a1f-fe3e-5685-a32c-aa8f88524c50",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-380,-360,-74",
+            "Maxs": "370,360,102"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 4096,
+          "Mode": "Realtime",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Medium",
+          "Texture": null,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 6000,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe East Warehouse Hall",
+        "object_id": "44849cc0-1911-5c34-b830-ed06137db233",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "818add6b-1e5d-5022-aab9-94a3acf8627f",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-380,-360,-160",
+            "Maxs": "380,360,192"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 4096,
+          "Mode": "Realtime",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Medium",
+          "Texture": null,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 6000,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe East Warehouse Ground",
+        "object_id": "ccd8fe4c-f643-52a4-bcb4-63c85b26abe1",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "8791a233-672c-5e8f-9ed9-5f8588c54a80",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-380,-360,-80",
+            "Maxs": "370,360,80"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 4096,
+          "Mode": "Realtime",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Medium",
+          "Texture": null,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 6000,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe East Mezzanine",
+        "object_id": "90af9fce-81d5-5da9-a659-fc7c194ae794",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "ac26c9cb-5a69-500c-8edf-5354d0ff7721",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-380,-360,-74",
+            "Maxs": "370,360,102"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 4096,
+          "Mode": "Realtime",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Medium",
+          "Texture": null,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 6000,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe West Quay",
+        "object_id": "15200414-d15f-5478-bc39-6b047815f702",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "c666ab9c-d6dc-582a-9d7d-c937ef7fe636",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-250,-875,-120",
+            "Maxs": "340,1090,360"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 4096,
+          "Mode": "Realtime",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Medium",
+          "Texture": null,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 6000,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe East Quay",
+        "object_id": "d889b1b3-978f-58da-970c-33ec0eca85a6",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "c91be42e-2a9e-5568-84f8-c9a1cb6a9e7d",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-250,-1090,-120",
+            "Maxs": "340,875,360"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 4096,
+          "Mode": "Realtime",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Medium",
+          "Texture": null,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 6000,
+          "ZNear": 8
+        }
+      }
+    ]
+  },
+  {
+    "path": "Assets/scenes/maps/Motel/motel.scene",
+    "title": "Edinburgh",
+    "lighting": []
+  },
+  {
+    "path": "Assets/scenes/maps/Orion/orion.scene",
+    "title": "Orion",
+    "lighting": [
+      {
+        "object": "Sun",
+        "object_id": "da4ba47e-563b-5fcb-adce-f229041d22a3",
+        "rotation": "0.0706524,0.0156633,-0.9737362,0.2158721",
+        "component": {
+          "__type": "Sandbox.DirectionalLight",
+          "__guid": "b67b3c2f-730f-52aa-8122-b9b967e793da",
+          "__enabled": true,
+          "Flags": 0,
+          "ContactShadows": true,
+          "FogMode": "Enabled",
+          "FogStrength": 1,
+          "LightColor": "2.1,1.42,0.80,1",
+          "ShadowBias": 0.0005,
+          "ShadowCascadeCount": 4,
+          "ShadowCascadeSplitRatio": 0.91,
+          "ShadowHardness": 0,
+          "Shadows": true,
+          "SkyColor": "0.15,0.145,0.145,1"
+        }
+      },
+      {
+        "object": "Sky",
+        "object_id": "9d4d8e3d-aed7-5386-a208-ac2771c14c4f",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.SkyBox2D",
+          "__guid": "8ecbc20d-eed8-5ec6-a26f-0832e0c70ac7",
+          "__enabled": true,
+          "Flags": 0,
+          "SkyIndirectLighting": true,
+          "SkyMaterial": "materials/orion/sky/oa_sky.vmat",
+          "Tint": "2.6,2.6,2.6,1"
+        }
+      },
+      {
+        "object": "Fog",
+        "object_id": "b5658d4c-7f17-53ba-8455-feb60427e796",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.GradientFog",
+          "__guid": "ef0670e5-89c7-5a53-8488-c0eecf4d0fa1",
+          "__enabled": true,
+          "Flags": 0,
+          "Color": "0.47,0.45,0.47,0.82",
+          "StartDistance": 1400,
+          "EndDistance": 34000,
+          "FalloffExponent": 0.85,
+          "Height": 14000,
+          "VerticalFalloffExponent": 1.1
+        }
+      },
+      {
+        "object": "Look",
+        "object_id": "73493a94-4142-511e-bc2a-b9ba889186cb",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.ColorGrading",
+          "__guid": "b9f21656-c8a6-5d36-b5fc-59b31f35e1b4",
+          "__enabled": true,
+          "Flags": 0,
+          "GradingMethod": "TemperatureControl",
+          "ColorTempK": 5300,
+          "BlendFactor": 0.5,
+          "ColorSpace": "None",
+          "LookupTexture": null
+        }
+      },
+      {
+        "object": "Look",
+        "object_id": "73493a94-4142-511e-bc2a-b9ba889186cb",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.Tonemapping",
+          "__guid": "0db059f5-bcf2-56c7-be14-980d2f89aaf4",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 3,
+          "AutoExposureEnabled": true,
+          "ExposureCompensation": 0.0,
+          "ExposureMethod": "RGB",
+          "MinimumExposure": 1.0,
+          "MaximumExposure": 1.2,
+          "Mode": "ACES",
+          "Rate": 1
+        }
+      },
+      {
+        "object": "Sky Reflection",
+        "object_id": "07731649-5344-501c-b3b2-71ef1689dce6",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "e7e155e2-93ed-5c43-8f86-c4f714937e28",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-1485,-1600,-300",
+            "Maxs": "1885,1600,1000"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 64,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "Priority": 0,
+          "Projection": "Sphere",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/orion/reflection_sky_77b5fc66.vtex",
+          "TintColor": "1.8,1.8,1.8,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 16
+        }
+      },
+      {
+        "object": "Yard Reflection",
+        "object_id": "e342e16b-b12b-578e-9336-ee4c36834601",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "f8df401a-cbe5-541e-8808-9f16d29d9283",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-394,-395,-11.5",
+            "Maxs": "394,395,11.5"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 2,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "Priority": 1,
+          "Projection": "Sphere",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/orion/reflection_wet_cbdc113c.vtex",
+          "TintColor": "4.5,4.5,4.5,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 16
+        }
+      },
+      {
+        "object": "Yard Mid Reflection",
+        "object_id": "84766ac4-1312-5178-a8a6-76f5f1c9b874",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "d32d602b-af39-5cf1-8f58-a138e3691acf",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-50,-395,-11.5",
+            "Maxs": "50,395,11.5"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 2,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "Priority": 1,
+          "Projection": "Sphere",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/orion/reflection_wet_cbdc113c.vtex",
+          "TintColor": "3.8,3.8,3.8,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 16
+        }
+      },
+      {
+        "object": "Yard Far Reflection",
+        "object_id": "e8d58330-8fc2-5187-9466-046c743be76a",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "d4cea32d-f962-5f36-88e3-0282b88dbc45",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-180,-395,-11.5",
+            "Maxs": "180,395,11.5"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 2,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "Priority": 1,
+          "Projection": "Sphere",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/orion/reflection_wet_cbdc113c.vtex",
+          "TintColor": "2.5,2.5,2.5,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 16
+        }
+      },
+      {
+        "object": "B3 Strip Reflection",
+        "object_id": "343aaeba-8eb2-5558-9a9c-65d8420ee9bb",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "cdbcbadd-487f-5d50-bcf3-9df6c0bab20f",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-348.5,-295,-11.5",
+            "Maxs": "348.5,295,11.5"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 2,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "Priority": 1,
+          "Projection": "Sphere",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/orion/reflection_wet_cbdc113c.vtex",
+          "TintColor": "5.5,5.5,5.5,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 16
+        }
+      },
+      {
+        "object": "Tunnel Mouth Reflection",
+        "object_id": "84ff55b1-f6bc-55f9-bd99-45b67487c9c2",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "1ccdfe26-ca76-5b72-a534-a473ecb4019d",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-100,-200,-11.5",
+            "Maxs": "100,200,11.5"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 2,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "Priority": 1,
+          "Projection": "Sphere",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/orion/reflection_wet_cbdc113c.vtex",
+          "TintColor": "1.3,1.3,1.3,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 16
+        }
+      },
+      {
+        "object": "Terrace Reflection",
+        "object_id": "736974f1-6f6f-5830-99d4-ccbc3f35d8c9",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "6fffc894-67ba-5675-ab20-28fb29631cf4",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-290,-98,-4.5",
+            "Maxs": "290,98,4.5"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 2,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "Priority": 1,
+          "Projection": "Sphere",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/orion/reflection_wet_cbdc113c.vtex",
+          "TintColor": "6,6,6,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 16
+        }
+      },
+      {
+        "object": "Deck Reflection",
+        "object_id": "3b489ebc-56f2-5c80-a9b4-e5ba895b2ebf",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "3534fc7a-13d6-52f6-b9dd-549415747ab2",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-250,-580,-11.5",
+            "Maxs": "250,580,11.5"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 2,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "Priority": 1,
+          "Projection": "Sphere",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/orion/reflection_wet_cbdc113c.vtex",
+          "TintColor": "3,3,3,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 16
+        }
+      },
+      {
+        "object": "East Roof Reflection",
+        "object_id": "ea58da75-770b-563e-b2c8-66f147270f19",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "8f81f2e4-612e-54c5-8bd6-f421c8fd99d0",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-621.5,-295,-11.5",
+            "Maxs": "621.5,295,11.5"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 2,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "Priority": 1,
+          "Projection": "Sphere",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/orion/reflection_wet_cbdc113c.vtex",
+          "TintColor": "3,3,3,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 16
+        }
+      },
+      {
+        "object": "B3 Roof Reflection",
+        "object_id": "20d16d66-55d7-52bb-85e0-c4b4c00cf204",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "6b283068-6457-5425-b46e-c4822ee48a09",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-183.5,-453.5,-10.5",
+            "Maxs": "183.5,453.5,10.5"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 2,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "Priority": 1,
+          "Projection": "Sphere",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/orion/reflection_wet_cbdc113c.vtex",
+          "TintColor": "3,3,3,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 16
+        }
+      },
+      {
+        "object": "Yard Tarp Reflection",
+        "object_id": "85afa582-caf0-54e0-8fc6-85d0173df7cb",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "f834e512-dbc0-58b6-8e8f-9d8f70ae679b",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-72.5,-85,-5.5",
+            "Maxs": "72.5,85,5.5"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 2,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "Priority": 1,
+          "Projection": "Sphere",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/orion/reflection_wet_cbdc113c.vtex",
+          "TintColor": "3.5,3.5,3.5,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 16
+        }
+      }
+    ]
+  },
+  {
+    "path": "Assets/scenes/maps/Railhead/railhead.scene",
+    "title": "Railhead",
+    "lighting": [
+      {
+        "object": "Sun",
+        "object_id": "247d9a82-1388-5183-ab18-b628acfbdfac",
+        "rotation": "0.0424952,0.3227829,-0.1234149,0.9374295",
+        "component": {
+          "__type": "Sandbox.DirectionalLight",
+          "__guid": "5044e2fd-8ce8-55a5-97ce-eb2eb0cb4d33",
+          "__enabled": true,
+          "Flags": 0,
+          "ContactShadows": true,
+          "FogMode": "Enabled",
+          "FogStrength": 1,
+          "LightColor": "1.55,1.35,1.10,1",
+          "ShadowBias": 0.0005,
+          "ShadowCascadeCount": 4,
+          "ShadowCascadeSplitRatio": 0.91,
+          "ShadowHardness": 0,
+          "Shadows": true,
+          "SkyColor": "0.25,0.31,0.40,1"
+        }
+      },
+      {
+        "object": "Sky",
+        "object_id": "20384c9d-271d-52a6-879b-92bf6a8e6665",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.SkyBox2D",
+          "__guid": "fba9c753-c232-5ffd-9525-2c1002608971",
+          "__enabled": true,
+          "Flags": 0,
+          "SkyIndirectLighting": true,
+          "SkyMaterial": "materials/railhead/sky/railhead_sky.vmat",
+          "Tint": "1,1,1,1"
+        }
+      },
+      {
+        "object": "Fog",
+        "object_id": "d1a0409d-e593-5feb-84ba-5ef718594a82",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.GradientFog",
+          "__guid": "04614418-a8af-5d42-a9a6-565bfac4aab7",
+          "__enabled": true,
+          "Flags": 0,
+          "Color": "0.62,0.72,0.9,0.95",
+          "StartDistance": 4000,
+          "EndDistance": 60000,
+          "FalloffExponent": 1.3,
+          "Height": 9000,
+          "VerticalFalloffExponent": 1.2
+        }
+      },
+      {
+        "object": "Look",
+        "object_id": "fbd5b2a4-a6cf-5f6c-9b97-10c30a15f8e9",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.ColorGrading",
+          "__guid": "eeb19c5b-9d85-5bdc-a309-1aaa42e262d2",
+          "__enabled": true,
+          "Flags": 0,
+          "GradingMethod": "TemperatureControl",
+          "ColorTempK": 5900,
+          "BlendFactor": 0.25,
+          "ColorSpace": "None",
+          "LookupTexture": null
+        }
+      },
+      {
+        "object": "Look",
+        "object_id": "fbd5b2a4-a6cf-5f6c-9b97-10c30a15f8e9",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.Tonemapping",
+          "__guid": "df28fe97-03db-5739-b97b-f6a78c159f7b",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 3,
+          "AutoExposureEnabled": true,
+          "ExposureCompensation": -0.2,
+          "ExposureMethod": "RGB",
+          "MinimumExposure": 1.6,
+          "MaximumExposure": 2.2,
+          "Mode": "ACES",
+          "Rate": 1
+        }
+      },
+      {
+        "object": "Probe Concourse",
+        "object_id": "6eab7570-b3a3-5e2e-9885-5e0927cc9f68",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "e4c5d9f2-e4ae-5e0e-87bb-87bff2d69da4",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-210,-1160,-160",
+            "Maxs": "210,1160,540"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe Shed West",
+        "object_id": "46bf55a0-6c38-532a-a93b-94927d7e0896",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "05d17af6-8388-5b9d-895e-0f8cc5abcee2",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-1110,-600,-187",
+            "Maxs": "1110,560,550"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe Shed East",
+        "object_id": "a28dd711-70a8-5028-b320-c66a787f5d26",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "6e7cf2f6-a939-536c-a4cd-239e4bb3e720",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-1110,-560,-187",
+            "Maxs": "1110,600,550"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe Track Ends West",
+        "object_id": "a6f504c1-c1ad-5fd5-91d1-e3c6bf0a8167",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "63f16760-1b7e-58a0-ba40-995ca4decf3c",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-310,-600,-117",
+            "Maxs": "270,560,160"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 1024,
+          "Priority": 2,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe Track Ends East",
+        "object_id": "8b024773-1f9a-5638-b349-fda7aca99e01",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "35789414-a117-5d6b-8a56-68e41dc153e9",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-310,-560,-117",
+            "Maxs": "270,600,160"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 1024,
+          "Priority": 2,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe Booking Hall",
+        "object_id": "387850f4-247f-51e3-b0ff-7875cdeffde6",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "e3faf792-def0-5021-b33b-a3e4d122c6b0",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-180,-600,-160",
+            "Maxs": "260,600,520"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe West Wing",
+        "object_id": "921e35a3-9e21-5d57-a156-b659f18228d5",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "f20cf34a-b1a4-5235-b8a9-1634fef702b9",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-220,-240,-100",
+            "Maxs": "220,260,108"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe East Wing",
+        "object_id": "65f419ed-e559-5506-b7c1-05af40ac2a5f",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "8fafdb83-4f01-50bd-9a97-5d1b666d38e1",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-220,-260,-100",
+            "Maxs": "220,240,108"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe West Goods Shed",
+        "object_id": "cf33c67b-00c9-5c02-9af9-1d7004f8497f",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "d4833863-9437-5aed-9c48-640dd2e56551",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-300,-140,-76",
+            "Maxs": "300,140,180"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe East Goods Shed",
+        "object_id": "822cc4c4-990c-5cb7-92cb-dfee1c473a9b",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "a2cfd676-62ba-5d3b-b0de-39348d977f79",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-300,-140,-76",
+            "Maxs": "300,140,180"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe Signal Box",
+        "object_id": "07c8608c-a3c3-5d78-9eed-54c110f7c0ea",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "b2dae0b3-1073-50be-8103-1e8e5322b16e",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-140,-130,-70",
+            "Maxs": "140,130,100"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe Footbridge",
+        "object_id": "e05d1f8b-ff11-5ab2-b014-7b2f7931aeb8",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "9495399e-9a62-51e0-ba4f-8c7b7425b4cf",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-50,-1200,-40",
+            "Maxs": "50,1200,40"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Priority": 2,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe Cab Road East",
+        "object_id": "dca3d670-2597-5fd9-953c-3027aeee7d84",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "35546b30-d059-5542-a8d4-32ae8103ac08",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-1540,-400,-126",
+            "Maxs": "1620,400,300"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe Cab Road West",
+        "object_id": "9bff20c4-30c7-556c-b5f8-4ddf17b6b111",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "54382472-3a75-520c-8a68-72ff5a6da5b5",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-1540,-400,-126",
+            "Maxs": "1620,400,300"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Station Indirect Light",
+        "object_id": "253d6710-29d5-4dcf-a19e-3c792ebd49d8",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.IndirectLightVolume",
+          "__guid": "bec58908-1f51-4793-8f70-b29b363676bb",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 2,
+          "BakeVersion": 1,
+          "BlendDistance": 128,
+          "Bounds": {
+            "Mins": "-1810,-1240,-56",
+            "Maxs": "1840,1240,752"
+          },
+          "DistanceTexture": "lighting/railhead/daylight-v3/distance.vtex",
+          "InsideGeometry": "Relocate",
+          "IrradianceTexture": "lighting/railhead/daylight-v3/irradiance.vtex",
+          "NormalBias": 16,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "ProbeDensity": 8,
+          "RelocationTexture": "lighting/railhead/daylight-v3/relocation.vtex",
+          "RenderExcludeTags": "",
+          "RuntimeContrast": 1,
+          "RuntimeIntensity": 2.4,
+          "RuntimeSaturation": 1,
+          "RuntimeTint": "1,1,1,1",
+          "ViewBias": 24
+        }
+      }
+    ]
+  },
+  {
+    "path": "Assets/scenes/maps/ReefHall/reefhall.scene",
+    "title": "Reef Hall",
+    "lighting": [
+      {
+        "object": "Fog",
+        "object_id": "1f740471-9c67-5fc8-9bdd-a66a04c8472e",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.GradientFog",
+          "__guid": "5e14876d-fdb8-57e3-ad7d-3bc223bd777c",
+          "__enabled": true,
+          "Flags": 0,
+          "Color": "0.05,0.09,0.12,0.25",
+          "StartDistance": 1200,
+          "EndDistance": 9000,
+          "FalloffExponent": 1.4,
+          "Height": 1200,
+          "VerticalFalloffExponent": 1.0
+        }
+      },
+      {
+        "object": "Probe Lobby",
+        "object_id": "8c660ed8-360a-5294-be5c-e68205b927bb",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "60496104-8f40-5b84-b450-d203f845c7a0",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-1000,-590,-160",
+            "Maxs": "1000,590,460"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe Rotunda",
+        "object_id": "f6038036-2a5a-57f1-9c83-cfb881c3ee54",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "fe1d0687-68e9-516b-b7e4-4e3e4300affe",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-290,-850,-150",
+            "Maxs": "1410,850,410"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe Control Room",
+        "object_id": "5802dae0-e1c2-5b8b-ace9-2c20bd77ff12",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "2caca44a-a617-54c1-858e-4cfddebad5ab",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-600,-600,-150",
+            "Maxs": "1200,580,290"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe Filter Hall",
+        "object_id": "43de92f2-9539-51e9-8484-77a2bb23e06c",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "95732d78-09ec-51e1-a912-7f183ce2f8bb",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-150,-1150,-150",
+            "Maxs": "600,1150,290"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe Tunnel Hall",
+        "object_id": "60a44aed-b131-5ac9-bbe4-2fe20ec473bb",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "34400bd1-d8cb-55cd-9ae6-67bfa39ccfb7",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-400,-1150,-140",
+            "Maxs": "400,1150,300"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe West Gallery",
+        "object_id": "6fb1e4b3-d860-5935-9d29-9a4e504f9ab7",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "c2c6de3a-4edb-5d60-b942-7b53fa660ee3",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-110,-450,-100",
+            "Maxs": "110,420,288"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe East Gallery",
+        "object_id": "72ea6080-df56-5021-8ffd-5d58f210205f",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "9d94860f-11cc-5b77-9c4d-6beb96f95aba",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-110,-420,-100",
+            "Maxs": "110,450,288"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe North Passage",
+        "object_id": "bf7c96ac-71b4-5320-8150-5f3eb04cf5c2",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "8f8b030e-fe6d-56b1-9698-f074761a2962",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-130,-110,-90",
+            "Maxs": "120,110,90"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe South Passage",
+        "object_id": "17ae98a2-301a-505d-b31e-01e1dcd5dc16",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "f94464d6-eab5-5ab9-84ae-99897b78e751",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-120,-110,-90",
+            "Maxs": "130,110,90"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe North-West Service",
+        "object_id": "5b4e14c8-651f-54cd-9579-310ab86aad51",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "8ac3f3cf-a7bb-5a48-86d4-48079fc976a4",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-110,-400,-90",
+            "Maxs": "490,420,90"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe North-East Service",
+        "object_id": "9537e658-7bb4-51e2-88d6-1d2153c6d36b",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "ba03415d-c426-5be6-85be-d13d32131b24",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-110,-420,-90",
+            "Maxs": "490,400,90"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe South-West Service",
+        "object_id": "ab146bfc-9028-595d-90a8-3580ca2fb604",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "4de6188a-146b-55f3-88af-6c5eb9410651",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-490,-400,-90",
+            "Maxs": "110,420,90"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe South-East Service",
+        "object_id": "a263bc35-7bdd-5cf6-9640-966c691690b5",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "1b5d2377-0dbd-5faa-bc7f-1d103a1a72e8",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-490,-420,-90",
+            "Maxs": "110,400,90"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe Lobby Door Gallery",
+        "object_id": "4b4f2979-f2af-5cb0-b034-8ec9fc7d3950",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "2a58ec95-afc7-54ba-a249-87bbbac8ac38",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-400,-140,-90",
+            "Maxs": "400,140,90"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      }
+    ]
+  },
+  {
+    "path": "Assets/scenes/maps/Refinery/Refinery.scene",
+    "title": "Refinery",
+    "lighting": [
+      {
+        "object": "Gradient Fog",
+        "object_id": "3291e94c-68dd-460d-a0ff-c651ea2abe69",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.GradientFog",
+          "__guid": "d3b2fe6e-2d8c-43ad-a917-00e6ecaf750c",
+          "__enabled": true,
+          "Flags": 0,
+          "Color": "0.712,0.86977,0.84084,0.15",
+          "EndDistance": 4096,
+          "FalloffExponent": 2,
+          "Height": 1024,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "StartDistance": 1600,
+          "VerticalFalloffExponent": 2
+        }
+      }
+    ]
+  },
+  {
+    "path": "Assets/scenes/maps/Ridgeback/ridgeback.scene",
+    "title": "Ridgeback",
+    "lighting": [
+      {
+        "object": "Sun",
+        "object_id": "fcd5032d-32f7-56a0-aea4-b386df038484",
+        "rotation": "-0.360779792,0.187810093,0.810324728,0.4218283",
+        "component": {
+          "__type": "Sandbox.DirectionalLight",
+          "__guid": "b663ca80-47be-58b7-960d-5b37f33657ac",
+          "__enabled": true,
+          "Flags": 0,
+          "ContactShadows": false,
+          "Contribution": "Diffuse, Specular, Transmissive",
+          "FogMode": "Enabled",
+          "FogStrength": 1,
+          "LightColor": "1,0.95,0.84,1",
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "ShadowBias": 0.0005,
+          "ShadowCascadeCount": 4,
+          "ShadowCascadeSplitRatio": 0.91,
+          "ShadowHardness": 0,
+          "Shadows": true,
+          "SkyColor": "0.36,0.43,0.52,1",
+          "Visualizer": {}
+        }
+      },
+      {
+        "object": "Sky",
+        "object_id": "ed9f9700-c9ce-56fe-8794-6a56a56f9ebd",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.SkyBox2D",
+          "__guid": "0c056554-c9a7-583b-8231-e2174f4b5085",
+          "__enabled": true,
+          "Flags": 0,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "SkyIndirectLighting": true,
+          "SkyMaterial": "materials/sky/atmosphere_sky.vmat",
+          "Tint": "1,1,1,1"
+        }
+      },
+      {
+        "object": "Fog",
+        "object_id": "db56d778-a47b-5c00-9b59-11a42b5d4493",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.GradientFog",
+          "__guid": "3474b7b5-1b2b-5698-818a-f5d6b39e5cae",
+          "__enabled": true,
+          "Flags": 0,
+          "Color": "0.7,0.77,0.85,0.55",
+          "EndDistance": 70000,
+          "FalloffExponent": 1.4,
+          "Height": 5000,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "StartDistance": 6000,
+          "VerticalFalloffExponent": 1.5
+        }
+      }
+    ]
+  },
+  {
+    "path": "Assets/scenes/maps/Riverdale/riverdale.scene",
+    "title": "Riverdale",
+    "lighting": [
+      {
+        "object": "Sun",
+        "object_id": "0d557953-a77a-5de0-938c-a1700c8ce80e",
+        "rotation": "-0.122307703,0.0664077029,0.870264471,0.472515106",
+        "component": {
+          "__type": "Sandbox.DirectionalLight",
+          "__guid": "146af2c6-2dc2-566a-8c07-9b902a5ffb39",
+          "__enabled": true,
+          "Flags": 0,
+          "ContactShadows": true,
+          "Contribution": "Diffuse, Specular, Transmissive",
+          "FogMode": "Enabled",
+          "FogStrength": 1,
+          "LightColor": "2.3,1.62,1.05,1",
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "ShadowBias": 0.0005,
+          "ShadowCascadeCount": 4,
+          "ShadowCascadeSplitRatio": 0.91,
+          "ShadowHardness": 0,
+          "Shadows": true,
+          "SkyColor": "0.1,0.12,0.16,1",
+          "Visualizer": {}
+        }
+      },
+      {
+        "object": "Sky",
+        "object_id": "f8497ea9-3903-59fa-884f-2e18df2ae79c",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.SkyBox2D",
+          "__guid": "a88058bf-9c5c-582e-bb56-9adff0dfa2a4",
+          "__enabled": true,
+          "Flags": 0,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "SkyIndirectLighting": true,
+          "SkyMaterial": {
+            "Id": "3e307147-e1fa-4289-86bd-4007b45291fb",
+            "Path": "materials/riverdale/sky/riverdale_sky.vmat"
+          },
+          "Tint": "1,1,1,1"
+        }
+      },
+      {
+        "object": "Fog",
+        "object_id": "9d664455-ddbc-582c-ac6e-e405fe4884e7",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.GradientFog",
+          "__guid": "ab1faa5f-065a-5892-84d6-6df1ca1a69eb",
+          "__enabled": true,
+          "Flags": 0,
+          "Color": "0.96,0.84,0.72,0.72",
+          "EndDistance": 75000,
+          "FalloffExponent": 1.3,
+          "Height": 12000,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "StartDistance": 2400,
+          "VerticalFalloffExponent": 1.2
+        }
+      },
+      {
+        "object": "Look",
+        "object_id": "ceb818a9-e903-50e6-b47e-1bce59042ddc",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.ColorGrading",
+          "__guid": "e923ebb1-5e6e-597f-9fad-414fccadc2c9",
+          "__enabled": true,
+          "Flags": 0,
+          "BlendFactor": 0.25,
+          "BlueCurve": [
+            {
+              "x": 0,
+              "y": 0.5,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "ColorSpace": "None",
+          "ColorTempK": 6400,
+          "GradingMethod": "TemperatureControl",
+          "GreenCurve": [
+            {
+              "x": 0,
+              "y": 0.5,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "HueCurve": [
+            {
+              "x": 0,
+              "y": 0.5,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "LookupTexture": null,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "RedCurve": [
+            {
+              "x": 0,
+              "y": 0.5,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "SaturationCurve": [
+            {
+              "x": 0,
+              "y": 0.5,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "ValueCurve": [
+            {
+              "x": 0,
+              "y": 0.5,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ]
+        }
+      },
+      {
+        "object": "Look",
+        "object_id": "ceb818a9-e903-50e6-b47e-1bce59042ddc",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.Tonemapping",
+          "__guid": "44230bd6-983a-5fff-bcb1-488a7083ae9f",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 3,
+          "AutoExposureEnabled": true,
+          "ExposureCompensation": 0,
+          "ExposureMethod": "RGB",
+          "MaximumExposure": 2.5,
+          "MinimumExposure": 1,
+          "Mode": "ACES",
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Rate": 1.3
+        }
+      },
+      {
+        "object": "Probe Hall",
+        "object_id": "0579885c-a46b-5ea4-94f1-df937fa63220",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "0f3cbd58-7c76-5ea8-ac09-b2556ba7ef92",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-760,-1260,-370",
+            "Maxs": "1440,740,670"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 1,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/riverdale/daylight-v1/reflection_hall.vtex",
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 8192,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe Pool",
+        "object_id": "a5717c4c-4ab3-5b8c-9717-a8a05c08a88d",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "6383271e-ec55-5dac-b5f4-2e824127427b",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-520,-780,-300",
+            "Maxs": "520,260,220"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 2,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/riverdale/daylight-v1/reflection_pool.vtex",
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 8192,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe A1",
+        "object_id": "6313743c-1a1a-50ad-bbda-b2c9abbdae16",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "1d367cc5-9539-59cf-a5d6-ed076be3e1da",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-400,-300,-150",
+            "Maxs": "400,300,170"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 1,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/riverdale/daylight-v1/reflection_a1.vtex",
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 8192,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe A2",
+        "object_id": "f6359d15-c9f8-57aa-ba53-445ec20d053b",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "0c0f91f4-cea8-5cc6-ad1c-bcaa33c235b0",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-400,-300,-150",
+            "Maxs": "400,300,170"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 1,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/riverdale/daylight-v1/reflection_a2.vtex",
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 8192,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe B1 Room",
+        "object_id": "398f1301-4949-59d2-8d13-7e4696c57c1c",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "bdc15c40-ca54-57da-a269-51af6326183c",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-146,-136,-88",
+            "Maxs": "146,136,140"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 1,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/riverdale/daylight-v1/reflection_b1_room.vtex",
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 8192,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe West Control",
+        "object_id": "94ddab84-69d4-5d61-9348-d0a39cc89b41",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "ba3c1a75-d06c-5f41-9f48-7eb15d8c7c02",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-270,-220,-82",
+            "Maxs": "270,220,98"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 2,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/riverdale/daylight-v1/reflection_west_control.vtex",
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 8192,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe East Control",
+        "object_id": "78e315db-5453-5ed0-88a7-7378f3e2ad8a",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "fc8f0bac-aa86-52c0-b6e3-452e61c83722",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-270,-220,-82",
+            "Maxs": "270,220,98"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 2,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/riverdale/daylight-v1/reflection_east_control.vtex",
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 8192,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe North",
+        "object_id": "20a9f5ec-1c33-55fe-92e0-767b968064a3",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "945d8947-20e9-5ac0-a8d2-2014c3bc2f24",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-290,-2670,-190",
+            "Maxs": "120,1930,530"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/riverdale/daylight-v1/reflection_north.vtex",
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 8192,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe West Yard",
+        "object_id": "986a5261-58b6-4be0-9443-0e9e00e8768b",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "33d1909b-1ec5-4a03-9f13-cd649fe64d12",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-870,-1250,-190",
+            "Maxs": "640,1050,730"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/riverdale/daylight-v1/reflection_west_yard.vtex",
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 16
+        }
+      },
+      {
+        "object": "Probe East Yard",
+        "object_id": "dffca95e-648d-4297-8519-a6b28e76ec4a",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "15686ae0-f846-48d7-b051-24c189e14810",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-870,-1050,-190",
+            "Maxs": "640,1250,730"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/riverdale/daylight-v1/reflection_east_yard.vtex",
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 16
+        }
+      },
+      {
+        "object": "Probe West Court",
+        "object_id": "dcbb869f-5ded-46a5-a746-d87e334027e2",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "96416faf-be4e-4776-bb8d-5145764f9043",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-1340,-330,-190",
+            "Maxs": "940,930,630"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/riverdale/daylight-v1/reflection_west_court.vtex",
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 16
+        }
+      },
+      {
+        "object": "Probe East Court",
+        "object_id": "a5472107-2834-4daf-833d-73c241dbf47b",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "e8fc730b-e966-4ab0-b7db-df3b5d2b8f81",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-1340,-930,-190",
+            "Maxs": "940,330,630"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/riverdale/daylight-v1/reflection_east_court.vtex",
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 16
+        }
+      },
+      {
+        "object": "Plant Yard Indirect Light",
+        "object_id": "337279ef-0a6e-413a-ad7f-0784e9a2bdd7",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.IndirectLightVolume",
+          "__guid": "26d5ce4c-365a-4787-882a-888ecc9996b7",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 2,
+          "BakeVersion": 1,
+          "BlendDistance": 120,
+          "Bounds": {
+            "Mins": "-1766,-2316,2",
+            "Maxs": "2466,2316,578"
+          },
+          "DistanceTexture": {
+            "Id": "573b092e-d33d-4f32-9ff5-33c749678ff5",
+            "Path": "lighting/riverdale/daylight-v1/yard_distance.vtex"
+          },
+          "InsideGeometry": "Relocate",
+          "IrradianceTexture": {
+            "Id": "a9f12ac1-5a36-4c66-9339-823c2e48c366",
+            "Path": "lighting/riverdale/daylight-v1/yard_irradiance.vtex"
+          },
+          "NormalBias": 20,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "ProbeDensity": 8,
+          "RelocationTexture": {
+            "Id": "7d9bd9fe-8bd9-487f-86c0-9eb5f131eb52",
+            "Path": "lighting/riverdale/daylight-v1/yard_relocation.vtex"
+          },
+          "RenderExcludeTags": "",
+          "RuntimeContrast": 1,
+          "RuntimeIntensity": 1.6,
+          "RuntimeSaturation": 1,
+          "RuntimeTint": "1,1,1,1",
+          "ViewBias": 30
+        }
+      },
+      {
+        "object": "Reactor Hall Indirect Light",
+        "object_id": "947a1f70-aa7f-4083-927f-f70a8f2295d7",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.IndirectLightVolume",
+          "__guid": "7bb591bd-4d46-4556-9c93-1837b288b863",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 2,
+          "BakeVersion": 1,
+          "BlendDistance": 24,
+          "Bounds": {
+            "Mins": "-216,-1016,2",
+            "Maxs": "2016,1016,1016"
+          },
+          "DistanceTexture": {
+            "Id": "c0dbac8b-2cdd-4579-b573-8e75a5127e98",
+            "Path": "lighting/riverdale/daylight-v1/hall_distance.vtex"
+          },
+          "InsideGeometry": "Relocate",
+          "IrradianceTexture": {
+            "Id": "78c59a53-da55-4abf-8c7c-664c820f25bc",
+            "Path": "lighting/riverdale/daylight-v1/hall_irradiance.vtex"
+          },
+          "NormalBias": 70,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "ProbeDensity": 8,
+          "RelocationTexture": {
+            "Id": "499a99f7-a638-4faa-8cb6-8b87afe10758",
+            "Path": "lighting/riverdale/daylight-v1/hall_relocation.vtex"
+          },
+          "RenderExcludeTags": "",
+          "RuntimeContrast": 1,
+          "RuntimeIntensity": 2.1,
+          "RuntimeSaturation": 1,
+          "RuntimeTint": "1,1,1,1",
+          "ViewBias": 100
+        }
+      },
+      {
+        "object": "Fuel Pool Indirect Light",
+        "object_id": "80363032-ba9a-4f12-a918-ca73daf3c701",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.IndirectLightVolume",
+          "__guid": "36077fd7-1896-4ad6-9a65-87ad202c0270",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 2,
+          "BakeVersion": 1,
+          "BlendDistance": 24,
+          "Bounds": {
+            "Mins": "372,-528,-528",
+            "Maxs": "1428,528,8"
+          },
+          "DistanceTexture": {
+            "Id": "3dcd1ebe-abe5-4c9a-b5fe-0559e275a522",
+            "Path": "lighting/riverdale/daylight-v1/pool_distance.vtex"
+          },
+          "InsideGeometry": "Relocate",
+          "IrradianceTexture": {
+            "Id": "16f00097-97e2-4b68-856b-82d1b9f140f0",
+            "Path": "lighting/riverdale/daylight-v1/pool_irradiance.vtex"
+          },
+          "NormalBias": 20,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "ProbeDensity": 8,
+          "RelocationTexture": {
+            "Id": "ee368f07-65a7-4487-8d9f-f2ef65e7a56f",
+            "Path": "lighting/riverdale/daylight-v1/pool_relocation.vtex"
+          },
+          "RenderExcludeTags": "",
+          "RuntimeContrast": 1,
+          "RuntimeIntensity": 1.2,
+          "RuntimeSaturation": 1,
+          "RuntimeTint": "1,1,1,1",
+          "ViewBias": 30
+        }
+      }
+    ]
+  },
+  {
+    "path": "Assets/scenes/maps/Riverside/riverside.scene",
+    "title": "Riverside",
+    "lighting": [
+      {
+        "object": "Moon",
+        "object_id": "ae5ea174-434b-537e-aa0a-df0f96223046",
+        "rotation": "0.3006028,0.0078716,-0.9533901,0.0249654",
+        "component": {
+          "__type": "Sandbox.DirectionalLight",
+          "__guid": "efb4cadd-89fb-50f7-aadb-4ae45dd41435",
+          "__enabled": true,
+          "Flags": 0,
+          "ContactShadows": true,
+          "FogMode": "Enabled",
+          "FogStrength": 1,
+          "LightColor": "0.20,0.25,0.36,1",
+          "ShadowBias": 0.0005,
+          "ShadowCascadeCount": 4,
+          "ShadowCascadeSplitRatio": 0.91,
+          "ShadowHardness": 0,
+          "Shadows": true,
+          "SkyColor": "0.035,0.045,0.07,1"
+        }
+      },
+      {
+        "object": "Sky",
+        "object_id": "fedf5014-8c5e-5bb7-b018-780c5ef397ba",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.SkyBox2D",
+          "__guid": "7309ed1b-1d9e-5719-a5cf-fb037f3ef05c",
+          "__enabled": true,
+          "Flags": 0,
+          "SkyIndirectLighting": true,
+          "SkyMaterial": "materials/riverside/sky/riverside_sky.vmat",
+          "Tint": "3.4,3.4,3.7,1"
+        }
+      },
+      {
+        "object": "Fog",
+        "object_id": "27376a11-79d3-506a-b28a-c798de5da935",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.GradientFog",
+          "__guid": "c280584e-9601-5d25-8947-0d10639d79fe",
+          "__enabled": true,
+          "Flags": 0,
+          "Color": "0.050,0.062,0.085,0.85",
+          "StartDistance": 600,
+          "EndDistance": 12000,
+          "FalloffExponent": 1.1,
+          "Height": 3000,
+          "VerticalFalloffExponent": 1.4
+        }
+      },
+      {
+        "object": "Look",
+        "object_id": "90ac853d-d57a-5590-9e4e-2f58a30e78b9",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.ColorGrading",
+          "__guid": "37751ea4-bed7-5c3f-a209-5e47aea9e7e3",
+          "__enabled": true,
+          "Flags": 0,
+          "GradingMethod": "TemperatureControl",
+          "ColorTempK": 7400,
+          "BlendFactor": 0.35,
+          "ColorSpace": "None",
+          "LookupTexture": null
+        }
+      },
+      {
+        "object": "Look",
+        "object_id": "90ac853d-d57a-5590-9e4e-2f58a30e78b9",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.Tonemapping",
+          "__guid": "a5e47804-5c44-5936-99e2-6b2715f947ab",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 3,
+          "AutoExposureEnabled": true,
+          "ExposureCompensation": 0,
+          "ExposureMethod": "RGB",
+          "MinimumExposure": 1.5,
+          "MaximumExposure": 3.5,
+          "Mode": "ACES",
+          "Rate": 1
+        }
+      },
+      {
+        "object": "Probe Store",
+        "object_id": "b61e6b0f-6aec-5f96-872a-607ec747dc71",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "2bf61a87-ff7d-56d0-b4ef-ab4eb43e711c",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-180,-150,-60",
+            "Maxs": "180,150,70"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 8192,
+          "ZNear": 8
+        }
+      },
+      {
+        "object": "Probe Plaza",
+        "object_id": "baa7e000-7092-5282-ac11-05369c86841b",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "21348dea-c3c9-5d08-be9a-caf6b6f5ab95",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-500,-700,-110",
+            "Maxs": "700,700,300"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 8192,
+          "ZNear": 8
+        }
+      }
+    ]
+  },
+  {
+    "path": "Assets/scenes/maps/sewage/sewage.scene",
+    "title": "Sewage",
+    "lighting": [
+      {
+        "object": "Chamber atmosphere",
+        "object_id": "74ce7457-d7e5-5c8b-b894-6bb73be0a283",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.GradientFog",
+          "__guid": "244d21d8-b050-5df4-8e9f-5c7b24a64b82",
+          "__enabled": true,
+          "Flags": 0,
+          "Color": "0.055,0.1,0.078,0.7",
+          "EndDistance": 3400,
+          "FalloffExponent": 1.8,
+          "Height": 900,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "StartDistance": 350,
+          "VerticalFalloffExponent": 1
+        }
+      },
+      {
+        "object": "Chamber reflection 0",
+        "object_id": "82c0743a-f495-557b-bbca-40908955ed44",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "4cacbaad-48a3-5eb8-b036-bca80b4f9f3b",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-650,-400,-350",
+            "Maxs": "1400,650,500"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 200,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "Projection": "Sphere",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": {
+            "Id": "16430ba5-0467-4da9-a9ac-367038c22d2b",
+            "Path": "lighting/sewage/reflection_0.vtex"
+          },
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 3000,
+          "ZNear": 16
+        }
+      },
+      {
+        "object": "Chamber reflection 1",
+        "object_id": "c9922cf5-c477-549f-927f-24d15097ad97",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "9211fd53-8633-5f67-9752-345d1c643925",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-1000,-600,-430",
+            "Maxs": "1050,520,500"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 200,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "Projection": "Sphere",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": {
+            "Id": "faf196bd-2ff1-46b0-a8a5-538249cfab49",
+            "Path": "lighting/sewage/reflection_1.vtex"
+          },
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 3000,
+          "ZNear": 16
+        }
+      },
+      {
+        "object": "Chamber reflection 2",
+        "object_id": "e4f435a8-9cc0-5f5d-935a-fffbd95809fa",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "54f3b1a9-6c16-5810-9de7-ee936eb3f186",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-1460,-1450,-100",
+            "Maxs": "570,640,500"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 200,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "Projection": "Sphere",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": {
+            "Id": "e69efa89-1f38-44ab-9b51-fb42a97ea41a",
+            "Path": "lighting/sewage/reflection_2.vtex"
+          },
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 3000,
+          "ZNear": 16
+        }
+      }
+    ]
+  },
+  {
+    "path": "Assets/scenes/maps/Shipment/Shipment.scene",
+    "title": "Shipment",
+    "lighting": [
+      {
+        "object": "2D Skybox",
+        "object_id": "00344a8c-fa5e-45ae-b12a-10bb781a1dc3",
+        "rotation": null,
+        "component": {
+          "__type": "Sandbox.SkyBox2D",
+          "__guid": "1547c864-ff73-42cf-8029-2510da54f185",
+          "SkyMaterial": "materials/sky/atmosphere_sky.vmat",
+          "Tint": "1,1,1,1"
+        }
+      },
+      {
+        "object": "Sun",
+        "object_id": "928bc0fc-bc7f-41be-83d6-ef65bb0cc9c7",
+        "rotation": "-0.1334227,0.3430976,0.3369845,0.8665587",
+        "component": {
+          "__type": "Sandbox.DirectionalLight",
+          "__guid": "009cfee9-49cb-4968-b159-727c3d637332",
+          "FogMode": "Enabled",
+          "FogStrength": 1,
+          "LightColor": "1,0.9476,0.75814,1",
+          "Shadows": true,
+          "SkyColor": "0.09767,0.09767,0.09767,1"
+        }
+      },
+      {
+        "object": "Envmap Probe",
+        "object_id": "4c5c8f01-4080-4057-8c27-ab104c8a2b11",
+        "rotation": null,
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "145aa785-7953-45f9-87d1-39b6357c5c50",
+          "Bounds": {
+            "Mins": "-1000,-1000,-1000",
+            "Maxs": "1000,1000,1000"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.02,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "FrameInterval",
+          "ZFar": 4096,
+          "ZNear": 16
+        }
+      },
+      {
+        "object": "Gradient Fog",
+        "object_id": "5d8fba87-e4dc-4ef8-bb78-6b6222242a99",
+        "rotation": null,
+        "component": {
+          "__type": "Sandbox.GradientFog",
+          "__guid": "d1f06fda-11b0-45f9-9bab-74f60b824242",
+          "Color": "0.88837,0.71152,0.44625,1",
+          "EndDistance": 16384,
+          "FalloffExponent": 1,
+          "Height": 128,
+          "StartDistance": 8192,
+          "VerticalFalloffExponent": 2
+        }
+      }
+    ]
+  },
+  {
+    "path": "Assets/scenes/maps/spillway/spillway.scene",
+    "title": "Spillway",
+    "lighting": [
+      {
+        "object": "Sun",
+        "object_id": "faff56ce-e2c2-5183-9977-298bea3a8309",
+        "rotation": "-0.1059946,0.3078307,0.3078307,0.8940054",
+        "component": {
+          "__type": "Sandbox.DirectionalLight",
+          "__guid": "4e99e25a-8687-51fb-b125-7ac5c4d54733",
+          "__enabled": true,
+          "Flags": 0,
+          "ContactShadows": true,
+          "FogMode": "Enabled",
+          "FogStrength": 1,
+          "LightColor": "1.40,1.29,1.14,1",
+          "ShadowBias": 0.0005,
+          "ShadowCascadeCount": 4,
+          "ShadowCascadeSplitRatio": 0.91,
+          "ShadowHardness": 0,
+          "Shadows": true,
+          "SkyColor": "0,0,0,1"
+        }
+      },
+      {
+        "object": "Sky",
+        "object_id": "43b54e42-26b3-5a5f-b743-c43c90b3bb1f",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.SkyBox2D",
+          "__guid": "f409b7c4-2258-5b27-96fe-c2def15a4869",
+          "__enabled": true,
+          "Flags": 0,
+          "SkyIndirectLighting": true,
+          "SkyMaterial": "materials/spillway/sky/spillway_sky.vmat",
+          "Tint": "1,1,1,1"
+        }
+      },
+      {
+        "object": "Fog",
+        "object_id": "5de43c42-9e35-5ccc-a782-187adf7bb19e",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.GradientFog",
+          "__guid": "94f454d7-e098-5ca7-90bc-c0b243ce3d48",
+          "__enabled": true,
+          "Flags": 0,
+          "Color": "0.48,0.55,0.63,0.92",
+          "StartDistance": 6000,
+          "EndDistance": 43000,
+          "FalloffExponent": 0.7,
+          "Height": 12000,
+          "VerticalFalloffExponent": 1.2
+        }
+      },
+      {
+        "object": "Look",
+        "object_id": "9999ab98-92f6-5525-b5c6-4a43464d27a2",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.ColorGrading",
+          "__guid": "ade6fdbd-f732-5644-9bfa-4fb06eccadaa",
+          "__enabled": true,
+          "Flags": 0,
+          "GradingMethod": "TemperatureControl",
+          "ColorTempK": 6700,
+          "BlendFactor": 0.15,
+          "ColorSpace": "None",
+          "LookupTexture": null
+        }
+      },
+      {
+        "object": "Look",
+        "object_id": "9999ab98-92f6-5525-b5c6-4a43464d27a2",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.Tonemapping",
+          "__guid": "6427b0fc-6987-58fd-8407-908af20412a0",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 3,
+          "AutoExposureEnabled": true,
+          "ExposureCompensation": 0,
+          "ExposureMethod": "RGB",
+          "MinimumExposure": 1.4,
+          "MaximumExposure": 1.4,
+          "Mode": "ACES",
+          "Rate": 1
+        }
+      },
+      {
+        "object": "Probe Yard",
+        "object_id": "12001003-e6c7-5f72-a693-8bdf9131c320",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "b06c434b-4a15-5fdb-8623-c989053cd0f7",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-1450,-2380,-580",
+            "Maxs": "2300,2420,920"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 8192,
+          "ZNear": 8,
+          "Mode": "CustomTexture",
+          "Texture": "lighting/spillway/reflection_0.vtex"
+        }
+      },
+      {
+        "object": "Probe Turbine",
+        "object_id": "2da2af69-f08c-57d9-85e3-84f38b7cc937",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "b5a93d4f-4173-5230-969e-5171c32366a3",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-540,-410,-140",
+            "Maxs": "550,620,460"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 8192,
+          "ZNear": 8,
+          "Mode": "CustomTexture",
+          "Texture": "lighting/spillway/reflection_1.vtex"
+        }
+      },
+      {
+        "object": "Probe Control lower",
+        "object_id": "8da29448-b33e-53f4-a0bd-f5fa795eeead",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "e4191e88-29be-530e-87bf-dd2d38dc248c",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-380,-550,-100",
+            "Maxs": "400,520,118"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 8192,
+          "ZNear": 8,
+          "Mode": "CustomTexture",
+          "Texture": "lighting/spillway/reflection_2.vtex"
+        }
+      },
+      {
+        "object": "Probe Control upper",
+        "object_id": "6df82235-3fd0-5d2a-a00b-66c858f4670f",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "63ef58aa-3637-5de0-9551-67b089d75c05",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-240,-520,-104",
+            "Maxs": "390,490,140"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 8192,
+          "ZNear": 8,
+          "Mode": "CustomTexture",
+          "Texture": "lighting/spillway/reflection_3.vtex"
+        }
+      },
+      {
+        "object": "Probe Pump room",
+        "object_id": "26eb95ff-5c80-557b-bde2-f5bb7f4c3f05",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "eea7e066-9b6f-5b39-bb82-a829d29ce048",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-300,-370,-160",
+            "Maxs": "320,340,180"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 8192,
+          "ZNear": 8,
+          "Mode": "CustomTexture",
+          "Texture": "lighting/spillway/reflection_4.vtex"
+        }
+      }
+    ]
+  },
+  {
+    "path": "Assets/scenes/maps/thieves_aesthetic.scene",
+    "title": "aesthetic_mall",
+    "lighting": []
+  },
+  {
+    "path": "Assets/scenes/maps/Veridant/veridant.scene",
+    "title": "Veridant",
+    "lighting": [
+      {
+        "object": "Sun",
+        "object_id": "88a8793f-72d4-57bb-880b-3302d31df3a4",
+        "rotation": "0.0247953,0.0162874,-0.8354395,0.5487812",
+        "component": {
+          "__type": "Sandbox.DirectionalLight",
+          "__guid": "1369a462-5204-57cd-905d-66eb77df0f71",
+          "__enabled": true,
+          "Flags": 0,
+          "ContactShadows": true,
+          "FogMode": "Enabled",
+          "FogStrength": 1,
+          "LightColor": "1.70,0.78,0.36,1",
+          "ShadowBias": 0.0005,
+          "ShadowCascadeCount": 4,
+          "ShadowCascadeSplitRatio": 0.91,
+          "ShadowHardness": 0,
+          "Shadows": true,
+          "SkyColor": "0.42,0.40,0.50,1"
+        }
+      },
+      {
+        "object": "Sky",
+        "object_id": "2c04e170-90b5-5073-8281-be9db1b0bd07",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.SkyBox2D",
+          "__guid": "61456e8d-b152-578a-ab87-3925720ee28a",
+          "__enabled": true,
+          "Flags": 0,
+          "SkyIndirectLighting": true,
+          "SkyMaterial": "materials/veridant/sky/veridant_sky.vmat",
+          "Tint": "1.32,1.32,1.32,1"
+        }
+      },
+      {
+        "object": "Fog",
+        "object_id": "bb420e15-850f-5312-91fa-7a8699c69a12",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.GradientFog",
+          "__guid": "d9dac57c-3b88-57fa-89c2-aa6e35f92512",
+          "__enabled": true,
+          "Flags": 0,
+          "Color": "0.72,0.69,0.73,0.74",
+          "StartDistance": 2500,
+          "EndDistance": 48000,
+          "FalloffExponent": 1.0,
+          "Height": 9000,
+          "VerticalFalloffExponent": 1.2
+        }
+      },
+      {
+        "object": "Look",
+        "object_id": "49a39ef0-1cff-5bc8-baad-dfded5b1d098",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.Tonemapping",
+          "__guid": "419c9bc4-bb03-56a4-bdd2-1acb434f33df",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 3,
+          "AutoExposureEnabled": true,
+          "ExposureCompensation": 0,
+          "ExposureMethod": "RGB",
+          "MinimumExposure": 2.1,
+          "MaximumExposure": 2.4,
+          "Mode": "ACES",
+          "Rate": 1
+        }
+      },
+      {
+        "object": "Probe Courtyard",
+        "object_id": "8a625316-fd69-5aad-84e5-e416fb027863",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "cf2c7e89-3bf3-5c6c-b6bb-fba8e07793f8",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-260,-480,-210",
+            "Maxs": "340,480,300"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 8192,
+          "ZNear": 8,
+          "Priority": 1
+        }
+      },
+      {
+        "object": "Probe Cafe",
+        "object_id": "32bddd87-a21c-5c58-94e7-e63285f283bb",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "b72c9f52-99e3-5a10-9b70-b2f7d7e16cae",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-190,-220,-60",
+            "Maxs": "190,240,52"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 8192,
+          "ZNear": 8,
+          "Priority": 1
+        }
+      },
+      {
+        "object": "Probe Lounge Down",
+        "object_id": "bd408f82-295c-5884-9aba-d0443895e459",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "2d7ccf01-c691-5c34-98e5-0da565425422",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-180,-260,-60",
+            "Maxs": "200,260,52"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 8192,
+          "ZNear": 8,
+          "Priority": 1
+        }
+      },
+      {
+        "object": "Probe Lounge Up",
+        "object_id": "5ca564e6-faee-5e0f-90c3-c99b5a5fd304",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "e8f912e7-9bc6-59f2-ae1c-b48eb3b630ff",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-180,-260,-62",
+            "Maxs": "200,260,66"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 8192,
+          "ZNear": 8,
+          "Priority": 1
+        }
+      },
+      {
+        "object": "Probe Hall",
+        "object_id": "3dd13f39-a882-5f3f-830c-4a0849de998f",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "b97ee8a1-8dc5-596b-a0ac-55f790dd43d5",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-190,-480,-60",
+            "Maxs": "190,480,52"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 8192,
+          "ZNear": 8,
+          "Priority": 1
+        }
+      },
+      {
+        "object": "Probe Lobby",
+        "object_id": "f61db2d7-167a-58eb-a769-1218f0b7a0bd",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "80f9c0da-73ed-532f-8471-0167138f2942",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-124,-304,-62",
+            "Maxs": "124,300,50"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 8192,
+          "ZNear": 8,
+          "Priority": 1
+        }
+      },
+      {
+        "object": "Probe Reception",
+        "object_id": "f6fc8063-4929-5ad1-bb80-a16f399be827",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "4c58f082-bbd1-5259-b6e2-f9d3d5c71df4",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-164,-144,-60",
+            "Maxs": "180,244,52"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 8192,
+          "ZNear": 8,
+          "Priority": 1
+        }
+      },
+      {
+        "object": "Probe Colonnade",
+        "object_id": "2fbfe269-f699-5f00-9a7c-fbaea8ec908e",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "d1877c6e-c8b4-56d9-a766-dd2c3c09912b",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-60,-220,-90",
+            "Maxs": "60,220,86"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 8192,
+          "ZNear": 8,
+          "Priority": 1
+        }
+      },
+      {
+        "object": "Probe Outside",
+        "object_id": "99ac6d2a-3eec-55d7-abbd-3ac8ff0f8fd9",
+        "rotation": "0,0,0,1",
+        "component": {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "1732ddf6-25a1-59fc-9b30-418130de1742",
+          "__enabled": true,
+          "Flags": 0,
+          "Bounds": {
+            "Mins": "-39850,-40000,-900",
+            "Maxs": "40150,40000,8600"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Box",
+          "RenderDynamically": true,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 60000,
+          "ZNear": 8,
+          "Priority": 0
+        }
+      }
+    ]
+  }
+]

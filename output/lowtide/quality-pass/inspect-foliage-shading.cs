@@ -1,0 +1,9 @@
+var material=Material.Load("models/sbox_props/trees/oak/oak_branch.vmat");
+var parameters=new[]{"g_flAlphaTestReference","g_flAlphaDistanceStart","g_flAlphaDistanceEnd","g_flWrapAmount","g_flWrapStrength","g_flTransmissionScale","g_flAmbientBoost","g_flMinRoughness","g_flNormalVariation","g_flGrassNormalUp","g_flGrazingFadeStart","g_flGrazingFadeEnd","g_flAntiAliasedEdgeStrength"}.Select(name=>new{name,value=material.GetVector4(name)}).ToArray();
+var features=new[]{"F_ALPHA_TEST","F_TRANSMISSIVE","F_FOLIAGE_ANIMATION","F_GRAZING_FADE","F_RENDER_BACKFACES"}.Select(name=>new{name,value=material.GetFeature(name)}).ToArray();
+var folder=System.IO.Path.Combine(Project.Current.GetRootPath(),"output/lowtide/quality-pass/foliage");
+using(var bitmap=material.GetTexture("g_tColor").GetBitmap(0))System.IO.File.WriteAllBytes(System.IO.Path.Combine(folder,"original-branch-atlas.png"),bitmap.ToPng());
+var t=material.GetTexture("g_tTransmissiveColor");
+var report=new{parameters,features,transmissionTexture=new{t?.Width,t?.Height}};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"shading.json"),System.Text.Json.JsonSerializer.Serialize(report,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return report;

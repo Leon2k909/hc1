@@ -1,0 +1,246 @@
+{
+  "accepted_utc": "2026-10-15T15:27:05.005079+00:00",
+  "state": "accepted after native comparison",
+  "revision": "garden-v2",
+  "predecessor_manifest": {
+    "path": "output/belltower/quality/models/garden-v1/native-import.json",
+    "sha256": "362378637b63f138fafd4b7a15f698659f7646d258ea81e353b328552f7ec2ff"
+  },
+  "changes": [
+    "closed shed roof gaps and fitted corrugated sheets",
+    "individual shed boards and braced doors with hardware",
+    "slatted compost bins",
+    "separate split logs with end grain",
+    "open wheelbarrow basin, frame, legs and rounded wheel",
+    "shed cladding recessed behind trim to remove coplanar surface artifacts"
+  ],
+  "source_manifest_sha256": "d1ccb5bad21f18fc8f90f0280d440430cac8ce776af06d3c1a20350e6824538d",
+  "source_hashes": {
+    "Tools/belltower_map.py": "5e6d9ecfc223d03445c83a009d2f411bc210626bfb72abaf6c3eca722dd6abb5",
+    "Tools/belltower_gardens.py": "97ecf15e63aeabee3ce49d03b7abb3fabcc2821699701c7c89732380da2d802f",
+    "Tools/belltower_furniture.py": "36c83d4883b3084b90b3ff46d9ef56e5aef7cd916f9e4c399058884105974a24",
+    "Tools/belltower_architecture.py": "1efa88784a36785c422f241701e90e9ffbe796cef8446d7343e88af23d563c73",
+    "Tools/belltower_detail.py": "fa4f756709e670c3053fb9d0be3c48f01cffec87eaa39c35f01497b9bf4f50bf",
+    "Tools/belltower_quality_models.py": "6a01a66a37fe714dd3c43b6017640a1890c7d1c2e42fb178376df902000d3709",
+    "Tools/map_kit.py": "00d860ffb0679c42efe962e6bb7e87da95c56c35e73b00923fa253dd5c95ecb7"
+  },
+  "models": [
+    {
+      "name": "belltower_west",
+      "triangles": 996123,
+      "boxes": 457,
+      "hulls": 116,
+      "physics_sha256": "701d5de6e33415fb8689379345575195912ce41f274e57daf93ac744fd63ba61",
+      "first_material": "materials/belltower/ashlar.vmat",
+      "first_material_triangles": 10681,
+      "new_material": "materials/gunsmith_range/bench_oak_endgrain.vmat"
+    },
+    {
+      "name": "belltower_east",
+      "triangles": 996123,
+      "boxes": 457,
+      "hulls": 116,
+      "physics_sha256": "0096ac4ed787521a92e3c48f6a364da6b2092712d047371644dbc6c46bc15b67",
+      "first_material": "materials/belltower/ashlar.vmat",
+      "first_material_triangles": 10681,
+      "new_material": "materials/gunsmith_range/bench_oak_endgrain.vmat"
+    }
+  ],
+  "installed_files": [
+    {
+      "source": "output/belltower/quality/models/garden-v2/belltower_east.obj",
+      "path": "models/maps/belltower/belltower_east.obj",
+      "sha256": "40b2ce9db660baa012f699c18975a18228ccfc33223a7e7dca4ce5661eabd5f0",
+      "expected_sha256": "3c44963c881be0158e809b31db1474ca2a260e1cd8a83699f39bf59d266e26c1"
+    },
+    {
+      "source": "output/belltower/quality/models/garden-v2/belltower_west.obj",
+      "path": "models/maps/belltower/belltower_west.obj",
+      "sha256": "6f0102d8acaf2f827d47e68d2c956e629f26cc31c892158c9b5ba7e78cf63585",
+      "expected_sha256": "7b4ab19f8c22047101617865c3b42d1063ffad712984fd63ac0640924ef25f9b"
+    }
+  ],
+  "unchanged_collision_inputs": [
+    {
+      "path": "Assets/models/maps/belltower/belltower_west_hulls_default.obj",
+      "sha256": "9e705ead3ab587de48d1af86ec071ecc16e4721e476771100a09378aaa8b4b77",
+      "equivalence": "same convex vertex sets; face triangulation may differ"
+    },
+    {
+      "path": "Assets/models/maps/belltower/belltower_west_hulls_metal.obj",
+      "sha256": "8184b390f812f999de0af3c8e00a94c55d7716cb22f2def38177e087d1a4a322",
+      "equivalence": "same convex vertex sets; face triangulation may differ"
+    },
+    {
+      "path": "Assets/models/maps/belltower/belltower_west_hulls_wood.obj",
+      "sha256": "7203718fb1367217d8d3a24731814f2c11af7c0c41f22a62b7322e77b65c0cae",
+      "equivalence": "same convex vertex sets; face triangulation may differ"
+    },
+    {
+      "path": "Assets/models/maps/belltower/belltower_east_hulls_default.obj",
+      "sha256": "54a84215ab782c2ee40ad35103b1c95e5a934a211901a3517bedd97b54a434ae",
+      "equivalence": "same convex vertex sets; face triangulation may differ"
+    },
+    {
+      "path": "Assets/models/maps/belltower/belltower_east_hulls_metal.obj",
+      "sha256": "da8d6bba9b8e73cc61f8964e6169e116c637b60a0e5a44694d6ef67ded6815b0",
+      "equivalence": "same convex vertex sets; face triangulation may differ"
+    },
+    {
+      "path": "Assets/models/maps/belltower/belltower_east_hulls_wood.obj",
+      "sha256": "ce30cd2f1eb94c16339396eb4b689e2fa0d55ac7fba4d19a4c379c3e32933c79",
+      "equivalence": "same convex vertex sets; face triangulation may differ"
+    }
+  ],
+  "existing_material_dependencies": [
+    {
+      "path": "Assets/materials/gunsmith_range/bench_oak_endgrain.vmat",
+      "sha256": "4ce210371596ca959e07590258757f5f335c1a5e84e79459ce38c51a2f0b3115"
+    },
+    {
+      "path": "Assets/materials/gunsmith_range/bench_oak_endgrain_color.png",
+      "sha256": "e17275492490c2ab11f5606719f02df2b28470c91c96efd43f166d8409c03f09"
+    },
+    {
+      "path": "Assets/materials/gunsmith_range/bench_oak_endgrain_normal.png",
+      "sha256": "75e04c3cb59fca9d42f5a7da8c020dc3dc43baeded89249fd3eea31cf217e746"
+    },
+    {
+      "path": "Assets/materials/gunsmith_range/bench_oak_endgrain_roughness.png",
+      "sha256": "8cb8197fa6fc47e2559cc256d50ae341452dc015d4da4d2b30f8e25e2a864f69"
+    }
+  ],
+  "unchanged_model_inputs": [
+    {
+      "path": "Assets/models/maps/belltower/belltower_east.mtl",
+      "sha256": "4d2a0dfdad2f85d8451dcc26aa1c54049970320d1f9a7cdc3af778e89f20492a"
+    },
+    {
+      "path": "Assets/models/maps/belltower/belltower_east.vmdl",
+      "sha256": "e1a44657ef186377880ea94a121b4e45d9a46761fb2e85fd9fa96346cdbcd145"
+    },
+    {
+      "path": "Assets/models/maps/belltower/belltower_west.mtl",
+      "sha256": "9704ac97eb2fed6b4ac226396b0dea2b823dcbd923aa590bb64fbe334157381a"
+    },
+    {
+      "path": "Assets/models/maps/belltower/belltower_west.vmdl",
+      "sha256": "ac4e95f72c92f87ee4c91d2b7800c890193cb92bbb0e323bbf5f66a286048ad9"
+    }
+  ],
+  "gameplay_spots": 94,
+  "geometry_checks": 11,
+  "shared_random_sequence_preserved": true,
+  "native_compiles": {
+    "west": {
+      "Success": true,
+      "Path": "models/maps/belltower/belltower_west.vmdl",
+      "CompiledFile": "d:/documents/s&box projects/hc1/forked-shooter-main/assets/models/maps/belltower/belltower_west.vmdl_c",
+      "Hint": null
+    },
+    "east": {
+      "Success": true,
+      "Path": "models/maps/belltower/belltower_east.vmdl",
+      "CompiledFile": "d:/documents/s&box projects/hc1/forked-shooter-main/assets/models/maps/belltower/belltower_east.vmdl_c",
+      "Hint": null
+    }
+  },
+  "native_resources": {
+    "ManifestSha256": "d1ccb5bad21f18fc8f90f0280d440430cac8ce776af06d3c1a20350e6824538d",
+    "Models": [
+      {
+        "Model": "models/maps/belltower/belltower_west.vmdl",
+        "AuthoredTriangles": 996123,
+        "NativeFirstMaterialTriangles": 10681,
+        "NativeTotalTrianglesVerified": false,
+        "MeshCount": 1,
+        "Materials": 105,
+        "NewMaterialLoaded": true
+      },
+      {
+        "Model": "models/maps/belltower/belltower_east.vmdl",
+        "AuthoredTriangles": 996123,
+        "NativeFirstMaterialTriangles": 10681,
+        "NativeTotalTrianglesVerified": false,
+        "MeshCount": 1,
+        "Materials": 102,
+        "NewMaterialLoaded": true
+      }
+    ]
+  },
+  "scene_sha256": "aef98ef9fc0c4e484f6456f31dccc58f27163eb339e4844ebfa251de0333154a",
+  "scene_unchanged": true,
+  "captures": [
+    {
+      "view": "terrace",
+      "before": "output/belltower/quality/garden-v1-before/terrace.png",
+      "after": "output/belltower/quality/garden-v2-saved/terrace.png",
+      "sha256": "558dae8137aba0a64823908b365c0b7dd9dce8052b58d75a4950fd69f7837aac"
+    },
+    {
+      "view": "coping",
+      "before": "output/belltower/quality/garden-v1-before/coping.png",
+      "after": "output/belltower/quality/garden-v2-saved/coping.png",
+      "sha256": "5b9643bc62eac5b0d424b8229d7c7d040deec444feecc53322aece409d685a6c"
+    },
+    {
+      "view": "garden-shed",
+      "before": "output/belltower/quality/garden-v1-before/garden-shed.png",
+      "after": "output/belltower/quality/garden-v2-saved/garden-shed.png",
+      "sha256": "ac29f7a9fc9b3cfeb4efa87562e4d9e1a8798d0f1d216ff6b7c1fed165d019b2"
+    },
+    {
+      "view": "small-shed",
+      "before": "output/belltower/quality/garden-v1-before/small-shed.png",
+      "after": "output/belltower/quality/garden-v2-saved/small-shed.png",
+      "sha256": "d4538e7c13852524e22d610ffef01a4adf1c5a935403324218fb3b77e603db88"
+    },
+    {
+      "view": "garden-store",
+      "before": "output/belltower/quality/garden-v1-before/garden-store.png",
+      "after": "output/belltower/quality/garden-v2-saved/garden-store.png",
+      "sha256": "1fcd3a646b3771e7bed41ac1c55a94efabb1c9f358b3e93976a9e680f3dea540"
+    },
+    {
+      "view": "firewood",
+      "before": "output/belltower/quality/garden-v1-before/firewood.png",
+      "after": "output/belltower/quality/garden-v2-saved/firewood.png",
+      "sha256": "fb660353fc3ba4796e71cba69d96dffbc9f23a799ecfe63dbeb5ae062b4dff2e"
+    },
+    {
+      "view": "wheelbarrow",
+      "before": "output/belltower/quality/garden-v1-before/wheelbarrow.png",
+      "after": "output/belltower/quality/garden-v2-saved/wheelbarrow.png",
+      "sha256": "9ff8620951f559e1d2418a146de9f793ac2c520adc24e520afa4a4538fe89872"
+    }
+  ],
+  "editor_restored": {
+    "EngineVersion": "26.10.13",
+    "Project": "razedtest",
+    "ProjectTitle": "RazedTest",
+    "ActiveScene": "cerroblanco",
+    "ActiveScenePath": "scenes/maps/cerroblanco/cerroblanco.scene",
+    "SceneHasUnsavedChanges": false,
+    "IsPlaying": false,
+    "IsPaused": false,
+    "ToolCount": 128,
+    "IsCompiling": false,
+    "LastCompileSucceeded": true,
+    "LastCompileErrors": 0,
+    "Paths": {
+      "Engine": "D:\\SteamLibrary\\steamapps\\common\\sbox",
+      "Logs": "D:\\SteamLibrary\\steamapps\\common\\sbox\\logs",
+      "ProjectRoot": "D:\\Documents\\s&box projects\\hc1\\forked-shooter-main",
+      "ProjectSettings": "D:\\Documents\\s&box projects\\hc1\\forked-shooter-main\\ProjectSettings"
+    }
+  },
+  "review": "Shed roof gaps are closed and the coplanar trim artifacts are gone in the matching native views. Retain this incremental prop pass; the broader visual-quality review remains open.",
+  "limitations": [
+    "GetIndexCountForLod exposes only the first material index count in this engine; total triangles are verified from the hashed source OBJ files.",
+    "The indirect lighting and reflections retain the previous bake.",
+    "Gameplay performance has not been measured for this pass.",
+    "Firewood still has visibly faceted profiles and needs convincing bark and cut-face detail.",
+    "The wheelbarrow chassis runs partly inside the basin; lower its support frame in a follow-up geometry pass.",
+    "The wider visual quality goal remains open."
+  ]
+}

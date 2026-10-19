@@ -1,0 +1,45 @@
+{
+  "tool": "call_tools",
+  "arguments": {
+    "calls": [
+      {
+        "name": "asset_compile",
+        "arguments": {
+          "path": "materials/lowtide/drainage/lt_grate_cast_iron.vmat",
+          "full": true
+        }
+      },
+      {
+        "name": "asset_compile",
+        "arguments": {
+          "path": "materials/lowtide/drainage/lt_grate_well.vmat",
+          "full": true
+        }
+      },
+      {
+        "name": "asset_compile",
+        "arguments": {
+          "path": "models/maps/lowtide/lowtide_finish.vmdl",
+          "full": true
+        }
+      },
+      {
+        "name": "asset_compile",
+        "arguments": {
+          "path": "models/maps/lowtide/lowtide_east.vmdl",
+          "full": true
+        }
+      },
+      {
+        "name": "asset_compile",
+        "arguments": {
+          "path": "models/maps/lowtide/lowtide_west.vmdl",
+          "full": true
+        }
+      }
+    ]
+  },
+  "returncode": 1,
+  "stdout": "",
+  "stderr": "sbox-cli: tools/call failed: The operation has timed out.\n"
+}

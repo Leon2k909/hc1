@@ -1,0 +1,595 @@
+{
+  "tool": "describe_toolset",
+  "arguments": {
+    "name": "asset"
+  },
+  "returncode": 0,
+  "stdout": "{\n  \"name\": \"asset\",\n  \"description\": \"The asset system - search, inspect, compile, edit and preview the project's assets\",\n  \"tools\": [\n    {\n      \"name\": \"asset_compile\",\n      \"title\": \"Asset Compile\",\n      \"toolset\": \"asset\",\n      \"description\": \"Recompile an asset from its source file. Compile errors and warnings land in the console - check read_console after a failure.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"path\": {\n            \"type\": \"string\",\n            \"description\": \"Asset path, as returned by asset_search.\"\n          },\n          \"full\": {\n            \"type\": \"boolean\",\n            \"description\": \"Force a full recompile instead of an incremental one.\",\n            \"default\": false\n          }\n        },\n        \"required\": [\n          \"path\"\n        ]\n      },\n      \"outputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"Success\": {\n            \"type\": \"boolean\"\n          },\n          \"Path\": {\n            \"type\": \"string\"\n          },\n          \"CompiledFile\": {\n            \"type\": \"string\"\n          },\n          \"Hint\": {\n            \"type\": \"string\"\n          }\n        },\n        \"required\": []\n      }\n    },\n    {\n      \"name\": \"asset_dependencies\",\n      \"title\": \"Asset Dependencies\",\n      \"toolset\": \"asset\",\n      \"description\": \"Walk an asset's relationships - the assets it references (uses), the assets that depend on it, or the assets it was generated from. Deep recurses the whole chain, e.g. a model's materials and their textures.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"path\": {\n            \"type\": \"string\",\n            \"description\": \"Asset path, as returned by asset_search.\"\n          },\n          \"relation\": {\n            \"type\": \"string\",\n            \"enum\": [\n              \"References\",\n              \"Dependants\",\n              \"Parents\"\n            ],\n            \"description\": \"Which direction to walk.\",\n            \"default\": \"References\"\n          },\n          \"deep\": {\n            \"type\": \"boolean\",\n            \"description\": \"Recurse instead of returning only direct relationships.\",\n            \"default\": false\n          },\n          \"type\": {\n            \"type\": \"string\",\n            \"description\": \"Filter results to one asset type - a file extension or friendly name. See asset_types.\"\n          },\n          \"limit\": {\n            \"type\": \"integer\",\n            \"description\": \"How many results to return.\",\n            \"minimum\": 1,\n            \"maximum\": 500,\n            \"default\": 100\n          }\n        },\n        \"required\": [\n          \"path\"\n        ]\n      },\n      \"annotations\": {\n        \"readOnlyHint\": true\n      },\n      \"outputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"Path\": {\n            \"type\": \"string\"\n          },\n          \"Relation\": {\n            \"type\": \"string\"\n          },\n          \"Total\": {\n            \"type\": \"integer\",\n            \"description\": \"How many related assets exist, beyond what's shown.\"\n          },\n          \"Assets\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"Path\": {\n                  \"type\": \"string\"\n                },\n                \"Type\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": []\n            }\n          }\n        },\n        \"required\": []\n      }\n    },\n    {\n      \"name\": \"asset_files\",\n      \"title\": \"Asset Files\",\n      \"toolset\": \"asset\",\n      \"description\": \"The loose disk files behind an asset - the input files it's built from (.fbx, .tga, .png...), extra content and game files it ships with, and reference paths that couldn't be resolved to assets.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"path\": {\n            \"type\": \"string\",\n            \"description\": \"Asset path, as returned by asset_search.\"\n          }\n        },\n        \"required\": [\n          \"path\"\n        ]\n      },\n      \"annotations\": {\n        \"readOnlyHint\": true\n      },\n      \"outputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"Path\": {\n            \"type\": \"string\"\n          },\n          \"SourceFile\": {\n            \"type\": \"string\"\n          },\n          \"CompiledFile\": {\n            \"type\": \"string\"\n          },\n          \"InputFiles\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"type\": \"string\"\n            }\n          },\n          \"AdditionalContentFiles\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"type\": \"string\"\n            }\n          },\n          \"AdditionalGameFiles\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"type\": \"string\"\n            }\n          },\n          \"UnresolvedReferences\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"type\": \"string\"\n            }\n          }\n        },\n        \"required\": []\n      }\n    },\n    {\n      \"name\": \"asset_find_by_file\",\n      \"title\": \"Asset Find By File\",\n      \"toolset\": \"asset\",\n      \"description\": \"Find the assets built from a loose disk file - which models use this .fbx, which textures use this .png. Matches the end of the path, so a filename is enough.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"file\": {\n            \"type\": \"string\",\n            \"description\": \"File path or filename, e.g. chair.fbx\"\n          },\n          \"limit\": {\n            \"type\": \"integer\",\n            \"description\": \"How many results to return.\",\n            \"minimum\": 1,\n            \"maximum\": 500,\n            \"default\": 50\n          }\n        },\n        \"required\": [\n          \"file\"\n        ]\n      },\n      \"annotations\": {\n        \"readOnlyHint\": true\n      },\n      \"outputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"Total\": {\n            \"type\": \"integer\"\n          },\n          \"Assets\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"Path\": {\n                  \"type\": \"string\"\n                },\n                \"Type\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": []\n            }\n          }\n        },\n        \"required\": []\n      }\n    },\n    {\n      \"name\": \"asset_info\",\n      \"title\": \"Asset Info\",\n      \"toolset\": \"asset\",\n      \"description\": \"Everything about one asset - name, type, source and compiled file paths, compile state, tags, cloud package, and how many assets it references and is used by. Explore those relationships with asset_dependencies.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"path\": {\n            \"type\": \"string\",\n            \"description\": \"Asset path, as returned by asset_search. Absolute paths work too.\"\n          }\n        },\n        \"required\": [\n          \"path\"\n        ]\n      },\n      \"annotations\": {\n        \"readOnlyHint\": true\n      },\n      \"outputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"Name\": {\n            \"type\": \"string\"\n          },\n          \"Path\": {\n            \"type\": \"string\"\n          },\n          \"Type\": {\n            \"type\": \"string\"\n          },\n          \"Extension\": {\n            \"type\": \"string\"\n          },\n          \"IsGameResource\": {\n            \"type\": \"boolean\"\n          },\n          \"SourceFile\": {\n            \"type\": \"string\"\n          },\n          \"CompiledFile\": {\n            \"type\": \"string\"\n          },\n          \"IsCompiled\": {\n            \"type\": \"boolean\"\n          },\n          \"IsCompiledAndUpToDate\": {\n            \"type\": \"boolean\"\n          },\n          \"IsCompileFailed\": {\n            \"type\": \"boolean\"\n          },\n          \"CanRecompile\": {\n            \"type\": \"boolean\"\n          },\n          \"IsCloud\": {\n            \"type\": \"boolean\"\n          },\n          \"IsTransient\": {\n            \"type\": \"boolean\"\n          },\n          \"IsProcedural\": {\n            \"type\": \"boolean\"\n          },\n          \"IsTrivialChild\": {\n            \"type\": \"boolean\"\n          },\n          \"Package\": {\n            \"type\": \"string\"\n          },\n          \"Tags\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"type\": \"string\"\n            }\n          },\n          \"ReferenceCount\": {\n            \"type\": \"integer\"\n          },\n          \"DependantCount\": {\n            \"type\": \"integer\"\n          },\n          \"LastOpened\": {\n            \"type\": \"string\"\n          }\n        },\n        \"required\": []\n      }\n    },\n    {\n      \"name\": \"asset_read\",\n      \"title\": \"Asset Read\",\n      \"toolset\": \"asset\",\n      \"description\": \"Read a game resource asset's raw json - the actual data of a prefab, sound event, clothing definition or any other GameResource type. Doesn't work on binary assets like models and textures.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"path\": {\n            \"type\": \"string\",\n            \"description\": \"Asset path, as returned by asset_search.\"\n          }\n        },\n        \"required\": [\n          \"path\"\n        ]\n      },\n      \"annotations\": {\n        \"readOnlyHint\": true\n      }\n    },\n    {\n      \"name\": \"asset_search\",\n      \"title\": \"Asset Search\",\n      \"toolset\": \"asset\",\n      \"description\": \"Search the asset system by keywords and type. An empty query lists every asset, so use limit and offset to page through. Returns relative asset paths - pass one to asset_info, asset_compile, asset_read or asset_dependencies.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"query\": {\n            \"type\": \"string\",\n            \"description\": \"Space separated keywords. Every keyword must match the asset's path or one of its tags. Empty matches everything.\"\n          },\n          \"type\": {\n            \"type\": \"string\",\n            \"description\": \"Filter to one asset type - a file extension (vmdl, vmat, prefab) or friendly name (Model, Material). See asset_types.\"\n          },\n          \"projectOnly\": {\n            \"type\": \"boolean\",\n            \"description\": \"Only assets belonging to the currently open project, excluding engine content and cloud downloads.\",\n            \"default\": false\n          },\n          \"unreferencedOnly\": {\n            \"type\": \"boolean\",\n            \"description\": \"Only assets nothing else references - useful for finding unused assets. Note map files and code can use an asset without the asset system knowing.\",\n            \"default\": false\n          },\n          \"compileFailedOnly\": {\n            \"type\": \"boolean\",\n            \"description\": \"Only assets whose last compile failed.\",\n            \"default\": false\n          },\n          \"uncompiledOnly\": {\n            \"type\": \"boolean\",\n            \"description\": \"Only assets with no compiled version at all.\",\n            \"default\": false\n          },\n          \"limit\": {\n            \"type\": \"integer\",\n            \"description\": \"How many results to return.\",\n            \"minimum\": 1,\n            \"maximum\": 500,\n            \"default\": 50\n          },\n          \"offset\": {\n            \"type\": \"integer\",\n            \"description\": \"How many results to skip, for paging.\",\n            \"default\": 0\n          }\n        },\n        \"required\": []\n      },\n      \"annotations\": {\n        \"readOnlyHint\": true\n      },\n      \"outputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"Total\": {\n            \"type\": \"integer\",\n            \"description\": \"How many assets matched in total, beyond this page.\"\n          },\n          \"Showing\": {\n            \"type\": \"integer\"\n          },\n          \"Offset\": {\n            \"type\": \"integer\"\n          },\n          \"Assets\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"Path\": {\n                  \"type\": \"string\"\n                },\n                \"Type\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": []\n            }\n          }\n        },\n        \"required\": []\n      }\n    },\n    {\n      \"name\": \"asset_thumbnail\",\n      \"title\": \"Asset Thumbnail\",\n      \"toolset\": \"asset\",\n      \"description\": \"Render an asset's preview thumbnail and return it as an image - see what a model, material or texture actually looks like.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"path\": {\n            \"type\": \"string\",\n            \"description\": \"Asset path, as returned by asset_search.\"\n          }\n        },\n        \"required\": [\n          \"path\"\n        ]\n      },\n      \"annotations\": {\n        \"readOnlyHint\": true\n      }\n    },\n    {\n      \"name\": \"asset_types\",\n      \"title\": \"Asset Types\",\n      \"toolset\": \"asset\",\n      \"description\": \"Every asset type the editor knows, with the file extensions and category of each. Use a type's extension or name to filter asset_search.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {},\n        \"required\": []\n      },\n      \"annotations\": {\n        \"readOnlyHint\": true\n      },\n      \"outputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"Types\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"Name\": {\n                  \"type\": \"string\"\n                },\n                \"Extension\": {\n                  \"type\": \"string\",\n                  \"description\": \"The extension asset_search's type filter takes.\"\n                },\n                \"AllExtensions\": {\n                  \"type\": \"array\",\n                  \"items\": {\n                    \"type\": \"string\"\n                  }\n                },\n                \"Category\": {\n                  \"type\": \"string\"\n                },\n                \"IsGameResource\": {\n                  \"type\": \"boolean\"\n                }\n              },\n              \"required\": []\n            }\n          }\n        },\n        \"required\": []\n      }\n    },\n    {\n      \"name\": \"asset_write\",\n      \"title\": \"Asset Write\",\n      \"toolset\": \"asset\",\n      \"description\": \"Overwrite a game resource asset's json and recompile it. Read the current json with asset_read first, modify it, and pass the whole document back - this replaces the entire file. Doesn't work on binary assets like models and textures.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"path\": {\n            \"type\": \"string\",\n            \"description\": \"Asset path, as returned by asset_search.\"\n          },\n          \"json\": {\n            \"type\": \"string\",\n            \"description\": \"The complete json document to write.\"\n          }\n        },\n        \"required\": [\n          \"path\",\n          \"json\"\n        ]\n      },\n      \"outputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"Success\": {\n            \"type\": \"boolean\"\n          },\n          \"Path\": {\n            \"type\": \"string\"\n          },\n          \"Hint\": {\n            \"type\": \"string\"\n          }\n        },\n        \"required\": []\n      }\n    },\n    {\n      \"name\": \"create_asset\",\n      \"title\": \"Create Asset\",\n      \"toolset\": \"asset\",\n      \"description\": \"Create a new game resource asset - a prefab, sound event or any other GameResource type. Give starting json to fill it, or leave empty for a default. Fails if the asset already exists - asset_write edits existing ones.\",\n      \"inputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"type\": {\n            \"type\": \"string\",\n            \"description\": \"Asset type file extension, e.g. 'prefab' or 'sndevt'. See asset_types.\"\n          },\n          \"path\": {\n            \"type\": \"string\",\n            \"description\": \"Where to create it, relative to the project's assets folder, e.g. 'weapons/pistol.prefab'.\"\n          },\n          \"json\": {\n            \"type\": \"string\",\n            \"description\": \"Starting json document. Empty creates a default resource.\"\n          }\n        },\n        \"required\": [\n          \"type\",\n          \"path\"\n        ]\n      },\n      \"outputSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"Path\": {\n            \"type\": \"string\"\n          },\n          \"SourceFile\": {\n            \"type\": \"string\"\n          },\n          \"IsCompileFailed\": {\n            \"type\": \"boolean\"\n          },\n          \"Hint\": {\n            \"type\": \"string\"\n          }\n        },\n        \"required\": []\n      }\n    }\n  ]\n}\n",
+  "stderr": "",
+  "result": {
+    "name": "asset",
+    "description": "The asset system - search, inspect, compile, edit and preview the project's assets",
+    "tools": [
+      {
+        "name": "asset_compile",
+        "title": "Asset Compile",
+        "toolset": "asset",
+        "description": "Recompile an asset from its source file. Compile errors and warnings land in the console - check read_console after a failure.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Asset path, as returned by asset_search."
+            },
+            "full": {
+              "type": "boolean",
+              "description": "Force a full recompile instead of an incremental one.",
+              "default": false
+            }
+          },
+          "required": [
+            "path"
+          ]
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "Success": {
+              "type": "boolean"
+            },
+            "Path": {
+              "type": "string"
+            },
+            "CompiledFile": {
+              "type": "string"
+            },
+            "Hint": {
+              "type": "string"
+            }
+          },
+          "required": []
+        }
+      },
+      {
+        "name": "asset_dependencies",
+        "title": "Asset Dependencies",
+        "toolset": "asset",
+        "description": "Walk an asset's relationships - the assets it references (uses), the assets that depend on it, or the assets it was generated from. Deep recurses the whole chain, e.g. a model's materials and their textures.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Asset path, as returned by asset_search."
+            },
+            "relation": {
+              "type": "string",
+              "enum": [
+                "References",
+                "Dependants",
+                "Parents"
+              ],
+              "description": "Which direction to walk.",
+              "default": "References"
+            },
+            "deep": {
+              "type": "boolean",
+              "description": "Recurse instead of returning only direct relationships.",
+              "default": false
+            },
+            "type": {
+              "type": "string",
+              "description": "Filter results to one asset type - a file extension or friendly name. See asset_types."
+            },
+            "limit": {
+              "type": "integer",
+              "description": "How many results to return.",
+              "minimum": 1,
+              "maximum": 500,
+              "default": 100
+            }
+          },
+          "required": [
+            "path"
+          ]
+        },
+        "annotations": {
+          "readOnlyHint": true
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "Path": {
+              "type": "string"
+            },
+            "Relation": {
+              "type": "string"
+            },
+            "Total": {
+              "type": "integer",
+              "description": "How many related assets exist, beyond what's shown."
+            },
+            "Assets": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "Path": {
+                    "type": "string"
+                  },
+                  "Type": {
+                    "type": "string"
+                  }
+                },
+                "required": []
+              }
+            }
+          },
+          "required": []
+        }
+      },
+      {
+        "name": "asset_files",
+        "title": "Asset Files",
+        "toolset": "asset",
+        "description": "The loose disk files behind an asset - the input files it's built from (.fbx, .tga, .png...), extra content and game files it ships with, and reference paths that couldn't be resolved to assets.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Asset path, as returned by asset_search."
+            }
+          },
+          "required": [
+            "path"
+          ]
+        },
+        "annotations": {
+          "readOnlyHint": true
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "Path": {
+              "type": "string"
+            },
+            "SourceFile": {
+              "type": "string"
+            },
+            "CompiledFile": {
+              "type": "string"
+            },
+            "InputFiles": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "AdditionalContentFiles": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "AdditionalGameFiles": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "UnresolvedReferences": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": []
+        }
+      },
+      {
+        "name": "asset_find_by_file",
+        "title": "Asset Find By File",
+        "toolset": "asset",
+        "description": "Find the assets built from a loose disk file - which models use this .fbx, which textures use this .png. Matches the end of the path, so a filename is enough.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "file": {
+              "type": "string",
+              "description": "File path or filename, e.g. chair.fbx"
+            },
+            "limit": {
+              "type": "integer",
+              "description": "How many results to return.",
+              "minimum": 1,
+              "maximum": 500,
+              "default": 50
+            }
+          },
+          "required": [
+            "file"
+          ]
+        },
+        "annotations": {
+          "readOnlyHint": true
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "Total": {
+              "type": "integer"
+            },
+            "Assets": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "Path": {
+                    "type": "string"
+                  },
+                  "Type": {
+                    "type": "string"
+                  }
+                },
+                "required": []
+              }
+            }
+          },
+          "required": []
+        }
+      },
+      {
+        "name": "asset_info",
+        "title": "Asset Info",
+        "toolset": "asset",
+        "description": "Everything about one asset - name, type, source and compiled file paths, compile state, tags, cloud package, and how many assets it references and is used by. Explore those relationships with asset_dependencies.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Asset path, as returned by asset_search. Absolute paths work too."
+            }
+          },
+          "required": [
+            "path"
+          ]
+        },
+        "annotations": {
+          "readOnlyHint": true
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "Name": {
+              "type": "string"
+            },
+            "Path": {
+              "type": "string"
+            },
+            "Type": {
+              "type": "string"
+            },
+            "Extension": {
+              "type": "string"
+            },
+            "IsGameResource": {
+              "type": "boolean"
+            },
+            "SourceFile": {
+              "type": "string"
+            },
+            "CompiledFile": {
+              "type": "string"
+            },
+            "IsCompiled": {
+              "type": "boolean"
+            },
+            "IsCompiledAndUpToDate": {
+              "type": "boolean"
+            },
+            "IsCompileFailed": {
+              "type": "boolean"
+            },
+            "CanRecompile": {
+              "type": "boolean"
+            },
+            "IsCloud": {
+              "type": "boolean"
+            },
+            "IsTransient": {
+              "type": "boolean"
+            },
+            "IsProcedural": {
+              "type": "boolean"
+            },
+            "IsTrivialChild": {
+              "type": "boolean"
+            },
+            "Package": {
+              "type": "string"
+            },
+            "Tags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "ReferenceCount": {
+              "type": "integer"
+            },
+            "DependantCount": {
+              "type": "integer"
+            },
+            "LastOpened": {
+              "type": "string"
+            }
+          },
+          "required": []
+        }
+      },
+      {
+        "name": "asset_read",
+        "title": "Asset Read",
+        "toolset": "asset",
+        "description": "Read a game resource asset's raw json - the actual data of a prefab, sound event, clothing definition or any other GameResource type. Doesn't work on binary assets like models and textures.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Asset path, as returned by asset_search."
+            }
+          },
+          "required": [
+            "path"
+          ]
+        },
+        "annotations": {
+          "readOnlyHint": true
+        }
+      },
+      {
+        "name": "asset_search",
+        "title": "Asset Search",
+        "toolset": "asset",
+        "description": "Search the asset system by keywords and type. An empty query lists every asset, so use limit and offset to page through. Returns relative asset paths - pass one to asset_info, asset_compile, asset_read or asset_dependencies.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "Space separated keywords. Every keyword must match the asset's path or one of its tags. Empty matches everything."
+            },
+            "type": {
+              "type": "string",
+              "description": "Filter to one asset type - a file extension (vmdl, vmat, prefab) or friendly name (Model, Material). See asset_types."
+            },
+            "projectOnly": {
+              "type": "boolean",
+              "description": "Only assets belonging to the currently open project, excluding engine content and cloud downloads.",
+              "default": false
+            },
+            "unreferencedOnly": {
+              "type": "boolean",
+              "description": "Only assets nothing else references - useful for finding unused assets. Note map files and code can use an asset without the asset system knowing.",
+              "default": false
+            },
+            "compileFailedOnly": {
+              "type": "boolean",
+              "description": "Only assets whose last compile failed.",
+              "default": false
+            },
+            "uncompiledOnly": {
+              "type": "boolean",
+              "description": "Only assets with no compiled version at all.",
+              "default": false
+            },
+            "limit": {
+              "type": "integer",
+              "description": "How many results to return.",
+              "minimum": 1,
+              "maximum": 500,
+              "default": 50
+            },
+            "offset": {
+              "type": "integer",
+              "description": "How many results to skip, for paging.",
+              "default": 0
+            }
+          },
+          "required": []
+        },
+        "annotations": {
+          "readOnlyHint": true
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "Total": {
+              "type": "integer",
+              "description": "How many assets matched in total, beyond this page."
+            },
+            "Showing": {
+              "type": "integer"
+            },
+            "Offset": {
+              "type": "integer"
+            },
+            "Assets": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "Path": {
+                    "type": "string"
+                  },
+                  "Type": {
+                    "type": "string"
+                  }
+                },
+                "required": []
+              }
+            }
+          },
+          "required": []
+        }
+      },
+      {
+        "name": "asset_thumbnail",
+        "title": "Asset Thumbnail",
+        "toolset": "asset",
+        "description": "Render an asset's preview thumbnail and return it as an image - see what a model, material or texture actually looks like.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Asset path, as returned by asset_search."
+            }
+          },
+          "required": [
+            "path"
+          ]
+        },
+        "annotations": {
+          "readOnlyHint": true
+        }
+      },
+      {
+        "name": "asset_types",
+        "title": "Asset Types",
+        "toolset": "asset",
+        "description": "Every asset type the editor knows, with the file extensions and category of each. Use a type's extension or name to filter asset_search.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        },
+        "annotations": {
+          "readOnlyHint": true
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "Types": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "Name": {
+                    "type": "string"
+                  },
+                  "Extension": {
+                    "type": "string",
+                    "description": "The extension asset_search's type filter takes."
+                  },
+                  "AllExtensions": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "Category": {
+                    "type": "string"
+                  },
+                  "IsGameResource": {
+                    "type": "boolean"
+                  }
+                },
+                "required": []
+              }
+            }
+          },
+          "required": []
+        }
+      },
+      {
+        "name": "asset_write",
+        "title": "Asset Write",
+        "toolset": "asset",
+        "description": "Overwrite a game resource asset's json and recompile it. Read the current json with asset_read first, modify it, and pass the whole document back - this replaces the entire file. Doesn't work on binary assets like models and textures.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Asset path, as returned by asset_search."
+            },
+            "json": {
+              "type": "string",
+              "description": "The complete json document to write."
+            }
+          },
+          "required": [
+            "path",
+            "json"
+          ]
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "Success": {
+              "type": "boolean"
+            },
+            "Path": {
+              "type": "string"
+            },
+            "Hint": {
+              "type": "string"
+            }
+          },
+          "required": []
+        }
+      },
+      {
+        "name": "create_asset",
+        "title": "Create Asset",
+        "toolset": "asset",
+        "description": "Create a new game resource asset - a prefab, sound event or any other GameResource type. Give starting json to fill it, or leave empty for a default. Fails if the asset already exists - asset_write edits existing ones.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "description": "Asset type file extension, e.g. 'prefab' or 'sndevt'. See asset_types."
+            },
+            "path": {
+              "type": "string",
+              "description": "Where to create it, relative to the project's assets folder, e.g. 'weapons/pistol.prefab'."
+            },
+            "json": {
+              "type": "string",
+              "description": "Starting json document. Empty creates a default resource."
+            }
+          },
+          "required": [
+            "type",
+            "path"
+          ]
+        },
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "Path": {
+              "type": "string"
+            },
+            "SourceFile": {
+              "type": "string"
+            },
+            "IsCompileFailed": {
+              "type": "boolean"
+            },
+            "Hint": {
+              "type": "string"
+            }
+          },
+          "required": []
+        }
+      }
+    ]
+  }
+}

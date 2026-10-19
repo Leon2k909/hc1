@@ -1,0 +1,120 @@
+{
+  "TimeUtc": "2026-10-18T18:34:03.4543623Z",
+  "IsPlaying": true,
+  "ActiveScene": "scenes/maps/orion/orion.scene",
+  "HasUnsavedChanges": false,
+  "rows": [
+    {
+      "Name": "East",
+      "Id": "ac28272b-8e0c-5f9d-8033-467296a4c4f7",
+      "Enabled": true,
+      "Active": true,
+      "Flags": "Static",
+      "Position": "0,0,0",
+      "Components": [
+        {
+          "Enabled": true,
+          "Active": true,
+          "Model": "models/maps/lowtide/lowtide_east.vmdl",
+          "Error": false,
+          "RenderType": 0,
+          "RenderOptions": "Sandbox.RenderOptions",
+          "Tint": "1,1,1,1",
+          "BodyGroups": 18446744073709551615,
+          "LodOverride": null,
+          "Object": {
+            "RenderingEnabled": true,
+            "Bounds": "mins -1616,-3300,-210, maxs 3402,-163,1400",
+            "MeshGroupMask": 18446744073709551615
+          },
+          "Vertices": 418844,
+          "Indices": 740562
+        }
+      ]
+    },
+    {
+      "Name": "West",
+      "Id": "c9e91fbf-ea4b-5ab1-a04b-4acbddcfa4fe",
+      "Enabled": true,
+      "Active": true,
+      "Flags": "Static",
+      "Position": "0,0,0",
+      "Components": [
+        {
+          "Enabled": true,
+          "Active": true,
+          "Model": "models/maps/lowtide/lowtide_west.vmdl",
+          "Error": false,
+          "RenderType": 0,
+          "RenderOptions": "Sandbox.RenderOptions",
+          "Tint": "1,1,1,1",
+          "BodyGroups": 18446744073709551615,
+          "LodOverride": null,
+          "Object": {
+            "RenderingEnabled": true,
+            "Bounds": "mins -1616,163,-210, maxs 3402,3300,1400",
+            "MeshGroupMask": 18446744073709551615
+          },
+          "Vertices": 420188,
+          "Indices": 740562
+        }
+      ]
+    },
+    {
+      "Name": "Dressing East",
+      "Id": "7599845a-1170-5f52-9cdb-3a10b2848c85",
+      "Enabled": true,
+      "Active": true,
+      "Flags": "Static",
+      "Position": "0,0,0",
+      "Components": [
+        {
+          "Enabled": true,
+          "Active": true,
+          "Model": "models/maps/lowtide/lowtide_dress_east.vmdl",
+          "Error": false,
+          "RenderType": 0,
+          "RenderOptions": "Sandbox.RenderOptions",
+          "Tint": "1,1,1,1",
+          "BodyGroups": 18446744073709551615,
+          "LodOverride": null,
+          "Object": {
+            "RenderingEnabled": true,
+            "Bounds": "mins -2633,-2172,-14, maxs 1429,0,870",
+            "MeshGroupMask": 18446744073709551615
+          },
+          "Vertices": 532132,
+          "Indices": 1044642
+        }
+      ]
+    },
+    {
+      "Name": "Dressing West",
+      "Id": "44bda15e-f089-54d3-9d5e-facaebc8e7ee",
+      "Enabled": true,
+      "Active": true,
+      "Flags": "Static",
+      "Position": "0,0,0",
+      "Components": [
+        {
+          "Enabled": true,
+          "Active": true,
+          "Model": "models/maps/lowtide/lowtide_dress_west.vmdl",
+          "Error": false,
+          "RenderType": 0,
+          "RenderOptions": "Sandbox.RenderOptions",
+          "Tint": "1,1,1,1",
+          "BodyGroups": 18446744073709551615,
+          "LodOverride": null,
+          "Object": {
+            "RenderingEnabled": true,
+            "Bounds": "mins -2633,0,-14, maxs 1429,2172,870",
+            "MeshGroupMask": 18446744073709551615
+          },
+          "Vertices": 532132,
+          "Indices": 1044642
+        }
+      ]
+    }
+  ]
+}

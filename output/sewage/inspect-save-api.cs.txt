@@ -1,0 +1,3 @@
+var session=Editor.SceneEditorSession.Active;
+var flags=System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance;
+return new {Session=session.GetType().FullName,Properties=session.GetType().GetProperties(flags).Where(p=>p.Name.Contains("Change")||p.Name.Contains("Dirty")).Select(p=>new{p.Name,p.CanWrite}).ToArray(),Methods=session.GetType().GetMethods(flags).Where(m=>m.Name.Contains("Save")||m.Name.Contains("Change")||m.Name.Contains("Dirty")).Select(m=>m.ToString()).ToArray()};

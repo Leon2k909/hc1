@@ -1,0 +1,52 @@
+{
+  "TimeUtc": "2026-10-18T18:23:44.9629265Z",
+  "Materials": [
+    {
+      "ResourcePath": "materials/lowtide/warehouse-floor/lt_warehouse_floor.vmat",
+      "ShaderName": "shaders/hc1_lowtide_warehouse_floor.shader",
+      "IsError": false
+    },
+    {
+      "ResourcePath": "materials/lowtide/concrete-wear/lt_concrete_wear.vmat",
+      "ShaderName": "shaders/hc1_lowtide_concrete_wear.shader",
+      "IsError": false
+    }
+  ],
+  "Renderers": [
+    {
+      "Name": "East",
+      "Model": "models/maps/lowtide/lowtide_east.vmdl",
+      "Slots": [
+        {
+          "Index": 3,
+          "ResourcePath": "materials/buildings/floorboards.vmat",
+          "Override": null
+        },
+        {
+          "Index": 16,
+          "ResourcePath": "materials/lowtide/interior/lt_concrete.vmat",
+          "Override": null
+        }
+      ]
+    },
+    {
+      "Name": "West",
+      "Model": "models/maps/lowtide/lowtide_west.vmdl",
+      "Slots": [
+        {
+          "Index": 2,
+          "ResourcePath": "materials/buildings/floorboards.vmat",
+          "Override": null
+        },
+        {
+          "Index": 16,
+          "ResourcePath": "materials/lowtide/interior/lt_concrete.vmat",
+          "Override": null
+        }
+      ]
+    }
+  ],
+  "IsPlaying": true,
+  "ActiveScene": "scenes/maps/collider/collider.scene",
+  "HasUnsavedChanges": false
+}

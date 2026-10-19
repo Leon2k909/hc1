@@ -1,0 +1,76 @@
+// Reusable non-mutating Riverdale gameplay smoke test; run in play mode through sbox-cli run_csharp.
+var scene = Game.ActiveScene;
+if (!Game.IsPlaying || scene?.Name?.Equals("riverdale", StringComparison.OrdinalIgnoreCase) != true)
+    throw new InvalidOperationException("Run Riverdale in play mode before verifying.");
+var player = scene.GetAllComponents<Facepunch.PlayerPawn>().FirstOrDefault();
+if (player?.CharacterController is null)
+    throw new InvalidOperationException("The runtime has no player CharacterController.");
+var controller = player.CharacterController;
+var worldCenter = new Vector3(900f, 0f, 0f);
+var sweepMisses = new System.Collections.Generic.List<object>();
+var bodyMisses = new System.Collections.Generic.List<object>();
+var rayHits = 0;
+var bodyHits = 0;
+
+// Every segment of the closed ring, including the seams and curved corners.
+for (var i = 0; i < 48; ++i)
+{
+    var theta = 2f * MathF.PI * (i + 0.5f) / 48f;
+    var radial = new Vector3(MathF.Cos(theta), MathF.Sin(theta), 0f);
+    var from = worldCenter + radial * 610f + Vector3.Up * 35f;
+    var to = worldCenter + radial * 450f + Vector3.Up * 35f;
+    var hit = scene.Trace.Ray(from, to).WithTag("playerclip").Run();
+    if (hit.Hit && hit.GameObject?.Name?.StartsWith("Player Clip pool rail", StringComparison.Ordinal) == true)
+        rayHits++;
+    else
+        sweepMisses.Add(new { Segment=i, Hit=hit.Hit, Name=hit.GameObject?.Name, hit.StartedSolid });
+}
+
+// Use the actual player's controller shape and its collision-ignore rules, as movement does.
+for (var i = 0; i < 16; ++i)
+{
+    var theta = 2f * MathF.PI * (i + 0.5f) / 16f;
+    var radial = new Vector3(MathF.Cos(theta), MathF.Sin(theta), 0f);
+    var from = worldCenter + radial * 620f + Vector3.Up * 6f;
+    var to = worldCenter + radial * 450f + Vector3.Up * 6f;
+    var hit = controller.TraceBox(controller.BoundingBox, from, to);
+    if (hit.Hit)
+        bodyHits++;
+    else
+        bodyMisses.Add(new { Direction=i, hit.StartedSolid, From=from.ToString(), To=to.ToString() });
+}
+
+var routes = new System.Collections.Generic.List<object>();
+var names = new[] { "Red Spawn 1", "Red Spawn 4", "Blue Spawn 1", "Blue Spawn 4" };
+var targets = new[] { "bombsite_a", "bombsite_b" };
+var objects = scene.GetAllObjects(true).GroupBy(g => g.Name, StringComparer.OrdinalIgnoreCase)
+    .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+foreach (var sourceName in names)
+foreach (var targetName in targets)
+{
+    var from = objects.TryGetValue(sourceName, out var source) ? scene.NavMesh.GetClosestPoint(source.WorldPosition, 180f) : null;
+    var to = objects.TryGetValue(targetName, out var target) ? scene.NavMesh.GetClosestPoint(target.WorldPosition, 180f) : null;
+    if (!from.HasValue || !to.HasValue)
+    {
+        routes.Add(new { From=sourceName, To=targetName, Status="No navmesh point" });
+        continue;
+    }
+    var path = scene.NavMesh.CalculatePath(new Sandbox.Navigation.CalculatePathRequest { Start=from.Value, Target=to.Value });
+    routes.Add(new { From=sourceName, To=targetName, Status=path.Status.ToString(), Points=path.Points?.Count ?? 0 });
+}
+
+var report = new {
+    Scene=scene.Name,
+    PlayerPosition=player.WorldPosition.ToString(),
+    ControllerRadius=controller.Radius,
+    ControllerHeight=controller.Height,
+    IgnoredLayers=controller.IgnoreLayers.ToString(),
+    RailClips=scene.GetAllComponents<BoxCollider>().Count(c => c.GameObject.Name.StartsWith("Player Clip pool rail", StringComparison.Ordinal)),
+    RingSegmentsTested=48, RingRayHits=rayHits, SweepMisses=sweepMisses,
+    BodyDirectionsTested=16, BodyBlocked=bodyHits, BodyMisses=bodyMisses,
+    NavEnabled=scene.NavMesh.IsEnabled, NavGenerating=scene.NavMesh.IsGenerating,
+    Routes=routes
+};
+var file=System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(), "output/riverdale/aaa/playtest/report.json");
+System.IO.File.WriteAllText(file,System.Text.Json.JsonSerializer.Serialize(report,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return report;

@@ -1,0 +1,48 @@
+{
+  "revision": "services-v1",
+  "reviewed_at": "2026-10-15T15:47:49.419091+00:00",
+  "imported": true,
+  "native_model_compiles_reported_successful": [
+    "collider_structure",
+    "collider_detail",
+    "collider_glass"
+  ],
+  "native_geometry_review_passed": true,
+  "darker_case_finish_reviewed": true,
+  "lighting_review_complete": false,
+  "native_capture_count": 8,
+  "editor_document_and_play_preserved": true,
+  "collision_identical": true,
+  "source_sha256": {
+    "models/maps/collider/collider_detail.mtl": "4e9fba2794343db51f99b004c90a3533d88b7be1dd8f6c0e52bddf6ffd285fcc",
+    "models/maps/collider/collider_detail.obj": "14b303198df6b8a8a6dc41ad167b387a951e2447d6ee13e6350fb3e903378e0f",
+    "models/maps/collider/collider_detail.vmdl": "ae60c68b92df8555e15f84306a7428f32085edd5bbda85a4468152b3f5d69064",
+    "models/maps/collider/collider_glass.obj": "77235fbd65d44896b218263bb5ab6e6e8f389babbc8792b90482d1636fdf85ba",
+    "models/maps/collider/collider_structure.obj": "eb32986e811c94423d60b8a9b008ab39581e4faf704d81d861a21b127414372e"
+  },
+  "capture_sha256": {
+    "art": "413f13f7f21d99172ec0b9523ce610747e8baffe5ff3904319430035db78fc15",
+    "floor": "e43e4f2b9d5a496d7034de4176c1d41a862fb3ae1670824c7e4f21c377475e7f",
+    "observation": "58b5c3e0d0ab1416c70a1eb6dad5affdb86f9e7474054ca7a35874a590180fc6",
+    "control": "3fb4badb75279228a91fc503440b4be82bc2048a7d301af1ce375825154d2832",
+    "stair": "49d24805f5cbc17c2c52b5a4e91ac70ab68a9518a1bb67dbd2b358049ad11fd5",
+    "cases": "6cebd081ab8d7362ed1ef0a1966af5324ff428c361de13146a098e9259a5c754",
+    "service-windows": "6ffbef54feb17098dc671266b595292d74d74629c2d298ccd095eff46cf67aeb",
+    "ceiling-services": "e375d1bb2a3e880d92cf4cbc3dd08d94e3670c7c3f38ad950a077853f13b7dcd"
+  },
+  "saved_scene_sha256": "2b4a50e149769322a8199efe6add03c3ab40a0629e060f01b6440dc440dbedfc",
+  "bake_guard_compile_check": "Passed via native run_csharp with an unconditional compile-only return; no bake started. Cancellation behavior awaits the next bake.",
+  "remaining": [
+    "Fresh indirect-light bake for the new windows and geometry",
+    "Refresh static reflections",
+    "Current-geometry local match and second connected client",
+    "Full-match performance check",
+    "Final map-picker capture and package"
+  ],
+  "bake_script_sha256": "b7fd8de75b191be6d38ccb2d69cd517d3e47a3f8339589c91a85eac60344026e",
+  "editor_at_handoff": {
+    "scene": "scenes/maps/orion/orion.scene",
+    "playing": true,
+    "modified_by_this_task": false
+  }
+}

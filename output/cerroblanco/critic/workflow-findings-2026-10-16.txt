@@ -1,0 +1,371 @@
+===== ad5068bc807fd2b23
+{
+ "findings": [
+  {
+   "title": "Gallery interiors are lit by flat fill: the art spots and tracks do almost nothing",
+   "severity": "high",
+   "views": "wg-ground, wg-upper, ng-ground, south-gallery, east-hall, cafe, lobby; lights-test/cafe vs after/cafe",
+   "world_location": "Every room in fitout.rooms() (sala_1..8, cafe, glass_room) and the rotunda",
+   "cause": "cerroblanco_map.lights() puts 1-3 big omni PointLights in each room (radius 380-560, NEUTRAL, mostly Shadows=False, patched to 0.6075 in quality-state.json). On top of that, DDGI runs at RuntimeIntensity 1.4. The fit-out's art spots are written by write_scene's spot_list at the same order of magnitude: ConeInner 20, ConeOuter 40, LightColor 1.25,1.12,0.94, Radius <=340, Shadows=False. quality_geometry's 'Gallery art' spots are the same (radius 240). Measured: hiding every light in the cafe lowers the walls by only 12/255 and the floor by 23/255, evenly, with no pools anywhere. Hiding DDGI shifts the room to sky blue, so DDGI is the main light. The walls sit at 95% white (198,193,182) with no falloff. fitout.ceiling_services also draws a spot head every 60 inches on every track, aimed 38 degrees at the walls, and none of them emits light. So the ceilings look busy but the light on the walls doesn't match them.",
+   "fix": "In lights(), cut each room to one low fill (radius ~300, 0.25-0.35 of now) or remove the fills where clerestory sun reaches. Lower DDGI's indoor contribution (RuntimeIntensity ~0.9, or interior_fill_scale 0.25 at the next bake). Make the art spots 3-4x brighter with Shadows=True, ConeInner 12 / ConeOuter 26, and a radius that covers the work plus 30%. That puts a pool on each work and lets frames and plinths cast. Bring the plaster albedo down from 236,233,226 (P.CB_PAINTED PLASTER) and 215,212,204 (quality 'plaster') to ~205/195 so walls stop clipping. In ceiling_services, space the decorative heads 120-180 inches apart and aim each one at an actual work (hanger.lights), so every visible head has a pool under it.",
+   "files": [
+    "Tools/cerroblanco_map.py",
+    "Tools/cerroblanco_fitout.py",
+    "Tools/cerroblanco_quality_geometry.py",
+    "Sources/CerroBlanco/lighting/config.json",
+    "Sources/CerroBlanco/quality-state.json"
+   ]
+  },
+  {
+   "title": "The pinned-exposure captures are about a stop brighter than the game, so the interiors are judged too bright",
+   "severity": "high",
+   "views": "all captures-v2 views vs output/cerroblanco/live/*.png; exposure-test/south-gallery-e3p5.png",
+   "world_location": "Whole map (look_object Tonemapping)",
+   "cause": "config.all.json pins exposure 4.0 outdoors and 5.0 indoors. The scene's Tonemapping (look_object: MinimumExposure=SKY_EXPOSURE=2, MaximumExposure=3) limits players to 2-3. Measured against the live game shots: west interior ceiling 148 live vs 205 in the capture, floor 126 vs 197, courtyard travertine ring 122,106,82 vs 197,183,160, sky 68,110,173 vs 106,148,206. At 3.5, south-gallery-e3p5 already shows a dim grey gallery. So players see grey, gloomy galleries, and the flat fill in finding 1 is worse than these captures show.",
+   "fix": "Pick one reference and make the captures match it. Either widen auto exposure in look_object (e.g. MinimumExposure 2, MaximumExposure 4.5-5, Rate ~1.5) so interiors adapt the way the captures assume, and check doorways for bloom. Or drop the per-view 'exposure' pins (or pin to the value the live camera settles on) and relight interiors to the 2-3 range. Re-shoot the live courtyard and west-interior after each lighting change; those are the shots that count.",
+   "files": [
+    "Tools/cerroblanco_map.py",
+    "output/cerroblanco/captures-v2/config.all.json",
+    "Sources/CerroBlanco/editor/capture-isolated.cs.txt"
+   ]
+  },
+  {
+   "title": "Courtyard and plaza paving reads as near-white bathroom tile with aliased joints",
+   "severity": "high",
+   "views": "courtyard, courtyard-high, east-terrace, forecourt, garden-circle; critic/courtyard_floor_contrast.png",
+   "world_location": "pave_around over PLAY; courtyard (-650..496, -1000..1050); forecourt; south plaza",
+   "cause": "cerroblanco_quality_materials 'paving' preset: a 30-inch square grid, tint 1 1 1, built from the same travertine source as the walls (and 'honed'). The courtyard paving measures 219,211,202 and is lighter and greyer than the travertine ring beside it (197,184,162). cerroblanco_stone.shader varies each slab by only ±3.3% (lerp(.967,1.033,variation)). Its only macro term is one sine, sin(x/413+sin(y/327)), which gives regular banding rather than variation. Nothing darkens the paving at wall bases, planters, benches, drains or along routes. The joint is a smoothstep of ±0.35x the footprint around a 0.16-inch groove, not coverage-filtered, so at mid range it breaks into dotted lines (the contrast crop shows this). Floor and walls read as one material.",
+   "fix": "Paving preset: warmer and a little darker (tint ~0.93,0.91,0.86) and a larger format. Add per-axis slab size to the stone shader for 60x30 running bond. Raise per-slab variation to ±8%, with ~1 in 12 slabs a denser 'walnut' or ivory stone by hash. Replace the sine with low-frequency world-space value noise. Add a grime and polish term: darker within ~24 inches of vertical faces (a baked mask or the AO channel) and lighter along the main routes. Filter the joint by pixel coverage (as cerroblanco_panel.shader does) so joints fade to a tone instead of dots past ~15 m. Add a contrasting border course (bush-hammered or darker) round the planter, the building bases and the drain lines to break up the field.",
+   "files": [
+    "Tools/cerroblanco_quality_materials.py",
+    "Sources/CerroBlanco/shaders/cerroblanco_stone.shader",
+    "Tools/cerroblanco_map.py"
+   ]
+  },
+  {
+   "title": "Enamel panels mirror the sky: facades read lavender-blue in a per-panel checker",
+   "severity": "high",
+   "views": "east-terrace (upper storey), forecourt (rotunda drums), courtyard, courtyard-high, panels",
+   "world_location": "Every PANEL facade above z 210, and both rotunda drums",
+   "cause": "The cb_panel preset in cerroblanco_quality_materials.small_surfaces is quite glossy: g_flPanelRoughness .34, g_flTilt .012, g_flPillow .05. Each panel tilts to reflect a different patch of the deep-blue sky, picked up from the Grounds and courtyard probes. The base colour is a neutral grey (206,203,196). Measured: east-terrace upper panels average 109,114,135 (blue/red 1.24); the rotunda's lit side is 153,153,158. Valderas' panels read as warm, satin off-white. This is separate from the known dark-joint issue.",
+   "fix": "Set g_flPanelRoughness to ~0.5-0.55, g_flTilt to ~0.004 and g_flPillow to ~0.02. Warm panel_color to ~218,212,200. Keep the per-panel brightness variation (g_flVariation) at or below 0.015 so the facade doesn't look like a quilt. Re-check the rotunda drum in the forecourt view, where the curvature makes the tilt worse.",
+   "files": [
+    "Tools/cerroblanco_quality_materials.py",
+    "Sources/CerroBlanco/shaders/cerroblanco_panel.shader"
+   ]
+  },
+  {
+   "title": "Sub-inch black FRAME trims alias into broken dashed lines; one exterior band sits at first-floor height",
+   "severity": "medium",
+   "views": "east-terrace (dashed line under the covered-walkway canopy and at the wall foot), courtyard (ragged black line where the panels meet the travertine), panels (dark line at every window head), wg-ground/cy_right (threshold and stair-nosing lines)",
+   "world_location": "Every exterior wall of 350 inches or taller at z≈180.3-181.1; every wall at z 0.3, z 210; window heads and sills; doors; stairs",
+   "cause": "cerroblanco_quality_geometry.main(): `for floor in storeys: band(a,b,floor+.3,floor+1.1,P.FRAME,.1,.18)` runs for both floor 0 and FLOOR1=180 on the OUTER face of every tall wall. That draws a 0.8-inch near-black line across facades at first-floor level, including the double-height East Hall, where it shows as the dashed line under the walkway canopy. The cladding-change trim (split ±0.45), the window heads (0.8 inch), the sills, the threshold grooves (0.24 inch) and the stair nosing grooves (0.32 inch) are all FRAME (50,53,54), effectively black, and all thinner than a pixel at play distance, so they flicker into dashes.",
+   "fix": "Draw the exterior plinth band only at floor 0, and only on walls standing on the ground (storeys=[0] for the outer band). Make every remaining trim at least 1.5-2 inches tall in a mid tone (a champagne or pale anodised ~150,146,138, or the panel colour for the drips). Remove the stair and threshold grooves from geometry; if they're wanted, put them in the stone shader as normal-only detail.",
+   "files": [
+    "Tools/cerroblanco_quality_geometry.py"
+   ]
+  },
+  {
+   "title": "The indirect-light volume misses both spawns, bomb site B and the outer grounds, and shadows go saturated blue",
+   "severity": "medium",
+   "views": "courtyard-high (roof shadow 60,78,119, blue/red 2.0), forecourt, garden-circle, east-terrace, aerial",
+   "world_location": "Outside plan e -1160..2100, n -2440..1660: Red spawn/forecourt/car park (n>1660), Blue spawn/south plaza/sculptures (n<-2440), garden circle site B (-1743,-1359), west garden (e<-1160), east promenade (e>2100)",
+   "cause": "The IndirectLightVolume bounds (world -2440,-2100,2 to 1660,1160,550, from Sources/CerroBlanco/lighting/config.json; map_kit.to_world maps plan e,n to world n,-e) cover only the buildings' block. PLAY is e -2560..2520, n -3250..3080. Outside the volume the only fill is the sun's SkyColor .22,.28,.36 (patched in quality-state.json; write_scene writes 0.42,0.48,0.58), so shade has no warm bounce off the travertine. Even inside, the roof pockets beside parapets reach a blue/red ratio of 2.0. The coarse 120-inch probe spacing also can't resolve the 16-inch walls.",
+   "fix": "Add a second, lower-priority coarse IndirectLightVolume (density 3-4) covering all of PLAY up to z 600, plus a short blend, and bake it with the current one. Desaturate the sun's SkyColor to ~.26,.28,.31 so the colour of the shade comes from bounce, not a blue constant. Consider a denser local volume, or raising probe density to 12, for the galleries' storeys so walls don't share probes.",
+   "files": [
+    "Sources/CerroBlanco/lighting/config.json",
+    "Sources/CerroBlanco/editor/bake-lighting.cs.txt",
+    "Tools/cerroblanco_map.py",
+    "Sources/CerroBlanco/quality-state.json"
+   ]
+  },
+  {
+   "title": "A near-black coping outlines every roofline like a cartoon",
+   "severity": "medium",
+   "views": "aerial, courtyard-high (thick navy band), courtyard, east-terrace",
+   "world_location": "All parapets (parapet_on records) and the two rotunda drum rings",
+   "cause": "The parapet loop in cerroblanco_quality_geometry draws a folded cap in P.FRAME: 2.7 inches wider than the parapet on each side, 1.4 inches tall, with two 0.5-inch downstands. It also adds FRAME rings on the drums at ROT_OUT and ROT_UP. FRAME is a dark anodised (50,53,54, metal .6), so at any distance every building gets a black top edge. Valderas' copings are light metal that matches the panels.",
+   "fix": "Paint the caps, downstands and drum rings cb_white, or add a pale anodised paint (~205,203,198, metal .55, rough .4) for metalwork on the facade. Keep FRAME for mullions and door frames only.",
+   "files": [
+    "Tools/cerroblanco_quality_geometry.py"
+   ]
+  },
+  {
+   "title": "Doorways have full-depth black reveals and mirror-blue steel thresholds",
+   "severity": "medium",
+   "views": "wg-ground (bright blue threshold strip, heavy black portal), cafe, east-terrace, courtyard (cy_right)",
+   "world_location": "Every door in every wall() call",
+   "cause": "cerroblanco_map.door_frame lines both jambs and the head across the full wall thickness (t = thickness/2 + 0.6) in FRAME, so each opening is a 14-20 inch deep black tunnel. quality_geometry adds a threshold plate in P.STEEL (metal .92, roughness .3) with FRAME grooves. Lying flat, the plate reflects the sky cube and reads as a saturated blue strip.",
+   "fix": "In door_frame, draw only a 1.5-inch-deep frame at each wall face and line the reveal with the wall's own paint (PLASTER inside, TRAV/PANEL outside). Make the thresholds honed travertine (HONED) flush with the floor, or a satin stainless at roughness 0.5 or more.",
+   "files": [
+    "Tools/cerroblanco_map.py",
+    "Tools/cerroblanco_quality_geometry.py"
+   ]
+  },
+  {
+   "title": "Bomb site B: the hedge ring ends in flat green cardboard boxes, with a carpet lawn and placeholder boulders",
+   "severity": "medium",
+   "views": "garden-circle (foreground x 340-500 and 1100-1250, far-left ring end); critic/gc_left.png",
+   "world_location": "Garden circle (-1743,-1359), r 520-560, at its four 110-inch path gaps (0/90/180/270 degrees)",
+   "cause": "garden_circle() builds a solid ring (P.ring, 44 inches tall) with outer, inner, top and reveal all painted HEDGE. The leafy hedge instances (quality_geometry garden_hedges) stop exactly at the gap edges (gap_half = 55/R), so at every path the ring's cut ends show as flat HEDGE-textured faces. P.lawn quarters are a single flat green (34,42,25) with no grass. The six P.boulder stones are 18-point flat-shaded hulls sitting on the lawn surface.",
+   "fix": "Draw the solid core as hedge_box does: reveal=None, inset ~9 inches and about half height, so only the collision stays full size. Extend the last leafy piece of each arc ~6-8 inches past the gap edge and finish each end with a beech_bush_regular_small. Scatter grass clutter on the lawn quarters (a ClutterComponent with the Ridgeback grass clumps). Sink the boulders 4-6 inches, shade them smoothly with the terrain 'rock' material, and add tufts round their feet.",
+   "files": [
+    "Tools/cerroblanco_map.py",
+    "Tools/cerroblanco_quality_geometry.py",
+    "Tools/cerroblanco_parts.py"
+   ]
+  },
+  {
+   "title": "Gallery art: banner posters reused as cropped paintings, and procedural works that read as clip-art",
+   "severity": "medium",
+   "views": "east-hall (ROSTROS face cut off at the forehead), ng-ground (FORMA Y VACIO poster between paintings), wg-ground, south-gallery; critic/eh_face.png, ng_sea.png, wg_portrait.png",
+   "world_location": "Display walls in west_gallery, the North Gallery, east_block (770,-540), (770,-560), (980,-270) and south_gallery",
+   "cause": "P.picture() (cerroblanco_parts) crops the four exhibition banners (cb_banner_k) to each frame's aspect, and the map calls it on every display wall. So the same four images appear on the facade banners, the flags and the gallery walls, cropped arbitrarily, mixed in with the Hanger's real works on the same walls. The cerroblanco_art works have obvious swirl-noise brush strokes and flat naive shapes. Every frame is a flat 2.4-inch black box flush to the wall, with no mat, glazing or shadow gap.",
+   "fix": "Remove the base map's P.picture calls and let the Hanger fill those display walls (display_walls already hands it the gallery walls). Rebuild quality_geometry's picture-driven spots from hanger.lights instead. Move cerroblanco_art toward painterly originals (retained generated sources, like the travertine pipeline), with more variety and larger formats. Give frames a mitred profile, add a mat on the works on paper, and stand them 0.5 inch off the wall for a contact shadow.",
+   "files": [
+    "Tools/cerroblanco_map.py",
+    "Tools/cerroblanco_parts.py",
+    "Tools/cerroblanco_art.py",
+    "Tools/cerroblanco_fitout.py",
+    "Tools/cerroblanco_quality_geometry.py"
+   ]
+  },
+  {
+   "title": "Plinth sculptures are faceted black lumps and red cylinders; the bronze spheres read as black plastic",
+   "severity": "medium",
+   "views": "ng-ground, east-hall, wg-upper, lobby (red box), south-gallery, garden-circle",
+   "world_location": "display_plinth sites in every gallery; the spheres at (-1743,-1359) (site B) and (-200,-1230) (South Gallery)",
+   "cause": "P.display_plinth draws its 'bust' as boulder(points=14) in flat BRONZE, a faceted dark low-poly lump, and its 'vase' as a 12-sided RED cylinder with a BLACK lid. The plinths are WHITE (painted steel, metal .12, rough .38) boxes with no base reveal. P.bronze_sphere uses BRONZE (92,66,40, metal .9, rough .34): in daylight it renders near black with a faint highlight and no patina. The South Gallery repeats site B's sphere indoors, so the landmark appears twice.",
+   "fix": "Replace the busts with smooth-normal forms: lathed vessels from fitout.lathe profiles, and abstract bronzes (a superellipsoid, twisted torus or stacked forms) with polygon_normals. Paint plinths PLASTER and give them a 1-inch recessed black base reveal. Lift the bronze to ~150,105,62 at roughness ~0.28 with a patina and streak mask (a small texture, or a vertical gradient by height). Replace the indoor sphere at (-200,-1230) with a different piece so site B's sphere stays unique.",
+   "files": [
+    "Tools/cerroblanco_parts.py",
+    "Tools/cerroblanco_map.py"
+   ]
+  },
+  {
+   "title": "Panel and travertine joints ignore openings, the cladding split and corners",
+   "severity": "medium",
+   "views": "panels (joints slice past window heads and jambs, leaving slivers), east-terrace, courtyard; critic/panels_win.png",
+   "world_location": "Every facade in P.facade / wall()",
+   "cause": "Panel joints come from world-projected UVs (map_kit.face_uv at 120 inches per UV, 4 panels per UV in cb_panel), and write_obj adds a random per-model uv_offset of 0-7 UV units in both axes. So the 30-inch module starts at a random place on every model: joints don't land on the z 210 split, on corners or on openings. Windows aren't on the module either: upper() sills at z 230 (7.67 modules), centres such as 620, 880 and 1550 with widths of 120 or 200. The result is 3-10-inch sliver panels round every window and at the split.",
+   "fix": "Put cb_panel and cb_travertine in model.anchored_paints and also zero their horizontal offset (a per-paint 'module' flag in write_obj), so z 0 and plan 0 land on joints. Snap opening edges in the wall() calls to 30-inch multiples (upper() z0 230 to 240, centres to 15-inch steps for 120-wide windows), or shift each wall's UV origin so a joint meets its first jamb. Check upper-window sightlines with design if the openings move.",
+   "files": [
+    "Tools/map_kit.py",
+    "Tools/cerroblanco_map.py",
+    "Tools/cerroblanco_parts.py"
+   ]
+  },
+  {
+   "title": "Gallery floors read as linoleum: no joints, no sheen, a 2 m repeat",
+   "severity": "medium",
+   "views": "wg-ground, wg-upper, south-gallery, ng-ground, cafe",
+   "world_location": "All interior floors and slabs painted HONED",
+   "cause": "The 'honed' preset has g_flHasJoints 0, so StoneUv returns grid*StoneScale with no slab rotation or offset. A continuous travertine runs across 1000-inch galleries and repeats every 1/0.381 x 30 ≈ 79 inches unrotated. Roughness 0.57 kills any reflection of the windows, art or spot pools, which is where a museum floor gets its life.",
+   "fix": "Split interior honed from exterior honed. Indoors use joints=1 on a 48x24 slab with a hairline, coverage-filtered 0.08-inch joint, so the shader's per-slab rotation and offset break up the repeat, and roughness ~0.36-0.40 so SSR and the room probes reflect the windows and spot pools.",
+   "files": [
+    "Tools/cerroblanco_quality_materials.py",
+    "Sources/CerroBlanco/shaders/cerroblanco_stone.shader"
+   ]
+  },
+  {
+   "title": "Galleries, lobby and cafe are sparse; ceilings are blank and the 'skylights' are floating discs",
+   "severity": "medium",
+   "views": "wg-upper, south-gallery (flat 80-inch disc under the ceiling), lobby (bare 60-ft drum wall), cafe (4 tables, gallery track lights), east-hall",
+   "world_location": "South Gallery discs at (-800/-400/0/300, -1575, 313.5); rotunda; cafe (498..1000, 0..697)",
+   "cause": "The fit-out hangs 32-56-inch works with 30-40-inch gaps, mostly round the room edges, and leaves the floors empty apart from 1-2 benches. fitout.ceiling_services also runs for the 'cafe' room, so the cafe gets gallery tracks. The cafe counter is a plain WHITE box (east_block). The rotunda's drum wall carries nothing. south_gallery's 'skylights' are flat LAMP discs drawn 0.5 inch under the ceiling (P.disc at SG_ROOF - 16.5) and read as hovering saucers. The ceilings have no shadow gap, coffers or bulkheads.",
+   "fix": "Skip ceiling_services for 'cafe' and give it pendant clusters, back-bar shelving, a stone or fluted counter front and stools. Give the lobby a large supergraphic show title or donor wall on the drum, plus info screens. Scale works with the room's height (HEIGHTS x (ceiling-floor)/160) and add a few large-format pieces and vitrine clusters. Replace the discs with recessed light wells 24-36 inches deep with frosted glazing. Add a 1-inch shadow-gap reveal where wall meets ceiling. Review any floor-standing addition for cover with design.",
+   "files": [
+    "Tools/cerroblanco_fitout.py",
+    "Tools/cerroblanco_map.py"
+   ]
+  },
+  {
+   "title": "Roofs are untextured slabs with one or two plant boxes",
+   "severity": "medium",
+   "views": "courtyard-high, aerial (menu-style shot); visible from the cafe roof terrace and the upper galleries' windows",
+   "world_location": "roof_slab tops at ROOF 360 and SG_ROOF 330 (West, North, East Hall, South Gallery)",
+   "cause": "roof_slab paints +z with P.ROOF, a flat 186,184,178 with no texture, on one quad per roof. fitout.roof_plant places 1-2 AHUs, three vents and a hatch per roof, so from above or the terrace the roofs read as blank cardboard (and blue in shade, see the DDGI finding).",
+   "fix": "Add a cb_roof material: single-ply membrane with welded seams every ~72 inches, faint ponding stains near the drains, and walkway pads. Add drain sumps at the falls that line up with the downpipes, duct and conduit runs on sleepers, lightning tape along the parapets, and rooflights over the galleries, which would also justify the interiors' light wells.",
+   "files": [
+    "Tools/cerroblanco_map.py",
+    "Tools/cerroblanco_fitout.py",
+    "Tools/cerroblanco_quality_materials.py"
+   ]
+  },
+  {
+   "title": "Oak crowns push through the West Gallery's windows into the room",
+   "severity": "medium",
+   "views": "wg-upper (oak leaves inside the left window, top right); critic/wgu_win.png",
+   "world_location": "West garden oaks at (-1350,-200,0.8), (-1350,450,0.9), (-1350,1300,0.9), 224 inches from the West Gallery's west wall (e -1126)",
+   "cause": "grounds() places medium oaks 224 inches from the facade at scales 0.8-0.9, but a tree_oak_medium_a crown has a radius of ~250-300 inches, so the leaves pass through the wall and its upper windows. P.tree has no clearance check against walls.",
+   "fix": "Move that column of trees to e ≈ -1520 (or scale them to ≤0.6). Add a crown-radius clearance test to P.tree against the recorded walls (fitout.Log.walls), at least the crown radius x scale, and report any violators when the map script runs.",
+   "files": [
+    "Tools/cerroblanco_map.py",
+    "Tools/cerroblanco_parts.py"
+   ]
+  },
+  {
+   "title": "A downpipe runs straight through the covered walkway's canopy",
+   "severity": "low",
+   "views": "east-terrace (left: the pipe enters the canopy top and leaves its soffit); critic/et_left.png",
+   "world_location": "Plan (1406,-900), z 0..360, inside the canopy (e 1400..1640, n -1190..-18, z 200..210)",
+   "cause": "fitout.exterior places a downpipe at (1403,-900, C.ROOF) on the East Hall's east face, but covered_walkway() runs a canopy slab along that whole wall.",
+   "fix": "Move the downpipe to n ≈ -1215 (south of the canopy). Or stop it at a hopper on the canopy and run a short canopy gutter and spout down a column.",
+   "files": [
+    "Tools/cerroblanco_fitout.py"
+   ]
+  },
+  {
+   "title": "The distant sierra reads as pale, smooth paper cut-outs",
+   "severity": "low",
+   "views": "courtyard (beige-white hills behind the North Gallery), garden-circle (right edge); critic/cy_hills.png",
+   "world_location": "Backdrop beyond ~14000 inches (the far*2200 rise in terrain_z)",
+   "cause": "cerroblanco_landscape.axis() uses 1600-inch quads past 14000, so the crest silhouettes are smooth and faceted. They're painted with the bright 'rock' tint (1.3,1.28,1.22), and the fog lifts them towards white rather than a blue-grey aerial perspective. This is separate from the known blocky ground patches and blob trees.",
+   "fix": "Densify the grid along the sierra band (e.g. 400 inches where far > 0.3) and add ridged noise with gullies and strata to height(). Use a darker scrub and limestone tint (~0.8-0.9) up there, and nudge the GradientFog colour and alpha so the ranges step back in blue-grey layers.",
+   "files": [
+    "Tools/cerroblanco_landscape.py",
+    "Tools/cerroblanco_map.py"
+   ]
+  },
+  {
+   "title": "The perimeter wall is a blank 96-inch travertine band round the whole play",
+   "severity": "low",
+   "views": "garden-circle (left), forecourt (left background)",
+   "world_location": "PLAY edges (e -2560/2520, n -3250/3080)",
+   "cause": "perimeter() is four plain TRAV boxes with a honed cap. From site B and the forecourt it's a long uniform grid wall with no rhythm, weathering or planting, and it reads as a level boundary.",
+   "fix": "Add piers every ~240 inches with a slightly proud, darker coping. Add rain staining and darker grime at its foot, climbing plants or espaliered bougainvillea on some runs, and a planted bed along the inside. Break a few runs into railings with views out to the hill. All visual only, keeping the collision.",
+   "files": [
+    "Tools/cerroblanco_map.py"
+   ]
+  }
+ ]
+}
+===== a9cf2095f291f967a
+{
+ "summary": "I reviewed all three of last night's fixes. Two of them are correct, and the third never ran. cerroblanco_quality_geometry.main() crashed in C.build() with a KeyError on 'axis', so the storeys/floored() fix was never staged: output/cerroblanco/stage/ still holds OBJs from 10-15 18:33 and before. I fixed the crash, plus seven other bugs I could show were wrong. Changed files: D:/Documents/s&box projects/hc1/forked-shooter-main/Sources/CerroBlanco/shaders/cerroblanco_panel.shader, D:/Documents/s&box projects/hc1/forked-shooter-main/Tools/cerroblanco_fitout.py, D:/Documents/s&box projects/hc1/forked-shooter-main/Tools/cerroblanco_quality_geometry.py. Nothing was written to Assets/, the shared stage or the shared output/cerroblanco/geometry-manifest.json. I didn't touch the editor or git.\n\nHow it was checked:\n- The joint box filter was compared with a brute-force box filter (joint_check.py).\n- The flags were rendered with their textures from the north and the south and read correctly.\n- The fixed quality pass ran end to end into output/cerroblanco/review-fixes/stage, with and without the backdrop stub. While I worked, another session's mid-edit to Tools/riverdale_mater.py briefly stopped it from parsing; I didn't touch that file.\n- A strip-gap checker measured every strip the pass draws against the map's own drawn geometry. Every strip is now within 0.12 inch of the map's geometry, apart from the door-threshold grooves, which sit on their steel plates.\n- An OBJ scan confirmed that first-floor plinths are now only on the cafe walls and along the West Gallery balcony.\n\nStill to do:\n- Re-run cerroblanco_quality_geometry.py (or cerroblanco_quality_materials.py) to restage, then publish, so the editor compiles the new shader and models.\n- The shader is unverified in-engine: HLSL can't be compiled offline here.\n- Scratch tools, logs and renders are in D:/Documents/s&box projects/hc1/forked-shooter-main/output/cerroblanco/review-fixes/.\n\nChecked and found fine:\n- **Panel joint maths:** the band [-J/2, J/2] is right for a joint centred on the cell boundary with edge as folded distance. Combining the axes with 1-(1-cx)(1-cy) is exact for an axis-aligned footprint. The result is within 0.0012 of brute force up to a 29-inch footprint; beyond about 30 inches it undercounts, which is harmless. Roughness and albedo lerped by the box-filtered joint are correct area averages.\n- **Flags:** the UVs match the façade banners' convention, and from the forecourt the titles read the right way round (rendered). Winding is correct: front faces +n, both_sides reverses consistently. The cloth clears the pole by 0.4 inch, its top edge hangs 0.15 inch under the arm, and the arm runs 0.4 inch past the free corner. All P.column, P.rod and lathe calls match their signatures.\n- **floored():** its axis and across conventions, the inner/outer signs and the recorded P.slab argument names (e0, e1, n0, n1, z1, holes) all check out.\n\nLeft alone and reported:\n- The bevel normal is still point-sampled. Its attenuated RMS tilt matches a true box filter, but its peaks shimmer at 0.4 to 2 inch footprints.\n- cerroblanco_stone.shader still has the old joint formula. It over-darkens grout 3 to 10 times at 2 to 8 inch footprints, so paving at grazing angles will still read as a heavy grid. It isn't one of the named files.\n- floored() samples every 2 inches, so its ends can overshoot by up to 2 inches. On this map every overshoot is hidden inside a wall.\n- The West balcony's rounded corner has no folded cap.\n- The flag arm's collar has open top and bottom rings, which are sub-pixel at that height.",
+ "issues": [
+  {
+   "file": "Tools/cerroblanco_quality_geometry.py",
+   "problem": "main() crashed with KeyError 'axis' in the fit-out, so last night's storeys/floored() fix never ran or staged",
+   "fixed": true,
+   "detail": "The recorder wrapped C.wall, P.flight and P.picture with call(*args, **kwargs). The fit-out's Log.recording, inside C.build(), then wrapped those wrappers again by inspect.signature, so its records held only args and kwargs. faces_of() then raised KeyError 'axis'. Fix: call.__signature__ = signature. After it, main() runs end to end in about 60-90 s. The shared stage OBJs (10-15 18:33 and earlier) predate the fix and still need a restage."
+  },
+  {
+   "file": "Tools/cerroblanco_quality_geometry.py",
+   "problem": "Exterior plinth drawn at FLOOR1 across two-storey façades where there is no floor outside",
+   "fixed": true,
+   "detail": "The storeys loop drew the outside band at every storey. On 15 walls (the West Gallery, North Gallery and East Hall façades) it left a dark 0.8-inch line across the stone at 180, 30 inches under the cladding trim, with nothing outside at that height. The outside band now goes through floored() on a line 8 inches outside the wall, as the inside skirting already did. FLOOR1 plinths remain only on the cafe walls (the terrace and the upper room) and along the West Gallery balcony."
+  },
+  {
+   "file": "Tools/cerroblanco_quality_geometry.py",
+   "problem": "floored() didn't know about the West Gallery balcony, which isn't a P.slab",
+   "fixed": true,
+   "detail": "The balcony is m.box and P.ring geometry at FLOOR1, not a P.slab, so its plinth would have been lost. floored() now also takes the bounds of every up-facing FLOOR1 polygon in cerroblanco_buildings that isn't on a recorded slab. The slabs' own tops are skipped: their bounds swallowed the stairwell holes, and the skirting overshot 2 inches into the stairwells. Verified on the West Gallery: the skirting ends exactly at the stairwell's edge (n 400), the top tread at floor height gets one, and the plinth runs along the balcony (e -650, and e -800..-650 on the south wall)."
+  },
+  {
+   "file": "Tools/cerroblanco_quality_geometry.py",
+   "problem": "Every band() strip and interior skirting stood 0.1-0.4 inch clear of its wall",
+   "fixed": true,
+   "detail": "band() put the strip's back at outer + off. That left window sills 0.4 inch off the façade (66 of them, a visible slot of daylight seen from 2 m), window heads 0.3, the cladding trim 0.13 and plinths 0.1. Interior skirtings were 0.1 inch off the inner face. Now each back sits on the wall face and each front stays where it was. The strip-gap checker finds every strip within 0.12 inch of geometry."
+  },
+  {
+   "file": "Tools/cerroblanco_quality_geometry.py",
+   "problem": "A hard-coded coping hung in the air at the South Gallery canopy",
+   "fixed": true,
+   "detail": "(-1060, 510, -2420, -2416, 420) was taken from the Portico callout rectangle, not the canopy. 300 inches of it hung in mid-air west of SG_CANOPY (-760..440), 70 inches east of it, and the rest lay 1.85 inches above the canopy roof, 20 inches behind its fascia. It now sits on the fascia's honed top: (-760, 180, -2440, -2436, 420), gap under 0.02 inch. The other three hard-coded copings and both rotunda ring copings sit on their tops correctly."
+  },
+  {
+   "file": "Tools/cerroblanco_quality_geometry.py",
+   "problem": "Parapet caps overhung 2.7 inches on the roof side, so their roof-side lips hung 2.2 inches off the parapet",
+   "fixed": true,
+   "detail": "parapet_on's coping is 2.5 inches proud only on the outward side, but the cap used min(across) - 2.7 and max(across) + 2.7 on both sides. The roof-side lip, or both lips on the two outward-None parapets, floated 2.2 inches off the parapet face; this shows from roof height or in freecam. The cap now overhangs the coping by 0.2 inch on each side. The outward side is unchanged."
+  },
+  {
+   "file": "Sources/CerroBlanco/shaders/cerroblanco_panel.shader",
+   "problem": "Joint AO and albedo both lerped by area, darkening part-covered pixels twice in shade",
+   "fixed": true,
+   "detail": "The albedo already darkens a part-covered pixel by the joint's share. Multiplying in AO lerped by the same share (down to 0.25) made a half-covered pixel about 35% too dark in indirect light: 0.205 against a true 0.314 for enamel 0.62, AO 1. In shade the grid read too strong at 1000-2000 inches, which is exactly the reported symptom. The AO weight is now joint x lum(joint colour) / lum(albedo), which is exact for the diffuse product and leaves the close-up joint unchanged (AO 0.25). The trade-off is that indirect specular in part-covered pixels is now slightly less occluded."
+  },
+  {
+   "file": "Sources/CerroBlanco/shaders/cerroblanco_panel.shader",
+   "problem": "Pillow normal sign inverted: panels were dished, not pillowed",
+   "fixed": true,
+   "detail": "pillow is the gradient of h = P(1-cx^2)(1-cy^2), so the normal must lean against it. It was added (+= pillow * .5), which leans the other way to the bevel's arrises (-= gradient * slope). Now -=. This assumes tangent U points along +U, the standard. The effect is small (about 0.3 degrees). Syntax checked by eye only; it can't be compiled offline."
+  },
+  {
+   "file": "Sources/CerroBlanco/shaders/cerroblanco_panel.shader",
+   "problem": "Bevel normal is point-sampled with a heuristic fade (unchanged); per-panel variation also noted",
+   "fixed": false,
+   "detail": "The 0.16-inch bevel is sampled once per pixel. Its RMS tilt after the W/(2aa) fade is close to a true box filter (0.011 against 0.020 at a 0.8-inch footprint), but individual pixels reach 0.15 against a filtered peak of 0.10, so it can sparkle as the camera moves. Left as is: it matches the stone shader's in-engine-verified fade, and TAA averages it. An analytic fix exists if it shows: (h(e+fp/2) - h(|e-fp/2|)) / fp, with h a smoothstep from J/2 to J/2+W. Other terms that could make the grid read from afar are subtle and intentional: plus or minus 2.5% albedo and 0.03 roughness per panel, and a tilt under 0.7 degrees."
+  },
+  {
+   "file": "Sources/CerroBlanco/shaders/cerroblanco_stone.shader",
+   "problem": "Stone joints still use the old smoothstep and stay dark at distance (not edited: not a named file)",
+   "fixed": false,
+   "detail": "joint = 1 - smoothstep(J/2-aa, J/2+aa, edge) keeps the joint centre above 0.5 at any distance. With J 0.16 the grout covers 1.6x the true area at a 1-inch footprint, 2.9x at 2, 5x at 4 and 9.7x at 8. Paving seen at grazing angles will read as a heavy grout grid. The panel shader's box filter applies directly. It has the same AO double-darkening too, milder: grout 0.3 at AO 0.72."
+  },
+  {
+   "file": "Tools/cerroblanco_fitout.py",
+   "problem": "Flagpole base had no top",
+   "fixed": true,
+   "detail": "P.column draws only a cylinder's sides, so the 9-inch, 6-inch-tall honed base was an open tube with the paving visible inside it at eye level; confirmed in a render. Added P.disc(solid, P.HONED, (e, n), 9.0, 6.0, sides=16), whose vertices match the column's ring."
+  },
+  {
+   "file": "Tools/cerroblanco_fitout.py",
+   "problem": "Flag cloth shaded flat in hard stripes",
+   "fixed": true,
+   "detail": "With flat face normals, neighbouring facets were up to 31.6 degrees apart, against the docstring's 'soft folds'. The finer fold harmonic also had only 3 columns per wave. Now 16 columns, and per-vertex normals from the grid by central differences. Front and back are drawn as separate polygons with plus and minus normals, because both_sides keeps only the front face's normals. All 1536 flag polygons have their normals on the face's side, the OBJ exports with vn, and a lit render shows smooth folds. UVs and orientation are unchanged: the titles read correctly from the north and mirrored from the south."
+  }
+ ]
+}
+===== a70b7860afa6212e0
+{
+ "summary": "The landscape ground now uses one blended material instead of a paint per quad. Every quad is drawn with \"cbf_land\" (shaders/cerroblanco_land.shader), which mixes four terrain materials through a painted 1024x1024 RGBA splat. The grid, heights, per-vertex normals and the cells skipped inside the play are exactly as before. I checked this with a fingerprint taken before and after: the same 45,314 quads with identical points and normals, and identical woods, oaks and props.\n\n**Mapping.** `zone_knots`, `map_axis` (a port of the shader's MapAxis), `axis_plan` (its inverse) and `texel_plan` give each texel's plan position. The round trip was checked against a separate copy of the shader formula on 200,000 random points plus the knots: the worst error is 3.4e-13 texels, and texel centres land exactly on whole texels.\n\n**Painter.** `splat( C )` runs `weights()` over the texels using 8 threads and takes about 20-30 s. It uses soft versions of the old rules:\n- **Rock:** steep slopes; outcrops from the height's own rock noise 1104; above about 3000-3700 high (with some dry grass left on gentle tops); and partial rock on middling slopes, standing in for the old scree.\n- **Dirt:** patches from noise 1202 on gentle ground.\n- **Green:** green noise 1201, plus gullies and low parts of the rolling ground.\n- **Dry meadow:** everything else.\n- **A channel:** broad light and dark over 3000\"+ (0.5 neutral, ranging 0.33-0.67), darker under the woodland noise 1301 and in hollows.\n\nAnti-aliasing and straight-line fixes:\n- A smooth footprint (24 + 0.025·d inches) is always at least one texel wide on both axes. A built-in assert checks this at every zone knot, and nothing in the paint jumps at the knots.\n- Noise octaves finer than the footprint fade out. `fbm` matches `vfbm` exactly when nothing is faded.\n- Slope is measured over 2·footprint, averaging the rise on each side so ridge crests don't read as level.\n- The paint's own noises are rotated and warped so nothing lines up with the grid.\n- The slope of `terrain_z` is smoothed with a Gaussian-derivative filter, because its creases otherwise painted straight lines (see open issues).\n\n**Shares by area outside the play (dry / green / dirt / rock):**\n\n| Zone | New | Old (per quad) |\n|---|---|---|\n| Within 3000 | 66 / 24 / 3 / 6 | 59 / 29 / 1 / 11 (rock + scree) |\n| 3000-14000 | 56 / 22 / 5 / 17 | 60 / 16 / 0 / 23 |\n| Past 14000 | 46 / 9 / 2 / 43 | 41 / 11 / 0 / 48 |\n\n**Materials.** `write_materials( root, C=None )` now writes `land_splat.png` (only when its bytes change, through a temp file with retries), `cbf_land.vmat` with every material key, and copies the shader source into root. The three canopy paints are still written; the five old `cbf_land_*` vmats are no longer written.\n\n**Layers.** Dry is `meadow_dry`, Green is `meadow`, Dirt is `dirt`, and Rock is the terrain's `rock`. I chose `rock` over `scree` after viewing both: scree's dark chips on brown earth would look speckled across whole hillsides. The old tints are kept (rock 1.3/1.28/1.22, for the light limestone).\n\n`python Tools/cerroblanco_landscape.py --preview <dir>` writes the splat, its views and the share report. The module docstring has been updated.",
+ "files_changed": [
+  "D:/Documents/s&box projects/hc1/forked-shooter-main/Tools/cerroblanco_landscape.py",
+  "D:/Documents/s&box projects/hc1/forked-shooter-main/Tools/cerroblanco_map.py (only line 152: L.write_materials( root, sys.modules[__name__] ))"
+ ],
+ "verification": [
+  "Before my edits I fingerprinted build( cerroblanco_map ) and repeated it after: 45,314 ground quads both times. A hash of the sorted quad points, face normals and per-vertex normals matched exactly. The woods polygons, oak props and woods overrides also hash the same. The ground now uses only 'cbf_land', mapped to materials/cerroblanco/fitout/cbf_land.vmat.",
+  "MapAxis round trip on 200k random points plus the zone knots: the worst error is 3.4e-13 texels on both axes. The plan error is under 1e-10 inches. map_axis matches a separately written copy of the shader formula exactly. texel_plan's centres fall on whole texels to within 2.3e-13. Texel sizes are 20.9 / 73.1 / 334.2 inches east-west and 22.1 / 77.4 / 353.7 north-south.",
+  "Zone knots: for each of the 8 knots I compared the splat's rate of change per 1000 inches across the knot with the 5 texel pairs on either side. The straddling pair always falls between its neighbours, so nothing jumps. The splat sampled the way the shader samples it shows no step bigger than 0.04 between 4-inch samples across a knot.",
+  "Splat sampled as the shader does, compared with evaluating the painter directly at 300k random points. Within 3000: mean error ≤ 0.0007, worst 0.035. 3000-14000: mean ≤ 0.002, 99th percentile ≤ 0.022. Past 14000: mean ≤ 0.013, 99th percentile ≤ 0.08, worst 0.58 (green) / 0.42 (rock) in rare spots.",
+  "I looked at output/cerroblanco/land-preview/: plan_full, plan_16000, plan_inner, plan_edge (the play's SW corner), plan_zooms, check_nw (sampled vs direct, identical), splat_weights, splat_alpha, colour_texels and terrain_sheet. There are no stair-steps, no grid-shaped patches and no straight lines. The earlier lines along terrain_z's creases and along value-noise lattice lines are gone. Edges are soft and broken by noise. The play's edge is plain dry or green meadow, with no rock right against it.",
+  "write_materials( output/cerroblanco/land-preview/root, C ) writes cbf_land.vmat (all keys checked), land_splat.png (RGBA 1024², same pixels as the preview; R+G+B never above 255; A 83-172) and the shader. The shader is byte-identical to Sources/CerroBlanco and to the existing Assets copy. A second run left the PNG untouched.",
+  "Nothing was written under Assets. The editor and sbox-cli weren't touched. The file keeps CRLF line endings like the other Tools scripts."
+ ],
+ "open_issues": [
+  "The old Assets/materials/cerroblanco/fitout/cbf_land_{dry,green,dirt,scree,rock}.vmat (and their _c files) will stay in Assets unused, because the publish step only copies files that changed. Delete them when publishing if they aren't wanted. Until a staging run is published and the editor compiles cbf_land.vmat and land_splat.png, the ground will load as a missing material.",
+  "terrain_z in cerroblanco_map.py (another session's file, which I didn't change) puts real creases in the geometry: at 600 and 1500 inches from the play's edge, from the clip(dist/600) and clip(dist/1500) ramps, and along n = 0, where the north and south slope factors 0.07 and 0.18 switch. The mesh shading will show these as straight lines whatever the paint does; the splat only avoids drawing them. Suggested fix: smoothstep easing and a smooth blend of the north/south factor.",
+  "In the far zone (past 14000) the splat is still slightly under-sampled in rare spots (99th-percentile rock error 0.08, worst 0.42). It shows as softness, not blockiness. Sampling several points per texel would fix it but roughly quadruple the ~25 s paint time.",
+  "Not checked in the engine (as instructed, no editor). Still to look at in-engine: how the height blend looks at partial weights (the rock texture's mean height is 0.55, so rock wins ties), the tint balance, and the g_flMacro strength.",
+  "While I was working, another session left Tools/riverdale_materials.py temporarily unparseable (line 1024, an unterminated string). Anything that imports veridant_backdrop failed during that time. For my checks in that window I ran against the committed copy in a scratch folder. It parsed again before my last runs."
+ ],
+ "integration_notes": "cerroblanco_map.write_materials() now calls L.write_materials( root, sys.modules[__name__] ), so painting the splat adds about 20-30 s to each map/staging run. If C isn't passed, write_materials imports cerroblanco_map itself. The splat needs only C.PLAY and C.terrain_z. cerroblanco_trees.py (the other agent's woods) only uses L.height, which is unchanged. The woods/oaks loop in build() is untouched. If the woods module later replaces that loop, the splat's woodland darkening still assumes the woods follow VB.vfbm( e, n, 2200, 3, 1301 ): keep that noise, or update weights(). The vmat expects shaders/cerroblanco_land.shader next to the materials. write_materials copies it from Sources/CerroBlanco/shaders into root, so staged and live copies stay identical."
+}
+===== aad897cb05f5d51d9
+{
+ "summary": "I wrote Tools/cerroblanco_trees.py. It draws Cerro Blanco's distant woods as alpha-tested photographic tree cards instead of the old veridant_backdrop.blob domes. In offline renders it now reads as a real oak woodland with ragged crown outlines (output/cerroblanco/trees-preview/compare/*.png has the blobs and the cards side by side for 6 views). I only wrote this one file. Nothing under Assets/ was touched, and the editor and git weren't used.\n\nSignatures (match the code style; the module has a docstring):\n- build( C, height, seed=27, avoid=() ) -> map_kit.Model. height is cerroblanco_landscape.height, called as height( E, N, C ). avoid is a list of plan (e, n[, z]) points (the cloud oaks): trees stay 200 inches from them and scrub 100. The paints are cbf_tree_green, cbf_tree_dry and cbf_tree_dark. Each gets material_overrides \"materials/cerroblanco/fitout/<paint>.vmat\" and tile_overrides 64. There is no collision. It uses its own rng (seed + 7000).\n- write_materials( root ) writes three files under root / \"materials/cerroblanco/fitout\". These are 2048² cbf_tree_{green,dry,dark}_color.png, the shared alpha cbf_tree_trans.png, and three vmats. The vmats use complex.shader with Riverside's alpha-test keys: F_ALPHA_TEST, TextureTranslucency, ref 0.40, AA edge 1, default normal and AO, roughness 0.9.\n- `python Tools/cerroblanco_trees.py [--out dir]` writes the model, the materials and atlas_sheet.png laid out like Assets. The default out is output/cerroblanco/trees-preview, and it refuses to write into Assets.\n\nHow it works:\n- **Atlas:** each of the four trees in Belltower's forest-trees-v1.png is cut out by its own alpha (the two bottom trees touch). Each is resized premultiplied into its own quarter of a 2048 atlas with a 24 px margin, standing on its foot. Colour is filled into the clear texels by a push-pull pass so the mips don't halo dark. The three tints are as photographed, a dusty dry-season olive, and a darker evergreen.\n- **Placement:** it keeps the landscape's rules: 700 inches or more from the play edge, the woodland-noise threshold vfbm( 2200, 3, 1301 ) >= -0.1 + 0.2·rand, slope ≤ 0.75 and z ≤ 3200, out to 22000. I deliberately changed the distance distribution. The blobs' 900 + 21000·u^1.7 made them about 30 times as dense by the walls as at 15000 out (crowns about four deep, a wall). Points are now spread evenly by area, with a weight of (1 + 0.8·e^(−d/5000))/1.8.\n- **Trees and scrub:** there are 6500 trees, 6–12 m tall (olives 4.8–8 m, a little larger far out). They go mostly where the woodland noise is high. Scrub (6000) is a crop of a tree's crown, 1.5–3 m tall, sunk 18% and following the ground across its width. It sits at woodland edges, on steep or high ground, and within 9000 inches of the play.\n- **Cards:** each faces the play centre ±9° with a random tree, mirroring, size, lean and tilt. Tint follows the landscape's green and hollow noise. Trees nearer than 3000 inches get a second crown layer, set back 0.2 of the width, turned 18–32°, mirrored and at 92% height.\n- **Faces and normals:** both faces are drawn, with the back face 0.25 inch behind the front. Per-vertex normals are mostly up and bowed out like a dome, using the same frame for both layers of a tree.\n\nResult in the preview: 13006 cards, 52024 triangles, 104048 vertices, and a 10.2 MB OBJ (the old blobs were 22 MB). The four PNGs add about 15 MB. With the real oaks passed as avoid it comes to 6070 trees, 5717 scrub, 12153 cards and 48612 triangles. Building takes about 10 s and writing the OBJ about 30 s.\n\nTwo things I tried and dropped, both found in renders:\n- A crossed X card on near trees showed as tall thin spikes wherever it was edge-on to the play. I replaced it with the set-back layer.\n- Front and back faces on the same plane made the woods render half see-through in Cycles. The quarter-inch offset fixes that and also avoids z-fighting.",
+ "files_changed": [
+  "D:/Documents/s&box projects/hc1/forked-shooter-main/Tools/cerroblanco_trees.py"
+ ],
+ "verification": [
+  "Built offline into output/cerroblanco/trees-preview (Assets layout): models/maps/cerroblanco/cerroblanco_backdrop_woods.{obj,mtl,vmdl}, materials/cerroblanco/fitout/cbf_tree_*.vmat, *_color.png and cbf_tree_trans.png (all 2048x2048), plus atlas_sheet.png (looked at: clean cut-outs, UV boxes and crown lines correct, tints plausible).",
+  "Parsed the OBJ: 104048 v / vt / vn, 52024 triangles, all finite. UVs stay inside the cells (0.0117 to 0.988). Normals are unit length with their up component at least 0.77. The vmdl has the 3 remaps and no PhysicsShape.",
+  "Rendered offline in Blender 5.1 Cycles on the CPU. The wrapper runs Tools/railhead_render.py on Assets/scenes/maps/CerroBlanco/cerroblanco.scene, with the preview folder searched before Assets. The woods were made transparent to shadow rays, to match their RenderType Off. Six views: gallery (600,-1100,700 -> -250,300,0), air (1800,-4800,3200 -> -200,0,0), west, terrace, south and northwest. Each was also rendered with the current blob woods. I looked at all of them; the side-by-sides are in output/cerroblanco/trees-preview/compare/ with the wrapper render_cb.py.",
+  "Checked with the real landscape.build() props as avoid: it runs (6070 trees, 5717 scrub, 12153 cards).",
+  "Moving the ground-height lookups into one batch gave a byte-identical OBJ (same md5) and cut the build from 100 s to about 10 s."
+ ],
+ "open_issues": [
+  "Nothing has been compiled or seen in the s&box engine. Still to check there: the complex-shader alpha test at distance (alpha mips may thin the far crowns; lower g_flAlphaTestReference if they do), how the per-vertex up-biased normals light in-game, and the PNGs compiling.",
+  "The previews are Cycles renders, not engine captures. The cloud oaks were left out (--no-trees), so whether the cards sit well beside the 300 3D oaks hasn't been seen.",
+  "I deliberately changed the distance distribution from the blobs' u^1.7 to even-by-area. The rule's filters are unchanged, but the near band is now much thinner than with the blobs, while far woods are denser.",
+  "Wiring cerroblanco_landscape.build() so the 300 cloud oaks stay exactly where they are: the props loop shares the landscape's rng with the blob loop, and VB.blob draws from it. So keep the blob loop and its rng draws as they are, but pass a throwaway model (VB.blob( Model(), ( e, n, z ), r, h, paint, rng, sink=0.25 )). After the props loop, add `import cerroblanco_trees as T` and `woods = T.build( C, height, seed, avoid=[ p[\"position\"] for p in props ] )`. The existing override loop over ( m, woods ) is harmless. Update the module docstring, and the FLAT cbf_canopy* paints can go.",
+  "Wiring cerroblanco_map.write_materials(): after `L.write_materials( root )`, add `import cerroblanco_trees as T` and `T.write_materials( root )`. The model name, cerroblanco_backdrop_woods, and its scene entry (\"Backdrop Woods\", no collision, RenderType Off, so no shadows) stay as they are.",
+  "The colour PNGs are 2048 and about 4.8 MB each (about 15 MB with the alpha) in Git LFS. Setting SIZE = 1024 cuts that to roughly a quarter at about 80% of the source's detail.",
+  "Only 4 tree shapes (Belltower's Tuscan atlas) × mirroring × 3 tints, so some repetition shows up close. A Mexican-encino-specific atlas would be the next step.",
+  "Tall cards just outside the north edge may now show over the galleries' roofs from the courtyard (the blobs were 2-4 m and never did). Not checked from the courtyard.",
+  "Another session briefly left Tools/riverdale_materials.py with a syntax error at line 1024 (around 14:10). That breaks the import chain veridant_backdrop -> riverdale_parts -> riverdale_materials, so cerroblanco_landscape and this module couldn't import. For my tests only I used a HEAD copy in the scratchpad. It parses again now, and I didn't touch it."
+ ],
+ "integration_notes": "In cerroblanco_landscape.build(): leave the rng-consuming woodland loop in place but have VB.blob draw into a discarded Model(), so the props stay identical. After the props loop:\n    import cerroblanco_trees as T\n    woods = T.build( C, height, seed, avoid=[ p[\"position\"] for p in props ] )\nIn cerroblanco_map.write_materials(), after L.write_materials( root ):\n    import cerroblanco_trees as T\n    T.write_materials( root )\nThen run cerroblanco_map.py --stage and publish as usual. The editor has to compile 3 new vmats, 4 PNGs and the woods vmdl. If the model compiles before its vmats (\"Missing vmat\"), recompile the vmats and then the vmdl. Preview the woods with `python Tools/cerroblanco_trees.py --out <dir>`. To re-render the views, run output/cerroblanco/trees-preview/compare/render_cb.py with \"blender -b --factory-startup --python render_cb.py -- <overlay root|-> --views \\\"\\\" --view name,e,n,z,te,tn,tz,fov ... --cpu --no-trees --exposure 2.4 --out <absolute dir>\". It needs an absolute --out path and transparent bounces raised (the wrapper does this)."
+}

@@ -1,5 +1,5 @@
 var session = Editor.SceneEditorSession.Active;
-if (Game.IsPlaying || session?.Scene?.IsEditor != true || session.Scene.Source?.ResourcePath != "scenes/maps/lowtide/lowtide.scene") throw new Exception("Expected Lowtide edit viewport");
+if (Game.IsPlaying || session?.Scene?.IsEditor != true || session.Scene.Source?.ResourcePath != "scenes/maps/lowtide/lowtide.scene" || Editor.SceneViewWidget.Current?.Session != session) throw new Exception("Expected Lowtide edit viewport");
 var folder = System.IO.Path.Combine(Project.Current.GetRootPath(),"output/lowtide/quality-pass");
 var requests = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"viewport-request.json"))).AsArray();
 var viewport = Editor.SceneViewWidget.Current.LastSelectedViewportWidget;
@@ -11,10 +11,12 @@ try
     foreach (var request in requests)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        if(Game.IsPlaying || Editor.SceneEditorSession.Active!=session || Editor.SceneViewWidget.Current?.Session!=session) throw new Exception("Viewport state changed");
         var name = request["name"].GetValue<string>();
         if (System.IO.Path.GetFileName(name) != name) throw new Exception("Expected simple capture name");
         Editor.Mcp.SceneTools.SetEditorCamera(request["position"].GetValue<string>(),request["angles"].GetValue<string>());
         await Task.Delay(250,cancellationToken);
+        if(Game.IsPlaying || Editor.SceneEditorSession.Active!=session || Editor.SceneViewWidget.Current?.Session!=session) throw new Exception("Viewport state changed");
         // Navigation inertia can update the native camera while yielding.
         // Reapply immediately before rendering to retain the requested view.
         Editor.Mcp.SceneTools.SetEditorCamera(request["position"].GetValue<string>(),request["angles"].GetValue<string>());
@@ -26,10 +28,13 @@ try
 }
 finally
 {
-    var angles=originalRotation.Angles();
-    Editor.Mcp.SceneTools.SetEditorCamera(
-        FormattableString.Invariant($"{originalPosition.x:R},{originalPosition.y:R},{originalPosition.z:R}"),
-        FormattableString.Invariant($"{angles.pitch:R},{angles.yaw:R},{angles.roll:R}"));
+    if(!Game.IsPlaying && Editor.SceneEditorSession.Active==session && Editor.SceneViewWidget.Current?.Session==session)
+    {
+        var angles=originalRotation.Angles();
+        Editor.Mcp.SceneTools.SetEditorCamera(
+            FormattableString.Invariant($"{originalPosition.x:R},{originalPosition.y:R},{originalPosition.z:R}"),
+            FormattableString.Invariant($"{angles.pitch:R},{angles.yaw:R},{angles.roll:R}"));
+    }
 }
 return new { results, scene=session.Scene.Source.ResourcePath, session.HasUnsavedChanges,
     originalPosition, originalRotation, restored=Editor.Mcp.SceneTools.GetEditorCamera() };

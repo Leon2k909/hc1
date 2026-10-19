@@ -1,0 +1,28 @@
+{
+  "status": "offline_filter_math_and_scope_passed",
+  "manifest_sha256": "77c8f24c151f2fcb5c7bdab744e5aa5ee1e3b1a97fcd306308f30479ab9405fc",
+  "reviewer_sha256": "b15987f40610a79e1e004744105ec8f2e5c7d7ea1e26a2c8acb25fbaf3e99541",
+  "protected_live_files": 567,
+  "target_size_cases": 72,
+  "constant_hdr_cases": 4,
+  "hdr_max_mean_error": 1.4114630175754428e-07,
+  "source_variances": [
+    12.000258149454899,
+    2.9950449799167806,
+    0.7417124408706796,
+    0.1916096747967266,
+    0.046984303126415515,
+    0.012907816777144358,
+    0.0036908020985507843
+  ],
+  "zero_lod_samples": 5000,
+  "roughness_projection_cases": 19216,
+  "resolution_scale_error": 4.163336342344337e-17,
+  "single_mip_fallback_cases": 200,
+  "derivative_only_cases": 301,
+  "roughness_filter_scale": 0.35,
+  "stage_files": 4,
+  "live_assets_and_code_unchanged": true,
+  "native_shader_compiled": false,
+  "limitation": "Source ordering and CPU mathematics are not proof of native GPU barriers, lifetime, rendering, sandbox acceptance or FPS"
+}

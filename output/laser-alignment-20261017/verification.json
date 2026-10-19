@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-17",
+  "change": "Align the first-person held laser with Shootable.WeaponRay after camera setup; retain emitter collision, range, and physical direction for lowered/world models.",
+  "game_code_files": [
+    "Code/Gunsmith/Attachments/GunsmithLaserBeam.cs",
+    "Code/Gunsmith/Attachments/GunsmithMw22Attachment.cs",
+    "Code/Weapons/Components/Shootable.cs"
+  ],
+  "dotnet_build": {
+    "command": "dotnet build Code/razedtest.csproj --no-restore --nologo --verbosity quiet",
+    "succeeded": true,
+    "errors": 0,
+    "warnings": 96,
+    "changed_file_diagnostics": 0,
+    "log": "dotnet-build.log"
+  },
+  "native_compilation": {
+    "reported_success": true,
+    "game_errors": 0,
+    "game_warnings": 69
+  },
+  "diff_check": {
+    "passed": true
+  },
+  "geometry_review": {
+    "passed": true,
+    "scope": "Read-only review of convergence, collision guards, update routing and shared ray selection; not a runtime test."
+  },
+  "native_ray_tests": {
+    "executed": false,
+    "script": "verify-rays.cs",
+    "reason": "The run_csharp staging call timed out. A follow-up search found no staged verify-rays.cs in the sbox-cli exchange directories."
+  },
+  "visual_check": {
+    "completed": false,
+    "reason": "Editor automation calls timed out after hot reload. The editor initially had Lowtide open, play stopped, with no unsaved active-scene changes."
+  }
+}

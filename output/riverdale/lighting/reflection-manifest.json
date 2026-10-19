@@ -1,0 +1,636 @@
+{
+  "revision": "daylight-v1",
+  "capture_encoding": "ACES inverse with sky calibration",
+  "radiance_scale": 0.7138424972549257,
+  "calibration": {
+    "probe": "west_yard",
+    "radiance_scale": 0.7138424972549257,
+    "channel_scales": [
+      0.6705410411823362,
+      0.7138424972549257,
+      0.7289441448161602
+    ],
+    "max_channel_deviation": 0.06065967806498607,
+    "sky_tint": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  "captures": [
+    {
+      "key": "hall",
+      "name": "Probe Hall",
+      "exposure": 2.5,
+      "radiance_max": 7.287733554840088,
+      "radiance_median": 0.07401825487613678,
+      "size": [
+        2048,
+        1024
+      ],
+      "faces": [
+        {
+          "face": 0,
+          "clipped_fraction": 0.00099945068359375,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 1,
+          "clipped_fraction": 0.001834869384765625,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 2,
+          "clipped_fraction": 1.52587890625e-05,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 3,
+          "clipped_fraction": 0.00074005126953125,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 4,
+          "clipped_fraction": 0.0013427734375,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 5,
+          "clipped_fraction": 0.000339508056640625,
+          "black_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "key": "pool",
+      "name": "Probe Pool",
+      "exposure": 2.5,
+      "radiance_max": 7.441187858581543,
+      "radiance_median": 0.05958171933889389,
+      "size": [
+        2048,
+        1024
+      ],
+      "faces": [
+        {
+          "face": 0,
+          "clipped_fraction": 9.5367431640625e-05,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 1,
+          "clipped_fraction": 0.00072479248046875,
+          "black_fraction": 1.1444091796875e-05
+        },
+        {
+          "face": 2,
+          "clipped_fraction": 4.9591064453125e-05,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 3,
+          "clipped_fraction": 5.340576171875e-05,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 4,
+          "clipped_fraction": 0.00095367431640625,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 5,
+          "clipped_fraction": 0.0,
+          "black_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "key": "a1",
+      "name": "Probe A1",
+      "exposure": 2.5,
+      "radiance_max": 6.913341522216797,
+      "radiance_median": 0.1074703186750412,
+      "size": [
+        2048,
+        1024
+      ],
+      "faces": [
+        {
+          "face": 0,
+          "clipped_fraction": 0.00250244140625,
+          "black_fraction": 7.62939453125e-06
+        },
+        {
+          "face": 1,
+          "clipped_fraction": 0.0,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 2,
+          "clipped_fraction": 0.001911163330078125,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 3,
+          "clipped_fraction": 0.0,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 4,
+          "clipped_fraction": 0.0,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 5,
+          "clipped_fraction": 0.0,
+          "black_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "key": "a2",
+      "name": "Probe A2",
+      "exposure": 2.5,
+      "radiance_max": 6.913341522216797,
+      "radiance_median": 0.0857890397310257,
+      "size": [
+        2048,
+        1024
+      ],
+      "faces": [
+        {
+          "face": 0,
+          "clipped_fraction": 0.00250244140625,
+          "black_fraction": 6.103515625e-05
+        },
+        {
+          "face": 1,
+          "clipped_fraction": 0.0,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 2,
+          "clipped_fraction": 0.001911163330078125,
+          "black_fraction": 8.7738037109375e-05
+        },
+        {
+          "face": 3,
+          "clipped_fraction": 0.0,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 4,
+          "clipped_fraction": 0.0,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 5,
+          "clipped_fraction": 0.0,
+          "black_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "key": "b1_room",
+      "name": "Probe B1 Room",
+      "exposure": 2.5,
+      "radiance_max": 6.913341522216797,
+      "radiance_median": 0.2574077844619751,
+      "size": [
+        2048,
+        1024
+      ],
+      "faces": [
+        {
+          "face": 0,
+          "clipped_fraction": 0.0,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 1,
+          "clipped_fraction": 0.00042724609375,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 2,
+          "clipped_fraction": 0.0,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 3,
+          "clipped_fraction": 0.000255584716796875,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 4,
+          "clipped_fraction": 0.00469970703125,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 5,
+          "clipped_fraction": 0.0,
+          "black_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "key": "west_control",
+      "name": "Probe West Control",
+      "exposure": 2.5,
+      "radiance_max": 7.33270788192749,
+      "radiance_median": 0.6789988279342651,
+      "size": [
+        2048,
+        1024
+      ],
+      "faces": [
+        {
+          "face": 0,
+          "clipped_fraction": 0.02021026611328125,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 1,
+          "clipped_fraction": 0.01686859130859375,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 2,
+          "clipped_fraction": 0.0267791748046875,
+          "black_fraction": 4.57763671875e-05
+        },
+        {
+          "face": 3,
+          "clipped_fraction": 0.0266876220703125,
+          "black_fraction": 3.814697265625e-06
+        },
+        {
+          "face": 4,
+          "clipped_fraction": 0.05340576171875,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 5,
+          "clipped_fraction": 0.0,
+          "black_fraction": 5.7220458984375e-05
+        }
+      ]
+    },
+    {
+      "key": "east_control",
+      "name": "Probe East Control",
+      "exposure": 2.5,
+      "radiance_max": 7.33270788192749,
+      "radiance_median": 0.6914867162704468,
+      "size": [
+        2048,
+        1024
+      ],
+      "faces": [
+        {
+          "face": 0,
+          "clipped_fraction": 0.020477294921875,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 1,
+          "clipped_fraction": 0.026271820068359375,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 2,
+          "clipped_fraction": 0.026874542236328125,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 3,
+          "clipped_fraction": 0.01686859130859375,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 4,
+          "clipped_fraction": 0.05340576171875,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 5,
+          "clipped_fraction": 0.0,
+          "black_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "key": "west_yard",
+      "name": "Probe West Yard",
+      "exposure": 1.5,
+      "radiance_max": 11.522235870361328,
+      "radiance_median": 0.17306500673294067,
+      "size": [
+        2048,
+        1024
+      ],
+      "faces": [
+        {
+          "face": 0,
+          "clipped_fraction": 0.001399993896484375,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 1,
+          "clipped_fraction": 0.000240325927734375,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 2,
+          "clipped_fraction": 0.00099945068359375,
+          "black_fraction": 3.814697265625e-06
+        },
+        {
+          "face": 3,
+          "clipped_fraction": 0.00018310546875,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 4,
+          "clipped_fraction": 3.814697265625e-06,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 5,
+          "clipped_fraction": 0.0,
+          "black_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "key": "east_yard",
+      "name": "Probe East Yard",
+      "exposure": 1.5,
+      "radiance_max": 11.522235870361328,
+      "radiance_median": 0.15854419767856598,
+      "size": [
+        2048,
+        1024
+      ],
+      "faces": [
+        {
+          "face": 0,
+          "clipped_fraction": 0.0002899169921875,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 1,
+          "clipped_fraction": 0.000583648681640625,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 2,
+          "clipped_fraction": 0.00067138671875,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 3,
+          "clipped_fraction": 0.00054931640625,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 4,
+          "clipped_fraction": 3.814697265625e-06,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 5,
+          "clipped_fraction": 0.0,
+          "black_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "key": "west_court",
+      "name": "Probe West Court",
+      "exposure": 1.5,
+      "radiance_max": 11.522235870361328,
+      "radiance_median": 0.10131911933422089,
+      "size": [
+        2048,
+        1024
+      ],
+      "faces": [
+        {
+          "face": 0,
+          "clipped_fraction": 2.288818359375e-05,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 1,
+          "clipped_fraction": 4.9591064453125e-05,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 2,
+          "clipped_fraction": 1.1444091796875e-05,
+          "black_fraction": 1.1444091796875e-05
+        },
+        {
+          "face": 3,
+          "clipped_fraction": 0.00011444091796875,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 4,
+          "clipped_fraction": 0.0,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 5,
+          "clipped_fraction": 0.0,
+          "black_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "key": "east_court",
+      "name": "Probe East Court",
+      "exposure": 1.5,
+      "radiance_max": 11.716367721557617,
+      "radiance_median": 0.13533872365951538,
+      "size": [
+        2048,
+        1024
+      ],
+      "faces": [
+        {
+          "face": 0,
+          "clipped_fraction": 0.0001068115234375,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 1,
+          "clipped_fraction": 0.00011444091796875,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 2,
+          "clipped_fraction": 1.1444091796875e-05,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 3,
+          "clipped_fraction": 0.00051116943359375,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 4,
+          "clipped_fraction": 0.0,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 5,
+          "clipped_fraction": 0.0,
+          "black_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "key": "north",
+      "name": "Probe North",
+      "exposure": 1.5,
+      "radiance_max": 11.522235870361328,
+      "radiance_median": 0.11716882884502411,
+      "size": [
+        2048,
+        1024
+      ],
+      "faces": [
+        {
+          "face": 0,
+          "clipped_fraction": 0.0,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 1,
+          "clipped_fraction": 0.000461578369140625,
+          "black_fraction": 1.1444091796875e-05
+        },
+        {
+          "face": 2,
+          "clipped_fraction": 7.62939453125e-06,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 3,
+          "clipped_fraction": 4.9591064453125e-05,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 4,
+          "clipped_fraction": 0.0,
+          "black_fraction": 0.0
+        },
+        {
+          "face": 5,
+          "clipped_fraction": 0.0,
+          "black_fraction": 0.0
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "materials/riverdale/reflections/daylight-v1/reflection_a1.exr",
+      "sha256": "9757886404c1d47703c33841fd964e8e133ca3d68f7233ceb9117bc1f5cf6470"
+    },
+    {
+      "path": "materials/riverdale/reflections/daylight-v1/reflection_a1.vmat",
+      "sha256": "00b81307c72cf4f1e9cb4d04a0aa197f5d580d952d694b8171d668ca7259a398"
+    },
+    {
+      "path": "materials/riverdale/reflections/daylight-v1/reflection_a2.exr",
+      "sha256": "e1ad9b3cde7ad78ddf120e9a3cbc969160bacf9713fdcf781d39fd5f6880e49b"
+    },
+    {
+      "path": "materials/riverdale/reflections/daylight-v1/reflection_a2.vmat",
+      "sha256": "9072112d8f7e9bd66f978926efe38935f109edc3dba33b979acfbb679e200f82"
+    },
+    {
+      "path": "materials/riverdale/reflections/daylight-v1/reflection_b1_room.exr",
+      "sha256": "e075f5e1d4bf35f0b070da01fa288fa95e116ff03aaa0f6ba8ba051ef535e852"
+    },
+    {
+      "path": "materials/riverdale/reflections/daylight-v1/reflection_b1_room.vmat",
+      "sha256": "c77f6a66dddfce0198fa8e90c7c361c78330b59c2a2c05baf2627316554a1efa"
+    },
+    {
+      "path": "materials/riverdale/reflections/daylight-v1/reflection_east_control.exr",
+      "sha256": "b304e134165e70546ea9344aa564a25d1fbed0c1979c3987d405176bcad0abec"
+    },
+    {
+      "path": "materials/riverdale/reflections/daylight-v1/reflection_east_control.vmat",
+      "sha256": "3ca8b827b9208ca84f46d03138315caf777c84e1cbe6638cb95a9b9e5e22ee7d"
+    },
+    {
+      "path": "materials/riverdale/reflections/daylight-v1/reflection_east_court.exr",
+      "sha256": "5aa105fd02fd614cb348f7ac8136c22c7177d40af3a80543314bd575e15f4595"
+    },
+    {
+      "path": "materials/riverdale/reflections/daylight-v1/reflection_east_court.vmat",
+      "sha256": "91032173ddb48b6d3127301b313593c110fa7457f91d727e9126450d2ad471ac"
+    },
+    {
+      "path": "materials/riverdale/reflections/daylight-v1/reflection_east_yard.exr",
+      "sha256": "cfadfe6351bc8791c3405397131be383d980790bc771ca2d11eba5de57794733"
+    },
+    {
+      "path": "materials/riverdale/reflections/daylight-v1/reflection_east_yard.vmat",
+      "sha256": "0a716937e8f24e3a30a7e6db406c7687cdee774b3e516b35b11e08f60f51be93"
+    },
+    {
+      "path": "materials/riverdale/reflections/daylight-v1/reflection_hall.exr",
+      "sha256": "af4463c433b81451ca84431458d0cb84aeb39611d3895c7382412272d71e76b4"
+    },
+    {
+      "path": "materials/riverdale/reflections/daylight-v1/reflection_hall.vmat",
+      "sha256": "ee94fdc59e8f9556713309ff9dc15665968b3a5258de770194e4bbe85bc7bb5f"
+    },
+    {
+      "path": "materials/riverdale/reflections/daylight-v1/reflection_north.exr",
+      "sha256": "b6c77dd178a84e174b85193f763c0b128f4b60e5e2f2c97c15a02368289ba69a"
+    },
+    {
+      "path": "materials/riverdale/reflections/daylight-v1/reflection_north.vmat",
+      "sha256": "d6b10060d969e9a8bca941810ba31e0abb0a74ee41e00d1b0e0086a45bfe2653"
+    },
+    {
+      "path": "materials/riverdale/reflections/daylight-v1/reflection_pool.exr",
+      "sha256": "0b48b6ac29ee684c9f8e089440bc211292e8b2bdc231eaf0474676f38f0b0fa5"
+    },
+    {
+      "path": "materials/riverdale/reflections/daylight-v1/reflection_pool.vmat",
+      "sha256": "1d64a59a5f3edf49fd818b6d6fa46b59f9daa15b4d6690703b8da09564e58ac5"
+    },
+    {
+      "path": "materials/riverdale/reflections/daylight-v1/reflection_west_control.exr",
+      "sha256": "2e5b8b0614a89438c3bb3229af1d388b932d7b65d29aff1b2e89ab63432096d9"
+    },
+    {
+      "path": "materials/riverdale/reflections/daylight-v1/reflection_west_control.vmat",
+      "sha256": "bc410947b744453bb1bc75ff3c26d1b7d8bf67dede3ae59a180da183c4c760e7"
+    },
+    {
+      "path": "materials/riverdale/reflections/daylight-v1/reflection_west_court.exr",
+      "sha256": "e0ada5d2b5ee8502711f31189b31144e8b75efc0fc382afad09f4760d743df0d"
+    },
+    {
+      "path": "materials/riverdale/reflections/daylight-v1/reflection_west_court.vmat",
+      "sha256": "9a4f3a7095ea340891b7741d73678ece055e2658fe3eb58547843a7e6402a57d"
+    },
+    {
+      "path": "materials/riverdale/reflections/daylight-v1/reflection_west_yard.exr",
+      "sha256": "d705b743e56b5059429a1ae0c1ae7aa1ef274ac6f1179576226b3b59e8713171"
+    },
+    {
+      "path": "materials/riverdale/reflections/daylight-v1/reflection_west_yard.vmat",
+      "sha256": "13a77c50afab28a3412710fbd3e1c4c2e64203659084dcb6e19bd403a31a1a8d"
+    }
+  ]
+}

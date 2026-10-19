@@ -1,0 +1,74 @@
+{
+  "checked_utc": "2026-10-15T17:52:15.596854+00:00",
+  "state": "offline construction comparison reviewed; not integrated or natively accepted",
+  "generator": "Tools/belltower_firewood_trial.py",
+  "trial_sha256": "1cb1c6608c5d9f5209de17f24a42761a5537e96692b6a88922c4f6e80f70d1b1",
+  "source_sha256": {
+    "Tools/belltower_firewood_trial.py": "1b5df03023451b68a456b7778ba44a00f87770f00f4d33cb0b4f34f92fbaa78b",
+    "Tools/belltower_gardens.py": "5bbf7dc306f955e4cd81f6369b40275f4a3c7559d34e5624352a095d37a72b8b",
+    "Tools/belltower_furniture.py": "36c83d4883b3084b90b3ff46d9ef56e5aef7cd916f9e4c399058884105974a24",
+    "Tools/map_kit.py": "00d860ffb0679c42efe962e6bb7e87da95c56c35e73b00923fa253dd5c95ecb7",
+    "Sources/Belltower/generated/firewood-cuts-v1.png": "a208aac9030c494b4464d005412e39aea6eca033c880d271102d495158365d05",
+    "Sources/Belltower/generated/firewood-cuts-v1.json": "ac96edbdf485b1348a7f5f704604ca0d6dd155b0d486af181024582c75398856",
+    "Sources/Belltower/generated/firewood-bark-v1.png": "177d11c9dc87e2099d3bf189bb416092d4bee1dea23c2e8c650d833e0d57167d",
+    "Sources/Belltower/generated/firewood-bark-v1.json": "a6bab8316ea4b7045dbe5f66fd63eea196b1e03480fca1d8b3f5199c58a34295",
+    "Sources/Belltower/generated/firewood-split-v1.png": "fec6d738bb88e2832216e7625c4d45f50e8543452195180ac70bdb691956e8c0",
+    "Sources/Belltower/generated/firewood-split-v1.json": "6fbbc259866515c51318c798f5596db2b30bbb7027bd744133ca3c8719edb8e4"
+  },
+  "images": {
+    "firewood-before": {
+      "path": "output/belltower/quality/firewood-v1-studio/firewood-before.png",
+      "sha256": "b54a8dee23121c034c85b21d27c34adc3af9407946995b725b03e8ef25895fc8"
+    },
+    "firewood-after": {
+      "path": "output/belltower/quality/firewood-v1-studio/firewood-after.png",
+      "sha256": "3c7b069efa25541a6e5ad05e643d4bfa611e67b99331f88479bd8a6b289463b1"
+    }
+  },
+  "same_camera_and_studio_lighting": true,
+  "generated_assets": [
+    {
+      "source": "Sources/Belltower/generated/firewood-cuts-v1.png",
+      "prompt_and_provenance": "Sources/Belltower/generated/firewood-cuts-v1.json",
+      "generator": "built-in image_gen",
+      "prompt": "Use case: photorealistic-natural\nAsset type: original RGBA albedo atlas for realistic game firewood end caps.\nCreate one square 2x2 atlas of four different dry oak log cross sections. Each quadrant contains exactly one complete roughly circular cut face, viewed perfectly straight-on with an orthographic lens. All four discs have equal scale and sit precisely at the centre of their quadrant; each occupies about 84 percent of its cell width, with clear transparent padding between cells and around the canvas. The bark ring is narrow, rough, muted grey-brown oak bark. The cut wood is pale muted honey-grey, weathered and dry, with subtle irregular annual growth rings around slightly offset heartwood, fine pores and rays, shallow radial drying cracks, and rough saw-cut fibres. Vary the ring spacing, small cracks and heartwood shape naturally across the four discs. Retain a solid wood face apart from thin dark cracks. Use restrained realistic contrast and flat, even diffuse illumination suitable for a base-colour texture. No visible log length, perspective, bevelled 3D thickness, cast shadows, directional lighting, background, labels, text, planks, glossy varnish, outline or watermark. Preserve actual transparency outside the discs. High-detail square 2048px texture."
+    },
+    {
+      "source": "Sources/Belltower/generated/firewood-bark-v1.png",
+      "prompt_and_provenance": "Sources/Belltower/generated/firewood-bark-v1.json",
+      "generator": "built-in image_gen",
+      "prompt": "Use case: photorealistic-natural\nAsset type: square seamless base-colour texture for the curved bark surface of dry oak firewood in a realistic game.\nCreate a flat orthographic photographic scan of weathered grey-brown oak bark, as if unwrapped from a modest 25 cm diameter seasoned log. Bark fibres and fine irregular fissures run vertically. Dense natural overlapping ridges, narrow broken plates and a few subtle small knots; thin dry bark, not huge chunky cork. Restrained neutral ash-grey and muted umber browns, with a little dusty tan in worn areas, matching dry pale oak end grain. Edge-to-edge texture, seamlessly repeating on all four edges, no borders or objects. Perfectly even diffuse illumination appropriate for an albedo map: no directional light, broad shading, baked cast shadow, specular shine or perspective. No wood boards, cut faces, leaves, moss, text or watermark. Sharp photographic microdetail and varied large-scale pattern without a grid. Square 2048px."
+    },
+    {
+      "source": "Sources/Belltower/generated/firewood-split-v1.png",
+      "prompt_and_provenance": "Sources/Belltower/generated/firewood-split-v1.json",
+      "generator": "built-in image_gen",
+      "prompt": "Use case: photorealistic-natural\nAsset type: seamless albedo texture for the flat SPLIT FACE along the length of seasoned oak firewood in a realistic game.\nCreate a new flat orthographic macro scan of oak that has been split lengthwise with an axe: torn long fibres, fine splinters, shallow irregular fibrous ridges and restrained narrow lengthwise drying checks. Grain runs vertically along the whole canvas. This is a continuous raw split wood surface, not a sawn or planed board. Natural pale muted honey-grey and straw-tan, almost neutral, matching the dry oak interior of a log cross section. Realistic diffuse base colour, restrained contrast and small-scale variation, no large dark stains. Fill the square edge-to-edge and repeat seamlessly on all four sides. Perfectly even diffuse illumination, no baked cast shadows, directional lighting, specular shine or perspective. No bark, circular annual rings, polished varnish, planks, seams, knots dominating the image, text, border or watermark. High-detail 2048px square."
+    }
+  ],
+  "review": [
+    "Rounded irregular bark silhouettes replace the repeated seven-sided extrusions.",
+    "The cut faces show annual rings and drying cracks, with four source variants and varied rotations.",
+    "Broad split faces now use raw lengthwise fibres instead of furniture board strips.",
+    "The comparison uses fixed framing and exposure -1.2; these are Blender renders, not engine captures."
+  ],
+  "geometry": {
+    "logs": 34,
+    "split_logs": 27,
+    "triangles_before": 1768,
+    "triangles_after": 8024,
+    "added_triangles_per_pile": 6256,
+    "checked_placements": 2,
+    "closed_surface": true,
+    "within_existing_prop_bounds": true,
+    "collision_authored": false
+  },
+  "production_garden_generator_unchanged": true,
+  "live_assets_written": false,
+  "remaining": [
+    "Finish and review garden v3 before changing its pinned generator or source manifest.",
+    "Integrate the candidate into staged whole-map models and native materials, then verify collision and gameplay checks.",
+    "The generated albedos currently have no matching surface normal maps.",
+    "Compare appearance and runtime cost in the native editor before any acceptance."
+  ]
+}

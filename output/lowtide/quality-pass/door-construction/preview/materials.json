@@ -1,0 +1,89 @@
+{
+  "brick": {
+    "resource": "materials/lowtide/lt_brick.vmat",
+    "inputs": {
+      "shader": "shaders/hc1_brick.shader",
+      "TextureColor": "materials/lowtide/lt_brick_v2_color.png",
+      "TextureNormal": "materials/lowtide/lt_brick_v2_normal.png",
+      "TextureRoughness": "materials/lowtide/lt_brick_v2_rough.png",
+      "TextureMetalness": "materials/default/default_black_mask.tga",
+      "TextureAmbientOcclusion": "materials/lowtide/lt_brick_v2_ao.png",
+      "TextureBlendMask": "materials/default/default_black_mask.tga",
+      "g_vBrickScale": "[1.337853 1.000927 0.0 0.0]",
+      "g_flTintColor": "[1.000 1.000 1.000]",
+      "TextureFacadeWear": "materials/lowtide/masonry/facade_wear.png",
+      "g_flFacadeWear": "1",
+      "TextureCanalBiofilm": "materials/lowtide/masonry/canal_biofilm_color.png",
+      "g_flCanalBiofilm": "0.8",
+      "TextureShedWear": "materials/lowtide/masonry/shed_wear.png",
+      "g_flShedWear": "0.900"
+    }
+  },
+  "ashlar_grey": {
+    "resource": "materials/lowtide/finish/lt_quay_stone.vmat",
+    "inputs": {
+      "shader": "shaders/hc1_brick.shader",
+      "F_SPECULAR": "1",
+      "TextureColor": "materials/lowtide/masonry/granite_color.png",
+      "TextureNormal": "materials/lowtide/masonry/granite_normal.png",
+      "TextureRoughness": "materials/lowtide/masonry/granite_rough.png",
+      "TextureAmbientOcclusion": "materials/default/default_ao.tga",
+      "TextureMetalness": "materials/default/default_black_mask.tga",
+      "g_vBrickScale": "[1.625599 1.625599 0 0]",
+      "g_flTintColor": "[0.94 0.96 0.93]",
+      "TextureCanalBiofilm": "materials/lowtide/masonry/canal_biofilm_color.png",
+      "g_flCanalBiofilm": "1",
+      "TextureShedWear": "materials/lowtide/masonry/shed_wear.png",
+      "g_flShedWear": "0.700"
+    }
+  },
+  "lt_door_green": {
+    "resource": "materials/lowtide/lt_door_green.vmat",
+    "inputs": {
+      "shader": "shaders/hc1_lowtide_door.shader",
+      "F_SPECULAR": "1",
+      "g_flRoughnessScaleFactor": "1",
+      "g_flMetalness": "0.00",
+      "TextureColor": "materials/lowtide/lt_door_green_color.png",
+      "TextureNormal": "materials/lowtide/lt_door_normal.png",
+      "TextureRoughness": "materials/lowtide/lt_door_rough.png",
+      "TextureAmbientOcclusion": "materials/lowtide/lt_door_ao.png",
+      "g_vDoorRegion": "[0.09106445 0.00024414 0.42626953 0.61181641]",
+      "g_vDoorScale": "[2.18181818 0.60000000]",
+      "g_vColorTint": "[1.0 1.0 1.0 1.0]",
+      "g_flModelTintAmount": "1.0"
+    }
+  },
+  "iron_black": {
+    "resource": "materials/buildings/iron_black.vmat",
+    "inputs": {
+      "shader": "shaders/complex.shader",
+      "F_SPECULAR": "1",
+      "g_flRoughnessScaleFactor": "1",
+      "g_flMetalness": "0.00",
+      "TextureColor": "materials/buildings/iron_black_color.png",
+      "TextureNormal": "materials/buildings/iron_normal.png",
+      "TextureRoughness": "materials/buildings/iron_rough.png",
+      "TextureAmbientOcclusion": "materials/default/default_ao.tga",
+      "g_vColorTint": "[1.0 1.0 1.0 1.0]",
+      "g_flModelTintAmount": "1.0"
+    }
+  },
+  "lt_brick_glazed": {
+    "resource": "materials/lowtide/lt_brick_glazed.vmat",
+    "inputs": {
+      "shader": "shaders/hc1_brick.shader",
+      "TextureColor": "materials/lowtide/lt_brick_v2_color.png",
+      "TextureNormal": "materials/lowtide/lt_brick_v2_normal.png",
+      "TextureRoughness": "[0.320000 0.320000 0.320000 0.000000]",
+      "TextureMetalness": "materials/default/default_black_mask.tga",
+      "TextureAmbientOcclusion": "materials/lowtide/lt_brick_v2_ao.png",
+      "TextureBlendMask": "materials/default/default_black_mask.tga",
+      "g_vBrickScale": "[1.337853 1.000927 0.0 0.0]",
+      "g_flTintColor": "[0.340 0.280 0.270]",
+      "TextureCanalBiofilm": "materials/lowtide/masonry/canal_biofilm_color.png",
+      "g_flCanalBiofilm": "0.8",
+      "g_flTidalClay": "1"
+    }
+  }
+}

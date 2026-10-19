@@ -1,21 +1,5 @@
 {
-  "status": "installed and natively compiled; visual verification pending",
-  "lastCheckedUtc": "2026-10-14T20:01:26.802596+00:00",
-  "liveHash": "a8407373bea1259b3ea5a69bde74d64db6b20c2964e39234adb116b9a979379e",
-  "liveMatchesBefore": false,
-  "scope": "80 footbridge boards; 320 existing UV records. Vertices, faces, normals, unrelated UVs, scene and collision unchanged.",
-  "offlineChecks": "Canonical deck_surface output matches repaired UV coordinates within OBJ rounding; original source image and maps retained. Python compile and diff checks passed.",
-  "blocker": "User reports still loading/frozen. Native import completed, but the active viewport redirects to the runtime scene during play. Do not move the runtime camera or stop the match for capture.",
-  "next": "When play mode ends and the editor is responsive, verify existing normal viewport walk and wide views. Import already completed: do not apply the staged patch again. Check fresh errors and saved-scene state after visual review.",
-  "baselineCapture": "bridge-uv-wide-before.png copied unchanged from the reviewed tone-preview-current-canal.png capture, before any bridge source edit.",
-  "liveMatchesAfter": true,
-  "protectedFilesVerified": 47,
-  "nativeCompile": {
-    "compiled": true,
-    "modelError": false,
-    "materialError": false,
-    "installedHash": "a8407373bea1259b3ea5a69bde74d64db6b20c2964e39234adb116b9a979379e",
-    "HasUnsavedChanges": false,
-    "IsPlaying": true
-  }
+  "status": "installed, natively compiled and visually verified in the existing Lowtide editor viewport",
+  "verification": "bridge-uv-verification.json",
+  "do_not_reapply": true
 }

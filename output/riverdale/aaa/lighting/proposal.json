@@ -1,0 +1,885 @@
+{
+  "area": "lighting",
+  "summary": "Bake indirect light (three DDGI volumes) and capture twelve static reflection cubes in the editor, after a sunrise grade that makes the low sun the key light, the baked sky the fill, and the hall's lamps, control rooms and cyan pool pockets of their own colour. Every value below has its old value and reason.",
+  "how_to_read": "old/new are as Tools/ writes them today and should write them. before_bake: put it in the scene before Sources/Riverdale/editor/bake-lighting.cs.txt runs (it lights the bake, or might); otherwise shading-time only, safe to tune after. Plan coordinates e,n,z; world ( n, -e, z ).",
+  "scene_changes": [
+    {
+      "id": "sun_colour",
+      "where": "Tools/riverdale_map.py SUN_COLOUR (Sun: DirectionalLight.LightColor); also Tools/riverdale_sky.py LIGHT",
+      "old": "1.55,1.02,0.58,1",
+      "new": "2.30,1.62,1.05,1",
+      "before_bake": true,
+      "why": "The key light, half again as strong and a little less orange (normalised 1:0.70:0.46, about 3300 K, where it was 1:0.66:0.37, about 2600 K). A 16-degree sun in clean air after rain is golden, not deep orange, and it has to out-shine the sky's fill: the ground it grazes gets cos 74 = 0.28 of it, so at 1.02 green it lit the ground less than the old flat ambient (0.44). The sky's clouds are lit with the same colour (riverdale_sky.LIGHT): change both and rebuild the sky."
+    },
+    {
+      "id": "sun_ambient",
+      "where": "Tools/riverdale_map.py write_scene Sun SkyColor (DirectionalLight.SkyColor)",
+      "old": "0.40,0.44,0.54,1",
+      "new": "0.10,0.12,0.16,1",
+      "before_bake": true,
+      "why": "A flat ambient reaches every surface alike, unoccluded: inside the hall, under the pipe racks and in the north lane as much as in the open yard. With the indirect light baked, the sky's light arrives occluded and bounced through the probes, so this stays only as a floor that keeps the deepest corners off black (Belltower keeps 0.14,0.18,0.24, Spillway 0). Set it before the bake, as Cerro Blanco did, whether or not the bake reads it."
+    },
+    {
+      "id": "fog_colour",
+      "where": "Tools/riverdale_map.py FOG_COLOUR and the GradientFog's alpha",
+      "old": "1.02,0.86,0.70,0.7",
+      "new": "0.96,0.84,0.72,0.72",
+      "before_bake": false,
+      "why": "A slightly less saturated morning haze: the same warm hue, less orange on the domes and towers across from the sun."
+    },
+    {
+      "id": "fog_start",
+      "where": "Tools/riverdale_map.py write_scene GradientFog.StartDistance",
+      "old": 3000,
+      "new": 2400,
+      "before_bake": false,
+      "why": "Aerial perspective a little sooner, so the domes (about 4,400 out), the cooling towers (10,000-14,000) and the mountains stand in separate layers of depth."
+    },
+    {
+      "id": "fog_end",
+      "where": "Tools/riverdale_map.py write_scene GradientFog.EndDistance",
+      "old": 90000,
+      "new": 75000,
+      "before_bake": false,
+      "why": "With the earlier start, the far mountains still fade before the world's edge."
+    },
+    {
+      "id": "hall_haze",
+      "where": "Tools/riverdale_map.py HAZE Hall Haze (strength, colour)",
+      "old": "0.35 0.78,0.88,1,1",
+      "new": "0.24 0.80,0.88,0.97,1",
+      "before_bake": true,
+      "why": "The hall's air at 0.35 veils its far wall at 55 m (readability across the hall's 2,200 in), and lit by sixteen lamps it flattens everything to grey. Thinner, the lamps' and the pool's light read as glow in the air instead. Its hue stays cool against the warm deck lamps."
+    },
+    {
+      "id": "yard_haze",
+      "where": "Tools/riverdale_map.py HAZE Yard Haze (strength, colour)",
+      "old": "0.06 1,0.86,0.7,1",
+      "new": "0.08 1,0.84,0.66,1",
+      "before_bake": true,
+      "why": "A little more humidity after rain, so the low sun shows as shafts between the buildings; still light enough to see across the yard."
+    },
+    {
+      "id": "ao",
+      "where": "Tools/riverdale_map.py look_object AmbientOcclusion (Intensity, Radius)",
+      "old": "0.7 110",
+      "new": "0.8 48",
+      "before_bake": false,
+      "why": "The baked light now gives the room-scale occlusion. Screen-space AO at a 110 radius smears view-dependent halos over big flat walls; at 48 it does contact shadow: wall feet, props on the deck, crates, rails (Belltower 60, Lowtide and Railhead 28)."
+    },
+    {
+      "id": "grading",
+      "where": "Tools/riverdale_map.py look_object ColorGrading (ColorTempK, BlendFactor)",
+      "old": "6200 0.4",
+      "new": "6400 0.25",
+      "before_bake": false,
+      "why": "Let the lights carry the colour (warm sun, cool sky fill, cyan pool, warm lamps) rather than a warm cast over everything, which muddies the pool's cyan and the shadows' blue."
+    },
+    {
+      "id": "vignette",
+      "where": "Tools/riverdale_map.py look_object Vignette.Intensity",
+      "old": 0.26,
+      "new": 0.16,
+      "before_bake": false,
+      "why": "A shooter needs its screen edges readable (Belltower 0.1)."
+    },
+    {
+      "id": "bloom",
+      "where": "Tools/riverdale_map.py look_object Bloom (Strength, Threshold)",
+      "old": "0.32 1.15",
+      "new": "0.22 1.4",
+      "before_bake": false,
+      "why": "With the stronger sun, sunlit concrete reaches about 1 before the tonemap: a threshold of 1.15 would glow whole walls. At 1.4 the lamps, beacons, screens, the pool and the sun's glints bloom, not the buildings."
+    },
+    {
+      "id": "exposure_rate",
+      "where": "Tools/riverdale_map.py look_object Tonemapping.Rate",
+      "old": 1,
+      "new": 1.3,
+      "before_bake": false,
+      "why": "A little quicker to adapt through the hall's doors (Belltower 1.5). The range (1.0 to 2.5) stays: the sky was balanced for it (Tools/riverdale_sky.py EXPOSURE, SHOWN)."
+    }
+  ],
+  "light_changes": [
+    {
+      "id": "high_bays",
+      "names": "^High bay ",
+      "where": "Tools/riverdale_hall.py lights() (HIGH_BAYS)",
+      "old": {
+        "LightColor": "1.05,1.18,1.35,1",
+        "Radius": 1100,
+        "Shadows": false,
+        "type": "PointLight"
+      },
+      "new": {
+        "LightColor": "1.25,1.28,1.30,1",
+        "Radius": 1500,
+        "type": "SpotLight",
+        "Rotation": "0,0.7071068,0,0.7071068",
+        "ConeInner": 30,
+        "ConeOuter": 60,
+        "Shadows": {
+          "High bay -250.0 600.0": true,
+          "High bay 250.0 600.0": true,
+          "High bay -250.0 1350.0": true,
+          "High bay 250.0 1350.0": true
+        }
+      },
+      "before_bake": true,
+      "why": "Real high-bay LEDs throw their light down. As 1100-radius point lights they lit the roof and the walls' tops as much as the deck, and reached the deck (870 below) at the end of their falloff, so the hall was evenly grey from floor to roof. Down-pointing spots with the reach to land on the deck light the floor and leave the roof dark, which is where a hall's depth comes from. About 5800 K instead of 7500 K: the pool is the hall's cool accent, not every lamp. The four over the pool's flanks cast shadows (the crane, the mast, the railings and the control rooms' columns throw them across the deck); a spotlight's shadow is one map, not a point light's six."
+    },
+    {
+      "id": "control_rooms",
+      "names": "^Control room ",
+      "where": "Tools/riverdale_hall.py upper_side() Control room",
+      "old": {
+        "LightColor": "1.6,1.8,2.1,1",
+        "Radius": 520,
+        "Shadows": true
+      },
+      "new": {
+        "LightColor": "1.55,1.50,1.40,1"
+      },
+      "before_bake": true,
+      "why": "An occupied control room is lit at 4000-4500 K. At about 9000 K the rooms read as empty grey boxes; warm-white pockets up on either side frame the cyan pool, and the screens stay the room's cool light."
+    },
+    {
+      "id": "control_fills",
+      "names": "^Control fill ",
+      "where": "Tools/riverdale_hall.py upper_side() Control fill",
+      "old": {
+        "LightColor": "1.1,1.25,1.45,1",
+        "Radius": 360,
+        "Shadows": false
+      },
+      "new": {
+        "LightColor": "1.00,0.96,0.90,1",
+        "Radius": 380
+      },
+      "before_bake": true,
+      "why": "The same white as the room's main light, reaching its corners."
+    },
+    {
+      "id": "interior_ceilings",
+      "names": "^(A[12] lamp |B1 passage$|B1 room$|Spawn room )",
+      "where": "Tools/riverdale_parts.py ceiling_light( kind='cool' ) via COOL, for the annexes, B1 and the spawn rooms",
+      "old": {
+        "LightColor": "0.72,0.82,0.95,1",
+        "type": "PointLight"
+      },
+      "new": {
+        "LightColor": "0.95,0.95,0.92,1",
+        "type": "SpotLight",
+        "Rotation": "0,0.7071068,0,0.7071068",
+        "ConeInner": 40,
+        "ConeOuter": 75
+      },
+      "before_bake": true,
+      "why": "Industrial rooms lit at about 4800 K rather than 8000 K, so they read as lit interiors with their own colour against the gold outside, not as blue-grey extensions of the shade. Pointing down, they stop lighting the roof slab and the floor above through it (point lights have no shadows here)."
+    },
+    {
+      "id": "masts",
+      "names": "^(Yard|Spawn) mast ",
+      "where": "Tools/riverdale_map.py yard_side() / spawn_side() masts",
+      "old": {
+        "LightColor": "1.00,0.80,0.55,1",
+        "Radius": "900 (yard) / 700 (spawn)"
+      },
+      "new": {
+        "LightColor": "0.80,0.66,0.48,1",
+        "Radius": "720 (yard) / 560 (spawn)"
+      },
+      "before_bake": true,
+      "why": "At sunrise the floods are still on but the sun out-shines them. At full strength over 900 in they lifted the yard's shade evenly, which flattened the long shadows; dimmer and shorter they stay a warm accent by their poles."
+    },
+    {
+      "id": "wall_packs",
+      "names": "^(?!High bay |Control |Pool |.*beacon|(Yard|Spawn) mast |A[12] lamp |B1 passage$|B1 room$|Spawn room ).*",
+      "where": "Tools/riverdale_parts.py wall_light() (every wall pack: warm, cool, cyan)",
+      "old": {
+        "type": "PointLight",
+        "Shadows": false
+      },
+      "new": {
+        "type": "SpotLight",
+        "aim": "the fixture's out, 60 degrees below level",
+        "ConeInner": 35,
+        "ConeOuter": 70
+      },
+      "before_bake": true,
+      "why": "Unshadowed point lights shine through walls: a wall pack outside the hall's south wall lit the deck inside, and the deck lamps on the hall's inner walls lit the courts outside; the bake would keep those leaks. A wall pack is a downward, forward lamp: as a spotlight aimed out and down from its lens it lights its wall and the ground in front and nothing behind. Colours stay (WARM 1.00,0.74,0.46 is the sodium-like accent against the cool fill)."
+    },
+    {
+      "id": "pool",
+      "names": "^Pool (lamp|glow) ",
+      "where": "Tools/riverdale_hall.py lights()",
+      "old": {},
+      "new": {},
+      "before_bake": false,
+      "why": "Unchanged: tuned with the user on 2026-10-15 (the pool was too bright)."
+    },
+    {
+      "id": "beacons",
+      "names": "beacon",
+      "where": "Tools/riverdale_parts.py beacon()",
+      "old": {},
+      "new": {},
+      "before_bake": false,
+      "why": "Unchanged: small red markers."
+    }
+  ],
+  "spot_lights": {
+    "why": "The generator writes every LIGHTS entry as a PointLight (riverdale_map.write_scene). Two changes above need SpotLights: the high bays and interior ceiling lights pointing down, the wall packs out and down.",
+    "generator_change": [
+      "riverdale_parts.LIGHTS entries gain an optional 6th element, a dict: { 'spot': ( dx, dy, dz ) plan direction, 'inner': degrees, 'outer': degrees }.",
+      "wall_light(): append { 'spot': tuple( out * 0.5 - UP * 0.866 ), 'inner': 35, 'outer': 70 } (60 degrees below level, out from the lens). ceiling_light(): { 'spot': ( 0, 0, -1 ), 'inner': 40, 'outer': 75 }. riverdale_hall.lights() high bays: { 'spot': ( 0, 0, -1 ), 'inner': 30, 'outer': 60 }, radius 1500.",
+      "write_scene(): for an entry with 'spot', the GameObject's Rotation is K.angles_rotation( pitch, yaw ) with world d = K.to_world( spot ) normalised, pitch = degrees( asin( -d.z ) ), yaw = degrees( atan2( d.y, d.x ) ); its component is the SpotLight below (keys from Lowtide's saved warehouse spots, which the engine wrote)."
+    ],
+    "component": {
+      "__type": "Sandbox.SpotLight",
+      "__enabled": true,
+      "Flags": 0,
+      "Attenuation": 1,
+      "ConeInner": 30,
+      "ConeOuter": 60,
+      "Contribution": "Diffuse, Specular, Transmissive",
+      "Cookie": null,
+      "FogMode": "Enabled",
+      "FogStrength": 1,
+      "LightColor": "1,1,1,1",
+      "Radius": 500,
+      "ShadowBias": 0,
+      "ShadowHardness": 0.25,
+      "Shadows": false
+    },
+    "straight_down_rotation": "0,0.7071068,0,0.7071068",
+    "shadow_budget": "6 shadowed lights after the change (the two control rooms' as now, four high bays); each spotlight shadow is one map where a point light's is six."
+  },
+  "indirect_light": {
+    "bake": "Sources/Riverdale/editor/bake-lighting.cs.txt, once per volume, in bake_order: the yard, the hall, the pool. Each later bake sees the earlier volumes' light (the cubemapper captures with every other baked volume), so the hall sees the yard's light through its doors and the pool the hall's.",
+    "why_these_volumes": [
+      "yard: the whole play area 16 past its edges, z 2 to 578 (every roof but the hall's; receivers are sampled 20 up their normal, so the ground at 0 is inside). The engine caps a side at 40 probes, so 35 x 38 x 6 = 7,980 about 125 apart, Belltower's and Cerro Blanco's spacing. It covers the hall too; inside, the hall's smaller volume wins. Above 578 the hall's outer walls blend over 120 to the sky's light.",
+      "hall: the reactor hall's inside, 16 into its walls, deck and roof, 19 x 17 x 9 = 2,907. A short blend (24) so its own light holds right up to its walls; a long one would fade to the yard's coarse probes inside it (and to the sky's light above 578).",
+      "pool: the fuel pool from its floor to 8 over the deck, 10 x 10 x 6 = 600. Without it the liner under the water gets the open sky's light; with it, the pool lamps' bounce."
+    ],
+    "volumes": [
+      {
+        "__type": "Sandbox.IndirectLightVolume",
+        "GameObject": "Plant Yard Indirect Light",
+        "key": "yard",
+        "bake_order": 0,
+        "Bounds": {
+          "Mins": "-1766,-2316,2",
+          "Maxs": "2466,2316,578"
+        },
+        "ProbeDensity": 8,
+        "expected_ProbeCounts": "35,38,6",
+        "probes": 7980,
+        "probe_spacing": "124.5,125.2,115.2",
+        "InsideGeometry": "Relocate",
+        "NormalBias": 20.0,
+        "ViewBias": 30.0,
+        "BlendDistance": 120.0,
+        "RuntimeIntensity": 1.6,
+        "RuntimeContrast": 1.0,
+        "RuntimeSaturation": 1.0,
+        "RuntimeTint": "1,1,1,1",
+        "RenderExcludeTags": "",
+        "BakeVersion": "0 before the bake, 1 after",
+        "IrradianceTexture": "lighting/riverdale/daylight-v1/yard_irradiance.vtex",
+        "DistanceTexture": "lighting/riverdale/daylight-v1/yard_distance.vtex",
+        "RelocationTexture": "lighting/riverdale/daylight-v1/yard_relocation.vtex"
+      },
+      {
+        "__type": "Sandbox.IndirectLightVolume",
+        "GameObject": "Reactor Hall Indirect Light",
+        "key": "hall",
+        "bake_order": 1,
+        "Bounds": {
+          "Mins": "-216,-1016,2",
+          "Maxs": "2016,1016,1016"
+        },
+        "ProbeDensity": 8,
+        "expected_ProbeCounts": "19,17,9",
+        "probes": 2907,
+        "probe_spacing": "124,127,126.8",
+        "InsideGeometry": "Relocate",
+        "NormalBias": 20.0,
+        "ViewBias": 30.0,
+        "BlendDistance": 24.0,
+        "RuntimeIntensity": 1.8,
+        "RuntimeContrast": 1.0,
+        "RuntimeSaturation": 1.0,
+        "RuntimeTint": "1,1,1,1",
+        "RenderExcludeTags": "",
+        "BakeVersion": "0 before the bake, 1 after",
+        "IrradianceTexture": "lighting/riverdale/daylight-v1/hall_irradiance.vtex",
+        "DistanceTexture": "lighting/riverdale/daylight-v1/hall_distance.vtex",
+        "RelocationTexture": "lighting/riverdale/daylight-v1/hall_relocation.vtex"
+      },
+      {
+        "__type": "Sandbox.IndirectLightVolume",
+        "GameObject": "Fuel Pool Indirect Light",
+        "key": "pool",
+        "bake_order": 2,
+        "Bounds": {
+          "Mins": "372,-528,-528",
+          "Maxs": "1428,528,8"
+        },
+        "ProbeDensity": 8,
+        "expected_ProbeCounts": "10,10,6",
+        "probes": 600,
+        "probe_spacing": "117.3,117.3,107.2",
+        "InsideGeometry": "Relocate",
+        "NormalBias": 20.0,
+        "ViewBias": 30.0,
+        "BlendDistance": 24.0,
+        "RuntimeIntensity": 1.2,
+        "RuntimeContrast": 1.0,
+        "RuntimeSaturation": 1.0,
+        "RuntimeTint": "1,1,1,1",
+        "RenderExcludeTags": "",
+        "BakeVersion": "0 before the bake, 1 after",
+        "IrradianceTexture": "lighting/riverdale/daylight-v1/pool_irradiance.vtex",
+        "DistanceTexture": "lighting/riverdale/daylight-v1/pool_distance.vtex",
+        "RelocationTexture": "lighting/riverdale/daylight-v1/pool_relocation.vtex"
+      }
+    ],
+    "scene_json": "The kept group is Sources/Riverdale/lighting/indirect.json (riverdale_lighting.py preserve writes it from the saved scene, ids from riverdale_map's SceneIds: indirect, indirect/<key>, indirect/<key>/volume; texture fields as plain resource paths). Its shape is Belltower's Sources/Belltower/lighting/indirect.json: an 'Indirect Light' GameObject at the origin whose children each hold one IndirectLightVolume.",
+    "runtime": "RuntimeIntensity (yard 1.6, hall 1.8, pool 1.2), RuntimeContrast and RuntimeSaturation are shading-time: tune them in review without baking again (Belltower 2, Railhead 2.4, Cerro Blanco 1.4, Collider 1.6).",
+    "scene_json_example": {
+      "__guid": "c7eb9bf4-cbfb-5ff4-acc1-095650f5f968",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Indirect Light",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [],
+      "Children": [
+        {
+          "__guid": "3371e323-aa3b-5ee7-960e-55f9e8b29faf",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Plant Yard Indirect Light",
+          "Position": "0,0,0",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.IndirectLightVolume",
+              "__guid": "b1bf8c07-fc6c-5a76-bf01-d19e0874d0d2",
+              "__enabled": true,
+              "Flags": 0,
+              "__version": 2,
+              "BakeVersion": 1,
+              "BlendDistance": 120.0,
+              "Bounds": {
+                "Mins": "-1766,-2316,2",
+                "Maxs": "2466,2316,578"
+              },
+              "DistanceTexture": "lighting/riverdale/daylight-v1/yard_distance.vtex",
+              "InsideGeometry": "Relocate",
+              "IrradianceTexture": "lighting/riverdale/daylight-v1/yard_irradiance.vtex",
+              "NormalBias": 20.0,
+              "ProbeDensity": 8,
+              "RelocationTexture": "lighting/riverdale/daylight-v1/yard_relocation.vtex",
+              "RenderExcludeTags": "",
+              "RuntimeContrast": 1.0,
+              "RuntimeIntensity": 1.6,
+              "RuntimeSaturation": 1.0,
+              "RuntimeTint": "1,1,1,1",
+              "ViewBias": 30.0
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "6b0d5b6d-59cb-5c43-9c68-3fddd94b2339",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Reactor Hall Indirect Light",
+          "Position": "0,0,0",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.IndirectLightVolume",
+              "__guid": "b287da7b-647a-5d33-8969-fe5dfabd8110",
+              "__enabled": true,
+              "Flags": 0,
+              "__version": 2,
+              "BakeVersion": 1,
+              "BlendDistance": 24.0,
+              "Bounds": {
+                "Mins": "-216,-1016,2",
+                "Maxs": "2016,1016,1016"
+              },
+              "DistanceTexture": "lighting/riverdale/daylight-v1/hall_distance.vtex",
+              "InsideGeometry": "Relocate",
+              "IrradianceTexture": "lighting/riverdale/daylight-v1/hall_irradiance.vtex",
+              "NormalBias": 20.0,
+              "ProbeDensity": 8,
+              "RelocationTexture": "lighting/riverdale/daylight-v1/hall_relocation.vtex",
+              "RenderExcludeTags": "",
+              "RuntimeContrast": 1.0,
+              "RuntimeIntensity": 1.8,
+              "RuntimeSaturation": 1.0,
+              "RuntimeTint": "1,1,1,1",
+              "ViewBias": 30.0
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "a926ac80-6a4c-5fb5-aa6c-0982f781c440",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Fuel Pool Indirect Light",
+          "Position": "0,0,0",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.IndirectLightVolume",
+              "__guid": "a03ca9d2-27f2-5c50-a9e1-9adc209f7285",
+              "__enabled": true,
+              "Flags": 0,
+              "__version": 2,
+              "BakeVersion": 1,
+              "BlendDistance": 24.0,
+              "Bounds": {
+                "Mins": "372,-528,-528",
+                "Maxs": "1428,528,8"
+              },
+              "DistanceTexture": "lighting/riverdale/daylight-v1/pool_distance.vtex",
+              "InsideGeometry": "Relocate",
+              "IrradianceTexture": "lighting/riverdale/daylight-v1/pool_irradiance.vtex",
+              "NormalBias": 20.0,
+              "ProbeDensity": 8,
+              "RelocationTexture": "lighting/riverdale/daylight-v1/pool_relocation.vtex",
+              "RenderExcludeTags": "",
+              "RuntimeContrast": 1.0,
+              "RuntimeIntensity": 1.2,
+              "RuntimeSaturation": 1.0,
+              "RuntimeTint": "1,1,1,1",
+              "ViewBias": 30.0
+            }
+          ],
+          "Children": []
+        }
+      ]
+    },
+    "scene_json_note": "Exactly what the kept indirect.json holds after a bake (ids from riverdale_map's SceneIds). riverdale_lighting.planned_indirect_object( ids ) gives the unbaked form (BakeVersion 0, textures null), which the generator may write before the first bake instead of prepare-lighting adding it."
+  },
+  "reflections": {
+    "plan": "Twelve static CustomTexture probes on cubes captured as ordinary camera faces (Sources/Riverdale/editor/capture-reflections.cs.txt), turned into linear panoramas offline (Sources/Riverdale/lighting/riverdale_reflections.py: the engine's ACES taken back exactly, calibrated on the west yard's open sky against the sky's own EXR), compiled by the sky asset compiler (import-reflections.cs.txt) and assigned (apply-reflections.cs.txt). Collider's and Cerro Blanco's accepted method.",
+    "why_not_realtime": "Riverdale's nine probes were realtime (RenderDynamically): each runs the engine's envmap filtering as the map loads, which faulted envmap_filtering_cs (VK_ERROR_DEVICE_LOST) twice in the last eight GPU crashes. EnvmapProbe.Bake and the GPU Quality GGX filter fault the same shader, so nothing here bakes a probe in the engine.",
+    "why_not_only_the_sky_cube": "Orion uses the sky's own compiled cube as one static probe. That suits an open yard but puts a bright blue sky in the reactor hall's, the control rooms' and the annexes' floors and glass. The sky cube is only the stand-in until the captures exist (dimmed to 0.1-0.15 indoors).",
+    "changes_from_the_old_probes": [
+      "The single yard probe stood at plan 0,-1000,200, inside B1's core (e -160..160, n -1040..-700, up to 440): its cube would have been the inside of a concrete box. The yard is split at e 0 into West and East Yard, captured at plan -1250/1250,-880,170.",
+      "The courts and the spawn strips (e beyond 1040, n -240..2040) had no probe; West and East Court cover them.",
+      "North moves to plan -370,2330,170, off the pipe rack's columns (it was 55 from one).",
+      "Capture points were checked against every drawn triangle (40 clear at least) and rendered flat from each face: output/riverdale/aaa/lighting/preview/probes/<key>.png."
+    ],
+    "probes": [
+      {
+        "GameObject": "Probe Hall",
+        "key": "hall",
+        "Position (world)": "560,260,330",
+        "capture (plan)": [
+          -260.0,
+          560.0,
+          330.0
+        ],
+        "world box": {
+          "Mins": "-200,-1000,-40",
+          "Maxs": "2000,1000,1000"
+        },
+        "Mode": "CustomTexture",
+        "Projection": "Box",
+        "Priority": 1,
+        "Texture": "lighting/riverdale/daylight-v1/reflection_hall.vtex",
+        "TintColor": "1,1,1,1",
+        "capture exposure": 2.5,
+        "fallback TintColor before capture": "0.15",
+        "calibration": false
+      },
+      {
+        "GameObject": "Probe Pool",
+        "key": "pool",
+        "Position (world)": "900,260,-220",
+        "capture (plan)": [
+          -260.0,
+          900.0,
+          -220.0
+        ],
+        "world box": {
+          "Mins": "380,-520,-520",
+          "Maxs": "1420,520,0"
+        },
+        "Mode": "CustomTexture",
+        "Projection": "Box",
+        "Priority": 2,
+        "Texture": "lighting/riverdale/daylight-v1/reflection_pool.vtex",
+        "TintColor": "1,1,1,1",
+        "capture exposure": 2.5,
+        "fallback TintColor before capture": "0.1",
+        "calibration": false
+      },
+      {
+        "GameObject": "Probe A1",
+        "key": "a1",
+        "Position (world)": "-190,1370,150",
+        "capture (plan)": [
+          -1370.0,
+          -190.0,
+          150.0
+        ],
+        "world box": {
+          "Mins": "-590,1070,0",
+          "Maxs": "210,1670,320"
+        },
+        "Mode": "CustomTexture",
+        "Projection": "Box",
+        "Priority": 1,
+        "Texture": "lighting/riverdale/daylight-v1/reflection_a1.vtex",
+        "TintColor": "1,1,1,1",
+        "capture exposure": 2.5,
+        "fallback TintColor before capture": "0.15",
+        "calibration": false
+      },
+      {
+        "GameObject": "Probe A2",
+        "key": "a2",
+        "Position (world)": "-190,-1370,150",
+        "capture (plan)": [
+          1370.0,
+          -190.0,
+          150.0
+        ],
+        "world box": {
+          "Mins": "-590,-1670,0",
+          "Maxs": "210,-1070,320"
+        },
+        "Mode": "CustomTexture",
+        "Projection": "Box",
+        "Priority": 1,
+        "Texture": "lighting/riverdale/daylight-v1/reflection_a2.vtex",
+        "TintColor": "1,1,1,1",
+        "capture exposure": 2.5,
+        "fallback TintColor before capture": "0.15",
+        "calibration": false
+      },
+      {
+        "GameObject": "Probe B1 Room",
+        "key": "b1_room",
+        "Position (world)": "-870,0,280",
+        "capture (plan)": [
+          0.0,
+          -870.0,
+          280.0
+        ],
+        "world box": {
+          "Mins": "-1016,-136,192",
+          "Maxs": "-724,136,420"
+        },
+        "Mode": "CustomTexture",
+        "Projection": "Box",
+        "Priority": 1,
+        "Texture": "lighting/riverdale/daylight-v1/reflection_b1_room.vtex",
+        "TintColor": "1,1,1,1",
+        "capture exposure": 2.5,
+        "fallback TintColor before capture": "0.15",
+        "calibration": false
+      },
+      {
+        "GameObject": "Probe West Control",
+        "key": "west_control",
+        "Position (world)": "930,780,370",
+        "capture (plan)": [
+          -780.0,
+          930.0,
+          370.0
+        ],
+        "world box": {
+          "Mins": "660,560,288",
+          "Maxs": "1200,1000,468"
+        },
+        "Mode": "CustomTexture",
+        "Projection": "Box",
+        "Priority": 2,
+        "Texture": "lighting/riverdale/daylight-v1/reflection_west_control.vtex",
+        "TintColor": "1,1,1,1",
+        "capture exposure": 2.5,
+        "fallback TintColor before capture": "0.15",
+        "calibration": false
+      },
+      {
+        "GameObject": "Probe East Control",
+        "key": "east_control",
+        "Position (world)": "930,-780,370",
+        "capture (plan)": [
+          780.0,
+          930.0,
+          370.0
+        ],
+        "world box": {
+          "Mins": "660,-1000,288",
+          "Maxs": "1200,-560,468"
+        },
+        "Mode": "CustomTexture",
+        "Projection": "Box",
+        "Priority": 2,
+        "Texture": "lighting/riverdale/daylight-v1/reflection_east_control.vtex",
+        "TintColor": "1,1,1,1",
+        "capture exposure": 2.5,
+        "fallback TintColor before capture": "0.15",
+        "calibration": false
+      },
+      {
+        "GameObject": "Probe West Yard",
+        "key": "west_yard",
+        "Position (world)": "-880,1250,170",
+        "capture (plan)": [
+          -1250.0,
+          -880.0,
+          170.0
+        ],
+        "world box": {
+          "Mins": "-1750,0,-20",
+          "Maxs": "-240,2300,900"
+        },
+        "Mode": "CustomTexture",
+        "Projection": "Box",
+        "Priority": 0,
+        "Texture": "lighting/riverdale/daylight-v1/reflection_west_yard.vtex",
+        "TintColor": "1,1,1,1",
+        "capture exposure": 1.5,
+        "fallback TintColor before capture": "1",
+        "calibration": true
+      },
+      {
+        "GameObject": "Probe East Yard",
+        "key": "east_yard",
+        "Position (world)": "-880,-1250,170",
+        "capture (plan)": [
+          1250.0,
+          -880.0,
+          170.0
+        ],
+        "world box": {
+          "Mins": "-1750,-2300,-20",
+          "Maxs": "-240,0,900"
+        },
+        "Mode": "CustomTexture",
+        "Projection": "Box",
+        "Priority": 0,
+        "Texture": "lighting/riverdale/daylight-v1/reflection_east_yard.vtex",
+        "TintColor": "1,1,1,1",
+        "capture exposure": 1.5,
+        "fallback TintColor before capture": "1",
+        "calibration": false
+      },
+      {
+        "GameObject": "Probe West Court",
+        "key": "west_court",
+        "Position (world)": "1100,1370,170",
+        "capture (plan)": [
+          -1370.0,
+          1100.0,
+          170.0
+        ],
+        "world box": {
+          "Mins": "-240,1040,-20",
+          "Maxs": "2040,2300,800"
+        },
+        "Mode": "CustomTexture",
+        "Projection": "Box",
+        "Priority": 0,
+        "Texture": "lighting/riverdale/daylight-v1/reflection_west_court.vtex",
+        "TintColor": "1,1,1,1",
+        "capture exposure": 1.5,
+        "fallback TintColor before capture": "1",
+        "calibration": false
+      },
+      {
+        "GameObject": "Probe East Court",
+        "key": "east_court",
+        "Position (world)": "1100,-1370,170",
+        "capture (plan)": [
+          1370.0,
+          1100.0,
+          170.0
+        ],
+        "world box": {
+          "Mins": "-240,-2300,-20",
+          "Maxs": "2040,-1040,800"
+        },
+        "Mode": "CustomTexture",
+        "Projection": "Box",
+        "Priority": 0,
+        "Texture": "lighting/riverdale/daylight-v1/reflection_east_court.vtex",
+        "TintColor": "1,1,1,1",
+        "capture exposure": 1.5,
+        "fallback TintColor before capture": "1",
+        "calibration": false
+      },
+      {
+        "GameObject": "Probe North",
+        "key": "north",
+        "Position (world)": "2330,370,170",
+        "capture (plan)": [
+          -370.0,
+          2330.0,
+          170.0
+        ],
+        "world box": {
+          "Mins": "2040,-2300,-20",
+          "Maxs": "2450,2300,700"
+        },
+        "Mode": "CustomTexture",
+        "Projection": "Box",
+        "Priority": 0,
+        "Texture": "lighting/riverdale/daylight-v1/reflection_north.vtex",
+        "TintColor": "1,1,1,1",
+        "capture exposure": 1.5,
+        "fallback TintColor before capture": "1",
+        "calibration": false
+      }
+    ],
+    "scene_json": "The kept group is Sources/Riverdale/lighting/reflections.json (the 'Reflection Probes' GameObject; probe ids as riverdale_map's probe_object: probe/<name without 'Probe '> and probe/<name>/probe).",
+    "scene_json_example": {
+      "__guid": "0579885c-a46b-5ea4-94f1-df937fa63220",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Probe Hall",
+      "Position": "560,260,330",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "0f3cbd58-7c76-5ea8-ac09-b2556ba7ef92",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "BakedTexture": null,
+          "Bounds": {
+            "Mins": "-760,-1260,-370",
+            "Maxs": "1440,740,670"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.04,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Mode": "CustomTexture",
+          "MultiBounce": false,
+          "Priority": 1,
+          "Projection": "Box",
+          "RenderExcludeTags": "",
+          "Resolution": "Small",
+          "Texture": "lighting/riverdale/daylight-v1/reflection_hall.vtex",
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 8
+        }
+      ],
+      "Children": []
+    }
+  },
+  "generator_integration": {
+    "summary": "Tools/riverdale_map.py rewrites the scene whole, so it has to write the kept lighting back. Its owner adds:",
+    "code": [
+      "import importlib.util",
+      "def lighting():",
+      "    spec = importlib.util.spec_from_file_location( 'riverdale_lighting', K.ROOT / 'Sources/Riverdale/lighting/riverdale_lighting.py' )",
+      "    module = importlib.util.module_from_spec( spec )",
+      "    spec.loader.exec_module( module )",
+      "    return module",
+      "",
+      "# in write_scene(), in place of the Reflection Probes group:",
+      "RL = lighting()",
+      "probe_group = RL.reflection_probes_object( RL.sky_fallback_texture( copy=True ), ids ) \\",
+      "    or K.game_object( ids, 'Reflection Probes', 'probes', children=[ probe_object( *p ) for p in probe_list ] )",
+      "# and after the Volumetric Fog group:",
+      "indirect = RL.indirect_light_object()",
+      "objects += [ indirect ] if indirect else []"
+    ],
+    "notes": [
+      "reflection_probes_object() returns the kept, captured probes once preserve has run; before that, with the sky's compiled cube, the planned probes static on it (dimmed indoors); without a compiled sky, None (the old probes).",
+      "probe_object()'s RenderDynamically=True (realtime) should go either way: the fallback path makes every probe static.",
+      "riverdale_lighting.py imports nothing from Tools at load; its config/check commands import riverdale_map inside functions only.",
+      "After any change to geometry, materials, the sky or a light, `riverdale_lighting.py status` reports the kept bake stale: bake a new revision (daylight-v2: change REVISION, run `config`)."
+    ]
+  },
+  "optional": [
+    {
+      "id": "wet_ground_probes",
+      "what": "Orion's after-rain trick: thin static probes over the open yard's ground only (box z -20..3, priority 3) on the west/east yard cubes at TintColor 1.6, so the wet ground and puddles mirror the yard more strongly than walls do.",
+      "why_optional": "Only worth it once the surfaces owner's wet ground (low roughness, puddles) is in; on dry-looking concrete it would read as a sheen."
+    },
+    {
+      "id": "colour_adjustments",
+      "what": "A ColorAdjustments component on Look with Saturation 1.05 (Contrast 1.0, Brightness 1.0).",
+      "why_optional": "A touch more colour in the sunrise; keep Contrast at 1: it works in linear HDR and crushed Orion's shadows."
+    },
+    {
+      "id": "sun_elevation",
+      "what": "Raise the sun from 16 to about 22-24 degrees, same azimuth (riverdale_map SUN_PITCH and riverdale_sky, whose owner rebuilds the sky), before the bake.",
+      "measured": {
+        "samples": 2008,
+        "azimuth_north_of_east": 33,
+        "sunlit_share_by_elevation": {
+          "16": 0.079,
+          "20": 0.144,
+          "24": 0.2,
+          "28": 0.273
+        }
+      },
+      "why_optional": "Measured against the map's collision (2,008 samples of open ground, 75 in apart): at 16 degrees the hall (1,040 high) and the annexes put all but 8% of the open ground in shade, so the yard is lit almost only by the sky and reads blue-grey wherever a player stands. At 24 degrees 20% is in sun, with shadows still 2.2 times their buildings' height: still a low, golden sun, with sunlit ground to read against. The sky and the reference picture's mood are the sky owner's call."
+    }
+  ],
+  "verification": {
+    "editor_scripts": "Sources/Riverdale/lighting/check-scripts.py: all five scripts compile as run_csharp's method bodies against the installed engine, and all 29 internal members they reach by reflection are in Sandbox.Engine.dll with the parameter counts used (output/riverdale/aaa/lighting/native-script-types/report.json). Not run in the editor.",
+    "plan": "riverdale_lighting.py check: 0 problems; every capture point at least 70 in from any drawn triangle, inside its box, outside the collision; the calibration probe's upward face 98.8% open sky (check-report.json, preview/).",
+    "reflection_converter": "riverdale_reflections.py --selftest: faces made from the sky EXR through the engine's ACES come back with scale 1.0002, median error 0.5%, 95th percentile 2.3% (reflection-selftest/).",
+    "look": "Cycles renders of the current scene and the proposal applied to a copy (render/compare_e1.0.png, compare_e1.8.png; Sources/Riverdale/lighting/render_look.py, which also keeps RenderType Off models from casting, as in a match, and renders SpotLights as spots). Cycles bounces light, so these stand for the baked result, not today's flat ambient."
+  }
+}

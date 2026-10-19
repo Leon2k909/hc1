@@ -1,0 +1,96 @@
+{
+  "kind": "Matched CPU material/context views",
+  "native_engine_capture": false,
+  "manifest_sha256": "c040ca22741c6c520e43d979d45df69beae234a7d8d53ff21a5c24c1a0541634",
+  "renderer_sha256": "60b27de3a1c90fac3c074314d0bef751e3fbd1b56d37a0206f0de249545c51f1",
+  "source_geometry": {
+    "Assets/models/maps/lowtide/lowtide_east.obj": "93ebb998d60470730012874327da91bcb35380b6a3b429e5e7fd831e9dbd07c6",
+    "output/lowtide/quality-pass/drain-junctions/stage/models/maps/lowtide/lowtide_finish.obj": "0de9b2e520ebff8712c8fc708e605936309278918b0cabfb96406a790b4ec12c"
+  },
+  "original_texture_inputs": {
+    "materials/lowtide/lt_setts_color.png": "6e522caa39c37ee649f0f565c3d1df7efedc1e1f592707be0b0fd4d3069072b6",
+    "materials/lowtide/paving_relief/lt_setts_normal.png": "847541c574f9154582db36284c673887a8a09eda2ad813a2ecadb97dece9ba3b",
+    "materials/lowtide/lt_setts_rough.png": "288e5bc7941331b813509d705c4fc41c919e7b2981380e6769554da7e20eadcf",
+    "materials/lowtide/paving_relief/lt_setts_ao.png": "4e498947e0a5e8ddda62de6244802e681ea09935a6a7f889f195d791a393ea7b",
+    "materials/lowtide/paving_relief/lt_setts_height.png": "24626484c30081d109be170eb37021b79906862dc47b721cd8a38af4954376a4"
+  },
+  "cases": {
+    "quay-shed": {
+      "origin": [
+        1314.0,
+        -1050.0,
+        0.0
+      ],
+      "outward": [
+        0.0,
+        -1.0,
+        0.0
+      ]
+    },
+    "warehouse-street": {
+      "origin": [
+        1000.0,
+        207.0,
+        0.0
+      ],
+      "outward": [
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    "shed-wall-base": {
+      "origin": [
+        1590.0,
+        -1050.0,
+        0.0
+      ],
+      "outward": [
+        0.0,
+        -1.0,
+        0.0
+      ]
+    }
+  },
+  "view": {
+    "eye": [
+      0.8,
+      1.8,
+      1.2
+    ],
+    "target": [
+      0.0,
+      0.36,
+      0.13
+    ],
+    "scale": 1.65,
+    "size": [
+      1100,
+      820
+    ]
+  },
+  "exposure": 0.78,
+  "renderer_dependencies": {
+    "Tools/lowtide_warehouse_floor_review.py": "5a2cdd39cd450db4505ac06d9bb54fce5d284cc57d149d33e7dca159eee29678",
+    "Tools/lowtide_concrete_wear_review.py": "3c26bf3674a4c629854a87152866726b0937a11f74170b7bd1dcd3794bfb6ffc",
+    "Tools/lowtide_window_software.py": "75c516523262951f33bf2cdb602c0e1fa49a39d3fa1d8f84e274db53a49c73e3",
+    "Tools/lowtide_drain_context.py": "7d207f7b9371551f26ccd99a23f3a941fcfb4c267f82f8c9cf9c743a04d2912d",
+    "Tools/lowtide_drain_review.py": "51b8fbf3a18bb99fcfccd5da786a8e60bc496724e4e2885f053abc426ea0dc4f",
+    "Tools/lowtide_sack_preview.py": "fa92a668fdb4080b9c1d79c90327dec4c63fd6783dec8b25e0954b566448851b"
+  },
+  "same_staged_drains_in_both": true,
+  "architecture": "Exact clipped saved triangles with neutral materials",
+  "wetness_model": "Current rotated three-octave PavingWetness; contact grit and outlet moisture added only in the candidate",
+  "limitations": [
+    "Approximate CPU PBR, relief and mip filtering",
+    "Native lighting, shader compilation, compression, temporal filtering and performance untested"
+  ],
+  "files": {
+    "quay-shed-before.png": "65bb2c131133290d2ba931d26851c65d4ab24f445ef2a7c4cd497f07221969d7",
+    "quay-shed-candidate.png": "d058a87aba68cc190f5f8afa531636e7fb093fd8aa54236970b0189a81954238",
+    "shed-wall-base-before.png": "5c936d013515d1a0a8657395817ad3691ff424834f27bbcff98b5c09890be53f",
+    "shed-wall-base-candidate.png": "7660c95412e6e811c433e7466648d232f59254d57413ae1e6e7ee9cdb8e28202",
+    "warehouse-street-before.png": "b170253e1754fe1481b67e1c1a6233a68607ea12aa2b506478fe0c2564f0ae9f",
+    "warehouse-street-candidate.png": "d0bb6efec21be177c83fee475438f65928f3b64f6f2788a3231bc400732bbf1a"
+  }
+}

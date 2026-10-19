@@ -1,0 +1,63 @@
+{
+  "kind": "CPU perspective PBR material comparison",
+  "native_engine_capture": false,
+  "manifest_sha256": "1fcfb1373adb1b6bf2a7ad62d8664d3da238c85991cb426ff71c348bc3280f4c",
+  "renderer_sha256": "5a2cdd39cd450db4505ac06d9bb54fce5d284cc57d149d33e7dca159eee29678",
+  "views": {
+    "close": {
+      "eye": [
+        0.6,
+        -1.8,
+        1.45
+      ],
+      "target": [
+        0,
+        1.0,
+        0
+      ],
+      "fov": 66
+    },
+    "wide": {
+      "eye": [
+        0.4,
+        -5.1,
+        4.3
+      ],
+      "target": [
+        0,
+        1.6,
+        0
+      ],
+      "fov": 68
+    },
+    "grazing": {
+      "eye": [
+        -0.6,
+        -3.0,
+        0.48
+      ],
+      "target": [
+        0,
+        1.7,
+        0
+      ],
+      "fov": 63
+    }
+  },
+  "source_texture_pixels_preserved": true,
+  "filtering": "Approximate 8-tap anisotropic/trilinear texture sampling",
+  "limitations": [
+    "No engine shader compilation",
+    "No native DDGI, exposure, texture compression or temporal sampling",
+    "Isolated floor-plane review; not a recreation of the warehouse screenshot",
+    "No performance result"
+  ],
+  "previews": {
+    "close-before.png": "fd80470bd8f3612bbb5380a2617001ff79c3f0ac91cdeb340b58c5dde426b809",
+    "close-candidate.png": "b678f7f3022ab5280533069e1cc0fc37297ada9e57212705eeaceaadb0828e98",
+    "grazing-before.png": "cea34c64ad4eee3d204fa8176911c98d0b6841fa78ddd01e5f8b8ce334c1f6b4",
+    "grazing-candidate.png": "7eeb58fdb391ecccdf5a9c360a5f293a1be3f999b88f1a37cbcbf3628d80f550",
+    "wide-before.png": "56a839071e92741e80846be1ff0bac570b6671452e3e75d555c5f0dfd95fa1a6",
+    "wide-candidate.png": "76bb732f424fc80b0fa8c38ead8cd2dff9211eca7661a67ddcd80245e58412eb"
+  }
+}

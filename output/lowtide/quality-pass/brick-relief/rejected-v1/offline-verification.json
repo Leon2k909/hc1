@@ -1,0 +1,64 @@
+{
+  "dense_reference": [
+    {
+      "angle_degrees": 0,
+      "rays": 2048,
+      "p50_position_error_mm": 1.3418229844772454e-07,
+      "p95_position_error_mm": 6.063798618041581e-05,
+      "p99_position_error_mm": 0.0002853070001765857,
+      "maximum_position_error_mm": 0.0010547076677564643
+    },
+    {
+      "angle_degrees": 30,
+      "rays": 2048,
+      "p50_position_error_mm": 0.0007801742062828597,
+      "p95_position_error_mm": 0.005716411270561069,
+      "p99_position_error_mm": 0.009859039941594587,
+      "maximum_position_error_mm": 0.022131797026530585
+    },
+    {
+      "angle_degrees": 60,
+      "rays": 2048,
+      "p50_position_error_mm": 0.004918340744367032,
+      "p95_position_error_mm": 0.04033763777686285,
+      "p99_position_error_mm": 0.06957276796479722,
+      "maximum_position_error_mm": 0.13369330206744304
+    },
+    {
+      "angle_degrees": 75,
+      "rays": 2048,
+      "p50_position_error_mm": 0.04542697904511356,
+      "p95_position_error_mm": 0.1797545185138515,
+      "p99_position_error_mm": 0.37391588895308797,
+      "maximum_position_error_mm": 8.748820626184099
+    },
+    {
+      "angle_degrees": 80,
+      "rays": 2048,
+      "p50_position_error_mm": 0.06110760755208475,
+      "p95_position_error_mm": 0.40723398273769984,
+      "p99_position_error_mm": 0.9631886954934185,
+      "maximum_position_error_mm": 12.798492440821239
+    }
+  ],
+  "repeated_uvs_agree": true,
+  "analytic_planes": 25,
+  "fade_samples": [
+    1.0,
+    1.0,
+    1.0,
+    0.778499219199474,
+    2.211251489681043e-05,
+    0.0,
+    0.0
+  ],
+  "dense_oracle_layers": 512,
+  "bisections": 12,
+  "native_compile": "not_run",
+  "native_visual_review": "not_run",
+  "preview": "CPU analogue of the staged POM shader on a plane; not an engine capture",
+  "limitations": [
+    "No engine mip filtering, world-space weathering, GI or measured gameplay cost"
+  ],
+  "protected_files_unchanged": true
+}

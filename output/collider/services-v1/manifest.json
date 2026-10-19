@@ -1,0 +1,90 @@
+{
+  "revision": "services-v1",
+  "native_import_pending": false,
+  "stage": "output/collider/services-v1/stage",
+  "files": [
+    {
+      "path": "models/maps/collider/collider_detail.mtl",
+      "before_sha256": "c65a5209cff92475b45e45a2518b65dd84eebfb3e4c03d36899589d2e28f8111",
+      "sha256": "4e9fba2794343db51f99b004c90a3533d88b7be1dd8f6c0e52bddf6ffd285fcc",
+      "bytes": 354
+    },
+    {
+      "path": "models/maps/collider/collider_detail.obj",
+      "before_sha256": "d3be11107281a7d1b24ffde8fde5e980c72db57c7b7faad9aa6a25471df5b65e",
+      "sha256": "14b303198df6b8a8a6dc41ad167b387a951e2447d6ee13e6350fb3e903378e0f",
+      "bytes": 23233434
+    },
+    {
+      "path": "models/maps/collider/collider_detail.vmdl",
+      "before_sha256": "d3fb9d22b11024675eb0868e1551a86986f47daaf6f1ad744e5aa7873c33fd7c",
+      "sha256": "ae60c68b92df8555e15f84306a7428f32085edd5bbda85a4468152b3f5d69064",
+      "bytes": 12508
+    },
+    {
+      "path": "models/maps/collider/collider_glass.obj",
+      "before_sha256": "60574cff38f6d000f7d2331c7fcee9b1c03ba14e80e6d4e5cbe8513d3bca7137",
+      "sha256": "77235fbd65d44896b218263bb5ab6e6e8f389babbc8792b90482d1636fdf85ba",
+      "bytes": 11589
+    },
+    {
+      "path": "models/maps/collider/collider_structure.obj",
+      "before_sha256": "c8ec6baa8602a69584dc8ea7057524eebbd79799100de920102f4e6be6c5fea5",
+      "sha256": "eb32986e811c94423d60b8a9b008ab39581e4faf704d81d861a21b127414372e",
+      "bytes": 12284947
+    }
+  ],
+  "unchanged_model_files": [
+    "collider_glass.mtl",
+    "collider_glass.vmdl",
+    "collider_machine.mtl",
+    "collider_machine.obj",
+    "collider_machine.vmdl",
+    "collider_structure.mtl",
+    "collider_structure.vmdl",
+    "collider_structure_hulls_metal.obj"
+  ],
+  "triangles": {
+    "collider_structure": 71396,
+    "collider_detail": 132960,
+    "collider_machine": 165594,
+    "collider_glass": 84
+  },
+  "collision_sha256": "86767c8b2a7802d2deaf0ef49d407504210a50e740cddccb7abe365cae564964",
+  "collision_identical": true,
+  "physics_definitions_identical": true,
+  "physics_definition_sha256": {
+    "models/maps/collider/collider_structure.vmdl": "a9b77f446a1c47c402c4ca98b7ba181d39e25fa504fbfdd329d90e2c496c298c",
+    "models/maps/collider/collider_detail.vmdl": "887b385ee447096153f7aed0b71c9e9d1c671841e2b55889a54d09b3ba209fe9"
+  },
+  "minimap_identical": true,
+  "window_render_rays": [
+    {
+      "pane_e": -335.0,
+      "opaque_hits": 0
+    },
+    {
+      "pane_e": -185.0,
+      "opaque_hits": 0
+    },
+    {
+      "pane_e": 185.0,
+      "opaque_hits": 0
+    },
+    {
+      "pane_e": 335.0,
+      "opaque_hits": 0
+    }
+  ],
+  "geometry_finite_and_nondegenerate": true,
+  "offline_positions_passed": 68,
+  "lights": 82,
+  "shadow_lights": 6,
+  "lighting_note": "The new transparent wall openings require a fresh lighting review/bake; neither v2 nor the pending v3 bake includes them.",
+  "source_sha256": {
+    "Tools/collider_map.py": "e82006b235f858a444fe0fd0cd4ad6b66b6896b92095f607d2c8d47161eff67d",
+    "Tools/collider_services.py": "75d4ad09169f082a439d2eb54e77b93d64dffc9c4c7c0c7f513edb875e0cec0e",
+    "Tools/collider_detail_geometry.py": "e4a11788eaabecc2b43971a2a96a3aefa986e4434c1521a3cc920d8dbdf41f0a"
+  },
+  "native_visual_review_report": "output/collider/services-v1/native-review/review-result.json"
+}

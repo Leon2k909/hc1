@@ -1,0 +1,99 @@
+{
+  "date": "2026-10-15",
+  "status": "offline_candidate_ready_for_native_review",
+  "revision": "paving-contact-use-v1",
+  "user_work_mode": "Continue offline for now",
+  "production_changed": false,
+  "native_accepted": false,
+  "canonical_generator_changed": false,
+  "generator": "Tools/lowtide_paving_use.py",
+  "reviewer": "Tools/lowtide_paving_use_review.py",
+  "settings": "Sources/Lowtide/paving/edge-use.json",
+  "shader_extension": "Sources/Lowtide/paving/edge-use.hlsl",
+  "changes": [
+    "Narrow settled grit follows 1,408 deduplicated wall-foot segments extracted from saved geometry.",
+    "Local moisture fields sit near 16 staged drain outlets over the existing granite paving.",
+    "Original generated stone colour, normal, roughness, AO and nine-millimetre relief are preserved.",
+    "The existing broad paving variation remains; local moisture only increases its wet response.",
+    "Only the existing Lowtide setts material is staged: no model remaps, material slots, geometry or collision changes."
+  ],
+  "scope": {
+    "ground_triangles": 22,
+    "wall_segments": 1408,
+    "drain_outlets_over_setts": 16,
+    "atlas_pixels": [
+      2048,
+      2048
+    ],
+    "channels": [
+      "settled_grit",
+      "local_drain_moisture",
+      "existing_setts_domain"
+    ],
+    "coverage_above_point1": [
+      0.04191865470151988,
+      0.0018818271784157897
+    ],
+    "delta_triangles": 0,
+    "new_material_slots": 0,
+    "model_remaps": 0,
+    "extra_texture_lookups": 1
+  },
+  "evidence": {
+    "manifest": "output/lowtide/quality-pass/paving-use/manifest.json",
+    "manifest_sha256": "39e370111ea483f1946ec07d0a4e767c3d9fb1e5d01259d31399df9a5a616cb8",
+    "verification": "output/lowtide/quality-pass/paving-use/verification.json",
+    "reproduction": "output/lowtide/quality-pass/paving-use/reproduction-verification.json",
+    "views": "output/lowtide/quality-pass/paving-use/preview/provenance.json",
+    "atlas_samples": 12000,
+    "excluded_surface_samples": 228,
+    "moisture_texels_checked": 4692,
+    "byte_identical_staged_files": 5,
+    "protected_live_files_unchanged": 557
+  },
+  "preview": {
+    "kind": "Six matched CPU material/context views",
+    "native_engine_capture": false,
+    "visual_review": "Reviewed both versions at the quay shed, warehouse street and shed wall base. The local changes are restrained; native response remains unproven.",
+    "limitations": [
+      "Neutral clipped architecture, same staged drains in both versions",
+      "Approximate CPU light, normal maps, relief and mip filtering",
+      "Native lighting, shader compilation, compression, temporal filtering and performance are untested"
+    ]
+  },
+  "first_review": {
+    "directory": "output/lowtide/quality-pass/paving-use/first-review",
+    "reason": "Wider brighter framing made the narrow contact fields difficult to assess; final views are closer with matched lower CPU exposure. Candidate assets are unchanged."
+  },
+  "atlas_audit": {
+    "report": "output/lowtide/quality-pass/atlas-audit/inventory.json",
+    "report_sha256": "b2c30edaf658e93e7b654725a97c8b38b1805f1c6511dc9e3d0e586914167f6b",
+    "materials": 98,
+    "unique_png_inputs": 41,
+    "finding": "Only the already staged drain mapping defect was confirmed among the repeated-border candidates. Existing bridge deck and distant shipyard meshes use bounded atlas UVs.",
+    "limitation": "Exact repeated-border detection and targeted UV checks, not a proof of every possible texture or filtering defect."
+  },
+  "integration": {
+    "stage": "output/lowtide/quality-pass/paving-use/stage",
+    "material": "materials/lowtide/lt_setts.vmat",
+    "live_target_states": {
+      "materials/lowtide/lt_setts.vmat": "cf5c8d304b4df09f45408f3ca563e6c30b705b49bb518663e5a5fae45dd4624d",
+      "materials/lowtide/paving-use/ground_use.png": null,
+      "materials/lowtide/paving-use/ground_use.png.meta": null,
+      "shaders/hc1_lowtide_paving_use.shader": null,
+      "shaders/hc1_lowtide_paving_use.shader.meta": null
+    },
+    "drainage_dependency": "Sources/Lowtide/drainage/junction-status.json",
+    "native_followup": [
+      "Keep offline mode until the user resumes native work; start with fresh editor/project/compile/scene/play/unsaved state.",
+      "Revalidate the manifest, all before hashes and recorded absent target paths. Compile the new shader and an unused review material through the editor.",
+      "Use the normal existing viewport and scoped temporary material overrides for comparison; preserve camera, tab, scene and play state.",
+      "Inspect wall contact, outlet alignment, roughness, atlas boundaries, distance filtering and cost under actual map lighting. This is a static art layout, not a fluid simulation.",
+      "After acceptance, promote only the five listed files and integrate this material extension with the canonical paving generator. No whole model snapshot or scene replacement is needed.",
+      "Save and verify persistence; do not claim overall AAA quality from these offline views."
+    ]
+  },
+  "overall_goal": "Open: map-wide native appearance and gameplay performance are not established",
+  "latest_checkout_revalidation": "Sources/Lowtide/construction/checkout-status.json",
+  "historical_evidence_note": "Other validation fields describe the dated candidate; use latest_checkout_revalidation for the current scoped rebase."
+}

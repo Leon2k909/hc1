@@ -1,0 +1,121 @@
+{
+  "status": "offline_detail_level_review",
+  "native_engine_capture": false,
+  "source_manifest_sha256": "4d86ef89ab0cfb1652b0cc9c5d8bc95779e679a437df53c0019846b246b5be89",
+  "source_sha256": "e367e4a2fe6c872a5d23a73418d327c64acb081d2e84b9e71ad79c1670b36175",
+  "reviewer_sha256": "6892461eda2ec5f08ca7196e0f985884abbcd07c80c1f96bc3b22a1e4328ebfd",
+  "geometry_checks": [
+    {
+      "level": 0,
+      "fitted_bar_joint_rays": 24,
+      "clear_pane_rays": 3,
+      "frame_border_rays": 64,
+      "closed_door_rays": 2294
+    },
+    {
+      "level": 1,
+      "fitted_bar_joint_rays": 24,
+      "clear_pane_rays": 3,
+      "frame_border_rays": 64,
+      "closed_door_rays": 2294
+    },
+    {
+      "level": 2,
+      "fitted_bar_joint_rays": 24,
+      "clear_pane_rays": 3,
+      "frame_border_rays": 64,
+      "closed_door_rays": 2294
+    }
+  ],
+  "comparisons": [
+    {
+      "kind": "window",
+      "approximate_height_pixels": 300,
+      "level": 1,
+      "mean_absolute_8bit_error": 0.6729208519945199,
+      "changed_pixel_fraction_over_8": 0.026724662255561495
+    },
+    {
+      "kind": "window",
+      "approximate_height_pixels": 300,
+      "level": 2,
+      "mean_absolute_8bit_error": 1.537577332571527,
+      "changed_pixel_fraction_over_8": 0.055771605507123505
+    },
+    {
+      "kind": "window",
+      "approximate_height_pixels": 160,
+      "level": 1,
+      "mean_absolute_8bit_error": 0.7288961038961039,
+      "changed_pixel_fraction_over_8": 0.033216783216783216
+    },
+    {
+      "kind": "window",
+      "approximate_height_pixels": 160,
+      "level": 2,
+      "mean_absolute_8bit_error": 1.2608016983016983,
+      "changed_pixel_fraction_over_8": 0.050699300699300696
+    },
+    {
+      "kind": "window",
+      "approximate_height_pixels": 80,
+      "level": 1,
+      "mean_absolute_8bit_error": 0.613022483778482,
+      "changed_pixel_fraction_over_8": 0.02195563603440471
+    },
+    {
+      "kind": "window",
+      "approximate_height_pixels": 80,
+      "level": 2,
+      "mean_absolute_8bit_error": 1.724837784819677,
+      "changed_pixel_fraction_over_8": 0.05432322317790855
+    },
+    {
+      "kind": "door",
+      "approximate_height_pixels": 300,
+      "level": 1,
+      "mean_absolute_8bit_error": 0.012902718843312903,
+      "changed_pixel_fraction_over_8": 0.0004243281471004243
+    },
+    {
+      "kind": "door",
+      "approximate_height_pixels": 300,
+      "level": 2,
+      "mean_absolute_8bit_error": 0.21674262664361674,
+      "changed_pixel_fraction_over_8": 0.004824768191104825
+    },
+    {
+      "kind": "door",
+      "approximate_height_pixels": 160,
+      "level": 1,
+      "mean_absolute_8bit_error": 0.025490196078431372,
+      "changed_pixel_fraction_over_8": 0.000588235294117647
+    },
+    {
+      "kind": "door",
+      "approximate_height_pixels": 160,
+      "level": 2,
+      "mean_absolute_8bit_error": 0.20941176470588235,
+      "changed_pixel_fraction_over_8": 0.0074866310160427805
+    },
+    {
+      "kind": "door",
+      "approximate_height_pixels": 80,
+      "level": 1,
+      "mean_absolute_8bit_error": 0.007259528130671506,
+      "changed_pixel_fraction_over_8": 0.00020165355918531962
+    },
+    {
+      "kind": "door",
+      "approximate_height_pixels": 80,
+      "level": 2,
+      "mean_absolute_8bit_error": 0.122403710425489,
+      "changed_pixel_fraction_over_8": 0.0012099213551119178
+    }
+  ],
+  "native_lod_thresholds": null,
+  "limitations": [
+    "CPU lighting and textures; no engine normal maps, mip selection, GI or gameplay cost",
+    "Pixel differences describe these views only; they are not an acceptance metric by themselves"
+  ]
+}

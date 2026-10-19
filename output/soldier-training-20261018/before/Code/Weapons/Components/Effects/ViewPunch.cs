@@ -1,0 +1,53 @@
+using Sandbox.Events;
+using Facepunch.Gunsmith;
+
+namespace Facepunch;
+
+[Title( "On Shot - View Punch" ), Category( "Weapon Components" ), Icon( "pending" )]
+public class ViewPunch : EquipmentComponent, IGameEventHandler<WeaponShotEvent>
+{
+	[Property] public float Lifetime { get; set; } = 0.3f;
+	[Property] public Vector3 PositionOffset { get; set; } = new( 0.5f, 0.2f, 0.75f );
+	[Property] public Vector3 MaxPositionOffset { get; set; } = new( 0.5f, 0.2f, 0.75f );
+	[Property] public Angles AnglesOffset { get; set; } = new( -0.5f, 0.1f, 0.5f );
+	[Property] public Angles MaxAnglesOffset { get; set; } = new( -0.5f, 0.1f, 0.5f );
+	[Property] public Curve Curve { get; set; }
+
+	private Vector3 GetBetween( Vector3 one, Vector3 two )
+	{
+		var x = Game.Random.Float( one.x, two.x );
+		var y = Game.Random.Float( one.y, two.y );
+		var z = Game.Random.Float( two.z, two.z );
+		return new Vector3( x, y, z );
+	}
+
+	private Angles GetBetween( Angles one, Angles two )
+	{
+		var pitch = Game.Random.Float( one.pitch, two.pitch );
+		var yaw = Game.Random.Float( one.yaw, two.yaw );
+		var roll = Game.Random.Float( two.roll, two.roll );
+		return new Angles( pitch, yaw, roll );
+	}
+
+	void IGameEventHandler<WeaponShotEvent>.OnGameEvent( WeaponShotEvent eventArgs )
+	{
+		if ( eventArgs.Equipment != Equipment )
+			return;
+
+		if ( !Player.IsValid() || !Player.IsViewer )
+			return;
+
+		var effects = GunsmithAttachmentEffects.For( Equipment );
+		var mountScale = Player.IsWeaponMounted ? 0.55f : 1f;
+		var positionScale = (effects.VerticalRecoil + effects.HorizontalRecoil) * 0.5f * mountScale;
+		var angles = GetBetween( AnglesOffset, MaxAnglesOffset );
+		var shake = new ScreenShake.Punch(
+			Lifetime,
+			GetBetween( PositionOffset, MaxPositionOffset ) * positionScale,
+			new Angles( angles.pitch * effects.VerticalRecoil * mountScale, angles.yaw * effects.HorizontalRecoil * mountScale,
+				angles.roll * positionScale ),
+			Curve );
+
+		ScreenShaker.Main?.Add( shake );
+	}
+}

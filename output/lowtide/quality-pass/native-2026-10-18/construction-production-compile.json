@@ -1,0 +1,52 @@
+{
+  "tool": "call_tools",
+  "arguments": {
+    "calls": [
+      {
+        "name": "asset_compile",
+        "arguments": {
+          "path": "materials/lowtide/finish/lt_drain_iron.vmat",
+          "full": false
+        }
+      },
+      {
+        "name": "asset_compile",
+        "arguments": {
+          "path": "materials/lowtide/finish/lt_drain_edge.vmat",
+          "full": false
+        }
+      },
+      {
+        "name": "asset_compile",
+        "arguments": {
+          "path": "models/maps/lowtide/lowtide_east.vmdl",
+          "full": false
+        }
+      },
+      {
+        "name": "asset_compile",
+        "arguments": {
+          "path": "models/maps/lowtide/lowtide_west.vmdl",
+          "full": false
+        }
+      },
+      {
+        "name": "asset_compile",
+        "arguments": {
+          "path": "models/maps/lowtide/lowtide_backdrop.vmdl",
+          "full": false
+        }
+      },
+      {
+        "name": "asset_compile",
+        "arguments": {
+          "path": "models/maps/lowtide/lowtide_finish.vmdl",
+          "full": false
+        }
+      }
+    ]
+  },
+  "returncode": 0,
+  "stdout": "{\"Success\":true,\"Path\":\"materials/lowtide/finish/lt_drain_iron.vmat\",\"CompiledFile\":\"c:/sbox-projects/hc1/forked-shooter-main/assets/materials/lowtide/finish/lt_drain_iron.vmat_c\",\"Hint\":null}\n{\"Success\":true,\"Path\":\"materials/lowtide/finish/lt_drain_edge.vmat\",\"CompiledFile\":\"c:/sbox-projects/hc1/forked-shooter-main/assets/materials/lowtide/finish/lt_drain_edge.vmat_c\",\"Hint\":null}\n{\"Success\":true,\"Path\":\"models/maps/lowtide/lowtide_east.vmdl\",\"CompiledFile\":\"c:/sbox-projects/hc1/forked-shooter-main/assets/models/maps/lowtide/lowtide_east.vmdl_c\",\"Hint\":null}\n{\"Success\":true,\"Path\":\"models/maps/lowtide/lowtide_west.vmdl\",\"CompiledFile\":\"c:/sbox-projects/hc1/forked-shooter-main/assets/models/maps/lowtide/lowtide_west.vmdl_c\",\"Hint\":null}\n{\"Success\":true,\"Path\":\"models/maps/lowtide/lowtide_backdrop.vmdl\",\"CompiledFile\":\"c:/sbox-projects/hc1/forked-shooter-main/assets/models/maps/lowtide/lowtide_backdrop.vmdl_c\",\"Hint\":null}\n{\"Success\":true,\"Path\":\"models/maps/lowtide/lowtide_finish.vmdl\",\"CompiledFile\":\"c:/sbox-projects/hc1/forked-shooter-main/assets/models/maps/lowtide/lowtide_finish.vmdl_c\",\"Hint\":null}\n",
+  "stderr": ""
+}

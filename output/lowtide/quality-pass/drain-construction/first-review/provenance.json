@@ -1,0 +1,84 @@
+{
+  "native_engine_capture": false,
+  "geometry_generator_sha256": "4afa73452b145209d27c9da431d389074ffa94595caac2b8186c693908cf780c",
+  "reviewer_sha256": "54752dd93480800a781da93acd6ce06f7d147d93f591e4db9f8eb44cbfe813cf",
+  "renderer_sha256": "75c516523262951f33bf2cdb602c0e1fa49a39d3fa1d8f84e274db53a49c73e3",
+  "shadow_adapter_sha256": "fa92a668fdb4080b9c1d79c90327dec4c63fd6783dec8b25e0954b566448851b",
+  "views": {
+    "shoe": {
+      "eye": [
+        0.65,
+        1.3,
+        0.62
+      ],
+      "target": [
+        0.0,
+        0.13,
+        0.37
+      ],
+      "scale": 0.85,
+      "size": [
+        800,
+        900
+      ]
+    },
+    "hopper": {
+      "eye": [
+        0.58,
+        1.2,
+        7.38
+      ],
+      "target": [
+        0.0,
+        0.12,
+        6.9
+      ],
+      "scale": 0.56,
+      "size": [
+        850,
+        800
+      ]
+    },
+    "fixing": {
+      "eye": [
+        0.43,
+        0.75,
+        0.7
+      ],
+      "target": [
+        0.0,
+        0.12,
+        0.55
+      ],
+      "scale": 0.38,
+      "size": [
+        850,
+        800
+      ]
+    }
+  },
+  "meshes": {
+    "drain-before.obj": "f3badd7725e14c4ec806c7ce3e37a0fccd210d108a2b3b414a2feb2383b6520f",
+    "drain-candidate.obj": "8a1bbdf40575e241f0f9ff07ae294aad744155a093e01cda7db46ac0a6c1371d"
+  },
+  "inputs": {
+    "Assets/materials/lowtide/lt_bridge_steel_color.png": "9c20f81354bc0e9f396789316170c4da8e753507caf329bcd13986090129d740",
+    "Assets/materials/lowtide/finish/lt_drain_iron.vmat": "065912f4ea405d1556b2bd3253979bef5c904325ea5c24fa0f813aa54ad9cd61",
+    "Assets/materials/lowtide/finish/lt_drain_edge.vmat": "ee94b3a3ccaafff0004bb16e0547c475503bf0b0377eeb3697c746c8707059ac"
+  },
+  "previews": {
+    "fixing-before.png": "02204f1eb407c2190e86a81048706cef03908718477f7232b7f0099f6b9ad60e",
+    "fixing-candidate.png": "8e7757a728a377315ac9dafab9ec003408993d57c6a47d0a9739d7b6731c375c",
+    "fixing-comparison.png": "0119356a53e447afd1bf4fe76cb04cd596a6be00db1fa724ebbb402cbd4cf027",
+    "hopper-before.png": "264ce533638e75d70dc275930d706f8902f953c511ba06aab075ceab364fb4d7",
+    "hopper-candidate.png": "e40a2fc69249821ec781eb61402835e8788d51c3cac6aebc949b0e710f836b12",
+    "hopper-comparison.png": "93aaeca2ae0b99a670dc1853679745679f3f0ff7c05bbbf54f1dc17ffcdc6b01",
+    "shoe-before.png": "44574f0e7bb439097a18321d958db182f8022e263adb320eed274e71472e8cdb",
+    "shoe-candidate.png": "2cbe1da98e909191bc5b0bef6cadf3a33f7b43d98c50407027a8fff2d5d73d3d",
+    "shoe-comparison.png": "c0abe70271f81c095a23fb61aa3da2e0bd03bf07de508c9daaa87df63d9884ae"
+  },
+  "limitations": [
+    "Isolated drain geometry; gutter/roof junctions require map inspection.",
+    "No engine metalness, normal mapping, GI, temporal rendering or performance check."
+  ]
+}

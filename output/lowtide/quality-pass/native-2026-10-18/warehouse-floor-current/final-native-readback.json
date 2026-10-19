@@ -1,0 +1,68 @@
+{
+  "editor": {
+    "EngineVersion": "26.10.13a",
+    "Project": "razedtest",
+    "ProjectTitle": "RazedTest",
+    "ActiveScene": "riverdale",
+    "ActiveScenePath": "scenes/maps/riverdale/riverdale.scene",
+    "SceneHasUnsavedChanges": false,
+    "IsPlaying": true,
+    "IsPaused": false,
+    "ToolCount": 128,
+    "IsCompiling": false,
+    "LastCompileSucceeded": true,
+    "LastCompileErrors": 0,
+    "Paths": {
+      "Engine": "D:\\SteamLibrary\\steamapps\\common\\sbox",
+      "Logs": "D:\\SteamLibrary\\steamapps\\common\\sbox\\logs",
+      "ProjectRoot": "C:\\sbox-projects\\hc1\\forked-shooter-main",
+      "ProjectSettings": "C:\\sbox-projects\\hc1\\forked-shooter-main\\ProjectSettings"
+    }
+  },
+  "lighting": {
+    "IsPlaying": true,
+    "HasUnsavedChanges": false,
+    "volumes": [
+      {
+        "Name": "Warehouse East Bounced Light",
+        "ProbeCounts": "20,10,6",
+        "RuntimeIntensity": 4,
+        "RuntimeContrast": 0.85,
+        "Irradiance": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-east-v4/irradiance.vtex",
+        "Distance": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-east-v4/distance.vtex",
+        "Relocation": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-east-v4/relocation.vtex"
+      },
+      {
+        "Name": "Warehouse West Bounced Light",
+        "ProbeCounts": "20,10,6",
+        "RuntimeIntensity": 4,
+        "RuntimeContrast": 0.85,
+        "Irradiance": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-west-v4/irradiance.vtex",
+        "Distance": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-west-v4/distance.vtex",
+        "Relocation": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-west-v4/relocation.vtex"
+      }
+    ],
+    "Methods": [
+      {
+        "Name": "BakeProbesUnavailableMessage",
+        "IsPublic": true,
+        "Return": "System.Void",
+        "Parameters": []
+      },
+      {
+        "Name": "BakeProbes",
+        "IsPublic": true,
+        "Return": "System.Threading.Tasks.Task",
+        "Parameters": [
+          {
+            "Name": "ct",
+            "Type": "System.Threading.CancellationToken"
+          }
+        ]
+      }
+    ]
+  },
+  "console": "No matching console output (2000 entries buffered). Cursor: 2964",
+  "scope": "Warehouse floor materials, dressing compile repair and v4 warehouse DDGI",
+  "performanceVerified": false
+}

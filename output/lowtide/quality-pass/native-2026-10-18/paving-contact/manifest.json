@@ -1,0 +1,632 @@
+{
+  "status": "native_review_pending",
+  "sources": {
+    "Assets/models/maps/lowtide/lowtide_east.obj": "ed5203baf8e8d612cf636e0f8f4beb1ba06a2cc5235f16cfa616a54f89ef2135",
+    "Assets/models/maps/lowtide/lowtide_west.obj": "031287a7e255db25ae84456ff4190983ebe1eb34e8c3fd1c1a5a8efdcae23cc1",
+    "Assets/models/maps/lowtide/lowtide_fleet.obj": "ba6f96464e80025b3508b50f3a236addf2355ab15f0f1cd2b10b1a108a2dc25e",
+    "Assets/models/maps/lowtide/lowtide_finish.obj": "b0065cb4cbbed1f8c64c68fc0adac7b98c019b9df52f6880433f17cbc6513f74",
+    "Assets/shaders/hc1_lowtide_paving_relief.shader": "478262f6dd4405c1a400a88030f92bbeb1748f375b95fbad737a056df23e0c20",
+    "Assets/materials/lowtide/lt_setts.vmat": "cf5c8d304b4df09f45408f3ca563e6c30b705b49bb518663e5a5fae45dd4624d",
+    "Sources/Lowtide/paving/edge-use.json": "4d799345a8fae4c5b04bab4a456d467e800d0ca34eb918014ce604501bea8cd7",
+    "Sources/Lowtide/paving/edge-use.hlsl": "b1fab62c85e79dde042b41112d9b6398c34d8edece1419eb3ada93058fd9bdcd",
+    "Assets/scenes/maps/Lowtide/lowtide.scene": "97de1e8f46850ba239022bf1a5b6a0c0e3afc9cceab85f47a3ac95e200a33834"
+  },
+  "staged_files": {
+    "shaders/hc1_lowtide_paving_use.shader": "cab899fef1769a72905f47b2e86627dc6486cac7e0cf673527f06d4ed63ef00d",
+    "shaders/hc1_lowtide_paving_use.shader.meta": "9e9799c6f453c0c581653e28584858fba7059a615d49513128697cddab6d180f",
+    "materials/lowtide/lt_setts.vmat": "8cf18cdce3aa63d156f7d4c2d42f7e3e98b4eb1acc91a9f665bf1a3c3781578e",
+    "materials/lowtide/paving-use/ground_use.png": "068378e27d739ca7ce735e59e659c0e6ee31214bc2cc32afb7f64e901a30f5e3",
+    "materials/lowtide/paving-use/ground_use.png.meta": "df503d416636c2f402ab58e64100b58b3b6fb5b0ddd28fca81704079a3d25f6b"
+  },
+  "live_before": {
+    "shaders/hc1_lowtide_paving_use.shader": null,
+    "shaders/hc1_lowtide_paving_use.shader.meta": null,
+    "materials/lowtide/lt_setts.vmat": "cf5c8d304b4df09f45408f3ca563e6c30b705b49bb518663e5a5fae45dd4624d",
+    "materials/lowtide/paving-use/ground_use.png": null,
+    "materials/lowtide/paving-use/ground_use.png.meta": null
+  },
+  "ground_triangles": 186,
+  "wall_segments": 1616,
+  "outlets": [
+    {
+      "index": 0,
+      "kind": "warehouse",
+      "position": [
+        -225.89102285427063,
+        -378.0,
+        -91.72452353390655
+      ],
+      "out": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "eligible_height": false,
+      "domain_samples": 0
+    },
+    {
+      "index": 1,
+      "kind": "warehouse",
+      "position": [
+        -225.89102285427063,
+        205.0,
+        -91.72452353390655
+      ],
+      "out": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "eligible_height": false,
+      "domain_samples": 0
+    },
+    {
+      "index": 2,
+      "kind": "warehouse",
+      "position": [
+        -225.89102285427063,
+        724.0,
+        -91.72452353390655
+      ],
+      "out": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "eligible_height": false,
+      "domain_samples": 0
+    },
+    {
+      "index": 3,
+      "kind": "warehouse",
+      "position": [
+        -225.89102285427063,
+        1126.0,
+        -91.72452353390655
+      ],
+      "out": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "eligible_height": false,
+      "domain_samples": 0
+    },
+    {
+      "index": 4,
+      "kind": "warehouse",
+      "position": [
+        -1014.1089771457293,
+        -372.0,
+        5.275476466093452
+      ],
+      "out": [
+        -1.0,
+        0.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 227
+    },
+    {
+      "index": 5,
+      "kind": "warehouse",
+      "position": [
+        -1014.1089771457293,
+        207.0,
+        5.275476466093452
+      ],
+      "out": [
+        -1.0,
+        0.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 237
+    },
+    {
+      "index": 6,
+      "kind": "warehouse",
+      "position": [
+        -1014.1089771457293,
+        727.0,
+        5.275476466093452
+      ],
+      "out": [
+        -1.0,
+        0.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 229
+    },
+    {
+      "index": 7,
+      "kind": "warehouse",
+      "position": [
+        -1014.1089771457293,
+        1126.0,
+        5.275476466093452
+      ],
+      "out": [
+        -1.0,
+        0.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 238
+    },
+    {
+      "index": 8,
+      "kind": "warehouse",
+      "position": [
+        -370.0,
+        -414.1089771457294,
+        5.275476466093452
+      ],
+      "out": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 0
+    },
+    {
+      "index": 9,
+      "kind": "warehouse",
+      "position": [
+        -870.0,
+        -414.1089771457294,
+        5.275476466093452
+      ],
+      "out": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 0
+    },
+    {
+      "index": 10,
+      "kind": "shed",
+      "position": [
+        -1314.0,
+        -1061.1089771457293,
+        5.275476466093452
+      ],
+      "out": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 231
+    },
+    {
+      "index": 11,
+      "kind": "shed",
+      "position": [
+        -1934.0,
+        -1061.1089771457293,
+        5.275476466093452
+      ],
+      "out": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 228
+    },
+    {
+      "index": 12,
+      "kind": "shed",
+      "position": [
+        -1314.0,
+        -588.8910228542707,
+        5.275476466093452
+      ],
+      "out": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 229
+    },
+    {
+      "index": 13,
+      "kind": "shed",
+      "position": [
+        -1934.0,
+        -588.8910228542707,
+        5.275476466093452
+      ],
+      "out": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 228
+    },
+    {
+      "index": 14,
+      "kind": "shed",
+      "position": [
+        -314.0,
+        -991.1089771457293,
+        5.275476466093452
+      ],
+      "out": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 0
+    },
+    {
+      "index": 15,
+      "kind": "shed",
+      "position": [
+        -604.0,
+        -991.1089771457293,
+        5.275476466093452
+      ],
+      "out": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 0
+    },
+    {
+      "index": 16,
+      "kind": "shed",
+      "position": [
+        -314.0,
+        -688.8910228542707,
+        5.275476466093452
+      ],
+      "out": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 0
+    },
+    {
+      "index": 17,
+      "kind": "shed",
+      "position": [
+        -604.0,
+        -688.8910228542707,
+        5.275476466093452
+      ],
+      "out": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 0
+    },
+    {
+      "index": 18,
+      "kind": "warehouse",
+      "position": [
+        225.89102285427063,
+        -378.0,
+        -91.72452353390655
+      ],
+      "out": [
+        -1.0,
+        0.0,
+        0.0
+      ],
+      "eligible_height": false,
+      "domain_samples": 0
+    },
+    {
+      "index": 19,
+      "kind": "warehouse",
+      "position": [
+        225.89102285427063,
+        205.0,
+        -91.72452353390655
+      ],
+      "out": [
+        -1.0,
+        0.0,
+        0.0
+      ],
+      "eligible_height": false,
+      "domain_samples": 0
+    },
+    {
+      "index": 20,
+      "kind": "warehouse",
+      "position": [
+        225.89102285427063,
+        724.0,
+        -91.72452353390655
+      ],
+      "out": [
+        -1.0,
+        0.0,
+        0.0
+      ],
+      "eligible_height": false,
+      "domain_samples": 0
+    },
+    {
+      "index": 21,
+      "kind": "warehouse",
+      "position": [
+        225.89102285427063,
+        1126.0,
+        -91.72452353390655
+      ],
+      "out": [
+        -1.0,
+        0.0,
+        0.0
+      ],
+      "eligible_height": false,
+      "domain_samples": 0
+    },
+    {
+      "index": 22,
+      "kind": "warehouse",
+      "position": [
+        1014.1089771457293,
+        -372.0,
+        5.275476466093452
+      ],
+      "out": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 230
+    },
+    {
+      "index": 23,
+      "kind": "warehouse",
+      "position": [
+        1014.1089771457293,
+        207.0,
+        5.275476466093452
+      ],
+      "out": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 238
+    },
+    {
+      "index": 24,
+      "kind": "warehouse",
+      "position": [
+        1014.1089771457293,
+        727.0,
+        5.275476466093452
+      ],
+      "out": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 232
+    },
+    {
+      "index": 25,
+      "kind": "warehouse",
+      "position": [
+        1014.1089771457293,
+        1126.0,
+        5.275476466093452
+      ],
+      "out": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 231
+    },
+    {
+      "index": 26,
+      "kind": "warehouse",
+      "position": [
+        370.0,
+        -414.1089771457294,
+        5.275476466093452
+      ],
+      "out": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 0
+    },
+    {
+      "index": 27,
+      "kind": "warehouse",
+      "position": [
+        870.0,
+        -414.1089771457294,
+        5.275476466093452
+      ],
+      "out": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 0
+    },
+    {
+      "index": 28,
+      "kind": "shed",
+      "position": [
+        1314.0,
+        -1061.1089771457293,
+        5.275476466093452
+      ],
+      "out": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 229
+    },
+    {
+      "index": 29,
+      "kind": "shed",
+      "position": [
+        1934.0,
+        -1061.1089771457293,
+        5.275476466093452
+      ],
+      "out": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 228
+    },
+    {
+      "index": 30,
+      "kind": "shed",
+      "position": [
+        1314.0,
+        -588.8910228542707,
+        5.275476466093452
+      ],
+      "out": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 230
+    },
+    {
+      "index": 31,
+      "kind": "shed",
+      "position": [
+        1934.0,
+        -588.8910228542707,
+        5.275476466093452
+      ],
+      "out": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 229
+    },
+    {
+      "index": 32,
+      "kind": "shed",
+      "position": [
+        314.0,
+        -991.1089771457293,
+        5.275476466093452
+      ],
+      "out": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 0
+    },
+    {
+      "index": 33,
+      "kind": "shed",
+      "position": [
+        604.0,
+        -991.1089771457293,
+        5.275476466093452
+      ],
+      "out": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 0
+    },
+    {
+      "index": 34,
+      "kind": "shed",
+      "position": [
+        314.0,
+        -688.8910228542707,
+        5.275476466093452
+      ],
+      "out": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 0
+    },
+    {
+      "index": 35,
+      "kind": "shed",
+      "position": [
+        604.0,
+        -688.8910228542707,
+        5.275476466093452
+      ],
+      "out": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "eligible_height": true,
+      "domain_samples": 0
+    }
+  ],
+  "drains_over_setts": 16,
+  "new_geometry": 0,
+  "new_material_slots": 0,
+  "extra_texture_lookups": 1,
+  "construction": "Sources/Lowtide/construction/recomposed-status.json",
+  "production_changed": false,
+  "settings": {
+    "revision": "paving-contact-use-v1",
+    "atlas_pixels": [
+      2048,
+      2048
+    ],
+    "bounds_plan_inches": [
+      -2800,
+      2800,
+      -1700,
+      1500
+    ],
+    "grit_decay_inches": 9.0,
+    "grit_cutoff_inches": 38.0,
+    "moisture_length_inches": 32.0,
+    "moisture_width_inches": 15.0,
+    "note": "Numerical surface-use data for existing granite only. Drain moisture is a static art layout, not a fluid simulation. Original generated colour/PBR maps and nine-millimetre relief remain intact."
+  }
+}

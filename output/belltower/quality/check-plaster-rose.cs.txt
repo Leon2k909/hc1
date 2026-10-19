@@ -1,0 +1,6 @@
+var path="materials/belltower/trials/plaster_rose.vmat";
+var asset=Editor.AssetSystem.FindByPath(path) ?? throw new InvalidOperationException("Trial material is not registered");
+var material=Material.Load(path);
+if(asset.IsCompileFailed || material is null || material.IsError)
+    throw new InvalidOperationException("The first trial material is invalid after compilation");
+return new {Path=path,asset.IsCompileFailed,material.IsError};

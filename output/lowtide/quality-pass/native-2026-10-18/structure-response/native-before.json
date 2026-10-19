@@ -1,0 +1,234 @@
+{
+  "TimeUtc": "2026-10-18T18:56:59.5115412Z",
+  "IsPlaying": true,
+  "ActiveScene": "scenes/maps/riverdale/riverdale.scene",
+  "HasUnsavedChanges": false,
+  "materials": [
+    {
+      "Path": "materials/lowtide/lt_timber.vmat",
+      "IsError": false,
+      "ShaderName": "shaders/complex.shader",
+      "Tint": "0.13,0.13,0.14,1",
+      "Features": [
+        {
+          "Name": "F_SPECULAR",
+          "Value": 1
+        },
+        {
+          "Name": "F_DIFFUSE_DIRECT",
+          "Value": 0
+        },
+        {
+          "Name": "F_DIFFUSE_INDIRECT",
+          "Value": 0
+        },
+        {
+          "Name": "F_FULLBRIGHT",
+          "Value": 0
+        },
+        {
+          "Name": "F_VERTEX_COLOR",
+          "Value": 0
+        },
+        {
+          "Name": "F_MODEL_TINT",
+          "Value": 0
+        }
+      ],
+      "Textures": [
+        {
+          "Name": "g_tColor",
+          "Path": null,
+          "Error": false,
+          "Width": 2048,
+          "Height": 2048
+        },
+        {
+          "Name": "g_tNormal",
+          "Path": null,
+          "Error": false,
+          "Width": 2048,
+          "Height": 2048
+        },
+        {
+          "Name": "g_tRoughness",
+          "Path": null,
+          "Error": null,
+          "Width": null,
+          "Height": null
+        },
+        {
+          "Name": "g_tAmbientOcclusion",
+          "Path": null,
+          "Error": false,
+          "Width": 2048,
+          "Height": 2048
+        }
+      ]
+    },
+    {
+      "Path": "materials/buildings/iron_black.vmat",
+      "IsError": false,
+      "ShaderName": "shaders/complex.shader",
+      "Tint": "1,1,1,1",
+      "Features": [
+        {
+          "Name": "F_SPECULAR",
+          "Value": 1
+        },
+        {
+          "Name": "F_DIFFUSE_DIRECT",
+          "Value": 0
+        },
+        {
+          "Name": "F_DIFFUSE_INDIRECT",
+          "Value": 0
+        },
+        {
+          "Name": "F_FULLBRIGHT",
+          "Value": 0
+        },
+        {
+          "Name": "F_VERTEX_COLOR",
+          "Value": 0
+        },
+        {
+          "Name": "F_MODEL_TINT",
+          "Value": 0
+        }
+      ],
+      "Textures": [
+        {
+          "Name": "g_tColor",
+          "Path": null,
+          "Error": false,
+          "Width": 256,
+          "Height": 256
+        },
+        {
+          "Name": "g_tNormal",
+          "Path": null,
+          "Error": false,
+          "Width": 256,
+          "Height": 256
+        },
+        {
+          "Name": "g_tRoughness",
+          "Path": null,
+          "Error": null,
+          "Width": null,
+          "Height": null
+        },
+        {
+          "Name": "g_tAmbientOcclusion",
+          "Path": null,
+          "Error": false,
+          "Width": 16,
+          "Height": 16
+        }
+      ]
+    },
+    {
+      "Path": "materials/railhead/rw_wood.vmat",
+      "IsError": false,
+      "ShaderName": "shaders/complex.shader",
+      "Tint": "1,1,1,1",
+      "Features": [
+        {
+          "Name": "F_SPECULAR",
+          "Value": 1
+        },
+        {
+          "Name": "F_DIFFUSE_DIRECT",
+          "Value": 0
+        },
+        {
+          "Name": "F_DIFFUSE_INDIRECT",
+          "Value": 0
+        },
+        {
+          "Name": "F_FULLBRIGHT",
+          "Value": 0
+        },
+        {
+          "Name": "F_VERTEX_COLOR",
+          "Value": 0
+        },
+        {
+          "Name": "F_MODEL_TINT",
+          "Value": 0
+        }
+      ],
+      "Textures": [
+        {
+          "Name": "g_tColor",
+          "Path": null,
+          "Error": false,
+          "Width": 2048,
+          "Height": 2048
+        },
+        {
+          "Name": "g_tNormal",
+          "Path": null,
+          "Error": false,
+          "Width": 2048,
+          "Height": 2048
+        },
+        {
+          "Name": "g_tRoughness",
+          "Path": null,
+          "Error": null,
+          "Width": null,
+          "Height": null
+        },
+        {
+          "Name": "g_tAmbientOcclusion",
+          "Path": null,
+          "Error": false,
+          "Width": 2048,
+          "Height": 2048
+        }
+      ]
+    }
+  ],
+  "bindings": [
+    {
+      "Name": "East",
+      "Slots": [
+        {
+          "Index": 4,
+          "ResourcePath": "materials/buildings/iron_black.vmat",
+          "ShaderName": "shaders/complex.shader",
+          "IsError": false,
+          "Override": null
+        },
+        {
+          "Index": 14,
+          "ResourcePath": "materials/lowtide/lt_timber.vmat",
+          "ShaderName": "shaders/complex.shader",
+          "IsError": false,
+          "Override": null
+        }
+      ]
+    },
+    {
+      "Name": "West",
+      "Slots": [
+        {
+          "Index": 3,
+          "ResourcePath": "materials/buildings/iron_black.vmat",
+          "ShaderName": "shaders/complex.shader",
+          "IsError": false,
+          "Override": null
+        },
+        {
+          "Index": 14,
+          "ResourcePath": "materials/lowtide/lt_timber.vmat",
+          "ShaderName": "shaders/complex.shader",
+          "IsError": false,
+          "Override": null
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "kind": "CPU material comparison and collision/use-mask diagrams",
+  "native_engine_capture": false,
+  "manifest_sha256": "958d30e29f904309918f79924ab526a086f111b6a01e9beaf38cdafd5b6b7c5a",
+  "renderer_sha256": "3c26bf3674a4c629854a87152866726b0937a11f74170b7bd1dcd3794bfb6ffc",
+  "shared_renderer_sha256": "5a2cdd39cd450db4505ac06d9bb54fce5d284cc57d149d33e7dca159eee29678",
+  "views": {
+    "receiving": {
+      "eye": [
+        0.6,
+        -2.8,
+        1.5
+      ],
+      "target": [
+        0,
+        1.2,
+        0
+      ],
+      "fov": 66,
+      "origin_plan": [
+        665,
+        -40
+      ]
+    },
+    "loading": {
+      "eye": [
+        0.5,
+        -3.1,
+        2.2
+      ],
+      "target": [
+        0,
+        1.3,
+        0
+      ],
+      "fov": 65,
+      "origin_plan": [
+        780,
+        800
+      ]
+    },
+    "grazing": {
+      "eye": [
+        -0.5,
+        -2.2,
+        0.5
+      ],
+      "target": [
+        0,
+        1.7,
+        0
+      ],
+      "fov": 63,
+      "origin_plan": [
+        655,
+        240
+      ]
+    }
+  },
+  "source_colour_pixels_preserved": true,
+  "geometry_changes": 0,
+  "limitations": [
+    "Isolated floor plane: cargo and architecture are absent from material previews",
+    "Native shader compilation, lightmaps, texture compression and temporal filtering are not tested",
+    "No measured performance or vehicle-route claim"
+  ],
+  "previews": {
+    "grazing-before.png": "09c6a380b0751fa204ccfa5843f4e82b26805515a4c111d645c60e3a60d1b57c",
+    "grazing-candidate.png": "ec292481fc5b57e6acd6e014044d2ba3afbbb6800d19ef6988053b8df4a38698",
+    "layout-+1.png": "601c7d9c174816ebfa0c211aa08fe3b2b935207570c1a4bc0cd1aca950a98f90",
+    "layout--1.png": "8b31ccc2deff5ba1cd47898b90b91ebf603aed6decfe1ffc6a75f679cd064fd1",
+    "loading-before.png": "20be1bf84cdd092e57cc7aa4922dd08143638aec6397c306a839d916d98b17d0",
+    "loading-candidate.png": "fb2bf83b72fd61814259fd142f6369b962ff234423e3f56bbc383257527430cb",
+    "receiving-before.png": "1bb18621fc18cd6c734a48f36fa0ba0e27daf7011b522e3f16053bed5c4e640a",
+    "receiving-candidate.png": "05162c436b2a606fe4d22c3a1c2029397fedaae8b894860bb455e42a66b9753f"
+  }
+}

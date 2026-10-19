@@ -1,0 +1,20 @@
+{
+  "process_id": 16792,
+  "stall_logged_local": "2026-10-14 23:28:11",
+  "player_active_local": "2026-10-14 23:35:03",
+  "diagnosis": "Main thread building multiplayer network file tables and CRC64 checksums. Disk read counters advanced throughout observation.",
+  "evidence": [
+    "editor-stall-16792.txt",
+    "GameInstanceDll-inspect.cs",
+    "LargeNetworkFiles-inspect.cs",
+    "network-asset-inventory.json"
+  ],
+  "recovery": "Operation completed without terminating or restarting the editor; native play_stop returned successfully.",
+  "native_editor_verified": {
+    "project_root": "D:\\Documents\\s&box projects\\hc1\\forked-shooter-main",
+    "last_compile_succeeded": true,
+    "last_compile_errors": 0,
+    "is_playing_after_stop": false
+  },
+  "source_changes_for_recovery": false
+}

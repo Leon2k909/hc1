@@ -17,6 +17,9 @@ parser.add_argument("--args-file", type=Path)
 parser.add_argument("--script", type=Path)
 parser.add_argument("--output-dir", type=Path)
 parser.add_argument("--timeout", type=int, default=30)
+parser.add_argument("--pid", type=int, help="Attach to a specific editor process when game clients are also running.")
+parser.add_argument("--cleanup-exchange", action="store_true", help="Record this connection and remove its copied script and empty exchange directory afterward.")
+parser.add_argument("--direct-call", action="store_true", help="Invoke the discovered tool directly through tools/call instead of the call_tool wrapper.")
 args = parser.parse_args()
 project = Path(__file__).resolve().parents[2]
 output_dir = args.output_dir or project / "output/knife-throw"
@@ -27,10 +30,13 @@ if not engine:
         engine = winreg.QueryValueEx(key, "FACEPUNCH_ENGINE")[0]
 messages = queue.Queue()
 request_id = 0
+exchange = None
 
 with tempfile.TemporaryFile(mode="w+t", encoding="utf-8") as errors:
     process = subprocess.Popen(
-        [str(Path(engine) / "bin/managed/sbox-cli.exe"), "--connect", "--request-timeout", str(args.timeout)],
+        [str(Path(engine) / "bin/managed/sbox-cli.exe"), "--connect"]
+        + ([str(args.pid)] if args.pid is not None else [])
+        + ["--request-timeout", str(args.timeout)],
         cwd=project, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=errors,
         text=True, encoding="utf-8", bufsize=1,
     )
@@ -62,7 +68,8 @@ with tempfile.TemporaryFile(mode="w+t", encoding="utf-8") as errors:
             return message["result"]
 
     def call(tool, arguments):
-        result = request("tools/call", {"name": "call_tool", "arguments": {"name": tool, "arguments": arguments}})
+        params = {"name": tool, "arguments": arguments} if args.direct_call else {"name": "call_tool", "arguments": {"name": tool, "arguments": arguments}}
+        result = request("tools/call", params)
         (output_dir / (tool + ".json")).write_text(json.dumps(result, ensure_ascii=False), encoding="utf-8")
         for item in result.get("content", []):
             if item["type"] == "text":
@@ -84,6 +91,14 @@ with tempfile.TemporaryFile(mode="w+t", encoding="utf-8") as errors:
     try:
         initialized = request("initialize", {"protocolVersion": "2025-11-25", "capabilities": {}, "clientInfo": {"name": "knife-throw-qa", "version": "1.0"}})
         exchange = initialized.get("_meta", {}).get("exchangeDirectory")
+        if args.cleanup_exchange:
+            (output_dir / "session.json").write_text(json.dumps(initialized, ensure_ascii=False), encoding="utf-8")
+        if args.pid is not None:
+            metadata = initialized.get("_meta", {})
+            if metadata.get("pid") != args.pid or metadata.get("kind") != "editor":
+                raise RuntimeError("The requested editor process did not match the native connection")
+            if Path(metadata.get("project", "")).resolve().parent != project:
+                raise RuntimeError("The connected editor is using a different project")
         process.stdin.write(json.dumps({"jsonrpc": "2.0", "method": "notifications/initialized"}) + "\n")
         process.stdin.flush()
         if args.find is not None:
@@ -106,3 +121,14 @@ with tempfile.TemporaryFile(mode="w+t", encoding="utf-8") as errors:
             process.wait(timeout=5)
         reader.join(timeout=2)
         process.stdout.close()
+        if args.cleanup_exchange and exchange:
+            target = Path(exchange).resolve()
+            temporary_root = (Path(tempfile.gettempdir()) / "sbox-cli").resolve()
+            assert target.parent == temporary_root and len(target.name) == 32 and all(c in "0123456789abcdef" for c in target.name), "Unexpected exchange path; retained for inspection."
+            if args.script and target.exists():
+                copied_script = target / args.script.name
+                assert copied_script.resolve().parent == target
+                copied_script.unlink(missing_ok=True)
+            if target.exists() and not any(target.iterdir()):
+                target.rmdir()
+            print(json.dumps({"ExchangeDirectory": str(target), "ExchangeRemoved": not target.exists()}), flush=True)

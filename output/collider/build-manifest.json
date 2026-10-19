@@ -1,0 +1,771 @@
+{
+  "map": "Collider",
+  "build": "native-v2",
+  "verification": {
+    "build": "native-v2",
+    "checked_at": "2026-10-15T17:03:00.841946+00:00",
+    "native_import_pending": false,
+    "native_lighting_verified": true,
+    "native_navigation_verified": true,
+    "native_local_tdm_verified": true,
+    "separate_client_multiplayer_verified": true,
+    "native_performance_profiled": true,
+    "scene_sha256": "b45ae8848a9d8581e87c4d2369ac4829d9f6afbc8956350dc1b8d2aed304b27c",
+    "native_checked_positions": 68,
+    "tdm_moving_bots": 8,
+    "tdm_connections": 1,
+    "lighting_textures": [
+      "lighting/collider/lighting-v4/irradiance.vtex",
+      "lighting/collider/lighting-v4/distance.vtex",
+      "lighting/collider/lighting-v4/relocation.vtex",
+      "lighting/collider/reflection_hall_v3.vtex",
+      "lighting/collider/reflection_beam_v3.vtex",
+      "lighting/collider/reflection_west_v3.vtex",
+      "lighting/collider/reflection_east_v3.vtex"
+    ],
+    "separate_client_connections": 2,
+    "geometry_note": "Current saved scene, all four stairs, native views and local TDM verified after the services and lighting pass.",
+    "source_sha256": {
+      "Tools/collider_detail_geometry.py": "e4a11788eaabecc2b43971a2a96a3aefa986e4434c1521a3cc920d8dbdf41f0a",
+      "Tools/collider_map.py": "6e8d8519ba9f3ab6ade603a1d3a096251da5306f8213b6573963d3c1fc8ed514",
+      "Tools/collider_materials.py": "f5423e53183818efbd8956bfafecbcd7b949c0613f2cd55b364ac49dfbdbb986",
+      "Tools/collider_package.py": "9a65f93c19602d3e9bed9e025ae900be438b8bbaa15dab68d53cff29f993fea4",
+      "Tools/collider_package_native.py": "938489f43a5b53ce1e9c0514014e21a9dd126a1f587ed9deb4df058df00e7aa0",
+      "Tools/collider_package_review.py": "a568f57d612914c10d85509e988364ea8bf45672a5dfceebcded820c19c97e8d",
+      "Tools/collider_preview.py": "1f666a56e3bdea43161bc6f45d5bfff082c164d535d33ea6ae3738244853577d",
+      "Tools/collider_preview_textured.py": "a2abca7f34755eb691704932bb3be68fa0bf5accefb1102e1c6e1363c8c18f90",
+      "Tools/collider_reflections.py": "d097024438ab2f8f92bb85b91a419f2f1617504a592383c9c08a4e3d4f189a3a",
+      "Tools/collider_services.py": "75d4ad09169f082a439d2eb54e77b93d64dffc9c4c7c0c7f513edb875e0cec0e",
+      "Tools/collider_validate.py": "855c28d609f23db4d1e4020f7505e46037a1a2380f3ae6499402f75913229970",
+      "Tools/collider_verify_network.py": "4bb41cb4ed92cd86cc341c78040cd17321025861fef9dba8ff47879554950d1e"
+    },
+    "remaining": []
+  },
+  "files": [
+    {
+      "path": "Assets/lighting/collider/lighting-v4/distance.vtex_c",
+      "size": 564548,
+      "sha256": "49832ac3bf294ceb58c4aca35fa4ad7f2e900c0e1c15aa4fbfed7a61ca254bba"
+    },
+    {
+      "path": "Assets/lighting/collider/lighting-v4/irradiance.vtex_c",
+      "size": 141188,
+      "sha256": "0018ded325b94852f7245d9359c6685366aa1e784431f8957b91e6060c4026ef"
+    },
+    {
+      "path": "Assets/lighting/collider/lighting-v4/relocation.vtex_c",
+      "size": 17708,
+      "sha256": "0dc45aece7fccc0fc807c5d2fbd8651f6048f13722e52afb2030babc5807d50f"
+    },
+    {
+      "path": "Assets/lighting/collider/reflection_beam_v3.vtex_c",
+      "size": 525260,
+      "sha256": "6384fdcae0dcb79136130e20a88c32e0c0be9b13dfd7cf9943211a44e8acf160"
+    },
+    {
+      "path": "Assets/lighting/collider/reflection_east_v3.vtex_c",
+      "size": 525260,
+      "sha256": "d8b8d1ff210a1515cc51b46b3691309291be75ab56ecb755b42f145a57848a7e"
+    },
+    {
+      "path": "Assets/lighting/collider/reflection_hall_v3.vtex_c",
+      "size": 525260,
+      "sha256": "59ee92cd471e26b866c7a2f189fd52e767a54665b2182f4dcaf901a23cbda2e6"
+    },
+    {
+      "path": "Assets/lighting/collider/reflection_west_v3.vtex_c",
+      "size": 525260,
+      "sha256": "ef1acc8cb3979d4b304081f05c74c60e8b64dab88cbbc849fcd4bb2f2baf68de"
+    },
+    {
+      "path": "Assets/materials/collider/co_amber.vmat",
+      "size": 477,
+      "sha256": "e11b3a478f17284be78d52668a82ab37d2685f01fd5d66e4f1a1953a5c1b3bdd"
+    },
+    {
+      "path": "Assets/materials/collider/co_beam.vmat",
+      "size": 672,
+      "sha256": "336effb000d9ae91cf4dc1e4db61224ead80af77b39ad18a3266a2df46755ddc"
+    },
+    {
+      "path": "Assets/materials/collider/co_case.vmat",
+      "size": 495,
+      "sha256": "f386444ea60e82d490e70a7df1542e799fc7722e92611db134dd5350ad029833"
+    },
+    {
+      "path": "Assets/materials/collider/co_case_color.png",
+      "size": 914560,
+      "sha256": "4034de4369cb357a3dbcaefde442d7bf39180d69fa954ceee429c39c04394700"
+    },
+    {
+      "path": "Assets/materials/collider/co_case_normal.png",
+      "size": 1379629,
+      "sha256": "d54597e6d6cbcf904702e7fda8badce111a3e2bf39d78f082cc28031c971fc48"
+    },
+    {
+      "path": "Assets/materials/collider/co_case_rough.png",
+      "size": 653187,
+      "sha256": "854b8d85a078f8a85a2b6af8f2f8c775ef78e55b168fd2aa46df3108b0c2ae8f"
+    },
+    {
+      "path": "Assets/materials/collider/co_concrete.vmat",
+      "size": 507,
+      "sha256": "66dd7b1f9b268884f565c487a24cb6ead0da66df162c24d2262de80134512558"
+    },
+    {
+      "path": "Assets/materials/collider/co_concrete_color.jpg",
+      "size": 284866,
+      "sha256": "45f43c19eb90e894bf87b33ba4c6c69efaafad2cd8887c912d66a940eadfe00c"
+    },
+    {
+      "path": "Assets/materials/collider/co_concrete_normal.png",
+      "size": 1399491,
+      "sha256": "77ddc819077a7301a00edab0d5c88b769cc74d489ecfbbd65d27be25c24b5a43"
+    },
+    {
+      "path": "Assets/materials/collider/co_concrete_rough.png",
+      "size": 665768,
+      "sha256": "958ce657f5d0319bd734514cc313723e0f286273704f1ed899d314cd8dd0b23e"
+    },
+    {
+      "path": "Assets/materials/collider/co_floor.vmat",
+      "size": 498,
+      "sha256": "8666747e5dc4bd0c419efacf2bf271bd39119281fa7039477cb82a737a13bb52"
+    },
+    {
+      "path": "Assets/materials/collider/co_floor_color.jpg",
+      "size": 220630,
+      "sha256": "ae967ccb04fbc880d3f2184300092af013768de0311ce8264522de903c7d2192"
+    },
+    {
+      "path": "Assets/materials/collider/co_floor_normal.png",
+      "size": 1370656,
+      "sha256": "5bc4d1d7f610d002ca761a800119805bf7adaede98b9b2fd35671a3809b87bae"
+    },
+    {
+      "path": "Assets/materials/collider/co_floor_rough.png",
+      "size": 613280,
+      "sha256": "4d3c77fe10b9b0be25aab7896b4cde727334bd2a4513fd71f41ab4fbc1b3f5ae"
+    },
+    {
+      "path": "Assets/materials/collider/co_glass.vmat",
+      "size": 764,
+      "sha256": "821bcb8a90bdfd4dfe13ec9da4b50c003a470a92677602e2c1925e2e1c5c6db8"
+    },
+    {
+      "path": "Assets/materials/collider/co_grating.vmat",
+      "size": 664,
+      "sha256": "3a5e287a10276c03efe74f6b23fcfab292d28eec5c7dfc2bcb8ab75b5a62f849"
+    },
+    {
+      "path": "Assets/materials/collider/co_grating_color.png",
+      "size": 427088,
+      "sha256": "8c0640bccf5b20bb147ed1b0939f760587eae0763f340f1fa9dc916d6f3a1464"
+    },
+    {
+      "path": "Assets/materials/collider/co_grating_normal.png",
+      "size": 11010,
+      "sha256": "020a9dc05f2d12213cc325d157b904e5134a3288ef77dafea02d4a31c24da066"
+    },
+    {
+      "path": "Assets/materials/collider/co_grating_rough.png",
+      "size": 95357,
+      "sha256": "1d3c98cab09b50fe1a5eba79c323f04b5ee12000d2f14c514ff7282127676792"
+    },
+    {
+      "path": "Assets/materials/collider/co_grating_trans.png",
+      "size": 3447,
+      "sha256": "cd94b5555c7a69d3b1a6e854b4ae355c871f105eee06ea4f10aa7a6c784c8191"
+    },
+    {
+      "path": "Assets/materials/collider/co_markings.vmat",
+      "size": 638,
+      "sha256": "0f63271d36b9b1af9c066abe68619d2a9cd4177e27f0a1ce3d66e60b76bebda7"
+    },
+    {
+      "path": "Assets/materials/collider/co_markings_alpha.png",
+      "size": 292825,
+      "sha256": "54f6a47c0e019d367727db866255dd5bbdf99adc491fd259ef86bfeb2b70188d"
+    },
+    {
+      "path": "Assets/materials/collider/co_red.vmat",
+      "size": 673,
+      "sha256": "a1f29d2023a59fdb6465f0141b84148e4d909842ac294f6e31fd234d7087999d"
+    },
+    {
+      "path": "Assets/materials/collider/co_rubber.vmat",
+      "size": 479,
+      "sha256": "43edad43ab05c8ddff3813bb94bfa3651b51904c82a28bb9a85c9f48492fb13e"
+    },
+    {
+      "path": "Assets/materials/collider/co_screens.vmat",
+      "size": 694,
+      "sha256": "6ae86a2c0cc79cdb153542c9a6545c6385de54ff2e2cebe74441c2ddb03946ae"
+    },
+    {
+      "path": "Assets/materials/collider/co_screens_color.png",
+      "size": 81690,
+      "sha256": "3a94d17311ef9698b8ccc7fe04cd42db8d1c154d3fb5a55affb2b19e436c0575"
+    },
+    {
+      "path": "Assets/materials/collider/co_signs.vmat",
+      "size": 496,
+      "sha256": "637e5f3a1472094786d9f74574ef0b41ca07be36e6de2223417d4615611fd4de"
+    },
+    {
+      "path": "Assets/materials/collider/co_signs_color.png",
+      "size": 726936,
+      "sha256": "90374cf8d20feb1ee53f65e4182a30712a9912d28a777a9c76b7a11e1b4c46d0"
+    },
+    {
+      "path": "Assets/materials/collider/co_silver.vmat",
+      "size": 476,
+      "sha256": "b432ad8520c333db0010267da8d9896cd1bb43d90e3d3bc2d1eda197547549f2"
+    },
+    {
+      "path": "Assets/materials/collider/co_steel.vmat",
+      "size": 498,
+      "sha256": "8c85d54db233a9b1927166ac65db777c9199e02af09c85cfd65bdc26b0c42310"
+    },
+    {
+      "path": "Assets/materials/collider/co_steel_color.jpg",
+      "size": 274827,
+      "sha256": "dc4fa67c4b4f1fc746a3d05a397fa1be15cd0a218ef37a59a37d05fda504a7a5"
+    },
+    {
+      "path": "Assets/materials/collider/co_steel_normal.png",
+      "size": 1636027,
+      "sha256": "de260ebaa8493930cb33affe95375041292c8858437cdb267183104ed1816fb2"
+    },
+    {
+      "path": "Assets/materials/collider/co_steel_rough.png",
+      "size": 622106,
+      "sha256": "d2ee8b39ad7babf97f097b337ffcb9cc7e018873cc639aeaa63f95ea3d568208"
+    },
+    {
+      "path": "Assets/materials/collider/co_trim.vmat",
+      "size": 477,
+      "sha256": "3de8e88b00121baea7a7bc9b118dfb1ba2cbc51bf5da3f9ed8d4629bc648b7a8"
+    },
+    {
+      "path": "Assets/materials/collider/co_wall.vmat",
+      "size": 495,
+      "sha256": "eeea9576bf9076a34016bf6d4f63b31ac2d80dcf81ca78fc949128d7f71478ed"
+    },
+    {
+      "path": "Assets/materials/collider/co_wall_color.jpg",
+      "size": 124620,
+      "sha256": "210958d56a23c51bf666106039d23fcadb00f7aa90230378110a5debdca0f743"
+    },
+    {
+      "path": "Assets/materials/collider/co_wall_normal.png",
+      "size": 1278254,
+      "sha256": "2ec3eb019b425fdc239f9bacb2038aa1cbe3d72344f21d970104528246351a06"
+    },
+    {
+      "path": "Assets/materials/collider/co_wall_rough.png",
+      "size": 704606,
+      "sha256": "b0637455ff424e9620b3ad594329b888fefe0dd67790eab204b644950d50646b"
+    },
+    {
+      "path": "Assets/materials/collider/co_white.vmat",
+      "size": 673,
+      "sha256": "bf9d1a7b33566a689562a7f8da4852421099afcdf411afb0187f70cadefb30b8"
+    },
+    {
+      "path": "Assets/materials/collider/reflections/reflection_Beam.exr",
+      "size": 1953623,
+      "sha256": "e2c20d88200aebd64d7e0bd8ecd7a986d25ab17839994d688df9f2b0b00cdad5"
+    },
+    {
+      "path": "Assets/materials/collider/reflections/reflection_Beam.vmat",
+      "size": 202,
+      "sha256": "6986ef026340fb6145b8152be93f97ea49fb1700c68ddb79828359229a323e07"
+    },
+    {
+      "path": "Assets/materials/collider/reflections/reflection_East.exr",
+      "size": 1569036,
+      "sha256": "6314c09b3467b289b26859bc13b9c02a5c86b18f9166ededf8902b9f9c300f6e"
+    },
+    {
+      "path": "Assets/materials/collider/reflections/reflection_East.vmat",
+      "size": 202,
+      "sha256": "64d9b8c65efe4c0a68ee8953d70961cd2247fe99afa5dcb5c1a90ad071991b53"
+    },
+    {
+      "path": "Assets/materials/collider/reflections/reflection_Hall.exr",
+      "size": 1904165,
+      "sha256": "06c1693183cbb90f8df692afab3e3ad1c64f3664dcc3ecc772f2298518bb7b34"
+    },
+    {
+      "path": "Assets/materials/collider/reflections/reflection_Hall.vmat",
+      "size": 202,
+      "sha256": "f6c93e58be0dd285454e5bd95f8c4f9aeb37be745decf68b3d1360b7b032d158"
+    },
+    {
+      "path": "Assets/materials/collider/reflections/reflection_West.exr",
+      "size": 1646867,
+      "sha256": "dd98bdb68fb161fd8657321e5f494e26eedc0e31022cf6f7e2231169daf2d3d4"
+    },
+    {
+      "path": "Assets/materials/collider/reflections/reflection_West.vmat",
+      "size": 202,
+      "sha256": "e7e84cd6f26b33f09e114f4d9dfdd609d68eef9c41beb7f1fc52c08c88a5f5d2"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_detail.mtl",
+      "size": 354,
+      "sha256": "4e9fba2794343db51f99b004c90a3533d88b7be1dd8f6c0e52bddf6ffd285fcc"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_detail.obj",
+      "size": 23233434,
+      "sha256": "14b303198df6b8a8a6dc41ad167b387a951e2447d6ee13e6350fb3e903378e0f"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_detail.obj.meta",
+      "size": 54,
+      "sha256": "4d8a8db805a8bf7a912b798161dcd66a5318e131f67a98d868c25c0132b49f8b"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_detail.vmdl",
+      "size": 12508,
+      "sha256": "ae60c68b92df8555e15f84306a7428f32085edd5bbda85a4468152b3f5d69064"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_detail.vmdl.meta",
+      "size": 54,
+      "sha256": "4ea86baadca71aa91806003c2fd53a669594faa1afc64b13be5c73d27f4bd804"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_glass.mtl",
+      "size": 29,
+      "sha256": "74d7a3e4c50e513c887cba15c4592f6289c7e90f1dc3559a3e08fefd92199a74"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_glass.obj",
+      "size": 11589,
+      "sha256": "77235fbd65d44896b218263bb5ab6e6e8f389babbc8792b90482d1636fdf85ba"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_glass.obj.meta",
+      "size": 54,
+      "sha256": "f8586fd0f6e16d1c0e118047fec6160dfbd12e10802168d4eac97bcfa7509723"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_glass.vmdl",
+      "size": 1119,
+      "sha256": "b924e5913e91ea00382a0477397a440ae86d86dbeb7edca9703d5bde1bc30ef3"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_glass.vmdl.meta",
+      "size": 54,
+      "sha256": "28ffa716064a5eebc69016435b155f2f5f6ba32075463776dfeeffad1fce57b3"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_machine.mtl",
+      "size": 381,
+      "sha256": "1cd3baef308ac8955ac264e98fb44dcdc55ef81afdd613e9610ec933d88b6885"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_machine.obj",
+      "size": 31281973,
+      "sha256": "04622188a4d89ecec76bc9a410f3aeac630868ab3f10890446c7eb97449b9d9e"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_machine.obj.meta",
+      "size": 54,
+      "sha256": "dc232e7d69819d3fd54d2ad6c4bef63d6e71f10583f590fea65be214d7b2ad6d"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_machine.vmdl",
+      "size": 2027,
+      "sha256": "2c5144bf86db04d1b3a5cf28baf2026651dba2708f6bb816f4b763463b88dd6a"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_machine.vmdl.meta",
+      "size": 54,
+      "sha256": "b0ee290725c6c936cbc1c9b4a38ddbfb576bdcad276c95c8a720277fda25bf6c"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_structure.mtl",
+      "size": 438,
+      "sha256": "498ef9ca9fa73d531d0f86c1b26f5a4b6d0224e825eb9c5a3fe8787ee5215831"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_structure.obj",
+      "size": 12284947,
+      "sha256": "eb32986e811c94423d60b8a9b008ab39581e4faf704d81d861a21b127414372e"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_structure.obj.meta",
+      "size": 54,
+      "sha256": "32e732604d02c07c73a06c368cec7f8ed85f91c18265a22fe26b681e3d7d5ca9"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_structure.vmdl",
+      "size": 40977,
+      "sha256": "9be39f52fd2bad5a2508a40d08a400c6ce7fcccbad82849a9cc09ac8cc79f523"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_structure.vmdl.meta",
+      "size": 54,
+      "sha256": "f665db530e661439ac8de460a5f33bf369049c276a095b3689009ace318791c5"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_structure_hulls_metal.obj",
+      "size": 1428,
+      "sha256": "25ce86ff752cc120dfa1ca88a432d3c347d9332660fd10f09d2381501caece96"
+    },
+    {
+      "path": "Assets/models/maps/collider/collider_structure_hulls_metal.obj.meta",
+      "size": 54,
+      "sha256": "a49b10bf2c16114f3d2a0014ec933f1ad869cf1564ddae21b53ff073f332fca5"
+    },
+    {
+      "path": "Assets/scenes/maps/Collider/collider.scene",
+      "size": 291527,
+      "sha256": "b45ae8848a9d8581e87c4d2369ac4829d9f6afbc8956350dc1b8d2aed304b27c"
+    },
+    {
+      "path": "Assets/ui/maps/collider.png",
+      "size": 1858648,
+      "sha256": "17a824774e4d5ebc03830338eefb875f6702077d6730fc7d36f6cb0289f3e02a"
+    },
+    {
+      "path": "Assets/ui/minimaps/minimap_collider.png",
+      "size": 6619,
+      "sha256": "b829ead1e27c329b27643e9be04cf10d528d725a1a226239016a79a9ce3d6f91"
+    },
+    {
+      "path": "Sources/Collider/editor/adopt-completed-bake.cs.txt",
+      "size": 2796,
+      "sha256": "d5bfbee13558ab5a8ef00dbeeaed32418d9e4c7c4788192710b8b2050edfeff0"
+    },
+    {
+      "path": "Sources/Collider/editor/apply-reflections.cs.txt",
+      "size": 2330,
+      "sha256": "984625ef7750a63cdf2443be4eac0383c4a93f880cdd358ca46ad552aac815e0"
+    },
+    {
+      "path": "Sources/Collider/editor/apply-reviewed-lighting.cs.txt",
+      "size": 1423,
+      "sha256": "e9e1255dc0f6e3f8bf83291047ac6f3ca2aac07cd067e4b7b32ba3c554b2d17a"
+    },
+    {
+      "path": "Sources/Collider/editor/bake-lighting.cs.txt",
+      "size": 13239,
+      "sha256": "aa15c9fd0db72045e3babf3eb28f8478727bece590adbbb2562739856810db2e"
+    },
+    {
+      "path": "Sources/Collider/editor/capture-config.json",
+      "size": 1686,
+      "sha256": "f3c2d299f40c731c275f15610850415cbeddd2d57b1cb7f9299735355f0aea95"
+    },
+    {
+      "path": "Sources/Collider/editor/capture-reflections.cs.txt",
+      "size": 4570,
+      "sha256": "dea9482dca6b40a5d46fbf72672bc231a541a5e45a05507175dc558df5ba1d4a"
+    },
+    {
+      "path": "Sources/Collider/editor/capture-services-config.json",
+      "size": 1686,
+      "sha256": "f3c2d299f40c731c275f15610850415cbeddd2d57b1cb7f9299735355f0aea95"
+    },
+    {
+      "path": "Sources/Collider/editor/capture.cs.txt",
+      "size": 6824,
+      "sha256": "7c6bdd071eeeeb209437139fc9b0ff41bfb079b781c0f499a82b75a664068e14"
+    },
+    {
+      "path": "Sources/Collider/editor/check-live-round.cs.txt",
+      "size": 2142,
+      "sha256": "42776577ddcbabfbe0c359a1f32e57f3aab6d736f90ee50fdae578abc690d5da"
+    },
+    {
+      "path": "Sources/Collider/editor/check-network.cs.txt",
+      "size": 3577,
+      "sha256": "f91c36c5daab56c69e809389996b5e3a068f78547173803698c8c1ba8be9f675"
+    },
+    {
+      "path": "Sources/Collider/editor/export-reviewed.cs.txt",
+      "size": 3263,
+      "sha256": "b434950833a12f1eb1adb0194f32a999b354ae41bdc1297dba42af05e5c0a61e"
+    },
+    {
+      "path": "Sources/Collider/editor/import-build.cs.txt",
+      "size": 2856,
+      "sha256": "381b5735136b76cb1968c5cdec12bd71ddf95452f6d7c612de01b67186cf5be5"
+    },
+    {
+      "path": "Sources/Collider/editor/import-services.cs.txt",
+      "size": 4323,
+      "sha256": "8384ba237fe61cdd584201cb652bfa540239c005d3043d44eb87877837819b4d"
+    },
+    {
+      "path": "Sources/Collider/editor/import-visual-assets.cs.txt",
+      "size": 1492,
+      "sha256": "56da7b4f1cfb54299d951c901e95a3fdcf3587a20153daadb80b82b0ad1b9ecd"
+    },
+    {
+      "path": "Sources/Collider/editor/prepare-live-round.cs.txt",
+      "size": 1091,
+      "sha256": "31cc143c715497d84794f906d8743c376e387c8aa7802cb7bd14758e0a847337"
+    },
+    {
+      "path": "Sources/Collider/editor/prepare-network-test.cs.txt",
+      "size": 2190,
+      "sha256": "3104201ed4b36ac4335516773584ac8fc8886ee1b2bc9e22a61c0227b64f2b27"
+    },
+    {
+      "path": "Sources/Collider/editor/refine-lighting.cs.txt",
+      "size": 988,
+      "sha256": "9c0a640b08735bb7dd39fe0a903f5f9935b4986b96c011897c58b3c65d42e611"
+    },
+    {
+      "path": "Sources/Collider/editor/restore-network-settings.cs.txt",
+      "size": 1955,
+      "sha256": "7ace185d0b10152cd5799568319da337f78e3e7cd490021622938866673d5b06"
+    },
+    {
+      "path": "Sources/Collider/editor/restore-test-settings.cs.txt",
+      "size": 852,
+      "sha256": "275b2b1bc77f3d68290106b6f52a750ce7cd30d66108ecd6f1ddee4dfe98daaf"
+    },
+    {
+      "path": "Sources/Collider/editor/review-lighting-options.cs.txt",
+      "size": 4544,
+      "sha256": "db39cfc669de99b896f6ef1e893ef0e394c4cea27f926b87e0df40ccbde8790f"
+    },
+    {
+      "path": "Sources/Collider/editor/validate-map.cs.txt",
+      "size": 3478,
+      "sha256": "1c275d63e50866e92c656ef7ddc82c91222c1977e095fd8602cc1aac3b6aa8fc"
+    },
+    {
+      "path": "Sources/Collider/editor/validate-stairs.cs.txt",
+      "size": 2457,
+      "sha256": "f4fc37d522c883a5f670e7d3c8d27e8361b27b540a93dde7d1427e2a80ea8c0d"
+    },
+    {
+      "path": "Sources/Collider/lighting/bake-result.json",
+      "size": 522,
+      "sha256": "1536fe80ec4d59beba43025bf1a1242efd89f7a265a107013949d603ceb3dbca"
+    },
+    {
+      "path": "Sources/Collider/lighting/indirect-light.json",
+      "size": 1242,
+      "sha256": "3ee722e3d8ff11fded1bc04754f646af1021cd5040dbd708b762a7991a8e1fe3"
+    },
+    {
+      "path": "Sources/Collider/lighting/reflections.json",
+      "size": 3922,
+      "sha256": "ecf3464374ee15020574064c138ef5ad03f3f74e6fb1d3dd9863e9f3c3e2bbbc"
+    },
+    {
+      "path": "Sources/Collider/preview.py",
+      "size": 543,
+      "sha256": "bdbb182a6e103677b5c165d5efc7eb41dd92b035eeae693cbfda13a972a5d32e"
+    },
+    {
+      "path": "Sources/Collider/review-notes.txt",
+      "size": 2554,
+      "sha256": "dae47a1feabb58c93be0416d668b376f0575366e0f84dfca2feddc34dc32e1c3"
+    },
+    {
+      "path": "Sources/Collider/verify-services.py",
+      "size": 6899,
+      "sha256": "38119775913bc14be8dcd448385622cc7d371de18f210aa180a863c2f87b1035"
+    },
+    {
+      "path": "Tools/collider_detail_geometry.py",
+      "size": 6257,
+      "sha256": "e4a11788eaabecc2b43971a2a96a3aefa986e4434c1521a3cc920d8dbdf41f0a"
+    },
+    {
+      "path": "Tools/collider_map.py",
+      "size": 38005,
+      "sha256": "6e8d8519ba9f3ab6ade603a1d3a096251da5306f8213b6573963d3c1fc8ed514"
+    },
+    {
+      "path": "Tools/collider_materials.py",
+      "size": 11646,
+      "sha256": "f5423e53183818efbd8956bfafecbcd7b949c0613f2cd55b364ac49dfbdbb986"
+    },
+    {
+      "path": "Tools/collider_package.py",
+      "size": 4809,
+      "sha256": "9a65f93c19602d3e9bed9e025ae900be438b8bbaa15dab68d53cff29f993fea4"
+    },
+    {
+      "path": "Tools/collider_package_native.py",
+      "size": 9672,
+      "sha256": "938489f43a5b53ce1e9c0514014e21a9dd126a1f587ed9deb4df058df00e7aa0"
+    },
+    {
+      "path": "Tools/collider_package_review.py",
+      "size": 8438,
+      "sha256": "a568f57d612914c10d85509e988364ea8bf45672a5dfceebcded820c19c97e8d"
+    },
+    {
+      "path": "Tools/collider_preview.py",
+      "size": 1753,
+      "sha256": "1f666a56e3bdea43161bc6f45d5bfff082c164d535d33ea6ae3738244853577d"
+    },
+    {
+      "path": "Tools/collider_preview_textured.py",
+      "size": 8386,
+      "sha256": "a2abca7f34755eb691704932bb3be68fa0bf5accefb1102e1c6e1363c8c18f90"
+    },
+    {
+      "path": "Tools/collider_reflections.py",
+      "size": 1635,
+      "sha256": "d097024438ab2f8f92bb85b91a419f2f1617504a592383c9c08a4e3d4f189a3a"
+    },
+    {
+      "path": "Tools/collider_services.py",
+      "size": 7102,
+      "sha256": "75d4ad09169f082a439d2eb54e77b93d64dffc9c4c7c0c7f513edb875e0cec0e"
+    },
+    {
+      "path": "Tools/collider_validate.py",
+      "size": 5789,
+      "sha256": "855c28d609f23db4d1e4020f7505e46037a1a2380f3ae6499402f75913229970"
+    },
+    {
+      "path": "Tools/collider_verify_network.py",
+      "size": 4469,
+      "sha256": "4bb41cb4ed92cd86cc341c78040cd17321025861fef9dba8ff47879554950d1e"
+    },
+    {
+      "path": "output/collider/captures/art.png",
+      "size": 1858648,
+      "sha256": "17a824774e4d5ebc03830338eefb875f6702077d6730fc7d36f6cb0289f3e02a"
+    },
+    {
+      "path": "output/collider/captures/capture-report.json",
+      "size": 1932,
+      "sha256": "db9f172400ac8e117c9431981ab803763e2f77beebb5e45902d835240f6e1a7e"
+    },
+    {
+      "path": "output/collider/captures/cases.png",
+      "size": 1721659,
+      "sha256": "88fa4f7a3bc96157da7b32cb2e02dd7866a3d57e672cc587be82f54c8d662c21"
+    },
+    {
+      "path": "output/collider/captures/ceiling-services.png",
+      "size": 1854997,
+      "sha256": "3b75ce841848013741adc50a165d65dacc284a74b5ad97e2920658748871e964"
+    },
+    {
+      "path": "output/collider/captures/control.png",
+      "size": 1110091,
+      "sha256": "eb06cf9e30503174506c2b5349d1e68fa33da4ef58d5e127213c03e2a1839733"
+    },
+    {
+      "path": "output/collider/captures/floor.png",
+      "size": 1827827,
+      "sha256": "9e79241b26e453bb7294e950e4db03c0f1972ca12878473f0d6e7c0a16385230"
+    },
+    {
+      "path": "output/collider/captures/live-client.png",
+      "size": 1567925,
+      "sha256": "17b03aeba69b919decf67648d44646108e0273fd6266cd92f157234e4b4015af"
+    },
+    {
+      "path": "output/collider/captures/live-tdm.png",
+      "size": 1847027,
+      "sha256": "eade97974ab1b42012bacc7d8497e1e2c0f0b74f92c5a0f616a757c1a2b04e9e"
+    },
+    {
+      "path": "output/collider/captures/observation.png",
+      "size": 1599479,
+      "sha256": "b8a79ad9258a3071a50475f2443166a3245ea9b4ab1fe090132da2f5b2cb6bb8"
+    },
+    {
+      "path": "output/collider/captures/service-windows.png",
+      "size": 1558698,
+      "sha256": "4cbe24c7d9b13d077f6dd4f0ca452699c99947ac38239741004deb436eb5855d"
+    },
+    {
+      "path": "output/collider/captures/stair.png",
+      "size": 1643608,
+      "sha256": "9f0e6d75c89d4825344546f237ab351d2241bc875e84352b53e47d20049b6669"
+    },
+    {
+      "path": "output/collider/check-points.json",
+      "size": 7184,
+      "sha256": "44e10ddef6c02ed0095302b1625fe2232ddfa27191257c4ce84fa8fb845b95ce"
+    },
+    {
+      "path": "output/collider/layout-validation.json",
+      "size": 248,
+      "sha256": "879a16320bd4be8bce45aaabf6de94b189087c966e9306def8b32dd306a75ec8"
+    },
+    {
+      "path": "output/collider/lighting-review.json",
+      "size": 409,
+      "sha256": "9b24f7db14d5f71abd27bc1975a74e859bfdb4800b7128b68b8ae598482121f7"
+    },
+    {
+      "path": "output/collider/live-round-validation.json",
+      "size": 2225,
+      "sha256": "6339e02677977c194f9b41b7837b3532fd393c86d9f95f3ae568e36df30d33fb"
+    },
+    {
+      "path": "output/collider/native-build-status.json",
+      "size": 2369,
+      "sha256": "775aa2df49420532433169758c28659978116f59fb72e611213d42cc567fbe18"
+    },
+    {
+      "path": "output/collider/native-validation.json",
+      "size": 20339,
+      "sha256": "525a2a67400f43ad8306616af26ab25dc555a3e828d723e71a371c0609b0ecca"
+    },
+    {
+      "path": "output/collider/network-validation.json",
+      "size": 6844,
+      "sha256": "2639856ae09fafee275fea11841e04b19c596a44094ec87d25051d3b64ede57d"
+    },
+    {
+      "path": "output/collider/network/client-after.json",
+      "size": 2355,
+      "sha256": "26a5be5d6794685ace91480645d04fad1e20c9afcc2cfda7f6f75bc26c1c5b86"
+    },
+    {
+      "path": "output/collider/network/client-before.json",
+      "size": 2367,
+      "sha256": "ff18db74070574bbc5e6dd539178933f826d005fc67459bef27047fe24248777"
+    },
+    {
+      "path": "output/collider/network/host-after.json",
+      "size": 2409,
+      "sha256": "ec59508ea2994e048f03faff6160a91fd6235eb7d775cb481a21c81b03041987"
+    },
+    {
+      "path": "output/collider/network/host-before.json",
+      "size": 2418,
+      "sha256": "4b8dc56da532868bb4b55cbe752de6d6051db59775d60727c1f4f500ff71f2c2"
+    },
+    {
+      "path": "output/collider/performance-validation.json",
+      "size": 23774,
+      "sha256": "77510811c68a4374f116bbca744b696b234f2fc6b37b828bef061ad9a7ff4128"
+    },
+    {
+      "path": "output/collider/reflections/validation.json",
+      "size": 513,
+      "sha256": "b878d4b11e6af45ed7bee3f51212ba8935498ff2aa7a562d3db2026e043ca36d"
+    },
+    {
+      "path": "output/collider/scene-validation.json",
+      "size": 5198,
+      "sha256": "16cc868b1f90af5b2a3ea022afdba3e3c7e27d661fcd002dc90915ae24e59ef9"
+    },
+    {
+      "path": "output/collider/stair-validation.json",
+      "size": 1460,
+      "sha256": "847fc3884fd30a30757746d2fec8f4acdcb369347c5d251ebc896d2a6d02357f"
+    }
+  ]
+}
