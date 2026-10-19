@@ -1,0 +1,338 @@
+{
+  "date": "2026-10-18",
+  "project": "C:\\sbox-projects\\hc1\\forked-shooter-main",
+  "scene": "Assets\\scenes\\maps\\spillway\\spillway.scene",
+  "scene_sha256": "c6faa140223bc1b4a5820a17e727689b0cff389fc76605c91974b81159b3dba9",
+  "status": "art_pass_saved_and_validated",
+  "navigation": {
+    "positions": 86,
+    "failures": 0,
+    "stairs": [
+      {
+        "Name": "Control west stair",
+        "Status": "Complete",
+        "Length": 621.54724,
+        "Direct": true
+      },
+      {
+        "Name": "Control east stair",
+        "Status": "Complete",
+        "Length": 621.54724,
+        "Direct": true
+      },
+      {
+        "Name": "B2 west stair",
+        "Status": "Complete",
+        "Length": 391.515,
+        "Direct": true
+      },
+      {
+        "Name": "B2 north stair",
+        "Status": "Complete",
+        "Length": 410.46802,
+        "Direct": true
+      }
+    ]
+  },
+  "water_motion": {
+    "Method": "Normalized cross-correlation of consecutive native camera images; image Y increases downward",
+    "Frames": 16,
+    "Matches": [
+      {
+        "DownwardPixels": 78,
+        "Correlation": 0.8927
+      },
+      {
+        "DownwardPixels": 76,
+        "Correlation": 0.8827
+      },
+      {
+        "DownwardPixels": 74,
+        "Correlation": 0.7437
+      },
+      {
+        "DownwardPixels": 72,
+        "Correlation": 0.7256
+      },
+      {
+        "DownwardPixels": 69,
+        "Correlation": 0.7519
+      },
+      {
+        "DownwardPixels": 70,
+        "Correlation": 0.6846
+      },
+      {
+        "DownwardPixels": 65,
+        "Correlation": 0.7124
+      },
+      {
+        "DownwardPixels": 68,
+        "Correlation": 0.8506
+      },
+      {
+        "DownwardPixels": 77,
+        "Correlation": 0.9074
+      },
+      {
+        "DownwardPixels": 77,
+        "Correlation": 0.8843
+      },
+      {
+        "DownwardPixels": 81,
+        "Correlation": 0.8681
+      },
+      {
+        "DownwardPixels": 76,
+        "Correlation": 0.7501
+      },
+      {
+        "DownwardPixels": 68,
+        "Correlation": 0.6894
+      },
+      {
+        "DownwardPixels": 72,
+        "Correlation": 0.7991
+      },
+      {
+        "DownwardPixels": 82,
+        "Correlation": 0.7737
+      }
+    ],
+    "MedianDownwardPixels": 74.0,
+    "Passed": true
+  },
+  "lighting": {
+    "revision": "lighting-v4",
+    "passes": 2,
+    "active_probes": 2647,
+    "total_probes": 3000,
+    "game_preserved": true,
+    "canvas_colour_finished_after_bake": true
+  },
+  "reflections": [
+    {
+      "Name": "Probe Yard",
+      "Path": "lighting/spillway/reflection_0_v3.vtex",
+      "Width": 256,
+      "Height": 256
+    },
+    {
+      "Name": "Probe Turbine",
+      "Path": "lighting/spillway/reflection_1_v3.vtex",
+      "Width": 256,
+      "Height": 256
+    },
+    {
+      "Name": "Probe Control lower",
+      "Path": "lighting/spillway/reflection_2_v3.vtex",
+      "Width": 256,
+      "Height": 256
+    },
+    {
+      "Name": "Probe Control upper",
+      "Path": "lighting/spillway/reflection_3_v3.vtex",
+      "Width": 256,
+      "Height": 256
+    },
+    {
+      "Name": "Probe Pump room",
+      "Path": "lighting/spillway/reflection_4_v3.vtex",
+      "Width": 256,
+      "Height": 256
+    }
+  ],
+  "captures": {
+    "Captures": [
+      {
+        "Name": "reference",
+        "At": "2026-10-18T16:44:21.0119771Z",
+        "Position": "-3100,-1100,700",
+        "Tone": "ACES",
+        "EnablePostProcessing": true,
+        "Minimum": 1,
+        "Maximum": 1
+      },
+      {
+        "Name": "art",
+        "At": "2026-10-18T16:44:22.8898617Z",
+        "Position": "-2700,-650,660",
+        "Tone": "ACES",
+        "EnablePostProcessing": true,
+        "Minimum": 1,
+        "Maximum": 1
+      },
+      {
+        "Name": "cargo",
+        "At": "2026-10-18T16:44:24.7196894Z",
+        "Position": "-1020,420,70",
+        "Tone": "ACES",
+        "EnablePostProcessing": true,
+        "Minimum": 1,
+        "Maximum": 1
+      },
+      {
+        "Name": "water",
+        "At": "2026-10-18T16:44:26.6278596Z",
+        "Position": "-1750,1000,140",
+        "Tone": "ACES",
+        "EnablePostProcessing": true,
+        "Minimum": 1,
+        "Maximum": 1
+      },
+      {
+        "Name": "west-bank",
+        "At": "2026-10-18T16:44:28.4713424Z",
+        "Position": "-2450,2000,680",
+        "Tone": "ACES",
+        "EnablePostProcessing": true,
+        "Minimum": 1,
+        "Maximum": 1
+      },
+      {
+        "Name": "hero",
+        "At": "2026-10-18T16:44:30.2760346Z",
+        "Position": "-2450,1250,560",
+        "Tone": "ACES",
+        "EnablePostProcessing": true,
+        "Minimum": 1,
+        "Maximum": 1
+      },
+      {
+        "Name": "b2",
+        "At": "2026-10-18T16:44:32.1523867Z",
+        "Position": "-1560,-1410,245",
+        "Tone": "ACES",
+        "EnablePostProcessing": true,
+        "Minimum": 1,
+        "Maximum": 1
+      }
+    ],
+    "GamePreserved": true,
+    "DirtyPreserved": true,
+    "AuthoredObjectsPreserved": true,
+    "TemporaryCameraRemoved": true,
+    "CamerasRestored": true
+  },
+  "integration": {
+    "Scene": "scenes/maps/spillway/spillway.scene",
+    "CheckedAt": "2026-10-18T16:46:38.8525247Z",
+    "Ready": true,
+    "Listed": true,
+    "Title": "Spillway",
+    "Image": "ui/maps/spillway.png",
+    "Thumbnail": true,
+    "Minimap": true,
+    "ModelCount": 11,
+    "MissingModels": [],
+    "MissingMaterials": [],
+    "IsPlaying": true,
+    "ActiveScene": "ares"
+  },
+  "native_compile": {
+    "date": "2026-10-18",
+    "engine": "26.10.13a",
+    "is_building": false,
+    "compilers": [
+      {
+        "name": "local.menu",
+        "success": true,
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "toolbase",
+        "success": true,
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "local.shadergraph",
+        "success": true,
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "local.actiongraph",
+        "success": true,
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "local.moviemaker",
+        "success": true,
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "local.hammer",
+        "success": true,
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "local.dooeditor",
+        "success": true,
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "facepunch.bettersounds",
+        "success": true,
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "facepunch.jigglebones",
+        "success": true,
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "facepunch.libevents",
+        "success": true,
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "facepunch.singletons",
+        "success": true,
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "sboxshare.sboxshare.editor",
+        "success": true,
+        "errors": 0,
+        "warnings": 1
+      },
+      {
+        "name": "sboxskinsgg.claudebridge",
+        "success": true,
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "name": "sboxskinsgg.claudebridge.editor",
+        "success": true,
+        "errors": 0,
+        "warnings": 9
+      },
+      {
+        "name": "verarp.razedtest",
+        "success": true,
+        "errors": 0,
+        "warnings": 68
+      },
+      {
+        "name": "verarp.razedtest.editor",
+        "success": true,
+        "errors": 0,
+        "warnings": 4
+      }
+    ]
+  },
+  "triangles": 348952,
+  "separate_client_test": "not run",
+  "live_round": "The existing play session moved to another map; it was preserved. Previous local bot check remains dated 2026-10-15."
+}

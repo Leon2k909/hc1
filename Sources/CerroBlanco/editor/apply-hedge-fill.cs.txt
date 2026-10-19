@@ -1,0 +1,31 @@
+if (Game.IsPlaying) throw new InvalidOperationException("Stop play before updating hedge foliage.");
+var session=Editor.SceneEditorSession.Active;
+var scene=session?.Scene;
+if (scene?.Source?.ResourcePath?.Equals("scenes/maps/cerroblanco/cerroblanco.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Open Cerro Blanco before updating foliage.");
+var root=Sandbox.Project.Current.GetRootPath();
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/cerroblanco/geometry-manifest.json")));
+var parent=scene.GetAllObjects(true).FirstOrDefault(g=>g.Name=="Cerro Blanco construction details");
+if(parent is null)throw new InvalidOperationException("Missing Cerro Blanco quality detail parent");
+var source=manifest["garden_hedges"].AsArray().Concat(manifest["hedge_fill"].AsArray()).ToArray();
+var names=source.Select(entry=>entry["name"].GetValue<string>()).ToHashSet();
+int created=0, updated=0;
+foreach(var entry in source)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var path=entry["model"].GetValue<string>();
+    var model=Model.Load(path);
+    if(model is null||model.IsError)throw new InvalidOperationException("Hedge asset unavailable: "+path);
+    var name=entry["name"].GetValue<string>();
+    var go=parent.Children.FirstOrDefault(g=>g.Name==name);
+    if(go is null){go=new GameObject(parent){Name=name};created++;}else updated++;
+    go.NetworkMode=NetworkMode.Snapshot;
+    go.Tags.Add("navskip");
+    go.WorldPosition=Vector3.Parse(entry["position"].GetValue<string>());
+    go.WorldRotation=Rotation.FromYaw(entry["yaw"].GetValue<float>());
+    go.LocalScale=Vector3.Parse(entry["scale"].GetValue<string>());
+    go.Components.GetOrCreate<ModelRenderer>().Model=model;
+}
+foreach(var obsolete in parent.Children.Where(g=>(g.Name.StartsWith("Garden hedge fill ")||g.Name.StartsWith("Linear hedge fill "))&&!names.Contains(g.Name)).ToArray())obsolete.Destroy();
+typeof(Editor.SceneEditorSession).GetProperty("HasUnsavedChanges").SetValue(session,true);
+return new { Created=created, Updated=updated, Total=source.Length, Scene=scene.Source.ResourcePath, session.HasUnsavedChanges };

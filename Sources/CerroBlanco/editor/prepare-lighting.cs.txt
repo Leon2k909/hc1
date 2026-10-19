@@ -1,0 +1,45 @@
+if(Game.IsPlaying) throw new InvalidOperationException("Stop play before preparing Cerro Blanco lighting.");
+var session=Editor.SceneEditorSession.Active;
+var scene=session?.Scene;
+if(scene?.Source?.ResourcePath?.Equals("scenes/maps/cerroblanco/cerroblanco.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Cerro Blanco must own the editor window.");
+var root=Sandbox.Project.Current.GetRootPath();
+var config=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Sources/CerroBlanco/lighting/config.json")));
+var output=System.IO.Path.Combine(root,"output/cerroblanco/lighting");
+System.IO.Directory.CreateDirectory(output);
+var originalsPath=System.IO.Path.Combine(root,"Sources/CerroBlanco/lighting/original-lights.json");
+if(!System.IO.File.Exists(originalsPath))throw new InvalidOperationException("The retained baseline light values are missing.");
+var originals=System.Text.Json.JsonSerializer.Deserialize<System.Collections.Generic.Dictionary<string,string>>(System.IO.File.ReadAllText(originalsPath));
+foreach(var light in scene.GetAllComponents<PointLight>())
+    if(originals.TryGetValue(light.GameObject.Name,out var color))
+    {
+        var original=Color.Parse(color)??Color.White;
+        var scale=config["interior_fill_scale"].GetValue<float>();
+        light.LightColor=new Color(original.r*scale,original.g*scale,original.b*scale,original.a);
+    }
+var sun=scene.GetAllComponents<DirectionalLight>().Single();
+sun.LightColor=Color.Parse(config["sun_color"].GetValue<string>())??Color.White;
+sun.SkyColor=Color.Parse(config["sky_color"].GetValue<string>())??Color.White;
+var existing=scene.GetAllComponents<IndirectLightVolume>().ToArray();
+if(existing.Any(p=>p.GameObject.Name!="Museum indirect light")) throw new InvalidOperationException("Unexpected existing indirect-light volume.");
+var go=scene.GetAllObjects(true).FirstOrDefault(g=>g.Name=="Museum indirect light");
+if(go is null)go=new GameObject(scene){Name="Museum indirect light"};
+go.WorldPosition=Vector3.Zero;
+var indirect=go.Components.GetOrCreate<IndirectLightVolume>();
+indirect.Bounds=new BBox(Vector3.Parse(config["bounds_min"].GetValue<string>()),Vector3.Parse(config["bounds_max"].GetValue<string>()));
+indirect.ProbeDensity=config["probe_density"].GetValue<int>();
+indirect.RuntimeIntensity=config["runtime_intensity"].GetValue<float>();
+indirect.RuntimeContrast=1;
+indirect.RuntimeSaturation=1;
+indirect.ViewBias=config["view_bias"].GetValue<float>();
+indirect.NormalBias=config["normal_bias"].GetValue<float>();
+indirect.BlendDistance=120;
+var inside=typeof(IndirectLightVolume).GetProperty("InsideGeometry");
+inside.SetValue(indirect,Enum.Parse(inside.PropertyType,"Relocate"));
+if(indirect.ProbeCounts.x*indirect.ProbeCounts.y*indirect.ProbeCounts.z>7000)throw new InvalidOperationException("Lighting grid exceeded its planned cost.");
+foreach(var probe in scene.GetAllComponents<EnvmapProbe>())
+    if(probe.Mode.ToString()!="CustomTexture")throw new InvalidOperationException("Reflections must remain static before a lighting bake.");
+typeof(Editor.SceneEditorSession).GetProperty("HasUnsavedChanges").SetValue(session,true);
+var report=new {Grid=indirect.ProbeCounts.ToString(),Total=indirect.ProbeCounts.x*indirect.ProbeCounts.y*indirect.ProbeCounts.z,indirect.RuntimeIntensity,Sun=sun.LightColor.ToString(),Sky=sun.SkyColor.ToString(),FillScale=config["interior_fill_scale"].GetValue<float>()};
+System.IO.File.WriteAllText(System.IO.Path.Combine(output,"prepared.json"),System.Text.Json.JsonSerializer.Serialize(report));
+return report;

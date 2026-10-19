@@ -1,0 +1,45 @@
+// Read existing camera state only. Do not initialize, select or render a camera.
+var root=Sandbox.Project.Current.GetRootPath();
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var previous=Editor.SceneEditorSession.Active;
+var gameId=Game.ActiveScene?.Id;
+var playing=Game.IsPlaying;
+var session=Editor.SceneEditorSession.All.SingleOrDefault(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase)==true);
+if(session is null)
+    return new {
+        ScenePresent=false, ActiveDocument=previous?.Scene.Source?.ResourcePath, Playing=playing,
+        OpenDocuments=Editor.SceneEditorSession.All.Select(s=>s.Scene.Source?.ResourcePath).ToArray(),
+        GamePreserved=Game.ActiveScene?.Id==gameId && Game.IsPlaying==playing,
+        SelectedDocumentPreserved=ReferenceEquals(previous,Editor.SceneEditorSession.Active)
+    };
+var scene=session.Scene;
+object ReadCamera(CameraComponent camera)
+{
+    if(!camera.IsValid()) return null;
+    var native=typeof(CameraComponent).GetField("sceneCamera",flags).GetValue(camera);
+    var tone=native?.GetType().GetProperty("Tonemap",flags)?.GetValue(native);
+    object ToneValue(string property) => tone?.GetType().GetProperty(property,flags)?.GetValue(tone);
+    var system=tone?.GetType().GetField("System",flags)?.GetValue(tone);
+    return new {
+        camera.Id, Name=camera.GameObject.Name, camera.Enabled,
+        EditorCamera=typeof(CameraComponent).GetField("IsSceneEditorCamera",flags)?.GetValue(camera),
+        camera.EnablePostProcessing,
+        Requested=new{camera.AutoExposure.Enabled,camera.AutoExposure.MinimumExposure,camera.AutoExposure.MaximumExposure,camera.AutoExposure.Compensation,camera.AutoExposure.Rate},
+        Native=tone is null ? null : new {
+            Enabled=ToneValue("Enabled"),MinimumExposure=ToneValue("MinExposure"),MaximumExposure=ToneValue("MaxExposure"),
+            Compensation=ToneValue("ExposureCompensation"),Rate=ToneValue("Rate"),
+            SystemValid=system?.GetType().GetProperty("IsValid",flags)?.GetValue(system)
+        }
+    };
+}
+var result=new {
+    ScenePresent=true,
+    Scene=scene.Source.ResourcePath, ActiveDocument=previous?.Scene.Source?.ResourcePath, Playing=playing,
+    MainCamera=ReadCamera(scene.Camera),
+    Cameras=scene.GetAllComponents<CameraComponent>().Select(ReadCamera).ToArray(),
+    GamePreserved=Game.ActiveScene?.Id==gameId && Game.IsPlaying==playing,
+    SelectedDocumentPreserved=ReferenceEquals(previous,Editor.SceneEditorSession.Active)
+};
+var output=System.IO.Path.Combine(root,"output/belltower/quality/capture-camera-state.json");
+System.IO.File.WriteAllText(output,System.Text.Json.JsonSerializer.Serialize(result));
+return result;

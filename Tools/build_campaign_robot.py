@@ -26,7 +26,7 @@ import numpy as np
 from mathutils import Vector, Matrix
 from mathutils.bvhtree import BVHTree
 
-SCRIPT = Path(globals().get("__file__") or r"D:\Documents\s&box projects\hc1\forked-shooter-main\Tools\build_campaign_robot.py").resolve()
+SCRIPT = Path(globals().get("__file__") or r"C:\sbox-projects\hc1\forked-shooter-main\Tools\build_campaign_robot.py").resolve()
 ROOT = SCRIPT.parents[1]
 SKELETON_FBX = ROOT / "Assets/models/player/ct_side/ct_side_player_01/ct_side_player_01_V2.fbx"
 OUT = ROOT / "Assets/models/campaign/robot"

@@ -1,0 +1,39 @@
+var session=Editor.SceneEditorSession.Active;
+var scene=session?.Scene;
+if(scene?.Source?.ResourcePath?.Equals("scenes/maps/cerroblanco/cerroblanco.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Cerro Blanco must be active for validation.");
+if(scene.NavMesh.IsGenerating)return new {WaitingForNavMesh=true};
+var names=new[]{"TeamSpawnPoint","ObjectiveSpot","CashPoint","ExtractionPoint"};
+var requested=scene.GetAllObjects(true).SelectMany(g=>g.Components.GetAll()).Where(c=>names.Contains(c.GetType().Name)).ToArray();
+var anchor=scene.NavMesh.GetClosestPoint(requested.First(c=>c.GetType().Name=="TeamSpawnPoint").WorldPosition,48);
+var checks=requested.Select(component=>
+{
+    // Extraction marker centers are deliberately 32 inches above their floor.
+    var p=component.WorldPosition-(component.GetType().Name=="ExtractionPoint"?Vector3.Up*32:Vector3.Zero);
+    var floor=scene.Trace.Ray(p+Vector3.Up*8,p+Vector3.Down*32).WithoutTags("zone").Run();
+    var head=scene.Trace.Box(new BBox(new Vector3(-16,-16,2),new Vector3(16,16,64)),p,p).WithoutTags("zone").Run();
+    var snap=scene.NavMesh.GetClosestPoint(p,48);
+    var status="MissingNavMesh";var count=0;var endError=float.MaxValue;
+    if(anchor is not null&&snap is not null)
+    {
+        var path=scene.NavMesh.CalculatePath(new Sandbox.Navigation.CalculatePathRequest{Start=anchor.Value,Target=snap.Value});
+        status=path.Status.ToString();count=path.Points?.Count()??0;
+        if(count>0)endError=(path.Points.Last().Position-snap.Value).Length;
+    }
+    return new {Name=component.GameObject.Name,Type=component.GetType().Name,Position=p.ToString(),Floor=floor.Hit,
+        Clear=!head.Hit&&!head.StartedSolid,BlockingObject=head.GameObject?.Name,Snapped=snap?.ToString(),
+        SnapDistance=snap is null?float.MaxValue:(snap.Value-p).Length,PathStatus=status,Waypoints=count,EndError=endError};
+}).ToArray();
+var models=scene.GetAllComponents<ModelRenderer>().ToArray();
+var materials=models.SelectMany(r=>Enumerable.Range(0,r.Materials.Count).Select(i=>r.Materials.GetOverride(i)??r.Materials.GetOriginal(i))).Distinct().ToArray();
+var result=new {Scene=scene.Source.ResourcePath,Checked=checks.Length,
+    MissingModels=models.Where(r=>r.Model is null||r.Model.IsError).Select(r=>r.GameObject.Name).ToArray(),
+    MissingMaterials=materials.Where(m=>m is null||m.IsError).Select(m=>m?.ResourcePath??"null").ToArray(),
+    Failed=checks.Where(c=>!c.Floor||!c.Clear||c.PathStatus!="Complete"||c.EndError>4).ToArray(),Checks=checks,
+    NavEnabled=scene.NavMesh.IsEnabled,scene.NavMesh.IsGenerating,scene.NavMesh.AgentRadius,scene.NavMesh.AgentHeight,scene.NavMesh.AgentStepSize,
+    Modes=Facepunch.GameMode.GetAll((SceneFile)scene.Source).Select(m=>m.Ident).ToArray(),
+    ReflectionModes=scene.GetAllComponents<EnvmapProbe>().Select(p=>new {p.GameObject.Name,Mode=p.Mode.ToString(),Texture=p.Texture?.ResourcePath}).ToArray(),
+    Indirect=scene.GetAllComponents<IndirectLightVolume>().Select(p=>new {p.BakeVersion,Irradiance=p.IrradianceTexture?.ResourcePath,Distance=p.DistanceTexture?.ResourcePath,Relocation=p.RelocationTexture?.ResourcePath}).ToArray()};
+var pathOut=System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/cerroblanco/native-validation.json");
+System.IO.File.WriteAllText(pathOut,System.Text.Json.JsonSerializer.Serialize(result,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return new {result.Checked,result.MissingModels,result.MissingMaterials,result.Failed,result.NavEnabled,result.IsGenerating,result.Modes};

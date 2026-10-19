@@ -25,10 +25,14 @@ SIDES = 48
 LIGHT_HEIGHT = 130.0
 LIGHT_COLOR = "3.4,2.30,1.25,1"
 LIGHT_RADIUS = 330.0
+# Move the bridge-end assemblies inwards to keep the lantern roof clear of
+# the adjoining brick warehouses. The posts and matching lights follow.
+BRIDGE_END_INSET = 8.0
 
 
 def placements():
-    return [(e, n, 58.0) for e in (-240.0, 240.0) for n in (1159.0, 1441.0)]
+    return [(e, n, 58.0) for e in (-240.0, 240.0)
+            for n in (1159.0 + BRIDGE_END_INSET, 1441.0 - BRIDGE_END_INSET)]
 
 
 def lights():

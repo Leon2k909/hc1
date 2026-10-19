@@ -1,0 +1,298 @@
+{
+  "revision": "forest-coverage-v1",
+  "status": "Native shader compiled and four fixed-exposure still comparisons reviewed; installed assets remain unreferenced.",
+  "hypothesis": "The generic alpha-mip boost expands whole-crown atlas coverage at coarse levels. Reducing that boost may improve distant coverage without moving the accepted distance fade. This is an unproven native appearance hypothesis.",
+  "stage_manifest": "output/belltower/quality/forest-coverage-v1/manifest.json",
+  "stage_manifest_sha256": "652b16e196dd678fa74dabeb5af4ea69166ed35754ea1973a016a4f68179aae1",
+  "source_checks": {
+    "passed": true,
+    "manifest_sha256": "652b16e196dd678fa74dabeb5af4ea69166ed35754ea1973a016a4f68179aae1",
+    "checker_sha256": "4382d7173e5e0000f4ce682ace9abc358b0aac19aa0cfceb2fd130aa234b6562",
+    "accepted_shader_roundtrip_exact": true,
+    "accepted_material_properties_preserved": true,
+    "strength_one_uses_accepted_path": true,
+    "mip_zero_unchanged": true,
+    "extra_texture_samples": 0,
+    "source_pixels_changed": false,
+    "scope": "Source and arithmetic checks only. Native compilation and still comparisons are recorded separately.",
+    "native_verified": false
+  },
+  "native_atlas": {
+    "Material": "materials/belltower/forest/forest_trees.vmat",
+    "ShaderName": "shaders/belltower_forest.shader",
+    "TextureWidth": 1254,
+    "TextureHeight": 1254,
+    "TextureMipCount": 9,
+    "EditorPid": 9580,
+    "CurrentScene": "collider",
+    "GamePreserved": true,
+    "SelectedDocumentPreserved": true,
+    "AssetsWritten": 0
+  },
+  "projection_scope": "Analytical projection at card centres, without terrain or building occlusion. Counts are not native visible-tree counts. Source atlas dimensions and rounded saved camera angles are used.",
+  "projection_views": [
+    {
+      "view": "west-ridge",
+      "projected_width_pixels": {
+        "p05": 2.0407530059920713,
+        "p25": 3.145591779190219,
+        "p50": 4.387757119620085,
+        "p75": 7.1792276069695475,
+        "p95": 14.446326555242358
+      },
+      "source_atlas_lod": {
+        "p05": 5.422505200821962,
+        "p25": 6.424230472860364,
+        "p50": 7.113746089132874,
+        "p75": 7.5931036850626565,
+        "p95": 8.227777940892773
+      },
+      "fraction_width_below_4px": 0.4376592688690173,
+      "fraction_at_or_beyond_last_native_mip": 0.09587406755316684,
+      "tested_22k_boundary": {
+        "count": 4200,
+        "projected_width_pixels": {
+          "p05": 6.357412144562941,
+          "p25": 7.862200121688479,
+          "p50": 9.302351944535086,
+          "p75": 11.078509939342451,
+          "p95": 15.011763077192898
+        },
+        "source_atlas_lod": {
+          "p05": 5.402705661893419,
+          "p25": 5.776703644202568,
+          "p50": 6.030245368750419,
+          "p75": 6.272070112103311,
+          "p95": 6.590211755193187
+        }
+      }
+    },
+    {
+      "view": "west-ridge-detail",
+      "projected_width_pixels": {
+        "p05": 4.878250792472749,
+        "p25": 7.556042768274353,
+        "p50": 10.041499625191715,
+        "p75": 17.10958347156841,
+        "p95": 32.04217463919206
+      },
+      "source_atlas_lod": {
+        "p05": 4.224583850132341,
+        "p25": 5.136573089192959,
+        "p50": 5.888416982330321,
+        "p75": 6.326146270103845,
+        "p95": 6.9660602493239665
+      },
+      "fraction_width_below_4px": 0.014122327200397812,
+      "fraction_at_or_beyond_last_native_mip": 0.0,
+      "tested_22k_boundary": {
+        "count": 1884,
+        "projected_width_pixels": {
+          "p05": 15.853466312566185,
+          "p25": 19.584234585076093,
+          "p50": 22.283628480383985,
+          "p75": 25.6482918557571,
+          "p95": 28.984199796752193
+        },
+        "source_atlas_lod": {
+          "p05": 4.323823384111641,
+          "p25": 4.539764155120776,
+          "p50": 4.739340189975465,
+          "p75": 4.967056386357974,
+          "p95": 5.26717485119565
+        }
+      }
+    },
+    {
+      "view": "valley",
+      "projected_width_pixels": {
+        "p05": 2.077925456848019,
+        "p25": 2.5643047329223227,
+        "p50": 3.069907303296951,
+        "p75": 3.9424762488053675,
+        "p95": 10.7950028805237
+      },
+      "source_atlas_lod": {
+        "p05": 5.877204094189556,
+        "p25": 7.256513435087832,
+        "p50": 7.59570260325373,
+        "p75": 7.8525241738911635,
+        "p95": 8.165576751515124
+      },
+      "fraction_width_below_4px": 0.7600289716703156,
+      "fraction_at_or_beyond_last_native_mip": 0.13404335873841544,
+      "tested_22k_boundary": {
+        "count": 695,
+        "projected_width_pixels": {
+          "p05": 5.9112659965063425,
+          "p25": 7.15638744096443,
+          "p50": 8.250485734611422,
+          "p75": 9.157481021172451,
+          "p95": 11.315162260285
+        },
+        "source_atlas_lod": {
+          "p05": 5.834464136642813,
+          "p25": 6.067876644474195,
+          "p50": 6.24405965830908,
+          "p75": 6.426575282365491,
+          "p95": 6.71200076168653
+        }
+      }
+    },
+    {
+      "view": "terrace",
+      "projected_width_pixels": {
+        "p05": 1.7299106631821128,
+        "p25": 2.733231167826025,
+        "p50": 3.9108402585167146,
+        "p75": 6.751624784576874,
+        "p95": 18.612791398134075
+      },
+      "source_atlas_lod": {
+        "p05": 5.030792039651949,
+        "p25": 6.50174521456477,
+        "p50": 7.276014647878442,
+        "p75": 7.801971205228819,
+        "p95": 8.465454558560069
+      },
+      "fraction_width_below_4px": 0.5151802804189166,
+      "fraction_at_or_beyond_last_native_mip": 0.17277975755123637,
+      "tested_22k_boundary": {
+        "count": 1658,
+        "projected_width_pixels": {
+          "p05": 6.402835613298735,
+          "p25": 7.7656061093921664,
+          "p50": 8.745994306408187,
+          "p75": 10.367639394646394,
+          "p95": 15.803784972944438
+        },
+        "source_atlas_lod": {
+          "p05": 5.330925272729268,
+          "p25": 5.867668057904451,
+          "p50": 6.096636105721836,
+          "p75": 6.310559004388681,
+          "p95": 6.5799615487498535
+        }
+      }
+    }
+  ],
+  "source_alpha_proxy_scope": "Source linear-alpha box-mip proxy, not native BC7, MSAA or rasterization.",
+  "source_alpha_proxy_level_7": {
+    "level": 7,
+    "dimensions": [
+      9,
+      9
+    ],
+    "variants": [
+      {
+        "variant": 0,
+        "alpha_mean": 0.4714798331260681,
+        "coverage": {
+          "0": 0.56,
+          "0.5": 0.68,
+          "1": 0.8
+        }
+      },
+      {
+        "variant": 1,
+        "alpha_mean": 0.47847384214401245,
+        "coverage": {
+          "0": 0.55,
+          "0.5": 0.7,
+          "1": 0.8
+        }
+      },
+      {
+        "variant": 2,
+        "alpha_mean": 0.46201449632644653,
+        "coverage": {
+          "0": 0.56,
+          "0.5": 0.72,
+          "1": 0.8
+        }
+      },
+      {
+        "variant": 3,
+        "alpha_mean": 0.6002055406570435,
+        "coverage": {
+          "0": 0.6,
+          "0.5": 0.8,
+          "1": 0.9
+        }
+      }
+    ]
+  },
+  "controls": {
+    "strength_1": "Accepted alpha path; must match a fresh accepted-material native baseline.",
+    "strength_half": "Half of the engine mip boost.",
+    "strength_0": "Cancel the engine mip boost; mip-zero alpha remains unchanged."
+  },
+  "geometry_changed": false,
+  "texture_inputs_changed": false,
+  "lighting_normals_fog_and_distance_fade_changed": false,
+  "extra_texture_samples": 0,
+  "accepted_assets_changed": false,
+  "native_assets_installed": [
+    "shaders/belltower_forest_coverage_trial.shader",
+    "materials/belltower/forest/trials/forest_coverage_v1.vmat"
+  ],
+  "native_verified": false,
+  "capture_helper": "Sources/Belltower/editor/capture-viewport.cs.txt",
+  "capture_helper_sha256": "613d00218c3d9039e7fe46d7fa17cbe054322799e30de024e37158d37c1fff96",
+  "import_helper": "Sources/Belltower/editor/import-forest-coverage-trial.cs.txt",
+  "import_helper_sha256": "bce164cb40d85dd569081e45d986792d7027e8b61768455301c9738cd2a501c1",
+  "static_compile_proof": "output/belltower/quality/forest-coverage-v1/helper-static-compile.json",
+  "native_sequence": [
+    "Completed: verified canonical checkout, compile state and the existing saved Belltower editor document while Orion play continued.",
+    "Completed: imported two private assets and verified native shader and material compilation; saved scene unchanged.",
+    "Discarded adaptive-exposure comparisons after the strength-one control changed sky brightness.",
+    "Completed: fixed ACES exposure 2 baselines and strengths one, one-half and zero in valley, west-ridge, west-ridge-detail and terrace. All four strength-one controls passed.",
+    "Completed: restored all 88 material slots and original tone settings after every trial capture; preserved the shared game and selected document.",
+    "Pending: representative native motion and consistent Belltower gameplay performance before promotion."
+  ],
+  "shared_editor_last_observed": {
+    "pid": 9580,
+    "scene": "riverdale",
+    "playing": true,
+    "preserved": true,
+    "observation": "Read-only final preflight; external scene change after the Orion comparisons."
+  },
+  "goal_complete": false,
+  "native_compilation_verified": true,
+  "native_still_comparison_verified": true,
+  "native_visual_acceptance": false,
+  "native_review": "output/belltower/quality/forest-coverage-v1/native-fixed-review.json",
+  "native_review_sha256": "977d0f5e6a63c6fb62247adf19c7cb3d21efa9be5aa4557f66bc6feee17a2b02",
+  "current_helper_sha256": {
+    "Sources/Belltower/editor/capture-viewport.cs.txt": "613d00218c3d9039e7fe46d7fa17cbe054322799e30de024e37158d37c1fff96",
+    "Sources/Belltower/editor/import-forest-coverage-trial.cs.txt": "bce164cb40d85dd569081e45d986792d7027e8b61768455301c9738cd2a501c1",
+    "Sources/Belltower/editor/compile-detail-shader.cs.txt": "3002285eddff966e4d2069ed1456bcd8507fa61e63b4261c97dd97e0e8031bf1"
+  },
+  "native_control_passed": true,
+  "preferred_experimental_strength": 0,
+  "saved_exposure_changed": false,
+  "trial_promoted": false,
+  "static_compile_scope": {
+    "path": "output/belltower/quality/forest-coverage-v1/helper-static-compile.json",
+    "current_source_matches": {
+      "Sources/Belltower/editor/capture-viewport.cs.txt": true,
+      "Sources/Belltower/editor/import-forest-coverage-trial.cs.txt": false,
+      "Sources/Belltower/editor/compile-detail-shader.cs.txt": false
+    },
+    "scope": "Historical static API binding proof. Current helpers also executed successfully in the engine."
+  },
+  "exposure_scope": "Temporary native QA exposure of 2 with ACES, restored after each capture. Saved automatic exposure is unchanged.",
+  "visual_review": {
+    "preferred_experimental_strength": 0,
+    "valley": "Lower coarse grey grain; existing distance fade retained, with no new abrupt boundary in this still.",
+    "ridge": "Crown shapes remain visible in the detail view. The regular repeated crown pattern remains conspicuous.",
+    "terrace": "The distant slope is less stippled. The existing tree rows and terrain treatment remain visible.",
+    "half": "Less pronounced change; retains more of the distant coarse pattern.",
+    "scope": "Visual judgement of native fixed-camera stills only. Edge-energy values describe local image changes, not a quality score."
+  },
+  "remaining": [
+    "Representative native motion and mip-transition review.",
+    "Consistent Belltower gameplay performance before acceptance.",
+    "Further distribution/shape work: alpha compensation alone does not meet the broad visual target."
+  ]
+}

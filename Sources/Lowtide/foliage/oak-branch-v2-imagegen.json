@@ -1,0 +1,10 @@
+{
+  "tool": "built-in image_gen",
+  "intent": "edit",
+  "edit_target": "output/lowtide/quality-pass/foliage/original-branch-atlas.png",
+  "source_atlas": "facepunch.tree_oak_small_a: models/sbox_props/trees/oak/oak_branch.vmat, extracted g_tColor unchanged through native editor",
+  "generated_file": "oak-branch-candidate-v2.png",
+  "transparent_background": true,
+  "prompt": "Use case: precise-object-edit. Asset type: RGBA foliage albedo texture for an existing game tree. The supplied image is the EDIT TARGET and a strict fixed UV template. Make ONE change: replace only the surface detail INSIDE its existing opaque oak leaves and twigs with fine natural photographic oak leaf veins and subtle bark texture. Treat the original alpha silhouette as a locked hard mask: every leaf outline, leaf size, hole, twig thickness, branch position, orientation, frame crop and transparent gap must remain EXACTLY the same. Do not make fuller clusters, larger leaves or additional leaves. The original intentionally has approximately 20% occupied area and 80% transparent empty area; preserve that sparse coverage. Retain its dark muted grey-olive palette and original average brightness, no brighter yellow-green tone. Each existing leaf should remain individual, with quiet vein detail, gently curled edges and natural botanical irregularities visible only within that original outline. Flat diffuse albedo illumination, no cast shadow, glow, sun, edge halos or specular highlights. Genuine transparent background and clean antialiased edges; no grey/white/black solid backdrop or checkerboard, text, border or watermark. Keep the exact square canvas and UV layout. This is texture detail restoration, not re-composition or a new arrangement.",
+  "status": "Candidate for offline inspection. Not imported or assigned to the scene."
+}

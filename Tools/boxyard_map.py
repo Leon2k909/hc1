@@ -56,10 +56,11 @@ MAP_ART_FILE = K.ASSETS / MAP_ART_PATH
 ids = K.SceneIds( "8b2d6e41-3f7c-4a9e-b1d5-27c94e0f6a18" )
 
 METAL, STONE, WOOD, PLASTIC = "metal", "default", "wood", "plastic"
-SUN_PITCH, SUN_YAW = R.SUN_PITCH, R.SUN_YAW
-SKY_MATERIAL = R.SKY_MATERIAL
-SKY_EXPOSURE = R.SKY_EXPOSURE
-FOG_COLOUR = R.FOG_COLOUR
+from map_daylight import PROFILES as DAYLIGHT_PROFILES
+SUN_PITCH, SUN_YAW = DAYLIGHT_PROFILES[TITLE]["sun_angles"][:2]
+SKY_MATERIAL = DAYLIGHT_PROFILES[TITLE]["components"]["SkyBox2D"]["SkyMaterial"]
+SKY_EXPOSURE = DAYLIGHT_PROFILES[TITLE]["components"]["Tonemapping"]["MinimumExposure"]
+FOG_COLOUR = ",".join(DAYLIGHT_PROFILES[TITLE]["components"]["GradientFog"]["Color"].split(",")[:3])
 CATCH_FLOOR_Z = -3000
 
 PLAY = ( -800.0, 800.0, -832.0, 832.0 )          # e0, e1, n0, n1: the wall's inner faces
@@ -1226,6 +1227,8 @@ def write_scene( written, light_list, probe_list, tops ):
         "__references": [],
         "__version": 3,
     }
+    from map_daylight import apply_profile
+    apply_profile( scene )
     SCENE_FILE.parent.mkdir( parents=True, exist_ok=True )
     K.write_text( SCENE_FILE, json.dumps( scene, indent=2 ), newline=None )
     print( f"wrote {SCENE_FILE.relative_to( K.ROOT )}" )

@@ -1,0 +1,51 @@
+// Isolated ordinary camera faces. Do not invoke GGX filtering or EnvmapProbe.Bake.
+var root=Sandbox.Project.Current.GetRootPath();
+var source=Editor.SceneEditorSession.Active?.Scene;
+var beforeScene=source?.Id;var beforeGame=Game.ActiveScene?.Id;var beforePlay=Game.IsPlaying;
+var data=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Assets/scenes/maps/spillway/spillway.scene"))).AsObject();
+var probes=data["GameObjects"].AsArray().First(o=>o["Name"]?.GetValue<string>()=="Reflection Probes")["Children"].AsArray()
+    .Select(o=>new {Name=o["Name"].GetValue<string>(),Position=Vector3.Parse(o["Position"].GetValue<string>())}).ToArray();
+var keep=new[]{"Sun","Sky","Sky Fill","Fog","Look","Spillway","Lights","Volumetric Fog"};
+var objects=new System.Text.Json.Nodes.JsonArray();
+foreach(var o in data["GameObjects"].AsArray()) if(keep.Contains(o["Name"]?.GetValue<string>()))objects.Add(o.DeepClone());
+data["GameObjects"]=objects;data["SceneProperties"]["WantsSystemScene"]=false;data["SceneProperties"]["NavMesh"]["Enabled"]=false;
+var scene=Scene.CreateEditorScene();
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var render=typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null);
+var preCamera=typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null);
+var output=System.IO.Path.Combine(root,"output/spillway/reflections");
+try {
+    CameraComponent camera;
+    using(scene.Push()) {
+        scene.Deserialize(data);
+        var holder=new GameObject(false,"Spillway reflection capture");
+        camera=holder.Components.Create<CameraComponent>();camera.ZNear=4;camera.ZFar=120000;
+        camera.FieldOfView=90;camera.CustomSize=new Vector2(512,512);holder.Enabled=true;
+        foreach(var material in scene.GetAllComponents<ModelRenderer>().SelectMany(r=>r.Model.Materials).Distinct())
+            foreach(var name in new[]{"g_tColor","g_tNormal","g_tRoughness"})material.GetTexture(name)?.MarkUsed(2048);
+    }
+    for(var i=0;i<35;i++) {
+        using(scene.Push()){scene.EditorTick(.016f,.016f);render.Invoke(scene,null);}
+        await Task.Delay(33,cancellationToken);
+    }
+    var rotations=new[]{new Angles(0,0,0),new Angles(0,90,0),new Angles(0,180,0),new Angles(0,-90,0),new Angles(-90,0,0),new Angles(90,0,0)};
+    using var bitmap=new Bitmap(512,512);
+    for(var index=0;index<probes.Length;index++) {
+        var directory=System.IO.Path.Combine(output,index.ToString());System.IO.Directory.CreateDirectory(directory);
+        for(var face=0;face<rotations.Length;face++) {
+            cancellationToken.ThrowIfCancellationRequested();
+            using(scene.Push()) {
+                camera.WorldPosition=probes[index].Position;camera.WorldRotation=Rotation.From(rotations[face]);
+                render.Invoke(scene,null);preCamera.Invoke(scene,null);
+                typeof(PostProcessSystem).GetMethod("UpdateCamera",flags).Invoke(scene.GetSystem<PostProcessSystem>(),new object[]{camera});
+                camera.CustomSize=new Vector2(512,512);camera.FieldOfView=90;
+                for(var warmup=0;warmup<3;warmup++)camera.RenderToBitmap(bitmap,false);
+                System.IO.File.WriteAllBytes(System.IO.Path.Combine(directory,face+".png"),bitmap.ToPng());
+                var meta=new {Position=camera.WorldPosition.ToString(),Faces=new[]{new {File=face+".png",Forward=camera.WorldRotation.Forward.ToString(),Right=camera.WorldRotation.Right.ToString(),Up=camera.WorldRotation.Up.ToString()}}};
+                System.IO.File.WriteAllText(System.IO.Path.Combine(directory,"face-"+face+".json"),System.Text.Json.JsonSerializer.Serialize(meta));
+            }
+            await Task.Delay(16,cancellationToken);
+        }
+    }
+    return new {Probes=probes.Length,Faces=probes.Length*6,Preserved=Editor.SceneEditorSession.Active?.Scene?.Id==beforeScene&&Game.ActiveScene?.Id==beforeGame&&Game.IsPlaying==beforePlay};
+} finally {scene.Destroy();}

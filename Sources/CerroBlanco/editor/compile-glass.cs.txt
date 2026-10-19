@@ -1,0 +1,4 @@
+if(Game.IsPlaying || Networking.IsActive)throw new InvalidOperationException("Stop play/network before compiling");
+if(Editor.SceneEditorSession.Active?.Scene.Source?.ResourcePath?.Equals("scenes/maps/cerroblanco/cerroblanco.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Cerro Blanco must own the editor");
+return await Editor.EditorUtility.CompileShader("shaders/cerroblanco_glass.shader",new(),cancellationToken);

@@ -1,0 +1,4 @@
+if(Game.IsPlaying)throw new InvalidOperationException("Stop play before saving the editor document.");
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.Source?.ResourcePath?.Equals("scenes/maps/sewage/sewage.scene",StringComparison.OrdinalIgnoreCase)==true);
+typeof(Editor.SceneEditorSession).GetProperty("HasUnsavedChanges").SetValue(session,true);
+return new {Scene=session.Scene.Source.ResourcePath,session.HasUnsavedChanges};

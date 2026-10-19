@@ -9,6 +9,9 @@ def write(path,text):
     if not path.exists() or path.read_text()!=text:path.write_text(text)
 base=(A/'attachments/m4a1/optics/reflex_reticle.vmat').read_text()
 base=re.sub(r'g_flUseReticleTexture\s+"[^"]*"','g_flUseReticleTexture "0"',base)
+# The holographic and box collimator windows have exposed, coated optical glass.
+# Keep scopes on the clear reticle-only path so their separate optics stay intact.
+glass_optics={'att_vm_reflex_02':0.19,'att_vm_holo_west01':0.16,'att_vm_holo_west02':0.16}
 for m in materials.values():
     if m.get('optic_glass'):write(A/m['vmat'],(A/'attachments/m4a1/materials/hidden.vmat').read_text())
 report=[]
@@ -41,6 +44,9 @@ for m in models:
     write(path,'\n'.join(lines)+'\n')
     scope=any(t in m['key']for t in ('scope','4x','thermal','hybrid','2x'))and not m['key'].endswith('holo')
     lens=base.replace('g_flScopeReticle "0"','g_flScopeReticle "1"' if scope else 'g_flScopeReticle "0"')
+    if m['key'] in glass_optics:
+        lens=lens.replace('g_flRefractionStrength "1.005"',
+            'g_flRefractionStrength "1.005"\n\tg_flLensCoatingOpacity "%.2f"'%glass_optics[m['key']])
     lenspath=path.with_name(path.stem+'_reticle.vmat');write(lenspath,lens)
     vmdl=path.with_suffix('.vmdl');data=vmdl.read_text()
     pattern=r'(from = "'+selected+r'\.vmat" to = ")[^"]*(")'

@@ -21,6 +21,7 @@ SOURCES = {
     "medieval_blocks_05": ("Diffuse", "nor_gl", "Rough", "AO", "Displacement"),
     "white_plaster_rough_01": ("Diffuse", "nor_gl", "Rough", "AO"),
     "painted_plaster_wall": ("Diffuse", "nor_gl", "Rough", "AO"),
+    "rough_plaster_broken": ("Diffuse", "nor_gl", "Rough", "AO", "Displacement"),
     "clay_roof_tiles": ("Diffuse", "nor_gl", "Rough", "AO", "Displacement"),
     "brown_planks_03": ("Diffuse", "nor_gl", "Rough", "AO"),
 }

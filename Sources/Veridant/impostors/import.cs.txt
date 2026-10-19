@@ -1,0 +1,61 @@
+// Run a copy in the sbox-cli exchange directory. Imports only the two visual
+// backdrop models, generated RGBA textures, their materials and shader.
+var project = Sandbox.Project.Current.GetRootPath();
+var expected = System.IO.Path.GetFullPath("C:/sbox-projects/hc1/forked-shooter-main").TrimEnd('\\', '/');
+if (!String.Equals(System.IO.Path.GetFullPath(project).TrimEnd('\\', '/'), expected, StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Wrong project");
+var destination = System.IO.Path.Combine(project, "output/veridant/impostors");
+var stage = System.IO.Path.Combine(destination, "stage");
+var backup = System.IO.Path.Combine(destination, "before-assets");
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage, "manifest.json")));
+var sourceScene = Editor.SceneEditorSession.Active?.Scene;
+var sourceSceneId = sourceScene?.Id;
+var sourceSceneName = sourceScene?.Name;
+var wasPlaying = Game.IsPlaying;
+string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path)));
+var sceneFile = System.IO.Path.Combine(project, "Assets/scenes/maps/Veridant/veridant.scene");
+var sceneHash = Hash(sceneFile);
+var files = manifest["files"].AsArray().Select(n => n.GetValue<string>()).ToList();
+var saved = new System.Collections.Generic.List<object>();
+foreach (var relative in files)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var target = System.IO.Path.GetFullPath(System.IO.Path.Combine(project, relative));
+    if (!target.StartsWith(expected + System.IO.Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+        throw new InvalidOperationException("Out-of-project target");
+    var existed = System.IO.File.Exists(target);
+    if (existed)
+    {
+        var old = System.IO.Path.Combine(backup, relative);
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(old));
+        if (!System.IO.File.Exists(old)) System.IO.File.Copy(target, old);
+    }
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    System.IO.File.Copy(System.IO.Path.Combine(stage, relative), target, true);
+    saved.Add(new { File = relative, Replaced = existed, Sha256 = Hash(target) });
+}
+var compiled = new System.Collections.Generic.List<object>();
+var shaderResult = await Editor.EditorUtility.CompileShader("shaders/hc1_veridant_impostor.shader", new() { ForceRecompile = true }, cancellationToken);
+if (!shaderResult.Success)
+    throw new Exception("Vista shader failed: " + String.Join("\n", shaderResult.Programs.SelectMany(p => p.Output ?? new System.Collections.Generic.List<string>())));
+if (shaderResult.CompiledShader is { Length: > 0 })
+    System.IO.File.WriteAllBytes(System.IO.Path.Combine(project, "Assets/shaders/hc1_veridant_impostor.shader_c"), shaderResult.CompiledShader);
+foreach (var relative in files.Where(p => p.EndsWith(".vmat")).Concat(files.Where(p => p.EndsWith(".vmdl"))))
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var asset = Editor.AssetSystem.FindByPath(System.IO.Path.Combine(project, relative))
+        ?? Editor.AssetSystem.RegisterFile(System.IO.Path.Combine(project, relative));
+    if (asset is null) throw new Exception("Could not register " + relative);
+    asset.Compile(true);
+    await asset.CompileIfNeededAsync();
+    compiled.Add(new { File = relative, asset.IsCompiled, asset.IsCompileFailed, asset.IsCompiledAndUpToDate });
+}
+var report = new {
+    SourceScene = sourceSceneName,
+    SourceUnchanged = Editor.SceneEditorSession.Active?.Scene?.Id == sourceSceneId,
+    PlayStateUnchanged = Game.IsPlaying == wasPlaying,
+    SceneFileUnchanged = sceneHash == Hash(sceneFile),
+    Files = saved, Compiled = compiled
+};
+System.IO.File.WriteAllText(System.IO.Path.Combine(destination, "import.json"), System.Text.Json.JsonSerializer.Serialize(report, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+return report;

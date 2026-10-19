@@ -137,6 +137,11 @@ class Weapon:
     # part_choices) -> (bone, offset). RoN's HK416 fits its Tarkov stocks that way: their vertices sit in the model's
     # own space on an unnamed bone with no parent, which bone-merge has nothing to put on.
     part_mounts: dict[str, tuple[str, np.ndarray]] = field(default_factory=dict)
+    # Pieces of a model that stand where the real gun's don't: path (as written in vm_meshes, part_meshes,
+    # optional_meshes or part_choices) -> [(lowest corner, highest corner, offset)], in the model's own space. Each
+    # connected piece whose bounds lie inside a box moves by its offset before the model is placed (port_kastov
+    # move_pieces). The M16's front sight post is its own piece, so it screws down into its base as the real one does.
+    part_moves: dict[str, list[tuple[np.ndarray, np.ndarray, np.ndarray]]] = field(default_factory=dict)
 
 
 def kastov762_materials() -> dict[str, str]:
@@ -629,9 +634,11 @@ M16 = Weapon(
     # From the addon's lua/weapons/mg_iw9_mike16/shared.lua, except aim. The addon's iron-sight aim (0.005, 0.5, 0.135)
     # leaves the sight line 0.113 above the camera, with the front post 0.32 deg over the aim point, low in the rear
     # aperture. This drops the gun onto the line through the aperture's centre and the post's top, and turns out the
-    # line's 0.058 deg up and 0.032 deg left, which puts both on the aim point (measured on ads_in's last frame).
+    # line's 0.058 deg up and 0.032 deg left, which puts both on the aim point (measured on ads_in's last frame). With
+    # the post screwed down (part_moves) the gun turns 0.293 deg nose up about the aperture (4.2 ahead of the eye,
+    # the post 20.3 beyond it), so the post's tip is back on the aim point and the aperture stays centred on it.
     hip=view_offset(),
-    aim=view_offset((0.004, 0.5, 0.022), (0.058, -0.032, 0.0)),
+    aim=view_offset((0.004, 0.5, 0.003), (-0.235, -0.032, 0.0)),
     sprint=view_offset(),
     m4_sprint=True,
     ads_pose=("ads_in", slice(-1, None)),
@@ -649,6 +656,12 @@ M16 = Weapon(
     # The rig's tag_grip_hide is 5.7 further back and 1.7 higher than the barrel's, which would lift the rail cover off
     # the bottom rail into the handguard.
     unmerged_bones=frozenset({"tag_grip_hide"}),
+    # The front sight post (its own piece of the front sight's mesh, 0.957 to 1.522 up) stood 1.514 over the flat-top's
+    # rail, 0.104 taller than an AR's iron sight line: 1.41 over the rail is the absolute co-witness height that
+    # red dot mounts are made to (SIG's ROMEO8T manual; Scalarworks' fixed front sight is 1.42). Screwed down into its
+    # base by that much, it co-witnesses with the 1x optics as on a real M16A4 (kastov_prefabs optic_sight_lines).
+    part_moves={f"{_M16_BARREL}/sighton.smd": [(np.array([14.0, -0.2, 0.9]), np.array([14.5, 0.2, 1.6]),
+                                                 np.array([0.0, 0.0, -0.104]))]},
 )
 
 def p90_materials() -> dict[str, str]:

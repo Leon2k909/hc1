@@ -41,6 +41,7 @@ warehouses are closed, and the blocks round the play are one collision box each.
 import argparse
 import json
 import math
+import sys
 import zlib
 from pathlib import Path
 
@@ -75,10 +76,13 @@ import lowtide_masonry as MASONRY
 import lowtide_frames as FRAMES
 import lowtide_roofs as ROOFS
 import lowtide_interior as INTERIOR
+import lowtide_floor_surfaces as FLOOR_SURFACES
+import lowtide_structure as STRUCTURE
 import lowtide_windows as WINDOWS
 import lowtide_facade as FACADE
 import lowtide_piles as PILES
 import lowtide_tyres as TYRES
+import lowtide_construction as CONSTRUCTION
 
 TITLE = "Lowtide"
 OUT_DIR = K.ASSETS / "models/maps/lowtide"
@@ -229,6 +233,8 @@ def write_materials():
     FRAMES.write_materials()
     ROOFS.write_materials()
     INTERIOR.write_materials()
+    FLOOR_SURFACES.write_materials()
+    STRUCTURE.write_materials()
     WINDOWS.write_materials()
     PILES.write_materials()
     TYRES.write_materials()
@@ -496,6 +502,20 @@ def window( m, wall, o, style, pane=None, glass=None ):
         slab( glass, wall, o.r0, o.r1, -depth - 1, -depth + 1, o.z0, o.z1, None, GLASS )
     else:
         card( m, pane or style.pane, pts, out )
+    if o.z0 <= CONSTRUCTION.DETAIL_SILL_MAX:
+        CONSTRUCTION.window_frame(m, sys.modules[__name__], wall, o, style)
+    else:
+        window_bars(m, wall, o, style, depth)
+        CONSTRUCTION.window_frame(m, sys.modules[__name__], wall, o, style)
+    if o.arched:
+        arch_ring( m, wall, o, style.band )
+    else:
+        slab( m, wall, o.r0 - 3, o.r1 + 3, 0.0, 1.2, o.z1, o.z1 + 9, style.band )
+    slab( m, wall, o.r0 - 4, o.r1 + 4, -1.0, 2.6, o.z0 - 4, o.z0, style.stone )
+
+
+def window_bars(m, wall, o, style, depth=6.0):
+    """Original simple bars retained for the sealed upper floors."""
     bar, fd = 1.6, -depth + 0.8
     top = o.spring if o.arched else o.z1
     # Sides, foot and head of the frame, then glazing bars: two uprights and a bar every 20.
@@ -514,10 +534,6 @@ def window( m, wall, o, style, pane=None, glass=None ):
         z += 20
     if o.arched:
         slab( m, wall, o.r0 + 3, o.r1 - 3, fd - 0.5, fd + 0.9, top - bar / 2, top + bar / 2, style.frame, back=True )
-        arch_ring( m, wall, o, style.band )
-    else:
-        slab( m, wall, o.r0 - 3, o.r1 + 3, 0.0, 1.2, o.z1, o.z1 + 9, style.band )
-    slab( m, wall, o.r0 - 4, o.r1 + 4, -1.0, 2.6, o.z0 - 4, o.z0, style.stone )
 
 
 def arch_ring( m, wall, o, paint, width=7.0, proud=1.0, steps=10 ):
@@ -561,12 +577,15 @@ def leaves_open( m, wall, o, style ):
 
 def leaves_shut( m, wall, o, style ):
     """ A pair of wooden doors shut in the opening, 8 into the wall, with strap hinges and the meeting stile. """
-    slab( m, wall, o.r0, o.r1, -10.0, -8.0, o.z0, o.z1, style.door )
-    rc = ( o.r0 + o.r1 ) / 2
-    slab( m, wall, rc - 1, rc + 1, -8.0, -7.4, o.z0, o.z1, "iron_black" )
-    for z in ( o.z0 + 14, o.z1 - 14 ):
-        slab( m, wall, o.r0 + 2, rc - 3, -8.0, -7.5, z - 1.5, z + 1.5, "iron_black" )
-        slab( m, wall, rc + 3, o.r1 - 2, -8.0, -7.5, z - 1.5, z + 1.5, "iron_black" )
+    if CONSTRUCTION.is_shed_door(sys.modules[__name__], wall, o):
+        CONSTRUCTION.shed_door(m, sys.modules[__name__], wall, o, style)
+    else:
+        slab( m, wall, o.r0, o.r1, -10.0, -8.0, o.z0, o.z1, style.door )
+        rc = ( o.r0 + o.r1 ) / 2
+        slab( m, wall, rc - 1, rc + 1, -8.0, -7.4, o.z0, o.z1, "iron_black" )
+        for z in ( o.z0 + 14, o.z1 - 14 ):
+            slab( m, wall, o.r0 + 2, rc - 3, -8.0, -7.5, z - 1.5, z + 1.5, "iron_black" )
+            slab( m, wall, rc + 3, o.r1 - 2, -8.0, -7.5, z - 1.5, z + 1.5, "iron_black" )
     slab( m, wall, o.r0 - 6, o.r1 + 6, 0.0, 1.4, o.z1, o.z1 + 10, style.band )
     if o.z0 <= wall.z[0] + 1e-6:
         # At the wall's foot there's no wall under the opening, so the recess in front of the leaves had no floor and
@@ -1562,18 +1581,22 @@ def street_bridge( m, n0, n1, collide=True ):
     for a, b in ( ( n0, n0 + 18 ), ( n1 - 18, n1 ) ):
         m.box( ( -FLEET, a, -44 ), ( FLEET, b, 12 ), "iron_green", metal )
         out = -1 if a == n0 else 1
+        # Match the end-post assembly to the inset lantern so the roof clears
+        # the warehouse wall and the supports remain connected.
+        post_offset = -out * LANTERNS.BRIDGE_END_INSET
+        post_n = ( a + b ) / 2 + post_offset
         face = a if out < 0 else b
         # Rivet rows and stiffeners on the girder's outer face.
         for e in np.arange( -FLEET + 30, FLEET - 20, 30 ):
             m.box( ( e - 1.5, min( face, face + out * 1.2 ), -42 ), ( e + 1.5, max( face, face + out * 1.2 ), 10 ), "iron_green" )
         for z in ( -38.0, 6.0 ):
             m.box( ( -FLEET, min( face, face + out * 0.8 ), z - 1 ), ( FLEET, max( face, face + out * 0.8 ), z + 1 ), "iron_green" )
-        railing( m, ( -FLEET + 8, ( a + b ) / 2 ), ( FLEET - 8, ( a + b ) / 2 ), 12.0, height=32.0, paint="iron_green",
+        railing( m, ( -FLEET + 8, post_n ), ( FLEET - 8, post_n ), 12.0, height=32.0, paint="iron_green",
                  posts=48.0, surface=metal, lattice=True )
         for e in ( -FLEET, FLEET ):
-            m.box( ( e - 8, a - 2, -44 ), ( e + 8, b + 2, 52 ), "iron_green", metal )
-            m.box( ( e - 10, a - 4, 52 ), ( e + 10, b + 4, 58 ), "iron_green" )
-            bridge_lamp( m, e, ( a + b ) / 2, 58.0 )
+            m.box( ( e - 8, a - 2 + post_offset, -44 ), ( e + 8, b + 2 + post_offset, 52 ), "iron_green", metal )
+            m.box( ( e - 10, a - 4 + post_offset, 52 ), ( e + 10, b + 4 + post_offset, 58 ), "iron_green" )
+            bridge_lamp( m, e, post_n, 58.0 )
 
 
 def bridge_lamp( m, e, n, z0 ):
@@ -1777,15 +1800,23 @@ def fleet():
 
 
 def water_model():
-    """ The water: the channel down the Fleet, falling to the harbour at its mouth; the harbour; and the pools on the
-    mud. Drawn only, no shadows. """
+    """A level tidal surface connects the Fleet to the harbour without a mouth ramp.
+
+    A sloping water *mesh* at the quay reflected the sky at a different angle and
+    revealed a rectangular strip of mud through its shallow transparency. Instead,
+    let the actual bed geometry define the shoreline wherever it meets the same
+    water level. The canal and harbour share one edge but never overlap.
+    """
     m = Model()
     w = 128.0
     m.polygon( "lt_water", [ ( -w, MOUTH_N, WATER_Z ), ( w, MOUTH_N, WATER_Z ), ( w, NORTH_ROW_N, WATER_Z ), ( -w, NORTH_ROW_N, WATER_Z ) ] )
-    m.polygon( "lt_water", [ ( -w - 20, PLAY[2], HARBOUR_Z + 4 ), ( w + 20, PLAY[2], HARBOUR_Z + 4 ), ( w, MOUTH_N, WATER_Z ), ( -w, MOUTH_N, WATER_Z ) ] )
     harbour_width = SHIPYARD.SHORE_EXTENT + 500.0
-    m.polygon( "lt_water", [ ( -harbour_width, -16000, HARBOUR_Z ), ( harbour_width, -16000, HARBOUR_Z ),
-                            ( harbour_width, QUAY_N, HARBOUR_Z ), ( -harbour_width, QUAY_N, HARBOUR_Z ) ] )
+    # Split the giant harbour quad at the two canal-bank coordinates. Its middle
+    # section now has precisely the canal's shared edge, avoiding a T-junction
+    # and microscopic cracks when the model is rendered from shallow angles.
+    for left, right in ( ( -harbour_width, -w ), ( -w, w ), ( w, harbour_width ) ):
+        m.polygon( "lt_water", [ ( left, -16000, WATER_Z ), ( right, -16000, WATER_Z ),
+                                ( right, MOUTH_N, WATER_Z ), ( left, MOUTH_N, WATER_Z ) ] )
     puddles( m, MOUTH_N, STREET_N[0] - 40, 26, 7 )
     puddles( m, STREET_N[1] + 40, NORTH_ROW_N - 100, 18, 11 )
     return m
@@ -1834,6 +1865,8 @@ def use( name, m, *args, **kw ):
         return CONTAINER.build( m, *args, **kw )
     if name == "lamp_post":
         return LAMPS.build( m, *args, **kw )
+    if name == "bollard":
+        return R.use( name, m, *args, illuminated=True, **kw )
     return R.use( name, m, *args, **kw )
 
 
@@ -1897,7 +1930,7 @@ def dress_side( s ):
     crates( m, s, 420, -560, 0.0, [ ( 0, 0, 2 ), ( 1, 0, 1 ) ], seed=6 )
     # The cross street and the square.
     for n in ( -820.0, -100.0, 620.0 ):
-        use( "lamp_post", m, s * 1285, n, 190.0 )
+        use( "lamp_post", m, s * 1285, n, 190.0, 0.0, "-e" if s > 0 else "+e" )
     tree( m, s, 1450, -430 )
     tree( m, s, 1450, 430 )
     for n in ( -280.0, 280.0 ):
@@ -1905,9 +1938,11 @@ def dress_side( s ):
     use( "pallet_stack", m, s * 2130, 300, 0.0, 5, "n" )
     # The north street: bollards along the kerb, lamps.
     for e in np.arange( 1050, 2200, 160 ):
-        use( "bollard", m, s * e, 1205, 5.0 )
+        # The pavement occupies n=1150..1200 at z=5. Keep the foot on that
+        # surface instead of floating over the z=0 road immediately beside it.
+        use( "bollard", m, s * e, 1193, 5.0 )
     for e in ( 900.0, 1700.0 ):
-        use( "lamp_post", m, s * e, 1425, 190.0, 5.0 )
+        use( "lamp_post", m, s * e, 1425, 190.0, 5.0, "-n" )
     # The quay: the crane at the B site and one further west, cargo, a container pair, a forklift.
     quay_crane( m, s, 1650 )
     quay_crane( m, s, 620 )
@@ -1962,7 +1997,9 @@ def lights():
 # ( name, centre, the box they cover e0, e1, n0, n1, z0, z1 )
 PROBES = [
     ( "Fleet North", ( 0, 900, -60 ), ( -240, 240, 300, 1450, -150, 400 ) ),
-    ( "Fleet South", ( 0, -500, -60 ), ( -240, 240, -1650, 300, -150, 400 ) ),
+    # Reach well into the harbour so cubemap lighting can feather away from
+    # the canal without a straight reflection cutoff at n=-1650.
+    ( "Fleet South", ( 0, -500, -60 ), ( -240, 240, -2300, 300, -150, 400 ) ),
     ( "Bridge", ( 0, 1300, 80 ), ( -600, 600, 1150, 1450, -50, 400 ) ),
 ]
 for _s, _side in ( ( -1, "West" ), ( 1, "East" ) ):
@@ -2220,7 +2257,8 @@ def probe_object( name, centre, box ):
     key = f"probe/{name}"
     return K.game_object( ids, f"Probe {name}", key, at, components=[
         K.component( ids, "Sandbox.EnvmapProbe", f"{key}/probe", Bounds={ "Mins": K.vec( lo ), "Maxs": K.vec( hi ) },
-                     DelayBetweenUpdates=0.1, Feathering=0.04, FrameInterval=5, MaxDistance=512, Projection="Box",
+                     DelayBetweenUpdates=0.1, Feathering=0.30 if name == "Fleet South" else 0.04,
+                     FrameInterval=5, MaxDistance=512, Projection="Box",
                      RenderDynamically=True, TintColor="1,1,1,1", UpdateStrategy="OnEnabled", ZFar=4096, ZNear=8 ) ] )
 
 
@@ -2436,8 +2474,16 @@ def build():
     MARINE.strip_model( models["lowtide_fleet"] )
     models["lowtide_marine"] = MARINE.build( sys.modules[__name__] )
     models["lowtide_masonry"] = MASONRY.build( sys.modules[__name__] )
+    # Open only the rendered pavement beneath the cast street grates. The
+    # original pavement collision continues to support players on the bars.
+    import lowtide_grates
+    for name in ("lowtide_east", "lowtide_west"):
+        lowtide_grates.cut_model( models[name] )
     for model in models.values():
         configure( model )
+    for name in ("lowtide_east", "lowtide_west"):
+        FLOOR_SURFACES.configure( models[name] )
+        STRUCTURE.configure( models[name] )
     for name in WINDOWS.NAMES:
         WINDOWS.configure( models[name] )
     return models

@@ -1,0 +1,152 @@
+{
+  "date": "2026-10-15",
+  "revision": "open-cast-drainage-v3",
+  "status": "offline_candidate_awaiting_native_review",
+  "native_accepted": false,
+  "production_changed": false,
+  "canonical_generator_changed": false,
+  "geometry": {
+    "pipes": 36,
+    "removed_triangles": 15088,
+    "candidate_triangles": 110592,
+    "delta_triangles": 95504,
+    "unchanged_triangles": 71642,
+    "description": "Continuous curved hollow shoes, tapered open hoppers, cast socket profiles and fixed wall plates.",
+    "collision_changed": false,
+    "new_material_slots": 0,
+    "direct_promotion_superseded": true
+  },
+  "material_mapping": {
+    "source_size": [
+      1254,
+      1254
+    ],
+    "atlas_size": [
+      2048,
+      2048
+    ],
+    "source_pixels_preserved": true,
+    "shader_compiled": false,
+    "physical_tile_inches": 24.0,
+    "description": "Original scan repeats inside its valid atlas rectangle; eliminates sampling of the edge padding.",
+    "affected_materials": [
+      "materials/lowtide/finish/lt_drain_iron.vmat",
+      "materials/lowtide/finish/lt_drain_edge.vmat"
+    ],
+    "scope": "Existing iron/edge slots also serve gutters, grates and anchors in lowtide_finish.",
+    "independent_of_geometry": true
+  },
+  "evidence": {
+    "manifest": "output/lowtide/quality-pass/drain-construction/manifest.json",
+    "manifest_sha256": "b63d9e950faa003d37e4c3ba0014bb8bd2c62f7fa6e897ed1a4e26779e0a795d",
+    "verification": {
+      "status": "offline_geometry_checks_passed",
+      "manifest_sha256": "b63d9e950faa003d37e4c3ba0014bb8bd2c62f7fa6e897ed1a4e26779e0a795d",
+      "verifier_sha256": "51b8fbf3a18bb99fcfccd5da786a8e60bc496724e4e2885f053abc426ea0dc4f",
+      "pipes": 36,
+      "paired_edges": 165888,
+      "triangles": 110592,
+      "aperture_ray_samples": 360,
+      "unchanged_triangles": 71642,
+      "protected_live_files": 556,
+      "byte_identical_reproduced_components": 1,
+      "atlas_mapping_samples": 20004,
+      "byte_identical_reproduced_material_files": 3,
+      "source_pixels_preserved": true,
+      "bounds": [
+        {
+          "height": 233,
+          "min": [
+            -4.92,
+            -0.1,
+            0.396
+          ],
+          "max": [
+            4.92,
+            11.793,
+            232.65
+          ]
+        },
+        {
+          "height": 273,
+          "min": [
+            -4.92,
+            -0.1,
+            0.396
+          ],
+          "max": [
+            4.92,
+            11.793,
+            272.65
+          ]
+        },
+        {
+          "height": 933,
+          "min": [
+            -4.92,
+            -0.1,
+            0.396
+          ],
+          "max": [
+            4.92,
+            11.793,
+            932.65
+          ]
+        },
+        {
+          "height": 939,
+          "min": [
+            -4.92,
+            -0.1,
+            0.396
+          ],
+          "max": [
+            4.92,
+            11.793,
+            938.65
+          ]
+        },
+        {
+          "height": 1036,
+          "min": [
+            -4.92,
+            -0.1,
+            0.396
+          ],
+          "max": [
+            4.92,
+            11.793,
+            1035.65
+          ]
+        }
+      ],
+      "native_validation": "Deferred"
+    },
+    "preview": "output/lowtide/quality-pass/drain-construction/preview/provenance.json",
+    "reviewed_comparisons": [
+      "output/lowtide/quality-pass/drain-construction/preview/shoe-comparison.png",
+      "output/lowtide/quality-pass/drain-construction/preview/shoe-geometry-comparison.png",
+      "output/lowtide/quality-pass/drain-construction/preview/hopper-comparison.png",
+      "output/lowtide/quality-pass/drain-construction/preview/hopper-geometry-comparison.png",
+      "output/lowtide/quality-pass/drain-construction/preview/fixing-comparison.png",
+      "output/lowtide/quality-pass/drain-construction/preview/fixing-geometry-comparison.png"
+    ],
+    "initial_preview": "output/lowtide/quality-pass/drain-construction/first-review/review-status.json"
+  },
+  "integration": {
+    "stage": "output/lowtide/quality-pass/drain-construction/stage",
+    "new_shader": "shaders/hc1_lowtide_finish_metal.shader (expected absent in live Assets; recheck before promotion)",
+    "material_only": "The two material changes and their new shader can be evaluated with the existing geometry.",
+    "geometry": "The isolated geometry intersects saved cornices/gutters; use the composed junction candidate for native review. Its material correction remains valid independently.",
+    "other_candidates": "Does not overlap window/door OBJ or warehouse-floor VMDL stages, or dressing/fleet sack models.",
+    "remaining": [
+      "Keep the user-requested offline mode until the human changes it.",
+      "Compile and inspect the shader/material correction in the normal native viewport, including gutters, grates and anchors.",
+      "Inspect hopper/gutter/roof connections in the map; isolated drain previews do not establish complete rainwater connections.",
+      "Profile the additional geometry, shadow cost and distant aliasing before deciding on promotion or lower detail.",
+      "If accepted, integrate scoped drainage/material hooks into the canonical finish generator and verify saving and persistence.",
+      "The overall AAA visual goal remains open."
+    ],
+    "current_composed_junction_candidate": "Sources/Lowtide/drainage/junction-status.json"
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "date": "2026-10-18",
+  "status": "saved_and_native_verified",
+  "imagegen": "built-in image_gen.imagegen",
+  "prompts": "Sources/Spillway/waterfalls/generation.json",
+  "shader_compile_success": true,
+  "materials_compile_success": true,
+  "models_compile_success": true,
+  "source_matches_live": true,
+  "scene_and_seven_collision_hulls_unchanged": true,
+  "modeldocs_unchanged": true,
+  "terrain_uvs_faces_materials_unchanged": true,
+  "terrain_vertices_lowered": 3999,
+  "waterfall_triangles_before": 288,
+  "waterfall_triangles_after": 5536,
+  "map_visual_triangles": 354200,
+  "texture_size": [
+    1254,
+    1254
+  ],
+  "captured_views": [
+    "reference",
+    "fall-close",
+    "impact"
+  ],
+  "capture_state_checks": {
+    "GamePreserved": true,
+    "DirtyPreserved": true,
+    "AuthoredObjectsPreserved": true,
+    "TemporaryCameraRemoved": true,
+    "CamerasRestored": true
+  },
+  "motion": {
+    "Method": "Normalized cross-correlation of consecutive native camera images; image Y increases downward",
+    "Frames": 16,
+    "Matches": [
+      {
+        "DownwardPixels": 80,
+        "Correlation": 0.3131
+      },
+      {
+        "DownwardPixels": 86,
+        "Correlation": 0.2152
+      },
+      {
+        "DownwardPixels": 79,
+        "Correlation": 0.2258
+      },
+      {
+        "DownwardPixels": 78,
+        "Correlation": 0.3414
+      },
+      {
+        "DownwardPixels": 79,
+        "Correlation": 0.2605
+      },
+      {
+        "DownwardPixels": 77,
+        "Correlation": 0.1977
+      },
+      {
+        "DownwardPixels": 80,
+        "Correlation": 0.2084
+      },
+      {
+        "DownwardPixels": 79,
+        "Correlation": 0.1973
+      },
+      {
+        "DownwardPixels": 82,
+        "Correlation": 0.2395
+      },
+      {
+        "DownwardPixels": 83,
+        "Correlation": 0.2537
+      },
+      {
+        "DownwardPixels": 86,
+        "Correlation": 0.1156
+      },
+      {
+        "DownwardPixels": 84,
+        "Correlation": 0.2302
+      },
+      {
+        "DownwardPixels": 84,
+        "Correlation": 0.3372
+      },
+      {
+        "DownwardPixels": 81,
+        "Correlation": 0.3283
+      },
+      {
+        "DownwardPixels": 79,
+        "Correlation": 0.114
+      }
+    ],
+    "MedianDownwardPixels": 80.5,
+    "Passed": true
+  },
+  "fps_benchmarked": false
+}

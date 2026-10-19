@@ -1,0 +1,3 @@
+if(!Game.IsPlaying || Game.ActiveScene.Source?.ResourcePath?.Equals("scenes/maps/sewage/sewage.scene",StringComparison.OrdinalIgnoreCase)!=true)throw new InvalidOperationException("A live Sewage round is required.");
+Facepunch.UI.ClassSelect.CloseAny();
+return new {ClassMenu=Facepunch.UI.ClassSelect.IsAnyOpen,Camera=Game.ActiveScene.Camera?.GameObject.Name,Player=Facepunch.Client.Local?.PlayerPawn?.GameObject.Name};

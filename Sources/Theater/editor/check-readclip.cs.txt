@@ -1,0 +1,40 @@
+// Theater: checks TheaterReplays.ReadClip (the recording parsed from the file's bytes) against the old way, ReadAllText and
+// Json.Deserialize of the string, on a saved replay. Run with the native MCP's run_csharp, in the editor, play or not. It
+// parses the replay twice on the main thread (about a second for the smallest), so don't run it during someone's match.
+// It reads the smallest replay in the data folder's replays/ (or REPLAY below) and changes nothing.
+const string REPLAY = null; // e.g. "replays/20261017_024004.movie"
+var data = FileSystem.Data;
+var path = REPLAY ?? data.FindFile( "replays", "*.movie" )
+	.Select( f => "replays/" + f )
+	.OrderBy( f => data.FileSize( f ) )
+	.FirstOrDefault() ?? throw new InvalidOperationException( "No replays in the data folder." );
+
+var allocatedBefore = GC.GetAllocatedBytesForCurrentThread();
+var watch = System.Diagnostics.Stopwatch.StartNew();
+var fromText = Sandbox.Json.Deserialize<Sandbox.MovieMaker.Compiled.MovieClip>( data.ReadAllText( path ) );
+var textMs = watch.Elapsed.TotalMilliseconds;
+var textAllocated = GC.GetAllocatedBytesForCurrentThread() - allocatedBefore;
+
+allocatedBefore = GC.GetAllocatedBytesForCurrentThread();
+watch.Restart();
+var fromBytes = Facepunch.TheaterReplays.ReadClip( path );
+var bytesMs = watch.Elapsed.TotalMilliseconds;
+var bytesAllocated = GC.GetAllocatedBytesForCurrentThread() - allocatedBefore;
+
+// The same clip serialises to the same JSON.
+var same = Sandbox.Json.Serialize( fromText ) == Sandbox.Json.Serialize( fromBytes );
+
+return new
+{
+	Replay = path,
+	FileMB = Math.Round( data.FileSize( path ) / 1048576.0, 1 ),
+	Tracks = fromBytes.Tracks.Length,
+	Duration = fromBytes.Duration.ToString(),
+	SameClip = same,
+	SameTracks = fromText.Tracks.Length == fromBytes.Tracks.Length,
+	SameDuration = fromText.Duration == fromBytes.Duration,
+	TextMs = Math.Round( textMs ),
+	BytesMs = Math.Round( bytesMs ),
+	TextAllocatedMB = Math.Round( textAllocated / 1048576.0, 1 ),
+	BytesAllocatedMB = Math.Round( bytesAllocated / 1048576.0, 1 )
+};

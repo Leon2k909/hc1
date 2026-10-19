@@ -1,0 +1,27 @@
+// Import separate trial plaster materials. Never overwrite current materials.
+var root=Sandbox.Project.Current.GetRootPath();
+var stage=System.IO.Path.Combine(root,"output/belltower/quality/plaster-weathered-v2");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"manifest.json")));
+if(manifest["revision"].GetValue<string>()!="plaster-weathered-v2") throw new InvalidOperationException("Unexpected weathering revision");
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+if(Hash(System.IO.Path.Combine(root,"Tools/belltower_quality_materials.py"))!=manifest["source_sha256"].GetValue<string>()) throw new InvalidOperationException("Plaster generator changed");
+foreach(var item in manifest["unchanged_accepted_materials"].AsObject())
+    if(Hash(System.IO.Path.Combine(root,item.Key))!=item.Value.GetValue<string>()) throw new InvalidOperationException("Accepted plaster changed: "+item.Key);
+var records=manifest["records"].AsArray();
+if(records.Count!=8) throw new InvalidOperationException("Expected eight plaster variants");
+foreach(var entry in records)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var name=entry["name"].GetValue<string>();
+    var resource=entry["path"].GetValue<string>();
+    if(!System.Text.RegularExpressions.Regex.IsMatch(name,"^plaster_(rose|terracotta|ochre|cream|blue|sage|pale|whitewash)\\.vmat$") || resource!="materials/belltower/trials/plaster-weathered-v2/"+name)
+        throw new InvalidOperationException("Unexpected plaster trial file");
+    var source=System.IO.Path.Combine(stage,name);
+    var dest=System.IO.Path.Combine(root,"Assets",resource);
+    if(Hash(source)!=entry["sha256"].GetValue<string>()) throw new InvalidOperationException("Trial hash changed");
+    if(System.IO.File.Exists(dest) && Hash(dest)!=entry["sha256"].GetValue<string>()) throw new InvalidOperationException("Different trial already installed");
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(dest));
+    if(!System.IO.File.Exists(dest)) System.IO.File.Copy(source,dest);
+    Editor.AssetSystem.RegisterFile(dest);
+}
+return new {Imported=records.Count,ProductionReplaced=false};

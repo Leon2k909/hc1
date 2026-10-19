@@ -1,0 +1,56 @@
+// Theater: checks TheaterReplays.WriteClip (a life at a time, Code/GameLoop/TheaterClipJson.cs) against the engine's
+// Json.Serialize of the whole clip, on a saved replay. Run with the native MCP's run_csharp, in the editor, play or not:
+// it reads the smallest replay in the data folder's replays/ (or REPLAY below), writes the check file beside it and deletes
+// it. Byte for byte equal unless a name has letters outside ASCII, which WriteClip leaves escaped (the same JSON).
+// Tools/TheaterJsonChecks checks the splicing itself offline; this checks the engine's MovieClip converter lays out a clip of
+// one life as its entry in the whole clip.
+const string REPLAY = null; // e.g. "replays/20261017_024004.movie"
+var data = FileSystem.Data;
+var path = REPLAY ?? data.FindFile( "replays", "*.movie" )
+	.Select( f => "replays/" + f )
+	.OrderBy( f => data.FileSize( f ) )
+	.FirstOrDefault() ?? throw new InvalidOperationException( "No replays in the data folder." );
+
+var clip = Sandbox.Json.Deserialize<Sandbox.MovieMaker.Compiled.MovieClip>( data.ReadAllText( path ) );
+
+var allocatedBefore = GC.GetAllocatedBytesForCurrentThread();
+var watch = System.Diagnostics.Stopwatch.StartNew();
+var whole = System.Text.Encoding.UTF8.GetBytes( Sandbox.Json.Serialize( clip ) );
+var wholeMs = watch.Elapsed.TotalMilliseconds;
+var wholeAllocated = GC.GetAllocatedBytesForCurrentThread() - allocatedBefore;
+
+const string check = "replays/_writeclip.check";
+allocatedBefore = GC.GetAllocatedBytesForCurrentThread();
+watch.Restart();
+var written = Facepunch.TheaterReplays.WriteClip( check, clip );
+var byLifeMs = watch.Elapsed.TotalMilliseconds;
+var byLifeAllocated = GC.GetAllocatedBytesForCurrentThread() - allocatedBefore;
+
+var byLife = data.ReadAllBytes( check ).ToArray();
+data.DeleteFile( check );
+
+var first = 0;
+while ( first < whole.Length && first < byLife.Length && whole[first] == byLife[first] ) first++;
+var equal = first == whole.Length && first == byLife.Length;
+
+string Around( byte[] bytes ) => first >= bytes.Length ? "" : System.Text.Encoding.UTF8.GetString( bytes, Math.Max( 0, first - 40 ), Math.Min( 80, bytes.Length - Math.Max( 0, first - 40 ) ) );
+
+var sameJson = equal || System.Text.Json.Nodes.JsonNode.DeepEquals(
+	System.Text.Json.Nodes.JsonNode.Parse( whole ), System.Text.Json.Nodes.JsonNode.Parse( byLife ) );
+
+return new
+{
+	Replay = path,
+	Tracks = clip.Tracks.Length,
+	Lives = clip.Tracks.Count( t => t.Parent is null ),
+	WholeBytes = whole.Length,
+	ByLifeBytes = byLife.Length,
+	Written = written,
+	ByteForByte = equal,
+	SameJson = sameJson,
+	FirstDifference = equal ? null : $"byte {first}: [{Around( whole )}] vs [{Around( byLife )}]",
+	WholeMs = Math.Round( wholeMs ),
+	ByLifeMs = Math.Round( byLifeMs ),
+	WholeAllocatedMB = Math.Round( wholeAllocated / 1048576.0, 1 ),
+	ByLifeAllocatedMB = Math.Round( byLifeAllocated / 1048576.0, 1 )
+};

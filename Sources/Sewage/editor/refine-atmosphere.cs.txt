@@ -1,0 +1,16 @@
+if(Game.IsPlaying)throw new InvalidOperationException("Stop play before scene refinement.");
+var scene=Editor.SceneEditorSession.All.Single(s=>s.Scene.Source?.ResourcePath?.Equals("scenes/maps/sewage/sewage.scene",StringComparison.OrdinalIgnoreCase)==true).Scene;
+var mist=scene.GetAllComponents<VolumetricFogVolume>().Single(p=>p.GameObject.Name=="Basin mist");
+mist.Strength=.065f;
+mist.Bounds=new BBox(new Vector3(-650,-640,-80),new Vector3(650,640,80));
+var entrance=scene.GetAllComponents<PointLight>().OrderBy(l=>l.WorldPosition.Distance(new Vector3(-239,940,214))).First();
+if(entrance.WorldPosition.Distance(new Vector3(-239,940,214))>2)throw new InvalidOperationException("Green entrance light not found");
+entrance.LightColor=new Color(.272f,1.156f,.561f);
+var root=Sandbox.Project.Current.GetRootPath();
+var config=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/sewage/capture.json")));
+var camera=scene.GetAllComponents<CameraComponent>().Single(c=>c.GameObject.Name=="Reference composition camera");
+camera.WorldPosition=Vector3.Parse(config["position"].GetValue<string>());
+camera.WorldRotation=Rotation.From(Angles.Parse(config["angles"].GetValue<string>()));
+camera.FieldOfView=config["fov"].GetValue<float>();
+typeof(Editor.SceneEditorSession).GetProperty("HasUnsavedChanges").SetValue(Editor.SceneEditorSession.All.Single(s=>s.Scene==scene),true);
+return new {MistStrength=mist.Strength,CameraPosition=camera.WorldPosition.ToString(),GreenEntrance=entrance.LightColor.ToString()};

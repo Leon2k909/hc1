@@ -1,0 +1,41 @@
+// Compiles what Tools/cerroblanco_publish.py copied into Assets (output/cerroblanco/publish-v2.json), in its order:
+// shaders, then textures and materials, then models, then the scene. Run with the native MCP's run_csharp. It refuses
+// while a game is playing: compiling stalls the editor's frame, and the user's match with it.
+if (Game.IsPlaying) throw new InvalidOperationException("A game is playing: compile after it stops.");
+var root = Sandbox.Project.Current.GetRootPath();
+var report = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root, "output/cerroblanco/publish-v2.json")));
+var assets = System.IO.Path.Combine(root, "Assets");
+var results = new System.Collections.Generic.List<object>();
+var failed = new System.Collections.Generic.List<string>();
+foreach (var item in report["copied"].AsArray())
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var relative = item["path"].GetValue<string>();
+    var file = System.IO.Path.Combine(assets, relative);
+    // Sources a model reads (OBJs, hull OBJs, MTLs) and data files: registered, not compiled on their own.
+    if (relative.EndsWith(".json") || relative.EndsWith(".mtl") || relative.EndsWith(".obj")) { Editor.AssetSystem.RegisterFile(file); continue; }
+    if (relative.EndsWith(".shader"))
+    {
+        Editor.AssetSystem.RegisterFile(file);
+        var shaderResult = await Editor.EditorUtility.CompileShader(relative, new(), cancellationToken);
+        // ShaderCompile.Results: report what it says (its success flag's name isn't fixed across builds).
+        var props = shaderResult?.GetType().GetProperties().Where(x => x.PropertyType == typeof(bool) || x.PropertyType == typeof(string) || x.PropertyType == typeof(int))
+            .ToDictionary(x => x.Name, x => x.GetValue(shaderResult)?.ToString());
+        results.Add(new { File = relative, Shader = props });
+        if (props != null && props.TryGetValue("Success", out var success) && success == "False") failed.Add(relative);
+        continue;
+    }
+    var asset = Editor.AssetSystem.FindByPath(file) ?? Editor.AssetSystem.RegisterFile(file);
+    if (asset is null) { failed.Add(relative); results.Add(new { File = relative, Registered = false }); continue; }
+    if (relative.EndsWith(".png") || relative.EndsWith(".jpg")) continue;
+    var compiled = false; string error = null;
+    try { compiled = asset.Compile(true); } catch (Exception e) { error = e.Message; }
+    await Task.Delay(1, cancellationToken);
+    if (!compiled || asset.IsCompileFailed) failed.Add(relative);
+    results.Add(new { File = relative, Ok = compiled, asset.IsCompiled, asset.IsCompileFailed, Error = error });
+}
+// The models, loaded back: an error model means a missing material or a bad mesh.
+var models = report["copied"].AsArray().Select(i => i["path"].GetValue<string>()).Where(p => p.EndsWith(".vmdl"))
+    .Select(p => new { Path = p, Model = Model.Load(p) })
+    .Select(x => new { x.Path, Error = x.Model is null || x.Model.IsError, Materials = x.Model?.Materials.Count(m => m is null || m.IsError) ?? -1 }).ToArray();
+return new { Compiled = results.Count, Failed = failed, Models = models, Results = results.Where(r => r.ToString().Contains("False") || r.ToString().Contains("Error = ") && !r.ToString().Contains("Error =  ")).Take(20) };

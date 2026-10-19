@@ -1,0 +1,40 @@
+if (Game.IsPlaying || Networking.IsActive) throw new InvalidOperationException("Stop the test before importing glass");
+var session = Editor.SceneEditorSession.Active;
+if (session?.Scene.Source?.ResourcePath?.Equals("scenes/maps/cerroblanco/cerroblanco.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Cerro Blanco must own the editor window");
+var root=Sandbox.Project.Current.GetRootPath();
+var stage=System.IO.Path.GetFullPath(System.IO.Path.Combine(root,"output/cerroblanco/glass-stage"));
+var assets=System.IO.Path.GetFullPath(System.IO.Path.Combine(root,"Assets"));
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/cerroblanco/glass-manifest.json")));
+var files=manifest["files"].AsArray();
+if(files.Count!=2)throw new InvalidOperationException("Unexpected glass candidate manifest");
+// Validate the complete manifest before publishing either file.
+foreach(var item in files)
+{
+    var relative=item["path"].GetValue<string>();
+    if(relative!="shaders/cerroblanco_glass.shader" && relative!="materials/cerroblanco/cb_glass.vmat")
+        throw new InvalidOperationException("Unexpected glass path");
+    var bytes=System.IO.File.ReadAllBytes(System.IO.Path.Combine(stage,relative));
+    if(!Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(bytes)).Equals(item["sha256"].GetValue<string>(),StringComparison.OrdinalIgnoreCase))
+        throw new InvalidOperationException("Staged glass hash changed");
+}
+var imported=new System.Collections.Generic.List<string>();
+foreach(var item in files)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var relative=item["path"].GetValue<string>();
+    var target=System.IO.Path.Combine(assets,relative);
+    var backup=System.IO.Path.Combine(root,"output/cerroblanco/before/glass",relative);
+    if(System.IO.File.Exists(target) && !System.IO.File.Exists(backup))
+    {
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+        System.IO.File.Copy(target,backup);
+    }
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    System.IO.File.WriteAllBytes(target+".cerroblanco-import",System.IO.File.ReadAllBytes(System.IO.Path.Combine(stage,relative)));
+    System.IO.File.Move(target+".cerroblanco-import",target,true);
+    Editor.AssetSystem.RegisterFile(target);
+    imported.Add(relative);
+    if(relative.EndsWith(".shader")) await Editor.EditorUtility.CompileShader(relative,new(),cancellationToken);
+}
+return new {Imported=imported, Compile="materials/cerroblanco/cb_glass.vmat", NeedsVisualComparison=true};

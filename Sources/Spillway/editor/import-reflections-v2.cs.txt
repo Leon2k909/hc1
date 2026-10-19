@@ -1,0 +1,27 @@
+// Import the new reflection resources without changing the running map's probes.
+var root=Sandbox.Project.Current.GetRootPath();
+var revision=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/spillway/reflection-config.json")))["revision"].GetValue<int>();
+if(revision<2 || revision>99)throw new InvalidOperationException("Invalid reflection revision");
+var stage=System.IO.Path.Combine(root,"output/spillway/stage/materials/spillway/reflections");
+var reports=new System.Collections.Generic.List<object>();
+for(var index=0;index<5;index++)
+{
+    foreach(var extension in new[]{"exr","vmat"})
+    {
+        var name=$"reflection_{index}_v{revision}.{extension}";
+        var source=System.IO.Path.Combine(stage,name);
+        var destination=System.IO.Path.Combine(root,"Assets/materials/spillway/reflections",name);
+        if(!System.IO.File.Exists(source))throw new InvalidOperationException("Missing staged reflection: "+name);
+        if(System.IO.File.Exists(destination) && !System.IO.File.ReadAllBytes(source).SequenceEqual(System.IO.File.ReadAllBytes(destination)))
+            throw new InvalidOperationException("Inspect the existing reflection revision before replacing "+name);
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(destination));
+        if(!System.IO.File.Exists(destination))System.IO.File.Copy(source,destination,false);
+        Editor.AssetSystem.RegisterFile(destination);
+    }
+    cancellationToken.ThrowIfCancellationRequested();
+    var asset=Editor.AssetSystem.FindByPath($"materials/spillway/reflections/reflection_{index}_v{revision}.vmat");
+    if(!asset.Compile(true))throw new InvalidOperationException("Reflection cube compilation failed: "+index);
+    reports.Add(new {Index=index,Compiled=true});
+    await Task.Delay(1,cancellationToken);
+}
+return reports;

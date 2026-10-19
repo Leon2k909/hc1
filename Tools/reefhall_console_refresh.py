@@ -21,6 +21,7 @@ def stage(out):
     material_dir.mkdir(parents=True, exist_ok=True)
     for name, source in R.RC.materials().items():
         (material_dir / f"{name}.vmat").write_text(source, encoding="utf-8", newline="\n")
+    R.RC.MONITORS.write_textures(material_dir)
     boxes = [[np.asarray(c).tolist(), np.asarray(a).tolist(), np.asarray(s).tolist(), p] for c, a, s, p in model.boxes]
     hulls = [[np.asarray(points).tolist(), surface] for points, surface in model.hulls]
     collision = json.dumps([boxes, hulls], sort_keys=True).encode()

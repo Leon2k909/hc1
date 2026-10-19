@@ -1,0 +1,20 @@
+{
+  "revision": "warehouse-floor-use-v2",
+  "bounds_plan_inches": [240, 1000, -400, 1150],
+  "atlas_cell_pixels": [1024, 2048],
+  "path_grid_inches": 4,
+  "height_interval_inches": [1, 78],
+  "routes": [
+    {"name": "south-receiving", "start": [620, -365], "end": [650, 340], "clearance": 30, "wear_radius": 35, "strength": 0.72},
+    {"name": "south-street-bay", "start": [960, -55], "end": [650, 340], "clearance": 30, "wear_radius": 36, "strength": 0.65},
+    {"name": "north-street-bay", "start": [960, 855], "end": [650, 650], "clearance": 30, "wear_radius": 38, "strength": 0.72},
+    {"name": "fleet-loading", "start": [280, 855], "end": [435, 550], "clearance": 20, "wear_radius": 26, "strength": 0.56},
+    {"name": "north-storage", "start": [760, 960], "end": [780, 860], "clearance": 18, "wear_radius": 25, "strength": 0.50},
+    {"name": "central-handling", "start": [650, 340], "end": [650, 650], "clearance": 30, "wear_radius": 36, "strength": 0.58}
+  ],
+  "notes": [
+    "These routes describe accumulated use, not changes to navigation or gameplay.",
+    "Endpoints and the smoothed paths must pass clearance checks against current saved collision before producing any wear.",
+    "Tire scuffs are allowed only on sufficiently broad, smooth segments; narrower paths receive traffic polish only."
+  ]
+}

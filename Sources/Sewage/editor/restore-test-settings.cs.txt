@@ -1,0 +1,8 @@
+if(Game.IsPlaying)throw new InvalidOperationException("Stop the test before restoring launch settings.");
+var root=Sandbox.Project.Current.GetRootPath();
+var previous=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/sewage/test-previous-state.json")));
+Facepunch.DevCommands.NoDamage=previous["NoDamage"].GetValue<bool>();
+var path=previous["Mode"]?.GetValue<string>();
+Facepunch.GameMode.SetCurrent(string.IsNullOrWhiteSpace(path)?null:GameObject.GetPrefab(path)?.GetComponent<Facepunch.GameMode>());
+Facepunch.GameMode.SetHardcore(previous["Hardcore"].GetValue<bool>());
+return new{Facepunch.DevCommands.NoDamage,Facepunch.GameMode.ActiveIdent,Facepunch.GameMode.ActiveHardcore};

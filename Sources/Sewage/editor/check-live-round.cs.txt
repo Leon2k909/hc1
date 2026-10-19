@@ -1,0 +1,31 @@
+if(!Game.IsPlaying)throw new InvalidOperationException("Start a Sewage Zombies round before running this check.");
+var scene=Game.ActiveScene;
+if(scene.Source?.ResourcePath?.Equals("scenes/maps/sewage/sewage.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("The running scene is not Sewage.");
+var rounds=scene.GetAllComponents<Facepunch.ZombiesRoundSystem>().FirstOrDefault();
+var pawn=Facepunch.Client.Local?.PlayerPawn;
+if(rounds is null || pawn is null)throw new InvalidOperationException("The Zombies round system and local survivor must both be present.");
+var before=scene.GetAllComponents<Facepunch.ZombieAI>().ToDictionary(z=>z.GameObject.Id,z=>z.WorldPosition);
+await Task.Delay(2500,cancellationToken);
+if(!Game.IsPlaying || Game.ActiveScene!=scene)throw new InvalidOperationException("The play session changed during the check.");
+var zombies=scene.GetAllComponents<Facepunch.ZombieAI>().Select(z=>
+{
+    var agent=z.GetComponent<NavMeshAgent>(true);
+    var moved=before.TryGetValue(z.GameObject.Id,out var old)?z.WorldPosition.Distance(old):0;
+    return new {Position=z.WorldPosition.ToString(),Health=z.Health,Moved=moved,Speed=agent?.Velocity.Length??0,DistanceToSurvivor=z.WorldPosition.Distance(pawn.WorldPosition)};
+}).ToArray();
+var data=new
+{
+    Scene=scene.Source.ResourcePath,CheckedAt=DateTime.UtcNow,scene.TimeScale,
+    rounds.CurrentRound,rounds.IsIntermission,rounds.ZombiesAlive,rounds.ZombiesRemainingInRound,rounds.IsGameOver,
+    Player=new {Position=pawn.WorldPosition.ToString(),Health=pawn.HealthComponent?.Health},
+    Modes=scene.GetAllComponents<Facepunch.GameMode>().Where(m=>m.Active).Select(m=>m.Ident).ToArray(),
+    MovingZombies=zombies.Count(z=>z.Moved>6),Zombies=zombies,
+    BuyStations=scene.GetAllComponents<Facepunch.ZombiesBuyStation>().Count(),
+    Workbenches=scene.GetAllComponents<Facepunch.ZombiesBuyStation>().Count(s=>s.Kind==Facepunch.ZombiesBuyKind.Workbench),
+    Camera=scene.Camera?.GameObject.Name,
+    PlayerCameraSelected=scene.Camera==pawn.CameraController?.Camera
+};
+var path=System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/sewage/live-round-validation.json");
+System.IO.File.WriteAllText(path,System.Text.Json.JsonSerializer.Serialize(data,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return data;

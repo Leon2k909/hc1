@@ -1,0 +1,44 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var request=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/belltower/quality/garden-import-request.json")));
+var revision=request["revision"].GetValue<string>();
+if(revision!="garden-v1" && revision!="garden-v2" && revision!="garden-v3") throw new InvalidOperationException("Unknown garden revision.");
+var stage=System.IO.Path.Combine(root,"output/belltower/quality/models",revision);
+var manifestPath=System.IO.Path.Combine(stage,"native-import.json");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(manifestPath));
+string Hash(string path)
+{
+    using var stream=System.IO.File.OpenRead(path);
+    return Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(stream)).ToLowerInvariant();
+}
+foreach(var file in manifest["files"].AsArray())
+    if(Hash(System.IO.Path.Combine(root,"Assets",file["path"].GetValue<string>()))!=file["sha256"].GetValue<string>())
+        throw new InvalidOperationException("Installed garden source differs from the checked candidate.");
+foreach(var dependency in manifest["collision_inputs"].AsArray())
+    if(Hash(System.IO.Path.Combine(root,dependency["path"].GetValue<string>()))!=dependency["sha256"].GetValue<string>())
+        throw new InvalidOperationException("Collision source changed during import.");
+var loaded=new System.Collections.Generic.List<object>();
+foreach(var record in manifest["models"].AsArray())
+{
+    var name=record["name"].GetValue<string>();
+    var resource="models/maps/belltower/"+name+".vmdl";
+    var source=System.IO.Path.Combine(root,"Assets",resource);
+    var compiled=source+"_c";
+    var newestSource=new[]{source,System.IO.Path.ChangeExtension(source,".obj"),System.IO.Path.ChangeExtension(source,".mtl")}
+        .Max(path=>System.IO.File.GetLastWriteTimeUtc(path));
+    if(!System.IO.File.Exists(compiled) || System.IO.File.GetLastWriteTimeUtc(compiled)<newestSource)
+        throw new InvalidOperationException("Model has not compiled since the garden import: "+name);
+    var model=Model.Load(resource);
+    if(model is null || model.IsError || model.Materials.Any(m=>m is null || m.IsError))
+        throw new InvalidOperationException("Model or material did not load: "+name);
+    if(!model.Materials.Any(m=>m.ResourcePath==record["new_material"].GetValue<string>()))
+        throw new InvalidOperationException("Loaded model is missing the new firewood material: "+name);
+    var nativeFirstMaterialTriangles=model.GetIndexCountForLod(0)/3;
+    if(model.Materials[0].ResourcePath!=record["first_material"].GetValue<string>()
+        || nativeFirstMaterialTriangles!=record["first_material_triangles"].GetValue<int>())
+        throw new InvalidOperationException("Loaded first-material geometry differs: "+name);
+    loaded.Add(new{Model=resource,AuthoredTriangles=record["triangles"].GetValue<int>(),NativeFirstMaterialTriangles=nativeFirstMaterialTriangles,
+        NativeTotalTrianglesVerified=false,model.MeshCount,Materials=model.Materials.Length,NewMaterialLoaded=true});
+}
+var result=new {ManifestSha256=Hash(manifestPath),Models=loaded.ToArray()};
+System.IO.File.WriteAllText(System.IO.Path.Combine(stage,"native-resources.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

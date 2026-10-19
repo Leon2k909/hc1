@@ -1,0 +1,232 @@
+"""Build and stage roughness-aware Lowtide planar reflection filtering.
+
+The original capture allocated one mip and always sampled level zero.
+The reviewed extension adds a bounded linear-HDR mip chain selected by projected
+roughness and UV footprint. It preserves the existing capture/view lifecycle,
+waves, refraction/absorption, reflection projection, lighting and blending.
+"""
+import argparse
+import difflib
+import hashlib
+import json
+import os
+from pathlib import Path
+import uuid
+import xml.etree.ElementTree as ET
+from xml.sax.saxutils import escape
+
+ROOT = Path(__file__).resolve().parents[1]
+OUT = ROOT/'output/lowtide/quality-pass/water-filter'
+SOURCE = ROOT/'Sources/Lowtide/water'
+def engine_path():
+    value = os.environ.get('FACEPUNCH_ENGINE')
+    if not value and os.name == 'nt':
+        import winreg
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, 'Environment') as key:
+            value = winreg.QueryValueEx(key, 'FACEPUNCH_ENGINE')[0]
+    if not value:
+        raise RuntimeError('FACEPUNCH_ENGINE must identify the installed engine for offline API checks')
+    result = Path(value)
+    assert (result/'bin/managed/Sandbox.Engine.dll').is_file(), result
+    return result
+
+
+CODE = 'Code/Map/LowtideWaterReflections.cs'
+BASE_SHADER = 'Assets/shaders/hc1_lowtide_water.shader'
+SHADER = 'Assets/shaders/hc1_lowtide_water_filtered.shader'
+MATERIAL = 'Assets/materials/lowtide/lt_water.vmat'
+MAX_MIPS = 7
+FILTER_STRENGTH = .08
+
+
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def write(path, text):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding='utf-8', newline='\n')
+
+
+def code(original=None):
+    original = (ROOT/CODE).read_text() if original is None else original
+    allocation = '            var target = commands.GetRenderTarget( "lowtide-reflection", width, height,'
+    added = (f'            // A short linear-HDR pyramid supplies roughness and minification filtering.\n'
+             f'            var reflectionMips = 1;\n'
+             f'            for ( var extent = Math.Min( width, height ); extent > 1 && reflectionMips < {MAX_MIPS}; extent >>= 1 )\n'
+             f'                reflectionMips++;\n')
+    count = 'ImageFormat.RGBA16161616F, ImageFormat.D24S8, MultisampleAmount.MultisampleNone, 1 );'
+    replacement = count.replace(', 1 );', ', reflectionMips );')
+    publish = '            // Published after the nested view completes. DrawReflection guards'
+    filtering = ('            // Generate only after the reflected view is complete, before publishing its texture.\n'
+                 '            // Box filtering preserves linear HDR radiance; the engine Gaussian path applies a display-space transform.\n'
+                 '            if ( reflectionMips > 1 )\n'
+                 '                commands.GenerateMipMaps( target, Sandbox.Graphics.DownsampleMethod.Box );\n')
+    if 'var reflectionMips = 1;' in original:
+        for anchor in (added, replacement, filtering):
+            assert original.count(anchor) == 1, anchor
+        baseline = original.replace(added, '', 1).replace(replacement, count, 1).replace(filtering, '', 1)
+        assert code(baseline) == original
+        return original
+    for anchor in (allocation, count, publish):
+        assert original.count(anchor) == 1, anchor
+    candidate = original.replace(allocation, added+allocation, 1).replace(count, replacement, 1).replace(publish, filtering+publish, 1)
+    assert candidate.replace(added, '', 1).replace(replacement, count, 1).replace(filtering, '', 1) == original
+    return candidate
+
+
+def material(original):
+    """Keep the authored optics while enabling the reviewed reflection filter."""
+    old = 'shader "shaders/hc1_lowtide_water.shader"'
+    new = f'shader "shaders/hc1_lowtide_water_filtered.shader"\n    g_flReflectionFilter "{FILTER_STRENGTH:g}"'
+    if new in original:
+        assert original.count(new) == 1 and old not in original
+        return original
+    assert original.count(old) == 1 and 'g_flReflectionFilter' not in original
+    return original.replace(old, new, 1)
+
+
+def shader():
+    original = (ROOT/BASE_SHADER).read_text()
+    declaration = (SOURCE/'reflection-filter.hlsl').read_text()
+    assert f'Default( {FILTER_STRENGTH:g} )' in declaration
+    anchor = '    float4 MainPs( PixelInput input ) : SV_Target0'
+    sample = 'g_tWaterReflection.SampleLevel( WaterReflectionSampler, saturate( uv ), 0 ).rgb'
+    replacement = 'FilteredPlanarReflection( saturate( uv ), water.Roughness )'
+    assert original.count(anchor) == original.count(sample) == 1
+    candidate = original.replace(anchor, declaration+'\n'+anchor, 1).replace(sample, replacement, 1)
+    assert candidate.replace(declaration+'\n', '', 1).replace(replacement, sample, 1) == original
+    return candidate
+
+
+def mip_dimensions(width, height):
+    result = [(width, height)]
+    while min(width, height) > 1 and len(result) < MAX_MIPS:
+        width, height = max(1, width//2), max(1, height//2)
+        result.append((width, height))
+    return result
+
+
+def api_evidence():
+    ENGINE = engine_path()
+    xml = ENGINE/'bin/managed/Sandbox.Engine.xml'
+    names = [
+        'M:Sandbox.Rendering.CommandList.GenerateMipMaps(Sandbox.Rendering.RenderTargetHandle,Sandbox.Graphics.DownsampleMethod)',
+        'M:Sandbox.Rendering.CommandList.GetRenderTarget(System.String,System.Int32,System.Int32,Sandbox.ImageFormat,Sandbox.ImageFormat,Sandbox.MultisampleAmount,System.Int32)',
+        'F:Sandbox.Graphics.DownsampleMethod.Box',
+    ]
+    members = {m.attrib['name']:m for m in ET.parse(xml).findall('.//member')}
+    assert all(name in members for name in names)
+    downsample = ENGINE/'core/shaders/downsample_cs.shader'
+    text = downsample.read_text()
+    assert 'float3 FilterBilinear' in text and 'return D_DOWNSAMPLE_METHOD == DownsampleMethod::GaussianBlur' in text
+    return dict(installed_api={name:' '.join(' '.join(members[name].itertext()).split()) for name in names},
+                external_sources={p.as_posix():sha(p) for p in (xml, downsample, ENGINE/'bin/managed/Sandbox.Engine.dll', ENGINE/'bin/managed/Sandbox.System.dll')},
+                filter='Native Box path averages four nonnegative linear HDR samples; Gaussian path converts to display space.')
+
+
+def compile_project(out):
+    ENGINE = engine_path()
+    folder = out/'compile'
+    folder.mkdir(parents=True, exist_ok=True)
+    references = '\n'.join(f'    <Reference Include="{name}"><HintPath>{escape((ENGINE/"bin/managed"/(name+".dll")).as_posix())}</HintPath><Private>false</Private></Reference>'
+                           for name in ('Sandbox.System', 'Sandbox.Engine', 'Sandbox.Filesystem', 'Sandbox.Reflection', 'Sandbox.Mounting'))
+    project = f'''<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>LowtideWaterOfflineCheck</AssemblyName>
+    <LangVersion>14</LangVersion>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <Nullable>disable</Nullable>
+    <UseSharedCompilation>false</UseSharedCompilation>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <NuGetAudit>false</NuGetAudit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../stage/{CODE}" />
+    <Using Include="System" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="System.Linq" />
+    <Using Include="Sandbox" />
+    <Using Include="Sandbox.Internal.GlobalGameNamespace" Static="true" />
+{references}
+  </ItemGroup>
+</Project>
+'''
+    write(folder/'WaterCheck.csproj', project)
+    write(folder/'NuGet.Config', '<configuration><packageSources><clear /></packageSources></configuration>\n')
+
+
+def build(out=OUT, baseline_audit=None):
+    out = out.resolve()
+    assert out.is_relative_to(ROOT/'output/lowtide/quality-pass')
+    previous_path = ROOT/'output/lowtide/quality-pass/paving-use/manifest.json'
+    previous = json.loads(previous_path.read_text())
+    protected = dict(previous['protected'])
+    rebase = None
+    if baseline_audit is not None:
+        baseline_audit = Path(baseline_audit).resolve()
+        assert baseline_audit.is_relative_to(ROOT/'output/lowtide/quality-pass')
+        baseline = json.loads(baseline_audit.read_text())
+        assert Path(baseline['project_root']).resolve() == ROOT, 'Audit belongs to another checkout'
+        assert not (out/'manifest.json').exists(), 'Rebase into a new folder; preserve historical evidence'
+        protected = {p:baseline['current_hashes'][p] for p in protected}
+        # Rebase from the audited current inputs, then use exact reversible edits
+        # below. A changed historical baseline is not an acceptance result.
+        for rel in (CODE, BASE_SHADER, MATERIAL, 'Tools/lowtide_water.py'):
+            protected[rel] = baseline['current_hashes'][rel]
+        assert all(h is not None and sha(ROOT/p) == h for p, h in protected.items()), 'Checkout changed after its audit'
+        rebase = dict(audit=baseline_audit.relative_to(ROOT).as_posix(), audit_sha256=sha(baseline_audit),
+                      historical_scope=previous_path.relative_to(ROOT).as_posix(),
+                      historical_scope_sha256=sha(previous_path), detected_changes=baseline['changed_paths'])
+        # New wave textures and other added Lowtide resources were not present
+        # in the older inventory; protect them as part of this current snapshot.
+        for folder in ('Assets/models/maps/lowtide', 'Assets/materials/lowtide', 'Assets/scenes/maps/Lowtide'):
+            for path in (ROOT/folder).rglob('*'):
+                if path.is_file() and not path.name.endswith('_c'):
+                    protected.setdefault(path.relative_to(ROOT).as_posix(), sha(path))
+    for rel in (CODE, BASE_SHADER, MATERIAL, 'Tools/lowtide_water.py'):
+        protected.setdefault(rel, sha(ROOT/rel))
+    assert all(sha(ROOT/p) == h for p, h in protected.items())
+    api = api_evidence()
+    stage = out/'stage'
+    write(stage/CODE, code())
+    write(stage/SHADER, shader())
+    original = (ROOT/MATERIAL).read_text()
+    write(stage/MATERIAL, material(original))
+    write(Path(str(stage/SHADER)+'.meta'), json.dumps(dict(guid=str(uuid.uuid5(uuid.NAMESPACE_URL, SHADER[7:]))), indent=2)+'\n')
+    compile_project(out)
+    patch = ''.join(difflib.unified_diff((ROOT/CODE).read_text().splitlines(True), code().splitlines(True), fromfile=CODE, tofile=CODE))
+    write(out/'capture-change.diff', patch)
+    sources = {p.relative_to(ROOT).as_posix():sha(p) for p in (Path(__file__), SOURCE/'reflection-filter.hlsl', ROOT/CODE, ROOT/BASE_SHADER, ROOT/MATERIAL)}
+    staged = {p.relative_to(stage).as_posix():sha(p) for p in sorted(stage.rglob('*')) if p.is_file()}
+    before = {p:(sha(ROOT/p) if (ROOT/p).is_file() else None) for p in staged}
+    targets = []
+    for width, height in ((256, 144), (640, 360), (960, 540), (1280, 720), (256, 1)):
+        dims = mip_dimensions(width, height)
+        extra = sum(w*h*8 for w, h in dims[1:])
+        targets.append(dict(size=[width, height], mips=dims, additional_color_bytes=extra,
+                            additional_color_fraction=extra/(width*height*8), extra_mip_passes=len(dims)-1))
+    manifest = dict(revision='linear-hdr-planar-filter-v3', status='offline_candidate_not_installed',
+                    project_root=str(ROOT), rebase=rebase,
+                    production_changed=False, code_changed=False, native_accepted=False, canonical_generator_changed=False,
+                    sources=sources, protected=protected, api=api, staged_files=staged, live_before=before,
+                    unchanged=['capture registration and release lifecycle', 'view recursion and camera guards',
+                               'water exclusion, projection and flip', 'waves, absorption, transparency, lighting and fog',
+                               'scene, geometry, collision and source artwork'],
+                    max_mips=MAX_MIPS, roughness_filter_scale=FILTER_STRENGTH,
+                    target_costs=targets, extra_water_texture_lookups=0,
+                    limitations=['Mip filtering is an approximate projected roughness footprint, not a full GGX convolution',
+                                 'Native shader compilation, sandbox hotload, GPU barriers/lifecycle, temporal appearance and performance unverified'])
+    assert all(sha(ROOT/p) == h for p, h in protected.items())
+    write(out/'manifest.json', json.dumps(manifest, indent=2)+'\n')
+    print(json.dumps(dict(stage=str(stage), files=len(staged), protected=len(protected),
+                         max_mips=MAX_MIPS, additional_960x540_color_bytes=targets[2]['additional_color_bytes']), indent=2))
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output', type=Path, default=OUT)
+    parser.add_argument('--baseline-audit', type=Path, help='Explicit current-checkout audit for rebasing into a new output folder')
+    args = parser.parse_args()
+    build(args.output, args.baseline_audit)

@@ -1,0 +1,30 @@
+if(Game.IsPlaying)throw new InvalidOperationException("Stop play before importing static reflections.");
+var session=Editor.SceneEditorSession.Active;
+if(session?.Scene.Source?.ResourcePath?.Equals("scenes/maps/cerroblanco/cerroblanco.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Cerro Blanco must own the editor window.");
+var root=Sandbox.Project.Current.GetRootPath();
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/cerroblanco/reflection-manifest.json")));
+var revision=manifest["revision"].GetValue<string>();
+if(!System.Text.RegularExpressions.Regex.IsMatch(revision,"^daylight-v[0-9]+$"))throw new InvalidOperationException("Invalid lighting revision.");
+if(manifest["capture_encoding"]?.GetValue<string>()!="ACES inverse with sky calibration" || manifest["captures"]?.AsArray().Count!=11 || manifest["files"].AsArray().Count!=22)
+    throw new InvalidOperationException("Capture and calibrate all eleven corrected reflection cubes before importing.");
+var imported=new System.Collections.Generic.List<string>();
+foreach(var item in manifest["files"].AsArray())
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var relative=item["path"].GetValue<string>();
+    if(!System.Text.RegularExpressions.Regex.IsMatch(relative,"^materials/cerroblanco/reflections/"+revision+"/reflection_[0-9]+\\.(exr|vmat)$"))
+        throw new InvalidOperationException("Unexpected reflection path.");
+    var source=System.IO.Path.Combine(root,"output/cerroblanco/stage",relative);
+    var target=System.IO.Path.Combine(root,"Assets",relative);
+    var bytes=System.IO.File.ReadAllBytes(source);
+    if(!Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(bytes)).Equals(item["sha256"].GetValue<string>(),StringComparison.OrdinalIgnoreCase))
+        throw new InvalidOperationException("Reflection source hash changed.");
+    if(System.IO.File.Exists(target)&&System.IO.File.ReadAllBytes(target).SequenceEqual(bytes))continue;
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    System.IO.File.WriteAllBytes(target+".cerroblanco-import",bytes);
+    System.IO.File.Move(target+".cerroblanco-import",target,true);
+    Editor.AssetSystem.RegisterFile(target);
+    imported.Add(relative);
+}
+return new {Imported=imported,Compile=manifest["files"].AsArray().Select(n=>n["path"].GetValue<string>()).Where(p=>p.EndsWith(".vmat")).ToArray()};

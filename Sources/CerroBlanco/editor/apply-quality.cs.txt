@@ -1,0 +1,74 @@
+if(Game.IsPlaying) throw new InvalidOperationException("Stop play before the persistent quality pass.");
+var session=Editor.SceneEditorSession.Active;
+var scene=session?.Scene;
+if(scene?.Source?.ResourcePath?.Equals("scenes/maps/cerroblanco/cerroblanco.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Cerro Blanco must be active.");
+var root=Sandbox.Project.Current.GetRootPath();
+var materialReport=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/cerroblanco/material-manifest.json")));
+var geometryReport=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/cerroblanco/geometry-manifest.json")));
+var sceneFile=System.IO.Path.Combine(root,"Assets/scenes/maps/CerroBlanco/cerroblanco.scene");
+var backup=System.IO.Path.Combine(root,"output/cerroblanco/before/cerroblanco.scene");
+System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+if(!System.IO.File.Exists(backup))System.IO.File.Copy(sceneFile,backup);
+var mapping=materialReport["overrides"].AsObject().ToDictionary(p=>p.Key,p=>Material.Load(p.Value.GetValue<string>()),StringComparer.OrdinalIgnoreCase);
+if(mapping.Any(p=>p.Value is null||p.Value.IsError))throw new InvalidOperationException("A staged material has not compiled.");
+var addedPaths=geometryReport["added_models"].AsArray().Select(n=>n.GetValue<string>()).ToArray();
+var replacement=geometryReport["render_model_replacement"].AsObject().ToDictionary(p=>p.Key,p=>Model.Load(p.Value.GetValue<string>()),StringComparer.OrdinalIgnoreCase);
+if(replacement.Any(p=>p.Value is null||p.Value.IsError)||addedPaths.Any(p=>Model.Load(p).IsError))throw new InvalidOperationException("A staged model has not compiled.");
+int overrides=0,replaced=0;
+foreach(var renderer in scene.GetAllComponents<ModelRenderer>())
+{
+    if(renderer.Model?.ResourcePath is string path && replacement.TryGetValue(path,out var model)) { renderer.Model=model;replaced++; }
+    for(int slot=0;slot<renderer.Materials.Count;slot++)
+    {
+        var original=renderer.Materials.GetOriginal(slot)?.ResourcePath;
+        if(original!=null&&mapping.TryGetValue(original,out var material)) {renderer.Materials.SetOverride(slot,material);overrides++;}
+    }
+}
+var parent=scene.GetAllObjects(true).FirstOrDefault(g=>g.Name=="Cerro Blanco construction details");
+if(parent is null)parent=new GameObject(scene){Name="Cerro Blanco construction details"};
+parent.NetworkMode=NetworkMode.Snapshot;
+foreach(var path in addedPaths)
+{
+    var name=System.IO.Path.GetFileNameWithoutExtension(path);
+    var go=parent.Children.FirstOrDefault(g=>g.Name==name);
+    if(go is null)go=new GameObject(parent){Name=name};
+    go.NetworkMode=NetworkMode.Snapshot;
+    go.Tags.Add("navskip");
+    var renderer=go.Components.GetOrCreate<ModelRenderer>();
+    renderer.Model=Model.Load(path);
+}
+foreach(var group in new[]{"garden_hedges","hedge_fill"})
+foreach(var entry in geometryReport[group]?.AsArray() ?? new System.Text.Json.Nodes.JsonArray())
+{
+    var model=Model.Load(entry["model"].GetValue<string>());
+    if(model is null || model.IsError)throw new InvalidOperationException("Garden hedge model is unavailable");
+    var name=entry["name"].GetValue<string>();
+    var go=parent.Children.FirstOrDefault(g=>g.Name==name);
+    if(go is null)go=new GameObject(parent){Name=name};
+    go.NetworkMode=NetworkMode.Snapshot;
+    go.Tags.Add("navskip");
+    go.WorldPosition=Vector3.Parse(entry["position"].GetValue<string>());
+    go.WorldRotation=Rotation.FromYaw(entry["yaw"].GetValue<float>());
+    go.LocalScale=Vector3.Parse(entry["scale"].GetValue<string>());
+    go.Components.GetOrCreate<ModelRenderer>().Model=model;
+}
+foreach(var entry in geometryReport["lights"].AsArray())
+{
+    var name=entry["name"].GetValue<string>();
+    var go=parent.Children.FirstOrDefault(g=>g.Name==name);
+    if(go is null)go=new GameObject(parent){Name=name};
+    go.NetworkMode=NetworkMode.Snapshot;
+    go.WorldPosition=Vector3.Parse(entry["position"].GetValue<string>());
+    go.WorldRotation=Rotation.LookAt(Vector3.Parse(entry["target"].GetValue<string>())-go.WorldPosition,Vector3.Up);
+    var light=go.Components.GetOrCreate<SpotLight>();
+    light.LightColor=Color.Parse(entry["color"].GetValue<string>()) ?? Color.White;
+    light.Radius=entry["radius"].GetValue<float>();
+    light.ConeInner=entry["inner"].GetValue<float>();
+    light.ConeOuter=entry["outer"].GetValue<float>();
+    light.Shadows=false;
+    light.Attenuation=1;
+    light.FogStrength=0;
+}
+typeof(Editor.SceneEditorSession).GetProperty("HasUnsavedChanges").SetValue(session,true);
+return new { Overrides=overrides,ReplacedRenderModels=replaced,DetailModels=addedPaths.Length,ArtLights=geometryReport["lights"].AsArray().Count,OriginalColliders=scene.GetAllComponents<ModelCollider>().Select(c=>c.Model?.ResourcePath).ToArray(),session.HasUnsavedChanges };

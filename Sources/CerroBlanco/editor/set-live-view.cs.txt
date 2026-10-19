@@ -1,0 +1,15 @@
+if (!Game.IsPlaying || Game.ActiveScene?.Source?.ResourcePath?.Equals("scenes/maps/cerroblanco/cerroblanco.scene", StringComparison.OrdinalIgnoreCase) != true)
+    throw new InvalidOperationException("The Cerro Blanco test must be running");
+var root = Sandbox.Project.Current.GetRootPath();
+var view = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root, "output/cerroblanco/live-view.json")));
+var name = view["name"].GetValue<string>();
+if (!System.Text.RegularExpressions.Regex.IsMatch(name, "^[a-z0-9-]+$")) throw new InvalidOperationException("Invalid view name");
+var pawn = Facepunch.Client.Local?.PlayerPawn;
+if (!pawn.IsValid()) throw new InvalidOperationException("The player is not spawned");
+Facepunch.UI.ClassSelect.CloseAny();
+var eye = Vector3.Parse(view["position"].GetValue<string>());
+pawn.WorldPosition = eye - Vector3.Up * 64;
+pawn.CharacterController.Velocity = Vector3.Zero;
+pawn.EyeAngles = Rotation.LookAt(Vector3.Parse(view["target"].GetValue<string>()) - eye, Vector3.Up).Angles();
+await Task.Delay(1500, cancellationToken);
+return new { View=name, Position=pawn.WorldPosition.ToString(), Camera=pawn.CameraController.Camera.WorldPosition.ToString(), pawn.HealthComponent.Health };

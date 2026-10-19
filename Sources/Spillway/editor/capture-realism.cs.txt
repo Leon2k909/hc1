@@ -1,0 +1,62 @@
+// Native persistent editor capture with the map's post-processing and planar water.
+var root=Sandbox.Project.Current.GetRootPath();
+var config=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/spillway/realism-capture.json")));
+var destination=System.IO.Path.Combine(root,"output/spillway",config["directory"].GetValue<string>());
+System.IO.Directory.CreateDirectory(destination);
+var selected=Editor.SceneEditorSession.Active;
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/spillway/spillway.scene",StringComparison.OrdinalIgnoreCase)==true);
+var scene=session.Scene;
+var gameId=Game.ActiveScene?.Id;var playing=Game.IsPlaying;var dirty=session.HasUnsavedChanges;
+var camera=scene.GetAllComponents<CameraComponent>().Single(c=>c.GameObject.Name=="editor_camera" && c.GameObject.Flags.HasFlag(GameObjectFlags.EditorOnly));
+var oldPosition=camera.WorldPosition;var oldRotation=camera.WorldRotation;var oldFov=camera.FieldOfView;
+var oldSize=camera.CustomSize;var oldAxis=camera.FovAxis;var oldOrtho=camera.Orthographic;
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var preRender=typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null);
+var preCamera=typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null);
+var updatePost=typeof(PostProcessSystem).GetMethod("UpdateCamera",flags);
+var reports=new System.Collections.Generic.List<object>();
+Vector3 World(System.Text.Json.Nodes.JsonNode p)=>new(p[1].GetValue<float>(),-p[0].GetValue<float>(),p[2].GetValue<float>());
+foreach(var material in scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model is not null).SelectMany(r=>r.Model.Materials).Distinct())
+    foreach(var texture in new[]{material.FirstTexture,material.GetTexture("g_tColor"),material.GetTexture("g_tNormal")}.Where(t=>t is not null))texture.MarkUsed(2048);
+await Task.Delay(1100,cancellationToken);
+try
+{
+    using var bitmap=new Bitmap(config["width"].GetValue<int>(),config["height"].GetValue<int>());
+    foreach(var view in config["views"].AsArray())
+    {
+        var count=view["frames"]?.GetValue<int>()??1;
+        for(var frame=-3;frame<count;frame++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            using(scene.Push())
+            {
+                camera.WorldPosition=World(view["eye"]);
+                camera.WorldRotation=Rotation.LookAt(World(view["target"])-camera.WorldPosition);
+                camera.FieldOfView=view["fov"].GetValue<float>();
+                preRender.Invoke(scene,null);preCamera.Invoke(scene,null);
+                updatePost.Invoke(scene.GetSystem<PostProcessSystem>(),new object[]{camera});
+                camera.CustomSize=new Vector2(config["width"].GetValue<int>(),config["height"].GetValue<int>());
+                camera.FovAxis=CameraComponent.Axis.Horizontal;camera.Orthographic=false;
+                foreach(var reflection in scene.GetAllComponents<Facepunch.LowtideWaterReflections>())reflection.PrepareViews();
+                camera.RenderToBitmap(bitmap,false);
+            }
+            if(frame>=0)
+            {
+                var name=view["name"].GetValue<string>()+(count>1?$"-{frame:000}":"");
+                System.IO.File.WriteAllBytes(System.IO.Path.Combine(destination,name+".png"),bitmap.ToPng());
+                reports.Add(new{Name=name,At=DateTime.UtcNow,Position=camera.WorldPosition.ToString(),camera.EnablePostProcessing,
+                    Minimum=camera.AutoExposure.MinimumExposure,Maximum=camera.AutoExposure.MaximumExposure});
+            }
+            if(count>1)await Task.Delay(50,cancellationToken);
+        }
+    }
+}
+finally
+{
+    camera.WorldPosition=oldPosition;camera.WorldRotation=oldRotation;camera.FieldOfView=oldFov;
+    camera.CustomSize=oldSize;camera.FovAxis=oldAxis;camera.Orthographic=oldOrtho;
+}
+var result=new {Captures=reports,Models=scene.GetAllComponents<ModelRenderer>().Count(r=>r.Model?.ResourcePath?.StartsWith("models/maps/spillway/")==true),
+    GamePreserved=Game.ActiveScene?.Id==gameId && Game.IsPlaying==playing,SelectedPreserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active),DirtyPreserved=session.HasUnsavedChanges==dirty};
+System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"report.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

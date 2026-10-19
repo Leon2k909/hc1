@@ -1,0 +1,13 @@
+var session=Editor.SceneEditorSession.All.FirstOrDefault(s=>s.Scene.Source?.ResourcePath?.Equals("scenes/maps/sewage/sewage.scene",StringComparison.OrdinalIgnoreCase)==true);
+var scene=session?.Scene;
+return new
+{
+    Game.IsPlaying,
+    Active=Editor.SceneEditorSession.Active?.Scene.Source?.ResourcePath,
+    Open=Editor.SceneEditorSession.All.Select(s=>s.Scene.Source?.ResourcePath).ToArray(),
+    Modes=Enum.GetNames(typeof(EnvmapProbe).GetProperty("Mode").PropertyType),
+    Resolutions=Enum.GetNames(typeof(EnvmapProbe).GetProperty("Resolution").PropertyType),
+    UpdateStrategies=Enum.GetNames(typeof(EnvmapProbe).GetProperty("UpdateStrategy").PropertyType),
+    NavGenerating=scene?.NavMesh.IsGenerating,
+    Probes=(scene?.GetAllComponents<EnvmapProbe>()??Enumerable.Empty<EnvmapProbe>()).Select(p=>new{p.GameObject.Name,Mode=p.Mode.ToString(),Texture=p.BakedTexture?.ResourcePath}).ToArray()
+};

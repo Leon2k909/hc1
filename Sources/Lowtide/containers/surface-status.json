@@ -1,0 +1,29 @@
+{
+  "status": "complete: six production materials compiled, loaded and visually verified",
+  "generator": "Tools/lowtide_container_surface.py",
+  "canonical_integration": "Tools/lowtide_container.py.write_materials",
+  "shader_source": "Sources/Lowtide/containers/hc1_lowtide_container.shader",
+  "material_hashes": {
+    "materials/lowtide/containers/lt_container_blue.vmat": "39d4faa64574b6ced0bbc24d4e0b733103d5b75af2e4715cc2e58c2385f018f7",
+    "materials/lowtide/containers/lt_container_blue_frame.vmat": "5cc472f0957db0b3ca4113845010f4d2f5ba400e78cedf2e92525f8504684586",
+    "materials/lowtide/containers/lt_container_red.vmat": "c2e73d3340872e1c7a4672ebe8a92c5182c4136b84a6f403bcf3d06815b8b106",
+    "materials/lowtide/containers/lt_container_red_frame.vmat": "f6b0f1a1f6e383131cefe998dfbcf5a08a35650f139bcf910e8f93190d3c13e7",
+    "materials/lowtide/containers/lt_container_grey.vmat": "4534d05d4248e3b515246a60c6ee3a64939d3be8c5f93a8025b2b9879466ea1d",
+    "materials/lowtide/containers/lt_container_grey_frame.vmat": "0f1a589bd49cd8d57cb2c53b2b6f4d5cf4ccb50d5ce92713334fd8cee49ad8b8"
+  },
+  "evidence": "output/lowtide/quality-pass/container-surface/verification.json",
+  "native_report": "output/lowtide/quality-pass/container-surface/production-native-verify.json",
+  "changes": "Intact enamel has smoother roughness, with lower-rail dirt, top-seam runoff and sparse rough dielectric oxide. All existing generated paint pixels and UVs retained.",
+  "validation": {
+    "compiled_materials": 6,
+    "loaded_slots": 8,
+    "production_views_reviewed": 4,
+    "protected_sources_unchanged": 536,
+    "canonical_files_byte_identical": 22,
+    "fresh_native_errors": 0,
+    "scene_clean": true,
+    "camera_and_prior_tab_restored": true
+  },
+  "do_not_reapply": true,
+  "limits": "No controlled gameplay performance comparison. Wider architecture and foliage remain below the intended AAA target."
+}

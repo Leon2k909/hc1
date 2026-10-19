@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-15",
+  "status": "offline_candidates_awaiting_native_review",
+  "user_work_mode": "Continue offline for now",
+  "production_changed": false,
+  "combined_models": {
+    "manifest": "output/lowtide/quality-pass/construction-integration/manifest.json",
+    "composer": "Tools/lowtide_construction_stage.py",
+    "window_status": "Sources/Lowtide/windows/construction-status.json",
+    "door_status": "Sources/Lowtide/doors/construction-status.json",
+    "total_added_triangles": 175112,
+    "new_material_slots": 0,
+    "warning": "Use the combined model set after native acceptance. The two independent stages share file names and must not overwrite each other."
+  },
+  "separate_pending_work": {
+    "foliage": "Sources/Lowtide/foliage/foliage-status.json",
+    "note": "Foliage persistence remains separate. The timber/concrete floor candidates share the combined material set; all are separate from the combined window/door OBJ geometry.",
+    "warehouse_floor": "Sources/Lowtide/floor/floor-status.json",
+    "concrete_floor_use": "Sources/Lowtide/concrete/wear-status.json",
+    "sewn_cargo_sacks": "Sources/Lowtide/sacks/construction-status.json",
+    "sack_integration": "Three dressing/fleet OBJ copies form a separate set; they do not overlap the window/door geometry or timber/concrete material stages. Revalidate before hashes before using any snapshot.",
+    "sack_detail_candidates": "Sources/Lowtide/sacks/lod-status.json",
+    "drainage_construction_and_atlas_mapping": "Sources/Lowtide/drainage/construction-status.json",
+    "drainage_junctions": "Sources/Lowtide/drainage/junction-status.json",
+    "exterior_paving_contact": "Sources/Lowtide/paving/use-status.json",
+    "water_reflection_filtering": "Sources/Lowtide/water/filter-status.json"
+  },
+  "rejected_work": {
+    "brick_relief": "Sources/Lowtide/brick/relief-status.json",
+    "reason": "Stretched mortar edges and rare skipped surface intersections. Retain the current production brick material."
+  },
+  "remaining": [
+    "Native compilation and visual review in the existing normal viewport.",
+    "Controlled gameplay performance and distance-aliasing checks.",
+    "Canonical generator integration, editor promotion, saving and persistence checks after acceptance.",
+    "The overall AAA quality goal remains open; offline construction previews do not establish completion."
+  ],
+  "reduced_detail_candidates": "Sources/Lowtide/construction/lod-status.json",
+  "combined_materials": {
+    "manifest": "output/lowtide/quality-pass/material-integration/manifest.json",
+    "composer": "Tools/lowtide_material_stage.py",
+    "model_snapshots": 2,
+    "existing_slot_remaps": 4,
+    "staged_files": 20,
+    "new_material_slots": 0,
+    "warning": "Use the combined material remap plan for the timber/concrete passes; independent VMDL copies overwrite each other. Revalidate later LOD/model edits."
+  },
+  "latest_checkout_revalidation": "Sources/Lowtide/construction/checkout-status.json",
+  "historical_evidence_note": "Other validation fields describe the dated candidate; use latest_checkout_revalidation for the current scoped rebase."
+}

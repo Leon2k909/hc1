@@ -1,0 +1,15 @@
+var root=Sandbox.Project.Current.GetRootPath();
+object Describe(string path,string[] keys)
+{
+    var material=Material.Load(path);
+    if(material is null || material.IsError) throw new InvalidOperationException("Material failed: "+path);
+    return new{Path=path,material.ShaderName,Textures=keys.Select(key=>{
+        var texture=material.GetTexture(key);
+        if(texture is null || texture.IsError) throw new InvalidOperationException("Missing texture "+key);
+        return new{Key=key,texture.Width,texture.Height,texture.IsError};
+    }).ToArray()};
+}
+var belltower=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase)==true);
+var result=new{Materials=new[]{Describe("materials/belltower/rubble.vmat",new[]{"g_tStoneColor","g_tStoneHeight","g_tStoneSeams"}),Describe("materials/belltower/ivy_climb.vmat",new[]{"g_tPlants"})},BelltowerSaved=!belltower.HasUnsavedChanges,ActiveScene=Game.ActiveScene?.Name,Game.IsPlaying};
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/belltower/quality/wall-v3/native-verification.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

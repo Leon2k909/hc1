@@ -1,0 +1,28 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var revision=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/spillway/reflection-config.json")))["revision"].GetValue<int>();
+if(revision<2 || revision>99)throw new InvalidOperationException("Invalid reflection revision");
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/spillway/spillway.scene",StringComparison.OrdinalIgnoreCase)==true);
+if(session?.Scene?.Source?.ResourcePath?.Equals("scenes/maps/spillway/spillway.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Spillway must be active");
+var source=System.IO.Path.Combine(root,"Assets/materials/spillway/reflections");
+var probes=session.Scene.GetAllComponents<EnvmapProbe>().ToArray();
+var names=new[]{"Probe Yard","Probe Turbine","Probe Control lower","Probe Control upper","Probe Pump room"};
+var results=new System.Collections.Generic.List<object>();
+for(var index=0;index<5;index++)
+{
+    var files=System.IO.Directory.GetFiles(source,$"reflection_{index}_v{revision}_exr_*.generated.vtex_c");
+    if(files.Length!=1)throw new InvalidOperationException("Expected one newly compiled reflection cube for "+index);
+    var path=$"lighting/spillway/reflection_{index}_v{revision}.vtex";
+    System.IO.File.Copy(files[0],System.IO.Path.Combine(root,"Assets",path+"_c"),true);
+    var texture=Texture.Load(path,false);
+    if(texture is null||texture.IsError)throw new InvalidOperationException("Static cube did not load: "+path);
+    var probe=probes.Single(p=>p.GameObject.Name==names[index]);
+    probe.Mode=EnvmapProbe.EnvmapProbeMode.CustomTexture;probe.Texture=texture;
+    results.Add(new {Name=names[index],Path=path,texture.Width,texture.Height});
+}
+typeof(Editor.SceneEditorSession).GetProperty("HasUnsavedChanges").SetValue(session,true);
+session.Save(false);
+var cache=System.IO.Path.Combine(root,"Sources/Spillway/lighting");
+System.IO.Directory.CreateDirectory(cache);
+System.IO.File.WriteAllText(System.IO.Path.Combine(cache,"reflections.json"),System.Text.Json.JsonSerializer.Serialize(results));
+return new {Saved=!session.HasUnsavedChanges,Probes=results};

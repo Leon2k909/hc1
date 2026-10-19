@@ -1,0 +1,9 @@
+var root=Sandbox.Project.Current.GetRootPath();
+const string relative="shaders/hc1_spillway_falls_v4.shader";
+var source=System.IO.Path.Combine(root,"Sources/Spillway",relative);
+var destination=System.IO.Path.Combine(root,"Assets",relative);
+System.IO.File.Copy(source,destination,true);Editor.AssetSystem.RegisterFile(destination);
+var result=await Editor.EditorUtility.CompileShader(relative,new(){ForceRecompile=true},cancellationToken);
+if(!result.Success)throw new InvalidOperationException(string.Join("\n",result.Programs.SelectMany(p=>p.Output??new System.Collections.Generic.List<string>())));
+if(result.CompiledShader is {Length:>0})System.IO.File.WriteAllBytes(destination+"_c",result.CompiledShader);
+return new {result.Success,Bytes=result.CompiledShader?.Length};

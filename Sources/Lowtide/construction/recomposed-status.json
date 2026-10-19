@@ -1,0 +1,111 @@
+{
+  "status": "installed_native_visual_review_complete",
+  "manifest": "output/lowtide/quality-pass/native-2026-10-18/construction-recomposed/manifest.json",
+  "manifest_sha256": "a3ed8ae5d609bbec116e4067dd2720891556ad9e4aa8d353f4b1c75646f8beef",
+  "verification": "output/lowtide/quality-pass/native-2026-10-18/construction-recomposed/verification.json",
+  "models": {
+    "lowtide_east": {
+      "triangles": 246854,
+      "windows": {
+        "removed": 15910,
+        "added": 82668,
+        "retained": 144192
+      },
+      "doors": {
+        "removed": 432,
+        "added": 20426,
+        "retained": 226428
+      }
+    },
+    "lowtide_west": {
+      "triangles": 246854,
+      "windows": {
+        "removed": 15910,
+        "added": 82668,
+        "retained": 144192
+      },
+      "doors": {
+        "removed": 432,
+        "added": 20426,
+        "retained": 226428
+      }
+    },
+    "lowtide_backdrop": {
+      "triangles": 6869,
+      "windows": {
+        "removed": 320,
+        "added": 1928,
+        "retained": 4941
+      },
+      "doors": null
+    },
+    "lowtide_finish": {
+      "triangles": 207258,
+      "pipes": {
+        "removed": 15088,
+        "added": 110592,
+        "retained": 80234
+      },
+      "junctions": {
+        "removed": 113040,
+        "added": 129472,
+        "retained": 77786
+      },
+      "grate_triangles_preserved": 12336
+    }
+  },
+  "stage_file_count": 11,
+  "live_models_unchanged": false,
+  "native_accepted": true,
+  "generator": "Tools/lowtide_recompose_construction.py",
+  "note": "Scoped construction is installed and reproduced by the canonical generators. All 24 street grates remain intact. Production native mesh data matches the reviewed candidates; 25 native images were reviewed. Discard mixed-scene performance samples; a controlled gameplay benchmark remains required. Historical manifests retain their original pre-import snapshots.",
+  "observed_utc": "2026-10-18T17:28:22.728747+00:00",
+  "project_root": "C:\\sbox-projects\\hc1\\forked-shooter-main",
+  "production_changed": true,
+  "native_acceptance_scope": "Geometry, materials and still-image appearance; gameplay performance and temporal stability remain open.",
+  "canonical_generator_integrated": true,
+  "canonical_generators": [
+    "Tools/lowtide_map.py",
+    "Tools/lowtide_finish.py",
+    "Tools/lowtide_construction.py"
+  ],
+  "canonical_verification": "output/lowtide/quality-pass/native-2026-10-18/construction-recomposed/canonical-verification.json",
+  "installed_files": {
+    "Assets/shaders/hc1_lowtide_finish_metal.shader": "a15c51b92ff632f8639f38d5398bca17933b9843bc274fe96b49f7a0d5805475",
+    "Assets/models/maps/lowtide/lowtide_backdrop.mtl": "72122bbc45e40a4e14615226312e2e7cb0e661c0d2c4046605f634a791a3cd4d",
+    "Assets/models/maps/lowtide/lowtide_backdrop.obj": "aa6339bb36a8d7ac2972ebdde6f01b6de814df3f3e06fd6a7329811507d7bde3",
+    "Assets/models/maps/lowtide/lowtide_east.mtl": "af7ec9997f4d5ef9de29f34ee163dfbe1d5baf33b85c7b5df4dce7c3f5bb09f7",
+    "Assets/models/maps/lowtide/lowtide_east.obj": "ed5203baf8e8d612cf636e0f8f4beb1ba06a2cc5235f16cfa616a54f89ef2135",
+    "Assets/models/maps/lowtide/lowtide_finish.mtl": "d2e70a095901b5e63a890f00c23e78cdc307fa8cfaf1987ed323d64f8c402247",
+    "Assets/models/maps/lowtide/lowtide_finish.obj": "b0065cb4cbbed1f8c64c68fc0adac7b98c019b9df52f6880433f17cbc6513f74",
+    "Assets/models/maps/lowtide/lowtide_west.mtl": "aa08510a4c2c66231993166f806d85b365e2076ce4332dd22e34dafacbda80ae",
+    "Assets/models/maps/lowtide/lowtide_west.obj": "031287a7e255db25ae84456ff4190983ebe1eb34e8c3fd1c1a5a8efdcae23cc1",
+    "Assets/materials/lowtide/finish/lt_drain_edge.vmat": "8844676ef03b0584ccc6ceca14381d6b74a68d0815bc58f4d8583857f5199447",
+    "Assets/materials/lowtide/finish/lt_drain_iron.vmat": "cf7d3afe0485b5ff3afc605e5017fcdd379ea44556b0719409f4d885b824a3b5"
+  },
+  "production_import": "output/lowtide/quality-pass/native-2026-10-18/construction-recomposed/production-import.json",
+  "native_mesh_readback": "output/lowtide/quality-pass/native-2026-10-18/construction-recomposed/production-readback.json",
+  "native_triangles": {
+    "lowtide_east": 246854,
+    "lowtide_west": 246854,
+    "lowtide_backdrop": 6869,
+    "lowtide_finish": 206394
+  },
+  "source_triangle_delta": 287048,
+  "material_slots_added": 0,
+  "visual_review": {
+    "comparison_images": 20,
+    "production_images": 5,
+    "comparison_directory": "output/lowtide/quality-pass/native-2026-10-18/construction-recomposed/native-review",
+    "production_capture": "output/lowtide/quality-pass/native-2026-10-18/construction-recomposed/production-review/capture.json"
+  },
+  "preserved_grates": 24,
+  "grate_verification": "output/lowtide/quality-pass/native-2026-10-18/construction-recomposed/grate-verification.json",
+  "scene_sha256": "97de1e8f46850ba239022bf1a5b6a0c0e3afc9cceab85f47a3ac95e200a33834",
+  "scene_changed": false,
+  "collision_changed": false,
+  "review_assets_archived": "output/lowtide/quality-pass/native-2026-10-18/construction-recomposed/review-retired.json",
+  "performance_measured": false,
+  "temporal_verification_complete": false,
+  "overall_AAA_verified": false
+}

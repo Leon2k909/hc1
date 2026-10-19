@@ -1463,6 +1463,8 @@ def write_scene( written, light_list, path ):
         "__references": [],
         "__version": 3,
     }
+    from map_daylight import apply_profile
+    apply_profile( scene )
     path.parent.mkdir( parents=True, exist_ok=True )
     K.write_text( path, json.dumps( scene, indent=2 ), newline=None )
     print( f"wrote {path}" )

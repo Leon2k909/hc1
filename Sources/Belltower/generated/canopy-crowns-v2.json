@@ -1,0 +1,11 @@
+{
+  "use_case": "precise-object-edit",
+  "asset_type": "RGBA aerial crown atlas, with padding for independent texture sampling",
+  "generator": "built-in image_gen",
+  "transparent_background": true,
+  "prompt": "Edit this RGBA tree-crown texture atlas. Change only packing and spacing: retain the same four photographic top-down crowns, their species, color, fine foliage, natural alpha holes and soft leaf edges. Place one crown centered within each exact quadrant of a square canvas in a regular 2 by 2 arrangement. Reduce every crown enough to leave at least 10 percent of its quadrant width as completely transparent padding on ALL FOUR sides of that quadrant. No foliage may cross a quadrant boundary. Preserve each crown's full natural silhouette without clipping or overlap. Do not introduce new ground, cast shadows, trunks, labels, grid lines, borders or background. Output actual transparency. This layout correction is for safe independent sampling in a game texture atlas.",
+  "input": "Sources/Belltower/generated/canopy-crowns-v1.png",
+  "source_output": "C:/Users/leon2/.codex/generated_images/01a137a3-a1f4-7cf1-a3b1-54c0f0bbf6db/exec-0f3bdb1c-fa44-4077-9950-5039d38caafa.png",
+  "asset": "Sources/Belltower/generated/canopy-crowns-v2.png",
+  "status": "original generated alpha retained; selected for offline painter trial; not published in live assets"
+}

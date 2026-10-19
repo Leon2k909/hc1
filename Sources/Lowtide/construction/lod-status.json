@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-15",
+  "status": "offline_detail_meshes_ready_for_native_profiling",
+  "revision": "construction-detail-levels-v1",
+  "user_work_mode": "Continue offline for now",
+  "production_changed": false,
+  "close_detail_candidate_changed": false,
+  "native_lod_switching_configured": false,
+  "native_switch_thresholds": null,
+  "generator": "Tools/lowtide_construction_lods.py",
+  "reviewer": "Tools/lowtide_construction_lod_review.py",
+  "scope": ["lowtide_east", "lowtide_west", "lowtide_backdrop"],
+  "triangle_counts": {
+    "close_detail": 500413,
+    "reduced_level_1": 411421,
+    "reduced_level_2": 381861,
+    "reduction_percent_from_close_detail": [17.783710655, 23.6908313733]
+  },
+  "changes": [
+    "Reduced arch subdivisions and glazing-bar profile complexity retain the fitted front shoulders.",
+    "Distant door variants omit tiny screw heads, simplify hinge barrels and grips, and retain the photographed board fronts.",
+    "Closed backing preserves door coverage; frame/pane openings remain clear.",
+    "Exact replacement retains every triangle, UV and normal outside the staged construction components.",
+    "The original close-detail builders are restored after each scoped build, including failed builds."
+  ],
+  "offline_evidence": {
+    "manifest": "output/lowtide/quality-pass/construction-lods/manifest.json",
+    "verification": "output/lowtide/quality-pass/construction-lods/offline-verification.json",
+    "visual_review": "output/lowtide/quality-pass/construction-lods/review/verification.json",
+    "byte_identical_component_reproductions": 6,
+    "geometry_coverage_clearance_and_joint_rays": 7155,
+    "matched_preview_images": 18,
+    "protected_live_files_unchanged": 556,
+    "reviewed_feature_heights_pixels": [300, 160, 80]
+  },
+  "visual_assessment": {
+    "medium_trial_condition": "The local window/door feature is around 160 pixels tall or smaller.",
+    "coarse_trial_condition": "The local window/door feature is around 80 pixels tall or smaller.",
+    "native_threshold_values": false,
+    "limitations": "Static CPU comparisons with approximate lighting. No engine normal maps, mip selection, GI, temporal transition, or measured gameplay performance."
+  },
+  "native_followup": [
+    "Keep the offline restriction until the user resumes editor work.",
+    "Recheck source and candidate hashes, then compile unused models and compare them in the existing normal viewport.",
+    "The warehouse halves are large aggregate models. Do not convert the per-feature pixel review conditions into a single origin-distance switch without checking actual engine LOD selection.",
+    "Profile the full-detail version first. Establish whether native aggregate bounds permit useful LOD selection, and assess grouping/draw costs before changing scene structure.",
+    "Check movement across transitions, oblique windows, both paint variants and shadow aliasing. Keep full detail wherever the reduced form is visible.",
+    "Only after native acceptance configure switching and integrate the chosen resources into the canonical generator and editor scene."
+  ]
+}

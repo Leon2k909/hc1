@@ -1,0 +1,23 @@
+if(!Game.IsPlaying) throw new InvalidOperationException("Start Cerro Blanco before the live check");
+var scene=Game.ActiveScene;
+if(scene.Source?.ResourcePath?.Equals("scenes/maps/cerroblanco/cerroblanco.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("The running scene is not Cerro Blanco");
+var pawn=Facepunch.Client.Local?.PlayerPawn;
+if(pawn is null) throw new InvalidOperationException("The local player has not spawned");
+var before=scene.GetAllComponents<Facepunch.LightweightCombatBot>().ToDictionary(b=>b.GameObject.Id,b=>b.WorldPosition);
+await Task.Delay(4000,cancellationToken);
+if(!Game.IsPlaying || Game.ActiveScene!=scene) throw new InvalidOperationException("The play session changed");
+var bots=scene.GetAllComponents<Facepunch.LightweightCombatBot>().Select(b=>new {
+    b.BotName,Team=b.Team.ToString(),b.IsAlive,Position=b.WorldPosition.ToString(),
+    Moved=before.TryGetValue(b.GameObject.Id,out var old)?b.WorldPosition.Distance(old):0,
+    Move=b.CurrentMove.ToString() }).ToArray();
+var result=new { Scene=scene.Source.ResourcePath, CheckedAt=DateTime.UtcNow,
+    GameMode=Facepunch.GameMode.ActiveIdent, Hardcore=Facepunch.GameMode.ActiveHardcore,
+    Player=new {Position=pawn.WorldPosition.ToString(),Health=pawn.HealthComponent?.Health},
+    Camera=scene.Camera?.GameObject.Name, PlayerCameraSelected=scene.Camera==pawn.CameraController?.Camera,
+    MovingBots=bots.Count(b=>b.Moved>6),Bots=bots,
+    NavEnabled=scene.NavMesh.IsEnabled,NavGenerating=scene.NavMesh.IsGenerating,
+    Networking.IsActive,Networking.IsHost,Connections=Networking.Connections.Count() };
+System.IO.File.WriteAllText(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/cerroblanco/live-round-validation.json"),
+    System.Text.Json.JsonSerializer.Serialize(result,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return result;

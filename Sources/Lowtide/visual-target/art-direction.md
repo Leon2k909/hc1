@@ -2,6 +2,13 @@
 
 The generated canal paintover is a visual target, not an in-engine screenshot.
 
+The quay paintover `quay-target.png` is a second generated reference, using the
+actual `shed-weathering-quay-after.png` view. Its built-in imagegen prompt and
+provenance are in `quay-target-imagegen.json`. The useful differences are clearer
+stone joints and rounded arrises, finer brick surface variation, and stronger
+contact beneath objects. It also alters some small architectural proportions;
+those changes are not a layout specification or evidence of shipped graphics.
+
 Keep the existing Speicherstadt warehouse architecture and playable low-tide
 layout. Use muted fired clay, soot-black iron, oxidized copper and dark estuary
 silt. Add construction detail at believable sizes: socketed drainpipes,
@@ -402,3 +409,52 @@ recompiles and loaded 2048px texture/strength checks passed after the interrupte
 editor reload. Three reviewed normal viewport captures cover both quays and the
 yard, with no new errors and the user's camera restored. The modest deposits
 improve contact and breakup; they do not resolve the broader quality goal.
+
+The bridge's scanned board rows now compensate for the OBJ importer's V flip.
+This corrects 320 existing UV records across 80 boards; the former padding
+samples stretched into broad brown streaks. Walk and canal-wide viewport views
+were accepted with 47 protected files unchanged. Geometry, collision and source
+texture pixels were preserved. Evidence: bridge-uv-verification.json.
+
+The original granite colour and roughness now drive a production paving material
+with nine-millimetre joint relief, physical-scale normals and recessed-joint AO.
+Parallax fades with distance and projected pixel footprint. Four actual-material
+viewport views cover both quays, a close view and a grazing view. All four 2048px
+textures load in the original three material slots without preview overrides.
+The canonical generator reproduces the maps; 54 protected sources matched when
+this pass completed. Evidence: paving-relief-production-verification.json.
+Later container geometry changes intentionally supersede that historical model
+hash baseline. No controlled gameplay performance claim is made.
+
+quay-target.png is a generated art reference, not an engine capture. Its complete
+built-in ImageGen prompt and provenance are in quay-target-imagegen.json. It is
+useful for surface response, architectural contact and foliage, while preserving
+the existing gameplay layout. The overall AAA goal remains open.
+
+Container construction now includes rounded sheet folds, bevelled structural
+rails and locking brackets, and 32 hollow corner castings across the four props.
+The roof and underplate stop around their 96 lifting apertures. Actual exported
+geometry rays verified each opening after exposing and fixing the old plates'
+overlap. The original placements, bounds, collision and generated paint textures
+are retained; the canonical builder reproduces the construction and collision.
+
+Each dressing half retains all 322,708 triangles outside its two containers. The
+whole pass adds 41,024 visual triangles. All 526 protected source files match;
+native compilation/loading and four normal viewport views pass without model or
+material errors. Camera and prior tab are restored. Evidence is in container-detail
+under the quality-pass folder, with final blue, red, corner and quay captures in
+the parent folder. The containers' broad paint/weathering response remains too
+uniform, and the wider buildings and foliage remain below the intended target.
+There is no controlled gameplay performance comparison for this addition.
+
+The six container materials now use the reviewed enamel shader in production.
+Smoother intact paint, rough oxide, seam runoff and base dirt produce a modest
+finish improvement across blue, red and grey variants. All existing generated
+paint pixels, UVs, geometry, collision, lighting and scene data are retained.
+Six materials compile and eight original material slots load correctly without
+preview overrides. Four production views are reviewed; 536 protected files match.
+The canonical generator reproduces all 22 shader/material/texture files byte for
+byte. The camera and prior tab are restored and no new native errors were logged.
+Evidence: container-surface/verification.json under the quality-pass folder.
+This does not resolve wider architectural repetition or the angular foliage, and
+there is no controlled gameplay performance comparison for this material change.

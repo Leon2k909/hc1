@@ -1,0 +1,47 @@
+// Import private geometry controls/candidates without changing any scene.
+var root=Sandbox.Project.Current.GetRootPath();
+var stage=System.IO.Path.Combine(root,"output/belltower/quality/forest-distribution-v1");
+string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var manifestPath=System.IO.Path.Combine(stage,"manifest.json");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(manifestPath));
+if(manifest["revision"].GetValue<string>()!="forest-distribution-v1" || !manifest["candidate_is_exact_subset"].GetValue<bool>()
+    || !manifest["trial_boundary_retention_one"].GetValue<bool>() || manifest["new_colliders"].GetValue<int>()!=0)
+    throw new InvalidOperationException("Unexpected forest distribution study.");
+foreach(var input in manifest["source_sha256"].AsObject())
+    if(Hash(System.IO.Path.Combine(root,input.Key))!=input.Value.GetValue<string>()) throw new InvalidOperationException("A forest input changed: "+input.Key);
+var expected=manifest["model_overrides"].AsArray().SelectMany(o=>new[]{o["control"].GetValue<string>(),o["clumped"].GetValue<string>()})
+    .SelectMany(p=>new[]{p,System.IO.Path.ChangeExtension(p,"obj"),System.IO.Path.ChangeExtension(p,"mtl")}).ToHashSet();
+var files=manifest["files"].AsArray();
+if(expected.Count!=48 || files.Count!=48 || !files.Select(f=>f["path"].GetValue<string>()).ToHashSet().SetEquals(expected))
+    throw new InvalidOperationException("Expected 48 private model sources.");
+foreach(var file in files)
+{
+    var path=file["path"].GetValue<string>();
+    if(!System.Text.RegularExpressions.Regex.IsMatch(path,@"^models/maps/belltower/forest/distribution-v1/(control|clumped)/belltower_forest_0[4-7]_0[7-8]\.(obj|mtl|vmdl)$")
+        || file["source"].GetValue<string>()!="output/belltower/quality/forest-distribution-v1/Assets/"+path
+        || Hash(System.IO.Path.Combine(root,file["source"].GetValue<string>()))!=file["sha256"].GetValue<string>())
+        throw new InvalidOperationException("A private model source differs: "+path);
+    var live=System.IO.Path.Combine(root,"Assets",path);
+    if(System.IO.File.Exists(live) && Hash(live)!=file["sha256"].GetValue<string>()) throw new InvalidOperationException("Different private geometry exists: "+path);
+}
+var selected=Editor.SceneEditorSession.Active;
+var game=Game.ActiveScene?.Id;
+var playing=Game.IsPlaying;
+var written=0;
+foreach(var file in files)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var path=file["path"].GetValue<string>();
+    var live=System.IO.Path.Combine(root,"Assets",path);
+    if(!System.IO.File.Exists(live))
+    {
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(live));
+        System.IO.File.Copy(System.IO.Path.Combine(root,file["source"].GetValue<string>()),live,false);
+        written++;
+    }
+}
+foreach(var path in expected.Where(p=>p.EndsWith(".vmdl"))) Editor.AssetSystem.RegisterFile(System.IO.Path.Combine(root,"Assets",path));
+var result=new {Imported=48,NewFiles=written,ModelsRegistered=16,SceneObjectsAdded=0,SceneSaved=false,ManifestSha256=Hash(manifestPath),
+    GamePreserved=game==Game.ActiveScene?.Id && playing==Game.IsPlaying,SelectedDocumentPreserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active)};
+System.IO.File.WriteAllText(System.IO.Path.Combine(stage,"native-import-result.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

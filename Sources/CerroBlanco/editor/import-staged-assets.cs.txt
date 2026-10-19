@@ -1,0 +1,48 @@
+if (Game.IsPlaying) throw new InvalidOperationException("Stop play before importing Cerro Blanco resources.");
+var session=Editor.SceneEditorSession.Active;
+if (session?.Scene.Source?.ResourcePath?.Equals("scenes/maps/cerroblanco/cerroblanco.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Cerro Blanco must own the editor window for this import.");
+var root=Sandbox.Project.Current.GetRootPath();
+var stage=System.IO.Path.GetFullPath(System.IO.Path.Combine(root,"output/cerroblanco/stage"));
+var assets=System.IO.Path.GetFullPath(System.IO.Path.Combine(root,"Assets"));
+var paths=new System.Collections.Generic.Dictionary<string,string>();
+foreach(var name in new[]{"material-manifest.json","geometry-manifest.json"})
+{
+    var document=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/cerroblanco",name)));
+    foreach(var item in document["files"].AsArray()) paths[item["path"].GetValue<string>()]=item["sha256"].GetValue<string>();
+}
+var imported=new System.Collections.Generic.List<string>();
+var toCompile=new System.Collections.Generic.List<string>();
+foreach(var pair in paths.OrderBy(p=>p.Key.EndsWith(".vmat")?2:p.Key.EndsWith(".vmdl")?3:1))
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var relative=pair.Key;
+    if (!(relative.StartsWith("materials/cerroblanco/quality-v1/") || relative.StartsWith("models/maps/cerroblanco/quality-v1/") || relative=="shaders/cerroblanco_stone.shader"))
+        throw new InvalidOperationException("Unexpected import path: "+relative);
+    var source=System.IO.Path.GetFullPath(System.IO.Path.Combine(stage,relative));
+    var target=System.IO.Path.GetFullPath(System.IO.Path.Combine(assets,relative));
+    if (!source.StartsWith(stage+System.IO.Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase) || !target.StartsWith(assets+System.IO.Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase))
+        throw new InvalidOperationException("Import escaped its root.");
+    var bytes=System.IO.File.ReadAllBytes(source);
+    var hash=Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(bytes));
+    if (!hash.Equals(pair.Value,StringComparison.OrdinalIgnoreCase)) throw new InvalidOperationException("Staged hash changed: "+relative);
+    if (System.IO.File.Exists(target) && System.IO.File.ReadAllBytes(target).SequenceEqual(bytes)) continue;
+    var backup=System.IO.Path.Combine(root,"output/cerroblanco/before/assets",relative);
+    if (System.IO.File.Exists(target) && !System.IO.File.Exists(backup))
+    {
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+        System.IO.File.Copy(target,backup);
+    }
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    var pending=target+".cerroblanco-import";
+    System.IO.File.WriteAllBytes(pending,bytes);
+    System.IO.File.Move(pending,target,true);
+    Editor.AssetSystem.RegisterFile(target);
+    imported.Add(relative);
+    if (relative.EndsWith(".shader"))
+        await Editor.EditorUtility.CompileShader(relative,new(),cancellationToken);
+    if (relative.EndsWith(".vmat") || relative.EndsWith(".vmdl"))toCompile.Add(relative);
+}
+var report=new { Imported=imported, Compile=toCompile };
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/cerroblanco/native-import.json"),System.Text.Json.JsonSerializer.Serialize(report));
+return report;

@@ -1,0 +1,11 @@
+if(Game.IsPlaying)throw new InvalidOperationException("Prepare the test before entering play.");
+if(Editor.SceneEditorSession.Active?.Scene.Source?.ResourcePath?.Equals("scenes/maps/sewage/sewage.scene",StringComparison.OrdinalIgnoreCase)!=true)throw new InvalidOperationException("Activate Sewage before testing it.");
+var root=Sandbox.Project.Current.GetRootPath();
+var previous=new {NoDamage=Facepunch.DevCommands.NoDamage,Mode=Facepunch.GameMode.ActivePath,Hardcore=Facepunch.GameMode.ActiveHardcore};
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/sewage/test-previous-state.json"),System.Text.Json.JsonSerializer.Serialize(previous));
+var mode=GameObject.GetPrefab("prefabs/game_modes/zombies.prefab")?.GetComponent<Facepunch.GameMode>();
+if(mode is null)throw new InvalidOperationException("The Zombies mode prefab is missing.");
+Facepunch.GameMode.SetCurrent(mode);
+Facepunch.GameMode.SetHardcore(false);
+Facepunch.DevCommands.NoDamage=true;
+return new{PreparedMode=Facepunch.GameMode.ActiveIdent,Facepunch.DevCommands.NoDamage};

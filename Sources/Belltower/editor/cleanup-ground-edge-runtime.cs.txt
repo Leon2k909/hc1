@@ -1,0 +1,26 @@
+// Clean only the recorded comparison root, without stopping another scene's play.
+var root=Sandbox.Project.Current.GetRootPath();
+var stage=System.IO.Path.Combine(root,"output/belltower/quality/ground-edge-v1");
+var state=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"runtime-state.json")));
+var current=Game.ActiveScene?.Id;
+var selected=Editor.SceneEditorSession.Active;
+var playing=Game.IsPlaying;
+var owned=Scene.All.FirstOrDefault(s=>s.Id.ToString()==state["SceneId"].GetValue<string>());
+var removed=false;
+if(owned is not null)
+{
+    var comparison=owned.GetAllObjects(true).SingleOrDefault(o=>o.Id.ToString()==state["RootId"].GetValue<string>() && o.Name=="Belltower ground-edge performance comparison");
+    if(comparison.IsValid())
+    {
+        using(owned.Push()) { comparison.Destroy(); owned.ProcessDeletes(); }
+        removed=true;
+    }
+}
+var editorObjects=Editor.SceneEditorSession.All.Where(s=>s.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase)==true)
+    .SelectMany(s=>s.Scene.GetAllObjects(true)).Count(o=>o.Name=="Belltower ground-edge comparison" || o.Name=="Belltower ground-edge performance comparison");
+var result=new {OriginalRuntimeSceneStillActive=owned is not null,OwnedComparisonRootRemoved=removed,
+    EditorComparisonObjectsRemaining=editorObjects,CurrentScene=Game.ActiveScene?.Name,
+    GamePreserved=Game.ActiveScene?.Id==current && Game.IsPlaying==playing,
+    SelectedDocumentPreserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active),SourceSceneWritten=false};
+System.IO.File.WriteAllText(System.IO.Path.Combine(stage,"runtime-cleanup-audit.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

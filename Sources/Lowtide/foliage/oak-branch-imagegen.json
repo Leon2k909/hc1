@@ -1,0 +1,10 @@
+{
+  "tool": "built-in image_gen",
+  "intent": "edit",
+  "edit_target": "output/lowtide/quality-pass/foliage/original-branch-atlas.png",
+  "source_atlas": "facepunch.tree_oak_small_a: models/sbox_props/trees/oak/oak_branch.vmat, extracted g_tColor unchanged through native editor",
+  "generated_file": "oak-branch-candidate.png",
+  "transparent_background": true,
+  "prompt": "Use case: precise-object-edit. Asset type: transparent oak foliage texture atlas for an existing 3D game tree. The attached image is the EDIT TARGET, a fixed UV atlas. Preserve the square canvas, every branch's location, orientation, branching structure, overall silhouette and empty transparent gaps. Do not rearrange, enlarge, crop, add new branches or change the atlas layout. Replace only the crude painted-looking surface detail with sharply photographed real English oak foliage and bark: believable lobed oak leaves, subtle veins, small curls and restrained natural variation from olive to muted healthy green, brown woody twigs. Individual leaves must read as thin natural leaves, not angular cardboard or plastic. Use neutral diffuse overcast lighting suitable for albedo, no cast shadows, no highlights, no baked directional light, no glow. Keep texture values in a usable photographic midtone range. Clean detailed alpha edges with genuinely transparent background, including holes between leaves. No checkerboard, solid backdrop, labels, text, borders, props or watermark. Output a high resolution square atlas, preferably 2048 by 2048, carefully matching the original branch arrangement.",
+  "status": "Rejected as a direct replacement: the compiled preview produced harsh contrast and the generated alpha enlarged foliage coverage by approximately 60%. Four original tree materials remain assigned. See foliage-status.json for the next candidate."
+}

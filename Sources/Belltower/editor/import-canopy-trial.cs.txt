@@ -1,0 +1,65 @@
+// Import a separate reviewed texture candidate. Accepted materials stay intact.
+var root=Sandbox.Project.Current.GetRootPath();
+var stage=System.IO.Path.GetFullPath(System.IO.Path.Combine(root,"output/belltower/quality/canopy-photo-v2-full"));
+var assets=System.IO.Path.GetFullPath(System.IO.Path.Combine(root,"Assets"));
+var manifestPath=System.IO.Path.Combine(stage,"native-import.json");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(manifestPath));
+if(manifest["revision"].GetValue<string>()!="canopy-photo-v2") throw new InvalidOperationException("Unexpected canopy revision.");
+string Hash(string path)
+{
+    using var stream=System.IO.File.OpenRead(path);
+    return Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(stream)).ToLowerInvariant();
+}
+foreach(var group in new[]{"source_hashes","base_inputs"})
+    foreach(var dependency in manifest[group].AsObject())
+        if(Hash(System.IO.Path.Combine(root,dependency.Key))!=dependency.Value.GetValue<string>())
+            throw new InvalidOperationException("Checked canopy dependency changed: "+dependency.Key);
+var accepted=manifest["accepted_manifest"];
+if(Hash(System.IO.Path.Combine(root,accepted["path"].GetValue<string>()))!=accepted["sha256"].GetValue<string>())
+    throw new InvalidOperationException("The accepted landscape changed after staging.");
+var allowed=new System.Collections.Generic.HashSet<string>{"vista_land.vmat","forest_trees.vmat"};
+foreach(var zone in new[]{"a","b","c","d"})
+    foreach(var suffix in new[]{"color.jpg","kind.png"}) allowed.Add("vista_"+zone+"_"+suffix);
+var files=manifest["files"].AsArray();
+if(files.Count!=allowed.Count) throw new InvalidOperationException("Unexpected canopy trial file count.");
+var checkedNames=new System.Collections.Generic.HashSet<string>();
+foreach(var file in files)
+{
+    var relative=file["path"].GetValue<string>();
+    var name=System.IO.Path.GetFileName(relative);
+    if(!allowed.Contains(name) || !checkedNames.Add(name)
+        || relative!="materials/belltower/vista/canopy-photo-v2/"+name
+        || file["source"].GetValue<string>()!="output/belltower/quality/canopy-photo-v2-full/"+name)
+        throw new InvalidOperationException("Unexpected canopy trial path.");
+    var destination=System.IO.Path.Combine(assets,relative);
+    var source=System.IO.Path.Combine(stage,name);
+    var digest=file["sha256"].GetValue<string>();
+    if(Hash(source)!=digest || (System.IO.File.Exists(destination) && Hash(destination)!=digest))
+        throw new InvalidOperationException("Canopy trial input or destination changed: "+name);
+}
+var game=Game.ActiveScene?.Id;
+var playing=Game.IsPlaying;
+var selected=Editor.SceneEditorSession.Active;
+var incomingDirectory=System.IO.Path.Combine(stage,"native-incoming");
+System.IO.Directory.CreateDirectory(incomingDirectory);
+foreach(var file in files)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var relative=file["path"].GetValue<string>();
+    var name=System.IO.Path.GetFileName(relative);
+    var destination=System.IO.Path.Combine(assets,relative);
+    if(System.IO.File.Exists(destination)) continue; // Complete batch checked above.
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(destination));
+    var incoming=System.IO.Path.Combine(incomingDirectory,name);
+    if(!System.IO.File.Exists(incoming)) System.IO.File.Copy(System.IO.Path.Combine(stage,name),incoming);
+    if(Hash(incoming)!=file["sha256"].GetValue<string>()) throw new InvalidOperationException("Incoming canopy asset changed.");
+    System.IO.File.Move(incoming,destination); // A trial never overwrites an existing different asset.
+    if(Hash(destination)!=file["sha256"].GetValue<string>()) throw new InvalidOperationException("Published canopy asset differs.");
+}
+foreach(var material in manifest["material_overrides"].AsObject())
+    Editor.AssetSystem.RegisterFile(System.IO.Path.Combine(assets,material.Value.GetValue<string>()));
+var result=new {Imported=files.Count, ManifestSha256=Hash(manifestPath), AcceptedAssetsReplaced=false,
+    GamePreserved=Game.ActiveScene?.Id==game && Game.IsPlaying==playing,
+    SelectedDocumentPreserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active)};
+System.IO.File.WriteAllText(System.IO.Path.Combine(stage,"native-import-result.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

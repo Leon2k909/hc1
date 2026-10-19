@@ -128,7 +128,11 @@ def access_cover(model, frame):
 
 
 def build(model, e, n, height, z0=0.0, along="n"):
-    frame = P.Frame((e, n, z0), (0, 1) if along == "n" else (1, 0))
+    directions = {"n": (0, 1), "+n": (0, 1), "-n": (0, -1),
+                  "e": (1, 0), "+e": (1, 0), "-e": (-1, 0)}
+    if along not in directions:
+        raise ValueError(f"Unknown street lamp facing: {along}")
+    frame = P.Frame((e, n, z0), directions[along])
     # Chamfered anchor flange and cast pedestal, followed by the smooth tapered shaft.
     profile = [(3.55, .12), (3.55, .8), (3.40, 1.05), (2.98, 1.35), (2.98, 12.6),
                (2.88, 13.2), (2.72, 13.65), (2.70, 15.0), (2.67, 16.0),
@@ -164,8 +168,11 @@ def build(model, e, n, height, z0=0.0, along="n"):
 
 
 def placements(side):
-    return [(side * 1285, n, 190.0, 0.0) for n in (-820.0, -100.0, 620.0)] + \
-           [(side * e, 1425, 190.0, 5.0) for e in (900.0, 1700.0)]
+    # The cross-street fixtures project into the road, and the northern
+    # pavement fixtures face south away from the warehouse walls.
+    return [(side * 1285, n, 190.0, 0.0, "-e" if side > 0 else "+e")
+            for n in (-820.0, -100.0, 620.0)] + \
+           [(side * e, 1425, 190.0, 5.0, "-n") for e in (900.0, 1700.0)]
 
 
 def refresh_fragment(path, name, side):
@@ -221,15 +228,15 @@ def patch_models():
             if not line.startswith("f ") or material not in (P.DARK, "rw_lamp_cool"):
                 continue
             points = vertices[[int(ref.split("/")[0]) - 1 for ref in line.split()[1:]]]
-            for e, n, height, z0 in poses:
+            for e, n, height, z0, _along in poses:
                 if (np.all(np.abs(points[:, 0] + e) <= 5.01) and np.all(np.abs(points[:, 2] - n) <= 14.01)
                     and points[:, 1].min() >= z0 - .01 and points[:, 1].max() <= z0 + height + 3.91):
                     removed.add(index)
                     break
         legacy, replacement = K.Model(), K.Model()
-        for e, n, height, z0 in poses:
+        for e, n, height, z0, along in poses:
             P.lamp_post(legacy, e, n, height, z0)
-            build(replacement, e, n, height, z0)
+            build(replacement, e, n, height, z0, along)
         expected = sum(len(points) - 2 for faces in legacy.polygons.values() for points, _ in faces)
         if len(removed) != expected:
             raise ValueError(f"{name}: expected {expected} legacy lamp triangles, found {len(removed)}")

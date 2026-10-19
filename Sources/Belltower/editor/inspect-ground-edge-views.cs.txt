@@ -1,0 +1,25 @@
+// Find clear views of the staged deposits using the actual editor render meshes.
+var root=Sandbox.Project.Current.GetRootPath();
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/belltower/quality/ground-edge-v1/manifest.json")));
+var scene=Editor.SceneEditorSession.All.Single(s=>s.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase)==true).Scene;
+var fronts=manifest["frontages"].AsArray().ToDictionary(f=>f["key"].GetValue<string>());
+var wanted=new[]{"house-8/+n","house-9/+e","house-11/+e","house-12/+e","house-15/+e"};
+var results=new System.Collections.Generic.List<object>();
+using(scene.Push())
+foreach(var key in wanted)
+{
+    var patch=manifest["patches"].AsArray().FirstOrDefault(p=>p["front"].GetValue<string>()==key);
+    if(patch is null) continue;
+    var front=fronts[key];
+    var e=patch["centre"][0].GetValue<float>();
+    var n=patch["centre"][1].GetValue<float>();
+    var de=front["normal"][0].GetValue<float>();
+    var dn=front["normal"][1].GetValue<float>();
+    var target=new Vector3(n,-e,1f);
+    var eye=new Vector3(n+dn*80f,-e-de*80f,38f);
+    var hit=scene.Trace.Ray(eye,target).UsePhysicsWorld(false).UseRenderMeshes(true).Run();
+    results.Add(new {Front=key,Eye=eye.ToString(),Target=target.ToString(),Angles=Rotation.LookAt(target-eye).Angles().ToString(),
+        hit.Hit,HitObject=hit.GameObject?.Name,DistanceFromTarget=(hit.EndPosition-target).Length});
+}
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/belltower/quality/ground-edge-v1/native-view-rays.json"),System.Text.Json.JsonSerializer.Serialize(results));
+return results;

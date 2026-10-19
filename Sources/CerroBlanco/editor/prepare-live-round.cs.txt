@@ -1,0 +1,29 @@
+if(Game.IsPlaying || Networking.IsActive) throw new InvalidOperationException("A test is already running");
+if(Editor.SceneEditorSession.Active?.Scene.Source?.ResourcePath?.Equals("scenes/maps/cerroblanco/cerroblanco.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Select Cerro Blanco before the live test");
+var path=System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/cerroblanco/test-state.json");
+if(System.IO.File.Exists(path))
+{
+    var pending=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(path));
+    if(pending["RestoredAt"] is null) throw new InvalidOperationException("An earlier test still needs its settings restored");
+}
+var mode=GameObject.GetPrefab("prefabs/game_modes/team_deathmatch.prefab")?.GetComponent<Facepunch.GameMode>();
+if(!mode.IsValid()) throw new InvalidOperationException("TDM prefab is unavailable");
+var previous=new {RunId=Guid.NewGuid(),StartedAt=DateTime.UtcNow,NoDamage=Facepunch.DevCommands.NoDamage,Mode=Facepunch.GameMode.ActivePath,
+    EditorLobby=Facepunch.GameNetworkManager.EditorLobby,
+    Hardcore=Facepunch.GameMode.ActiveHardcore,Ranked=Facepunch.GameMode.ActiveRanked,
+    Privacy=Editor.EditorUtility.Network.HostPrivacy.ToString(),
+    Custom=Facepunch.CustomGameSettings.Current,
+    CustomPrivacy=Facepunch.CustomGameSettings.Current?.Privacy.ToString(),
+    CustomInput=Facepunch.CustomGameSettings.Current?.Input.ToString(),
+    InstanceArguments=Editor.EditorPreferences.NewInstanceCommandLineArgs};
+System.IO.File.WriteAllText(path,System.Text.Json.JsonSerializer.Serialize(previous));
+Facepunch.GameMode.SetCurrent(mode);
+// This visual/performance check runs locally with bots. It adds no networked
+// gameplay and does not need the project's full client-download file scan.
+Facepunch.GameNetworkManager.EditorLobby=false;
+Facepunch.CustomGameSettings.Configure(10,true,Sandbox.Network.LobbyPrivacy.Private,
+    new Facepunch.CustomGameRules {TimeLimit=0,ScoreLimit=0});
+Facepunch.DevCommands.NoDamage=true;
+Editor.EditorUtility.Network.HostPrivacy=Sandbox.Network.LobbyPrivacy.Private;
+return new {previous.RunId,Mode=Facepunch.GameMode.ActiveIdent,LocalBotMatch=true,TimeAndScoreLimitsDisabled=true};

@@ -1,0 +1,15 @@
+// Read existing resource metadata without changing any scene, play or material state.
+var root=Sandbox.Project.Current.GetRootPath();
+var selected=Editor.SceneEditorSession.Active;
+var game=Game.ActiveScene?.Id;
+var playing=Game.IsPlaying;
+var material=Material.Load("materials/belltower/forest/forest_trees.vmat");
+if(material is null || material.IsError) throw new InvalidOperationException("The accepted forest material failed to load.");
+var texture=material.GetTexture("g_tPlants");
+if(texture is null || texture.IsError) throw new InvalidOperationException("The accepted forest atlas failed to load.");
+var result=new {Material=material.ResourcePath,material.ShaderName,TextureWidth=texture.Width,TextureHeight=texture.Height,
+    TextureMipCount=texture.Mips,EditorPid=Environment.ProcessId,CurrentScene=Game.ActiveScene?.Name,
+    GamePreserved=Game.ActiveScene?.Id==game && Game.IsPlaying==playing,
+    SelectedDocumentPreserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active),AssetsWritten=0};
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/belltower/quality/forest-coverage-v1/native-atlas-metadata.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

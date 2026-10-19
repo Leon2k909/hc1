@@ -4,11 +4,111 @@ Photographed height data gives the terracotta roof its silhouette and shadows.
 All relief and joinery remain separate from the existing gameplay collision.
 """
 import math
+import zlib
 import numpy as np
 import belltower_furniture as Furniture
 from functools import lru_cache
 from pathlib import Path
-from map_kit import normalise
+from map_kit import Model, normalise
+
+
+def wall_moulding(model, wall, r0, r1, z0, profile, paint):
+    """Extrude a stone profile along a wall; close returns without a concave fan.
+
+    Profile points are (outward depth, height), ordered from bottom to top.
+    Horizontal steps create the lips and shadow gaps. Each return is split into
+    monotone strips so projecting cornices have no overlapping cap triangles.
+    """
+    d, sign = wall.outer()
+    axis = np.array((1.,0.,0.)) if wall.axis == 'e' else np.array((0.,1.,0.))
+    out = np.array((0.,sign,0.)) if wall.axis == 'e' else np.array((sign,0.,0.))
+    up = np.array((0.,0.,1.))
+    back = min(p[0] for p in profile)
+
+    def at(r, depth, z):
+        return wall.point(r,d+sign*depth,z0+z)
+
+    for (da,za),(db,zb) in zip(profile,profile[1:]):
+        assert zb >= za, 'Moulding heights must be monotone'
+        normal = out*(zb-za)+up*(da-db)
+        if np.linalg.norm(normal) < 1e-9:
+            continue
+        Furniture.face(model,paint,[at(r0,da,za),at(r1,da,za),at(r1,db,zb),at(r0,db,zb)],normal)
+        if zb > za:
+            for r,toward in ((r0,-axis),(r1,axis)):
+                points=[at(r,back,za),at(r,da,za),at(r,db,zb),at(r,back,zb)]
+                # At either profile tip the strip can be triangular.
+                clean=[]
+                for point in points:
+                    if not clean or np.linalg.norm(point-clean[-1])>1e-8:
+                        clean.append(point)
+                if len(clean)>2 and np.linalg.norm(clean[0]-clean[-1])<1e-8:
+                    clean.pop()
+                if len(clean)>=3:
+                    Furniture.face(model,paint,clean,toward)
+    Furniture.face(model,paint,[at(r0,back,profile[0][1]),at(r0,back,profile[-1][1]),
+        at(r1,back,profile[-1][1]),at(r1,back,profile[0][1])],-out)
+
+
+def window_sill(model, wall, opening, paint):
+    """Sloped stone weathering, a rounded nose and an underside drip recess."""
+    # Keep every point in the former sill's bounds, including its highest edge.
+    profile=((-0.5,0),(1.8,0),(1.8,.35),(2.45,.35),(2.7,.65),
+             (2.7,1.75),(3.0,2.0),(3.0,3.05),(2.65,3.35),(-0.5,4.0))
+    wall_moulding(model,wall,opening.r0-3,opening.r1+3,opening.z0-4,profile,paint)
+
+
+def window_surround(model, wall, opening, paint, variant=0, hood=True):
+    """Eased jambs and three related lintel profiles, consistent per house."""
+    d, sign=wall.outer()
+    band=5.0
+    for r0,r1,z0,z1 in ((opening.r0-band,opening.r0,opening.z0,opening.z1+band),
+                       (opening.r1,opening.r1+band,opening.z0,opening.z1+band),
+                       (opening.r0,opening.r1,opening.z1,opening.z1+band)):
+        lo,hi=map(np.asarray,wall.lo_hi(r0,r1,d,d+sign*1.5,z0,z1))
+        Furniture.bevel_box(model,(lo+hi)/2,np.eye(3),hi-lo,paint,.22)
+    if not hood:
+        return
+    profiles=(
+        ((-.2,0),(1.3,0),(1.3,1),(2.8,1.8),(3.0,2.1),(3.0,3.5),(-.2,4.5)),
+        ((-.2,0),(.9,0),(.9,1.3),(1.7,1.3),(2.8,3.2),(3.8,3.2),(4.0,3.4),(4.0,4.6),(-.2,5.5)),
+        ((-.2,0),(1.1,0),(1.1,1),(1.6,1.4),(2.2,1.6),(2.9,2.3),(3.1,3.1),(4.4,3.1),(4.4,4.9),(-.2,5.8)),
+    )
+    wall_moulding(model,wall,opening.r0-band-2,opening.r1+band+2,opening.z1+band,
+                  profiles[variant%len(profiles)],paint)
+
+
+def cornice(model, wall, r0, r1, z0, paint, variant=0):
+    """Twelve-inch eaves mouldings, inside the original roof clearance."""
+    profiles=(
+        ((0,0),(1.3,0),(1.3,2),(3.0,2),(4.5,5),(4.5,6),(6.7,6),(7,6.3),(7,10.8),(6.6,11.3),(0,12)),
+        ((0,0),(2,0),(2,3),(3.2,3),(3.2,5),(5.2,5),(5.2,7),(7,7),(7,10.8),(6.6,11.2),(0,12)),
+        ((0,0),(1,0),(1,1.8),(2.2,2.3),(3.1,3.1),(3.8,4.4),(4.1,5.6),(6.7,5.6),(7,6),(7,10.8),(6.6,11.3),(0,12)),
+    )
+    wall_moulding(model,wall,r0,r1,z0,profiles[variant%len(profiles)],paint)
+
+
+def coping(model, lo, hi, paint, surface):
+    """Jointed coping stones within one unchanged gameplay collision box."""
+    lo,hi=np.asarray(lo,float),np.asarray(hi,float)
+    model.box(lo,hi,None,surface)
+    along=int(np.argmax((hi-lo)[:2]))
+    length=hi[along]-lo[along]
+    count=max(1,round(length/30))
+    seed=zlib.crc32(np.round(np.r_[lo,hi],3).tobytes())
+    rng=np.random.default_rng(seed)
+    weights=rng.uniform(.82,1.18,count)
+    bounds=np.r_[0,np.cumsum(weights)/sum(weights)*length]+lo[along]
+    # A shallow continuous bedding course closes the visible mortar joints.
+    bed=hi.copy(); bed[2]=lo[2]+.28
+    model.box(lo,bed,paint)
+    for index,(a,b) in enumerate(zip(bounds,bounds[1:])):
+        left,right=lo.copy(),hi.copy()
+        left[along]=a+(.12 if index else 0)
+        right[along]=b-(.12 if index<count-1 else 0)
+        left[2]+=.18
+        right[2]-=rng.uniform(0,.12)
+        Furniture.bevel_box(model,(left+right)/2,np.eye(3),right-left,paint,.3)
 
 
 def stone_pier(model, lo, hi, surface):
@@ -125,9 +225,24 @@ def roof_ridge(model, start, end):
         clay_shell(model,start+along*k*step,across,along,up,11.5,step+1.2,4.4,k)
 
 
-def shutter(model, wall, r0, r1, z0, z1, depth, paint):
+def shutter(model, wall, r0, r1, z0, z1, depth, paint, angle=0.0, hinge=None):
     """Timber stiles, rails, tilted louvres, and iron hinge straps."""
     d, sign = wall.outer()
+    if angle:
+        # Rotate an upper-storey leaf around its actual hinge. This uses a
+        # rigid transform, retaining outward winding on every wall direction.
+        part=Model()
+        shutter(part,wall,r0,r1,z0,z1,depth,paint)
+        axis=np.array((1.,0.,0.)) if wall.axis=='e' else np.array((0.,1.,0.))
+        out=np.array((0.,sign,0.)) if wall.axis=='e' else np.array((sign,0.,0.))
+        turn=math.radians(angle)*np.cross(axis,out)[2]
+        c,s=math.cos(turn),math.sin(turn)
+        rotation=np.array(((c,-s,0),(s,c,0),(0,0,1)))
+        pivot=wall.point(r0 if hinge is None else hinge,d+sign*depth,z0)
+        for material,faces in part.polygons.items():
+            for points,normal in faces:
+                model.polygon(material,[(p-pivot)@rotation.T+pivot for p in points],normal=normal@rotation.T)
+        return
     def box(a,b,c,e,f,g,material):
         lo,hi = wall.lo_hi(a,b,d+sign*c,d+sign*e,f,g)
         model.box(lo,hi,material)

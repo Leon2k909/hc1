@@ -1,0 +1,57 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var output=System.IO.Path.Combine(root,"output/spillway/waterfall-pass");
+var backup=System.IO.Path.Combine(output,"before-assets");
+System.IO.Directory.CreateDirectory(backup);
+var playing=Game.IsPlaying;var gameId=Game.ActiveScene?.Id;
+var selected=Editor.SceneEditorSession.Active;var dirty=selected?.HasUnsavedChanges;
+void Backup(string relative)
+{
+    var from=System.IO.Path.Combine(root,"Assets",relative);
+    var to=System.IO.Path.Combine(backup,relative);
+    if(System.IO.File.Exists(from) && !System.IO.File.Exists(to))
+    {
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(to));
+        System.IO.File.Copy(from,to);
+    }
+}
+const string shader="shaders/hc1_spillway_falls_v5.shader";
+var shaderDestination=System.IO.Path.Combine(root,"Assets",shader);
+Backup(shader);
+System.IO.File.Copy(System.IO.Path.Combine(root,"Sources/Spillway",shader),shaderDestination,true);
+Editor.AssetSystem.RegisterFile(shaderDestination);
+var compiled=await Editor.EditorUtility.CompileShader(shader,new(){ForceRecompile=true},cancellationToken);
+if(!compiled.Success)throw new InvalidOperationException(string.Join("\n",compiled.Programs.SelectMany(p=>p.Output??new System.Collections.Generic.List<string>())));
+if(compiled.CompiledShader is {Length:>0})System.IO.File.WriteAllBytes(shaderDestination+"_c",compiled.CompiledShader);
+const string texture="materials/spillway/waterfall-turbulence-v1.png";
+var textureDestination=System.IO.Path.Combine(root,"Assets",texture);
+Backup(texture);
+System.IO.File.Copy(System.IO.Path.Combine(root,"Sources/Spillway/waterfalls/waterfall-turbulence-v1.png"),textureDestination,true);
+Editor.AssetSystem.RegisterFile(textureDestination);
+var results=new System.Collections.Generic.List<object>();
+foreach(var name in new[]{"sw_fall_v4","sw_foam_v4","sw_mist_v4"})
+{
+    var relative="materials/spillway/"+name+".vmat";
+    Backup(relative);
+    var destination=System.IO.Path.Combine(root,"Assets",relative);
+    var original=System.IO.File.ReadAllText(System.IO.Path.Combine(backup,relative));
+    var revised=original.Replace("hc1_spillway_falls_v4.shader","hc1_spillway_falls_v5.shader");
+    revised=revised.Replace(" g_flFoam", " TextureTurbulence \""+texture+"\"\n g_flFoam");
+    System.IO.File.WriteAllText(destination,revised);
+    var asset=Editor.AssetSystem.FindByPath(destination)??Editor.AssetSystem.RegisterFile(destination);
+    var success=asset.Compile(true);
+    if(!success)throw new InvalidOperationException("Material compile failed: "+relative);
+    results.Add(new {Path=relative,Success=success});
+}
+await Task.Delay(500,cancellationToken);
+foreach(var name in new[]{"sw_fall_v4","sw_foam_v4","sw_mist_v4"})
+{
+    var material=Material.Load("materials/spillway/"+name+".vmat");
+    var data=material.GetTexture("g_tTurbulence");
+    if(material.IsError || data is null || data.IsError)throw new InvalidOperationException("Waterfall resource missing: "+name);
+    data.MarkUsed(2048);
+}
+var result=new {ShaderCompiled=compiled.Success,ShaderBytes=compiled.CompiledShader?.Length,Materials=results,
+    GamePreserved=Game.IsPlaying==playing && Game.ActiveScene?.Id==gameId,
+    EditorPreserved=Editor.SceneEditorSession.Active==selected && selected?.HasUnsavedChanges==dirty};
+System.IO.File.WriteAllText(System.IO.Path.Combine(output,"import.json"),System.Text.Json.JsonSerializer.Serialize(result,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return result;

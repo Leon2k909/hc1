@@ -1,0 +1,72 @@
+// Run during Belltower's coordinated editor window, after source validation.
+if(Game.IsPlaying) throw new InvalidOperationException("Preserve the current play session; wait for the editor window.");
+var root=Sandbox.Project.Current.GetRootPath();
+var stage=System.IO.Path.Combine(root,"output/belltower/quality/models/facades-v1");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"native-import.json")));
+if(manifest["invalid_spots"].GetValue<int>()!=0 || manifest["unreachable_spots"].GetValue<int>()!=0 || manifest["spots"].GetValue<int>()!=94)
+    throw new InvalidOperationException("Gameplay validation did not pass.");
+if(manifest["geometry_checks"]["checks"].GetValue<int>()!=35)
+    throw new InvalidOperationException("Detail geometry validation did not pass.");
+string Hash(string path)
+{
+    using var stream=System.IO.File.OpenRead(path);
+    return Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(stream)).ToLowerInvariant();
+}
+var files=manifest["files"].AsArray();
+var expected=new[]{"belltower_centre.obj","belltower_west.obj","belltower_east.obj"};
+if(files.Count!=3) throw new InvalidOperationException("This pass only replaces three visible meshes.");
+foreach(var source in manifest["source_hashes"].AsObject())
+    if(Hash(System.IO.Path.Combine(root,source.Key))!=source.Value.GetValue<string>())
+        throw new InvalidOperationException("Generator changed since validation: "+source.Key);
+var checkedNames=new System.Collections.Generic.HashSet<string>();
+foreach(var file in files)
+{
+    var relative=file["path"].GetValue<string>();
+    var name=System.IO.Path.GetFileName(relative);
+    if(!expected.Contains(name) || !checkedNames.Add(name) || relative!="models/maps/belltower/"+name
+        || file["source"].GetValue<string>()!="output/belltower/quality/models/facades-v1/"+name)
+        throw new InvalidOperationException("Unexpected facade asset path.");
+    var installed=Hash(System.IO.Path.Combine(root,"Assets",relative));
+    if(Hash(System.IO.Path.Combine(stage,name))!=file["sha256"].GetValue<string>()
+        || (installed!=file["expected_sha256"].GetValue<string>() && installed!=file["sha256"].GetValue<string>()))
+        throw new InvalidOperationException("A facade source or destination changed since validation: "+name);
+}
+var game=Game.ActiveScene?.Id;
+var active=Editor.SceneEditorSession.Active;
+foreach(var file in files)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var relative=file["path"].GetValue<string>();
+    var name=System.IO.Path.GetFileName(relative);
+    var destination=System.IO.Path.Combine(root,"Assets",relative);
+    var backup=System.IO.Path.Combine(root,"output/belltower/quality/facades-v1-before/assets",relative);
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+    if(!System.IO.File.Exists(backup))
+    {
+        if(Hash(destination)!=file["expected_sha256"].GetValue<string>()) throw new InvalidOperationException("Original backup missing: "+name);
+        System.IO.File.Copy(destination,backup);
+    }
+    if(Hash(backup)!=file["expected_sha256"].GetValue<string>()) throw new InvalidOperationException("Backup differs: "+name);
+    if(Hash(destination)==file["sha256"].GetValue<string>()) continue;
+    var incoming=destination+".facades-import";
+    if(!System.IO.File.Exists(incoming)) System.IO.File.Copy(System.IO.Path.Combine(stage,name),incoming);
+    if(Hash(incoming)!=file["sha256"].GetValue<string>()) throw new InvalidOperationException("Incoming mesh differs: "+name);
+    try { System.IO.File.Move(incoming,destination,true); }
+    catch(UnauthorizedAccessException)
+    {
+        // A mapped old source can be renamed even when Windows refuses to replace it.
+        // Preserve that exact file as well as the verified backup until the editor releases it.
+        var retained=destination+".facades-retained";
+        if(System.IO.File.Exists(retained)) throw new InvalidOperationException("Inspect retained source before resuming: "+name);
+        if(Hash(destination)!=file["expected_sha256"].GetValue<string>()) throw;
+        System.IO.File.Move(destination,retained);
+        try { System.IO.File.Move(incoming,destination); }
+        catch { System.IO.File.Move(retained,destination); throw; }
+    }
+    if(Hash(destination)!=file["sha256"].GetValue<string>()) throw new InvalidOperationException("Published mesh differs: "+name);
+}
+var result=new { Imported=files.Count,GameplaySpots=94,CollisionDefinitionsReplaced=false,
+    GamePreserved=Game.ActiveScene?.Id==game && !Game.IsPlaying,
+    SelectedDocumentPreserved=ReferenceEquals(active,Editor.SceneEditorSession.Active) };
+System.IO.File.WriteAllText(System.IO.Path.Combine(stage,"native-import-result.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

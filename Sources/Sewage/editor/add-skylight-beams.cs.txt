@@ -1,0 +1,21 @@
+if(Game.IsPlaying)throw new InvalidOperationException("Stop play before lighting changes.");
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.Source?.ResourcePath?.Equals("scenes/maps/sewage/sewage.scene",StringComparison.OrdinalIgnoreCase)==true);
+var scene=session.Scene;
+var positions=new[]{new Vector3(255,460,1110),new Vector3(875,-145,1110),new Vector3(255,-730,1110)};
+for(var i=0;i<positions.Length;i++)
+{
+    var name="Skylight shaft "+i;
+    var obj=scene.GetAllObjects(true).FirstOrDefault(o=>o.Name==name)??new GameObject(scene){Name=name};
+    obj.WorldPosition=positions[i];obj.WorldRotation=Rotation.From(new Angles(90,0,0));
+    var light=obj.Components.GetOrCreate<SpotLight>();
+    light.LightColor=new Color(2.6f,3.8f,4.3f);
+    light.Radius=1400;light.ConeInner=9;light.ConeOuter=22;
+    light.Shadows=true;light.Attenuation=.6f;light.FogStrength=1.5f;
+    var mode=typeof(SpotLight).GetProperty("FogMode");mode.SetValue(light,Enum.Parse(mode.PropertyType,"Enabled"));
+}
+var mistObject=scene.GetAllObjects(true).FirstOrDefault(o=>o.Name=="Chamber suspended moisture")??new GameObject(scene){Name="Chamber suspended moisture"};
+var mist=mistObject.Components.GetOrCreate<VolumetricFogVolume>();
+mist.Bounds=new BBox(new Vector3(-980,-980,-100),new Vector3(1020,980,1120));
+mist.Strength=.009f;mist.Color=new Color(.24f,.32f,.29f);mist.FalloffExponent=1;
+typeof(Editor.SceneEditorSession).GetProperty("HasUnsavedChanges").SetValue(session,true);
+return new {SkylightBeams=positions.Length,MistStrength=mist.Strength};

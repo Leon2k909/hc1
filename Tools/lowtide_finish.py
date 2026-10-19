@@ -17,6 +17,8 @@ from scipy import ndimage
 import map_kit as K
 from lowtide_brick import metadata
 import lowtide_banks as BANKS
+import lowtide_grates as GRATES
+import lowtide_construction as CONSTRUCTION
 
 SOURCE = K.ROOT / "Sources/Lowtide/visual-target/estuary-silt-source.png"
 DIRECTORY = K.ASSETS / "materials/lowtide/finish"
@@ -49,6 +51,7 @@ def bake_silt(source):
 
 def write_materials():
     DIRECTORY.mkdir(parents=True, exist_ok=True)
+    GRATES.write_materials()
     if not (DIRECTORY / "silt_color.png").exists():
         raise FileNotFoundError("Bake the generated silt source before writing finish materials")
     for name in ("lt_mud", "lt_mud_wet"):
@@ -78,6 +81,9 @@ def write_materials():
         ("lt_rope_detail", ".70 .62 .50", 0, .85, "sacks/lt_jute"),
         ("lt_bank_stone", ".65 .64 .61", 0, .69, "finish/silt"),
     ):
+        if name in ("lt_drain_iron", "lt_drain_edge"):
+            K.write_text(DIRECTORY / f"{name}.vmat", CONSTRUCTION.metal_material(tint, metal, rough))
+            continue
         K.write_text(DIRECTORY / f"{name}.vmat", f'''"Layer0"
 {{
     shader "shaders/complex.shader"
@@ -105,6 +111,9 @@ def write_materials():
     g_vColorTint "[{tint} 1]"
 }}
 ''')
+    shader = K.ASSETS / "shaders/hc1_lowtide_finish_metal.shader"
+    K.write_text(shader, (K.ROOT / "Sources/Lowtide/drainage/finish-metal.shader").read_text())
+    metadata(shader)
     metadata(K.ASSETS / "shaders/hc1_lowtide_silt.shader")
 
 
@@ -115,54 +124,80 @@ def configure(model):
             model.tile_overrides[paint] = 36
         elif paint == "ashlar_grey":
             model.material_overrides[paint] = f"{RESOURCE}/lt_quay_stone.vmat"
+    GRATES.configure(model)
     return model
 
 
 def drainpipe(m, L, e, n, top, out, bottom=3):
     """Four-inch cast iron pipe, socket joints, wall fixings and rain hopper."""
-    out = np.asarray(out, float)
-    foot = np.array([e, n, bottom], float) + out * 5
-    head = np.array([e, n, top - 10], float) + out * 5
-    L.bar(m, foot, head, 2.0, "lt_drain_iron", sides=12)
-    for z in np.arange(bottom + 16, top - 20, 92):
-        at = np.array([e, n, z], float) + out * 5
-        L.bar(m, at, at + (0, 0, 4), 2.55, "lt_drain_edge", sides=12)
-        m.beam(at, at - out * 5, (1.1, 1.1), "lt_drain_iron")
-    L.bar(m, foot + (0, 0, 9), foot + out * 6, 2.0, "lt_drain_iron", sides=12)
-    m.box(head + (-4.3, -4.3, 0), head + (4.3, 4.3, 8), "lt_drain_iron")
-    m.box(head + (-5, -5, 8), head + (5, 5, 9), "lt_drain_edge")
+    CONSTRUCTION.drainpipe(m, L, e, n, top, out, bottom)
 
 
 def grate(m, e, n, width=23, length=32):
-    # Flush grates have no new collision; the existing pavement supports players.
-    m.box((e-width/2, n-length/2, .02), (e+width/2, n+length/2, .10), "lt_drain_iron")
-    for x in (-width/2, width/2):
-        m.box((e+x-.6, n-length/2-.8, .10), (e+x+.6, n+length/2+.8, .45), "lt_drain_edge")
-    for y in np.arange(-length/2, length/2+1, 3):
-        m.box((e-width/2, n+y-.45, .12), (e+width/2, n+y+.45, .40), "lt_drain_edge")
+    GRATES.grate(m, e, n, width, length)
 
 
 def gutter(m, L, e0, e1, n, height):
     """Open half-round iron gutter, rolled lips, stop ends and real brackets."""
-    angles = np.linspace(-math.pi, 0, 13)
-    def point(e, radius, angle):
-        return np.array((e, n + radius * math.cos(angle), height + radius * math.sin(angle)))
-    for radius, inside in ((2.6, False), (2.32, True)):
-        for a, b in zip(angles, angles[1:]):
-            normal = np.array((0, math.cos((a+b)/2), math.sin((a+b)/2))) * (-1 if inside else 1)
-            L.card(m, "lt_drain_iron", [point(e0, radius, a), point(e1, radius, a),
-                point(e1, radius, b), point(e0, radius, b)], normal)
-    for e, sign in ((e0, -1), (e1, 1)):
-        for a, b in zip(angles, angles[1:]):
-            L.card(m, "lt_drain_edge", [point(e, 2.6, a), point(e, 2.6, b),
-                point(e, 2.32, b), point(e, 2.32, a)], (sign, 0, 0))
-        L.card(m, "lt_drain_iron", [point(e, 2.32, a) for a in angles], (sign, 0, 0))
+    CONSTRUCTION.gutter(m, L, e0, e1, n, height)
+
+
+def drainage_layout(L, side):
+    """Pipes and shed gutters in draw order; the same pipe locations drive physics."""
+    for n in (-378, 205, 724, 1126):
+        yield "pipe", (side*240, n, 942, (-side, 0, 0), -94)
+    for n in (-372, 207, 727, 1126):
+        yield "pipe", (side*1000, n, 942, (side, 0, 0), 3)
+    for e in (370, 870):
+        yield "pipe", (side*e, -400, 936, (0, -1, 0), 3)
+    for bounds, eaves in ((L.QUAY_SHED, 276), (L.YARD_SHED, 236)):
+        e0, e1, n0, n1 = bounds
+        left, right = sorted((side*e0, side*e1))
+        for n, direction in ((n0, -1), (n1, 1)):
+            yield "gutter", (left-.5, right+.5, n+direction*2.8, eaves-.5)
+            for e in (e0+14, e1-16):
+                yield "pipe", (side*e, n, eaves, (0, direction, 0), 3)
+
+
+def pipe_collider_specs(L):
+    """Small static capsules for the solid pipe barrels, in world coordinates.
+
+    The visible warehouse downpipes bend outward from 8 to 12 inches at the
+    cornice. The two touching capsules follow that change without putting a
+    large box across a walkway or covering the drainage model's other details.
+    """
+    specs = []
     for side in (-1, 1):
-        L.bar(m, (e0, n+side*2.5, height), (e1, n+side*2.5, height), .28, "lt_drain_edge", sides=6)
-    for e in np.arange(e0+24, e1-12, 72):
-        for a, b in zip(angles, angles[1:]):
-            L.card(m, "lt_drain_edge", [point(e-.5, 2.82, a), point(e+.5, 2.82, a),
-                point(e+.5, 2.82, b), point(e-.5, 2.82, b)], (0, math.cos((a+b)/2), math.sin((a+b)/2)))
+        for kind, values in drainage_layout(L, side):
+            if kind != "pipe":
+                continue
+            e, n, top, outward, bottom = values
+            warehouse = top > 900
+            runs = ((8., bottom, 908.), (12., 906., top-10.)) if warehouse else (
+                (5., bottom, top-10.),)
+            for segment, (offset, z0, z1) in enumerate(runs):
+                radius = 2.55
+                key = f"world/downpipe_collisions/{len(specs)}"
+                position = K.to_world((e+outward[0]*offset, n+outward[1]*offset, z0))
+                specs.append(dict(
+                    key=key, name=f"Downpipe {len(specs)+1:02d}",
+                    position=position.tolist(),
+                    start=(0., 0., radius), end=(0., 0., z1-z0-radius), radius=radius,
+                ))
+    assert len(specs) == 56  # 20 warehouse downpipes (2 runs) and 16 shed downpipes
+    return specs
+
+
+def pipe_collision_object(L):
+    children = []
+    for spec in pipe_collider_specs(L):
+        key = spec["key"]
+        children.append(K.game_object(L.ids, spec["name"], key, spec["position"], components=[
+            K.component(L.ids, "Sandbox.CapsuleCollider", f"{key}/capsule",
+                        Start=K.vec(spec["start"]), End=K.vec(spec["end"]),
+                        Radius=spec["radius"], Static=True, IsTrigger=False),
+        ]))
+    return K.game_object(L.ids, "Downpipe Collisions", "world/downpipe_collisions", children=children)
 
 
 def build(L):
@@ -170,19 +205,11 @@ def build(L):
     for s in (-1, 1):
         # The canal's tidal courses now share one plane, with no raised cap.
         # Locate pipes on solid piers, away from doors and window openings.
-        for n in (-378, 205, 724, 1126):
-            drainpipe(m, L, s*240, n, 942, (-s, 0, 0), bottom=-94)
-        for n in (-372, 207, 727, 1126):
-            drainpipe(m, L, s*1000, n, 942, (s, 0, 0))
-        for e in (370, 870):
-            drainpipe(m, L, s*e, -400, 936, (0, -1, 0))
-        for bounds, eaves in ((L.QUAY_SHED, 276), (L.YARD_SHED, 236)):
-            e0, e1, n0, n1 = bounds
-            left, right = sorted((s*e0, s*e1))
-            for n, direction in ((n0, -1), (n1, 1)):
-                gutter(m, L, left-.5, right+.5, n+direction*2.8, eaves-.5)
-                for e in (e0+14, e1-16):
-                    drainpipe(m, L, s*e, n, eaves, (0, direction, 0))
+        for kind, values in drainage_layout(L, s):
+            if kind == "pipe":
+                drainpipe(m, L, *values)
+            else:
+                gutter(m, L, *values)
         # Raised anchor plates and bolt ends give long facades construction detail.
         for n in (-245, 140, 530, 920):
             for z in (334, 634):
@@ -234,8 +261,9 @@ def apply_scene(scene, L):
     component("Look", "Sandbox.Tonemapping").update(MinimumExposure=2.0, MaximumExposure=3.0, Rate=1.3)
     children = objects["Lowtide"]["Children"]
     index = next((i for i, o in enumerate(children) if o.get("Name") == "Harbour Details"), len(children))
-    children[:] = [o for o in children if o.get("Name") != "Harbour Details"]
+    children[:] = [o for o in children if o.get("Name") not in ("Harbour Details", "Downpipe Collisions")]
     children.insert(index, L.model_object("Harbour Details", "world/lowtide_finish", MODEL, False, True))
+    children.insert(index+1, pipe_collision_object(L))
     L.WATER.apply_scene(scene, L)
     # Outdoor metal and damp paving previously had only sky reflections.
     probes = objects["Reflection Probes"]["Children"]
@@ -254,6 +282,8 @@ def apply_scene(scene, L):
     lowtide_lighting.apply_scene(scene)
     import lowtide_static
     lowtide_static.apply_scene(scene)
+    from map_daylight import apply_profile
+    apply_profile(scene)
 
 
 def remap_stone():

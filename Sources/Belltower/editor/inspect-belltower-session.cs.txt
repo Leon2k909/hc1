@@ -1,0 +1,11 @@
+// Read-only preflight for a hidden-document comparison during shared play.
+var root=Sandbox.Project.Current.GetRootPath();
+var session=Editor.SceneEditorSession.All.SingleOrDefault(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase)==true);
+var result=new {ProjectRoot=root,CurrentGameScene=Game.ActiveScene?.Name,CurrentGameId=Game.ActiveScene?.Id,IsPlaying=Game.IsPlaying,
+    SelectedDocument=Editor.SceneEditorSession.Active?.Scene.Source?.ResourcePath,
+    BelltowerDocumentOpen=session is not null,BelltowerHasUnsavedChanges=session?.HasUnsavedChanges,
+    BelltowerEditorSceneId=session?.Scene.Id,
+    ForestSlots=session is null ? 0 : session.Scene.GetAllComponents<ModelRenderer>().Sum(r=>Enumerable.Range(0,r.Materials.Count).Count(i=>r.Materials.GetOriginal(i)?.ResourcePath=="materials/belltower/forest/forest_trees.vmat")),
+    SourceSceneSha256=Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(System.IO.Path.Combine(root,"Assets/scenes/maps/Belltower/belltower.scene")))).ToLowerInvariant()};
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/belltower/quality/forest-coverage-v1/editor-preflight.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

@@ -1,0 +1,52 @@
+// Shader sources use EditorUtility rather than the generic asset compiler.
+// Compile only an imported, hash-checked, versioned comparison shader.
+var root=Sandbox.Project.Current.GetRootPath();
+var config=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/belltower/quality/detail-shader-compile.json")));
+var revision=config["revision"].GetValue<string>();
+var relative=revision switch
+{
+    "forest-detail-v1" => "shaders/belltower_forest_detail_trial.shader",
+    "ground-edge-v1" => "shaders/belltower_ground_edge_trial.shader",
+    "forest-coverage-v1" => "shaders/belltower_forest_coverage_trial.shader",
+    _ => throw new InvalidOperationException("Unknown detail shader comparison.")
+};
+string Hash(string path)
+{
+    using var stream=System.IO.File.OpenRead(path);
+    return Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(stream)).ToLowerInvariant();
+}
+var stage=System.IO.Path.Combine(root,"output/belltower/quality",revision);
+var manifestPath=System.IO.Path.Combine(stage,"manifest.json");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(manifestPath));
+var imported=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"native-import-result.json")));
+var entry=manifest["files"].AsArray().Single(f=>f["path"].GetValue<string>()==relative);
+var source=System.IO.Path.Combine(root,"Assets",relative);
+if(manifest["revision"].GetValue<string>()!=revision || imported["ManifestSha256"].GetValue<string>()!=Hash(manifestPath)
+    || Hash(source)!=entry["sha256"].GetValue<string>())
+    throw new InvalidOperationException("The checked shader import changed.");
+if(manifest["engine_source_sha256"] is not null)
+{
+    var engineRoot=System.IO.Path.GetDirectoryName(Environment.ProcessPath);
+    foreach(var input in manifest["engine_source_sha256"].AsObject())
+        if(Hash(System.IO.Path.Combine(engineRoot,input.Key))!=input.Value.GetValue<string>())
+            throw new InvalidOperationException("The engine shader implementation changed since the trial was staged.");
+}
+var game=Game.ActiveScene?.Id;
+var playing=Game.IsPlaying;
+var selected=Editor.SceneEditorSession.Active;
+var pending=Editor.EditorUtility.CompileShader(relative,new(),cancellationToken);
+await pending;
+var reported=pending.GetType().GetProperty("Result")?.GetValue(pending);
+var reportedSuccess=reported is bool success ? success : reported?.GetType().GetProperty("Success")?.GetValue(reported) as bool?;
+var skipped=reported?.GetType().GetProperty("Skipped")?.GetValue(reported) as bool?;
+var compiled=source+"_c";
+if(reportedSuccess==false || !System.IO.File.Exists(compiled)
+    || System.IO.File.GetLastWriteTimeUtc(compiled)<System.IO.File.GetLastWriteTimeUtc(source)
+    || Hash(source)!=entry["sha256"].GetValue<string>())
+    throw new InvalidOperationException("Detail shader compilation did not produce a current resource.");
+var result=new {Shader=relative,SourceSha256=Hash(source),CompiledFileExists=true,CompiledFileSha256=Hash(compiled),
+    CompilerResultType=reported?.GetType().FullName,CompilerReportedSuccess=reportedSuccess,CompilerSkipped=skipped,
+    EditorPid=Environment.ProcessId,GamePreserved=Game.ActiveScene?.Id==game && Game.IsPlaying==playing,
+    SelectedDocumentPreserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active),NativeVisualAcceptance=false};
+System.IO.File.WriteAllText(System.IO.Path.Combine(stage,"native-compile-shader.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

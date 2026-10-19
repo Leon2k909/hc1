@@ -1,0 +1,10 @@
+if(Game.IsPlaying) throw new InvalidOperationException("Stop play before assembling the scene.");
+const string relative="scenes/maps/sewage/sewage.scene";
+var asset=Editor.AssetSystem.FindByPath(relative) ?? throw new InvalidOperationException("Create the scene with create_asset first.");
+if(Editor.SceneEditorSession.All.Any(s=>s.Scene.Source?.ResourcePath?.Equals(relative,StringComparison.OrdinalIgnoreCase)==true))
+    throw new InvalidOperationException("Close the Sewage editor tab before initial scene assembly.");
+var root=Sandbox.Project.Current.GetRootPath();
+var resource=asset.LoadResource<SceneFile>();
+resource.LoadFromJson(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/sewage/scene-import.json")));
+if(!asset.SaveToDisk(resource))throw new InvalidOperationException("Editor could not save Sewage.");
+return new {Saved=relative};

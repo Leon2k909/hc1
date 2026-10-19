@@ -334,7 +334,8 @@ def ring( m, centre, r_in, r_out, z0, z1, outer=TRAV, inner=PLASTER, top=HONED, 
                     lo2, hi2 = gaps_here[0][0], gaps_here[-1][1]
                 tangent = np.array( ( -u[1], u[0], 0.0 ) ) * facing
                 pts = [ c + u * r_in + ( 0, 0, lo2 ), c + u * r_out + ( 0, 0, lo2 ), c + u * r_out + ( 0, 0, hi2 ), c + u * r_in + ( 0, 0, hi2 ) ]
-                card( m, reveal, pts, tangent )
+                if reveal is not None:
+                    card( m, reveal, pts, tangent )
             if surface:
                 m.hull( [ c + u * r + ( 0, 0, z ) for u in ( ua, ub ) for r in ( r_in, r_out ) for z in ( lo, hi ) ], surface )
 
@@ -518,7 +519,9 @@ def hedge_box( m, e0, e1, n0, n1, height=34.0, z0=0.0, planter=None ):
     if planter:
         m.box( ( e0 - 6, n0 - 6, z0 ), ( e1 + 6, n1 + 6, z0 + planter ), { "+z": HONED, "-z": None, "default": TRAV }, STONE )
         z0 += planter - 2
-    m.box( ( e0 + 3, n0 + 3, z0 ), ( e1 - 3, n1 - 3, z0 + height - 4 ), { "default": HEDGE, "-z": None }, WOOD )
+    # Use an invisible core for collision. A solid green visual core shows through
+    # the gaps in the leaf meshes, making the hedge look like a green cuboid.
+    m.collision_box( ( e0 + 3, n0 + 3, z0 ), ( e1 - 3, n1 - 3, z0 + height - 4 ), WOOD )
     along_e = ( e1 - e0 ) >= ( n1 - n0 )
     length, width = ( e1 - e0, n1 - n0 ) if along_e else ( n1 - n0, e1 - e0 )
     pieces = max( 1, math.ceil( length / 110.0 ) )
@@ -1038,8 +1041,54 @@ def lettering( m, paint, centre, z0, width, outward, off=1.0 ):
 
 
 def bollard_light( m, e, n, h=34.0 ):
-    m.cylinder( ( e, n ), 3.5, 0, h, { "side": FRAME, "top": FRAME, "bottom": None }, sides=12, surface=METAL )
-    m.cylinder( ( e, n ), 3.6, h - 8, h - 2, { "side": LAMP, "top": None, "bottom": None }, sides=12 )
+    """A turned aluminium bollard with a gently rolled cap and an opal diffuser.
+
+    The close-up silhouette has 48 radial segments and per-vertex radial normals;
+    the old 12-sided convex hull is retained for gameplay collision.
+    """
+    sides = 48
+
+    def lathe( profile, paint ):
+        # Each (radius, height) ring is smoothly shaded, including the small
+        # rolled shoulders at the diffuser and the cap. The fabricators' edges
+        # remain distinct at material boundaries rather than blending into one.
+        ring_normals = []
+        for j in range( len( profile ) ):
+            r0, z0 = profile[max( j - 1, 0 )]
+            r1, z1 = profile[min( j + 1, len( profile ) - 1 )]
+            dr, dz = r1 - r0, z1 - z0
+            l = math.hypot( dr, dz )
+            ring_normals.append( ( dz / l, -dr / l ) )
+        for j, ( ( r0, z0 ), ( r1, z1 ) ) in enumerate( zip( profile, profile[1:] ) ):
+            nr0, nz0 = ring_normals[j]
+            nr1, nz1 = ring_normals[j + 1]
+            for k in range( sides ):
+                a0, a1 = 2 * math.pi * k / sides, 2 * math.pi * ( k + 1 ) / sides
+                c0, s0 = math.cos( a0 ), math.sin( a0 )
+                c1, s1 = math.cos( a1 ), math.sin( a1 )
+                card( m, paint, [ ( e + r0 * c0, n + r0 * s0, z0 ),
+                                  ( e + r0 * c1, n + r0 * s1, z0 ),
+                                  ( e + r1 * c1, n + r1 * s1, z1 ),
+                                  ( e + r1 * c0, n + r1 * s0, z1 ) ],
+                      ( c0 + c1, s0 + s1, 0 ),
+                      normals=[ ( nr0 * c0, nr0 * s0, nz0 ), ( nr0 * c1, nr0 * s1, nz0 ),
+                                ( nr1 * c1, nr1 * s1, nz1 ), ( nr1 * c0, nr1 * s0, nz1 ) ] )
+
+    # The diffuser slips into a slim shoulder below the cap. Its slight crown
+    # and the cap's bevel catch highlights without the broad flat facets.
+    lathe( [ ( 3.32, 0 ), ( 3.50, 0.20 ), ( 3.50, h - 8.35 ),
+             ( 3.46, h - 8.16 ) ], FRAME )
+    lathe( [ ( 3.49, h - 8.18 ), ( 3.60, h - 7.98 ),
+             ( 3.60, h - 2.28 ), ( 3.53, h - 2.10 ) ], LAMP )
+    lathe( [ ( 3.57, h - 2.17 ), ( 3.62, h - 1.96 ),
+             ( 3.62, h - 0.48 ), ( 3.28, h ) ], FRAME )
+    m.polygon( FRAME, [ ( e + 3.28 * math.cos( 2 * math.pi * k / sides ),
+                          n + 3.28 * math.sin( 2 * math.pi * k / sides ), h ) for k in range( sides ) ] )
+
+    # Identical dimensions and facet count to the previous collision hull.
+    m.hull( [ ( e + 3.5 * math.cos( 2 * math.pi * k / 12 ),
+                n + 3.5 * math.sin( 2 * math.pi * k / 12 ), z )
+              for z in ( 0, h ) for k in range( 12 ) ], METAL )
 
 
 def litter_bin( m, e, n ):
@@ -1068,4 +1117,15 @@ def picture( m, centre, z, w, h, facing, paint ):
     m.oriented_box( c + out * 0.6, ( side, out, ( 0, 0, 1 ) ), ( w + 4, 1.4, h + 4 ), BLACK )
     corners = [ c - side * w / 2 + out * 1.35 + ( 0, 0, -h / 2 ), c + side * w / 2 + out * 1.35 + ( 0, 0, -h / 2 ),
                 c + side * w / 2 + out * 1.35 + ( 0, 0, h / 2 ), c - side * w / 2 + out * 1.35 + ( 0, 0, h / 2 ) ]
-    card( m, paint, corners, out )
+    # A canvas must have explicit image UVs. World-projected defaults repeated
+    # and stretched whole exhibition posters across the gallery frames.
+    # Crop only the original banner's artwork, keeping typography on banners.
+    if paint.startswith( "cb_banner_" ):
+        source_w, source_h = 444.0, 920.0
+        crop_h = min( source_h, source_w * h / w )
+        crop_w = min( source_w, source_h * w / h )
+        u0, u1 = ( 256 - crop_w / 2 ) / 512, ( 256 + crop_w / 2 ) / 512
+        v0, v1 = ( 580 - crop_h / 2 ) / 1536, ( 580 + crop_h / 2 ) / 1536
+        card( m, paint, corners, out, uv=[ ( u0, 1 - v1 ), ( u1, 1 - v1 ), ( u1, 1 - v0 ), ( u0, 1 - v0 ) ] )
+    else:
+        card( m, paint, corners, out, uv=[ ( 0, 0 ), ( 1, 0 ), ( 1, 1 ), ( 0, 1 ) ] )

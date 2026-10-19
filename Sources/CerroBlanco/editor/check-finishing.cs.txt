@@ -1,0 +1,11 @@
+if(Game.IsPlaying)throw new InvalidOperationException("Use the stopped editor scene");
+var scene=Editor.SceneEditorSession.Active?.Scene;
+if(scene?.Source?.ResourcePath?.Equals("scenes/maps/cerroblanco/cerroblanco.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Cerro Blanco must own the editor");
+var material=Material.Load("materials/cerroblanco/cb_glass.vmat");
+return new {
+    Glass=new{material.IsError,material.ShaderName},
+    ShaderCompileMethod=typeof(Editor.EditorUtility).GetMethods().Where(m=>m.Name=="CompileShader").Select(m=>m.ToString()).ToArray(),
+    AO=scene.GetAllComponents<AmbientOcclusion>().Select(c=>new{c.Id,c.Enabled,c.Intensity,c.Radius,c.FalloffRange}).ToArray(),
+    Garden=scene.GetAllObjects(true).Where(g=>g.Name.StartsWith("Garden hedge ")).Select(g=>new{g.Name,Position=g.WorldPosition.ToString(),Scale=g.LocalScale.ToString()}).Take(2).ToArray()
+};

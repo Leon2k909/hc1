@@ -1,0 +1,91 @@
+// Render the authored map through the shared player's native ACES camera profile.
+// Temporary objects and every existing camera's enabled state are restored.
+var root=Sandbox.Project.Current.GetRootPath();
+var config=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/spillway/realism-capture.json")));
+var selected=Editor.SceneEditorSession.Active;
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/spillway/spillway.scene",StringComparison.OrdinalIgnoreCase)==true);
+if(Game.IsPlaying && config["preserve_running_session"]?.GetValue<bool>()!=true)
+    throw new InvalidOperationException("Stop play or explicitly select a capture in the separate editor scene that preserves the running session.");
+var scene=session.Scene;var dirty=session.HasUnsavedChanges;var gameId=Game.ActiveScene?.Id;var playing=Game.IsPlaying;
+var destroyImmediate=typeof(GameObject).GetMethod("DestroyImmediate",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic);
+foreach(var old in scene.GetAllObjects(true).Where(g=>g.Name=="Spillway temporary player-look camera" && g.Flags.HasFlag(GameObjectFlags.NotSaved)).ToArray())
+    destroyImmediate.Invoke(old,null);
+var destination=System.IO.Path.Combine(root,"output/spillway",config["directory"].GetValue<string>());
+System.IO.Directory.CreateDirectory(destination);
+var sources=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Assets/prefabs/player/cameras/default_player_camera.prefab")))["RootObject"]["Components"].AsArray();
+bool Authored(GameObject g)=>!g.Flags.HasFlag(GameObjectFlags.NotSaved) && !g.Flags.HasFlag(GameObjectFlags.EditorOnly);
+var originalIds=scene.GetAllObjects(true).Where(Authored).Select(g=>g.Id).ToHashSet();
+var cameras=scene.GetAllComponents<CameraComponent>().Select(c=>(Camera:c,Enabled:c.Enabled)).ToArray();
+var fogs=scene.GetAllComponents<GradientFog>().Select(f=>(Fog:f,Enabled:f.Enabled)).ToArray();
+GameObject review;
+using(scene.Push())review=new GameObject(false,"Spillway temporary player-look camera");
+review.Flags=GameObjectFlags.NotSaved|GameObjectFlags.NotNetworked|GameObjectFlags.Hidden;
+T Copy<T>() where T:Component,new()
+{
+    var source=sources.FirstOrDefault(x=>x["__type"]?.GetValue<string>()=="Sandbox."+typeof(T).Name);
+    if(source is null)return null;
+    var json=source.DeepClone().AsObject();json.Remove("__guid");
+    var component=review.Components.Create<T>();component.DeserializeImmediately(json);return component;
+}
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var preRender=typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null);
+var preCamera=typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null);
+var update=typeof(PostProcessSystem).GetMethod("UpdateCamera",flags);
+Vector3 World(System.Text.Json.Nodes.JsonNode p)=>new(p[1].GetValue<float>(),-p[0].GetValue<float>(),p[2].GetValue<float>());
+var reports=new System.Collections.Generic.List<object>();
+try
+{
+    var camera=Copy<CameraComponent>();camera.IsMainCamera=true;camera.Priority=1000;
+    camera.ZFar=120000;camera.ZNear=4;camera.FovAxis=CameraComponent.Axis.Horizontal;
+    camera.CustomSize=new Vector2(config["width"].GetValue<int>(),config["height"].GetValue<int>());
+    Copy<Bloom>();var tone=Copy<Tonemapping>();Copy<Sharpen>();Copy<AmbientOcclusion>();Copy<ColorAdjustments>();Copy<Vignette>();
+    foreach(var old in cameras)old.Camera.Enabled=false;
+    if(config["hideFog"]?.GetValue<bool>()==true)foreach(var fog in fogs)fog.Fog.Enabled=false;
+    review.Enabled=true;
+    foreach(var material in scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model is not null).SelectMany(r=>r.Model.Materials).Distinct())
+        foreach(var texture in new[]{material.FirstTexture,material.GetTexture("g_tColor"),material.GetTexture("g_tNormal"),material.GetTexture("g_tRoughness")}.Where(t=>t is not null))texture.MarkUsed(4096);
+    foreach(var volume in scene.GetAllComponents<IndirectLightVolume>())
+        foreach(var texture in new[]{volume.IrradianceTexture,volume.DistanceTexture,volume.RelocationTexture}.Where(t=>t is not null))texture.MarkUsed(Math.Max(texture.Width,texture.Height));
+    foreach(var sky in scene.GetAllComponents<SkyBox2D>())
+        sky.SkyMaterial?.GetTexture("g_tSkyTexture")?.MarkUsed(2048);
+    await Task.Delay(1500,cancellationToken);
+    foreach(var view in config["views"].AsArray())
+    {
+        review.WorldPosition=World(view["eye"]);review.WorldRotation=Rotation.LookAt(World(view["target"])-review.WorldPosition);
+        camera.FieldOfView=view["fov"].GetValue<float>();
+        var count=view["frames"]?.GetValue<int>()??1;
+        for(var frame=-40;frame<count;frame++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if(Game.ActiveScene?.Id!=gameId || Game.IsPlaying!=playing || Editor.SceneEditorSession.Active!=selected)throw new InvalidOperationException("Editor state changed during capture.");
+            using(scene.Push())
+            {
+                preRender.Invoke(scene,null);preCamera.Invoke(scene,null);
+                update.Invoke(scene.GetSystem<PostProcessSystem>(),new object[]{camera});
+                foreach(var reflection in scene.GetAllComponents<Facepunch.LowtideWaterReflections>())reflection.PrepareViews();
+                using var bitmap=new Bitmap(config["width"].GetValue<int>(),config["height"].GetValue<int>());
+                camera.RenderToBitmap(bitmap,false);
+                if(frame>=0)
+                {
+                    var name=view["name"].GetValue<string>()+(count>1?$"-{frame:000}":"");
+                    System.IO.File.WriteAllBytes(System.IO.Path.Combine(destination,name+".png"),bitmap.ToPng());
+                    reports.Add(new{Name=name,At=DateTime.UtcNow,Position=camera.WorldPosition.ToString(),Tone=tone.Mode.ToString(),camera.EnablePostProcessing,Minimum=camera.AutoExposure.MinimumExposure,Maximum=camera.AutoExposure.MaximumExposure});
+                }
+            }
+            await Task.Delay(count>1 && frame>=0?50:16,cancellationToken);
+        }
+    }
+}
+finally
+{
+    destroyImmediate.Invoke(review,null);foreach(var old in cameras)if(old.Camera.IsValid())old.Camera.Enabled=old.Enabled;
+    foreach(var fog in fogs)if(fog.Fog.IsValid())fog.Fog.Enabled=fog.Enabled;
+    using(scene.Push())foreach(var reflection in scene.GetAllComponents<Facepunch.LowtideWaterReflections>())reflection.PrepareViews();
+    await Task.Delay(50);
+}
+var result=new {Captures=reports,GamePreserved=Game.ActiveScene?.Id==gameId && Game.IsPlaying==playing,DirtyPreserved=session.HasUnsavedChanges==dirty,
+    AuthoredObjectsPreserved=originalIds.SetEquals(scene.GetAllObjects(true).Where(Authored).Select(g=>g.Id)),
+    TemporaryCameraRemoved=!scene.GetAllObjects(true).Any(g=>g.Name=="Spillway temporary player-look camera"),
+    CamerasRestored=cameras.All(c=>c.Camera.IsValid() && c.Camera.Enabled==c.Enabled)};
+System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"report.json"),System.Text.Json.JsonSerializer.Serialize(result,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return result;

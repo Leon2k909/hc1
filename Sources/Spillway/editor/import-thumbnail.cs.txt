@@ -1,0 +1,9 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var source=System.IO.Path.Combine(root,"output/spillway/realism-final/reference.png");
+if(!System.IO.File.Exists(source)) throw new InvalidOperationException("Capture the reference view before importing the thumbnail.");
+const string relative="ui/maps/spillway.png";
+var destination=System.IO.Path.Combine(root,"Assets",relative);
+System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(destination));
+System.IO.File.Copy(source,destination,true);
+var asset=Editor.AssetSystem.RegisterFile(destination);
+return new {Path=relative,Bytes=new System.IO.FileInfo(destination).Length,Registered=asset is not null};

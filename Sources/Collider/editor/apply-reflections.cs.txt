@@ -1,0 +1,31 @@
+if(Game.IsPlaying) throw new InvalidOperationException("Stop play before assigning reflections");
+var root=Sandbox.Project.Current.GetRootPath();
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.Source?.ResourcePath?.Equals("scenes/maps/collider/collider.scene",StringComparison.OrdinalIgnoreCase)==true);
+var directory=System.IO.Path.Combine(root,"Assets/materials/collider/reflections");
+var destination=System.IO.Path.Combine(root,"Assets/lighting/collider");
+System.IO.Directory.CreateDirectory(destination);
+var result=new System.Collections.Generic.List<object>();
+foreach(var label in new[]{"Hall","Beam","West","East"})
+{
+    var files=System.IO.Directory.GetFiles(directory,$"reflection_{label}_exr_*.generated.vtex_c");
+    if(files.Length!=1) throw new InvalidOperationException("Expected one compiled cube: "+label);
+    var path="lighting/collider/reflection_"+label.ToLowerInvariant()+"_v3.vtex";
+    System.IO.File.Copy(files[0],System.IO.Path.Combine(root,"Assets",path+"_c"),true);
+    var texture=Texture.Load(path,false);
+    if(texture is null || texture.IsError) throw new InvalidOperationException("Reflection texture did not load: "+path);
+    var probe=session.Scene.GetAllComponents<EnvmapProbe>().Single(p=>p.GameObject.Name==label);
+    var meta=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/collider/reflections",label,"face-0.json")));
+    var position=Vector3.Parse(meta["Position"].GetValue<string>());
+    var delta=probe.WorldPosition-position;
+    probe.Bounds=new BBox(probe.Bounds.Mins+delta,probe.Bounds.Maxs+delta);
+    probe.WorldPosition=position;
+    probe.Texture=texture;
+    var mode=typeof(EnvmapProbe).GetProperty("Mode");
+    mode.SetValue(probe,Enum.Parse(mode.PropertyType,"CustomTexture"));
+    result.Add(new {Label=label,Texture=texture.ResourcePath,texture.Width,texture.Height,texture.Mips,Mode=probe.Mode.ToString()});
+}
+typeof(Editor.SceneEditorSession).GetProperty("HasUnsavedChanges").SetValue(session,true);
+session.Save(false);
+if(session.HasUnsavedChanges) throw new InvalidOperationException("Collider reflections were not saved");
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/collider/reflections/validation.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

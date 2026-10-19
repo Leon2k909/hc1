@@ -234,9 +234,18 @@ def floor_plates( n=None ):
     colour = mix( colour, lin( ( 104, 102, 98 ) ), smoothstep( 1.2, 2.6, scratch ) * 0.3 )
     dirt = np.clip( seam * 0.9 + 0.5 * ring + smoothstep( 0.8, 2.6, -big + 0.5 * mid ) * 0.5, 0, 1 )
     colour = mix( colour, lin( ( 30, 26, 22 ) ), dirt * 0.8 )
+    # Abraded plate lips and walk-polished grain reveal clean steel beneath worn paint.
+    lip = smoothstep( 0.25, 0.45, edge ) * ( 1.0 - smoothstep( 0.55, 1.05, edge ) )
+    abrasion = ( 1.0 - smoothstep( 0.35, 1.7, edge ) ) * smoothstep( 0.1, 2.0, scratch + 0.35 * mid )
+    grain = smoothstep( 0.85, 2.25, scratch + 0.25 * mid ) * ( 1.0 - seam )
+    colour = mix( colour, lin( ( 128, 124, 116 ) ), np.clip( abrasion * 0.55 + lip * 0.3 + grain * 0.12, 0, 1 ) )
+    # A little red Martian dust gathers at plate seams and fasteners.
+    dust = ( 1.0 - smoothstep( 0.2, 2.4, edge ) ) * smoothstep( 0.2, 2.3, -mid + 0.3 * big )
+    colour = mix( colour, lin( ( 112, 70, 51 ) ), np.clip( dust * 0.28 + ring * 0.08, 0, 0.3 ) )
     colour = mix( colour, lin( ( 120, 118, 112 ) ), bolts * 0.45 )
-    rough = 0.34 + 0.06 * tone - 0.12 * polish + 0.35 * dirt + 0.03 * fine + 0.05 * smoothstep( 1.0, 2.0, scratch )
-    height += 0.004 * scratch + 0.006 * fine
+    rough = ( 0.34 + 0.06 * tone - 0.12 * polish + 0.35 * dirt + 0.03 * fine
+              + 0.05 * smoothstep( 1.0, 2.0, scratch ) - 0.11 * abrasion - 0.04 * grain + 0.2 * dust )
+    height += 0.018 * lip - 0.006 * abrasion - 0.003 * grain + 0.004 * scratch + 0.006 * fine
     return T.linear_to_srgb( colour ), np.clip( rough, 0.08, 1 ), normals( height, ( ppi, ppi ) )
 
 
@@ -274,9 +283,18 @@ def wall_panels( n=None ):
     colour = base[None, None, :] * ( 0.85 + 0.25 * tone + 0.07 * big + 0.02 * fine )[..., None]
     grime = np.clip( seam + 0.5 * smoothstep( 0.5, 2.2, streak ) * ( 1 - fy / ph ) + 0.3 * smoothstep( 1.0, 2.5, -big ), 0, 1 )
     colour = mix( colour, lin( ( 34, 31, 28 ) ), grime * 0.6 )
-    colour = mix( colour, lin( ( 110, 108, 104 ) ), frame * 0.2 + rivets * 0.3 )
-    rough = 0.48 + 0.08 * tone + 0.2 * grime - 0.1 * frame + 0.03 * fine
-    height += 0.005 * fine
+    # Scuffed pressed rims and intermittent oxidation leaking down from fasteners.
+    rim_wear = np.exp( -( ( edge - 3.35 ) / 0.55 ) ** 2 ) * smoothstep( 0.4, 1.8, big + 0.28 * fine )
+    rivet_pitch = ph / 16
+    rivet_row = np.floor( ( fy - rivet_pitch * 0.5 ) / rivet_pitch ).astype( int )
+    rivet_down = ( fy - rivet_pitch * 0.5 ) % rivet_pitch
+    runoff_x = np.exp( -( ( fx - 1.2 ) / 0.52 ) ** 2 ) + np.exp( -( ( fx - ( pw - 1.2 ) ) / 0.52 ) ** 2 )
+    active = smoothstep( 0.55, 0.8, periodic_hash( ix * 17 + rivet_row, iy, 35 ) )
+    runoff = runoff_x * active * smoothstep( 0.2, 1.0, rivet_down ) * np.exp( -rivet_down / 4.0 )
+    colour = mix( colour, lin( ( 120, 118, 114 ) ), frame * 0.2 + rivets * 0.3 + rim_wear * 0.42 )
+    colour = mix( colour, lin( ( 110, 63, 43 ) ), np.clip( runoff * 0.4, 0, 0.3 ) )
+    rough = 0.48 + 0.08 * tone + 0.2 * grime - 0.1 * frame + 0.03 * fine - 0.09 * rim_wear + 0.13 * runoff
+    height += 0.005 * fine - 0.006 * rim_wear - 0.004 * runoff
     return T.linear_to_srgb( colour ), np.clip( rough, 0.1, 1 ), normals( height, ( ppi, ppi ) )
 
 
@@ -393,8 +411,13 @@ def regolith( n=None ):
     colour = lin( ( 168, 92, 56 ) )[None, None, :] * ( 0.92 + 0.1 * big + 0.05 * mid + 0.04 * fine )[..., None]
     colour = mix( colour, lin( ( 200, 124, 78 ) ), smoothstep( 0.4, 2.0, big + 0.3 * mid ) * 0.5 )
     colour = mix( colour, lin( ( 92, 56, 40 ) ), np.clip( rocks + smoothstep( 1.0, 2.6, -mid ) * 0.4, 0, 1 ) * 0.7 )
-    height = 2.0 * rocks + 0.6 * mid + 0.15 * fine
-    rough = 0.9 - 0.08 * rocks
+    # Fine wind-scoured ripples interrupt the broad volcanic dust fields.
+    x, y = grid( n, tile )
+    drift = smoothstep( 0.05, 1.8, big + 0.25 * mid )
+    ripple = ( 0.5 + 0.5 * np.sin( ( x + 0.22 * y + 11.0 * mid ) * ( 2 * math.pi / 22.0 ) ) ) * drift
+    colour = mix( colour, lin( ( 198, 127, 84 ) ), ripple * 0.16 )
+    height = 2.0 * rocks + 0.6 * mid + 0.15 * fine + 0.24 * ripple
+    rough = 0.9 - 0.08 * rocks + 0.04 * drift
     return T.linear_to_srgb( colour ), np.clip( rough, 0.1, 1 ), normals( height, ( ppi, ppi ) )
 
 
@@ -790,11 +813,11 @@ def dome_lattice():
     panel = lin( ( 168, 162, 154 ) )[None, None, :] * ( 0.92 + 0.08 * shade )[..., None] * np.ones( ( n, n, 3 ), np.float32 )
     panel = mix( panel, lin( ( 120, 112, 104 ) ), smoothstep( 0.0, 0.25, 1 - yy ) * 0.0 + ( periodic_hash( cell_i, cell_j, 23 ) < 0.12 ) * 0.5 )
     c = np.where( lit[..., None], lin( ( 255, 196, 128 ) ), panel )
-    c = np.where( frame[..., None], lin( ( 214, 208, 198 ) ), c )
+    c = np.where( frame[..., None], lin( ( 170, 160, 152 ) ), c )
     dust = smoothstep( 0.6, 1.0, yy ) * 0.0 + smoothstep( 0.0, 0.3, 1 - yy ) * 0.3
     c = mix( c, lin( ( 170, 100, 64 ) ), dust * frame )
     illum = ( lit & ~frame ).astype( np.float32 )
-    rough = np.where( frame, 0.5, 0.3 ).astype( np.float32 )
+    rough = np.where( frame, 0.62, 0.38 ).astype( np.float32 )
     return T.linear_to_srgb( c ), illum, rough
 
 
@@ -814,7 +837,7 @@ PAINTED = {
     "ar_pipe": ( ( 84, 86, 88 ), 0.6, 0.4 ),
     "ar_cable": ( ( 22, 22, 24 ), 0.0, 0.7 ),
     "ar_concrete_dark": ( ( 70, 66, 62 ), 0.0, 0.85 ),
-    "ar_dome_frame": ( ( 214, 208, 198 ), 0.3, 0.45 ),
+    "ar_dome_frame": ( ( 170, 160, 152 ), 0.3, 0.56 ),
     "ar_tower_dark": ( ( 40, 36, 34 ), 0.4, 0.5 ),
     "ar_spire": ( ( 70, 60, 54 ), 0.5, 0.45 ),
     "ar_bezel": ( ( 30, 31, 33 ), 0.3, 0.4 ),
@@ -832,7 +855,7 @@ EMISSIVE = {
     "ar_led_red": ( ( 255, 60, 40 ), 4.0 ),
     "ar_led_cyan": ( ( 120, 220, 255 ), 4.0 ),
     "ar_core": ( ( 255, 190, 110 ), 3.2 ),
-    "ar_far_light": ( ( 255, 196, 120 ), 3.5 ),
+    "ar_far_light": ( ( 255, 164, 96 ), 2.5 ),
 }
 
 # Glass: tint (sRGB, for TextureColor), roughness, AlbedoAbsorption.

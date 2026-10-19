@@ -1,0 +1,12 @@
+if(Game.IsPlaying)throw new InvalidOperationException("Stop play before publishing the map preview.");
+if(Editor.SceneEditorSession.Active?.Scene.Source?.ResourcePath?.Equals("scenes/maps/cerroblanco/cerroblanco.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Cerro Blanco must own the editor window.");
+var root=Sandbox.Project.Current.GetRootPath();
+var source=System.IO.Path.Combine(root,"output/cerroblanco/final/courtyard.png");
+if(!System.IO.File.Exists(source))throw new InvalidOperationException("Capture and review the final native scene first.");
+var target=System.IO.Path.Combine(root,"Assets/ui/maps/cerroblanco.png");
+var backup=System.IO.Path.Combine(root,"output/cerroblanco/before/map-art.png");
+if(!System.IO.File.Exists(backup)&&System.IO.File.Exists(target))System.IO.File.Copy(target,backup);
+System.IO.File.Copy(source,target,true);
+Editor.AssetSystem.RegisterFile(target);
+return new {Path="ui/maps/cerroblanco.png",FromNativeCamera=true,Bytes=new System.IO.FileInfo(target).Length};

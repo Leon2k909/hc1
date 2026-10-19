@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-15",
+  "revision": "sewn-filled-sacks-v1",
+  "status": "offline_geometry_candidate_native_review_pending",
+  "production_changed": false,
+  "generator": "Tools/lowtide_sack_construction.py",
+  "verifier": "Tools/lowtide_sack_verify.py",
+  "changes": [
+    "Pinched sewn ends and an embedded longitudinal hem replace the rounded box shape.",
+    "Local gathers and small asymmetry vary each filled sack within its saved cover bounds.",
+    "The same generated jute pixels wrap continuously around the body at a finer 13.3 cm tile scale.",
+    "No live material, collision, scene, placement or other prop faces change."
+  ],
+  "scope": {
+    "sacks": 264,
+    "models": 3,
+    "triangles_per_sack": 1570,
+    "delta_triangles": 382800,
+    "new_material_slots": 0
+  },
+  "evidence": {
+    "manifest": "output/lowtide/quality-pass/sack-construction/manifest.json",
+    "manifest_sha256": "e30ddfce351269a42ad844e0ed180166ffc0e06f9dc21e37689a47d0a747810c",
+    "verification": "output/lowtide/quality-pass/sack-construction/verification.json",
+    "preview": "output/lowtide/quality-pass/sack-construction/final-preview/provenance.json",
+    "exported_closed_meshes": 264,
+    "protected_files_unchanged": 556,
+    "byte_identical_reproduced_components": 3
+  },
+  "preview": {
+    "native_engine_capture": false,
+    "review": "The six final matched single-sack, sewn-mouth and stack views were reviewed. The complete stack is framed and the false triangular self-shadows are removed.",
+    "renderer_fix": "A local half-pixel shadow adapter matches rasterized and receiver depth coordinates; analytic sloped-plane checks cover it. Existing shared renderer and prior candidate evidence are unchanged.",
+    "limitations": [
+      "No engine GI, fibre normal mapping, texture mip/compression or temporal rendering",
+      "Isolated sack examples; integration and gameplay cost remain unverified"
+    ]
+  },
+  "integration": {
+    "canonical_writer_integrated": false,
+    "native_accepted": false,
+    "independent_from": "The window/door OBJ and timber/concrete VMDL stages use different model paths.",
+    "next": [
+      "Keep the user-requested offline mode until native work is resumed.",
+      "Recheck live source hashes before any import; preserve later dressing/fleet edits.",
+      "Use the existing normal viewport to inspect end closures, contact, textile filtering and actual warehouse lighting; preserve camera/tab/play state.",
+      "Measure the added geometry cost in a match and choose distance reduction or instancing if needed. Offline renders do not prove a performance budget.",
+      "Only after acceptance integrate the sack builder into canonical generation, compile, refresh affected lighting and verify saved persistence."
+    ],
+    "distance_detail_candidates": "Sources/Lowtide/sacks/lod-status.json"
+  },
+  "overall_goal": "Open: neither native acceptance nor AAA quality is established by this candidate",
+  "latest_checkout_revalidation": "Sources/Lowtide/construction/checkout-status.json",
+  "historical_evidence_note": "Other validation fields describe the dated candidate; use latest_checkout_revalidation for the current scoped rebase."
+}

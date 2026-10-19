@@ -1,0 +1,5 @@
+// Read enum metadata only; do not change a scene, game object or network session.
+return new {
+    NetworkModes=Enum.GetValues<NetworkMode>().ToDictionary(v=>v.ToString(),v=>Convert.ToInt32(v)),
+    GameObjectFlags=Enum.GetValues<GameObjectFlags>().ToDictionary(v=>v.ToString(),v=>Convert.ToInt64(v))
+};

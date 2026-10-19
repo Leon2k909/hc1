@@ -1,0 +1,9 @@
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/spillway/spillway.scene",StringComparison.OrdinalIgnoreCase)==true);
+if(session?.Scene?.Source?.ResourcePath?.Equals("scenes/maps/spillway/spillway.scene",StringComparison.OrdinalIgnoreCase)!=true || session.HasUnsavedChanges)
+    throw new InvalidOperationException("Spillway must be active and saved");
+var volume=session.Scene.GetAllComponents<IndirectLightVolume>().Single();
+if(new[]{volume.IrradianceTexture,volume.DistanceTexture,volume.RelocationTexture}.Any(t=>t is null||t.IsError))throw new InvalidOperationException("Invalid saved lighting");
+var path=System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"Sources/Spillway/lighting");
+System.IO.Directory.CreateDirectory(path);
+System.IO.File.WriteAllText(System.IO.Path.Combine(path,"indirect-light.json"),volume.GameObject.Serialize().ToJsonString());
+return new {Saved=path,volume.BakeVersion,Grid=volume.ProbeCounts.ToString(),Irradiance=volume.IrradianceTexture.ResourcePath};

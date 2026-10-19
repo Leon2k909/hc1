@@ -1,0 +1,27 @@
+{
+  "status": "installed in production, compiled, loaded and visually verified",
+  "height_mm": 9,
+  "world_stone_size_inches": [
+    8,
+    5.3333333333
+  ],
+  "textures": [
+    2048,
+    2048
+  ],
+  "shader_source": "Sources/Lowtide/paving/hc1_lowtide_paving_relief.shader",
+  "candidate_material": "Assets/materials/lowtide/paving_relief/lt_setts_relief.vmat",
+  "production_material": "Assets/materials/lowtide/lt_setts.vmat",
+  "canonical_generator": "Tools/lowtide_paving.py and Tools/lowtide_paving_relief.py",
+  "validated": [
+    "Native shader and material compilation, four valid 2048px texture bindings",
+    "Normal viewport before/after pairs at the quay, close, grazing and west views",
+    "Preview overrides removed, camera restored, scene clean, previous active tab restored",
+    "Full canonical regeneration retains original colour and roughness byte-for-byte and reproduces all three new data maps",
+    "No model, collision or scene source change",
+    "Production material saved and loaded in all three original slots; four production viewport views reviewed; 54 protected sources unchanged"
+  ],
+  "next": "Paving pass complete. Do not reimport or replay the promotion script. Continue the broader Lowtide art pass and controlled gameplay performance review.",
+  "limits": "The overall AAA goal remains incomplete. This pass adds shader work; gameplay performance has not been benchmarked.",
+  "production_verification": "output/lowtide/quality-pass/paving-relief-production-verification.json"
+}

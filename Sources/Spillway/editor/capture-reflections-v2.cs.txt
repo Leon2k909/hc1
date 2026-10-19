@@ -1,0 +1,59 @@
+// Capture ordinary views of the persistent, lit scene; never call runtime GGX filtering.
+var root=Sandbox.Project.Current.GetRootPath();
+var gameId=Game.ActiveScene?.Id;var playing=Game.IsPlaying;var selected=Editor.SceneEditorSession.Active;
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/spillway/spillway.scene",StringComparison.OrdinalIgnoreCase)==true);
+if(session?.Scene?.Source?.ResourcePath?.Equals("scenes/maps/spillway/spillway.scene",StringComparison.OrdinalIgnoreCase)!=true)throw new InvalidOperationException("Spillway must be active");
+var scene=session.Scene;
+var camera=scene.GetAllComponents<CameraComponent>().Single(c=>c.GameObject.Name=="editor_camera" && c.GameObject.Flags.HasFlag(GameObjectFlags.EditorOnly));
+var oldPosition=camera.WorldPosition;var oldRotation=camera.WorldRotation;var oldFov=camera.FieldOfView;
+var oldSize=camera.CustomSize;var oldAxis=camera.FovAxis;var oldOrtho=camera.Orthographic;
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var names=new[]{"Probe Yard","Probe Turbine","Probe Control lower","Probe Control upper","Probe Pump room"};
+var probes=scene.GetAllComponents<EnvmapProbe>().ToArray();
+var mirrors=scene.GetAllComponents<Facepunch.LowtideWaterReflections>().Select(c=>(Component:c,Enabled:c.Enabled)).ToArray();
+var rotations=new[]{new Angles(0,0,0),new Angles(0,90,0),new Angles(0,180,0),new Angles(0,-90,0),new Angles(-90,0,0),new Angles(90,0,0)};
+try
+{
+    foreach(var mirror in mirrors)mirror.Component.Enabled=false;
+    foreach(var material in scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model is not null).SelectMany(r=>r.Model.Materials).Distinct())
+        foreach(var texture in new[]{material.FirstTexture,material.GetTexture("g_tColor"),material.GetTexture("g_tNormal")}.Where(t=>t is not null))texture.MarkUsed(2048);
+    foreach(var volume in scene.GetAllComponents<IndirectLightVolume>())
+        foreach(var texture in new[]{volume.IrradianceTexture,volume.DistanceTexture,volume.RelocationTexture}.Where(t=>t is not null))texture.MarkUsed(Math.Max(texture.Width,texture.Height));
+    foreach(var sky in scene.GetAllComponents<SkyBox2D>())sky.SkyMaterial?.GetTexture("g_tSkyTexture")?.MarkUsed(2048);
+    await Task.Delay(1500,cancellationToken);
+    using var bitmap=new Bitmap(512,512);
+    for(var index=0;index<5;index++)
+    {
+        var position=probes.Single(p=>p.GameObject.Name==names[index]).WorldPosition;
+        var directory=System.IO.Path.Combine(root,"output/spillway/reflections",index.ToString());
+        System.IO.Directory.CreateDirectory(directory);
+        for(var face=0;face<6;face++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if(Game.ActiveScene?.Id!=gameId || Game.IsPlaying!=playing || Editor.SceneEditorSession.Active!=selected)throw new InvalidOperationException("Editor/game state changed during reflection capture");
+            using(scene.Push())
+            {
+                camera.WorldPosition=position;camera.WorldRotation=Rotation.From(rotations[face]);camera.FieldOfView=90;
+                typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+                typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+                typeof(PostProcessSystem).GetMethod("UpdateCamera",flags).Invoke(scene.GetSystem<PostProcessSystem>(),new object[]{camera});
+                for(var frame=0;frame<3;frame++)
+                {
+                    camera.CustomSize=new Vector2(512,512);camera.FieldOfView=90;camera.FovAxis=CameraComponent.Axis.Horizontal;camera.Orthographic=false;
+                    camera.RenderToBitmap(bitmap,false);
+                }
+                System.IO.File.WriteAllBytes(System.IO.Path.Combine(directory,face+".png"),bitmap.ToPng());
+                var meta=new {Position=position.ToString(),Faces=new[]{new {File=face+".png",Forward=camera.WorldRotation.Forward.ToString(),Right=camera.WorldRotation.Right.ToString(),Up=camera.WorldRotation.Up.ToString()}}};
+                System.IO.File.WriteAllText(System.IO.Path.Combine(directory,"face-"+face+".json"),System.Text.Json.JsonSerializer.Serialize(meta));
+            }
+            await Task.Delay(16,cancellationToken);
+        }
+    }
+}
+finally
+{
+    camera.WorldPosition=oldPosition;camera.WorldRotation=oldRotation;camera.FieldOfView=oldFov;
+    camera.CustomSize=oldSize;camera.FovAxis=oldAxis;camera.Orthographic=oldOrtho;
+    foreach(var mirror in mirrors)if(mirror.Component.IsValid())mirror.Component.Enabled=mirror.Enabled;
+}
+return new {Faces=30,Source=scene.Source.ResourcePath,PostProcessing=true,PersistentScene=true,GamePreserved=Game.ActiveScene?.Id==gameId && Game.IsPlaying==playing};

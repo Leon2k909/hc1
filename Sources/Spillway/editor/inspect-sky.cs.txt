@@ -1,0 +1,11 @@
+var session=Editor.SceneEditorSession.Active;
+var sky=session.Scene.GetAllComponents<SkyBox2D>().Single();
+var texture=sky.SkyMaterial.GetTexture("g_tSkyTexture");
+texture.MarkUsed(2048);await Task.Delay(1000,cancellationToken);
+var root=Sandbox.Project.Current.GetRootPath();var directory=System.IO.Path.Combine(root,"output/spillway/aaa/sky-faces");System.IO.Directory.CreateDirectory(directory);
+for(var face=0;face<6;face++)
+{
+    using var bitmap=(Bitmap)typeof(Texture).GetMethod("GetFaceBitmap",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Public).Invoke(texture,new object[]{0,face});
+    System.IO.File.WriteAllBytes(System.IO.Path.Combine(directory,face+".png"),bitmap.ToPng());
+}
+return new {Sky=sky.Serialize(),Texture=texture.ToString(),texture.Width,texture.Height,texture.IsError};

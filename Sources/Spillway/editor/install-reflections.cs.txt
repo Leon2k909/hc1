@@ -1,0 +1,17 @@
+// Install the ordinary sky compiler's static cube output; no GGX bake.
+var root=Sandbox.Project.Current.GetRootPath();
+var source=System.IO.Path.Combine(root,"Assets/materials/spillway/reflections");
+var destination=System.IO.Path.Combine(root,"Assets/lighting/spillway");
+System.IO.Directory.CreateDirectory(destination);
+var results=new System.Collections.Generic.List<object>();
+for(var index=0;index<5;index++) {
+    var files=System.IO.Directory.GetFiles(source,$"reflection_{index}_exr_*.generated.vtex_c");
+    if(files.Length!=1)throw new InvalidOperationException("Expected one compiled reflection cube: "+index);
+    var path="lighting/spillway/reflection_"+index+".vtex";
+    System.IO.File.Copy(files[0],System.IO.Path.Combine(root,"Assets",path+"_c"),true);
+    var texture=Texture.Load(path,false);
+    if(texture is null || texture.IsError)throw new InvalidOperationException("Static cube did not load: "+path);
+    results.Add(new {Path=path,texture.Width,texture.Height,texture.Mips});
+}
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/spillway/reflections/validation.json"),System.Text.Json.JsonSerializer.Serialize(results));
+return results;

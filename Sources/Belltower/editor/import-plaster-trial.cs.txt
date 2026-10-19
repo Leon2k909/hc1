@@ -1,0 +1,59 @@
+// Import original scan maps and separate trial materials. The scene and accepted
+// plaster materials are unchanged; capture-viewport can temporarily preview them.
+var project=Sandbox.Project.Current.GetRootPath();
+var assets=System.IO.Path.Combine(project,"Assets");
+var staged=System.IO.Path.Combine(project,"output/belltower/quality/plaster-v1-sources");
+var source=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(staged,"manifest.json")));
+var scan=source["assets"].AsArray().Single(x=>x["id"].GetValue<string>()=="rough_plaster_broken");
+var originals=new System.Collections.Generic.List<(string Path,byte[] Bytes)>();
+foreach(var item in scan["files"].AsObject())
+{
+    var relative=item.Value["path"].GetValue<string>();
+    if(!relative.StartsWith("materials/belltower/scans/rough_plaster_broken_",StringComparison.Ordinal) || !relative.EndsWith("_4k.png") || relative.Contains(".."))
+        throw new InvalidOperationException("Unexpected plaster source path");
+    var bytes=System.IO.File.ReadAllBytes(System.IO.Path.Combine(staged,System.IO.Path.GetFileName(relative)));
+    if(Convert.ToHexString(System.Security.Cryptography.MD5.HashData(bytes)).ToLowerInvariant()!=item.Value["md5"].GetValue<string>())
+        throw new InvalidOperationException("Plaster source differs from the Poly Haven original");
+    var target=System.IO.Path.Combine(assets,relative);
+    if(System.IO.File.Exists(target) && !System.IO.File.ReadAllBytes(target).SequenceEqual(bytes))
+        throw new InvalidOperationException("Different source already exists: "+relative);
+    originals.Add((target,bytes));
+}
+if(originals.Count!=5) throw new InvalidOperationException("Expected five plaster maps");
+foreach(var item in originals)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    if(!System.IO.File.Exists(item.Path)) System.IO.File.WriteAllBytes(item.Path,item.Bytes);
+    Editor.AssetSystem.RegisterFile(item.Path);
+}
+void Write(string path,string text)
+{
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path));
+    if(System.IO.File.Exists(path) && System.IO.File.ReadAllText(path)==text) return;
+    var pending=path+".belltower-import";
+    System.IO.File.WriteAllText(pending,text);
+    System.IO.File.Move(pending,path,true);
+    Editor.AssetSystem.RegisterFile(path);
+}
+var shader="shaders/belltower_plaster.shader";
+var shaderTarget=System.IO.Path.Combine(assets,shader);
+Write(shaderTarget,System.IO.File.ReadAllText(System.IO.Path.Combine(project,"Sources/Belltower",shader)));
+await Editor.EditorUtility.CompileShader(shader,new(),cancellationToken);
+if(!System.IO.File.Exists(shaderTarget+"_c") || System.IO.File.GetLastWriteTimeUtc(shaderTarget+"_c")<System.IO.File.GetLastWriteTimeUtc(shaderTarget))
+    throw new InvalidOperationException("Plaster shader did not compile");
+var records=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(project,"output/belltower/quality/plaster-v1-materials.json"))).AsArray();
+foreach(var record in records)
+{
+    var relative=record["path"].GetValue<string>();
+    if(!relative.StartsWith("materials/belltower/trials/plaster_",StringComparison.Ordinal) || relative.Contains("..") || !relative.EndsWith(".vmat"))
+        throw new InvalidOperationException("Unexpected trial material path");
+    Write(System.IO.Path.Combine(assets,relative),record["text"].GetValue<string>());
+}
+var provenance=System.IO.Path.Combine(project,"Sources/Belltower/scans/manifest.json");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(provenance));
+var available=manifest["assets"].AsArray();
+var previous=available.FirstOrDefault(x=>x["id"].GetValue<string>()=="rough_plaster_broken");
+if(previous is not null) available.Remove(previous);
+available.Add(scan.DeepClone());
+System.IO.File.WriteAllText(provenance,manifest.ToJsonString(new System.Text.Json.JsonSerializerOptions{WriteIndented=true})+"\n");
+return new { OriginalScanMaps=originals.Count, ShaderCompiled=true, TrialMaterials=records.Select(x=>x["path"].GetValue<string>()).ToArray(), AcceptedMaterialsUnchanged=true };

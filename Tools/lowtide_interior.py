@@ -69,7 +69,8 @@ def write_materials():
         raise FileNotFoundError("Bake the generated concrete source first")
     if not (DIRECTORY / "ceiling_color.png").exists():
         raise FileNotFoundError("Bake the generated ceiling source first")
-    K.write_text(K.ASSETS / MATERIAL, f'''// Tools/lowtide_interior.py: two-metre concrete scan.
+    K.write_text(K.ASSETS / MATERIAL, f'''// Static floor contact input, compiled after shader schema update.
+// Tools/lowtide_interior.py: two-metre concrete scan.
 "Layer0"
 {{
     shader "shaders/hc1_lowtide_concrete.shader"

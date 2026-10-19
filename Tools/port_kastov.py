@@ -340,6 +340,40 @@ class ArmRetarget:
         return world
 
 
+def move_pieces(triangles: list[tuple[str, list]], moves) -> list[tuple[str, list]]:
+    """Weapon.part_moves: each connected piece (triangles sharing a vertex position) whose bounds lie inside a box
+    moves by that box's offset, in the model's own space."""
+    keys: dict[tuple, int] = {}
+    corners = [[keys.setdefault(tuple(np.round(position, 4)), len(keys)) for position, *_ in vertices]
+               for _, vertices in triangles]
+    parent = list(range(len(keys)))
+
+    def find(node: int) -> int:
+        while parent[node] != node:
+            parent[node] = parent[parent[node]]
+            node = parent[node]
+        return node
+
+    for a, b, c in corners:
+        for x, y in ((a, b), (b, c)):
+            parent[find(x)] = find(y)
+    pieces: dict[int, list[int]] = {}
+    for index, triangle in enumerate(corners):
+        pieces.setdefault(find(triangle[0]), []).append(index)
+    shift = [None] * len(triangles)
+    for members in pieces.values():
+        points = np.array([position for index in members for position, *_ in triangles[index][1]])
+        low, high = points.min(0), points.max(0)
+        for lowest, highest, offset in moves:
+            if np.all(low >= lowest) and np.all(high <= highest):
+                for index in members:
+                    shift[index] = np.asarray(offset, float)
+                break
+    return [(material, vertices if offset is None
+             else [(position + offset, normal, uv, links) for position, normal, uv, links in vertices])
+            for (material, vertices), offset in zip(triangles, shift)]
+
+
 def smd_file(path: str) -> str:
     """The SMD file of a mesh path: the first of several joined by +, without its #bone or @material filter."""
     return path.partition("+")[0].partition("@")[0].partition("#")[0]
@@ -759,6 +793,7 @@ class Kastov:
             return [triangle for piece, reference in zip(pieces, references)
                     for triangle in self.part_triangles(piece, reference)]
         mount = self.weapon.part_mounts.get(path)
+        moves = self.weapon.part_moves.get(path)
         path, _, materials = path.partition("@")
         path, _, bones = path.partition("#")
         smd = Smd(self.decompiled / path)
@@ -773,6 +808,8 @@ class Kastov:
             triangles = [(material, vertices) for material, vertices in triangles
                          if any(bone in wanted and weight > 0.5
                                 for *_, links in vertices for bone, weight in links) == keep]
+        if moves:
+            triangles = move_pieces(triangles, moves)
         bind = smd.world(smd.dense_frames()[0])
         ref_world = self.part_reference(reference_path) if reference_path is not None else None
         return [(material, [self._vertex(vertex, smd, bind, ref_world, mount) for vertex in vertices])

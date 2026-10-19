@@ -34,6 +34,7 @@ check_reach and check_retakes_sight), and prints what's wrong. The navmesh stops
 import argparse
 import json
 import math
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -136,6 +137,21 @@ def write_materials():
     lines = [ f'    {line.split()[0]} "{frit[line.split()[0]]}"' if line.split() and line.split()[0] in frit else line
               for line in lines ]
     K.write_text( MAT_DIR / f"{P.FRIT}.vmat", "\n".join( lines ) + "\n" )
+    if not STAGING:
+        from cerroblanco_quality_glass import publish_accepted
+        publish_accepted()
+    # The fit-out's flat paints, and its drawn sheets (cerroblanco_art.py) if they're missing.
+    import cerroblanco_fitout as F
+    root = MAT_DIR.parents[1]
+    F.LAYOUT_FILE = root / F.RESOURCE / "layout.json"
+    if not F.LAYOUT_FILE.exists():
+        import cerroblanco_art
+        cerroblanco_art.main( [ "--out", str( root ) ] )
+    F.write_materials( root )
+    import cerroblanco_landscape as L
+    L.write_materials( root, sys.modules[__name__] )
+    import cerroblanco_trees as T
+    T.write_materials( root )
 
 
 def configure( model ):
@@ -681,7 +697,10 @@ def garden_circle( m, d ):
     """ Bomb site B: a hedged circle round the bronze sphere, lawns in its quarters, gravel and paths. """
     c = GARDEN
     gaps = [ ( a, 110.0, 0.0, 60.0 ) for a in ( 0.0, 90.0, 180.0, 270.0 ) ]
-    P.ring( m, c, GARDEN_R - 40, GARDEN_R, 0, 44, outer=HEDGE, inner=HEDGE, top=HEDGE, reveal=HEDGE, gaps=gaps, surface=WOOD,
+    # The ring keeps its original collision hulls, while the overlapping beech
+    # meshes provide the entire visible hedge. The old green shell showed as
+    # broad flat patches anywhere the leaf cards were sparse.
+    P.ring( m, c, GARDEN_R - 40, GARDEN_R, 0, 44, outer=None, inner=None, top=None, reveal=None, gaps=gaps, surface=WOOD,
             step=6.0 )
     square_round( m, GARDEN_SQUARE, c, GARDEN_R - 20, PAVE )
     annulus( m, c, 0, GARDEN_R - 20, 0.0, GRAVEL, step=6.0 )
@@ -910,39 +929,12 @@ def terrain_z( e, n ):
 
 
 def backdrop():
-    m = Model()
-    es = sorted( set( np.arange( PLAY[0], -20000, -500 ).tolist() + np.linspace( PLAY[0], PLAY[1], 11 ).tolist()
-                      + np.arange( PLAY[1], 20000, 500 ).tolist() ) )
-    ns = sorted( set( np.arange( PLAY[2], -20000, -500 ).tolist() + np.linspace( PLAY[2], PLAY[3], 13 ).tolist()
-                      + np.arange( PLAY[3], 20000, 500 ).tolist() ) )
-    E, N = np.meshgrid( es, ns, indexing="ij" )
-    Z = terrain_z( E, N )
-    for i in range( len( es ) - 1 ):
-        for j in range( len( ns ) - 1 ):
-            me, mn = ( es[i] + es[i + 1] ) / 2, ( ns[j] + ns[j + 1] ) / 2
-            if PLAY[0] <= me <= PLAY[1] and PLAY[2] <= mn <= PLAY[3]:
-                continue
-            quad = [ ( es[i], ns[j], Z[i, j] ), ( es[i + 1], ns[j], Z[i + 1, j] ), ( es[i + 1], ns[j + 1], Z[i + 1, j + 1] ),
-                     ( es[i], ns[j + 1], Z[i, j + 1] ) ]
-            z = float( np.mean( [ q[2] for q in quad ] ) )
-            dist = math.hypot( max( 0, PLAY[0] - me, me - PLAY[1] ), max( 0, PLAY[2] - mn, mn - PLAY[3] ) )
-            paint = LAWN if dist < 1200 else ( SOIL if ( z > 900 or P.chance( 0.25, "tb", i, j ) ) else "lawn" )
-            if z > 1500:
-                paint = ROCK
-            m.polygon( paint, quad[:3] )
-            m.polygon( paint, [ quad[0], quad[2], quad[3] ] )
-    # The low-poly town that stood on the slopes below (170 rendered boxes with tiled roofs) came out on 2026-10-09:
-    # the user found it looked cheap. Only the trees are left on the hills.
-    rng = np.random.default_rng( 7 )
-    for k in range( 260 ):
-        e, n = rng.uniform( -9000, 9000 ), rng.uniform( -9000, 9000 )
-        dist = math.hypot( max( 0, PLAY[0] - e, e - PLAY[1] ), max( 0, PLAY[2] - n, n - PLAY[3] ) )
-        if 500 < dist < 6000:
-            z = float( terrain_z( e, n ) )
-            m.props.append( { "path": f"{P.OAK}/tree_oak_medium_a.vmdl" if k % 3 else f"{P.OAK}/tree_oak_dry_medium_a.vmdl",
-                              "position": ( e, n, z - 10 ), "yaw": float( rng.uniform( 0, 360 ) ),
-                              "scale": ( 1.2, 1.2, 1.2 ), "name": "Backdrop Tree" } )
-    return m
+    """ The land round the walls: cerroblanco_landscape.py's (the old 500-inch grid's lie, with its detail, painted, its
+    woods), with its oaks as scene props. """
+    import cerroblanco_landscape as L
+    m, woods, props = L.build( sys.modules[__name__] )
+    m.props.extend( props )
+    return m, woods
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -1197,6 +1189,8 @@ SCENE_MODELS = [
     ( "cerroblanco_buildings", "Buildings", True, True ), ( "cerroblanco_grounds", "Grounds", True, True ),
     ( "cerroblanco_dressing", "Dressing", True, True ), ( "cerroblanco_glass", "Glass", True, False ),
     ( "cerroblanco_canopies", "Canopies", True, True ), ( "cerroblanco_backdrop", "Backdrop", False, True ),
+    ( "cerroblanco_fitout", "Fit-out", True, True ), ( "cerroblanco_fitout_fine", "Fit-out Detail", False, True ),
+    ( "cerroblanco_backdrop_woods", "Backdrop Woods", False, False ),
 ]
 NAV_SKIP = { "cerroblanco_glass", "cerroblanco_canopies" }
 PROP_PACKAGES = { **R.PROP_PACKAGES, **P.FOLIAGE }
@@ -1213,7 +1207,10 @@ def model_object( name, key, model_name, collide=True, shadows=True ):
 
 
 def probe_object( name, centre, box, priority=1, reach=512, far=4096 ):
-    """ An envmap probe. `reach` is how near a camera must be for it to render (EnvmapProbe.MaxDistance). """
+    """Static fallback; the accepted quality state restores the room captures.
+
+    Runtime GGX filtering is unstable on the current workstation's Vulkan driver.
+    """
     e0, e1, n0, n1, z0, z1 = box
     at = K.to_world( centre )
     lo = K.to_world( ( e1, n0, z0 ) ) - at
@@ -1222,7 +1219,9 @@ def probe_object( name, centre, box, priority=1, reach=512, far=4096 ):
     return K.game_object( ids, f"Probe {name}", key, at, components=[
         K.component( ids, "Sandbox.EnvmapProbe", f"{key}/probe", Bounds={ "Mins": K.vec( lo ), "Maxs": K.vec( hi ) },
                      DelayBetweenUpdates=0.1, Feathering=0.04, FrameInterval=5, MaxDistance=reach, Priority=priority,
-                     Projection="Box", RenderDynamically=True, TintColor="1,1,1,1", UpdateStrategy="OnEnabled", ZFar=far,
+                     **{ "__version": 1 }, Projection="Box", Mode="CustomTexture", MultiBounce=False,
+                     Texture={ "Path": "materials/cerroblanco/sky/cerroblanco_sky_exr_388c0bca.generated.vtex" },
+                     TintColor="1,1,1,1", UpdateStrategy="OnEnabled", ZFar=far,
                      ZNear=8 ) ] )
 
 
@@ -1240,12 +1239,21 @@ def look_object():
         K.component( ids, "Sandbox.Vignette", "look/vignette", Center="0.5,0.5", Color="0,0,0,1", Intensity=0.2, Roundness=1,
                      Smoothness=1 ),
         K.component( ids, "Sandbox.Tonemapping", "look/tonemap", **{ "__version": 3 }, AutoExposureEnabled=True,
-                     ExposureCompensation=0, ExposureMethod="RGB", MinimumExposure=SKY_EXPOSURE, MaximumExposure=3,
-                     Mode="ACES", Rate=1 ),
+                     ExposureCompensation=0, ExposureMethod="RGB", MinimumExposure=SKY_EXPOSURE, MaximumExposure=4.5,
+                     Mode="ACES", Rate=1.5 ),
     ] )
 
 
-def write_scene( written, light_list, props, glazing=None ):
+def spot_rotation( direction ):
+    """ A world rotation ( x, y, z, w ) whose forward (+x) points along a plan direction: yaw, then pitch (down +). """
+    f = K.normalise( K.to_world( direction ) )
+    yaw = math.atan2( f[1], f[0] )
+    pitch = math.asin( max( -1.0, min( 1.0, -f[2] ) ) )
+    cy, sy, cp, sp = math.cos( yaw / 2 ), math.sin( yaw / 2 ), math.cos( pitch / 2 ), math.sin( pitch / 2 )
+    return f"{-sy * sp:.7f},{cy * sp:.7f},{sy * cp:.7f},{cy * cp:.7f}"
+
+
+def write_scene( written, light_list, props, glazing=None, spot_list=() ):
     foliage = []
     for index, prop in enumerate( props ):
         key = f"foliage/{index}"
@@ -1265,6 +1273,14 @@ def write_scene( written, light_list, props, glazing=None ):
             K.component( ids, "Sandbox.PointLight", f"light/{name}/light", Attenuation=1, FogMode="Enabled", FogStrength=1,
                          LightColor=color, Radius=radius, Shadows=shadows ) ] )
         for name, position, color, radius, shadows in light_list ]
+    # The fit-out's spots on the works and wall texts (cerroblanco_fitout): warm, narrow, no shadows. Bright enough to
+    # throw a pool on each work over the rooms' fill: at 1.25 they lit the walls evenly with it and left no pools.
+    spot_objects = [
+        K.game_object( ids, name, f"spot/{name}", K.to_world( position ), spot_rotation( np.subtract( target, position ) ),
+                       tags="light_spot,light", components=[
+            K.component( ids, "Sandbox.SpotLight", f"spot/{name}/light", Attenuation=1, ConeInner=13, ConeOuter=28, FogMode="Enabled",
+                         FogStrength=0, LightColor="3.4,3.02,2.5,1", Radius=radius * 1.3, Shadows=False ) ] )
+        for name, position, target, radius in spot_list ]
 
     team_spawns = [ spawn_object( f"Red Spawn {k + 1}", f"spawn/red/{k}", p, "Terrorist" ) for k, p in enumerate( RED_SPAWNS ) ]
     team_spawns += [ spawn_object( f"Blue Spawn {k + 1}", f"spawn/blue/{k}", p, "CounterTerrorist" ) for k, p in enumerate( BLUE_SPAWNS ) ]
@@ -1358,6 +1374,7 @@ def write_scene( written, light_list, props, glazing=None ):
         world,
         K.game_object( ids, "Trees", "foliage", children=foliage ),
         K.game_object( ids, "Lights", "lights", children=light_objects ),
+        K.game_object( ids, "Art Lights", "art_lights", children=spot_objects ),
         K.game_object( ids, "Reflection Probes", "probes", children=[ probe_object( *p ) for p in PROBES ]
                        + [ probe_object( *GROUNDS_PROBE, priority=0, reach=20000, far=60000 ) ] ),
         mode_group( "Team Spawns", "spawns", ( "Deathmatch", "Gun Game" ), team_spawns, inverse=True ),
@@ -1402,6 +1419,10 @@ def write_scene( written, light_list, props, glazing=None ):
         "__references": references,
         "__version": 3,
     }
+    from cerroblanco_quality_state import apply_saved_quality
+    apply_saved_quality( scene )
+    from map_daylight import apply_profile
+    apply_profile( scene )
     SCENE_FILE.parent.mkdir( parents=True, exist_ok=True )
     K.write_text( SCENE_FILE, json.dumps( scene, indent=2 ), newline=None )
     print( f"wrote {SCENE_FILE.relative_to( K.ROOT )}" )
@@ -1425,24 +1446,35 @@ def banners( m ):
 
 
 def build():
-    """ Every model by name. """
-    buildings, glass_, dressing, canopies, ground = Model(), GlassModel(), Model(), Model(), Model()
-    west_gallery( buildings, glass_, dressing )
-    rotunda( buildings, glass_, dressing )
-    east_block( buildings, glass_, dressing )
-    south_gallery( buildings, glass_, dressing, canopies )
-    grounds( ground, dressing, canopies )
-    banners( buildings )
+    """ Every model by name. The walls, stairs and furniture are recorded as they're built, for the fit-out
+    (cerroblanco_fitout.py), which dresses the rooms they make. """
+    import cerroblanco_fitout as F
+    log = F.Log()
+    with log.recording( sys.modules[__name__] ):
+        buildings, glass_, dressing, canopies, ground = Model(), GlassModel(), Model(), Model(), Model()
+        west_gallery( buildings, glass_, dressing )
+        rotunda( buildings, glass_, dressing )
+        east_block( buildings, glass_, dressing )
+        south_gallery( buildings, glass_, dressing, canopies )
+        grounds( ground, dressing, canopies )
+    # The exhibition banners down the façades are drawn with the fit-out, not in the buildings' model: the museum's
+    # quality pass overrides the buildings' materials by slot, and a new paint there would move every slot.
+    facade_banners = Model()
+    banners( facade_banners )
     models = {
         "cerroblanco_buildings": buildings,
         "cerroblanco_grounds": ground,
         "cerroblanco_dressing": dressing,
         "cerroblanco_glass": glass_,
         "cerroblanco_canopies": canopies,
-        "cerroblanco_backdrop": backdrop(),
     }
+    models["cerroblanco_backdrop"], models["cerroblanco_backdrop_woods"] = backdrop()
+    models.update( F.build( log, sys.modules[__name__], all_spots(), [ buildings, ground, dressing, canopies ] ) )
+    models["cerroblanco_fitout_fine"].extend( facade_banners )
     for model in models.values():
         configure( model )
+    for name in ( "cerroblanco_fitout", "cerroblanco_fitout_fine" ):
+        F.point_quality( models[name] )
     return models
 
 
@@ -1497,6 +1529,25 @@ def write_map_art( models ):
     print( f"wrote {MAP_ART_FILE.relative_to( K.ROOT )}" )
 
 
+STAGING = False
+
+
+def stage( root ):
+    """ Points every output under root, laid out as Assets is, so a run can be checked before it's published (the
+    editor compiles whatever lands in Assets, into a match being played too). """
+    global OUT_DIR, SCENE_FILE, MAT_DIR, MINIMAP_FILE, MAP_ART_FILE, STAGING
+    import cerroblanco_glass
+    root = root.resolve()
+
+    def moved( path ):
+        return root / Path( path ).resolve().relative_to( K.ASSETS.resolve() )
+
+    OUT_DIR, SCENE_FILE, MAT_DIR, MINIMAP_FILE, MAP_ART_FILE = ( moved( p ) for p in ( OUT_DIR, SCENE_FILE, MAT_DIR, MINIMAP_FILE, MAP_ART_FILE ) )
+    cerroblanco_glass.OUT = moved( cerroblanco_glass.OUT )
+    STAGING = True
+    print( f"staging into {root}" )
+
+
 def main():
     parser = argparse.ArgumentParser( description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter )
     parser.add_argument( "--preview", metavar="DIR", help="also write the reach grid's picture to this folder" )
@@ -1504,7 +1555,11 @@ def main():
     parser.add_argument( "--art", action="store_true", help="write the menus' stand-in picture" )
     parser.add_argument( "--views", metavar="DIR", help="render the comparison views (VIEWS) to this folder" )
     parser.add_argument( "--only", nargs="*", help="with --views, just these" )
+    parser.add_argument( "--stage", metavar="DIR", help="write everything under this folder (laid out as Assets) instead of "
+                                                          "into Assets, to publish later" )
     args = parser.parse_args()
+    if args.stage:
+        stage( Path( args.stage ) )
 
     write_materials()
     models = build()
@@ -1544,7 +1599,8 @@ def main():
     props = [ prop for model in models.values() for prop in model.props ]
     if not args.no_scene:
         write_minimap( solid )
-        write_scene( written, light_list, props, glazing=models["cerroblanco_glass"] )
+        write_scene( written, light_list, props, glazing=models["cerroblanco_glass"],
+                     spot_list=getattr( models["cerroblanco_fitout_fine"], "spot_lights", () ) )
     if args.art:
         write_map_art( list( models.values() ) )
     if args.views:

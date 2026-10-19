@@ -1,0 +1,92 @@
+if ( Game.IsPlaying ) throw new InvalidOperationException("Stop play before the comparison capture.");
+var session = Editor.SceneEditorSession.Active;
+var scene = session?.Scene;
+if (scene?.Source?.ResourcePath?.Equals("scenes/maps/cerroblanco/cerroblanco.scene", StringComparison.OrdinalIgnoreCase) != true)
+    throw new InvalidOperationException("Cerro Blanco must be the active editor scene.");
+var root = Sandbox.Project.Current.GetRootPath();
+var config = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root, "output/cerroblanco/capture.json")));
+var folder = config["folder"].GetValue<string>();
+if (!System.Text.RegularExpressions.Regex.IsMatch(folder, "^[a-z0-9-]+$")) throw new InvalidOperationException("Invalid output folder.");
+var output = System.IO.Path.Combine(root, "output/cerroblanco", folder);
+System.IO.Directory.CreateDirectory(output);
+foreach (var renderer in scene.GetAllComponents<ModelRenderer>())
+for (int slot = 0; slot < renderer.Materials.Count; slot++)
+{
+    var material = renderer.Materials.GetOverride(slot) ?? renderer.Materials.GetOriginal(slot);
+    if (material is null || material.IsError) continue;
+    foreach (var key in new[] { "g_tColor", "g_tNormal", "g_tRma" }) material.GetTexture(key)?.MarkUsed(4096);
+}
+await Task.Delay(1000, cancellationToken);
+var camera = scene.GetAllComponents<CameraComponent>().First(c => c.GameObject.Name == "editor_camera");
+var previousPosition = camera.WorldPosition;
+var previousRotation = camera.WorldRotation;
+var previousFov = camera.FieldOfView;
+var previousSize = camera.CustomSize;
+var previousAxis = camera.FovAxis;
+var previousOrtho = camera.Orthographic;
+var previousAo = scene.GetAllComponents<AmbientOcclusion>().Select(c=>(Component:c,Enabled:c.Enabled)).ToArray();
+var disableAo = config["disable_ao"]?.GetValue<bool>() == true;
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public;
+var composeView = typeof(CameraComponent).GetMethod("ComposeView", flags, null, Type.EmptyTypes, null);
+var post = scene.GetSystem<PostProcessSystem>();
+var updatePost = typeof(PostProcessSystem).GetMethod("UpdateCamera", flags);
+void RefreshPostProcessing()
+{
+    foreach(var other in scene.GetAllComponents<CameraComponent>().Where(c=>c!=camera))
+        updatePost.Invoke(post,new object[]{other});
+    updatePost.Invoke(post,new object[]{camera});
+}
+var results = new System.Collections.Generic.List<object>();
+if(scene.GetAllComponents<IndirectLightVolume>().Any())
+using(scene.Push())
+{
+    var systemType=typeof(Scene).Assembly.GetType("Sandbox.DDGIVolumeSystem");
+    var getter=typeof(Scene).GetMethods().Single(m=>m.Name=="GetSystem" && m.IsGenericMethodDefinition && m.GetParameters().Length==0);
+    var system=getter.MakeGenericMethod(systemType).Invoke(scene,null);
+    systemType.GetMethod("MarkDirty",flags).Invoke(system,null);
+    systemType.GetMethod("UpdateVolumes",flags).Invoke(system,null);
+}
+try
+{
+    if(disableAo)foreach(var item in previousAo)item.Component.Enabled=false;
+    foreach (var view in config["views"].AsArray())
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        string name = view["name"].GetValue<string>();
+        if (!System.Text.RegularExpressions.Regex.IsMatch(name, "^[a-z0-9-]+$")) throw new InvalidOperationException("Invalid view name.");
+        using (scene.Push())
+        {
+            typeof(Scene).GetMethod("PreRender", flags, null, Type.EmptyTypes, null).Invoke(scene, null);
+            typeof(Scene).GetMethod("PreCameraRender", flags, null, Type.EmptyTypes, null).Invoke(scene, null);
+            using var bitmap = new Bitmap(1600, 900);
+            for(var warmup=0;warmup<2;warmup++)
+            {
+                camera.WorldPosition = Vector3.Parse(view["position"].GetValue<string>());
+                camera.WorldRotation = Rotation.LookAt(Vector3.Parse(view["target"].GetValue<string>()) - camera.WorldPosition, Vector3.Up);
+                camera.FieldOfView = view["fov"].GetValue<float>();
+                camera.CustomSize=new Vector2(1600,900);
+                camera.FovAxis=CameraComponent.Axis.Horizontal;camera.Orthographic=false;
+                composeView.Invoke(camera,null);
+                RefreshPostProcessing();
+                camera.RenderToBitmap(bitmap, false);
+            }
+            var path = System.IO.Path.Combine(output, name + ".png");
+            System.IO.File.WriteAllBytes(path, bitmap.ToPng());
+            results.Add(new { Name = name, Path = path, Position = camera.WorldPosition.ToString(), Rotation = camera.WorldRotation.ToString(), Fov = camera.FieldOfView });
+        }
+        await Task.Yield();
+    }
+}
+finally
+{
+    foreach(var item in previousAo)item.Component.Enabled=item.Enabled;
+    camera.WorldPosition = previousPosition;
+    camera.WorldRotation = previousRotation;
+    camera.FieldOfView = previousFov;
+    camera.CustomSize = previousSize;
+    camera.FovAxis = previousAxis;
+    camera.Orthographic = previousOrtho;
+    using(scene.Push()){composeView.Invoke(camera,null);RefreshPostProcessing();}
+}
+System.IO.File.WriteAllText(System.IO.Path.Combine(output, "captures.json"), System.Text.Json.JsonSerializer.Serialize(results));
+return new { Scene = scene.Name, Captures = results, session.HasUnsavedChanges };

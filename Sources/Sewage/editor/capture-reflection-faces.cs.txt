@@ -1,0 +1,39 @@
+// Ordinary camera captures only. Never invoke EnvmapProbe.Bake or CubemapRendering:
+// envmap_filtering_cs faults on this workstation's current Vulkan driver.
+if(Game.IsPlaying)throw new InvalidOperationException("Stop play before reflection capture.");
+var scene=Editor.SceneEditorSession.All.Single(s=>s.Scene.Source?.ResourcePath?.Equals("scenes/maps/sewage/sewage.scene",StringComparison.OrdinalIgnoreCase)==true).Scene;
+var root=Sandbox.Project.Current.GetRootPath();
+var config=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/sewage/reflection-config.json")));
+var index=config["index"].GetValue<int>();
+if(index<0 || index>2)throw new InvalidOperationException("Invalid probe index");
+var position=Vector3.Parse(config["position"].GetValue<string>());
+var directory=System.IO.Path.Combine(root,"output/sewage/reflections",index.ToString());
+System.IO.Directory.CreateDirectory(directory);
+var camera=scene.GetAllComponents<CameraComponent>().First(c=>c.GameObject.Name=="Reference composition camera");
+var oldPosition=camera.WorldPosition;var oldRotation=camera.WorldRotation;var oldFov=camera.FieldOfView;
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Public;
+var faces=new System.Collections.Generic.List<object>();
+try
+{
+    camera.WorldPosition=position;camera.FieldOfView=90;
+    var rotations=new[]{new Angles(0,0,0),new Angles(0,90,0),new Angles(0,180,0),new Angles(0,-90,0),new Angles(-90,0,0),new Angles(90,0,0)};
+    var face=config["face"].GetValue<int>();
+    if(face<0 || face>=rotations.Length)throw new InvalidOperationException("Invalid face");
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        using(scene.Push())
+        {
+            camera.WorldRotation=Rotation.From(rotations[face]);
+            typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+            typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+            typeof(PostProcessSystem).GetMethod("UpdateCamera",flags).Invoke(scene.GetSystem<PostProcessSystem>(),new object[]{camera});
+            using var bitmap=new Bitmap(512,512);
+            camera.RenderToBitmap(bitmap,false);
+            System.IO.File.WriteAllBytes(System.IO.Path.Combine(directory,face+".png"),bitmap.ToPng());
+            faces.Add(new {File=face+".png",Forward=camera.WorldRotation.Forward.ToString(),Right=camera.WorldRotation.Right.ToString(),Up=camera.WorldRotation.Up.ToString()});
+        }
+    }
+    System.IO.File.WriteAllText(System.IO.Path.Combine(directory,"face-"+face+".json"),System.Text.Json.JsonSerializer.Serialize(new {Position=position.ToString(),Faces=faces}));
+    return new {Index=index,Faces=faces.Count,Directory=directory};
+}
+finally{camera.WorldPosition=oldPosition;camera.WorldRotation=oldRotation;camera.FieldOfView=oldFov;}

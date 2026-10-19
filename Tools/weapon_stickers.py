@@ -2,12 +2,20 @@
 
 python Tools/weapon_stickers.py              writes the stickers' assets (below)
 python Tools/weapon_stickers.py --preview <png>   draws every sticker on a grey sheet instead, and writes nothing else
+python Tools/weapon_stickers.py --materials-only  rewrites only the _tex copies and vmats from the existing artwork
 
 Per sticker it writes:
-  Assets/materials/stickers/<name>.png       the artwork, RGBA, cropped to its cut. It's the gunsmith tile and the
-                                             print's colour; outside the cut the colour is bled from the edge, so
-                                             filtering never pulls black into the border.
-  Assets/materials/stickers/<name>_mask.png  the cut (white inside), the material's alpha-test mask
+  Assets/materials/stickers/<name>.png       the artwork, RGBA, cropped to its cut. It's the gunsmith tile, and
+                                             GunsmithSticker takes the quad's shape from its width over height;
+                                             outside the cut the colour is bled from the edge, so filtering never
+                                             pulls black into the border.
+  Assets/materials/stickers/<name>_mask.png  the cut (white inside)
+  Assets/materials/stickers/<name>_tex.png, <name>_tex_mask.png
+                                             the artwork and cut stretched to a power of two on each side, which the
+                                             material samples. The texture compiler can't make alpha-weighted mips of
+                                             a non-power-of-two image ("Cannot filter non-power-of-two texture
+                                             1004x292"), so a vmat on the cropped artwork never compiled. The quad's
+                                             UVs run 0-1, so the stretch maps back onto the artwork's shape.
   Assets/materials/stickers/<name>.vmat      complex.shader, alpha tested, satin vinyl
   Assets/gunsmith/stickers/<name>.gnsmth     the Sticker part (universal: every gun with a sticker point takes it)
 and once, Assets/prefabs/gunsmith/stickers/sticker.prefab: the GunsmithSticker every sticker part mounts.
@@ -313,8 +321,8 @@ def vmat(name: str) -> str:
         '    g_flAlphaTestReference "0.5"',
         '    g_flRoughnessScaleFactor "1"',
         '    g_flMetalness "0.00"',
-        f'    TextureColor "materials/stickers/{name}.png"',
-        f'    TextureTranslucency "materials/stickers/{name}_mask.png"',
+        f'    TextureColor "materials/stickers/{name}_tex.png"',
+        f'    TextureTranslucency "materials/stickers/{name}_tex_mask.png"',
         '    TextureNormal "materials/default/default_normal.tga"',
         '    TextureRoughness "materials/default/default_rough_s1import.tga"',
         '    TextureAmbientOcclusion "materials/default/default_ao.tga"',
@@ -391,10 +399,31 @@ def preview(path: Path, images: dict) -> None:
     sheet.save(path)
 
 
+def power_of_two(n: int) -> int:
+    return 1 << max(0, (n - 1).bit_length())
+
+
+def write_material(name: str, img: np.ndarray) -> None:
+    """The material's power-of-two copies of the artwork and its cut, and the vmat that samples them."""
+    size = (power_of_two(img.shape[1]), power_of_two(img.shape[0]))
+    Image.fromarray(img, "RGBA").resize(size, Image.LANCZOS).save(ART / f"{name}_tex.png", optimize=True)
+    Image.fromarray(img[..., 3], "L").resize(size, Image.BILINEAR).save(ART / f"{name}_tex_mask.png", optimize=True)
+    (ART / f"{name}.vmat").write_text(vmat(name), encoding="utf-8", newline="\n")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--preview", type=Path, help="draw the stickers on a sheet here and write nothing else")
+    parser.add_argument("--materials-only", action="store_true",
+                        help="rewrite only the _tex copies and the vmats, from the artwork already written")
     args = parser.parse_args()
+    if args.materials_only:
+        for name in STICKERS:
+            img = np.asarray(Image.open(ART / f"{name}.png").convert("RGBA"))
+            write_material(name, img)
+            print(f"{name}: {img.shape[1]}x{img.shape[0]} -> "
+                  f"{power_of_two(img.shape[1])}x{power_of_two(img.shape[0])}")
+        return
     images = {name: draw().finish() for name, (_, draw) in STICKERS.items()}
     if args.preview:
         preview(args.preview, images)
@@ -407,7 +436,7 @@ def main() -> None:
         img = images[name]
         Image.fromarray(img, "RGBA").save(ART / f"{name}.png", optimize=True)
         Image.fromarray(img[..., 3], "L").save(ART / f"{name}_mask.png", optimize=True)
-        (ART / f"{name}.vmat").write_text(vmat(name), encoding="utf-8", newline="\n")
+        write_material(name, img)
         (PARTS / f"{name}.gnsmth").write_text(json.dumps(part(name, title), indent=2) + "\n", encoding="utf-8",
                                               newline="\n")
         print(f"{name}: {img.shape[1]}x{img.shape[0]}")

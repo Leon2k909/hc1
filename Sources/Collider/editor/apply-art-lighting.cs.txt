@@ -1,0 +1,27 @@
+// Apply only the staged light group to the existing, clean Collider document.
+if(Game.IsPlaying)throw new InvalidOperationException("Stop play before adjusting Collider lighting");
+var root=Sandbox.Project.Current.GetRootPath();
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.Source?.ResourcePath?.Equals("scenes/maps/collider/collider.scene",StringComparison.OrdinalIgnoreCase)==true);
+if(session.HasUnsavedChanges)throw new InvalidOperationException("Collider has unrelated unsaved edits");
+var scene=session.Scene;
+var output=System.IO.Path.Combine(root,"output/collider/art-v3");
+var data=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"stage/collider.scene.json")));
+var lights=data["GameObjects"].AsArray().Single(n=>n["Name"]?.GetValue<string>()=="Lights").DeepClone().AsObject();
+var old=scene.GetAllObjects(true).Single(g=>g.Name=="Lights");
+var backup=old.Serialize().DeepClone().AsObject();
+System.IO.File.WriteAllText(System.IO.Path.Combine(output,"before-light-group.json"),backup.ToJsonString());
+using(scene.Push())
+{
+    old.Destroy();
+    var replacement=new GameObject(false,"Lights");
+    try{replacement.Deserialize(lights);replacement.Enabled=true;}
+    catch{replacement.Destroy();var restore=new GameObject(false,"Lights");restore.Deserialize(backup);restore.Enabled=true;throw;}
+}
+var indirect=scene.GetAllComponents<IndirectLightVolume>().Single();
+indirect.RuntimeIntensity=1.45f;
+var bloom=scene.GetAllComponents<Bloom>().Single();bloom.Strength=.20f;bloom.Threshold=2.3f;
+typeof(Editor.SceneEditorSession).GetProperty("HasUnsavedChanges").SetValue(session,true);
+session.Save(false);
+if(session.HasUnsavedChanges)throw new InvalidOperationException("Collider lighting did not save");
+return new{PointLights=scene.GetAllComponents<PointLight>().Count(),SpotLights=scene.GetAllComponents<SpotLight>().Count(),
+    Saved=true,NeedsFreshBake=true,GI=indirect.RuntimeIntensity};

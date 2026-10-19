@@ -1,0 +1,20 @@
+// Tools/cerroblanco_quality_glass.py; low-e coated museum glazing
+"Layer0"
+{
+    shader "shaders/cerroblanco_glass.shader"
+    F_GLASS_QUALITY "2"
+    g_flCoatingReflection "0.100000"
+    g_bFogEnabled "1"
+    g_flBlurAmount "0.02"
+    g_flRefractionStrength "1.006"
+    AlbedoAbsorption "0.15"
+    g_flTintColor "[1.000000 1.000000 1.000000 0.000000]"
+    TextureColor "[0.780000 0.840000 0.850000 0.000000]"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureRoughness "[0.040000 0.040000 0.040000 0.000000]"
+    TextureMetalness "[0.000000 0.000000 0.000000 0.000000]"
+    TextureAmbientOcclusion "[1.000000 1.000000 1.000000 0.000000]"
+    TextureBlendMask "materials/default/default_blend.tga"
+    TextureTintMask "materials/default/default.tga"
+    TextureTranslucency "materials/default/default_trans.tga"
+}

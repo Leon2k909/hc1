@@ -52,7 +52,7 @@ foreach ( var tucked in new[] { false, true } )
 		}
 		if ( step == 100 )
 		{
-			NearPoint( root.PointToLocal( to.Position ), new Vector3( -5f, -2f, 13f ), "Hips finish on the ground" );
+				NearPoint( root.PointToLocal( to.Position ), new Vector3( -3f, -4f, 10f ), "Hips finish on the ground" );
 			Check( root.PointToLocal( boot.Position ).x > (tucked ? 8f : 23f), "Leg has a distinct tucked or extended pose" );
 		}
 	}

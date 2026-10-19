@@ -201,7 +201,7 @@ EDGE_PLAIN, EDGE_TRACK, EDGE_HEDGE, EDGE_DITCH, EDGE_TREES = range( 5 )
 EDGE_HALF = np.array( ( 0.8, 1.5, 1.6, 1.0, 1.4 ) ) * M
 
 DISTRICT = 110000.0         # the districts' size where they're played (2.8 km)
-PARCEL = 6200.0             # mean short axis of a field where played (157 m), scaled by district
+PARCEL = 5580.0             # accepted parcel-v4 layout: 90% of original 6200-unit farmland fields
 TERRACE_STEP = 1.8 * M      # the olive terraces' rise
 TERRACE_REACH = 3000.0      # how far out from the walls they go
 FOOT = 160.0                # the grass strip along the walls' foot
@@ -1669,6 +1669,8 @@ def preview( out_dir, tex_dir, views, props=True ):
 
 def main():
     parser = argparse.ArgumentParser( description=__doc__.split( "\n\n" )[0] )
+    parser.add_argument( "--parcel-scale", type=float, default=1.0,
+                         help="Trial-only multiplier for farmland parcel dimensions; default keeps accepted layout." )
     parser.add_argument( "--size", type=int, default=COLOUR_SIZE )
     parser.add_argument( "--zones" )
     parser.add_argument( "--out", type=Path, default=OUT_DIR )
@@ -1679,6 +1681,10 @@ def main():
     parser.add_argument( "--no-props", action="store_true",
                          help="leave the vista's buildings and trees out: their ground, their shadows and --preview" )
     args = parser.parse_args()
+    if not 0.6 <= args.parcel_scale <= 1.4:
+        parser.error( "--parcel-scale must be between 0.6 and 1.4" )
+    global PARCEL
+    PARCEL *= args.parcel_scale
     numba.set_num_threads( min( 4, numba.get_num_threads() ) )
     if args.zones is None:
         args.zones = "" if args.preview else "abcd"

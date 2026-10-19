@@ -1,0 +1,36 @@
+if(Game.IsPlaying)throw new InvalidOperationException("Stop play before assigning static reflections.");
+var session=Editor.SceneEditorSession.Active;
+if(session?.Scene.Source?.ResourcePath?.Equals("scenes/maps/cerroblanco/cerroblanco.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Cerro Blanco must own the editor window.");
+var root=Sandbox.Project.Current.GetRootPath();
+var config=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Sources/CerroBlanco/lighting/config.json")));
+var revision=config["revision"].GetValue<string>();
+if(!System.Text.RegularExpressions.Regex.IsMatch(revision,"^daylight-v[0-9]+$"))throw new InvalidOperationException("Invalid lighting revision.");
+var names=config["reflection_names"].AsArray().Select(n=>n.GetValue<string>()).ToArray();
+var directory=System.IO.Path.Combine(root,"Assets/materials/cerroblanco/reflections",revision);
+var result=new System.Collections.Generic.List<object>();
+var prepared=new System.Collections.Generic.List<(EnvmapProbe Probe,Texture Texture)>();
+for(var index=0;index<names.Length;index++)
+{
+    var files=System.IO.Directory.GetFiles(directory,$"reflection_{index}_exr_*.generated.vtex_c");
+    if(files.Length!=1)throw new InvalidOperationException("Expected one compiled reflection cube: "+index);
+    var path=$"lighting/cerroblanco/{revision}/reflection_{index}.vtex";
+    var target=System.IO.Path.Combine(root,"Assets",path+"_c");
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    System.IO.File.Copy(files[0],target,true);
+    var texture=Texture.Load(path,false);
+    if(texture is null||texture.IsError)throw new InvalidOperationException("Could not load reflection cube: "+path);
+    var probe=session.Scene.GetAllComponents<EnvmapProbe>().Single(p=>p.GameObject.Name==names[index]);
+    prepared.Add((probe,texture));
+    result.Add(new {Index=index,Name=names[index],Path=texture.ResourcePath,texture.Width,texture.Height,texture.Mips});
+}
+foreach(var entry in prepared)
+{
+    entry.Probe.GameObject.NetworkMode=NetworkMode.Snapshot;
+    entry.Probe.Texture=entry.Texture;
+    var mode=typeof(EnvmapProbe).GetProperty("Mode");
+    mode.SetValue(entry.Probe,Enum.Parse(mode.PropertyType,"CustomTexture"));
+}
+typeof(Editor.SceneEditorSession).GetProperty("HasUnsavedChanges").SetValue(session,true);
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/cerroblanco/reflections",revision,"applied.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

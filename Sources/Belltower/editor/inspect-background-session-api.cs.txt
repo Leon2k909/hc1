@@ -1,0 +1,20 @@
+// Read only: determine whether a scene document can be loaded without activation.
+var type=typeof(Editor.SceneEditorSession);
+var flags=System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Static;
+string[] Calls(System.Reflection.MethodBase method)
+{
+    var bytes=method.GetMethodBody()?.GetILAsByteArray();
+    var calls=new System.Collections.Generic.List<string>();
+    if(bytes is null) return calls.ToArray();
+    for(var i=0;i+4<bytes.Length;i++)
+        if(bytes[i]==0x28 || bytes[i]==0x6f || bytes[i]==0x73)
+            try { var member=method.Module.ResolveMember(BitConverter.ToInt32(bytes,i+1)); calls.Add(member.DeclaringType.FullName+"."+member); }
+            catch(ArgumentException) { }
+    return calls.ToArray();
+}
+var methods=type.GetMethods(flags).Where(m=>m.Name.Contains("CreateFromPath") || m.Name.Contains("Close") || m.Name=="Dispose")
+    .Select(m=>new {m.Name,m.IsStatic,Return=m.ReturnType.FullName,Parameters=m.GetParameters().Select(p=>new {p.Name,Type=p.ParameterType.FullName}).ToArray(),Calls=Calls(m)}).ToArray();
+var constructors=type.GetConstructors(flags).Select(m=>new {Signature=m.ToString(),Calls=Calls(m)}).ToArray();
+var result=new {Methods=methods,Constructors=constructors,AssetsWritten=0,SceneDocumentsOpened=0};
+System.IO.File.WriteAllText(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/belltower/quality/forest-distribution-v1/background-session-api.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

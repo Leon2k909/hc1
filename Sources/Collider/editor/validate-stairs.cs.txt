@@ -1,0 +1,34 @@
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/collider/collider.scene",StringComparison.OrdinalIgnoreCase)==true);
+var scene=session.Scene;
+if(scene.NavMesh.IsGenerating) return new {WaitingForNavMesh=true};
+Vector3 World(float e,float n,float z)=>new(n,-e,z);
+var stairs=new[]{
+    (Name:"West hall",Axis:"e",C:-130f,S0:-400f,S1:-1000f),
+    (Name:"East hall",Axis:"e",C:120f,S0:400f,S1:1000f),
+    (Name:"West wing",Axis:"n",C:-1795f,S0:-770f,S1:-140f),
+    (Name:"East wing",Axis:"n",C:1795f,S0:-770f,S1:-140f)
+};
+var checks=stairs.Select(s=>{
+    Vector3 P(float at,float z)=>s.Axis=="e"?World(at,s.C,z):World(s.C,at,z);
+    var sign=MathF.Sign(s.S1-s.S0);
+    var bottom=P(s.S0-sign*24,1);var top=P(s.S1+sign*24,257);
+    var start=scene.NavMesh.GetClosestPoint(bottom,48);var end=scene.NavMesh.GetClosestPoint(top,48);
+    var status="MissingNavMesh";var length=0f;var endError=float.MaxValue;
+    if(start is not null && end is not null)
+    {
+        var path=scene.NavMesh.CalculatePath(new Sandbox.Navigation.CalculatePathRequest{Start=start.Value,Target=end.Value});
+        status=path.Status.ToString();var points=path.Points.Select(p=>p.Position).ToArray();
+        for(var i=1;i<points.Length;i++) length+=points[i].Distance(points[i-1]);
+        if(points.Length>0)endError=points.Last().Distance(end.Value);
+    }
+    var under=P(s.S0+(s.S1-s.S0)*.76f,1);
+    var floor=scene.Trace.Ray(under+Vector3.Up*8,under-Vector3.Up*32).WithoutTags("zone").Run();
+    var clear=scene.Trace.Box(new BBox(new Vector3(-16,-16,2),new Vector3(16,16,64)),under,under).WithoutTags("zone").Run();
+    return new {s.Name,Bottom=bottom.ToString(),Top=top.ToString(),PathStatus=status,PathLength=length,
+        DirectLength=bottom.Distance(top),EndError=endError,UnderPosition=under.ToString(),
+        UnderFloor=floor.Hit,UnderClear=!clear.Hit&&!clear.StartedSolid,
+        Passed=status=="Complete" && length>0 && length<bottom.Distance(top)*1.5f && endError<4 && floor.Hit && !clear.Hit && !clear.StartedSolid};
+}).ToArray();
+var result=new {Scene=scene.Source.ResourcePath,Stairs=checks,Passed=checks.All(c=>c.Passed)};
+System.IO.File.WriteAllText(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/collider/stair-validation.json"),System.Text.Json.JsonSerializer.Serialize(result,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return result;

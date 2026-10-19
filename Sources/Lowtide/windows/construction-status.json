@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-15",
+  "status": "offline_candidate_ready_for_native_review",
+  "revision": "cast-frame-v2",
+  "user_work_mode": "Continue offline for now",
+  "production_changed": false,
+  "generator": "Tools/lowtide_window_construction.py",
+  "production_generator_integrated": false,
+  "changes": [
+    "380 lower windows receive bevelled cast surrounds and glazing bars, including fitted arched heads.",
+    "586 upper windows receive simple curved heads; their existing bars remain.",
+    "Horizontal bar ends meet the vertical shoulders without coplanar front patches.",
+    "Hidden faces against masonry and behind sealed upper panes are omitted."
+  ],
+  "scope": {
+    "models": [
+      "lowtide_east",
+      "lowtide_west",
+      "lowtide_backdrop"
+    ],
+    "windows": 966,
+    "detailed_windows": 380,
+    "delta_triangles": 135124,
+    "new_material_slots": 0,
+    "panes_room_uvs_masonry_collision_scene_preserved": true
+  },
+  "evidence": {
+    "manifest": "output/lowtide/quality-pass/window-construction/manifest.json",
+    "verification": "output/lowtide/quality-pass/window-construction/verification.json",
+    "matched_views": "output/lowtide/quality-pass/window-construction/preview",
+    "opaque_coverage_rays": 8192,
+    "clear_pane_rays": 288,
+    "exterior_clearance_rays": 960,
+    "orientations": 32,
+    "byte_identical_canonical_reproductions": 3,
+    "protected_live_files_unchanged": 556
+  },
+  "preview": {
+    "type": "Offline CPU rendering of the exact OBJ geometry",
+    "native_engine_capture": false,
+    "limitations": "Approximate light and material response. Neutral panes replace engine glass and room parallax. No engine GI, weathering or performance claim.",
+    "blender_script": "Tools/lowtide_window_preview.py",
+    "blender_status": "Two owned background attempts stalled before script execution and were terminated. No blend or Blender render was produced.",
+    "cpu_script": "Tools/lowtide_window_software.py"
+  },
+  "native_followup": [
+    "When online work resumes, get fresh editor status, project, compile, play and unsaved-scene state.",
+    "Recheck the manifest's before hashes; inspect any changed source before importing.",
+    "Compile an unused candidate model and compare it in the existing normal viewport, preserving camera, active tab and play state.",
+    "Review both paint colours, oblique arch views, transparent windows from inside, and distant aliasing. Measure the gameplay cost of the added triangles.",
+    "Only after acceptance, integrate frame() into the canonical window writer and promote the scoped mesh changes through the editor.",
+    "Retain the broader AAA quality goal; this candidate does not establish completion."
+  ],
+  "combined_integration_manifest": "output/lowtide/quality-pass/construction-integration/manifest.json",
+  "combined_integration_note": "The shed-door candidate shares the east/west OBJ paths. Use the verified combined set after native acceptance; separate copies would overwrite each other."
+}

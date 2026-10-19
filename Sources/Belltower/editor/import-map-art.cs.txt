@@ -1,5 +1,5 @@
 var root = Sandbox.Project.Current.GetRootPath();
-var source = System.IO.Path.Combine(root,"output/belltower/quality/saved-relief-v1/map_art.png");
+var source = System.IO.Path.Combine(root,"output/belltower/quality/hall-plaster-final/map-art.png");
 var bytes = System.IO.File.ReadAllBytes(source);
 var width = System.Buffers.Binary.BinaryPrimitives.ReadInt32BigEndian(bytes.AsSpan(16,4));
 var height = System.Buffers.Binary.BinaryPrimitives.ReadInt32BigEndian(bytes.AsSpan(20,4));

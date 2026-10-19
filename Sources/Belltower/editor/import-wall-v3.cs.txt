@@ -1,0 +1,43 @@
+var root=Sandbox.Project.Current.GetRootPath();
+if(!System.IO.Path.GetFullPath(root).TrimEnd('\\','/').Equals(@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Unexpected project.");
+if(Game.IsPlaying && Game.ActiveScene.GetAllComponents<ModelRenderer>().Any(r=>r.Model?.ResourcePath?.StartsWith("models/maps/belltower/",StringComparison.OrdinalIgnoreCase)==true))
+    throw new InvalidOperationException("Do not replace materials during a live Belltower match.");
+var previous=Editor.SceneEditorSession.Active;
+var gameId=Game.ActiveScene?.Id;
+var playing=Game.IsPlaying;
+var imported=new System.Collections.Generic.List<string>();
+var stage=System.IO.Path.Combine(root,"output/belltower/quality/wall-v3");
+void Publish(string relative,byte[] bytes)
+{
+    var target=System.IO.Path.Combine(root,"Assets",relative);
+    if(System.IO.File.Exists(target) && System.IO.File.ReadAllBytes(target).SequenceEqual(bytes)) return;
+    var backup=System.IO.Path.Combine(stage,"before/Assets",relative);
+    if(System.IO.File.Exists(target) && !System.IO.File.Exists(backup))
+    {
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+        System.IO.File.Copy(target,backup);
+    }
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    var incoming=target+".wall-v3-import";
+    System.IO.File.WriteAllBytes(incoming,bytes);
+    System.IO.File.Move(incoming,target,true);
+    Editor.AssetSystem.RegisterFile(target);
+    imported.Add(relative);
+}
+foreach(var name in new[]{"wall-limestone-v3-color.png","wall-limestone-v3-height.png","wall-limestone-v3-quilt.png","ivy-climb-v3.png"})
+    Publish("materials/belltower/generated/"+name,System.IO.File.ReadAllBytes(System.IO.Path.Combine(root,"Sources/Belltower/generated",name)));
+var shader="shaders/belltower_masonry_v3.shader";
+Publish(shader,System.IO.File.ReadAllBytes(System.IO.Path.Combine(root,"Sources/Belltower",shader)));
+await Editor.EditorUtility.CompileShader(shader,new(),cancellationToken);
+var shaderSource=System.IO.Path.Combine(root,"Assets",shader);
+if(!System.IO.File.Exists(shaderSource+"_c") || System.IO.File.GetLastWriteTimeUtc(shaderSource+"_c")<System.IO.File.GetLastWriteTimeUtc(shaderSource))
+    throw new InvalidOperationException("Masonry shader did not compile.");
+var materials=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/belltower/quality/material-import.json"))).AsArray();
+if(materials.Count!=2 || materials.Any(m=>m["path"].GetValue<string>()!="materials/belltower/rubble.vmat" && m["path"].GetValue<string>()!="materials/belltower/ivy_climb.vmat"))
+    throw new InvalidOperationException("Expected only the masonry and climbing ivy materials.");
+foreach(var material in materials)
+    Publish(material["path"].GetValue<string>(),System.Text.Encoding.UTF8.GetBytes(material["text"].GetValue<string>()));
+var result=new{Imported=imported,MatchPreserved=Game.ActiveScene?.Id==gameId && playing==Game.IsPlaying,DocumentPreserved=ReferenceEquals(previous,Editor.SceneEditorSession.Active)};
+System.IO.File.WriteAllText(System.IO.Path.Combine(stage,"native-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

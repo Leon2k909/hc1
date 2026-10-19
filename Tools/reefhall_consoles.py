@@ -4,6 +4,7 @@ The screen atlas is an ImageGen original, mapped by quadrant without resampling.
 Geometry is built in the room's local frame; the existing cover hulls are kept.
 """
 import math
+import reefhall_monitors as MONITORS
 
 RESOURCE_DIR = "materials/reefhall/consoles"
 SCREEN = "rh_console_lcd"
@@ -15,6 +16,7 @@ FINISHES = {
     "rh_console_keys": ((0.60, 0.63, 0.62), 0.67, 0.0),
     "rh_console_status": ((0.15, 0.42, 0.31), 0.45, 0.0),
     "rh_console_amber": ((0.68, 0.34, 0.09), 0.50, 0.0),
+    **MONITORS.FINISHES,
 }
 
 
@@ -22,6 +24,8 @@ def configure(model):
     for paint in (*FINISHES, SCREEN):
         model.material_overrides[paint] = f"{RESOURCE_DIR}/{paint}.vmat"
         model.tile_overrides[paint] = 24.0
+    model.tile_overrides[MONITORS.SHELL] = 4.0
+    model.tile_overrides[MONITORS.METAL] = 4.0
 
 
 def materials():
@@ -31,6 +35,12 @@ def materials():
         color = "[" + " ".join(f"{v:.4f}" for v in rgb) + " 1.0]"
         glow = 0.35 if paint == "rh_console_status" else 0
         out[paint] = material(color, rough, metal, glow)
+        finish = {MONITORS.SHELL: "polymer", MONITORS.METAL: "brushed"}.get(paint)
+        if finish:
+            out[paint] = out[paint].replace("materials/default/default_normal.tga",
+                f"{RESOURCE_DIR}/rh_monitor_{finish}_normal.png").replace(
+                f'TextureRoughness "[{rough} {rough} {rough} 1.0]"',
+                f'TextureRoughness "{RESOURCE_DIR}/rh_monitor_{finish}_rough.png"')
     out[SCREEN] = material(f"{RESOURCE_DIR}/rh_console_screen_atlas.png", 0.42, 0, 0.85)
     return out
 
@@ -64,14 +74,6 @@ def build(model, centre, length, yaw=0.0, z=0.0):
 
     def face(paint, points, towards):
         R.facing(model, paint, [fr.p(u, w, z + zz) for u, w, zz in points], fr.vec(*towards))
-
-    def chamfered_panel(a, b, w0, w1, lo, hi, radius, paint):
-        outline = [(a+radius,lo),(b-radius,lo),(b,lo+radius),(b,hi-radius),
-                   (b-radius,hi),(a+radius,hi),(a,hi-radius),(a,lo+radius)]
-        for w, sign in ((w0,-1),(w1,1)):
-            face(paint, [(u,w,zz) for u,zz in outline], (0,sign,0))
-        for (u0,z0),(u1,z1) in zip(outline,outline[1:]+outline[:1]):
-            face(paint, [(u0,w0,z0),(u1,w0,z1),(u1,w1,z1),(u0,w1,z0)], (z1-z0,0,u0-u1))
 
     # Solid service cabinet: retain the original desk and cover collision exactly.
     box(-h,h,-16,16,0,30,shell,R.METAL)
@@ -146,13 +148,7 @@ def build(model, centre, length, yaw=0.0, z=0.0):
     count = max(1,int(length/44))
     for k in range(count):
         u = -h+length*(k+0.5)/count
-        box(u-7,u+7,6,14,36.3,36.9,bezel)
-        box(u-1.0,u+1.0,9.9,12.2,36.9,47.0,edge)
-        chamfered_panel(u-19.4,u+19.4,8.8,11.6,42.6,66,0.65,bezel)
-        # A thicker rear electronics housing, mounting plate and ventilation ribs.
-        chamfered_panel(u-13,u+13,11.6,13.3,46,61,0.7,edge)
-        for rib in range(7):
-            box(u-9,u+9,13.3,13.36,49+rib*1.1,49.3+rib*1.1,bezel)
+        MONITORS.build(model,fr,u,z,MONITORS.variant(k,centre))
         slot = (k + (2 if length < 200 else 0) + (1 if centre[1]<0 else 0)) % 4
         s0 = (slot%2)*0.5+0.0015
         s1 = (slot%2+1)*0.5-0.0015
@@ -162,8 +158,6 @@ def build(model, centre, length, yaw=0.0, z=0.0):
                   fr.p(u+18.2,8.74,z+64.775),fr.p(u-18.2,8.74,z+64.775)]
         R.uv_quad(model,SCREEN,points,[(s0,t0),(s1,t0),(s1,t1),(s0,t1)],fr.vec(0,-1,0))
         box(u+16.8,u+17.15,8.70,8.74,43.25,43.5,"rh_console_status")
-        # Cable descending behind the stand, visible from the tank side.
-        box(u+1.6,u+2.05,11.7,12.15,36.3,46,bezel)
     # The map's authored solid cover stays unchanged; this is a visual replacement.
     import numpy as np
     model.boxes.append((fr.p(0,0,z+33),((*fr.d,0.0),(*fr.f,0.0),(0.0,0.0,1.0)),

@@ -1,0 +1,13 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var results=new System.Collections.Generic.List<object>();
+foreach(var path in new[]{"shaders/hc1_spillway_mountain.shader","shaders/hc1_spillway_concrete.shader"})
+{
+    var r=await Editor.EditorUtility.CompileShader(path,new(){ForceRecompile=true},cancellationToken);
+    results.Add(new{Path=path,r.Success,Bytes=r.CompiledShader?.Length,Output=r.Programs.SelectMany(p=>p.Output??new System.Collections.Generic.List<string>()).Take(30).ToArray()});
+}
+var materials=new[]{"sw_mountain","sw_hill","sw_concrete","sw_yard"}.Select(name=>{
+    var m=Material.Load("materials/spillway/"+name+".vmat");
+    var texture=m.GetTexture("g_tColor");
+    return new{Name=name,m.IsError,Texture=texture?.ResourcePath,Width=texture?.Width,Height=texture?.Height};
+}).ToArray();
+return new{Shaders=results,Materials=materials};

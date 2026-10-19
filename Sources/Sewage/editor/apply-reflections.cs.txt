@@ -1,0 +1,32 @@
+if(Game.IsPlaying)throw new InvalidOperationException("Stop play before assigning static reflections.");
+var root=Sandbox.Project.Current.GetRootPath();
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.Source?.ResourcePath?.Equals("scenes/maps/sewage/sewage.scene",StringComparison.OrdinalIgnoreCase)==true);
+var directory=System.IO.Path.Combine(root,"Assets/materials/sewage/reflections");
+var destination=System.IO.Path.Combine(root,"Assets/lighting/sewage");
+System.IO.Directory.CreateDirectory(destination);
+var result=new System.Collections.Generic.List<object>();
+for(var index=0;index<3;index++)
+{
+    var files=System.IO.Directory.GetFiles(directory,$"reflection_{index}_exr_*.generated.vtex_c");
+    if(files.Length!=1)throw new InvalidOperationException("Expected one compiled cube per panorama: "+index);
+    var path="lighting/sewage/reflection_"+index+".vtex";
+    System.IO.File.Copy(files[0],System.IO.Path.Combine(root,"Assets",path+"_c"),true);
+    var texture=Texture.Load(path,false);
+    if(texture is null || texture.IsError)throw new InvalidOperationException("Static reflection texture did not load: "+path);
+    var probe=session.Scene.GetAllComponents<EnvmapProbe>().Single(p=>p.GameObject.Name=="Chamber reflection "+index);
+    var meta=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/sewage/reflections",index.ToString(),"face-0.json")));
+    probe.WorldPosition=Vector3.Parse(meta["Position"].GetValue<string>());
+    probe.Texture=texture;
+    var mode=typeof(EnvmapProbe).GetProperty("Mode");
+    mode.SetValue(probe,Enum.Parse(mode.PropertyType,"CustomTexture"));
+    // Separate the upper catwalk capture from the basin. Overlapping probes from
+    // opposite floors otherwise reflect the upper floor into the lower water.
+    probe.Bounds=index switch {
+        0=>new BBox(new Vector3(-650,-400,-350),new Vector3(1400,650,500)),
+        1=>new BBox(new Vector3(-1000,-600,-430),new Vector3(1050,520,500)),
+        _=>new BBox(new Vector3(-1460,-1450,-100),new Vector3(570,640,500))
+    };
+    result.Add(new{Index=index,Path=texture.ResourcePath,texture.Width,texture.Height,texture.Mips,Mode=probe.Mode.ToString()});
+}
+typeof(Editor.SceneEditorSession).GetProperty("HasUnsavedChanges").SetValue(session,true);
+return result;

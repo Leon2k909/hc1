@@ -1,0 +1,32 @@
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/sewage/sewage.scene",StringComparison.OrdinalIgnoreCase)==true);
+var scene=session.Scene;
+var root=Sandbox.Project.Current.GetRootPath();
+var route=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/sewage/route-checks.json")));
+Vector3 V(System.Text.Json.Nodes.JsonNode a)=>new(a[0].GetValue<float>(),a[1].GetValue<float>(),a[2].GetValue<float>());
+var spawns=scene.GetAllComponents<TeamSpawnPoint>().ToArray();
+var models=scene.GetAllComponents<ModelRenderer>().Where(x=>x.Model?.ResourcePath?.Contains("maps/sewage/")==true).ToArray();
+if(scene.NavMesh.IsGenerating)return new{WaitingForNavMesh=true};
+var start=scene.NavMesh.GetClosestPoint(V(route["spawn"]),100);
+var paths=route["destinations"].AsArray().Select(n=>{
+    var requested=V(n);
+    var end=scene.NavMesh.GetClosestPoint(requested,100);
+    var status="MissingNavMesh";
+    var points=Array.Empty<string>();
+    if(start is not null && end is not null)
+    {
+        var path=scene.NavMesh.CalculatePath(new Sandbox.Navigation.CalculatePathRequest{Start=start.Value,Target=end.Value});
+        status=path.Status.ToString();
+        points=path.Points?.Select(p=>p.Position.ToString()).ToArray()??Array.Empty<string>();
+    }
+    return new {Requested=requested.ToString(),Snapped=end?.ToString(),Status=status,LastPoint=points.LastOrDefault(),Waypoints=points.Length};
+}).ToArray();
+var standing=spawns.Select(s=>{
+    var p=s.WorldPosition;
+    var floor=scene.Trace.Ray(p+Vector3.Up*8,p+Vector3.Down*32).WithoutTags("zone").Run();
+    var head=scene.Trace.Box(new BBox(new Vector3(-16,-16,2),new Vector3(16,16,72)),p,p).WithoutTags("zone").Run();
+    return new{s.GameObject.Name,Position=p.ToString(),Floor=floor.Hit,Clear=!head.Hit&&!head.StartedSolid};
+}).ToArray();
+var materials=models.SelectMany(x=>Enumerable.Range(0,x.Materials.Count).Select(i=>x.Materials.GetOverride(i)??x.Materials.GetOriginal(i))).Distinct().ToArray();
+var data=new{Scene=scene.Source.ResourcePath,Models=models.Length,MissingModels=models.Where(x=>x.Model is null||x.Model.IsError).Select(x=>x.GameObject.Name).ToArray(),MissingMaterials=materials.Where(m=>m is null||m.IsError).Select(m=>m?.ResourcePath??"null").ToArray(),Spawns=standing,Paths=paths,Menu=Facepunch.UI.MatchLauncher.ZombiesMaps().Any(s=>s.ResourcePath==scene.Source.ResourcePath),Modes=Facepunch.GameMode.GetAll((SceneFile)scene.Source).Select(m=>m.Ident).ToArray()};
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/sewage/native-validation.json"),System.Text.Json.JsonSerializer.Serialize(data,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return data;

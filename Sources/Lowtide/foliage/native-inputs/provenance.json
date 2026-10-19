@@ -1,0 +1,31 @@
+{
+  "source": "models/sbox_props/trees/oak/oak_branch.vmat",
+  "ShaderName": "shaders/foliage.shader",
+  "textures": {
+    "g_tColor": {
+      "file": "coverage.png",
+      "Width": 1024,
+      "Height": 1024,
+      "sha256": "db1ad7264d2332cb3580dd24a13296d883a6f6ec6c392d1e01b440e0188ef1bb"
+    },
+    "g_tNormal": {
+      "file": "normal.png",
+      "Width": 2048,
+      "Height": 2048,
+      "sha256": "f337f1ff4f8c03ed685d847e163975f45d6f7f3d5df461be0921f4034d686e98"
+    },
+    "g_tRma": {
+      "file": "surface.png",
+      "Width": 1024,
+      "Height": 1024,
+      "sha256": "fc0272608df052d61b5b26d2b35b73c5aaf1381736fbe6ed52d14265cc4edd81"
+    },
+    "g_tTransmissiveColor": {
+      "file": "transmission.png",
+      "Width": 1024,
+      "Height": 1024,
+      "sha256": "264ede76801ad509fd5ab9bfde0b53fbaa103922e9211b1e10cc8f2a49c12d10"
+    }
+  },
+  "note": "Unchanged native GPU texture readbacks for private Lowtide material evaluation. No scene, resource or game state changed."
+}

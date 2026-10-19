@@ -1,0 +1,56 @@
+{
+  "status": "installed_native_visual_review_complete",
+  "observed_utc": "2026-10-18T17:49:49.093153+00:00",
+  "project_root": "C:\\sbox-projects\\hc1\\forked-shooter-main",
+  "revision": "paving-contact-use-v1-current-construction",
+  "production_changed": true,
+  "native_accepted": true,
+  "canonical_generator_integrated": true,
+  "generator": "Tools/lowtide_paving_use.py",
+  "material_writer": "Tools/lowtide_paving.py",
+  "refresh_command": "rtk proxy python Tools/lowtide_paving_use.py --current --output output/lowtide/quality-pass/<new-folder>",
+  "installed_files": {
+    "Assets/shaders/hc1_lowtide_paving_use.shader": "cab899fef1769a72905f47b2e86627dc6486cac7e0cf673527f06d4ed63ef00d",
+    "Assets/shaders/hc1_lowtide_paving_use.shader.meta": "9e9799c6f453c0c581653e28584858fba7059a615d49513128697cddab6d180f",
+    "Assets/materials/lowtide/lt_setts.vmat": "8cf18cdce3aa63d156f7d4c2d42f7e3e98b4eb1acc91a9f665bf1a3c3781578e",
+    "Assets/materials/lowtide/paving-use/ground_use.png": "068378e27d739ca7ce735e59e659c0e6ee31214bc2cc32afb7f64e901a30f5e3",
+    "Assets/materials/lowtide/paving-use/ground_use.png.meta": "df503d416636c2f402ab58e64100b58b3b6fb5b0ddd28fca81704079a3d25f6b"
+  },
+  "scope": {
+    "ground_triangles": 186,
+    "wall_segments": 1616,
+    "drain_outlets_over_paving": 16,
+    "grate_apertures": 24,
+    "aperture_samples_clear": 216,
+    "new_triangles": 0,
+    "material_slots_added": 0,
+    "texture_lookups_added": 1,
+    "scene_changed": false,
+    "collision_changed": false
+  },
+  "verification": {
+    "manifest": "output/lowtide/quality-pass/native-2026-10-18/paving-contact/manifest.json",
+    "source_data": "output/lowtide/quality-pass/native-2026-10-18/paving-contact/verification.json",
+    "canonical": "output/lowtide/quality-pass/native-2026-10-18/paving-contact/canonical-verification.json",
+    "material_readback": "output/lowtide/quality-pass/native-2026-10-18/paving-contact/material-readback.json",
+    "native_comparison": "output/lowtide/quality-pass/native-2026-10-18/paving-contact/review/acceptance.json",
+    "production_readback": "output/lowtide/quality-pass/native-2026-10-18/paving-contact/production/verification.json",
+    "production_import": "output/lowtide/quality-pass/native-2026-10-18/paving-contact/production-import.json"
+  },
+  "reviewed_native_images": 12,
+  "production_images": {
+    "pipe-outlet.png": "aa241e3f52d7f38c29bdd032c40a94fecd67577537cc16f3b29b80592128f6a3",
+    "shed-foot.png": "d1cb749b308f19ff3d1a8c5d3181a787e45b18384188e89f2e13c8b84c1292a4"
+  },
+  "compiled_shader_present": true,
+  "project_compile_errors": 0,
+  "native_paving_slots": 3,
+  "temporary_review_material_archived": true,
+  "capture_restored_tab": "scenes/maps/belltower/belltower.scene",
+  "capture_restored_play_state": false,
+  "historical_status": "output/lowtide/quality-pass/native-2026-10-18/paving-contact/historical-use-status.json",
+  "gameplay_performance_measured": false,
+  "temporal_review_complete": false,
+  "overall_AAA_verified": false,
+  "note": "Narrow settled grit and local outlet moisture are installed. Original generated stone colour/PBR inputs and relief are unchanged. Current-layout regeneration reproduces all five installed files. Initial asynchronous shader loading warned before the compiler finished; subsequent native readback verifies the correct loaded shader and 2048-square mask. This is a static art layout, not a fluid simulation; broader map quality and controlled gameplay performance remain open."
+}

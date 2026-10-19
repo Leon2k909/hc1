@@ -1,0 +1,99 @@
+// Ordinary camera faces bypass the workstation's unstable runtime GGX filter.
+// Invert the engine's known ACES curve offline, calibrated against the source
+// sky. The bitmap path ignores exposure changes and rejects float readback.
+if(Game.IsPlaying)throw new InvalidOperationException("Stop play before reflection capture.");
+var session=Editor.SceneEditorSession.Active;
+var scene=session?.Scene;
+if(scene?.Source?.ResourcePath?.Equals("scenes/maps/cerroblanco/cerroblanco.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Cerro Blanco must own the editor window.");
+var root=Sandbox.Project.Current.GetRootPath();
+var config=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Sources/CerroBlanco/lighting/config.json")));
+var request=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/cerroblanco/reflection-request.json")));
+var revision=config["revision"].GetValue<string>();
+if(!System.Text.RegularExpressions.Regex.IsMatch(revision,"^daylight-v[0-9]+$"))throw new InvalidOperationException("Invalid lighting revision.");
+var names=config["reflection_names"].AsArray().Select(n=>n.GetValue<string>()).ToArray();
+var index=request["index"].GetValue<int>();
+if(index<0||index>=names.Length)throw new InvalidOperationException("Invalid reflection index.");
+var probe=scene.GetAllComponents<EnvmapProbe>().Single(p=>p.GameObject.Name==names[index]);
+var directory=System.IO.Path.Combine(root,"output/cerroblanco/reflections",revision,index.ToString());
+System.IO.Directory.CreateDirectory(directory);
+var camera=scene.GetAllComponents<CameraComponent>().First(c=>c.GameObject.Name=="editor_camera");
+var oldPosition=camera.WorldPosition;var oldRotation=camera.WorldRotation;var oldFov=camera.FieldOfView;
+var oldSize=camera.CustomSize;
+var oldAxis=camera.FovAxis;var oldOrtho=camera.Orthographic;
+var tone=scene.GetAllComponents<Tonemapping>().Single();
+var oldTone=(tone.Mode,tone.AutoExposureEnabled,tone.MinimumExposure,tone.MaximumExposure,tone.ExposureCompensation);
+var grading=scene.GetAllComponents<ColorGrading>().Select(c=>(Component:c,Enabled:c.Enabled)).ToArray();
+var vignette=scene.GetAllComponents<Vignette>().Select(c=>(Component:c,Enabled:c.Enabled)).ToArray();
+var occlusion=scene.GetAllComponents<AmbientOcclusion>().Select(c=>(Component:c,Enabled:c.Enabled)).ToArray();
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Public;
+var post=scene.GetSystem<PostProcessSystem>();
+var updatePost=typeof(PostProcessSystem).GetMethod("UpdateCamera",flags);
+var composeView=typeof(CameraComponent).GetMethod("ComposeView",flags,null,Type.EmptyTypes,null);
+void RefreshPostProcessing()
+{
+    // RenderToBitmap initializes editor captures from the map's main camera.
+    // Refresh both so the requested grade and exposure reach the native view.
+    foreach(var other in scene.GetAllComponents<CameraComponent>().Where(c=>c!=camera))
+        updatePost.Invoke(post,new object[]{other});
+    updatePost.Invoke(post,new object[]{camera});
+}
+var rotations=new[]{new Angles(0,0,0),new Angles(0,90,0),new Angles(0,180,0),new Angles(0,-90,0),new Angles(-90,0,0),new Angles(90,0,0)};
+var faces=new System.Collections.Generic.List<object>();
+try
+{
+    tone.Mode=Tonemapping.TonemappingMode.ACES;tone.AutoExposureEnabled=true;tone.ExposureCompensation=0;
+    foreach(var entry in grading)entry.Component.Enabled=false;
+    foreach(var entry in vignette)entry.Component.Enabled=false;
+    // Screen-space AO has different edge information on adjacent cube faces.
+    // The baked environment must retain scene lighting without those seams.
+    foreach(var entry in occlusion)entry.Component.Enabled=false;
+    for(var face=0;face<rotations.Length;face++)
+    {
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            using(scene.Push())
+            {
+                tone.MinimumExposure=1;tone.MaximumExposure=1;
+                typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+                typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+                using var bitmap=new Bitmap(512,512);
+                float renderedFov=0;string renderedSize=null;Vector3 renderedPosition=default;Rotation renderedRotation=default;
+                for(var warmup=0;warmup<3;warmup++)
+                {
+                    // The viewport overwrites these between yielded frames.
+                    // Reapply the complete view immediately before every render.
+                    camera.WorldPosition=probe.WorldPosition;
+                    camera.WorldRotation=Rotation.From(rotations[face]);
+                    camera.FieldOfView=90;camera.CustomSize=new Vector2(512,512);
+                    camera.FovAxis=CameraComponent.Axis.Horizontal;camera.Orthographic=false;
+                    composeView.Invoke(camera,null);
+                    RefreshPostProcessing();
+                    if(Math.Abs(camera.View.FieldOfView-90)>0.01f)
+                        throw new InvalidOperationException("Reflection camera lost its 90-degree projection.");
+                    renderedFov=camera.View.FieldOfView;renderedSize=camera.CustomSize.Value.ToString();
+                    renderedPosition=camera.WorldPosition;renderedRotation=camera.WorldRotation;
+                    camera.RenderToBitmap(bitmap,false);
+                }
+                var file=$"face-{face}.png";
+                System.IO.File.WriteAllBytes(System.IO.Path.Combine(directory,file),bitmap.ToPng());
+                faces.Add(new {File=file,Face=face,FieldOfView=renderedFov,Position=renderedPosition.ToString(),CaptureSize=renderedSize,Forward=renderedRotation.Forward.ToString(),Right=renderedRotation.Right.ToString(),Up=renderedRotation.Up.ToString()});
+            }
+            await Task.Yield();
+        }
+    }
+    var report=new {Index=index,Name=names[index],Position=probe.WorldPosition.ToString(),Encoding="sRGB; ACES tonemapper; native bitmap capture",ScreenSpaceOcclusion=false,CaptureSize="512,512",Faces=faces};
+    System.IO.File.WriteAllText(System.IO.Path.Combine(directory,"faces.json"),System.Text.Json.JsonSerializer.Serialize(report));
+    return new {Index=index,Name=names[index],Faces=faces.Count,Directory=directory};
+}
+finally
+{
+    camera.WorldPosition=oldPosition;camera.WorldRotation=oldRotation;camera.FieldOfView=oldFov;
+    camera.CustomSize=oldSize;
+    camera.FovAxis=oldAxis;camera.Orthographic=oldOrtho;
+    tone.Mode=oldTone.Item1;tone.AutoExposureEnabled=oldTone.Item2;tone.MinimumExposure=oldTone.Item3;tone.MaximumExposure=oldTone.Item4;tone.ExposureCompensation=oldTone.Item5;
+    foreach(var entry in grading)entry.Component.Enabled=entry.Enabled;
+    foreach(var entry in vignette)entry.Component.Enabled=entry.Enabled;
+    foreach(var entry in occlusion)entry.Component.Enabled=entry.Enabled;
+    using(scene.Push()){composeView.Invoke(camera,null);RefreshPostProcessing();}
+}

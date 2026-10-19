@@ -11,13 +11,16 @@ foreach(var imageName in new[]{"shop-shelves-v1.png","window-plants-v1.png"})
     System.IO.File.Copy(imageSource,imageTarget);
     Editor.AssetSystem.RegisterFile(imageTarget);
 }
-foreach(var shaderName in new[]{"belltower_window.shader","belltower_plants.shader"})
+foreach(var shaderName in new[]{"belltower_window.shader","belltower_plants.shader","belltower_plaster.shader"})
 {
     var shaderSource = System.IO.Path.Combine(project,"Sources/Belltower/shaders",shaderName);
     var shaderTarget = System.IO.Path.Combine(assets,"shaders",shaderName);
     if(!System.IO.File.Exists(shaderSource) || (System.IO.File.Exists(shaderTarget) && System.IO.File.ReadAllText(shaderSource) == System.IO.File.ReadAllText(shaderTarget))) continue;
-    System.IO.File.Copy(shaderSource,shaderTarget,true);
+    var pending=shaderTarget+".belltower-import";
+    System.IO.File.Copy(shaderSource,pending,true);
+    System.IO.File.Move(pending,shaderTarget,true);
     Editor.AssetSystem.RegisterFile(shaderTarget);
+    await Editor.EditorUtility.CompileShader("shaders/"+shaderName,new(),cancellationToken);
 }
 var source = System.IO.Path.Combine(project, "output/belltower/quality/material-import.json");
 using var document = System.Text.Json.JsonDocument.Parse(System.IO.File.ReadAllText(source));

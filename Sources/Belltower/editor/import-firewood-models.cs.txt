@@ -1,0 +1,40 @@
+// Publish checked Belltower visual mesh updates. Preserve all collision source.
+var root=Sandbox.Project.Current.GetRootPath();
+var relative="output/belltower/quality/models/firewood-v2";
+var stage=System.IO.Path.Combine(root,relative);
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"model-import.json")));
+if(Game.IsPlaying || manifest["spots"].GetValue<int>()!=94 || manifest["invalid_spots"].GetValue<int>()!=0 || manifest["unreachable_spots"].GetValue<int>()!=0)
+    throw new InvalidOperationException("Map is playing or gameplay checks failed");
+string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var assets=System.IO.Path.Combine(root,"Assets/models/maps/belltower");
+var sourceFiles=new[]{"belltower_west.obj","belltower_east.obj","belltower_west.mtl","belltower_east.mtl","belltower_west.vmdl","belltower_east.vmdl"};
+var changes=new System.Collections.Generic.List<(string Source,string Target,string Backup)>();
+foreach(var name in sourceFiles)
+{
+    var source=System.IO.Path.Combine(stage,name);
+    var target=System.IO.Path.Combine(assets,name);
+    var backup=System.IO.Path.Combine(stage,"before",name);
+    if(!System.IO.File.Exists(source) || !System.IO.File.Exists(target)) throw new InvalidOperationException("Missing model input: "+name);
+    if(name.EndsWith(".vmdl") && System.IO.File.ReadAllText(source).Split("_class = \"PhysicsShapeList\"")[1] != System.IO.File.ReadAllText(target).Split("_class = \"PhysicsShapeList\"")[1])
+        throw new InvalidOperationException("Physics configuration changed: "+name);
+    if(Hash(source)==Hash(target)) continue;
+    if(System.IO.File.Exists(backup) && Hash(backup)!=Hash(target) && Hash(source)!=Hash(target))
+        throw new InvalidOperationException("Current source differs from checked backup: "+name);
+    changes.Add((source,target,backup));
+}
+var game=Game.ActiveScene?.Id;
+var selection=Editor.SceneEditorSession.Active;
+foreach(var item in changes)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(item.Backup));
+    if(!System.IO.File.Exists(item.Backup)) System.IO.File.Copy(item.Target,item.Backup);
+    var staging=item.Target+".firewood-incoming";
+    System.IO.File.Copy(item.Source,staging,true);
+    if(Hash(staging)!=Hash(item.Source)) throw new InvalidOperationException("Incoming copy differs");
+    System.IO.File.Move(staging,item.Target,true);
+}
+foreach(var name in new[]{"belltower_west.vmdl","belltower_east.vmdl"})
+    Editor.AssetSystem.RegisterFile(System.IO.Path.Combine(assets,name));
+return new {Imported=changes.Count,ValidatedSpots=94,GamePreserved=Game.ActiveScene?.Id==game,
+    SelectionPreserved=ReferenceEquals(selection,Editor.SceneEditorSession.Active)};

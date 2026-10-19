@@ -1,0 +1,76 @@
+{
+  "revision": "ground-edge-v1",
+  "status": "Rejected for saved-map use after the sunlit native comparison exposed flat contact over cobbles.",
+  "review_note": "The shaded close and contextual views are clear, but the sunlit close/wide pair exposes a flat tan gravel strip bridging the paving relief. Preserve the original atlas; redesign the contact treatment before acceptance.",
+  "source_atlas": "Sources/Belltower/generated/ground-edge-v2.png",
+  "source_atlas_sha256": "6071d85940d3004ff16e5467b6209e3a6ceea9b10c36210c65bd027a8c2ac800",
+  "prompt_and_provenance": "Sources/Belltower/generated/ground-edge-v2.json",
+  "image_method": "built-in image_gen edit; original pixels and alpha preserved",
+  "stage_manifest": "output/belltower/quality/ground-edge-v1/manifest.json",
+  "stage_manifest_sha256": "246d059772e70f66426a9ad0144640e5550b924b5bff22550a550c83f139b33b",
+  "geometry_checks": {
+    "passed": true,
+    "manifest_sha256": "246d059772e70f66426a9ad0144640e5550b924b5bff22550a550c83f139b33b",
+    "checker_sha256": "38494e369d64ebd9a543e374ff4fac8acaab2111c1f7e47578849e10d0b99a51",
+    "patches_per_half": 58,
+    "triangles_total": 232,
+    "materials": 1,
+    "flat_paving_containment": true,
+    "protected_thresholds_clear": true,
+    "wall_plinth_clear": true,
+    "exact_mirror": true,
+    "atlas_aspect_and_regions_preserved": true,
+    "original_pixels_and_alpha_preserved": true,
+    "authored_physics_shapes": 0,
+    "negative_door_and_wall_fixtures_rejected": true,
+    "native_verified": false
+  },
+  "views": {
+    "wide": {
+      "before_image": "output/belltower/quality/ground-edge-v1-studio/ground-edge-before.png",
+      "after_image": "output/belltower/quality/ground-edge-v1-studio/ground-edge-after.png",
+      "matched_camera_lighting_and_exposure": true,
+      "before_sha256": "2288d613e9d19951c7ce478a9faf0acb691d6a2946508d8fdbdbbebd094e5dec",
+      "after_sha256": "b06794e77e2406470ffd3d6c52b8575dbe0c5b86ccd705512873bd321bd2666b",
+      "changed_pixels_over_12_fraction": 0.0016,
+      "exposure": -2.0
+    },
+    "-close": {
+      "before_image": "output/belltower/quality/ground-edge-v1-studio/ground-edge-before-close.png",
+      "after_image": "output/belltower/quality/ground-edge-v1-studio/ground-edge-after-close.png",
+      "matched_camera_lighting_and_exposure": true,
+      "before_sha256": "3206c0fb2f116591d9f7b2b09a2c4dae71d6686babc03c6c8b0f9db195dedb1f",
+      "after_sha256": "3ac28de54e4564df2285c28f4e3a046d55ce34daccfa7c932bab49687a1d4e75",
+      "changed_pixels_over_12_fraction": 0.006351851851851852,
+      "exposure": -2.0
+    }
+  },
+  "native_verified": false,
+  "scene_or_collision_changes": false,
+  "trial_assets_currently_installed": [
+    "materials/belltower/ground-edge-v1/ground_edge.png",
+    "materials/belltower/ground-edge-v1/ground_edge.vmat",
+    "models/maps/belltower/ground-edge-v1/belltower_ground_edge_east.mtl",
+    "models/maps/belltower/ground-edge-v1/belltower_ground_edge_east.obj",
+    "models/maps/belltower/ground-edge-v1/belltower_ground_edge_east.vmdl",
+    "models/maps/belltower/ground-edge-v1/belltower_ground_edge_west.mtl",
+    "models/maps/belltower/ground-edge-v1/belltower_ground_edge_west.obj",
+    "models/maps/belltower/ground-edge-v1/belltower_ground_edge_west.vmdl",
+    "shaders/belltower_ground_edge_trial.shader"
+  ],
+  "import_helper": "Sources/Belltower/editor/import-ground-edge-trial.cs.txt",
+  "import_helper_sha256": "924517547ca57c28036f447e4671034bfc5def4d23449d656d5d0d901b3aaa3b",
+  "remaining": [
+    "Redesign the contact treatment; the current flat albedo mesh fails the sunlit visual check.",
+    "Recheck distance fade and consistent Belltower gameplay performance after redesign."
+  ],
+  "native_compilation_verified": true,
+  "native_comparison_verified": true,
+  "native_visual_acceptance": false,
+  "native_review": "output/belltower/quality/native-detail-review-oct18.json",
+  "native_review_sha256": "86d4da9707bf8acbbd8e595b257775e73149917d8c25f4ccfcf9f0da28fe8662",
+  "native_contextual_comparison_verified": true,
+  "native_sunlit_comparison_verified": true,
+  "trial_promoted": false,
+  "source_revalidation": "output/belltower/quality/ground-edge-v1/source-revalidation.json"
+}

@@ -1,0 +1,61 @@
+// Run only after reviewing the forest_trial captures. This edits the persistent
+// Belltower document, adds one undo entry, and leaves the other game/tab alone.
+var root=Sandbox.Project.Current.GetRootPath();
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase)==true);
+if(session.HasUnsavedChanges) throw new InvalidOperationException("Inspect existing Belltower edits before adding woodland.");
+if(session.IsPlaying) throw new InvalidOperationException("Do not edit a running Belltower session.");
+var scene=session.Scene;
+var previous=Editor.SceneEditorSession.Active;
+var game=Game.ActiveScene?.Id;
+var playing=Game.IsPlaying;
+var staging=System.IO.Path.Combine(root,"output/belltower/quality/forest-v1-staging");
+var data=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(staging,"forest.json"))).AsObject();
+var id=Guid.Parse(data["__guid"].GetValue<string>());
+if(scene.GetAllObjects(true).Any(o=>o.Id==id || o.Name=="Distant woodland"))
+    throw new InvalidOperationException("A woodland group already exists; inspect it instead of adding another.");
+foreach(var child in data["Children"].AsArray())
+{
+    var components=child["Components"].AsArray();
+    if(components.Count!=1 || components[0]["__type"].GetValue<string>()!="Sandbox.ModelRenderer" || components[0]["RenderType"].GetValue<string>()!="Off")
+        throw new InvalidOperationException("Woodland must be visual only, without colliders or shadow casting.");
+    var model=Model.Load(components[0]["Model"].GetValue<string>());
+    if(model is null || model.IsError) throw new InvalidOperationException("A woodland model did not load.");
+}
+var backup=System.IO.Path.Combine(root,"output/belltower/quality/before-forest-v1/belltower.scene");
+System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+if(!System.IO.File.Exists(backup)) System.IO.File.Copy(System.IO.Path.Combine(root,"Assets/scenes/maps/Belltower/belltower.scene"),backup);
+GameObject added=null;
+void Add()
+{
+    using(scene.Push())
+    {
+        added=scene.CreateObject(false);
+        added.Deserialize(data.DeepClone().AsObject());
+    }
+}
+void Remove()
+{
+    using(scene.Push()) if(added.IsValid()) { added.Destroy(); scene.ProcessDeletes(); }
+}
+try
+{
+    Add();
+    if(added.Children.Count!=data["Children"].AsArray().Count) throw new InvalidOperationException("Woodland sector count differs.");
+    session.AddUndo("Add Belltower distant woodland",Remove,Add);
+    session.HasUnsavedChanges=true;
+    session.Save(false);
+    if(session.HasUnsavedChanges) throw new InvalidOperationException("Belltower did not save.");
+    var source=System.IO.Path.Combine(root,"Sources/Belltower/landscape/forest.json");
+    System.IO.File.WriteAllText(source,added.Serialize().ToJsonString());
+    var result=new { Added=added.Children.Count,SourceScene=scene.Source.ResourcePath,Saved=!session.HasUnsavedChanges,
+        GamePreserved=Game.ActiveScene?.Id==game && Game.IsPlaying==playing,
+        SelectedDocumentPreserved=ReferenceEquals(previous,Editor.SceneEditorSession.Active) };
+    System.IO.File.WriteAllText(System.IO.Path.Combine(staging,"native-save.json"),System.Text.Json.JsonSerializer.Serialize(result));
+    return result;
+}
+catch
+{
+    // Keep a failed save visible to the editor; do not silently erase user edits.
+    if(added.IsValid()) session.HasUnsavedChanges=true;
+    throw;
+}

@@ -1,0 +1,68 @@
+// Compare practical-light coverage before committing a new bake. Restore all values.
+if(Game.IsPlaying) throw new InvalidOperationException("Stop play before the lighting comparison");
+var root=Sandbox.Project.Current.GetRootPath();
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.Source?.ResourcePath?.Equals("scenes/maps/collider/collider.scene",StringComparison.OrdinalIgnoreCase)==true);
+var scene=session.Scene;
+var camera=scene.GetAllComponents<CameraComponent>().Single(c=>c.GameObject.Name=="editor_camera" && c.GameObject.Flags.HasFlag(GameObjectFlags.EditorOnly));
+var lights=scene.GetAllComponents<PointLight>().Where(l=>l.GameObject.Name.StartsWith("under ") ||
+    new[]{"service -850","service 0","service 850"}.Contains(l.GameObject.Name)).ToArray();
+if(lights.Length!=11) throw new InvalidOperationException("Unexpected practical-light count");
+var oldLights=lights.Select(l=>(Light:l,Color:l.LightColor,Radius:l.Radius)).ToArray();
+var indirect=scene.GetAllComponents<IndirectLightVolume>().Single();
+var oldIntensity=indirect.RuntimeIntensity;
+var oldCamera=(camera.WorldPosition,camera.WorldRotation,camera.FieldOfView);
+var oldSize=camera.CustomSize;var oldAxis=camera.FovAxis;var oldOrtho=camera.Orthographic;
+var dirty=session.HasUnsavedChanges;
+var game=Game.ActiveScene?.Id;
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var directory=System.IO.Path.Combine(root,"output/collider/lighting-options");
+System.IO.Directory.CreateDirectory(directory);
+var variants=new[]{(Name:"baseline",UnderPower:7f,UnderRadius:700f,ServicePower:3.1f,ServiceRadius:400f,GI:oldIntensity),
+    (Name:"balanced",UnderPower:10f,UnderRadius:900f,ServicePower:7f,ServiceRadius:600f,GI:1.6f),
+    (Name:"bright",UnderPower:14f,UnderRadius:950f,ServicePower:10f,ServiceRadius:650f,GI:1.85f)};
+try
+{
+    camera.WorldPosition=new Vector3(-620,-850,330);
+    camera.WorldRotation=Rotation.LookAt(new Vector3(500,650,220)-camera.WorldPosition);
+    camera.FieldOfView=82;
+    using(scene.Push())
+    using(var bitmap=new Bitmap(1600,900))
+    foreach(var variant in variants)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        foreach(var light in lights)
+        {
+            var under=light.GameObject.Name.StartsWith("under ");
+            var power=under?variant.UnderPower:variant.ServicePower;
+            light.LightColor=new Color(power,power*.93f,power*.82f);
+            light.Radius=under?variant.UnderRadius:variant.ServiceRadius;
+        }
+        indirect.RuntimeIntensity=variant.GI;
+        typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+        typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+        typeof(PostProcessSystem).GetMethod("UpdateCamera",flags).Invoke(scene.GetSystem<PostProcessSystem>(),new object[]{camera});
+        var ddgiType=typeof(Scene).Assembly.GetType("Sandbox.DDGIVolumeSystem");
+        var getter=typeof(Scene).GetMethods().Single(m=>m.Name=="GetSystem" && m.IsGenericMethodDefinition && m.GetParameters().Length==0);
+        var ddgi=getter.MakeGenericMethod(ddgiType).Invoke(scene,null);
+        ddgiType.GetMethod("MarkDirty",flags).Invoke(ddgi,null);
+        ddgiType.GetMethod("UpdateVolumes",flags).Invoke(ddgi,null);
+        for(var warmup=0;warmup<3;warmup++)
+        {
+            camera.WorldPosition=new Vector3(-620,-850,330);
+            camera.WorldRotation=Rotation.LookAt(new Vector3(500,650,220)-camera.WorldPosition);
+            camera.FieldOfView=82;camera.CustomSize=new Vector2(1600,900);
+            camera.FovAxis=CameraComponent.Axis.Horizontal;camera.Orthographic=false;
+            camera.RenderToBitmap(bitmap,false);
+        }
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(directory,variant.Name+".png"),bitmap.ToPng());
+    }
+}
+finally
+{
+    foreach(var old in oldLights){old.Light.LightColor=old.Color;old.Light.Radius=old.Radius;}
+    indirect.RuntimeIntensity=oldIntensity;
+    camera.WorldPosition=oldCamera.Item1;camera.WorldRotation=oldCamera.Item2;camera.FieldOfView=oldCamera.Item3;
+    camera.CustomSize=oldSize;camera.FovAxis=oldAxis;camera.Orthographic=oldOrtho;
+}
+return new {Directory=directory,Variants=variants.Select(v=>new{v.Name,v.UnderPower,v.UnderRadius,v.ServicePower,v.ServiceRadius,v.GI}),
+    SettingsRestored=true,DirtyStatePreserved=session.HasUnsavedChanges==dirty,GamePreserved=Game.ActiveScene?.Id==game&&!Game.IsPlaying};

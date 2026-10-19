@@ -1,0 +1,69 @@
+// Temporary play-mode comparison from the stationary player's camera.
+// Camera poses are recorded so samples from different views can be rejected.
+var root=Sandbox.Project.Current.GetRootPath();
+var stage=System.IO.Path.Combine(root,"output/belltower/quality/ground-edge-v1");
+var action=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"runtime-action.json")))["action"].GetValue<string>();
+var scene=Game.ActiveScene;
+if(!Game.IsPlaying || scene is null || scene.IsEditor
+    || scene.GetAllComponents<ModelRenderer>().Count(r=>r.Model?.ResourcePath?.StartsWith("models/maps/belltower/",StringComparison.OrdinalIgnoreCase)==true)<10)
+    throw new InvalidOperationException("A running Belltower scene is required.");
+var statePath=System.IO.Path.Combine(stage,"runtime-state.json");
+var label="Belltower ground-edge performance comparison";
+GameObject comparison=null;
+using(scene.Push())
+{
+    if(action=="prepare")
+    {
+        if(scene.GetAllObjects(true).Any(o=>o.Name==label)) throw new InvalidOperationException("A comparison is already present.");
+        var camera=scene.Camera;
+        if(!camera.IsValid() || scene.GetAllComponents<CameraComponent>().Count(c=>c.Enabled)!=1)
+            throw new InvalidOperationException("Wait for the player's single runtime camera before sampling.");
+        comparison=new GameObject(scene,false,label);
+        comparison.Flags|=GameObjectFlags.NotSaved;
+        comparison.Enabled=true;
+        System.IO.File.WriteAllText(statePath,System.Text.Json.JsonSerializer.Serialize(new {SceneId=scene.Id.ToString(),RootId=comparison.Id.ToString(),CameraId=camera.Id.ToString(),camera.WorldPosition,camera.WorldRotation,camera.FieldOfView}));
+    }
+    else
+    {
+        var state=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(statePath));
+        if(state["SceneId"].GetValue<string>()!=scene.Id.ToString()) throw new InvalidOperationException("The runtime scene changed; do not reuse these timings.");
+        comparison=scene.GetAllObjects(true).Single(o=>o.Id.ToString()==state["RootId"].GetValue<string>() && o.Name==label);
+        if(action=="add")
+        {
+            if(comparison.Children.Count!=0) throw new InvalidOperationException("Comparison models already exist.");
+            foreach(var side in new[]{"west","east"})
+            {
+                var model=Model.Load("models/maps/belltower/ground-edge-v1/belltower_ground_edge_"+side+".vmdl");
+                if(model is null || model.IsError) throw new InvalidOperationException("Ground-edge model failed to load.");
+                var go=new GameObject(comparison,false,side);
+                go.Flags|=GameObjectFlags.NotSaved;
+                // Mesh vertices already contain map coordinates.
+                go.WorldPosition=Vector3.Zero;
+                go.WorldRotation=Rotation.Identity;
+                go.WorldScale=Vector3.One;
+                var renderer=go.Components.Create<ModelRenderer>();
+                renderer.Model=model;
+                renderer.RenderType=ModelRenderer.ShadowRenderType.Off;
+                go.Enabled=true;
+            }
+        }
+        else if(action=="remove" || action=="cleanup")
+        {
+            foreach(var child in comparison.Children.ToArray()) child.Destroy();
+            scene.ProcessDeletes();
+            if(action=="cleanup")
+            {
+                comparison.Destroy();
+                scene.ProcessDeletes();
+            }
+        }
+        else if(action!="inspect") throw new InvalidOperationException("Unknown runtime comparison action.");
+    }
+}
+var result=new {Action=action,Scene=scene.Name,SceneId=scene.Id.ToString(),IsPlaying=Game.IsPlaying,
+    Camera=scene.Camera?.GameObject.Name,EnabledCameras=scene.GetAllComponents<CameraComponent>().Where(c=>c.Enabled).Select(c=>new {Id=c.Id.ToString(),c.GameObject.Name,c.WorldPosition,c.WorldRotation,c.FieldOfView}).ToArray(),
+    ComparisonModels=comparison.IsValid() ? comparison.Children.Count : 0,ComparisonPresent=comparison.IsValid(),
+    ComparisonModelPoses=comparison.IsValid() ? comparison.Children.Select(c=>new {c.Name,c.WorldPosition,c.WorldRotation,c.WorldScale}).ToArray() : null,
+    SceneSource=scene.Source?.ResourcePath,FrameWidth=Screen.Width,FrameHeight=Screen.Height,SourceSceneWritten=false};
+System.IO.File.WriteAllText(System.IO.Path.Combine(stage,"runtime-"+action+"-result.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

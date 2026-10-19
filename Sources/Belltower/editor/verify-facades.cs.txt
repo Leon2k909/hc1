@@ -1,0 +1,43 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var stage=System.IO.Path.Combine(root,"output/belltower/quality/models/facades-v1");
+var manifestPath=System.IO.Path.Combine(stage,"native-import.json");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(manifestPath));
+string Hash(string path)
+{
+    using var stream=System.IO.File.OpenRead(path);
+    return Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(stream)).ToLowerInvariant();
+}
+foreach(var file in manifest["files"].AsArray())
+    if(Hash(System.IO.Path.Combine(root,"Assets",file["path"].GetValue<string>()))!=file["sha256"].GetValue<string>())
+        throw new InvalidOperationException("Installed facade mesh differs from the checked candidate.");
+var loaded=new System.Collections.Generic.List<object>();
+var geometry=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"source-geometry.json")));
+if(geometry["manifest_sha256"].GetValue<string>()!=Hash(manifestPath)) throw new InvalidOperationException("Geometry report is stale.");
+foreach(var record in manifest["models"].AsArray())
+{
+    var name=record["name"].GetValue<string>();
+    var resource="models/maps/belltower/"+name+".vmdl";
+    var source=System.IO.Path.Combine(root,"Assets",resource);
+    var compiled=source+"_c";
+    var mesh=System.IO.Path.ChangeExtension(source,".obj");
+    if(!System.IO.File.Exists(compiled) || System.IO.File.GetLastWriteTimeUtc(compiled)<System.IO.File.GetLastWriteTimeUtc(mesh))
+        throw new InvalidOperationException("Model has not compiled since the facade import: "+name);
+    var model=Model.Load(resource);
+    if(model is null || model.IsError || model.Materials.Any(m=>m is null || m.IsError))
+        throw new InvalidOperationException("Model or material did not load: "+name);
+    var sourceGeometry=geometry["models"].AsArray().Single(x=>x["name"].GetValue<string>()==name);
+    if(sourceGeometry["sha256"].GetValue<string>()!=Hash(mesh)) throw new InvalidOperationException("Geometry report source differs: "+name);
+    var sourceTriangles=sourceGeometry["triangles"].GetValue<int>();
+    var firstMaterialTriangles=sourceGeometry["first_material_triangles"].GetValue<int>();
+    if(sourceTriangles!=record["triangles"].GetValue<int>()) throw new InvalidOperationException("Source triangle count differs: "+name);
+    // This running engine returns the first material's index buffer here,
+    // not a sum over all material draw calls. Check that exact subset.
+    var nativeFirstMaterialTriangles=model.GetIndexCountForLod(0)/3;
+    if(model.Materials[0].ResourcePath!="materials/belltower/ashlar.vmat" || nativeFirstMaterialTriangles!=firstMaterialTriangles)
+        throw new InvalidOperationException("Loaded first-material geometry differs: "+name);
+    loaded.Add(new {Model=resource,SourceTriangles=sourceTriangles,NativeFirstMaterialTriangles=nativeFirstMaterialTriangles,
+        NativeTotalTrianglesVerified=false,model.MeshCount,Materials=model.Materials.Length});
+}
+var result=new {ManifestSha256=Hash(manifestPath),Models=loaded.ToArray()};
+System.IO.File.WriteAllText(System.IO.Path.Combine(stage,"native-resources.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

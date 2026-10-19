@@ -1,0 +1,58 @@
+var root = Sandbox.Project.Current.GetRootPath();
+var assets = System.IO.Path.GetFullPath(System.IO.Path.Combine(root,"Assets"));
+var staging = System.IO.Path.GetFullPath(System.IO.Path.Combine(root,"output/belltower/quality/forest-v1-staging"));
+if(Game.IsPlaying && Game.ActiveScene?.GetAllComponents<ModelRenderer>().Any(r=>r.Model?.ResourcePath?.Contains("maps/belltower/",StringComparison.OrdinalIgnoreCase)==true)==true)
+    throw new InvalidOperationException("Do not import woodland during a live Belltower match.");
+var game = Game.ActiveScene?.Id;
+var playing = Game.IsPlaying;
+var selected = Editor.SceneEditorSession.Active;
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(staging,"import.json"))).AsArray();
+string Hash(byte[] data) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(data)).ToLowerInvariant();
+var files = new System.Collections.Generic.List<(string Relative,string Target,byte[] Bytes)>();
+foreach(var entry in manifest)
+{
+    var relative = entry["path"].GetValue<string>();
+    if(relative.Contains("..") || !(relative.StartsWith("models/maps/belltower/forest/",StringComparison.Ordinal)
+        || relative.StartsWith("materials/belltower/forest/",StringComparison.Ordinal)
+        || relative=="shaders/belltower_forest.shader")) throw new InvalidOperationException("Unexpected forest path.");
+    var destination=System.IO.Path.GetFullPath(System.IO.Path.Combine(assets,relative));
+    var source=System.IO.Path.GetFullPath(System.IO.Path.Combine(root,entry["source"].GetValue<string>()));
+    if(!destination.StartsWith(assets+System.IO.Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase)
+       || !source.StartsWith(staging+System.IO.Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase))
+        throw new InvalidOperationException("Forest import escaped its directories.");
+    var bytes=System.IO.File.ReadAllBytes(source);
+    var hash=Hash(bytes);
+    if(hash!=entry["sha256"].GetValue<string>()) throw new InvalidOperationException("Staged asset changed: "+relative);
+    var current=System.IO.File.Exists(destination) ? Hash(System.IO.File.ReadAllBytes(destination)) : null;
+    if(current==hash) continue;
+    if(current!=entry["expected_sha256"]?.GetValue<string>()) throw new InvalidOperationException("Destination changed: "+relative);
+    if(relative.EndsWith(".vmdl",StringComparison.Ordinal) && System.Text.Encoding.UTF8.GetString(bytes).Contains("PhysicsShape"))
+        throw new InvalidOperationException("Distant woodland must not have collision.");
+    files.Add((relative,destination,bytes));
+}
+foreach(var file in files)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var backup=System.IO.Path.Combine(root,"output/belltower/quality/before-forest-v1/Assets",file.Relative);
+    if(System.IO.File.Exists(file.Target) && !System.IO.File.Exists(backup))
+    {
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+        System.IO.File.Copy(file.Target,backup);
+    }
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(file.Target));
+    var temporary=file.Target+".forest-import";
+    System.IO.File.WriteAllBytes(temporary,file.Bytes);
+    System.IO.File.Move(temporary,file.Target,true);
+}
+// Register only after all dependencies have their complete source on disk.
+await Editor.EditorUtility.CompileShader("shaders/belltower_forest.shader",new(),cancellationToken);
+if(!System.IO.File.Exists(System.IO.Path.Combine(assets,"shaders/belltower_forest.shader_c")))
+    throw new InvalidOperationException("The woodland shader did not compile.");
+foreach(var file in files.Where(f=>f.Relative.EndsWith(".shader") || f.Relative.EndsWith(".vmat") || f.Relative.EndsWith(".vmdl")))
+    Editor.AssetSystem.RegisterFile(file.Target);
+var result=new { Imported=files.Count, Models=manifest.Count(x=>x["path"].GetValue<string>().EndsWith(".vmdl")),
+    ShaderCompiled=true,
+    GamePreserved=Game.ActiveScene?.Id==game && Game.IsPlaying==playing,
+    SelectedDocumentPreserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active) };
+System.IO.File.WriteAllText(System.IO.Path.Combine(staging,"native-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

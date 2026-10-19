@@ -3,6 +3,7 @@
 Scene objects, terrain, foliage placement, and gameplay configuration are kept
 in the editor. Collision checks run before the staged files may be imported.
 """
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -38,10 +39,17 @@ def collision_signature(path):
 
 
 def main():
-    OUT.mkdir(parents=True, exist_ok=True)
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--out',type=Path,default=OUT,help='Separate staging folder inside output/belltower/quality/models')
+    parser.add_argument('--parts',nargs='+',choices=('centre','west','east'),default=('centre','west','east'))
+    args=parser.parse_args()
+    out=args.out.resolve()
+    if not out.is_relative_to(OUT.resolve()):
+        raise ValueError('Model staging must remain inside output/belltower/quality/models')
+    out.mkdir(parents=True, exist_ok=True)
     # An interrupted build must not leave an older import list pointing at
     # partially replaced staging files.
-    import_path = OUT.parent/"model-import.json"
+    import_path = OUT.parent/'model-import.json' if out==OUT.resolve() else out/'model-import.json'
     import_path.write_text(json.dumps({"status":"building","invalid_spots":-1,"unreachable_spots":-1,"files":[]})+"\n")
     centre = B.build_centre([])
     west = B.build_west([], np.random.default_rng(2024))
@@ -57,12 +65,14 @@ def main():
         raise RuntimeError(f"Refusing import: {problems} invalid spots, {cut_off} unreachable")
     manifest = {"spots":len(spots),"invalid_spots":problems,"unreachable_spots":cut_off,"models":[],"files":[]}
     for name,model in models:
+        if name not in args.parts:
+            continue
         full_name = "belltower_"+name
-        triangles = B.K.write_model(OUT,B.RESOURCE_DIR,full_name,model)
+        triangles = B.K.write_model(out,B.RESOURCE_DIR,full_name,model)
         record = {"name":full_name,"triangles":triangles,"boxes":len(model.boxes),"hulls":len(model.hulls)}
         manifest["models"].append(record)
         print(record,flush=True)
-        for path in sorted(OUT.glob(full_name+"*")):
+        for path in sorted(out.glob(full_name+"*")):
             if path.suffix not in (".obj",".mtl",".vmdl"):
                 continue
             relative = f"{B.RESOURCE_DIR}/{path.name}"

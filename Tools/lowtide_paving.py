@@ -2,8 +2,9 @@
 
 The scan is packed into a power-of-two atlas without resampling. An interior
 region repeats between grit courses, with the original approximately 8 x 5.33
-inch sett size applied to the existing 64-inch mesh UVs. Normal, roughness and
-AO data follow the new joints; no geometry or collision needs rebuilding.
+inch sett size applied to the existing 64-inch mesh UVs. Physical height, normal
+and joint AO maps supply nine-millimetre paving relief; no geometry or collision
+needs rebuilding. The generated colour image and roughness remain unchanged.
 
     rtk proxy python Tools/lowtide_paving.py --source <generated.png>
     rtk proxy python Tools/lowtide_paving.py
@@ -111,6 +112,10 @@ def bake_surface_maps():
         Image.fromarray(packed).save(path, optimize=True)
         metadata(path)
     scale, region = layout(rgb)
+    from lowtide_paving_relief import write_maps
+    write_maps(DIRECTORY / "paving_relief", rgb, scale, region)
+    for suffix in ("normal", "height", "ao"):
+        metadata(DIRECTORY / "paving_relief" / f"lt_setts_{suffix}.png")
     settings = json.loads(SETTINGS.read_text(encoding="utf-8"))
     settings.update(source_dimensions=list(rgb.shape[:2]), atlas_dimensions=[atlas, atlas],
                     source_sha256=hashlib.sha256(SOURCE.read_bytes()).hexdigest(),
@@ -124,22 +129,13 @@ def write_materials():
         raise FileNotFoundError("Bake Tools/lowtide_paving.py before writing the Lowtide materials")
     settings = json.loads(SETTINGS.read_text(encoding="utf-8"))
     u, v = settings["repeat_scale"]
-    region = " ".join(f"{value:.8f}" for value in settings["repeat_region_normalized"])
     path = DIRECTORY / "lt_setts.vmat"
-    K.write_text(path, f'''// Tools/lowtide_paving.py: generated granite, matching shallow relief, original world scale.
-"Layer0"
-{{
-    shader "shaders/hc1_lowtide_paving.shader"
-    F_SPECULAR "1"
-    TextureColor "{RESOURCE}_color.png"
-    TextureNormal "{RESOURCE}_normal.png"
-    TextureRoughness "{RESOURCE}_rough.png"
-    TextureMetalness "[0.0 0.0 0.0 0.0]"
-    TextureAmbientOcclusion "{RESOURCE}_ao.png"
-    g_vPavingScale "[{u:.8f} {v:.8f}]"
-    g_vPavingRegion "[{region}]"
-}}
-''')
+    from lowtide_paving_relief import material_text
+    from lowtide_paving_use import contact_material, shader, MASK, SHADER
+    if not (K.ASSETS / MASK).is_file():
+        raise FileNotFoundError("Stage current Lowtide paving contact data with lowtide_paving_use.py --current, then import it")
+    K.write_text(K.ASSETS / SHADER, shader())
+    K.write_text(path, contact_material(material_text((u, v), settings["repeat_region_normalized"])))
     metadata(path)
 
 

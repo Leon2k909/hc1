@@ -1,0 +1,7 @@
+if(Game.IsPlaying)throw new InvalidOperationException("Stop play before fixing the editor preview camera.");
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.Source?.ResourcePath?.Equals("scenes/maps/sewage/sewage.scene",StringComparison.OrdinalIgnoreCase)==true);
+var camera=session.Scene.GetAllComponents<CameraComponent>().Single(c=>c.GameObject.Name=="Reference composition camera");
+camera.IsMainCamera=false;
+camera.GameObject.Flags|=GameObjectFlags.EditorOnly;
+typeof(Editor.SceneEditorSession).GetProperty("HasUnsavedChanges").SetValue(session,true);
+return new{camera.IsMainCamera,Flags=camera.GameObject.Flags.ToString(),FlagValue=(int)camera.GameObject.Flags};

@@ -1,0 +1,56 @@
+// Stage separate parcel-v4 landscape and woodland sectors in the open project.
+// Refuse any Belltower match, preserve other playing scenes and accepted assets.
+var root=Sandbox.Project.Current.GetRootPath();
+var assets=System.IO.Path.Combine(root,"Assets");
+var stage=System.IO.Path.Combine(root,"output/belltower/quality/parcel-v4-production");
+var forest=System.IO.Path.Combine(root,"output/belltower/quality/parcel-v4-forest");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"native-trial-manifest.json")));
+var forestImport=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(forest,"import.json")));
+string Hash(string path) { using var stream=System.IO.File.OpenRead(path); return Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(stream)).ToLowerInvariant(); }
+if(Game.IsPlaying && Game.ActiveScene?.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase)==true)
+    throw new InvalidOperationException("Cannot import during a Belltower match");
+if(manifest["revision"].GetValue<string>()!="parcel-v4" || manifest["parcel"].GetValue<double>()!=5580.0) throw new InvalidOperationException("Wrong parcel revision");
+foreach(var dep in manifest["source_sha256"].AsObject())
+    if(Hash(System.IO.Path.Combine(root,dep.Key))!=dep.Value.GetValue<string>()) throw new InvalidOperationException("Accepted asset changed: "+dep.Key);
+if(Hash(System.IO.Path.Combine(root,manifest["generator_path"].GetValue<string>()))!=manifest["generator_sha256"].GetValue<string>()) throw new InvalidOperationException("Generator differs");
+var files=new System.Collections.Generic.List<(string Resource,string Source,string Target,string Sha)>();
+foreach(var item in manifest["resources"].AsArray())
+{
+    var path=item["path"].GetValue<string>();
+    var name=System.IO.Path.GetFileName(path);
+    if(!path.StartsWith("materials/belltower/vista/parcel-v4/",StringComparison.Ordinal) || !new[]{"vista_land.vmat","forest_trees.vmat","detail_grass.png","detail_soil.png","detail_stone.png","vista_a_color.jpg","vista_a_normal.jpg","vista_a_kind.png","vista_b_color.jpg","vista_b_normal.jpg","vista_b_kind.png","vista_c_color.jpg","vista_c_normal.jpg","vista_c_kind.png","vista_d_color.jpg","vista_d_normal.jpg","vista_d_kind.png"}.Contains(name))
+        throw new InvalidOperationException("Unexpected parcel texture: "+path);
+    files.Add((path,System.IO.Path.Combine(root,item["source"].GetValue<string>()),System.IO.Path.Combine(assets,path),item["sha256"].GetValue<string>()));
+}
+if(files.Count!=17 || forestImport.AsArray().Count!=264) throw new InvalidOperationException("Incomplete parcel or forest candidate");
+foreach(var item in forestImport.AsArray())
+{
+    var path=item["path"].GetValue<string>();
+    if(!path.StartsWith("models/maps/belltower/forest/parcel-v4/",StringComparison.Ordinal)
+        || !(path.EndsWith(".obj") || path.EndsWith(".mtl") || path.EndsWith(".vmdl"))) throw new InvalidOperationException("Unexpected forest path");
+    files.Add((path,System.IO.Path.Combine(root,item["source"].GetValue<string>()),System.IO.Path.Combine(assets,path),item["sha256"].GetValue<string>()));
+}
+foreach(var entry in files)
+{
+    if(Hash(entry.Source)!=entry.Sha || System.IO.File.Exists(entry.Target) && Hash(entry.Target)!=entry.Sha)
+        throw new InvalidOperationException("Trial resource changed or conflicts: "+entry.Resource);
+}
+var game=Game.ActiveScene?.Id;
+var playing=Game.IsPlaying;
+var selected=Editor.SceneEditorSession.Active;
+var imported=0;
+foreach(var entry in files)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    if(System.IO.File.Exists(entry.Target)) continue;
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(entry.Target));
+    System.IO.File.Copy(entry.Source,entry.Target);
+    if(Hash(entry.Target)!=entry.Sha) throw new InvalidOperationException("Imported source differs: "+entry.Resource);
+    if(entry.Resource.EndsWith(".vmat") || entry.Resource.EndsWith(".vmdl")) Editor.AssetSystem.RegisterFile(entry.Target);
+    imported++;
+}
+var result=new {Imported=imported,Expected=files.Count,ManifestSha256=Hash(System.IO.Path.Combine(stage,"native-trial-manifest.json")),
+    AcceptedAssetsReplaced=false,GamePreserved=Game.ActiveScene?.Id==game && Game.IsPlaying==playing,
+    SelectedDocumentPreserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active)};
+System.IO.File.WriteAllText(System.IO.Path.Combine(stage,"native-import-result.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

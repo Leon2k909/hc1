@@ -1,0 +1,9 @@
+var records=new System.Collections.Generic.List<object>();
+foreach(var name in new[]{"centre","west","east"})
+{
+    var model=Model.Load("models/maps/belltower/belltower_"+name+".vmdl");
+    records.Add(new {Name=name,model.IsError,model.MeshCount,
+        Indices=model.GetIndexCountForLod(0),
+        Materials=model.Materials.Select(m=>new{m.ResourcePath,m.IsError}).ToArray()});
+}
+return records;

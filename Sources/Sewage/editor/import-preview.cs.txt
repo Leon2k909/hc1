@@ -1,0 +1,12 @@
+if(Game.IsPlaying)throw new InvalidOperationException("Stop play before importing the map preview.");
+var root=Sandbox.Project.Current.GetRootPath();
+var source=System.IO.Path.Combine(root,"output/sewage/reference-view.png");
+if(!System.IO.File.Exists(source) || DateTime.UtcNow-System.IO.File.GetLastWriteTimeUtc(source)>TimeSpan.FromMinutes(10))
+    throw new InvalidOperationException("Capture and inspect the current Sewage view before importing its preview.");
+var destination=System.IO.Path.Combine(root,"Assets/ui/maps/sewage.png");
+System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(destination));
+var pending=destination+".sewage-import";
+System.IO.File.Copy(source,pending,true);
+System.IO.File.Move(pending,destination,true);
+var asset=Editor.AssetSystem.RegisterFile(destination);
+return new {Path=destination,Registered=asset is not null};

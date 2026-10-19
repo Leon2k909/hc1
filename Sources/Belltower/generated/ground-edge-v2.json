@@ -1,0 +1,20 @@
+{
+  "asset": "Belltower ground edge detail atlas v2",
+  "kind": "original generated albedo cutout; offline candidate",
+  "method": "built-in image_gen edit",
+  "prompt": "Use case: precise-object-edit. Edit target: the attached four-patch transparent ground-detail atlas. Keep its photographic grit, sparse dry oak/olive leaves, tiny twigs, muted moss, four-cell 2 by 2 layout and genuine RGBA transparency. Change the silhouette of EACH of the four patches: replace the current broad oval piles with VERY THIN, LONG ground-edge deposits, approximately 5:1 width to height (about 550 pixels wide and only 100 pixels tall within each cell). These lie against the base of a wall: each deposit has a nearly straight but finely broken UPPER/back edge where grit gathers against a straight wall, while its LOWER/front edge dissolves into irregular wisps, isolated grains and a few leaf tips on clear alpha. The wall itself is not shown. Taper both ends irregularly. Keep the dense material within that thin band; do not make oval mounds. Top left mostly fine dry grit, top right sparse dry leaves in grit, bottom left restrained dull moss, bottom right tiny gravel and two thin twigs. Make the earth and gravel neutral dusty grey-brown rather than rusty orange or peach. Sparse small leaves should remain clearly leaf-shaped and proportional, about 5 to 8 cm in a 90 cm-long strip. Straight-down orthographic, unlit diffuse albedo, no baked shadows, no ground plane or pavement. All four strips centered in their original equal cells with transparent padding, no overlap across cells. Preserve alpha. No labels, grid, border, text or watermarks.",
+  "reference_path": "Sources/Belltower/generated/ground-edge-v1.png",
+  "reference_sha256": "d2523c7356f19925a06a651f1ddecb17e712a10802b71d09e1175c42ce93398a",
+  "original_path": "C:/Users/leon2/.codex/generated_images/01a137a3-a1f4-7cf1-a3b1-54c0f0bbf6db/exec-5918216a-1f56-4425-9840-7951973f6acf.png",
+  "path": "Sources/Belltower/generated/ground-edge-v2.png",
+  "sha256": "6071d85940d3004ff16e5467b6209e3a6ceea9b10c36210c65bd027a8c2ac800",
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "mode": "RGBA",
+  "original_pixels_and_alpha_preserved": true,
+  "production_assets_changed": false,
+  "native_verified": false,
+  "review": "Thin deposits with a straighter back edge and loose grains on the front edge. The first broad atlas read as isolated piles in the studio; its image, meshes and renders remain preserved in ground-edge-v1-first-atlas. Saturated fringe pixels have alpha below 50/255, below the candidate's alpha threshold."
+}

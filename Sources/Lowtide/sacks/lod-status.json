@@ -1,0 +1,91 @@
+{
+  "date": "2026-10-15",
+  "revision": "sewn-sack-distance-candidates-v5",
+  "status": "offline_detail_candidates_reviewed",
+  "native_switching_configured": false,
+  "production_changed": false,
+  "close_candidate_changed": false,
+  "generator": "Tools/lowtide_sack_lods.py",
+  "reviewer": "Tools/lowtide_sack_lod_review.py",
+  "geometry": {
+    "sacks": 264,
+    "close_triangles_per_sack": 1570,
+    "lower_triangles_per_sack": {
+      "1": 818,
+      "2": 288
+    },
+    "lower_total_sack_triangles": {
+      "1": 215952,
+      "2": 76032
+    },
+    "retained_attributes": "Every exported lower-detail vertex position, cloth UV and shading normal occurs in the reviewed close mesh.",
+    "simplification": "Retains extra vertices around pinched corners. The medium mesh keeps simplified closed seams; the far mesh omits thread shells. Full close geometry stays intact."
+  },
+  "evidence": {
+    "manifest": "output/lowtide/quality-pass/sack-lods/manifest.json",
+    "manifest_sha256": "8f53b27df3a360d6e59a6852c3d4278f1f6f6bcccb087e2623aaf5778a9bf183",
+    "verification": "output/lowtide/quality-pass/sack-lods/verification.json",
+    "previews": "output/lowtide/quality-pass/sack-lods/preview/provenance.json",
+    "closed_meshes_checked": 528,
+    "vertex_attributes_checked": 875952,
+    "protected_live_files": 556,
+    "silhouette_comparisons": 36,
+    "max_silhouette_error_pixels": {
+      "level-1-320px": 3.0,
+      "level-1-160px": 1.4142135623730951,
+      "level-1-80px": 1.0,
+      "level-2-320px": 5.656854249492381,
+      "level-2-160px": 3.1622776601683795,
+      "level-2-80px": 1.4142135623730951
+    }
+  },
+  "preview": {
+    "native_engine_capture": false,
+    "reviewed": "Nine comparison sheets cover the sewn end, side and oblique views at 320/160/80 pixels.",
+    "filtering": "CPU nearest-mip choice from each triangle footprint; source albedo files remain unchanged.",
+    "limitations": [
+      "Nearest mip chosen per orthographic triangle; not native anisotropic/trilinear filtering",
+      "No engine GI, normal map shading, temporal LOD switching or performance measurement",
+      "Two representative seed variants; silhouette results are not an exhaustive visual proof"
+    ]
+  },
+  "material_library_dependencies": {
+    "output/lowtide/quality-pass/sack-lods/level-1/stage/models/maps/lowtide/lod-candidates/lowtide_dress_east.mtl": {
+      "source": "Assets/models/maps/lowtide/lowtide_dress_east.mtl",
+      "sha256": "b67f3b7a375eda8b3648824da617aee414e662481f23d0d0958ce852f201a69c"
+    },
+    "output/lowtide/quality-pass/sack-lods/level-1/stage/models/maps/lowtide/lod-candidates/lowtide_dress_west.mtl": {
+      "source": "Assets/models/maps/lowtide/lowtide_dress_west.mtl",
+      "sha256": "cb21b81ccb16ebfefe26c9deeff53a6ab3ac06747b1a2ea5d6802c26821d44dd"
+    },
+    "output/lowtide/quality-pass/sack-lods/level-1/stage/models/maps/lowtide/lod-candidates/lowtide_fleet.mtl": {
+      "source": "Assets/models/maps/lowtide/lowtide_fleet.mtl",
+      "sha256": "247652515e4f20385b8e25efbed64fa32e05ce14d7d747b09a8fb524f0fdb869"
+    },
+    "output/lowtide/quality-pass/sack-lods/level-2/stage/models/maps/lowtide/lod-candidates/lowtide_dress_east.mtl": {
+      "source": "Assets/models/maps/lowtide/lowtide_dress_east.mtl",
+      "sha256": "b67f3b7a375eda8b3648824da617aee414e662481f23d0d0958ce852f201a69c"
+    },
+    "output/lowtide/quality-pass/sack-lods/level-2/stage/models/maps/lowtide/lod-candidates/lowtide_dress_west.mtl": {
+      "source": "Assets/models/maps/lowtide/lowtide_dress_west.mtl",
+      "sha256": "cb21b81ccb16ebfefe26c9deeff53a6ab3ac06747b1a2ea5d6802c26821d44dd"
+    },
+    "output/lowtide/quality-pass/sack-lods/level-2/stage/models/maps/lowtide/lod-candidates/lowtide_fleet.mtl": {
+      "source": "Assets/models/maps/lowtide/lowtide_fleet.mtl",
+      "sha256": "247652515e4f20385b8e25efbed64fa32e05ce14d7d747b09a8fb524f0fdb869"
+    }
+  },
+  "integration": {
+    "native_accepted": false,
+    "next": [
+      "Retain offline mode until the user resumes native work; refresh before hashes and editor state.",
+      "Profile the close sacks in an actual match before choosing budgets.",
+      "The three source meshes aggregate many props. Choose per-stack grouping/instancing or an appropriate ModelDoc strategy before assigning screen or distance thresholds.",
+      "Reuse the existing model material remaps and collision. Each staged alternative includes its unchanged original material library.",
+      "Check temporal transitions, textile filtering, silhouette changes, draw calls and gameplay cost in the normal viewport; save and verify persistence after acceptance."
+    ]
+  },
+  "overall_goal": "Open; lower triangle counts do not establish native performance or AAA quality",
+  "latest_checkout_revalidation": "Sources/Lowtide/construction/checkout-status.json",
+  "historical_evidence_note": "Other validation fields describe the dated candidate; use latest_checkout_revalidation for the current scoped rebase."
+}

@@ -1,0 +1,60 @@
+// Add only isolated Belltower far-field trial resources. Original landscape,
+// forest materials, collision and any running game stay untouched.
+var root=Sandbox.Project.Current.GetRootPath();
+var stage=System.IO.Path.Combine(root,"output/belltower/quality/farfield-v3");
+var assets=System.IO.Path.Combine(root,"Assets");
+var manifestPath=System.IO.Path.Combine(stage,"manifest.json");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(manifestPath));
+if(manifest["revision"].GetValue<string>()!="farfield-v3")
+    throw new InvalidOperationException("Unexpected farfield trial revision");
+string Hash(string path)
+{
+    using var source=System.IO.File.OpenRead(path);
+    return Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(source)).ToLowerInvariant();
+}
+foreach(var item in manifest["accepted_inputs"].AsObject())
+    if(Hash(System.IO.Path.Combine(root,item.Key))!=item.Value.GetValue<string>())
+        throw new InvalidOperationException("Accepted farfield dependency changed: "+item.Key);
+var expectedNames=new System.Collections.Generic.HashSet<string>{"vista_c_color.jpg","vista_d_color.jpg","vista_land.vmat","forest_trees.vmat"};
+var seen=new System.Collections.Generic.HashSet<string>();
+var files=manifest["resources"].AsArray();
+if(files.Count!=4) throw new InvalidOperationException("Expected four separate terrain trial resources");
+foreach(var item in files)
+{
+    var relative=item["path"].GetValue<string>();
+    var name=System.IO.Path.GetFileName(relative);
+    if(!expectedNames.Contains(name) || !seen.Add(name)
+        || relative!="materials/belltower/vista/farfield-v3/"+name
+        || item["source"].GetValue<string>()!="output/belltower/quality/farfield-v3/"+name)
+        throw new InvalidOperationException("Unexpected terrain candidate asset: "+relative);
+    var source=System.IO.Path.Combine(stage,name);
+    var destination=System.IO.Path.Combine(assets,relative);
+    if(Hash(source)!=item["sha256"].GetValue<string>()
+        || System.IO.File.Exists(destination) && Hash(destination)!=item["sha256"].GetValue<string>())
+        throw new InvalidOperationException("Terrain candidate source or destination differs: "+name);
+}
+var gameId=Game.ActiveScene?.Id;
+var playing=Game.IsPlaying;
+var selected=Editor.SceneEditorSession.Active;
+var imported=0;
+foreach(var item in files)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var relative=item["path"].GetValue<string>();
+    var name=System.IO.Path.GetFileName(relative);
+    var destination=System.IO.Path.Combine(assets,relative);
+    if(System.IO.File.Exists(destination)) continue;
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(destination));
+    System.IO.File.Copy(System.IO.Path.Combine(stage,name),destination);
+    if(Hash(destination)!=item["sha256"].GetValue<string>())
+        throw new InvalidOperationException("Imported terrain resource hash differs: "+name);
+    Editor.AssetSystem.RegisterFile(destination);
+    imported++;
+}
+foreach(var filename in new[]{"vista_land.vmat","forest_trees.vmat"})
+    Editor.AssetSystem.RegisterFile(System.IO.Path.Combine(assets,"materials/belltower/vista/farfield-v3",filename));
+var result=new {Imported=imported,ManifestSha256=Hash(manifestPath),AcceptedAssetsReplaced=false,
+    GamePreserved=Game.ActiveScene?.Id==gameId && Game.IsPlaying==playing,
+    SelectedDocumentPreserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active)};
+System.IO.File.WriteAllText(System.IO.Path.Combine(stage,"native-import-result.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

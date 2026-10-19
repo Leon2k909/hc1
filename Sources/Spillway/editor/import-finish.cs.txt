@@ -1,0 +1,30 @@
+// This pass changes only two visual OBJ files and canvas colour. Keep every
+// ModelDoc and physics hull byte-identical, including during a running match.
+var root=Sandbox.Project.Current.GetRootPath();
+var stage=System.IO.Path.Combine(root,"output/spillway/stage");
+foreach(var name in new[]{"spillway_east","spillway_falls"})
+{
+    var relative=$"models/maps/spillway/{name}.vmdl";
+    if(!System.IO.File.ReadAllBytes(System.IO.Path.Combine(stage,relative)).SequenceEqual(System.IO.File.ReadAllBytes(System.IO.Path.Combine(root,"Assets",relative))))
+        throw new InvalidOperationException("The visual finish must preserve ModelDoc: "+name);
+}
+foreach(var hull in System.IO.Directory.GetFiles(System.IO.Path.Combine(root,"Assets/models/maps/spillway"),"*hulls*.obj"))
+    if(!System.IO.File.ReadAllBytes(hull).SequenceEqual(System.IO.File.ReadAllBytes(System.IO.Path.Combine(stage,"models/maps/spillway",System.IO.Path.GetFileName(hull)))))
+        throw new InvalidOperationException("A physics hull changed");
+var relatives=new[]{"models/maps/spillway/spillway_east.obj","models/maps/spillway/spillway_falls.obj","materials/spillway/sw_tarp.vmat"};
+foreach(var relative in relatives)
+{
+    var source=System.IO.Path.Combine(stage,relative);var destination=System.IO.Path.Combine(root,"Assets",relative);
+    var backup=System.IO.Path.Combine(root,"output/spillway/finish-before",relative);
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+    if(!System.IO.File.Exists(backup))System.IO.File.Copy(destination,backup,false);
+    System.IO.File.Copy(source,destination,true);Editor.AssetSystem.RegisterFile(destination);
+}
+foreach(var relative in new[]{"materials/spillway/sw_tarp.vmat","models/maps/spillway/spillway_east.vmdl","models/maps/spillway/spillway_falls.vmdl"})
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var asset=Editor.AssetSystem.FindByPath(relative);
+    if(!asset.Compile(true))throw new InvalidOperationException("Visual finish compilation failed: "+relative);
+    await Task.Delay(1,cancellationToken);
+}
+return new {Imported=relatives,PhysicsPreserved=true};

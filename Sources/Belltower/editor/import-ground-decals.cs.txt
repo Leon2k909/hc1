@@ -1,0 +1,55 @@
+// Install only the four unreferenced native decal definitions; preserve shared play.
+var root=Sandbox.Project.Current.GetRootPath();
+var stage=System.IO.Path.Combine(root,"output/belltower/quality/ground-edge-v2");
+string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var manifestPath=System.IO.Path.Combine(stage,"manifest.json");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(manifestPath));
+if(manifest["revision"].GetValue<string>()!="ground-edge-v2" || manifest["source_pixels_or_alpha_changed"].GetValue<bool>()
+    || manifest["normal_roughness_metalness_ao_overrides"].GetValue<bool>())
+    throw new InvalidOperationException("Wrong decal study or modified source pixels/PBR.");
+foreach(var input in manifest["source_sha256"].AsObject())
+    if(Hash(System.IO.Path.Combine(root,input.Key))!=input.Value.GetValue<string>())
+        throw new InvalidOperationException("A native decal input changed: "+input.Key);
+var engine=System.IO.Path.GetDirectoryName(Environment.ProcessPath);
+foreach(var input in manifest["engine_source_sha256"].AsObject())
+    if(Hash(System.IO.Path.Combine(engine,input.Key))!=input.Value.GetValue<string>())
+        throw new InvalidOperationException("The engine decal implementation changed.");
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor
+    && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase)==true);
+if(session.HasUnsavedChanges) throw new InvalidOperationException("The Belltower document must be saved before this study.");
+var files=manifest["files"].AsArray();
+var expected=Enumerable.Range(0,4).Select(i=>"decals/belltower/ground-edge-v2/ground_"+i+".decal").ToHashSet();
+if(files.Count!=4 || !files.Select(f=>f["path"].GetValue<string>()).ToHashSet().SetEquals(expected))
+    throw new InvalidOperationException("Expected exactly four private decal definitions.");
+foreach(var item in files)
+{
+    var path=item["path"].GetValue<string>();
+    if(item["source"].GetValue<string>()!="output/belltower/quality/ground-edge-v2/Assets/"+path
+        || Hash(System.IO.Path.Combine(root,item["source"].GetValue<string>()))!=item["sha256"].GetValue<string>())
+        throw new InvalidOperationException("A staged decal differs: "+path);
+    var live=System.IO.Path.Combine(root,"Assets",path);
+    if(System.IO.File.Exists(live) && Hash(live)!=item["sha256"].GetValue<string>())
+        throw new InvalidOperationException("A different private definition already exists: "+path);
+}
+var game=Game.ActiveScene?.Id;
+var playing=Game.IsPlaying;
+var selected=Editor.SceneEditorSession.Active;
+var written=0;
+foreach(var item in files)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var path=item["path"].GetValue<string>();
+    var live=System.IO.Path.Combine(root,"Assets",path);
+    if(!System.IO.File.Exists(live))
+    {
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(live));
+        System.IO.File.Copy(System.IO.Path.Combine(root,item["source"].GetValue<string>()),live,false);
+        written++;
+    }
+    Editor.AssetSystem.RegisterFile(live);
+}
+var result=new {Imported=4,NewFiles=written,ManifestSha256=Hash(manifestPath),SceneObjectsAdded=0,SceneSaved=false,
+    GamePreserved=game==Game.ActiveScene?.Id && playing==Game.IsPlaying,
+    SelectedDocumentPreserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active)};
+System.IO.File.WriteAllText(System.IO.Path.Combine(stage,"native-import-result.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

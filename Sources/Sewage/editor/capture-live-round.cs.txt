@@ -1,0 +1,10 @@
+if(!Game.IsPlaying)throw new InvalidOperationException("A live round is required.");
+var scene=Game.ActiveScene;
+if(scene.Source?.ResourcePath?.Equals("scenes/maps/sewage/sewage.scene",StringComparison.OrdinalIgnoreCase)!=true)throw new InvalidOperationException("The running map is not Sewage.");
+var camera=scene.Camera;
+if(camera is null)throw new InvalidOperationException("No live player camera.");
+using var bitmap=new Bitmap(1600,900);
+camera.RenderToBitmap(bitmap,true);
+var path=System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/sewage/live-round.png");
+System.IO.File.WriteAllBytes(path,bitmap.ToPng());
+return new {Path=path,Camera=camera.GameObject.Name,Position=camera.WorldPosition.ToString()};

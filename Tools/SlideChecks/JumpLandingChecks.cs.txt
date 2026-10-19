@@ -1,0 +1,222 @@
+// Native-engine regression checks. Copy into the sbox-cli exchange directory and run with run_csharp.
+// Uses the production input/movement methods in an isolated scene; restores input, time and sprint settings.
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var type = typeof(Facepunch.PlayerPawn);
+var inputType = typeof(Input).GetNestedType("Context", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+var input = Activator.CreateInstance(inputType, flags, null, new object[] { "JumpSlideQA" }, null);
+var names = Input.ActionNames.ToList();
+var timeMethod = typeof(Time).GetMethod("Scope", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+var inputScope = (IDisposable)inputType.GetMethod("Push", flags).Invoke(input, null);
+var scene = new Scene();
+var settings = Facepunch.GameSettingsSystem.Current;
+var savedToggleSprint = settings.ToggleSprint;
+var checks = 0;
+var simulations = 0;
+ulong previousButtons = 0;
+void Check(bool condition, string label) { if (!condition) throw new Exception(label); checks++; }
+IDisposable At(double now, double delta) => (IDisposable)timeMethod.Invoke(null, new object[] { now, delta });
+ulong Mask(params string[] actions) => actions.Aggregate(0UL, (mask, action) => {
+    var index = names.FindIndex(x => string.Equals(x, action, StringComparison.OrdinalIgnoreCase));
+    if (index < 0) throw new Exception("Missing input action: " + action);
+    return mask | (1UL << index);
+});
+void Buttons(params string[] actions) {
+    var current = Mask(actions);
+    inputType.GetProperty("ActionsCurrent", flags).SetValue(input, current);
+    inputType.GetProperty("ActionsPrevious", flags).SetValue(input, previousButtons);
+    previousButtons = current;
+}
+void Call(Facepunch.PlayerPawn pawn, string method, params object[] args) => type.GetMethod(method, flags).Invoke(pawn, args);
+bool Pending(Facepunch.PlayerPawn pawn) => (bool)type.GetField("_slideOnLanding", flags).GetValue(pawn);
+void Field(Facepunch.PlayerPawn pawn, string name, object value) => type.GetField(name, flags).SetValue(pawn, value);
+Facepunch.PlayerPawn NewPawn(float fatigue = 0f) {
+    previousButtons = 0;
+    Buttons();
+    var go = new GameObject(false, "Jump slide regression");
+    go.Flags |= GameObjectFlags.NotSaved | GameObjectFlags.NotNetworked;
+    var pawn = go.AddComponent<Facepunch.PlayerPawn>();
+    pawn.Enabled = false;
+    pawn.HealthComponent = go.AddComponent<Facepunch.HealthComponent>();
+    pawn.HealthComponent.Enabled = false;
+    pawn.CharacterController = go.GetComponent<Facepunch.CharacterController>() ?? go.AddComponent<Facepunch.CharacterController>();
+    pawn.CharacterController.Enabled = false;
+    pawn.CharacterController.Velocity = new Vector3(285f, 0f, 0f);
+    pawn.CharacterController.IsOnGround = true;
+    // Leave the controller's collision skin above the floor, as a real grounded controller does.
+    pawn.WorldPosition = Vector3.Up * 2f;
+    pawn.WishMove = Vector3.Forward;
+    pawn.IsSprinting = true;
+    pawn.Body = go.AddComponent<Facepunch.PlayerBody>();
+    pawn.Body.Enabled = false;
+    pawn.Head = new GameObject(go, false, "Head");
+    pawn.Head.LocalPosition = Vector3.Up * 60f;
+    pawn.CameraController = go.GetComponent<Facepunch.CameraController>() ?? go.AddComponent<Facepunch.CameraController>();
+    pawn.CameraController.Enabled = false;
+    pawn.CameraController.Player = pawn;
+    type.GetProperty("JumpFatigue", flags).SetValue(pawn, fatigue);
+    type.GetProperty("WantsToggleSprint", flags).SetValue(pawn, settings.ToggleSprint);
+    return pawn;
+}
+void Step(Facepunch.PlayerPawn pawn, int tick, float delta, params string[] actions) {
+    using (At(1000d + tick * (double)delta, delta)) {
+        Buttons(actions);
+        Call(pawn, "BuildWishVelocity");
+        Call(pawn, "BuildInput");
+        Call(pawn, "ApplyAcceleration");
+        Call(pawn, "ApplyMovement");
+    }
+}
+try {
+    using (scene.Push()) {
+        var floor = new GameObject(false, "Regression floor");
+        floor.WorldPosition = new Vector3(0f, 0f, -10f);
+        floor.AddComponent<BoxCollider>().Scale = new Vector3(2000f, 2000f, 20f);
+        floor.Enabled = true;
+        Check(scene.Trace.Ray(Vector3.Up * 5f, Vector3.Down * 5f).Run().Hit, "Isolated floor has collision");
+        Check(!Input.Suppressed, "Test input is available");
+        foreach (var hz in new[] { 30, 50, 120 }) {
+            var delta = 1f / hz;
+            foreach (var fatigue in new[] { 0f, .45f }) {
+                settings.ToggleSprint = false;
+                var reference = NewPawn(fatigue);
+                var landingTick = -1;
+                var referenceTrace = new System.Collections.Generic.List<object>();
+                for (var tick = 0; tick < hz * 2; tick++) {
+                    Step(reference, tick, delta, tick == 0 ? new[] { "Run", "Jump" } : new[] { "Run" });
+                    if (tick < 3 || tick % 10 == 0) referenceTrace.Add(new { tick, reference.WorldPosition, reference.CharacterController.Velocity, reference.CharacterController.IsOnGround });
+                    if (tick > 0 && reference.CharacterController.IsOnGround) { landingTick = tick; break; }
+                }
+                Check(landingTick > 2, "Reference jump lands at " + hz + "Hz, fatigue " + fatigue + " " + Json.Serialize(referenceTrace));
+                reference.GameObject.Destroy();
+                foreach (var toggle in new[] { false, true })
+                foreach (var style in new[] { "tap", "hold", "repeat" })
+                foreach (var fraction in new[] { 0f, .1f, .5f, .9f, 1f }) {
+                    settings.ToggleSprint = toggle;
+                    var pawn = NewPawn(fatigue);
+                    var pressTick = (int)(landingTick * fraction);
+                    var label = $"{hz}Hz fatigue={fatigue} toggle={toggle} {style} at={fraction}";
+                    var leftGround = false;
+                    for (var tick = 0; tick <= landingTick + 2; tick++) {
+                        var actions = new System.Collections.Generic.List<string>();
+                        // Release held sprint before late presses; momentum must still accept the slide.
+                        if (!toggle && (tick < landingTick / 3 || fraction < .5f)) actions.Add("Run");
+                        if (tick == 0) actions.Add("Jump");
+                        if (tick == pressTick || (style == "hold" && tick > pressTick)
+                            || (style == "repeat" && tick == pressTick + 2)) actions.Add("Duck");
+                        Step(pawn, tick, delta, actions.ToArray());
+                        if (!pawn.CharacterController.IsOnGround) {
+                            leftGround = true;
+                            Check(!pawn.IsSliding, label + ": no slide boost in the air");
+                        }
+                        if (leftGround && pawn.CharacterController.IsOnGround) break;
+                    }
+                    Check(leftGround, label + ": Jump still leaves the floor");
+                    Check(pawn.IsSliding && pawn.IsCrouching, label + ": slide starts on ground contact");
+                    Check(!Pending(pawn), label + ": landing consumes the request");
+                    Check(pawn.CharacterController.Velocity.WithZ(0f).Length is >= 340f and <= 430f, label + ": normal slide speed");
+                    if (toggle) Check((bool)type.GetField("_resumeSprintAfterSlide", flags).GetValue(pawn), label + ": toggle sprint survives the jump");
+                    simulations++;
+                    pawn.GameObject.Destroy();
+                }
+            }
+        }
+
+        settings.ToggleSprint = false;
+        foreach (var hz in new[] { 30, 50, 120 })
+        foreach (var style in new[] { "tap", "hold", "late" }) {
+            var delta = 1f / hz;
+            Facepunch.PlayerPawn pawn;
+            using (At(999.8d, delta)) {
+                pawn = NewPawn(.45f);
+                Buttons("Duck", "Run");
+                Call(pawn, "UpdateSlide", true);
+                Check(pawn.IsSliding, "Chain starts in an active slide");
+                Buttons();
+            }
+            var landed = false;
+            var chainTrace = new System.Collections.Generic.List<object>();
+            for (var tick = 0; tick < hz; tick++) {
+                var actions = new System.Collections.Generic.List<string>();
+                if (tick == 0) actions.Add("Jump");
+                if ((style == "tap" && tick == 0) || style == "hold"
+                    || (style == "late" && tick == (int)(hz * .25f))) actions.Add("Duck");
+                Step(pawn, tick, delta, actions.ToArray());
+                chainTrace.Add(new { tick, pawn.WorldPosition, pawn.CharacterController.Velocity, pawn.CharacterController.IsOnGround, pawn.IsSliding, Pending = Pending(pawn), pawn.IsCrouching });
+                if (tick == 0) Check(!pawn.IsSliding && !pawn.CharacterController.IsOnGround, "Jump wins over Duck cancelling the slide");
+                landed |= pawn.CharacterController.IsOnGround;
+                if (landed && pawn.IsSliding) break;
+            }
+            Check(landed && pawn.IsSliding, $"Slide-jump-slide chain at {hz}Hz with {style} Duck survives the cooldown " + Json.Serialize(chainTrace));
+            simulations++;
+            pawn.GameObject.Destroy();
+        }
+        using (At(2000d, .02d)) {
+            var pawn = NewPawn();
+            pawn.CharacterController.IsOnGround = false;
+            pawn.IsSprinting = false;
+            Buttons("Duck");
+            Call(pawn, "UpdateSlide", false);
+            Check(Pending(pawn), "Airborne momentum queues a slide without a sprint flag");
+            pawn.CharacterController.IsOnGround = true;
+            Field(pawn, "_slideCooldown", (TimeUntil).1f);
+            Buttons();
+            Call(pawn, "UpdateSlide", false);
+            Check(Pending(pawn) && !pawn.IsSliding, "Cooldown keeps the landing request pending");
+            using (At(2000.12d, .02d)) {
+                Call(pawn, "UpdateSlide", false);
+                Check(pawn.IsSliding, "A landing request starts after the cooldown clears");
+            }
+            pawn.GameObject.Destroy();
+        }
+        foreach (var guard in new[] { "IsProne", "IsMantling", "IsPipeClimbing", "IsNoclipping", "IsFrozen", "IsFallKnockedDown", "IsSlowWalking" }) {
+            var pawn = NewPawn();
+            pawn.CharacterController.IsOnGround = false;
+            Buttons("Duck");
+            Call(pawn, "UpdateSlide", true);
+            Check(Pending(pawn), guard + ": request is initially queued");
+            type.GetProperty(guard, flags).SetValue(pawn, true);
+            Buttons();
+            Call(pawn, "UpdateSlide", false);
+            Check(!Pending(pawn) && !pawn.IsSliding, guard + ": cancels the request");
+            pawn.GameObject.Destroy();
+        }
+        {
+            var pawn = NewPawn();
+            pawn.CharacterController.IsOnGround = false;
+            pawn.CharacterController.Velocity = new Vector3(100f, 0f, 0f);
+            pawn.IsSprinting = false;
+            Buttons("Duck");
+            Call(pawn, "UpdateSlide", false);
+            Check(!Pending(pawn), "A slow airborne crouch does not invent running momentum");
+            pawn.CharacterController.Velocity = new Vector3(285f, 0f, 0f);
+            Buttons("Duck");
+            Call(pawn, "UpdateSlide", false);
+            Check(Pending(pawn), "Holding Duck arms the landing once moving fast enough");
+            Call(pawn, "StopSlide");
+            Check(!Pending(pawn), "Stopping movement clears a queued slide even before it starts");
+            pawn.GameObject.Destroy();
+        }
+        using (At(3000d, .02d)) {
+            var pawn = NewPawn();
+            Buttons("Duck", "Run");
+            Call(pawn, "UpdateSlide", true);
+            Check(pawn.IsSliding, "Ground sprint-to-slide still starts immediately");
+            using (At(3000.2d, .02d)) {
+                Buttons();
+                Call(pawn, "UpdateSlide", false);
+                Buttons("Duck");
+                Call(pawn, "UpdateSlide", false);
+                Check(!pawn.IsSliding && (bool)type.GetField("_slideCancelHeld", flags).GetValue(pawn), "Second Duck still cancels an active grounded slide");
+            }
+            pawn.GameObject.Destroy();
+        }
+    }
+    var report = System.IO.Path.Combine(exchangeDirectory, "jump-slide-results.json");
+    var result = new { Passed = checks, Simulations = simulations, TickRates = new[] { 30, 50, 120 }, Report = report };
+    System.IO.File.WriteAllText(report, Json.Serialize(result));
+    return result;
+} finally {
+    settings.ToggleSprint = savedToggleSprint;
+    scene.Destroy();
+    inputScope.Dispose();
+}

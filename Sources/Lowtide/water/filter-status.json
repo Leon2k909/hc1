@@ -1,0 +1,76 @@
+{
+  "date": "2026-10-18",
+  "status": "installed_native_visual_and_editor_lifecycle_verified",
+  "project_root": "C:\\sbox-projects\\hc1\\forked-shooter-main",
+  "user_work_mode": "native_checks_resumed",
+  "production_changed": true,
+  "native_accepted": true,
+  "static_native_comparison_reviewed": true,
+  "canonical_generator_changed": true,
+  "generator": "Tools/lowtide_water_filter.py",
+  "canonical_generator": "Tools/lowtide_water.py",
+  "shader_extension": "Sources/Lowtide/water/reflection-filter.hlsl",
+  "installed": {
+    "Code/Map/LowtideWaterReflections.cs": "cff7f27a27d531bc5d550f2bd81275bcc53ae8561c838049315cdaf81aeba230",
+    "Assets/materials/lowtide/lt_water.vmat": "1bdbfc0579ec69a9a835285814073c8b64faf0aa11dc950fa66509d57aab688f",
+    "Assets/shaders/hc1_lowtide_water_filtered.shader": "3ad98648ad3d15f5b7ca4f251a82e4936abf3657b25a46685eaa41733e7adc87",
+    "Assets/shaders/hc1_lowtide_water_filtered.shader.meta": "3a978cd321a66ea3e7c89d79bb1f5c80d74f2dd5019956df68c779ac01c36039"
+  },
+  "generators": {
+    "Tools/lowtide_water.py": "f072c9c84b309b16d554d56b3a447599a0c858350bd97b2488dd376849b3527a",
+    "Tools/lowtide_water_filter.py": "9c59e45a2d4686b97e0322578332e002f30eb830727f442bc7bbbc532cd186eb"
+  },
+  "scope": {
+    "max_mips": 7,
+    "roughness_filter_scale": 0.08,
+    "base_roughness": 0.22,
+    "extra_water_texture_lookups": 0,
+    "max_downsample_passes": 6,
+    "additional_color_bytes_at_960x540": 1380960,
+    "delta_triangles": 0,
+    "new_material_slots": 0,
+    "geometry_collision_and_scene_unchanged": true
+  },
+  "evidence": {
+    "directory": "output/lowtide/quality-pass/native-2026-10-18/water-reflection",
+    "review": "output/lowtide/quality-pass/native-2026-10-18/water-reflection/static-review.json",
+    "native_compile": "output/lowtide/quality-pass/native-2026-10-18/water-reflection/native-compile.json",
+    "unused_review_readback": "output/lowtide/quality-pass/native-2026-10-18/water-reflection/review-readback.json",
+    "production_import": "output/lowtide/quality-pass/native-2026-10-18/water-reflection/production-import.json",
+    "canonical_reproduction": "output/lowtide/quality-pass/native-2026-10-18/water-reflection/canonical-verification.json",
+    "production_readback": "output/lowtide/quality-pass/native-2026-10-18/water-reflection/production-readback.json",
+    "production_captures": "output/lowtide/quality-pass/native-2026-10-18/water-reflection/production/verification.json",
+    "review_cleanup": "output/lowtide/quality-pass/native-2026-10-18/water-reflection/review-retired.json",
+    "rejected_performance_sample": "output/lowtide/quality-pass/native-2026-10-18/water-reflection/performance-unaccepted.json"
+  },
+  "native_validation": {
+    "capture_hotload_errors": 0,
+    "review_material_compiled": true,
+    "reviewed_images": 12,
+    "active_reflection_views_in_all_captures": 1,
+    "production_compiled_file_exists": true,
+    "production_compile_request_timed_out": true,
+    "production_loaded_material_readback": true,
+    "lifecycle_verified": true,
+    "temporal_stability_verified": false,
+    "gameplay_performance_measured": false,
+    "lifecycle_scope": "Six single-perspective editor checks: visible, outside bounds, below plane, return, disable and reenable.",
+    "performance_sample_rejected": true,
+    "performance_rejection": "Camera orientation changed during the fixed-view sample; no Lowtide timing claim."
+  },
+  "editor_state": {
+    "restored_play_scene": "scenes/maps/ares/ares.scene",
+    "restoration": "Native play_start confirmed Ares started after the brief review interruption.",
+    "later_state": "The editor recovered; production readback and all six lifecycle checks passed. Ares play was started again and the connection remained responsive.",
+    "log": "Repeated game-cache search-path failures and ToolsStallMonitor entries during Ares loading.",
+    "process_left_running": true
+  },
+  "remaining": [
+    "Measure controlled Lowtide gameplay/GPU performance with verified camera context.",
+    "Review moving-camera temporal appearance and multiple-view behavior."
+  ],
+  "historical_status": "output/lowtide/quality-pass/native-2026-10-18/water-reflection/historical-filter-status.json",
+  "overall_AAA_verified": false,
+  "observed_utc": "2026-10-18T18:17:22.737695+00:00",
+  "temporary_review_assets_archived": 6
+}

@@ -11,6 +11,18 @@ import belltower_map as B
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def texture_path(value):
+    # New engine serializers emit a resource handle; old captures use a path.
+    # Keep the regeneration cache portable instead of storing session IDs.
+    path = value.get("Path") if isinstance(value, dict) else value
+    if not isinstance(path, str) or not path.startswith("lighting/belltower/") or not path.endswith(".vtex"):
+        raise ValueError(f"Unexpected Belltower lighting texture: {path!r}")
+    resolved = (ROOT / "Assets" / (path + "_c")).resolve()
+    if not resolved.is_relative_to(ROOT / "Assets/lighting/belltower"):
+        raise ValueError("Lighting texture must remain inside Belltower assets")
+    return path
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("capture", help="Native capture folder under output/belltower/quality")
@@ -46,6 +58,7 @@ def main():
                 raise ValueError(f"{key} must be finite and nonnegative")
             component[key] = value
     for key in ("IrradianceTexture", "DistanceTexture", "RelocationTexture"):
+        component[key] = texture_path(component[key])
         resource = ROOT / "Assets" / (component[key] + "_c")
         if not resource.is_file() or resource.stat().st_size == 0:
             raise FileNotFoundError(resource)
@@ -61,6 +74,7 @@ def main():
         reflections = json.loads(reflections_path.read_text())
         for child in reflections["Children"]:
             probe = next(c for c in child["Components"] if c["__type"] == "Sandbox.EnvmapProbe")
+            probe["BakedTexture"] = texture_path(probe["BakedTexture"])
             if probe["Mode"] != "Baked" or not (ROOT/"Assets"/(probe["BakedTexture"]+"_c")).is_file():
                 raise ValueError(f"Missing baked reflection for {child['Name']}")
     sources = [ROOT/"Assets/models/maps/belltower"/f"belltower_{part}.obj" for part in ("centre","west","east")]

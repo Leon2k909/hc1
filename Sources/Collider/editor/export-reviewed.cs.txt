@@ -1,0 +1,38 @@
+// Export the saved, reviewed editor document and its lighting to the reproducible stage.
+if(Game.IsPlaying) throw new InvalidOperationException("Stop play before exporting");
+var root=Sandbox.Project.Current.GetRootPath();
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.Source?.ResourcePath?.Equals("scenes/maps/collider/collider.scene",StringComparison.OrdinalIgnoreCase)==true);
+if(session.HasUnsavedChanges) throw new InvalidOperationException("Save Collider before exporting");
+var source=System.IO.Path.Combine(root,"Assets/scenes/maps/Collider/collider.scene");
+var stage=System.IO.Path.Combine(root,"output/collider/stage");
+System.IO.File.Copy(source,System.IO.Path.Combine(stage,"collider.scene.json"),true);
+var data=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(source));
+var objects=data["GameObjects"].AsArray();
+var cache=System.IO.Path.Combine(root,"Sources/Collider/lighting");
+System.IO.Directory.CreateDirectory(cache);
+System.IO.File.WriteAllText(System.IO.Path.Combine(cache,"indirect-light.json"),objects.Single(o=>o["Name"]?.GetValue<string>()=="Collider indirect lighting").ToJsonString());
+System.IO.File.WriteAllText(System.IO.Path.Combine(cache,"reflections.json"),objects.Single(o=>o["Name"]?.GetValue<string>()=="Reflection Probes")["Children"].ToJsonString());
+var revision=session.Scene.GetAllComponents<IndirectLightVolume>().Single().IrradianceTexture.ResourcePath.Split('/')[2];
+var bake=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/collider",revision,"bake-result.json")));
+bake["SavedScene"]=true;bake["AcceptedRevision"]=revision;
+System.IO.File.WriteAllText(System.IO.Path.Combine(cache,"bake-result.json"),bake.ToJsonString());
+var texturePaths=new System.Collections.Generic.HashSet<string>();
+foreach(var volume in session.Scene.GetAllComponents<IndirectLightVolume>())
+foreach(var texture in new[]{volume.IrradianceTexture,volume.DistanceTexture,volume.RelocationTexture})
+    if(texture is null || texture.IsError) throw new InvalidOperationException("Invalid baked GI"); else texturePaths.Add(texture.ResourcePath);
+foreach(var probe in session.Scene.GetAllComponents<EnvmapProbe>())
+    if(probe.Texture is null || probe.Texture.IsError || probe.Mode.ToString()!="CustomTexture") throw new InvalidOperationException("Invalid static reflection"); else texturePaths.Add(probe.Texture.ResourcePath);
+foreach(var texture in texturePaths)
+{
+    var target=System.IO.Path.Combine(stage,texture+"_c");
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    System.IO.File.Copy(System.IO.Path.Combine(root,"Assets",texture+"_c"),target,true);
+}
+var preview=System.IO.Path.Combine(root,"output/collider/captures/art.png");
+foreach(var target in new[]{System.IO.Path.Combine(root,"Assets/ui/maps/collider.png"),System.IO.Path.Combine(stage,"ui/maps/collider.png")})
+{
+    System.IO.File.Copy(preview,target+".collider-import",true);
+    System.IO.File.Move(target+".collider-import",target,true);
+}
+Editor.AssetSystem.RegisterFile(System.IO.Path.Combine(root,"Assets/ui/maps/collider.png"));
+return new {Scene=source,LightingTextures=texturePaths.ToArray(),Preview="ui/maps/collider.png",NativeCapture=true};

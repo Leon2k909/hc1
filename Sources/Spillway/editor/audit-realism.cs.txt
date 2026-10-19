@@ -1,0 +1,14 @@
+var scene=Editor.SceneEditorSession.All.Single(s=>s.Scene.Source?.ResourcePath?.Equals("scenes/maps/spillway/spillway.scene",StringComparison.OrdinalIgnoreCase)==true).Scene;
+var materials=scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model is not null).SelectMany(r=>r.Model.Materials)
+    .Concat(new[]{Material.Load("materials/spillway/sky/spillway_overcast.vmat")}).Distinct().ToArray();
+var result=new {
+    At=DateTime.UtcNow,
+    Materials=materials.Select(m=>new {
+        Path=m.ResourcePath,m.IsError,m.ShaderName,ShaderLoaded=m.Shader is not null,
+        Textures=new[]{"g_tColor","g_tNormal","g_tRoughness","g_tSkyTexture"}.Select(n=>new {Name=n,Texture=m.GetTexture(n)?.ResourcePath,Error=m.GetTexture(n)?.IsError,Width=m.GetTexture(n)?.Width}).ToArray()
+    }).ToArray(),
+    Models=scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model is not null).Select(r=>new {Name=r.GameObject.Name,r.Model.ResourcePath,r.Model.IsError}).ToArray(),
+    Game.IsPlaying,Scene=scene.Source.ResourcePath
+};
+System.IO.File.WriteAllText(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/spillway/aaa/material-audit.json"),System.Text.Json.JsonSerializer.Serialize(result,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return result;

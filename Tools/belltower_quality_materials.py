@@ -1,8 +1,9 @@
 """Belltower's photographed material definitions, staged for import through the editor.
 
-Textures remain original CC0 sources. UV scales convert the existing generated UVs
-to the photographed surface dimensions. The old procedural generators delegate
-these material names here so a rebuild cannot silently restore the old finish.
+Photographed textures remain original CC0 sources. Generated limestone and ivy
+provenance is recorded in Sources/Belltower/wall-v3/generation.json. UV scales
+convert existing mesh UVs to surface dimensions. Old procedural generators
+delegate these definitions so rebuilding retains the current finish.
 """
 from pathlib import Path
 import argparse
@@ -50,13 +51,53 @@ def scanned_relief(ident, scale, depth, tint=(1, 1, 1), roughness=1):
     return properties
 
 
+def scanned_plaster(tint, coverage=.49):
+    properties = {key: value for key, value in scan("painted_plaster_wall", 1).items()
+                  if key.startswith("Texture")}
+    properties.update({
+        "shader": "shaders/belltower_plaster.shader",
+        "TextureWearColor": f"{SCAN}/rough_plaster_broken_diffuse_4k.png",
+        "TextureWearNormal": f"{SCAN}/rough_plaster_broken_nor_gl_4k.png",
+        "TextureWearRoughness": f"{SCAN}/rough_plaster_broken_rough_4k.png",
+        "TextureWearAo": f"{SCAN}/rough_plaster_broken_ao_4k.png",
+        "TextureWearHeight": f"{SCAN}/rough_plaster_broken_displacement_4k.png",
+        "g_vPlasterUvScale": "[6.5024 6.5024]",
+        "g_vWearUvScale": "[8.66987 8.66987]",
+        "g_flTintColor": "[" + " ".join(f"{x*1.35:.5f}" for x in tint) + "]",
+        "g_flWearCoverage": coverage,
+        "g_flWearBrightness": 2.3,
+    })
+    return properties
+
+
 def definitions():
     result = {
         "ashlar": scan("medieval_blocks_03", 1.4, (1.45, 1.42, 1.35)),
         "ashlar_grey": scan("medieval_blocks_03", 1.4, (1.17, 1.23, 1.29)),
-        # Generated rubble UVs repeat every 160 inches; the scan covers two metres.
-        "rubble": scanned_relief("medieval_blocks_05", 160/(2000/25.4), 1.5, (1.12, 1.1, 1.04)),
-        **{f"plaster_{name}": scan("painted_plaster_wall", 512 / (2000 / 25.4), tuple(x * 1.35 for x in tint), 0.8)
+        # ImageGen's irregular limestone pattern and matching height supply the
+        # broad stone faces and recessed joints. The source pixels are retained.
+        "rubble": {
+            "shader": "shaders/belltower_masonry_v3.shader",
+            "TextureStoneColor": "materials/belltower/generated/wall-limestone-v3-color.png",
+            "TextureStoneHeight": "materials/belltower/generated/wall-limestone-v3-height.png",
+            "TextureStoneSeams": "materials/belltower/generated/wall-limestone-v3-quilt.png",
+            "g_vMasonryUvScale": "[.677333 .677333]",
+            "g_vMasonryQuiltShift": "[.37001595 .42982456]",
+            "g_vMasonryTint": "[.92 1.0 .84]",
+            "g_flMasonryDepth": .65,
+            "g_flMasonryNormal": .65,
+            "g_flMasonrySaturation": .72,
+            "g_flMasonryContrast": .86,
+            "g_flMasonryWeather": .28,
+        },
+        "ivy_climb": {
+            "shader": "shaders/belltower_plants.shader",
+            "TexturePlants": "materials/belltower/generated/ivy-climb-v3.png",
+            "F_ALPHA_TEST": 1,
+            "g_flAlphaTestReference": .4,
+            "g_flAntiAliasedEdgeStrength": 1,
+        },
+        **{f"plaster_{name}": scanned_plaster(tint)
            for name, tint in PAINTS.items()},
         "roof_tiles": scan("clay_roof_tiles", 1, (1.0,1.0,1.0), .85),
         "plaster_interior": scan("painted_plaster_wall",128/(2000/25.4),(1.35,1.32,1.24),.8),
@@ -157,7 +198,8 @@ def material_text(name, staged=False):
         return staged and value.startswith("materials/belltower/generated/") and (ROOT / "Sources/Belltower/generated" / Path(value).name).is_file()
     if not all(exists(value) for key, value in properties.items() if key.startswith("Texture")):
         return None
-    lines = ["// Tools/belltower_quality_materials.py; sources: Sources/Belltower/scans/manifest.json",
+    provenance = "Sources/Belltower/wall-v3/generation.json" if name in ("rubble", "ivy_climb") else "Sources/Belltower/scans/manifest.json"
+    lines = [f"// Tools/belltower_quality_materials.py; sources: {provenance}",
              '"Layer0"', "{", f'    shader "{properties.get("shader", "shaders/complex.shader")}"']
     lines += [f'    {key} "{value}"' for key, value in properties.items() if key != "shader"]
     return "\n".join(lines + ["}", ""])

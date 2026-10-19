@@ -1,0 +1,21 @@
+if(Game.IsPlaying)throw new InvalidOperationException("Stop play before preparing Spillway light transport.");
+var session=Editor.SceneEditorSession.Active;
+var scene=session?.Scene;
+if(scene?.Source?.ResourcePath?.Equals("scenes/maps/spillway/spillway.scene",StringComparison.OrdinalIgnoreCase)!=true)throw new InvalidOperationException("Spillway must be active.");
+var go=scene.GetAllObjects(true).FirstOrDefault(g=>g.Name=="Spillway indirect light");
+if(go is null)go=new GameObject(scene){Name="Spillway indirect light"};
+go.NetworkMode=NetworkMode.Snapshot;
+var indirect=go.Components.GetOrCreate<IndirectLightVolume>();
+indirect.Bounds=new BBox(new Vector3(-1850,-2420,-200),new Vector3(1990,2420,650));
+indirect.ProbeDensity=5;
+indirect.RuntimeIntensity=1.1f;indirect.RuntimeContrast=1;indirect.RuntimeSaturation=1;
+indirect.ViewBias=25;indirect.NormalBias=20;indirect.BlendDistance=160;
+var inside=typeof(IndirectLightVolume).GetProperty("InsideGeometry");
+inside.SetValue(indirect,Enum.Parse(inside.PropertyType,"Relocate"));
+var total=indirect.ProbeCounts.x*indirect.ProbeCounts.y*indirect.ProbeCounts.z;
+if(total>6000)throw new InvalidOperationException("Spillway light grid exceeds budget");
+foreach(var probe in scene.GetAllComponents<EnvmapProbe>())
+    if(probe.Mode.ToString()!="CustomTexture")throw new InvalidOperationException("Use static reflections only");
+typeof(Editor.SceneEditorSession).GetProperty("HasUnsavedChanges").SetValue(session,true);
+session.Save(false);
+return new {Grid=indirect.ProbeCounts.ToString(),Total=total,indirect.RuntimeIntensity,Saved=!session.HasUnsavedChanges};

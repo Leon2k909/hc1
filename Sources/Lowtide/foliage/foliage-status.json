@@ -1,0 +1,82 @@
+{
+  "date": "2026-10-15",
+  "status": "awaiting_native_integration_user_requested_offline",
+  "production_foliage_changed": false,
+  "tree_count": 4,
+  "model": "models/sbox_props/trees/oak/tree_oak_medium_a.vmdl",
+  "production_leaf_material": "models/sbox_props/trees/oak/oak_branch.vmat",
+  "v1": {
+    "status": "rejected",
+    "material": "materials/lowtide/foliage/lt_oak_branch.vmat",
+    "installed_but_unassigned": true,
+    "reasons": [
+      "All three native viewport comparisons show excessive black shadows and yellow-green flat cards.",
+      "Atlas coverage increased from 19.85% to 31.79%, making the crown denser.",
+      "Flat replacement normals and changed transmission also affected the comparison; do not promote this material."
+    ],
+    "evidence": "output/lowtide/quality-pass/foliage/material-preview.json"
+  },
+  "v2": {
+    "status": "compiled_and_visually_accepted_with_tint",
+    "atlas": "oak-branch-candidate-v2.png",
+    "imagegen_provenance": "oak-branch-v2-imagegen.json",
+    "approach": "Retain original normal, packed surface, transmission and lighting parameters; constrain generated-alpha coverage by the original UV atlas alpha. Input PNGs remain unchanged.",
+    "cpu_coverage_check": {
+      "original_covered_pixels": 208194,
+      "combined_covered_pixels": 208026,
+      "additional_pixels": 0,
+      "retained_original_coverage": 0.9991930603187412
+    },
+    "native_input_export": "output/lowtide/quality-pass/export-foliage-inputs.cs",
+    "stage_command": "rtk python output/lowtide/quality-pass/prepare-foliage-v2.py",
+    "requires": [
+      "Connect to the new editor process and confirm project, compile, play and dirty-scene state.",
+      "Apply staged tint through apply-foliage-material.cs, then check the report and loaded value.",
+      "Inspect native per-slot material serialization through inspect-foliage-persistence.cs; the previous timed-out call wrote no report and its process has exited.",
+      "Integrate the exact native material-slot serialization into the canonical map writer.",
+      "Apply only the leaf slot on the four trees through the editor and save; verify scene diff, resource bindings and actual production captures.",
+      "Keep the wider AAA goal open; this is a foliage improvement only."
+    ],
+    "not_imported": false,
+    "tint": [
+      0.48,
+      0.66,
+      0.54
+    ],
+    "native_compile": "output/lowtide/quality-pass/foliage/v2-compile.json",
+    "native_bindings": "output/lowtide/quality-pass/foliage/v2-bindings.json",
+    "accepted_visual_review": "output/lowtide/quality-pass/foliage/v2-tint-preview.json",
+    "accepted_views": [
+      "quay-v2-tint.png",
+      "crown-v2-tint.png",
+      "west-v2-tint.png"
+    ],
+    "visual_result": "Original silhouette retained, finer generated leaf detail, and restrained green tint. Untinted version was too pale. All four overrides, camera and prior Sewage tab were restored after each preview.",
+    "production_stage": "output/lowtide/quality-pass/foliage/production-stage",
+    "production_manifest": "output/lowtide/quality-pass/foliage/production-manifest.json",
+    "production_preflight": "output/lowtide/quality-pass/foliage/production-preflight.json",
+    "canonical_resource_writer": "Tools/lowtide_trees.py",
+    "map_generator_integration_pending": true,
+    "scene_assignment_pending": true
+  },
+  "preservation": {
+    "protected_files_checked": 547,
+    "changed_protected_files": [],
+    "manifest": "output/lowtide/quality-pass/foliage/candidate-manifest.json",
+    "preview_attempt": "V2 and tinted V2 native comparisons completed. All four material overrides restored; camera and prior tab restored; no fresh errors through native console cursor 9918."
+  },
+  "blocker": {
+    "current_pid": 33668,
+    "current_process_confirmed_alive": true,
+    "state": "Restarted editor is still processing startup resources and native status calls time out. No restart or termination was performed by this work.",
+    "audit": "output/lowtide/quality-pass/foliage/blocked-audit.json",
+    "consecutive_goal_turns": 3
+  },
+  "overall_aaa_target": "not_complete",
+  "work_mode": {
+    "date": "2026-10-15",
+    "instruction": "Continue offline for now",
+    "production_changed": false,
+    "note": "The accepted tint and four leaf-slot assignments remain pending. Do not keep polling the editor while working offline."
+  }
+}

@@ -1,0 +1,89 @@
+// Check all native projector bounds against the validated footprints, then remove them.
+var root=Sandbox.Project.Current.GetRootPath();
+var stage=System.IO.Path.Combine(root,"output/belltower/quality/ground-edge-v2");
+var manifestPath=System.IO.Path.Combine(stage,"manifest.json");
+string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(manifestPath));
+foreach(var input in manifest["source_sha256"].AsObject())
+    if(Hash(System.IO.Path.Combine(root,input.Key))!=input.Value.GetValue<string>()) throw new InvalidOperationException("A decal source changed: "+input.Key);
+var game=Game.ActiveScene?.Id;
+var playing=Game.IsPlaying;
+var selected=Editor.SceneEditorSession.Active;
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase)==true);
+if(session.HasUnsavedChanges) throw new InvalidOperationException("The Belltower document must be saved.");
+var scene=session.Scene;
+var ids=scene.GetAllObjects(true).Select(o=>o.Id).ToHashSet();
+var objects=new System.Collections.Generic.List<GameObject>();
+var samples=new System.Collections.Generic.List<(System.Text.Json.Nodes.JsonNode Placement,Decal Decal)>();
+var errors=new System.Collections.Generic.List<object>();
+var maximum=0f;
+var unrotatedMaximum=0f;
+var surfaceContained=0;
+Vector3 Vector(System.Text.Json.Nodes.JsonNode node) => new Vector3(node[0].GetValue<float>(),node[1].GetValue<float>(),node[2].GetValue<float>());
+try
+{
+    using(scene.Push())
+    {
+    foreach(var placement in manifest["placements"].AsArray())
+    {
+        var go=new GameObject(scene,false,"Belltower decal bounds check");
+        objects.Add(go);
+        go.Flags|=GameObjectFlags.NotSaved|GameObjectFlags.EditorOnly;
+        go.WorldPosition=Vector(placement["position"]);
+        go.WorldRotation=Rotation.LookAt(Vector(placement["forward"]),Vector(placement["up"]));
+        var decal=go.Components.Create<Decal>();
+        var definition=ResourceLibrary.Get<DecalDefinition>(placement["definition"].GetValue<string>());
+        if(definition is null || definition.IsError || definition.Width!=1 || definition.Height!=1) throw new InvalidOperationException("Unexpected definition size.");
+        decal.Decals=new System.Collections.Generic.List<DecalDefinition>{definition};
+        decal.Size=new Vector2(placement["size"][0].GetValue<float>(),placement["size"][1].GetValue<float>());
+        decal.Depth=placement["projection_depth"].GetValue<float>();
+        decal.Scale=1; decal.Rotation=0; decal.LifeTime=0; decal.Transient=false; decal.ColorMix=0;
+        go.Enabled=true;
+        samples.Add((placement,decal));
+    }
+    var flags=System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance;
+    typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+    typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+    foreach(var sample in samples)
+    {
+        var placement=sample.Placement;
+        var decal=sample.Decal;
+        var points=placement["source_footprint"].AsArray().Select(p=>new Vector3(p[1].GetValue<float>(),-p[0].GetValue<float>(),p[2].GetValue<float>())).ToArray();
+        // This engine's public WorldBounds getter calls FromPositionAndSize
+        // with world scale but omits rotation (native-api.json records its IL).
+        // Use the native computed decal volume and actual world transform.
+        var volume=(Vector3)typeof(Decal).GetMethod("GetDecalVolume",flags).Invoke(decal,new object[]{.5f});
+        var local=BBox.FromPositionAndSize(Vector3.Zero,volume);
+        var corners=(from x in new[]{local.Mins.x,local.Maxs.x}
+                     from y in new[]{local.Mins.y,local.Maxs.y}
+                     from z in new[]{local.Mins.z,local.Maxs.z}
+                     select decal.WorldPosition+decal.WorldRotation*new Vector3(x,y,z)).ToArray();
+        var unrotated=decal.WorldBounds;
+        var expected=new[]{points.Min(p=>p.x),points.Min(p=>p.y),points.Max(p=>p.x),points.Max(p=>p.y)};
+        var actual=new[]{corners.Min(p=>p.x),corners.Min(p=>p.y),corners.Max(p=>p.x),corners.Max(p=>p.y)};
+        var publicActual=new[]{unrotated.Mins.x,unrotated.Mins.y,unrotated.Maxs.x,unrotated.Maxs.y};
+        unrotatedMaximum=MathF.Max(unrotatedMaximum,expected.Zip(publicActual,(a,b)=>MathF.Abs(a-b)).Max());
+        var error=expected.Zip(actual,(a,b)=>MathF.Abs(a-b)).Max();
+        maximum=MathF.Max(maximum,error);
+        if(error>.05f) errors.Add(new {Name=placement["name"].GetValue<string>(),Error=error,Expected=expected,Actual=actual});
+        if(corners.Min(p=>p.z)<=0 && corners.Max(p=>p.z)>=0) surfaceContained++;
+    }
+    }
+}
+finally
+{
+    using(scene.Push())
+    {
+        foreach(var go in objects) if(go.IsValid()) go.Destroy();
+        scene.ProcessDeletes();
+    }
+}
+var result=new {Placements=objects.Count,MaximumPlanarErrorInches=maximum,SurfacePlaneContained=surfaceContained,
+    PublicUnrotatedBoundsMaximumErrorInches=unrotatedMaximum,Method="Native GetDecalVolume with actual world rotation; public WorldBounds omits rotation in this engine.",
+    Errors=errors,OriginalObjectIdentitiesRestored=scene.GetAllObjects(true).Select(o=>o.Id).ToHashSet().SetEquals(ids),
+    ManifestSha256=Hash(manifestPath),GamePreserved=game==Game.ActiveScene?.Id && playing==Game.IsPlaying,
+    SelectedDocumentPreserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active),SceneHasUnsavedChanges=session.HasUnsavedChanges};
+System.IO.File.WriteAllText(System.IO.Path.Combine(stage,"native-projection-bounds.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(errors.Count>0 || surfaceContained!=116 || !result.OriginalObjectIdentitiesRestored || result.SceneHasUnsavedChanges)
+    throw new InvalidOperationException("A native decal footprint differs; inspect native-projection-bounds.json.");
+return result;

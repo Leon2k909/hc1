@@ -1,0 +1,45 @@
+// Native import for the checked art-v3 candidate. Original files live in art-v3/before.
+if(Game.IsPlaying) throw new InvalidOperationException("Stop play before importing Collider art");
+var root=Sandbox.Project.Current.GetRootPath();
+var output=System.IO.Path.Combine(root,"output/collider/art-v3");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"manifest.json")));
+if(manifest["revision"]?.GetValue<string>()!="art-v3" || manifest["collision_identical"]?.GetValue<bool>()!=true ||
+    manifest["physics_definitions_identical"]?.GetValue<bool>()!=true || manifest["offline_positions_passed"]?.GetValue<int>()!=68)
+    throw new InvalidOperationException("The art candidate has not passed its geometry checks");
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var stage=System.IO.Path.GetFullPath(System.IO.Path.Combine(root,manifest["stage"].GetValue<string>()));
+if(!stage.StartsWith(System.IO.Path.GetFullPath(output)+System.IO.Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Invalid candidate directory");
+var selected=Editor.SceneEditorSession.Active;
+var game=Game.ActiveScene?.Id;
+var jobs=new System.Collections.Generic.List<(string Path,string Source,string Target,string Before,string After)>();
+foreach(var item in manifest["files"].AsArray())
+{
+    var path=item["path"].GetValue<string>();
+    if(!System.Text.RegularExpressions.Regex.IsMatch(path,@"^(models/maps/collider/collider_[a-z_]+\.(obj|mtl|vmdl)|materials/collider/co_[a-z_]+\.(vmat|png|jpg))$"))
+        throw new InvalidOperationException("Unexpected candidate asset: "+path);
+    var source=System.IO.Path.Combine(stage,path);var target=System.IO.Path.Combine(root,"Assets",path);
+    var before=item["before_sha256"]?.GetValue<string>();var after=item["sha256"].GetValue<string>();
+    if(Hash(source)!=after)throw new InvalidOperationException("Candidate changed: "+path);
+    var actual=System.IO.File.Exists(target)?Hash(target):null;
+    if(actual!=before && actual!=after)throw new InvalidOperationException("Asset changed independently: "+path);
+    if(before is not null && Hash(System.IO.Path.Combine(output,"before/Assets",path))!=before)
+        throw new InvalidOperationException("Backup is invalid: "+path);
+    jobs.Add((path,source,target,before,after));
+}
+var changed=new System.Collections.Generic.List<string>();
+foreach(var job in jobs.OrderBy(j=>j.Path.EndsWith(".vmdl")?2:j.Path.EndsWith(".vmat")?1:0))
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    if(System.IO.File.Exists(job.Target) && Hash(job.Target)==job.After)continue;
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(job.Target));
+    System.IO.File.Copy(job.Source,job.Target+".collider-art-import",true);
+    System.IO.File.Move(job.Target+".collider-art-import",job.Target,true);
+    Editor.AssetSystem.RegisterFile(job.Target);
+    if(Hash(job.Target)!=job.After)throw new InvalidOperationException("Import did not persist: "+job.Path);
+    changed.Add(job.Path);
+}
+var report=new{Imported=changed,SelectedDocumentPreserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active),
+    GamePreserved=!Game.IsPlaying && Game.ActiveScene?.Id==game,CollisionIdentical=true,VisualReviewPending=true};
+System.IO.File.WriteAllText(System.IO.Path.Combine(output,"native-import.json"),System.Text.Json.JsonSerializer.Serialize(report));
+return report;

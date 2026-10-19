@@ -37,9 +37,10 @@ SKY_MATERIAL = f"{RESOURCE_DIR}/{NAME}.vmat"
 SUN_PITCH, SUN_YAW = 20.0, 42.0
 
 # The sky's linear colour by degrees above the horizon.
-SKY_KEYS = ( ( -10.0, ( 0.040, 0.020, 0.012 ) ), ( 0.0, ( 0.24, 0.11, 0.052 ) ), ( 3.0, ( 0.17, 0.077, 0.037 ) ),
-             ( 10.0, ( 0.095, 0.044, 0.024 ) ), ( 22.0, ( 0.030, 0.016, 0.011 ) ), ( 40.0, ( 0.010, 0.0065, 0.0055 ) ),
-             ( 90.0, ( 0.0045, 0.0035, 0.0035 ) ) )
+# The dusty horizon keeps its copper colour; above it the thin Martian atmosphere falls into a darker twilight.
+SKY_KEYS = ( ( -10.0, ( 0.040, 0.020, 0.012 ) ), ( 0.0, ( 0.24, 0.11, 0.052 ) ), ( 3.0, ( 0.155, 0.070, 0.035 ) ),
+             ( 10.0, ( 0.070, 0.033, 0.019 ) ), ( 22.0, ( 0.020, 0.011, 0.008 ) ), ( 40.0, ( 0.008, 0.0052, 0.0046 ) ),
+             ( 90.0, ( 0.0042, 0.0033, 0.0033 ) ) )
 
 # The moons: degrees east of north, degrees up, angular diameter, albedo, seed.
 MOONS = ( ( -10.0, 13.0, 3.0, 0.30, 5 ), ( -4.0, 9.5, 1.7, 0.24, 6 ) )

@@ -2339,6 +2339,8 @@ def write_scene( written, light_list, props ):
         "__references": references,
         "__version": 3,
     }
+    from map_daylight import apply_profile
+    apply_profile( scene )
     SCENE_FILE.parent.mkdir( parents=True, exist_ok=True )
     K.write_text( SCENE_FILE, json.dumps( scene, indent=2 ), newline=None )
     print( f"wrote {SCENE_FILE}" )

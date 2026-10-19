@@ -1,12 +1,14 @@
-"""Stage physical paving relief without changing the installed Lowtide material.
+"""Physical paving relief for Lowtide's generated granite.
 
 The generated granite colour image and existing UV layout remain unchanged.
 Derived height, normals and joint AO describe a shallow nine-millimetre surface.
-Run this staging command only; the editor imports and previews the candidate.
+The paving generator calls write_maps on regeneration. The explicit --stage
+command writes a separate comparison candidate for import through the editor.
 """
 import argparse
 import hashlib
 import json
+import shutil
 from pathlib import Path
 
 import numpy as np
@@ -20,6 +22,7 @@ import terrain_textures as T
 DEPTH_MM = 9.0
 RESOURCE = "materials/lowtide/paving_relief/lt_setts"
 SHADER = "shaders/hc1_lowtide_paving_relief.shader"
+SHADER_SOURCE = K.ROOT / "Sources/Lowtide/paving/hc1_lowtide_paving_relief.shader"
 
 
 def surface_maps(rgb, scale, region):
@@ -30,8 +33,12 @@ def surface_maps(rgb, scale, region):
     mm_pixel = P.TILE_UNITS * 25.4 / (np.asarray(scale) * np.asarray(region[2:]) * atlas)
     luminance = rgb @ np.array([.2126, .7152, .0722], dtype=np.float32)
     smooth = ndimage.gaussian_filter(luminance, 2.5, mode="wrap")
-    tops = ndimage.binary_closing(smooth > .355, iterations=2, border_value=1)
-    tops = ndimage.binary_fill_holes(tops)
+    tops = smooth > .355
+    # Fill only mineral-sized dark islands. Filling all enclosed holes would
+    # erase connected joints wherever a stone bridge closes their outer edge.
+    labels, _ = ndimage.label(~tops)
+    areas = np.bincount(labels.ravel())
+    tops |= (labels > 0) & (areas[labels] < 36)
     inside = ndimage.distance_transform_edt(tops, sampling=mm_pixel[::-1])
     outside = ndimage.distance_transform_edt(~tops, sampling=mm_pixel[::-1])
     crest = T.smoothstep(-1.2, 4.5, inside - outside)
@@ -62,7 +69,7 @@ def surface_maps(rgb, scale, region):
 
 def material_text(scale, region):
     values = " ".join(f"{n:.8f}" for n in region)
-    return f'''// Tools/lowtide_paving_relief.py: candidate; generated albedo is unchanged.
+    return f'''// Tools/lowtide_paving_relief.py: physical granite relief; generated albedo is unchanged.
 "Layer0"
 {{
     shader "{SHADER}"
@@ -80,12 +87,9 @@ def material_text(scale, region):
 '''
 
 
-def write_candidate(directory):
-    directory = Path(directory).resolve()
-    if directory == K.ASSETS.resolve() or K.ASSETS.resolve() in directory.parents:
-        raise ValueError("Stage outside Assets; import through the running editor")
-    rgb = P.read_surface()
-    scale, region = P.layout(rgb)
+def write_maps(directory, rgb, scale, region):
+    """Write the three registered numerical maps; keep original colour intact."""
+    directory = Path(directory)
     maps, report = surface_maps(rgb, scale, region)
     atlas = 1 << int(np.ceil(np.log2(rgb.shape[0])))
     for suffix, array in maps.items():
@@ -93,9 +97,23 @@ def write_candidate(directory):
         if array.ndim == 3:
             repeats += (1,)
         packed = np.tile(array, repeats)[:atlas, :atlas]
-        path = directory / f"{RESOURCE}_{suffix}.png"
+        path = directory / f"lt_setts_{suffix}.png"
         path.parent.mkdir(parents=True, exist_ok=True)
         Image.fromarray(packed).save(path, optimize=True)
+    return report
+
+
+def write_candidate(directory):
+    directory = Path(directory).resolve()
+    if directory == K.ASSETS.resolve() or K.ASSETS.resolve() in directory.parents:
+        raise ValueError("Stage outside Assets; import through the running editor")
+    rgb = P.read_surface()
+    scale, region = P.layout(rgb)
+    report = write_maps(directory / Path(RESOURCE).parent, rgb, scale, region)
+    atlas = 1 << int(np.ceil(np.log2(rgb.shape[0])))
+    shader_path = directory / SHADER
+    shader_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(SHADER_SOURCE, shader_path)
     (directory / f"{RESOURCE}_relief.vmat").write_text(material_text(scale, region), encoding="utf-8")
     report.update(scale=list(scale), region=list(region), atlas=atlas,
         source_sha256=hashlib.sha256(P.SOURCE.read_bytes()).hexdigest(),

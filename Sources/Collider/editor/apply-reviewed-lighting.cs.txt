@@ -1,0 +1,20 @@
+if(Game.IsPlaying) throw new InvalidOperationException("Stop play before applying the reviewed lighting");
+var root=Sandbox.Project.Current.GetRootPath();
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.Source?.ResourcePath?.Equals("scenes/maps/collider/collider.scene",StringComparison.OrdinalIgnoreCase)==true);
+if(session.HasUnsavedChanges) throw new InvalidOperationException("Review Collider's unsaved changes first");
+var scene=session.Scene;
+var lights=scene.GetAllComponents<PointLight>().Where(l=>l.GameObject.Name.StartsWith("under ") ||
+    new[]{"service -850","service 0","service 850"}.Contains(l.GameObject.Name)).ToArray();
+if(lights.Length!=11) throw new InvalidOperationException("Unexpected practical-light count");
+System.IO.File.Copy(System.IO.Path.Combine(root,"Assets/scenes/maps/Collider/collider.scene"),
+    System.IO.Path.Combine(root,"output/collider/lighting-options/before.scene.json"),false);
+foreach(var light in lights)
+{
+    var under=light.GameObject.Name.StartsWith("under ");
+    var power=under?10f:7f;
+    light.LightColor=new Color(power,power*.93f,power*.82f);
+    light.Radius=under?900:600;
+}
+scene.GetAllComponents<IndirectLightVolume>().Single().RuntimeIntensity=1.6f;
+typeof(Editor.SceneEditorSession).GetProperty("HasUnsavedChanges").SetValue(session,true);
+return new{Variant="balanced",LightsChanged=lights.Length,ExposureUnchanged=true,ReadyForFreshBake=true};

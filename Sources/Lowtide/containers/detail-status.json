@@ -1,0 +1,19 @@
+{
+  "status": "installed, compiled and visually verified",
+  "generator": "Tools/lowtide_container.py and Tools/lowtide_container_detail.py",
+  "evidence": "output/lowtide/quality-pass/container-detail/verification.json",
+  "source_hashes": {
+    "models/maps/lowtide/lowtide_dress_east.obj": "5356b3bacc6c54c2310210048eea02a3d338b0e170319f2955576a42405fd2a4",
+    "models/maps/lowtide/lowtide_dress_west.obj": "94596bb7e8d97272545692e3973164920ea1e8bff34814d0ab1443d40c1c841c"
+  },
+  "containers": 4,
+  "hollow_corner_castings": 32,
+  "verified_open_apertures": 96,
+  "visual_triangles_added": 41024,
+  "other_triangles_preserved_per_half": 322708,
+  "protected_source_files": 526,
+  "canonical_collision_regeneration": "All four containers match the previous collision boxes and hulls",
+  "visual_review": "Blue, red, corner close-up and quay views reviewed in the existing native editor viewport; no model/material errors. Camera and prior Railhead tab restored.",
+  "next": "Improve the broad painted-metal response and architectural/foliage finish. Do not replay this geometry replacement. The whole AAA goal remains incomplete.",
+  "limits": "No controlled gameplay performance comparison. Background texture residency varied during tab changes; these captures verify container construction, not scene-wide texture quality. Earlier whole-file hash reports are historical baselines preceding this intentional mesh revision."
+}

@@ -1,0 +1,12 @@
+if(Game.IsPlaying) throw new InvalidOperationException("Stop play before preparing the test");
+if(Editor.SceneEditorSession.Active?.Scene.Source?.ResourcePath?.Equals("scenes/maps/collider/collider.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Activate Collider first");
+var root=Sandbox.Project.Current.GetRootPath();
+var previous=new { NoDamage=Facepunch.DevCommands.NoDamage,Mode=Facepunch.GameMode.ActivePath,
+    Hardcore=Facepunch.GameMode.ActiveHardcore,Ranked=Facepunch.GameMode.ActiveRanked };
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/collider/test-previous-state.json"),System.Text.Json.JsonSerializer.Serialize(previous));
+var mode=GameObject.GetPrefab("prefabs/game_modes/team_deathmatch.prefab")?.GetComponent<Facepunch.GameMode>();
+if(mode is null) throw new InvalidOperationException("Team Deathmatch prefab is missing");
+Facepunch.GameMode.SetCurrent(mode);
+Facepunch.DevCommands.NoDamage=true;
+return new { Facepunch.GameMode.ActiveIdent,Facepunch.GameMode.ActiveHardcore,Facepunch.DevCommands.NoDamage };

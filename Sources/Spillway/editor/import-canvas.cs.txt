@@ -1,0 +1,8 @@
+var root=Sandbox.Project.Current.GetRootPath();
+const string relative="materials/spillway/sw_tarp.vmat";
+var source=System.IO.Path.Combine(root,"output/spillway/stage",relative);
+var destination=System.IO.Path.Combine(root,"Assets",relative);
+System.IO.File.Copy(source,destination,true);
+var asset=Editor.AssetSystem.RegisterFile(destination);
+if(!asset.Compile(true))throw new InvalidOperationException("Canvas material did not compile.");
+return new {Saved=relative,Compiled=true};

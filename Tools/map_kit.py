@@ -473,7 +473,9 @@ def uv_offset( name ):
 
 
 def write_obj( path, model, name ):
-    offset = uv_offset( name )
+    # A render-only spatial partition may need the parent model's UV origin so splitting a mesh for
+    # frustum culling never changes its texture alignment. Other models keep the existing rule.
+    offset = uv_offset( getattr( model, "uv_source_name", name ) )
     lines = [ "# Tools/map_kit.py", f"mtllib {path.stem}.mtl", f"o {path.stem}" ]
     vertices, uvs, normals, faces = [], [], [], []
     anchored = getattr( model, "anchored_paints", () )

@@ -57,6 +57,11 @@ import map_kit as K
 import belltower_detail as Detail
 import belltower_architecture as Architecture
 import belltower_fountain as Fountain
+import belltower_furniture as Furniture
+import belltower_interiors as Interiors
+import belltower_gardens as Gardens
+import belltower_firewood_trial as Firewood
+import belltower_wall_cleanup as WallCleanup
 import belltower_vista as Vista
 import belltower_vista_props as VistaProps
 from map_kit import Model, Wall, arc, normalise
@@ -454,7 +459,10 @@ def shutters_open( model, wall, o, paint ):
     leaves = max( 1, round( width / 24 ) )
     for r0, r1 in ( left, right ):
         if louvre and leaves == 1:
-            Architecture.shutter(model,wall,r0,r1,o.z0,o.z1,2.2,paint)
+            angle = pick((0,0,12,25,42),"shutter_angle",wall.outward,wall.across[0],r0,o.z0) if o.z0>120 else 0
+            left_leaf = r1 < o.r0
+            Architecture.shutter(model,wall,r0,r1,o.z0,o.z1,2.2,paint,
+                                 angle=-angle if left_leaf else angle,hinge=r1 if left_leaf else r0)
             continue
         slab_at( model, wall, r0, r1, 0.0, 2.0, o.z0, o.z1, { "default": paint } )
         if louvre:
@@ -496,13 +504,13 @@ def dress( model, wall, style, rng ):
                 if room and o.z0 > 120 and o.z1 - o.z0 < 80 and chance( 0.35, "box", *key ):
                     window_box( model, wall, o, key )
             if o.z0 > 20 and not o.arched:
-                slab_at( model, wall, o.r0 - 3, o.r1 + 3, -0.5, 3.0, o.z0 - 4, o.z0, style.get( "sill", "ashlar" ) )
+                Architecture.window_sill(model,wall,o,style.get("sill","ashlar"))
             if not closed and shutter and not o.arched and style.get( "shutters", True ) and rng.random() < 0.8:
                 shutters_open( model, wall, o, shutter )
         elif kind == "window":
             frame( model, wall, o, trim, 1.5, mullion=False )
             if o.z0 > 20:
-                slab_at( model, wall, o.r0 - 3, o.r1 + 3, -0.5, 3.0, o.z0 - 4, o.z0, style.get( "sill", "ashlar" ) )
+                Architecture.window_sill(model,wall,o,style.get("sill","ashlar"))
             if shutter and style.get( "shutters", True ):
                 shutters_open( model, wall, o, shutter )
         elif kind == "shut":
@@ -564,13 +572,8 @@ def dress( model, wall, style, rng ):
         if style.get( "surround" ) and kind in ( "glass", "window" ) and not o.arched:
             band = 5.0
             paint = style["surround"]
-            slab_at( model, wall, o.r0 - band, o.r0, 0.0, 1.5, o.z0, o.z1 + band, paint )
-            slab_at( model, wall, o.r1, o.r1 + band, 0.0, 1.5, o.z0, o.z1 + band, paint )
-            slab_at( model, wall, o.r0, o.r1, 0.0, 1.5, o.z1, o.z1 + band, paint )
-            # Its hood: a little cornice over the head, which throws a line of shadow, where it clears the eaves and
-            # the openings beside it.
-            if o.z1 + band + 4.5 <= wall.z[1] and room_beside( wall, o.r0 - band - 2, o.r1 + band + 2 ):
-                slab_at( model, wall, o.r0 - band - 2, o.r1 + band + 2, 0.0, 3.0, o.z1 + band, o.z1 + band + 2.5, paint )
+            hood = o.z1 + band + 7 <= wall.z[1] and room_beside(wall,o.r0-band-2,o.r1+band+2)
+            Architecture.window_surround(model,wall,o,paint,style.get("surround_profile",0),hood)
 
 
 def shop_name( style, glazed, key ):
@@ -960,6 +963,7 @@ def solid_house( model, e0, e1, n0, n1, eave, render, faces, ridge, rng, blocks,
     style = { "trim": trim, "shutter": shutter, "sill": "ashlar", "door": "planks_dark", "sign": sign,
               "awning": awning_paint, "surround": surround, "solid": True, "names": list( names ) }
     gutter = "copper_brown" if chance( 0.55, "gutter", e0, n0 ) else "metal"
+    style["surround_profile"] = pick((0,1,2),"surround_profile",e0,n0)
     levels = floors_of( eave )
     shown = { face: exposure( box, face, blocks ) for face in ( "+n", "-n", "+e", "-e" ) }
 
@@ -983,7 +987,8 @@ def solid_house( model, e0, e1, n0, n1, eave, render, faces, ridge, rng, blocks,
     def cornice_along( wall ):
         # The roof slopes down across its overhang. Keep the projecting cornice
         # under the timber substrate instead of cutting a white band through tiles.
-        slab_at( model, wall, *returned( wall.outward, *wall.run, eave - 24, 7.0 ), 0.0, 7.0, eave - 24, eave - 12, trim )
+        Architecture.cornice(model,wall,*returned(wall.outward,*wall.run,eave-24,7.0),
+                             eave-24,trim,style["surround_profile"])
 
     fronts, front_walls = {}, {}
     for face, ( ground, run ) in faces.items():
@@ -1247,30 +1252,42 @@ def town_hall( model, lights ):
         ra, rb = sorted( ( side * ( e1 - T - 60 ), side * ( e1 - T - 66 ) ) )
         model.box( ( ra, 754, FL ), ( rb, 991, FL + 36 ), "planks_dark", WOOD )
         model.box( ( min( ea, ra ), 754, FL ), ( max( eb, rb ), 760, FL + 36 ), "planks_dark", WOOD )
-    floor_slab( model, e0 + T, e1 - T, n0 + T, n1 - T, GF, FL, holes, { "+z": "floorboards", "-z": "planks_dark", "default": "planks_dark" } )
+    floor_slab( model, e0 + T, e1 - T, n0 + T, n1 - T, GF, FL, holes, { "+z": None, "-z": "planks_dark", "default": "planks_dark" } )
+    Interiors.deck(model,Place((0,0,0)),e0+T,e1-T,n0+T,n1-T,FL,holes)
     ceiling( model, e0 + T, e1 - T, 712, n1 - T, GF, None, ( "e", 110 ), holes=holes )
     ceiling( model, e0 + T, e1 - T, n0 + T, 700, GF, None, ( "e", 110 ) )
     # The rooms' furniture: a clerk's desk and cabinets.
     for side in ( -1, 1 ):
         ea, eb = sorted( ( side * 330, side * 250 ) )
-        model.box( ( ea, 820, 0 ), ( eb, 860, 30 ), { "+z": "planks", "default": "planks_dark" }, WOOD )
+        model.collision_box( ( ea, 820, 0 ), ( eb, 860, 30 ), WOOD )
+        Interiors.table(model,Place(((ea+eb)/2,840,0)),eb-ea,40,drawers=True)
         ea, eb = sorted( ( side * 300, side * 350 ) )
-        model.box( ( ea, 1060, 0 ), ( eb, n1 - T, 78 ), "planks_dark", WOOD )
+        model.collision_box( ( ea, 1060, 0 ), ( eb, n1 - T, 78 ), WOOD )
+        Interiors.cabinet(model,Place(((ea+eb)/2,(1060+n1-T)/2,0)),eb-ea,n1-T-1060,78)
         # A bench against each end of the loggia.
         ea, eb = sorted( ( side * ( e1 - T ), side * ( e1 - T - 22 ) ) )
-        model.box( ( ea, 590, 0 ), ( eb, 690, 18 ), "planks_dark", WOOD )
+        model.collision_box( ( ea, 590, 0 ), ( eb, 690, 18 ), WOOD )
+        Interiors.bench(model,Place(((ea+eb)/2,640,0),90),100,eb-ea)
 
     # The council hall: its table round the Hot Zone, bookcases, and a timber ceiling.
-    model.box( ( -60, 790, FL ), ( 60, 860, FL + 30 ), { "+z": "planks", "default": "planks_dark" }, WOOD )
+    model.collision_box( ( -60, 790, FL ), ( 60, 860, FL + 30 ), WOOD )
+    Interiors.table(model,Place((0,825,FL)),120,70)
     for side in ( -1, 1 ):
         ea, eb = sorted( ( side * ( e1 - T ), side * ( e1 - T - 22 ) ) )
-        model.box( ( ea, 600, FL ), ( eb, 700, FL + 96 ), "planks_dark", WOOD )
+        model.collision_box( ( ea, 600, FL ), ( eb, 700, FL + 96 ), WOOD )
+        Interiors.cabinet(model,Place(((ea+eb)/2,650,FL),-90*side),100,eb-ea,96)
         ea, eb = sorted( ( side * 200, side * 330 ) )
-        model.box( ( ea, 640, FL ), ( eb, 660, FL + 18 ), "planks_dark", WOOD )
-        model.box( ( ea, 960, FL ), ( eb, 980, FL + 18 ), "planks_dark", WOOD )
-    model.box( ( e0 + T, n0 + T, CEIL ), ( e1 - T, n1 - T, HALL_EAVE ), { "-z": "planks_dark", "default": None }, STONE )
+        for n in (650,970):
+            model.collision_box( ( ea, n-10, FL ), ( eb, n+10, FL+18 ), WOOD )
+            Interiors.bench(model,Place(((ea+eb)/2,n,FL)),eb-ea)
+    # Chair rail follows the walls but leaves all three balcony doorways open.
+    for a,b in ((e0+T,-188),(-132,-28),(28,132),(188,e1-T)):
+        Interiors.wall_rail(model,Place(((a+b)/2,n0+T,FL+28)),b-a)
+    Interiors.wall_rail(model,Place((0,n1-T,FL+28),180),e1-e0-2*T)
+    model.collision_box( ( e0 + T, n0 + T, CEIL ), ( e1 - T, n1 - T, HALL_EAVE ), STONE )
+    Interiors.deck(model,Place((0,0,0)),e0+T,e1-T,n0+T,n1-T,CEIL,underside=True)
     for e in np.arange( -380, 381, 95 ):
-        model.box( ( e - 6, n0 + T, CEIL - 12 ), ( e + 6, n1 - T, CEIL ), "planks_dark" )
+        Furniture.box(model,Place((0,0,0)),(e-6,n0+T,CEIL-12),(e+6,n1-T,CEIL),Furniture.DARK,.32,1300+round(e))
     ridge = gable_roof( model, e0, e1, n0, n1, HALL_EAVE, "e", "roof_tiles", paints["outside"], over=18, ends_over=( 12, 12 ) )
 
     # The belltower, from the roof: shaft, clock, belfry and a copper spire.
@@ -1591,7 +1608,7 @@ def planter( model, centre, z=0.0, size=40.0, seed=0 ):
 def low_wall( model, e0, e1, n0, n1, z0, z1, paint="rubble", cap="ashlar_grey" ):
     """ A garden or yard wall with a coping. """
     model.box( ( e0, n0, z0 ), ( e1, n1, z1 - 4 ), paint, STONE )
-    model.box( ( e0 - 1.5, n0 - 1.5, z1 - 4 ), ( e1 + 1.5, n1 + 1.5, z1 ), cap, STONE )
+    Architecture.coping(model,(e0-1.5,n0-1.5,z1-4),(e1+1.5,n1+1.5,z1),cap,STONE)
 
 
 def pier( model, centre, z0, height, size=18.0 ):
@@ -1599,7 +1616,7 @@ def pier( model, centre, z0, height, size=18.0 ):
     e, n = centre
     h = size / 2
     model.box( ( e - h, n - h, z0 ), ( e + h, n + h, z0 + height ), "ashlar", STONE )
-    model.box( ( e - h - 2, n - h - 2, z0 + height ), ( e + h + 2, n + h + 2, z0 + height + 4 ), "ashlar_grey", STONE )
+    Architecture.coping(model,(e-h-2,n-h-2,z0+height),(e+h+2,n+h+2,z0+height+4),"ashlar_grey",STONE)
     blob( model, ( e, n, z0 + height + 11 ), 7, "ashlar_grey", squash=1.0, segments=8, rings=4, seed=abs( int( e * 7 + n ) ) )
 
 
@@ -1958,7 +1975,7 @@ def terrace( model, rng ):
     for g0, g1 in gaps + [ ( 0, 0 ) ]:
         if g0 > r:
             model.box( ( r, -1000, GARDEN_Z ), ( g0, -988, 28 ), { "default": "rubble", "+n": "ashlar" }, STONE )
-            model.box( ( r - 1.5, -1001.5, 28 ), ( g0 + ( 1.5 if g0 < 0 else 0 ), -986.5, 32 ), "ashlar_grey", STONE )
+            Architecture.coping(model,(r-1.5,-1001.5,28),(g0+(1.5 if g0<0 else 0),-986.5,32),"ashlar_grey",STONE)
         r = g1
     for ea, eb in gaps:
         stair( model, ( ea, STAIR_FOOT ), ( eb, -1000 ), GARDEN_Z, 0, "+n", "ashlar", "ashlar_grey", STONE )
@@ -2021,14 +2038,14 @@ def gardens( model, rng ):
     ring( model, ( -1100, -1365 ), 22, 32, z, z + 32, 10, { "outside": "rubble", "inside": "rubble", "top": "ashlar_grey" }, STONE )
     model.cylinder( ( -1100, -1365 ), 22, z + 6, z + 7, { "top": "water" }, sides=10, turn=math.pi / 10 )
     # The woodpile and compost bins by the garden wall; a wheelbarrow; a gazebo among the flower beds.
-    model.box( ( -1840, -1170, z ), ( -1740, -1140, z + 40 ), { "default": "planks_dark", "+z": "planks" }, WOOD )
+    model.box( ( -1840, -1170, z ), ( -1740, -1140, z + 40 ), None, WOOD )
+    Firewood.woodpile( model, -1840, -1740, -1170, -1140, z,
+                       material_dir="materials/belltower/firewood-v2" )
     for ea in ( -1700, -1640 ):
-        model.box( ( ea, -1080, z ), ( ea + 50, -1030, z + 36 ), { "default": "planks", "+z": "soil" }, WOOD )
+        model.box( ( ea, -1080, z ), ( ea + 50, -1030, z + 36 ), None, WOOD )
+        Gardens.compost_bin( model, ea, ea + 50, -1080, -1030, z )
     p = Place( ( -1520, -1180, z ), 20 )
-    p.box( model, ( -20, -14, 12 ), ( 20, 14, 26 ), "iron_green" )
-    axle( model, p.at( ( 26, 0, 8 ) ), p.y, 8, 4, { "side": "iron_black", "end": "iron_black" }, sides=8 )
-    p.beam( model, ( -20, -10, 22 ), ( -48, -12, 30 ), ( 2.5, 2.5 ), "planks_dark" )
-    p.beam( model, ( -20, 10, 22 ), ( -48, 12, 30 ), ( 2.5, 2.5 ), "planks_dark" )
+    Gardens.wheelbarrow( model, p )
     for k in range( 6 ):
         a = 2 * math.pi * k / 6
         model.cylinder( ( -500 + 56 * math.cos( a ), -1130 + 56 * math.sin( a ) ), 4, z, z + 96, { "side": "iron_green" },
@@ -2043,25 +2060,17 @@ def gardens( model, rng ):
 
 
 def shed( model, e0, e1, n0, n1, z, door, rng, small=False ):
-    """ A plank shed with a lean-to roof of corrugated iron, shut. One collision box. """
+    """ A closed garden shed; retain the original single collision box. """
     height = 84 if small else 100
-    model.box( ( e0, n0, z ), ( e1, n1, z + height ), "planks", WOOD )
-    wall = face_wall( e0, e1, n0, n1, door, z, z + height, 2.0 )
-    r0, r1 = wall.run
-    rc = ( r0 + r1 ) / 2
-    slab_at( model, wall, rc - 20, rc + 20, 0.0, 1.5, z, z + 76, "planks_dark" )
-    slab_at( model, wall, rc + 12, rc + 16, 1.5, 2.5, z + 36, z + 40, "iron_black" )
-    rise = 16
-    model.oriented_box( ( ( e0 + e1 ) / 2, ( n0 + n1 ) / 2, z + height + rise / 2 + 2 ),
-                        ( ( 1, 0, 0 ), normalise( ( 0, 1, -rise / ( n1 - n0 + 16 ) ) ),
-                          np.cross( ( 1, 0, 0 ), normalise( ( 0, 1, -rise / ( n1 - n0 + 16 ) ) ) ) ),
-                        ( e1 - e0 + 12, math.hypot( n1 - n0 + 16, rise ), 3 ), { "+z": "corrugated", "default": "iron_black" } )
+    model.box( ( e0, n0, z ), ( e1, n1, z + height ), None, WOOD )
+    Gardens.shed( model, e0, e1, n0, n1, z, door, small )
 
 
 # ---------------------------------------------------------------------------------------------------------------------
 # The west town wall, its gate and the parapets round the edge
 
-def town_walls( model ):
+def town_walls( model, trim_buried=True ):
+    first_faces = {paint: len(faces) for paint, faces in model.polygons.items()}
     wall = Wall( "n", ( SOUTH_EDGE, 1880 ), TOWN_WALL, ( -500, 240 ), "-e" )
     wall.add( 0, 160, 0, 200, "arch" )
     wall.build( model, "rubble", "rubble", "ashlar", "rubble", STONE )
@@ -2132,6 +2141,8 @@ def town_walls( model ):
     # The wall between the road's ramp and the gardens.
     model.box( ( ROAD[1] - 12, RAMP[0], GARDEN_Z ), ( ROAD[1], RAMP[1], 28 ), "rubble", STONE )
     model.box( ( ROAD[1] - 13.5, RAMP[0] - 1.5, 28 ), ( ROAD[1] + 1.5, RAMP[1], 32 ), "ashlar_grey", STONE )
+    if trim_buried:
+        WallCleanup.trim_model( model, first_faces )
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -2884,11 +2895,13 @@ def look_object():
                      Priority=0, SceneVolume={ "Type": "Infinite", "Sphere": { "Center": "0,0,0", "Radius": 10 },
                                                "Box": { "Mins": "-50,-50,-50", "Maxs": "50,50,50" },
                                                "Capsule": { "CenterA": "0,0,10", "CenterB": "0,0,90", "Radius": 10 } } ),
-        K.component( ids, "Sandbox.AmbientOcclusion", "look/ao", **{ "__version": 1 }, FalloffRange=1, Intensity=0.75, Radius=60,
+        # Keep contact shadows around masonry and setts without making narrow
+        # arches or the hall's corners appear uniformly soot-black.
+        K.component( ids, "Sandbox.AmbientOcclusion", "look/ao", **{ "__version": 1 }, FalloffRange=1, Intensity=0.62, Radius=48,
                      ThinCompensation=1.5 ),
         K.component( ids, "Sandbox.ColorGrading", "look/grade", GradingMethod="TemperatureControl", ColorTempK=6200,
-                     BlendFactor=0.25, ColorSpace="None", LookupTexture=None ),
-        K.component( ids, "Sandbox.Vignette", "look/vignette", Center="0.5,0.5", Color="0,0,0,1", Intensity=0.1, Roundness=1,
+                     BlendFactor=0.2, ColorSpace="None", LookupTexture=None ),
+        K.component( ids, "Sandbox.Vignette", "look/vignette", Center="0.5,0.5", Color="0,0,0,1", Intensity=0.065, Roundness=1,
                      Smoothness=1 ),
         K.component( ids, "Sandbox.Tonemapping", "look/tonemap", **{ "__version": 3 }, AutoExposureEnabled=True,
                      ExposureCompensation=0, ExposureMethod="RGB", MinimumExposure=SKY_EXPOSURE, MaximumExposure=2.2,
@@ -2922,6 +2935,13 @@ def indirect_light_object():
 
 def landscape_tree_object():
     path = Path(__file__).resolve().parents[1] / "Sources/Belltower/landscape/trees.json"
+    return json.loads(path.read_text()) if path.is_file() else None
+
+
+def landscape_forest_object():
+    # This cache is written by the editor only after the woodland is reviewed
+    # and saved. A staged trial must never enter a regenerated map.
+    path = Path(__file__).resolve().parents[1] / "Sources/Belltower/landscape/forest.json"
     return json.loads(path.read_text()) if path.is_file() else None
 
 
@@ -3067,6 +3087,9 @@ def write_scene( lights, models ):
     landscape = landscape_tree_object()
     if landscape:
         objects.append(landscape)
+    forest = landscape_forest_object()
+    if forest:
+        objects.append(forest)
     scene = {
         "__guid": ids( "scene" ),
         "GameObjects": objects,
@@ -3094,6 +3117,8 @@ def write_scene( lights, models ):
                           "facepunch.tree_oak_small_a#288917", "facepunch.treeoakdrymediuma#289352" ],
         "__version": 3,
     }
+    from map_daylight import apply_profile
+    apply_profile( scene )
     SCENE_FILE.parent.mkdir( parents=True, exist_ok=True )
     K.write_text( SCENE_FILE, json.dumps( scene, indent=2 ), newline=None )
     print( f"wrote {SCENE_FILE.relative_to( K.ROOT )}" )

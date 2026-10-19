@@ -1,0 +1,13 @@
+if (!Game.IsPlaying || Game.ActiveScene?.Source?.ResourcePath?.Equals("scenes/maps/cerroblanco/cerroblanco.scene", StringComparison.OrdinalIgnoreCase) != true)
+    throw new InvalidOperationException("The Cerro Blanco test must be running");
+var root = Sandbox.Project.Current.GetRootPath();
+var view = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root, "output/cerroblanco/live-view.json")));
+var name = view["name"].GetValue<string>();
+if (!System.Text.RegularExpressions.Regex.IsMatch(name, "^[a-z0-9-]+$")) throw new InvalidOperationException("Invalid view name");
+var camera = Game.ActiveScene.Camera;
+var path = System.IO.Path.Combine(root, "output/cerroblanco/live", name + ".png");
+System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path));
+using var bitmap = new Bitmap(1920, 1080);
+camera.RenderToBitmap(bitmap, true);
+System.IO.File.WriteAllBytes(path, bitmap.ToPng());
+return new { Path=path, Position=camera.WorldPosition.ToString(), camera.FieldOfView };

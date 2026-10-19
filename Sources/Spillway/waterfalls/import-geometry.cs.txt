@@ -1,0 +1,32 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var output=System.IO.Path.Combine(root,"output/spillway/waterfall-pass");
+var stage=System.IO.Path.Combine(output,"stage/models/maps/spillway");
+var playing=Game.IsPlaying;var gameId=Game.ActiveScene?.Id;
+var selected=Editor.SceneEditorSession.Active;var dirty=selected?.HasUnsavedChanges;
+var directory=System.IO.Path.Combine(root,"Assets/models/maps/spillway");
+foreach(var file in new[]{"spillway_falls.obj","spillway_falls.mtl","spillway_mountains.obj","spillway_river.obj"})
+{
+    var destination=System.IO.Path.Combine(directory,file);
+    var staged=System.IO.Path.Combine(stage,file);
+    if(!System.IO.File.Exists(staged))throw new InvalidOperationException("Missing staged geometry: "+file);
+    var contents=System.IO.File.ReadAllText(staged);
+    if(contents.Contains("nan",StringComparison.OrdinalIgnoreCase) || contents.Contains(" inf",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Non-finite staged geometry");
+    System.IO.File.Copy(staged,destination,true);
+    Editor.AssetSystem.RegisterFile(destination);
+}
+var results=new System.Collections.Generic.List<object>();
+foreach(var name in new[]{"spillway_falls","spillway_mountains","spillway_river"})
+{
+    var file=System.IO.Path.Combine(directory,name+".vmdl");
+    var staged=System.IO.Path.Combine(stage,name+".vmdl");
+    if(System.IO.File.ReadAllText(file)!=System.IO.File.ReadAllText(staged))throw new InvalidOperationException("The saved ModelDoc changed since staging: "+name);
+    var asset=Editor.AssetSystem.FindByPath(file)??Editor.AssetSystem.RegisterFile(file);
+    var success=asset.Compile(true);
+    if(!success)throw new InvalidOperationException("Model compile failed: "+name);
+    results.Add(new{Name=name,Success=success});
+}
+await Task.Delay(500,cancellationToken);
+var result=new {Models=results,GamePreserved=Game.IsPlaying==playing && Game.ActiveScene?.Id==gameId,
+    EditorPreserved=Editor.SceneEditorSession.Active==selected && selected?.HasUnsavedChanges==dirty};
+System.IO.File.WriteAllText(System.IO.Path.Combine(output,"geometry-import.json"),System.Text.Json.JsonSerializer.Serialize(result,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return result;

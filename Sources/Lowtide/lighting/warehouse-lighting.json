@@ -552,9 +552,15 @@
             "Mins": "-402,-1002,-8",
             "Maxs": "1152,-238,360"
           },
-          "DistanceTexture": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-east-v3/east_distancetexture_9e1819e296ef442caf69ede6d41c1963.vtex",
+          "DistanceTexture": {
+            "Id": "fb1739e2-c90c-4117-b413-0e61ae37968c",
+            "Path": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-east-v5/distance.vtex"
+          },
           "InsideGeometry": "Relocate",
-          "IrradianceTexture": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-east-v3/east_irradiancetexture_9e1819e296ef442caf69ede6d41c1963.vtex",
+          "IrradianceTexture": {
+            "Id": "5a93be09-2f80-4030-ac4f-801e4bd47482",
+            "Path": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-east-v5/irradiance.vtex"
+          },
           "NormalBias": 3,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
@@ -563,7 +569,10 @@
           "OnComponentStart": null,
           "OnComponentUpdate": null,
           "ProbeDensity": 12,
-          "RelocationTexture": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-east-v3/east_relocationtexture_9e1819e296ef442caf69ede6d41c1963.vtex",
+          "RelocationTexture": {
+            "Id": "d5249274-89a4-4fc8-9ad3-ef68a04dac96",
+            "Path": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-east-v5/relocation.vtex"
+          },
           "RenderExcludeTags": "water",
           "RuntimeContrast": 0.85,
           "RuntimeIntensity": 4,
@@ -602,9 +611,15 @@
             "Mins": "-402,238,-8",
             "Maxs": "1152,1002,360"
           },
-          "DistanceTexture": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-west-v3/west_distancetexture_4ff91e59bc504094b089da8450699294.vtex",
+          "DistanceTexture": {
+            "Id": "e840c8b8-f2a0-45bb-b18d-2900578e97ea",
+            "Path": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-west-v5/distance.vtex"
+          },
           "InsideGeometry": "Relocate",
-          "IrradianceTexture": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-west-v3/west_irradiancetexture_4ff91e59bc504094b089da8450699294.vtex",
+          "IrradianceTexture": {
+            "Id": "9b31e87d-da80-47cc-86a5-7e4a1d3018cd",
+            "Path": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-west-v5/irradiance.vtex"
+          },
           "NormalBias": 3,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
@@ -613,7 +628,10 @@
           "OnComponentStart": null,
           "OnComponentUpdate": null,
           "ProbeDensity": 12,
-          "RelocationTexture": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-west-v3/west_relocationtexture_4ff91e59bc504094b089da8450699294.vtex",
+          "RelocationTexture": {
+            "Id": "d9be0489-ea17-4bde-9ddb-3087231ce201",
+            "Path": "scenes/maps/lowtide/lowtide_scene_data/ddgi/warehouse-west-v5/relocation.vtex"
+          },
           "RenderExcludeTags": "water",
           "RuntimeContrast": 0.85,
           "RuntimeIntensity": 4,
@@ -625,6 +643,6 @@
       "Children": []
     }
   ],
-  "engineVersion": "26.10.13",
-  "notes": "Baked direct light plus one bounce. Re-bake after changing static warehouse geometry, fixtures or daylight. Runtime intensity 4 and contrast 0.85 compensate for the limited bounce count."
+  "engineVersion": "26.10.13a",
+  "notes": "Refreshed 2026-10-18 through native IndirectLightVolume.BakeProbes after the accepted continuous structural timber and painted cast-iron materials. Warehouse floor/dressing fixes remain included. Both volumes retain 1200 probes, intensity 4 and contrast 0.85. Re-bake after static geometry, material, fixture or daylight changes."
 }

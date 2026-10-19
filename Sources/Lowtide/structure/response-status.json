@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-18",
+  "observed_utc": "2026-10-18T19:09:38.255838+00:00",
+  "status": "reviewed_not_accepted_sources_retired",
+  "production_changed": false,
+  "reviewed_lit_comparisons": 9,
+  "evidence": "output/lowtide/quality-pass/native-2026-10-18/structure-response/review-lit/capture.json",
+  "invalid_early_comparison": "review/ was captured with stale DDGI and must not be used to judge the material.",
+  "findings": [
+    "The current standard shader and lighter tint recover timber detail.",
+    "The reused railhead wood scan contains repeated plank seams, inappropriate for solid structural beams.",
+    "Cast iron columns remain too dark; a brighter generic tint alone is not accepted."
+  ],
+  "next_steps": [
+    "Use individual long-grain beam faces with correct UV orientation and no plank seams.",
+    "Inspect cast iron material response and surface normals, then review at close range and in daylight.",
+    "Rebake warehouse indirect light after accepted structural material changes."
+  ],
+  "retained_candidates": "output/lowtide/quality-pass/native-2026-10-18/structure-response/stage",
+  "cleanup": "output/lowtide/quality-pass/native-2026-10-18/structure-response/retired.json",
+  "lighting_persistence": "saved_v4_lighting_verified_after_scene_reload",
+  "overall_AAA_verified": false,
+  "superseded_by": "Sources/Lowtide/structure/material-status.json"
+}

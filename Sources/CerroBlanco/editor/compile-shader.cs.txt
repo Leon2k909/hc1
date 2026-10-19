@@ -1,0 +1,11 @@
+// Compiles one shader (output/cerroblanco/compile-shader.txt names it, relative to Assets) and reports the compiler's
+// messages: run with the native MCP's run_csharp. Refuses while a game is playing.
+if (Game.IsPlaying) throw new InvalidOperationException("A game is playing: compile after it stops.");
+var root = Sandbox.Project.Current.GetRootPath();
+var relative = System.IO.File.ReadAllText(System.IO.Path.Combine(root, "output/cerroblanco/compile-shader.txt")).Trim();
+var file = System.IO.Path.Combine(root, "Assets", relative);
+Editor.AssetSystem.RegisterFile(file);
+var result = await Editor.EditorUtility.CompileShader(relative, new(), cancellationToken);
+var props = result?.GetType().GetProperties().ToDictionary(x => x.Name, x => { try { var v = x.GetValue(result); return v is System.Collections.IEnumerable e && v is not string ? string.Join(" | ", e.Cast<object>().Select(o => o?.ToString()).Take(30)) : v?.ToString(); } catch (Exception ex) { return "!" + ex.Message; } });
+var compiled = System.IO.File.Exists(file + "_c") ? new System.IO.FileInfo(file + "_c").LastWriteTime.ToString("HH:mm:ss") : "none";
+return new { Shader = relative, Compiled = compiled, Result = props };

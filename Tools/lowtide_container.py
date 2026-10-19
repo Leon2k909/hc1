@@ -20,6 +20,8 @@ from scipy.ndimage import gaussian_filter
 
 import map_kit as K
 import railhead_props as P
+import lowtide_container_detail as DETAIL
+import lowtide_container_surface as SURFACE
 
 RESOURCE = "materials/lowtide/containers"
 OUT = K.ASSETS / RESOURCE
@@ -58,6 +60,8 @@ def save_image(path, data):
 
 
 def write_materials():
+    write_bytes(K.ASSETS / SURFACE.SHADER, SURFACE.SOURCE.read_bytes())
+    meta(K.ASSETS / SURFACE.SHADER)
     report = {}
     for colour in COLOURS:
         source = K.ROOT / f"Tools/lowtide_container_{colour}_source.png"
@@ -93,24 +97,7 @@ def write_materials():
         save_image(OUT / f"lt_container_{colour}_metalness.png", np.rint(metal * 255).astype(np.uint8))
         for frame in (False, True):
             name = f"lt_container_{colour}" + ("_frame" if frame else "")
-            normal_suffix = "frame_normal" if frame else "normal"
-            K.write_text(OUT / f"{name}.vmat", f'''// Tools/lowtide_container.py: built-in ImageGen, {"smooth frame" if frame else "corrugated sheets"}
-"Layer0"
-{{
-    shader "shaders/complex.shader"
-    F_SPECULAR "1"
-    F_METALNESS_TEXTURE "1"
-    g_flRoughnessScaleFactor "{.90 if frame else 1.0}"
-    g_flMetalness "0"
-    TextureColor "{RESOURCE}/lt_container_{colour}_color.png"
-    TextureNormal "{RESOURCE}/lt_container_{colour}_{normal_suffix}.png"
-    TextureRoughness "{RESOURCE}/lt_container_{colour}_roughness.png"
-    TextureMetalness "{RESOURCE}/lt_container_{colour}_metalness.png"
-    TextureAmbientOcclusion "materials/default/default_ao.tga"
-    g_vColorTint "[1.0 1.0 1.0 1.0]"
-    g_flModelTintAmount "1.0"
-}}
-''')
+            K.write_text(OUT / f"{name}.vmat", SURFACE.material_text(colour, frame))
             meta(OUT / f"{name}.vmat")
         report[colour] = {
             "source": source.relative_to(K.ROOT).as_posix(),
@@ -136,28 +123,7 @@ def configure(model):
 
 
 def sheet(model, paint, points, normal, frame, shift):
-    """Fold a rectangular painted sheet inward; preserve its outer footprint."""
-    points = np.asarray(points, float)
-    normal = K.normalise(normal)
-    along = frame.x if abs(normal[2]) > .9 else np.array((0., 0., 1.))
-    across = np.cross(along, normal)
-    centre = points.mean(axis=0)
-    us, vs = (points - centre) @ across, (points - centre) @ along
-    u0, u1, v0, v1 = us.min(), us.max(), vs.min(), vs.max()
-    depth = ROOF_DEPTH if abs(normal[2]) > .9 else WALL_DEPTH
-    # Crest / slope / valley / slope, 12-inch pitch. Both panel ends meet
-    # the original plane. No ribs are stamped on the rails or corner posts.
-    ribs = max(1, int(round((u1 - u0) / RIB_PITCH)))
-    pitch = (u1 - u0) / ribs
-    knots = [(u0 + (i + t) * pitch, h * depth)
-             for i in range(ribs) for t, h in ((0., 0.), (.30, 0.), (.50, -1.), (.80, -1.))]
-    knots.append((u1, 0.))
-    for (a, ha), (b, hb) in zip(knots, knots[1:]):
-        pts = [centre + across * u + along * v + normal * h
-               for u, v, h in ((a, v0, ha), (b, v0, hb), (b, v1, hb), (a, v1, ha))]
-        uv = [[(u - u0) / TILE + shift[0], (v - v0) / TILE + shift[1]]
-              for u, v in ((a, v0), (b, v0), (b, v1), (a, v1))]
-        model.polygon(paint, pts, uv=uv)
+    return DETAIL.sheet(model, paint, points, normal, frame, shift, TILE, RIB_PITCH, WALL_DEPTH, ROOF_DEPTH)
 
 
 def build(model, e, n, z0, size="20", axis="n", paint="rw_container_blue",
@@ -165,7 +131,7 @@ def build(model, e, n, z0, size="20", axis="n", paint="rw_container_blue",
     """Use Railhead's checked prop, replacing only its painted sheets and rails."""
     if paint not in {f"rw_container_{colour}" for colour in COLOURS}:
         return P.container(model, e, n, z0, size, axis, paint, doors_open, high_cube, door_end)
-    source = K.Model()
+    source = DETAIL.Source(paint, (e, n, z0), 114.0 if high_cube else 102.0)
     P.container(source, e, n, z0, size, axis, paint, doors_open, high_cube, door_end)
     colour = paint.removeprefix("rw_container_")
     panel, rail = f"lt_container_{colour}", f"lt_container_{colour}_frame"

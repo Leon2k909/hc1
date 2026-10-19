@@ -1,0 +1,22 @@
+// Import only staged Collider visual assets; preserve the open document and gameplay.
+if(Game.IsPlaying) throw new InvalidOperationException("Stop play before importing visual assets");
+var root=Sandbox.Project.Current.GetRootPath();
+var stage=System.IO.Path.Combine(root,"output/collider/stage");
+var imported=new System.Collections.Generic.List<string>();
+foreach(var folder in new[]{"materials/collider","models/maps/collider","ui/maps","ui/minimaps"})
+foreach(var source in System.IO.Directory.GetFiles(System.IO.Path.Combine(stage,folder),"*",System.IO.SearchOption.AllDirectories).OrderBy(p=>p.EndsWith(".vmdl")?1:0))
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var relative=System.IO.Path.GetRelativePath(stage,source).Replace('\\','/');
+    if(relative.StartsWith("ui/maps/") && relative!="ui/maps/collider.png") continue;
+    if(relative.StartsWith("ui/minimaps/") && relative!="ui/minimaps/minimap_collider.png") continue;
+    var target=System.IO.Path.Combine(root,"Assets",relative);
+    var bytes=System.IO.File.ReadAllBytes(source);
+    if(System.IO.File.Exists(target) && System.IO.File.ReadAllBytes(target).SequenceEqual(bytes)) continue;
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    System.IO.File.WriteAllBytes(target+".collider-import",bytes);
+    System.IO.File.Move(target+".collider-import",target,true);
+    Editor.AssetSystem.RegisterFile(target);
+    imported.Add(relative);
+}
+return new {Imported=imported};

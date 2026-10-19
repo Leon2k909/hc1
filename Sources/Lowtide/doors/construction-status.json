@@ -1,0 +1,53 @@
+{
+  "date": "2026-10-15",
+  "status": "offline_candidate_ready_for_native_review",
+  "revision": "shed-timber-and-iron-v2",
+  "user_work_mode": "Continue offline for now",
+  "production_changed": false,
+  "production_generator_integrated": false,
+  "generator": "Tools/lowtide_door_construction.py",
+  "changes": [
+    "Twelve closed door pairs on the four yard/quay sheds receive individually bevelled boards.",
+    "Tapered straps connect to segmented hinge barrels and fixed reveal brackets.",
+    "Forged pull handles have clear hand openings; the hasp passes through an open staple on a fixed mounting plate.",
+    "The original generated green/red colour images are read unchanged, with explicit per-board atlas UVs and varied board selection.",
+    "A closed rectangular backing preserves coverage through joints and bevelled outer corners."
+  ],
+  "scope": {
+    "models": ["lowtide_east", "lowtide_west"],
+    "closed_door_pairs": 12,
+    "sheds": 4,
+    "delta_triangles": 39988,
+    "new_material_slots": 0,
+    "open_passages_upper_doors_masonry_materials_collision_scene_preserved": true
+  },
+  "evidence": {
+    "manifest": "output/lowtide/quality-pass/door-construction/manifest.json",
+    "verification": "output/lowtide/quality-pass/door-construction/verification.json",
+    "views": "output/lowtide/quality-pass/door-construction/preview",
+    "coverage_rays": 17632,
+    "clear_grip_rays": 648,
+    "solid_grip_rays": 216,
+    "clear_staple_rays": 72,
+    "byte_identical_reproductions": 2,
+    "protected_live_files_unchanged": 556
+  },
+  "preview": {
+    "type": "CPU rendering of exported geometry with current albedo and atlas mapping",
+    "native_engine_capture": false,
+    "limitations": "Approximate lighting. No engine normal mapping, GI, weathering or measured performance.",
+    "scripts": ["Tools/lowtide_door_preview.py", "Tools/lowtide_window_software.py"]
+  },
+  "integration": {
+    "combined_manifest": "output/lowtide/quality-pass/construction-integration/manifest.json",
+    "composer": "Tools/lowtide_construction_stage.py",
+    "warning": "The independent window and door stages both replace the east/west OBJ files. Use the verified combined set; copying both separate files would overwrite one change.",
+    "native_followup": [
+      "Resume native work only after the user's offline restriction is lifted. Read fresh editor/project/compile/play/unsaved state.",
+      "Recheck all before hashes and inspect any changed source before importing.",
+      "Compile unused candidate models and review existing normal viewport views, preserving scene, camera, tab and play state.",
+      "Review both paint variants, board UVs, hinge mounts, latch clearances, shadows and distance aliasing. Measure the added mesh cost.",
+      "After acceptance, integrate the scoped builder into the canonical map writer and promote through the editor. Save and recheck persistence."
+    ]
+  }
+}

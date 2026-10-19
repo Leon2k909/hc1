@@ -1,0 +1,16 @@
+// Inspect serialized probe modes without ticking or rendering the temporary scene.
+var root=Sandbox.Project.Current.GetRootPath();
+var data=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Assets/scenes/maps/spillway/spillway.scene"))).AsObject();
+var probes=data["GameObjects"].AsArray().Single(o=>o["Name"]?.GetValue<string>()=="Reflection Probes").DeepClone();
+data["GameObjects"]=new System.Text.Json.Nodes.JsonArray(probes);
+data["SceneProperties"]["WantsSystemScene"]=false;data["SceneProperties"]["NavMesh"]["Enabled"]=false;
+var scene=Scene.CreateEditorScene();
+try {
+    using(scene.Push()) {
+        scene.Deserialize(data);
+        var result=scene.GetAllComponents<EnvmapProbe>().Select(p=>new {Name=p.GameObject.Name,Mode=p.Mode.ToString(),Texture=p.Texture?.ResourcePath,Valid=p.Texture is not null&&!p.Texture.IsError}).ToArray();
+        if(result.Length!=5 || result.Any(p=>p.Mode!="CustomTexture" || !p.Valid))
+            throw new InvalidOperationException(System.Text.Json.JsonSerializer.Serialize(result));
+        return result;
+    }
+} finally {scene.Destroy();}

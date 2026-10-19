@@ -1,0 +1,49 @@
+{
+  "revision": "ground-edge-v2",
+  "status": "Eight native still comparisons reviewed across both halves; private definitions installed, saved scene unchanged.",
+  "method": "Native Multiply decal, no normal, roughness, metalness, AO, emission or parallax override.",
+  "source_atlas": "Sources/Belltower/generated/ground-edge-v2.png",
+  "source_atlas_sha256": "6071d85940d3004ff16e5467b6209e3a6ceea9b10c36210c65bd027a8c2ac800",
+  "source_pixels_and_alpha_changed": false,
+  "stage_manifest": "output/belltower/quality/ground-edge-v2/manifest.json",
+  "stage_manifest_sha256": "f0dacad2b8cf65c443ccf57ad284482d1f24dadb04137dae98145fd26a4f9576",
+  "native_assets_installed": [
+    "decals/belltower/ground-edge-v2/ground_0.decal",
+    "decals/belltower/ground-edge-v2/ground_1.decal",
+    "decals/belltower/ground-edge-v2/ground_2.decal",
+    "decals/belltower/ground-edge-v2/ground_3.decal"
+  ],
+  "native_compilation_verified": true,
+  "native_still_comparison_verified": true,
+  "native_control_passed": true,
+  "native_visual_acceptance": false,
+  "trial_promoted": false,
+  "native_review": "output/belltower/quality/ground-edge-v2/native-review.json",
+  "native_review_sha256": "07be8e76480ae87313e150ce78a524b499aa273cbade016f363d2deaa7909009",
+  "native_projection_audit": "output/belltower/quality/ground-edge-v2/native-projection-bounds.json",
+  "candidate_color_mix": 0.5,
+  "placements": 116,
+  "native_maximum_footprint_error_inches": 0.00012207031,
+  "public_bounds_scope": "This engine getter omits rotation. The audit uses native GetDecalVolume and actual component world rotation; native-api.json records the getter IL.",
+  "helper_sha256": {
+    "Sources/Belltower/editor/import-ground-decals.cs.txt": "83642c1f1b31f9c26ab00b31a1d44a068d02e4daafd4b4d703d57a920656fcec",
+    "Sources/Belltower/editor/capture-ground-decals.cs.txt": "f9d575ca0d7b20ec7d4216c97c3fbe1da49610a8b2fc3a46754821377e6a592c",
+    "Sources/Belltower/editor/check-ground-decal-bounds.cs.txt": "4fe024ff3505ad33599766f1d1b4bf7dda08ed64966f68a6f3b12a04e7f0af41",
+    "Sources/Belltower/editor/inspect-ground-decal-api.cs.txt": "ccf3fe0ce587a4574e1062111069b39fd81e90948ed5aabbd36216806a7ae7d3"
+  },
+  "native_visual_review": "The existing cobble relief remains visible through a restrained dirt stain in sun and shade. The earlier bright flat gravel strip is avoided. This is a local still-image improvement, not overall map acceptance.",
+  "remaining": [
+    "Check representative gameplay motion, distance/culling and cost in Belltower when the shared editor is available.",
+    "Check the remaining frontages during that walkthrough before saving a permanent scene group."
+  ],
+  "accepted_scene_changed": false,
+  "gameplay_performance_verified": false,
+  "overall_quality_goal_complete": false,
+  "native_still_views": 8,
+  "shared_editor_last_observed": {
+    "pid": 9580,
+    "scene": "orion",
+    "playing": false,
+    "selected_scene_preserved": true
+  }
+}

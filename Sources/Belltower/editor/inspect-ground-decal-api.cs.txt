@@ -1,0 +1,41 @@
+// Read only: inspect this engine's native decal and texture-source API.
+var selected=Editor.SceneEditorSession.Active;
+var game=Game.ActiveScene?.Id;
+var playing=Game.IsPlaying;
+object Describe(Type type) => new {
+    Type=type.FullName,
+    Properties=type.GetProperties(System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.Instance)
+        .Select(p=>new {p.Name,Type=p.PropertyType.FullName,p.CanWrite}).ToArray(),
+    Fields=type.GetFields(System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.Instance)
+        .Select(p=>new {p.Name,Type=p.FieldType.FullName}).ToArray()
+};
+var types=new System.Collections.Generic.List<Type>{typeof(Sandbox.DecalDefinition),typeof(Sandbox.Decal),typeof(Sandbox.Resources.ImageFileGenerator)};
+var boundsGetter=typeof(Decal).GetProperty("WorldBounds").GetMethod;
+var boundsIl=boundsGetter.GetMethodBody().GetILAsByteArray();
+var boundsCalls=new System.Collections.Generic.List<string>();
+for(var i=0;i+4<boundsIl.Length;i++)
+    if(boundsIl[i]==0x28 || boundsIl[i]==0x6f)
+        try { var member=boundsGetter.Module.ResolveMember(BitConverter.ToInt32(boundsIl,i+1)); boundsCalls.Add(member.DeclaringType.FullName+"."+member); }
+        catch(ArgumentException) { }
+foreach(var property in typeof(Sandbox.Resources.ImageFileGenerator).GetProperties())
+    if(property.Name=="Cropping") types.Add(property.PropertyType);
+foreach(var property in typeof(Sandbox.DecalDefinition).GetProperties())
+    if(property.Name.Contains("Texture") && !types.Contains(property.PropertyType)) types.Add(property.PropertyType);
+foreach(var assembly in types.Select(t=>t.Assembly).Distinct().ToArray())
+    foreach(var type in assembly.GetTypes())
+        if(type.Name.Contains("ImageFileTexture") || type.Name.Contains("CropTexture")) types.Add(type);
+var result=new {
+    Types=types.Distinct().Select(Describe).ToArray(),
+    DecalBlendModes=Enum.GetNames(typeof(Sandbox.Rendering.DecalBlendMode)),
+    CroppingExample=System.Text.Json.JsonSerializer.Serialize(new Sandbox.UI.Margin {Left=1,Top=2,Right=3,Bottom=4}),
+    ImageFileGeneratorDefaults=System.Text.Json.JsonSerializer.Serialize(new Sandbox.Resources.ImageFileGenerator()),
+    TextureMethods=typeof(Texture).GetMethods().Where(m=>m.Name.Contains("MarkUsed") || m.Name.Contains("Mip") || m.Name.Contains("Resident"))
+        .Select(m=>new {m.Name,Parameters=m.GetParameters().Select(p=>new {p.Name,Type=p.ParameterType.FullName,p.HasDefaultValue,Default=p.HasDefaultValue ? p.DefaultValue?.ToString() : null}).ToArray()}).ToArray(),
+    WorldBoundsGetter=new {IL=Convert.ToHexString(boundsIl),ReferencedCalls=boundsCalls},
+    GamePreserved=game==Game.ActiveScene?.Id && playing==Game.IsPlaying,
+    SelectedDocumentPreserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active),
+    AssetsWritten=0,SceneObjectsAdded=0
+};
+System.IO.File.WriteAllText(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),
+    "output/belltower/quality/ground-edge-v2/native-api.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

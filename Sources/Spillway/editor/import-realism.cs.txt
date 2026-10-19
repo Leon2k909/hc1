@@ -1,0 +1,55 @@
+if (Game.IsPlaying && Game.ActiveScene?.Source?.ResourcePath?.Contains("/spillway/",StringComparison.OrdinalIgnoreCase)==true)
+    throw new InvalidOperationException("Stop Spillway before importing its assets.");
+var root=Sandbox.Project.Current.GetRootPath();
+var stage=System.IO.Path.Combine(root,"output/spillway/stage");
+var assets=System.IO.Path.Combine(root,"Assets");
+var backup=System.IO.Path.Combine(root,"output/spillway/realism-v1-before/assets");
+void Backup(string relative,string destination)
+{
+    var path=System.IO.Path.Combine(backup,relative);
+    if(System.IO.File.Exists(destination) && !System.IO.File.Exists(path))
+    {
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path));
+        System.IO.File.Copy(destination,path,false);
+    }
+}
+var shaders=System.IO.Path.Combine(root,"Sources/Spillway/shaders");
+foreach(var source in System.IO.Directory.GetFiles(shaders,"*.shader"))
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var relative="shaders/"+System.IO.Path.GetFileName(source);
+    var destination=System.IO.Path.Combine(assets,relative);
+    var unchanged=System.IO.File.Exists(destination) && System.IO.File.ReadAllBytes(source).SequenceEqual(System.IO.File.ReadAllBytes(destination));
+    if(unchanged && System.IO.File.Exists(destination+"_c") && System.IO.File.GetLastWriteTimeUtc(destination+"_c")>=System.IO.File.GetLastWriteTimeUtc(destination)) continue;
+    if(!unchanged)
+    {
+        Backup(relative,destination);
+        var pending=destination+".spillway-import";
+        System.IO.File.Copy(source,pending,true);
+        System.IO.File.Move(pending,destination,true);
+    }
+    Editor.AssetSystem.RegisterFile(destination);
+    var result=await Editor.EditorUtility.CompileShader(relative,new(){ForceRecompile=true},cancellationToken);
+    if(!result.Success) throw new InvalidOperationException("Shader compile failed: "+relative+"\n"+string.Join("\n",result.Programs.SelectMany(p=>p.Output??new System.Collections.Generic.List<string>())));
+    if(result.CompiledShader is {Length:>0}) System.IO.File.WriteAllBytes(destination+"_c",result.CompiledShader);
+}
+var files=System.IO.Directory.GetFiles(stage,"*",System.IO.SearchOption.AllDirectories)
+    .OrderBy(x=>x.EndsWith(".vmdl")?2:x.EndsWith(".vmat")?1:0).ToArray();
+var count=0;
+foreach(var source in files)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var relative=System.IO.Path.GetRelativePath(stage,source).Replace('\\','/');
+    if(!relative.StartsWith("materials/spillway/") && !relative.StartsWith("models/maps/spillway/") && !relative.StartsWith("sounds/spillway/") && !relative.StartsWith("ui/minimaps/minimap_spillway") && !relative.StartsWith("ui/maps/spillway"))
+        throw new InvalidOperationException("Unexpected asset: "+relative);
+    var destination=System.IO.Path.Combine(assets,relative);
+    if(System.IO.File.Exists(destination) && System.IO.File.ReadAllBytes(source).SequenceEqual(System.IO.File.ReadAllBytes(destination))) continue;
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(destination));
+    Backup(relative,destination);
+    var pending=destination+".spillway-import";
+    System.IO.File.Copy(source,pending,true);
+    System.IO.File.Move(pending,destination,true);
+    Editor.AssetSystem.RegisterFile(destination);
+    count++;
+}
+return new {Imported=count,Models=files.Count(x=>x.EndsWith(".vmdl")),Materials=files.Count(x=>x.EndsWith(".vmat"))};

@@ -4,7 +4,7 @@ picture (2026-10-14): the ATMOS PROCESSING column glowing orange through its gla
 galleries, a leaning window wall looking out over the red plain to habitat domes, spired towers and two moons, posters
 and banners of the facility's slogans, and black hard cases stencilled MARS / BIGGER / CLEANER / BRIGHTER.
 
-    python Tools/ares_map.py [--preview <dir>] [--no-scene] [--art]
+    python Tools/ares_map.py [--preview <dir>] [--no-scene] [--scene-only] [--art]
 
 Built by script like Boxyard, Lowtide and Railhead out of map_kit's boxes and polygons, painted with
 Tools/ares_materials.py's drawn materials (run that first: `python Tools/ares_materials.py`). Writes:
@@ -69,8 +69,9 @@ ids = K.SceneIds( "4e8a1c37-92d5-4b6f-a0e3-7c15d9b2f846" )
 METAL, STONE, GLASS, PLASTIC, SHEET = "metal", "default", "glass", "plastic", "metal.sheet"
 SUN_PITCH, SUN_YAW = SKY.SUN_PITCH, SKY.SUN_YAW
 SKY_MATERIAL = SKY.SKY_MATERIAL
-MIN_EXPOSURE, MAX_EXPOSURE = 1.5, 4.0
-FOG_COLOUR = "0.62,0.33,0.19"
+# Keep the reactor readable against the Martian exterior when moving between the hall and its windows.
+MIN_EXPOSURE, MAX_EXPOSURE = 1.7, 3.35
+FOG_COLOUR = "0.59,0.31,0.18"
 CATCH_FLOOR_Z = -4000
 
 # Levels and the plan.
@@ -1132,8 +1133,9 @@ def terrain( m ):
     """ The land as a grid, fine where the window looks and coarser further out, shaded smooth (a normal per point
     from the heights' slopes), dust on the gentle ground and rock on the steep. """
     # Within 60000 of the middle: the engine leaves out a mesh with a point at 90000 ("ignoring mesh").
-    es = axis_values( -WORLD_EDGE, WORLD_EDGE, 200.0, -8000.0, 8000.0, growth=1.06 )
-    ns = axis_values( -40000.0, WORLD_EDGE, 200.0, -3000.0, 14000.0, growth=1.06 )
+    # More detail near the observation wall keeps the exposed Martian cliff from reading as broad facets.
+    es = axis_values( -WORLD_EDGE, WORLD_EDGE, 160.0, -8000.0, 8000.0, growth=1.06 )
+    ns = axis_values( -40000.0, WORLD_EDGE, 160.0, -3000.0, 14000.0, growth=1.06 )
     E, N = np.meshgrid( es, ns )
     Z = terrain_height( E, N )
     # Under the building, keep the ground below the floor.
@@ -1149,13 +1151,16 @@ def terrain( m ):
     for i in range( rows - 1 ):
         for j in range( cols - 1 ):
             quad = ( ( i, j ), ( i, j + 1 ), ( i + 1, j + 1 ), ( i + 1, j ) )
+            # Use the smoothed quad slope for the dust/bedrock decision. Material boundaries should follow
+            # escarpments instead of revealing each triangulation diagonal against the window.
+            up = sum( float( normals[a][2] ) for a in quad ) / 4.0
+            paint = "ar_regolith" if up > 0.76 else "ar_rock"
             for tri in ( ( quad[0], quad[1], quad[2] ), ( quad[0], quad[2], quad[3] ) ):
                 pts = [ P[a] for a in tri ]
                 nrm = np.cross( pts[1] - pts[0], pts[2] - pts[0] )
                 ln = np.linalg.norm( nrm )
                 if ln < 1e-6:
                     continue
-                paint = "ar_regolith" if nrm[2] / ln > 0.80 else "ar_rock"
                 m.polygon( paint, pts, nrm, normals=[ normals[a] for a in tri ] )
                 count += 1
     return count
@@ -1169,9 +1174,9 @@ def boulders( m, count=70 ):
         e, n = rng.uniform( -6000, 6000 ), rng.uniform( 1500, 7000 )
         z = float( terrain_height( np.array( [ e ] ), np.array( [ n ] ) )[0] )
         r = rng.uniform( 40, 160 ) * ( 1.0 + ( n - 1500 ) / 6000 )
-        rings, sides = 5, 8
+        rings, sides = 7, 12
         squash = rng.uniform( 0.5, 0.8 )
-        bumps = rng.uniform( 0.75, 1.2, ( rings + 1, sides ) )
+        bumps = rng.uniform( 0.82, 1.16, ( rings + 1, sides ) )
         pts = []
         for a in range( rings + 1 ):
             el = -0.25 * math.pi + 0.75 * math.pi * a / rings
@@ -1294,16 +1299,17 @@ def backdrop():
 # ---------------------------------------------------------------------------------------------------------------------
 # Lights and probes
 
-COOL = "2.5,2.65,2.9,1"
-WARM = "3.2,2.4,1.6,1"
-CORE = "4.0,1.5,0.4,1"
+COOL = "2.35,2.55,2.95,1"
+WARM = "3.0,2.23,1.48,1"
+CORE = "3.8,1.42,0.39,1"
+SCREEN_GLOW = "1.1,1.95,2.55,1"
 
 
 def lights():
     out = []
     # The column's glow (no shadows: it's inside its own glass).
     for k, z in enumerate( ( 110.0, 285.0, 520.0 ) ):
-        out.append( ( f"Core {k}", ( 0.0, 0.0, z ), CORE, 1300, False ) )
+        out.append( ( f"Core {k}", ( 0.0, 0.0, z ), CORE, 1190, False ) )
     # Under the hall's trusses.
     for e in ( -900.0, -600.0, -300.0, 300.0, 600.0, 900.0 ):
         for nn in ( -450.0, -50.0, 350.0, 700.0 ):
@@ -1316,6 +1322,8 @@ def lights():
         for nn in ( -400.0, 0.0, 380.0 ):
             out.append( ( f"Side Arcade {s} {nn:g}", ( s * 990.0, nn, 170.0 ), WARM, 400, False ) )
         out.append( ( f"Control Room {s}", ( s * 990.0, 330.0, 160.0 ), COOL, 320, True ) )
+        # The two active operator consoles give off a local cool screen glow under the warm reactor.
+        out.append( ( f"Operator Console {s}", ( s * 230.0, -440.0, 63.0 ), SCREEN_GLOW, 205, False ) )
         # The galleries: lamps on the walls.
         for nn in ( -480.0, 0.0, 420.0 ):
             out.append( ( f"Gallery {s} {nn:g}", ( s * 1040.0, nn, G + 120 ), WARM, 450, False ) )
@@ -1583,13 +1591,13 @@ def look_object():
                      Priority=0, SceneVolume={ "Type": "Infinite", "Sphere": { "Center": "0,0,0", "Radius": 10 },
                                                "Box": { "Mins": "-50,-50,-50", "Maxs": "50,50,50" },
                                                "Capsule": { "CenterA": "0,0,10", "CenterB": "0,0,90", "Radius": 10 } } ),
-        K.component( ids, "Sandbox.AmbientOcclusion", "look/ao", **{ "__version": 1 }, FalloffRange=1, Intensity=0.8, Radius=96,
+        K.component( ids, "Sandbox.AmbientOcclusion", "look/ao", **{ "__version": 1 }, FalloffRange=1, Intensity=0.68, Radius=72,
                      ThinCompensation=5 ),
-        K.component( ids, "Sandbox.ColorGrading", "look/grade", GradingMethod="TemperatureControl", ColorTempK=5600,
-                     BlendFactor=0.45, ColorSpace="None", LookupTexture=None ),
-        K.component( ids, "Sandbox.Bloom", "look/bloom", **{ "__version": 1 }, Mode="Additive", Strength=0.2, Threshold=2.2,
+        K.component( ids, "Sandbox.ColorGrading", "look/grade", GradingMethod="TemperatureControl", ColorTempK=5800,
+                     BlendFactor=0.33, ColorSpace="None", LookupTexture=None ),
+        K.component( ids, "Sandbox.Bloom", "look/bloom", **{ "__version": 1 }, Mode="Additive", Strength=0.135, Threshold=2.5,
                      Tint="1,1,1,1" ),
-        K.component( ids, "Sandbox.Vignette", "look/vignette", Center="0.5,0.5", Color="0,0,0,1", Intensity=0.3, Roundness=1,
+        K.component( ids, "Sandbox.Vignette", "look/vignette", Center="0.5,0.5", Color="0,0,0,1", Intensity=0.19, Roundness=1,
                      Smoothness=1 ),
         K.component( ids, "Sandbox.Tonemapping", "look/tonemap", **{ "__version": 3 }, AutoExposureEnabled=True,
                      ExposureCompensation=0, ExposureMethod="RGB", MinimumExposure=MIN_EXPOSURE, MaximumExposure=MAX_EXPOSURE,
@@ -1679,15 +1687,15 @@ def write_scene( written, light_list, probe_list ):
         K.game_object( ids, "Sun", "sun", ( 0, 0, 3000 ), K.angles_rotation( SUN_PITCH, SUN_YAW ), tags="light_directional,light",
                        components=[
             K.component( ids, "Sandbox.DirectionalLight", "sun/light", ContactShadows=True, FogMode="Enabled", FogStrength=1,
-                         LightColor="1.55,1.05,0.72,1", ShadowBias=0.0005, ShadowCascadeCount=4, ShadowCascadeSplitRatio=0.91,
-                         ShadowHardness=0, Shadows=True, SkyColor="0.10,0.06,0.045,1" ),
+                         LightColor="1.48,1.06,0.75,1", ShadowBias=0.0005, ShadowCascadeCount=4, ShadowCascadeSplitRatio=0.91,
+                         ShadowHardness=0, Shadows=True, SkyColor="0.13,0.083,0.061,1" ),
         ] ),
         K.game_object( ids, "Sky", "sky", tags="skybox", components=[
             K.component( ids, "Sandbox.SkyBox2D", "sky/box", SkyIndirectLighting=True, SkyMaterial=SKY_MATERIAL, Tint="1,1,1,1" ),
         ] ),
         K.game_object( ids, "Fog", "fog", components=[
-            K.component( ids, "Sandbox.GradientFog", "fog/gradient", Color=f"{FOG_COLOUR},0.8", StartDistance=4000,
-                         EndDistance=70000, FalloffExponent=1.4, Height=7000, VerticalFalloffExponent=1.3 ),
+            K.component( ids, "Sandbox.GradientFog", "fog/gradient", Color=f"{FOG_COLOUR},0.68", StartDistance=5200,
+                         EndDistance=68000, FalloffExponent=1.55, Height=7000, VerticalFalloffExponent=1.3 ),
         ] ),
         look_object(),
         world,
@@ -1733,6 +1741,8 @@ def write_scene( written, light_list, probe_list ):
         "__references": [],
         "__version": 3,
     }
+    from map_daylight import apply_profile
+    apply_profile( scene )
     SCENE_FILE.parent.mkdir( parents=True, exist_ok=True )
     K.write_text( SCENE_FILE, json.dumps( scene, indent=2 ), newline=None )
     print( f"wrote {SCENE_FILE.relative_to( K.ROOT )}" )
@@ -1774,8 +1784,19 @@ def main():
     parser = argparse.ArgumentParser( description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter )
     parser.add_argument( "--preview", metavar="DIR", help="also write the reach grid's picture to this folder" )
     parser.add_argument( "--no-scene", action="store_true", help="write the models only, not the scene or the radar picture" )
+    parser.add_argument( "--scene-only", action="store_true", help="update lighting and postprocessing using existing models, for fast visual iteration" )
     parser.add_argument( "--art", action="store_true", help="write the menus' stand-in picture (flat-shaded)" )
     args = parser.parse_args()
+
+    if args.scene_only:
+        if args.no_scene or args.preview or args.art:
+            parser.error( "--scene-only cannot be combined with model-generation or preview options" )
+        available = { name for name, _, _, _ in SCENE_MODELS if ( OUT_DIR / f"{name}.vmdl" ).exists() }
+        missing_models = { name for name, _, _, _ in SCENE_MODELS } - available
+        if missing_models:
+            parser.error( f"build the Ares models first: {', '.join( sorted( missing_models ) )}" )
+        write_scene( available, lights(), probes() )
+        return
 
     missing = [ p for p in AM.all_paints() if not ( AM.OUT_DIR / f"{p}.vmat" ).exists() ]
     if missing:

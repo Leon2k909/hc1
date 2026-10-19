@@ -1,0 +1,84 @@
+{
+  "status": "grates_construction_paving_water_floors_installed_performance_pending",
+  "candidate_count": 4,
+  "observed_utc": "2026-10-18T18:54:16.944733+00:00",
+  "project_root": "C:\\sbox-projects\\hc1\\forked-shooter-main",
+  "user_work_mode": "native_checks_resumed",
+  "live_assets_or_code_changed": true,
+  "protected_live_files": 566,
+  "candidates": {
+    "sacks": {
+      "manifest": "output/lowtide/quality-pass/rebase-2026-10-18/sacks/manifest.json",
+      "manifest_sha256": "37d46fdc983672f2ab9a5f73b89c5a3b193180f1120ab5597eab577d7c4b0a5d",
+      "verification_sha256": "2a1488b87d74e0e8c020320a6ea62538c5edac3e0a3bfca9b6c0d440fb66f5e4",
+      "staged_files": 3,
+      "native_accepted": false
+    },
+    "water-filter-gentle": {
+      "manifest": "output/lowtide/quality-pass/rebase-2026-10-18/water-filter-gentle/manifest.json",
+      "manifest_sha256": "3c6069cec09657f4bce1e50b61faf9f9d688f888a8600264eeedff5bdaee1d92",
+      "verification_sha256": "78871f84e29bd6bb91a49ef8276d6839ab688d3bb2c48e3d8021e863f5c39d04",
+      "staged_files": 4,
+      "native_accepted": true,
+      "preview_provenance_sha256": "aa8ba9c98fdbd9ce176755a4a0d5ddf7a6dc16b505a6c5299a7439d4fb5c21f6",
+      "compile_verification_sha256": "13131f3ce065becfc4b70e24bafdd93dd0aecffc92e052bc45caccbb6179df5e",
+      "reproduction_verification_sha256": "5845ef7f513855c6212942c116d5a9a15ec3768233e5f71fe0f59e4cd6213e64",
+      "visual_review_sha256": "c35daf980a94733efd58945e4b331ff7a340da16e75dbabf48b7a84fbb6aec8b",
+      "filter_strength": 0.08,
+      "material_base_roughness": 0.22,
+      "installed": true,
+      "static_native_comparison_reviewed": true,
+      "current_installed_status": "Sources/Lowtide/water/filter-status.json",
+      "historical_manifest_superseded": true
+    },
+    "paving-use": {
+      "manifest": "output/lowtide/quality-pass/rebase-2026-10-18/paving-use/manifest.json",
+      "manifest_sha256": "c040ca22741c6c520e43d979d45df69beae234a7d8d53ff21a5c24c1a0541634",
+      "verification_sha256": "8e6b4c6851def5adc4166a606eaffbe966196d8d4f26c390d3485b94093381f7",
+      "staged_files": 5,
+      "native_accepted": true,
+      "preview_provenance_sha256": "eae180d7bb4ee35383075059e9cc4e9797625125d84e6e6f49ea1d519a327294",
+      "rebase_verification_sha256": "8e9d3ba2e5db6ae8d26f4585566780f7fd06375b7d7457497f6df2a1cd80abd5",
+      "visual_review_sha256": "de0954cf133dc8e03478e200333c6724514f4d6d5c49c0aa8c1fd44a0b017945",
+      "current_installed_status": "Sources/Lowtide/paving/use-status.json",
+      "historical_manifest_superseded": true
+    },
+    "sack-lods": {
+      "manifest": "output/lowtide/quality-pass/rebase-2026-10-18/sack-lods/manifest.json",
+      "manifest_sha256": "f05e8f2b23ba6c492520bc151c87a1ccc6dcf885f6f5452f04ab2fe4577d23e0",
+      "verification_sha256": "bb2321957cde896e1114ad40265812233641436143031efed60bc505a7b6151a",
+      "rebase_verification_sha256": "892a6962db9e1f631108953600b385e268f6b987c058a0b37a85d6f91cf26c8f",
+      "staged_files": 12,
+      "full_aggregate_triangle_counts": {
+        "close": 1157222,
+        "level-1": 958694,
+        "level-2": 818774
+      },
+      "native_switching_configured": false,
+      "native_accepted": false
+    }
+  },
+  "native_accepted": false,
+  "overall_AAA_verified": false,
+  "note": "This validates the named staged candidates only. Historical candidate bundles have not been globally revalidated.",
+  "remaining": [
+    "Measure water gameplay cost and moving-camera temporal behavior.",
+    "Recompose sack distance candidates against current sources; configure native grouping/switching and measure cost.",
+    "Controlled gameplay performance, temporal behavior and overall visual quality remain open.",
+    "Validate floor temporal filtering/gameplay cost, current foliage and broader warehouse quality."
+  ],
+  "evidence": "output/lowtide/quality-pass/rebase-2026-10-18/scoped-validation.json",
+  "initial_audit": "output/lowtide/quality-pass/rebase-2026-10-18/audit.json",
+  "latest_native_work": "Sources/Lowtide/floor/floor-status.json",
+  "historical_snapshot_note": "Historical full mesh stages must be recomposed. Grates, construction, paving, water and floor materials are installed; see each current status for evidence and limits. Sacks remain staged.",
+  "current_construction_recomposition": "Sources/Lowtide/construction/recomposed-status.json",
+  "native_work": [
+    "Sources/Lowtide/drainage/grate-status.json",
+    "Sources/Lowtide/construction/recomposed-status.json",
+    "Sources/Lowtide/paving/use-status.json",
+    "Sources/Lowtide/water/filter-status.json",
+    "Sources/Lowtide/floor/floor-status.json",
+    "Sources/Lowtide/concrete/wear-status.json"
+  ],
+  "current_warehouse_floor_stage": "output/lowtide/quality-pass/native-2026-10-18/warehouse-floor-current/promotion.json"
+}

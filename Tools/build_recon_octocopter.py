@@ -48,7 +48,7 @@ from pathlib import Path
 import numpy as np
 from mathutils import Matrix, Vector
 
-SCRIPT = Path(globals().get("__file__") or r"D:\Documents\s&box projects\hc1\forked-shooter-main\Tools\build_recon_octocopter.py").resolve()
+SCRIPT = Path(globals().get("__file__") or r"C:\sbox-projects\hc1\forked-shooter-main\Tools\build_recon_octocopter.py").resolve()
 ROOT = SCRIPT.parents[1]
 
 

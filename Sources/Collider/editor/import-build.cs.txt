@@ -1,0 +1,38 @@
+// Import the staged Collider build without opening it or changing an existing scene.
+var root = Sandbox.Project.Current.GetRootPath();
+var stage = System.IO.Path.Combine(root,"output/collider/stage");
+var scenePath = "scenes/maps/Collider/collider.scene";
+if (Editor.SceneEditorSession.All.Any(s=>s.Scene?.Source?.ResourcePath?.Equals(scenePath,StringComparison.OrdinalIgnoreCase)==true))
+    throw new InvalidOperationException("Collider is open; preserve that document and import its changes through the scene tools.");
+var before = new { Scene=Editor.SceneEditorSession.Active?.Scene?.Id, GameScene=Game.ActiveScene?.Id, Game.IsPlaying };
+var imported = new System.Collections.Generic.List<string>();
+foreach(var folder in new[]{"materials/collider","models/maps/collider","lighting/collider","ui/minimaps","ui/maps"})
+foreach(var source in System.IO.Directory.GetFiles(System.IO.Path.Combine(stage,folder),"*",System.IO.SearchOption.AllDirectories).OrderBy(f=>f.EndsWith(".vmdl")?1:0))
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var relative=System.IO.Path.GetRelativePath(stage,source).Replace('\\','/');
+    var target=System.IO.Path.Combine(root,"Assets",relative);
+    var bytes=System.IO.File.ReadAllBytes(source);
+    if(System.IO.File.Exists(target) && System.IO.File.ReadAllBytes(target).SequenceEqual(bytes)) continue;
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    var replacement=target+".collider-import";
+    System.IO.File.WriteAllBytes(replacement,bytes);
+    System.IO.File.Move(replacement,target,true);
+    Editor.AssetSystem.RegisterFile(target);
+    imported.Add(relative);
+}
+// Save the staged, schema-checked source through the editor without deserializing
+// gameplay prefabs into the user's running scene or invoking a reflection bake.
+var sceneSource=System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"collider.scene.json"));
+var data=System.Text.Json.Nodes.JsonNode.Parse(sceneSource).AsObject();
+if(data["Title"]?.GetValue<string>()!="Collider" || data["GameObjects"] is not System.Text.Json.Nodes.JsonArray)
+    throw new InvalidOperationException("Unexpected staged scene");
+var output=System.IO.Path.Combine(root,"Assets",scenePath);
+System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(output));
+System.IO.File.WriteAllText(output+".collider-import",sceneSource);
+System.IO.File.Move(output+".collider-import",output,true);
+Editor.AssetSystem.RegisterFile(output);
+var result=new { Imported=imported, SavedScene=scenePath,
+    EditorPreserved=Editor.SceneEditorSession.Active?.Scene?.Id==before.Scene && Game.ActiveScene?.Id==before.GameScene && Game.IsPlaying==before.IsPlaying };
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/collider/native-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

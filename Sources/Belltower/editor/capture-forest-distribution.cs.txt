@@ -1,0 +1,527 @@
+// Derived from verified capture helper 613d00218c3d9039e7fe46d7fa17cbe054322799e30de024e37158d37c1fff96
+// Capture the existing Belltower editor scene. No temporary scene or frame callbacks.
+// Use its existing editor camera directly without changing the selected tab.
+// Apply post-process and DDGI explicitly because hidden tabs skip normal updates.
+var root = Sandbox.Project.Current.GetRootPath();
+var config = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/belltower/quality/forest-distribution-v1/capture.json")));
+var folder = config["directory"].GetValue<string>();
+var name = config["name"].GetValue<string>();
+if (!System.Text.RegularExpressions.Regex.IsMatch(folder,"^[a-z0-9-]+$") || !System.Text.RegularExpressions.Regex.IsMatch(name,"^[a-z0-9-]+$"))
+    throw new InvalidOperationException("Invalid capture name");
+var destination = System.IO.Path.Combine(root,"output/belltower/quality",folder);
+System.IO.Directory.CreateDirectory(destination);
+var previous = Editor.SceneEditorSession.Active;
+var gameId = Game.ActiveScene?.Id;
+var playing = Game.IsPlaying;
+var session = Editor.SceneEditorSession.All.Single(s => s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase)==true);
+var scene = session.Scene;
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+Vector3 oldPosition = default;
+Rotation oldRotation = default;
+CameraComponent camera = null;
+float oldFov = 80;
+Action restoreProjection = null;
+var trialOverrides = new System.Collections.Generic.List<(ModelRenderer Renderer,int Slot,Material Original)>();
+var trialSnapshots = new System.Collections.Generic.Dictionary<ModelRenderer,string>();
+var plasterTrialSlots = 0;
+var weatheredPlasterTrial = config["weathered_plaster_trial"]?.GetValue<bool>()==true;
+var canopyTrialSlots = 0;
+var farfieldTrialSlots = 0;
+var forestDetailTrialSlots = 0;
+object forestDetailParameters = null;
+var forestCoverageTrialSlots = 0;
+object forestCoverageParameters = null;
+var streetTrialSlots = 0;
+var streetTrial = config["street_trial"]?.GetValue<bool>()==true;
+Material streetTrialMaterial = null;
+var canopyTrial = config["canopy_trial"]?.GetValue<bool>()==true;
+var farfieldTrial = config["farfield_trial"]?.GetValue<bool>()==true;
+var forestDetailTrial = config["forest_detail_trial"]?.GetValue<bool>()==true;
+var forestCoverageTrial = config["forest_coverage_trial"]?.GetValue<bool>()==true;
+var forestCoverageStrength = config["forest_coverage_strength"]?.GetValue<float>() ?? 0f;
+if(!float.IsFinite(forestCoverageStrength) || forestCoverageStrength<0f || forestCoverageStrength>1f
+    || (config["forest_coverage_strength"] is not null && !forestCoverageTrial))
+    throw new InvalidOperationException("Forest coverage strength requires its trial and a finite value from zero to one.");
+var forestDetailBlend = config["forest_detail_blend"]?.GetValue<float>() ?? 1f;
+var forestDetailFadeStart = config["forest_detail_fade_start"]?.GetValue<float>();
+var forestDetailFadeEnd = config["forest_detail_fade_end"]?.GetValue<float>();
+if((canopyTrial ? 1 : 0)+(farfieldTrial ? 1 : 0)+(forestDetailTrial ? 1 : 0)+(forestCoverageTrial ? 1 : 0)>1)
+    throw new InvalidOperationException("Choose only one landscape material trial.");
+if(!float.IsFinite(forestDetailBlend) || forestDetailBlend<0f || forestDetailBlend>1f
+    || (config["forest_detail_blend"] is not null && !forestDetailTrial))
+    throw new InvalidOperationException("Forest-detail blend requires its trial and a value from zero to one.");
+if(forestDetailFadeStart.HasValue!=forestDetailFadeEnd.HasValue
+    || (forestDetailFadeStart is float fadeStart && (!forestDetailTrial || !float.IsFinite(fadeStart)
+        || !float.IsFinite(forestDetailFadeEnd.Value) || fadeStart<1000f || forestDetailFadeEnd.Value>65000f || forestDetailFadeEnd.Value<=fadeStart)))
+    throw new InvalidOperationException("Forest-detail fade requires its trial and a finite increasing range from 1000 to 65000 units.");
+var forestMaterialTrial = forestDetailTrial || forestCoverageTrial;
+var landscapeTrial = canopyTrial || farfieldTrial || forestMaterialTrial;
+System.Collections.Generic.Dictionary<string,Material> canopyMaterials = null;
+GameObject trialForest = null;
+var groundEdgeTrial = config["ground_edge_trial"]?.GetValue<bool>()==true;
+var groundEdgeObjects = new System.Collections.Generic.List<GameObject>();
+Model[] groundEdgeModels = null;
+object groundEdgeParameters = null;
+var originalObjects = scene.GetAllObjects(true).Select(o=>o.Id).ToHashSet();
+var forestTrial = config["forest_trial"]?.GetValue<bool>()==true;
+if(forestMaterialTrial && forestTrial) throw new InvalidOperationException("Compare forest material and geometry separately.");
+var forestBrightness = config["forest_brightness"]?.GetValue<float>();
+var lookTrial = config["look_trial"]?.AsObject();
+var syncMainPostprocess = config["sync_main_postprocess"]?.GetValue<bool>()==true;
+if(groundEdgeTrial && (landscapeTrial || forestTrial || streetTrial || weatheredPlasterTrial || config["plaster_trial"]?.GetValue<bool>()==true))
+    throw new InvalidOperationException("Compare ground-edge geometry separately from other asset trials.");
+
+if(!forestCoverageTrial || forestCoverageStrength!=0 || groundEdgeTrial || forestTrial || streetTrial || weatheredPlasterTrial)
+    throw new InvalidOperationException("The distribution study holds coverage strength at zero and uses no other asset trial.");
+var distributionVariant=config["distribution_variant"].GetValue<string>();
+if(distributionVariant!="accepted" && distributionVariant!="control" && distributionVariant!="clumped")
+    throw new InvalidOperationException("Unknown distribution variant.");
+string DistributionHash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var distributionPath=System.IO.Path.Combine(root,"output/belltower/quality/forest-distribution-v1/manifest.json");
+var distribution=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(distributionPath));
+foreach(var input in distribution["source_sha256"].AsObject())
+    if(DistributionHash(System.IO.Path.Combine(root,input.Key))!=input.Value.GetValue<string>())
+        throw new InvalidOperationException("A distribution input changed: "+input.Key);
+foreach(var file in distribution["files"].AsArray())
+    if(DistributionHash(System.IO.Path.Combine(root,"Assets",file["path"].GetValue<string>()))!=file["sha256"].GetValue<string>())
+        throw new InvalidOperationException("Installed distribution source differs.");
+var distributionModels=new System.Collections.Generic.List<(ModelRenderer Renderer,Model Original)>();
+var distributionOverrides=new System.Collections.Generic.Dictionary<ModelRenderer,Material[]>();
+var distributionTargets=new System.Collections.Generic.Dictionary<string,Model>(StringComparer.OrdinalIgnoreCase);
+if(distributionVariant!="accepted")
+foreach(var item in distribution["model_overrides"].AsArray())
+{
+    var model=Model.Load(item[distributionVariant].GetValue<string>());
+    if(model is null || model.IsError) throw new InvalidOperationException("A private forest model failed to load.");
+    distributionTargets.Add(item["original"].GetValue<string>(),model);
+}
+var mainCamera = scene.Camera;
+var mainExposureSnapshot = mainCamera.IsValid() ? new {
+    mainCamera.AutoExposure.Enabled, mainCamera.AutoExposure.MinimumExposure,
+    mainCamera.AutoExposure.MaximumExposure, mainCamera.AutoExposure.Compensation, mainCamera.AutoExposure.Rate
+} : null;
+var tone = scene.GetAllComponents<Tonemapping>().Single(c=>c.GameObject.Name=="Look");
+var oldToneMinimum = tone.MinimumExposure;
+var oldToneMaximum = tone.MaximumExposure;
+var oldToneCompensation = tone.ExposureCompensation;
+var oldToneMode = tone.Mode;
+var toneSnapshot = tone.Serialize().ToJsonString();
+if(lookTrial is not null)
+{
+    var minimum=lookTrial["minimum_exposure"].GetValue<float>();
+    var maximum=lookTrial["maximum_exposure"].GetValue<float>();
+    if(minimum<.2f || maximum>3 || maximum<minimum
+        || !Enum.TryParse<Tonemapping.TonemappingMode>(lookTrial["mode"].GetValue<string>(),out _))
+        throw new InvalidOperationException("Invalid tone mapping comparison.");
+}
+if(forestBrightness is float brightness && (!forestTrial || brightness<.05f || brightness>1.5f))
+    throw new InvalidOperationException("Forest brightness requires a trial and a value from .05 to 1.5.");
+// Request useful mip levels before the atomic capture. This await never holds
+// a scene scope, camera change, material override or selected-document change.
+var captureMaterials = new System.Collections.Generic.HashSet<Material>();
+using(scene.Push())
+{
+    foreach(var renderer in scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.ResourcePath?.Contains("models/maps/belltower/",StringComparison.OrdinalIgnoreCase)==true))
+    for(var slot=0;slot<renderer.Materials.Count;slot++)
+        captureMaterials.Add(renderer.Materials.GetOverride(slot) ?? renderer.Materials.GetOriginal(slot));
+    if(config["plaster_trial"]?.GetValue<bool>()==true)
+    {
+        var records=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/belltower/quality/plaster-v1-materials.json"))).AsArray();
+        foreach(var record in records) captureMaterials.Add(Material.Load(record["path"].GetValue<string>()));
+    }
+    if(weatheredPlasterTrial)
+    {
+        var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/belltower/quality/plaster-weathered-v2/manifest.json")));
+        if(manifest["revision"].GetValue<string>()!="plaster-weathered-v2") throw new InvalidOperationException("Wrong plaster trial");
+        foreach(var entry in manifest["records"].AsArray()) captureMaterials.Add(Material.Load(entry["path"].GetValue<string>()));
+    }
+    if(streetTrial)
+    {
+        var stage=System.IO.Path.Combine(root,"output/belltower/quality/streetwear-v1/manifest.json");
+        var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(stage));
+        string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+        if(manifest["revision"].GetValue<string>()!="streetwear-v1")
+            throw new InvalidOperationException("Unexpected street trial revision");
+        foreach(var asset in manifest["trial"].AsArray())
+        {
+            var resource=asset["resource"].GetValue<string>();
+            if(resource!="shaders/belltower_streetwear_trial.shader" && resource!="materials/belltower/trials/street_cobbles_aaa.vmat")
+                throw new InvalidOperationException("Unexpected street trial resource");
+            if(Hash(System.IO.Path.Combine(root,"Assets",resource))!=asset["sha256"].GetValue<string>())
+                throw new InvalidOperationException("Street trial resource differs from staged source");
+        }
+        streetTrialMaterial=Material.Load("materials/belltower/trials/street_cobbles_aaa.vmat");
+        if(streetTrialMaterial is null || streetTrialMaterial.IsError)
+            throw new InvalidOperationException("Street trial material is not compiled");
+        captureMaterials.Add(streetTrialMaterial);
+    }
+    if(forestTrial) captureMaterials.Add(Material.Load("materials/belltower/forest/forest_trees.vmat"));
+    if(groundEdgeTrial)
+    {
+        string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+        var stage=System.IO.Path.Combine(root,"output/belltower/quality/ground-edge-v1");
+        var manifestPath=System.IO.Path.Combine(stage,"manifest.json");
+        var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(manifestPath));
+        var imported=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"native-import-result.json")));
+        var checks=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"geometry-checks.json")));
+        if(session.HasUnsavedChanges || manifest["revision"].GetValue<string>()!="ground-edge-v1"
+            || imported["ManifestSha256"].GetValue<string>()!=Hash(manifestPath)
+            || !checks["passed"].GetValue<bool>() || checks["manifest_sha256"].GetValue<string>()!=Hash(manifestPath)
+            || checks["checker_sha256"].GetValue<string>()!=Hash(System.IO.Path.Combine(root,"Tools/belltower_check_ground_edges.py")))
+            throw new InvalidOperationException("The saved ground-edge comparison requires its current native import and geometry checks.");
+        foreach(var input in manifest["source_sha256"].AsObject())
+            if(Hash(System.IO.Path.Combine(root,input.Key))!=input.Value.GetValue<string>())
+                throw new InvalidOperationException("A ground-edge placement input changed: "+input.Key);
+        foreach(var file in manifest["files"].AsArray())
+            if(Hash(System.IO.Path.Combine(root,"Assets",file["path"].GetValue<string>()))!=file["sha256"].GetValue<string>())
+                throw new InvalidOperationException("An installed ground-edge trial file changed.");
+        var paths=new[]{"models/maps/belltower/ground-edge-v1/belltower_ground_edge_west.vmdl","models/maps/belltower/ground-edge-v1/belltower_ground_edge_east.vmdl"};
+        groundEdgeModels=paths.Select(Model.Load).ToArray();
+        var material=Material.Load("materials/belltower/ground-edge-v1/ground_edge.vmat");
+        if(groundEdgeModels.Any(m=>m is null || m.IsError) || material is null || material.IsError
+            || !material.ShaderName.Contains("belltower_ground_edge_trial",StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException("Ground-edge models or material failed to load.");
+        captureMaterials.Add(material);
+        groundEdgeParameters=new {ModelPaths=paths,SourceTriangles=checks["triangles_total"].GetValue<int>(),
+            ManifestSha256=Hash(manifestPath),Shader=material.ShaderName,ShadowMode="Off",ColliderComponentsAdded=0};
+    }
+    if(landscapeTrial)
+    {
+        var stage=System.IO.Path.Combine(root,forestCoverageTrial ? "output/belltower/quality/forest-coverage-v1" : forestDetailTrial ? "output/belltower/quality/forest-detail-v1" : canopyTrial ? "output/belltower/quality/canopy-photo-v2-full" : "output/belltower/quality/farfield-v3");
+        var manifestPath=System.IO.Path.Combine(stage,canopyTrial ? "native-import.json" : "manifest.json");
+        var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(manifestPath));
+        var imported=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"native-import-result.json")));
+        string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+        if(manifest["revision"].GetValue<string>()!=(forestCoverageTrial ? "forest-coverage-v1" : forestDetailTrial ? "forest-detail-v1" : canopyTrial ? "canopy-photo-v2" : "farfield-v3") || imported["ManifestSha256"].GetValue<string>()!=Hash(manifestPath))
+            throw new InvalidOperationException("The landscape trial has not completed its checked native import.");
+        foreach(var file in manifest[canopyTrial || forestMaterialTrial ? "files" : "resources"].AsArray())
+            if(Hash(System.IO.Path.Combine(root,"Assets",file["path"].GetValue<string>()))!=file["sha256"].GetValue<string>())
+                throw new InvalidOperationException("An installed landscape trial file changed.");
+        canopyMaterials=manifest["material_overrides"].AsObject().ToDictionary(x=>x.Key,x=>Material.Load(x.Value.GetValue<string>()),StringComparer.OrdinalIgnoreCase);
+        if(canopyMaterials.Count!=(forestMaterialTrial ? 1 : 2) || canopyMaterials.Values.Any(m=>m is null || m.IsError))
+            throw new InvalidOperationException("A landscape trial material failed to load.");
+        if(forestDetailTrial)
+        {
+            if(session.HasUnsavedChanges) throw new InvalidOperationException("Forest-detail comparison requires the saved Belltower document.");
+            foreach(var input in manifest["source_sha256"].AsObject())
+                if(Hash(System.IO.Path.Combine(root,input.Key))!=input.Value.GetValue<string>())
+                    throw new InvalidOperationException("A forest-detail calibration input changed: "+input.Key);
+            var calibrationPath=System.IO.Path.Combine(stage,"calibration.json");
+            if(Hash(calibrationPath)!=manifest["calibration_sha256"].GetValue<string>())
+                throw new InvalidOperationException("The forest-detail calibration changed.");
+            var calibration=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(calibrationPath));
+            var material=canopyMaterials.Single().Value;
+            if(!material.ShaderName.Contains("belltower_forest_detail_trial",StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("The forest-detail material loaded a different shader.");
+            var knees=material.GetVector4("g_vCanopyDetailKnee");
+            var kneeValues=new[]{knees.x,knees.y,knees.z,knees.w};
+            for(var cell=0;cell<4;cell++)
+            {
+                if(MathF.Abs(kneeValues[cell]-calibration["cells"][cell]["knee"].GetValue<float>())>0.000001f)
+                    throw new InvalidOperationException("The loaded forest-detail knee differs from its calibration.");
+                var mean=material.GetVector4("g_vCanopyChromaMean"+cell);
+                var values=new[]{mean.x,mean.y,mean.z};
+                for(var channel=0;channel<3;channel++)
+                    if(MathF.Abs(values[channel]-calibration["chroma_means"][cell][channel].GetValue<float>())>0.00001f)
+                        throw new InvalidOperationException("The loaded forest-detail chroma differs from its calibration.");
+            }
+            forestDetailParameters=new {material.ResourcePath,material.ShaderName,LoadedKnees=knees.ToString(),BlendOverride=forestDetailBlend,
+                FadeStartOverride=forestDetailFadeStart,FadeEndOverride=forestDetailFadeEnd,
+                CalibrationSha256=Hash(calibrationPath),ManifestSha256=Hash(manifestPath)};
+            // A private copy keeps blend-zero checks from changing the cached asset.
+            var copy=material.CreateCopy("belltower-forest-detail-capture-"+Guid.NewGuid());
+            copy.Set("g_flCanopyDetailBlend",forestDetailBlend);
+            if(forestDetailFadeStart.HasValue)
+            {
+                copy.Set("g_flCanopyFadeStart",forestDetailFadeStart.Value);
+                copy.Set("g_flCanopyFadeEnd",forestDetailFadeEnd.Value);
+            }
+            canopyMaterials[canopyMaterials.Single().Key]=copy;
+        }
+        if(forestCoverageTrial)
+        {
+            if(session.HasUnsavedChanges) throw new InvalidOperationException("Forest coverage comparison requires the saved Belltower document.");
+            foreach(var input in manifest["source_sha256"].AsObject())
+                if(Hash(System.IO.Path.Combine(root,input.Key))!=input.Value.GetValue<string>())
+                    throw new InvalidOperationException("A forest coverage input changed: "+input.Key);
+            var engineRoot=System.IO.Path.GetDirectoryName(Environment.ProcessPath);
+            foreach(var input in manifest["engine_source_sha256"].AsObject())
+                if(Hash(System.IO.Path.Combine(engineRoot,input.Key))!=input.Value.GetValue<string>())
+                    throw new InvalidOperationException("The engine alpha coverage implementation changed.");
+            var material=canopyMaterials.Single().Value;
+            if(!material.ShaderName.Contains("belltower_forest_coverage_trial",StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("The forest coverage material loaded a different shader.");
+            forestCoverageParameters=new {material.ResourcePath,material.ShaderName,StrengthOverride=forestCoverageStrength,
+                ManifestSha256=Hash(manifestPath),EngineCoverageSourceVerified=true};
+            var copy=material.CreateCopy("belltower-forest-coverage-capture-"+Guid.NewGuid());
+            copy.Set("g_flCanopyMipCompensation",forestCoverageStrength);
+            canopyMaterials[canopyMaterials.Single().Key]=copy;
+        }
+        foreach(var material in canopyMaterials.Values) captureMaterials.Add(material);
+    }
+    foreach(var material in captureMaterials.Where(m=>m is not null && !m.IsError))
+    {
+    foreach(var key in new[]{"g_tColor","g_tNormal","g_tRma","g_tHeight","g_tPlants","g_tWearColor","g_tWearNormal","g_tWearData","g_tCanopyColorB","g_tCanopyNormalB","g_tCanopyColorC","g_tCanopyNormalC","g_tCanopyColorD","g_tCanopyNormalD"})
+        material.GetTexture(key)?.MarkUsed(2048);
+    foreach(var key in new[]{"g_tColorA","g_tColorB","g_tColorC","g_tColorD","g_tCanopyColorB","g_tCanopyColorC","g_tCanopyColorD"})
+        material.GetTexture(key)?.MarkUsed(4096);
+    foreach(var key in new[]{"g_tNormalA","g_tNormalB","g_tNormalC","g_tNormalD"})
+        material.GetTexture(key)?.MarkUsed(2048);
+    }
+    foreach(var volume in scene.GetAllComponents<IndirectLightVolume>())
+    foreach(var texture in new[]{volume.IrradianceTexture,volume.DistanceTexture,volume.RelocationTexture})
+        if(texture is not null && !texture.IsError) texture.MarkUsed(Math.Max(texture.Width,texture.Height));
+}
+await Task.Delay(1000,cancellationToken);
+try
+{
+    cancellationToken.ThrowIfCancellationRequested();
+
+    if(Game.ActiveScene?.Id!=gameId || Game.IsPlaying!=playing || !ReferenceEquals(previous,Editor.SceneEditorSession.Active))
+        throw new InvalidOperationException("Shared state changed during prewarm; inspect before continuing.");
+    camera = scene.GetAllComponents<CameraComponent>().Single(c => c.GameObject.Name=="editor_camera" && c.GameObject.Flags.HasFlag(GameObjectFlags.EditorOnly));
+    oldPosition = camera.WorldPosition;
+    oldRotation = camera.WorldRotation;
+    oldFov = camera.FieldOfView;
+    var oldFovAxis = camera.FovAxis;
+    var oldCustomSize = camera.CustomSize;
+    restoreProjection = () => { camera.FovAxis=oldFovAxis; camera.CustomSize=oldCustomSize; };
+    object captureResult;
+    object captureProjection;
+    object nativeExposure;
+    using (scene.Push())
+    {
+        if(lookTrial is not null)
+        {
+            tone.MinimumExposure=lookTrial["minimum_exposure"].GetValue<float>();
+            tone.MaximumExposure=lookTrial["maximum_exposure"].GetValue<float>();
+            tone.ExposureCompensation=lookTrial["compensation"]?.GetValue<float>() ?? 0;
+            tone.Mode=Enum.Parse<Tonemapping.TonemappingMode>(lookTrial["mode"].GetValue<string>());
+        }
+
+        if(distributionVariant!="accepted")
+        {
+            foreach(var renderer in scene.GetAllComponents<ModelRenderer>())
+            {
+                if(renderer.Model?.ResourcePath is not string path || !distributionTargets.TryGetValue(path,out var model)) continue;
+                trialSnapshots.Add(renderer,renderer.Serialize().ToJsonString());
+                distributionModels.Add((renderer,renderer.Model));
+                distributionOverrides.Add(renderer,Enumerable.Range(0,renderer.Materials.Count).Select(renderer.Materials.GetOverride).ToArray());
+                renderer.Model=model;
+                if(renderer.Materials.Count!=1) throw new InvalidOperationException("A forest model changed its material layout.");
+            }
+            if(distributionModels.Count!=8) throw new InvalidOperationException("Expected eight original forest sector renderers.");
+        }
+        if(forestTrial)
+        {
+            if(scene.GetAllObjects(true).Any(o=>o.Name=="Distant woodland"))
+                throw new InvalidOperationException("A saved woodland group is already present; use a saved-scene capture.");
+            var data=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/belltower/quality/forest-v1-staging/forest.json"))).AsObject();
+            trialForest=scene.CreateObject(false);
+            trialForest.Deserialize(data);
+            trialForest.Flags |= GameObjectFlags.EditorOnly;
+            if(forestBrightness is float canopyBrightness)
+            {
+                var material=Material.Load("materials/belltower/forest/forest_trees.vmat").CreateCopy("forest-canopy-trial-"+Guid.NewGuid());
+                material.Set("g_flCanopyBrightness",canopyBrightness);
+                foreach(var renderer in scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.ResourcePath?.StartsWith("models/maps/belltower/forest/",StringComparison.OrdinalIgnoreCase)==true))
+                    renderer.Materials.SetOverride(0,material);
+            }
+        }
+        if(groundEdgeTrial)
+        {
+            foreach(var model in groundEdgeModels)
+            {
+                var go=new GameObject(scene,false,"Belltower ground-edge comparison");
+                groundEdgeObjects.Add(go);
+                go.Flags |= GameObjectFlags.NotSaved | GameObjectFlags.EditorOnly;
+                var renderer=go.Components.Create<ModelRenderer>();
+                renderer.Model=model;
+                renderer.RenderType=ModelRenderer.ShadowRenderType.Off;
+                if(renderer.Materials.Count!=1) throw new InvalidOperationException("Ground-edge model must have one material slot.");
+                go.Enabled=true;
+            }
+        }
+        if(config["plaster_trial"]?.GetValue<bool>()==true || weatheredPlasterTrial)
+        {
+            var records=weatheredPlasterTrial
+                ? System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/belltower/quality/plaster-weathered-v2/manifest.json")))["records"].AsArray()
+                : System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/belltower/quality/plaster-v1-materials.json"))).AsArray();
+            var trials=records.ToDictionary(x=>x["target"].GetValue<string>(),x=>Material.Load(x["path"].GetValue<string>()),StringComparer.OrdinalIgnoreCase);
+            if(trials.Values.Any(m=>m is null || m.IsError)) throw new InvalidOperationException("A plaster trial material failed to load");
+            foreach(var renderer in scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.ResourcePath?.Contains("models/maps/belltower/",StringComparison.OrdinalIgnoreCase)==true))
+            for(var slot=0;slot<renderer.Materials.Count;slot++)
+            {
+                var path=renderer.Materials.GetOriginal(slot)?.ResourcePath;
+                if(path is null || !trials.TryGetValue(path,out var material)) continue;
+                if(!trialSnapshots.ContainsKey(renderer)) trialSnapshots.Add(renderer,renderer.Serialize().ToJsonString());
+                trialOverrides.Add((renderer,slot,renderer.Materials.GetOverride(slot)));
+                renderer.Materials.SetOverride(slot,material);
+            }
+            if(trialOverrides.Count==0) throw new InvalidOperationException("No plaster material slots matched");
+            plasterTrialSlots=trialOverrides.Count;
+        }
+        if(streetTrial)
+        {
+            foreach(var renderer in scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.ResourcePath?.Contains("models/maps/belltower/",StringComparison.OrdinalIgnoreCase)==true))
+            for(var slot=0;slot<renderer.Materials.Count;slot++)
+            {
+                var path=renderer.Materials.GetOriginal(slot)?.ResourcePath;
+                if(!string.Equals(path,"materials/belltower/street_cobbles.vmat",StringComparison.OrdinalIgnoreCase)) continue;
+                if(!trialSnapshots.ContainsKey(renderer)) trialSnapshots.Add(renderer,renderer.Serialize().ToJsonString());
+                trialOverrides.Add((renderer,slot,renderer.Materials.GetOverride(slot)));
+                renderer.Materials.SetOverride(slot,streetTrialMaterial);
+                streetTrialSlots++;
+            }
+            if(streetTrialSlots==0) throw new InvalidOperationException("No cobblestone slots matched the Belltower models");
+        }
+        if(landscapeTrial)
+        {
+            var matched=new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach(var renderer in scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.ResourcePath?.Contains("models/maps/belltower/",StringComparison.OrdinalIgnoreCase)==true))
+            for(var slot=0;slot<renderer.Materials.Count;slot++)
+            {
+                var path=renderer.Materials.GetOriginal(slot)?.ResourcePath;
+                if(path is null || !canopyMaterials.TryGetValue(path,out var material)) continue;
+                if(!trialSnapshots.ContainsKey(renderer)) trialSnapshots.Add(renderer,renderer.Serialize().ToJsonString());
+                trialOverrides.Add((renderer,slot,renderer.Materials.GetOverride(slot)));
+                renderer.Materials.SetOverride(slot,material);
+                matched.Add(path);
+                if(forestCoverageTrial) forestCoverageTrialSlots++;
+                else if(forestDetailTrial) forestDetailTrialSlots++;
+                else if(canopyTrial) canopyTrialSlots++;
+                else farfieldTrialSlots++;
+            }
+            if(matched.Count!=(forestMaterialTrial ? 1 : 2) || (forestMaterialTrial && forestDetailTrialSlots+forestCoverageTrialSlots!=88))
+                throw new InvalidOperationException("The landscape comparison did not match all expected material slots.");
+        }
+        camera.WorldPosition = Vector3.Parse(config["position"].GetValue<string>());
+        camera.WorldRotation = Rotation.From(Angles.Parse(config["angles"].GetValue<string>()));
+        camera.FieldOfView = config["fov"]?.GetValue<float>() ?? 80;
+        // SceneViewportWidget resets projection on editor frames. Configure it
+        // after the streaming wait, immediately before this synchronous render.
+        camera.FovAxis = CameraComponent.Axis.Horizontal;
+        camera.CustomSize = new Vector2(config["width"]?.GetValue<int>() ?? 1920,config["height"]?.GetValue<int>() ?? 1080);
+        typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+        typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+        var post = scene.GetSystem<PostProcessSystem>();
+        typeof(PostProcessSystem).GetMethod("UpdateCamera",flags).Invoke(post,new object[]{camera});
+        if(syncMainPostprocess && mainCamera.IsValid() && !ReferenceEquals(mainCamera,camera))
+            typeof(PostProcessSystem).GetMethod("UpdateCamera",flags).Invoke(post,new object[]{mainCamera});
+        // Hidden documents can miss FinishUpdate after resource hotloads. Refresh
+        // the native DDGI buffer so its bindless indices match the loaded textures.
+        var ddgiType = typeof(Scene).Assembly.GetType("Sandbox.DDGIVolumeSystem");
+        var getSystem = typeof(Scene).GetMethods().Single(m => m.Name=="GetSystem" && m.IsGenericMethodDefinition && m.GetParameters().Length==0);
+        var ddgi = getSystem.MakeGenericMethod(ddgiType).Invoke(scene,null);
+        ddgiType.GetMethod("MarkDirty",flags).Invoke(ddgi,null);
+        ddgiType.GetMethod("UpdateVolumes",flags).Invoke(ddgi,null);
+        if (!camera.AutoExposure.Enabled || MathF.Abs(camera.AutoExposure.MinimumExposure-tone.MinimumExposure)>.001f || MathF.Abs(camera.AutoExposure.MaximumExposure-tone.MaximumExposure)>.001f)
+            throw new InvalidOperationException("Belltower's saved tone mapping did not reach the viewport camera");
+        using var bitmap = new Bitmap(config["width"]?.GetValue<int>() ?? 1920,config["height"]?.GetValue<int>() ?? 1080);
+        camera.RenderToBitmap(bitmap,false);
+        var nativeCamera=typeof(CameraComponent).GetField("sceneCamera",flags).GetValue(camera);
+        var nativeTone=nativeCamera.GetType().GetProperty("Tonemap",flags).GetValue(nativeCamera);
+        object NativeToneValue(string property) => nativeTone.GetType().GetProperty(property,flags).GetValue(nativeTone);
+        var main=scene.Camera;
+        nativeExposure=new {
+            Enabled=NativeToneValue("Enabled"), MinExposure=NativeToneValue("MinExposure"), MaxExposure=NativeToneValue("MaxExposure"),
+            ExposureCompensation=NativeToneValue("ExposureCompensation"), Rate=NativeToneValue("Rate"),
+            MainCamera=main?.GameObject.Name, MainCameraIsViewport=ReferenceEquals(main,camera),
+            MainAutoExposureEnabled=main?.AutoExposure.Enabled,
+            MainMinimumExposure=main?.AutoExposure.MinimumExposure,
+            MainMaximumExposure=main?.AutoExposure.MaximumExposure,
+            MainCompensation=main?.AutoExposure.Compensation
+        };
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(destination,name+".png"),bitmap.ToPng());
+        captureProjection = new { FovAxis=camera.FovAxis.ToString(), CustomSize=camera.CustomSize.ToString(), Width=bitmap.Width, Height=bitmap.Height };
+        captureResult = new { Scene=scene.Name, CameraScene=camera.Scene.Name, Position=camera.WorldPosition.ToString(), Angles=camera.WorldRotation.Angles().ToString(), camera.FieldOfView,
+            camera.EnablePostProcessing, camera.AutoExposure.Enabled, camera.AutoExposure.MinimumExposure, camera.AutoExposure.MaximumExposure,
+            camera.AutoExposure.Compensation, camera.AutoExposure.Rate };
+    }
+    var result = new { Capture=captureResult, Projection=captureProjection, TrialPlasterSlots=plasterTrialSlots, TrialCanopySlots=canopyTrialSlots, TrialFarfieldSlots=farfieldTrialSlots, TrialForestDetailSlots=forestDetailTrialSlots, ForestDetailParameters=forestDetailParameters,
+        TrialForestCoverageSlots=forestCoverageTrialSlots,ForestCoverageParameters=forestCoverageParameters,TrialStreetSlots=streetTrialSlots,
+
+        DistributionVariant=distributionVariant,DistributionModels=distributionModels.Count,DistributionManifestSha256=DistributionHash(distributionPath),
+        TrialForestSectors=trialForest is null ? 0 : trialForest.Children.Count,
+        TrialGroundEdgeModels=groundEdgeObjects.Count, GroundEdgeParameters=groundEdgeParameters,
+        Lighting=scene.GetAllComponents<IndirectLightVolume>().Select(v=>new {
+            v.GameObject.Name, v.BakeVersion,
+            Irradiance=v.IrradianceTexture?.ResourcePath, Distance=v.DistanceTexture?.ResourcePath, Relocation=v.RelocationTexture?.ResourcePath,
+            TexturesValid=v.IrradianceTexture is not null && !v.IrradianceTexture.IsError && v.DistanceTexture is not null && !v.DistanceTexture.IsError && v.RelocationTexture is not null && !v.RelocationTexture.IsError }).ToArray(),
+        TrialForestBrightness=forestBrightness,
+        TrialLook=lookTrial,
+        NativeExposureAfterRender=nativeExposure,
+        MainPostprocessSynced=syncMainPostprocess,
+        SourceScene=scene.Source?.ResourcePath,
+        SourceSceneSha256=Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(System.IO.Path.Combine(root,"Assets",scene.Source.ResourcePath)))).ToLowerInvariant(),
+        CaptureHelperSha256=Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(System.IO.Path.Combine(root,"Sources/Belltower/editor/capture-forest-distribution.cs.txt")))).ToLowerInvariant(),
+        SceneHasUnsavedChanges=session.HasUnsavedChanges,
+        GamePreserved=Game.ActiveScene?.Id==gameId && Game.IsPlaying==playing, SelectedDocumentPreserved=ReferenceEquals(previous,Editor.SceneEditorSession.Active) };
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination,name+"-camera.json"),System.Text.Json.JsonSerializer.Serialize(result));
+    return result;
+}
+finally
+{
+    var toneRestored=true;
+    var forestRestored=true;
+    var groundEdgesRestored=true;
+    if(lookTrial is not null)
+    {
+        tone.MinimumExposure=oldToneMinimum;
+        tone.MaximumExposure=oldToneMaximum;
+        tone.ExposureCompensation=oldToneCompensation;
+        tone.Mode=oldToneMode;
+        toneRestored=tone.Serialize().ToJsonString()==toneSnapshot;
+        if(camera.IsValid())
+        {
+            using(scene.Push())
+                typeof(PostProcessSystem).GetMethod("UpdateCamera",flags).Invoke(scene.GetSystem<PostProcessSystem>(),new object[]{camera});
+        }
+        System.IO.File.WriteAllText(System.IO.Path.Combine(destination,name+"-look-restore.json"),System.Text.Json.JsonSerializer.Serialize(new{ToneRestored=toneRestored}));
+    }
+    if(syncMainPostprocess && mainCamera.IsValid() && !ReferenceEquals(mainCamera,camera))
+    {
+        using(scene.Push())
+            typeof(PostProcessSystem).GetMethod("UpdateCamera",flags).Invoke(scene.GetSystem<PostProcessSystem>(),new object[]{mainCamera});
+        mainCamera.AutoExposure.Enabled=mainExposureSnapshot.Enabled;
+        mainCamera.AutoExposure.MinimumExposure=mainExposureSnapshot.MinimumExposure;
+        mainCamera.AutoExposure.MaximumExposure=mainExposureSnapshot.MaximumExposure;
+        mainCamera.AutoExposure.Compensation=mainExposureSnapshot.Compensation;
+        mainCamera.AutoExposure.Rate=mainExposureSnapshot.Rate;
+    }
+    if(trialForest.IsValid())
+    {
+        using(scene.Push()) { trialForest.Destroy(); scene.ProcessDeletes(); }
+        forestRestored=scene.GetAllObjects(true).Select(o=>o.Id).ToHashSet().SetEquals(originalObjects);
+        System.IO.File.WriteAllText(System.IO.Path.Combine(destination,name+"-forest-restore.json"),System.Text.Json.JsonSerializer.Serialize(new{ForestRestored=forestRestored}));
+    }
+    if(groundEdgeObjects.Count>0)
+    {
+        using(scene.Push())
+        {
+            foreach(var go in groundEdgeObjects) if(go.IsValid()) go.Destroy();
+            scene.ProcessDeletes();
+        }
+        groundEdgesRestored=scene.GetAllObjects(true).Select(o=>o.Id).ToHashSet().SetEquals(originalObjects);
+        System.IO.File.WriteAllText(System.IO.Path.Combine(destination,name+"-ground-edge-restore.json"),System.Text.Json.JsonSerializer.Serialize(new{GroundEdgesRestored=groundEdgesRestored,ModelsRemoved=groundEdgeObjects.Count}));
+    }
+
+    foreach(var item in distributionModels) if(item.Renderer.IsValid()) item.Renderer.Model=item.Original;
+    foreach(var item in trialOverrides) if(item.Renderer.IsValid()) item.Renderer.Materials.SetOverride(item.Slot,item.Original);
+    foreach(var pair in distributionOverrides)
+    {
+        if(!pair.Key.IsValid() || pair.Key.Materials.Count!=pair.Value.Length) throw new InvalidOperationException("Original model material layout did not restore.");
+        for(var slot=0;slot<pair.Value.Length;slot++) pair.Key.Materials.SetOverride(slot,pair.Value[slot]);
+    }
+    var materialsRestored=trialSnapshots.All(x=>x.Key.IsValid() && x.Key.Serialize().ToJsonString()==x.Value);
+    if(trialOverrides.Count>0) System.IO.File.WriteAllText(System.IO.Path.Combine(destination,name+"-restore.json"),System.Text.Json.JsonSerializer.Serialize(new{MaterialsRestored=materialsRestored,Slots=trialOverrides.Count}));
+
+    var distributionRestored=distributionModels.All(x=>x.Renderer.IsValid() && x.Renderer.Model?.ResourcePath==x.Original.ResourcePath) && materialsRestored;
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination,name+"-distribution-restore.json"),System.Text.Json.JsonSerializer.Serialize(new{ModelsRestored=distributionRestored,Models=distributionModels.Count}));
+    if (camera.IsValid()) { camera.WorldPosition=oldPosition; camera.WorldRotation=oldRotation; camera.FieldOfView=oldFov; restoreProjection?.Invoke(); }
+
+    if(!distributionRestored) throw new InvalidOperationException("Original woodland renderer state differs; inspect before further work.");
+    if(!forestRestored || !groundEdgesRestored) throw new InvalidOperationException("Temporary geometry cleanup differs; inspect before continuing.");
+    if(!toneRestored) throw new InvalidOperationException("Tone mapping comparison did not restore; inspect before continuing.");
+    if(!materialsRestored) throw new InvalidOperationException("Material trial restoration differs; inspect the editor before further work");
+}

@@ -1,0 +1,26 @@
+var root=Sandbox.Project.Current.GetRootPath();
+const string relative="scenes/maps/spillway/spillway.scene";
+var map=Editor.AssetSystem.FindByPath(relative)?.LoadResource<SceneFile>()
+    ?? throw new InvalidOperationException("Spillway scene resource is missing");
+var chunks=new[]{"ground","west","east","control","cargo","dam","falls","mountains","forest","backdrop","river"};
+var models=chunks.Select(name=>Model.Load("models/maps/spillway/spillway_"+name+".vmdl")).ToArray();
+var errors=models.Where(m=>m is null || m.IsError).Select(m=>m?.ResourcePath??"null").ToArray();
+var badMaterials=models.Where(m=>m is not null && !m.IsError).SelectMany(m=>m.Materials)
+    .Where(m=>m is null || m.IsError || m.ShaderName=="shaders/error.shader").Select(m=>m?.ResourcePath??"null").Distinct().ToArray();
+var thumbnail="ui/maps/spillway.png";
+var minimap="ui/minimaps/minimap_spillway.png";
+var result=new {
+    Scene=relative,CheckedAt=DateTime.UtcNow,
+    Ready=Facepunch.GameUtils.IsMatchReadyMap(map),
+    Listed=Facepunch.GameUtils.GetMatchMaps().Any(m=>m.ResourcePath==relative),
+    Title=map.GetMetadata("Title",""),Image=map.GetMetadata("Image",""),
+    Thumbnail=System.IO.File.Exists(System.IO.Path.Combine(root,"Assets",thumbnail)),
+    Minimap=System.IO.File.Exists(System.IO.Path.Combine(root,"Assets",minimap)),
+    ModelCount=models.Length,MissingModels=errors,MissingMaterials=badMaterials,
+    Game.IsPlaying,ActiveScene=Editor.SceneEditorSession.Active?.Scene?.Name
+};
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/spillway/integration-validation.json"),
+    System.Text.Json.JsonSerializer.Serialize(result,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+if(!result.Ready || !result.Listed || !result.Thumbnail || !result.Minimap || errors.Length>0 || badMaterials.Length>0)
+    throw new InvalidOperationException("Spillway integration audit failed; see integration-validation.json");
+return result;

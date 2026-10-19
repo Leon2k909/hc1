@@ -1,0 +1,14 @@
+var scene = Editor.SceneEditorSession.Active?.Scene;
+if (scene?.Source?.ResourcePath?.Equals("scenes/maps/cerroblanco/cerroblanco.scene", StringComparison.OrdinalIgnoreCase) != true)
+    throw new InvalidOperationException("Cerro Blanco must be the active editor scene.");
+var report = new {
+    Scene = scene.Name,
+    Renderers = scene.GetAllComponents<ModelRenderer>().Select(r => new { r.GameObject.Name, Model = r.Model?.ResourcePath, Error = r.Model?.IsError ?? true, Materials = Enumerable.Range(0,r.Materials.Count).Select(i => (r.Materials.GetOverride(i) ?? r.Materials.GetOriginal(i))?.ResourcePath).ToArray() }).ToArray(),
+    Probes = scene.GetAllComponents<EnvmapProbe>().Select(p => new { p.GameObject.Name, p.Mode, Texture = p.Texture?.ResourcePath }).ToArray(),
+    Components = scene.GetAllObjects(true).SelectMany(g => g.Components.GetAll()).GroupBy(c => c.GetType().FullName).Select(g => new { Type = g.Key, Count = g.Count() }).ToArray(),
+    Sessions = Editor.SceneEditorSession.All.Select(s => new { s.Scene.Name, Path = s.Scene.Source?.ResourcePath, s.HasUnsavedChanges }).ToArray()
+};
+var path = System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(), "output/cerroblanco/native-scene-audit.json");
+System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path));
+System.IO.File.WriteAllText(path, System.Text.Json.JsonSerializer.Serialize(report));
+return new { Path = path, Renderers = report.Renderers.Length, MissingModels = report.Renderers.Where(r => r.Error).ToArray(), report.Probes, report.Components, report.Sessions };

@@ -1,0 +1,43 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var staging=System.IO.Path.Combine(root,"output/belltower/quality/forest-v1-staging");
+var records=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(staging,"import.json"))).AsArray();
+var manifestPath=System.IO.Path.Combine(staging,"manifest.json");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(manifestPath));
+string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+foreach(var record in records)
+{
+    var relative=record["path"].GetValue<string>();
+    var source=System.IO.Path.Combine(root,record["source"].GetValue<string>());
+    var installed=System.IO.Path.Combine(root,"Assets",relative);
+    var expected=record["sha256"].GetValue<string>();
+    if(Hash(source)!=expected || Hash(installed)!=expected)
+        throw new InvalidOperationException("Woodland input differs from the current candidate: "+relative);
+    if(relative.EndsWith(".vmdl",StringComparison.Ordinal))
+    {
+        var compiled=installed+"_c";
+        var mesh=System.IO.Path.ChangeExtension(installed,".obj");
+        if(!System.IO.File.Exists(compiled) || System.IO.File.GetLastWriteTimeUtc(compiled)<System.IO.File.GetLastWriteTimeUtc(installed)
+            || System.IO.File.GetLastWriteTimeUtc(compiled)<System.IO.File.GetLastWriteTimeUtc(mesh))
+            throw new InvalidOperationException("Woodland model has not compiled since its inputs changed: "+relative);
+    }
+}
+var models=records.Where(x=>x["path"].GetValue<string>().EndsWith(".vmdl"))
+    .Select(x=>Model.Load(x["path"].GetValue<string>())).ToArray();
+if(models.Any(m=>m is null || m.IsError)) throw new InvalidOperationException("A woodland model did not load.");
+var material=Material.Load("materials/belltower/forest/forest_trees.vmat");
+var texture=material?.GetTexture("g_tPlants");
+if(material is null || material.IsError || texture is null || texture.IsError)
+    throw new InvalidOperationException("The woodland material or its atlas did not load.");
+if(models.Any(m=>m.Materials.Length!=1 || m.Materials[0].ResourcePath!=material.ResourcePath))
+    throw new InvalidOperationException("A woodland model has the wrong material.");
+var triangles=models.Sum(m=>m.GetIndexCountForLod(0))/3;
+if(models.Length!=manifest["sectors"].GetValue<int>() || triangles!=manifest["triangles"].GetValue<int>())
+    throw new InvalidOperationException("Loaded woodland geometry does not match the current candidate.");
+if(texture.Width!=1254 || texture.Height!=1254)
+    throw new InvalidOperationException("The original woodland atlas has unexpected dimensions.");
+var result=new { ManifestSha256=Hash(manifestPath), Models=models.Length,Triangles=triangles,
+    Meshes=models.Sum(m=>m.MeshCount),Material=material.ResourcePath,
+    Texture=new{texture.ResourcePath,texture.Width,texture.Height},
+    Sectors=models.Select(m=>new{m.ResourcePath,Min=m.Bounds.Mins.ToString(),Max=m.Bounds.Maxs.ToString(),Triangles=m.GetIndexCountForLod(0)/3}).ToArray() };
+System.IO.File.WriteAllText(System.IO.Path.Combine(staging,"native-resources.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return new {result.Models,result.Triangles,result.Meshes,result.Material,result.Texture};

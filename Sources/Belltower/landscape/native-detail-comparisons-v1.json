@@ -1,0 +1,145 @@
+{
+  "revision": "native-detail-comparisons-v1",
+  "project_root": "C:\\sbox-projects\\hc1\\forked-shooter-main",
+  "state": "native comparison evidence recorded; neither trial promoted",
+  "capture_source_sha256": "94f3b7c3d279ba5e74e2736005f800591baf1711708a04e5f7836f22999a3925",
+  "manifest_sha256": {
+    "forest-detail-v1": "bb34d072189015d350c82dff4c65c30da565e0c2f6ad2f6cc98b011ca460ae15",
+    "ground-edge-v1": "e4b14ed144f0fa0798591a740bc84d3e2c5baeca719555c2373910ffd1cbb904"
+  },
+  "static_compile": "output/belltower/quality/forest-detail-v1-native/helper-static-compile.json",
+  "preflight": [
+    "Editor root is the canonical C: checkout.",
+    "Recheck shared editor availability; preserve selected scene and play state.",
+    "Native import only the checked versioned files, then compile the six shader/material/model resources."
+  ],
+  "forest_cases": [
+    {
+      "directory": "forest-detail-v1-native-baseline-current",
+      "views": [
+        "valley",
+        "west-ridge",
+        "west-ridge-detail",
+        "terrace"
+      ],
+      "forest_detail_trial": false
+    },
+    {
+      "directory": "forest-detail-v1-native-baseline-repeat",
+      "views": [
+        "west-ridge"
+      ],
+      "forest_detail_trial": false
+    },
+    {
+      "directory": "forest-detail-v1-native-null",
+      "views": [
+        "west-ridge",
+        "valley"
+      ],
+      "forest_detail_trial": true,
+      "forest_detail_blend": 0
+    },
+    {
+      "directory": "forest-detail-v1-native-candidate",
+      "views": [
+        "valley",
+        "west-ridge",
+        "west-ridge-detail",
+        "terrace"
+      ],
+      "forest_detail_trial": true,
+      "forest_detail_blend": 1
+    }
+  ],
+  "ground_cases": [
+    {
+      "directory": "ground-edge-v1-native-visible-baseline",
+      "views": [
+        "ground-edge-close"
+      ],
+      "ground_edge_trial": false
+    },
+    {
+      "directory": "ground-edge-v1-native-visible-candidate",
+      "views": [
+        "ground-edge-close"
+      ],
+      "ground_edge_trial": true
+    }
+  ],
+  "review_requirements": [
+    "Match camera, projection, source-scene hash, helper hash, lighting and native exposure across each comparison.",
+    "Quantify repeated-baseline capture variation and verify city control pixels stay stable across the forest comparison.",
+    "Blend zero should reproduce the accepted forest within measured capture variation.",
+    "Confirm all 88 forest slots are replaced and restored exactly; review native mip colour and existing distance fade.",
+    "Confirm both temporary ground models use one material each, no shadow casting or collider components, and are removed with original scene object identities restored.",
+    "Judge ground colour/contact, doorway clearance and alpha edges in the game renderer.",
+    "Measure gameplay performance before promoting a visually accepted change."
+  ],
+  "native_verified": false,
+  "scene_or_play_changes_this_turn": true,
+  "editor_restarted_by_this_turn": false,
+  "native_session": {
+    "pid": 9580,
+    "restore_scene": "scenes/menu.scene",
+    "restore_playing": false,
+    "restore_scene_unsaved": false,
+    "restoration_required": false,
+    "editor_opened_by_task": false,
+    "menu_restored": false,
+    "restoration_superseded_by_external_scene_change": true,
+    "preserved_current_scene": "scenes/maps/ares/ares.scene",
+    "preserved_current_playing": true,
+    "own_belltower_play_ended": true
+  },
+  "native_review": "output/belltower/quality/native-detail-review-oct18.json",
+  "native_review_sha256": "86d4da9707bf8acbbd8e595b257775e73149917d8c25f4ccfcf9f0da28fe8662",
+  "installed_unreferenced_assets": {
+    "forest-detail-v1": [
+      "shaders/belltower_forest_detail_trial.shader",
+      "materials/belltower/forest/trials/forest_detail_v1.vmat"
+    ],
+    "ground-edge-v1": [
+      "materials/belltower/ground-edge-v1/ground_edge.png",
+      "materials/belltower/ground-edge-v1/ground_edge.vmat",
+      "models/maps/belltower/ground-edge-v1/belltower_ground_edge_east.mtl",
+      "models/maps/belltower/ground-edge-v1/belltower_ground_edge_east.obj",
+      "models/maps/belltower/ground-edge-v1/belltower_ground_edge_east.vmdl",
+      "models/maps/belltower/ground-edge-v1/belltower_ground_edge_west.mtl",
+      "models/maps/belltower/ground-edge-v1/belltower_ground_edge_west.obj",
+      "models/maps/belltower/ground-edge-v1/belltower_ground_edge_west.vmdl",
+      "shaders/belltower_ground_edge_trial.shader"
+    ]
+  },
+  "accepted_scene_changed": false,
+  "remaining_contextual_camera": {
+    "view": "ground-edge",
+    "eye_plan": [
+      -1313.323,
+      379.7965,
+      64
+    ],
+    "target_plan": [
+      -1393.323,
+      379.7965,
+      26
+    ],
+    "horizontal_fov": 90,
+    "verified": false
+  },
+  "colour_comparison_capture_source_sha256": "ca8b36da7a2c26b051cdd3249092ba477588572e9871914357477a9bf7cdeec1",
+  "temporary_material_overrides_restored": true,
+  "temporary_editor_geometry_restored": true,
+  "preflight_status": "completed for the current imported resources",
+  "coverage_review": "output/belltower/quality/forest-coverage-v1/native-fixed-review.json",
+  "coverage_review_sha256": "977d0f5e6a63c6fb62247adf19c7cb3d21efa9be5aa4557f66bc6feee17a2b02",
+  "shared_editor_last_observed": {
+    "pid": 9580,
+    "scene": "riverdale",
+    "playing": true,
+    "preserved": true,
+    "observation": "Read-only final preflight; external scene change after the Orion comparisons."
+  },
+  "ground_review_update": "Three additional fixed-exposure contextual/sunlit pairs passed restoration. Current ground mesh is rejected for sunlit contact quality."
+}

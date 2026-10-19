@@ -1,0 +1,6 @@
+var shader = "shaders/hc1_veridant_impostor.shader";
+var result = await Editor.EditorUtility.CompileShader(shader, new() { ForceRecompile = true }, cancellationToken);
+if (result.CompiledShader is { Length: > 0 })
+    System.IO.File.WriteAllBytes(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(), "Assets", shader + "_c"), result.CompiledShader);
+return new { result.Success, Bytes = result.CompiledShader?.Length,
+    Output = result.Programs.SelectMany(p => p.Output ?? new System.Collections.Generic.List<string>()).Take(30).ToArray() };

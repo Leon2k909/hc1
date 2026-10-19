@@ -1,0 +1,27 @@
+if (Game.IsPlaying || Networking.IsActive) throw new InvalidOperationException("Stop the test before restoring assets");
+if (Editor.SceneEditorSession.Active?.Scene.Source?.ResourcePath?.Equals("scenes/maps/cerroblanco/cerroblanco.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Cerro Blanco must own the editor window");
+var root=Sandbox.Project.Current.GetRootPath();
+var request=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/cerroblanco/restore-candidate.json")));
+var paths=new System.Collections.Generic.Dictionary<string,string>();
+if(request["glass"]?.GetValue<bool>()==true)
+    paths["materials/cerroblanco/cb_glass.vmat"]="output/cerroblanco/before/glass/materials/cerroblanco/cb_glass.vmat";
+if(request["coping"]?.GetValue<bool>()==true)
+    foreach(var name in new[]{"cerroblanco_detail_north","cerroblanco_detail_south"})
+        paths["models/maps/cerroblanco/quality-v1/"+name+".obj"]="output/cerroblanco/before/coping-stage/"+name+".obj";
+foreach(var pair in paths)
+    if(!System.IO.File.Exists(System.IO.Path.Combine(root,pair.Value)))throw new InvalidOperationException("Missing baseline: "+pair.Value);
+foreach(var pair in paths)
+{
+    var target=System.IO.Path.Combine(root,"Assets",pair.Key);
+    System.IO.File.Copy(System.IO.Path.Combine(root,pair.Value),target,true);
+    Editor.AssetSystem.RegisterFile(target);
+}
+if(request["garden"]?.GetValue<bool>()==true)
+{
+    var session=Editor.SceneEditorSession.Active;
+    var parent=session.Scene.GetAllObjects(true).FirstOrDefault(g=>g.Name=="Cerro Blanco construction details");
+    if(parent!=null)foreach(var go in parent.Children.Where(g=>g.Name.StartsWith("Garden hedge ")).ToArray())go.Destroy();
+    typeof(Editor.SceneEditorSession).GetProperty("HasUnsavedChanges").SetValue(session,true);
+}
+return new {Restored=paths.Keys, RequiresAssetCompile=true};

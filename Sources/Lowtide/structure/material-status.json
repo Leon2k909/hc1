@@ -1,0 +1,105 @@
+{
+  "status": "installed_native_reviewed_and_reload_verified",
+  "observed_utc": "2026-10-18T19:35:19.896638+00:00",
+  "project_root": "C:\\sbox-projects\\hc1\\forked-shooter-main",
+  "production_changed": true,
+  "assets": {
+    "materials/lowtide/structure/beam_timber_color.png": "be98e4cbc23f948e6d3ca26af42e2ac932f9cf396e0c67ac7df19ba61a16e44e",
+    "materials/lowtide/structure/beam_timber_color.png.meta": "307c008e3f64a5ca927b131f0d2b8c68d036d2fd09508c6e80a60c227a64ce0d",
+    "materials/lowtide/structure/beam_timber_normal.png": "2543e580251adbb59187e5949e32fb0cf903fc0ed637753b7bb50f4234a0613d",
+    "materials/lowtide/structure/beam_timber_normal.png.meta": "9835c9ac3cde98c2c3138ce6df8a4b1421bb5e4e9e2ef0baa9e7572921eee09d",
+    "materials/lowtide/structure/beam_timber_rough.png": "520648310646b32aa31207c4eb43a54bceffc96d03b63f4f9466a07e0be64a40",
+    "materials/lowtide/structure/beam_timber_rough.png.meta": "a1ccb14382ba5b71c6026b5a3e04286fbcabccd76574f16abe17c6f6d35ee8ee",
+    "materials/lowtide/structure/lt_beam_timber_v2.vmat": "33f4bc0765f5404de2dfa9f38db45c8bedc1f2a535a01978e8a1eee00102c77e",
+    "materials/lowtide/structure/lt_beam_timber_v2.vmat.meta": "13cdec4954a1520ed4cb8550d5d98279ab584ca90301831b962d23f4a95a877e",
+    "materials/lowtide/structure/lt_cast_iron_v2.vmat": "7752f92be10c85fdf131cd43fd8f8824fdeafa670122009b905963cbe5b062c7",
+    "materials/lowtide/structure/lt_cast_iron_v2.vmat.meta": "e0882dd8bec36aff357ca29a9f3fb1bf820b84cd397e7c536b9d2f9c5536efb2",
+    "shaders/hc1_lowtide_structure_v2.shader": "08ebac04352d5412e148bf626a12445b4cfda14a97a8e2e3544a39076fcbdae3",
+    "shaders/hc1_lowtide_structure_v2.shader.meta": "38f3b16184a2e7ae4cc38bf152a6b0c35ad4583ec2dda7364c1a88c21ad44fc6"
+  },
+  "models": [
+    {
+      "path": "models/maps/lowtide/lowtide_east.vmdl",
+      "before": "1172b0eab02316dc724cc5625e017bfc2ced940570d85a558923f57eb4f68ca8",
+      "after": "e8e1df15d3eab913e2e3ee240c48e52fcbb8562ea3da463013a0d9cd28f7859f",
+      "remaps": 2,
+      "materialSlots": 23,
+      "onlyTwoMaterialPathsChanged": true
+    },
+    {
+      "path": "models/maps/lowtide/lowtide_west.vmdl",
+      "before": "97c460c453156305cfbc9264060b16c91f1d75bdde13750aa3250ddbd1022432",
+      "after": "d3600e78dcc2892974607d7a59d9bf5f599245d4da3fc0d109f67b58e87172fd",
+      "remaps": 2,
+      "materialSlots": 23,
+      "onlyTwoMaterialPathsChanged": true
+    }
+  ],
+  "generated_image": {
+    "source": "Sources/Lowtide/structure/beam-timber-source.png",
+    "sha256": "be98e4cbc23f948e6d3ca26af42e2ac932f9cf396e0c67ac7df19ba61a16e44e",
+    "tool": "built-in image_gen",
+    "prompt": "Sources/Lowtide/structure/beam-timber-prompt.txt",
+    "size": [
+      1254,
+      1254
+    ],
+    "generated_pixels_unchanged": true
+  },
+  "numerical_surface_data": {
+    "physical_patch_metres": [
+      0.6,
+      2.4
+    ],
+    "fibre_depth_metres": 0.0012,
+    "roughness_range": [
+      0.66,
+      0.9
+    ]
+  },
+  "selected_iron": "Weathered painted cast iron; marine paint scan reused unchanged",
+  "rejected_iron": "Uniform casting/oxidation texture read too brown and stone-like in daylight",
+  "normal_audit": [
+    {
+      "bank": "east",
+      "uniqueShaftCorners": 240,
+      "normalLengths": [
+        0.9999534989188247,
+        1.0001444895613834
+      ],
+      "minimumRadialDot": 0.9999409960659495
+    },
+    {
+      "bank": "west",
+      "uniqueShaftCorners": 240,
+      "normalLengths": [
+        0.9999534989188247,
+        1.0001444895613834
+      ],
+      "minimumRadialDot": 0.9999409960659495
+    }
+  ],
+  "reviewed_comparison_captures": 18,
+  "reviewed_production_captures": 6,
+  "reviewed_fresh_load_captures": 6,
+  "new_geometry": 0,
+  "new_material_slots": 0,
+  "collision_unchanged": true,
+  "canonical_resources_byte_exact": 12,
+  "native_production": "output/lowtide/quality-pass/native-2026-10-18/structure-timber-v2/production/verification.json",
+  "native_reloaded": "output/lowtide/quality-pass/native-2026-10-18/structure-timber-v2/production-reloaded/verification.json",
+  "lighting": "output/lowtide/quality-pass/native-2026-10-18/structure-timber-v2/lighting/verification.json",
+  "cleanup": [
+    "output/lowtide/quality-pass/native-2026-10-18/structure-timber-v2/retired-trial/cleanup.json",
+    "output/lowtide/quality-pass/native-2026-10-18/structure-timber-v2/lighting/cleanup.json"
+  ],
+  "restored_editor_tab": "scenes/maps/orion/orion.scene",
+  "restored_runtime_map": "scenes/maps/lowtide/lowtide.scene",
+  "remaining": [
+    "Broader warehouse lighting and cargo quality",
+    "Foliage and whole-map visual audit",
+    "Controlled gameplay performance, LOD switching and moving-camera temporal checks"
+  ],
+  "performance_verified": false,
+  "overall_AAA_verified": false
+}

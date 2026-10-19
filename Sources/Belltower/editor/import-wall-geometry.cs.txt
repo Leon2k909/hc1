@@ -1,0 +1,46 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var selected=Editor.SceneEditorSession.Active;
+var gameId=Game.ActiveScene?.Id;
+var playing=Game.IsPlaying;
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase)==true);
+if(Game.IsPlaying && Game.ActiveScene.GetAllComponents<ModelRenderer>().Any(r=>r.Model?.ResourcePath?.StartsWith("models/maps/belltower/",StringComparison.OrdinalIgnoreCase)==true))
+    throw new InvalidOperationException("Do not replace the wall meshes during a live Belltower match.");
+var stage=System.IO.Path.GetFullPath(System.IO.Path.Combine(root,"output/belltower/quality/wall-v2"));
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"geometry-manifest.json")));
+if(manifest["revision"].GetValue<string>()!="wall-v2" || !manifest["collision_unchanged"].GetValue<bool>() || !manifest["exterior_retaining_faces_unchanged"].GetValue<bool>())
+    throw new InvalidOperationException("Geometry validation did not pass.");
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+foreach(var protectedFile in manifest["protected_sha256"].AsObject())
+    if(Hash(System.IO.Path.Combine(root,"Assets",protectedFile.Key))!=protectedFile.Value.GetValue<string>())
+        throw new InvalidOperationException("Collision or model definition changed: "+protectedFile.Key);
+var imported=new System.Collections.Generic.List<string>();
+var files=manifest["files"].AsArray();
+foreach(var file in files)
+{
+    var relative=file["path"].GetValue<string>();
+    if(relative!="models/maps/belltower/belltower_west.obj" && relative!="models/maps/belltower/belltower_east.obj")
+        throw new InvalidOperationException("Unexpected wall mesh path.");
+    var source=System.IO.Path.GetFullPath(System.IO.Path.Combine(root,file["source"].GetValue<string>()));
+    if(!source.StartsWith(System.IO.Path.Combine(stage,"stage")+System.IO.Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase)
+       || Hash(source)!=file["sha256"].GetValue<string>())
+        throw new InvalidOperationException("Staged wall mesh differs from its manifest.");
+    var target=System.IO.Path.Combine(root,"Assets",relative);
+    var current=Hash(target);
+    if(current!=file["before_sha256"].GetValue<string>() && current!=file["sha256"].GetValue<string>())
+        throw new InvalidOperationException("The wall source changed since staging.");
+}
+foreach(var file in files)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var relative=file["path"].GetValue<string>();
+    var target=System.IO.Path.Combine(root,"Assets",relative);
+    if(Hash(target)==file["sha256"].GetValue<string>()) continue;
+    var incoming=target+".belltower-import";
+    System.IO.File.Copy(System.IO.Path.Combine(root,file["source"].GetValue<string>()),incoming,true);
+    System.IO.File.Move(incoming,target,true);
+    Editor.AssetSystem.RegisterFile(target);
+    imported.Add(relative);
+}
+var result=new{Imported=imported,HiddenAreaRemovedSquareMetres=manifest["hidden_surface_removed_m2"].GetValue<double>(),session.HasUnsavedChanges,Game.IsPlaying,MatchPreserved=Game.ActiveScene?.Id==gameId && playing==Game.IsPlaying,SelectedDocumentPreserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active)};
+System.IO.File.WriteAllText(System.IO.Path.Combine(stage,"native-geometry-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

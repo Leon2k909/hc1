@@ -1,0 +1,29 @@
+if (Game.IsPlaying) throw new InvalidOperationException("Wall material import requires the stopped editor.");
+var root = Sandbox.Project.Current.GetRootPath();
+var session = Editor.SceneEditorSession.Active;
+if (!session.Scene.Source.ResourcePath.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Expected Belltower.");
+void Publish(string relative, string text)
+{
+    var target=System.IO.Path.Combine(root,"Assets",relative);
+    var backup=System.IO.Path.Combine(root,"output/belltower/quality/wall-v2/before-assets/Assets",relative);
+    if(!System.IO.File.Exists(backup))
+    {
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+        System.IO.File.Copy(target,backup);
+    }
+    var incoming=target+".belltower-import";
+    System.IO.File.WriteAllText(incoming,text);
+    System.IO.File.Move(incoming,target,true);
+    Editor.AssetSystem.RegisterFile(target);
+}
+var shader="shaders/belltower_relief.shader";
+Publish(shader,System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Sources/Belltower",shader)));
+await Editor.EditorUtility.CompileShader(shader,new(),cancellationToken);
+if(System.IO.File.GetLastWriteTimeUtc(System.IO.Path.Combine(root,"Assets",shader+"_c"))<System.IO.File.GetLastWriteTimeUtc(System.IO.Path.Combine(root,"Assets",shader)))
+    throw new InvalidOperationException("Shader compile did not publish.");
+var materials=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/belltower/quality/material-import.json"))).AsArray();
+if(materials.Count!=1 || materials[0]["path"].GetValue<string>()!="materials/belltower/rubble.vmat")
+    throw new InvalidOperationException("Expected only the rubble material.");
+Publish("materials/belltower/rubble.vmat",materials[0]["text"].GetValue<string>());
+return new{Published=new[]{shader,"materials/belltower/rubble.vmat"},session.HasUnsavedChanges,Game.IsPlaying};

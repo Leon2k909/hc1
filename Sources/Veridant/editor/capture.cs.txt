@@ -1,0 +1,131 @@
+// Veridant's offscreen views: run with the native s&box MCP's run_csharp (sbox-cli --call run_csharp '{"path":...}').
+// Loads Assets/scenes/maps/Veridant/veridant.scene's visual roots into an isolated editor scene, renders the views
+// listed in output/veridant/captures/config.json to PNGs there, then destroys that scene. The user's open scene and
+// play state are never touched. Config: "views": [ { "name", "eye": [e, n, z], "target": [e, n, z], "fov",
+// optional "width"/"height", optional "art": true (also written to Assets/ui/maps/veridant.png) } ], "settle_frames",
+// "stream_frames", "hide": [ object names ].
+var projectRoot = Sandbox.Project.Current.GetRootPath();
+var destination = System.IO.Path.Combine(projectRoot, "output/veridant/captures");
+System.IO.Directory.CreateDirectory(destination);
+var configuration = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(destination, "config.json"))).AsObject();
+var source = Editor.SceneEditorSession.Active?.Scene;
+var before = new { Game.IsPlaying, Scene = source?.Name, SceneId = source?.Id, GameSceneId = Game.ActiveScene?.Id };
+var visual = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase) {
+    "Sun", "Sky", "Fog", "Look", "Veridant", "Lights", "Reflection Probes", "Volumetric Fog"
+};
+var root = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(projectRoot, "Assets/scenes/maps/Veridant/veridant.scene"))).AsObject();
+var objects = new System.Text.Json.Nodes.JsonArray();
+foreach (var item in root["GameObjects"].AsArray())
+    if (visual.Contains(item["Name"]?.GetValue<string>() ?? "")) objects.Add(item.DeepClone());
+root["GameObjects"] = objects;
+root["SceneProperties"]["NavMesh"]["Enabled"] = false;
+root["SceneProperties"]["WantsSystemScene"] = false;
+var scene = Scene.CreateEditorScene();
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var preRender = typeof(Scene).GetMethod("PreRender", flags, null, Type.EmptyTypes, null) ?? throw new MissingMethodException("Scene.PreRender");
+var preCameraRender = typeof(Scene).GetMethod("PreCameraRender", flags, null, Type.EmptyTypes, null) ?? throw new MissingMethodException("Scene.PreCameraRender");
+try {
+    CameraComponent camera;
+    var hidden = new System.Collections.Generic.List<string>();
+    using (scene.Push()) {
+        scene.Deserialize(root);
+        foreach (var probe in scene.GetAllComponents<EnvmapProbe>()) probe.Mode = EnvmapProbe.EnvmapProbeMode.Realtime;
+        if (configuration["hide"] is System.Text.Json.Nodes.JsonArray hide)
+            foreach (var name in hide.Select(x => x.GetValue<string>()))
+                foreach (var go in scene.GetAllObjects(false).Where(g => g.Name == name).ToArray()) { go.Enabled = false; hidden.Add(go.Name); }
+        // "fixed_exposure": pin the scene's tonemapper (min = max), as Belltower's captures do, so a short offscreen
+        // render isn't left wherever auto exposure had got to.
+        if (configuration["fixed_exposure"] is not null)
+            foreach (var tonemap in scene.GetAllComponents<Tonemapping>())
+            {
+                tonemap.AutoExposureEnabled = true;
+                tonemap.MinimumExposure = tonemap.MaximumExposure = configuration["fixed_exposure"].GetValue<float>();
+                tonemap.ExposureCompensation = 0;
+                tonemap.Rate = 10;
+            }
+        // "disable": component types to switch off for a diagnostic view (e.g. "PointLight", "SkyBox2D"). The scene's
+        // component index is by concrete type, so GetAllComponents<Component>() finds nothing: go through the objects.
+        if (configuration["disable"] is System.Text.Json.Nodes.JsonArray off)
+            foreach (var typeName in off.Select(x => x.GetValue<string>()))
+                foreach (var component in scene.GetAllObjects(false).SelectMany(go => go.Components.GetAll()).Where(c => c.GetType().Name == typeName).ToArray())
+                { component.Enabled = false; hidden.Add(typeName); }
+        var holder = new GameObject(false, "Veridant capture camera");
+        camera = holder.Components.Create<CameraComponent>();
+        camera.ZNear = 4; camera.ZFar = 120000;
+        holder.Enabled = true;
+        scene.EditorTick(.016f, .016f);
+        preRender.Invoke(scene, null);
+        preCameraRender.Invoke(scene, null);
+    }
+    // Textures stream in: ask for every map at 2048 (not 4096: a whole map at full size ran the shared editor out of
+    // video memory on 2026-10-15), then give the streamer a few seconds.
+    var marked = 0;
+    var textureNames = new[] { "g_tColor", "g_tNormal", "g_tRoughness", "g_tSelfIllumMask", "g_tTransmissiveColor", "g_tAmbientOcclusion", "SkyTexture" };
+    foreach (var material in scene.GetAllComponents<ModelRenderer>().Where(r => r.Model is not null).SelectMany(r => r.Model.Materials).Distinct())
+        foreach (var texture in textureNames.Select(material.GetTexture).Append(material.FirstTexture).Where(t => t is not null).Distinct())
+        { texture.MarkUsed(2048); marked++; }
+    for (var wait = 0; wait < (configuration["stream_frames"]?.GetValue<int>() ?? 90); wait++)
+    {
+        using (scene.Push()) { scene.EditorTick(.016f, .016f); preRender.Invoke(scene, null); }
+        await Task.Delay(33, cancellationToken);
+    }
+    var renderProbe = typeof(EnvmapProbe).GetMethod("RenderCubemap", flags, null, Type.EmptyTypes, null);
+    if (renderProbe is not null)
+        foreach (var probe in scene.GetAllComponents<EnvmapProbe>())
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            using (scene.Push()) renderProbe.Invoke(probe, null);
+            await Task.Delay(16, cancellationToken);
+        }
+    // Plan ( e, n, z ) to world ( n, -e, z ).
+    Vector3 World(System.Text.Json.Nodes.JsonNode node) { var a = node.AsArray(); return new(a[1].GetValue<float>(), -a[0].GetValue<float>(), a[2].GetValue<float>()); }
+    var settle = configuration["settle_frames"]?.GetValue<int>() ?? 20;
+    var written = new System.Collections.Generic.List<string>();
+    foreach (var view in configuration["views"].AsArray())
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var name = view["name"].GetValue<string>();
+        if (view["exposure"] is not null)
+            foreach (var tonemap in scene.GetAllComponents<Tonemapping>())
+            {
+                tonemap.AutoExposureEnabled = true;
+                tonemap.MinimumExposure = tonemap.MaximumExposure = view["exposure"].GetValue<float>();
+                tonemap.ExposureCompensation = 0;
+                tonemap.Rate = 10;
+            }
+        using var bitmap = new Bitmap(view["width"]?.GetValue<int>() ?? configuration["width"]?.GetValue<int>() ?? 1536,
+                                      view["height"]?.GetValue<int>() ?? configuration["height"]?.GetValue<int>() ?? 1024);
+        var eye = World(view["eye"]);
+        var target = World(view["target"]);
+        for (var frame = 0; frame < settle; frame++)
+        {
+            using (scene.Push()) {
+                camera.WorldPosition = eye;
+                camera.WorldRotation = Rotation.LookAt(target - eye);
+                camera.FieldOfView = view["fov"].GetValue<float>();
+                scene.EditorTick(.016f, .016f);
+                preRender.Invoke(scene, null);
+                preCameraRender.Invoke(scene, null);
+                camera.RenderToBitmap(bitmap);
+            }
+            await Task.Delay(16, cancellationToken);
+        }
+        var png = bitmap.ToPng();
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(destination, name + ".png"), png);
+        written.Add(name);
+        if (view["art"]?.GetValue<bool>() == true)
+        {
+            var art = System.IO.Path.Combine(projectRoot, "Assets/ui/maps/veridant.png");
+            System.IO.File.WriteAllBytes(art, png);
+            written.Add(art);
+        }
+    }
+    var missing = scene.GetAllComponents<ModelRenderer>().Where(r => r.Model is null || r.Model.IsError).Select(r => r.GameObject.Name).ToArray();
+    return new { Before = before, Game.IsPlaying,
+        SourceUnchanged = Editor.SceneEditorSession.Active?.Scene?.Id == before.SceneId && Game.ActiveScene?.Id == before.GameSceneId,
+        Written = written, Renderers = scene.GetAllComponents<ModelRenderer>().Count(), ErrorModels = missing,
+        Lights = scene.GetAllComponents<PointLight>().Count(), Probes = scene.GetAllComponents<EnvmapProbe>().Count(), MarkedTextures = marked, Hidden = hidden };
+} catch (Exception error) {
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination, "capture-error.txt"), error.ToString());
+    throw;
+} finally { scene.Destroy(); }

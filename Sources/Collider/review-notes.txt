@@ -1,0 +1,41 @@
+Collider - reviewed native-v2 build, 2026-10-15
+
+The saved map follows the blue accelerator laboratory reference: a two-level
+research hall, glazed accelerator chamber, control rooms and red access doors.
+The current geometry adds open metal stairs, bevelled railings and cases,
+service-room windows, suspended cable trays, pipes, flanges and valves.
+
+All 68 authored positions passed native floor support, player-box clearance and
+complete navigation paths. All four stair routes passed, including clearance
+beneath their high ends. The current local TDM check selected the player's
+camera and observed eight of nine bots moving during its four-second sample.
+
+A separate game process joined the host. Both processes loaded the same four
+Collider models and materials, two distinct player pawns with correct ownership
+and their local player cameras. A controlled host-pawn teleport of about 100
+units appeared in both before/after snapshots. This validates position
+replication; it is not a keyboard traversal or Internet latency test.
+The owned client was closed and all temporary test settings restored.
+
+The saved lighting uses the accepted v4 two-pass indirect bake (2205 probes)
+and four v3 static reflection cubes. Eleven practical lights have wider floor
+coverage. Eight native editor views plus live host/client captures are under
+output/collider/captures; the map-picker image matches the current art view.
+The rejected v3 indirect bake remains historical and must not be adopted.
+Use serial probe relocation and the ordinary camera/sky-compiler reflection
+workflow; the default parallel relocation and GPU GGX bake are unstable here.
+
+Short editor-hosted performance samples averaged 12.85 ms (77.8 FPS) and
+14.05 ms (71.2 FPS in the lower hall). The raw report retains startup/GC hitches
+and the missed 90 FPS target. These samples are not a full-match benchmark.
+
+Build with: rtk python Tools/collider_package_native.py
+output/collider/current-build.json points to the current archive. The packager
+checks saved/staged asset identity, evidence freshness, seven lighting textures,
+archive CRC and every packaged file's SHA256. Older detail-v2-review, native-v1
+and offline-v2 archives are historical; their pending-review notes are obsolete.
+
+This is an overlay for the existing hc1 repository, relying on its shared
+materials, prefabs, helpers and gameplay code. GameUtils.cs already registers
+Collider and is intentionally excluded. When the editor is open, use the
+native import scripts; never overwrite an open scene from the filesystem.

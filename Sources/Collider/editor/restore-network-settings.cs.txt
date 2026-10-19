@@ -1,0 +1,22 @@
+if(Game.IsPlaying || Networking.IsActive) throw new InvalidOperationException("Stop the test before restoring settings");
+var statePath=System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/collider/network-test-state.json");
+var previous=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(statePath));
+var path=previous["Mode"]?.GetValue<string>();
+var mode=string.IsNullOrWhiteSpace(path)?null:GameObject.GetPrefab(path)?.GetComponent<Facepunch.GameMode>();
+if(!string.IsNullOrWhiteSpace(path) && !mode.IsValid()) throw new InvalidOperationException("Previous mode is unavailable: "+path);
+Facepunch.DevCommands.NoDamage=previous["NoDamage"].GetValue<bool>();
+Facepunch.GameMode.SetCurrent(mode);
+Facepunch.GameMode.SetHardcore(previous["Hardcore"].GetValue<bool>());
+if(previous["Ranked"].GetValue<bool>())Facepunch.GameMode.PrepareRankedMatch();
+var custom=previous["Custom"];
+if(custom is null) Facepunch.CustomGameSettings.Reset();
+else Facepunch.CustomGameSettings.Configure(custom["PlayerLimit"].GetValue<int>(),custom["FillWithBots"].GetValue<bool>(),
+    Enum.Parse<Sandbox.Network.LobbyPrivacy>(previous["CustomPrivacy"].GetValue<string>()),
+    System.Text.Json.JsonSerializer.Deserialize<Facepunch.CustomGameRules>(custom["Rules"].ToJsonString()),
+    Enum.Parse<Facepunch.LobbyInput>(previous["CustomInput"].GetValue<string>()));
+Editor.EditorUtility.Network.HostPrivacy=Enum.Parse<Sandbox.Network.LobbyPrivacy>(previous["Privacy"].GetValue<string>());
+Editor.EditorPreferences.NewInstanceCommandLineArgs=previous["InstanceArguments"]?.GetValue<string>();
+previous["RestoredAt"]=DateTime.UtcNow.ToString("O");
+System.IO.File.WriteAllText(statePath,previous.ToJsonString());
+return new {Facepunch.DevCommands.NoDamage,Facepunch.GameMode.ActiveIdent,Facepunch.GameMode.ActiveHardcore,Facepunch.GameMode.ActiveRanked,
+    Privacy=Editor.EditorUtility.Network.HostPrivacy.ToString(),InstanceArgumentsRestored=true};

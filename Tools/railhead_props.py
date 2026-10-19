@@ -5159,7 +5159,7 @@ def van( model, e, n, along="+n", paint="rw_car_white", z0=0.0, plate=None ):
     F.collide( model, -VAN_W + 1.0, VAN_W - 1.0, -L, -52.0, 47.6, 92.7, "metal" )
 
 
-def bollard( model, e, n, z0=0.0, kind="steel" ):
+def bollard( model, e, n, z0=0.0, kind="steel", illuminated=False ):
     """ A bollard: "steel" (102 mm tube, 1 m tall, anthracite with a white reflective band and a domed cap) or
     "concrete" (400 mm round, 700 mm tall, chamfered). Collision to its top. """
     if kind == "concrete":
@@ -5171,7 +5171,7 @@ def bollard( model, e, n, z0=0.0, kind="steel" ):
     # Smooth-shaded continuous tube, with the reflective band at the same height.
     # A shallow rounded shoulder and a solid top close the hollow-looking end.
     sides = 32
-    for za, zb, paint in ( ( -0.7, 31.5, DARK ), ( 31.5, 34.5, "rw_white_paint" ), ( 34.5, 38.2, DARK ) ):
+    for za, zb, paint in ( ( -0.7, 31.5, DARK ), ( 31.5, 34.5, "lt_bollard_diffuser" if illuminated else "rw_white_paint" ), ( 34.5, 38.2, DARK ) ):
         rod( model, ( e, n, z0 + za ), ( e, n, z0 + zb ), 2.0, paint, sides=sides )
     for za, zb, ra, rb in ( ( 38.2, 38.65, 2.0, 1.88 ), ( 38.65, 39.0, 1.88, 1.58 ),
                             ( 39.0, 39.28, 1.58, 1.12 ), ( 39.28, 39.4, 1.12, 0.58 ) ):
