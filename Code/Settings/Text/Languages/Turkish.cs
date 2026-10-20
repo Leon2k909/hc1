@@ -585,6 +585,9 @@ public static partial class GameText
 		["Affected"] = "Bağlı",
 		["Independent"] = "Bağımsız",
 		["Third Person Field Of View"] = "Üçüncü şahıs görüş alanı",
+		["Weapon Distance"] = "Silah mesafesi",
+		["Weapon Horizontal Position"] = "Silahın yatay konumu",
+		["Weapon Vertical Position"] = "Silahın dikey konumu",
 		["Picture-In-Picture Scopes"] = "Dürbünlerde resim içinde resim",
 		["s&box Settings"] = "s&box ayarları",
 		["Resolution, window mode and graphics quality are set in s&box itself and apply to every game."] =

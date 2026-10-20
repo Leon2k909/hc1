@@ -1307,6 +1307,9 @@ public static partial class GameText
 		["Affected"] = "Influenzato",
 		["Independent"] = "Indipendente",
 		["Third Person Field Of View"] = "Campo visivo in terza persona",
+		["Weapon Distance"] = "Distanza dell'arma",
+		["Weapon Horizontal Position"] = "Posizione orizzontale dell'arma",
+		["Weapon Vertical Position"] = "Posizione verticale dell'arma",
 		["Picture-In-Picture Scopes"] = "Ottiche picture-in-picture",
 		["s&box Settings"] = "Impostazioni di s&box",
 		["Resolution, window mode and graphics quality are set in s&box itself and apply to every game."] =

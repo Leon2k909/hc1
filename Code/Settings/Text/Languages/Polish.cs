@@ -1302,6 +1302,9 @@ public static partial class GameText
 		["Affected"] = "Zależne",
 		["Independent"] = "Niezależne",
 		["Third Person Field Of View"] = "Pole widzenia w trzeciej osobie",
+		["Weapon Distance"] = "Odległość broni",
+		["Weapon Horizontal Position"] = "Pozycja broni w poziomie",
+		["Weapon Vertical Position"] = "Pozycja broni w pionie",
 		["Picture-In-Picture Scopes"] = "Lunety z obrazem w obrazie",
 		["s&box Settings"] = "Ustawienia s&box",
 		["Resolution, window mode and graphics quality are set in s&box itself and apply to every game."] =

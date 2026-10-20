@@ -9,6 +9,8 @@ public sealed class CrosshairInputSystem : GameObjectSystem<CrosshairInputSystem
 
 	void Tick()
 	{
+		// The hitmarker is drawn with the frame's flash, then the flash runs down.
+		HitmarkerPainter.Draw( Scene );
 		CrosshairManager.Tick();
 	}
 }

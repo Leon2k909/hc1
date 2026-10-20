@@ -96,6 +96,21 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 	/// <summary> Where the gun goes in a slide, in the view's space: a little back, in and down. It doesn't tilt. </summary>
 	private static readonly Vector3 SlidePosition = new( -1.5f, 1f, -1.5f );
 
+	/// <summary>
+	/// The player's Weapon Distance, Horizontal and Vertical Position settings, in the view's space (forward, left, up),
+	/// faded out by how far the sights are up (<paramref name="aimWeight"/>, 0 at the hip, 1 aimed), so aiming is where
+	/// it always was.
+	/// </summary>
+	public static Vector3 HipOffset( float aimWeight )
+	{
+		var settings = GameSettingsSystem.Current;
+		if ( settings is null )
+			return Vector3.Zero;
+
+		var offset = new Vector3( settings.WeaponDistance, -settings.WeaponSidePosition, settings.WeaponHeightPosition );
+		return offset * (1f - aimWeight.Clamp( 0f, 1f ));
+	}
+
 	void ICameraSetup.Setup( CameraComponent cc )
 	{
 		if ( !Owner.IsValid() || !Owner.CharacterController.IsValid() )
@@ -265,6 +280,9 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 		var slide = Owner.IsValid() ? Owner.SlideBlend * (1f - _aimProgress) : 0f;
 		if ( slide > 0f )
 			targetPositionOffset += SlidePosition * slide;
+
+		// The player's own place for the gun at the hip (Settings → Video), gone once the sights are up.
+		targetPositionOffset += HipOffset( _aimProgress * _aimProgress * (3f - 2f * _aimProgress) );
 
 		// Smoothly interpolate position and rotation
 		lerpedPositionOffset = lerpedPositionOffset.LerpTo( targetPositionOffset, Time.Delta * 10f );

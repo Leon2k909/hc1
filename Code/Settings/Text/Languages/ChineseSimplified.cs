@@ -574,6 +574,9 @@ public static partial class GameText
 		["Affected"] = "受影响",
 		["Independent"] = "独立",
 		["Third Person Field Of View"] = "第三人称视野",
+		["Weapon Distance"] = "武器距离",
+		["Weapon Horizontal Position"] = "武器水平位置",
+		["Weapon Vertical Position"] = "武器垂直位置",
 		["Picture-In-Picture Scopes"] = "画中画瞄准镜",
 		["s&box Settings"] = "s&box设置",
 		["Resolution, window mode and graphics quality are set in s&box itself and apply to every game."] =

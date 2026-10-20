@@ -119,6 +119,18 @@ public class GameSettings
 	public float ThirdPersonFieldOfView { get => thirdPersonFov > 0f ? thirdPersonFov : 85f; set => thirdPersonFov = value; }
 	private float thirdPersonFov;
 
+	// Where the first-person gun sits at the hip, in inches from where its animations hold it (ViewModel.HipOffset). They
+	// fade out as the sights come up, so aiming lines up as it always did. 0 is the default, which is also what a
+	// settings file or a hotloaded settings object from before them has.
+	[Title( "Weapon Distance" ), Description( "Brings the gun at your hip closer to you (lower) or further away (higher). Aiming down the sights isn't affected." ), Group( "Video" ), Icon( "open_in_full" ), Range( -4, 4, 0.25f )]
+	public float WeaponDistance { get; set; }
+
+	[Title( "Weapon Horizontal Position" ), Description( "Moves the gun at your hip left (lower) or right (higher). Aiming down the sights isn't affected." ), Group( "Video" ), Icon( "swap_horiz" ), Range( -3, 3, 0.25f )]
+	public float WeaponSidePosition { get; set; }
+
+	[Title( "Weapon Vertical Position" ), Description( "Moves the gun at your hip down (lower) or up (higher). Aiming down the sights isn't affected." ), Group( "Video" ), Icon( "swap_vert" ), Range( -3, 3, 0.25f )]
+	public float WeaponHeightPosition { get; set; }
+
 	[Title( "Picture-In-Picture Scopes" ), Description( "Render live 3D scope lenses. Turn this off if scoped weapons cause render artifacts or performance issues." ), Group( "Video" ), Icon( "center_focus_strong" )]
 	public bool PictureInPictureScopes { get; set; } = true;
 

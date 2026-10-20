@@ -57,36 +57,7 @@
     </div>
 }
 
-@if ( CrosshairManager.HitFlash > 0 && cfg.HitStyle != "none" )
-{
-    var hrgb = HexToRgb( cfg.HitColor );
-    var hcol = $"rgba({hrgb.r},{hrgb.g},{hrgb.b},{cfg.HitAlpha.ToString( "F2", System.Globalization.CultureInfo.InvariantCulture )})";
-    var hout = cfg.HitOutline ? $"0 0 0 {cfg.HitOutlineThickness}px rgba(0,0,0,{cfg.HitOutlineAlpha.ToString( "F2", System.Globalization.CultureInfo.InvariantCulture )})" : "none";
-    var hsz = cfg.HitSize;
-    var hth = cfg.HitThickness;
-
-    @if ( cfg.HitStyle == "x" )
-    {
-        <div class="hit-marker x" style="width:@(hsz)px;height:@(hsz)px;animation-duration:@(cfg.HitDuration)ms;">
-            <div style="position:absolute;left:50%;top:50%;width:@(hth)px;height:@(hsz)px;background-color:@hcol;box-shadow:@hout;transform-origin:center;transform:translate(-50%,-50%) rotate(45deg);"></div>
-            <div style="position:absolute;left:50%;top:50%;width:@(hth)px;height:@(hsz)px;background-color:@hcol;box-shadow:@hout;transform-origin:center;transform:translate(-50%,-50%) rotate(-45deg);"></div>
-        </div>
-    }
-    else if ( cfg.HitStyle == "ring" )
-    {
-        <div class="hit-marker ring" style="width:@(hsz)px;height:@(hsz)px;border:@(hth)px solid @hcol;box-shadow:@hout;animation-duration:@(cfg.HitDuration)ms;"></div>
-    }
-    else if ( cfg.HitStyle == "dot" )
-    {
-        var dsz = hsz / 3;
-        <div class="hit-marker dot" style="width:@(dsz)px;height:@(dsz)px;background-color:@hcol;box-shadow:@hout;animation-duration:@(cfg.HitDuration)ms;"></div>
-    }
-    else if ( cfg.HitStyle == "diamond" )
-    {
-        var dsz = hsz / 2;
-        <div class="hit-marker" style="width:@(dsz)px;height:@(dsz)px;background-color:@hcol;box-shadow:@hout;transform:translate(-50%,-50%) rotate(45deg);animation-duration:@(cfg.HitDuration)ms;"></div>
-    }
-}
+@* The hitmarker is drawn with the crosshair's own painter, on its exact centre: HitmarkerPainter. *@
 
 @code
 {
@@ -141,7 +112,6 @@
         h.Add( c.HitOutline );
         h.Add( c.HitOutlineThickness );
         h.Add( c.HitOutlineAlpha );
-        h.Add( CrosshairManager.HitFlash > 0 );
         h.Add( IsAimingDownSights() );
         return h.ToHashCode();
     }

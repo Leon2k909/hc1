@@ -1914,6 +1914,33 @@
 - Aim sensitivity doesn't follow the zoom: irons aren't scaled at all (`ManualOffset` only divides `AimDampening` by
   a magnified optic's power). So at a high Field Of View, Independent irons feel faster than Affected ones.
 - Compiled with dotnet and hotloaded into the user's match (2026-10-08). Not yet checked in-game.
+- Weapon position (2026-10-20, the user: the gun sat "further away from my screen", and they wanted it in settings):
+  Weapon Distance (-4 to 4), Weapon Horizontal Position and Weapon Vertical Position (-3 to 3), in inches from where
+  the gun's animations hold it at the hip (`GameSettings.WeaponDistance`, `WeaponSidePosition`, `WeaponHeightPosition`;
+  0 is the default and what an old settings file reads as).
+  - `ViewModel.HipOffset` adds them in the view's space in `ApplyOffsets`, faded out by the eased `ironsights_weight`,
+    so aiming down the sights lines up exactly as before. It moves the arms and clothing with the gun.
+  - Theater's first-person gun (`TheaterViewModel`) doesn't take them yet.
+  - What had made the gun look further away wasn't found: no hip pose, viewmodel or camera change since 2026-10-15
+    moves it. A wider Field Of View shrinks it, since the viewmodel draws with the main camera's.
+  - Built with dotnet and compiled in the editor, not yet seen in a match.
+
+## Hitmarker (`HitmarkerPainter`, Settings → Crosshair's hit marker)
+- The user (2026-10-20): the kill hitmarker "isnt fully centered". It was a UI panel in `CrosshairHud`, while the HC1
+  crosshair is drawn with the camera's HUD painter at `Screen.Size * 0.5`. UI layout snaps to whole pixels, so on an odd
+  width (the editor's game view was 1905 px, centre 952.5) the two could sit a pixel apart.
+- Now `CrosshairInputSystem` (Stage.FinishUpdate) calls `HitmarkerPainter.Draw` on the main camera's HUD painter every
+  frame, at the crosshair's own centre and scale (`Screen.Height / 1080`), with the old CSS animation (in from 0.6x over
+  30%, out to 1.2x, ease-out). Same style, colour, alpha, size, thickness, outline and duration settings.
+  - The X and the diamond are `DrawLine`s, as the crosshair's arms are. `DrawRect` (and `DrawCircle`) snap their rect
+    to whole pixels, so the ring and the dot are sized to a whole number of pixels whose corner already lands on one
+    (`Aligned`).
+  - The diamond is a turned square now: the panel's animation replaced its `rotate(45deg)`, so it had shown as a square.
+  - Hidden as the panel was: HUD off, a team's win banner, the recon drone's feed. It also draws in the firing range
+    and the main menu (the settings' Preview Hit), which have a camera but no `Crosshair` component.
+- Checked offscreen in the editor (`HitmarkerPainter.Paint` into a throwaway scene's camera, beside crosshair-style
+  lines): every style's centroid within 0.001 px of the cross's centre, round a whole pixel and between pixels. Not yet
+  seen in a match.
 
 ## Quitting (`QuitPrompt`): a game can't close s&box
 - Escape on the main menu (`MainMenuRoot.HandleEscape`) closes one thing at a time: the language list, the bug report,
