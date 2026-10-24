@@ -918,6 +918,38 @@ def downpipe( m, e, n, z_top, out ):
         m.oriented_box( np.array( ( e, n, zz ) ) + o * 2.0, ( side, o, up ), ( 6.0, 4.0, 1.0 ), "cbf_track" )
 
 
+# Sheffield stands: one 48.3 mm stainless tube bent into an inverted U, 700 mm long between its legs' centre lines and
+# 800 mm tall, its two top bends on a 150 mm radius, root-fixed (its legs set into core-drilled holes in the paving).
+# A metre apart. Base plates were tried: the paving's relief (cerroblanco_stone.shader) buries anything within about
+# 0.4 of the ground, so a real 8 mm plate showed only as a sliver of rim.
+STAND_R = 0.95
+STAND_LENGTH = 27.6
+STAND_HEIGHT = 31.5
+STAND_BEND = 5.9
+STAND_PITCH = 39.4
+
+
+def bike_stand( m, e, n ):
+    """ A Sheffield stand at e, running along n and centred on n: the tube swept in one piece (P.sweep, 16 sides, shaded
+    smooth) from just under the paving up a leg, over the two bends and down the other. Drawn only. It was ten
+    separate six-sided bars, which showed a seam at every bend. """
+    r, half, bend = STAND_R, STAND_LENGTH / 2, STAND_BEND
+    top = STAND_HEIGHT - r
+    # ( n, z ) along the tube's centre line and the tangent there.
+    path = [ ( ( n - half, -0.5 ), ( 0.0, 1.0 ) ) ]
+    for k in range( 13 ):
+        a = math.pi - math.pi / 2 * k / 12            # the near bend, from the leg's top round to the top rail
+        path.append( ( ( n - half + bend + bend * math.cos( a ), top - bend + bend * math.sin( a ) ), ( math.sin( a ), -math.cos( a ) ) ) )
+    for k in range( 13 ):
+        a = math.pi / 2 - math.pi / 2 * k / 12        # the far bend, from the top rail round and down the other leg
+        path.append( ( ( n + half - bend + bend * math.cos( a ), top - bend + bend * math.sin( a ) ), ( math.sin( a ), -math.cos( a ) ) ) )
+    path.append( ( ( n + half, -0.5 ), ( 0.0, -1.0 ) ) )
+    side = np.array( ( 1.0, 0.0, 0.0 ) )
+    frames = [ ( np.array( ( e, pn, pz ) ), side, np.array( ( 0.0, -tz, tn ) ), ( r, r ) ) for ( pn, pz ), ( tn, tz ) in path ]
+    profile = [ ( math.cos( 2 * math.pi * k / 16 ), math.sin( 2 * math.pi * k / 16 ) ) for k in range( 16 ) ]
+    P.sweep( m, P.STEEL, frames, profile )
+
+
 def flagpole( m, solid, e, n, k, height=360.0 ):
     """ A flagpole on a honed base with its gilt finial, flying one of the museum's shows as a vertical banner flag
     (cb_banner_k, the façade banners' art) from an outrigger arm at its top, in soft folds in the still air. The flag
@@ -1015,13 +1047,9 @@ def exterior( fine, solid, layout, C, log, rooms_list, stats, spots, aabbs ):
                           ( 483.0, -1100.0, C.SG_ROOF, ( 1, 0 ) ) ):
         downpipe( fine, e, n, z, out )
         stats["downpipes"] += 1
-    # Bike hoops on the forecourt by the car park, and the three flags.
+    # Bike stands on the forecourt by the car park (the row ends at e 1040, short of the kerb), and the three flags.
     for k in range( 6 ):
-        e, n = 880.0 + 32 * k, 1640.0
-        pts = [ ( e, n, 0.0 ) ] + [ ( e, n + 9 - 9 * math.cos( math.pi * j / 8 ), 26 + 9 * math.sin( math.pi * j / 8 ) ) for j in range( 9 ) ] + \
-              [ ( e, n + 18, 0.0 ) ]
-        for a, b in zip( pts, pts[1:] ):
-            P.rod( fine, a, b, 1.0, P.STEEL, sides=6 )
+        bike_stand( fine, 1040.0 - STAND_PITCH * ( 5 - k ), 1649.0 )
     for k, e in enumerate( ( 420.0, 500.0, 580.0 ) ):
         flagpole( fine, solid, e, 2330.0, k )
     stats["flags"] = 3

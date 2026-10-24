@@ -5444,7 +5444,14 @@ simulate_input.
       - wall lights by the doors, the façade lettering, and blinds behind half the upper windows;
       - wayfinding totems, agaves in pots and pole lights on the promenade (with collision);
       - cameras, downpipes and the roofs' plant;
-      - bike hoops and three flags on the forecourt.
+      - bike stands and three flags on the forecourt.
+    - The bike stands (`bike_stand`, 2026-10-25; the user saw seams at every bend) are Sheffield stands at their real
+      size: one 48 mm stainless tube swept in a piece (`P.sweep`), 700 mm long and 800 mm tall with 150 mm bends,
+      root-fixed into the paving, a metre apart in a row ending at e 1040. They were ten six-sided bars each, 18 wide.
+      Base plates were tried: the paving's relief (`cerroblanco_stone.shader`) buries anything within about 0.4 of
+      the ground, so plates showed only as slivers. Drawn only, as before. Published by splicing just their faces into
+      the installed `cerroblanco_fitout_fine.obj` (`output/cerroblanco/bike-stands-20261025/stage_stands.py`), and
+      checked in offscreen editor renders there, not yet in a match.
     - Two models: `cerroblanco_fitout` (with collision) and `cerroblanco_fitout_fine` (drawn only).
     - The façade banners (`banners()`) are drawn in the fine model. The glass install (`cerroblanco_glass.install`)
       had rebuilt the buildings' model without them. The quality pass overrides the buildings' materials by slot, so
