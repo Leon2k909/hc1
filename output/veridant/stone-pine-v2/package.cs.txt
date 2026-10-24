@@ -1,0 +1,3 @@
+var asset=Editor.AssetSystem.FindByPath("models/sbox_props/shrubs/pine/pine_shrub_wide.vmdl");
+var package=asset.Package;
+return new {Package=package.ToString(),Properties=package.GetType().GetProperties().Where(p=>p.CanRead && p.GetIndexParameters().Length==0 && (p.PropertyType==typeof(string)||p.PropertyType==typeof(int)||p.PropertyType==typeof(long))).ToDictionary(p=>p.Name,p=>p.GetValue(package)?.ToString())};

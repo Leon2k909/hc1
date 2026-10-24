@@ -1,0 +1,6 @@
+var model = Model.Load("models/sbox_props/shrubs/pine/pine_shrub_wide.vmdl");
+return new { model.IsError, Bounds=model.Bounds.ToString(), model.MeshCount,
+    Materials=model.Materials.Select(m=>new{m.ResourcePath,m.IsError}).ToArray(),
+    MeshMethods=typeof(Model).GetMethods().Where(m=>m.Name.Contains("Mesh")||m.Name.Contains("Vert")||m.Name.Contains("Indice")).Select(m=>m.ToString()).ToArray(),
+    Vertices=model.GetVertices().Length,Indices=model.GetIndices().Length,
+    Source=Editor.SceneEditorSession.Active.Scene.Source?.ResourcePath };

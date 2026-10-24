@@ -1,0 +1,25 @@
+var root=Sandbox.Project.Current.GetRootPath();
+if(!string.Equals(System.IO.Path.GetFullPath(root).TrimEnd('\\','/'),@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Wrong project.");
+var folder=System.IO.Path.Combine(root,"output/veridant/soil-v1");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"manifest.json")));
+var relative=manifest["target"].GetValue<string>();
+if(relative!="Assets/materials/veridant/vr_soil.vmat")throw new InvalidOperationException("Unexpected target.");
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var session=Editor.SceneEditorSession.Active;var playing=Game.IsPlaying;var game=Game.ActiveScene?.Id;var dirty=session.HasUnsavedChanges;
+var scenePath=System.IO.Path.Combine(root,"Assets/scenes/maps/Veridant/veridant.scene");var sceneHash=Hash(scenePath);
+var target=System.IO.Path.Combine(root,relative);var source=System.IO.Path.Combine(root,manifest["source"].GetValue<string>());
+var before=manifest["before"].GetValue<string>();var after=manifest["after"].GetValue<string>();
+if(Hash(source)!=after)throw new InvalidOperationException("Stage changed.");
+if(Hash(target)!=before&&Hash(target)!=after)throw new InvalidOperationException("Soil material changed since staging.");
+if(Hash(target)!=after)
+{
+    var incoming=target+".brown-soil-incoming";
+    try{System.IO.File.Copy(source,incoming,true);if(Hash(incoming)!=after)throw new InvalidOperationException("Incoming checksum differs.");System.IO.File.Move(incoming,target,true);}
+    finally{if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+    Editor.AssetSystem.RegisterFile(target);
+}
+var preserved=ReferenceEquals(session,Editor.SceneEditorSession.Active)&&playing==Game.IsPlaying&&game==Game.ActiveScene?.Id&&dirty==session.HasUnsavedChanges&&Hash(scenePath)==sceneHash;
+var result=new{Material=relative,Imported=Hash(target)==after,EditorStatePreserved=preserved,SceneUnchanged=true};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"native-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved)throw new InvalidOperationException("Editor state changed during the import; inspect it.");
+return result;

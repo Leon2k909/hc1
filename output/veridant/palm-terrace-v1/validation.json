@@ -1,0 +1,105 @@
+{
+  "geometry_coverage": {
+    "trunks": {
+      "expected_faces": 19920,
+      "missing_faces": 0
+    },
+    "pits": {
+      "expected_faces": 2480,
+      "missing_faces": 0
+    }
+  },
+  "removed_tree_geometry_absent": true,
+  "removed_colliders_absent": true,
+  "collision_traces": {
+    "-240": {
+      "Hit": false,
+      "StartedSolid": false,
+      "EndPosition": "-240,960,60",
+      "Normal": "0,0,0",
+      "Fraction": 1,
+      "Distance": 120,
+      "GameObject": null,
+      "Component": null
+    },
+    "180": {
+      "Hit": false,
+      "StartedSolid": false,
+      "EndPosition": "180,960,60",
+      "Normal": "0,0,0",
+      "Fraction": 1,
+      "Distance": 120,
+      "GameObject": null,
+      "Component": null
+    },
+    "-660": {
+      "Hit": true,
+      "StartedSolid": false,
+      "EndPosition": "-660,888,60",
+      "Normal": "0,-1,0",
+      "Fraction": 0.4,
+      "Distance": 48,
+      "GameObject": {
+        "Id": "de1d400f-5d38-5f53-a1fe-45181b74a699",
+        "Name": "Dressing"
+      },
+      "Component": "ModelCollider"
+    }
+  },
+  "native": {
+    "Models": [
+      {
+        "Path": "models/maps/veridant/veridant_foliage.vmdl",
+        "IsError": false,
+        "Vertices": 60881
+      },
+      {
+        "Path": "models/maps/veridant/veridant_dress.vmdl",
+        "IsError": false,
+        "Vertices": 215320
+      },
+      {
+        "Path": "models/maps/veridant/veridant_palm_pits.vmdl",
+        "IsError": false,
+        "Vertices": 5279
+      }
+    ],
+    "Materials": [
+      {
+        "Path": "materials/veridant/vr_palm_bark.vmat",
+        "IsError": false,
+        "ColorWidth": 1024,
+        "ColorHeight": 1024
+      },
+      {
+        "Path": "materials/veridant/vr_palm_mulch.vmat",
+        "IsError": false,
+        "ColorWidth": 1024,
+        "ColorHeight": 1024
+      }
+    ],
+    "ActiveScene": "scenes/maps/veridant/veridant.scene",
+    "IsPlaying": false,
+    "SceneHasUnsavedChanges": false,
+    "PlantingInstances": 1
+  },
+  "generator": {
+    "retained_palm_placements_exact": 15,
+    "removed_seeds": [
+      202,
+      203
+    ],
+    "separate_pit_triangles": 2480,
+    "pit_collision_shapes": 0,
+    "pit_geometry_in_dressing": false,
+    "scene_generation_retains_separate_pits": true
+  },
+  "map_checks": {
+    "spots_checked": 97,
+    "spot_problems": 0,
+    "unreachable_spots": 0,
+    "retakes_sight_pairs": 0
+  },
+  "scene_change": "One render-only Palm planting surrounds object under Veridant; saved through native save_scene",
+  "captures": "output/veridant/palm-terrace-v1/captures/final"
+}

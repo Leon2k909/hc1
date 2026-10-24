@@ -1,0 +1,13 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var work=System.IO.Path.Combine(root,"output/veridant/stone-pine-v2/stage");
+var destination=System.IO.Path.Combine(root,"Assets/models/maps/veridant/stone-pine-v2");
+foreach(var extension in new[]{"obj","mtl","vmdl"}) {
+    var name="veridant_foliage_preview."+extension;
+    System.IO.File.Copy(System.IO.Path.Combine(work,name),System.IO.Path.Combine(destination,name),true);
+    Editor.AssetSystem.RegisterFile(System.IO.Path.Combine(destination,name));
+}
+var obj=System.IO.File.ReadAllText(System.IO.Path.Combine(work,"new-tree.obj")).Replace("mtllib new-tree.mtl","mtllib veridant_stone_pine.mtl");
+System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"veridant_stone_pine.obj"),obj);
+Editor.AssetSystem.RegisterFile(System.IO.Path.Combine(destination,"veridant_stone_pine.obj"));
+var package=Editor.AssetSystem.FindByPath("models/sbox_props/shrubs/pine/pine_shrub_wide.vmdl").Package;
+return new{UpdatedPreview=true,package.FullIdent,Revision=package.Revision?.VersionId};

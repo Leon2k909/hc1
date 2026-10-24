@@ -1,0 +1,16 @@
+var path = "models/sbox_props/shrubs/pine/pine_shrub_wide.vmdl";
+var model = Model.Load(path);
+if (model is null || model.IsError || model.Materials.Length != 1 || model.Materials[0].IsError)
+    throw new InvalidOperationException("Expected the installed single-material mountain-pine source.");
+var vertices = model.GetVertices();
+var indices = model.GetIndices();
+if (indices.Any(i=>i>=vertices.Length)) throw new InvalidOperationException("Mesh indices are outside the exported vertices.");
+var destination = System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"Sources/Veridant/stone-pine-v2/pine-cluster.json");
+System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(destination));
+var record = new { SourceModel=path, SourcePackage="facepunch.pine_shrub_wide", Material=model.Materials[0].ResourcePath,
+    Vertices=vertices.Select(v=>new {Position=new[]{v.Position.x,v.Position.y,v.Position.z},
+        Normal=new[]{v.Normal.x,v.Normal.y,v.Normal.z},UV=new[]{v.TexCoord0.x,v.TexCoord0.y}}).ToArray(),
+    Indices=indices };
+System.IO.File.WriteAllText(destination,System.Text.Json.JsonSerializer.Serialize(record));
+return new { Destination=destination,Vertices=vertices.Length,Triangles=indices.Length/3,
+    Material=model.Materials[0].ResourcePath,AssetProperties=typeof(Editor.Asset).GetProperties().Where(p=>p.Name.Contains("Package")).Select(p=>p.Name).ToArray() };
